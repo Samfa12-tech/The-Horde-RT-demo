@@ -6,9 +6,9 @@ import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.ScrollView;
 
-import androidx.appcompat.app.AppCompatActivity;
+import android.app.Activity;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
     private static final String REPORT_DIRECTORY = "reports";
     private static final String TEXT_REPORT_FILE = "vulkan_capability_report.txt";
     private static final String JSON_REPORT_FILE = "vulkan_capability_report.json";

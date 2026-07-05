@@ -36,4 +36,12 @@ This task is the first executable Vulkan hardware RT proof and is gated by real 
 
 ## Next smallest task
 
-Start Phase 1A by adding the minimal Vulkan RT shader/toolchain and pipeline skeleton for a tiny hardware RT scene, guarded by the existing RT capability result.
+Next smallest task:
+
+- Start Phase 1B by adding the first tiny hardware RT render path on Android using `RayTracingPipeline`, with no fake fallback.
+
+Latest verification status:
+
+- Device: `SM-S948B` (`samsung`)
+- RT result: `RayTracingPipeline`
+- Report files in app private `files/reports` were read successfully from `com.samfa12.hordelanternrt` on-device.
