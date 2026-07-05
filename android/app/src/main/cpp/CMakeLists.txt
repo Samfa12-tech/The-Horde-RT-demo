@@ -9,6 +9,7 @@ add_library(horde_rt_probe_android
     ../../../../../src/vulkan/RtCapabilityReport.cpp
     ../../../../../src/vulkan/VulkanContext.cpp
     ../../../../../src/vulkan/raytracing/RayTracingRequirements.cpp
+    ../../../../../src/ui/DiagnosticOverlay.cpp
 )
 
 target_include_directories(horde_rt_probe_android PRIVATE
