@@ -2,7 +2,7 @@
 
 ## Phase 0C target
 
-Phase 0C adds the native diagnostic window shell on Windows and keeps the Android TextView-based probe UI.
+Phase 0C adds the native diagnostic window shell on Windows and keeps the Android native Vulkan diagnostic surface plus overlay text UI.
 
 ## Windows checks
 
@@ -75,7 +75,7 @@ features:
 
 ## Verification expectations
 
-- The on-screen output must show the required diagnostic fields from the probe report.
+- The on-screen output must show the required diagnostic fields from the probe report and the native Vulkan diagnostic surface should present a colour matching RT mode.
 - Unsupported hardware must still show `RT mode: Unsupported` and clear missing extension/feature lines.
 - For RayTracingPipeline-capable hardware, the report now also includes a tiny RT scene skeleton status line (`RT scene status`) indicating whether the native RT setup path was built and validated.
 - The probe must write both reports under `files/reports` in app private storage and `reports/` on desktop paths.

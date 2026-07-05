@@ -10,4 +10,7 @@ public final class ProbeBridge {
     public static native String getTextReport();
     public static native String getJsonReport();
     public static native boolean writeReports(String baseDirectory);
+
+    public static native boolean startDiagnosticSurface(android.view.Surface surface, String baseDirectory);
+    public static native void stopDiagnosticSurface();
 }

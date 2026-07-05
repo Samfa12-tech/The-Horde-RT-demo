@@ -18,14 +18,13 @@ Windows is the secondary/equal hardware target for this phase.
 ## What is implemented
 
 - Shared probe logic from `src/vulkan/*` and `src/ui/DiagnosticOverlay.cpp`.
-- Win32 diagnostic shell displays probe text in a native window (`horde_rt_diagnostic_window`).
+- Win32 diagnostic shell displays probe text in a native window (`horde_rt_diagnostic_window`), now backed by a Vulkan swapchain surface.
 - Console output remains available from the CLI probe target.
 
 ## What is intentionally not implemented yet
 
-- No Vulkan surface swapchain path yet.
 - No RT scene/scene rendering path yet.
-- No Android rendering overlay through Vulkan on this target yet.
+- No gameplay, fake RT, or non-Vulkan rendering fallback.
 - Gameplay, torch room, audio, fake RT, or shader pipeline.
 
 ## Next task

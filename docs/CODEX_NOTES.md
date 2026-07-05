@@ -11,6 +11,7 @@ This task is the first executable Vulkan hardware RT proof and is gated by real 
 - Android native shell is now a minimal `android/` app shell and should continue using JNI/native C++ probe logic.
 - Add a native Win32 diagnostic window shell (`horde_rt_diagnostic_window`) and share output formatting with UI helpers.
 - Emit both text and JSON reports in `reports/` and `files/reports` on Android.
+- Add Android and Windows native Vulkan swapchain/surface diagnostic presentation while keeping all capability text and report generation shared.
 - Update docs whenever build scope changes.
 
 ## Do not
@@ -23,7 +24,7 @@ This task is the first executable Vulkan hardware RT proof and is gated by real 
 ## Current status notes
 
 - `horde_rt_capability_probe` exists as the first concrete native proof target.
-- Android is wired as a minimal `android/` app shell in prior slices and remains the primary probe path there.
+- Android is wired as a native `android/` app shell with shared probe text overlay plus a native diagnostic surface and remains the primary probe path there.
 - 0C adds `horde_rt_diagnostic_window` using the same probe core and report data.
 - `src/vulkan/raytracing/TinyRtScene.cpp` now performs a native tiny RT device/function skeleton setup before reporting RT scene status.
 
@@ -39,8 +40,8 @@ This task is the first executable Vulkan hardware RT proof and is gated by real 
 
 Next smallest task:
 
-- Extend the tiny RT path into a presentable native dispatch path:
-  - create the minimum Vulkan pipeline/surface flow needed to show on-screen text or simple debug output without fake fallback.
+- Extend the tiny RT path into a presentable native dispatch path in Phase 1B:
+  - create the minimum Vulkan pipeline/surface flow needed for native RT draw dispatch using `RayTracingPipeline`/`RayQuery` support only.
 
 Latest verification status:
 

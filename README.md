@@ -18,10 +18,10 @@ The app must use native Vulkan hardware ray tracing. It must query the actual Vu
 Phase 0A/B/C now includes:
 
 - Windows CLI: `horde_rt_capability_probe`.
-- Android native shell (`android/`) that runs the same probe core and displays diagnostics in-app.
+- Android native shell (`android/`) that runs the same probe core and displays diagnostics in-app via shared text and a native Vulkan surface.
 - Android report persistence to app private storage.
-- Windows native diagnostic window: `horde_rt_diagnostic_window`.
-- Real probe now includes a tiny hardware RT scene skeleton validation path on Android (no presentation yet, no gameplay).
+- Windows native diagnostic window: `horde_rt_diagnostic_window` with native Vulkan swapchain/surface diagnostics.
+- Real probe now includes a tiny hardware RT scene skeleton validation path on Android (no gameplay).
 
 ### Probe feature coverage
 
@@ -109,7 +109,7 @@ Verified on-device run (2026-07-05, Samsung Galaxy S26 Ultra, model `SM-S948B`, 
 ## Planned build targets
 
 - Android native capability shell (`android/` app module).
-- Windows native Vulkan build path (capability probe + later overlay surface).
+- Windows native Vulkan build path (capability probe + diagnostic surface swapchain).
 
 ## First milestone: Phase 0 capability probe
 
@@ -118,7 +118,7 @@ Verified on-device run (2026-07-05, Samsung Galaxy S26 Ultra, model `SM-S948B`, 
 - Unsupported output explicitly explains missing requirements.
 - No fake renderer fallback.
 
-RT rendering is not implemented. This task still validates that the probe can initialise a native RT-capable logical device and RT dispatch skeleton path.
+RT scene rendering is not implemented in this phase. This task now uses native Vulkan diagnostic surfaces on Windows and Android to present the same shared probe result.
 
 ## First milestone report fields
 

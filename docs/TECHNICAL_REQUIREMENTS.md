@@ -6,7 +6,7 @@ This project is **RT or nothing**.
 
 The renderer must use native Vulkan hardware ray tracing. It must not use browser rendering, Godot/Unreal as the first renderer path, Three.js, Babylon.js, WebGPU, raster-only rendering, screen-space reflections, baked lighting, fake RT effects, or compute-only path tracing as a substitute for the core proof.
 
-## Phase 0A + 0B completed scope
+## Phase 0A + 0B + diagnostic surface progress
 
 - Real Vulkan probe now runs on Windows and is reused through Android JNI in the same project.
 - Creates Vulkan instance and enumerates physical devices.
@@ -14,7 +14,7 @@ The renderer must use native Vulkan hardware ray tracing. It must not use browse
 - Queries feature-chain structs through `vkGetPhysicalDeviceFeatures2`.
 - Evaluates `RayTracingPipeline`, `RayQuery`, or `Unsupported`.
 - Uses plain-text and JSON report format.
-- Android shell target can now display and persist the report on-device.
+- Android shell target can now display a native Vulkan diagnostic surface and persist the report on-device.
 
 ## Phase 1B progress
 
@@ -89,11 +89,12 @@ For each physical device, this project now queries and evaluates:
 
 ## Android implementation status
 
-Phase 0B minimal shell is now implemented:
+Phase 0B shell now plus minimal diagnostic surface:
 
 - Android app module under `android/`.
 - JNI bridge uses shared C++ probe code from `src/vulkan/*`.
-- On-screen diagnostic TextView plus persisted text/JSON report.
+- Native diagnostic surface rendering starts from `SurfaceView` with shared text report overlay.
+- On-screen diagnostic TextView remains for detailed probe text.
 - Reports under `files/reports` in app private storage.
 
 ## Unsupported-device behaviour

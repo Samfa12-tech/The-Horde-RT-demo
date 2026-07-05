@@ -23,12 +23,12 @@ Goal: prove the target devices expose the required Vulkan hardware RT support.
 
 - No on-screen Vulkan RT rendering path yet.
 - No swapchain or surface path yet.
-- Android output is plain text only (no Vulkan-surface overlay yet).
-- No desktop/Android Vulkan-surface rendering pipeline yet.
+- Android output now includes Vulkan diagnostic surface plus shared text overlay.
+- Native swapchain/surface pipeline is in place on Windows and Android for diagnostics.
 
 ## Next smallest task
 
-Create a Vulkan swapchain/surface path on both Android and Windows to display diagnostics from a native window while preserving unsupported-device honesty.
+Keep unsupported-device diagnostics unchanged, then start Phase 1B (tiny native RT render path) using shared probe results.
 
 ## Planned milestone sequence
 
