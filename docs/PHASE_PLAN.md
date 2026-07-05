@@ -20,12 +20,12 @@ Goal: prove the target devices expose the required Vulkan hardware RT support.
 
 - No rendering path yet.
 - No swapchain or surface path yet.
-- No Android native screen wiring yet.
+- Android screen output is still minimal (toast), not a long-lived in-app overlay.
 - No on-device overlay yet.
 
 ## Next smallest task
 
-Wire the same Vulkan capability-probe core into an Android native app shell on the Galaxy S26 Ultra, display the report on screen, and write the report to device storage.
+Run the native Android probe on the Galaxy S26 Ultra, confirm `run-as` report extraction, and then upgrade the on-screen diagnostic path from toast to a deterministic in-app overlay.
 
 ## Planned milestone sequence
 

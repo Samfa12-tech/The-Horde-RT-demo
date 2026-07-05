@@ -8,12 +8,13 @@ The renderer must use native Vulkan hardware ray tracing. It must not use browse
 
 ## Phase 0A completed scope
 
-- Real Vulkan probe on Windows:
+- Real Vulkan probe implemented on Windows and wired into Android native shell:
   - creates a Vulkan instance,
   - enumerates physical devices,
   - enumerates required extensions,
   - queries feature chain fields through `vkGetPhysicalDeviceFeatures2`,
   - evaluates `RayTracingPipeline`, `RayQuery`, or `Unsupported`.
+- Adds an Android native activity target that reuses the same core and writes both text/JSON reports.
 - Writes both:
   - `reports/vulkan_capability_report.txt`
   - `reports/vulkan_capability_report.json`
@@ -79,14 +80,17 @@ For each physical device, this project now queries and evaluates:
 
 - Neither mode is fully satisfied by required extensions/features.
 
-## Android requirement for this slice
+## Android native status
 
-Android native integration is **not complete yet**. Use this next smallest task:
+Android native wiring exists in this slice as:
 
-1. Set up an Android CMake/NDK target that links the same `VulkanContext` probe core.
-2. Create a minimal native activity that calls `InitialiseForCapabilityProbe()`.
-3. Reuse the same JSON/text serialization and write reports to app-private storage.
-4. Show the selected RT mode and diagnostics on-screen in a minimal text overlay.
+- CMake Android target `horde_rt_capability_probe_android`.
+- NativeActivity bootstrap that runs the probe and writes:
+  - `files/reports/vulkan_capability_report.txt`
+  - `files/reports/vulkan_capability_report.json`
+- Toast-style diagnostic text from the native side.
+
+Next small task: run and validate this target on the Galaxy S26 Ultra with `adb run-as` report extraction and confirm unsupported-mode diagnostics remain explicit.
 
 ## Unsupported-device behaviour
 

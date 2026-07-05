@@ -7,20 +7,20 @@ This task is the first executable Vulkan hardware RT proof and is gated by real 
 - Keep the repository clean and native-first.
 - Query real Vulkan extensions/features before any RT rendering claims.
 - Keep unsupported devices honest with explicit missing extension/feature diagnostics.
-- Prefer Windows CLI proof, then Android-native shell next.
+- Keep the same core shared between Windows CLI and Android-native probe execution.
 - Emit both text and JSON reports in `reports/`.
 - Update notes whenever build/test scope changes.
 
 ## Do not
 
-- Do not claim Android support is complete without a compiling Android native build.
+- Do not claim Android support is complete without a compiling Android native build and on-device report verification.
 - Do not claim RT works without hardware RT mode selection.
 - Do not add gameplay, fake RT, raster-only renderer, or fallback-only paths before this proof is wired.
 
 ## Current status notes
 
 - `horde_rt_capability_probe` now exists as the first concrete native proof target.
-- Android is documented for next-phase integration; it is not yet complete.
+- Android is now wired as a native activity probe in this phase.
 
 ## Reference hierarchy
 
@@ -32,4 +32,4 @@ This task is the first executable Vulkan hardware RT proof and is gated by real 
 
 ## Next smallest task
 
-Wire the same Vulkan capability-probe core into an Android native app shell on the Galaxy S26 Ultra, display the report on screen, and write the report to device storage.
+Run the Android probe on the Galaxy S26 Ultra, verify on-device report output (including `run-as` extraction), and then replace toast-only output with a deterministic in-app overlay.

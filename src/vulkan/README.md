@@ -16,4 +16,7 @@ Current outputs:
 - Plain text: `reports/vulkan_capability_report.txt`
 - JSON: `reports/vulkan_capability_report.json`
 
-Android build integration is still pending and described in `src/platform/android/README.md`.
+Android build integration is now wired through:
+- `src/platform/android/CapabilityProbeAndroidMain.cpp`
+- `src/platform/android/AndroidManifest.xml`
+- `src/platform/android/README.md`

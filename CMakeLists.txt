@@ -12,6 +12,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(HORDE_RT_BUILD_SCAFFOLD_CODE "Build the non-rendering Phase 0 scaffold library" ON)
 option(HORDE_RT_BUILD_CAPABILITY_PROBE_EXECUTABLE "Build the standalone command line Vulkan capability probe" ON)
+option(HORDE_RT_BUILD_ANDROID_CAPABILITY_PROBE "Build the Android native Vulkan capability probe library" ON)
 
 set(HORDE_RT_SOURCE_FILES
     src/vulkan/DeviceCapabilities.cpp
@@ -19,16 +20,29 @@ set(HORDE_RT_SOURCE_FILES
     src/vulkan/VulkanContext.cpp
     src/vulkan/raytracing/RayTracingRequirements.cpp
 )
-
 find_package(Vulkan REQUIRED)
 
 message(STATUS "Vulkan SDK found: ${Vulkan_VERSION}")
 
+set(HORDE_RT_APP_FILES
+    src/app/HordeLanternApp.cpp
+    src/ui/DiagnosticOverlay.cpp
+)
+
+add_library(horde_rt_probe_core STATIC
+    ${HORDE_RT_SOURCE_FILES}
+)
+
+target_include_directories(horde_rt_probe_core
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+target_compile_features(horde_rt_probe_core PUBLIC cxx_std_20)
+target_link_libraries(horde_rt_probe_core PUBLIC Vulkan::Vulkan)
+
 if(HORDE_RT_BUILD_SCAFFOLD_CODE)
     add_library(horde_rt_scaffold STATIC
-        src/app/HordeLanternApp.cpp
-        ${HORDE_RT_SOURCE_FILES}
-        src/ui/DiagnosticOverlay.cpp
+        ${HORDE_RT_APP_FILES}
     )
 
     target_include_directories(horde_rt_scaffold
@@ -37,7 +51,7 @@ if(HORDE_RT_BUILD_SCAFFOLD_CODE)
     )
 
     target_compile_features(horde_rt_scaffold PUBLIC cxx_std_20)
-    target_link_libraries(horde_rt_scaffold PUBLIC Vulkan::Vulkan)
+    target_link_libraries(horde_rt_scaffold PUBLIC horde_rt_probe_core)
     target_compile_definitions(horde_rt_scaffold PUBLIC HORDE_RT_VULKAN_SDK_AVAILABLE=1)
 endif()
 
@@ -51,8 +65,7 @@ if(HORDE_RT_BUILD_CAPABILITY_PROBE_EXECUTABLE)
     )
 
     target_link_libraries(horde_rt_capability_probe PRIVATE
-        horde_rt_scaffold
-        Vulkan::Vulkan
+        horde_rt_probe_core
     )
 
     set_target_properties(horde_rt_capability_probe PROPERTIES
@@ -60,4 +73,24 @@ if(HORDE_RT_BUILD_CAPABILITY_PROBE_EXECUTABLE)
     )
 endif()
 
-message(STATUS "Horde Lantern RT: native Vulkan RT capability probe target is available. Android integration is pending.")
+if(HORDE_RT_BUILD_ANDROID_CAPABILITY_PROBE AND ANDROID)
+    add_library(horde_rt_capability_probe_android SHARED
+        src/platform/android/CapabilityProbeAndroidMain.cpp
+    )
+
+    target_include_directories(horde_rt_capability_probe_android PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+    )
+
+    target_link_libraries(horde_rt_capability_probe_android PRIVATE
+        horde_rt_probe_core
+        log
+        android
+    )
+
+    set_target_properties(horde_rt_capability_probe_android PROPERTIES
+        OUTPUT_NAME "horde_rt_capability_probe_android"
+    )
+endif()
+
+message(STATUS "Horde Lantern RT: Vulkan capability probe targets are available for Windows CLI and Android native.")

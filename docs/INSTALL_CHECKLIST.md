@@ -1,6 +1,6 @@
 # Install Checklist
 
-Phase 0A implements a real Vulkan capability-probe core on Windows. Android is acknowledged but still pending integration.
+Phase 0A implements a real Vulkan capability-probe core on Windows, and Android native wiring now shares the same core and writes device reports to app-private storage.
 
 ## Windows host tools
 
@@ -37,15 +37,17 @@ Phase 0A implements a real Vulkan capability-probe core on Windows. Android is a
    - `reports/vulkan_capability_report.json`
 6. Confirm the log shows device enumeration, extension/feature support, and explicit missing requirements for unsupported hardware.
 
+7. Confirm Android native integration:
+   - `cmake -S . -B build-android -DCMAKE_SYSTEM_NAME=Android -DANDROID_PLATFORM=33 -DANDROID_ABI=arm64-v8a -DHORDE_RT_BUILD_ANDROID_CAPABILITY_PROBE=ON`
+   - `cmake --build build-android --target horde_rt_capability_probe_android`
+   - Package the library into a NativeActivity APK that includes `src/platform/android/AndroidManifest.xml`.
+   - Run on-device probe and verify with:
+     - `adb shell run-as com.samfa12.hordet.probe cat /data/data/com.samfa12.hordet.probe/files/reports/vulkan_capability_report.txt`
+     - `adb shell run-as com.samfa12.hordet.probe cat /data/data/com.samfa12.hordet.probe/files/reports/vulkan_capability_report.json`
+
 ## Android status for this slice
 
-Android is not yet wired into the native app shell in this PR. Use the documented plan in:
-
-- `src/platform/android/README.md`
-- `docs/TECHNICAL_REQUIREMENTS.md`
-- `docs/PHASE_PLAN.md`
-
-Do not mark Android support as complete until an Android CMake/NDK build compiles and writes the same probe report on-device.
+Android is now wired to a native activity path in this PR. Do not mark complete until an APK is built and the reports are verified on a Galaxy S26 Ultra device.
 
 ## Explicit unsupported policy
 

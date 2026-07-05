@@ -15,7 +15,10 @@ The app must use native Vulkan hardware ray tracing. It must query the actual Vu
 
 ## Current status
 
-Phase 0A real capability probe is implemented for Windows:
+Phase 0A real capability probe is implemented and wired for:
+
+- Windows CLI (`horde_rt_capability_probe`).
+- Android native activity (`horde_rt_capability_probe_android`) that writes reports to app-private storage.
 
 - Creates a Vulkan instance.
 - Enumerates all physical devices.
@@ -52,6 +55,31 @@ Reports are written to:
 - `reports/vulkan_capability_report.txt`
 - `reports/vulkan_capability_report.json`
 
+## Build and run (Phase 0A Android activity path)
+
+1. Configure Android toolchain (example):
+
+```powershell
+cmake -S . -B build-android `
+    -DCMAKE_SYSTEM_NAME=Android `
+    -DANDROID_PLATFORM=33 `
+    -DANDROID_ABI=arm64-v8a `
+    -DCMAKE_ANDROID_NDK_TOOLCHAIN_VERSION=clang `
+    -DHORDE_RT_BUILD_CAPABILITY_PROBE_EXECUTABLE=OFF `
+    -DHORDE_RT_BUILD_ANDROID_CAPABILITY_PROBE=ON
+```
+
+2. Build the native library:
+
+```powershell
+cmake --build build-android --target horde_rt_capability_probe_android
+```
+
+3. Package and run via an Android Studio wrapper shell; verify reports at:
+
+- `/data/data/com.samfa12.hordet.probe/files/reports/vulkan_capability_report.txt`
+- `/data/data/com.samfa12.hordet.probe/files/reports/vulkan_capability_report.json`
+
 ## Planned build targets
 
 - Android-first native Vulkan build path.
@@ -66,7 +94,7 @@ This slice is the RT or nothing startup proof:
 - Unsupported output that explicitly explains missing requirements.
 - No fake renderer fallback.
 
-No claims should be made that RT rendering is complete until this probe is integrated into a native on-screen Android flow.
+RT rendering is not implemented. Do not claim RT rendering success until both Windows and Android probe outputs are verified on target hardware.
 
 ## First milestone report fields
 
