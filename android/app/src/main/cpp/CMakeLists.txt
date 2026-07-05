@@ -5,14 +5,14 @@ project(horde_rt_probe_android)
 add_library(horde_rt_probe_android
     SHARED
     android_probe_bridge.cpp
-    ../../../../src/vulkan/DeviceCapabilities.cpp
-    ../../../../src/vulkan/RtCapabilityReport.cpp
-    ../../../../src/vulkan/VulkanContext.cpp
-    ../../../../src/vulkan/raytracing/RayTracingRequirements.cpp
+    ../../../../../src/vulkan/DeviceCapabilities.cpp
+    ../../../../../src/vulkan/RtCapabilityReport.cpp
+    ../../../../../src/vulkan/VulkanContext.cpp
+    ../../../../../src/vulkan/raytracing/RayTracingRequirements.cpp
 )
 
 target_include_directories(horde_rt_probe_android PRIVATE
-    ../../../../src
+    ../../../../../src
 )
 
 target_compile_features(horde_rt_probe_android PRIVATE cxx_std_20)
