@@ -1,0 +1,7 @@
+build/
+reports/
+android/build/
+android/.gradle/
+android/app/build/
+**/*.user
+*.vcxproj.user
