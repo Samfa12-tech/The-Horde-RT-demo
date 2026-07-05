@@ -4,8 +4,9 @@
 #include <string>
 #include <vector>
 
-#include "vulkan/RtCapabilityReport.h"
+#include "ui/DiagnosticOverlay.h"
 #include "vulkan/VulkanContext.h"
+#include "vulkan/RtCapabilityReport.h"
 
 namespace
 {
@@ -59,7 +60,7 @@ int main()
     PrintDiagnosticLines(context.GetDiagnosticLog());
     std::cout << '\n';
 
-    const std::string textReport = BuildCapabilityTextReport(capabilities);
+    const std::string textReport = horde::ui::BuildDiagnosticOverlayText(capabilities);
     const std::string jsonReport = BuildCapabilityJsonReport(capabilities);
 
     const std::filesystem::path reportDirectory = kReportDirectory;

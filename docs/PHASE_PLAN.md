@@ -16,13 +16,14 @@ Goal: prove the target devices expose the required Vulkan hardware RT support.
 - Diagnostics and report generation.
 - Windows CLI executable `horde_rt_capability_probe`.
 - Android JNI shell under `android/` with native `TextView` diagnostics and report persistence.
+- Win32 diagnostic window app (`horde_rt_diagnostic_window`) with shared probe formatting.
 
 ### Current known limitations
 
 - No rendering path yet.
 - No swapchain or surface path yet.
-- Android output is plain text only (no in-app render overlay yet).
-- No desktop/Android surface pipeline yet.
+- Android output is plain text only (no Vulkan-surface overlay yet).
+- No desktop/Android Vulkan-surface rendering pipeline yet.
 
 ## Next smallest task
 

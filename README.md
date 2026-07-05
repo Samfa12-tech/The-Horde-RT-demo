@@ -15,11 +15,12 @@ The app must use native Vulkan hardware ray tracing. It must query the actual Vu
 
 ## Current status
 
-Phase 0A/B now includes:
+Phase 0A/B/C now includes:
 
 - Windows CLI: `horde_rt_capability_probe`.
 - Android native shell (`android/`) that runs the same probe core and displays diagnostics in-app.
 - Android report persistence to app private storage.
+- Windows native diagnostic window: `horde_rt_diagnostic_window`.
 - Real probe still only reports capabilities (no render path yet).
 
 ### Probe feature coverage
@@ -47,10 +48,17 @@ Phase 0A/B now includes:
 ```bash
 cmake -S . -B build
 cmake --build build --target horde_rt_capability_probe
+cmake --build build --target horde_rt_diagnostic_window
 ```
 
 ```bash
 ./build/horde_rt_capability_probe
+./build/horde_rt_diagnostic_window
+```
+
+```bash
+# Windows
+.\build\horde_rt_diagnostic_window.exe
 ```
 
 Reports:

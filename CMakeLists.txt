@@ -12,6 +12,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(HORDE_RT_BUILD_SCAFFOLD_CODE "Build the non-rendering Phase 0 scaffold library" ON)
 option(HORDE_RT_BUILD_CAPABILITY_PROBE_EXECUTABLE "Build the standalone command line Vulkan capability probe" ON)
+option(HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW "Build the Win32 diagnostic shell" ON)
 option(HORDE_RT_BUILD_ANDROID_CAPABILITY_PROBE "Build the Android native Vulkan capability probe library" ON)
 
 set(HORDE_RT_SOURCE_FILES
@@ -73,6 +74,25 @@ if(HORDE_RT_BUILD_CAPABILITY_PROBE_EXECUTABLE)
     )
 endif()
 
+if(HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AND WIN32)
+    add_executable(horde_rt_diagnostic_window
+        src/platform/windows/DiagnosticWindowMain.cpp
+        src/platform/windows/DiagnosticWindow.cpp
+    )
+
+    target_include_directories(horde_rt_diagnostic_window PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+    )
+
+    target_link_libraries(horde_rt_diagnostic_window PRIVATE
+        horde_rt_probe_core
+    )
+
+    set_target_properties(horde_rt_diagnostic_window PROPERTIES
+        OUTPUT_NAME "horde_rt_diagnostic_window"
+    )
+endif()
+
 if(HORDE_RT_BUILD_ANDROID_CAPABILITY_PROBE AND ANDROID)
     add_library(horde_rt_capability_probe_android SHARED
         src/platform/android/CapabilityProbeAndroidMain.cpp
@@ -93,4 +113,4 @@ if(HORDE_RT_BUILD_ANDROID_CAPABILITY_PROBE AND ANDROID)
     )
 endif()
 
-message(STATUS "Horde Lantern RT: Vulkan capability probe targets are available for Windows CLI and Android native.")
+message(STATUS "Horde Lantern RT: Vulkan capability probe targets are available for Windows CLI, diagnostic shell, and Android native.")

@@ -8,6 +8,7 @@
 
 #include <jni.h>
 
+#include "ui/DiagnosticOverlay.h"
 #include "vulkan/RtCapabilityReport.h"
 #include "vulkan/VulkanContext.h"
 
@@ -48,13 +49,22 @@ std::string BuildReportDirectory(const std::string& baseDirectory)
     return baseDirectory + '/' + kReportDirectory;
 }
 
+std::string BuildDisplayText(const horde::vulkan::DeviceCapabilities& capabilities)
+{
+    if (capabilities.rtMode == horde::vulkan::RtMode::Unsupported)
+    {
+        return horde::ui::BuildUnsupportedDeviceText(capabilities);
+    }
+    return horde::ui::BuildDiagnosticOverlayText(capabilities);
+}
+
 } // namespace
 
 extern "C" JNIEXPORT jstring JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_getTextReport(JNIEnv* env, jclass)
 {
     const horde::vulkan::DeviceCapabilities capabilities = RunProbe();
-    const std::string reportText = horde::vulkan::BuildCapabilityTextReport(capabilities);
+    const std::string reportText = BuildDisplayText(capabilities);
     return env->NewStringUTF(reportText.c_str());
 }
 
@@ -79,7 +89,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_writeReports(JNIEnv* env, jclass, js
     env->ReleaseStringUTFChars(baseDirectory, baseDirectoryUtf);
 
     const horde::vulkan::DeviceCapabilities capabilities = RunProbe();
-    const std::string textReport = horde::vulkan::BuildCapabilityTextReport(capabilities);
+    const std::string textReport = BuildDisplayText(capabilities);
     const std::string jsonReport = horde::vulkan::BuildCapabilityJsonReport(capabilities);
 
     const std::string reportDirectory = BuildReportDirectory(baseDirectoryValue);
