@@ -1,57 +1,79 @@
 # Install Checklist
 
-Phase 0A implements a real Vulkan capability-probe core on Windows, and Android native wiring now shares the same core and writes device reports to app-private storage.
+## Phase 0B target
 
-## Windows host tools
+Phase 0B adds a minimal Android native shell for the existing Vulkan capability-probe core.
 
-- Windows 11.
-- Git.
-- Visual Studio 2022 with **Desktop development with C++**.
-- CMake.
-- Ninja (optional, supported by CMake).
-- Vulkan SDK.
-- RenderDoc.
-- NVIDIA Nsight Graphics.
-- Vulkan Hardware Capability Viewer or equivalent.
+## Windows checks (from prior slice)
 
-## Android tools
+- Confirm Vulkan SDK availability.
+- Configure:
+  - `cmake -S . -B build`
+- Build the probe executable:
+  - `cmake --build build --target horde_rt_capability_probe`
+- Run:
+  - `./build/horde_rt_capability_probe` (Windows: `build\\horde_rt_capability_probe.exe`)
+- Verify reports:
+  - `reports/vulkan_capability_report.txt`
+  - `reports/vulkan_capability_report.json`
 
-- Android Studio.
-- Android SDK.
-- Android NDK.
-- Android CMake package.
-- USB debugging enabled on the Samsung Galaxy S26 Ultra.
-- C++17/CMake-friendly Android native activity project template.
+## Android checks
 
-## Phase 0A exact setup checks
+From repository root (verified on-device on `SM-S948B`):
 
-1. Confirm Vulkan SDK availability.
-2. Configure:
-   - `cmake -S . -B build`
-3. Build the probe executable:
-   - `cmake --build build --target horde_rt_capability_probe`
-4. Run from repository root:
-   - `.\build\horde_rt_capability_probe.exe`
-5. Verify output and ensure files exist:
-   - `reports/vulkan_capability_report.txt`
-   - `reports/vulkan_capability_report.json`
-6. Confirm the log shows device enumeration, extension/feature support, and explicit missing requirements for unsupported hardware.
+```powershell
+cd android
+./gradlew.bat assembleDebug
+./gradlew.bat installDebug
+adb shell monkey -p com.samfa12.hordelanternrt 1
+```
 
-7. Confirm Android native integration:
-   - `cmake -S . -B build-android -DCMAKE_SYSTEM_NAME=Android -DANDROID_PLATFORM=33 -DANDROID_ABI=arm64-v8a -DHORDE_RT_BUILD_ANDROID_CAPABILITY_PROBE=ON`
-   - `cmake --build build-android --target horde_rt_capability_probe_android`
-   - Package the library into a NativeActivity APK that includes `src/platform/android/AndroidManifest.xml`.
-   - Run on-device probe and verify with:
-     - `adb shell run-as com.samfa12.hordet.probe cat /data/data/com.samfa12.hordet.probe/files/reports/vulkan_capability_report.txt`
-     - `adb shell run-as com.samfa12.hordet.probe cat /data/data/com.samfa12.hordet.probe/files/reports/vulkan_capability_report.json`
+Optional install:
 
-## Android status for this slice
+```bash
+adb install app/build/outputs/apk/debug/app-debug.apk
+```
 
-Android is now wired to a native activity path in this PR. Do not mark complete until an APK is built and the reports are verified on a Galaxy S26 Ultra device.
+Alternate install:
 
-## Explicit unsupported policy
+```powershell
+./gradlew.bat installDebug
+```
 
-At no point should the project be treated as working when the probe reports:
+Run and collect on-device diagnostics:
 
-- `RT mode: Unsupported`
-- required extension and feature diagnostics indicating any missing path-tracing requirements.
+```bash
+adb shell run-as com.samfa12.hordelanternrt ls files/reports
+adb shell run-as com.samfa12.hordelanternrt cat files/reports/vulkan_capability_report.txt
+adb shell run-as com.samfa12.hordelanternrt cat files/reports/vulkan_capability_report.json
+```
+
+Sample verified output from `SM-S948B`:
+
+```text
+Backend: Vulkan
+RT mode: RayTracingPipeline
+GPU name: Adreno (TM) 840
+Vendor ID: 20803
+Device ID: 1141180977
+Driver version: 512.842.19
+Vulkan API version: 1.4.295
+VK_KHR_acceleration_structure: yes
+VK_KHR_ray_tracing_pipeline: yes
+VK_KHR_ray_query: yes
+VK_KHR_buffer_device_address: yes
+VK_KHR_deferred_host_operations: yes
+features:
+  accelerationStructure: true
+  rayTracingPipeline: true
+  rayQuery: true
+  bufferDeviceAddress: true
+```
+
+## Verification expectations
+
+- The on-screen output must show the required diagnostic fields from the probe report.
+- Unsupported hardware must still show `RT mode: Unsupported` and clear missing extension/feature lines.
+- The probe must write both reports under `files/reports` in app private storage.
+- Do not mark Android support complete until APK install/run is verified on a target device.
+- Last verified (2026-07-05): Android build, install, launch, and report retrieval succeeded on `SM-S948B` (`samsung`).

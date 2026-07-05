@@ -16,7 +16,4 @@ Current outputs:
 - Plain text: `reports/vulkan_capability_report.txt`
 - JSON: `reports/vulkan_capability_report.json`
 
-Android build integration is now wired through:
-- `src/platform/android/CapabilityProbeAndroidMain.cpp`
-- `src/platform/android/AndroidManifest.xml`
-- `src/platform/android/README.md`
+Android integration is now available through `android/app/src/main/cpp/android_probe_bridge.cpp` and `android/app/src/main/java/com/samfa12/hordelanternrt/*`.

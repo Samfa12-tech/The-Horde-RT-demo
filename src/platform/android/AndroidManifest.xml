@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Legacy NativeActivity prototype used during early phase.
+     Phase 0B now uses android/app MainActivity + JNI bridge under android/ module. -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.samfa12.hordet.probe">
 

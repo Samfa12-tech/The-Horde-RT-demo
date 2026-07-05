@@ -15,10 +15,14 @@ The app must use native Vulkan hardware ray tracing. It must query the actual Vu
 
 ## Current status
 
-Phase 0A real capability probe is implemented and wired for:
+Phase 0A/B now includes:
 
-- Windows CLI (`horde_rt_capability_probe`).
-- Android native activity (`horde_rt_capability_probe_android`) that writes reports to app-private storage.
+- Windows CLI: `horde_rt_capability_probe`.
+- Android native shell (`android/`) that runs the same probe core and displays diagnostics in-app.
+- Android report persistence to app private storage.
+- Real probe still only reports capabilities (no render path yet).
+
+### Probe feature coverage
 
 - Creates a Vulkan instance.
 - Enumerates all physical devices.
@@ -36,10 +40,9 @@ Phase 0A real capability probe is implemented and wired for:
     - `VkPhysicalDeviceRayQueryFeaturesKHR`
     - `VkPhysicalDeviceBufferDeviceAddressFeatures`
 - Evaluates RT mode as `RayTracingPipeline`, `RayQuery`, or `Unsupported`.
-- Writes a plain text and JSON report.
-- Prints diagnostics to console.
+- Writes plain text and JSON reports.
 
-## Build and run (Phase 0A Windows executable)
+## Build and run (Windows probe)
 
 ```bash
 cmake -S . -B build
@@ -47,54 +50,67 @@ cmake --build build --target horde_rt_capability_probe
 ```
 
 ```bash
-.\build\horde_rt_capability_probe.exe
+./build/horde_rt_capability_probe
 ```
 
-Reports are written to:
+Reports:
 
 - `reports/vulkan_capability_report.txt`
 - `reports/vulkan_capability_report.json`
 
-## Build and run (Phase 0A Android activity path)
-
-1. Configure Android toolchain (example):
+## Build and run (Phase 0B Android activity shell)
 
 ```powershell
-cmake -S . -B build-android `
-    -DCMAKE_SYSTEM_NAME=Android `
-    -DANDROID_PLATFORM=33 `
-    -DANDROID_ABI=arm64-v8a `
-    -DCMAKE_ANDROID_NDK_TOOLCHAIN_VERSION=clang `
-    -DHORDE_RT_BUILD_CAPABILITY_PROBE_EXECUTABLE=OFF `
-    -DHORDE_RT_BUILD_ANDROID_CAPABILITY_PROBE=ON
+cd android
+./gradlew.bat assembleDebug
 ```
 
-2. Build the native library:
+On Windows/CLI, install, launch, and verify reports:
 
 ```powershell
-cmake --build build-android --target horde_rt_capability_probe_android
+cd android
+./gradlew.bat installDebug
+adb shell monkey -p com.samfa12.hordelanternrt 1
 ```
 
-3. Package and run via an Android Studio wrapper shell; verify reports at:
+Then collect reports from app private storage:
 
-- `/data/data/com.samfa12.hordet.probe/files/reports/vulkan_capability_report.txt`
-- `/data/data/com.samfa12.hordet.probe/files/reports/vulkan_capability_report.json`
+- `adb shell run-as com.samfa12.hordelanternrt ls files/reports`
+- `adb shell run-as com.samfa12.hordelanternrt cat files/reports/vulkan_capability_report.txt`
+- `adb shell run-as com.samfa12.hordelanternrt cat files/reports/vulkan_capability_report.json`
+
+Verified on-device run (2026-07-05, Samsung Galaxy S26 Ultra, model `SM-S948B`, manufacturer `samsung`):
+
+- `adb devices` → `R5GL219SZGK	device`
+- `adb shell getprop ro.product.model` → `SM-S948B`
+- `adb shell getprop ro.product.manufacturer` → `samsung`
+- Retrieved both report files successfully from `files/reports`.
+- RT mode: `RayTracingPipeline`
+- GPU name: `Adreno (TM) 840`
+- Vendor ID: `20803`
+- Device ID: `1141180977`
+- Driver version: `512.842.19`
+- Vulkan API version: `1.4.295`
+- `VK_KHR_acceleration_structure`: `yes`
+- `VK_KHR_ray_tracing_pipeline`: `yes`
+- `VK_KHR_ray_query`: `yes`
+- `VK_KHR_buffer_device_address`: `yes`
+- `VK_KHR_deferred_host_operations`: `yes`
+- Features: `accelerationStructure=true`, `rayTracingPipeline=true`, `rayQuery=true`, `bufferDeviceAddress=true`
 
 ## Planned build targets
 
-- Android-first native Vulkan build path.
-- Windows native Vulkan build path.
+- Android native capability shell (`android/` app module).
+- Windows native Vulkan build path (capability probe + later overlay surface).
 
 ## First milestone: Phase 0 capability probe
 
-This slice is the RT or nothing startup proof:
-
 - Vulkan capability probe with real extension/feature diagnostics.
 - JSON/text capability reporting.
-- Unsupported output that explicitly explains missing requirements.
+- Unsupported output explicitly explains missing requirements.
 - No fake renderer fallback.
 
-RT rendering is not implemented. Do not claim RT rendering success until both Windows and Android probe outputs are verified on target hardware.
+RT rendering is not implemented. Do not claim RT rendering success until both Windows and Android probe flows are verified on target hardware.
 
 ## First milestone report fields
 
@@ -122,23 +138,9 @@ This repo should stay clean. Do not dump a giant third-party engine into the pro
 Reference hierarchy:
 
 1. Primary base/reference: KhronosGroup/Vulkan-Samples, especially `samples/extensions/ray_tracing_basic`.
-2. Main learning/reference: NVIDIA `nvpro-samples/vk_raytracing_tutorial_KHR`.
+2. Main learning/reference: NVIDIA `nvpro-samples/vk_ray_tracing_tutorial_KHR`.
 3. Focused reference snippets: Sascha Willems Vulkan examples.
 4. Backup/reference only: Diligent Engine.
 5. Deferred/not first base: The Forge and Unreal Engine.
 
 If code is adapted later from permissive sources, preserve license notices and document the source.
-
-## Repository map
-
-```text
-src/app/                  Application shell and high-level flow.
-src/platform/android/     Android native Vulkan notes and future glue.
-src/platform/windows/     Windows probe executable and future windowed entry.
-src/vulkan/               Vulkan context, device capability, and report code.
-src/vulkan/raytracing/    RT extension/feature requirement evaluation.
-src/ui/                   Diagnostic overlay text/data model.
-shaders/                  Future raygen/miss/hit/ray-query shaders.
-assets/                   Future commercial-safe assets only.
-tools/capability_report/  Future helper scripts/tools for capability reports.
-```

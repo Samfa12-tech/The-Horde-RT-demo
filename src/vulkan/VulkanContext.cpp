@@ -218,7 +218,31 @@ DeviceCapabilities VulkanContext::ProbePhysicalDevice(const VkPhysicalDevice phy
     accelerationStructureFeatures.pNext = &rayTracingPipelineFeatures;
     rayTracingPipelineFeatures.pNext = &rayQueryFeatures;
     rayQueryFeatures.pNext = &bufferDeviceAddressFeatures;
-    vkGetPhysicalDeviceFeatures2(physicalDevice, &features2);
+
+    bool features2Retrieved = false;
+
+    const auto getPhysicalDeviceFeatures2 = reinterpret_cast<PFN_vkGetPhysicalDeviceFeatures2>(
+        vkGetInstanceProcAddr(instance_, "vkGetPhysicalDeviceFeatures2"));
+    if (getPhysicalDeviceFeatures2 != nullptr)
+    {
+        getPhysicalDeviceFeatures2(physicalDevice, &features2);
+        features2Retrieved = true;
+    }
+    else
+    {
+        const auto getPhysicalDeviceFeatures2KHR = reinterpret_cast<PFN_vkGetPhysicalDeviceFeatures2KHR>(
+            vkGetInstanceProcAddr(instance_, "vkGetPhysicalDeviceFeatures2KHR"));
+        if (getPhysicalDeviceFeatures2KHR != nullptr)
+        {
+            getPhysicalDeviceFeatures2KHR(physicalDevice, &features2);
+            features2Retrieved = true;
+        }
+    }
+
+    if (!features2Retrieved)
+    {
+        capabilities.diagnostics.push_back("vkGetPhysicalDeviceFeatures2 unavailable on this platform; assuming RT extension features unavailable.");
+    }
 
     capabilities.features.accelerationStructure = accelerationStructureFeatures.accelerationStructure == VK_TRUE;
     capabilities.features.rayTracingPipeline = rayTracingPipelineFeatures.rayTracingPipeline == VK_TRUE;

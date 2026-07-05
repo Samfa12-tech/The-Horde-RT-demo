@@ -15,17 +15,18 @@ Goal: prove the target devices expose the required Vulkan hardware RT support.
   - `Unsupported`
 - Diagnostics and report generation.
 - Windows CLI executable `horde_rt_capability_probe`.
+- Android JNI shell under `android/` with native `TextView` diagnostics and report persistence.
 
 ### Current known limitations
 
 - No rendering path yet.
 - No swapchain or surface path yet.
-- Android screen output is still minimal (toast), not a long-lived in-app overlay.
-- No on-device overlay yet.
+- Android output is plain text only (no in-app render overlay yet).
+- No desktop/Android surface pipeline yet.
 
 ## Next smallest task
 
-Run the native Android probe on the Galaxy S26 Ultra, confirm `run-as` report extraction, and then upgrade the on-screen diagnostic path from toast to a deterministic in-app overlay.
+Wire a minimal native Vulkan surface/swapchain path on both Android and Windows to render the same diagnostic overlay text without a fake scene.
 
 ## Planned milestone sequence
 

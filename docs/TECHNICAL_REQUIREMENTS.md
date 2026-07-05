@@ -6,18 +6,15 @@ This project is **RT or nothing**.
 
 The renderer must use native Vulkan hardware ray tracing. It must not use browser rendering, Godot/Unreal as the first renderer path, Three.js, Babylon.js, WebGPU, raster-only rendering, screen-space reflections, baked lighting, fake RT effects, or compute-only path tracing as a substitute for the core proof.
 
-## Phase 0A completed scope
+## Phase 0A + 0B completed scope
 
-- Real Vulkan probe implemented on Windows and wired into Android native shell:
-  - creates a Vulkan instance,
-  - enumerates physical devices,
-  - enumerates required extensions,
-  - queries feature chain fields through `vkGetPhysicalDeviceFeatures2`,
-  - evaluates `RayTracingPipeline`, `RayQuery`, or `Unsupported`.
-- Adds an Android native activity target that reuses the same core and writes both text/JSON reports.
-- Writes both:
-  - `reports/vulkan_capability_report.txt`
-  - `reports/vulkan_capability_report.json`
+- Real Vulkan probe now runs on Windows and is reused through Android JNI in the same project.
+- Creates Vulkan instance and enumerates physical devices.
+- Enumerates required extensions.
+- Queries feature-chain structs through `vkGetPhysicalDeviceFeatures2`.
+- Evaluates `RayTracingPipeline`, `RayQuery`, or `Unsupported`.
+- Uses plain-text and JSON report format.
+- Android shell target can now display and persist the report on-device.
 
 ## Phase 0A required report fields
 
@@ -80,24 +77,20 @@ For each physical device, this project now queries and evaluates:
 
 - Neither mode is fully satisfied by required extensions/features.
 
-## Android native status
+## Android implementation status
 
-Android native wiring exists in this slice as:
+Phase 0B minimal shell is now implemented:
 
-- CMake Android target `horde_rt_capability_probe_android`.
-- NativeActivity bootstrap that runs the probe and writes:
-  - `files/reports/vulkan_capability_report.txt`
-  - `files/reports/vulkan_capability_report.json`
-- Toast-style diagnostic text from the native side.
-
-Next small task: run and validate this target on the Galaxy S26 Ultra with `adb run-as` report extraction and confirm unsupported-mode diagnostics remain explicit.
+- Android app module under `android/`.
+- JNI bridge uses shared C++ probe code from `src/vulkan/*`.
+- On-screen diagnostic TextView plus persisted text/JSON report.
+- Reports under `files/reports` in app private storage.
 
 ## Unsupported-device behaviour
 
-When unsupported, report:
+When unsupported:
 
-- backend attempted (`Vulkan`)
-- GPU/driver/version context when available
-- exact missing extension and feature diagnostics
-- `RT mode: Unsupported`
-- do not pretend to be rendering-capable.
+- `backend` still reports Vulkan.
+- `RT mode` is `Unsupported`.
+- Missing extension/feature diagnostics list exact reasons.
+- No fake RT fallback path is used.
