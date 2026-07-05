@@ -6,9 +6,20 @@ This project is **RT or nothing**.
 
 The renderer must use native Vulkan hardware ray tracing. It must not use browser rendering, Godot/Unreal as the first renderer path, Three.js, Babylon.js, WebGPU, raster-only rendering, screen-space reflections, baked lighting, fake RT effects, or compute-only path tracing as a substitute for the core proof.
 
-## Phase 0 output fields
+## Phase 0A completed scope
 
-Phase 0 must query and report:
+- Real Vulkan probe implemented on Windows and wired into Android native shell:
+  - creates a Vulkan instance,
+  - enumerates physical devices,
+  - enumerates required extensions,
+  - queries feature chain fields through `vkGetPhysicalDeviceFeatures2`,
+  - evaluates `RayTracingPipeline`, `RayQuery`, or `Unsupported`.
+- Adds an Android native activity target that reuses the same core and writes both text/JSON reports.
+- Writes both:
+  - `reports/vulkan_capability_report.txt`
+  - `reports/vulkan_capability_report.json`
+
+## Phase 0A required report fields
 
 ```text
 Backend: Vulkan
@@ -27,56 +38,66 @@ Internal render resolution
 FPS / frame time
 ```
 
-## Required Vulkan extension interpretation
+## Vulkan extension interpretation
 
-- `VK_KHR_acceleration_structure` is essential for Vulkan RT.
+- `VK_KHR_acceleration_structure` is required.
 - `VK_KHR_ray_tracing_pipeline` is the preferred path.
-- `VK_KHR_ray_query` is acceptable only if it genuinely uses Vulkan hardware ray traversal and is clearly labelled as `RayQuery` mode.
-- `VK_KHR_buffer_device_address` is required for practical acceleration-structure/ray-tracing work.
-- `VK_KHR_deferred_host_operations` is required by the ray-tracing pipeline extension path.
+- `VK_KHR_ray_query` is accepted only when it is a genuine hardware-ray-query path.
+- `VK_KHR_buffer_device_address` is required for practical RT support.
+- `VK_KHR_deferred_host_operations` is required for RT pipeline probing.
 
-## Feature structs to check and enable later
+## Feature structs to query
 
-The real implementation must query and enable relevant feature structs through the Vulkan feature chain, including:
+For each physical device, this project now queries and evaluates:
 
-```text
-VkPhysicalDeviceAccelerationStructureFeaturesKHR
-VkPhysicalDeviceRayTracingPipelineFeaturesKHR
-VkPhysicalDeviceRayQueryFeaturesKHR
-VkPhysicalDeviceBufferDeviceAddressFeatures
-```
-
-A device should not be labelled as RT-capable just because extension names exist. The relevant feature fields must also be checked.
+- `VkPhysicalDeviceAccelerationStructureFeaturesKHR`
+- `VkPhysicalDeviceRayTracingPipelineFeaturesKHR`
+- `VkPhysicalDeviceRayQueryFeaturesKHR`
+- `VkPhysicalDeviceBufferDeviceAddressFeatures`
 
 ## RT mode rules
 
 ### RayTracingPipeline
 
-Use when the device exposes the acceleration-structure path and `VK_KHR_ray_tracing_pipeline`, with required features enabled. This is the preferred path for the demo.
+- `VK_KHR_acceleration_structure`
+- `VK_KHR_ray_tracing_pipeline`
+- `VK_KHR_buffer_device_address`
+- `VK_KHR_deferred_host_operations`
+- `VkPhysicalDeviceAccelerationStructureFeaturesKHR::accelerationStructure`
+- `VkPhysicalDeviceRayTracingPipelineFeaturesKHR::rayTracingPipeline`
+- `VkPhysicalDeviceBufferDeviceAddressFeatures::bufferDeviceAddress`
 
 ### RayQuery
 
-Use only when the device exposes `VK_KHR_acceleration_structure`, `VK_KHR_ray_query`, buffer device address support, and the required feature structs. Label this clearly as `RayQuery` and do not pretend it is the full ray-tracing-pipeline path.
+- `VK_KHR_acceleration_structure`
+- `VK_KHR_ray_query`
+- `VK_KHR_buffer_device_address`
+- `VkPhysicalDeviceAccelerationStructureFeaturesKHR::accelerationStructure`
+- `VkPhysicalDeviceRayQueryFeaturesKHR::rayQuery`
+- `VkPhysicalDeviceBufferDeviceAddressFeatures::bufferDeviceAddress`
 
 ### Unsupported
 
-Use when required Vulkan RT support is unavailable. The app must show a clear unsupported diagnostic screen and write a report. It must not silently fall back to fake RT.
+- Neither mode is fully satisfied by required extensions/features.
+
+## Android native status
+
+Android native wiring exists in this slice as:
+
+- CMake Android target `horde_rt_capability_probe_android`.
+- NativeActivity bootstrap that runs the probe and writes:
+  - `files/reports/vulkan_capability_report.txt`
+  - `files/reports/vulkan_capability_report.json`
+- Toast-style diagnostic text from the native side.
+
+Next small task: run and validate this target on the Galaxy S26 Ultra with `adb run-as` report extraction and confirm unsupported-mode diagnostics remain explicit.
 
 ## Unsupported-device behaviour
 
-Unsupported devices must show:
+When unsupported, report:
 
-- Backend attempted: Vulkan.
-- GPU name, vendor ID, device ID, driver version, and Vulkan API version where available.
-- Extension yes/no values.
-- Feature yes/no values where available.
-- A clear reason that the RT path is unavailable.
-- No fake rendered scene pretending to be RT.
-
-## First technical proof
-
-The first successful proof is:
-
-> The Galaxy S26 Ultra launches a native Vulkan app, reports RT capability on screen, writes a capability report, and renders a tiny hardware RT scene.
-
-The tiny scene belongs to the next milestone after the capability probe itself is real.
+- backend attempted (`Vulkan`)
+- GPU/driver/version context when available
+- exact missing extension and feature diagnostics
+- `RT mode: Unsupported`
+- do not pretend to be rendering-capable.

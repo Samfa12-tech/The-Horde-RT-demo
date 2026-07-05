@@ -1,6 +1,6 @@
 # Install Checklist
 
-Phase 0 needs a clean native Vulkan development environment for both Windows and Android.
+Phase 0A implements a real Vulkan capability-probe core on Windows, and Android native wiring now shares the same core and writes device reports to app-private storage.
 
 ## Windows host tools
 
@@ -8,7 +8,7 @@ Phase 0 needs a clean native Vulkan development environment for both Windows and
 - Git.
 - Visual Studio 2022 with **Desktop development with C++**.
 - CMake.
-- Ninja.
+- Ninja (optional, supported by CMake).
 - Vulkan SDK.
 - RenderDoc.
 - NVIDIA Nsight Graphics.
@@ -21,24 +21,37 @@ Phase 0 needs a clean native Vulkan development environment for both Windows and
 - Android NDK.
 - Android CMake package.
 - USB debugging enabled on the Samsung Galaxy S26 Ultra.
-- Vulkan-capability checker available on the phone, if useful.
-- Snapdragon Profiler, if useful and compatible with the device/toolchain.
+- C++17/CMake-friendly Android native activity project template.
 
-## Target hardware
+## Phase 0A exact setup checks
 
-- Samsung Galaxy S26 Ultra.
-- Windows laptop with RTX 5050.
+1. Confirm Vulkan SDK availability.
+2. Configure:
+   - `cmake -S . -B build`
+3. Build the probe executable:
+   - `cmake --build build --target horde_rt_capability_probe`
+4. Run from repository root:
+   - `.\build\horde_rt_capability_probe.exe`
+5. Verify output and ensure files exist:
+   - `reports/vulkan_capability_report.txt`
+   - `reports/vulkan_capability_report.json`
+6. Confirm the log shows device enumeration, extension/feature support, and explicit missing requirements for unsupported hardware.
 
-## Phase 0 setup checks
+7. Confirm Android native integration:
+   - `cmake -S . -B build-android -DCMAKE_SYSTEM_NAME=Android -DANDROID_PLATFORM=33 -DANDROID_ABI=arm64-v8a -DHORDE_RT_BUILD_ANDROID_CAPABILITY_PROBE=ON`
+   - `cmake --build build-android --target horde_rt_capability_probe_android`
+   - Package the library into a NativeActivity APK that includes `src/platform/android/AndroidManifest.xml`.
+   - Run on-device probe and verify with:
+     - `adb shell run-as com.samfa12.hordet.probe cat /data/data/com.samfa12.hordet.probe/files/reports/vulkan_capability_report.txt`
+     - `adb shell run-as com.samfa12.hordet.probe cat /data/data/com.samfa12.hordet.probe/files/reports/vulkan_capability_report.json`
 
-1. Clone the repo.
-2. Confirm CMake can configure the scaffold.
-3. Confirm the Vulkan SDK is discoverable on Windows.
-4. Confirm Android Studio can see the Android SDK, NDK, and CMake package.
-5. Confirm the phone is visible through ADB.
-6. Confirm a Vulkan-capability tool can show the phone GPU and Vulkan API version.
-7. Do not begin gameplay work until native Vulkan RT capability probing is implemented.
+## Android status for this slice
 
-## Expected early limitation
+Android is now wired to a native activity path in this PR. Do not mark complete until an APK is built and the reports are verified on a Galaxy S26 Ultra device.
 
-The scaffold CMake target is not a runnable game and not a working RT renderer. It only establishes the project shape for the real capability probe.
+## Explicit unsupported policy
+
+At no point should the project be treated as working when the probe reports:
+
+- `RT mode: Unsupported`
+- required extension and feature diagnostics indicating any missing path-tracing requirements.

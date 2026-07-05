@@ -1,0 +1,4 @@
+build/
+reports/
+**/*.user
+*.vcxproj.user

@@ -1,14 +1,22 @@
 # Vulkan Layer
 
-The Vulkan layer will own:
+The Vulkan layer now performs the real Phase 0A hardware RT capability probe.
+
+Responsibilities:
 
 - Vulkan instance creation.
-- Physical device enumeration.
-- Extension and feature-chain queries.
-- Logical device creation with required RT features.
-- Swapchain setup later.
-- Capability report data.
+- Physical device enumeration and selection.
+- Device extension enumeration.
+- `vkGetPhysicalDeviceFeatures2` chain queries.
+- RT mode evaluation and diagnostics.
+- Report struct population.
 
-Current files are scaffolding only. The real next task is to wire `vkEnumeratePhysicalDevices`, extension enumeration, and feature queries.
+Current outputs:
 
-The required Phase 0 report fields are listed in `docs/TECHNICAL_REQUIREMENTS.md`.
+- Plain text: `reports/vulkan_capability_report.txt`
+- JSON: `reports/vulkan_capability_report.json`
+
+Android build integration is now wired through:
+- `src/platform/android/CapabilityProbeAndroidMain.cpp`
+- `src/platform/android/AndroidManifest.xml`
+- `src/platform/android/README.md`
