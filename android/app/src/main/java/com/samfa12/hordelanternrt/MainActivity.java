@@ -1,6 +1,7 @@
 package com.samfa12.hordelanternrt;
 
 import android.graphics.Typeface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.ScrollView;
@@ -20,10 +21,14 @@ public class MainActivity extends Activity {
         reportTextView.setTextIsSelectable(true);
         reportTextView.setTypeface(Typeface.MONOSPACE);
         reportTextView.setTextSize(12);
+        reportTextView.setTextColor(Color.GREEN);
+        reportTextView.setBackgroundColor(Color.BLACK);
+        reportTextView.setPadding(16, 16, 16, 16);
 
         final ScrollView container = new ScrollView(this);
         container.addView(reportTextView);
         setContentView(container);
+        container.setBackgroundColor(Color.BLACK);
 
         final String textReport;
         final String jsonReport;

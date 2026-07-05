@@ -1,18 +1,21 @@
 # Install Checklist
 
-## Phase 0B target
+## Phase 0C target
 
-Phase 0B adds a minimal Android native shell for the existing Vulkan capability-probe core.
+Phase 0C adds the native diagnostic window shell on Windows and keeps the Android TextView-based probe UI.
 
-## Windows checks (from prior slice)
+## Windows checks
 
 - Confirm Vulkan SDK availability.
 - Configure:
   - `cmake -S . -B build`
-- Build the probe executable:
+- Build the CLI probe executable:
   - `cmake --build build --target horde_rt_capability_probe`
+- Build the Windows diagnostic window executable:
+  - `cmake --build build --target horde_rt_diagnostic_window`
 - Run:
   - `./build/horde_rt_capability_probe` (Windows: `build\\horde_rt_capability_probe.exe`)
+  - `./build/horde_rt_diagnostic_window` (Windows: `build\\horde_rt_diagnostic_window.exe`)
 - Verify reports:
   - `reports/vulkan_capability_report.txt`
   - `reports/vulkan_capability_report.json`
@@ -74,6 +77,15 @@ features:
 
 - The on-screen output must show the required diagnostic fields from the probe report.
 - Unsupported hardware must still show `RT mode: Unsupported` and clear missing extension/feature lines.
-- The probe must write both reports under `files/reports` in app private storage.
-- Do not mark Android support complete until APK install/run is verified on a target device.
-- Last verified (2026-07-05): Android build, install, launch, and report retrieval succeeded on `SM-S948B` (`samsung`).
+- The probe must write both reports under `files/reports` in app private storage and `reports/` on desktop paths.
+- Windows and Android should continue writing both text and JSON reports.
+- Do not claim Android support complete until APK install/run is verified on target hardware.
+- Last verified (2026-07-05): Android build, install, launch, and report retrieval succeeded on `SM-S948B` (`samsung`) with `RayTracingPipeline`.
+- Do not add fake RT, raster-only fallback, or render-path placeholders as production substitutes in this phase.
+
+## Next milestone guardrails
+
+- Keep the path text-only.
+- Keep unsupported-device honesty intact.
+- Do not add gameplay, fake RT, raster-only fallback, or scene rendering beyond diagnostics in this phase.
+- Proceed to Phase 1B once on-device RT mode validation is confirmed.
