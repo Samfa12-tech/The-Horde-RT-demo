@@ -1,12 +1,12 @@
 # The Horde RT Demo / Horde Lantern RT
 
-A public Samfa12 technology demo for proving native Vulkan hardware ray tracing on Android and Windows. The long-term creative target is a historical gothic scene: dark torch-lit tunnels, wet stone, puddles, fog, lanterns, moving shadows, and an eventual ruined courtyard/colosseum horde encounter. The first job is not gameplay; it is proving real Vulkan RT support on target hardware.
+A public Samfa12 technology demo for proving native Vulkan hardware ray tracing on Android and Windows. The long-term creative target is a historical gothic scene: dark torch-lit tunnels, wet stone, puddles, fog, lanterns, and an eventual ruined corridor/courtyard horde encounter. The first job is not gameplay; it is proving real Vulkan RT support on target hardware.
 
 ## RT or nothing
 
 This project is **RT or nothing**.
 
-The app must use native Vulkan hardware ray tracing. It must query the actual Vulkan ray-tracing extensions and features exposed by the device. If RT support is unavailable, it must show a clear unsupported diagnostic screen and write a capability report. It must not silently fall back to browser rendering, WebGPU, raster-only lighting, screen-space reflections, baked lighting, compute-only path tracing, or fake RT effects.
+The app must use native Vulkan hardware ray tracing. It must query the actual Vulkan ray-tracing extensions and features exposed by the device. If RT support is unavailable, it must show a clear unsupported diagnostic state and write a capability report. It must not silently fall back to browser rendering, WebGPU, raster-only lighting, screen-space reflections, baked lighting, compute-only path tracing, or fake RT effects.
 
 ## Hardware targets
 
@@ -15,44 +15,112 @@ The app must use native Vulkan hardware ray tracing. It must query the actual Vu
 
 ## Current status
 
-Phase 0 repository scaffold is in progress. The repo now defines the documentation, directory layout, and skeletal C++ architecture for the capability probe, but the real Vulkan extension/feature detection is **not implemented yet**.
+Phase 0A/B/C now includes:
 
-No claims should be made that RT is working until the app performs real Vulkan physical-device queries and reports the result on screen and in a capability report.
+- Windows CLI: `horde_rt_capability_probe`.
+- Android native shell (`android/`) that runs the same probe core and displays diagnostics in-app.
+- Android report persistence to app private storage.
+- Windows native diagnostic window: `horde_rt_diagnostic_window`.
+- Real probe still only reports capabilities (no render path yet).
+
+### Probe feature coverage
+
+- Creates a Vulkan instance.
+- Enumerates all physical devices.
+- Logs each candidate device and gathers:
+  - GPU name, vendor ID, device ID, driver version, Vulkan API version.
+  - extension presence for:
+    - `VK_KHR_acceleration_structure`
+    - `VK_KHR_ray_tracing_pipeline`
+    - `VK_KHR_ray_query`
+    - `VK_KHR_buffer_device_address`
+    - `VK_KHR_deferred_host_operations`
+  - feature-chain state for:
+    - `VkPhysicalDeviceAccelerationStructureFeaturesKHR`
+    - `VkPhysicalDeviceRayTracingPipelineFeaturesKHR`
+    - `VkPhysicalDeviceRayQueryFeaturesKHR`
+    - `VkPhysicalDeviceBufferDeviceAddressFeatures`
+- Evaluates RT mode as `RayTracingPipeline`, `RayQuery`, or `Unsupported`.
+- Writes plain text and JSON reports.
+
+## Build and run (Windows probe)
+
+```bash
+cmake -S . -B build
+cmake --build build --target horde_rt_capability_probe
+cmake --build build --target horde_rt_diagnostic_window
+```
+
+```bash
+./build/horde_rt_capability_probe
+./build/horde_rt_diagnostic_window
+```
+
+```bash
+# Windows
+.\build\horde_rt_diagnostic_window.exe
+```
+
+Reports:
+
+- `reports/vulkan_capability_report.txt`
+- `reports/vulkan_capability_report.json`
+
+## Build and run (Phase 0B Android activity shell)
+
+```powershell
+cd android
+./gradlew.bat assembleDebug
+```
+
+On Windows/CLI, install, launch, and verify reports:
+
+```powershell
+cd android
+./gradlew.bat installDebug
+adb shell monkey -p com.samfa12.hordelanternrt 1
+```
+
+Then collect reports from app private storage:
+
+- `adb shell run-as com.samfa12.hordelanternrt ls files/reports`
+- `adb shell run-as com.samfa12.hordelanternrt cat files/reports/vulkan_capability_report.txt`
+- `adb shell run-as com.samfa12.hordelanternrt cat files/reports/vulkan_capability_report.json`
+
+Verified on-device run (2026-07-05, Samsung Galaxy S26 Ultra, model `SM-S948B`, manufacturer `samsung`):
+
+- `adb devices` → `R5GL219SZGK	device`
+- `adb shell getprop ro.product.model` → `SM-S948B`
+- `adb shell getprop ro.product.manufacturer` → `samsung`
+- Retrieved both report files successfully from `files/reports`.
+- RT mode: `RayTracingPipeline`
+- GPU name: `Adreno (TM) 840`
+- Vendor ID: `20803`
+- Device ID: `1141180977`
+- Driver version: `512.842.19`
+- Vulkan API version: `1.4.295`
+- `VK_KHR_acceleration_structure`: `yes`
+- `VK_KHR_ray_tracing_pipeline`: `yes`
+- `VK_KHR_ray_query`: `yes`
+- `VK_KHR_buffer_device_address`: `yes`
+- `VK_KHR_deferred_host_operations`: `yes`
+- Features: `accelerationStructure=true`, `rayTracingPipeline=true`, `rayQuery=true`, `bufferDeviceAddress=true`
 
 ## Planned build targets
 
-- Android-first native Vulkan build path.
-- Windows native Vulkan build path.
-
-## Recommended tool checklist
-
-- Windows 11
-- Git
-- Visual Studio 2022 with Desktop development with C++
-- CMake
-- Ninja
-- Vulkan SDK
-- Android Studio
-- Android SDK
-- Android NDK
-- Android CMake package
-- RenderDoc
-- NVIDIA Nsight Graphics
-- Snapdragon Profiler, if useful on the target phone
-- Vulkan Hardware Capability Viewer or equivalent Vulkan capability checker
-
-See `docs/INSTALL_CHECKLIST.md` for the setup checklist.
+- Android native capability shell (`android/` app module).
+- Windows native Vulkan build path (capability probe + later overlay surface).
 
 ## First milestone: Phase 0 capability probe
 
-The first real milestone is:
+- Vulkan capability probe with real extension/feature diagnostics.
+- JSON/text capability reporting.
+- Unsupported output explicitly explains missing requirements.
+- No fake renderer fallback.
 
-- Android and Windows capability probe.
-- On-screen diagnostic overlay.
-- JSON/text capability report.
-- Unsupported-device diagnostic screen.
+RT rendering is not implemented. Do not claim RT rendering success until both Windows and Android probe flows are verified on target hardware.
 
-Phase 0 must report:
+## First milestone report fields
 
 ```text
 Backend: Vulkan
@@ -71,10 +139,6 @@ Internal render resolution
 FPS / frame time
 ```
 
-## Next milestone: minimal torch-lit hardware RT room
-
-After Phase 0 is genuinely complete, the next milestone is a tiny hardware RT scene: a minimal torch-lit room with wet stone/puddle material tests. This must still use native Vulkan RT and must keep the diagnostic overlay/reporting path visible.
-
 ## Reference policy
 
 This repo should stay clean. Do not dump a giant third-party engine into the project.
@@ -82,23 +146,9 @@ This repo should stay clean. Do not dump a giant third-party engine into the pro
 Reference hierarchy:
 
 1. Primary base/reference: KhronosGroup/Vulkan-Samples, especially `samples/extensions/ray_tracing_basic`.
-2. Main learning/reference: NVIDIA `nvpro-samples/vk_raytracing_tutorial_KHR`.
+2. Main learning/reference: NVIDIA `nvpro-samples/vk_ray_tracing_tutorial_KHR`.
 3. Focused reference snippets: Sascha Willems Vulkan examples.
 4. Backup/reference only: Diligent Engine.
 5. Deferred/not first base: The Forge and Unreal Engine.
 
-If code is later adapted from a permissive source, preserve license notices and document the source.
-
-## Repository map
-
-```text
-src/app/                  Application shell and high-level Phase 0 flow.
-src/platform/android/     Android native Vulkan notes and future glue.
-src/platform/windows/     Windows native Vulkan notes and future Win32 entry.
-src/vulkan/               Vulkan context, device capability, and report code.
-src/vulkan/raytracing/    RT extension/feature requirement evaluation.
-src/ui/                   Diagnostic overlay text/data model.
-shaders/                  Future raygen/miss/hit/ray-query shaders.
-assets/                   Future commercial-safe assets only.
-tools/capability_report/  Future helper scripts/tools for capability reports.
-```
+If code is adapted later from permissive sources, preserve license notices and document the source.
