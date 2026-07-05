@@ -21,7 +21,7 @@ Phase 0A/B/C now includes:
 - Android native shell (`android/`) that runs the same probe core and displays diagnostics in-app.
 - Android report persistence to app private storage.
 - Windows native diagnostic window: `horde_rt_diagnostic_window`.
-- Real probe still only reports capabilities (no render path yet).
+- Real probe now includes a tiny hardware RT scene skeleton validation path on Android (no presentation yet, no gameplay).
 
 ### Probe feature coverage
 
@@ -118,7 +118,7 @@ Verified on-device run (2026-07-05, Samsung Galaxy S26 Ultra, model `SM-S948B`, 
 - Unsupported output explicitly explains missing requirements.
 - No fake renderer fallback.
 
-RT rendering is not implemented. Do not claim RT rendering success until both Windows and Android probe flows are verified on target hardware.
+RT rendering is not implemented. This task still validates that the probe can initialise a native RT-capable logical device and RT dispatch skeleton path.
 
 ## First milestone report fields
 

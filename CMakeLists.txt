@@ -20,6 +20,10 @@ set(HORDE_RT_SOURCE_FILES
     src/vulkan/RtCapabilityReport.cpp
     src/vulkan/VulkanContext.cpp
     src/vulkan/raytracing/RayTracingRequirements.cpp
+    src/vulkan/raytracing/AccelerationStructures.cpp
+    src/vulkan/raytracing/RayTracingPipeline.cpp
+    src/vulkan/raytracing/ShaderBindingTable.cpp
+    src/vulkan/raytracing/TinyRtScene.cpp
 )
 find_package(Vulkan REQUIRED)
 

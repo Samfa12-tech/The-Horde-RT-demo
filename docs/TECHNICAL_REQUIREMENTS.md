@@ -16,6 +16,16 @@ The renderer must use native Vulkan hardware ray tracing. It must not use browse
 - Uses plain-text and JSON report format.
 - Android shell target can now display and persist the report on-device.
 
+## Phase 1B progress
+
+- Added tiny RT scene skeleton verification in `src/vulkan/raytracing/TinyRtScene.cpp`.
+- The skeleton now:
+  - validates required RT extensions/features before attempting setup,
+  - creates a minimal logical device with RT pipeline/AS feature chain,
+  - checks required RT entry points via `vkGetDeviceProcAddr`,
+  - creates and submits a minimal command buffer as a dispatch-path sanity check.
+- The skeleton is still probe-gated: no surface, no framebuffer presentation, no gameplay.
+
 ## Phase 0A required report fields
 
 ```text

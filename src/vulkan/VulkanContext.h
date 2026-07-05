@@ -17,12 +17,10 @@ public:
     VulkanContext(const VulkanContext&) = delete;
     VulkanContext& operator=(const VulkanContext&) = delete;
 
-    // Scaffold only. The next task must replace this with real Vulkan startup:
-    // vkCreateInstance, vkEnumeratePhysicalDevices, extension enumeration, and
-    // VkPhysicalDevice*FeaturesKHR queries.
     bool InitialiseForCapabilityProbe();
 
     DeviceCapabilities QueryDeviceCapabilities() const;
+    VkPhysicalDevice GetSelectedPhysicalDevice() const;
     const std::vector<std::string>& GetDiagnosticLog() const { return startupDiagnostics_; }
 
 private:
@@ -32,6 +30,7 @@ private:
     DeviceCapabilities selectedCapabilities_;
     bool initialised_ = false;
     VkInstance instance_ = VK_NULL_HANDLE;
+    VkPhysicalDevice selectedPhysicalDevice_ = VK_NULL_HANDLE;
 };
 
 } // namespace horde::vulkan

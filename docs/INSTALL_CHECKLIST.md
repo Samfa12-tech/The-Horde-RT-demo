@@ -77,6 +77,7 @@ features:
 
 - The on-screen output must show the required diagnostic fields from the probe report.
 - Unsupported hardware must still show `RT mode: Unsupported` and clear missing extension/feature lines.
+- For RayTracingPipeline-capable hardware, the report now also includes a tiny RT scene skeleton status line (`RT scene status`) indicating whether the native RT setup path was built and validated.
 - The probe must write both reports under `files/reports` in app private storage and `reports/` on desktop paths.
 - Windows and Android should continue writing both text and JSON reports.
 - Do not claim Android support complete until APK install/run is verified on target hardware.

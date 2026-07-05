@@ -25,6 +25,7 @@ This task is the first executable Vulkan hardware RT proof and is gated by real 
 - `horde_rt_capability_probe` exists as the first concrete native proof target.
 - Android is wired as a minimal `android/` app shell in prior slices and remains the primary probe path there.
 - 0C adds `horde_rt_diagnostic_window` using the same probe core and report data.
+- `src/vulkan/raytracing/TinyRtScene.cpp` now performs a native tiny RT device/function skeleton setup before reporting RT scene status.
 
 ## Reference hierarchy
 
@@ -38,7 +39,8 @@ This task is the first executable Vulkan hardware RT proof and is gated by real 
 
 Next smallest task:
 
-- Start Phase 1B by adding the first tiny hardware RT render path on Android using `RayTracingPipeline`, with no fake fallback.
+- Extend the tiny RT path into a presentable native dispatch path:
+  - create the minimum Vulkan pipeline/surface flow needed to show on-screen text or simple debug output without fake fallback.
 
 Latest verification status:
 

@@ -101,6 +101,19 @@ std::string BuildCapabilityTextReport(const DeviceCapabilities& capabilities)
         out << "FPS / frame time: N/A\n";
     }
 
+    out << "RT scene status: " << capabilities.rtScene.status << '\n';
+    out << "RT scene geometry: " << capabilities.rtScene.geometry << '\n';
+    if (capabilities.rtScene.dispatchWidth > 0 && capabilities.rtScene.dispatchHeight > 0)
+    {
+        out << "RT scene dispatch resolution: " << capabilities.rtScene.dispatchWidth << "x"
+            << capabilities.rtScene.dispatchHeight << '\n';
+    }
+    else
+    {
+        out << "RT scene dispatch resolution: N/A\n";
+    }
+    out << "RT scene presented: " << (capabilities.rtScene.presented ? "yes" : "no") << '\n';
+
     if (!capabilities.diagnostics.empty())
     {
         out << "Diagnostics:" << '\n';
@@ -145,6 +158,13 @@ std::string BuildCapabilityJsonReport(const DeviceCapabilities& capabilities)
     out << "  },\n";
     out << "  \"fps\": " << (IsMeasured(capabilities.performance.fps) ? std::to_string(capabilities.performance.fps) : "\"N/A\"") << ",\n";
     out << "  \"frameTimeMs\": " << (capabilities.performance.frameTimeMs > 0.0f ? std::to_string(capabilities.performance.frameTimeMs) : "\"N/A\"") << ",\n";
+    out << "  \"rtScene\": {\n";
+    out << "    \"status\": \"" << JsonEscape(capabilities.rtScene.status) << "\",\n";
+    out << "    \"geometry\": \"" << JsonEscape(capabilities.rtScene.geometry) << "\",\n";
+    out << "    \"dispatchWidth\": " << capabilities.rtScene.dispatchWidth << ",\n";
+    out << "    \"dispatchHeight\": " << capabilities.rtScene.dispatchHeight << ",\n";
+    out << "    \"presented\": " << (capabilities.rtScene.presented ? "true" : "false") << "\n";
+    out << "  },\n";
     out << "  \"diagnostics\": [";
 
     for (std::size_t i = 0; i < capabilities.diagnostics.size(); ++i)

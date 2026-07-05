@@ -32,6 +32,7 @@ adb shell run-as com.samfa12.hordelanternrt cat files/reports/vulkan_capability_
 - Probe text rendering remains TextView-based for now.
 - Unsupported hardware still shows a clear warning and diagnostic details via the shared overlay text path.
 - Report writing uses the same C++ probe core as the Windows CLI and diagnostic window.
+- On supported hardware, the shared core also runs a tiny RT scene skeleton validation path using the ray-tracing pipeline stack and reports status in `RT scene status`.
 
 Verified result:
 

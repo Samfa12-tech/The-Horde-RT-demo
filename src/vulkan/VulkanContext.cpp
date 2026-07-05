@@ -1,6 +1,7 @@
 #include "vulkan/VulkanContext.h"
 
 #include "vulkan/raytracing/RayTracingRequirements.h"
+#include "vulkan/raytracing/TinyRtScene.h"
 
 #include <algorithm>
 #include <iomanip>
@@ -281,6 +282,7 @@ bool VulkanContext::InitialiseForCapabilityProbe()
     startupDiagnostics_.clear();
     selectedCapabilities_ = DeviceCapabilities{};
     selectedCapabilities_.rtMode = RtMode::Unsupported;
+    selectedPhysicalDevice_ = VK_NULL_HANDLE;
 
     const VkApplicationInfo appInfo{
         VK_STRUCTURE_TYPE_APPLICATION_INFO, nullptr, "HordeLanternRTCapabilityProbe", 1, "horde_rt", 1,
@@ -326,6 +328,7 @@ bool VulkanContext::InitialiseForCapabilityProbe()
         if (!hasSelectedCandidate || IsBetterMode(capabilities.rtMode, selectedCapabilities_.rtMode))
         {
             selectedCapabilities_ = capabilities;
+            selectedPhysicalDevice_ = physicalDevices[deviceIndex];
             hasSelectedCandidate = true;
         }
     }
@@ -342,6 +345,19 @@ bool VulkanContext::InitialiseForCapabilityProbe()
         selectedCapabilities_.diagnostics.push_back(kNoProbeResultMessage);
     }
 
+    if (selectedPhysicalDevice_ != VK_NULL_HANDLE)
+    {
+        selectedCapabilities_.rtScene = raytracing::ExecuteTinyRtScene(selectedPhysicalDevice_, selectedCapabilities_);
+        startupDiagnostics_.push_back("Tiny RT scene status: " + selectedCapabilities_.rtScene.status);
+        startupDiagnostics_.push_back("Tiny RT scene geometry: " + selectedCapabilities_.rtScene.geometry);
+
+        if (selectedCapabilities_.rtScene.dispatchWidth > 0 && selectedCapabilities_.rtScene.dispatchHeight > 0)
+        {
+            selectedCapabilities_.performance.internalRenderWidth = selectedCapabilities_.rtScene.dispatchWidth;
+            selectedCapabilities_.performance.internalRenderHeight = selectedCapabilities_.rtScene.dispatchHeight;
+        }
+    }
+
     if (selectedCapabilities_.rtMode == RtMode::Unsupported && selectedCapabilities_.diagnostics.empty())
     {
         selectedCapabilities_.diagnostics.push_back("Unsupported: no valid Vulkan RT requirements found.");
@@ -352,6 +368,11 @@ bool VulkanContext::InitialiseForCapabilityProbe()
 
     initialised_ = true;
     return true;
+}
+
+VkPhysicalDevice VulkanContext::GetSelectedPhysicalDevice() const
+{
+    return selectedPhysicalDevice_;
 }
 
 DeviceCapabilities VulkanContext::QueryDeviceCapabilities() const
