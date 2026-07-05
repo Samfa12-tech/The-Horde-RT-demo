@@ -1,14 +1,30 @@
 # Windows Platform Path
 
-Windows is the secondary / equal hardware target for Phase 0.
+Windows is the secondary/equal hardware target for this phase.
 
-Future work should add:
+## Window for this slice
 
-- Win32 or minimal platform entry point.
-- Vulkan instance creation and surface support.
-- Device capability query on the RTX 5050 laptop.
-- On-screen diagnostic overlay.
-- JSON/text capability report written beside the executable or to a known reports directory.
-- Unsupported-device screen with extension/feature details.
+- Build and run the CLI capability probe:
+  - `cmake -S . -B build`
+  - `cmake --build build --target horde_rt_capability_probe`
+  - `.\build\horde_rt_capability_probe.exe`
+- Outputs are written to `reports/`:
+  - `vulkan_capability_report.txt`
+  - `vulkan_capability_report.json`
 
-Do not add raster-only demo code as a substitute for Vulkan RT capability work.
+## What is implemented
+
+- No Win32 windowed overlay is wired yet.
+- Native Vulkan capability probe logic is implemented and runs as CLI.
+- Probe prints logs to stdout and writes text/JSON reports.
+
+## What is intentionally not implemented yet
+
+- Swapchain and present path.
+- Windowed diagnostics overlay.
+- Rendering / scene.
+- Android overlay parity.
+
+## Next task
+
+- Keep this logic as shared core while Android brings the same `VulkanContext` probe into a native activity.

@@ -1,6 +1,6 @@
 # Install Checklist
 
-Phase 0 needs a clean native Vulkan development environment for both Windows and Android.
+Phase 0A implements a real Vulkan capability-probe core on Windows. Android is acknowledged but still pending integration.
 
 ## Windows host tools
 
@@ -8,7 +8,7 @@ Phase 0 needs a clean native Vulkan development environment for both Windows and
 - Git.
 - Visual Studio 2022 with **Desktop development with C++**.
 - CMake.
-- Ninja.
+- Ninja (optional, supported by CMake).
 - Vulkan SDK.
 - RenderDoc.
 - NVIDIA Nsight Graphics.
@@ -21,24 +21,35 @@ Phase 0 needs a clean native Vulkan development environment for both Windows and
 - Android NDK.
 - Android CMake package.
 - USB debugging enabled on the Samsung Galaxy S26 Ultra.
-- Vulkan-capability checker available on the phone, if useful.
-- Snapdragon Profiler, if useful and compatible with the device/toolchain.
+- C++17/CMake-friendly Android native activity project template.
 
-## Target hardware
+## Phase 0A exact setup checks
 
-- Samsung Galaxy S26 Ultra.
-- Windows laptop with RTX 5050.
+1. Confirm Vulkan SDK availability.
+2. Configure:
+   - `cmake -S . -B build`
+3. Build the probe executable:
+   - `cmake --build build --target horde_rt_capability_probe`
+4. Run from repository root:
+   - `.\build\horde_rt_capability_probe.exe`
+5. Verify output and ensure files exist:
+   - `reports/vulkan_capability_report.txt`
+   - `reports/vulkan_capability_report.json`
+6. Confirm the log shows device enumeration, extension/feature support, and explicit missing requirements for unsupported hardware.
 
-## Phase 0 setup checks
+## Android status for this slice
 
-1. Clone the repo.
-2. Confirm CMake can configure the scaffold.
-3. Confirm the Vulkan SDK is discoverable on Windows.
-4. Confirm Android Studio can see the Android SDK, NDK, and CMake package.
-5. Confirm the phone is visible through ADB.
-6. Confirm a Vulkan-capability tool can show the phone GPU and Vulkan API version.
-7. Do not begin gameplay work until native Vulkan RT capability probing is implemented.
+Android is not yet wired into the native app shell in this PR. Use the documented plan in:
 
-## Expected early limitation
+- `src/platform/android/README.md`
+- `docs/TECHNICAL_REQUIREMENTS.md`
+- `docs/PHASE_PLAN.md`
 
-The scaffold CMake target is not a runnable game and not a working RT renderer. It only establishes the project shape for the real capability probe.
+Do not mark Android support as complete until an Android CMake/NDK build compiles and writes the same probe report on-device.
+
+## Explicit unsupported policy
+
+At no point should the project be treated as working when the probe reports:
+
+- `RT mode: Unsupported`
+- required extension and feature diagnostics indicating any missing path-tracing requirements.

@@ -1,12 +1,12 @@
 # The Horde RT Demo / Horde Lantern RT
 
-A public Samfa12 technology demo for proving native Vulkan hardware ray tracing on Android and Windows. The long-term creative target is a historical gothic scene: dark torch-lit tunnels, wet stone, puddles, fog, lanterns, moving shadows, and an eventual ruined courtyard/colosseum horde encounter. The first job is not gameplay; it is proving real Vulkan RT support on target hardware.
+A public Samfa12 technology demo for proving native Vulkan hardware ray tracing on Android and Windows. The long-term creative target is a historical gothic scene: dark torch-lit tunnels, wet stone, puddles, fog, lanterns, and an eventual ruined corridor/courtyard horde encounter. The first job is not gameplay; it is proving real Vulkan RT support on target hardware.
 
 ## RT or nothing
 
 This project is **RT or nothing**.
 
-The app must use native Vulkan hardware ray tracing. It must query the actual Vulkan ray-tracing extensions and features exposed by the device. If RT support is unavailable, it must show a clear unsupported diagnostic screen and write a capability report. It must not silently fall back to browser rendering, WebGPU, raster-only lighting, screen-space reflections, baked lighting, compute-only path tracing, or fake RT effects.
+The app must use native Vulkan hardware ray tracing. It must query the actual Vulkan ray-tracing extensions and features exposed by the device. If RT support is unavailable, it must show a clear unsupported diagnostic state and write a capability report. It must not silently fall back to browser rendering, WebGPU, raster-only lighting, screen-space reflections, baked lighting, compute-only path tracing, or fake RT effects.
 
 ## Hardware targets
 
@@ -15,44 +15,60 @@ The app must use native Vulkan hardware ray tracing. It must query the actual Vu
 
 ## Current status
 
-Phase 0 repository scaffold is in progress. The repo now defines the documentation, directory layout, and skeletal C++ architecture for the capability probe, but the real Vulkan extension/feature detection is **not implemented yet**.
+Phase 0A real capability probe is implemented for Windows:
 
-No claims should be made that RT is working until the app performs real Vulkan physical-device queries and reports the result on screen and in a capability report.
+- Creates a Vulkan instance.
+- Enumerates all physical devices.
+- Logs each candidate device and gathers:
+  - GPU name, vendor ID, device ID, driver version, Vulkan API version.
+  - extension presence for:
+    - `VK_KHR_acceleration_structure`
+    - `VK_KHR_ray_tracing_pipeline`
+    - `VK_KHR_ray_query`
+    - `VK_KHR_buffer_device_address`
+    - `VK_KHR_deferred_host_operations`
+  - feature-chain state for:
+    - `VkPhysicalDeviceAccelerationStructureFeaturesKHR`
+    - `VkPhysicalDeviceRayTracingPipelineFeaturesKHR`
+    - `VkPhysicalDeviceRayQueryFeaturesKHR`
+    - `VkPhysicalDeviceBufferDeviceAddressFeatures`
+- Evaluates RT mode as `RayTracingPipeline`, `RayQuery`, or `Unsupported`.
+- Writes a plain text and JSON report.
+- Prints diagnostics to console.
+
+## Build and run (Phase 0A Windows executable)
+
+```bash
+cmake -S . -B build
+cmake --build build --target horde_rt_capability_probe
+```
+
+```bash
+.\build\horde_rt_capability_probe.exe
+```
+
+Reports are written to:
+
+- `reports/vulkan_capability_report.txt`
+- `reports/vulkan_capability_report.json`
 
 ## Planned build targets
 
 - Android-first native Vulkan build path.
 - Windows native Vulkan build path.
 
-## Recommended tool checklist
-
-- Windows 11
-- Git
-- Visual Studio 2022 with Desktop development with C++
-- CMake
-- Ninja
-- Vulkan SDK
-- Android Studio
-- Android SDK
-- Android NDK
-- Android CMake package
-- RenderDoc
-- NVIDIA Nsight Graphics
-- Snapdragon Profiler, if useful on the target phone
-- Vulkan Hardware Capability Viewer or equivalent Vulkan capability checker
-
-See `docs/INSTALL_CHECKLIST.md` for the setup checklist.
-
 ## First milestone: Phase 0 capability probe
 
-The first real milestone is:
+This slice is the RT or nothing startup proof:
 
-- Android and Windows capability probe.
-- On-screen diagnostic overlay.
-- JSON/text capability report.
-- Unsupported-device diagnostic screen.
+- Vulkan capability probe with real extension/feature diagnostics.
+- JSON/text capability reporting.
+- Unsupported output that explicitly explains missing requirements.
+- No fake renderer fallback.
 
-Phase 0 must report:
+No claims should be made that RT rendering is complete until this probe is integrated into a native on-screen Android flow.
+
+## First milestone report fields
 
 ```text
 Backend: Vulkan
@@ -71,10 +87,6 @@ Internal render resolution
 FPS / frame time
 ```
 
-## Next milestone: minimal torch-lit hardware RT room
-
-After Phase 0 is genuinely complete, the next milestone is a tiny hardware RT scene: a minimal torch-lit room with wet stone/puddle material tests. This must still use native Vulkan RT and must keep the diagnostic overlay/reporting path visible.
-
 ## Reference policy
 
 This repo should stay clean. Do not dump a giant third-party engine into the project.
@@ -87,14 +99,14 @@ Reference hierarchy:
 4. Backup/reference only: Diligent Engine.
 5. Deferred/not first base: The Forge and Unreal Engine.
 
-If code is later adapted from a permissive source, preserve license notices and document the source.
+If code is adapted later from permissive sources, preserve license notices and document the source.
 
 ## Repository map
 
 ```text
-src/app/                  Application shell and high-level Phase 0 flow.
+src/app/                  Application shell and high-level flow.
 src/platform/android/     Android native Vulkan notes and future glue.
-src/platform/windows/     Windows native Vulkan notes and future Win32 entry.
+src/platform/windows/     Windows probe executable and future windowed entry.
 src/vulkan/               Vulkan context, device capability, and report code.
 src/vulkan/raytracing/    RT extension/feature requirement evaluation.
 src/ui/                   Diagnostic overlay text/data model.

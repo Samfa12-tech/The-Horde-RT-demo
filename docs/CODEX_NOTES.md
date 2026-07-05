@@ -1,25 +1,26 @@
 # Codex Notes
 
-Codex should treat `PROJECT_DECISIONS.md` and the Phase 0 docs as the current source of truth.
+This task is the first executable Vulkan hardware RT proof and is gated by real capability reporting only.
 
 ## Do
 
-- Keep the repo clean.
-- Implement native Vulkan work directly.
-- Prioritise Android and Windows capability probing.
-- Query real Vulkan extensions and feature structs before claiming RT support.
-- Keep unsupported-device diagnostics clear.
-- Update docs when decisions change.
-- End each task with files changed, what was verified, known limitations, and the exact next smallest task.
+- Keep the repository clean and native-first.
+- Query real Vulkan extensions/features before any RT rendering claims.
+- Keep unsupported devices honest with explicit missing extension/feature diagnostics.
+- Prefer Windows CLI proof, then Android-native shell next.
+- Emit both text and JSON reports in `reports/`.
+- Update notes whenever build/test scope changes.
 
 ## Do not
 
-- Do not build gameplay before RT capability proof.
-- Do not add browser, WebGPU, Three.js, Babylon.js, Godot renderer, Unreal-first, raster-only, SSR, baked-lighting, or compute-only path-tracing substitutes.
-- Do not claim RT is working until real Vulkan RT extension/feature detection exists.
-- Do not import untextured Meshy assets.
-- Do not dump a giant third-party engine into this repo.
-- Do not let stale prompts override `RT or nothing`.
+- Do not claim Android support is complete without a compiling Android native build.
+- Do not claim RT works without hardware RT mode selection.
+- Do not add gameplay, fake RT, raster-only renderer, or fallback-only paths before this proof is wired.
+
+## Current status notes
+
+- `horde_rt_capability_probe` now exists as the first concrete native proof target.
+- Android is documented for next-phase integration; it is not yet complete.
 
 ## Reference hierarchy
 
@@ -31,4 +32,4 @@ Codex should treat `PROJECT_DECISIONS.md` and the Phase 0 docs as the current so
 
 ## Next smallest task
 
-Implement the real Vulkan device capability probe that detects and reports Vulkan RT support on Windows and Android, writes a JSON/text capability report, and shows an unsupported diagnostic screen when hardware RT is unavailable.
+Wire the same Vulkan capability-probe core into an Android native app shell on the Galaxy S26 Ultra, display the report on screen, and write the report to device storage.
