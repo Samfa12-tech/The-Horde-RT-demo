@@ -65,11 +65,38 @@ cd android
 ./gradlew.bat assembleDebug
 ```
 
-Install and run from Studio, then verify:
+On Windows/CLI, install, launch, and verify reports:
+
+```powershell
+cd android
+./gradlew.bat installDebug
+adb shell monkey -p com.samfa12.hordelanternrt 1
+```
+
+Then collect reports from app private storage:
 
 - `adb shell run-as com.samfa12.hordelanternrt ls files/reports`
 - `adb shell run-as com.samfa12.hordelanternrt cat files/reports/vulkan_capability_report.txt`
 - `adb shell run-as com.samfa12.hordelanternrt cat files/reports/vulkan_capability_report.json`
+
+Verified on-device run (2026-07-05, Samsung Galaxy S26 Ultra, model `SM-S948B`, manufacturer `samsung`):
+
+- `adb devices` → `R5GL219SZGK	device`
+- `adb shell getprop ro.product.model` → `SM-S948B`
+- `adb shell getprop ro.product.manufacturer` → `samsung`
+- Retrieved both report files successfully from `files/reports`.
+- RT mode: `RayTracingPipeline`
+- GPU name: `Adreno (TM) 840`
+- Vendor ID: `20803`
+- Device ID: `1141180977`
+- Driver version: `512.842.19`
+- Vulkan API version: `1.4.295`
+- `VK_KHR_acceleration_structure`: `yes`
+- `VK_KHR_ray_tracing_pipeline`: `yes`
+- `VK_KHR_ray_query`: `yes`
+- `VK_KHR_buffer_device_address`: `yes`
+- `VK_KHR_deferred_host_operations`: `yes`
+- Features: `accelerationStructure=true`, `rayTracingPipeline=true`, `rayQuery=true`, `bufferDeviceAddress=true`
 
 ## Planned build targets
 

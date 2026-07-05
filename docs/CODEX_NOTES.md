@@ -34,3 +34,9 @@ This task is the first executable Vulkan hardware RT proof and is gated by real 
 ## Next smallest task
 
 Run the Android probe on the Galaxy S26 Ultra, verify `files/reports` output with `adb run-as`, then add native Vulkan surface rendering for overlay text on Android and Windows without fake RT paths.
+
+Latest verification status:
+
+- Device: `SM-S948B` (`samsung`)
+- RT result: `RayTracingPipeline`
+- Report files in app private `files/reports` were read successfully from `com.samfa12.hordelanternrt` on-device.
