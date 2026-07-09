@@ -29,7 +29,7 @@
 ### Still required to close Phase 1C
 
 1. Build, install, and test this source slice on the target phone; confirm collision is comfortable and `RT frame reached Android swapchain presentation.` still appears.
-2. Visually tune the real torch mesh and its reflected flame proof on laptop and phone; do not reintroduce a detached fake torch light or fullscreen overlay.
+2. Visually validate and tune the real torch mesh and its reflected flame proof on the phone; the RTX laptop proof is complete. Do not reintroduce a detached fake torch light or fullscreen overlay.
 3. Add a narrow GLB animation/PBR loader for the staged skeleton and measure one animated enemy on laptop and phone; keep the sword separate.
 4. Remesh/LOD the staged sword to a roughly 10–15k-triangle held-prop budget before adding it to the Android RT BLAS/TLAS. This needs a new credit approval.
 5. Add a right-hand attachment only after that remesh is accepted; measure the mobile RT cost first.
