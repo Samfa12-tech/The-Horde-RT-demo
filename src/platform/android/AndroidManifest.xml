@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Legacy NativeActivity prototype used during early phase.
+     Phase 0B now uses android/app MainActivity + JNI bridge under android/ module. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.samfa12.hordet.probe">
+
+    <application android:label="Horde RT Capability Probe"
+        android:hasCode="true">
+        <activity
+            android:name="android.app.NativeActivity"
+            android:label="Horde RT Capability Probe"
+            android:exported="true"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize">
+            <meta-data android:name="android.app.lib_name" android:value="horde_rt_capability_probe_android" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

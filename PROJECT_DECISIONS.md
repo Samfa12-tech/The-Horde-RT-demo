@@ -109,6 +109,37 @@ The following are intentionally not part of the scaffold step:
 - BLAS/TLAS implementation.
 - Platform packaging.
 
-## Next smallest task
+## Tested Phase 1 status - 2026-07-10
 
-Implement the real Vulkan device capability probe that detects and reports Vulkan RT support on Windows and Android, writes a JSON/text capability report, and shows an unsupported diagnostic screen when hardware RT is unavailable.
+The project has moved beyond the original Phase 0 scaffold/probe.
+
+Current proven path:
+
+- Android app builds, installs, and launches on Samsung `SM-S948B`.
+- Native Vulkan swapchain path presents an RT-produced storage image to screen.
+- The scene uses BLAS/TLAS acceleration structures, an RT pipeline/SBT, `vkCmdTraceRaysKHR`, and a storage-image-to-swapchain copy.
+- Reports only set `rtScene.presented = true` after successful swapchain presentation.
+- The visible scene is now a first-person gothic corridor/ruin prototype with a handheld medieval torch, reflective objects, puddle/wet-stone response, horde silhouettes, fog, and second-room sunlight.
+- The current source represents the held torch as a real emissive BLAS/TLAS instance rather than a screen overlay. Its laptop visual proof is complete; target-phone visual validation remains pending.
+- The live laptop proof shows the real orange flame and a deterministic ray-query reflection in a high-reflectivity wall insert. The raw RGBA-to-BGRA copy is explicitly compensated so the flame cannot turn cyan at presentation.
+- Controls are now left-drag movement/strafe and right-drag 360 look.
+- Windows now runs the same RT corridor as an interactive desktop scene: `WASD` moves, left mouse/trackpad click-drag looks, and `Esc` exits.
+- The RTX 5050 laptop reported `RayTracingPipeline` and successful RT swapchain presentation at 984 x 661 in the interactive Windows build.
+- A Meshy biped skeleton with 11 correctly named animations is staged as source art only. The sword remains separate; neither asset has a runtime GLB import or attachment path yet.
+
+Important technical finding:
+
+- A recursive path-tracing attempt using closest-hit secondary `traceRayEXT` calls and pipeline recursion depth 2 failed on the phone at RT pipeline creation.
+- The stable phone path uses `rayQueryEXT` from raygen to query the same TLAS for primary hits, shadow rays, and a first bounce sample while keeping pipeline recursion depth 1.
+- This keeps the project aligned with RT-or-nothing because ray queries use Vulkan hardware acceleration-structure traversal.
+
+## Next smallest task - Phase 1C
+
+Implement the gothic material and collision proof:
+
+1. Re-test the collision/material source and real torch/panel-reflection proof on the phone while preserving the verified laptop interactive controls and colour-correct RT presentation.
+2. Add a narrow GLB animation/PBR import path for the staged skeleton, keeping the sword separate.
+3. Instantiate and animate one skeleton enemy only after its import path is measured on the laptop and phone.
+4. Import a small number of commercial-safe open-source environment PBR textures, preferably CC0 from Poly Haven or ambientCG.
+5. Record every imported asset in `ASSET_LICENSES.md` and resolve its Meshy account-plan license gate before release.
+6. Preserve the phone-safe ray-query path tracing route unless a stronger RT route is proven on device.

@@ -48,6 +48,15 @@ struct PerformanceSnapshot
     float frameTimeMs = 0.0f;
 };
 
+struct TinyRtSceneSnapshot
+{
+    std::string status = "Not attempted";
+    std::string geometry = "Horde Lantern corridor demo scene";
+    std::uint32_t dispatchWidth = 0;
+    std::uint32_t dispatchHeight = 0;
+    bool presented = false;
+};
+
 struct DeviceCapabilities
 {
     std::string backend = "Vulkan";
@@ -56,6 +65,7 @@ struct DeviceCapabilities
     ExtensionSupport extensions;
     FeatureSupport features;
     PerformanceSnapshot performance;
+    TinyRtSceneSnapshot rtScene;
     std::vector<std::string> diagnostics;
 };
 

@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+set -e
+
+if [ -f "$(dirname "$0")/gradle/wrapper/gradle-wrapper.jar" ]; then
+  exec "${JAVA_HOME}/bin/java" -classpath "$(dirname "$0")/gradle/wrapper/gradle-wrapper.jar" org.gradle.wrapper.GradleWrapperMain "$@"
+fi
+
+if command -v gradle >/dev/null 2>&1; then
+  exec gradle "$@"
+fi
+
+echo "ERROR: Neither Gradle wrapper jar nor system gradle found. Install Android Studio or Gradle, then run again." >&2
+exit 1

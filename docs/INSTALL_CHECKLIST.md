@@ -1,44 +1,92 @@
 # Install Checklist
 
-Phase 0 needs a clean native Vulkan development environment for both Windows and Android.
+## Phase 0C target
 
-## Windows host tools
+Phase 0C adds the native diagnostic window shell on Windows and keeps the Android native Vulkan diagnostic surface plus overlay text UI.
 
-- Windows 11.
-- Git.
-- Visual Studio 2022 with **Desktop development with C++**.
-- CMake.
-- Ninja.
-- Vulkan SDK.
-- RenderDoc.
-- NVIDIA Nsight Graphics.
-- Vulkan Hardware Capability Viewer or equivalent.
+## Windows checks
 
-## Android tools
+- Confirm Vulkan SDK availability.
+- Configure:
+  - `cmake -S . -B build`
+- Build the CLI probe executable:
+  - `cmake --build build --target horde_rt_capability_probe`
+- Build the Windows diagnostic window executable:
+  - `cmake --build build --target horde_rt_diagnostic_window`
+- Run:
+  - `./build/horde_rt_capability_probe` (Windows: `build\\horde_rt_capability_probe.exe`)
+  - `./build/horde_rt_diagnostic_window` (Windows: `build\\horde_rt_diagnostic_window.exe`)
+- Verify reports:
+  - `reports/vulkan_capability_report.txt`
+  - `reports/vulkan_capability_report.json`
 
-- Android Studio.
-- Android SDK.
-- Android NDK.
-- Android CMake package.
-- USB debugging enabled on the Samsung Galaxy S26 Ultra.
-- Vulkan-capability checker available on the phone, if useful.
-- Snapdragon Profiler, if useful and compatible with the device/toolchain.
+## Android checks
 
-## Target hardware
+From repository root (verified on-device on `SM-S948B`):
 
-- Samsung Galaxy S26 Ultra.
-- Windows laptop with RTX 5050.
+```powershell
+cd android
+./gradlew.bat assembleDebug
+./gradlew.bat installDebug
+adb shell monkey -p com.samfa12.hordelanternrt 1
+```
 
-## Phase 0 setup checks
+Optional install:
 
-1. Clone the repo.
-2. Confirm CMake can configure the scaffold.
-3. Confirm the Vulkan SDK is discoverable on Windows.
-4. Confirm Android Studio can see the Android SDK, NDK, and CMake package.
-5. Confirm the phone is visible through ADB.
-6. Confirm a Vulkan-capability tool can show the phone GPU and Vulkan API version.
-7. Do not begin gameplay work until native Vulkan RT capability probing is implemented.
+```bash
+adb install app/build/outputs/apk/debug/app-debug.apk
+```
 
-## Expected early limitation
+Alternate install:
 
-The scaffold CMake target is not a runnable game and not a working RT renderer. It only establishes the project shape for the real capability probe.
+```powershell
+./gradlew.bat installDebug
+```
+
+Run and collect on-device diagnostics:
+
+```bash
+adb shell run-as com.samfa12.hordelanternrt ls files/reports
+adb shell run-as com.samfa12.hordelanternrt cat files/reports/vulkan_capability_report.txt
+adb shell run-as com.samfa12.hordelanternrt cat files/reports/vulkan_capability_report.json
+```
+
+Sample verified output from `SM-S948B`:
+
+```text
+Backend: Vulkan
+RT mode: RayTracingPipeline
+GPU name: Adreno (TM) 840
+Vendor ID: 20803
+Device ID: 1141180977
+Driver version: 512.842.19
+Vulkan API version: 1.4.295
+VK_KHR_acceleration_structure: yes
+VK_KHR_ray_tracing_pipeline: yes
+VK_KHR_ray_query: yes
+VK_KHR_buffer_device_address: yes
+VK_KHR_deferred_host_operations: yes
+features:
+  accelerationStructure: true
+  rayTracingPipeline: true
+  rayQuery: true
+  bufferDeviceAddress: true
+```
+
+## Verification expectations
+
+- The on-screen output must show the required diagnostic fields from the probe report and the native Vulkan diagnostic surface should present a colour matching RT mode.
+- Unsupported hardware must still show `RT mode: Unsupported` and clear missing extension/feature lines.
+- For RayTracingPipeline-capable hardware, the report now also includes a tiny RT scene skeleton status line (`RT scene status`) indicating whether the native RT setup path was built and validated.
+- The probe must write both reports under `files/reports` in app private storage and `reports/` on desktop paths.
+- Windows and Android should continue writing both text and JSON reports.
+- Do not claim Android support complete until APK install/run is verified on target hardware.
+- Last verified (2026-07-05): Android build, install, launch, and report retrieval succeeded on `SM-S948B` (`samsung`) with `RayTracingPipeline`.
+- Do not add fake RT, raster-only fallback, or render-path placeholders as production substitutes in this phase.
+
+## Next milestone guardrails
+
+- Keep the path text-only.
+- Keep unsupported-device honesty intact.
+- Do not add gameplay, fake RT, raster-only fallback, or scene rendering beyond diagnostics in this phase.
+- Proceed to Phase 1B once on-device RT mode validation is confirmed.

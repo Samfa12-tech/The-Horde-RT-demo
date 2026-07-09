@@ -1,6 +1,6 @@
 # Textures
 
-No textures are imported yet.
+No standalone environment texture sets are imported yet. The staged Meshy sword includes embedded PBR maps and matching sidecar maps under `assets/models/weapons/meshy/`.
 
 Future texture rules:
 

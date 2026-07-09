@@ -1,12 +1,12 @@
 # The Horde RT Demo / Horde Lantern RT
 
-A public Samfa12 technology demo for proving native Vulkan hardware ray tracing on Android and Windows. The long-term creative target is a historical gothic scene: dark torch-lit tunnels, wet stone, puddles, fog, lanterns, moving shadows, and an eventual ruined courtyard/colosseum horde encounter. The first job is not gameplay; it is proving real Vulkan RT support on target hardware.
+A public Samfa12 technology demo for proving native Vulkan hardware ray tracing on Android and Windows. The long-term creative target is a historical gothic scene: dark torch-lit tunnels, wet stone, puddles, fog, lanterns, and an eventual ruined corridor/courtyard horde encounter. The first job is not gameplay; it is proving real Vulkan RT support on target hardware.
 
 ## RT or nothing
 
 This project is **RT or nothing**.
 
-The app must use native Vulkan hardware ray tracing. It must query the actual Vulkan ray-tracing extensions and features exposed by the device. If RT support is unavailable, it must show a clear unsupported diagnostic screen and write a capability report. It must not silently fall back to browser rendering, WebGPU, raster-only lighting, screen-space reflections, baked lighting, compute-only path tracing, or fake RT effects.
+The app must use native Vulkan hardware ray tracing. It must query the actual Vulkan ray-tracing extensions and features exposed by the device. If RT support is unavailable, it must show a clear unsupported diagnostic state and write a capability report. It must not silently fall back to browser rendering, WebGPU, raster-only lighting, screen-space reflections, baked lighting, compute-only path tracing, or fake RT effects.
 
 ## Hardware targets
 
@@ -15,44 +15,142 @@ The app must use native Vulkan hardware ray tracing. It must query the actual Vu
 
 ## Current status
 
-Phase 0 repository scaffold is in progress. The repo now defines the documentation, directory layout, and skeletal C++ architecture for the capability probe, but the real Vulkan extension/feature detection is **not implemented yet**.
+Phase 0A/B/C established the capability probe and native diagnostic shells. The project has now moved into an early Phase 1 phone scene.
 
-No claims should be made that RT is working until the app performs real Vulkan physical-device queries and reports the result on screen and in a capability report.
+Current tested phone build includes:
+
+- A native Vulkan Android app that builds, installs, and launches on Samsung `SM-S948B`.
+- A real RT-produced frame path: BLAS/TLAS, RT pipeline/SBT, `vkCmdTraceRaysKHR`, storage image output, and swapchain presentation.
+- A first-person gothic corridor/ruin scene with authored triangle geometry.
+- Visible handheld medieval flame torch on the left side of the player view.
+- Left-side touch movement/strafe and right-side 360 look.
+- Ray-query path-tracing style shading: primary TLAS queries, shadow queries, and a first bounce sample.
+- Reflective objects, wet-floor/puddle response, fog, horde silhouettes, and second-room sunlight.
+- Diagnostics hidden behind the HUD tap instead of being the primary screen.
+
+The current Phase 1C source slice additionally adds simple corridor/arch collision and a stronger procedural material table for dry stone, wet stone/puddles, mossy stone, old metal, and flame. The RT look now removes synthetic grain and time-varying random bounce sampling, reduces cool sky/indirect influence, and places a real low-poly emissive held-torch mesh into a second TLAS instance. Its camera-local flame placement drives the direct-light sample and is visible to reflection rays; the old fullscreen torch overlay is gone. The renderer also compensates for the RGBA-storage-to-BGRA-swapchain raw copy, so the fire stays orange rather than cyan. This torch/reflection proof is visually verified on the RTX laptop; it must still be installed and re-tested on the target phone before being counted as a verified phone result.
+
+Asset staging update: a Meshy-6 PBR gothic sword has been generated for the future right hand. The staged GLB has 2K maps but also 49,439 triangles, so it is not runtime-integrated; it needs remesh/LOD plus a GLB/PBR import and right-hand attachment path before it can enter the Android RT scene.
+
+A separate Meshy skeleton is staged with its merged animation file. It has 11 correctly named clips and is a 9,402-triangle skinned prop, but it too remains outside the runtime until a narrow GLB animation/PBR import path is built. The sword is intentionally not attached to its hand.
+
+Verified desktop interactive run (2026-07-10): NVIDIA GeForce RTX 5050 Laptop GPU reported `RayTracingPipeline` and presented the RT corridor at 984 x 661. Controls are `WASD` to move, left mouse/trackpad click-drag to look, and `Esc` to exit.
+
+Important phone finding:
+
+- Recursive closest-hit secondary tracing with pipeline recursion depth 2 failed on phone at RT pipeline creation.
+- The stable mobile path uses `rayQueryEXT` in raygen for secondary visibility/bounce work while keeping RT pipeline recursion depth 1.
+
+The earlier probe foundation includes:
+
+- Windows CLI: `horde_rt_capability_probe`.
+- Android native shell (`android/`) that runs the same probe core and displays diagnostics in-app via shared text and a native Vulkan surface.
+- Android report persistence to app private storage.
+- Windows native diagnostic window: `horde_rt_diagnostic_window` with native Vulkan swapchain/surface diagnostics.
+- Real probe now includes a presentable RT scene path on Android and Windows scaffolds.
+
+### Probe feature coverage
+
+- Creates a Vulkan instance.
+- Enumerates all physical devices.
+- Logs each candidate device and gathers:
+  - GPU name, vendor ID, device ID, driver version, Vulkan API version.
+  - extension presence for:
+    - `VK_KHR_acceleration_structure`
+    - `VK_KHR_ray_tracing_pipeline`
+    - `VK_KHR_ray_query`
+    - `VK_KHR_buffer_device_address`
+    - `VK_KHR_deferred_host_operations`
+  - feature-chain state for:
+    - `VkPhysicalDeviceAccelerationStructureFeaturesKHR`
+    - `VkPhysicalDeviceRayTracingPipelineFeaturesKHR`
+    - `VkPhysicalDeviceRayQueryFeaturesKHR`
+    - `VkPhysicalDeviceBufferDeviceAddressFeatures`
+- Evaluates RT mode as `RayTracingPipeline`, `RayQuery`, or `Unsupported`.
+- Writes plain text and JSON reports.
+
+## Build and run (Windows interactive RT scene)
+
+```powershell
+$cmake = "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe"
+& $cmake --build build --config Debug --target horde_rt_diagnostic_window
+.\build\Debug\horde_rt_diagnostic_window.exe
+```
+
+Controls: `WASD` move, left mouse/trackpad click-drag looks, `Esc` exits. On unsupported hardware the window keeps its diagnostic view rather than falling back to a fake renderer.
+
+Reports:
+
+- `reports/vulkan_capability_report.txt`
+- `reports/vulkan_capability_report.json`
+
+## Build and run (Phase 0B Android activity shell)
+
+```powershell
+cd android
+./gradlew.bat assembleDebug
+```
+
+On Windows/CLI, install, launch, and verify reports:
+
+```powershell
+cd android
+./gradlew.bat installDebug
+adb shell monkey -p com.samfa12.hordelanternrt 1
+```
+
+Then collect reports from app private storage:
+
+- `adb shell run-as com.samfa12.hordelanternrt ls files/reports`
+- `adb shell run-as com.samfa12.hordelanternrt cat files/reports/vulkan_capability_report.txt`
+- `adb shell run-as com.samfa12.hordelanternrt cat files/reports/vulkan_capability_report.json`
+
+Verified on-device run (2026-07-05, Samsung Galaxy S26 Ultra, model `SM-S948B`, manufacturer `samsung`):
+
+- `adb devices` → `R5GL219SZGK	device`
+- `adb shell getprop ro.product.model` → `SM-S948B`
+- `adb shell getprop ro.product.manufacturer` → `samsung`
+- Retrieved both report files successfully from `files/reports`.
+- RT mode: `RayTracingPipeline`
+- GPU name: `Adreno (TM) 840`
+- Vendor ID: `20803`
+- Device ID: `1141180977`
+- Driver version: `512.842.19`
+- Vulkan API version: `1.4.295`
+- `VK_KHR_acceleration_structure`: `yes`
+- `VK_KHR_ray_tracing_pipeline`: `yes`
+- `VK_KHR_ray_query`: `yes`
+- `VK_KHR_buffer_device_address`: `yes`
+- `VK_KHR_deferred_host_operations`: `yes`
+- Features: `accelerationStructure=true`, `rayTracingPipeline=true`, `rayQuery=true`, `bufferDeviceAddress=true`
 
 ## Planned build targets
 
-- Android-first native Vulkan build path.
-- Windows native Vulkan build path.
-
-## Recommended tool checklist
-
-- Windows 11
-- Git
-- Visual Studio 2022 with Desktop development with C++
-- CMake
-- Ninja
-- Vulkan SDK
-- Android Studio
-- Android SDK
-- Android NDK
-- Android CMake package
-- RenderDoc
-- NVIDIA Nsight Graphics
-- Snapdragon Profiler, if useful on the target phone
-- Vulkan Hardware Capability Viewer or equivalent Vulkan capability checker
-
-See `docs/INSTALL_CHECKLIST.md` for the setup checklist.
+- Android native phone build (`android/` app module).
+- Windows native Vulkan build path (capability probe + diagnostic surface swapchain).
 
 ## First milestone: Phase 0 capability probe
 
-The first real milestone is:
+- Vulkan capability probe with real extension/feature diagnostics.
+- JSON/text capability reporting.
+- Unsupported output explicitly explains missing requirements.
+- No fake renderer fallback.
 
-- Android and Windows capability probe.
-- On-screen diagnostic overlay.
-- JSON/text capability report.
-- Unsupported-device diagnostic screen.
+Phase 0 is complete enough to support Phase 1 scene work. Native Vulkan diagnostic surfaces on Windows and Android now present shared probe results, and Android has a real RT scene path.
 
-Phase 0 must report:
+## Next milestone: close Phase 1C on device
+
+Next slice:
+
+- Build/install the latest collision/material source and confirm the RT swapchain success log on the Galaxy.
+- Check that movement respects corridor walls and the low arch posts without trapping the player.
+- Add a narrow GLB animation/PBR import path for the staged 9,402-triangle skeleton before using it as the first live enemy; keep the sword separate.
+- Remesh the staged 49k-triangle sword to a phone-safe budget before implementing GLB/PBR loading and right-hand attachment.
+- Bring in a small number of commercial-safe open-source PBR texture sets, then measure their mobile cost.
+- Preferred texture sources: Poly Haven and ambientCG, both checked per asset and recorded in `ASSET_LICENSES.md`.
+- Preserve the phone-safe ray-query path-tracing route unless a better RT route is proven on device.
+
+## First milestone report fields
 
 ```text
 Backend: Vulkan
@@ -71,10 +169,6 @@ Internal render resolution
 FPS / frame time
 ```
 
-## Next milestone: minimal torch-lit hardware RT room
-
-After Phase 0 is genuinely complete, the next milestone is a tiny hardware RT scene: a minimal torch-lit room with wet stone/puddle material tests. This must still use native Vulkan RT and must keep the diagnostic overlay/reporting path visible.
-
 ## Reference policy
 
 This repo should stay clean. Do not dump a giant third-party engine into the project.
@@ -82,23 +176,9 @@ This repo should stay clean. Do not dump a giant third-party engine into the pro
 Reference hierarchy:
 
 1. Primary base/reference: KhronosGroup/Vulkan-Samples, especially `samples/extensions/ray_tracing_basic`.
-2. Main learning/reference: NVIDIA `nvpro-samples/vk_raytracing_tutorial_KHR`.
+2. Main learning/reference: NVIDIA `nvpro-samples/vk_ray_tracing_tutorial_KHR`.
 3. Focused reference snippets: Sascha Willems Vulkan examples.
 4. Backup/reference only: Diligent Engine.
 5. Deferred/not first base: The Forge and Unreal Engine.
 
-If code is later adapted from a permissive source, preserve license notices and document the source.
-
-## Repository map
-
-```text
-src/app/                  Application shell and high-level Phase 0 flow.
-src/platform/android/     Android native Vulkan notes and future glue.
-src/platform/windows/     Windows native Vulkan notes and future Win32 entry.
-src/vulkan/               Vulkan context, device capability, and report code.
-src/vulkan/raytracing/    RT extension/feature requirement evaluation.
-src/ui/                   Diagnostic overlay text/data model.
-shaders/                  Future raygen/miss/hit/ray-query shaders.
-assets/                   Future commercial-safe assets only.
-tools/capability_report/  Future helper scripts/tools for capability reports.
-```
+If code is adapted later from permissive sources, preserve license notices and document the source.

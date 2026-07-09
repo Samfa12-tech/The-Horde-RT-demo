@@ -1,12 +1,9 @@
 # Shaders
 
-No production shaders are included yet.
+The current native Vulkan RT path uses the `raytracing/` shader set:
 
-Future Phase 1 shader work may include:
+- Ray generation (`minimal.rgen`) with phone-safe `rayQueryEXT` primary/shadow/first-bounce work.
+- Miss (`minimal.rmiss`) and closest-hit (`minimal.rchit`) pipeline stages.
+- Generated embedded raygen SPIR-V source (`MinimalRayGenShader.inc`) for the self-contained Android build.
 
-- Ray generation shader (`.rgen`).
-- Miss shader (`.rmiss`).
-- Closest-hit shader (`.rchit`).
-- Ray-query shader path only if the device genuinely supports Vulkan ray query hardware traversal.
-
-Do not add fake RT, SSR, baked-lighting, or compute-only path-tracing shaders as a substitute for hardware Vulkan RT.
+Do not add fake RT, SSR, baked lighting, or compute-only path tracing as a substitute for hardware Vulkan RT.

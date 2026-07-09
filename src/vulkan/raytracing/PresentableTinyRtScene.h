@@ -1,0 +1,137 @@
+#pragma once
+
+#include <cstdint>
+#include <string>
+
+#include <vulkan/vulkan.h>
+
+namespace horde::vulkan::raytracing
+{
+
+class PresentableTinyRtScene
+{
+public:
+    PresentableTinyRtScene() = default;
+    ~PresentableTinyRtScene();
+
+    PresentableTinyRtScene(const PresentableTinyRtScene&) = delete;
+    PresentableTinyRtScene& operator=(const PresentableTinyRtScene&) = delete;
+    PresentableTinyRtScene(PresentableTinyRtScene&& other) noexcept;
+    PresentableTinyRtScene& operator=(PresentableTinyRtScene&& other) noexcept;
+
+    bool Initialise(VkInstance instance,
+                    VkPhysicalDevice physicalDevice,
+                    VkDevice device,
+                    VkQueue queue,
+                    VkCommandPool commandPool,
+                    VkExtent2D dispatchExtent,
+                    VkFormat presentationFormat,
+                    std::string& diagnostic);
+
+    void Destroy();
+
+    bool IsReady() const { return ready_; }
+    VkExtent2D DispatchExtent() const { return dispatchExtent_; }
+
+    bool RecordTraceAndCopy(VkCommandBuffer commandBuffer,
+                            VkImage swapchainImage,
+                            VkImageLayout& swapchainImageLayout,
+                            VkExtent2D swapchainExtent,
+                            float cameraYaw,
+                            float cameraPitch,
+                            float lanternStrength,
+                            float walkTime,
+                            float cameraX,
+                            float cameraZ,
+                            float walkAmount,
+                            std::string& diagnostic);
+
+private:
+    struct Buffer
+    {
+        VkBuffer buffer = VK_NULL_HANDLE;
+        VkDeviceMemory memory = VK_NULL_HANDLE;
+        VkDeviceAddress address = 0;
+        VkDeviceSize size = 0;
+    };
+
+    struct AccelerationStructure
+    {
+        Buffer backing;
+        VkAccelerationStructureKHR handle = VK_NULL_HANDLE;
+        VkDeviceAddress address = 0;
+    };
+
+    bool LoadEntryPoints(std::string& diagnostic);
+    bool CreateBuffer(VkDeviceSize size,
+                      VkBufferUsageFlags usage,
+                      VkMemoryPropertyFlags memoryFlags,
+                      bool deviceAddress,
+                      Buffer& out,
+                      std::string& diagnostic) const;
+    bool CreateStorageImage(std::string& diagnostic);
+    bool BuildAccelerationStructures(std::string& diagnostic);
+    bool CreateDescriptors(std::string& diagnostic);
+    bool CreatePipeline(std::string& diagnostic);
+    bool CreateShaderBindingTable(std::string& diagnostic);
+    bool UpdateHeldTorchInstance(VkCommandBuffer commandBuffer,
+                                 float cameraYaw,
+                                 float walkTime,
+                                 float cameraX,
+                                 float cameraZ,
+                                 float walkAmount,
+                                 std::string& diagnostic);
+    bool RunOneTimeCommands(void (*record)(VkCommandBuffer, void*), void* userData, std::string& diagnostic) const;
+    void DestroyBuffer(Buffer& buffer) const;
+    void DestroyAccelerationStructure(AccelerationStructure& accelerationStructure);
+
+    std::uint32_t FindMemoryType(std::uint32_t typeBits, VkMemoryPropertyFlags flags) const;
+    VkDeviceAddress BufferAddress(VkBuffer buffer) const;
+
+    VkPhysicalDevice physicalDevice_ = VK_NULL_HANDLE;
+    VkInstance instance_ = VK_NULL_HANDLE;
+    VkDevice device_ = VK_NULL_HANDLE;
+    VkQueue queue_ = VK_NULL_HANDLE;
+    VkCommandPool commandPool_ = VK_NULL_HANDLE;
+    VkExtent2D dispatchExtent_{};
+    bool presentationUsesBgra_ = false;
+
+    VkImage storageImage_ = VK_NULL_HANDLE;
+    VkDeviceMemory storageImageMemory_ = VK_NULL_HANDLE;
+    VkImageView storageImageView_ = VK_NULL_HANDLE;
+    VkImageLayout storageImageLayout_ = VK_IMAGE_LAYOUT_UNDEFINED;
+
+    Buffer vertexBuffer_;
+    Buffer indexBuffer_;
+    Buffer transformBuffer_;
+    Buffer instanceBuffer_;
+    AccelerationStructure blas_;
+    AccelerationStructure torchBlas_;
+    AccelerationStructure tlas_;
+    Buffer tlasUpdateScratch_;
+
+    VkDescriptorSetLayout descriptorSetLayout_ = VK_NULL_HANDLE;
+    VkDescriptorPool descriptorPool_ = VK_NULL_HANDLE;
+    VkDescriptorSet descriptorSet_ = VK_NULL_HANDLE;
+    VkPipelineLayout pipelineLayout_ = VK_NULL_HANDLE;
+    VkPipeline pipeline_ = VK_NULL_HANDLE;
+    Buffer shaderBindingTable_;
+    VkStridedDeviceAddressRegionKHR raygenRegion_{};
+    VkStridedDeviceAddressRegionKHR missRegion_{};
+    VkStridedDeviceAddressRegionKHR hitRegion_{};
+    VkStridedDeviceAddressRegionKHR callableRegion_{};
+
+    PFN_vkCreateAccelerationStructureKHR vkCreateAccelerationStructureKHR_ = nullptr;
+    PFN_vkDestroyAccelerationStructureKHR vkDestroyAccelerationStructureKHR_ = nullptr;
+    PFN_vkGetAccelerationStructureBuildSizesKHR vkGetAccelerationStructureBuildSizesKHR_ = nullptr;
+    PFN_vkGetAccelerationStructureDeviceAddressKHR vkGetAccelerationStructureDeviceAddressKHR_ = nullptr;
+    PFN_vkCmdBuildAccelerationStructuresKHR vkCmdBuildAccelerationStructuresKHR_ = nullptr;
+    PFN_vkCreateRayTracingPipelinesKHR vkCreateRayTracingPipelinesKHR_ = nullptr;
+    PFN_vkGetRayTracingShaderGroupHandlesKHR vkGetRayTracingShaderGroupHandlesKHR_ = nullptr;
+    PFN_vkCmdTraceRaysKHR vkCmdTraceRaysKHR_ = nullptr;
+    PFN_vkGetBufferDeviceAddressKHR vkGetBufferDeviceAddressKHR_ = nullptr;
+
+    bool ready_ = false;
+};
+
+} // namespace horde::vulkan::raytracing
