@@ -1,6 +1,6 @@
 # Models
 
-One Meshy-generated sword is staged under `weapons/meshy/`; it is not runtime-integrated.
+Staged source art includes a Meshy sword under `weapons/meshy/` and an animated Meshy skeleton under `enemies/meshy/`; neither is runtime-integrated.
 
 Future model rules:
 

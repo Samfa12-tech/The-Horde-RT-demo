@@ -21,14 +21,17 @@
 - The active raygen shader has a compact procedural material table: dry stone, wet stone/puddles, mossy stone, aged metal/bronze, and flame emissive.
 - Wet materials and puddles use stronger reflected torch and bounce-light responses.
 - A Meshy-6 PBR right-hand sword is staged as source art with embedded and 2K sidecar maps. It is intentionally not in the runtime because the delivered 49,439 triangles are not phone-safe for the RT acceleration structure.
+- The Windows RT scene is an interactive laptop build: `WASD` movement, left mouse/trackpad click-drag look, and `Esc` exit. On 2026-07-10, the RTX 5050 laptop reported `RayTracingPipeline` and a successful RT swapchain presentation at 984 x 661.
+- The 9,402-triangle merged-animation skeleton is staged as source art with 11 correctly named clips. It is not loaded by the renderer, and the sword is intentionally separate.
 
 ### Still required to close Phase 1C
 
 1. Build, install, and test this source slice on the target phone; confirm collision is comfortable and `RT frame reached Android swapchain presentation.` still appears.
-2. Remesh/LOD the staged sword to a roughly 10–15k-triangle held-prop budget before adding it to the Android RT BLAS/TLAS. This needs a new credit approval.
-3. Add a narrow GLB/PBR loader and right-hand attachment only after that remesh is accepted; measure the mobile RT cost first.
-4. Import a deliberately small set of commercial-safe environment PBR texture sets and record each one in `ASSET_LICENSES.md` before it ships.
-5. Add one idle or moving horde proxy after the corridor feels bounded and materially convincing.
+2. Add a narrow GLB animation/PBR loader for the staged skeleton and measure one animated enemy on laptop and phone; keep the sword separate.
+3. Remesh/LOD the staged sword to a roughly 10–15k-triangle held-prop budget before adding it to the Android RT BLAS/TLAS. This needs a new credit approval.
+4. Add a right-hand attachment only after that remesh is accepted; measure the mobile RT cost first.
+5. Import a deliberately small set of commercial-safe environment PBR texture sets and record each one in `ASSET_LICENSES.md` before it ships.
+6. Add one idle or moving horde proxy after the corridor feels bounded and materially convincing.
 
 ## Later milestones
 

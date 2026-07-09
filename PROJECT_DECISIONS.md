@@ -109,7 +109,7 @@ The following are intentionally not part of the scaffold step:
 - BLAS/TLAS implementation.
 - Platform packaging.
 
-## Tested Phase 1 status - 2026-07-09
+## Tested Phase 1 status - 2026-07-10
 
 The project has moved beyond the original Phase 0 scaffold/probe.
 
@@ -121,6 +121,9 @@ Current proven path:
 - Reports only set `rtScene.presented = true` after successful swapchain presentation.
 - The visible scene is now a first-person gothic corridor/ruin prototype with a handheld medieval torch, reflective objects, puddle/wet-stone response, horde silhouettes, fog, and second-room sunlight.
 - Controls are now left-drag movement/strafe and right-drag 360 look.
+- Windows now runs the same RT corridor as an interactive desktop scene: `WASD` moves, left mouse/trackpad click-drag looks, and `Esc` exits.
+- The RTX 5050 laptop reported `RayTracingPipeline` and successful RT swapchain presentation at 984 x 661 in the interactive Windows build.
+- A Meshy biped skeleton with 11 correctly named animations is staged as source art only. The sword remains separate; neither asset has a runtime GLB import or attachment path yet.
 
 Important technical finding:
 
@@ -132,9 +135,9 @@ Important technical finding:
 
 Implement the gothic material and collision proof:
 
-1. Add simple collision bounds for the corridor/arch/second-room scene.
-2. Add obvious reflection showcases for puddles, wet stone, and metal.
-3. Introduce a material table for dry stone, wet stone, mossy stone, water/puddle, old metal, and flame.
-4. Import a small number of commercial-safe open-source PBR textures, preferably CC0 from Poly Haven or ambientCG.
-5. Record every imported asset in `ASSET_LICENSES.md`.
+1. Re-test the collision/material source on the phone and preserve the current laptop interactive controls.
+2. Add a narrow GLB animation/PBR import path for the staged skeleton, keeping the sword separate.
+3. Instantiate and animate one skeleton enemy only after its import path is measured on the laptop and phone.
+4. Import a small number of commercial-safe open-source environment PBR textures, preferably CC0 from Poly Haven or ambientCG.
+5. Record every imported asset in `ASSET_LICENSES.md` and resolve its Meshy account-plan license gate before release.
 6. Preserve the phone-safe ray-query path tracing route unless a stronger RT route is proven on device.

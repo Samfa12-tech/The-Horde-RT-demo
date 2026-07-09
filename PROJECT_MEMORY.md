@@ -31,6 +31,8 @@ Last updated: 2026-07-10
 - Diagnostics are hidden behind the HUD tap so the app opens as a scene instead of a probe screen.
 - The current Phase 1C source moves the visible torch and its light to the left side of the player view, adds basic Android corridor/arch collision, and strengthens the procedural dry/wet/mossy stone, puddle, aged-metal, and flame material table. This source slice still needs an on-device re-test.
 - A textured Meshy sword is staged at `assets/models/weapons/meshy/gothic_arming_sword_rh_v01.glb`. It has embedded and sidecar 2K PBR maps, but it is not loaded by the renderer, and its 49,439 triangles exceed the Android held-prop RT budget.
+- The Windows RT scene now has a verified interactive desktop path on the RTX 5050 laptop: `WASD` movement, left mouse/trackpad click-drag look, and `Esc` exit. It reported `RayTracingPipeline` and successful RT swapchain presentation at 984 x 661 on 2026-07-10.
+- A separate 9,402-triangle Meshy biped with 11 named clips is staged at `assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb`. It is not runtime-integrated, and the sword remains separate from its `RightHand` joint.
 
 ## Tested phone results
 
@@ -52,6 +54,7 @@ Last updated: 2026-07-10
 - Shader sources: `shaders/raytracing/minimal.rgen`, `minimal.rmiss`, `minimal.rchit`.
 - Embedded raygen shader include: `src/vulkan/raytracing/MinimalRayGenShader.inc`.
 - Staged sword metadata/license gate: `assets/models/weapons/meshy/gothic_arming_sword_rh_v01.METADATA.md` and `ASSET_LICENSES.md`.
+- Staged skeleton metadata/license gate: `assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.METADATA.md` and `ASSET_LICENSES.md`.
 - Capability/report model: `src/vulkan/DeviceCapabilities.h`, `src/vulkan/RtCapabilityReport.cpp`.
 - Larger decisions doc: `PROJECT_DECISIONS.md`.
 
@@ -75,15 +78,18 @@ Last updated: 2026-07-10
 7. Recursive path-tracing attempt tested and rejected by phone pipeline creation; ray-query path became the stable route.
 8. Phase 1C source adds left-hand torch placement, basic corridor/arch collision, and stronger procedural gothic materials/reflections; target-phone validation is pending.
 9. Generated and staged a Meshy-6 PBR right-hand sword. It has 2K PBR maps but needs explicit remesh approval because the delivered 49,439 triangles are too costly for the Android RT target.
+10. Added a verified interactive Windows RTX 5050 RT corridor build with keyboard and mouse/trackpad controls.
+11. Staged the merged-animation skeleton, verified its 11 clip names, and kept the sword separate.
 
 ## Next-step sequence: Phase 1C Gothic material and collision proof
 
 1. Build, install, and re-test the new collision/material source on the target phone before adding more scope.
-2. Decide whether to remesh the staged sword to roughly 10–15k triangles. Do not put the 49k-triangle source mesh into the Android TLAS/BLAS path.
-3. Add a narrow GLB/PBR import and right-hand attachment path only after the remeshed weapon is approved; measure the phone RT cost before expanding asset scope.
-4. Add open-source commercial-safe PBR environment textures, preferably CC0 from Poly Haven or ambientCG, and record every imported asset/texture in `ASSET_LICENSES.md`.
-5. Strengthen gothic castle feeling with moss patches, wet edges, old stone blocks, ruin silhouettes, and a stronger second-room composition.
-6. After collision/materials feel good, add one horde silhouette/enemy proxy that moves or idles in the corridor.
+2. Add a narrow GLB animation/PBR import path for the staged skeleton; then animate one enemy while keeping the sword separate.
+3. Measure the skeleton's mobile RT cost before scaling enemies; its 9,402 triangles make it a viable first enemy candidate.
+4. Decide whether to remesh the staged sword to roughly 10–15k triangles. Do not put the 49k-triangle source mesh into the Android TLAS/BLAS path.
+5. Add a right-hand attachment path only after the remeshed weapon is approved; measure the phone RT cost before expanding asset scope.
+6. Add open-source commercial-safe PBR environment textures, preferably CC0 from Poly Haven or ambientCG, and record every imported asset/texture in `ASSET_LICENSES.md`.
+7. Strengthen gothic castle feeling with moss patches, wet edges, old stone blocks, ruin silhouettes, and a stronger second-room composition.
 
 ## Validation breadcrumbs
 

@@ -1,6 +1,7 @@
 #include "platform/windows/DiagnosticWindow.h"
 
 #include <algorithm>
+#include <cmath>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -35,6 +36,21 @@ constexpr char kTextReportFilename[] = "vulkan_capability_report.txt";
 constexpr char kJsonReportFilename[] = "vulkan_capability_report.json";
 constexpr int kEditControlId = 101;
 constexpr UINT kMaxFramesInFlight = 2u;
+constexpr float kPlayerCollisionRadius = 0.24f;
+
+struct CollisionRect
+{
+    float minX;
+    float maxX;
+    float minZ;
+    float maxZ;
+};
+
+// These volumes match the two low arch posts in PresentableTinyRtScene.
+constexpr CollisionRect kCorridorObstacles[] = {
+    {-1.20f, -0.78f, -3.48f, -3.32f},
+    {0.78f, 1.20f, -3.48f, -3.32f},
+};
 
 struct VulkanSurfaceContext
 {
@@ -61,6 +77,21 @@ struct VulkanSurfaceContext
     std::vector<VkFence> inFlightFences;
     horde::vulkan::raytracing::PresentableTinyRtScene rtScene;
     bool useRtPath = false;
+    bool controlsEnabled = false;
+    bool forwardHeld = false;
+    bool backwardHeld = false;
+    bool leftHeld = false;
+    bool rightHeld = false;
+    bool mouseLookActive = false;
+    POINT lastMousePosition{};
+    ULONGLONG lastControlTick = 0u;
+    float cameraYaw = 0.0f;
+    float cameraPitch = 0.0f;
+    float lanternStrength = 1.8f;
+    float walkTime = 0.0f;
+    float cameraX = 0.0f;
+    float cameraZ = 4.7f;
+    float walkAmount = 0.0f;
     uint32_t currentFrame = 0u;
 };
 
@@ -235,6 +266,121 @@ bool HasDeviceExtension(VkPhysicalDevice physicalDevice, const char* extensionNa
         }
     }
     return false;
+}
+
+void PushPlayerOutOfRect(float& x, float& z, const CollisionRect& rect)
+{
+    const float minX = rect.minX - kPlayerCollisionRadius;
+    const float maxX = rect.maxX + kPlayerCollisionRadius;
+    const float minZ = rect.minZ - kPlayerCollisionRadius;
+    const float maxZ = rect.maxZ + kPlayerCollisionRadius;
+    if (x <= minX || x >= maxX || z <= minZ || z >= maxZ)
+    {
+        return;
+    }
+
+    const float pushLeft = x - minX;
+    const float pushRight = maxX - x;
+    const float pushBack = z - minZ;
+    const float pushForward = maxZ - z;
+    const float smallestPush = std::min({pushLeft, pushRight, pushBack, pushForward});
+    if (smallestPush == pushLeft)
+    {
+        x = minX;
+    }
+    else if (smallestPush == pushRight)
+    {
+        x = maxX;
+    }
+    else if (smallestPush == pushBack)
+    {
+        z = minZ;
+    }
+    else
+    {
+        z = maxZ;
+    }
+}
+
+void ResolvePlayerCollision(float& x, float& z)
+{
+    // The entrance stays open, while the corridor walls and low arch posts block movement.
+    z = std::clamp(z, -4.75f, 4.90f);
+    if (z <= 3.20f)
+    {
+        x = std::clamp(x, -1.58f, 1.58f);
+        for (const CollisionRect& obstacle : kCorridorObstacles)
+        {
+            PushPlayerOutOfRect(x, z, obstacle);
+        }
+    }
+    else
+    {
+        x = std::clamp(x, -2.40f, 2.40f);
+    }
+}
+
+void ClearDesktopInput(VulkanSurfaceContext& context)
+{
+    context.forwardHeld = false;
+    context.backwardHeld = false;
+    context.leftHeld = false;
+    context.rightHeld = false;
+    context.mouseLookActive = false;
+    if (GetCapture() == context.windowHandle)
+    {
+        ReleaseCapture();
+    }
+}
+
+void UpdateDesktopSceneControls(VulkanSurfaceContext& context)
+{
+    const ULONGLONG now = GetTickCount64();
+    float deltaSeconds = 1.0f / 60.0f;
+    if (context.lastControlTick != 0u)
+    {
+        deltaSeconds = std::clamp(static_cast<float>(now - context.lastControlTick) / 1000.0f, 0.0f, 0.05f);
+    }
+    context.lastControlTick = now;
+    context.walkTime += deltaSeconds * 2.7f;
+
+    const float forwardAmount = (context.forwardHeld ? 1.0f : 0.0f) - (context.backwardHeld ? 1.0f : 0.0f);
+    const float strafeAmount = (context.rightHeld ? 1.0f : 0.0f) - (context.leftHeld ? 1.0f : 0.0f);
+    context.walkAmount = std::clamp(std::abs(forwardAmount) + std::abs(strafeAmount), 0.0f, 1.0f);
+    if (context.walkAmount <= 0.01f)
+    {
+        return;
+    }
+
+    const float forwardX = std::sin(context.cameraYaw);
+    const float forwardZ = -std::cos(context.cameraYaw);
+    const float rightX = std::cos(context.cameraYaw);
+    const float rightZ = std::sin(context.cameraYaw);
+    constexpr float kMoveSpeed = 1.9f;
+    context.cameraX += (forwardX * forwardAmount + rightX * strafeAmount) * kMoveSpeed * deltaSeconds;
+    context.cameraZ += (forwardZ * forwardAmount + rightZ * strafeAmount) * kMoveSpeed * deltaSeconds;
+    ResolvePlayerCollision(context.cameraX, context.cameraZ);
+}
+
+bool SetDesktopMovementKey(VulkanSurfaceContext& context, const WPARAM key, const bool held)
+{
+    switch (key)
+    {
+    case 'W':
+        context.forwardHeld = held;
+        return true;
+    case 'S':
+        context.backwardHeld = held;
+        return true;
+    case 'A':
+        context.leftHeld = held;
+        return true;
+    case 'D':
+        context.rightHeld = held;
+        return true;
+    default:
+        return false;
+    }
 }
 
 bool CreateLogicalDevice(VkPhysicalDevice physicalDevice,
@@ -861,18 +1007,19 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
     const bool useRtFrame = ctx.useRtPath && ctx.rtScene.IsReady();
     if (useRtFrame)
     {
+        UpdateDesktopSceneControls(ctx);
         std::string diagnostic;
         if (!ctx.rtScene.RecordTraceAndCopy(ctx.commandBuffers[imageIndex],
                                             ctx.swapchainImages[imageIndex],
                                             ctx.swapchainImageLayouts[imageIndex],
                                             ctx.swapchainExtent,
-                                            0.0f,
-                                            0.0f,
-                                            1.8f,
-                                            0.0f,
-                                            0.0f,
-                                            4.7f,
-                                            0.0f,
+                                            ctx.cameraYaw,
+                                            ctx.cameraPitch,
+                                            ctx.lanternStrength,
+                                            ctx.walkTime,
+                                            ctx.cameraX,
+                                            ctx.cameraZ,
+                                            ctx.walkAmount,
                                             diagnostic))
         {
             std::cerr << "Failed to record RT frame: " << diagnostic << '\n';
@@ -1073,6 +1220,13 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         return 1;
     }
 
+    context.controlsEnabled = context.useRtPath && context.rtScene.IsReady();
+    if (context.controlsEnabled)
+    {
+        SetWindowLongPtrA(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(&context));
+        SetFocus(hWnd);
+    }
+
     const VkClearColorValue clearColor = ClearColorForMode(capabilities.rtMode);
     MSG message{};
     bool running = true;
@@ -1113,6 +1267,10 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         }
     }
 
+    if (IsWindow(hWnd))
+    {
+        SetWindowLongPtrA(hWnd, GWLP_USERDATA, 0);
+    }
     DestroyRenderContext(context);
     return running ? 0 : static_cast<int>(message.wParam);
 }
@@ -1131,8 +1289,75 @@ bool WriteReportFile(const std::filesystem::path& path, const std::string& data)
 
 LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    auto* sceneContext = reinterpret_cast<VulkanSurfaceContext*>(GetWindowLongPtrA(hWnd, GWLP_USERDATA));
     switch (message)
     {
+    case WM_KEYDOWN:
+    case WM_SYSKEYDOWN:
+        if (sceneContext && sceneContext->controlsEnabled)
+        {
+            if (wParam == VK_ESCAPE)
+            {
+                DestroyWindow(hWnd);
+                return 0;
+            }
+            if (SetDesktopMovementKey(*sceneContext, wParam, true))
+            {
+                return 0;
+            }
+        }
+        break;
+    case WM_KEYUP:
+    case WM_SYSKEYUP:
+        if (sceneContext && sceneContext->controlsEnabled && SetDesktopMovementKey(*sceneContext, wParam, false))
+        {
+            return 0;
+        }
+        break;
+    case WM_LBUTTONDOWN:
+        if (sceneContext && sceneContext->controlsEnabled)
+        {
+            SetFocus(hWnd);
+            SetCapture(hWnd);
+            sceneContext->mouseLookActive = true;
+            sceneContext->lastMousePosition = {
+                static_cast<LONG>(static_cast<short>(LOWORD(lParam))),
+                static_cast<LONG>(static_cast<short>(HIWORD(lParam)))};
+            return 0;
+        }
+        break;
+    case WM_MOUSEMOVE:
+        if (sceneContext && sceneContext->controlsEnabled && sceneContext->mouseLookActive)
+        {
+            const POINT currentMousePosition{
+                static_cast<LONG>(static_cast<short>(LOWORD(lParam))),
+                static_cast<LONG>(static_cast<short>(HIWORD(lParam)))};
+            const LONG deltaX = currentMousePosition.x - sceneContext->lastMousePosition.x;
+            const LONG deltaY = currentMousePosition.y - sceneContext->lastMousePosition.y;
+            sceneContext->lastMousePosition = currentMousePosition;
+            sceneContext->cameraYaw += static_cast<float>(deltaX) * 0.0036f;
+            sceneContext->cameraPitch = std::clamp(sceneContext->cameraPitch - static_cast<float>(deltaY) * 0.0028f, -0.32f, 0.28f);
+            return 0;
+        }
+        break;
+    case WM_LBUTTONUP:
+    case WM_CAPTURECHANGED:
+        if (sceneContext && sceneContext->controlsEnabled)
+        {
+            sceneContext->mouseLookActive = false;
+            if (GetCapture() == hWnd)
+            {
+                ReleaseCapture();
+            }
+            return 0;
+        }
+        break;
+    case WM_KILLFOCUS:
+        if (sceneContext && sceneContext->controlsEnabled)
+        {
+            ClearDesktopInput(*sceneContext);
+        }
+        break;
     case WM_SIZE:
     {
         const int width = LOWORD(lParam);
@@ -1145,6 +1370,10 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         return 0;
     }
     case WM_DESTROY:
+        if (sceneContext && sceneContext->controlsEnabled)
+        {
+            ClearDesktopInput(*sceneContext);
+        }
         PostQuitMessage(0);
         return 0;
     default:
@@ -1235,14 +1464,21 @@ int CreateAndShowWindow(const std::string& diagnosticText,
 
     SendMessageA(edit, WM_SETFONT, reinterpret_cast<WPARAM>(monoFont), TRUE);
     const std::string windowText = WindowSafeText(diagnosticText);
-    const std::string windowTitle = MakeWindowTitle(diagnosticText);
+    const bool sceneMode = capabilities.rtMode == horde::vulkan::RtMode::RayTracingPipeline;
+    const std::string windowTitle = sceneMode
+        ? "Horde Lantern RT | WASD move | left drag look | Esc exit"
+        : MakeWindowTitle(diagnosticText);
     SetWindowTextA(edit, windowText.c_str());
     SetWindowTextA(hWnd, windowTitle.c_str());
+    if (sceneMode)
+    {
+        ShowWindow(edit, SW_HIDE);
+    }
 
     ShowWindow(hWnd, SW_SHOW);
     UpdateWindow(hWnd);
     SetForegroundWindow(hWnd);
-    SetFocus(edit);
+    SetFocus(sceneMode ? hWnd : edit);
 
     return RunDiagnosticSwapchainWindow(hWnd, capabilities, textReportPath, jsonReportPath);
 }

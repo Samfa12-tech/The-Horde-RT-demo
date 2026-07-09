@@ -32,6 +32,10 @@ The current Phase 1C source slice additionally adds simple corridor/arch collisi
 
 Asset staging update: a Meshy-6 PBR gothic sword has been generated for the future right hand. The staged GLB has 2K maps but also 49,439 triangles, so it is not runtime-integrated; it needs remesh/LOD plus a GLB/PBR import and right-hand attachment path before it can enter the Android RT scene.
 
+A separate Meshy skeleton is staged with its merged animation file. It has 11 correctly named clips and is a 9,402-triangle skinned prop, but it too remains outside the runtime until a narrow GLB animation/PBR import path is built. The sword is intentionally not attached to its hand.
+
+Verified desktop interactive run (2026-07-10): NVIDIA GeForce RTX 5050 Laptop GPU reported `RayTracingPipeline` and presented the RT corridor at 984 x 661. Controls are `WASD` to move, left mouse/trackpad click-drag to look, and `Esc` to exit.
+
 Important phone finding:
 
 - Recursive closest-hit secondary tracing with pipeline recursion depth 2 failed on phone at RT pipeline creation.
@@ -65,23 +69,15 @@ The earlier probe foundation includes:
 - Evaluates RT mode as `RayTracingPipeline`, `RayQuery`, or `Unsupported`.
 - Writes plain text and JSON reports.
 
-## Build and run (Windows probe)
+## Build and run (Windows interactive RT scene)
 
-```bash
-cmake -S . -B build
-cmake --build build --target horde_rt_capability_probe
-cmake --build build --target horde_rt_diagnostic_window
+```powershell
+$cmake = "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe"
+& $cmake --build build --config Debug --target horde_rt_diagnostic_window
+.\build\Debug\horde_rt_diagnostic_window.exe
 ```
 
-```bash
-./build/horde_rt_capability_probe
-./build/horde_rt_diagnostic_window
-```
-
-```bash
-# Windows
-.\build\horde_rt_diagnostic_window.exe
-```
+Controls: `WASD` move, left mouse/trackpad click-drag looks, `Esc` exits. On unsupported hardware the window keeps its diagnostic view rather than falling back to a fake renderer.
 
 Reports:
 
@@ -148,6 +144,7 @@ Next slice:
 
 - Build/install the latest collision/material source and confirm the RT swapchain success log on the Galaxy.
 - Check that movement respects corridor walls and the low arch posts without trapping the player.
+- Add a narrow GLB animation/PBR import path for the staged 9,402-triangle skeleton before using it as the first live enemy; keep the sword separate.
 - Remesh the staged 49k-triangle sword to a phone-safe budget before implementing GLB/PBR loading and right-hand attachment.
 - Bring in a small number of commercial-safe open-source PBR texture sets, then measure their mobile cost.
 - Preferred texture sources: Poly Haven and ambientCG, both checked per asset and recorded in `ASSET_LICENSES.md`.
