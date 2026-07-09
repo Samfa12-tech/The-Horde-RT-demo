@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <cstring>
 #include <utility>
 #include <vector>
@@ -23,7 +24,7 @@ struct ScenePushConstants
     float cameraX = 0.0f;
     float cameraZ = 4.7f;
     float walkAmount = 0.0f;
-    float unused = 0.0f;
+    float outputRedBlueSwap = 0.0f;
 };
 
 // Retained temporarily for binary-diff troubleshooting; the generated include below is the active shader.
@@ -1136,6 +1137,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     queue_ = std::exchange(other.queue_, nullptr);
     commandPool_ = std::exchange(other.commandPool_, VK_NULL_HANDLE);
     dispatchExtent_ = std::exchange(other.dispatchExtent_, VkExtent2D{});
+    presentationUsesBgra_ = std::exchange(other.presentationUsesBgra_, false);
     storageImage_ = std::exchange(other.storageImage_, VK_NULL_HANDLE);
     storageImageMemory_ = std::exchange(other.storageImageMemory_, VK_NULL_HANDLE);
     storageImageView_ = std::exchange(other.storageImageView_, VK_NULL_HANDLE);
@@ -1145,7 +1147,9 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     transformBuffer_ = std::exchange(other.transformBuffer_, Buffer{});
     instanceBuffer_ = std::exchange(other.instanceBuffer_, Buffer{});
     blas_ = std::exchange(other.blas_, AccelerationStructure{});
+    torchBlas_ = std::exchange(other.torchBlas_, AccelerationStructure{});
     tlas_ = std::exchange(other.tlas_, AccelerationStructure{});
+    tlasUpdateScratch_ = std::exchange(other.tlasUpdateScratch_, Buffer{});
     descriptorSetLayout_ = std::exchange(other.descriptorSetLayout_, VK_NULL_HANDLE);
     descriptorPool_ = std::exchange(other.descriptorPool_, VK_NULL_HANDLE);
     descriptorSet_ = std::exchange(other.descriptorSet_, VK_NULL_HANDLE);
@@ -1176,6 +1180,7 @@ bool PresentableTinyRtScene::Initialise(VkInstance instance,
                                         VkQueue queue,
                                         VkCommandPool commandPool,
                                         VkExtent2D dispatchExtent,
+                                        VkFormat presentationFormat,
                                         std::string& diagnostic)
 {
     Destroy();
@@ -1186,6 +1191,7 @@ bool PresentableTinyRtScene::Initialise(VkInstance instance,
     queue_ = queue;
     commandPool_ = commandPool;
     dispatchExtent_ = dispatchExtent;
+    presentationUsesBgra_ = presentationFormat == VK_FORMAT_B8G8R8A8_UNORM || presentationFormat == VK_FORMAT_B8G8R8A8_SRGB;
 
     if (instance_ == VK_NULL_HANDLE || physicalDevice_ == VK_NULL_HANDLE || device_ == VK_NULL_HANDLE || queue_ == VK_NULL_HANDLE || commandPool_ == VK_NULL_HANDLE)
     {
@@ -1245,6 +1251,8 @@ void PresentableTinyRtScene::Destroy()
 
     DestroyBuffer(shaderBindingTable_);
     DestroyAccelerationStructure(tlas_);
+    DestroyBuffer(tlasUpdateScratch_);
+    DestroyAccelerationStructure(torchBlas_);
     DestroyAccelerationStructure(blas_);
     DestroyBuffer(instanceBuffer_);
     DestroyBuffer(transformBuffer_);
@@ -1562,8 +1570,8 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     };
     std::vector<Vertex> vertices;
     std::vector<std::uint32_t> indices;
-    vertices.reserve(64u);
-    indices.reserve(128u);
+    vertices.reserve(96u);
+    indices.reserve(160u);
 
     const auto addQuad = [&vertices, &indices](const Vertex& a, const Vertex& b, const Vertex& c, const Vertex& d) {
         const std::uint32_t base = static_cast<std::uint32_t>(vertices.size());
@@ -1572,6 +1580,13 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         vertices.push_back(c);
         vertices.push_back(d);
         indices.insert(indices.end(), {base, base + 1u, base + 2u, base, base + 2u, base + 3u});
+    };
+    const auto addTriangle = [&vertices, &indices](const Vertex& a, const Vertex& b, const Vertex& c) {
+        const std::uint32_t base = static_cast<std::uint32_t>(vertices.size());
+        vertices.push_back(a);
+        vertices.push_back(b);
+        vertices.push_back(c);
+        indices.insert(indices.end(), {base, base + 1u, base + 2u});
     };
 
     addQuad({{-1.85f, -0.95f, 3.4f}}, {{1.85f, -0.95f, 3.4f}}, {{1.85f, -0.95f, -6.4f}}, {{-1.85f, -0.95f, -6.4f}});
@@ -1594,6 +1609,14 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         const float h = 0.58f + static_cast<float>(i % 3u) * 0.12f;
         addQuad({{x - 0.18f, -0.95f, z}}, {{x + 0.18f, -0.95f, z}}, {{x + 0.14f, -0.95f + h, z}}, {{x - 0.14f, -0.95f + h, z}});
     }
+
+    const std::uint32_t sceneIndexCount = static_cast<std::uint32_t>(indices.size());
+
+    // A small held torch built in local hand space. It becomes its own BLAS/TLAS instance below.
+    addQuad({{-0.045f, -0.42f, 0.0f}}, {{0.045f, -0.42f, 0.0f}}, {{0.045f, 0.10f, 0.0f}}, {{-0.045f, 0.10f, 0.0f}});
+    addTriangle({{-0.13f, 0.08f, 0.0f}}, {{0.13f, 0.08f, 0.0f}}, {{0.0f, 0.52f, 0.0f}});
+    addTriangle({{0.0f, 0.08f, -0.13f}}, {{0.0f, 0.08f, 0.13f}}, {{0.0f, 0.52f, 0.0f}});
+    const std::uint32_t torchPrimitiveCount = (static_cast<std::uint32_t>(indices.size()) - sceneIndexCount) / 3u;
     const VkTransformMatrixKHR transform{{
         1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f, 0.0f,
@@ -1638,7 +1661,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     blasBuildInfo.geometryCount = 1u;
     blasBuildInfo.pGeometries = &blasGeometry;
 
-    std::uint32_t primitiveCount = static_cast<std::uint32_t>(indices.size() / 3u);
+    std::uint32_t primitiveCount = sceneIndexCount / 3u;
     VkAccelerationStructureBuildSizesInfoKHR blasSizes{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR};
     vkGetAccelerationStructureBuildSizesKHR_(device_, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &blasBuildInfo, &primitiveCount, &blasSizes);
 
@@ -1699,19 +1722,84 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     blasAddressInfo.accelerationStructure = blas_.handle;
     blas_.address = vkGetAccelerationStructureDeviceAddressKHR_(device_, &blasAddressInfo);
 
-    VkAccelerationStructureInstanceKHR instance{};
-    instance.transform = transform;
-    instance.instanceCustomIndex = 0u;
-    instance.mask = 0xffu;
-    instance.instanceShaderBindingTableRecordOffset = 0u;
-    instance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
-    instance.accelerationStructureReference = blas_.address;
-    if (!CreateBuffer(sizeof(instance), VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, instanceBuffer_, diagnostic))
+    VkAccelerationStructureBuildRangeInfoKHR torchRange{};
+    torchRange.primitiveCount = torchPrimitiveCount;
+    torchRange.primitiveOffset = sceneIndexCount * sizeof(std::uint32_t);
+    // addQuad writes absolute indices into the shared vertex buffer, so no vertex offset belongs here.
+    torchRange.firstVertex = 0u;
+
+    VkAccelerationStructureBuildGeometryInfoKHR torchBlasBuildInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR};
+    torchBlasBuildInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+    torchBlasBuildInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
+    torchBlasBuildInfo.geometryCount = 1u;
+    torchBlasBuildInfo.pGeometries = &blasGeometry;
+    VkAccelerationStructureBuildSizesInfoKHR torchBlasSizes{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR};
+    vkGetAccelerationStructureBuildSizesKHR_(device_, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &torchBlasBuildInfo, &torchPrimitiveCount, &torchBlasSizes);
+    if (!CreateBuffer(torchBlasSizes.accelerationStructureSize,
+                      VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR,
+                      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                      true,
+                      torchBlas_.backing,
+                      diagnostic))
     {
         return false;
     }
-    vkMapMemory(device_, instanceBuffer_.memory, 0u, sizeof(instance), 0u, &mapped);
-    std::memcpy(mapped, &instance, sizeof(instance));
+
+    VkAccelerationStructureCreateInfoKHR torchBlasCreateInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR};
+    torchBlasCreateInfo.buffer = torchBlas_.backing.buffer;
+    torchBlasCreateInfo.size = torchBlasSizes.accelerationStructureSize;
+    torchBlasCreateInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+    if (vkCreateAccelerationStructureKHR_(device_, &torchBlasCreateInfo, nullptr, &torchBlas_.handle) != VK_SUCCESS)
+    {
+        diagnostic = "Failed to create held-torch BLAS.";
+        return false;
+    }
+
+    Buffer torchBlasScratch;
+    if (!CreateBuffer(torchBlasSizes.buildScratchSize,
+                      VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                      true,
+                      torchBlasScratch,
+                      diagnostic))
+    {
+        return false;
+    }
+    torchBlasBuildInfo.dstAccelerationStructure = torchBlas_.handle;
+    torchBlasBuildInfo.scratchData.deviceAddress = torchBlasScratch.address;
+    const VkAccelerationStructureBuildRangeInfoKHR* torchBlasRanges[] = {&torchRange};
+    BlasBuildData torchBlasBuildData{this, &torchBlasBuildInfo, torchBlasRanges};
+    if (!RunOneTimeCommands(buildBlas, &torchBlasBuildData, diagnostic))
+    {
+        DestroyBuffer(torchBlasScratch);
+        return false;
+    }
+    DestroyBuffer(torchBlasScratch);
+
+    VkAccelerationStructureDeviceAddressInfoKHR torchBlasAddressInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR};
+    torchBlasAddressInfo.accelerationStructure = torchBlas_.handle;
+    torchBlas_.address = vkGetAccelerationStructureDeviceAddressKHR_(device_, &torchBlasAddressInfo);
+
+    std::array<VkAccelerationStructureInstanceKHR, 2u> instances{};
+    instances[0].transform = transform;
+    instances[0].instanceCustomIndex = 0u;
+    instances[0].mask = 0xffu;
+    instances[0].instanceShaderBindingTableRecordOffset = 0u;
+    instances[0].flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
+    instances[0].accelerationStructureReference = blas_.address;
+    instances[1] = instances[0];
+    instances[1].instanceCustomIndex = 1u;
+    instances[1].accelerationStructureReference = torchBlas_.address;
+    instances[1].transform = {{
+        1.0f, 0.0f, 0.0f, -0.32f,
+        0.0f, 1.0f, 0.0f, -0.36f,
+        0.0f, 0.0f, -1.0f, 3.82f}};
+    if (!CreateBuffer(sizeof(instances), VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, instanceBuffer_, diagnostic))
+    {
+        return false;
+    }
+    vkMapMemory(device_, instanceBuffer_.memory, 0u, sizeof(instances), 0u, &mapped);
+    std::memcpy(mapped, instances.data(), sizeof(instances));
     vkUnmapMemory(device_, instanceBuffer_.memory);
 
     VkAccelerationStructureGeometryKHR tlasGeometry{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
@@ -1722,12 +1810,12 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
 
     VkAccelerationStructureBuildGeometryInfoKHR tlasBuildInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR};
     tlasBuildInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR;
-    tlasBuildInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
+    tlasBuildInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR | VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_KHR;
     tlasBuildInfo.geometryCount = 1u;
     tlasBuildInfo.pGeometries = &tlasGeometry;
 
     VkAccelerationStructureBuildSizesInfoKHR tlasSizes{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR};
-    std::uint32_t instanceCount = 1u;
+    std::uint32_t instanceCount = static_cast<std::uint32_t>(instances.size());
     vkGetAccelerationStructureBuildSizesKHR_(device_, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &tlasBuildInfo, &instanceCount, &tlasSizes);
     if (!CreateBuffer(tlasSizes.accelerationStructureSize,
                       VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR,
@@ -1749,29 +1837,26 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         return false;
     }
 
-    Buffer tlasScratch;
-    if (!CreateBuffer(tlasSizes.buildScratchSize,
+    if (!CreateBuffer(std::max(tlasSizes.buildScratchSize, tlasSizes.updateScratchSize),
                       VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                       VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
                       true,
-                      tlasScratch,
+                      tlasUpdateScratch_,
                       diagnostic))
     {
         return false;
     }
 
     VkAccelerationStructureBuildRangeInfoKHR tlasRange{};
-    tlasRange.primitiveCount = 1u;
+    tlasRange.primitiveCount = instanceCount;
     tlasBuildInfo.dstAccelerationStructure = tlas_.handle;
-    tlasBuildInfo.scratchData.deviceAddress = tlasScratch.address;
+    tlasBuildInfo.scratchData.deviceAddress = tlasUpdateScratch_.address;
     const VkAccelerationStructureBuildRangeInfoKHR* tlasRanges[] = {&tlasRange};
     BlasBuildData tlasBuildData{this, &tlasBuildInfo, tlasRanges};
     if (!RunOneTimeCommands(buildBlas, &tlasBuildData, diagnostic))
     {
-        DestroyBuffer(tlasScratch);
         return false;
     }
-    DestroyBuffer(tlasScratch);
 
     VkAccelerationStructureDeviceAddressInfoKHR tlasAddressInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR};
     tlasAddressInfo.accelerationStructure = tlas_.handle;
@@ -2014,6 +2099,110 @@ bool PresentableTinyRtScene::CreateShaderBindingTable(std::string& diagnostic)
     return true;
 }
 
+bool PresentableTinyRtScene::UpdateHeldTorchInstance(VkCommandBuffer commandBuffer,
+                                                      float cameraYaw,
+                                                      float walkTime,
+                                                      float cameraX,
+                                                      float cameraZ,
+                                                      float walkAmount,
+                                                      std::string& diagnostic)
+{
+    if (instanceBuffer_.memory == VK_NULL_HANDLE || tlas_.handle == VK_NULL_HANDLE || tlasUpdateScratch_.address == 0u)
+    {
+        diagnostic = "Held-torch TLAS resources are unavailable.";
+        return false;
+    }
+
+    const float forwardX = std::sin(cameraYaw);
+    const float forwardZ = -std::cos(cameraYaw);
+    const float rightX = std::cos(cameraYaw);
+    const float rightZ = std::sin(cameraYaw);
+    const float movement = std::max(walkAmount, 0.2f);
+    constexpr float torchScale = 0.72f;
+    const float torchSway = std::sin(walkTime * 6.2f) * 0.08f * movement;
+    const float torchX = cameraX + forwardX * 1.18f - rightX * (0.42f + torchSway * 0.8f);
+    const float torchY = -0.48f + std::abs(std::sin(walkTime * 6.2f)) * 0.04f * movement;
+    const float torchZ = cameraZ + forwardZ * 1.18f - rightZ * (0.42f + torchSway * 0.8f);
+
+    std::array<VkAccelerationStructureInstanceKHR, 2u> instances{};
+    instances[0].transform = {{
+        1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f}};
+    instances[0].instanceCustomIndex = 0u;
+    instances[0].mask = 0xffu;
+    instances[0].flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
+    instances[0].accelerationStructureReference = blas_.address;
+    instances[1] = instances[0];
+    instances[1].transform = {{
+        rightX * torchScale, 0.0f, forwardX * torchScale, torchX,
+        0.0f, torchScale, 0.0f, torchY,
+        rightZ * torchScale, 0.0f, forwardZ * torchScale, torchZ}};
+    instances[1].instanceCustomIndex = 1u;
+    instances[1].accelerationStructureReference = torchBlas_.address;
+
+    void* mapped = nullptr;
+    if (vkMapMemory(device_, instanceBuffer_.memory, 0u, sizeof(instances), 0u, &mapped) != VK_SUCCESS || mapped == nullptr)
+    {
+        diagnostic = "Failed to update held-torch instance data.";
+        return false;
+    }
+    std::memcpy(mapped, instances.data(), sizeof(instances));
+    vkUnmapMemory(device_, instanceBuffer_.memory);
+
+    VkMemoryBarrier hostWriteBarrier{VK_STRUCTURE_TYPE_MEMORY_BARRIER};
+    hostWriteBarrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;
+    hostWriteBarrier.dstAccessMask = VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR;
+    vkCmdPipelineBarrier(commandBuffer,
+                         VK_PIPELINE_STAGE_HOST_BIT,
+                         VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR,
+                         0u,
+                         1u,
+                         &hostWriteBarrier,
+                         0u,
+                         nullptr,
+                         0u,
+                         nullptr);
+
+    VkAccelerationStructureGeometryKHR tlasGeometry{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
+    tlasGeometry.geometryType = VK_GEOMETRY_TYPE_INSTANCES_KHR;
+    tlasGeometry.geometry.instances.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_INSTANCES_DATA_KHR;
+    tlasGeometry.geometry.instances.arrayOfPointers = VK_FALSE;
+    tlasGeometry.geometry.instances.data.deviceAddress = instanceBuffer_.address;
+
+    VkAccelerationStructureBuildGeometryInfoKHR updateInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR};
+    updateInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR;
+    updateInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR | VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_KHR;
+    updateInfo.mode = VK_BUILD_ACCELERATION_STRUCTURE_MODE_UPDATE_KHR;
+    updateInfo.srcAccelerationStructure = tlas_.handle;
+    updateInfo.dstAccelerationStructure = tlas_.handle;
+    updateInfo.geometryCount = 1u;
+    updateInfo.pGeometries = &tlasGeometry;
+    updateInfo.scratchData.deviceAddress = tlasUpdateScratch_.address;
+
+    VkAccelerationStructureBuildRangeInfoKHR updateRange{};
+    updateRange.primitiveCount = static_cast<std::uint32_t>(instances.size());
+    const VkAccelerationStructureBuildRangeInfoKHR* updateRanges[] = {&updateRange};
+    vkCmdBuildAccelerationStructuresKHR_(commandBuffer, 1u, &updateInfo, updateRanges);
+
+    VkMemoryBarrier traceBarrier{VK_STRUCTURE_TYPE_MEMORY_BARRIER};
+    traceBarrier.srcAccessMask = VK_ACCESS_ACCELERATION_STRUCTURE_WRITE_BIT_KHR;
+    traceBarrier.dstAccessMask = VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR;
+    vkCmdPipelineBarrier(commandBuffer,
+                         VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR,
+                         VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
+                         0u,
+                         1u,
+                         &traceBarrier,
+                         0u,
+                         nullptr,
+                         0u,
+                         nullptr);
+
+    diagnostic.clear();
+    return true;
+}
+
 bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                                                 VkImage swapchainImage,
                                                 VkImageLayout& swapchainImageLayout,
@@ -2033,6 +2222,11 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
         return false;
     }
 
+    if (!UpdateHeldTorchInstance(commandBuffer, cameraYaw, walkTime, cameraX, cameraZ, walkAmount, diagnostic))
+    {
+        return false;
+    }
+
     if (storageImageLayout_ != VK_IMAGE_LAYOUT_GENERAL)
     {
         SetImageBarrier(commandBuffer,
@@ -2048,7 +2242,14 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
 
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, pipeline_);
     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, pipelineLayout_, 0u, 1u, &descriptorSet_, 0u, nullptr);
-    const ScenePushConstants pushConstants{cameraYaw, cameraPitch, lanternStrength, walkTime, cameraX, cameraZ, walkAmount, 0.0f};
+    const ScenePushConstants pushConstants{cameraYaw,
+                                           cameraPitch,
+                                           lanternStrength,
+                                           walkTime,
+                                           cameraX,
+                                           cameraZ,
+                                           walkAmount,
+                                           presentationUsesBgra_ ? 1.0f : 0.0f};
     vkCmdPushConstants(commandBuffer,
                        pipelineLayout_,
                        VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR,

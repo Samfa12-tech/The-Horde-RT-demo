@@ -120,6 +120,8 @@ Current proven path:
 - The scene uses BLAS/TLAS acceleration structures, an RT pipeline/SBT, `vkCmdTraceRaysKHR`, and a storage-image-to-swapchain copy.
 - Reports only set `rtScene.presented = true` after successful swapchain presentation.
 - The visible scene is now a first-person gothic corridor/ruin prototype with a handheld medieval torch, reflective objects, puddle/wet-stone response, horde silhouettes, fog, and second-room sunlight.
+- The in-progress source now represents the held torch as a real emissive BLAS/TLAS instance rather than a screen overlay; it still needs visual validation.
+- The live laptop proof shows the real orange flame and a deterministic ray-query reflection in a high-reflectivity wall insert. The raw RGBA-to-BGRA copy is explicitly compensated so the flame cannot turn cyan at presentation.
 - Controls are now left-drag movement/strafe and right-drag 360 look.
 - Windows now runs the same RT corridor as an interactive desktop scene: `WASD` moves, left mouse/trackpad click-drag looks, and `Esc` exits.
 - The RTX 5050 laptop reported `RayTracingPipeline` and successful RT swapchain presentation at 984 x 661 in the interactive Windows build.
@@ -135,7 +137,7 @@ Important technical finding:
 
 Implement the gothic material and collision proof:
 
-1. Re-test the collision/material source on the phone and preserve the current laptop interactive controls.
+1. Re-test the collision/material source on the phone and tune the real torch mesh/panel-reflection proof while preserving the current laptop interactive controls.
 2. Add a narrow GLB animation/PBR import path for the staged skeleton, keeping the sword separate.
 3. Instantiate and animate one skeleton enemy only after its import path is measured on the laptop and phone.
 4. Import a small number of commercial-safe open-source environment PBR textures, preferably CC0 from Poly Haven or ambientCG.

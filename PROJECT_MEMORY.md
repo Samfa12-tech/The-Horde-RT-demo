@@ -30,7 +30,8 @@ Last updated: 2026-07-10
 - A recursive closest-hit path-tracing attempt with `maxPipelineRayRecursionDepth = 2` compiled but failed on phone at pipeline creation, so the phone-safe path is ray-query path tracing inside raygen with recursion depth 1.
 - Diagnostics are hidden behind the HUD tap so the app opens as a scene instead of a probe screen.
 - The current Phase 1C source moves the visible torch and its light to the left side of the player view, adds basic Android corridor/arch collision, and strengthens the procedural dry/wet/mossy stone, puddle, aged-metal, and flame material table. This source slice still needs an on-device re-test.
-- The current RT cleanup removes synthetic grain and temporal random-bounce shimmer, dims the blue sky/cold indirect contribution, and makes the warm torch light follow the camera-local left-hand position. The updated laptop scene was rebuilt and relaunched; phone validation remains pending.
+- The current RT cleanup removes synthetic grain and temporal random-bounce shimmer, dims the blue sky/cold indirect contribution, and adds a real emissive held-torch mesh as a second TLAS instance. Its camera-local flame mesh is the source used for direct-light sampling and reflection rays; the previous fullscreen torch art is removed. The updated laptop scene was rebuilt/relaunched and the Android debug build compiles; phone visual validation remains pending.
+- The RGBA RT storage image is raw-copied into common BGRA swapchains. `PresentableTinyRtScene` now passes the presentation format into a shader push constant and swaps red/blue before that copy when required; this fixes the cyan-torch presentation bug without changing the RT light transport.
 - A textured Meshy sword is staged at `assets/models/weapons/meshy/gothic_arming_sword_rh_v01.glb`. It has embedded and sidecar 2K PBR maps, but it is not loaded by the renderer, and its 49,439 triangles exceed the Android held-prop RT budget.
 - The Windows RT scene now has a verified interactive desktop path on the RTX 5050 laptop: `WASD` movement, left mouse/trackpad click-drag look, and `Esc` exit. It reported `RayTracingPipeline` and successful RT swapchain presentation at 984 x 661 on 2026-07-10.
 - A separate 9,402-triangle Meshy biped with 11 named clips is staged at `assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb`. It is not runtime-integrated, and the sword remains separate from its `RightHand` joint.
@@ -66,7 +67,7 @@ Last updated: 2026-07-10
 - There is no enemy AI, attacks, block, dodge, animation, audio, or asset pipeline integration yet.
 - Current runtime geometry is hand-authored simple triangles/quads. A Meshy sword is staged only and needs remesh/LOD plus a GLB/PBR import and right-hand attachment path before it can render.
 - Current materials are procedural/stylized placeholders. They prove mood, shadows, reflections, and bounce direction, but are not final PBR textures.
-- The visible handheld torch is a shader overlay/light source, not yet real world geometry that casts its own mesh shadow.
+- The held torch uses a host-written TLAS transform, so Android and Windows intentionally run one frame in flight until the renderer has per-frame TLAS/instance-buffer ownership.
 
 ## Completed Phase 1B / early Phase 1C work
 
@@ -81,6 +82,7 @@ Last updated: 2026-07-10
 9. Generated and staged a Meshy-6 PBR right-hand sword. It has 2K PBR maps but needs explicit remesh approval because the delivered 49,439 triangles are too costly for the Android RT target.
 10. Added a verified interactive Windows RTX 5050 RT corridor build with keyboard and mouse/trackpad controls.
 11. Staged the merged-animation skeleton, verified its 11 clip names, and kept the sword separate.
+12. Replaced the fake held-torch overlay/light relationship with a two-BLAS RT scene: static corridor plus a camera-following emissive torch mesh in the TLAS.
 
 ## Next-step sequence: Phase 1C Gothic material and collision proof
 

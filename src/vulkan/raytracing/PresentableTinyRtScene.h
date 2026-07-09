@@ -25,6 +25,7 @@ public:
                     VkQueue queue,
                     VkCommandPool commandPool,
                     VkExtent2D dispatchExtent,
+                    VkFormat presentationFormat,
                     std::string& diagnostic);
 
     void Destroy();
@@ -73,6 +74,13 @@ private:
     bool CreateDescriptors(std::string& diagnostic);
     bool CreatePipeline(std::string& diagnostic);
     bool CreateShaderBindingTable(std::string& diagnostic);
+    bool UpdateHeldTorchInstance(VkCommandBuffer commandBuffer,
+                                 float cameraYaw,
+                                 float walkTime,
+                                 float cameraX,
+                                 float cameraZ,
+                                 float walkAmount,
+                                 std::string& diagnostic);
     bool RunOneTimeCommands(void (*record)(VkCommandBuffer, void*), void* userData, std::string& diagnostic) const;
     void DestroyBuffer(Buffer& buffer) const;
     void DestroyAccelerationStructure(AccelerationStructure& accelerationStructure);
@@ -86,6 +94,7 @@ private:
     VkQueue queue_ = VK_NULL_HANDLE;
     VkCommandPool commandPool_ = VK_NULL_HANDLE;
     VkExtent2D dispatchExtent_{};
+    bool presentationUsesBgra_ = false;
 
     VkImage storageImage_ = VK_NULL_HANDLE;
     VkDeviceMemory storageImageMemory_ = VK_NULL_HANDLE;
@@ -97,7 +106,9 @@ private:
     Buffer transformBuffer_;
     Buffer instanceBuffer_;
     AccelerationStructure blas_;
+    AccelerationStructure torchBlas_;
     AccelerationStructure tlas_;
+    Buffer tlasUpdateScratch_;
 
     VkDescriptorSetLayout descriptorSetLayout_ = VK_NULL_HANDLE;
     VkDescriptorPool descriptorPool_ = VK_NULL_HANDLE;

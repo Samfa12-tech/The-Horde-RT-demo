@@ -35,7 +35,8 @@ constexpr char kReportDirectory[] = "reports";
 constexpr char kTextReportFilename[] = "vulkan_capability_report.txt";
 constexpr char kJsonReportFilename[] = "vulkan_capability_report.json";
 constexpr int kEditControlId = 101;
-constexpr UINT kMaxFramesInFlight = 2u;
+// One frame in flight keeps the dynamically refit held-torch TLAS safely synchronized with its host-written instance buffer.
+constexpr UINT kMaxFramesInFlight = 1u;
 constexpr float kPlayerCollisionRadius = 0.24f;
 
 struct CollisionRect
@@ -860,6 +861,7 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx)
                                 ctx.graphicsQueue,
                                 ctx.commandPool,
                                 ctx.swapchainExtent,
+                                ctx.swapchainFormat,
                                 diagnostic))
     {
         std::cerr << "Failed to initialise presentable RT scene: " << diagnostic << '\n';

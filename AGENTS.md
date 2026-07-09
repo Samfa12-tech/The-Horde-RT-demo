@@ -27,6 +27,8 @@ This repo is a native Vulkan hardware ray tracing game/tech-demo project. Keep w
 - Prefer small, shippable vertical slices over large speculative rewrites.
 - When adding visual/gameplay features, keep a visible phone build runnable at each step.
 - Record asset licenses in `ASSET_LICENSES.md` before shipping any imported asset.
+- Keep one frame in flight while the held-torch TLAS uses a host-written instance buffer; changing this requires proper per-frame TLAS/instance-buffer ownership.
+- The RT storage image is RGBA but is raw-copied to common BGRA swapchains. Preserve the presentation-format-driven `outputRedBlueSwap` push constant or warm fire will render cyan.
 
 ## Visual direction
 
@@ -40,7 +42,7 @@ This repo is a native Vulkan hardware ray tracing game/tech-demo project. Keep w
 - Left-side drag walks/strafs.
 - Right-side drag gives 360 camera look.
 - Pitch stays clamped; yaw should remain unbounded for 360 look.
-- A visible handheld medieval flame torch and its light contribution are passed to the RT shaders through push constants.
+- The held torch is a separate low-poly BLAS instance refit into the TLAS from the camera pose each frame. Its emissive flame mesh and direct-light estimate share the same hand-space placement; do not restore the old fullscreen torch overlay.
 - Diagnostics are intentionally hidden behind the small HUD so the app first reads as a game scene.
 
 ## Known renderer constraint

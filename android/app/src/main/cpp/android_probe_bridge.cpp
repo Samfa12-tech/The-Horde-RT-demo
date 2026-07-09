@@ -32,7 +32,8 @@ constexpr const char* kTag = "HordeRtProbeBridge";
 constexpr const char* kReportDirectory = "reports";
 constexpr const char* kTextReportFilename = "vulkan_capability_report.txt";
 constexpr const char* kJsonReportFilename = "vulkan_capability_report.json";
-constexpr uint32_t kMaxFramesInFlight = 2u;
+// One frame in flight keeps the dynamically refit held-torch TLAS safely synchronized with its host-written instance buffer.
+constexpr uint32_t kMaxFramesInFlight = 1u;
 constexpr float kPlayerCollisionRadius = 0.24f;
 
 struct CollisionRect
@@ -69,9 +70,10 @@ struct SwapchainContext
     std::vector<VkFramebuffer> swapchainFramebuffers;
     VkCommandPool commandPool = VK_NULL_HANDLE;
     std::vector<VkCommandBuffer> commandBuffers;
-    VkSemaphore imageAvailableSemaphores[kMaxFramesInFlight] = {};
-    VkSemaphore renderFinishedSemaphores[kMaxFramesInFlight] = {};
-    VkFence inFlightFences[kMaxFramesInFlight] = {};
+    // Keep two slots allocated until the legacy cleanup path is simplified; only slot zero is active.
+    VkSemaphore imageAvailableSemaphores[2u] = {};
+    VkSemaphore renderFinishedSemaphores[2u] = {};
+    VkFence inFlightFences[2u] = {};
     VkClearColorValue clearColor = {{0.12f, 0.04f, 0.18f, 1.0f}};
     horde::vulkan::DeviceCapabilities capabilities;
     horde::vulkan::raytracing::PresentableTinyRtScene rtScene;
@@ -768,6 +770,7 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
                                     context.graphicsQueue,
                                     context.commandPool,
                                     context.swapchainExtent,
+                                    context.swapchainFormat,
                                     diagnostic))
     {
         __android_log_print(ANDROID_LOG_ERROR, kTag, "Failed to initialise presentable RT scene: %s", diagnostic.c_str());
