@@ -30,6 +30,8 @@ Current tested phone build includes:
 
 The current Phase 1C source slice additionally adds simple corridor/arch collision and a stronger procedural material table for dry stone, wet stone/puddles, mossy stone, old metal, and flame. It must be rebuilt and re-tested on the target phone before being counted as a verified phone result.
 
+Asset staging update: a Meshy-6 PBR gothic sword has been generated for the future right hand. The staged GLB has 2K maps but also 49,439 triangles, so it is not runtime-integrated; it needs remesh/LOD plus a GLB/PBR import and right-hand attachment path before it can enter the Android RT scene.
+
 Important phone finding:
 
 - Recursive closest-hit secondary tracing with pipeline recursion depth 2 failed on phone at RT pipeline creation.
@@ -146,6 +148,7 @@ Next slice:
 
 - Build/install the latest collision/material source and confirm the RT swapchain success log on the Galaxy.
 - Check that movement respects corridor walls and the low arch posts without trapping the player.
+- Remesh the staged 49k-triangle sword to a phone-safe budget before implementing GLB/PBR loading and right-hand attachment.
 - Bring in a small number of commercial-safe open-source PBR texture sets, then measure their mobile cost.
 - Preferred texture sources: Poly Haven and ambientCG, both checked per asset and recorded in `ASSET_LICENSES.md`.
 - Preserve the phone-safe ray-query path-tracing route unless a better RT route is proven on device.

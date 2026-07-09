@@ -20,13 +20,15 @@
 - The handheld torch and its world-space light are on the left side of the player view.
 - The active raygen shader has a compact procedural material table: dry stone, wet stone/puddles, mossy stone, aged metal/bronze, and flame emissive.
 - Wet materials and puddles use stronger reflected torch and bounce-light responses.
+- A Meshy-6 PBR right-hand sword is staged as source art with embedded and 2K sidecar maps. It is intentionally not in the runtime because the delivered 49,439 triangles are not phone-safe for the RT acceleration structure.
 
 ### Still required to close Phase 1C
 
 1. Build, install, and test this source slice on the target phone; confirm collision is comfortable and `RT frame reached Android swapchain presentation.` still appears.
-2. Import a deliberately small set of commercial-safe PBR texture sets and record each one in `ASSET_LICENSES.md` before it ships.
-3. Add texture loading/binding only once the mobile performance cost is understood; retain procedural material slots as the safe fallback for missing art data, never as an RT fallback.
-4. Add one idle or moving horde proxy after the corridor feels bounded and materially convincing.
+2. Remesh/LOD the staged sword to a roughly 10–15k-triangle held-prop budget before adding it to the Android RT BLAS/TLAS. This needs a new credit approval.
+3. Add a narrow GLB/PBR loader and right-hand attachment only after that remesh is accepted; measure the mobile RT cost first.
+4. Import a deliberately small set of commercial-safe environment PBR texture sets and record each one in `ASSET_LICENSES.md` before it ships.
+5. Add one idle or moving horde proxy after the corridor feels bounded and materially convincing.
 
 ## Later milestones
 
