@@ -20,6 +20,7 @@
 - The handheld torch and its world-space light are on the left side of the player view.
 - The active raygen shader has a compact procedural material table: dry stone, wet stone/puddles, mossy stone, aged metal/bronze, and flame emissive.
 - Wet materials and puddles use stronger reflected torch and bounce-light responses.
+- The first RT cleanup removes deliberate grain and time-varying hemisphere jitter, uses a deterministic single ray-query bounce, and keeps the torch's warm light camera-local to the left-hand overlay.
 - A Meshy-6 PBR right-hand sword is staged as source art with embedded and 2K sidecar maps. It is intentionally not in the runtime because the delivered 49,439 triangles are not phone-safe for the RT acceleration structure.
 - The Windows RT scene is an interactive laptop build: `WASD` movement, left mouse/trackpad click-drag look, and `Esc` exit. On 2026-07-10, the RTX 5050 laptop reported `RayTracingPipeline` and a successful RT swapchain presentation at 984 x 661.
 - The 9,402-triangle merged-animation skeleton is staged as source art with 11 correctly named clips. It is not loaded by the renderer, and the sword is intentionally separate.

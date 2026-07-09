@@ -28,7 +28,7 @@ Current tested phone build includes:
 - Reflective objects, wet-floor/puddle response, fog, horde silhouettes, and second-room sunlight.
 - Diagnostics hidden behind the HUD tap instead of being the primary screen.
 
-The current Phase 1C source slice additionally adds simple corridor/arch collision and a stronger procedural material table for dry stone, wet stone/puddles, mossy stone, old metal, and flame. It must be rebuilt and re-tested on the target phone before being counted as a verified phone result.
+The current Phase 1C source slice additionally adds simple corridor/arch collision and a stronger procedural material table for dry stone, wet stone/puddles, mossy stone, old metal, and flame. The RT look now removes synthetic grain and time-varying random bounce sampling, follows the camera with the left-hand torch light, and reduces cool sky/indirect influence so torches read warm. It must be rebuilt and re-tested on the target phone before being counted as a verified phone result.
 
 Asset staging update: a Meshy-6 PBR gothic sword has been generated for the future right hand. The staged GLB has 2K maps but also 49,439 triangles, so it is not runtime-integrated; it needs remesh/LOD plus a GLB/PBR import and right-hand attachment path before it can enter the Android RT scene.
 
