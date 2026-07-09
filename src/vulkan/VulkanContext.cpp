@@ -375,6 +375,11 @@ VkPhysicalDevice VulkanContext::GetSelectedPhysicalDevice() const
     return selectedPhysicalDevice_;
 }
 
+void VulkanContext::SetRtScenePresented(const bool presented)
+{
+    selectedCapabilities_.rtScene.presented = presented;
+}
+
 DeviceCapabilities VulkanContext::QueryDeviceCapabilities() const
 {
     if (!initialised_)

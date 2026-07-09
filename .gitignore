@@ -3,5 +3,9 @@ reports/
 android/build/
 android/.gradle/
 android/app/build/
+android/app/.cxx/
+.tmp_nvtut/
+temp_vulkan_samples/
+shaders/raytracing/*.spv
 **/*.user
 *.vcxproj.user

@@ -14,6 +14,7 @@ add_library(horde_rt_probe_android
     ../../../../../src/vulkan/raytracing/RayTracingPipeline.cpp
     ../../../../../src/vulkan/raytracing/ShaderBindingTable.cpp
     ../../../../../src/vulkan/raytracing/TinyRtScene.cpp
+    ../../../../../src/vulkan/raytracing/PresentableTinyRtScene.cpp
 )
 
 target_include_directories(horde_rt_probe_android PRIVATE

@@ -15,13 +15,33 @@ The app must use native Vulkan hardware ray tracing. It must query the actual Vu
 
 ## Current status
 
-Phase 0A/B/C now includes:
+Phase 0A/B/C established the capability probe and native diagnostic shells. The project has now moved into an early Phase 1 phone scene.
+
+Current tested phone build includes:
+
+- A native Vulkan Android app that builds, installs, and launches on Samsung `SM-S948B`.
+- A real RT-produced frame path: BLAS/TLAS, RT pipeline/SBT, `vkCmdTraceRaysKHR`, storage image output, and swapchain presentation.
+- A first-person gothic corridor/ruin scene with authored triangle geometry.
+- Visible handheld medieval flame torch on the left side of the player view.
+- Left-side touch movement/strafe and right-side 360 look.
+- Ray-query path-tracing style shading: primary TLAS queries, shadow queries, and a first bounce sample.
+- Reflective objects, wet-floor/puddle response, fog, horde silhouettes, and second-room sunlight.
+- Diagnostics hidden behind the HUD tap instead of being the primary screen.
+
+The current Phase 1C source slice additionally adds simple corridor/arch collision and a stronger procedural material table for dry stone, wet stone/puddles, mossy stone, old metal, and flame. It must be rebuilt and re-tested on the target phone before being counted as a verified phone result.
+
+Important phone finding:
+
+- Recursive closest-hit secondary tracing with pipeline recursion depth 2 failed on phone at RT pipeline creation.
+- The stable mobile path uses `rayQueryEXT` in raygen for secondary visibility/bounce work while keeping RT pipeline recursion depth 1.
+
+The earlier probe foundation includes:
 
 - Windows CLI: `horde_rt_capability_probe`.
 - Android native shell (`android/`) that runs the same probe core and displays diagnostics in-app via shared text and a native Vulkan surface.
 - Android report persistence to app private storage.
 - Windows native diagnostic window: `horde_rt_diagnostic_window` with native Vulkan swapchain/surface diagnostics.
-- Real probe now includes a tiny hardware RT scene skeleton validation path on Android (no gameplay).
+- Real probe now includes a presentable RT scene path on Android and Windows scaffolds.
 
 ### Probe feature coverage
 
@@ -108,7 +128,7 @@ Verified on-device run (2026-07-05, Samsung Galaxy S26 Ultra, model `SM-S948B`, 
 
 ## Planned build targets
 
-- Android native capability shell (`android/` app module).
+- Android native phone build (`android/` app module).
 - Windows native Vulkan build path (capability probe + diagnostic surface swapchain).
 
 ## First milestone: Phase 0 capability probe
@@ -118,7 +138,17 @@ Verified on-device run (2026-07-05, Samsung Galaxy S26 Ultra, model `SM-S948B`, 
 - Unsupported output explicitly explains missing requirements.
 - No fake renderer fallback.
 
-RT scene rendering is not implemented in this phase. This task now uses native Vulkan diagnostic surfaces on Windows and Android to present the same shared probe result.
+Phase 0 is complete enough to support Phase 1 scene work. Native Vulkan diagnostic surfaces on Windows and Android now present shared probe results, and Android has a real RT scene path.
+
+## Next milestone: close Phase 1C on device
+
+Next slice:
+
+- Build/install the latest collision/material source and confirm the RT swapchain success log on the Galaxy.
+- Check that movement respects corridor walls and the low arch posts without trapping the player.
+- Bring in a small number of commercial-safe open-source PBR texture sets, then measure their mobile cost.
+- Preferred texture sources: Poly Haven and ambientCG, both checked per asset and recorded in `ASSET_LICENSES.md`.
+- Preserve the phone-safe ray-query path-tracing route unless a better RT route is proven on device.
 
 ## First milestone report fields
 

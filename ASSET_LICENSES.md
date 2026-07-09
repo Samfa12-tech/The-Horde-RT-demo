@@ -1,6 +1,6 @@
 # Asset Licenses
 
-No production assets are imported yet.
+No external production assets are imported yet. The current Phase 1C material proof is procedural; it does not claim to use third-party PBR textures.
 
 Phase 0 is a capability-probe scaffold only. The first step should not import large models, textures, audio, Meshy exports, or third-party asset packs.
 
@@ -18,4 +18,4 @@ Phase 0 is a capability-probe scaffold only. The first step should not import la
 
 | Asset | Type | Source | License | Imported by | Notes |
 |---|---|---|---|---|---|
-| None yet | - | - | - | - | Phase 0 scaffold only. |
+| None yet | - | - | - | - | Do not add an entry until an asset is actually imported and its exact source and license are known. |

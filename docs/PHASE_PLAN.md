@@ -1,40 +1,37 @@
 # Phase Plan
 
-## Phase 0 - Vulkan RT Capability Probe
+## Phase 0 - Vulkan RT capability proof: complete
 
-Goal: prove the target devices expose the required Vulkan hardware RT support.
+- Android and Windows use a native Vulkan capability probe with clear unsupported-device diagnostics.
+- The target Galaxy S26 Ultra reported the required RT extensions/features and runs the app in `RayTracingPipeline` mode.
+- The Android renderer has presented an RT-produced frame through the swapchain. There is no raster or fake-RT success path.
 
-### Completed in this slice
+## Phase 1A/1B - presentable hardware RT scene: complete
 
-- Real Vulkan instance creation.
-- Physical device enumeration.
-- Per-device extension + feature-chain probe.
-- RT mode evaluation:
-  - `RayTracingPipeline`
-  - `RayQuery`
-  - `Unsupported`
-- Diagnostics and report generation.
-- Windows CLI executable `horde_rt_capability_probe`.
-- Android JNI shell under `android/` with native `TextView` diagnostics and report persistence.
-- Win32 diagnostic window app (`horde_rt_diagnostic_window`) with shared probe formatting.
-- Native Android minimal RT scene skeleton status check now runs through the same probe core and validates RT pipeline/AS runtime entry points.
+- The renderer builds BLAS/TLAS, an RT pipeline and SBT, dispatches `vkCmdTraceRaysKHR`, writes a storage image, and copies it to the swapchain.
+- The stable phone path retains ray-pipeline recursion depth 1 and performs primary/shadow/first-bounce work through `rayQueryEXT` in raygen.
+- The playable visual proof is a first-person gothic corridor with torch light, wet floor response, fog, silhouettes, and a second-room sun shaft.
 
-### Current known limitations
+## Current slice - Phase 1C: collision and gothic material proof
 
-- No on-screen Vulkan RT rendering path yet.
-- No swapchain or surface path yet.
-- Android output now includes Vulkan diagnostic surface plus shared text overlay.
-- Native swapchain/surface pipeline is in place on Windows and Android for diagnostics.
+### Implemented in source
 
-## Next smallest task
+- Simple Android player collision now keeps the camera inside the corridor and pushes it away from the two low arch posts.
+- The handheld torch and its world-space light are on the left side of the player view.
+- The active raygen shader has a compact procedural material table: dry stone, wet stone/puddles, mossy stone, aged metal/bronze, and flame emissive.
+- Wet materials and puddles use stronger reflected torch and bounce-light responses.
 
-Keep unsupported-device diagnostics unchanged, then start Phase 1B (tiny native RT render path) using shared probe results.
+### Still required to close Phase 1C
 
-## Planned milestone sequence
+1. Build, install, and test this source slice on the target phone; confirm collision is comfortable and `RT frame reached Android swapchain presentation.` still appears.
+2. Import a deliberately small set of commercial-safe PBR texture sets and record each one in `ASSET_LICENSES.md` before it ships.
+3. Add texture loading/binding only once the mobile performance cost is understood; retain procedural material slots as the safe fallback for missing art data, never as an RT fallback.
+4. Add one idle or moving horde proxy after the corridor feels bounded and materially convincing.
 
-1. Phase 1 - Minimal hardware RT scene
-2. Phase 2 - Torch corridor visual prototype
-3. Phase 3 - Movement and simple combat shell
-4. Phase 4 - Asset upgrade
-5. Phase 5 - Playable route
-6. Phase 6 - Release package
+## Later milestones
+
+1. Phase 2 - Torch corridor visual prototype expansion
+2. Phase 3 - Movement and simple combat shell
+3. Phase 4 - Asset upgrade
+4. Phase 5 - Playable route
+5. Phase 6 - Release package

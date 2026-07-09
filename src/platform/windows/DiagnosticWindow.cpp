@@ -7,13 +7,23 @@
 #include <string>
 #include <vector>
 
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#ifdef DeviceCapabilities
+#undef DeviceCapabilities
+#endif
 #include <vulkan/vulkan.h>
 #include <vulkan/vulkan_win32.h>
-#include <windows.h>
 
 #include "ui/DiagnosticOverlay.h"
 #include "vulkan/RtCapabilityReport.h"
 #include "vulkan/VulkanContext.h"
+#include "vulkan/raytracing/PresentableTinyRtScene.h"
 
 namespace
 {
@@ -28,6 +38,7 @@ constexpr UINT kMaxFramesInFlight = 2u;
 
 struct VulkanSurfaceContext
 {
+    HWND windowHandle = nullptr;
     VkInstance instance = VK_NULL_HANDLE;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
     VkDevice device = VK_NULL_HANDLE;
@@ -40,6 +51,7 @@ struct VulkanSurfaceContext
     VkExtent2D swapchainExtent{};
     VkRenderPass renderPass = VK_NULL_HANDLE;
     std::vector<VkImage> swapchainImages;
+    std::vector<VkImageLayout> swapchainImageLayouts;
     std::vector<VkImageView> swapchainImageViews;
     std::vector<VkFramebuffer> swapchainFramebuffers;
     VkCommandPool commandPool = VK_NULL_HANDLE;
@@ -47,8 +59,12 @@ struct VulkanSurfaceContext
     std::vector<VkSemaphore> imageAvailableSemaphores;
     std::vector<VkSemaphore> renderFinishedSemaphores;
     std::vector<VkFence> inFlightFences;
+    horde::vulkan::raytracing::PresentableTinyRtScene rtScene;
+    bool useRtPath = false;
     uint32_t currentFrame = 0u;
 };
+
+bool WriteReportFile(const std::filesystem::path& path, const std::string& data);
 
 std::string BuildDisplayText(const horde::vulkan::DeviceCapabilities& capabilities)
 {
@@ -138,9 +154,7 @@ bool CreateInstance(VkInstance& instance)
         0,
         nullptr,
         static_cast<uint32_t>(std::size(extensions)),
-        extensions,
-        0,
-        nullptr};
+        extensions};
 
     const VkResult result = vkCreateInstance(&createInfo, nullptr, &instance);
     if (result != VK_SUCCESS)
@@ -203,7 +217,31 @@ bool FindGraphicsAndPresentQueueFamily(VkPhysicalDevice physicalDevice, VkSurfac
     return false;
 }
 
-bool CreateLogicalDevice(VkPhysicalDevice physicalDevice, uint32_t graphicsQueueFamilyIndex, VkDevice& device, VkQueue& graphicsQueue)
+bool HasDeviceExtension(VkPhysicalDevice physicalDevice, const char* extensionName)
+{
+    uint32_t extensionCount = 0u;
+    if (vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, nullptr) != VK_SUCCESS)
+    {
+        return false;
+    }
+
+    std::vector<VkExtensionProperties> extensions(extensionCount);
+    vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, extensions.data());
+    for (const VkExtensionProperties& extension : extensions)
+    {
+        if (std::string(extension.extensionName) == extensionName)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CreateLogicalDevice(VkPhysicalDevice physicalDevice,
+                         uint32_t graphicsQueueFamilyIndex,
+                         const horde::vulkan::DeviceCapabilities& capabilities,
+                         VkDevice& device,
+                         VkQueue& graphicsQueue)
 {
     const float queuePriority = 1.0f;
     const VkDeviceQueueCreateInfo queueCreateInfo{
@@ -213,18 +251,57 @@ bool CreateLogicalDevice(VkPhysicalDevice physicalDevice, uint32_t graphicsQueue
         graphicsQueueFamilyIndex,
         1u,
         &queuePriority};
-    const char* extensions[] = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+    std::vector<const char*> extensions{VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+    const bool enableRayTracing = capabilities.rtMode == horde::vulkan::RtMode::RayTracingPipeline;
+    if (enableRayTracing)
+    {
+        const char* rtExtensions[] = {
+            VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME,
+            VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME,
+            VK_KHR_RAY_QUERY_EXTENSION_NAME,
+            VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME,
+            VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME,
+            VK_KHR_SPIRV_1_4_EXTENSION_NAME,
+            VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME};
+        for (const char* extension : rtExtensions)
+        {
+            if (!HasDeviceExtension(physicalDevice, extension))
+            {
+                std::cerr << "Selected RayTracingPipeline device is missing required extension: " << extension << ".\n";
+                return false;
+            }
+            extensions.push_back(extension);
+        }
+    }
+
+    VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures{
+        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR};
+    accelerationStructureFeatures.accelerationStructure = enableRayTracing ? VK_TRUE : VK_FALSE;
+    VkPhysicalDeviceRayTracingPipelineFeaturesKHR rayTracingPipelineFeatures{
+        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR};
+    rayTracingPipelineFeatures.rayTracingPipeline = enableRayTracing ? VK_TRUE : VK_FALSE;
+    VkPhysicalDeviceRayQueryFeaturesKHR rayQueryFeatures{
+        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR};
+    rayQueryFeatures.rayQuery = enableRayTracing ? VK_TRUE : VK_FALSE;
+    VkPhysicalDeviceBufferDeviceAddressFeaturesKHR bufferDeviceAddressFeatures{
+        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES_KHR};
+    bufferDeviceAddressFeatures.bufferDeviceAddress = enableRayTracing ? VK_TRUE : VK_FALSE;
+    VkPhysicalDeviceFeatures2 features2{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2};
+    features2.pNext = &accelerationStructureFeatures;
+    accelerationStructureFeatures.pNext = &rayTracingPipelineFeatures;
+    rayTracingPipelineFeatures.pNext = &rayQueryFeatures;
+    rayQueryFeatures.pNext = &bufferDeviceAddressFeatures;
 
     const VkDeviceCreateInfo createInfo{
         VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
-        nullptr,
+        enableRayTracing ? &features2 : nullptr,
         0,
         1u,
         &queueCreateInfo,
         0,
         nullptr,
-        static_cast<uint32_t>(std::size(extensions)),
-        extensions,
+        static_cast<uint32_t>(extensions.size()),
+        extensions.data(),
         nullptr};
 
     const VkResult createResult = vkCreateDevice(physicalDevice, &createInfo, nullptr, &device);
@@ -332,7 +409,7 @@ bool CreateSwapchain(VulkanSurfaceContext& ctx, HWND hwnd)
         ctx.swapchainColorSpace,
         ctx.swapchainExtent,
         1u,
-        VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+        VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT,
         VK_SHARING_MODE_EXCLUSIVE,
         0,
         nullptr,
@@ -359,6 +436,7 @@ bool CreateSwapchain(VulkanSurfaceContext& ctx, HWND hwnd)
     {
         return false;
     }
+    ctx.swapchainImageLayouts.assign(ctx.swapchainImages.size(), VK_IMAGE_LAYOUT_UNDEFINED);
 
     ctx.swapchainImageViews.resize(ctx.swapchainImages.size());
     for (size_t index = 0u; index < ctx.swapchainImages.size(); ++index)
@@ -473,7 +551,7 @@ bool CreateSwapchain(VulkanSurfaceContext& ctx, HWND hwnd)
         return false;
     }
 
-    VkCommandBufferAllocateInfo commandBufferAllocateInfo{
+VkCommandBufferAllocateInfo commandBufferAllocateInfo{
         VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
         nullptr,
         ctx.commandPool,
@@ -538,6 +616,124 @@ bool CreateSwapchain(VulkanSurfaceContext& ctx, HWND hwnd)
     return true;
 }
 
+void ReleaseSwapchainResources(VulkanSurfaceContext& ctx)
+{
+    if (ctx.device == VK_NULL_HANDLE)
+    {
+        return;
+    }
+
+    vkDeviceWaitIdle(ctx.device);
+    ctx.rtScene.Destroy();
+
+    if (ctx.commandPool != VK_NULL_HANDLE)
+    {
+        if (!ctx.commandBuffers.empty())
+        {
+            vkFreeCommandBuffers(ctx.device,
+                                 ctx.commandPool,
+                                 static_cast<uint32_t>(ctx.commandBuffers.size()),
+                                 ctx.commandBuffers.data());
+            ctx.commandBuffers.clear();
+        }
+        vkDestroyCommandPool(ctx.device, ctx.commandPool, nullptr);
+        ctx.commandPool = VK_NULL_HANDLE;
+    }
+
+    for (VkFramebuffer framebuffer : ctx.swapchainFramebuffers)
+    {
+        if (framebuffer != VK_NULL_HANDLE)
+        {
+            vkDestroyFramebuffer(ctx.device, framebuffer, nullptr);
+        }
+    }
+    ctx.swapchainFramebuffers.clear();
+
+    for (VkImageView imageView : ctx.swapchainImageViews)
+    {
+        if (imageView != VK_NULL_HANDLE)
+        {
+            vkDestroyImageView(ctx.device, imageView, nullptr);
+        }
+    }
+    ctx.swapchainImageViews.clear();
+
+    if (ctx.renderPass != VK_NULL_HANDLE)
+    {
+        vkDestroyRenderPass(ctx.device, ctx.renderPass, nullptr);
+        ctx.renderPass = VK_NULL_HANDLE;
+    }
+
+    if (ctx.swapchain != VK_NULL_HANDLE)
+    {
+        vkDestroySwapchainKHR(ctx.device, ctx.swapchain, nullptr);
+        ctx.swapchain = VK_NULL_HANDLE;
+    }
+
+    for (VkSemaphore semaphore : ctx.imageAvailableSemaphores)
+    {
+        if (semaphore != VK_NULL_HANDLE)
+        {
+            vkDestroySemaphore(ctx.device, semaphore, nullptr);
+        }
+    }
+    for (VkSemaphore semaphore : ctx.renderFinishedSemaphores)
+    {
+        if (semaphore != VK_NULL_HANDLE)
+        {
+            vkDestroySemaphore(ctx.device, semaphore, nullptr);
+        }
+    }
+    for (VkFence fence : ctx.inFlightFences)
+    {
+        if (fence != VK_NULL_HANDLE)
+        {
+            vkDestroyFence(ctx.device, fence, nullptr);
+        }
+    }
+
+    ctx.imageAvailableSemaphores.clear();
+    ctx.renderFinishedSemaphores.clear();
+    ctx.inFlightFences.clear();
+    ctx.swapchainImageLayouts.clear();
+    ctx.swapchainImages.clear();
+    ctx.currentFrame = 0u;
+}
+
+bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx)
+{
+    if (!ctx.useRtPath)
+    {
+        return true;
+    }
+
+    std::string diagnostic;
+    if (!ctx.rtScene.Initialise(ctx.instance,
+                                ctx.physicalDevice,
+                                ctx.device,
+                                ctx.graphicsQueue,
+                                ctx.commandPool,
+                                ctx.swapchainExtent,
+                                diagnostic))
+    {
+        std::cerr << "Failed to initialise presentable RT scene: " << diagnostic << '\n';
+        return false;
+    }
+
+    return true;
+}
+
+bool RecreateSwapchain(VulkanSurfaceContext& ctx)
+{
+    ReleaseSwapchainResources(ctx);
+    if (ctx.windowHandle == nullptr)
+    {
+        return false;
+    }
+
+    return CreateSwapchain(ctx, ctx.windowHandle) && InitialiseRtSceneForSwapchain(ctx);
+}
+
 void DestroyRenderContext(VulkanSurfaceContext& ctx)
 {
     if (ctx.device == VK_NULL_HANDLE)
@@ -554,6 +750,7 @@ void DestroyRenderContext(VulkanSurfaceContext& ctx)
     }
 
     vkDeviceWaitIdle(ctx.device);
+    ctx.rtScene.Destroy();
 
     for (VkFence fence : ctx.inFlightFences)
     {
@@ -617,8 +814,9 @@ void DestroyRenderContext(VulkanSurfaceContext& ctx)
     ctx = {};
 }
 
-bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor)
+bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor, bool& rtFramePresented)
 {
+    rtFramePresented = false;
     if (ctx.commandBuffers.empty())
     {
         return false;
@@ -641,18 +839,12 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor)
 
     if (acquireResult == VK_ERROR_OUT_OF_DATE_KHR || acquireResult == VK_SUBOPTIMAL_KHR)
     {
-        return true;
+        return RecreateSwapchain(ctx);
     }
     if (acquireResult != VK_SUCCESS)
     {
         return false;
     }
-
-    VkClearValue clearValue{};
-    clearValue.color.float32[0] = clearColor.float32[0];
-    clearValue.color.float32[1] = clearColor.float32[1];
-    clearValue.color.float32[2] = clearColor.float32[2];
-    clearValue.color.float32[3] = clearColor.float32[3];
 
     VkCommandBufferBeginInfo beginInfo{
         VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
@@ -666,16 +858,48 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor)
         return false;
     }
 
-    const VkRenderPassBeginInfo renderPassBegin{
-        VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-        nullptr,
-        ctx.renderPass,
-        ctx.swapchainFramebuffers[imageIndex],
-        {{0, 0}, ctx.swapchainExtent},
-        1u,
-        &clearValue};
-    vkCmdBeginRenderPass(ctx.commandBuffers[imageIndex], &renderPassBegin, VK_SUBPASS_CONTENTS_INLINE);
-    vkCmdEndRenderPass(ctx.commandBuffers[imageIndex]);
+    const bool useRtFrame = ctx.useRtPath && ctx.rtScene.IsReady();
+    if (useRtFrame)
+    {
+        std::string diagnostic;
+        if (!ctx.rtScene.RecordTraceAndCopy(ctx.commandBuffers[imageIndex],
+                                            ctx.swapchainImages[imageIndex],
+                                            ctx.swapchainImageLayouts[imageIndex],
+                                            ctx.swapchainExtent,
+                                            0.0f,
+                                            0.0f,
+                                            1.8f,
+                                            0.0f,
+                                            0.0f,
+                                            4.7f,
+                                            0.0f,
+                                            diagnostic))
+        {
+            std::cerr << "Failed to record RT frame: " << diagnostic << '\n';
+            return false;
+        }
+    }
+    else
+    {
+        VkClearValue clearValue{};
+        clearValue.color.float32[0] = clearColor.float32[0];
+        clearValue.color.float32[1] = clearColor.float32[1];
+        clearValue.color.float32[2] = clearColor.float32[2];
+        clearValue.color.float32[3] = clearColor.float32[3];
+
+        const VkRenderPassBeginInfo renderPassBegin{
+            VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
+            nullptr,
+            ctx.renderPass,
+            ctx.swapchainFramebuffers[imageIndex],
+            {{0, 0}, ctx.swapchainExtent},
+            1u,
+            &clearValue};
+        vkCmdBeginRenderPass(ctx.commandBuffers[imageIndex], &renderPassBegin, VK_SUBPASS_CONTENTS_INLINE);
+        vkCmdEndRenderPass(ctx.commandBuffers[imageIndex]);
+        ctx.swapchainImageLayouts[imageIndex] = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    }
+
     if (vkEndCommandBuffer(ctx.commandBuffers[imageIndex]) != VK_SUCCESS)
     {
         return false;
@@ -686,7 +910,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor)
         return false;
     }
 
-    VkPipelineStageFlags waitStages = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    VkPipelineStageFlags waitStages = useRtFrame ? VK_PIPELINE_STAGE_TRANSFER_BIT : VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
     VkSubmitInfo submitInfo{
         VK_STRUCTURE_TYPE_SUBMIT_INFO,
         nullptr,
@@ -711,23 +935,26 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor)
         1u,
         &ctx.swapchain,
         &imageIndex,
-        nullptr,
         nullptr};
     const VkResult presentResult = vkQueuePresentKHR(ctx.graphicsQueue, &presentInfo);
     if (presentResult == VK_ERROR_OUT_OF_DATE_KHR || presentResult == VK_SUBOPTIMAL_KHR)
     {
-        return true;
+        return RecreateSwapchain(ctx);
     }
     if (presentResult != VK_SUCCESS)
     {
         return false;
     }
 
+    rtFramePresented = useRtFrame;
     ctx.currentFrame = (ctx.currentFrame + 1u) % kMaxFramesInFlight;
     return true;
 }
 
-int RunDiagnosticSwapchainWindow(HWND hWnd, const horde::vulkan::DeviceCapabilities& capabilities)
+int RunDiagnosticSwapchainWindow(HWND hWnd,
+                                 horde::vulkan::DeviceCapabilities& capabilities,
+                                 const std::filesystem::path& textReportPath,
+                                 const std::filesystem::path& jsonReportPath)
 {
     VulkanSurfaceContext context;
     context.currentFrame = 0u;
@@ -826,13 +1053,21 @@ int RunDiagnosticSwapchainWindow(HWND hWnd, const horde::vulkan::DeviceCapabilit
         return 1;
     }
 
-    if (!CreateLogicalDevice(context.physicalDevice, context.graphicsQueueFamilyIndex, context.device, context.graphicsQueue))
+    context.useRtPath = capabilities.rtMode == horde::vulkan::RtMode::RayTracingPipeline;
+    if (!CreateLogicalDevice(context.physicalDevice, context.graphicsQueueFamilyIndex, capabilities, context.device, context.graphicsQueue))
     {
         DestroyRenderContext(context);
         return 1;
     }
 
+    context.windowHandle = hWnd;
+
     if (!CreateSwapchain(context, hWnd))
+    {
+        DestroyRenderContext(context);
+        return 1;
+    }
+    if (!InitialiseRtSceneForSwapchain(context))
     {
         DestroyRenderContext(context);
         return 1;
@@ -859,9 +1094,22 @@ int RunDiagnosticSwapchainWindow(HWND hWnd, const horde::vulkan::DeviceCapabilit
             break;
         }
 
-        if (!RenderFrame(context, clearColor))
+        bool rtFramePresented = false;
+        if (!RenderFrame(context, clearColor, rtFramePresented))
         {
             break;
+        }
+        if (rtFramePresented && !capabilities.rtScene.presented)
+        {
+            capabilities.rtScene.presented = true;
+            capabilities.rtScene.status = "Presented via swapchain";
+            capabilities.rtScene.geometry = "Horde Lantern corridor demo scene";
+            capabilities.rtScene.dispatchWidth = context.rtScene.DispatchExtent().width;
+            capabilities.rtScene.dispatchHeight = context.rtScene.DispatchExtent().height;
+            capabilities.performance.internalRenderWidth = capabilities.rtScene.dispatchWidth;
+            capabilities.performance.internalRenderHeight = capabilities.rtScene.dispatchHeight;
+            WriteReportFile(textReportPath, horde::vulkan::BuildCapabilityTextReport(capabilities));
+            WriteReportFile(jsonReportPath, horde::vulkan::BuildCapabilityJsonReport(capabilities));
         }
     }
 
@@ -906,7 +1154,10 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
     return DefWindowProc(hWnd, message, wParam, lParam);
 }
 
-int CreateAndShowWindow(const std::string& diagnosticText, const horde::vulkan::DeviceCapabilities& capabilities)
+int CreateAndShowWindow(const std::string& diagnosticText,
+                        horde::vulkan::DeviceCapabilities& capabilities,
+                        const std::filesystem::path& textReportPath,
+                        const std::filesystem::path& jsonReportPath)
 {
     const HINSTANCE instance = GetModuleHandleA(nullptr);
     WNDCLASSA windowClass{};
@@ -958,7 +1209,7 @@ int CreateAndShowWindow(const std::string& diagnosticText, const horde::vulkan::
         "Consolas");
     if (!monoFont)
     {
-        monoFont = GetStockObject(ANSI_FIXED_FONT);
+    monoFont = static_cast<HFONT>(GetStockObject(ANSI_FIXED_FONT));
     }
 
     RECT clientRect{};
@@ -993,7 +1244,7 @@ int CreateAndShowWindow(const std::string& diagnosticText, const horde::vulkan::
     SetForegroundWindow(hWnd);
     SetFocus(edit);
 
-    return RunDiagnosticSwapchainWindow(hWnd, capabilities);
+    return RunDiagnosticSwapchainWindow(hWnd, capabilities, textReportPath, jsonReportPath);
 }
 
 } // namespace
@@ -1007,7 +1258,7 @@ int RunDiagnosticWindow(const int showCommand)
 
     horde::vulkan::VulkanContext context;
     const bool initialised = context.InitialiseForCapabilityProbe();
-    const horde::vulkan::DeviceCapabilities capabilities = context.QueryDeviceCapabilities();
+    horde::vulkan::DeviceCapabilities capabilities = context.QueryDeviceCapabilities();
 
     const std::string diagnosticText = BuildDisplayText(capabilities);
     const std::string textReport = horde::vulkan::BuildCapabilityTextReport(capabilities);
@@ -1044,7 +1295,7 @@ int RunDiagnosticWindow(const int showCommand)
     std::cout << "Stored report (text): " << textReportPath << '\n';
     std::cout << "Stored report (json): " << jsonReportPath << '\n';
 
-    return CreateAndShowWindow(diagnosticText, capabilities);
+    return CreateAndShowWindow(diagnosticText, capabilities, textReportPath, jsonReportPath);
 }
 
 } // namespace horde::platform::windows

@@ -109,6 +109,32 @@ The following are intentionally not part of the scaffold step:
 - BLAS/TLAS implementation.
 - Platform packaging.
 
-## Next smallest task
+## Tested Phase 1 status - 2026-07-09
 
-Implement the real Vulkan device capability probe that detects and reports Vulkan RT support on Windows and Android, writes a JSON/text capability report, and shows an unsupported diagnostic screen when hardware RT is unavailable.
+The project has moved beyond the original Phase 0 scaffold/probe.
+
+Current proven path:
+
+- Android app builds, installs, and launches on Samsung `SM-S948B`.
+- Native Vulkan swapchain path presents an RT-produced storage image to screen.
+- The scene uses BLAS/TLAS acceleration structures, an RT pipeline/SBT, `vkCmdTraceRaysKHR`, and a storage-image-to-swapchain copy.
+- Reports only set `rtScene.presented = true` after successful swapchain presentation.
+- The visible scene is now a first-person gothic corridor/ruin prototype with a handheld medieval torch, reflective objects, puddle/wet-stone response, horde silhouettes, fog, and second-room sunlight.
+- Controls are now left-drag movement/strafe and right-drag 360 look.
+
+Important technical finding:
+
+- A recursive path-tracing attempt using closest-hit secondary `traceRayEXT` calls and pipeline recursion depth 2 failed on the phone at RT pipeline creation.
+- The stable phone path uses `rayQueryEXT` from raygen to query the same TLAS for primary hits, shadow rays, and a first bounce sample while keeping pipeline recursion depth 1.
+- This keeps the project aligned with RT-or-nothing because ray queries use Vulkan hardware acceleration-structure traversal.
+
+## Next smallest task - Phase 1C
+
+Implement the gothic material and collision proof:
+
+1. Add simple collision bounds for the corridor/arch/second-room scene.
+2. Add obvious reflection showcases for puddles, wet stone, and metal.
+3. Introduce a material table for dry stone, wet stone, mossy stone, water/puddle, old metal, and flame.
+4. Import a small number of commercial-safe open-source PBR textures, preferably CC0 from Poly Haven or ambientCG.
+5. Record every imported asset in `ASSET_LICENSES.md`.
+6. Preserve the phone-safe ray-query path tracing route unless a stronger RT route is proven on device.

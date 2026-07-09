@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <cmath>
 #include <chrono>
 #include <cerrno>
 #include <cstring>
@@ -22,6 +23,7 @@
 #include "ui/DiagnosticOverlay.h"
 #include "vulkan/RtCapabilityReport.h"
 #include "vulkan/VulkanContext.h"
+#include "vulkan/raytracing/PresentableTinyRtScene.h"
 
 namespace
 {
@@ -31,6 +33,21 @@ constexpr const char* kReportDirectory = "reports";
 constexpr const char* kTextReportFilename = "vulkan_capability_report.txt";
 constexpr const char* kJsonReportFilename = "vulkan_capability_report.json";
 constexpr uint32_t kMaxFramesInFlight = 2u;
+constexpr float kPlayerCollisionRadius = 0.24f;
+
+struct CollisionRect
+{
+    float minX;
+    float maxX;
+    float minZ;
+    float maxZ;
+};
+
+// These volumes match the two low arch posts in PresentableTinyRtScene.
+constexpr CollisionRect kCorridorObstacles[] = {
+    {-1.20f, -0.78f, -3.48f, -3.32f},
+    {0.78f, 1.20f, -3.48f, -3.32f},
+};
 
 struct SwapchainContext
 {
@@ -47,6 +64,7 @@ struct SwapchainContext
     VkExtent2D swapchainExtent{};
     VkRenderPass renderPass = VK_NULL_HANDLE;
     std::vector<VkImage> swapchainImages;
+    std::vector<VkImageLayout> swapchainImageLayouts;
     std::vector<VkImageView> swapchainImageViews;
     std::vector<VkFramebuffer> swapchainFramebuffers;
     VkCommandPool commandPool = VK_NULL_HANDLE;
@@ -55,6 +73,18 @@ struct SwapchainContext
     VkSemaphore renderFinishedSemaphores[kMaxFramesInFlight] = {};
     VkFence inFlightFences[kMaxFramesInFlight] = {};
     VkClearColorValue clearColor = {{0.12f, 0.04f, 0.18f, 1.0f}};
+    horde::vulkan::DeviceCapabilities capabilities;
+    horde::vulkan::raytracing::PresentableTinyRtScene rtScene;
+    float cameraYaw = 0.0f;
+    float cameraPitch = 0.0f;
+    float lanternStrength = 1.8f;
+    float walkTime = 0.0f;
+    float cameraX = 0.0f;
+    float cameraZ = 4.7f;
+    float moveStrafe = 0.0f;
+    float moveForward = 0.0f;
+    std::string reportDirectory;
+    bool useRtPath = false;
     uint32_t currentFrame = 0u;
 };
 
@@ -189,7 +219,83 @@ bool FindGraphicsAndPresentQueueFamily(VkPhysicalDevice physicalDevice, VkSurfac
     return false;
 }
 
-bool CreateLogicalDevice(VkPhysicalDevice physicalDevice, uint32_t graphicsQueueFamilyIndex, VkDevice& device, VkQueue& graphicsQueue)
+bool HasDeviceExtension(VkPhysicalDevice physicalDevice, const char* extensionName)
+{
+    uint32_t extensionCount = 0u;
+    if (vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, nullptr) != VK_SUCCESS)
+    {
+        return false;
+    }
+
+    std::vector<VkExtensionProperties> extensions(extensionCount);
+    vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, extensions.data());
+    for (const VkExtensionProperties& extension : extensions)
+    {
+        if (std::string(extension.extensionName) == extensionName)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void PushPlayerOutOfRect(float& x, float& z, const CollisionRect& rect)
+{
+    const float minX = rect.minX - kPlayerCollisionRadius;
+    const float maxX = rect.maxX + kPlayerCollisionRadius;
+    const float minZ = rect.minZ - kPlayerCollisionRadius;
+    const float maxZ = rect.maxZ + kPlayerCollisionRadius;
+    if (x <= minX || x >= maxX || z <= minZ || z >= maxZ)
+    {
+        return;
+    }
+
+    const float pushLeft = x - minX;
+    const float pushRight = maxX - x;
+    const float pushBack = z - minZ;
+    const float pushForward = maxZ - z;
+    const float smallestPush = std::min({pushLeft, pushRight, pushBack, pushForward});
+    if (smallestPush == pushLeft)
+    {
+        x = minX;
+    }
+    else if (smallestPush == pushRight)
+    {
+        x = maxX;
+    }
+    else if (smallestPush == pushBack)
+    {
+        z = minZ;
+    }
+    else
+    {
+        z = maxZ;
+    }
+}
+
+void ResolvePlayerCollision(float& x, float& z)
+{
+    // The entrance remains open, but movement inside the corridor respects the stone walls.
+    z = std::clamp(z, -4.75f, 4.90f);
+    if (z <= 3.20f)
+    {
+        x = std::clamp(x, -1.58f, 1.58f);
+        for (const CollisionRect& obstacle : kCorridorObstacles)
+        {
+            PushPlayerOutOfRect(x, z, obstacle);
+        }
+    }
+    else
+    {
+        x = std::clamp(x, -2.40f, 2.40f);
+    }
+}
+
+bool CreateLogicalDevice(VkPhysicalDevice physicalDevice,
+                         uint32_t graphicsQueueFamilyIndex,
+                         const horde::vulkan::DeviceCapabilities& capabilities,
+                         VkDevice& device,
+                         VkQueue& graphicsQueue)
 {
     const float queuePriority = 1.0f;
     const VkDeviceQueueCreateInfo queueCreateInfo{
@@ -199,18 +305,57 @@ bool CreateLogicalDevice(VkPhysicalDevice physicalDevice, uint32_t graphicsQueue
         graphicsQueueFamilyIndex,
         1u,
         &queuePriority};
-    const char* extensions[] = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+    std::vector<const char*> extensions{VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+    const bool enableRayTracing = capabilities.rtMode == horde::vulkan::RtMode::RayTracingPipeline;
+    if (enableRayTracing)
+    {
+        const char* rtExtensions[] = {
+            VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME,
+            VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME,
+            VK_KHR_RAY_QUERY_EXTENSION_NAME,
+            VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME,
+            VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME,
+            VK_KHR_SPIRV_1_4_EXTENSION_NAME,
+            VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME};
+        for (const char* extension : rtExtensions)
+        {
+            if (!HasDeviceExtension(physicalDevice, extension))
+            {
+                __android_log_print(ANDROID_LOG_ERROR, kTag, "Selected RayTracingPipeline device is missing required extension: %s", extension);
+                return false;
+            }
+            extensions.push_back(extension);
+        }
+    }
+
+    VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures{
+        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR};
+    accelerationStructureFeatures.accelerationStructure = enableRayTracing ? VK_TRUE : VK_FALSE;
+    VkPhysicalDeviceRayTracingPipelineFeaturesKHR rayTracingPipelineFeatures{
+        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR};
+    rayTracingPipelineFeatures.rayTracingPipeline = enableRayTracing ? VK_TRUE : VK_FALSE;
+    VkPhysicalDeviceRayQueryFeaturesKHR rayQueryFeatures{
+        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR};
+    rayQueryFeatures.rayQuery = enableRayTracing ? VK_TRUE : VK_FALSE;
+    VkPhysicalDeviceBufferDeviceAddressFeaturesKHR bufferDeviceAddressFeatures{
+        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES_KHR};
+    bufferDeviceAddressFeatures.bufferDeviceAddress = enableRayTracing ? VK_TRUE : VK_FALSE;
+    VkPhysicalDeviceFeatures2 features2{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2};
+    features2.pNext = &accelerationStructureFeatures;
+    accelerationStructureFeatures.pNext = &rayTracingPipelineFeatures;
+    rayTracingPipelineFeatures.pNext = &rayQueryFeatures;
+    rayQueryFeatures.pNext = &bufferDeviceAddressFeatures;
 
     const VkDeviceCreateInfo createInfo{
         VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
-        nullptr,
+        enableRayTracing ? &features2 : nullptr,
         0,
         1u,
         &queueCreateInfo,
         0,
         nullptr,
-        static_cast<uint32_t>(std::size(extensions)),
-        extensions,
+        static_cast<uint32_t>(extensions.size()),
+        extensions.data(),
         nullptr};
 
     const VkResult createResult = vkCreateDevice(physicalDevice, &createInfo, nullptr, &device);
@@ -313,7 +458,7 @@ bool CreateSwapchain(SwapchainContext& context)
         context.swapchainColorSpace,
         context.swapchainExtent,
         1u,
-        VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+        VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT,
         VK_SHARING_MODE_EXCLUSIVE,
         0,
         nullptr,
@@ -340,6 +485,7 @@ bool CreateSwapchain(SwapchainContext& context)
     {
         return false;
     }
+    context.swapchainImageLayouts.assign(context.swapchainImages.size(), VK_IMAGE_LAYOUT_UNDEFINED);
 
     context.swapchainImageViews.resize(context.swapchainImages.size());
     for (size_t index = 0u; index < context.swapchainImages.size(); ++index)
@@ -515,7 +661,126 @@ VkPhysicalDevice FindMatchingPhysicalDevice(
         }
     }
 
-    return physicalDevices.front();
+    return VK_NULL_HANDLE;
+}
+
+void ReleaseSwapchainResources(SwapchainContext& context)
+{
+    if (context.device == VK_NULL_HANDLE)
+    {
+        return;
+    }
+
+    vkDeviceWaitIdle(context.device);
+    context.rtScene.Destroy();
+
+    if (context.commandPool != VK_NULL_HANDLE)
+    {
+        if (!context.commandBuffers.empty())
+        {
+            vkFreeCommandBuffers(context.device,
+                                 context.commandPool,
+                                 static_cast<uint32_t>(context.commandBuffers.size()),
+                                 context.commandBuffers.data());
+            context.commandBuffers.clear();
+        }
+        vkDestroyCommandPool(context.device, context.commandPool, nullptr);
+        context.commandPool = VK_NULL_HANDLE;
+    }
+
+    for (VkFramebuffer framebuffer : context.swapchainFramebuffers)
+    {
+        if (framebuffer != VK_NULL_HANDLE)
+        {
+            vkDestroyFramebuffer(context.device, framebuffer, nullptr);
+        }
+    }
+    context.swapchainFramebuffers.clear();
+
+    for (VkImageView imageView : context.swapchainImageViews)
+    {
+        if (imageView != VK_NULL_HANDLE)
+        {
+            vkDestroyImageView(context.device, imageView, nullptr);
+        }
+    }
+    context.swapchainImageViews.clear();
+
+    if (context.renderPass != VK_NULL_HANDLE)
+    {
+        vkDestroyRenderPass(context.device, context.renderPass, nullptr);
+        context.renderPass = VK_NULL_HANDLE;
+    }
+
+    if (context.swapchain != VK_NULL_HANDLE)
+    {
+        vkDestroySwapchainKHR(context.device, context.swapchain, nullptr);
+        context.swapchain = VK_NULL_HANDLE;
+    }
+
+    if (context.inFlightFences[0] != VK_NULL_HANDLE)
+    {
+        vkDestroyFence(context.device, context.inFlightFences[0], nullptr);
+        context.inFlightFences[0] = VK_NULL_HANDLE;
+    }
+    if (context.inFlightFences[1] != VK_NULL_HANDLE)
+    {
+        vkDestroyFence(context.device, context.inFlightFences[1], nullptr);
+        context.inFlightFences[1] = VK_NULL_HANDLE;
+    }
+    if (context.imageAvailableSemaphores[0] != VK_NULL_HANDLE)
+    {
+        vkDestroySemaphore(context.device, context.imageAvailableSemaphores[0], nullptr);
+        context.imageAvailableSemaphores[0] = VK_NULL_HANDLE;
+    }
+    if (context.imageAvailableSemaphores[1] != VK_NULL_HANDLE)
+    {
+        vkDestroySemaphore(context.device, context.imageAvailableSemaphores[1], nullptr);
+        context.imageAvailableSemaphores[1] = VK_NULL_HANDLE;
+    }
+    if (context.renderFinishedSemaphores[0] != VK_NULL_HANDLE)
+    {
+        vkDestroySemaphore(context.device, context.renderFinishedSemaphores[0], nullptr);
+        context.renderFinishedSemaphores[0] = VK_NULL_HANDLE;
+    }
+    if (context.renderFinishedSemaphores[1] != VK_NULL_HANDLE)
+    {
+        vkDestroySemaphore(context.device, context.renderFinishedSemaphores[1], nullptr);
+        context.renderFinishedSemaphores[1] = VK_NULL_HANDLE;
+    }
+
+    context.swapchainImageLayouts.clear();
+    context.swapchainImages.clear();
+    context.currentFrame = 0u;
+}
+
+bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
+{
+    if (!context.useRtPath)
+    {
+        return true;
+    }
+
+    std::string diagnostic;
+    if (!context.rtScene.Initialise(context.instance,
+                                    context.physicalDevice,
+                                    context.device,
+                                    context.graphicsQueue,
+                                    context.commandPool,
+                                    context.swapchainExtent,
+                                    diagnostic))
+    {
+        __android_log_print(ANDROID_LOG_ERROR, kTag, "Failed to initialise presentable RT scene: %s", diagnostic.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+bool RecreateSwapchain(SwapchainContext& context)
+{
+    ReleaseSwapchainResources(context);
+    return CreateSwapchain(context) && InitialiseRtSceneForSwapchain(context);
 }
 
 void DestroySwapchainContext(SwapchainContext& context)
@@ -540,6 +805,7 @@ void DestroySwapchainContext(SwapchainContext& context)
     }
 
     vkDeviceWaitIdle(context.device);
+    context.rtScene.Destroy();
     for (VkSemaphore semaphore : context.imageAvailableSemaphores)
     {
         if (semaphore != VK_NULL_HANDLE)
@@ -608,8 +874,9 @@ void DestroySwapchainContext(SwapchainContext& context)
     context = {};
 }
 
-bool RenderFrame(SwapchainContext& context)
+bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
 {
+    rtFramePresented = false;
     if (context.commandBuffers.empty())
     {
         return false;
@@ -632,14 +899,13 @@ bool RenderFrame(SwapchainContext& context)
 
     if (acquireResult == VK_ERROR_OUT_OF_DATE_KHR || acquireResult == VK_SUBOPTIMAL_KHR)
     {
-        return true;
+        return RecreateSwapchain(context);
     }
     if (acquireResult != VK_SUCCESS)
     {
         return false;
     }
 
-    const VkClearValue clearValue = {context.clearColor};
     VkCommandBufferResetFlags resetFlags = 0;
     if (vkResetCommandBuffer(context.commandBuffers[imageIndex], resetFlags) != VK_SUCCESS)
     {
@@ -657,16 +923,56 @@ bool RenderFrame(SwapchainContext& context)
         return false;
     }
 
-    const VkRenderPassBeginInfo renderPassBegin{
-        VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-        nullptr,
-        context.renderPass,
-        context.swapchainFramebuffers[imageIndex],
-        {{0, 0}, context.swapchainExtent},
-        1u,
-        &clearValue};
-    vkCmdBeginRenderPass(context.commandBuffers[imageIndex], &renderPassBegin, VK_SUBPASS_CONTENTS_INLINE);
-    vkCmdEndRenderPass(context.commandBuffers[imageIndex]);
+    const bool useRtFrame = context.useRtPath && context.rtScene.IsReady();
+    if (useRtFrame)
+    {
+        context.walkTime += 0.045f;
+        const float moveAmount = std::clamp(std::abs(context.moveForward) + std::abs(context.moveStrafe), 0.0f, 1.0f);
+        if (moveAmount > 0.02f)
+        {
+            const float forwardX = std::sin(context.cameraYaw);
+            const float forwardZ = -std::cos(context.cameraYaw);
+            const float rightX = std::cos(context.cameraYaw);
+            const float rightZ = std::sin(context.cameraYaw);
+            const float speed = 0.032f;
+            context.cameraX += (forwardX * context.moveForward + rightX * context.moveStrafe) * speed;
+            context.cameraZ += (forwardZ * context.moveForward + rightZ * context.moveStrafe) * speed;
+            ResolvePlayerCollision(context.cameraX, context.cameraZ);
+        }
+        std::string diagnostic;
+        if (!context.rtScene.RecordTraceAndCopy(context.commandBuffers[imageIndex],
+                                                context.swapchainImages[imageIndex],
+                                                context.swapchainImageLayouts[imageIndex],
+                                                context.swapchainExtent,
+                                                context.cameraYaw,
+                                                context.cameraPitch,
+                                                context.lanternStrength,
+                                                context.walkTime,
+                                                context.cameraX,
+                                                context.cameraZ,
+                                                moveAmount,
+                                                diagnostic))
+        {
+            __android_log_print(ANDROID_LOG_ERROR, kTag, "Failed to record RT frame: %s", diagnostic.c_str());
+            return false;
+        }
+    }
+    else
+    {
+        const VkClearValue clearValue = {context.clearColor};
+        const VkRenderPassBeginInfo renderPassBegin{
+            VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
+            nullptr,
+            context.renderPass,
+            context.swapchainFramebuffers[imageIndex],
+            {{0, 0}, context.swapchainExtent},
+            1u,
+            &clearValue};
+        vkCmdBeginRenderPass(context.commandBuffers[imageIndex], &renderPassBegin, VK_SUBPASS_CONTENTS_INLINE);
+        vkCmdEndRenderPass(context.commandBuffers[imageIndex]);
+        context.swapchainImageLayouts[imageIndex] = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    }
+
     if (vkEndCommandBuffer(context.commandBuffers[imageIndex]) != VK_SUCCESS)
     {
         return false;
@@ -677,7 +983,7 @@ bool RenderFrame(SwapchainContext& context)
         return false;
     }
 
-    VkPipelineStageFlags waitStages = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    VkPipelineStageFlags waitStages = useRtFrame ? VK_PIPELINE_STAGE_TRANSFER_BIT : VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
     const VkSubmitInfo submitInfo{
         VK_STRUCTURE_TYPE_SUBMIT_INFO,
         nullptr,
@@ -704,13 +1010,14 @@ bool RenderFrame(SwapchainContext& context)
     const VkResult presentResult = vkQueuePresentKHR(context.graphicsQueue, &presentInfo);
     if (presentResult == VK_ERROR_OUT_OF_DATE_KHR || presentResult == VK_SUBOPTIMAL_KHR)
     {
-        return true;
+        return RecreateSwapchain(context);
     }
     if (presentResult != VK_SUCCESS)
     {
         return false;
     }
 
+    rtFramePresented = useRtFrame;
     context.currentFrame = (context.currentFrame + 1u) % kMaxFramesInFlight;
     return true;
 }
@@ -719,20 +1026,39 @@ void SwapchainRenderLoop()
 {
     while (gSwapchainRunning.load(std::memory_order_acquire))
     {
-        if (!RenderFrame(gSwapchainContext))
+        bool rtFramePresented = false;
+        if (!RenderFrame(gSwapchainContext, rtFramePresented))
         {
             __android_log_print(ANDROID_LOG_ERROR, kTag, "Diagnostic surface render loop ended unexpectedly.");
             break;
         }
+        if (rtFramePresented && !gSwapchainContext.capabilities.rtScene.presented)
+        {
+            gSwapchainContext.capabilities.rtScene.presented = true;
+            gSwapchainContext.capabilities.rtScene.status = "Presented via swapchain";
+            gSwapchainContext.capabilities.rtScene.geometry = "Horde Lantern corridor demo scene";
+            gSwapchainContext.capabilities.rtScene.dispatchWidth = gSwapchainContext.rtScene.DispatchExtent().width;
+            gSwapchainContext.capabilities.rtScene.dispatchHeight = gSwapchainContext.rtScene.DispatchExtent().height;
+            gSwapchainContext.capabilities.performance.internalRenderWidth = gSwapchainContext.capabilities.rtScene.dispatchWidth;
+            gSwapchainContext.capabilities.performance.internalRenderHeight = gSwapchainContext.capabilities.rtScene.dispatchHeight;
+
+            WriteTextFile(gSwapchainContext.reportDirectory + '/' + kTextReportFilename, BuildDisplayText(gSwapchainContext.capabilities));
+            WriteTextFile(gSwapchainContext.reportDirectory + '/' + kJsonReportFilename, horde::vulkan::BuildCapabilityJsonReport(gSwapchainContext.capabilities));
+            __android_log_print(ANDROID_LOG_INFO, kTag, "RT frame reached Android swapchain presentation.");
+        }
         std::this_thread::sleep_for(std::chrono::milliseconds(16));
     }
+
+    gSwapchainRunning.store(false, std::memory_order_release);
 
     SwapchainContext cleanup = std::move(gSwapchainContext);
     gSwapchainContext = {};
     DestroySwapchainContext(cleanup);
 }
 
-bool StartSurfaceInternal(ANativeWindow* window)
+bool StartSurfaceInternal(ANativeWindow* window,
+                          horde::vulkan::DeviceCapabilities capabilities,
+                          const std::string& reportDirectory)
 {
     if (window == nullptr)
     {
@@ -743,12 +1069,15 @@ bool StartSurfaceInternal(ANativeWindow* window)
     if (gSwapchainRunning.load(std::memory_order_acquire))
     {
         __android_log_print(ANDROID_LOG_WARN, kTag, "Diagnostic surface already running.");
+        ANativeWindow_release(window);
         return false;
     }
 
-    horde::vulkan::DeviceCapabilities capabilities = RunProbe();
     SwapchainContext context;
     context.window = window;
+    context.capabilities = capabilities;
+    context.reportDirectory = reportDirectory;
+    context.useRtPath = capabilities.rtMode == horde::vulkan::RtMode::RayTracingPipeline;
     context.clearColor = ClearColorForMode(capabilities.rtMode);
 
     if (!CreateInstance(context.instance))
@@ -778,13 +1107,18 @@ bool StartSurfaceInternal(ANativeWindow* window)
         return false;
     }
 
-    if (!CreateLogicalDevice(context.physicalDevice, context.graphicsQueueFamilyIndex, context.device, context.graphicsQueue))
+    if (!CreateLogicalDevice(context.physicalDevice, context.graphicsQueueFamilyIndex, capabilities, context.device, context.graphicsQueue))
     {
         DestroySwapchainContext(context);
         return false;
     }
 
     if (!CreateSwapchain(context))
+    {
+        DestroySwapchainContext(context);
+        return false;
+    }
+    if (!InitialiseRtSceneForSwapchain(context))
     {
         DestroySwapchainContext(context);
         return false;
@@ -802,6 +1136,10 @@ void StopSurfaceInternal()
     const bool wasRunning = gSwapchainRunning.exchange(false, std::memory_order_acq_rel);
     if (!wasRunning)
     {
+        if (gSwapchainThread.joinable())
+        {
+            gSwapchainThread.join();
+        }
         return;
     }
 
@@ -918,9 +1256,8 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_startDiagnosticSurface(JNIEnv* env, 
         return JNI_FALSE;
     }
 
-    if (!StartSurfaceInternal(window))
+    if (!StartSurfaceInternal(window, capabilities, reportDirectory))
     {
-        ANativeWindow_release(window);
         return JNI_FALSE;
     }
 
@@ -933,4 +1270,15 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_stopDiagnosticSurface(JNIEnv*, jclas
 {
     std::lock_guard<std::mutex> lock(gSwapchainMutex);
     StopSurfaceInternal();
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_setViewControls(JNIEnv*, jclass, jfloat yaw, jfloat pitch, jfloat lanternStrength, jfloat moveStrafe, jfloat moveForward)
+{
+    std::lock_guard<std::mutex> lock(gSwapchainMutex);
+    gSwapchainContext.cameraYaw = static_cast<float>(yaw);
+    gSwapchainContext.cameraPitch = std::clamp(static_cast<float>(pitch), -0.32f, 0.28f);
+    gSwapchainContext.lanternStrength = std::clamp(static_cast<float>(lanternStrength), 0.65f, 2.4f);
+    gSwapchainContext.moveStrafe = std::clamp(static_cast<float>(moveStrafe), -1.0f, 1.0f);
+    gSwapchainContext.moveForward = std::clamp(static_cast<float>(moveForward), -1.0f, 1.0f);
 }

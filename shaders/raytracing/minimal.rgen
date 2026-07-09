@@ -1,10 +1,299 @@
 #version 460
 #extension GL_EXT_ray_tracing : require
-#extension GL_EXT_buffer_reference : require
+#extension GL_EXT_ray_query : require
 
-layout(location = 0) rayPayloadEXT vec4 payload;
+layout(set = 0, binding = 0) uniform accelerationStructureEXT topLevelAS;
+layout(set = 0, binding = 1, rgba8) uniform writeonly image2D outputImage;
+
+layout(push_constant) uniform SceneControls
+{
+    float yaw;
+    float pitch;
+    float lantern;
+    float time;
+    float cameraX;
+    float cameraZ;
+    float walkAmount;
+    float unused;
+} controls;
+
+struct HitInfo
+{
+    bool hit;
+    float t;
+    int primitive;
+    vec3 position;
+    vec3 normal;
+    vec3 base;
+    float metallic;
+    float reflectivity;
+    float emissive;
+};
+
+float hash12(vec2 p)
+{
+    vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+    p3 += dot(p3, p3.yzx + 33.33);
+    return fract((p3.x + p3.y) * p3.z);
+}
+
+float hash13(vec3 p)
+{
+    p = fract(p * 0.1031);
+    p += dot(p, p.zyx + 31.32);
+    return fract((p.x + p.y) * p.z);
+}
+
+vec3 skyColor(vec3 d)
+{
+    float moon = pow(max(dot(d, normalize(vec3(-0.28, 0.5, -0.82))), 0.0), 64.0);
+    float horizon = smoothstep(-0.22, 0.45, d.y);
+    vec3 sky = mix(vec3(0.015, 0.018, 0.024), vec3(0.04, 0.065, 0.105), horizon);
+    sky += vec3(0.25, 0.33, 0.48) * moon;
+    sky += vec3(0.09, 0.035, 0.012) * smoothstep(-0.35, 0.15, -d.y);
+    return sky;
+}
+
+float stonePattern(vec3 p)
+{
+    vec2 tile = abs(fract(vec2(p.x * 2.2, p.z * 1.35)) - 0.5);
+    float mortar = smoothstep(0.445, 0.5, max(tile.x, tile.y));
+    float chip = fract(sin(dot(floor(p.xz * 5.0), vec2(12.9898, 78.233))) * 43758.5453);
+    return mix(0.72 + chip * 0.16, 0.34, mortar);
+}
+
+float mossPattern(vec3 p)
+{
+    float blotch = hash13(floor(vec3(p.x * 3.0, p.y * 4.0, p.z * 2.2)));
+    float lowerWallDamp = smoothstep(0.82, -0.68, p.y);
+    return lowerWallDamp * smoothstep(0.52, 0.81, blotch);
+}
+
+float puddleMask(vec3 p)
+{
+    return smoothstep(0.20, 0.0, abs(p.x + 0.28)) * smoothstep(2.1, -0.2, abs(p.z - 0.4));
+}
+
+vec3 randomHemisphere(vec3 normal, vec3 seed)
+{
+    float a = hash13(seed) * 6.2831853;
+    float z = hash13(seed + 19.17) * 0.72 + 0.22;
+    float r = sqrt(max(1.0 - z * z, 0.0));
+    vec3 tangent = normalize(abs(normal.y) < 0.9 ? cross(normal, vec3(0.0, 1.0, 0.0)) : cross(normal, vec3(1.0, 0.0, 0.0)));
+    vec3 bitangent = cross(normal, tangent);
+    return normalize(tangent * cos(a) * r + bitangent * sin(a) * r + normal * z);
+}
+
+void materialForPrimitive(int primitive, vec3 p, out vec3 normal, out vec3 base, out float metallic, out float reflectivity, out float emissive)
+{
+    float roughStone = stonePattern(p);
+    float moss = mossPattern(p);
+    metallic = 0.0;
+    reflectivity = 0.07;
+    emissive = 0.0;
+    normal = vec3(0.0, 0.0, 1.0);
+    base = vec3(0.19, 0.18, 0.16) * roughStone;
+
+    if (primitive < 2)
+    {
+        normal = vec3(0.0, 1.0, 0.0);
+        float puddle = puddleMask(p);
+        base = mix(vec3(0.125, 0.12, 0.112), vec3(0.035, 0.052, 0.058), 0.36 + puddle * 0.64) * roughStone;
+        reflectivity = 0.18 + puddle * 0.74;
+    }
+    else if (primitive < 4)
+    {
+        normal = vec3(0.0, -1.0, 0.0);
+        base = vec3(0.105, 0.098, 0.09) * roughStone;
+    }
+    else if (primitive < 6)
+    {
+        normal = vec3(1.0, 0.0, 0.0);
+        base = mix(vec3(0.18, 0.165, 0.145), vec3(0.055, 0.11, 0.06), moss) * roughStone;
+        reflectivity = mix(0.08, 0.18, moss);
+    }
+    else if (primitive < 8)
+    {
+        normal = vec3(-1.0, 0.0, 0.0);
+        base = mix(vec3(0.19, 0.172, 0.15), vec3(0.06, 0.12, 0.065), moss) * roughStone;
+        reflectivity = mix(0.08, 0.18, moss);
+    }
+    else if (primitive < 16)
+    {
+        normal = vec3(0.0, 0.0, 1.0);
+        base = mix(vec3(0.21, 0.193, 0.17), vec3(0.065, 0.12, 0.07), moss) * roughStone;
+        reflectivity = mix(0.08, 0.15, moss);
+    }
+    else if (primitive < 20)
+    {
+        normal = vec3(0.0, 0.0, 1.0);
+        base = vec3(1.0, 0.35, 0.06);
+        emissive = 2.2 + 0.45 * sin((p.y + p.x) * 35.0 + controls.time * 18.0);
+    }
+    else if (primitive < 26)
+    {
+        normal = primitive < 22 ? vec3(1.0, 0.0, 0.0) : (primitive < 24 ? vec3(-1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0));
+        base = primitive < 24 ? vec3(0.55, 0.39, 0.19) : vec3(0.052, 0.075, 0.085);
+        metallic = primitive < 24 ? 0.82 : 0.52;
+        reflectivity = primitive < 24 ? 0.78 : 0.42;
+    }
+    else
+    {
+        normal = vec3(0.0, 0.0, 1.0);
+        base = vec3(0.012, 0.016, 0.014);
+        reflectivity = 0.12;
+        float eyeBand = smoothstep(0.055, 0.0, abs(p.y + 0.13));
+        float eyePair = smoothstep(0.11, 0.0, abs(abs(fract(p.x * 3.7) - 0.5) - 0.19));
+        base += vec3(0.08, 0.82, 0.21) * eyeBand * eyePair;
+    }
+}
+
+HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance)
+{
+    HitInfo h;
+    h.hit = false;
+    h.t = maxDistance;
+    h.primitive = -1;
+    h.position = origin + direction * maxDistance;
+    h.normal = vec3(0.0, 1.0, 0.0);
+    h.base = vec3(0.0);
+    h.metallic = 0.0;
+    h.reflectivity = 0.0;
+    h.emissive = 0.0;
+
+    rayQueryEXT query;
+    rayQueryInitializeEXT(query, topLevelAS, gl_RayFlagsOpaqueEXT, 0xFF, origin, 0.025, direction, maxDistance);
+    while (rayQueryProceedEXT(query)) {}
+
+    if (rayQueryGetIntersectionTypeEXT(query, true) != gl_RayQueryCommittedIntersectionNoneEXT)
+    {
+        h.hit = true;
+        h.t = rayQueryGetIntersectionTEXT(query, true);
+        h.primitive = rayQueryGetIntersectionPrimitiveIndexEXT(query, true);
+        h.position = origin + direction * h.t;
+        materialForPrimitive(h.primitive, h.position, h.normal, h.base, h.metallic, h.reflectivity, h.emissive);
+    }
+    return h;
+}
+
+float visibility(vec3 origin, vec3 direction, float maxDistance)
+{
+    return traceScene(origin, direction, max(maxDistance, 0.04)).hit ? 0.0 : 1.0;
+}
+
+vec3 bounceSample(HitInfo h, vec3 incoming)
+{
+    if (!h.hit)
+    {
+        return skyColor(incoming);
+    }
+    if (h.emissive > 0.0)
+    {
+        return h.base * h.emissive;
+    }
+    vec3 sunDirection = normalize(vec3(-0.45, 0.55, -0.72));
+    return h.base * (0.11 + 0.16 * max(dot(h.normal, sunDirection), 0.0));
+}
+
+vec3 shadePrimary(HitInfo h, vec3 rayDirection)
+{
+    if (!h.hit)
+    {
+        return skyColor(rayDirection);
+    }
+    if (h.emissive > 0.0)
+    {
+        return h.base * h.emissive;
+    }
+
+    vec3 warm = vec3(1.0, 0.47, 0.14);
+    vec3 cold = vec3(0.32, 0.42, 0.63);
+    float flamePulse = 0.84 + 0.16 * sin(controls.time * 15.0);
+    vec3 torchPosition = vec3(controls.cameraX - 0.32 - sin(controls.time * 6.2) * 0.08 * max(controls.walkAmount, 0.2),
+                              -0.36 + abs(sin(controls.time * 6.2)) * 0.04 * max(controls.walkAmount, 0.2),
+                              controls.cameraZ - 0.88);
+    vec3 toTorch = torchPosition - h.position;
+    float torchDistance = length(toTorch);
+    vec3 torchDirection = toTorch / max(torchDistance, 0.001);
+    float torchVisibility = visibility(h.position + h.normal * 0.035, torchDirection, torchDistance - 0.14);
+    float torchDiffuse = max(dot(h.normal, torchDirection), 0.0);
+    float reflective = max(h.metallic, h.reflectivity);
+    float torchSpec = pow(max(dot(reflect(-torchDirection, h.normal), -rayDirection), 0.0), mix(34.0, 5.0, reflective));
+    float torchAttenuation = 1.0 / (1.0 + torchDistance * torchDistance * 0.58);
+
+    vec3 sunDirection = normalize(vec3(-0.45, 0.55, -0.72));
+    float sunVisibility = visibility(h.position + h.normal * 0.04, sunDirection, 18.0);
+    float sunDiffuse = max(dot(h.normal, sunDirection), 0.0);
+    float secondRoom = smoothstep(-2.9, -4.9, h.position.z);
+    float sunBand = smoothstep(0.18, 0.62, h.position.y) * smoothstep(1.28, -0.35, abs(h.position.x + 0.28));
+
+    vec3 bounceDirection = reflective > 0.38
+        ? normalize(reflect(rayDirection, h.normal) + randomHemisphere(h.normal, h.position + controls.time) * 0.08)
+        : randomHemisphere(h.normal, h.position + controls.time);
+    HitInfo bounceHit = traceScene(h.position + h.normal * 0.045, bounceDirection, 12.0);
+    vec3 bounce = bounceSample(bounceHit, bounceDirection);
+
+    vec3 color = h.base * vec3(0.025, 0.028, 0.032);
+    color += h.base * warm * torchDiffuse * torchAttenuation * torchVisibility * controls.lantern * flamePulse * 2.65;
+    color += warm * torchSpec * torchAttenuation * torchVisibility * (0.12 + reflective * 1.04);
+    color += h.base * cold * sunDiffuse * sunVisibility * 0.18;
+    color += vec3(0.9, 0.72, 0.42) * secondRoom * sunBand * sunVisibility * (0.18 + sunDiffuse * 0.9);
+    color += h.base * bounce * (0.22 + reflective * 0.30);
+    color += bounce * reflective * 0.74;
+
+    if (h.primitive < 2)
+    {
+        float puddle = puddleMask(h.position);
+        color += vec3(0.95, 0.42, 0.12) * puddle * torchVisibility * 0.28;
+        color += bounce * puddle * 0.78;
+    }
+
+    float fog = 1.0 - exp(-h.t * h.t * 0.022);
+    color = mix(color, vec3(0.035, 0.043, 0.055), fog);
+    color += vec3(0.18, 0.07, 0.025) * exp(-h.t * 0.24);
+    return color;
+}
 
 void main()
 {
-    payload = vec4(0.06, 0.08, 0.12, 1.0);
+    vec2 uv = (vec2(gl_LaunchIDEXT.xy) + vec2(0.5)) / vec2(gl_LaunchSizeEXT.xy);
+    float aspect = float(gl_LaunchSizeEXT.x) / max(float(gl_LaunchSizeEXT.y), 1.0);
+    float step = controls.time * 6.2;
+    vec3 origin = vec3(controls.cameraX + sin(step * 0.5) * 0.035 * controls.walkAmount,
+                       -0.08 + abs(sin(step)) * 0.035 * controls.walkAmount,
+                       controls.cameraZ);
+    float pitch = clamp(controls.pitch + sin(step) * 0.012 * controls.walkAmount, -0.32, 0.28);
+    vec3 forward = normalize(vec3(sin(controls.yaw), -0.05 + pitch, -cos(controls.yaw)));
+    vec3 right = normalize(cross(forward, vec3(0.0, 1.0, 0.0)));
+    vec3 up = normalize(cross(right, forward));
+    vec2 screen = uv * 2.0 - 1.0;
+    screen.x *= aspect;
+    screen.y *= -0.74;
+    vec3 rayDirection = normalize(forward * 1.22 + right * screen.x + up * screen.y);
+
+    HitInfo primary = traceScene(origin, rayDirection, 10000.0);
+    vec3 color = shadePrimary(primary, rayDirection);
+
+    vec2 centered = uv * 2.0 - 1.0;
+    float vignette = smoothstep(1.22, 0.28, length(centered * vec2(0.82, 1.08)));
+    float grain = (hash12(vec2(gl_LaunchIDEXT.xy) + controls.time) - 0.5) * 0.018;
+    float flame = 0.72 + 0.28 * sin(controls.time * 17.0 + hash12(vec2(gl_LaunchIDEXT.xy)) * 5.0);
+    float lanternBloom = smoothstep(0.92, 0.0, length(centered - vec2(-0.25 + sin(step) * 0.035 * controls.walkAmount, 0.36 + cos(step * 0.7) * 0.025 * controls.walkAmount)));
+    color += vec3(1.0, 0.39, 0.095) * lanternBloom * flame * (0.11 + controls.lantern * 0.06);
+
+    vec2 torchSpace = centered - vec2(-0.52 - sin(step) * 0.018 * controls.walkAmount, 0.48 + cos(step * 0.7) * 0.015 * controls.walkAmount);
+    float handle = smoothstep(0.055, 0.015, abs(torchSpace.x + torchSpace.y * 0.17)) * smoothstep(0.78, 0.18, torchSpace.y) * smoothstep(-0.24, -0.04, torchSpace.y);
+    float wrap = smoothstep(0.12, 0.015, abs(torchSpace.x + 0.012)) * smoothstep(0.18, -0.02, abs(torchSpace.y + 0.06));
+    vec2 flameSpace = torchSpace - vec2(-0.025, -0.30);
+    flameSpace.x *= 1.35;
+    float outerFlame = smoothstep(0.34, 0.05, length(flameSpace * vec2(0.92, 1.32))) * smoothstep(0.28, -0.12, flameSpace.y + abs(flameSpace.x) * 0.52);
+    float innerFlame = smoothstep(0.17, 0.02, length((flameSpace + vec2(0.02 * sin(controls.time * 14.0), 0.03)) * vec2(1.2, 1.7)));
+    color = mix(color, vec3(0.22, 0.11, 0.045), handle * 0.88);
+    color = mix(color, vec3(0.42, 0.31, 0.18), wrap * 0.85);
+    color += vec3(1.0, 0.28, 0.035) * outerFlame * (0.72 + flame * 0.35);
+    color += vec3(1.0, 0.78, 0.22) * innerFlame * (0.9 + flame * 0.35);
+
+    color = color * (0.62 + 0.38 * vignette) + grain;
+    color = pow(max(color, vec3(0.0)), vec3(0.92));
+    imageStore(outputImage, ivec2(gl_LaunchIDEXT.xy), vec4(clamp(color, 0.0, 1.0), 1.0));
 }

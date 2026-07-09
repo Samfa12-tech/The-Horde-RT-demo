@@ -15,7 +15,7 @@ namespace horde::vulkan::raytracing
 namespace
 {
 
-const char* const kSceneStatusDispatchImplemented = "Dispatch implemented (RT device/function skeleton)";
+const char* const kSceneStatusDispatchImplemented = "Dispatch command path validated (offscreen-only)";
 const char* const kSceneStatusNotAttempted = "Not attempted";
 const char* const kSceneStatusUnsupported = "Unsupported";
 constexpr std::uint32_t kTinySceneWidth = 256;
@@ -270,7 +270,7 @@ bool CreateAndDestroyMinimalRayTracingDevice(const VkPhysicalDevice physicalDevi
 TinyRtSceneSnapshot ExecuteTinyRtScene(const VkPhysicalDevice physicalDevice, const DeviceCapabilities& capabilities)
 {
     TinyRtSceneSnapshot result{};
-    result.geometry = "triangle";
+    result.geometry = "Horde Lantern corridor demo scene";
     result.dispatchWidth = 0;
     result.dispatchHeight = 0;
     result.presented = false;
@@ -308,9 +308,10 @@ TinyRtSceneSnapshot ExecuteTinyRtScene(const VkPhysicalDevice physicalDevice, co
     }
 
     result.status = kSceneStatusDispatchImplemented;
-    result.geometry = "triangle";
+    result.geometry = "Horde Lantern corridor demo scene";
     result.dispatchWidth = kTinySceneWidth;
     result.dispatchHeight = kTinySceneHeight;
+    result.presented = false;
 
     return result;
 }

@@ -13,4 +13,5 @@ public final class ProbeBridge {
 
     public static native boolean startDiagnosticSurface(android.view.Surface surface, String baseDirectory);
     public static native void stopDiagnosticSurface();
+    public static native void setViewControls(float yaw, float pitch, float lanternStrength, float moveStrafe, float moveForward);
 }

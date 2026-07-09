@@ -24,6 +24,7 @@ set(HORDE_RT_SOURCE_FILES
     src/vulkan/raytracing/RayTracingPipeline.cpp
     src/vulkan/raytracing/ShaderBindingTable.cpp
     src/vulkan/raytracing/TinyRtScene.cpp
+    src/vulkan/raytracing/PresentableTinyRtScene.cpp
 )
 find_package(Vulkan REQUIRED)
 
@@ -82,6 +83,7 @@ if(HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AND WIN32)
     add_executable(horde_rt_diagnostic_window
         src/platform/windows/DiagnosticWindowMain.cpp
         src/platform/windows/DiagnosticWindow.cpp
+        src/ui/DiagnosticOverlay.cpp
     )
 
     target_include_directories(horde_rt_diagnostic_window PRIVATE

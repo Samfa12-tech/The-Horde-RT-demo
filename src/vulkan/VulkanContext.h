@@ -20,6 +20,7 @@ public:
     bool InitialiseForCapabilityProbe();
 
     DeviceCapabilities QueryDeviceCapabilities() const;
+    void SetRtScenePresented(const bool presented);
     VkPhysicalDevice GetSelectedPhysicalDevice() const;
     const std::vector<std::string>& GetDiagnosticLog() const { return startupDiagnostics_; }
 
