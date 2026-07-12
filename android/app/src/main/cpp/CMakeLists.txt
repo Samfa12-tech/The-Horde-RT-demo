@@ -15,6 +15,7 @@ add_library(horde_rt_probe_android
     ../../../../../src/vulkan/raytracing/ShaderBindingTable.cpp
     ../../../../../src/vulkan/raytracing/TinyRtScene.cpp
     ../../../../../src/vulkan/raytracing/PresentableTinyRtScene.cpp
+    ../../../../../src/scene/SkeletonBipedModel.cpp
 )
 
 target_include_directories(horde_rt_probe_android PRIVATE
@@ -22,6 +23,9 @@ target_include_directories(horde_rt_probe_android PRIVATE
 )
 
 target_compile_features(horde_rt_probe_android PRIVATE cxx_std_20)
+# Keep the locally installable debug APK inspectable while avoiding an -O0
+# CPU skinning path that is not representative of a shipped phone build.
+target_compile_options(horde_rt_probe_android PRIVATE $<$<CONFIG:Debug>:-O2>)
 
 find_library(VULKAN_LIBRARY vulkan)
 find_library(ANDROID_LOG_LIBRARY log)

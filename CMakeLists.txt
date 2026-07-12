@@ -25,6 +25,7 @@ set(HORDE_RT_SOURCE_FILES
     src/vulkan/raytracing/ShaderBindingTable.cpp
     src/vulkan/raytracing/TinyRtScene.cpp
     src/vulkan/raytracing/PresentableTinyRtScene.cpp
+    src/scene/SkeletonBipedModel.cpp
 )
 find_package(Vulkan REQUIRED)
 
@@ -92,6 +93,9 @@ if(HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AND WIN32)
 
     target_link_libraries(horde_rt_diagnostic_window PRIVATE
         horde_rt_probe_core
+    )
+    target_compile_definitions(horde_rt_diagnostic_window PRIVATE
+        HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
     )
 
     set_target_properties(horde_rt_diagnostic_window PROPERTIES

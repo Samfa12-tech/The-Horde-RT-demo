@@ -51,7 +51,7 @@ struct PerformanceSnapshot
 struct TinyRtSceneSnapshot
 {
     std::string status = "Not attempted";
-    std::string geometry = "Horde Lantern corridor demo scene";
+    std::string geometry = "Horde Lantern corridor with animated skeleton";
     std::uint32_t dispatchWidth = 0;
     std::uint32_t dispatchHeight = 0;
     bool presented = false;

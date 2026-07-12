@@ -12,7 +12,7 @@
 - The stable phone path retains ray-pipeline recursion depth 1 and performs primary/shadow/first-bounce work through `rayQueryEXT` in raygen.
 - The playable visual proof is a first-person gothic corridor with torch light, wet floor response, fog, silhouettes, and a second-room sun shaft.
 
-## Current slice - Phase 1C: collision and gothic material proof
+## Phase 1C - collision and gothic material proof: complete
 
 ### Implemented in source
 
@@ -24,17 +24,67 @@
 - The first RT cleanup removes deliberate grain and time-varying hemisphere jitter and uses a deterministic single ray-query bounce.
 - A Meshy-6 PBR right-hand sword is staged as source art with embedded and 2K sidecar maps. It is intentionally not in the runtime because the delivered 49,439 triangles are not phone-safe for the RT acceleration structure.
 - The Windows RT scene is an interactive laptop build: `WASD` movement, left mouse/trackpad click-drag look, and `Esc` exit. On 2026-07-10, the RTX 5050 laptop reported `RayTracingPipeline` and a successful RT swapchain presentation at 984 x 661.
-- The 9,402-triangle merged-animation skeleton is staged as source art with 11 correctly named clips. It is not loaded by the renderer, and the sword is intentionally separate.
+- The 9,402-triangle merged-animation skeleton is loaded, CPU-skinned from `Idle_5`, and refit into a dynamic RT BLAS. It is intentionally unarmed; the sword belongs to the player view.
 
-### Still required to close Phase 1C
+### Phone closeout - verified 2026-07-11
 
-1. Build, install, and test this source slice on the target phone; confirm collision is comfortable and `RT frame reached Android swapchain presentation.` still appears.
-2. Visually validate and tune the real torch mesh and its reflected flame proof on the phone; the RTX laptop proof is complete. Do not reintroduce a detached fake torch light or fullscreen overlay.
-3. Add a narrow GLB animation/PBR loader for the staged skeleton and measure one animated enemy on laptop and phone; keep the sword separate.
-4. Remesh/LOD the staged sword to a roughly 10–15k-triangle held-prop budget before adding it to the Android RT BLAS/TLAS. This needs a new credit approval.
-5. Add a right-hand attachment only after that remesh is accepted; measure the mobile RT cost first.
-6. Import a deliberately small set of commercial-safe environment PBR texture sets and record each one in `ASSET_LICENSES.md` before it ships.
-7. Add one idle or moving horde proxy after the corridor feels bounded and materially convincing.
+1. Commit `93e8818` rebuilt, installed, and cold-launched on `SM-S948B`; the fresh run logged `RT frame reached Android swapchain presentation.`
+2. Phone captures verify the real warm-orange torch mesh, reflected flame silhouette, wet-floor response, fog, silhouettes, and deeper corridor lighting without a fake overlay.
+3. Full-turn yaw, pitch limits, corridor boundaries, and repeated arch-area movement were exercised with Android touch events without a crash, trap, or observed tunnelling.
+4. A 126-interval SurfaceFlinger sample measured 17.284 ms median and 17.908 ms p95 at the `1440x2812` RT surface. See `docs/PHASE_1C_PHONE_VALIDATION_2026-07-11.md`.
+
+## Current slice - first animated skeleton proof
+
+1. Keep the narrow skeleton GLB animation loader bounded to exactly one unarmed animated enemy on laptop and phone.
+2. Measure the 9,402-triangle skeleton's mobile RT cost before adding another enemy or gameplay behavior.
+3. Preserve the Phase 1C phone baseline and keep imported environment textures, weapon remeshing, attachment, and combat out of this slice.
+
+### Presentation cleanup and player weapon proof - verified 2026-07-12
+
+1. Corrected player/skeleton scale: approximately 1.53 m eye height and 1.0x skeleton scale.
+2. Removed the coarse world-space bone hash that appeared as checkerboard lighting.
+3. Kept the skeleton unarmed and added a lightweight procedural player sword to the right side of the first-person view; it shares the camera-held prop BLAS with the left-hand torch.
+4. Produced and audited `gothic_arming_sword_rh_lod1.glb` at 12,358 triangles; keep it staged until static GLB/PBR upload is ready.
+5. Rebuilt, installed, cold-launched, captured, and confirmed `RT frame reached Android swapchain presentation.` on the target Galaxy.
+6. The corrected player-sword build sampled 25.000 ms median and 37.500 ms p95 over 45 SurfaceFlinger intervals (approximately 40 FPS). This is a short sanity sample; treat animated skinning/BLAS refit performance as the immediate technical constraint until a longer profile confirms it.
+7. Phone composition evidence: `docs/validation/player_sword_phone_2026-07-12.png`.
+
+## Next slice - first imported PBR texture batch
+
+The one-enemy performance gate closed on 2026-07-12 at 16.667 ms median and 20.833 ms p95 over 126 phone intervals. See `docs/SKELETON_PERFORMANCE_2026-07-12.md`.
+
+1. Add the smallest reusable image upload/sampler/material path required for albedo, normal, roughness, metallic, and AO.
+2. Import exact CC0 Poly Haven sets for dry stone, wet stone, moss, puddle/water, and aged metal, capped at 1K for the first Android proof.
+3. Record each asset URL, author, license, downloaded resolution, and derived mobile files in `ASSET_LICENSES.md`.
+4. Re-run the phone benchmark after each material step and keep a 50+ FPS median regression gate.
+5. Measure phone memory and frame pacing before replacing the procedural player sword with its textured 12,358-triangle LOD.
+
+### First PBR batch - complete 2026-07-12
+
+The five-source CC0 Poly Haven batch, Vulkan array upload, world-space mapping, Android staging, license manifest, visual phone proof, and 60 FPS median regression test are complete. See `docs/PBR_MATERIAL_BATCH_2026-07-12.md`.
+
+## Next slice - settle material art direction and compressed mobile assets
+
+1. Tune scale, orientation, wetness, and normal strength from hands-on phone feedback.
+2. Replace raw runtime arrays with a supported mobile GPU-compressed format.
+3. Measure APK size, device memory, and the 126-interval frame gate again.
+4. Keep the full textured sword LOD separate until this environment material path is stable.
+
+### RT lighting refinement - complete 2026-07-12
+
+- Removed held-prop self-shadow artifacts from torch direct lighting.
+- Replaced the perfect point-light shadow sample with an interleaved two-point flame-area sample.
+- Added physical roof gaps and genuine directional-light ray-query visibility through them.
+- Rejected and removed fake analytic/overlay shafts.
+- Deferred true volumetric dust until a participating-media implementation is proven, likely desktop-first.
+
+## Next technical slice
+
+1. Encode the three PBR arrays in a device-supported GPU-compressed format and add capability-checked upload.
+2. Cold-benchmark room two after compression and preserve the 50+ FPS median gate.
+3. Consider true participating-media dust on Windows RTX only after the compressed phone path is stable.
+
+The runtime-only Android asset task is complete and reduced the debug APK from 93,855,324 to 46,793,811 bytes.
 
 ## Later milestones
 

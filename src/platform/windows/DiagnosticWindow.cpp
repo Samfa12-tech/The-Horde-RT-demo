@@ -862,6 +862,8 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx)
                                 ctx.commandPool,
                                 ctx.swapchainExtent,
                                 ctx.swapchainFormat,
+                                (std::filesystem::path(HORDE_RT_SOURCE_DIR) / "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb").string(),
+                                (std::filesystem::path(HORDE_RT_SOURCE_DIR) / "assets/textures/polyhaven/mobile_1k").string(),
                                 diagnostic))
     {
         std::cerr << "Failed to initialise presentable RT scene: " << diagnostic << '\n';
@@ -1259,7 +1261,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         {
             capabilities.rtScene.presented = true;
             capabilities.rtScene.status = "Presented via swapchain";
-            capabilities.rtScene.geometry = "Horde Lantern corridor demo scene";
+            capabilities.rtScene.geometry = "Horde Lantern corridor with animated skeleton";
             capabilities.rtScene.dispatchWidth = context.rtScene.DispatchExtent().width;
             capabilities.rtScene.dispatchHeight = context.rtScene.DispatchExtent().height;
             capabilities.performance.internalRenderWidth = capabilities.rtScene.dispatchWidth;

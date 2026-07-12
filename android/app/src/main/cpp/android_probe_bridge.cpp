@@ -63,6 +63,12 @@ struct SwapchainContext
     VkFormat swapchainFormat = VK_FORMAT_B8G8R8A8_UNORM;
     VkColorSpaceKHR swapchainColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
     VkExtent2D swapchainExtent{};
+    float frameDeltaSeconds = 1.0f / 60.0f;
+    uint32_t timingFrameCount = 0u;
+    double timingFenceMs = 0.0;
+    double timingRecordMs = 0.0;
+    double timingPresentMs = 0.0;
+    double timingTotalMs = 0.0;
     VkRenderPass renderPass = VK_NULL_HANDLE;
     std::vector<VkImage> swapchainImages;
     std::vector<VkImageLayout> swapchainImageLayouts;
@@ -771,6 +777,8 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
                                     context.commandPool,
                                     context.swapchainExtent,
                                     context.swapchainFormat,
+                                    context.reportDirectory + "/../skeleton_biped_merged_animations_v01.glb",
+                                    context.reportDirectory + "/..",
                                     diagnostic))
     {
         __android_log_print(ANDROID_LOG_ERROR, kTag, "Failed to initialise presentable RT scene: %s", diagnostic.c_str());
@@ -879,6 +887,7 @@ void DestroySwapchainContext(SwapchainContext& context)
 
 bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
 {
+    const auto frameStart = std::chrono::steady_clock::now();
     rtFramePresented = false;
     if (context.commandBuffers.empty())
     {
@@ -886,6 +895,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
     }
 
     const VkResult waitResult = vkWaitForFences(context.device, 1u, &context.inFlightFences[context.currentFrame], VK_TRUE, UINT64_MAX);
+    const auto fenceDone = std::chrono::steady_clock::now();
     if (waitResult != VK_SUCCESS && waitResult != VK_TIMEOUT)
     {
         return false;
@@ -927,9 +937,10 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
     }
 
     const bool useRtFrame = context.useRtPath && context.rtScene.IsReady();
+    const auto recordStart = std::chrono::steady_clock::now();
     if (useRtFrame)
     {
-        context.walkTime += 0.045f;
+        context.walkTime += context.frameDeltaSeconds;
         const float moveAmount = std::clamp(std::abs(context.moveForward) + std::abs(context.moveStrafe), 0.0f, 1.0f);
         if (moveAmount > 0.02f)
         {
@@ -980,6 +991,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
     {
         return false;
     }
+    const auto recordDone = std::chrono::steady_clock::now();
 
     if (vkResetFences(context.device, 1u, &context.inFlightFences[context.currentFrame]) != VK_SUCCESS)
     {
@@ -1011,6 +1023,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
     presentInfo.pSwapchains = &context.swapchain;
     presentInfo.pImageIndices = &imageIndex;
     const VkResult presentResult = vkQueuePresentKHR(context.graphicsQueue, &presentInfo);
+    const auto presentDone = std::chrono::steady_clock::now();
     if (presentResult == VK_ERROR_OUT_OF_DATE_KHR || presentResult == VK_SUBOPTIMAL_KHR)
     {
         return RecreateSwapchain(context);
@@ -1022,13 +1035,35 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
 
     rtFramePresented = useRtFrame;
     context.currentFrame = (context.currentFrame + 1u) % kMaxFramesInFlight;
+    const auto milliseconds = [](auto duration) { return std::chrono::duration<double, std::milli>(duration).count(); };
+    context.timingFenceMs += milliseconds(fenceDone - frameStart);
+    context.timingRecordMs += milliseconds(recordDone - recordStart);
+    context.timingPresentMs += milliseconds(presentDone - recordDone);
+    context.timingTotalMs += milliseconds(presentDone - frameStart);
+    if (++context.timingFrameCount >= 120u)
+    {
+        const double count = static_cast<double>(context.timingFrameCount);
+        __android_log_print(ANDROID_LOG_INFO,
+                            kTag,
+                            "RT frame timing avg ms: total=%.3f fence=%.3f record=%.3f submit+present=%.3f",
+                            context.timingTotalMs / count,
+                            context.timingFenceMs / count,
+                            context.timingRecordMs / count,
+                            context.timingPresentMs / count);
+        context.timingFrameCount = 0u;
+        context.timingFenceMs = context.timingRecordMs = context.timingPresentMs = context.timingTotalMs = 0.0;
+    }
     return true;
 }
 
 void SwapchainRenderLoop()
 {
+    auto previousFrameStart = std::chrono::steady_clock::now();
     while (gSwapchainRunning.load(std::memory_order_acquire))
     {
+        const auto frameStart = std::chrono::steady_clock::now();
+        gSwapchainContext.frameDeltaSeconds = std::clamp(std::chrono::duration<float>(frameStart - previousFrameStart).count(), 1.0f / 240.0f, 0.1f);
+        previousFrameStart = frameStart;
         bool rtFramePresented = false;
         if (!RenderFrame(gSwapchainContext, rtFramePresented))
         {
@@ -1039,7 +1074,7 @@ void SwapchainRenderLoop()
         {
             gSwapchainContext.capabilities.rtScene.presented = true;
             gSwapchainContext.capabilities.rtScene.status = "Presented via swapchain";
-            gSwapchainContext.capabilities.rtScene.geometry = "Horde Lantern corridor demo scene";
+            gSwapchainContext.capabilities.rtScene.geometry = "Horde Lantern corridor with animated skeleton";
             gSwapchainContext.capabilities.rtScene.dispatchWidth = gSwapchainContext.rtScene.DispatchExtent().width;
             gSwapchainContext.capabilities.rtScene.dispatchHeight = gSwapchainContext.rtScene.DispatchExtent().height;
             gSwapchainContext.capabilities.performance.internalRenderWidth = gSwapchainContext.capabilities.rtScene.dispatchWidth;
@@ -1049,7 +1084,6 @@ void SwapchainRenderLoop()
             WriteTextFile(gSwapchainContext.reportDirectory + '/' + kJsonReportFilename, horde::vulkan::BuildCapabilityJsonReport(gSwapchainContext.capabilities));
             __android_log_print(ANDROID_LOG_INFO, kTag, "RT frame reached Android swapchain presentation.");
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(16));
     }
 
     gSwapchainRunning.store(false, std::memory_order_release);

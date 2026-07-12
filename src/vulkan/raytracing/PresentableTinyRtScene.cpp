@@ -4,6 +4,7 @@
 #include <array>
 #include <cmath>
 #include <cstring>
+#include <fstream>
 #include <utility>
 #include <vector>
 
@@ -1142,14 +1143,24 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     storageImageMemory_ = std::exchange(other.storageImageMemory_, VK_NULL_HANDLE);
     storageImageView_ = std::exchange(other.storageImageView_, VK_NULL_HANDLE);
     storageImageLayout_ = std::exchange(other.storageImageLayout_, VK_IMAGE_LAYOUT_UNDEFINED);
+    materialDiffuse_ = std::exchange(other.materialDiffuse_, TextureArray{});
+    materialNormal_ = std::exchange(other.materialNormal_, TextureArray{});
+    materialArm_ = std::exchange(other.materialArm_, TextureArray{});
+    materialSampler_ = std::exchange(other.materialSampler_, VK_NULL_HANDLE);
     vertexBuffer_ = std::exchange(other.vertexBuffer_, Buffer{});
     indexBuffer_ = std::exchange(other.indexBuffer_, Buffer{});
     transformBuffer_ = std::exchange(other.transformBuffer_, Buffer{});
     instanceBuffer_ = std::exchange(other.instanceBuffer_, Buffer{});
+    skeletonVertexBuffer_ = std::exchange(other.skeletonVertexBuffer_, Buffer{});
     blas_ = std::exchange(other.blas_, AccelerationStructure{});
     torchBlas_ = std::exchange(other.torchBlas_, AccelerationStructure{});
+    skeletonBlas_ = std::exchange(other.skeletonBlas_, AccelerationStructure{});
     tlas_ = std::exchange(other.tlas_, AccelerationStructure{});
+    skeletonBlasUpdateScratch_ = std::exchange(other.skeletonBlasUpdateScratch_, Buffer{});
     tlasUpdateScratch_ = std::exchange(other.tlasUpdateScratch_, Buffer{});
+    skeletonModel_ = std::move(other.skeletonModel_);
+    skeletonSkinnedVertices_ = std::move(other.skeletonSkinnedVertices_);
+    lastSkeletonUpdateTime_ = std::exchange(other.lastSkeletonUpdateTime_, -1.0f);
     descriptorSetLayout_ = std::exchange(other.descriptorSetLayout_, VK_NULL_HANDLE);
     descriptorPool_ = std::exchange(other.descriptorPool_, VK_NULL_HANDLE);
     descriptorSet_ = std::exchange(other.descriptorSet_, VK_NULL_HANDLE);
@@ -1181,6 +1192,8 @@ bool PresentableTinyRtScene::Initialise(VkInstance instance,
                                         VkCommandPool commandPool,
                                         VkExtent2D dispatchExtent,
                                         VkFormat presentationFormat,
+                                        const std::string& skeletonAssetPath,
+                                        const std::string& materialAssetDirectory,
                                         std::string& diagnostic)
 {
     Destroy();
@@ -1203,8 +1216,10 @@ bool PresentableTinyRtScene::Initialise(VkInstance instance,
         diagnostic = "RT dispatch extent is zero.";
         return false;
     }
-    if (!LoadEntryPoints(diagnostic) ||
+    if (!skeletonModel_.LoadIdleClip(skeletonAssetPath, diagnostic) ||
+        !LoadEntryPoints(diagnostic) ||
         !CreateStorageImage(diagnostic) ||
+        !CreateMaterialTextures(materialAssetDirectory, diagnostic) ||
         !BuildAccelerationStructures(diagnostic) ||
         !CreateDescriptors(diagnostic) ||
         !CreatePipeline(diagnostic) ||
@@ -1252,12 +1267,25 @@ void PresentableTinyRtScene::Destroy()
     DestroyBuffer(shaderBindingTable_);
     DestroyAccelerationStructure(tlas_);
     DestroyBuffer(tlasUpdateScratch_);
+    DestroyAccelerationStructure(skeletonBlas_);
+    DestroyBuffer(skeletonBlasUpdateScratch_);
     DestroyAccelerationStructure(torchBlas_);
     DestroyAccelerationStructure(blas_);
+    DestroyBuffer(skeletonVertexBuffer_);
     DestroyBuffer(instanceBuffer_);
     DestroyBuffer(transformBuffer_);
     DestroyBuffer(indexBuffer_);
     DestroyBuffer(vertexBuffer_);
+    lastSkeletonUpdateTime_ = -1.0f;
+
+    if (materialSampler_ != VK_NULL_HANDLE)
+    {
+        vkDestroySampler(device_, materialSampler_, nullptr);
+        materialSampler_ = VK_NULL_HANDLE;
+    }
+    DestroyTextureArray(materialArm_);
+    DestroyTextureArray(materialNormal_);
+    DestroyTextureArray(materialDiffuse_);
 
     if (storageImageView_ != VK_NULL_HANDLE)
     {
@@ -1552,6 +1580,140 @@ bool PresentableTinyRtScene::CreateStorageImage(std::string& diagnostic)
     return true;
 }
 
+void PresentableTinyRtScene::DestroyTextureArray(TextureArray& texture)
+{
+    if (device_ != VK_NULL_HANDLE && texture.view != VK_NULL_HANDLE) vkDestroyImageView(device_, texture.view, nullptr);
+    if (device_ != VK_NULL_HANDLE && texture.image != VK_NULL_HANDLE) vkDestroyImage(device_, texture.image, nullptr);
+    if (device_ != VK_NULL_HANDLE && texture.memory != VK_NULL_HANDLE) vkFreeMemory(device_, texture.memory, nullptr);
+    texture = {};
+}
+
+bool PresentableTinyRtScene::CreateTextureArray(const std::string& path, VkFormat format, TextureArray& texture, std::string& diagnostic)
+{
+    constexpr std::uint32_t width = 512u;
+    constexpr std::uint32_t height = 512u;
+    constexpr std::uint32_t layers = 5u;
+    constexpr VkDeviceSize byteSize = static_cast<VkDeviceSize>(width) * height * layers * 4u;
+    std::ifstream stream(path, std::ios::binary | std::ios::ate);
+    if (!stream || static_cast<VkDeviceSize>(stream.tellg()) != byteSize)
+    {
+        diagnostic = "PBR texture array is missing or has the wrong size: " + path;
+        return false;
+    }
+    stream.seekg(0, std::ios::beg);
+    std::vector<std::uint8_t> pixels(static_cast<std::size_t>(byteSize));
+    if (!stream.read(reinterpret_cast<char*>(pixels.data()), static_cast<std::streamsize>(pixels.size())))
+    {
+        diagnostic = "Failed to read PBR texture array: " + path;
+        return false;
+    }
+
+    Buffer staging;
+    if (!CreateBuffer(byteSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, false, staging, diagnostic)) return false;
+    void* mapped = nullptr;
+    if (vkMapMemory(device_, staging.memory, 0u, byteSize, 0u, &mapped) != VK_SUCCESS || mapped == nullptr)
+    {
+        DestroyBuffer(staging);
+        diagnostic = "Failed to map PBR texture staging memory.";
+        return false;
+    }
+    std::memcpy(mapped, pixels.data(), pixels.size());
+    vkUnmapMemory(device_, staging.memory);
+
+    VkImageCreateInfo imageInfo{VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO};
+    imageInfo.imageType = VK_IMAGE_TYPE_2D;
+    imageInfo.format = format;
+    imageInfo.extent = {width, height, 1u};
+    imageInfo.mipLevels = 1u;
+    imageInfo.arrayLayers = layers;
+    imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+    imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+    imageInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+    imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    if (vkCreateImage(device_, &imageInfo, nullptr, &texture.image) != VK_SUCCESS)
+    {
+        DestroyBuffer(staging);
+        diagnostic = "Failed to create PBR texture array image.";
+        return false;
+    }
+    VkMemoryRequirements requirements{};
+    vkGetImageMemoryRequirements(device_, texture.image, &requirements);
+    const std::uint32_t memoryType = FindMemoryType(requirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+    VkMemoryAllocateInfo allocation{VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO};
+    allocation.allocationSize = requirements.size;
+    allocation.memoryTypeIndex = memoryType;
+    if (memoryType == UINT32_MAX || vkAllocateMemory(device_, &allocation, nullptr, &texture.memory) != VK_SUCCESS || vkBindImageMemory(device_, texture.image, texture.memory, 0u) != VK_SUCCESS)
+    {
+        DestroyBuffer(staging);
+        DestroyTextureArray(texture);
+        diagnostic = "Failed to allocate PBR texture array memory.";
+        return false;
+    }
+    struct UploadData { PresentableTinyRtScene* scene; Buffer* staging; TextureArray* texture; } upload{this, &staging, &texture};
+    const auto recordUpload = [](VkCommandBuffer commandBuffer, void* userData) {
+        auto* data = static_cast<UploadData*>(userData);
+        VkImageMemoryBarrier toTransfer{VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER};
+        toTransfer.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        toTransfer.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        toTransfer.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        toTransfer.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        toTransfer.image = data->texture->image;
+        toTransfer.subresourceRange = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, 1u, 0u, 5u};
+        toTransfer.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0u, 0u, nullptr, 0u, nullptr, 1u, &toTransfer);
+        std::array<VkBufferImageCopy, 5u> copies{};
+        for (std::uint32_t layer = 0u; layer < copies.size(); ++layer)
+        {
+            copies[layer].bufferOffset = static_cast<VkDeviceSize>(layer) * 512u * 512u * 4u;
+            copies[layer].imageSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, layer, 1u};
+            copies[layer].imageExtent = {512u, 512u, 1u};
+        }
+        vkCmdCopyBufferToImage(commandBuffer, data->staging->buffer, data->texture->image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, static_cast<std::uint32_t>(copies.size()), copies.data());
+        VkImageMemoryBarrier toShader = toTransfer;
+        toShader.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        toShader.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        toShader.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        toShader.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+        vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR, 0u, 0u, nullptr, 0u, nullptr, 1u, &toShader);
+    };
+    const bool uploaded = RunOneTimeCommands(recordUpload, &upload, diagnostic);
+    DestroyBuffer(staging);
+    if (!uploaded) { DestroyTextureArray(texture); return false; }
+
+    VkImageViewCreateInfo viewInfo{VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO};
+    viewInfo.image = texture.image;
+    viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
+    viewInfo.format = format;
+    viewInfo.subresourceRange = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, 1u, 0u, layers};
+    if (vkCreateImageView(device_, &viewInfo, nullptr, &texture.view) != VK_SUCCESS)
+    {
+        DestroyTextureArray(texture);
+        diagnostic = "Failed to create PBR texture array view.";
+        return false;
+    }
+    return true;
+}
+
+bool PresentableTinyRtScene::CreateMaterialTextures(const std::string& directory, std::string& diagnostic)
+{
+    const auto path = [&directory](const char* name) { return directory + "/" + name; };
+    if (!CreateTextureArray(path("diff-array-512.rgba"), VK_FORMAT_R8G8B8A8_SRGB, materialDiffuse_, diagnostic) ||
+        !CreateTextureArray(path("normal-array-512.rgba"), VK_FORMAT_R8G8B8A8_UNORM, materialNormal_, diagnostic) ||
+        !CreateTextureArray(path("arm-array-512.rgba"), VK_FORMAT_R8G8B8A8_UNORM, materialArm_, diagnostic)) return false;
+    VkSamplerCreateInfo sampler{VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO};
+    sampler.magFilter = VK_FILTER_LINEAR;
+    sampler.minFilter = VK_FILTER_LINEAR;
+    sampler.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
+    sampler.addressModeU = sampler.addressModeV = sampler.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    sampler.maxAnisotropy = 1.0f;
+    if (vkCreateSampler(device_, &sampler, nullptr, &materialSampler_) != VK_SUCCESS)
+    {
+        diagnostic = "Failed to create PBR material sampler.";
+        return false;
+    }
+    return true;
+}
+
 void PresentableTinyRtScene::DestroyAccelerationStructure(AccelerationStructure& accelerationStructure)
 {
     if (accelerationStructure.handle != VK_NULL_HANDLE && vkDestroyAccelerationStructureKHR_)
@@ -1590,7 +1752,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     };
 
     addQuad({{-1.85f, -0.95f, 3.4f}}, {{1.85f, -0.95f, 3.4f}}, {{1.85f, -0.95f, -6.4f}}, {{-1.85f, -0.95f, -6.4f}});
-    addQuad({{-1.85f, 1.35f, 3.4f}}, {{-1.85f, 1.35f, -6.4f}}, {{1.85f, 1.35f, -6.4f}}, {{1.85f, 1.35f, 3.4f}});
+    addQuad({{-1.85f, 1.35f, 3.4f}}, {{-1.85f, 1.35f, -0.2f}}, {{1.85f, 1.35f, -0.2f}}, {{1.85f, 1.35f, 3.4f}});
     addQuad({{-1.85f, -0.95f, 3.4f}}, {{-1.85f, -0.95f, -6.4f}}, {{-1.85f, 1.35f, -6.4f}}, {{-1.85f, 1.35f, 3.4f}});
     addQuad({{1.85f, -0.95f, -6.4f}}, {{1.85f, -0.95f, 3.4f}}, {{1.85f, 1.35f, 3.4f}}, {{1.85f, 1.35f, -6.4f}});
     addQuad({{-1.85f, -0.95f, -6.4f}}, {{1.85f, -0.95f, -6.4f}}, {{1.85f, 1.35f, -6.4f}}, {{-1.85f, 1.35f, -6.4f}});
@@ -1602,6 +1764,12 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     addQuad({{-1.84f, -0.32f, -0.82f}}, {{-1.84f, 0.24f, -0.62f}}, {{-1.84f, 0.42f, -1.12f}}, {{-1.84f, -0.12f, -1.34f}});
     addQuad({{1.84f, -0.44f, 0.24f}}, {{1.84f, -0.02f, 0.5f}}, {{1.84f, 0.28f, 0.1f}}, {{1.84f, -0.18f, -0.2f}});
     addQuad({{-0.52f, -0.94f, -0.86f}}, {{0.34f, -0.94f, -0.64f}}, {{0.64f, -0.94f, -1.18f}}, {{-0.38f, -0.94f, -1.42f}});
+    // Physical roof slabs in room two leave three narrow cracks. Direct-light
+    // and volumetric ray queries use these same openings.
+    addQuad({{-1.85f, 1.35f, -0.2f}}, {{-1.85f, 1.35f, -6.4f}}, {{-1.15f, 1.35f, -6.4f}}, {{-1.15f, 1.35f, -0.2f}});
+    addQuad({{-1.02f, 1.35f, -0.2f}}, {{-1.02f, 1.35f, -6.4f}}, {{-0.30f, 1.35f, -6.4f}}, {{-0.30f, 1.35f, -0.2f}});
+    addQuad({{-0.18f, 1.35f, -0.2f}}, {{-0.18f, 1.35f, -6.4f}}, {{0.55f, 1.35f, -6.4f}}, {{0.55f, 1.35f, -0.2f}});
+    addQuad({{0.68f, 1.35f, -0.2f}}, {{0.68f, 1.35f, -6.4f}}, {{1.85f, 1.35f, -6.4f}}, {{1.85f, 1.35f, -0.2f}});
     for (std::uint32_t i = 0u; i < 8u; ++i)
     {
         const float x = -1.05f + static_cast<float>(i % 4u) * 0.7f + (i >= 4u ? 0.18f : 0.0f);
@@ -1612,10 +1780,22 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
 
     const std::uint32_t sceneIndexCount = static_cast<std::uint32_t>(indices.size());
 
-    // A small held torch built in local hand space. It becomes its own BLAS/TLAS instance below.
+    // Camera-held props share one tiny BLAS: torch on the left, sword on the right.
     addQuad({{-0.045f, -0.42f, 0.0f}}, {{0.045f, -0.42f, 0.0f}}, {{0.045f, 0.10f, 0.0f}}, {{-0.045f, 0.10f, 0.0f}});
     addTriangle({{-0.13f, 0.08f, 0.0f}}, {{0.13f, 0.08f, 0.0f}}, {{0.0f, 0.52f, 0.0f}});
     addTriangle({{0.0f, 0.08f, -0.13f}}, {{0.0f, 0.08f, 0.13f}}, {{0.0f, 0.52f, 0.0f}});
+
+    // Low-poly player sword proof, angled inward from the right hand. The
+    // textured 12k LOD replaces this when static GLB/PBR upload is available.
+    constexpr float swordZ = 0.025f;
+    addQuad({{1.43f, -0.66f, swordZ}}, {{1.51f, -0.66f, swordZ}}, {{1.51f, -0.31f, swordZ}}, {{1.43f, -0.31f, swordZ}});
+    addQuad({{1.18f, -0.34f, swordZ}}, {{1.72f, -0.34f, swordZ}}, {{1.70f, -0.25f, swordZ}}, {{1.20f, -0.25f, swordZ}});
+    addQuad({{1.37f, -0.26f, swordZ}}, {{1.51f, -0.26f, swordZ}}, {{1.14f, 1.12f, swordZ}}, {{1.04f, 1.09f, swordZ}});
+    addTriangle({{1.04f, 1.09f, swordZ}}, {{1.14f, 1.12f, swordZ}}, {{1.00f, 1.34f, swordZ}});
+    addQuad({{1.51f, -0.66f, -swordZ}}, {{1.43f, -0.66f, -swordZ}}, {{1.43f, -0.31f, -swordZ}}, {{1.51f, -0.31f, -swordZ}});
+    addQuad({{1.72f, -0.34f, -swordZ}}, {{1.18f, -0.34f, -swordZ}}, {{1.20f, -0.25f, -swordZ}}, {{1.70f, -0.25f, -swordZ}});
+    addQuad({{1.51f, -0.26f, -swordZ}}, {{1.37f, -0.26f, -swordZ}}, {{1.04f, 1.09f, -swordZ}}, {{1.14f, 1.12f, -swordZ}});
+    addTriangle({{1.14f, 1.12f, -swordZ}}, {{1.04f, 1.09f, -swordZ}}, {{1.00f, 1.34f, -swordZ}});
     const std::uint32_t torchPrimitiveCount = (static_cast<std::uint32_t>(indices.size()) - sceneIndexCount) / 3u;
     const VkTransformMatrixKHR transform{{
         1.0f, 0.0f, 0.0f, 0.0f,
@@ -1780,20 +1960,94 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     torchBlasAddressInfo.accelerationStructure = torchBlas_.handle;
     torchBlas_.address = vkGetAccelerationStructureDeviceAddressKHR_(device_, &torchBlasAddressInfo);
 
-    std::array<VkAccelerationStructureInstanceKHR, 2u> instances{};
+    if (!skeletonModel_.SkinIdle(0.0f, skeletonSkinnedVertices_, diagnostic) || skeletonSkinnedVertices_.empty())
+    {
+        if (diagnostic.empty()) diagnostic = "Skeleton produced no skinned vertices.";
+        return false;
+    }
+    const VkDeviceSize skeletonVertexBufferSize = sizeof(horde::scene::SkinnedRtVertex) * skeletonSkinnedVertices_.size();
+    if (!CreateBuffer(skeletonVertexBufferSize,
+                      VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                      uploadMemory,
+                      true,
+                      skeletonVertexBuffer_,
+                      diagnostic))
+    {
+        return false;
+    }
+    vkMapMemory(device_, skeletonVertexBuffer_.memory, 0u, skeletonVertexBufferSize, 0u, &mapped);
+    std::memcpy(mapped, skeletonSkinnedVertices_.data(), static_cast<std::size_t>(skeletonVertexBufferSize));
+    vkUnmapMemory(device_, skeletonVertexBuffer_.memory);
+
+    VkAccelerationStructureGeometryKHR skeletonGeometry{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
+    skeletonGeometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
+    skeletonGeometry.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
+    skeletonGeometry.geometry.triangles.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
+    skeletonGeometry.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
+    skeletonGeometry.geometry.triangles.vertexData.deviceAddress = skeletonVertexBuffer_.address;
+    skeletonGeometry.geometry.triangles.vertexStride = sizeof(horde::scene::SkinnedRtVertex);
+    skeletonGeometry.geometry.triangles.maxVertex = static_cast<std::uint32_t>(skeletonSkinnedVertices_.size() - 1u);
+    skeletonGeometry.geometry.triangles.indexType = VK_INDEX_TYPE_NONE_KHR;
+    skeletonGeometry.geometry.triangles.transformData.deviceAddress = 0u;
+    const std::uint32_t skeletonPrimitiveCount = static_cast<std::uint32_t>(skeletonSkinnedVertices_.size() / 3u);
+    VkAccelerationStructureBuildGeometryInfoKHR skeletonBuildInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR};
+    skeletonBuildInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+    skeletonBuildInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR | VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_KHR;
+    skeletonBuildInfo.geometryCount = 1u;
+    skeletonBuildInfo.pGeometries = &skeletonGeometry;
+    VkAccelerationStructureBuildSizesInfoKHR skeletonSizes{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR};
+    vkGetAccelerationStructureBuildSizesKHR_(device_, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &skeletonBuildInfo, &skeletonPrimitiveCount, &skeletonSizes);
+    if (!CreateBuffer(skeletonSizes.accelerationStructureSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, true, skeletonBlas_.backing, diagnostic))
+    {
+        return false;
+    }
+    VkAccelerationStructureCreateInfoKHR skeletonCreateInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR};
+    skeletonCreateInfo.buffer = skeletonBlas_.backing.buffer;
+    skeletonCreateInfo.size = skeletonSizes.accelerationStructureSize;
+    skeletonCreateInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+    if (vkCreateAccelerationStructureKHR_(device_, &skeletonCreateInfo, nullptr, &skeletonBlas_.handle) != VK_SUCCESS)
+    {
+        diagnostic = "Failed to create animated skeleton BLAS.";
+        return false;
+    }
+    if (!CreateBuffer(std::max(skeletonSizes.buildScratchSize, skeletonSizes.updateScratchSize), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, true, skeletonBlasUpdateScratch_, diagnostic))
+    {
+        return false;
+    }
+    VkAccelerationStructureBuildRangeInfoKHR skeletonRange{};
+    skeletonRange.primitiveCount = skeletonPrimitiveCount;
+    skeletonBuildInfo.dstAccelerationStructure = skeletonBlas_.handle;
+    skeletonBuildInfo.scratchData.deviceAddress = skeletonBlasUpdateScratch_.address;
+    const VkAccelerationStructureBuildRangeInfoKHR* skeletonRanges[] = {&skeletonRange};
+    BlasBuildData skeletonBuildData{this, &skeletonBuildInfo, skeletonRanges};
+    if (!RunOneTimeCommands(buildBlas, &skeletonBuildData, diagnostic)) return false;
+    VkAccelerationStructureDeviceAddressInfoKHR skeletonAddressInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR};
+    skeletonAddressInfo.accelerationStructure = skeletonBlas_.handle;
+    skeletonBlas_.address = vkGetAccelerationStructureDeviceAddressKHR_(device_, &skeletonAddressInfo);
+
+    std::array<VkAccelerationStructureInstanceKHR, 3u> instances{};
     instances[0].transform = transform;
     instances[0].instanceCustomIndex = 0u;
-    instances[0].mask = 0xffu;
+    instances[0].mask = 0x01u;
     instances[0].instanceShaderBindingTableRecordOffset = 0u;
     instances[0].flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
     instances[0].accelerationStructureReference = blas_.address;
     instances[1] = instances[0];
     instances[1].instanceCustomIndex = 1u;
+    instances[1].mask = 0x02u;
     instances[1].accelerationStructureReference = torchBlas_.address;
     instances[1].transform = {{
         1.0f, 0.0f, 0.0f, -0.32f,
         0.0f, 1.0f, 0.0f, -0.36f,
         0.0f, 0.0f, -1.0f, 3.82f}};
+    instances[2] = instances[0];
+    instances[2].instanceCustomIndex = 2u;
+    instances[2].mask = 0x01u;
+    instances[2].accelerationStructureReference = skeletonBlas_.address;
+    instances[2].transform = {{
+        1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, -0.95f,
+        0.0f, 0.0f, 1.0f, -2.35f}};
     if (!CreateBuffer(sizeof(instances), VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, instanceBuffer_, diagnostic))
     {
         return false;
@@ -1868,9 +2122,13 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
 
 bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
 {
-    const std::array<VkDescriptorSetLayoutBinding, 2u> bindings{{
+    const std::array<VkDescriptorSetLayoutBinding, 6u> bindings{{
         {0u, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, nullptr},
         {1u, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
+        {2u, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
+        {3u, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
+        {4u, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
+        {5u, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
     }};
     const VkDescriptorSetLayoutCreateInfo layoutInfo{
         VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
@@ -1884,9 +2142,11 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
         return false;
     }
 
-    const std::array<VkDescriptorPoolSize, 2u> poolSizes{{
+    const std::array<VkDescriptorPoolSize, 4u> poolSizes{{
         {VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1u},
         {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1u},
+        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u},
+        {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 3u},
     }};
     const VkDescriptorPoolCreateInfo poolInfo{
         VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
@@ -1933,7 +2193,31 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
     imageWrite.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
     imageWrite.pImageInfo = &imageInfo;
 
-    const std::array<VkWriteDescriptorSet, 2u> writes{{accelerationStructureWrite, imageWrite}};
+    VkDescriptorBufferInfo skeletonBufferInfo{};
+    skeletonBufferInfo.buffer = skeletonVertexBuffer_.buffer;
+    skeletonBufferInfo.offset = 0u;
+    skeletonBufferInfo.range = skeletonVertexBuffer_.size;
+    VkWriteDescriptorSet skeletonWrite{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
+    skeletonWrite.dstSet = descriptorSet_;
+    skeletonWrite.dstBinding = 2u;
+    skeletonWrite.descriptorCount = 1u;
+    skeletonWrite.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    skeletonWrite.pBufferInfo = &skeletonBufferInfo;
+
+    const VkDescriptorImageInfo diffuseInfo{materialSampler_, materialDiffuse_.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
+    const VkDescriptorImageInfo normalInfo{materialSampler_, materialNormal_.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
+    const VkDescriptorImageInfo armInfo{materialSampler_, materialArm_.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
+    const auto sampledWrite = [this](std::uint32_t binding, const VkDescriptorImageInfo* info) {
+        VkWriteDescriptorSet write{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
+        write.dstSet = descriptorSet_;
+        write.dstBinding = binding;
+        write.descriptorCount = 1u;
+        write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        write.pImageInfo = info;
+        return write;
+    };
+    const std::array<VkWriteDescriptorSet, 6u> writes{{accelerationStructureWrite, imageWrite, skeletonWrite,
+                                                       sampledWrite(3u, &diffuseInfo), sampledWrite(4u, &normalInfo), sampledWrite(5u, &armInfo)}};
     vkUpdateDescriptorSets(device_, static_cast<std::uint32_t>(writes.size()), writes.data(), 0u, nullptr);
 
     diagnostic.clear();
@@ -2107,9 +2391,9 @@ bool PresentableTinyRtScene::UpdateHeldTorchInstance(VkCommandBuffer commandBuff
                                                       float walkAmount,
                                                       std::string& diagnostic)
 {
-    if (instanceBuffer_.memory == VK_NULL_HANDLE || tlas_.handle == VK_NULL_HANDLE || tlasUpdateScratch_.address == 0u)
+    if (instanceBuffer_.memory == VK_NULL_HANDLE || skeletonVertexBuffer_.memory == VK_NULL_HANDLE || skeletonBlas_.handle == VK_NULL_HANDLE || tlas_.handle == VK_NULL_HANDLE || skeletonBlasUpdateScratch_.address == 0u || tlasUpdateScratch_.address == 0u)
     {
-        diagnostic = "Held-torch TLAS resources are unavailable.";
+        diagnostic = "Animated skeleton or held-torch TLAS resources are unavailable.";
         return false;
     }
 
@@ -2118,19 +2402,39 @@ bool PresentableTinyRtScene::UpdateHeldTorchInstance(VkCommandBuffer commandBuff
     const float rightX = std::cos(cameraYaw);
     const float rightZ = std::sin(cameraYaw);
     const float movement = std::max(walkAmount, 0.2f);
-    constexpr float torchScale = 0.72f;
+    constexpr float torchScale = 0.56f;
     const float torchSway = std::sin(walkTime * 6.2f) * 0.08f * movement;
-    const float torchX = cameraX + forwardX * 1.18f - rightX * (0.42f + torchSway * 0.8f);
-    const float torchY = -0.48f + std::abs(std::sin(walkTime * 6.2f)) * 0.04f * movement;
-    const float torchZ = cameraZ + forwardZ * 1.18f - rightZ * (0.42f + torchSway * 0.8f);
+    const float torchX = cameraX + forwardX * 1.34f - rightX * (0.42f + torchSway * 0.8f);
+    const float torchY = 0.02f + std::abs(std::sin(walkTime * 6.2f)) * 0.04f * movement;
+    const float torchZ = cameraZ + forwardZ * 1.34f - rightZ * (0.42f + torchSway * 0.8f);
 
-    std::array<VkAccelerationStructureInstanceKHR, 2u> instances{};
+    constexpr float skeletonUpdateInterval = 1.0f / 30.0f;
+    const bool updateSkeleton = lastSkeletonUpdateTime_ < 0.0f || walkTime < lastSkeletonUpdateTime_ || (walkTime - lastSkeletonUpdateTime_) >= skeletonUpdateInterval;
+    void* mapped = nullptr;
+    if (updateSkeleton)
+    {
+        if (!skeletonModel_.SkinIdle(walkTime, skeletonSkinnedVertices_, diagnostic))
+        {
+            return false;
+        }
+        const VkDeviceSize skeletonVertexBufferSize = sizeof(horde::scene::SkinnedRtVertex) * skeletonSkinnedVertices_.size();
+        if (vkMapMemory(device_, skeletonVertexBuffer_.memory, 0u, skeletonVertexBufferSize, 0u, &mapped) != VK_SUCCESS || mapped == nullptr)
+        {
+            diagnostic = "Failed to update animated skeleton vertex data.";
+            return false;
+        }
+        std::memcpy(mapped, skeletonSkinnedVertices_.data(), static_cast<std::size_t>(skeletonVertexBufferSize));
+        vkUnmapMemory(device_, skeletonVertexBuffer_.memory);
+        lastSkeletonUpdateTime_ = walkTime;
+    }
+
+    std::array<VkAccelerationStructureInstanceKHR, 3u> instances{};
     instances[0].transform = {{
         1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f, 0.0f,
         0.0f, 0.0f, 1.0f, 0.0f}};
     instances[0].instanceCustomIndex = 0u;
-    instances[0].mask = 0xffu;
+    instances[0].mask = 0x01u;
     instances[0].flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
     instances[0].accelerationStructureReference = blas_.address;
     instances[1] = instances[0];
@@ -2139,9 +2443,17 @@ bool PresentableTinyRtScene::UpdateHeldTorchInstance(VkCommandBuffer commandBuff
         0.0f, torchScale, 0.0f, torchY,
         rightZ * torchScale, 0.0f, forwardZ * torchScale, torchZ}};
     instances[1].instanceCustomIndex = 1u;
+    instances[1].mask = 0x02u;
     instances[1].accelerationStructureReference = torchBlas_.address;
+    instances[2] = instances[0];
+    instances[2].instanceCustomIndex = 2u;
+    instances[2].mask = 0x01u;
+    instances[2].accelerationStructureReference = skeletonBlas_.address;
+    instances[2].transform = {{
+        1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, -0.95f,
+        0.0f, 0.0f, 1.0f, -2.35f}};
 
-    void* mapped = nullptr;
     if (vkMapMemory(device_, instanceBuffer_.memory, 0u, sizeof(instances), 0u, &mapped) != VK_SUCCESS || mapped == nullptr)
     {
         diagnostic = "Failed to update held-torch instance data.";
@@ -2152,7 +2464,7 @@ bool PresentableTinyRtScene::UpdateHeldTorchInstance(VkCommandBuffer commandBuff
 
     VkMemoryBarrier hostWriteBarrier{VK_STRUCTURE_TYPE_MEMORY_BARRIER};
     hostWriteBarrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;
-    hostWriteBarrier.dstAccessMask = VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR;
+    hostWriteBarrier.dstAccessMask = VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR | VK_ACCESS_SHADER_READ_BIT;
     vkCmdPipelineBarrier(commandBuffer,
                          VK_PIPELINE_STAGE_HOST_BIT,
                          VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR,
@@ -2163,6 +2475,46 @@ bool PresentableTinyRtScene::UpdateHeldTorchInstance(VkCommandBuffer commandBuff
                          nullptr,
                          0u,
                          nullptr);
+
+    if (updateSkeleton)
+    {
+        VkAccelerationStructureGeometryKHR skeletonGeometry{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
+        skeletonGeometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
+        skeletonGeometry.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
+        skeletonGeometry.geometry.triangles.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
+        skeletonGeometry.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
+        skeletonGeometry.geometry.triangles.vertexData.deviceAddress = skeletonVertexBuffer_.address;
+        skeletonGeometry.geometry.triangles.vertexStride = sizeof(horde::scene::SkinnedRtVertex);
+        skeletonGeometry.geometry.triangles.maxVertex = static_cast<std::uint32_t>(skeletonSkinnedVertices_.size() - 1u);
+        skeletonGeometry.geometry.triangles.indexType = VK_INDEX_TYPE_NONE_KHR;
+        VkAccelerationStructureBuildGeometryInfoKHR skeletonUpdateInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR};
+        skeletonUpdateInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+        skeletonUpdateInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR | VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_KHR;
+        skeletonUpdateInfo.mode = VK_BUILD_ACCELERATION_STRUCTURE_MODE_UPDATE_KHR;
+        skeletonUpdateInfo.srcAccelerationStructure = skeletonBlas_.handle;
+        skeletonUpdateInfo.dstAccelerationStructure = skeletonBlas_.handle;
+        skeletonUpdateInfo.geometryCount = 1u;
+        skeletonUpdateInfo.pGeometries = &skeletonGeometry;
+        skeletonUpdateInfo.scratchData.deviceAddress = skeletonBlasUpdateScratch_.address;
+        VkAccelerationStructureBuildRangeInfoKHR skeletonRange{};
+        skeletonRange.primitiveCount = static_cast<std::uint32_t>(skeletonSkinnedVertices_.size() / 3u);
+        const VkAccelerationStructureBuildRangeInfoKHR* skeletonRanges[] = {&skeletonRange};
+        vkCmdBuildAccelerationStructuresKHR_(commandBuffer, 1u, &skeletonUpdateInfo, skeletonRanges);
+
+        VkMemoryBarrier skeletonBuildBarrier{VK_STRUCTURE_TYPE_MEMORY_BARRIER};
+        skeletonBuildBarrier.srcAccessMask = VK_ACCESS_ACCELERATION_STRUCTURE_WRITE_BIT_KHR;
+        skeletonBuildBarrier.dstAccessMask = VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR;
+        vkCmdPipelineBarrier(commandBuffer,
+                             VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR | VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
+                             VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR,
+                             0u,
+                             1u,
+                             &skeletonBuildBarrier,
+                             0u,
+                             nullptr,
+                             0u,
+                             nullptr);
+    }
 
     VkAccelerationStructureGeometryKHR tlasGeometry{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
     tlasGeometry.geometryType = VK_GEOMETRY_TYPE_INSTANCES_KHR;
@@ -2187,7 +2539,7 @@ bool PresentableTinyRtScene::UpdateHeldTorchInstance(VkCommandBuffer commandBuff
 
     VkMemoryBarrier traceBarrier{VK_STRUCTURE_TYPE_MEMORY_BARRIER};
     traceBarrier.srcAccessMask = VK_ACCESS_ACCELERATION_STRUCTURE_WRITE_BIT_KHR;
-    traceBarrier.dstAccessMask = VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR;
+    traceBarrier.dstAccessMask = VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR | VK_ACCESS_SHADER_READ_BIT;
     vkCmdPipelineBarrier(commandBuffer,
                          VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR,
                          VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,

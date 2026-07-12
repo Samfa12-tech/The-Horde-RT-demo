@@ -2,8 +2,11 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
 
 #include <vulkan/vulkan.h>
+
+#include "scene/SkeletonBipedModel.h"
 
 namespace horde::vulkan::raytracing
 {
@@ -26,6 +29,8 @@ public:
                     VkCommandPool commandPool,
                     VkExtent2D dispatchExtent,
                     VkFormat presentationFormat,
+                    const std::string& skeletonAssetPath,
+                    const std::string& materialAssetDirectory,
                     std::string& diagnostic);
 
     void Destroy();
@@ -62,6 +67,13 @@ private:
         VkDeviceAddress address = 0;
     };
 
+    struct TextureArray
+    {
+        VkImage image = VK_NULL_HANDLE;
+        VkDeviceMemory memory = VK_NULL_HANDLE;
+        VkImageView view = VK_NULL_HANDLE;
+    };
+
     bool LoadEntryPoints(std::string& diagnostic);
     bool CreateBuffer(VkDeviceSize size,
                       VkBufferUsageFlags usage,
@@ -70,6 +82,8 @@ private:
                       Buffer& out,
                       std::string& diagnostic) const;
     bool CreateStorageImage(std::string& diagnostic);
+    bool CreateTextureArray(const std::string& path, VkFormat format, TextureArray& texture, std::string& diagnostic);
+    bool CreateMaterialTextures(const std::string& directory, std::string& diagnostic);
     bool BuildAccelerationStructures(std::string& diagnostic);
     bool CreateDescriptors(std::string& diagnostic);
     bool CreatePipeline(std::string& diagnostic);
@@ -84,6 +98,7 @@ private:
     bool RunOneTimeCommands(void (*record)(VkCommandBuffer, void*), void* userData, std::string& diagnostic) const;
     void DestroyBuffer(Buffer& buffer) const;
     void DestroyAccelerationStructure(AccelerationStructure& accelerationStructure);
+    void DestroyTextureArray(TextureArray& texture);
 
     std::uint32_t FindMemoryType(std::uint32_t typeBits, VkMemoryPropertyFlags flags) const;
     VkDeviceAddress BufferAddress(VkBuffer buffer) const;
@@ -100,15 +115,25 @@ private:
     VkDeviceMemory storageImageMemory_ = VK_NULL_HANDLE;
     VkImageView storageImageView_ = VK_NULL_HANDLE;
     VkImageLayout storageImageLayout_ = VK_IMAGE_LAYOUT_UNDEFINED;
+    TextureArray materialDiffuse_;
+    TextureArray materialNormal_;
+    TextureArray materialArm_;
+    VkSampler materialSampler_ = VK_NULL_HANDLE;
 
     Buffer vertexBuffer_;
     Buffer indexBuffer_;
     Buffer transformBuffer_;
     Buffer instanceBuffer_;
+    Buffer skeletonVertexBuffer_;
     AccelerationStructure blas_;
     AccelerationStructure torchBlas_;
+    AccelerationStructure skeletonBlas_;
     AccelerationStructure tlas_;
+    Buffer skeletonBlasUpdateScratch_;
     Buffer tlasUpdateScratch_;
+    horde::scene::SkeletonBipedModel skeletonModel_;
+    std::vector<horde::scene::SkinnedRtVertex> skeletonSkinnedVertices_;
+    float lastSkeletonUpdateTime_ = -1.0f;
 
     VkDescriptorSetLayout descriptorSetLayout_ = VK_NULL_HANDLE;
     VkDescriptorPool descriptorPool_ = VK_NULL_HANDLE;

@@ -31,3 +31,10 @@ The Meshy account plan was not available through the generation workflow. Confir
 ## Integration gate
 
 The current renderer has no GLB/PBR import, texture upload, material binding, dynamic BLAS update, or right-hand attachment path. This file is staged source art only.
+
+## Phone LOD and attachment proof - 2026-07-11
+
+- `gothic_arming_sword_rh_lod1.glb` was produced with glTF Transform 4.4.1 using weld plus meshoptimizer simplification at a 0.25 target ratio and 0.02 error limit.
+- Verified LOD result: 12,358 triangles, 7,952 uploaded vertices, 16-bit indices, one material, and the same four embedded 2K texture maps.
+- The live phone scene keeps the skeleton unarmed and uses a deliberately tiny procedural player sword on the right side of the first-person view. It shares the camera-held prop BLAS with the left-hand torch, validating RT visibility and shadowing without pretending the full textured GLB path exists.
+- Replace the proof with LOD1 only after static GLB geometry and PBR texture upload are implemented and measured on Android.

@@ -2,6 +2,18 @@ plugins {
     id 'com.android.application'
 }
 
+def runtimeAssetsDir = layout.buildDirectory.dir('generated/runtimeAssets')
+
+tasks.register('prepareRuntimeAssets', Sync) {
+    from('../../assets') {
+        include 'models/enemies/meshy/skeleton_biped_merged_animations_v01.glb'
+        include 'textures/polyhaven/mobile_1k/diff-array-512.rgba'
+        include 'textures/polyhaven/mobile_1k/normal-array-512.rgba'
+        include 'textures/polyhaven/mobile_1k/arm-array-512.rgba'
+    }
+    into runtimeAssetsDir
+}
+
 android {
     namespace 'com.samfa12.hordelanternrt'
     compileSdk 34
@@ -43,4 +55,12 @@ android {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
     }
+
+    sourceSets {
+        main.assets.srcDirs = [runtimeAssetsDir.get().asFile]
+    }
+}
+
+tasks.named('preBuild').configure {
+    dependsOn tasks.named('prepareRuntimeAssets')
 }

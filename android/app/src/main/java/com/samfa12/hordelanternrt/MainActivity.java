@@ -13,11 +13,33 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import android.app.Activity;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 
 public class MainActivity extends Activity {
     private static final String REPORT_DIRECTORY = "reports";
     private static final String TEXT_REPORT_FILE = "vulkan_capability_report.txt";
     private static final String JSON_REPORT_FILE = "vulkan_capability_report.json";
+    private static final String SKELETON_ASSET = "models/enemies/meshy/skeleton_biped_merged_animations_v01.glb";
+    private static final String SKELETON_FILE = "skeleton_biped_merged_animations_v01.glb";
+
+    private boolean stageAsset(final String assetPath, final String fileName) {
+        final File destination = new File(getFilesDir(), fileName);
+        try (InputStream source = getAssets().open(assetPath);
+             FileOutputStream output = new FileOutputStream(destination, false)) {
+            final byte[] buffer = new byte[64 * 1024];
+            int read;
+            while ((read = source.read(buffer)) != -1) output.write(buffer, 0, read);
+            return true;
+        } catch (final Exception ignored) {
+            return false;
+        }
+    }
+
+    private boolean stageSkeletonAsset() {
+        return stageAsset(SKELETON_ASSET, SKELETON_FILE);
+    }
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -145,6 +167,10 @@ public class MainActivity extends Activity {
         }
 
         final String filesRoot = getFilesDir().getAbsolutePath();
+        final boolean skeletonStaged = stageSkeletonAsset();
+        final boolean materialsStaged = stageAsset("textures/polyhaven/mobile_1k/diff-array-512.rgba", "diff-array-512.rgba")
+                && stageAsset("textures/polyhaven/mobile_1k/normal-array-512.rgba", "normal-array-512.rgba")
+                && stageAsset("textures/polyhaven/mobile_1k/arm-array-512.rgba", "arm-array-512.rgba");
         final boolean written = ProbeBridge.writeReports(filesRoot);
         final StringBuilder output = new StringBuilder();
         output.append(textReport).append('\n');
@@ -152,6 +178,8 @@ public class MainActivity extends Activity {
             output.append("Unsupported: fake RT fallback is disabled.\n\n");
         }
         output.append("Reports written: ").append(written ? "yes" : "no").append('\n');
+        output.append("Animated skeleton staged: ").append(skeletonStaged ? "yes" : "no").append('\n');
+        output.append("PBR material arrays staged: ").append(materialsStaged ? "yes" : "no").append('\n');
         output.append("Report directory: ").append(filesRoot).append('/').append(REPORT_DIRECTORY).append('\n');
         output.append("Report files: ").append(TEXT_REPORT_FILE).append(", ").append(JSON_REPORT_FILE).append('\n');
         output.append("JSON sample:\n").append(jsonReport);

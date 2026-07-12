@@ -270,7 +270,7 @@ bool CreateAndDestroyMinimalRayTracingDevice(const VkPhysicalDevice physicalDevi
 TinyRtSceneSnapshot ExecuteTinyRtScene(const VkPhysicalDevice physicalDevice, const DeviceCapabilities& capabilities)
 {
     TinyRtSceneSnapshot result{};
-    result.geometry = "Horde Lantern corridor demo scene";
+    result.geometry = "Horde Lantern corridor with animated skeleton";
     result.dispatchWidth = 0;
     result.dispatchHeight = 0;
     result.presented = false;
@@ -308,7 +308,7 @@ TinyRtSceneSnapshot ExecuteTinyRtScene(const VkPhysicalDevice physicalDevice, co
     }
 
     result.status = kSceneStatusDispatchImplemented;
-    result.geometry = "Horde Lantern corridor demo scene";
+    result.geometry = "Horde Lantern corridor with animated skeleton";
     result.dispatchWidth = kTinySceneWidth;
     result.dispatchHeight = kTinySceneHeight;
     result.presented = false;

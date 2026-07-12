@@ -28,11 +28,21 @@ Current tested phone build includes:
 - Reflective objects, wet-floor/puddle response, fog, horde silhouettes, and second-room sunlight.
 - Diagnostics hidden behind the HUD tap instead of being the primary screen.
 
-The current Phase 1C source slice additionally adds simple corridor/arch collision and a stronger procedural material table for dry stone, wet stone/puddles, mossy stone, old metal, and flame. The RT look now removes synthetic grain and time-varying random bounce sampling, reduces cool sky/indirect influence, and places a real low-poly emissive held-torch mesh into a second TLAS instance. Its camera-local flame placement drives the direct-light sample and is visible to reflection rays; the old fullscreen torch overlay is gone. The renderer also compensates for the RGBA-storage-to-BGRA-swapchain raw copy, so the fire stays orange rather than cyan. This torch/reflection proof is visually verified on the RTX laptop; it must still be installed and re-tested on the target phone before being counted as a verified phone result.
+Phase 1C adds simple corridor/arch collision and a stronger procedural material table for dry stone, wet stone/puddles, mossy stone, old metal, and flame. The RT look removes synthetic grain and time-varying random bounce sampling, reduces cool sky/indirect influence, and places a real low-poly emissive held-torch mesh into a second TLAS instance. Its camera-local flame placement drives the direct-light sample and is visible to reflection rays; the old fullscreen torch overlay is gone. The renderer also compensates for the RGBA-storage-to-BGRA-swapchain raw copy, so the fire stays orange rather than cyan. The complete torch/reflection, collision, and material proof is now visually verified on both the RTX laptop and target phone.
 
 Asset staging update: a Meshy-6 PBR gothic sword has been generated for the future right hand. The staged GLB has 2K maps but also 49,439 triangles, so it is not runtime-integrated; it needs remesh/LOD plus a GLB/PBR import and right-hand attachment path before it can enter the Android RT scene.
 
-A separate Meshy skeleton is staged with its merged animation file. It has 11 correctly named clips and is a 9,402-triangle skinned prop, but it too remains outside the runtime until a narrow GLB animation/PBR import path is built. The sword is intentionally not attached to its hand.
+Character presentation update (2026-07-12): the camera now reads at approximately 1.53 m above the corridor floor, the skeleton renders unarmed at its authored 1.0 scale, and its coarse checker-like procedural colour variation has been replaced with a smooth bone tone. A lightweight player sword occupies the right side of the first-person view and shares the camera-held prop BLAS with the left-hand torch. The textured source sword has also been reduced to a verified 12,358-triangle LOD, but remains outside the runtime until static GLB/PBR upload is implemented.
+
+Animated-enemy performance update (2026-07-12): the Android loop no longer adds a fixed 16 ms sleep after presentation, animation uses real elapsed time, skeleton skinning/BLAS refit runs at 30 Hz, and unique source vertices are skinned once before RT expansion. The installable debug native library uses `-O2`. A sustained target-phone sample measured 16.667 ms median and 20.833 ms p95 over 126 intervals (60 FPS median), with CPU frame recording reduced to roughly 0.4-0.6 ms. See `docs/SKELETON_PERFORMANCE_2026-07-12.md`.
+
+Imported-material update (2026-07-12): five exact CC0 Poly Haven PBR sets now texture dry stone, wet cobblestone, mossy masonry, damp puddle edges, and aged metal through three five-layer Vulkan arrays. The runtime proof uses 512 x 512 derived layers while retaining the 1K JPG sources. Its phone regression test held 60 FPS median over 126 intervals. See `docs/PBR_MATERIAL_BATCH_2026-07-12.md` and `ASSET_LICENSES.md`.
+
+Lighting refinement (2026-07-12): held props are excluded from direct torch-shadow occlusion while remaining visible to primary/reflection rays, and the flame uses a small interleaved area sample instead of a perfect point. Room two has physical roof gaps; directional sun/moon light reaches surfaces only when a ray query passes through those gaps. An artificial volumetric-shaft experiment was removed. True participating-media dust is deferred until it can be implemented and measured honestly. See `docs/RT_LIGHTING_REFINEMENT_2026-07-12.md`.
+
+Android packaging now uses a Gradle-generated runtime-only asset set. Retained source textures and unused model sources stay in the repo but no longer enter the APK; the debug artifact fell from 93.9 MB to 46.8 MB. The live raw PBR arrays still need a capability-checked GPU-compressed replacement.
+
+A separate Meshy skeleton is live through a narrow animation import path. It has 11 correctly named clips and is a 9,402-triangle skinned prop; `Idle_5` is CPU-skinned and refit into a dynamic RT BLAS. The enemy is intentionally unarmed because the sword belongs to the player view.
 
 Verified desktop interactive run (2026-07-10): NVIDIA GeForce RTX 5050 Laptop GPU reported `RayTracingPipeline` and presented the RT corridor at 984 x 661. Controls are `WASD` to move, left mouse/trackpad click-drag to look, and `Esc` to exit.
 
@@ -138,17 +148,16 @@ Verified on-device run (2026-07-05, Samsung Galaxy S26 Ultra, model `SM-S948B`, 
 
 Phase 0 is complete enough to support Phase 1 scene work. Native Vulkan diagnostic surfaces on Windows and Android now present shared probe results, and Android has a real RT scene path.
 
-## Next milestone: close Phase 1C on device
+## Next milestone: one animated skeleton
 
 Next slice:
 
-- Build/install the latest collision/material source and confirm the RT swapchain success log on the Galaxy.
-- Check that movement respects corridor walls and the low arch posts without trapping the player.
-- Add a narrow GLB animation/PBR import path for the staged 9,402-triangle skeleton before using it as the first live enemy; keep the sword separate.
-- Remesh the staged 49k-triangle sword to a phone-safe budget before implementing GLB/PBR loading and right-hand attachment.
-- Bring in a small number of commercial-safe open-source PBR texture sets, then measure their mobile cost.
-- Preferred texture sources: Poly Haven and ambientCG, both checked per asset and recorded in `ASSET_LICENSES.md`.
-- Preserve the phone-safe ray-query path-tracing route unless a better RT route is proven on device.
+- Add a narrow GLB animation/PBR import path for the staged 9,402-triangle skeleton.
+- Display and animate exactly one unarmed skeleton on laptop and phone while keeping the sword in the player view.
+- Measure its mobile RT cost before adding another enemy, weapon attachment, combat, or environment texture scope.
+- Preserve the phone-safe ray-query path-tracing route and the verified Phase 1C baseline unless a stronger RT route is proven on-device.
+
+Phase 1C phone evidence, controls exercised, presentation timing, and screenshots are recorded in `docs/PHASE_1C_PHONE_VALIDATION_2026-07-11.md`.
 
 ## First milestone report fields
 
