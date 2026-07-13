@@ -1,6 +1,6 @@
 # Horde Lantern RT - Project Memory
 
-Last updated: 2026-07-11
+Last updated: 2026-07-13
 
 ## Project identity
 
@@ -43,7 +43,7 @@ Last updated: 2026-07-11
 - The PBR phone regression gate passed at 16.667 ms median and 20.833 ms p95 over 126 intervals (60 FPS median). Evidence and exact assets: `docs/PBR_MATERIAL_BATCH_2026-07-12.md` and `ASSET_LICENSES.md`.
 - The first PBR debug APK was 93,855,324 bytes. A filtered Gradle runtime-asset task now packages only the live skeleton and three 5,242,880-byte arrays, reducing the APK to 46,793,811 bytes. GPU compression remains the next asset-size task.
 - RT lighting refinement separates held props into TLAS mask `0x02` and world/enemy geometry into `0x01`, so direct torch visibility no longer lets the torch or player sword cast distracting self-shadows. The flame uses a deterministic interleaved two-point area sample without adding another shadow ray per pixel.
-- Room two now has four physical roof slabs and three real gaps. Directional sun/moon surface light is admitted only by ray-query visibility through those gaps. An experimental analytic shaft overlay was explicitly rejected and removed; no fake shafts ship. True participating-media dust is deferred until separately proven, likely desktop-first. See `docs/RT_LIGHTING_REFINEMENT_2026-07-12.md`.
+- The 2026-07-13 lighting repair seals zero-thickness room joins with an eight-triangle hidden outer shell and launches secondary rays from geometric normals with millimetre-scale bias, removing the cold exterior seams at floor/wall/ceiling joins. Room two now uses four physical roof slabs around one irregular breach; one aligned moon direction drives both the visible disc and the existing ray-query visibility test. Moon diffuse respects albedo, wet/metal surfaces receive a cheap view-dependent highlight, and the final pass uses filmic tone mapping plus linear-to-sRGB output. No fake shaft or additional visibility ray was added. See `docs/RT_LIGHTING_SEAM_FIX_2026-07-13.md`.
 
 ## Tested phone results
 
@@ -54,6 +54,7 @@ Last updated: 2026-07-11
 - User confirmed the scene loads, is performant on the phone, manual movement works, and the ray-query path-tracing look is promising.
 - Phase 1C closeout on 2026-07-11 rebuilt and installed commit `93e8818`, cold-launched successfully, and again logged `RT frame reached Android swapchain presentation.` at a `1440x2812` RT dispatch.
 - A 126-interval SurfaceFlinger sample measured 17.284 ms median, 17.908 ms p95, and approximately 57.9 FPS median. The in-app FPS field remains honestly `N/A` because engine timing instrumentation is not implemented.
+- The 2026-07-13 seam/moon repair compiled and presented successfully on Windows RTX, and the Android debug APK rebuilt successfully for all four configured ABIs. The phone was not connected for install/runtime validation; that gate remains open.
 - Scripted phone touch tests exercised full-turn yaw, both pitch limits, forward/back movement, corridor side limits, and repeated arch-area strafe/forward input without a crash, trap, or observed wall tunnelling.
 - The failed recursive experiment logged: `Failed to initialise presentable RT scene: Failed to create RT pipeline.`
 - Resolution: keep phone path at ray pipeline recursion depth 1 and use ray queries for path-tracing-like secondary visibility/bounce work.

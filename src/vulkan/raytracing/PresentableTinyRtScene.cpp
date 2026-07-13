@@ -1732,8 +1732,8 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     };
     std::vector<Vertex> vertices;
     std::vector<std::uint32_t> indices;
-    vertices.reserve(96u);
-    indices.reserve(160u);
+    vertices.reserve(128u);
+    indices.reserve(192u);
 
     const auto addQuad = [&vertices, &indices](const Vertex& a, const Vertex& b, const Vertex& c, const Vertex& d) {
         const std::uint32_t base = static_cast<std::uint32_t>(vertices.size());
@@ -1764,12 +1764,13 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     addQuad({{-1.84f, -0.32f, -0.82f}}, {{-1.84f, 0.24f, -0.62f}}, {{-1.84f, 0.42f, -1.12f}}, {{-1.84f, -0.12f, -1.34f}});
     addQuad({{1.84f, -0.44f, 0.24f}}, {{1.84f, -0.02f, 0.5f}}, {{1.84f, 0.28f, 0.1f}}, {{1.84f, -0.18f, -0.2f}});
     addQuad({{-0.52f, -0.94f, -0.86f}}, {{0.34f, -0.94f, -0.64f}}, {{0.64f, -0.94f, -1.18f}}, {{-0.38f, -0.94f, -1.42f}});
-    // Physical roof slabs in room two leave three narrow cracks. Direct-light
-    // and volumetric ray queries use these same openings.
-    addQuad({{-1.85f, 1.35f, -0.2f}}, {{-1.85f, 1.35f, -6.4f}}, {{-1.15f, 1.35f, -6.4f}}, {{-1.15f, 1.35f, -0.2f}});
-    addQuad({{-1.02f, 1.35f, -0.2f}}, {{-1.02f, 1.35f, -6.4f}}, {{-0.30f, 1.35f, -6.4f}}, {{-0.30f, 1.35f, -0.2f}});
-    addQuad({{-0.18f, 1.35f, -0.2f}}, {{-0.18f, 1.35f, -6.4f}}, {{0.55f, 1.35f, -6.4f}}, {{0.55f, 1.35f, -0.2f}});
-    addQuad({{0.68f, 1.35f, -0.2f}}, {{0.68f, 1.35f, -6.4f}}, {{1.85f, 1.35f, -6.4f}}, {{1.85f, 1.35f, -0.2f}});
+    // Four physical roof slabs surround one broken opening in room two. The
+    // moon query sees this real breach, producing one composed floor/wall patch
+    // instead of several ruler-straight stripes across the entire room.
+    addQuad({{-1.85f, 1.35f, -0.2f}}, {{-1.85f, 1.35f, -6.4f}}, {{-0.72f, 1.35f, -5.20f}}, {{-0.55f, 1.35f, -3.45f}});
+    addQuad({{0.32f, 1.35f, -3.55f}}, {{0.62f, 1.35f, -5.05f}}, {{1.85f, 1.35f, -6.4f}}, {{1.85f, 1.35f, -0.2f}});
+    addQuad({{-1.85f, 1.35f, -0.2f}}, {{-0.55f, 1.35f, -3.45f}}, {{0.32f, 1.35f, -3.55f}}, {{1.85f, 1.35f, -0.2f}});
+    addQuad({{-0.72f, 1.35f, -5.20f}}, {{-1.85f, 1.35f, -6.4f}}, {{1.85f, 1.35f, -6.4f}}, {{0.62f, 1.35f, -5.05f}});
     for (std::uint32_t i = 0u; i < 8u; ++i)
     {
         const float x = -1.05f + static_cast<float>(i % 4u) * 0.7f + (i >= 4u ? 0.18f : 0.0f);
@@ -1777,6 +1778,15 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         const float h = 0.58f + static_cast<float>(i % 3u) * 0.12f;
         addQuad({{x - 0.18f, -0.95f, z}}, {{x + 0.18f, -0.95f, z}}, {{x + 0.14f, -0.95f + h, z}}, {{x - 0.14f, -0.95f + h, z}});
     }
+
+    // A thin hidden shell behind the zero-thickness room planes catches rays
+    // that start near a join and skip the adjoining face because of ray tMin.
+    // It stops at the open entrance and leaves the three room-two roof gaps
+    // unobstructed. Appending it here preserves every existing material index.
+    addQuad({{-1.92f, -1.02f, 3.4f}}, {{-1.92f, -1.02f, -6.47f}}, {{-1.92f, 1.42f, -6.47f}}, {{-1.92f, 1.42f, 3.4f}});
+    addQuad({{1.92f, -1.02f, -6.47f}}, {{1.92f, -1.02f, 3.4f}}, {{1.92f, 1.42f, 3.4f}}, {{1.92f, 1.42f, -6.47f}});
+    addQuad({{-1.92f, -1.02f, 3.4f}}, {{1.92f, -1.02f, 3.4f}}, {{1.92f, -1.02f, -6.47f}}, {{-1.92f, -1.02f, -6.47f}});
+    addQuad({{-1.92f, -1.02f, -6.47f}}, {{1.92f, -1.02f, -6.47f}}, {{1.92f, 1.42f, -6.47f}}, {{-1.92f, 1.42f, -6.47f}});
 
     const std::uint32_t sceneIndexCount = static_cast<std::uint32_t>(indices.size());
 
