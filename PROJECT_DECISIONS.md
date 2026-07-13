@@ -119,13 +119,13 @@ Current proven path:
 - Native Vulkan swapchain path presents an RT-produced storage image to screen.
 - The scene uses BLAS/TLAS acceleration structures, an RT pipeline/SBT, `vkCmdTraceRaysKHR`, and a storage-image-to-swapchain copy.
 - Reports only set `rtScene.presented = true` after successful swapchain presentation.
-- The visible scene is now a first-person gothic corridor/ruin prototype with a handheld medieval torch, reflective objects, puddle/wet-stone response, horde silhouettes, fog, and second-room sunlight.
+- The visible scene is now a first-person gothic corridor/ruin prototype with a handheld medieval torch, reflective objects, puddle/wet-stone response, horde silhouettes, fog, and moonlight through a physical second-room roof breach.
 - The current source represents the held torch as a real emissive BLAS/TLAS instance rather than a screen overlay. Its laptop and target-phone visual proofs are complete.
 - The live laptop and phone proofs show the real orange flame and a deterministic ray-query reflection in a high-reflectivity wall insert. The raw RGBA-to-BGRA copy is explicitly compensated so the flame cannot turn cyan at presentation.
 - Controls are now left-drag movement/strafe and right-drag 360 look.
 - Windows now runs the same RT corridor as an interactive desktop scene: `WASD` moves, left mouse/trackpad click-drag looks, and `Esc` exits.
 - The RTX 5050 laptop reported `RayTracingPipeline` and successful RT swapchain presentation at 984 x 661 in the interactive Windows build.
-- A Meshy biped skeleton with 11 correctly named animations is staged as source art only. The sword remains separate; neither asset has a runtime GLB import or attachment path yet.
+- A Meshy biped skeleton with 11 correctly named animations is live through a narrow CPU-skinned RT path. The sword remains separate; the 12,358-triangle sword LOD stays staged until a measured static GLB/PBR upload path exists.
 
 Important technical finding:
 
@@ -133,12 +133,11 @@ Important technical finding:
 - The stable phone path uses `rayQueryEXT` from raygen to query the same TLAS for primary hits, shadow rays, and a first bounce sample while keeping pipeline recursion depth 1.
 - This keeps the project aligned with RT-or-nothing because ray queries use Vulkan hardware acceleration-structure traversal.
 
-## Next smallest task - first animated skeleton proof
+## Next smallest task - compressed mobile PBR arrays
 
-Phase 1C's gothic material, collision, and phone RT presentation proof closed on 2026-07-11. The next bounded task is:
+The first animated skeleton and imported environment PBR batches are live and phone-validated. The next bounded task is:
 
-1. Add a narrow GLB animation/PBR import path for the staged skeleton, keeping the sword separate.
-2. Instantiate and animate exactly one skeleton enemy, then measure its cost on the laptop and phone.
-3. Do not add another enemy, weapon attachment, combat, or environment texture scope until the one-enemy mobile RT cost is known.
-4. Record every imported asset in `ASSET_LICENSES.md` and resolve its Meshy account-plan license gate before release.
-5. Preserve the phone-safe ray-query path tracing route unless a stronger RT route is proven on device.
+1. Replace the three raw runtime PBR arrays with a capability-checked mobile GPU-compressed format.
+2. Re-run the cold 126-interval phone benchmark and preserve the 50+ FPS median gate.
+3. Keep the textured sword LOD out of the runtime until the static GLB/PBR path exists and is measured on phone.
+4. Preserve the phone-safe ray-query path tracing route unless a stronger RT route is proven on device.

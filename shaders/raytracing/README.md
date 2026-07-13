@@ -4,10 +4,10 @@
 - `minimal.rmiss` and `minimal.rchit` are active pipeline stages.
 - `MinimalRayGenShader.inc` is generated from `minimal.rgen` and embedded by `PresentableTinyRtScene.cpp`, so the Android scene remains self-contained.
 
-Regenerate the embedded raygen include after changing `minimal.rgen`:
+Regenerate the compiled shader and embedded include after changing `minimal.rgen`:
 
 ```powershell
-C:\VulkanSDK\1.4.350.0\Bin\glslangValidator.exe -V --target-env vulkan1.2 -Os -S rgen -o shaders\raytracing\minimal.rgen.spv shaders\raytracing\minimal.rgen
+.\tools\compile-raygen.ps1
 ```
 
-Then regenerate `MinimalRayGenShader.inc` from that SPIR-V binary before building. The `.spv` output is an ignored intermediate, while the generated include is the reviewed source artifact.
+The script compiles for Vulkan 1.2, deterministically rewrites `MinimalRayGenShader.inc`, and prints the SPIR-V size and SHA-256. The `.spv` output is an ignored intermediate, while the generated include is the reviewed source artifact.

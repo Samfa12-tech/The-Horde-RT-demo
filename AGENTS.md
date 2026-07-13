@@ -17,7 +17,7 @@ This repo is a native Vulkan hardware ray tracing game/tech-demo project. Keep w
 - Windows diagnostic path: `src/platform/windows/DiagnosticWindow.cpp`.
 - Shared presentable RT scene: `src/vulkan/raytracing/PresentableTinyRtScene.cpp`.
 - RT shaders: `shaders/raytracing/minimal.rgen`, `minimal.rmiss`, `minimal.rchit`.
-- Embedded SPIR-V arrays in `PresentableTinyRtScene.cpp` must be regenerated after shader edits.
+- Regenerate the embedded raygen SPIR-V after shader edits with `tools/compile-raygen.ps1`.
 - Current phone-safe path tracing is implemented with `rayQueryEXT` in the raygen shader, not recursive closest-hit tracing.
 
 ## Working rules
@@ -53,13 +53,12 @@ This repo is a native Vulkan hardware ray tracing game/tech-demo project. Keep w
 
 ## Next slice target
 
-- Phase 1C should focus on collision, reflections, and gothic PBR material proof.
-- Add simple corridor/room collision before expanding movement.
-- Add commercial-safe open-source PBR textures for dry stone, wet stone, moss, puddles/water, and old metal.
-- Record every imported texture or mesh in `ASSET_LICENSES.md`.
+- Replace the three raw PBR runtime arrays with a capability-checked mobile GPU-compressed format.
+- Re-run the cold 126-interval phone benchmark and preserve the 50+ FPS median gate.
+- Keep the textured sword LOD out of the runtime until the static GLB/PBR path exists and is measured on phone.
 
 ## Build notes
 
 - Android debug build from `android/`: `.\gradlew.bat assembleDebug installDebug --console=plain`.
 - Windows Vulkan SDK was installed at `C:\VulkanSDK\1.4.350.0` during development.
-- Shader compile command uses `C:\VulkanSDK\1.4.350.0\Bin\glslangValidator.exe`.
+- Shader generation from the repo root: `.\tools\compile-raygen.ps1`.

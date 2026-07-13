@@ -22,6 +22,7 @@
 #include <vulkan/vulkan_win32.h>
 
 #include "ui/DiagnosticOverlay.h"
+#include "gameplay/CorridorCollision.h"
 #include "vulkan/RtCapabilityReport.h"
 #include "vulkan/VulkanContext.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
@@ -37,22 +38,6 @@ constexpr char kJsonReportFilename[] = "vulkan_capability_report.json";
 constexpr int kEditControlId = 101;
 // One frame in flight keeps the dynamically refit held-torch TLAS safely synchronized with its host-written instance buffer.
 constexpr UINT kMaxFramesInFlight = 1u;
-constexpr float kPlayerCollisionRadius = 0.24f;
-
-struct CollisionRect
-{
-    float minX;
-    float maxX;
-    float minZ;
-    float maxZ;
-};
-
-// These volumes match the two low arch posts in PresentableTinyRtScene.
-constexpr CollisionRect kCorridorObstacles[] = {
-    {-1.20f, -0.78f, -3.48f, -3.32f},
-    {0.78f, 1.20f, -3.48f, -3.32f},
-};
-
 struct VulkanSurfaceContext
 {
     HWND windowHandle = nullptr;
@@ -109,10 +94,9 @@ std::string BuildDisplayText(const horde::vulkan::DeviceCapabilities& capabiliti
 
 std::string WindowSafeText(const std::string& value)
 {
-    std::string replaced = value;
     std::string out;
-    out.reserve(replaced.size());
-    for (const char c : replaced)
+    out.reserve(value.size());
+    for (const char c : value)
     {
         if (c == '\n')
         {
@@ -269,58 +253,6 @@ bool HasDeviceExtension(VkPhysicalDevice physicalDevice, const char* extensionNa
     return false;
 }
 
-void PushPlayerOutOfRect(float& x, float& z, const CollisionRect& rect)
-{
-    const float minX = rect.minX - kPlayerCollisionRadius;
-    const float maxX = rect.maxX + kPlayerCollisionRadius;
-    const float minZ = rect.minZ - kPlayerCollisionRadius;
-    const float maxZ = rect.maxZ + kPlayerCollisionRadius;
-    if (x <= minX || x >= maxX || z <= minZ || z >= maxZ)
-    {
-        return;
-    }
-
-    const float pushLeft = x - minX;
-    const float pushRight = maxX - x;
-    const float pushBack = z - minZ;
-    const float pushForward = maxZ - z;
-    const float smallestPush = std::min({pushLeft, pushRight, pushBack, pushForward});
-    if (smallestPush == pushLeft)
-    {
-        x = minX;
-    }
-    else if (smallestPush == pushRight)
-    {
-        x = maxX;
-    }
-    else if (smallestPush == pushBack)
-    {
-        z = minZ;
-    }
-    else
-    {
-        z = maxZ;
-    }
-}
-
-void ResolvePlayerCollision(float& x, float& z)
-{
-    // The entrance stays open, while the corridor walls and low arch posts block movement.
-    z = std::clamp(z, -4.75f, 4.90f);
-    if (z <= 3.20f)
-    {
-        x = std::clamp(x, -1.58f, 1.58f);
-        for (const CollisionRect& obstacle : kCorridorObstacles)
-        {
-            PushPlayerOutOfRect(x, z, obstacle);
-        }
-    }
-    else
-    {
-        x = std::clamp(x, -2.40f, 2.40f);
-    }
-}
-
 void ClearDesktopInput(VulkanSurfaceContext& context)
 {
     context.forwardHeld = false;
@@ -360,7 +292,7 @@ void UpdateDesktopSceneControls(VulkanSurfaceContext& context)
     constexpr float kMoveSpeed = 1.9f;
     context.cameraX += (forwardX * forwardAmount + rightX * strafeAmount) * kMoveSpeed * deltaSeconds;
     context.cameraZ += (forwardZ * forwardAmount + rightZ * strafeAmount) * kMoveSpeed * deltaSeconds;
-    ResolvePlayerCollision(context.cameraX, context.cameraZ);
+    horde::gameplay::ResolveCorridorPlayerCollision(context.cameraX, context.cameraZ);
 }
 
 bool SetDesktopMovementKey(VulkanSurfaceContext& context, const WPARAM key, const bool held)
@@ -698,7 +630,7 @@ bool CreateSwapchain(VulkanSurfaceContext& ctx, HWND hwnd)
         return false;
     }
 
-VkCommandBufferAllocateInfo commandBufferAllocateInfo{
+    VkCommandBufferAllocateInfo commandBufferAllocateInfo{
         VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
         nullptr,
         ctx.commandPool,
@@ -708,41 +640,6 @@ VkCommandBufferAllocateInfo commandBufferAllocateInfo{
     if (vkAllocateCommandBuffers(ctx.device, &commandBufferAllocateInfo, ctx.commandBuffers.data()) != VK_SUCCESS)
     {
         return false;
-    }
-
-    for (size_t index = 0u; index < ctx.commandBuffers.size(); ++index)
-    {
-        VkClearValue clearValue{};
-        clearValue.color.float32[0] = 0.0f;
-        clearValue.color.float32[1] = 0.0f;
-        clearValue.color.float32[2] = 0.0f;
-        clearValue.color.float32[3] = 1.0f;
-        const VkRenderPassBeginInfo renderPassBegin{
-            VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-            nullptr,
-            ctx.renderPass,
-            ctx.swapchainFramebuffers[index],
-            {{0, 0}, ctx.swapchainExtent},
-            1u,
-            &clearValue};
-
-        const VkCommandBufferBeginInfo commandBegin{
-            VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-            nullptr,
-            0u,
-            nullptr};
-
-        if (vkBeginCommandBuffer(ctx.commandBuffers[index], &commandBegin) != VK_SUCCESS)
-        {
-            return false;
-        }
-
-        vkCmdBeginRenderPass(ctx.commandBuffers[index], &renderPassBegin, VK_SUBPASS_CONTENTS_INLINE);
-        vkCmdEndRenderPass(ctx.commandBuffers[index]);
-        if (vkEndCommandBuffer(ctx.commandBuffers[index]) != VK_SUCCESS)
-        {
-            return false;
-        }
     }
 
     ctx.imageAvailableSemaphores.resize(kMaxFramesInFlight);
@@ -1108,7 +1005,6 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                                  const std::filesystem::path& jsonReportPath)
 {
     VulkanSurfaceContext context;
-    context.currentFrame = 0u;
     if (!CreateInstance(context.instance))
     {
         return 1;
@@ -1120,17 +1016,9 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         return 1;
     }
 
-    horde::vulkan::VulkanContext probe;
-    if (!probe.InitialiseForCapabilityProbe())
-    {
-        DestroyRenderContext(context);
-        return 1;
-    }
-
-    const horde::vulkan::DeviceCapabilities selectedCapabilities = probe.QueryDeviceCapabilities();
-    const uint32_t desiredVendorId = selectedCapabilities.identity.vendorId;
-    const uint32_t desiredDeviceId = selectedCapabilities.identity.deviceId;
-    const std::string desiredDeviceName = selectedCapabilities.identity.gpuName;
+    const uint32_t desiredVendorId = capabilities.identity.vendorId;
+    const uint32_t desiredDeviceId = capabilities.identity.deviceId;
+    const std::string& desiredDeviceName = capabilities.identity.gpuName;
 
     uint32_t physicalDeviceCount = 0u;
     if (vkEnumeratePhysicalDevices(context.instance, &physicalDeviceCount, nullptr) != VK_SUCCESS || physicalDeviceCount == 0u)
@@ -1160,33 +1048,10 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     {
         for (const VkPhysicalDevice candidate : physicalDevices)
         {
-            uint32_t queueFamilyCount = 0u;
-            vkGetPhysicalDeviceQueueFamilyProperties(candidate, &queueFamilyCount, nullptr);
-            if (queueFamilyCount == 0u)
+            uint32_t queueFamilyIndex = 0u;
+            if (FindGraphicsAndPresentQueueFamily(candidate, context.surface, queueFamilyIndex))
             {
-                continue;
-            }
-
-            std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
-            vkGetPhysicalDeviceQueueFamilyProperties(candidate, &queueFamilyCount, queueFamilies.data());
-            for (uint32_t index = 0u; index < queueFamilyCount; ++index)
-            {
-                if ((queueFamilies[index].queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0u)
-                {
-                    continue;
-                }
-
-                VkBool32 support = VK_FALSE;
-                vkGetPhysicalDeviceSurfaceSupportKHR(candidate, index, context.surface, &support);
-                if (support == VK_TRUE)
-                {
-                    context.physicalDevice = candidate;
-                    break;
-                }
-            }
-
-            if (context.physicalDevice != VK_NULL_HANDLE)
-            {
+                context.physicalDevice = candidate;
                 break;
             }
         }

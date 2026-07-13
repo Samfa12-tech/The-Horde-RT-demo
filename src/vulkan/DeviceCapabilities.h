@@ -48,7 +48,7 @@ struct PerformanceSnapshot
     float frameTimeMs = 0.0f;
 };
 
-struct TinyRtSceneSnapshot
+struct RtSceneSnapshot
 {
     std::string status = "Not attempted";
     std::string geometry = "Horde Lantern corridor with animated skeleton";
@@ -65,12 +65,10 @@ struct DeviceCapabilities
     ExtensionSupport extensions;
     FeatureSupport features;
     PerformanceSnapshot performance;
-    TinyRtSceneSnapshot rtScene;
+    RtSceneSnapshot rtScene;
     std::vector<std::string> diagnostics;
 };
 
 std::string ToString(RtMode mode);
-bool HasEssentialAccelerationStructureSupport(const DeviceCapabilities& capabilities);
-bool HasPreferredPipelineSupport(const DeviceCapabilities& capabilities);
 
 } // namespace horde::vulkan

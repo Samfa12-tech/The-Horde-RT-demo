@@ -21,6 +21,7 @@
 #include <vulkan/vulkan_android.h>
 
 #include "ui/DiagnosticOverlay.h"
+#include "gameplay/CorridorCollision.h"
 #include "vulkan/RtCapabilityReport.h"
 #include "vulkan/VulkanContext.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
@@ -34,22 +35,6 @@ constexpr const char* kTextReportFilename = "vulkan_capability_report.txt";
 constexpr const char* kJsonReportFilename = "vulkan_capability_report.json";
 // One frame in flight keeps the dynamically refit held-torch TLAS safely synchronized with its host-written instance buffer.
 constexpr uint32_t kMaxFramesInFlight = 1u;
-constexpr float kPlayerCollisionRadius = 0.24f;
-
-struct CollisionRect
-{
-    float minX;
-    float maxX;
-    float minZ;
-    float maxZ;
-};
-
-// These volumes match the two low arch posts in PresentableTinyRtScene.
-constexpr CollisionRect kCorridorObstacles[] = {
-    {-1.20f, -0.78f, -3.48f, -3.32f},
-    {0.78f, 1.20f, -3.48f, -3.32f},
-};
-
 struct SwapchainContext
 {
     ANativeWindow* window = nullptr;
@@ -76,10 +61,9 @@ struct SwapchainContext
     std::vector<VkFramebuffer> swapchainFramebuffers;
     VkCommandPool commandPool = VK_NULL_HANDLE;
     std::vector<VkCommandBuffer> commandBuffers;
-    // Keep two slots allocated until the legacy cleanup path is simplified; only slot zero is active.
-    VkSemaphore imageAvailableSemaphores[2u] = {};
-    VkSemaphore renderFinishedSemaphores[2u] = {};
-    VkFence inFlightFences[2u] = {};
+    VkSemaphore imageAvailableSemaphores[kMaxFramesInFlight] = {};
+    VkSemaphore renderFinishedSemaphores[kMaxFramesInFlight] = {};
+    VkFence inFlightFences[kMaxFramesInFlight] = {};
     VkClearColorValue clearColor = {{0.12f, 0.04f, 0.18f, 1.0f}};
     horde::vulkan::DeviceCapabilities capabilities;
     horde::vulkan::raytracing::PresentableTinyRtScene rtScene;
@@ -245,58 +229,6 @@ bool HasDeviceExtension(VkPhysicalDevice physicalDevice, const char* extensionNa
         }
     }
     return false;
-}
-
-void PushPlayerOutOfRect(float& x, float& z, const CollisionRect& rect)
-{
-    const float minX = rect.minX - kPlayerCollisionRadius;
-    const float maxX = rect.maxX + kPlayerCollisionRadius;
-    const float minZ = rect.minZ - kPlayerCollisionRadius;
-    const float maxZ = rect.maxZ + kPlayerCollisionRadius;
-    if (x <= minX || x >= maxX || z <= minZ || z >= maxZ)
-    {
-        return;
-    }
-
-    const float pushLeft = x - minX;
-    const float pushRight = maxX - x;
-    const float pushBack = z - minZ;
-    const float pushForward = maxZ - z;
-    const float smallestPush = std::min({pushLeft, pushRight, pushBack, pushForward});
-    if (smallestPush == pushLeft)
-    {
-        x = minX;
-    }
-    else if (smallestPush == pushRight)
-    {
-        x = maxX;
-    }
-    else if (smallestPush == pushBack)
-    {
-        z = minZ;
-    }
-    else
-    {
-        z = maxZ;
-    }
-}
-
-void ResolvePlayerCollision(float& x, float& z)
-{
-    // The entrance remains open, but movement inside the corridor respects the stone walls.
-    z = std::clamp(z, -4.75f, 4.90f);
-    if (z <= 3.20f)
-    {
-        x = std::clamp(x, -1.58f, 1.58f);
-        for (const CollisionRect& obstacle : kCorridorObstacles)
-        {
-            PushPlayerOutOfRect(x, z, obstacle);
-        }
-    }
-    else
-    {
-        x = std::clamp(x, -2.40f, 2.40f);
-    }
 }
 
 bool CreateLogicalDevice(VkPhysicalDevice physicalDevice,
@@ -609,12 +541,6 @@ bool CreateSwapchain(SwapchainContext& context)
         return false;
     }
 
-    context.imageAvailableSemaphores[0u] = VK_NULL_HANDLE;
-    context.imageAvailableSemaphores[1u] = VK_NULL_HANDLE;
-    context.renderFinishedSemaphores[0u] = VK_NULL_HANDLE;
-    context.renderFinishedSemaphores[1u] = VK_NULL_HANDLE;
-    context.inFlightFences[0u] = VK_NULL_HANDLE;
-    context.inFlightFences[1u] = VK_NULL_HANDLE;
     VkSemaphoreCreateInfo semaphoreCreateInfo{VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO};
     VkFenceCreateInfo fenceCreateInfo{VK_STRUCTURE_TYPE_FENCE_CREATE_INFO, nullptr, VK_FENCE_CREATE_SIGNALED_BIT};
     for (uint32_t i = 0u; i < kMaxFramesInFlight; ++i)
@@ -726,35 +652,29 @@ void ReleaseSwapchainResources(SwapchainContext& context)
         context.swapchain = VK_NULL_HANDLE;
     }
 
-    if (context.inFlightFences[0] != VK_NULL_HANDLE)
+    for (VkFence& fence : context.inFlightFences)
     {
-        vkDestroyFence(context.device, context.inFlightFences[0], nullptr);
-        context.inFlightFences[0] = VK_NULL_HANDLE;
+        if (fence != VK_NULL_HANDLE)
+        {
+            vkDestroyFence(context.device, fence, nullptr);
+            fence = VK_NULL_HANDLE;
+        }
     }
-    if (context.inFlightFences[1] != VK_NULL_HANDLE)
+    for (VkSemaphore& semaphore : context.imageAvailableSemaphores)
     {
-        vkDestroyFence(context.device, context.inFlightFences[1], nullptr);
-        context.inFlightFences[1] = VK_NULL_HANDLE;
+        if (semaphore != VK_NULL_HANDLE)
+        {
+            vkDestroySemaphore(context.device, semaphore, nullptr);
+            semaphore = VK_NULL_HANDLE;
+        }
     }
-    if (context.imageAvailableSemaphores[0] != VK_NULL_HANDLE)
+    for (VkSemaphore& semaphore : context.renderFinishedSemaphores)
     {
-        vkDestroySemaphore(context.device, context.imageAvailableSemaphores[0], nullptr);
-        context.imageAvailableSemaphores[0] = VK_NULL_HANDLE;
-    }
-    if (context.imageAvailableSemaphores[1] != VK_NULL_HANDLE)
-    {
-        vkDestroySemaphore(context.device, context.imageAvailableSemaphores[1], nullptr);
-        context.imageAvailableSemaphores[1] = VK_NULL_HANDLE;
-    }
-    if (context.renderFinishedSemaphores[0] != VK_NULL_HANDLE)
-    {
-        vkDestroySemaphore(context.device, context.renderFinishedSemaphores[0], nullptr);
-        context.renderFinishedSemaphores[0] = VK_NULL_HANDLE;
-    }
-    if (context.renderFinishedSemaphores[1] != VK_NULL_HANDLE)
-    {
-        vkDestroySemaphore(context.device, context.renderFinishedSemaphores[1], nullptr);
-        context.renderFinishedSemaphores[1] = VK_NULL_HANDLE;
+        if (semaphore != VK_NULL_HANDLE)
+        {
+            vkDestroySemaphore(context.device, semaphore, nullptr);
+            semaphore = VK_NULL_HANDLE;
+        }
     }
 
     context.swapchainImageLayouts.clear();
@@ -951,7 +871,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             const float speed = 0.032f;
             context.cameraX += (forwardX * context.moveForward + rightX * context.moveStrafe) * speed;
             context.cameraZ += (forwardZ * context.moveForward + rightZ * context.moveStrafe) * speed;
-            ResolvePlayerCollision(context.cameraX, context.cameraZ);
+            horde::gameplay::ResolveCorridorPlayerCollision(context.cameraX, context.cameraZ);
         }
         std::string diagnostic;
         if (!context.rtScene.RecordTraceAndCopy(context.commandBuffers[imageIndex],

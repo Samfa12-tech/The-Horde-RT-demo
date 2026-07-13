@@ -25,7 +25,7 @@ Current tested phone build includes:
 - Visible handheld medieval flame torch on the left side of the player view.
 - Left-side touch movement/strafe and right-side 360 look.
 - Ray-query path-tracing style shading: primary TLAS queries, shadow queries, and a first bounce sample.
-- Reflective objects, wet-floor/puddle response, fog, horde silhouettes, and second-room sunlight.
+- Reflective objects, wet-floor/puddle response, fog, horde silhouettes, and second-room moonlight through a physical roof breach.
 - Diagnostics hidden behind the HUD tap instead of being the primary screen.
 
 Phase 1C adds simple corridor/arch collision and a stronger procedural material table for dry stone, wet stone/puddles, mossy stone, old metal, and flame. The RT look removes synthetic grain and time-varying random bounce sampling, reduces cool sky/indirect influence, and places a real low-poly emissive held-torch mesh into a second TLAS instance. Its camera-local flame placement drives the direct-light sample and is visible to reflection rays; the old fullscreen torch overlay is gone. The renderer also compensates for the RGBA-storage-to-BGRA-swapchain raw copy, so the fire stays orange rather than cyan. The complete torch/reflection, collision, and material proof is now visually verified on both the RTX laptop and target phone.
@@ -148,14 +148,14 @@ Verified on-device run (2026-07-05, Samsung Galaxy S26 Ultra, model `SM-S948B`, 
 
 Phase 0 is complete enough to support Phase 1 scene work. Native Vulkan diagnostic surfaces on Windows and Android now present shared probe results, and Android has a real RT scene path.
 
-## Next milestone: one animated skeleton
+## Next milestone: compressed mobile PBR assets
 
 Next slice:
 
-- Add a narrow GLB animation/PBR import path for the staged 9,402-triangle skeleton.
-- Display and animate exactly one unarmed skeleton on laptop and phone while keeping the sword in the player view.
-- Measure its mobile RT cost before adding another enemy, weapon attachment, combat, or environment texture scope.
-- Preserve the phone-safe ray-query path-tracing route and the verified Phase 1C baseline unless a stronger RT route is proven on-device.
+- Replace the three raw 512 x 512 x 5-layer PBR arrays with a capability-checked mobile GPU-compressed format.
+- Re-run the cold 126-interval phone benchmark and preserve the 50+ FPS median gate.
+- Keep the textured sword LOD out of the runtime until the static GLB/PBR path exists and is measured on phone.
+- Preserve the phone-safe ray-query path-tracing route unless a stronger RT route is proven on-device.
 
 Phase 1C phone evidence, controls exercised, presentation timing, and screenshots are recorded in `docs/PHASE_1C_PHONE_VALIDATION_2026-07-11.md`.
 

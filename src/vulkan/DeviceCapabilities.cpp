@@ -17,20 +17,4 @@ std::string ToString(const RtMode mode)
     }
 }
 
-bool HasEssentialAccelerationStructureSupport(const DeviceCapabilities& capabilities)
-{
-    return capabilities.extensions.accelerationStructure &&
-           capabilities.extensions.bufferDeviceAddress &&
-           capabilities.features.accelerationStructure &&
-           capabilities.features.bufferDeviceAddress;
-}
-
-bool HasPreferredPipelineSupport(const DeviceCapabilities& capabilities)
-{
-    return HasEssentialAccelerationStructureSupport(capabilities) &&
-           capabilities.extensions.rayTracingPipeline &&
-           capabilities.extensions.deferredHostOperations &&
-           capabilities.features.rayTracingPipeline;
-}
-
 } // namespace horde::vulkan

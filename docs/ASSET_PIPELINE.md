@@ -1,6 +1,6 @@
 # Asset Pipeline
 
-Phase 0 imports no large assets. The asset pipeline is documented now so later work does not accidentally pollute the repo with unsafe or unfinished content.
+The runtime currently uses one animated skeleton and five CC0 Poly Haven material sets. Keep future imports bounded, licensed, and measured so the Android RT path does not accumulate unsafe or unfinished content.
 
 ## Asset rules
 

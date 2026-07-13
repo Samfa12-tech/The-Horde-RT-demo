@@ -1,5 +1,5 @@
 # Scene
 
-Scene code is intentionally empty during the scaffold step.
+Scene code currently loads the merged-animation skeleton GLB, evaluates `Idle_5`, skins unique vertices on CPU, and supplies the dynamic RT vertex stream.
 
-Do not add the torch-lit room, goblins, courtyard, horde logic, or Meshy assets until Phase 0 capability probing is real.
+Keep import paths narrow and measured on Android before adding more models, clips, or general-purpose asset machinery.

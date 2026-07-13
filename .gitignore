@@ -10,3 +10,9 @@ temp_vulkan_samples/
 shaders/raytracing/*.spv
 **/*.user
 *.vcxproj.user
+.idea/
+.vscode/
+CMakeUserPresets.json
+android/local.properties
+*.apk
+*.aab

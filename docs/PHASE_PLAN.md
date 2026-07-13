@@ -10,7 +10,7 @@
 
 - The renderer builds BLAS/TLAS, an RT pipeline and SBT, dispatches `vkCmdTraceRaysKHR`, writes a storage image, and copies it to the swapchain.
 - The stable phone path retains ray-pipeline recursion depth 1 and performs primary/shadow/first-bounce work through `rayQueryEXT` in raygen.
-- The playable visual proof is a first-person gothic corridor with torch light, wet floor response, fog, silhouettes, and a second-room sun shaft.
+- The playable visual proof is a first-person gothic corridor with torch light, wet floor response, fog, silhouettes, and moonlight through a physical roof breach.
 
 ## Phase 1C - collision and gothic material proof: complete
 
@@ -33,7 +33,7 @@
 3. Full-turn yaw, pitch limits, corridor boundaries, and repeated arch-area movement were exercised with Android touch events without a crash, trap, or observed tunnelling.
 4. A 126-interval SurfaceFlinger sample measured 17.284 ms median and 17.908 ms p95 at the `1440x2812` RT surface. See `docs/PHASE_1C_PHONE_VALIDATION_2026-07-11.md`.
 
-## Current slice - first animated skeleton proof
+## Animated skeleton proof - complete
 
 1. Keep the narrow skeleton GLB animation loader bounded to exactly one unarmed animated enemy on laptop and phone.
 2. Measure the 9,402-triangle skeleton's mobile RT cost before adding another enemy or gameplay behavior.
@@ -49,7 +49,7 @@
 6. The corrected player-sword build sampled 25.000 ms median and 37.500 ms p95 over 45 SurfaceFlinger intervals (approximately 40 FPS). This is a short sanity sample; treat animated skinning/BLAS refit performance as the immediate technical constraint until a longer profile confirms it.
 7. Phone composition evidence: `docs/validation/player_sword_phone_2026-07-12.png`.
 
-## Next slice - first imported PBR texture batch
+## Imported PBR texture batch
 
 The one-enemy performance gate closed on 2026-07-12 at 16.667 ms median and 20.833 ms p95 over 126 phone intervals. See `docs/SKELETON_PERFORMANCE_2026-07-12.md`.
 

@@ -1,70 +1,33 @@
-# Android Platform Path
+# Android Vulkan RT App
 
-Phase 0B now runs the Vulkan capability probe from a minimal Android Studio app shell.
+The `android/` module is the supported phone path for Horde Lantern RT. It owns the Java activity and lifecycle/JNI bridge while compiling the shared renderer and scene sources from `src/`.
 
-## Current status
+## Current implementation
 
-- Android Studio module exists at `android/`.
-- Native JNI bridge is added at `android/app/src/main/cpp/android_probe_bridge.cpp`.
-- Java entrypoint displays plain-text diagnostics in a single `TextView` (`MainActivity`).
-- Probe reports are written to app private storage:
-  - `files/reports/vulkan_capability_report.txt`
-  - `files/reports/vulkan_capability_report.json`
-- No renderer, surface swapchain, or gameplay is implemented in this phase.
+- Java entrypoint: `app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java`
+- JNI/Vulkan bridge: `app/src/main/cpp/android_probe_bridge.cpp`
+- Shared native source manifest: `../cmake/HordeRtSources.cmake`
+- Native Vulkan RT presentation through the Android swapchain
+- One frame in flight while the held-prop TLAS uses a host-written instance buffer
+- Touch movement/look, corridor collision, animated skeleton BLAS refit, PBR texture arrays, and phone-safe ray-query shading inside `vkCmdTraceRaysKHR`
+- Unsupported devices retain explicit diagnostics instead of a fake rendering fallback
 
-## Android module files
-
-- `android/build.gradle`
-- `android/settings.gradle`
-- `android/app/build.gradle`
-- `android/app/src/main/AndroidManifest.xml`
-- `android/app/src/main/cpp/CMakeLists.txt`
-- `android/app/src/main/cpp/android_probe_bridge.cpp`
-- `android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java`
-- `android/app/src/main/java/com/samfa12/hordelanternrt/ProbeBridge.java`
-
-## Build & run (Phase 0B)
+## Build, install, and launch
 
 ```powershell
 cd android
-./gradlew.bat assembleDebug
+.\gradlew.bat assembleDebug installDebug --console=plain
+adb shell am start -n com.samfa12.hordelanternrt/.MainActivity
 ```
 
-If using a Unix-style shell:
+Expected RT success log:
 
-```bash
-cd android
-./gradlew assembleDebug
+```powershell
+adb logcat -d -s HordeRtProbeBridge AndroidRuntime
 ```
 
-Then install and run on the Galaxy S26 Ultra as usual from Android Studio or `adb install`.
+Look for `RT frame reached Android swapchain presentation.`
 
-## Retrieve reports
+Reports are stored under `files/reports/` in app-private storage and can be retrieved with `adb shell run-as com.samfa12.hordelanternrt`.
 
-From a connected device/shell:
-
-```bash
-adb shell run-as com.samfa12.hordelanternrt ls files/reports
-adb shell run-as com.samfa12.hordelanternrt cat files/reports/vulkan_capability_report.txt
-adb shell run-as com.samfa12.hordelanternrt cat files/reports/vulkan_capability_report.json
-```
-
-The app also renders the on-screen text report with:
-
-- `Backend`
-- `RT mode`
-- GPU/device IDs
-- driver/API versions
-- required extension/feature presence
-- unsupported diagnostics (when present)
-- storage confirmation
-
-## Known limitations
-
-- On-screen output is plain text only.
-- No Vulkan surface/rendering path is added yet.
-- This is a capability probe shell only.
-
-## Next smallest task
-
-Create a minimal native Vulkan surface path on Android and Windows so the same diagnostics text is presented through a proper in-app overlay without any fake rendering path.
+The current primary test device is Samsung `SM-S948B`. Re-run the 126-interval phone performance gate after renderer, animation, or material-path changes.

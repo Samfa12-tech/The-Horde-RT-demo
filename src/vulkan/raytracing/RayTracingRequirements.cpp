@@ -3,14 +3,19 @@
 namespace horde::vulkan::raytracing
 {
 
-bool SupportsRayTracingPipeline(const ExtensionSupport& extensions, const FeatureSupport& features)
+namespace
+{
+
+bool SupportsPresentableRayTracingPath(const ExtensionSupport& extensions, const FeatureSupport& features)
 {
     return extensions.accelerationStructure &&
            extensions.rayTracingPipeline &&
+           extensions.rayQuery &&
            extensions.bufferDeviceAddress &&
            extensions.deferredHostOperations &&
            features.accelerationStructure &&
            features.rayTracingPipeline &&
+           features.rayQuery &&
            features.bufferDeviceAddress;
 }
 
@@ -24,9 +29,11 @@ bool SupportsRayQuery(const ExtensionSupport& extensions, const FeatureSupport& 
            features.bufferDeviceAddress;
 }
 
+} // namespace
+
 RtMode EvaluateRtMode(const ExtensionSupport& extensions, const FeatureSupport& features)
 {
-    if (SupportsRayTracingPipeline(extensions, features))
+    if (SupportsPresentableRayTracingPath(extensions, features))
     {
         return RtMode::RayTracingPipeline;
     }

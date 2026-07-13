@@ -2,24 +2,22 @@ cmake_minimum_required(VERSION 3.22.1)
 
 project(horde_rt_probe_android)
 
+get_filename_component(HORDE_RT_REPO_ROOT "${CMAKE_CURRENT_LIST_DIR}/../../../../.." ABSOLUTE)
+include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtSources.cmake")
+set(HORDE_RT_ANDROID_CORE_SOURCES)
+foreach(source IN LISTS HORDE_RT_CORE_RELATIVE_SOURCES)
+    list(APPEND HORDE_RT_ANDROID_CORE_SOURCES "${HORDE_RT_REPO_ROOT}/src/${source}")
+endforeach()
+
 add_library(horde_rt_probe_android
     SHARED
     android_probe_bridge.cpp
-    ../../../../../src/ui/DiagnosticOverlay.cpp
-    ../../../../../src/vulkan/DeviceCapabilities.cpp
-    ../../../../../src/vulkan/RtCapabilityReport.cpp
-    ../../../../../src/vulkan/VulkanContext.cpp
-    ../../../../../src/vulkan/raytracing/RayTracingRequirements.cpp
-    ../../../../../src/vulkan/raytracing/AccelerationStructures.cpp
-    ../../../../../src/vulkan/raytracing/RayTracingPipeline.cpp
-    ../../../../../src/vulkan/raytracing/ShaderBindingTable.cpp
-    ../../../../../src/vulkan/raytracing/TinyRtScene.cpp
-    ../../../../../src/vulkan/raytracing/PresentableTinyRtScene.cpp
-    ../../../../../src/scene/SkeletonBipedModel.cpp
+    "${HORDE_RT_REPO_ROOT}/src/ui/DiagnosticOverlay.cpp"
+    ${HORDE_RT_ANDROID_CORE_SOURCES}
 )
 
 target_include_directories(horde_rt_probe_android PRIVATE
-    ../../../../../src
+    "${HORDE_RT_REPO_ROOT}/src"
 )
 
 target_compile_features(horde_rt_probe_android PRIVATE cxx_std_20)

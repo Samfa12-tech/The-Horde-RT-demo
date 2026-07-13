@@ -1,5 +1,5 @@
 # Gameplay
 
-Gameplay is intentionally deferred.
+The current gameplay layer contains the shared corridor/arch collision helper used by Android and Windows.
 
-The project will eventually include simple movement, attack, block, and possibly dodge, but gameplay must not start until native Vulkan RT capability detection and reporting are working.
+Combat, attacks, block, dodge, and enemy AI remain deferred until the visual RT scene and phone asset path are stable.

@@ -24,7 +24,7 @@ Last updated: 2026-07-13
 - The Android path creates a Vulkan swapchain surface and presents frames from the native renderer.
 - The current render path builds BLAS/TLAS, creates an RT pipeline and SBT, dispatches `vkCmdTraceRaysKHR`, renders into a storage image, and copies to the swapchain image.
 - Reports set `rtScene.presented = true` only after an RT-produced frame reaches successful swapchain presentation.
-- The current phone scene is a small first-person gothic corridor/ruin scene with authored triangle geometry, torch panels, reflective objects, horde silhouettes, fog, wet-floor response, a visible handheld medieval flame torch, and second-room sunlight.
+- The current phone scene is a small first-person gothic corridor/ruin scene with authored triangle geometry, torch panels, reflective objects, horde silhouettes, fog, wet-floor response, a visible handheld medieval flame torch, and moonlight through a physical roof breach.
 - Controls are mobile FPS style: left side drag walks/strafs, right side drag gives 360 camera look. Pitch remains clamped to avoid flipping.
 - The path-tracing experiment now uses `rayQueryEXT` in the raygen shader for primary hits, shadow rays, and one first-bounce sample against the same TLAS/BVH-style acceleration structure.
 - A recursive closest-hit path-tracing attempt with `maxPipelineRayRecursionDepth = 2` compiled but failed on phone at pipeline creation, so the phone-safe path is ray-query path tracing inside raygen with recursion depth 1.
@@ -44,6 +44,7 @@ Last updated: 2026-07-13
 - The first PBR debug APK was 93,855,324 bytes. A filtered Gradle runtime-asset task now packages only the live skeleton and three 5,242,880-byte arrays, reducing the APK to 46,793,811 bytes. GPU compression remains the next asset-size task.
 - RT lighting refinement separates held props into TLAS mask `0x02` and world/enemy geometry into `0x01`, so direct torch visibility no longer lets the torch or player sword cast distracting self-shadows. The flame uses a deterministic interleaved two-point area sample without adding another shadow ray per pixel.
 - The 2026-07-13 lighting repair seals zero-thickness room joins with an eight-triangle hidden outer shell and launches secondary rays from geometric normals with millimetre-scale bias, removing the cold exterior seams at floor/wall/ceiling joins. Room two now uses four physical roof slabs around one irregular breach; one aligned moon direction drives both the visible disc and the existing ray-query visibility test. Moon diffuse respects albedo, wet/metal surfaces receive a cheap view-dependent highlight, and the final pass uses filmic tone mapping plus linear-to-sRGB output. No fake shaft or additional visibility ray was added. See `docs/RT_LIGHTING_SEAM_FIX_2026-07-13.md`.
+- The 2026-07-13 codebase audit removed the disabled legacy raygen blob, abandoned NativeActivity/scaffold paths, and the misleading empty-command-buffer Tiny RT bootstrap. Android and Windows now share one collision helper and one native source manifest; the RT mode predicate requires the ray-query feature used by the actual renderer. The standalone probe leaves `rtScene` as `Not attempted` until a real platform swapchain presents it. Windows probe/window and Android all-ABI builds pass. See `docs/CODEBASE_AUDIT_2026-07-13.md`.
 
 ## Tested phone results
 
@@ -77,9 +78,9 @@ Last updated: 2026-07-13
 
 - This is not yet a full playable game loop.
 - Android has basic manual movement, 360 look, corridor bounds, and arch-post collision, but not a full physics/collision system.
-- There is no enemy AI, attacks, block, dodge, animation, audio, or asset pipeline integration yet.
+- There is no enemy AI, attacks, block, dodge, combat loop, or audio yet. Animation is currently limited to the narrow skeleton path.
 - Current environment and held-prop geometry is hand-authored simple triangles/quads. A procedural player sword is visible in the right hand; the Meshy sword now has a 12,358-triangle LOD but still needs static GLB/PBR import before it can replace the proof.
-- Current materials are procedural/stylized placeholders. They prove mood, shadows, reflections, and bounce direction, but are not final PBR textures.
+- Five CC0 PBR material sets are live through raw texture arrays; those arrays still need a capability-checked GPU-compressed replacement.
 - The held torch uses a host-written TLAS transform, so Android and Windows intentionally run one frame in flight until the renderer has per-frame TLAS/instance-buffer ownership.
 
 ## Completed Phase 1B / early Phase 1C work
@@ -89,7 +90,7 @@ Last updated: 2026-07-13
 3. Android build installed and run on phone with RT frame reaching swapchain presentation.
 4. Visible handheld medieval torch added.
 5. Manual mobile controls added: left drag movement, right drag 360 look.
-6. Reflective objects, puddle response, second-room sun shaft, and shadow/bounce ray-query work added.
+6. Reflective objects, puddle response, physical roof-breach moonlight, and shadow/bounce ray-query work added.
 7. Recursive path-tracing attempt tested and rejected by phone pipeline creation; ray-query path became the stable route.
 8. Phase 1C adds left-hand torch placement, basic corridor/arch collision, and stronger procedural gothic materials/reflections; target-phone validation passed on 2026-07-11.
 9. Generated and staged a Meshy-6 PBR right-hand sword. It has 2K PBR maps but needs explicit remesh approval because the delivered 49,439 triangles are too costly for the Android RT target.
@@ -97,14 +98,12 @@ Last updated: 2026-07-13
 11. Staged the merged-animation skeleton, verified its 11 clip names, and kept the sword separate.
 12. Replaced the fake held-torch overlay/light relationship with a two-BLAS RT scene: static corridor plus a camera-following emissive torch mesh in the TLAS.
 
-## Next-step sequence: first animated skeleton proof
+## Next-step sequence
 
-1. Add the smallest reusable PBR image upload/sampler/material path for albedo, normal, roughness, metallic, and AO.
-2. Import a deliberately small CC0 Poly Haven environment batch: dry stone, wet stone, moss, puddle/water, and aged metal, initially capped at 1K on Android. Record every exact asset in `ASSET_LICENSES.md` before import.
-3. Re-run the 126-interval phone benchmark after each material step; preserve a 50+ FPS median gate and investigate any regression before expanding scope.
-4. Replace the procedural player-right-hand sword proof with the 12,358-triangle LOD only after static GLB/PBR upload exists and its phone cost is measured. Keep enemies unarmed unless a later design explicitly calls for weapons. Never put the 49k source mesh into Android RT.
-5. Treat FreePBR as non-commercial unless its commercial-rights package is purchased and recorded; do not import its free downloads into a potentially commercial build.
-6. Strengthen gothic castle feeling with moss patches, wet edges, old stone blocks, ruin silhouettes, and a stronger second-room composition.
+1. Replace the three raw PBR arrays with a capability-checked mobile GPU-compressed format.
+2. Re-run the 126-interval cold phone benchmark and preserve the 50+ FPS median gate.
+3. Replace the procedural player-right-hand sword proof only after static GLB/PBR upload exists and the 12,358-triangle LOD is measured on phone. Never put the 49k source mesh into Android RT.
+4. Keep enemies unarmed unless a later design explicitly calls for weapons.
 
 ## Validation breadcrumbs
 

@@ -1,16 +1,14 @@
 # Source Layout
 
-The `src` tree is intentionally small and honest at this stage. It is a Phase 0 scaffold, not a working renderer.
+The `src` tree contains the shared Vulkan RT renderer, scene import code, platform shells, collision helper, and diagnostic UI.
 
 ```text
-src/app/                  High-level app flow.
-src/platform/android/     Android native Vulkan notes and future glue.
-src/platform/windows/     Windows native Vulkan notes and future Win32 entry.
+src/platform/windows/     Interactive Win32 Vulkan RT entry and presentation.
 src/vulkan/               Vulkan capability data, context, and reports.
-src/vulkan/raytracing/    RT requirement evaluation.
+src/vulkan/raytracing/    Presentable RT scene and requirement evaluation.
 src/ui/                   Diagnostic overlay text/data model.
-src/scene/                Future scene code.
-src/gameplay/             Future gameplay code.
+src/scene/                Skeleton GLB animation loading and CPU skinning.
+src/gameplay/             Shared phone/Windows corridor collision.
 ```
 
-No gameplay should be added until the real Vulkan RT capability probe is complete.
+The Android entry and lifecycle code live in `android/app`; renderer and scene code remain shared under `src`.
