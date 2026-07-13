@@ -45,6 +45,7 @@ Last updated: 2026-07-13
 - RT lighting refinement separates held props into TLAS mask `0x02` and world/enemy geometry into `0x01`, so direct torch visibility no longer lets the torch or player sword cast distracting self-shadows. The flame uses a deterministic interleaved two-point area sample without adding another shadow ray per pixel.
 - The 2026-07-13 lighting repair seals zero-thickness room joins with an eight-triangle hidden outer shell and launches secondary rays from geometric normals with millimetre-scale bias, removing the cold exterior seams at floor/wall/ceiling joins. Room two now uses four physical roof slabs around one irregular breach; one aligned moon direction drives both the visible disc and the existing ray-query visibility test. Moon diffuse respects albedo, wet/metal surfaces receive a cheap view-dependent highlight, and the final pass uses filmic tone mapping plus linear-to-sRGB output. No fake shaft or additional visibility ray was added. See `docs/RT_LIGHTING_SEAM_FIX_2026-07-13.md`.
 - The 2026-07-13 codebase audit removed the disabled legacy raygen blob, abandoned NativeActivity/scaffold paths, and the misleading empty-command-buffer Tiny RT bootstrap. Android and Windows now share one collision helper and one native source manifest; the RT mode predicate requires the ray-query feature used by the actual renderer. The standalone probe leaves `rtScene` as `Not attempted` until a real platform swapchain presents it. Windows probe/window and Android all-ABI builds pass. See `docs/CODEBASE_AUDIT_2026-07-13.md`.
+- The first combat/ASTC slice is implemented. The procedural sword has its own BLAS/fourth TLAS instance and swings independently of the torch; one skeleton walks toward the player, attacks, dies to a timed forward hit, and respawns using the exact `Walking`, `Attack`, and `Dead` clips. Android has a `SWING` control; Windows uses right mouse or Space. Android packages 2,494,080 bytes of capability-checked ASTC KTX2 texture payload instead of 15,728,640 raw bytes, while Windows retains the raw fallback. Windows exposure is 0.62 and Android remains 0.92. Full evidence: `docs/COMBAT_ASTC_SLICE_2026-07-13.md`.
 
 ## Tested phone results
 
@@ -56,6 +57,7 @@ Last updated: 2026-07-13
 - Phase 1C closeout on 2026-07-11 rebuilt and installed commit `93e8818`, cold-launched successfully, and again logged `RT frame reached Android swapchain presentation.` at a `1440x2812` RT dispatch.
 - A 126-interval SurfaceFlinger sample measured 17.284 ms median, 17.908 ms p95, and approximately 57.9 FPS median. The in-app FPS field remains honestly `N/A` because engine timing instrumentation is not implemented.
 - The 2026-07-13 seam/moon repair compiled and presented successfully on Windows RTX, and the Android debug APK rebuilt successfully for all four configured ABIs. The phone was not connected for install/runtime validation; that gate remains open.
+- The combat/ASTC build also passed Windows compilation, RTX smoke, all-ABI Android assembly, strict APK asset audit, and the automated combat state test. No phone was connected, so fresh install, ASTC runtime selection, current-shader visual comparison, combat input, RT presentation, and the 126-interval performance gate remain open.
 - Scripted phone touch tests exercised full-turn yaw, both pitch limits, forward/back movement, corridor side limits, and repeated arch-area strafe/forward input without a crash, trap, or observed wall tunnelling.
 - The failed recursive experiment logged: `Failed to initialise presentable RT scene: Failed to create RT pipeline.`
 - Resolution: keep phone path at ray pipeline recursion depth 1 and use ray queries for path-tracing-like secondary visibility/bounce work.
@@ -78,9 +80,9 @@ Last updated: 2026-07-13
 
 - This is not yet a full playable game loop.
 - Android has basic manual movement, 360 look, corridor bounds, and arch-post collision, but not a full physics/collision system.
-- There is no enemy AI, attacks, block, dodge, combat loop, or audio yet. Animation is currently limited to the narrow skeleton path.
+- There is one deliberately narrow approach/attack/death/respawn enemy loop and player sword hit test. There is still no horde AI, block, dodge, player-death loop, or audio.
 - Current environment and held-prop geometry is hand-authored simple triangles/quads. A procedural player sword is visible in the right hand; the Meshy sword now has a 12,358-triangle LOD but still needs static GLB/PBR import before it can replace the proof.
-- Five CC0 PBR material sets are live through raw texture arrays; those arrays still need a capability-checked GPU-compressed replacement.
+- Five CC0 PBR material sets are live through ASTC KTX2 arrays on supported Android hardware and raw RGBA fallback on Windows. The new phone path still needs runtime and performance validation.
 - The held torch uses a host-written TLAS transform, so Android and Windows intentionally run one frame in flight until the renderer has per-frame TLAS/instance-buffer ownership.
 
 ## Completed Phase 1B / early Phase 1C work
@@ -100,10 +102,11 @@ Last updated: 2026-07-13
 
 ## Next-step sequence
 
-1. Replace the three raw PBR arrays with a capability-checked mobile GPU-compressed format.
+1. Fresh-install the combat/ASTC build, require the ASTC selection plus RT-present logs, and visually compare the current ACES/sRGB shader on the phone.
 2. Re-run the 126-interval cold phone benchmark and preserve the 50+ FPS median gate.
-3. Replace the procedural player-right-hand sword proof only after static GLB/PBR upload exists and the 12,358-triangle LOD is measured on phone. Never put the 49k source mesh into Android RT.
-4. Keep enemies unarmed unless a later design explicitly calls for weapons.
+3. Hands-on tune the existing sword timing, enemy range/readability, Android attack control, and desktop exposure; do not add another enemy yet.
+4. Replace the procedural player-right-hand sword proof only after static GLB/PBR upload exists and the 12,358-triangle LOD is measured on phone. Never put the 49k source mesh into Android RT.
+5. Keep enemies unarmed unless a later design explicitly calls for weapons.
 
 ## Validation breadcrumbs
 

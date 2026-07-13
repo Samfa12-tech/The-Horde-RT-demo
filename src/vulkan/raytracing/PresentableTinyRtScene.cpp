@@ -26,6 +26,8 @@ struct ScenePushConstants
     float cameraZ = 4.7f;
     float walkAmount = 0.0f;
     float outputRedBlueSwap = 0.0f;
+    float outputExposure = 0.92f;
+    float damageFlash = 0.0f;
 };
 
 // Generated from shaders/raytracing/minimal.rgen with glslangValidator -V -Os.
@@ -200,6 +202,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     materialNormal_ = std::exchange(other.materialNormal_, TextureArray{});
     materialArm_ = std::exchange(other.materialArm_, TextureArray{});
     materialSampler_ = std::exchange(other.materialSampler_, VK_NULL_HANDLE);
+    materialEncoding_ = std::move(other.materialEncoding_);
     vertexBuffer_ = std::exchange(other.vertexBuffer_, Buffer{});
     indexBuffer_ = std::exchange(other.indexBuffer_, Buffer{});
     transformBuffer_ = std::exchange(other.transformBuffer_, Buffer{});
@@ -207,6 +210,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     skeletonVertexBuffer_ = std::exchange(other.skeletonVertexBuffer_, Buffer{});
     blas_ = std::exchange(other.blas_, AccelerationStructure{});
     torchBlas_ = std::exchange(other.torchBlas_, AccelerationStructure{});
+    swordBlas_ = std::exchange(other.swordBlas_, AccelerationStructure{});
     skeletonBlas_ = std::exchange(other.skeletonBlas_, AccelerationStructure{});
     tlas_ = std::exchange(other.tlas_, AccelerationStructure{});
     skeletonBlasUpdateScratch_ = std::exchange(other.skeletonBlasUpdateScratch_, Buffer{});
@@ -214,6 +218,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     skeletonModel_ = std::move(other.skeletonModel_);
     skeletonSkinnedVertices_ = std::move(other.skeletonSkinnedVertices_);
     lastSkeletonUpdateTime_ = std::exchange(other.lastSkeletonUpdateTime_, -1.0f);
+    lastSkeletonClip_ = std::exchange(other.lastSkeletonClip_, -1);
     descriptorSetLayout_ = std::exchange(other.descriptorSetLayout_, VK_NULL_HANDLE);
     descriptorPool_ = std::exchange(other.descriptorPool_, VK_NULL_HANDLE);
     descriptorSet_ = std::exchange(other.descriptorSet_, VK_NULL_HANDLE);
@@ -269,7 +274,7 @@ bool PresentableTinyRtScene::Initialise(VkInstance instance,
         diagnostic = "RT dispatch extent is zero.";
         return false;
     }
-    if (!skeletonModel_.LoadIdleClip(skeletonAssetPath, diagnostic) ||
+    if (!skeletonModel_.LoadCombatClips(skeletonAssetPath, diagnostic) ||
         !LoadEntryPoints(diagnostic) ||
         !CreateStorageImage(diagnostic) ||
         !CreateMaterialTextures(materialAssetDirectory, diagnostic) ||
@@ -322,6 +327,7 @@ void PresentableTinyRtScene::Destroy()
     DestroyBuffer(tlasUpdateScratch_);
     DestroyAccelerationStructure(skeletonBlas_);
     DestroyBuffer(skeletonBlasUpdateScratch_);
+    DestroyAccelerationStructure(swordBlas_);
     DestroyAccelerationStructure(torchBlas_);
     DestroyAccelerationStructure(blas_);
     DestroyBuffer(skeletonVertexBuffer_);
@@ -330,6 +336,7 @@ void PresentableTinyRtScene::Destroy()
     DestroyBuffer(indexBuffer_);
     DestroyBuffer(vertexBuffer_);
     lastSkeletonUpdateTime_ = -1.0f;
+    lastSkeletonClip_ = -1;
 
     if (materialSampler_ != VK_NULL_HANDLE)
     {
@@ -339,6 +346,7 @@ void PresentableTinyRtScene::Destroy()
     DestroyTextureArray(materialArm_);
     DestroyTextureArray(materialNormal_);
     DestroyTextureArray(materialDiffuse_);
+    materialEncoding_.clear();
 
     if (storageImageView_ != VK_NULL_HANDLE)
     {
@@ -646,19 +654,68 @@ bool PresentableTinyRtScene::CreateTextureArray(const std::string& path, VkForma
     constexpr std::uint32_t width = 512u;
     constexpr std::uint32_t height = 512u;
     constexpr std::uint32_t layers = 5u;
-    constexpr VkDeviceSize byteSize = static_cast<VkDeviceSize>(width) * height * layers * 4u;
+    const bool ktx2 = path.ends_with(".ktx2");
+    const VkDeviceSize layerByteSize = ktx2
+        ? (format == VK_FORMAT_ASTC_4x4_UNORM_BLOCK || format == VK_FORMAT_ASTC_4x4_SRGB_BLOCK
+               ? static_cast<VkDeviceSize>((width + 3u) / 4u) * ((height + 3u) / 4u) * 16u
+               : static_cast<VkDeviceSize>((width + 5u) / 6u) * ((height + 5u) / 6u) * 16u)
+        : static_cast<VkDeviceSize>(width) * height * 4u;
+    const VkDeviceSize byteSize = layerByteSize * layers;
     std::ifstream stream(path, std::ios::binary | std::ios::ate);
-    if (!stream || static_cast<VkDeviceSize>(stream.tellg()) != byteSize)
+    if (!stream)
     {
-        diagnostic = "PBR texture array is missing or has the wrong size: " + path;
+        diagnostic = "PBR texture array is missing: " + path;
         return false;
     }
+    const std::size_t fileSize = static_cast<std::size_t>(stream.tellg());
     stream.seekg(0, std::ios::beg);
-    std::vector<std::uint8_t> pixels(static_cast<std::size_t>(byteSize));
-    if (!stream.read(reinterpret_cast<char*>(pixels.data()), static_cast<std::streamsize>(pixels.size())))
+    std::vector<std::uint8_t> fileBytes(fileSize);
+    if (!stream.read(reinterpret_cast<char*>(fileBytes.data()), static_cast<std::streamsize>(fileBytes.size())))
     {
         diagnostic = "Failed to read PBR texture array: " + path;
         return false;
+    }
+    std::vector<std::uint8_t> pixels;
+    if (ktx2)
+    {
+        constexpr std::array<std::uint8_t, 12u> identifier{{0xABu, 0x4Bu, 0x54u, 0x58u, 0x20u, 0x32u, 0x30u, 0xBBu, 0x0Du, 0x0Au, 0x1Au, 0x0Au}};
+        const auto read32 = [&fileBytes](std::size_t offset) {
+            std::uint32_t value = 0u;
+            if (offset + sizeof(value) <= fileBytes.size()) std::memcpy(&value, fileBytes.data() + offset, sizeof(value));
+            return value;
+        };
+        const auto read64 = [&fileBytes](std::size_t offset) {
+            std::uint64_t value = 0u;
+            if (offset + sizeof(value) <= fileBytes.size()) std::memcpy(&value, fileBytes.data() + offset, sizeof(value));
+            return value;
+        };
+        const std::uint64_t levelOffset = read64(80u);
+        const std::uint64_t levelLength = read64(88u);
+        const std::uint64_t levelUncompressedLength = read64(96u);
+        const bool validHeader = fileBytes.size() >= 104u &&
+                                 std::equal(identifier.begin(), identifier.end(), fileBytes.begin()) &&
+                                 read32(12u) == static_cast<std::uint32_t>(format) && read32(16u) == 1u &&
+                                 read32(20u) == width && read32(24u) == height && read32(28u) == 0u &&
+                                 read32(32u) == layers && read32(36u) == 1u && read32(40u) == 1u &&
+                                 read32(44u) == 0u && levelLength == byteSize &&
+                                 levelUncompressedLength == byteSize && levelOffset <= fileBytes.size() &&
+                                 levelLength <= fileBytes.size() - static_cast<std::size_t>(levelOffset);
+        if (!validHeader)
+        {
+            diagnostic = "PBR KTX2 array has an unsupported header, format, or payload size: " + path;
+            return false;
+        }
+        pixels.assign(fileBytes.begin() + static_cast<std::ptrdiff_t>(levelOffset),
+                      fileBytes.begin() + static_cast<std::ptrdiff_t>(levelOffset + levelLength));
+    }
+    else
+    {
+        if (fileBytes.size() != static_cast<std::size_t>(byteSize))
+        {
+            diagnostic = "Raw PBR texture array has the wrong size: " + path;
+            return false;
+        }
+        pixels = std::move(fileBytes);
     }
 
     Buffer staging;
@@ -702,7 +759,13 @@ bool PresentableTinyRtScene::CreateTextureArray(const std::string& path, VkForma
         diagnostic = "Failed to allocate PBR texture array memory.";
         return false;
     }
-    struct UploadData { PresentableTinyRtScene* scene; Buffer* staging; TextureArray* texture; } upload{this, &staging, &texture};
+    struct UploadData
+    {
+        PresentableTinyRtScene* scene;
+        Buffer* staging;
+        TextureArray* texture;
+        VkDeviceSize layerByteSize;
+    } upload{this, &staging, &texture, layerByteSize};
     const auto recordUpload = [](VkCommandBuffer commandBuffer, void* userData) {
         auto* data = static_cast<UploadData*>(userData);
         VkImageMemoryBarrier toTransfer{VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER};
@@ -717,7 +780,7 @@ bool PresentableTinyRtScene::CreateTextureArray(const std::string& path, VkForma
         std::array<VkBufferImageCopy, 5u> copies{};
         for (std::uint32_t layer = 0u; layer < copies.size(); ++layer)
         {
-            copies[layer].bufferOffset = static_cast<VkDeviceSize>(layer) * 512u * 512u * 4u;
+            copies[layer].bufferOffset = static_cast<VkDeviceSize>(layer) * data->layerByteSize;
             copies[layer].imageSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, layer, 1u};
             copies[layer].imageExtent = {512u, 512u, 1u};
         }
@@ -747,12 +810,68 @@ bool PresentableTinyRtScene::CreateTextureArray(const std::string& path, VkForma
     return true;
 }
 
+bool PresentableTinyRtScene::SupportsTextureArrayFormat(VkFormat format) const
+{
+    VkFormatProperties formatProperties{};
+    vkGetPhysicalDeviceFormatProperties(physicalDevice_, format, &formatProperties);
+    constexpr VkFormatFeatureFlags required = VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT |
+                                               VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT |
+                                               VK_FORMAT_FEATURE_TRANSFER_DST_BIT;
+    if ((formatProperties.optimalTilingFeatures & required) != required)
+    {
+        return false;
+    }
+    VkImageFormatProperties imageProperties{};
+    const VkResult result = vkGetPhysicalDeviceImageFormatProperties(physicalDevice_,
+                                                                      format,
+                                                                      VK_IMAGE_TYPE_2D,
+                                                                      VK_IMAGE_TILING_OPTIMAL,
+                                                                      VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+                                                                      0u,
+                                                                      &imageProperties);
+    return result == VK_SUCCESS && imageProperties.maxExtent.width >= 512u &&
+           imageProperties.maxExtent.height >= 512u && imageProperties.maxArrayLayers >= 5u;
+}
+
 bool PresentableTinyRtScene::CreateMaterialTextures(const std::string& directory, std::string& diagnostic)
 {
     const auto path = [&directory](const char* name) { return directory + "/" + name; };
-    if (!CreateTextureArray(path("diff-array-512.rgba"), VK_FORMAT_R8G8B8A8_SRGB, materialDiffuse_, diagnostic) ||
-        !CreateTextureArray(path("normal-array-512.rgba"), VK_FORMAT_R8G8B8A8_UNORM, materialNormal_, diagnostic) ||
-        !CreateTextureArray(path("arm-array-512.rgba"), VK_FORMAT_R8G8B8A8_UNORM, materialArm_, diagnostic)) return false;
+    const bool astcSupported = SupportsTextureArrayFormat(VK_FORMAT_ASTC_6x6_SRGB_BLOCK) &&
+                               SupportsTextureArrayFormat(VK_FORMAT_ASTC_4x4_UNORM_BLOCK) &&
+                               SupportsTextureArrayFormat(VK_FORMAT_ASTC_6x6_UNORM_BLOCK);
+    const std::string compressedDiffuse = path("diff-array-512-astc6x6.ktx2");
+    const std::string compressedNormal = path("normal-array-512-astc4x4.ktx2");
+    const std::string compressedArm = path("arm-array-512-astc6x6.ktx2");
+    const bool compressedAssetsPresent = std::ifstream(compressedDiffuse, std::ios::binary).good() &&
+                                         std::ifstream(compressedNormal, std::ios::binary).good() &&
+                                         std::ifstream(compressedArm, std::ios::binary).good();
+    if (astcSupported && compressedAssetsPresent)
+    {
+        if (!CreateTextureArray(compressedDiffuse, VK_FORMAT_ASTC_6x6_SRGB_BLOCK, materialDiffuse_, diagnostic) ||
+            !CreateTextureArray(compressedNormal, VK_FORMAT_ASTC_4x4_UNORM_BLOCK, materialNormal_, diagnostic) ||
+            !CreateTextureArray(compressedArm, VK_FORMAT_ASTC_6x6_UNORM_BLOCK, materialArm_, diagnostic)) return false;
+        materialEncoding_ = "ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2)";
+    }
+    else
+    {
+        const std::string rawDiffuse = path("diff-array-512.rgba");
+        const std::string rawNormal = path("normal-array-512.rgba");
+        const std::string rawArm = path("arm-array-512.rgba");
+        const bool rawAssetsPresent = std::ifstream(rawDiffuse, std::ios::binary).good() &&
+                                      std::ifstream(rawNormal, std::ios::binary).good() &&
+                                      std::ifstream(rawArm, std::ios::binary).good();
+        if (!rawAssetsPresent)
+        {
+            diagnostic = astcSupported
+                ? "ASTC texture arrays are missing and no raw fallback is packaged."
+                : "ASTC LDR sampled-array linear filtering is unsupported and no raw mobile fallback is packaged.";
+            return false;
+        }
+        if (!CreateTextureArray(rawDiffuse, VK_FORMAT_R8G8B8A8_SRGB, materialDiffuse_, diagnostic) ||
+            !CreateTextureArray(rawNormal, VK_FORMAT_R8G8B8A8_UNORM, materialNormal_, diagnostic) ||
+            !CreateTextureArray(rawArm, VK_FORMAT_R8G8B8A8_UNORM, materialArm_, diagnostic)) return false;
+        materialEncoding_ = "RGBA8 raw fallback";
+    }
     VkSamplerCreateInfo sampler{VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO};
     sampler.magFilter = VK_FILTER_LINEAR;
     sampler.minFilter = VK_FILTER_LINEAR;
@@ -843,10 +962,12 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
 
     const std::uint32_t sceneIndexCount = static_cast<std::uint32_t>(indices.size());
 
-    // Camera-held props share one tiny BLAS: torch on the left, sword on the right.
+    // The camera-held props share upload buffers but use separate BLAS instances
+    // so the sword can swing without moving the torch or its light estimate.
     addQuad({{-0.045f, -0.42f, 0.0f}}, {{0.045f, -0.42f, 0.0f}}, {{0.045f, 0.10f, 0.0f}}, {{-0.045f, 0.10f, 0.0f}});
     addTriangle({{-0.13f, 0.08f, 0.0f}}, {{0.13f, 0.08f, 0.0f}}, {{0.0f, 0.52f, 0.0f}});
     addTriangle({{0.0f, 0.08f, -0.13f}}, {{0.0f, 0.08f, 0.13f}}, {{0.0f, 0.52f, 0.0f}});
+    const std::uint32_t torchIndexCount = static_cast<std::uint32_t>(indices.size());
 
     // Low-poly player sword proof, angled inward from the right hand. The
     // textured 12k LOD replaces this when static GLB/PBR upload is available.
@@ -859,7 +980,8 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     addQuad({{1.72f, -0.34f, -swordZ}}, {{1.18f, -0.34f, -swordZ}}, {{1.20f, -0.25f, -swordZ}}, {{1.70f, -0.25f, -swordZ}});
     addQuad({{1.51f, -0.26f, -swordZ}}, {{1.37f, -0.26f, -swordZ}}, {{1.04f, 1.09f, -swordZ}}, {{1.14f, 1.12f, -swordZ}});
     addTriangle({{1.14f, 1.12f, -swordZ}}, {{1.04f, 1.09f, -swordZ}}, {{1.00f, 1.34f, -swordZ}});
-    const std::uint32_t torchPrimitiveCount = (static_cast<std::uint32_t>(indices.size()) - sceneIndexCount) / 3u;
+    const std::uint32_t torchPrimitiveCount = (torchIndexCount - sceneIndexCount) / 3u;
+    const std::uint32_t swordPrimitiveCount = (static_cast<std::uint32_t>(indices.size()) - torchIndexCount) / 3u;
     const VkTransformMatrixKHR transform{{
         1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f, 0.0f,
@@ -1023,7 +1145,60 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     torchBlasAddressInfo.accelerationStructure = torchBlas_.handle;
     torchBlas_.address = vkGetAccelerationStructureDeviceAddressKHR_(device_, &torchBlasAddressInfo);
 
-    if (!skeletonModel_.SkinIdle(0.0f, skeletonSkinnedVertices_, diagnostic) || skeletonSkinnedVertices_.empty())
+    VkAccelerationStructureBuildRangeInfoKHR swordRange{};
+    swordRange.primitiveCount = swordPrimitiveCount;
+    swordRange.primitiveOffset = torchIndexCount * sizeof(std::uint32_t);
+    swordRange.firstVertex = 0u;
+    VkAccelerationStructureBuildGeometryInfoKHR swordBlasBuildInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR};
+    swordBlasBuildInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+    swordBlasBuildInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
+    swordBlasBuildInfo.geometryCount = 1u;
+    swordBlasBuildInfo.pGeometries = &blasGeometry;
+    VkAccelerationStructureBuildSizesInfoKHR swordBlasSizes{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR};
+    vkGetAccelerationStructureBuildSizesKHR_(device_, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &swordBlasBuildInfo, &swordPrimitiveCount, &swordBlasSizes);
+    if (!CreateBuffer(swordBlasSizes.accelerationStructureSize,
+                      VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR,
+                      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                      true,
+                      swordBlas_.backing,
+                      diagnostic))
+    {
+        return false;
+    }
+    VkAccelerationStructureCreateInfoKHR swordBlasCreateInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR};
+    swordBlasCreateInfo.buffer = swordBlas_.backing.buffer;
+    swordBlasCreateInfo.size = swordBlasSizes.accelerationStructureSize;
+    swordBlasCreateInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+    if (vkCreateAccelerationStructureKHR_(device_, &swordBlasCreateInfo, nullptr, &swordBlas_.handle) != VK_SUCCESS)
+    {
+        diagnostic = "Failed to create held-sword BLAS.";
+        return false;
+    }
+    Buffer swordBlasScratch;
+    if (!CreateBuffer(swordBlasSizes.buildScratchSize,
+                      VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                      true,
+                      swordBlasScratch,
+                      diagnostic))
+    {
+        return false;
+    }
+    swordBlasBuildInfo.dstAccelerationStructure = swordBlas_.handle;
+    swordBlasBuildInfo.scratchData.deviceAddress = swordBlasScratch.address;
+    const VkAccelerationStructureBuildRangeInfoKHR* swordBlasRanges[] = {&swordRange};
+    BlasBuildData swordBlasBuildData{this, &swordBlasBuildInfo, swordBlasRanges};
+    if (!RunOneTimeCommands(buildBlas, &swordBlasBuildData, diagnostic))
+    {
+        DestroyBuffer(swordBlasScratch);
+        return false;
+    }
+    DestroyBuffer(swordBlasScratch);
+    VkAccelerationStructureDeviceAddressInfoKHR swordBlasAddressInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR};
+    swordBlasAddressInfo.accelerationStructure = swordBlas_.handle;
+    swordBlas_.address = vkGetAccelerationStructureDeviceAddressKHR_(device_, &swordBlasAddressInfo);
+
+    if (!skeletonModel_.Skin(horde::scene::SkeletonClip::Idle, 0.0f, skeletonSkinnedVertices_, diagnostic) || skeletonSkinnedVertices_.empty())
     {
         if (diagnostic.empty()) diagnostic = "Skeleton produced no skinned vertices.";
         return false;
@@ -1088,7 +1263,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     skeletonAddressInfo.accelerationStructure = skeletonBlas_.handle;
     skeletonBlas_.address = vkGetAccelerationStructureDeviceAddressKHR_(device_, &skeletonAddressInfo);
 
-    std::array<VkAccelerationStructureInstanceKHR, 3u> instances{};
+    std::array<VkAccelerationStructureInstanceKHR, 4u> instances{};
     instances[0].transform = transform;
     instances[0].instanceCustomIndex = 0u;
     instances[0].mask = 0x01u;
@@ -1111,6 +1286,9 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f, -0.95f,
         0.0f, 0.0f, 1.0f, -2.35f}};
+    instances[3] = instances[1];
+    instances[3].instanceCustomIndex = 3u;
+    instances[3].accelerationStructureReference = swordBlas_.address;
     if (!CreateBuffer(sizeof(instances), VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, instanceBuffer_, diagnostic))
     {
         return false;
@@ -1446,17 +1624,20 @@ bool PresentableTinyRtScene::CreateShaderBindingTable(std::string& diagnostic)
     return true;
 }
 
-bool PresentableTinyRtScene::UpdateHeldTorchInstance(VkCommandBuffer commandBuffer,
-                                                      float cameraYaw,
-                                                      float walkTime,
-                                                      float cameraX,
-                                                      float cameraZ,
-                                                      float walkAmount,
-                                                      std::string& diagnostic)
+bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffer,
+                                                     float cameraYaw,
+                                                     float walkTime,
+                                                     float cameraX,
+                                                     float cameraZ,
+                                                     float walkAmount,
+                                                     const horde::gameplay::CombatSnapshot& combat,
+                                                     std::string& diagnostic)
 {
-    if (instanceBuffer_.memory == VK_NULL_HANDLE || skeletonVertexBuffer_.memory == VK_NULL_HANDLE || skeletonBlas_.handle == VK_NULL_HANDLE || tlas_.handle == VK_NULL_HANDLE || skeletonBlasUpdateScratch_.address == 0u || tlasUpdateScratch_.address == 0u)
+    if (instanceBuffer_.memory == VK_NULL_HANDLE || skeletonVertexBuffer_.memory == VK_NULL_HANDLE ||
+        skeletonBlas_.handle == VK_NULL_HANDLE || swordBlas_.handle == VK_NULL_HANDLE ||
+        tlas_.handle == VK_NULL_HANDLE || skeletonBlasUpdateScratch_.address == 0u || tlasUpdateScratch_.address == 0u)
     {
-        diagnostic = "Animated skeleton or held-torch TLAS resources are unavailable.";
+        diagnostic = "Combat skeleton or held-prop TLAS resources are unavailable.";
         return false;
     }
 
@@ -1471,12 +1652,23 @@ bool PresentableTinyRtScene::UpdateHeldTorchInstance(VkCommandBuffer commandBuff
     const float torchY = 0.02f + std::abs(std::sin(walkTime * 6.2f)) * 0.04f * movement;
     const float torchZ = cameraZ + forwardZ * 1.34f - rightZ * (0.42f + torchSway * 0.8f);
 
+    const horde::scene::SkeletonClip skeletonClip = combat.enemyAnimation == horde::gameplay::EnemyAnimation::Walking
+        ? horde::scene::SkeletonClip::Walking
+        : (combat.enemyAnimation == horde::gameplay::EnemyAnimation::Attack
+               ? horde::scene::SkeletonClip::Attack
+               : (combat.enemyAnimation == horde::gameplay::EnemyAnimation::Dead
+                      ? horde::scene::SkeletonClip::Dead
+                      : horde::scene::SkeletonClip::Idle));
     constexpr float skeletonUpdateInterval = 1.0f / 30.0f;
-    const bool updateSkeleton = lastSkeletonUpdateTime_ < 0.0f || walkTime < lastSkeletonUpdateTime_ || (walkTime - lastSkeletonUpdateTime_) >= skeletonUpdateInterval;
+    const int skeletonClipIndex = static_cast<int>(skeletonClip);
+    const float skeletonTime = combat.enemyAnimationTime;
+    const bool clipChanged = skeletonClipIndex != lastSkeletonClip_;
+    const bool updateSkeleton = clipChanged || lastSkeletonUpdateTime_ < 0.0f || skeletonTime < lastSkeletonUpdateTime_ ||
+                                (skeletonTime - lastSkeletonUpdateTime_) >= skeletonUpdateInterval;
     void* mapped = nullptr;
     if (updateSkeleton)
     {
-        if (!skeletonModel_.SkinIdle(walkTime, skeletonSkinnedVertices_, diagnostic))
+        if (!skeletonModel_.Skin(skeletonClip, skeletonTime, skeletonSkinnedVertices_, diagnostic))
         {
             return false;
         }
@@ -1488,10 +1680,11 @@ bool PresentableTinyRtScene::UpdateHeldTorchInstance(VkCommandBuffer commandBuff
         }
         std::memcpy(mapped, skeletonSkinnedVertices_.data(), static_cast<std::size_t>(skeletonVertexBufferSize));
         vkUnmapMemory(device_, skeletonVertexBuffer_.memory);
-        lastSkeletonUpdateTime_ = walkTime;
+        lastSkeletonUpdateTime_ = skeletonTime;
+        lastSkeletonClip_ = skeletonClipIndex;
     }
 
-    std::array<VkAccelerationStructureInstanceKHR, 3u> instances{};
+    std::array<VkAccelerationStructureInstanceKHR, 4u> instances{};
     instances[0].transform = {{
         1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f, 0.0f,
@@ -1512,14 +1705,25 @@ bool PresentableTinyRtScene::UpdateHeldTorchInstance(VkCommandBuffer commandBuff
     instances[2].instanceCustomIndex = 2u;
     instances[2].mask = 0x01u;
     instances[2].accelerationStructureReference = skeletonBlas_.address;
+    const float enemyCos = std::cos(combat.enemyFacingRadians);
+    const float enemySin = std::sin(combat.enemyFacingRadians);
     instances[2].transform = {{
-        1.0f, 0.0f, 0.0f, 0.0f,
+        enemyCos, 0.0f, enemySin, combat.enemyX,
         0.0f, 1.0f, 0.0f, -0.95f,
-        0.0f, 0.0f, 1.0f, -2.35f}};
+        -enemySin, 0.0f, enemyCos, combat.enemyZ}};
+    instances[3] = instances[1];
+    instances[3].instanceCustomIndex = 3u;
+    instances[3].accelerationStructureReference = swordBlas_.address;
+    const float swordCos = std::cos(combat.swordSwingRadians);
+    const float swordSin = std::sin(combat.swordSwingRadians);
+    instances[3].transform = {{
+        rightX * torchScale * swordCos, -rightX * torchScale * swordSin, forwardX * torchScale, torchX,
+        torchScale * swordSin, torchScale * swordCos, 0.0f, torchY,
+        rightZ * torchScale * swordCos, -rightZ * torchScale * swordSin, forwardZ * torchScale, torchZ}};
 
     if (vkMapMemory(device_, instanceBuffer_.memory, 0u, sizeof(instances), 0u, &mapped) != VK_SUCCESS || mapped == nullptr)
     {
-        diagnostic = "Failed to update held-torch instance data.";
+        diagnostic = "Failed to update combat instance data.";
         return false;
     }
     std::memcpy(mapped, instances.data(), sizeof(instances));
@@ -1626,10 +1830,12 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                                                 float cameraPitch,
                                                 float lanternStrength,
                                                 float walkTime,
-                                                float cameraX,
-                                                float cameraZ,
-                                                float walkAmount,
-                                                std::string& diagnostic)
+                                                 float cameraX,
+                                                 float cameraZ,
+                                                 float walkAmount,
+                                                 float outputExposure,
+                                                 const horde::gameplay::CombatSnapshot& combat,
+                                                 std::string& diagnostic)
 {
     if (!ready_)
     {
@@ -1637,7 +1843,7 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
         return false;
     }
 
-    if (!UpdateHeldTorchInstance(commandBuffer, cameraYaw, walkTime, cameraX, cameraZ, walkAmount, diagnostic))
+    if (!UpdateDynamicInstances(commandBuffer, cameraYaw, walkTime, cameraX, cameraZ, walkAmount, combat, diagnostic))
     {
         return false;
     }
@@ -1662,9 +1868,11 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                                            lanternStrength,
                                            walkTime,
                                            cameraX,
-                                           cameraZ,
-                                           walkAmount,
-                                           presentationUsesBgra_ ? 1.0f : 0.0f};
+                                            cameraZ,
+                                            walkAmount,
+                                            presentationUsesBgra_ ? 1.0f : 0.0f,
+                                            std::clamp(outputExposure, 0.2f, 1.4f),
+                                            std::clamp(combat.damageFlash, 0.0f, 1.0f)};
     vkCmdPushConstants(commandBuffer,
                        pipelineLayout_,
                        VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR,

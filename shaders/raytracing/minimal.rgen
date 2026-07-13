@@ -28,6 +28,8 @@ layout(push_constant) uniform SceneControls
     float cameraZ;
     float walkAmount;
     float outputRedBlueSwap;
+    float outputExposure;
+    float damageFlash;
 } controls;
 
 struct HitInfo
@@ -108,14 +110,19 @@ void materialForPrimitive(int primitive, int instance, vec3 p, out vec3 normal, 
             base = vec3(1.0, 0.09, 0.01);
             emissive = 2.8 + 0.35 * sin(controls.time * 15.0);
         }
-        else
-        {
-            bool leather = (primitive >= 4 && primitive < 6) || (primitive >= 11 && primitive < 13);
-            base = leather ? vec3(0.16, 0.075, 0.028) : vec3(0.48, 0.52, 0.56);
-            metallic = leather ? 0.12 : 0.92;
-            reflectivity = leather ? 0.22 : 0.86;
-            emissive = 0.0;
-        }
+        return;
+    }
+
+    if (instance == 3)
+    {
+        vec3 cameraForward = normalize(vec3(sin(controls.yaw), 0.0, -cos(controls.yaw)));
+        normal = cameraForward;
+        geometricNormal = normal;
+        bool leather = primitive < 2 || (primitive >= 7 && primitive < 9);
+        base = leather ? vec3(0.16, 0.075, 0.028) : vec3(0.48, 0.52, 0.56);
+        metallic = leather ? 0.12 : 0.92;
+        reflectivity = leather ? 0.22 : 0.86;
+        emissive = 0.0;
         return;
     }
 
@@ -267,13 +274,17 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance)
             const int firstVertex = h.primitive * 3;
             const vec2 bary = rayQueryGetIntersectionBarycentricsEXT(query, true);
             const float w0 = 1.0 - bary.x - bary.y;
-            h.normal = normalize(skeleton.vertices[firstVertex].normal.xyz * w0
+            const mat3 objectToWorld = mat3(rayQueryGetIntersectionObjectToWorldEXT(query, true));
+            vec3 localNormal = normalize(skeleton.vertices[firstVertex].normal.xyz * w0
                 + skeleton.vertices[firstVertex + 1].normal.xyz * bary.x
                 + skeleton.vertices[firstVertex + 2].normal.xyz * bary.y);
+            h.normal = normalize(objectToWorld * localNormal);
             vec3 edgeA = skeleton.vertices[firstVertex + 1].position.xyz - skeleton.vertices[firstVertex].position.xyz;
             vec3 edgeB = skeleton.vertices[firstVertex + 2].position.xyz - skeleton.vertices[firstVertex].position.xyz;
             vec3 faceNormal = cross(edgeA, edgeB);
-            h.geometricNormal = length(faceNormal) > 0.00001 ? normalize(faceNormal) : h.normal;
+            h.geometricNormal = length(faceNormal) > 0.00001
+                ? normalize(objectToWorld * normalize(faceNormal))
+                : h.normal;
             if (dot(h.geometricNormal, -direction) < 0.0)
             {
                 h.geometricNormal = -h.geometricNormal;
@@ -431,7 +442,8 @@ void main()
     vec2 centered = uv * 2.0 - 1.0;
     float vignette = 1.0 - smoothstep(0.28, 1.22, length(centered * vec2(0.82, 1.08)));
     color = color * (0.62 + 0.38 * vignette);
-    color = linearToSrgb(toneMapAces(max(color, vec3(0.0)) * 0.92));
+    color += vec3(0.46, 0.012, 0.004) * controls.damageFlash * (0.28 + 0.72 * (1.0 - vignette));
+    color = linearToSrgb(toneMapAces(max(color, vec3(0.0)) * controls.outputExposure));
     // The RT storage image is RGBA, while common Android/Windows swapchains are BGRA and receive a raw image copy.
     if (controls.outputRedBlueSwap > 0.5)
     {

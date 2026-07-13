@@ -70,6 +70,13 @@ The five-source CC0 Poly Haven batch, Vulkan array upload, world-space mapping, 
 3. Measure APK size, device memory, and the 126-interval frame gate again.
 4. Keep the full textured sword LOD separate until this environment material path is stable.
 
+### Compressed material and first combat slice - implementation complete 2026-07-13
+
+- Android packages ASTC KTX2 arrays at 6x6 diffuse/ARM and 4x4 normal quality, with strict header and Vulkan format-capability checks. Windows retains RGBA8 raw fallback.
+- The procedural sword is an independent held-prop BLAS/TLAS instance and drives a timed one-enemy hit/death/respawn loop.
+- The skeleton reader is still narrow: exactly `Idle_5`, `Walking`, `Attack`, and `Dead` at a 30 Hz skin/refit cadence.
+- Windows and all-ABI Android builds, APK contents, RTX smoke, and automated combat state transitions pass. Target-phone runtime and the 126-interval performance gate remain open. See `docs/COMBAT_ASTC_SLICE_2026-07-13.md`.
+
 ### RT lighting refinement - complete 2026-07-12
 
 - Removed held-prop self-shadow artifacts from torch direct lighting.
@@ -80,9 +87,9 @@ The five-source CC0 Poly Haven batch, Vulkan array upload, world-space mapping, 
 
 ## Next technical slice
 
-1. Encode the three PBR arrays in a device-supported GPU-compressed format and add capability-checked upload.
-2. Cold-benchmark room two after compression and preserve the 50+ FPS median gate.
-3. Consider true participating-media dust on Windows RTX only after the compressed phone path is stable.
+1. Fresh-install and cold-benchmark the exact combat/ASTC build on the target phone; preserve the 50+ FPS median gate.
+2. Tune only the existing combat readability/input and Windows exposure from hands-on comparison.
+3. Consider true participating-media dust on Windows RTX only after the compressed phone path and combat loop are stable.
 
 The runtime-only Android asset task is complete and reduced the debug APK from 93,855,324 to 46,793,811 bytes.
 

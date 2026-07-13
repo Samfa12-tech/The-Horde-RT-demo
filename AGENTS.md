@@ -53,8 +53,9 @@ This repo is a native Vulkan hardware ray tracing game/tech-demo project. Keep w
 
 ## Next slice target
 
-- Replace the three raw PBR runtime arrays with a capability-checked mobile GPU-compressed format.
-- Re-run the cold 126-interval phone benchmark and preserve the 50+ FPS median gate.
+- Fresh-install the ASTC combat build on the target phone, verify the ASTC selection and RT-present logs, then re-run the cold 126-interval benchmark and preserve the 50+ FPS median gate.
+- Hands-on tune only the existing sword timing, enemy range/readability, Android attack control, and Windows exposure until the one-enemy loop feels legible.
+- Do not add a second enemy, broader AI, block/dodge, or audio before that phone gate closes.
 - Keep the textured sword LOD out of the runtime until the static GLB/PBR path exists and is measured on phone.
 
 ## Build notes

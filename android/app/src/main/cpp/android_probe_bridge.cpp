@@ -22,6 +22,7 @@
 
 #include "ui/DiagnosticOverlay.h"
 #include "gameplay/CorridorCollision.h"
+#include "gameplay/SwordCombat.h"
 #include "vulkan/RtCapabilityReport.h"
 #include "vulkan/VulkanContext.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
@@ -75,6 +76,9 @@ struct SwapchainContext
     float cameraZ = 4.7f;
     float moveStrafe = 0.0f;
     float moveForward = 0.0f;
+    float outputExposure = 0.92f;
+    horde::gameplay::SwordCombat combat;
+    horde::gameplay::CombatSnapshot combatSnapshot;
     std::string reportDirectory;
     bool useRtPath = false;
     uint32_t currentFrame = 0u;
@@ -84,6 +88,7 @@ SwapchainContext gSwapchainContext{};
 std::atomic<bool> gSwapchainRunning{false};
 std::thread gSwapchainThread;
 std::mutex gSwapchainMutex;
+std::atomic<bool> gAttackRequested{false};
 
 std::string BuildDisplayText(const horde::vulkan::DeviceCapabilities& capabilities)
 {
@@ -281,6 +286,9 @@ bool CreateLogicalDevice(VkPhysicalDevice physicalDevice,
         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES_KHR};
     bufferDeviceAddressFeatures.bufferDeviceAddress = enableRayTracing ? VK_TRUE : VK_FALSE;
     VkPhysicalDeviceFeatures2 features2{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2};
+    VkPhysicalDeviceFeatures supportedCoreFeatures{};
+    vkGetPhysicalDeviceFeatures(physicalDevice, &supportedCoreFeatures);
+    features2.features.textureCompressionASTC_LDR = supportedCoreFeatures.textureCompressionASTC_LDR;
     features2.pNext = &accelerationStructureFeatures;
     accelerationStructureFeatures.pNext = &rayTracingPipelineFeatures;
     rayTracingPipelineFeatures.pNext = &rayQueryFeatures;
@@ -704,6 +712,7 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
         __android_log_print(ANDROID_LOG_ERROR, kTag, "Failed to initialise presentable RT scene: %s", diagnostic.c_str());
         return false;
     }
+    __android_log_print(ANDROID_LOG_INFO, kTag, "PBR material encoding: %s", context.rtScene.MaterialEncoding().c_str());
 
     return true;
 }
@@ -861,6 +870,10 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
     if (useRtFrame)
     {
         context.walkTime += context.frameDeltaSeconds;
+        if (gAttackRequested.exchange(false))
+        {
+            context.combat.RequestAttack();
+        }
         const float moveAmount = std::clamp(std::abs(context.moveForward) + std::abs(context.moveStrafe), 0.0f, 1.0f);
         if (moveAmount > 0.02f)
         {
@@ -873,6 +886,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             context.cameraZ += (forwardZ * context.moveForward + rightZ * context.moveStrafe) * speed;
             horde::gameplay::ResolveCorridorPlayerCollision(context.cameraX, context.cameraZ);
         }
+        context.combatSnapshot = context.combat.Update(context.frameDeltaSeconds, context.cameraX, context.cameraZ, context.cameraYaw);
         std::string diagnostic;
         if (!context.rtScene.RecordTraceAndCopy(context.commandBuffers[imageIndex],
                                                 context.swapchainImages[imageIndex],
@@ -885,6 +899,8 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
                                                 context.cameraX,
                                                 context.cameraZ,
                                                 moveAmount,
+                                                context.outputExposure,
+                                                context.combatSnapshot,
                                                 diagnostic))
         {
             __android_log_print(ANDROID_LOG_ERROR, kTag, "Failed to record RT frame: %s", diagnostic.c_str());
@@ -1238,4 +1254,10 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_setViewControls(JNIEnv*, jclass, jfl
     gSwapchainContext.lanternStrength = std::clamp(static_cast<float>(lanternStrength), 0.65f, 2.4f);
     gSwapchainContext.moveStrafe = std::clamp(static_cast<float>(moveStrafe), -1.0f, 1.0f);
     gSwapchainContext.moveForward = std::clamp(static_cast<float>(moveForward), -1.0f, 1.0f);
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_requestAttack(JNIEnv*, jclass)
+{
+    gAttackRequested.store(true);
 }

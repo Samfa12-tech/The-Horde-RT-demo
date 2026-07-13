@@ -6,6 +6,7 @@
 
 #include <vulkan/vulkan.h>
 
+#include "gameplay/SwordCombat.h"
 #include "scene/SkeletonBipedModel.h"
 
 namespace horde::vulkan::raytracing
@@ -37,6 +38,7 @@ public:
 
     bool IsReady() const { return ready_; }
     VkExtent2D DispatchExtent() const { return dispatchExtent_; }
+    const std::string& MaterialEncoding() const { return materialEncoding_; }
 
     bool RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                             VkImage swapchainImage,
@@ -46,10 +48,12 @@ public:
                             float cameraPitch,
                             float lanternStrength,
                             float walkTime,
-                            float cameraX,
-                            float cameraZ,
-                            float walkAmount,
-                            std::string& diagnostic);
+                             float cameraX,
+                             float cameraZ,
+                             float walkAmount,
+                             float outputExposure,
+                             const horde::gameplay::CombatSnapshot& combat,
+                             std::string& diagnostic);
 
 private:
     struct Buffer
@@ -83,18 +87,20 @@ private:
                       std::string& diagnostic) const;
     bool CreateStorageImage(std::string& diagnostic);
     bool CreateTextureArray(const std::string& path, VkFormat format, TextureArray& texture, std::string& diagnostic);
+    bool SupportsTextureArrayFormat(VkFormat format) const;
     bool CreateMaterialTextures(const std::string& directory, std::string& diagnostic);
     bool BuildAccelerationStructures(std::string& diagnostic);
     bool CreateDescriptors(std::string& diagnostic);
     bool CreatePipeline(std::string& diagnostic);
     bool CreateShaderBindingTable(std::string& diagnostic);
-    bool UpdateHeldTorchInstance(VkCommandBuffer commandBuffer,
-                                 float cameraYaw,
-                                 float walkTime,
-                                 float cameraX,
-                                 float cameraZ,
-                                 float walkAmount,
-                                 std::string& diagnostic);
+    bool UpdateDynamicInstances(VkCommandBuffer commandBuffer,
+                                float cameraYaw,
+                                float walkTime,
+                                float cameraX,
+                                float cameraZ,
+                                float walkAmount,
+                                const horde::gameplay::CombatSnapshot& combat,
+                                std::string& diagnostic);
     bool RunOneTimeCommands(void (*record)(VkCommandBuffer, void*), void* userData, std::string& diagnostic) const;
     void DestroyBuffer(Buffer& buffer) const;
     void DestroyAccelerationStructure(AccelerationStructure& accelerationStructure);
@@ -119,6 +125,7 @@ private:
     TextureArray materialNormal_;
     TextureArray materialArm_;
     VkSampler materialSampler_ = VK_NULL_HANDLE;
+    std::string materialEncoding_;
 
     Buffer vertexBuffer_;
     Buffer indexBuffer_;
@@ -127,6 +134,7 @@ private:
     Buffer skeletonVertexBuffer_;
     AccelerationStructure blas_;
     AccelerationStructure torchBlas_;
+    AccelerationStructure swordBlas_;
     AccelerationStructure skeletonBlas_;
     AccelerationStructure tlas_;
     Buffer skeletonBlasUpdateScratch_;
@@ -134,6 +142,7 @@ private:
     horde::scene::SkeletonBipedModel skeletonModel_;
     std::vector<horde::scene::SkinnedRtVertex> skeletonSkinnedVertices_;
     float lastSkeletonUpdateTime_ = -1.0f;
+    int lastSkeletonClip_ = -1;
 
     VkDescriptorSetLayout descriptorSetLayout_ = VK_NULL_HANDLE;
     VkDescriptorPool descriptorPool_ = VK_NULL_HANDLE;

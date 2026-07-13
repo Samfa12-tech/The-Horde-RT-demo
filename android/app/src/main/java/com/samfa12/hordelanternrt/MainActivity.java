@@ -77,7 +77,7 @@ public class MainActivity extends Activity {
         root.addView(container, overlayLayoutParams);
 
         final TextView sceneHud = new TextView(this);
-        sceneHud.setText("HORDE LANTERN RT\nPath-traced shadows + first bounce\nLeft drag: walk/strafe\nRight drag: 360 look");
+        sceneHud.setText("HORDE LANTERN RT\nPath-traced shadows + first bounce\nLeft drag: walk/strafe\nRight drag: 360 look  •  SWING: attack");
         sceneHud.setTextColor(0xFFFFC46B);
         sceneHud.setTextSize(14);
         sceneHud.setTypeface(Typeface.create(Typeface.SERIF, Typeface.BOLD));
@@ -95,9 +95,26 @@ public class MainActivity extends Activity {
             final boolean showingDiagnostics = container.getVisibility() == View.VISIBLE;
             container.setVisibility(showingDiagnostics ? View.GONE : View.VISIBLE);
             sceneHud.setText(showingDiagnostics
-                    ? "HORDE LANTERN RT\nPath-traced shadows + first bounce\nLeft drag: walk/strafe\nRight drag: 360 look"
+                    ? "HORDE LANTERN RT\nPath-traced shadows + first bounce\nLeft drag: walk/strafe\nRight drag: 360 look  •  SWING: attack"
                     : "HORDE LANTERN RT\nDiagnostics open\nTap to return to scene");
         });
+
+        final TextView attackButton = new TextView(this);
+        attackButton.setText("SWING");
+        attackButton.setTextColor(0xFFFFE0A3);
+        attackButton.setTextSize(17);
+        attackButton.setTypeface(Typeface.create(Typeface.SERIF, Typeface.BOLD));
+        attackButton.setGravity(Gravity.CENTER);
+        attackButton.setBackgroundColor(0x883D1608);
+        attackButton.setPadding(34, 24, 34, 24);
+        attackButton.setOnClickListener(view -> ProbeBridge.requestAttack());
+        final FrameLayout.LayoutParams attackLayoutParams = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT
+        );
+        attackLayoutParams.gravity = Gravity.BOTTOM | Gravity.END;
+        attackLayoutParams.setMargins(24, 24, 28, 42);
+        root.addView(attackButton, attackLayoutParams);
         final float[] viewControls = {0.0f, 0.0f, 1.8f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
         final int[] activePointers = {-1, -1};
         surfaceView.setOnTouchListener((view, event) -> {
@@ -168,9 +185,13 @@ public class MainActivity extends Activity {
 
         final String filesRoot = getFilesDir().getAbsolutePath();
         final boolean skeletonStaged = stageSkeletonAsset();
-        final boolean materialsStaged = stageAsset("textures/polyhaven/mobile_1k/diff-array-512.rgba", "diff-array-512.rgba")
-                && stageAsset("textures/polyhaven/mobile_1k/normal-array-512.rgba", "normal-array-512.rgba")
-                && stageAsset("textures/polyhaven/mobile_1k/arm-array-512.rgba", "arm-array-512.rgba");
+        for (final String legacy : new String[]{"diff-array-512.rgba", "normal-array-512.rgba", "arm-array-512.rgba"}) {
+            final File stale = new File(getFilesDir(), legacy);
+            if (stale.exists()) stale.delete();
+        }
+        final boolean materialsStaged = stageAsset("textures/polyhaven/mobile_1k/diff-array-512-astc6x6.ktx2", "diff-array-512-astc6x6.ktx2")
+                && stageAsset("textures/polyhaven/mobile_1k/normal-array-512-astc4x4.ktx2", "normal-array-512-astc4x4.ktx2")
+                && stageAsset("textures/polyhaven/mobile_1k/arm-array-512-astc6x6.ktx2", "arm-array-512-astc6x6.ktx2");
         final boolean written = ProbeBridge.writeReports(filesRoot);
         final StringBuilder output = new StringBuilder();
         output.append(textReport).append('\n');
@@ -179,7 +200,7 @@ public class MainActivity extends Activity {
         }
         output.append("Reports written: ").append(written ? "yes" : "no").append('\n');
         output.append("Animated skeleton staged: ").append(skeletonStaged ? "yes" : "no").append('\n');
-        output.append("PBR material arrays staged: ").append(materialsStaged ? "yes" : "no").append('\n');
+        output.append("ASTC PBR material arrays staged: ").append(materialsStaged ? "yes" : "no").append('\n');
         output.append("Report directory: ").append(filesRoot).append('/').append(REPORT_DIRECTORY).append('\n');
         output.append("Report files: ").append(TEXT_REPORT_FILE).append(", ").append(JSON_REPORT_FILE).append('\n');
         output.append("JSON sample:\n").append(jsonReport);

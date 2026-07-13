@@ -9,7 +9,7 @@ The `android/` module is the supported phone path for Horde Lantern RT. It owns 
 - Shared native source manifest: `../cmake/HordeRtSources.cmake`
 - Native Vulkan RT presentation through the Android swapchain
 - One frame in flight while the held-prop TLAS uses a host-written instance buffer
-- Touch movement/look, corridor collision, animated skeleton BLAS refit, PBR texture arrays, and phone-safe ray-query shading inside `vkCmdTraceRaysKHR`
+- Touch movement/look, a dedicated `SWING` attack control, one-enemy combat, animated skeleton BLAS refit, ASTC PBR texture arrays, and phone-safe ray-query shading inside `vkCmdTraceRaysKHR`
 - Unsupported devices retain explicit diagnostics instead of a fake rendering fallback
 
 ## Build, install, and launch
@@ -27,6 +27,7 @@ adb logcat -d -s HordeRtProbeBridge AndroidRuntime
 ```
 
 Look for `RT frame reached Android swapchain presentation.`
+Also require `PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2)` on the target phone.
 
 Reports are stored under `files/reports/` in app-private storage and can be retrieved with `adb shell run-as com.samfa12.hordelanternrt`.
 

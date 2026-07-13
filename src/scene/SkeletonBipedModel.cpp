@@ -371,15 +371,22 @@ struct SkeletonBipedModel::Channel
     std::vector<std::array<float, 4u>> values;
 };
 
+struct SkeletonBipedModel::Clip
+{
+    std::vector<Channel> channels;
+    float duration = 0.0f;
+    bool loops = false;
+};
+
 SkeletonBipedModel::SkeletonBipedModel() = default;
 SkeletonBipedModel::~SkeletonBipedModel() = default;
 SkeletonBipedModel::SkeletonBipedModel(SkeletonBipedModel&&) noexcept = default;
 SkeletonBipedModel& SkeletonBipedModel::operator=(SkeletonBipedModel&&) noexcept = default;
 
-bool SkeletonBipedModel::LoadIdleClip(const std::string& glbPath, std::string& diagnostic)
+bool SkeletonBipedModel::LoadCombatClips(const std::string& glbPath, std::string& diagnostic)
 {
     loaded_ = false;
-    vertices_.clear(); expandedIndices_.clear(); nodes_.clear(); joints_.clear(); inverseBindMatrices_.clear(); channels_.clear(); skinnedUniqueVertices_.clear(); clipDuration_ = 0.0f;
+    vertices_.clear(); expandedIndices_.clear(); nodes_.clear(); joints_.clear(); inverseBindMatrices_.clear(); clips_.clear(); skinnedUniqueVertices_.clear();
     std::ifstream stream(glbPath, std::ios::binary);
     if (!stream)
     {
@@ -502,62 +509,102 @@ bool SkeletonBipedModel::LoadIdleClip(const std::string& glbPath, std::string& d
     inverseBindMatrices_.resize(inverseBinds.count * 16u);
     for (std::size_t i = 0u; i < inverseBindMatrices_.size(); ++i) inverseBindMatrices_[i] = ReadFloat(binary, inverseBinds, i / 16u, i % 16u);
 
-    const JsonValue* idle = nullptr;
-    for (const JsonValue& animation : *animations)
-        if (const JsonValue* name = animation.Find("name"); name != nullptr && name->string == "Idle_5") { idle = &animation; break; }
-    if (idle == nullptr) { diagnostic = "Skeleton GLB is missing the Idle_5 animation clip."; return false; }
-    const JsonValue* samplers = idle->Find("samplers");
-    const JsonValue* animationChannels = idle->Find("channels");
-    if (samplers == nullptr || animationChannels == nullptr) { diagnostic = "Skeleton Idle_5 clip is incomplete."; return false; }
-    for (const JsonValue& sourceChannel : animationChannels->array)
+    constexpr std::array<std::string_view, 4u> expectedNames{{"Idle_5", "Walking", "Attack", "Dead"}};
+    for (std::size_t clipIndex = 0u; clipIndex < expectedNames.size(); ++clipIndex)
     {
-        const JsonValue* samplerIndex = sourceChannel.Find("sampler");
-        const JsonValue* target = sourceChannel.Find("target");
-        const JsonValue* targetNode = target == nullptr ? nullptr : target->Find("node");
-        const JsonValue* path = target == nullptr ? nullptr : target->Find("path");
-        if (samplerIndex == nullptr || targetNode == nullptr || path == nullptr || samplerIndex->Uint() >= samplers->array.size()) continue;
-        const JsonValue& sampler = samplers->array[samplerIndex->Uint()];
-        const JsonValue* input = sampler.Find("input");
-        const JsonValue* output = sampler.Find("output");
-        if (input == nullptr || output == nullptr) continue;
-        Accessor inputAccessor, outputAccessor;
-        if (!ReadAccessor(*accessors, *views, input->Uint(), inputAccessor, diagnostic) || !ReadAccessor(*accessors, *views, output->Uint(), outputAccessor, diagnostic) ||
-            inputAccessor.componentType != 5126u || outputAccessor.componentType != 5126u || inputAccessor.count != outputAccessor.count ||
-            (path->string != "translation" && path->string != "rotation" && path->string != "scale")) return false;
-        Channel channel;
-        channel.node = targetNode->Uint();
-        channel.path = path->string == "rotation" ? Channel::Path::Rotation : (path->string == "scale" ? Channel::Path::Scale : Channel::Path::Translation);
-        channel.times.resize(inputAccessor.count);
-        channel.values.resize(outputAccessor.count);
-        for (std::size_t key = 0u; key < channel.times.size(); ++key)
+        const JsonValue* sourceAnimation = nullptr;
+        for (const JsonValue& animation : *animations)
         {
-            channel.times[key] = ReadFloat(binary, inputAccessor, key, 0u);
-            clipDuration_ = std::max(clipDuration_, channel.times[key]);
-            for (std::size_t component = 0u; component < outputAccessor.components; ++component) channel.values[key][component] = ReadFloat(binary, outputAccessor, key, component);
-            if (outputAccessor.components == 3u) channel.values[key][3u] = 0.0f;
+            const JsonValue* name = animation.Find("name");
+            if (name != nullptr && name->string == expectedNames[clipIndex])
+            {
+                sourceAnimation = &animation;
+                break;
+            }
         }
-        channels_.push_back(std::move(channel));
+        if (sourceAnimation == nullptr)
+        {
+            diagnostic = "Skeleton GLB is missing combat clip: " + std::string(expectedNames[clipIndex]);
+            return false;
+        }
+        const JsonValue* samplers = sourceAnimation->Find("samplers");
+        const JsonValue* animationChannels = sourceAnimation->Find("channels");
+        if (samplers == nullptr || animationChannels == nullptr)
+        {
+            diagnostic = "Skeleton combat clip is incomplete: " + std::string(expectedNames[clipIndex]);
+            return false;
+        }
+
+        Clip clip;
+        clip.loops = clipIndex <= static_cast<std::size_t>(SkeletonClip::Walking);
+        for (const JsonValue& sourceChannel : animationChannels->array)
+        {
+            const JsonValue* samplerIndex = sourceChannel.Find("sampler");
+            const JsonValue* target = sourceChannel.Find("target");
+            const JsonValue* targetNode = target == nullptr ? nullptr : target->Find("node");
+            const JsonValue* path = target == nullptr ? nullptr : target->Find("path");
+            if (samplerIndex == nullptr || targetNode == nullptr || path == nullptr || samplerIndex->Uint() >= samplers->array.size()) continue;
+            const JsonValue& sampler = samplers->array[samplerIndex->Uint()];
+            const JsonValue* input = sampler.Find("input");
+            const JsonValue* output = sampler.Find("output");
+            if (input == nullptr || output == nullptr) continue;
+            Accessor inputAccessor, outputAccessor;
+            if (!ReadAccessor(*accessors, *views, input->Uint(), inputAccessor, diagnostic) || !ReadAccessor(*accessors, *views, output->Uint(), outputAccessor, diagnostic) ||
+                inputAccessor.componentType != 5126u || outputAccessor.componentType != 5126u || inputAccessor.count != outputAccessor.count ||
+                (path->string != "translation" && path->string != "rotation" && path->string != "scale")) return false;
+            Channel channel;
+            channel.node = targetNode->Uint();
+            channel.path = path->string == "rotation" ? Channel::Path::Rotation : (path->string == "scale" ? Channel::Path::Scale : Channel::Path::Translation);
+            channel.times.resize(inputAccessor.count);
+            channel.values.resize(outputAccessor.count);
+            for (std::size_t key = 0u; key < channel.times.size(); ++key)
+            {
+                channel.times[key] = ReadFloat(binary, inputAccessor, key, 0u);
+                clip.duration = std::max(clip.duration, channel.times[key]);
+                for (std::size_t component = 0u; component < outputAccessor.components; ++component) channel.values[key][component] = ReadFloat(binary, outputAccessor, key, component);
+                if (outputAccessor.components == 3u) channel.values[key][3u] = 0.0f;
+            }
+            clip.channels.push_back(std::move(channel));
+        }
+        if (clip.duration <= 0.0f || clip.channels.empty())
+        {
+            diagnostic = "Skeleton combat clip contains no usable animation channels: " + std::string(expectedNames[clipIndex]);
+            return false;
+        }
+        clips_.push_back(std::move(clip));
     }
-    if (clipDuration_ <= 0.0f || channels_.empty()) { diagnostic = "Skeleton Idle_5 clip contains no usable animation channels."; return false; }
     loaded_ = true;
     diagnostic.clear();
     return true;
 }
 
-bool SkeletonBipedModel::SkinIdle(float timeSeconds, std::vector<SkinnedRtVertex>& output, std::string& diagnostic) const
+float SkeletonBipedModel::ClipDuration(SkeletonClip clip) const
+{
+    const std::size_t index = static_cast<std::size_t>(clip);
+    return index < clips_.size() ? clips_[index].duration : 0.0f;
+}
+
+bool SkeletonBipedModel::Skin(SkeletonClip clipId, float timeSeconds, std::vector<SkinnedRtVertex>& output, std::string& diagnostic) const
 {
     if (!loaded_) { diagnostic = "Skeleton model was not loaded."; return false; }
+    const std::size_t clipIndex = static_cast<std::size_t>(clipId);
+    if (clipIndex >= clips_.size()) { diagnostic = "Skeleton combat clip index is invalid."; return false; }
+    const Clip& clip = clips_[clipIndex];
     std::vector<Node> pose = nodes_;
-    const float time = std::fmod(std::max(timeSeconds, 0.0f), clipDuration_);
-    for (const Channel& channel : channels_)
+    const float time = clip.loops
+        ? std::fmod(std::max(timeSeconds, 0.0f), clip.duration)
+        : std::clamp(timeSeconds, 0.0f, clip.duration);
+    for (const Channel& channel : clip.channels)
     {
         if (channel.node >= pose.size() || channel.times.empty()) continue;
         const auto upper = std::upper_bound(channel.times.begin(), channel.times.end(), time);
-        const std::size_t next = upper == channel.times.end() ? 0u : static_cast<std::size_t>(upper - channel.times.begin());
+        const std::size_t next = upper == channel.times.end()
+            ? (clip.loops ? 0u : channel.times.size() - 1u)
+            : static_cast<std::size_t>(upper - channel.times.begin());
         const std::size_t previous = next == 0u ? channel.times.size() - 1u : next - 1u;
         const float previousTime = channel.times[previous];
-        const float nextTime = next == 0u ? clipDuration_ : channel.times[next];
-        const float sampledTime = next == 0u && time < previousTime ? time + clipDuration_ : time;
+        const float nextTime = next == 0u ? clip.duration : channel.times[next];
+        const float sampledTime = next == 0u && time < previousTime ? time + clip.duration : time;
         const float fraction = nextTime > previousTime ? std::clamp((sampledTime - previousTime) / (nextTime - previousTime), 0.0f, 1.0f) : 0.0f;
         const auto& a = channel.values[previous];
         const auto& b = channel.values[next];

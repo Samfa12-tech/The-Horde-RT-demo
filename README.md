@@ -38,13 +38,15 @@ Animated-enemy performance update (2026-07-12): the Android loop no longer adds 
 
 Imported-material update (2026-07-12): five exact CC0 Poly Haven PBR sets now texture dry stone, wet cobblestone, mossy masonry, damp puddle edges, and aged metal through three five-layer Vulkan arrays. The runtime proof uses 512 x 512 derived layers while retaining the 1K JPG sources. Its phone regression test held 60 FPS median over 126 intervals. See `docs/PBR_MATERIAL_BATCH_2026-07-12.md` and `ASSET_LICENSES.md`.
 
+Combat/compression update (2026-07-13): the procedural player sword now owns an independent BLAS/fourth TLAS instance and can swing without moving the torch. One skeleton approaches, attacks, dies, and respawns through the existing phone-safe 30 Hz skin/BLAS refit path. Android exposes a `SWING` button; Windows uses right mouse or Space. Android now packages capability-checked ASTC KTX2 material arrays with a 2.38 MiB GPU payload; Windows retains the RGBA8 fallback. Windows exposure is separately calibrated to 0.62 while Android remains 0.92. Builds and automated combat state tests pass, but the target-phone install and performance gate remain open. See `docs/COMBAT_ASTC_SLICE_2026-07-13.md`.
+
 Lighting refinement (updated 2026-07-13): held props remain excluded from direct torch-shadow occlusion while staying visible to primary/reflection rays. Secondary rays now use geometric-normal millimetre-scale bias, and a tiny hidden outer shell catches numerical misses at the zero-thickness room joins. Four physical roof slabs surround one irregular breach in room two; the aligned visible moon and directional light reach surfaces only when the existing ray query passes through that breach. Moon diffuse now respects albedo, wet/metal surfaces receive a cheap highlight, and the final pass uses filmic tone mapping plus linear-to-sRGB output. No artificial volumetric shaft ships. See `docs/RT_LIGHTING_REFINEMENT_2026-07-12.md` and `docs/RT_LIGHTING_SEAM_FIX_2026-07-13.md`.
 
-Android packaging now uses a Gradle-generated runtime-only asset set. Retained source textures and unused model sources stay in the repo but no longer enter the APK; the debug artifact fell from 93.9 MB to 46.8 MB. The live raw PBR arrays still need a capability-checked GPU-compressed replacement.
+Android packaging uses a Gradle-generated runtime-only asset set. Retained source textures and unused model sources stay in the repo; the live build packages only the skeleton and three ASTC KTX2 material arrays. The compressed GPU payload is 84.1% smaller than the raw arrays, although APK ZIP size remains approximately 46.8 MB.
 
 A separate Meshy skeleton is live through a narrow animation import path. It has 11 correctly named clips and is a 9,402-triangle skinned prop; `Idle_5` is CPU-skinned and refit into a dynamic RT BLAS. The enemy is intentionally unarmed because the sword belongs to the player view.
 
-Verified desktop interactive run (2026-07-10): NVIDIA GeForce RTX 5050 Laptop GPU reported `RayTracingPipeline` and presented the RT corridor at 984 x 661. Controls are `WASD` to move, left mouse/trackpad click-drag to look, and `Esc` to exit.
+Verified desktop interactive run: NVIDIA GeForce RTX 5050 Laptop GPU reports `RayTracingPipeline`. Controls are `WASD` to move, left mouse/trackpad click-drag to look, right mouse or Space to swing, and `Esc` to exit.
 
 Important phone finding:
 

@@ -36,6 +36,8 @@ Verify:
 - The log includes `RT frame reached Android swapchain presentation.`
 - Unsupported devices show explicit diagnostics instead of a fallback renderer.
 - Touch movement/look, collision, held props, skeleton animation, PBR materials, and roof-breach moonlight remain functional.
+- `SWING` triggers an independent sword arc; the skeleton approaches, attacks, can die, and respawns. Windows equivalents are right mouse and Space.
+- Log reports the expected material path: ASTC KTX2 on the target phone, RGBA8 raw fallback on RTX Windows.
 - Run the 126-interval cold performance gate after renderer, animation, or asset-path changes; preserve a 50+ FPS median target.
 
 Reports are written under app-private `files/reports/` and desktop `reports/`.

@@ -13,6 +13,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 option(HORDE_RT_BUILD_CAPABILITY_PROBE_EXECUTABLE "Build the standalone command line Vulkan capability probe" ON)
 option(HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW "Build the Win32 diagnostic shell" ON)
 
+include(CTest)
+
 include(cmake/HordeRtSources.cmake)
 set(HORDE_RT_SOURCE_FILES)
 foreach(source IN LISTS HORDE_RT_CORE_RELATIVE_SOURCES)
@@ -73,6 +75,12 @@ if(HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AND WIN32)
     set_target_properties(horde_rt_diagnostic_window PROPERTIES
         OUTPUT_NAME "horde_rt_diagnostic_window"
     )
+endif()
+
+if(BUILD_TESTING)
+    add_executable(horde_rt_combat_smoke tests/SwordCombatSmoke.cpp)
+    target_include_directories(horde_rt_combat_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_combat_smoke COMMAND horde_rt_combat_smoke)
 endif()
 
 message(STATUS "Horde Lantern RT: Vulkan capability probe and Windows diagnostic targets are available; Android builds from android/.")

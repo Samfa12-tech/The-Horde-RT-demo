@@ -23,6 +23,7 @@
 
 #include "ui/DiagnosticOverlay.h"
 #include "gameplay/CorridorCollision.h"
+#include "gameplay/SwordCombat.h"
 #include "vulkan/RtCapabilityReport.h"
 #include "vulkan/VulkanContext.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
@@ -78,6 +79,10 @@ struct VulkanSurfaceContext
     float cameraX = 0.0f;
     float cameraZ = 4.7f;
     float walkAmount = 0.0f;
+    float frameDeltaSeconds = 1.0f / 60.0f;
+    float outputExposure = 0.62f;
+    horde::gameplay::SwordCombat combat;
+    horde::gameplay::CombatSnapshot combatSnapshot;
     uint32_t currentFrame = 0u;
 };
 
@@ -275,6 +280,7 @@ void UpdateDesktopSceneControls(VulkanSurfaceContext& context)
         deltaSeconds = std::clamp(static_cast<float>(now - context.lastControlTick) / 1000.0f, 0.0f, 0.05f);
     }
     context.lastControlTick = now;
+    context.frameDeltaSeconds = deltaSeconds;
     context.walkTime += deltaSeconds * 2.7f;
 
     const float forwardAmount = (context.forwardHeld ? 1.0f : 0.0f) - (context.backwardHeld ? 1.0f : 0.0f);
@@ -366,6 +372,9 @@ bool CreateLogicalDevice(VkPhysicalDevice physicalDevice,
         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES_KHR};
     bufferDeviceAddressFeatures.bufferDeviceAddress = enableRayTracing ? VK_TRUE : VK_FALSE;
     VkPhysicalDeviceFeatures2 features2{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2};
+    VkPhysicalDeviceFeatures supportedCoreFeatures{};
+    vkGetPhysicalDeviceFeatures(physicalDevice, &supportedCoreFeatures);
+    features2.features.textureCompressionASTC_LDR = supportedCoreFeatures.textureCompressionASTC_LDR;
     features2.pNext = &accelerationStructureFeatures;
     accelerationStructureFeatures.pNext = &rayTracingPipelineFeatures;
     rayTracingPipelineFeatures.pNext = &rayQueryFeatures;
@@ -766,6 +775,7 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx)
         std::cerr << "Failed to initialise presentable RT scene: " << diagnostic << '\n';
         return false;
     }
+    std::cout << "PBR material encoding: " << ctx.rtScene.MaterialEncoding() << '\n' << std::flush;
 
     return true;
 }
@@ -909,6 +919,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
     if (useRtFrame)
     {
         UpdateDesktopSceneControls(ctx);
+        ctx.combatSnapshot = ctx.combat.Update(ctx.frameDeltaSeconds, ctx.cameraX, ctx.cameraZ, ctx.cameraYaw);
         std::string diagnostic;
         if (!ctx.rtScene.RecordTraceAndCopy(ctx.commandBuffers[imageIndex],
                                             ctx.swapchainImages[imageIndex],
@@ -921,6 +932,8 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
                                             ctx.cameraX,
                                             ctx.cameraZ,
                                             ctx.walkAmount,
+                                            ctx.outputExposure,
+                                            ctx.combatSnapshot,
                                             diagnostic))
         {
             std::cerr << "Failed to record RT frame: " << diagnostic << '\n';
@@ -1170,6 +1183,11 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 DestroyWindow(hWnd);
                 return 0;
             }
+            if (wParam == VK_SPACE && (lParam & (1ll << 30)) == 0)
+            {
+                sceneContext->combat.RequestAttack();
+                return 0;
+            }
             if (SetDesktopMovementKey(*sceneContext, wParam, true))
             {
                 return 0;
@@ -1192,6 +1210,13 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             sceneContext->lastMousePosition = {
                 static_cast<LONG>(static_cast<short>(LOWORD(lParam))),
                 static_cast<LONG>(static_cast<short>(HIWORD(lParam)))};
+            return 0;
+        }
+        break;
+    case WM_RBUTTONDOWN:
+        if (sceneContext && sceneContext->controlsEnabled)
+        {
+            sceneContext->combat.RequestAttack();
             return 0;
         }
         break;
