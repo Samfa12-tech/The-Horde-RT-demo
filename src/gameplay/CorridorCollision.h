@@ -19,6 +19,8 @@ struct CollisionRect
 };
 
 constexpr CollisionRect kCorridorObstacles[] = {
+    // Wall-attached gallery table: extend into the wall so collision resolves back into the open lane.
+    {-10.0f, -0.72f, 0.05f, 2.35f},
     {-1.20f, -0.78f, -3.48f, -3.32f},
     {0.78f, 1.20f, -3.48f, -3.32f},
 };

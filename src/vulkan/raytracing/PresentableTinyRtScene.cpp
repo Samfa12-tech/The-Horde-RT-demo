@@ -208,6 +208,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     transformBuffer_ = std::exchange(other.transformBuffer_, Buffer{});
     instanceBuffer_ = std::exchange(other.instanceBuffer_, Buffer{});
     skeletonVertexBuffer_ = std::exchange(other.skeletonVertexBuffer_, Buffer{});
+    worldSurfaceBuffer_ = std::exchange(other.worldSurfaceBuffer_, Buffer{});
     blas_ = std::exchange(other.blas_, AccelerationStructure{});
     torchBlas_ = std::exchange(other.torchBlas_, AccelerationStructure{});
     swordBlas_ = std::exchange(other.swordBlas_, AccelerationStructure{});
@@ -334,6 +335,7 @@ void PresentableTinyRtScene::Destroy()
     DestroyAccelerationStructure(swordBlas_);
     DestroyAccelerationStructure(torchBlas_);
     DestroyAccelerationStructure(blas_);
+    DestroyBuffer(worldSurfaceBuffer_);
     DestroyBuffer(skeletonVertexBuffer_);
     DestroyBuffer(instanceBuffer_);
     DestroyBuffer(transformBuffer_);
@@ -908,8 +910,38 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     };
     std::vector<Vertex> vertices;
     std::vector<std::uint32_t> indices;
+    std::vector<std::uint32_t> worldSurfaceCodes;
     vertices.reserve(512u);
     indices.reserve(768u);
+    worldSurfaceCodes.reserve(96u);
+
+    enum SurfaceMaterial : std::uint32_t
+    {
+        SurfaceDryStone = 0u,
+        SurfaceWetCobble = 1u,
+        SurfaceMossyStone = 2u,
+        SurfaceDampGround = 3u,
+        SurfaceAgedMetal = 4u,
+        SurfaceFlame = 5u,
+        SurfaceDarkFigure = 6u,
+        SurfaceHiddenShell = 7u,
+        SurfaceMirror = 8u,
+        SurfaceClearGlass = 9u,
+        SurfaceStainedGlass = 10u,
+    };
+    enum SurfaceNormal : std::uint32_t
+    {
+        SurfaceUp = 0u,
+        SurfaceDown = 1u,
+        SurfaceRight = 2u,
+        SurfaceLeft = 3u,
+        SurfaceForward = 4u,
+        SurfaceBack = 5u,
+        SurfaceGalleryCant = 6u,
+    };
+    const auto surfaceCode = [](SurfaceMaterial material, SurfaceNormal normal) {
+        return static_cast<std::uint32_t>(material) | (static_cast<std::uint32_t>(normal) << 8u);
+    };
 
     const auto addQuad = [&vertices, &indices](const Vertex& a, const Vertex& b, const Vertex& c, const Vertex& d) {
         const std::uint32_t base = static_cast<std::uint32_t>(vertices.size());
@@ -926,6 +958,17 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         vertices.push_back(c);
         indices.insert(indices.end(), {base, base + 1u, base + 2u});
     };
+    const auto addWorldQuad = [&addQuad, &worldSurfaceCodes, &surfaceCode](const Vertex& a,
+                                                                          const Vertex& b,
+                                                                          const Vertex& c,
+                                                                          const Vertex& d,
+                                                                          SurfaceMaterial material,
+                                                                          SurfaceNormal normal) {
+        addQuad(a, b, c, d);
+        const std::uint32_t code = surfaceCode(material, normal);
+        worldSurfaceCodes.push_back(code);
+        worldSurfaceCodes.push_back(code);
+    };
     const auto addBox = [&addQuad](float minX, float minY, float minZ, float maxX, float maxY, float maxZ) {
         // Fixed face order for the raygen material normal lookup:
         // -Z, +Z, -X, +X, +Y, -Y (two triangles per face).
@@ -937,44 +980,70 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         addQuad({{minX, minY, maxZ}}, {{minX, minY, minZ}}, {{maxX, minY, minZ}}, {{maxX, minY, maxZ}});
     };
 
-    addQuad({{-1.85f, -0.95f, 3.4f}}, {{1.85f, -0.95f, 3.4f}}, {{1.85f, -0.95f, -6.4f}}, {{-1.85f, -0.95f, -6.4f}});
-    addQuad({{-1.85f, 1.35f, 3.4f}}, {{-1.85f, 1.35f, -0.2f}}, {{1.85f, 1.35f, -0.2f}}, {{1.85f, 1.35f, 3.4f}});
-    addQuad({{-1.85f, -0.95f, 3.4f}}, {{-1.85f, -0.95f, -6.4f}}, {{-1.85f, 1.35f, -6.4f}}, {{-1.85f, 1.35f, 3.4f}});
-    addQuad({{1.85f, -0.95f, -6.4f}}, {{1.85f, -0.95f, 3.4f}}, {{1.85f, 1.35f, 3.4f}}, {{1.85f, 1.35f, -6.4f}});
-    addQuad({{-1.85f, -0.95f, -6.4f}}, {{1.85f, -0.95f, -6.4f}}, {{1.85f, 1.35f, -6.4f}}, {{-1.85f, 1.35f, -6.4f}});
-    addQuad({{-1.2f, -0.95f, -3.4f}}, {{-0.78f, -0.95f, -3.4f}}, {{-0.78f, 0.95f, -3.4f}}, {{-1.2f, 0.95f, -3.4f}});
-    addQuad({{0.78f, -0.95f, -3.4f}}, {{1.2f, -0.95f, -3.4f}}, {{1.2f, 0.95f, -3.4f}}, {{0.78f, 0.95f, -3.4f}});
-    addQuad({{-1.2f, 0.78f, -3.4f}}, {{1.2f, 0.78f, -3.4f}}, {{1.2f, 1.18f, -3.4f}}, {{-1.2f, 1.18f, -3.4f}});
-    addQuad({{-1.86f, -0.28f, 1.12f}}, {{-1.86f, 0.46f, 1.12f}}, {{-1.86f, 0.46f, 0.62f}}, {{-1.86f, -0.28f, 0.62f}});
-    addQuad({{1.86f, -0.35f, -1.98f}}, {{1.86f, -0.35f, -1.48f}}, {{1.86f, 0.38f, -1.48f}}, {{1.86f, 0.38f, -1.98f}});
-    addQuad({{-1.84f, -0.32f, -0.82f}}, {{-1.84f, 0.24f, -0.62f}}, {{-1.84f, 0.42f, -1.12f}}, {{-1.84f, -0.12f, -1.34f}});
-    addQuad({{1.84f, -0.44f, 0.24f}}, {{1.84f, -0.02f, 0.5f}}, {{1.84f, 0.28f, 0.1f}}, {{1.84f, -0.18f, -0.2f}});
-    addQuad({{-0.52f, -0.94f, -0.86f}}, {{0.34f, -0.94f, -0.64f}}, {{0.64f, -0.94f, -1.18f}}, {{-0.38f, -0.94f, -1.42f}});
+    addWorldQuad({{-1.85f, -0.95f, 3.4f}}, {{1.85f, -0.95f, 3.4f}}, {{1.85f, -0.95f, -6.4f}}, {{-1.85f, -0.95f, -6.4f}}, SurfaceWetCobble, SurfaceUp);
+    addWorldQuad({{-1.85f, 1.35f, 3.4f}}, {{-1.85f, 1.35f, -0.2f}}, {{1.85f, 1.35f, -0.2f}}, {{1.85f, 1.35f, 3.4f}}, SurfaceDryStone, SurfaceDown);
+    addWorldQuad({{-1.85f, -0.95f, 3.4f}}, {{-1.85f, -0.95f, -6.4f}}, {{-1.85f, 1.35f, -6.4f}}, {{-1.85f, 1.35f, 3.4f}}, SurfaceMossyStone, SurfaceRight);
+    addWorldQuad({{1.85f, -0.95f, -6.4f}}, {{1.85f, -0.95f, 3.4f}}, {{1.85f, 1.35f, 3.4f}}, {{1.85f, 1.35f, -6.4f}}, SurfaceMossyStone, SurfaceLeft);
+    addWorldQuad({{-1.85f, -0.95f, -6.4f}}, {{1.85f, -0.95f, -6.4f}}, {{1.85f, 1.35f, -6.4f}}, {{-1.85f, 1.35f, -6.4f}}, SurfaceMossyStone, SurfaceForward);
+    addWorldQuad({{-1.2f, -0.95f, -3.4f}}, {{-0.78f, -0.95f, -3.4f}}, {{-0.78f, 0.95f, -3.4f}}, {{-1.2f, 0.95f, -3.4f}}, SurfaceMossyStone, SurfaceForward);
+    addWorldQuad({{0.78f, -0.95f, -3.4f}}, {{1.2f, -0.95f, -3.4f}}, {{1.2f, 0.95f, -3.4f}}, {{0.78f, 0.95f, -3.4f}}, SurfaceMossyStone, SurfaceForward);
+    addWorldQuad({{-1.2f, 0.78f, -3.4f}}, {{1.2f, 0.78f, -3.4f}}, {{1.2f, 1.18f, -3.4f}}, {{-1.2f, 1.18f, -3.4f}}, SurfaceMossyStone, SurfaceForward);
+    addWorldQuad({{-1.86f, -0.28f, 1.12f}}, {{-1.86f, 0.46f, 1.12f}}, {{-1.86f, 0.46f, 0.62f}}, {{-1.86f, -0.28f, 0.62f}}, SurfaceFlame, SurfaceRight);
+    addWorldQuad({{1.86f, -0.35f, -1.98f}}, {{1.86f, -0.35f, -1.48f}}, {{1.86f, 0.38f, -1.48f}}, {{1.86f, 0.38f, -1.98f}}, SurfaceFlame, SurfaceLeft);
+    addWorldQuad({{-1.84f, -0.32f, -0.82f}}, {{-1.84f, 0.24f, -0.62f}}, {{-1.84f, 0.42f, -1.12f}}, {{-1.84f, -0.12f, -1.34f}}, SurfaceMirror, SurfaceRight);
+    addWorldQuad({{1.84f, -0.44f, 0.24f}}, {{1.84f, -0.02f, 0.5f}}, {{1.84f, 0.28f, 0.1f}}, {{1.84f, -0.18f, -0.2f}}, SurfaceMirror, SurfaceLeft);
+    addWorldQuad({{-0.52f, -0.94f, -0.86f}}, {{0.34f, -0.94f, -0.64f}}, {{0.64f, -0.94f, -1.18f}}, {{-0.38f, -0.94f, -1.42f}}, SurfaceAgedMetal, SurfaceUp);
     // Four physical roof slabs surround one broken opening in room two. The
     // moon query sees this real breach, producing one composed floor/wall patch
     // instead of several ruler-straight stripes across the entire room.
-    addQuad({{-1.85f, 1.35f, -0.2f}}, {{-1.85f, 1.35f, -6.4f}}, {{-0.72f, 1.35f, -5.20f}}, {{-0.55f, 1.35f, -3.45f}});
-    addQuad({{0.32f, 1.35f, -3.55f}}, {{0.62f, 1.35f, -5.05f}}, {{1.85f, 1.35f, -6.4f}}, {{1.85f, 1.35f, -0.2f}});
-    addQuad({{-1.85f, 1.35f, -0.2f}}, {{-0.55f, 1.35f, -3.45f}}, {{0.32f, 1.35f, -3.55f}}, {{1.85f, 1.35f, -0.2f}});
-    addQuad({{-0.72f, 1.35f, -5.20f}}, {{-1.85f, 1.35f, -6.4f}}, {{1.85f, 1.35f, -6.4f}}, {{0.62f, 1.35f, -5.05f}});
+    addWorldQuad({{-1.85f, 1.35f, -0.2f}}, {{-1.85f, 1.35f, -6.4f}}, {{-0.72f, 1.35f, -5.20f}}, {{-0.55f, 1.35f, -3.45f}}, SurfaceDryStone, SurfaceDown);
+    addWorldQuad({{0.32f, 1.35f, -3.55f}}, {{0.62f, 1.35f, -5.05f}}, {{1.85f, 1.35f, -6.4f}}, {{1.85f, 1.35f, -0.2f}}, SurfaceDryStone, SurfaceDown);
+    addWorldQuad({{-1.85f, 1.35f, -0.2f}}, {{-0.55f, 1.35f, -3.45f}}, {{0.32f, 1.35f, -3.55f}}, {{1.85f, 1.35f, -0.2f}}, SurfaceDryStone, SurfaceDown);
+    addWorldQuad({{-0.72f, 1.35f, -5.20f}}, {{-1.85f, 1.35f, -6.4f}}, {{1.85f, 1.35f, -6.4f}}, {{0.62f, 1.35f, -5.05f}}, SurfaceDryStone, SurfaceDown);
     for (std::uint32_t i = 0u; i < 8u; ++i)
     {
         const float x = -1.05f + static_cast<float>(i % 4u) * 0.7f + (i >= 4u ? 0.18f : 0.0f);
         const float z = -2.55f - static_cast<float>(i / 4u) * 1.1f - static_cast<float>(i % 2u) * 0.24f;
         const float h = 0.58f + static_cast<float>(i % 3u) * 0.12f;
-        addQuad({{x - 0.18f, -0.95f, z}}, {{x + 0.18f, -0.95f, z}}, {{x + 0.14f, -0.95f + h, z}}, {{x - 0.14f, -0.95f + h, z}});
+        addWorldQuad({{x - 0.18f, -0.95f, z}}, {{x + 0.18f, -0.95f, z}}, {{x + 0.14f, -0.95f + h, z}}, {{x - 0.14f, -0.95f + h, z}}, SurfaceDarkFigure, SurfaceForward);
+    }
+
+    // A shallow gallery table runs along the left wall, leaving the central
+    // lane open. Five canted swatches reuse the existing ASTC material layers.
+    constexpr float galleryMinX = -1.55f;
+    constexpr float galleryMaxX = -0.72f;
+    constexpr float galleryMinY = -0.95f;
+    constexpr float galleryMaxY = -0.58f;
+    constexpr float galleryMinZ = 0.05f;
+    constexpr float galleryMaxZ = 2.35f;
+    addWorldQuad({{galleryMinX, galleryMinY, galleryMinZ}}, {{galleryMinX, galleryMaxY, galleryMinZ}}, {{galleryMaxX, galleryMaxY, galleryMinZ}}, {{galleryMaxX, galleryMinY, galleryMinZ}}, SurfaceDryStone, SurfaceBack);
+    addWorldQuad({{galleryMaxX, galleryMinY, galleryMaxZ}}, {{galleryMaxX, galleryMaxY, galleryMaxZ}}, {{galleryMinX, galleryMaxY, galleryMaxZ}}, {{galleryMinX, galleryMinY, galleryMaxZ}}, SurfaceDryStone, SurfaceForward);
+    addWorldQuad({{galleryMinX, galleryMinY, galleryMaxZ}}, {{galleryMinX, galleryMaxY, galleryMaxZ}}, {{galleryMinX, galleryMaxY, galleryMinZ}}, {{galleryMinX, galleryMinY, galleryMinZ}}, SurfaceDryStone, SurfaceLeft);
+    addWorldQuad({{galleryMaxX, galleryMinY, galleryMinZ}}, {{galleryMaxX, galleryMaxY, galleryMinZ}}, {{galleryMaxX, galleryMaxY, galleryMaxZ}}, {{galleryMaxX, galleryMinY, galleryMaxZ}}, SurfaceDryStone, SurfaceRight);
+    addWorldQuad({{galleryMinX, galleryMaxY, galleryMinZ}}, {{galleryMinX, galleryMaxY, galleryMaxZ}}, {{galleryMaxX, galleryMaxY, galleryMaxZ}}, {{galleryMaxX, galleryMaxY, galleryMinZ}}, SurfaceDryStone, SurfaceUp);
+    addWorldQuad({{galleryMinX, galleryMinY, galleryMaxZ}}, {{galleryMinX, galleryMinY, galleryMinZ}}, {{galleryMaxX, galleryMinY, galleryMinZ}}, {{galleryMaxX, galleryMinY, galleryMaxZ}}, SurfaceDryStone, SurfaceDown);
+    const std::array<SurfaceMaterial, 5u> galleryMaterials{{SurfaceDryStone, SurfaceWetCobble, SurfaceMossyStone, SurfaceDampGround, SurfaceAgedMetal}};
+    for (std::size_t i = 0u; i < galleryMaterials.size(); ++i)
+    {
+        const float z = 2.05f - static_cast<float>(i) * 0.43f;
+        addWorldQuad({{-0.80f, -0.54f, z + 0.16f}}, {{-0.80f, -0.54f, z - 0.16f}}, {{-1.22f, -0.08f, z - 0.16f}}, {{-1.22f, -0.08f, z + 0.16f}}, galleryMaterials[i], SurfaceGalleryCant);
     }
 
     // A thin hidden shell behind the zero-thickness room planes catches rays
     // that start near a join and skip the adjoining face because of ray tMin.
     // It stops at the open entrance and leaves the room-two roof breach
     // unobstructed. Appending it here preserves every existing material index.
-    addQuad({{-1.92f, -1.02f, 3.4f}}, {{-1.92f, -1.02f, -6.47f}}, {{-1.92f, 1.42f, -6.47f}}, {{-1.92f, 1.42f, 3.4f}});
-    addQuad({{1.92f, -1.02f, -6.47f}}, {{1.92f, -1.02f, 3.4f}}, {{1.92f, 1.42f, 3.4f}}, {{1.92f, 1.42f, -6.47f}});
-    addQuad({{-1.92f, -1.02f, 3.4f}}, {{1.92f, -1.02f, 3.4f}}, {{1.92f, -1.02f, -6.47f}}, {{-1.92f, -1.02f, -6.47f}});
-    addQuad({{-1.92f, -1.02f, -6.47f}}, {{1.92f, -1.02f, -6.47f}}, {{1.92f, 1.42f, -6.47f}}, {{-1.92f, 1.42f, -6.47f}});
+    addWorldQuad({{-1.92f, -1.02f, 3.4f}}, {{-1.92f, -1.02f, -6.47f}}, {{-1.92f, 1.42f, -6.47f}}, {{-1.92f, 1.42f, 3.4f}}, SurfaceHiddenShell, SurfaceRight);
+    addWorldQuad({{1.92f, -1.02f, -6.47f}}, {{1.92f, -1.02f, 3.4f}}, {{1.92f, 1.42f, 3.4f}}, {{1.92f, 1.42f, -6.47f}}, SurfaceHiddenShell, SurfaceLeft);
+    addWorldQuad({{-1.92f, -1.02f, 3.4f}}, {{1.92f, -1.02f, 3.4f}}, {{1.92f, -1.02f, -6.47f}}, {{-1.92f, -1.02f, -6.47f}}, SurfaceHiddenShell, SurfaceUp);
+    addWorldQuad({{-1.92f, -1.02f, -6.47f}}, {{1.92f, -1.02f, -6.47f}}, {{1.92f, 1.42f, -6.47f}}, {{-1.92f, 1.42f, -6.47f}}, SurfaceHiddenShell, SurfaceForward);
 
     const std::uint32_t sceneIndexCount = static_cast<std::uint32_t>(indices.size());
+    if (worldSurfaceCodes.size() != sceneIndexCount / 3u)
+    {
+        diagnostic = "World surface metadata does not match the world triangle count.";
+        return false;
+    }
 
     // The camera-held props share upload buffers but use separate BLAS instances
     // so the sword can swing without moving the torch or its light estimate.
@@ -1017,9 +1086,11 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     const VkMemoryPropertyFlags uploadMemory = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
     const VkDeviceSize vertexBufferSize = sizeof(Vertex) * vertices.size();
     const VkDeviceSize indexBufferSize = sizeof(std::uint32_t) * indices.size();
+    const VkDeviceSize worldSurfaceBufferSize = sizeof(std::uint32_t) * worldSurfaceCodes.size();
     if (!CreateBuffer(vertexBufferSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, vertexBuffer_, diagnostic) ||
         !CreateBuffer(indexBufferSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, indexBuffer_, diagnostic) ||
-        !CreateBuffer(sizeof(transform), VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, transformBuffer_, diagnostic))
+        !CreateBuffer(sizeof(transform), VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, transformBuffer_, diagnostic) ||
+        !CreateBuffer(worldSurfaceBufferSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, uploadMemory, false, worldSurfaceBuffer_, diagnostic))
     {
         return false;
     }
@@ -1034,6 +1105,9 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     vkMapMemory(device_, transformBuffer_.memory, 0u, sizeof(transform), 0u, &mapped);
     std::memcpy(mapped, &transform, sizeof(transform));
     vkUnmapMemory(device_, transformBuffer_.memory);
+    vkMapMemory(device_, worldSurfaceBuffer_.memory, 0u, worldSurfaceBufferSize, 0u, &mapped);
+    std::memcpy(mapped, worldSurfaceCodes.data(), static_cast<std::size_t>(worldSurfaceBufferSize));
+    vkUnmapMemory(device_, worldSurfaceBuffer_.memory);
 
     VkAccelerationStructureGeometryKHR blasGeometry{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
     blasGeometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
@@ -1514,13 +1588,14 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
 
 bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
 {
-    const std::array<VkDescriptorSetLayoutBinding, 6u> bindings{{
+    const std::array<VkDescriptorSetLayoutBinding, 7u> bindings{{
         {0u, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, nullptr},
         {1u, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
         {2u, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
         {3u, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
         {4u, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
         {5u, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
+        {6u, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
     }};
     const VkDescriptorSetLayoutCreateInfo layoutInfo{
         VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
@@ -1537,7 +1612,7 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
     const std::array<VkDescriptorPoolSize, 4u> poolSizes{{
         {VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1u},
         {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1u},
-        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u},
+        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 2u},
         {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 3u},
     }};
     const VkDescriptorPoolCreateInfo poolInfo{
@@ -1596,6 +1671,17 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
     skeletonWrite.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     skeletonWrite.pBufferInfo = &skeletonBufferInfo;
 
+    VkDescriptorBufferInfo worldSurfaceBufferInfo{};
+    worldSurfaceBufferInfo.buffer = worldSurfaceBuffer_.buffer;
+    worldSurfaceBufferInfo.offset = 0u;
+    worldSurfaceBufferInfo.range = worldSurfaceBuffer_.size;
+    VkWriteDescriptorSet worldSurfaceWrite{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
+    worldSurfaceWrite.dstSet = descriptorSet_;
+    worldSurfaceWrite.dstBinding = 6u;
+    worldSurfaceWrite.descriptorCount = 1u;
+    worldSurfaceWrite.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    worldSurfaceWrite.pBufferInfo = &worldSurfaceBufferInfo;
+
     const VkDescriptorImageInfo diffuseInfo{materialSampler_, materialDiffuse_.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
     const VkDescriptorImageInfo normalInfo{materialSampler_, materialNormal_.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
     const VkDescriptorImageInfo armInfo{materialSampler_, materialArm_.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
@@ -1608,8 +1694,9 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
         write.pImageInfo = info;
         return write;
     };
-    const std::array<VkWriteDescriptorSet, 6u> writes{{accelerationStructureWrite, imageWrite, skeletonWrite,
-                                                       sampledWrite(3u, &diffuseInfo), sampledWrite(4u, &normalInfo), sampledWrite(5u, &armInfo)}};
+    const std::array<VkWriteDescriptorSet, 7u> writes{{accelerationStructureWrite, imageWrite, skeletonWrite,
+                                                       sampledWrite(3u, &diffuseInfo), sampledWrite(4u, &normalInfo), sampledWrite(5u, &armInfo),
+                                                       worldSurfaceWrite}};
     vkUpdateDescriptorSets(device_, static_cast<std::uint32_t>(writes.size()), writes.data(), 0u, nullptr);
 
     diagnostic.clear();

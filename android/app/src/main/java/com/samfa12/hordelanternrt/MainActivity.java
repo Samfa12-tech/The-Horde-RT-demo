@@ -77,13 +77,14 @@ public class MainActivity extends Activity {
         root.addView(container, overlayLayoutParams);
 
         final TextView sceneHud = new TextView(this);
-        sceneHud.setText("HORDE LANTERN RT\nPath-traced shadows + first bounce\nLeft drag: walk/strafe\nRight drag: 360 look  •  SWING: attack");
+        sceneHud.setText("HORDE RT\nMOVE | LOOK");
         sceneHud.setTextColor(0xFFFFC46B);
-        sceneHud.setTextSize(14);
+        sceneHud.setTextSize(11);
         sceneHud.setTypeface(Typeface.create(Typeface.SERIF, Typeface.BOLD));
         sceneHud.setShadowLayer(8.0f, 0.0f, 2.0f, Color.BLACK);
         sceneHud.setBackgroundColor(0x33000000);
         sceneHud.setPadding(18, 14, 18, 14);
+        sceneHud.setMaxLines(2);
         final FrameLayout.LayoutParams hudLayoutParams = new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.WRAP_CONTENT,
                 FrameLayout.LayoutParams.WRAP_CONTENT
@@ -95,8 +96,8 @@ public class MainActivity extends Activity {
             final boolean showingDiagnostics = container.getVisibility() == View.VISIBLE;
             container.setVisibility(showingDiagnostics ? View.GONE : View.VISIBLE);
             sceneHud.setText(showingDiagnostics
-                    ? "HORDE LANTERN RT\nPath-traced shadows + first bounce\nLeft drag: walk/strafe\nRight drag: 360 look  •  SWING: attack"
-                    : "HORDE LANTERN RT\nDiagnostics open\nTap to return to scene");
+                    ? "HORDE RT\nMOVE | LOOK"
+                    : "HORDE RT\nLOGS OPEN");
         });
 
         final TextView attackButton = new TextView(this);

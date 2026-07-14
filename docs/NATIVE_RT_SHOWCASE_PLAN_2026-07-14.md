@@ -24,13 +24,13 @@ The strongest final composition is player arms and torch reflected in the mirror
 - Android all-ABI and Windows builds pass; the exact Android build selected ASTC and reached honest RT swapchain presentation.
 - Sustained warm phone evidence is approximately 50-52 FPS at thermal status 2. This is the minimum baseline and provides little spare query/shader budget.
 
-### Slice 1 - explicit material plumbing and gallery table
+### Slice 1 - explicit material plumbing and gallery table: complete
 
 - Replace fragile world-material selection by primitive-number ranges with a compact per-triangle material ID path.
 - Reuse the existing five ASTC texture layers; do not import another large batch yet.
 - Build one bounded table/plinth set with consistent lighting angles so roughness, metallic, normal strength, wetness, and albedo differences are obvious at a glance.
 - Add mirror and glass identifiers as routing types, even before their expensive behavior is enabled.
-- Gate: Windows composition, Android ASTC selection/RT presentation, then warm 50+ FPS median.
+- Gate: Windows composition, Android ASTC selection/RT presentation, then warm phone sampling. The first table pass is verified on `SM-S948B` with strict ASTC selection, honest RT presentation, and sampled engine totals mostly around 13-15 ms at thermal status 2. See `docs/MATERIAL_GALLERY_SLICE_2026-07-14.md`.
 
 ### Slice 2 - framed mirror wall
 
@@ -76,4 +76,4 @@ The strongest final composition is player arms and torch reflected in the mirror
 
 ## Immediate next implementation
 
-Build Slice 1: compact explicit material IDs plus the materials gallery table. It gives the demo a clear exhibit immediately and creates the clean routing foundation required by both mirror and glass.
+Refine Slice 1's exhibit readability from the walking path, then build Slice 2: one framed mirror wall with a single reflected segment and player/prop/skeleton reflection masks. The material ID route is now in place for the mirror and glass follow-up.

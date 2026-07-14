@@ -133,6 +133,7 @@ private:
     Buffer transformBuffer_;
     Buffer instanceBuffer_;
     Buffer skeletonVertexBuffer_;
+    Buffer worldSurfaceBuffer_;
     AccelerationStructure blas_;
     AccelerationStructure torchBlas_;
     AccelerationStructure swordBlas_;
