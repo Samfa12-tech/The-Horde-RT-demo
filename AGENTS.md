@@ -43,6 +43,7 @@ This repo is a native Vulkan hardware ray tracing game/tech-demo project. Keep w
 - Right-side drag gives 360 camera look.
 - Pitch stays clamped; yaw should remain unbounded for 360 look.
 - The held torch is a separate low-poly BLAS instance refit into the TLAS from the camera pose each frame. Its emissive flame mesh and direct-light estimate share the same hand-space placement; do not restore the old fullscreen torch overlay.
+- The player uses a yaw-relative torso BLAS plus four arm TLAS instances drawn from one reusable limb BLAS, all on mask `0x04`. Two-bone IK locks the hands to exact torch/sword grips; limbs and props use the same pitch-aware camera basis, while the torso must remain outside the camera origin. See `docs/PLAYER_BODY_RT_SLICE_2026-07-14.md`.
 - Diagnostics are intentionally hidden behind the small HUD so the app first reads as a game scene.
 
 ## Known renderer constraint
@@ -53,9 +54,11 @@ This repo is a native Vulkan hardware ray tracing game/tech-demo project. Keep w
 
 ## Next slice target
 
-- Fresh-install the ASTC combat build on the target phone, verify the ASTC selection and RT-present logs, then re-run the cold 126-interval benchmark and preserve the 50+ FPS median gate.
-- Hands-on tune only the existing sword timing, enemy range/readability, Android attack control, and Windows exposure until the one-enemy loop feels legible.
-- Do not add a second enemy, broader AI, block/dodge, or audio before that phone gate closes.
+- The combat/ASTC phone gate passed on `SM-S948B`: strict ASTC selection, honest RT swapchain presentation, and two 126-interval samples at 12.500 ms median / 16.667 ms p95. See `docs/COMBAT_ASTC_PHONE_VALIDATION_2026-07-14.md`.
+- The articulated grip/pitch revision is phone-verified: strict ASTC selection, honest RT presentation, live grip/swing composition, and sustained warm evidence around 50-52 FPS at thermal status 2. Preserve mask `0x04` culling and the compact material route. See `docs/PLAYER_BODY_RT_SLICE_2026-07-14.md`.
+- Build the downloadable native RT showcase in bounded order: explicit material IDs and gallery table, one framed one-segment mirror, honest thin clear/stained transmission, then the existing single skeleton as a final-room reveal. See `docs/NATIVE_RT_SHOWCASE_PLAN_2026-07-14.md`.
+- Keep the HUD compact or collapsible at large Android accessibility font scales; do not change the user's system font setting.
+- Do not add a second enemy, broader AI, block/dodge, or audio; the showcase route reuses the existing one-enemy loop.
 - Keep the textured sword LOD out of the runtime until the static GLB/PBR path exists and is measured on phone.
 
 ## Build notes

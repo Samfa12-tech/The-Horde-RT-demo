@@ -23,6 +23,7 @@ Current tested phone build includes:
 - A real RT-produced frame path: BLAS/TLAS, RT pipeline/SBT, `vkCmdTraceRaysKHR`, storage image output, and swapchain presentation.
 - A first-person gothic corridor/ruin scene with authored triangle geometry.
 - Visible handheld medieval flame torch on the left side of the player view.
+- A real RT torso plus four articulated arm-segment instances, visible in the lower first-person view and to selected shadow/reflection rays.
 - Left-side touch movement/strafe and right-side 360 look.
 - Ray-query path-tracing style shading: primary TLAS queries, shadow queries, and a first bounce sample.
 - Reflective objects, wet-floor/puddle response, fog, horde silhouettes, and second-room moonlight through a physical roof breach.
@@ -38,7 +39,11 @@ Animated-enemy performance update (2026-07-12): the Android loop no longer adds 
 
 Imported-material update (2026-07-12): five exact CC0 Poly Haven PBR sets now texture dry stone, wet cobblestone, mossy masonry, damp puddle edges, and aged metal through three five-layer Vulkan arrays. The runtime proof uses 512 x 512 derived layers while retaining the 1K JPG sources. Its phone regression test held 60 FPS median over 126 intervals. See `docs/PBR_MATERIAL_BATCH_2026-07-12.md` and `ASSET_LICENSES.md`.
 
-Combat/compression update (2026-07-13): the procedural player sword now owns an independent BLAS/fourth TLAS instance and can swing without moving the torch. One skeleton approaches, attacks, dies, and respawns through the existing phone-safe 30 Hz skin/BLAS refit path. Android exposes a `SWING` button; Windows uses right mouse or Space. Android now packages capability-checked ASTC KTX2 material arrays with a 2.38 MiB GPU payload; Windows retains the RGBA8 fallback. Windows exposure is separately calibrated to 0.62 while Android remains 0.92. Builds and automated combat state tests pass, but the target-phone install and performance gate remain open. See `docs/COMBAT_ASTC_SLICE_2026-07-13.md`.
+Combat/compression update (2026-07-14): the procedural player sword owns an independent BLAS/fourth TLAS instance and can swing without moving the torch. One skeleton approaches, attacks, dies, and respawns through the existing phone-safe 30 Hz skin/BLAS refit path. Android exposes a `SWING` button; Windows uses right mouse or Space. Android packages capability-checked ASTC KTX2 material arrays with a 2.38 MiB GPU payload; Windows retains the RGBA8 fallback. Windows exposure is 0.62 and Android remains 0.92. The target `SM-S948B` selected ASTC and honestly presented the RT scene; two 126-interval samples measured 12.500 ms median / 16.667 ms p95 (approximately 80 FPS median), closing the phone gate. See `docs/COMBAT_ASTC_SLICE_2026-07-13.md` and `docs/COMBAT_ASTC_PHONE_VALIDATION_2026-07-14.md`.
+
+Player-presence update (2026-07-14): the verified rigid five-box blockout has been refined into a yaw-relative torso plus four articulated arm instances drawn from one reusable limb BLAS. Camera-relative two-bone IK connects both shoulders to exact prop grips: the left hand follows the torch handle and walk bob, the right hand remains on the sword handle throughout its smoothed swing, and both props/arms follow view pitch. The exact `SM-S948B` build selected ASTC, honestly presented RT frames, and visually kept both forearms attached to their props. Sustained thermal-status-2 evidence covered 23,446 SurfaceFlinger TimeStats frames at 52.352 average FPS; internal warm telemetry measured 19.718 ms median (approximately 50.7 FPS). See `docs/PLAYER_BODY_RT_SLICE_2026-07-14.md`.
+
+Showcase direction (2026-07-14): the next milestone is a downloadable 60-90 second native RT route, not broader combat. It proceeds through the existing torch corridor, an explicit materials gallery, one framed mirror wall, honest thin clear/stained transmission, and a final crypt where the existing skeleton is revealed through the RT effects before combat. See `docs/NATIVE_RT_SHOWCASE_PLAN_2026-07-14.md`.
 
 Lighting refinement (updated 2026-07-13): held props remain excluded from direct torch-shadow occlusion while staying visible to primary/reflection rays. Secondary rays now use geometric-normal millimetre-scale bias, and a tiny hidden outer shell catches numerical misses at the zero-thickness room joins. Four physical roof slabs surround one irregular breach in room two; the aligned visible moon and directional light reach surfaces only when the existing ray query passes through that breach. Moon diffuse now respects albedo, wet/metal surfaces receive a cheap highlight, and the final pass uses filmic tone mapping plus linear-to-sRGB output. No artificial volumetric shaft ships. See `docs/RT_LIGHTING_REFINEMENT_2026-07-12.md` and `docs/RT_LIGHTING_SEAM_FIX_2026-07-13.md`.
 
@@ -150,12 +155,14 @@ Verified on-device run (2026-07-05, Samsung Galaxy S26 Ultra, model `SM-S948B`, 
 
 Phase 0 is complete enough to support Phase 1 scene work. Native Vulkan diagnostic surfaces on Windows and Android now present shared probe results, and Android has a real RT scene path.
 
-## Next milestone: compressed mobile PBR assets
+## Next milestone: one-enemy feel and readability
 
 Next slice:
 
-- Replace the three raw 512 x 512 x 5-layer PBR arrays with a capability-checked mobile GPU-compressed format.
-- Re-run the cold 126-interval phone benchmark and preserve the 50+ FPS median gate.
+- Make the HUD compact/collapsible at large Android accessibility font scales without changing the user's system setting.
+- Tune sword timing/reach, enemy attack telegraph, hit/death readability, damage feedback, and attack-button comfort before expanding the combat system.
+- Re-run the 126-interval phone benchmark after meaningful cost changes and preserve the 50+ FPS median gate.
+- Do not add another enemy, broader AI, block/dodge, or audio until the one-enemy loop reads and feels right.
 - Keep the textured sword LOD out of the runtime until the static GLB/PBR path exists and is measured on phone.
 - Preserve the phone-safe ray-query path-tracing route unless a stronger RT route is proven on-device.
 

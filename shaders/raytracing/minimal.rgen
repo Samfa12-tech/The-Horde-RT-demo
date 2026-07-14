@@ -94,8 +94,8 @@ void materialForPrimitive(int primitive, int instance, vec3 p, out vec3 normal, 
 {
     if (instance == 1)
     {
-        vec3 cameraForward = normalize(vec3(sin(controls.yaw), 0.0, -cos(controls.yaw)));
-        vec3 cameraRight = normalize(vec3(cos(controls.yaw), 0.0, sin(controls.yaw)));
+        vec3 cameraForward = normalize(vec3(sin(controls.yaw), -0.05 + controls.pitch, -cos(controls.yaw)));
+        vec3 cameraRight = normalize(cross(cameraForward, vec3(0.0, 1.0, 0.0)));
         normal = primitive == 3 ? cameraRight : cameraForward;
         geometricNormal = normal;
         metallic = 0.0;
@@ -115,13 +115,24 @@ void materialForPrimitive(int primitive, int instance, vec3 p, out vec3 normal, 
 
     if (instance == 3)
     {
-        vec3 cameraForward = normalize(vec3(sin(controls.yaw), 0.0, -cos(controls.yaw)));
+        vec3 cameraForward = normalize(vec3(sin(controls.yaw), -0.05 + controls.pitch, -cos(controls.yaw)));
         normal = cameraForward;
         geometricNormal = normal;
         bool leather = primitive < 2 || (primitive >= 7 && primitive < 9);
         base = leather ? vec3(0.16, 0.075, 0.028) : vec3(0.48, 0.52, 0.56);
         metallic = leather ? 0.12 : 0.92;
         reflectivity = leather ? 0.22 : 0.86;
+        emissive = 0.0;
+        return;
+    }
+
+    if (instance == 4)
+    {
+        normal = normalize(vec3(controls.cameraX, 0.75, controls.cameraZ) - p);
+        geometricNormal = normal;
+        base = vec3(0.12, 0.045, 0.018);
+        metallic = 0.06;
+        reflectivity = 0.18;
         emissive = 0.0;
         return;
     }
@@ -242,7 +253,7 @@ void materialForPrimitive(int primitive, int instance, vec3 p, out vec3 normal, 
     }
 }
 
-HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance)
+HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask)
 {
     HitInfo h;
     h.hit = false;
@@ -258,7 +269,7 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance)
     h.emissive = 0.0;
 
     rayQueryEXT query;
-    rayQueryInitializeEXT(query, topLevelAS, gl_RayFlagsOpaqueEXT, 0xFF, origin, 0.002, direction, maxDistance);
+    rayQueryInitializeEXT(query, topLevelAS, gl_RayFlagsOpaqueEXT, mask, origin, 0.002, direction, maxDistance);
     while (rayQueryProceedEXT(query)) {}
 
     if (rayQueryGetIntersectionTypeEXT(query, true) != gl_RayQueryCommittedIntersectionNoneEXT)
@@ -274,10 +285,10 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance)
             const int firstVertex = h.primitive * 3;
             const vec2 bary = rayQueryGetIntersectionBarycentricsEXT(query, true);
             const float w0 = 1.0 - bary.x - bary.y;
-            const mat3 objectToWorld = mat3(rayQueryGetIntersectionObjectToWorldEXT(query, true));
             vec3 localNormal = normalize(skeleton.vertices[firstVertex].normal.xyz * w0
                 + skeleton.vertices[firstVertex + 1].normal.xyz * bary.x
                 + skeleton.vertices[firstVertex + 2].normal.xyz * bary.y);
+            const mat3 objectToWorld = mat3(rayQueryGetIntersectionObjectToWorldEXT(query, true));
             h.normal = normalize(objectToWorld * localNormal);
             vec3 edgeA = skeleton.vertices[firstVertex + 1].position.xyz - skeleton.vertices[firstVertex].position.xyz;
             vec3 edgeB = skeleton.vertices[firstVertex + 2].position.xyz - skeleton.vertices[firstVertex].position.xyz;
@@ -310,9 +321,13 @@ vec3 offsetRayOrigin(HitInfo h, vec3 direction)
 
 float visibility(vec3 origin, vec3 direction, float maxDistance)
 {
-    // Direct lights ignore camera-held props so the torch and sword cannot cast
-    // distracting self-shadows across nearby floors and walls.
-    return visibilityMask(origin, direction, maxDistance, 0x01u);
+    // Held prop meshes stay excluded from their own direct-light estimate. The
+    // world uses bit 0x01 and the separate player body uses bit 0x04. Keep real
+    // player shadow queries in the lower third where the first-person body and
+    // nearby receiving surfaces live, avoiding a mobile traversal cost on the
+    // upper view that cannot visibly read as player self-shadowing.
+    uint visibilityRayMask = gl_LaunchIDEXT.y * 100u >= gl_LaunchSizeEXT.y * 68u ? 0x05u : 0x01u;
+    return visibilityMask(origin, direction, maxDistance, visibilityRayMask);
 }
 
 vec3 bounceSample(HitInfo h, vec3 incoming)
@@ -343,13 +358,16 @@ vec3 shadePrimary(HitInfo h, vec3 rayDirection)
     vec3 warm = vec3(1.0, 0.28, 0.055);
     vec3 cold = vec3(0.15, 0.20, 0.28);
     float flamePulse = 0.84 + 0.16 * sin(controls.time * 15.0);
-    vec3 cameraForward = normalize(vec3(sin(controls.yaw), 0.0, -cos(controls.yaw)));
-    vec3 cameraRight = normalize(vec3(cos(controls.yaw), 0.0, sin(controls.yaw)));
-    float torchSway = sin(controls.time * 6.2) * 0.08 * max(controls.walkAmount, 0.2);
-    vec3 torchGripPosition = vec3(controls.cameraX, 0.02 + abs(sin(controls.time * 6.2)) * 0.04 * max(controls.walkAmount, 0.2), controls.cameraZ)
-        + cameraForward * 1.34 - cameraRight * (0.42 + torchSway * 0.8);
+    vec3 cameraForward = normalize(vec3(sin(controls.yaw), -0.05 + controls.pitch, -cos(controls.yaw)));
+    vec3 cameraRight = normalize(cross(cameraForward, vec3(0.0, 1.0, 0.0)));
+    vec3 cameraUp = normalize(cross(cameraRight, cameraForward));
+    float movement = max(controls.walkAmount, 0.2);
+    float torchSway = sin(controls.time * 6.2) * 0.035 * movement;
+    float torchBob = abs(sin(controls.time * 6.2)) * 0.025 * movement;
+    vec3 torchGripPosition = vec3(controls.cameraX, 0.58, controls.cameraZ)
+        + cameraRight * (-0.34 - torchSway) + cameraUp * (-0.40 + torchBob) + cameraForward * 1.05;
     // Next-event estimate sampled from the same flame mesh placed in the TLAS, not from a detached light.
-    vec3 torchFlamePosition = torchGripPosition + vec3(0.0, 0.22, 0.0);
+    vec3 torchFlamePosition = torchGripPosition + cameraUp * 0.28;
     vec3 toTorch = torchFlamePosition - h.position;
     float torchDistance = length(toTorch);
     vec3 torchDirection = toTorch / max(torchDistance, 0.001);
@@ -375,7 +393,10 @@ vec3 shadePrimary(HitInfo h, vec3 rayDirection)
     vec3 bounceDirection = reflective > 0.38
         ? reflect(rayDirection, h.normal)
         : normalize(h.normal + vec3(0.18, 0.58, -0.34));
-    HitInfo bounceHit = traceScene(offsetRayOrigin(h, bounceDirection), bounceDirection, 12.0);
+    bool wantsPlayerReflection = reflective > 0.38 ||
+        (h.instance == 0 && h.primitive < 2 && puddleMask(h.position) > 0.05);
+    uint bounceMask = wantsPlayerReflection ? 0x07u : 0x03u;
+    HitInfo bounceHit = traceScene(offsetRayOrigin(h, bounceDirection), bounceDirection, 12.0, bounceMask);
     vec3 bounce = bounceSample(bounceHit, bounceDirection);
 
     vec3 color = h.base * vec3(0.025, 0.028, 0.032);
@@ -388,7 +409,7 @@ vec3 shadePrimary(HitInfo h, vec3 rayDirection)
     float reflectionGain = h.instance == 0 && h.primitive >= 20 && h.primitive < 24 ? 0.82 : 0.32;
     color += bounce * reflective * reflectionGain;
 
-    if (h.primitive < 2)
+    if (h.instance == 0 && h.primitive < 2)
     {
         float puddle = puddleMask(h.position);
         color += vec3(0.95, 0.42, 0.12) * puddle * torchVisibility * 0.28;
@@ -436,7 +457,13 @@ void main()
     screen.y *= -0.74;
     vec3 rayDirection = normalize(forward * 1.22 + right * screen.x + up * screen.y);
 
-    HitInfo primary = traceScene(origin, rayDirection, 10000.0);
+    // The first-person body only occupies the lower view. Skip its BLAS for
+    // upper-screen primary rays, but retain it in lower-screen primary rays,
+    // reflective bounces and lower-view direct-light visibility queries. Move
+    // the cull boundary upward when looking down so the body never shears off.
+    float playerPrimaryStart = clamp(0.68 + controls.pitch, 0.34, 0.82);
+    uint primaryMask = uv.y > playerPrimaryStart ? 0x07u : 0x03u;
+    HitInfo primary = traceScene(origin, rayDirection, 10000.0, primaryMask);
     vec3 color = shadePrimary(primary, rayDirection);
 
     vec2 centered = uv * 2.0 - 1.0;

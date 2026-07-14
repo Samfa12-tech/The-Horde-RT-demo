@@ -211,6 +211,8 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     blas_ = std::exchange(other.blas_, AccelerationStructure{});
     torchBlas_ = std::exchange(other.torchBlas_, AccelerationStructure{});
     swordBlas_ = std::exchange(other.swordBlas_, AccelerationStructure{});
+    playerBodyBlas_ = std::exchange(other.playerBodyBlas_, AccelerationStructure{});
+    playerLimbBlas_ = std::exchange(other.playerLimbBlas_, AccelerationStructure{});
     skeletonBlas_ = std::exchange(other.skeletonBlas_, AccelerationStructure{});
     tlas_ = std::exchange(other.tlas_, AccelerationStructure{});
     skeletonBlasUpdateScratch_ = std::exchange(other.skeletonBlasUpdateScratch_, Buffer{});
@@ -327,6 +329,8 @@ void PresentableTinyRtScene::Destroy()
     DestroyBuffer(tlasUpdateScratch_);
     DestroyAccelerationStructure(skeletonBlas_);
     DestroyBuffer(skeletonBlasUpdateScratch_);
+    DestroyAccelerationStructure(playerLimbBlas_);
+    DestroyAccelerationStructure(playerBodyBlas_);
     DestroyAccelerationStructure(swordBlas_);
     DestroyAccelerationStructure(torchBlas_);
     DestroyAccelerationStructure(blas_);
@@ -904,8 +908,8 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     };
     std::vector<Vertex> vertices;
     std::vector<std::uint32_t> indices;
-    vertices.reserve(128u);
-    indices.reserve(192u);
+    vertices.reserve(512u);
+    indices.reserve(768u);
 
     const auto addQuad = [&vertices, &indices](const Vertex& a, const Vertex& b, const Vertex& c, const Vertex& d) {
         const std::uint32_t base = static_cast<std::uint32_t>(vertices.size());
@@ -921,6 +925,16 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         vertices.push_back(b);
         vertices.push_back(c);
         indices.insert(indices.end(), {base, base + 1u, base + 2u});
+    };
+    const auto addBox = [&addQuad](float minX, float minY, float minZ, float maxX, float maxY, float maxZ) {
+        // Fixed face order for the raygen material normal lookup:
+        // -Z, +Z, -X, +X, +Y, -Y (two triangles per face).
+        addQuad({{minX, minY, minZ}}, {{minX, maxY, minZ}}, {{maxX, maxY, minZ}}, {{maxX, minY, minZ}});
+        addQuad({{maxX, minY, maxZ}}, {{maxX, maxY, maxZ}}, {{minX, maxY, maxZ}}, {{minX, minY, maxZ}});
+        addQuad({{minX, minY, maxZ}}, {{minX, maxY, maxZ}}, {{minX, maxY, minZ}}, {{minX, minY, minZ}});
+        addQuad({{maxX, minY, minZ}}, {{maxX, maxY, minZ}}, {{maxX, maxY, maxZ}}, {{maxX, minY, maxZ}});
+        addQuad({{minX, maxY, minZ}}, {{minX, maxY, maxZ}}, {{maxX, maxY, maxZ}}, {{maxX, maxY, minZ}});
+        addQuad({{minX, minY, maxZ}}, {{minX, minY, minZ}}, {{maxX, minY, minZ}}, {{maxX, minY, maxZ}});
     };
 
     addQuad({{-1.85f, -0.95f, 3.4f}}, {{1.85f, -0.95f, 3.4f}}, {{1.85f, -0.95f, -6.4f}}, {{-1.85f, -0.95f, -6.4f}});
@@ -980,8 +994,21 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     addQuad({{1.72f, -0.34f, -swordZ}}, {{1.18f, -0.34f, -swordZ}}, {{1.20f, -0.25f, -swordZ}}, {{1.70f, -0.25f, -swordZ}});
     addQuad({{1.51f, -0.26f, -swordZ}}, {{1.37f, -0.26f, -swordZ}}, {{1.04f, 1.09f, -swordZ}}, {{1.14f, 1.12f, -swordZ}});
     addTriangle({{1.14f, 1.12f, -swordZ}}, {{1.04f, 1.09f, -swordZ}}, {{1.00f, 1.34f, -swordZ}});
+
+    const std::uint32_t swordIndexCount = static_cast<std::uint32_t>(indices.size());
+
+    // The torso remains in body/world space. Arms are articulated separately
+    // from one reusable unit limb BLAS below, following the first-person view.
+    addBox(-0.23f, -0.94f, -0.12f, 0.23f, -0.40f, 0.14f);  // tunic torso
+    const std::uint32_t playerBodyIndexCount = static_cast<std::uint32_t>(indices.size());
+
+    // Unit square prism along +Z. Four TLAS instances scale/rotate this one
+    // BLAS into the upper/lower segments produced by the two-bone IK solve.
+    addBox(-1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 1.0f);
     const std::uint32_t torchPrimitiveCount = (torchIndexCount - sceneIndexCount) / 3u;
-    const std::uint32_t swordPrimitiveCount = (static_cast<std::uint32_t>(indices.size()) - torchIndexCount) / 3u;
+    const std::uint32_t swordPrimitiveCount = (swordIndexCount - torchIndexCount) / 3u;
+    const std::uint32_t playerBodyPrimitiveCount = (playerBodyIndexCount - swordIndexCount) / 3u;
+    const std::uint32_t playerLimbPrimitiveCount = (static_cast<std::uint32_t>(indices.size()) - playerBodyIndexCount) / 3u;
     const VkTransformMatrixKHR transform{{
         1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f, 0.0f,
@@ -1198,6 +1225,112 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     swordBlasAddressInfo.accelerationStructure = swordBlas_.handle;
     swordBlas_.address = vkGetAccelerationStructureDeviceAddressKHR_(device_, &swordBlasAddressInfo);
 
+    VkAccelerationStructureBuildRangeInfoKHR playerBodyRange{};
+    playerBodyRange.primitiveCount = playerBodyPrimitiveCount;
+    playerBodyRange.primitiveOffset = swordIndexCount * sizeof(std::uint32_t);
+    playerBodyRange.firstVertex = 0u;
+    VkAccelerationStructureBuildGeometryInfoKHR playerBodyBlasBuildInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR};
+    playerBodyBlasBuildInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+    playerBodyBlasBuildInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
+    playerBodyBlasBuildInfo.geometryCount = 1u;
+    playerBodyBlasBuildInfo.pGeometries = &blasGeometry;
+    VkAccelerationStructureBuildSizesInfoKHR playerBodyBlasSizes{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR};
+    vkGetAccelerationStructureBuildSizesKHR_(device_, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &playerBodyBlasBuildInfo, &playerBodyPrimitiveCount, &playerBodyBlasSizes);
+    if (!CreateBuffer(playerBodyBlasSizes.accelerationStructureSize,
+                      VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR,
+                      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                      true,
+                      playerBodyBlas_.backing,
+                      diagnostic))
+    {
+        return false;
+    }
+    VkAccelerationStructureCreateInfoKHR playerBodyBlasCreateInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR};
+    playerBodyBlasCreateInfo.buffer = playerBodyBlas_.backing.buffer;
+    playerBodyBlasCreateInfo.size = playerBodyBlasSizes.accelerationStructureSize;
+    playerBodyBlasCreateInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+    if (vkCreateAccelerationStructureKHR_(device_, &playerBodyBlasCreateInfo, nullptr, &playerBodyBlas_.handle) != VK_SUCCESS)
+    {
+        diagnostic = "Failed to create first-person player-body BLAS.";
+        return false;
+    }
+    Buffer playerBodyBlasScratch;
+    if (!CreateBuffer(playerBodyBlasSizes.buildScratchSize,
+                      VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                      true,
+                      playerBodyBlasScratch,
+                      diagnostic))
+    {
+        return false;
+    }
+    playerBodyBlasBuildInfo.dstAccelerationStructure = playerBodyBlas_.handle;
+    playerBodyBlasBuildInfo.scratchData.deviceAddress = playerBodyBlasScratch.address;
+    const VkAccelerationStructureBuildRangeInfoKHR* playerBodyBlasRanges[] = {&playerBodyRange};
+    BlasBuildData playerBodyBlasBuildData{this, &playerBodyBlasBuildInfo, playerBodyBlasRanges};
+    if (!RunOneTimeCommands(buildBlas, &playerBodyBlasBuildData, diagnostic))
+    {
+        DestroyBuffer(playerBodyBlasScratch);
+        return false;
+    }
+    DestroyBuffer(playerBodyBlasScratch);
+    VkAccelerationStructureDeviceAddressInfoKHR playerBodyBlasAddressInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR};
+    playerBodyBlasAddressInfo.accelerationStructure = playerBodyBlas_.handle;
+    playerBodyBlas_.address = vkGetAccelerationStructureDeviceAddressKHR_(device_, &playerBodyBlasAddressInfo);
+
+    VkAccelerationStructureBuildRangeInfoKHR playerLimbRange{};
+    playerLimbRange.primitiveCount = playerLimbPrimitiveCount;
+    playerLimbRange.primitiveOffset = playerBodyIndexCount * sizeof(std::uint32_t);
+    playerLimbRange.firstVertex = 0u;
+    VkAccelerationStructureBuildGeometryInfoKHR playerLimbBlasBuildInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR};
+    playerLimbBlasBuildInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+    playerLimbBlasBuildInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
+    playerLimbBlasBuildInfo.geometryCount = 1u;
+    playerLimbBlasBuildInfo.pGeometries = &blasGeometry;
+    VkAccelerationStructureBuildSizesInfoKHR playerLimbBlasSizes{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR};
+    vkGetAccelerationStructureBuildSizesKHR_(device_, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &playerLimbBlasBuildInfo, &playerLimbPrimitiveCount, &playerLimbBlasSizes);
+    if (!CreateBuffer(playerLimbBlasSizes.accelerationStructureSize,
+                      VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR,
+                      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                      true,
+                      playerLimbBlas_.backing,
+                      diagnostic))
+    {
+        return false;
+    }
+    VkAccelerationStructureCreateInfoKHR playerLimbBlasCreateInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR};
+    playerLimbBlasCreateInfo.buffer = playerLimbBlas_.backing.buffer;
+    playerLimbBlasCreateInfo.size = playerLimbBlasSizes.accelerationStructureSize;
+    playerLimbBlasCreateInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+    if (vkCreateAccelerationStructureKHR_(device_, &playerLimbBlasCreateInfo, nullptr, &playerLimbBlas_.handle) != VK_SUCCESS)
+    {
+        diagnostic = "Failed to create reusable first-person limb BLAS.";
+        return false;
+    }
+    Buffer playerLimbBlasScratch;
+    if (!CreateBuffer(playerLimbBlasSizes.buildScratchSize,
+                      VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                      true,
+                      playerLimbBlasScratch,
+                      diagnostic))
+    {
+        return false;
+    }
+    playerLimbBlasBuildInfo.dstAccelerationStructure = playerLimbBlas_.handle;
+    playerLimbBlasBuildInfo.scratchData.deviceAddress = playerLimbBlasScratch.address;
+    const VkAccelerationStructureBuildRangeInfoKHR* playerLimbBlasRanges[] = {&playerLimbRange};
+    BlasBuildData playerLimbBlasBuildData{this, &playerLimbBlasBuildInfo, playerLimbBlasRanges};
+    if (!RunOneTimeCommands(buildBlas, &playerLimbBlasBuildData, diagnostic))
+    {
+        DestroyBuffer(playerLimbBlasScratch);
+        return false;
+    }
+    DestroyBuffer(playerLimbBlasScratch);
+    VkAccelerationStructureDeviceAddressInfoKHR playerLimbBlasAddressInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR};
+    playerLimbBlasAddressInfo.accelerationStructure = playerLimbBlas_.handle;
+    playerLimbBlas_.address = vkGetAccelerationStructureDeviceAddressKHR_(device_, &playerLimbBlasAddressInfo);
+
     if (!skeletonModel_.Skin(horde::scene::SkeletonClip::Idle, 0.0f, skeletonSkinnedVertices_, diagnostic) || skeletonSkinnedVertices_.empty())
     {
         if (diagnostic.empty()) diagnostic = "Skeleton produced no skinned vertices.";
@@ -1263,7 +1396,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     skeletonAddressInfo.accelerationStructure = skeletonBlas_.handle;
     skeletonBlas_.address = vkGetAccelerationStructureDeviceAddressKHR_(device_, &skeletonAddressInfo);
 
-    std::array<VkAccelerationStructureInstanceKHR, 4u> instances{};
+    std::array<VkAccelerationStructureInstanceKHR, 9u> instances{};
     instances[0].transform = transform;
     instances[0].instanceCustomIndex = 0u;
     instances[0].mask = 0x01u;
@@ -1288,7 +1421,25 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         0.0f, 0.0f, 1.0f, -2.35f}};
     instances[3] = instances[1];
     instances[3].instanceCustomIndex = 3u;
+    instances[3].mask = 0x02u;
     instances[3].accelerationStructureReference = swordBlas_.address;
+    instances[4] = instances[0];
+    instances[4].instanceCustomIndex = 4u;
+    instances[4].mask = 0x04u;
+    instances[4].accelerationStructureReference = playerBodyBlas_.address;
+    instances[4].transform = {{
+        1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.58f,
+        0.0f, 0.0f, 1.0f, 0.0f}};
+    for (std::size_t i = 5u; i < instances.size(); ++i)
+    {
+        instances[i] = instances[4];
+        instances[i].accelerationStructureReference = playerLimbBlas_.address;
+        instances[i].transform = {{
+            0.07f, 0.0f, 0.0f, 0.0f,
+            0.0f, 0.07f, 0.0f, 0.0f,
+            0.0f, 0.0f, 0.40f, 0.0f}};
+    }
     if (!CreateBuffer(sizeof(instances), VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, instanceBuffer_, diagnostic))
     {
         return false;
@@ -1626,6 +1777,7 @@ bool PresentableTinyRtScene::CreateShaderBindingTable(std::string& diagnostic)
 
 bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffer,
                                                      float cameraYaw,
+                                                     float cameraPitch,
                                                      float walkTime,
                                                      float cameraX,
                                                      float cameraZ,
@@ -1635,22 +1787,106 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
 {
     if (instanceBuffer_.memory == VK_NULL_HANDLE || skeletonVertexBuffer_.memory == VK_NULL_HANDLE ||
         skeletonBlas_.handle == VK_NULL_HANDLE || swordBlas_.handle == VK_NULL_HANDLE ||
+        playerBodyBlas_.handle == VK_NULL_HANDLE || playerLimbBlas_.handle == VK_NULL_HANDLE ||
         tlas_.handle == VK_NULL_HANDLE || skeletonBlasUpdateScratch_.address == 0u || tlasUpdateScratch_.address == 0u)
     {
         diagnostic = "Combat skeleton or held-prop TLAS resources are unavailable.";
         return false;
     }
 
-    const float forwardX = std::sin(cameraYaw);
-    const float forwardZ = -std::cos(cameraYaw);
-    const float rightX = std::cos(cameraYaw);
-    const float rightZ = std::sin(cameraYaw);
+    using Vec3 = std::array<float, 3>;
+    const auto add = [](const Vec3& a, const Vec3& b) { return Vec3{a[0] + b[0], a[1] + b[1], a[2] + b[2]}; };
+    const auto subtract = [](const Vec3& a, const Vec3& b) { return Vec3{a[0] - b[0], a[1] - b[1], a[2] - b[2]}; };
+    const auto scaled = [](const Vec3& v, float scale) { return Vec3{v[0] * scale, v[1] * scale, v[2] * scale}; };
+    const auto dot = [](const Vec3& a, const Vec3& b) { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; };
+    const auto cross = [](const Vec3& a, const Vec3& b) {
+        return Vec3{a[1] * b[2] - a[2] * b[1],
+                    a[2] * b[0] - a[0] * b[2],
+                    a[0] * b[1] - a[1] * b[0]};
+    };
+    const auto normalize = [&dot](const Vec3& v) {
+        const float length = std::sqrt(std::max(dot(v, v), 0.0000001f));
+        return Vec3{v[0] / length, v[1] / length, v[2] / length};
+    };
+    const auto lerp = [](const Vec3& a, const Vec3& b, float amount) {
+        return Vec3{a[0] + (b[0] - a[0]) * amount,
+                    a[1] + (b[1] - a[1]) * amount,
+                    a[2] + (b[2] - a[2]) * amount};
+    };
+
+    const Vec3 worldUp{0.0f, 1.0f, 0.0f};
+    const Vec3 eye{cameraX, 0.58f, cameraZ};
+    const Vec3 bodyForward{std::sin(cameraYaw), 0.0f, -std::cos(cameraYaw)};
+    const Vec3 bodyRight{std::cos(cameraYaw), 0.0f, std::sin(cameraYaw)};
+    const float viewPitch = std::clamp(cameraPitch, -0.32f, 0.28f);
+    const Vec3 viewForward = normalize(Vec3{std::sin(cameraYaw), -0.05f + viewPitch, -std::cos(cameraYaw)});
+    const Vec3 viewRight = normalize(cross(viewForward, worldUp));
+    const Vec3 viewUp = normalize(cross(viewRight, viewForward));
+    const auto toWorld = [&eye, &viewRight, &viewUp, &viewForward, &add, &scaled](const Vec3& local) {
+        return add(add(add(eye, scaled(viewRight, local[0])), scaled(viewUp, local[1])), scaled(viewForward, local[2]));
+    };
+    const auto solveElbow = [&subtract, &add, &scaled, &dot, &normalize](const Vec3& shoulder,
+                                                                        const Vec3& hand,
+                                                                        float upperLength,
+                                                                        float lowerLength,
+                                                                        const Vec3& poleSeed) {
+        const Vec3 delta = subtract(hand, shoulder);
+        const float distance = std::sqrt(std::max(dot(delta, delta), 0.0000001f));
+        const Vec3 direction = scaled(delta, 1.0f / distance);
+        const Vec3 pole = normalize(subtract(poleSeed, scaled(direction, dot(poleSeed, direction))));
+        const float along = std::clamp((upperLength * upperLength - lowerLength * lowerLength + distance * distance) / (2.0f * distance),
+                                       0.0f,
+                                       upperLength);
+        const float height = std::sqrt(std::max(upperLength * upperLength - along * along, 0.0f));
+        return add(add(shoulder, scaled(direction, along)), scaled(pole, height));
+    };
+    const auto segmentTransform = [&subtract, &cross, &normalize, &dot](const Vec3& start, const Vec3& end, float radius) {
+        const Vec3 delta = subtract(end, start);
+        const float length = std::sqrt(std::max(dot(delta, delta), 0.0000001f));
+        const Vec3 zAxis = normalize(delta);
+        const Vec3 reference = std::abs(zAxis[1]) < 0.95f ? Vec3{0.0f, 1.0f, 0.0f} : Vec3{1.0f, 0.0f, 0.0f};
+        const Vec3 xAxis = normalize(cross(reference, zAxis));
+        const Vec3 yAxis = cross(zAxis, xAxis);
+        return VkTransformMatrixKHR{{
+            xAxis[0] * radius, yAxis[0] * radius, zAxis[0] * length, start[0],
+            xAxis[1] * radius, yAxis[1] * radius, zAxis[1] * length, start[1],
+            xAxis[2] * radius, yAxis[2] * radius, zAxis[2] * length, start[2]}};
+    };
+
     const float movement = std::max(walkAmount, 0.2f);
     constexpr float torchScale = 0.56f;
-    const float torchSway = std::sin(walkTime * 6.2f) * 0.08f * movement;
-    const float torchX = cameraX + forwardX * 1.34f - rightX * (0.42f + torchSway * 0.8f);
-    const float torchY = 0.02f + std::abs(std::sin(walkTime * 6.2f)) * 0.04f * movement;
-    const float torchZ = cameraZ + forwardZ * 1.34f - rightZ * (0.42f + torchSway * 0.8f);
+    const float torchSway = std::sin(walkTime * 6.2f) * 0.035f * movement;
+    const float torchBob = std::abs(std::sin(walkTime * 6.2f)) * 0.025f * movement;
+    // Keep the visible grip line above the bottom crop and far enough forward
+    // that the held props read at a natural first-person scale on a tall phone.
+    const Vec3 leftShoulderLocal{-0.24f, -0.44f, 0.06f};
+    const Vec3 leftHandLocal{-0.34f - torchSway, -0.40f + torchBob, 1.05f};
+    const float swingAmount = std::clamp(-combat.swordSwingRadians / 1.12f, 0.0f, 1.0f);
+    const float smoothSwing = swingAmount * swingAmount * (3.0f - 2.0f * swingAmount);
+    const Vec3 rightShoulderLocal{0.24f, -0.44f, 0.06f};
+    const Vec3 rightHandLocal = lerp(Vec3{0.34f, -0.41f, 1.05f}, Vec3{-0.08f, -0.47f, 1.00f}, smoothSwing);
+    const Vec3 leftElbowLocal = solveElbow(leftShoulderLocal, leftHandLocal, 0.53f, 0.53f, Vec3{-1.0f, -0.15f, 0.08f});
+    const Vec3 rightElbowLocal = solveElbow(rightShoulderLocal, rightHandLocal, 0.53f, 0.53f, Vec3{1.0f, -0.20f, 0.10f});
+    const Vec3 leftShoulder = toWorld(leftShoulderLocal);
+    const Vec3 leftElbow = toWorld(leftElbowLocal);
+    const Vec3 leftHand = toWorld(leftHandLocal);
+    const Vec3 rightShoulder = toWorld(rightShoulderLocal);
+    const Vec3 rightElbow = toWorld(rightElbowLocal);
+    const Vec3 rightHand = toWorld(rightHandLocal);
+
+    const Vec3 torchColumnX = scaled(viewRight, torchScale);
+    const Vec3 torchColumnY = scaled(viewUp, torchScale);
+    const Vec3 torchColumnZ = scaled(viewForward, torchScale);
+    // Local torch grip is (0, -0.22, 0), so T = hand - M * grip.
+    const Vec3 torchTranslation = add(leftHand, scaled(torchColumnY, 0.22f));
+
+    const float swordCos = std::cos(combat.swordSwingRadians);
+    const float swordSin = std::sin(combat.swordSwingRadians);
+    const Vec3 swordColumnX = scaled(add(scaled(viewRight, swordCos), scaled(viewUp, swordSin)), torchScale);
+    const Vec3 swordColumnY = scaled(add(scaled(viewRight, -swordSin), scaled(viewUp, swordCos)), torchScale);
+    const Vec3 swordColumnZ = scaled(viewForward, torchScale);
+    // Local sword grip is (1.47, -0.485, 0), so T = hand - M * grip.
+    const Vec3 swordTranslation = add(add(rightHand, scaled(swordColumnX, -1.47f)), scaled(swordColumnY, 0.485f));
 
     const horde::scene::SkeletonClip skeletonClip = combat.enemyAnimation == horde::gameplay::EnemyAnimation::Walking
         ? horde::scene::SkeletonClip::Walking
@@ -1684,7 +1920,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         lastSkeletonClip_ = skeletonClipIndex;
     }
 
-    std::array<VkAccelerationStructureInstanceKHR, 4u> instances{};
+    std::array<VkAccelerationStructureInstanceKHR, 9u> instances{};
     instances[0].transform = {{
         1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f, 0.0f,
@@ -1695,9 +1931,9 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     instances[0].accelerationStructureReference = blas_.address;
     instances[1] = instances[0];
     instances[1].transform = {{
-        rightX * torchScale, 0.0f, forwardX * torchScale, torchX,
-        0.0f, torchScale, 0.0f, torchY,
-        rightZ * torchScale, 0.0f, forwardZ * torchScale, torchZ}};
+        torchColumnX[0], torchColumnY[0], torchColumnZ[0], torchTranslation[0],
+        torchColumnX[1], torchColumnY[1], torchColumnZ[1], torchTranslation[1],
+        torchColumnX[2], torchColumnY[2], torchColumnZ[2], torchTranslation[2]}};
     instances[1].instanceCustomIndex = 1u;
     instances[1].mask = 0x02u;
     instances[1].accelerationStructureReference = torchBlas_.address;
@@ -1713,13 +1949,29 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         -enemySin, 0.0f, enemyCos, combat.enemyZ}};
     instances[3] = instances[1];
     instances[3].instanceCustomIndex = 3u;
+    instances[3].mask = 0x02u;
     instances[3].accelerationStructureReference = swordBlas_.address;
-    const float swordCos = std::cos(combat.swordSwingRadians);
-    const float swordSin = std::sin(combat.swordSwingRadians);
     instances[3].transform = {{
-        rightX * torchScale * swordCos, -rightX * torchScale * swordSin, forwardX * torchScale, torchX,
-        torchScale * swordSin, torchScale * swordCos, 0.0f, torchY,
-        rightZ * torchScale * swordCos, -rightZ * torchScale * swordSin, forwardZ * torchScale, torchZ}};
+        swordColumnX[0], swordColumnY[0], swordColumnZ[0], swordTranslation[0],
+        swordColumnX[1], swordColumnY[1], swordColumnZ[1], swordTranslation[1],
+        swordColumnX[2], swordColumnY[2], swordColumnZ[2], swordTranslation[2]}};
+    instances[4] = instances[0];
+    instances[4].instanceCustomIndex = 4u;
+    instances[4].mask = 0x04u;
+    instances[4].accelerationStructureReference = playerBodyBlas_.address;
+    instances[4].transform = {{
+        bodyRight[0], 0.0f, bodyForward[0], cameraX,
+        bodyRight[1], 1.0f, bodyForward[1], 0.58f,
+        bodyRight[2], 0.0f, bodyForward[2], cameraZ}};
+    for (std::size_t i = 5u; i < instances.size(); ++i)
+    {
+        instances[i] = instances[4];
+        instances[i].accelerationStructureReference = playerLimbBlas_.address;
+    }
+    instances[5].transform = segmentTransform(leftShoulder, leftElbow, 0.065f);
+    instances[6].transform = segmentTransform(leftElbow, leftHand, 0.055f);
+    instances[7].transform = segmentTransform(rightShoulder, rightElbow, 0.065f);
+    instances[8].transform = segmentTransform(rightElbow, rightHand, 0.055f);
 
     if (vkMapMemory(device_, instanceBuffer_.memory, 0u, sizeof(instances), 0u, &mapped) != VK_SUCCESS || mapped == nullptr)
     {
@@ -1843,7 +2095,7 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
         return false;
     }
 
-    if (!UpdateDynamicInstances(commandBuffer, cameraYaw, walkTime, cameraX, cameraZ, walkAmount, combat, diagnostic))
+    if (!UpdateDynamicInstances(commandBuffer, cameraYaw, cameraPitch, walkTime, cameraX, cameraZ, walkAmount, combat, diagnostic))
     {
         return false;
     }

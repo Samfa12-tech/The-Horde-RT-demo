@@ -70,12 +70,22 @@ The five-source CC0 Poly Haven batch, Vulkan array upload, world-space mapping, 
 3. Measure APK size, device memory, and the 126-interval frame gate again.
 4. Keep the full textured sword LOD separate until this environment material path is stable.
 
-### Compressed material and first combat slice - implementation complete 2026-07-13
+### Compressed material and first combat slice - phone verified 2026-07-14
 
 - Android packages ASTC KTX2 arrays at 6x6 diffuse/ARM and 4x4 normal quality, with strict header and Vulkan format-capability checks. Windows retains RGBA8 raw fallback.
 - The procedural sword is an independent held-prop BLAS/TLAS instance and drives a timed one-enemy hit/death/respawn loop.
 - The skeleton reader is still narrow: exactly `Idle_5`, `Walking`, `Attack`, and `Dead` at a 30 Hz skin/refit cadence.
-- Windows and all-ABI Android builds, APK contents, RTX smoke, and automated combat state transitions pass. Target-phone runtime and the 126-interval performance gate remain open. See `docs/COMBAT_ASTC_SLICE_2026-07-13.md`.
+- Windows and all-ABI Android builds, APK contents, RTX smoke, automated combat state transitions, strict ASTC phone selection, RT swapchain presentation, and phone input stability pass. Two 126-interval samples measured 12.500 ms median / 16.667 ms p95 (approximately 80 FPS median). See `docs/COMBAT_ASTC_SLICE_2026-07-13.md` and `docs/COMBAT_ASTC_PHONE_VALIDATION_2026-07-14.md`.
+
+### First-person RT body presence - articulated phone proof complete 2026-07-14
+
+- The initial rigid five-box torso/arm blockout passed Android/Windows builds, RT presentation, visual checks, and a clean 126-interval phone sample at 12.500 ms median / 16.667 ms p95 (approximately 80 FPS median).
+- The refined renderer uses nine total TLAS instances: a yaw-relative torso and four arm segments reusing one static limb BLAS, alongside world, torch, enemy, and sword.
+- Camera-relative two-bone IK attaches each hand to an exact prop grip. Torch/left arm and sword/right arm now follow pitch; the sword hand follows a smoothed swing arc while the grip remains locked.
+- Independent ray mask `0x04` keeps the body available to lower-view primary rays, selected direct-light occlusion, and reflective/puddle bounces without making held props self-shadow.
+- The articulated all-ABI Android and Windows builds pass compilation and desktop combat smoke. The exact phone build selected ASTC, honestly presented RT frames, and visually kept both forearms on their prop handles.
+- Sustained warm phone evidence at thermal status 2 covered 23,446 SurfaceFlinger TimeStats frames at 52.352 average FPS; thirty internal 120-frame windows measured 19.718 ms median (approximately 50.7 FPS) and 20.502 ms p95.
+- This closes the structural attachment implementation, not character art: authored hands, legs, a skinned rig, and richer cloth/leather materials remain deferred. See `docs/PLAYER_BODY_RT_SLICE_2026-07-14.md`.
 
 ### RT lighting refinement - complete 2026-07-12
 
@@ -85,11 +95,15 @@ The five-source CC0 Poly Haven batch, Vulkan array upload, world-space mapping, 
 - Rejected and removed fake analytic/overlay shafts.
 - Deferred true volumetric dust until a participating-media implementation is proven, likely desktop-first.
 
-## Next technical slice
+## Next technical slice - downloadable native RT showcase
 
-1. Fresh-install and cold-benchmark the exact combat/ASTC build on the target phone; preserve the 50+ FPS median gate.
-2. Tune only the existing combat readability/input and Windows exposure from hands-on comparison.
-3. Consider true participating-media dust on Windows RTX only after the compressed phone path and combat loop are stable.
+1. Add compact explicit per-triangle material IDs and build a bounded materials gallery table from the five existing ASTC PBR layers.
+2. Reclaim diffuse-ray budget, then add one framed one-segment mirror wall with a directly lit reflected hit.
+3. Add honest thin clear/stained panes through a separate static glass instance/mask and bounded Fresnel plus one transmission query.
+4. Compose the existing single skeleton as the final-room mirror/glass reveal; do not add enemy count or broader AI.
+5. Finish with compact effect labels, reproducible benchmark/reset mode, signed Android APK, Windows zip, compatibility notes, hashes, and license evidence.
+
+Full route, gates, and technical boundaries: `docs/NATIVE_RT_SHOWCASE_PLAN_2026-07-14.md`.
 
 The runtime-only Android asset task is complete and reduced the debug APK from 93,855,324 to 46,793,811 bytes.
 

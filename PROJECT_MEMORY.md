@@ -1,6 +1,6 @@
 # Horde Lantern RT - Project Memory
 
-Last updated: 2026-07-13
+Last updated: 2026-07-14
 
 ## Project identity
 
@@ -46,6 +46,9 @@ Last updated: 2026-07-13
 - The 2026-07-13 lighting repair seals zero-thickness room joins with an eight-triangle hidden outer shell and launches secondary rays from geometric normals with millimetre-scale bias, removing the cold exterior seams at floor/wall/ceiling joins. Room two now uses four physical roof slabs around one irregular breach; one aligned moon direction drives both the visible disc and the existing ray-query visibility test. Moon diffuse respects albedo, wet/metal surfaces receive a cheap view-dependent highlight, and the final pass uses filmic tone mapping plus linear-to-sRGB output. No fake shaft or additional visibility ray was added. See `docs/RT_LIGHTING_SEAM_FIX_2026-07-13.md`.
 - The 2026-07-13 codebase audit removed the disabled legacy raygen blob, abandoned NativeActivity/scaffold paths, and the misleading empty-command-buffer Tiny RT bootstrap. Android and Windows now share one collision helper and one native source manifest; the RT mode predicate requires the ray-query feature used by the actual renderer. The standalone probe leaves `rtScene` as `Not attempted` until a real platform swapchain presents it. Windows probe/window and Android all-ABI builds pass. See `docs/CODEBASE_AUDIT_2026-07-13.md`.
 - The first combat/ASTC slice is implemented. The procedural sword has its own BLAS/fourth TLAS instance and swings independently of the torch; one skeleton walks toward the player, attacks, dies to a timed forward hit, and respawns using the exact `Walking`, `Attack`, and `Dead` clips. Android has a `SWING` control; Windows uses right mouse or Space. Android packages 2,494,080 bytes of capability-checked ASTC KTX2 texture payload instead of 15,728,640 raw bytes, while Windows retains the raw fallback. Windows exposure is 0.62 and Android remains 0.92. Full evidence: `docs/COMBAT_ASTC_SLICE_2026-07-13.md`.
+- Target-phone validation on 2026-07-14 closed the combat/ASTC gate. A fresh install on `SM-S948B` selected the strict ASTC path and `RayTracingPipeline`, honestly presented the RT scene at `1440x2812`, and passed two 126-interval SurfaceFlinger samples at 12.500 ms median / 16.667 ms p95 (approximately 80 FPS median), including a warm thermal-status-2 sample. Scripted movement/look/swing input remained stable. Full evidence: `docs/COMBAT_ASTC_PHONE_VALIDATION_2026-07-14.md`.
+- The player-presence RT slice first passed phone validation as a rigid five-box blockout and is now refined to nine total TLAS instances: world, torch, enemy, sword, torso, and four arm segments reusing one static limb BLAS. Camera-relative two-bone IK locks both hands to exact prop grips throughout movement/swing; limbs, props, and the torch-light estimate follow pitch while the torso remains yaw-relative. The exact articulated Android build selected ASTC and honestly presented RT frames. Warm thermal-status-2 evidence covered 23,446 SurfaceFlinger TimeStats frames at 52.352 average FPS; thirty internal 120-frame windows measured 19.718 ms median (approximately 50.7 FPS) and 20.502 ms p95. Full status: `docs/PLAYER_BODY_RT_SLICE_2026-07-14.md`.
+- The production direction is now a downloadable 60-90 second native RT showcase rather than broader combat: torch corridor, explicit materials gallery, framed mirror wall, honest thin clear/stained transmission, then a final crypt where the existing single skeleton is revealed through mirror/glass. Every slice must retain real `vkCmdTraceRaysKHR`, phone-safe ray queries, honest diagnostics, and the warm 50+ FPS median gate. Full plan: `docs/NATIVE_RT_SHOWCASE_PLAN_2026-07-14.md`.
 
 ## Tested phone results
 
@@ -56,8 +59,8 @@ Last updated: 2026-07-13
 - User confirmed the scene loads, is performant on the phone, manual movement works, and the ray-query path-tracing look is promising.
 - Phase 1C closeout on 2026-07-11 rebuilt and installed commit `93e8818`, cold-launched successfully, and again logged `RT frame reached Android swapchain presentation.` at a `1440x2812` RT dispatch.
 - A 126-interval SurfaceFlinger sample measured 17.284 ms median, 17.908 ms p95, and approximately 57.9 FPS median. The in-app FPS field remains honestly `N/A` because engine timing instrumentation is not implemented.
-- The 2026-07-13 seam/moon repair compiled and presented successfully on Windows RTX, and the Android debug APK rebuilt successfully for all four configured ABIs. The phone was not connected for install/runtime validation; that gate remains open.
-- The combat/ASTC build also passed Windows compilation, RTX smoke, all-ABI Android assembly, strict APK asset audit, and the automated combat state test. No phone was connected, so fresh install, ASTC runtime selection, current-shader visual comparison, combat input, RT presentation, and the 126-interval performance gate remain open.
+- The 2026-07-13 seam/moon repair compiled and presented successfully on Windows RTX; the exact current shader subsequently presented successfully on the target phone with Android exposure retained at 0.92.
+- The combat/ASTC build passed Windows compilation, RTX smoke, all-ABI Android assembly, strict APK asset audit, automated combat state testing, fresh phone install, ASTC runtime selection, current-shader visual comparison, combat input, honest RT presentation, and the 126-interval performance gate.
 - Scripted phone touch tests exercised full-turn yaw, both pitch limits, forward/back movement, corridor side limits, and repeated arch-area strafe/forward input without a crash, trap, or observed wall tunnelling.
 - The failed recursive experiment logged: `Failed to initialise presentable RT scene: Failed to create RT pipeline.`
 - Resolution: keep phone path at ray pipeline recursion depth 1 and use ray queries for path-tracing-like secondary visibility/bounce work.
@@ -82,7 +85,8 @@ Last updated: 2026-07-13
 - Android has basic manual movement, 360 look, corridor bounds, and arch-post collision, but not a full physics/collision system.
 - There is one deliberately narrow approach/attack/death/respawn enemy loop and player sword hit test. There is still no horde AI, block, dodge, player-death loop, or audio.
 - Current environment and held-prop geometry is hand-authored simple triangles/quads. A procedural player sword is visible in the right hand; the Meshy sword now has a 12,358-triangle LOD but still needs static GLB/PBR import before it can replace the proof.
-- Five CC0 PBR material sets are live through ASTC KTX2 arrays on supported Android hardware and raw RGBA fallback on Windows. The new phone path still needs runtime and performance validation.
+- The first-person body remains low-poly RT geometry: a yaw-relative torso and four camera/pitch-relative limb instances driven by two-bone IK to exact torch/sword grips. It proves presence, attachment, lighting occlusion, and reflection participation and is phone-validated, but does not yet have authored hands, legs, a skinned rig, or detailed cloth/leather materials.
+- Five CC0 PBR material sets are live through phone-verified ASTC KTX2 arrays on Android and raw RGBA fallback on Windows.
 - The held torch uses a host-written TLAS transform, so Android and Windows intentionally run one frame in flight until the renderer has per-frame TLAS/instance-buffer ownership.
 
 ## Completed Phase 1B / early Phase 1C work
@@ -99,12 +103,13 @@ Last updated: 2026-07-13
 10. Added a verified interactive Windows RTX 5050 RT corridor build with keyboard and mouse/trackpad controls.
 11. Staged the merged-animation skeleton, verified its 11 clip names, and kept the sword separate.
 12. Replaced the fake held-torch overlay/light relationship with a two-BLAS RT scene: static corridor plus a camera-following emissive torch mesh in the TLAS.
+13. Added a phone-verified fifth player-body BLAS/TLAS instance so the first-person character has real torso/arm geometry in primary, direct-light, and reflection queries.
 
 ## Next-step sequence
 
-1. Fresh-install the combat/ASTC build, require the ASTC selection plus RT-present logs, and visually compare the current ACES/sRGB shader on the phone.
-2. Re-run the 126-interval cold phone benchmark and preserve the 50+ FPS median gate.
-3. Hands-on tune the existing sword timing, enemy range/readability, Android attack control, and desktop exposure; do not add another enemy yet.
+1. Run a focused feel/readability pass on the existing one-enemy loop: compact/collapsible HUD behavior at large accessibility font scales, sword timing/reach, attack telegraph, hit/death readability, damage feedback, Android attack comfort, and desktop exposure.
+2. Re-run the 126-interval phone gate after any renderer, animation, material, or meaningful combat-cost change; preserve the 50+ FPS median target.
+3. Do not add another enemy, broader AI, block/dodge, or audio until the one-enemy feel pass is accepted.
 4. Replace the procedural player-right-hand sword proof only after static GLB/PBR upload exists and the 12,358-triangle LOD is measured on phone. Never put the 49k source mesh into Android RT.
 5. Keep enemies unarmed unless a later design explicitly calls for weapons.
 

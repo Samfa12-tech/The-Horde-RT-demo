@@ -95,6 +95,7 @@ private:
     bool CreateShaderBindingTable(std::string& diagnostic);
     bool UpdateDynamicInstances(VkCommandBuffer commandBuffer,
                                 float cameraYaw,
+                                float cameraPitch,
                                 float walkTime,
                                 float cameraX,
                                 float cameraZ,
@@ -135,6 +136,8 @@ private:
     AccelerationStructure blas_;
     AccelerationStructure torchBlas_;
     AccelerationStructure swordBlas_;
+    AccelerationStructure playerBodyBlas_;
+    AccelerationStructure playerLimbBlas_;
     AccelerationStructure skeletonBlas_;
     AccelerationStructure tlas_;
     Buffer skeletonBlasUpdateScratch_;

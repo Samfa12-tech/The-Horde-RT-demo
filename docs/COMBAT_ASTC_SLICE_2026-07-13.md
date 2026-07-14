@@ -33,8 +33,8 @@
 - Debug APK size is 46,793,835 bytes. ZIP compression had already made the raw arrays inexpensive on disk, so APK size is effectively unchanged; the material win is app-private staging and GPU memory, not archive size.
 - `horde_rt_combat_smoke` passed swing, player hit/death, respawn, and enemy damage-pulse state transitions.
 
-## Open phone gate
+## Phone gate closed - 2026-07-14
 
-No Android device was connected during this pass. Fresh install, current-shader visual comparison, ASTC selection log, RT-present log, hands-on controls/combat, and the cold 126-interval benchmark remain mandatory. Preserve the 50+ FPS median gate before adding another enemy or the textured sword LOD.
+The exact APK was subsequently fresh-installed on the target `SM-S948B`. It selected the strict ASTC KTX2 path and `RayTracingPipeline`, then logged an RT-produced frame reaching swapchain presentation at `1440x2812`. A 126-interval SurfaceFlinger sample measured 12.500 ms median and 16.667 ms p95; a second warm sample at thermal status 2 retained the same median and p95. Both are approximately 80 FPS median and pass the 50+ FPS gate.
 
-The desktop brightness comparison must also account for build age: the latest ACES/sRGB seam-and-moon shader had not previously been run on the phone. Android keeps its existing exposure until the exact current build is compared on target hardware.
+Android movement/look and `SWING` input were exercised without a crash, and captures show the independent sword arc, warm fire, corridor depth, and readable compressed PBR floor. Android exposure remains `0.92`. The remaining presentation issue is that the informational HUD is large at the phone's 1.7 accessibility font scale; compact/collapsible HUD treatment belongs in the next readability pass. Full evidence: `docs/COMBAT_ASTC_PHONE_VALIDATION_2026-07-14.md`.
