@@ -3,9 +3,9 @@
 ## Exact package
 
 - Candidate: `Horde-Lantern-RT-Alpha-0.1.0-alpha.1-Windows-x64.zip`
-- SHA-256: `11b59046d531a1d3f86c3f5ae488ee6dc26a5deeaf2e39e11da304575edd2f19`
+- SHA-256: `1bae34e6d323bbd201ff4dd113f3c78518788f90a298a7babce1a446da2721cc`
 - Itch channel: `samfa12/the-horde:windows-x64`
-- Itch upload/build: `#18339908` / `#1797811`
+- Itch upload/build: `#18339908` / `#1798649`
 - User version: `0.1.0-alpha.1`
 - Validated GPU: NVIDIA GeForce RTX 5050 Laptop GPU
 
@@ -34,4 +34,6 @@ Evidence:
 
 ## Remaining extended desktop sweep
 
-The alpha package and core settings/diagnostics path are verified. A later polish pass should still repeat every menu action, F1/F2, fullscreen, arbitrary resize, minimize/restore, look sensitivity, and 100%/150% Windows display scaling as one uninterrupted interaction sweep.
+The alpha package and core settings/diagnostics path are verified. A later compatibility pass should still repeat explicit 100% and 150% Windows display scaling.
+
+The refreshed candidate adds an embedded Per-Monitor V2 application manifest, DPI-scaled fonts/overlay geometry, minimum window sizing, `WM_DPICHANGED` handling, and an in-app Credits & Licences dialog. On 2026-07-16 it passed a freshly extracted live sweep at the machine's active 125% scale: entry/pause, settings, 90% render scale, diagnostics, F1/F2, credits, fullscreen, maximize/restore, minimum resize, combat input, and quit. The sweep caught and fixed a clipped branded title by widening the shared menu/settings panel before the final rebuild.

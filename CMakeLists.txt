@@ -65,6 +65,7 @@ if(HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AND WIN32)
     add_executable(horde_rt_diagnostic_window WIN32
         src/platform/windows/DiagnosticWindowMain.cpp
         src/platform/windows/DiagnosticWindow.cpp
+        src/platform/windows/HordeLanternRT.manifest
         src/platform/windows/HordeLanternRT.rc
         src/ui/DiagnosticOverlay.cpp
     )

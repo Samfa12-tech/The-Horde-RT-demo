@@ -4,7 +4,7 @@
 
 - Public title: **Horde Lantern RT**.
 - Release label: **Initial Showing Alpha 0.1.0** (`0.1.0-alpha.1` package version).
-- Distribution: Android APK and portable Windows x64 zip are hosted on itch at `https://samfa12.itch.io/the-horde` and linked from Samfa12.com.
+- Distribution: Android APK and portable Windows x64 zip are hosted on itch at `https://samfa12.itch.io/the-horde` and linked from the rendered Samfa12.com `/games/` catalogue.
 - Scope: honest torch-corridor and material-gallery alpha, not the completed 60-90 second mirror/glass/final-crypt route.
 
 ## Player-facing features
@@ -16,6 +16,8 @@
 - Persistent look sensitivity, 50-100% RT render-resolution slider (100% default), sound-effect state/level where supported, compact-HUD control on Android, and windowed/fullscreen control on Windows.
 - FilmCow UI, sword, impact/fall, quiet player/skeleton footsteps, and skeleton attack sound effects.
 - Android two-zone touch movement/look plus a large `SWING` action.
+- Android native libraries and APK packaging are verified for 16 KiB page alignment; the r26 shared C++ runtime is not packaged.
+- Android diagnostics publish internal resolution, FPS, and frame time after the first 30-frame sample, then use steadier 120-frame updates.
 - Windows WASD, left-drag look, right-click/Space attack, Esc pause, R reset, F1 controls, F2 diagnostics, and Alt+Enter fullscreen.
 
 ## Technical proof in this alpha

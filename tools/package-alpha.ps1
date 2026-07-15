@@ -6,6 +6,29 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+
+function Find-LatestVersionedTool {
+    param(
+        [Parameter(Mandatory = $true)][string]$Root,
+        [Parameter(Mandatory = $true)][string]$RelativeToolPath
+    )
+
+    $matches = foreach ($directory in Get-ChildItem -LiteralPath $Root -Directory -ErrorAction SilentlyContinue) {
+        $version = $null
+        if ([Version]::TryParse($directory.Name, [ref]$version)) {
+            $candidate = Join-Path $directory.FullName $RelativeToolPath
+            if (Test-Path -LiteralPath $candidate) {
+                [PSCustomObject]@{ Version = $version; Path = $candidate }
+            }
+        }
+    }
+    $selected = $matches | Sort-Object Version -Descending | Select-Object -First 1
+    if (-not $selected) {
+        throw "Could not find $RelativeToolPath beneath $Root"
+    }
+    return $selected.Path
+}
+
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 $outputFull = [IO.Path]::GetFullPath($OutputRoot)
 $allowedRoot = [IO.Path]::GetFullPath((Join-Path $repoRoot "releases\candidates"))
@@ -52,6 +75,27 @@ if ($LASTEXITCODE -ne 0) { throw "Windows build failed." }
 if ($LASTEXITCODE -ne 0) { throw "Combat smoke test failed." }
 
 $windowsExe = Join-Path $repoRoot "build\$WindowsConfiguration\HordeLanternRT.exe"
+$windowsSdkBin = Join-Path ${env:ProgramFiles(x86)} "Windows Kits\10\bin"
+$mt = Find-LatestVersionedTool -Root $windowsSdkBin -RelativeToolPath "x64\mt.exe"
+$manifestAudit = Join-Path $outputFull "HordeLanternRT.embedded.manifest"
+try {
+    & $mt -nologo "-inputresource:$windowsExe;#1" "-out:$manifestAudit"
+    if ($LASTEXITCODE -ne 0) { throw "Failed to extract the Windows application manifest." }
+    $manifestText = Get-Content -LiteralPath $manifestAudit -Raw
+    if ($manifestText -notmatch 'PerMonitorV2') {
+        throw "Windows executable does not declare Per-Monitor V2 DPI awareness."
+    }
+} finally {
+    if (Test-Path -LiteralPath $manifestAudit) {
+        Remove-Item -LiteralPath $manifestAudit -Force
+    }
+}
+$windowsBinaryText = [Text.Encoding]::ASCII.GetString([IO.File]::ReadAllBytes($windowsExe))
+foreach ($creditMarker in @("credits and licences", "Hotstrike Studio", "FilmCow", "Meshy")) {
+    if ($windowsBinaryText -notmatch [regex]::Escape($creditMarker)) {
+        throw "Windows executable is missing in-app credit marker: $creditMarker"
+    }
+}
 Copy-Item -LiteralPath $windowsExe -Destination (Join-Path $windowsStage "HordeLanternRT.exe")
 Copy-Item -LiteralPath (Join-Path $repoRoot "release\windows\README.txt") -Destination (Join-Path $windowsStage "README.txt")
 Copy-Item -LiteralPath (Join-Path $repoRoot "ASSET_LICENSES.md") -Destination (Join-Path $windowsStage "ASSET_LICENSES.md")
@@ -104,7 +148,70 @@ if ($releaseSigningConfigured -and (Test-Path -LiteralPath $signedRelease)) {
     throw "No unsigned Android release APK was produced."
 }
 
+$androidSdkRoot = if (-not [string]::IsNullOrWhiteSpace($env:ANDROID_HOME)) {
+    $env:ANDROID_HOME
+} elseif (-not [string]::IsNullOrWhiteSpace($env:ANDROID_SDK_ROOT)) {
+    $env:ANDROID_SDK_ROOT
+} else {
+    throw "ANDROID_HOME or ANDROID_SDK_ROOT is required to inspect the Android candidate."
+}
+$androidBuildTools = Join-Path $androidSdkRoot "build-tools"
+$aapt2 = Find-LatestVersionedTool -Root $androidBuildTools -RelativeToolPath "aapt2.exe"
+$zipalign = Find-LatestVersionedTool -Root $androidBuildTools -RelativeToolPath "zipalign.exe"
+$androidResources = (& $aapt2 dump resources $androidCandidate 2>&1 | Out-String)
+if ($LASTEXITCODE -ne 0) { throw "Failed to inspect Android resources in $androidCandidate" }
+foreach ($creditMarker in @("string/credits_body", "Hotstrike Studio", "FilmCow", "Meshy")) {
+    if ($androidResources -notmatch [regex]::Escape($creditMarker)) {
+        throw "Android candidate is missing in-app credit marker: $creditMarker"
+    }
+}
+$androidManifest = (& $aapt2 dump xmltree --file AndroidManifest.xml $androidCandidate 2>&1 | Out-String)
+if ($LASTEXITCODE -ne 0) { throw "Failed to inspect the Android manifest in $androidCandidate" }
+if ($androidManifest -notmatch 'versionName[^\r\n]*="0\.1\.0-alpha\.1"') {
+    throw "Android candidate does not contain versionName 0.1.0-alpha.1."
+}
+if ($androidManifest -notmatch 'screenOrientation[^\r\n]*=7(?:\s|$)') {
+    throw "Android candidate is not locked to sensorPortrait (screenOrientation=7)."
+}
+
+& $zipalign -c -P 16 -v 4 $androidCandidate | Out-Null
+if ($LASTEXITCODE -ne 0) {
+    throw "Android candidate failed 16 KiB APK alignment verification."
+}
+
 Add-Type -AssemblyName System.IO.Compression.FileSystem
+$apkArchive = [IO.Compression.ZipFile]::OpenRead($androidCandidate)
+try {
+    $nativeEntries = @($apkArchive.Entries | Where-Object { $_.FullName -match '^lib/.+\.so$' } | ForEach-Object FullName)
+    if ($nativeEntries.Count -lt 1) {
+        throw "Android candidate does not contain a native runtime library."
+    }
+    if ($nativeEntries -match 'libc\+\+_shared\.so$') {
+        throw "Android candidate still packages the r26 shared C++ runtime, which is not 16 KiB-page compatible."
+    }
+} finally {
+    $apkArchive.Dispose()
+}
+
+$ndkRoot = Join-Path $androidSdkRoot "ndk"
+$readelf = Find-LatestVersionedTool -Root $ndkRoot -RelativeToolPath "toolchains\llvm\prebuilt\windows-x86_64\bin\llvm-readelf.exe"
+$strippedNativeRoot = Join-Path $repoRoot "android\app\build\intermediates\stripped_native_libs\release\stripReleaseDebugSymbols\out\lib"
+$releaseNativeLibraries = @(Get-ChildItem -LiteralPath $strippedNativeRoot -Recurse -Filter "*.so")
+if ($releaseNativeLibraries.Count -lt 1) {
+    throw "Could not find stripped Android release libraries for 16 KiB ELF verification."
+}
+foreach ($nativeLibrary in $releaseNativeLibraries) {
+    $programHeaders = @(& $readelf -l $nativeLibrary.FullName 2>&1 | Select-String '^\s*LOAD\s')
+    if ($LASTEXITCODE -ne 0 -or $programHeaders.Count -lt 1) {
+        throw "Failed to inspect ELF program headers: $($nativeLibrary.FullName)"
+    }
+    foreach ($header in $programHeaders) {
+        if ($header.Line -notmatch '\s0x4000\s*$') {
+            throw "Android release library has a LOAD segment below 16 KiB alignment: $($nativeLibrary.FullName)"
+        }
+    }
+}
+
 $archive = [IO.Compression.ZipFile]::OpenRead($windowsZip)
 try {
     $entryNames = @($archive.Entries | ForEach-Object FullName)

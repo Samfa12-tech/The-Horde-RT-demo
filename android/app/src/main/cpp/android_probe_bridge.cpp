@@ -1092,7 +1092,11 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
     context.timingRecordMs += milliseconds(recordDone - recordStart);
     context.timingPresentMs += milliseconds(presentDone - recordDone);
     context.timingTotalMs += milliseconds(presentDone - frameStart);
-    if (++context.timingFrameCount >= 120u)
+    // Publish the first live diagnostic quickly so opening the panel does not
+    // sit on "N/A" for several seconds; subsequent samples use the steadier
+    // two-second window.
+    const uint32_t timingSampleFrames = context.capabilities.performance.frameTimeMs > 0.0f ? 120u : 30u;
+    if (++context.timingFrameCount >= timingSampleFrames)
     {
         const double count = static_cast<double>(context.timingFrameCount);
         const double averageFrameMs = context.timingTotalMs / count;

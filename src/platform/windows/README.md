@@ -20,7 +20,8 @@ Windows is the secondary/equal hardware target for this phase.
 - Shared probe logic from `src/vulkan/*` and `src/ui/DiagnosticOverlay.cpp`.
 - The interactive Win32 path presents the shared RT scene through a Vulkan swapchain with `WASD`, mouse-drag look, right mouse/Space swing, `Esc` pause, `R` restart, `F1` controls, `F2` diagnostics, and `Alt+Enter` fullscreen.
 - The renderer builds BLAS/TLAS, dispatches `vkCmdTraceRaysKHR`, and preserves clear unsupported-device diagnostics.
-- Branded entry/pause/settings/diagnostics UI, one-enemy combat, FilmCow SFX, persisted settings, and 50-100% RT render scaling are implemented.
+- Branded entry/pause/settings/diagnostics UI, one-enemy combat, FilmCow SFX, persisted settings, 50-100% RT render scaling, and an in-app credits/licences dialog are implemented.
+- The executable declares Per-Monitor V2 DPI awareness and rescales its fonts and overlay geometry when the window DPI changes.
 - Release assets resolve beside `HordeLanternRT.exe`; the portable zip uses the static MSVC runtime and leaves Vulkan as a driver prerequisite.
 - Console output remains available from the CLI probe target.
 

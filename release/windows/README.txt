@@ -24,6 +24,7 @@ SETTINGS
 - Render resolution: 50-100% of the window, 100% by default
 - Lower percentages reduce RT ray count and upscale to the full window
 - Sound, look sensitivity, display mode, and render scale persist beside the demo
+- Per-Monitor V2 DPI scaling keeps menus and overlays crisp across display scales
 
 STARTING THE DEMO
 Run HordeLanternRT.exe. Keep the assets folder beside the executable.
@@ -39,6 +40,7 @@ ALPHA CONTENT
 - Wet stone, PBR material arrays, mirror-routing groundwork, player body,
   held torch/sword, one animated skeleton and a small combat loop
 - FilmCow UI, combat, footstep and skeleton-attack sound effects
+- Help > Credits & licences carries the main attribution inside the executable
 
 KNOWN ALPHA LIMITS
 - This is the corridor/material-gallery initial showing, not the completed

@@ -8,6 +8,7 @@
     <string name="controls">CONTROLS</string>
     <string name="settings">SETTINGS</string>
     <string name="technical_info">RT DIAGNOSTICS</string>
+    <string name="credits">CREDITS &amp; LICENCES</string>
     <string name="quit">QUIT DEMO</string>
     <string name="back">BACK</string>
     <string name="swing">SWING</string>
@@ -24,4 +25,5 @@
     <string name="render_scale">Render resolution</string>
     <string name="show_hud">Show compact HUD</string>
     <string name="reset_defaults">RESET DEFAULTS</string>
+    <string name="credits_body">Environment materials: Poly Haven — CC0.\nhttps://polyhaven.com/\n\nSound effects: FilmCow Royalty Free Sound Effects Library — FilmCow custom royalty-free licence.\nhttps://filmcow.itch.io/filmcow-sfx\n\nSkeleton derivative: original Free Stylized Dark Fantasy Skeleton by Hotstrike Studio; texture, rig, and animation processing created with Meshy — CC BY 4.0.\nhttps://hotstrikestudio.itch.io/free-stylized-skeleton\nhttps://www.meshy.ai/\n\nApplication icon created for this project with OpenAI image generation.\n\nFull provenance and licence details:\nhttps://github.com/Samfa12-tech/The-Horde-RT-demo/blob/main/ASSET_LICENSES.md</string>
 </resources>

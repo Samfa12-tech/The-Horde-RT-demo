@@ -10,6 +10,8 @@ import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.method.LinkMovementMethod;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -291,7 +293,9 @@ public class MainActivity extends Activity {
         addMenuButtonRow(panel,
                 getString(R.string.settings), this::showSettings,
                 getString(R.string.technical_info), () -> showDiagnostics(false));
-        addMenuButton(panel, getString(R.string.quit), this::finishAndRemoveTask);
+        addMenuButtonRow(panel,
+                getString(R.string.credits), this::showCredits,
+                getString(R.string.quit), this::finishAndRemoveTask);
         attachPanel(panel);
     }
 
@@ -310,6 +314,15 @@ public class MainActivity extends Activity {
         menuScrim.removeAllViews();
         final LinearLayout panel = createPanel(getString(R.string.controls), "PHONE CONTROLS");
         addBody(panel, getString(R.string.controls_help));
+        addMenuButton(panel, getString(R.string.back), () -> showMainMenu(false));
+        attachPanel(panel);
+    }
+
+    private void showCredits() {
+        playSound("ui_select", 0.18f);
+        menuScrim.removeAllViews();
+        final LinearLayout panel = createPanel(getString(R.string.credits), "ASSET PROVENANCE");
+        addLinkedBody(panel, getString(R.string.credits_body));
         addMenuButton(panel, getString(R.string.back), () -> showMainMenu(false));
         attachPanel(panel);
     }
@@ -560,6 +573,19 @@ public class MainActivity extends Activity {
         body.setTextSize(13);
         body.setLineSpacing(0.0f, 1.15f);
         body.setPadding(0, 0, 0, dp(14));
+        panel.addView(body, matchWrap());
+    }
+
+    private void addLinkedBody(final LinearLayout panel, final String text) {
+        final TextView body = new TextView(this);
+        body.setText(text);
+        body.setTextColor(0xFFD8C9B2);
+        body.setLinkTextColor(0xFFFFB84F);
+        body.setTextSize(13);
+        body.setLineSpacing(0.0f, 1.15f);
+        body.setPadding(0, 0, 0, dp(14));
+        Linkify.addLinks(body, Linkify.WEB_URLS);
+        body.setMovementMethod(LinkMovementMethod.getInstance());
         panel.addView(body, matchWrap());
     }
 

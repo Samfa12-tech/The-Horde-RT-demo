@@ -14,6 +14,7 @@ Horde Lantern RT is a short native Vulkan hardware-ray-tracing technology demo r
 ## Downloads
 
 - Android: signed APK for compatible Vulkan-RT phones. The first validated target is Samsung `SM-S948B`.
+- The APK's native libraries and packaging are verified for Android 16 KiB page compatibility.
 - Windows: portable x64 zip for compatible Vulkan hardware-RT GPUs. The first validated target is an NVIDIA GeForce RTX 5050 Laptop GPU.
 - Source and issue tracking: https://github.com/Samfa12-tech/The-Horde-RT-demo
 
@@ -32,3 +33,7 @@ This is the initial torch-corridor and material-gallery showing. It includes a c
 - Original stylized skeleton: Hotstrike Studio; texture, rig, and animation processing created with Meshy.
 - Full provenance and licence details are linked from the download page and included in the Windows zip.
 - Meshy attribution route used for this release: conservative Free-plan **CC BY 4.0** credit for the processed skeleton derivative.
+
+## AI assistance disclosure
+
+AI tools assisted code development. Meshy was used to texture, rig, and animate the credited Hotstrike Studio skeleton derivative. OpenAI image generation was used to create the application icon. On itch, classify the project as AI Assisted and select both Code and Graphics.

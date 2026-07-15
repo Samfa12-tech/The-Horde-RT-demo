@@ -36,6 +36,23 @@ try {
     if ($LASTEXITCODE -ne 0) { throw "apksigner rejected the signed candidate.`n$verification" }
     if ($verification -match "CN=Android Debug") { throw "Refusing a debug-certificate candidate." }
 
+    # Refresh hashes only after the final signed APK has passed certificate
+    # verification. This keeps the guarded itch preflight tied to the exact
+    # artifacts produced by this signing run.
+    $candidateRoot = Join-Path $repoRoot "releases\candidates"
+    $baseName = "Horde-Lantern-RT-Alpha-$safeVersion"
+    $hashTargets = @(
+        (Join-Path $candidateRoot "$baseName-Windows-x64.zip"),
+        (Join-Path $candidateRoot "$baseName-Android-preview-debug-signed.apk"),
+        $apk,
+        (Join-Path $candidateRoot "$baseName-Android-UNSIGNED-DO-NOT-PUBLISH.apk")
+    ) | Where-Object { Test-Path -LiteralPath $_ }
+    $hashLines = foreach ($target in $hashTargets) {
+        $hash = Get-FileHash -Algorithm SHA256 -LiteralPath $target
+        "$($hash.Hash.ToLowerInvariant())  $([IO.Path]::GetFileName($target))"
+    }
+    $hashLines | Set-Content -LiteralPath (Join-Path $candidateRoot "SHA256SUMS.txt") -Encoding ascii
+
     Write-Host $verification
     Write-Host "Signed Android candidate ready: $apk"
 } finally {

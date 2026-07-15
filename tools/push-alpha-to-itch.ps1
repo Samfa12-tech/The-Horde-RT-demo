@@ -30,9 +30,24 @@ if ($Channels -in @("Both", "Android")) {
     $buildTools = Get-ChildItem "$env:LOCALAPPDATA\Android\Sdk\build-tools" -Directory |
         Sort-Object Name -Descending | Select-Object -First 1
     $apksigner = Join-Path $buildTools.FullName "apksigner.bat"
+    $zipalign = Join-Path $buildTools.FullName "zipalign.exe"
     $verification = & $apksigner verify --verbose --print-certs $androidApk 2>&1
     if ($LASTEXITCODE -ne 0) { throw "apksigner rejected the Android candidate.`n$verification" }
     if ($verification -match "CN=Android Debug") { throw "Refusing to publish an Android Debug certificate." }
+    & $zipalign -c -P 16 -v 4 $androidApk | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw "Refusing an Android candidate without 16 KiB APK alignment." }
+
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    $apkArchive = [IO.Compression.ZipFile]::OpenRead($androidApk)
+    try {
+        $nativeEntries = @($apkArchive.Entries | Where-Object { $_.FullName -match '^lib/.+\.so$' } | ForEach-Object FullName)
+        if ($nativeEntries.Count -lt 1) { throw "Android candidate has no native runtime library." }
+        if ($nativeEntries -match 'libc\+\+_shared\.so$') {
+            throw "Refusing the r26 shared C++ runtime because it is not 16 KiB-page compatible."
+        }
+    } finally {
+        $apkArchive.Dispose()
+    }
 }
 
 $hashLines = Get-Content -LiteralPath $hashFile

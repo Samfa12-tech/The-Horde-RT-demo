@@ -9,7 +9,7 @@
 - The user's accessibility font scale remained unchanged at `1.7`.
 - Display rotation remained `0` in portrait throughout the pass.
 
-The full interaction and render-scale pass used the debug-certificate preview above. A final release sanity pass then installed the exact stable-key-signed candidate `Horde-Lantern-RT-Alpha-0.1.0-alpha.1-Android.apk` (SHA-256 `590cc2cbecbf598dfb7a7c67c6e2e3b39d46380dff87974356698a10da12d72e`).
+The full interaction and render-scale pass used the debug-certificate preview above. The final 2026-07-16 release refresh then installed the exact stable-key-signed candidate `Horde-Lantern-RT-Alpha-0.1.0-alpha.1-Android.apk` (SHA-256 `13bced0aa40e4a102e25aa1c57083f7feb4b12ca7a8d492c46cc7c6cfdda932a`).
 
 `apksigner` verified one non-debug v2 signer, `CN=Samfa12, OU=Games, O=Samfa12, C=AU`, certificate SHA-256 `8245277a11bca5576f116724507f799d6f4c178ce5fbb7e3981415c9e6b3c245`.
 
@@ -59,7 +59,8 @@ The legacy `SurfaceFlinger --latency` history returned at most 120 timestamps on
 - `docs/validation/android-final-2026-07-15/08-rear-wall-collision.png`
 - `docs/validation/android-final-2026-07-15/09-home-resume.png`
 - `docs/validation/android-final-2026-07-15/10-signed-release.png`
+- `docs/validation/android-final-2026-07-16/signed-release-entry.png`
 
 ## Signed release result
 
-The release-signed APK retained portrait rotation `0`, font scale `1.7`, the default 100% `1440x2980` RT dispatch, strict ASTC materials, and honest RT swapchain presentation. All thirteen SoundPool clips loaded again with no app/native Vulkan failure. It is published to `samfa12/the-horde:android` as itch upload `#18341739`, build `#1797750`, version `0.1.0-alpha.1`.
+The release-signed APK retained portrait rotation `0`, font scale `1.7`, the default 100% `1440x2980` RT dispatch, strict ASTC materials, 16 KiB page compatibility, and honest RT swapchain presentation. All thirteen SoundPool clips loaded again with no app/native Vulkan failure. It is published to `samfa12/the-horde:android` as itch upload `#18341739`, build `#1798652`, version `0.1.0-alpha.1`.

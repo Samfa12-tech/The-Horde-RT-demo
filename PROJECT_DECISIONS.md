@@ -7,7 +7,7 @@ This file records locked decisions for the native Vulkan hardware ray-tracing de
 - Public project: Samfa12 technology demo.
 - Repository: `Samfa12-tech/The-Horde-RT-demo`.
 - Working creative title: **Horde Lantern RT**.
-- Distribution: itch hosts the canonical Android and Windows artifacts at `https://samfa12.itch.io/the-horde`; Samfa12.com links to that page.
+- Distribution: itch hosts the canonical Android and Windows artifacts at `https://samfa12.itch.io/the-horde`; Samfa12.com links to that page instead of hosting a second copy. The live `/games/` card was rendered and link-verified on 2026-07-15.
 
 ## Core decision
 
@@ -136,8 +136,16 @@ Important technical finding:
 ## Current release and next bounded route - 2026-07-15
 
 - Initial Showing Alpha `0.1.0-alpha.1` is published on separate Windows and Android itch channels.
+- The 2026-07-16 hardened refresh is live as Windows build `#1798649` and Android build `#1798652`; the exact published hashes are recorded in `PROJECT_MEMORY.md` and `README.md`.
 - Android uses strict ASTC KTX2 arrays and a stable Samfa12 signing identity; Windows uses a portable executable-relative asset tree.
 - Final `SM-S948B` validation passed at 100%, 75%, and 50%. The 75% tier is the sustained phone recommendation; report 100% separately rather than treating it as an unconditional 50+ FPS promise.
 - The next route is `docs/COLOURED_LIGHT_ROUTE_PLAN_2026-07-15.md`: lower body/lantern drop, zig-zag shadows, blue skylight, bay-selected coloured torches, bounded coloured transmission, one hero mirror, and an emissive replacement in the existing one-enemy slot.
 - Keep the textured sword LOD out of runtime until static GLB/PBR support is measured on phone.
 - Preserve phone-safe ray-query shading and real `vkCmdTraceRaysKHR` presentation unless a stronger RT route is proven on-device.
+
+## Initial alpha refresh hardening - 2026-07-16
+
+- Keep the local r26 NDK, link the C++ runtime statically, and require 16 KiB ELF/APK alignment in the packaging gate. This removes the unaligned r26 `libc++_shared.so` without adding a second toolchain dependency.
+- Publish Android's first performance sample after 30 frames so diagnostics do not appear broken; retain 120-frame steady-state updates afterward.
+- Treat 125% as the completed live Windows DPI validation for this refresh. Explicit 100%/150% repeats remain a non-blocking later compatibility check.
+- Do not rewrite public Git history until Hotstrike answers the explicit permission request or the owner chooses history remediation.

@@ -5,6 +5,8 @@ Horde Lantern RT is a native Vulkan hardware-ray-tracing technology demo for And
 - Public alpha: https://samfa12.itch.io/the-horde
 - Source repository: https://github.com/Samfa12-tech/The-Horde-RT-demo
 - Current package version: `0.1.0-alpha.1`
+- Current itch builds: Windows `#1798649`; Android `#1798652`
+- Published SHA-256: Windows `1bae34e6d323bbd201ff4dd113f3c78518788f90a298a7babce1a446da2721cc`; Android `13bced0aa40e4a102e25aa1c57083f7feb4b12ca7a8d492c46cc7c6cfdda932a`
 - Primary validated phone: Samsung `SM-S948B` / Adreno 840
 - Validated Windows GPU: NVIDIA GeForce RTX 5050 Laptop GPU
 
@@ -118,6 +120,8 @@ For a signed rebuild:
 ```
 
 The packaging and push scripts securely prompt for signing secrets, reject debug/unsigned Android candidates, verify hashes, and keep Windows and Android on separate itch channels. Add `-ConfirmPush` only after the preflight passes.
+
+Android native code is linked for 16 KiB page compatibility. The release uses a static C++ runtime, 16 KiB ELF `LOAD` alignment, and AGP 8.7.2 APK alignment; `package-alpha.ps1` rejects candidates that fail either APK or ELF verification or reintroduce `libc++_shared.so` from the r26 NDK.
 
 Never commit a keystore, signing properties, credentials, APK, or generated candidate directory. Losing the release JKS or its passwords prevents compatible Android updates.
 

@@ -1,6 +1,6 @@
 # Horde Lantern RT - Project Memory
 
-Last updated: 2026-07-15
+Last updated: 2026-07-16
 
 ## Identity and release state
 
@@ -9,12 +9,12 @@ Last updated: 2026-07-15
 - Principle: **RT or nothing**; unsupported devices receive honest diagnostics, never a fake fallback.
 - Primary target: Android phone. Equal validation target: Windows RTX.
 - Current release: **Initial Showing Alpha 0.1.0**, package version `0.1.0-alpha.1`.
-- Canonical downloads: https://samfa12.itch.io/the-horde; Samfa12.com links to itch rather than hosting a second copy.
+- Canonical downloads: https://samfa12.itch.io/the-horde. Samfa12.com links to itch rather than hosting a second copy; the live `/games/` card, itch link, GitHub link, thumbnail, and released status were rendered and verified on 2026-07-15.
 - Source: https://github.com/Samfa12-tech/The-Horde-RT-demo.
-- Windows itch channel: upload `#18339908`, build `#1797811`, `windows-x64`.
-- Android itch channel: upload `#18341739`, build `#1797750`, `android`.
-- Signed Android APK SHA-256: `590cc2cbecbf598dfb7a7c67c6e2e3b39d46380dff87974356698a10da12d72e`.
-- Windows ZIP SHA-256: `11b59046d531a1d3f86c3f5ae488ee6dc26a5deeaf2e39e11da304575edd2f19`.
+- Windows itch channel: upload `#18339908`, build `#1798649`, `windows-x64`.
+- Android itch channel: upload `#18341739`, build `#1798652`, `android`.
+- Signed Android APK SHA-256: `13bced0aa40e4a102e25aa1c57083f7feb4b12ca7a8d492c46cc7c6cfdda932a`.
+- Windows ZIP SHA-256: `1bae34e6d323bbd201ff4dd113f3c78518788f90a298a7babce1a446da2721cc`.
 - Signing certificate SHA-256: `8245277a11bca5576f116724507f799d6f4c178ce5fbb7e3981415c9e6b3c245`.
 - The release JKS lives outside Git. It and both passwords need an independent owner backup.
 
@@ -109,3 +109,12 @@ Last updated: 2026-07-15
 3. Build the coloured-light route in bounded slices: lower body/lantern drop, zig-zag shadow corridor, blue skylight, bay-selected coloured torches, bounded coloured transmission, one hero mirror, optional measured shallow water, and an emissive reskin/replacement in the existing enemy slot.
 4. Gate each meaningful renderer change on the phone at the recommended quality tier; report 100% separately.
 5. Keep real RT and honest diagnostics. Reduce bounded effect area/ray cost before expanding gameplay or substituting fake effects.
+
+## Alpha refresh validation - 2026-07-16
+
+- Android debug uses `com.samfa12.hordelanternrt.debug` beside the stable public package; release keeps `com.samfa12.hordelanternrt`.
+- Android native packaging is 16 KiB-page compatible through a static C++ runtime, `0x4000` ELF `LOAD` alignment, and verified 16 KiB APK alignment.
+- Android publishes a first 30-frame timing sample so resolution, FPS, and frame time appear promptly; later updates retain the 120-frame window.
+- Windows carries a Per-Monitor V2 manifest, DPI-scaled layout/fonts, minimum sizing, and in-app credits. The freshly extracted package passed the full live sweep at the machine's active 125% scale.
+- The live itch page now directly credits FilmCow, Poly Haven, Hotstrike Studio, Meshy, CC BY 4.0, and the full licence manifest; Code and Graphics are selected in the AI disclosure.
+- Hotstrike public-source permission was requested at `https://itch.io/post/16578566`. Finished-game packaging remains permitted, but the public raw-GLB/history question is still pending their reply.

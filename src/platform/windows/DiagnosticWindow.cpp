@@ -66,7 +66,11 @@ constexpr int kMenuFullscreenId = 2014;
 constexpr int kMenuControlsId = 2020;
 constexpr int kMenuDiagnosticsId = 2021;
 constexpr int kMenuAboutId = 2022;
+constexpr int kMenuCreditsId = 2023;
 constexpr int kAppIconId = 1;
+constexpr UINT kDefaultDpi = 96u;
+constexpr char kUiFontProperty[] = "HordeLanternRtUiFont";
+constexpr char kMonoFontProperty[] = "HordeLanternRtMonoFont";
 // One frame in flight keeps the dynamically refit held-torch TLAS safely synchronized with its host-written instance buffer.
 constexpr UINT kMaxFramesInFlight = 1u;
 struct VulkanSurfaceContext
@@ -1564,44 +1568,131 @@ bool WriteReportFile(const std::filesystem::path& path, const std::string& data)
     return stream.good();
 }
 
-void LayoutOverlayControls(HWND window, const int width, const int height)
+int ScaleForDpi(HWND window, const int logicalPixels)
 {
+    const UINT dpi = GetDpiForWindow(window);
+    return MulDiv(logicalPixels, static_cast<int>(dpi == 0u ? kDefaultDpi : dpi), static_cast<int>(kDefaultDpi));
+}
+
+void ReplaceFontProperty(HWND window, const char* propertyName, HFONT font)
+{
+    if (HFONT oldFont = reinterpret_cast<HFONT>(GetPropA(window, propertyName)))
+    {
+        DeleteObject(oldFont);
+    }
+    SetPropA(window, propertyName, font);
+}
+
+void ApplyDpiScaledFonts(HWND window)
+{
+    HFONT monoFont = CreateFontA(
+        ScaleForDpi(window, 18), 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
+        ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+        FF_MODERN, "Consolas");
+    if (!monoFont)
+    {
+        monoFont = static_cast<HFONT>(GetStockObject(ANSI_FIXED_FONT));
+    }
+
+    HFONT uiFont = CreateFontA(
+        ScaleForDpi(window, 18), 0, 0, 0, FW_SEMIBOLD, FALSE, FALSE, FALSE,
+        ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
+        DEFAULT_PITCH | FF_DONTCARE, "Segoe UI");
+    if (!uiFont)
+    {
+        uiFont = static_cast<HFONT>(GetStockObject(DEFAULT_GUI_FONT));
+    }
+
     if (HWND edit = GetDlgItem(window, kEditControlId))
     {
-        MoveWindow(edit, 16, 16, std::max(100, width - 32), std::max(100, height - 32), TRUE);
+        SendMessageA(edit, WM_SETFONT, reinterpret_cast<WPARAM>(monoFont), TRUE);
+    }
+    for (const int id : {kHudControlId, kPauseTitleId, kResumeButtonId, kRestartButtonId,
+                         kControlsButtonId, kSettingsButtonId, kDiagnosticsButtonId, kExitButtonId,
+                         kSettingsTitleId, kSfxButtonId, kSensitivityButtonId, kRenderScaleLabelId,
+                         kRenderScaleSliderId, kFullscreenButtonId, kSettingsBackButtonId})
+    {
+        if (HWND control = GetDlgItem(window, id))
+        {
+            SendMessageA(control, WM_SETFONT, reinterpret_cast<WPARAM>(uiFont), TRUE);
+        }
+    }
+
+    if (monoFont != GetStockObject(ANSI_FIXED_FONT))
+    {
+        ReplaceFontProperty(window, kMonoFontProperty, monoFont);
+    }
+    if (uiFont != GetStockObject(DEFAULT_GUI_FONT))
+    {
+        ReplaceFontProperty(window, kUiFontProperty, uiFont);
+    }
+}
+
+void ReleaseDpiScaledFonts(HWND window)
+{
+    for (const char* propertyName : {kUiFontProperty, kMonoFontProperty})
+    {
+        if (HFONT font = reinterpret_cast<HFONT>(RemovePropA(window, propertyName)))
+        {
+            DeleteObject(font);
+        }
+    }
+}
+
+void LayoutOverlayControls(HWND window, const int width, const int height)
+{
+    if (width <= 0 || height <= 0)
+    {
+        return;
+    }
+
+    const int inset = ScaleForDpi(window, 16);
+    if (HWND edit = GetDlgItem(window, kEditControlId))
+    {
+        MoveWindow(edit, inset, inset,
+                   std::max(ScaleForDpi(window, 100), width - inset * 2),
+                   std::max(ScaleForDpi(window, 100), height - inset * 2), TRUE);
     }
     if (HWND hud = GetDlgItem(window, kHudControlId))
     {
-        MoveWindow(hud, 14, 14, std::min(650, std::max(260, width - 28)), 30, TRUE);
+        const int hudInset = ScaleForDpi(window, 14);
+        MoveWindow(hud, hudInset, hudInset,
+                   std::min(ScaleForDpi(window, 650), std::max(ScaleForDpi(window, 260), width - hudInset * 2)),
+                   ScaleForDpi(window, 30), TRUE);
     }
 
-    const int buttonWidth = std::min(320, std::max(220, width - 64));
-    const int buttonHeight = 38;
-    const int gap = 8;
-    const int pauseTotal = 48 + 6 * buttonHeight + 5 * gap;
+    const int buttonWidth = std::min(ScaleForDpi(window, 420),
+                                     std::max(ScaleForDpi(window, 220), width - ScaleForDpi(window, 64)));
+    const int buttonHeight = ScaleForDpi(window, 38);
+    const int gap = ScaleForDpi(window, 8);
+    const int titleHeight = ScaleForDpi(window, 48);
+    const int titleAdvance = ScaleForDpi(window, 54);
+    const int pauseTotal = titleHeight + 6 * buttonHeight + 5 * gap;
     const int pauseX = (width - buttonWidth) / 2;
-    int y = std::max(54, (height - pauseTotal) / 2);
-    if (HWND title = GetDlgItem(window, kPauseTitleId)) MoveWindow(title, pauseX, y, buttonWidth, 48, TRUE);
-    y += 54;
+    int y = std::max(ScaleForDpi(window, 54), (height - pauseTotal) / 2);
+    if (HWND title = GetDlgItem(window, kPauseTitleId)) MoveWindow(title, pauseX, y, buttonWidth, titleHeight, TRUE);
+    y += titleAdvance;
     for (const int id : {kResumeButtonId, kRestartButtonId, kControlsButtonId, kSettingsButtonId, kDiagnosticsButtonId, kExitButtonId})
     {
         if (HWND control = GetDlgItem(window, id)) MoveWindow(control, pauseX, y, buttonWidth, buttonHeight, TRUE);
         y += buttonHeight + gap;
     }
 
-    const int settingsTotal = 48 + 4 * buttonHeight + 26 + 38 + 5 * gap;
-    y = std::max(54, (height - settingsTotal) / 2);
-    if (HWND title = GetDlgItem(window, kSettingsTitleId)) MoveWindow(title, pauseX, y, buttonWidth, 48, TRUE);
-    y += 54;
+    const int labelHeight = ScaleForDpi(window, 26);
+    const int sliderHeight = ScaleForDpi(window, 38);
+    const int settingsTotal = titleHeight + 4 * buttonHeight + labelHeight + sliderHeight + 5 * gap;
+    y = std::max(ScaleForDpi(window, 54), (height - settingsTotal) / 2);
+    if (HWND title = GetDlgItem(window, kSettingsTitleId)) MoveWindow(title, pauseX, y, buttonWidth, titleHeight, TRUE);
+    y += titleAdvance;
     for (const int id : {kSfxButtonId, kSensitivityButtonId})
     {
         if (HWND control = GetDlgItem(window, id)) MoveWindow(control, pauseX, y, buttonWidth, buttonHeight, TRUE);
         y += buttonHeight + gap;
     }
-    if (HWND label = GetDlgItem(window, kRenderScaleLabelId)) MoveWindow(label, pauseX, y, buttonWidth, 26, TRUE);
-    y += 26;
-    if (HWND slider = GetDlgItem(window, kRenderScaleSliderId)) MoveWindow(slider, pauseX, y, buttonWidth, 38, TRUE);
-    y += 38 + gap;
+    if (HWND label = GetDlgItem(window, kRenderScaleLabelId)) MoveWindow(label, pauseX, y, buttonWidth, labelHeight, TRUE);
+    y += labelHeight;
+    if (HWND slider = GetDlgItem(window, kRenderScaleSliderId)) MoveWindow(slider, pauseX, y, buttonWidth, sliderHeight, TRUE);
+    y += sliderHeight + gap;
     for (const int id : {kFullscreenButtonId, kSettingsBackButtonId})
     {
         if (HWND control = GetDlgItem(window, id)) MoveWindow(control, pauseX, y, buttonWidth, buttonHeight, TRUE);
@@ -1621,6 +1712,18 @@ void ShowControlsHelp(HWND window)
                 "F2  RT diagnostics\n"
                 "Alt+Enter  Fullscreen",
                 "Horde Lantern RT - controls",
+                MB_OK | MB_ICONINFORMATION);
+}
+
+void ShowCredits(HWND window)
+{
+    MessageBoxA(window,
+                "Environment materials: Poly Haven (CC0).\n"
+                "Sound effects: FilmCow Royalty Free Sound Effects Library.\n"
+                "Skeleton derivative: original by Hotstrike Studio; texture, rig, and animation processing created with Meshy (CC BY 4.0).\n"
+                "Application icon created for this project with OpenAI image generation.\n\n"
+                "See ASSET_LICENSES.md beside the demo for source links and full licence details.",
+                "Horde Lantern RT - credits and licences",
                 MB_OK | MB_ICONINFORMATION);
 }
 
@@ -1729,6 +1832,9 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                             "Horde Lantern RT\nInitial Showing Alpha 0.1.0\n\nNative Vulkan hardware ray tracing. RT or nothing.\nA Samfa12 technology demo.",
                             "About Horde Lantern RT",
                             MB_OK | MB_ICONINFORMATION);
+                return 0;
+            case kMenuCreditsId:
+                ShowCredits(hWnd);
                 return 0;
             case kExitButtonId:
             case kMenuExitId:
@@ -1843,6 +1949,27 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
     case WM_SIZE:
         LayoutOverlayControls(hWnd, LOWORD(lParam), HIWORD(lParam));
         return 0;
+    case WM_GETMINMAXINFO:
+    {
+        auto* minMaxInfo = reinterpret_cast<MINMAXINFO*>(lParam);
+        minMaxInfo->ptMinTrackSize.x = ScaleForDpi(hWnd, 520);
+        minMaxInfo->ptMinTrackSize.y = ScaleForDpi(hWnd, 560);
+        return 0;
+    }
+    case WM_DPICHANGED:
+    {
+        const auto* suggested = reinterpret_cast<const RECT*>(lParam);
+        SetWindowPos(hWnd, nullptr,
+                     suggested->left, suggested->top,
+                     suggested->right - suggested->left,
+                     suggested->bottom - suggested->top,
+                     SWP_NOACTIVATE | SWP_NOZORDER);
+        ApplyDpiScaledFonts(hWnd);
+        RECT clientRect{};
+        GetClientRect(hWnd, &clientRect);
+        LayoutOverlayControls(hWnd, clientRect.right - clientRect.left, clientRect.bottom - clientRect.top);
+        return 0;
+    }
     case WM_CTLCOLORSTATIC:
     {
         HDC dc = reinterpret_cast<HDC>(wParam);
@@ -1856,6 +1983,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         {
             ClearDesktopInput(*sceneContext);
         }
+        ReleaseDpiScaledFonts(hWnd);
         PostQuitMessage(0);
         return 0;
     default:
@@ -1889,6 +2017,7 @@ HMENU CreateApplicationMenu()
     AppendMenuA(help, MF_STRING, kMenuControlsId, "&Controls\tF1");
     AppendMenuA(help, MF_STRING, kMenuDiagnosticsId, "RT &diagnostics\tF2");
     AppendMenuA(help, MF_SEPARATOR, 0, nullptr);
+    AppendMenuA(help, MF_STRING, kMenuCreditsId, "&Credits && licences");
     AppendMenuA(help, MF_STRING, kMenuAboutId, "&About");
     AppendMenuA(bar, MF_POPUP, reinterpret_cast<UINT_PTR>(help), "&Help");
     return bar;
@@ -1916,6 +2045,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
         return 1;
     }
 
+    const UINT systemDpi = GetDpiForSystem();
     HWND hWnd = CreateWindowExA(
         0,
         kWindowClassName,
@@ -1923,8 +2053,8 @@ int CreateAndShowWindow(const std::string& diagnosticText,
         WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_CLIPCHILDREN,
         CW_USEDEFAULT,
         CW_USEDEFAULT,
-        1000,
-        700,
+        MulDiv(1000, static_cast<int>(systemDpi == 0u ? kDefaultDpi : systemDpi), static_cast<int>(kDefaultDpi)),
+        MulDiv(700, static_cast<int>(systemDpi == 0u ? kDefaultDpi : systemDpi), static_cast<int>(kDefaultDpi)),
         nullptr,
         CreateApplicationMenu(),
         instance,
@@ -1933,26 +2063,6 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     {
         std::cerr << "Failed to create diagnostic window." << std::endl;
         return 1;
-    }
-
-    HFONT monoFont = CreateFontA(
-        18,
-        0,
-        0,
-        0,
-        FW_NORMAL,
-        FALSE,
-        FALSE,
-        FALSE,
-        ANSI_CHARSET,
-        OUT_DEFAULT_PRECIS,
-        CLIP_DEFAULT_PRECIS,
-        DEFAULT_QUALITY,
-        FF_MODERN,
-        "Consolas");
-    if (!monoFont)
-    {
-    monoFont = static_cast<HFONT>(GetStockObject(ANSI_FIXED_FONT));
     }
 
     RECT clientRect{};
@@ -1976,25 +2086,16 @@ int CreateAndShowWindow(const std::string& diagnosticText,
         return 1;
     }
 
-    SendMessageA(edit, WM_SETFONT, reinterpret_cast<WPARAM>(monoFont), TRUE);
-    HFONT uiFont = CreateFontA(
-        18, 0, 0, 0, FW_SEMIBOLD, FALSE, FALSE, FALSE, ANSI_CHARSET,
-        OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
-        DEFAULT_PITCH | FF_DONTCARE, "Segoe UI");
-    if (!uiFont) uiFont = static_cast<HFONT>(GetStockObject(DEFAULT_GUI_FONT));
-
     auto createStatic = [&](const int id, const char* text, const DWORD style = SS_CENTER) {
         HWND control = CreateWindowExA(0, "STATIC", text, WS_CHILD | WS_VISIBLE | style,
                                        0, 0, 100, 30, hWnd,
                                        reinterpret_cast<HMENU>(static_cast<INT_PTR>(id)), instance, nullptr);
-        SendMessageA(control, WM_SETFONT, reinterpret_cast<WPARAM>(uiFont), TRUE);
         return control;
     };
     auto createButton = [&](const int id, const char* text) {
         HWND control = CreateWindowExA(0, "BUTTON", text, WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON,
                                        0, 0, 100, 38, hWnd,
                                        reinterpret_cast<HMENU>(static_cast<INT_PTR>(id)), instance, nullptr);
-        SendMessageA(control, WM_SETFONT, reinterpret_cast<WPARAM>(uiFont), TRUE);
         return control;
     };
 
@@ -2019,6 +2120,8 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     SendMessageA(renderScaleSlider, TBM_SETPOS, TRUE, 100);
     createButton(kFullscreenButtonId, "DISPLAY: WINDOWED");
     createButton(kSettingsBackButtonId, "BACK");
+
+    ApplyDpiScaledFonts(hWnd);
 
     const std::string windowText = WindowSafeText(diagnosticText);
     const bool sceneMode = capabilities.rtMode == horde::vulkan::RtMode::RayTracingPipeline;

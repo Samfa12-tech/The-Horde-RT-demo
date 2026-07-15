@@ -25,6 +25,15 @@ target_compile_features(horde_rt_probe_android PRIVATE cxx_std_20)
 # CPU skinning path that is not representative of a shipped phone build.
 target_compile_options(horde_rt_probe_android PRIVATE $<$<CONFIG:Debug>:-O2>)
 
+# Android 15+ devices may use 16 KiB memory pages. Keep the native payload
+# installable on both 4 KiB and 16 KiB devices even while this project remains
+# on the locally provisioned r26 NDK. The static C++ runtime avoids packaging
+# r26's 4 KiB-only libc++_shared.so alongside this aligned library.
+target_link_options(horde_rt_probe_android PRIVATE
+    "-Wl,-z,max-page-size=16384"
+    "-Wl,-z,common-page-size=16384"
+)
+
 find_library(VULKAN_LIBRARY vulkan)
 find_library(ANDROID_LOG_LIBRARY log)
 find_library(ANDROID_LIBRARY android)
