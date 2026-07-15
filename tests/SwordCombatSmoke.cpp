@@ -7,13 +7,18 @@ int main()
 {
     constexpr float dt = 1.0f / 120.0f;
     horde::gameplay::SwordCombat combat;
-    combat.RequestAttack();
     bool sawSwing = false;
     bool sawDeath = false;
     bool sawRespawn = false;
-    for (int frame = 0; frame < 600; ++frame)
+    bool requestedCloseAttack = false;
+    for (int frame = 0; frame < 1600; ++frame)
     {
         const auto& snapshot = combat.Update(dt, 0.0f, -0.8f, 0.0f);
+        if (!requestedCloseAttack && std::abs(snapshot.enemyZ - (-0.8f)) <= 1.58f)
+        {
+            combat.RequestAttack();
+            requestedCloseAttack = true;
+        }
         sawSwing = sawSwing || std::abs(snapshot.swordSwingRadians) > 0.1f;
         if (snapshot.enemyAnimation == horde::gameplay::EnemyAnimation::Dead)
         {
@@ -27,7 +32,7 @@ int main()
 
     horde::gameplay::SwordCombat enemyAttack;
     bool sawDamage = false;
-    for (int frame = 0; frame < 500; ++frame)
+    for (int frame = 0; frame < 1000; ++frame)
     {
         const auto& snapshot = enemyAttack.Update(dt, 0.0f, -0.8f, 0.0f);
         sawDamage = sawDamage || snapshot.damageFlash > 0.5f;

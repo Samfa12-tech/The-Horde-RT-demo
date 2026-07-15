@@ -1,17 +1,17 @@
 # Asset Pipeline
 
-The runtime currently uses one animated skeleton and five CC0 Poly Haven material sets. Keep future imports bounded, licensed, and measured so the Android RT path does not accumulate unsafe or unfinished content.
+The runtime currently uses one animated skeleton, five CC0 Poly Haven material sets, thirteen FilmCow SFX clips, and project-created launcher/icon art. Keep future imports bounded, licensed, and measured so the Android RT path does not accumulate unsafe or unfinished content.
 
 ## Asset rules
 
 - All assets must be commercial-safe.
 - Asset source and license must be recorded in `ASSET_LICENSES.md`.
-- Meshy assets are allowed later.
+- Meshy-assisted assets are allowed when the underlying source permits distribution and the applicable Meshy attribution route is recorded.
 - Meshy models must be textured before export.
 - Do not import untextured Meshy models and call them complete.
 - Prefer glTF/GLB where practical.
 - Use high-quality PBR textures from the start when actual visual work begins.
-- The first step should not import big assets yet.
+- Preserve source assets in Git/LFS, but package only measured runtime assets; staged sword/torch studies remain outside downloads.
 
 ## Meshy workflow rule
 
@@ -41,9 +41,9 @@ Use high-quality PBR textures from the beginning of visual work:
 - Ambient occlusion where appropriate.
 - Emissive for torches/lanterns/fire sources where appropriate.
 
-## First visual environment direction
+## Original visual environment direction - completed baseline
 
-The first real visual work after the RT capability probe should focus on a very small historical gothic test room:
+The original post-probe baseline was a small historical gothic test room and is now implemented in expanded alpha form:
 
 - Wet stone floor.
 - One torch or lantern.

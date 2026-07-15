@@ -23,7 +23,7 @@
 - Wet materials and puddles use stronger reflected torch and bounce-light responses.
 - The first RT cleanup removes deliberate grain and time-varying hemisphere jitter and uses a deterministic single ray-query bounce.
 - A Meshy-6 PBR right-hand sword is staged as source art with embedded and 2K sidecar maps. It is intentionally not in the runtime because the delivered 49,439 triangles are not phone-safe for the RT acceleration structure.
-- The Windows RT scene is an interactive laptop build: `WASD` movement, left mouse/trackpad click-drag look, and `Esc` exit. On 2026-07-10, the RTX 5050 laptop reported `RayTracingPipeline` and a successful RT swapchain presentation at 984 x 661.
+- The Windows RT scene is an interactive laptop build: `WASD` movement, left mouse/trackpad click-drag look, right mouse/Space swing, and `Esc` pause/resume. On 2026-07-10, the RTX 5050 laptop reported `RayTracingPipeline` and a successful RT swapchain presentation at 984 x 661; the packaged alpha later passed clean-extraction validation at `982x628`.
 - The 9,402-triangle merged-animation skeleton is loaded, CPU-skinned from `Idle_5`, and refit into a dynamic RT BLAS. It is intentionally unarmed; the sword belongs to the player view.
 
 ### Phone closeout - verified 2026-07-11
@@ -63,12 +63,9 @@ The one-enemy performance gate closed on 2026-07-12 at 16.667 ms median and 20.8
 
 The five-source CC0 Poly Haven batch, Vulkan array upload, world-space mapping, Android staging, license manifest, visual phone proof, and 60 FPS median regression test are complete. See `docs/PBR_MATERIAL_BATCH_2026-07-12.md`.
 
-## Next slice - settle material art direction and compressed mobile assets
+## Compressed mobile material slice - complete
 
-1. Tune scale, orientation, wetness, and normal strength from hands-on phone feedback.
-2. Replace raw runtime arrays with a supported mobile GPU-compressed format.
-3. Measure APK size, device memory, and the 126-interval frame gate again.
-4. Keep the full textured sword LOD separate until this environment material path is stable.
+Android now uses capability-checked ASTC KTX2 arrays; Windows retains raw RGBA8. The textured sword LOD remains staged until static GLB/PBR support is measured on phone.
 
 ### Compressed material and first combat slice - phone verified 2026-07-14
 
@@ -95,13 +92,11 @@ The five-source CC0 Poly Haven batch, Vulkan array upload, world-space mapping, 
 - Rejected and removed fake analytic/overlay shafts.
 - Deferred true volumetric dust until a participating-media implementation is proven, likely desktop-first.
 
-## Next technical slice - downloadable native RT showcase
+## Initial downloadable alpha - complete; extended showcase remains
 
-1. Add compact explicit per-triangle material IDs and build a bounded materials gallery table from the five existing ASTC PBR layers.
-2. Reclaim diffuse-ray budget, then add one framed one-segment mirror wall with a directly lit reflected hit.
-3. Add honest thin clear/stained panes through a separate static glass instance/mask and bounded Fresnel plus one transmission query.
-4. Compose the existing single skeleton as the final-room mirror/glass reveal; do not add enemy count or broader AI.
-5. Finish with compact effect labels, reproducible benchmark/reset mode, signed Android APK, Windows zip, compatibility notes, hashes, and license evidence.
+The initial showing alpha now has explicit material IDs/gallery surfaces, one bounded clear skylight transmission slice, compact entry/pause/settings/diagnostics UI, restart flow, a stable-key-signed Android APK, portable Windows zip, compatibility notes, hashes, licences, and separate public itch channels.
+
+The extended showcase still needs one hero framed mirror, coloured transmission, the authored guided route, and final reveal composition. Continue with `docs/COLOURED_LIGHT_ROUTE_PLAN_2026-07-15.md`; do not add enemy count or broader AI.
 
 Full route, gates, and technical boundaries: `docs/NATIVE_RT_SHOWCASE_PLAN_2026-07-14.md`.
 
@@ -113,4 +108,4 @@ The runtime-only Android asset task is complete and reduced the debug APK from 9
 2. Phase 3 - Movement and simple combat shell
 3. Phase 4 - Asset upgrade
 4. Phase 5 - Playable route
-5. Phase 6 - Release package
+5. Phase 6 - Full showcase release package (the bounded initial alpha package is already public)

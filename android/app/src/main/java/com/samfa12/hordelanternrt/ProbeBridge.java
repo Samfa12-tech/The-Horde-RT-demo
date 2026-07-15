@@ -15,4 +15,9 @@ public final class ProbeBridge {
     public static native void stopDiagnosticSurface();
     public static native void setViewControls(float yaw, float pitch, float lanternStrength, float moveStrafe, float moveForward);
     public static native void requestAttack();
+    public static native void requestRouteReset();
+    public static native void setSimulationPaused(boolean paused);
+    public static native void setRenderScale(float scale);
+    public static native int getRuntimeState();
+    public static native int consumeAudioEvents();
 }

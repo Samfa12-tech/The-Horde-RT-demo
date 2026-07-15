@@ -18,7 +18,7 @@ struct CombatSnapshot
 {
     float swordSwingRadians = 0.0f;
     float enemyX = 0.0f;
-    float enemyZ = -2.35f;
+    float enemyZ = -4.65f;
     float enemyFacingRadians = 0.0f;
     float enemyAnimationTime = 0.0f;
     float damageFlash = 0.0f;
@@ -148,7 +148,7 @@ private:
     void ResetEnemy()
     {
         enemyX_ = 0.0f;
-        enemyZ_ = -2.35f;
+        enemyZ_ = -4.65f;
         enemyFacing_ = 0.0f;
         phase_ = EnemyPhase::Approach;
         phaseTime_ = 0.0f;
@@ -166,7 +166,7 @@ private:
     CombatSnapshot snapshot_{};
     EnemyPhase phase_ = EnemyPhase::Approach;
     float enemyX_ = 0.0f;
-    float enemyZ_ = -2.35f;
+    float enemyZ_ = -4.65f;
     float enemyFacing_ = 0.0f;
     float phaseTime_ = 0.0f;
     float animationTime_ = 0.0f;

@@ -9,7 +9,8 @@ The `android/` module is the supported phone path for Horde Lantern RT. It owns 
 - Shared native source manifest: `../cmake/HordeRtSources.cmake`
 - Native Vulkan RT presentation through the Android swapchain
 - One frame in flight while the held-prop TLAS uses a host-written instance buffer
-- Touch movement/look, a dedicated `SWING` attack control, one-enemy combat, animated skeleton BLAS refit, a yaw-relative first-person torso plus four pitch-relative IK arm instances, ASTC PBR texture arrays, and phone-safe ray-query shading inside `vkCmdTraceRaysKHR`
+- Portrait-first branded entry/pause/settings/controls/diagnostics UI, touch movement/look, a dedicated `SWING` control, one-enemy combat, animated skeleton BLAS refit, a yaw-relative first-person torso plus four pitch-relative IK arm instances, ASTC PBR texture arrays, and phone-safe ray-query shading inside `vkCmdTraceRaysKHR`
+- Persisted SFX volume, look sensitivity, compact HUD, and 50-100% RT render scale; thirteen FilmCow clips play through SoundPool
 - Unsupported devices retain explicit diagnostics instead of a fake rendering fallback
 
 ## Build, install, and launch
@@ -31,8 +32,12 @@ Also require `PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX
 
 Reports are stored under `files/reports/` in app-private storage and can be retrieved with `adb shell run-as com.samfa12.hordelanternrt`.
 
-The current primary test device is Samsung `SM-S948B`. Re-run the 126-interval phone performance gate after renderer, animation, or material-path changes.
+The current primary test device is Samsung `SM-S948B`. Use the renderer's 120-frame telemetry after meaningful renderer, animation, or material-path changes and validate the recommended quality tier separately from 100%.
 
 The combat/ASTC build passed that gate on 2026-07-14: strict ASTC selection, honest RT swapchain presentation, stable movement/look/swing input, and two samples at 12.500 ms median / 16.667 ms p95. See `../docs/COMBAT_ASTC_PHONE_VALIDATION_2026-07-14.md`.
 
 The articulated grip-locked, pitch-following revision builds for all Android ABIs and is verified on `SM-S948B`: strict ASTC selection, honest RT presentation, live idle/swing grip composition, and thermal-status-2 sustained evidence at 52.352 SurfaceFlinger TimeStats average FPS / 19.718 ms internal median (approximately 50.7 FPS). See `../docs/PLAYER_BODY_RT_SLICE_2026-07-14.md`.
+
+The published `0.1.0-alpha.1` APK is stable-key signed and passed the final portrait/UI/audio/render-scale sanity pass. At 75%, 21 warm 120-frame windows measured 10.933 ms median / 15.050 ms p95 at thermal status 3; 75% is the sustained recommendation. See `../docs/ALPHA_ANDROID_PHONE_VALIDATION_2026-07-15.md`.
+
+Create/sign future releases with `../tools/create-android-release-key.ps1` and `../tools/package-signed-alpha.ps1`. Keep the JKS and signing properties outside Git.

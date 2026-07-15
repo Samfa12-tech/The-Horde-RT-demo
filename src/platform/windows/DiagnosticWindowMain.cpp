@@ -1,6 +1,8 @@
 #include "platform/windows/DiagnosticWindow.h"
 
-int main()
+#include <windows.h>
+
+int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int showCommand)
 {
-    return horde::platform::windows::RunDiagnosticWindow();
+    return horde::platform::windows::RunDiagnosticWindow(showCommand);
 }

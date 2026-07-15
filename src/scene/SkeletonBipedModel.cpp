@@ -453,7 +453,7 @@ bool SkeletonBipedModel::LoadCombatClips(const std::string& glbPath, std::string
         !ReadAccessor(*accessors, *views, indexAccessor->Uint(), indices, diagnostic) || positions.count != normals.count || positions.count != joints.count || positions.count != weights.count ||
         positions.componentType != 5126u || normals.componentType != 5126u || weights.componentType != 5126u || joints.componentType != 5121u)
     {
-        diagnostic = "Skeleton GLB mesh layout is not the audited Meshy layout.";
+        diagnostic = "Skeleton GLB mesh layout is not the audited derivative layout.";
         return false;
     }
     vertices_.resize(positions.count);

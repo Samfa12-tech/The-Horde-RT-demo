@@ -23,7 +23,7 @@ struct ScenePushConstants
     float lantern = 1.0f;
     float time = 0.0f;
     float cameraX = 0.0f;
-    float cameraZ = 4.7f;
+    float cameraZ = 1.85f;
     float walkAmount = 0.0f;
     float outputRedBlueSwap = 0.0f;
     float outputExposure = 0.92f;
@@ -194,6 +194,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     commandPool_ = std::exchange(other.commandPool_, VK_NULL_HANDLE);
     dispatchExtent_ = std::exchange(other.dispatchExtent_, VkExtent2D{});
     presentationUsesBgra_ = std::exchange(other.presentationUsesBgra_, false);
+    scaledBlitSupported_ = std::exchange(other.scaledBlitSupported_, false);
     storageImage_ = std::exchange(other.storageImage_, VK_NULL_HANDLE);
     storageImageMemory_ = std::exchange(other.storageImageMemory_, VK_NULL_HANDLE);
     storageImageView_ = std::exchange(other.storageImageView_, VK_NULL_HANDLE);
@@ -266,7 +267,6 @@ bool PresentableTinyRtScene::Initialise(VkInstance instance,
     commandPool_ = commandPool;
     dispatchExtent_ = dispatchExtent;
     presentationUsesBgra_ = presentationFormat == VK_FORMAT_B8G8R8A8_UNORM || presentationFormat == VK_FORMAT_B8G8R8A8_SRGB;
-
     if (instance_ == VK_NULL_HANDLE || physicalDevice_ == VK_NULL_HANDLE || device_ == VK_NULL_HANDLE || queue_ == VK_NULL_HANDLE || commandPool_ == VK_NULL_HANDLE)
     {
         diagnostic = "Invalid Vulkan handles supplied to presentable RT scene.";
@@ -277,6 +277,14 @@ bool PresentableTinyRtScene::Initialise(VkInstance instance,
         diagnostic = "RT dispatch extent is zero.";
         return false;
     }
+    VkFormatProperties storageFormatProperties{};
+    VkFormatProperties presentationFormatProperties{};
+    vkGetPhysicalDeviceFormatProperties(physicalDevice_, kStorageImageFormat, &storageFormatProperties);
+    vkGetPhysicalDeviceFormatProperties(physicalDevice_, presentationFormat, &presentationFormatProperties);
+    const VkFormatFeatureFlags storageBlitFeatures = VK_FORMAT_FEATURE_BLIT_SRC_BIT |
+                                                     VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT;
+    scaledBlitSupported_ = (storageFormatProperties.optimalTilingFeatures & storageBlitFeatures) == storageBlitFeatures &&
+                           (presentationFormatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_DST_BIT) != 0u;
     if (!skeletonModel_.LoadCombatClips(skeletonAssetPath, diagnostic) ||
         !LoadEntryPoints(diagnostic) ||
         !CreateStorageImage(diagnostic) ||
@@ -375,6 +383,7 @@ void PresentableTinyRtScene::Destroy()
     hitRegion_ = {};
     callableRegion_ = {};
     storageImageLayout_ = VK_IMAGE_LAYOUT_UNDEFINED;
+    scaledBlitSupported_ = false;
     ready_ = false;
 }
 
@@ -969,6 +978,16 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         worldSurfaceCodes.push_back(code);
         worldSurfaceCodes.push_back(code);
     };
+    const auto addWorldBox = [&addWorldQuad](float minX, float minY, float minZ,
+                                             float maxX, float maxY, float maxZ,
+                                             SurfaceMaterial material) {
+        addWorldQuad({{minX, minY, minZ}}, {{minX, maxY, minZ}}, {{maxX, maxY, minZ}}, {{maxX, minY, minZ}}, material, SurfaceForward);
+        addWorldQuad({{maxX, minY, maxZ}}, {{maxX, maxY, maxZ}}, {{minX, maxY, maxZ}}, {{minX, minY, maxZ}}, material, SurfaceBack);
+        addWorldQuad({{minX, minY, maxZ}}, {{minX, maxY, maxZ}}, {{minX, maxY, minZ}}, {{minX, minY, minZ}}, material, SurfaceRight);
+        addWorldQuad({{maxX, minY, minZ}}, {{maxX, maxY, minZ}}, {{maxX, maxY, maxZ}}, {{maxX, minY, maxZ}}, material, SurfaceLeft);
+        addWorldQuad({{minX, maxY, minZ}}, {{minX, maxY, maxZ}}, {{maxX, maxY, maxZ}}, {{maxX, maxY, minZ}}, material, SurfaceDown);
+        addWorldQuad({{minX, minY, maxZ}}, {{minX, minY, minZ}}, {{maxX, minY, minZ}}, {{maxX, minY, maxZ}}, material, SurfaceUp);
+    };
     const auto addBox = [&addQuad](float minX, float minY, float minZ, float maxX, float maxY, float maxZ) {
         // Fixed face order for the raygen material normal lookup:
         // -Z, +Z, -X, +X, +Y, -Y (two triangles per face).
@@ -984,10 +1003,14 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     addWorldQuad({{-1.85f, 1.35f, 3.4f}}, {{-1.85f, 1.35f, -0.2f}}, {{1.85f, 1.35f, -0.2f}}, {{1.85f, 1.35f, 3.4f}}, SurfaceDryStone, SurfaceDown);
     addWorldQuad({{-1.85f, -0.95f, 3.4f}}, {{-1.85f, -0.95f, -6.4f}}, {{-1.85f, 1.35f, -6.4f}}, {{-1.85f, 1.35f, 3.4f}}, SurfaceMossyStone, SurfaceRight);
     addWorldQuad({{1.85f, -0.95f, -6.4f}}, {{1.85f, -0.95f, 3.4f}}, {{1.85f, 1.35f, 3.4f}}, {{1.85f, 1.35f, -6.4f}}, SurfaceMossyStone, SurfaceLeft);
+    // Close the starting chamber behind the player. This is real RT geometry,
+    // preventing a 180-degree turn at spawn from exposing the exterior sky.
+    addWorldQuad({{-1.85f, -0.95f, 3.4f}}, {{-1.85f, 1.35f, 3.4f}}, {{1.85f, 1.35f, 3.4f}}, {{1.85f, -0.95f, 3.4f}}, SurfaceMossyStone, SurfaceBack);
     addWorldQuad({{-1.85f, -0.95f, -6.4f}}, {{1.85f, -0.95f, -6.4f}}, {{1.85f, 1.35f, -6.4f}}, {{-1.85f, 1.35f, -6.4f}}, SurfaceMossyStone, SurfaceForward);
-    addWorldQuad({{-1.2f, -0.95f, -3.4f}}, {{-0.78f, -0.95f, -3.4f}}, {{-0.78f, 0.95f, -3.4f}}, {{-1.2f, 0.95f, -3.4f}}, SurfaceMossyStone, SurfaceForward);
-    addWorldQuad({{0.78f, -0.95f, -3.4f}}, {{1.2f, -0.95f, -3.4f}}, {{1.2f, 0.95f, -3.4f}}, {{0.78f, 0.95f, -3.4f}}, SurfaceMossyStone, SurfaceForward);
-    addWorldQuad({{-1.2f, 0.78f, -3.4f}}, {{1.2f, 0.78f, -3.4f}}, {{1.2f, 1.18f, -3.4f}}, {{-1.2f, 1.18f, -3.4f}}, SurfaceMossyStone, SurfaceForward);
+    // Give the room-two portal real RT depth instead of three paper-thin cards.
+    addWorldBox(-1.20f, -0.95f, -3.55f, -0.78f, 0.95f, -3.25f, SurfaceMossyStone);
+    addWorldBox(0.78f, -0.95f, -3.55f, 1.20f, 0.95f, -3.25f, SurfaceMossyStone);
+    addWorldBox(-1.20f, 0.78f, -3.55f, 1.20f, 1.18f, -3.25f, SurfaceMossyStone);
     addWorldQuad({{-1.86f, -0.28f, 1.12f}}, {{-1.86f, 0.46f, 1.12f}}, {{-1.86f, 0.46f, 0.62f}}, {{-1.86f, -0.28f, 0.62f}}, SurfaceFlame, SurfaceRight);
     addWorldQuad({{1.86f, -0.35f, -1.98f}}, {{1.86f, -0.35f, -1.48f}}, {{1.86f, 0.38f, -1.48f}}, {{1.86f, 0.38f, -1.98f}}, SurfaceFlame, SurfaceLeft);
     addWorldQuad({{-1.84f, -0.32f, -0.82f}}, {{-1.84f, 0.24f, -0.62f}}, {{-1.84f, 0.42f, -1.12f}}, {{-1.84f, -0.12f, -1.34f}}, SurfaceMirror, SurfaceRight);
@@ -1000,6 +1023,10 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     addWorldQuad({{0.32f, 1.35f, -3.55f}}, {{0.62f, 1.35f, -5.05f}}, {{1.85f, 1.35f, -6.4f}}, {{1.85f, 1.35f, -0.2f}}, SurfaceDryStone, SurfaceDown);
     addWorldQuad({{-1.85f, 1.35f, -0.2f}}, {{-0.55f, 1.35f, -3.45f}}, {{0.32f, 1.35f, -3.55f}}, {{1.85f, 1.35f, -0.2f}}, SurfaceDryStone, SurfaceDown);
     addWorldQuad({{-0.72f, 1.35f, -5.20f}}, {{-1.85f, 1.35f, -6.4f}}, {{1.85f, 1.35f, -6.4f}}, {{0.62f, 1.35f, -5.05f}}, SurfaceDryStone, SurfaceDown);
+    // One bounded thin clear pane closes the irregular roof breach. Primary
+    // rays route through the glass material while visibility rays treat it as
+    // non-occluding, preserving the physically open moon direction.
+    addWorldQuad({{-0.55f, 1.33f, -3.45f}}, {{-0.72f, 1.33f, -5.20f}}, {{0.62f, 1.33f, -5.05f}}, {{0.32f, 1.33f, -3.55f}}, SurfaceClearGlass, SurfaceDown);
     for (std::uint32_t i = 0u; i < 8u; ++i)
     {
         const float x = -1.05f + static_cast<float>(i % 4u) * 0.7f + (i >= 4u ? 0.18f : 0.0f);
@@ -1031,11 +1058,12 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
 
     // A thin hidden shell behind the zero-thickness room planes catches rays
     // that start near a join and skip the adjoining face because of ray tMin.
-    // It stops at the open entrance and leaves the room-two roof breach
-    // unobstructed. Appending it here preserves every existing material index.
+    // It leaves the room-two roof breach unobstructed. Appending it here
+    // preserves every existing material index.
     addWorldQuad({{-1.92f, -1.02f, 3.4f}}, {{-1.92f, -1.02f, -6.47f}}, {{-1.92f, 1.42f, -6.47f}}, {{-1.92f, 1.42f, 3.4f}}, SurfaceHiddenShell, SurfaceRight);
     addWorldQuad({{1.92f, -1.02f, -6.47f}}, {{1.92f, -1.02f, 3.4f}}, {{1.92f, 1.42f, 3.4f}}, {{1.92f, 1.42f, -6.47f}}, SurfaceHiddenShell, SurfaceLeft);
     addWorldQuad({{-1.92f, -1.02f, 3.4f}}, {{1.92f, -1.02f, 3.4f}}, {{1.92f, -1.02f, -6.47f}}, {{-1.92f, -1.02f, -6.47f}}, SurfaceHiddenShell, SurfaceUp);
+    addWorldQuad({{-1.92f, -1.02f, 3.47f}}, {{-1.92f, 1.42f, 3.47f}}, {{1.92f, 1.42f, 3.47f}}, {{1.92f, -1.02f, 3.47f}}, SurfaceHiddenShell, SurfaceBack);
     addWorldQuad({{-1.92f, -1.02f, -6.47f}}, {{1.92f, -1.02f, -6.47f}}, {{1.92f, 1.42f, -6.47f}}, {{-1.92f, 1.42f, -6.47f}}, SurfaceHiddenShell, SurfaceForward);
 
     const std::uint32_t sceneIndexCount = static_cast<std::uint32_t>(indices.size());
@@ -1047,9 +1075,32 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
 
     // The camera-held props share upload buffers but use separate BLAS instances
     // so the sword can swing without moving the torch or its light estimate.
-    addQuad({{-0.045f, -0.42f, 0.0f}}, {{0.045f, -0.42f, 0.0f}}, {{0.045f, 0.10f, 0.0f}}, {{-0.045f, 0.10f, 0.0f}});
-    addTriangle({{-0.13f, 0.08f, 0.0f}}, {{0.13f, 0.08f, 0.0f}}, {{0.0f, 0.52f, 0.0f}});
-    addTriangle({{0.0f, 0.08f, -0.13f}}, {{0.0f, 0.08f, 0.13f}}, {{0.0f, 0.52f, 0.0f}});
+    // Keep this torch deliberately compact for phone RT: a solid wooden shaft,
+    // iron collar/cage and two nested faceted flames replace the old four-triangle
+    // proof while the generated Meshy LOD waits for the measured static-GLB path.
+    addBox(-0.034f, -0.44f, -0.034f, 0.034f, 0.12f, 0.034f);     // wood shaft: 12 triangles
+    addBox(-0.11f, 0.09f, -0.11f, 0.11f, 0.15f, 0.11f);         // iron lower collar
+    addBox(-0.105f, 0.14f, -0.105f, -0.075f, 0.35f, -0.075f);   // cage bars
+    addBox(0.075f, 0.14f, -0.105f, 0.105f, 0.35f, -0.075f);
+    addBox(-0.105f, 0.14f, 0.075f, -0.075f, 0.35f, 0.105f);
+    addBox(0.075f, 0.14f, 0.075f, 0.105f, 0.35f, 0.105f);
+    addBox(-0.115f, 0.33f, -0.115f, 0.115f, 0.38f, 0.115f);     // iron upper collar
+    const auto addFacetedFlame = [&addTriangle](float radius, float bottom, float waist, float top) {
+        const Vertex lower{{0.0f, bottom, 0.0f}};
+        const Vertex upper{{0.0f, top, 0.0f}};
+        const std::array<Vertex, 4u> ring{{
+            Vertex{{radius, waist, 0.0f}}, Vertex{{0.0f, waist, radius}},
+            Vertex{{-radius, waist, 0.0f}}, Vertex{{0.0f, waist, -radius}}}};
+        for (std::size_t i = 0u; i < ring.size(); ++i)
+        {
+            const Vertex& current = ring[i];
+            const Vertex& next = ring[(i + 1u) % ring.size()];
+            addTriangle(lower, next, current);
+            addTriangle(upper, current, next);
+        }
+    };
+    addFacetedFlame(0.095f, 0.16f, 0.31f, 0.58f);               // orange outer flame: 8 triangles
+    addFacetedFlame(0.050f, 0.19f, 0.30f, 0.47f);               // bright inner flame: 8 triangles
     const std::uint32_t torchIndexCount = static_cast<std::uint32_t>(indices.size());
 
     // Low-poly player sword proof, angled inward from the right hand. The
@@ -1492,7 +1543,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     instances[2].transform = {{
         1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f, -0.95f,
-        0.0f, 0.0f, 1.0f, -2.35f}};
+        0.0f, 0.0f, 1.0f, -4.65f}};
     instances[3] = instances[1];
     instances[3].instanceCustomIndex = 3u;
     instances[3].mask = 0x02u;
@@ -1984,7 +2035,9 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                       : horde::scene::SkeletonClip::Idle));
     constexpr float skeletonUpdateInterval = 1.0f / 30.0f;
     const int skeletonClipIndex = static_cast<int>(skeletonClip);
-    const float skeletonTime = combat.enemyAnimationTime;
+    const float skeletonTime = combat.enemyAnimation == horde::gameplay::EnemyAnimation::Walking
+        ? combat.enemyAnimationTime * 0.90f
+        : combat.enemyAnimationTime;
     const bool clipChanged = skeletonClipIndex != lastSkeletonClip_;
     const bool updateSkeleton = clipChanged || lastSkeletonUpdateTime_ < 0.0f || skeletonTime < lastSkeletonUpdateTime_ ||
                                 (skeletonTime - lastSkeletonUpdateTime_) >= skeletonUpdateInterval;
@@ -2181,6 +2234,13 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
         diagnostic = "RT scene is not ready.";
         return false;
     }
+    const bool scaledPresentation = dispatchExtent_.width != swapchainExtent.width ||
+                                    dispatchExtent_.height != swapchainExtent.height;
+    if (scaledPresentation && !scaledBlitSupported_)
+    {
+        diagnostic = "This Vulkan device cannot linearly upscale the RT storage format to the presentation format.";
+        return false;
+    }
 
     if (!UpdateDynamicInstances(commandBuffer, cameraYaw, cameraPitch, walkTime, cameraX, cameraZ, walkAmount, combat, diagnostic))
     {
@@ -2209,7 +2269,7 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                                            cameraX,
                                             cameraZ,
                                             walkAmount,
-                                            presentationUsesBgra_ ? 1.0f : 0.0f,
+                                            presentationUsesBgra_ && !scaledPresentation ? 1.0f : 0.0f,
                                             std::clamp(outputExposure, 0.2f, 1.4f),
                                             std::clamp(combat.damageFlash, 0.0f, 1.0f)};
     vkCmdPushConstants(commandBuffer,
@@ -2249,17 +2309,38 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                     0u,
                     VK_ACCESS_TRANSFER_WRITE_BIT);
 
-    VkImageCopy copyRegion{};
-    copyRegion.srcSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, 0u, 1u};
-    copyRegion.dstSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, 0u, 1u};
-    copyRegion.extent = {std::min(dispatchExtent_.width, swapchainExtent.width), std::min(dispatchExtent_.height, swapchainExtent.height), 1u};
-    vkCmdCopyImage(commandBuffer,
-                   storageImage_,
-                   VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-                   swapchainImage,
-                   VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                   1u,
-                   &copyRegion);
+    if (scaledPresentation)
+    {
+        VkImageBlit blitRegion{};
+        blitRegion.srcSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, 0u, 1u};
+        blitRegion.srcOffsets[1] = {static_cast<std::int32_t>(dispatchExtent_.width),
+                                    static_cast<std::int32_t>(dispatchExtent_.height), 1};
+        blitRegion.dstSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, 0u, 1u};
+        blitRegion.dstOffsets[1] = {static_cast<std::int32_t>(swapchainExtent.width),
+                                    static_cast<std::int32_t>(swapchainExtent.height), 1};
+        vkCmdBlitImage(commandBuffer,
+                       storageImage_,
+                       VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                       swapchainImage,
+                       VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                       1u,
+                       &blitRegion,
+                       VK_FILTER_LINEAR);
+    }
+    else
+    {
+        VkImageCopy copyRegion{};
+        copyRegion.srcSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, 0u, 1u};
+        copyRegion.dstSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, 0u, 1u};
+        copyRegion.extent = {dispatchExtent_.width, dispatchExtent_.height, 1u};
+        vkCmdCopyImage(commandBuffer,
+                       storageImage_,
+                       VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                       swapchainImage,
+                       VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                       1u,
+                       &copyRegion);
+    }
 
     SetImageBarrier(commandBuffer,
                     swapchainImage,

@@ -1,4 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Horde Lantern RT Probe</string>
+    <string name="app_name">Horde Lantern RT Alpha</string>
+    <string name="alpha_version">INITIAL SHOWING · ALPHA 0.1.0</string>
+    <string name="start_demo">ENTER THE RUIN</string>
+    <string name="resume_demo">RESUME</string>
+    <string name="restart_route">RESTART ROUTE</string>
+    <string name="controls">CONTROLS</string>
+    <string name="settings">SETTINGS</string>
+    <string name="technical_info">RT DIAGNOSTICS</string>
+    <string name="quit">QUIT DEMO</string>
+    <string name="back">BACK</string>
+    <string name="swing">SWING</string>
+    <string name="menu">MENU</string>
+    <string name="rt_starting">VULKAN RT STARTING…</string>
+    <string name="rt_active">NATIVE VULKAN RT ACTIVE</string>
+    <string name="rt_unsupported">HARDWARE RT UNSUPPORTED</string>
+    <string name="rt_error">RT RENDERER ERROR</string>
+    <string name="hardware_requirement">Vulkan hardware RT required. No fallback.</string>
+    <string name="controls_help">LEFT HALF\nDrag to walk and strafe\n\nRIGHT HALF\nDrag for 360° camera look\n\nSWING\nTap the amber button to attack\n\nMENU / BACK\nPause, restart, settings and diagnostics</string>
+    <string name="sfx_enabled">Sound effects</string>
+    <string name="sfx_volume">SFX volume</string>
+    <string name="look_sensitivity">Look sensitivity</string>
+    <string name="render_scale">Render resolution</string>
+    <string name="show_hud">Show compact HUD</string>
+    <string name="reset_defaults">RESET DEFAULTS</string>
 </resources>

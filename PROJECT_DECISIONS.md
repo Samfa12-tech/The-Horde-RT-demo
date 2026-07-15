@@ -7,7 +7,7 @@ This file records locked decisions for the native Vulkan hardware ray-tracing de
 - Public project: Samfa12 technology demo.
 - Repository: `Samfa12-tech/The-Horde-RT-demo`.
 - Working creative title: **Horde Lantern RT**.
-- Future distribution: downloadable from `samfa12.com`.
+- Distribution: itch hosts the canonical Android and Windows artifacts at `https://samfa12.itch.io/the-horde`; Samfa12.com links to that page.
 
 ## Core decision
 
@@ -55,7 +55,7 @@ Internal render resolution
 FPS / frame time
 ```
 
-Feature structs to check/enable later:
+Feature structs checked and enabled by the current capability path:
 
 ```text
 VkPhysicalDeviceAccelerationStructureFeaturesKHR
@@ -89,16 +89,16 @@ Do not dump a giant third-party engine into this repo. If code is later adapted 
 
 - All assets must be commercial-safe.
 - Asset source and license must be recorded in `ASSET_LICENSES.md`.
-- Meshy assets are allowed later.
+- Meshy-assisted assets are allowed when the underlying source permits use and the applicable Meshy attribution route is recorded.
 - Meshy models must be textured before export.
 - Do not import untextured Meshy models and call them complete.
 - Prefer glTF/GLB where practical.
 - Use high-quality PBR textures from the start when actual visual work begins.
 - Phase 0 should not import big assets.
 
-## Deferred work
+## Deferred from the original scaffold
 
-The following are intentionally not part of the scaffold step:
+The following were intentionally outside the original scaffold. Gameplay, Meshy integration, the torch room, BLAS/TLAS, SBT, audio, and packaging have since been implemented in bounded alpha form; broader versions remain deferred.
 
 - Gameplay systems.
 - Horde/enemy behaviour.
@@ -123,9 +123,9 @@ Current proven path:
 - The current source represents the held torch as a real emissive BLAS/TLAS instance rather than a screen overlay. Its laptop and target-phone visual proofs are complete.
 - The live laptop and phone proofs show the real orange flame and a deterministic ray-query reflection in a high-reflectivity wall insert. The raw RGBA-to-BGRA copy is explicitly compensated so the flame cannot turn cyan at presentation.
 - Controls are now left-drag movement/strafe and right-drag 360 look.
-- Windows now runs the same RT corridor as an interactive desktop scene: `WASD` moves, left mouse/trackpad click-drag looks, and `Esc` exits.
+- Windows now runs the same RT corridor as an interactive desktop scene: `WASD` moves, left mouse/trackpad click-drag looks, and `Esc` pauses/resumes.
 - The RTX 5050 laptop reported `RayTracingPipeline` and successful RT swapchain presentation at 984 x 661 in the interactive Windows build.
-- A Meshy biped skeleton with 11 correctly named animations is live through a narrow CPU-skinned RT path. The sword remains separate; the 12,358-triangle sword LOD stays staged until a measured static GLB/PBR upload path exists.
+- A Hotstrike Studio stylized skeleton, subsequently textured, rigged, and animated with Meshy, has 11 correctly named animations and is live through a narrow CPU-skinned RT path. The sword remains separate; the 12,358-triangle sword LOD stays staged until a measured static GLB/PBR upload path exists.
 
 Important technical finding:
 
@@ -133,11 +133,11 @@ Important technical finding:
 - The stable phone path uses `rayQueryEXT` from raygen to query the same TLAS for primary hits, shadow rays, and a first bounce sample while keeping pipeline recursion depth 1.
 - This keeps the project aligned with RT-or-nothing because ray queries use Vulkan hardware acceleration-structure traversal.
 
-## Next smallest task - compressed mobile PBR arrays
+## Current release and next bounded route - 2026-07-15
 
-The first animated skeleton and imported environment PBR batches are live and phone-validated. The next bounded task is:
-
-1. Replace the three raw runtime PBR arrays with a capability-checked mobile GPU-compressed format.
-2. Re-run the cold 126-interval phone benchmark and preserve the 50+ FPS median gate.
-3. Keep the textured sword LOD out of the runtime until the static GLB/PBR path exists and is measured on phone.
-4. Preserve the phone-safe ray-query path tracing route unless a stronger RT route is proven on device.
+- Initial Showing Alpha `0.1.0-alpha.1` is published on separate Windows and Android itch channels.
+- Android uses strict ASTC KTX2 arrays and a stable Samfa12 signing identity; Windows uses a portable executable-relative asset tree.
+- Final `SM-S948B` validation passed at 100%, 75%, and 50%. The 75% tier is the sustained phone recommendation; report 100% separately rather than treating it as an unconditional 50+ FPS promise.
+- The next route is `docs/COLOURED_LIGHT_ROUTE_PLAN_2026-07-15.md`: lower body/lantern drop, zig-zag shadows, blue skylight, bay-selected coloured torches, bounded coloured transmission, one hero mirror, and an emissive replacement in the existing one-enemy slot.
+- Keep the textured sword LOD out of runtime until static GLB/PBR support is measured on phone.
+- Preserve phone-safe ray-query shading and real `vkCmdTraceRaysKHR` presentation unless a stronger RT route is proven on-device.

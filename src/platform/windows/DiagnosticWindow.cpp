@@ -1,6 +1,7 @@
 #include "platform/windows/DiagnosticWindow.h"
 
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <filesystem>
 #include <fstream>
@@ -15,6 +16,8 @@
 #define NOMINMAX
 #endif
 #include <windows.h>
+#include <commctrl.h>
+#include <mmsystem.h>
 #ifdef DeviceCapabilities
 #undef DeviceCapabilities
 #endif
@@ -32,11 +35,38 @@ namespace
 {
 
 constexpr char kWindowClassName[] = "HordeRtDiagnosticWindowClass";
-constexpr char kWindowTitle[] = "Horde Lantern RT Diagnostic";
+constexpr char kWindowTitle[] = "Horde Lantern RT - Initial Showing Alpha";
 constexpr char kReportDirectory[] = "reports";
 constexpr char kTextReportFilename[] = "vulkan_capability_report.txt";
 constexpr char kJsonReportFilename[] = "vulkan_capability_report.json";
 constexpr int kEditControlId = 101;
+constexpr int kHudControlId = 102;
+constexpr int kPauseTitleId = 103;
+constexpr int kResumeButtonId = 104;
+constexpr int kRestartButtonId = 105;
+constexpr int kControlsButtonId = 106;
+constexpr int kSettingsButtonId = 107;
+constexpr int kDiagnosticsButtonId = 108;
+constexpr int kExitButtonId = 109;
+constexpr int kSettingsTitleId = 110;
+constexpr int kSfxButtonId = 111;
+constexpr int kSensitivityButtonId = 112;
+constexpr int kFullscreenButtonId = 113;
+constexpr int kSettingsBackButtonId = 114;
+constexpr int kRenderScaleLabelId = 115;
+constexpr int kRenderScaleSliderId = 116;
+constexpr int kMenuPauseId = 2001;
+constexpr int kMenuRestartId = 2002;
+constexpr int kMenuExitId = 2003;
+constexpr int kMenuSfxId = 2010;
+constexpr int kMenuSensitivityLowId = 2011;
+constexpr int kMenuSensitivityNormalId = 2012;
+constexpr int kMenuSensitivityHighId = 2013;
+constexpr int kMenuFullscreenId = 2014;
+constexpr int kMenuControlsId = 2020;
+constexpr int kMenuDiagnosticsId = 2021;
+constexpr int kMenuAboutId = 2022;
+constexpr int kAppIconId = 1;
 // One frame in flight keeps the dynamically refit held-torch TLAS safely synchronized with its host-written instance buffer.
 constexpr UINT kMaxFramesInFlight = 1u;
 struct VulkanSurfaceContext
@@ -65,6 +95,12 @@ struct VulkanSurfaceContext
     horde::vulkan::raytracing::PresentableTinyRtScene rtScene;
     bool useRtPath = false;
     bool controlsEnabled = false;
+    bool simulationPaused = true;
+    bool pauseMenuVisible = true;
+    bool settingsVisible = false;
+    bool diagnosticsVisible = false;
+    bool sfxEnabled = true;
+    bool fullscreen = false;
     bool forwardHeld = false;
     bool backwardHeld = false;
     bool leftHeld = false;
@@ -77,16 +113,242 @@ struct VulkanSurfaceContext
     float lanternStrength = 1.8f;
     float walkTime = 0.0f;
     float cameraX = 0.0f;
-    float cameraZ = 4.7f;
+    float cameraZ = 1.85f;
     float walkAmount = 0.0f;
     float frameDeltaSeconds = 1.0f / 60.0f;
+    float playerFootstepTime = 0.0f;
+    int enemyFootstepPhase = -1;
+    int playerFootstepVariant = 0;
+    int enemyFootstepVariant = 0;
     float outputExposure = 0.62f;
+    float mouseSensitivity = 1.0f;
+    float renderScale = 1.0f;
+    bool renderScaleDirty = false;
+    WINDOWPLACEMENT windowedPlacement{sizeof(WINDOWPLACEMENT)};
     horde::gameplay::SwordCombat combat;
     horde::gameplay::CombatSnapshot combatSnapshot;
     uint32_t currentFrame = 0u;
 };
 
 bool WriteReportFile(const std::filesystem::path& path, const std::string& data);
+void ClearDesktopInput(VulkanSurfaceContext& context);
+
+std::filesystem::path ExecutableDirectory()
+{
+    std::vector<char> path(MAX_PATH);
+    for (;;)
+    {
+        const DWORD length = GetModuleFileNameA(nullptr, path.data(), static_cast<DWORD>(path.size()));
+        if (length == 0u)
+        {
+            return std::filesystem::current_path();
+        }
+        if (length < path.size() - 1u)
+        {
+            return std::filesystem::path(path.data()).parent_path();
+        }
+        path.resize(path.size() * 2u);
+    }
+}
+
+std::filesystem::path ResolveAssetRoot()
+{
+    const std::filesystem::path packaged = ExecutableDirectory() / "assets";
+    if (std::filesystem::exists(packaged))
+    {
+        return packaged;
+    }
+    return std::filesystem::path(HORDE_RT_SOURCE_DIR) / "assets";
+}
+
+std::filesystem::path SettingsPath()
+{
+    return ExecutableDirectory() / "HordeLanternRT.settings.ini";
+}
+
+void LoadSettings(VulkanSurfaceContext& context)
+{
+    const std::string path = SettingsPath().string();
+    context.sfxEnabled = GetPrivateProfileIntA("audio", "sfx", 1, path.c_str()) != 0;
+    const int sensitivity = std::clamp(static_cast<int>(GetPrivateProfileIntA("controls", "lookSensitivity", 100, path.c_str())), 60, 150);
+    context.mouseSensitivity = static_cast<float>(sensitivity) / 100.0f;
+    const int renderScale = std::clamp(static_cast<int>(GetPrivateProfileIntA("display", "renderScale", 100, path.c_str())), 50, 100);
+    context.renderScale = static_cast<float>(renderScale) / 100.0f;
+}
+
+void SaveSettings(const VulkanSurfaceContext& context)
+{
+    const std::string path = SettingsPath().string();
+    WritePrivateProfileStringA("audio", "sfx", context.sfxEnabled ? "1" : "0", path.c_str());
+    const std::string sensitivity = std::to_string(static_cast<int>(std::round(context.mouseSensitivity * 100.0f)));
+    WritePrivateProfileStringA("controls", "lookSensitivity", sensitivity.c_str(), path.c_str());
+    const std::string renderScale = std::to_string(static_cast<int>(std::round(context.renderScale * 100.0f)));
+    WritePrivateProfileStringA("display", "renderScale", renderScale.c_str(), path.c_str());
+}
+
+void PlaySoundEffect(const VulkanSurfaceContext& context, const char* filename)
+{
+    if (!context.sfxEnabled)
+    {
+        return;
+    }
+    const std::filesystem::path path = ResolveAssetRoot() / "audio/filmcow" / filename;
+    if (std::filesystem::exists(path))
+    {
+        PlaySoundA(path.string().c_str(), nullptr, SND_FILENAME | SND_ASYNC | SND_NODEFAULT);
+    }
+}
+
+void PlayAmbientSoundEffect(const VulkanSurfaceContext& context, const char* filename)
+{
+    if (!context.sfxEnabled)
+    {
+        return;
+    }
+    const std::filesystem::path path = ResolveAssetRoot() / "audio/filmcow" / filename;
+    if (std::filesystem::exists(path))
+    {
+        // WinMM has no per-stream mixer here. NOSTOP keeps quiet movement cues
+        // from cutting off a swing, impact, menu, or attack cue already playing.
+        PlaySoundA(path.string().c_str(), nullptr, SND_FILENAME | SND_ASYNC | SND_NODEFAULT | SND_NOSTOP);
+    }
+}
+
+void SetControlVisible(HWND window, const int id, const bool visible)
+{
+    if (HWND control = GetDlgItem(window, id))
+    {
+        ShowWindow(control, visible ? SW_SHOW : SW_HIDE);
+    }
+}
+
+void UpdateSettingsLabels(VulkanSurfaceContext& context)
+{
+    if (HWND sfx = GetDlgItem(context.windowHandle, kSfxButtonId))
+    {
+        SetWindowTextA(sfx, context.sfxEnabled ? "SOUND EFFECTS: ON" : "SOUND EFFECTS: OFF");
+    }
+    if (HWND sensitivity = GetDlgItem(context.windowHandle, kSensitivityButtonId))
+    {
+        const char* value = context.mouseSensitivity < 0.8f ? "LOW" : (context.mouseSensitivity > 1.2f ? "HIGH" : "NORMAL");
+        const std::string label = std::string("LOOK SENSITIVITY: ") + value;
+        SetWindowTextA(sensitivity, label.c_str());
+    }
+    if (HWND fullscreen = GetDlgItem(context.windowHandle, kFullscreenButtonId))
+    {
+        SetWindowTextA(fullscreen, context.fullscreen ? "DISPLAY: FULLSCREEN" : "DISPLAY: WINDOWED");
+    }
+    if (HWND label = GetDlgItem(context.windowHandle, kRenderScaleLabelId))
+    {
+        const std::string text = "RENDER RESOLUTION: " + std::to_string(static_cast<int>(std::round(context.renderScale * 100.0f))) + "%";
+        SetWindowTextA(label, text.c_str());
+    }
+    if (HWND slider = GetDlgItem(context.windowHandle, kRenderScaleSliderId))
+    {
+        SendMessageA(slider, TBM_SETPOS, TRUE, static_cast<LPARAM>(std::round(context.renderScale * 100.0f)));
+    }
+
+    HMENU menu = GetMenu(context.windowHandle);
+    if (menu)
+    {
+        CheckMenuItem(menu, kMenuSfxId, MF_BYCOMMAND | (context.sfxEnabled ? MF_CHECKED : MF_UNCHECKED));
+        CheckMenuItem(menu, kMenuFullscreenId, MF_BYCOMMAND | (context.fullscreen ? MF_CHECKED : MF_UNCHECKED));
+        CheckMenuRadioItem(menu, kMenuSensitivityLowId, kMenuSensitivityHighId,
+                           context.mouseSensitivity < 0.8f ? kMenuSensitivityLowId :
+                           (context.mouseSensitivity > 1.2f ? kMenuSensitivityHighId : kMenuSensitivityNormalId), MF_BYCOMMAND);
+    }
+}
+
+void ApplyOverlayState(VulkanSurfaceContext& context)
+{
+    const bool pauseVisible = context.pauseMenuVisible && !context.settingsVisible && !context.diagnosticsVisible;
+    for (const int id : {kPauseTitleId, kResumeButtonId, kRestartButtonId, kControlsButtonId,
+                         kSettingsButtonId, kDiagnosticsButtonId, kExitButtonId})
+    {
+        SetControlVisible(context.windowHandle, id, pauseVisible);
+    }
+    for (const int id : {kSettingsTitleId, kSfxButtonId, kSensitivityButtonId, kRenderScaleLabelId,
+                         kRenderScaleSliderId, kFullscreenButtonId, kSettingsBackButtonId})
+    {
+        SetControlVisible(context.windowHandle, id, context.settingsVisible);
+    }
+    SetControlVisible(context.windowHandle, kEditControlId, context.diagnosticsVisible);
+    SetControlVisible(context.windowHandle, kHudControlId, !context.diagnosticsVisible);
+    context.simulationPaused = pauseVisible || context.settingsVisible || context.diagnosticsVisible;
+    if (context.simulationPaused)
+    {
+        ClearDesktopInput(context);
+    }
+    if (HMENU menu = GetMenu(context.windowHandle))
+    {
+        ModifyMenuA(menu, kMenuPauseId, MF_BYCOMMAND | MF_STRING, kMenuPauseId,
+                    context.simulationPaused ? "&Resume\tEsc" : "&Pause\tEsc");
+        DrawMenuBar(context.windowHandle);
+    }
+    UpdateSettingsLabels(context);
+}
+
+void ShowPauseMenu(VulkanSurfaceContext& context, const bool visible)
+{
+    context.pauseMenuVisible = visible;
+    context.settingsVisible = false;
+    context.diagnosticsVisible = false;
+    ApplyOverlayState(context);
+    if (visible)
+    {
+        PlaySoundEffect(context, "menu_toggle.wav");
+        SetFocus(GetDlgItem(context.windowHandle, kResumeButtonId));
+    }
+    else
+    {
+        PlaySoundEffect(context, "ui_back.wav");
+        SetFocus(context.windowHandle);
+    }
+}
+
+void ResetRoute(VulkanSurfaceContext& context)
+{
+    context.cameraYaw = 0.0f;
+    context.cameraPitch = 0.0f;
+    context.lanternStrength = 1.8f;
+    context.walkTime = 0.0f;
+    context.cameraX = 0.0f;
+    context.cameraZ = 1.85f;
+    context.walkAmount = 0.0f;
+    context.playerFootstepTime = 0.0f;
+    context.enemyFootstepPhase = -1;
+    context.combat = {};
+    context.combatSnapshot = {};
+    ClearDesktopInput(context);
+}
+
+void ToggleFullscreen(VulkanSurfaceContext& context)
+{
+    HWND window = context.windowHandle;
+    if (!context.fullscreen)
+    {
+        context.windowedPlacement.length = sizeof(WINDOWPLACEMENT);
+        GetWindowPlacement(window, &context.windowedPlacement);
+        MONITORINFO monitor{sizeof(MONITORINFO)};
+        if (GetMonitorInfoA(MonitorFromWindow(window, MONITOR_DEFAULTTONEAREST), &monitor))
+        {
+            SetWindowLongA(window, GWL_STYLE, WS_POPUP | WS_VISIBLE | WS_CLIPCHILDREN);
+            SetWindowPos(window, HWND_TOP, monitor.rcMonitor.left, monitor.rcMonitor.top,
+                         monitor.rcMonitor.right - monitor.rcMonitor.left,
+                         monitor.rcMonitor.bottom - monitor.rcMonitor.top,
+                         SWP_FRAMECHANGED | SWP_NOOWNERZORDER);
+            context.fullscreen = true;
+        }
+    }
+    else
+    {
+        SetWindowLongA(window, GWL_STYLE, WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_CLIPCHILDREN);
+        SetWindowPlacement(window, &context.windowedPlacement);
+        SetWindowPos(window, nullptr, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER);
+        context.fullscreen = false;
+    }
+    UpdateSettingsLabels(context);
+}
 
 std::string BuildDisplayText(const horde::vulkan::DeviceCapabilities& capabilities)
 {
@@ -281,6 +543,12 @@ void UpdateDesktopSceneControls(VulkanSurfaceContext& context)
     }
     context.lastControlTick = now;
     context.frameDeltaSeconds = deltaSeconds;
+    if (context.simulationPaused)
+    {
+        context.frameDeltaSeconds = 0.0f;
+        context.walkAmount = 0.0f;
+        return;
+    }
     context.walkTime += deltaSeconds * 2.7f;
 
     const float forwardAmount = (context.forwardHeld ? 1.0f : 0.0f) - (context.backwardHeld ? 1.0f : 0.0f);
@@ -753,6 +1021,14 @@ void ReleaseSwapchainResources(VulkanSurfaceContext& ctx)
     ctx.currentFrame = 0u;
 }
 
+VkExtent2D ScaledRenderExtent(VkExtent2D presentationExtent, float renderScale)
+{
+    const float scale = std::clamp(renderScale, 0.50f, 1.0f);
+    return {
+        std::max(1u, static_cast<uint32_t>(std::lround(static_cast<double>(presentationExtent.width) * scale))),
+        std::max(1u, static_cast<uint32_t>(std::lround(static_cast<double>(presentationExtent.height) * scale)))};
+}
+
 bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx)
 {
     if (!ctx.useRtPath)
@@ -760,22 +1036,32 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx)
         return true;
     }
 
+    const std::filesystem::path assetRoot = ResolveAssetRoot();
+    const VkExtent2D renderExtent = ScaledRenderExtent(ctx.swapchainExtent, ctx.renderScale);
     std::string diagnostic;
     if (!ctx.rtScene.Initialise(ctx.instance,
                                 ctx.physicalDevice,
                                 ctx.device,
                                 ctx.graphicsQueue,
                                 ctx.commandPool,
-                                ctx.swapchainExtent,
+                                renderExtent,
                                 ctx.swapchainFormat,
-                                (std::filesystem::path(HORDE_RT_SOURCE_DIR) / "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb").string(),
-                                (std::filesystem::path(HORDE_RT_SOURCE_DIR) / "assets/textures/polyhaven/mobile_1k").string(),
+                                (assetRoot / "models/enemies/meshy/skeleton_biped_merged_animations_v01.glb").string(),
+                                (assetRoot / "textures/polyhaven/mobile_1k").string(),
                                 diagnostic))
     {
         std::cerr << "Failed to initialise presentable RT scene: " << diagnostic << '\n';
+        MessageBoxA(ctx.windowHandle,
+                    ("The native RT scene could not start.\n\n" + diagnostic +
+                     "\n\nKeep the packaged assets folder beside HordeLanternRT.exe. No fallback renderer will be used.").c_str(),
+                    "Horde Lantern RT - startup error",
+                    MB_OK | MB_ICONERROR);
         return false;
     }
-    std::cout << "PBR material encoding: " << ctx.rtScene.MaterialEncoding() << '\n' << std::flush;
+    std::cout << "PBR material encoding: " << ctx.rtScene.MaterialEncoding() << '\n'
+              << "RT render scale " << std::round(ctx.renderScale * 100.0f) << "%: "
+              << renderExtent.width << 'x' << renderExtent.height << " -> "
+              << ctx.swapchainExtent.width << 'x' << ctx.swapchainExtent.height << '\n' << std::flush;
 
     return true;
 }
@@ -919,7 +1205,44 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
     if (useRtFrame)
     {
         UpdateDesktopSceneControls(ctx);
+        if (ctx.walkAmount > 0.01f && ctx.frameDeltaSeconds > 0.0f)
+        {
+            ctx.playerFootstepTime += ctx.frameDeltaSeconds;
+            if (ctx.playerFootstepTime >= 0.46f)
+            {
+                ctx.playerFootstepTime = std::fmod(ctx.playerFootstepTime, 0.46f);
+                PlayAmbientSoundEffect(ctx, (ctx.playerFootstepVariant++ & 1) == 0 ? "player_step_1.wav" : "player_step_2.wav");
+            }
+        }
+        else
+        {
+            ctx.playerFootstepTime = 0.0f;
+        }
+        const horde::gameplay::EnemyAnimation previousAnimation = ctx.combatSnapshot.enemyAnimation;
         ctx.combatSnapshot = ctx.combat.Update(ctx.frameDeltaSeconds, ctx.cameraX, ctx.cameraZ, ctx.cameraYaw);
+        if (previousAnimation != horde::gameplay::EnemyAnimation::Dead &&
+            ctx.combatSnapshot.enemyAnimation == horde::gameplay::EnemyAnimation::Dead)
+        {
+            PlaySoundEffect(ctx, "sword_hit_1.wav");
+        }
+        if (previousAnimation != horde::gameplay::EnemyAnimation::Attack &&
+            ctx.combatSnapshot.enemyAnimation == horde::gameplay::EnemyAnimation::Attack)
+        {
+            PlaySoundEffect(ctx, "skeleton_attack.wav");
+        }
+        if (ctx.combatSnapshot.enemyAnimation == horde::gameplay::EnemyAnimation::Walking)
+        {
+            const int phase = static_cast<int>(std::floor(ctx.combatSnapshot.enemyAnimationTime * 0.90f / 0.52f));
+            if (ctx.enemyFootstepPhase >= 0 && phase != ctx.enemyFootstepPhase)
+            {
+                PlayAmbientSoundEffect(ctx, (ctx.enemyFootstepVariant++ & 1) == 0 ? "skeleton_step_1.wav" : "skeleton_step_2.wav");
+            }
+            ctx.enemyFootstepPhase = phase;
+        }
+        else
+        {
+            ctx.enemyFootstepPhase = -1;
+        }
         std::string diagnostic;
         if (!ctx.rtScene.RecordTraceAndCopy(ctx.commandBuffers[imageIndex],
                                             ctx.swapchainImages[imageIndex],
@@ -1018,6 +1341,8 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                                  const std::filesystem::path& jsonReportPath)
 {
     VulkanSurfaceContext context;
+    context.windowHandle = hWnd;
+    LoadSettings(context);
     if (!CreateInstance(context.instance))
     {
         return 1;
@@ -1089,8 +1414,6 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         return 1;
     }
 
-    context.windowHandle = hWnd;
-
     if (!CreateSwapchain(context, hWnd))
     {
         DestroyRenderContext(context);
@@ -1106,12 +1429,16 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     if (context.controlsEnabled)
     {
         SetWindowLongPtrA(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(&context));
-        SetFocus(hWnd);
+        ApplyOverlayState(context);
+        SetFocus(GetDlgItem(hWnd, kResumeButtonId));
     }
 
     const VkClearColorValue clearColor = ClearColorForMode(capabilities.rtMode);
     MSG message{};
     bool running = true;
+    bool renderFailed = false;
+    uint32_t timingFrameCount = 0u;
+    double timingTotalMs = 0.0;
     while (running)
     {
         while (PeekMessageA(&message, nullptr, 0, 0, PM_REMOVE) != 0)
@@ -1130,10 +1457,65 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             break;
         }
 
+        if (context.renderScaleDirty && context.useRtPath)
+        {
+            context.renderScaleDirty = false;
+            vkDeviceWaitIdle(context.device);
+            context.rtScene.Destroy();
+            capabilities.rtScene.presented = false;
+            capabilities.rtScene.dispatchWidth = 0u;
+            capabilities.rtScene.dispatchHeight = 0u;
+            capabilities.performance.internalRenderWidth = 0u;
+            capabilities.performance.internalRenderHeight = 0u;
+            capabilities.performance.frameTimeMs = 0.0f;
+            capabilities.performance.fps = 0.0f;
+            if (HWND hud = GetDlgItem(hWnd, kHudControlId))
+            {
+                SetWindowTextA(hud, "ALPHA 0.1.0  |  APPLYING RT RENDER SCALE...");
+            }
+            if (!InitialiseRtSceneForSwapchain(context))
+            {
+                renderFailed = true;
+                break;
+            }
+        }
+
+        const auto frameStart = std::chrono::steady_clock::now();
         bool rtFramePresented = false;
         if (!RenderFrame(context, clearColor, rtFramePresented))
         {
+            renderFailed = true;
+            MessageBoxA(hWnd,
+                        "The native RT render loop stopped unexpectedly. Check the reports folder for diagnostics.",
+                        "Horde Lantern RT - renderer stopped",
+                        MB_OK | MB_ICONERROR);
             break;
+        }
+        const auto frameEnd = std::chrono::steady_clock::now();
+        timingTotalMs += std::chrono::duration<double, std::milli>(frameEnd - frameStart).count();
+        if (++timingFrameCount >= 120u)
+        {
+            const double averageFrameMs = timingTotalMs / static_cast<double>(timingFrameCount);
+            capabilities.performance.frameTimeMs = static_cast<float>(averageFrameMs);
+            capabilities.performance.fps = averageFrameMs > 0.0
+                ? static_cast<float>(1000.0 / averageFrameMs)
+                : 0.0f;
+            auto& timingDiagnostics = capabilities.diagnostics;
+            timingDiagnostics.erase(std::remove(timingDiagnostics.begin(), timingDiagnostics.end(),
+                                                "FPS / frame time: not measured yet."),
+                                    timingDiagnostics.end());
+            WriteReportFile(textReportPath, horde::vulkan::BuildCapabilityTextReport(capabilities));
+            WriteReportFile(jsonReportPath, horde::vulkan::BuildCapabilityJsonReport(capabilities));
+            if (context.diagnosticsVisible)
+            {
+                if (HWND edit = GetDlgItem(hWnd, kEditControlId))
+                {
+                    const std::string updatedText = WindowSafeText(BuildDisplayText(capabilities));
+                    SetWindowTextA(edit, updatedText.c_str());
+                }
+            }
+            timingFrameCount = 0u;
+            timingTotalMs = 0.0;
         }
         if (rtFramePresented && !capabilities.rtScene.presented)
         {
@@ -1144,8 +1526,21 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             capabilities.rtScene.dispatchHeight = context.rtScene.DispatchExtent().height;
             capabilities.performance.internalRenderWidth = capabilities.rtScene.dispatchWidth;
             capabilities.performance.internalRenderHeight = capabilities.rtScene.dispatchHeight;
+            auto& presentationDiagnostics = capabilities.diagnostics;
+            presentationDiagnostics.erase(std::remove(presentationDiagnostics.begin(), presentationDiagnostics.end(),
+                                                       "Internal render resolution: not measured yet."),
+                                          presentationDiagnostics.end());
             WriteReportFile(textReportPath, horde::vulkan::BuildCapabilityTextReport(capabilities));
             WriteReportFile(jsonReportPath, horde::vulkan::BuildCapabilityJsonReport(capabilities));
+            if (HWND hud = GetDlgItem(hWnd, kHudControlId))
+            {
+                SetWindowTextA(hud, "ALPHA 0.1.0  |  NATIVE VULKAN HARDWARE RT ACTIVE  |  F1 CONTROLS  |  ESC MENU");
+            }
+            if (HWND edit = GetDlgItem(hWnd, kEditControlId))
+            {
+                const std::string updatedText = WindowSafeText(BuildDisplayText(capabilities));
+                SetWindowTextA(edit, updatedText.c_str());
+            }
         }
     }
 
@@ -1154,7 +1549,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         SetWindowLongPtrA(hWnd, GWLP_USERDATA, 0);
     }
     DestroyRenderContext(context);
-    return running ? 0 : static_cast<int>(message.wParam);
+    return renderFailed ? 1 : (running ? 0 : static_cast<int>(message.wParam));
 }
 
 bool WriteReportFile(const std::filesystem::path& path, const std::string& data)
@@ -1169,26 +1564,218 @@ bool WriteReportFile(const std::filesystem::path& path, const std::string& data)
     return stream.good();
 }
 
+void LayoutOverlayControls(HWND window, const int width, const int height)
+{
+    if (HWND edit = GetDlgItem(window, kEditControlId))
+    {
+        MoveWindow(edit, 16, 16, std::max(100, width - 32), std::max(100, height - 32), TRUE);
+    }
+    if (HWND hud = GetDlgItem(window, kHudControlId))
+    {
+        MoveWindow(hud, 14, 14, std::min(650, std::max(260, width - 28)), 30, TRUE);
+    }
+
+    const int buttonWidth = std::min(320, std::max(220, width - 64));
+    const int buttonHeight = 38;
+    const int gap = 8;
+    const int pauseTotal = 48 + 6 * buttonHeight + 5 * gap;
+    const int pauseX = (width - buttonWidth) / 2;
+    int y = std::max(54, (height - pauseTotal) / 2);
+    if (HWND title = GetDlgItem(window, kPauseTitleId)) MoveWindow(title, pauseX, y, buttonWidth, 48, TRUE);
+    y += 54;
+    for (const int id : {kResumeButtonId, kRestartButtonId, kControlsButtonId, kSettingsButtonId, kDiagnosticsButtonId, kExitButtonId})
+    {
+        if (HWND control = GetDlgItem(window, id)) MoveWindow(control, pauseX, y, buttonWidth, buttonHeight, TRUE);
+        y += buttonHeight + gap;
+    }
+
+    const int settingsTotal = 48 + 4 * buttonHeight + 26 + 38 + 5 * gap;
+    y = std::max(54, (height - settingsTotal) / 2);
+    if (HWND title = GetDlgItem(window, kSettingsTitleId)) MoveWindow(title, pauseX, y, buttonWidth, 48, TRUE);
+    y += 54;
+    for (const int id : {kSfxButtonId, kSensitivityButtonId})
+    {
+        if (HWND control = GetDlgItem(window, id)) MoveWindow(control, pauseX, y, buttonWidth, buttonHeight, TRUE);
+        y += buttonHeight + gap;
+    }
+    if (HWND label = GetDlgItem(window, kRenderScaleLabelId)) MoveWindow(label, pauseX, y, buttonWidth, 26, TRUE);
+    y += 26;
+    if (HWND slider = GetDlgItem(window, kRenderScaleSliderId)) MoveWindow(slider, pauseX, y, buttonWidth, 38, TRUE);
+    y += 38 + gap;
+    for (const int id : {kFullscreenButtonId, kSettingsBackButtonId})
+    {
+        if (HWND control = GetDlgItem(window, id)) MoveWindow(control, pauseX, y, buttonWidth, buttonHeight, TRUE);
+        y += buttonHeight + gap;
+    }
+}
+
+void ShowControlsHelp(HWND window)
+{
+    MessageBoxA(window,
+                "WASD  Move and strafe\n"
+                "Left mouse drag  360 camera look\n"
+                "Right mouse or Space  Swing sword\n"
+                "Esc  Pause / resume\n"
+                "R  Restart route\n"
+                "F1  Controls\n"
+                "F2  RT diagnostics\n"
+                "Alt+Enter  Fullscreen",
+                "Horde Lantern RT - controls",
+                MB_OK | MB_ICONINFORMATION);
+}
+
+void ToggleDiagnostics(VulkanSurfaceContext& context)
+{
+    context.diagnosticsVisible = !context.diagnosticsVisible;
+    context.settingsVisible = false;
+    context.pauseMenuVisible = context.diagnosticsVisible;
+    ApplyOverlayState(context);
+    PlaySoundEffect(context, context.diagnosticsVisible ? "ui_select.wav" : "ui_back.wav");
+    SetFocus(context.diagnosticsVisible ? GetDlgItem(context.windowHandle, kEditControlId) : context.windowHandle);
+}
+
+void OpenSettings(VulkanSurfaceContext& context)
+{
+    context.pauseMenuVisible = true;
+    context.settingsVisible = true;
+    context.diagnosticsVisible = false;
+    ApplyOverlayState(context);
+    PlaySoundEffect(context, "ui_select.wav");
+    SetFocus(GetDlgItem(context.windowHandle, kSfxButtonId));
+}
+
 LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     auto* sceneContext = reinterpret_cast<VulkanSurfaceContext*>(GetWindowLongPtrA(hWnd, GWLP_USERDATA));
     switch (message)
     {
+    case WM_HSCROLL:
+        if (sceneContext && reinterpret_cast<HWND>(lParam) == GetDlgItem(hWnd, kRenderScaleSliderId))
+        {
+            const int percentage = std::clamp(static_cast<int>(SendMessageA(reinterpret_cast<HWND>(lParam), TBM_GETPOS, 0, 0)), 50, 100);
+            sceneContext->renderScale = static_cast<float>(percentage) / 100.0f;
+            UpdateSettingsLabels(*sceneContext);
+            if (LOWORD(wParam) != TB_THUMBTRACK)
+            {
+                sceneContext->renderScaleDirty = true;
+                SaveSettings(*sceneContext);
+            }
+            return 0;
+        }
+        break;
+    case WM_COMMAND:
+        if (sceneContext)
+        {
+            switch (LOWORD(wParam))
+            {
+            case kResumeButtonId:
+            case kMenuPauseId:
+                ShowPauseMenu(*sceneContext, !sceneContext->simulationPaused);
+                return 0;
+            case kRestartButtonId:
+            case kMenuRestartId:
+                ResetRoute(*sceneContext);
+                PlaySoundEffect(*sceneContext, "ui_select.wav");
+                ShowPauseMenu(*sceneContext, false);
+                return 0;
+            case kControlsButtonId:
+            case kMenuControlsId:
+                PlaySoundEffect(*sceneContext, "ui_select.wav");
+                ShowControlsHelp(hWnd);
+                return 0;
+            case kSettingsButtonId:
+                OpenSettings(*sceneContext);
+                return 0;
+            case kDiagnosticsButtonId:
+            case kMenuDiagnosticsId:
+                ToggleDiagnostics(*sceneContext);
+                return 0;
+            case kSfxButtonId:
+            case kMenuSfxId:
+                sceneContext->sfxEnabled = !sceneContext->sfxEnabled;
+                SaveSettings(*sceneContext);
+                UpdateSettingsLabels(*sceneContext);
+                PlaySoundEffect(*sceneContext, "ui_select.wav");
+                return 0;
+            case kSensitivityButtonId:
+                sceneContext->mouseSensitivity = sceneContext->mouseSensitivity < 0.8f ? 1.0f :
+                                                 (sceneContext->mouseSensitivity < 1.2f ? 1.35f : 0.70f);
+                SaveSettings(*sceneContext);
+                UpdateSettingsLabels(*sceneContext);
+                PlaySoundEffect(*sceneContext, "ui_select.wav");
+                return 0;
+            case kMenuSensitivityLowId:
+            case kMenuSensitivityNormalId:
+            case kMenuSensitivityHighId:
+                sceneContext->mouseSensitivity = LOWORD(wParam) == kMenuSensitivityLowId ? 0.70f :
+                                                 (LOWORD(wParam) == kMenuSensitivityHighId ? 1.35f : 1.0f);
+                SaveSettings(*sceneContext);
+                UpdateSettingsLabels(*sceneContext);
+                return 0;
+            case kFullscreenButtonId:
+            case kMenuFullscreenId:
+                ToggleFullscreen(*sceneContext);
+                PlaySoundEffect(*sceneContext, "ui_select.wav");
+                return 0;
+            case kSettingsBackButtonId:
+                sceneContext->settingsVisible = false;
+                sceneContext->pauseMenuVisible = true;
+                ApplyOverlayState(*sceneContext);
+                PlaySoundEffect(*sceneContext, "ui_back.wav");
+                SetFocus(GetDlgItem(hWnd, kResumeButtonId));
+                return 0;
+            case kMenuAboutId:
+                MessageBoxA(hWnd,
+                            "Horde Lantern RT\nInitial Showing Alpha 0.1.0\n\nNative Vulkan hardware ray tracing. RT or nothing.\nA Samfa12 technology demo.",
+                            "About Horde Lantern RT",
+                            MB_OK | MB_ICONINFORMATION);
+                return 0;
+            case kExitButtonId:
+            case kMenuExitId:
+                DestroyWindow(hWnd);
+                return 0;
+            default:
+                break;
+            }
+        }
+        break;
     case WM_KEYDOWN:
     case WM_SYSKEYDOWN:
         if (sceneContext && sceneContext->controlsEnabled)
         {
             if (wParam == VK_ESCAPE)
             {
-                DestroyWindow(hWnd);
+                ShowPauseMenu(*sceneContext, !sceneContext->simulationPaused);
                 return 0;
             }
-            if (wParam == VK_SPACE && (lParam & (1ll << 30)) == 0)
+            if (wParam == VK_F1)
+            {
+                ShowControlsHelp(hWnd);
+                return 0;
+            }
+            if (wParam == VK_F2)
+            {
+                ToggleDiagnostics(*sceneContext);
+                return 0;
+            }
+            if (wParam == 'R' && !sceneContext->simulationPaused)
+            {
+                ResetRoute(*sceneContext);
+                PlaySoundEffect(*sceneContext, "ui_select.wav");
+                return 0;
+            }
+            if (wParam == VK_RETURN && (GetKeyState(VK_MENU) & 0x8000) != 0)
+            {
+                ToggleFullscreen(*sceneContext);
+                return 0;
+            }
+            if (!sceneContext->simulationPaused && wParam == VK_SPACE && (lParam & (1ll << 30)) == 0)
             {
                 sceneContext->combat.RequestAttack();
+                PlaySoundEffect(*sceneContext, "sword_swing_1.wav");
                 return 0;
             }
-            if (SetDesktopMovementKey(*sceneContext, wParam, true))
+            if (!sceneContext->simulationPaused && SetDesktopMovementKey(*sceneContext, wParam, true))
             {
                 return 0;
             }
@@ -1202,7 +1789,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         }
         break;
     case WM_LBUTTONDOWN:
-        if (sceneContext && sceneContext->controlsEnabled)
+        if (sceneContext && sceneContext->controlsEnabled && !sceneContext->simulationPaused)
         {
             SetFocus(hWnd);
             SetCapture(hWnd);
@@ -1214,14 +1801,15 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         }
         break;
     case WM_RBUTTONDOWN:
-        if (sceneContext && sceneContext->controlsEnabled)
+        if (sceneContext && sceneContext->controlsEnabled && !sceneContext->simulationPaused)
         {
             sceneContext->combat.RequestAttack();
+            PlaySoundEffect(*sceneContext, "sword_swing_2.wav");
             return 0;
         }
         break;
     case WM_MOUSEMOVE:
-        if (sceneContext && sceneContext->controlsEnabled && sceneContext->mouseLookActive)
+        if (sceneContext && sceneContext->controlsEnabled && !sceneContext->simulationPaused && sceneContext->mouseLookActive)
         {
             const POINT currentMousePosition{
                 static_cast<LONG>(static_cast<short>(LOWORD(lParam))),
@@ -1229,8 +1817,8 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             const LONG deltaX = currentMousePosition.x - sceneContext->lastMousePosition.x;
             const LONG deltaY = currentMousePosition.y - sceneContext->lastMousePosition.y;
             sceneContext->lastMousePosition = currentMousePosition;
-            sceneContext->cameraYaw += static_cast<float>(deltaX) * 0.0036f;
-            sceneContext->cameraPitch = std::clamp(sceneContext->cameraPitch - static_cast<float>(deltaY) * 0.0028f, -0.32f, 0.28f);
+            sceneContext->cameraYaw += static_cast<float>(deltaX) * 0.0036f * sceneContext->mouseSensitivity;
+            sceneContext->cameraPitch = std::clamp(sceneContext->cameraPitch - static_cast<float>(deltaY) * 0.0028f * sceneContext->mouseSensitivity, -0.32f, 0.28f);
             return 0;
         }
         break;
@@ -1253,15 +1841,15 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         }
         break;
     case WM_SIZE:
-    {
-        const int width = LOWORD(lParam);
-        const int height = HIWORD(lParam);
-        HWND child = GetDlgItem(hWnd, kEditControlId);
-        if (child)
-        {
-            MoveWindow(child, 12, 12, width - 24, height - 24, TRUE);
-        }
+        LayoutOverlayControls(hWnd, LOWORD(lParam), HIWORD(lParam));
         return 0;
+    case WM_CTLCOLORSTATIC:
+    {
+        HDC dc = reinterpret_cast<HDC>(wParam);
+        SetTextColor(dc, RGB(255, 208, 122));
+        SetBkColor(dc, RGB(13, 11, 9));
+        static HBRUSH brush = CreateSolidBrush(RGB(13, 11, 9));
+        return reinterpret_cast<LRESULT>(brush);
     }
     case WM_DESTROY:
         if (sceneContext && sceneContext->controlsEnabled)
@@ -1277,18 +1865,50 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
     return DefWindowProc(hWnd, message, wParam, lParam);
 }
 
+HMENU CreateApplicationMenu()
+{
+    HMENU bar = CreateMenu();
+    HMENU demo = CreatePopupMenu();
+    AppendMenuA(demo, MF_STRING, kMenuPauseId, "&Pause\tEsc");
+    AppendMenuA(demo, MF_STRING, kMenuRestartId, "&Restart route\tR");
+    AppendMenuA(demo, MF_SEPARATOR, 0, nullptr);
+    AppendMenuA(demo, MF_STRING, kMenuExitId, "E&xit");
+    AppendMenuA(bar, MF_POPUP, reinterpret_cast<UINT_PTR>(demo), "&Demo");
+
+    HMENU settings = CreatePopupMenu();
+    AppendMenuA(settings, MF_STRING | MF_CHECKED, kMenuSfxId, "Sound &effects");
+    HMENU sensitivity = CreatePopupMenu();
+    AppendMenuA(sensitivity, MF_STRING, kMenuSensitivityLowId, "Low");
+    AppendMenuA(sensitivity, MF_STRING | MF_CHECKED, kMenuSensitivityNormalId, "Normal");
+    AppendMenuA(sensitivity, MF_STRING, kMenuSensitivityHighId, "High");
+    AppendMenuA(settings, MF_POPUP, reinterpret_cast<UINT_PTR>(sensitivity), "Look &sensitivity");
+    AppendMenuA(settings, MF_STRING, kMenuFullscreenId, "&Fullscreen\tAlt+Enter");
+    AppendMenuA(bar, MF_POPUP, reinterpret_cast<UINT_PTR>(settings), "&Settings");
+
+    HMENU help = CreatePopupMenu();
+    AppendMenuA(help, MF_STRING, kMenuControlsId, "&Controls\tF1");
+    AppendMenuA(help, MF_STRING, kMenuDiagnosticsId, "RT &diagnostics\tF2");
+    AppendMenuA(help, MF_SEPARATOR, 0, nullptr);
+    AppendMenuA(help, MF_STRING, kMenuAboutId, "&About");
+    AppendMenuA(bar, MF_POPUP, reinterpret_cast<UINT_PTR>(help), "&Help");
+    return bar;
+}
+
 int CreateAndShowWindow(const std::string& diagnosticText,
                         horde::vulkan::DeviceCapabilities& capabilities,
                         const std::filesystem::path& textReportPath,
                         const std::filesystem::path& jsonReportPath)
 {
     const HINSTANCE instance = GetModuleHandleA(nullptr);
+    INITCOMMONCONTROLSEX commonControls{sizeof(INITCOMMONCONTROLSEX), ICC_BAR_CLASSES};
+    InitCommonControlsEx(&commonControls);
     WNDCLASSA windowClass{};
     windowClass.lpfnWndProc = DiagnosticWindowProc;
     windowClass.hInstance = instance;
     windowClass.lpszClassName = kWindowClassName;
-    windowClass.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_3DFACE + 1);
+    windowClass.hbrBackground = static_cast<HBRUSH>(GetStockObject(BLACK_BRUSH));
     windowClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
+    windowClass.hIcon = LoadIconA(instance, MAKEINTRESOURCEA(kAppIconId));
 
     if (!RegisterClassA(&windowClass) && GetLastError() != ERROR_CLASS_ALREADY_EXISTS)
     {
@@ -1300,13 +1920,13 @@ int CreateAndShowWindow(const std::string& diagnosticText,
         0,
         kWindowClassName,
         kWindowTitle,
-        WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+        WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_CLIPCHILDREN,
         CW_USEDEFAULT,
         CW_USEDEFAULT,
         1000,
         700,
         nullptr,
-        nullptr,
+        CreateApplicationMenu(),
         instance,
         nullptr);
     if (!hWnd)
@@ -1357,10 +1977,53 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     }
 
     SendMessageA(edit, WM_SETFONT, reinterpret_cast<WPARAM>(monoFont), TRUE);
+    HFONT uiFont = CreateFontA(
+        18, 0, 0, 0, FW_SEMIBOLD, FALSE, FALSE, FALSE, ANSI_CHARSET,
+        OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
+        DEFAULT_PITCH | FF_DONTCARE, "Segoe UI");
+    if (!uiFont) uiFont = static_cast<HFONT>(GetStockObject(DEFAULT_GUI_FONT));
+
+    auto createStatic = [&](const int id, const char* text, const DWORD style = SS_CENTER) {
+        HWND control = CreateWindowExA(0, "STATIC", text, WS_CHILD | WS_VISIBLE | style,
+                                       0, 0, 100, 30, hWnd,
+                                       reinterpret_cast<HMENU>(static_cast<INT_PTR>(id)), instance, nullptr);
+        SendMessageA(control, WM_SETFONT, reinterpret_cast<WPARAM>(uiFont), TRUE);
+        return control;
+    };
+    auto createButton = [&](const int id, const char* text) {
+        HWND control = CreateWindowExA(0, "BUTTON", text, WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON,
+                                       0, 0, 100, 38, hWnd,
+                                       reinterpret_cast<HMENU>(static_cast<INT_PTR>(id)), instance, nullptr);
+        SendMessageA(control, WM_SETFONT, reinterpret_cast<WPARAM>(uiFont), TRUE);
+        return control;
+    };
+
+    createStatic(kHudControlId, "ALPHA 0.1.0  |  VULKAN RT STARTING...  |  F1 CONTROLS  |  ESC MENU", SS_LEFT | SS_CENTERIMAGE);
+    createStatic(kPauseTitleId, "HORDE LANTERN RT  |  INITIAL SHOWING ALPHA", SS_CENTER | SS_CENTERIMAGE);
+    createButton(kResumeButtonId, "ENTER THE RUIN / RESUME");
+    createButton(kRestartButtonId, "RESTART ROUTE");
+    createButton(kControlsButtonId, "CONTROLS");
+    createButton(kSettingsButtonId, "SETTINGS");
+    createButton(kDiagnosticsButtonId, "RT DIAGNOSTICS");
+    createButton(kExitButtonId, "QUIT DEMO");
+    createStatic(kSettingsTitleId, "SETTINGS  |  SAVED BESIDE THE DEMO", SS_CENTER | SS_CENTERIMAGE);
+    createButton(kSfxButtonId, "SOUND EFFECTS: ON");
+    createButton(kSensitivityButtonId, "LOOK SENSITIVITY: NORMAL");
+    createStatic(kRenderScaleLabelId, "RENDER RESOLUTION: 100%", SS_CENTER | SS_CENTERIMAGE);
+    HWND renderScaleSlider = CreateWindowExA(0, TRACKBAR_CLASSA, "",
+                                              WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_AUTOTICKS,
+                                              0, 0, 100, 38, hWnd,
+                                              reinterpret_cast<HMENU>(static_cast<INT_PTR>(kRenderScaleSliderId)), instance, nullptr);
+    SendMessageA(renderScaleSlider, TBM_SETRANGE, TRUE, MAKELPARAM(50, 100));
+    SendMessageA(renderScaleSlider, TBM_SETTICFREQ, 10, 0);
+    SendMessageA(renderScaleSlider, TBM_SETPOS, TRUE, 100);
+    createButton(kFullscreenButtonId, "DISPLAY: WINDOWED");
+    createButton(kSettingsBackButtonId, "BACK");
+
     const std::string windowText = WindowSafeText(diagnosticText);
     const bool sceneMode = capabilities.rtMode == horde::vulkan::RtMode::RayTracingPipeline;
     const std::string windowTitle = sceneMode
-        ? "Horde Lantern RT | WASD move | left drag look | Esc exit"
+        ? "Horde Lantern RT - Initial Showing Alpha 0.1.0"
         : MakeWindowTitle(diagnosticText);
     SetWindowTextA(edit, windowText.c_str());
     SetWindowTextA(hWnd, windowTitle.c_str());
@@ -1368,6 +2031,8 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     {
         ShowWindow(edit, SW_HIDE);
     }
+
+    LayoutOverlayControls(hWnd, clientRect.right - clientRect.left, clientRect.bottom - clientRect.top);
 
     ShowWindow(hWnd, SW_SHOW);
     UpdateWindow(hWnd);
@@ -1385,6 +2050,7 @@ namespace horde::platform::windows
 int RunDiagnosticWindow(const int showCommand)
 {
     (void)showCommand;
+    SetProcessDPIAware();
 
     horde::vulkan::VulkanContext context;
     const bool initialised = context.InitialiseForCapabilityProbe();
@@ -1399,7 +2065,7 @@ int RunDiagnosticWindow(const int showCommand)
     std::cout << diagnosticText << "\n\n";
 
     std::error_code error;
-    const std::filesystem::path reportDirectory = kReportDirectory;
+    const std::filesystem::path reportDirectory = ExecutableDirectory() / kReportDirectory;
     std::filesystem::create_directories(reportDirectory, error);
     if (error)
     {

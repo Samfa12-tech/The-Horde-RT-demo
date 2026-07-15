@@ -2,6 +2,8 @@
 
 ## Source and selected file
 
+- Original base model: **Free Stylized Skeleton** by Hotstrike Studio, https://hotstrikestudio.itch.io/free-stylized-skeleton
+- The user subsequently textured, rigged, and animated the base model with Meshy.
 - User-provided archive: `C:\Users\sam_s\Downloads\Meshy_AI_SKM_Skeleton_Var_1_biped.zip`
 - Selected source inside the archive: `Meshy_AI_SKM_Skeleton_Var_1_biped_Meshy_AI_Meshy_Merged_Animations.glb`
 - Excluded companion file: `Meshy_AI_SKM_Skeleton_Var_1_biped_Character_output.glb`; it only contains a short bind/static clip (`Armature|clip0|baselayer`).
@@ -32,8 +34,15 @@
 
 The names match the Meshy UI screenshot. The two backward-walk labels were merely truncated in the UI; no clip-name repair is required.
 
+## Licence and attribution
+
+- Hotstrike Studio permits the asset to be used and modified in free or paid finished games and other media. Standalone redistribution, resale, and inclusion in asset packs are prohibited.
+- Public credit: **Original stylized skeleton by Hotstrike Studio; texture, rig, and animation processing created with Meshy.**
+- The Meshy contribution is credited under the conservative Free-plan CC BY 4.0 path, which also satisfies a paid-plan build without reducing its commercial permissions.
+- Package this GLB only inside the finished demo. Do not publish it as a separate downloadable source asset.
+
 ## Integration and release gates
 
 - Build a GLB animation/PBR import path and a dynamic-skinned RT BLAS/TLAS path before attempting runtime rendering.
 - Keep the sword separate until an explicit attachment and animation pass is requested.
-- Confirm the Meshy account plan and update `ASSET_LICENSES.md` before public distribution.
+- Preserve the Hotstrike and Meshy credit in `ASSET_LICENSES.md` and the public download description.

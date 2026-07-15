@@ -16,3 +16,13 @@ CMakeUserPresets.json
 android/local.properties
 *.apk
 *.aab
+*.jks
+*.keystore
+*.p12
+*.pfx
+.env
+.env.*
+signing.properties
+keystore.properties
+releases/candidates/
+docs/validation/horde_alpha_*.png

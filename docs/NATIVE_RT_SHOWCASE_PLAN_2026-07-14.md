@@ -41,11 +41,11 @@ The strongest final composition is player arms and torch reflected in the mirror
 - Include held props and player body in the reflection mask; retain geometric-normal origin bias.
 - Gate on phone before adding glass.
 
-### Slice 3 - honest thin-pane transmission
+### Slice 3 - honest thin-pane transmission: clear alpha skylight partial
 
 - Add a separate static glass BLAS/TLAS instance and ray mask (planned `0x08`) so ordinary opaque traversal stays simple and fast.
 - On a primary glass hit, use bounded Schlick Fresnel plus one transmitted/refracted query and a constant thin-pane absorption tint.
-- Start with one clear pane and one stained pane. Market this honestly as thin dielectric transmission.
+- One bounded clear skylight pane ships in the initial alpha with thin Fresnel/transmission behavior. A general separate glass instance/mask, stained pane, and coloured shadow transmission remain.
 - Defer thick crystals, multiple entry/exit surfaces, nested dielectrics, dispersion, caustics, and repeated internal bounces.
 - Add coloured transmission to shadow queries only if the phone budget survives the primary proof.
 
@@ -56,13 +56,12 @@ The strongest final composition is player arms and torch reflected in the mirror
 - Stage the reveal so the mirror or glass shows the skeleton before direct line of sight, then reuse the existing approach/attack/death/respawn loop.
 - Final phone gate must include mirror/glass visibility while the skeleton animates and the sword swings.
 
-### Slice 5 - downloadable demonstration release
+### Slice 5 - downloadable demonstration release: initial alpha complete, full route pending
 
-- Replace the oversized instructional HUD with compact effect labels and a collapsible panel.
-- Show `Native Vulkan hardware RT active` only when the real capability mode and honest RT presentation state support that claim.
-- Add guided reset and benchmark modes so reviewers can reproduce the route and performance sample.
-- Produce a signed Android release APK and a self-contained Windows zip.
-- Publish device compatibility, controls, known unsupported diagnostics, build notes, APK/zip SHA-256 hashes, screenshots/video, and the asset-license manifest.
+- The initial alpha has branded compact entry/pause/settings/diagnostics UI and only shows the active RT claim after honest presentation.
+- Restart and live diagnostics make the bounded route and performance settings reproducible.
+- A signed Android APK and self-contained Windows zip are public on separate itch channels with compatibility, controls, hashes, screenshots, and licence evidence.
+- The complete guided 60-90 second mirror/coloured-glass/final-room composition remains the full Slice 5 gate.
 
 ## Hard technical boundaries
 
@@ -72,8 +71,8 @@ The strongest final composition is player arms and torch reflected in the mirror
 - Mirror and glass logic must execute only for pixels that hit those materials. The current shader already pays for primary, torch visibility, moon visibility, and a bounce.
 - Keep the embedded raygen below the observed mobile shader-size/occupancy cliff and verify phone pipeline creation after every shader change.
 - Preserve one frame in flight while TLAS instance data remains host-written.
-- Preserve the warm 50+ FPS median gate after every slice. If headroom is needed, reduce bounded effect area or offer genuine-RT quality tiers; do not substitute fake reflections or transparency.
+- Preserve 50+ FPS median at the documented recommended quality tier after every slice and report 100% separately. On `SM-S948B`, 75% is the sustained recommendation. If headroom is needed, reduce bounded effect area or offer genuine-RT quality tiers; do not substitute fake reflections or transparency.
 
-## Immediate next implementation
+## Superseded next implementation
 
-Refine Slice 1's exhibit readability from the walking path, then build Slice 2: one framed mirror wall with a single reflected segment and player/prop/skeleton reflection masks. The material ID route is now in place for the mirror and glass follow-up.
+The initial alpha and its material-ID route are complete. Continue through `docs/COLOURED_LIGHT_ROUTE_PLAN_2026-07-15.md`: authored route blockout/lower-body lantern drop, zig-zag and blue-skylight chambers, bay-selected coloured torches, bounded coloured transmission, one hero mirror, then an emissive replacement in the existing one-enemy slot.

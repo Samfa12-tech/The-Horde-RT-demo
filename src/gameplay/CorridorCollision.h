@@ -21,8 +21,8 @@ struct CollisionRect
 constexpr CollisionRect kCorridorObstacles[] = {
     // Wall-attached gallery table: extend into the wall so collision resolves back into the open lane.
     {-10.0f, -0.72f, 0.05f, 2.35f},
-    {-1.20f, -0.78f, -3.48f, -3.32f},
-    {0.78f, 1.20f, -3.48f, -3.32f},
+    {-1.20f, -0.78f, -3.55f, -3.25f},
+    {0.78f, 1.20f, -3.55f, -3.25f},
 };
 
 inline void PushPlayerOutOfRect(float& x, float& z, const CollisionRect& rect)
@@ -63,19 +63,14 @@ inline void PushPlayerOutOfRect(float& x, float& z, const CollisionRect& rect)
 
 inline void ResolveCorridorPlayerCollision(float& x, float& z)
 {
-    // The entrance remains open while the corridor walls and arch posts block movement.
-    z = std::clamp(z, -4.75f, 4.90f);
-    if (z <= 3.20f)
+    // The starting chamber is now enclosed. Keep the player's collision
+    // radius inside the rear wall at z=3.4 as well as the side walls.
+    z = std::clamp(z, -4.75f, 3.16f);
+    x = std::clamp(x, -1.58f, 1.58f);
+    for (const detail::CollisionRect& obstacle : detail::kCorridorObstacles)
     {
-        x = std::clamp(x, -1.58f, 1.58f);
-        for (const detail::CollisionRect& obstacle : detail::kCorridorObstacles)
-        {
-            detail::PushPlayerOutOfRect(x, z, obstacle);
-        }
-        return;
+        detail::PushPlayerOutOfRect(x, z, obstacle);
     }
-
-    x = std::clamp(x, -2.40f, 2.40f);
 }
 
 } // namespace horde::gameplay

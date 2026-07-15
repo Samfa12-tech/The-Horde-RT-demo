@@ -1,29 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FF000000">
+    android:background="#050403"
+    android:keepScreenOn="true">
 
     <SurfaceView
-        android:id="@+id/diagnosticSurface"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <ScrollView
-        android:id="@+id/overlayScroll"
+        android:id="@+id/scene_surface"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#00000000">
+        android:contentDescription="@string/app_name" />
 
-        <TextView
-            android:id="@+id/diagnosticText"
-            android:layout_width="wrap_content"
+    <ScrollView
+        android:id="@+id/diagnostics_panel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#F20A0908"
+        android:fillViewport="true"
+        android:padding="24dp"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#FF00FF00"
-            android:fontFamily="monospace"
-            android:textIsSelectable="true"
-            android:textSize="14sp"
-            android:lineSpacingExtra="4sp"
-            android:padding="12dp" />
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/diagnostics_back"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:text="@string/back" />
+
+            <TextView
+                android:id="@+id/report_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:paddingTop="16dp"
+                android:textColor="#D8F0D0"
+                android:textIsSelectable="true"
+                android:textSize="12sp" />
+        </LinearLayout>
     </ScrollView>
+
+    <TextView
+        android:id="@+id/rt_status"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="16dp"
+        android:background="#B30D0B09"
+        android:gravity="center"
+        android:ellipsize="end"
+        android:maxWidth="240dp"
+        android:maxLines="1"
+        android:minWidth="180dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:text="@string/rt_starting"
+        android:textColor="#FFD07A"
+        android:textSize="9sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/menu_button"
+        android:layout_width="72dp"
+        android:layout_height="48dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="16dp"
+        android:text="@string/menu"
+        android:textSize="12sp" />
+
+    <Button
+        android:id="@+id/attack_button"
+        android:layout_width="104dp"
+        android:layout_height="72dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="32dp"
+        android:text="@string/swing"
+        android:textSize="17sp"
+        android:textStyle="bold" />
+
+    <FrameLayout
+        android:id="@+id/menu_scrim"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#C7080706" />
+
 </FrameLayout>

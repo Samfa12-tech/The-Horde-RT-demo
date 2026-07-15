@@ -117,6 +117,7 @@ private:
     VkCommandPool commandPool_ = VK_NULL_HANDLE;
     VkExtent2D dispatchExtent_{};
     bool presentationUsesBgra_ = false;
+    bool scaledBlitSupported_ = false;
 
     VkImage storageImage_ = VK_NULL_HANDLE;
     VkDeviceMemory storageImageMemory_ = VK_NULL_HANDLE;

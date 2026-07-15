@@ -1,131 +1,111 @@
 # Horde Lantern RT - Project Memory
 
-Last updated: 2026-07-14
+Last updated: 2026-07-15
 
-## Project identity
+## Identity and release state
 
-- Working title: Horde Lantern RT.
-- Repo purpose: native Vulkan hardware ray tracing game/tech demo.
-- Core principle: RT or nothing.
-- Primary target: Android phone.
-- Secondary/equal target: Windows RTX laptop.
+- Working/public title: **Horde Lantern RT**.
+- Purpose: native Vulkan hardware-ray-tracing game/technology demo.
+- Principle: **RT or nothing**; unsupported devices receive honest diagnostics, never a fake fallback.
+- Primary target: Android phone. Equal validation target: Windows RTX.
+- Current release: **Initial Showing Alpha 0.1.0**, package version `0.1.0-alpha.1`.
+- Canonical downloads: https://samfa12.itch.io/the-horde; Samfa12.com links to itch rather than hosting a second copy.
+- Source: https://github.com/Samfa12-tech/The-Horde-RT-demo.
+- Windows itch channel: upload `#18339908`, build `#1797811`, `windows-x64`.
+- Android itch channel: upload `#18341739`, build `#1797750`, `android`.
+- Signed Android APK SHA-256: `590cc2cbecbf598dfb7a7c67c6e2e3b39d46380dff87974356698a10da12d72e`.
+- Windows ZIP SHA-256: `11b59046d531a1d3f86c3f5ae488ee6dc26a5deeaf2e39e11da304575edd2f19`.
+- Signing certificate SHA-256: `8245277a11bca5576f116724507f799d6f4c178ce5fbb7e3981415c9e6b3c245`.
+- The release JKS lives outside Git. It and both passwords need an independent owner backup.
 
 ## Locked creative direction
 
-- Historical gothic action scene.
-- Dark corridor into ruined courtyard/colosseum direction.
-- Wet stone, puddles, fog, torches, lantern light, silhouettes, and horde shapes.
-- The lighting and atmosphere matter before deep combat.
-- First playable direction should feel like holding a lantern in a dangerous ruin.
+- Historical gothic action demo: dark ruin, wet stone, fog, torch/lantern light, silhouettes, shadows, and obvious RT mood.
+- Lighting and atmosphere come before broader combat.
+- Keep the one-enemy loop bounded; do not add a second concurrent enemy, block/dodge, or broad AI without a later phone-measured plan.
+- The next authored route is defined in `docs/COLOURED_LIGHT_ROUTE_PLAN_2026-07-15.md`.
 
-## Current technical state
+## Current renderer
 
-- Android app builds, installs, and launches on connected `SM-S948B`.
-- The Android path creates a Vulkan swapchain surface and presents frames from the native renderer.
-- The current render path builds BLAS/TLAS, creates an RT pipeline and SBT, dispatches `vkCmdTraceRaysKHR`, renders into a storage image, and copies to the swapchain image.
-- Reports set `rtScene.presented = true` only after an RT-produced frame reaches successful swapchain presentation.
-- The current phone scene is a small first-person gothic corridor/ruin scene with authored triangle geometry, torch panels, reflective objects, horde silhouettes, fog, wet-floor response, a visible handheld medieval flame torch, and moonlight through a physical roof breach.
-- Controls are mobile FPS style: left side drag walks/strafs, right side drag gives 360 camera look. Pitch remains clamped to avoid flipping.
-- The path-tracing experiment now uses `rayQueryEXT` in the raygen shader for primary hits, shadow rays, and one first-bounce sample against the same TLAS/BVH-style acceleration structure.
-- A recursive closest-hit path-tracing attempt with `maxPipelineRayRecursionDepth = 2` compiled but failed on phone at pipeline creation, so the phone-safe path is ray-query path tracing inside raygen with recursion depth 1.
-- Diagnostics are hidden behind the HUD tap so the app opens as a scene instead of a probe screen.
-- Phase 1C is now phone-verified. The visible torch/light stays on the left, corridor and arch collision remains bounded under sustained touch input, and the procedural dry/wet/mossy stone, puddle, aged-metal, and flame materials render distinctly enough for the current proof.
-- The RT cleanup removes synthetic grain and temporal random-bounce shimmer, dims the blue sky/cold indirect contribution, and adds a real emissive held-torch mesh as a second TLAS instance. Its camera-local flame mesh is the source used for direct-light sampling and reflection rays; the previous fullscreen torch art is removed. Both laptop and phone captures now show a warm flame and reflected flame silhouette.
-- The RGBA RT storage image is raw-copied into common BGRA swapchains. `PresentableTinyRtScene` now passes the presentation format into a shader push constant and swaps red/blue before that copy when required; this fixes the cyan-torch presentation bug without changing the RT light transport.
-- A textured Meshy sword is staged at `assets/models/weapons/meshy/gothic_arming_sword_rh_v01.glb`. It has embedded and sidecar 2K PBR maps, but it is not loaded by the renderer, and its 49,439 triangles exceed the Android held-prop RT budget.
-- The Windows RT scene now has a verified interactive desktop path on the RTX 5050 laptop: `WASD` movement, left mouse/trackpad click-drag look, and `Esc` exit. It reported `RayTracingPipeline` and successful RT swapchain presentation at 984 x 661 on 2026-07-10.
-- A 9,402-triangle Meshy biped with 11 named clips is live at `assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb`; `Idle_5` is CPU-skinned and refit into one dynamic RT BLAS each frame.
-- The first live enemy presentation pass uses a 1.0x skeleton scale and raises the camera from 0.87 m to about 1.53 m above the corridor floor. The old coarse world-space hash was removed because it read as checkerboard lighting.
-- The skeleton is deliberately unarmed. A lightweight procedural player sword is held on the right side of the first-person view and shares the camera-held prop BLAS with the left-hand torch. The staged textured sword was separately reduced from 49,439 to 12,358 triangles as `gothic_arming_sword_rh_lod1.glb`; it is not uploaded until static GLB/PBR support exists.
-- The animated-skeleton performance pass on 2026-07-12 removed an unconditional post-present 16 ms sleep, switched animation to elapsed time, updates the skeleton skin/BLAS at 30 Hz, skins 9,854 unique vertices before expanding to 28,206 RT vertices, and compiles the installable Android debug native library with `-O2`.
-- Target-phone validation recovered 16.667 ms median and 20.833 ms p95 over 126 SurfaceFlinger intervals (60 FPS median). Warm internal telemetry showed roughly 0.4-0.6 ms CPU recording, with the previous GPU frame/fence wait now dominant. Full evidence: `docs/SKELETON_PERFORMANCE_2026-07-12.md`.
-- The first imported environment PBR batch is live: five exact CC0 Poly Haven 1K sources are retained and packed into three 512 x 512 x 5-layer runtime arrays for diffuse, OpenGL normal, and AO/roughness/metal. World-space planar sampling textures dry stone, wet cobblestone, mossy stone, damp ground/puddles, and aged metal.
-- The PBR phone regression gate passed at 16.667 ms median and 20.833 ms p95 over 126 intervals (60 FPS median). Evidence and exact assets: `docs/PBR_MATERIAL_BATCH_2026-07-12.md` and `ASSET_LICENSES.md`.
-- The first PBR debug APK was 93,855,324 bytes. A filtered Gradle runtime-asset task now packages only the live skeleton and three 5,242,880-byte arrays, reducing the APK to 46,793,811 bytes. GPU compression remains the next asset-size task.
-- RT lighting refinement separates held props into TLAS mask `0x02` and world/enemy geometry into `0x01`, so direct torch visibility no longer lets the torch or player sword cast distracting self-shadows. The flame uses a deterministic interleaved two-point area sample without adding another shadow ray per pixel.
-- The 2026-07-13 lighting repair seals zero-thickness room joins with an eight-triangle hidden outer shell and launches secondary rays from geometric normals with millimetre-scale bias, removing the cold exterior seams at floor/wall/ceiling joins. Room two now uses four physical roof slabs around one irregular breach; one aligned moon direction drives both the visible disc and the existing ray-query visibility test. Moon diffuse respects albedo, wet/metal surfaces receive a cheap view-dependent highlight, and the final pass uses filmic tone mapping plus linear-to-sRGB output. No fake shaft or additional visibility ray was added. See `docs/RT_LIGHTING_SEAM_FIX_2026-07-13.md`.
-- The 2026-07-13 codebase audit removed the disabled legacy raygen blob, abandoned NativeActivity/scaffold paths, and the misleading empty-command-buffer Tiny RT bootstrap. Android and Windows now share one collision helper and one native source manifest; the RT mode predicate requires the ray-query feature used by the actual renderer. The standalone probe leaves `rtScene` as `Not attempted` until a real platform swapchain presents it. Windows probe/window and Android all-ABI builds pass. See `docs/CODEBASE_AUDIT_2026-07-13.md`.
-- The first combat/ASTC slice is implemented. The procedural sword has its own BLAS/fourth TLAS instance and swings independently of the torch; one skeleton walks toward the player, attacks, dies to a timed forward hit, and respawns using the exact `Walking`, `Attack`, and `Dead` clips. Android has a `SWING` control; Windows uses right mouse or Space. Android packages 2,494,080 bytes of capability-checked ASTC KTX2 texture payload instead of 15,728,640 raw bytes, while Windows retains the raw fallback. Windows exposure is 0.62 and Android remains 0.92. Full evidence: `docs/COMBAT_ASTC_SLICE_2026-07-13.md`.
-- Target-phone validation on 2026-07-14 closed the combat/ASTC gate. A fresh install on `SM-S948B` selected the strict ASTC path and `RayTracingPipeline`, honestly presented the RT scene at `1440x2812`, and passed two 126-interval SurfaceFlinger samples at 12.500 ms median / 16.667 ms p95 (approximately 80 FPS median), including a warm thermal-status-2 sample. Scripted movement/look/swing input remained stable. Full evidence: `docs/COMBAT_ASTC_PHONE_VALIDATION_2026-07-14.md`.
-- The player-presence RT slice first passed phone validation as a rigid five-box blockout and is now refined to nine total TLAS instances: world, torch, enemy, sword, torso, and four arm segments reusing one static limb BLAS. Camera-relative two-bone IK locks both hands to exact prop grips throughout movement/swing; limbs, props, and the torch-light estimate follow pitch while the torso remains yaw-relative. The exact articulated Android build selected ASTC and honestly presented RT frames. Warm thermal-status-2 evidence covered 23,446 SurfaceFlinger TimeStats frames at 52.352 average FPS; thirty internal 120-frame windows measured 19.718 ms median (approximately 50.7 FPS) and 20.502 ms p95. Full status: `docs/PLAYER_BODY_RT_SLICE_2026-07-14.md`.
-- The production direction is now a downloadable 60-90 second native RT showcase rather than broader combat: torch corridor, explicit materials gallery, framed mirror wall, honest thin clear/stained transmission, then a final crypt where the existing single skeleton is revealed through mirror/glass. Every slice must retain real `vkCmdTraceRaysKHR`, phone-safe ray queries, honest diagnostics, and the warm 50+ FPS median gate. Full plan: `docs/NATIVE_RT_SHOWCASE_PLAN_2026-07-14.md`.
+- Android and Windows build BLAS/TLAS, RT pipeline/SBT, dispatch `vkCmdTraceRaysKHR`, write an RT storage image, and present it through the swapchain.
+- `rtScene.presented` becomes true only after an RT-produced frame reaches successful presentation.
+- The phone-safe path uses `rayQueryEXT` in raygen for primary, visibility, and bounded bounce/transmission work with pipeline recursion depth 1.
+- A recursive depth-2 closest-hit experiment compiled but failed during phone pipeline creation. Do not restore it without proving capability and pipeline creation on the phone.
+- The RT storage image is RGBA. Common BGRA swapchains require the presentation-format-driven `outputRedBlueSwap` path on raw copy; scaled modes use a format-aware blit.
+- One frame remains in flight while held-prop TLAS transforms use host-written instance data.
+- Android uses strict ASTC KTX2 arrays: ASTC 6x6 diffuse/ARM and ASTC 4x4 normals. Windows uses executable-relative raw RGBA8 arrays.
 
-## Tested phone results
+## Current alpha scene and controls
 
-- Device tested: Samsung `SM-S948B`.
-- Android debug builds repeatedly completed with `.\gradlew.bat assembleDebug installDebug --console=plain`.
-- Launch command used: `adb shell am start -n com.samfa12.hordelanternrt/.MainActivity`.
-- RT-present success log repeatedly observed: `RT frame reached Android swapchain presentation.`
-- User confirmed the scene loads, is performant on the phone, manual movement works, and the ray-query path-tracing look is promising.
-- Phase 1C closeout on 2026-07-11 rebuilt and installed commit `93e8818`, cold-launched successfully, and again logged `RT frame reached Android swapchain presentation.` at a `1440x2812` RT dispatch.
-- A 126-interval SurfaceFlinger sample measured 17.284 ms median, 17.908 ms p95, and approximately 57.9 FPS median. The in-app FPS field remains honestly `N/A` because engine timing instrumentation is not implemented.
-- The 2026-07-13 seam/moon repair compiled and presented successfully on Windows RTX; the exact current shader subsequently presented successfully on the target phone with Android exposure retained at 0.92.
-- The combat/ASTC build passed Windows compilation, RTX smoke, all-ABI Android assembly, strict APK asset audit, automated combat state testing, fresh phone install, ASTC runtime selection, current-shader visual comparison, combat input, honest RT presentation, and the 126-interval performance gate.
-- Scripted phone touch tests exercised full-turn yaw, both pitch limits, forward/back movement, corridor side limits, and repeated arch-area strafe/forward input without a crash, trap, or observed wall tunnelling.
-- The failed recursive experiment logged: `Failed to initialise presentable RT scene: Failed to create RT pipeline.`
-- Resolution: keep phone path at ray pipeline recursion depth 1 and use ray queries for path-tracing-like secondary visibility/bounce work.
+- Closed start chamber; spawn/reset is inside with room to turn and collision prevents rear-wall escape.
+- A physically deep arch leads to room two; the single skeleton begins behind the arch.
+- One bounded clear skylight pane uses thin RT transmission and does not incorrectly block sky/moon visibility.
+- The held torch is RT geometry: wooden shaft, collars/cage, and two nested emissive flame volumes. The old fullscreen triangle overlay must not return.
+- Player presence uses one yaw-relative torso plus four reusable-limb TLAS instances on mask `0x04`; two-bone IK locks hands to torch/sword grips while the props/arms follow pitch.
+- The procedural sword has its own RT instance and swings independently of the torch.
+- The skeleton uses Hotstrike Studio's base asset, later textured/rigged/animated with Meshy. Walking clip time is 90% to reduce ground slide.
+- One narrow approach/attack/death/respawn loop is implemented.
+- Android: left drag movement/strafe, right drag 360 look, Swing button, Android Back pause/resume.
+- Windows: WASD, left-drag look, right mouse/Space swing, Esc pause/resume, R restart, F1 controls, F2 diagnostics, Alt+Enter fullscreen.
+
+## UI, settings, diagnostics, and audio
+
+- Both platforms have branded entry, pause, controls, settings, RT diagnostics, restart, and quit flows.
+- Technical output stays tucked away unless requested or startup fails.
+- Both platforms persist a 50-100% RT render-resolution slider with 100% default.
+- Android also persists SFX enable/volume, look sensitivity, and compact HUD.
+- Windows persists SFX, sensitivity, display mode, and render scale beside the executable.
+- Android diagnostics report internal resolution, FPS, frame time, dispatch resolution, and honest RT presentation.
+- Thirteen FilmCow WAVs cover UI, sword, impacts/fall, quiet alternating player/skeleton footsteps, and skeleton attack.
+- Android uses SoundPool per-cue gain; Windows uses asynchronous WinMM playback with non-interrupting movement cues.
+
+## Validated Android release state
+
+- Device: Samsung `SM-S948B`, Adreno 840, Vulkan 1.4.295.
+- Exact stable-key-signed APK installed and launched after replacing the debug-signature package.
+- Portrait rotation `0`; physical display `1440x3120`; user font scale `1.7` remained unchanged.
+- Strict ASTC and `RayTracingPipeline` selected; honest RT swapchain presentation reconfirmed.
+- All thirteen SoundPool clips loaded; no native renderer or Android runtime failure occurred.
+- Menu/settings fit at font scale 1.7; Back pause, movement, look, swing, restart, diagnostics, Home/resume, rear-wall collision, arch/skeleton/skylight staging, and scene warmth were exercised.
+- Render scale verification:
+  - 100%: `1440x2980`, default; hot performance is route/view dependent and can fall below 50 FPS.
+  - 75%: `1080x2235`; 21 renderer telemetry windows at thermal status 3 measured 10.933 ms median / 15.050 ms p95. This is the sustained recommendation.
+  - 50%: `720x1490`; visible diagnostics recorded 163.12 FPS / 6.13 ms.
+- Evidence: `docs/ALPHA_ANDROID_PHONE_VALIDATION_2026-07-15.md`.
+
+## Validated Windows release state
+
+- GPU: NVIDIA GeForce RTX 5050 Laptop GPU.
+- Release builds as `HordeLanternRT.exe` with GUI subsystem, icon/version resource, static MSVC runtime, and executable-relative assets.
+- A clean candidate extraction launched without the source tree, selected `RayTracingPipeline`, and honestly presented at `982x628`.
+- Packaged diagnostics recorded `163.24 FPS / 6.13 ms`; 75% recreated the RT target at `737x471` and retained warm colour.
+- Windows package includes release notes, `README.txt`, `ASSET_LICENSES.md`, skeleton, raw textures, and thirteen FilmCow WAVs.
+
+## Asset and licence state
+
+- Five Poly Haven environment sets are retained under CC0 and packed into current platform formats.
+- The skeleton derivative ships under Hotstrike's finished-project/modification permission plus the conservative Meshy Free-plan CC BY 4.0 attribution route.
+- FilmCow SFX use FilmCow's custom royalty-free project-use terms; the complete source archive is not redistributed.
+- Meshy sword source/LOD and torch study are staged only. Neither is loaded or distributed until a measured static GLB/PBR path and appropriate attribution route exist.
+- Preserve public Hotstrike/Meshy credit and keep `ASSET_LICENSES.md` with Windows packages and linked from the download page.
 
 ## Important files
 
-- Android UI and touch controls: `android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java`.
-- JNI/native Android rendering bridge: `android/app/src/main/cpp/android_probe_bridge.cpp`.
-- Shared RT scene implementation: `src/vulkan/raytracing/PresentableTinyRtScene.cpp`.
-- RT scene interface: `src/vulkan/raytracing/PresentableTinyRtScene.h`.
-- Windows diagnostic renderer: `src/platform/windows/DiagnosticWindow.cpp`.
-- Shader sources: `shaders/raytracing/minimal.rgen`, `minimal.rmiss`, `minimal.rchit`.
-- Embedded raygen shader include: `src/vulkan/raytracing/MinimalRayGenShader.inc`.
-- Staged sword metadata/license gate: `assets/models/weapons/meshy/gothic_arming_sword_rh_v01.METADATA.md` and `ASSET_LICENSES.md`.
-- Staged skeleton metadata/license gate: `assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.METADATA.md` and `ASSET_LICENSES.md`.
-- Capability/report model: `src/vulkan/DeviceCapabilities.h`, `src/vulkan/RtCapabilityReport.cpp`.
-- Larger decisions doc: `PROJECT_DECISIONS.md`.
-
-## Known limitations
-
-- This is not yet a full playable game loop.
-- Android has basic manual movement, 360 look, corridor bounds, and arch-post collision, but not a full physics/collision system.
-- There is one deliberately narrow approach/attack/death/respawn enemy loop and player sword hit test. There is still no horde AI, block, dodge, player-death loop, or audio.
-- Current environment and held-prop geometry is hand-authored simple triangles/quads. A procedural player sword is visible in the right hand; the Meshy sword now has a 12,358-triangle LOD but still needs static GLB/PBR import before it can replace the proof.
-- The first-person body remains low-poly RT geometry: a yaw-relative torso and four camera/pitch-relative limb instances driven by two-bone IK to exact torch/sword grips. It proves presence, attachment, lighting occlusion, and reflection participation and is phone-validated, but does not yet have authored hands, legs, a skinned rig, or detailed cloth/leather materials.
-- Five CC0 PBR material sets are live through phone-verified ASTC KTX2 arrays on Android and raw RGBA fallback on Windows.
-- The held torch uses a host-written TLAS transform, so Android and Windows intentionally run one frame in flight until the renderer has per-frame TLAS/instance-buffer ownership.
-
-## Completed Phase 1B / early Phase 1C work
-
-1. Real presentable RT path built for Android and Windows scaffolds.
-2. Minimal triangle proof replaced with a gothic corridor scene.
-3. Android build installed and run on phone with RT frame reaching swapchain presentation.
-4. Visible handheld medieval torch added.
-5. Manual mobile controls added: left drag movement, right drag 360 look.
-6. Reflective objects, puddle response, physical roof-breach moonlight, and shadow/bounce ray-query work added.
-7. Recursive path-tracing attempt tested and rejected by phone pipeline creation; ray-query path became the stable route.
-8. Phase 1C adds left-hand torch placement, basic corridor/arch collision, and stronger procedural gothic materials/reflections; target-phone validation passed on 2026-07-11.
-9. Generated and staged a Meshy-6 PBR right-hand sword. It has 2K PBR maps but needs explicit remesh approval because the delivered 49,439 triangles are too costly for the Android RT target.
-10. Added a verified interactive Windows RTX 5050 RT corridor build with keyboard and mouse/trackpad controls.
-11. Staged the merged-animation skeleton, verified its 11 clip names, and kept the sword separate.
-12. Replaced the fake held-torch overlay/light relationship with a two-BLAS RT scene: static corridor plus a camera-following emissive torch mesh in the TLAS.
-13. Added a phone-verified fifth player-body BLAS/TLAS instance so the first-person character has real torso/arm geometry in primary, direct-light, and reflection queries.
+- Android UI: `android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java`
+- Android native bridge: `android/app/src/main/cpp/android_probe_bridge.cpp`
+- Windows presentation/UI: `src/platform/windows/DiagnosticWindow.cpp`
+- Shared RT scene: `src/vulkan/raytracing/PresentableTinyRtScene.cpp`
+- Raygen source: `shaders/raytracing/minimal.rgen`
+- Embedded raygen: `src/vulkan/raytracing/MinimalRayGenShader.inc`
+- Collision/combat: `src/gameplay/CorridorCollision.h`, `src/gameplay/SwordCombat.h`
+- Licences: `ASSET_LICENSES.md`
+- Release readiness: `docs/ALPHA_RELEASE_READINESS_2026-07-15.md`
+- Packaging: `tools/package-alpha.ps1`, `tools/package-signed-alpha.ps1`, `tools/push-alpha-to-itch.ps1`
 
 ## Next-step sequence
 
-1. Run a focused feel/readability pass on the existing one-enemy loop: compact/collapsible HUD behavior at large accessibility font scales, sword timing/reach, attack telegraph, hit/death readability, damage feedback, Android attack comfort, and desktop exposure.
-2. Re-run the 126-interval phone gate after any renderer, animation, material, or meaningful combat-cost change; preserve the 50+ FPS median target.
-3. Do not add another enemy, broader AI, block/dodge, or audio until the one-enemy feel pass is accepted.
-4. Replace the procedural player-right-hand sword proof only after static GLB/PBR upload exists and the 12,358-triangle LOD is measured on phone. Never put the 49k source mesh into Android RT.
-5. Keep enemies unarmed unless a later design explicitly calls for weapons.
-
-## Validation breadcrumbs
-
-- Android build/install command: `.\gradlew.bat assembleDebug installDebug --console=plain` from `android/`.
-- Launch command: `adb shell am start -n com.samfa12.hordelanternrt/.MainActivity`.
-- Useful log filter: `adb logcat -d -s HordeRtProbeBridge AndroidRuntime`.
-- Expected RT success log: `RT frame reached Android swapchain presentation.`
-- Full Phase 1C phone evidence: `docs/PHASE_1C_PHONE_VALIDATION_2026-07-11.md`.
-
-## Do not regress
-
-- Do not reintroduce fake fallback rendering as a success path.
-- Do not make diagnostics the main user-facing screen again unless the device is unsupported.
-- Do not mark RT presentation successful before `vkQueuePresentKHR` succeeds.
-- Do not add gameplay features that bypass the native Vulkan RT frame producer.
-- Do not reintroduce recursive ray pipeline depth on phone unless the device capability and pipeline creation are proven first.
-- Do not import assets without license tracking.
+1. Preserve the published alpha and its stable signing identity.
+2. Back up the JKS and both passwords independently.
+3. Build the coloured-light route in bounded slices: lower body/lantern drop, zig-zag shadow corridor, blue skylight, bay-selected coloured torches, bounded coloured transmission, one hero mirror, optional measured shallow water, and an emissive reskin/replacement in the existing enemy slot.
+4. Gate each meaningful renderer change on the phone at the recommended quality tier; report 100% separately.
+5. Keep real RT and honest diagnostics. Reduce bounded effect area/ray cost before expanding gameplay or substituting fake effects.

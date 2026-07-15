@@ -49,6 +49,7 @@ struct SwapchainContext
     VkFormat swapchainFormat = VK_FORMAT_B8G8R8A8_UNORM;
     VkColorSpaceKHR swapchainColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
     VkExtent2D swapchainExtent{};
+    float renderScale = 1.0f;
     float frameDeltaSeconds = 1.0f / 60.0f;
     uint32_t timingFrameCount = 0u;
     double timingFenceMs = 0.0;
@@ -73,9 +74,11 @@ struct SwapchainContext
     float lanternStrength = 1.8f;
     float walkTime = 0.0f;
     float cameraX = 0.0f;
-    float cameraZ = 4.7f;
+    float cameraZ = 1.85f;
     float moveStrafe = 0.0f;
     float moveForward = 0.0f;
+    float playerFootstepTime = 0.0f;
+    int enemyFootstepPhase = -1;
     float outputExposure = 0.92f;
     horde::gameplay::SwordCombat combat;
     horde::gameplay::CombatSnapshot combatSnapshot;
@@ -88,7 +91,20 @@ SwapchainContext gSwapchainContext{};
 std::atomic<bool> gSwapchainRunning{false};
 std::thread gSwapchainThread;
 std::mutex gSwapchainMutex;
+std::mutex gReportMutex;
+std::string gLatestTextReport;
+std::string gLatestJsonReport;
 std::atomic<bool> gAttackRequested{false};
+std::atomic<bool> gResetRequested{false};
+std::atomic<bool> gSimulationPaused{true};
+std::atomic<int> gRuntimeState{0}; // 0 starting/stopped, 1 honestly presented RT, 2 unsupported, 3 render error.
+std::atomic<uint32_t> gAudioEvents{0u};
+std::atomic<float> gRequestedRenderScale{1.0f};
+
+constexpr uint32_t kAudioEventEnemyDefeated = 1u << 0u;
+constexpr uint32_t kAudioEventPlayerFootstep = 1u << 1u;
+constexpr uint32_t kAudioEventEnemyFootstep = 1u << 2u;
+constexpr uint32_t kAudioEventEnemyAttack = 1u << 3u;
 
 std::string BuildDisplayText(const horde::vulkan::DeviceCapabilities& capabilities)
 {
@@ -97,6 +113,27 @@ std::string BuildDisplayText(const horde::vulkan::DeviceCapabilities& capabiliti
         return horde::ui::BuildUnsupportedDeviceText(capabilities);
     }
     return horde::ui::BuildDiagnosticOverlayText(capabilities);
+}
+
+void PublishReportSnapshot(const horde::vulkan::DeviceCapabilities& capabilities)
+{
+    const std::string text = BuildDisplayText(capabilities);
+    const std::string json = horde::vulkan::BuildCapabilityJsonReport(capabilities);
+    std::lock_guard<std::mutex> lock(gReportMutex);
+    gLatestTextReport = text;
+    gLatestJsonReport = json;
+}
+
+std::string LatestTextReport()
+{
+    std::lock_guard<std::mutex> lock(gReportMutex);
+    return gLatestTextReport;
+}
+
+std::string LatestJsonReport()
+{
+    std::lock_guard<std::mutex> lock(gReportMutex);
+    return gLatestJsonReport;
 }
 
 std::string BuildReportDirectory(const std::string& baseDirectory)
@@ -327,6 +364,14 @@ VkExtent2D ClampExtent(const VkSurfaceCapabilitiesKHR& capabilities, uint32_t de
     return {
         std::clamp(desiredWidth, capabilities.minImageExtent.width, capabilities.maxImageExtent.width),
         std::clamp(desiredHeight, capabilities.minImageExtent.height, capabilities.maxImageExtent.height)};
+}
+
+VkExtent2D ScaledRenderExtent(VkExtent2D presentationExtent, float renderScale)
+{
+    const float scale = std::clamp(renderScale, 0.50f, 1.0f);
+    return {
+        std::max(1u, static_cast<uint32_t>(std::lround(static_cast<double>(presentationExtent.width) * scale))),
+        std::max(1u, static_cast<uint32_t>(std::lround(static_cast<double>(presentationExtent.height) * scale)))};
 }
 
 bool CreateSwapchain(SwapchainContext& context)
@@ -697,13 +742,14 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
         return true;
     }
 
+    const VkExtent2D renderExtent = ScaledRenderExtent(context.swapchainExtent, context.renderScale);
     std::string diagnostic;
     if (!context.rtScene.Initialise(context.instance,
                                     context.physicalDevice,
                                     context.device,
                                     context.graphicsQueue,
                                     context.commandPool,
-                                    context.swapchainExtent,
+                                    renderExtent,
                                     context.swapchainFormat,
                                     context.reportDirectory + "/../skeleton_biped_merged_animations_v01.glb",
                                     context.reportDirectory + "/..",
@@ -713,6 +759,14 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
         return false;
     }
     __android_log_print(ANDROID_LOG_INFO, kTag, "PBR material encoding: %s", context.rtScene.MaterialEncoding().c_str());
+    __android_log_print(ANDROID_LOG_INFO,
+                        kTag,
+                        "RT render scale %.0f%%: %ux%u -> %ux%u",
+                        static_cast<double>(context.renderScale * 100.0f),
+                        renderExtent.width,
+                        renderExtent.height,
+                        context.swapchainExtent.width,
+                        context.swapchainExtent.height);
 
     return true;
 }
@@ -869,12 +923,37 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
     const auto recordStart = std::chrono::steady_clock::now();
     if (useRtFrame)
     {
-        context.walkTime += context.frameDeltaSeconds;
+        if (gResetRequested.exchange(false))
+        {
+            context.cameraYaw = 0.0f;
+            context.cameraPitch = 0.0f;
+            context.lanternStrength = 1.8f;
+            context.walkTime = 0.0f;
+            context.cameraX = 0.0f;
+            context.cameraZ = 1.85f;
+            context.moveStrafe = 0.0f;
+            context.moveForward = 0.0f;
+            context.playerFootstepTime = 0.0f;
+            context.enemyFootstepPhase = -1;
+            context.combat = {};
+            context.combatSnapshot = {};
+        }
+
+        const bool simulationPaused = gSimulationPaused.load(std::memory_order_acquire);
+        if (!simulationPaused)
+        {
+            context.walkTime += context.frameDeltaSeconds;
+        }
         if (gAttackRequested.exchange(false))
         {
-            context.combat.RequestAttack();
+            if (!simulationPaused)
+            {
+                context.combat.RequestAttack();
+            }
         }
-        const float moveAmount = std::clamp(std::abs(context.moveForward) + std::abs(context.moveStrafe), 0.0f, 1.0f);
+        const float moveAmount = simulationPaused
+            ? 0.0f
+            : std::clamp(std::abs(context.moveForward) + std::abs(context.moveStrafe), 0.0f, 1.0f);
         if (moveAmount > 0.02f)
         {
             const float forwardX = std::sin(context.cameraYaw);
@@ -885,8 +964,45 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             context.cameraX += (forwardX * context.moveForward + rightX * context.moveStrafe) * speed;
             context.cameraZ += (forwardZ * context.moveForward + rightZ * context.moveStrafe) * speed;
             horde::gameplay::ResolveCorridorPlayerCollision(context.cameraX, context.cameraZ);
+            context.playerFootstepTime += context.frameDeltaSeconds;
+            if (context.playerFootstepTime >= 0.46f)
+            {
+                context.playerFootstepTime = std::fmod(context.playerFootstepTime, 0.46f);
+                gAudioEvents.fetch_or(kAudioEventPlayerFootstep, std::memory_order_release);
+            }
         }
-        context.combatSnapshot = context.combat.Update(context.frameDeltaSeconds, context.cameraX, context.cameraZ, context.cameraYaw);
+        else
+        {
+            context.playerFootstepTime = 0.0f;
+        }
+        if (!simulationPaused)
+        {
+            const horde::gameplay::EnemyAnimation previousAnimation = context.combatSnapshot.enemyAnimation;
+            context.combatSnapshot = context.combat.Update(context.frameDeltaSeconds, context.cameraX, context.cameraZ, context.cameraYaw);
+            if (previousAnimation != horde::gameplay::EnemyAnimation::Dead &&
+                context.combatSnapshot.enemyAnimation == horde::gameplay::EnemyAnimation::Dead)
+            {
+                gAudioEvents.fetch_or(kAudioEventEnemyDefeated, std::memory_order_release);
+            }
+            if (previousAnimation != horde::gameplay::EnemyAnimation::Attack &&
+                context.combatSnapshot.enemyAnimation == horde::gameplay::EnemyAnimation::Attack)
+            {
+                gAudioEvents.fetch_or(kAudioEventEnemyAttack, std::memory_order_release);
+            }
+            if (context.combatSnapshot.enemyAnimation == horde::gameplay::EnemyAnimation::Walking)
+            {
+                const int footstepPhase = static_cast<int>(std::floor(context.combatSnapshot.enemyAnimationTime * 0.90f / 0.52f));
+                if (context.enemyFootstepPhase >= 0 && footstepPhase != context.enemyFootstepPhase)
+                {
+                    gAudioEvents.fetch_or(kAudioEventEnemyFootstep, std::memory_order_release);
+                }
+                context.enemyFootstepPhase = footstepPhase;
+            }
+            else
+            {
+                context.enemyFootstepPhase = -1;
+            }
+        }
         std::string diagnostic;
         if (!context.rtScene.RecordTraceAndCopy(context.commandBuffers[imageIndex],
                                                 context.swapchainImages[imageIndex],
@@ -979,6 +1095,19 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
     if (++context.timingFrameCount >= 120u)
     {
         const double count = static_cast<double>(context.timingFrameCount);
+        const double averageFrameMs = context.timingTotalMs / count;
+        context.capabilities.performance.frameTimeMs = static_cast<float>(averageFrameMs);
+        context.capabilities.performance.fps = averageFrameMs > 0.0
+            ? static_cast<float>(1000.0 / averageFrameMs)
+            : 0.0f;
+        auto& timingDiagnostics = context.capabilities.diagnostics;
+        timingDiagnostics.erase(std::remove(timingDiagnostics.begin(), timingDiagnostics.end(),
+                                            "FPS / frame time: not measured yet."),
+                                timingDiagnostics.end());
+        PublishReportSnapshot(context.capabilities);
+        WriteTextFile(context.reportDirectory + '/' + kTextReportFilename, BuildDisplayText(context.capabilities));
+        WriteTextFile(context.reportDirectory + '/' + kJsonReportFilename,
+                      horde::vulkan::BuildCapabilityJsonReport(context.capabilities));
         __android_log_print(ANDROID_LOG_INFO,
                             kTag,
                             "RT frame timing avg ms: total=%.3f fence=%.3f record=%.3f submit+present=%.3f",
@@ -997,12 +1126,37 @@ void SwapchainRenderLoop()
     auto previousFrameStart = std::chrono::steady_clock::now();
     while (gSwapchainRunning.load(std::memory_order_acquire))
     {
+        const float requestedRenderScale = std::clamp(gRequestedRenderScale.load(std::memory_order_acquire), 0.50f, 1.0f);
+        if (gSwapchainContext.useRtPath && std::abs(requestedRenderScale - gSwapchainContext.renderScale) > 0.001f)
+        {
+            vkDeviceWaitIdle(gSwapchainContext.device);
+            gSwapchainContext.rtScene.Destroy();
+            gSwapchainContext.renderScale = requestedRenderScale;
+            gSwapchainContext.capabilities.rtScene.presented = false;
+            gSwapchainContext.capabilities.rtScene.dispatchWidth = 0u;
+            gSwapchainContext.capabilities.rtScene.dispatchHeight = 0u;
+            gSwapchainContext.capabilities.performance.internalRenderWidth = 0u;
+            gSwapchainContext.capabilities.performance.internalRenderHeight = 0u;
+            gSwapchainContext.capabilities.performance.frameTimeMs = 0.0f;
+            gSwapchainContext.capabilities.performance.fps = 0.0f;
+            gSwapchainContext.timingFrameCount = 0u;
+            gSwapchainContext.timingFenceMs = gSwapchainContext.timingRecordMs = 0.0;
+            gSwapchainContext.timingPresentMs = gSwapchainContext.timingTotalMs = 0.0;
+            gRuntimeState.store(0, std::memory_order_release);
+            if (!InitialiseRtSceneForSwapchain(gSwapchainContext))
+            {
+                gRuntimeState.store(3, std::memory_order_release);
+                __android_log_print(ANDROID_LOG_ERROR, kTag, "Failed to apply requested RT render scale.");
+                break;
+            }
+        }
         const auto frameStart = std::chrono::steady_clock::now();
         gSwapchainContext.frameDeltaSeconds = std::clamp(std::chrono::duration<float>(frameStart - previousFrameStart).count(), 1.0f / 240.0f, 0.1f);
         previousFrameStart = frameStart;
         bool rtFramePresented = false;
         if (!RenderFrame(gSwapchainContext, rtFramePresented))
         {
+            gRuntimeState.store(3, std::memory_order_release);
             __android_log_print(ANDROID_LOG_ERROR, kTag, "Diagnostic surface render loop ended unexpectedly.");
             break;
         }
@@ -1015,7 +1169,13 @@ void SwapchainRenderLoop()
             gSwapchainContext.capabilities.rtScene.dispatchHeight = gSwapchainContext.rtScene.DispatchExtent().height;
             gSwapchainContext.capabilities.performance.internalRenderWidth = gSwapchainContext.capabilities.rtScene.dispatchWidth;
             gSwapchainContext.capabilities.performance.internalRenderHeight = gSwapchainContext.capabilities.rtScene.dispatchHeight;
+            auto& presentationDiagnostics = gSwapchainContext.capabilities.diagnostics;
+            presentationDiagnostics.erase(std::remove(presentationDiagnostics.begin(), presentationDiagnostics.end(),
+                                                       "Internal render resolution: not measured yet."),
+                                          presentationDiagnostics.end());
+            gRuntimeState.store(1, std::memory_order_release);
 
+            PublishReportSnapshot(gSwapchainContext.capabilities);
             WriteTextFile(gSwapchainContext.reportDirectory + '/' + kTextReportFilename, BuildDisplayText(gSwapchainContext.capabilities));
             WriteTextFile(gSwapchainContext.reportDirectory + '/' + kJsonReportFilename, horde::vulkan::BuildCapabilityJsonReport(gSwapchainContext.capabilities));
             __android_log_print(ANDROID_LOG_INFO, kTag, "RT frame reached Android swapchain presentation.");
@@ -1050,8 +1210,11 @@ bool StartSurfaceInternal(ANativeWindow* window,
     context.window = window;
     context.capabilities = capabilities;
     context.reportDirectory = reportDirectory;
+    context.renderScale = std::clamp(gRequestedRenderScale.load(std::memory_order_acquire), 0.50f, 1.0f);
     context.useRtPath = capabilities.rtMode == horde::vulkan::RtMode::RayTracingPipeline;
     context.clearColor = ClearColorForMode(capabilities.rtMode);
+    gRuntimeState.store(context.useRtPath ? 0 : 2, std::memory_order_release);
+    gAudioEvents.store(0u, std::memory_order_release);
 
     if (!CreateInstance(context.instance))
     {
@@ -1127,16 +1290,26 @@ void StopSurfaceInternal()
 extern "C" JNIEXPORT jstring JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_getTextReport(JNIEnv* env, jclass)
 {
-    const horde::vulkan::DeviceCapabilities capabilities = RunProbe();
-    const std::string reportText = BuildDisplayText(capabilities);
+    std::string reportText = LatestTextReport();
+    if (reportText.empty())
+    {
+        const horde::vulkan::DeviceCapabilities capabilities = RunProbe();
+        PublishReportSnapshot(capabilities);
+        reportText = LatestTextReport();
+    }
     return env->NewStringUTF(reportText.c_str());
 }
 
 extern "C" JNIEXPORT jstring JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_getJsonReport(JNIEnv* env, jclass)
 {
-    const horde::vulkan::DeviceCapabilities capabilities = RunProbe();
-    const std::string reportJson = horde::vulkan::BuildCapabilityJsonReport(capabilities);
+    std::string reportJson = LatestJsonReport();
+    if (reportJson.empty())
+    {
+        const horde::vulkan::DeviceCapabilities capabilities = RunProbe();
+        PublishReportSnapshot(capabilities);
+        reportJson = LatestJsonReport();
+    }
     return env->NewStringUTF(reportJson.c_str());
 }
 
@@ -1155,6 +1328,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_writeReports(JNIEnv* env, jclass, js
     const horde::vulkan::DeviceCapabilities capabilities = RunProbe();
     const std::string textReport = BuildDisplayText(capabilities);
     const std::string jsonReport = horde::vulkan::BuildCapabilityJsonReport(capabilities);
+    PublishReportSnapshot(capabilities);
 
     const std::string reportDirectory = BuildReportDirectory(baseDirectoryValue);
     if (!EnsureDirectoryExists(reportDirectory))
@@ -1222,6 +1396,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_startDiagnosticSurface(JNIEnv* env, 
     // Write updated report from shared probe source.
     const std::string textReport = BuildDisplayText(capabilities);
     const std::string jsonReport = horde::vulkan::BuildCapabilityJsonReport(capabilities);
+    PublishReportSnapshot(capabilities);
     if (!WriteTextFile(reportDirectory + '/' + kTextReportFilename, textReport) ||
         !WriteTextFile(reportDirectory + '/' + kJsonReportFilename, jsonReport))
     {
@@ -1260,4 +1435,34 @@ extern "C" JNIEXPORT void JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_requestAttack(JNIEnv*, jclass)
 {
     gAttackRequested.store(true);
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_requestRouteReset(JNIEnv*, jclass)
+{
+    gResetRequested.store(true, std::memory_order_release);
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_setSimulationPaused(JNIEnv*, jclass, jboolean paused)
+{
+    gSimulationPaused.store(paused == JNI_TRUE, std::memory_order_release);
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_setRenderScale(JNIEnv*, jclass, jfloat scale)
+{
+    gRequestedRenderScale.store(std::clamp(static_cast<float>(scale), 0.50f, 1.0f), std::memory_order_release);
+}
+
+extern "C" JNIEXPORT jint JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getRuntimeState(JNIEnv*, jclass)
+{
+    return static_cast<jint>(gRuntimeState.load(std::memory_order_acquire));
+}
+
+extern "C" JNIEXPORT jint JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_consumeAudioEvents(JNIEnv*, jclass)
+{
+    return static_cast<jint>(gAudioEvents.exchange(0u, std::memory_order_acq_rel));
 }

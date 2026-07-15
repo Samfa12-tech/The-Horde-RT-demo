@@ -1,14 +1,21 @@
 cmake_minimum_required(VERSION 3.22)
 
+if(POLICY CMP0091)
+    cmake_policy(SET CMP0091 NEW)
+endif()
+
 project(HordeLanternRT
     VERSION 0.1.0
-    DESCRIPTION "Native Vulkan hardware ray tracing capability probe"
+    DESCRIPTION "Native Vulkan hardware ray tracing technology demo"
     LANGUAGES CXX
 )
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+if(MSVC)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
 
 option(HORDE_RT_BUILD_CAPABILITY_PROBE_EXECUTABLE "Build the standalone command line Vulkan capability probe" ON)
 option(HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW "Build the Win32 diagnostic shell" ON)
@@ -55,9 +62,10 @@ if(HORDE_RT_BUILD_CAPABILITY_PROBE_EXECUTABLE)
 endif()
 
 if(HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AND WIN32)
-    add_executable(horde_rt_diagnostic_window
+    add_executable(horde_rt_diagnostic_window WIN32
         src/platform/windows/DiagnosticWindowMain.cpp
         src/platform/windows/DiagnosticWindow.cpp
+        src/platform/windows/HordeLanternRT.rc
         src/ui/DiagnosticOverlay.cpp
     )
 
@@ -67,13 +75,15 @@ if(HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AND WIN32)
 
     target_link_libraries(horde_rt_diagnostic_window PRIVATE
         horde_rt_probe_core
+        comctl32
+        winmm
     )
     target_compile_definitions(horde_rt_diagnostic_window PRIVATE
         HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
     )
 
     set_target_properties(horde_rt_diagnostic_window PROPERTIES
-        OUTPUT_NAME "horde_rt_diagnostic_window"
+        OUTPUT_NAME "HordeLanternRT"
     )
 endif()
 
