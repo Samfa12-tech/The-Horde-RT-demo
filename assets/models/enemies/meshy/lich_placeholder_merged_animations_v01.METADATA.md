@@ -2,9 +2,9 @@
 
 ## Status and provenance
 
-- User-supplied file: `C:\Users\sam_s\Downloads\Meshy_AI_Meshy_Merged_Animations.glb`.
+- User-supplied file: `Meshy_AI_Meshy_Merged_Animations.glb`.
 - Staged destination: `lich_placeholder_merged_animations_v01.glb`.
-- Role: active placeholder for the coloured-light route's final emissive enemy in the Windows-first showcase goal. It is included in the debug Android compile package but has not been device-validated. The GLB already exists in public Git/LFS history; the new derived textures and active integration must not be pushed until the source-licence evidence below is retained.
+- Role: active placeholder for the coloured-light route's final emissive enemy in the Windows-first showcase goal. It is included in the debug Android compile package but has not been device-validated.
 - Source size: 14,940,452 bytes.
 - SHA-256: `049979A83ACA55358F54AF8D3AF1F7D518607BEF634474A4EF015BFDFF947A42`.
 - glTF 2.0 / GLB v2, exported by Blender glTF I/O 4.2.57.
@@ -49,7 +49,7 @@ All nine clips key translation, rotation, and scale on all 24 joints. There is n
 
 ## Integration gates
 
-1. The approved project plan records the original source as CC0-derived, but the exact source page and Meshy account-plan terms have not yet been retained or independently verified. Before any further public distribution, add the original CC0 source URL or licence screenshot to the project record.
+1. Source licence is CC0. The user supplied a Meshy workspace screenshot showing this exact lich asset with `Change License: CC0`; it is retained as `lich_placeholder_source_licence.png`, SHA-256 `6094E4D9A27A25022A1426C297F069DB60F779CC77526CFE6B154421F6DB96EE`.
 2. The derived mask and textured runtime are now active on Windows. Replace the thresholded placeholder with an art-authored mask if the staff/eye selection needs polish.
 3. Map only visually acceptable clips. The current asset has no direct replacement for the skeleton's attack clip.
 4. The 9,188-triangle model runs at a 30 Hz skin/BLAS-refit cadence on Windows. Measure it on the target phone before certifying the Android path.

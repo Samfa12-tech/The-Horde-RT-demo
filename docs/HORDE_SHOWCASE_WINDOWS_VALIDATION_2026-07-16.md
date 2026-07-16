@@ -106,6 +106,6 @@ When `SM-S948B` access returns:
 4. Capture the planned 75% sustained per-zone thermal windows and report 100% separately without imposing a 50 FPS requirement.
 5. Raise the active skinned-enemy count above one only after a separate multi-enemy phone measurement.
 
-Before any public distribution of the placeholder lich, retain the original Meshy CC0 source page or licence screenshot in the project record.
+The placeholder lich's Meshy CC0 licence evidence is retained at `assets/models/enemies/meshy/lich_placeholder_source_licence.png`, SHA-256 `6094E4D9A27A25022A1426C297F069DB60F779CC77526CFE6B154421F6DB96EE`.
 
 The compile-only Android artifact is `android/app/build/outputs/apk/debug/app-debug.apk`, 58,887,407 bytes, SHA-256 `44D49F9F30BEED08A1B579546D32845B1BF4E8916816A85B58FA39A59D536273`. Its APK contains the lich GLB, normalized/new FilmCow cues, and only the strict ASTC lich derivatives; the raw Windows KTX2 files are not packaged into Android.
