@@ -25,4 +25,5 @@ android/local.properties
 signing.properties
 keystore.properties
 releases/candidates/
+assets/textures/meshy/**/*.rgba
 docs/validation/horde_alpha_*.png

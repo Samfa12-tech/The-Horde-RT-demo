@@ -92,6 +92,23 @@ if(BUILD_TESTING)
     add_executable(horde_rt_combat_smoke tests/SwordCombatSmoke.cpp)
     target_include_directories(horde_rt_combat_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_combat_smoke COMMAND horde_rt_combat_smoke)
+
+    add_executable(horde_rt_showcase_route_smoke tests/ShowcaseRouteSmoke.cpp)
+    target_include_directories(horde_rt_showcase_route_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_showcase_route_smoke COMMAND horde_rt_showcase_route_smoke)
+
+    add_executable(horde_rt_showcase_gameplay_smoke tests/ShowcaseGameplaySmoke.cpp)
+    target_include_directories(horde_rt_showcase_gameplay_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_showcase_gameplay_smoke COMMAND horde_rt_showcase_gameplay_smoke)
+
+    add_executable(horde_rt_spatial_audio_smoke tests/SpatialAudioSmoke.cpp)
+    target_include_directories(horde_rt_spatial_audio_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_spatial_audio_smoke COMMAND horde_rt_spatial_audio_smoke)
+
+    add_executable(horde_rt_skinned_character_smoke tests/SkinnedCharacterModelSmoke.cpp)
+    target_include_directories(horde_rt_skinned_character_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(horde_rt_skinned_character_smoke PRIVATE horde_rt_probe_core)
+    add_test(NAME horde_rt_skinned_character_smoke COMMAND horde_rt_skinned_character_smoke)
 endif()
 
 message(STATUS "Horde Lantern RT: Vulkan capability probe and Windows diagnostic targets are available; Android builds from android/.")

@@ -3,10 +3,15 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <cstdint>
+#include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <memory>
+#include <mutex>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #ifndef WIN32_LEAN_AND_MEAN
@@ -18,6 +23,7 @@
 #include <windows.h>
 #include <commctrl.h>
 #include <mmsystem.h>
+#include <xaudio2.h>
 #ifdef DeviceCapabilities
 #undef DeviceCapabilities
 #endif
@@ -26,6 +32,8 @@
 
 #include "ui/DiagnosticOverlay.h"
 #include "gameplay/CorridorCollision.h"
+#include "gameplay/ShowcaseGameplay.h"
+#include "gameplay/SpatialAudio.h"
 #include "gameplay/SwordCombat.h"
 #include "vulkan/RtCapabilityReport.h"
 #include "vulkan/VulkanContext.h"
@@ -110,6 +118,7 @@ struct VulkanSurfaceContext
     bool leftHeld = false;
     bool rightHeld = false;
     bool mouseLookActive = false;
+    bool playerAttackRequested = false;
     POINT lastMousePosition{};
     ULONGLONG lastControlTick = 0u;
     float cameraYaw = 0.0f;
@@ -119,11 +128,13 @@ struct VulkanSurfaceContext
     float cameraX = 0.0f;
     float cameraZ = 1.85f;
     float walkAmount = 0.0f;
+    float playerTravelledThisFrame = 0.0f;
     float frameDeltaSeconds = 1.0f / 60.0f;
-    float playerFootstepTime = 0.0f;
-    int enemyFootstepPhase = -1;
+    horde::gameplay::TravelFootstepCadence playerFootsteps;
+    horde::gameplay::PlayerFootstepCadence enemyFootsteps;
     int playerFootstepVariant = 0;
     int enemyFootstepVariant = 0;
+    bool lichDeathCuePlayed = false;
     float outputExposure = 0.62f;
     float mouseSensitivity = 1.0f;
     float renderScale = 1.0f;
@@ -131,6 +142,14 @@ struct VulkanSurfaceContext
     WINDOWPLACEMENT windowedPlacement{sizeof(WINDOWPLACEMENT)};
     horde::gameplay::SwordCombat combat;
     horde::gameplay::CombatSnapshot combatSnapshot;
+    horde::gameplay::LanternSequence lanternSequence;
+    horde::gameplay::LanternSnapshot lanternSnapshot;
+    horde::gameplay::EnemyDirector enemyDirector;
+    horde::gameplay::LichEncounter lichEncounter;
+    horde::gameplay::EnemyKind activeEnemyKind = horde::gameplay::EnemyKind::Skeleton;
+    horde::gameplay::EnemyKind debugEnemyOverride = horde::gameplay::EnemyKind::None;
+    uint32_t debugValidationPoint = 0u;
+    float lichDamageFlash = 0.0f;
     uint32_t currentFrame = 0u;
 };
 
@@ -190,6 +209,24 @@ void SaveSettings(const VulkanSurfaceContext& context)
     WritePrivateProfileStringA("display", "renderScale", renderScale.c_str(), path.c_str());
 }
 
+void LogWindowsAudio(const std::string& message)
+{
+    static std::mutex logMutex;
+    const std::lock_guard<std::mutex> lock(logMutex);
+    const std::string debugMessage = "Horde audio: " + message + "\n";
+    OutputDebugStringA(debugMessage.c_str());
+    const std::filesystem::path reportDirectory = ExecutableDirectory() / kReportDirectory;
+    std::error_code error;
+    std::filesystem::create_directories(reportDirectory, error);
+    std::ofstream log(reportDirectory / "windows_audio.log", std::ios::app);
+    if (log)
+    {
+        log << message << '\n';
+    }
+}
+
+bool PlayXAudioFile(const std::filesystem::path& path, float leftGain, float rightGain);
+
 void PlaySoundEffect(const VulkanSurfaceContext& context, const char* filename)
 {
     if (!context.sfxEnabled)
@@ -199,7 +236,14 @@ void PlaySoundEffect(const VulkanSurfaceContext& context, const char* filename)
     const std::filesystem::path path = ResolveAssetRoot() / "audio/filmcow" / filename;
     if (std::filesystem::exists(path))
     {
-        PlaySoundA(path.string().c_str(), nullptr, SND_FILENAME | SND_ASYNC | SND_NODEFAULT);
+        if (!PlayXAudioFile(path, 1.0f, 1.0f))
+        {
+            PlaySoundA(path.string().c_str(), nullptr, SND_FILENAME | SND_ASYNC | SND_NODEFAULT);
+        }
+    }
+    else
+    {
+        LogWindowsAudio("missing centred SFX asset: " + path.string());
     }
 }
 
@@ -212,9 +256,323 @@ void PlayAmbientSoundEffect(const VulkanSurfaceContext& context, const char* fil
     const std::filesystem::path path = ResolveAssetRoot() / "audio/filmcow" / filename;
     if (std::filesystem::exists(path))
     {
-        // WinMM has no per-stream mixer here. NOSTOP keeps quiet movement cues
-        // from cutting off a swing, impact, menu, or attack cue already playing.
-        PlaySoundA(path.string().c_str(), nullptr, SND_FILENAME | SND_ASYNC | SND_NODEFAULT | SND_NOSTOP);
+        if (!PlayXAudioFile(path, 1.0f, 1.0f))
+        {
+            PlaySoundA(path.string().c_str(), nullptr, SND_FILENAME | SND_ASYNC | SND_NODEFAULT | SND_NOSTOP);
+        }
+    }
+    else
+    {
+        LogWindowsAudio("missing ambient SFX asset: " + path.string());
+    }
+}
+
+class PositionalAudioEngine
+{
+public:
+    PositionalAudioEngine()
+    {
+        const HRESULT engineResult = XAudio2Create(&engine_, 0u, XAUDIO2_DEFAULT_PROCESSOR);
+        if (FAILED(engineResult) || engine_ == nullptr)
+        {
+            LogWindowsAudio("XAudio2Create failed, HRESULT=" + std::to_string(static_cast<long>(engineResult)));
+            return;
+        }
+        const HRESULT masteringResult = engine_->CreateMasteringVoice(&masteringVoice_);
+        if (FAILED(masteringResult) || masteringVoice_ == nullptr)
+        {
+            LogWindowsAudio("CreateMasteringVoice failed, HRESULT=" + std::to_string(static_cast<long>(masteringResult)));
+            engine_->Release();
+            engine_ = nullptr;
+            return;
+        }
+        XAUDIO2_VOICE_DETAILS details{};
+        masteringVoice_->GetVoiceDetails(&details);
+        outputChannels_ = std::max(1u, details.InputChannels);
+        LogWindowsAudio("XAudio2 ready; output channels=" + std::to_string(outputChannels_) +
+                        ", asset root=" + ResolveAssetRoot().string());
+    }
+
+    ~PositionalAudioEngine()
+    {
+        for (ActiveVoice& active : activeVoices_)
+        {
+            active.voice->DestroyVoice();
+        }
+        if (masteringVoice_ != nullptr)
+        {
+            masteringVoice_->DestroyVoice();
+        }
+        if (engine_ != nullptr)
+        {
+            engine_->Release();
+        }
+    }
+
+    PositionalAudioEngine(const PositionalAudioEngine&) = delete;
+    PositionalAudioEngine& operator=(const PositionalAudioEngine&) = delete;
+
+    void Update()
+    {
+        for (auto it = activeVoices_.begin(); it != activeVoices_.end();)
+        {
+            XAUDIO2_VOICE_STATE state{};
+            it->voice->GetState(&state, XAUDIO2_VOICE_NOSAMPLESPLAYED);
+            if (state.BuffersQueued == 0u)
+            {
+                if (!completedVoiceLogged_)
+                {
+                    completedVoiceLogged_ = true;
+                    LogWindowsAudio("first voice completed: " + it->filename);
+                }
+                it->voice->DestroyVoice();
+                it = activeVoices_.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
+        }
+    }
+
+    bool Play(const std::filesystem::path& path, float leftGain, float rightGain)
+    {
+        if (engine_ == nullptr || masteringVoice_ == nullptr)
+        {
+            LogFailureOnce("XAudio2 unavailable; falling back for " + path.string());
+            return false;
+        }
+        const std::shared_ptr<const LoadedWave> wave = Load(path);
+        if (!wave || wave->format.nChannels != 1u)
+        {
+            LogFailureOnce("unsupported or unreadable mono WAV: " + path.string());
+            return false;
+        }
+
+        if (wave->samples.size() > UINT32_MAX)
+        {
+            LogFailureOnce("WAV exceeds XAudio2 buffer size: " + path.string());
+            return false;
+        }
+
+        IXAudio2SourceVoice* voice = nullptr;
+        const HRESULT sourceResult = engine_->CreateSourceVoice(&voice, &wave->format);
+        if (FAILED(sourceResult) || voice == nullptr)
+        {
+            LogFailureOnce("CreateSourceVoice failed, HRESULT=" +
+                           std::to_string(static_cast<long>(sourceResult)) + ": " + path.string());
+            return false;
+        }
+
+        std::vector<float> matrix(outputChannels_, 0.0f);
+        if (outputChannels_ == 1u)
+        {
+            matrix[0] = std::max(leftGain, rightGain);
+        }
+        else
+        {
+            matrix[0] = leftGain;
+            matrix[1] = rightGain;
+        }
+        const HRESULT matrixResult = voice->SetOutputMatrix(masteringVoice_, 1u, outputChannels_, matrix.data());
+        if (FAILED(matrixResult))
+        {
+            LogFailureOnce("SetOutputMatrix failed, HRESULT=" +
+                           std::to_string(static_cast<long>(matrixResult)) + ": " + path.string());
+            voice->DestroyVoice();
+            return false;
+        }
+
+        const XAUDIO2_BUFFER buffer{
+            0u,
+            static_cast<UINT32>(wave->samples.size()),
+            wave->samples.data(),
+            0u,
+            0u,
+            0u,
+            0u,
+            0u,
+            nullptr};
+        const HRESULT submitResult = voice->SubmitSourceBuffer(&buffer);
+        const HRESULT startResult = SUCCEEDED(submitResult) ? voice->Start() : E_FAIL;
+        if (FAILED(submitResult) || FAILED(startResult))
+        {
+            LogFailureOnce("voice submit/start failed, HRESULT=" +
+                           std::to_string(static_cast<long>(FAILED(submitResult) ? submitResult : startResult)) +
+                           ": " + path.string());
+            voice->DestroyVoice();
+            return false;
+        }
+        const std::string filename = path.filename().string();
+        activeVoices_.push_back({voice, wave, filename});
+        if (!successfulVoiceLogged_)
+        {
+            successfulVoiceLogged_ = true;
+            LogWindowsAudio("first voice started: " + path.filename().string() +
+                            ", format=" + std::to_string(wave->format.nSamplesPerSec) + " Hz/" +
+                            std::to_string(wave->format.wBitsPerSample) + " bit mono");
+        }
+        return true;
+    }
+
+private:
+    struct LoadedWave
+    {
+        WAVEFORMATEX format{};
+        std::vector<BYTE> samples;
+    };
+
+    struct ActiveVoice
+    {
+        IXAudio2SourceVoice* voice = nullptr;
+        std::shared_ptr<const LoadedWave> wave;
+        std::string filename;
+    };
+
+    std::shared_ptr<const LoadedWave> Load(const std::filesystem::path& path)
+    {
+        const std::string key = path.string();
+        if (const auto found = waves_.find(key); found != waves_.end())
+        {
+            return found->second;
+        }
+
+        std::ifstream stream(path, std::ios::binary | std::ios::ate);
+        if (!stream)
+        {
+            return {};
+        }
+        const std::streamsize size = stream.tellg();
+        if (size < 12)
+        {
+            return {};
+        }
+        stream.seekg(0, std::ios::beg);
+        std::vector<BYTE> fileBytes(static_cast<std::size_t>(size));
+        if (!stream.read(reinterpret_cast<char*>(fileBytes.data()), size))
+        {
+            return {};
+        }
+
+        const auto fourCc = [&fileBytes](std::size_t offset, const char* value)
+        {
+            return offset + 4u <= fileBytes.size() &&
+                   std::memcmp(fileBytes.data() + offset, value, 4u) == 0;
+        };
+        const auto readU32 = [&fileBytes](std::size_t offset)
+        {
+            uint32_t value = 0u;
+            if (offset + sizeof(value) <= fileBytes.size())
+            {
+                std::memcpy(&value, fileBytes.data() + offset, sizeof(value));
+            }
+            return value;
+        };
+        if (!fourCc(0u, "RIFF") || !fourCc(8u, "WAVE"))
+        {
+            return {};
+        }
+
+        auto wave = std::make_shared<LoadedWave>();
+        bool hasFormat = false;
+        bool hasSamples = false;
+        for (std::size_t offset = 12u; offset + 8u <= fileBytes.size();)
+        {
+            const uint32_t chunkSize = readU32(offset + 4u);
+            const std::size_t dataOffset = offset + 8u;
+            if (dataOffset + chunkSize > fileBytes.size())
+            {
+                return {};
+            }
+            if (fourCc(offset, "fmt ") && chunkSize >= 16u)
+            {
+                const std::size_t formatBytes = std::min<std::size_t>(chunkSize, sizeof(WAVEFORMATEX));
+                std::memcpy(&wave->format, fileBytes.data() + dataOffset, formatBytes);
+                if (chunkSize == 16u)
+                {
+                    wave->format.cbSize = 0u;
+                }
+                hasFormat = true;
+            }
+            else if (fourCc(offset, "data"))
+            {
+                wave->samples.assign(fileBytes.begin() + static_cast<std::ptrdiff_t>(dataOffset),
+                                     fileBytes.begin() + static_cast<std::ptrdiff_t>(dataOffset + chunkSize));
+                hasSamples = !wave->samples.empty();
+            }
+            offset = dataOffset + chunkSize + (chunkSize & 1u);
+        }
+
+        if (!hasFormat || !hasSamples || wave->format.wFormatTag != WAVE_FORMAT_PCM ||
+            wave->format.nChannels == 0u || wave->format.nSamplesPerSec == 0u ||
+            wave->format.nBlockAlign == 0u || wave->format.wBitsPerSample == 0u)
+        {
+            return {};
+        }
+        waves_.emplace(key, wave);
+        return wave;
+    }
+
+    void LogFailureOnce(const std::string& message)
+    {
+        if (message != lastFailure_)
+        {
+            lastFailure_ = message;
+            LogWindowsAudio(message);
+        }
+    }
+
+    IXAudio2* engine_ = nullptr;
+    IXAudio2MasteringVoice* masteringVoice_ = nullptr;
+    UINT32 outputChannels_ = 2u;
+    std::unordered_map<std::string, std::shared_ptr<const LoadedWave>> waves_;
+    std::vector<ActiveVoice> activeVoices_;
+    std::string lastFailure_;
+    bool successfulVoiceLogged_ = false;
+    bool completedVoiceLogged_ = false;
+};
+
+PositionalAudioEngine& SpatialAudioEngine()
+{
+    static PositionalAudioEngine engine;
+    return engine;
+}
+
+bool PlayXAudioFile(const std::filesystem::path& path, float leftGain, float rightGain)
+{
+    return SpatialAudioEngine().Play(path,
+                                     std::clamp(leftGain, 0.0f, 1.0f),
+                                     std::clamp(rightGain, 0.0f, 1.0f));
+}
+
+void PlayEnemySoundEffect(const VulkanSurfaceContext& context, const char* filename, float mixGain)
+{
+    if (!context.sfxEnabled)
+    {
+        return;
+    }
+    const float emitterX = context.activeEnemyKind == horde::gameplay::EnemyKind::Lich
+        ? context.lichEncounter.Snapshot().x : context.combatSnapshot.enemyX;
+    const float emitterZ = context.activeEnemyKind == horde::gameplay::EnemyKind::Lich
+        ? context.lichEncounter.Snapshot().z : context.combatSnapshot.enemyZ;
+    const horde::gameplay::SpatialAudioGains gains = horde::gameplay::CalculateSpatialAudio(
+        {emitterX, emitterZ, mixGain, 1.0f, 14.0f},
+        {context.cameraX, context.cameraZ, context.cameraYaw});
+    if (gains.left <= 0.0f && gains.right <= 0.0f)
+    {
+        return;
+    }
+    const std::filesystem::path path = ResolveAssetRoot() / "audio/filmcow" / filename;
+    if (std::filesystem::exists(path))
+    {
+        if (!PlayXAudioFile(path, gains.left, gains.right))
+        {
+            PlaySoundA(path.string().c_str(), nullptr, SND_FILENAME | SND_ASYNC | SND_NODEFAULT | SND_NOSTOP);
+        }
+    }
+    else
+    {
+        LogWindowsAudio("missing positional SFX asset: " + path.string());
     }
 }
 
@@ -319,10 +677,21 @@ void ResetRoute(VulkanSurfaceContext& context)
     context.cameraX = 0.0f;
     context.cameraZ = 1.85f;
     context.walkAmount = 0.0f;
-    context.playerFootstepTime = 0.0f;
-    context.enemyFootstepPhase = -1;
+    context.playerTravelledThisFrame = 0.0f;
+    context.playerFootsteps.Reset();
+    context.enemyFootsteps.Reset();
+    context.lichDeathCuePlayed = false;
     context.combat = {};
     context.combatSnapshot = {};
+    context.lanternSequence.Reset();
+    context.lanternSnapshot = {};
+    context.enemyDirector.Reset();
+    context.lichEncounter.Reset();
+    context.activeEnemyKind = horde::gameplay::EnemyKind::Skeleton;
+    context.debugEnemyOverride = horde::gameplay::EnemyKind::None;
+    context.debugValidationPoint = 0u;
+    context.lichDamageFlash = 0.0f;
+    context.playerAttackRequested = false;
     ClearDesktopInput(context);
 }
 
@@ -547,6 +916,7 @@ void UpdateDesktopSceneControls(VulkanSurfaceContext& context)
     }
     context.lastControlTick = now;
     context.frameDeltaSeconds = deltaSeconds;
+    context.playerTravelledThisFrame = 0.0f;
     if (context.simulationPaused)
     {
         context.frameDeltaSeconds = 0.0f;
@@ -568,9 +938,14 @@ void UpdateDesktopSceneControls(VulkanSurfaceContext& context)
     const float rightX = std::cos(context.cameraYaw);
     const float rightZ = std::sin(context.cameraYaw);
     constexpr float kMoveSpeed = 1.9f;
+    const float previousCameraX = context.cameraX;
+    const float previousCameraZ = context.cameraZ;
     context.cameraX += (forwardX * forwardAmount + rightX * strafeAmount) * kMoveSpeed * deltaSeconds;
     context.cameraZ += (forwardZ * forwardAmount + rightZ * strafeAmount) * kMoveSpeed * deltaSeconds;
-    horde::gameplay::ResolveCorridorPlayerCollision(context.cameraX, context.cameraZ);
+    horde::gameplay::ResolveCorridorPlayerCollision(previousCameraX, previousCameraZ, context.cameraX, context.cameraZ);
+    const float travelledX = context.cameraX - previousCameraX;
+    const float travelledZ = context.cameraZ - previousCameraZ;
+    context.playerTravelledThisFrame = std::sqrt(travelledX * travelledX + travelledZ * travelledZ);
 }
 
 bool SetDesktopMovementKey(VulkanSurfaceContext& context, const WPARAM key, const bool held)
@@ -1051,7 +1426,9 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx)
                                 renderExtent,
                                 ctx.swapchainFormat,
                                 (assetRoot / "models/enemies/meshy/skeleton_biped_merged_animations_v01.glb").string(),
+                                (assetRoot / "models/enemies/meshy/lich_placeholder_merged_animations_v01.glb").string(),
                                 (assetRoot / "textures/polyhaven/mobile_1k").string(),
+                                (assetRoot / "textures/meshy/lich_placeholder_v01").string(),
                                 diagnostic))
     {
         std::cerr << "Failed to initialise presentable RT scene: " << diagnostic << '\n';
@@ -1208,44 +1585,120 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
     const bool useRtFrame = ctx.useRtPath && ctx.rtScene.IsReady();
     if (useRtFrame)
     {
+        SpatialAudioEngine().Update();
         UpdateDesktopSceneControls(ctx);
-        if (ctx.walkAmount > 0.01f && ctx.frameDeltaSeconds > 0.0f)
+        ctx.lanternSnapshot = ctx.lanternSequence.Update(
+            ctx.simulationPaused ? 0.0f : ctx.frameDeltaSeconds,
+            ctx.cameraX,
+            ctx.cameraZ,
+            ctx.cameraYaw,
+            ctx.cameraPitch);
+        if (ctx.debugEnemyOverride == horde::gameplay::EnemyKind::None)
         {
-            ctx.playerFootstepTime += ctx.frameDeltaSeconds;
-            if (ctx.playerFootstepTime >= 0.46f)
-            {
-                ctx.playerFootstepTime = std::fmod(ctx.playerFootstepTime, 0.46f);
-                PlayAmbientSoundEffect(ctx, (ctx.playerFootstepVariant++ & 1) == 0 ? "player_step_1.wav" : "player_step_2.wav");
-            }
+            ctx.enemyDirector.Update(ctx.cameraX, ctx.cameraZ);
         }
         else
         {
-            ctx.playerFootstepTime = 0.0f;
+            ctx.enemyDirector.ForceSelectForDebug(ctx.debugEnemyOverride);
+        }
+        const horde::gameplay::EnemyRosterSnapshot& roster = ctx.enemyDirector.Snapshot();
+        if (roster.selectedEnemy != ctx.activeEnemyKind)
+        {
+            ctx.activeEnemyKind = roster.selectedEnemy;
+            if (ctx.activeEnemyKind == horde::gameplay::EnemyKind::Skeleton)
+            {
+                ctx.combat = {};
+                ctx.combatSnapshot = {};
+            }
+            else if (ctx.activeEnemyKind == horde::gameplay::EnemyKind::Lich)
+            {
+                ctx.lichEncounter.Reset();
+                ctx.lichDeathCuePlayed = false;
+            }
+        }
+        bool lichHitRequested = false;
+        if (ctx.playerAttackRequested)
+        {
+            ctx.playerAttackRequested = false;
+            // The sword is a player action, not a skeleton-only animation. Keep
+            // its swing advancing after the lantern drop and through the finale.
+            ctx.combat.RequestAttack();
+            lichHitRequested = ctx.activeEnemyKind == horde::gameplay::EnemyKind::Lich;
+        }
+        if (ctx.playerFootsteps.Update(ctx.playerTravelledThisFrame, ctx.walkAmount > 0.01f))
+        {
+            const char* clip = (ctx.playerFootstepVariant++ & 1) == 0 ? "player_step_1.wav" : "player_step_2.wav";
+            PlayAmbientSoundEffect(ctx, clip);
         }
         const horde::gameplay::EnemyAnimation previousAnimation = ctx.combatSnapshot.enemyAnimation;
         ctx.combatSnapshot = ctx.combat.Update(ctx.frameDeltaSeconds, ctx.cameraX, ctx.cameraZ, ctx.cameraYaw);
-        if (previousAnimation != horde::gameplay::EnemyAnimation::Dead &&
+        const bool finaleActive = horde::gameplay::QueryShowcaseZone(ctx.cameraX, ctx.cameraZ) == horde::gameplay::ShowcaseZone::Finale;
+        const horde::gameplay::LichPhase previousLichPhase = ctx.lichEncounter.Snapshot().phase;
+        const horde::gameplay::LichSnapshot& lich = ctx.lichEncounter.Update(
+            ctx.activeEnemyKind == horde::gameplay::EnemyKind::Lich ? ctx.frameDeltaSeconds : 0.0f,
+            ctx.cameraX,
+            ctx.cameraZ,
+            !horde::gameplay::IsRouteAudioObstructed(ctx.cameraX, ctx.cameraZ,
+                                                      ctx.lichEncounter.Snapshot().x, ctx.lichEncounter.Snapshot().z),
+            ctx.activeEnemyKind == horde::gameplay::EnemyKind::Lich && finaleActive);
+        // Resolve melee after the encounter update. A debug warp or first entry
+        // can select and awaken the lich on this same frame; resolving earlier
+        // incorrectly discarded that visibly connected opening strike as a hit
+        // against the dormant state.
+        if (lichHitRequested)
+        {
+            if (ctx.lichEncounter.TryAcceptPlayerHit(ctx.cameraX, ctx.cameraZ))
+            {
+                // The hurt recording already contains its own body impact.
+                // Do not mask its brief vocal with a second centred fencing hit.
+                PlayEnemySoundEffect(ctx, "lich_hurt.wav", 0.95f);
+            }
+        }
+        if (ctx.activeEnemyKind == horde::gameplay::EnemyKind::Lich &&
+            previousLichPhase != horde::gameplay::LichPhase::Charging &&
+            lich.phase == horde::gameplay::LichPhase::Charging)
+        {
+            PlayEnemySoundEffect(ctx, "lich_charge.wav", 0.42f);
+        }
+        ctx.lichDamageFlash = std::max(0.0f, ctx.lichDamageFlash - ctx.frameDeltaSeconds * 2.8f);
+        if (lich.damagePulse)
+        {
+            ctx.lichDamageFlash = 1.0f;
+            PlayEnemySoundEffect(ctx, "lich_impact.wav", 0.55f);
+        }
+        if (ctx.activeEnemyKind == horde::gameplay::EnemyKind::Lich &&
+            lich.phase == horde::gameplay::LichPhase::Dead &&
+            !ctx.lichDeathCuePlayed)
+        {
+            ctx.lichDeathCuePlayed = true;
+            PlayEnemySoundEffect(ctx, "lich_fall.wav", 0.36f);
+        }
+        if (ctx.activeEnemyKind == horde::gameplay::EnemyKind::Lich &&
+            lich.deathAnimationComplete)
+        {
+            ctx.enemyDirector.MarkSelectedDead();
+        }
+        horde::gameplay::CombatSnapshot renderCombat = ctx.combatSnapshot;
+        renderCombat.damageFlash = std::max(renderCombat.damageFlash, ctx.lichDamageFlash);
+        if (ctx.activeEnemyKind == horde::gameplay::EnemyKind::Skeleton &&
+            previousAnimation != horde::gameplay::EnemyAnimation::Dead &&
             ctx.combatSnapshot.enemyAnimation == horde::gameplay::EnemyAnimation::Dead)
         {
             PlaySoundEffect(ctx, "sword_hit_1.wav");
         }
-        if (previousAnimation != horde::gameplay::EnemyAnimation::Attack &&
+        if (ctx.activeEnemyKind == horde::gameplay::EnemyKind::Skeleton &&
+            previousAnimation != horde::gameplay::EnemyAnimation::Attack &&
             ctx.combatSnapshot.enemyAnimation == horde::gameplay::EnemyAnimation::Attack)
         {
-            PlaySoundEffect(ctx, "skeleton_attack.wav");
+            PlayEnemySoundEffect(ctx, "skeleton_attack.wav", 0.85f);
         }
-        if (ctx.combatSnapshot.enemyAnimation == horde::gameplay::EnemyAnimation::Walking)
+        const bool skeletonWalking = !ctx.simulationPaused &&
+                                     ctx.activeEnemyKind == horde::gameplay::EnemyKind::Skeleton &&
+                                     ctx.combatSnapshot.enemyAnimation == horde::gameplay::EnemyAnimation::Walking;
+        if (ctx.enemyFootsteps.Update(ctx.frameDeltaSeconds, skeletonWalking))
         {
-            const int phase = static_cast<int>(std::floor(ctx.combatSnapshot.enemyAnimationTime * 0.90f / 0.52f));
-            if (ctx.enemyFootstepPhase >= 0 && phase != ctx.enemyFootstepPhase)
-            {
-                PlayAmbientSoundEffect(ctx, (ctx.enemyFootstepVariant++ & 1) == 0 ? "skeleton_step_1.wav" : "skeleton_step_2.wav");
-            }
-            ctx.enemyFootstepPhase = phase;
-        }
-        else
-        {
-            ctx.enemyFootstepPhase = -1;
+            const char* clip = (ctx.enemyFootstepVariant++ & 1) == 0 ? "skeleton_step_1.wav" : "skeleton_step_2.wav";
+            PlayEnemySoundEffect(ctx, clip, 1.0f);
         }
         std::string diagnostic;
         if (!ctx.rtScene.RecordTraceAndCopy(ctx.commandBuffers[imageIndex],
@@ -1254,13 +1707,16 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
                                             ctx.swapchainExtent,
                                             ctx.cameraYaw,
                                             ctx.cameraPitch,
-                                            ctx.lanternStrength,
+                                            ctx.lanternStrength * ctx.lanternSnapshot.flameStrength,
                                             ctx.walkTime,
                                             ctx.cameraX,
                                             ctx.cameraZ,
                                             ctx.walkAmount,
                                             ctx.outputExposure,
-                                            ctx.combatSnapshot,
+                                            renderCombat,
+                                            ctx.lanternSnapshot,
+                                            roster,
+                                            lich,
                                             diagnostic))
         {
             std::cerr << "Failed to record RT frame: " << diagnostic << '\n';
@@ -1441,8 +1897,15 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     MSG message{};
     bool running = true;
     bool renderFailed = false;
-    uint32_t timingFrameCount = 0u;
-    double timingTotalMs = 0.0;
+    std::vector<double> timingSamples;
+    timingSamples.reserve(120u);
+    std::uint64_t timingWindowIndex = 0u;
+    const std::filesystem::path timingEvidencePath = textReportPath.parent_path() / "windows_showcase_timing.csv";
+    if (!std::filesystem::exists(timingEvidencePath))
+    {
+        std::ofstream header(timingEvidencePath, std::ios::binary);
+        header << "window,render_scale_percent,zone,median_ms,p95_ms,average_ms,fps_from_median,cap_bound_165\n";
+    }
     while (running)
     {
         while (PeekMessageA(&message, nullptr, 0, 0, PM_REMOVE) != 0)
@@ -1464,6 +1927,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         if (context.renderScaleDirty && context.useRtPath)
         {
             context.renderScaleDirty = false;
+            timingSamples.clear();
             vkDeviceWaitIdle(context.device);
             context.rtScene.Destroy();
             capabilities.rtScene.presented = false;
@@ -1496,14 +1960,30 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             break;
         }
         const auto frameEnd = std::chrono::steady_clock::now();
-        timingTotalMs += std::chrono::duration<double, std::milli>(frameEnd - frameStart).count();
-        if (++timingFrameCount >= 120u)
+        timingSamples.push_back(std::chrono::duration<double, std::milli>(frameEnd - frameStart).count());
+        if (timingSamples.size() >= 120u)
         {
-            const double averageFrameMs = timingTotalMs / static_cast<double>(timingFrameCount);
-            capabilities.performance.frameTimeMs = static_cast<float>(averageFrameMs);
-            capabilities.performance.fps = averageFrameMs > 0.0
-                ? static_cast<float>(1000.0 / averageFrameMs)
+            std::vector<double> sortedSamples = timingSamples;
+            std::sort(sortedSamples.begin(), sortedSamples.end());
+            const double medianFrameMs = (sortedSamples[59] + sortedSamples[60]) * 0.5;
+            const double p95FrameMs = sortedSamples[113];
+            double totalFrameMs = 0.0;
+            for (double sample : timingSamples) totalFrameMs += sample;
+            const double averageFrameMs = totalFrameMs / static_cast<double>(timingSamples.size());
+            capabilities.performance.frameTimeMs = static_cast<float>(medianFrameMs);
+            capabilities.performance.fps = medianFrameMs > 0.0
+                ? static_cast<float>(1000.0 / medianFrameMs)
                 : 0.0f;
+            {
+                std::ofstream evidence(timingEvidencePath, std::ios::binary | std::ios::app);
+                const horde::gameplay::ShowcaseZone zone = horde::gameplay::QueryShowcaseZone(context.cameraX, context.cameraZ);
+                const double fps = medianFrameMs > 0.0 ? 1000.0 / medianFrameMs : 0.0;
+                evidence << ++timingWindowIndex << ','
+                         << static_cast<int>(std::lround(context.renderScale * 100.0f)) << ','
+                         << horde::gameplay::ShowcaseZoneName(zone) << ','
+                         << medianFrameMs << ',' << p95FrameMs << ',' << averageFrameMs << ',' << fps << ','
+                         << (fps >= 160.0 ? "yes" : "no") << '\n';
+            }
             auto& timingDiagnostics = capabilities.diagnostics;
             timingDiagnostics.erase(std::remove(timingDiagnostics.begin(), timingDiagnostics.end(),
                                                 "FPS / frame time: not measured yet."),
@@ -1518,14 +1998,13 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                     SetWindowTextA(edit, updatedText.c_str());
                 }
             }
-            timingFrameCount = 0u;
-            timingTotalMs = 0.0;
+            timingSamples.clear();
         }
         if (rtFramePresented && !capabilities.rtScene.presented)
         {
             capabilities.rtScene.presented = true;
             capabilities.rtScene.status = "Presented via swapchain";
-            capabilities.rtScene.geometry = "Horde Lantern corridor with animated skeleton";
+            capabilities.rtScene.geometry = "Complete Horde showcase route with sequential animated skeleton and staff-lit lich";
             capabilities.rtScene.dispatchWidth = context.rtScene.DispatchExtent().width;
             capabilities.rtScene.dispatchHeight = context.rtScene.DispatchExtent().height;
             capabilities.performance.internalRenderWidth = capabilities.rtScene.dispatchWidth;
@@ -1864,6 +2343,79 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 ToggleDiagnostics(*sceneContext);
                 return 0;
             }
+#if defined(_DEBUG)
+            if (wParam == VK_F5)
+            {
+                sceneContext->debugEnemyOverride = sceneContext->debugEnemyOverride == horde::gameplay::EnemyKind::Lich
+                    ? horde::gameplay::EnemyKind::Skeleton
+                    : horde::gameplay::EnemyKind::Lich;
+                return 0;
+            }
+            if (wParam == VK_F6)
+            {
+                sceneContext->debugEnemyOverride = horde::gameplay::EnemyKind::None;
+                // Place the validation camera inside the real 2 m sword range.
+                sceneContext->cameraX = -33.25f;
+                sceneContext->cameraZ = -14.25f;
+                sceneContext->cameraYaw = 2.52f;
+                sceneContext->cameraPitch = 0.0f;
+                return 0;
+            }
+            if (wParam == VK_F7)
+            {
+                sceneContext->debugEnemyOverride = horde::gameplay::EnemyKind::None;
+                sceneContext->lanternSequence.Reset();
+                sceneContext->lanternSnapshot = {};
+                sceneContext->cameraX = -1.8f;
+                sceneContext->cameraZ = -15.2f;
+                sceneContext->cameraYaw = -1.57079632679f;
+                sceneContext->cameraPitch = -0.08f;
+                return 0;
+            }
+            if (wParam == VK_F8)
+            {
+                struct ValidationPoint
+                {
+                    float x;
+                    float z;
+                    float yaw;
+                    float pitch;
+                };
+                static constexpr ValidationPoint kValidationPoints[] = {
+                    {0.0f, 1.85f, 0.0f, -0.05f},
+                    {4.2f, -10.0f, 0.0f, -0.04f},
+                    {-5.5f, -15.2f, 0.0f, 0.22f},
+                    {-27.5f, -15.2f, -1.57079632679f, -0.02f},
+                    {-33.7f, -15.2f, 2.52f, 0.0f},
+                };
+                const ValidationPoint& point = kValidationPoints[sceneContext->debugValidationPoint];
+                sceneContext->cameraX = point.x;
+                sceneContext->cameraZ = point.z;
+                sceneContext->cameraYaw = point.yaw;
+                sceneContext->cameraPitch = point.pitch;
+                sceneContext->debugValidationPoint =
+                    (sceneContext->debugValidationPoint + 1u) %
+                    static_cast<uint32_t>(sizeof(kValidationPoints) / sizeof(kValidationPoints[0]));
+                return 0;
+            }
+            if (wParam == VK_F9)
+            {
+                // Inspect the settled prop from inside the same corridor leg
+                // without resetting the already-triggered lantern sequence.
+                sceneContext->cameraX = 1.20f;
+                sceneContext->cameraZ = -15.20f;
+                sceneContext->cameraYaw = -1.57079632679f;
+                sceneContext->cameraPitch = -0.32f;
+                return 0;
+            }
+            if (wParam == VK_F10 && (lParam & (1ll << 30)) == 0)
+            {
+                const char* clip = (sceneContext->playerFootstepVariant++ & 1) == 0
+                    ? "player_step_1.wav" : "player_step_2.wav";
+                PlayAmbientSoundEffect(*sceneContext, clip);
+                return 0;
+            }
+#endif
             if (wParam == 'R' && !sceneContext->simulationPaused)
             {
                 ResetRoute(*sceneContext);
@@ -1877,7 +2429,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             }
             if (!sceneContext->simulationPaused && wParam == VK_SPACE && (lParam & (1ll << 30)) == 0)
             {
-                sceneContext->combat.RequestAttack();
+                sceneContext->playerAttackRequested = true;
                 PlaySoundEffect(*sceneContext, "sword_swing_1.wav");
                 return 0;
             }
@@ -1909,7 +2461,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
     case WM_RBUTTONDOWN:
         if (sceneContext && sceneContext->controlsEnabled && !sceneContext->simulationPaused)
         {
-            sceneContext->combat.RequestAttack();
+            sceneContext->playerAttackRequested = true;
             PlaySoundEffect(*sceneContext, "sword_swing_2.wav");
             return 0;
         }

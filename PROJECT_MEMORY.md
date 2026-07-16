@@ -56,8 +56,8 @@ Last updated: 2026-07-16
 - Android also persists SFX enable/volume, look sensitivity, and compact HUD.
 - Windows persists SFX, sensitivity, display mode, and render scale beside the executable.
 - Android diagnostics report internal resolution, FPS, frame time, dispatch resolution, and honest RT presentation.
-- Thirteen FilmCow WAVs cover UI, sword, impacts/fall, quiet alternating player/skeleton footsteps, and skeleton attack.
-- Android uses SoundPool per-cue gain; Windows uses asynchronous WinMM playback with non-interrupting movement cues.
+- Seventeen FilmCow WAVs cover UI, sword, normalized alternating player/skeleton footsteps, skeleton attack, and lich charge/impact/fall/hurt reactions.
+- Android uses SoundPool per-cue gain; Windows uses XAudio2 per-voice matrices with WinMM fallback.
 
 ## Validated Android release state
 
@@ -97,6 +97,7 @@ Last updated: 2026-07-16
 - Shared RT scene: `src/vulkan/raytracing/PresentableTinyRtScene.cpp`
 - Raygen source: `shaders/raytracing/minimal.rgen`
 - Embedded raygen: `src/vulkan/raytracing/MinimalRayGenShader.inc`
+- Shared showcase route: `src/gameplay/ShowcaseRoute.h`
 - Collision/combat: `src/gameplay/CorridorCollision.h`, `src/gameplay/SwordCombat.h`
 - Licences: `ASSET_LICENSES.md`
 - Release readiness: `docs/ALPHA_RELEASE_READINESS_2026-07-15.md`
@@ -106,9 +107,18 @@ Last updated: 2026-07-16
 
 1. Preserve the published alpha and its stable signing identity.
 2. Back up the JKS and both passwords independently.
-3. Build the coloured-light route in bounded slices: lower body/lantern drop, zig-zag shadow corridor, blue skylight, bay-selected coloured torches, bounded coloured transmission, one hero mirror, optional measured shallow water, and an emissive reskin/replacement in the existing enemy slot.
+3. Slice A route blockout is complete. Continue in bounded slices with lower body/lantern drop, zig-zag shadows and blue skylight, bay-selected coloured torches, bounded coloured transmission, one hero mirror, optional measured shallow water, and an emissive reskin/replacement in the existing enemy slot.
 4. Gate each meaningful renderer change on the phone at the recommended quality tier; report 100% separately.
 5. Keep real RT and honest diagnostics. Reduce bounded effect area/ray cost before expanding gameplay or substituting fake effects.
+
+## Showcase route blockout - 2026-07-16
+
+- The original room, material gallery, skeleton encounter, controls, reset, and shader path remain intact.
+- A shared route definition now owns walkable rectangles, preserved obstacles, spawn/room coordinates, showcase zones, and the pure position-to-zone query for both platforms.
+- The route extends through a three-turn shadow corridor, physical-aperture skylight chamber, four unlit torch bays, empty transmission frame, and dry empty finale with a mirror surround.
+- Collision resolves from previous to proposed position with swept union checks and X/Z wall sliding; `ShowcaseRouteSmoke` covers every zone, corners, shortcuts, the old far wall, and preserved obstacles.
+- Windows Debug/Release tests and the Android debug build/install passed. Strict ASTC and honest RT swapchain presentation were observed on `SM-S948B`; see `docs/SHOWCASE_ROUTE_BLOCKOUT_VALIDATION_2026-07-16.md` for evidence and the remaining manual performance sweep.
+- Hands-on feedback added a raised masonry skylight shaft plus a skeleton arena leash and collision-aware movement. Directional attenuation, distance rolloff, and wall-aware audio remain an explicit follow-up rather than part of the geometry slice.
 
 ## Alpha refresh validation - 2026-07-16
 
@@ -118,3 +128,13 @@ Last updated: 2026-07-16
 - Windows carries a Per-Monitor V2 manifest, DPI-scaled layout/fonts, minimum sizing, and in-app credits. The freshly extracted package passed the full live sweep at the machine's active 125% scale.
 - The live itch page now directly credits FilmCow, Poly Haven, Hotstrike Studio, Meshy, CC BY 4.0, and the full licence manifest; Code and Graphics are selected in the AI disclosure.
 - Hotstrike public-source permission was requested at `https://itch.io/post/16578566`. Finished-game packaging remains permitted, but the public raw-GLB/history question is still pending their reply.
+
+## Windows-first complete showcase route - 2026-07-16
+
+- The playable route now sequences skeleton -> deterministic lantern gutter/drop -> bounded blue skylight -> yellow/blue/deep-red/restrained-green torch bays -> open framed threshold -> light-aware one-bounce hero mirror -> floating staff-lit lich -> post-death sliding skylight.
+- Player presence is complete with a reusable-BLAS leather pelvis, articulated thighs/shins/boots, procedural gait, exact retained hand grips, and reset-only lantern failure/lowered left arm.
+- `ShowcaseGameplay.h` owns deterministic lantern, lower-body, lighting, plural roster/director, and lich charge/recovery state. Only one skinned enemy is selected/rendered/refit at once; the capacity remains configurable for later Horde measurements.
+- The lich uses continuous living `Idle_02` and non-looping `Dead` clips; whole-instance hover/orbit replaces the visibly distorted walking clip. Its separate 48-byte UV stream, raw Windows KTX2, strict Android ASTC 6x6, derived violet emissive map, and forty skin-weighted staff vertices drive the visible staff light/electricity. It takes three hits with a two-second lockout; each accepted hit produces recoil plus a positional cry, and death opens the finale roof over 4.5 seconds.
+- Player travel and skeleton cadence now produce accepted audible footsteps. Skeleton and lich spatial cues share equal-power pan, distance rolloff, and route-obstruction attenuation through XAudio2 on Windows; compile-only SoundPool L/R integration remains on Android.
+- Windows Debug/Release and all five CTests pass, and the final hands-on Windows route/audio/combat verdict passed. Android `assembleDebug` passes for all configured ABIs; device presentation, visuals, thermal behavior, and performance remain explicitly pending until `SM-S948B` access returns. Label this state **Windows-validated / Android device validation pending**.
+- Preserve the latest raygen artifact recorded in `docs/HORDE_SHOWCASE_WINDOWS_VALIDATION_2026-07-16.md`. Do not publish the lich until the original CC0 source page or licence screenshot is retained.

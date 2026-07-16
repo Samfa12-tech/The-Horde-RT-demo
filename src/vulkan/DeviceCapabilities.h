@@ -51,7 +51,7 @@ struct PerformanceSnapshot
 struct RtSceneSnapshot
 {
     std::string status = "Not attempted";
-    std::string geometry = "Horde Lantern corridor with animated skeleton";
+    std::string geometry = "Complete Horde showcase route with sequential animated skeleton and staff-lit lich";
     std::uint32_t dispatchWidth = 0;
     std::uint32_t dispatchHeight = 0;
     bool presented = false;

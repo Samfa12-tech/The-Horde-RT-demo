@@ -351,6 +351,7 @@ struct SkeletonBipedModel::SourceVertex
 {
     Vec3 position;
     Vec3 normal;
+    std::array<float, 2u> texcoord{};
     std::array<std::uint8_t, 4u> joints{};
     std::array<float, 4u> weights{};
 };
@@ -378,6 +379,31 @@ struct SkeletonBipedModel::Clip
     bool loops = false;
 };
 
+const SkinnedClipSet& SkeletonCombatClipSet()
+{
+    static const SkinnedClipSet clips{{{
+        {"Idle_5", true, true},
+        {"Walking", true, true},
+        {"Attack", false, true},
+        {"Dead", false, true},
+    }}};
+    return clips;
+}
+
+const SkinnedClipSet& LichPlaceholderClipSet()
+{
+    // The source has no cast/attack animation. Leaving that slot optional is
+    // intentional; the finale can hold Idle while its analytic staff attack
+    // charges instead of pretending another clip is an authored cast.
+    static const SkinnedClipSet clips{{{
+        {"Idle_02", true, true},
+        {"Walking", true, true},
+        {"", false, false},
+        {"Dead", false, true},
+    }}};
+    return clips;
+}
+
 SkeletonBipedModel::SkeletonBipedModel() = default;
 SkeletonBipedModel::~SkeletonBipedModel() = default;
 SkeletonBipedModel::SkeletonBipedModel(SkeletonBipedModel&&) noexcept = default;
@@ -385,8 +411,14 @@ SkeletonBipedModel& SkeletonBipedModel::operator=(SkeletonBipedModel&&) noexcept
 
 bool SkeletonBipedModel::LoadCombatClips(const std::string& glbPath, std::string& diagnostic)
 {
+    return LoadClips(glbPath, SkeletonCombatClipSet(), diagnostic);
+}
+
+bool SkeletonBipedModel::LoadClips(const std::string& glbPath, const SkinnedClipSet& clipSet, std::string& diagnostic)
+{
     loaded_ = false;
-    vertices_.clear(); expandedIndices_.clear(); nodes_.clear(); joints_.clear(); inverseBindMatrices_.clear(); clips_.clear(); skinnedUniqueVertices_.clear();
+    hasTexcoords_ = false;
+    vertices_.clear(); expandedIndices_.clear(); nodes_.clear(); joints_.clear(); inverseBindMatrices_.clear(); clips_.clear(); skinnedUniqueVertices_.clear(); texturedSkinScratch_.clear();
     std::ifstream stream(glbPath, std::ios::binary);
     if (!stream)
     {
@@ -444,9 +476,10 @@ bool SkeletonBipedModel::LoadCombatClips(const std::string& glbPath, std::string
     }
     const JsonValue* position = attributes->Find("POSITION");
     const JsonValue* normal = attributes->Find("NORMAL");
+    const JsonValue* texcoord = attributes->Find("TEXCOORD_0");
     const JsonValue* joint = attributes->Find("JOINTS_0");
     const JsonValue* weight = attributes->Find("WEIGHTS_0");
-    Accessor positions, normals, joints, weights, indices;
+    Accessor positions, normals, texcoords, joints, weights, indices;
     if (position == nullptr || normal == nullptr || joint == nullptr || weight == nullptr ||
         !ReadAccessor(*accessors, *views, position->Uint(), positions, diagnostic) || !ReadAccessor(*accessors, *views, normal->Uint(), normals, diagnostic) ||
         !ReadAccessor(*accessors, *views, joint->Uint(), joints, diagnostic) || !ReadAccessor(*accessors, *views, weight->Uint(), weights, diagnostic) ||
@@ -456,11 +489,25 @@ bool SkeletonBipedModel::LoadCombatClips(const std::string& glbPath, std::string
         diagnostic = "Skeleton GLB mesh layout is not the audited derivative layout.";
         return false;
     }
+    if (texcoord != nullptr)
+    {
+        if (!ReadAccessor(*accessors, *views, texcoord->Uint(), texcoords, diagnostic) ||
+            texcoords.count != positions.count || texcoords.componentType != 5126u || texcoords.components != 2u)
+        {
+            diagnostic = "Skinned GLB TEXCOORD_0 layout is unsupported.";
+            return false;
+        }
+        hasTexcoords_ = true;
+    }
     vertices_.resize(positions.count);
     for (std::size_t i = 0u; i < vertices_.size(); ++i)
     {
         vertices_[i].position = {ReadFloat(binary, positions, i, 0u), ReadFloat(binary, positions, i, 1u), ReadFloat(binary, positions, i, 2u)};
         vertices_[i].normal = {ReadFloat(binary, normals, i, 0u), ReadFloat(binary, normals, i, 1u), ReadFloat(binary, normals, i, 2u)};
+        if (hasTexcoords_)
+        {
+            vertices_[i].texcoord = {ReadFloat(binary, texcoords, i, 0u), ReadFloat(binary, texcoords, i, 1u)};
+        }
         for (std::size_t component = 0u; component < 4u; ++component)
         {
             vertices_[i].joints[component] = static_cast<std::uint8_t>(ReadUnsigned(binary, joints, i, component));
@@ -509,14 +556,14 @@ bool SkeletonBipedModel::LoadCombatClips(const std::string& glbPath, std::string
     inverseBindMatrices_.resize(inverseBinds.count * 16u);
     for (std::size_t i = 0u; i < inverseBindMatrices_.size(); ++i) inverseBindMatrices_[i] = ReadFloat(binary, inverseBinds, i / 16u, i % 16u);
 
-    constexpr std::array<std::string_view, 4u> expectedNames{{"Idle_5", "Walking", "Attack", "Dead"}};
-    for (std::size_t clipIndex = 0u; clipIndex < expectedNames.size(); ++clipIndex)
+    for (std::size_t clipIndex = 0u; clipIndex < clipSet.clips.size(); ++clipIndex)
     {
+        const SkinnedClipBinding& binding = clipSet.clips[clipIndex];
         const JsonValue* sourceAnimation = nullptr;
-        for (const JsonValue& animation : *animations)
+        if (!binding.name.empty()) for (const JsonValue& animation : *animations)
         {
             const JsonValue* name = animation.Find("name");
-            if (name != nullptr && name->string == expectedNames[clipIndex])
+            if (name != nullptr && name->string == binding.name)
             {
                 sourceAnimation = &animation;
                 break;
@@ -524,19 +571,24 @@ bool SkeletonBipedModel::LoadCombatClips(const std::string& glbPath, std::string
         }
         if (sourceAnimation == nullptr)
         {
-            diagnostic = "Skeleton GLB is missing combat clip: " + std::string(expectedNames[clipIndex]);
-            return false;
+            if (binding.required)
+            {
+                diagnostic = "Skinned GLB is missing required clip: " + binding.name;
+                return false;
+            }
+            clips_.emplace_back();
+            continue;
         }
         const JsonValue* samplers = sourceAnimation->Find("samplers");
         const JsonValue* animationChannels = sourceAnimation->Find("channels");
         if (samplers == nullptr || animationChannels == nullptr)
         {
-            diagnostic = "Skeleton combat clip is incomplete: " + std::string(expectedNames[clipIndex]);
+            diagnostic = "Skinned clip is incomplete: " + binding.name;
             return false;
         }
 
         Clip clip;
-        clip.loops = clipIndex <= static_cast<std::size_t>(SkeletonClip::Walking);
+        clip.loops = binding.loops;
         for (const JsonValue& sourceChannel : animationChannels->array)
         {
             const JsonValue* samplerIndex = sourceChannel.Find("sampler");
@@ -568,7 +620,7 @@ bool SkeletonBipedModel::LoadCombatClips(const std::string& glbPath, std::string
         }
         if (clip.duration <= 0.0f || clip.channels.empty())
         {
-            diagnostic = "Skeleton combat clip contains no usable animation channels: " + std::string(expectedNames[clipIndex]);
+            diagnostic = "Skinned clip contains no usable animation channels: " + binding.name;
             return false;
         }
         clips_.push_back(std::move(clip));
@@ -578,18 +630,19 @@ bool SkeletonBipedModel::LoadCombatClips(const std::string& glbPath, std::string
     return true;
 }
 
-float SkeletonBipedModel::ClipDuration(SkeletonClip clip) const
+float SkeletonBipedModel::ClipDuration(SkinnedClip clip) const
 {
     const std::size_t index = static_cast<std::size_t>(clip);
     return index < clips_.size() ? clips_[index].duration : 0.0f;
 }
 
-bool SkeletonBipedModel::Skin(SkeletonClip clipId, float timeSeconds, std::vector<SkinnedRtVertex>& output, std::string& diagnostic) const
+bool SkeletonBipedModel::Skin(SkinnedClip clipId, float timeSeconds, std::vector<SkinnedRtVertex>& output, std::string& diagnostic) const
 {
     if (!loaded_) { diagnostic = "Skeleton model was not loaded."; return false; }
     const std::size_t clipIndex = static_cast<std::size_t>(clipId);
     if (clipIndex >= clips_.size()) { diagnostic = "Skeleton combat clip index is invalid."; return false; }
     const Clip& clip = clips_[clipIndex];
+    if (clip.channels.empty() || clip.duration <= 0.0f) { diagnostic = "Requested skinned clip is not mapped."; return false; }
     std::vector<Node> pose = nodes_;
     const float time = clip.loops
         ? std::fmod(std::max(timeSeconds, 0.0f), clip.duration)
@@ -659,6 +712,34 @@ bool SkeletonBipedModel::Skin(SkeletonClip clipId, float timeSeconds, std::vecto
     for (std::size_t outputIndex = 0u; outputIndex < expandedIndices_.size(); ++outputIndex)
         output[outputIndex] = skinnedUniqueVertices_[expandedIndices_[outputIndex]];
 
+    diagnostic.clear();
+    return true;
+}
+
+bool SkeletonBipedModel::SkinTextured(SkinnedClip clipId,
+                                      float timeSeconds,
+                                      std::vector<TexturedSkinnedRtVertex>& output,
+                                      std::string& diagnostic) const
+{
+    if (!hasTexcoords_)
+    {
+        diagnostic = "Skinned model has no TEXCOORD_0 stream.";
+        return false;
+    }
+    if (!Skin(clipId, timeSeconds, texturedSkinScratch_, diagnostic)) return false;
+    output.resize(texturedSkinScratch_.size());
+    for (std::size_t outputIndex = 0u; outputIndex < output.size(); ++outputIndex)
+    {
+        const SkinnedRtVertex& source = texturedSkinScratch_[outputIndex];
+        TexturedSkinnedRtVertex& destination = output[outputIndex];
+        std::copy(std::begin(source.position), std::end(source.position), std::begin(destination.position));
+        std::copy(std::begin(source.normal), std::end(source.normal), std::begin(destination.normal));
+        const auto& uv = vertices_[expandedIndices_[outputIndex]].texcoord;
+        destination.texcoord[0] = uv[0];
+        destination.texcoord[1] = uv[1];
+        destination.texcoord[2] = 0.0f;
+        destination.texcoord[3] = 0.0f;
+    }
     diagnostic.clear();
     return true;
 }

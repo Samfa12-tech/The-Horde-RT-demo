@@ -101,8 +101,19 @@ Copy-Item -LiteralPath (Join-Path $repoRoot "release\windows\README.txt") -Desti
 Copy-Item -LiteralPath (Join-Path $repoRoot "ASSET_LICENSES.md") -Destination (Join-Path $windowsStage "ASSET_LICENSES.md")
 Copy-Item -LiteralPath (Join-Path $repoRoot "docs\ALPHA_RELEASE_NOTES_2026-07-15.md") -Destination (Join-Path $windowsStage "ALPHA_RELEASE_NOTES.md")
 
+$lichLicenceEvidence = @(
+    (Join-Path $repoRoot "assets\models\enemies\meshy\lich_placeholder_source_licence.md"),
+    (Join-Path $repoRoot "assets\models\enemies\meshy\lich_placeholder_source_licence.png")
+) | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
+if ($null -eq $lichLicenceEvidence) {
+    throw "Lich public-package gate is unmet. Retain the original CC0 source URL or licence screenshot before packaging."
+}
+
 $assetCopies = @(
     @{ Source = "assets\models\enemies\meshy\skeleton_biped_merged_animations_v01.glb"; Destination = "assets\models\enemies\meshy" },
+    @{ Source = "assets\models\enemies\meshy\lich_placeholder_merged_animations_v01.glb"; Destination = "assets\models\enemies\meshy" },
+    @{ Source = "assets\textures\meshy\lich_placeholder_v01\base-color-2048-rgba8.ktx2"; Destination = "assets\textures\meshy\lich_placeholder_v01" },
+    @{ Source = "assets\textures\meshy\lich_placeholder_v01\emissive-2048-rgba8.ktx2"; Destination = "assets\textures\meshy\lich_placeholder_v01" },
     @{ Source = "assets\textures\polyhaven\mobile_1k\diff-array-512.rgba"; Destination = "assets\textures\polyhaven\mobile_1k" },
     @{ Source = "assets\textures\polyhaven\mobile_1k\normal-array-512.rgba"; Destination = "assets\textures\polyhaven\mobile_1k" },
     @{ Source = "assets\textures\polyhaven\mobile_1k\arm-array-512.rgba"; Destination = "assets\textures\polyhaven\mobile_1k" }
@@ -220,6 +231,9 @@ try {
         "README.txt",
         "ASSET_LICENSES.md",
         "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb",
+        "assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb",
+        "assets/textures/meshy/lich_placeholder_v01/base-color-2048-rgba8.ktx2",
+        "assets/textures/meshy/lich_placeholder_v01/emissive-2048-rgba8.ktx2",
         "assets/textures/polyhaven/mobile_1k/diff-array-512.rgba",
         "assets/audio/filmcow/sword_swing_1.wav"
     )) {

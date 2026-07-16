@@ -10,6 +10,8 @@ The first environment PBR batch is live under `polyhaven/mobile_1k/`.
 - Windows retains the raw RGBA fallback because desktop ASTC support is not assumed. Android reports an explicit unsupported diagnostic if its required ASTC formats are unavailable.
 - Regenerate the KTX2 derivatives with `tools/compile-material-textures.ps1` and validate their exact VkFormat headers before use.
 
+The active placeholder lich derivatives live under `meshy/lich_placeholder_v01/`. Windows uses 2K raw RGBA8 KTX2 files; Android requires strict ASTC 6x6 KTX2; the uncompressed KTX2 payload and derived violet preview form the audit chain without committing duplicate raw intermediates. Regenerate them with `tools/prepare-lich-textures.ps1`; the script intentionally refuses an unaudited source GLB.
+
 Texture rules:
 
 - Use commercial-safe high-quality PBR textures.

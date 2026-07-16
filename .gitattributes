@@ -1,3 +1,5 @@
 # Keep high-resolution source art out of normal Git history.
 *.glb filter=lfs diff=lfs merge=lfs -text
 *.png filter=lfs diff=lfs merge=lfs -text
+*.ktx2 filter=lfs diff=lfs merge=lfs -text
+*.rgba filter=lfs diff=lfs merge=lfs -text

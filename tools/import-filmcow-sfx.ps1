@@ -14,15 +14,23 @@ $clips = [ordered]@{
     "sword_hit_1.wav"   = "fencing hit 1.wav"
     "sword_hit_2.wav"   = "fencing hit 2.wav"
     "enemy_fall.wav"    = "body fall 1.wav"
-    "player_step_1.wav" = "footstep dirt 3.wav"
-    "player_step_2.wav" = "footstep dirt 4.wav"
+    "player_step_1.wav" = "footstep dirt 9.wav"
+    "player_step_2.wav" = "footstep dirt 14.wav"
     "skeleton_step_1.wav" = "footstep dirt 17.wav"
     "skeleton_step_2.wav" = "footstep dirt 18.wav"
     "skeleton_attack.wav" = "harpoon rattle.wav"
+    "lich_charge.wav"     = "air duster 5.wav"
+    "lich_impact.wav"     = "anvil hit 1.wav"
+    "lich_fall.wav"       = "body fall with lots of bass 4.wav"
+    "lich_hurt.wav"       = "body hit with grunt 3.wav"
 }
 
 function Convert-Pcm24ToPcm16 {
-    param([string]$InputPath, [string]$OutputPath)
+    param(
+        [string]$InputPath,
+        [string]$OutputPath,
+        [double]$TargetPeak = 0.0
+    )
 
     $reader = [System.IO.BinaryReader]::new([System.IO.File]::OpenRead($InputPath))
     try {
@@ -57,6 +65,21 @@ function Convert-Pcm24ToPcm16 {
         if (($data.Length % 3) -ne 0) { throw "Invalid 24-bit sample data length: $InputPath" }
 
         $sampleCount = [int]($data.Length / 3)
+        $scale = 1.0
+        if ($TargetPeak -gt 0.0) {
+            if ($TargetPeak -gt 0.95) { throw "TargetPeak must retain headroom (<= 0.95): $TargetPeak" }
+            $maximumMagnitude = 0
+            for ($i = 0; $i -lt $sampleCount; $i++) {
+                $offset24 = $i * 3
+                $value = [int]$data[$offset24] -bor ([int]$data[$offset24 + 1] -shl 8) -bor ([int]$data[$offset24 + 2] -shl 16)
+                if (($value -band 0x800000) -ne 0) { $value -= 0x1000000 }
+                $magnitude = if ($value -eq -8388608) { 8388608 } else { [Math]::Abs($value) }
+                if ($magnitude -gt $maximumMagnitude) { $maximumMagnitude = $magnitude }
+            }
+            if ($maximumMagnitude -gt 0) {
+                $scale = ($TargetPeak * 8388607.0) / $maximumMagnitude
+            }
+        }
         $pcm16 = [byte[]]::new($sampleCount * 2)
         for ($i = 0; $i -lt $sampleCount; $i++) {
             $offset24 = $i * 3
@@ -65,7 +88,8 @@ function Convert-Pcm24ToPcm16 {
             # which silently converted the original import to zero samples.
             $value = [int]$data[$offset24] -bor ([int]$data[$offset24 + 1] -shl 8) -bor ([int]$data[$offset24 + 2] -shl 16)
             if (($value -band 0x800000) -ne 0) { $value -= 0x1000000 }
-            $sample = [int16]($value -shr 8)
+            $scaled = [Math]::Round(($value * $scale) / 256.0)
+            $sample = [int16]([Math]::Max(-32768, [Math]::Min(32767, $scaled)))
             $bytes = [BitConverter]::GetBytes($sample)
             $pcm16[$i * 2] = $bytes[0]
             $pcm16[$i * 2 + 1] = $bytes[1]
@@ -101,7 +125,17 @@ foreach ($entry in $clips.GetEnumerator()) {
     $source = Join-Path $SourceRoot $entry.Value
     $destination = Join-Path $DestinationRoot $entry.Key
     if (-not (Test-Path -LiteralPath $source)) { throw "Missing FilmCow source clip: $source" }
-    Convert-Pcm24ToPcm16 -InputPath $source -OutputPath $destination
+    # The raw dirt contacts have substantially lower peaks than the UI and
+    # finale cues. Normalize both actor sets with 2.16 dB of headroom; runtime
+    # distance and spatial gains still set their place in the mix.
+    $targetPeak = if ($entry.Key -like "player_step_*.wav" -or $entry.Key -like "skeleton_step_*.wav") {
+        0.78
+    } elseif ($entry.Key -eq "lich_hurt.wav") {
+        0.84
+    } else {
+        0.0
+    }
+    Convert-Pcm24ToPcm16 -InputPath $source -OutputPath $destination -TargetPeak $targetPeak
     Write-Host "$($entry.Value) -> $($entry.Key)"
 }
 

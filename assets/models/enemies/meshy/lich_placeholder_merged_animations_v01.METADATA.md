@@ -4,7 +4,7 @@
 
 - User-supplied file: `C:\Users\sam_s\Downloads\Meshy_AI_Meshy_Merged_Animations.glb`.
 - Staged destination: `lich_placeholder_merged_animations_v01.glb`.
-- Role: proposed placeholder for the coloured-light route's final emissive enemy. It is staged source art only and is not selected by the runtime or release packaging.
+- Role: active placeholder for the coloured-light route's final emissive enemy in the Windows-first showcase goal. It is included in the debug Android compile package but has not been device-validated. The GLB already exists in public Git/LFS history; the new derived textures and active integration must not be pushed until the source-licence evidence below is retained.
 - Source size: 14,940,452 bytes.
 - SHA-256: `049979A83ACA55358F54AF8D3AF1F7D518607BEF634474A4EF015BFDFF947A42`.
 - glTF 2.0 / GLB v2, exported by Blender glTF I/O 4.2.57.
@@ -17,10 +17,10 @@
 - Vertex data includes position, normal, UV, joints, and weights. There are no morph targets.
 - One 24-joint skin named `Armature` using a conventional biped hierarchy.
 - One double-sided alpha-blended material named `Material_1`.
-- Two distinct embedded 2,048 x 2,048 RGBA PNGs: base colour and emissive.
+- Two separately encoded embedded 2,048 x 2,048 RGBA PNGs whose decoded pixels are identical (canonical top-left RGBA SHA-256 `5765579E0CE081C3BD2CDC62DF0900C7E92FAC679CB53DE9F1F6CA527CA464A1`). The alleged emissive image is therefore not a usable authored emissive map.
 - The material declares an emissive texture with factor `[1, 1, 1]`. It has no normal, metallic-roughness, or occlusion maps. Its specular extension contains the unusual colour factor `[2, 2, 2]`, which must be normalised or deliberately remapped during runtime import.
 
-The emissive map can provide visible glowing surfaces, but it does not make the model illuminate the room in the current renderer. The RT integration still needs one or a few bounded analytic light anchors whose position, colour, intensity, and animation state agree with the visible emissive regions.
+`tools/prepare-lich-textures.ps1` extracts the embedded base colour and derives a deliberately selective violet mask for the bright staff crystal and eye/gem candidates. Windows uses raw RGBA8 KTX2; Android selects strict ASTC 6x6 KTX2. The runtime UV audit identifies 40 emissive staff-crystal vertices and averages their animated positions, so the bounded violet light follows the real skin weights despite the missing staff bone.
 
 ## Animation clips
 
@@ -49,11 +49,11 @@ All nine clips key translation, rotation, and scale on all 24 joints. There is n
 
 ## Integration gates
 
-1. Confirm the user's Meshy account-plan/licence status before shipping. Until then, treat the asset as staged-only and use the conservative Meshy Free-plan CC BY 4.0 attribution path if public distribution is later approved.
-2. Inspect the emissive texture to identify which areas are intended to glow; do not assume the entire single material is a clean light mask.
+1. The approved project plan records the original source as CC0-derived, but the exact source page and Meshy account-plan terms have not yet been retained or independently verified. Before any further public distribution, add the original CC0 source URL or licence screenshot to the project record.
+2. The derived mask and textured runtime are now active on Windows. Replace the thresholded placeholder with an art-authored mask if the staff/eye selection needs polish.
 3. Map only visually acceptable clips. The current asset has no direct replacement for the skeleton's attack clip.
-4. Measure its 9,188-triangle 30 Hz skin/BLAS-refit cost on the target phone before replacing the skeleton.
-5. Keep it in the existing single-enemy slot. Do not package or activate both animated enemies concurrently by default.
+4. The 9,188-triangle model runs at a 30 Hz skin/BLAS-refit cadence on Windows. Measure it on the target phone before certifying the Android path.
+5. Keep it in the shared one-active-skinned-enemy slot. The roster remains plural/configurable, but skeleton and lich are not rendered together in this goal.
 6. If staff or robe deformation remains distracting in the final reveal, replace or re-rig the asset rather than expanding the runtime around a placeholder defect.
 
 ## Proposed credit if shipped

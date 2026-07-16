@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -7,6 +8,7 @@
 #include <vulkan/vulkan.h>
 
 #include "gameplay/SwordCombat.h"
+#include "gameplay/ShowcaseGameplay.h"
 #include "scene/SkeletonBipedModel.h"
 
 namespace horde::vulkan::raytracing
@@ -31,7 +33,9 @@ public:
                     VkExtent2D dispatchExtent,
                     VkFormat presentationFormat,
                     const std::string& skeletonAssetPath,
+                    const std::string& lichAssetPath,
                     const std::string& materialAssetDirectory,
+                    const std::string& lichTextureDirectory,
                     std::string& diagnostic);
 
     void Destroy();
@@ -53,6 +57,9 @@ public:
                              float walkAmount,
                              float outputExposure,
                              const horde::gameplay::CombatSnapshot& combat,
+                             const horde::gameplay::LanternSnapshot& lantern,
+                             const horde::gameplay::EnemyRosterSnapshot& roster,
+                             const horde::gameplay::LichSnapshot& lich,
                              std::string& diagnostic);
 
 private:
@@ -87,8 +94,16 @@ private:
                       std::string& diagnostic) const;
     bool CreateStorageImage(std::string& diagnostic);
     bool CreateTextureArray(const std::string& path, VkFormat format, TextureArray& texture, std::string& diagnostic);
+    bool CreateTexture(const std::string& path,
+                       VkFormat format,
+                       std::uint32_t width,
+                       std::uint32_t height,
+                       std::uint32_t layers,
+                       TextureArray& texture,
+                       std::string& diagnostic);
     bool SupportsTextureArrayFormat(VkFormat format) const;
     bool CreateMaterialTextures(const std::string& directory, std::string& diagnostic);
+    bool CreateLichTextures(const std::string& directory, std::string& diagnostic);
     bool BuildAccelerationStructures(std::string& diagnostic);
     bool CreateDescriptors(std::string& diagnostic);
     bool CreatePipeline(std::string& diagnostic);
@@ -101,6 +116,9 @@ private:
                                 float cameraZ,
                                 float walkAmount,
                                 const horde::gameplay::CombatSnapshot& combat,
+                                const horde::gameplay::LanternSnapshot& lantern,
+                                const horde::gameplay::EnemyRosterSnapshot& roster,
+                                const horde::gameplay::LichSnapshot& lich,
                                 std::string& diagnostic);
     bool RunOneTimeCommands(void (*record)(VkCommandBuffer, void*), void* userData, std::string& diagnostic) const;
     void DestroyBuffer(Buffer& buffer) const;
@@ -126,6 +144,8 @@ private:
     TextureArray materialDiffuse_;
     TextureArray materialNormal_;
     TextureArray materialArm_;
+    TextureArray lichBaseColor_;
+    TextureArray lichEmissive_;
     VkSampler materialSampler_ = VK_NULL_HANDLE;
     std::string materialEncoding_;
 
@@ -134,20 +154,29 @@ private:
     Buffer transformBuffer_;
     Buffer instanceBuffer_;
     Buffer skeletonVertexBuffer_;
+    Buffer lichVertexBuffer_;
     Buffer worldSurfaceBuffer_;
     AccelerationStructure blas_;
+    AccelerationStructure finaleRoofBlas_;
     AccelerationStructure torchBlas_;
     AccelerationStructure swordBlas_;
     AccelerationStructure playerBodyBlas_;
     AccelerationStructure playerLimbBlas_;
     AccelerationStructure skeletonBlas_;
+    AccelerationStructure lichBlas_;
     AccelerationStructure tlas_;
     Buffer skeletonBlasUpdateScratch_;
+    Buffer lichBlasUpdateScratch_;
     Buffer tlasUpdateScratch_;
     horde::scene::SkeletonBipedModel skeletonModel_;
+    horde::scene::SkinnedCharacterModel lichModel_;
     std::vector<horde::scene::SkinnedRtVertex> skeletonSkinnedVertices_;
+    std::vector<horde::scene::TexturedSkinnedRtVertex> lichSkinnedVertices_;
+    std::array<float, 3u> lichStaffLocalSample_{{0.94f, 0.79f, 0.64f}};
     float lastSkeletonUpdateTime_ = -1.0f;
     int lastSkeletonClip_ = -1;
+    float lastLichUpdateTime_ = -1.0f;
+    int lastLichClip_ = -1;
 
     VkDescriptorSetLayout descriptorSetLayout_ = VK_NULL_HANDLE;
     VkDescriptorPool descriptorPool_ = VK_NULL_HANDLE;

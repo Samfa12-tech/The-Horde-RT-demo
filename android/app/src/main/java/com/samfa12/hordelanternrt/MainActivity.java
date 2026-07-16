@@ -45,10 +45,16 @@ public class MainActivity extends Activity {
     private static final String JSON_REPORT_FILE = "vulkan_capability_report.json";
     private static final String SKELETON_ASSET = "models/enemies/meshy/skeleton_biped_merged_animations_v01.glb";
     private static final String SKELETON_FILE = "skeleton_biped_merged_animations_v01.glb";
+    private static final String LICH_ASSET = "models/enemies/meshy/lich_placeholder_merged_animations_v01.glb";
+    private static final String LICH_FILE = "lich_placeholder_merged_animations_v01.glb";
     private static final int AUDIO_EVENT_ENEMY_DEFEATED = 1;
     private static final int AUDIO_EVENT_PLAYER_FOOTSTEP = 1 << 1;
     private static final int AUDIO_EVENT_ENEMY_FOOTSTEP = 1 << 2;
     private static final int AUDIO_EVENT_ENEMY_ATTACK = 1 << 3;
+    private static final int AUDIO_EVENT_LICH_CHARGE = 1 << 4;
+    private static final int AUDIO_EVENT_LICH_IMPACT = 1 << 5;
+    private static final int AUDIO_EVENT_LICH_DEFEATED = 1 << 6;
+    private static final int AUDIO_EVENT_LICH_HIT = 1 << 7;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final float[] viewControls = {0.0f, 0.0f, 1.8f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
@@ -136,13 +142,16 @@ public class MainActivity extends Activity {
             final String jsonReport = ProbeBridge.getJsonReport();
             final String filesRoot = getFilesDir().getAbsolutePath();
             final boolean skeletonStaged = stageAsset(SKELETON_ASSET, SKELETON_FILE);
+            final boolean lichStaged = stageAsset(LICH_ASSET, LICH_FILE);
             for (final String legacy : new String[]{"diff-array-512.rgba", "normal-array-512.rgba", "arm-array-512.rgba"}) {
                 final File stale = new File(getFilesDir(), legacy);
                 if (stale.exists()) stale.delete();
             }
             final boolean materialsStaged = stageAsset("textures/polyhaven/mobile_1k/diff-array-512-astc6x6.ktx2", "diff-array-512-astc6x6.ktx2")
                     && stageAsset("textures/polyhaven/mobile_1k/normal-array-512-astc4x4.ktx2", "normal-array-512-astc4x4.ktx2")
-                    && stageAsset("textures/polyhaven/mobile_1k/arm-array-512-astc6x6.ktx2", "arm-array-512-astc6x6.ktx2");
+                    && stageAsset("textures/polyhaven/mobile_1k/arm-array-512-astc6x6.ktx2", "arm-array-512-astc6x6.ktx2")
+                    && stageAsset("textures/meshy/lich_placeholder_v01/base-color-2048-astc6x6.ktx2", "base-color-2048-astc6x6.ktx2")
+                    && stageAsset("textures/meshy/lich_placeholder_v01/emissive-2048-astc6x6.ktx2", "emissive-2048-astc6x6.ktx2");
             final boolean written = ProbeBridge.writeReports(filesRoot);
             final StringBuilder output = new StringBuilder(textReport).append('\n');
             if (textReport.contains("RT mode: Unsupported")) {
@@ -150,6 +159,7 @@ public class MainActivity extends Activity {
             }
             output.append("Reports written: ").append(written ? "yes" : "no").append('\n');
             output.append("Animated skeleton staged: ").append(skeletonStaged ? "yes" : "no").append('\n');
+            output.append("Animated lich placeholder staged: ").append(lichStaged ? "yes" : "no").append('\n');
             output.append("ASTC PBR material arrays staged: ").append(materialsStaged ? "yes" : "no").append('\n');
             output.append("Report directory: ").append(filesRoot).append('/').append(REPORT_DIRECTORY).append('\n');
             output.append("Report files: ").append(TEXT_REPORT_FILE).append(", ").append(JSON_REPORT_FILE).append('\n');
@@ -436,18 +446,34 @@ public class MainActivity extends Activity {
                 }
 
                 final int events = ProbeBridge.consumeAudioEvents();
+                final long enemyStereoGains = ProbeBridge.getEnemyAudioStereoGains();
                 if ((events & AUDIO_EVENT_ENEMY_DEFEATED) != 0) {
                     playSound((swingVariant & 1) == 0 ? "sword_hit_1" : "sword_hit_2", 0.32f);
                     handler.postDelayed(() -> playSound("enemy_fall", 0.24f), 140L);
                 }
                 if ((events & AUDIO_EVENT_PLAYER_FOOTSTEP) != 0) {
-                    playSound((playerStepVariant++ & 1) == 0 ? "player_step_1" : "player_step_2", 0.13f);
+                    playSound((playerStepVariant++ & 1) == 0 ? "player_step_1" : "player_step_2", 0.62f);
                 }
                 if ((events & AUDIO_EVENT_ENEMY_FOOTSTEP) != 0) {
-                    playSound((enemyStepVariant++ & 1) == 0 ? "skeleton_step_1" : "skeleton_step_2", 0.11f);
+                    playSpatialSound((enemyStepVariant++ & 1) == 0 ? "skeleton_step_1" : "skeleton_step_2",
+                            0.11f, enemyStereoGains);
                 }
                 if ((events & AUDIO_EVENT_ENEMY_ATTACK) != 0) {
-                    playSound("skeleton_attack", 0.22f);
+                    playSpatialSound("skeleton_attack", 0.22f, enemyStereoGains);
+                }
+                if ((events & AUDIO_EVENT_LICH_CHARGE) != 0) {
+                    playSpatialSound("lich_charge", 0.38f, enemyStereoGains);
+                }
+                if ((events & AUDIO_EVENT_LICH_IMPACT) != 0) {
+                    playSpatialSound("lich_impact", 0.55f, enemyStereoGains);
+                }
+                if ((events & AUDIO_EVENT_LICH_DEFEATED) != 0) {
+                    playSpatialSound("lich_fall", 0.28f, enemyStereoGains);
+                }
+                if ((events & AUDIO_EVENT_LICH_HIT) != 0) {
+                    // The hurt source includes its own impact; layering the
+                    // fencing hit masks the short vocal reaction.
+                    playSpatialSound("lich_hurt", 0.82f, enemyStereoGains);
                 }
                 if (diagnosticsVisible && ++diagnosticsRefreshTick >= 5) {
                     diagnosticsRefreshTick = 0;
@@ -489,6 +515,10 @@ public class MainActivity extends Activity {
         loadSound("skeleton_step_1", "audio/filmcow/skeleton_step_1.wav");
         loadSound("skeleton_step_2", "audio/filmcow/skeleton_step_2.wav");
         loadSound("skeleton_attack", "audio/filmcow/skeleton_attack.wav");
+        loadSound("lich_charge", "audio/filmcow/lich_charge.wav");
+        loadSound("lich_impact", "audio/filmcow/lich_impact.wav");
+        loadSound("lich_fall", "audio/filmcow/lich_fall.wav");
+        loadSound("lich_hurt", "audio/filmcow/lich_hurt.wav");
     }
 
     private void loadSound(final String key, final String assetPath) {
@@ -512,6 +542,16 @@ public class MainActivity extends Activity {
     }
 
     private void playSound(final String key, final float mixGain) {
+        playSound(key, mixGain, 1.0f, 1.0f);
+    }
+
+    private void playSpatialSound(final String key, final float mixGain, final long packedStereoGains) {
+        final float left = clamp(Float.intBitsToFloat((int) packedStereoGains), 0.0f, 1.0f);
+        final float right = clamp(Float.intBitsToFloat((int) (packedStereoGains >>> 32)), 0.0f, 1.0f);
+        playSound(key, mixGain, left, right);
+    }
+
+    private void playSound(final String key, final float mixGain, final float leftScale, final float rightScale) {
         if (soundPool == null || !preferences.getBoolean("sfx_enabled", true)) return;
         final Integer soundId = sounds.get(key);
         if (soundId == null) return;
@@ -522,8 +562,9 @@ public class MainActivity extends Activity {
             }
         }
         final float userGain = preferences.getInt("sfx_volume", 70) / 100.0f;
-        final float gain = clamp(userGain * mixGain, 0.0f, 1.0f);
-        final int streamId = soundPool.play(soundId, gain, gain, 1, 0, 1.0f);
+        final float leftGain = clamp(userGain * mixGain * leftScale, 0.0f, 1.0f);
+        final float rightGain = clamp(userGain * mixGain * rightScale, 0.0f, 1.0f);
+        final int streamId = soundPool.play(soundId, leftGain, rightGain, 1, 0, 1.0f);
         if (streamId == 0) Log.e(TAG, "SoundPool failed to play " + key);
     }
 

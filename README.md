@@ -27,7 +27,7 @@ The demo uses Vulkan acceleration structures, an RT pipeline and shader binding 
 - A low-poly held torch with wooden shaft, iron cage, and layered emissive flame volumes.
 - A camera-relative RT torso and articulated two-bone-IK arms holding a procedural torch and sword.
 - One Hotstrike Studio skeleton derivative, textured/rigged/animated with Meshy, using a narrow walk/attack/death/respawn loop.
-- Thirteen FilmCow UI, sword, impact, fall, player-footstep, skeleton-footstep, and skeleton-attack WAV cues.
+- Seventeen FilmCow UI, sword, movement, skeleton, and lich reaction/attack WAV cues.
 
 The signed Android APK contains the skeleton GLB, strict ASTC KTX2 material arrays, thirteen FilmCow WAVs, four ABI libraries, and launcher assets. The Windows ZIP contains `HordeLanternRT.exe`, an executable-relative `assets/` tree, release notes, controls, and `ASSET_LICENSES.md`.
 
@@ -146,8 +146,10 @@ Do not redistribute source assets as standalone asset packs. Preserve the public
 
 After raygen edits, run `tools/compile-raygen.ps1`. Keep one frame in flight while the held-prop TLAS uses host-written instance data. Preserve presentation-format-driven red/blue swapping on the 100% raw-copy path so warm fire does not render cyan.
 
-## Next route
+## Showcase route status
 
-The initial showing alpha is packaged and published. The next bounded visual route is described in `docs/COLOURED_LIGHT_ROUTE_PLAN_2026-07-15.md`: lower-body/lantern-drop staging, a zig-zag shadow corridor, blue skylight, bay-selected coloured torches, bounded coloured transmission, one hero mirror, and an emissive-model replacement in the existing one-enemy slot.
+The initial showing alpha remains the published build. The complete follow-on route is now Windows-validated: lower body and lantern drop, zig-zag shadows, blue skylight, bay-selected coloured torches, an open framed threshold, one hero mirror, and a sequential staff-lit lich finale with a post-death sliding skylight. Android device validation remains pending. See `docs/HORDE_SHOWCASE_WINDOWS_VALIDATION_2026-07-16.md`.
+
+Android shared code and strict ASTC assets compile into the debug APK, but this new route is not phone-validated or publicly released. Only one skinned enemy is animated/refit/rendered at a time; the plural roster remains configurable for future measured Horde work.
 
 The 75% setting is the sustained phone recommendation. Preserve real RT at the documented quality tier; reduce bounded effect area or ray cost before considering any broader feature expansion.

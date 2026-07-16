@@ -1,6 +1,6 @@
 # Asset Pipeline
 
-The runtime currently uses one animated skeleton, five CC0 Poly Haven material sets, thirteen FilmCow SFX clips, and project-created launcher/icon art. Keep future imports bounded, licensed, and measured so the Android RT path does not accumulate unsafe or unfinished content.
+The runtime currently uses animated skeleton/placeholder-lich assets, five CC0 Poly Haven material sets, seventeen FilmCow SFX clips, and project-created launcher/icon art. Keep future imports bounded, licensed, and measured so the Android RT path does not accumulate unsafe or unfinished content.
 
 ## Asset rules
 

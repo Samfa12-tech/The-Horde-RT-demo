@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <bit>
 #include <cmath>
 #include <chrono>
 #include <cerrno>
@@ -22,6 +23,8 @@
 
 #include "ui/DiagnosticOverlay.h"
 #include "gameplay/CorridorCollision.h"
+#include "gameplay/ShowcaseGameplay.h"
+#include "gameplay/SpatialAudio.h"
 #include "gameplay/SwordCombat.h"
 #include "vulkan/RtCapabilityReport.h"
 #include "vulkan/VulkanContext.h"
@@ -77,11 +80,17 @@ struct SwapchainContext
     float cameraZ = 1.85f;
     float moveStrafe = 0.0f;
     float moveForward = 0.0f;
-    float playerFootstepTime = 0.0f;
-    int enemyFootstepPhase = -1;
+    horde::gameplay::TravelFootstepCadence playerFootsteps;
+    horde::gameplay::PlayerFootstepCadence enemyFootsteps;
     float outputExposure = 0.92f;
     horde::gameplay::SwordCombat combat;
     horde::gameplay::CombatSnapshot combatSnapshot;
+    horde::gameplay::LanternSequence lanternSequence;
+    horde::gameplay::LanternSnapshot lanternSnapshot;
+    horde::gameplay::EnemyDirector enemyDirector;
+    horde::gameplay::LichEncounter lichEncounter;
+    horde::gameplay::EnemyKind activeEnemyKind = horde::gameplay::EnemyKind::Skeleton;
+    float lichDamageFlash = 0.0f;
     std::string reportDirectory;
     bool useRtPath = false;
     uint32_t currentFrame = 0u;
@@ -99,12 +108,35 @@ std::atomic<bool> gResetRequested{false};
 std::atomic<bool> gSimulationPaused{true};
 std::atomic<int> gRuntimeState{0}; // 0 starting/stopped, 1 honestly presented RT, 2 unsupported, 3 render error.
 std::atomic<uint32_t> gAudioEvents{0u};
+std::atomic<uint64_t> gEnemyAudioStereoGains{0u};
 std::atomic<float> gRequestedRenderScale{1.0f};
 
 constexpr uint32_t kAudioEventEnemyDefeated = 1u << 0u;
 constexpr uint32_t kAudioEventPlayerFootstep = 1u << 1u;
 constexpr uint32_t kAudioEventEnemyFootstep = 1u << 2u;
 constexpr uint32_t kAudioEventEnemyAttack = 1u << 3u;
+constexpr uint32_t kAudioEventLichCharge = 1u << 4u;
+constexpr uint32_t kAudioEventLichImpact = 1u << 5u;
+constexpr uint32_t kAudioEventLichDefeated = 1u << 6u;
+constexpr uint32_t kAudioEventLichHit = 1u << 7u;
+
+uint64_t PackStereoGains(float left, float right)
+{
+    return static_cast<uint64_t>(std::bit_cast<uint32_t>(left)) |
+           (static_cast<uint64_t>(std::bit_cast<uint32_t>(right)) << 32u);
+}
+
+void PublishEnemyAudioGains(const SwapchainContext& context)
+{
+    const float emitterX = context.activeEnemyKind == horde::gameplay::EnemyKind::Lich
+        ? context.lichEncounter.Snapshot().x : context.combatSnapshot.enemyX;
+    const float emitterZ = context.activeEnemyKind == horde::gameplay::EnemyKind::Lich
+        ? context.lichEncounter.Snapshot().z : context.combatSnapshot.enemyZ;
+    const horde::gameplay::SpatialAudioGains gains = horde::gameplay::CalculateSpatialAudio(
+        {emitterX, emitterZ, 1.0f, 1.0f, 14.0f},
+        {context.cameraX, context.cameraZ, context.cameraYaw});
+    gEnemyAudioStereoGains.store(PackStereoGains(gains.left, gains.right), std::memory_order_release);
+}
 
 std::string BuildDisplayText(const horde::vulkan::DeviceCapabilities& capabilities)
 {
@@ -752,6 +784,8 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
                                     renderExtent,
                                     context.swapchainFormat,
                                     context.reportDirectory + "/../skeleton_biped_merged_animations_v01.glb",
+                                    context.reportDirectory + "/../lich_placeholder_merged_animations_v01.glb",
+                                    context.reportDirectory + "/..",
                                     context.reportDirectory + "/..",
                                     diagnostic))
     {
@@ -933,10 +967,16 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             context.cameraZ = 1.85f;
             context.moveStrafe = 0.0f;
             context.moveForward = 0.0f;
-            context.playerFootstepTime = 0.0f;
-            context.enemyFootstepPhase = -1;
+            context.playerFootsteps.Reset();
+            context.enemyFootsteps.Reset();
             context.combat = {};
             context.combatSnapshot = {};
+            context.lanternSequence.Reset();
+            context.lanternSnapshot = {};
+            context.enemyDirector.Reset();
+            context.lichEncounter.Reset();
+            context.activeEnemyKind = horde::gameplay::EnemyKind::Skeleton;
+            context.lichDamageFlash = 0.0f;
         }
 
         const bool simulationPaused = gSimulationPaused.load(std::memory_order_acquire);
@@ -944,16 +984,11 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
         {
             context.walkTime += context.frameDeltaSeconds;
         }
-        if (gAttackRequested.exchange(false))
-        {
-            if (!simulationPaused)
-            {
-                context.combat.RequestAttack();
-            }
-        }
+        const bool playerAttackRequested = gAttackRequested.exchange(false) && !simulationPaused;
         const float moveAmount = simulationPaused
             ? 0.0f
             : std::clamp(std::abs(context.moveForward) + std::abs(context.moveStrafe), 0.0f, 1.0f);
+        float travelledThisFrame = 0.0f;
         if (moveAmount > 0.02f)
         {
             const float forwardX = std::sin(context.cameraYaw);
@@ -961,48 +996,108 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             const float rightX = std::cos(context.cameraYaw);
             const float rightZ = std::sin(context.cameraYaw);
             const float speed = 0.032f;
+            const float previousCameraX = context.cameraX;
+            const float previousCameraZ = context.cameraZ;
             context.cameraX += (forwardX * context.moveForward + rightX * context.moveStrafe) * speed;
             context.cameraZ += (forwardZ * context.moveForward + rightZ * context.moveStrafe) * speed;
-            horde::gameplay::ResolveCorridorPlayerCollision(context.cameraX, context.cameraZ);
-            context.playerFootstepTime += context.frameDeltaSeconds;
-            if (context.playerFootstepTime >= 0.46f)
+            horde::gameplay::ResolveCorridorPlayerCollision(previousCameraX, previousCameraZ, context.cameraX, context.cameraZ);
+            travelledThisFrame = std::hypot(context.cameraX - previousCameraX,
+                                             context.cameraZ - previousCameraZ);
+        }
+        if (context.playerFootsteps.Update(travelledThisFrame, moveAmount > 0.02f))
+        {
+            gAudioEvents.fetch_or(kAudioEventPlayerFootstep, std::memory_order_release);
+        }
+        context.enemyDirector.Update(context.cameraX, context.cameraZ);
+        const horde::gameplay::EnemyRosterSnapshot& roster = context.enemyDirector.Snapshot();
+        if (roster.selectedEnemy != context.activeEnemyKind)
+        {
+            context.activeEnemyKind = roster.selectedEnemy;
+            if (context.activeEnemyKind == horde::gameplay::EnemyKind::Skeleton)
             {
-                context.playerFootstepTime = std::fmod(context.playerFootstepTime, 0.46f);
-                gAudioEvents.fetch_or(kAudioEventPlayerFootstep, std::memory_order_release);
+                context.combat = {};
+                context.combatSnapshot = {};
+            }
+            else if (context.activeEnemyKind == horde::gameplay::EnemyKind::Lich)
+            {
+                context.lichEncounter.Reset();
             }
         }
-        else
+        bool lichHitRequested = false;
+        if (playerAttackRequested)
         {
-            context.playerFootstepTime = 0.0f;
+            // Keep the player sword animation independent of the selected enemy.
+            context.combat.RequestAttack();
+            lichHitRequested = context.activeEnemyKind == horde::gameplay::EnemyKind::Lich;
         }
         if (!simulationPaused)
         {
+            context.lanternSnapshot = context.lanternSequence.Update(
+                context.frameDeltaSeconds,
+                context.cameraX,
+                context.cameraZ,
+                context.cameraYaw,
+                context.cameraPitch);
             const horde::gameplay::EnemyAnimation previousAnimation = context.combatSnapshot.enemyAnimation;
             context.combatSnapshot = context.combat.Update(context.frameDeltaSeconds, context.cameraX, context.cameraZ, context.cameraYaw);
-            if (previousAnimation != horde::gameplay::EnemyAnimation::Dead &&
+            if (context.activeEnemyKind == horde::gameplay::EnemyKind::Skeleton &&
+                previousAnimation != horde::gameplay::EnemyAnimation::Dead &&
                 context.combatSnapshot.enemyAnimation == horde::gameplay::EnemyAnimation::Dead)
             {
                 gAudioEvents.fetch_or(kAudioEventEnemyDefeated, std::memory_order_release);
             }
-            if (previousAnimation != horde::gameplay::EnemyAnimation::Attack &&
+            if (context.activeEnemyKind == horde::gameplay::EnemyKind::Skeleton &&
+                previousAnimation != horde::gameplay::EnemyAnimation::Attack &&
                 context.combatSnapshot.enemyAnimation == horde::gameplay::EnemyAnimation::Attack)
             {
                 gAudioEvents.fetch_or(kAudioEventEnemyAttack, std::memory_order_release);
             }
-            if (context.combatSnapshot.enemyAnimation == horde::gameplay::EnemyAnimation::Walking)
+            const bool skeletonWalking = context.activeEnemyKind == horde::gameplay::EnemyKind::Skeleton &&
+                                         context.combatSnapshot.enemyAnimation == horde::gameplay::EnemyAnimation::Walking;
+            if (context.enemyFootsteps.Update(context.frameDeltaSeconds, skeletonWalking))
             {
-                const int footstepPhase = static_cast<int>(std::floor(context.combatSnapshot.enemyAnimationTime * 0.90f / 0.52f));
-                if (context.enemyFootstepPhase >= 0 && footstepPhase != context.enemyFootstepPhase)
-                {
-                    gAudioEvents.fetch_or(kAudioEventEnemyFootstep, std::memory_order_release);
-                }
-                context.enemyFootstepPhase = footstepPhase;
-            }
-            else
-            {
-                context.enemyFootstepPhase = -1;
+                gAudioEvents.fetch_or(kAudioEventEnemyFootstep, std::memory_order_release);
             }
         }
+        const bool finaleActive = horde::gameplay::QueryShowcaseZone(context.cameraX, context.cameraZ) ==
+                                  horde::gameplay::ShowcaseZone::Finale;
+        const horde::gameplay::LichPhase previousLichPhase = context.lichEncounter.Snapshot().phase;
+        const horde::gameplay::LichSnapshot& lich = context.lichEncounter.Update(
+            !simulationPaused && context.activeEnemyKind == horde::gameplay::EnemyKind::Lich ? context.frameDeltaSeconds : 0.0f,
+            context.cameraX,
+            context.cameraZ,
+            !horde::gameplay::IsRouteAudioObstructed(context.cameraX, context.cameraZ,
+                                                      context.lichEncounter.Snapshot().x,
+                                                      context.lichEncounter.Snapshot().z),
+            context.activeEnemyKind == horde::gameplay::EnemyKind::Lich && finaleActive);
+        if (lichHitRequested && context.lichEncounter.TryAcceptPlayerHit(context.cameraX, context.cameraZ))
+        {
+            gAudioEvents.fetch_or(kAudioEventLichHit, std::memory_order_release);
+            if (lich.phase == horde::gameplay::LichPhase::Dead)
+            {
+                gAudioEvents.fetch_or(kAudioEventLichDefeated, std::memory_order_release);
+            }
+        }
+        if (context.activeEnemyKind == horde::gameplay::EnemyKind::Lich &&
+            previousLichPhase != horde::gameplay::LichPhase::Charging &&
+            lich.phase == horde::gameplay::LichPhase::Charging)
+        {
+            gAudioEvents.fetch_or(kAudioEventLichCharge, std::memory_order_release);
+        }
+        if (context.activeEnemyKind == horde::gameplay::EnemyKind::Lich &&
+            lich.deathAnimationComplete)
+        {
+            context.enemyDirector.MarkSelectedDead();
+        }
+        context.lichDamageFlash = std::max(0.0f, context.lichDamageFlash - context.frameDeltaSeconds * 2.8f);
+        if (lich.damagePulse)
+        {
+            context.lichDamageFlash = 1.0f;
+            gAudioEvents.fetch_or(kAudioEventLichImpact, std::memory_order_release);
+        }
+        horde::gameplay::CombatSnapshot renderCombat = context.combatSnapshot;
+        renderCombat.damageFlash = std::max(renderCombat.damageFlash, context.lichDamageFlash);
+        PublishEnemyAudioGains(context);
         std::string diagnostic;
         if (!context.rtScene.RecordTraceAndCopy(context.commandBuffers[imageIndex],
                                                 context.swapchainImages[imageIndex],
@@ -1010,13 +1105,16 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
                                                 context.swapchainExtent,
                                                 context.cameraYaw,
                                                 context.cameraPitch,
-                                                context.lanternStrength,
+                                                context.lanternStrength * context.lanternSnapshot.flameStrength,
                                                 context.walkTime,
                                                 context.cameraX,
                                                 context.cameraZ,
                                                 moveAmount,
                                                 context.outputExposure,
-                                                context.combatSnapshot,
+                                                renderCombat,
+                                                context.lanternSnapshot,
+                                                roster,
+                                                lich,
                                                 diagnostic))
         {
             __android_log_print(ANDROID_LOG_ERROR, kTag, "Failed to record RT frame: %s", diagnostic.c_str());
@@ -1168,7 +1266,7 @@ void SwapchainRenderLoop()
         {
             gSwapchainContext.capabilities.rtScene.presented = true;
             gSwapchainContext.capabilities.rtScene.status = "Presented via swapchain";
-            gSwapchainContext.capabilities.rtScene.geometry = "Horde Lantern corridor with animated skeleton";
+            gSwapchainContext.capabilities.rtScene.geometry = "Complete Horde showcase route with sequential animated skeleton and staff-lit lich";
             gSwapchainContext.capabilities.rtScene.dispatchWidth = gSwapchainContext.rtScene.DispatchExtent().width;
             gSwapchainContext.capabilities.rtScene.dispatchHeight = gSwapchainContext.rtScene.DispatchExtent().height;
             gSwapchainContext.capabilities.performance.internalRenderWidth = gSwapchainContext.capabilities.rtScene.dispatchWidth;
@@ -1219,6 +1317,7 @@ bool StartSurfaceInternal(ANativeWindow* window,
     context.clearColor = ClearColorForMode(capabilities.rtMode);
     gRuntimeState.store(context.useRtPath ? 0 : 2, std::memory_order_release);
     gAudioEvents.store(0u, std::memory_order_release);
+    gEnemyAudioStereoGains.store(0u, std::memory_order_release);
 
     if (!CreateInstance(context.instance))
     {
@@ -1469,4 +1568,10 @@ extern "C" JNIEXPORT jint JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_consumeAudioEvents(JNIEnv*, jclass)
 {
     return static_cast<jint>(gAudioEvents.exchange(0u, std::memory_order_acq_rel));
+}
+
+extern "C" JNIEXPORT jlong JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getEnemyAudioStereoGains(JNIEnv*, jclass)
+{
+    return static_cast<jlong>(gEnemyAudioStereoGains.load(std::memory_order_acquire));
 }

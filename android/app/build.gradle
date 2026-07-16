@@ -11,9 +11,12 @@ def releaseKeyPassword = System.getenv('HORDE_RELEASE_KEY_PASSWORD')
 tasks.register('prepareRuntimeAssets', Sync) {
     from('../../assets') {
         include 'models/enemies/meshy/skeleton_biped_merged_animations_v01.glb'
+        include 'models/enemies/meshy/lich_placeholder_merged_animations_v01.glb'
         include 'textures/polyhaven/mobile_1k/diff-array-512-astc6x6.ktx2'
         include 'textures/polyhaven/mobile_1k/normal-array-512-astc4x4.ktx2'
         include 'textures/polyhaven/mobile_1k/arm-array-512-astc6x6.ktx2'
+        include 'textures/meshy/lich_placeholder_v01/base-color-2048-astc6x6.ktx2'
+        include 'textures/meshy/lich_placeholder_v01/emissive-2048-astc6x6.ktx2'
         include 'audio/filmcow/*.wav'
     }
     into runtimeAssetsDir

@@ -62,6 +62,8 @@ Legs are promoted from deferred polish to a prerequisite for the new route becau
 
 ### Slice A - route blockout and light choreography
 
+Implemented on 2026-07-16 as the geometry-only route blockout. The shared route, collision contract, host smoke test, platform builds, and device evidence are recorded in `SHOWCASE_ROUTE_BLOCKOUT_VALIDATION_2026-07-16.md`. Coloured lights and all new shader behavior remain deferred.
+
 - Greybox the zig-zag, skylight room, torch bays, transmission threshold, and final room.
 - Define trigger volumes, reset behaviour, collision, approximate five-metre spacing, and which light is active in each bay.
 - Validate that the full walk reads at the current lighting cost before adding new renderer behavior.
@@ -133,7 +135,7 @@ Other low-cost showcase ideas worth considering after the core route works:
 
 ## Remaining enemy decisions
 
-- Inspect the embedded emissive texture and decide which surfaces should glow and whether their colour/intensity changes by animation state.
-- Choose visually acceptable clips. The asset has idle, walk, running, turning, pain/fall, and death animation, but no dedicated attack, cast, or staff clip.
-- Is the intended finale a replacement for the skeleton, or is the skeleton seen earlier and despawned before the emissive enemy becomes active?
-- What is the mobile triangle/texture budget after measuring the completed route?
+- Resolved for the Windows-first goal: glow is limited to the derived staff/eye/gem selection; 40 audited staff-crystal vertices anchor the violet analytic light.
+- Resolved clips: `Idle_02`, `Walking`, and `Dead`; the missing cast clip remains unmapped and charge timing is procedural.
+- Resolved encounter order: the skeleton is seen first, the skylight gate selects/resets the lich, and only one skinned enemy is rendered/refit at once.
+- Still pending: measure the completed 9,188-triangle/2K-ASTC lich route on `SM-S948B` before certifying the mobile budget or raising the active-enemy count.

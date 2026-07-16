@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <cmath>
 
+#include "gameplay/CorridorCollision.h"
+
 namespace horde::gameplay
 {
 
@@ -39,6 +41,7 @@ public:
     {
         deltaSeconds = std::clamp(deltaSeconds, 0.0f, 0.05f);
         damageFlash_ = std::max(0.0f, damageFlash_ - deltaSeconds * 2.8f);
+        walkAnimationHold_ = std::max(0.0f, walkAnimationHold_ - deltaSeconds);
 
         if (attackQueued_ && swordTime_ >= kSwordDuration)
         {
@@ -61,7 +64,10 @@ public:
         const float toPlayerX = playerX - enemyX_;
         const float toPlayerZ = playerZ - enemyZ_;
         const float distance = std::sqrt(toPlayerX * toPlayerX + toPlayerZ * toPlayerZ);
-        if (distance > 0.0001f)
+        const ShowcaseZone playerZone = QueryShowcaseZone(playerX, playerZ);
+        const bool playerInsideEnemyArena = playerZone == ShowcaseZone::Opening ||
+                                            playerZone == ShowcaseZone::SkeletonRoom;
+        if (playerInsideEnemyArena && distance > 0.0001f)
         {
             // The staged skeleton's authored forward direction is +Z.
             enemyFacing_ = std::atan2(toPlayerX, toPlayerZ);
@@ -88,15 +94,36 @@ public:
         switch (phase_)
         {
         case EnemyPhase::Approach:
-            if (distance > 1.28f)
+            if (!playerInsideEnemyArena)
+            {
+                walkAnimationHold_ = 0.0f;
+                snapshot_.enemyAnimation = EnemyAnimation::Idle;
+            }
+            else if (distance > 1.28f)
             {
                 const float step = std::min(distance - 1.28f, kEnemyWalkSpeed * deltaSeconds);
-                enemyX_ += toPlayerX / std::max(distance, 0.0001f) * step;
-                enemyZ_ += toPlayerZ / std::max(distance, 0.0001f) * step;
-                snapshot_.enemyAnimation = EnemyAnimation::Walking;
+                float proposedEnemyX = enemyX_ + toPlayerX / std::max(distance, 0.0001f) * step;
+                float proposedEnemyZ = enemyZ_ + toPlayerZ / std::max(distance, 0.0001f) * step;
+                ResolveSkeletonEnemyCollision(enemyX_, enemyZ_, proposedEnemyX, proposedEnemyZ);
+                const bool moved = std::abs(proposedEnemyX - enemyX_) > 0.00001f ||
+                                   std::abs(proposedEnemyZ - enemyZ_) > 0.00001f;
+                enemyX_ = proposedEnemyX;
+                enemyZ_ = proposedEnemyZ;
+                // Collision sliding can alternate between a tiny accepted step
+                // and a rejected step at a wall/post. Preserve locomotion for a
+                // short no-motion grace period so that geometric jitter cannot
+                // thrash the skinned clip between Walking and Idle every frame.
+                if (moved)
+                {
+                    walkAnimationHold_ = kWalkAnimationHold;
+                }
+                snapshot_.enemyAnimation = walkAnimationHold_ > 0.0f
+                    ? EnemyAnimation::Walking
+                    : EnemyAnimation::Idle;
             }
             else
             {
+                walkAnimationHold_ = 0.0f;
                 phase_ = EnemyPhase::Attack;
                 phaseTime_ = 0.0f;
                 animationTime_ = 0.0f;
@@ -105,6 +132,16 @@ public:
             }
             break;
         case EnemyPhase::Attack:
+            if (!playerInsideEnemyArena)
+            {
+                walkAnimationHold_ = 0.0f;
+                phase_ = EnemyPhase::Approach;
+                phaseTime_ = 0.0f;
+                animationTime_ = 0.0f;
+                playerHitApplied_ = false;
+                snapshot_.enemyAnimation = EnemyAnimation::Idle;
+                break;
+            }
             snapshot_.enemyAnimation = EnemyAnimation::Attack;
             if (!playerHitApplied_ && phaseTime_ >= 1.12f && distance <= 1.55f)
             {
@@ -153,12 +190,14 @@ private:
         phase_ = EnemyPhase::Approach;
         phaseTime_ = 0.0f;
         animationTime_ = 0.0f;
+        walkAnimationHold_ = kWalkAnimationHold;
         playerHitApplied_ = false;
         snapshot_.enemyAnimation = EnemyAnimation::Walking;
     }
 
     static constexpr float kSwordDuration = 0.56f;
     static constexpr float kEnemyWalkSpeed = 0.62f;
+    static constexpr float kWalkAnimationHold = 0.24f;
     static constexpr float kEnemyAttackDuration = 2.80f;
     static constexpr float kEnemyDeadDuration = 2.967f;
     static constexpr float kRespawnHold = 0.85f;
@@ -172,6 +211,7 @@ private:
     float animationTime_ = 0.0f;
     float swordTime_ = kSwordDuration;
     float damageFlash_ = 0.0f;
+    float walkAnimationHold_ = kWalkAnimationHold;
     bool attackQueued_ = false;
     bool swordHitConsumed_ = false;
     bool playerHitApplied_ = false;
