@@ -1,5 +1,5 @@
 param(
-    [string]$Version = "0.1.0-alpha.1",
+    [string]$Version = "0.1.1-alpha.1",
     [ValidateSet("Both", "Windows", "Android")]
     [string]$Channels = "Both",
     [switch]$ConfirmPush,
@@ -7,6 +7,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+$expectedCertificateSha256 = "8245277a11bca5576f116724507f799d6f4c178ce5fbb7e3981415c9e6b3c245"
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 $candidateRoot = [IO.Path]::GetFullPath((Join-Path $repoRoot "releases\candidates"))
 $safeVersion = $Version -replace '[^0-9A-Za-z.-]', '-'
@@ -34,6 +35,10 @@ if ($Channels -in @("Both", "Android")) {
     $verification = & $apksigner verify --verbose --print-certs $androidApk 2>&1
     if ($LASTEXITCODE -ne 0) { throw "apksigner rejected the Android candidate.`n$verification" }
     if ($verification -match "CN=Android Debug") { throw "Refusing to publish an Android Debug certificate." }
+    $certificateMatch = [regex]::Match(($verification | Out-String), 'certificate SHA-256 digest:\s*([0-9a-fA-F]+)')
+    if (-not $certificateMatch.Success -or $certificateMatch.Groups[1].Value.ToLowerInvariant() -ne $expectedCertificateSha256) {
+        throw "Refusing to publish an APK that is not signed by the established Horde release certificate."
+    }
     & $zipalign -c -P 16 -v 4 $androidApk | Out-Null
     if ($LASTEXITCODE -ne 0) { throw "Refusing an Android candidate without 16 KiB APK alignment." }
 

@@ -1,14 +1,14 @@
-HORDE LANTERN RT - INITIAL SHOWING ALPHA 0.1.0
-================================================
+HORDE LANTERN RT - SHOWCASE ALPHA 0.1.1
+=======================================
 
-This is a native Vulkan hardware ray-tracing technology demo from Samfa12.
+This is a native Vulkan hardware-ray-tracing technology demo from Samfa12.
 There is no raster, browser, or fake-RT fallback.
 
 WINDOWS REQUIREMENTS
 - Windows 10 or 11, 64-bit
 - A Vulkan driver exposing VK_KHR_ray_tracing_pipeline and the required
-  acceleration-structure / buffer-device-address features
-- Tested target: NVIDIA GeForce RTX 5050 Laptop GPU
+  acceleration-structure and buffer-device-address features
+- Validated target: NVIDIA GeForce RTX 5050 Laptop GPU
 
 CONTROLS
 - WASD: move and strafe
@@ -33,19 +33,23 @@ The reports folder is created beside the executable after launch.
 If the required hardware RT path is unavailable, the demo shows diagnostics
 and does not silently start a fallback renderer.
 
-ALPHA CONTENT
-- Torch-lit historical-gothic corridor and materials gallery
+SHOWCASE CONTENT
+- Skeleton encounter followed by a three-turn shadow corridor
+- Authored lantern gutter, drop, and first-person body transition
+- Blue skylight chamber and four bay-selected coloured torch environments
+- Open framed threshold, wet stone, and a single-bounce hero mirror
+- Floating staff-lit lich finale with violet charge electricity, three-hit combat,
+  hit recoil/cry, death animation, and a post-defeat sliding roof aperture
 - Native Vulkan BLAS/TLAS, RT pipeline/SBT and vkCmdTraceRaysKHR presentation
 - Phone-safe ray-query shading work inside raygen
-- Wet stone, PBR material arrays, mirror-routing groundwork, player body,
-  held torch/sword, one animated skeleton and a small combat loop
-- FilmCow UI, combat, footstep and skeleton-attack sound effects
+- Seventeen FilmCow UI, combat, movement, skeleton, and lich sound cues
 - Help > Credits & licences carries the main attribution inside the executable
 
 KNOWN ALPHA LIMITS
-- This is the corridor/material-gallery initial showing, not the completed
-  60-90 second mirror/glass/final-crypt showcase.
-- Only the tested RT-capable hardware paths are supported.
+- One skinned enemy is rendered and animated at a time.
+- The lich is a CC0 Meshy placeholder with visible source-rig limitations.
+- Water, simultaneous hordes, and the staged textured sword remain deferred.
+- Only tested RT-capable hardware paths are supported.
 - See ASSET_LICENSES.md and ALPHA_RELEASE_NOTES.md.
 
 Website: https://samfa12.com

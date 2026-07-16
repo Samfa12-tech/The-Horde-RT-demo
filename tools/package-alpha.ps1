@@ -1,5 +1,5 @@
 param(
-    [string]$Version = "0.1.0-alpha.1",
+    [string]$Version = "0.1.1-alpha.1",
     [ValidateSet("Release", "Debug")]
     [string]$WindowsConfiguration = "Release",
     [string]$OutputRoot = (Join-Path $PSScriptRoot "..\releases\candidates")
@@ -53,6 +53,13 @@ $releaseSigningValues = @(
 $releaseSigningConfigured = @($releaseSigningValues | Where-Object { [string]::IsNullOrWhiteSpace($_) }).Count -eq 0
 $stageRoot = Join-Path $outputFull "stage"
 $windowsStage = Join-Path $stageRoot "$baseName-Windows-x64"
+$candidateFiles = @(
+    (Join-Path $outputFull "$baseName-Windows-x64.zip"),
+    (Join-Path $outputFull "$baseName-Android-preview-debug-signed.apk"),
+    (Join-Path $outputFull "$baseName-Android.apk"),
+    (Join-Path $outputFull "$baseName-Android-UNSIGNED-DO-NOT-PUBLISH.apk"),
+    (Join-Path $outputFull "SHA256SUMS.txt")
+)
 
 foreach ($path in @($stageRoot, $outputFull)) {
     if (Test-Path -LiteralPath $path) {
@@ -65,14 +72,20 @@ foreach ($path in @($stageRoot, $outputFull)) {
 if (Test-Path -LiteralPath $stageRoot) {
     Remove-Item -LiteralPath $stageRoot -Recurse -Force
 }
+foreach ($candidateFile in $candidateFiles) {
+    if (Test-Path -LiteralPath $candidateFile) {
+        Remove-Item -LiteralPath $candidateFile -Force
+    }
+}
 New-Item -ItemType Directory -Force -Path $windowsStage | Out-Null
 
 & $cmake -S $repoRoot -B (Join-Path $repoRoot "build") -G "Visual Studio 17 2022" -A x64
 if ($LASTEXITCODE -ne 0) { throw "CMake configure failed." }
-& $cmake --build (Join-Path $repoRoot "build") --config $WindowsConfiguration --target horde_rt_diagnostic_window horde_rt_combat_smoke
+& $cmake --build (Join-Path $repoRoot "build") --config $WindowsConfiguration
 if ($LASTEXITCODE -ne 0) { throw "Windows build failed." }
-& (Join-Path $repoRoot "build\$WindowsConfiguration\horde_rt_combat_smoke.exe")
-if ($LASTEXITCODE -ne 0) { throw "Combat smoke test failed." }
+$ctest = Join-Path (Split-Path -Parent $cmake) "ctest.exe"
+& $ctest --test-dir (Join-Path $repoRoot "build") -C $WindowsConfiguration --output-on-failure
+if ($LASTEXITCODE -ne 0) { throw "Windows CTest suite failed." }
 
 $windowsExe = Join-Path $repoRoot "build\$WindowsConfiguration\HordeLanternRT.exe"
 $windowsSdkBin = Join-Path ${env:ProgramFiles(x86)} "Windows Kits\10\bin"
@@ -96,10 +109,14 @@ foreach ($creditMarker in @("credits and licences", "Hotstrike Studio", "FilmCow
         throw "Windows executable is missing in-app credit marker: $creditMarker"
     }
 }
+$windowsVersion = (Get-Item -LiteralPath $windowsExe).VersionInfo
+if ($windowsVersion.FileVersion -ne $Version -or $windowsVersion.ProductVersion -ne $Version) {
+    throw "Windows executable version mismatch: file=$($windowsVersion.FileVersion), product=$($windowsVersion.ProductVersion), expected=$Version"
+}
 Copy-Item -LiteralPath $windowsExe -Destination (Join-Path $windowsStage "HordeLanternRT.exe")
 Copy-Item -LiteralPath (Join-Path $repoRoot "release\windows\README.txt") -Destination (Join-Path $windowsStage "README.txt")
 Copy-Item -LiteralPath (Join-Path $repoRoot "ASSET_LICENSES.md") -Destination (Join-Path $windowsStage "ASSET_LICENSES.md")
-Copy-Item -LiteralPath (Join-Path $repoRoot "docs\ALPHA_RELEASE_NOTES_2026-07-15.md") -Destination (Join-Path $windowsStage "ALPHA_RELEASE_NOTES.md")
+Copy-Item -LiteralPath (Join-Path $repoRoot "docs\SHOWCASE_ALPHA_RELEASE_NOTES_2026-07-17.md") -Destination (Join-Path $windowsStage "ALPHA_RELEASE_NOTES.md")
 
 $lichLicenceEvidence = @(
     (Join-Path $repoRoot "assets\models\enemies\meshy\lich_placeholder_source_licence.md"),
@@ -178,8 +195,12 @@ foreach ($creditMarker in @("string/credits_body", "Hotstrike Studio", "FilmCow"
 }
 $androidManifest = (& $aapt2 dump xmltree --file AndroidManifest.xml $androidCandidate 2>&1 | Out-String)
 if ($LASTEXITCODE -ne 0) { throw "Failed to inspect the Android manifest in $androidCandidate" }
-if ($androidManifest -notmatch 'versionName[^\r\n]*="0\.1\.0-alpha\.1"') {
-    throw "Android candidate does not contain versionName 0.1.0-alpha.1."
+$escapedVersion = [regex]::Escape($Version)
+if ($androidManifest -notmatch "versionName[^\r\n]*=`"$escapedVersion`"") {
+    throw "Android candidate does not contain versionName $Version."
+}
+if ($androidManifest -notmatch 'versionCode[^\r\n]*=2(?:\s|$)') {
+    throw "Android candidate does not contain release versionCode 2."
 }
 if ($androidManifest -notmatch 'screenOrientation[^\r\n]*=7(?:\s|$)') {
     throw "Android candidate is not locked to sensorPortrait (screenOrientation=7)."

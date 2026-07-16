@@ -1,0 +1,9 @@
+files/arm-array-512-astc6x6.ktx2
+files/base-color-2048-astc6x6.ktx2
+files/diff-array-512-astc6x6.ktx2
+files/emissive-2048-astc6x6.ktx2
+files/lich_placeholder_merged_animations_v01.glb
+files/normal-array-512-astc4x4.ktx2
+files/reports/vulkan_capability_report.json
+files/reports/vulkan_capability_report.txt
+files/skeleton_biped_merged_animations_v01.glb

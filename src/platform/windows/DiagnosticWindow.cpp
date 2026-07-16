@@ -43,7 +43,7 @@ namespace
 {
 
 constexpr char kWindowClassName[] = "HordeRtDiagnosticWindowClass";
-constexpr char kWindowTitle[] = "Horde Lantern RT - Initial Showing Alpha";
+constexpr char kWindowTitle[] = "Horde Lantern RT - Showcase Alpha";
 constexpr char kReportDirectory[] = "reports";
 constexpr char kTextReportFilename[] = "vulkan_capability_report.txt";
 constexpr char kJsonReportFilename[] = "vulkan_capability_report.json";
@@ -1939,7 +1939,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             capabilities.performance.fps = 0.0f;
             if (HWND hud = GetDlgItem(hWnd, kHudControlId))
             {
-                SetWindowTextA(hud, "ALPHA 0.1.0  |  APPLYING RT RENDER SCALE...");
+                SetWindowTextA(hud, "ALPHA 0.1.1  |  APPLYING RT RENDER SCALE...");
             }
             if (!InitialiseRtSceneForSwapchain(context))
             {
@@ -2017,7 +2017,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             WriteReportFile(jsonReportPath, horde::vulkan::BuildCapabilityJsonReport(capabilities));
             if (HWND hud = GetDlgItem(hWnd, kHudControlId))
             {
-                SetWindowTextA(hud, "ALPHA 0.1.0  |  NATIVE VULKAN HARDWARE RT ACTIVE  |  F1 CONTROLS  |  ESC MENU");
+                SetWindowTextA(hud, "ALPHA 0.1.1  |  NATIVE VULKAN HARDWARE RT ACTIVE  |  F1 CONTROLS  |  ESC MENU");
             }
             if (HWND edit = GetDlgItem(hWnd, kEditControlId))
             {
@@ -2200,6 +2200,7 @@ void ShowCredits(HWND window)
                 "Environment materials: Poly Haven (CC0).\n"
                 "Sound effects: FilmCow Royalty Free Sound Effects Library.\n"
                 "Skeleton derivative: original by Hotstrike Studio; texture, rig, and animation processing created with Meshy (CC BY 4.0).\n"
+                "Placeholder lich character created and animated with Meshy (CC0).\n"
                 "Application icon created for this project with OpenAI image generation.\n\n"
                 "See ASSET_LICENSES.md beside the demo for source links and full licence details.",
                 "Horde Lantern RT - credits and licences",
@@ -2308,7 +2309,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 return 0;
             case kMenuAboutId:
                 MessageBoxA(hWnd,
-                            "Horde Lantern RT\nInitial Showing Alpha 0.1.0\n\nNative Vulkan hardware ray tracing. RT or nothing.\nA Samfa12 technology demo.",
+                            "Horde Lantern RT\nShowcase Alpha 0.1.1\n\nNative Vulkan hardware ray tracing. RT or nothing.\nA Samfa12 technology demo.",
                             "About Horde Lantern RT",
                             MB_OK | MB_ICONINFORMATION);
                 return 0;
@@ -2651,8 +2652,8 @@ int CreateAndShowWindow(const std::string& diagnosticText,
         return control;
     };
 
-    createStatic(kHudControlId, "ALPHA 0.1.0  |  VULKAN RT STARTING...  |  F1 CONTROLS  |  ESC MENU", SS_LEFT | SS_CENTERIMAGE);
-    createStatic(kPauseTitleId, "HORDE LANTERN RT  |  INITIAL SHOWING ALPHA", SS_CENTER | SS_CENTERIMAGE);
+    createStatic(kHudControlId, "ALPHA 0.1.1  |  VULKAN RT STARTING...  |  F1 CONTROLS  |  ESC MENU", SS_LEFT | SS_CENTERIMAGE);
+    createStatic(kPauseTitleId, "HORDE LANTERN RT  |  SHOWCASE ALPHA", SS_CENTER | SS_CENTERIMAGE);
     createButton(kResumeButtonId, "ENTER THE RUIN / RESUME");
     createButton(kRestartButtonId, "RESTART ROUTE");
     createButton(kControlsButtonId, "CONTROLS");
@@ -2678,7 +2679,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     const std::string windowText = WindowSafeText(diagnosticText);
     const bool sceneMode = capabilities.rtMode == horde::vulkan::RtMode::RayTracingPipeline;
     const std::string windowTitle = sceneMode
-        ? "Horde Lantern RT - Initial Showing Alpha 0.1.0"
+        ? "Horde Lantern RT - Showcase Alpha 0.1.1"
         : MakeWindowTitle(diagnosticText);
     SetWindowTextA(edit, windowText.c_str());
     SetWindowTextA(hWnd, windowTitle.c_str());

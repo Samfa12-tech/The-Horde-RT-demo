@@ -1,0 +1,23 @@
+Horde showcase Android thermal record - 2026-07-17
+
+Initial launch:
+- Android thermal status: 0
+- AP sensor: 47.4 C
+- battery sensor: 35.4 C
+- skin sensor: 37.9 C
+
+After the extended hands-on route session:
+- Android thermal status: 3
+- AP sensor: 52.8 C
+- battery sensor: 43.7 C
+- skin sensor: 44.6 C
+
+Controlled 75% per-zone sweep:
+- Every retained zone sample was taken at thermal status 3.
+- Battery readings were 43.7-44.1 C.
+
+100% extent/timing check:
+- Android thermal status: 3
+- Battery reading: 43.7 C.
+
+The run is warm sustained evidence, not a cold-device claim.

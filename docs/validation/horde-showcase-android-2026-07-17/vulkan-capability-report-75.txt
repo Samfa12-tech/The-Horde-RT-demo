@@ -1,0 +1,24 @@
+Backend: Vulkan
+RT mode: RayTracingPipeline
+GPU name: Adreno (TM) 840
+Vendor ID: 20803
+Device ID: 1141180977
+Driver version: 512.842.19
+Vulkan API version: 1.4.295
+VK_KHR_acceleration_structure: yes
+VK_KHR_ray_tracing_pipeline: yes
+VK_KHR_ray_query: yes
+VK_KHR_buffer_device_address: yes
+VK_KHR_deferred_host_operations: yes
+Internal render resolution: 1080x2235
+FPS / frame time: 69.30 fps / 14.43 ms
+RT scene status: Presented via swapchain
+RT scene geometry: Complete Horde showcase route with sequential animated skeleton and staff-lit lich
+RT scene dispatch resolution: 1080x2235
+RT scene presented: yes
+Diagnostics:
+- Inspecting candidate 0
+- Driver version packed: 2150932499
+- Driver version: 512.842.19
+- Vulkan API version: 1.4.295
+- RT mode selected: RayTracingPipeline

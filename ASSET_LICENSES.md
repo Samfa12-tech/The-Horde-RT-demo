@@ -1,6 +1,6 @@
 # Asset Licenses
 
-The running RT scene uses the five Poly Haven material sets, the Hotstrike Studio skeleton derivative, and the FilmCow sound subset recorded below. The staged Meshy-generated sword and torch source models remain outside release packages until their runtime paths and account-plan gates are resolved.
+The running RT scene uses the five Poly Haven material sets, the Hotstrike Studio skeleton derivative, the CC0 Meshy placeholder lich, and the FilmCow sound subset recorded below. The staged Meshy-generated sword and torch source models remain outside release packages until their runtime paths and account-plan gates are resolved.
 
 ## Asset rules
 

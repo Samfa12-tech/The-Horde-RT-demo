@@ -1,0 +1,27 @@
+Horde showcase Android validation device/build record
+Date: 2026-07-17 Australia/Sydney
+
+Git commit: 323fee0d3e6da572b186bce26986bff5f1078416
+APK: android/app/build/outputs/apk/debug/app-debug.apk
+APK bytes: 58,887,407
+APK SHA-256: 44D49F9F30BEED08A1B579546D32845B1BF4E8916816A85B58FA39A59D536273
+Application ID: com.samfa12.hordelanternrt.debug
+Version: 0.1.0-alpha.1-debug (versionCode 1)
+Build/install: assembleDebug installDebug passed for all configured ABIs; installed on one device
+
+Device serial: redacted from public validation evidence
+Model: Samsung SM-S948B (m3q)
+Android: 16, API 36
+Primary ABI: arm64-v8a
+GPU: Adreno (TM) 840
+Vulkan API: 1.4.295
+Driver: 512.842.19
+Physical display: 1440x3120
+Swapchain extent: 1440x2980
+Physical density: 600; active override: 560
+Font scale: 1.7
+Rotation: 0
+
+75% internal/dispatch extent: 1080x2235
+100% internal/dispatch extent: 1440x2980
+Final persisted render scale after testing: 75%

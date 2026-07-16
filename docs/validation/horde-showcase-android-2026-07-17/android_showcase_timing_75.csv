@@ -1,0 +1,6 @@
+scale,zone,window_1_avg_ms,window_2_avg_ms,window_3_avg_ms,median_of_window_avgs_ms,mean_of_window_avgs_ms,median_derived_fps,thermal_status,battery_c
+75,opening,12.313,15.587,13.613,13.613,13.838,73.459,3,44.1
+75,worst-zig-zag-bend,10.143,10.274,10.233,10.233,10.217,97.723,3,43.7
+75,lantern-off-skylight-chamber,10.097,10.976,10.819,10.819,10.631,92.430,3,43.7
+75,far-green-torch-passage,12.002,11.122,11.989,11.989,11.704,83.410,3,43.7
+75,finale-active-lich,10.406,10.458,10.425,10.425,10.430,95.923,3,43.7

@@ -2,10 +2,11 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$KeyStorePath,
     [string]$KeyAlias = "horde-lantern-rt",
-    [string]$Version = "0.1.0-alpha.1"
+    [string]$Version = "0.1.1-alpha.1"
 )
 
 $ErrorActionPreference = "Stop"
+$expectedCertificateSha256 = "8245277a11bca5576f116724507f799d6f4c178ce5fbb7e3981415c9e6b3c245"
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 $keyStoreFull = [IO.Path]::GetFullPath($KeyStorePath)
 if (-not (Test-Path -LiteralPath $keyStoreFull)) {
@@ -35,6 +36,10 @@ try {
     $verification = & $apksigner verify --verbose --print-certs $apk 2>&1
     if ($LASTEXITCODE -ne 0) { throw "apksigner rejected the signed candidate.`n$verification" }
     if ($verification -match "CN=Android Debug") { throw "Refusing a debug-certificate candidate." }
+    $certificateMatch = [regex]::Match(($verification | Out-String), 'certificate SHA-256 digest:\s*([0-9a-fA-F]+)')
+    if (-not $certificateMatch.Success -or $certificateMatch.Groups[1].Value.ToLowerInvariant() -ne $expectedCertificateSha256) {
+        throw "Refusing an Android candidate that is not signed by the established Horde release certificate."
+    }
 
     # Refresh hashes only after the final signed APK has passed certificate
     # verification. This keeps the guarded itch preflight tied to the exact

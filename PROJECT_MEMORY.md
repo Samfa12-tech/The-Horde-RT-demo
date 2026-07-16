@@ -1,6 +1,6 @@
 # Horde Lantern RT - Project Memory
 
-Last updated: 2026-07-16
+Last updated: 2026-07-17
 
 ## Identity and release state
 
@@ -8,15 +8,16 @@ Last updated: 2026-07-16
 - Purpose: native Vulkan hardware-ray-tracing game/technology demo.
 - Principle: **RT or nothing**; unsupported devices receive honest diagnostics, never a fake fallback.
 - Primary target: Android phone. Equal validation target: Windows RTX.
-- Current release: **Initial Showing Alpha 0.1.0**, package version `0.1.0-alpha.1`.
+- Current release: **Showcase Alpha 0.1.1**, package version `0.1.1-alpha.1`.
 - Canonical downloads: https://samfa12.itch.io/the-horde. Samfa12.com links to itch rather than hosting a second copy; the live `/games/` card, itch link, GitHub link, thumbnail, and released status were rendered and verified on 2026-07-15.
 - Source: https://github.com/Samfa12-tech/The-Horde-RT-demo.
-- Windows itch channel: upload `#18339908`, build `#1798649`, `windows-x64`.
-- Android itch channel: upload `#18341739`, build `#1798652`, `android`.
-- Signed Android APK SHA-256: `13bced0aa40e4a102e25aa1c57083f7feb4b12ca7a8d492c46cc7c6cfdda932a`.
-- Windows ZIP SHA-256: `1bae34e6d323bbd201ff4dd113f3c78518788f90a298a7babce1a446da2721cc`.
+- Windows itch channel: upload `#18339908`, build `#1801016`, `windows-x64`.
+- Android itch channel: upload `#18341739`, build `#1801017`, `android`.
+- Signed Android APK SHA-256: `ae73afec2c75b317187aeb61d81a592ec8bb4d8b5e89ef9b474fb2a60ae1354a`.
+- Windows ZIP SHA-256: `8a254c9d14b35bf868f1cb96619dc572f3505a9564b668aa55241b33bfeaec2e`.
 - Signing certificate SHA-256: `8245277a11bca5576f116724507f799d6f4c178ce5fbb7e3981415c9e6b3c245`.
 - The release JKS lives outside Git. It and both passwords need an independent owner backup.
+- Release proof: `docs/SHOWCASE_ALPHA_RELEASE_VALIDATION_2026-07-17.md`.
 
 ## Locked creative direction
 
@@ -102,6 +103,7 @@ Last updated: 2026-07-16
 - Licences: `ASSET_LICENSES.md`
 - Release readiness: `docs/ALPHA_RELEASE_READINESS_2026-07-15.md`
 - Packaging: `tools/package-alpha.ps1`, `tools/package-signed-alpha.ps1`, `tools/push-alpha-to-itch.ps1`
+- Build/test/demo cycle plan: `docs/BUILD_TEST_DEMO_CYCLE_PLAN_2026-07-17.md`
 
 ## Next-step sequence
 
@@ -110,6 +112,8 @@ Last updated: 2026-07-16
 3. Slice A route blockout is complete. Continue in bounded slices with lower body/lantern drop, zig-zag shadows and blue skylight, bay-selected coloured torches, bounded coloured transmission, one hero mirror, optional measured shallow water, and an emissive reskin/replacement in the existing enemy slot.
 4. Gate each meaningful renderer change on the phone at the recommended quality tier; report 100% separately.
 5. Keep real RT and honest diagnostics. Reduce bounded effect area/ray cost before expanding gameplay or substituting fake effects.
+6. Build the supporting cycle in this order: deterministic showcase checkpoints; repeatable benchmark route; input recording/replay; developer overlay; one-command build/test/package validation; fixed screenshot/video capture; then bounded combat-readability polish.
+7. Treat `docs/BUILD_TEST_DEMO_CYCLE_PLAN_2026-07-17.md` as the detailed backlog. Keep its guardrails: real RT presentation, phone measurement, strict asset/package validation, compact player-facing UI, and one active skinned enemy until separately measured.
 
 ## Showcase route blockout - 2026-07-16
 
@@ -136,5 +140,5 @@ Last updated: 2026-07-16
 - `ShowcaseGameplay.h` owns deterministic lantern, lower-body, lighting, plural roster/director, and lich charge/recovery state. Only one skinned enemy is selected/rendered/refit at once; the capacity remains configurable for later Horde measurements.
 - The lich uses continuous living `Idle_02` and non-looping `Dead` clips; whole-instance hover/orbit replaces the visibly distorted walking clip. Its separate 48-byte UV stream, raw Windows KTX2, strict Android ASTC 6x6, derived violet emissive map, and forty skin-weighted staff vertices drive the visible staff light/electricity. It takes three hits with a two-second lockout; each accepted hit produces recoil plus a positional cry, and death opens the finale roof over 4.5 seconds.
 - Player travel and skeleton cadence now produce accepted audible footsteps. Skeleton and lich spatial cues share equal-power pan, distance rolloff, and route-obstruction attenuation through XAudio2 on Windows; compile-only SoundPool L/R integration remains on Android.
-- Windows Debug/Release and all five CTests pass, and the final hands-on Windows route/audio/combat verdict passed. Android `assembleDebug` passes for all configured ABIs; device presentation, visuals, thermal behavior, and performance remain explicitly pending until `SM-S948B` access returns. Label this state **Windows-validated / Android device validation pending**.
-- Preserve the latest raygen artifact recorded in `docs/HORDE_SHOWCASE_WINDOWS_VALIDATION_2026-07-16.md`. The lich's Meshy CC0 evidence is retained at `assets/models/enemies/meshy/lich_placeholder_source_licence.png`; Android device validation remains pending.
+- Windows Debug/Release and all five CTests pass, and the final hands-on Windows route/audio/combat verdict passed. The complete route is also device-validated on `SM-S948B`: strict environment/lich ASTC, honest RT presentation, full hands-on traversal, lifecycle recovery, and controlled warm 75% measurements all pass. Every required zone's median of three 120-frame average windows was below 13.7 ms at thermal status 3; see `docs/HORDE_SHOWCASE_ANDROID_VALIDATION_2026-07-17.md`. Label this state **Windows-validated / Android-device-validated**.
+- Preserve the latest raygen artifact recorded in `docs/HORDE_SHOWCASE_WINDOWS_VALIDATION_2026-07-16.md`. The lich's Meshy CC0 evidence is retained at `assets/models/enemies/meshy/lich_placeholder_source_licence.png`. Preserve the current one-active-skinned-enemy limit until a separate multi-enemy phone measurement.

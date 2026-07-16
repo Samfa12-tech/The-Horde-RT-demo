@@ -2,7 +2,7 @@
 
 ## Status
 
-**Windows-validated / Android device validation pending.**
+**Windows-validated. Android device validation subsequently passed on 2026-07-17.**
 
 This goal is deliberately not a signed release and has not been uploaded. Android validation in this document means compilation only unless explicitly stated otherwise.
 
@@ -96,7 +96,11 @@ The final 100% user-driven run then produced one continuous report sequence thro
 
 Final hands-on acceptance confirmed audible player and skeleton footsteps, visible and audible feedback on every accepted lich hit, exactly three hits with the two-second lockout, lich death playback, wall-aware prop retraction, the sliding post-death roof and incoming light, and the light-aware mirror. F10 independently proved the centred step asset/output path while temporary event/voice diagnostics verified movement and spatial submissions through XAudio2; those per-event file writes were removed during the closing review.
 
-## Deferred phone gate
+## Completed phone gate
+
+The deferred `SM-S948B` gate subsequently passed with strict environment/lich ASTC, honest RT swapchain presentation, a full user-driven route run, automated lifecycle/route evidence, and controlled warm 75% measurements in every required zone. See `HORDE_SHOWCASE_ANDROID_VALIDATION_2026-07-17.md` for the authoritative device verdict and raw evidence.
+
+The original deferred checklist was:
 
 When `SM-S948B` access returns:
 

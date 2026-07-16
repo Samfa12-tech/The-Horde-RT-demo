@@ -15,6 +15,12 @@ This file records locked decisions for the native Vulkan hardware ray-tracing de
 
 The demo must prove real native Vulkan hardware ray tracing. Browser rendering, Godot renderer work, Unreal-first work, Three.js, Babylon.js, WebGPU, raster-only rendering, SSR, baked lighting, compute-only path tracing, and fake RT are not acceptable substitutes for the core proof.
 
+## Build / test / demo cycle decision - 2026-07-17
+
+The next supporting slice is to make the existing showcase repeatable and measurable before expanding the game. Prioritize deterministic route checkpoints, benchmark/replay capture, developer diagnostics, one-command validation and packaging checks, and fixed screenshot/video capture. Detailed scope and guardrails live in `docs/BUILD_TEST_DEMO_CYCLE_PLAN_2026-07-17.md`.
+
+The normal player-facing route remains intact; development checkpoints and overlays must stay tucked away from branded entry/pause/settings surfaces. Game-facing combat polish follows the tooling foundation. Do not raise the one-active-skinned-enemy limit without a separate phone measurement.
+
 ## Target devices
 
 - Primary target: Samsung Galaxy S26 Ultra.
@@ -142,6 +148,13 @@ Important technical finding:
 - The next route is `docs/COLOURED_LIGHT_ROUTE_PLAN_2026-07-15.md`: lower body/lantern drop, zig-zag shadows, blue skylight, bay-selected coloured torches, bounded coloured transmission, one hero mirror, and an emissive replacement in the existing one-enemy slot.
 - Keep the textured sword LOD out of runtime until static GLB/PBR support is measured on phone.
 - Preserve phone-safe ray-query shading and real `vkCmdTraceRaysKHR` presentation unless a stronger RT route is proven on-device.
+
+## Showcase alpha 0.1.1 publication - 2026-07-17
+
+- Publish the completed route as **Showcase Alpha 0.1.1**, package version `0.1.1-alpha.1`, with Android `versionCode 2`.
+- Keep the existing itch channels and stable Android update identity. Public build IDs are Windows `#1801016` and Android `#1801017`; exact hashes and validation evidence are recorded in `docs/SHOWCASE_ALPHA_RELEASE_VALIDATION_2026-07-17.md`.
+- Treat 75% RT resolution as the sustained Android recommendation. The 100% pass proves full extent and image correctness but carries no 50 FPS promise.
+- Keep one rendered/animated skinned enemy at a time. A simultaneous horde requires its own measured phone slice.
 
 ## Initial alpha refresh hardening - 2026-07-16
 

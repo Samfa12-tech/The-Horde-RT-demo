@@ -138,4 +138,4 @@ Other low-cost showcase ideas worth considering after the core route works:
 - Resolved for the Windows-first goal: glow is limited to the derived staff/eye/gem selection; 40 audited staff-crystal vertices anchor the violet analytic light.
 - Resolved clips: `Idle_02`, `Walking`, and `Dead`; the missing cast clip remains unmapped and charge timing is procedural.
 - Resolved encounter order: the skeleton is seen first, the skylight gate selects/resets the lich, and only one skinned enemy is rendered/refit at once.
-- Still pending: measure the completed 9,188-triangle/2K-ASTC lich route on `SM-S948B` before certifying the mobile budget or raising the active-enemy count.
+- The completed 9,188-triangle/2K-ASTC lich route passed its `SM-S948B` device gate on 2026-07-17 at the current one-active-skinned-enemy limit. Every required warm 75% zone retained a median of three 120-frame average windows below 13.7 ms at thermal status 3. Raising the active-enemy count still requires a separate phone measurement; see `HORDE_SHOWCASE_ANDROID_VALIDATION_2026-07-17.md`.

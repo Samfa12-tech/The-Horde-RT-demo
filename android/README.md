@@ -10,7 +10,7 @@ The `android/` module is the supported phone path for Horde Lantern RT. It owns 
 - Native Vulkan RT presentation through the Android swapchain
 - One frame in flight while the held-prop TLAS uses a host-written instance buffer
 - Portrait-first branded entry/pause/settings/controls/diagnostics/credits UI, touch movement/look, a dedicated `SWING` control, one-enemy combat, animated skeleton BLAS refit, a yaw-relative first-person torso plus four pitch-relative IK arm instances, ASTC PBR texture arrays, and phone-safe ray-query shading inside `vkCmdTraceRaysKHR`
-- Persisted SFX volume, look sensitivity, compact HUD, and 50-100% RT render scale; thirteen FilmCow clips play through SoundPool
+- Persisted SFX volume, look sensitivity, compact HUD, and 50-100% RT render scale; seventeen FilmCow clips play through SoundPool
 - The in-app Credits & Licences panel carries Poly Haven, FilmCow, Hotstrike Studio, Meshy, and generated-icon provenance with the APK
 - Native libraries use a static C++ runtime plus 16 KiB ELF alignment; the packaging gate verifies 16 KiB APK/ELF alignment and rejects an r26 `libc++_shared.so`
 - Unsupported devices retain explicit diagnostics instead of a fake rendering fallback
@@ -42,6 +42,12 @@ The combat/ASTC build passed that gate on 2026-07-14: strict ASTC selection, hon
 
 The articulated grip-locked, pitch-following revision builds for all Android ABIs and is verified on `SM-S948B`: strict ASTC selection, honest RT presentation, live idle/swing grip composition, and thermal-status-2 sustained evidence at 52.352 SurfaceFlinger TimeStats average FPS / 19.718 ms internal median (approximately 50.7 FPS). See `../docs/PLAYER_BODY_RT_SLICE_2026-07-14.md`.
 
-The published `0.1.0-alpha.1` APK is stable-key signed and passed the final portrait/UI/audio/render-scale sanity pass. At 75%, 21 warm 120-frame windows measured 10.933 ms median / 15.050 ms p95 at thermal status 3; 75% is the sustained recommendation. The 2026-07-16 refresh also verifies side-by-side debug installation, 16 KiB native/APK alignment, and fast live diagnostics on Android 16. See `../docs/ALPHA_ANDROID_PHONE_VALIDATION_2026-07-15.md` and `../docs/ALPHA_ANDROID_REFRESH_VALIDATION_2026-07-16.md`.
+The previous `0.1.0-alpha.1` APK established the stable signing identity and passed the portrait/UI/audio/render-scale sanity pass. Its 2026-07-16 refresh also verified side-by-side debug installation, 16 KiB native/APK alignment, and fast live diagnostics on Android 16. See `../docs/ALPHA_ANDROID_PHONE_VALIDATION_2026-07-15.md` and `../docs/ALPHA_ANDROID_REFRESH_VALIDATION_2026-07-16.md`.
+
+The complete showcase route is device-validated on `SM-S948B` in the debug package: strict environment plus lich ASTC, honest RT presentation, full route traversal, Home/resume recreation, and warm controlled 75% measurements passed at thermal status 3. Every required zone's median of three 120-frame average windows remained below 13.7 ms. The phone was restored to the recommended 75% tier after the 100% extent/reporting check. See `../docs/HORDE_SHOWCASE_ANDROID_VALIDATION_2026-07-17.md`.
+
+The showcase release identity is `0.1.1-alpha.1` with `versionCode 2`. Public candidates must be signed by the established Horde release key, retain strict ASTC routing and 16 KiB compatibility, and pass `tools/package-signed-alpha.ps1`; never replace the existing update identity with a new keystore.
+
+The exact signed 0.1.1 APK is published as itch build `#1801017`; SHA-256 `ae73afec2c75b317187aeb61d81a592ec8bb4d8b5e89ef9b474fb2a60ae1354a`. It was installed over the stable package and reconfirmed `versionCode 2`, all seventeen SoundPool loads, strict ASTC environment/lich routing, and honest RT swapchain presentation. See `../docs/SHOWCASE_ALPHA_RELEASE_VALIDATION_2026-07-17.md`.
 
 Create/sign future releases with `../tools/create-android-release-key.ps1` and `../tools/package-signed-alpha.ps1`. Keep the JKS and signing properties outside Git.

@@ -1,12 +1,12 @@
 # Horde Lantern RT
 
-Horde Lantern RT is a native Vulkan hardware-ray-tracing technology demo for Android and Windows. It is an early historical-gothic showing built around a torch-lit ruin, wet stone, a bounded material gallery, and one animated skeleton encounter.
+Horde Lantern RT is a native Vulkan hardware-ray-tracing technology demo for Android and Windows. Its historical-gothic route moves from a lantern-lit skeleton encounter through coloured-light and mirror studies to a staff-lit lich finale.
 
 - Public alpha: https://samfa12.itch.io/the-horde
 - Source repository: https://github.com/Samfa12-tech/The-Horde-RT-demo
-- Current package version: `0.1.0-alpha.1`
-- Current itch builds: Windows `#1798649`; Android `#1798652`
-- Published SHA-256: Windows `1bae34e6d323bbd201ff4dd113f3c78518788f90a298a7babce1a446da2721cc`; Android `13bced0aa40e4a102e25aa1c57083f7feb4b12ca7a8d492c46cc7c6cfdda932a`
+- Current package version: `0.1.1-alpha.1`
+- Current itch builds: Windows `#1801016`; Android `#1801017`
+- Published SHA-256: Windows `8a254c9d14b35bf868f1cb96619dc572f3505a9564b668aa55241b33bfeaec2e`; Android `ae73afec2c75b317187aeb61d81a592ec8bb4d8b5e89ef9b474fb2a60ae1354a`
 - Primary validated phone: Samsung `SM-S948B` / Adreno 840
 - Validated Windows GPU: NVIDIA GeForce RTX 5050 Laptop GPU
 
@@ -16,20 +16,20 @@ The demo uses Vulkan acceleration structures, an RT pipeline and shader binding 
 
 `rtScene.presented` becomes true only after an RT-produced frame reaches successful swapchain presentation.
 
-## Initial alpha contents
+## Showcase alpha contents
 
 - Portrait-first Android presentation and a native Windows desktop build.
 - Branded entry, pause, controls, settings, diagnostics, restart, and quit flows.
 - Persisted 50-100% RT render-resolution scale, defaulting to 100%.
 - Android SFX volume and compact-HUD settings; Windows SFX, sensitivity, display-mode, and render-scale settings.
-- Closed starting chamber with a collision-safe spawn, deep room-two arch, and the skeleton staged behind it.
-- Thin clear skylight transmission, material-ID gallery surfaces, wet stone, fog, moonlight, and bounded reflection work.
+- Collision-safe starting chamber and material gallery, a leashed skeleton encounter, and a three-turn moving-shadow corridor.
+- Lantern failure and drop, blue skylight chamber, yellow/blue/deep-red/restrained-green torch bays, open threshold, wet stone, fog, and a single-bounce hero mirror.
 - A low-poly held torch with wooden shaft, iron cage, and layered emissive flame volumes.
-- A camera-relative RT torso and articulated two-bone-IK arms holding a procedural torch and sword.
-- One Hotstrike Studio skeleton derivative, textured/rigged/animated with Meshy, using a narrow walk/attack/death/respawn loop.
+- A complete camera-relative RT player body with articulated two-bone-IK arms, procedural gait, held torch/sword, and wall-aware prop retraction.
+- A Hotstrike Studio skeleton derivative followed sequentially by a CC0 Meshy placeholder lich with emissive staff/eyes, charge electricity, spatial audio, three-hit combat, death animation, and a sliding-roof finale.
 - Seventeen FilmCow UI, sword, movement, skeleton, and lich reaction/attack WAV cues.
 
-The signed Android APK contains the skeleton GLB, strict ASTC KTX2 material arrays, thirteen FilmCow WAVs, four ABI libraries, and launcher assets. The Windows ZIP contains `HordeLanternRT.exe`, an executable-relative `assets/` tree, release notes, controls, and `ASSET_LICENSES.md`.
+The signed Android APK contains both enemy GLBs, strict ASTC KTX2 environment and lich textures, seventeen FilmCow WAVs, four ABI libraries, and launcher assets. The Windows ZIP contains `HordeLanternRT.exe`, an executable-relative `assets/` tree, release notes, controls, and `ASSET_LICENSES.md`.
 
 The staged Meshy sword LOD and torch study are not used by the runtime or included in either download. Their metadata is retained for later measured GLB/PBR work.
 
@@ -55,24 +55,24 @@ The staged Meshy sword LOD and torch study are not used by the runtime or includ
 
 ## Current validation
 
-The stable-key-signed Android candidate was installed on `SM-S948B` and reconfirmed in portrait at accessibility font scale `1.7`. It selected the strict ASTC path, dispatched at `1440x2980` at the default 100% scale, loaded all thirteen SoundPool clips, and honestly presented RT frames.
+The complete showcase route is Windows-validated and Android-device-validated on `SM-S948B`. Android selected strict environment and lich ASTC textures, honestly presented RT frames, survived pause/resume and Home/surface recreation, and completed the full hands-on route without a reported issue.
 
 Render scaling was verified at:
 
 | Scale | Android internal RT extent | Result |
 |---:|---:|---|
-| 100% | `1440x2980` | Default; hot performance varies with route/view and may fall below 50 FPS |
-| 75% | `1080x2235` | Sustained recommendation; 10.933 ms median / 15.050 ms p95 across 21 renderer telemetry windows at thermal status 3 |
+| 100% | `1440x2980` | Full-extent/image check passed; opening median of three 120-frame average windows 21.700 ms at thermal status 3 |
+| 75% | `1080x2235` | Sustained recommendation; all required warm route zones below 13.7 ms median of three 120-frame average windows at thermal status 3 |
 | 50% | `720x1490` | 163.12 FPS / 6.13 ms observed in live diagnostics |
 
 Windows Release was launched from a clean extraction using only its packaged assets. It reported `RayTracingPipeline`, `RT scene presented: yes`, and live resolution/FPS/frame-time diagnostics. The 100% and 75% render targets were verified at `982x628` and `737x471` respectively.
 
 See:
 
-- `docs/ALPHA_ANDROID_PHONE_VALIDATION_2026-07-15.md`
-- `docs/ALPHA_WINDOWS_VALIDATION_2026-07-15.md`
-- `docs/ALPHA_RELEASE_READINESS_2026-07-15.md`
-- `docs/ALPHA_RELEASE_NOTES_2026-07-15.md`
+- `docs/HORDE_SHOWCASE_WINDOWS_VALIDATION_2026-07-16.md`
+- `docs/HORDE_SHOWCASE_ANDROID_VALIDATION_2026-07-17.md`
+- `docs/SHOWCASE_ALPHA_RELEASE_NOTES_2026-07-17.md`
+- Historical 0.1.0 readiness and validation records remain under `docs/`.
 
 ## Build and run
 
@@ -100,7 +100,7 @@ Look for:
 
 - `PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2)`
 - `RT frame reached Android swapchain presentation.`
-- `SFX loaded` IDs 1 through 13
+- `SFX loaded` IDs 1 through 17
 
 Debug builds expose reports with `adb shell run-as`; release builds deliberately do not set `android:debuggable`.
 
@@ -116,7 +116,7 @@ For a signed rebuild:
 
 ```powershell
 .\tools\package-signed-alpha.ps1 -KeyStorePath '<outside-repo path>'
-.\tools\push-alpha-to-itch.ps1 -Version 0.1.0-alpha.1 -Channels Both
+.\tools\push-alpha-to-itch.ps1 -Version 0.1.1-alpha.1 -Channels Both
 ```
 
 The packaging and push scripts securely prompt for signing secrets, reject debug/unsigned Android candidates, verify hashes, and keep Windows and Android on separate itch channels. Add `-ConfirmPush` only after the preflight passes.
@@ -148,8 +148,8 @@ After raygen edits, run `tools/compile-raygen.ps1`. Keep one frame in flight whi
 
 ## Showcase route status
 
-The initial showing alpha remains the published build. The complete follow-on route is now Windows-validated: lower body and lantern drop, zig-zag shadows, blue skylight, bay-selected coloured torches, an open framed threshold, one hero mirror, and a sequential staff-lit lich finale with a post-death sliding skylight. Android device validation remains pending. See `docs/HORDE_SHOWCASE_WINDOWS_VALIDATION_2026-07-16.md`.
+The complete route is Windows- and Android-device-validated: lower body and lantern drop, zig-zag shadows, blue skylight, bay-selected coloured torches, an open framed threshold, one hero mirror, and a sequential staff-lit lich finale with a post-death sliding skylight. See `docs/HORDE_SHOWCASE_WINDOWS_VALIDATION_2026-07-16.md` and `docs/HORDE_SHOWCASE_ANDROID_VALIDATION_2026-07-17.md`.
 
-Android shared code and strict ASTC assets compile into the debug APK, but this new route is not phone-validated or publicly released. Only one skinned enemy is animated/refit/rendered at a time; the plural roster remains configurable for future measured Horde work.
+Only one skinned enemy is animated, refit, and rendered at a time; the plural roster remains configurable for a future separately measured Horde slice.
 
 The 75% setting is the sustained phone recommendation. Preserve real RT at the documented quality tier; reduce bounded effect area or ray cost before considering any broader feature expansion.

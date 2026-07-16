@@ -1,0 +1,2 @@
+scale,zone,window_1_avg_ms,window_2_avg_ms,window_3_avg_ms,median_of_window_avgs_ms,mean_of_window_avgs_ms,median_derived_fps,thermal_status,battery_c,gate
+100,opening,19.767,21.700,23.991,21.700,21.819,46.083,3,43.7,reported-no-50fps-requirement

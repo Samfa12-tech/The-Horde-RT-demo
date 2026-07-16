@@ -1,0 +1,174 @@
+--------- beginning of main
+07-17 06:09:38.477 15938 15938 I HordeLanternAudio: SFX loaded: 1
+07-17 06:09:38.477 15938 15938 I HordeLanternAudio: SFX loaded: 2
+07-17 06:09:38.477 15938 15938 I HordeLanternAudio: SFX loaded: 3
+07-17 06:09:38.477 15938 15938 I HordeLanternAudio: SFX loaded: 4
+07-17 06:09:38.477 15938 15938 I HordeLanternAudio: SFX loaded: 5
+07-17 06:09:38.478 15938 15938 I HordeLanternAudio: SFX loaded: 6
+07-17 06:09:38.478 15938 15938 I HordeLanternAudio: SFX loaded: 7
+07-17 06:09:38.478 15938 15938 I HordeLanternAudio: SFX loaded: 8
+07-17 06:09:38.478 15938 15938 I HordeLanternAudio: SFX loaded: 9
+07-17 06:09:38.478 15938 15938 I HordeLanternAudio: SFX loaded: 10
+07-17 06:09:38.478 15938 15938 I HordeLanternAudio: SFX loaded: 11
+07-17 06:09:38.478 15938 15938 I HordeLanternAudio: SFX loaded: 12
+07-17 06:09:38.478 15938 15938 I HordeLanternAudio: SFX loaded: 13
+07-17 06:09:38.478 15938 15938 I HordeLanternAudio: SFX loaded: 14
+07-17 06:09:38.478 15938 15938 I HordeLanternAudio: SFX loaded: 15
+07-17 06:09:38.478 15938 15938 I HordeLanternAudio: SFX loaded: 16
+07-17 06:09:38.478 15938 15938 I HordeLanternAudio: SFX loaded: 17
+07-17 06:09:39.167 15938 15938 I HordeRtProbeBridge: PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich
+07-17 06:09:39.167 15938 15938 I HordeRtProbeBridge: RT render scale 75%: 1080x2235 -> 1440x2980
+07-17 06:09:39.168 15938 15938 I HordeRtProbeBridge: Started Android diagnostic surface rendering loop.
+07-17 06:09:39.175 15938 24595 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
+07-17 06:09:39.466 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=9.914 fence=8.825 record=0.302 submit+present=0.630
+07-17 06:09:40.657 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=9.921 fence=9.222 record=0.169 submit+present=0.385
+07-17 06:09:41.870 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=10.103 fence=9.185 record=0.230 submit+present=0.508
+07-17 06:09:43.427 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.971 fence=11.882 record=0.281 submit+present=0.605
+07-17 06:09:45.159 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=14.428 fence=13.272 record=0.279 submit+present=0.660
+07-17 06:09:46.781 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=13.512 fence=12.487 record=0.263 submit+present=0.566
+07-17 06:09:48.315 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.783 fence=11.773 record=0.235 submit+present=0.574
+07-17 06:09:49.806 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.415 fence=11.414 record=0.243 submit+present=0.563
+07-17 06:09:51.291 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.376 fence=11.374 record=0.237 submit+present=0.569
+07-17 06:09:52.784 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.431 fence=11.404 record=0.235 submit+present=0.594
+07-17 06:09:54.271 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.394 fence=11.362 record=0.252 submit+present=0.566
+07-17 06:09:55.762 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.420 fence=11.379 record=0.224 submit+present=0.611
+07-17 06:09:57.252 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.408 fence=11.378 record=0.228 submit+present=0.598
+07-17 06:09:58.738 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.378 fence=11.391 record=0.238 submit+present=0.551
+07-17 06:10:00.232 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.448 fence=11.413 record=0.240 submit+present=0.588
+07-17 06:10:01.716 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.360 fence=11.371 record=0.221 submit+present=0.562
+07-17 06:10:03.203 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.387 fence=11.404 record=0.223 submit+present=0.558
+07-17 06:10:04.694 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.418 fence=11.392 record=0.240 submit+present=0.592
+07-17 06:10:06.180 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.379 fence=11.396 record=0.241 submit+present=0.558
+07-17 06:10:07.672 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.428 fence=11.413 record=0.240 submit+present=0.579
+07-17 06:10:09.163 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.416 fence=11.401 record=0.230 submit+present=0.595
+07-17 06:10:10.619 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.135 fence=11.360 record=0.131 submit+present=0.509
+07-17 06:10:12.083 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.196 fence=11.394 record=0.125 submit+present=0.542
+07-17 06:10:13.547 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.194 fence=11.377 record=0.127 submit+present=0.546
+07-17 06:10:15.005 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.141 fence=11.353 record=0.132 submit+present=0.515
+07-17 06:10:16.470 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.209 fence=11.380 record=0.130 submit+present=0.547
+07-17 06:10:17.930 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.162 fence=11.360 record=0.121 submit+present=0.544
+07-17 06:10:19.394 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.195 fence=11.388 record=0.127 submit+present=0.542
+07-17 06:10:20.855 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.167 fence=11.338 record=0.138 submit+present=0.553
+07-17 06:10:22.314 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.158 fence=11.341 record=0.138 submit+present=0.537
+07-17 06:10:23.775 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.164 fence=11.362 record=0.134 submit+present=0.532
+07-17 06:10:25.236 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.171 fence=11.361 record=0.123 submit+present=0.542
+07-17 06:10:26.696 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.162 fence=11.369 record=0.120 submit+present=0.533
+07-17 06:10:28.161 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.208 fence=11.389 record=0.135 submit+present=0.544
+07-17 06:10:29.620 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.156 fence=11.361 record=0.131 submit+present=0.529
+07-17 06:10:31.079 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.145 fence=11.341 record=0.132 submit+present=0.537
+07-17 06:10:32.540 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.178 fence=11.378 record=0.133 submit+present=0.534
+07-17 06:10:34.003 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.185 fence=11.362 record=0.125 submit+present=0.557
+07-17 06:10:35.459 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.122 fence=11.343 record=0.130 submit+present=0.510
+07-17 06:10:36.919 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.165 fence=11.368 record=0.124 submit+present=0.532
+07-17 06:10:38.370 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.086 fence=11.357 record=0.121 submit+present=0.493
+07-17 06:10:39.887 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.633 fence=11.842 record=0.129 submit+present=0.525
+07-17 06:10:41.377 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.411 fence=11.573 record=0.135 submit+present=0.569
+07-17 06:10:42.833 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.121 fence=11.350 record=0.118 submit+present=0.519
+07-17 06:10:44.294 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.168 fence=11.372 record=0.127 submit+present=0.526
+07-17 06:10:45.756 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.180 fence=11.360 record=0.125 submit+present=0.563
+07-17 06:10:47.219 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.187 fence=11.380 record=0.130 submit+present=0.532
+07-17 06:10:48.685 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.213 fence=11.391 record=0.129 submit+present=0.546
+07-17 06:10:50.147 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.182 fence=11.373 record=0.127 submit+present=0.539
+07-17 06:10:51.607 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.163 fence=11.350 record=0.131 submit+present=0.550
+07-17 06:10:53.088 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.336 fence=11.530 record=0.127 submit+present=0.541
+07-17 06:10:54.617 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.735 fence=11.899 record=0.134 submit+present=0.550
+07-17 06:10:56.083 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.212 fence=11.400 record=0.132 submit+present=0.540
+07-17 06:10:57.542 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.152 fence=11.374 record=0.124 submit+present=0.517
+07-17 06:10:59.006 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.200 fence=11.370 record=0.130 submit+present=0.560
+07-17 06:11:00.468 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.179 fence=11.371 record=0.131 submit+present=0.541
+07-17 06:11:01.932 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.194 fence=11.383 record=0.129 submit+present=0.546
+07-17 06:11:03.392 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.164 fence=11.365 record=0.127 submit+present=0.531
+07-17 06:11:04.854 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.182 fence=11.374 record=0.123 submit+present=0.549
+07-17 06:11:06.317 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.190 fence=11.377 record=0.125 submit+present=0.534
+07-17 06:11:07.822 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.529 fence=11.706 record=0.130 submit+present=0.546
+07-17 06:11:09.325 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.525 fence=11.733 record=0.125 submit+present=0.528
+07-17 06:11:10.789 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.193 fence=11.379 record=0.127 submit+present=0.545
+07-17 06:11:12.249 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.158 fence=11.366 record=0.125 submit+present=0.527
+07-17 06:11:13.713 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.195 fence=11.376 record=0.134 submit+present=0.544
+07-17 06:11:15.175 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.174 fence=11.349 record=0.131 submit+present=0.560
+07-17 06:11:16.629 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.111 fence=11.344 record=0.130 submit+present=0.503
+07-17 06:11:18.091 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.183 fence=11.369 record=0.130 submit+present=0.545
+07-17 06:11:19.579 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=12.395 fence=11.578 record=0.133 submit+present=0.544
+07-17 06:11:21.367 15938 24595 I HordeRtProbeBridge: RT frame timing avg ms: total=14.892 fence=14.131 record=0.177 submit+present=0.446
+07-17 06:11:31.777 15938 15938 I HordeRtProbeBridge: PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich
+07-17 06:11:31.777 15938 15938 I HordeRtProbeBridge: RT render scale 75%: 1080x2235 -> 1440x2980
+07-17 06:11:31.777 15938 15938 I HordeRtProbeBridge: Started Android diagnostic surface rendering loop.
+07-17 06:11:31.779 15938 25885 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
+07-17 06:11:32.149 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=12.344 fence=11.294 record=0.322 submit+present=0.545
+07-17 06:11:33.559 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=11.749 fence=10.816 record=0.218 submit+present=0.536
+07-17 06:11:34.859 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=10.826 fence=9.901 record=0.228 submit+present=0.532
+07-17 06:11:36.299 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=11.995 fence=11.093 record=0.212 submit+present=0.519
+07-17 06:11:37.780 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=12.344 fence=11.372 record=0.230 submit+present=0.557
+07-17 06:11:39.264 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=12.359 fence=11.399 record=0.207 submit+present=0.567
+07-17 06:11:40.746 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=12.342 fence=11.388 record=0.211 submit+present=0.562
+07-17 06:11:42.226 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=12.332 fence=11.372 record=0.219 submit+present=0.553
+07-17 06:11:43.710 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=12.366 fence=11.399 record=0.213 submit+present=0.567
+07-17 06:11:45.194 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=12.357 fence=11.416 record=0.212 submit+present=0.546
+07-17 06:11:46.680 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=12.376 fence=11.405 record=0.219 submit+present=0.572
+07-17 06:11:48.200 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=12.659 fence=11.732 record=0.206 submit+present=0.545
+07-17 06:11:49.721 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=12.667 fence=11.713 record=0.221 submit+present=0.548
+07-17 06:11:51.477 15938 25885 I HordeRtProbeBridge: PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich
+07-17 06:11:51.477 15938 25885 I HordeRtProbeBridge: RT render scale 100%: 1440x2980 -> 1440x2980
+07-17 06:11:51.478 15938 25885 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
+07-17 06:11:52.080 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=20.075 fence=19.021 record=0.344 submit+present=0.528
+07-17 06:11:54.453 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=19.767 fence=18.652 record=0.257 submit+present=0.661
+07-17 06:11:57.058 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=21.700 fence=20.299 record=0.629 submit+present=0.587
+07-17 06:11:59.937 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=23.991 fence=22.516 record=0.760 submit+present=0.548
+07-17 06:12:03.047 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=25.908 fence=24.388 record=0.788 submit+present=0.514
+07-17 06:12:06.070 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=25.184 fence=23.546 record=0.846 submit+present=0.604
+07-17 06:12:08.974 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=24.198 fence=22.584 record=0.812 submit+present=0.602
+07-17 06:12:11.875 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=24.173 fence=22.567 record=0.817 submit+present=0.602
+07-17 06:12:14.778 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=24.179 fence=22.586 record=0.850 submit+present=0.571
+07-17 06:12:17.668 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=24.081 fence=22.530 record=0.829 submit+present=0.546
+07-17 06:12:20.576 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=24.228 fence=22.782 record=0.787 submit+present=0.488
+07-17 06:12:23.509 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=24.434 fence=22.889 record=0.832 submit+present=0.527
+07-17 06:12:26.405 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=24.125 fence=22.577 record=0.797 submit+present=0.569
+07-17 06:12:29.312 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=24.218 fence=22.572 record=0.866 submit+present=0.592
+07-17 06:12:32.206 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=24.110 fence=22.614 record=0.747 submit+present=0.590
+07-17 06:12:35.226 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=25.159 fence=23.597 record=0.788 submit+present=0.601
+07-17 06:12:38.154 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=24.394 fence=22.845 record=0.769 submit+present=0.618
+07-17 06:12:41.223 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=25.575 fence=23.975 record=0.796 submit+present=0.624
+07-17 06:12:44.175 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=24.594 fence=23.058 record=0.778 submit+present=0.599
+07-17 06:12:47.188 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=25.102 fence=23.608 record=0.755 submit+present=0.583
+07-17 06:12:50.094 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=24.213 fence=22.687 record=0.792 submit+present=0.569
+07-17 06:12:53.064 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=24.741 fence=23.234 record=0.729 submit+present=0.618
+07-17 06:12:55.930 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=23.873 fence=22.393 record=0.725 submit+present=0.589
+07-17 06:12:58.792 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=23.845 fence=22.423 record=0.706 submit+present=0.566
+07-17 06:13:01.542 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=22.915 fence=21.680 record=0.458 submit+present=0.573
+07-17 06:13:04.536 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=24.944 fence=23.966 record=0.195 submit+present=0.562
+07-17 06:13:07.593 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=25.471 fence=24.470 record=0.180 submit+present=0.579
+07-17 06:13:10.719 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=26.043 fence=24.969 record=0.191 submit+present=0.638
+07-17 06:13:13.790 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=25.588 fence=24.512 record=0.185 submit+present=0.639
+07-17 06:13:16.940 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=26.245 fence=25.134 record=0.186 submit+present=0.650
+07-17 06:13:20.008 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=25.562 fence=24.525 record=0.167 submit+present=0.624
+07-17 06:13:23.013 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=25.037 fence=24.026 record=0.170 submit+present=0.617
+07-17 06:13:26.021 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=25.062 fence=24.027 record=0.180 submit+present=0.626
+07-17 06:13:29.020 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=24.985 fence=23.963 record=0.173 submit+present=0.618
+07-17 06:13:32.029 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=25.070 fence=24.040 record=0.167 submit+present=0.629
+07-17 06:13:35.029 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=24.998 fence=23.992 record=0.169 submit+present=0.607
+07-17 06:13:38.038 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=25.073 fence=24.018 record=0.186 submit+present=0.632
+07-17 06:13:41.042 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=25.031 fence=24.016 record=0.169 submit+present=0.632
+07-17 06:13:44.044 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=25.010 fence=23.990 record=0.177 submit+present=0.615
+07-17 06:13:47.051 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=25.054 fence=23.996 record=0.174 submit+present=0.632
+07-17 06:13:50.061 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=25.079 fence=24.031 record=0.192 submit+present=0.626
+07-17 06:13:53.071 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=25.075 fence=24.039 record=0.180 submit+present=0.646
+07-17 06:13:56.077 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=25.046 fence=24.022 record=0.180 submit+present=0.626
+07-17 06:13:59.083 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=25.048 fence=24.029 record=0.176 submit+present=0.635
+07-17 06:14:02.098 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=25.123 fence=24.078 record=0.170 submit+present=0.636
+07-17 06:14:05.112 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=25.113 fence=24.019 record=0.178 submit+present=0.656
+07-17 06:14:08.120 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=25.061 fence=24.029 record=0.171 submit+present=0.633
+07-17 06:14:11.134 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=25.107 fence=24.073 record=0.169 submit+present=0.638
+07-17 06:14:14.139 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=25.037 fence=24.019 record=0.186 submit+present=0.622
+07-17 06:14:17.144 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=25.040 fence=23.992 record=0.174 submit+present=0.619
+07-17 06:14:20.156 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=25.087 fence=24.031 record=0.169 submit+present=0.636
+07-17 06:14:23.160 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=25.036 fence=24.004 record=0.188 submit+present=0.623
+07-17 06:14:26.162 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=25.007 fence=23.990 record=0.174 submit+present=0.619
+07-17 06:14:29.178 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=25.128 fence=24.048 record=0.185 submit+present=0.646
+07-17 06:14:32.190 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=25.096 fence=24.032 record=0.198 submit+present=0.640
+07-17 06:14:35.196 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=25.045 fence=24.036 record=0.175 submit+present=0.623
+07-17 06:14:38.199 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=25.022 fence=23.978 record=0.193 submit+present=0.624
+07-17 06:14:41.290 15938 25885 I HordeRtProbeBridge: PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich
+07-17 06:14:41.290 15938 25885 I HordeRtProbeBridge: RT render scale 75%: 1080x2235 -> 1440x2980
+07-17 06:14:41.291 15938 25885 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
+07-17 06:14:41.746 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=15.172 fence=14.232 record=0.223 submit+present=0.517
+07-17 06:14:43.478 15938 25885 I HordeRtProbeBridge: RT frame timing avg ms: total=14.430 fence=13.570 record=0.144 submit+present=0.565

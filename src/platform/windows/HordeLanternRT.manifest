@@ -4,8 +4,8 @@
       name="Samfa12.HordeLanternRT"
       processorArchitecture="*"
       type="win32"
-      version="0.1.0.0" />
-  <description>Horde Lantern RT - Initial Showing Alpha</description>
+      version="0.1.1.0" />
+  <description>Horde Lantern RT - Showcase Alpha</description>
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
     <security>
       <requestedPrivileges>
