@@ -1972,7 +1972,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     lichAddressInfo.accelerationStructure = lichBlas_.handle;
     lichBlas_.address = vkGetAccelerationStructureDeviceAddressKHR_(device_, &lichAddressInfo);
 
-    std::array<VkAccelerationStructureInstanceKHR, 18u> instances{};
+    std::array<VkAccelerationStructureInstanceKHR, PresentableTinyRtScene::kTlasInstanceCount> instances{};
     instances[0].transform = transform;
     instances[0].instanceCustomIndex = 0u;
     instances[0].mask = 0x01u;
@@ -2641,7 +2641,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         lastLichClip_ = lichClipIndex;
     }
 
-    std::array<VkAccelerationStructureInstanceKHR, 18u> instances{};
+    std::array<VkAccelerationStructureInstanceKHR, PresentableTinyRtScene::kTlasInstanceCount> instances{};
     instances[0].transform = {{
         1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f, 0.0f,

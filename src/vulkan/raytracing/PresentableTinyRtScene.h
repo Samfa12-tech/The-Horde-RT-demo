@@ -17,6 +17,10 @@ namespace horde::vulkan::raytracing
 class PresentableTinyRtScene
 {
 public:
+    static constexpr std::uint32_t kBlasCount = 8u;
+    static constexpr std::uint32_t kTlasCount = 1u;
+    static constexpr std::uint32_t kTlasInstanceCount = 18u;
+
     PresentableTinyRtScene() = default;
     ~PresentableTinyRtScene();
 
@@ -43,6 +47,9 @@ public:
     bool IsReady() const { return ready_; }
     VkExtent2D DispatchExtent() const { return dispatchExtent_; }
     const std::string& MaterialEncoding() const { return materialEncoding_; }
+    std::uint32_t BlasCount() const { return ready_ ? kBlasCount : 0u; }
+    std::uint32_t TlasCount() const { return ready_ ? kTlasCount : 0u; }
+    std::uint32_t TlasInstanceCount() const { return ready_ ? kTlasInstanceCount : 0u; }
 
     bool RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                             VkImage swapchainImage,

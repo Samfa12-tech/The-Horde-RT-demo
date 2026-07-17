@@ -1,6 +1,8 @@
 package com.samfa12.hordelanternrt;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
@@ -9,6 +11,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.media.AudioAttributes;
 import android.media.SoundPool;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -30,10 +33,13 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -53,6 +59,8 @@ public class MainActivity extends Activity {
     private static final String EXTRA_DEBUG_REPLAY = "horde.debug.replay";
     private static final String EXTRA_DEBUG_SCALE = "horde.debug.scale";
     private static final String EXTRA_DEBUG_AUTOSTART = "horde.debug.autostart";
+    private static final String EXTRA_DEBUG_OVERLAY = "horde.debug.overlay";
+    private static final int REQUEST_SAVE_BENCHMARK = 7101;
     private static final int AUDIO_EVENT_ENEMY_DEFEATED = 1;
     private static final int AUDIO_EVENT_PLAYER_FOOTSTEP = 1 << 1;
     private static final int AUDIO_EVENT_ENEMY_FOOTSTEP = 1 << 2;
@@ -75,6 +83,7 @@ public class MainActivity extends Activity {
     private ScrollView diagnosticsPanel;
     private TextView reportTextView;
     private TextView rtStatus;
+    private TextView developerOverlay;
     private Button menuButton;
     private Button attackButton;
     private SoundPool soundPool;
@@ -94,6 +103,10 @@ public class MainActivity extends Activity {
     private int pendingDebugCheckpoint = -1;
     private boolean pendingDebugReplay;
     private boolean debugAutomationAutostart;
+    private boolean developerOverlayVisible;
+    private boolean benchmarkRunning;
+    private boolean benchmarkReportVisible;
+    private String latestBenchmarkReport = "";
     private final Runnable applyPendingRenderScale = () ->
             ProbeBridge.setRenderScale(preferences.getInt("render_scale", 100) / 100.0f);
 
@@ -112,6 +125,7 @@ public class MainActivity extends Activity {
         diagnosticsPanel = findViewById(R.id.diagnostics_panel);
         reportTextView = findViewById(R.id.report_text);
         rtStatus = findViewById(R.id.rt_status);
+        developerOverlay = findViewById(R.id.developer_overlay);
         menuButton = findViewById(R.id.menu_button);
         attackButton = findViewById(R.id.attack_button);
         final Button diagnosticsBack = findViewById(R.id.diagnostics_back);
@@ -121,6 +135,13 @@ public class MainActivity extends Activity {
         styleActionButton(diagnosticsBack, 0xCC211B15, 0xFFFFD28A);
         menuButton.setContentDescription(getString(R.string.menu));
         attackButton.setContentDescription(getString(R.string.swing));
+        if (isDebuggableApp()) {
+            rtStatus.setOnLongClickListener(view -> {
+                developerOverlayVisible = !developerOverlayVisible;
+                if (!developerOverlayVisible) developerOverlay.setVisibility(View.GONE);
+                return true;
+            });
+        }
 
         initialiseAudio();
         menuButton.setOnClickListener(view -> {
@@ -283,6 +304,7 @@ public class MainActivity extends Activity {
     }
 
     private void showMainMenu(final boolean firstLaunch) {
+        benchmarkReportVisible = false;
         diagnosticsVisible = false;
         diagnosticsPanel.setVisibility(View.GONE);
         menuVisible = true;
@@ -291,6 +313,7 @@ public class MainActivity extends Activity {
         attackButton.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
+        developerOverlay.setVisibility(View.GONE);
         menuScrim.setVisibility(View.VISIBLE);
         menuScrim.removeAllViews();
 
@@ -313,10 +336,93 @@ public class MainActivity extends Activity {
         addMenuButtonRow(panel,
                 getString(R.string.settings), this::showSettings,
                 getString(R.string.technical_info), () -> showDiagnostics(false));
+        addMenuButton(panel, getString(R.string.run_benchmark), this::startBenchmark);
+        addMenuButton(panel, getString(R.string.more_by_samfa12), this::openSamfa12Website);
         addMenuButtonRow(panel,
                 getString(R.string.credits), this::showCredits,
                 getString(R.string.quit), this::finishAndRemoveTask);
         attachPanel(panel);
+    }
+
+    private void openSamfa12Website() {
+        playSound("ui_select", 0.18f);
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://samfa12.com/")));
+        } catch (final RuntimeException error) {
+            Log.e(TAG, "Failed to open Samfa12.com.", error);
+            Toast.makeText(this, R.string.website_open_failed, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void startBenchmark() {
+        playSound("ui_select", 0.18f);
+        if (ProbeBridge.getRuntimeState() != 1 || !ProbeBridge.requestBenchmark()) {
+            Toast.makeText(this, R.string.benchmark_unavailable, Toast.LENGTH_LONG).show();
+            return;
+        }
+        benchmarkRunning = true;
+        latestBenchmarkReport = "";
+        firstMenu = false;
+        hideMenu();
+        menuButton.setVisibility(View.GONE);
+        attackButton.setVisibility(View.GONE);
+        rtStatus.setVisibility(View.VISIBLE);
+        rtStatus.setText(R.string.benchmark_starting);
+    }
+
+    private void showBenchmarkReport(final boolean completed) {
+        benchmarkRunning = false;
+        benchmarkReportVisible = true;
+        menuVisible = true;
+        diagnosticsVisible = false;
+        ProbeBridge.setSimulationPaused(true);
+        clearTouchState();
+        attackButton.setVisibility(View.GONE);
+        menuButton.setVisibility(View.GONE);
+        developerOverlay.setVisibility(View.GONE);
+        rtStatus.setVisibility(View.GONE);
+        diagnosticsPanel.setVisibility(View.GONE);
+        menuScrim.setVisibility(View.VISIBLE);
+        menuScrim.removeAllViews();
+
+        final LinearLayout panel = createPanel(getString(R.string.benchmark_report),
+                completed ? getString(R.string.benchmark_complete) : getString(R.string.benchmark_invalid));
+        final TextView report = new TextView(this);
+        report.setText(latestBenchmarkReport);
+        report.setTextColor(0xFFD8F0D0);
+        report.setTextSize(11);
+        report.setTypeface(Typeface.MONOSPACE);
+        report.setTextIsSelectable(true);
+        report.setPadding(0, 0, 0, dp(14));
+        panel.addView(report, matchWrap());
+        addMenuButtonRow(panel,
+                getString(R.string.copy_report), this::copyBenchmarkReport,
+                getString(R.string.save_report), this::saveBenchmarkReport);
+        addMenuButton(panel, getString(R.string.back), () -> showMainMenu(false));
+        attachPanel(panel);
+    }
+
+    private void copyBenchmarkReport() {
+        final ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        if (clipboard == null) {
+            Toast.makeText(this, R.string.report_copy_failed, Toast.LENGTH_LONG).show();
+            return;
+        }
+        clipboard.setPrimaryClip(ClipData.newPlainText(getString(R.string.benchmark_report), latestBenchmarkReport));
+        Toast.makeText(this, R.string.report_copied, Toast.LENGTH_SHORT).show();
+    }
+
+    private void saveBenchmarkReport() {
+        final Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_TITLE, "HordeLanternRT-benchmark.txt");
+        try {
+            startActivityForResult(intent, REQUEST_SAVE_BENCHMARK);
+        } catch (final RuntimeException error) {
+            Log.e(TAG, "Failed to open benchmark document picker.", error);
+            Toast.makeText(this, R.string.report_save_failed, Toast.LENGTH_LONG).show();
+        }
     }
 
     private void hideMenu() {
@@ -402,6 +508,7 @@ public class MainActivity extends Activity {
         menuScrim.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         attackButton.setVisibility(View.GONE);
+        developerOverlay.setVisibility(View.GONE);
         refreshDiagnosticsText();
         diagnosticsPanel.setVisibility(View.VISIBLE);
         diagnosticsPanel.bringToFront();
@@ -473,6 +580,33 @@ public class MainActivity extends Activity {
                     }
                 } else {
                     rtStatus.setText(R.string.rt_starting);
+                }
+
+                if (benchmarkRunning) {
+                    final int benchmarkStatus = ProbeBridge.getBenchmarkStatus();
+                    if (benchmarkStatus == 1) {
+                        final String progress = ProbeBridge.getBenchmarkProgress();
+                        rtStatus.setText(progress.isEmpty() ? getString(R.string.benchmark_starting) : progress);
+                        rtStatus.setVisibility(View.VISIBLE);
+                        menuButton.setVisibility(View.GONE);
+                        attackButton.setVisibility(View.GONE);
+                    } else if (benchmarkStatus == 2 || benchmarkStatus == 3) {
+                        latestBenchmarkReport = ProbeBridge.getBenchmarkReport();
+                        if (latestBenchmarkReport.isEmpty()) {
+                            latestBenchmarkReport = getString(R.string.benchmark_interrupted);
+                        }
+                        showBenchmarkReport(benchmarkStatus == 2);
+                    }
+                }
+
+                if (isDebuggableApp() && developerOverlayVisible && state == 1 &&
+                        !menuVisible && !diagnosticsVisible && !benchmarkRunning) {
+                    final String overlayText = ProbeBridge.getDeveloperOverlayText();
+                    developerOverlay.setText(overlayText);
+                    developerOverlay.setVisibility(overlayText.isEmpty() ? View.GONE : View.VISIBLE);
+                    developerOverlay.bringToFront();
+                } else {
+                    developerOverlay.setVisibility(View.GONE);
                 }
 
                 final int events = ProbeBridge.consumeAudioEvents();
@@ -547,6 +681,9 @@ public class MainActivity extends Activity {
         }
         final int requestedCheckpoint = checkpointId(intent.getStringExtra(EXTRA_DEBUG_CHECKPOINT));
         final boolean requestedReplay = intent.getBooleanExtra(EXTRA_DEBUG_REPLAY, false);
+        if (intent.hasExtra(EXTRA_DEBUG_OVERLAY)) {
+            developerOverlayVisible = intent.getBooleanExtra(EXTRA_DEBUG_OVERLAY, false);
+        }
         if (requestedCheckpoint >= 0) {
             pendingDebugCheckpoint = requestedCheckpoint;
             pendingDebugReplay = false;
@@ -851,8 +988,33 @@ public class MainActivity extends Activity {
     }
 
     @Override
+    protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != REQUEST_SAVE_BENCHMARK || resultCode != RESULT_OK ||
+                data == null || data.getData() == null) {
+            return;
+        }
+        try (OutputStream output = getContentResolver().openOutputStream(data.getData(), "wt")) {
+            if (output == null) throw new IllegalStateException("Document provider returned no output stream.");
+            output.write(latestBenchmarkReport.getBytes(StandardCharsets.UTF_8));
+            Toast.makeText(this, R.string.report_saved, Toast.LENGTH_SHORT).show();
+        } catch (final Exception error) {
+            Log.e(TAG, "Failed to save benchmark report.", error);
+            Toast.makeText(this, R.string.report_save_failed, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
     public void onBackPressed() {
-        if (diagnosticsVisible) {
+        if (benchmarkRunning) {
+            ProbeBridge.cancelBenchmark();
+            benchmarkRunning = false;
+            playSound("ui_back", 0.18f);
+            showMainMenu(false);
+        } else if (benchmarkReportVisible) {
+            playSound("ui_back", 0.18f);
+            showMainMenu(false);
+        } else if (diagnosticsVisible) {
             diagnosticsVisible = false;
             diagnosticsPanel.setVisibility(View.GONE);
             showMainMenu(false);
@@ -887,6 +1049,11 @@ public class MainActivity extends Activity {
     @Override
     protected void onPause() {
         resumed = false;
+        if (benchmarkRunning) {
+            ProbeBridge.cancelBenchmark();
+            benchmarkRunning = false;
+            showMainMenu(false);
+        }
         ProbeBridge.setSimulationPaused(true);
         stopSurface();
         super.onPause();

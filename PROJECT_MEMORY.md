@@ -1,6 +1,6 @@
 # Horde Lantern RT - Project Memory
 
-Last updated: 2026-07-17
+Last updated: 2026-07-18
 
 ## Identity and release state
 
@@ -46,16 +46,19 @@ Last updated: 2026-07-17
 - The skeleton uses Hotstrike Studio's base asset processed with Meshy. The CC0 Meshy lich uses restrained `Idle_02`/`Dead` skinning plus whole-instance hover/orbit; its visibly distorted walking clip is deliberately not presented.
 - One skinned enemy is animated/refit/rendered at a time: skeleton in the opening route, lich after the skylight gate.
 - Android: left drag movement/strafe, right drag 360 look, Swing button, Android Back pause/resume.
-- Windows: WASD, left-drag look, right mouse/Space swing, Esc pause/resume, R restart, F1 controls, F2 diagnostics, Alt+Enter fullscreen.
+- Windows: WASD, left-drag look, right mouse/Space swing, Esc pause/resume, R restart, F1 controls, F2 diagnostics, Debug-only F3 live developer overlay, Alt+Enter fullscreen.
 
 ## UI, settings, diagnostics, and audio
 
 - Both platforms have branded entry, pause, controls, settings, RT diagnostics, restart, and quit flows.
+- Both platform menus expose a release-safe two-pass benchmark: pass 1 warms the deterministic 13-waypoint route, pass 2 measures it, and completion produces a selectable/copyable/exportable text report plus automatically archived JSON evidence. Windows is live-validated; Android device validation waits for the phone.
+- Both platform menus include `More by Samfa12`, which opens https://samfa12.com/ in the system browser.
 - Technical output stays tucked away unless requested or startup fails.
 - Both platforms persist a 50-100% RT render-resolution slider with 100% default.
 - Android also persists SFX enable/volume, look sensitivity, and compact HUD.
 - Windows persists SFX, sensitivity, display mode, and render scale beside the executable.
 - Android diagnostics report internal resolution, FPS, frame time, dispatch resolution, and honest RT presentation.
+- The shared Debug developer overlay reports build/shader identity, GPU/API, RT mode/presentation, render scale/extents/timing, route/lantern/enemy state, BLAS/TLAS/instance counts, active skinned count, and material route. Windows F3 is live-validated and non-pausing; Android Debug/Release compile, but the Android overlay still needs device touch/layout/performance/lifecycle validation.
 - Seventeen FilmCow WAVs cover UI, sword, normalized alternating player/skeleton footsteps, skeleton attack, and lich charge/impact/fall/hurt reactions.
 - Android uses SoundPool per-cue gain; Windows uses XAudio2 per-voice matrices with WinMM fallback.
 
@@ -75,7 +78,8 @@ Last updated: 2026-07-17
 - GPU: NVIDIA GeForce RTX 5050 Laptop GPU.
 - Release builds as `HordeLanternRT.exe` with GUI subsystem, icon/version resource, static MSVC runtime, and executable-relative assets.
 - A clean 0.1.1 candidate extraction launched without the source tree, selected `RayTracingPipeline`, and honestly presented the full route.
-- Windows Debug/Release and all five CTests pass; hands-on route, collision, mirror, combat, lighting, reset, and spatial-audio validation passed.
+- Windows Debug/Release and all seven CTests pass; hands-on route, collision, mirror, combat, lighting, reset, and spatial-audio validation passed.
+- The Windows Release in-app benchmark is live-validated at 100%: 2/2 frame-symmetric laps, 26/26 waypoints, 1,838 measured frames, honest RT presentation throughout, selectable/copyable UI, and parseable timestamped text/JSON. See `docs/IN_APP_BENCHMARK_WINDOWS_VALIDATION_2026-07-17.md`.
 - The package includes both enemy GLBs, raw environment and lich textures, seventeen FilmCow WAVs, release notes, controls, and `ASSET_LICENSES.md`.
 
 ## Asset and licence state
@@ -100,6 +104,8 @@ Last updated: 2026-07-17
 - Release readiness: `docs/ALPHA_RELEASE_READINESS_2026-07-15.md`
 - Packaging: `tools/package-alpha.ps1`, `tools/package-signed-alpha.ps1`, `tools/push-alpha-to-itch.ps1`
 - Build/test/demo cycle plan: `docs/BUILD_TEST_DEMO_CYCLE_PLAN_2026-07-17.md`
+- RTXPT-derived performance/quality/workflow reference and no-regression gates: `docs/RTXPT_1_8_1_REFERENCE_AND_REGRESSION_GATES_2026-07-17.md`
+- Developer overlay Windows validation and Android build boundary: `docs/DEVELOPER_OVERLAY_WINDOWS_VALIDATION_2026-07-17.md`
 
 ## Next-step sequence
 
@@ -107,7 +113,7 @@ Last updated: 2026-07-17
 2. Back up the JKS and both passwords independently.
 3. Treat the complete 0.1.1 route as the preserved playable baseline; the stained pane was rejected, water remains deferred, and no second concurrent enemy is authorised without a measured plan.
 4. The deterministic checkpoint, three-window benchmark, native route replay, and bounded Android evidence runner foundation is complete and live-validated.
-5. Continue the support cycle with developer overlay/state visibility, an integrated cross-platform clean-build/package/stale-shader/licence gate, then fixed video/presentation capture.
+5. Developer overlay/state visibility is complete and live-validated on Windows; Android build plumbing is complete but device validation waits for the phone. Continue with that phone gate, then the integrated cross-platform clean-build/package/stale-shader/licence gate and fixed video/presentation capture.
 6. Gate each meaningful renderer/gameplay-route change on the phone at 75%; report 100% separately and retain the short hands-on touch/audio/lifecycle pass.
 7. Keep real RT and honest diagnostics. Reduce bounded effect area/ray cost before expanding gameplay or substituting fake effects.
 8. Treat `docs/BUILD_TEST_DEMO_CYCLE_PLAN_2026-07-17.md` as the detailed backlog and `docs/DOCUMENTATION_CHECKPOINT_2026-07-17.md` as the documentation authority map.

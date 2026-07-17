@@ -17,9 +17,11 @@ The demo must prove real native Vulkan hardware ray tracing. Browser rendering, 
 
 ## Build / test / demo cycle decision - 2026-07-17
 
-The first supporting foundation is complete: Android Debug has deterministic route checkpoints, three-window measurement, native route replay, fixed screenshots, state evidence, and a bounded one-command runner. The remaining cycle work is developer visibility, integrated cross-platform clean-build/package/stale-shader/licence gates, and fixed video/presentation capture. Detailed scope and guardrails live in `docs/BUILD_TEST_DEMO_CYCLE_PLAN_2026-07-17.md`.
+The first supporting foundation is complete: Android Debug has deterministic route checkpoints, three-window measurement, native route replay, fixed screenshots, state evidence, and a bounded one-command runner. The live developer overlay is now complete and live-validated on Windows; its shared Android Debug plumbing compiles but remains device-unvalidated until the phone is attached. The remaining cycle work is that Android device gate, integrated cross-platform clean-build/package/stale-shader/licence gates, and fixed video/presentation capture. Detailed scope and guardrails live in `docs/BUILD_TEST_DEMO_CYCLE_PLAN_2026-07-17.md`.
 
 The normal player-facing route remains intact; development checkpoints and overlays must stay tucked away from branded entry/pause/settings surfaces. Game-facing combat polish follows the tooling foundation. Do not raise the one-active-skinned-enemy limit without a separate phone measurement.
+
+Windows Debug uses F3 for the compact live overlay while F2 retains the full paused RT diagnostics surface. Release builds omit the F3 control, help text, menu command, and live overlay UI. Android Release keeps the native developer-overlay request empty; only debuggable builds may show the hidden view.
 
 ## Target devices
 

@@ -106,7 +106,8 @@ The runtime-only Android asset task is complete and reduced the debug APK from 9
 
 ## Next support milestones
 
-1. Developer overlay/state visibility.
-2. Integrated cross-platform clean-build, test, shader-staleness, asset/licence, and package verification.
-3. Fixed video/presentation capture.
-4. Only then, a separately scoped gameplay or multi-enemy slice with phone measurements.
+1. Developer overlay/state visibility — Windows complete/live-validated; Android Debug plumbing compiled, device validation pending.
+2. Player-facing two-pass benchmark/report export — Windows complete/live-validated; Android Debug/Release/lint pass, device validation pending.
+3. Integrated cross-platform clean-build, test, shader-staleness, asset/licence, and package verification.
+4. Fixed video/presentation capture.
+5. Only then, a separately scoped gameplay or multi-enemy slice with phone measurements.
