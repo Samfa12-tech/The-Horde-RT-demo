@@ -74,7 +74,7 @@ Render scaling was verified at:
 
 Windows Release was launched from a clean extraction using only its packaged assets. It reported `RayTracingPipeline`, `RT scene presented: yes`, and live resolution/FPS/frame-time diagnostics. The 100% and 75% render targets were verified at `982x628` and `737x471` respectively.
 
-The in-app Windows Release benchmark is live-validated: its warm-up plus measured course completed 26/26 waypoints with honest RT presentation on every measured frame, displayed a selectable result, copied the complete report to the clipboard, and wrote parseable timestamped text/JSON. Android builds and lints; its touch/lifecycle/export gate waits for the connected phone.
+The in-app benchmark is live-validated on both targets. Windows Release completed 26/26 waypoints with honest RT presentation on every measured frame, copied the full report, and wrote parseable timestamped text/JSON. On `SM-S948B`, Android completed the same 1,838-frame measured lap at 100% and 75%, passed Back/Home recovery and its 1.7-font report layout, and opened the document picker with the expected export filename.
 
 See:
 
@@ -84,6 +84,7 @@ See:
 - `docs/ANDROID_SHOWCASE_AUTOMATION_2026-07-17.md`
 - `docs/ANDROID_SHOWCASE_AUTOMATION_VALIDATION_2026-07-17.md`
 - `docs/IN_APP_BENCHMARK_WINDOWS_VALIDATION_2026-07-17.md`
+- `docs/IN_APP_BENCHMARK_ANDROID_VALIDATION_2026-07-18.md`
 - `docs/SHOWCASE_ALPHA_RELEASE_NOTES_2026-07-17.md`
 - Historical 0.1.0 readiness and validation records remain under `docs/`.
 

@@ -2,7 +2,7 @@
 
 ## Verdict
 
-**PASS on Windows Debug. Android build integration passes; Android device validation is pending.**
+**PASS on Windows Debug and the connected Android Debug device.**
 
 The compact developer overlay is live, non-pausing, Debug-only, and hidden from branded entry, pause, settings, and full-diagnostics surfaces. Windows F3 toggles it independently while F2 retains the existing paused RT diagnostics view.
 
@@ -35,16 +35,10 @@ The compact developer overlay is live, non-pausing, Debug-only, and hidden from 
 - Android: `assembleDebug assembleRelease lintRelease` passed for all configured ABIs.
 - The shared formatter smoke test covers presented yes/no, explicit BLAS/TLAS/instance counts, active and absent enemy health, timing/extents, state, material, build, and shader identity.
 
-## Android completion boundary
+## Android device addendum - 2026-07-18
 
 Android Debug contains the native 4 Hz snapshot publisher, hidden non-interactive overlay view, `horde.debug.overlay` intent, and debuggable long-press toggle. Android Release returns an empty developer-overlay request and never shows the view.
 
-The following are deliberately not certified without the connected phone:
+On `SM-S948B`, the overlay displayed all seven telemetry lines at the existing 1.7 font scale, reported correct Adreno/Vulkan/RT/extents/state/material values, toggled through the RT-status long press, and survived Home/resume. The standard five-checkpoint 75% gate and route replay passed at thermal status 0. A separate overlay-active opening sample retained honest presentation and a 17.473 ms median of three 120-frame averages, below the existing 20 ms validation budget.
 
-1. touch movement/look/Swing pass-through under the overlay bounds;
-2. compact layout at the device's 1.7 accessibility font scale;
-3. 75% five-checkpoint timing and thermal comparison;
-4. pause/resume and Home/surface recreation;
-5. perceived audio and hands-on visual approval.
-
-Run `tools/run-android-showcase-validation.ps1` and the short hands-on pass when the phone is attached. Do not call the Android overlay device-validated before that gate passes.
+The view is non-clickable. The owner subsequently passed the requested movement/look/Swing, perceived-audio, and visual-legibility check without reporting an issue. Full details are in `IN_APP_BENCHMARK_ANDROID_VALIDATION_2026-07-18.md`.

@@ -45,6 +45,6 @@ These figures are representative local evidence, not a new release promise or cr
 - The focused smoke covers two frame-symmetric deterministic laps, 26 waypoints, final-lap sampling, slowest-1% aggregation, presentation-integrity failure and deterministic text/JSON generation.
 - Android Debug and Release assemble for all four ABIs and Release lint passes.
 
-## Pending phone gate
+## Android phone gate completed
 
-When the phone is attached, validate portrait and landscape at the normal and 1.7 accessibility font scales, course visibility, Back cancellation, thermal behavior, Home/surface interruption, report scrolling/selection, clipboard copy, document-provider export, and return from the picker. Record 75% as the sustained phone tier and 100% separately.
+The connected `SM-S948B` subsequently passed 100% and recommended-tier 75% benchmark runs, honest presentation integrity, 1.7-font report scrolling/actions, Back/Home recovery, supported portrait recreation, and document-picker handoff. See `IN_APP_BENCHMARK_ANDROID_VALIDATION_2026-07-18.md`. Clipboard contents were not shell-read because that could expose unrelated private data; perceived audio/touch/visual quality remains hands-on.
