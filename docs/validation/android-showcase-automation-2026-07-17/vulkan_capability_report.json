@@ -1,0 +1,24 @@
+{
+  "backend": "Vulkan",
+  "rtMode": "RayTracingPipeline",
+  "gpuName": "Adreno (TM) 840",
+  "vendorId": 20803,
+  "deviceId": 1141180977,
+  "driverVersionText": "512.842.19",
+  "vulkanApiVersionText": "1.4.295",
+  "extensions": {
+    "VK_KHR_acceleration_structure": true,
+    "VK_KHR_ray_tracing_pipeline": true,
+    "VK_KHR_ray_query": true,
+    "VK_KHR_buffer_device_address": true,
+    "VK_KHR_deferred_host_operations": true
+  },
+  "features": {
+    "accelerationStructure": true,
+    "rayTracingPipeline": true,
+    "rayQuery": true,
+    "bufferDeviceAddress": true
+  },
+  "internalRenderResolution": {"width":1080,"height":2235},
+  "rtScene": {"status":"Presented via swapchain","geometry":"Complete Horde showcase route with sequential animated skeleton and staff-lit lich","dispatchWidth":1080,"dispatchHeight":2235,"presented":true}
+}

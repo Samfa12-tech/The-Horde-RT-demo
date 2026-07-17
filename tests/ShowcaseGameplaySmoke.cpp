@@ -1,7 +1,10 @@
 #include <cmath>
 #include <iostream>
+#include <string>
 
 #include "gameplay/ShowcaseGameplay.h"
+#include "gameplay/ShowcaseCheckpoints.h"
+#include "gameplay/CorridorCollision.h"
 
 namespace
 {
@@ -24,6 +27,53 @@ int main()
             std::cerr << "Showcase gameplay smoke failed: " << message << '\n';
         }
     };
+
+    for (std::size_t i = 0; i < kShowcaseCheckpoints.size(); ++i)
+    {
+        const ShowcaseCheckpoint& checkpoint = kShowcaseCheckpoints[i];
+        check(checkpoint.id == static_cast<std::int32_t>(i), "checkpoint ids must remain stable and contiguous");
+        check(FindShowcaseCheckpoint(checkpoint.id) == &checkpoint, "checkpoint id lookup must be deterministic");
+        check(FindShowcaseCheckpoint(checkpoint.name) == &checkpoint, "checkpoint name lookup must be deterministic");
+        check(IsShowcasePlayerPositionWalkable(checkpoint.x, checkpoint.z), "checkpoint position must be walkable");
+        check(QueryShowcaseZone(checkpoint.x, checkpoint.z) == checkpoint.expectedZone,
+              "checkpoint position must match its declared zone");
+        check(checkpoint.pitch >= -0.32f && checkpoint.pitch <= 0.28f,
+              "checkpoint pitch must respect the runtime camera clamp");
+        for (std::size_t other = i + 1; other < kShowcaseCheckpoints.size(); ++other)
+        {
+            check(std::string(checkpoint.name) != kShowcaseCheckpoints[other].name,
+                  "checkpoint names must be unique");
+        }
+
+        const ShowcaseCheckpointState state = BuildShowcaseCheckpointState(checkpoint);
+        if (checkpoint.preset == ShowcaseCheckpointPreset::LanternTrigger)
+        {
+            check(state.lanternSnapshot.phase == LanternPhase::Guttering,
+                  "lantern-drop checkpoint must begin the authored gutter");
+        }
+        if (checkpoint.preset == ShowcaseCheckpointPreset::LanternSettled ||
+            checkpoint.preset == ShowcaseCheckpointPreset::LichActive ||
+            checkpoint.preset == ShowcaseCheckpointPreset::FinaleRoofOpen)
+        {
+            check(state.lanternSnapshot.phase == LanternPhase::Settled &&
+                  state.lanternSnapshot.flameStrength == 0.0f &&
+                  state.lanternSnapshot.leftArmLowerBlend == 1.0f,
+                  "post-drop checkpoints must prime a dark settled lantern and lowered arm");
+        }
+        if (checkpoint.preset == ShowcaseCheckpointPreset::LichActive)
+        {
+            check(state.activeEnemyKind == EnemyKind::Lich &&
+                  state.lichEncounter.Snapshot().phase != LichPhase::Dormant,
+                  "lich checkpoints must deterministically activate the finale encounter");
+        }
+        if (checkpoint.preset == ShowcaseCheckpointPreset::FinaleRoofOpen)
+        {
+            check(state.lichEncounter.Snapshot().phase == LichPhase::Dead &&
+                  state.lichEncounter.Snapshot().deathAnimationComplete &&
+                  NearlyEqual(state.lichEncounter.Snapshot().finaleSkylightOpenProgress, 1.0f, 0.003f),
+                  "finale-roof checkpoint must retain the dead lich and fully open roof");
+        }
+    }
 
     LanternSequence lantern;
     lantern.Update(0.05f, 4.0f, -15.2f);

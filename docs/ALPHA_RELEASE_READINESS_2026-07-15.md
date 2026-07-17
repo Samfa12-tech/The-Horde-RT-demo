@@ -1,5 +1,7 @@
 # Initial showing alpha release readiness - 2026-07-15
 
+> Historical 0.1.0 release record. It is preserved for exact build, package, and measurement evidence; Showcase Alpha 0.1.1 is the current public release. See `DOCUMENTATION_CHECKPOINT_2026-07-17.md`.
+
 ## Decision
 
 Prepare a bounded **Horde Lantern RT - Initial Showing Alpha 0.1.0** for Samfa12.com now. Market it as the native RT torch-corridor/material-gallery proof with one honest thin clear-glass skylight. Do not imply the planned framed mirror, stained-glass route, or final guided crypt slices are complete.

@@ -6,8 +6,10 @@ There is no raster, browser, or fake-RT fallback.
 
 WINDOWS REQUIREMENTS
 - Windows 10 or 11, 64-bit
-- A Vulkan driver exposing VK_KHR_ray_tracing_pipeline and the required
-  acceleration-structure and buffer-device-address features
+- A Vulkan driver exposing VK_KHR_acceleration_structure,
+  VK_KHR_ray_tracing_pipeline, VK_KHR_ray_query,
+  VK_KHR_buffer_device_address, VK_KHR_deferred_host_operations,
+  and the required feature structs
 - Validated target: NVIDIA GeForce RTX 5050 Laptop GPU
 
 CONTROLS

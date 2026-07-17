@@ -1,10 +1,12 @@
 # Showcase Route Blockout Validation - 2026-07-16
 
+> Historical Slice A record. The coloured-light route, lantern failure, mirror, complete low-poly player, lich finale, and moving roof were subsequently completed, Android-validated, and published in Showcase Alpha 0.1.1. See `DOCUMENTATION_CHECKPOINT_2026-07-17.md`.
+
 ## Result
 
 Slice A is implemented as a geometry-first extension of the existing native Vulkan RT scene. It preserves the opening room, material gallery, animated skeleton encounter, controls, deterministic reset, one-frame-in-flight ownership, ASTC routing, BGRA correction, `vkCmdTraceRaysKHR`, and honest `rtScene.presented` reporting.
 
-No coloured illumination, lantern failure, lower body, active stained glass, mirror reflection, water, lich, or new shader behavior is included.
+No coloured illumination, lantern failure, lower body, active stained glass, mirror reflection, water, lich, or new shader behavior was included in this geometry-only milestone.
 
 ## Implemented route
 

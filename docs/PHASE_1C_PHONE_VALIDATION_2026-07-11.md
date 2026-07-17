@@ -1,5 +1,7 @@
 # Phase 1C Phone Validation - 2026-07-11
 
+> Historical renderer-foundation record. Its “current” and “next” language applies to the 2026-07-11 milestone; use `DOCUMENTATION_CHECKPOINT_2026-07-17.md` for the current release and backlog.
+
 ## Outcome
 
 Phase 1C passed its primary-target RT closeout on the Samsung `SM-S948B` from baseline commit `93e881856bfeec05efd9c35bddc7c7753146a94e`.

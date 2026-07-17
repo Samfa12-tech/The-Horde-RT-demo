@@ -4,7 +4,7 @@
 
 - User-supplied file: `Meshy_AI_Meshy_Merged_Animations.glb`.
 - Staged destination: `lich_placeholder_merged_animations_v01.glb`.
-- Role: active placeholder for the coloured-light route's final emissive enemy in the Windows-first showcase goal. It is included in the debug Android compile package but has not been device-validated.
+- Role: active published placeholder for the final emissive enemy. It is included in Windows and signed Android 0.1.1 packages and is device-validated on `SM-S948B` at the one-active-skinned-enemy limit.
 - Source size: 14,940,452 bytes.
 - SHA-256: `049979A83ACA55358F54AF8D3AF1F7D518607BEF634474A4EF015BFDFF947A42`.
 - glTF 2.0 / GLB v2, exported by Blender glTF I/O 4.2.57.
@@ -45,14 +45,14 @@ All nine clips key translation, rotation, and scale on all 24 joints. There is n
 - The staff is therefore likely weighted to ordinary hand, arm, or body joints and can bend or distort during biped animation.
 - The robe is driven by the hidden biped legs and can stretch, collapse, or expose unnatural motion. The runtime cannot add cloth physics to this source without a new cloth/simulation design, and cloth physics is not part of this showcase phase.
 - Correcting these faults cleanly requires source separation and re-rigging: a rigid staff mesh parented to an appropriate hand/accessory bone, plus authored robe deformation or skirt/cloth bones. This is not a material or shader fix.
-- Restrained idle and walking clips are the safest initial candidates. Every selected clip needs visual review before it is mapped into the one-enemy loop.
+- Runtime presentation uses restrained `Idle_02` and non-looping `Dead`; whole-instance hover/orbit replaces the visibly distorted walking clip. The source clips remain available for inspection but are not all mapped into gameplay.
 
 ## Integration gates
 
 1. Source licence is CC0. The user supplied a Meshy workspace screenshot showing this exact lich asset with `Change License: CC0`; it is retained as `lich_placeholder_source_licence.png`, SHA-256 `6094E4D9A27A25022A1426C297F069DB60F779CC77526CFE6B154421F6DB96EE`.
 2. The derived mask and textured runtime are now active on Windows. Replace the thresholded placeholder with an art-authored mask if the staff/eye selection needs polish.
 3. Map only visually acceptable clips. The current asset has no direct replacement for the skeleton's attack clip.
-4. The 9,188-triangle model runs at a 30 Hz skin/BLAS-refit cadence on Windows. Measure it on the target phone before certifying the Android path.
+4. The 9,188-triangle model runs at a 30 Hz skin/BLAS-refit cadence and passed the target-phone gate on `SM-S948B`; keep one active skinned enemy until a separate multi-enemy measurement.
 5. Keep it in the shared one-active-skinned-enemy slot. The roster remains plural/configurable, but skeleton and lich are not rendered together in this goal.
 6. If staff or robe deformation remains distracting in the final reveal, replace or re-rig the asset rather than expanding the runtime around a placeholder defect.
 

@@ -10,6 +10,8 @@ Horde Lantern RT is a native Vulkan hardware-ray-tracing technology demo for And
 - Primary validated phone: Samsung `SM-S948B` / Adreno 840
 - Validated Windows GPU: NVIDIA GeForce RTX 5050 Laptop GPU
 
+The APK declares Android 7 / API 24 as its packaging minimum, but hardware support is intentionally much narrower: the device and driver must expose Vulkan acceleration structures, ray-tracing pipeline, ray query, buffer device address, deferred host operations, and the required ASTC formats. Only `SM-S948B` on Android 16 is currently device-certified.
+
 ## RT or nothing
 
 The demo uses Vulkan acceleration structures, an RT pipeline and shader binding table, `vkCmdTraceRaysKHR`, an RT storage image, and swapchain presentation. The phone-safe shading path uses `rayQueryEXT` inside raygen with pipeline recursion depth 1. Unsupported devices show explicit diagnostics; there is no browser, raster, baked, screen-space, or fake-RT fallback.
@@ -61,16 +63,19 @@ Render scaling was verified at:
 
 | Scale | Android internal RT extent | Result |
 |---:|---:|---|
-| 100% | `1440x2980` | Full-extent/image check passed; opening median of three 120-frame average windows 21.700 ms at thermal status 3 |
-| 75% | `1080x2235` | Sustained recommendation; all required warm route zones below 13.7 ms median of three 120-frame average windows at thermal status 3 |
-| 50% | `720x1490` | 163.12 FPS / 6.13 ms observed in live diagnostics |
+| 100% | `1440x2980` | Full-extent/image check passed; latest cool automated opening 25.191 ms median of three 120-frame averages, report-only |
+| 75% | `1080x2235` | Sustained recommendation; warm hands-on route zones below 13.7 ms at thermal status 3; cool automated default set 7.667-16.123 ms at status 0 |
+| 50% | `720x1490` | Initial-alpha opening diagnostic recorded 163.12 FPS / 6.13 ms; retained as historical evidence, not a complete-route baseline |
 
 Windows Release was launched from a clean extraction using only its packaged assets. It reported `RayTracingPipeline`, `RT scene presented: yes`, and live resolution/FPS/frame-time diagnostics. The 100% and 75% render targets were verified at `982x628` and `737x471` respectively.
 
 See:
 
+- `docs/DOCUMENTATION_CHECKPOINT_2026-07-17.md`
 - `docs/HORDE_SHOWCASE_WINDOWS_VALIDATION_2026-07-16.md`
 - `docs/HORDE_SHOWCASE_ANDROID_VALIDATION_2026-07-17.md`
+- `docs/ANDROID_SHOWCASE_AUTOMATION_2026-07-17.md`
+- `docs/ANDROID_SHOWCASE_AUTOMATION_VALIDATION_2026-07-17.md`
 - `docs/SHOWCASE_ALPHA_RELEASE_NOTES_2026-07-17.md`
 - Historical 0.1.0 readiness and validation records remain under `docs/`.
 
@@ -92,7 +97,7 @@ The standalone capability probe remains available as target `horde_rt_capability
 ```powershell
 cd android
 .\gradlew.bat assembleDebug installDebug --console=plain
-adb shell am start -n com.samfa12.hordelanternrt/.MainActivity
+adb shell am start -n com.samfa12.hordelanternrt.debug/com.samfa12.hordelanternrt.MainActivity
 adb logcat -d -s HordeRtProbeBridge HordeLanternAudio AndroidRuntime
 ```
 
@@ -103,6 +108,14 @@ Look for:
 - `SFX loaded` IDs 1 through 17
 
 Debug builds expose reports with `adb shell run-as`; release builds deliberately do not set `android:debuggable`.
+
+For repeatable Android checkpoint timing and deterministic route-collision replay, connect one authorised device and run:
+
+```powershell
+.\tools\run-android-showcase-validation.ps1
+```
+
+The debug-only runner collects a timestamped evidence bundle without changing the public release path. See `docs/ANDROID_SHOWCASE_AUTOMATION_2026-07-17.md`.
 
 ## Package and publish
 
@@ -121,6 +134,8 @@ For a signed rebuild:
 
 The packaging and push scripts securely prompt for signing secrets, reject debug/unsigned Android candidates, verify hashes, and keep Windows and Android on separate itch channels. Add `-ConfirmPush` only after the preflight passes.
 
+The current packaging defaults describe the already-published immutable `0.1.1-alpha.1` release. Do not rebuild or republish changed source under that version. A future public build must first bump CMake/Windows/Android/package metadata, increment Android `versionCode` above 2, provide matching release notes, and update the guarded candidate hashes.
+
 Android native code is linked for 16 KiB page compatibility. The release uses a static C++ runtime, 16 KiB ELF `LOAD` alignment, and AGP 8.7.2 APK alignment; `package-alpha.ps1` rejects candidates that fail either APK or ELF verification or reintroduce `libc++_shared.so` from the r26 NDK.
 
 Never commit a keystore, signing properties, credentials, APK, or generated candidate directory. Losing the release JKS or its passwords prevents compatible Android updates.
@@ -131,6 +146,7 @@ All shipped third-party assets are recorded in `ASSET_LICENSES.md`. The current 
 
 - Five Poly Haven environment sets under CC0.
 - Free Stylized Skeleton by Hotstrike Studio, modified through Meshy; the release uses the conservative Meshy Free-plan CC BY 4.0 attribution route.
+- The active placeholder lich created and animated with Meshy under CC0; the retained licence screenshot and hash are recorded in `ASSET_LICENSES.md`.
 - A bounded FilmCow Recorded SFX subset under FilmCow's custom royalty-free project-use terms.
 
 Do not redistribute source assets as standalone asset packs. Preserve the public Hotstrike/Meshy credit and the full licence manifest with releases.

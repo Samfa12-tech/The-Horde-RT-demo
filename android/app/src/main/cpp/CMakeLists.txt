@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.22.1)
 
 project(horde_rt_probe_android)
 
+option(HORDE_RT_DEBUG_CHECKPOINTS "Enable debug-only showcase checkpoint and replay commands" OFF)
+
 get_filename_component(HORDE_RT_REPO_ROOT "${CMAKE_CURRENT_LIST_DIR}/../../../../.." ABSOLUTE)
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtSources.cmake")
 set(HORDE_RT_ANDROID_CORE_SOURCES)
@@ -21,6 +23,9 @@ target_include_directories(horde_rt_probe_android PRIVATE
 )
 
 target_compile_features(horde_rt_probe_android PRIVATE cxx_std_20)
+if(HORDE_RT_DEBUG_CHECKPOINTS)
+    target_compile_definitions(horde_rt_probe_android PRIVATE HORDE_RT_DEBUG_CHECKPOINTS=1)
+endif()
 # Keep the locally installable debug APK inspectable while avoiding an -O0
 # CPU skinning path that is not representative of a shipped phone build.
 target_compile_options(horde_rt_probe_android PRIVATE $<$<CONFIG:Debug>:-O2>)

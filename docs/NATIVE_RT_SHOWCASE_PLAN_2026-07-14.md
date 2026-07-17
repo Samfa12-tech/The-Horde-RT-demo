@@ -1,5 +1,7 @@
 # Native RT showcase plan - 2026-07-14
 
+> Historical precursor. The route was redesigned by `COLOURED_LIGHT_ROUTE_PLAN_2026-07-15.md` and completed/published in Showcase Alpha 0.1.1. The stained pane was rejected and removed, the threshold remains open, the hero mirror and sequential lich finale shipped, and water remains deferred. Current verdicts are in the Windows, Android, automation, and release validation records dated 2026-07-16/17.
+
 ## North star
 
 Turn Horde Lantern RT into a downloadable 60-90 second guided showcase whose memorable fact is that the same native Vulkan hardware-ray-traced scene runs on a phone and Windows RTX.
@@ -56,7 +58,7 @@ The strongest final composition is player arms and torch reflected in the mirror
 - Stage the reveal so the mirror or glass shows the skeleton before direct line of sight, then reuse the existing approach/attack/death/respawn loop.
 - Final phone gate must include mirror/glass visibility while the skeleton animates and the sword swings.
 
-### Slice 5 - downloadable demonstration release: initial alpha complete, full route pending
+### Slice 5 - downloadable demonstration release: completed later as Showcase Alpha 0.1.1
 
 - The initial alpha has branded compact entry/pause/settings/diagnostics UI and only shows the active RT claim after honest presentation.
 - Restart and live diagnostics make the bounded route and performance settings reproducible.
@@ -73,6 +75,6 @@ The strongest final composition is player arms and torch reflected in the mirror
 - Preserve one frame in flight while TLAS instance data remains host-written.
 - Preserve 50+ FPS median at the documented recommended quality tier after every slice and report 100% separately. On `SM-S948B`, 75% is the sustained recommendation. If headroom is needed, reduce bounded effect area or offer genuine-RT quality tiers; do not substitute fake reflections or transparency.
 
-## Superseded next implementation
+## Superseded next implementation (historical)
 
 The initial alpha and its material-ID route are complete. Continue through `docs/COLOURED_LIGHT_ROUTE_PLAN_2026-07-15.md`: authored route blockout/lower-body lantern drop, zig-zag and blue-skylight chambers, bay-selected coloured torches, bounded coloured transmission, one hero mirror, then an emissive replacement in the existing one-enemy slot.

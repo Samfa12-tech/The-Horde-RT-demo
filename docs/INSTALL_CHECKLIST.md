@@ -27,17 +27,18 @@ Verify:
 ```powershell
 cd android
 .\gradlew.bat assembleDebug installDebug --console=plain
-adb shell am start -n com.samfa12.hordelanternrt/.MainActivity
-adb logcat -d -s HordeRtProbeBridge AndroidRuntime
+adb shell am start -n com.samfa12.hordelanternrt.debug/com.samfa12.hordelanternrt.MainActivity
+adb logcat -d -s HordeRtProbeBridge HordeLanternAudio AndroidRuntime
 ```
 
 Verify:
 
 - The log includes `RT frame reached Android swapchain presentation.`
 - Unsupported devices show explicit diagnostics instead of a fallback renderer.
-- Touch movement/look, collision, held props, skeleton animation, PBR materials, and roof-breach moonlight remain functional.
-- `SWING` triggers an independent sword arc; the skeleton approaches, attacks, can die, and respawns. Windows equivalents are right mouse and Space.
-- Log reports the expected material path: ASTC KTX2 on the target phone, RGBA8 raw fallback on RTX Windows.
-- Use honest renderer 120-frame telemetry after renderer, animation, or asset-path changes. Preserve the documented 50+ FPS target at the recommended quality tier and report 100% separately; `SM-S948B` currently recommends 75% for sustained play.
+- Touch movement/look, collision, lantern drop, coloured bays, mirror, sequential skeleton/lich selection, three-hit finale, and sliding roof remain functional.
+- `SWING` triggers an independent sword arc; verify accepted-hit recoil/cry, two-second lockout, lich death, and player/skeleton footsteps.
+- Log reports strict ASTC KTX2 for both environment and lich, all 17 SoundPool loads, and honest RT presentation.
+- Use `.\tools\run-android-showcase-validation.ps1` from the repo root for the default five 75% checkpoints and 13-waypoint replay. Each enforced checkpoint must retain three 120-frame windows at or below 20 ms; 100% is report-only.
+- Automation is regression evidence, not a substitute for a short hands-on touch, perceived audio/directionality, visual-art, and pause/Home lifecycle pass.
 
-Reports are written under app-private `files/reports/` and desktop `reports/`.
+Debug reports are available through `adb shell run-as com.samfa12.hordelanternrt.debug`; stable release builds are deliberately non-debuggable. Desktop and routine automation reports remain under ignored `reports/` until a reviewed milestone is promoted into `docs/validation/`.

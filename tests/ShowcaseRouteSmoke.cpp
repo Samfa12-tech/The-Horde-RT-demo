@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "gameplay/CorridorCollision.h"
+#include "gameplay/ShowcaseReplay.h"
 
 namespace
 {
@@ -122,6 +123,22 @@ int main()
           "held props must retract at the south-leg end wall");
     check(ComputeShowcaseHeldPropDepth(0.90f, -7.5f, 1.0f, 0.0f) <= 0.38f,
           "held props must retract at a corridor side wall");
+
+    ShowcaseRouteReplay replay;
+    replay.Reset();
+    int replayFrames = 0;
+    while (!replay.Snapshot().complete && !replay.Snapshot().failed && replayFrames < 4000)
+    {
+        replay.Update();
+        ++replayFrames;
+    }
+    check(replay.Snapshot().complete && !replay.Snapshot().failed,
+          "deterministic replay must complete the shared collision route");
+    check(replay.Snapshot().reachedWaypoints == kShowcaseReplayPath.size(),
+          "deterministic replay must reach every authored waypoint");
+    check(NearlyEqual(replay.Snapshot().x, kFinaleCenter.x) &&
+          NearlyEqual(replay.Snapshot().z, kFinaleCenter.z),
+          "deterministic replay must finish at the finale centre");
 
     if (!passed)
     {

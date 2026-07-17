@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "run75": "20260717-101642",
+  "run100": "20260717-101403",
+  "states": [
+    {"checkpoint":"opening","scale":0.75,"player":{"x":0.0,"z":1.85,"yaw":0.0,"pitch":-0.05},"zone":"opening","extent":[1080,2235],"presented":true,"lantern":"held","enemy":"skeleton","activeSkinnedEnemies":1,"benchmarkWindows":3},
+    {"checkpoint":"worst-bend","scale":0.75,"player":{"x":4.2,"z":-10.0,"yaw":0.0,"pitch":-0.04},"zone":"shadow-corridor","extent":[1080,2235],"presented":true,"lantern":"held","enemy":"skeleton","activeSkinnedEnemies":1,"benchmarkWindows":3},
+    {"checkpoint":"skylight","scale":0.75,"player":{"x":-5.5,"z":-15.2,"yaw":0.0,"pitch":0.22},"zone":"skylight-chamber","extent":[1080,2235],"presented":true,"lantern":"settled","enemy":"lich","activeSkinnedEnemies":1,"benchmarkWindows":3},
+    {"checkpoint":"green","scale":0.75,"player":{"x":-26.0,"z":-15.2,"yaw":-1.5708,"pitch":-0.02},"zone":"green-torch-bay","extent":[1080,2235],"presented":true,"lantern":"settled","enemy":"lich","activeSkinnedEnemies":1,"benchmarkWindows":3},
+    {"checkpoint":"lich","scale":0.75,"player":{"x":-33.25,"z":-14.25,"yaw":2.52,"pitch":0.0},"zone":"finale","extent":[1080,2235],"presented":true,"lantern":"settled","enemy":"lich","activeSkinnedEnemies":1,"lichPhase":"maintaining-range","benchmarkWindows":3},
+    {"checkpoint":"opening","scale":1.0,"player":{"x":0.0,"z":1.85,"yaw":0.0,"pitch":-0.05},"zone":"opening","extent":[1440,2980],"presented":true,"lantern":"held","enemy":"skeleton","activeSkinnedEnemies":1,"benchmarkWindows":3}
+  ],
+  "replay":{"status":"complete","scale":0.75,"player":{"x":-33.7,"z":-15.2,"yaw":-1.5708,"pitch":-0.04},"zone":"finale","extent":[1080,2235],"presented":true,"lantern":"settled","enemy":"lich","activeSkinnedEnemies":1,"waypointsReached":13,"expectedWaypoints":13,"failed":false}
+}

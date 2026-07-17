@@ -18,6 +18,8 @@ public final class ProbeBridge {
     public static native void requestRouteReset();
     public static native void setSimulationPaused(boolean paused);
     public static native void setRenderScale(float scale);
+    public static native boolean requestDebugCheckpoint(int checkpointId);
+    public static native boolean requestDebugRouteReplay();
     public static native int getRuntimeState();
     public static native int consumeAudioEvents();
     public static native long getEnemyAudioStereoGains();

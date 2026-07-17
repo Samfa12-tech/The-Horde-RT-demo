@@ -17,7 +17,7 @@ The demo must prove real native Vulkan hardware ray tracing. Browser rendering, 
 
 ## Build / test / demo cycle decision - 2026-07-17
 
-The next supporting slice is to make the existing showcase repeatable and measurable before expanding the game. Prioritize deterministic route checkpoints, benchmark/replay capture, developer diagnostics, one-command validation and packaging checks, and fixed screenshot/video capture. Detailed scope and guardrails live in `docs/BUILD_TEST_DEMO_CYCLE_PLAN_2026-07-17.md`.
+The first supporting foundation is complete: Android Debug has deterministic route checkpoints, three-window measurement, native route replay, fixed screenshots, state evidence, and a bounded one-command runner. The remaining cycle work is developer visibility, integrated cross-platform clean-build/package/stale-shader/licence gates, and fixed video/presentation capture. Detailed scope and guardrails live in `docs/BUILD_TEST_DEMO_CYCLE_PLAN_2026-07-17.md`.
 
 The normal player-facing route remains intact; development checkpoints and overlays must stay tucked away from branded entry/pause/settings surfaces. Game-facing combat polish follows the tooling foundation. Do not raise the one-active-skinned-enemy limit without a separate phone measurement.
 
@@ -139,19 +139,19 @@ Important technical finding:
 - The stable phone path uses `rayQueryEXT` from raygen to query the same TLAS for primary hits, shadow rays, and a first bounce sample while keeping pipeline recursion depth 1.
 - This keeps the project aligned with RT-or-nothing because ray queries use Vulkan hardware acceleration-structure traversal.
 
-## Current release and next bounded route - 2026-07-15
+## Initial alpha 0.1.0 route decision - 2026-07-15 historical
 
 - Initial Showing Alpha `0.1.0-alpha.1` is published on separate Windows and Android itch channels.
-- The 2026-07-16 hardened refresh is live as Windows build `#1798649` and Android build `#1798652`; the exact published hashes are recorded in `PROJECT_MEMORY.md` and `README.md`.
+- The 2026-07-16 hardened refresh was published as Windows build `#1798649` and Android build `#1798652`; its exact hashes remain in the dated 0.1.0 validation records.
 - Android uses strict ASTC KTX2 arrays and a stable Samfa12 signing identity; Windows uses a portable executable-relative asset tree.
 - Final `SM-S948B` validation passed at 100%, 75%, and 50%. The 75% tier is the sustained phone recommendation; report 100% separately rather than treating it as an unconditional 50+ FPS promise.
-- The next route is `docs/COLOURED_LIGHT_ROUTE_PLAN_2026-07-15.md`: lower body/lantern drop, zig-zag shadows, blue skylight, bay-selected coloured torches, bounded coloured transmission, one hero mirror, and an emissive replacement in the existing one-enemy slot.
+- The coloured route was subsequently completed for 0.1.1. The stained transmission pane was rejected in hands-on review and removed; the threshold remains open.
 - Keep the textured sword LOD out of runtime until static GLB/PBR support is measured on phone.
 - Preserve phone-safe ray-query shading and real `vkCmdTraceRaysKHR` presentation unless a stronger RT route is proven on-device.
 
 ## Showcase alpha 0.1.1 publication - 2026-07-17
 
-- Publish the completed route as **Showcase Alpha 0.1.1**, package version `0.1.1-alpha.1`, with Android `versionCode 2`.
+- Published the completed route as **Showcase Alpha 0.1.1**, package version `0.1.1-alpha.1`, with Android `versionCode 2`.
 - Keep the existing itch channels and stable Android update identity. Public build IDs are Windows `#1801016` and Android `#1801017`; exact hashes and validation evidence are recorded in `docs/SHOWCASE_ALPHA_RELEASE_VALIDATION_2026-07-17.md`.
 - Treat 75% RT resolution as the sustained Android recommendation. The 100% pass proves full extent and image correctness but carries no 50 FPS promise.
 - Keep one rendered/animated skinned enemy at a time. A simultaneous horde requires its own measured phone slice.

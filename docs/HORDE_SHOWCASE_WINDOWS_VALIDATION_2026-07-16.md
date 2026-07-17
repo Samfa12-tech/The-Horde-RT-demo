@@ -4,7 +4,7 @@
 
 **Windows-validated. Android device validation subsequently passed on 2026-07-17.**
 
-This goal is deliberately not a signed release and has not been uploaded. Android validation in this document means compilation only unless explicitly stated otherwise.
+At the time of this Windows-first checkpoint, the goal was deliberately not a signed release and had not been uploaded. It was subsequently device-validated and published as Showcase Alpha 0.1.1; Android claims inside the original checkpoint sections remain compilation-only unless explicitly stated otherwise.
 
 ## Implemented route
 

@@ -1,5 +1,7 @@
 # Phase Plan
 
+> This file records the implementation sequence. Earlier “next” and “deferred” statements are preserved as dated history; the complete coloured-light/mirror/lich route is published in Showcase Alpha 0.1.1. Current priorities are indexed by `DOCUMENTATION_CHECKPOINT_2026-07-17.md`.
+
 ## Phase 0 - Vulkan RT capability proof: complete
 
 - Android and Windows use a native Vulkan capability probe with clear unsupported-device diagnostics.
@@ -92,20 +94,19 @@ Android now uses capability-checked ASTC KTX2 arrays; Windows retains raw RGBA8.
 - Rejected and removed fake analytic/overlay shafts.
 - Deferred true volumetric dust until a participating-media implementation is proven, likely desktop-first.
 
-## Initial downloadable alpha - complete; extended showcase remains
+## Showcase Alpha 0.1.1 - complete and published
 
-The initial showing alpha now has explicit material IDs/gallery surfaces, one bounded clear skylight transmission slice, compact entry/pause/settings/diagnostics UI, restart flow, a stable-key-signed Android APK, portable Windows zip, compatibility notes, hashes, licences, and separate public itch channels.
+The initial showing alpha established material IDs/gallery surfaces, compact UI, restart, signed Android and portable Windows packages. Showcase Alpha 0.1.1 then completed the authored route: lantern failure, lower body/head, shadow corridor, blue skylight, four coloured bays, open threshold, hero mirror, sequential CC0 lich finale, three-hit combat, spatial audio, and the sliding roof.
 
-The extended showcase still needs one hero framed mirror, coloured transmission, the authored guided route, and final reveal composition. Continue with `docs/COLOURED_LIGHT_ROUTE_PLAN_2026-07-15.md`; do not add enemy count or broader AI.
+The planned stained transmission pane was rejected during hands-on review and removed; water, simultaneous hordes, authored hands/full rig, broader AI, and the textured sword runtime remain deferred. Do not raise enemy count without a separate phone measurement.
 
-Full route, gates, and technical boundaries: `docs/NATIVE_RT_SHOWCASE_PLAN_2026-07-14.md`.
+Final route and release evidence: `docs/HORDE_SHOWCASE_WINDOWS_VALIDATION_2026-07-16.md`, `docs/HORDE_SHOWCASE_ANDROID_VALIDATION_2026-07-17.md`, and `docs/SHOWCASE_ALPHA_RELEASE_VALIDATION_2026-07-17.md`.
 
 The runtime-only Android asset task is complete and reduced the debug APK from 93,855,324 to 46,793,811 bytes.
 
-## Later milestones
+## Next support milestones
 
-1. Phase 2 - Torch corridor visual prototype expansion
-2. Phase 3 - Movement and simple combat shell
-3. Phase 4 - Asset upgrade
-4. Phase 5 - Playable route
-5. Phase 6 - Full showcase release package (the bounded initial alpha package is already public)
+1. Developer overlay/state visibility.
+2. Integrated cross-platform clean-build, test, shader-staleness, asset/licence, and package verification.
+3. Fixed video/presentation capture.
+4. Only then, a separately scoped gameplay or multi-enemy slice with phone measurements.

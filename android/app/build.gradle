@@ -66,9 +66,19 @@ android {
             applicationIdSuffix '.debug'
             versionNameSuffix '-debug'
             minifyEnabled false
+            externalNativeBuild {
+                cmake {
+                    arguments '-DHORDE_RT_DEBUG_CHECKPOINTS=ON'
+                }
+            }
         }
         release {
             minifyEnabled false
+            externalNativeBuild {
+                cmake {
+                    arguments '-DHORDE_RT_DEBUG_CHECKPOINTS=OFF'
+                }
+            }
             if (signingConfigs.findByName('release') != null) {
                 signingConfig signingConfigs.release
             }

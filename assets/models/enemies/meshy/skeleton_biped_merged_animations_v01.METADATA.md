@@ -41,8 +41,8 @@ The names match the Meshy UI screenshot. The two backward-walk labels were merel
 - The Meshy contribution is credited under the conservative Free-plan CC BY 4.0 path, which also satisfies a paid-plan build without reducing its commercial permissions.
 - Package this GLB only inside the finished demo. Do not publish it as a separate downloadable source asset.
 
-## Integration and release gates
+## Integration and release status
 
-- Build a GLB animation/PBR import path and a dynamic-skinned RT BLAS/TLAS path before attempting runtime rendering.
+- The bounded GLB animation path and dynamic-skinned RT BLAS/TLAS path are implemented and published. The embedded skeleton texture remains intentionally unsampled.
 - Keep the sword separate until an explicit attachment and animation pass is requested.
 - Preserve the Hotstrike and Meshy credit in `ASSET_LICENSES.md` and the public download description.

@@ -1,0 +1,7 @@
+scale,checkpoint,expected_zone,actual_zone,window_1_avg_ms,window_2_avg_ms,window_3_avg_ms,median_of_window_avgs_ms,mean_of_window_avgs_ms,median_derived_fps,thermal_status,battery_c,presented,timing_method,source_run
+75,opening,opening,opening,11.042,11.931,12.647,11.931,11.873,83.815,0,30.4,True,cpu-present-loop,20260717-101642
+75,worst-bend,shadow-corridor,shadow-corridor,7.756,7.863,7.830,7.830,7.816,127.714,0,31.5,True,cpu-present-loop,20260717-101642
+75,skylight,skylight-chamber,skylight-chamber,7.496,7.667,8.857,7.667,8.007,130.429,0,31.5,True,cpu-present-loop,20260717-101642
+75,green,green-torch-bay,green-torch-bay,11.348,11.366,11.378,11.366,11.364,87.982,0,33.0,True,cpu-present-loop,20260717-101642
+75,lich,finale,finale,16.123,16.782,13.949,16.123,15.618,62.023,0,33.7,True,cpu-present-loop,20260717-101642
+100,opening,opening,opening,25.191,26.320,23.826,25.191,25.112,39.697,0,32.6,True,cpu-present-loop,20260717-101403

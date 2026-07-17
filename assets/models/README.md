@@ -1,6 +1,6 @@
 # Models
 
-Source art includes staged Meshy sword and torch studies under `weapons/meshy/` and `props/meshy/`, plus a runtime-integrated Hotstrike Studio skeleton derivative under `enemies/meshy/`. The skeleton was textured, rigged, and animated with Meshy and uses a narrow animation loader. The sword and torch GLBs are not runtime-integrated or distributed; the live torch is a compact procedural RT model derived from the approved silhouette direction.
+Source art includes staged Meshy sword and torch studies under `weapons/meshy/` and `props/meshy/`, plus two sequential runtime enemies under `enemies/meshy/`: the Hotstrike Studio skeleton derivative processed with Meshy and the CC0 Meshy placeholder lich. The sword and torch GLBs are not runtime-integrated or distributed; the live torch is compact procedural RT geometry derived from the approved silhouette direction.
 
 Future model rules:
 

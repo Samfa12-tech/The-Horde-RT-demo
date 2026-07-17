@@ -1,5 +1,9 @@
 # Coloured-light dungeon route plan - 2026-07-15
 
+## Implementation reconciliation - 2026-07-17
+
+This design plan is complete with one deliberate rejection. Slices A-D shipped; Slice E's stained pane/coloured transmission was removed after hands-on review; Slice F's hero mirror shipped while optional shallow water remains deferred; Slices G-H shipped with the sequential CC0 lich, signed Android/portable Windows packages, and itch publication. The architectural threshold stays open. The final implementation and device evidence are authoritative over future-tense wording retained below.
+
 ## Outcome
 
 Extend Horde Lantern RT into a short authored dungeon route that demonstrates moving hard shadows, loss of light, soft cool skylight, coloured direct lighting, coloured transmission, reflection, and an animated emissive threat. This is still a native RT showcase rather than a larger combat game.
@@ -62,7 +66,7 @@ Legs are promoted from deferred polish to a prerequisite for the new route becau
 
 ### Slice A - route blockout and light choreography
 
-Implemented on 2026-07-16 as the geometry-only route blockout. The shared route, collision contract, host smoke test, platform builds, and device evidence are recorded in `SHOWCASE_ROUTE_BLOCKOUT_VALIDATION_2026-07-16.md`. Coloured lights and all new shader behavior remain deferred.
+Implemented on 2026-07-16 as the geometry-only route blockout. The shared route, collision contract, host smoke test, platform builds, and device evidence are recorded in `SHOWCASE_ROUTE_BLOCKOUT_VALIDATION_2026-07-16.md`. At that Slice-A milestone, coloured lights and all new shader behavior remained deferred; later slices closed them as reconciled above.
 
 - Greybox the zig-zag, skylight room, torch bays, transmission threshold, and final room.
 - Define trigger volumes, reset behaviour, collision, approximate five-metre spacing, and which light is active in each bay.
@@ -106,7 +110,7 @@ Implemented on 2026-07-16 as the geometry-only route blockout. The shared route,
 
 - Add compact effect labels, reliable route reset, benchmark mode, signed Android package, Windows zip, device notes, hashes, captures, and asset attribution.
 
-## Priority of optional RT proofs
+## Original priority of optional RT proofs (historical)
 
 1. **Coloured transparent shadow** - highest value because it combines the new colour route with genuine visibility/transmission and already has a bounded thin-glass foundation.
 2. **One hero mirror** - high value and honest within the existing one-reflected-segment design; it also exposes the completed player body and final enemy before direct sight.
@@ -133,7 +137,7 @@ Other low-cost showcase ideas worth considering after the core route works:
 - Record all supplied/imported asset licences in `ASSET_LICENSES.md` before release.
 - Do not expand enemy count, AI breadth, block/dodge, or unrelated gameplay during this route. The new enemy supersedes the skeleton finale unless a later measured plan explicitly budgets simultaneous enemies.
 
-## Remaining enemy decisions
+## Resolved enemy decisions and remaining scale boundary
 
 - Resolved for the Windows-first goal: glow is limited to the derived staff/eye/gem selection; 40 audited staff-crystal vertices anchor the violet analytic light.
 - Resolved clips: `Idle_02`, `Walking`, and `Dead`; the missing cast clip remains unmapped and charge timing is procedural.

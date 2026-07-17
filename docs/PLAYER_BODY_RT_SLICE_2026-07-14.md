@@ -1,12 +1,14 @@
 # Player body RT slice - 2026-07-14
 
+> Historical slice record. Showcase Alpha 0.1.1 subsequently added pelvis, articulated legs and boots, gait, head shadow/reflection geometry, lantern-drop poses, and wall-aware held-prop retraction. See `DOCUMENTATION_CHECKPOINT_2026-07-17.md` for current authority.
+
 ## Outcome
 
 The first-person player now has real ray-traced torso and articulated arm geometry. It is not an overlay: the torso and four arm segments are TLAS instances, are visible to lower-view primary rays, can block direct lighting in the lower receiving region, and participate in reflective and puddle bounce queries.
 
 The current refinement replaces the original rigid five-box blockout. A torso BLAS remains body/yaw-relative, while one reusable unit-limb BLAS supplies left/right upper- and lower-arm instances. Two-bone IK connects each shoulder to an exact prop grip target. The torch hand meets the handle, the sword hand remains on the sword grip throughout the swing, and both arms and held props follow camera pitch as a single first-person viewmodel.
 
-This is still a low-poly presence, attachment, and lighting proof rather than final character art. Hands, legs, a skinned character asset, and authored first-person animation remain deferred.
+At this milestone it was still a low-poly presence, attachment, and lighting proof rather than final character art. Hands, legs, a skinned character asset, and authored first-person animation were deferred; the later procedural lower-body and head additions are documented by the current authority map above.
 
 ## Renderer shape
 

@@ -9,7 +9,7 @@ The `android/` module is the supported phone path for Horde Lantern RT. It owns 
 - Shared native source manifest: `../cmake/HordeRtSources.cmake`
 - Native Vulkan RT presentation through the Android swapchain
 - One frame in flight while the held-prop TLAS uses a host-written instance buffer
-- Portrait-first branded entry/pause/settings/controls/diagnostics/credits UI, touch movement/look, a dedicated `SWING` control, one-enemy combat, animated skeleton BLAS refit, a yaw-relative first-person torso plus four pitch-relative IK arm instances, ASTC PBR texture arrays, and phone-safe ray-query shading inside `vkCmdTraceRaysKHR`
+- Portrait-first branded entry/pause/settings/controls/diagnostics/credits UI; touch movement/look and `SWING`; sequential skeleton/lich selection through one active skinned BLAS; complete low-poly body/head, lantern-drop sequence, coloured bays, mirror and sliding-roof finale; strict ASTC assets; and phone-safe ray-query shading inside `vkCmdTraceRaysKHR`
 - Persisted SFX volume, look sensitivity, compact HUD, and 50-100% RT render scale; seventeen FilmCow clips play through SoundPool
 - The in-app Credits & Licences panel carries Poly Haven, FilmCow, Hotstrike Studio, Meshy, and generated-icon provenance with the APK
 - Native libraries use a static C++ runtime plus 16 KiB ELF alignment; the packaging gate verifies 16 KiB APK/ELF alignment and rejects an r26 `libc++_shared.so`
@@ -28,13 +28,23 @@ The debug build uses `com.samfa12.hordelanternrt.debug`, so it can be installed 
 Expected RT success log:
 
 ```powershell
-adb logcat -d -s HordeRtProbeBridge AndroidRuntime
+adb logcat -d -s HordeRtProbeBridge HordeLanternAudio AndroidRuntime
 ```
 
 Look for `RT frame reached Android swapchain presentation.`
-Also require `PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2)` on the target phone.
+Also require `PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich` on the target phone.
 
-Reports are stored under `files/reports/` in app-private storage and can be retrieved with `adb shell run-as com.samfa12.hordelanternrt`.
+Reports are stored under `files/reports/` in app-private storage and can be retrieved from Debug with `adb shell run-as com.samfa12.hordelanternrt.debug`. The stable release is deliberately non-debuggable.
+
+## Repeatable showcase validation
+
+The debug build exposes deterministic native checkpoints and a 13-waypoint route replay. Run the standard 75% checkpoint, timing, collision, strict-ASTC, and honest-presentation pass from the repository root:
+
+```powershell
+.\tools\run-android-showcase-validation.ps1
+```
+
+Add `-Include100 -Capture` for the report-only 100% opening check and post-timing screenshots. Evidence is written to a unique ignored `reports/android-showcase-runs/run-<timestamp>/` directory. Release builds reject the debug automation request path. See `../docs/ANDROID_SHOWCASE_AUTOMATION_2026-07-17.md` for checkpoints, evidence semantics, and the remaining hands-on checks.
 
 The current primary test device is Samsung `SM-S948B`. Use the renderer's 120-frame telemetry after meaningful renderer, animation, or material-path changes and validate the recommended quality tier separately from 100%.
 
@@ -45,6 +55,8 @@ The articulated grip-locked, pitch-following revision builds for all Android ABI
 The previous `0.1.0-alpha.1` APK established the stable signing identity and passed the portrait/UI/audio/render-scale sanity pass. Its 2026-07-16 refresh also verified side-by-side debug installation, 16 KiB native/APK alignment, and fast live diagnostics on Android 16. See `../docs/ALPHA_ANDROID_PHONE_VALIDATION_2026-07-15.md` and `../docs/ALPHA_ANDROID_REFRESH_VALIDATION_2026-07-16.md`.
 
 The complete showcase route is device-validated on `SM-S948B` in the debug package: strict environment plus lich ASTC, honest RT presentation, full route traversal, Home/resume recreation, and warm controlled 75% measurements passed at thermal status 3. Every required zone's median of three 120-frame average windows remained below 13.7 ms. The phone was restored to the recommended 75% tier after the 100% extent/reporting check. See `../docs/HORDE_SHOWCASE_ANDROID_VALIDATION_2026-07-17.md`.
+
+The later debug automation baseline also passed live: five deterministic 75% checkpoints, report-only 100% opening, native state assertions, and all 13 replay waypoints. These cool thermal-status-0 results are regression evidence and do not replace the warm sustained certification above. See `../docs/ANDROID_SHOWCASE_AUTOMATION_VALIDATION_2026-07-17.md`.
 
 The showcase release identity is `0.1.1-alpha.1` with `versionCode 2`. Public candidates must be signed by the established Horde release key, retain strict ASTC routing and 16 KiB compatibility, and pass `tools/package-signed-alpha.ps1`; never replace the existing update identity with a new keystore.
 

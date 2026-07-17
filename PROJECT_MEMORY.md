@@ -24,7 +24,7 @@ Last updated: 2026-07-17
 - Historical gothic action demo: dark ruin, wet stone, fog, torch/lantern light, silhouettes, shadows, and obvious RT mood.
 - Lighting and atmosphere come before broader combat.
 - Keep the one-enemy loop bounded; do not add a second concurrent enemy, block/dodge, or broad AI without a later phone-measured plan.
-- The next authored route is defined in `docs/COLOURED_LIGHT_ROUTE_PLAN_2026-07-15.md`.
+- The authored coloured-light route is complete and published in Showcase Alpha 0.1.1; its design history is `docs/COLOURED_LIGHT_ROUTE_PLAN_2026-07-15.md` and its final evidence is in the Windows/Android/release validation records.
 
 ## Current renderer
 
@@ -38,14 +38,13 @@ Last updated: 2026-07-17
 
 ## Current alpha scene and controls
 
-- Closed start chamber; spawn/reset is inside with room to turn and collision prevents rear-wall escape.
-- A physically deep arch leads to room two; the single skeleton begins behind the arch.
-- One bounded clear skylight pane uses thin RT transmission and does not incorrectly block sky/moon visibility.
-- The held torch is RT geometry: wooden shaft, collars/cage, and two nested emissive flame volumes. The old fullscreen triangle overlay must not return.
-- Player presence uses one yaw-relative torso plus four reusable-limb TLAS instances on mask `0x04`; two-bone IK locks hands to torch/sword grips while the props/arms follow pitch.
-- The procedural sword has its own RT instance and swings independently of the torch.
-- The skeleton uses Hotstrike Studio's base asset, later textured/rigged/animated with Meshy. Walking clip time is 90% to reduce ground slide.
-- One narrow approach/attack/death/respawn loop is implemented.
+- The complete route is skeleton encounter -> three-turn moving-shadow corridor -> lantern failure/drop -> blue skylight -> yellow/blue/red/green bays -> open framed threshold -> light-aware hero mirror -> floating staff-lit lich -> post-death sliding roof.
+- The rejected stained pane is not present. The threshold remains open; shallow water is deferred while the wet-floor proof remains live.
+- The held and dropped lantern are RT geometry. Visible flame and direct-light contribution both reach zero after the authored fall; the old fullscreen overlay must not return.
+- The complete low-poly player uses torso, articulated IK arms, pelvis/legs/boots, procedural gait, a head shadow/reflection instance, and wall-aware held-prop retraction.
+- The procedural sword swings independently of the torch and the lich requires three accepted hits with a two-second lockout.
+- The skeleton uses Hotstrike Studio's base asset processed with Meshy. The CC0 Meshy lich uses restrained `Idle_02`/`Dead` skinning plus whole-instance hover/orbit; its visibly distorted walking clip is deliberately not presented.
+- One skinned enemy is animated/refit/rendered at a time: skeleton in the opening route, lich after the skylight gate.
 - Android: left drag movement/strafe, right drag 360 look, Swing button, Android Back pause/resume.
 - Windows: WASD, left-drag look, right mouse/Space swing, Esc pause/resume, R restart, F1 controls, F2 diagnostics, Alt+Enter fullscreen.
 
@@ -62,25 +61,22 @@ Last updated: 2026-07-17
 
 ## Validated Android release state
 
-- Device: Samsung `SM-S948B`, Adreno 840, Vulkan 1.4.295.
-- Exact stable-key-signed APK installed and launched after replacing the debug-signature package.
-- Portrait rotation `0`; physical display `1440x3120`; user font scale `1.7` remained unchanged.
-- Strict ASTC and `RayTracingPipeline` selected; honest RT swapchain presentation reconfirmed.
-- All thirteen SoundPool clips loaded; no native renderer or Android runtime failure occurred.
-- Menu/settings fit at font scale 1.7; Back pause, movement, look, swing, restart, diagnostics, Home/resume, rear-wall collision, arch/skeleton/skylight staging, and scene warmth were exercised.
-- Render scale verification:
-  - 100%: `1440x2980`, default; hot performance is route/view dependent and can fall below 50 FPS.
-  - 75%: `1080x2235`; 21 renderer telemetry windows at thermal status 3 measured 10.933 ms median / 15.050 ms p95. This is the sustained recommendation.
-  - 50%: `720x1490`; visible diagnostics recorded 163.12 FPS / 6.13 ms.
-- Evidence: `docs/ALPHA_ANDROID_PHONE_VALIDATION_2026-07-15.md`.
+- Device: Samsung `SM-S948B`, Adreno 840, Vulkan 1.4.295, Android 16.
+- The exact stable-key-signed 0.1.1 APK installed as an update and reported `versionCode 2` / `versionName 0.1.1-alpha.1`.
+- Strict environment plus lich ASTC and `RayTracingPipeline` selected; honest RT swapchain presentation reconfirmed.
+- All seventeen SoundPool clips loaded; no native renderer or Android runtime failure occurred.
+- The full route, touch controls, combat, reset, pause/Home lifecycle, and accessibility-scale UI passed hands-on validation.
+- At 75%, every required warm route zone remained below 13.7 ms median-of-three-window averages at thermal status 3. The later deterministic cool/status-0 default checkpoint set measured 7.667-16.123 ms and completed all 13 replay waypoints.
+- At 100%, full `1440x2980` image/extent presentation passed without a 50 FPS requirement. The latest automated opening was 25.191 ms.
+- Evidence: `docs/HORDE_SHOWCASE_ANDROID_VALIDATION_2026-07-17.md`, `docs/ANDROID_SHOWCASE_AUTOMATION_VALIDATION_2026-07-17.md`, and `docs/SHOWCASE_ALPHA_RELEASE_VALIDATION_2026-07-17.md`.
 
 ## Validated Windows release state
 
 - GPU: NVIDIA GeForce RTX 5050 Laptop GPU.
 - Release builds as `HordeLanternRT.exe` with GUI subsystem, icon/version resource, static MSVC runtime, and executable-relative assets.
-- A clean candidate extraction launched without the source tree, selected `RayTracingPipeline`, and honestly presented at `982x628`.
-- Packaged diagnostics recorded `163.24 FPS / 6.13 ms`; 75% recreated the RT target at `737x471` and retained warm colour.
-- Windows package includes release notes, `README.txt`, `ASSET_LICENSES.md`, skeleton, raw textures, and thirteen FilmCow WAVs.
+- A clean 0.1.1 candidate extraction launched without the source tree, selected `RayTracingPipeline`, and honestly presented the full route.
+- Windows Debug/Release and all five CTests pass; hands-on route, collision, mirror, combat, lighting, reset, and spatial-audio validation passed.
+- The package includes both enemy GLBs, raw environment and lich textures, seventeen FilmCow WAVs, release notes, controls, and `ASSET_LICENSES.md`.
 
 ## Asset and licence state
 
@@ -109,13 +105,14 @@ Last updated: 2026-07-17
 
 1. Preserve the published alpha and its stable signing identity.
 2. Back up the JKS and both passwords independently.
-3. Slice A route blockout is complete. Continue in bounded slices with lower body/lantern drop, zig-zag shadows and blue skylight, bay-selected coloured torches, bounded coloured transmission, one hero mirror, optional measured shallow water, and an emissive reskin/replacement in the existing enemy slot.
-4. Gate each meaningful renderer change on the phone at the recommended quality tier; report 100% separately.
-5. Keep real RT and honest diagnostics. Reduce bounded effect area/ray cost before expanding gameplay or substituting fake effects.
-6. Build the supporting cycle in this order: deterministic showcase checkpoints; repeatable benchmark route; input recording/replay; developer overlay; one-command build/test/package validation; fixed screenshot/video capture; then bounded combat-readability polish.
-7. Treat `docs/BUILD_TEST_DEMO_CYCLE_PLAN_2026-07-17.md` as the detailed backlog. Keep its guardrails: real RT presentation, phone measurement, strict asset/package validation, compact player-facing UI, and one active skinned enemy until separately measured.
+3. Treat the complete 0.1.1 route as the preserved playable baseline; the stained pane was rejected, water remains deferred, and no second concurrent enemy is authorised without a measured plan.
+4. The deterministic checkpoint, three-window benchmark, native route replay, and bounded Android evidence runner foundation is complete and live-validated.
+5. Continue the support cycle with developer overlay/state visibility, an integrated cross-platform clean-build/package/stale-shader/licence gate, then fixed video/presentation capture.
+6. Gate each meaningful renderer/gameplay-route change on the phone at 75%; report 100% separately and retain the short hands-on touch/audio/lifecycle pass.
+7. Keep real RT and honest diagnostics. Reduce bounded effect area/ray cost before expanding gameplay or substituting fake effects.
+8. Treat `docs/BUILD_TEST_DEMO_CYCLE_PLAN_2026-07-17.md` as the detailed backlog and `docs/DOCUMENTATION_CHECKPOINT_2026-07-17.md` as the documentation authority map.
 
-## Showcase route blockout - 2026-07-16
+## Showcase route blockout - 2026-07-16 historical milestone
 
 - The original room, material gallery, skeleton encounter, controls, reset, and shader path remain intact.
 - A shared route definition now owns walkable rectangles, preserved obstacles, spawn/room coordinates, showcase zones, and the pure position-to-zone query for both platforms.
@@ -139,6 +136,6 @@ Last updated: 2026-07-17
 - Player presence is complete with a reusable-BLAS leather pelvis, articulated thighs/shins/boots, procedural gait, exact retained hand grips, and reset-only lantern failure/lowered left arm.
 - `ShowcaseGameplay.h` owns deterministic lantern, lower-body, lighting, plural roster/director, and lich charge/recovery state. Only one skinned enemy is selected/rendered/refit at once; the capacity remains configurable for later Horde measurements.
 - The lich uses continuous living `Idle_02` and non-looping `Dead` clips; whole-instance hover/orbit replaces the visibly distorted walking clip. Its separate 48-byte UV stream, raw Windows KTX2, strict Android ASTC 6x6, derived violet emissive map, and forty skin-weighted staff vertices drive the visible staff light/electricity. It takes three hits with a two-second lockout; each accepted hit produces recoil plus a positional cry, and death opens the finale roof over 4.5 seconds.
-- Player travel and skeleton cadence now produce accepted audible footsteps. Skeleton and lich spatial cues share equal-power pan, distance rolloff, and route-obstruction attenuation through XAudio2 on Windows; compile-only SoundPool L/R integration remains on Android.
+- Player travel and skeleton cadence now produce accepted audible footsteps. Skeleton and lich spatial cues share equal-power pan, distance rolloff, and route-obstruction attenuation through XAudio2 on Windows and published left/right SoundPool gains on Android. Android playback passed hands-on testing, while perceived stereo directionality and distance remain explicitly uncertified.
 - Windows Debug/Release and all five CTests pass, and the final hands-on Windows route/audio/combat verdict passed. The complete route is also device-validated on `SM-S948B`: strict environment/lich ASTC, honest RT presentation, full hands-on traversal, lifecycle recovery, and controlled warm 75% measurements all pass. Every required zone's median of three 120-frame average windows was below 13.7 ms at thermal status 3; see `docs/HORDE_SHOWCASE_ANDROID_VALIDATION_2026-07-17.md`. Label this state **Windows-validated / Android-device-validated**.
 - Preserve the latest raygen artifact recorded in `docs/HORDE_SHOWCASE_WINDOWS_VALIDATION_2026-07-16.md`. The lich's Meshy CC0 evidence is retained at `assets/models/enemies/meshy/lich_placeholder_source_licence.png`. Preserve the current one-active-skinned-enemy limit until a separate multi-enemy phone measurement.

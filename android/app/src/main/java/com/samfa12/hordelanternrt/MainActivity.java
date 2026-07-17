@@ -1,7 +1,9 @@
 package com.samfa12.hordelanternrt;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
@@ -47,6 +49,10 @@ public class MainActivity extends Activity {
     private static final String SKELETON_FILE = "skeleton_biped_merged_animations_v01.glb";
     private static final String LICH_ASSET = "models/enemies/meshy/lich_placeholder_merged_animations_v01.glb";
     private static final String LICH_FILE = "lich_placeholder_merged_animations_v01.glb";
+    private static final String EXTRA_DEBUG_CHECKPOINT = "horde.debug.checkpoint";
+    private static final String EXTRA_DEBUG_REPLAY = "horde.debug.replay";
+    private static final String EXTRA_DEBUG_SCALE = "horde.debug.scale";
+    private static final String EXTRA_DEBUG_AUTOSTART = "horde.debug.autostart";
     private static final int AUDIO_EVENT_ENEMY_DEFEATED = 1;
     private static final int AUDIO_EVENT_PLAYER_FOOTSTEP = 1 << 1;
     private static final int AUDIO_EVENT_ENEMY_FOOTSTEP = 1 << 2;
@@ -85,6 +91,9 @@ public class MainActivity extends Activity {
     private int playerStepVariant;
     private int enemyStepVariant;
     private int diagnosticsRefreshTick;
+    private int pendingDebugCheckpoint = -1;
+    private boolean pendingDebugReplay;
+    private boolean debugAutomationAutostart;
     private final Runnable applyPendingRenderScale = () ->
             ProbeBridge.setRenderScale(preferences.getInt("render_scale", 100) / 100.0f);
 
@@ -96,6 +105,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         preferences = getSharedPreferences(PREFS, MODE_PRIVATE);
         ProbeBridge.setRenderScale(preferences.getInt("render_scale", 100) / 100.0f);
+        consumeDebugAutomationIntent(getIntent());
 
         surfaceView = findViewById(R.id.scene_surface);
         menuScrim = findViewById(R.id.menu_scrim);
@@ -427,6 +437,26 @@ public class MainActivity extends Activity {
                     rtStatus.setText(R.string.rt_active);
                     rtStatus.setTextColor(0xFFFFD07A);
                     if (!menuVisible && preferences.getBoolean("show_hud", true)) attackButton.setVisibility(View.VISIBLE);
+                    if (debugAutomationAutostart && menuVisible) hideMenu();
+                    if (pendingDebugCheckpoint >= 0) {
+                        applyDebugCheckpointViewPose(pendingDebugCheckpoint);
+                        clearTouchState();
+                        final int checkpoint = pendingDebugCheckpoint;
+                        pendingDebugCheckpoint = -1;
+                        if (!ProbeBridge.requestDebugCheckpoint(checkpoint)) {
+                            Log.e(TAG, "Debug checkpoint request rejected: " + checkpoint);
+                        }
+                        debugAutomationAutostart = false;
+                    } else if (pendingDebugReplay) {
+                        pendingDebugReplay = false;
+                        viewControls[0] = 0.0f;
+                        viewControls[1] = -0.04f;
+                        clearTouchState();
+                        if (!ProbeBridge.requestDebugRouteReplay()) {
+                            Log.e(TAG, "Debug route replay request rejected.");
+                        }
+                        debugAutomationAutostart = false;
+                    }
                 } else if (state == 2) {
                     rtStatus.setText(R.string.rt_unsupported);
                     rtStatus.setTextColor(0xFFFF8A7A);
@@ -485,6 +515,70 @@ public class MainActivity extends Activity {
             handler.postDelayed(this, 180L);
         }
     };
+
+    private boolean isDebuggableApp() {
+        return (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+    }
+
+    private static int checkpointId(final String name) {
+        if (name == null) return -1;
+        switch (name) {
+            case "opening": return 0;
+            case "skeleton": return 1;
+            case "worst-bend": return 2;
+            case "lantern-drop": return 3;
+            case "skylight": return 4;
+            case "yellow": return 5;
+            case "blue": return 6;
+            case "red": return 7;
+            case "green": return 8;
+            case "mirror": return 9;
+            case "lich": return 10;
+            case "finale-roof": return 11;
+            default: return -1;
+        }
+    }
+
+    private void consumeDebugAutomationIntent(final Intent intent) {
+        if (!isDebuggableApp() || intent == null) return;
+        final int requestedScale = intent.getIntExtra(EXTRA_DEBUG_SCALE, -1);
+        if (requestedScale >= 50 && requestedScale <= 100) {
+            ProbeBridge.setRenderScale(requestedScale / 100.0f);
+        }
+        final int requestedCheckpoint = checkpointId(intent.getStringExtra(EXTRA_DEBUG_CHECKPOINT));
+        final boolean requestedReplay = intent.getBooleanExtra(EXTRA_DEBUG_REPLAY, false);
+        if (requestedCheckpoint >= 0) {
+            pendingDebugCheckpoint = requestedCheckpoint;
+            pendingDebugReplay = false;
+        } else if (requestedReplay) {
+            pendingDebugReplay = true;
+            pendingDebugCheckpoint = -1;
+        }
+        debugAutomationAutostart = intent.getBooleanExtra(EXTRA_DEBUG_AUTOSTART, false) ||
+                requestedCheckpoint >= 0 || requestedReplay;
+        if (debugAutomationAutostart) {
+            Log.i(TAG, "Accepted debug automation intent: checkpoint=" + requestedCheckpoint +
+                    " replay=" + requestedReplay + " scale=" + requestedScale);
+        }
+    }
+
+    private void applyDebugCheckpointViewPose(final int checkpoint) {
+        switch (checkpoint) {
+            case 0: viewControls[0] = 0.0f; viewControls[1] = -0.05f; break;
+            case 1: viewControls[0] = 0.0f; viewControls[1] = 0.0f; break;
+            case 2: viewControls[0] = 0.0f; viewControls[1] = -0.04f; break;
+            case 3: viewControls[0] = -1.5707963f; viewControls[1] = -0.08f; break;
+            case 4: viewControls[0] = 0.0f; viewControls[1] = 0.22f; break;
+            case 5:
+            case 6:
+            case 7:
+            case 8: viewControls[0] = -1.5707963f; viewControls[1] = -0.02f; break;
+            case 9: viewControls[0] = -1.5707963f; viewControls[1] = 0.0f; break;
+            case 10: viewControls[0] = 2.52f; viewControls[1] = 0.0f; break;
+            case 11: viewControls[0] = 1.5707963f; viewControls[1] = 0.28f; break;
+            default: break;
+        }
+    }
 
     private void initialiseAudio() {
         final AudioAttributes attributes = new AudioAttributes.Builder()
@@ -781,6 +875,13 @@ public class MainActivity extends Activity {
         resumed = true;
         enterImmersiveMode();
         startSurfaceIfReady();
+    }
+
+    @Override
+    protected void onNewIntent(final Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        consumeDebugAutomationIntent(intent);
     }
 
     @Override

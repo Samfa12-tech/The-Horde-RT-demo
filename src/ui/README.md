@@ -1,6 +1,6 @@
 # UI / Diagnostic Overlay
 
-The Phase 0 UI is a diagnostic overlay and unsupported-device screen, not a game HUD.
+The shared UI layer is the diagnostic data/text model used behind the branded platform menus and unsupported-device surface. Normal play keeps technical output tucked away unless requested or startup fails.
 
 It should show:
 
@@ -13,4 +13,4 @@ It should show:
 - FPS / frame time.
 - Unsupported reason when applicable.
 
-This can start as simple text rendering. It must be visible on both Android and Windows.
+Both platforms expose the capability/performance view on demand. A future developer overlay may add route/enemy/BLAS detail, but it must not replace the current branded player-facing HUD.
