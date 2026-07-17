@@ -51,14 +51,14 @@ Last updated: 2026-07-18
 ## UI, settings, diagnostics, and audio
 
 - Both platforms have branded entry, pause, controls, settings, RT diagnostics, restart, and quit flows.
-- Both platform menus expose a release-safe two-pass benchmark: pass 1 warms the deterministic 13-waypoint route, pass 2 measures it, and completion produces a selectable/copyable/exportable text report plus automatically archived JSON evidence. Windows is live-validated; Android device validation waits for the phone.
+- Both platform menus expose a release-safe two-pass benchmark: pass 1 warms the deterministic 13-waypoint route, pass 2 measures it, and completion produces a selectable/copyable/exportable text report plus automatically archived JSON evidence. Windows and `SM-S948B` Android device validation pass.
 - Both platform menus include `More by Samfa12`, which opens https://samfa12.com/ in the system browser.
 - Technical output stays tucked away unless requested or startup fails.
 - Both platforms persist a 50-100% RT render-resolution slider with 100% default.
 - Android also persists SFX enable/volume, look sensitivity, and compact HUD.
 - Windows persists SFX, sensitivity, display mode, and render scale beside the executable.
 - Android diagnostics report internal resolution, FPS, frame time, dispatch resolution, and honest RT presentation.
-- The shared Debug developer overlay reports build/shader identity, GPU/API, RT mode/presentation, render scale/extents/timing, route/lantern/enemy state, BLAS/TLAS/instance counts, active skinned count, and material route. Windows F3 is live-validated and non-pausing; Android Debug/Release compile, but the Android overlay still needs device touch/layout/performance/lifecycle validation.
+- The shared Debug developer overlay reports build/shader identity, GPU/API, RT mode/presentation, render scale/extents/timing, route/lantern/enemy state, BLAS/TLAS/instance counts, active skinned count, and material route. Windows F3 and Android long-press are live-validated; Android passed 1.7-font layout, Home/resume state, and a 75% overlay-active opening measurement.
 - Seventeen FilmCow WAVs cover UI, sword, normalized alternating player/skeleton footsteps, skeleton attack, and lich charge/impact/fall/hurt reactions.
 - Android uses SoundPool per-cue gain; Windows uses XAudio2 per-voice matrices with WinMM fallback.
 
@@ -72,6 +72,7 @@ Last updated: 2026-07-18
 - At 75%, every required warm route zone remained below 13.7 ms median-of-three-window averages at thermal status 3. The later deterministic cool/status-0 default checkpoint set measured 7.667-16.123 ms and completed all 13 replay waypoints.
 - At 100%, full `1440x2980` image/extent presentation passed without a 50 FPS requirement. The latest automated opening was 25.191 ms.
 - Evidence: `docs/HORDE_SHOWCASE_ANDROID_VALIDATION_2026-07-17.md`, `docs/ANDROID_SHOWCASE_AUTOMATION_VALIDATION_2026-07-17.md`, and `docs/SHOWCASE_ALPHA_RELEASE_VALIDATION_2026-07-17.md`.
+- The player benchmark and Debug overlay device gate passed on 2026-07-18, including the owner's follow-up movement/look/Swing, audio-cue, and visual-legibility check. At 75%, the two-pass benchmark measured 12.330 ms median / 19.844 ms P95 across 1,838 frames with honest presentation throughout; 100% completed separately at 17.725 ms median. See `docs/IN_APP_BENCHMARK_ANDROID_VALIDATION_2026-07-18.md`.
 
 ## Validated Windows release state
 
@@ -113,7 +114,7 @@ Last updated: 2026-07-18
 2. Back up the JKS and both passwords independently.
 3. Treat the complete 0.1.1 route as the preserved playable baseline; the stained pane was rejected, water remains deferred, and no second concurrent enemy is authorised without a measured plan.
 4. The deterministic checkpoint, three-window benchmark, native route replay, and bounded Android evidence runner foundation is complete and live-validated.
-5. Developer overlay/state visibility is complete and live-validated on Windows; Android build plumbing is complete but device validation waits for the phone. Continue with that phone gate, then the integrated cross-platform clean-build/package/stale-shader/licence gate and fixed video/presentation capture.
+5. Developer overlay/state visibility and the player benchmark are device-validated on Windows and Android. Continue with the integrated cross-platform clean-build/package/stale-shader/licence gate and fixed video/presentation capture.
 6. Gate each meaningful renderer/gameplay-route change on the phone at 75%; report 100% separately and retain the short hands-on touch/audio/lifecycle pass.
 7. Keep real RT and honest diagnostics. Reduce bounded effect area/ray cost before expanding gameplay or substituting fake effects.
 8. Treat `docs/BUILD_TEST_DEMO_CYCLE_PLAN_2026-07-17.md` as the detailed backlog and `docs/DOCUMENTATION_CHECKPOINT_2026-07-17.md` as the documentation authority map.

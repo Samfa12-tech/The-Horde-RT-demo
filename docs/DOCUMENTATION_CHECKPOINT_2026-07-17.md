@@ -30,7 +30,7 @@ This is the consolidation map after Showcase Alpha 0.1.1 publication and the fir
 - Android release packages both enemy GLBs, strict environment/lich ASTC, and 17 FilmCow cues. Windows packages both enemies, raw textures, 17 cues, and the licence manifest.
 - Warm 75% Android hands-on certification and cool deterministic automation are separate evidence classes; neither should be relabelled as the other.
 - The Android Debug harness supplies 12 presets, a default five-checkpoint three-window pass, and a 13-waypoint replay. Release rejects the request path.
-- A separate player-facing benchmark is release-safe on both platforms: one warm-up lap plus one measured 13-waypoint lap, followed by a selectable/copyable/savable report. Windows is live-validated; Android device validation is pending.
+- A separate player-facing benchmark is release-safe on both platforms: one warm-up lap plus one measured 13-waypoint lap, followed by a selectable/copyable/exportable report and archived JSON. Windows and `SM-S948B` Android device validation pass; see the dated in-app benchmark validation records.
 
 ## Historical records
 
