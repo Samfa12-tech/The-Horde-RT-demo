@@ -14,6 +14,7 @@ This is the consolidation map after Showcase Alpha 0.1.1 publication and the fir
 | Android hands-on route, lifecycle and warm sustained measurements | `HORDE_SHOWCASE_ANDROID_VALIDATION_2026-07-17.md` |
 | Android deterministic checkpoint/replay procedure | `ANDROID_SHOWCASE_AUTOMATION_2026-07-17.md` |
 | Android cool/status-0 automation baseline | `ANDROID_SHOWCASE_AUTOMATION_VALIDATION_2026-07-17.md` and `validation/android-showcase-automation-2026-07-17/` |
+| Player-facing benchmark contract and Windows evidence | `IN_APP_BENCHMARK_WINDOWS_VALIDATION_2026-07-17.md` |
 | Asset provenance/licences | root `ASSET_LICENSES.md` |
 | Remaining tooling backlog | `BUILD_TEST_DEMO_CYCLE_PLAN_2026-07-17.md` |
 | Day-to-day agent constraints | root `AGENTS.md`, `PROJECT_MEMORY.md`, and `PROJECT_DECISIONS.md` |
@@ -29,6 +30,7 @@ This is the consolidation map after Showcase Alpha 0.1.1 publication and the fir
 - Android release packages both enemy GLBs, strict environment/lich ASTC, and 17 FilmCow cues. Windows packages both enemies, raw textures, 17 cues, and the licence manifest.
 - Warm 75% Android hands-on certification and cool deterministic automation are separate evidence classes; neither should be relabelled as the other.
 - The Android Debug harness supplies 12 presets, a default five-checkpoint three-window pass, and a 13-waypoint replay. Release rejects the request path.
+- A separate player-facing benchmark is release-safe on both platforms: one warm-up lap plus one measured 13-waypoint lap, followed by a selectable/copyable/savable report. Windows is live-validated; Android device validation is pending.
 
 ## Historical records
 
@@ -43,7 +45,7 @@ The following dated families are intentionally preserved rather than rewritten: 
 - Do not raise the one-active-skinned-enemy limit without a dedicated phone measurement.
 - Android audio events execute on-device, but perceived stereo directionality/distance is not separately certified.
 - Water, authored hands/full character rig, broader AI, block/dodge, player death, and the staged textured sword runtime remain deferred.
-- Developer overlay, integrated cross-platform clean-build/package/stale-shader/licence gates, and fixed video/presentation capture remain tooling work.
+- Post-checkpoint update: the developer overlay is Windows-live-validated and Android-build-validated; Android device validation, integrated cross-platform clean-build/package/stale-shader/licence gates, and fixed video/presentation capture remain tooling work.
 - Future publishing must bump all version surfaces and Android `versionCode`; the current package scripts default to the immutable published 0.1.1 identity and must not be used to republish changed source under the same version.
 - The unchecked historical `v0.1.0-alpha.1` tag task is superseded; do not create a retroactive tag on a later commit.
 

@@ -10,6 +10,8 @@ Horde Lantern RT is a native Vulkan hardware-ray-tracing technology demo for And
 - Primary validated phone: Samsung `SM-S948B` / Adreno 840
 - Validated Windows GPU: NVIDIA GeForce RTX 5050 Laptop GPU
 
+Development note: the in-app benchmark, developer overlay, and Samfa12 menu link are source changes made after `0.1.1-alpha.1`; they are not included in the itch builds listed above yet.
+
 The APK declares Android 7 / API 24 as its packaging minimum, but hardware support is intentionally much narrower: the device and driver must expose Vulkan acceleration structures, ray-tracing pipeline, ray query, buffer device address, deferred host operations, and the required ASTC formats. Only `SM-S948B` on Android 16 is currently device-certified.
 
 ## RT or nothing
@@ -22,6 +24,8 @@ The demo uses Vulkan acceleration structures, an RT pipeline and shader binding 
 
 - Portrait-first Android presentation and a native Windows desktop build.
 - Branded entry, pause, controls, settings, diagnostics, restart, and quit flows.
+- A player-facing two-pass `Run benchmark` course ends in a selectable, copyable, exportable text report and automatically archives JSON evidence.
+- A `More by Samfa12` menu button opens https://samfa12.com/ in the system browser.
 - Persisted 50-100% RT render-resolution scale, defaulting to 100%.
 - Android SFX volume and compact-HUD settings; Windows SFX, sensitivity, display-mode, and render-scale settings.
 - Collision-safe starting chamber and material gallery, a leashed skeleton encounter, and a three-turn moving-shadow corridor.
@@ -53,6 +57,7 @@ The staged Meshy sword LOD and torch study are not used by the runtime or includ
 - `R`: restart route
 - `F1`: controls
 - `F2`: RT diagnostics
+- `F3`: live non-pausing developer overlay (Debug builds only)
 - `Alt+Enter`: fullscreen/windowed
 
 ## Current validation
@@ -69,6 +74,8 @@ Render scaling was verified at:
 
 Windows Release was launched from a clean extraction using only its packaged assets. It reported `RayTracingPipeline`, `RT scene presented: yes`, and live resolution/FPS/frame-time diagnostics. The 100% and 75% render targets were verified at `982x628` and `737x471` respectively.
 
+The in-app Windows Release benchmark is live-validated: its warm-up plus measured course completed 26/26 waypoints with honest RT presentation on every measured frame, displayed a selectable result, copied the complete report to the clipboard, and wrote parseable timestamped text/JSON. Android builds and lints; its touch/lifecycle/export gate waits for the connected phone.
+
 See:
 
 - `docs/DOCUMENTATION_CHECKPOINT_2026-07-17.md`
@@ -76,6 +83,7 @@ See:
 - `docs/HORDE_SHOWCASE_ANDROID_VALIDATION_2026-07-17.md`
 - `docs/ANDROID_SHOWCASE_AUTOMATION_2026-07-17.md`
 - `docs/ANDROID_SHOWCASE_AUTOMATION_VALIDATION_2026-07-17.md`
+- `docs/IN_APP_BENCHMARK_WINDOWS_VALIDATION_2026-07-17.md`
 - `docs/SHOWCASE_ALPHA_RELEASE_NOTES_2026-07-17.md`
 - Historical 0.1.0 readiness and validation records remain under `docs/`.
 

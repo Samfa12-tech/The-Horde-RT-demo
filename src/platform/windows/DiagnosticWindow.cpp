@@ -5,6 +5,7 @@
 #include <cmath>
 #include <cstdint>
 #include <cstring>
+#include <ctime>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -21,8 +22,10 @@
 #define NOMINMAX
 #endif
 #include <windows.h>
+#include <commdlg.h>
 #include <commctrl.h>
 #include <mmsystem.h>
+#include <shellapi.h>
 #include <xaudio2.h>
 #ifdef DeviceCapabilities
 #undef DeviceCapabilities
@@ -32,12 +35,21 @@
 
 #include "ui/DiagnosticOverlay.h"
 #include "gameplay/CorridorCollision.h"
+#include "gameplay/ShowcaseBenchmark.h"
+#include "gameplay/ShowcaseCheckpoints.h"
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/SpatialAudio.h"
 #include "gameplay/SwordCombat.h"
 #include "vulkan/RtCapabilityReport.h"
 #include "vulkan/VulkanContext.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
+
+#ifndef HORDE_RT_BUILD_ID
+#define HORDE_RT_BUILD_ID "development"
+#endif
+#ifndef HORDE_RT_RAYGEN_SHA256
+#define HORDE_RT_RAYGEN_SHA256 "unknown"
+#endif
 
 namespace
 {
@@ -63,6 +75,13 @@ constexpr int kFullscreenButtonId = 113;
 constexpr int kSettingsBackButtonId = 114;
 constexpr int kRenderScaleLabelId = 115;
 constexpr int kRenderScaleSliderId = 116;
+constexpr int kDeveloperOverlayId = 117;
+constexpr int kMoreBySamfa12ButtonId = 118;
+constexpr int kRunBenchmarkButtonId = 119;
+constexpr int kBenchmarkTitleId = 120;
+constexpr int kBenchmarkCopyButtonId = 121;
+constexpr int kBenchmarkSaveButtonId = 122;
+constexpr int kBenchmarkBackButtonId = 123;
 constexpr int kMenuPauseId = 2001;
 constexpr int kMenuRestartId = 2002;
 constexpr int kMenuExitId = 2003;
@@ -75,10 +94,12 @@ constexpr int kMenuControlsId = 2020;
 constexpr int kMenuDiagnosticsId = 2021;
 constexpr int kMenuAboutId = 2022;
 constexpr int kMenuCreditsId = 2023;
+constexpr int kMenuDeveloperOverlayId = 2024;
 constexpr int kAppIconId = 1;
 constexpr UINT kDefaultDpi = 96u;
 constexpr char kUiFontProperty[] = "HordeLanternRtUiFont";
 constexpr char kMonoFontProperty[] = "HordeLanternRtMonoFont";
+constexpr char kDeveloperFontProperty[] = "HordeLanternRtDeveloperFont";
 // One frame in flight keeps the dynamically refit held-torch TLAS safely synchronized with its host-written instance buffer.
 constexpr UINT kMaxFramesInFlight = 1u;
 struct VulkanSurfaceContext
@@ -93,6 +114,7 @@ struct VulkanSurfaceContext
     VkSwapchainKHR swapchain = VK_NULL_HANDLE;
     VkFormat swapchainFormat = VK_FORMAT_B8G8R8A8_UNORM;
     VkColorSpaceKHR swapchainColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+    VkPresentModeKHR swapchainPresentMode = VK_PRESENT_MODE_FIFO_KHR;
     VkExtent2D swapchainExtent{};
     VkRenderPass renderPass = VK_NULL_HANDLE;
     std::vector<VkImage> swapchainImages;
@@ -111,6 +133,11 @@ struct VulkanSurfaceContext
     bool pauseMenuVisible = true;
     bool settingsVisible = false;
     bool diagnosticsVisible = false;
+    bool benchmarkReportVisible = false;
+#if defined(_DEBUG)
+    bool developerOverlayVisible = false;
+    ULONGLONG lastDeveloperOverlayTick = 0u;
+#endif
     bool sfxEnabled = true;
     bool fullscreen = false;
     bool forwardHeld = false;
@@ -150,11 +177,17 @@ struct VulkanSurfaceContext
     horde::gameplay::EnemyKind debugEnemyOverride = horde::gameplay::EnemyKind::None;
     uint32_t debugValidationPoint = 0u;
     float lichDamageFlash = 0.0f;
+    horde::gameplay::ShowcaseBenchmarkRun benchmark;
+    std::string benchmarkReport;
+    std::string benchmarkJsonReport;
+    bool benchmarkCompletionHandled = false;
     uint32_t currentFrame = 0u;
 };
 
 bool WriteReportFile(const std::filesystem::path& path, const std::string& data);
 void ClearDesktopInput(VulkanSurfaceContext& context);
+void LayoutOverlayControls(HWND window, int width, int height);
+std::string WindowSafeText(const std::string& value);
 
 std::filesystem::path ExecutableDirectory()
 {
@@ -623,9 +656,11 @@ void UpdateSettingsLabels(VulkanSurfaceContext& context)
 
 void ApplyOverlayState(VulkanSurfaceContext& context)
 {
-    const bool pauseVisible = context.pauseMenuVisible && !context.settingsVisible && !context.diagnosticsVisible;
+    const bool pauseVisible = context.pauseMenuVisible && !context.settingsVisible &&
+                              !context.diagnosticsVisible && !context.benchmarkReportVisible;
     for (const int id : {kPauseTitleId, kResumeButtonId, kRestartButtonId, kControlsButtonId,
-                         kSettingsButtonId, kDiagnosticsButtonId, kExitButtonId})
+                         kSettingsButtonId, kDiagnosticsButtonId, kRunBenchmarkButtonId,
+                         kMoreBySamfa12ButtonId, kExitButtonId})
     {
         SetControlVisible(context.windowHandle, id, pauseVisible);
     }
@@ -634,9 +669,23 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
     {
         SetControlVisible(context.windowHandle, id, context.settingsVisible);
     }
-    SetControlVisible(context.windowHandle, kEditControlId, context.diagnosticsVisible);
-    SetControlVisible(context.windowHandle, kHudControlId, !context.diagnosticsVisible);
-    context.simulationPaused = pauseVisible || context.settingsVisible || context.diagnosticsVisible;
+    SetControlVisible(context.windowHandle, kEditControlId,
+                      context.diagnosticsVisible || context.benchmarkReportVisible);
+    for (const int id : {kBenchmarkTitleId, kBenchmarkCopyButtonId,
+                         kBenchmarkSaveButtonId, kBenchmarkBackButtonId})
+    {
+        SetControlVisible(context.windowHandle, id, context.benchmarkReportVisible);
+    }
+    SetControlVisible(context.windowHandle, kHudControlId,
+                      !context.diagnosticsVisible && !context.benchmarkReportVisible);
+#if defined(_DEBUG)
+    SetControlVisible(context.windowHandle, kDeveloperOverlayId,
+                       context.developerOverlayVisible && !pauseVisible && !context.benchmarkReportVisible &&
+                           !context.settingsVisible && !context.diagnosticsVisible &&
+                           !context.benchmark.IsRunning());
+#endif
+    context.simulationPaused = pauseVisible || context.settingsVisible ||
+                               context.diagnosticsVisible || context.benchmarkReportVisible;
     if (context.simulationPaused)
     {
         ClearDesktopInput(context);
@@ -655,6 +704,7 @@ void ShowPauseMenu(VulkanSurfaceContext& context, const bool visible)
     context.pauseMenuVisible = visible;
     context.settingsVisible = false;
     context.diagnosticsVisible = false;
+    context.benchmarkReportVisible = false;
     ApplyOverlayState(context);
     if (visible)
     {
@@ -695,6 +745,134 @@ void ResetRoute(VulkanSurfaceContext& context)
     ClearDesktopInput(context);
 }
 
+const char* PresentModeName(const VkPresentModeKHR mode)
+{
+    switch (mode)
+    {
+    case VK_PRESENT_MODE_MAILBOX_KHR: return "MAILBOX";
+    case VK_PRESENT_MODE_IMMEDIATE_KHR: return "IMMEDIATE";
+    case VK_PRESENT_MODE_FIFO_RELAXED_KHR: return "FIFO_RELAXED";
+    default: return "FIFO";
+    }
+}
+
+std::string UtcTimestamp(const char* format)
+{
+    const std::time_t now = std::time(nullptr);
+    std::tm utc{};
+    gmtime_s(&utc, &now);
+    char text[64]{};
+    std::strftime(text, sizeof(text), format, &utc);
+    return text;
+}
+
+horde::gameplay::ShowcaseBenchmarkMetadata BuildBenchmarkMetadata(
+    const VulkanSurfaceContext& context,
+    const horde::vulkan::DeviceCapabilities& capabilities)
+{
+    horde::gameplay::ShowcaseBenchmarkMetadata metadata;
+    metadata.timestampUtc = UtcTimestamp("%Y-%m-%dT%H:%M:%SZ");
+    metadata.buildIdentity = HORDE_RT_BUILD_ID;
+    metadata.shaderIdentity = std::string(HORDE_RT_RAYGEN_SHA256).substr(0u, 12u);
+    metadata.gpuName = capabilities.identity.gpuName;
+    metadata.vulkanApi = std::to_string(VK_API_VERSION_MAJOR(capabilities.identity.vulkanApiVersion)) + "." +
+                         std::to_string(VK_API_VERSION_MINOR(capabilities.identity.vulkanApiVersion)) + "." +
+                         std::to_string(VK_API_VERSION_PATCH(capabilities.identity.vulkanApiVersion));
+    metadata.rtMode = horde::vulkan::ToString(capabilities.rtMode);
+    metadata.presentMode = PresentModeName(context.swapchainPresentMode);
+    metadata.materialEncoding = context.rtScene.MaterialEncoding();
+    metadata.renderScalePercent = static_cast<std::uint32_t>(std::lround(context.renderScale * 100.0f));
+    metadata.internalWidth = context.rtScene.DispatchExtent().width;
+    metadata.internalHeight = context.rtScene.DispatchExtent().height;
+    metadata.presentationWidth = context.swapchainExtent.width;
+    metadata.presentationHeight = context.swapchainExtent.height;
+    return metadata;
+}
+
+void UpdateBenchmarkHud(VulkanSurfaceContext& context)
+{
+    if (HWND hud = GetDlgItem(context.windowHandle, kHudControlId))
+    {
+        const std::string text = context.benchmark.ProgressText() + "  |  ESC CANCELS";
+        SetWindowTextA(hud, text.c_str());
+    }
+}
+
+void StartBenchmark(VulkanSurfaceContext& context)
+{
+    ResetRoute(context);
+    context.benchmark.Start();
+    context.benchmarkCompletionHandled = false;
+    context.benchmarkReport.clear();
+    context.benchmarkJsonReport.clear();
+    context.pauseMenuVisible = false;
+    context.settingsVisible = false;
+    context.diagnosticsVisible = false;
+    context.benchmarkReportVisible = false;
+    ApplyOverlayState(context);
+    UpdateBenchmarkHud(context);
+    PlaySoundEffect(context, "ui_select.wav");
+    SetFocus(context.windowHandle);
+}
+
+void CancelBenchmark(VulkanSurfaceContext& context, const bool showMenu)
+{
+    if (!context.benchmark.IsRunning())
+    {
+        return;
+    }
+    context.benchmark.Cancel();
+    ResetRoute(context);
+    if (HWND hud = GetDlgItem(context.windowHandle, kHudControlId))
+    {
+        SetWindowTextA(hud, "ALPHA 0.1.1  |  NATIVE VULKAN HARDWARE RT ACTIVE  |  F1 CONTROLS  |  ESC MENU");
+    }
+    if (showMenu)
+    {
+        ShowPauseMenu(context, true);
+    }
+}
+
+void CompleteBenchmark(VulkanSurfaceContext& context,
+                       const horde::vulkan::DeviceCapabilities& capabilities,
+                       const std::filesystem::path& reportDirectory)
+{
+    if (context.benchmarkCompletionHandled)
+    {
+        return;
+    }
+    context.benchmarkCompletionHandled = true;
+    const horde::gameplay::ShowcaseBenchmarkMetadata metadata =
+        BuildBenchmarkMetadata(context, capabilities);
+    context.benchmarkReport = context.benchmark.BuildTextReport(metadata);
+    context.benchmarkJsonReport = context.benchmark.BuildJsonReport(metadata);
+    const std::string stamp = UtcTimestamp("%Y%m%d-%H%M%S");
+    const std::filesystem::path textPath = reportDirectory / ("HordeLanternRT-benchmark-" + stamp + ".txt");
+    const std::filesystem::path jsonPath = reportDirectory / ("HordeLanternRT-benchmark-" + stamp + ".json");
+    const bool jsonSaved = WriteReportFile(jsonPath, context.benchmarkJsonReport);
+    context.benchmarkReport += "\nSaved text report: " + textPath.string() +
+        "\nSaved JSON report: " + (jsonSaved ? jsonPath.string() : std::string("FAILED")) +
+        "\nUse the buttons below or Ctrl+A, Ctrl+C to copy.\n";
+    if (!WriteReportFile(textPath, context.benchmarkReport))
+    {
+        context.benchmarkReport += "WARNING: automatic text report save failed; COPY REPORT and SAVE AS remain available.\n";
+    }
+    ResetRoute(context);
+    context.pauseMenuVisible = false;
+    context.settingsVisible = false;
+    context.diagnosticsVisible = false;
+    context.benchmarkReportVisible = true;
+    if (HWND edit = GetDlgItem(context.windowHandle, kEditControlId))
+    {
+        SetWindowTextA(edit, WindowSafeText(context.benchmarkReport).c_str());
+    }
+    ApplyOverlayState(context);
+    RECT client{};
+    GetClientRect(context.windowHandle, &client);
+    LayoutOverlayControls(context.windowHandle, client.right - client.left, client.bottom - client.top);
+    SetFocus(GetDlgItem(context.windowHandle, kEditControlId));
+}
+
 void ToggleFullscreen(VulkanSurfaceContext& context)
 {
     HWND window = context.windowHandle;
@@ -731,6 +909,106 @@ std::string BuildDisplayText(const horde::vulkan::DeviceCapabilities& capabiliti
     }
     return horde::ui::BuildDiagnosticOverlayText(capabilities);
 }
+
+#if defined(_DEBUG)
+std::string PackedVulkanVersion(const std::uint32_t version)
+{
+    return std::to_string(VK_API_VERSION_MAJOR(version)) + "." +
+           std::to_string(VK_API_VERSION_MINOR(version)) + "." +
+           std::to_string(VK_API_VERSION_PATCH(version));
+}
+
+const char* EncounterStatusName(const horde::gameplay::EncounterStatus status)
+{
+    switch (status)
+    {
+    case horde::gameplay::EncounterStatus::Active: return "active";
+    case horde::gameplay::EncounterStatus::Dead: return "dead";
+    default: return "inactive";
+    }
+}
+
+const horde::gameplay::EnemyEncounterSnapshot* SelectedEncounter(
+    const horde::gameplay::EnemyRosterSnapshot& roster)
+{
+    for (const horde::gameplay::EnemyEncounterSnapshot& encounter : roster.encounters)
+    {
+        if (encounter.kind == roster.selectedEnemy)
+        {
+            return &encounter;
+        }
+    }
+    return nullptr;
+}
+
+horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(
+    const VulkanSurfaceContext& context,
+    const horde::vulkan::DeviceCapabilities& capabilities)
+{
+    const horde::gameplay::EnemyRosterSnapshot& roster = context.enemyDirector.Snapshot();
+    const horde::gameplay::LichSnapshot& lich = context.lichEncounter.Snapshot();
+    const horde::gameplay::EnemyEncounterSnapshot* encounter = SelectedEncounter(roster);
+    horde::ui::DeveloperOverlaySnapshot snapshot;
+    snapshot.buildIdentity = std::string(HORDE_RT_BUILD_ID) + " DEBUG";
+    snapshot.shaderIdentity = std::string(HORDE_RT_RAYGEN_SHA256).substr(0u, 12u);
+    snapshot.gpuName = capabilities.identity.gpuName;
+    snapshot.vulkanApi = PackedVulkanVersion(capabilities.identity.vulkanApiVersion);
+    snapshot.rtMode = horde::vulkan::ToString(capabilities.rtMode);
+    snapshot.routeZone = horde::gameplay::ShowcaseZoneName(
+        horde::gameplay::QueryShowcaseZone(context.cameraX, context.cameraZ));
+    snapshot.materialEncoding = context.rtScene.MaterialEncoding();
+    snapshot.lanternPhase = horde::gameplay::LanternPhaseName(context.lanternSnapshot.phase);
+    snapshot.selectedEnemy = horde::gameplay::EnemyKindName(roster.selectedEnemy);
+    snapshot.encounterPhase = encounter ? EncounterStatusName(encounter->status) : "inactive";
+    if (roster.selectedEnemy == horde::gameplay::EnemyKind::Lich)
+    {
+        snapshot.encounterPhase = horde::gameplay::LichPhaseName(lich.phase);
+        snapshot.enemyHealth = lich.health;
+    }
+    snapshot.internalWidth = capabilities.performance.internalRenderWidth;
+    snapshot.internalHeight = capabilities.performance.internalRenderHeight;
+    snapshot.presentationWidth = context.swapchainExtent.width;
+    snapshot.presentationHeight = context.swapchainExtent.height;
+    snapshot.blasCount = context.rtScene.BlasCount();
+    snapshot.tlasCount = context.rtScene.TlasCount();
+    snapshot.tlasInstanceCount = context.rtScene.TlasInstanceCount();
+    snapshot.activeSkinnedEnemies = static_cast<std::uint32_t>(roster.renderedEnemyCount);
+    snapshot.renderScale = context.renderScale;
+    snapshot.fps = capabilities.performance.fps;
+    snapshot.frameTimeMs = capabilities.performance.frameTimeMs;
+    snapshot.presented = capabilities.rtScene.presented;
+    return snapshot;
+}
+
+void RefreshDeveloperOverlay(VulkanSurfaceContext& context,
+                             const horde::vulkan::DeviceCapabilities& capabilities,
+                             const bool force = false)
+{
+    if (!context.developerOverlayVisible || context.benchmark.IsRunning())
+    {
+        return;
+    }
+    const ULONGLONG now = GetTickCount64();
+    if (!force && now - context.lastDeveloperOverlayTick < 250u)
+    {
+        return;
+    }
+    context.lastDeveloperOverlayTick = now;
+    if (HWND overlay = GetDlgItem(context.windowHandle, kDeveloperOverlayId))
+    {
+        const std::string text = WindowSafeText(
+            horde::ui::BuildDeveloperOverlayText(BuildDeveloperOverlaySnapshot(context, capabilities)));
+        SetWindowTextA(overlay, text.c_str());
+    }
+}
+
+void ToggleDeveloperOverlay(VulkanSurfaceContext& context)
+{
+    context.developerOverlayVisible = !context.developerOverlayVisible;
+    context.lastDeveloperOverlayTick = 0u;
+    ApplyOverlayState(context);
+}
+#endif
 
 std::string WindowSafeText(const std::string& value)
 {
@@ -917,6 +1195,31 @@ void UpdateDesktopSceneControls(VulkanSurfaceContext& context)
     context.lastControlTick = now;
     context.frameDeltaSeconds = deltaSeconds;
     context.playerTravelledThisFrame = 0.0f;
+    if (context.benchmark.IsRunning())
+    {
+        context.frameDeltaSeconds = 1.0f / 60.0f;
+        ClearDesktopInput(context);
+        const float previousCameraX = context.cameraX;
+        const float previousCameraZ = context.cameraZ;
+        const horde::gameplay::ShowcaseBenchmarkAdvance advance = context.benchmark.Advance();
+        if (advance.lapStarted)
+        {
+            ResetRoute(context);
+        }
+        context.cameraX = advance.replay.x;
+        context.cameraZ = advance.replay.z;
+        context.cameraYaw = advance.replay.yaw;
+        context.cameraPitch = -0.04f;
+        context.walkAmount = advance.finished ? 0.0f : 1.0f;
+        context.playerTravelledThisFrame = std::hypot(
+            context.cameraX - previousCameraX, context.cameraZ - previousCameraZ);
+        context.walkTime += context.frameDeltaSeconds * 2.7f;
+        if (advance.replay.waypointReached || advance.lapStarted || advance.finished)
+        {
+            UpdateBenchmarkHud(context);
+        }
+        return;
+    }
     if (context.simulationPaused)
     {
         context.frameDeltaSeconds = 0.0f;
@@ -1127,6 +1430,7 @@ bool CreateSwapchain(VulkanSurfaceContext& ctx, HWND hwnd)
     ctx.swapchainExtent = ClampExtent(capabilities, requestedWidth, requestedHeight);
     ctx.swapchainFormat = chosenFormat.format;
     ctx.swapchainColorSpace = chosenFormat.colorSpace;
+    ctx.swapchainPresentMode = chosenPresentMode;
 
     uint32_t imageCount = std::max(2u, capabilities.minImageCount);
     if (capabilities.maxImageCount > 0u && imageCount > capabilities.maxImageCount)
@@ -1948,6 +2252,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             }
         }
 
+        const bool benchmarkFrame = context.benchmark.IsRunning();
         const auto frameStart = std::chrono::steady_clock::now();
         bool rtFramePresented = false;
         if (!RenderFrame(context, clearColor, rtFramePresented))
@@ -1960,7 +2265,20 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             break;
         }
         const auto frameEnd = std::chrono::steady_clock::now();
-        timingSamples.push_back(std::chrono::duration<double, std::milli>(frameEnd - frameStart).count());
+        const double frameTimeMs = std::chrono::duration<double, std::milli>(frameEnd - frameStart).count();
+        if (benchmarkFrame)
+        {
+            timingSamples.clear();
+            context.benchmark.RecordFrame(frameTimeMs, rtFramePresented);
+            if (!context.benchmark.IsRunning())
+            {
+                CompleteBenchmark(context, capabilities, textReportPath.parent_path());
+            }
+        }
+        else
+        {
+            timingSamples.push_back(frameTimeMs);
+        }
         if (timingSamples.size() >= 120u)
         {
             std::vector<double> sortedSamples = timingSamples;
@@ -2025,6 +2343,9 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                 SetWindowTextA(edit, updatedText.c_str());
             }
         }
+#if defined(_DEBUG)
+        RefreshDeveloperOverlay(context, capabilities);
+#endif
     }
 
     if (IsWindow(hWnd))
@@ -2073,6 +2394,17 @@ void ApplyDpiScaledFonts(HWND window)
         monoFont = static_cast<HFONT>(GetStockObject(ANSI_FIXED_FONT));
     }
 
+#if defined(_DEBUG)
+    HFONT developerFont = CreateFontA(
+        ScaleForDpi(window, 11), 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
+        ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
+        FF_MODERN, "Consolas");
+    if (!developerFont)
+    {
+        developerFont = static_cast<HFONT>(GetStockObject(ANSI_FIXED_FONT));
+    }
+#endif
+
     HFONT uiFont = CreateFontA(
         ScaleForDpi(window, 18), 0, 0, 0, FW_SEMIBOLD, FALSE, FALSE, FALSE,
         ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
@@ -2086,8 +2418,16 @@ void ApplyDpiScaledFonts(HWND window)
     {
         SendMessageA(edit, WM_SETFONT, reinterpret_cast<WPARAM>(monoFont), TRUE);
     }
+#if defined(_DEBUG)
+    if (HWND developerOverlay = GetDlgItem(window, kDeveloperOverlayId))
+    {
+        SendMessageA(developerOverlay, WM_SETFONT, reinterpret_cast<WPARAM>(developerFont), TRUE);
+    }
+#endif
     for (const int id : {kHudControlId, kPauseTitleId, kResumeButtonId, kRestartButtonId,
-                         kControlsButtonId, kSettingsButtonId, kDiagnosticsButtonId, kExitButtonId,
+                         kControlsButtonId, kSettingsButtonId, kDiagnosticsButtonId, kRunBenchmarkButtonId,
+                         kMoreBySamfa12ButtonId, kExitButtonId, kBenchmarkTitleId,
+                         kBenchmarkCopyButtonId, kBenchmarkSaveButtonId, kBenchmarkBackButtonId,
                          kSettingsTitleId, kSfxButtonId, kSensitivityButtonId, kRenderScaleLabelId,
                          kRenderScaleSliderId, kFullscreenButtonId, kSettingsBackButtonId})
     {
@@ -2105,11 +2445,17 @@ void ApplyDpiScaledFonts(HWND window)
     {
         ReplaceFontProperty(window, kUiFontProperty, uiFont);
     }
+#if defined(_DEBUG)
+    if (developerFont != GetStockObject(ANSI_FIXED_FONT))
+    {
+        ReplaceFontProperty(window, kDeveloperFontProperty, developerFont);
+    }
+#endif
 }
 
 void ReleaseDpiScaledFonts(HWND window)
 {
-    for (const char* propertyName : {kUiFontProperty, kMonoFontProperty})
+    for (const char* propertyName : {kUiFontProperty, kMonoFontProperty, kDeveloperFontProperty})
     {
         if (HFONT font = reinterpret_cast<HFONT>(RemovePropA(window, propertyName)))
         {
@@ -2132,6 +2478,35 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
                    std::max(ScaleForDpi(window, 100), width - inset * 2),
                    std::max(ScaleForDpi(window, 100), height - inset * 2), TRUE);
     }
+    auto* sceneContext = reinterpret_cast<VulkanSurfaceContext*>(GetWindowLongPtrA(window, GWLP_USERDATA));
+    if (sceneContext && sceneContext->benchmarkReportVisible)
+    {
+        const int reportTitleHeight = ScaleForDpi(window, 42);
+        const int reportButtonHeight = ScaleForDpi(window, 40);
+        const int reportGap = ScaleForDpi(window, 8);
+        const int reportButtonY = height - inset - reportButtonHeight;
+        if (HWND title = GetDlgItem(window, kBenchmarkTitleId))
+        {
+            MoveWindow(title, inset, inset, width - inset * 2, reportTitleHeight, TRUE);
+        }
+        if (HWND edit = GetDlgItem(window, kEditControlId))
+        {
+            const int editY = inset + reportTitleHeight + reportGap;
+            MoveWindow(edit, inset, editY, width - inset * 2,
+                       std::max(ScaleForDpi(window, 100), reportButtonY - reportGap - editY), TRUE);
+        }
+        const int availableWidth = width - inset * 2 - reportGap * 2;
+        const int reportButtonWidth = availableWidth / 3;
+        int reportX = inset;
+        for (const int id : {kBenchmarkCopyButtonId, kBenchmarkSaveButtonId, kBenchmarkBackButtonId})
+        {
+            if (HWND control = GetDlgItem(window, id))
+            {
+                MoveWindow(control, reportX, reportButtonY, reportButtonWidth, reportButtonHeight, TRUE);
+            }
+            reportX += reportButtonWidth + reportGap;
+        }
+    }
     if (HWND hud = GetDlgItem(window, kHudControlId))
     {
         const int hudInset = ScaleForDpi(window, 14);
@@ -2139,6 +2514,19 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
                    std::min(ScaleForDpi(window, 650), std::max(ScaleForDpi(window, 260), width - hudInset * 2)),
                    ScaleForDpi(window, 30), TRUE);
     }
+#if defined(_DEBUG)
+    if (HWND developerOverlay = GetDlgItem(window, kDeveloperOverlayId))
+    {
+        const int overlayInset = ScaleForDpi(window, 14);
+        const int overlayWidth = std::min(ScaleForDpi(window, 520),
+                                          std::max(ScaleForDpi(window, 300), width - overlayInset * 2));
+        MoveWindow(developerOverlay,
+                   std::max(overlayInset, width - overlayWidth - overlayInset),
+                   ScaleForDpi(window, 52),
+                   overlayWidth,
+                   ScaleForDpi(window, 100), TRUE);
+    }
+#endif
 
     const int buttonWidth = std::min(ScaleForDpi(window, 420),
                                      std::max(ScaleForDpi(window, 220), width - ScaleForDpi(window, 64)));
@@ -2146,12 +2534,13 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
     const int gap = ScaleForDpi(window, 8);
     const int titleHeight = ScaleForDpi(window, 48);
     const int titleAdvance = ScaleForDpi(window, 54);
-    const int pauseTotal = titleHeight + 6 * buttonHeight + 5 * gap;
+    const int pauseTotal = titleHeight + 8 * buttonHeight + 7 * gap;
     const int pauseX = (width - buttonWidth) / 2;
     int y = std::max(ScaleForDpi(window, 54), (height - pauseTotal) / 2);
     if (HWND title = GetDlgItem(window, kPauseTitleId)) MoveWindow(title, pauseX, y, buttonWidth, titleHeight, TRUE);
     y += titleAdvance;
-    for (const int id : {kResumeButtonId, kRestartButtonId, kControlsButtonId, kSettingsButtonId, kDiagnosticsButtonId, kExitButtonId})
+    for (const int id : {kResumeButtonId, kRestartButtonId, kControlsButtonId, kSettingsButtonId,
+                         kDiagnosticsButtonId, kRunBenchmarkButtonId, kMoreBySamfa12ButtonId, kExitButtonId})
     {
         if (HWND control = GetDlgItem(window, id)) MoveWindow(control, pauseX, y, buttonWidth, buttonHeight, TRUE);
         y += buttonHeight + gap;
@@ -2186,10 +2575,13 @@ void ShowControlsHelp(HWND window)
                 "Left mouse drag  360 camera look\n"
                 "Right mouse or Space  Swing sword\n"
                 "Esc  Pause / resume\n"
-                "R  Restart route\n"
-                "F1  Controls\n"
-                "F2  RT diagnostics\n"
-                "Alt+Enter  Fullscreen",
+                 "R  Restart route\n"
+                 "F1  Controls\n"
+                 "F2  RT diagnostics\n"
+#if defined(_DEBUG)
+                 "F3  Live developer overlay\n"
+#endif
+                 "Alt+Enter  Fullscreen",
                 "Horde Lantern RT - controls",
                 MB_OK | MB_ICONINFORMATION);
 }
@@ -2207,10 +2599,67 @@ void ShowCredits(HWND window)
                 MB_OK | MB_ICONINFORMATION);
 }
 
+void OpenSamfa12Website(HWND window)
+{
+    const HINSTANCE result = ShellExecuteA(window, "open", "https://samfa12.com/", nullptr, nullptr, SW_SHOWNORMAL);
+    if (reinterpret_cast<INT_PTR>(result) <= 32)
+    {
+        MessageBoxA(window,
+                    "Samfa12.com could not be opened in your default browser.",
+                    "Horde Lantern RT",
+                    MB_OK | MB_ICONERROR);
+    }
+}
+
+bool CopyTextToClipboard(HWND window, const std::string& text)
+{
+    if (!OpenClipboard(window))
+    {
+        return false;
+    }
+    EmptyClipboard();
+    HGLOBAL memory = GlobalAlloc(GMEM_MOVEABLE, text.size() + 1u);
+    if (!memory)
+    {
+        CloseClipboard();
+        return false;
+    }
+    void* destination = GlobalLock(memory);
+    std::memcpy(destination, text.c_str(), text.size() + 1u);
+    GlobalUnlock(memory);
+    if (!SetClipboardData(CF_TEXT, memory))
+    {
+        GlobalFree(memory);
+        CloseClipboard();
+        return false;
+    }
+    CloseClipboard();
+    return true;
+}
+
+void SaveBenchmarkReportAs(HWND window, const std::string& report)
+{
+    char path[MAX_PATH] = "HordeLanternRT-benchmark.txt";
+    OPENFILENAMEA dialog{};
+    dialog.lStructSize = sizeof(dialog);
+    dialog.hwndOwner = window;
+    dialog.lpstrFilter = "Text report (*.txt)\0*.txt\0All files (*.*)\0*.*\0\0";
+    dialog.lpstrFile = path;
+    dialog.nMaxFile = MAX_PATH;
+    dialog.lpstrDefExt = "txt";
+    dialog.Flags = OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST;
+    if (GetSaveFileNameA(&dialog) && !WriteReportFile(path, report))
+    {
+        MessageBoxA(window, "The benchmark report could not be saved to that location.",
+                    "Horde Lantern RT", MB_OK | MB_ICONERROR);
+    }
+}
+
 void ToggleDiagnostics(VulkanSurfaceContext& context)
 {
     context.diagnosticsVisible = !context.diagnosticsVisible;
     context.settingsVisible = false;
+    context.benchmarkReportVisible = false;
     context.pauseMenuVisible = context.diagnosticsVisible;
     ApplyOverlayState(context);
     PlaySoundEffect(context, context.diagnosticsVisible ? "ui_select.wav" : "ui_back.wav");
@@ -2222,6 +2671,7 @@ void OpenSettings(VulkanSurfaceContext& context)
     context.pauseMenuVisible = true;
     context.settingsVisible = true;
     context.diagnosticsVisible = false;
+    context.benchmarkReportVisible = false;
     ApplyOverlayState(context);
     PlaySoundEffect(context, "ui_select.wav");
     SetFocus(GetDlgItem(context.windowHandle, kSfxButtonId));
@@ -2249,6 +2699,18 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
     case WM_COMMAND:
         if (sceneContext)
         {
+            if (sceneContext->benchmark.IsRunning())
+            {
+                if (LOWORD(wParam) == kExitButtonId || LOWORD(wParam) == kMenuExitId)
+                {
+                    DestroyWindow(hWnd);
+                }
+                else if (LOWORD(wParam) == kMenuPauseId)
+                {
+                    CancelBenchmark(*sceneContext, true);
+                }
+                return 0;
+            }
             switch (LOWORD(wParam))
             {
             case kResumeButtonId:
@@ -2257,6 +2719,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 return 0;
             case kRestartButtonId:
             case kMenuRestartId:
+                CancelBenchmark(*sceneContext, false);
                 ResetRoute(*sceneContext);
                 PlaySoundEffect(*sceneContext, "ui_select.wav");
                 ShowPauseMenu(*sceneContext, false);
@@ -2273,6 +2736,14 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             case kMenuDiagnosticsId:
                 ToggleDiagnostics(*sceneContext);
                 return 0;
+            case kRunBenchmarkButtonId:
+                StartBenchmark(*sceneContext);
+                return 0;
+#if defined(_DEBUG)
+            case kMenuDeveloperOverlayId:
+                ToggleDeveloperOverlay(*sceneContext);
+                return 0;
+#endif
             case kSfxButtonId:
             case kMenuSfxId:
                 sceneContext->sfxEnabled = !sceneContext->sfxEnabled;
@@ -2297,6 +2768,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 return 0;
             case kFullscreenButtonId:
             case kMenuFullscreenId:
+                CancelBenchmark(*sceneContext, true);
                 ToggleFullscreen(*sceneContext);
                 PlaySoundEffect(*sceneContext, "ui_select.wav");
                 return 0;
@@ -2316,6 +2788,31 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             case kMenuCreditsId:
                 ShowCredits(hWnd);
                 return 0;
+            case kMoreBySamfa12ButtonId:
+                PlaySoundEffect(*sceneContext, "ui_select.wav");
+                OpenSamfa12Website(hWnd);
+                return 0;
+            case kBenchmarkCopyButtonId:
+                if (!CopyTextToClipboard(hWnd, sceneContext->benchmarkReport))
+                {
+                    MessageBoxA(hWnd, "The benchmark report could not be copied to the clipboard.",
+                                "Horde Lantern RT", MB_OK | MB_ICONERROR);
+                }
+                return 0;
+            case kBenchmarkSaveButtonId:
+                SaveBenchmarkReportAs(hWnd, sceneContext->benchmarkReport);
+                return 0;
+            case kBenchmarkBackButtonId:
+                sceneContext->benchmarkReportVisible = false;
+                sceneContext->pauseMenuVisible = true;
+                ApplyOverlayState(*sceneContext);
+                {
+                    RECT client{};
+                    GetClientRect(hWnd, &client);
+                    LayoutOverlayControls(hWnd, client.right - client.left, client.bottom - client.top);
+                }
+                SetFocus(GetDlgItem(hWnd, kRunBenchmarkButtonId));
+                return 0;
             case kExitButtonId:
             case kMenuExitId:
                 DestroyWindow(hWnd);
@@ -2331,7 +2828,23 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         {
             if (wParam == VK_ESCAPE)
             {
+                if (sceneContext->benchmark.IsRunning())
+                {
+                    CancelBenchmark(*sceneContext, true);
+                    return 0;
+                }
+                if (sceneContext->benchmarkReportVisible)
+                {
+                    sceneContext->benchmarkReportVisible = false;
+                    sceneContext->pauseMenuVisible = true;
+                    ApplyOverlayState(*sceneContext);
+                    return 0;
+                }
                 ShowPauseMenu(*sceneContext, !sceneContext->simulationPaused);
+                return 0;
+            }
+            if (sceneContext->benchmark.IsRunning())
+            {
                 return 0;
             }
             if (wParam == VK_F1)
@@ -2345,6 +2858,11 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 return 0;
             }
 #if defined(_DEBUG)
+            if (wParam == VK_F3 && (lParam & (1ll << 30)) == 0)
+            {
+                ToggleDeveloperOverlay(*sceneContext);
+                return 0;
+            }
             if (wParam == VK_F5)
             {
                 sceneContext->debugEnemyOverride = sceneContext->debugEnemyOverride == horde::gameplay::EnemyKind::Lich
@@ -2448,7 +2966,8 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         }
         break;
     case WM_LBUTTONDOWN:
-        if (sceneContext && sceneContext->controlsEnabled && !sceneContext->simulationPaused)
+        if (sceneContext && sceneContext->controlsEnabled && !sceneContext->simulationPaused &&
+            !sceneContext->benchmark.IsRunning())
         {
             SetFocus(hWnd);
             SetCapture(hWnd);
@@ -2460,7 +2979,8 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         }
         break;
     case WM_RBUTTONDOWN:
-        if (sceneContext && sceneContext->controlsEnabled && !sceneContext->simulationPaused)
+        if (sceneContext && sceneContext->controlsEnabled && !sceneContext->simulationPaused &&
+            !sceneContext->benchmark.IsRunning())
         {
             sceneContext->playerAttackRequested = true;
             PlaySoundEffect(*sceneContext, "sword_swing_2.wav");
@@ -2468,7 +2988,8 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         }
         break;
     case WM_MOUSEMOVE:
-        if (sceneContext && sceneContext->controlsEnabled && !sceneContext->simulationPaused && sceneContext->mouseLookActive)
+        if (sceneContext && sceneContext->controlsEnabled && !sceneContext->simulationPaused &&
+            !sceneContext->benchmark.IsRunning() && sceneContext->mouseLookActive)
         {
             const POINT currentMousePosition{
                 static_cast<LONG>(static_cast<short>(LOWORD(lParam))),
@@ -2499,7 +3020,17 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             ClearDesktopInput(*sceneContext);
         }
         break;
+    case WM_ACTIVATEAPP:
+        if (sceneContext && wParam == FALSE && sceneContext->benchmark.IsRunning())
+        {
+            CancelBenchmark(*sceneContext, true);
+        }
+        break;
     case WM_SIZE:
+        if (sceneContext && sceneContext->benchmark.IsRunning() && wParam != SIZE_MINIMIZED)
+        {
+            CancelBenchmark(*sceneContext, true);
+        }
         LayoutOverlayControls(hWnd, LOWORD(lParam), HIWORD(lParam));
         return 0;
     case WM_GETMINMAXINFO:
@@ -2511,6 +3042,10 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
     }
     case WM_DPICHANGED:
     {
+        if (sceneContext && sceneContext->benchmark.IsRunning())
+        {
+            CancelBenchmark(*sceneContext, true);
+        }
         const auto* suggested = reinterpret_cast<const RECT*>(lParam);
         SetWindowPos(hWnd, nullptr,
                      suggested->left, suggested->top,
@@ -2569,6 +3104,9 @@ HMENU CreateApplicationMenu()
     HMENU help = CreatePopupMenu();
     AppendMenuA(help, MF_STRING, kMenuControlsId, "&Controls\tF1");
     AppendMenuA(help, MF_STRING, kMenuDiagnosticsId, "RT &diagnostics\tF2");
+#if defined(_DEBUG)
+    AppendMenuA(help, MF_STRING, kMenuDeveloperOverlayId, "Live developer &overlay\tF3");
+#endif
     AppendMenuA(help, MF_SEPARATOR, 0, nullptr);
     AppendMenuA(help, MF_STRING, kMenuCreditsId, "&Credits && licences");
     AppendMenuA(help, MF_STRING, kMenuAboutId, "&About");
@@ -2653,13 +3191,26 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     };
 
     createStatic(kHudControlId, "ALPHA 0.1.1  |  VULKAN RT STARTING...  |  F1 CONTROLS  |  ESC MENU", SS_LEFT | SS_CENTERIMAGE);
+#if defined(_DEBUG)
+    if (HWND developerOverlay = createStatic(kDeveloperOverlayId, "DEV OVERLAY STARTING...", SS_LEFT | SS_NOPREFIX))
+    {
+        EnableWindow(developerOverlay, FALSE);
+        ShowWindow(developerOverlay, SW_HIDE);
+    }
+#endif
     createStatic(kPauseTitleId, "HORDE LANTERN RT  |  SHOWCASE ALPHA", SS_CENTER | SS_CENTERIMAGE);
     createButton(kResumeButtonId, "ENTER THE RUIN / RESUME");
     createButton(kRestartButtonId, "RESTART ROUTE");
     createButton(kControlsButtonId, "CONTROLS");
     createButton(kSettingsButtonId, "SETTINGS");
     createButton(kDiagnosticsButtonId, "RT DIAGNOSTICS");
+    createButton(kRunBenchmarkButtonId, "RUN BENCHMARK");
+    createButton(kMoreBySamfa12ButtonId, "MORE BY SAMFA12");
     createButton(kExitButtonId, "QUIT DEMO");
+    createStatic(kBenchmarkTitleId, "BENCHMARK REPORT  |  SELECTABLE TEXT", SS_CENTER | SS_CENTERIMAGE);
+    createButton(kBenchmarkCopyButtonId, "COPY REPORT");
+    createButton(kBenchmarkSaveButtonId, "SAVE AS...");
+    createButton(kBenchmarkBackButtonId, "BACK TO MENU");
     createStatic(kSettingsTitleId, "SETTINGS  |  SAVED BESIDE THE DEMO", SS_CENTER | SS_CENTERIMAGE);
     createButton(kSfxButtonId, "SOUND EFFECTS: ON");
     createButton(kSensitivityButtonId, "LOOK SENSITIVITY: NORMAL");

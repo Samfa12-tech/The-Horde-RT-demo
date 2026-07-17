@@ -53,15 +53,34 @@
         android:background="#B30D0B09"
         android:gravity="center"
         android:ellipsize="end"
-        android:maxWidth="240dp"
+        android:maxWidth="360dp"
         android:maxLines="1"
-        android:minWidth="180dp"
+        android:minWidth="260dp"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:text="@string/rt_starting"
         android:textColor="#FFD07A"
         android:textSize="9sp"
         android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/developer_overlay"
+        android:layout_width="360dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|start"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="64dp"
+        android:background="#D90D0B09"
+        android:clickable="false"
+        android:enabled="false"
+        android:focusable="false"
+        android:fontFamily="monospace"
+        android:importantForAccessibility="no"
+        android:maxLines="7"
+        android:padding="8dp"
+        android:textColor="#D8F0D0"
+        android:textSize="8sp"
+        android:visibility="gone" />
 
     <Button
         android:id="@+id/menu_button"

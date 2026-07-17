@@ -10,6 +10,10 @@ project(HordeLanternRT
     LANGUAGES CXX
 )
 
+set(HORDE_RT_EMBEDDED_RAYGEN "${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan/raytracing/MinimalRayGenShader.inc")
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${HORDE_RT_EMBEDDED_RAYGEN}")
+file(SHA256 "${HORDE_RT_EMBEDDED_RAYGEN}" HORDE_RT_RAYGEN_SHA256)
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -76,11 +80,15 @@ if(HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AND WIN32)
 
     target_link_libraries(horde_rt_diagnostic_window PRIVATE
         horde_rt_probe_core
+        comdlg32
         comctl32
+        shell32
         winmm
     )
     target_compile_definitions(horde_rt_diagnostic_window PRIVATE
         HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
+        HORDE_RT_BUILD_ID="${HORDE_RT_PACKAGE_VERSION}"
+        HORDE_RT_RAYGEN_SHA256="${HORDE_RT_RAYGEN_SHA256}"
     )
 
     set_target_properties(horde_rt_diagnostic_window PROPERTIES
@@ -109,6 +117,19 @@ if(BUILD_TESTING)
     target_include_directories(horde_rt_skinned_character_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_link_libraries(horde_rt_skinned_character_smoke PRIVATE horde_rt_probe_core)
     add_test(NAME horde_rt_skinned_character_smoke COMMAND horde_rt_skinned_character_smoke)
+
+    add_executable(horde_rt_developer_overlay_smoke
+        tests/DeveloperOverlaySmoke.cpp
+        src/ui/DiagnosticOverlay.cpp
+    )
+    target_include_directories(horde_rt_developer_overlay_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(horde_rt_developer_overlay_smoke PRIVATE horde_rt_probe_core)
+    add_test(NAME horde_rt_developer_overlay_smoke COMMAND horde_rt_developer_overlay_smoke)
+
+    add_executable(horde_rt_showcase_benchmark_smoke tests/ShowcaseBenchmarkSmoke.cpp)
+    target_include_directories(horde_rt_showcase_benchmark_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(horde_rt_showcase_benchmark_smoke PRIVATE horde_rt_probe_core)
+    add_test(NAME horde_rt_showcase_benchmark_smoke COMMAND horde_rt_showcase_benchmark_smoke)
 endif()
 
 message(STATUS "Horde Lantern RT: Vulkan capability probe and Windows diagnostic targets are available; Android builds from android/.")

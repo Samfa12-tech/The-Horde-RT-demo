@@ -13,7 +13,8 @@ This is a supporting production/tooling plan for the current **Windows-validated
 - Priorities 1 and 2 now have shared named checkpoints, deterministic encounter presets, fixed three-window measurement, strict ASTC/honest-presentation gates, and native state evidence.
 - Priority 3 now has a deterministic 13-waypoint Android route replay for movement, collision, zone, lantern, and enemy-update regression coverage. Full raw touch/look/swing/pause input recording remains deferred because ADB gesture timing is refresh-rate dependent; hands-on input validation remains required.
 - The first bounded part of Priority 5 is available as `tools/run-android-showcase-validation.ps1`, producing a timestamped Android evidence bundle. Cross-platform packaging, shader-staleness, licence, and clean-package gates remain future work.
-- The automation surface is compiled into Debug only. Normal release traversal and player-facing presentation are unchanged.
+- Priority 4 now has a shared compact formatter and Debug-only live overlay. Windows F3 is live-validated without pausing or intercepting input; Android Debug/Release and Release lint pass, but the Android device gate remains pending.
+- The engineering checkpoint surface remains Debug-only. A separate release-safe two-pass in-app benchmark now reuses the shared route and produces player-exportable reports without exposing checkpoint controls.
 
 ### 1. Deterministic showcase mode — complete
 
@@ -21,21 +22,24 @@ This is a supporting production/tooling plan for the current **Windows-validated
 - Lighting, enemy, lantern, roof, and encounter states are reproducibly selectable in Android Debug and host-tested shared code.
 - Keep normal player traversal intact; checkpoints are for development, validation, and presentation.
 
-### 2. Repeatable measurement — complete for Android Debug
+### 2. Repeatable measurement — engineering harness and player-facing Windows flow complete
 
 - A fixed 13-waypoint route and default five-checkpoint benchmark cover the important showcase cost centres.
 - Evidence records render scale, internal resolution, frame time, derived FPS, thermal/battery state, RT mode, active skinned-enemy count, and presentation status.
 - Preserve separate 100% and recommended 75% Android results.
+- The in-app benchmark runs one visible warm-up lap and one measured lap, aggregates overall and per-zone timing, requires honest RT presentation, and emits selectable text plus JSON. Windows Release is live-validated; Android device lifecycle/export validation is pending.
 
 ### 3. Reproducible input — partial
 
 - Native deterministic movement/collision replay is complete. Raw Android touch and Windows keyboard/mouse/look/swing/pause recording remains deferred because wall-clock input injection is refresh-rate dependent.
 - Mark replay results as automated evidence; retain hands-on verification where the device cannot expose a state directly.
 
-### 4. Developer visibility — pending
+### 4. Developer visibility — Windows complete; Android device validation pending
 
-- Add a toggleable in-game overlay for GPU/API, RT mode, route zone, render scale, frame timing, BLAS/TLAS counts, ray/material diagnostics, enemy state, and honest RT presentation.
-- Keep technical output hidden from the branded player-facing surfaces unless requested or startup fails.
+- The shared formatter reports build/shader identity, GPU/API, RT mode, route zone, render scale/extents/timing, BLAS/TLAS/instance counts, material encoding, lantern/enemy state, active skinned count, and honest RT presentation.
+- Windows Debug toggles it with F3 without pausing; F2 remains the full paused diagnostic surface. The compact control is disabled for input and hides during entry, pause, settings, and diagnostics.
+- Android Debug has a hidden non-interactive view, `horde.debug.overlay` intent, long-press status toggle, and a native 4 Hz snapshot publisher. Both APK build types and Release lint pass; touch pass-through, font scale 1.7, thermal timing, audio/lifecycle interaction, and visual approval remain a connected-phone gate.
+- Windows Release omits the developer UI and Android Release returns no developer overlay text. Keep technical output hidden from branded player-facing surfaces unless requested or startup fails.
 
 ### 5. One-command validation and packaging — Android evidence runner complete; integrated package gate pending
 

@@ -6,6 +6,9 @@ option(HORDE_RT_DEBUG_CHECKPOINTS "Enable debug-only showcase checkpoint and rep
 
 get_filename_component(HORDE_RT_REPO_ROOT "${CMAKE_CURRENT_LIST_DIR}/../../../../.." ABSOLUTE)
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtSources.cmake")
+set(HORDE_RT_EMBEDDED_RAYGEN "${HORDE_RT_REPO_ROOT}/src/vulkan/raytracing/MinimalRayGenShader.inc")
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${HORDE_RT_EMBEDDED_RAYGEN}")
+file(SHA256 "${HORDE_RT_EMBEDDED_RAYGEN}" HORDE_RT_RAYGEN_SHA256)
 set(HORDE_RT_ANDROID_CORE_SOURCES)
 foreach(source IN LISTS HORDE_RT_CORE_RELATIVE_SOURCES)
     list(APPEND HORDE_RT_ANDROID_CORE_SOURCES "${HORDE_RT_REPO_ROOT}/src/${source}")
@@ -23,8 +26,14 @@ target_include_directories(horde_rt_probe_android PRIVATE
 )
 
 target_compile_features(horde_rt_probe_android PRIVATE cxx_std_20)
+target_compile_definitions(horde_rt_probe_android PRIVATE
+    HORDE_RT_BUILD_ID="${HORDE_RT_PACKAGE_VERSION}"
+    HORDE_RT_RAYGEN_SHA256="${HORDE_RT_RAYGEN_SHA256}"
+)
 if(HORDE_RT_DEBUG_CHECKPOINTS)
-    target_compile_definitions(horde_rt_probe_android PRIVATE HORDE_RT_DEBUG_CHECKPOINTS=1)
+    target_compile_definitions(horde_rt_probe_android PRIVATE
+        HORDE_RT_DEBUG_CHECKPOINTS=1
+    )
 endif()
 # Keep the locally installable debug APK inspectable while avoiding an -O0
 # CPU skinning path that is not representative of a shipped phone build.
