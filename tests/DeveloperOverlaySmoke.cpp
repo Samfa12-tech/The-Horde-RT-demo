@@ -21,7 +21,7 @@ bool RequireContains(const std::string& text, const std::string& expected)
 int main()
 {
     horde::ui::DeveloperOverlaySnapshot snapshot;
-    snapshot.buildIdentity = "0.1.1-alpha.1 DEBUG";
+    snapshot.buildIdentity = "0.1.2-alpha.1 DEBUG";
     snapshot.shaderIdentity = "0123456789ab";
     snapshot.gpuName = "Test RTX";
     snapshot.vulkanApi = "1.4.350";
@@ -47,7 +47,7 @@ int main()
 
     const std::string text = horde::ui::BuildDeveloperOverlayText(snapshot);
     bool ok = true;
-    ok &= RequireContains(text, "DEV  0.1.1-alpha.1 DEBUG  shader 0123456789ab");
+    ok &= RequireContains(text, "DEV  0.1.2-alpha.1 DEBUG  shader 0123456789ab");
     ok &= RequireContains(text, "RT RayTracingPipeline  |  presented YES  |  scale 75%");
     ok &= RequireContains(text, "FRAME 11.9 ms  |  83.8 FPS  |  1080x2235 -> 1440x2980");
     ok &= RequireContains(text, "SCENE finale  |  lantern settled  |  lich charging hp 2");

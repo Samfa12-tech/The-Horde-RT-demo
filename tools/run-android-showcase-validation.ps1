@@ -37,9 +37,17 @@ $checkpointZones = @{
     "finale-roof" = "finale"
 }
 $baselineCheckpoints = @("opening", "worst-bend", "skylight", "green", "lich")
+$captureCheckpoints = @("opening", "skeleton", "worst-bend", "lantern-drop", "skylight", "yellow", "blue", "red", "green", "mirror", "lich", "finale-roof")
 $timingRows = [System.Collections.Generic.List[object]]::new()
+$captureRecords = [System.Collections.Generic.List[object]]::new()
 $failures = [System.Collections.Generic.List[string]]::new()
 $initialWakefulness = ""
+$lifecycleEvidence = [ordered]@{
+    requested = [bool]$Capture
+    homeResumePassed = $false
+    honestPresentationAfterResume = $false
+    log = $null
+}
 
 function Invoke-AdbText {
     param([string[]]$Arguments, [switch]$AllowFailure)
@@ -102,22 +110,106 @@ function Get-ShowcaseState {
 function Save-Screenshot {
     param([string]$Name)
     $remote = "/data/local/tmp/horde-$runId-$Name.png"
+    $destination = Join-Path $outputDirectory "$Name.png"
     Invoke-AdbText @("shell", "screencap", "-p", $remote) | Out-Null
-    Invoke-AdbText @("pull", $remote, (Join-Path $outputDirectory "$Name.png")) | Out-Null
+    Invoke-AdbText @("pull", $remote, $destination) | Out-Null
     Invoke-AdbText @("shell", "rm", $remote) -AllowFailure | Out-Null
+    $bytes = [IO.File]::ReadAllBytes($destination)
+    if ($bytes.Length -lt 24 -or $bytes[0] -ne 0x89 -or $bytes[1] -ne 0x50 -or
+        $bytes[2] -ne 0x4e -or $bytes[3] -ne 0x47 -or $bytes[4] -ne 0x0d -or
+        $bytes[5] -ne 0x0a -or $bytes[6] -ne 0x1a -or $bytes[7] -ne 0x0a) {
+        throw "ADB screencap did not produce a valid PNG: $destination"
+    }
+    $width = ([int]$bytes[16] -shl 24) -bor ([int]$bytes[17] -shl 16) -bor ([int]$bytes[18] -shl 8) -bor [int]$bytes[19]
+    $height = ([int]$bytes[20] -shl 24) -bor ([int]$bytes[21] -shl 16) -bor ([int]$bytes[22] -shl 8) -bor [int]$bytes[23]
+    if ($width -le 0 -or $height -le 0) { throw "ADB screencap PNG has invalid dimensions: ${width}x${height}." }
+    return [PSCustomObject]@{
+        file = [IO.Path]::GetFileName($destination)
+        width = $width
+        height = $height
+        sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $destination).Hash.ToLowerInvariant()
+    }
 }
 
 function Send-AutomationIntent {
-    param([string]$Checkpoint, [int]$RequestedScale, [switch]$Replay)
+    param([string]$Checkpoint, [int]$RequestedScale, [switch]$Replay, [switch]$CaptureOnly)
     $arguments = @("shell", "am", "start", "--activity-single-top", "-n", $activityName,
                    "--ei", "horde.debug.scale", "$RequestedScale",
-                   "--ez", "horde.debug.autostart", "true")
+                   "--ez", "horde.debug.autostart", "true",
+                   "--ez", "horde.debug.overlay", "false")
     if ($Replay) {
         $arguments += @("--ez", "horde.debug.replay", "true")
     } else {
         $arguments += @("--es", "horde.debug.checkpoint", $Checkpoint)
+        if ($CaptureOnly) { $arguments += @("--ez", "horde.debug.capture", "true") }
     }
     Invoke-AdbText $arguments | Out-Null
+}
+
+function Invoke-CaptureCheckpoint {
+    param([string]$Checkpoint, [int]$RequestedScale, [int]$Index)
+    if (-not $checkpointZones.ContainsKey($Checkpoint)) { throw "Unknown capture checkpoint '$Checkpoint'." }
+    Write-Host "Capturing deterministic scene-only checkpoint $Checkpoint at $RequestedScale%..."
+    Send-AutomationIntent -Checkpoint $Checkpoint -RequestedScale $RequestedScale -CaptureOnly
+    $escapedName = [regex]::Escape($Checkpoint)
+    $log = Wait-ForLogPattern -Pattern "HORDE_CAPTURE_READY generation=\d+ checkpoint=$escapedName scale=$RequestedScale stable_frames=12 presented=1" -Description "$Checkpoint capture-ready marker"
+    $readyMatches = [regex]::Matches($log, "HORDE_CAPTURE_READY generation=(\d+) checkpoint=$escapedName scale=$RequestedScale stable_frames=12 presented=1")
+    if ($readyMatches.Count -lt 1) { throw "No capture-ready generation marker for $Checkpoint." }
+    $generation = [int]$readyMatches[$readyMatches.Count - 1].Groups[1].Value
+    $statePath = Join-Path $outputDirectory ("capture-{0:d2}-{1}-state.json" -f $Index, $Checkpoint)
+    $state = Get-ShowcaseState -Destination $statePath
+    if ($state.status -ne "capture-ready") { $failures.Add("$Checkpoint capture state status was '$($state.status)'.") }
+    if ($state.checkpoint -ne $Checkpoint) { $failures.Add("$Checkpoint capture state identified '$($state.checkpoint)'.") }
+    if ($state.zone -ne $checkpointZones[$Checkpoint]) { $failures.Add("$Checkpoint capture state reported zone '$($state.zone)'.") }
+    if (-not $state.presented) { $failures.Add("$Checkpoint capture did not retain honest RT presentation.") }
+    if ([int]$state.captureStableFrames -lt 12) { $failures.Add("$Checkpoint capture had only $($state.captureStableFrames) stable presented frames.") }
+    if ([double]$state.animationTime -ne 0.0) { $failures.Add("$Checkpoint capture animation time was not fixed at zero.") }
+    $image = Save-Screenshot ("capture-{0:d2}-{1}-{2}" -f $Index, $Checkpoint, $RequestedScale)
+    $captureRecords.Add([PSCustomObject]@{
+        index = $Index
+        checkpoint = $Checkpoint
+        expectedZone = $checkpointZones[$Checkpoint]
+        zone = $state.zone
+        generation = $generation
+        camera = $state.player
+        renderScale = $state.renderScale
+        internalExtent = $state.internalExtent
+        swapchainExtent = $state.swapchainExtent
+        gpu = $state.gpu
+        buildIdentity = $state.buildIdentity
+        shaderIdentity = $state.shaderIdentity
+        outputRedBlueSwap = [bool]$state.outputRedBlueSwap
+        animationTime = $state.animationTime
+        stablePresentedFrames = $state.captureStableFrames
+        presented = [bool]$state.presented
+        sceneOnly = $true
+        overlaysHidden = @("menu", "touch-actions", "HUD", "diagnostics", "developer-overlay")
+        png = $image
+        nativeStateFile = [IO.Path]::GetFileName($statePath)
+    })
+}
+
+function Invoke-HomeResumeLifecycleCheck {
+    Write-Host "Checking Android Home/resume surface recreation..."
+    $beforeLog = Get-ScopedLogcat
+    $presentationPattern = "RT frame reached Android swapchain presentation"
+    $presentationCountBefore = [regex]::Matches($beforeLog, $presentationPattern).Count
+    Invoke-AdbText @("shell", "input", "keyevent", "3") | Out-Null
+    Start-Sleep -Milliseconds 1200
+    Invoke-AdbText @("shell", "am", "start", "--activity-single-top", "-n", $activityName) | Out-Null
+    $deadline = [DateTime]::UtcNow.AddSeconds($TimeoutSeconds)
+    do {
+        $resumeLog = Get-ScopedLogcat
+        if ([regex]::Matches($resumeLog, $presentationPattern).Count -gt $presentationCountBefore) { break }
+        Start-Sleep -Milliseconds 750
+    } while ([DateTime]::UtcNow -lt $deadline)
+    if ([regex]::Matches($resumeLog, $presentationPattern).Count -le $presentationCountBefore) {
+        throw "Timed out waiting for honest RT presentation after Home/resume."
+    }
+    $lifecycleEvidence.homeResumePassed = $true
+    $lifecycleEvidence.honestPresentationAfterResume = $true
+    $lifecycleEvidence.log = "lifecycle-home-resume-logcat.txt"
+    $resumeLog | Set-Content -LiteralPath (Join-Path $outputDirectory $lifecycleEvidence.log) -Encoding utf8
 }
 
 function Start-AutomationSession {
@@ -176,7 +268,6 @@ function Invoke-CheckpointBenchmark {
     if ($state.zone -ne $checkpointZones[$Checkpoint]) { $failures.Add("$Checkpoint native state reported zone '$($state.zone)'.") }
     if (-not $state.presented) { $failures.Add("$Checkpoint native state did not retain honest RT presentation.") }
     if ([int]$state.benchmarkWindowsCompleted -ne 3) { $failures.Add("$Checkpoint native state completed $($state.benchmarkWindowsCompleted) timing windows.") }
-    if ($Capture) { Save-Screenshot "$Checkpoint-$RequestedScale" }
 }
 
 if (-not (Test-Path -LiteralPath $adb)) { throw "adb not found: $adb" }
@@ -244,7 +335,33 @@ try {
             $failures.Add("Native route replay state did not finish all 13 waypoints in the finale.")
         }
         if (-not $replayState.presented) { $failures.Add("Route replay native state did not retain honest RT presentation.") }
-        if ($Capture) { Save-Screenshot "route-replay-finale-$Scale" }
+    }
+
+    if ($Capture) {
+        for ($captureIndex = 0; $captureIndex -lt $captureCheckpoints.Count; ++$captureIndex) {
+            Invoke-CaptureCheckpoint -Checkpoint $captureCheckpoints[$captureIndex] -RequestedScale $Scale -Index ($captureIndex + 1)
+        }
+        Invoke-HomeResumeLifecycleCheck
+        $captureManifest = [ordered]@{
+            schema = 1
+            runId = $runId
+            captureMode = "debug-only deterministic checkpoint intent plus ADB screencap"
+            scale = $Scale
+            device = [ordered]@{
+                serial = $serial
+                model = $deviceModel
+                androidVersion = $androidVersion
+                apiLevel = $apiLevel
+                displaySize = $displaySize
+                displayDensity = $displayDensity
+            }
+            package = $packageName
+            apkSha256 = $apkHash
+            checkpointCount = $captureRecords.Count
+            checkpoints = @($captureRecords)
+            lifecycle = $lifecycleEvidence
+        }
+        $captureManifest | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath (Join-Path $outputDirectory "capture-manifest.json") -Encoding utf8
     }
 
     $finalLog = Get-ScopedLogcat
@@ -259,7 +376,7 @@ try {
     Invoke-AdbText @("shell", "dumpsys", "battery") -AllowFailure | Set-Content -LiteralPath (Join-Path $outputDirectory "battery-after.txt") -Encoding utf8
     $timingRows | Export-Csv -LiteralPath (Join-Path $outputDirectory "timing.csv") -NoTypeInformation
     $metadata = [ordered]@{
-        schema = 1
+        schema = 2
         runId = $runId
         mode = $Mode
         scale = $Scale
@@ -272,6 +389,10 @@ try {
         displayDensity = $displayDensity
         package = $packageName
         apkSha256 = $apkHash
+        captureRequested = [bool]$Capture
+        captureCheckpointCount = $captureRecords.Count
+        captureManifest = $(if ($Capture) { "capture-manifest.json" } else { $null })
+        lifecycle = $lifecycleEvidence
         timingMethod = "CPU wall-clock from frame start through vkQueuePresentKHR; not a Vulkan GPU timestamp"
         failures = @($failures)
     }

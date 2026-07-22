@@ -2,10 +2,19 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$KeyStorePath,
     [string]$KeyAlias = "horde-lantern-rt",
-    [string]$Version = "0.1.1-alpha.1"
+    [Parameter(Mandatory = $true)]
+    [string]$Version,
+    [Parameter(Mandatory = $true)]
+    [int]$VersionCode
 )
 
 $ErrorActionPreference = "Stop"
+if ($Version -match '^0\.1\.1(?:$|[-+.])') {
+    throw "The 0.1.1 release line is immutable. Choose a new Version."
+}
+if ($VersionCode -le 2) {
+    throw "VersionCode must be greater than the immutable published value 2."
+}
 $expectedCertificateSha256 = "8245277a11bca5576f116724507f799d6f4c178ce5fbb7e3981415c9e6b3c245"
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 $keyStoreFull = [IO.Path]::GetFullPath($KeyStorePath)
@@ -23,7 +32,7 @@ try {
     $env:HORDE_RELEASE_KEY_ALIAS = $KeyAlias
     $env:HORDE_RELEASE_KEY_PASSWORD = $keyPassword
 
-    & (Join-Path $PSScriptRoot "package-alpha.ps1") -Version $Version
+    & (Join-Path $PSScriptRoot "package-alpha.ps1") -Version $Version -VersionCode $VersionCode
     if ($LASTEXITCODE -ne 0) { throw "Signed alpha packaging failed." }
 
     $safeVersion = $Version -replace '[^0-9A-Za-z.-]', '-'

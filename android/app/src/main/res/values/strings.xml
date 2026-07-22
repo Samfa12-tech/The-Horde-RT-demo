@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Horde Lantern RT Alpha</string>
-    <string name="alpha_version">SHOWCASE · ALPHA 0.1.1</string>
+    <string name="alpha_version">SHOWCASE · ALPHA 0.1.2</string>
     <string name="start_demo">ENTER THE RUIN</string>
     <string name="resume_demo">RESUME</string>
     <string name="restart_route">RESTART ROUTE</string>

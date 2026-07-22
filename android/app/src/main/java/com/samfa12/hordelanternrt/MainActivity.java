@@ -56,6 +56,7 @@ public class MainActivity extends Activity {
     private static final String LICH_ASSET = "models/enemies/meshy/lich_placeholder_merged_animations_v01.glb";
     private static final String LICH_FILE = "lich_placeholder_merged_animations_v01.glb";
     private static final String EXTRA_DEBUG_CHECKPOINT = "horde.debug.checkpoint";
+    private static final String EXTRA_DEBUG_CAPTURE = "horde.debug.capture";
     private static final String EXTRA_DEBUG_REPLAY = "horde.debug.replay";
     private static final String EXTRA_DEBUG_SCALE = "horde.debug.scale";
     private static final String EXTRA_DEBUG_AUTOSTART = "horde.debug.autostart";
@@ -101,9 +102,11 @@ public class MainActivity extends Activity {
     private int enemyStepVariant;
     private int diagnosticsRefreshTick;
     private int pendingDebugCheckpoint = -1;
+    private boolean pendingDebugCapture;
     private boolean pendingDebugReplay;
     private boolean debugAutomationAutostart;
     private boolean developerOverlayVisible;
+    private boolean debugCaptureUiSuppressed;
     private boolean benchmarkRunning;
     private boolean benchmarkReportVisible;
     private String latestBenchmarkReport = "";
@@ -543,14 +546,22 @@ public class MainActivity extends Activity {
                 if (state == 1) {
                     rtStatus.setText(R.string.rt_active);
                     rtStatus.setTextColor(0xFFFFD07A);
-                    if (!menuVisible && preferences.getBoolean("show_hud", true)) attackButton.setVisibility(View.VISIBLE);
+                    if (!debugCaptureUiSuppressed && !menuVisible && preferences.getBoolean("show_hud", true)) {
+                        attackButton.setVisibility(View.VISIBLE);
+                    }
                     if (debugAutomationAutostart && menuVisible) hideMenu();
                     if (pendingDebugCheckpoint >= 0) {
                         applyDebugCheckpointViewPose(pendingDebugCheckpoint);
                         clearTouchState();
                         final int checkpoint = pendingDebugCheckpoint;
                         pendingDebugCheckpoint = -1;
-                        if (!ProbeBridge.requestDebugCheckpoint(checkpoint)) {
+                        if (pendingDebugCapture) {
+                            suppressUiForDebugCapture();
+                            pendingDebugCapture = false;
+                            if (!ProbeBridge.requestDebugCaptureCheckpoint(checkpoint)) {
+                                Log.e(TAG, "Debug capture checkpoint request rejected: " + checkpoint);
+                            }
+                        } else if (!ProbeBridge.requestDebugCheckpoint(checkpoint)) {
                             Log.e(TAG, "Debug checkpoint request rejected: " + checkpoint);
                         }
                         debugAutomationAutostart = false;
@@ -674,29 +685,53 @@ public class MainActivity extends Activity {
     }
 
     private void consumeDebugAutomationIntent(final Intent intent) {
-        if (!isDebuggableApp() || intent == null) return;
+        if (intent == null) return;
+        if (!isDebuggableApp()) {
+            if (intent.getBooleanExtra(EXTRA_DEBUG_CAPTURE, false)) {
+                Log.w(TAG, "Rejected debug capture intent in a non-debuggable build.");
+            }
+            return;
+        }
         final int requestedScale = intent.getIntExtra(EXTRA_DEBUG_SCALE, -1);
         if (requestedScale >= 50 && requestedScale <= 100) {
             ProbeBridge.setRenderScale(requestedScale / 100.0f);
         }
         final int requestedCheckpoint = checkpointId(intent.getStringExtra(EXTRA_DEBUG_CHECKPOINT));
         final boolean requestedReplay = intent.getBooleanExtra(EXTRA_DEBUG_REPLAY, false);
+        final boolean requestedCapture = intent.getBooleanExtra(EXTRA_DEBUG_CAPTURE, false);
         if (intent.hasExtra(EXTRA_DEBUG_OVERLAY)) {
             developerOverlayVisible = intent.getBooleanExtra(EXTRA_DEBUG_OVERLAY, false);
         }
         if (requestedCheckpoint >= 0) {
             pendingDebugCheckpoint = requestedCheckpoint;
+            pendingDebugCapture = requestedCapture;
             pendingDebugReplay = false;
         } else if (requestedReplay) {
             pendingDebugReplay = true;
             pendingDebugCheckpoint = -1;
+            pendingDebugCapture = false;
         }
         debugAutomationAutostart = intent.getBooleanExtra(EXTRA_DEBUG_AUTOSTART, false) ||
                 requestedCheckpoint >= 0 || requestedReplay;
         if (debugAutomationAutostart) {
             Log.i(TAG, "Accepted debug automation intent: checkpoint=" + requestedCheckpoint +
-                    " replay=" + requestedReplay + " scale=" + requestedScale);
+                    " capture=" + requestedCapture + " replay=" + requestedReplay + " scale=" + requestedScale);
         }
+    }
+
+    private void suppressUiForDebugCapture() {
+        debugCaptureUiSuppressed = true;
+        developerOverlayVisible = false;
+        menuVisible = false;
+        diagnosticsVisible = false;
+        benchmarkReportVisible = false;
+        menuScrim.setVisibility(View.GONE);
+        diagnosticsPanel.setVisibility(View.GONE);
+        menuButton.setVisibility(View.GONE);
+        attackButton.setVisibility(View.GONE);
+        rtStatus.setVisibility(View.GONE);
+        developerOverlay.setVisibility(View.GONE);
+        clearTouchState();
     }
 
     private void applyDebugCheckpointViewPose(final int checkpoint) {

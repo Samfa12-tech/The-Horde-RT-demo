@@ -48,6 +48,8 @@ Add `-Include100 -Capture` for the report-only 100% opening check and post-timin
 
 The current primary test device is Samsung `SM-S948B`. Use the renderer's 120-frame telemetry after meaningful renderer, animation, or material-path changes and validate the recommended quality tier separately from 100%.
 
+Keep new device results in [`../docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md`](../docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md). Include the exact model code, GPU/Vulkan/driver details, whether the result was locally tested or user-reported, any screenshot/report attachment, RT presentation status, and performance evidence. A device is not considered supported from SoC marketing claims alone.
+
 The combat/ASTC build passed that gate on 2026-07-14: strict ASTC selection, honest RT swapchain presentation, stable movement/look/swing input, and two samples at 12.500 ms median / 16.667 ms p95. See `../docs/COMBAT_ASTC_PHONE_VALIDATION_2026-07-14.md`.
 
 The articulated grip-locked, pitch-following revision builds for all Android ABIs and is verified on `SM-S948B`: strict ASTC selection, honest RT presentation, live idle/swing grip composition, and thermal-status-2 sustained evidence at 52.352 SurfaceFlinger TimeStats average FPS / 19.718 ms internal median (approximately 50.7 FPS). See `../docs/PLAYER_BODY_RT_SLICE_2026-07-14.md`.

@@ -1,11 +1,21 @@
 param(
-    [string]$Version = "0.1.1-alpha.1",
+    [Parameter(Mandatory = $true)]
+    [string]$Version,
+    [Parameter(Mandatory = $true)]
+    [int]$VersionCode,
     [ValidateSet("Release", "Debug")]
     [string]$WindowsConfiguration = "Release",
     [string]$OutputRoot = (Join-Path $PSScriptRoot "..\releases\candidates")
 )
 
 $ErrorActionPreference = "Stop"
+
+if ($Version -match '^0\.1\.1(?:$|[-+.])') {
+    throw "The 0.1.1 release line is immutable. Choose a new Version."
+}
+if ($VersionCode -le 2) {
+    throw "VersionCode must be greater than the immutable published value 2."
+}
 
 function Find-LatestVersionedTool {
     param(
@@ -32,7 +42,8 @@ function Find-LatestVersionedTool {
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 $outputFull = [IO.Path]::GetFullPath($OutputRoot)
 $allowedRoot = [IO.Path]::GetFullPath((Join-Path $repoRoot "releases\candidates"))
-if (-not $outputFull.StartsWith($allowedRoot, [StringComparison]::OrdinalIgnoreCase)) {
+$allowedPrefix = $allowedRoot.TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+if ($outputFull -ne $allowedRoot -and -not $outputFull.StartsWith($allowedPrefix, [StringComparison]::OrdinalIgnoreCase)) {
     throw "OutputRoot must stay inside $allowedRoot"
 }
 
@@ -64,7 +75,7 @@ $candidateFiles = @(
 foreach ($path in @($stageRoot, $outputFull)) {
     if (Test-Path -LiteralPath $path) {
         $resolved = [IO.Path]::GetFullPath($path)
-        if (-not $resolved.StartsWith($allowedRoot, [StringComparison]::OrdinalIgnoreCase)) {
+        if ($resolved -ne $allowedRoot -and -not $resolved.StartsWith($allowedPrefix, [StringComparison]::OrdinalIgnoreCase)) {
             throw "Refusing to clean path outside candidate output: $resolved"
         }
     }
@@ -113,10 +124,20 @@ $windowsVersion = (Get-Item -LiteralPath $windowsExe).VersionInfo
 if ($windowsVersion.FileVersion -ne $Version -or $windowsVersion.ProductVersion -ne $Version) {
     throw "Windows executable version mismatch: file=$($windowsVersion.FileVersion), product=$($windowsVersion.ProductVersion), expected=$Version"
 }
+$releaseNoteMatches = @(Get-ChildItem -LiteralPath (Join-Path $repoRoot "docs") -Filter "*RELEASE_NOTES*.md" -File |
+    Where-Object {
+        $text = Get-Content -LiteralPath $_.FullName -Raw
+        $text.Contains("Package version: ``$Version``") -and
+            $text.Contains("Android version code: ``$VersionCode``")
+    })
+if ($releaseNoteMatches.Count -ne 1) {
+    throw "Expected exactly one release-note file for $Version / Android versionCode $VersionCode; found $($releaseNoteMatches.Count)."
+}
+$releaseNotes = $releaseNoteMatches[0].FullName
 Copy-Item -LiteralPath $windowsExe -Destination (Join-Path $windowsStage "HordeLanternRT.exe")
 Copy-Item -LiteralPath (Join-Path $repoRoot "release\windows\README.txt") -Destination (Join-Path $windowsStage "README.txt")
 Copy-Item -LiteralPath (Join-Path $repoRoot "ASSET_LICENSES.md") -Destination (Join-Path $windowsStage "ASSET_LICENSES.md")
-Copy-Item -LiteralPath (Join-Path $repoRoot "docs\SHOWCASE_ALPHA_RELEASE_NOTES_2026-07-17.md") -Destination (Join-Path $windowsStage "ALPHA_RELEASE_NOTES.md")
+Copy-Item -LiteralPath $releaseNotes -Destination (Join-Path $windowsStage "ALPHA_RELEASE_NOTES.md")
 
 $lichLicenceEvidence = @(
     (Join-Path $repoRoot "assets\models\enemies\meshy\lich_placeholder_source_licence.md"),
@@ -199,8 +220,8 @@ $escapedVersion = [regex]::Escape($Version)
 if ($androidManifest -notmatch "versionName[^\r\n]*=`"$escapedVersion`"") {
     throw "Android candidate does not contain versionName $Version."
 }
-if ($androidManifest -notmatch 'versionCode[^\r\n]*=2(?:\s|$)') {
-    throw "Android candidate does not contain release versionCode 2."
+if ($androidManifest -notmatch "versionCode[^\r\n]*=$VersionCode(?:\s|$)") {
+    throw "Android candidate does not contain versionCode $VersionCode."
 }
 if ($androidManifest -notmatch 'screenOrientation[^\r\n]*=7(?:\s|$)') {
     throw "Android candidate is not locked to sensorPortrait (screenOrientation=7)."

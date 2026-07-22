@@ -115,6 +115,8 @@ struct SwapchainContext
     double benchmarkPresentMs = 0.0;
     double benchmarkTotalMs = 0.0;
     bool benchmarkSampling = false;
+    bool captureActive = false;
+    std::uint32_t capturePresentedFrames = 0u;
     horde::gameplay::ShowcaseRouteReplay routeReplay;
     bool routeReplayActive = false;
     horde::gameplay::ShowcaseBenchmarkRun inAppBenchmark;
@@ -141,6 +143,7 @@ std::atomic<uint32_t> gAudioEvents{0u};
 std::atomic<uint64_t> gEnemyAudioStereoGains{0u};
 std::atomic<float> gRequestedRenderScale{1.0f};
 std::atomic<std::int32_t> gBenchmarkCheckpointRequested{-1};
+std::atomic<std::int32_t> gCaptureCheckpointRequested{-1};
 std::atomic<bool> gRouteReplayRequested{false};
 std::atomic<bool> gInAppBenchmarkRequested{false};
 std::atomic<bool> gInAppBenchmarkCancelRequested{false};
@@ -394,11 +397,14 @@ void PublishBenchmarkProgress(const SwapchainContext& context)
 void StartInAppBenchmark(SwapchainContext& context)
 {
     gBenchmarkCheckpointRequested.store(-1, std::memory_order_release);
+    gCaptureCheckpointRequested.store(-1, std::memory_order_release);
     gRouteReplayRequested.store(false, std::memory_order_release);
     ResetShowcaseSimulation(context);
     context.activeBenchmarkCheckpoint = -1;
     context.benchmarkSampling = false;
     context.routeReplayActive = false;
+    context.captureActive = false;
+    context.capturePresentedFrames = 0u;
     context.inAppBenchmark.Start();
     {
         std::lock_guard<std::mutex> lock(gReportMutex);
@@ -474,6 +480,18 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
          << "  \"internalExtent\": {\"width\": " << context.capabilities.performance.internalRenderWidth
          << ", \"height\": " << context.capabilities.performance.internalRenderHeight << "},\n"
          << "  \"presented\": " << (context.capabilities.rtScene.presented ? "true" : "false") << ",\n"
+         << "  \"buildIdentity\": \"" << HORDE_RT_BUILD_ID << " DEBUG\",\n"
+         << "  \"shaderIdentity\": \"" << std::string(HORDE_RT_RAYGEN_SHA256).substr(0u, 12u) << "\",\n"
+         << "  \"gpu\": \"" << context.capabilities.identity.gpuName << "\",\n"
+         << "  \"swapchainExtent\": {\"width\": " << context.swapchainExtent.width
+         << ", \"height\": " << context.swapchainExtent.height << "},\n"
+         << "  \"outputRedBlueSwap\": "
+         << ((context.swapchainFormat == VK_FORMAT_B8G8R8A8_UNORM ||
+              context.swapchainFormat == VK_FORMAT_B8G8R8A8_SRGB) &&
+             context.rtScene.DispatchExtent().width == context.swapchainExtent.width &&
+             context.rtScene.DispatchExtent().height == context.swapchainExtent.height ? "true" : "false") << ",\n"
+         << "  \"animationTime\": " << context.walkTime << ",\n"
+         << "  \"captureStableFrames\": " << context.capturePresentedFrames << ",\n"
          << "  \"lanternPhase\": \"" << horde::gameplay::LanternPhaseName(context.lanternSnapshot.phase) << "\",\n"
          << "  \"selectedEnemy\": \"" << horde::gameplay::EnemyKindName(roster.selectedEnemy) << "\",\n"
          << "  \"activeSkinnedEnemies\": " << roster.renderedEnemyCount << ",\n"
@@ -503,6 +521,8 @@ void ApplyBenchmarkCheckpoint(SwapchainContext& context, const horde::gameplay::
     context.activeEnemyKind = state.activeEnemyKind;
     context.activeBenchmarkCheckpoint = checkpoint.id;
     context.routeReplayActive = false;
+    context.captureActive = false;
+    context.capturePresentedFrames = 0u;
     context.benchmarkSampling = true;
     ++context.benchmarkGeneration;
     ResetBenchmarkTiming(context);
@@ -516,11 +536,44 @@ void ApplyBenchmarkCheckpoint(SwapchainContext& context, const horde::gameplay::
     WriteShowcaseDebugState(context, "warming");
 }
 
+void ApplyCaptureCheckpoint(SwapchainContext& context, const horde::gameplay::ShowcaseCheckpoint& checkpoint)
+{
+    ResetShowcaseSimulation(context);
+    const horde::gameplay::ShowcaseCheckpointState state =
+        horde::gameplay::BuildShowcaseCheckpointState(checkpoint);
+    context.cameraX = checkpoint.x;
+    context.cameraZ = checkpoint.z;
+    context.cameraYaw = checkpoint.yaw;
+    context.cameraPitch = checkpoint.pitch;
+    context.lanternSequence = state.lantern;
+    context.lanternSnapshot = state.lanternSnapshot;
+    context.enemyDirector = state.enemyDirector;
+    context.lichEncounter = state.lichEncounter;
+    context.activeEnemyKind = state.activeEnemyKind;
+    context.activeBenchmarkCheckpoint = checkpoint.id;
+    context.routeReplayActive = false;
+    context.benchmarkSampling = false;
+    context.captureActive = true;
+    context.capturePresentedFrames = 0u;
+    ++context.benchmarkGeneration;
+    ResetBenchmarkTiming(context);
+    __android_log_print(ANDROID_LOG_INFO,
+                        kTag,
+                        "HORDE_CAPTURE begin generation=%u checkpoint=%s scale=%.0f stable_frames=12 zone=%s",
+                        context.benchmarkGeneration,
+                        checkpoint.name,
+                        context.renderScale * 100.0f,
+                        horde::gameplay::ShowcaseZoneName(checkpoint.expectedZone));
+    WriteShowcaseDebugState(context, "capture-warming");
+}
+
 void ApplyRouteReplay(SwapchainContext& context)
 {
     ResetShowcaseSimulation(context);
     context.activeBenchmarkCheckpoint = -1;
     context.benchmarkSampling = false;
+    context.captureActive = false;
+    context.capturePresentedFrames = 0u;
     context.routeReplay.Reset();
     context.routeReplayActive = true;
     ++context.benchmarkGeneration;
@@ -1384,6 +1437,8 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             context.activeBenchmarkCheckpoint = -1;
             context.benchmarkSampling = false;
             context.routeReplayActive = false;
+            context.captureActive = false;
+            context.capturePresentedFrames = 0u;
         }
 
         if (gInAppBenchmarkRequested.exchange(false, std::memory_order_acq_rel))
@@ -1404,9 +1459,16 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
 
         const std::int32_t requestedCheckpoint =
             gBenchmarkCheckpointRequested.exchange(-1, std::memory_order_acq_rel);
+        const std::int32_t requestedCaptureCheckpoint =
+            gCaptureCheckpointRequested.exchange(-1, std::memory_order_acq_rel);
         if (!context.inAppBenchmark.IsRunning())
         {
-            if (const horde::gameplay::ShowcaseCheckpoint* checkpoint =
+            if (const horde::gameplay::ShowcaseCheckpoint* captureCheckpoint =
+                    horde::gameplay::FindShowcaseCheckpoint(requestedCaptureCheckpoint))
+            {
+                ApplyCaptureCheckpoint(context, *captureCheckpoint);
+            }
+            else if (const horde::gameplay::ShowcaseCheckpoint* checkpoint =
                     horde::gameplay::FindShowcaseCheckpoint(requestedCheckpoint))
             {
                 ApplyBenchmarkCheckpoint(context, *checkpoint);
@@ -1419,9 +1481,10 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
         else
         {
             gRouteReplayRequested.store(false, std::memory_order_release);
+            gCaptureCheckpointRequested.store(-1, std::memory_order_release);
         }
 
-        const bool simulationPaused = gSimulationPaused.load(std::memory_order_acquire);
+        const bool simulationPaused = context.captureActive || gSimulationPaused.load(std::memory_order_acquire);
         if (!simulationPaused)
         {
             context.walkTime += context.frameDeltaSeconds;
@@ -1741,6 +1804,23 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
         if (!context.inAppBenchmark.IsRunning())
         {
             FinishInAppBenchmark(context);
+        }
+    }
+    if (context.captureActive && rtFramePresented && context.capturePresentedFrames < 12u)
+    {
+        ++context.capturePresentedFrames;
+        if (context.capturePresentedFrames == 12u)
+        {
+            const horde::gameplay::ShowcaseCheckpoint* checkpoint =
+                horde::gameplay::FindShowcaseCheckpoint(context.activeBenchmarkCheckpoint);
+            WriteShowcaseDebugState(context, "capture-ready");
+            __android_log_print(ANDROID_LOG_INFO,
+                                kTag,
+                                "HORDE_CAPTURE_READY generation=%u checkpoint=%s scale=%.0f stable_frames=12 presented=%d",
+                                context.benchmarkGeneration,
+                                checkpoint ? checkpoint->name : "unknown",
+                                context.renderScale * 100.0f,
+                                context.capabilities.rtScene.presented ? 1 : 0);
         }
     }
     return true;
@@ -2130,6 +2210,24 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestDebugCheckpoint(JNIEnv*, jcla
         return JNI_FALSE;
     }
     gBenchmarkCheckpointRequested.store(static_cast<std::int32_t>(checkpointId), std::memory_order_release);
+    return JNI_TRUE;
+#else
+    (void)checkpointId;
+    return JNI_FALSE;
+#endif
+}
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_requestDebugCaptureCheckpoint(JNIEnv*, jclass, jint checkpointId)
+{
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS)
+    if (gRuntimeState.load(std::memory_order_acquire) != 1 ||
+        gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1 ||
+        horde::gameplay::FindShowcaseCheckpoint(static_cast<std::int32_t>(checkpointId)) == nullptr)
+    {
+        return JNI_FALSE;
+    }
+    gCaptureCheckpointRequested.store(static_cast<std::int32_t>(checkpointId), std::memory_order_release);
     return JNI_TRUE;
 #else
     (void)checkpointId;

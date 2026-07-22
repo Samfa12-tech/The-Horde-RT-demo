@@ -8,13 +8,14 @@ This is a supporting production/tooling plan for the current **Windows-validated
 
 ## Priority order
 
-## Implemented foundation - 2026-07-17
+## Implemented foundation - updated 2026-07-22
 
 - Priorities 1 and 2 now have shared named checkpoints, deterministic encounter presets, fixed three-window measurement, strict ASTC/honest-presentation gates, and native state evidence.
 - Priority 3 now has a deterministic 13-waypoint Android route replay for movement, collision, zone, lantern, and enemy-update regression coverage. Full raw touch/look/swing/pause input recording remains deferred because ADB gesture timing is refresh-rate dependent; hands-on input validation remains required.
-- The first bounded part of Priority 5 is available as `tools/run-android-showcase-validation.ps1`, producing a timestamped Android evidence bundle. Cross-platform packaging, shader-staleness, licence, and clean-package gates remain future work.
-- Priority 4 now has a shared compact formatter and Debug-only live overlay. Windows F3 is live-validated without pausing or intercepting input; Android Debug/Release and Release lint pass, but the Android device gate remains pending.
+- Priority 5 is complete as `tools/run-foundation-validation.ps1 -Mode Host|Full`: fresh dual-configuration Windows builds/tests, clean Android builds/lint, shader-staleness, package/layout, asset/licence, release-identity, hashes, Windows capture, and the connected-phone evidence gate share one timestamped report contract.
+- Priority 4 has a shared compact formatter and Debug-only live overlay. Windows F3 and the Android long-press surface are device-validated; Release omits/rejects engineering automation paths.
 - The engineering checkpoint surface remains Debug-only. A separate release-safe two-pass in-app benchmark now reuses the shared route and produces player-exportable reports without exposing checkpoint controls.
+- Priority 6's deterministic still-capture portion is complete for all 12 shared checkpoints on Windows and Android. Video, presentation orbit camera, and comparison-view UI remain deferred.
 
 ### 1. Deterministic showcase mode — complete
 
@@ -22,36 +23,38 @@ This is a supporting production/tooling plan for the current **Windows-validated
 - Lighting, enemy, lantern, roof, and encounter states are reproducibly selectable in Android Debug and host-tested shared code.
 - Keep normal player traversal intact; checkpoints are for development, validation, and presentation.
 
-### 2. Repeatable measurement — engineering harness and player-facing Windows flow complete
+### 2. Repeatable measurement — complete on Windows and Android
 
 - A fixed 13-waypoint route and default five-checkpoint benchmark cover the important showcase cost centres.
 - Evidence records render scale, internal resolution, frame time, derived FPS, thermal/battery state, RT mode, active skinned-enemy count, and presentation status.
 - Preserve separate 100% and recommended 75% Android results.
-- The in-app benchmark runs one visible warm-up lap and one measured lap, aggregates overall and per-zone timing, requires honest RT presentation, and emits selectable text plus JSON. Windows Release is live-validated; Android device lifecycle/export validation is pending.
+- The in-app benchmark runs one visible warm-up lap and one measured lap, aggregates overall and per-zone timing, requires honest RT presentation, and emits selectable text plus JSON. Windows Release and Android device lifecycle/export are live-validated.
 
 ### 3. Reproducible input — partial
 
 - Native deterministic movement/collision replay is complete. Raw Android touch and Windows keyboard/mouse/look/swing/pause recording remains deferred because wall-clock input injection is refresh-rate dependent.
 - Mark replay results as automated evidence; retain hands-on verification where the device cannot expose a state directly.
 
-### 4. Developer visibility — Windows complete; Android device validation pending
+### 4. Developer visibility — complete
 
 - The shared formatter reports build/shader identity, GPU/API, RT mode, route zone, render scale/extents/timing, BLAS/TLAS/instance counts, material encoding, lantern/enemy state, active skinned count, and honest RT presentation.
 - Windows Debug toggles it with F3 without pausing; F2 remains the full paused diagnostic surface. The compact control is disabled for input and hides during entry, pause, settings, and diagnostics.
-- Android Debug has a hidden non-interactive view, `horde.debug.overlay` intent, long-press status toggle, and a native 4 Hz snapshot publisher. Both APK build types and Release lint pass; touch pass-through, font scale 1.7, thermal timing, audio/lifecycle interaction, and visual approval remain a connected-phone gate.
+- Android Debug has a hidden non-interactive view, `horde.debug.overlay` intent, long-press status toggle, and a native 4 Hz snapshot publisher. Both APK build types, Release lint, touch pass-through, font scale 1.7, thermal timing, audio/lifecycle interaction, and visual approval passed on `SM-S948B`.
 - Windows Release omits the developer UI and Android Release returns no developer overlay text. Keep technical output hidden from branded player-facing surfaces unless requested or startup fails.
 
-### 5. One-command validation and packaging — Android evidence runner complete; integrated package gate pending
+### 5. One-command validation and packaging — complete
 
-- Provide a command path that builds Windows and Android, runs CTests/smoke tests, regenerates embedded raygen SPIR-V when needed, packages assets, and collects a timestamped report bundle.
-- Add clean-package smoke checks for executable-relative Windows assets, strict Android ASTC contents, signing state, hashes, and required licence files.
-- Fail clearly on stale shaders, missing assets, unsupported capabilities, or invalid package layout.
+- `tools/run-foundation-validation.ps1` defaults to the daily `Host` gate; `-Mode Full` adds the required `SM-S948B` checkpoint/replay/lifecycle/capture gate and reports 100% separately.
+- The gate produces timestamped logs, source/build/asset/APK/ZIP/licence hashes, summaries, manifests, PNGs, and validation-only packages beneath ignored `reports/foundation-runs/`.
+- Validation artifacts are explicitly unpublishable, never enter `releases/candidates/`, and use an unsigned validation-only Android build without reading or requiring release secrets.
+- Negative fixtures prove rejection of stale embedded SPIR-V, missing licences/assets, invalid ZIP root layout, immutable 0.1.1 identities, old Android version codes, and another 0.1.1 upload before Butler is contacted.
+- Future candidate packaging requires explicit `Version` and `VersionCode`, rejects the immutable 0.1.1 line, and requires `versionCode > 2`.
 
-### 6. Capture and presentation — fixed screenshots partial; video/orbit pending
+### 6. Capture and presentation — deterministic screenshots complete; video/orbit pending
 
-- Capture fixed screenshots and short videos for the opening, shadow corridor, skylight, coloured lights, mirror, combat, and finale.
-- Add a presentation camera/orbit option for showing the player body, held props, reflections, and RT lighting without changing the first-person game path.
-- Add optional render-scale comparison views using the real renderer and clearly labelled diagnostics.
+- Windows Debug `--capture-showcase <directory>` and Android Debug capture intents produce all 12 shared scene-only checkpoints with fixed animation time, settling frames, honest presentation, camera/state/build/shader/GPU/extent/colour-route metadata, and PNG SHA-256. Release rejects both automation paths.
+- Windows captures read back the RT storage image and encode PNG through WIC, applying red/blue normalization only for the raw-copy BGRA route. Android hides menu, touch, HUD, diagnostics, and developer overlays before stable-frame ADB capture.
+- Short video, a presentation/orbit camera, and optional render-scale comparison views remain explicitly deferred.
 
 ## Game-facing support after the tooling foundation
 

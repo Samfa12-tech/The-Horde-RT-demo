@@ -22,6 +22,8 @@ This repo is a native Vulkan hardware ray tracing game/tech-demo project. Keep w
 
 ## Working rules
 
+- Android device evidence maintenance: whenever new Android device evidence appears (local validation, capability report, logcat, screenshot, or user report), update `docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md` in the same task. Preserve the exact model code and classify the evidence type. Do not mark devices as working from SoC/vendor claims alone, and do not overwrite prior evidence.
+
 - Preserve actual `vkCmdTraceRaysKHR` presentation through the swapchain.
 - Keep `selectedCapabilities_.rtScene.presented` / report `rtScene.presented` honest: only true after an RT-produced frame reaches successful swapchain presentation.
 - Prefer small, shippable vertical slices over large speculative rewrites.

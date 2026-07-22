@@ -17,6 +17,14 @@ namespace horde::vulkan::raytracing
 class PresentableTinyRtScene
 {
 public:
+    struct StorageImageCapture
+    {
+        std::uint32_t width = 0u;
+        std::uint32_t height = 0u;
+        bool redBlueSwapNormalised = false;
+        std::vector<std::uint8_t> rgba;
+    };
+
     static constexpr std::uint32_t kBlasCount = 8u;
     static constexpr std::uint32_t kTlasCount = 1u;
     static constexpr std::uint32_t kTlasInstanceCount = 18u;
@@ -68,6 +76,11 @@ public:
                              const horde::gameplay::EnemyRosterSnapshot& roster,
                              const horde::gameplay::LichSnapshot& lich,
                              std::string& diagnostic);
+
+    // Synchronously reads the last RT-produced storage image. The returned
+    // bytes are canonical RGBA even when the presentation push constant had
+    // swapped red/blue for a raw copy to a BGRA swapchain.
+    bool CaptureStorageImage(StorageImageCapture& capture, std::string& diagnostic);
 
 private:
     struct Buffer
@@ -148,6 +161,7 @@ private:
     VkDeviceMemory storageImageMemory_ = VK_NULL_HANDLE;
     VkImageView storageImageView_ = VK_NULL_HANDLE;
     VkImageLayout storageImageLayout_ = VK_IMAGE_LAYOUT_UNDEFINED;
+    bool lastOutputRedBlueSwapApplied_ = false;
     TextureArray materialDiffuse_;
     TextureArray materialNormal_;
     TextureArray materialArm_;

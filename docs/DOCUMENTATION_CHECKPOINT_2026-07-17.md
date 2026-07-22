@@ -14,6 +14,7 @@ This is the consolidation map after Showcase Alpha 0.1.1 publication and the fir
 | Android hands-on route, lifecycle and warm sustained measurements | `HORDE_SHOWCASE_ANDROID_VALIDATION_2026-07-17.md` |
 | Android deterministic checkpoint/replay procedure | `ANDROID_SHOWCASE_AUTOMATION_2026-07-17.md` |
 | Android cool/status-0 automation baseline | `ANDROID_SHOWCASE_AUTOMATION_VALIDATION_2026-07-17.md` and `validation/android-showcase-automation-2026-07-17/` |
+| Integrated foundation gate, deterministic captures, and raygen A/B | `FOUNDATION_VALIDATION_2026-07-22.md` |
 | Player-facing benchmark contract and Windows evidence | `IN_APP_BENCHMARK_WINDOWS_VALIDATION_2026-07-17.md` |
 | Asset provenance/licences | root `ASSET_LICENSES.md` |
 | Remaining tooling backlog | `BUILD_TEST_DEMO_CYCLE_PLAN_2026-07-17.md` |
@@ -31,6 +32,8 @@ This is the consolidation map after Showcase Alpha 0.1.1 publication and the fir
 - Warm 75% Android hands-on certification and cool deterministic automation are separate evidence classes; neither should be relabelled as the other.
 - The Android Debug harness supplies 12 presets, a default five-checkpoint three-window pass, and a 13-waypoint replay. Release rejects the request path.
 - A separate player-facing benchmark is release-safe on both platforms: one warm-up lap plus one measured 13-waypoint lap, followed by a selectable/copyable/exportable report and archived JSON. Windows and `SM-S948B` Android device validation pass; see the dated in-app benchmark validation records.
+- The integrated `Host|Full` foundation gate is complete. It owns clean cross-platform builds/tests, stale-shader and package/licence/identity checks, validation-only artifacts and hashes, 12 deterministic Windows captures, and the connected-phone replay/lifecycle/12-capture evidence path.
+- The unreachable stained-glass material route was removed after a bounded A/B: SPIR-V structure improved, all 12 Windows images were bit-exact, Windows median timing was unchanged, and all five comparable-temperature Android 75% checkpoints improved within the required non-regression rule.
 
 ## Historical records
 
@@ -45,8 +48,8 @@ The following dated families are intentionally preserved rather than rewritten: 
 - Do not raise the one-active-skinned-enemy limit without a dedicated phone measurement.
 - Android audio events execute on-device, but perceived stereo directionality/distance is not separately certified.
 - Water, authored hands/full character rig, broader AI, block/dodge, player death, and the staged textured sword runtime remain deferred.
-- Post-checkpoint update: the developer overlay is Windows-live-validated and Android-build-validated; Android device validation, integrated cross-platform clean-build/package/stale-shader/licence gates, and fixed video/presentation capture remain tooling work.
-- Future publishing must bump all version surfaces and Android `versionCode`; the current package scripts default to the immutable published 0.1.1 identity and must not be used to republish changed source under the same version.
+- The developer overlay is device-validated on Windows and Android. Integrated clean-build/package/stale-shader/licence gates and fixed PNG capture are complete; video and orbit-camera presentation remain tooling deferrals.
+- Future publishing must explicitly supply and bump all version surfaces and Android `versionCode > 2`; candidate and push scripts reject the immutable 0.1.1 line before packaging/upload work.
 - The unchecked historical `v0.1.0-alpha.1` tag task is superseded; do not create a retroactive tag on a later commit.
 
 ## Audit scope and outcome

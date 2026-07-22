@@ -5,7 +5,7 @@ if(POLICY CMP0091)
 endif()
 
 project(HordeLanternRT
-    VERSION 0.1.1
+    VERSION 0.1.2
     DESCRIPTION "Native Vulkan hardware ray tracing technology demo"
     LANGUAGES CXX
 )
@@ -82,11 +82,15 @@ if(HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AND WIN32)
         horde_rt_probe_core
         comdlg32
         comctl32
+        bcrypt
+        ole32
+        windowscodecs
         shell32
         winmm
     )
     target_compile_definitions(horde_rt_diagnostic_window PRIVATE
         HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
+        HORDE_RT_DISPLAY_VERSION="${HORDE_RT_DISPLAY_VERSION}"
         HORDE_RT_BUILD_ID="${HORDE_RT_PACKAGE_VERSION}"
         HORDE_RT_RAYGEN_SHA256="${HORDE_RT_RAYGEN_SHA256}"
     )

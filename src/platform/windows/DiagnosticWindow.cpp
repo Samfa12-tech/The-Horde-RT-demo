@@ -1,6 +1,7 @@
 #include "platform/windows/DiagnosticWindow.h"
 
 #include <algorithm>
+#include <array>
 #include <chrono>
 #include <cmath>
 #include <cstdint>
@@ -8,9 +9,12 @@
 #include <ctime>
 #include <filesystem>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <memory>
 #include <mutex>
+#include <numeric>
+#include <sstream>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -22,10 +26,13 @@
 #define NOMINMAX
 #endif
 #include <windows.h>
+#include <bcrypt.h>
 #include <commdlg.h>
 #include <commctrl.h>
 #include <mmsystem.h>
 #include <shellapi.h>
+#include <wincodec.h>
+#include <wrl/client.h>
 #include <xaudio2.h>
 #ifdef DeviceCapabilities
 #undef DeviceCapabilities
@@ -47,6 +54,9 @@
 #ifndef HORDE_RT_BUILD_ID
 #define HORDE_RT_BUILD_ID "development"
 #endif
+#ifndef HORDE_RT_DISPLAY_VERSION
+#define HORDE_RT_DISPLAY_VERSION "development"
+#endif
 #ifndef HORDE_RT_RAYGEN_SHA256
 #define HORDE_RT_RAYGEN_SHA256 "unknown"
 #endif
@@ -55,10 +65,17 @@ namespace
 {
 
 constexpr char kWindowClassName[] = "HordeRtDiagnosticWindowClass";
-constexpr char kWindowTitle[] = "Horde Lantern RT - Showcase Alpha";
+constexpr char kWindowTitle[] = "Horde Lantern RT - Showcase Alpha " HORDE_RT_DISPLAY_VERSION;
+constexpr char kHudStartingText[] = "ALPHA " HORDE_RT_DISPLAY_VERSION "  |  VULKAN RT STARTING...  |  F1 CONTROLS  |  ESC MENU";
+constexpr char kHudActiveText[] = "ALPHA " HORDE_RT_DISPLAY_VERSION "  |  NATIVE VULKAN HARDWARE RT ACTIVE  |  F1 CONTROLS  |  ESC MENU";
+constexpr char kHudApplyingScaleText[] = "ALPHA " HORDE_RT_DISPLAY_VERSION "  |  APPLYING RT RENDER SCALE...";
+constexpr char kAboutText[] = "Horde Lantern RT\nShowcase Alpha " HORDE_RT_DISPLAY_VERSION "\n\nNative Vulkan hardware ray tracing. RT or nothing.\nA Samfa12 technology demo.";
 constexpr char kReportDirectory[] = "reports";
 constexpr char kTextReportFilename[] = "vulkan_capability_report.txt";
 constexpr char kJsonReportFilename[] = "vulkan_capability_report.json";
+constexpr std::uint32_t kCaptureWidth = 960u;
+constexpr std::uint32_t kCaptureHeight = 540u;
+constexpr int kCaptureSettlingFrames = 12;
 constexpr int kEditControlId = 101;
 constexpr int kHudControlId = 102;
 constexpr int kPauseTitleId = 103;
@@ -100,8 +117,32 @@ constexpr UINT kDefaultDpi = 96u;
 constexpr char kUiFontProperty[] = "HordeLanternRtUiFont";
 constexpr char kMonoFontProperty[] = "HordeLanternRtMonoFont";
 constexpr char kDeveloperFontProperty[] = "HordeLanternRtDeveloperFont";
+constexpr char kCaptureModeProperty[] = "HordeLanternRtCaptureMode";
 // One frame in flight keeps the dynamically refit held-torch TLAS safely synchronized with its host-written instance buffer.
 constexpr UINT kMaxFramesInFlight = 1u;
+
+struct CaptureLaunchOptions
+{
+    bool requested = false;
+    std::filesystem::path outputDirectory;
+    std::string error;
+};
+
+struct ShowcaseCaptureRecord
+{
+    const horde::gameplay::ShowcaseCheckpoint* checkpoint = nullptr;
+    std::string lanternPhase;
+    std::string selectedEnemy;
+    std::string lichPhase;
+    float finaleSkylightOpenProgress = 0.0f;
+    std::string filename;
+    std::string pngSha256;
+    std::uint32_t width = 0u;
+    std::uint32_t height = 0u;
+    bool redBlueSwapNormalised = false;
+    std::vector<double> frameTimesMs;
+};
+
 struct VulkanSurfaceContext
 {
     HWND windowHandle = nullptr;
@@ -188,6 +229,181 @@ bool WriteReportFile(const std::filesystem::path& path, const std::string& data)
 void ClearDesktopInput(VulkanSurfaceContext& context);
 void LayoutOverlayControls(HWND window, int width, int height);
 std::string WindowSafeText(const std::string& value);
+
+CaptureLaunchOptions ParseCaptureLaunchOptions()
+{
+    CaptureLaunchOptions options;
+    int argumentCount = 0;
+    LPWSTR* arguments = CommandLineToArgvW(GetCommandLineW(), &argumentCount);
+    if (arguments == nullptr)
+    {
+        options.error = "Failed to parse the process command line.";
+        return options;
+    }
+    for (int index = 1; index < argumentCount; ++index)
+    {
+        if (std::wstring_view(arguments[index]) != L"--capture-showcase")
+        {
+            continue;
+        }
+        if (options.requested)
+        {
+            options.error = "--capture-showcase may only be specified once.";
+            break;
+        }
+        if (index + 1 >= argumentCount || arguments[index + 1][0] == L'-')
+        {
+            options.error = "--capture-showcase requires an output directory.";
+            break;
+        }
+        options.requested = true;
+        options.outputDirectory = std::filesystem::absolute(std::filesystem::path(arguments[++index]));
+    }
+    LocalFree(arguments);
+    return options;
+}
+
+std::string JsonEscape(const std::string& value)
+{
+    std::ostringstream escaped;
+    for (const unsigned char character : value)
+    {
+        switch (character)
+        {
+        case '\\': escaped << "\\\\"; break;
+        case '"': escaped << "\\\""; break;
+        case '\b': escaped << "\\b"; break;
+        case '\f': escaped << "\\f"; break;
+        case '\n': escaped << "\\n"; break;
+        case '\r': escaped << "\\r"; break;
+        case '\t': escaped << "\\t"; break;
+        default:
+            if (character < 0x20u)
+            {
+                escaped << "\\u" << std::hex << std::setw(4) << std::setfill('0')
+                        << static_cast<unsigned int>(character) << std::dec;
+            }
+            else
+            {
+                escaped << static_cast<char>(character);
+            }
+            break;
+        }
+    }
+    return escaped.str();
+}
+
+bool WriteRgbaPng(const std::filesystem::path& path,
+                  const horde::vulkan::raytracing::PresentableTinyRtScene::StorageImageCapture& capture,
+                  std::string& diagnostic)
+{
+    const HRESULT initialiseResult = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+    const bool uninitialiseCom = SUCCEEDED(initialiseResult);
+    if (FAILED(initialiseResult) && initialiseResult != RPC_E_CHANGED_MODE)
+    {
+        diagnostic = "Failed to initialise COM for WIC PNG encoding.";
+        return false;
+    }
+
+    using Microsoft::WRL::ComPtr;
+    ComPtr<IWICImagingFactory> factory;
+    ComPtr<IWICStream> stream;
+    ComPtr<IWICBitmapEncoder> encoder;
+    ComPtr<IWICBitmapFrameEncode> frame;
+    ComPtr<IPropertyBag2> properties;
+    HRESULT result = CoCreateInstance(CLSID_WICImagingFactory,
+                                      nullptr,
+                                      CLSCTX_INPROC_SERVER,
+                                      IID_PPV_ARGS(&factory));
+    if (SUCCEEDED(result)) result = factory->CreateStream(&stream);
+    if (SUCCEEDED(result)) result = stream->InitializeFromFilename(path.c_str(), GENERIC_WRITE);
+    if (SUCCEEDED(result)) result = factory->CreateEncoder(GUID_ContainerFormatPng, nullptr, &encoder);
+    if (SUCCEEDED(result)) result = encoder->Initialize(stream.Get(), WICBitmapEncoderNoCache);
+    if (SUCCEEDED(result)) result = encoder->CreateNewFrame(&frame, &properties);
+    if (SUCCEEDED(result)) result = frame->Initialize(properties.Get());
+    if (SUCCEEDED(result)) result = frame->SetSize(capture.width, capture.height);
+    std::vector<std::uint8_t> encoderPixels = capture.rgba;
+    for (std::size_t offset = 0; offset < encoderPixels.size(); offset += 4u)
+    {
+        std::swap(encoderPixels[offset], encoderPixels[offset + 2u]);
+    }
+    WICPixelFormatGUID pixelFormat = GUID_WICPixelFormat32bppBGRA;
+    if (SUCCEEDED(result)) result = frame->SetPixelFormat(&pixelFormat);
+    if (SUCCEEDED(result) && !IsEqualGUID(pixelFormat, GUID_WICPixelFormat32bppBGRA)) result = WINCODEC_ERR_UNSUPPORTEDPIXELFORMAT;
+    if (SUCCEEDED(result))
+    {
+        result = frame->WritePixels(capture.height,
+                                    capture.width * 4u,
+                                    static_cast<UINT>(encoderPixels.size()),
+                                    encoderPixels.data());
+    }
+    if (SUCCEEDED(result)) result = frame->Commit();
+    if (SUCCEEDED(result)) result = encoder->Commit();
+
+    properties.Reset();
+    frame.Reset();
+    encoder.Reset();
+    stream.Reset();
+    factory.Reset();
+    if (uninitialiseCom)
+    {
+        CoUninitialize();
+    }
+    if (FAILED(result))
+    {
+        std::ostringstream failure;
+        failure << "WIC PNG encoding failed with HRESULT 0x" << std::hex
+                << static_cast<unsigned long>(result) << '.';
+        diagnostic = failure.str();
+        return false;
+    }
+    diagnostic.clear();
+    return true;
+}
+
+bool Sha256File(const std::filesystem::path& path, std::string& hexDigest, std::string& diagnostic)
+{
+    std::ifstream input(path, std::ios::binary);
+    if (!input.good())
+    {
+        diagnostic = "Failed to reopen capture for SHA-256: " + path.string();
+        return false;
+    }
+    std::vector<std::uint8_t> bytes((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
+
+    BCRYPT_ALG_HANDLE algorithm = nullptr;
+    BCRYPT_HASH_HANDLE hash = nullptr;
+    DWORD objectSize = 0u;
+    DWORD digestSize = 0u;
+    DWORD resultSize = 0u;
+    NTSTATUS status = BCryptOpenAlgorithmProvider(&algorithm, BCRYPT_SHA256_ALGORITHM, nullptr, 0u);
+    if (status >= 0) status = BCryptGetProperty(algorithm, BCRYPT_OBJECT_LENGTH,
+                                               reinterpret_cast<PUCHAR>(&objectSize), sizeof(objectSize), &resultSize, 0u);
+    if (status >= 0) status = BCryptGetProperty(algorithm, BCRYPT_HASH_LENGTH,
+                                               reinterpret_cast<PUCHAR>(&digestSize), sizeof(digestSize), &resultSize, 0u);
+    std::vector<std::uint8_t> object(objectSize);
+    std::vector<std::uint8_t> digest(digestSize);
+    if (status >= 0) status = BCryptCreateHash(algorithm, &hash, object.data(), objectSize, nullptr, 0u, 0u);
+    if (status >= 0 && !bytes.empty())
+    {
+        status = BCryptHashData(hash, bytes.data(), static_cast<ULONG>(bytes.size()), 0u);
+    }
+    if (status >= 0) status = BCryptFinishHash(hash, digest.data(), digestSize, 0u);
+    if (hash != nullptr) BCryptDestroyHash(hash);
+    if (algorithm != nullptr) BCryptCloseAlgorithmProvider(algorithm, 0u);
+    if (status < 0 || digestSize != 32u)
+    {
+        diagnostic = "Failed to calculate capture SHA-256.";
+        return false;
+    }
+
+    std::ostringstream output;
+    output << std::hex << std::setfill('0');
+    for (const std::uint8_t byte : digest) output << std::setw(2) << static_cast<unsigned int>(byte);
+    hexDigest = output.str();
+    diagnostic.clear();
+    return true;
+}
 
 std::filesystem::path ExecutableDirectory()
 {
@@ -825,7 +1041,7 @@ void CancelBenchmark(VulkanSurfaceContext& context, const bool showMenu)
     ResetRoute(context);
     if (HWND hud = GetDlgItem(context.windowHandle, kHudControlId))
     {
-        SetWindowTextA(hud, "ALPHA 0.1.1  |  NATIVE VULKAN HARDWARE RT ACTIVE  |  F1 CONTROLS  |  ESC MENU");
+        SetWindowTextA(hud, kHudActiveText);
     }
     if (showMenu)
     {
@@ -2099,14 +2315,245 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
     return true;
 }
 
+#if defined(_DEBUG)
+const char* CapturePresetName(const horde::gameplay::ShowcaseCheckpointPreset preset)
+{
+    switch (preset)
+    {
+    case horde::gameplay::ShowcaseCheckpointPreset::Fresh: return "fresh";
+    case horde::gameplay::ShowcaseCheckpointPreset::LanternTrigger: return "lantern-trigger";
+    case horde::gameplay::ShowcaseCheckpointPreset::LanternSettled: return "lantern-settled";
+    case horde::gameplay::ShowcaseCheckpointPreset::LichActive: return "lich-active";
+    case horde::gameplay::ShowcaseCheckpointPreset::FinaleRoofOpen: return "finale-roof-open";
+    default: return "unknown";
+    }
+}
+
+void ApplyCaptureCheckpoint(VulkanSurfaceContext& context,
+                            const horde::gameplay::ShowcaseCheckpoint& checkpoint)
+{
+    ResetRoute(context);
+    horde::gameplay::ShowcaseCheckpointState state =
+        horde::gameplay::BuildShowcaseCheckpointState(checkpoint);
+    context.cameraX = checkpoint.x;
+    context.cameraZ = checkpoint.z;
+    context.cameraYaw = checkpoint.yaw;
+    context.cameraPitch = checkpoint.pitch;
+    context.walkTime = 0.0f;
+    context.frameDeltaSeconds = 0.0f;
+    context.walkAmount = 0.0f;
+    context.simulationPaused = true;
+    context.lanternSequence = std::move(state.lantern);
+    context.lanternSnapshot = state.lanternSnapshot;
+    context.enemyDirector = std::move(state.enemyDirector);
+    context.lichEncounter = std::move(state.lichEncounter);
+    context.activeEnemyKind = state.activeEnemyKind;
+    context.debugEnemyOverride = horde::gameplay::EnemyKind::None;
+}
+
+double CaptureMeanMs(const std::vector<double>& samples)
+{
+    return samples.empty()
+        ? 0.0
+        : std::accumulate(samples.begin(), samples.end(), 0.0) / static_cast<double>(samples.size());
+}
+
+double CaptureMedianMs(const std::vector<double>& samples)
+{
+    if (samples.empty())
+    {
+        return 0.0;
+    }
+    std::vector<double> sorted = samples;
+    std::sort(sorted.begin(), sorted.end());
+    const std::size_t middle = sorted.size() / 2u;
+    return (sorted.size() & 1u) != 0u
+        ? sorted[middle]
+        : (sorted[middle - 1u] + sorted[middle]) * 0.5;
+}
+
+bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
+                          const VulkanSurfaceContext& context,
+                          const horde::vulkan::DeviceCapabilities& capabilities,
+                          const std::vector<ShowcaseCaptureRecord>& captures,
+                          bool complete,
+                          const std::string& error)
+{
+    std::vector<double> allFrameTimes;
+    allFrameTimes.reserve(captures.size() * static_cast<std::size_t>(kCaptureSettlingFrames));
+    for (const ShowcaseCaptureRecord& capture : captures)
+    {
+        allFrameTimes.insert(allFrameTimes.end(), capture.frameTimesMs.begin(), capture.frameTimesMs.end());
+    }
+    std::ostringstream manifest;
+    manifest << std::fixed << std::setprecision(6)
+             << "{\n"
+             << "  \"schemaVersion\": 1,\n"
+             << "  \"complete\": " << (complete ? "true" : "false") << ",\n"
+             << "  \"source\": \"rt-storage-image\",\n"
+             << "  \"sceneOnly\": true,\n"
+             << "  \"overlaysIncluded\": false,\n"
+             << "  \"settlingFrames\": " << kCaptureSettlingFrames << ",\n"
+             << "  \"fixedAnimationTimeSeconds\": 0.000000,\n"
+             << "  \"buildId\": \"" << JsonEscape(HORDE_RT_BUILD_ID) << "\",\n"
+             << "  \"raygenSha256\": \"" << JsonEscape(HORDE_RT_RAYGEN_SHA256) << "\",\n"
+             << "  \"device\": {\n"
+             << "    \"gpuName\": \"" << JsonEscape(capabilities.identity.gpuName) << "\",\n"
+             << "    \"vendorId\": " << capabilities.identity.vendorId << ",\n"
+             << "    \"deviceId\": " << capabilities.identity.deviceId << "\n"
+             << "  },\n"
+             << "  \"presentation\": {\n"
+             << "    \"renderScale\": " << context.renderScale << ",\n"
+             << "    \"dispatchWidth\": " << context.rtScene.DispatchExtent().width << ",\n"
+             << "    \"dispatchHeight\": " << context.rtScene.DispatchExtent().height << ",\n"
+             << "    \"swapchainWidth\": " << context.swapchainExtent.width << ",\n"
+             << "    \"swapchainHeight\": " << context.swapchainExtent.height << ",\n"
+             << "    \"swapchainFormat\": " << static_cast<std::uint32_t>(context.swapchainFormat) << "\n"
+             << "  },\n"
+             << "  \"timing\": {\n"
+             << "    \"sampleCount\": " << allFrameTimes.size() << ",\n"
+             << "    \"overallMedianMs\": " << CaptureMedianMs(allFrameTimes) << ",\n"
+             << "    \"overallMeanMs\": " << CaptureMeanMs(allFrameTimes) << "\n"
+             << "  },\n"
+             << "  \"error\": " << (error.empty() ? "null" : "\"" + JsonEscape(error) + "\"") << ",\n"
+             << "  \"captures\": [\n";
+    for (std::size_t index = 0; index < captures.size(); ++index)
+    {
+        const ShowcaseCaptureRecord& capture = captures[index];
+        const auto& checkpoint = *capture.checkpoint;
+        manifest << "    {\n"
+                 << "      \"id\": " << checkpoint.id << ",\n"
+                 << "      \"checkpoint\": \"" << JsonEscape(checkpoint.name) << "\",\n"
+                 << "      \"preset\": \"" << CapturePresetName(checkpoint.preset) << "\",\n"
+                 << "      \"zone\": \"" << horde::gameplay::ShowcaseZoneName(checkpoint.expectedZone) << "\",\n"
+                 << "      \"camera\": {\"x\": " << checkpoint.x << ", \"z\": " << checkpoint.z
+                 << ", \"yaw\": " << checkpoint.yaw << ", \"pitch\": " << checkpoint.pitch << "},\n"
+                 << "      \"state\": {\"lanternPhase\": \"" << capture.lanternPhase
+                 << "\", \"selectedEnemy\": \"" << capture.selectedEnemy
+                 << "\", \"lichPhase\": \"" << capture.lichPhase
+                 << "\", \"finaleSkylightOpenProgress\": " << capture.finaleSkylightOpenProgress << "},\n"
+                 << "      \"width\": " << capture.width << ",\n"
+                 << "      \"height\": " << capture.height << ",\n"
+                 << "      \"honestlyPresentedRtFrame\": true,\n"
+                 << "      \"timing\": {\"sampleCount\": " << capture.frameTimesMs.size()
+                 << ", \"medianMs\": " << CaptureMedianMs(capture.frameTimesMs)
+                 << ", \"meanMs\": " << CaptureMeanMs(capture.frameTimesMs) << "},\n"
+                 << "      \"outputRedBlueSwapAppliedAndNormalised\": "
+                 << (capture.redBlueSwapNormalised ? "true" : "false") << ",\n"
+                 << "      \"pixelFormat\": \"RGBA8\",\n"
+                 << "      \"file\": \"" << JsonEscape(capture.filename) << "\",\n"
+                 << "      \"pngSha256\": \"" << capture.pngSha256 << "\"\n"
+                 << "    }" << (index + 1u == captures.size() ? "\n" : ",\n");
+    }
+    manifest << "  ]\n}\n";
+    return WriteReportFile(outputDirectory / "capture-manifest.json", manifest.str());
+}
+
+int RunShowcaseCapture(VulkanSurfaceContext& context,
+                       horde::vulkan::DeviceCapabilities& capabilities,
+                       const std::filesystem::path& outputDirectory)
+{
+    std::error_code directoryError;
+    std::filesystem::create_directories(outputDirectory, directoryError);
+    if (directoryError)
+    {
+        std::cerr << "Failed to create showcase capture directory: " << directoryError.message() << '\n';
+        return 1;
+    }
+
+    std::vector<ShowcaseCaptureRecord> captures;
+    captures.reserve(horde::gameplay::kShowcaseCheckpoints.size());
+    auto fail = [&](const std::string& diagnostic) {
+        WriteCaptureManifest(outputDirectory, context, capabilities, captures, false, diagnostic);
+        std::cerr << "Showcase capture failed: " << diagnostic << '\n';
+        return 1;
+    };
+    if (!context.useRtPath || !context.rtScene.IsReady())
+    {
+        return fail("A ready RayTracingPipeline scene is required; no fallback capture is allowed.");
+    }
+
+    const VkClearColorValue clearColor = ClearColorForMode(capabilities.rtMode);
+    for (const horde::gameplay::ShowcaseCheckpoint& checkpoint : horde::gameplay::kShowcaseCheckpoints)
+    {
+        ApplyCaptureCheckpoint(context, checkpoint);
+        std::vector<double> frameTimesMs;
+        frameTimesMs.reserve(kCaptureSettlingFrames);
+        for (int frame = 0; frame < kCaptureSettlingFrames; ++frame)
+        {
+            bool rtFramePresented = false;
+            const auto frameStart = std::chrono::steady_clock::now();
+            if (!RenderFrame(context, clearColor, rtFramePresented) || !rtFramePresented)
+            {
+                return fail(std::string("Checkpoint '") + checkpoint.name +
+                            "' did not reach a successful RT swapchain presentation.");
+            }
+            const auto frameEnd = std::chrono::steady_clock::now();
+            frameTimesMs.push_back(std::chrono::duration<double, std::milli>(frameEnd - frameStart).count());
+            capabilities.rtScene.presented = true;
+        }
+
+        horde::vulkan::raytracing::PresentableTinyRtScene::StorageImageCapture image;
+        std::string diagnostic;
+        if (!context.rtScene.CaptureStorageImage(image, diagnostic))
+        {
+            return fail(std::string("Checkpoint '") + checkpoint.name + "' readback failed: " + diagnostic);
+        }
+
+        std::ostringstream filename;
+        filename << std::setw(2) << std::setfill('0') << checkpoint.id << '-' << checkpoint.name << ".png";
+        const std::filesystem::path pngPath = outputDirectory / filename.str();
+        if (!WriteRgbaPng(pngPath, image, diagnostic))
+        {
+            return fail(std::string("Checkpoint '") + checkpoint.name + "' PNG write failed: " + diagnostic);
+        }
+
+        ShowcaseCaptureRecord record;
+        record.checkpoint = &checkpoint;
+        record.lanternPhase = horde::gameplay::LanternPhaseName(context.lanternSnapshot.phase);
+        record.selectedEnemy = horde::gameplay::EnemyKindName(context.enemyDirector.Snapshot().selectedEnemy);
+        record.lichPhase = horde::gameplay::LichPhaseName(context.lichEncounter.Snapshot().phase);
+        record.finaleSkylightOpenProgress = context.lichEncounter.Snapshot().finaleSkylightOpenProgress;
+        record.filename = filename.str();
+        record.width = image.width;
+        record.height = image.height;
+        record.redBlueSwapNormalised = image.redBlueSwapNormalised;
+        record.frameTimesMs = std::move(frameTimesMs);
+        if (!Sha256File(pngPath, record.pngSha256, diagnostic))
+        {
+            return fail(std::string("Checkpoint '") + checkpoint.name + "' hash failed: " + diagnostic);
+        }
+        captures.push_back(std::move(record));
+        std::cout << "Captured " << checkpoint.name << " -> " << pngPath << '\n';
+    }
+
+    if (!WriteCaptureManifest(outputDirectory, context, capabilities, captures, true, {}))
+    {
+        std::cerr << "Failed to write capture manifest.\n";
+        return 1;
+    }
+    std::cout << "Captured all " << captures.size() << " showcase checkpoints to " << outputDirectory << '\n';
+    return 0;
+}
+#endif
+
 int RunDiagnosticSwapchainWindow(HWND hWnd,
                                  horde::vulkan::DeviceCapabilities& capabilities,
                                  const std::filesystem::path& textReportPath,
-                                 const std::filesystem::path& jsonReportPath)
+                                 const std::filesystem::path& jsonReportPath,
+                                 const std::filesystem::path* captureDirectory)
 {
     VulkanSurfaceContext context;
     context.windowHandle = hWnd;
     LoadSettings(context);
+    if (captureDirectory != nullptr)
+    {
+        context.renderScale = 1.0f;
+        context.outputExposure = 0.62f;
+        context.sfxEnabled = false;
+        context.simulationPaused = true;
+        context.pauseMenuVisible = false;
+    }
     if (!CreateInstance(context.instance))
     {
         return 1;
@@ -2193,9 +2640,27 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     if (context.controlsEnabled)
     {
         SetWindowLongPtrA(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(&context));
-        ApplyOverlayState(context);
-        SetFocus(GetDlgItem(hWnd, kResumeButtonId));
+        if (captureDirectory == nullptr)
+        {
+            ApplyOverlayState(context);
+            SetFocus(GetDlgItem(hWnd, kResumeButtonId));
+        }
     }
+
+#if defined(_DEBUG)
+    if (captureDirectory != nullptr)
+    {
+        const int captureResult = RunShowcaseCapture(context, capabilities, *captureDirectory);
+        if (IsWindow(hWnd))
+        {
+            SetWindowLongPtrA(hWnd, GWLP_USERDATA, 0);
+        }
+        DestroyRenderContext(context);
+        return captureResult;
+    }
+#else
+    (void)captureDirectory;
+#endif
 
     const VkClearColorValue clearColor = ClearColorForMode(capabilities.rtMode);
     MSG message{};
@@ -2243,7 +2708,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             capabilities.performance.fps = 0.0f;
             if (HWND hud = GetDlgItem(hWnd, kHudControlId))
             {
-                SetWindowTextA(hud, "ALPHA 0.1.1  |  APPLYING RT RENDER SCALE...");
+                SetWindowTextA(hud, kHudApplyingScaleText);
             }
             if (!InitialiseRtSceneForSwapchain(context))
             {
@@ -2335,7 +2800,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             WriteReportFile(jsonReportPath, horde::vulkan::BuildCapabilityJsonReport(capabilities));
             if (HWND hud = GetDlgItem(hWnd, kHudControlId))
             {
-                SetWindowTextA(hud, "ALPHA 0.1.1  |  NATIVE VULKAN HARDWARE RT ACTIVE  |  F1 CONTROLS  |  ESC MENU");
+                SetWindowTextA(hud, kHudActiveText);
             }
             if (HWND edit = GetDlgItem(hWnd, kEditControlId))
             {
@@ -2781,7 +3246,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 return 0;
             case kMenuAboutId:
                 MessageBoxA(hWnd,
-                            "Horde Lantern RT\nShowcase Alpha 0.1.1\n\nNative Vulkan hardware ray tracing. RT or nothing.\nA Samfa12 technology demo.",
+                            kAboutText,
                             "About Horde Lantern RT",
                             MB_OK | MB_ICONINFORMATION);
                 return 0;
@@ -3035,6 +3500,10 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         return 0;
     case WM_GETMINMAXINFO:
     {
+        if (GetPropA(hWnd, kCaptureModeProperty) != nullptr)
+        {
+            return 0;
+        }
         auto* minMaxInfo = reinterpret_cast<MINMAXINFO*>(lParam);
         minMaxInfo->ptMinTrackSize.x = ScaleForDpi(hWnd, 520);
         minMaxInfo->ptMinTrackSize.y = ScaleForDpi(hWnd, 560);
@@ -3072,6 +3541,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             ClearDesktopInput(*sceneContext);
         }
         ReleaseDpiScaledFonts(hWnd);
+        RemovePropA(hWnd, kCaptureModeProperty);
         PostQuitMessage(0);
         return 0;
     default:
@@ -3117,7 +3587,8 @@ HMENU CreateApplicationMenu()
 int CreateAndShowWindow(const std::string& diagnosticText,
                         horde::vulkan::DeviceCapabilities& capabilities,
                         const std::filesystem::path& textReportPath,
-                        const std::filesystem::path& jsonReportPath)
+                        const std::filesystem::path& jsonReportPath,
+                        const std::filesystem::path* captureDirectory)
 {
     const HINSTANCE instance = GetModuleHandleA(nullptr);
     INITCOMMONCONTROLSEX commonControls{sizeof(INITCOMMONCONTROLSEX), ICC_BAR_CLASSES};
@@ -3137,15 +3608,25 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     }
 
     const UINT systemDpi = GetDpiForSystem();
+    constexpr DWORD windowStyle = WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN;
+    int windowWidth = MulDiv(1000, static_cast<int>(systemDpi == 0u ? kDefaultDpi : systemDpi), static_cast<int>(kDefaultDpi));
+    int windowHeight = MulDiv(700, static_cast<int>(systemDpi == 0u ? kDefaultDpi : systemDpi), static_cast<int>(kDefaultDpi));
+    if (captureDirectory != nullptr)
+    {
+        RECT captureRect{0, 0, static_cast<LONG>(kCaptureWidth), static_cast<LONG>(kCaptureHeight)};
+        AdjustWindowRectEx(&captureRect, windowStyle, TRUE, 0u);
+        windowWidth = captureRect.right - captureRect.left;
+        windowHeight = captureRect.bottom - captureRect.top;
+    }
     HWND hWnd = CreateWindowExA(
         0,
         kWindowClassName,
         kWindowTitle,
-        WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_CLIPCHILDREN,
+        windowStyle,
         CW_USEDEFAULT,
         CW_USEDEFAULT,
-        MulDiv(1000, static_cast<int>(systemDpi == 0u ? kDefaultDpi : systemDpi), static_cast<int>(kDefaultDpi)),
-        MulDiv(700, static_cast<int>(systemDpi == 0u ? kDefaultDpi : systemDpi), static_cast<int>(kDefaultDpi)),
+        windowWidth,
+        windowHeight,
         nullptr,
         CreateApplicationMenu(),
         instance,
@@ -3154,6 +3635,21 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     {
         std::cerr << "Failed to create diagnostic window." << std::endl;
         return 1;
+    }
+
+    if (captureDirectory != nullptr)
+    {
+        SetPropA(hWnd, kCaptureModeProperty, reinterpret_cast<HANDLE>(1));
+        RECT windowRect{};
+        RECT actualClientRect{};
+        GetWindowRect(hWnd, &windowRect);
+        GetClientRect(hWnd, &actualClientRect);
+        const int adjustedWidth = (windowRect.right - windowRect.left) +
+                                  static_cast<int>(kCaptureWidth) - (actualClientRect.right - actualClientRect.left);
+        const int adjustedHeight = (windowRect.bottom - windowRect.top) +
+                                   static_cast<int>(kCaptureHeight) - (actualClientRect.bottom - actualClientRect.top);
+        SetWindowPos(hWnd, nullptr, 0, 0, adjustedWidth, adjustedHeight,
+                     SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER);
     }
 
     RECT clientRect{};
@@ -3190,7 +3686,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
         return control;
     };
 
-    createStatic(kHudControlId, "ALPHA 0.1.1  |  VULKAN RT STARTING...  |  F1 CONTROLS  |  ESC MENU", SS_LEFT | SS_CENTERIMAGE);
+    createStatic(kHudControlId, kHudStartingText, SS_LEFT | SS_CENTERIMAGE);
 #if defined(_DEBUG)
     if (HWND developerOverlay = createStatic(kDeveloperOverlayId, "DEV OVERLAY STARTING...", SS_LEFT | SS_NOPREFIX))
     {
@@ -3230,7 +3726,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     const std::string windowText = WindowSafeText(diagnosticText);
     const bool sceneMode = capabilities.rtMode == horde::vulkan::RtMode::RayTracingPipeline;
     const std::string windowTitle = sceneMode
-        ? "Horde Lantern RT - Showcase Alpha 0.1.1"
+        ? kWindowTitle
         : MakeWindowTitle(diagnosticText);
     SetWindowTextA(edit, windowText.c_str());
     SetWindowTextA(hWnd, windowTitle.c_str());
@@ -3241,12 +3737,41 @@ int CreateAndShowWindow(const std::string& diagnosticText,
 
     LayoutOverlayControls(hWnd, clientRect.right - clientRect.left, clientRect.bottom - clientRect.top);
 
-    ShowWindow(hWnd, SW_SHOW);
+    if (captureDirectory != nullptr)
+    {
+        EnumChildWindows(hWnd, [](HWND child, LPARAM) -> BOOL {
+            ShowWindow(child, SW_HIDE);
+            return TRUE;
+        }, 0);
+    }
+    ShowWindow(hWnd, captureDirectory != nullptr ? SW_SHOWNOACTIVATE : SW_SHOW);
     UpdateWindow(hWnd);
-    SetForegroundWindow(hWnd);
-    SetFocus(sceneMode ? hWnd : edit);
+    if (captureDirectory != nullptr)
+    {
+        RECT windowRect{};
+        RECT actualClientRect{};
+        GetWindowRect(hWnd, &windowRect);
+        GetClientRect(hWnd, &actualClientRect);
+        SetWindowPos(hWnd, nullptr, 0, 0,
+                     (windowRect.right - windowRect.left) + static_cast<int>(kCaptureWidth) -
+                         (actualClientRect.right - actualClientRect.left),
+                     (windowRect.bottom - windowRect.top) + static_cast<int>(kCaptureHeight) -
+                         (actualClientRect.bottom - actualClientRect.top),
+                     SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER);
+    }
+    if (captureDirectory == nullptr)
+    {
+        SetForegroundWindow(hWnd);
+        SetFocus(sceneMode ? hWnd : edit);
+    }
 
-    return RunDiagnosticSwapchainWindow(hWnd, capabilities, textReportPath, jsonReportPath);
+    const int result = RunDiagnosticSwapchainWindow(
+        hWnd, capabilities, textReportPath, jsonReportPath, captureDirectory);
+    if (captureDirectory != nullptr && IsWindow(hWnd))
+    {
+        DestroyWindow(hWnd);
+    }
+    return result;
 }
 
 } // namespace
@@ -3258,6 +3783,20 @@ int RunDiagnosticWindow(const int showCommand)
 {
     (void)showCommand;
     SetProcessDPIAware();
+
+    const CaptureLaunchOptions launchOptions = ParseCaptureLaunchOptions();
+    if (!launchOptions.error.empty())
+    {
+        std::cerr << launchOptions.error << '\n';
+        return 2;
+    }
+#if !defined(_DEBUG)
+    if (launchOptions.requested)
+    {
+        std::cerr << "--capture-showcase is a Debug-only automation mode; Release builds reject it.\n";
+        return 2;
+    }
+#endif
 
     horde::vulkan::VulkanContext context;
     const bool initialised = context.InitialiseForCapabilityProbe();
@@ -3298,7 +3837,10 @@ int RunDiagnosticWindow(const int showCommand)
     std::cout << "Stored report (text): " << textReportPath << '\n';
     std::cout << "Stored report (json): " << jsonReportPath << '\n';
 
-    return CreateAndShowWindow(diagnosticText, capabilities, textReportPath, jsonReportPath);
+    const std::filesystem::path* captureDirectory = launchOptions.requested
+        ? &launchOptions.outputDirectory
+        : nullptr;
+    return CreateAndShowWindow(diagnosticText, capabilities, textReportPath, jsonReportPath, captureDirectory);
 }
 
 } // namespace horde::platform::windows

@@ -14,6 +14,8 @@ Development note: the in-app benchmark, developer overlay, and Samfa12 menu link
 
 The APK declares Android 7 / API 24 as its packaging minimum, but hardware support is intentionally much narrower: the device and driver must expose Vulkan acceleration structures, ray-tracing pipeline, ray query, buffer device address, deferred host operations, and the required ASTC formats. Only `SM-S948B` on Android 16 is currently device-certified.
 
+Device compatibility is tracked in [`docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md`](docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md). New device results should be recorded there with the exact model code and evidence class: locally tested confirmation, user-reported plus screenshot evidence, user-reported, vendor/SoC inference, or unverified candidate. Hardware marketing claims alone do not establish support; the runtime capability probe and honest RT swapchain presentation are the deciding checks.
+
 ## RT or nothing
 
 The demo uses Vulkan acceleration structures, an RT pipeline and shader binding table, `vkCmdTraceRaysKHR`, an RT storage image, and swapchain presentation. The phone-safe shading path uses `rayQueryEXT` inside raygen with pipeline recursion depth 1. Unsupported devices show explicit diagnostics; there is no browser, raster, baked, screen-space, or fake-RT fallback.
@@ -85,6 +87,7 @@ See:
 - `docs/ANDROID_SHOWCASE_AUTOMATION_VALIDATION_2026-07-17.md`
 - `docs/IN_APP_BENCHMARK_WINDOWS_VALIDATION_2026-07-17.md`
 - `docs/IN_APP_BENCHMARK_ANDROID_VALIDATION_2026-07-18.md`
+- `docs/FOUNDATION_VALIDATION_2026-07-22.md`
 - `docs/SHOWCASE_ALPHA_RELEASE_NOTES_2026-07-17.md`
 - Historical 0.1.0 readiness and validation records remain under `docs/`.
 
@@ -126,6 +129,32 @@ For repeatable Android checkpoint timing and deterministic route-collision repla
 
 The debug-only runner collects a timestamped evidence bundle without changing the public release path. See `docs/ANDROID_SHOWCASE_AUTOMATION_2026-07-17.md`.
 
+## Foundation validation and deterministic captures
+
+Run the daily host gate from the repository root:
+
+```powershell
+.\tools\run-foundation-validation.ps1
+```
+
+It performs fresh Windows Debug/Release builds, all seven CTests in both configurations, deterministic Windows captures, clean Android Debug/Release builds, Release lint, non-mutating shader-staleness checks, validation package/layout and asset/licence checks, release-identity safeguards, and evidence hashing.
+
+With the authorised `SM-S948B` connected, run the milestone gate:
+
+```powershell
+.\tools\run-foundation-validation.ps1 -Mode Full
+```
+
+`Full` adds the 75% checkpoint/replay gate, a separately reported 100% opening result, Home/resume evidence, and all 12 deterministic Android captures. Both modes write timestamped logs, manifests, hashes, PNGs, `summary.json`, and `validation.md` beneath ignored `reports/foundation-runs/`. Their ZIP/APK artifacts are marked unpublishable, stay out of `releases/candidates/`, are not signed, and do not read or require release-key secrets.
+
+Check raygen staleness without modifying the embedded include:
+
+```powershell
+.\tools\compile-raygen.ps1 -Check
+```
+
+Windows Debug also supports `HordeLanternRT.exe --capture-showcase <directory>`; Windows Release and Android Release reject capture/checkpoint automation. Video and orbit-camera capture remain deferred.
+
 ## Package and publish
 
 Create a release key once, outside Git:
@@ -137,13 +166,13 @@ Create a release key once, outside Git:
 For a signed rebuild:
 
 ```powershell
-.\tools\package-signed-alpha.ps1 -KeyStorePath '<outside-repo path>'
-.\tools\push-alpha-to-itch.ps1 -Version 0.1.1-alpha.1 -Channels Both
+.\tools\package-signed-alpha.ps1 -KeyStorePath '<outside-repo path>' -Version '0.1.2-alpha.1' -VersionCode 3
+.\tools\push-alpha-to-itch.ps1 -Version '0.1.2-alpha.1' -Channels Both
 ```
 
 The packaging and push scripts securely prompt for signing secrets, reject debug/unsigned Android candidates, verify hashes, and keep Windows and Android on separate itch channels. Add `-ConfirmPush` only after the preflight passes.
 
-The current packaging defaults describe the already-published immutable `0.1.1-alpha.1` release. Do not rebuild or republish changed source under that version. A future public build must first bump CMake/Windows/Android/package metadata, increment Android `versionCode` above 2, provide matching release notes, and update the guarded candidate hashes.
+There are no packaging version defaults: candidate scripts require explicit `Version` and `VersionCode`, reject the immutable `0.1.1` line, and require Android `versionCode > 2`. The itch push script rejects another 0.1.1 upload before contacting Butler. A future public build must first bump CMake/Windows/Android/package metadata, provide matching release notes, and update the guarded candidate hashes.
 
 Android native code is linked for 16 KiB page compatibility. The release uses a static C++ runtime, 16 KiB ELF `LOAD` alignment, and AGP 8.7.2 APK alignment; `package-alpha.ps1` rejects candidates that fail either APK or ELF verification or reintroduce `libc++_shared.so` from the r26 NDK.
 
@@ -169,7 +198,7 @@ Do not redistribute source assets as standalone asset packs. Preserve the public
 - Raygen source: `shaders/raytracing/minimal.rgen`
 - Embedded raygen SPIR-V: `src/vulkan/raytracing/MinimalRayGenShader.inc`
 
-After raygen edits, run `tools/compile-raygen.ps1`. Keep one frame in flight while the held-prop TLAS uses host-written instance data. Preserve presentation-format-driven red/blue swapping on the 100% raw-copy path so warm fire does not render cyan.
+After raygen edits, run `tools/compile-raygen.ps1`; use `tools/compile-raygen.ps1 -Check` in validation when mutation is not allowed. Keep one frame in flight while the held-prop TLAS uses host-written instance data. Preserve presentation-format-driven red/blue swapping on the 100% raw-copy path so warm fire does not render cyan.
 
 ## Showcase route status
 

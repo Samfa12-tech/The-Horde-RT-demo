@@ -1,4 +1,4 @@
-HORDE LANTERN RT - SHOWCASE ALPHA 0.1.1
+HORDE LANTERN RT - SHOWCASE ALPHA 0.1.2
 =======================================
 
 This is a native Vulkan hardware-ray-tracing technology demo from Samfa12.

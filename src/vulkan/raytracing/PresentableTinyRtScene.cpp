@@ -248,6 +248,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     storageImageMemory_ = std::exchange(other.storageImageMemory_, VK_NULL_HANDLE);
     storageImageView_ = std::exchange(other.storageImageView_, VK_NULL_HANDLE);
     storageImageLayout_ = std::exchange(other.storageImageLayout_, VK_IMAGE_LAYOUT_UNDEFINED);
+    lastOutputRedBlueSwapApplied_ = std::exchange(other.lastOutputRedBlueSwapApplied_, false);
     materialDiffuse_ = std::exchange(other.materialDiffuse_, TextureArray{});
     materialNormal_ = std::exchange(other.materialNormal_, TextureArray{});
     materialArm_ = std::exchange(other.materialArm_, TextureArray{});
@@ -450,12 +451,13 @@ void PresentableTinyRtScene::Destroy()
         vkFreeMemory(device_, storageImageMemory_, nullptr);
         storageImageMemory_ = VK_NULL_HANDLE;
     }
+    storageImageLayout_ = VK_IMAGE_LAYOUT_UNDEFINED;
+    lastOutputRedBlueSwapApplied_ = false;
 
     raygenRegion_ = {};
     missRegion_ = {};
     hitRegion_ = {};
     callableRegion_ = {};
-    storageImageLayout_ = VK_IMAGE_LAYOUT_UNDEFINED;
     scaledBlitSupported_ = false;
     ready_ = false;
 }
@@ -1052,7 +1054,6 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         SurfaceHiddenShell = 7u,
         SurfaceMirror = 8u,
         SurfaceClearGlass = 9u,
-        SurfaceStainedGlass = 10u,
     };
     enum SurfaceNormal : std::uint32_t
     {
@@ -1324,9 +1325,9 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         addWorldBox(x - 0.055f, 0.50f, -14.015f, x + 0.055f, 0.78f, -13.945f, SurfaceFlame);
     }
 
-    // The threshold reserves an empty opening for a future stained pane. Its
-    // narrow jambs sit inside the collision wall inset and the high lintel
-    // leaves the full central walking lane unobstructed.
+    // The authored threshold remains open. Its narrow jambs sit inside the
+    // collision wall inset and the high lintel leaves the full central walking
+    // lane unobstructed.
     addWorldBox(-29.62f, -0.95f, -16.80f, -29.38f, 0.88f, -16.62f, SurfaceMossyStone);
     addWorldBox(-29.62f, -0.95f, -13.78f, -29.38f, 0.88f, -13.60f, SurfaceMossyStone);
     addWorldBox(-29.62f, 0.88f, -16.80f, -29.38f, 1.20f, -13.60f, SurfaceMossyStone);
@@ -2955,6 +2956,7 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                                             staffWorldPosition[2],
                                             std::clamp(lich.finaleSkylightOpenProgress, 0.0f, 1.0f),
                                             heldPropDepth};
+    lastOutputRedBlueSwapApplied_ = pushConstants.outputRedBlueSwap > 0.5f;
     vkCmdPushConstants(commandBuffer,
                        pipelineLayout_,
                        VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR,
@@ -3044,6 +3046,100 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                     VK_ACCESS_TRANSFER_READ_BIT,
                     VK_ACCESS_SHADER_WRITE_BIT);
     storageImageLayout_ = VK_IMAGE_LAYOUT_GENERAL;
+
+    diagnostic.clear();
+    return true;
+}
+
+bool PresentableTinyRtScene::CaptureStorageImage(StorageImageCapture& capture, std::string& diagnostic)
+{
+    capture = {};
+    if (!ready_ || storageImage_ == VK_NULL_HANDLE || storageImageLayout_ != VK_IMAGE_LAYOUT_GENERAL)
+    {
+        diagnostic = "RT storage image is not ready for capture.";
+        return false;
+    }
+
+    const VkDeviceSize byteSize = static_cast<VkDeviceSize>(dispatchExtent_.width) *
+                                  static_cast<VkDeviceSize>(dispatchExtent_.height) * 4u;
+    Buffer readback;
+    if (!CreateBuffer(byteSize,
+                      VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+                      VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                      false,
+                      readback,
+                      diagnostic))
+    {
+        diagnostic = "Failed to create RT capture readback buffer: " + diagnostic;
+        return false;
+    }
+
+    struct CaptureCommands
+    {
+        VkImage image;
+        VkBuffer buffer;
+        VkExtent2D extent;
+    } commands{storageImage_, readback.buffer, dispatchExtent_};
+    const auto record = [](VkCommandBuffer commandBuffer, void* userData) {
+        const auto* captureCommands = static_cast<const CaptureCommands*>(userData);
+        SetImageBarrier(commandBuffer,
+                        captureCommands->image,
+                        VK_IMAGE_LAYOUT_GENERAL,
+                        VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                        VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
+                        VK_PIPELINE_STAGE_TRANSFER_BIT,
+                        VK_ACCESS_SHADER_WRITE_BIT,
+                        VK_ACCESS_TRANSFER_READ_BIT);
+
+        VkBufferImageCopy copy{};
+        copy.imageSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, 0u, 1u};
+        copy.imageExtent = {captureCommands->extent.width, captureCommands->extent.height, 1u};
+        vkCmdCopyImageToBuffer(commandBuffer,
+                               captureCommands->image,
+                               VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                               captureCommands->buffer,
+                               1u,
+                               &copy);
+
+        SetImageBarrier(commandBuffer,
+                        captureCommands->image,
+                        VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                        VK_IMAGE_LAYOUT_GENERAL,
+                        VK_PIPELINE_STAGE_TRANSFER_BIT,
+                        VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
+                        VK_ACCESS_TRANSFER_READ_BIT,
+                        VK_ACCESS_SHADER_WRITE_BIT);
+    };
+    if (!RunOneTimeCommands(record, &commands, diagnostic))
+    {
+        DestroyBuffer(readback);
+        diagnostic = "Failed to read back RT storage image: " + diagnostic;
+        return false;
+    }
+
+    void* mapped = nullptr;
+    if (vkMapMemory(device_, readback.memory, 0u, byteSize, 0u, &mapped) != VK_SUCCESS || mapped == nullptr)
+    {
+        DestroyBuffer(readback);
+        diagnostic = "Failed to map RT capture readback memory.";
+        return false;
+    }
+
+    capture.width = dispatchExtent_.width;
+    capture.height = dispatchExtent_.height;
+    capture.redBlueSwapNormalised = lastOutputRedBlueSwapApplied_;
+    capture.rgba.resize(static_cast<std::size_t>(byteSize));
+    std::memcpy(capture.rgba.data(), mapped, capture.rgba.size());
+    vkUnmapMemory(device_, readback.memory);
+    DestroyBuffer(readback);
+
+    if (capture.redBlueSwapNormalised)
+    {
+        for (std::size_t offset = 0; offset < capture.rgba.size(); offset += 4u)
+        {
+            std::swap(capture.rgba[offset], capture.rgba[offset + 2u]);
+        }
+    }
 
     diagnostic.clear();
     return true;

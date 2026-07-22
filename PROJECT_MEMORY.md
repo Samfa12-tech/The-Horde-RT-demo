@@ -1,6 +1,6 @@
 # Horde Lantern RT - Project Memory
 
-Last updated: 2026-07-18
+Last updated: 2026-07-22
 
 ## Identity and release state
 
@@ -35,6 +35,7 @@ Last updated: 2026-07-18
 - The RT storage image is RGBA. Common BGRA swapchains require the presentation-format-driven `outputRedBlueSwap` path on raw copy; scaled modes use a format-aware blit.
 - One frame remains in flight while held-prop TLAS transforms use host-written instance data.
 - Android uses strict ASTC KTX2 arrays: ASTC 6x6 diffuse/ARM and ASTC 4x4 normals. Windows uses executable-relative raw RGBA8 arrays.
+- The unreachable stained-glass material route has been removed from the CPU material table and raygen. The retained open threshold and live clear-glass route are unchanged. The regenerated raygen is 71,180 SPIR-V bytes / 3,978 instructions / 557 branch operations / 6 loops / 212 selection merges, down from 71,908 / 4,025 / 568 / 6 / 216, with bit-exact fixed Windows captures and non-regressing Windows/phone timing.
 
 ## Current alpha scene and controls
 
@@ -82,6 +83,16 @@ Last updated: 2026-07-18
 - Windows Debug/Release and all seven CTests pass; hands-on route, collision, mirror, combat, lighting, reset, and spatial-audio validation passed.
 - The Windows Release in-app benchmark is live-validated at 100%: 2/2 frame-symmetric laps, 26/26 waypoints, 1,838 measured frames, honest RT presentation throughout, selectable/copyable UI, and parseable timestamped text/JSON. See `docs/IN_APP_BENCHMARK_WINDOWS_VALIDATION_2026-07-17.md`.
 - The package includes both enemy GLBs, raw environment and lich textures, seventeen FilmCow WAVs, release notes, controls, and `ASSET_LICENSES.md`.
+- The 2026-07-22 foundation gate produced all 12 deterministic 960x540 scene-only RT captures on the RTX 5050, with fixed animation time, honest presentation, complete capture identity/hashes, and no pixel changes across the raygen A/B. Fresh Debug and Release builds and all seven CTests passed in both configurations.
+
+## Foundation validation and capture
+
+- Daily host gate: `tools/run-foundation-validation.ps1` (equivalent to `-Mode Host`). It performs fresh Windows Debug/Release builds, both seven-test CTest passes, Windows captures, Android clean Debug/Release builds, Release lint, shader-staleness, package/layout, asset/licence, release-identity and evidence-hash gates.
+- Milestone/device gate: `tools/run-foundation-validation.ps1 -Mode Full`. It adds the `SM-S948B` 75% checkpoint/replay gate, report-only 100% opening, Home/resume evidence, and all 12 Android scene-only captures.
+- Reports are timestamped beneath ignored `reports/foundation-runs/`. Validation ZIP/APK artifacts stay under `reports/`, are explicitly unpublishable/unsigned, and never read or require release-key secrets.
+- `tools/compile-raygen.ps1 -Check` compiles into an evidence directory and compares SPIR-V words with the embedded include without mutating the checkout or depending on text line endings.
+- Windows Debug supports `--capture-showcase <directory>`; Release rejects it. Android capture/checkpoint intent handling is Debug-only and Release rejects the automation path. Video and orbit-camera work remain deferred.
+- Exact 2026-07-22 Full-gate and shader A/B evidence: `docs/FOUNDATION_VALIDATION_2026-07-22.md`.
 
 ## Asset and licence state
 
@@ -114,7 +125,7 @@ Last updated: 2026-07-18
 2. Back up the JKS and both passwords independently.
 3. Treat the complete 0.1.1 route as the preserved playable baseline; the stained pane was rejected, water remains deferred, and no second concurrent enemy is authorised without a measured plan.
 4. The deterministic checkpoint, three-window benchmark, native route replay, and bounded Android evidence runner foundation is complete and live-validated.
-5. Developer overlay/state visibility and the player benchmark are device-validated on Windows and Android. Continue with the integrated cross-platform clean-build/package/stale-shader/licence gate and fixed video/presentation capture.
+5. The integrated cross-platform clean-build/package/stale-shader/licence gate and deterministic 12-checkpoint Windows/Android PNG capture foundation are complete and device-validated. Keep video/orbit-camera presentation work deferred until it has a separately bounded need.
 6. Gate each meaningful renderer/gameplay-route change on the phone at 75%; report 100% separately and retain the short hands-on touch/audio/lifecycle pass.
 7. Keep real RT and honest diagnostics. Reduce bounded effect area/ray cost before expanding gameplay or substituting fake effects.
 8. Treat `docs/BUILD_TEST_DEMO_CYCLE_PLAN_2026-07-17.md` as the detailed backlog and `docs/DOCUMENTATION_CHECKPOINT_2026-07-17.md` as the documentation authority map.

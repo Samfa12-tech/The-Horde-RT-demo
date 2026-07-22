@@ -3,10 +3,11 @@ plugins {
 }
 
 def runtimeAssetsDir = layout.buildDirectory.dir('generated/runtimeAssets')
-def releaseStoreFile = System.getenv('HORDE_RELEASE_STORE_FILE')
-def releaseStorePassword = System.getenv('HORDE_RELEASE_STORE_PASSWORD')
-def releaseKeyAlias = System.getenv('HORDE_RELEASE_KEY_ALIAS')
-def releaseKeyPassword = System.getenv('HORDE_RELEASE_KEY_PASSWORD')
+def validationUnsigned = System.getenv('HORDE_VALIDATION_UNSIGNED') == '1'
+def releaseStoreFile = validationUnsigned ? null : System.getenv('HORDE_RELEASE_STORE_FILE')
+def releaseStorePassword = validationUnsigned ? null : System.getenv('HORDE_RELEASE_STORE_PASSWORD')
+def releaseKeyAlias = validationUnsigned ? null : System.getenv('HORDE_RELEASE_KEY_ALIAS')
+def releaseKeyPassword = validationUnsigned ? null : System.getenv('HORDE_RELEASE_KEY_PASSWORD')
 
 tasks.register('prepareRuntimeAssets', Sync) {
     from('../../assets') {
@@ -30,8 +31,8 @@ android {
         applicationId 'com.samfa12.hordelanternrt'
         minSdk 24
         targetSdk 34
-        versionCode 2
-        versionName '0.1.1-alpha.1'
+        versionCode 3
+        versionName '0.1.2-alpha.1'
 
         externalNativeBuild {
             cmake {
@@ -51,7 +52,7 @@ android {
     }
 
     signingConfigs {
-        if (releaseStoreFile && releaseStorePassword && releaseKeyAlias && releaseKeyPassword) {
+        if (!validationUnsigned && releaseStoreFile && releaseStorePassword && releaseKeyAlias && releaseKeyPassword) {
             release {
                 storeFile file(releaseStoreFile)
                 storePassword releaseStorePassword

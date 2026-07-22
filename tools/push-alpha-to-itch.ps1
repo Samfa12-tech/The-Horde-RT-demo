@@ -1,5 +1,6 @@
 param(
-    [string]$Version = "0.1.1-alpha.1",
+    [Parameter(Mandatory = $true)]
+    [string]$Version,
     [ValidateSet("Both", "Windows", "Android")]
     [string]$Channels = "Both",
     [switch]$ConfirmPush,
@@ -7,6 +8,9 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+if ($Version -match '^0\.1\.1(?:$|[-+.])') {
+    throw "The 0.1.1 release line is immutable. Refusing another upload."
+}
 $expectedCertificateSha256 = "8245277a11bca5576f116724507f799d6f4c178ce5fbb7e3981415c9e6b3c245"
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 $candidateRoot = [IO.Path]::GetFullPath((Join-Path $repoRoot "releases\candidates"))
@@ -79,7 +83,8 @@ if (-not $ConfirmPush) {
 }
 
 $stage = [IO.Path]::GetFullPath((Join-Path $candidateRoot ".butler-windows-stage"))
-if (-not $stage.StartsWith($candidateRoot, [StringComparison]::OrdinalIgnoreCase)) {
+$candidatePrefix = $candidateRoot.TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+if (-not $stage.StartsWith($candidatePrefix, [StringComparison]::OrdinalIgnoreCase)) {
     throw "Unsafe Butler staging path: $stage"
 }
 try {
