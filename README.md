@@ -4,13 +4,13 @@ Horde Lantern RT is a native Vulkan hardware-ray-tracing technology demo for And
 
 - Public alpha: https://samfa12.itch.io/the-horde
 - Source repository: https://github.com/Samfa12-tech/The-Horde-RT-demo
-- Current package version: `0.1.1-alpha.1`
-- Current itch builds: Windows `#1801016`; Android `#1801017`
-- Published SHA-256: Windows `8a254c9d14b35bf868f1cb96619dc572f3505a9564b668aa55241b33bfeaec2e`; Android `ae73afec2c75b317187aeb61d81a592ec8bb4d8b5e89ef9b474fb2a60ae1354a`
+- Current package version: `0.1.2-alpha.1`
+- Current itch builds: Windows `#1815416`; Android `#1815417`
+- Published SHA-256: Windows `c3688bd8483ec13af2ae8e1d2e1708e17c840b33232822b795ef3283c6b7dee6`; Android `c9a26c79d4881230d2fd18b3bcbe4c1543032bccea760ade581f9a9fdcbf72b6`
 - Primary validated phone: Samsung `SM-S948B` / Adreno 840
 - Validated Windows GPU: NVIDIA GeForce RTX 5050 Laptop GPU
 
-Development note: the in-app benchmark, developer overlay, and Samfa12 menu link are source changes made after `0.1.1-alpha.1`; they are not included in the itch builds listed above yet.
+Showcase Alpha 0.1.2 includes the release-safe in-app benchmark and Samfa12 menu link; detailed checkpoint, capture, and developer telemetry remain Debug-only.
 
 The APK declares Android 7 / API 24 as its packaging minimum, but hardware support is intentionally much narrower: the device and driver must expose Vulkan acceleration structures, ray-tracing pipeline, ray query, buffer device address, deferred host operations, and the required ASTC formats. Only `SM-S948B` on Android 16 is currently device-certified.
 
@@ -70,8 +70,8 @@ Render scaling was verified at:
 
 | Scale | Android internal RT extent | Result |
 |---:|---:|---|
-| 100% | `1440x2980` | Full-extent/image check passed; latest cool automated opening 25.191 ms median of three 120-frame averages, report-only |
-| 75% | `1080x2235` | Sustained recommendation; warm hands-on route zones below 13.7 ms at thermal status 3; cool automated default set 7.667-16.123 ms at status 0 |
+| 100% | `1440x2980` | Full-extent/image check passed; latest cool automated opening 23.353 ms median of three 120-frame averages, report-only |
+| 75% | `1080x2235` | Sustained recommendation; warm hands-on route zones below 13.7 ms at thermal status 3; latest cool automated default set 10.288-13.929 ms at status 0 |
 | 50% | `720x1490` | Initial-alpha opening diagnostic recorded 163.12 FPS / 6.13 ms; retained as historical evidence, not a complete-route baseline |
 
 Windows Release was launched from a clean extraction using only its packaged assets. It reported `RayTracingPipeline`, `RT scene presented: yes`, and live resolution/FPS/frame-time diagnostics. The 100% and 75% render targets were verified at `982x628` and `737x471` respectively.
@@ -88,7 +88,8 @@ See:
 - `docs/IN_APP_BENCHMARK_WINDOWS_VALIDATION_2026-07-17.md`
 - `docs/IN_APP_BENCHMARK_ANDROID_VALIDATION_2026-07-18.md`
 - `docs/FOUNDATION_VALIDATION_2026-07-22.md`
-- `docs/SHOWCASE_ALPHA_RELEASE_NOTES_2026-07-17.md`
+- `docs/SHOWCASE_ALPHA_0_1_2_RELEASE_VALIDATION_2026-07-22.md`
+- `docs/SHOWCASE_ALPHA_RELEASE_NOTES_2026-07-22.md`
 - Historical 0.1.0 readiness and validation records remain under `docs/`.
 
 ## Build and run
@@ -166,13 +167,13 @@ Create a release key once, outside Git:
 For a signed rebuild:
 
 ```powershell
-.\tools\package-signed-alpha.ps1 -KeyStorePath '<outside-repo path>' -Version '0.1.2-alpha.1' -VersionCode 3
-.\tools\push-alpha-to-itch.ps1 -Version '0.1.2-alpha.1' -Channels Both
+.\tools\package-signed-alpha.ps1 -KeyStorePath '<outside-repo path>' -Version '0.1.3-alpha.1' -VersionCode 4
+.\tools\push-alpha-to-itch.ps1 -Version '0.1.3-alpha.1' -Channels Both
 ```
 
 The packaging and push scripts securely prompt for signing secrets, reject debug/unsigned Android candidates, verify hashes, and keep Windows and Android on separate itch channels. Add `-ConfirmPush` only after the preflight passes.
 
-There are no packaging version defaults: candidate scripts require explicit `Version` and `VersionCode`, reject the immutable `0.1.1` line, and require Android `versionCode > 2`. The itch push script rejects another 0.1.1 upload before contacting Butler. A future public build must first bump CMake/Windows/Android/package metadata, provide matching release notes, and update the guarded candidate hashes.
+There are no packaging version defaults: candidate scripts require explicit `Version` and `VersionCode`, reject the immutable published `0.1.1` and `0.1.2` lines, and require Android `versionCode > 3`. The itch push script rejects another 0.1.1 or 0.1.2 upload before contacting Butler. A future public build must first bump CMake/Windows/Android/package metadata, provide matching release notes, and update the guarded candidate hashes.
 
 Android native code is linked for 16 KiB page compatibility. The release uses a static C++ runtime, 16 KiB ELF `LOAD` alignment, and AGP 8.7.2 APK alignment; `package-alpha.ps1` rejects candidates that fail either APK or ELF verification or reintroduce `libc++_shared.so` from the r26 NDK.
 

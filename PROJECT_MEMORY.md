@@ -8,16 +8,16 @@ Last updated: 2026-07-22
 - Purpose: native Vulkan hardware-ray-tracing game/technology demo.
 - Principle: **RT or nothing**; unsupported devices receive honest diagnostics, never a fake fallback.
 - Primary target: Android phone. Equal validation target: Windows RTX.
-- Current release: **Showcase Alpha 0.1.1**, package version `0.1.1-alpha.1`.
+- Current release: **Showcase Alpha 0.1.2**, package version `0.1.2-alpha.1`.
 - Canonical downloads: https://samfa12.itch.io/the-horde. Samfa12.com links to itch rather than hosting a second copy; the live `/games/` card, itch link, GitHub link, thumbnail, and released status were rendered and verified on 2026-07-15.
 - Source: https://github.com/Samfa12-tech/The-Horde-RT-demo.
-- Windows itch channel: upload `#18339908`, build `#1801016`, `windows-x64`.
-- Android itch channel: upload `#18341739`, build `#1801017`, `android`.
-- Signed Android APK SHA-256: `ae73afec2c75b317187aeb61d81a592ec8bb4d8b5e89ef9b474fb2a60ae1354a`.
-- Windows ZIP SHA-256: `8a254c9d14b35bf868f1cb96619dc572f3505a9564b668aa55241b33bfeaec2e`.
+- Windows itch channel: upload `#18339908`, build `#1815416`, `windows-x64`.
+- Android itch channel: upload `#18341739`, build `#1815417`, `android`.
+- Signed Android APK SHA-256: `c9a26c79d4881230d2fd18b3bcbe4c1543032bccea760ade581f9a9fdcbf72b6`.
+- Windows ZIP SHA-256: `c3688bd8483ec13af2ae8e1d2e1708e17c840b33232822b795ef3283c6b7dee6`.
 - Signing certificate SHA-256: `8245277a11bca5576f116724507f799d6f4c178ce5fbb7e3981415c9e6b3c245`.
-- The release JKS lives outside Git. It and both passwords need an independent owner backup.
-- Release proof: `docs/SHOWCASE_ALPHA_RELEASE_VALIDATION_2026-07-17.md`.
+- The release JKS and a local-only password note live together outside Git with restricted ACLs. An independent owner backup is still required.
+- Release proof: `docs/SHOWCASE_ALPHA_0_1_2_RELEASE_VALIDATION_2026-07-22.md`.
 
 ## Locked creative direction
 
@@ -66,20 +66,20 @@ Last updated: 2026-07-22
 ## Validated Android release state
 
 - Device: Samsung `SM-S948B`, Adreno 840, Vulkan 1.4.295, Android 16.
-- The exact stable-key-signed 0.1.1 APK installed as an update and reported `versionCode 2` / `versionName 0.1.1-alpha.1`.
+- The exact stable-key-signed 0.1.2 APK installed as an update and reported `versionCode 3` / `versionName 0.1.2-alpha.1`.
 - Strict environment plus lich ASTC and `RayTracingPipeline` selected; honest RT swapchain presentation reconfirmed.
 - All seventeen SoundPool clips loaded; no native renderer or Android runtime failure occurred.
 - The full route, touch controls, combat, reset, pause/Home lifecycle, and accessibility-scale UI passed hands-on validation.
-- At 75%, every required warm route zone remained below 13.7 ms median-of-three-window averages at thermal status 3. The later deterministic cool/status-0 default checkpoint set measured 7.667-16.123 ms and completed all 13 replay waypoints.
-- At 100%, full `1440x2980` image/extent presentation passed without a 50 FPS requirement. The latest automated opening was 25.191 ms.
-- Evidence: `docs/HORDE_SHOWCASE_ANDROID_VALIDATION_2026-07-17.md`, `docs/ANDROID_SHOWCASE_AUTOMATION_VALIDATION_2026-07-17.md`, and `docs/SHOWCASE_ALPHA_RELEASE_VALIDATION_2026-07-17.md`.
+- At 75%, every required warm route zone remained below 13.7 ms median-of-three-window averages at thermal status 3. The 0.1.2 publication gate measured 10.288-13.929 ms across the cool/status-0 default set and completed all 13 replay waypoints plus 12 captures.
+- At 100%, full `1440x2980` image/extent presentation passed without a 50 FPS requirement. The latest automated opening was 23.353 ms.
+- Evidence: `docs/HORDE_SHOWCASE_ANDROID_VALIDATION_2026-07-17.md`, `docs/ANDROID_SHOWCASE_AUTOMATION_VALIDATION_2026-07-17.md`, and `docs/SHOWCASE_ALPHA_0_1_2_RELEASE_VALIDATION_2026-07-22.md`.
 - The player benchmark and Debug overlay device gate passed on 2026-07-18, including the owner's follow-up movement/look/Swing, audio-cue, and visual-legibility check. At 75%, the two-pass benchmark measured 12.330 ms median / 19.844 ms P95 across 1,838 frames with honest presentation throughout; 100% completed separately at 17.725 ms median. See `docs/IN_APP_BENCHMARK_ANDROID_VALIDATION_2026-07-18.md`.
 
 ## Validated Windows release state
 
 - GPU: NVIDIA GeForce RTX 5050 Laptop GPU.
 - Release builds as `HordeLanternRT.exe` with GUI subsystem, icon/version resource, static MSVC runtime, and executable-relative assets.
-- A clean 0.1.1 candidate extraction launched without the source tree, selected `RayTracingPipeline`, and honestly presented the full route.
+- A clean 0.1.2 candidate extraction launched without the source tree, selected `RayTracingPipeline`, and honestly presented the full route.
 - Windows Debug/Release and all seven CTests pass; hands-on route, collision, mirror, combat, lighting, reset, and spatial-audio validation passed.
 - The Windows Release in-app benchmark is live-validated at 100%: 2/2 frame-symmetric laps, 26/26 waypoints, 1,838 measured frames, honest RT presentation throughout, selectable/copyable UI, and parseable timestamped text/JSON. See `docs/IN_APP_BENCHMARK_WINDOWS_VALIDATION_2026-07-17.md`.
 - The package includes both enemy GLBs, raw environment and lich textures, seventeen FilmCow WAVs, release notes, controls, and `ASSET_LICENSES.md`.
@@ -123,7 +123,7 @@ Last updated: 2026-07-22
 
 1. Preserve the published alpha and its stable signing identity.
 2. Back up the JKS and both passwords independently.
-3. Treat the complete 0.1.1 route as the preserved playable baseline; the stained pane was rejected, water remains deferred, and no second concurrent enemy is authorised without a measured plan.
+3. Treat the complete 0.1.2 route as the preserved playable baseline; the stained pane was rejected, water remains deferred, and no second concurrent enemy is authorised without a measured plan.
 4. The deterministic checkpoint, three-window benchmark, native route replay, and bounded Android evidence runner foundation is complete and live-validated.
 5. The integrated cross-platform clean-build/package/stale-shader/licence gate and deterministic 12-checkpoint Windows/Android PNG capture foundation are complete and device-validated. Keep video/orbit-camera presentation work deferred until it has a separately bounded need.
 6. Gate each meaningful renderer/gameplay-route change on the phone at 75%; report 100% separately and retain the short hands-on touch/audio/lifecycle pass.

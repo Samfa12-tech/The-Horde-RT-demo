@@ -20,6 +20,7 @@ Android version code: `3`
 - Android Debug/Release builds and Release lint pass. The release retains strict ASTC materials, four native ABIs, 16 KiB APK/ELF alignment, a static C++ runtime, and the established update-signing certificate.
 - The complete deterministic 75% checkpoint/replay/capture/lifecycle gate passed on Samsung `SM-S948B`; 100% remains a separately reported image/extent result rather than the sustained recommendation.
 - The current one-active-skinned-enemy limit and honest `rtScene.presented` semantics are unchanged.
+- Exact published hashes, itch build IDs, and package/device smoke evidence are recorded in `SHOWCASE_ALPHA_0_1_2_RELEASE_VALIDATION_2026-07-22.md`.
 
 ## Known alpha limits
 

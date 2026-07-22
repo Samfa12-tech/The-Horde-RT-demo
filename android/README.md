@@ -60,8 +60,8 @@ The complete showcase route is device-validated on `SM-S948B` in the debug packa
 
 The later debug automation baseline also passed live: five deterministic 75% checkpoints, report-only 100% opening, native state assertions, and all 13 replay waypoints. These cool thermal-status-0 results are regression evidence and do not replace the warm sustained certification above. See `../docs/ANDROID_SHOWCASE_AUTOMATION_VALIDATION_2026-07-17.md`.
 
-The showcase release identity is `0.1.1-alpha.1` with `versionCode 2`. Public candidates must be signed by the established Horde release key, retain strict ASTC routing and 16 KiB compatibility, and pass `tools/package-signed-alpha.ps1`; never replace the existing update identity with a new keystore.
+The showcase release identity is `0.1.2-alpha.1` with `versionCode 3`. Public candidates must be signed by the established Horde release key, retain strict ASTC routing and 16 KiB compatibility, and pass `tools/package-signed-alpha.ps1`; never replace the existing update identity with a new keystore.
 
-The exact signed 0.1.1 APK is published as itch build `#1801017`; SHA-256 `ae73afec2c75b317187aeb61d81a592ec8bb4d8b5e89ef9b474fb2a60ae1354a`. It was installed over the stable package and reconfirmed `versionCode 2`, all seventeen SoundPool loads, strict ASTC environment/lich routing, and honest RT swapchain presentation. See `../docs/SHOWCASE_ALPHA_RELEASE_VALIDATION_2026-07-17.md`.
+The exact signed 0.1.2 APK is published as itch build `#1815417`; SHA-256 `c9a26c79d4881230d2fd18b3bcbe4c1543032bccea760ade581f9a9fdcbf72b6`. It was installed over the stable package and reconfirmed `versionCode 3`, all seventeen SoundPool loads, strict ASTC environment/lich routing, Home/resume, Release automation rejection, and honest RT swapchain presentation. See `../docs/SHOWCASE_ALPHA_0_1_2_RELEASE_VALIDATION_2026-07-22.md`.
 
 Create/sign future releases with `../tools/create-android-release-key.ps1` and `../tools/package-signed-alpha.ps1`. Keep the JKS and signing properties outside Git.

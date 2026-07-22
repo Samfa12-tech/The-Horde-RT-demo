@@ -8,8 +8,8 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-if ($Version -match '^0\.1\.1(?:$|[-+.])') {
-    throw "The 0.1.1 release line is immutable. Refusing another upload."
+if ($Version -match '^0\.1\.(?:1|2)(?:$|[-+.])') {
+    throw "The published 0.1.1 and 0.1.2 release lines are immutable. Refusing another upload."
 }
 $expectedCertificateSha256 = "8245277a11bca5576f116724507f799d6f4c178ce5fbb7e3981415c9e6b3c245"
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))

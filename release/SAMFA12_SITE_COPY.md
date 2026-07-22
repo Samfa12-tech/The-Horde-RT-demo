@@ -1,6 +1,6 @@
-# Horde Lantern RT - showcase alpha 0.1.1
+# Horde Lantern RT - showcase alpha 0.1.2
 
-Public package version: `0.1.1-alpha.1`
+Public package version: `0.1.2-alpha.1`
 Canonical downloads: https://samfa12.itch.io/the-horde
 
 Horde Lantern RT is a short native Vulkan hardware-ray-tracing technology demo for Android phone hardware and Windows RTX. Carry a lantern through a wet gothic ruin, fight a skeleton, watch the flame fail, then cross a blue skylight chamber and four coloured-light bays before facing a floating, staff-lit lich.
@@ -27,7 +27,7 @@ This demo is RT or nothing. Unsupported devices receive a clear diagnostic repor
 - Android packaging minimum is Android 7 / API 24, but only Samsung `SM-S948B` on Android 16 is currently device-certified. The driver must expose Vulkan acceleration structures, RT pipeline, ray query, buffer device address, deferred host operations, and required ASTC formats.
 - Windows requires 64-bit Windows 10/11 and a Vulkan driver exposing the same RT extension set. The validated GPU is an NVIDIA GeForce RTX 5050 Laptop GPU.
 
-At the recommended Android 75% RT scale, every required warm route zone remained below 13.7 ms median-of-three-window averages at thermal status 3. A later cool deterministic regression run retained 7.667-16.123 ms across its default checkpoint set. The full 100% extent is report-only and can fall below 50 FPS.
+At the recommended Android 75% RT scale, every required warm route zone remained below 13.7 ms median-of-three-window averages at thermal status 3. The 0.1.2 cool deterministic publication gate retained 10.288-13.929 ms across its default checkpoint set and completed all 12 scene captures. The full 100% extent is report-only and can fall below 50 FPS.
 
 ## Controls
 
