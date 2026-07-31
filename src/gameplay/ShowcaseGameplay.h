@@ -43,14 +43,130 @@ struct LowerBodyPoseState
     float leftStride = 0.0f;
     float rightStride = 0.0f;
     float pelvisBob = 0.0f;
+    float pelvisSway = 0.0f;
+    float torsoTwistRadians = 0.0f;
+    float leftFootLift = 0.0f;
+    float rightFootLift = 0.0f;
+    float leftKneeBend = 0.0f;
+    float rightKneeBend = 0.0f;
+    float leftToeRoll = 0.0f;
+    float rightToeRoll = 0.0f;
 };
+
+enum class PlayerLifePhase
+{
+    Alive,
+    Dying,
+    Dead,
+};
+
+enum class PlayerDamageResult
+{
+    Ignored,
+    Damaged,
+    Killed,
+};
+
+struct PlayerVitalsSnapshot
+{
+    PlayerLifePhase phase = PlayerLifePhase::Alive;
+    int vitality = 3;
+    int maxVitality = 3;
+    float invulnerabilityRemaining = 0.0f;
+    float damageFlash = 0.0f;
+    float deathHoldRemaining = 0.0f;
+};
+
+class PlayerVitals
+{
+public:
+    const PlayerVitalsSnapshot& Update(float deltaSeconds)
+    {
+        deltaSeconds = std::clamp(deltaSeconds, 0.0f, 0.05f);
+        snapshot_.invulnerabilityRemaining =
+            std::max(0.0f, snapshot_.invulnerabilityRemaining - deltaSeconds);
+        snapshot_.damageFlash = std::max(0.0f, snapshot_.damageFlash - deltaSeconds * kDamageFlashDecay);
+        if (snapshot_.phase == PlayerLifePhase::Dying)
+        {
+            snapshot_.deathHoldRemaining = std::max(0.0f, snapshot_.deathHoldRemaining - deltaSeconds);
+            if (snapshot_.deathHoldRemaining <= 0.00001f)
+            {
+                snapshot_.phase = PlayerLifePhase::Dead;
+            }
+        }
+        return snapshot_;
+    }
+
+    PlayerDamageResult TryApplyDamage()
+    {
+        if (snapshot_.phase != PlayerLifePhase::Alive ||
+            snapshot_.invulnerabilityRemaining > 0.00001f)
+        {
+            return PlayerDamageResult::Ignored;
+        }
+
+        snapshot_.vitality = std::max(0, snapshot_.vitality - 1);
+        snapshot_.invulnerabilityRemaining = kInvulnerabilityDuration;
+        snapshot_.damageFlash = 1.0f;
+        if (snapshot_.vitality == 0)
+        {
+            snapshot_.phase = PlayerLifePhase::Dying;
+            snapshot_.deathHoldRemaining = kDeathHoldDuration;
+            return PlayerDamageResult::Killed;
+        }
+        return PlayerDamageResult::Damaged;
+    }
+
+    void ResetForEncounter()
+    {
+        snapshot_ = {};
+    }
+
+    const PlayerVitalsSnapshot& Snapshot() const { return snapshot_; }
+
+    static constexpr int kMaxVitality = 3;
+    static constexpr float kInvulnerabilityDuration = 1.0f;
+    static constexpr float kDeathHoldDuration = 0.65f;
+
+private:
+    static constexpr float kDamageFlashDecay = 2.8f;
+    PlayerVitalsSnapshot snapshot_{};
+};
+
+constexpr const char* PlayerLifePhaseName(PlayerLifePhase phase)
+{
+    switch (phase)
+    {
+    case PlayerLifePhase::Alive: return "alive";
+    case PlayerLifePhase::Dying: return "dying";
+    case PlayerLifePhase::Dead: return "dead";
+    default: return "unknown";
+    }
+}
 
 inline LowerBodyPoseState EvaluateLowerBodyPose(float walkTime, float walkAmount)
 {
-    const float amount = std::clamp(walkAmount, 0.0f, 1.0f);
+    const float rawAmount = std::clamp(walkAmount, 0.0f, 1.0f);
+    const float amount = rawAmount * rawAmount * (3.0f - 2.0f * rawAmount);
     const float phase = walkTime * 6.2f;
-    const float stride = std::sin(phase) * amount;
-    return {phase, stride, -stride, std::abs(std::sin(phase)) * 0.018f * amount};
+    const float gaitSine = std::sin(phase);
+    const float gaitCosine = std::cos(phase);
+    const float leftLift = std::max(0.0f, gaitSine) * amount;
+    const float rightLift = std::max(0.0f, -gaitSine) * amount;
+    LowerBodyPoseState pose;
+    pose.gaitPhase = phase;
+    pose.leftStride = gaitSine * amount;
+    pose.rightStride = -pose.leftStride;
+    pose.pelvisBob = (0.5f - 0.5f * std::cos(phase * 2.0f)) * 0.024f * amount;
+    pose.pelvisSway = -gaitSine * 0.018f * amount;
+    pose.torsoTwistRadians = -gaitSine * 0.055f * amount;
+    pose.leftFootLift = leftLift;
+    pose.rightFootLift = rightLift;
+    pose.leftKneeBend = std::clamp((0.16f + leftLift * 0.84f) * amount, 0.0f, 1.0f);
+    pose.rightKneeBend = std::clamp((0.16f + rightLift * 0.84f) * amount, 0.0f, 1.0f);
+    pose.leftToeRoll = std::max(0.0f, -gaitCosine) * amount;
+    pose.rightToeRoll = std::max(0.0f, gaitCosine) * amount;
+    return pose;
 }
 
 struct SceneLightingState
@@ -355,6 +471,15 @@ enum class LichPhase
     Dead,
 };
 
+enum class FinaleEndingPhase
+{
+    Inactive,
+    LichFalling,
+    SkylightOpening,
+    DawnRevealed,
+    Complete,
+};
+
 struct LichSnapshot
 {
     LichPhase phase = LichPhase::Dormant;
@@ -368,10 +493,12 @@ struct LichSnapshot
     float hitCooldownRemaining = 0.0f;
     float hitRecoil = 0.0f;
     float finaleSkylightOpenProgress = 0.0f;
+    float finaleDawnRevealProgress = 0.0f;
     int health = 3;
     bool damagePulse = false;
     bool hitPulse = false;
     bool deathAnimationComplete = false;
+    FinaleEndingPhase finaleEndingPhase = FinaleEndingPhase::Inactive;
 };
 
 class LichEncounter
@@ -395,18 +522,39 @@ public:
         // authored Dead clip has reached its clamped final pose.
         if (snapshot_.phase == LichPhase::Dead)
         {
+            float remainingDelta = deltaSeconds;
             const float deathTimeRemaining = std::max(0.0f, kDeathAnimationDuration - snapshot_.phaseTime);
-            const float deathDelta = std::min(deltaSeconds, deathTimeRemaining);
+            const float deathDelta = std::min(remainingDelta, deathTimeRemaining);
             snapshot_.phaseTime = std::min(kDeathAnimationDuration, snapshot_.phaseTime + deathDelta);
             snapshot_.animationTime = snapshot_.phaseTime;
+            remainingDelta -= deathDelta;
             snapshot_.deathAnimationComplete =
                 snapshot_.phaseTime + 0.00001f >= kDeathAnimationDuration;
             if (snapshot_.deathAnimationComplete)
             {
-                finaleSkylightOpenTime_ = std::min(kFinaleSkylightOpenDuration,
-                                                   finaleSkylightOpenTime_ + (deltaSeconds - deathDelta));
+                snapshot_.finaleEndingPhase = FinaleEndingPhase::SkylightOpening;
+                const float skylightTimeRemaining =
+                    std::max(0.0f, kFinaleSkylightOpenDuration - finaleSkylightOpenTime_);
+                const float skylightDelta = std::min(remainingDelta, skylightTimeRemaining);
+                finaleSkylightOpenTime_ = std::min(
+                    kFinaleSkylightOpenDuration,
+                    finaleSkylightOpenTime_ + skylightDelta);
+                remainingDelta -= skylightDelta;
                 snapshot_.finaleSkylightOpenProgress =
                     finaleSkylightOpenTime_ / kFinaleSkylightOpenDuration;
+                if (snapshot_.finaleSkylightOpenProgress + 0.00001f >= 1.0f)
+                {
+                    snapshot_.finaleEndingPhase = FinaleEndingPhase::DawnRevealed;
+                    finaleDawnRevealTime_ = std::min(
+                        kFinaleDawnRevealDuration,
+                        finaleDawnRevealTime_ + remainingDelta);
+                    snapshot_.finaleDawnRevealProgress =
+                        finaleDawnRevealTime_ / kFinaleDawnRevealDuration;
+                    if (snapshot_.finaleDawnRevealProgress + 0.00001f >= 1.0f)
+                    {
+                        snapshot_.finaleEndingPhase = FinaleEndingPhase::Complete;
+                    }
+                }
             }
             snapshot_.staffLightStrength = 0.0f;
             return snapshot_;
@@ -513,6 +661,7 @@ public:
         hitPulseTime_ = 0.0f;
         hitRecoilTime_ = 0.0f;
         finaleSkylightOpenTime_ = 0.0f;
+        finaleDawnRevealTime_ = 0.0f;
     }
 
     const LichSnapshot& Snapshot() const { return snapshot_; }
@@ -521,6 +670,7 @@ public:
     static constexpr float kRecoveryDuration = 1.80f;
     static constexpr float kDeathAnimationDuration = 2.967f;
     static constexpr float kFinaleSkylightOpenDuration = 4.50f;
+    static constexpr float kFinaleDawnRevealDuration = 1.75f;
     static constexpr float kMinimumRepositionDuration = 0.65f;
     static constexpr float kAttackRange = 7.0f;
     static constexpr float kPreferredMinRange = 3.0f;
@@ -541,7 +691,10 @@ private:
         snapshot_.damagePulse = false;
         snapshot_.deathAnimationComplete = false;
         snapshot_.finaleSkylightOpenProgress = 0.0f;
+        snapshot_.finaleDawnRevealProgress = 0.0f;
+        snapshot_.finaleEndingPhase = FinaleEndingPhase::LichFalling;
         finaleSkylightOpenTime_ = 0.0f;
+        finaleDawnRevealTime_ = 0.0f;
     }
     static constexpr float MovementScaleForPhase(LichPhase phase)
     {
@@ -591,6 +744,7 @@ private:
     float hitPulseTime_ = 0.0f;
     float hitRecoilTime_ = 0.0f;
     float finaleSkylightOpenTime_ = 0.0f;
+    float finaleDawnRevealTime_ = 0.0f;
 };
 
 } // namespace horde::gameplay

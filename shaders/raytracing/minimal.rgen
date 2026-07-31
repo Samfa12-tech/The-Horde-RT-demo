@@ -53,6 +53,7 @@ layout(push_constant) uniform SceneControls
     float staffY;
     float staffZ;
     float finaleSkylightOpen;
+    float finaleDawnReveal;
     float heldPropDepth;
 } controls;
 
@@ -187,10 +188,28 @@ void materialForPrimitive(int primitive,
     {
         normal = normalize(vec3(controls.cameraX, 0.75, controls.cameraZ) - p);
         geometricNormal = normal;
-        bool boots = instance == 14 || instance == 15;
-        base = boots ? vec3(0.045, 0.022, 0.012) : vec3(0.12, 0.045, 0.018);
-        metallic = boots ? 0.02 : 0.06;
-        reflectivity = boots ? 0.11 : 0.18;
+        if (instance == 4)
+        {
+            bool brass = primitive >= 60 && primitive < 72;
+            bool leather = (primitive >= 48 && primitive < 60) ||
+                           (primitive >= 72 && primitive < 96) || primitive >= 120;
+            base = brass ? vec3(0.52, 0.29, 0.065) :
+                   (leather ? vec3(0.24, 0.090, 0.030) : vec3(0.18, 0.028, 0.034));
+            metallic = brass ? 0.82 : (leather ? 0.08 : 0.0);
+            reflectivity = brass ? 0.72 : (leather ? 0.20 : 0.08);
+        }
+        else
+        {
+            bool boots = instance == 14 || instance == 15;
+            bool leather = instance == 6 || instance == 8 || instance == 9 ||
+                           instance == 11 || instance == 13;
+            bool head = instance == 16;
+            base = boots ? vec3(0.028, 0.014, 0.011) :
+                   (head ? vec3(0.16, 0.085, 0.055) :
+                   (leather ? vec3(0.19, 0.064, 0.023) : vec3(0.14, 0.024, 0.030)));
+            metallic = boots ? 0.02 : (leather ? 0.05 : 0.0);
+            reflectivity = boots ? 0.13 : (leather ? 0.18 : 0.08);
+        }
         emissive = 0.0;
         return;
     }
@@ -492,7 +511,13 @@ vec3 shadePrimary(HitInfo h, vec3 rayDirection)
 {
     if (!h.hit)
     {
-        return skyColor(rayDirection);
+        vec3 nightSky = skyColor(rayDirection);
+        bool cameraInFinale = controls.cameraX >= -36.9 && controls.cameraX <= -30.5 &&
+                              controls.cameraZ >= -18.4 && controls.cameraZ <= -12.0;
+        float dawn = cameraInFinale ? smoothstep(0.0, 1.0, controls.finaleDawnReveal) : 0.0;
+        vec3 dawnSky = mix(vec3(0.34, 0.14, 0.09), vec3(1.05, 0.52, 0.22),
+                           smoothstep(-0.12, 0.52, rayDirection.y));
+        return mix(nightSky, dawnSky, dawn);
     }
     if (h.emissive > 0.0)
     {
@@ -592,7 +617,9 @@ vec3 shadePrimary(HitInfo h, vec3 rayDirection)
     vec3 moonHalf = normalize(skyDirection - rayDirection);
     float moonSpecular = pow(max(dot(h.normal, moonHalf), 0.0), mix(12.0, 96.0, reflective));
     float moonFresnel = pow(1.0 - max(dot(h.normal, -rayDirection), 0.0), 5.0);
-    vec3 moonRadiance = finaleSkylightActive ? vec3(0.38, 0.52, 0.76) :
+    vec3 finaleRadiance = mix(vec3(0.38, 0.52, 0.76), vec3(1.12, 0.54, 0.23),
+                              smoothstep(0.0, 1.0, controls.finaleDawnReveal));
+    vec3 moonRadiance = finaleSkylightActive ? finaleRadiance :
                         (inSkylightChamber ? vec3(0.28, 0.44, 0.72) : vec3(0.26, 0.34, 0.48));
 
     // Keep the one RT bounce deterministic. The previous time-varying hemisphere sample was the main source of shimmer.

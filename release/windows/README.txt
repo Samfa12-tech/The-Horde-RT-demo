@@ -1,4 +1,4 @@
-HORDE LANTERN RT - SHOWCASE ALPHA 0.1.2
+HORDE LANTERN RT - SHOWCASE ALPHA 0.1.3
 =======================================
 
 This is a native Vulkan hardware-ray-tracing technology demo from Samfa12.
@@ -37,11 +37,12 @@ and does not silently start a fallback renderer.
 
 SHOWCASE CONTENT
 - Skeleton encounter followed by a three-turn shadow corridor
-- Authored lantern gutter, drop, and first-person body transition
+- Rebuilt low-poly coat/body with articulated first-person walking
+- Three-point vitality, encounter retry, and route restart flow
 - Blue skylight chamber and four bay-selected coloured torch environments
 - Open framed threshold, wet stone, and a single-bounce hero mirror
 - Floating staff-lit lich finale with violet charge electricity, three-hit combat,
-  hit recoil/cry, death animation, and a post-defeat sliding roof aperture
+  hit recoil/cry, death animation, opening roof, returning dawn, and epilogue
 - Native Vulkan BLAS/TLAS, RT pipeline/SBT and vkCmdTraceRaysKHR presentation
 - Phone-safe ray-query shading work inside raygen
 - Seventeen FilmCow UI, combat, movement, skeleton, and lich sound cues

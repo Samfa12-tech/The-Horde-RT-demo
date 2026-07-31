@@ -1,6 +1,7 @@
 #include <cmath>
 #include <iostream>
 
+#include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/SwordCombat.h"
 
 int main()
@@ -30,12 +31,28 @@ int main()
         }
     }
 
+    int playerHitPulses = 0;
+    bool previousPlayerHitPulse = false;
+    bool repeatedPlayerHitPulse = false;
+    int acceptedPlayerHits = 0;
+    horde::gameplay::PlayerVitals attackedPlayer;
     horde::gameplay::SwordCombat enemyAttack;
     bool sawDamage = false;
-    for (int frame = 0; frame < 1000; ++frame)
+    for (int frame = 0; frame < 2000; ++frame)
     {
+        attackedPlayer.Update(dt);
         const auto& snapshot = enemyAttack.Update(dt, 0.0f, -0.8f, 0.0f);
         sawDamage = sawDamage || snapshot.damageFlash > 0.5f;
+        if (snapshot.playerHitPulse)
+        {
+            ++playerHitPulses;
+            repeatedPlayerHitPulse = repeatedPlayerHitPulse || previousPlayerHitPulse;
+            if (attackedPlayer.TryApplyDamage() != horde::gameplay::PlayerDamageResult::Ignored)
+            {
+                ++acceptedPlayerHits;
+            }
+        }
+        previousPlayerHitPulse = snapshot.playerHitPulse;
     }
 
     horde::gameplay::SwordCombat leashedEnemy;
@@ -67,15 +84,21 @@ int main()
                           std::abs(snapshot.enemyZ - beforeLeash.enemyZ) < 0.001f;
     }
 
-    if (!sawSwing || !sawDeath || !sawRespawn || !sawDamage || !stayedInsideArena || !idledBeyondDoor ||
-        idleWalkTransitions > 2)
+    if (!sawSwing || !sawDeath || !sawRespawn || !sawDamage ||
+        playerHitPulses < horde::gameplay::PlayerVitals::kMaxVitality ||
+        acceptedPlayerHits != horde::gameplay::PlayerVitals::kMaxVitality ||
+        attackedPlayer.Snapshot().phase != horde::gameplay::PlayerLifePhase::Dead ||
+        repeatedPlayerHitPulse || !stayedInsideArena || !idledBeyondDoor || idleWalkTransitions > 2)
     {
         std::cerr << "Combat smoke failed: swing=" << sawSwing << " death=" << sawDeath
                   << " respawn=" << sawRespawn << " damage=" << sawDamage
                   << " enemyCollision=" << stayedInsideArena << " leash=" << idledBeyondDoor
+                  << " hitPulses=" << playerHitPulses << " repeatedPulse=" << repeatedPlayerHitPulse
+                  << " acceptedPlayerHits=" << acceptedPlayerHits
                   << " idleWalkTransitions=" << idleWalkTransitions << '\n';
         return 1;
     }
-    std::cout << "Combat smoke passed: swing, hit/death, respawn, damage, collision, and route leash.\n";
+    std::cout << "Combat smoke passed: swing, hit/death, respawn, single-frame damage pulses, "
+                 "three-vitality routing, collision, and route leash.\n";
     return 0;
 }

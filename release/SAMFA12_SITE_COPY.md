@@ -1,9 +1,9 @@
-# Horde Lantern RT - showcase alpha 0.1.2
+# Horde Lantern RT - showcase alpha 0.1.3
 
-Public package version: `0.1.2-alpha.1`
+Public package version: `0.1.3-alpha.1`
 Canonical downloads: https://samfa12.itch.io/the-horde
 
-Horde Lantern RT is a short native Vulkan hardware-ray-tracing technology demo for Android phone hardware and Windows RTX. Carry a lantern through a wet gothic ruin, fight a skeleton, watch the flame fail, then cross a blue skylight chamber and four coloured-light bays before facing a floating, staff-lit lich.
+Horde Lantern RT is a short native Vulkan hardware-ray-tracing technology demo for Android phone hardware and Windows RTX. Carry a lantern through a wet gothic ruin, fight a skeleton, watch the flame fail, cross a blue skylight chamber and four coloured-light bays, then defeat a floating, staff-lit lich and return dawn to the ruin.
 
 ## This alpha proves
 
@@ -13,6 +13,7 @@ Horde Lantern RT is a short native Vulkan hardware-ray-tracing technology demo f
 - Phone-safe `rayQueryEXT` shading inside raygen rather than a raster fallback.
 - Moving lantern shadows, bounded coloured lighting, a hero mirror, wet stone, and emissive enemy effects.
 - One shared scene and gameplay route across Android and Windows.
+- A rebuilt low-poly player body with articulated walking, vitality, encounter retry, and a complete post-lich epilogue.
 
 ## Downloads
 
@@ -27,7 +28,7 @@ This demo is RT or nothing. Unsupported devices receive a clear diagnostic repor
 - Android packaging minimum is Android 7 / API 24, but only Samsung `SM-S948B` on Android 16 is currently device-certified. The driver must expose Vulkan acceleration structures, RT pipeline, ray query, buffer device address, deferred host operations, and required ASTC formats.
 - Windows requires 64-bit Windows 10/11 and a Vulkan driver exposing the same RT extension set. The validated GPU is an NVIDIA GeForce RTX 5050 Laptop GPU.
 
-At the recommended Android 75% RT scale, every required warm route zone remained below 13.7 ms median-of-three-window averages at thermal status 3. The 0.1.2 cool deterministic publication gate retained 10.288-13.929 ms across its default checkpoint set and completed all 12 scene captures. The full 100% extent is report-only and can fall below 50 FPS.
+At the recommended Android 75% RT scale, the 0.1.3 connected Debug gate completed all five measured checkpoints, all 13 replay waypoints, all 12 scene captures, and Home/resume with honest RT presentation. The measured checkpoints ranged from 7.096 to 15.727 ms; two later cool/status-0 lich samples measured 13.723 and 13.600 ms. The full 100% extent remains report-only and can fall below 50 FPS.
 
 ## Controls
 

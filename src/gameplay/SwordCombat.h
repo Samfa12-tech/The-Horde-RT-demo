@@ -24,6 +24,7 @@ struct CombatSnapshot
     float enemyFacingRadians = 0.0f;
     float enemyAnimationTime = 0.0f;
     float damageFlash = 0.0f;
+    bool playerHitPulse = false;
     EnemyAnimation enemyAnimation = EnemyAnimation::Idle;
 };
 
@@ -40,6 +41,7 @@ public:
     const CombatSnapshot& Update(float deltaSeconds, float playerX, float playerZ, float playerYaw)
     {
         deltaSeconds = std::clamp(deltaSeconds, 0.0f, 0.05f);
+        snapshot_.playerHitPulse = false;
         damageFlash_ = std::max(0.0f, damageFlash_ - deltaSeconds * 2.8f);
         walkAnimationHold_ = std::max(0.0f, walkAnimationHold_ - deltaSeconds);
 
@@ -147,6 +149,7 @@ public:
             {
                 playerHitApplied_ = true;
                 damageFlash_ = 1.0f;
+                snapshot_.playerHitPulse = true;
             }
             if (phaseTime_ >= kEnemyAttackDuration)
             {

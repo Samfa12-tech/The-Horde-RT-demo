@@ -1,9 +1,13 @@
 package com.samfa12.hordelanternrt;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ClipData;
+import android.content.BroadcastReceiver;
 import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.graphics.Color;
@@ -12,12 +16,14 @@ import android.graphics.drawable.GradientDrawable;
 import android.media.AudioAttributes;
 import android.media.SoundPool;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
 import android.util.Log;
+import android.view.HapticFeedbackConstants;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.Surface;
@@ -61,6 +67,8 @@ public class MainActivity extends Activity {
     private static final String EXTRA_DEBUG_SCALE = "horde.debug.scale";
     private static final String EXTRA_DEBUG_AUTOSTART = "horde.debug.autostart";
     private static final String EXTRA_DEBUG_OVERLAY = "horde.debug.overlay";
+    private static final String DEBUG_RETRY_ACTION =
+            "com.samfa12.hordelanternrt.DEBUG_RETRY_ENCOUNTER";
     private static final int REQUEST_SAVE_BENCHMARK = 7101;
     private static final int AUDIO_EVENT_ENEMY_DEFEATED = 1;
     private static final int AUDIO_EVENT_PLAYER_FOOTSTEP = 1 << 1;
@@ -70,6 +78,12 @@ public class MainActivity extends Activity {
     private static final int AUDIO_EVENT_LICH_IMPACT = 1 << 5;
     private static final int AUDIO_EVENT_LICH_DEFEATED = 1 << 6;
     private static final int AUDIO_EVENT_LICH_HIT = 1 << 7;
+    private static final int AUDIO_EVENT_PLAYER_DAMAGED = 1 << 8;
+    private static final int AUDIO_EVENT_PLAYER_KILLED = 1 << 9;
+    private static final int PLAYER_ALIVE = 0;
+    private static final int PLAYER_DYING = 1;
+    private static final int PLAYER_DEAD = 2;
+    private static final int FINALE_ENDING_COMPLETE = 4;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final float[] viewControls = {0.0f, 0.0f, 1.8f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
@@ -86,6 +100,7 @@ public class MainActivity extends Activity {
     private TextView rtStatus;
     private TextView developerOverlay;
     private Button menuButton;
+    private TextView vitalityStatus;
     private Button attackButton;
     private SoundPool soundPool;
     private String reportText = "";
@@ -110,6 +125,13 @@ public class MainActivity extends Activity {
     private boolean benchmarkRunning;
     private boolean benchmarkReportVisible;
     private String latestBenchmarkReport = "";
+    private BroadcastReceiver debugRetryReceiver;
+    private boolean deathOverlayVisible;
+    private boolean endingOverlayVisible;
+    private boolean endingOverlayDismissed;
+    private boolean retryPending;
+    private int lastPlayerLifePhase = PLAYER_ALIVE;
+    private int lastPlayerVitality = 3;
     private final Runnable applyPendingRenderScale = () ->
             ProbeBridge.setRenderScale(preferences.getInt("render_scale", 100) / 100.0f);
 
@@ -131,6 +153,7 @@ public class MainActivity extends Activity {
         developerOverlay = findViewById(R.id.developer_overlay);
         menuButton = findViewById(R.id.menu_button);
         attackButton = findViewById(R.id.attack_button);
+        vitalityStatus = findViewById(R.id.vitality_status);
         final Button diagnosticsBack = findViewById(R.id.diagnostics_back);
 
         styleActionButton(menuButton, 0xCC1A1713, 0xFFFFD28A);
@@ -138,12 +161,14 @@ public class MainActivity extends Activity {
         styleActionButton(diagnosticsBack, 0xCC211B15, 0xFFFFD28A);
         menuButton.setContentDescription(getString(R.string.menu));
         attackButton.setContentDescription(getString(R.string.swing));
+        updateVitalityHud(3);
         if (isDebuggableApp()) {
             rtStatus.setOnLongClickListener(view -> {
                 developerOverlayVisible = !developerOverlayVisible;
                 if (!developerOverlayVisible) developerOverlay.setVisibility(View.GONE);
                 return true;
             });
+            registerDebugRetryReceiver();
         }
 
         initialiseAudio();
@@ -152,7 +177,7 @@ public class MainActivity extends Activity {
             showMainMenu(false);
         });
         attackButton.setOnClickListener(view -> {
-            if (menuVisible || diagnosticsVisible || ProbeBridge.getRuntimeState() != 1) return;
+            if (menuVisible || diagnosticsVisible || deathOverlayVisible || ProbeBridge.getRuntimeState() != 1) return;
             ProbeBridge.requestAttack();
             playSound((swingVariant++ & 1) == 0 ? "sword_swing_1" : "sword_swing_2", 0.28f);
         });
@@ -252,7 +277,7 @@ public class MainActivity extends Activity {
 
     private void configureTouchControls() {
         surfaceView.setOnTouchListener((view, event) -> {
-            if (menuVisible || diagnosticsVisible || ProbeBridge.getRuntimeState() != 1) return true;
+            if (menuVisible || diagnosticsVisible || deathOverlayVisible || ProbeBridge.getRuntimeState() != 1) return true;
             final int action = event.getActionMasked();
             if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
                 final int index = event.getActionIndex();
@@ -316,6 +341,7 @@ public class MainActivity extends Activity {
         attackButton.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
+        vitalityStatus.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);
         menuScrim.setVisibility(View.VISIBLE);
         menuScrim.removeAllViews();
@@ -370,6 +396,7 @@ public class MainActivity extends Activity {
         menuButton.setVisibility(View.GONE);
         attackButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.VISIBLE);
+        vitalityStatus.setVisibility(View.GONE);
         rtStatus.setText(R.string.benchmark_starting);
     }
 
@@ -384,6 +411,7 @@ public class MainActivity extends Activity {
         menuButton.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
+        vitalityStatus.setVisibility(View.GONE);
         diagnosticsPanel.setVisibility(View.GONE);
         menuScrim.setVisibility(View.VISIBLE);
         menuScrim.removeAllViews();
@@ -429,12 +457,18 @@ public class MainActivity extends Activity {
     }
 
     private void hideMenu() {
+        if (deathOverlayVisible) {
+            return;
+        }
         menuVisible = false;
         menuScrim.setVisibility(View.GONE);
         final boolean showHud = preferences.getBoolean("show_hud", true);
         menuButton.setVisibility(showHud ? View.VISIBLE : View.GONE);
-        attackButton.setVisibility(ProbeBridge.getRuntimeState() == 1 ? View.VISIBLE : View.GONE);
+        attackButton.setVisibility(showHud && ProbeBridge.getRuntimeState() == 1 &&
+                lastPlayerLifePhase == PLAYER_ALIVE
+                ? View.VISIBLE : View.GONE);
         rtStatus.setVisibility(showHud ? View.VISIBLE : View.GONE);
+        vitalityStatus.setVisibility(showHud && lastPlayerLifePhase == PLAYER_ALIVE ? View.VISIBLE : View.GONE);
         ProbeBridge.setSimulationPaused(false);
     }
 
@@ -511,6 +545,8 @@ public class MainActivity extends Activity {
         menuScrim.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         attackButton.setVisibility(View.GONE);
+        rtStatus.setVisibility(View.GONE);
+        vitalityStatus.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);
         refreshDiagnosticsText();
         diagnosticsPanel.setVisibility(View.VISIBLE);
@@ -530,12 +566,119 @@ public class MainActivity extends Activity {
     }
 
     private void resetRoute() {
+        endingOverlayVisible = false;
+        endingOverlayDismissed = false;
         for (int i = 0; i < viewControls.length; ++i) viewControls[i] = 0.0f;
         viewControls[2] = 1.8f;
         activePointers[0] = -1;
         activePointers[1] = -1;
         ProbeBridge.requestRouteReset();
         pushViewControls();
+    }
+
+    private void updateVitalityHud(final int vitality) {
+        final int safeVitality = Math.max(0, Math.min(3, vitality));
+        lastPlayerVitality = safeVitality;
+        vitalityStatus.setText("VITALITY  " + safeVitality + " / 3");
+        vitalityStatus.setContentDescription(getString(R.string.vitality_accessibility, safeVitality));
+        if (safeVitality >= 3) {
+            vitalityStatus.setTextColor(0xFFFFD07A);
+        } else if (safeVitality == 2) {
+            vitalityStatus.setTextColor(0xFFFFA84F);
+        } else {
+            vitalityStatus.setTextColor(0xFFFF705C);
+        }
+    }
+
+    private void showDeathOverlay() {
+        if (deathOverlayVisible || benchmarkRunning || debugCaptureUiSuppressed) return;
+        deathOverlayVisible = true;
+        menuVisible = true;
+        ProbeBridge.setSimulationPaused(true);
+        clearTouchState();
+        attackButton.setVisibility(View.GONE);
+        menuButton.setVisibility(View.GONE);
+        rtStatus.setVisibility(View.GONE);
+        vitalityStatus.setVisibility(View.GONE);
+        developerOverlay.setVisibility(View.GONE);
+        diagnosticsPanel.setVisibility(View.GONE);
+        menuScrim.setVisibility(View.VISIBLE);
+        menuScrim.removeAllViews();
+
+        final LinearLayout panel = createPanel(getString(R.string.you_fell), getString(R.string.death_message));
+        addMenuButtonRow(panel,
+                getString(R.string.retry_encounter), this::retryEncounter,
+                getString(R.string.restart_route), this::restartAfterDeath);
+        addMenuButton(panel, getString(R.string.quit), this::finishAndRemoveTask);
+        attachPanel(panel);
+    }
+
+    private void showEndingOverlay() {
+        if (endingOverlayVisible || endingOverlayDismissed || deathOverlayVisible ||
+                benchmarkRunning || debugCaptureUiSuppressed) return;
+        endingOverlayVisible = true;
+        menuVisible = true;
+        ProbeBridge.setSimulationPaused(true);
+        clearTouchState();
+        attackButton.setVisibility(View.GONE);
+        menuButton.setVisibility(View.GONE);
+        rtStatus.setVisibility(View.GONE);
+        vitalityStatus.setVisibility(View.GONE);
+        developerOverlay.setVisibility(View.GONE);
+        diagnosticsPanel.setVisibility(View.GONE);
+        menuScrim.setVisibility(View.VISIBLE);
+        menuScrim.removeAllViews();
+
+        final LinearLayout panel = createPanel(getString(R.string.ending_title),
+                getString(R.string.ending_subtitle));
+        addBody(panel, getString(R.string.ending_body));
+        addMenuButtonRow(panel,
+                getString(R.string.continue_in_ruin), this::continueAfterEnding,
+                getString(R.string.begin_again), this::restartAfterEnding);
+        addMenuButton(panel, getString(R.string.quit), this::finishAndRemoveTask);
+        attachPanel(panel);
+    }
+
+    private void continueAfterEnding() {
+        playSound("ui_select", 0.18f);
+        endingOverlayVisible = false;
+        endingOverlayDismissed = true;
+        firstMenu = false;
+        hideMenu();
+    }
+
+    private void restartAfterEnding() {
+        playSound("ui_select", 0.18f);
+        endingOverlayVisible = false;
+        resetRoute();
+        firstMenu = false;
+        hideMenu();
+    }
+
+    private void retryEncounter() {
+        if (retryPending) {
+            return;
+        }
+        final int checkpoint = ProbeBridge.retryEncounter();
+        if (checkpoint < 0) {
+            Toast.makeText(this, R.string.retry_unavailable, Toast.LENGTH_LONG).show();
+            return;
+        }
+        retryPending = true;
+        applyCheckpointViewPose(checkpoint);
+        clearTouchState();
+        pushViewControls();
+        Toast.makeText(this, R.string.retrying_encounter, Toast.LENGTH_SHORT).show();
+    }
+
+    private void restartAfterDeath() {
+        retryPending = false;
+        resetRoute();
+        deathOverlayVisible = false;
+        lastPlayerLifePhase = PLAYER_ALIVE;
+        updateVitalityHud(3);
+        firstMenu = false;
+        hideMenu();
     }
 
     private final Runnable runtimePoll = new Runnable() {
@@ -546,12 +689,39 @@ public class MainActivity extends Activity {
                 if (state == 1) {
                     rtStatus.setText(R.string.rt_active);
                     rtStatus.setTextColor(0xFFFFD07A);
-                    if (!debugCaptureUiSuppressed && !menuVisible && preferences.getBoolean("show_hud", true)) {
+                    final int vitality = ProbeBridge.getPlayerVitality();
+                    final int lifePhase = ProbeBridge.getPlayerLifePhase();
+                    final int finaleEndingPhase = ProbeBridge.getFinaleEndingPhase();
+                    if (vitality != lastPlayerVitality) updateVitalityHud(vitality);
+                    lastPlayerLifePhase = lifePhase;
+                    if (deathOverlayVisible && lifePhase == PLAYER_ALIVE) {
+                        deathOverlayVisible = false;
+                        if (retryPending) {
+                            retryPending = false;
+                            firstMenu = false;
+                            hideMenu();
+                        } else {
+                            showMainMenu(false);
+                        }
+                    }
+                    final boolean showHud = preferences.getBoolean("show_hud", true);
+                    if (!debugCaptureUiSuppressed && !menuVisible && !benchmarkRunning && showHud &&
+                            lifePhase == PLAYER_ALIVE) {
                         attackButton.setVisibility(View.VISIBLE);
                     }
-                    if (debugAutomationAutostart && menuVisible) hideMenu();
+                    if (!debugCaptureUiSuppressed && !menuVisible && !benchmarkRunning && showHud &&
+                            lifePhase != PLAYER_DEAD) {
+                        vitalityStatus.setVisibility(View.VISIBLE);
+                    }
+                    if (lifePhase != PLAYER_ALIVE) {
+                        clearTouchState();
+                        attackButton.setVisibility(View.GONE);
+                    }
+                    if (lifePhase == PLAYER_DEAD) showDeathOverlay();
+                    if (finaleEndingPhase == FINALE_ENDING_COMPLETE) showEndingOverlay();
+                    if (debugAutomationAutostart && menuVisible && !deathOverlayVisible && !endingOverlayVisible) hideMenu();
                     if (pendingDebugCheckpoint >= 0) {
-                        applyDebugCheckpointViewPose(pendingDebugCheckpoint);
+                        applyCheckpointViewPose(pendingDebugCheckpoint);
                         clearTouchState();
                         final int checkpoint = pendingDebugCheckpoint;
                         pendingDebugCheckpoint = -1;
@@ -601,6 +771,7 @@ public class MainActivity extends Activity {
                         rtStatus.setVisibility(View.VISIBLE);
                         menuButton.setVisibility(View.GONE);
                         attackButton.setVisibility(View.GONE);
+                        vitalityStatus.setVisibility(View.GONE);
                     } else if (benchmarkStatus == 2 || benchmarkStatus == 3) {
                         latestBenchmarkReport = ProbeBridge.getBenchmarkReport();
                         if (latestBenchmarkReport.isEmpty()) {
@@ -649,6 +820,11 @@ public class MainActivity extends Activity {
                     // The hurt source includes its own impact; layering the
                     // fencing hit masks the short vocal reaction.
                     playSpatialSound("lich_hurt", 0.82f, enemyStereoGains);
+                }
+                if ((events & AUDIO_EVENT_PLAYER_KILLED) != 0) {
+                    surfaceView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+                } else if ((events & AUDIO_EVENT_PLAYER_DAMAGED) != 0) {
+                    surfaceView.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK);
                 }
                 if (diagnosticsVisible && ++diagnosticsRefreshTick >= 5) {
                     diagnosticsRefreshTick = 0;
@@ -719,7 +895,34 @@ public class MainActivity extends Activity {
         }
     }
 
+    @SuppressLint("UnspecifiedRegisterReceiverFlag") // API 24-32 require the legacy overload.
+    private void registerDebugRetryReceiver() {
+        debugRetryReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(final Context context, final Intent intent) {
+                if (intent == null || !DEBUG_RETRY_ACTION.equals(intent.getAction())) return;
+                if (ProbeBridge.getRuntimeState() != 1 ||
+                        ProbeBridge.getPlayerLifePhase() != PLAYER_DEAD) {
+                    Log.w(TAG, "Rejected debug encounter-retry broadcast outside Dead state.");
+                    return;
+                }
+                Log.i(TAG, "Accepted debug encounter-retry broadcast.");
+                retryEncounter();
+            }
+        };
+        final IntentFilter filter = new IntentFilter(DEBUG_RETRY_ACTION);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(debugRetryReceiver, filter, Context.RECEIVER_EXPORTED);
+        } else {
+            registerReceiver(debugRetryReceiver, filter);
+        }
+    }
+
     private void suppressUiForDebugCapture() {
+        retryPending = false;
+        deathOverlayVisible = false;
+        endingOverlayVisible = false;
+        endingOverlayDismissed = true;
         debugCaptureUiSuppressed = true;
         developerOverlayVisible = false;
         menuVisible = false;
@@ -730,11 +933,12 @@ public class MainActivity extends Activity {
         menuButton.setVisibility(View.GONE);
         attackButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
+        vitalityStatus.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);
         clearTouchState();
     }
 
-    private void applyDebugCheckpointViewPose(final int checkpoint) {
+    private void applyCheckpointViewPose(final int checkpoint) {
         switch (checkpoint) {
             case 0: viewControls[0] = 0.0f; viewControls[1] = -0.05f; break;
             case 1: viewControls[0] = 0.0f; viewControls[1] = 0.0f; break;
@@ -974,7 +1178,6 @@ public class MainActivity extends Activity {
         button.setTextColor(text);
         button.setMinHeight(dp(48));
     }
-
     private LinearLayout.LayoutParams matchWrap() {
         return new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
     }
@@ -1041,6 +1244,14 @@ public class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
+        if (deathOverlayVisible) {
+            return;
+        }
+        if (endingOverlayVisible) {
+            continueAfterEnding();
+            return;
+        }
+
         if (benchmarkRunning) {
             ProbeBridge.cancelBenchmark();
             benchmarkRunning = false;
@@ -1084,6 +1295,15 @@ public class MainActivity extends Activity {
     @Override
     protected void onPause() {
         resumed = false;
+        if (deathOverlayVisible || retryPending || endingOverlayVisible) {
+            retryPending = false;
+            deathOverlayVisible = false;
+            endingOverlayVisible = false;
+            endingOverlayDismissed = false;
+            lastPlayerLifePhase = PLAYER_ALIVE;
+            updateVitalityHud(3);
+            showMainMenu(false);
+        }
         if (benchmarkRunning) {
             ProbeBridge.cancelBenchmark();
             benchmarkRunning = false;
@@ -1097,6 +1317,10 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         handler.removeCallbacksAndMessages(null);
+        if (debugRetryReceiver != null) {
+            unregisterReceiver(debugRetryReceiver);
+            debugRetryReceiver = null;
+        }
         stopSurface();
         if (soundPool != null) soundPool.release();
         super.onDestroy();

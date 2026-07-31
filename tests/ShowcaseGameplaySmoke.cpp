@@ -28,6 +28,90 @@ int main()
         }
     };
 
+    PlayerVitals vitals;
+    check(vitals.Snapshot().phase == PlayerLifePhase::Alive &&
+          vitals.Snapshot().vitality == PlayerVitals::kMaxVitality &&
+          vitals.Snapshot().maxVitality == PlayerVitals::kMaxVitality,
+          "player vitality must begin alive and full");
+    check(vitals.TryApplyDamage() == PlayerDamageResult::Damaged &&
+          vitals.Snapshot().vitality == 2 && NearlyEqual(vitals.Snapshot().damageFlash, 1.0f),
+          "first accepted hit must remove one vitality and start feedback");
+    check(vitals.TryApplyDamage() == PlayerDamageResult::Ignored && vitals.Snapshot().vitality == 2,
+          "invulnerability must reject an immediate repeated hit");
+    for (int frame = 0; frame < 19; ++frame)
+    {
+        vitals.Update(0.05f);
+    }
+    check(vitals.TryApplyDamage() == PlayerDamageResult::Ignored && vitals.Snapshot().vitality == 2,
+          "invulnerability must remain active before one second");
+    vitals.Update(0.05f);
+    check(vitals.TryApplyDamage() == PlayerDamageResult::Damaged && vitals.Snapshot().vitality == 1,
+          "damage must be accepted when the one-second guard expires");
+    for (int frame = 0; frame < 20; ++frame)
+    {
+        vitals.Update(0.05f);
+    }
+    check(vitals.TryApplyDamage() == PlayerDamageResult::Killed &&
+          vitals.Snapshot().vitality == 0 && vitals.Snapshot().phase == PlayerLifePhase::Dying,
+          "third accepted hit must begin the fatal hold");
+    for (int frame = 0; frame < 12; ++frame)
+    {
+        vitals.Update(0.05f);
+    }
+    check(vitals.Snapshot().phase == PlayerLifePhase::Dying,
+          "fatal hold must keep the RT scene visible before 0.65 seconds");
+    vitals.Update(0.05f);
+    check(vitals.Snapshot().phase == PlayerLifePhase::Dead,
+          "fatal hold must end in the dead phase at 0.65 seconds");
+    check(vitals.TryApplyDamage() == PlayerDamageResult::Ignored,
+          "dead players must reject further damage");
+    vitals.Update(10.0f);
+    check(vitals.Snapshot().phase == PlayerLifePhase::Dead &&
+          vitals.Snapshot().vitality == 0,
+          "oversized updates must not revive a dead player");
+    vitals.ResetForEncounter();
+    check(vitals.Snapshot().phase == PlayerLifePhase::Alive &&
+          vitals.Snapshot().vitality == PlayerVitals::kMaxVitality &&
+          NearlyEqual(vitals.Snapshot().invulnerabilityRemaining, 0.0f) &&
+          NearlyEqual(vitals.Snapshot().damageFlash, 0.0f) &&
+          NearlyEqual(vitals.Snapshot().deathHoldRemaining, 0.0f),
+          "encounter reset must restore full vitality and clear every timer");
+
+    PlayerVitals clampedFatalHold;
+    check(clampedFatalHold.TryApplyDamage() == PlayerDamageResult::Damaged,
+          "clamp test first hit must be accepted");
+    for (int hit = 0; hit < 2; ++hit)
+    {
+        for (int frame = 0; frame < 20; ++frame)
+        {
+            clampedFatalHold.Update(0.05f);
+        }
+        clampedFatalHold.TryApplyDamage();
+    }
+    clampedFatalHold.Update(10.0f);
+    check(clampedFatalHold.Snapshot().phase == PlayerLifePhase::Dying &&
+          NearlyEqual(clampedFatalHold.Snapshot().deathHoldRemaining, 0.60f, 0.001f),
+          "oversized updates must clamp to 50 ms instead of skipping the fatal hold");
+
+    const ShowcaseCheckpoint* skeletonRetry = FindShowcaseCheckpoint(0);
+    const ShowcaseCheckpoint* lichRetry = FindShowcaseCheckpoint(9);
+    check(skeletonRetry != nullptr && std::string(skeletonRetry->name) == "opening",
+          "skeleton retry must use the safe opening checkpoint");
+    check(lichRetry != nullptr && std::string(lichRetry->name) == "mirror",
+          "lich retry must use the mirror checkpoint rather than the close inspection point");
+    if (skeletonRetry != nullptr && lichRetry != nullptr)
+    {
+        const ShowcaseCheckpointState skeletonRetryState = BuildShowcaseCheckpointState(*skeletonRetry);
+        const ShowcaseCheckpointState lichRetryState = BuildShowcaseCheckpointState(*lichRetry);
+        check(skeletonRetryState.activeEnemyKind == EnemyKind::Skeleton &&
+              skeletonRetryState.lanternSnapshot.phase == LanternPhase::Held,
+              "skeleton retry must restore the fresh opening encounter");
+        check(lichRetryState.activeEnemyKind == EnemyKind::Lich &&
+              lichRetryState.lanternSnapshot.phase == LanternPhase::Settled &&
+              lichRetryState.lichEncounter.Snapshot().phase != LichPhase::Dormant,
+              "lich retry must restore settled lantern and an active lich");
+    }
+
     for (std::size_t i = 0; i < kShowcaseCheckpoints.size(); ++i)
     {
         const ShowcaseCheckpoint& checkpoint = kShowcaseCheckpoints[i];
@@ -70,8 +154,10 @@ int main()
         {
             check(state.lichEncounter.Snapshot().phase == LichPhase::Dead &&
                   state.lichEncounter.Snapshot().deathAnimationComplete &&
-                  NearlyEqual(state.lichEncounter.Snapshot().finaleSkylightOpenProgress, 1.0f, 0.003f),
-                  "finale-roof checkpoint must retain the dead lich and fully open roof");
+                  NearlyEqual(state.lichEncounter.Snapshot().finaleSkylightOpenProgress, 1.0f, 0.003f) &&
+                  state.lichEncounter.Snapshot().finaleEndingPhase == FinaleEndingPhase::DawnRevealed &&
+                  state.lichEncounter.Snapshot().finaleDawnRevealProgress < 0.1f,
+                  "finale-roof checkpoint must retain the dead lich, open the roof, and stay before the ending overlay");
         }
     }
 
@@ -107,10 +193,25 @@ int main()
 
     const LowerBodyPoseState standingPose = EvaluateLowerBodyPose(0.25f, 0.0f);
     const LowerBodyPoseState walkingPose = EvaluateLowerBodyPose(0.25f, 1.0f);
-    check(NearlyEqual(standingPose.leftStride, 0.0f) && NearlyEqual(standingPose.pelvisBob, 0.0f),
+    const LowerBodyPoseState opposedPose = EvaluateLowerBodyPose(0.25f + 0.5067f, 1.0f);
+    check(NearlyEqual(standingPose.leftStride, 0.0f) &&
+              NearlyEqual(standingPose.pelvisBob, 0.0f) &&
+              NearlyEqual(standingPose.pelvisSway, 0.0f) &&
+              NearlyEqual(standingPose.leftFootLift, 0.0f) &&
+              NearlyEqual(standingPose.rightFootLift, 0.0f),
           "standing lower body must not drift");
-    check(NearlyEqual(walkingPose.leftStride, -walkingPose.rightStride) && walkingPose.pelvisBob > 0.0f,
-          "walking lower body must keep opposed legs and a bounded pelvis bob");
+    check(NearlyEqual(walkingPose.leftStride, -walkingPose.rightStride) &&
+              walkingPose.pelvisBob > 0.0f &&
+              std::abs(walkingPose.pelvisSway) <= 0.0181f &&
+              std::abs(walkingPose.torsoTwistRadians) <= 0.0551f,
+          "walking lower body must keep opposed legs with bounded pelvis and torso motion");
+    check((walkingPose.leftFootLift > 0.0f) != (walkingPose.rightFootLift > 0.0f) &&
+              walkingPose.leftKneeBend >= walkingPose.leftFootLift &&
+              walkingPose.rightKneeBend >= walkingPose.rightFootLift,
+          "only the swinging foot may lift while both knees retain a small walking bend");
+    check(walkingPose.leftStride * opposedPose.leftStride < 0.0f &&
+              walkingPose.leftFootLift * opposedPose.leftFootLift == 0.0f,
+          "half a gait cycle must exchange stride direction and the lifted foot");
 
     const SceneLightingState yellowLight = RouteLightForPosition(-11.0f, -15.2f);
     const SceneLightingState blueLight = RouteLightForPosition(-16.0f, -15.2f);
@@ -242,7 +343,8 @@ int main()
           "third accepted close hit must exhaust lich health and start its recoil");
     check(dyingLich.Snapshot().phase == LichPhase::Dead &&
           NearlyEqual(dyingLich.Snapshot().animationTime, 0.0f) &&
-          !dyingLich.Snapshot().deathAnimationComplete,
+          !dyingLich.Snapshot().deathAnimationComplete &&
+          dyingLich.Snapshot().finaleEndingPhase == FinaleEndingPhase::LichFalling,
           "third hit must start the authored death clip at frame zero");
     for (int i = 0; i < 296; ++i)
     {
@@ -254,7 +356,8 @@ int main()
     dyingLich.Update(0.007f, closeHitX, closeHitZ, true, true);
     check(dyingLich.Snapshot().deathAnimationComplete &&
           NearlyEqual(dyingLich.Snapshot().animationTime, LichEncounter::kDeathAnimationDuration, 0.002f) &&
-          NearlyEqual(dyingLich.Snapshot().finaleSkylightOpenProgress, 0.0f, 0.002f),
+          NearlyEqual(dyingLich.Snapshot().finaleSkylightOpenProgress, 0.0f, 0.002f) &&
+          dyingLich.Snapshot().finaleEndingPhase == FinaleEndingPhase::SkylightOpening,
           "death animation must reach and hold its authored final frame");
     director.MarkSelectedDead();
     check(director.Snapshot().encounters[1].status == EncounterStatus::Dead,
@@ -272,14 +375,26 @@ int main()
     }
     check(NearlyEqual(dyingLich.Snapshot().finaleSkylightOpenProgress, 1.0f, 0.003f),
           "finale skylight must finish opening after 4.5 post-death seconds");
+    check(dyingLich.Snapshot().finaleEndingPhase == FinaleEndingPhase::DawnRevealed &&
+              NearlyEqual(dyingLich.Snapshot().finaleDawnRevealProgress, 0.0f, 0.03f),
+          "the fully open roof must begin a short visible dawn reveal before completing the demo");
+    for (int i = 0; i < 175; ++i)
+    {
+        dyingLich.Update(0.01f, closeHitX, closeHitZ, true, true);
+    }
+    check(dyingLich.Snapshot().finaleEndingPhase == FinaleEndingPhase::Complete &&
+              NearlyEqual(dyingLich.Snapshot().finaleDawnRevealProgress, 1.0f, 0.003f),
+          "the ending must complete deterministically after the dawn reveal hold");
     check(!dyingLich.TryAcceptPlayerHit(closeHitX, closeHitZ),
           "dead lich must reject all further player hits");
     dyingLich.Reset();
     check(dyingLich.Snapshot().health == 3 &&
           NearlyEqual(dyingLich.Snapshot().hitCooldownRemaining, 0.0f) &&
           NearlyEqual(dyingLich.Snapshot().hitRecoil, 0.0f) &&
-          NearlyEqual(dyingLich.Snapshot().finaleSkylightOpenProgress, 0.0f),
-          "encounter reset must restore three-hit health, lockout, recoil, and finale progression");
+          NearlyEqual(dyingLich.Snapshot().finaleSkylightOpenProgress, 0.0f) &&
+          NearlyEqual(dyingLich.Snapshot().finaleDawnRevealProgress, 0.0f) &&
+          dyingLich.Snapshot().finaleEndingPhase == FinaleEndingPhase::Inactive,
+          "encounter reset must restore health, lockout, recoil, and all finale progression");
 
     lich.Reset();
     bool sawVisibleDamage = false;

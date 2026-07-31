@@ -23,6 +23,7 @@ struct DeveloperOverlaySnapshot
     std::string lanternPhase;
     std::string selectedEnemy;
     std::string encounterPhase;
+    std::string playerLifePhase = "alive";
     std::uint32_t internalWidth = 0;
     std::uint32_t internalHeight = 0;
     std::uint32_t presentationWidth = 0;
@@ -32,6 +33,9 @@ struct DeveloperOverlaySnapshot
     std::uint32_t tlasInstanceCount = 0;
     std::uint32_t activeSkinnedEnemies = 0;
     int enemyHealth = -1;
+    int playerVitality = 3;
+    int playerMaxVitality = 3;
+    bool playerDamageEnabled = true;
     float renderScale = 1.0f;
     float fps = 0.0f;
     float frameTimeMs = 0.0f;

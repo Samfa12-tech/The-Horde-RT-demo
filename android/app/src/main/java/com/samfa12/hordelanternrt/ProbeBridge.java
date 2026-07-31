@@ -17,6 +17,10 @@ public final class ProbeBridge {
     public static native void setViewControls(float yaw, float pitch, float lanternStrength, float moveStrafe, float moveForward);
     public static native void requestAttack();
     public static native void requestRouteReset();
+    public static native int getPlayerVitality();
+    public static native int getPlayerLifePhase();
+    public static native int getFinaleEndingPhase();
+    public static native int retryEncounter();
     public static native void setSimulationPaused(boolean paused);
     public static native void setRenderScale(float scale);
     public static native boolean requestDebugCheckpoint(int checkpointId);

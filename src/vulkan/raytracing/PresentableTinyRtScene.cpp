@@ -47,6 +47,7 @@ struct ScenePushConstants
     float staffY = 0.55f;
     float staffZ = -13.1f;
     float finaleSkylightOpen = 0.0f;
+    float finaleDawnReveal = 0.0f;
     float heldPropDepth = 1.05f;
 };
 
@@ -1417,16 +1418,79 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
 
     const std::uint32_t swordIndexCount = static_cast<std::uint32_t>(indices.size());
 
-    // The torso remains in body/world space. The reflection-only head is a
-    // separate limb-BLAS instance so it can appear in the hero mirror without
-    // ever entering first-person primary rays.
-    addBox(-0.23f, -0.94f, -0.12f, 0.23f, -0.40f, 0.14f);  // lower tunic
-    addBox(-0.28f, -0.45f, -0.10f, 0.28f, -0.15f, 0.17f);  // upper chest
+    // A layered low-poly travelling coat replaces the original two-box torso
+    // without adding a new BLAS or TLAS instance. The two main sections taper
+    // away from the camera instead of presenting a broad chest slab, while
+    // primitive ranges stay stable for raygen material assignment.
+    const auto addTaperedCoatSection = [&addQuad](float topHalfWidth,
+                                                  float bottomHalfWidth,
+                                                  float topY,
+                                                  float bottomY,
+                                                  float backZ,
+                                                  float frontZ) {
+        const Vertex backTopLeft{{-topHalfWidth, topY, backZ}};
+        const Vertex backTopRight{{topHalfWidth, topY, backZ}};
+        const Vertex backBottomLeft{{-bottomHalfWidth, bottomY, backZ}};
+        const Vertex backBottomRight{{bottomHalfWidth, bottomY, backZ}};
+        const Vertex frontTopLeft{{-topHalfWidth, topY, frontZ}};
+        const Vertex frontTopRight{{topHalfWidth, topY, frontZ}};
+        const Vertex frontBottomLeft{{-bottomHalfWidth, bottomY, frontZ}};
+        const Vertex frontBottomRight{{bottomHalfWidth, bottomY, frontZ}};
+        addQuad(backBottomLeft, backBottomRight, backTopRight, backTopLeft);
+        addQuad(frontBottomRight, frontBottomLeft, frontTopLeft, frontTopRight);
+        addQuad(backBottomLeft, backTopLeft, frontTopLeft, frontBottomLeft);
+        addQuad(frontBottomRight, frontTopRight, backTopRight, backBottomRight);
+        addQuad(backTopLeft, backTopRight, frontTopRight, frontTopLeft);
+        addQuad(frontBottomLeft, frontBottomRight, backBottomRight, backBottomLeft);
+    };
+    addTaperedCoatSection(0.245f, 0.16f, -0.49f, -0.82f, 0.39f, 0.56f); // 0-11 lower coat
+    addTaperedCoatSection(0.22f, 0.28f, -0.22f, -0.56f, 0.36f, 0.56f);   // 12-23 chest
+    addBox(-0.34f, -0.50f, 0.37f, -0.20f, -0.30f, 0.58f); // 24-35 left shoulder
+    addBox(0.20f, -0.50f, 0.37f, 0.34f, -0.30f, 0.58f);   // 36-47 right shoulder
+    addBox(-0.245f, -0.60f, 0.33f, 0.245f, -0.51f, 0.57f); // 48-59 belt
+    addBox(-0.055f, -0.61f, 0.565f, 0.055f, -0.49f, 0.605f); // 60-71 buckle
+    addBox(-0.17f, -0.31f, 0.36f, -0.035f, -0.17f, 0.55f); // 72-83 left collar
+    addBox(0.035f, -0.31f, 0.36f, 0.17f, -0.17f, 0.55f);   // 84-95 right collar
+    addBox(-0.13f, -0.98f, 0.50f, -0.035f, -0.70f, 0.59f); // 96-107 left tail
+    addBox(0.035f, -0.98f, 0.50f, 0.13f, -0.70f, 0.59f);   // 108-119 right tail
+    addQuad({{-0.20f, -0.19f, 0.585f}}, {{-0.13f, -0.19f, 0.585f}},
+            {{0.20f, -0.48f, 0.585f}}, {{0.13f, -0.48f, 0.585f}}); // 120-121 strap
     const std::uint32_t playerBodyIndexCount = static_cast<std::uint32_t>(indices.size());
 
-    // Unit square prism along +Z. Four TLAS instances scale/rotate this one
-    // BLAS into the upper/lower segments produced by the two-bone IK solve.
-    addBox(-1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 1.0f);
+    // A six-sided bevel-ended capsule along +Z gives every articulated limb a
+    // recognisable silhouette while retaining one shared phone-cheap limb BLAS.
+    constexpr std::size_t limbSides = 6u;
+    constexpr std::array<float, 4u> limbRingZ{0.0f, 0.13f, 0.87f, 1.0f};
+    constexpr std::array<float, 4u> limbRingRadius{0.72f, 1.0f, 1.0f, 0.72f};
+    constexpr float fullTurn = 6.28318530717958647692f;
+    std::array<std::array<Vertex, limbSides>, limbRingZ.size()> limbRings{};
+    for (std::size_t ring = 0u; ring < limbRingZ.size(); ++ring)
+    {
+        for (std::size_t side = 0u; side < limbSides; ++side)
+        {
+            const float angle = fullTurn * static_cast<float>(side) / static_cast<float>(limbSides);
+            limbRings[ring][side] = Vertex{{std::cos(angle) * limbRingRadius[ring],
+                                                   std::sin(angle) * limbRingRadius[ring],
+                                                   limbRingZ[ring]}};
+        }
+    }
+    for (std::size_t ring = 0u; ring + 1u < limbRingZ.size(); ++ring)
+    {
+        for (std::size_t side = 0u; side < limbSides; ++side)
+        {
+            const std::size_t next = (side + 1u) % limbSides;
+            addQuad(limbRings[ring][side], limbRings[ring][next],
+                    limbRings[ring + 1u][next], limbRings[ring + 1u][side]);
+        }
+    }
+    const Vertex limbBase{{0.0f, 0.0f, 0.0f}};
+    const Vertex limbTip{{0.0f, 0.0f, 1.0f}};
+    for (std::size_t side = 0u; side < limbSides; ++side)
+    {
+        const std::size_t next = (side + 1u) % limbSides;
+        addTriangle(limbBase, limbRings[0u][next], limbRings[0u][side]);
+        addTriangle(limbTip, limbRings[3u][side], limbRings[3u][next]);
+    }
     const std::uint32_t finaleRoofPrimitiveCount = (finaleRoofIndexCount - sceneIndexCount) / 3u;
     const std::uint32_t torchPrimitiveCount = (torchIndexCount - finaleRoofIndexCount) / 3u;
     const std::uint32_t swordPrimitiveCount = (swordIndexCount - torchIndexCount) / 3u;
@@ -2002,7 +2066,10 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     instances[3].accelerationStructureReference = swordBlas_.address;
     instances[4] = instances[0];
     instances[4].instanceCustomIndex = 4u;
-    instances[4].mask = 0x04u;
+    // The complete coat remains visible in mirror/reflection rays. Keeping its
+    // chest out of first-person primary rays avoids a near-camera slab while
+    // articulated arms, pelvis, legs and boots stay visible on mask 0x04.
+    instances[4].mask = 0x10u;
     instances[4].accelerationStructureReference = playerBodyBlas_.address;
     instances[4].transform = {{
         1.0f, 0.0f, 0.0f, 0.0f,
@@ -2012,6 +2079,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     {
         instances[i] = instances[4];
         instances[i].instanceCustomIndex = static_cast<std::uint32_t>(i);
+        instances[i].mask = 0x04u;
         instances[i].accelerationStructureReference = playerLimbBlas_.address;
         instances[i].transform = {{
             0.07f, 0.0f, 0.0f, 0.0f,
@@ -2438,6 +2506,14 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const Vec3 eye{cameraX, 0.58f, cameraZ};
     const Vec3 bodyForward{std::sin(cameraYaw), 0.0f, -std::cos(cameraYaw)};
     const Vec3 bodyRight{std::cos(cameraYaw), 0.0f, std::sin(cameraYaw)};
+    const horde::gameplay::LowerBodyPoseState lowerBodyPose =
+        horde::gameplay::EvaluateLowerBodyPose(walkTime, walkAmount);
+    const float torsoCos = std::cos(lowerBodyPose.torsoTwistRadians);
+    const float torsoSin = std::sin(lowerBodyPose.torsoTwistRadians);
+    const Vec3 animatedBodyForward = normalize(add(scaled(bodyForward, torsoCos), scaled(bodyRight, torsoSin)));
+    const Vec3 animatedBodyRight = normalize(subtract(scaled(bodyRight, torsoCos), scaled(bodyForward, torsoSin)));
+    const Vec3 animatedBodyOrigin = add(add(eye, scaled(bodyRight, lowerBodyPose.pelvisSway)),
+                                        Vec3{0.0f, lowerBodyPose.pelvisBob * 0.65f, 0.0f});
     const float viewPitch = std::clamp(cameraPitch, -0.32f, 0.28f);
     const Vec3 viewForward = normalize(Vec3{std::sin(cameraYaw), -0.05f + viewPitch, -std::cos(cameraYaw)});
     const Vec3 viewRight = normalize(cross(viewForward, worldUp));
@@ -2473,7 +2549,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             xAxis[2] * radius, yAxis[2] * radius, zAxis[2] * length, start[2]}};
     };
 
-    const float movement = std::max(walkAmount, 0.2f);
+    const float movement = std::max(std::clamp(walkAmount, 0.0f, 1.0f), 0.2f);
     constexpr float torchScale = 0.56f;
     const float torchSway = std::sin(walkTime * 6.2f) * 0.035f * movement;
     const float torchBob = std::abs(std::sin(walkTime * 6.2f)) * 0.025f * movement;
@@ -2485,7 +2561,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         cameraX, cameraZ, bodyForward[0], bodyForward[2]);
     // Keep the visible grip line above the bottom crop and far enough forward
     // that the held props read at a natural first-person scale on a tall phone.
-    const Vec3 leftShoulderLocal{-0.24f, -0.44f, 0.06f};
+    const Vec3 leftShoulderLocal{-0.25f, -0.44f + lowerBodyPose.pelvisBob * 0.35f, 0.39f - lowerBodyPose.leftStride * 0.018f};
     const Vec3 heldLeftHandLocal{-0.34f - torchSway, -0.40f + torchBob, heldPropDepth};
     const Vec3 loweredLeftHandLocal{-0.31f, -0.92f, 0.27f};
     const Vec3 leftHandLocal = lerp(heldLeftHandLocal,
@@ -2493,7 +2569,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                                     std::clamp(lantern.leftArmLowerBlend, 0.0f, 1.0f));
     const float swingAmount = std::clamp(-combat.swordSwingRadians / 1.12f, 0.0f, 1.0f);
     const float smoothSwing = swingAmount * swingAmount * (3.0f - 2.0f * swingAmount);
-    const Vec3 rightShoulderLocal{0.24f, -0.44f, 0.06f};
+    const Vec3 rightShoulderLocal{0.25f, -0.44f + lowerBodyPose.pelvisBob * 0.35f, 0.39f + lowerBodyPose.leftStride * 0.018f};
     const Vec3 rightHandLocal = lerp(Vec3{0.34f, -0.41f, heldPropDepth},
                                      Vec3{-0.08f, -0.47f, std::min(heldPropDepth, 1.00f)},
                                      smoothSwing);
@@ -2686,16 +2762,20 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         swordColumnX[2], swordColumnY[2], swordColumnZ[2], swordTranslation[2]}};
     instances[4] = instances[0];
     instances[4].instanceCustomIndex = 4u;
-    instances[4].mask = 0x04u;
+    // The complete coat remains visible in mirror/reflection rays. Keeping its
+    // chest out of first-person primary rays avoids a near-camera slab while
+    // articulated arms, pelvis, legs and boots stay visible on mask 0x04.
+    instances[4].mask = 0x10u;
     instances[4].accelerationStructureReference = playerBodyBlas_.address;
     instances[4].transform = {{
-        bodyRight[0], 0.0f, bodyForward[0], cameraX,
-        bodyRight[1], 1.0f, bodyForward[1], 0.58f,
-        bodyRight[2], 0.0f, bodyForward[2], cameraZ}};
+        animatedBodyRight[0], 0.0f, animatedBodyForward[0], animatedBodyOrigin[0],
+        animatedBodyRight[1], 1.0f, animatedBodyForward[1], animatedBodyOrigin[1],
+        animatedBodyRight[2], 0.0f, animatedBodyForward[2], animatedBodyOrigin[2]}};
     for (std::size_t i = 5u; i < instances.size(); ++i)
     {
         instances[i] = instances[4];
         instances[i].instanceCustomIndex = static_cast<std::uint32_t>(i);
+        instances[i].mask = 0x04u;
         instances[i].accelerationStructureReference = playerLimbBlas_.address;
     }
     instances[5].transform = segmentTransform(leftShoulder, leftElbow, 0.065f);
@@ -2703,35 +2783,43 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     instances[7].transform = segmentTransform(rightShoulder, rightElbow, 0.065f);
     instances[8].transform = segmentTransform(rightElbow, rightHand, 0.055f);
 
-    // Complete the player silhouette with a compact leather pelvis, articulated
-    // thighs/shins and boots. These all reuse the limb BLAS on mask 0x04.
-    const horde::gameplay::LowerBodyPoseState lowerBodyPose =
-        horde::gameplay::EvaluateLowerBodyPose(walkTime, walkAmount);
-
-    const float gait = lowerBodyPose.leftStride;
-    const auto legPoint = [&eye, &bodyRight, &bodyForward, &add, &scaled](float side, float y, float forward) {
-        return add(add(add(eye, scaled(bodyRight, side)), Vec3{0.0f, y, 0.0f}), scaled(bodyForward, forward));
+    // Complete the silhouette with a leather pelvis, articulated thighs/shins,
+    // lifted feet and heel-to-toe roll. All reuse the shared limb BLAS on mask
+    // 0x04; no new skinned enemy slot or per-frame resource is introduced.
+    const auto legPoint = [&animatedBodyOrigin, &animatedBodyRight, &animatedBodyForward, &add, &scaled](float side, float y, float forward) {
+        return add(add(add(animatedBodyOrigin, scaled(animatedBodyRight, side)), Vec3{0.0f, y, 0.0f}),
+                   scaled(animatedBodyForward, forward));
     };
-    const Vec3 leftHip = legPoint(-0.13f, -0.66f, 0.0f);
-    const Vec3 rightHip = legPoint(0.13f, -0.66f, 0.0f);
-    const Vec3 pelvisLeft = legPoint(-0.18f, -0.62f + lowerBodyPose.pelvisBob, 0.02f);
-    const Vec3 pelvisRight = legPoint(0.18f, -0.62f + lowerBodyPose.pelvisBob, 0.02f);
-    const Vec3 leftKnee = legPoint(-0.13f, -1.04f, 0.10f * gait);
-    const Vec3 rightKnee = legPoint(0.13f, -1.04f, -0.10f * gait);
-    const Vec3 leftAnkle = legPoint(-0.13f, -1.43f, -0.07f * gait);
-    const Vec3 rightAnkle = legPoint(0.13f, -1.43f, 0.07f * gait);
-    const Vec3 leftToe = add(leftAnkle, scaled(bodyForward, 0.25f + 0.06f * gait));
-    const Vec3 rightToe = add(rightAnkle, scaled(bodyForward, 0.25f - 0.06f * gait));
-    instances[9].transform = segmentTransform(pelvisLeft, pelvisRight, 0.14f);
-    instances[10].transform = segmentTransform(leftHip, leftKnee, 0.095f);
-    instances[11].transform = segmentTransform(leftKnee, leftAnkle, 0.078f);
-    instances[12].transform = segmentTransform(rightHip, rightKnee, 0.095f);
-    instances[13].transform = segmentTransform(rightKnee, rightAnkle, 0.078f);
-    instances[14].transform = segmentTransform(leftAnkle, leftToe, 0.105f);
-    instances[15].transform = segmentTransform(rightAnkle, rightToe, 0.105f);
-    const Vec3 headBase = add(add(eye, Vec3{0.0f, -0.16f, 0.0f}), scaled(bodyForward, 0.20f));
-    const Vec3 headTop = add(add(eye, Vec3{0.0f, 0.14f, 0.0f}), scaled(bodyForward, 0.20f));
-    instances[16].transform = segmentTransform(headBase, headTop, 0.14f);
+    const Vec3 leftHip = legPoint(-0.14f, -0.66f, 0.01f);
+    const Vec3 rightHip = legPoint(0.14f, -0.66f, 0.01f);
+    const Vec3 pelvisLeft = legPoint(-0.19f, -0.62f, 0.02f);
+    const Vec3 pelvisRight = legPoint(0.19f, -0.62f, 0.02f);
+    const Vec3 leftKnee = legPoint(-0.14f,
+                                   -1.04f + 0.04f * lowerBodyPose.leftKneeBend,
+                                   0.08f * lowerBodyPose.leftStride + 0.05f * lowerBodyPose.leftKneeBend);
+    const Vec3 rightKnee = legPoint(0.14f,
+                                    -1.04f + 0.04f * lowerBodyPose.rightKneeBend,
+                                    0.08f * lowerBodyPose.rightStride + 0.05f * lowerBodyPose.rightKneeBend);
+    const Vec3 leftAnkle = legPoint(-0.14f,
+                                    -1.43f + 0.095f * lowerBodyPose.leftFootLift,
+                                    0.18f * lowerBodyPose.leftStride);
+    const Vec3 rightAnkle = legPoint(0.14f,
+                                     -1.43f + 0.095f * lowerBodyPose.rightFootLift,
+                                     0.18f * lowerBodyPose.rightStride);
+    const Vec3 leftToe = add(add(leftAnkle, scaled(animatedBodyForward, 0.26f)),
+                             Vec3{0.0f, 0.055f * lowerBodyPose.leftToeRoll, 0.0f});
+    const Vec3 rightToe = add(add(rightAnkle, scaled(animatedBodyForward, 0.26f)),
+                              Vec3{0.0f, 0.055f * lowerBodyPose.rightToeRoll, 0.0f});
+    instances[9].transform = segmentTransform(pelvisLeft, pelvisRight, 0.16f);
+    instances[10].transform = segmentTransform(leftHip, leftKnee, 0.105f);
+    instances[11].transform = segmentTransform(leftKnee, leftAnkle, 0.09f);
+    instances[12].transform = segmentTransform(rightHip, rightKnee, 0.105f);
+    instances[13].transform = segmentTransform(rightKnee, rightAnkle, 0.09f);
+    instances[14].transform = segmentTransform(leftAnkle, leftToe, 0.11f);
+    instances[15].transform = segmentTransform(rightAnkle, rightToe, 0.11f);
+    const Vec3 headBase = add(add(animatedBodyOrigin, Vec3{0.0f, -0.16f, 0.0f}), scaled(animatedBodyForward, 0.20f));
+    const Vec3 headTop = add(add(animatedBodyOrigin, Vec3{0.0f, 0.15f, 0.0f}), scaled(animatedBodyForward, 0.20f));
+    instances[16].transform = segmentTransform(headBase, headTop, 0.145f);
     instances[16].mask = 0x10u; // Hero-mirror reflection only; never first-person primary.
     instances[17] = instances[0];
     instances[17].instanceCustomIndex = 17u;
@@ -2955,6 +3043,7 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                                             staffWorldPosition[1],
                                             staffWorldPosition[2],
                                             std::clamp(lich.finaleSkylightOpenProgress, 0.0f, 1.0f),
+                                            std::clamp(lich.finaleDawnRevealProgress, 0.0f, 1.0f),
                                             heldPropDepth};
     lastOutputRedBlueSwapApplied_ = pushConstants.outputRedBlueSwap > 0.5f;
     vkCmdPushConstants(commandBuffer,

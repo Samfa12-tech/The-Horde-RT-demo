@@ -99,6 +99,8 @@ constexpr int kBenchmarkTitleId = 120;
 constexpr int kBenchmarkCopyButtonId = 121;
 constexpr int kBenchmarkSaveButtonId = 122;
 constexpr int kBenchmarkBackButtonId = 123;
+constexpr int kVitalityHudControlId = 124;
+constexpr int kEndingBodyId = 125;
 constexpr int kMenuPauseId = 2001;
 constexpr int kMenuRestartId = 2002;
 constexpr int kMenuExitId = 2003;
@@ -193,6 +195,7 @@ struct VulkanSurfaceContext
     float cameraPitch = 0.0f;
     float lanternStrength = 1.8f;
     float walkTime = 0.0f;
+    float walkVisualAmount = 0.0f;
     float cameraX = 0.0f;
     float cameraZ = 1.85f;
     float walkAmount = 0.0f;
@@ -210,6 +213,11 @@ struct VulkanSurfaceContext
     WINDOWPLACEMENT windowedPlacement{sizeof(WINDOWPLACEMENT)};
     horde::gameplay::SwordCombat combat;
     horde::gameplay::CombatSnapshot combatSnapshot;
+    horde::gameplay::PlayerVitals playerVitals;
+    bool deathOverlayVisible = false;
+    bool endingOverlayVisible = false;
+    bool endingOverlayDismissed = false;
+    std::int32_t playerRetryCheckpoint = 0;
     horde::gameplay::LanternSequence lanternSequence;
     horde::gameplay::LanternSnapshot lanternSnapshot;
     horde::gameplay::EnemyDirector enemyDirector;
@@ -217,7 +225,6 @@ struct VulkanSurfaceContext
     horde::gameplay::EnemyKind activeEnemyKind = horde::gameplay::EnemyKind::Skeleton;
     horde::gameplay::EnemyKind debugEnemyOverride = horde::gameplay::EnemyKind::None;
     uint32_t debugValidationPoint = 0u;
-    float lichDamageFlash = 0.0f;
     horde::gameplay::ShowcaseBenchmarkRun benchmark;
     std::string benchmarkReport;
     std::string benchmarkJsonReport;
@@ -870,15 +877,40 @@ void UpdateSettingsLabels(VulkanSurfaceContext& context)
     }
 }
 
+void UpdateVitalityHud(VulkanSurfaceContext& context)
+{
+    const horde::gameplay::PlayerVitalsSnapshot& vitals = context.playerVitals.Snapshot();
+    const std::string text = "VITALITY  " + std::to_string(vitals.vitality) + " / " +
+                             std::to_string(vitals.maxVitality);
+    if (HWND hud = GetDlgItem(context.windowHandle, kVitalityHudControlId))
+    {
+        SetWindowTextA(hud, text.c_str());
+        InvalidateRect(hud, nullptr, TRUE);
+    }
+}
+
+bool IsPlayerDamageEnabled(const VulkanSurfaceContext& context)
+{
+    return !context.simulationPaused &&
+           context.playerVitals.Snapshot().phase == horde::gameplay::PlayerLifePhase::Alive &&
+           !context.benchmark.IsRunning() &&
+           GetPropA(context.windowHandle, kCaptureModeProperty) == nullptr;
+}
+
 void ApplyOverlayState(VulkanSurfaceContext& context)
 {
     const bool pauseVisible = context.pauseMenuVisible && !context.settingsVisible &&
                               !context.diagnosticsVisible && !context.benchmarkReportVisible;
-    for (const int id : {kPauseTitleId, kResumeButtonId, kRestartButtonId, kControlsButtonId,
-                         kSettingsButtonId, kDiagnosticsButtonId, kRunBenchmarkButtonId,
-                         kMoreBySamfa12ButtonId, kExitButtonId})
+    for (const int id : {kPauseTitleId, kResumeButtonId, kRestartButtonId, kExitButtonId})
     {
         SetControlVisible(context.windowHandle, id, pauseVisible);
+    }
+    SetControlVisible(context.windowHandle, kEndingBodyId, pauseVisible && context.endingOverlayVisible);
+    const bool fullPauseMenuVisible = pauseVisible && !context.deathOverlayVisible && !context.endingOverlayVisible;
+    for (const int id : {kControlsButtonId, kSettingsButtonId, kDiagnosticsButtonId,
+                         kRunBenchmarkButtonId, kMoreBySamfa12ButtonId})
+    {
+        SetControlVisible(context.windowHandle, id, fullPauseMenuVisible);
     }
     for (const int id : {kSettingsTitleId, kSfxButtonId, kSensitivityButtonId, kRenderScaleLabelId,
                          kRenderScaleSliderId, kFullscreenButtonId, kSettingsBackButtonId})
@@ -894,6 +926,9 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
     }
     SetControlVisible(context.windowHandle, kHudControlId,
                       !context.diagnosticsVisible && !context.benchmarkReportVisible);
+    SetControlVisible(context.windowHandle, kVitalityHudControlId,
+                      !pauseVisible && !context.settingsVisible && !context.diagnosticsVisible &&
+                          !context.benchmarkReportVisible && !context.benchmark.IsRunning());
 #if defined(_DEBUG)
     SetControlVisible(context.windowHandle, kDeveloperOverlayId,
                        context.developerOverlayVisible && !pauseVisible && !context.benchmarkReportVisible &&
@@ -912,16 +947,44 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
                     context.simulationPaused ? "&Resume\tEsc" : "&Pause\tEsc");
         DrawMenuBar(context.windowHandle);
     }
+    if (HWND title = GetDlgItem(context.windowHandle, kPauseTitleId))
+    {
+        SetWindowTextA(title, context.deathOverlayVisible
+            ? "YOU FELL  |  THE RUIN CLAIMS ANOTHER LIGHT."
+            : (context.endingOverlayVisible
+                ? "DAWN RETURNS  |  THE LAST LANTERN HAS DONE ITS WORK"
+                : "HORDE LANTERN RT  |  SHOWCASE ALPHA"));
+    }
+    if (HWND resume = GetDlgItem(context.windowHandle, kResumeButtonId))
+    {
+        SetWindowTextA(resume, context.deathOverlayVisible
+            ? "RETRY ENCOUNTER"
+            : (context.endingOverlayVisible ? "CONTINUE IN THE RUIN" : "ENTER THE RUIN / RESUME"));
+    }
     UpdateSettingsLabels(context);
 }
 
 void ShowPauseMenu(VulkanSurfaceContext& context, const bool visible)
 {
+    if (context.deathOverlayVisible && !visible)
+    {
+        return;
+    }
+    if (context.endingOverlayVisible && !visible)
+    {
+        context.endingOverlayVisible = false;
+        context.endingOverlayDismissed = true;
+    }
     context.pauseMenuVisible = visible;
     context.settingsVisible = false;
     context.diagnosticsVisible = false;
     context.benchmarkReportVisible = false;
     ApplyOverlayState(context);
+    RECT clientRect{};
+    GetClientRect(context.windowHandle, &clientRect);
+    LayoutOverlayControls(context.windowHandle,
+                          clientRect.right - clientRect.left,
+                          clientRect.bottom - clientRect.top);
     if (visible)
     {
         PlaySoundEffect(context, "menu_toggle.wav");
@@ -940,6 +1003,7 @@ void ResetRoute(VulkanSurfaceContext& context)
     context.cameraPitch = 0.0f;
     context.lanternStrength = 1.8f;
     context.walkTime = 0.0f;
+    context.walkVisualAmount = 0.0f;
     context.cameraX = 0.0f;
     context.cameraZ = 1.85f;
     context.walkAmount = 0.0f;
@@ -949,6 +1013,11 @@ void ResetRoute(VulkanSurfaceContext& context)
     context.lichDeathCuePlayed = false;
     context.combat = {};
     context.combatSnapshot = {};
+    context.playerVitals.ResetForEncounter();
+    context.deathOverlayVisible = false;
+    context.endingOverlayVisible = false;
+    context.endingOverlayDismissed = false;
+    context.playerRetryCheckpoint = 0;
     context.lanternSequence.Reset();
     context.lanternSnapshot = {};
     context.enemyDirector.Reset();
@@ -956,9 +1025,89 @@ void ResetRoute(VulkanSurfaceContext& context)
     context.activeEnemyKind = horde::gameplay::EnemyKind::Skeleton;
     context.debugEnemyOverride = horde::gameplay::EnemyKind::None;
     context.debugValidationPoint = 0u;
-    context.lichDamageFlash = 0.0f;
     context.playerAttackRequested = false;
     ClearDesktopInput(context);
+    UpdateVitalityHud(context);
+}
+
+void ShowDeathMenu(VulkanSurfaceContext& context)
+{
+    if (context.deathOverlayVisible)
+    {
+        return;
+    }
+    context.deathOverlayVisible = true;
+    context.pauseMenuVisible = true;
+    context.settingsVisible = false;
+    context.diagnosticsVisible = false;
+    context.benchmarkReportVisible = false;
+    ApplyOverlayState(context);
+    RECT clientRect{};
+    GetClientRect(context.windowHandle, &clientRect);
+    LayoutOverlayControls(context.windowHandle,
+                          clientRect.right - clientRect.left,
+                          clientRect.bottom - clientRect.top);
+    SetFocus(GetDlgItem(context.windowHandle, kResumeButtonId));
+}
+
+void ShowEndingMenu(VulkanSurfaceContext& context)
+{
+    if (context.endingOverlayVisible || context.endingOverlayDismissed ||
+        context.deathOverlayVisible || context.benchmark.IsRunning() ||
+        GetPropA(context.windowHandle, kCaptureModeProperty) != nullptr)
+    {
+        return;
+    }
+    context.endingOverlayVisible = true;
+    context.pauseMenuVisible = true;
+    context.settingsVisible = false;
+    context.diagnosticsVisible = false;
+    context.benchmarkReportVisible = false;
+    ApplyOverlayState(context);
+    RECT clientRect{};
+    GetClientRect(context.windowHandle, &clientRect);
+    LayoutOverlayControls(context.windowHandle,
+                          clientRect.right - clientRect.left,
+                          clientRect.bottom - clientRect.top);
+    SetFocus(GetDlgItem(context.windowHandle, kResumeButtonId));
+}
+bool ApplyPlayerRetryCheckpoint(VulkanSurfaceContext& context, const std::int32_t checkpointId)
+{
+    if (checkpointId != 0 && checkpointId != 9)
+    {
+        return false;
+    }
+    const horde::gameplay::ShowcaseCheckpoint* checkpoint =
+        horde::gameplay::FindShowcaseCheckpoint(checkpointId);
+    if (checkpoint == nullptr)
+    {
+        return false;
+    }
+    ResetRoute(context);
+    horde::gameplay::ShowcaseCheckpointState state =
+        horde::gameplay::BuildShowcaseCheckpointState(*checkpoint);
+    context.cameraX = checkpoint->x;
+    context.cameraZ = checkpoint->z;
+    context.cameraYaw = checkpoint->yaw;
+    context.cameraPitch = checkpoint->pitch;
+    context.walkTime = 0.0f;
+    context.walkVisualAmount = 0.0f;
+    context.walkAmount = 0.0f;
+    context.lanternSequence = std::move(state.lantern);
+    context.lanternSnapshot = state.lanternSnapshot;
+    context.enemyDirector = std::move(state.enemyDirector);
+    context.lichEncounter = std::move(state.lichEncounter);
+    context.activeEnemyKind = state.activeEnemyKind;
+    context.debugEnemyOverride = horde::gameplay::EnemyKind::None;
+    context.playerRetryCheckpoint = checkpointId;
+    context.pauseMenuVisible = false;
+    context.settingsVisible = false;
+    context.diagnosticsVisible = false;
+    context.benchmarkReportVisible = false;
+    ApplyOverlayState(context);
+    UpdateVitalityHud(context);
+    SetFocus(context.windowHandle);
+    return true;
 }
 
 const char* PresentModeName(const VkPresentModeKHR mode)
@@ -1181,6 +1330,11 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(
         snapshot.encounterPhase = horde::gameplay::LichPhaseName(lich.phase);
         snapshot.enemyHealth = lich.health;
     }
+    const horde::gameplay::PlayerVitalsSnapshot& player = context.playerVitals.Snapshot();
+    snapshot.playerLifePhase = horde::gameplay::PlayerLifePhaseName(player.phase);
+    snapshot.playerVitality = player.vitality;
+    snapshot.playerMaxVitality = player.maxVitality;
+    snapshot.playerDamageEnabled = IsPlayerDamageEnabled(context);
     snapshot.internalWidth = capabilities.performance.internalRenderWidth;
     snapshot.internalHeight = capabilities.performance.internalRenderHeight;
     snapshot.presentationWidth = context.swapchainExtent.width;
@@ -1429,7 +1583,9 @@ void UpdateDesktopSceneControls(VulkanSurfaceContext& context)
         context.walkAmount = advance.finished ? 0.0f : 1.0f;
         context.playerTravelledThisFrame = std::hypot(
             context.cameraX - previousCameraX, context.cameraZ - previousCameraZ);
-        context.walkTime += context.frameDeltaSeconds * 2.7f;
+        context.walkVisualAmount += (context.walkAmount - context.walkVisualAmount) *
+                                    std::clamp(context.frameDeltaSeconds * 8.0f, 0.0f, 1.0f);
+        context.walkTime += context.frameDeltaSeconds;
         if (advance.replay.waypointReached || advance.lapStarted || advance.finished)
         {
             UpdateBenchmarkHud(context);
@@ -1440,13 +1596,22 @@ void UpdateDesktopSceneControls(VulkanSurfaceContext& context)
     {
         context.frameDeltaSeconds = 0.0f;
         context.walkAmount = 0.0f;
+        context.walkVisualAmount = 0.0f;
         return;
     }
-    context.walkTime += deltaSeconds * 2.7f;
+    if (context.playerVitals.Snapshot().phase != horde::gameplay::PlayerLifePhase::Alive)
+    {
+        context.walkAmount = 0.0f;
+        context.walkVisualAmount = 0.0f;
+        return;
+    }
+    context.walkTime += deltaSeconds;
 
     const float forwardAmount = (context.forwardHeld ? 1.0f : 0.0f) - (context.backwardHeld ? 1.0f : 0.0f);
     const float strafeAmount = (context.rightHeld ? 1.0f : 0.0f) - (context.leftHeld ? 1.0f : 0.0f);
     context.walkAmount = std::clamp(std::abs(forwardAmount) + std::abs(strafeAmount), 0.0f, 1.0f);
+    context.walkVisualAmount += (context.walkAmount - context.walkVisualAmount) *
+                                std::clamp(deltaSeconds * 8.0f, 0.0f, 1.0f);
     if (context.walkAmount <= 0.01f)
     {
         return;
@@ -2107,17 +2272,28 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
     {
         SpatialAudioEngine().Update();
         UpdateDesktopSceneControls(ctx);
+        if (!ctx.simulationPaused && !ctx.benchmark.IsRunning())
+        {
+            ctx.playerVitals.Update(ctx.frameDeltaSeconds);
+        }
+        if (ctx.playerVitals.Snapshot().phase == horde::gameplay::PlayerLifePhase::Dead)
+        {
+            ShowDeathMenu(ctx);
+        }
+        const bool playerAlive =
+            ctx.playerVitals.Snapshot().phase == horde::gameplay::PlayerLifePhase::Alive;
+        const bool gameplayPaused = ctx.simulationPaused || !playerAlive;
         ctx.lanternSnapshot = ctx.lanternSequence.Update(
-            ctx.simulationPaused ? 0.0f : ctx.frameDeltaSeconds,
+            gameplayPaused ? 0.0f : ctx.frameDeltaSeconds,
             ctx.cameraX,
             ctx.cameraZ,
             ctx.cameraYaw,
             ctx.cameraPitch);
-        if (ctx.debugEnemyOverride == horde::gameplay::EnemyKind::None)
+        if (!gameplayPaused && ctx.debugEnemyOverride == horde::gameplay::EnemyKind::None)
         {
             ctx.enemyDirector.Update(ctx.cameraX, ctx.cameraZ);
         }
-        else
+        else if (!gameplayPaused && ctx.debugEnemyOverride != horde::gameplay::EnemyKind::None)
         {
             ctx.enemyDirector.ForceSelectForDebug(ctx.debugEnemyOverride);
         }
@@ -2125,6 +2301,13 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         if (roster.selectedEnemy != ctx.activeEnemyKind)
         {
             ctx.activeEnemyKind = roster.selectedEnemy;
+            if (ctx.activeEnemyKind == horde::gameplay::EnemyKind::Skeleton ||
+                ctx.activeEnemyKind == horde::gameplay::EnemyKind::Lich)
+            {
+                ctx.playerVitals.ResetForEncounter();
+                ctx.playerRetryCheckpoint = ctx.activeEnemyKind == horde::gameplay::EnemyKind::Lich ? 9 : 0;
+                UpdateVitalityHud(ctx);
+            }
             if (ctx.activeEnemyKind == horde::gameplay::EnemyKind::Skeleton)
             {
                 ctx.combat = {};
@@ -2137,7 +2320,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             }
         }
         bool lichHitRequested = false;
-        if (ctx.playerAttackRequested)
+        if (ctx.playerAttackRequested && !gameplayPaused)
         {
             ctx.playerAttackRequested = false;
             // The sword is a player action, not a skeleton-only animation. Keep
@@ -2151,11 +2334,12 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             PlayAmbientSoundEffect(ctx, clip);
         }
         const horde::gameplay::EnemyAnimation previousAnimation = ctx.combatSnapshot.enemyAnimation;
-        ctx.combatSnapshot = ctx.combat.Update(ctx.frameDeltaSeconds, ctx.cameraX, ctx.cameraZ, ctx.cameraYaw);
+        ctx.combatSnapshot = ctx.combat.Update(
+            gameplayPaused ? 0.0f : ctx.frameDeltaSeconds, ctx.cameraX, ctx.cameraZ, ctx.cameraYaw);
         const bool finaleActive = horde::gameplay::QueryShowcaseZone(ctx.cameraX, ctx.cameraZ) == horde::gameplay::ShowcaseZone::Finale;
         const horde::gameplay::LichPhase previousLichPhase = ctx.lichEncounter.Snapshot().phase;
         const horde::gameplay::LichSnapshot& lich = ctx.lichEncounter.Update(
-            ctx.activeEnemyKind == horde::gameplay::EnemyKind::Lich ? ctx.frameDeltaSeconds : 0.0f,
+            ctx.activeEnemyKind == horde::gameplay::EnemyKind::Lich && !gameplayPaused ? ctx.frameDeltaSeconds : 0.0f,
             ctx.cameraX,
             ctx.cameraZ,
             !horde::gameplay::IsRouteAudioObstructed(ctx.cameraX, ctx.cameraZ,
@@ -2180,11 +2364,27 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         {
             PlayEnemySoundEffect(ctx, "lich_charge.wav", 0.42f);
         }
-        ctx.lichDamageFlash = std::max(0.0f, ctx.lichDamageFlash - ctx.frameDeltaSeconds * 2.8f);
-        if (lich.damagePulse)
+        if (ctx.activeEnemyKind == horde::gameplay::EnemyKind::Lich && lich.damagePulse)
         {
-            ctx.lichDamageFlash = 1.0f;
             PlayEnemySoundEffect(ctx, "lich_impact.wav", 0.55f);
+        }
+        const bool playerHitPulse =
+            (ctx.activeEnemyKind == horde::gameplay::EnemyKind::Skeleton && ctx.combatSnapshot.playerHitPulse) ||
+            (ctx.activeEnemyKind == horde::gameplay::EnemyKind::Lich && lich.damagePulse);
+        if (playerHitPulse && IsPlayerDamageEnabled(ctx))
+        {
+            const horde::gameplay::PlayerDamageResult result = ctx.playerVitals.TryApplyDamage();
+            if (result != horde::gameplay::PlayerDamageResult::Ignored)
+            {
+                UpdateVitalityHud(ctx);
+            }
+            if (result == horde::gameplay::PlayerDamageResult::Killed)
+            {
+                ctx.playerRetryCheckpoint =
+                    ctx.activeEnemyKind == horde::gameplay::EnemyKind::Lich ? 9 : 0;
+                ctx.playerAttackRequested = false;
+                ClearDesktopInput(ctx);
+            }
         }
         if (ctx.activeEnemyKind == horde::gameplay::EnemyKind::Lich &&
             lich.phase == horde::gameplay::LichPhase::Dead &&
@@ -2198,8 +2398,12 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         {
             ctx.enemyDirector.MarkSelectedDead();
         }
+        if (lich.finaleEndingPhase == horde::gameplay::FinaleEndingPhase::Complete)
+        {
+            ShowEndingMenu(ctx);
+        }
         horde::gameplay::CombatSnapshot renderCombat = ctx.combatSnapshot;
-        renderCombat.damageFlash = std::max(renderCombat.damageFlash, ctx.lichDamageFlash);
+        renderCombat.damageFlash = ctx.playerVitals.Snapshot().damageFlash;
         if (ctx.activeEnemyKind == horde::gameplay::EnemyKind::Skeleton &&
             previousAnimation != horde::gameplay::EnemyAnimation::Dead &&
             ctx.combatSnapshot.enemyAnimation == horde::gameplay::EnemyAnimation::Dead)
@@ -2212,7 +2416,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         {
             PlayEnemySoundEffect(ctx, "skeleton_attack.wav", 0.85f);
         }
-        const bool skeletonWalking = !ctx.simulationPaused &&
+        const bool skeletonWalking = !gameplayPaused &&
                                      ctx.activeEnemyKind == horde::gameplay::EnemyKind::Skeleton &&
                                      ctx.combatSnapshot.enemyAnimation == horde::gameplay::EnemyAnimation::Walking;
         if (ctx.enemyFootsteps.Update(ctx.frameDeltaSeconds, skeletonWalking))
@@ -2231,7 +2435,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
                                             ctx.walkTime,
                                             ctx.cameraX,
                                             ctx.cameraZ,
-                                            ctx.walkAmount,
+                                            ctx.walkVisualAmount,
                                             ctx.outputExposure,
                                             renderCombat,
                                             ctx.lanternSnapshot,
@@ -2340,6 +2544,7 @@ void ApplyCaptureCheckpoint(VulkanSurfaceContext& context,
     context.cameraYaw = checkpoint.yaw;
     context.cameraPitch = checkpoint.pitch;
     context.walkTime = 0.0f;
+    context.walkVisualAmount = 0.0f;
     context.frameDeltaSeconds = 0.0f;
     context.walkAmount = 0.0f;
     context.simulationPaused = true;
@@ -2889,7 +3094,7 @@ void ApplyDpiScaledFonts(HWND window)
         SendMessageA(developerOverlay, WM_SETFONT, reinterpret_cast<WPARAM>(developerFont), TRUE);
     }
 #endif
-    for (const int id : {kHudControlId, kPauseTitleId, kResumeButtonId, kRestartButtonId,
+    for (const int id : {kHudControlId, kVitalityHudControlId, kPauseTitleId, kEndingBodyId, kResumeButtonId, kRestartButtonId,
                          kControlsButtonId, kSettingsButtonId, kDiagnosticsButtonId, kRunBenchmarkButtonId,
                          kMoreBySamfa12ButtonId, kExitButtonId, kBenchmarkTitleId,
                          kBenchmarkCopyButtonId, kBenchmarkSaveButtonId, kBenchmarkBackButtonId,
@@ -2979,6 +3184,12 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
                    std::min(ScaleForDpi(window, 650), std::max(ScaleForDpi(window, 260), width - hudInset * 2)),
                    ScaleForDpi(window, 30), TRUE);
     }
+    if (HWND vitality = GetDlgItem(window, kVitalityHudControlId))
+    {
+        const int vitalityWidth = ScaleForDpi(window, 190);
+        MoveWindow(vitality, (width - vitalityWidth) / 2, ScaleForDpi(window, 52),
+                   vitalityWidth, ScaleForDpi(window, 28), TRUE);
+    }
 #if defined(_DEBUG)
     if (HWND developerOverlay = GetDlgItem(window, kDeveloperOverlayId))
     {
@@ -2987,9 +3198,9 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
                                           std::max(ScaleForDpi(window, 300), width - overlayInset * 2));
         MoveWindow(developerOverlay,
                    std::max(overlayInset, width - overlayWidth - overlayInset),
-                   ScaleForDpi(window, 52),
+                   ScaleForDpi(window, 86),
                    overlayWidth,
-                   ScaleForDpi(window, 100), TRUE);
+                   ScaleForDpi(window, 116), TRUE);
     }
 #endif
 
@@ -2999,16 +3210,42 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
     const int gap = ScaleForDpi(window, 8);
     const int titleHeight = ScaleForDpi(window, 48);
     const int titleAdvance = ScaleForDpi(window, 54);
-    const int pauseTotal = titleHeight + 8 * buttonHeight + 7 * gap;
+    const auto* layoutContext = reinterpret_cast<const VulkanSurfaceContext*>(GetWindowLongPtrA(window, GWLP_USERDATA));
+    const bool endingLayout = layoutContext != nullptr && layoutContext->endingOverlayVisible;
+    const bool compactOverlayLayout = layoutContext != nullptr &&
+                                      (layoutContext->deathOverlayVisible || endingLayout);
+    const int endingBodyHeight = endingLayout ? ScaleForDpi(window, 132) : 0;
+    const int pauseTotal = compactOverlayLayout
+        ? titleHeight + endingBodyHeight + (endingLayout ? gap : 0) + 3 * buttonHeight + 3 * gap
+        : titleHeight + 8 * buttonHeight + 7 * gap;
     const int pauseX = (width - buttonWidth) / 2;
     int y = std::max(ScaleForDpi(window, 54), (height - pauseTotal) / 2);
     if (HWND title = GetDlgItem(window, kPauseTitleId)) MoveWindow(title, pauseX, y, buttonWidth, titleHeight, TRUE);
     y += titleAdvance;
-    for (const int id : {kResumeButtonId, kRestartButtonId, kControlsButtonId, kSettingsButtonId,
-                         kDiagnosticsButtonId, kRunBenchmarkButtonId, kMoreBySamfa12ButtonId, kExitButtonId})
+    if (endingLayout)
     {
-        if (HWND control = GetDlgItem(window, id)) MoveWindow(control, pauseX, y, buttonWidth, buttonHeight, TRUE);
-        y += buttonHeight + gap;
+        if (HWND body = GetDlgItem(window, kEndingBodyId))
+        {
+            MoveWindow(body, pauseX, y, buttonWidth, endingBodyHeight, TRUE);
+        }
+        y += endingBodyHeight + gap;
+    }
+    if (compactOverlayLayout)
+    {
+        for (const int id : {kResumeButtonId, kRestartButtonId, kExitButtonId})
+        {
+            if (HWND control = GetDlgItem(window, id)) MoveWindow(control, pauseX, y, buttonWidth, buttonHeight, TRUE);
+            y += buttonHeight + gap;
+        }
+    }
+    else
+    {
+        for (const int id : {kResumeButtonId, kRestartButtonId, kControlsButtonId, kSettingsButtonId,
+                             kDiagnosticsButtonId, kRunBenchmarkButtonId, kMoreBySamfa12ButtonId, kExitButtonId})
+        {
+            if (HWND control = GetDlgItem(window, id)) MoveWindow(control, pauseX, y, buttonWidth, buttonHeight, TRUE);
+            y += buttonHeight + gap;
+        }
     }
 
     const int labelHeight = ScaleForDpi(window, 26);
@@ -3176,9 +3413,38 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 }
                 return 0;
             }
-            switch (LOWORD(wParam))
+            const int commandId = LOWORD(wParam);
+            if ((sceneContext->deathOverlayVisible || sceneContext->endingOverlayVisible) &&
+                commandId != kResumeButtonId && commandId != kRestartButtonId &&
+                commandId != kMenuRestartId && commandId != kExitButtonId &&
+                commandId != kMenuExitId)
+            {
+                return 0;
+            }
+            switch (commandId)
             {
             case kResumeButtonId:
+                if (sceneContext->deathOverlayVisible)
+                {
+                    if (!ApplyPlayerRetryCheckpoint(*sceneContext, sceneContext->playerRetryCheckpoint))
+                    {
+                        MessageBoxA(hWnd, "The encounter checkpoint could not be restored.", "Horde Lantern RT", MB_OK | MB_ICONERROR);
+                    }
+                    else
+                    {
+                        PlaySoundEffect(*sceneContext, "ui_select.wav");
+                    }
+                }
+                else if (sceneContext->endingOverlayVisible)
+                {
+                    PlaySoundEffect(*sceneContext, "ui_select.wav");
+                    ShowPauseMenu(*sceneContext, false);
+                }
+                else
+                {
+                    ShowPauseMenu(*sceneContext, !sceneContext->simulationPaused);
+                }
+                return 0;
             case kMenuPauseId:
                 ShowPauseMenu(*sceneContext, !sceneContext->simulationPaused);
                 return 0;
@@ -3291,6 +3557,14 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
     case WM_SYSKEYDOWN:
         if (sceneContext && sceneContext->controlsEnabled)
         {
+            if (sceneContext->playerVitals.Snapshot().phase != horde::gameplay::PlayerLifePhase::Alive)
+            {
+                if (wParam == VK_F4 && (GetKeyState(VK_MENU) & 0x8000) != 0)
+                {
+                    break;
+                }
+                return 0;
+            }
             if (wParam == VK_ESCAPE)
             {
                 if (sceneContext->benchmark.IsRunning())
@@ -3399,6 +3673,29 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 PlayAmbientSoundEffect(*sceneContext, clip);
                 return 0;
             }
+            if (wParam == VK_F11 && (lParam & (1ll << 30)) == 0)
+            {
+                // Debug-only authoring preview: reuse the deterministic open-roof
+                // checkpoint, then advance only the dawn hold to exercise the
+                // real completed-finale UI without changing the 12 capture gates.
+                if (const horde::gameplay::ShowcaseCheckpoint* finale =
+                        horde::gameplay::FindShowcaseCheckpoint(11))
+                {
+                    ApplyCaptureCheckpoint(*sceneContext, *finale);
+                    const int dawnFrames = static_cast<int>(
+                        horde::gameplay::LichEncounter::kFinaleDawnRevealDuration / 0.05f) + 2;
+                    for (int frame = 0; frame < dawnFrames; ++frame)
+                    {
+                        sceneContext->lichEncounter.Update(0.05f,
+                                                           sceneContext->cameraX,
+                                                           sceneContext->cameraZ,
+                                                           true,
+                                                           true);
+                    }
+                    ShowEndingMenu(*sceneContext);
+                }
+                return 0;
+            }
 #endif
             if (wParam == 'R' && !sceneContext->simulationPaused)
             {
@@ -3432,6 +3729,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         break;
     case WM_LBUTTONDOWN:
         if (sceneContext && sceneContext->controlsEnabled && !sceneContext->simulationPaused &&
+            sceneContext->playerVitals.Snapshot().phase == horde::gameplay::PlayerLifePhase::Alive &&
             !sceneContext->benchmark.IsRunning())
         {
             SetFocus(hWnd);
@@ -3445,6 +3743,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         break;
     case WM_RBUTTONDOWN:
         if (sceneContext && sceneContext->controlsEnabled && !sceneContext->simulationPaused &&
+            sceneContext->playerVitals.Snapshot().phase == horde::gameplay::PlayerLifePhase::Alive &&
             !sceneContext->benchmark.IsRunning())
         {
             sceneContext->playerAttackRequested = true;
@@ -3454,6 +3753,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         break;
     case WM_MOUSEMOVE:
         if (sceneContext && sceneContext->controlsEnabled && !sceneContext->simulationPaused &&
+            sceneContext->playerVitals.Snapshot().phase == horde::gameplay::PlayerLifePhase::Alive &&
             !sceneContext->benchmark.IsRunning() && sceneContext->mouseLookActive)
         {
             const POINT currentMousePosition{
@@ -3530,7 +3830,14 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
     case WM_CTLCOLORSTATIC:
     {
         HDC dc = reinterpret_cast<HDC>(wParam);
-        SetTextColor(dc, RGB(255, 208, 122));
+        COLORREF textColor = RGB(255, 208, 122);
+        if (sceneContext && GetDlgCtrlID(reinterpret_cast<HWND>(lParam)) == kVitalityHudControlId)
+        {
+            const int vitality = sceneContext->playerVitals.Snapshot().vitality;
+            textColor = vitality >= 3 ? RGB(255, 208, 122) :
+                        (vitality == 2 ? RGB(255, 154, 67) : RGB(255, 83, 72));
+        }
+        SetTextColor(dc, textColor);
         SetBkColor(dc, RGB(13, 11, 9));
         static HBRUSH brush = CreateSolidBrush(RGB(13, 11, 9));
         return reinterpret_cast<LRESULT>(brush);
@@ -3687,6 +3994,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     };
 
     createStatic(kHudControlId, kHudStartingText, SS_LEFT | SS_CENTERIMAGE);
+    createStatic(kVitalityHudControlId, "VITALITY  3 / 3", SS_CENTER | SS_CENTERIMAGE);
 #if defined(_DEBUG)
     if (HWND developerOverlay = createStatic(kDeveloperOverlayId, "DEV OVERLAY STARTING...", SS_LEFT | SS_NOPREFIX))
     {
@@ -3695,6 +4003,10 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     }
 #endif
     createStatic(kPauseTitleId, "HORDE LANTERN RT  |  SHOWCASE ALPHA", SS_CENTER | SS_CENTERIMAGE);
+    createStatic(kEndingBodyId,
+                 "The old guard bound the lich beneath this ruin and left one lantern to guide whoever came after.\r\n\r\n"
+                 "Its flame died when the final seal opened. Now the staff is silent, the roof gives way, and stolen morning returns to the halls.",
+                 SS_CENTER | SS_NOPREFIX);
     createButton(kResumeButtonId, "ENTER THE RUIN / RESUME");
     createButton(kRestartButtonId, "RESTART ROUTE");
     createButton(kControlsButtonId, "CONTROLS");

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Horde Lantern RT Alpha</string>
-    <string name="alpha_version">SHOWCASE · ALPHA 0.1.2</string>
+    <string name="alpha_version">SHOWCASE · ALPHA 0.1.3</string>
     <string name="start_demo">ENTER THE RUIN</string>
     <string name="resume_demo">RESUME</string>
     <string name="restart_route">RESTART ROUTE</string>
@@ -14,6 +14,18 @@
     <string name="quit">QUIT DEMO</string>
     <string name="back">BACK</string>
     <string name="swing">SWING</string>
+    <string name="vitality_full">VITALITY  3 / 3</string>
+    <string name="vitality_accessibility">Vitality %1$d of 3</string>
+    <string name="ending_title">DAWN RETURNS</string>
+    <string name="ending_subtitle">THE LAST LANTERN HAS DONE ITS WORK</string>
+    <string name="ending_body">The old guard bound the lich beneath this ruin and left one lantern to guide whoever came after.\n\nIts flame died when the final seal opened. Now the staff is silent, the roof gives way, and stolen morning returns to the halls.</string>
+    <string name="continue_in_ruin">CONTINUE IN THE RUIN</string>
+    <string name="begin_again">BEGIN AGAIN</string>
+    <string name="you_fell">YOU FELL</string>
+    <string name="death_message">The ruin claims another light.</string>
+    <string name="retry_encounter">RETRY ENCOUNTER</string>
+    <string name="retry_unavailable">The encounter cannot be restored yet.</string>
+    <string name="retrying_encounter">Restoring encounter…</string>
     <string name="menu">MENU</string>
     <string name="rt_starting">VULKAN RT STARTING…</string>
     <string name="rt_active">NATIVE VULKAN RT ACTIVE</string>

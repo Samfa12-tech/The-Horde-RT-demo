@@ -204,5 +204,17 @@ constexpr const char* LichPhaseName(LichPhase phase)
     default: return "unknown";
     }
 }
+constexpr const char* FinaleEndingPhaseName(FinaleEndingPhase phase)
+{
+    switch (phase)
+    {
+    case FinaleEndingPhase::Inactive: return "inactive";
+    case FinaleEndingPhase::LichFalling: return "lich-falling";
+    case FinaleEndingPhase::SkylightOpening: return "skylight-opening";
+    case FinaleEndingPhase::DawnRevealed: return "dawn-revealed";
+    case FinaleEndingPhase::Complete: return "complete";
+    default: return "unknown";
+    }
+}
 
 } // namespace horde::gameplay

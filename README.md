@@ -4,13 +4,13 @@ Horde Lantern RT is a native Vulkan hardware-ray-tracing technology demo for And
 
 - Public alpha: https://samfa12.itch.io/the-horde
 - Source repository: https://github.com/Samfa12-tech/The-Horde-RT-demo
-- Current package version: `0.1.2-alpha.1`
+- Current package version: `0.1.3-alpha.1`
 - Current itch builds: Windows `#1815416`; Android `#1815417`
 - Published SHA-256: Windows `c3688bd8483ec13af2ae8e1d2e1708e17c840b33232822b795ef3283c6b7dee6`; Android `c9a26c79d4881230d2fd18b3bcbe4c1543032bccea760ade581f9a9fdcbf72b6`
 - Primary validated phone: Samsung `SM-S948B` / Adreno 840
 - Validated Windows GPU: NVIDIA GeForce RTX 5050 Laptop GPU
 
-Showcase Alpha 0.1.2 includes the release-safe in-app benchmark and Samfa12 menu link; detailed checkpoint, capture, and developer telemetry remain Debug-only.
+Showcase Alpha 0.1.3 adds a substantially rebuilt procedural player body with articulated walking, a three-point vitality/retry loop, and a complete post-lich dawn ending. The release-safe in-app benchmark and Samfa12 menu link remain available; detailed checkpoint, capture, and developer telemetry remain Debug-only.
 
 The APK declares Android 7 / API 24 as its packaging minimum, but hardware support is intentionally much narrower: the device and driver must expose Vulkan acceleration structures, ray-tracing pipeline, ray query, buffer device address, deferred host operations, and the required ASTC formats. Only `SM-S948B` on Android 16 is currently device-certified.
 
@@ -33,8 +33,9 @@ The demo uses Vulkan acceleration structures, an RT pipeline and shader binding 
 - Collision-safe starting chamber and material gallery, a leashed skeleton encounter, and a three-turn moving-shadow corridor.
 - Lantern failure and drop, blue skylight chamber, yellow/blue/deep-red/restrained-green torch bays, open threshold, wet stone, fog, and a single-bounce hero mirror.
 - A low-poly held torch with wooden shaft, iron cage, and layered emissive flame volumes.
-- A complete camera-relative RT player body with articulated two-bone-IK arms, procedural gait, held torch/sword, and wall-aware prop retraction.
-- A Hotstrike Studio skeleton derivative followed sequentially by a CC0 Meshy placeholder lich with emissive staff/eyes, charge electricity, spatial audio, three-hit combat, death animation, and a sliding-roof finale.
+- A complete camera-relative RT player body with a layered travelling coat, shoulder/collar/belt/strap/tail detail, bevelled articulated limbs, two-bone-IK arms, pelvis sway, torso counter-twist, knee bend, foot lift, heel-to-toe walking, held torch/sword, and wall-aware prop retraction.
+- A Hotstrike Studio skeleton derivative followed sequentially by a CC0 Meshy placeholder lich with emissive staff/eyes, charge electricity, spatial audio, three-hit combat, death animation, a physical sliding roof, a moonlight-to-dawn RT reveal, and a contextual ending with continue/restart/quit.
+- Three player vitality per encounter, one-second post-hit invulnerability, an RT-visible fatal hold, and death-menu retry at the safe opening or mirror checkpoint.
 - Seventeen FilmCow UI, sword, movement, skeleton, and lich reaction/attack WAV cues.
 
 The signed Android APK contains both enemy GLBs, strict ASTC KTX2 environment and lich textures, seventeen FilmCow WAVs, four ABI libraries, and launcher assets. The Windows ZIP contains `HordeLanternRT.exe`, an executable-relative `assets/` tree, release notes, controls, and `ASSET_LICENSES.md`.
@@ -62,9 +63,13 @@ The staged Meshy sword LOD and torch study are not used by the runtime or includ
 - `F3`: live non-pausing developer overlay (Debug builds only)
 - `Alt+Enter`: fullscreen/windowed
 
+At zero vitality, `RETRY ENCOUNTER` restores the current encounter, `RESTART ROUTE` returns to the opening, and Back/`Esc` cannot resume a dead player.
+
 ## Current validation
 
 The complete showcase route is Windows-validated and Android-device-validated on `SM-S948B`. Android selected strict environment and lich ASTC textures, honestly presented RT frames, survived pause/resume and Home/surface recreation, and completed the full hands-on route without a reported issue.
+
+The player-vitality/retry slice is host-validated by clean Windows Debug and Release builds, all seven CTests in both configurations, twelve fixed RT captures, clean Android Debug and unsigned Release builds across all four configured ABIs, and `lintRelease`. On `SM-S948B`, real skeleton/lich damage, death UI, native opening/mirror retry, 3/3 restoration, the complete showcase automation route, captures, and Home/resume RT presentation are also validated. The project owner subsequently reported the remaining hands-on touch, haptics, spatial-audio, and fatal-hold checks complete on that installed build; see `docs/PLAYER_VITALITY_RETRY_SLICE_2026-07-31.md`.
 
 Render scaling was verified at:
 
@@ -129,6 +134,14 @@ For repeatable Android checkpoint timing and deterministic route-collision repla
 ```
 
 The debug-only runner collects a timestamped evidence bundle without changing the public release path. See `docs/ANDROID_SHOWCASE_AUTOMATION_2026-07-17.md`.
+
+For focused real-enemy vitality, death-menu, and encounter-retry evidence on the installed Debug APK, run:
+
+```powershell
+.\tools\run-android-vitality-validation.ps1 -SkipInstall
+```
+
+This Debug-only runner preserves screenshots, Android UI hierarchies, scoped logs, hashes, and a structured pass/fail summary without injecting player damage. It does not itself replace hands-on touch or perceived-haptics checks; the separately qualified owner report is recorded in the vitality and device-compatibility documents.
 
 ## Foundation validation and deterministic captures
 
@@ -203,7 +216,7 @@ After raygen edits, run `tools/compile-raygen.ps1`; use `tools/compile-raygen.ps
 
 ## Showcase route status
 
-The complete route is Windows- and Android-device-validated: lower body and lantern drop, zig-zag shadows, blue skylight, bay-selected coloured torches, an open framed threshold, one hero mirror, and a sequential staff-lit lich finale with a post-death sliding skylight. See `docs/HORDE_SHOWCASE_WINDOWS_VALIDATION_2026-07-16.md` and `docs/HORDE_SHOWCASE_ANDROID_VALIDATION_2026-07-17.md`.
+The established route is Windows- and Android-device-validated: lower body and lantern drop, zig-zag shadows, blue skylight, bay-selected coloured torches, an open framed threshold, one hero mirror, and a sequential staff-lit lich finale. The newer body-and-ending slice adds the layered animated player, post-death sliding skylight, warm dawn reveal, and contextual ending; its host and exact-APK `SM-S948B` evidence are recorded in `docs/PLAYER_BODY_AND_FINALE_SLICE_2026-07-31.md`.
 
 Only one skinned enemy is animated, refit, and rendered at a time; the plural roster remains configurable for a future separately measured Horde slice.
 

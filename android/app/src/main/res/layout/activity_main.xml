@@ -64,19 +64,36 @@
         android:textStyle="bold" />
 
     <TextView
+        android:id="@+id/vitality_status"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="62dp"
+        android:background="#B30D0B09"
+        android:gravity="center"
+        android:maxLines="1"
+        android:minWidth="132dp"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        android:text="@string/vitality_full"
+        android:textColor="#FFD07A"
+        android:textSize="11sp"
+        android:textStyle="bold" />
+
+    <TextView
         android:id="@+id/developer_overlay"
         android:layout_width="360dp"
         android:layout_height="wrap_content"
         android:layout_gravity="top|start"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="102dp"
         android:background="#D90D0B09"
         android:clickable="false"
         android:enabled="false"
         android:focusable="false"
         android:fontFamily="monospace"
         android:importantForAccessibility="no"
-        android:maxLines="7"
+        android:maxLines="8"
         android:padding="8dp"
         android:textColor="#D8F0D0"
         android:textSize="8sp"

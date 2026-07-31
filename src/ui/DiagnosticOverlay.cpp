@@ -41,6 +41,9 @@ std::string BuildDeveloperOverlayText(const DeveloperOverlaySnapshot& snapshot)
         out << " hp " << snapshot.enemyHealth;
     }
     out << '\n';
+    out << "PLAYER " << snapshot.playerLifePhase << "  |  vitality "
+        << snapshot.playerVitality << '/' << snapshot.playerMaxVitality
+        << "  |  damage " << (snapshot.playerDamageEnabled ? "ON" : "OFF") << '\n';
     out << "AS " << snapshot.blasCount << " BLAS / " << snapshot.tlasCount << " TLAS / "
         << snapshot.tlasInstanceCount << " inst  |  skinned " << snapshot.activeSkinnedEnemies << '\n';
     out << "MAT " << snapshot.materialEncoding;

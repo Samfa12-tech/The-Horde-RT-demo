@@ -21,7 +21,7 @@ bool RequireContains(const std::string& text, const std::string& expected)
 int main()
 {
     horde::ui::DeveloperOverlaySnapshot snapshot;
-    snapshot.buildIdentity = "0.1.2-alpha.1 DEBUG";
+    snapshot.buildIdentity = "0.1.3-alpha.1 DEBUG";
     snapshot.shaderIdentity = "0123456789ab";
     snapshot.gpuName = "Test RTX";
     snapshot.vulkanApi = "1.4.350";
@@ -31,6 +31,10 @@ int main()
     snapshot.lanternPhase = "settled";
     snapshot.selectedEnemy = "lich";
     snapshot.encounterPhase = "charging";
+    snapshot.playerLifePhase = "dying";
+    snapshot.playerVitality = 0;
+    snapshot.playerMaxVitality = 3;
+    snapshot.playerDamageEnabled = false;
     snapshot.internalWidth = 1080;
     snapshot.internalHeight = 2235;
     snapshot.presentationWidth = 1440;
@@ -47,10 +51,11 @@ int main()
 
     const std::string text = horde::ui::BuildDeveloperOverlayText(snapshot);
     bool ok = true;
-    ok &= RequireContains(text, "DEV  0.1.2-alpha.1 DEBUG  shader 0123456789ab");
+    ok &= RequireContains(text, "DEV  0.1.3-alpha.1 DEBUG  shader 0123456789ab");
     ok &= RequireContains(text, "RT RayTracingPipeline  |  presented YES  |  scale 75%");
     ok &= RequireContains(text, "FRAME 11.9 ms  |  83.8 FPS  |  1080x2235 -> 1440x2980");
     ok &= RequireContains(text, "SCENE finale  |  lantern settled  |  lich charging hp 2");
+    ok &= RequireContains(text, "PLAYER dying  |  vitality 0/3  |  damage OFF");
     ok &= RequireContains(text, "AS 8 BLAS / 1 TLAS / 18 inst  |  skinned 1");
     ok &= RequireContains(text, "MAT ASTC test route");
 

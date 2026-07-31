@@ -90,6 +90,7 @@ struct SwapchainContext
     float cameraPitch = 0.0f;
     float lanternStrength = 1.8f;
     float walkTime = 0.0f;
+    float walkVisualAmount = 0.0f;
     float cameraX = 0.0f;
     float cameraZ = 1.85f;
     float moveStrafe = 0.0f;
@@ -104,7 +105,7 @@ struct SwapchainContext
     horde::gameplay::EnemyDirector enemyDirector;
     horde::gameplay::LichEncounter lichEncounter;
     horde::gameplay::EnemyKind activeEnemyKind = horde::gameplay::EnemyKind::Skeleton;
-    float lichDamageFlash = 0.0f;
+    horde::gameplay::PlayerVitals playerVitals;
     std::int32_t activeBenchmarkCheckpoint = -1;
     std::uint32_t benchmarkGeneration = 0u;
     std::uint32_t benchmarkWarmupFrames = 0u;
@@ -148,6 +149,11 @@ std::atomic<bool> gRouteReplayRequested{false};
 std::atomic<bool> gInAppBenchmarkRequested{false};
 std::atomic<bool> gInAppBenchmarkCancelRequested{false};
 std::atomic<int> gInAppBenchmarkStatus{0}; // 0 idle, 1 running, 2 complete, 3 failed/cancelled.
+std::atomic<int> gPlayerVitality{horde::gameplay::PlayerVitals::kMaxVitality};
+std::atomic<int> gPlayerLifePhase{static_cast<int>(horde::gameplay::PlayerLifePhase::Alive)};
+std::atomic<std::int32_t> gPlayerRetryCheckpoint{0};
+std::atomic<std::int32_t> gEncounterRetryRequested{-1};
+std::atomic<int> gFinaleEndingPhase{static_cast<int>(horde::gameplay::FinaleEndingPhase::Inactive)};
 
 constexpr uint32_t kAudioEventEnemyDefeated = 1u << 0u;
 constexpr uint32_t kAudioEventPlayerFootstep = 1u << 1u;
@@ -157,6 +163,8 @@ constexpr uint32_t kAudioEventLichCharge = 1u << 4u;
 constexpr uint32_t kAudioEventLichImpact = 1u << 5u;
 constexpr uint32_t kAudioEventLichDefeated = 1u << 6u;
 constexpr uint32_t kAudioEventLichHit = 1u << 7u;
+constexpr uint32_t kAudioEventPlayerDamaged = 1u << 8u;
+constexpr uint32_t kAudioEventPlayerKilled = 1u << 9u;
 
 uint64_t PackStereoGains(float left, float right)
 {
@@ -174,6 +182,18 @@ void PublishEnemyAudioGains(const SwapchainContext& context)
         {emitterX, emitterZ, 1.0f, 1.0f, 14.0f},
         {context.cameraX, context.cameraZ, context.cameraYaw});
     gEnemyAudioStereoGains.store(PackStereoGains(gains.left, gains.right), std::memory_order_release);
+}
+
+
+void PublishPlayerVitals(const SwapchainContext& context)
+{
+    const horde::gameplay::PlayerVitalsSnapshot& vitals = context.playerVitals.Snapshot();
+    gPlayerVitality.store(vitals.vitality, std::memory_order_release);
+    gPlayerLifePhase.store(static_cast<int>(vitals.phase), std::memory_order_release);
+}
+void PublishFinaleEnding(const horde::gameplay::LichSnapshot& lich)
+{
+    gFinaleEndingPhase.store(static_cast<int>(lich.finaleEndingPhase), std::memory_order_release);
 }
 
 std::string BuildDisplayText(const horde::vulkan::DeviceCapabilities& capabilities)
@@ -224,6 +244,16 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(const Swapchai
     horde::ui::DeveloperOverlaySnapshot snapshot;
     snapshot.buildIdentity = std::string(HORDE_RT_BUILD_ID) + " DEBUG";
     snapshot.shaderIdentity = std::string(HORDE_RT_RAYGEN_SHA256).substr(0u, 12u);
+    const horde::gameplay::PlayerVitalsSnapshot& playerVitals = context.playerVitals.Snapshot();
+    snapshot.playerLifePhase = horde::gameplay::PlayerLifePhaseName(playerVitals.phase);
+    snapshot.playerVitality = playerVitals.vitality;
+    snapshot.playerMaxVitality = playerVitals.maxVitality;
+    snapshot.playerDamageEnabled =
+        playerVitals.phase == horde::gameplay::PlayerLifePhase::Alive &&
+        !gSimulationPaused.load(std::memory_order_acquire) &&
+        !context.inAppBenchmark.IsRunning() &&
+        !context.routeReplayActive && !context.benchmarkSampling && !context.captureActive;
+
     snapshot.gpuName = context.capabilities.identity.gpuName;
     snapshot.vulkanApi = PackedVulkanVersion(context.capabilities.identity.vulkanApiVersion);
     snapshot.rtMode = horde::vulkan::ToString(context.capabilities.rtMode);
@@ -328,6 +358,7 @@ void ResetShowcaseSimulation(SwapchainContext& context)
     context.cameraPitch = 0.0f;
     context.lanternStrength = 1.8f;
     context.walkTime = 0.0f;
+    context.walkVisualAmount = 0.0f;
     context.cameraX = horde::gameplay::kPlayerSpawn.x;
     context.cameraZ = horde::gameplay::kPlayerSpawn.z;
     context.moveStrafe = 0.0f;
@@ -341,7 +372,11 @@ void ResetShowcaseSimulation(SwapchainContext& context)
     context.enemyDirector.Reset();
     context.lichEncounter.Reset();
     context.activeEnemyKind = horde::gameplay::EnemyKind::Skeleton;
-    context.lichDamageFlash = 0.0f;
+    context.playerVitals.ResetForEncounter();
+    gEncounterRetryRequested.store(-1, std::memory_order_release);
+    gPlayerRetryCheckpoint.store(0, std::memory_order_release);
+    PublishPlayerVitals(context);
+    gFinaleEndingPhase.store(static_cast<int>(horde::gameplay::FinaleEndingPhase::Inactive), std::memory_order_release);
     gAttackRequested.store(false, std::memory_order_release);
     gAudioEvents.store(0u, std::memory_order_release);
 }
@@ -465,6 +500,12 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
     const horde::gameplay::LichSnapshot& lich = context.lichEncounter.Snapshot();
     const horde::gameplay::EnemyRosterSnapshot& roster = context.enemyDirector.Snapshot();
     const horde::gameplay::ShowcaseReplaySnapshot& replay = context.routeReplay.Snapshot();
+    const horde::gameplay::PlayerVitalsSnapshot& playerVitals = context.playerVitals.Snapshot();
+    const bool playerDamageEnabled =
+        playerVitals.phase == horde::gameplay::PlayerLifePhase::Alive &&
+        !gSimulationPaused.load(std::memory_order_acquire) &&
+        !context.inAppBenchmark.IsRunning() &&
+        !context.routeReplayActive && !context.benchmarkSampling && !context.captureActive;
     std::ostringstream json;
     json.setf(std::ios::fixed);
     json.precision(4);
@@ -474,7 +515,11 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
          << "  \"generation\": " << context.benchmarkGeneration << ",\n"
          << "  \"checkpoint\": \"" << (checkpoint ? checkpoint->name : (context.routeReplayActive ? "route-replay" : "none")) << "\",\n"
          << "  \"player\": {\"x\": " << context.cameraX << ", \"z\": " << context.cameraZ
-         << ", \"yaw\": " << context.cameraYaw << ", \"pitch\": " << context.cameraPitch << "},\n"
+         << ", \"yaw\": " << context.cameraYaw << ", \"pitch\": " << context.cameraPitch
+         << ", \"vitality\": " << playerVitals.vitality
+         << ", \"maxVitality\": " << playerVitals.maxVitality
+         << ", \"lifePhase\": \"" << horde::gameplay::PlayerLifePhaseName(playerVitals.phase) << "\""
+         << ", \"damageEnabled\": " << (playerDamageEnabled ? "true" : "false") << "},\n"
          << "  \"zone\": \"" << horde::gameplay::ShowcaseZoneName(zone) << "\",\n"
          << "  \"renderScale\": " << context.renderScale << ",\n"
          << "  \"internalExtent\": {\"width\": " << context.capabilities.performance.internalRenderWidth
@@ -496,7 +541,9 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
          << "  \"selectedEnemy\": \"" << horde::gameplay::EnemyKindName(roster.selectedEnemy) << "\",\n"
          << "  \"activeSkinnedEnemies\": " << roster.renderedEnemyCount << ",\n"
          << "  \"lich\": {\"phase\": \"" << horde::gameplay::LichPhaseName(lich.phase)
-         << "\", \"health\": " << lich.health << ", \"roofProgress\": " << lich.finaleSkylightOpenProgress << "},\n"
+         << "\", \"health\": " << lich.health << ", \"roofProgress\": " << lich.finaleSkylightOpenProgress
+         << ", \"ending\": \"" << horde::gameplay::FinaleEndingPhaseName(lich.finaleEndingPhase)
+         << "\", \"dawnProgress\": " << lich.finaleDawnRevealProgress << "},\n"
          << "  \"benchmarkWindowsCompleted\": " << context.benchmarkWindow << ",\n"
          << "  \"replayWaypointsReached\": " << replay.reachedWaypoints << ",\n"
          << "  \"replayComplete\": " << (replay.complete ? "true" : "false") << ",\n"
@@ -565,6 +612,44 @@ void ApplyCaptureCheckpoint(SwapchainContext& context, const horde::gameplay::Sh
                         context.renderScale * 100.0f,
                         horde::gameplay::ShowcaseZoneName(checkpoint.expectedZone));
     WriteShowcaseDebugState(context, "capture-warming");
+}
+
+bool ApplyPlayerRetryCheckpoint(SwapchainContext& context, std::int32_t checkpointId)
+{
+    if (checkpointId != 0 && checkpointId != 9)
+    {
+        return false;
+    }
+    const horde::gameplay::ShowcaseCheckpoint* checkpoint =
+        horde::gameplay::FindShowcaseCheckpoint(checkpointId);
+    if (checkpoint == nullptr)
+    {
+        return false;
+    }
+
+    ResetShowcaseSimulation(context);
+    const horde::gameplay::ShowcaseCheckpointState state =
+        horde::gameplay::BuildShowcaseCheckpointState(*checkpoint);
+    context.cameraX = checkpoint->x;
+    context.cameraZ = checkpoint->z;
+    context.cameraYaw = checkpoint->yaw;
+    context.cameraPitch = checkpoint->pitch;
+    context.walkTime = 0.0f;
+    context.walkVisualAmount = 0.0f;
+    context.lanternSequence = state.lantern;
+    context.lanternSnapshot = state.lanternSnapshot;
+    context.enemyDirector = state.enemyDirector;
+    context.lichEncounter = state.lichEncounter;
+    context.activeEnemyKind = state.activeEnemyKind;
+    context.activeBenchmarkCheckpoint = -1;
+    context.routeReplayActive = false;
+    context.benchmarkSampling = false;
+    context.captureActive = false;
+    context.capturePresentedFrames = 0u;
+    gPlayerRetryCheckpoint.store(checkpointId, std::memory_order_release);
+    PublishPlayerVitals(context);
+    __android_log_print(ANDROID_LOG_INFO, kTag, "HORDE_PLAYER retry checkpoint=%s", checkpoint->name);
+    return true;
 }
 
 void ApplyRouteReplay(SwapchainContext& context)
@@ -1440,6 +1525,13 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             context.captureActive = false;
             context.capturePresentedFrames = 0u;
         }
+        const std::int32_t requestedRetry =
+            gEncounterRetryRequested.exchange(-1, std::memory_order_acq_rel);
+        if (requestedRetry >= 0 && !context.inAppBenchmark.IsRunning())
+        {
+            ApplyPlayerRetryCheckpoint(context, requestedRetry);
+        }
+
 
         if (gInAppBenchmarkRequested.exchange(false, std::memory_order_acq_rel))
         {
@@ -1487,10 +1579,19 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
         const bool simulationPaused = context.captureActive || gSimulationPaused.load(std::memory_order_acquire);
         if (!simulationPaused)
         {
+            context.playerVitals.Update(context.frameDeltaSeconds);
+        }
+        PublishPlayerVitals(context);
+        const bool playerAlive = context.playerVitals.Snapshot().phase == horde::gameplay::PlayerLifePhase::Alive;
+        const bool gameplayPaused = simulationPaused || !playerAlive;
+        const bool playerDamageEnabled = !simulationPaused && !context.inAppBenchmark.IsRunning() &&
+            !context.routeReplayActive && !context.benchmarkSampling && !context.captureActive;
+        if (!gameplayPaused)
+        {
             context.walkTime += context.frameDeltaSeconds;
         }
-        const bool playerAttackRequested = gAttackRequested.exchange(false) && !simulationPaused;
-        float moveAmount = simulationPaused
+        const bool playerAttackRequested = gAttackRequested.exchange(false) && !gameplayPaused;
+        float moveAmount = gameplayPaused
             ? 0.0f
             : std::clamp(std::abs(context.moveForward) + std::abs(context.moveStrafe), 0.0f, 1.0f);
         float travelledThisFrame = 0.0f;
@@ -1570,6 +1671,12 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             travelledThisFrame = std::hypot(context.cameraX - previousCameraX,
                                              context.cameraZ - previousCameraZ);
         }
+        const float walkBlend = std::clamp(context.frameDeltaSeconds * 8.0f, 0.0f, 1.0f);
+        context.walkVisualAmount += (moveAmount - context.walkVisualAmount) * walkBlend;
+        if (gameplayPaused)
+        {
+            context.walkVisualAmount = 0.0f;
+        }
         if (context.playerFootsteps.Update(travelledThisFrame, moveAmount > 0.02f))
         {
             gAudioEvents.fetch_or(kAudioEventPlayerFootstep, std::memory_order_release);
@@ -1588,6 +1695,11 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             {
                 context.lichEncounter.Reset();
             }
+            context.playerVitals.ResetForEncounter();
+            gPlayerRetryCheckpoint.store(
+                context.activeEnemyKind == horde::gameplay::EnemyKind::Lich ? 9 : 0,
+                std::memory_order_release);
+            PublishPlayerVitals(context);
         }
         bool lichHitRequested = false;
         if (playerAttackRequested)
@@ -1596,7 +1708,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             context.combat.RequestAttack();
             lichHitRequested = context.activeEnemyKind == horde::gameplay::EnemyKind::Lich;
         }
-        if (!simulationPaused)
+        if (!gameplayPaused)
         {
             context.lanternSnapshot = context.lanternSequence.Update(
                 context.frameDeltaSeconds,
@@ -1629,13 +1741,14 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
                                   horde::gameplay::ShowcaseZone::Finale;
         const horde::gameplay::LichPhase previousLichPhase = context.lichEncounter.Snapshot().phase;
         const horde::gameplay::LichSnapshot& lich = context.lichEncounter.Update(
-            !simulationPaused && context.activeEnemyKind == horde::gameplay::EnemyKind::Lich ? context.frameDeltaSeconds : 0.0f,
+            !gameplayPaused && context.activeEnemyKind == horde::gameplay::EnemyKind::Lich ? context.frameDeltaSeconds : 0.0f,
             context.cameraX,
             context.cameraZ,
             !horde::gameplay::IsRouteAudioObstructed(context.cameraX, context.cameraZ,
                                                       context.lichEncounter.Snapshot().x,
                                                       context.lichEncounter.Snapshot().z),
             context.activeEnemyKind == horde::gameplay::EnemyKind::Lich && finaleActive);
+        PublishFinaleEnding(lich);
         if (lichHitRequested && context.lichEncounter.TryAcceptPlayerHit(context.cameraX, context.cameraZ))
         {
             gAudioEvents.fetch_or(kAudioEventLichHit, std::memory_order_release);
@@ -1655,14 +1768,35 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
         {
             context.enemyDirector.MarkSelectedDead();
         }
-        context.lichDamageFlash = std::max(0.0f, context.lichDamageFlash - context.frameDeltaSeconds * 2.8f);
-        if (lich.damagePulse)
+        if (context.activeEnemyKind == horde::gameplay::EnemyKind::Lich && lich.damagePulse)
         {
-            context.lichDamageFlash = 1.0f;
             gAudioEvents.fetch_or(kAudioEventLichImpact, std::memory_order_release);
         }
+        const bool playerDamagePulse =
+            (context.activeEnemyKind == horde::gameplay::EnemyKind::Skeleton &&
+             context.combatSnapshot.playerHitPulse) ||
+            (context.activeEnemyKind == horde::gameplay::EnemyKind::Lich && lich.damagePulse);
+        if (playerDamageEnabled && playerDamagePulse)
+        {
+            const horde::gameplay::PlayerDamageResult damageResult = context.playerVitals.TryApplyDamage();
+            if (damageResult != horde::gameplay::PlayerDamageResult::Ignored)
+            {
+                gAudioEvents.fetch_or(kAudioEventPlayerDamaged, std::memory_order_release);
+                if (damageResult == horde::gameplay::PlayerDamageResult::Killed)
+                {
+                    gPlayerRetryCheckpoint.store(
+                        context.activeEnemyKind == horde::gameplay::EnemyKind::Lich ? 9 : 0,
+                        std::memory_order_release);
+                    context.moveStrafe = 0.0f;
+                    context.moveForward = 0.0f;
+                    gAttackRequested.store(false, std::memory_order_release);
+                    gAudioEvents.fetch_or(kAudioEventPlayerKilled, std::memory_order_release);
+                }
+                PublishPlayerVitals(context);
+            }
+        }
         horde::gameplay::CombatSnapshot renderCombat = context.combatSnapshot;
-        renderCombat.damageFlash = std::max(renderCombat.damageFlash, context.lichDamageFlash);
+        renderCombat.damageFlash = context.playerVitals.Snapshot().damageFlash;
         PublishEnemyAudioGains(context);
         std::string diagnostic;
         if (!context.rtScene.RecordTraceAndCopy(context.commandBuffers[imageIndex],
@@ -1675,7 +1809,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
                                                 context.walkTime,
                                                 context.cameraX,
                                                 context.cameraZ,
-                                                moveAmount,
+                                                context.walkVisualAmount,
                                                 context.outputExposure,
                                                 renderCombat,
                                                 context.lanternSnapshot,
@@ -1996,6 +2130,14 @@ bool StartSurfaceInternal(ANativeWindow* window,
 
 void StopSurfaceInternal()
 {
+    gEncounterRetryRequested.store(-1, std::memory_order_release);
+    gRuntimeState.store(0, std::memory_order_release);
+    gPlayerVitality.store(horde::gameplay::PlayerVitals::kMaxVitality, std::memory_order_release);
+    gPlayerLifePhase.store(
+        static_cast<int>(horde::gameplay::PlayerLifePhase::Alive),
+        std::memory_order_release);
+    gPlayerRetryCheckpoint.store(0, std::memory_order_release);
+    gFinaleEndingPhase.store(static_cast<int>(horde::gameplay::FinaleEndingPhase::Inactive), std::memory_order_release);
     if (gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1)
     {
         gInAppBenchmarkStatus.store(3, std::memory_order_release);
@@ -2187,6 +2329,41 @@ extern "C" JNIEXPORT void JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_requestRouteReset(JNIEnv*, jclass)
 {
     gResetRequested.store(true, std::memory_order_release);
+}
+
+extern "C" JNIEXPORT jint JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getPlayerVitality(JNIEnv*, jclass)
+{
+    return static_cast<jint>(gPlayerVitality.load(std::memory_order_acquire));
+}
+
+extern "C" JNIEXPORT jint JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getPlayerLifePhase(JNIEnv*, jclass)
+{
+    return static_cast<jint>(gPlayerLifePhase.load(std::memory_order_acquire));
+}
+
+extern "C" JNIEXPORT jint JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getFinaleEndingPhase(JNIEnv*, jclass)
+{
+    return static_cast<jint>(gFinaleEndingPhase.load(std::memory_order_acquire));
+}
+extern "C" JNIEXPORT jint JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_retryEncounter(JNIEnv*, jclass)
+{
+    if (gRuntimeState.load(std::memory_order_acquire) != 1 ||
+        gPlayerLifePhase.load(std::memory_order_acquire) !=
+            static_cast<int>(horde::gameplay::PlayerLifePhase::Dead))
+    {
+        return -1;
+    }
+    const std::int32_t checkpoint = gPlayerRetryCheckpoint.load(std::memory_order_acquire);
+    if (checkpoint != 0 && checkpoint != 9)
+    {
+        return -1;
+    }
+    gEncounterRetryRequested.store(checkpoint, std::memory_order_release);
+    return static_cast<jint>(checkpoint);
 }
 
 extern "C" JNIEXPORT void JNICALL
