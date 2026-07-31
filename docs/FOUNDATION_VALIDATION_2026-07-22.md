@@ -1,6 +1,6 @@
 # Foundation validation, capture, and raygen audit - 2026-07-22
 
-> Post-publication update: Showcase Alpha 0.1.2 is now published. Its exact artifact/device evidence is in `SHOWCASE_ALPHA_0_1_2_RELEASE_VALIDATION_2026-07-22.md`; current scripts also make the 0.1.2 line and Android `versionCode 3` immutable.
+> Post-publication update: Showcase Alpha 0.1.3 is now published. Its exact artifact/device evidence is in `SHOWCASE_ALPHA_0_1_3_RELEASE_VALIDATION_2026-07-31.md`; current scripts make the 0.1.1-0.1.3 lines and Android `versionCode <= 4` immutable.
 
 ## Outcome
 
@@ -18,7 +18,7 @@ The qualifying integrated Full run is `reports/foundation-runs/run-20260722-1923
 
 Windows Release rejects `--capture-showcase` with exit code 2 and creates no capture directory. Android Release rejects checkpoint/capture automation. Validation-only ZIP/APK artifacts are created only beneath ignored `reports/`, are named `UNPUBLISHABLE` / `UNSIGNED-DO-NOT-PUBLISH`, and never enter `releases/candidates/`. The foundation gate neither reads nor requires keystore paths or signing passwords.
 
-At qualification time, candidate packaging had no version defaults and protected the then-published 0.1.1 identity. After 0.1.2 publication, `package-alpha.ps1` and `package-signed-alpha.ps1` reject both immutable published 0.1.1/0.1.2 lines and require `versionCode > 3`; `push-alpha-to-itch.ps1` rejects another 0.1.1 or 0.1.2 upload before inspecting Butler or contacting itch.
+Candidate packaging has no version defaults. After 0.1.3 publication, `package-alpha.ps1` and `package-signed-alpha.ps1` reject the immutable 0.1.1, 0.1.2, and 0.1.3 lines and require `versionCode > 4`; `push-alpha-to-itch.ps1` rejects another upload on those lines before inspecting Butler or contacting itch.
 
 ## Build, test, package, and safety evidence
 

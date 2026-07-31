@@ -5,8 +5,8 @@ Horde Lantern RT is a native Vulkan hardware-ray-tracing technology demo for And
 - Public alpha: https://samfa12.itch.io/the-horde
 - Source repository: https://github.com/Samfa12-tech/The-Horde-RT-demo
 - Current package version: `0.1.3-alpha.1`
-- Current itch builds: Windows `#1815416`; Android `#1815417`
-- Published SHA-256: Windows `c3688bd8483ec13af2ae8e1d2e1708e17c840b33232822b795ef3283c6b7dee6`; Android `c9a26c79d4881230d2fd18b3bcbe4c1543032bccea760ade581f9a9fdcbf72b6`
+- Current itch builds: Windows `#1845895`; Android `#1845896`
+- Published SHA-256: Windows `4ccc86bfab56beb9bce238f025afbf3afbf00589c8396ce937607ae1b95c274f`; Android `a4eb996104c03734a7fa8a16be1f8f701d5b19c861c066af002f96f9a199eee9`
 - Primary validated phone: Samsung `SM-S948B` / Adreno 840
 - Validated Windows GPU: NVIDIA GeForce RTX 5050 Laptop GPU
 
@@ -180,13 +180,13 @@ Create a release key once, outside Git:
 For a signed rebuild:
 
 ```powershell
-.\tools\package-signed-alpha.ps1 -KeyStorePath '<outside-repo path>' -Version '0.1.3-alpha.1' -VersionCode 4
-.\tools\push-alpha-to-itch.ps1 -Version '0.1.3-alpha.1' -Channels Both
+.\tools\package-signed-alpha.ps1 -KeyStorePath '<outside-repo path>' -Version '<next-version>' -VersionCode <next-version-code>
+.\tools\push-alpha-to-itch.ps1 -Version '<next-version>' -Channels Both
 ```
 
 The packaging and push scripts securely prompt for signing secrets, reject debug/unsigned Android candidates, verify hashes, and keep Windows and Android on separate itch channels. Add `-ConfirmPush` only after the preflight passes.
 
-There are no packaging version defaults: candidate scripts require explicit `Version` and `VersionCode`, reject the immutable published `0.1.1` and `0.1.2` lines, and require Android `versionCode > 3`. The itch push script rejects another 0.1.1 or 0.1.2 upload before contacting Butler. A future public build must first bump CMake/Windows/Android/package metadata, provide matching release notes, and update the guarded candidate hashes.
+There are no packaging version defaults: candidate scripts require explicit `Version` and `VersionCode`, reject the immutable published `0.1.1`, `0.1.2`, and `0.1.3` lines, and require Android `versionCode > 4`. The itch push script rejects another upload on any of those release lines before contacting Butler. A future public build must first bump CMake/Windows/Android/package metadata, provide matching release notes, and update the guarded candidate hashes.
 
 Android native code is linked for 16 KiB page compatibility. The release uses a static C++ runtime, 16 KiB ELF `LOAD` alignment, and AGP 8.7.2 APK alignment; `package-alpha.ps1` rejects candidates that fail either APK or ELF verification or reintroduce `libc++_shared.so` from the r26 NDK.
 

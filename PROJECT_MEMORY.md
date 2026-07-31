@@ -1,6 +1,6 @@
 # Horde Lantern RT - Project Memory
 
-Last updated: 2026-07-22
+Last updated: 2026-07-31
 
 ## Identity and release state
 
@@ -8,16 +8,16 @@ Last updated: 2026-07-22
 - Purpose: native Vulkan hardware-ray-tracing game/technology demo.
 - Principle: **RT or nothing**; unsupported devices receive honest diagnostics, never a fake fallback.
 - Primary target: Android phone. Equal validation target: Windows RTX.
-- Current release: **Showcase Alpha 0.1.2**, package version `0.1.2-alpha.1`.
+- Current release: **Showcase Alpha 0.1.3**, package version `0.1.3-alpha.1`.
 - Canonical downloads: https://samfa12.itch.io/the-horde. Samfa12.com links to itch rather than hosting a second copy; the live `/games/` card, itch link, GitHub link, thumbnail, and released status were rendered and verified on 2026-07-15.
 - Source: https://github.com/Samfa12-tech/The-Horde-RT-demo.
-- Windows itch channel: upload `#18339908`, build `#1815416`, `windows-x64`.
-- Android itch channel: upload `#18341739`, build `#1815417`, `android`.
-- Signed Android APK SHA-256: `c9a26c79d4881230d2fd18b3bcbe4c1543032bccea760ade581f9a9fdcbf72b6`.
-- Windows ZIP SHA-256: `c3688bd8483ec13af2ae8e1d2e1708e17c840b33232822b795ef3283c6b7dee6`.
+- Windows itch channel: upload `#18339908`, build `#1845895`, `windows-x64`.
+- Android itch channel: upload `#18341739`, build `#1845896`, `android`.
+- Signed Android APK SHA-256: `a4eb996104c03734a7fa8a16be1f8f701d5b19c861c066af002f96f9a199eee9`.
+- Windows ZIP SHA-256: `4ccc86bfab56beb9bce238f025afbf3afbf00589c8396ce937607ae1b95c274f`.
 - Signing certificate SHA-256: `8245277a11bca5576f116724507f799d6f4c178ce5fbb7e3981415c9e6b3c245`.
 - The release JKS and a local-only password note live together outside Git with restricted ACLs. An independent owner backup is still required.
-- Release proof: `docs/SHOWCASE_ALPHA_0_1_2_RELEASE_VALIDATION_2026-07-22.md`.
+- Release proof: `docs/SHOWCASE_ALPHA_0_1_3_RELEASE_VALIDATION_2026-07-31.md`.
 
 ## Locked creative direction
 
@@ -39,11 +39,12 @@ Last updated: 2026-07-22
 
 ## Current alpha scene and controls
 
-- The complete route is skeleton encounter -> three-turn moving-shadow corridor -> lantern failure/drop -> blue skylight -> yellow/blue/red/green bays -> open framed threshold -> light-aware hero mirror -> floating staff-lit lich -> post-death sliding roof.
+- The complete route is skeleton encounter -> three-turn moving-shadow corridor -> lantern failure/drop -> blue skylight -> yellow/blue/red/green bays -> open framed threshold -> light-aware hero mirror -> floating staff-lit lich -> opening roof -> returning dawn -> epilogue.
 - The rejected stained pane is not present. The threshold remains open; shallow water is deferred while the wet-floor proof remains live.
 - The held and dropped lantern are RT geometry. Visible flame and direct-light contribution both reach zero after the authored fall; the old fullscreen overlay must not return.
-- The complete low-poly player uses torso, articulated IK arms, pelvis/legs/boots, procedural gait, a head shadow/reflection instance, and wall-aware held-prop retraction.
-- The procedural sword swings independently of the torch and the lich requires three accepted hits with a two-second lockout.
+- The rebuilt low-poly player uses a layered travelling coat, shaped shoulders/belt/collar/tails, articulated capsule arms and legs, pelvis/boots, foot lift and toe roll, torso counter-rotation, a head shadow/reflection instance, and wall-aware held-prop retraction.
+- Player vitality is three points with a one-second damage lockout, short fatal hold, encounter retry, route restart, and platform-native death overlays.
+- The procedural sword swings independently of the torch and the lich requires three accepted hits with a two-second lockout. Its death now opens the roof, reveals warm dawn, and ends in a contextual Continue/Begin Again/Quit epilogue.
 - The skeleton uses Hotstrike Studio's base asset processed with Meshy. The CC0 Meshy lich uses restrained `Idle_02`/`Dead` skinning plus whole-instance hover/orbit; its visibly distorted walking clip is deliberately not presented.
 - One skinned enemy is animated/refit/rendered at a time: skeleton in the opening route, lich after the skylight gate.
 - Android: left drag movement/strafe, right drag 360 look, Swing button, Android Back pause/resume.
@@ -66,7 +67,8 @@ Last updated: 2026-07-22
 ## Validated Android release state
 
 - Device: Samsung `SM-S948B`, Adreno 840, Vulkan 1.4.295, Android 16.
-- The exact stable-key-signed 0.1.2 APK installed as an update and reported `versionCode 3` / `versionName 0.1.2-alpha.1`.
+- The exact stable-key-signed 0.1.3 APK is published as build `#1845896`, `versionCode 4` / `versionName 0.1.3-alpha.1`, but was not installed in the publication pass because ADB exposed zero devices after restart. Do not infer a signed-release device pass.
+- The same feature source before the release-identity bump passed the full connected `SM-S948B` Debug gate, body/finale screenshots, real Continue and Begin Again actions, 13-waypoint replay, 12 captures, and Home/resume; see the 0.1.3 release proof for exact hashes and boundaries.
 - Strict environment plus lich ASTC and `RayTracingPipeline` selected; honest RT swapchain presentation reconfirmed.
 - All seventeen SoundPool clips loaded; no native renderer or Android runtime failure occurred.
 - The full route, touch controls, combat, reset, pause/Home lifecycle, and accessibility-scale UI passed hands-on validation.
@@ -79,7 +81,7 @@ Last updated: 2026-07-22
 
 - GPU: NVIDIA GeForce RTX 5050 Laptop GPU.
 - Release builds as `HordeLanternRT.exe` with GUI subsystem, icon/version resource, static MSVC runtime, and executable-relative assets.
-- A clean 0.1.2 candidate extraction launched without the source tree, selected `RayTracingPipeline`, and honestly presented the full route.
+- The exact final 0.1.3 candidate extraction launched without the source tree, selected `RayTracingPipeline`, dispatched `1232x803`, and honestly presented the RT scene.
 - Windows Debug/Release and all seven CTests pass; hands-on route, collision, mirror, combat, lighting, reset, and spatial-audio validation passed.
 - The Windows Release in-app benchmark is live-validated at 100%: 2/2 frame-symmetric laps, 26/26 waypoints, 1,838 measured frames, honest RT presentation throughout, selectable/copyable UI, and parseable timestamped text/JSON. See `docs/IN_APP_BENCHMARK_WINDOWS_VALIDATION_2026-07-17.md`.
 - The package includes both enemy GLBs, raw environment and lich textures, seventeen FilmCow WAVs, release notes, controls, and `ASSET_LICENSES.md`.
@@ -123,7 +125,7 @@ Last updated: 2026-07-22
 
 1. Preserve the published alpha and its stable signing identity.
 2. Back up the JKS and both passwords independently.
-3. Treat the complete 0.1.2 route as the preserved playable baseline; the stained pane was rejected, water remains deferred, and no second concurrent enemy is authorised without a measured plan.
+3. Treat the complete 0.1.3 body/vitality/dawn route as the preserved playable baseline; water remains deferred, and no second concurrent enemy is authorised without a measured plan.
 4. The deterministic checkpoint, three-window benchmark, native route replay, and bounded Android evidence runner foundation is complete and live-validated.
 5. The integrated cross-platform clean-build/package/stale-shader/licence gate and deterministic 12-checkpoint Windows/Android PNG capture foundation are complete and device-validated. Keep video/orbit-camera presentation work deferred until it has a separately bounded need.
 6. Gate each meaningful renderer/gameplay-route change on the phone at 75%; report 100% separately and retain the short hands-on touch/audio/lifecycle pass.

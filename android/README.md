@@ -64,6 +64,6 @@ The later debug automation baseline also passed live: five deterministic 75% che
 
 The showcase release identity is `0.1.3-alpha.1` with `versionCode 4`. Public candidates must be signed by the established Horde release key, retain strict ASTC routing and 16 KiB compatibility, and pass `tools/package-signed-alpha.ps1`; never replace the existing update identity with a new keystore.
 
-The exact signed 0.1.2 APK is published as itch build `#1815417`; SHA-256 `c9a26c79d4881230d2fd18b3bcbe4c1543032bccea760ade581f9a9fdcbf72b6`. It was installed over the stable package and reconfirmed `versionCode 3`, all seventeen SoundPool loads, strict ASTC environment/lich routing, Home/resume, Release automation rejection, and honest RT swapchain presentation. See `../docs/SHOWCASE_ALPHA_0_1_2_RELEASE_VALIDATION_2026-07-22.md`.
+The exact signed 0.1.3 APK is published as itch build `#1845896`; SHA-256 `a4eb996104c03734a7fa8a16be1f8f701d5b19c861c066af002f96f9a199eee9`. It passed the stable-key, manifest/version, 16 KiB alignment, ASTC/native-content, lint, and hash gates. The connected `SM-S948B` Debug build from the same feature source passed the complete body/finale route before the release identity bump, but ADB exposed no device for a final signed-APK install; that boundary is retained in `../docs/SHOWCASE_ALPHA_0_1_3_RELEASE_VALIDATION_2026-07-31.md`.
 
 Create/sign future releases with `../tools/create-android-release-key.ps1` and `../tools/package-signed-alpha.ps1`. Keep the JKS and signing properties outside Git.

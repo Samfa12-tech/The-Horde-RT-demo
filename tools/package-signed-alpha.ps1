@@ -9,11 +9,11 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-if ($Version -match '^0\.1\.(?:1|2)(?:$|[-+.])') {
-    throw "The published 0.1.1 and 0.1.2 release lines are immutable. Choose a new Version."
+if ($Version -match '^0\.1\.(?:1|2|3)(?:$|[-+.])') {
+    throw "The published 0.1.1, 0.1.2, and 0.1.3 release lines are immutable. Choose a new Version."
 }
-if ($VersionCode -le 3) {
-    throw "VersionCode must be greater than the immutable published value 3."
+if ($VersionCode -le 4) {
+    throw "VersionCode must be greater than the immutable published value 4."
 }
 $expectedCertificateSha256 = "8245277a11bca5576f116724507f799d6f4c178ce5fbb7e3981415c9e6b3c245"
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
