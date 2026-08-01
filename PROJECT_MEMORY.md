@@ -1,6 +1,6 @@
 # Horde Lantern RT - Project Memory
 
-Last updated: 2026-07-31
+Last updated: 2026-08-01
 
 ## Identity and release state
 
@@ -67,7 +67,8 @@ Last updated: 2026-07-31
 ## Validated Android release state
 
 - Device: Samsung `SM-S948B`, Adreno 840, Vulkan 1.4.295, Android 16.
-- The exact stable-key-signed 0.1.3 APK is published as build `#1845896`, `versionCode 4` / `versionName 0.1.3-alpha.1`, but was not installed in the publication pass because ADB exposed zero devices after restart. Do not infer a signed-release device pass.
+- The exact stable-key-signed 0.1.3 APK is published as build `#1845896`, `versionCode 4` / `versionName 0.1.3-alpha.1`. On 2026-08-01 the old stable 0.1.2 and Debug packages were removed, and the exact published APK was clean-installed on `SM-S948B`; the installed `base.apk` SHA-256 matched `a4eb996104c03734a7fa8a16be1f8f701d5b19c861c066af002f96f9a199eee9` byte-for-byte.
+- The signed Release selected strict ASTC, loaded all 17 SoundPool cues, visibly identified Alpha 0.1.3, explicitly rejected Debug capture automation, and honestly presented before and after Home/resume with no fatal marker. Evidence: `reports/release-smoke/android-signed-20260801-165934/` and `docs/SHOWCASE_ALPHA_0_1_3_RELEASE_VALIDATION_2026-07-31.md`.
 - The same feature source before the release-identity bump passed the full connected `SM-S948B` Debug gate, body/finale screenshots, real Continue and Begin Again actions, 13-waypoint replay, 12 captures, and Home/resume; see the 0.1.3 release proof for exact hashes and boundaries.
 - Strict environment plus lich ASTC and `RayTracingPipeline` selected; honest RT swapchain presentation reconfirmed.
 - All seventeen SoundPool clips loaded; no native renderer or Android runtime failure occurred.

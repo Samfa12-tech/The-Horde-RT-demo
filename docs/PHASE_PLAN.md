@@ -1,6 +1,6 @@
 # Phase Plan
 
-> This file records the implementation sequence. Earlier “next” and “deferred” statements are preserved as dated history; the complete route and foundation tooling are published in Showcase Alpha 0.1.2. Current priorities are indexed by `DOCUMENTATION_CHECKPOINT_2026-07-17.md`.
+> This file records the implementation sequence. Earlier “next” and “deferred” statements are preserved as dated history; the rebuilt player, vitality/retry loop, complete dawn ending, and foundation tooling are published in Showcase Alpha 0.1.3. Current priorities are indexed by `DOCUMENTATION_CHECKPOINT_2026-07-17.md`.
 
 ## Phase 0 - Vulkan RT capability proof: complete
 

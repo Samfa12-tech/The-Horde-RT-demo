@@ -1,5 +1,7 @@
 # Showcase Alpha 0.1.3 release validation - 2026-07-31
 
+> Post-publication device update, 2026-08-01: the exact published signed Android APK is now clean-install and Home/resume validated on `SM-S948B`; the publication-time unavailable-device caveat below is closed by the preserved evidence in `reports/release-smoke/android-signed-20260801-165934/`.
+
 ## Published identity
 
 - Display: **Horde Lantern RT - Showcase Alpha 0.1.3**
@@ -36,7 +38,13 @@ Evidence: `reports/release-smoke/windows-final-20260731-230246/`.
 
 Before the release identity bump, the exact Debug feature build was installed on Samsung `SM-S948B` / Android 16 and passed the full five-checkpoint 75% gate, all 13 replay waypoints, all 12 captures, Home/resume, touch-driven body inspection, the real dawn ending, Continue, and Begin Again with honest presentation. Its APK SHA-256 was `a9fe35932548f38e067c39ef604739aaa7eacd12005d119a88c0b77e2d7fa81e`; evidence is in `reports/android-showcase-runs/run-20260731-221231/` and `reports/android-body-finale-runs/run-20260731-221525/`.
 
-The final signed `0.1.3-alpha.1` APK passed static and packaging validation but was not installed: the publication gate and a subsequent ADB daemon restart both exposed zero devices. Therefore this record does **not** claim an exact signed-APK install, Release automation rejection, or signed-build Home/resume check. Reconnect the `SM-S948B` and run that focused release smoke before treating those checks as current.
+At publication time, the final signed `0.1.3-alpha.1` APK had passed static and packaging validation but could not be installed because the publication gate and a subsequent ADB daemon restart both exposed zero devices. That was the correct boundary for the initial publication record.
+
+On 2026-08-01, the phone reconnected as exact model `SM-S948B` / device code `m3q` / Android 16. The old stable `0.1.2-alpha.1` (`versionCode 3`) and Debug `0.1.2-alpha.1-debug` packages were explicitly removed. The published signed APK was then clean-installed as `com.samfa12.hordelanternrt`, `versionCode 4`, `versionName 0.1.3-alpha.1`; no Debug package remained. The installed on-device `base.apk` SHA-256 was `a4eb996104c03734a7fa8a16be1f8f701d5b19c861c066af002f96f9a199eee9`, exactly matching the published candidate.
+
+The exact Release build visibly identified `SHOWCASE · ALPHA 0.1.3`, selected strict ASTC 6x6 diffuse/ARM plus ASTC 4x4 normals and strict ASTC 6x6 lich textures, loaded 17/17 SoundPool cues, and explicitly logged `Rejected debug capture intent in a non-debuggable build.` It produced two `RT frame reached Android swapchain presentation.` markers across Home/resume, with no fatal Java, native, or renderer marker. The headed menu screenshot was visually inspected; battery temperature was 33.7 C. This closes the exact signed-install, Release automation-rejection, and signed-build Home/resume checks. It remains an automated functional smoke rather than a new performance certification or a claim about human touch feel, haptic perception, or perceived audio quality.
+
+Evidence: `reports/release-smoke/android-signed-20260801-165934/` (`summary.json`, scoped `logcat.txt`, package records, UI hierarchies, and startup/resume PNGs).
 
 ## Preserved boundaries
 

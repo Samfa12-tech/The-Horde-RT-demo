@@ -8,6 +8,7 @@ Horde Lantern RT is a native Vulkan hardware-ray-tracing technology demo for And
 - Current itch builds: Windows `#1845895`; Android `#1845896`
 - Published SHA-256: Windows `4ccc86bfab56beb9bce238f025afbf3afbf00589c8396ce937607ae1b95c274f`; Android `a4eb996104c03734a7fa8a16be1f8f701d5b19c861c066af002f96f9a199eee9`
 - Primary validated phone: Samsung `SM-S948B` / Adreno 840
+- Exact Android release smoke: the published signed `0.1.3-alpha.1` APK was clean-installed and byte-for-byte verified on `SM-S948B`, with strict ASTC, 17/17 SFX loads, honest RT presentation, Release automation rejection, and Home/resume recovery.
 - Validated Windows GPU: NVIDIA GeForce RTX 5050 Laptop GPU
 
 Showcase Alpha 0.1.3 adds a substantially rebuilt procedural player body with articulated walking, a three-point vitality/retry loop, and a complete post-lich dawn ending. The release-safe in-app benchmark and Samfa12 menu link remain available; detailed checkpoint, capture, and developer telemetry remain Debug-only.
