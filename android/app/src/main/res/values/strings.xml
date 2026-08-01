@@ -47,6 +47,7 @@
     <string name="report_save_failed">The benchmark report could not be saved.</string>
     <string name="controls_help">LEFT HALF\nDrag to walk and strafe\n\nRIGHT HALF\nDrag for 360° camera look\n\nSWING\nTap the amber button to attack\n\nMENU / BACK\nPause, restart, settings and diagnostics</string>
     <string name="sfx_enabled">Sound effects</string>
+    <string name="haptics_enabled">Vibration / haptics</string>
     <string name="sfx_volume">SFX volume</string>
     <string name="look_sensitivity">Look sensitivity</string>
     <string name="render_scale">Render resolution</string>

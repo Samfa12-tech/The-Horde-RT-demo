@@ -17,11 +17,19 @@ The demo must prove real native Vulkan hardware ray tracing. Browser rendering, 
 
 ## Build / test / demo cycle decision - 2026-07-17
 
-The first supporting foundation is complete: Android Debug has deterministic route checkpoints, three-window measurement, native route replay, fixed screenshots, state evidence, and a bounded one-command runner. The live developer overlay is now complete and live-validated on Windows; its shared Android Debug plumbing compiles but remains device-unvalidated until the phone is attached. The remaining cycle work is that Android device gate, integrated cross-platform clean-build/package/stale-shader/licence gates, and fixed video/presentation capture. Detailed scope and guardrails live in `docs/BUILD_TEST_DEMO_CYCLE_PLAN_2026-07-17.md`.
+The supporting demo foundation is complete and device-validated: Android Debug has deterministic route checkpoints, three-window measurement, native route replay, fixed screenshots, state evidence, the live developer overlay, and a bounded one-command runner. The integrated cross-platform clean-build/package/stale-shader/licence gate and deterministic capture foundation are also complete. Fixed video/orbit presentation remains separately deferred. Detailed historical scope and guardrails live in `docs/BUILD_TEST_DEMO_CYCLE_PLAN_2026-07-17.md`.
 
 The normal player-facing route remains intact; development checkpoints and overlays must stay tucked away from branded entry/pause/settings surfaces. Game-facing combat polish follows the tooling foundation. Do not raise the one-active-skinned-enemy limit without a separate phone measurement.
 
 Windows Debug uses F3 for the compact live overlay while F2 retains the full paused RT diagnostics surface. Release builds omit the F3 control, help text, menu command, and live overlay UI. Android Release keeps the native developer-overlay request empty; only debuggable builds may show the hidden view.
+
+## Full-game foundation decision - 2026-08-01
+
+Showcase Alpha 0.1.3 is the preserved demo baseline. Full-game work begins with a shared fixed-step simulation, input mailbox, bounded gameplay-event queue, persistent enemy IDs/state, and platform-parity tests. Do not expand the current duplicated Windows/Android render-loop orchestration directly.
+
+The first multi-enemy slice is two skeleton instances with a dedicated `SM-S948B` performance gate. Keep the published one-active-skinned-enemy default until that gate passes; four enemies require a later measured step. Use flat fixed-capacity data and stable IDs rather than a general ECS.
+
+Combat animations use game-owned action state and explicit animation events for damage windows. Fire uses bounded emitter data plus emissive RT geometry and raygen effects. Shallow water uses real RT-visible geometry with bounded ray-query reflection/transmission; steam uses bounded depth-aware raygen volumes. Preserve `vkCmdTraceRaysKHR`, phone-safe `rayQueryEXT`, one frame in flight, honest presentation, strict ASTC, and BGRA copy compensation throughout. The audit and acceptance plan are `docs/FULL_REPO_AUDIT_AND_GAME_PLAN_2026-08-01.md`.
 
 ## Target devices
 

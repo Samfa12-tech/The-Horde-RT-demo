@@ -20,6 +20,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
 import android.util.Log;
@@ -84,6 +86,9 @@ public class MainActivity extends Activity {
     private static final int PLAYER_DYING = 1;
     private static final int PLAYER_DEAD = 2;
     private static final int FINALE_ENDING_COMPLETE = 4;
+    private static final int HAPTIC_SWING = 0;
+    private static final int HAPTIC_DAMAGE = 1;
+    private static final int HAPTIC_FATAL = 2;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final float[] viewControls = {0.0f, 0.0f, 1.8f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
@@ -103,6 +108,7 @@ public class MainActivity extends Activity {
     private TextView vitalityStatus;
     private Button attackButton;
     private SoundPool soundPool;
+    private Vibrator vibrator;
     private String reportText = "";
     private boolean resumed;
     private boolean surfaceAvailable;
@@ -142,10 +148,12 @@ public class MainActivity extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_main);
         preferences = getSharedPreferences(PREFS, MODE_PRIVATE);
+        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         ProbeBridge.setRenderScale(preferences.getInt("render_scale", 100) / 100.0f);
         consumeDebugAutomationIntent(getIntent());
 
         surfaceView = findViewById(R.id.scene_surface);
+        surfaceView.setHapticFeedbackEnabled(true);
         menuScrim = findViewById(R.id.menu_scrim);
         diagnosticsPanel = findViewById(R.id.diagnostics_panel);
         reportTextView = findViewById(R.id.report_text);
@@ -180,6 +188,7 @@ public class MainActivity extends Activity {
             if (menuVisible || diagnosticsVisible || deathOverlayVisible || ProbeBridge.getRuntimeState() != 1) return;
             ProbeBridge.requestAttack();
             playSound((swingVariant++ & 1) == 0 ? "sword_swing_1" : "sword_swing_2", 0.28f);
+            performHaptic(HAPTIC_SWING);
         });
         diagnosticsBack.setOnClickListener(view -> {
             playSound("ui_back", 0.18f);
@@ -515,6 +524,18 @@ public class MainActivity extends Activity {
                     handler.postDelayed(applyPendingRenderScale, 350L);
                 });
 
+        final CheckBox hapticsEnabled = new CheckBox(this);
+        hapticsEnabled.setText(R.string.haptics_enabled);
+        hapticsEnabled.setTextColor(0xFFFFE5BA);
+        hapticsEnabled.setTextSize(16);
+        hapticsEnabled.setChecked(preferences.getBoolean("haptics_enabled", true));
+        hapticsEnabled.setMinHeight(dp(48));
+        hapticsEnabled.setOnCheckedChangeListener((buttonView, checked) -> {
+            preferences.edit().putBoolean("haptics_enabled", checked).apply();
+            if (checked) performHaptic(HAPTIC_SWING);
+        });
+        panel.addView(hapticsEnabled, matchWrap());
+
         final CheckBox showHud = new CheckBox(this);
         showHud.setText(R.string.show_hud);
         showHud.setTextColor(0xFFFFE5BA);
@@ -822,9 +843,9 @@ public class MainActivity extends Activity {
                     playSpatialSound("lich_hurt", 0.82f, enemyStereoGains);
                 }
                 if ((events & AUDIO_EVENT_PLAYER_KILLED) != 0) {
-                    surfaceView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+                    performHaptic(HAPTIC_FATAL);
                 } else if ((events & AUDIO_EVENT_PLAYER_DAMAGED) != 0) {
-                    surfaceView.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK);
+                    performHaptic(HAPTIC_DAMAGE);
                 }
                 if (diagnosticsVisible && ++diagnosticsRefreshTick >= 5) {
                     diagnosticsRefreshTick = 0;
@@ -839,6 +860,39 @@ public class MainActivity extends Activity {
 
     private boolean isDebuggableApp() {
         return (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+    }
+
+    @SuppressWarnings("deprecation")
+    private void performHaptic(final int cue) {
+        if (!resumed || !preferences.getBoolean("haptics_enabled", true)) return;
+
+        try {
+            if (vibrator != null && vibrator.hasVibrator()) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    if (cue == HAPTIC_FATAL) {
+                        vibrator.vibrate(VibrationEffect.createWaveform(
+                                new long[]{0L, 70L, 55L, 120L},
+                                new int[]{0, 210, 0, 255},
+                                -1));
+                    } else {
+                        final long duration = cue == HAPTIC_DAMAGE ? 55L : 22L;
+                        final int amplitude = cue == HAPTIC_DAMAGE ? 180 : 90;
+                        vibrator.vibrate(VibrationEffect.createOneShot(duration, amplitude));
+                    }
+                } else if (cue == HAPTIC_FATAL) {
+                    vibrator.vibrate(new long[]{0L, 70L, 55L, 120L}, -1);
+                } else {
+                    vibrator.vibrate(cue == HAPTIC_DAMAGE ? 55L : 22L);
+                }
+                return;
+            }
+        } catch (final RuntimeException error) {
+            Log.w(TAG, "Direct vibration failed; using view haptic fallback.", error);
+        }
+
+        surfaceView.performHapticFeedback(
+                cue == HAPTIC_FATAL ? HapticFeedbackConstants.LONG_PRESS : HapticFeedbackConstants.CLOCK_TICK,
+                HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
     }
 
     private static int checkpointId(final String name) {
@@ -1295,6 +1349,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onPause() {
         resumed = false;
+        if (vibrator != null) vibrator.cancel();
         if (deathOverlayVisible || retryPending || endingOverlayVisible) {
             retryPending = false;
             deathOverlayVisible = false;
@@ -1317,6 +1372,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         handler.removeCallbacksAndMessages(null);
+        if (vibrator != null) vibrator.cancel();
         if (debugRetryReceiver != null) {
             unregisterReceiver(debugRetryReceiver);
             debugRetryReceiver = null;

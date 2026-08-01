@@ -126,12 +126,25 @@ Last updated: 2026-08-01
 
 1. Preserve the published alpha and its stable signing identity.
 2. Back up the JKS and both passwords independently.
-3. Treat the complete 0.1.3 body/vitality/dawn route as the preserved playable baseline; water remains deferred, and no second concurrent enemy is authorised without a measured plan.
+3. Treat the complete 0.1.3 body/vitality/dawn route as the preserved playable baseline. The 2026-08-01 full-repo audit freezes it as the demo baseline and selects a shared fixed-step simulation/input/event foundation as the next milestone; see `docs/FULL_REPO_AUDIT_AND_GAME_PLAN_2026-08-01.md`.
 4. The deterministic checkpoint, three-window benchmark, native route replay, and bounded Android evidence runner foundation is complete and live-validated.
 5. The integrated cross-platform clean-build/package/stale-shader/licence gate and deterministic 12-checkpoint Windows/Android PNG capture foundation are complete and device-validated. Keep video/orbit-camera presentation work deferred until it has a separately bounded need.
 6. Gate each meaningful renderer/gameplay-route change on the phone at 75%; report 100% separately and retain the short hands-on touch/audio/lifecycle pass.
 7. Keep real RT and honest diagnostics. Reduce bounded effect area/ray cost before expanding gameplay or substituting fake effects.
 8. Treat `docs/BUILD_TEST_DEMO_CYCLE_PLAN_2026-07-17.md` as the detailed backlog and `docs/DOCUMENTATION_CHECKPOINT_2026-07-17.md` as the documentation authority map.
+
+## Full-game pause-point audit - 2026-08-01
+
+- The next work is a short pre-production foundation, not direct horde expansion: one shared `GameSimulation` tick, an Android-safe input mailbox, normalized fixed-step movement, a bounded gameplay-event queue, persistent encounter state, and deterministic platform-parity tests.
+- The audit found a real Android input data race and frame-dependent movement. Fix both before adding enemies or richer combat.
+- Current multi-enemy capacity is only descriptive metadata: one TLAS enemy slot, global shader enemy selection, and one active CPU-skinned/refit pose remain the real implementation boundary.
+- First expansion gate is two skeleton instances sharing a model/pose and using an attacker token. Four enemies require a later, separate phone pass.
+- Combat animation follows the shared simulation and uses action states plus explicit animation hit events. Rendering consumes snapshots and never decides damage.
+- Fire uses bounded emitter records, emissive RT geometry, and phone-budgeted raygen effects. Shallow water uses real geometry plus bounded reflection/transmission queries; steam uses bounded raygen density volumes. No particle BLAS swarm, SSR, raster fallback, or fluid simulation.
+- The audit introduced a named `RtSceneFrameInputs` renderer snapshot and one checked buffer-write helper without changing shader output or renderer policy.
+- Before wider source collaboration, resolve the pending raw-skeleton public redistribution permission or replace/remediate the asset. This pause-point commit normalized the six current Poly Haven texture arrays that conflicted with the repo's Git LFS attributes; any older-history rewrite remains a separate decision.
+- Audit validation passed Windows Debug/Release builds and 7/7 CTests in each configuration, a 12/12 deterministic Windows RT capture set bit-exact against the 2026-07-31 baseline, Android Debug/unsigned Release across all configured ABIs, and `lintRelease`. No new renderer-visual or performance phone claim was made; exact-device haptics evidence was added separately.
+- The owner corrected the earlier haptics report: haptics had not previously been checked or perceived on `SM-S948B`. The audit revision adds direct Android vibration for swing/damage/fatal cues plus an enabled-by-default setting/preview and view fallback. Exact Debug APK `14e63fcfa4d3b2ed5fc6982ea4f0e35d5ea4b1a0bb78ef7cf7ba15e4d4cb3380` installed byte-for-byte with permission granted; after unlock, Android recorded completed preview, Swing, damage, and fatal effects through the real encounter, and the owner confirmed the haptic was physically felt. Basic operation passes; intensity/comfort/cue distinction remain later tuning. Full-game haptics should consume the shared gameplay-event queue beside audio.
 
 ## Showcase route blockout - 2026-07-16 historical milestone
 

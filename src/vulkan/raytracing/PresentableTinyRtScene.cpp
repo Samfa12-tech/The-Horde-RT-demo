@@ -580,6 +580,29 @@ void PresentableTinyRtScene::DestroyBuffer(Buffer& buffer) const
     buffer = {};
 }
 
+bool PresentableTinyRtScene::WriteBuffer(const Buffer& buffer,
+                                         const void* data,
+                                         const VkDeviceSize size,
+                                         const char* label,
+                                         std::string& diagnostic) const
+{
+    if (buffer.memory == VK_NULL_HANDLE || data == nullptr || size == 0u || size > buffer.size)
+    {
+        diagnostic = std::string("Invalid ") + label + " upload.";
+        return false;
+    }
+
+    void* mapped = nullptr;
+    if (vkMapMemory(device_, buffer.memory, 0u, size, 0u, &mapped) != VK_SUCCESS || mapped == nullptr)
+    {
+        diagnostic = std::string("Failed to map ") + label + " memory.";
+        return false;
+    }
+    std::memcpy(mapped, data, static_cast<std::size_t>(size));
+    vkUnmapMemory(device_, buffer.memory);
+    return true;
+}
+
 VkDeviceAddress PresentableTinyRtScene::BufferAddress(VkBuffer buffer) const
 {
     VkBufferDeviceAddressInfo addressInfo{VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO};
@@ -821,15 +844,11 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
 
     Buffer staging;
     if (!CreateBuffer(byteSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, false, staging, diagnostic)) return false;
-    void* mapped = nullptr;
-    if (vkMapMemory(device_, staging.memory, 0u, byteSize, 0u, &mapped) != VK_SUCCESS || mapped == nullptr)
+    if (!WriteBuffer(staging, pixels.data(), byteSize, "PBR texture staging", diagnostic))
     {
         DestroyBuffer(staging);
-        diagnostic = "Failed to map PBR texture staging memory.";
         return false;
     }
-    std::memcpy(mapped, pixels.data(), pixels.size());
-    vkUnmapMemory(device_, staging.memory);
 
     VkImageCreateInfo imageInfo{VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO};
     imageInfo.imageType = VK_IMAGE_TYPE_2D;
@@ -1513,19 +1532,14 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         return false;
     }
 
-    void* mapped = nullptr;
-    vkMapMemory(device_, vertexBuffer_.memory, 0u, vertexBufferSize, 0u, &mapped);
-    std::memcpy(mapped, vertices.data(), static_cast<std::size_t>(vertexBufferSize));
-    vkUnmapMemory(device_, vertexBuffer_.memory);
-    vkMapMemory(device_, indexBuffer_.memory, 0u, indexBufferSize, 0u, &mapped);
-    std::memcpy(mapped, indices.data(), static_cast<std::size_t>(indexBufferSize));
-    vkUnmapMemory(device_, indexBuffer_.memory);
-    vkMapMemory(device_, transformBuffer_.memory, 0u, sizeof(transform), 0u, &mapped);
-    std::memcpy(mapped, &transform, sizeof(transform));
-    vkUnmapMemory(device_, transformBuffer_.memory);
-    vkMapMemory(device_, worldSurfaceBuffer_.memory, 0u, worldSurfaceBufferSize, 0u, &mapped);
-    std::memcpy(mapped, worldSurfaceCodes.data(), static_cast<std::size_t>(worldSurfaceBufferSize));
-    vkUnmapMemory(device_, worldSurfaceBuffer_.memory);
+    if (!WriteBuffer(vertexBuffer_, vertices.data(), vertexBufferSize, "world vertex", diagnostic) ||
+        !WriteBuffer(indexBuffer_, indices.data(), indexBufferSize, "world index", diagnostic) ||
+        !WriteBuffer(transformBuffer_, &transform, sizeof(transform), "world transform", diagnostic) ||
+        !WriteBuffer(worldSurfaceBuffer_, worldSurfaceCodes.data(), worldSurfaceBufferSize,
+                     "world surface metadata", diagnostic))
+    {
+        return false;
+    }
 
     VkAccelerationStructureGeometryKHR blasGeometry{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
     blasGeometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
@@ -1892,9 +1906,11 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     {
         return false;
     }
-    vkMapMemory(device_, skeletonVertexBuffer_.memory, 0u, skeletonVertexBufferSize, 0u, &mapped);
-    std::memcpy(mapped, skeletonSkinnedVertices_.data(), static_cast<std::size_t>(skeletonVertexBufferSize));
-    vkUnmapMemory(device_, skeletonVertexBuffer_.memory);
+    if (!WriteBuffer(skeletonVertexBuffer_, skeletonSkinnedVertices_.data(), skeletonVertexBufferSize,
+                     "skeleton vertex", diagnostic))
+    {
+        return false;
+    }
 
     VkAccelerationStructureGeometryKHR skeletonGeometry{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
     skeletonGeometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
@@ -1975,9 +1991,11 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     {
         return false;
     }
-    vkMapMemory(device_, lichVertexBuffer_.memory, 0u, lichVertexBufferSize, 0u, &mapped);
-    std::memcpy(mapped, lichSkinnedVertices_.data(), static_cast<std::size_t>(lichVertexBufferSize));
-    vkUnmapMemory(device_, lichVertexBuffer_.memory);
+    if (!WriteBuffer(lichVertexBuffer_, lichSkinnedVertices_.data(), lichVertexBufferSize,
+                     "lich vertex", diagnostic))
+    {
+        return false;
+    }
 
     VkAccelerationStructureGeometryKHR lichGeometry{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
     lichGeometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
@@ -2096,9 +2114,10 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     {
         return false;
     }
-    vkMapMemory(device_, instanceBuffer_.memory, 0u, sizeof(instances), 0u, &mapped);
-    std::memcpy(mapped, instances.data(), sizeof(instances));
-    vkUnmapMemory(device_, instanceBuffer_.memory);
+    if (!WriteBuffer(instanceBuffer_, instances.data(), sizeof(instances), "TLAS instance", diagnostic))
+    {
+        return false;
+    }
 
     VkAccelerationStructureGeometryKHR tlasGeometry{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
     tlasGeometry.geometryType = VK_GEOMETRY_TYPE_INSTANCES_KHR;
@@ -2428,19 +2447,15 @@ bool PresentableTinyRtScene::CreateShaderBindingTable(std::string& diagnostic)
         return false;
     }
 
-    void* mapped = nullptr;
-    if (vkMapMemory(device_, shaderBindingTable_.memory, 0u, sbtSize, 0u, &mapped) != VK_SUCCESS)
-    {
-        diagnostic = "Failed to map RT shader binding table.";
-        return false;
-    }
-    auto* output = static_cast<std::uint8_t*>(mapped);
-    std::memset(output, 0, sbtSize);
+    std::vector<std::uint8_t> sbtData(sbtSize, 0u);
     for (std::uint32_t group = 0u; group < groupCount; ++group)
     {
-        std::memcpy(output + (regionSize * group), handles.data() + (handleSize * group), handleSize);
+        std::memcpy(sbtData.data() + (regionSize * group), handles.data() + (handleSize * group), handleSize);
     }
-    vkUnmapMemory(device_, shaderBindingTable_.memory);
+    if (!WriteBuffer(shaderBindingTable_, sbtData.data(), sbtSize, "RT shader binding table", diagnostic))
+    {
+        return false;
+    }
 
     raygenRegion_.deviceAddress = shaderBindingTable_.address;
     raygenRegion_.stride = groupStride;
@@ -2458,18 +2473,19 @@ bool PresentableTinyRtScene::CreateShaderBindingTable(std::string& diagnostic)
 }
 
 bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffer,
-                                                     float cameraYaw,
-                                                     float cameraPitch,
-                                                     float walkTime,
-                                                     float cameraX,
-                                                     float cameraZ,
-                                                     float walkAmount,
-                                                     const horde::gameplay::CombatSnapshot& combat,
-                                                     const horde::gameplay::LanternSnapshot& lantern,
-                                                     const horde::gameplay::EnemyRosterSnapshot& roster,
-                                                     const horde::gameplay::LichSnapshot& lich,
+                                                     const RtSceneFrameInputs& frame,
                                                      std::string& diagnostic)
 {
+    const float cameraYaw = frame.cameraYaw;
+    const float cameraPitch = frame.cameraPitch;
+    const float walkTime = frame.walkTime;
+    const float cameraX = frame.cameraX;
+    const float cameraZ = frame.cameraZ;
+    const float walkAmount = frame.walkAmount;
+    const horde::gameplay::CombatSnapshot& combat = frame.combat;
+    const horde::gameplay::LanternSnapshot& lantern = frame.lantern;
+    const horde::gameplay::EnemyRosterSnapshot& roster = frame.roster;
+    const horde::gameplay::LichSnapshot& lich = frame.lich;
     if (instanceBuffer_.memory == VK_NULL_HANDLE || skeletonVertexBuffer_.memory == VK_NULL_HANDLE ||
         skeletonBlas_.handle == VK_NULL_HANDLE || lichBlas_.handle == VK_NULL_HANDLE ||
         finaleRoofBlas_.handle == VK_NULL_HANDLE ||
@@ -2658,7 +2674,6 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const bool updateSkeleton = !selectedLich && (clipChanged || lastSkeletonUpdateTime_ < 0.0f ||
                                 skeletonTime < lastSkeletonUpdateTime_ ||
                                 (skeletonTime - lastSkeletonUpdateTime_) >= skeletonUpdateInterval);
-    void* mapped = nullptr;
     if (updateSkeleton)
     {
         if (!skeletonModel_.Skin(skeletonClip, skeletonTime, skeletonSkinnedVertices_, diagnostic))
@@ -2666,13 +2681,11 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             return false;
         }
         const VkDeviceSize skeletonVertexBufferSize = sizeof(horde::scene::SkinnedRtVertex) * skeletonSkinnedVertices_.size();
-        if (vkMapMemory(device_, skeletonVertexBuffer_.memory, 0u, skeletonVertexBufferSize, 0u, &mapped) != VK_SUCCESS || mapped == nullptr)
+        if (!WriteBuffer(skeletonVertexBuffer_, skeletonSkinnedVertices_.data(), skeletonVertexBufferSize,
+                         "animated skeleton vertex", diagnostic))
         {
-            diagnostic = "Failed to update animated skeleton vertex data.";
             return false;
         }
-        std::memcpy(mapped, skeletonSkinnedVertices_.data(), static_cast<std::size_t>(skeletonVertexBufferSize));
-        vkUnmapMemory(device_, skeletonVertexBuffer_.memory);
         lastSkeletonUpdateTime_ = skeletonTime;
         lastSkeletonClip_ = skeletonClipIndex;
     }
@@ -2695,13 +2708,11 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             return false;
         }
         const VkDeviceSize lichVertexBufferSize = sizeof(horde::scene::TexturedSkinnedRtVertex) * lichSkinnedVertices_.size();
-        if (vkMapMemory(device_, lichVertexBuffer_.memory, 0u, lichVertexBufferSize, 0u, &mapped) != VK_SUCCESS || mapped == nullptr)
+        if (!WriteBuffer(lichVertexBuffer_, lichSkinnedVertices_.data(), lichVertexBufferSize,
+                         "animated lich vertex", diagnostic))
         {
-            diagnostic = "Failed to update animated lich vertex data.";
             return false;
         }
-        std::memcpy(mapped, lichSkinnedVertices_.data(), static_cast<std::size_t>(lichVertexBufferSize));
-        vkUnmapMemory(device_, lichVertexBuffer_.memory);
         lichStaffLocalSample_ = {{0.0f, 0.0f, 0.0f}};
         for (std::uint32_t vertexIndex : kLichStaffEmissiveVertices)
         {
@@ -2829,13 +2840,10 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         1.0f, 0.0f, 0.0f, -2.72f * std::clamp(lich.finaleSkylightOpenProgress, 0.0f, 1.0f),
         0.0f, 1.0f, 0.0f, 0.0f,
         0.0f, 0.0f, 1.0f, 0.0f}};
-    if (vkMapMemory(device_, instanceBuffer_.memory, 0u, sizeof(instances), 0u, &mapped) != VK_SUCCESS || mapped == nullptr)
+    if (!WriteBuffer(instanceBuffer_, instances.data(), sizeof(instances), "animated TLAS instance", diagnostic))
     {
-        diagnostic = "Failed to update combat instance data.";
         return false;
     }
-    std::memcpy(mapped, instances.data(), sizeof(instances));
-    vkUnmapMemory(device_, instanceBuffer_.memory);
 
     VkMemoryBarrier hostWriteBarrier{VK_STRUCTURE_TYPE_MEMORY_BARRIER};
     hostWriteBarrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;
@@ -2975,19 +2983,8 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                                                 VkImage swapchainImage,
                                                 VkImageLayout& swapchainImageLayout,
                                                 VkExtent2D swapchainExtent,
-                                                float cameraYaw,
-                                                float cameraPitch,
-                                                float lanternStrength,
-                                                float walkTime,
-                                                 float cameraX,
-                                                 float cameraZ,
-                                                 float walkAmount,
-                                                 float outputExposure,
-                                                 const horde::gameplay::CombatSnapshot& combat,
-                                                 const horde::gameplay::LanternSnapshot& lantern,
-                                                 const horde::gameplay::EnemyRosterSnapshot& roster,
-                                                 const horde::gameplay::LichSnapshot& lich,
-                                                 std::string& diagnostic)
+                                                const RtSceneFrameInputs& frame,
+                                                std::string& diagnostic)
 {
     if (!ready_)
     {
@@ -3002,8 +2999,7 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
         return false;
     }
 
-    if (!UpdateDynamicInstances(commandBuffer, cameraYaw, cameraPitch, walkTime, cameraX, cameraZ,
-                                walkAmount, combat, lantern, roster, lich, diagnostic))
+    if (!UpdateDynamicInstances(commandBuffer, frame, diagnostic))
     {
         return false;
     }
@@ -3024,26 +3020,26 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, pipeline_);
     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, pipelineLayout_, 0u, 1u, &descriptorSet_, 0u, nullptr);
     const std::array<float, 3u> staffWorldPosition =
-        TransformPoint(LichInstanceTransform(lich), lichStaffLocalSample_);
+        TransformPoint(LichInstanceTransform(frame.lich), lichStaffLocalSample_);
     const float heldPropDepth = horde::gameplay::ComputeShowcaseHeldPropDepth(
-        cameraX, cameraZ, std::sin(cameraYaw), -std::cos(cameraYaw));
-    const ScenePushConstants pushConstants{cameraYaw,
-                                           cameraPitch,
-                                           lanternStrength,
-                                           walkTime,
-                                           cameraX,
-                                            cameraZ,
-                                            walkAmount,
+        frame.cameraX, frame.cameraZ, std::sin(frame.cameraYaw), -std::cos(frame.cameraYaw));
+    const ScenePushConstants pushConstants{frame.cameraYaw,
+                                           frame.cameraPitch,
+                                           frame.lanternStrength,
+                                           frame.walkTime,
+                                           frame.cameraX,
+                                           frame.cameraZ,
+                                           frame.walkAmount,
                                             presentationUsesBgra_ && !scaledPresentation ? 1.0f : 0.0f,
-                                            std::clamp(outputExposure, 0.2f, 1.4f),
-                                            std::clamp(combat.damageFlash, 0.0f, 1.0f),
-                                            roster.selectedEnemy == horde::gameplay::EnemyKind::Lich ? 1.0f : 0.0f,
-                                            std::clamp(lich.staffLightStrength, 0.0f, 2.2f),
+                                            std::clamp(frame.outputExposure, 0.2f, 1.4f),
+                                            std::clamp(frame.combat.damageFlash, 0.0f, 1.0f),
+                                            frame.roster.selectedEnemy == horde::gameplay::EnemyKind::Lich ? 1.0f : 0.0f,
+                                            std::clamp(frame.lich.staffLightStrength, 0.0f, 2.2f),
                                             staffWorldPosition[0],
                                             staffWorldPosition[1],
                                             staffWorldPosition[2],
-                                            std::clamp(lich.finaleSkylightOpenProgress, 0.0f, 1.0f),
-                                            std::clamp(lich.finaleDawnRevealProgress, 0.0f, 1.0f),
+                                            std::clamp(frame.lich.finaleSkylightOpenProgress, 0.0f, 1.0f),
+                                            std::clamp(frame.lich.finaleDawnRevealProgress, 0.0f, 1.0f),
                                             heldPropDepth};
     lastOutputRedBlueSwapApplied_ = pushConstants.outputRedBlueSwap > 0.5f;
     vkCmdPushConstants(commandBuffer,

@@ -1798,23 +1798,25 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
         horde::gameplay::CombatSnapshot renderCombat = context.combatSnapshot;
         renderCombat.damageFlash = context.playerVitals.Snapshot().damageFlash;
         PublishEnemyAudioGains(context);
+        horde::vulkan::raytracing::RtSceneFrameInputs frameInputs;
+        frameInputs.cameraYaw = context.cameraYaw;
+        frameInputs.cameraPitch = context.cameraPitch;
+        frameInputs.lanternStrength = context.lanternStrength * context.lanternSnapshot.flameStrength;
+        frameInputs.walkTime = context.walkTime;
+        frameInputs.cameraX = context.cameraX;
+        frameInputs.cameraZ = context.cameraZ;
+        frameInputs.walkAmount = context.walkVisualAmount;
+        frameInputs.outputExposure = context.outputExposure;
+        frameInputs.combat = renderCombat;
+        frameInputs.lantern = context.lanternSnapshot;
+        frameInputs.roster = roster;
+        frameInputs.lich = lich;
         std::string diagnostic;
         if (!context.rtScene.RecordTraceAndCopy(context.commandBuffers[imageIndex],
                                                 context.swapchainImages[imageIndex],
                                                 context.swapchainImageLayouts[imageIndex],
                                                 context.swapchainExtent,
-                                                context.cameraYaw,
-                                                context.cameraPitch,
-                                                context.lanternStrength * context.lanternSnapshot.flameStrength,
-                                                context.walkTime,
-                                                context.cameraX,
-                                                context.cameraZ,
-                                                context.walkVisualAmount,
-                                                context.outputExposure,
-                                                renderCombat,
-                                                context.lanternSnapshot,
-                                                roster,
-                                                lich,
+                                                frameInputs,
                                                 diagnostic))
         {
             __android_log_print(ANDROID_LOG_ERROR, kTag, "Failed to record RT frame: %s", diagnostic.c_str());

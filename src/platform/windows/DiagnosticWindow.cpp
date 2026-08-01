@@ -2424,23 +2424,25 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             const char* clip = (ctx.enemyFootstepVariant++ & 1) == 0 ? "skeleton_step_1.wav" : "skeleton_step_2.wav";
             PlayEnemySoundEffect(ctx, clip, 1.0f);
         }
+        horde::vulkan::raytracing::RtSceneFrameInputs frameInputs;
+        frameInputs.cameraYaw = ctx.cameraYaw;
+        frameInputs.cameraPitch = ctx.cameraPitch;
+        frameInputs.lanternStrength = ctx.lanternStrength * ctx.lanternSnapshot.flameStrength;
+        frameInputs.walkTime = ctx.walkTime;
+        frameInputs.cameraX = ctx.cameraX;
+        frameInputs.cameraZ = ctx.cameraZ;
+        frameInputs.walkAmount = ctx.walkVisualAmount;
+        frameInputs.outputExposure = ctx.outputExposure;
+        frameInputs.combat = renderCombat;
+        frameInputs.lantern = ctx.lanternSnapshot;
+        frameInputs.roster = roster;
+        frameInputs.lich = lich;
         std::string diagnostic;
         if (!ctx.rtScene.RecordTraceAndCopy(ctx.commandBuffers[imageIndex],
                                             ctx.swapchainImages[imageIndex],
                                             ctx.swapchainImageLayouts[imageIndex],
                                             ctx.swapchainExtent,
-                                            ctx.cameraYaw,
-                                            ctx.cameraPitch,
-                                            ctx.lanternStrength * ctx.lanternSnapshot.flameStrength,
-                                            ctx.walkTime,
-                                            ctx.cameraX,
-                                            ctx.cameraZ,
-                                            ctx.walkVisualAmount,
-                                            ctx.outputExposure,
-                                            renderCombat,
-                                            ctx.lanternSnapshot,
-                                            roster,
-                                            lich,
+                                            frameInputs,
                                             diagnostic))
         {
             std::cerr << "Failed to record RT frame: " << diagnostic << '\n';

@@ -2,7 +2,7 @@
 
 Date: 2026-07-31
 
-Status: host validation and automated `SM-S948B` device validation passed; the project owner subsequently reported the pending hands-on touch, haptics, spatial-audio, and fatal-hold checks complete on that installed build.
+Status: host validation and automated `SM-S948B` device validation passed. The project owner subsequently corrected the earlier hands-on report on 2026-08-01 because haptics had not actually been checked. A revised direct-vibration Debug build was then installed byte-for-byte; Android recorded its preview, Swing, damage, and fatal effects through the live encounter, and the owner confirmed the revised haptic was physically felt. Basic haptic operation is now device-validated, while intensity/comfort/cue distinction remain tuning questions.
 
 ## Delivered behavior
 
@@ -55,4 +55,4 @@ The focused `tools/run-android-vitality-validation.ps1 -SkipInstall` trial in `r
 
 An earlier extended run at 35.7-36.0 C exceeded 13.7 ms in opening, green, and lich, so temperature and run-order sensitivity remain relevant stress evidence. The later exact-clean-APK run above reconfirmed every required zone below target in one uninterrupted pass.
 
-The project owner later reported the hands-on pass complete on the same `SM-S948B`, covering human-finger activation of the death actions, perceived accepted/fatal-hit haptics, perceived spatial audio, and the 0.65-second fatal hold. This remains owner-reported local device evidence; the preserved automation evidence above still uses the documented Debug-only receiver because ADB shell touch did not dispatch the visible retry button on this Samsung build.
+The project owner later reported the hands-on pass complete on the same `SM-S948B`, covering human-finger activation of the death actions, perceived accepted/fatal-hit haptics, perceived spatial audio, and the 0.65-second fatal hold. On 2026-08-01 the owner corrected that report: haptics had not actually been checked and were not perceived in the current demo. Preserve the original history, but withdraw only its haptics qualification. The preserved automation evidence above still uses the documented Debug-only receiver because ADB shell touch did not dispatch the visible retry button on this Samsung build.

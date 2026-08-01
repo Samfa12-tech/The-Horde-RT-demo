@@ -14,6 +14,22 @@
 namespace horde::vulkan::raytracing
 {
 
+struct RtSceneFrameInputs
+{
+    float cameraYaw = 0.0f;
+    float cameraPitch = 0.0f;
+    float lanternStrength = 1.0f;
+    float walkTime = 0.0f;
+    float cameraX = 0.0f;
+    float cameraZ = 1.85f;
+    float walkAmount = 0.0f;
+    float outputExposure = 0.92f;
+    horde::gameplay::CombatSnapshot combat{};
+    horde::gameplay::LanternSnapshot lantern{};
+    horde::gameplay::EnemyRosterSnapshot roster{};
+    horde::gameplay::LichSnapshot lich{};
+};
+
 class PresentableTinyRtScene
 {
 public:
@@ -63,19 +79,8 @@ public:
                             VkImage swapchainImage,
                             VkImageLayout& swapchainImageLayout,
                             VkExtent2D swapchainExtent,
-                            float cameraYaw,
-                            float cameraPitch,
-                            float lanternStrength,
-                            float walkTime,
-                             float cameraX,
-                             float cameraZ,
-                             float walkAmount,
-                             float outputExposure,
-                             const horde::gameplay::CombatSnapshot& combat,
-                             const horde::gameplay::LanternSnapshot& lantern,
-                             const horde::gameplay::EnemyRosterSnapshot& roster,
-                             const horde::gameplay::LichSnapshot& lich,
-                             std::string& diagnostic);
+                            const RtSceneFrameInputs& frame,
+                            std::string& diagnostic);
 
     // Synchronously reads the last RT-produced storage image. The returned
     // bytes are canonical RGBA even when the presentation push constant had
@@ -112,6 +117,11 @@ private:
                       bool deviceAddress,
                       Buffer& out,
                       std::string& diagnostic) const;
+    bool WriteBuffer(const Buffer& buffer,
+                     const void* data,
+                     VkDeviceSize size,
+                     const char* label,
+                     std::string& diagnostic) const;
     bool CreateStorageImage(std::string& diagnostic);
     bool CreateTextureArray(const std::string& path, VkFormat format, TextureArray& texture, std::string& diagnostic);
     bool CreateTexture(const std::string& path,
@@ -129,16 +139,7 @@ private:
     bool CreatePipeline(std::string& diagnostic);
     bool CreateShaderBindingTable(std::string& diagnostic);
     bool UpdateDynamicInstances(VkCommandBuffer commandBuffer,
-                                float cameraYaw,
-                                float cameraPitch,
-                                float walkTime,
-                                float cameraX,
-                                float cameraZ,
-                                float walkAmount,
-                                const horde::gameplay::CombatSnapshot& combat,
-                                const horde::gameplay::LanternSnapshot& lantern,
-                                const horde::gameplay::EnemyRosterSnapshot& roster,
-                                const horde::gameplay::LichSnapshot& lich,
+                                const RtSceneFrameInputs& frame,
                                 std::string& diagnostic);
     bool RunOneTimeCommands(void (*record)(VkCommandBuffer, void*), void* userData, std::string& diagnostic) const;
     void DestroyBuffer(Buffer& buffer) const;
