@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "result": "complete",
+  "status": "complete",
+  "timestampUtc": "2026-08-03T02:23:05Z",
+  "build": "0.1.3-alpha.1",
+  "shader": "59bf3ce8503c",
+  "gpu": "AMD Radeon(TM) Graphics",
+  "vulkanApi": "1.3.280",
+  "rtMode": "RayTracingPipeline",
+  "presentMode": "FIFO",
+  "materialEncoding": "RGBA8 raw fallback + raw RGBA8 KTX2 lich",
+  "presentedEveryFrame": true,
+  "renderScalePercent": 100,
+  "internalExtent": {"width": 1484, "height": 991},
+  "presentationExtent": {"width": 1484, "height": 991},
+  "lapsCompleted": 2,
+  "lapsRequested": 2,
+  "waypointsReached": 26,
+  "measuredFrames": 1838,
+  "overall": {"averageMs": 10.2512, "medianMs": 10.2220, "p95Ms": 13.2992, "onePercentLowFps": 59.6495},
+  "zones": [
+    {"name": "opening", "frames": 160, "averageMs": 10.8552, "medianMs": 10.5604, "p95Ms": 13.2484, "onePercentLowFps": 51.0519},
+    {"name": "skeleton-room", "frames": 98, "averageMs": 9.9357, "medianMs": 9.5760, "p95Ms": 12.9857, "onePercentLowFps": 56.1545},
+    {"name": "shadow-corridor", "frames": 599, "averageMs": 8.9033, "medianMs": 8.7315, "p95Ms": 12.2393, "onePercentLowFps": 63.6133},
+    {"name": "skylight-chamber", "frames": 189, "averageMs": 11.9909, "medianMs": 11.6635, "p95Ms": 14.8380, "onePercentLowFps": 59.0966},
+    {"name": "yellow-torch-bay", "frames": 157, "averageMs": 11.3989, "medianMs": 11.1489, "p95Ms": 13.7892, "onePercentLowFps": 56.2718},
+    {"name": "blue-torch-bay", "frames": 157, "averageMs": 11.0311, "medianMs": 10.7924, "p95Ms": 13.0468, "onePercentLowFps": 70.6055},
+    {"name": "red-torch-bay", "frames": 157, "averageMs": 10.8460, "medianMs": 10.5192, "p95Ms": 13.4275, "onePercentLowFps": 65.2075},
+    {"name": "green-torch-bay", "frames": 157, "averageMs": 9.9182, "medianMs": 9.5462, "p95Ms": 13.0921, "onePercentLowFps": 71.6761},
+    {"name": "transmission-threshold", "frames": 63, "averageMs": 12.3916, "medianMs": 12.3150, "p95Ms": 15.1097, "onePercentLowFps": 62.0944},
+    {"name": "finale", "frames": 101, "averageMs": 9.6002, "medianMs": 9.3093, "p95Ms": 12.3305, "onePercentLowFps": 66.7031}
+  ],
+  "capability": {
+    "backend": "Vulkan",
+    "gpuName": "AMD Radeon(TM) Graphics",
+    "vendorId": 4098,
+    "deviceId": 6400,
+    "driverVersionText": "2.0.302",
+    "vulkanApiVersionText": "1.3.280",
+    "extensions": {
+      "VK_KHR_acceleration_structure": true,
+      "VK_KHR_ray_tracing_pipeline": true,
+      "VK_KHR_ray_query": true,
+      "VK_KHR_buffer_device_address": true,
+      "VK_KHR_deferred_host_operations": true
+    },
+    "features": {
+      "accelerationStructure": true,
+      "rayTracingPipeline": true,
+      "rayQuery": true,
+      "bufferDeviceAddress": true
+    },
+    "rtScenePresented": true
+  },
+  "provenance": "Copied from the project-owner supplied HordeLanternRT-benchmark-20260803-022305.zip and its vulkan_capability_report.json."
+}
