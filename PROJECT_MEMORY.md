@@ -116,7 +116,7 @@ Last updated: 2026-08-11
 - Low-level buffer allocation/upload/destruction, acceleration-structure lifetime helpers, and updatable triangle-BLAS state are extracted from `PresentableTinyRtScene` behind `RtGpuResources`; BLAS sizing/build/refit recording, platform device ownership, descriptors, textures, pipeline, SBT, and capture remain unchanged.
 - One `CharacterRenderSlot` owns both resident archetype resources and the historical animation/refit cadence while selecting exactly one skeleton or lich acceleration-structure address for TLAS instance 2. The eight-BLAS, eighteen-instance, one-active-enemy ceiling is unchanged.
 - Windows and Android use a non-blocking two-query Vulkan timestamp lifecycle tied to the existing one-frame fence. Reduced-width timestamp wrap and availability are handled; unsupported/query-failure states remain diagnostic only.
-- CPU frame timings, benchmark schema/pass criteria, shader ABI, raygen, and presentation honesty remain unchanged. Current physical-phone GPU timing remains unverified because no Android device was connected for this milestone.
+- CPU frame timings, benchmark schema/pass criteria, shader ABI, raygen, and presentation honesty remain unchanged. A later exact-device `SM-S948B` follow-up verified GPU timing, strict ASTC, honest RT presentation, replay, captures, and Home/resume; sustained 75% performance did not pass because the lich checkpoint measured 23.604 ms against the 20 ms gate.
 - Detailed implementation and validation evidence: `docs/RENDERER_RESOURCE_SLOTS_GPU_TIMING_2026-08-11.md`.
 
 ## Asset and licence state
