@@ -70,6 +70,6 @@ After the phone was unlocked on 2026-08-12, the exact clean-commit Debug APK wit
 - Deterministic replay: 13/13 waypoints.
 - Captures: 13/13 after stable honest presentation; Home/resume passed.
 
-This rules out GPU timestamp overhead as the cause of the older hot 23.604 ms result and clears the automated phone-performance/presentation gate without weakening RT or raising the budget. See `TWO_SKELETON_COMBAT_ANDROID_VALIDATION_2026-08-12.md` for exact evidence and thermal qualification.
+This matched pair did not identify GPU timestamp overhead as the material cause of the older hot 23.604 ms result, and the full run clears the automated phone-performance/presentation gate without weakening RT or raising the budget. See `TWO_SKELETON_COMBAT_ANDROID_VALIDATION_2026-08-12.md` for exact evidence and thermal qualification.
 
 Owner hands-on judgment remains required for touch/camera comfort, live two-enemy readability, distinct positional audio/haptic feedback, persistent corpse/survivor readability, and combat feel. Do not publish or describe those perceptual checks as passed until the owner reports them.

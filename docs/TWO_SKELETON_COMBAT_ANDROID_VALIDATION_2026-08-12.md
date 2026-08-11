@@ -27,7 +27,7 @@ The same installed APK ran isolated 75% lich sessions after cooling. The compara
 
 Enabled was 1.188% slower than disabled, below the 15% investigation threshold; both remained below the strict 20 ms gate. The exact A/B comparator passed at `reports/android-showcase-runs/gpu-timing-ab-20260812-lich.json`.
 
-This rules out timestamp instrumentation as the cause of the earlier 23.604 ms lich failure. That older run rose from AP 31.9 C to 51.1 C and was not thermally matched. The recovered cooled results support thermal/run-order variance rather than a persistent renderer regression; this is an inference from the matched evidence, not a claim that timestamps have zero cost.
+This did not identify timestamp instrumentation as the material cause of the earlier 23.604 ms lich failure under the tested cooled conditions. That older run rose from AP 31.9 C to 51.1 C and was not thermally matched. The recovered cooled results support thermal/run-order variance rather than a persistent renderer regression; this is an inference from one matched pair, not a claim that timestamps have zero cost.
 
 ## Six-checkpoint 75% gate
 

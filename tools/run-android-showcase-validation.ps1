@@ -289,6 +289,9 @@ function Invoke-CheckpointBenchmark {
     if ($actualZone -ne $checkpointZones[$Checkpoint]) { $failures.Add("$Checkpoint reported zone $actualZone.") }
     if (-not $presented) { $failures.Add("$Checkpoint did not retain honest RT presentation.") }
     if ($EnforceBudget -and $median -ge 20.0) { $failures.Add("$Checkpoint median $median ms reached or exceeded the strict below-20 ms 75% gate.") }
+    if ($EnforceBudget -and ($thermal -lt 0 -or $thermal -gt 3)) {
+        $failures.Add("$Checkpoint thermal status $thermal was outside the required 0-3 range for the 75% gate.")
+    }
     $state = Get-ShowcaseState -Destination (Join-Path $outputDirectory "$Checkpoint-$RequestedScale-state.json")
     if ($state.status -ne "complete") { $failures.Add("$Checkpoint native state status was '$($state.status)'.") }
     if ($state.checkpoint -ne $Checkpoint) { $failures.Add("$Checkpoint native state identified '$($state.checkpoint)'.") }
@@ -315,6 +318,7 @@ try {
     $deviceModel = Invoke-AdbText @("shell", "getprop", "ro.product.model")
     $androidVersion = Invoke-AdbText @("shell", "getprop", "ro.build.version.release")
     $apiLevel = Invoke-AdbText @("shell", "getprop", "ro.build.version.sdk")
+    $osBuildFingerprint = Invoke-AdbText @("shell", "getprop", "ro.build.fingerprint")
     $displaySize = Invoke-AdbText @("shell", "wm", "size")
     $displayDensity = Invoke-AdbText @("shell", "wm", "density")
     $deviceBuild = Invoke-AdbText @("shell", "getprop")
@@ -415,22 +419,31 @@ try {
     if ($finalLog -match $crashPattern) { $failures.Add("Current logcat contains a fatal/runtime renderer failure marker.") }
 
     Save-PrivateFile -RemotePath "files/reports/vulkan_capability_report.txt" -Destination (Join-Path $outputDirectory "vulkan_capability_report.txt")
-    Save-PrivateFile -RemotePath "files/reports/vulkan_capability_report.json" -Destination (Join-Path $outputDirectory "vulkan_capability_report.json")
+    $capabilityPath = Join-Path $outputDirectory "vulkan_capability_report.json"
+    Save-PrivateFile -RemotePath "files/reports/vulkan_capability_report.json" -Destination $capabilityPath
+    $capability = Get-Content -LiteralPath $capabilityPath -Raw | ConvertFrom-Json
     Invoke-AdbText @("shell", "dumpsys", "package", $packageName) -AllowFailure | Set-Content -LiteralPath (Join-Path $outputDirectory "package-after-install.txt") -Encoding utf8
     Invoke-AdbText @("shell", "dumpsys", "thermalservice") -AllowFailure | Set-Content -LiteralPath (Join-Path $outputDirectory "thermal-after.txt") -Encoding utf8
     Invoke-AdbText @("shell", "dumpsys", "battery") -AllowFailure | Set-Content -LiteralPath (Join-Path $outputDirectory "battery-after.txt") -Encoding utf8
     $timingRows | Export-Csv -LiteralPath (Join-Path $outputDirectory "timing.csv") -NoTypeInformation
     $metadata = [ordered]@{
-        schema = 4
+        schema = 5
         runId = $runId
         mode = $Mode
         scale = $Scale
         include100 = [bool]$Include100
         checkpoints = $Checkpoints
         gpuTiming = $gpuTimingLabel
+        deviceSerial = $serial
         deviceModel = $deviceModel
         androidVersion = $androidVersion
         apiLevel = $apiLevel
+        osBuildFingerprint = $osBuildFingerprint
+        gpuName = $capability.gpuName
+        gpuVendorId = $capability.vendorId
+        gpuDeviceId = $capability.deviceId
+        gpuDriverVersion = $capability.driverVersion
+        vulkanApiVersion = $capability.vulkanApiVersion
         displaySize = $displaySize
         displayDensity = $displayDensity
         package = $packageName

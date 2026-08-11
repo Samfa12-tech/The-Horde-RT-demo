@@ -15,6 +15,14 @@ function Read-Manifest([string]$directory) {
     return Get-Content -LiteralPath $path -Raw | ConvertFrom-Json
 }
 
+function Get-Median([double[]]$values) {
+    if ($values.Count -eq 0) { throw "Cannot compute a median from an empty timing set." }
+    $sorted = @($values | Sort-Object)
+    $middle = [int][Math]::Floor($sorted.Count / 2)
+    if ($sorted.Count % 2 -eq 1) { return [double]$sorted[$middle] }
+    return ([double]$sorted[$middle - 1] + [double]$sorted[$middle]) / 2.0
+}
+
 $baseline = Read-Manifest $BaselineDirectory
 $candidate = Read-Manifest $CandidateDirectory
 if (-not $baseline.complete -or -not $candidate.complete) { throw "Both capture manifests must be complete." }
@@ -84,17 +92,25 @@ for ($index = 0; $index -lt $expected.Count; ++$index) {
     }
 }
 
-$baselineMedian = [double]$baseline.timing.overallMedianMs
-$candidateMedian = [double]$candidate.timing.overallMedianMs
+$timingBasis = "overall capture sample median"
+if ($baseline.captures.Count -eq 12) {
+    $timingBasis = "median of the 12 matched per-capture medians"
+    $baselineMedian = Get-Median @($baseline.captures | ForEach-Object { [double]$_.timing.medianMs })
+    $candidateMedian = Get-Median @($candidate.captures[0..11] | ForEach-Object { [double]$_.timing.medianMs })
+} else {
+    $baselineMedian = [double]$baseline.timing.overallMedianMs
+    $candidateMedian = [double]$candidate.timing.overallMedianMs
+}
 $timingPassed = $candidateMedian -le $baselineMedian * 1.02
 if (-not $timingPassed) { $failed = $true }
 $result = [ordered]@{
-    schema = 2
+    schema = 3
     passed = -not $failed
     pixelTolerance = [ordered]@{ maximumChannelDifference = 3; maximumFractionOverOne = 0.001 }
     timingTolerancePercent = 2.0
-    baselineOverallMedianMs = $baselineMedian
-    candidateOverallMedianMs = $candidateMedian
+    timingBasis = $timingBasis
+    baselineMatchedMedianMs = $baselineMedian
+    candidateMatchedMedianMs = $candidateMedian
     timingDeltaPercent = [Math]::Round((($candidateMedian / $baselineMedian) - 1.0) * 100.0, 3)
     timingPassed = $timingPassed
     captures = @($comparisons)
@@ -106,6 +122,7 @@ $result = [ordered]@{
                 file = $newCapture.file
                 pngSha256 = $newCapture.pngSha256
                 honestlyPresentedRtFrame = [bool]$newCapture.honestlyPresentedRtFrame
+                medianMs = [double]$newCapture.timing.medianMs
                 requiresExplicitVisualReview = $true
             }
         }

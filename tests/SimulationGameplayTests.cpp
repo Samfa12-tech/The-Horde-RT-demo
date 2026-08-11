@@ -171,8 +171,10 @@ int main()
     }
     check(skeletonPair.Snapshot().skeletonEnemies[expectedFirstTarget].dead &&
           !skeletonPair.Snapshot().skeletonEnemies[expectedSecondTarget].dead &&
-          postDeathSeparationHeld,
-          "a defeated skeleton must remain fixed while the survivor stays separated and world-valid");
+          postDeathSeparationHeld &&
+          skeletonPair.Snapshot().skeletonAttackerId ==
+              skeletonPair.Snapshot().skeletonEnemies[expectedSecondTarget].id,
+          "a defeated skeleton must remain fixed while the separated survivor owns the attack token");
 
     pairInput.commands.attack = 2u;
     for (int frame = 0; frame < 60 && !skeletonPair.Snapshot().openingEncounterComplete; ++frame)
@@ -188,36 +190,40 @@ int main()
     std::size_t defeatedTargetCount = 0u;
     std::uint64_t previousDefeatSequence = 0u;
     bool orderedDistinctDefeats = true;
+    bool hitImmediatelyPrecedesDefeat = true;
+    GameplayEvent previousEvent{};
     for (const GameplayEvent& event : skeletonPair.Events().Events())
     {
-        if (event.type != GameplayEventType::EnemyDefeated)
+        if (event.type == GameplayEventType::EnemyDefeated)
         {
-            continue;
+            orderedDistinctDefeats = orderedDistinctDefeats && event.sequence > previousDefeatSequence;
+            hitImmediatelyPrecedesDefeat = hitImmediatelyPrecedesDefeat &&
+                previousEvent.type == GameplayEventType::EnemyHit &&
+                previousEvent.target == event.target && previousEvent.sequence + 1u == event.sequence;
+            previousDefeatSequence = event.sequence;
+            if (defeatedTargetCount < defeatedTargets.size())
+            {
+                defeatedTargets[defeatedTargetCount++] = event.target;
+            }
         }
-        orderedDistinctDefeats = orderedDistinctDefeats && event.sequence > previousDefeatSequence;
-        previousDefeatSequence = event.sequence;
-        if (defeatedTargetCount < defeatedTargets.size())
-        {
-            defeatedTargets[defeatedTargetCount++] = event.target;
-        }
+        previousEvent = event;
     }
-    check(defeatedTargetCount == 2u && orderedDistinctDefeats &&
+    check(defeatedTargetCount == 2u && orderedDistinctDefeats && hitImmediatelyPrecedesDefeat &&
           defeatedTargets[0] == skeletonPair.Snapshot().skeletonEnemies[expectedFirstTarget].id &&
           defeatedTargets[1] == skeletonPair.Snapshot().skeletonEnemies[expectedSecondTarget].id,
-          "ordered defeat events must retain distinct Skeleton A/B target identities");
-    std::array<EntityId, 2> swingTargets{};
+          "each ordered A/B defeat must immediately follow its entity-aware hit event");
     std::size_t pairSwingCount = 0u;
+    bool pairSwingsAreTargetless = true;
     for (const GameplayEvent& event : skeletonPair.Events().Events())
     {
-        if (event.type == GameplayEventType::PlayerSwing && pairSwingCount < swingTargets.size())
+        if (event.type == GameplayEventType::PlayerSwing)
         {
-            swingTargets[pairSwingCount++] = event.target;
+            ++pairSwingCount;
+            pairSwingsAreTargetless = pairSwingsAreTargetless && event.target == EntityId::Invalid;
         }
     }
-    check(pairSwingCount == 2u &&
-          swingTargets[0] == skeletonPair.Snapshot().skeletonEnemies[expectedFirstTarget].id &&
-          swingTargets[1] == skeletonPair.Snapshot().skeletonEnemies[expectedSecondTarget].id,
-          "in-range swing events must identify the actual nearest A/B target in order");
+    check(pairSwingCount == 2u && pairSwingsAreTargetless,
+          "swing-intent events must stay targetless until an actual entity-aware hit resolves");
 
     pairInput.commands.retry = 1u;
     skeletonPair.AdvanceFrame(pairInput, 1.0 / 60.0);

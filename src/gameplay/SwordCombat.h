@@ -181,7 +181,7 @@ public:
         }
 
         SelectAttacker(distances, playerInsideEnemyArena);
-        ResolveSwordHit(playerX, playerZ, playerYaw, distances);
+        ResolveSwordHit(playerX, playerZ, playerYaw);
 
         for (std::size_t index = 0; index < combatantCount_; ++index)
         {
@@ -258,42 +258,14 @@ private:
         }
     }
 
-    void ResolveSwordHit(float playerX,
-                         float playerZ,
-                         float playerYaw,
-                         const std::array<float, kSkeletonCombatantCapacity>& distances)
+    void ResolveSwordHit(float playerX, float playerZ, float playerYaw)
     {
         if (swordHitConsumed_ || swordTime_ < 0.18f || swordTime_ > 0.34f)
         {
             return;
         }
 
-        std::int32_t targetIndex = -1;
-        float targetDistance = 0.0f;
-        const float forwardX = std::sin(playerYaw);
-        const float forwardZ = -std::cos(playerYaw);
-        for (std::size_t index = 0; index < combatantCount_; ++index)
-        {
-            const Combatant& combatant = combatants_[index];
-            const float distance = distances[index];
-            if (combatant.health <= 0 || distance > kPlayerHitRange)
-            {
-                continue;
-            }
-            const float inverseDistance = distance > 0.0001f ? 1.0f / distance : 0.0f;
-            const float targetX = (combatant.x - playerX) * inverseDistance;
-            const float targetZ = (combatant.z - playerZ) * inverseDistance;
-            if (targetX * forwardX + targetZ * forwardZ < kPlayerHitConeDot)
-            {
-                continue;
-            }
-            if (targetIndex < 0 || distance < targetDistance)
-            {
-                targetIndex = static_cast<std::int32_t>(index);
-                targetDistance = distance;
-            }
-        }
-
+        const std::int32_t targetIndex = PlayerSwingTargetIndex(playerX, playerZ, playerYaw);
         if (targetIndex < 0)
         {
             return;

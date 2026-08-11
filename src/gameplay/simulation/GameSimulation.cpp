@@ -382,18 +382,9 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
         swordCombat_.RequestAttack();
         playerAttackCooldownRemaining_ = kSwordDurationSeconds;
         lichHitRequested = activeEnemyKind_ == EnemyKind::Lich;
-        EntityId swingTarget = EntityForEnemy(activeEnemyKind_);
-        if (activeEnemyKind_ == EnemyKind::Skeleton)
-        {
-            const std::int32_t targetIndex = swordCombat_.PlayerSwingTargetIndex(
-                playerX_, playerZ_, playerYawRadians_);
-            swingTarget = targetIndex >= 0
-                ? SkeletonEntity(static_cast<std::size_t>(targetIndex))
-                : EntityId::Invalid;
-        }
         Emit(GameplayEventType::PlayerSwing,
              EntityId::Player,
-             swingTarget,
+             EntityId::Invalid,
              playerX_,
              playerZ_);
     }

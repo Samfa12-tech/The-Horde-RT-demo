@@ -506,9 +506,18 @@ try {
                         Where-Object { [int]$_.scale -eq 75 })
                     $candidateRows = @(Import-Csv -LiteralPath $candidateTimingPath |
                         Where-Object { [int]$_.scale -eq 75 })
-                    $required = @("opening", "two-enemy-combat", "worst-bend", "skylight", "green", "lich")
-                    if ($baselineRows.Count -ne 6 -or $candidateRows.Count -ne 6) {
-                        throw "Android A/B requires exactly six 75% timing rows in each run."
+                    $historicalRequired = @("opening", "worst-bend", "skylight", "green", "lich")
+                    $expandedRequired = @("opening", "two-enemy-combat", "worst-bend", "skylight", "green", "lich")
+                    if ($baselineRows.Count -notin @(5, 6) -or $candidateRows.Count -ne 6) {
+                        throw "Android A/B requires a historical five- or expanded six-checkpoint baseline and exactly six candidate rows at 75%."
+                    }
+                    $required = $(if ($baselineRows.Count -eq 5) { $historicalRequired } else { $expandedRequired })
+                    foreach ($row in @($baselineRows) + @($candidateRows)) {
+                        if ([int]$row.scale -ne 75 -or [string]$row.timing_method -ne "cpu-present-loop" -or
+                            [string]$row.presented -ne "True" -or [int]$row.thermal_status -lt 0 -or
+                            [int]$row.thermal_status -gt 3) {
+                            throw "Android A/B timing rows must retain 75% CPU-present-loop timing, honest RT presentation, and thermal status 0-3."
+                        }
                     }
                     $phoneComparisons = foreach ($checkpoint in $required) {
                         $before = $baselineRows | Where-Object checkpoint -eq $checkpoint | Select-Object -First 1
@@ -548,6 +557,15 @@ try {
                         windowsComparison = "windows-capture-comparison.json"
                         androidBaselineTiming = [IO.Path]::GetFullPath($BaselineAndroidTimingCsv)
                         androidCandidateTiming = $candidateTimingPath
+                        unpairedAndroidCandidate = $(if ($baselineRows.Count -eq 5) {
+                            $twoEnemy = $candidateRows | Where-Object checkpoint -eq "two-enemy-combat" | Select-Object -First 1
+                            [ordered]@{
+                                checkpoint = "two-enemy-combat"
+                                medianMs = [double]$twoEnemy.median_of_window_avgs_ms
+                                thermalStatus = [int]$twoEnemy.thermal_status
+                                honestlyPresented = [string]$twoEnemy.presented -eq "True"
+                            }
+                        } else { $null })
                         phoneComparisons = @($phoneComparisons)
                     }
                     $retention | ConvertTo-Json -Depth 8 | Set-Content `

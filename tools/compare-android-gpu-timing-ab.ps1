@@ -14,10 +14,12 @@ function Read-Run([string]$directory) {
     $summaryPath = Join-Path $full "summary.json"
     $timingPath = Join-Path $full "timing.csv"
     $thermalPath = Join-Path $full "thermal-before.txt"
+    $capabilityPath = Join-Path $full "vulkan_capability_report.json"
     if (-not (Test-Path -LiteralPath $summaryPath) -or
         -not (Test-Path -LiteralPath $timingPath) -or
-        -not (Test-Path -LiteralPath $thermalPath)) {
-        throw "A/B run is missing summary.json, timing.csv, or thermal-before.txt: $full"
+        -not (Test-Path -LiteralPath $thermalPath) -or
+        -not (Test-Path -LiteralPath $capabilityPath)) {
+        throw "A/B run is missing summary.json, timing.csv, thermal-before.txt, or Vulkan capability evidence: $full"
     }
     $summary = Get-Content -LiteralPath $summaryPath -Raw | ConvertFrom-Json
     if ([int]$summary.schema -lt 4) { throw "A/B run lacks exact installed-APK/source provenance: $full" }
@@ -38,6 +40,7 @@ function Read-Run([string]$directory) {
         directory = $full
         summary = $summary
         timing = @(Import-Csv -LiteralPath $timingPath)
+        capability = Get-Content -LiteralPath $capabilityPath -Raw | ConvertFrom-Json
         startingThermalStatus = [int]$statusMatch.Groups[1].Value
         startingTemperaturesC = $temperatures
     }
@@ -55,16 +58,41 @@ foreach ($run in @($first, $second)) {
 if ($null -eq $enabled -or $null -eq $disabled) { throw "A/B requires exactly one enabled run and one disabled run." }
 
 $mismatches = [Collections.Generic.List[string]]::new()
+$provenanceWarnings = [Collections.Generic.List[string]]::new()
 foreach ($field in @("deviceModel", "androidVersion", "apiLevel", "scale", "package", "apkSha256", "installedApkSha256", "sourceCommit", "sourceDirty", "raygenSha256")) {
     if ([string]$enabled.summary.$field -ne [string]$disabled.summary.$field) {
         $mismatches.Add("Run provenance differs at $field.")
     }
+}
+foreach ($field in @("gpuName", "vendorId", "deviceId", "driverVersion", "vulkanApiVersion")) {
+    if ([string]$enabled.capability.$field -ne [string]$disabled.capability.$field) {
+        $mismatches.Add("Vulkan device provenance differs at $field.")
+    }
+}
+if ([int]$enabled.summary.schema -ge 5 -and [int]$disabled.summary.schema -ge 5) {
+    foreach ($field in @("deviceSerial", "osBuildFingerprint")) {
+        if ([string]::IsNullOrWhiteSpace([string]$enabled.summary.$field) -or
+            [string]$enabled.summary.$field -ne [string]$disabled.summary.$field) {
+            $mismatches.Add("Physical-device provenance differs or is missing at $field.")
+        }
+    }
+} else {
+    $provenanceWarnings.Add("Legacy schema-4 evidence lacks device serial and OS build fingerprint; model and Vulkan device/driver identity were matched instead.")
 }
 foreach ($run in @($enabled, $disabled)) {
     if ($run.summary.apkSha256 -ne $run.summary.installedApkSha256) {
         $mismatches.Add("Local and installed APK hashes differ in $($run.directory).")
     }
     if (@($run.summary.failures).Count -ne 0) { $mismatches.Add("Run reports validation failures: $($run.directory).") }
+    foreach ($row in $run.timing) {
+        if ([int]$row.scale -ne [int]$run.summary.scale -or
+            [string]$row.gpu_timing -ne [string]$run.summary.gpuTiming -or
+            [string]$row.timing_method -ne "cpu-present-loop" -or
+            [string]$row.presented -ne "True") {
+            $mismatches.Add("Timing-row metadata is inconsistent with honest matched-run provenance in $($run.directory).")
+            break
+        }
+    }
 }
 
 $enabledCheckpoints = @($enabled.timing | ForEach-Object checkpoint)
@@ -127,6 +155,7 @@ $result = [ordered]@{
     frameGateMs = $FrameGateMs
     investigationThresholdPercent = $InvestigationThresholdPercent
     mismatches = @($mismatches)
+    provenanceWarnings = @($provenanceWarnings)
     gateFailed = $gateFailed
     investigationRequired = $investigationRequired
     checkpoints = @($comparisons)

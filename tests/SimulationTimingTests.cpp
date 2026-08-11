@@ -51,6 +51,15 @@ int main()
     const SimulationSnapshot at30 = RunCadence(30, 2.0, 1.0f, 0.0f);
     const SimulationSnapshot at60 = RunCadence(60, 2.0, 1.0f, 0.0f);
     const SimulationSnapshot at120 = RunCadence(120, 2.0, 1.0f, 0.0f);
+    const auto sameEnemy = [](const auto& left, const auto& right)
+    {
+        return left.id == right.id && NearlyEqual(left.x, right.x) &&
+               NearlyEqual(left.z, right.z) && NearlyEqual(left.facingRadians, right.facingRadians) &&
+               NearlyEqual(left.animationTime, right.animationTime) &&
+               NearlyEqual(left.damageFlash, right.damageFlash) && left.health == right.health &&
+               left.animation == right.animation && left.dead == right.dead &&
+               left.playerHitPulse == right.playerHitPulse;
+    };
     check(at30.tickIndex == 120u && at60.tickIndex == 120u && at120.tickIndex == 120u,
           "30/60/120 Hz delivery must execute the same 120 fixed ticks");
     check(NearlyEqual(at30.playerX, at60.playerX) && NearlyEqual(at60.playerX, at120.playerX) &&
@@ -61,16 +70,16 @@ int main()
           at60.playerVitals.vitality == at120.playerVitals.vitality &&
           at30.activeSkeletonCount == at60.activeSkeletonCount &&
           at60.activeSkeletonCount == at120.activeSkeletonCount &&
+          at30.skeletonEnemyCount == at60.skeletonEnemyCount &&
+          at60.skeletonEnemyCount == at120.skeletonEnemyCount &&
           at30.skeletonAttackerId == at60.skeletonAttackerId &&
           at60.skeletonAttackerId == at120.skeletonAttackerId &&
-          at30.skeletonEnemies[0].animation == at60.skeletonEnemies[0].animation &&
-          at60.skeletonEnemies[0].animation == at120.skeletonEnemies[0].animation &&
-          at30.skeletonEnemies[1].animation == at60.skeletonEnemies[1].animation &&
-          at60.skeletonEnemies[1].animation == at120.skeletonEnemies[1].animation &&
-          NearlyEqual(at30.skeletonEnemies[0].x, at60.skeletonEnemies[0].x) &&
-          NearlyEqual(at60.skeletonEnemies[0].x, at120.skeletonEnemies[0].x) &&
-          NearlyEqual(at30.skeletonEnemies[1].z, at60.skeletonEnemies[1].z) &&
-          NearlyEqual(at60.skeletonEnemies[1].z, at120.skeletonEnemies[1].z),
+          at30.openingEncounterComplete == at60.openingEncounterComplete &&
+          at60.openingEncounterComplete == at120.openingEncounterComplete &&
+          sameEnemy(at30.skeletonEnemies[0], at60.skeletonEnemies[0]) &&
+          sameEnemy(at60.skeletonEnemies[0], at120.skeletonEnemies[0]) &&
+          sameEnemy(at30.skeletonEnemies[1], at60.skeletonEnemies[1]) &&
+          sameEnemy(at60.skeletonEnemies[1], at120.skeletonEnemies[1]),
           "render cadence must preserve encounter, vitality, and action state");
 
     GameSimulation baseline;
