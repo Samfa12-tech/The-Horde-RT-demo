@@ -850,16 +850,6 @@ void PlayPositionalSoundEffect(const VulkanSurfaceContext& context,
     }
 }
 
-void PlayEnemySoundEffect(const VulkanSurfaceContext& context, const char* filename, float mixGain)
-{
-    const horde::gameplay::simulation::SimulationSnapshot& simulation = context.simulation.Snapshot();
-    const float emitterX = simulation.activeEnemyKind == horde::gameplay::EnemyKind::Lich
-        ? simulation.lich.x : simulation.swordCombat.enemyX;
-    const float emitterZ = simulation.activeEnemyKind == horde::gameplay::EnemyKind::Lich
-        ? simulation.lich.z : simulation.swordCombat.enemyZ;
-    PlayPositionalSoundEffect(context, filename, mixGain, emitterX, emitterZ);
-}
-
 void DrainGameplayEvents(VulkanSurfaceContext& context)
 {
     using horde::gameplay::simulation::EntityId;

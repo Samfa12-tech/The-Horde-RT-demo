@@ -113,7 +113,7 @@ int main()
         RtGpuResources unboundResources;
         std::string diagnostic;
         EnemyRosterSnapshot invalidRoster = roster;
-        invalidRoster.renderedEnemyCapacity = 2u;
+        invalidRoster.renderedEnemyCapacity = 8u;
         invalidRoster.renderedEnemyCount = 2u;
         invalidRoster.renderedEnemies[0] = EnemyKind::Skeleton;
         invalidRoster.renderedEnemies[1] = EnemyKind::Lich;
@@ -145,6 +145,16 @@ int main()
         ok &= Require(slot.PrepareInitialGeometry(diagnostic), diagnostic.c_str());
         ok &= Require(slot.SkeletonVertices().size() == 28206u, "skeleton slot vertex count changed");
         ok &= Require(slot.LichVertices().size() == 27564u, "lich slot vertex count changed");
+        EnemyRosterSnapshot spareCapacityRoster;
+        spareCapacityRoster.renderedEnemyCapacity = 8u;
+        spareCapacityRoster.renderedEnemyCount = 1u;
+        spareCapacityRoster.selectedEnemy = EnemyKind::Skeleton;
+        spareCapacityRoster.renderedEnemies[0] = EnemyKind::Skeleton;
+        RtGpuResources unboundResources;
+        diagnostic.clear();
+        ok &= Require(!slot.PrepareFrame(combat, spareCapacityRoster, lich, unboundResources, diagnostic) &&
+                      diagnostic.find("Invalid animated skeleton vertex upload") != std::string::npos,
+                      "spare roster capacity was mistaken for more than one active character");
         const auto& staff = slot.LichStaffLocalSample();
         ok &= Require(staff[0] > 0.90f && staff[1] > 0.70f,
                       "audited lich staff sample moved into the robe or eye cluster");

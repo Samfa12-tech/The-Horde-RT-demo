@@ -181,6 +181,12 @@ void ClearPlatformGameplayEvents()
     gPlatformGameplayEventCount = 0u;
 }
 
+std::uint64_t PlatformGameplayEventOverflowCount()
+{
+    std::lock_guard<std::mutex> lock(gPlatformGameplayEventMutex);
+    return gPlatformGameplayEventOverflowCount;
+}
+
 void EnqueuePlatformGameplayEvent(const horde::gameplay::simulation::GameplayEvent& event,
                                   const horde::gameplay::simulation::SimulationSnapshot& simulation)
 {
@@ -323,7 +329,8 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(const Swapchai
     snapshot.catchUpOverrunCount = simulation.catchUpOverrunCount;
     snapshot.queuedEventCount = simulation.queuedEventCount;
     snapshot.eventQueueHighWaterMark = simulation.eventQueueHighWaterMark;
-    snapshot.eventQueueOverflowCount = simulation.eventQueueOverflowCount;
+    snapshot.eventQueueOverflowCount =
+        simulation.eventQueueOverflowCount + PlatformGameplayEventOverflowCount();
     snapshot.inputPublicationSequence = simulation.inputPublicationSequence;
     snapshot.consumedAttackSequence = simulation.lastConsumedAttackSequence;
     snapshot.consumedRouteResetSequence = simulation.lastConsumedRouteResetSequence;

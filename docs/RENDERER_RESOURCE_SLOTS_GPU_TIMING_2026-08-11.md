@@ -23,7 +23,7 @@ The helper borrows Vulkan device/dispatch handles. The platform still owns the d
 
 One explicit character render slot owns the existing skeleton and lich CPU models, skinned vertices, vertex buffers, resident BLAS/scratch resources, animation caches, and audited lich staff sample. Both archetype resources remain resident, but only the selected archetype is uploaded/refit and only one acceleration-structure address is placed in TLAS instance 2.
 
-The extraction preserves the historical animation cadence, clip selection, transforms, custom index, mask, staff sample accumulation order, floating-point expressions, eight-BLAS report, eighteen-instance TLAS, and one-active-character ceiling. The slot rejects roster capacity/count above one and rejects a selected/active archetype mismatch before touching GPU resources.
+The extraction preserves the historical animation cadence, clip selection, transforms, custom index, mask, staff sample accumulation order, floating-point expressions, eight-BLAS report, eighteen-instance TLAS, and one-active-character ceiling. The slot permits spare roster capacity for future architecture while rejecting an active count above one or a selected/active archetype mismatch before touching GPU resources.
 
 ## GPU timing contract
 

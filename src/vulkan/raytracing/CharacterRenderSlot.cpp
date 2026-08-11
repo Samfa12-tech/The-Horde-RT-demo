@@ -150,8 +150,7 @@ bool CharacterRenderSlot::PrepareFrame(const horde::gameplay::CombatSnapshot& co
                                        std::string& diagnostic)
 {
     pendingRefit_ = CharacterBlasRefit::None;
-    if (roster.renderedEnemyCapacity > kMaximumActiveCharacters ||
-        roster.renderedEnemyCount > kMaximumActiveCharacters)
+    if (roster.renderedEnemyCount > kMaximumActiveCharacters)
     {
         diagnostic = "CharacterRenderSlot supports exactly one active character; the roster exceeded that limit.";
         return false;

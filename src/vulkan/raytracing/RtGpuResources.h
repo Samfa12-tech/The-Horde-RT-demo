@@ -30,8 +30,6 @@ struct RtUpdatableTriangleBlas
     RtGpuBuffer updateScratch;
     VkDeviceSize vertexStride = 0u;
     std::uint32_t vertexCount = 0u;
-
-    std::uint32_t PrimitiveCount() const { return vertexCount / 3u; }
 };
 
 // Non-owning Vulkan device seam used by scene resource owners. Resource

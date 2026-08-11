@@ -464,7 +464,7 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
     if (input.damageEnabled && playerDamagePulse)
     {
         const PlayerDamageResult damageResult = playerVitals_.TryApplyDamage();
-        if (damageResult != PlayerDamageResult::Ignored)
+        if (damageResult == PlayerDamageResult::Damaged)
         {
             Emit(GameplayEventType::PlayerDamaged,
                  EntityForEnemy(activeEnemyKind_),

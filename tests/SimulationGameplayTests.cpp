@@ -106,6 +106,23 @@ int main()
     check(firstSwingSequence != 0u && secondSwingSequence > firstSwingSequence,
           "serialized swings must remain separate semantic events");
 
+    GameSimulation damageEvents;
+    InputSnapshot damageInput;
+    damageInput.hasAuthoritativePlayerPose = true;
+    damageInput.authoritativePlayerX = 0.0f;
+    damageInput.authoritativePlayerZ = -3.40f;
+    damageInput.damageEnabled = true;
+    for (int frame = 0;
+         frame < 600 && damageEvents.Snapshot().playerVitals.phase == PlayerLifePhase::Alive;
+         ++frame)
+    {
+        damageEvents.AdvanceFrame(damageInput, 1.0 / 60.0, static_cast<std::uint64_t>(frame + 1));
+    }
+    check(damageEvents.Snapshot().playerVitals.phase == PlayerLifePhase::Dying &&
+          CountEvents(damageEvents.Events(), GameplayEventType::PlayerDamaged) == 2u &&
+          CountEvents(damageEvents.Events(), GameplayEventType::PlayerKilled) == 1u,
+          "two nonfatal hits must emit PlayerDamaged while the lethal hit emits only PlayerKilled");
+
     GameSimulation retry;
     InputSnapshot finaleInput;
     finaleInput.hasAuthoritativePlayerPose = true;
