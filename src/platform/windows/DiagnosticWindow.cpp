@@ -14,6 +14,7 @@
 #include <memory>
 #include <mutex>
 #include <numeric>
+#include <optional>
 #include <sstream>
 #include <string>
 #include <unordered_map>
@@ -48,6 +49,7 @@
 #include "gameplay/SpatialAudio.h"
 #include "gameplay/SwordCombat.h"
 #include "gameplay/simulation/GameSimulation.h"
+#include "vulkan/GpuFrameTimer.h"
 #include "vulkan/RtCapabilityReport.h"
 #include "vulkan/VulkanContext.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
@@ -174,6 +176,11 @@ struct VulkanSurfaceContext
     std::vector<VkSemaphore> renderFinishedSemaphores;
     std::vector<VkFence> inFlightFences;
     horde::vulkan::raytracing::PresentableTinyRtScene rtScene;
+    horde::vulkan::GpuFrameTimer gpuFrameTimer;
+    horde::vulkan::GpuRtTimingSnapshot gpuRtTiming;
+    double gpuFrameTimingTotalMs = 0.0;
+    std::uint64_t gpuFrameTimingSampleCount = 0u;
+    std::uint64_t gpuFrameSubmissionSequence = 0u;
     bool useRtPath = false;
     bool controlsEnabled = false;
     bool simulationPaused = true;
@@ -843,16 +850,6 @@ void PlayPositionalSoundEffect(const VulkanSurfaceContext& context,
     }
 }
 
-void PlayEnemySoundEffect(const VulkanSurfaceContext& context, const char* filename, float mixGain)
-{
-    const horde::gameplay::simulation::SimulationSnapshot& simulation = context.simulation.Snapshot();
-    const float emitterX = simulation.activeEnemyKind == horde::gameplay::EnemyKind::Lich
-        ? simulation.lich.x : simulation.swordCombat.enemyX;
-    const float emitterZ = simulation.activeEnemyKind == horde::gameplay::EnemyKind::Lich
-        ? simulation.lich.z : simulation.swordCombat.enemyZ;
-    PlayPositionalSoundEffect(context, filename, mixGain, emitterX, emitterZ);
-}
-
 void DrainGameplayEvents(VulkanSurfaceContext& context)
 {
     using horde::gameplay::simulation::EntityId;
@@ -1446,6 +1443,11 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(
     snapshot.renderScale = context.renderScale;
     snapshot.fps = capabilities.performance.fps;
     snapshot.frameTimeMs = capabilities.performance.frameTimeMs;
+    snapshot.gpuRtTimingValid = context.gpuRtTiming.valid;
+    snapshot.gpuRtLatestMs = context.gpuRtTiming.latestMs;
+    snapshot.gpuRtAverageMs = context.gpuRtTiming.averageMs;
+    snapshot.gpuRtSampleCount = context.gpuRtTiming.sampleCount;
+    snapshot.gpuRtTimingStatus = context.gpuRtTiming.status;
     snapshot.presented = capabilities.rtScene.presented;
     return snapshot;
 }
@@ -2125,6 +2127,9 @@ void ReleaseSwapchainResources(VulkanSurfaceContext& ctx)
     }
 
     vkDeviceWaitIdle(ctx.device);
+    ctx.gpuFrameTimer.ResetAfterDeviceIdle();
+    ctx.gpuFrameTimingTotalMs = 0.0;
+    ctx.gpuFrameTimingSampleCount = 0u;
     ctx.rtScene.Destroy();
 
     if (ctx.commandPool != VK_NULL_HANDLE)
@@ -2209,6 +2214,32 @@ VkExtent2D ScaledRenderExtent(VkExtent2D presentationExtent, float renderScale)
         std::max(1u, static_cast<uint32_t>(std::lround(static_cast<double>(presentationExtent.height) * scale)))};
 }
 
+void RefreshGpuTimingTelemetry(
+    VulkanSurfaceContext& ctx,
+    const std::optional<horde::vulkan::GpuFrameTimingSample>& completedSample = std::nullopt)
+{
+    if (completedSample.has_value())
+    {
+        ctx.gpuFrameTimingTotalMs += completedSample->milliseconds;
+        ++ctx.gpuFrameTimingSampleCount;
+    }
+    const horde::vulkan::GpuFrameTimerTelemetry& timer = ctx.gpuFrameTimer.Telemetry();
+    auto& output = ctx.gpuRtTiming;
+    output.status = timer.diagnostic;
+    output.supported = ctx.gpuFrameTimer.Supported();
+    output.valid = ctx.gpuFrameTimingSampleCount > 0u &&
+        horde::vulkan::GpuFrameTimerHasCurrentSample(timer.status);
+    output.latestMs = output.valid ? static_cast<float>(timer.latestMilliseconds) : 0.0f;
+    output.averageMs = output.valid
+        ? static_cast<float>(ctx.gpuFrameTimingTotalMs / static_cast<double>(ctx.gpuFrameTimingSampleCount))
+        : 0.0f;
+    output.timestampPeriodNanoseconds = timer.timestampPeriodNanoseconds;
+    output.timestampValidBits = timer.timestampValidBits;
+    output.sampleCount = ctx.gpuFrameTimingSampleCount;
+    output.unavailableCount = timer.unavailableResultCount;
+    output.errorCount = timer.errorCount;
+}
+
 bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx)
 {
     if (!ctx.useRtPath)
@@ -2240,6 +2271,12 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx)
                     MB_OK | MB_ICONERROR);
         return false;
     }
+    if (ctx.gpuFrameTimer.Telemetry().status == horde::vulkan::GpuFrameTimerStatus::Uninitialised)
+    {
+        ctx.gpuFrameTimer.Initialise(
+            ctx.physicalDevice, ctx.device, ctx.graphicsQueueFamilyIndex, kMaxFramesInFlight);
+    }
+    RefreshGpuTimingTelemetry(ctx);
     std::cout << "PBR material encoding: " << ctx.rtScene.MaterialEncoding() << '\n'
               << "RT render scale " << std::round(ctx.renderScale * 100.0f) << "%: "
               << renderExtent.width << 'x' << renderExtent.height << " -> "
@@ -2276,6 +2313,7 @@ void DestroyRenderContext(VulkanSurfaceContext& ctx)
 
     vkDeviceWaitIdle(ctx.device);
     ctx.rtScene.Destroy();
+    ctx.gpuFrameTimer.Destroy();
 
     for (VkFence fence : ctx.inFlightFences)
     {
@@ -2348,10 +2386,11 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
     }
 
     const VkResult waitResult = vkWaitForFences(ctx.device, 1u, &ctx.inFlightFences[ctx.currentFrame], VK_TRUE, UINT64_MAX);
-    if (waitResult != VK_SUCCESS && waitResult != VK_TIMEOUT)
+    if (waitResult != VK_SUCCESS)
     {
         return false;
     }
+    RefreshGpuTimingTelemetry(ctx, ctx.gpuFrameTimer.CollectCompleted(ctx.currentFrame));
 
     uint32_t imageIndex = 0u;
     const VkResult acquireResult = vkAcquireNextImageKHR(
@@ -2384,6 +2423,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
     }
 
     const bool useRtFrame = ctx.useRtPath && ctx.rtScene.IsReady();
+    bool gpuTimingRecording = false;
     if (useRtFrame)
     {
         SpatialAudioEngine().Update();
@@ -2410,6 +2450,8 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             frameInputs.roster.renderedEnemies[0] = ctx.debugEnemyOverride;
         }
         std::string diagnostic;
+        gpuTimingRecording = ctx.gpuFrameTimer.RecordBegin(
+            ctx.commandBuffers[imageIndex], ctx.currentFrame);
         if (!ctx.rtScene.RecordTraceAndCopy(ctx.commandBuffers[imageIndex],
                                             ctx.swapchainImages[imageIndex],
                                             ctx.swapchainImageLayouts[imageIndex],
@@ -2417,8 +2459,19 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
                                             frameInputs,
                                             diagnostic))
         {
+            if (gpuTimingRecording)
+            {
+                ctx.gpuFrameTimer.CancelRecording(ctx.currentFrame);
+            }
             std::cerr << "Failed to record RT frame: " << diagnostic << '\n';
             return false;
+        }
+        if (gpuTimingRecording &&
+            !ctx.gpuFrameTimer.RecordEnd(ctx.commandBuffers[imageIndex], ctx.currentFrame))
+        {
+            ctx.gpuFrameTimer.CancelRecording(ctx.currentFrame);
+            gpuTimingRecording = false;
+            RefreshGpuTimingTelemetry(ctx);
         }
     }
     else
@@ -2444,11 +2497,13 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
 
     if (vkEndCommandBuffer(ctx.commandBuffers[imageIndex]) != VK_SUCCESS)
     {
+        if (gpuTimingRecording) ctx.gpuFrameTimer.CancelRecording(ctx.currentFrame);
         return false;
     }
 
     if (vkResetFences(ctx.device, 1u, &ctx.inFlightFences[ctx.currentFrame]) != VK_SUCCESS)
     {
+        if (gpuTimingRecording) ctx.gpuFrameTimer.CancelRecording(ctx.currentFrame);
         return false;
     }
 
@@ -2466,7 +2521,14 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
 
     if (vkQueueSubmit(ctx.graphicsQueue, 1u, &submitInfo, ctx.inFlightFences[ctx.currentFrame]) != VK_SUCCESS)
     {
+        if (gpuTimingRecording) ctx.gpuFrameTimer.CancelRecording(ctx.currentFrame);
         return false;
+    }
+    if (gpuTimingRecording &&
+        !ctx.gpuFrameTimer.MarkSubmitted(ctx.currentFrame, ++ctx.gpuFrameSubmissionSequence))
+    {
+        ctx.gpuFrameTimer.CancelRecording(ctx.currentFrame);
+        RefreshGpuTimingTelemetry(ctx);
     }
 
     VkPresentInfoKHR presentInfo{
@@ -2588,7 +2650,15 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
              << "  \"timing\": {\n"
              << "    \"sampleCount\": " << allFrameTimes.size() << ",\n"
              << "    \"overallMedianMs\": " << CaptureMedianMs(allFrameTimes) << ",\n"
-             << "    \"overallMeanMs\": " << CaptureMeanMs(allFrameTimes) << "\n"
+             << "    \"overallMeanMs\": " << CaptureMeanMs(allFrameTimes) << ",\n"
+             << "    \"gpuRtCommandBuffer\": {\"valid\": "
+             << (context.gpuRtTiming.valid ? "true" : "false")
+             << ", \"latestMs\": " << context.gpuRtTiming.latestMs
+             << ", \"averageMs\": " << context.gpuRtTiming.averageMs
+             << ", \"sampleCount\": " << context.gpuRtTiming.sampleCount
+             << ", \"timestampValidBits\": " << context.gpuRtTiming.timestampValidBits
+             << ", \"timestampPeriodNanoseconds\": "
+             << context.gpuRtTiming.timestampPeriodNanoseconds << "}\n"
              << "  },\n"
              << "  \"error\": " << (error.empty() ? "null" : "\"" + JsonEscape(error) + "\"") << ",\n"
              << "  \"captures\": [\n";
@@ -2665,6 +2735,7 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             }
             const auto frameEnd = std::chrono::steady_clock::now();
             frameTimesMs.push_back(std::chrono::duration<double, std::milli>(frameEnd - frameStart).count());
+            capabilities.performance.gpuRt = context.gpuRtTiming;
             capabilities.rtScene.presented = true;
         }
 
@@ -2874,6 +2945,10 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             context.renderScaleDirty = false;
             timingSamples.clear();
             vkDeviceWaitIdle(context.device);
+            context.gpuFrameTimer.ResetAfterDeviceIdle();
+            context.gpuFrameTimingTotalMs = 0.0;
+            context.gpuFrameTimingSampleCount = 0u;
+            RefreshGpuTimingTelemetry(context);
             context.rtScene.Destroy();
             capabilities.rtScene.presented = false;
             capabilities.rtScene.dispatchWidth = 0u;
@@ -2905,6 +2980,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                         MB_OK | MB_ICONERROR);
             break;
         }
+        capabilities.performance.gpuRt = context.gpuRtTiming;
         const auto frameEnd = std::chrono::steady_clock::now();
         const double frameTimeMs = std::chrono::duration<double, std::milli>(frameEnd - frameStart).count();
         if (benchmarkFrame)

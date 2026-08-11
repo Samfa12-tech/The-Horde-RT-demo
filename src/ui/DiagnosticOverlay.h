@@ -40,6 +40,11 @@ struct DeveloperOverlaySnapshot
     float renderScale = 1.0f;
     float fps = 0.0f;
     float frameTimeMs = 0.0f;
+    bool gpuRtTimingValid = false;
+    float gpuRtLatestMs = 0.0f;
+    float gpuRtAverageMs = 0.0f;
+    std::uint64_t gpuRtSampleCount = 0u;
+    std::string gpuRtTimingStatus = "Not initialised";
     std::uint32_t simulationTicksThisFrame = 0;
     double fixedStepAccumulatorSeconds = 0.0;
     std::uint64_t catchUpOverrunCount = 0;

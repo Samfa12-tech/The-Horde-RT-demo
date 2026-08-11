@@ -852,7 +852,11 @@ public class MainActivity extends Activity {
                             }
                             break;
                         case PLATFORM_EVENT_ENEMY_DEFEATED:
-                            playSpatialSound("enemy_fall", 0.24f, stereoGains);
+                            // Preserve the authored separation between the sword impact
+                            // and the fall cue while retaining the event's spatial gains.
+                            handler.postDelayed(
+                                    () -> playSpatialSound("enemy_fall", 0.24f, stereoGains),
+                                    140L);
                             break;
                         case PLATFORM_EVENT_LICH_CHARGE_STARTED:
                             playSpatialSound("lich_charge", 0.38f, stereoGains);

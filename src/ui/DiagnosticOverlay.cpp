@@ -34,6 +34,16 @@ std::string BuildDeveloperOverlayText(const DeveloperOverlaySnapshot& snapshot)
     out << "FRAME " << snapshot.frameTimeMs << " ms  |  " << snapshot.fps << " FPS  |  "
         << snapshot.internalWidth << 'x' << snapshot.internalHeight << " -> "
         << snapshot.presentationWidth << 'x' << snapshot.presentationHeight << '\n';
+    if (snapshot.gpuRtTimingValid)
+    {
+        out << "GPU RT " << snapshot.gpuRtLatestMs << " ms  |  avg "
+            << snapshot.gpuRtAverageMs << " ms  |  " << snapshot.gpuRtSampleCount
+            << " samples\n";
+    }
+    else
+    {
+        out << "GPU RT N/A  |  " << snapshot.gpuRtTimingStatus << '\n';
+    }
     out << "SCENE " << snapshot.routeZone << "  |  lantern " << snapshot.lanternPhase
         << "  |  " << snapshot.selectedEnemy << ' ' << snapshot.encounterPhase;
     if (snapshot.enemyHealth >= 0)

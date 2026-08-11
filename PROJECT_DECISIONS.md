@@ -37,7 +37,13 @@ Milestone 1 centralises Windows and Android gameplay in one fixed 60 Hz `GameSim
 
 The runner clamps render contribution to 100 ms, supports up to eight catch-up ticks, reports discarded excess, normalises two-axis movement, and clears accumulated time across pause/reset/retry/checkpoint transitions. Exact authored checkpoint imports remain a separate no-tick path because capture state must preserve the 0.1.3 floating-point and zero-delta finalization behavior.
 
-The renderer, shader ABI, `vkCmdTraceRaysKHR`, recursion depth 1, `rayQueryEXT`, one frame in flight, ASTC route, Android identity, one-active-enemy limit, and public 0.1.3 artifacts are unchanged. The next task remains renderer resource/character-slot extraction plus GPU timing, without adding a second enemy.
+The renderer, shader ABI, `vkCmdTraceRaysKHR`, recursion depth 1, `rayQueryEXT`, one frame in flight, ASTC route, Android identity, one-active-enemy limit, and public 0.1.3 artifacts are unchanged.
+
+## Renderer resource and GPU timing decision - 2026-08-11
+
+Milestone 2 extracts checked Vulkan buffer operations, acceleration-structure lifetime helpers, and updatable-BLAS state behind `RtGpuResources`; BLAS sizing/build/refit recording remains in the scene. It makes the existing skeleton-or-lich renderer path an explicit `CharacterRenderSlot`. Both archetype resources remain resident, but exactly one selected address is written to TLAS instance 2, and a roster above that capacity is rejected. This is a bounded ownership/test seam, not permission to add another enemy or change the shader ABI.
+
+GPU telemetry uses Vulkan timestamp queries only when the selected graphics queue reports non-zero timestamp bits. It resolves the prior submission after the existing frame fence, never waits inside the query read, and reports a separate **GPU RT command-buffer time**. CPU wall-clock frame timing, benchmark schema and pass/fail remain authoritative for continuity; timestamps do not include queue presentation, compositor, display, or input latency. Unsupported or failed timing remains non-fatal and visibly `N/A`.
 
 ## Target devices
 

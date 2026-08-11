@@ -100,6 +100,18 @@ std::string BuildCapabilityTextReport(const DeviceCapabilities& capabilities)
     {
         out << "FPS / frame time: N/A\n";
     }
+    if (capabilities.performance.gpuRt.valid)
+    {
+        out << "GPU RT command-buffer time: " << std::fixed << std::setprecision(3)
+            << capabilities.performance.gpuRt.latestMs << " ms latest / "
+            << capabilities.performance.gpuRt.averageMs << " ms average ("
+            << capabilities.performance.gpuRt.sampleCount << " samples)\n";
+    }
+    else
+    {
+        out << "GPU RT command-buffer time: N/A ("
+            << capabilities.performance.gpuRt.status << ")\n";
+    }
 
     out << "RT scene status: " << capabilities.rtScene.status << '\n';
     out << "RT scene geometry: " << capabilities.rtScene.geometry << '\n';
@@ -158,6 +170,18 @@ std::string BuildCapabilityJsonReport(const DeviceCapabilities& capabilities)
     out << "  },\n";
     out << "  \"fps\": " << (IsMeasured(capabilities.performance.fps) ? std::to_string(capabilities.performance.fps) : "\"N/A\"") << ",\n";
     out << "  \"frameTimeMs\": " << (capabilities.performance.frameTimeMs > 0.0f ? std::to_string(capabilities.performance.frameTimeMs) : "\"N/A\"") << ",\n";
+    out << "  \"gpuRtTiming\": {\n";
+    out << "    \"status\": \"" << JsonEscape(capabilities.performance.gpuRt.status) << "\",\n";
+    out << "    \"supported\": " << (capabilities.performance.gpuRt.supported ? "true" : "false") << ",\n";
+    out << "    \"valid\": " << (capabilities.performance.gpuRt.valid ? "true" : "false") << ",\n";
+    out << "    \"latestMs\": " << (capabilities.performance.gpuRt.valid ? std::to_string(capabilities.performance.gpuRt.latestMs) : "\"N/A\"") << ",\n";
+    out << "    \"averageMs\": " << (capabilities.performance.gpuRt.valid ? std::to_string(capabilities.performance.gpuRt.averageMs) : "\"N/A\"") << ",\n";
+    out << "    \"timestampPeriodNanoseconds\": " << capabilities.performance.gpuRt.timestampPeriodNanoseconds << ",\n";
+    out << "    \"timestampValidBits\": " << capabilities.performance.gpuRt.timestampValidBits << ",\n";
+    out << "    \"sampleCount\": " << capabilities.performance.gpuRt.sampleCount << ",\n";
+    out << "    \"unavailableCount\": " << capabilities.performance.gpuRt.unavailableCount << ",\n";
+    out << "    \"errorCount\": " << capabilities.performance.gpuRt.errorCount << "\n";
+    out << "  },\n";
     out << "  \"rtScene\": {\n";
     out << "    \"status\": \"" << JsonEscape(capabilities.rtScene.status) << "\",\n";
     out << "    \"geometry\": \"" << JsonEscape(capabilities.rtScene.geometry) << "\",\n";

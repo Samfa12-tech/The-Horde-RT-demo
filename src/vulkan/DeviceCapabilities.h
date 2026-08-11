@@ -40,12 +40,27 @@ struct DeviceIdentity
     std::uint32_t vulkanApiVersion = 0;
 };
 
+struct GpuRtTimingSnapshot
+{
+    std::string status = "Not initialised";
+    bool supported = false;
+    bool valid = false;
+    float latestMs = 0.0f;
+    float averageMs = 0.0f;
+    float timestampPeriodNanoseconds = 0.0f;
+    std::uint32_t timestampValidBits = 0u;
+    std::uint64_t sampleCount = 0u;
+    std::uint64_t unavailableCount = 0u;
+    std::uint64_t errorCount = 0u;
+};
+
 struct PerformanceSnapshot
 {
     std::uint32_t internalRenderWidth = 0;
     std::uint32_t internalRenderHeight = 0;
     float fps = 0.0f;
     float frameTimeMs = 0.0f;
+    GpuRtTimingSnapshot gpuRt;
 };
 
 struct RtSceneSnapshot
