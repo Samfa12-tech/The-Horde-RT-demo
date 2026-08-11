@@ -9,7 +9,8 @@
 
 #include "gameplay/SwordCombat.h"
 #include "gameplay/ShowcaseGameplay.h"
-#include "scene/SkeletonBipedModel.h"
+#include "vulkan/raytracing/CharacterRenderSlot.h"
+#include "vulkan/raytracing/RtGpuResources.h"
 
 namespace horde::vulkan::raytracing
 {
@@ -88,20 +89,8 @@ public:
     bool CaptureStorageImage(StorageImageCapture& capture, std::string& diagnostic);
 
 private:
-    struct Buffer
-    {
-        VkBuffer buffer = VK_NULL_HANDLE;
-        VkDeviceMemory memory = VK_NULL_HANDLE;
-        VkDeviceAddress address = 0;
-        VkDeviceSize size = 0;
-    };
-
-    struct AccelerationStructure
-    {
-        Buffer backing;
-        VkAccelerationStructureKHR handle = VK_NULL_HANDLE;
-        VkDeviceAddress address = 0;
-    };
+    using Buffer = RtGpuBuffer;
+    using AccelerationStructure = RtAccelerationStructure;
 
     struct TextureArray
     {
@@ -146,7 +135,6 @@ private:
     void DestroyAccelerationStructure(AccelerationStructure& accelerationStructure);
     void DestroyTextureArray(TextureArray& texture);
 
-    std::uint32_t FindMemoryType(std::uint32_t typeBits, VkMemoryPropertyFlags flags) const;
     VkDeviceAddress BufferAddress(VkBuffer buffer) const;
 
     VkPhysicalDevice physicalDevice_ = VK_NULL_HANDLE;
@@ -175,8 +163,6 @@ private:
     Buffer indexBuffer_;
     Buffer transformBuffer_;
     Buffer instanceBuffer_;
-    Buffer skeletonVertexBuffer_;
-    Buffer lichVertexBuffer_;
     Buffer worldSurfaceBuffer_;
     AccelerationStructure blas_;
     AccelerationStructure finaleRoofBlas_;
@@ -184,21 +170,10 @@ private:
     AccelerationStructure swordBlas_;
     AccelerationStructure playerBodyBlas_;
     AccelerationStructure playerLimbBlas_;
-    AccelerationStructure skeletonBlas_;
-    AccelerationStructure lichBlas_;
     AccelerationStructure tlas_;
-    Buffer skeletonBlasUpdateScratch_;
-    Buffer lichBlasUpdateScratch_;
     Buffer tlasUpdateScratch_;
-    horde::scene::SkeletonBipedModel skeletonModel_;
-    horde::scene::SkinnedCharacterModel lichModel_;
-    std::vector<horde::scene::SkinnedRtVertex> skeletonSkinnedVertices_;
-    std::vector<horde::scene::TexturedSkinnedRtVertex> lichSkinnedVertices_;
-    std::array<float, 3u> lichStaffLocalSample_{{0.94f, 0.79f, 0.64f}};
-    float lastSkeletonUpdateTime_ = -1.0f;
-    int lastSkeletonClip_ = -1;
-    float lastLichUpdateTime_ = -1.0f;
-    int lastLichClip_ = -1;
+    RtGpuResources gpuResources_;
+    CharacterRenderSlot characterSlot_;
 
     VkDescriptorSetLayout descriptorSetLayout_ = VK_NULL_HANDLE;
     VkDescriptorPool descriptorPool_ = VK_NULL_HANDLE;

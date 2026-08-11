@@ -2,6 +2,7 @@
 #include <string>
 
 #include "ui/DiagnosticOverlay.h"
+#include "vulkan/GpuFrameTimer.h"
 
 namespace
 {
@@ -20,6 +21,13 @@ bool RequireContains(const std::string& text, const std::string& expected)
 
 int main()
 {
+    static_assert(horde::vulkan::GpuFrameTimerHasCurrentSample(
+        horde::vulkan::GpuFrameTimerStatus::Available));
+    static_assert(!horde::vulkan::GpuFrameTimerHasCurrentSample(
+        horde::vulkan::GpuFrameTimerStatus::ResultUnavailable));
+    static_assert(!horde::vulkan::GpuFrameTimerHasCurrentSample(
+        horde::vulkan::GpuFrameTimerStatus::QueryError));
+
     horde::ui::DeveloperOverlaySnapshot snapshot;
     snapshot.buildIdentity = "0.1.3-alpha.1 DEBUG";
     snapshot.shaderIdentity = "0123456789ab";
@@ -47,6 +55,11 @@ int main()
     snapshot.renderScale = 0.75f;
     snapshot.fps = 83.815f;
     snapshot.frameTimeMs = 11.931f;
+    snapshot.gpuRtTimingValid = true;
+    snapshot.gpuRtLatestMs = 7.425f;
+    snapshot.gpuRtAverageMs = 7.812f;
+    snapshot.gpuRtSampleCount = 120u;
+    snapshot.gpuRtTimingStatus = "Available";
     snapshot.simulationTicksThisFrame = 1;
     snapshot.fixedStepAccumulatorSeconds = 0.0025;
     snapshot.catchUpOverrunCount = 2;
@@ -64,6 +77,7 @@ int main()
     ok &= RequireContains(text, "DEV  0.1.3-alpha.1 DEBUG  shader 0123456789ab");
     ok &= RequireContains(text, "RT RayTracingPipeline  |  presented YES  |  scale 75%");
     ok &= RequireContains(text, "FRAME 11.9 ms  |  83.8 FPS  |  1080x2235 -> 1440x2980");
+    ok &= RequireContains(text, "GPU RT 7.4 ms  |  avg 7.8 ms  |  120 samples");
     ok &= RequireContains(text, "SCENE finale  |  lantern settled  |  lich charging hp 2");
     ok &= RequireContains(text, "PLAYER dying  |  vitality 0/3  |  damage OFF");
     ok &= RequireContains(text, "SIM 1 ticks  |  accum 2.5 ms  |  overruns 2");
@@ -75,9 +89,12 @@ int main()
     snapshot.selectedEnemy = "none";
     snapshot.encounterPhase = "inactive";
     snapshot.enemyHealth = -1;
+    snapshot.gpuRtTimingValid = false;
+    snapshot.gpuRtTimingStatus = "Queue timestamps unsupported";
     const std::string inactiveText = horde::ui::BuildDeveloperOverlayText(snapshot);
     ok &= RequireContains(inactiveText, "presented NO");
     ok &= RequireContains(inactiveText, "none inactive");
+    ok &= RequireContains(inactiveText, "GPU RT N/A  |  Queue timestamps unsupported");
     if (inactiveText.find(" hp ") != std::string::npos)
     {
         std::cerr << "Developer overlay printed health for an encounter without a health value.\n";

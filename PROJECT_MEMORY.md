@@ -34,6 +34,8 @@ Last updated: 2026-08-11
 - A recursive depth-2 closest-hit experiment compiled but failed during phone pipeline creation. Do not restore it without proving capability and pipeline creation on the phone.
 - The RT storage image is RGBA. Common BGRA swapchains require the presentation-format-driven `outputRedBlueSwap` path on raw copy; scaled modes use a format-aware blit.
 - One frame remains in flight while held-prop TLAS transforms use host-written instance data.
+- `RtGpuResources` owns checked buffer operations, acceleration-structure lifetime helpers, and updatable-BLAS state without taking ownership of the platform device; BLAS sizing/build/refit recording remains in the scene. `CharacterRenderSlot` owns the resident skeleton/lich pose resources but enforces one active character at TLAS instance 2.
+- Supported graphics queues expose a separately labelled Vulkan GPU RT command-buffer interval from top-of-pipe to bottom-of-pipe around acceleration-structure, trace, barrier, and copy/blit recording. It does not replace CPU frame time or include presentation/display latency; unsupported timestamp queues report `N/A` without affecting rendering.
 - Android uses strict ASTC KTX2 arrays: ASTC 6x6 diffuse/ARM and ASTC 4x4 normals. Windows uses executable-relative raw RGBA8 arrays.
 - The unreachable stained-glass material route has been removed from the CPU material table and raygen. The retained open threshold and live clear-glass route are unchanged. The regenerated raygen is 71,180 SPIR-V bytes / 3,978 instructions / 557 branch operations / 6 loops / 212 selection merges, down from 71,908 / 4,025 / 568 / 6 / 216, with bit-exact fixed Windows captures and non-regressing Windows/phone timing.
 
@@ -109,6 +111,14 @@ Last updated: 2026-08-11
 - Additive `CMakePresets.json` presets and a Vulkan-off host CI lane improve reproducibility. CI explicitly does not prove hardware RT presentation or phone behavior.
 - Detailed implementation and validation evidence: `docs/SHARED_SIMULATION_FOUNDATION_2026-08-10.md`.
 
+## Renderer resource and GPU timing foundation
+
+- Low-level buffer allocation/upload/destruction, acceleration-structure lifetime helpers, and updatable triangle-BLAS state are extracted from `PresentableTinyRtScene` behind `RtGpuResources`; BLAS sizing/build/refit recording, platform device ownership, descriptors, textures, pipeline, SBT, and capture remain unchanged.
+- One `CharacterRenderSlot` owns both resident archetype resources and the historical animation/refit cadence while selecting exactly one skeleton or lich acceleration-structure address for TLAS instance 2. The eight-BLAS, eighteen-instance, one-active-enemy ceiling is unchanged.
+- Windows and Android use a non-blocking two-query Vulkan timestamp lifecycle tied to the existing one-frame fence. Reduced-width timestamp wrap and availability are handled; unsupported/query-failure states remain diagnostic only.
+- CPU frame timings, benchmark schema/pass criteria, shader ABI, raygen, and presentation honesty remain unchanged. Current physical-phone GPU timing remains unverified because no Android device was connected for this milestone.
+- Detailed implementation and validation evidence: `docs/RENDERER_RESOURCE_SLOTS_GPU_TIMING_2026-08-11.md`.
+
 ## Asset and licence state
 
 - Five Poly Haven environment sets are retained under CC0 and packed into current platform formats.
@@ -123,6 +133,9 @@ Last updated: 2026-08-11
 - Android native bridge: `android/app/src/main/cpp/android_probe_bridge.cpp`
 - Windows presentation/UI: `src/platform/windows/DiagnosticWindow.cpp`
 - Shared RT scene: `src/vulkan/raytracing/PresentableTinyRtScene.cpp`
+- Renderer resource seam: `src/vulkan/raytracing/RtGpuResources.cpp`
+- One-active character slot: `src/vulkan/raytracing/CharacterRenderSlot.cpp`
+- Vulkan GPU timer: `src/vulkan/GpuFrameTimer.cpp`
 - Raygen source: `shaders/raytracing/minimal.rgen`
 - Embedded raygen: `src/vulkan/raytracing/MinimalRayGenShader.inc`
 - Shared showcase route: `src/gameplay/ShowcaseRoute.h`
@@ -138,7 +151,7 @@ Last updated: 2026-08-11
 
 1. Preserve the published alpha and its stable signing identity.
 2. Back up the JKS and both passwords independently.
-3. Treat the complete 0.1.3 body/vitality/dawn route as the preserved playable baseline. The 2026-08-01 full-repo audit freezes it as the demo baseline and selects a shared fixed-step simulation/input/event foundation as the next milestone; see `docs/FULL_REPO_AUDIT_AND_GAME_PLAN_2026-08-01.md`.
+3. Treat the complete 0.1.3 body/vitality/dawn route as the preserved playable baseline. The shared fixed-step simulation/input/event foundation and the bounded renderer resource/character-slot plus GPU-timing foundation are complete; see `docs/FULL_REPO_AUDIT_AND_GAME_PLAN_2026-08-01.md`.
 4. The deterministic checkpoint, three-window benchmark, native route replay, and bounded Android evidence runner foundation is complete and live-validated.
 5. The integrated cross-platform clean-build/package/stale-shader/licence gate and deterministic 12-checkpoint Windows/Android PNG capture foundation are complete and device-validated. Keep video/orbit-camera presentation work deferred until it has a separately bounded need.
 6. Gate each meaningful renderer/gameplay-route change on the phone at 75%; report 100% separately and retain the short hands-on touch/audio/lifecycle pass.

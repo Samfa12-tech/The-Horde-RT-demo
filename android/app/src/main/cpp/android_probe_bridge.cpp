@@ -13,6 +13,7 @@
 #include <ctime>
 #include <fstream>
 #include <mutex>
+#include <optional>
 #include <sstream>
 #include <string>
 #include <thread>
@@ -34,6 +35,7 @@
 #include "gameplay/SwordCombat.h"
 #include "gameplay/simulation/GameSimulation.h"
 #include "gameplay/simulation/InputMailbox.h"
+#include "vulkan/GpuFrameTimer.h"
 #include "vulkan/RtCapabilityReport.h"
 #include "vulkan/VulkanContext.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
@@ -90,6 +92,10 @@ struct SwapchainContext
     VkClearColorValue clearColor = {{0.12f, 0.04f, 0.18f, 1.0f}};
     horde::vulkan::DeviceCapabilities capabilities;
     horde::vulkan::raytracing::PresentableTinyRtScene rtScene;
+    horde::vulkan::GpuFrameTimer gpuFrameTimer;
+    double gpuFrameTimingTotalMs = 0.0;
+    std::uint64_t gpuFrameTimingSampleCount = 0u;
+    std::uint64_t gpuFrameSubmissionSequence = 0u;
     float outputExposure = 0.92f;
     std::int32_t activeBenchmarkCheckpoint = -1;
     std::uint32_t benchmarkGeneration = 0u;
@@ -306,6 +312,11 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(const Swapchai
     snapshot.renderScale = context.renderScale;
     snapshot.fps = context.capabilities.performance.fps;
     snapshot.frameTimeMs = context.capabilities.performance.frameTimeMs;
+    snapshot.gpuRtTimingValid = context.capabilities.performance.gpuRt.valid;
+    snapshot.gpuRtLatestMs = context.capabilities.performance.gpuRt.latestMs;
+    snapshot.gpuRtAverageMs = context.capabilities.performance.gpuRt.averageMs;
+    snapshot.gpuRtSampleCount = context.capabilities.performance.gpuRt.sampleCount;
+    snapshot.gpuRtTimingStatus = context.capabilities.performance.gpuRt.status;
     snapshot.presented = context.capabilities.rtScene.presented;
     snapshot.simulationTicksThisFrame = simulation.simulationTicksThisFrame;
     snapshot.fixedStepAccumulatorSeconds = simulation.fixedStepAccumulatorSeconds;
@@ -1210,6 +1221,9 @@ void ReleaseSwapchainResources(SwapchainContext& context)
     }
 
     vkDeviceWaitIdle(context.device);
+    context.gpuFrameTimer.ResetAfterDeviceIdle();
+    context.gpuFrameTimingTotalMs = 0.0;
+    context.gpuFrameTimingSampleCount = 0u;
     context.rtScene.Destroy();
 
     if (context.commandPool != VK_NULL_HANDLE)
@@ -1286,6 +1300,32 @@ void ReleaseSwapchainResources(SwapchainContext& context)
     context.currentFrame = 0u;
 }
 
+void RefreshGpuTimingTelemetry(
+    SwapchainContext& context,
+    const std::optional<horde::vulkan::GpuFrameTimingSample>& completedSample = std::nullopt)
+{
+    if (completedSample.has_value())
+    {
+        context.gpuFrameTimingTotalMs += completedSample->milliseconds;
+        ++context.gpuFrameTimingSampleCount;
+    }
+    const horde::vulkan::GpuFrameTimerTelemetry& timer = context.gpuFrameTimer.Telemetry();
+    auto& output = context.capabilities.performance.gpuRt;
+    output.status = timer.diagnostic;
+    output.supported = context.gpuFrameTimer.Supported();
+    output.valid = context.gpuFrameTimingSampleCount > 0u &&
+        horde::vulkan::GpuFrameTimerHasCurrentSample(timer.status);
+    output.latestMs = output.valid ? static_cast<float>(timer.latestMilliseconds) : 0.0f;
+    output.averageMs = output.valid
+        ? static_cast<float>(context.gpuFrameTimingTotalMs / static_cast<double>(context.gpuFrameTimingSampleCount))
+        : 0.0f;
+    output.timestampPeriodNanoseconds = timer.timestampPeriodNanoseconds;
+    output.timestampValidBits = timer.timestampValidBits;
+    output.sampleCount = context.gpuFrameTimingSampleCount;
+    output.unavailableCount = timer.unavailableResultCount;
+    output.errorCount = timer.errorCount;
+}
+
 bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
 {
     if (!context.useRtPath)
@@ -1311,6 +1351,12 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
         __android_log_print(ANDROID_LOG_ERROR, kTag, "Failed to initialise presentable RT scene: %s", diagnostic.c_str());
         return false;
     }
+    if (context.gpuFrameTimer.Telemetry().status == horde::vulkan::GpuFrameTimerStatus::Uninitialised)
+    {
+        context.gpuFrameTimer.Initialise(
+            context.physicalDevice, context.device, context.graphicsQueueFamilyIndex, kMaxFramesInFlight);
+    }
+    RefreshGpuTimingTelemetry(context);
     __android_log_print(ANDROID_LOG_INFO, kTag, "PBR material encoding: %s", context.rtScene.MaterialEncoding().c_str());
     __android_log_print(ANDROID_LOG_INFO,
                         kTag,
@@ -1353,6 +1399,7 @@ void DestroySwapchainContext(SwapchainContext& context)
 
     vkDeviceWaitIdle(context.device);
     context.rtScene.Destroy();
+    context.gpuFrameTimer.Destroy();
     for (VkSemaphore semaphore : context.imageAvailableSemaphores)
     {
         if (semaphore != VK_NULL_HANDLE)
@@ -1432,10 +1479,11 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
 
     const VkResult waitResult = vkWaitForFences(context.device, 1u, &context.inFlightFences[context.currentFrame], VK_TRUE, UINT64_MAX);
     const auto fenceDone = std::chrono::steady_clock::now();
-    if (waitResult != VK_SUCCESS && waitResult != VK_TIMEOUT)
+    if (waitResult != VK_SUCCESS)
     {
         return false;
     }
+    RefreshGpuTimingTelemetry(context, context.gpuFrameTimer.CollectCompleted(context.currentFrame));
 
     uint32_t imageIndex = 0u;
     const VkResult acquireResult = vkAcquireNextImageKHR(
@@ -1473,6 +1521,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
     }
 
     const bool useRtFrame = context.useRtPath && context.rtScene.IsReady();
+    bool gpuTimingRecording = false;
     bool inAppBenchmarkFrame = false;
     const auto recordStart = std::chrono::steady_clock::now();
     if (useRtFrame)
@@ -1655,6 +1704,8 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
                 gGameSimulation.Snapshot(),
                 context.outputExposure);
         std::string diagnostic;
+        gpuTimingRecording = context.gpuFrameTimer.RecordBegin(
+            context.commandBuffers[imageIndex], context.currentFrame);
         if (!context.rtScene.RecordTraceAndCopy(context.commandBuffers[imageIndex],
                                                 context.swapchainImages[imageIndex],
                                                 context.swapchainImageLayouts[imageIndex],
@@ -1662,8 +1713,19 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
                                                 frameInputs,
                                                 diagnostic))
         {
+            if (gpuTimingRecording)
+            {
+                context.gpuFrameTimer.CancelRecording(context.currentFrame);
+            }
             __android_log_print(ANDROID_LOG_ERROR, kTag, "Failed to record RT frame: %s", diagnostic.c_str());
             return false;
+        }
+        if (gpuTimingRecording &&
+            !context.gpuFrameTimer.RecordEnd(context.commandBuffers[imageIndex], context.currentFrame))
+        {
+            context.gpuFrameTimer.CancelRecording(context.currentFrame);
+            gpuTimingRecording = false;
+            RefreshGpuTimingTelemetry(context);
         }
     }
     else
@@ -1684,12 +1746,14 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
 
     if (vkEndCommandBuffer(context.commandBuffers[imageIndex]) != VK_SUCCESS)
     {
+        if (gpuTimingRecording) context.gpuFrameTimer.CancelRecording(context.currentFrame);
         return false;
     }
     const auto recordDone = std::chrono::steady_clock::now();
 
     if (vkResetFences(context.device, 1u, &context.inFlightFences[context.currentFrame]) != VK_SUCCESS)
     {
+        if (gpuTimingRecording) context.gpuFrameTimer.CancelRecording(context.currentFrame);
         return false;
     }
 
@@ -1707,7 +1771,14 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
 
     if (vkQueueSubmit(context.graphicsQueue, 1u, &submitInfo, context.inFlightFences[context.currentFrame]) != VK_SUCCESS)
     {
+        if (gpuTimingRecording) context.gpuFrameTimer.CancelRecording(context.currentFrame);
         return false;
+    }
+    if (gpuTimingRecording &&
+        !context.gpuFrameTimer.MarkSubmitted(context.currentFrame, ++context.gpuFrameSubmissionSequence))
+    {
+        context.gpuFrameTimer.CancelRecording(context.currentFrame);
+        RefreshGpuTimingTelemetry(context);
     }
 
     VkPresentInfoKHR presentInfo{};
@@ -1773,6 +1844,20 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
                             context.timingFenceMs / count,
                             context.timingRecordMs / count,
                             context.timingPresentMs / count);
+        const auto& gpuTiming = context.capabilities.performance.gpuRt;
+        __android_log_print(ANDROID_LOG_INFO,
+                            kTag,
+                            "HORDE_GPU status=%s valid=%d latest_ms=%.3f average_ms=%.3f samples=%llu valid_bits=%u period_ns=%.6f unavailable=%llu errors=%llu",
+                            horde::vulkan::GpuFrameTimerStatusName(
+                                context.gpuFrameTimer.Telemetry().status),
+                            gpuTiming.valid ? 1 : 0,
+                            static_cast<double>(gpuTiming.latestMs),
+                            static_cast<double>(gpuTiming.averageMs),
+                            static_cast<unsigned long long>(gpuTiming.sampleCount),
+                            gpuTiming.timestampValidBits,
+                            static_cast<double>(gpuTiming.timestampPeriodNanoseconds),
+                            static_cast<unsigned long long>(gpuTiming.unavailableCount),
+                            static_cast<unsigned long long>(gpuTiming.errorCount));
         context.timingFrameCount = 0u;
         context.timingFenceMs = context.timingRecordMs = context.timingPresentMs = context.timingTotalMs = 0.0;
     }
@@ -1817,6 +1902,10 @@ void SwapchainRenderLoop()
         if (gSwapchainContext.useRtPath && std::abs(requestedRenderScale - gSwapchainContext.renderScale) > 0.001f)
         {
             vkDeviceWaitIdle(gSwapchainContext.device);
+            gSwapchainContext.gpuFrameTimer.ResetAfterDeviceIdle();
+            gSwapchainContext.gpuFrameTimingTotalMs = 0.0;
+            gSwapchainContext.gpuFrameTimingSampleCount = 0u;
+            RefreshGpuTimingTelemetry(gSwapchainContext);
             gSwapchainContext.rtScene.Destroy();
             gSwapchainContext.renderScale = requestedRenderScale;
             gSwapchainContext.capabilities.rtScene.presented = false;

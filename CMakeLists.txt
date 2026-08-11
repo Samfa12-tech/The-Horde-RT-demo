@@ -128,6 +128,10 @@ if(BUILD_TESTING)
     target_include_directories(horde_rt_input_mailbox_stress PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_input_mailbox_stress COMMAND horde_rt_input_mailbox_stress)
 
+    add_executable(horde_rt_gpu_timestamp_math_tests tests/GpuTimestampMathTests.cpp)
+    target_include_directories(horde_rt_gpu_timestamp_math_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_gpu_timestamp_math_tests COMMAND horde_rt_gpu_timestamp_math_tests)
+
     add_executable(horde_rt_combat_smoke tests/SwordCombatSmoke.cpp)
     target_include_directories(horde_rt_combat_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_combat_smoke COMMAND horde_rt_combat_smoke)
@@ -149,6 +153,11 @@ if(BUILD_TESTING)
         target_include_directories(horde_rt_skinned_character_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
         target_link_libraries(horde_rt_skinned_character_smoke PRIVATE horde_rt_probe_core)
         add_test(NAME horde_rt_skinned_character_smoke COMMAND horde_rt_skinned_character_smoke)
+
+        add_executable(horde_rt_character_render_slot_smoke tests/CharacterRenderSlotSmoke.cpp)
+        target_include_directories(horde_rt_character_render_slot_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+        target_link_libraries(horde_rt_character_render_slot_smoke PRIVATE horde_rt_probe_core)
+        add_test(NAME horde_rt_character_render_slot_smoke COMMAND horde_rt_character_render_slot_smoke)
 
         add_executable(horde_rt_developer_overlay_smoke
             tests/DeveloperOverlaySmoke.cpp
