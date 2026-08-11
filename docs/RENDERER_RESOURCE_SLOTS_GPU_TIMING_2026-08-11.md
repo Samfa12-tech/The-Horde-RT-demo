@@ -53,9 +53,22 @@ The final canonical Host gate passed all seven stages at `reports/foundation-run
 
 ADB reported zero connected devices. No APK was installed, signed, or published, and no Android GPU-timestamp, presentation, frame-time, thermal, touch, audio, haptic, or lifecycle result is claimed from this milestone.
 
+## Android device follow-up
+
+The authorised `SM-S948B` was subsequently reserved for this project and tested from the exact clean source commit with:
+
+`.\tools\run-android-showcase-validation.ps1 -Mode Both -Scale 75 -Capture -TimeoutSeconds 300`
+
+The retained bundle is `reports/android-showcase-runs/run-20260811-201708`; the durable record is [`RENDERER_RESOURCE_SLOTS_ANDROID_VALIDATION_2026-08-11.md`](RENDERER_RESOURCE_SLOTS_ANDROID_VALIDATION_2026-08-11.md). The freshly built Debug APK SHA-256 was `4e782c89a323a4b00db2eb23a5de3c5ff44862880014e7c9394bcb982f8001af`.
+
+On Android 16/API 36, the Adreno 840 (driver 512.842.19, Vulkan 1.4.295) selected strict ASTC and `RayTracingPipeline`, exposed every required extension/feature, and honestly presented RT-produced swapchain frames. GPU RT command-buffer timing was supported and valid: the final capability snapshot recorded 5.486302 ms latest / 5.953842 ms average across 29 samples, 48 valid timestamp bits, 52.0833 ns period, zero unavailable results, and zero errors. The deterministic replay reached 13/13 waypoints, all 12 scene-only captures completed, and Home/resume retained honest presentation.
+
+This was not a full performance pass. Ordered 75% CPU medians were 10.327 / 7.109 / 8.353 / 11.220 / 23.604 ms for opening / worst bend / skylight / green / lich. Lich exceeded the 20 ms gate, so the runner exited non-zero. Recorded HAL temperatures rose from AP 31.9 C / battery 28.9 C / skin 31.1 C / status 0 before the run to AP 51.1 C / battery 35.4 C / skin 40.3 C / status 1 afterward. The historical zero-device Host-gate statements above remain intact because they describe the earlier run conditions.
+
 ## Known limits
 
 - One active character render slot and one enemy TLAS entry remain enforced.
 - Both skeleton and lich resources remain resident; this slice does not reduce the current memory footprint.
 - Timestamp queries add small profiling overhead and provide approximate GPU execution intervals, not presentation latency.
-- Current phone timing and thermal behavior remain unverified until the authorised `SM-S948B` is connected.
+- Phone GPU timing, functional presentation, replay, capture, and lifecycle behavior are now exact-device verified on `SM-S948B`; sustained 75% performance remains unresolved because the lich checkpoint failed the 20 ms gate.
+- Automated device testing does not establish human touch feel, camera comfort, perceived audio/haptics, artistic correctness, or behavior on another model/driver.
