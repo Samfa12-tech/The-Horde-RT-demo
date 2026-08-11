@@ -15,7 +15,7 @@ Showcase Alpha 0.1.3 adds a substantially rebuilt procedural player body with ar
 
 The current development foundation runs Windows and Android gameplay through one deterministic 60 Hz `GameSimulation`. Android input crosses JNI through a coherent snapshot mailbox with monotonic attack/reset/retry counters; ordered semantic events drive platform audio and haptics; and one shared adapter preserves the existing `RtSceneFrameInputs` renderer boundary. See `docs/SHARED_SIMULATION_FOUNDATION_2026-08-10.md`.
 
-The current development candidate builds the first bounded two-skeleton encounter on the checked renderer resource seam. Stable entities share a skeleton pose/BLAS when their actions match and use at most two pose buckets when they diverge; the lich remains singular. The scene now owns nine BLAS and nineteen physical TLAS slots, with unused slots masked. Vulkan timestamp queries remain separately labelled from CPU frame time, and Debug can disable only that instrumentation for matched phone A/B runs. The candidate is host-validated but is not the new phone-performance baseline until its `SM-S948B` gate passes. See `docs/TWO_SKELETON_COMBAT_SLICE_2026-08-11.md`.
+The current development candidate builds the first bounded two-skeleton encounter on the checked renderer resource seam. Stable entities share a skeleton pose/BLAS when their actions match and use at most two pose buckets when they diverge; the lich remains singular. The scene now owns nine BLAS and nineteen physical TLAS slots, with unused slots masked. Its exact `SM-S948B` automated gate passed at 75%, including the two-enemy checkpoint and lich below 20 ms, plus 13 captures, replay, and lifecycle recovery. Owner hands-on two-enemy readability and combat-feel checks remain separate. See `docs/TWO_SKELETON_COMBAT_ANDROID_VALIDATION_2026-08-12.md`.
 
 After these foundations merged, the project owner reported that controls, audio, and haptics all worked correctly during a hands-on test on `SM-S948B`. This is owner-reported development-build evidence rather than a new exact-artifact check; the separate automated lich performance failure remains open. See `docs/RENDERER_RESOURCE_SLOTS_ANDROID_VALIDATION_2026-08-11.md`.
 
@@ -78,14 +78,14 @@ The complete showcase route is Windows-validated and Android-device-validated on
 
 The player-vitality/retry slice is host-validated by clean Windows Debug and Release builds, all seven CTests in both configurations, twelve fixed RT captures, clean Android Debug and unsigned Release builds across all four configured ABIs, and `lintRelease`. On `SM-S948B`, real skeleton/lich damage, death UI, native opening/mirror retry, 3/3 restoration, the complete showcase automation route, captures, and Home/resume RT presentation are also validated. The earlier owner report of perceived haptics was corrected on 2026-08-01 because haptics had not actually been checked. The audit revision adds direct `Vibrator` effects, an enabled settings toggle/preview, and view-feedback fallback; the exact installed Debug APK subsequently produced completed preview, Swing, damage, and fatal effects through the live encounter, and the owner confirmed the revised haptic was physically felt. See `docs/PLAYER_VITALITY_RETRY_SLICE_2026-07-31.md` and `docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md`.
 
-For the merged shared-simulation and ordered-event migration, the owner separately reconfirmed basic controls, audible audio, and perceived haptics on `SM-S948B`. No new exact APK provenance accompanied that report, and it does not clear the current sustained-performance failure.
+For the merged shared-simulation and ordered-event migration, the owner separately reconfirmed basic controls, audible audio, and perceived haptics on `SM-S948B`. That older report lacked exact APK provenance; the later two-skeleton candidate now has exact automated performance/presentation evidence, while its new hands-on combat verdict remains pending.
 
 Render scaling was verified at:
 
 | Scale | Android internal RT extent | Result |
 |---:|---:|---|
-| 100% | `1440x2980` | Full-extent/image check passed; latest cool automated opening 23.353 ms median of three 120-frame averages, report-only |
-| 75% | `1080x2235` | Relative recommended tier; historical warm hands-on route zones were below 13.7 ms, while the latest exact development candidate measured 10.327 / 7.109 / 8.353 / 11.220 / 23.604 ms and failed the 20 ms lich gate |
+| 100% | `1440x2980` | Full-extent/image check passed; exact two-skeleton candidate opening measured 18.674 ms median of three 120-frame averages, report-only |
+| 75% | `1080x2235` | Recommended tier; exact two-skeleton candidate measured 10.589 / 12.139 / 9.246 / 8.888 / 11.060 / 19.735 ms across the six-checkpoint gate, all below 20 ms at thermal status 0 |
 | 50% | `720x1490` | Initial-alpha opening diagnostic recorded 163.12 FPS / 6.13 ms; retained as historical evidence, not a complete-route baseline |
 
 Windows Release was launched from a clean extraction using only its packaged assets. It reported `RayTracingPipeline`, `RT scene presented: yes`, and live resolution/FPS/frame-time diagnostics. The 100% and 75% render targets were verified at `982x628` and `737x471` respectively.

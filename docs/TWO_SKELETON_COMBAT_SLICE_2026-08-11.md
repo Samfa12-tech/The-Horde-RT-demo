@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-11
 
-**Status:** Host-validated development candidate; Android-device performance and hands-on promotion gates pending
+**Status:** Host- and Android-performance-validated development candidate; owner hands-on promotion checks pending
 
 **Publication:** None. Showcase Alpha 0.1.3 artifacts and itch builds remain unchanged.
 
@@ -59,15 +59,17 @@ The generated validation artifacts are evidence only:
 - unsigned Android APK SHA-256 `2525905f974579afa2e7de9d8367082d8722d548b5ee2668bfa7237cc357205e`;
 - unpublishable Windows ZIP SHA-256 `13662f64629ae92f2e81b8df4972f93ade0c73e8106604814700b53c6a29fb3a`.
 
-## Pending Android promotion gate
+## Android acceptance evidence
 
-The authorised `SM-S948B` was connected but remained locked/dozing during this task, so no new RT presentation, timing, lifecycle, capture, audio, haptic, or touch evidence is claimed. The earlier 23.604 ms lich failure belongs to the pre-two-enemy development build and cannot yet be attributed to GPU timing overhead because its temperature rose materially during the run.
+After the phone was unlocked on 2026-08-12, the exact clean-commit Debug APK with SHA-256 `245c7526051b5323f9521ea3407b3c412908af427078148c9123a28296f7cafa` installed on `SM-S948B` and matched the installed `base.apk` byte-for-byte.
 
-Before this candidate becomes the new playable phone baseline:
+- Matched cooled lich A/B: 19.497 ms with GPU timestamps, 19.268 ms without; 1.188% difference, comparator passed.
+- Six-checkpoint 75% medians: 10.589 / 12.139 / 9.246 / 8.888 / 11.060 / 19.735 ms; every checkpoint below 20 ms at thermal status 0.
+- `two-enemy-combat`: two entities, attacker ID 2, one shared pose bucket, honest presentation.
+- Separate report-only 100% opening: 18.674 ms.
+- Deterministic replay: 13/13 waypoints.
+- Captures: 13/13 after stable honest presentation; Home/resume passed.
 
-1. Run matched cooled 75% `lich` sessions from the same APK with GPU timing enabled and disabled, then pass the A/B comparator.
-2. Run the complete six-checkpoint 75% gate with honest presentation, thermal status no worse than 3, and every median-of-three 120-frame window below 20 ms.
-3. Report 100% separately and complete deterministic replay, all 13 captures, and Home/resume recovery.
-4. Hands-on verify touch/camera comfort, two-enemy readability, distinct positional audio/haptic feedback, persistent corpse/survivor spacing, lifecycle recovery, and combat feel.
+This rules out GPU timestamp overhead as the cause of the older hot 23.604 ms result and clears the automated phone-performance/presentation gate without weakening RT or raising the budget. See `TWO_SKELETON_COMBAT_ANDROID_VALIDATION_2026-08-12.md` for exact evidence and thermal qualification.
 
-Do not publish, sign, upload, or describe the two-skeleton candidate as Android-device-validated until those steps pass.
+Owner hands-on judgment remains required for touch/camera comfort, live two-enemy readability, distinct positional audio/haptic feedback, persistent corpse/survivor readability, and combat feel. Do not publish or describe those perceptual checks as passed until the owner reports them.

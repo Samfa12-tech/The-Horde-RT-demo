@@ -53,6 +53,8 @@ The renderer exposes two skeleton instances and no more than two measured pose b
 
 This candidate does not change `vkCmdTraceRaysKHR`, `rayQueryEXT`, recursion depth one, one frame in flight, strict ASTC, swapchain presentation semantics, release identity, or published artifacts. Host validation and explicit capture review are necessary but not sufficient: promotion requires matched cooled `SM-S948B` timing-enabled/disabled evidence, the six-checkpoint 75% gate below 20 ms, separate 100% reporting, lifecycle checks, and hands-on combat/readability/audio/haptic checks. More than two enemies remains out of scope.
 
+The automated `SM-S948B` requirements passed on 2026-08-12 for exact clean commit `b3428a7`: matched cooled lich A/B was 19.497 ms enabled / 19.268 ms disabled, all six 75% checkpoints stayed below 20 ms, 100% opening was reported separately, and replay, 13 captures, and Home/resume passed. Owner hands-on readability, cue distinction, comfort, and combat-feel judgment remains the final promotion boundary.
+
 ## Target devices
 
 - Primary target: Samsung Galaxy S26 Ultra.
