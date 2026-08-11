@@ -37,6 +37,7 @@ This repo is a native Vulkan hardware ray tracing game/tech-demo project. Keep w
 - Keep gameplay on the existing owning application/render thread. Movement, collision, encounters, combat, vitality, retry, finale, and semantic events belong to the shared 60 Hz `GameSimulation`, not platform loops.
 - Android input publications use a coherent two-slot mailbox with monotonic attack/reset/retry counters. A bare atomic published index is insufficient because a writer may lap a reader and overwrite its slot.
 - Platform audio and haptics drain ordered `GameplayEvent` records. Do not restore one-bit-per-sound polling that collapses repeated same-type events.
+- Preserve feedback semantics: nonfatal accepted hits emit `PlayerDamaged`, the lethal hit emits only `PlayerKilled`, and Android keeps the 140 ms separation between skeleton impact and fall audio.
 - Deterministic captures import exact authored checkpoint state and then freeze simulation. Preserve the zero-delta skeleton/lich snapshot finalization required by the 0.1.3 hashes.
 
 ## Visual direction
@@ -68,6 +69,7 @@ This repo is a native Vulkan hardware ray tracing game/tech-demo project. Keep w
 - The complete showcase route is Windows- and Android-device-validated: lower body and lantern drop, bounded skylight/torch/mirror lighting, spatial audio, and sequential skeleton/lich selection. At 75% on `SM-S948B`, every required warm zone retained a median of three 120-frame average windows below 13.7 ms at thermal status 3. Preserve the one-active-skinned-enemy limit until a separate multi-enemy phone measurement. See `docs/HORDE_SHOWCASE_WINDOWS_VALIDATION_2026-07-16.md`, `docs/HORDE_SHOWCASE_ANDROID_VALIDATION_2026-07-17.md`, and `docs/COLOURED_LIGHT_ROUTE_PLAN_2026-07-15.md`.
 - Keep the HUD compact or collapsible at large Android accessibility font scales; do not change the user's system font setting.
 - Android Debug now has twelve named checkpoints, three-window measurement, a deterministic 13-waypoint replay, and a live-validated evidence runner. Use `tools/run-android-showcase-validation.ps1` after meaningful Android renderer or gameplay-route changes; automation does not replace hands-on touch, perceived audio, or lifecycle checks. See `docs/ANDROID_SHOWCASE_AUTOMATION_2026-07-17.md`.
+- After the simulation/renderer foundation merged, the owner reported a hands-on pass for basic controls, audible audio, and perceived haptics on an installed development build on `SM-S948B`; no exact APK or merged-build provenance was captured. The separate exact automated development candidate still failed the 20 ms lich gate at 23.604 ms, so do not describe current development `main` as a full phone-performance pass.
 - Do not run a second concurrent enemy, add broader AI, block/dodge, or unrelated gameplay. Preserve sequential skeleton/lich selection and the one-active-skinned-enemy slot unless a later phone-measured plan explicitly changes that scope.
 - Keep the textured sword LOD out of the runtime until the static GLB/PBR path exists and is measured on phone.
 

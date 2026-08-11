@@ -17,6 +17,8 @@ The current development foundation runs Windows and Android gameplay through one
 
 The renderer now keeps its low-level Vulkan buffer/acceleration-structure operations behind a checked resource seam and makes the existing skeleton-or-lich path an explicit one-active `CharacterRenderSlot` at TLAS instance 2. Vulkan timestamp queries report a separate GPU RT command-buffer interval when the selected graphics queue supports them; existing CPU frame time and benchmark results retain their prior meaning. See `docs/RENDERER_RESOURCE_SLOTS_GPU_TIMING_2026-08-11.md`.
 
+After these foundations merged, the project owner reported that controls, audio, and haptics all worked correctly during a hands-on test on `SM-S948B`. This is owner-reported development-build evidence rather than a new exact-artifact check; the separate automated lich performance failure remains open. See `docs/RENDERER_RESOURCE_SLOTS_ANDROID_VALIDATION_2026-08-11.md`.
+
 The APK declares Android 7 / API 24 as its packaging minimum, but hardware support is intentionally much narrower: the device and driver must expose Vulkan acceleration structures, ray-tracing pipeline, ray query, buffer device address, deferred host operations, and the required ASTC formats. Only `SM-S948B` on Android 16 is currently device-certified.
 
 Device compatibility is tracked in [`docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md`](docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md). New device results should be recorded there with the exact model code and evidence class: locally tested confirmation, user-reported plus screenshot evidence, user-reported, vendor/SoC inference, or unverified candidate. Hardware marketing claims alone do not establish support; the runtime capability probe and honest RT swapchain presentation are the deciding checks.
@@ -76,12 +78,14 @@ The complete showcase route is Windows-validated and Android-device-validated on
 
 The player-vitality/retry slice is host-validated by clean Windows Debug and Release builds, all seven CTests in both configurations, twelve fixed RT captures, clean Android Debug and unsigned Release builds across all four configured ABIs, and `lintRelease`. On `SM-S948B`, real skeleton/lich damage, death UI, native opening/mirror retry, 3/3 restoration, the complete showcase automation route, captures, and Home/resume RT presentation are also validated. The earlier owner report of perceived haptics was corrected on 2026-08-01 because haptics had not actually been checked. The audit revision adds direct `Vibrator` effects, an enabled settings toggle/preview, and view-feedback fallback; the exact installed Debug APK subsequently produced completed preview, Swing, damage, and fatal effects through the live encounter, and the owner confirmed the revised haptic was physically felt. See `docs/PLAYER_VITALITY_RETRY_SLICE_2026-07-31.md` and `docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md`.
 
+For the merged shared-simulation and ordered-event migration, the owner separately reconfirmed basic controls, audible audio, and perceived haptics on `SM-S948B`. No new exact APK provenance accompanied that report, and it does not clear the current sustained-performance failure.
+
 Render scaling was verified at:
 
 | Scale | Android internal RT extent | Result |
 |---:|---:|---|
 | 100% | `1440x2980` | Full-extent/image check passed; latest cool automated opening 23.353 ms median of three 120-frame averages, report-only |
-| 75% | `1080x2235` | Sustained recommendation; warm hands-on route zones below 13.7 ms at thermal status 3; latest cool automated default set 10.288-13.929 ms at status 0 |
+| 75% | `1080x2235` | Relative recommended tier; historical warm hands-on route zones were below 13.7 ms, while the latest exact development candidate measured 10.327 / 7.109 / 8.353 / 11.220 / 23.604 ms and failed the 20 ms lich gate |
 | 50% | `720x1490` | Initial-alpha opening diagnostic recorded 163.12 FPS / 6.13 ms; retained as historical evidence, not a complete-route baseline |
 
 Windows Release was launched from a clean extraction using only its packaged assets. It reported `RayTracingPipeline`, `RT scene presented: yes`, and live resolution/FPS/frame-time diagnostics. The 100% and 75% render targets were verified at `982x628` and `737x471` respectively.
@@ -164,7 +168,7 @@ Run the daily host gate from the repository root:
 .\tools\run-foundation-validation.ps1
 ```
 
-It performs fresh Windows Debug/Release builds, all seven CTests in both configurations, deterministic Windows captures, clean Android Debug/Release builds, Release lint, non-mutating shader-staleness checks, validation package/layout and asset/licence checks, release-identity safeguards, and evidence hashing.
+It performs fresh Windows Debug/Release builds, all configured CTests in both configurations, deterministic Windows captures, clean Android Debug/Release builds, Release lint, non-mutating shader-staleness checks, validation package/layout and asset/licence checks, release-identity safeguards, and evidence hashing.
 
 With the authorised `SM-S948B` connected, run the milestone gate:
 

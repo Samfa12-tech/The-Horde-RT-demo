@@ -63,3 +63,9 @@ Earlier measurements made before the phone was reserved exclusively were affecte
 This exact device/driver validates the resource-slot path, strict ASTC selection, real RT presentation, Vulkan timestamp support, deterministic route/capture behavior, and Home/resume recovery. It does **not** pass the current sustained 75% performance gate because the lich checkpoint exceeded 20 ms. The result must not be presented as a full Android performance pass or used to rebaseline the guardrail.
 
 Automated testing does not prove human touch feel, camera comfort, perceived audio or haptics, artistic correctness, or behavior on another model or driver. No signed release was installed and nothing was published.
+
+## Owner hands-on follow-up
+
+The project owner subsequently reported that controls, audio, and haptics all worked correctly during a hands-on test on `SM-S948B`. This is owner-reported local device validation, separate from the automated exact-APK evidence above; this task did not capture a new APK hash, installed-package check, log, or screenshot for the hands-on session.
+
+The report closes basic control operation, audible feedback, and perceived haptic operation for the owner-tested installed development build. It does not change the 23.604 ms lich performance failure or establish touch/camera comfort, spatial direction or distance accuracy, audio-mix quality, haptic intensity or cue distinction, artistic approval, signed-release behavior, or another device/driver.
