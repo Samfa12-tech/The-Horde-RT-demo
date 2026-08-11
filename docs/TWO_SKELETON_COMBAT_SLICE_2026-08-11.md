@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-11
 
-**Status:** Host- and Android-performance-validated development candidate; owner hands-on promotion checks pending
+**Status:** Host-, Android-performance-, and owner-hands-on-validated development candidate
 
 **Publication:** None. Showcase Alpha 0.1.3 artifacts and itch builds remain unchanged.
 
@@ -72,4 +72,4 @@ After the phone was unlocked on 2026-08-12, the exact clean-commit Debug APK wit
 
 This matched pair did not identify GPU timestamp overhead as the material cause of the older hot 23.604 ms result, and the full run clears the automated phone-performance/presentation gate without weakening RT or raising the budget. See `TWO_SKELETON_COMBAT_ANDROID_VALIDATION_2026-08-12.md` for exact evidence and thermal qualification.
 
-Owner hands-on judgment remains required for touch/camera comfort, live two-enemy readability, distinct positional audio/haptic feedback, persistent corpse/survivor readability, and combat feel. Do not publish or describe those perceptual checks as passed until the owner reports them.
+On 2026-08-12, after the exact candidate remained installed and open for play, the owner reported that the hands-on experience "feels fine." This closes the broad subjective promotion gate for touch/camera comfort, live readability, and combat feel on the tested candidate. The short verdict is not a detailed cue-by-cue certification of positional audio or haptic distinction, and it does not generalise beyond `SM-S948B`.

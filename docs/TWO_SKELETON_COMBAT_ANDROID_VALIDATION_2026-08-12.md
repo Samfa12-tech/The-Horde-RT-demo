@@ -4,7 +4,7 @@
 
 **Device:** Samsung `SM-S948B`, Android 16 / API 36, Adreno 840, driver 512.842.19, Vulkan 1.4.295
 
-**Result:** Automated exact-device performance, presentation, replay, capture, and lifecycle gate passed. Owner hands-on combat/readability/audio/haptic judgment remains separate.
+**Result:** Automated exact-device performance, presentation, replay, capture, and lifecycle gate passed; the owner subsequently passed the broad hands-on promotion check.
 
 ## Exact candidate
 
@@ -67,4 +67,6 @@ Evidence bundles:
 
 This closes automated exact-device performance, honest RT presentation, strict ASTC, two-entity/pose-bucket telemetry, deterministic replay, 13 captures, and Home/resume for this exact `SM-S948B` candidate.
 
-Automation and screenshot review do not prove touch/camera comfort, two-enemy readability during live movement, perceived positional audio, haptic cue distinction, corpse/survivor readability, or combat feel. Those remain owner hands-on checks before calling this the fully playtested phone baseline.
+Automation and screenshot review alone do not prove touch/camera comfort, two-enemy readability during live movement, perceived positional audio, haptic cue distinction, corpse/survivor readability, or combat feel.
+
+After the exact APK above remained installed and the game was left open for physical play, the owner reported on 2026-08-12 that the hands-on experience "feels fine." Evidence type: owner-reported physical-device judgment on the still-installed exact candidate. This closes the broad touch/camera/readability/combat-feel promotion gate for `SM-S948B`; the brief verdict does not independently certify each positional-audio or haptic cue, another device, or the later review-only source commit that was not reinstalled.
