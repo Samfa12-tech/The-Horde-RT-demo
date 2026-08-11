@@ -65,15 +65,21 @@ On Android 16/API 36, the Adreno 840 (driver 512.842.19, Vulkan 1.4.295) selecte
 
 This was not a full performance pass. Ordered 75% CPU medians were 10.327 / 7.109 / 8.353 / 11.220 / 23.604 ms for opening / worst bend / skylight / green / lich. Lich exceeded the 20 ms gate, so the runner exited non-zero. Recorded HAL temperatures rose from AP 31.9 C / battery 28.9 C / skin 31.1 C / status 0 before the run to AP 51.1 C / battery 35.4 C / skin 40.3 C / status 1 afterward. The historical zero-device Host-gate statements above remain intact because they describe the earlier run conditions.
 
+The run order and temperature rise prevent attributing the lich failure to GPU timestamps. Debug automation now exposes `-GpuTiming Enabled|Disabled`; disabled mode removes only the per-frame timestamp-query commands and result readback, records the mode in every evidence layer, and keeps the shipping RT path and performance gate unchanged. A conclusive comparison still requires matched, cooled `SM-S948B` runs from the same APK with comparable starting temperatures and thermal status. No such A/B device result is claimed here.
+
+## Superseding two-skeleton development state
+
+The later two-skeleton development slice raises the resident renderer totals to nine BLAS and nineteen physical TLAS slots. The additional skeleton slot is masked outside the opening encounter, matching poses share one pose bucket/BLAS route, divergent actions use at most two, and the lich remains singular. The earlier eight-BLAS/eighteen-instance statements and measurements above remain historical evidence for the exact pre-two-enemy build; they are not claims about the new candidate. Phone performance for the new totals remains pending.
+
 ## Owner hands-on follow-up
 
 After the simulation and renderer foundations merged, the project owner reported that controls, audio, and haptics all worked correctly during a hands-on test on `SM-S948B`. This is owner-reported local device validation without a newly captured exact-artifact hash, log, screenshot, or installed-package check. It closes basic operation for the owner-tested development build but does not change the failed lich performance result or certify touch/camera comfort, spatial-audio quality, haptic intensity or cue distinction, artistic approval, or another device.
 
 ## Known limits
 
-- One active character render slot and one enemy TLAS entry remain enforced.
-- Both skeleton and lich resources remain resident; this slice does not reduce the current memory footprint.
+- The current development ceiling is two active skeletons in the opening encounter and one singular lich later in the route; broader enemy counts remain out of scope.
+- Skeleton pose sharing is bounded to one or two buckets, with the second physical skeleton TLAS slot masked when unused. Skeleton and lich resources remain resident.
 - Timestamp queries add small profiling overhead and provide approximate GPU execution intervals, not presentation latency.
-- Phone GPU timing, functional presentation, replay, capture, and lifecycle behavior are now exact-device verified on `SM-S948B`; sustained 75% performance remains unresolved because the lich checkpoint failed the 20 ms gate.
+- Phone GPU timing, functional presentation, replay, capture, and lifecycle behavior were exact-device verified on the pre-two-enemy renderer build; sustained 75% performance remained unresolved because the lich checkpoint failed the 20 ms gate. These results are historical baseline evidence, not device clearance for the later nine-BLAS/nineteen-slot candidate.
 - Automated device testing does not establish human touch feel, camera comfort, perceived audio/haptics, artistic correctness, or behavior on another model/driver.
 - The separate owner report establishes basic controls, audible audio, and perceived haptics for the tested installed development build only; exact merged-build provenance and the qualitative boundaries above remain open.

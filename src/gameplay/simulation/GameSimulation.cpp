@@ -26,6 +26,11 @@ std::uint64_t SequenceDelta(std::uint64_t newer, std::uint64_t older)
     return newer >= older ? newer - older : 0u;
 }
 
+EntityId SkeletonEntity(std::size_t index)
+{
+    return index == 0u ? EntityId::SkeletonA : EntityId::SkeletonB;
+}
+
 } // namespace
 
 GameSimulation::GameSimulation(GameSimulationConfig config)
@@ -43,6 +48,7 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
     config_.movementSpeedMetresPerSecond = std::max(0.0f, config_.movementSpeedMetresPerSecond);
     enemyDirector_.Reset();
     activeEnemyKind_ = enemyDirector_.Snapshot().selectedEnemy;
+    combatSnapshot_ = swordCombat_.Snapshot();
     lanternSnapshot_ = lantern_.Snapshot();
     RefreshSnapshot(lastInput_);
 }
@@ -70,7 +76,10 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& input,
         walkVisualAmount_ = 0.0f;
         snapshot_.playerTravelledThisTick = 0.0f;
         playerFootsteps_.Reset();
-        enemyFootsteps_.Reset();
+        for (PlayerFootstepCadence& cadence : enemyFootsteps_)
+        {
+            cadence.Reset();
+        }
     }
     const std::uint32_t ticks = fixedStepRunner_.Advance(
         frameDeltaSeconds,
@@ -127,7 +136,10 @@ void GameSimulation::StepFixed(const InputSnapshot& input,
         snapshot_.playerTravelledThisTick = 0.0f;
         walkVisualAmount_ = 0.0f;
         playerFootsteps_.Reset();
-        enemyFootsteps_.Reset();
+        for (PlayerFootstepCadence& cadence : enemyFootsteps_)
+        {
+            cadence.Reset();
+        }
     }
 
     if (wasAlive && playerVitals_.Snapshot().phase != PlayerLifePhase::Alive)
@@ -157,6 +169,11 @@ void GameSimulation::ResetRoute()
     playerPitchRadians_ = std::clamp(FiniteOr(config_.playerStartPitchRadians, 0.0f),
                                      kMinimumPitch,
                                      kMaximumPitch);
+    swordCombat_.Reset(kSkeletonEnemyCapacity);
+    combatSnapshot_ = swordCombat_.Update(0.0f,
+                                           playerX_,
+                                           playerZ_,
+                                           playerYawRadians_);
     RefreshSnapshot(lastInput_);
 }
 
@@ -187,7 +204,7 @@ EntityId GameSimulation::EntityForEnemy(EnemyKind kind)
 {
     switch (kind)
     {
-    case EnemyKind::Skeleton: return EntityId::Skeleton;
+    case EnemyKind::Skeleton: return EntityId::SkeletonA;
     case EnemyKind::Lich: return EntityId::Lich;
     default: return EntityId::Invalid;
     }
@@ -243,7 +260,8 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
     enemyDirector_ = state.enemyDirector;
     activeEnemyKind_ = state.activeEnemyKind;
     lichEncounter_ = state.lichEncounter;
-    swordCombat_ = {};
+    const bool pairCheckpoint = checkpoint->preset == ShowcaseCheckpointPreset::TwoSkeletonCombat;
+    swordCombat_.Reset((isRetry || pairCheckpoint) ? kSkeletonEnemyCapacity : 1u);
     combatSnapshot_ = swordCombat_.Update(0.0f,
                                            playerX_,
                                            playerZ_,
@@ -261,7 +279,10 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
                           finaleActive);
     playerVitals_.ResetForEncounter();
     playerFootsteps_.Reset();
-    enemyFootsteps_.Reset();
+    for (PlayerFootstepCadence& cadence : enemyFootsteps_)
+    {
+        cadence.Reset();
+    }
     playerAttackCooldownRemaining_ = 0.0f;
     pendingAttackCommands_ = 0u;
     retryCheckpoint_ = activeEnemyKind_ == EnemyKind::Lich ? 9 : 0;
@@ -343,8 +364,8 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
         retryCheckpoint_ = activeEnemyKind_ == EnemyKind::Lich ? 9 : 0;
         if (activeEnemyKind_ == EnemyKind::Skeleton)
         {
-            swordCombat_ = {};
-            combatSnapshot_ = {};
+            // The opening enemies persist across route selection changes. Only
+            // an explicit retry, route reset, or checkpoint import respawns them.
         }
         else if (activeEnemyKind_ == EnemyKind::Lich)
         {
@@ -361,52 +382,74 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
         swordCombat_.RequestAttack();
         playerAttackCooldownRemaining_ = kSwordDurationSeconds;
         lichHitRequested = activeEnemyKind_ == EnemyKind::Lich;
+        EntityId swingTarget = EntityForEnemy(activeEnemyKind_);
+        if (activeEnemyKind_ == EnemyKind::Skeleton)
+        {
+            const std::int32_t targetIndex = swordCombat_.PlayerSwingTargetIndex(
+                playerX_, playerZ_, playerYawRadians_);
+            swingTarget = targetIndex >= 0
+                ? SkeletonEntity(static_cast<std::size_t>(targetIndex))
+                : EntityId::Invalid;
+        }
         Emit(GameplayEventType::PlayerSwing,
              EntityId::Player,
-             EntityForEnemy(activeEnemyKind_),
+             swingTarget,
              playerX_,
              playerZ_);
     }
 
-    const EnemyAnimation previousEnemyAnimation = combatSnapshot_.enemyAnimation;
+    const auto previousSkeletons = combatSnapshot_.combatants;
     combatSnapshot_ = swordCombat_.Update(deltaSeconds,
                                            playerX_,
                                            playerZ_,
                                            playerYawRadians_);
-    if (activeEnemyKind_ == EnemyKind::Skeleton &&
-        previousEnemyAnimation != EnemyAnimation::Attack &&
-        combatSnapshot_.enemyAnimation == EnemyAnimation::Attack)
+    EntityId skeletonDamageSource = EntityId::Invalid;
+    for (std::size_t index = 0u; index < combatSnapshot_.combatantCount; ++index)
     {
-        Emit(GameplayEventType::EnemyAttackStarted,
-             EntityId::Skeleton,
-             EntityId::Player,
-             combatSnapshot_.enemyX,
-             combatSnapshot_.enemyZ);
+        const SkeletonCombatantSnapshot& previous = previousSkeletons[index];
+        const SkeletonCombatantSnapshot& current = combatSnapshot_.combatants[index];
+        const EntityId entity = SkeletonEntity(index);
+        if (activeEnemyKind_ == EnemyKind::Skeleton &&
+            previous.animation != EnemyAnimation::Attack &&
+            current.animation == EnemyAnimation::Attack)
+        {
+            Emit(GameplayEventType::EnemyAttackStarted,
+                 entity,
+                 EntityId::Player,
+                 current.x,
+                 current.z);
+        }
+        if (activeEnemyKind_ == EnemyKind::Skeleton && previous.health > 0 && current.health <= 0)
+        {
+            Emit(GameplayEventType::EnemyHit,
+                 EntityId::Player,
+                 entity,
+                 current.x,
+                 current.z);
+            Emit(GameplayEventType::EnemyDefeated,
+                 EntityId::Player,
+                 entity,
+                 current.x,
+                 current.z);
+        }
+        if (current.playerHitPulse)
+        {
+            skeletonDamageSource = entity;
+        }
+        const bool skeletonWalking = activeEnemyKind_ == EnemyKind::Skeleton &&
+                                     current.animation == EnemyAnimation::Walking;
+        if (enemyFootsteps_[index].Update(deltaSeconds, skeletonWalking))
+        {
+            Emit(GameplayEventType::EnemyFootstep,
+                 entity,
+                 EntityId::Invalid,
+                 current.x,
+                 current.z);
+        }
     }
-    if (activeEnemyKind_ == EnemyKind::Skeleton &&
-        previousEnemyAnimation != EnemyAnimation::Dead &&
-        combatSnapshot_.enemyAnimation == EnemyAnimation::Dead)
+    if (activeEnemyKind_ == EnemyKind::Skeleton && combatSnapshot_.encounterComplete)
     {
-        Emit(GameplayEventType::EnemyHit,
-             EntityId::Player,
-             EntityId::Skeleton,
-             combatSnapshot_.enemyX,
-             combatSnapshot_.enemyZ);
-        Emit(GameplayEventType::EnemyDefeated,
-             EntityId::Player,
-             EntityId::Skeleton,
-             combatSnapshot_.enemyX,
-             combatSnapshot_.enemyZ);
-    }
-    const bool skeletonWalking = activeEnemyKind_ == EnemyKind::Skeleton &&
-                                 combatSnapshot_.enemyAnimation == EnemyAnimation::Walking;
-    if (enemyFootsteps_.Update(deltaSeconds, skeletonWalking))
-    {
-        Emit(GameplayEventType::EnemyFootstep,
-             EntityId::Skeleton,
-             EntityId::Invalid,
-             combatSnapshot_.enemyX,
-             combatSnapshot_.enemyZ);
+        enemyDirector_.MarkSelectedDead();
     }
 
     const bool finaleActive = QueryShowcaseZone(playerX_, playerZ_) == ShowcaseZone::Finale;
@@ -459,7 +502,7 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
     }
 
     const bool playerDamagePulse =
-        (activeEnemyKind_ == EnemyKind::Skeleton && combatSnapshot_.playerHitPulse) ||
+        (activeEnemyKind_ == EnemyKind::Skeleton && skeletonDamageSource != EntityId::Invalid) ||
         (activeEnemyKind_ == EnemyKind::Lich && lichEncounter_.Snapshot().damagePulse);
     if (input.damageEnabled && playerDamagePulse)
     {
@@ -467,7 +510,9 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
         if (damageResult == PlayerDamageResult::Damaged)
         {
             Emit(GameplayEventType::PlayerDamaged,
-                 EntityForEnemy(activeEnemyKind_),
+                 activeEnemyKind_ == EnemyKind::Skeleton
+                     ? skeletonDamageSource
+                     : EntityForEnemy(activeEnemyKind_),
                  EntityId::Player,
                  playerX_,
                  playerZ_);
@@ -477,7 +522,9 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
             retryCheckpoint_ = activeEnemyKind_ == EnemyKind::Lich ? 9 : 0;
             pendingAttackCommands_ = 0u;
             Emit(GameplayEventType::PlayerKilled,
-                 EntityForEnemy(activeEnemyKind_),
+                 activeEnemyKind_ == EnemyKind::Skeleton
+                     ? skeletonDamageSource
+                     : EntityForEnemy(activeEnemyKind_),
                  EntityId::Player,
                  playerX_,
                  playerZ_);
@@ -535,7 +582,39 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.lanternStrength = std::clamp(FiniteOr(input.lanternStrength, 1.8f), 0.65f, 2.4f);
     snapshot_.zone = QueryShowcaseZone(playerX_, playerZ_);
     snapshot_.activeEnemyKind = activeEnemyKind_;
+    snapshot_.skeletonEnemyCount = combatSnapshot_.combatantCount;
+    snapshot_.activeSkeletonCount = combatSnapshot_.aliveCount;
+    snapshot_.skeletonAttackerId = combatSnapshot_.attackerIndex >= 0
+        ? SkeletonEntity(static_cast<std::size_t>(combatSnapshot_.attackerIndex))
+        : EntityId::Invalid;
+    snapshot_.openingEncounterComplete = combatSnapshot_.encounterComplete;
+    for (std::size_t index = 0u; index < combatSnapshot_.combatants.size(); ++index)
+    {
+        const SkeletonCombatantSnapshot& source = combatSnapshot_.combatants[index];
+        SkeletonEnemySnapshot& target = snapshot_.skeletonEnemies[index];
+        target.id = SkeletonEntity(index);
+        target.x = source.x;
+        target.z = source.z;
+        target.facingRadians = source.facingRadians;
+        target.animationTime = source.animationTime;
+        target.damageFlash = source.damageFlash;
+        target.health = source.health;
+        target.animation = source.animation;
+        target.dead = source.health <= 0;
+        target.playerHitPulse = source.playerHitPulse;
+    }
     snapshot_.activeEnemyId = EntityForEnemy(activeEnemyKind_);
+    if (activeEnemyKind_ == EnemyKind::Skeleton)
+    {
+        if (snapshot_.skeletonAttackerId != EntityId::Invalid)
+        {
+            snapshot_.activeEnemyId = snapshot_.skeletonAttackerId;
+        }
+        else if (snapshot_.skeletonEnemies[0].dead && !snapshot_.skeletonEnemies[1].dead)
+        {
+            snapshot_.activeEnemyId = EntityId::SkeletonB;
+        }
+    }
     snapshot_.retryCheckpoint = retryCheckpoint_;
     snapshot_.retryGeneration = retryGeneration_;
     snapshot_.paused = input.paused;

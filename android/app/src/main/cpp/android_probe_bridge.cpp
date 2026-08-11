@@ -93,6 +93,7 @@ struct SwapchainContext
     horde::vulkan::DeviceCapabilities capabilities;
     horde::vulkan::raytracing::PresentableTinyRtScene rtScene;
     horde::vulkan::GpuFrameTimer gpuFrameTimer;
+    bool gpuFrameTimingEnabled = true;
     double gpuFrameTimingTotalMs = 0.0;
     std::uint64_t gpuFrameTimingSampleCount = 0u;
     std::uint64_t gpuFrameSubmissionSequence = 0u;
@@ -139,6 +140,7 @@ horde::gameplay::simulation::InputSnapshot gInputPublisherState = []
 }();
 std::atomic<int> gRuntimeState{0}; // 0 starting/stopped, 1 honestly presented RT, 2 unsupported, 3 render error.
 std::atomic<float> gRequestedRenderScale{1.0f};
+std::atomic<bool> gRequestedGpuFrameTimingEnabled{true};
 std::atomic<std::int32_t> gBenchmarkCheckpointRequested{-1};
 std::atomic<std::int32_t> gCaptureCheckpointRequested{-1};
 std::atomic<bool> gRouteReplayRequested{false};
@@ -314,7 +316,16 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(const Swapchai
     snapshot.blasCount = context.rtScene.BlasCount();
     snapshot.tlasCount = context.rtScene.TlasCount();
     snapshot.tlasInstanceCount = context.rtScene.TlasInstanceCount();
-    snapshot.activeSkinnedEnemies = static_cast<std::uint32_t>(roster.renderedEnemyCount);
+    snapshot.activeSkinnedEnemies = simulation.activeEnemyKind == horde::gameplay::EnemyKind::Skeleton
+        ? static_cast<std::uint32_t>(simulation.activeSkeletonCount)
+        : static_cast<std::uint32_t>(roster.renderedEnemyCount);
+    snapshot.activeEnemyEntityCount = simulation.activeEnemyKind == horde::gameplay::EnemyKind::Skeleton
+        ? static_cast<std::uint32_t>(simulation.activeSkeletonCount)
+        : static_cast<std::uint32_t>(roster.renderedEnemyCount);
+    snapshot.attackerEntityId = simulation.skeletonAttackerId == horde::gameplay::simulation::EntityId::Invalid
+        ? -1
+        : static_cast<std::int32_t>(simulation.skeletonAttackerId);
+    snapshot.skeletonPoseBucketCount = static_cast<std::uint32_t>(context.rtScene.SkeletonPoseBucketCount());
     snapshot.renderScale = context.renderScale;
     snapshot.fps = context.capabilities.performance.fps;
     snapshot.frameTimeMs = context.capabilities.performance.frameTimeMs;
@@ -577,7 +588,17 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
          << "  \"captureStableFrames\": " << context.capturePresentedFrames << ",\n"
          << "  \"lanternPhase\": \"" << horde::gameplay::LanternPhaseName(simulation.lantern.phase) << "\",\n"
          << "  \"selectedEnemy\": \"" << horde::gameplay::EnemyKindName(roster.selectedEnemy) << "\",\n"
-         << "  \"activeSkinnedEnemies\": " << roster.renderedEnemyCount << ",\n"
+         << "  \"activeSkinnedEnemies\": "
+         << (simulation.activeEnemyKind == horde::gameplay::EnemyKind::Skeleton
+                 ? simulation.activeSkeletonCount
+                 : roster.renderedEnemyCount) << ",\n"
+         << "  \"activeEnemyEntities\": "
+         << (simulation.activeEnemyKind == horde::gameplay::EnemyKind::Skeleton
+                 ? simulation.activeSkeletonCount
+                 : roster.renderedEnemyCount) << ",\n"
+         << "  \"attackerEntityId\": " << static_cast<std::uint32_t>(simulation.skeletonAttackerId) << ",\n"
+         << "  \"skeletonPoseBuckets\": " << context.rtScene.SkeletonPoseBucketCount() << ",\n"
+         << "  \"gpuTimingMode\": \"" << (context.gpuFrameTimingEnabled ? "enabled" : "disabled") << "\",\n"
          << "  \"lich\": {\"phase\": \"" << horde::gameplay::LichPhaseName(lich.phase)
          << "\", \"health\": " << lich.health << ", \"roofProgress\": " << lich.finaleSkylightOpenProgress
          << ", \"ending\": \"" << horde::gameplay::FinaleEndingPhaseName(lich.finaleEndingPhase)
@@ -1311,6 +1332,13 @@ void RefreshGpuTimingTelemetry(
     SwapchainContext& context,
     const std::optional<horde::vulkan::GpuFrameTimingSample>& completedSample = std::nullopt)
 {
+    if (!context.gpuFrameTimingEnabled)
+    {
+        context.capabilities.performance.gpuRt = {};
+        context.capabilities.performance.gpuRt.status =
+            "Disabled for matched benchmark A/B; RT rendering is unchanged.";
+        return;
+    }
     if (completedSample.has_value())
     {
         context.gpuFrameTimingTotalMs += completedSample->milliseconds;
@@ -1358,7 +1386,8 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
         __android_log_print(ANDROID_LOG_ERROR, kTag, "Failed to initialise presentable RT scene: %s", diagnostic.c_str());
         return false;
     }
-    if (context.gpuFrameTimer.Telemetry().status == horde::vulkan::GpuFrameTimerStatus::Uninitialised)
+    if (context.gpuFrameTimingEnabled &&
+        context.gpuFrameTimer.Telemetry().status == horde::vulkan::GpuFrameTimerStatus::Uninitialised)
     {
         context.gpuFrameTimer.Initialise(
             context.physicalDevice, context.device, context.graphicsQueueFamilyIndex, kMaxFramesInFlight);
@@ -1490,7 +1519,10 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
     {
         return false;
     }
-    RefreshGpuTimingTelemetry(context, context.gpuFrameTimer.CollectCompleted(context.currentFrame));
+    if (context.gpuFrameTimingEnabled)
+    {
+        RefreshGpuTimingTelemetry(context, context.gpuFrameTimer.CollectCompleted(context.currentFrame));
+    }
 
     uint32_t imageIndex = 0u;
     const VkResult acquireResult = vkAcquireNextImageKHR(
@@ -1711,8 +1743,8 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
                 gGameSimulation.Snapshot(),
                 context.outputExposure);
         std::string diagnostic;
-        gpuTimingRecording = context.gpuFrameTimer.RecordBegin(
-            context.commandBuffers[imageIndex], context.currentFrame);
+        gpuTimingRecording = context.gpuFrameTimingEnabled &&
+            context.gpuFrameTimer.RecordBegin(context.commandBuffers[imageIndex], context.currentFrame);
         if (!context.rtScene.RecordTraceAndCopy(context.commandBuffers[imageIndex],
                                                 context.swapchainImages[imageIndex],
                                                 context.swapchainImageLayouts[imageIndex],
@@ -1854,9 +1886,11 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
         const auto& gpuTiming = context.capabilities.performance.gpuRt;
         __android_log_print(ANDROID_LOG_INFO,
                             kTag,
-                            "HORDE_GPU status=%s valid=%d latest_ms=%.3f average_ms=%.3f samples=%llu valid_bits=%u period_ns=%.6f unavailable=%llu errors=%llu",
-                            horde::vulkan::GpuFrameTimerStatusName(
-                                context.gpuFrameTimer.Telemetry().status),
+                            "HORDE_GPU mode=%s status=%s valid=%d latest_ms=%.3f average_ms=%.3f samples=%llu valid_bits=%u period_ns=%.6f unavailable=%llu errors=%llu",
+                            context.gpuFrameTimingEnabled ? "enabled" : "disabled",
+                            context.gpuFrameTimingEnabled
+                                ? horde::vulkan::GpuFrameTimerStatusName(context.gpuFrameTimer.Telemetry().status)
+                                : "disabled",
                             gpuTiming.valid ? 1 : 0,
                             static_cast<double>(gpuTiming.latestMs),
                             static_cast<double>(gpuTiming.averageMs),
@@ -2012,8 +2046,13 @@ bool StartSurfaceInternal(ANativeWindow* window,
     context.capabilities = capabilities;
     context.reportDirectory = reportDirectory;
     context.renderScale = std::clamp(gRequestedRenderScale.load(std::memory_order_acquire), 0.50f, 1.0f);
+    context.gpuFrameTimingEnabled = gRequestedGpuFrameTimingEnabled.load(std::memory_order_acquire);
     context.useRtPath = capabilities.rtMode == horde::vulkan::RtMode::RayTracingPipeline;
     context.clearColor = ClearColorForMode(capabilities.rtMode);
+    __android_log_print(ANDROID_LOG_INFO,
+                        kTag,
+                        "HORDE_GPU_TIMING mode=%s rt_rendering=unchanged",
+                        context.gpuFrameTimingEnabled ? "enabled" : "disabled");
     gRuntimeState.store(context.useRtPath ? 0 : 2, std::memory_order_release);
     ClearPlatformGameplayEvents();
     {
@@ -2326,6 +2365,17 @@ extern "C" JNIEXPORT void JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_setRenderScale(JNIEnv*, jclass, jfloat scale)
 {
     gRequestedRenderScale.store(std::clamp(static_cast<float>(scale), 0.50f, 1.0f), std::memory_order_release);
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_setGpuTimingEnabled(JNIEnv*, jclass, jboolean enabled)
+{
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS)
+    gRequestedGpuFrameTimingEnabled.store(enabled == JNI_TRUE, std::memory_order_release);
+#else
+    (void)enabled;
+    gRequestedGpuFrameTimingEnabled.store(true, std::memory_order_release);
+#endif
 }
 
 extern "C" JNIEXPORT jboolean JNICALL

@@ -12,8 +12,10 @@ enum class EntityId : std::uint32_t
 {
     Invalid = 0,
     Player = 1,
-    Skeleton = 2,
+    SkeletonA = 2,
+    Skeleton = SkeletonA,
     Lich = 3,
+    SkeletonB = 4,
 };
 
 enum class GameplayEventType : std::uint8_t

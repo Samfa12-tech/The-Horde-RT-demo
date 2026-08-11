@@ -59,8 +59,18 @@ int main()
     check(at30.activeEnemyKind == at60.activeEnemyKind && at60.activeEnemyKind == at120.activeEnemyKind &&
           at30.playerVitals.vitality == at60.playerVitals.vitality &&
           at60.playerVitals.vitality == at120.playerVitals.vitality &&
-          at30.swordCombat.enemyAnimation == at60.swordCombat.enemyAnimation &&
-          at60.swordCombat.enemyAnimation == at120.swordCombat.enemyAnimation,
+          at30.activeSkeletonCount == at60.activeSkeletonCount &&
+          at60.activeSkeletonCount == at120.activeSkeletonCount &&
+          at30.skeletonAttackerId == at60.skeletonAttackerId &&
+          at60.skeletonAttackerId == at120.skeletonAttackerId &&
+          at30.skeletonEnemies[0].animation == at60.skeletonEnemies[0].animation &&
+          at60.skeletonEnemies[0].animation == at120.skeletonEnemies[0].animation &&
+          at30.skeletonEnemies[1].animation == at60.skeletonEnemies[1].animation &&
+          at60.skeletonEnemies[1].animation == at120.skeletonEnemies[1].animation &&
+          NearlyEqual(at30.skeletonEnemies[0].x, at60.skeletonEnemies[0].x) &&
+          NearlyEqual(at60.skeletonEnemies[0].x, at120.skeletonEnemies[0].x) &&
+          NearlyEqual(at30.skeletonEnemies[1].z, at60.skeletonEnemies[1].z) &&
+          NearlyEqual(at60.skeletonEnemies[1].z, at120.skeletonEnemies[1].z),
           "render cadence must preserve encounter, vitality, and action state");
 
     GameSimulation baseline;

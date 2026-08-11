@@ -18,6 +18,8 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     frame.outputExposure = outputExposure;
     frame.combat = simulation.swordCombat;
     frame.combat.damageFlash = simulation.playerVitals.damageFlash;
+    frame.skeletonEnemies = simulation.skeletonEnemies;
+    frame.skeletonEnemyCount = simulation.skeletonEnemyCount;
     frame.lantern = simulation.lantern;
     frame.roster = simulation.enemyRoster;
     frame.lich = simulation.lich;

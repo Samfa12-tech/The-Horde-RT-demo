@@ -23,6 +23,7 @@ public final class ProbeBridge {
     public static native int retryEncounter();
     public static native void setSimulationPaused(boolean paused);
     public static native void setRenderScale(float scale);
+    public static native void setGpuTimingEnabled(boolean enabled);
     public static native boolean requestDebugCheckpoint(int checkpointId);
     public static native boolean requestDebugCaptureCheckpoint(int checkpointId);
     public static native boolean requestDebugRouteReplay();

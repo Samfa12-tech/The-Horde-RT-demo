@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cstddef>
 #include <cstdint>
 
@@ -9,6 +10,22 @@
 
 namespace horde::gameplay::simulation
 {
+
+inline constexpr std::size_t kSkeletonEnemyCapacity = 2u;
+
+struct SkeletonEnemySnapshot
+{
+    EntityId id = EntityId::Invalid;
+    float x = 0.0f;
+    float z = -4.65f;
+    float facingRadians = 0.0f;
+    float animationTime = 0.0f;
+    float damageFlash = 0.0f;
+    std::int32_t health = 1;
+    EnemyAnimation animation = EnemyAnimation::Walking;
+    bool dead = false;
+    bool playerHitPulse = false;
+};
 
 struct SimulationSnapshot
 {
@@ -29,7 +46,12 @@ struct SimulationSnapshot
 
     ShowcaseZone zone = ShowcaseZone::Opening;
     EnemyKind activeEnemyKind = EnemyKind::Skeleton;
-    EntityId activeEnemyId = EntityId::Skeleton;
+    EntityId activeEnemyId = EntityId::SkeletonA;
+    std::array<SkeletonEnemySnapshot, kSkeletonEnemyCapacity> skeletonEnemies{};
+    std::size_t skeletonEnemyCount = kSkeletonEnemyCapacity;
+    std::size_t activeSkeletonCount = kSkeletonEnemyCapacity;
+    EntityId skeletonAttackerId = EntityId::Invalid;
+    bool openingEncounterComplete = false;
     std::int32_t retryCheckpoint = 0;
     std::uint32_t retryGeneration = 0;
     bool paused = false;

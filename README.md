@@ -15,7 +15,7 @@ Showcase Alpha 0.1.3 adds a substantially rebuilt procedural player body with ar
 
 The current development foundation runs Windows and Android gameplay through one deterministic 60 Hz `GameSimulation`. Android input crosses JNI through a coherent snapshot mailbox with monotonic attack/reset/retry counters; ordered semantic events drive platform audio and haptics; and one shared adapter preserves the existing `RtSceneFrameInputs` renderer boundary. See `docs/SHARED_SIMULATION_FOUNDATION_2026-08-10.md`.
 
-The renderer now keeps its low-level Vulkan buffer/acceleration-structure operations behind a checked resource seam and makes the existing skeleton-or-lich path an explicit one-active `CharacterRenderSlot` at TLAS instance 2. Vulkan timestamp queries report a separate GPU RT command-buffer interval when the selected graphics queue supports them; existing CPU frame time and benchmark results retain their prior meaning. See `docs/RENDERER_RESOURCE_SLOTS_GPU_TIMING_2026-08-11.md`.
+The current development candidate builds the first bounded two-skeleton encounter on the checked renderer resource seam. Stable entities share a skeleton pose/BLAS when their actions match and use at most two pose buckets when they diverge; the lich remains singular. The scene now owns nine BLAS and nineteen physical TLAS slots, with unused slots masked. Vulkan timestamp queries remain separately labelled from CPU frame time, and Debug can disable only that instrumentation for matched phone A/B runs. The candidate is host-validated but is not the new phone-performance baseline until its `SM-S948B` gate passes. See `docs/TWO_SKELETON_COMBAT_SLICE_2026-08-11.md`.
 
 After these foundations merged, the project owner reported that controls, audio, and haptics all worked correctly during a hands-on test on `SM-S948B`. This is owner-reported development-build evidence rather than a new exact-artifact check; the separate automated lich performance failure remains open. See `docs/RENDERER_RESOURCE_SLOTS_ANDROID_VALIDATION_2026-08-11.md`.
 
@@ -176,7 +176,7 @@ With the authorised `SM-S948B` connected, run the milestone gate:
 .\tools\run-foundation-validation.ps1 -Mode Full
 ```
 
-`Full` adds the 75% checkpoint/replay gate, a separately reported 100% opening result, Home/resume evidence, and all 12 deterministic Android captures. Both modes write timestamped logs, manifests, hashes, PNGs, `summary.json`, and `validation.md` beneath ignored `reports/foundation-runs/`. Their ZIP/APK artifacts are marked unpublishable, stay out of `releases/candidates/`, are not signed, and do not read or require release-key secrets.
+`Full` adds the six-checkpoint 75% timing/replay gate, a separately reported 100% opening result, Home/resume evidence, and all 13 deterministic Android captures. Both modes write timestamped logs, manifests, hashes, PNGs, exact installed-APK/source/shader provenance, `summary.json`, and `validation.md` beneath ignored `reports/foundation-runs/`. Their ZIP/APK artifacts are marked unpublishable, stay out of `releases/candidates/`, are not signed, and do not read or require release-key secrets.
 
 Check raygen staleness without modifying the embedded include:
 

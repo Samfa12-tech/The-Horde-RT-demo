@@ -12,6 +12,7 @@ namespace horde::gameplay
 enum class ShowcaseCheckpointPreset
 {
     Fresh,
+    TwoSkeletonCombat,
     LanternTrigger,
     LanternSettled,
     LichActive,
@@ -31,7 +32,7 @@ struct ShowcaseCheckpoint
 };
 
 inline constexpr float kHalfPi = 1.57079632679f;
-inline constexpr std::array<ShowcaseCheckpoint, 12> kShowcaseCheckpoints{{
+inline constexpr std::array<ShowcaseCheckpoint, 13> kShowcaseCheckpoints{{
     {0, "opening", 0.0f, 1.85f, 0.0f, -0.05f, ShowcaseZone::Opening, ShowcaseCheckpointPreset::Fresh},
     {1, "skeleton", kSkeletonRoomCenter.x, kSkeletonRoomCenter.z, 0.0f, 0.0f, ShowcaseZone::SkeletonRoom, ShowcaseCheckpointPreset::Fresh},
     {2, "worst-bend", 4.20f, -10.00f, 0.0f, -0.04f, ShowcaseZone::ShadowCorridor, ShowcaseCheckpointPreset::Fresh},
@@ -44,6 +45,7 @@ inline constexpr std::array<ShowcaseCheckpoint, 12> kShowcaseCheckpoints{{
     {9, "mirror", -33.70f, -15.20f, -kHalfPi, 0.0f, ShowcaseZone::Finale, ShowcaseCheckpointPreset::LichActive},
     {10, "lich", -33.25f, -14.25f, 2.52f, 0.0f, ShowcaseZone::Finale, ShowcaseCheckpointPreset::LichActive},
     {11, "finale-roof", -35.50f, -15.20f, kHalfPi, 0.28f, ShowcaseZone::Finale, ShowcaseCheckpointPreset::FinaleRoofOpen},
+    {12, "two-enemy-combat", 0.0f, -3.50f, 0.0f, 0.0f, ShowcaseZone::SkeletonRoom, ShowcaseCheckpointPreset::TwoSkeletonCombat},
 }};
 
 constexpr const ShowcaseCheckpoint* FindShowcaseCheckpoint(std::int32_t id)

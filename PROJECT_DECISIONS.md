@@ -45,6 +45,14 @@ Milestone 2 extracts checked Vulkan buffer operations, acceleration-structure li
 
 GPU telemetry uses Vulkan timestamp queries only when the selected graphics queue reports non-zero timestamp bits. It resolves the prior submission after the existing frame fence, never waits inside the query read, and reports a separate **GPU RT command-buffer time**. CPU wall-clock frame timing, benchmark schema and pass/fail remain authoritative for continuity; timestamps do not include queue presentation, compositor, display, or input latency. Unsupported or failed timing remains non-fatal and visibly `N/A`.
 
+## Measured two-skeleton combat decision - 2026-08-11
+
+The first multi-enemy candidate is a fixed-capacity pair with stable `SkeletonA`/`SkeletonB` IDs, independent health/action/death persistence, deterministic wall collision and 0.70 m separation, nearest-only sword damage, and one attack token selected by strict distance then entity ID. Retry and route reset restore the pair; both deaths complete the opening encounter. Historical checkpoints 0-11 continue importing the original singular skeleton so the published 0.1.3 capture hashes remain exact, while checkpoint 12 is the explicit two-enemy proof.
+
+The renderer exposes two skeleton instances and no more than two measured pose buckets. Matching actions share one pose/BLAS; divergent attack/death states may use the second. The lich remains singular. The physical totals are nine BLAS and nineteen TLAS slots; semantic custom indices 0-17 remain stable and the second pose route uses bounded custom index 18. Every masked slot retains an invertible identity transform.
+
+This candidate does not change `vkCmdTraceRaysKHR`, `rayQueryEXT`, recursion depth one, one frame in flight, strict ASTC, swapchain presentation semantics, release identity, or published artifacts. Host validation and explicit capture review are necessary but not sufficient: promotion requires matched cooled `SM-S948B` timing-enabled/disabled evidence, the six-checkpoint 75% gate below 20 ms, separate 100% reporting, lifecycle checks, and hands-on combat/readability/audio/haptic checks. More than two enemies remains out of scope.
+
 ## Target devices
 
 - Primary target: Samsung Galaxy S26 Ultra.

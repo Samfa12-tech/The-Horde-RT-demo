@@ -6,7 +6,8 @@ param(
 
 $ErrorActionPreference = "Stop"
 Add-Type -AssemblyName System.Drawing
-$expected = @("opening", "skeleton", "worst-bend", "lantern-drop", "skylight", "yellow", "blue", "red", "green", "mirror", "lich", "finale-roof")
+$historicalExpected = @("opening", "skeleton", "worst-bend", "lantern-drop", "skylight", "yellow", "blue", "red", "green", "mirror", "lich", "finale-roof")
+$expandedExpected = @($historicalExpected) + "two-enemy-combat"
 
 function Read-Manifest([string]$directory) {
     $path = Join-Path ([IO.Path]::GetFullPath($directory)) "capture-manifest.json"
@@ -17,7 +18,9 @@ function Read-Manifest([string]$directory) {
 $baseline = Read-Manifest $BaselineDirectory
 $candidate = Read-Manifest $CandidateDirectory
 if (-not $baseline.complete -or -not $candidate.complete) { throw "Both capture manifests must be complete." }
-if ($baseline.captures.Count -ne 12 -or $candidate.captures.Count -ne 12) { throw "Both capture sets must contain 12 records." }
+if ($baseline.captures.Count -notin @(12, 13)) { throw "The baseline capture set must contain the published 12 records or the expanded 13 records." }
+if ($candidate.captures.Count -ne 13) { throw "The candidate capture set must contain 13 records." }
+$expected = $(if ($baseline.captures.Count -eq 12) { $historicalExpected } else { $expandedExpected })
 
 $comparisons = [Collections.Generic.List[object]]::new()
 $failed = $false
@@ -29,6 +32,22 @@ for ($index = 0; $index -lt $expected.Count; ++$index) {
     }
     $beforePath = Join-Path ([IO.Path]::GetFullPath($BaselineDirectory)) $before.file
     $afterPath = Join-Path ([IO.Path]::GetFullPath($CandidateDirectory)) $after.file
+    $beforeHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $beforePath).Hash
+    $afterHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $afterPath).Hash
+    if ($beforeHash -eq $afterHash) {
+        if ([int]$before.width -ne [int]$after.width -or [int]$before.height -ne [int]$after.height) {
+            throw "Capture manifest dimensions differ for $($expected[$index]) despite an identical PNG hash."
+        }
+        $comparisons.Add([PSCustomObject]@{
+            checkpoint = $expected[$index]
+            pixels = [long]$before.width * [long]$before.height
+            pixelsDifferentByMoreThanOne = 0
+            differentFraction = 0.0
+            maximumChannelDifference = 0
+            passed = $true
+        })
+        continue
+    }
     $beforeBitmap = [Drawing.Bitmap]::new($beforePath)
     $afterBitmap = [Drawing.Bitmap]::new($afterPath)
     try {
@@ -70,7 +89,7 @@ $candidateMedian = [double]$candidate.timing.overallMedianMs
 $timingPassed = $candidateMedian -le $baselineMedian * 1.02
 if (-not $timingPassed) { $failed = $true }
 $result = [ordered]@{
-    schema = 1
+    schema = 2
     passed = -not $failed
     pixelTolerance = [ordered]@{ maximumChannelDifference = 3; maximumFractionOverOne = 0.001 }
     timingTolerancePercent = 2.0
@@ -79,6 +98,18 @@ $result = [ordered]@{
     timingDeltaPercent = [Math]::Round((($candidateMedian / $baselineMedian) - 1.0) * 100.0, 3)
     timingPassed = $timingPassed
     captures = @($comparisons)
+    unpairedCandidateCaptures = @(
+        if ($baseline.captures.Count -eq 12) {
+            $newCapture = $candidate.captures[12]
+            [PSCustomObject]@{
+                checkpoint = $newCapture.checkpoint
+                file = $newCapture.file
+                pngSha256 = $newCapture.pngSha256
+                honestlyPresentedRtFrame = [bool]$newCapture.honestlyPresentedRtFrame
+                requiresExplicitVisualReview = $true
+            }
+        }
+    )
 }
 $outputFull = [IO.Path]::GetFullPath($OutputPath)
 New-Item -ItemType Directory -Force -Path (Split-Path -Parent $outputFull) | Out-Null

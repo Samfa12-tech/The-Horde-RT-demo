@@ -34,7 +34,7 @@ Last updated: 2026-08-11
 - A recursive depth-2 closest-hit experiment compiled but failed during phone pipeline creation. Do not restore it without proving capability and pipeline creation on the phone.
 - The RT storage image is RGBA. Common BGRA swapchains require the presentation-format-driven `outputRedBlueSwap` path on raw copy; scaled modes use a format-aware blit.
 - One frame remains in flight while held-prop TLAS transforms use host-written instance data.
-- `RtGpuResources` owns checked buffer operations, acceleration-structure lifetime helpers, and updatable-BLAS state without taking ownership of the platform device; BLAS sizing/build/refit recording remains in the scene. `CharacterRenderSlot` owns the resident skeleton/lich pose resources but enforces one active character at TLAS instance 2.
+- `RtGpuResources` owns checked buffer operations, acceleration-structure lifetime helpers, and updatable-BLAS state without taking ownership of the platform device; BLAS sizing/build/refit recording remains in the scene. `CharacterRenderSlot` owns two bounded skeleton pose/BLAS routes plus the singular lich route.
 - Supported graphics queues expose a separately labelled Vulkan GPU RT command-buffer interval from top-of-pipe to bottom-of-pipe around acceleration-structure, trace, barrier, and copy/blit recording. It does not replace CPU frame time or include presentation/display latency; unsupported timestamp queues report `N/A` without affecting rendering.
 - Android uses strict ASTC KTX2 arrays: ASTC 6x6 diffuse/ARM and ASTC 4x4 normals. Windows uses executable-relative raw RGBA8 arrays.
 - The unreachable stained-glass material route has been removed from the CPU material table and raygen. The retained open threshold and live clear-glass route are unchanged. The regenerated raygen is 71,180 SPIR-V bytes / 3,978 instructions / 557 branch operations / 6 loops / 212 selection merges, down from 71,908 / 4,025 / 568 / 6 / 216, with bit-exact fixed Windows captures and non-regressing Windows/phone timing.
@@ -117,6 +117,16 @@ Last updated: 2026-08-11
 - One `CharacterRenderSlot` owns both resident archetype resources and the historical animation/refit cadence while selecting exactly one skeleton or lich acceleration-structure address for TLAS instance 2. The eight-BLAS, eighteen-instance, one-active-enemy ceiling is unchanged.
 - Windows and Android use a non-blocking two-query Vulkan timestamp lifecycle tied to the existing one-frame fence. Reduced-width timestamp wrap and availability are handled; unsupported/query-failure states remain diagnostic only.
 - CPU frame timings, benchmark schema/pass criteria, shader ABI, raygen, and presentation honesty remain unchanged. A later exact-device `SM-S948B` follow-up verified GPU timing, strict ASTC, honest RT presentation, replay, captures, and Home/resume; sustained 75% performance did not pass because the lich checkpoint measured 23.604 ms against the 20 ms gate.
+
+## Measured two-skeleton combat candidate - 2026-08-11
+
+- The opening encounter is now a fixed pair at `(-0.75, -4.65)` / `(0.75, -4.65)` with stable `SkeletonA`/`SkeletonB` IDs, strict nearest-then-ID attack ownership, nearest-only sword hits, independent persistent death, world-valid 0.70 m separation including around fixed corpses, and completion only after both die. Retry/reset restores both; no third enemy or general ECS was added.
+- `SimulationSnapshot` publishes a bounded two-entity array, alive count, attacker ID, and encounter completion. Ordered events retain the bounded queue contract and identify A/B; a missed swing targets `Invalid` rather than inventing an entity.
+- `CharacterRenderSlot` emits up to two skeleton instances. Matching actions share pose bucket 0; divergent action/death poses use at most bucket 1. Final dead poses clamp to their clip duration so corpses converge to a shared bucket and stop redundant refits. The lich stays singular.
+- The scene now reports nine BLAS and nineteen physical TLAS slots. Semantic custom indices 0-17 remain stable; the second pose route uses custom index 18. Unused slots are masked and keep invertible identity transforms.
+- Historical checkpoint imports 0-11 remain singular and all twelve published 0.1.3 PNG hashes are byte-exact. Checkpoint 12, `two-enemy-combat`, is the explicitly reviewed new capture and the default phone gate now measures six checkpoints.
+- The Debug runner records enabled/disabled GPU-timing mode, verifies local and installed APK hashes match, and records commit/dirty/shader identity. `tools/compare-android-gpu-timing-ab.ps1` enforces same-artifact/device/run shape, comparable AP/SKIN/BAT starting temperatures, the 20 ms gate, and the 15% investigation threshold.
+- Host foundation validation and the new Windows capture passed. Phone performance, 100% reporting, and new hands-on combat/readability/audio/haptic/lifecycle checks remain pending; do not call this the new playable phone baseline yet. See `docs/TWO_SKELETON_COMBAT_SLICE_2026-08-11.md`.
 - PRs #10 and #11 merged to `main` at `6ec3119`. Final review preserved the historical 140 ms separation between Android sword impact and enemy-fall audio, exposed platform-event overflow in diagnostics, and removed duplicate lethal-hit haptics. The owner subsequently reported that controls, audio, and haptics all worked correctly hands-on on `SM-S948B`. This is owner-reported development-build evidence without a new exact-artifact check; it does not clear the lich performance failure or certify comfort, spatial-audio quality, cue tuning, or exact merged-build provenance.
 - Detailed implementation and validation evidence: `docs/RENDERER_RESOURCE_SLOTS_GPU_TIMING_2026-08-11.md`.
 
@@ -135,7 +145,7 @@ Last updated: 2026-08-11
 - Windows presentation/UI: `src/platform/windows/DiagnosticWindow.cpp`
 - Shared RT scene: `src/vulkan/raytracing/PresentableTinyRtScene.cpp`
 - Renderer resource seam: `src/vulkan/raytracing/RtGpuResources.cpp`
-- One-active character slot: `src/vulkan/raytracing/CharacterRenderSlot.cpp`
+- Bounded two-skeleton/singular-lich slot: `src/vulkan/raytracing/CharacterRenderSlot.cpp`
 - Vulkan GPU timer: `src/vulkan/GpuFrameTimer.cpp`
 - Raygen source: `shaders/raytracing/minimal.rgen`
 - Embedded raygen: `src/vulkan/raytracing/MinimalRayGenShader.inc`
@@ -154,7 +164,7 @@ Last updated: 2026-08-11
 2. Back up the JKS and both passwords independently.
 3. Treat the complete 0.1.3 body/vitality/dawn route as the preserved playable baseline. The shared fixed-step simulation/input/event foundation and the bounded renderer resource/character-slot plus GPU-timing foundation are complete; see `docs/FULL_REPO_AUDIT_AND_GAME_PLAN_2026-08-01.md`.
 4. The deterministic checkpoint, three-window benchmark, native route replay, and bounded Android evidence runner foundation is complete and live-validated.
-5. The integrated cross-platform clean-build/package/stale-shader/licence gate and deterministic 12-checkpoint Windows/Android PNG capture foundation are complete and device-validated. Keep video/orbit-camera presentation work deferred until it has a separately bounded need.
+5. The integrated cross-platform clean-build/package/stale-shader/licence gate and deterministic 13-checkpoint Windows/Android PNG capture foundation are complete. The original 12 captures are device-validated; the new two-enemy capture is host-reviewed and awaits the current device gate. Keep video/orbit-camera presentation work deferred until it has a separately bounded need.
 6. Gate each meaningful renderer/gameplay-route change on the phone at 75%; report 100% separately and retain the short hands-on touch/audio/lifecycle pass.
 7. Keep real RT and honest diagnostics. Reduce bounded effect area/ray cost before expanding gameplay or substituting fake effects.
 8. Treat `docs/BUILD_TEST_DEMO_CYCLE_PLAN_2026-07-17.md` as the detailed backlog and `docs/DOCUMENTATION_CHECKPOINT_2026-07-17.md` as the documentation authority map.
@@ -163,7 +173,7 @@ Last updated: 2026-08-11
 
 - The next work is a short pre-production foundation, not direct horde expansion: one shared `GameSimulation` tick, an Android-safe input mailbox, normalized fixed-step movement, a bounded gameplay-event queue, persistent encounter state, and deterministic platform-parity tests.
 - The audit found a real Android input data race and frame-dependent movement. Fix both before adding enemies or richer combat.
-- Current multi-enemy capacity is only descriptive metadata: one TLAS enemy slot, global shader enemy selection, and one active CPU-skinned/refit pose remain the real implementation boundary.
+- Current multi-enemy capacity is a hard two-skeleton ceiling with two physical TLAS routes and at most two CPU-skinned/refit pose buckets. The lich remains singular; four enemies require a later measured design.
 - First expansion gate is two skeleton instances sharing a model/pose and using an attacker token. Four enemies require a later, separate phone pass.
 - Combat animation follows the shared simulation and uses action states plus explicit animation hit events. Rendering consumes snapshots and never decides damage.
 - Fire uses bounded emitter records, emissive RT geometry, and phone-budgeted raygen effects. Shallow water uses real geometry plus bounded reflection/transmission queries; steam uses bounded raygen density volumes. No particle BLAS swarm, SSR, raster fallback, or fluid simulation.
@@ -198,4 +208,4 @@ Last updated: 2026-08-11
 - The lich uses continuous living `Idle_02` and non-looping `Dead` clips; whole-instance hover/orbit replaces the visibly distorted walking clip. Its separate 48-byte UV stream, raw Windows KTX2, strict Android ASTC 6x6, derived violet emissive map, and forty skin-weighted staff vertices drive the visible staff light/electricity. It takes three hits with a two-second lockout; each accepted hit produces recoil plus a positional cry, and death opens the finale roof over 4.5 seconds.
 - Player travel and skeleton cadence now produce accepted audible footsteps. Skeleton and lich spatial cues share equal-power pan, distance rolloff, and route-obstruction attenuation through XAudio2 on Windows and published left/right SoundPool gains on Android. Android playback passed hands-on testing, while perceived stereo directionality and distance remain explicitly uncertified.
 - Windows Debug/Release and all five CTests pass, and the final hands-on Windows route/audio/combat verdict passed. The complete route is also device-validated on `SM-S948B`: strict environment/lich ASTC, honest RT presentation, full hands-on traversal, lifecycle recovery, and controlled warm 75% measurements all pass. Every required zone's median of three 120-frame average windows was below 13.7 ms at thermal status 3; see `docs/HORDE_SHOWCASE_ANDROID_VALIDATION_2026-07-17.md`. Label this state **Windows-validated / Android-device-validated**.
-- Preserve the latest raygen artifact recorded in `docs/HORDE_SHOWCASE_WINDOWS_VALIDATION_2026-07-16.md`. The lich's Meshy CC0 evidence is retained at `assets/models/enemies/meshy/lich_placeholder_source_licence.png`. Preserve the current one-active-skinned-enemy limit until a separate multi-enemy phone measurement.
+- Preserve the latest raygen artifact recorded by the current foundation gate. The lich's Meshy CC0 evidence is retained at `assets/models/enemies/meshy/lich_placeholder_source_licence.png`. The two-skeleton candidate remains capped at two and cannot become the phone baseline without its separate device measurement.

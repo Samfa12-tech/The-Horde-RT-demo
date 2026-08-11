@@ -38,7 +38,7 @@ Verify:
 - Touch movement/look, collision, lantern drop, coloured bays, mirror, sequential skeleton/lich selection, three-hit finale, and sliding roof remain functional.
 - `SWING` triggers an independent sword arc; verify accepted-hit recoil/cry, two-second lockout, lich death, and player/skeleton footsteps.
 - Log reports strict ASTC KTX2 for both environment and lich, all 17 SoundPool loads, and honest RT presentation.
-- Use `.\tools\run-android-showcase-validation.ps1` from the repo root for the default five 75% checkpoints and 13-waypoint replay. Each enforced checkpoint must retain three 120-frame windows at or below 20 ms; 100% is report-only.
+- Use `.\tools\run-android-showcase-validation.ps1` from the repo root for the default six 75% checkpoints and 13-waypoint replay. Each enforced checkpoint must retain three 120-frame windows below 20 ms; 100% is report-only. The runner verifies the installed `base.apk` hash against the local Debug APK and records source/shader identity.
 - Automation is regression evidence, not a substitute for a short hands-on touch, perceived audio/directionality, visual-art, and pause/Home lifecycle pass.
 
 Debug reports are available through `adb shell run-as com.samfa12.hordelanternrt.debug`; stable release builds are deliberately non-debuggable. Desktop and routine automation reports remain under ignored `reports/` until a reviewed milestone is promoted into `docs/validation/`.

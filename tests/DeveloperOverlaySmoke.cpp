@@ -47,10 +47,13 @@ int main()
     snapshot.internalHeight = 2235;
     snapshot.presentationWidth = 1440;
     snapshot.presentationHeight = 2980;
-    snapshot.blasCount = 8;
+    snapshot.blasCount = 9;
     snapshot.tlasCount = 1;
-    snapshot.tlasInstanceCount = 18;
-    snapshot.activeSkinnedEnemies = 1;
+    snapshot.tlasInstanceCount = 19;
+    snapshot.activeSkinnedEnemies = 2;
+    snapshot.activeEnemyEntityCount = 2;
+    snapshot.attackerEntityId = 2;
+    snapshot.skeletonPoseBucketCount = 2;
     snapshot.enemyHealth = 2;
     snapshot.renderScale = 0.75f;
     snapshot.fps = 83.815f;
@@ -82,7 +85,8 @@ int main()
     ok &= RequireContains(text, "PLAYER dying  |  vitality 0/3  |  damage OFF");
     ok &= RequireContains(text, "SIM 1 ticks  |  accum 2.5 ms  |  overruns 2");
     ok &= RequireContains(text, "EVENTS 3 queued / 7 high / 0 overflow  |  input 42  |  cmd 5/2/1");
-    ok &= RequireContains(text, "AS 8 BLAS / 1 TLAS / 18 inst  |  skinned 1");
+    ok &= RequireContains(text, "AS 9 BLAS / 1 TLAS / 19 inst  |  skinned 2");
+    ok &= RequireContains(text, "COMBAT 2 active  |  attacker 2  |  pose buckets 2");
     ok &= RequireContains(text, "MAT ASTC test route");
 
     snapshot.presented = false;
@@ -91,10 +95,14 @@ int main()
     snapshot.enemyHealth = -1;
     snapshot.gpuRtTimingValid = false;
     snapshot.gpuRtTimingStatus = "Queue timestamps unsupported";
+    snapshot.activeEnemyEntityCount = 0;
+    snapshot.attackerEntityId = -1;
+    snapshot.skeletonPoseBucketCount = 0;
     const std::string inactiveText = horde::ui::BuildDeveloperOverlayText(snapshot);
     ok &= RequireContains(inactiveText, "presented NO");
     ok &= RequireContains(inactiveText, "none inactive");
     ok &= RequireContains(inactiveText, "GPU RT N/A  |  Queue timestamps unsupported");
+    ok &= RequireContains(inactiveText, "COMBAT 0 active  |  attacker none  |  pose buckets 0");
     if (inactiveText.find(" hp ") != std::string::npos)
     {
         std::cerr << "Developer overlay printed health for an encounter without a health value.\n";

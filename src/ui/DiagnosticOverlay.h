@@ -33,6 +33,9 @@ struct DeveloperOverlaySnapshot
     std::uint32_t tlasCount = 0;
     std::uint32_t tlasInstanceCount = 0;
     std::uint32_t activeSkinnedEnemies = 0;
+    std::uint32_t activeEnemyEntityCount = 0;
+    std::int32_t attackerEntityId = -1;
+    std::uint32_t skeletonPoseBucketCount = 0;
     int enemyHealth = -1;
     int playerVitality = 3;
     int playerMaxVitality = 3;

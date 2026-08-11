@@ -34,6 +34,10 @@ layout(std430, set = 0, binding = 7) readonly buffer LichVertices
 } lich;
 layout(set = 0, binding = 8) uniform sampler2DArray lichBaseColor;
 layout(set = 0, binding = 9) uniform sampler2DArray lichEmissive;
+layout(std430, set = 0, binding = 10) readonly buffer SecondSkeletonVertices
+{
+    SkeletonVertex vertices[];
+} secondSkeleton;
 
 layout(push_constant) uniform SceneControls
 {
@@ -230,7 +234,7 @@ void materialForPrimitive(int primitive,
         return;
     }
 
-    if (instance == 2)
+    if (instance == 2 || instance == 18)
     {
         normal = vec3(0.0, 1.0, 0.0);
         geometricNormal = normal;
@@ -238,10 +242,11 @@ void materialForPrimitive(int primitive,
         // floor/hash lookup changed colour in hard 10 cm cells and looked like
         // checkerboard lighting across the animated mesh.
         float age = 0.5 + 0.5 * sin(p.y * 3.1 + p.x * 1.7 + p.z * 2.3);
-        base = controls.enemyKind > 0.5 ? vec3(0.16, 0.13, 0.19)
-                                       : mix(vec3(0.34, 0.29, 0.21), vec3(0.48, 0.42, 0.30), age * 0.42);
-        metallic = controls.enemyKind > 0.5 ? 0.08 : 0.04;
-        reflectivity = controls.enemyKind > 0.5 ? 0.18 : 0.24;
+        bool lichInstance = instance == 2 && controls.enemyKind > 0.5;
+        base = lichInstance ? vec3(0.16, 0.13, 0.19)
+                            : mix(vec3(0.34, 0.29, 0.21), vec3(0.48, 0.42, 0.30), age * 0.42);
+        metallic = lichInstance ? 0.08 : 0.04;
+        reflectivity = lichInstance ? 0.18 : 0.24;
         emissive = 0.0;
         return;
     }
@@ -357,26 +362,36 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask)
         h.instance = int(rayQueryGetIntersectionInstanceCustomIndexEXT(query, true));
         h.position = origin + direction * h.t;
         materialForPrimitive(h.primitive, h.instance, h.position, h.material, h.normal, h.geometricNormal, h.base, h.metallic, h.reflectivity, h.emissive);
-        if (h.instance == 2)
+        if (h.instance == 2 || h.instance == 18)
         {
             const int firstVertex = h.primitive * 3;
             const vec2 bary = rayQueryGetIntersectionBarycentricsEXT(query, true);
             const float w0 = 1.0 - bary.x - bary.y;
-            vec3 localNormal = controls.enemyKind > 0.5
+            bool lichInstance = h.instance == 2 && controls.enemyKind > 0.5;
+            bool secondSkeletonPose = h.instance == 18;
+            vec3 localNormal = lichInstance
                 ? normalize(lich.vertices[firstVertex].normal.xyz * w0
                     + lich.vertices[firstVertex + 1].normal.xyz * bary.x
                     + lich.vertices[firstVertex + 2].normal.xyz * bary.y)
-                : normalize(skeleton.vertices[firstVertex].normal.xyz * w0
-                    + skeleton.vertices[firstVertex + 1].normal.xyz * bary.x
-                    + skeleton.vertices[firstVertex + 2].normal.xyz * bary.y);
+                : (secondSkeletonPose
+                    ? normalize(secondSkeleton.vertices[firstVertex].normal.xyz * w0
+                        + secondSkeleton.vertices[firstVertex + 1].normal.xyz * bary.x
+                        + secondSkeleton.vertices[firstVertex + 2].normal.xyz * bary.y)
+                    : normalize(skeleton.vertices[firstVertex].normal.xyz * w0
+                        + skeleton.vertices[firstVertex + 1].normal.xyz * bary.x
+                        + skeleton.vertices[firstVertex + 2].normal.xyz * bary.y));
             const mat3 objectToWorld = mat3(rayQueryGetIntersectionObjectToWorldEXT(query, true));
             h.normal = normalize(objectToWorld * localNormal);
-            vec3 edgeA = controls.enemyKind > 0.5
+            vec3 edgeA = lichInstance
                 ? lich.vertices[firstVertex + 1].position.xyz - lich.vertices[firstVertex].position.xyz
-                : skeleton.vertices[firstVertex + 1].position.xyz - skeleton.vertices[firstVertex].position.xyz;
-            vec3 edgeB = controls.enemyKind > 0.5
+                : (secondSkeletonPose
+                    ? secondSkeleton.vertices[firstVertex + 1].position.xyz - secondSkeleton.vertices[firstVertex].position.xyz
+                    : skeleton.vertices[firstVertex + 1].position.xyz - skeleton.vertices[firstVertex].position.xyz);
+            vec3 edgeB = lichInstance
                 ? lich.vertices[firstVertex + 2].position.xyz - lich.vertices[firstVertex].position.xyz
-                : skeleton.vertices[firstVertex + 2].position.xyz - skeleton.vertices[firstVertex].position.xyz;
+                : (secondSkeletonPose
+                    ? secondSkeleton.vertices[firstVertex + 2].position.xyz - secondSkeleton.vertices[firstVertex].position.xyz
+                    : skeleton.vertices[firstVertex + 2].position.xyz - skeleton.vertices[firstVertex].position.xyz);
             vec3 faceNormal = cross(edgeA, edgeB);
             h.geometricNormal = length(faceNormal) > 0.00001
                 ? normalize(objectToWorld * normalize(faceNormal))
@@ -385,7 +400,7 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask)
             {
                 h.geometricNormal = -h.geometricNormal;
             }
-            if (controls.enemyKind > 0.5)
+            if (lichInstance)
             {
                 vec2 uv = lich.vertices[firstVertex].texcoord.xy * w0
                     + lich.vertices[firstVertex + 1].texcoord.xy * bary.x

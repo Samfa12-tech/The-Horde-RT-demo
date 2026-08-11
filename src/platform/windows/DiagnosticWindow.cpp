@@ -1439,7 +1439,16 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(
     snapshot.blasCount = context.rtScene.BlasCount();
     snapshot.tlasCount = context.rtScene.TlasCount();
     snapshot.tlasInstanceCount = context.rtScene.TlasInstanceCount();
-    snapshot.activeSkinnedEnemies = static_cast<std::uint32_t>(roster.renderedEnemyCount);
+    snapshot.activeSkinnedEnemies = simulation.activeEnemyKind == horde::gameplay::EnemyKind::Skeleton
+        ? static_cast<std::uint32_t>(simulation.activeSkeletonCount)
+        : static_cast<std::uint32_t>(roster.renderedEnemyCount);
+    snapshot.activeEnemyEntityCount = simulation.activeEnemyKind == horde::gameplay::EnemyKind::Skeleton
+        ? static_cast<std::uint32_t>(simulation.activeSkeletonCount)
+        : static_cast<std::uint32_t>(roster.renderedEnemyCount);
+    snapshot.attackerEntityId = simulation.skeletonAttackerId == horde::gameplay::simulation::EntityId::Invalid
+        ? -1
+        : static_cast<std::int32_t>(simulation.skeletonAttackerId);
+    snapshot.skeletonPoseBucketCount = static_cast<std::uint32_t>(context.rtScene.SkeletonPoseBucketCount());
     snapshot.renderScale = context.renderScale;
     snapshot.fps = capabilities.performance.fps;
     snapshot.frameTimeMs = capabilities.performance.frameTimeMs;
@@ -2448,6 +2457,10 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             frameInputs.roster.renderedEnemyCount = 1u;
             frameInputs.roster.renderedEnemies.fill(horde::gameplay::EnemyKind::None);
             frameInputs.roster.renderedEnemies[0] = ctx.debugEnemyOverride;
+            if (ctx.debugEnemyOverride == horde::gameplay::EnemyKind::Lich)
+            {
+                frameInputs.skeletonEnemyCount = 0u;
+            }
         }
         std::string diagnostic;
         gpuTimingRecording = ctx.gpuFrameTimer.RecordBegin(

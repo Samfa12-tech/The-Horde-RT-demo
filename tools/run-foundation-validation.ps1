@@ -164,7 +164,7 @@ function Test-CaptureManifest {
     if (-not (Test-Path -LiteralPath $ManifestPath)) { throw "$Platform capture manifest is missing: $ManifestPath" }
     $manifest = Get-Content -LiteralPath $ManifestPath -Raw | ConvertFrom-Json
     $records = @($(if ($Platform -eq "Windows") { $manifest.captures } else { $manifest.checkpoints }))
-    $expected = @("opening", "skeleton", "worst-bend", "lantern-drop", "skylight", "yellow", "blue", "red", "green", "mirror", "lich", "finale-roof")
+    $expected = @("opening", "skeleton", "worst-bend", "lantern-drop", "skylight", "yellow", "blue", "red", "green", "mirror", "lich", "finale-roof", "two-enemy-combat")
     if ($records.Count -ne $expected.Count) { throw "$Platform manifest contains $($records.Count) captures; expected $($expected.Count)." }
     if ($Platform -eq "Windows") {
         if (-not $manifest.complete -or -not $manifest.sceneOnly -or $manifest.overlaysIncluded) {
@@ -416,7 +416,7 @@ try {
             if ($captureProcess.ExitCode -ne 0) { throw "Windows Debug capture failed with exit code $($captureProcess.ExitCode)." }
             $captureCount = Test-CaptureManifest `
                 -ManifestPath (Join-Path $windowsCaptureDirectory "capture-manifest.json") -Platform Windows
-            if ($captureCount -ne 12) { throw "Windows deterministic capture count was $captureCount." }
+            if ($captureCount -ne 13) { throw "Windows deterministic capture count was $captureCount." }
             $releaseRejectionDirectory = Join-Path $captureDirectory "release-must-not-create"
             $releaseProcess = Start-Process -FilePath (Join-Path $windowsBuild "Release\HordeLanternRT.exe") `
                 -ArgumentList @("--capture-showcase", "`"$releaseRejectionDirectory`"") -Wait -PassThru
@@ -483,7 +483,7 @@ try {
                 if ($manifests.Count -ne 1) { throw "Expected one Android capture manifest; found $($manifests.Count)." }
                 $captureCount = Test-CaptureManifest -ManifestPath $manifests[0].FullName `
                     -Platform Android -ExpectedModel $ExpectedDeviceModel
-                if ($captureCount -ne 12) { throw "Android deterministic capture count was $captureCount." }
+                if ($captureCount -ne 13) { throw "Android deterministic capture count was $captureCount." }
             }
 
             if ([string]::IsNullOrWhiteSpace($BaselineWindowsCaptureDirectory) -xor
@@ -506,9 +506,9 @@ try {
                         Where-Object { [int]$_.scale -eq 75 })
                     $candidateRows = @(Import-Csv -LiteralPath $candidateTimingPath |
                         Where-Object { [int]$_.scale -eq 75 })
-                    $required = @("opening", "worst-bend", "skylight", "green", "lich")
-                    if ($baselineRows.Count -ne 5 -or $candidateRows.Count -ne 5) {
-                        throw "Android A/B requires exactly five 75% timing rows in each run."
+                    $required = @("opening", "two-enemy-combat", "worst-bend", "skylight", "green", "lich")
+                    if ($baselineRows.Count -ne 6 -or $candidateRows.Count -ne 6) {
+                        throw "Android A/B requires exactly six 75% timing rows in each run."
                     }
                     $phoneComparisons = foreach ($checkpoint in $required) {
                         $before = $baselineRows | Where-Object checkpoint -eq $checkpoint | Select-Object -First 1

@@ -3,7 +3,9 @@ param(
     [string]$Mode = "Both",
     [ValidateRange(50, 100)]
     [int]$Scale = 75,
-    [string[]]$Checkpoints = @("opening", "worst-bend", "skylight", "green", "lich"),
+    [string[]]$Checkpoints = @("opening", "two-enemy-combat", "worst-bend", "skylight", "green", "lich"),
+    [ValidateSet("Enabled", "Disabled")]
+    [string]$GpuTiming = "Enabled",
     [switch]$Include100,
     [switch]$Capture,
     [switch]$SkipBuild,
@@ -22,6 +24,13 @@ $activityName = "$packageName/com.samfa12.hordelanternrt.MainActivity"
 $adb = Join-Path $env:LOCALAPPDATA "Android\Sdk\platform-tools\adb.exe"
 $runId = Get-Date -Format "yyyyMMdd-HHmmss"
 $outputDirectory = [IO.Path]::GetFullPath((Join-Path $OutputRoot "run-$runId"))
+$gpuTimingEnabled = $GpuTiming -eq "Enabled"
+$gpuTimingLabel = $GpuTiming.ToLowerInvariant()
+$gpuTimingArgument = $(if ($gpuTimingEnabled) { "true" } else { "false" })
+$sourceCommit = (& git -C $repoRoot rev-parse HEAD 2>&1 | Out-String).Trim()
+if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($sourceCommit)) { throw "Could not resolve the source Git commit." }
+$sourceDirty = -not [string]::IsNullOrWhiteSpace((& git -C $repoRoot status --porcelain 2>&1 | Out-String).Trim())
+$raygenSha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $repoRoot "src\vulkan\raytracing\MinimalRayGenShader.inc")).Hash.ToLowerInvariant()
 $checkpointZones = @{
     "opening" = "opening"
     "skeleton" = "skeleton-room"
@@ -35,9 +44,10 @@ $checkpointZones = @{
     "mirror" = "finale"
     "lich" = "finale"
     "finale-roof" = "finale"
+    "two-enemy-combat" = "skeleton-room"
 }
-$baselineCheckpoints = @("opening", "worst-bend", "skylight", "green", "lich")
-$captureCheckpoints = @("opening", "skeleton", "worst-bend", "lantern-drop", "skylight", "yellow", "blue", "red", "green", "mirror", "lich", "finale-roof")
+$baselineCheckpoints = @("opening", "two-enemy-combat", "worst-bend", "skylight", "green", "lich")
+$captureCheckpoints = @("opening", "skeleton", "worst-bend", "lantern-drop", "skylight", "yellow", "blue", "red", "green", "mirror", "lich", "finale-roof", "two-enemy-combat")
 $timingRows = [System.Collections.Generic.List[object]]::new()
 $captureRecords = [System.Collections.Generic.List[object]]::new()
 $failures = [System.Collections.Generic.List[string]]::new()
@@ -97,6 +107,20 @@ function Save-PrivateFile {
     $content | Set-Content -LiteralPath $Destination -Encoding utf8
 }
 
+function Get-InstalledApkSha256 {
+    $packagePaths = Invoke-AdbText @("shell", "pm", "path", $packageName)
+    $baseMatch = [regex]::Match($packagePaths, '(?m)^package:(.+/base\.apk)\r?$')
+    if (-not $baseMatch.Success) { throw "Could not resolve the installed base APK for $packageName." }
+    $remotePath = $baseMatch.Groups[1].Value.Trim()
+    $temporaryApk = Join-Path $outputDirectory "installed-base.apk"
+    try {
+        Invoke-AdbText @("pull", $remotePath, $temporaryApk) | Out-Null
+        return (Get-FileHash -Algorithm SHA256 -LiteralPath $temporaryApk).Hash.ToLowerInvariant()
+    } finally {
+        if (Test-Path -LiteralPath $temporaryApk) { Remove-Item -LiteralPath $temporaryApk -Force }
+    }
+}
+
 function Get-ShowcaseState {
     param([string]$Destination)
     Save-PrivateFile -RemotePath "files/reports/showcase_debug_state.json" -Destination $Destination
@@ -136,7 +160,8 @@ function Send-AutomationIntent {
     $arguments = @("shell", "am", "start", "--activity-single-top", "-n", $activityName,
                    "--ei", "horde.debug.scale", "$RequestedScale",
                    "--ez", "horde.debug.autostart", "true",
-                   "--ez", "horde.debug.overlay", "false")
+                   "--ez", "horde.debug.overlay", "false",
+                   "--ez", "horde.debug.gpu_timing", $gpuTimingArgument)
     if ($Replay) {
         $arguments += @("--ez", "horde.debug.replay", "true")
     } else {
@@ -216,7 +241,8 @@ function Start-AutomationSession {
     param([int]$RequestedScale)
     Invoke-AdbText @("shell", "am", "start", "-n", $activityName,
                      "--ei", "horde.debug.scale", "$RequestedScale",
-                     "--ez", "horde.debug.autostart", "true") | Out-Null
+                     "--ez", "horde.debug.autostart", "true",
+                     "--ez", "horde.debug.gpu_timing", $gpuTimingArgument) | Out-Null
 }
 
 function Invoke-CheckpointBenchmark {
@@ -224,7 +250,7 @@ function Invoke-CheckpointBenchmark {
     if (-not $checkpointZones.ContainsKey($Checkpoint)) {
         throw "Unknown checkpoint '$Checkpoint'."
     }
-    Write-Host "Benchmarking $Checkpoint at $RequestedScale%..."
+    Write-Host "Benchmarking $Checkpoint at $RequestedScale% with GPU timing $gpuTimingLabel..."
     Send-AutomationIntent -Checkpoint $Checkpoint -RequestedScale $RequestedScale
     $escapedName = [regex]::Escape($Checkpoint)
     $log = Wait-ForLogPattern -Pattern "HORDE_BENCH complete generation=\d+ checkpoint=$escapedName scale=$RequestedScale windows=3" -Description "$Checkpoint benchmark completion"
@@ -257,16 +283,24 @@ function Invoke-CheckpointBenchmark {
         battery_c = $battery
         presented = $presented
         timing_method = "cpu-present-loop"
+        gpu_timing = $gpuTimingLabel
     }
     $timingRows.Add($row)
     if ($actualZone -ne $checkpointZones[$Checkpoint]) { $failures.Add("$Checkpoint reported zone $actualZone.") }
     if (-not $presented) { $failures.Add("$Checkpoint did not retain honest RT presentation.") }
-    if ($EnforceBudget -and $median -gt 20.0) { $failures.Add("$Checkpoint median $median ms exceeded the 20 ms 75% gate.") }
+    if ($EnforceBudget -and $median -ge 20.0) { $failures.Add("$Checkpoint median $median ms reached or exceeded the strict below-20 ms 75% gate.") }
     $state = Get-ShowcaseState -Destination (Join-Path $outputDirectory "$Checkpoint-$RequestedScale-state.json")
     if ($state.status -ne "complete") { $failures.Add("$Checkpoint native state status was '$($state.status)'.") }
     if ($state.checkpoint -ne $Checkpoint) { $failures.Add("$Checkpoint native state identified '$($state.checkpoint)'.") }
     if ($state.zone -ne $checkpointZones[$Checkpoint]) { $failures.Add("$Checkpoint native state reported zone '$($state.zone)'.") }
     if (-not $state.presented) { $failures.Add("$Checkpoint native state did not retain honest RT presentation.") }
+    if ($state.gpuTimingMode -ne $gpuTimingLabel) { $failures.Add("$Checkpoint native state reported GPU timing '$($state.gpuTimingMode)' instead of '$gpuTimingLabel'.") }
+    if ($Checkpoint -eq "two-enemy-combat") {
+        if ([int]$state.activeEnemyEntities -ne 2) { $failures.Add("Two-enemy checkpoint reported $($state.activeEnemyEntities) active enemy entities instead of 2.") }
+        if ([int]$state.skeletonPoseBuckets -lt 1 -or [int]$state.skeletonPoseBuckets -gt 2) {
+            $failures.Add("Two-enemy checkpoint reported $($state.skeletonPoseBuckets) skeleton pose buckets outside the bounded 1-2 contract.")
+        }
+    }
     if ([int]$state.benchmarkWindowsCompleted -ne 3) { $failures.Add("$Checkpoint native state completed $($state.benchmarkWindowsCompleted) timing windows.") }
 }
 
@@ -302,11 +336,18 @@ try {
     if (-not (Test-Path -LiteralPath $apk)) { throw "Debug APK not found: $apk" }
     $apkHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $apk).Hash.ToLowerInvariant()
     if (-not $SkipInstall) { Invoke-AdbText @("install", "-r", $apk) | Set-Content -LiteralPath (Join-Path $outputDirectory "install.txt") }
+    $installedApkHash = Get-InstalledApkSha256
+    if ($installedApkHash -ne $apkHash) {
+        throw "Installed base APK SHA-256 $installedApkHash does not match local debug APK $apkHash."
+    }
 
     Invoke-AdbText @("logcat", "-c") | Out-Null
     Invoke-AdbText @("shell", "am", "force-stop", $packageName) | Out-Null
     Start-AutomationSession -RequestedScale $Scale
     $startupLog = Wait-ForLogPattern -Pattern "RT frame reached Android swapchain presentation" -Description "honest RT presentation"
+    if ($startupLog -notmatch "HORDE_GPU_TIMING mode=$gpuTimingLabel rt_rendering=unchanged") {
+        throw "Renderer did not report the requested GPU timing mode '$gpuTimingLabel'."
+    }
     if ($startupLog -notmatch [regex]::Escape("PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich")) {
         throw "Strict ASTC environment/lich selection was not reported."
     }
@@ -357,6 +398,10 @@ try {
             }
             package = $packageName
             apkSha256 = $apkHash
+            installedApkSha256 = $installedApkHash
+            sourceCommit = $sourceCommit
+            sourceDirty = $sourceDirty
+            raygenSha256 = $raygenSha256
             checkpointCount = $captureRecords.Count
             checkpoints = @($captureRecords)
             lifecycle = $lifecycleEvidence
@@ -376,12 +421,13 @@ try {
     Invoke-AdbText @("shell", "dumpsys", "battery") -AllowFailure | Set-Content -LiteralPath (Join-Path $outputDirectory "battery-after.txt") -Encoding utf8
     $timingRows | Export-Csv -LiteralPath (Join-Path $outputDirectory "timing.csv") -NoTypeInformation
     $metadata = [ordered]@{
-        schema = 2
+        schema = 4
         runId = $runId
         mode = $Mode
         scale = $Scale
         include100 = [bool]$Include100
         checkpoints = $Checkpoints
+        gpuTiming = $gpuTimingLabel
         deviceModel = $deviceModel
         androidVersion = $androidVersion
         apiLevel = $apiLevel
@@ -389,6 +435,10 @@ try {
         displayDensity = $displayDensity
         package = $packageName
         apkSha256 = $apkHash
+        installedApkSha256 = $installedApkHash
+        sourceCommit = $sourceCommit
+        sourceDirty = $sourceDirty
+        raygenSha256 = $raygenSha256
         captureRequested = [bool]$Capture
         captureCheckpointCount = $captureRecords.Count
         captureManifest = $(if ($Capture) { "capture-manifest.json" } else { $null })
@@ -403,7 +453,11 @@ try {
         "- Mode: $Mode"
         "- Device: $deviceModel (Android $androidVersion / API $apiLevel)"
         "- Debug APK SHA-256: ``$apkHash``"
+        "- Installed base APK SHA-256: ``$installedApkHash`` (exact match)"
+        "- Source: ``$sourceCommit``$(if ($sourceDirty) { ' with a dirty worktree recorded' } else { ' from a clean worktree' })"
+        "- Embedded raygen SHA-256: ``$raygenSha256``"
         "- Scale: $Scale%$(if ($Include100) { ' plus report-only 100% opening' } else { '' })"
+        "- GPU timestamp instrumentation: $gpuTimingLabel (RT rendering unchanged)"
         "- Evidence type: automated deterministic checkpoint/replay evidence; visual quality and perceived spatial audio remain hands-on checks."
         "- Result: $(if ($failures.Count) { 'FAIL' } else { 'PASS' })"
         ""

@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <cstdint>
 #include <iostream>
@@ -105,6 +106,126 @@ int main()
     }
     check(firstSwingSequence != 0u && secondSwingSequence > firstSwingSequence,
           "serialized swings must remain separate semantic events");
+    check(std::all_of(swingEvents.begin(), swingEvents.end(), [](const GameplayEvent& event)
+          {
+              return event.type != GameplayEventType::PlayerSwing || event.target == EntityId::Invalid;
+          }),
+          "an out-of-range player swing must not falsely claim a skeleton target");
+
+    GameSimulation skeletonPair;
+    InputSnapshot pairInput;
+    pairInput.hasAuthoritativePlayerPose = true;
+    pairInput.authoritativePlayerX = 0.0f;
+    pairInput.authoritativePlayerZ = -2.85f;
+    pairInput.yawRadians = 0.0f;
+    pairInput.damageEnabled = false;
+    for (int frame = 0; frame < 100; ++frame)
+    {
+        skeletonPair.AdvanceFrame(pairInput, 1.0 / 60.0);
+    }
+    check(skeletonPair.Snapshot().skeletonEnemyCount == 2u &&
+          skeletonPair.Snapshot().activeSkeletonCount == 2u &&
+          skeletonPair.Snapshot().skeletonEnemies[0].id == EntityId::SkeletonA &&
+          skeletonPair.Snapshot().skeletonEnemies[1].id == EntityId::SkeletonB &&
+          skeletonPair.Snapshot().skeletonAttackerId == EntityId::SkeletonA,
+          "the bounded pair must expose stable A/B IDs and choose A on an equal-distance tie");
+    check(std::hypot(skeletonPair.Snapshot().skeletonEnemies[1].x -
+                     skeletonPair.Snapshot().skeletonEnemies[0].x,
+                     skeletonPair.Snapshot().skeletonEnemies[1].z -
+                     skeletonPair.Snapshot().skeletonEnemies[0].z) >= 0.699f,
+          "the live skeleton pair must retain the deterministic 0.70 m separation");
+
+    const float distanceToA = std::hypot(skeletonPair.Snapshot().skeletonEnemies[0].x -
+                                         pairInput.authoritativePlayerX,
+                                         skeletonPair.Snapshot().skeletonEnemies[0].z -
+                                         pairInput.authoritativePlayerZ);
+    const float distanceToB = std::hypot(skeletonPair.Snapshot().skeletonEnemies[1].x -
+                                         pairInput.authoritativePlayerX,
+                                         skeletonPair.Snapshot().skeletonEnemies[1].z -
+                                         pairInput.authoritativePlayerZ);
+    const std::size_t expectedFirstTarget = distanceToA <= distanceToB ? 0u : 1u;
+    const std::size_t expectedSecondTarget = 1u - expectedFirstTarget;
+
+    pairInput.commands.attack = 1u;
+    for (int frame = 0; frame < 40 && skeletonPair.Snapshot().activeSkeletonCount == 2u; ++frame)
+    {
+        skeletonPair.AdvanceFrame(pairInput, 1.0 / 60.0);
+    }
+    check(skeletonPair.Snapshot().skeletonEnemies[expectedFirstTarget].dead &&
+          !skeletonPair.Snapshot().skeletonEnemies[expectedSecondTarget].dead &&
+          skeletonPair.Snapshot().activeSkeletonCount == 1u,
+          "one sword action must kill only the nearest valid skeleton");
+    const float defeatedX = skeletonPair.Snapshot().skeletonEnemies[expectedFirstTarget].x;
+    const float defeatedZ = skeletonPair.Snapshot().skeletonEnemies[expectedFirstTarget].z;
+    bool postDeathSeparationHeld = true;
+    for (int frame = 0; frame < 120; ++frame)
+    {
+        skeletonPair.AdvanceFrame(pairInput, 1.0 / 60.0);
+        postDeathSeparationHeld = postDeathSeparationHeld &&
+            std::hypot(skeletonPair.Snapshot().skeletonEnemies[1].x -
+                       skeletonPair.Snapshot().skeletonEnemies[0].x,
+                       skeletonPair.Snapshot().skeletonEnemies[1].z -
+                       skeletonPair.Snapshot().skeletonEnemies[0].z) >= 0.699f &&
+            NearlyEqual(skeletonPair.Snapshot().skeletonEnemies[expectedFirstTarget].x, defeatedX) &&
+            NearlyEqual(skeletonPair.Snapshot().skeletonEnemies[expectedFirstTarget].z, defeatedZ);
+    }
+    check(skeletonPair.Snapshot().skeletonEnemies[expectedFirstTarget].dead &&
+          !skeletonPair.Snapshot().skeletonEnemies[expectedSecondTarget].dead &&
+          postDeathSeparationHeld,
+          "a defeated skeleton must remain fixed while the survivor stays separated and world-valid");
+
+    pairInput.commands.attack = 2u;
+    for (int frame = 0; frame < 60 && !skeletonPair.Snapshot().openingEncounterComplete; ++frame)
+    {
+        skeletonPair.AdvanceFrame(pairInput, 1.0 / 60.0);
+    }
+    check(skeletonPair.Snapshot().openingEncounterComplete &&
+          skeletonPair.Snapshot().activeSkeletonCount == 0u &&
+          skeletonPair.Snapshot().enemyRoster.encounters[0].status == EncounterStatus::Dead,
+          "defeating both stable entities must complete the opening encounter");
+
+    std::array<EntityId, 2> defeatedTargets{};
+    std::size_t defeatedTargetCount = 0u;
+    std::uint64_t previousDefeatSequence = 0u;
+    bool orderedDistinctDefeats = true;
+    for (const GameplayEvent& event : skeletonPair.Events().Events())
+    {
+        if (event.type != GameplayEventType::EnemyDefeated)
+        {
+            continue;
+        }
+        orderedDistinctDefeats = orderedDistinctDefeats && event.sequence > previousDefeatSequence;
+        previousDefeatSequence = event.sequence;
+        if (defeatedTargetCount < defeatedTargets.size())
+        {
+            defeatedTargets[defeatedTargetCount++] = event.target;
+        }
+    }
+    check(defeatedTargetCount == 2u && orderedDistinctDefeats &&
+          defeatedTargets[0] == skeletonPair.Snapshot().skeletonEnemies[expectedFirstTarget].id &&
+          defeatedTargets[1] == skeletonPair.Snapshot().skeletonEnemies[expectedSecondTarget].id,
+          "ordered defeat events must retain distinct Skeleton A/B target identities");
+    std::array<EntityId, 2> swingTargets{};
+    std::size_t pairSwingCount = 0u;
+    for (const GameplayEvent& event : skeletonPair.Events().Events())
+    {
+        if (event.type == GameplayEventType::PlayerSwing && pairSwingCount < swingTargets.size())
+        {
+            swingTargets[pairSwingCount++] = event.target;
+        }
+    }
+    check(pairSwingCount == 2u &&
+          swingTargets[0] == skeletonPair.Snapshot().skeletonEnemies[expectedFirstTarget].id &&
+          swingTargets[1] == skeletonPair.Snapshot().skeletonEnemies[expectedSecondTarget].id,
+          "in-range swing events must identify the actual nearest A/B target in order");
+
+    pairInput.commands.retry = 1u;
+    skeletonPair.AdvanceFrame(pairInput, 1.0 / 60.0);
+    check(skeletonPair.Snapshot().activeSkeletonCount == 2u &&
+          !skeletonPair.Snapshot().openingEncounterComplete &&
+          NearlyEqual(skeletonPair.Snapshot().skeletonEnemies[0].x, -0.75f) &&
+          NearlyEqual(skeletonPair.Snapshot().skeletonEnemies[1].x, 0.75f),
+          "encounter retry must restore both skeletons at their authored spawns");
 
     GameSimulation damageEvents;
     InputSnapshot damageInput;
@@ -188,15 +309,46 @@ int main()
     GameSimulation resetParity;
     check(resetParity.ApplyShowcaseCheckpoint(0) &&
           NearlyEqual(resetParity.Snapshot().playerPitchRadians, -0.05f) &&
+          resetParity.Snapshot().skeletonEnemyCount == 1u &&
+          resetParity.Snapshot().activeSkeletonCount == 1u &&
+          NearlyEqual(resetParity.Snapshot().skeletonEnemies[0].x, 0.0f) &&
+          NearlyEqual(resetParity.Snapshot().skeletonEnemies[0].z, -4.65f) &&
           resetParity.Snapshot().swordCombat.enemyAnimation == EnemyAnimation::Walking &&
           NearlyEqual(resetParity.Snapshot().swordCombat.enemyAnimationTime, 0.0f) &&
           resetParity.Snapshot().tickIndex == 0u &&
           resetParity.Events().Empty(),
           "exact checkpoint 0 import must retain capture pitch and zero-time walking renderer state without a tick or event");
+    bool historicalCheckpointsRemainSingle = true;
+    for (std::int32_t checkpointId = 0; checkpointId < 12; ++checkpointId)
+    {
+        GameSimulation historicalCapture;
+        historicalCheckpointsRemainSingle = historicalCheckpointsRemainSingle &&
+            historicalCapture.ApplyShowcaseCheckpoint(checkpointId) &&
+            historicalCapture.Snapshot().skeletonEnemyCount == 1u &&
+            historicalCapture.Snapshot().activeSkeletonCount == 1u &&
+            NearlyEqual(historicalCapture.Snapshot().skeletonEnemies[0].x, 0.0f) &&
+            NearlyEqual(historicalCapture.Snapshot().skeletonEnemies[0].z, -4.65f);
+    }
+    check(historicalCheckpointsRemainSingle,
+          "all twelve historical authored checkpoints must retain the original one-skeleton capture state");
+    GameSimulation twoEnemyCapture;
+    check(twoEnemyCapture.ApplyShowcaseCheckpoint(12) &&
+          twoEnemyCapture.Snapshot().activeEnemyKind == EnemyKind::Skeleton &&
+          twoEnemyCapture.Snapshot().skeletonEnemyCount == 2u &&
+          twoEnemyCapture.Snapshot().activeSkeletonCount == 2u &&
+          NearlyEqual(twoEnemyCapture.Snapshot().skeletonEnemies[0].x, -0.75f) &&
+          NearlyEqual(twoEnemyCapture.Snapshot().skeletonEnemies[1].x, 0.75f) &&
+          twoEnemyCapture.Snapshot().tickIndex == 0u &&
+          twoEnemyCapture.Events().Empty(),
+          "two-enemy-combat checkpoint import must retain the exact fresh bounded pair without a tick or event");
     resetParity.ResetRoute();
-    check(NearlyEqual(resetParity.Snapshot().playerYawRadians, 0.0f) &&
+    check(resetParity.Snapshot().skeletonEnemyCount == 2u &&
+          resetParity.Snapshot().activeSkeletonCount == 2u &&
+          NearlyEqual(resetParity.Snapshot().skeletonEnemies[0].x, -0.75f) &&
+          NearlyEqual(resetParity.Snapshot().skeletonEnemies[1].x, 0.75f) &&
+          NearlyEqual(resetParity.Snapshot().playerYawRadians, 0.0f) &&
           NearlyEqual(resetParity.Snapshot().playerPitchRadians, 0.0f),
-          "live ResetRoute must override checkpoint pose with the configured zero yaw and pitch");
+          "live ResetRoute must restore the pair and override checkpoint pose with configured yaw and pitch");
 
     GameSimulation mirrorCapture;
     check(mirrorCapture.ApplyShowcaseCheckpoint(9),

@@ -19,9 +19,9 @@ The default run:
 - builds and installs the side-by-side debug package;
 - requires strict environment and lich ASTC selection;
 - requires a genuinely RT-produced frame to reach swapchain presentation;
-- measures `opening`, `worst-bend`, `skylight`, `green`, and `lich` at 75%;
+- measures `opening`, `two-enemy-combat`, `worst-bend`, `skylight`, `green`, and `lich` at 75%;
 - discards 120 warm-up frames, then records three consecutive 120-frame windows per checkpoint;
-- enforces the existing 20 ms median-of-window-averages gate for those five 75% checkpoints;
+- enforces the existing 20 ms median-of-window-averages gate for those six 75% checkpoints;
 - runs the deterministic 13-waypoint route through the finale;
 - checks the saved native state against the expected checkpoint, zone, window count, replay completion, and honest presentation state;
 - restores the screen to asleep if the script woke it, and always stops the debug app on exit.
@@ -39,12 +39,23 @@ Useful focused runs:
 .\tools\run-android-showcase-validation.ps1 -Mode Replay -SkipBuild -SkipInstall
 ```
 
+GPU timestamp queries remain enabled by default. For a matched instrumentation A/B, cool the phone back to the same thermal status and comparable reported temperatures before each run, use the same freshly built APK, checkpoint order, scale, and background state, and run separate cold app sessions:
+
+```powershell
+.\tools\run-android-showcase-validation.ps1 -Mode Benchmark -Scale 75 -Checkpoints lich -GpuTiming Enabled -SkipBuild
+.\tools\run-android-showcase-validation.ps1 -Mode Benchmark -Scale 75 -Checkpoints lich -GpuTiming Disabled -SkipBuild -SkipInstall
+.\tools\compare-android-gpu-timing-ab.ps1 -FirstRunDirectory <enabled-run> -SecondRunDirectory <disabled-run>
+```
+
+`Disabled` removes the per-frame query reset, timestamp writes, and result readback only. Native `vkCmdTraceRaysKHR`, ray-query shading, swapchain presentation, render scale, and the 20 ms CPU gate are unchanged. Each run hashes the local and installed APK and refuses an artifact mismatch; summaries also record commit/dirty state and the embedded raygen hash. The comparator requires one enabled and one disabled run with matching artifact/device/scale/checkpoint provenance, AP/SKIN/BAT starting temperatures within 2 C by default, the 20 ms gate, and no enabled-versus-disabled regression above the 15% investigation threshold.
+
 ## Named checkpoints
 
 | Name | Expected state |
 |---|---|
 | `opening` | Fresh opening state |
 | `skeleton` | Fresh skeleton-room encounter view |
+| `two-enemy-combat` | Fresh two-skeleton encounter at its deterministic measurement pose |
 | `worst-bend` | Fresh zig-zag corner |
 | `lantern-drop` | Lantern failure triggered |
 | `skylight` | Lantern settled; skylight chamber |
@@ -60,12 +71,12 @@ Checkpoint state is constructed through the shared gameplay state machines rathe
 Each run creates a unique ignored working directory under `reports/android-showcase-runs/run-<timestamp>/` containing:
 
 - `validation.md` and `summary.json`;
-- `timing.csv` with three 120-frame averages, median, derived FPS, thermal status, and battery temperature;
+- `timing.csv` with three 120-frame averages, median, derived FPS, thermal status, battery temperature, and GPU instrumentation mode;
 - one native checkpoint-state JSON file per measured view;
 - deterministic replay state;
 - scoped `logcat.txt`;
 - private Vulkan capability reports;
-- APK hash, package/build/device properties, and before/after raw battery and thermal dumps;
+- matching local/installed APK hashes, source commit/dirty state, embedded raygen hash, package/build/device properties, and before/after raw battery and thermal dumps;
 - optional fixed checkpoint screenshots.
 
 `reports/` is Git-ignored so routine runs do not dirty the repository. Promote only a reviewed result into a dated `docs/` validation record when it represents a milestone or release gate.
@@ -78,12 +89,12 @@ The route replay uses the same shared walkable rectangles, obstacles, collision 
 
 It does not prove that touch controls feel good, that sound is audible or directional to a listener, that a screenshot looks artistically correct, or that lifecycle recovery works. Keep these short hands-on checks after meaningful input, audio, rendering, or lifecycle changes:
 
-1. Walk and look with both touch regions; swing three accepted hits against the lich.
-2. Confirm player and skeleton footsteps, lich hit cries, charge/electricity, recoil, death, and the moving roof.
+1. Walk and look with both touch regions; fight both opening skeletons, then swing three accepted hits against the lich.
+2. Confirm the two skeletons remain readable, have distinguishable positional audio/haptic impacts, preserve corpse/survivor separation, and still retain the lich hit cries, charge/electricity, recoil, death, and moving roof.
 3. Inspect zig-zag seams, lantern drop, skylight depth, four light colours, mirror exposure, wet floor, player shadow, and prop wall retraction.
 4. Exercise pause/resume and Home/surface recreation.
 5. Confirm the phone remains comfortable and responsive at the recommended 75% tier.
 
 ## Current validation status
 
-The shared checkpoint builders and route replay pass Windows host smoke tests. Android Debug and Release APKs compile with the automation enabled only for Debug. The first full live execution and a second corrected fast execution both passed on `SM-S948B`; see `ANDROID_SHOWCASE_AUTOMATION_VALIDATION_2026-07-17.md`. The previously completed hands-on Android showcase validation remains recorded separately in `HORDE_SHOWCASE_ANDROID_VALIDATION_2026-07-17.md`.
+The original shared checkpoint builders and route replay pass Windows host smoke tests. Android Debug and Release APKs compile with the automation enabled only for Debug. The first full live execution and a second corrected fast execution both passed on `SM-S948B`; see `ANDROID_SHOWCASE_AUTOMATION_VALIDATION_2026-07-17.md`. The two-enemy checkpoint and GPU-timing A/B extensions require a fresh device run before they carry Android evidence. The previously completed hands-on Android showcase validation remains recorded separately in `HORDE_SHOWCASE_ANDROID_VALIDATION_2026-07-17.md`.

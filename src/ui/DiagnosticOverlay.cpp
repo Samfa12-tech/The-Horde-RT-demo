@@ -64,6 +64,16 @@ std::string BuildDeveloperOverlayText(const DeveloperOverlaySnapshot& snapshot)
         << '/' << snapshot.consumedRetrySequence << '\n';
     out << "AS " << snapshot.blasCount << " BLAS / " << snapshot.tlasCount << " TLAS / "
         << snapshot.tlasInstanceCount << " inst  |  skinned " << snapshot.activeSkinnedEnemies << '\n';
+    out << "COMBAT " << snapshot.activeEnemyEntityCount << " active  |  attacker ";
+    if (snapshot.attackerEntityId >= 0)
+    {
+        out << snapshot.attackerEntityId;
+    }
+    else
+    {
+        out << "none";
+    }
+    out << "  |  pose buckets " << snapshot.skeletonPoseBucketCount << '\n';
     out << "MAT " << snapshot.materialEncoding;
     return out.str();
 }

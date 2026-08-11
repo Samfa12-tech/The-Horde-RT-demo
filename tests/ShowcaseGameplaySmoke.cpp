@@ -95,10 +95,16 @@ int main()
 
     const ShowcaseCheckpoint* skeletonRetry = FindShowcaseCheckpoint(0);
     const ShowcaseCheckpoint* lichRetry = FindShowcaseCheckpoint(9);
+    const ShowcaseCheckpoint* twoEnemyCombat = FindShowcaseCheckpoint("two-enemy-combat");
     check(skeletonRetry != nullptr && std::string(skeletonRetry->name) == "opening",
           "skeleton retry must use the safe opening checkpoint");
     check(lichRetry != nullptr && std::string(lichRetry->name) == "mirror",
           "lich retry must use the mirror checkpoint rather than the close inspection point");
+    check(twoEnemyCombat != nullptr && twoEnemyCombat->id == 12 &&
+              twoEnemyCombat->preset == ShowcaseCheckpointPreset::TwoSkeletonCombat &&
+              NearlyEqual(twoEnemyCombat->x, 0.0f) && NearlyEqual(twoEnemyCombat->z, -3.50f) &&
+              NearlyEqual(twoEnemyCombat->yaw, 0.0f),
+          "two-enemy combat checkpoint must retain its named deterministic measurement pose");
     if (skeletonRetry != nullptr && lichRetry != nullptr)
     {
         const ShowcaseCheckpointState skeletonRetryState = BuildShowcaseCheckpointState(*skeletonRetry);

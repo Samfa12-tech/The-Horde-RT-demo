@@ -69,6 +69,7 @@ public class MainActivity extends Activity {
     private static final String EXTRA_DEBUG_SCALE = "horde.debug.scale";
     private static final String EXTRA_DEBUG_AUTOSTART = "horde.debug.autostart";
     private static final String EXTRA_DEBUG_OVERLAY = "horde.debug.overlay";
+    private static final String EXTRA_DEBUG_GPU_TIMING = "horde.debug.gpu_timing";
     private static final String DEBUG_RETRY_ACTION =
             "com.samfa12.hordelanternrt.DEBUG_RETRY_ENCOUNTER";
     private static final int REQUEST_SAVE_BENCHMARK = 7101;
@@ -934,6 +935,7 @@ public class MainActivity extends Activity {
             case "mirror": return 9;
             case "lich": return 10;
             case "finale-roof": return 11;
+            case "two-enemy-combat": return 12;
             default: return -1;
         }
     }
@@ -956,6 +958,8 @@ public class MainActivity extends Activity {
         if (intent.hasExtra(EXTRA_DEBUG_OVERLAY)) {
             developerOverlayVisible = intent.getBooleanExtra(EXTRA_DEBUG_OVERLAY, false);
         }
+        final boolean gpuTimingEnabled = intent.getBooleanExtra(EXTRA_DEBUG_GPU_TIMING, true);
+        ProbeBridge.setGpuTimingEnabled(gpuTimingEnabled);
         if (requestedCheckpoint >= 0) {
             pendingDebugCheckpoint = requestedCheckpoint;
             pendingDebugCapture = requestedCapture;
@@ -969,7 +973,8 @@ public class MainActivity extends Activity {
                 requestedCheckpoint >= 0 || requestedReplay;
         if (debugAutomationAutostart) {
             Log.i(TAG, "Accepted debug automation intent: checkpoint=" + requestedCheckpoint +
-                    " capture=" + requestedCapture + " replay=" + requestedReplay + " scale=" + requestedScale);
+                    " capture=" + requestedCapture + " replay=" + requestedReplay + " scale=" + requestedScale +
+                    " gpuTiming=" + (gpuTimingEnabled ? "enabled" : "disabled"));
         }
     }
 
@@ -1030,6 +1035,7 @@ public class MainActivity extends Activity {
             case 9: viewControls[0] = -1.5707963f; viewControls[1] = 0.0f; break;
             case 10: viewControls[0] = 2.52f; viewControls[1] = 0.0f; break;
             case 11: viewControls[0] = 1.5707963f; viewControls[1] = 0.28f; break;
+            case 12: viewControls[0] = 0.0f; viewControls[1] = 0.0f; break;
             default: break;
         }
     }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cstdint>
 
 #include "gameplay/ShowcaseGameplay.h"
@@ -72,7 +73,7 @@ private:
     LichEncounter lichEncounter_{};
     PlayerVitals playerVitals_{};
     TravelFootstepCadence playerFootsteps_{};
-    PlayerFootstepCadence enemyFootsteps_{};
+    std::array<PlayerFootstepCadence, kSkeletonEnemyCapacity> enemyFootsteps_{};
     CombatSnapshot combatSnapshot_{};
     LanternSnapshot lanternSnapshot_{};
     EnemyKind activeEnemyKind_ = EnemyKind::Skeleton;

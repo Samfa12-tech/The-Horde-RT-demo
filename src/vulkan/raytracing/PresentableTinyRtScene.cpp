@@ -1743,81 +1743,108 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     {
         return false;
     }
-    auto& skeletonGpu = characterSlot_.SkeletonGpu();
     auto& lichGpu = characterSlot_.LichGpu();
-    auto& skeletonVertexBuffer_ = skeletonGpu.vertices;
-    auto& skeletonBlas_ = skeletonGpu.accelerationStructure;
-    auto& skeletonBlasUpdateScratch_ = skeletonGpu.updateScratch;
     auto& lichVertexBuffer_ = lichGpu.vertices;
     auto& lichBlas_ = lichGpu.accelerationStructure;
     auto& lichBlasUpdateScratch_ = lichGpu.updateScratch;
-    const auto& skeletonSkinnedVertices_ = characterSlot_.SkeletonVertices();
     const auto& lichSkinnedVertices_ = characterSlot_.LichVertices();
-    skeletonGpu.vertexStride = sizeof(horde::scene::SkinnedRtVertex);
-    skeletonGpu.vertexCount = static_cast<std::uint32_t>(skeletonSkinnedVertices_.size());
     lichGpu.vertexStride = sizeof(horde::scene::TexturedSkinnedRtVertex);
     lichGpu.vertexCount = static_cast<std::uint32_t>(lichSkinnedVertices_.size());
-    const VkDeviceSize skeletonVertexBufferSize = sizeof(horde::scene::SkinnedRtVertex) * skeletonSkinnedVertices_.size();
-    if (!CreateBuffer(skeletonVertexBufferSize,
-                      VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                      uploadMemory,
-                      true,
-                      skeletonVertexBuffer_,
-                      diagnostic))
+    for (std::size_t bucket = 0u; bucket < CharacterRenderSlot::kMaximumSkeletonPoseBuckets; ++bucket)
     {
-        return false;
-    }
-    if (!WriteBuffer(skeletonVertexBuffer_, skeletonSkinnedVertices_.data(), skeletonVertexBufferSize,
-                     "skeleton vertex", diagnostic))
-    {
-        return false;
-    }
+        auto& skeletonGpu = characterSlot_.SkeletonGpu(bucket);
+        const auto& skeletonVertices = characterSlot_.SkeletonVertices(bucket);
+        skeletonGpu.vertexStride = sizeof(horde::scene::SkinnedRtVertex);
+        skeletonGpu.vertexCount = static_cast<std::uint32_t>(skeletonVertices.size());
+        const VkDeviceSize skeletonVertexBufferSize =
+            sizeof(horde::scene::SkinnedRtVertex) * skeletonVertices.size();
+        if (!CreateBuffer(skeletonVertexBufferSize,
+                          VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR |
+                              VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                          uploadMemory,
+                          true,
+                          skeletonGpu.vertices,
+                          diagnostic) ||
+            !WriteBuffer(skeletonGpu.vertices,
+                         skeletonVertices.data(),
+                         skeletonVertexBufferSize,
+                         bucket == 0u ? "skeleton pose 0 vertex" : "skeleton pose 1 vertex",
+                         diagnostic))
+        {
+            return false;
+        }
 
-    VkAccelerationStructureGeometryKHR skeletonGeometry{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
-    skeletonGeometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
-    skeletonGeometry.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
-    skeletonGeometry.geometry.triangles.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
-    skeletonGeometry.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
-    skeletonGeometry.geometry.triangles.vertexData.deviceAddress = skeletonVertexBuffer_.address;
-    skeletonGeometry.geometry.triangles.vertexStride = sizeof(horde::scene::SkinnedRtVertex);
-    skeletonGeometry.geometry.triangles.maxVertex = static_cast<std::uint32_t>(skeletonSkinnedVertices_.size() - 1u);
-    skeletonGeometry.geometry.triangles.indexType = VK_INDEX_TYPE_NONE_KHR;
-    skeletonGeometry.geometry.triangles.transformData.deviceAddress = 0u;
-    const std::uint32_t skeletonPrimitiveCount = static_cast<std::uint32_t>(skeletonSkinnedVertices_.size() / 3u);
-    VkAccelerationStructureBuildGeometryInfoKHR skeletonBuildInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR};
-    skeletonBuildInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
-    skeletonBuildInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR | VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_KHR;
-    skeletonBuildInfo.geometryCount = 1u;
-    skeletonBuildInfo.pGeometries = &skeletonGeometry;
-    VkAccelerationStructureBuildSizesInfoKHR skeletonSizes{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR};
-    vkGetAccelerationStructureBuildSizesKHR_(device_, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &skeletonBuildInfo, &skeletonPrimitiveCount, &skeletonSizes);
-    if (!CreateBuffer(skeletonSizes.accelerationStructureSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, true, skeletonBlas_.backing, diagnostic))
-    {
-        return false;
+        VkAccelerationStructureGeometryKHR skeletonGeometry{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
+        skeletonGeometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
+        skeletonGeometry.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
+        skeletonGeometry.geometry.triangles.sType =
+            VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
+        skeletonGeometry.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
+        skeletonGeometry.geometry.triangles.vertexData.deviceAddress = skeletonGpu.vertices.address;
+        skeletonGeometry.geometry.triangles.vertexStride = sizeof(horde::scene::SkinnedRtVertex);
+        skeletonGeometry.geometry.triangles.maxVertex =
+            static_cast<std::uint32_t>(skeletonVertices.size() - 1u);
+        skeletonGeometry.geometry.triangles.indexType = VK_INDEX_TYPE_NONE_KHR;
+        const std::uint32_t skeletonPrimitiveCount =
+            static_cast<std::uint32_t>(skeletonVertices.size() / 3u);
+        VkAccelerationStructureBuildGeometryInfoKHR skeletonBuildInfo{
+            VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR};
+        skeletonBuildInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+        skeletonBuildInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR |
+                                  VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_KHR;
+        skeletonBuildInfo.geometryCount = 1u;
+        skeletonBuildInfo.pGeometries = &skeletonGeometry;
+        VkAccelerationStructureBuildSizesInfoKHR skeletonSizes{
+            VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR};
+        vkGetAccelerationStructureBuildSizesKHR_(device_,
+                                                 VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR,
+                                                 &skeletonBuildInfo,
+                                                 &skeletonPrimitiveCount,
+                                                 &skeletonSizes);
+        if (!CreateBuffer(skeletonSizes.accelerationStructureSize,
+                          VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR,
+                          VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                          true,
+                          skeletonGpu.accelerationStructure.backing,
+                          diagnostic))
+        {
+            return false;
+        }
+        VkAccelerationStructureCreateInfoKHR skeletonCreateInfo{
+            VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR};
+        skeletonCreateInfo.buffer = skeletonGpu.accelerationStructure.backing.buffer;
+        skeletonCreateInfo.size = skeletonSizes.accelerationStructureSize;
+        skeletonCreateInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+        if (vkCreateAccelerationStructureKHR_(device_,
+                                              &skeletonCreateInfo,
+                                              nullptr,
+                                              &skeletonGpu.accelerationStructure.handle) != VK_SUCCESS)
+        {
+            diagnostic = "Failed to create animated skeleton pose BLAS.";
+            return false;
+        }
+        if (!CreateBuffer(std::max(skeletonSizes.buildScratchSize, skeletonSizes.updateScratchSize),
+                          VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                          VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                          true,
+                          skeletonGpu.updateScratch,
+                          diagnostic))
+        {
+            return false;
+        }
+        VkAccelerationStructureBuildRangeInfoKHR skeletonRange{};
+        skeletonRange.primitiveCount = skeletonPrimitiveCount;
+        skeletonBuildInfo.dstAccelerationStructure = skeletonGpu.accelerationStructure.handle;
+        skeletonBuildInfo.scratchData.deviceAddress = skeletonGpu.updateScratch.address;
+        const VkAccelerationStructureBuildRangeInfoKHR* skeletonRanges[] = {&skeletonRange};
+        BlasBuildData skeletonBuildData{this, &skeletonBuildInfo, skeletonRanges};
+        if (!RunOneTimeCommands(buildBlas, &skeletonBuildData, diagnostic)) return false;
+        VkAccelerationStructureDeviceAddressInfoKHR skeletonAddressInfo{
+            VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR};
+        skeletonAddressInfo.accelerationStructure = skeletonGpu.accelerationStructure.handle;
+        skeletonGpu.accelerationStructure.address =
+            vkGetAccelerationStructureDeviceAddressKHR_(device_, &skeletonAddressInfo);
     }
-    VkAccelerationStructureCreateInfoKHR skeletonCreateInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR};
-    skeletonCreateInfo.buffer = skeletonBlas_.backing.buffer;
-    skeletonCreateInfo.size = skeletonSizes.accelerationStructureSize;
-    skeletonCreateInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
-    if (vkCreateAccelerationStructureKHR_(device_, &skeletonCreateInfo, nullptr, &skeletonBlas_.handle) != VK_SUCCESS)
-    {
-        diagnostic = "Failed to create animated skeleton BLAS.";
-        return false;
-    }
-    if (!CreateBuffer(std::max(skeletonSizes.buildScratchSize, skeletonSizes.updateScratchSize), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, true, skeletonBlasUpdateScratch_, diagnostic))
-    {
-        return false;
-    }
-    VkAccelerationStructureBuildRangeInfoKHR skeletonRange{};
-    skeletonRange.primitiveCount = skeletonPrimitiveCount;
-    skeletonBuildInfo.dstAccelerationStructure = skeletonBlas_.handle;
-    skeletonBuildInfo.scratchData.deviceAddress = skeletonBlasUpdateScratch_.address;
-    const VkAccelerationStructureBuildRangeInfoKHR* skeletonRanges[] = {&skeletonRange};
-    BlasBuildData skeletonBuildData{this, &skeletonBuildInfo, skeletonRanges};
-    if (!RunOneTimeCommands(buildBlas, &skeletonBuildData, diagnostic)) return false;
-    VkAccelerationStructureDeviceAddressInfoKHR skeletonAddressInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR};
-    skeletonAddressInfo.accelerationStructure = skeletonBlas_.handle;
-    skeletonBlas_.address = vkGetAccelerationStructureDeviceAddressKHR_(device_, &skeletonAddressInfo);
 
     const VkDeviceSize lichVertexBufferSize = sizeof(horde::scene::TexturedSkinnedRtVertex) * lichSkinnedVertices_.size();
     if (!CreateBuffer(lichVertexBufferSize,
@@ -1911,7 +1938,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     instances[2] = instances[0];
     instances[2].instanceCustomIndex = 2u;
     instances[2].mask = 0x01u;
-    instances[2].accelerationStructureReference = skeletonBlas_.address;
+    instances[2].accelerationStructureReference = characterSlot_.SkeletonGpu(0u).accelerationStructure.address;
     instances[2].transform = {{
         1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f, -0.95f,
@@ -1931,7 +1958,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f, 0.58f,
         0.0f, 0.0f, 1.0f, 0.0f}};
-    for (std::size_t i = 5u; i < instances.size(); ++i)
+    for (std::size_t i = 5u; i <= 16u; ++i)
     {
         instances[i] = instances[4];
         instances[i].instanceCustomIndex = static_cast<std::uint32_t>(i);
@@ -1948,6 +1975,9 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     instances[17].instanceCustomIndex = 17u;
     instances[17].mask = 0x20u;
     instances[17].accelerationStructureReference = finaleRoofBlas_.address;
+    instances[18] = instances[2];
+    instances[18].instanceCustomIndex = CharacterRenderSlot::kSecondSkeletonTlasInstanceIndex;
+    instances[18].mask = 0u;
     if (!CreateBuffer(sizeof(instances), VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, instanceBuffer_, diagnostic))
     {
         return false;
@@ -2023,9 +2053,10 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
 
 bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
 {
-    const auto& skeletonVertexBuffer_ = characterSlot_.SkeletonGpu().vertices;
+    const auto& skeletonVertexBuffer_ = characterSlot_.SkeletonGpu(0u).vertices;
+    const auto& secondSkeletonVertexBuffer = characterSlot_.SkeletonGpu(1u).vertices;
     const auto& lichVertexBuffer_ = characterSlot_.LichGpu().vertices;
-    const std::array<VkDescriptorSetLayoutBinding, 10u> bindings{{
+    const std::array<VkDescriptorSetLayoutBinding, 11u> bindings{{
         {0u, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, nullptr},
         {1u, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
         {2u, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
@@ -2036,6 +2067,7 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
         {7u, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
         {8u, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
         {9u, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
+        {10u, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
     }};
     const VkDescriptorSetLayoutCreateInfo layoutInfo{
         VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
@@ -2052,7 +2084,7 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
     const std::array<VkDescriptorPoolSize, 4u> poolSizes{{
         {VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1u},
         {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1u},
-        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 3u},
+        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 4u},
         {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 5u},
     }};
     const VkDescriptorPoolCreateInfo poolInfo{
@@ -2111,6 +2143,17 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
     skeletonWrite.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     skeletonWrite.pBufferInfo = &skeletonBufferInfo;
 
+    VkDescriptorBufferInfo secondSkeletonBufferInfo{};
+    secondSkeletonBufferInfo.buffer = secondSkeletonVertexBuffer.buffer;
+    secondSkeletonBufferInfo.offset = 0u;
+    secondSkeletonBufferInfo.range = secondSkeletonVertexBuffer.size;
+    VkWriteDescriptorSet secondSkeletonWrite{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
+    secondSkeletonWrite.dstSet = descriptorSet_;
+    secondSkeletonWrite.dstBinding = 10u;
+    secondSkeletonWrite.descriptorCount = 1u;
+    secondSkeletonWrite.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    secondSkeletonWrite.pBufferInfo = &secondSkeletonBufferInfo;
+
     VkDescriptorBufferInfo lichBufferInfo{};
     lichBufferInfo.buffer = lichVertexBuffer_.buffer;
     lichBufferInfo.offset = 0u;
@@ -2147,10 +2190,11 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
         write.pImageInfo = info;
         return write;
     };
-    const std::array<VkWriteDescriptorSet, 10u> writes{{accelerationStructureWrite, imageWrite, skeletonWrite,
+    const std::array<VkWriteDescriptorSet, 11u> writes{{accelerationStructureWrite, imageWrite, skeletonWrite,
                                                        sampledWrite(3u, &diffuseInfo), sampledWrite(4u, &normalInfo), sampledWrite(5u, &armInfo),
                                                        worldSurfaceWrite, lichBufferWrite,
-                                                       sampledWrite(8u, &lichBaseInfo), sampledWrite(9u, &lichEmissiveInfo)}};
+                                                       sampledWrite(8u, &lichBaseInfo), sampledWrite(9u, &lichEmissiveInfo),
+                                                       secondSkeletonWrite}};
     vkUpdateDescriptorSets(device_, static_cast<std::uint32_t>(writes.size()), writes.data(), 0u, nullptr);
 
     diagnostic.clear();
@@ -2326,15 +2370,19 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const horde::gameplay::LanternSnapshot& lantern = frame.lantern;
     const horde::gameplay::EnemyRosterSnapshot& roster = frame.roster;
     const horde::gameplay::LichSnapshot& lich = frame.lich;
-    const auto& skeletonGpu = characterSlot_.SkeletonGpu();
+    const auto& skeletonGpu = characterSlot_.SkeletonGpu(0u);
+    const auto& secondSkeletonGpu = characterSlot_.SkeletonGpu(1u);
     const auto& lichGpu = characterSlot_.LichGpu();
     if (instanceBuffer_.memory == VK_NULL_HANDLE || skeletonGpu.vertices.memory == VK_NULL_HANDLE ||
+        secondSkeletonGpu.vertices.memory == VK_NULL_HANDLE ||
         skeletonGpu.accelerationStructure.handle == VK_NULL_HANDLE ||
+        secondSkeletonGpu.accelerationStructure.handle == VK_NULL_HANDLE ||
         lichGpu.accelerationStructure.handle == VK_NULL_HANDLE ||
         finaleRoofBlas_.handle == VK_NULL_HANDLE ||
         swordBlas_.handle == VK_NULL_HANDLE ||
         playerBodyBlas_.handle == VK_NULL_HANDLE || playerLimbBlas_.handle == VK_NULL_HANDLE ||
         tlas_.handle == VK_NULL_HANDLE || skeletonGpu.updateScratch.address == 0u ||
+        secondSkeletonGpu.updateScratch.address == 0u ||
         lichGpu.updateScratch.address == 0u || tlasUpdateScratch_.address == 0u)
     {
         diagnostic = "Combat skeleton or held-prop TLAS resources are unavailable.";
@@ -2500,20 +2548,24 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     // Local sword grip is (1.47, -0.485, 0), so T = hand - M * grip.
     const Vec3 swordTranslation = add(add(rightHand, scaled(swordColumnX, -1.47f)), scaled(swordColumnY, 0.485f));
 
-    if (!characterSlot_.PrepareFrame(combat, roster, lich, gpuResources_, diagnostic))
+    if (!characterSlot_.PrepareFrame(frame.skeletonEnemies,
+                                     frame.skeletonEnemyCount,
+                                     roster,
+                                     lich,
+                                     gpuResources_,
+                                     diagnostic))
     {
         return false;
     }
     const CharacterBlasRefit pendingCharacterRefit = characterSlot_.PendingRefit();
-    const bool updateSkeleton = pendingCharacterRefit == CharacterBlasRefit::Skeleton;
-    const bool updateLich = pendingCharacterRefit == CharacterBlasRefit::Lich;
-    const auto& skeletonVertexBuffer_ = skeletonGpu.vertices;
-    const auto& skeletonBlas_ = skeletonGpu.accelerationStructure;
-    const auto& skeletonBlasUpdateScratch_ = skeletonGpu.updateScratch;
+    const bool updateSkeletonPose0 =
+        HasCharacterBlasRefit(pendingCharacterRefit, CharacterBlasRefit::SkeletonPose0);
+    const bool updateSkeletonPose1 =
+        HasCharacterBlasRefit(pendingCharacterRefit, CharacterBlasRefit::SkeletonPose1);
+    const bool updateLich = HasCharacterBlasRefit(pendingCharacterRefit, CharacterBlasRefit::Lich);
     const auto& lichVertexBuffer_ = lichGpu.vertices;
     const auto& lichBlas_ = lichGpu.accelerationStructure;
     const auto& lichBlasUpdateScratch_ = lichGpu.updateScratch;
-    const auto& skeletonSkinnedVertices_ = characterSlot_.SkeletonVertices();
     const auto& lichSkinnedVertices_ = characterSlot_.LichVertices();
 
     std::array<VkAccelerationStructureInstanceKHR, PresentableTinyRtScene::kTlasInstanceCount> instances{};
@@ -2533,7 +2585,9 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     instances[1].instanceCustomIndex = 1u;
     instances[1].mask = 0x02u;
     instances[1].accelerationStructureReference = torchBlas_.address;
-    instances[CharacterRenderSlot::kTlasInstanceIndex] = characterSlot_.BuildActiveInstance(combat, roster, lich);
+    const auto characterInstances = characterSlot_.BuildActiveInstances(
+        frame.skeletonEnemies, frame.skeletonEnemyCount, roster, lich);
+    instances[CharacterRenderSlot::kTlasInstanceIndex] = characterInstances[0];
     instances[3] = instances[1];
     instances[3].instanceCustomIndex = 3u;
     instances[3].mask = 0x02u;
@@ -2553,7 +2607,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         animatedBodyRight[0], 0.0f, animatedBodyForward[0], animatedBodyOrigin[0],
         animatedBodyRight[1], 1.0f, animatedBodyForward[1], animatedBodyOrigin[1],
         animatedBodyRight[2], 0.0f, animatedBodyForward[2], animatedBodyOrigin[2]}};
-    for (std::size_t i = 5u; i < instances.size(); ++i)
+    for (std::size_t i = 5u; i <= 16u; ++i)
     {
         instances[i] = instances[4];
         instances[i].instanceCustomIndex = static_cast<std::uint32_t>(i);
@@ -2611,6 +2665,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         1.0f, 0.0f, 0.0f, -2.72f * std::clamp(lich.finaleSkylightOpenProgress, 0.0f, 1.0f),
         0.0f, 1.0f, 0.0f, 0.0f,
         0.0f, 0.0f, 1.0f, 0.0f}};
+    instances[CharacterRenderSlot::kSecondSkeletonTlasInstanceIndex] = characterInstances[1];
     if (!WriteBuffer(instanceBuffer_, instances.data(), sizeof(instances), "animated TLAS instance", diagnostic))
     {
         return false;
@@ -2631,36 +2686,48 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                          0u,
                          nullptr);
 
-    if (updateSkeleton)
+    for (std::size_t bucket = 0u; bucket < CharacterRenderSlot::kMaximumSkeletonPoseBuckets; ++bucket)
     {
+        const bool updateBucket = bucket == 0u ? updateSkeletonPose0 : updateSkeletonPose1;
+        if (!updateBucket)
+        {
+            continue;
+        }
+        const auto& skeletonBucketGpu = characterSlot_.SkeletonGpu(bucket);
+        const auto& skeletonVertices = characterSlot_.SkeletonVertices(bucket);
         VkAccelerationStructureGeometryKHR skeletonGeometry{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
         skeletonGeometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
         skeletonGeometry.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
         skeletonGeometry.geometry.triangles.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
         skeletonGeometry.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
-        skeletonGeometry.geometry.triangles.vertexData.deviceAddress = skeletonVertexBuffer_.address;
+        skeletonGeometry.geometry.triangles.vertexData.deviceAddress = skeletonBucketGpu.vertices.address;
         skeletonGeometry.geometry.triangles.vertexStride = sizeof(horde::scene::SkinnedRtVertex);
-        skeletonGeometry.geometry.triangles.maxVertex = static_cast<std::uint32_t>(skeletonSkinnedVertices_.size() - 1u);
+        skeletonGeometry.geometry.triangles.maxVertex = static_cast<std::uint32_t>(skeletonVertices.size() - 1u);
         skeletonGeometry.geometry.triangles.indexType = VK_INDEX_TYPE_NONE_KHR;
         VkAccelerationStructureBuildGeometryInfoKHR skeletonUpdateInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR};
         skeletonUpdateInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
         skeletonUpdateInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR | VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_KHR;
         skeletonUpdateInfo.mode = VK_BUILD_ACCELERATION_STRUCTURE_MODE_UPDATE_KHR;
-        skeletonUpdateInfo.srcAccelerationStructure = skeletonBlas_.handle;
-        skeletonUpdateInfo.dstAccelerationStructure = skeletonBlas_.handle;
+        skeletonUpdateInfo.srcAccelerationStructure = skeletonBucketGpu.accelerationStructure.handle;
+        skeletonUpdateInfo.dstAccelerationStructure = skeletonBucketGpu.accelerationStructure.handle;
         skeletonUpdateInfo.geometryCount = 1u;
         skeletonUpdateInfo.pGeometries = &skeletonGeometry;
-        skeletonUpdateInfo.scratchData.deviceAddress = skeletonBlasUpdateScratch_.address;
+        skeletonUpdateInfo.scratchData.deviceAddress = skeletonBucketGpu.updateScratch.address;
         VkAccelerationStructureBuildRangeInfoKHR skeletonRange{};
-        skeletonRange.primitiveCount = static_cast<std::uint32_t>(skeletonSkinnedVertices_.size() / 3u);
+        skeletonRange.primitiveCount = static_cast<std::uint32_t>(skeletonVertices.size() / 3u);
         const VkAccelerationStructureBuildRangeInfoKHR* skeletonRanges[] = {&skeletonRange};
         vkCmdBuildAccelerationStructuresKHR_(commandBuffer, 1u, &skeletonUpdateInfo, skeletonRanges);
 
+    }
+
+    if (updateSkeletonPose0 || updateSkeletonPose1)
+    {
         VkMemoryBarrier skeletonBuildBarrier{VK_STRUCTURE_TYPE_MEMORY_BARRIER};
         skeletonBuildBarrier.srcAccessMask = VK_ACCESS_ACCELERATION_STRUCTURE_WRITE_BIT_KHR;
         skeletonBuildBarrier.dstAccessMask = VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR;
         vkCmdPipelineBarrier(commandBuffer,
-                             VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR | VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
+                             VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR |
+                                 VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
                              VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR,
                              0u,
                              1u,

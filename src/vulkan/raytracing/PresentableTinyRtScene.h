@@ -26,6 +26,9 @@ struct RtSceneFrameInputs
     float walkAmount = 0.0f;
     float outputExposure = 0.92f;
     horde::gameplay::CombatSnapshot combat{};
+    std::array<horde::gameplay::simulation::SkeletonEnemySnapshot,
+               horde::gameplay::simulation::kSkeletonEnemyCapacity> skeletonEnemies{};
+    std::size_t skeletonEnemyCount = 0u;
     horde::gameplay::LanternSnapshot lantern{};
     horde::gameplay::EnemyRosterSnapshot roster{};
     horde::gameplay::LichSnapshot lich{};
@@ -42,9 +45,9 @@ public:
         std::vector<std::uint8_t> rgba;
     };
 
-    static constexpr std::uint32_t kBlasCount = 8u;
+    static constexpr std::uint32_t kBlasCount = 9u;
     static constexpr std::uint32_t kTlasCount = 1u;
-    static constexpr std::uint32_t kTlasInstanceCount = 18u;
+    static constexpr std::uint32_t kTlasInstanceCount = 19u;
 
     PresentableTinyRtScene() = default;
     ~PresentableTinyRtScene();
@@ -75,6 +78,7 @@ public:
     std::uint32_t BlasCount() const { return ready_ ? kBlasCount : 0u; }
     std::uint32_t TlasCount() const { return ready_ ? kTlasCount : 0u; }
     std::uint32_t TlasInstanceCount() const { return ready_ ? kTlasInstanceCount : 0u; }
+    std::size_t SkeletonPoseBucketCount() const { return characterSlot_.SkeletonPoseBucketCount(); }
 
     bool RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                             VkImage swapchainImage,
