@@ -36,7 +36,7 @@ Existing CPU frame time, FPS, benchmark schema, benchmark pass/fail, Android che
 ## Focused tests
 
 - `horde_rt_gpu_timestamp_math_tests` covers ordinary conversion, 16/32/36/48/64-bit masking and wrap, zero duration, invalid bit widths/periods, and non-finite results.
-- `horde_rt_character_render_slot_smoke` covers historical skeleton/lich clip and transform mapping, 30 Hz refresh cadence, exact asset vertex counts, the audited staff sample, rejection of a two-character roster, and rejection of selected/active roster mismatch.
+- `horde_rt_character_render_slot_smoke` covers historical skeleton/lich clip and transform mapping, 30 Hz refresh cadence, exact asset vertex counts, the audited staff sample, rejection of an active count above one, acceptance of spare roster capacity, and rejection of selected/active roster mismatch.
 - `horde_rt_developer_overlay_smoke` covers available and unavailable GPU text plus the compile-time `Available -> ResultUnavailable/QueryError` current-sample contract.
 - Fresh Windows Debug and Release each passed 12/12 CTests. The separate Vulkan-off Release lane passed 8/8 host tests, including timestamp math.
 
@@ -65,6 +65,10 @@ On Android 16/API 36, the Adreno 840 (driver 512.842.19, Vulkan 1.4.295) selecte
 
 This was not a full performance pass. Ordered 75% CPU medians were 10.327 / 7.109 / 8.353 / 11.220 / 23.604 ms for opening / worst bend / skylight / green / lich. Lich exceeded the 20 ms gate, so the runner exited non-zero. Recorded HAL temperatures rose from AP 31.9 C / battery 28.9 C / skin 31.1 C / status 0 before the run to AP 51.1 C / battery 35.4 C / skin 40.3 C / status 1 afterward. The historical zero-device Host-gate statements above remain intact because they describe the earlier run conditions.
 
+## Owner hands-on follow-up
+
+After the simulation and renderer foundations merged, the project owner reported that controls, audio, and haptics all worked correctly during a hands-on test on `SM-S948B`. This is owner-reported local device validation without a newly captured exact-artifact hash, log, screenshot, or installed-package check. It closes basic operation for the owner-tested development build but does not change the failed lich performance result or certify touch/camera comfort, spatial-audio quality, haptic intensity or cue distinction, artistic approval, or another device.
+
 ## Known limits
 
 - One active character render slot and one enemy TLAS entry remain enforced.
@@ -72,3 +76,4 @@ This was not a full performance pass. Ordered 75% CPU medians were 10.327 / 7.10
 - Timestamp queries add small profiling overhead and provide approximate GPU execution intervals, not presentation latency.
 - Phone GPU timing, functional presentation, replay, capture, and lifecycle behavior are now exact-device verified on `SM-S948B`; sustained 75% performance remains unresolved because the lich checkpoint failed the 20 ms gate.
 - Automated device testing does not establish human touch feel, camera comfort, perceived audio/haptics, artistic correctness, or behavior on another model/driver.
+- The separate owner report establishes basic controls, audible audio, and perceived haptics for the tested installed development build only; exact merged-build provenance and the qualitative boundaries above remain open.

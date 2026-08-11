@@ -7,7 +7,11 @@ The `android/` module is the supported phone path for Horde Lantern RT. It owns 
 - Java entrypoint: `app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java`
 - JNI/Vulkan bridge: `app/src/main/cpp/android_probe_bridge.cpp`
 - Shared native source manifest: `../cmake/HordeRtSources.cmake`
+- Shared fixed-step gameplay authority: `../src/gameplay/simulation/GameSimulation.cpp`
+- Coherent JNI input publication through the two-slot `InputMailbox`, with monotonic attack/reset/retry counters
+- Ordered semantic gameplay events with per-event spatial gains drive SoundPool and haptics without collapsing repeated cues
 - Native Vulkan RT presentation through the Android swapchain
+- Optional Vulkan timestamp queries report a separate GPU RT command-buffer interval without changing CPU benchmark pass/fail
 - One frame in flight while the held-prop TLAS uses a host-written instance buffer
 - Portrait-first branded entry/pause/settings/controls/diagnostics/credits UI; touch movement/look and `SWING`; sequential skeleton/lich selection through one active skinned BLAS; layered articulated body/head with a smoothed walk gait, lantern-drop sequence, coloured bays, mirror, sliding-roof dawn reveal, and Continue/Begin Again/Quit ending; strict ASTC assets; and phone-safe ray-query shading inside `vkCmdTraceRaysKHR`
 - Persisted SFX volume, look sensitivity, compact HUD, and 50-100% RT render scale; seventeen FilmCow clips play through SoundPool
@@ -61,6 +65,8 @@ The previous `0.1.0-alpha.1` APK established the stable signing identity and pas
 The complete showcase route is device-validated on `SM-S948B` in the debug package: strict environment plus lich ASTC, honest RT presentation, full route traversal, Home/resume recreation, and warm controlled 75% measurements passed at thermal status 3. Every required zone's median of three 120-frame average windows remained below 13.7 ms. The phone was restored to the recommended 75% tier after the 100% extent/reporting check. See `../docs/HORDE_SHOWCASE_ANDROID_VALIDATION_2026-07-17.md`.
 
 The later debug automation baseline also passed live: five deterministic 75% checkpoints, report-only 100% opening, native state assertions, and all 13 replay waypoints. These cool thermal-status-0 results are regression evidence and do not replace the warm sustained certification above. See `../docs/ANDROID_SHOWCASE_AUTOMATION_VALIDATION_2026-07-17.md`.
+
+The 2026-08-11 shared-simulation/renderer development candidate subsequently verified strict ASTC, honest RT presentation, valid GPU timestamps, 13/13 replay, 12/12 captures, and Home/resume on `SM-S948B`. Its ordered 75% CPU medians were 10.327 / 7.109 / 8.353 / 11.220 / 23.604 ms, so lich failed the 20 ms gate and current sustained performance is not cleared. The owner separately reported that controls, audio, and haptics all worked correctly hands-on on the installed development build. That report is owner-reported local device evidence without a new exact-artifact check and does not alter the performance failure. See `../docs/RENDERER_RESOURCE_SLOTS_ANDROID_VALIDATION_2026-08-11.md`.
 
 The showcase release identity is `0.1.3-alpha.1` with `versionCode 4`. Public candidates must be signed by the established Horde release key, retain strict ASTC routing and 16 KiB compatibility, and pass `tools/package-signed-alpha.ps1`; never replace the existing update identity with a new keystore.
 

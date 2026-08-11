@@ -8,4 +8,6 @@ The gameplay layer owns the shared route/collision contract and deliberately bou
 
 `simulation/GameSimulation.cpp` is now the cross-platform gameplay authority that composes those bounded authored systems at a fixed 60 Hz. `InputSnapshot`/`InputMailbox` provide coherent continuous and monotonic edge input, `SimulationSnapshot` is the immutable renderer/UI view, and the fixed-capacity `GameplayEvent` queue is the semantic audio/haptics boundary. Platform code must not recreate this orchestration.
 
+Accepted nonfatal player hits emit `PlayerDamaged`; the lethal hit emits only `PlayerKilled`, so platform feedback does not layer damage and fatal haptics for the same hit. Android preserves the authored 140 ms separation between a skeleton sword impact and its subsequent fall cue.
+
 Implemented combat includes skeleton approach/attack/death/respawn, a three-hit ranged lich finale, and three player vitality with one-second invulnerability, a 0.65-second fatal hold, and retry/restart/quit death flow. Lich death now advances sequentially through its fall, physical roof opening, a 1.75-second RT dawn reveal, and the completed contextual ending. Benchmark, replay, and capture paths are damage-immune. Block/dodge, broader AI, and simultaneous skinned enemies remain deferred.

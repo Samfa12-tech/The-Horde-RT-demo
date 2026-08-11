@@ -92,13 +92,21 @@ The final twelve-capture run recorded an overall median of 6.055700 ms and mean 
 
 ADB reported zero connected devices. The Full `SM-S948B` gate, physical touch feel, haptics, perceived spatial audio, lifecycle handling, and current phone performance were therefore not run or claimed. No install, signing, merge, or publication was performed.
 
+## Post-merge Android follow-up
+
+PR #10 and the stacked renderer/GPU-timing PR #11 subsequently merged to `main`. A later exact-device automated run on `SM-S948B` verified strict ASTC, honest RT presentation, GPU timestamps, 13/13 replay, 12/12 captures, and Home/resume, while retaining a disclosed lich performance failure of 23.604 ms against the 20 ms gate.
+
+The project owner then reported that controls, audio, and haptics all worked correctly during a hands-on test on the same model. This is owner-reported local device validation for the installed development build; no new exact APK hash, log, screenshot, or installed-package check was captured with that report. It closes basic migrated control/audio/haptic operation, but not touch or camera comfort, spatial-audio quality, haptic intensity/cue distinction, artistic approval, exact merged-build provenance, or sustained performance.
+
 ## Known limitations
 
 - The published renderer still supports one active CPU-skinned/refit enemy and one enemy TLAS slot.
 - No visual interpolation is introduced.
 - The simulation continues to compose the existing bounded skeleton and lich authored behaviours; combat redesign is deferred.
-- Physical touch feel, haptic distinction, audio perception, camera comfort, lifecycle behaviour, and phone performance require a connected-device and owner pass.
+- Basic controls, audible audio, and perceived haptic operation have a later owner-reported `SM-S948B` pass. Touch/camera comfort, spatial-audio quality, haptic intensity and cue distinction, artistic approval, exact merged-build provenance, and a passing current phone-performance gate remain open.
 
-## Next smallest milestone
+## Next smallest milestone at foundation completion
 
 Extract renderer resource/character-slot seams and add GPU timing without adding a second enemy.
+
+That follow-up is now implemented and merged; see [`RENDERER_RESOURCE_SLOTS_GPU_TIMING_2026-08-11.md`](RENDERER_RESOURCE_SLOTS_GPU_TIMING_2026-08-11.md).
