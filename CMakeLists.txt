@@ -23,6 +23,7 @@ endif()
 
 option(HORDE_RT_BUILD_CAPABILITY_PROBE_EXECUTABLE "Build the standalone command line Vulkan capability probe" ON)
 option(HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW "Build the Win32 diagnostic shell" ON)
+option(HORDE_RT_BUILD_VULKAN_TARGETS "Build targets that require a Vulkan SDK" ON)
 
 include(CTest)
 
@@ -31,22 +32,34 @@ set(HORDE_RT_SOURCE_FILES)
 foreach(source IN LISTS HORDE_RT_CORE_RELATIVE_SOURCES)
     list(APPEND HORDE_RT_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/${source}")
 endforeach()
-find_package(Vulkan REQUIRED)
+list(FILTER HORDE_RT_SOURCE_FILES EXCLUDE REGEX "/gameplay/simulation/GameSimulation\\.cpp$")
 
-message(STATUS "Vulkan SDK found: ${Vulkan_VERSION}")
-
-add_library(horde_rt_probe_core STATIC
-    ${HORDE_RT_SOURCE_FILES}
+add_library(horde_gameplay_simulation STATIC
+    src/gameplay/simulation/GameSimulation.cpp
 )
-
-target_include_directories(horde_rt_probe_core
+target_include_directories(horde_gameplay_simulation
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
-target_compile_features(horde_rt_probe_core PUBLIC cxx_std_20)
-target_link_libraries(horde_rt_probe_core PUBLIC Vulkan::Vulkan)
+target_compile_features(horde_gameplay_simulation PUBLIC cxx_std_20)
 
-if(HORDE_RT_BUILD_CAPABILITY_PROBE_EXECUTABLE)
+if(HORDE_RT_BUILD_VULKAN_TARGETS)
+    find_package(Vulkan REQUIRED)
+    message(STATUS "Vulkan SDK found: ${Vulkan_VERSION}")
+
+    add_library(horde_rt_probe_core STATIC
+        ${HORDE_RT_SOURCE_FILES}
+    )
+
+    target_include_directories(horde_rt_probe_core
+        PUBLIC
+            ${CMAKE_CURRENT_SOURCE_DIR}/src
+    )
+    target_compile_features(horde_rt_probe_core PUBLIC cxx_std_20)
+    target_link_libraries(horde_rt_probe_core PUBLIC Vulkan::Vulkan horde_gameplay_simulation)
+endif()
+
+if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_CAPABILITY_PROBE_EXECUTABLE)
     add_executable(horde_rt_capability_probe
         src/platform/windows/CapabilityProbeMain.cpp
         src/ui/DiagnosticOverlay.cpp
@@ -65,7 +78,7 @@ if(HORDE_RT_BUILD_CAPABILITY_PROBE_EXECUTABLE)
     )
 endif()
 
-if(HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AND WIN32)
+if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AND WIN32)
     add_executable(horde_rt_diagnostic_window WIN32
         src/platform/windows/DiagnosticWindowMain.cpp
         src/platform/windows/DiagnosticWindow.cpp
@@ -89,10 +102,10 @@ if(HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AND WIN32)
         winmm
     )
     target_compile_definitions(horde_rt_diagnostic_window PRIVATE
-        HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
         HORDE_RT_DISPLAY_VERSION="${HORDE_RT_DISPLAY_VERSION}"
         HORDE_RT_BUILD_ID="${HORDE_RT_PACKAGE_VERSION}"
         HORDE_RT_RAYGEN_SHA256="${HORDE_RT_RAYGEN_SHA256}"
+        $<$<CONFIG:Debug>:HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}">
     )
 
     set_target_properties(horde_rt_diagnostic_window PROPERTIES
@@ -101,6 +114,20 @@ if(HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AND WIN32)
 endif()
 
 if(BUILD_TESTING)
+    add_executable(horde_rt_simulation_timing_tests tests/SimulationTimingTests.cpp)
+    target_include_directories(horde_rt_simulation_timing_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(horde_rt_simulation_timing_tests PRIVATE horde_gameplay_simulation)
+    add_test(NAME horde_rt_simulation_timing_tests COMMAND horde_rt_simulation_timing_tests)
+
+    add_executable(horde_rt_simulation_gameplay_tests tests/SimulationGameplayTests.cpp)
+    target_include_directories(horde_rt_simulation_gameplay_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(horde_rt_simulation_gameplay_tests PRIVATE horde_gameplay_simulation)
+    add_test(NAME horde_rt_simulation_gameplay_tests COMMAND horde_rt_simulation_gameplay_tests)
+
+    add_executable(horde_rt_input_mailbox_stress tests/InputMailboxStress.cpp)
+    target_include_directories(horde_rt_input_mailbox_stress PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_input_mailbox_stress COMMAND horde_rt_input_mailbox_stress)
+
     add_executable(horde_rt_combat_smoke tests/SwordCombatSmoke.cpp)
     target_include_directories(horde_rt_combat_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_combat_smoke COMMAND horde_rt_combat_smoke)
@@ -117,23 +144,29 @@ if(BUILD_TESTING)
     target_include_directories(horde_rt_spatial_audio_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_spatial_audio_smoke COMMAND horde_rt_spatial_audio_smoke)
 
-    add_executable(horde_rt_skinned_character_smoke tests/SkinnedCharacterModelSmoke.cpp)
-    target_include_directories(horde_rt_skinned_character_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-    target_link_libraries(horde_rt_skinned_character_smoke PRIVATE horde_rt_probe_core)
-    add_test(NAME horde_rt_skinned_character_smoke COMMAND horde_rt_skinned_character_smoke)
+    if(HORDE_RT_BUILD_VULKAN_TARGETS)
+        add_executable(horde_rt_skinned_character_smoke tests/SkinnedCharacterModelSmoke.cpp)
+        target_include_directories(horde_rt_skinned_character_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+        target_link_libraries(horde_rt_skinned_character_smoke PRIVATE horde_rt_probe_core)
+        add_test(NAME horde_rt_skinned_character_smoke COMMAND horde_rt_skinned_character_smoke)
 
-    add_executable(horde_rt_developer_overlay_smoke
-        tests/DeveloperOverlaySmoke.cpp
-        src/ui/DiagnosticOverlay.cpp
-    )
-    target_include_directories(horde_rt_developer_overlay_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-    target_link_libraries(horde_rt_developer_overlay_smoke PRIVATE horde_rt_probe_core)
-    add_test(NAME horde_rt_developer_overlay_smoke COMMAND horde_rt_developer_overlay_smoke)
+        add_executable(horde_rt_developer_overlay_smoke
+            tests/DeveloperOverlaySmoke.cpp
+            src/ui/DiagnosticOverlay.cpp
+        )
+        target_include_directories(horde_rt_developer_overlay_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+        target_link_libraries(horde_rt_developer_overlay_smoke PRIVATE horde_rt_probe_core)
+        add_test(NAME horde_rt_developer_overlay_smoke COMMAND horde_rt_developer_overlay_smoke)
 
-    add_executable(horde_rt_showcase_benchmark_smoke tests/ShowcaseBenchmarkSmoke.cpp)
-    target_include_directories(horde_rt_showcase_benchmark_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-    target_link_libraries(horde_rt_showcase_benchmark_smoke PRIVATE horde_rt_probe_core)
-    add_test(NAME horde_rt_showcase_benchmark_smoke COMMAND horde_rt_showcase_benchmark_smoke)
+        add_executable(horde_rt_showcase_benchmark_smoke tests/ShowcaseBenchmarkSmoke.cpp)
+        target_include_directories(horde_rt_showcase_benchmark_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+        target_link_libraries(horde_rt_showcase_benchmark_smoke PRIVATE horde_rt_probe_core)
+        add_test(NAME horde_rt_showcase_benchmark_smoke COMMAND horde_rt_showcase_benchmark_smoke)
+    endif()
 endif()
 
-message(STATUS "Horde Lantern RT: Vulkan capability probe and Windows diagnostic targets are available; Android builds from android/.")
+if(HORDE_RT_BUILD_VULKAN_TARGETS)
+    message(STATUS "Horde Lantern RT: Vulkan capability probe and Windows diagnostic targets are available; Android builds from android/.")
+else()
+    message(STATUS "Horde Lantern RT: configuring shared host gameplay tests without Vulkan targets.")
+endif()

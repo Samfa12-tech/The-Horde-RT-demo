@@ -13,6 +13,8 @@ Horde Lantern RT is a native Vulkan hardware-ray-tracing technology demo for And
 
 Showcase Alpha 0.1.3 adds a substantially rebuilt procedural player body with articulated walking, a three-point vitality/retry loop, and a complete post-lich dawn ending. The release-safe in-app benchmark and Samfa12 menu link remain available; detailed checkpoint, capture, and developer telemetry remain Debug-only.
 
+The current development foundation runs Windows and Android gameplay through one deterministic 60 Hz `GameSimulation`. Android input crosses JNI through a coherent snapshot mailbox with monotonic attack/reset/retry counters; ordered semantic events drive platform audio and haptics; and one shared adapter preserves the existing `RtSceneFrameInputs` renderer boundary. See `docs/SHARED_SIMULATION_FOUNDATION_2026-08-10.md`.
+
 The APK declares Android 7 / API 24 as its packaging minimum, but hardware support is intentionally much narrower: the device and driver must expose Vulkan acceleration structures, ray-tracing pipeline, ray query, buffer device address, deferred host operations, and the required ASTC formats. Only `SM-S948B` on Android 16 is currently device-certified.
 
 Device compatibility is tracked in [`docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md`](docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md). New device results should be recorded there with the exact model code and evidence class: locally tested confirmation, user-reported plus screenshot evidence, user-reported, vendor/SoC inference, or unverified candidate. Hardware marketing claims alone do not establish support; the runtime capability probe and honest RT swapchain presentation are the deciding checks.
@@ -111,6 +113,14 @@ $cmake = "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7
 
 The standalone capability probe remains available as target `horde_rt_capability_probe`.
 
+Additive Visual Studio configure/build/test presets are also available:
+
+```powershell
+cmake --preset windows-x64-debug
+cmake --build --preset windows-x64-debug
+ctest --preset windows-x64-debug
+```
+
 ### Android development build
 
 ```powershell
@@ -170,6 +180,8 @@ Check raygen staleness without modifying the embedded include:
 
 Windows Debug also supports `HordeLanternRT.exe --capture-showcase <directory>`; Windows Release and Android Release reject capture/checkpoint automation. Video and orbit-camera capture remain deferred.
 
+The lightweight `.github/workflows/shared-simulation-host.yml` lane configures with `HORDE_RT_BUILD_VULKAN_TARGETS=OFF` and runs portable gameplay tests. It catches deterministic simulation regressions but does not establish Vulkan capability, RT swapchain presentation, device thermals, touch feel, audio perception, or haptics.
+
 ## Package and publish
 
 Create a release key once, outside Git:
@@ -210,6 +222,9 @@ Do not redistribute source assets as standalone asset packs. Preserve the public
 - Android native bridge: `android/app/src/main/cpp/android_probe_bridge.cpp`
 - Windows presentation: `src/platform/windows/DiagnosticWindow.cpp`
 - Shared scene: `src/vulkan/raytracing/PresentableTinyRtScene.cpp`
+- Shared gameplay: `src/gameplay/simulation/GameSimulation.cpp`
+- Android input mailbox: `src/gameplay/simulation/InputMailbox.h`
+- Shared simulation-to-renderer adapter: `src/vulkan/raytracing/SimulationFrameAdapter.cpp`
 - Raygen source: `shaders/raytracing/minimal.rgen`
 - Embedded raygen SPIR-V: `src/vulkan/raytracing/MinimalRayGenShader.inc`
 

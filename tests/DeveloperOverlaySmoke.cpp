@@ -47,6 +47,16 @@ int main()
     snapshot.renderScale = 0.75f;
     snapshot.fps = 83.815f;
     snapshot.frameTimeMs = 11.931f;
+    snapshot.simulationTicksThisFrame = 1;
+    snapshot.fixedStepAccumulatorSeconds = 0.0025;
+    snapshot.catchUpOverrunCount = 2;
+    snapshot.queuedEventCount = 3;
+    snapshot.eventQueueHighWaterMark = 7;
+    snapshot.eventQueueOverflowCount = 0;
+    snapshot.inputPublicationSequence = 42;
+    snapshot.consumedAttackSequence = 5;
+    snapshot.consumedRouteResetSequence = 2;
+    snapshot.consumedRetrySequence = 1;
     snapshot.presented = true;
 
     const std::string text = horde::ui::BuildDeveloperOverlayText(snapshot);
@@ -56,6 +66,8 @@ int main()
     ok &= RequireContains(text, "FRAME 11.9 ms  |  83.8 FPS  |  1080x2235 -> 1440x2980");
     ok &= RequireContains(text, "SCENE finale  |  lantern settled  |  lich charging hp 2");
     ok &= RequireContains(text, "PLAYER dying  |  vitality 0/3  |  damage OFF");
+    ok &= RequireContains(text, "SIM 1 ticks  |  accum 2.5 ms  |  overruns 2");
+    ok &= RequireContains(text, "EVENTS 3 queued / 7 high / 0 overflow  |  input 42  |  cmd 5/2/1");
     ok &= RequireContains(text, "AS 8 BLAS / 1 TLAS / 18 inst  |  skinned 1");
     ok &= RequireContains(text, "MAT ASTC test route");
 

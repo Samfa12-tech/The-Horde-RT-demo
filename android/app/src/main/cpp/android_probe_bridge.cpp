@@ -3,6 +3,7 @@
 #include <android/native_window_jni.h>
 
 #include <algorithm>
+#include <array>
 #include <atomic>
 #include <bit>
 #include <cmath>
@@ -31,9 +32,12 @@
 #include "gameplay/ShowcaseReplay.h"
 #include "gameplay/SpatialAudio.h"
 #include "gameplay/SwordCombat.h"
+#include "gameplay/simulation/GameSimulation.h"
+#include "gameplay/simulation/InputMailbox.h"
 #include "vulkan/RtCapabilityReport.h"
 #include "vulkan/VulkanContext.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
+#include "vulkan/raytracing/SimulationFrameAdapter.h"
 
 #ifndef HORDE_RT_BUILD_ID
 #define HORDE_RT_BUILD_ID "development"
@@ -86,26 +90,7 @@ struct SwapchainContext
     VkClearColorValue clearColor = {{0.12f, 0.04f, 0.18f, 1.0f}};
     horde::vulkan::DeviceCapabilities capabilities;
     horde::vulkan::raytracing::PresentableTinyRtScene rtScene;
-    float cameraYaw = 0.0f;
-    float cameraPitch = 0.0f;
-    float lanternStrength = 1.8f;
-    float walkTime = 0.0f;
-    float walkVisualAmount = 0.0f;
-    float cameraX = 0.0f;
-    float cameraZ = 1.85f;
-    float moveStrafe = 0.0f;
-    float moveForward = 0.0f;
-    horde::gameplay::TravelFootstepCadence playerFootsteps;
-    horde::gameplay::PlayerFootstepCadence enemyFootsteps;
     float outputExposure = 0.92f;
-    horde::gameplay::SwordCombat combat;
-    horde::gameplay::CombatSnapshot combatSnapshot;
-    horde::gameplay::LanternSequence lanternSequence;
-    horde::gameplay::LanternSnapshot lanternSnapshot;
-    horde::gameplay::EnemyDirector enemyDirector;
-    horde::gameplay::LichEncounter lichEncounter;
-    horde::gameplay::EnemyKind activeEnemyKind = horde::gameplay::EnemyKind::Skeleton;
-    horde::gameplay::PlayerVitals playerVitals;
     std::int32_t activeBenchmarkCheckpoint = -1;
     std::uint32_t benchmarkGeneration = 0u;
     std::uint32_t benchmarkWarmupFrames = 0u;
@@ -136,12 +121,17 @@ std::string gLatestJsonReport;
 std::string gLatestDeveloperOverlayText;
 std::string gLatestBenchmarkReport;
 std::string gLatestBenchmarkProgress;
-std::atomic<bool> gAttackRequested{false};
-std::atomic<bool> gResetRequested{false};
-std::atomic<bool> gSimulationPaused{true};
+horde::gameplay::simulation::GameSimulation gGameSimulation;
+horde::gameplay::simulation::InputMailbox gInputMailbox;
+std::mutex gInputPublisherMutex;
+horde::gameplay::simulation::InputSnapshot gInputPublisherState = []
+{
+    horde::gameplay::simulation::InputSnapshot input;
+    input.lanternStrength = 1.8f;
+    input.paused = true;
+    return input;
+}();
 std::atomic<int> gRuntimeState{0}; // 0 starting/stopped, 1 honestly presented RT, 2 unsupported, 3 render error.
-std::atomic<uint32_t> gAudioEvents{0u};
-std::atomic<uint64_t> gEnemyAudioStereoGains{0u};
 std::atomic<float> gRequestedRenderScale{1.0f};
 std::atomic<std::int32_t> gBenchmarkCheckpointRequested{-1};
 std::atomic<std::int32_t> gCaptureCheckpointRequested{-1};
@@ -152,19 +142,20 @@ std::atomic<int> gInAppBenchmarkStatus{0}; // 0 idle, 1 running, 2 complete, 3 f
 std::atomic<int> gPlayerVitality{horde::gameplay::PlayerVitals::kMaxVitality};
 std::atomic<int> gPlayerLifePhase{static_cast<int>(horde::gameplay::PlayerLifePhase::Alive)};
 std::atomic<std::int32_t> gPlayerRetryCheckpoint{0};
-std::atomic<std::int32_t> gEncounterRetryRequested{-1};
 std::atomic<int> gFinaleEndingPhase{static_cast<int>(horde::gameplay::FinaleEndingPhase::Inactive)};
 
-constexpr uint32_t kAudioEventEnemyDefeated = 1u << 0u;
-constexpr uint32_t kAudioEventPlayerFootstep = 1u << 1u;
-constexpr uint32_t kAudioEventEnemyFootstep = 1u << 2u;
-constexpr uint32_t kAudioEventEnemyAttack = 1u << 3u;
-constexpr uint32_t kAudioEventLichCharge = 1u << 4u;
-constexpr uint32_t kAudioEventLichImpact = 1u << 5u;
-constexpr uint32_t kAudioEventLichDefeated = 1u << 6u;
-constexpr uint32_t kAudioEventLichHit = 1u << 7u;
-constexpr uint32_t kAudioEventPlayerDamaged = 1u << 8u;
-constexpr uint32_t kAudioEventPlayerKilled = 1u << 9u;
+struct PlatformGameplayEvent
+{
+    std::uint64_t metadata = 0u;
+    std::uint64_t stereoGains = 0u;
+};
+
+constexpr std::size_t kPlatformGameplayEventCapacity = 128u;
+std::array<PlatformGameplayEvent, kPlatformGameplayEventCapacity> gPlatformGameplayEvents{};
+std::size_t gPlatformGameplayEventHead = 0u;
+std::size_t gPlatformGameplayEventCount = 0u;
+std::uint64_t gPlatformGameplayEventOverflowCount = 0u;
+std::mutex gPlatformGameplayEventMutex;
 
 uint64_t PackStereoGains(float left, float right)
 {
@@ -172,28 +163,63 @@ uint64_t PackStereoGains(float left, float right)
            (static_cast<uint64_t>(std::bit_cast<uint32_t>(right)) << 32u);
 }
 
-void PublishEnemyAudioGains(const SwapchainContext& context)
+std::uint64_t PublishInputLocked()
 {
-    const float emitterX = context.activeEnemyKind == horde::gameplay::EnemyKind::Lich
-        ? context.lichEncounter.Snapshot().x : context.combatSnapshot.enemyX;
-    const float emitterZ = context.activeEnemyKind == horde::gameplay::EnemyKind::Lich
-        ? context.lichEncounter.Snapshot().z : context.combatSnapshot.enemyZ;
+    return gInputMailbox.Publish(gInputPublisherState);
+}
+
+void ClearPlatformGameplayEvents()
+{
+    std::lock_guard<std::mutex> lock(gPlatformGameplayEventMutex);
+    gPlatformGameplayEventHead = 0u;
+    gPlatformGameplayEventCount = 0u;
+}
+
+void EnqueuePlatformGameplayEvent(const horde::gameplay::simulation::GameplayEvent& event,
+                                  const horde::gameplay::simulation::SimulationSnapshot& simulation)
+{
     const horde::gameplay::SpatialAudioGains gains = horde::gameplay::CalculateSpatialAudio(
-        {emitterX, emitterZ, 1.0f, 1.0f, 14.0f},
-        {context.cameraX, context.cameraZ, context.cameraYaw});
-    gEnemyAudioStereoGains.store(PackStereoGains(gains.left, gains.right), std::memory_order_release);
+        {event.worldX, event.worldZ, std::max(0.0f, event.intensity), 1.0f, 14.0f},
+        {simulation.playerX, simulation.playerZ, simulation.playerYawRadians});
+    const std::uint64_t metadata =
+        static_cast<std::uint64_t>(event.type) |
+        (static_cast<std::uint64_t>(event.source) << 8u) |
+        (static_cast<std::uint64_t>(event.target) << 16u) |
+        ((event.sequence & 0xffffffffu) << 32u);
+
+    std::lock_guard<std::mutex> lock(gPlatformGameplayEventMutex);
+    if (gPlatformGameplayEventCount >= gPlatformGameplayEvents.size())
+    {
+        ++gPlatformGameplayEventOverflowCount;
+        return;
+    }
+    const std::size_t tail =
+        (gPlatformGameplayEventHead + gPlatformGameplayEventCount) % gPlatformGameplayEvents.size();
+    gPlatformGameplayEvents[tail] = {metadata, PackStereoGains(gains.left, gains.right)};
+    ++gPlatformGameplayEventCount;
+}
+
+void DrainSimulationEventsToPlatform()
+{
+    const horde::gameplay::simulation::SimulationSnapshot& simulation = gGameSimulation.Snapshot();
+    for (const horde::gameplay::simulation::GameplayEvent& event : gGameSimulation.Events().Events())
+    {
+        EnqueuePlatformGameplayEvent(event, simulation);
+    }
+    gGameSimulation.ClearEvents();
 }
 
 
-void PublishPlayerVitals(const SwapchainContext& context)
+void PublishSimulationUiState()
 {
-    const horde::gameplay::PlayerVitalsSnapshot& vitals = context.playerVitals.Snapshot();
+    const horde::gameplay::simulation::SimulationSnapshot& simulation = gGameSimulation.Snapshot();
+    const horde::gameplay::PlayerVitalsSnapshot& vitals = simulation.playerVitals;
     gPlayerVitality.store(vitals.vitality, std::memory_order_release);
     gPlayerLifePhase.store(static_cast<int>(vitals.phase), std::memory_order_release);
-}
-void PublishFinaleEnding(const horde::gameplay::LichSnapshot& lich)
-{
-    gFinaleEndingPhase.store(static_cast<int>(lich.finaleEndingPhase), std::memory_order_release);
+    gPlayerRetryCheckpoint.store(simulation.retryCheckpoint, std::memory_order_release);
+    gFinaleEndingPhase.store(
+        static_cast<int>(simulation.lich.finaleEndingPhase),
+        std::memory_order_release);
 }
 
 std::string BuildDisplayText(const horde::vulkan::DeviceCapabilities& capabilities)
@@ -238,19 +264,20 @@ const horde::gameplay::EnemyEncounterSnapshot* SelectedEncounter(
 
 horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(const SwapchainContext& context)
 {
-    const horde::gameplay::EnemyRosterSnapshot& roster = context.enemyDirector.Snapshot();
-    const horde::gameplay::LichSnapshot& lich = context.lichEncounter.Snapshot();
+    const horde::gameplay::simulation::SimulationSnapshot& simulation = gGameSimulation.Snapshot();
+    const horde::gameplay::EnemyRosterSnapshot& roster = simulation.enemyRoster;
+    const horde::gameplay::LichSnapshot& lich = simulation.lich;
     const horde::gameplay::EnemyEncounterSnapshot* encounter = SelectedEncounter(roster);
     horde::ui::DeveloperOverlaySnapshot snapshot;
     snapshot.buildIdentity = std::string(HORDE_RT_BUILD_ID) + " DEBUG";
     snapshot.shaderIdentity = std::string(HORDE_RT_RAYGEN_SHA256).substr(0u, 12u);
-    const horde::gameplay::PlayerVitalsSnapshot& playerVitals = context.playerVitals.Snapshot();
+    const horde::gameplay::PlayerVitalsSnapshot& playerVitals = simulation.playerVitals;
     snapshot.playerLifePhase = horde::gameplay::PlayerLifePhaseName(playerVitals.phase);
     snapshot.playerVitality = playerVitals.vitality;
     snapshot.playerMaxVitality = playerVitals.maxVitality;
     snapshot.playerDamageEnabled =
         playerVitals.phase == horde::gameplay::PlayerLifePhase::Alive &&
-        !gSimulationPaused.load(std::memory_order_acquire) &&
+        !simulation.paused &&
         !context.inAppBenchmark.IsRunning() &&
         !context.routeReplayActive && !context.benchmarkSampling && !context.captureActive;
 
@@ -258,9 +285,9 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(const Swapchai
     snapshot.vulkanApi = PackedVulkanVersion(context.capabilities.identity.vulkanApiVersion);
     snapshot.rtMode = horde::vulkan::ToString(context.capabilities.rtMode);
     snapshot.routeZone = horde::gameplay::ShowcaseZoneName(
-        horde::gameplay::QueryShowcaseZone(context.cameraX, context.cameraZ));
+        simulation.zone);
     snapshot.materialEncoding = context.rtScene.MaterialEncoding();
-    snapshot.lanternPhase = horde::gameplay::LanternPhaseName(context.lanternSnapshot.phase);
+    snapshot.lanternPhase = horde::gameplay::LanternPhaseName(simulation.lantern.phase);
     snapshot.selectedEnemy = horde::gameplay::EnemyKindName(roster.selectedEnemy);
     snapshot.encounterPhase = encounter ? EncounterStatusName(encounter->status) : "inactive";
     if (roster.selectedEnemy == horde::gameplay::EnemyKind::Lich)
@@ -280,6 +307,16 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(const Swapchai
     snapshot.fps = context.capabilities.performance.fps;
     snapshot.frameTimeMs = context.capabilities.performance.frameTimeMs;
     snapshot.presented = context.capabilities.rtScene.presented;
+    snapshot.simulationTicksThisFrame = simulation.simulationTicksThisFrame;
+    snapshot.fixedStepAccumulatorSeconds = simulation.fixedStepAccumulatorSeconds;
+    snapshot.catchUpOverrunCount = simulation.catchUpOverrunCount;
+    snapshot.queuedEventCount = simulation.queuedEventCount;
+    snapshot.eventQueueHighWaterMark = simulation.eventQueueHighWaterMark;
+    snapshot.eventQueueOverflowCount = simulation.eventQueueOverflowCount;
+    snapshot.inputPublicationSequence = simulation.inputPublicationSequence;
+    snapshot.consumedAttackSequence = simulation.lastConsumedAttackSequence;
+    snapshot.consumedRouteResetSequence = simulation.lastConsumedRouteResetSequence;
+    snapshot.consumedRetrySequence = simulation.lastConsumedRetrySequence;
     return snapshot;
 }
 
@@ -352,33 +389,12 @@ bool WriteTextFile(const std::string& path, const std::string& data)
     return stream.good();
 }
 
-void ResetShowcaseSimulation(SwapchainContext& context)
+void ResetShowcaseSimulation()
 {
-    context.cameraYaw = 0.0f;
-    context.cameraPitch = 0.0f;
-    context.lanternStrength = 1.8f;
-    context.walkTime = 0.0f;
-    context.walkVisualAmount = 0.0f;
-    context.cameraX = horde::gameplay::kPlayerSpawn.x;
-    context.cameraZ = horde::gameplay::kPlayerSpawn.z;
-    context.moveStrafe = 0.0f;
-    context.moveForward = 0.0f;
-    context.playerFootsteps.Reset();
-    context.enemyFootsteps.Reset();
-    context.combat = {};
-    context.combatSnapshot = {};
-    context.lanternSequence.Reset();
-    context.lanternSnapshot = {};
-    context.enemyDirector.Reset();
-    context.lichEncounter.Reset();
-    context.activeEnemyKind = horde::gameplay::EnemyKind::Skeleton;
-    context.playerVitals.ResetForEncounter();
-    gEncounterRetryRequested.store(-1, std::memory_order_release);
-    gPlayerRetryCheckpoint.store(0, std::memory_order_release);
-    PublishPlayerVitals(context);
-    gFinaleEndingPhase.store(static_cast<int>(horde::gameplay::FinaleEndingPhase::Inactive), std::memory_order_release);
-    gAttackRequested.store(false, std::memory_order_release);
-    gAudioEvents.store(0u, std::memory_order_release);
+    gGameSimulation.ResetRoute();
+    gGameSimulation.ClearEvents();
+    ClearPlatformGameplayEvents();
+    PublishSimulationUiState();
 }
 
 const char* PresentModeName(const VkPresentModeKHR mode)
@@ -434,7 +450,7 @@ void StartInAppBenchmark(SwapchainContext& context)
     gBenchmarkCheckpointRequested.store(-1, std::memory_order_release);
     gCaptureCheckpointRequested.store(-1, std::memory_order_release);
     gRouteReplayRequested.store(false, std::memory_order_release);
-    ResetShowcaseSimulation(context);
+    ResetShowcaseSimulation();
     context.activeBenchmarkCheckpoint = -1;
     context.benchmarkSampling = false;
     context.routeReplayActive = false;
@@ -469,8 +485,12 @@ void FinishInAppBenchmark(SwapchainContext& context)
         gLatestBenchmarkProgress = context.inAppBenchmark.Passed() ? "BENCHMARK COMPLETE" : "BENCHMARK INVALID";
     }
     gInAppBenchmarkStatus.store(context.inAppBenchmark.Passed() ? 2 : 3, std::memory_order_release);
-    gSimulationPaused.store(true, std::memory_order_release);
-    ResetShowcaseSimulation(context);
+    {
+        std::lock_guard<std::mutex> inputLock(gInputPublisherMutex);
+        gInputPublisherState.paused = true;
+        PublishInputLocked();
+    }
+    ResetShowcaseSimulation();
 }
 
 void ResetBenchmarkTiming(SwapchainContext& context)
@@ -493,17 +513,17 @@ void ResetBenchmarkTiming(SwapchainContext& context)
 
 void WriteShowcaseDebugState(const SwapchainContext& context, const char* status)
 {
+    const horde::gameplay::simulation::SimulationSnapshot& simulation = gGameSimulation.Snapshot();
     const horde::gameplay::ShowcaseCheckpoint* checkpoint =
         horde::gameplay::FindShowcaseCheckpoint(context.activeBenchmarkCheckpoint);
-    const horde::gameplay::ShowcaseZone zone =
-        horde::gameplay::QueryShowcaseZone(context.cameraX, context.cameraZ);
-    const horde::gameplay::LichSnapshot& lich = context.lichEncounter.Snapshot();
-    const horde::gameplay::EnemyRosterSnapshot& roster = context.enemyDirector.Snapshot();
+    const horde::gameplay::ShowcaseZone zone = simulation.zone;
+    const horde::gameplay::LichSnapshot& lich = simulation.lich;
+    const horde::gameplay::EnemyRosterSnapshot& roster = simulation.enemyRoster;
     const horde::gameplay::ShowcaseReplaySnapshot& replay = context.routeReplay.Snapshot();
-    const horde::gameplay::PlayerVitalsSnapshot& playerVitals = context.playerVitals.Snapshot();
+    const horde::gameplay::PlayerVitalsSnapshot& playerVitals = simulation.playerVitals;
     const bool playerDamageEnabled =
         playerVitals.phase == horde::gameplay::PlayerLifePhase::Alive &&
-        !gSimulationPaused.load(std::memory_order_acquire) &&
+        !simulation.paused &&
         !context.inAppBenchmark.IsRunning() &&
         !context.routeReplayActive && !context.benchmarkSampling && !context.captureActive;
     std::ostringstream json;
@@ -514,8 +534,8 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
          << "  \"status\": \"" << status << "\",\n"
          << "  \"generation\": " << context.benchmarkGeneration << ",\n"
          << "  \"checkpoint\": \"" << (checkpoint ? checkpoint->name : (context.routeReplayActive ? "route-replay" : "none")) << "\",\n"
-         << "  \"player\": {\"x\": " << context.cameraX << ", \"z\": " << context.cameraZ
-         << ", \"yaw\": " << context.cameraYaw << ", \"pitch\": " << context.cameraPitch
+         << "  \"player\": {\"x\": " << simulation.playerX << ", \"z\": " << simulation.playerZ
+         << ", \"yaw\": " << simulation.playerYawRadians << ", \"pitch\": " << simulation.playerPitchRadians
          << ", \"vitality\": " << playerVitals.vitality
          << ", \"maxVitality\": " << playerVitals.maxVitality
          << ", \"lifePhase\": \"" << horde::gameplay::PlayerLifePhaseName(playerVitals.phase) << "\""
@@ -535,9 +555,9 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
               context.swapchainFormat == VK_FORMAT_B8G8R8A8_SRGB) &&
              context.rtScene.DispatchExtent().width == context.swapchainExtent.width &&
              context.rtScene.DispatchExtent().height == context.swapchainExtent.height ? "true" : "false") << ",\n"
-         << "  \"animationTime\": " << context.walkTime << ",\n"
+         << "  \"animationTime\": " << simulation.walkTime << ",\n"
          << "  \"captureStableFrames\": " << context.capturePresentedFrames << ",\n"
-         << "  \"lanternPhase\": \"" << horde::gameplay::LanternPhaseName(context.lanternSnapshot.phase) << "\",\n"
+         << "  \"lanternPhase\": \"" << horde::gameplay::LanternPhaseName(simulation.lantern.phase) << "\",\n"
          << "  \"selectedEnemy\": \"" << horde::gameplay::EnemyKindName(roster.selectedEnemy) << "\",\n"
          << "  \"activeSkinnedEnemies\": " << roster.renderedEnemyCount << ",\n"
          << "  \"lich\": {\"phase\": \"" << horde::gameplay::LichPhaseName(lich.phase)
@@ -554,18 +574,10 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
 
 void ApplyBenchmarkCheckpoint(SwapchainContext& context, const horde::gameplay::ShowcaseCheckpoint& checkpoint)
 {
-    ResetShowcaseSimulation(context);
-    const horde::gameplay::ShowcaseCheckpointState state =
-        horde::gameplay::BuildShowcaseCheckpointState(checkpoint);
-    context.cameraX = checkpoint.x;
-    context.cameraZ = checkpoint.z;
-    context.cameraYaw = checkpoint.yaw;
-    context.cameraPitch = checkpoint.pitch;
-    context.lanternSequence = state.lantern;
-    context.lanternSnapshot = state.lanternSnapshot;
-    context.enemyDirector = state.enemyDirector;
-    context.lichEncounter = state.lichEncounter;
-    context.activeEnemyKind = state.activeEnemyKind;
+    gGameSimulation.ApplyShowcaseCheckpoint(checkpoint.id);
+    gGameSimulation.ResetTiming();
+    gGameSimulation.ClearEvents();
+    PublishSimulationUiState();
     context.activeBenchmarkCheckpoint = checkpoint.id;
     context.routeReplayActive = false;
     context.captureActive = false;
@@ -585,18 +597,10 @@ void ApplyBenchmarkCheckpoint(SwapchainContext& context, const horde::gameplay::
 
 void ApplyCaptureCheckpoint(SwapchainContext& context, const horde::gameplay::ShowcaseCheckpoint& checkpoint)
 {
-    ResetShowcaseSimulation(context);
-    const horde::gameplay::ShowcaseCheckpointState state =
-        horde::gameplay::BuildShowcaseCheckpointState(checkpoint);
-    context.cameraX = checkpoint.x;
-    context.cameraZ = checkpoint.z;
-    context.cameraYaw = checkpoint.yaw;
-    context.cameraPitch = checkpoint.pitch;
-    context.lanternSequence = state.lantern;
-    context.lanternSnapshot = state.lanternSnapshot;
-    context.enemyDirector = state.enemyDirector;
-    context.lichEncounter = state.lichEncounter;
-    context.activeEnemyKind = state.activeEnemyKind;
+    gGameSimulation.ApplyShowcaseCheckpoint(checkpoint.id);
+    gGameSimulation.ResetTiming();
+    gGameSimulation.ClearEvents();
+    PublishSimulationUiState();
     context.activeBenchmarkCheckpoint = checkpoint.id;
     context.routeReplayActive = false;
     context.benchmarkSampling = false;
@@ -614,47 +618,9 @@ void ApplyCaptureCheckpoint(SwapchainContext& context, const horde::gameplay::Sh
     WriteShowcaseDebugState(context, "capture-warming");
 }
 
-bool ApplyPlayerRetryCheckpoint(SwapchainContext& context, std::int32_t checkpointId)
-{
-    if (checkpointId != 0 && checkpointId != 9)
-    {
-        return false;
-    }
-    const horde::gameplay::ShowcaseCheckpoint* checkpoint =
-        horde::gameplay::FindShowcaseCheckpoint(checkpointId);
-    if (checkpoint == nullptr)
-    {
-        return false;
-    }
-
-    ResetShowcaseSimulation(context);
-    const horde::gameplay::ShowcaseCheckpointState state =
-        horde::gameplay::BuildShowcaseCheckpointState(*checkpoint);
-    context.cameraX = checkpoint->x;
-    context.cameraZ = checkpoint->z;
-    context.cameraYaw = checkpoint->yaw;
-    context.cameraPitch = checkpoint->pitch;
-    context.walkTime = 0.0f;
-    context.walkVisualAmount = 0.0f;
-    context.lanternSequence = state.lantern;
-    context.lanternSnapshot = state.lanternSnapshot;
-    context.enemyDirector = state.enemyDirector;
-    context.lichEncounter = state.lichEncounter;
-    context.activeEnemyKind = state.activeEnemyKind;
-    context.activeBenchmarkCheckpoint = -1;
-    context.routeReplayActive = false;
-    context.benchmarkSampling = false;
-    context.captureActive = false;
-    context.capturePresentedFrames = 0u;
-    gPlayerRetryCheckpoint.store(checkpointId, std::memory_order_release);
-    PublishPlayerVitals(context);
-    __android_log_print(ANDROID_LOG_INFO, kTag, "HORDE_PLAYER retry checkpoint=%s", checkpoint->name);
-    return true;
-}
-
 void ApplyRouteReplay(SwapchainContext& context)
 {
-    ResetShowcaseSimulation(context);
+    ResetShowcaseSimulation();
     context.activeBenchmarkCheckpoint = -1;
     context.benchmarkSampling = false;
     context.captureActive = false;
@@ -705,7 +671,7 @@ void RecordBenchmarkFrame(SwapchainContext& context,
     const horde::gameplay::ShowcaseCheckpoint* checkpoint =
         horde::gameplay::FindShowcaseCheckpoint(context.activeBenchmarkCheckpoint);
     const horde::gameplay::ShowcaseZone zone =
-        horde::gameplay::QueryShowcaseZone(context.cameraX, context.cameraZ);
+        gGameSimulation.Snapshot().zone;
     __android_log_print(ANDROID_LOG_INFO,
                         kTag,
                         "HORDE_BENCH sample generation=%u checkpoint=%s scale=%.0f window=%u frames=120 total_ms=%.3f fence_ms=%.3f record_ms=%.3f present_ms=%.3f zone=%s presented=%d",
@@ -1511,28 +1477,6 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
     const auto recordStart = std::chrono::steady_clock::now();
     if (useRtFrame)
     {
-        if (gResetRequested.exchange(false))
-        {
-            if (context.inAppBenchmark.IsRunning())
-            {
-                context.inAppBenchmark.Cancel();
-                gInAppBenchmarkStatus.store(3, std::memory_order_release);
-            }
-            ResetShowcaseSimulation(context);
-            context.activeBenchmarkCheckpoint = -1;
-            context.benchmarkSampling = false;
-            context.routeReplayActive = false;
-            context.captureActive = false;
-            context.capturePresentedFrames = 0u;
-        }
-        const std::int32_t requestedRetry =
-            gEncounterRetryRequested.exchange(-1, std::memory_order_acq_rel);
-        if (requestedRetry >= 0 && !context.inAppBenchmark.IsRunning())
-        {
-            ApplyPlayerRetryCheckpoint(context, requestedRetry);
-        }
-
-
         if (gInAppBenchmarkRequested.exchange(false, std::memory_order_acq_rel))
         {
             StartInAppBenchmark(context);
@@ -1541,7 +1485,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             context.inAppBenchmark.IsRunning())
         {
             context.inAppBenchmark.Cancel();
-            ResetShowcaseSimulation(context);
+            ResetShowcaseSimulation();
             {
                 std::lock_guard<std::mutex> lock(gReportMutex);
                 gLatestBenchmarkProgress = "BENCHMARK CANCELLED";
@@ -1576,43 +1520,69 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             gCaptureCheckpointRequested.store(-1, std::memory_order_release);
         }
 
-        const bool simulationPaused = context.captureActive || gSimulationPaused.load(std::memory_order_acquire);
-        if (!simulationPaused)
+        const horde::gameplay::simulation::PublishedInput publishedInput =
+            gInputMailbox.ConsumeLatest();
+        horde::gameplay::simulation::InputSnapshot simulationInput = publishedInput.snapshot;
+        const horde::gameplay::simulation::SimulationSnapshot& beforeCommands = gGameSimulation.Snapshot();
+        const bool routeResetPending =
+            simulationInput.commands.routeReset > beforeCommands.lastConsumedRouteResetSequence;
+        const bool retryPending =
+            simulationInput.commands.retry > beforeCommands.lastConsumedRetrySequence;
+        if (routeResetPending)
         {
-            context.playerVitals.Update(context.frameDeltaSeconds);
+            if (context.inAppBenchmark.IsRunning())
+            {
+                context.inAppBenchmark.Cancel();
+                gInAppBenchmarkStatus.store(3, std::memory_order_release);
+            }
+            context.activeBenchmarkCheckpoint = -1;
+            context.benchmarkSampling = false;
+            context.routeReplayActive = false;
+            context.captureActive = false;
+            context.capturePresentedFrames = 0u;
         }
-        PublishPlayerVitals(context);
-        const bool playerAlive = context.playerVitals.Snapshot().phase == horde::gameplay::PlayerLifePhase::Alive;
-        const bool gameplayPaused = simulationPaused || !playerAlive;
-        const bool playerDamageEnabled = !simulationPaused && !context.inAppBenchmark.IsRunning() &&
+
+        // World commands must remain responsive while menus/death pause fixed
+        // time. StepFixed consumes reset/retry before its paused branch, while
+        // attack edges remain queued until live gameplay resumes.
+        for (std::size_t command = 0u; command < 128u; ++command)
+        {
+            const horde::gameplay::simulation::SimulationSnapshot& snapshot = gGameSimulation.Snapshot();
+            if (snapshot.lastConsumedRouteResetSequence >= simulationInput.commands.routeReset &&
+                snapshot.lastConsumedRetrySequence >= simulationInput.commands.retry)
+            {
+                break;
+            }
+            if (context.inAppBenchmark.IsRunning() && retryPending)
+            {
+                break;
+            }
+            gGameSimulation.StepFixed(simulationInput, 0.0f, publishedInput.publicationSequence);
+        }
+
+        const bool simulationPaused = context.captureActive || simulationInput.paused;
+        simulationInput.damageEnabled = !simulationPaused && !context.inAppBenchmark.IsRunning() &&
             !context.routeReplayActive && !context.benchmarkSampling && !context.captureActive;
-        if (!gameplayPaused)
-        {
-            context.walkTime += context.frameDeltaSeconds;
-        }
-        const bool playerAttackRequested = gAttackRequested.exchange(false) && !gameplayPaused;
-        float moveAmount = gameplayPaused
-            ? 0.0f
-            : std::clamp(std::abs(context.moveForward) + std::abs(context.moveStrafe), 0.0f, 1.0f);
-        float travelledThisFrame = 0.0f;
-        inAppBenchmarkFrame = context.inAppBenchmark.IsRunning() && !simulationPaused;
+        inAppBenchmarkFrame = context.inAppBenchmark.IsRunning();
         if (inAppBenchmarkFrame)
         {
             context.frameDeltaSeconds = 1.0f / 60.0f;
-            const float previousCameraX = context.cameraX;
-            const float previousCameraZ = context.cameraZ;
             const horde::gameplay::ShowcaseBenchmarkAdvance advance = context.inAppBenchmark.Advance();
             if (advance.lapStarted)
             {
-                ResetShowcaseSimulation(context);
+                ResetShowcaseSimulation();
             }
-            context.cameraX = advance.replay.x;
-            context.cameraZ = advance.replay.z;
-            context.cameraYaw = advance.replay.yaw;
-            context.cameraPitch = -0.04f;
-            moveAmount = advance.finished ? 0.0f : 1.0f;
-            travelledThisFrame = std::hypot(context.cameraX - previousCameraX,
-                                             context.cameraZ - previousCameraZ);
+            simulationInput.paused = false;
+            simulationInput.damageEnabled = false;
+            simulationInput.hasAuthoritativePlayerPose = true;
+            simulationInput.authoritativePlayerX = advance.replay.x;
+            simulationInput.authoritativePlayerZ = advance.replay.z;
+            simulationInput.yawRadians = advance.replay.yaw;
+            simulationInput.pitchRadians = -0.04f;
+            gGameSimulation.StepFixed(
+                simulationInput,
+                static_cast<float>(horde::gameplay::simulation::FixedStepRunner::kFixedDeltaSeconds),
+                publishedInput.publicationSequence);
             if (advance.replay.waypointReached || advance.lapStarted || advance.finished)
             {
                 PublishBenchmarkProgress(context);
@@ -1620,16 +1590,18 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
         }
         else if (context.routeReplayActive && !simulationPaused)
         {
-            const float previousCameraX = context.cameraX;
-            const float previousCameraZ = context.cameraZ;
             const horde::gameplay::ShowcaseReplaySnapshot& replay = context.routeReplay.Update();
-            context.cameraX = replay.x;
-            context.cameraZ = replay.z;
-            context.cameraYaw = replay.yaw;
-            context.cameraPitch = -0.04f;
-            moveAmount = replay.complete || replay.failed ? 0.0f : 1.0f;
-            travelledThisFrame = std::hypot(context.cameraX - previousCameraX,
-                                             context.cameraZ - previousCameraZ);
+            simulationInput.paused = false;
+            simulationInput.damageEnabled = false;
+            simulationInput.hasAuthoritativePlayerPose = true;
+            simulationInput.authoritativePlayerX = replay.x;
+            simulationInput.authoritativePlayerZ = replay.z;
+            simulationInput.yawRadians = replay.yaw;
+            simulationInput.pitchRadians = -0.04f;
+            gGameSimulation.StepFixed(
+                simulationInput,
+                static_cast<float>(horde::gameplay::simulation::FixedStepRunner::kFixedDeltaSeconds),
+                publishedInput.publicationSequence);
             if (replay.waypointReached)
             {
                 __android_log_print(ANDROID_LOG_INFO,
@@ -1656,161 +1628,32 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
                 context.routeReplayActive = false;
             }
         }
-        else if (moveAmount > 0.02f)
+        else if (context.captureActive || context.benchmarkSampling)
         {
-            const float forwardX = std::sin(context.cameraYaw);
-            const float forwardZ = -std::cos(context.cameraYaw);
-            const float rightX = std::cos(context.cameraYaw);
-            const float rightZ = std::sin(context.cameraYaw);
-            const float speed = 0.032f;
-            const float previousCameraX = context.cameraX;
-            const float previousCameraZ = context.cameraZ;
-            context.cameraX += (forwardX * context.moveForward + rightX * context.moveStrafe) * speed;
-            context.cameraZ += (forwardZ * context.moveForward + rightZ * context.moveStrafe) * speed;
-            horde::gameplay::ResolveCorridorPlayerCollision(previousCameraX, previousCameraZ, context.cameraX, context.cameraZ);
-            travelledThisFrame = std::hypot(context.cameraX - previousCameraX,
-                                             context.cameraZ - previousCameraZ);
+            // Debug checkpoint measurements and captures are frozen snapshots.
+            simulationInput.paused = true;
+            simulationInput.damageEnabled = false;
+            simulationInput.hasAuthoritativePlayerPose = false;
+            gGameSimulation.AdvanceFrame(
+                simulationInput,
+                0.0,
+                publishedInput.publicationSequence);
         }
-        const float walkBlend = std::clamp(context.frameDeltaSeconds * 8.0f, 0.0f, 1.0f);
-        context.walkVisualAmount += (moveAmount - context.walkVisualAmount) * walkBlend;
-        if (gameplayPaused)
+        else if (!inAppBenchmarkFrame && !context.routeReplayActive)
         {
-            context.walkVisualAmount = 0.0f;
-        }
-        if (context.playerFootsteps.Update(travelledThisFrame, moveAmount > 0.02f))
-        {
-            gAudioEvents.fetch_or(kAudioEventPlayerFootstep, std::memory_order_release);
-        }
-        context.enemyDirector.Update(context.cameraX, context.cameraZ);
-        const horde::gameplay::EnemyRosterSnapshot& roster = context.enemyDirector.Snapshot();
-        if (roster.selectedEnemy != context.activeEnemyKind)
-        {
-            context.activeEnemyKind = roster.selectedEnemy;
-            if (context.activeEnemyKind == horde::gameplay::EnemyKind::Skeleton)
-            {
-                context.combat = {};
-                context.combatSnapshot = {};
-            }
-            else if (context.activeEnemyKind == horde::gameplay::EnemyKind::Lich)
-            {
-                context.lichEncounter.Reset();
-            }
-            context.playerVitals.ResetForEncounter();
-            gPlayerRetryCheckpoint.store(
-                context.activeEnemyKind == horde::gameplay::EnemyKind::Lich ? 9 : 0,
-                std::memory_order_release);
-            PublishPlayerVitals(context);
-        }
-        bool lichHitRequested = false;
-        if (playerAttackRequested)
-        {
-            // Keep the player sword animation independent of the selected enemy.
-            context.combat.RequestAttack();
-            lichHitRequested = context.activeEnemyKind == horde::gameplay::EnemyKind::Lich;
-        }
-        if (!gameplayPaused)
-        {
-            context.lanternSnapshot = context.lanternSequence.Update(
+            simulationInput.hasAuthoritativePlayerPose = false;
+            gGameSimulation.AdvanceFrame(
+                simulationInput,
                 context.frameDeltaSeconds,
-                context.cameraX,
-                context.cameraZ,
-                context.cameraYaw,
-                context.cameraPitch);
-            const horde::gameplay::EnemyAnimation previousAnimation = context.combatSnapshot.enemyAnimation;
-            context.combatSnapshot = context.combat.Update(context.frameDeltaSeconds, context.cameraX, context.cameraZ, context.cameraYaw);
-            if (context.activeEnemyKind == horde::gameplay::EnemyKind::Skeleton &&
-                previousAnimation != horde::gameplay::EnemyAnimation::Dead &&
-                context.combatSnapshot.enemyAnimation == horde::gameplay::EnemyAnimation::Dead)
-            {
-                gAudioEvents.fetch_or(kAudioEventEnemyDefeated, std::memory_order_release);
-            }
-            if (context.activeEnemyKind == horde::gameplay::EnemyKind::Skeleton &&
-                previousAnimation != horde::gameplay::EnemyAnimation::Attack &&
-                context.combatSnapshot.enemyAnimation == horde::gameplay::EnemyAnimation::Attack)
-            {
-                gAudioEvents.fetch_or(kAudioEventEnemyAttack, std::memory_order_release);
-            }
-            const bool skeletonWalking = context.activeEnemyKind == horde::gameplay::EnemyKind::Skeleton &&
-                                         context.combatSnapshot.enemyAnimation == horde::gameplay::EnemyAnimation::Walking;
-            if (context.enemyFootsteps.Update(context.frameDeltaSeconds, skeletonWalking))
-            {
-                gAudioEvents.fetch_or(kAudioEventEnemyFootstep, std::memory_order_release);
-            }
+                publishedInput.publicationSequence);
         }
-        const bool finaleActive = horde::gameplay::QueryShowcaseZone(context.cameraX, context.cameraZ) ==
-                                  horde::gameplay::ShowcaseZone::Finale;
-        const horde::gameplay::LichPhase previousLichPhase = context.lichEncounter.Snapshot().phase;
-        const horde::gameplay::LichSnapshot& lich = context.lichEncounter.Update(
-            !gameplayPaused && context.activeEnemyKind == horde::gameplay::EnemyKind::Lich ? context.frameDeltaSeconds : 0.0f,
-            context.cameraX,
-            context.cameraZ,
-            !horde::gameplay::IsRouteAudioObstructed(context.cameraX, context.cameraZ,
-                                                      context.lichEncounter.Snapshot().x,
-                                                      context.lichEncounter.Snapshot().z),
-            context.activeEnemyKind == horde::gameplay::EnemyKind::Lich && finaleActive);
-        PublishFinaleEnding(lich);
-        if (lichHitRequested && context.lichEncounter.TryAcceptPlayerHit(context.cameraX, context.cameraZ))
-        {
-            gAudioEvents.fetch_or(kAudioEventLichHit, std::memory_order_release);
-            if (lich.phase == horde::gameplay::LichPhase::Dead)
-            {
-                gAudioEvents.fetch_or(kAudioEventLichDefeated, std::memory_order_release);
-            }
-        }
-        if (context.activeEnemyKind == horde::gameplay::EnemyKind::Lich &&
-            previousLichPhase != horde::gameplay::LichPhase::Charging &&
-            lich.phase == horde::gameplay::LichPhase::Charging)
-        {
-            gAudioEvents.fetch_or(kAudioEventLichCharge, std::memory_order_release);
-        }
-        if (context.activeEnemyKind == horde::gameplay::EnemyKind::Lich &&
-            lich.deathAnimationComplete)
-        {
-            context.enemyDirector.MarkSelectedDead();
-        }
-        if (context.activeEnemyKind == horde::gameplay::EnemyKind::Lich && lich.damagePulse)
-        {
-            gAudioEvents.fetch_or(kAudioEventLichImpact, std::memory_order_release);
-        }
-        const bool playerDamagePulse =
-            (context.activeEnemyKind == horde::gameplay::EnemyKind::Skeleton &&
-             context.combatSnapshot.playerHitPulse) ||
-            (context.activeEnemyKind == horde::gameplay::EnemyKind::Lich && lich.damagePulse);
-        if (playerDamageEnabled && playerDamagePulse)
-        {
-            const horde::gameplay::PlayerDamageResult damageResult = context.playerVitals.TryApplyDamage();
-            if (damageResult != horde::gameplay::PlayerDamageResult::Ignored)
-            {
-                gAudioEvents.fetch_or(kAudioEventPlayerDamaged, std::memory_order_release);
-                if (damageResult == horde::gameplay::PlayerDamageResult::Killed)
-                {
-                    gPlayerRetryCheckpoint.store(
-                        context.activeEnemyKind == horde::gameplay::EnemyKind::Lich ? 9 : 0,
-                        std::memory_order_release);
-                    context.moveStrafe = 0.0f;
-                    context.moveForward = 0.0f;
-                    gAttackRequested.store(false, std::memory_order_release);
-                    gAudioEvents.fetch_or(kAudioEventPlayerKilled, std::memory_order_release);
-                }
-                PublishPlayerVitals(context);
-            }
-        }
-        horde::gameplay::CombatSnapshot renderCombat = context.combatSnapshot;
-        renderCombat.damageFlash = context.playerVitals.Snapshot().damageFlash;
-        PublishEnemyAudioGains(context);
-        horde::vulkan::raytracing::RtSceneFrameInputs frameInputs;
-        frameInputs.cameraYaw = context.cameraYaw;
-        frameInputs.cameraPitch = context.cameraPitch;
-        frameInputs.lanternStrength = context.lanternStrength * context.lanternSnapshot.flameStrength;
-        frameInputs.walkTime = context.walkTime;
-        frameInputs.cameraX = context.cameraX;
-        frameInputs.cameraZ = context.cameraZ;
-        frameInputs.walkAmount = context.walkVisualAmount;
-        frameInputs.outputExposure = context.outputExposure;
-        frameInputs.combat = renderCombat;
-        frameInputs.lantern = context.lanternSnapshot;
-        frameInputs.roster = roster;
-        frameInputs.lich = lich;
+
+        DrainSimulationEventsToPlatform();
+        PublishSimulationUiState();
+        const horde::vulkan::raytracing::RtSceneFrameInputs frameInputs =
+            horde::vulkan::raytracing::BuildRtSceneFrameInputs(
+                gGameSimulation.Snapshot(),
+                context.outputExposure);
         std::string diagnostic;
         if (!context.rtScene.RecordTraceAndCopy(context.commandBuffers[imageIndex],
                                                 context.swapchainImages[imageIndex],
@@ -2076,8 +1919,11 @@ bool StartSurfaceInternal(ANativeWindow* window,
     context.useRtPath = capabilities.rtMode == horde::vulkan::RtMode::RayTracingPipeline;
     context.clearColor = ClearColorForMode(capabilities.rtMode);
     gRuntimeState.store(context.useRtPath ? 0 : 2, std::memory_order_release);
-    gAudioEvents.store(0u, std::memory_order_release);
-    gEnemyAudioStereoGains.store(0u, std::memory_order_release);
+    ClearPlatformGameplayEvents();
+    {
+        std::lock_guard<std::mutex> inputLock(gInputPublisherMutex);
+        PublishInputLocked();
+    }
 
     if (!CreateInstance(context.instance))
     {
@@ -2132,14 +1978,7 @@ bool StartSurfaceInternal(ANativeWindow* window,
 
 void StopSurfaceInternal()
 {
-    gEncounterRetryRequested.store(-1, std::memory_order_release);
     gRuntimeState.store(0, std::memory_order_release);
-    gPlayerVitality.store(horde::gameplay::PlayerVitals::kMaxVitality, std::memory_order_release);
-    gPlayerLifePhase.store(
-        static_cast<int>(horde::gameplay::PlayerLifePhase::Alive),
-        std::memory_order_release);
-    gPlayerRetryCheckpoint.store(0, std::memory_order_release);
-    gFinaleEndingPhase.store(static_cast<int>(horde::gameplay::FinaleEndingPhase::Inactive), std::memory_order_release);
     if (gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1)
     {
         gInAppBenchmarkStatus.store(3, std::memory_order_release);
@@ -2148,20 +1987,12 @@ void StopSurfaceInternal()
     }
     gInAppBenchmarkRequested.store(false, std::memory_order_release);
     gInAppBenchmarkCancelRequested.store(false, std::memory_order_release);
-    const bool wasRunning = gSwapchainRunning.exchange(false, std::memory_order_acq_rel);
-    if (!wasRunning)
-    {
-        if (gSwapchainThread.joinable())
-        {
-            gSwapchainThread.join();
-        }
-        return;
-    }
-
+    gSwapchainRunning.store(false, std::memory_order_release);
     if (gSwapchainThread.joinable())
     {
         gSwapchainThread.join();
     }
+    PublishSimulationUiState();
 }
 
 } // namespace
@@ -2313,24 +2144,36 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_stopDiagnosticSurface(JNIEnv*, jclas
 extern "C" JNIEXPORT void JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_setViewControls(JNIEnv*, jclass, jfloat yaw, jfloat pitch, jfloat lanternStrength, jfloat moveStrafe, jfloat moveForward)
 {
-    std::lock_guard<std::mutex> lock(gSwapchainMutex);
-    gSwapchainContext.cameraYaw = static_cast<float>(yaw);
-    gSwapchainContext.cameraPitch = std::clamp(static_cast<float>(pitch), -0.32f, 0.28f);
-    gSwapchainContext.lanternStrength = std::clamp(static_cast<float>(lanternStrength), 0.65f, 2.4f);
-    gSwapchainContext.moveStrafe = std::clamp(static_cast<float>(moveStrafe), -1.0f, 1.0f);
-    gSwapchainContext.moveForward = std::clamp(static_cast<float>(moveForward), -1.0f, 1.0f);
+    std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+    gInputPublisherState.yawRadians = static_cast<float>(yaw);
+    gInputPublisherState.pitchRadians = std::clamp(static_cast<float>(pitch), -0.32f, 0.28f);
+    gInputPublisherState.lanternStrength =
+        std::clamp(static_cast<float>(lanternStrength), 0.65f, 2.4f);
+    gInputPublisherState.moveStrafe = std::clamp(static_cast<float>(moveStrafe), -1.0f, 1.0f);
+    gInputPublisherState.moveForward = std::clamp(static_cast<float>(moveForward), -1.0f, 1.0f);
+    PublishInputLocked();
 }
 
 extern "C" JNIEXPORT void JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_requestAttack(JNIEnv*, jclass)
 {
-    gAttackRequested.store(true);
+    std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+    if (gInputPublisherState.commands.attack != UINT64_MAX)
+    {
+        ++gInputPublisherState.commands.attack;
+    }
+    PublishInputLocked();
 }
 
 extern "C" JNIEXPORT void JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_requestRouteReset(JNIEnv*, jclass)
 {
-    gResetRequested.store(true, std::memory_order_release);
+    std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+    if (gInputPublisherState.commands.routeReset != UINT64_MAX)
+    {
+        ++gInputPublisherState.commands.routeReset;
+    }
+    PublishInputLocked();
 }
 
 extern "C" JNIEXPORT jint JNICALL
@@ -2364,14 +2207,23 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_retryEncounter(JNIEnv*, jclass)
     {
         return -1;
     }
-    gEncounterRetryRequested.store(checkpoint, std::memory_order_release);
+    {
+        std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+        if (gInputPublisherState.commands.retry != UINT64_MAX)
+        {
+            ++gInputPublisherState.commands.retry;
+        }
+        PublishInputLocked();
+    }
     return static_cast<jint>(checkpoint);
 }
 
 extern "C" JNIEXPORT void JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_setSimulationPaused(JNIEnv*, jclass, jboolean paused)
 {
-    gSimulationPaused.store(paused == JNI_TRUE, std::memory_order_release);
+    std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+    gInputPublisherState.paused = paused == JNI_TRUE;
+    PublishInputLocked();
 }
 
 extern "C" JNIEXPORT void JNICALL
@@ -2471,14 +2323,28 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getRuntimeState(JNIEnv*, jclass)
     return static_cast<jint>(gRuntimeState.load(std::memory_order_acquire));
 }
 
-extern "C" JNIEXPORT jint JNICALL
-Java_com_samfa12_hordelanternrt_ProbeBridge_consumeAudioEvents(JNIEnv*, jclass)
+extern "C" JNIEXPORT jlongArray JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_drainPlatformEvents(JNIEnv* env, jclass)
 {
-    return static_cast<jint>(gAudioEvents.exchange(0u, std::memory_order_acq_rel));
-}
+    std::vector<jlong> packed;
+    {
+        std::lock_guard<std::mutex> lock(gPlatformGameplayEventMutex);
+        packed.reserve(gPlatformGameplayEventCount * 2u);
+        for (std::size_t index = 0u; index < gPlatformGameplayEventCount; ++index)
+        {
+            const PlatformGameplayEvent& event = gPlatformGameplayEvents[
+                (gPlatformGameplayEventHead + index) % gPlatformGameplayEvents.size()];
+            packed.push_back(static_cast<jlong>(event.metadata));
+            packed.push_back(static_cast<jlong>(event.stereoGains));
+        }
+        gPlatformGameplayEventHead = 0u;
+        gPlatformGameplayEventCount = 0u;
+    }
 
-extern "C" JNIEXPORT jlong JNICALL
-Java_com_samfa12_hordelanternrt_ProbeBridge_getEnemyAudioStereoGains(JNIEnv*, jclass)
-{
-    return static_cast<jlong>(gEnemyAudioStereoGains.load(std::memory_order_acquire));
+    jlongArray result = env->NewLongArray(static_cast<jsize>(packed.size()));
+    if (result != nullptr && !packed.empty())
+    {
+        env->SetLongArrayRegion(result, 0, static_cast<jsize>(packed.size()), packed.data());
+    }
+    return result;
 }

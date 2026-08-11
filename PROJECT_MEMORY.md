@@ -1,6 +1,6 @@
 # Horde Lantern RT - Project Memory
 
-Last updated: 2026-08-01
+Last updated: 2026-08-11
 
 ## Identity and release state
 
@@ -96,6 +96,18 @@ Last updated: 2026-08-01
 - `tools/compile-raygen.ps1 -Check` compiles into an evidence directory and compares SPIR-V words with the embedded include without mutating the checkout or depending on text line endings.
 - Windows Debug supports `--capture-showcase <directory>`; Release rejects it. Android capture/checkpoint intent handling is Debug-only and Release rejects the automation path. Video and orbit-camera work remain deferred.
 - Exact 2026-07-22 Full-gate and shader A/B evidence: `docs/FOUNDATION_VALIDATION_2026-07-22.md`.
+
+## Shared deterministic simulation foundation
+
+- Windows and Android now consume one fixed 60 Hz `GameSimulation` for player pose/movement/collision, walk state, lantern, encounter selection, skeleton and lich actions, vitality/death/retry, finale progression, and semantic events.
+- Android JNI publishes complete `InputSnapshot` values through a reader-pinned two-slot mailbox; attack, route reset, and retry use monotonic counters so repeated requests cannot collapse into one boolean.
+- A fixed-capacity 64-event queue uses stable player/skeleton/lich IDs and unique event sequences. Windows maps drained events to XAudio; Android forwards ordered event records with per-event spatial gains to SoundPool and haptics.
+- The shared fixed-step runner clamps a render contribution at 100 ms, permits up to eight catch-up ticks, reports overruns, normalises diagonal movement at 1.9 m/s, and resets its accumulator across pause/lifecycle/reset/retry/checkpoint transitions.
+- `SimulationFrameAdapter.cpp` is the single `SimulationSnapshot` to `RtSceneFrameInputs` conversion. `PresentableTinyRtScene`, shader ABI, raygen, RT dispatch/presentation, and public release identity remain unchanged.
+- Exact captures import existing `BuildShowcaseCheckpointState` results, perform the historical zero-delta skeleton/lich finalization, and freeze. The post-migration Windows set is 12/12 byte-exact against the 2026-08-11 pre-edit run.
+- Focused host tests cover 30/60/120 Hz parity, a 100 ms hitch, diagonal normalization, pause/resume, input edge retention, bounded event identity/overflow, encounter seam persistence, retry/reset, direct-vs-mailbox platform parity, and concurrent mailbox coherence.
+- Additive `CMakePresets.json` presets and a Vulkan-off host CI lane improve reproducibility. CI explicitly does not prove hardware RT presentation or phone behavior.
+- Detailed implementation and validation evidence: `docs/SHARED_SIMULATION_FOUNDATION_2026-08-10.md`.
 
 ## Asset and licence state
 

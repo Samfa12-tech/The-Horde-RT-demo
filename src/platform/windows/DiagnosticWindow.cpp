@@ -47,9 +47,11 @@
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/SpatialAudio.h"
 #include "gameplay/SwordCombat.h"
+#include "gameplay/simulation/GameSimulation.h"
 #include "vulkan/RtCapabilityReport.h"
 #include "vulkan/VulkanContext.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
+#include "vulkan/raytracing/SimulationFrameAdapter.h"
 
 #ifndef HORDE_RT_BUILD_ID
 #define HORDE_RT_BUILD_ID "development"
@@ -147,6 +149,8 @@ struct ShowcaseCaptureRecord
 
 struct VulkanSurfaceContext
 {
+    VulkanSurfaceContext() = default;
+
     HWND windowHandle = nullptr;
     VkInstance instance = VK_NULL_HANDLE;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
@@ -188,7 +192,6 @@ struct VulkanSurfaceContext
     bool leftHeld = false;
     bool rightHeld = false;
     bool mouseLookActive = false;
-    bool playerAttackRequested = false;
     POINT lastMousePosition{};
     ULONGLONG lastControlTick = 0u;
     float cameraYaw = 0.0f;
@@ -201,27 +204,28 @@ struct VulkanSurfaceContext
     float walkAmount = 0.0f;
     float playerTravelledThisFrame = 0.0f;
     float frameDeltaSeconds = 1.0f / 60.0f;
-    horde::gameplay::TravelFootstepCadence playerFootsteps;
-    horde::gameplay::PlayerFootstepCadence enemyFootsteps;
     int playerFootstepVariant = 0;
     int enemyFootstepVariant = 0;
-    bool lichDeathCuePlayed = false;
     float outputExposure = 0.62f;
     float mouseSensitivity = 1.0f;
     float renderScale = 1.0f;
     bool renderScaleDirty = false;
     WINDOWPLACEMENT windowedPlacement{sizeof(WINDOWPLACEMENT)};
-    horde::gameplay::SwordCombat combat;
+    horde::gameplay::simulation::GameSimulation simulation;
+    horde::gameplay::simulation::InputSnapshot simulationInput;
+    std::uint64_t inputPublicationSequence = 0u;
+    std::uint64_t attackSequence = 0u;
+    std::uint64_t routeResetSequence = 0u;
+    std::uint64_t retrySequence = 0u;
+    int playerSwingVariant = 0;
+    // Legacy mirrors retained only for Win32 overlays, capture manifests, and
+    // existing debug authoring controls. GameSimulation is gameplay authority.
     horde::gameplay::CombatSnapshot combatSnapshot;
-    horde::gameplay::PlayerVitals playerVitals;
     bool deathOverlayVisible = false;
     bool endingOverlayVisible = false;
     bool endingOverlayDismissed = false;
     std::int32_t playerRetryCheckpoint = 0;
-    horde::gameplay::LanternSequence lanternSequence;
     horde::gameplay::LanternSnapshot lanternSnapshot;
-    horde::gameplay::EnemyDirector enemyDirector;
-    horde::gameplay::LichEncounter lichEncounter;
     horde::gameplay::EnemyKind activeEnemyKind = horde::gameplay::EnemyKind::Skeleton;
     horde::gameplay::EnemyKind debugEnemyOverride = horde::gameplay::EnemyKind::None;
     uint32_t debugValidationPoint = 0u;
@@ -234,6 +238,7 @@ struct VulkanSurfaceContext
 
 bool WriteReportFile(const std::filesystem::path& path, const std::string& data);
 void ClearDesktopInput(VulkanSurfaceContext& context);
+void UpdateVitalityHud(VulkanSurfaceContext& context);
 void LayoutOverlayControls(HWND window, int width, int height);
 std::string WindowSafeText(const std::string& value);
 
@@ -437,7 +442,13 @@ std::filesystem::path ResolveAssetRoot()
     {
         return packaged;
     }
+#if defined(_DEBUG) && defined(HORDE_RT_SOURCE_DIR)
     return std::filesystem::path(HORDE_RT_SOURCE_DIR) / "assets";
+#else
+    // Release must prove that the executable-relative package is complete.
+    // Falling back into a developer checkout can otherwise hide a broken ZIP.
+    return packaged;
+#endif
 }
 
 std::filesystem::path SettingsPath()
@@ -801,16 +812,16 @@ bool PlayXAudioFile(const std::filesystem::path& path, float leftGain, float rig
                                      std::clamp(rightGain, 0.0f, 1.0f));
 }
 
-void PlayEnemySoundEffect(const VulkanSurfaceContext& context, const char* filename, float mixGain)
+void PlayPositionalSoundEffect(const VulkanSurfaceContext& context,
+                               const char* filename,
+                               float mixGain,
+                               float emitterX,
+                               float emitterZ)
 {
     if (!context.sfxEnabled)
     {
         return;
     }
-    const float emitterX = context.activeEnemyKind == horde::gameplay::EnemyKind::Lich
-        ? context.lichEncounter.Snapshot().x : context.combatSnapshot.enemyX;
-    const float emitterZ = context.activeEnemyKind == horde::gameplay::EnemyKind::Lich
-        ? context.lichEncounter.Snapshot().z : context.combatSnapshot.enemyZ;
     const horde::gameplay::SpatialAudioGains gains = horde::gameplay::CalculateSpatialAudio(
         {emitterX, emitterZ, mixGain, 1.0f, 14.0f},
         {context.cameraX, context.cameraZ, context.cameraYaw});
@@ -830,6 +841,86 @@ void PlayEnemySoundEffect(const VulkanSurfaceContext& context, const char* filen
     {
         LogWindowsAudio("missing positional SFX asset: " + path.string());
     }
+}
+
+void PlayEnemySoundEffect(const VulkanSurfaceContext& context, const char* filename, float mixGain)
+{
+    const horde::gameplay::simulation::SimulationSnapshot& simulation = context.simulation.Snapshot();
+    const float emitterX = simulation.activeEnemyKind == horde::gameplay::EnemyKind::Lich
+        ? simulation.lich.x : simulation.swordCombat.enemyX;
+    const float emitterZ = simulation.activeEnemyKind == horde::gameplay::EnemyKind::Lich
+        ? simulation.lich.z : simulation.swordCombat.enemyZ;
+    PlayPositionalSoundEffect(context, filename, mixGain, emitterX, emitterZ);
+}
+
+void DrainGameplayEvents(VulkanSurfaceContext& context)
+{
+    using horde::gameplay::simulation::EntityId;
+    using horde::gameplay::simulation::GameplayEvent;
+    using horde::gameplay::simulation::GameplayEventType;
+
+    for (const GameplayEvent& event : context.simulation.Events().Events())
+    {
+        switch (event.type)
+        {
+        case GameplayEventType::PlayerFootstep:
+        {
+            const char* clip = (context.playerFootstepVariant++ & 1) == 0
+                ? "player_step_1.wav" : "player_step_2.wav";
+            PlayAmbientSoundEffect(context, clip);
+            break;
+        }
+        case GameplayEventType::PlayerSwing:
+            PlaySoundEffect(context,
+                            (context.playerSwingVariant++ & 1) == 0
+                                ? "sword_swing_1.wav" : "sword_swing_2.wav");
+            break;
+        case GameplayEventType::EnemyFootstep:
+        {
+            const char* clip = (context.enemyFootstepVariant++ & 1) == 0
+                ? "skeleton_step_1.wav" : "skeleton_step_2.wav";
+            PlayPositionalSoundEffect(context, clip, 1.0f, event.worldX, event.worldZ);
+            break;
+        }
+        case GameplayEventType::EnemyAttackStarted:
+            PlayPositionalSoundEffect(context, "skeleton_attack.wav", 0.85f,
+                                      event.worldX, event.worldZ);
+            break;
+        case GameplayEventType::EnemyHit:
+            if (event.target == EntityId::Lich)
+            {
+                PlayPositionalSoundEffect(context, "lich_hurt.wav", 0.95f,
+                                          event.worldX, event.worldZ);
+            }
+            else
+            {
+                PlaySoundEffect(context, "sword_hit_1.wav");
+            }
+            break;
+        case GameplayEventType::LichChargeStarted:
+            PlayPositionalSoundEffect(context, "lich_charge.wav", 0.42f,
+                                      event.worldX, event.worldZ);
+            break;
+        case GameplayEventType::LichImpact:
+            PlayPositionalSoundEffect(context, "lich_impact.wav", 0.55f,
+                                      event.worldX, event.worldZ);
+            break;
+        case GameplayEventType::LichDefeated:
+            PlayPositionalSoundEffect(context, "lich_fall.wav", 0.36f,
+                                      event.worldX, event.worldZ);
+            break;
+        case GameplayEventType::PlayerDamaged:
+            UpdateVitalityHud(context);
+            break;
+        case GameplayEventType::PlayerKilled:
+            UpdateVitalityHud(context);
+            ClearDesktopInput(context);
+            break;
+        default:
+            break;
+        }
+    }
+    context.simulation.ClearEvents();
 }
 
 void SetControlVisible(HWND window, const int id, const bool visible)
@@ -879,7 +970,7 @@ void UpdateSettingsLabels(VulkanSurfaceContext& context)
 
 void UpdateVitalityHud(VulkanSurfaceContext& context)
 {
-    const horde::gameplay::PlayerVitalsSnapshot& vitals = context.playerVitals.Snapshot();
+    const horde::gameplay::PlayerVitalsSnapshot& vitals = context.simulation.Snapshot().playerVitals;
     const std::string text = "VITALITY  " + std::to_string(vitals.vitality) + " / " +
                              std::to_string(vitals.maxVitality);
     if (HWND hud = GetDlgItem(context.windowHandle, kVitalityHudControlId))
@@ -892,9 +983,26 @@ void UpdateVitalityHud(VulkanSurfaceContext& context)
 bool IsPlayerDamageEnabled(const VulkanSurfaceContext& context)
 {
     return !context.simulationPaused &&
-           context.playerVitals.Snapshot().phase == horde::gameplay::PlayerLifePhase::Alive &&
+           context.simulation.Snapshot().playerVitals.phase == horde::gameplay::PlayerLifePhase::Alive &&
            !context.benchmark.IsRunning() &&
            GetPropA(context.windowHandle, kCaptureModeProperty) == nullptr;
+}
+
+void MirrorSimulationSnapshot(VulkanSurfaceContext& context)
+{
+    const horde::gameplay::simulation::SimulationSnapshot& snapshot = context.simulation.Snapshot();
+    context.cameraYaw = snapshot.playerYawRadians;
+    context.cameraPitch = snapshot.playerPitchRadians;
+    context.walkTime = snapshot.walkTime;
+    context.walkVisualAmount = snapshot.walkAmount;
+    context.cameraX = snapshot.playerX;
+    context.cameraZ = snapshot.playerZ;
+    context.walkAmount = snapshot.walkAmount;
+    context.playerTravelledThisFrame = snapshot.playerTravelledThisTick;
+    context.combatSnapshot = snapshot.swordCombat;
+    context.lanternSnapshot = snapshot.lantern;
+    context.activeEnemyKind = snapshot.activeEnemyKind;
+    context.playerRetryCheckpoint = snapshot.retryCheckpoint;
 }
 
 void ApplyOverlayState(VulkanSurfaceContext& context)
@@ -935,8 +1043,14 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
                            !context.settingsVisible && !context.diagnosticsVisible &&
                            !context.benchmark.IsRunning());
 #endif
+    const bool wasSimulationPaused = context.simulationPaused;
     context.simulationPaused = pauseVisible || context.settingsVisible ||
                                context.diagnosticsVisible || context.benchmarkReportVisible;
+    context.simulationInput.paused = context.simulationPaused;
+    if (context.simulationPaused != wasSimulationPaused)
+    {
+        context.simulation.ResetTiming();
+    }
     if (context.simulationPaused)
     {
         ClearDesktopInput(context);
@@ -999,33 +1113,19 @@ void ShowPauseMenu(VulkanSurfaceContext& context, const bool visible)
 
 void ResetRoute(VulkanSurfaceContext& context)
 {
-    context.cameraYaw = 0.0f;
-    context.cameraPitch = 0.0f;
     context.lanternStrength = 1.8f;
-    context.walkTime = 0.0f;
-    context.walkVisualAmount = 0.0f;
-    context.cameraX = 0.0f;
-    context.cameraZ = 1.85f;
-    context.walkAmount = 0.0f;
-    context.playerTravelledThisFrame = 0.0f;
-    context.playerFootsteps.Reset();
-    context.enemyFootsteps.Reset();
-    context.lichDeathCuePlayed = false;
-    context.combat = {};
-    context.combatSnapshot = {};
-    context.playerVitals.ResetForEncounter();
     context.deathOverlayVisible = false;
     context.endingOverlayVisible = false;
     context.endingOverlayDismissed = false;
-    context.playerRetryCheckpoint = 0;
-    context.lanternSequence.Reset();
-    context.lanternSnapshot = {};
-    context.enemyDirector.Reset();
-    context.lichEncounter.Reset();
-    context.activeEnemyKind = horde::gameplay::EnemyKind::Skeleton;
     context.debugEnemyOverride = horde::gameplay::EnemyKind::None;
     context.debugValidationPoint = 0u;
-    context.playerAttackRequested = false;
+    context.simulation.ResetRoute();
+    context.simulation.ClearEvents();
+    context.simulationInput.moveForward = 0.0f;
+    context.simulationInput.moveStrafe = 0.0f;
+    context.simulationInput.lanternStrength = context.lanternStrength;
+    context.simulationInput.hasAuthoritativePlayerPose = false;
+    MirrorSimulationSnapshot(context);
     ClearDesktopInput(context);
     UpdateVitalityHud(context);
 }
@@ -1083,23 +1183,12 @@ bool ApplyPlayerRetryCheckpoint(VulkanSurfaceContext& context, const std::int32_
     {
         return false;
     }
-    ResetRoute(context);
-    horde::gameplay::ShowcaseCheckpointState state =
-        horde::gameplay::BuildShowcaseCheckpointState(*checkpoint);
-    context.cameraX = checkpoint->x;
-    context.cameraZ = checkpoint->z;
-    context.cameraYaw = checkpoint->yaw;
-    context.cameraPitch = checkpoint->pitch;
-    context.walkTime = 0.0f;
-    context.walkVisualAmount = 0.0f;
-    context.walkAmount = 0.0f;
-    context.lanternSequence = std::move(state.lantern);
-    context.lanternSnapshot = state.lanternSnapshot;
-    context.enemyDirector = std::move(state.enemyDirector);
-    context.lichEncounter = std::move(state.lichEncounter);
-    context.activeEnemyKind = state.activeEnemyKind;
+    context.simulation.RetryEncounter();
+    context.simulation.ClearEvents();
+    context.simulationInput.hasAuthoritativePlayerPose = false;
+    context.simulationInput.paused = false;
+    MirrorSimulationSnapshot(context);
     context.debugEnemyOverride = horde::gameplay::EnemyKind::None;
-    context.playerRetryCheckpoint = checkpointId;
     context.pauseMenuVisible = false;
     context.settingsVisible = false;
     context.diagnosticsVisible = false;
@@ -1310,8 +1399,9 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(
     const VulkanSurfaceContext& context,
     const horde::vulkan::DeviceCapabilities& capabilities)
 {
-    const horde::gameplay::EnemyRosterSnapshot& roster = context.enemyDirector.Snapshot();
-    const horde::gameplay::LichSnapshot& lich = context.lichEncounter.Snapshot();
+    const horde::gameplay::simulation::SimulationSnapshot& simulation = context.simulation.Snapshot();
+    const horde::gameplay::EnemyRosterSnapshot& roster = simulation.enemyRoster;
+    const horde::gameplay::LichSnapshot& lich = simulation.lich;
     const horde::gameplay::EnemyEncounterSnapshot* encounter = SelectedEncounter(roster);
     horde::ui::DeveloperOverlaySnapshot snapshot;
     snapshot.buildIdentity = std::string(HORDE_RT_BUILD_ID) + " DEBUG";
@@ -1330,11 +1420,21 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(
         snapshot.encounterPhase = horde::gameplay::LichPhaseName(lich.phase);
         snapshot.enemyHealth = lich.health;
     }
-    const horde::gameplay::PlayerVitalsSnapshot& player = context.playerVitals.Snapshot();
+    const horde::gameplay::PlayerVitalsSnapshot& player = simulation.playerVitals;
     snapshot.playerLifePhase = horde::gameplay::PlayerLifePhaseName(player.phase);
     snapshot.playerVitality = player.vitality;
     snapshot.playerMaxVitality = player.maxVitality;
     snapshot.playerDamageEnabled = IsPlayerDamageEnabled(context);
+    snapshot.simulationTicksThisFrame = simulation.simulationTicksThisFrame;
+    snapshot.fixedStepAccumulatorSeconds = simulation.fixedStepAccumulatorSeconds;
+    snapshot.catchUpOverrunCount = simulation.catchUpOverrunCount;
+    snapshot.queuedEventCount = simulation.queuedEventCount;
+    snapshot.eventQueueHighWaterMark = simulation.eventQueueHighWaterMark;
+    snapshot.eventQueueOverflowCount = simulation.eventQueueOverflowCount;
+    snapshot.inputPublicationSequence = simulation.inputPublicationSequence;
+    snapshot.consumedAttackSequence = simulation.lastConsumedAttackSequence;
+    snapshot.consumedRouteResetSequence = simulation.lastConsumedRouteResetSequence;
+    snapshot.consumedRetrySequence = simulation.lastConsumedRetrySequence;
     snapshot.internalWidth = capabilities.performance.internalRenderWidth;
     snapshot.internalHeight = capabilities.performance.internalRenderHeight;
     snapshot.presentationWidth = context.swapchainExtent.width;
@@ -1556,81 +1656,97 @@ void ClearDesktopInput(VulkanSurfaceContext& context)
 
 void UpdateDesktopSceneControls(VulkanSurfaceContext& context)
 {
+    const int previousVitality = context.simulation.Snapshot().playerVitals.vitality;
+    const horde::gameplay::PlayerLifePhase previousLifePhase =
+        context.simulation.Snapshot().playerVitals.phase;
     const ULONGLONG now = GetTickCount64();
     float deltaSeconds = 1.0f / 60.0f;
     if (context.lastControlTick != 0u)
     {
-        deltaSeconds = std::clamp(static_cast<float>(now - context.lastControlTick) / 1000.0f, 0.0f, 0.05f);
+        deltaSeconds = std::clamp(static_cast<float>(now - context.lastControlTick) / 1000.0f, 0.0f, 0.1f);
     }
     context.lastControlTick = now;
     context.frameDeltaSeconds = deltaSeconds;
-    context.playerTravelledThisFrame = 0.0f;
+
+    horde::gameplay::simulation::InputSnapshot input = context.simulationInput;
+    input.yawRadians = context.cameraYaw;
+    input.pitchRadians = context.cameraPitch;
+    input.lanternStrength = context.lanternStrength;
+    input.paused = context.simulationPaused;
+    input.damageEnabled = IsPlayerDamageEnabled(context);
+    input.commands.attack = context.attackSequence;
+    input.commands.routeReset = context.routeResetSequence;
+    input.commands.retry = context.retrySequence;
+    input.hasAuthoritativePlayerPose = false;
+    input.moveForward = (context.forwardHeld ? 1.0f : 0.0f) -
+                        (context.backwardHeld ? 1.0f : 0.0f);
+    input.moveStrafe = (context.rightHeld ? 1.0f : 0.0f) -
+                       (context.leftHeld ? 1.0f : 0.0f);
+
     if (context.benchmark.IsRunning())
     {
         context.frameDeltaSeconds = 1.0f / 60.0f;
         ClearDesktopInput(context);
-        const float previousCameraX = context.cameraX;
-        const float previousCameraZ = context.cameraZ;
         const horde::gameplay::ShowcaseBenchmarkAdvance advance = context.benchmark.Advance();
         if (advance.lapStarted)
         {
             ResetRoute(context);
         }
-        context.cameraX = advance.replay.x;
-        context.cameraZ = advance.replay.z;
-        context.cameraYaw = advance.replay.yaw;
-        context.cameraPitch = -0.04f;
-        context.walkAmount = advance.finished ? 0.0f : 1.0f;
-        context.playerTravelledThisFrame = std::hypot(
-            context.cameraX - previousCameraX, context.cameraZ - previousCameraZ);
-        context.walkVisualAmount += (context.walkAmount - context.walkVisualAmount) *
-                                    std::clamp(context.frameDeltaSeconds * 8.0f, 0.0f, 1.0f);
-        context.walkTime += context.frameDeltaSeconds;
+        input = context.simulationInput;
+        input.paused = false;
+        input.damageEnabled = false;
+        input.hasAuthoritativePlayerPose = true;
+        input.authoritativePlayerX = advance.replay.x;
+        input.authoritativePlayerZ = advance.replay.z;
+        input.yawRadians = advance.replay.yaw;
+        input.pitchRadians = -0.04f;
+        input.lanternStrength = context.lanternStrength;
+        input.commands.attack = context.attackSequence;
+        input.commands.routeReset = context.routeResetSequence;
+        input.commands.retry = context.retrySequence;
         if (advance.replay.waypointReached || advance.lapStarted || advance.finished)
         {
             UpdateBenchmarkHud(context);
         }
-        return;
-    }
-    if (context.simulationPaused)
-    {
-        context.frameDeltaSeconds = 0.0f;
-        context.walkAmount = 0.0f;
-        context.walkVisualAmount = 0.0f;
-        return;
-    }
-    if (context.playerVitals.Snapshot().phase != horde::gameplay::PlayerLifePhase::Alive)
-    {
-        context.walkAmount = 0.0f;
-        context.walkVisualAmount = 0.0f;
-        return;
-    }
-    context.walkTime += deltaSeconds;
-
-    const float forwardAmount = (context.forwardHeld ? 1.0f : 0.0f) - (context.backwardHeld ? 1.0f : 0.0f);
-    const float strafeAmount = (context.rightHeld ? 1.0f : 0.0f) - (context.leftHeld ? 1.0f : 0.0f);
-    context.walkAmount = std::clamp(std::abs(forwardAmount) + std::abs(strafeAmount), 0.0f, 1.0f);
-    context.walkVisualAmount += (context.walkAmount - context.walkVisualAmount) *
-                                std::clamp(deltaSeconds * 8.0f, 0.0f, 1.0f);
-    if (context.walkAmount <= 0.01f)
-    {
-        return;
     }
 
-    const float forwardX = std::sin(context.cameraYaw);
-    const float forwardZ = -std::cos(context.cameraYaw);
-    const float rightX = std::cos(context.cameraYaw);
-    const float rightZ = std::sin(context.cameraYaw);
-    constexpr float kMoveSpeed = 1.9f;
-    const float previousCameraX = context.cameraX;
-    const float previousCameraZ = context.cameraZ;
-    context.cameraX += (forwardX * forwardAmount + rightX * strafeAmount) * kMoveSpeed * deltaSeconds;
-    context.cameraZ += (forwardZ * forwardAmount + rightZ * strafeAmount) * kMoveSpeed * deltaSeconds;
-    horde::gameplay::ResolveCorridorPlayerCollision(previousCameraX, previousCameraZ, context.cameraX, context.cameraZ);
-    const float travelledX = context.cameraX - previousCameraX;
-    const float travelledZ = context.cameraZ - previousCameraZ;
-    context.playerTravelledThisFrame = std::sqrt(travelledX * travelledX + travelledZ * travelledZ);
+    context.simulationInput = input;
+    context.simulation.AdvanceFrame(input,
+                                    context.frameDeltaSeconds,
+                                    ++context.inputPublicationSequence);
+    MirrorSimulationSnapshot(context);
+    if (context.simulation.Snapshot().playerVitals.vitality != previousVitality ||
+        context.simulation.Snapshot().playerVitals.phase != previousLifePhase)
+    {
+        UpdateVitalityHud(context);
+    }
 }
+
+#if defined(_DEBUG)
+void DebugWarpSimulation(VulkanSurfaceContext& context,
+                         float x,
+                         float z,
+                         float yaw,
+                         float pitch)
+{
+    horde::gameplay::simulation::InputSnapshot input = context.simulationInput;
+    input.paused = false;
+    input.damageEnabled = false;
+    input.hasAuthoritativePlayerPose = true;
+    input.authoritativePlayerX = x;
+    input.authoritativePlayerZ = z;
+    input.yawRadians = yaw;
+    input.pitchRadians = pitch;
+    input.lanternStrength = context.lanternStrength;
+    context.simulation.StepFixed(input, 0.0f, ++context.inputPublicationSequence);
+    context.simulation.ResetTiming();
+    context.simulation.ClearEvents();
+    context.simulationInput = input;
+    context.simulationInput.hasAuthoritativePlayerPose = false;
+    context.simulationInput.paused = context.simulationPaused;
+    MirrorSimulationSnapshot(context);
+}
+#endif
 
 bool SetDesktopMovementKey(VulkanSurfaceContext& context, const WPARAM key, const bool held)
 {
@@ -2272,171 +2388,27 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
     {
         SpatialAudioEngine().Update();
         UpdateDesktopSceneControls(ctx);
-        if (!ctx.simulationPaused && !ctx.benchmark.IsRunning())
-        {
-            ctx.playerVitals.Update(ctx.frameDeltaSeconds);
-        }
-        if (ctx.playerVitals.Snapshot().phase == horde::gameplay::PlayerLifePhase::Dead)
+        const horde::gameplay::simulation::SimulationSnapshot& simulation =
+            ctx.simulation.Snapshot();
+        if (simulation.playerVitals.phase == horde::gameplay::PlayerLifePhase::Dead)
         {
             ShowDeathMenu(ctx);
         }
-        const bool playerAlive =
-            ctx.playerVitals.Snapshot().phase == horde::gameplay::PlayerLifePhase::Alive;
-        const bool gameplayPaused = ctx.simulationPaused || !playerAlive;
-        ctx.lanternSnapshot = ctx.lanternSequence.Update(
-            gameplayPaused ? 0.0f : ctx.frameDeltaSeconds,
-            ctx.cameraX,
-            ctx.cameraZ,
-            ctx.cameraYaw,
-            ctx.cameraPitch);
-        if (!gameplayPaused && ctx.debugEnemyOverride == horde::gameplay::EnemyKind::None)
-        {
-            ctx.enemyDirector.Update(ctx.cameraX, ctx.cameraZ);
-        }
-        else if (!gameplayPaused && ctx.debugEnemyOverride != horde::gameplay::EnemyKind::None)
-        {
-            ctx.enemyDirector.ForceSelectForDebug(ctx.debugEnemyOverride);
-        }
-        const horde::gameplay::EnemyRosterSnapshot& roster = ctx.enemyDirector.Snapshot();
-        if (roster.selectedEnemy != ctx.activeEnemyKind)
-        {
-            ctx.activeEnemyKind = roster.selectedEnemy;
-            if (ctx.activeEnemyKind == horde::gameplay::EnemyKind::Skeleton ||
-                ctx.activeEnemyKind == horde::gameplay::EnemyKind::Lich)
-            {
-                ctx.playerVitals.ResetForEncounter();
-                ctx.playerRetryCheckpoint = ctx.activeEnemyKind == horde::gameplay::EnemyKind::Lich ? 9 : 0;
-                UpdateVitalityHud(ctx);
-            }
-            if (ctx.activeEnemyKind == horde::gameplay::EnemyKind::Skeleton)
-            {
-                ctx.combat = {};
-                ctx.combatSnapshot = {};
-            }
-            else if (ctx.activeEnemyKind == horde::gameplay::EnemyKind::Lich)
-            {
-                ctx.lichEncounter.Reset();
-                ctx.lichDeathCuePlayed = false;
-            }
-        }
-        bool lichHitRequested = false;
-        if (ctx.playerAttackRequested && !gameplayPaused)
-        {
-            ctx.playerAttackRequested = false;
-            // The sword is a player action, not a skeleton-only animation. Keep
-            // its swing advancing after the lantern drop and through the finale.
-            ctx.combat.RequestAttack();
-            lichHitRequested = ctx.activeEnemyKind == horde::gameplay::EnemyKind::Lich;
-        }
-        if (ctx.playerFootsteps.Update(ctx.playerTravelledThisFrame, ctx.walkAmount > 0.01f))
-        {
-            const char* clip = (ctx.playerFootstepVariant++ & 1) == 0 ? "player_step_1.wav" : "player_step_2.wav";
-            PlayAmbientSoundEffect(ctx, clip);
-        }
-        const horde::gameplay::EnemyAnimation previousAnimation = ctx.combatSnapshot.enemyAnimation;
-        ctx.combatSnapshot = ctx.combat.Update(
-            gameplayPaused ? 0.0f : ctx.frameDeltaSeconds, ctx.cameraX, ctx.cameraZ, ctx.cameraYaw);
-        const bool finaleActive = horde::gameplay::QueryShowcaseZone(ctx.cameraX, ctx.cameraZ) == horde::gameplay::ShowcaseZone::Finale;
-        const horde::gameplay::LichPhase previousLichPhase = ctx.lichEncounter.Snapshot().phase;
-        const horde::gameplay::LichSnapshot& lich = ctx.lichEncounter.Update(
-            ctx.activeEnemyKind == horde::gameplay::EnemyKind::Lich && !gameplayPaused ? ctx.frameDeltaSeconds : 0.0f,
-            ctx.cameraX,
-            ctx.cameraZ,
-            !horde::gameplay::IsRouteAudioObstructed(ctx.cameraX, ctx.cameraZ,
-                                                      ctx.lichEncounter.Snapshot().x, ctx.lichEncounter.Snapshot().z),
-            ctx.activeEnemyKind == horde::gameplay::EnemyKind::Lich && finaleActive);
-        // Resolve melee after the encounter update. A debug warp or first entry
-        // can select and awaken the lich on this same frame; resolving earlier
-        // incorrectly discarded that visibly connected opening strike as a hit
-        // against the dormant state.
-        if (lichHitRequested)
-        {
-            if (ctx.lichEncounter.TryAcceptPlayerHit(ctx.cameraX, ctx.cameraZ))
-            {
-                // The hurt recording already contains its own body impact.
-                // Do not mask its brief vocal with a second centred fencing hit.
-                PlayEnemySoundEffect(ctx, "lich_hurt.wav", 0.95f);
-            }
-        }
-        if (ctx.activeEnemyKind == horde::gameplay::EnemyKind::Lich &&
-            previousLichPhase != horde::gameplay::LichPhase::Charging &&
-            lich.phase == horde::gameplay::LichPhase::Charging)
-        {
-            PlayEnemySoundEffect(ctx, "lich_charge.wav", 0.42f);
-        }
-        if (ctx.activeEnemyKind == horde::gameplay::EnemyKind::Lich && lich.damagePulse)
-        {
-            PlayEnemySoundEffect(ctx, "lich_impact.wav", 0.55f);
-        }
-        const bool playerHitPulse =
-            (ctx.activeEnemyKind == horde::gameplay::EnemyKind::Skeleton && ctx.combatSnapshot.playerHitPulse) ||
-            (ctx.activeEnemyKind == horde::gameplay::EnemyKind::Lich && lich.damagePulse);
-        if (playerHitPulse && IsPlayerDamageEnabled(ctx))
-        {
-            const horde::gameplay::PlayerDamageResult result = ctx.playerVitals.TryApplyDamage();
-            if (result != horde::gameplay::PlayerDamageResult::Ignored)
-            {
-                UpdateVitalityHud(ctx);
-            }
-            if (result == horde::gameplay::PlayerDamageResult::Killed)
-            {
-                ctx.playerRetryCheckpoint =
-                    ctx.activeEnemyKind == horde::gameplay::EnemyKind::Lich ? 9 : 0;
-                ctx.playerAttackRequested = false;
-                ClearDesktopInput(ctx);
-            }
-        }
-        if (ctx.activeEnemyKind == horde::gameplay::EnemyKind::Lich &&
-            lich.phase == horde::gameplay::LichPhase::Dead &&
-            !ctx.lichDeathCuePlayed)
-        {
-            ctx.lichDeathCuePlayed = true;
-            PlayEnemySoundEffect(ctx, "lich_fall.wav", 0.36f);
-        }
-        if (ctx.activeEnemyKind == horde::gameplay::EnemyKind::Lich &&
-            lich.deathAnimationComplete)
-        {
-            ctx.enemyDirector.MarkSelectedDead();
-        }
-        if (lich.finaleEndingPhase == horde::gameplay::FinaleEndingPhase::Complete)
+        if (simulation.finaleComplete)
         {
             ShowEndingMenu(ctx);
         }
-        horde::gameplay::CombatSnapshot renderCombat = ctx.combatSnapshot;
-        renderCombat.damageFlash = ctx.playerVitals.Snapshot().damageFlash;
-        if (ctx.activeEnemyKind == horde::gameplay::EnemyKind::Skeleton &&
-            previousAnimation != horde::gameplay::EnemyAnimation::Dead &&
-            ctx.combatSnapshot.enemyAnimation == horde::gameplay::EnemyAnimation::Dead)
+        DrainGameplayEvents(ctx);
+        horde::vulkan::raytracing::RtSceneFrameInputs frameInputs =
+            horde::vulkan::raytracing::BuildRtSceneFrameInputs(simulation, ctx.outputExposure);
+        if (ctx.debugEnemyOverride != horde::gameplay::EnemyKind::None)
         {
-            PlaySoundEffect(ctx, "sword_hit_1.wav");
+            // Debug-only renderer inspection remains non-authoritative gameplay.
+            frameInputs.roster.selectedEnemy = ctx.debugEnemyOverride;
+            frameInputs.roster.renderedEnemyCount = 1u;
+            frameInputs.roster.renderedEnemies.fill(horde::gameplay::EnemyKind::None);
+            frameInputs.roster.renderedEnemies[0] = ctx.debugEnemyOverride;
         }
-        if (ctx.activeEnemyKind == horde::gameplay::EnemyKind::Skeleton &&
-            previousAnimation != horde::gameplay::EnemyAnimation::Attack &&
-            ctx.combatSnapshot.enemyAnimation == horde::gameplay::EnemyAnimation::Attack)
-        {
-            PlayEnemySoundEffect(ctx, "skeleton_attack.wav", 0.85f);
-        }
-        const bool skeletonWalking = !gameplayPaused &&
-                                     ctx.activeEnemyKind == horde::gameplay::EnemyKind::Skeleton &&
-                                     ctx.combatSnapshot.enemyAnimation == horde::gameplay::EnemyAnimation::Walking;
-        if (ctx.enemyFootsteps.Update(ctx.frameDeltaSeconds, skeletonWalking))
-        {
-            const char* clip = (ctx.enemyFootstepVariant++ & 1) == 0 ? "skeleton_step_1.wav" : "skeleton_step_2.wav";
-            PlayEnemySoundEffect(ctx, clip, 1.0f);
-        }
-        horde::vulkan::raytracing::RtSceneFrameInputs frameInputs;
-        frameInputs.cameraYaw = ctx.cameraYaw;
-        frameInputs.cameraPitch = ctx.cameraPitch;
-        frameInputs.lanternStrength = ctx.lanternStrength * ctx.lanternSnapshot.flameStrength;
-        frameInputs.walkTime = ctx.walkTime;
-        frameInputs.cameraX = ctx.cameraX;
-        frameInputs.cameraZ = ctx.cameraZ;
-        frameInputs.walkAmount = ctx.walkVisualAmount;
-        frameInputs.outputExposure = ctx.outputExposure;
-        frameInputs.combat = renderCombat;
-        frameInputs.lantern = ctx.lanternSnapshot;
-        frameInputs.roster = roster;
-        frameInputs.lich = lich;
         std::string diagnostic;
         if (!ctx.rtScene.RecordTraceAndCopy(ctx.commandBuffers[imageIndex],
                                             ctx.swapchainImages[imageIndex],
@@ -2538,23 +2510,19 @@ const char* CapturePresetName(const horde::gameplay::ShowcaseCheckpointPreset pr
 void ApplyCaptureCheckpoint(VulkanSurfaceContext& context,
                             const horde::gameplay::ShowcaseCheckpoint& checkpoint)
 {
-    ResetRoute(context);
-    horde::gameplay::ShowcaseCheckpointState state =
-        horde::gameplay::BuildShowcaseCheckpointState(checkpoint);
-    context.cameraX = checkpoint.x;
-    context.cameraZ = checkpoint.z;
-    context.cameraYaw = checkpoint.yaw;
-    context.cameraPitch = checkpoint.pitch;
-    context.walkTime = 0.0f;
-    context.walkVisualAmount = 0.0f;
+    context.simulation.ApplyShowcaseCheckpoint(checkpoint.id);
+    context.simulation.ClearEvents();
+    context.simulation.ResetTiming();
     context.frameDeltaSeconds = 0.0f;
-    context.walkAmount = 0.0f;
     context.simulationPaused = true;
-    context.lanternSequence = std::move(state.lantern);
-    context.lanternSnapshot = state.lanternSnapshot;
-    context.enemyDirector = std::move(state.enemyDirector);
-    context.lichEncounter = std::move(state.lichEncounter);
-    context.activeEnemyKind = state.activeEnemyKind;
+    context.simulationInput.paused = true;
+    context.simulationInput.damageEnabled = false;
+    context.simulationInput.hasAuthoritativePlayerPose = false;
+    context.simulationInput.lanternStrength = context.lanternStrength;
+    context.simulation.AdvanceFrame(context.simulationInput,
+                                    0.0,
+                                    ++context.inputPublicationSequence);
+    MirrorSimulationSnapshot(context);
     context.debugEnemyOverride = horde::gameplay::EnemyKind::None;
 }
 
@@ -2717,10 +2685,11 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
 
         ShowcaseCaptureRecord record;
         record.checkpoint = &checkpoint;
-        record.lanternPhase = horde::gameplay::LanternPhaseName(context.lanternSnapshot.phase);
-        record.selectedEnemy = horde::gameplay::EnemyKindName(context.enemyDirector.Snapshot().selectedEnemy);
-        record.lichPhase = horde::gameplay::LichPhaseName(context.lichEncounter.Snapshot().phase);
-        record.finaleSkylightOpenProgress = context.lichEncounter.Snapshot().finaleSkylightOpenProgress;
+        const horde::gameplay::simulation::SimulationSnapshot& simulation = context.simulation.Snapshot();
+        record.lanternPhase = horde::gameplay::LanternPhaseName(simulation.lantern.phase);
+        record.selectedEnemy = horde::gameplay::EnemyKindName(simulation.enemyRoster.selectedEnemy);
+        record.lichPhase = horde::gameplay::LichPhaseName(simulation.lich.phase);
+        record.finaleSkylightOpenProgress = simulation.lich.finaleSkylightOpenProgress;
         record.filename = filename.str();
         record.width = image.width;
         record.height = image.height;
@@ -3559,7 +3528,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
     case WM_SYSKEYDOWN:
         if (sceneContext && sceneContext->controlsEnabled)
         {
-            if (sceneContext->playerVitals.Snapshot().phase != horde::gameplay::PlayerLifePhase::Alive)
+            if (sceneContext->simulation.Snapshot().playerVitals.phase != horde::gameplay::PlayerLifePhase::Alive)
             {
                 if (wParam == VK_F4 && (GetKeyState(VK_MENU) & 0x8000) != 0)
                 {
@@ -3615,21 +3584,17 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             {
                 sceneContext->debugEnemyOverride = horde::gameplay::EnemyKind::None;
                 // Place the validation camera inside the real 2 m sword range.
-                sceneContext->cameraX = -33.25f;
-                sceneContext->cameraZ = -14.25f;
-                sceneContext->cameraYaw = 2.52f;
-                sceneContext->cameraPitch = 0.0f;
+                sceneContext->simulation.ApplyShowcaseCheckpoint(10);
+                sceneContext->simulation.ClearEvents();
+                MirrorSimulationSnapshot(*sceneContext);
                 return 0;
             }
             if (wParam == VK_F7)
             {
                 sceneContext->debugEnemyOverride = horde::gameplay::EnemyKind::None;
-                sceneContext->lanternSequence.Reset();
-                sceneContext->lanternSnapshot = {};
-                sceneContext->cameraX = -1.8f;
-                sceneContext->cameraZ = -15.2f;
-                sceneContext->cameraYaw = -1.57079632679f;
-                sceneContext->cameraPitch = -0.08f;
+                sceneContext->simulation.ApplyShowcaseCheckpoint(3);
+                sceneContext->simulation.ClearEvents();
+                MirrorSimulationSnapshot(*sceneContext);
                 return 0;
             }
             if (wParam == VK_F8)
@@ -3649,10 +3614,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                     {-33.7f, -15.2f, 2.52f, 0.0f},
                 };
                 const ValidationPoint& point = kValidationPoints[sceneContext->debugValidationPoint];
-                sceneContext->cameraX = point.x;
-                sceneContext->cameraZ = point.z;
-                sceneContext->cameraYaw = point.yaw;
-                sceneContext->cameraPitch = point.pitch;
+                DebugWarpSimulation(*sceneContext, point.x, point.z, point.yaw, point.pitch);
                 sceneContext->debugValidationPoint =
                     (sceneContext->debugValidationPoint + 1u) %
                     static_cast<uint32_t>(sizeof(kValidationPoints) / sizeof(kValidationPoints[0]));
@@ -3662,10 +3624,8 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             {
                 // Inspect the settled prop from inside the same corridor leg
                 // without resetting the already-triggered lantern sequence.
-                sceneContext->cameraX = 1.20f;
-                sceneContext->cameraZ = -15.20f;
-                sceneContext->cameraYaw = -1.57079632679f;
-                sceneContext->cameraPitch = -0.32f;
+                DebugWarpSimulation(*sceneContext, 1.20f, -15.20f,
+                                    -1.57079632679f, -0.32f);
                 return 0;
             }
             if (wParam == VK_F10 && (lParam & (1ll << 30)) == 0)
@@ -3686,14 +3646,18 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                     ApplyCaptureCheckpoint(*sceneContext, *finale);
                     const int dawnFrames = static_cast<int>(
                         horde::gameplay::LichEncounter::kFinaleDawnRevealDuration / 0.05f) + 2;
+                    horde::gameplay::simulation::InputSnapshot input = sceneContext->simulationInput;
+                    input.paused = false;
+                    input.damageEnabled = false;
+                    input.hasAuthoritativePlayerPose = false;
                     for (int frame = 0; frame < dawnFrames; ++frame)
                     {
-                        sceneContext->lichEncounter.Update(0.05f,
-                                                           sceneContext->cameraX,
-                                                           sceneContext->cameraZ,
-                                                           true,
-                                                           true);
+                        sceneContext->simulation.StepFixed(
+                            input, 0.05f, ++sceneContext->inputPublicationSequence);
                     }
+                    sceneContext->simulation.ClearEvents();
+                    sceneContext->simulation.ResetTiming();
+                    MirrorSimulationSnapshot(*sceneContext);
                     ShowEndingMenu(*sceneContext);
                 }
                 return 0;
@@ -3712,8 +3676,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             }
             if (!sceneContext->simulationPaused && wParam == VK_SPACE && (lParam & (1ll << 30)) == 0)
             {
-                sceneContext->playerAttackRequested = true;
-                PlaySoundEffect(*sceneContext, "sword_swing_1.wav");
+                ++sceneContext->attackSequence;
                 return 0;
             }
             if (!sceneContext->simulationPaused && SetDesktopMovementKey(*sceneContext, wParam, true))
@@ -3731,7 +3694,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         break;
     case WM_LBUTTONDOWN:
         if (sceneContext && sceneContext->controlsEnabled && !sceneContext->simulationPaused &&
-            sceneContext->playerVitals.Snapshot().phase == horde::gameplay::PlayerLifePhase::Alive &&
+            sceneContext->simulation.Snapshot().playerVitals.phase == horde::gameplay::PlayerLifePhase::Alive &&
             !sceneContext->benchmark.IsRunning())
         {
             SetFocus(hWnd);
@@ -3745,17 +3708,16 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         break;
     case WM_RBUTTONDOWN:
         if (sceneContext && sceneContext->controlsEnabled && !sceneContext->simulationPaused &&
-            sceneContext->playerVitals.Snapshot().phase == horde::gameplay::PlayerLifePhase::Alive &&
+            sceneContext->simulation.Snapshot().playerVitals.phase == horde::gameplay::PlayerLifePhase::Alive &&
             !sceneContext->benchmark.IsRunning())
         {
-            sceneContext->playerAttackRequested = true;
-            PlaySoundEffect(*sceneContext, "sword_swing_2.wav");
+            ++sceneContext->attackSequence;
             return 0;
         }
         break;
     case WM_MOUSEMOVE:
         if (sceneContext && sceneContext->controlsEnabled && !sceneContext->simulationPaused &&
-            sceneContext->playerVitals.Snapshot().phase == horde::gameplay::PlayerLifePhase::Alive &&
+            sceneContext->simulation.Snapshot().playerVitals.phase == horde::gameplay::PlayerLifePhase::Alive &&
             !sceneContext->benchmark.IsRunning() && sceneContext->mouseLookActive)
         {
             const POINT currentMousePosition{
@@ -3835,7 +3797,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         COLORREF textColor = RGB(255, 208, 122);
         if (sceneContext && GetDlgCtrlID(reinterpret_cast<HWND>(lParam)) == kVitalityHudControlId)
         {
-            const int vitality = sceneContext->playerVitals.Snapshot().vitality;
+            const int vitality = sceneContext->simulation.Snapshot().playerVitals.vitality;
             textColor = vitality >= 3 ? RGB(255, 208, 122) :
                         (vitality == 2 ? RGB(255, 154, 67) : RGB(255, 83, 72));
         }

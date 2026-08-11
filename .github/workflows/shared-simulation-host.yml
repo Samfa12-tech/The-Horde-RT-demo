@@ -1,0 +1,31 @@
+name: Shared simulation host tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  shared-gameplay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+
+      - name: Configure non-hardware host tests
+        run: >-
+          cmake -S . -B build/host-ci
+          -DCMAKE_BUILD_TYPE=Release
+          -DBUILD_TESTING=ON
+          -DHORDE_RT_BUILD_VULKAN_TARGETS=OFF
+
+      - name: Build shared gameplay tests
+        run: cmake --build build/host-ci --config Release --parallel 2
+
+      - name: Run shared gameplay tests
+        run: ctest --test-dir build/host-ci --build-config Release --output-on-failure
