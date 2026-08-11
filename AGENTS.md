@@ -16,6 +16,9 @@ This repo is a native Vulkan hardware ray tracing game/tech-demo project. Keep w
 - Android native bridge: `android/app/src/main/cpp/android_probe_bridge.cpp`.
 - Windows diagnostic path: `src/platform/windows/DiagnosticWindow.cpp`.
 - Shared presentable RT scene: `src/vulkan/raytracing/PresentableTinyRtScene.cpp`.
+- Shared gameplay authority: `src/gameplay/simulation/GameSimulation.cpp` with immutable `SimulationSnapshot` output.
+- Shared renderer adapter: `src/vulkan/raytracing/SimulationFrameAdapter.cpp`.
+- Android continuous and edge input crosses JNI through `src/gameplay/simulation/InputMailbox.h`; do not restore direct JNI mutation of render-thread gameplay state.
 - RT shaders: `shaders/raytracing/minimal.rgen`, `minimal.rmiss`, `minimal.rchit`.
 - Regenerate the embedded raygen SPIR-V after shader edits with `tools/compile-raygen.ps1`.
 - Current phone-safe path tracing is implemented with `rayQueryEXT` in the raygen shader, not recursive closest-hit tracing.
@@ -31,6 +34,10 @@ This repo is a native Vulkan hardware ray tracing game/tech-demo project. Keep w
 - Record asset licenses in `ASSET_LICENSES.md` before shipping any imported asset.
 - Keep one frame in flight while the held-torch TLAS uses a host-written instance buffer; changing this requires proper per-frame TLAS/instance-buffer ownership.
 - The RT storage image is RGBA but is raw-copied to common BGRA swapchains. Preserve the presentation-format-driven `outputRedBlueSwap` push constant or warm fire will render cyan.
+- Keep gameplay on the existing owning application/render thread. Movement, collision, encounters, combat, vitality, retry, finale, and semantic events belong to the shared 60 Hz `GameSimulation`, not platform loops.
+- Android input publications use a coherent two-slot mailbox with monotonic attack/reset/retry counters. A bare atomic published index is insufficient because a writer may lap a reader and overwrite its slot.
+- Platform audio and haptics drain ordered `GameplayEvent` records. Do not restore one-bit-per-sound polling that collapses repeated same-type events.
+- Deterministic captures import exact authored checkpoint state and then freeze simulation. Preserve the zero-delta skeleton/lich snapshot finalization required by the 0.1.3 hashes.
 
 ## Visual direction
 
@@ -70,3 +77,5 @@ This repo is a native Vulkan hardware ray tracing game/tech-demo project. Keep w
 - Standard Android checkpoint/replay gate from repo root: `.\tools\run-android-showcase-validation.ps1`.
 - Windows Vulkan SDK was installed at `C:\VulkanSDK\1.4.350.0` during development.
 - Shader generation from the repo root: `.\tools\compile-raygen.ps1`.
+- Additive Windows configure/build/test presets are in `CMakePresets.json`.
+- `.github/workflows/shared-simulation-host.yml` exercises non-hardware shared gameplay tests only; it does not prove Vulkan RT presentation or phone behavior.

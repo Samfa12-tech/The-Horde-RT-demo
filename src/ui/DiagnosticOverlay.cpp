@@ -44,6 +44,14 @@ std::string BuildDeveloperOverlayText(const DeveloperOverlaySnapshot& snapshot)
     out << "PLAYER " << snapshot.playerLifePhase << "  |  vitality "
         << snapshot.playerVitality << '/' << snapshot.playerMaxVitality
         << "  |  damage " << (snapshot.playerDamageEnabled ? "ON" : "OFF") << '\n';
+    out << "SIM " << snapshot.simulationTicksThisFrame << " ticks  |  accum "
+        << snapshot.fixedStepAccumulatorSeconds * 1000.0 << " ms  |  overruns "
+        << snapshot.catchUpOverrunCount << '\n';
+    out << "EVENTS " << snapshot.queuedEventCount << " queued / "
+        << snapshot.eventQueueHighWaterMark << " high / " << snapshot.eventQueueOverflowCount
+        << " overflow  |  input " << snapshot.inputPublicationSequence << "  |  cmd "
+        << snapshot.consumedAttackSequence << '/' << snapshot.consumedRouteResetSequence
+        << '/' << snapshot.consumedRetrySequence << '\n';
     out << "AS " << snapshot.blasCount << " BLAS / " << snapshot.tlasCount << " TLAS / "
         << snapshot.tlasInstanceCount << " inst  |  skinned " << snapshot.activeSkinnedEnemies << '\n';
     out << "MAT " << snapshot.materialEncoding;

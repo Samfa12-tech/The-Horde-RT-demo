@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <string>
 
@@ -39,6 +40,16 @@ struct DeveloperOverlaySnapshot
     float renderScale = 1.0f;
     float fps = 0.0f;
     float frameTimeMs = 0.0f;
+    std::uint32_t simulationTicksThisFrame = 0;
+    double fixedStepAccumulatorSeconds = 0.0;
+    std::uint64_t catchUpOverrunCount = 0;
+    std::size_t queuedEventCount = 0;
+    std::size_t eventQueueHighWaterMark = 0;
+    std::uint64_t eventQueueOverflowCount = 0;
+    std::uint64_t inputPublicationSequence = 0;
+    std::uint64_t consumedAttackSequence = 0;
+    std::uint64_t consumedRouteResetSequence = 0;
+    std::uint64_t consumedRetrySequence = 0;
     bool presented = false;
 };
 

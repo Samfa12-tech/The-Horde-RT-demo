@@ -32,6 +32,5 @@ public final class ProbeBridge {
     public static native String getBenchmarkProgress();
     public static native String getBenchmarkReport();
     public static native int getRuntimeState();
-    public static native int consumeAudioEvents();
-    public static native long getEnemyAudioStereoGains();
+    public static native long[] drainPlatformEvents();
 }

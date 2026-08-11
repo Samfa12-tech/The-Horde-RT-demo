@@ -1,0 +1,60 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 22,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "windows-x64-debug",
+      "displayName": "Windows x64 Debug",
+      "description": "Configure the native Windows target for Visual Studio 2022 x64 Debug builds.",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "binaryDir": "${sourceDir}/build/presets/windows-x64-debug"
+    },
+    {
+      "name": "windows-x64-release",
+      "displayName": "Windows x64 Release",
+      "description": "Configure the native Windows target for Visual Studio 2022 x64 Release builds.",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "binaryDir": "${sourceDir}/build/presets/windows-x64-release"
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "windows-x64-debug",
+      "displayName": "Build Windows x64 Debug",
+      "configurePreset": "windows-x64-debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "windows-x64-release",
+      "displayName": "Build Windows x64 Release",
+      "configurePreset": "windows-x64-release",
+      "configuration": "Release"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "windows-x64-debug",
+      "displayName": "Test Windows x64 Debug",
+      "configurePreset": "windows-x64-debug",
+      "configuration": "Debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "windows-x64-release",
+      "displayName": "Test Windows x64 Release",
+      "configurePreset": "windows-x64-release",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ]
+}

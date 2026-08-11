@@ -72,16 +72,18 @@ public class MainActivity extends Activity {
     private static final String DEBUG_RETRY_ACTION =
             "com.samfa12.hordelanternrt.DEBUG_RETRY_ENCOUNTER";
     private static final int REQUEST_SAVE_BENCHMARK = 7101;
-    private static final int AUDIO_EVENT_ENEMY_DEFEATED = 1;
-    private static final int AUDIO_EVENT_PLAYER_FOOTSTEP = 1 << 1;
-    private static final int AUDIO_EVENT_ENEMY_FOOTSTEP = 1 << 2;
-    private static final int AUDIO_EVENT_ENEMY_ATTACK = 1 << 3;
-    private static final int AUDIO_EVENT_LICH_CHARGE = 1 << 4;
-    private static final int AUDIO_EVENT_LICH_IMPACT = 1 << 5;
-    private static final int AUDIO_EVENT_LICH_DEFEATED = 1 << 6;
-    private static final int AUDIO_EVENT_LICH_HIT = 1 << 7;
-    private static final int AUDIO_EVENT_PLAYER_DAMAGED = 1 << 8;
-    private static final int AUDIO_EVENT_PLAYER_KILLED = 1 << 9;
+    private static final int PLATFORM_EVENT_PLAYER_FOOTSTEP = 0;
+    private static final int PLATFORM_EVENT_PLAYER_SWING = 1;
+    private static final int PLATFORM_EVENT_PLAYER_DAMAGED = 2;
+    private static final int PLATFORM_EVENT_PLAYER_KILLED = 3;
+    private static final int PLATFORM_EVENT_ENEMY_FOOTSTEP = 4;
+    private static final int PLATFORM_EVENT_ENEMY_ATTACK_STARTED = 5;
+    private static final int PLATFORM_EVENT_ENEMY_HIT = 6;
+    private static final int PLATFORM_EVENT_ENEMY_DEFEATED = 7;
+    private static final int PLATFORM_EVENT_LICH_CHARGE_STARTED = 8;
+    private static final int PLATFORM_EVENT_LICH_IMPACT = 9;
+    private static final int PLATFORM_EVENT_LICH_DEFEATED = 10;
+    private static final int ENTITY_LICH = 3;
     private static final int PLAYER_ALIVE = 0;
     private static final int PLAYER_DYING = 1;
     private static final int PLAYER_DEAD = 2;
@@ -187,8 +189,6 @@ public class MainActivity extends Activity {
         attackButton.setOnClickListener(view -> {
             if (menuVisible || diagnosticsVisible || deathOverlayVisible || ProbeBridge.getRuntimeState() != 1) return;
             ProbeBridge.requestAttack();
-            playSound((swingVariant++ & 1) == 0 ? "sword_swing_1" : "sword_swing_2", 0.28f);
-            performHaptic(HAPTIC_SWING);
         });
         diagnosticsBack.setOnClickListener(view -> {
             playSound("ui_back", 0.18f);
@@ -812,40 +812,60 @@ public class MainActivity extends Activity {
                     developerOverlay.setVisibility(View.GONE);
                 }
 
-                final int events = ProbeBridge.consumeAudioEvents();
-                final long enemyStereoGains = ProbeBridge.getEnemyAudioStereoGains();
-                if ((events & AUDIO_EVENT_ENEMY_DEFEATED) != 0) {
-                    playSound((swingVariant & 1) == 0 ? "sword_hit_1" : "sword_hit_2", 0.32f);
-                    handler.postDelayed(() -> playSound("enemy_fall", 0.24f), 140L);
-                }
-                if ((events & AUDIO_EVENT_PLAYER_FOOTSTEP) != 0) {
-                    playSound((playerStepVariant++ & 1) == 0 ? "player_step_1" : "player_step_2", 0.62f);
-                }
-                if ((events & AUDIO_EVENT_ENEMY_FOOTSTEP) != 0) {
-                    playSpatialSound((enemyStepVariant++ & 1) == 0 ? "skeleton_step_1" : "skeleton_step_2",
-                            0.11f, enemyStereoGains);
-                }
-                if ((events & AUDIO_EVENT_ENEMY_ATTACK) != 0) {
-                    playSpatialSound("skeleton_attack", 0.22f, enemyStereoGains);
-                }
-                if ((events & AUDIO_EVENT_LICH_CHARGE) != 0) {
-                    playSpatialSound("lich_charge", 0.38f, enemyStereoGains);
-                }
-                if ((events & AUDIO_EVENT_LICH_IMPACT) != 0) {
-                    playSpatialSound("lich_impact", 0.55f, enemyStereoGains);
-                }
-                if ((events & AUDIO_EVENT_LICH_DEFEATED) != 0) {
-                    playSpatialSound("lich_fall", 0.28f, enemyStereoGains);
-                }
-                if ((events & AUDIO_EVENT_LICH_HIT) != 0) {
-                    // The hurt source includes its own impact; layering the
-                    // fencing hit masks the short vocal reaction.
-                    playSpatialSound("lich_hurt", 0.82f, enemyStereoGains);
-                }
-                if ((events & AUDIO_EVENT_PLAYER_KILLED) != 0) {
-                    performHaptic(HAPTIC_FATAL);
-                } else if ((events & AUDIO_EVENT_PLAYER_DAMAGED) != 0) {
-                    performHaptic(HAPTIC_DAMAGE);
+                final long[] platformEvents = ProbeBridge.drainPlatformEvents();
+                for (int eventIndex = 0; eventIndex + 1 < platformEvents.length; eventIndex += 2) {
+                    final long metadata = platformEvents[eventIndex];
+                    final long stereoGains = platformEvents[eventIndex + 1];
+                    final int eventType = (int) (metadata & 0xffL);
+                    final int targetEntity = (int) ((metadata >>> 16) & 0xffL);
+                    switch (eventType) {
+                        case PLATFORM_EVENT_PLAYER_FOOTSTEP:
+                            playSpatialSound((playerStepVariant++ & 1) == 0 ?
+                                    "player_step_1" : "player_step_2", 0.62f, stereoGains);
+                            break;
+                        case PLATFORM_EVENT_PLAYER_SWING:
+                            playSpatialSound((swingVariant++ & 1) == 0 ?
+                                    "sword_swing_1" : "sword_swing_2", 0.28f, stereoGains);
+                            performHaptic(HAPTIC_SWING);
+                            break;
+                        case PLATFORM_EVENT_PLAYER_DAMAGED:
+                            performHaptic(HAPTIC_DAMAGE);
+                            break;
+                        case PLATFORM_EVENT_PLAYER_KILLED:
+                            performHaptic(HAPTIC_FATAL);
+                            break;
+                        case PLATFORM_EVENT_ENEMY_FOOTSTEP:
+                            playSpatialSound((enemyStepVariant++ & 1) == 0 ?
+                                    "skeleton_step_1" : "skeleton_step_2", 0.11f, stereoGains);
+                            break;
+                        case PLATFORM_EVENT_ENEMY_ATTACK_STARTED:
+                            playSpatialSound("skeleton_attack", 0.22f, stereoGains);
+                            break;
+                        case PLATFORM_EVENT_ENEMY_HIT:
+                            if (targetEntity == ENTITY_LICH) {
+                                // The hurt source includes its own impact; layering the
+                                // fencing hit masks the short vocal reaction.
+                                playSpatialSound("lich_hurt", 0.82f, stereoGains);
+                            } else {
+                                playSpatialSound((swingVariant & 1) == 0 ?
+                                        "sword_hit_1" : "sword_hit_2", 0.32f, stereoGains);
+                            }
+                            break;
+                        case PLATFORM_EVENT_ENEMY_DEFEATED:
+                            playSpatialSound("enemy_fall", 0.24f, stereoGains);
+                            break;
+                        case PLATFORM_EVENT_LICH_CHARGE_STARTED:
+                            playSpatialSound("lich_charge", 0.38f, stereoGains);
+                            break;
+                        case PLATFORM_EVENT_LICH_IMPACT:
+                            playSpatialSound("lich_impact", 0.55f, stereoGains);
+                            break;
+                        case PLATFORM_EVENT_LICH_DEFEATED:
+                            playSpatialSound("lich_fall", 0.28f, stereoGains);
+                            break;
+                        default:
+                            break;
+                    }
                 }
                 if (diagnosticsVisible && ++diagnosticsRefreshTick >= 5) {
                     diagnosticsRefreshTick = 0;

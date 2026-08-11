@@ -31,6 +31,14 @@ The first multi-enemy slice is two skeleton instances with a dedicated `SM-S948B
 
 Combat animations use game-owned action state and explicit animation events for damage windows. Fire uses bounded emitter data plus emissive RT geometry and raygen effects. Shallow water uses real RT-visible geometry with bounded ray-query reflection/transmission; steam uses bounded depth-aware raygen volumes. Preserve `vkCmdTraceRaysKHR`, phone-safe `rayQueryEXT`, one frame in flight, honest presentation, strict ASTC, and BGRA copy compensation throughout. The audit and acceptance plan are `docs/FULL_REPO_AUDIT_AND_GAME_PLAN_2026-08-01.md`.
 
+## Shared simulation foundation decision - 2026-08-11
+
+Milestone 1 centralises Windows and Android gameplay in one fixed 60 Hz `GameSimulation` on the existing owning thread. Platform input publishes `InputSnapshot`; Android uses a coherent two-slot mailbox plus monotonic edge counters. Rendering consumes immutable `SimulationSnapshot` through one `RtSceneFrameInputs` adapter, while ordered bounded `GameplayEvent` records drive platform audio and haptics.
+
+The runner clamps render contribution to 100 ms, supports up to eight catch-up ticks, reports discarded excess, normalises two-axis movement, and clears accumulated time across pause/reset/retry/checkpoint transitions. Exact authored checkpoint imports remain a separate no-tick path because capture state must preserve the 0.1.3 floating-point and zero-delta finalization behavior.
+
+The renderer, shader ABI, `vkCmdTraceRaysKHR`, recursion depth 1, `rayQueryEXT`, one frame in flight, ASTC route, Android identity, one-active-enemy limit, and public 0.1.3 artifacts are unchanged. The next task remains renderer resource/character-slot extraction plus GPU timing, without adding a second enemy.
+
 ## Target devices
 
 - Primary target: Samsung Galaxy S26 Ultra.

@@ -4,11 +4,13 @@ set(HORDE_RT_DISPLAY_VERSION "0.1.3")
 set(HORDE_RT_PACKAGE_VERSION "0.1.3-alpha.1")
 
 set(HORDE_RT_CORE_RELATIVE_SOURCES
+    gameplay/simulation/GameSimulation.cpp
     gameplay/ShowcaseBenchmark.cpp
     vulkan/DeviceCapabilities.cpp
     vulkan/RtCapabilityReport.cpp
     vulkan/VulkanContext.cpp
     vulkan/raytracing/RayTracingRequirements.cpp
     vulkan/raytracing/PresentableTinyRtScene.cpp
+    vulkan/raytracing/SimulationFrameAdapter.cpp
     scene/SkeletonBipedModel.cpp
 )
