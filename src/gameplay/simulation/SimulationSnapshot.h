@@ -23,8 +23,13 @@ struct SkeletonEnemySnapshot
     float damageFlash = 0.0f;
     std::int32_t health = 1;
     EnemyAnimation animation = EnemyAnimation::Walking;
+    EnemyCombatAction action = EnemyCombatAction::Locomotion;
+    CombatReaction reaction = CombatReaction::None;
+    float actionTime = 0.0f;
+    float reactionTime = 0.0f;
     bool dead = false;
     bool playerHitPulse = false;
+    bool parrySuccessPulse = false;
 };
 
 struct SimulationSnapshot
@@ -32,6 +37,7 @@ struct SimulationSnapshot
     std::uint64_t tickIndex = 0;
     std::uint64_t inputPublicationSequence = 0;
     std::uint64_t lastConsumedAttackSequence = 0;
+    std::uint64_t lastConsumedParrySequence = 0;
     std::uint64_t lastConsumedRouteResetSequence = 0;
     std::uint64_t lastConsumedRetrySequence = 0;
 
@@ -61,6 +67,7 @@ struct SimulationSnapshot
     LanternSnapshot lantern{};
     EnemyRosterSnapshot enemyRoster{};
     CombatSnapshot swordCombat{};
+    PlayerCombatSnapshot playerCombat{};
     LichSnapshot lich{};
     PlayerVitalsSnapshot playerVitals{};
 

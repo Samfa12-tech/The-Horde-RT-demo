@@ -325,6 +325,16 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(const Swapchai
     snapshot.attackerEntityId = simulation.skeletonAttackerId == horde::gameplay::simulation::EntityId::Invalid
         ? -1
         : static_cast<std::int32_t>(simulation.skeletonAttackerId);
+    snapshot.playerCombatAction = simulation.playerCombat.action;
+    for (std::size_t index = 0u; index < simulation.skeletonEnemyCount; ++index)
+    {
+        if (simulation.skeletonEnemies[index].id == simulation.skeletonAttackerId)
+        {
+            snapshot.attackerCombatAction = simulation.skeletonEnemies[index].action;
+            snapshot.hasAttackerCombatAction = true;
+            break;
+        }
+    }
     snapshot.skeletonPoseBucketCount = static_cast<std::uint32_t>(context.rtScene.SkeletonPoseBucketCount());
     snapshot.renderScale = context.renderScale;
     snapshot.fps = context.capabilities.performance.fps;
@@ -344,6 +354,7 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(const Swapchai
         simulation.eventQueueOverflowCount + PlatformGameplayEventOverflowCount();
     snapshot.inputPublicationSequence = simulation.inputPublicationSequence;
     snapshot.consumedAttackSequence = simulation.lastConsumedAttackSequence;
+    snapshot.consumedParrySequence = simulation.lastConsumedParrySequence;
     snapshot.consumedRouteResetSequence = simulation.lastConsumedRouteResetSequence;
     snapshot.consumedRetrySequence = simulation.lastConsumedRetrySequence;
     return snapshot;
@@ -2296,6 +2307,17 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestAttack(JNIEnv*, jclass)
     if (gInputPublisherState.commands.attack != UINT64_MAX)
     {
         ++gInputPublisherState.commands.attack;
+    }
+    PublishInputLocked();
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_requestParry(JNIEnv*, jclass)
+{
+    std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+    if (gInputPublisherState.commands.parry != UINT64_MAX)
+    {
+        ++gInputPublisherState.commands.parry;
     }
     PublishInputLocked();
 }

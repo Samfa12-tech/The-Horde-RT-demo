@@ -27,6 +27,7 @@ int main()
             input.paused = (sequence & 1u) != 0u;
             input.damageEnabled = !input.paused;
             input.commands.attack = sequence;
+            input.commands.parry = sequence + 7u;
             input.commands.routeReset = sequence + 11u;
             input.commands.retry = sequence + 29u;
             mailbox.Publish(input);
@@ -57,6 +58,7 @@ int main()
                 input.paused == expectedPaused &&
                 input.damageEnabled == !expectedPaused &&
                 input.commands.attack == latest &&
+                input.commands.parry == latest + 7u &&
                 input.commands.routeReset == latest + 11u &&
                 input.commands.retry == latest + 29u;
             if (!matches)
@@ -72,7 +74,8 @@ int main()
     const PublishedInput finalPublication = mailbox.ConsumeLatest();
     if (!coherent.load(std::memory_order_acquire) ||
         finalPublication.publicationSequence != kPublications ||
-        finalPublication.snapshot.commands.attack != kPublications)
+        finalPublication.snapshot.commands.attack != kPublications ||
+        finalPublication.snapshot.commands.parry != kPublications + 7u)
     {
         std::cerr << "Input mailbox stress failed: reader observed a mixed or missing publication.\n";
         return 1;

@@ -13,9 +13,11 @@ Horde Lantern RT is a native Vulkan hardware-ray-tracing technology demo for And
 
 Showcase Alpha 0.1.3 adds a substantially rebuilt procedural player body with articulated walking, a three-point vitality/retry loop, and a complete post-lich dawn ending. The release-safe in-app benchmark and Samfa12 menu link remain available; detailed checkpoint, capture, and developer telemetry remain Debug-only.
 
-The current development foundation runs Windows and Android gameplay through one deterministic 60 Hz `GameSimulation`. Android input crosses JNI through a coherent snapshot mailbox with monotonic attack/reset/retry counters; ordered semantic events drive platform audio and haptics; and one shared adapter preserves the existing `RtSceneFrameInputs` renderer boundary. See `docs/SHARED_SIMULATION_FOUNDATION_2026-08-10.md`.
+The current development foundation runs Windows and Android gameplay through one deterministic 60 Hz `GameSimulation`. Android input crosses JNI through a coherent snapshot mailbox with independent monotonic swing/parry/reset/retry counters; ordered semantic events drive platform audio and haptics; and one shared adapter preserves the existing `RtSceneFrameInputs` renderer boundary. See `docs/SHARED_SIMULATION_FOUNDATION_2026-08-10.md`.
 
 The current development candidate builds the first bounded two-skeleton encounter on the checked renderer resource seam. Stable entities share a skeleton pose/BLAS when their actions match and use at most two pose buckets when they diverge; the lich remains singular. The scene now owns nine BLAS and nineteen physical TLAS slots, with unused slots masked. Its exact `SM-S948B` automated gate passed at 75%, including the two-enemy checkpoint and lich below 20 ms, plus 13 captures, replay, and lifecycle recovery. The owner then reported the hands-on two-enemy experience feels fine on that exact installed candidate. See `docs/TWO_SKELETON_COMBAT_ANDROID_VALIDATION_2026-08-12.md`.
+
+The next development slice makes combat animation-owned and adds a timed skeleton-only parry. Swing contact now resolves once as the visible sword enters its active phase, including against the lich; skeleton attacks expose wind-up, active, recovery, stagger, and death phases. A successful frontal parry cancels the real strike, holds the attack token during an 800 ms stagger, and enables a normal next-tick riposte. Android adds a thumb-reachable `PARRY` control with a distinct clang/haptic route, while Windows binds `Q`. No renderer slot, BLAS, pose-bucket, asset, or public-release identity was added. See `docs/ANIMATION_COMBAT_PARRY_SLICE_2026-08-13.md`.
 
 After these foundations merged, the project owner reported that controls, audio, and haptics all worked correctly during a hands-on test on `SM-S948B`. This is owner-reported development-build evidence rather than a new exact-artifact check; the separate automated lich performance failure remains open. See `docs/RENDERER_RESOURCE_SLOTS_ANDROID_VALIDATION_2026-08-11.md`.
 
@@ -56,6 +58,7 @@ The staged Meshy sword LOD and torch study are not used by the runtime or includ
 - Left-side drag: walk and strafe
 - Right-side drag: 360-degree look
 - `SWING`: sword attack
+- `PARRY`: timed skeleton-strike parry
 - Android Back: pause/resume
 
 ### Windows
@@ -63,6 +66,7 @@ The staged Meshy sword LOD and torch study are not used by the runtime or includ
 - `WASD`: walk and strafe
 - Left mouse drag: look
 - Right mouse or `Space`: sword attack
+- `Q`: timed skeleton-strike parry
 - `Esc`: pause/resume
 - `R`: restart route
 - `F1`: controls

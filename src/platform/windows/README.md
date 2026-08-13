@@ -18,7 +18,7 @@ Windows is the secondary/equal hardware target for this phase.
 ## What is implemented
 
 - Shared probe logic from `src/vulkan/*` and `src/ui/DiagnosticOverlay.cpp`.
-- The interactive Win32 path presents the shared RT scene through a Vulkan swapchain with `WASD`, mouse-drag look, right mouse/Space swing, `Esc` pause, `R` restart, `F1` controls, `F2` diagnostics, and `Alt+Enter` fullscreen.
+- The interactive Win32 path presents the shared RT scene through a Vulkan swapchain with `WASD`, mouse-drag look, right mouse/Space swing, `Q` parry, `Esc` pause, `R` restart, `F1` controls, `F2` diagnostics, and `Alt+Enter` fullscreen.
 - The renderer builds BLAS/TLAS, dispatches `vkCmdTraceRaysKHR`, and preserves clear unsupported-device diagnostics.
 - Branded entry/pause/settings/diagnostics UI, bounded two-skeleton opening combat followed by a singular lich, FilmCow SFX, persisted settings, 50-100% RT render scaling, and an in-app credits/licences dialog are implemented.
 - The executable declares Per-Monitor V2 DPI awareness and rescales its fonts and overlay geometry when the window DPI changes.
@@ -27,7 +27,7 @@ Windows is the secondary/equal hardware target for this phase.
 
 ## Intentionally bounded
 
-- At most two simultaneous skeletons and one singular lich route; no larger horde AI or block/dodge system.
+- At most two simultaneous skeletons and one singular lich route; timed parry affects skeleton melee only, with no larger horde AI, held guard, or dodge system.
 - No fake RT or non-Vulkan success fallback.
 - The complete route includes lantern failure, blue skylight, four selected coloured-light bays, an open framed threshold, a live-lighting single-bounce hero mirror, and a staff-lit lich/sliding-roof finale. The rejected stained pane is absent and water remains deferred.
 

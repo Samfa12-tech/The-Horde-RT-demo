@@ -84,6 +84,7 @@ public class MainActivity extends Activity {
     private static final int PLATFORM_EVENT_LICH_CHARGE_STARTED = 8;
     private static final int PLATFORM_EVENT_LICH_IMPACT = 9;
     private static final int PLATFORM_EVENT_LICH_DEFEATED = 10;
+    private static final int PLATFORM_EVENT_PLAYER_PARRY_SUCCEEDED = 12;
     private static final int ENTITY_LICH = 3;
     private static final int PLAYER_ALIVE = 0;
     private static final int PLAYER_DYING = 1;
@@ -92,6 +93,7 @@ public class MainActivity extends Activity {
     private static final int HAPTIC_SWING = 0;
     private static final int HAPTIC_DAMAGE = 1;
     private static final int HAPTIC_FATAL = 2;
+    private static final int HAPTIC_PARRY = 3;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final float[] viewControls = {0.0f, 0.0f, 1.8f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
@@ -110,6 +112,7 @@ public class MainActivity extends Activity {
     private Button menuButton;
     private TextView vitalityStatus;
     private Button attackButton;
+    private Button parryButton;
     private SoundPool soundPool;
     private Vibrator vibrator;
     private String reportText = "";
@@ -164,14 +167,17 @@ public class MainActivity extends Activity {
         developerOverlay = findViewById(R.id.developer_overlay);
         menuButton = findViewById(R.id.menu_button);
         attackButton = findViewById(R.id.attack_button);
+        parryButton = findViewById(R.id.parry_button);
         vitalityStatus = findViewById(R.id.vitality_status);
         final Button diagnosticsBack = findViewById(R.id.diagnostics_back);
 
         styleActionButton(menuButton, 0xCC1A1713, 0xFFFFD28A);
         styleActionButton(attackButton, 0xDD5B210D, 0xFFFFE0A3);
+        styleActionButton(parryButton, 0xDD263B42, 0xFFE5F7FF);
         styleActionButton(diagnosticsBack, 0xCC211B15, 0xFFFFD28A);
         menuButton.setContentDescription(getString(R.string.menu));
         attackButton.setContentDescription(getString(R.string.swing));
+        parryButton.setContentDescription(getString(R.string.parry));
         updateVitalityHud(3);
         if (isDebuggableApp()) {
             rtStatus.setOnLongClickListener(view -> {
@@ -190,6 +196,10 @@ public class MainActivity extends Activity {
         attackButton.setOnClickListener(view -> {
             if (menuVisible || diagnosticsVisible || deathOverlayVisible || ProbeBridge.getRuntimeState() != 1) return;
             ProbeBridge.requestAttack();
+        });
+        parryButton.setOnClickListener(view -> {
+            if (menuVisible || diagnosticsVisible || deathOverlayVisible || ProbeBridge.getRuntimeState() != 1) return;
+            ProbeBridge.requestParry();
         });
         diagnosticsBack.setOnClickListener(view -> {
             playSound("ui_back", 0.18f);
@@ -349,6 +359,7 @@ public class MainActivity extends Activity {
         ProbeBridge.setSimulationPaused(true);
         clearTouchState();
         attackButton.setVisibility(View.GONE);
+        parryButton.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
@@ -405,6 +416,7 @@ public class MainActivity extends Activity {
         hideMenu();
         menuButton.setVisibility(View.GONE);
         attackButton.setVisibility(View.GONE);
+        parryButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.VISIBLE);
         vitalityStatus.setVisibility(View.GONE);
         rtStatus.setText(R.string.benchmark_starting);
@@ -418,6 +430,7 @@ public class MainActivity extends Activity {
         ProbeBridge.setSimulationPaused(true);
         clearTouchState();
         attackButton.setVisibility(View.GONE);
+        parryButton.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
@@ -475,6 +488,9 @@ public class MainActivity extends Activity {
         final boolean showHud = preferences.getBoolean("show_hud", true);
         menuButton.setVisibility(showHud ? View.VISIBLE : View.GONE);
         attackButton.setVisibility(showHud && ProbeBridge.getRuntimeState() == 1 &&
+                lastPlayerLifePhase == PLAYER_ALIVE
+                ? View.VISIBLE : View.GONE);
+        parryButton.setVisibility(showHud && ProbeBridge.getRuntimeState() == 1 &&
                 lastPlayerLifePhase == PLAYER_ALIVE
                 ? View.VISIBLE : View.GONE);
         rtStatus.setVisibility(showHud ? View.VISIBLE : View.GONE);
@@ -567,6 +583,7 @@ public class MainActivity extends Activity {
         menuScrim.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         attackButton.setVisibility(View.GONE);
+        parryButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);
@@ -619,6 +636,7 @@ public class MainActivity extends Activity {
         ProbeBridge.setSimulationPaused(true);
         clearTouchState();
         attackButton.setVisibility(View.GONE);
+        parryButton.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
@@ -643,6 +661,7 @@ public class MainActivity extends Activity {
         ProbeBridge.setSimulationPaused(true);
         clearTouchState();
         attackButton.setVisibility(View.GONE);
+        parryButton.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
@@ -730,6 +749,7 @@ public class MainActivity extends Activity {
                     if (!debugCaptureUiSuppressed && !menuVisible && !benchmarkRunning && showHud &&
                             lifePhase == PLAYER_ALIVE) {
                         attackButton.setVisibility(View.VISIBLE);
+                        parryButton.setVisibility(View.VISIBLE);
                     }
                     if (!debugCaptureUiSuppressed && !menuVisible && !benchmarkRunning && showHud &&
                             lifePhase != PLAYER_DEAD) {
@@ -738,6 +758,7 @@ public class MainActivity extends Activity {
                     if (lifePhase != PLAYER_ALIVE) {
                         clearTouchState();
                         attackButton.setVisibility(View.GONE);
+                        parryButton.setVisibility(View.GONE);
                     }
                     if (lifePhase == PLAYER_DEAD) showDeathOverlay();
                     if (finaleEndingPhase == FINALE_ENDING_COMPLETE) showEndingOverlay();
@@ -793,6 +814,7 @@ public class MainActivity extends Activity {
                         rtStatus.setVisibility(View.VISIBLE);
                         menuButton.setVisibility(View.GONE);
                         attackButton.setVisibility(View.GONE);
+                        parryButton.setVisibility(View.GONE);
                         vitalityStatus.setVisibility(View.GONE);
                     } else if (benchmarkStatus == 2 || benchmarkStatus == 3) {
                         latestBenchmarkReport = ProbeBridge.getBenchmarkReport();
@@ -868,6 +890,10 @@ public class MainActivity extends Activity {
                         case PLATFORM_EVENT_LICH_DEFEATED:
                             playSpatialSound("lich_fall", 0.28f, stereoGains);
                             break;
+                        case PLATFORM_EVENT_PLAYER_PARRY_SUCCEEDED:
+                            playSpatialSound("sword_hit_2", 0.46f, stereoGains);
+                            performHaptic(HAPTIC_PARRY);
+                            break;
                         default:
                             break;
                     }
@@ -900,14 +926,14 @@ public class MainActivity extends Activity {
                                 new int[]{0, 210, 0, 255},
                                 -1));
                     } else {
-                        final long duration = cue == HAPTIC_DAMAGE ? 55L : 22L;
-                        final int amplitude = cue == HAPTIC_DAMAGE ? 180 : 90;
+                        final long duration = cue == HAPTIC_DAMAGE ? 55L : cue == HAPTIC_PARRY ? 34L : 22L;
+                        final int amplitude = cue == HAPTIC_DAMAGE ? 180 : cue == HAPTIC_PARRY ? 235 : 90;
                         vibrator.vibrate(VibrationEffect.createOneShot(duration, amplitude));
                     }
                 } else if (cue == HAPTIC_FATAL) {
                     vibrator.vibrate(new long[]{0L, 70L, 55L, 120L}, -1);
                 } else {
-                    vibrator.vibrate(cue == HAPTIC_DAMAGE ? 55L : 22L);
+                    vibrator.vibrate(cue == HAPTIC_DAMAGE ? 55L : cue == HAPTIC_PARRY ? 34L : 22L);
                 }
                 return;
             }
@@ -916,7 +942,8 @@ public class MainActivity extends Activity {
         }
 
         surfaceView.performHapticFeedback(
-                cue == HAPTIC_FATAL ? HapticFeedbackConstants.LONG_PRESS : HapticFeedbackConstants.CLOCK_TICK,
+                cue == HAPTIC_FATAL ? HapticFeedbackConstants.LONG_PRESS :
+                        cue == HAPTIC_PARRY ? HapticFeedbackConstants.CONTEXT_CLICK : HapticFeedbackConstants.CLOCK_TICK,
                 HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
     }
 
@@ -1015,6 +1042,7 @@ public class MainActivity extends Activity {
         diagnosticsPanel.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         attackButton.setVisibility(View.GONE);
+        parryButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);

@@ -222,6 +222,7 @@ struct VulkanSurfaceContext
     horde::gameplay::simulation::InputSnapshot simulationInput;
     std::uint64_t inputPublicationSequence = 0u;
     std::uint64_t attackSequence = 0u;
+    std::uint64_t parrySequence = 0u;
     std::uint64_t routeResetSequence = 0u;
     std::uint64_t retrySequence = 0u;
     int playerSwingVariant = 0;
@@ -872,6 +873,10 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
                             (context.playerSwingVariant++ & 1) == 0
                                 ? "sword_swing_1.wav" : "sword_swing_2.wav");
             break;
+        case GameplayEventType::PlayerParrySucceeded:
+            PlayPositionalSoundEffect(context, "sword_hit_2.wav", 1.0f,
+                                      event.worldX, event.worldZ);
+            break;
         case GameplayEventType::EnemyFootstep:
         {
             const char* clip = (context.enemyFootstepVariant++ & 1) == 0
@@ -1430,6 +1435,7 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(
     snapshot.eventQueueOverflowCount = simulation.eventQueueOverflowCount;
     snapshot.inputPublicationSequence = simulation.inputPublicationSequence;
     snapshot.consumedAttackSequence = simulation.lastConsumedAttackSequence;
+    snapshot.consumedParrySequence = simulation.lastConsumedParrySequence;
     snapshot.consumedRouteResetSequence = simulation.lastConsumedRouteResetSequence;
     snapshot.consumedRetrySequence = simulation.lastConsumedRetrySequence;
     snapshot.internalWidth = capabilities.performance.internalRenderWidth;
@@ -1448,6 +1454,16 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(
     snapshot.attackerEntityId = simulation.skeletonAttackerId == horde::gameplay::simulation::EntityId::Invalid
         ? -1
         : static_cast<std::int32_t>(simulation.skeletonAttackerId);
+    snapshot.playerCombatAction = simulation.playerCombat.action;
+    for (std::size_t index = 0u; index < simulation.skeletonEnemyCount; ++index)
+    {
+        if (simulation.skeletonEnemies[index].id == simulation.skeletonAttackerId)
+        {
+            snapshot.attackerCombatAction = simulation.skeletonEnemies[index].action;
+            snapshot.hasAttackerCombatAction = true;
+            break;
+        }
+    }
     snapshot.skeletonPoseBucketCount = static_cast<std::uint32_t>(context.rtScene.SkeletonPoseBucketCount());
     snapshot.renderScale = context.renderScale;
     snapshot.fps = capabilities.performance.fps;
@@ -1686,6 +1702,7 @@ void UpdateDesktopSceneControls(VulkanSurfaceContext& context)
     input.paused = context.simulationPaused;
     input.damageEnabled = IsPlayerDamageEnabled(context);
     input.commands.attack = context.attackSequence;
+    input.commands.parry = context.parrySequence;
     input.commands.routeReset = context.routeResetSequence;
     input.commands.retry = context.retrySequence;
     input.hasAuthoritativePlayerPose = false;
@@ -1713,6 +1730,7 @@ void UpdateDesktopSceneControls(VulkanSurfaceContext& context)
         input.pitchRadians = -0.04f;
         input.lanternStrength = context.lanternStrength;
         input.commands.attack = context.attackSequence;
+        input.commands.parry = context.parrySequence;
         input.commands.routeReset = context.routeResetSequence;
         input.commands.retry = context.retrySequence;
         if (advance.replay.waypointReached || advance.lapStarted || advance.finished)
@@ -3336,6 +3354,7 @@ void ShowControlsHelp(HWND window)
                 "WASD  Move and strafe\n"
                 "Left mouse drag  360 camera look\n"
                 "Right mouse or Space  Swing sword\n"
+                "Q  Parry skeleton strike\n"
                 "Esc  Pause / resume\n"
                  "R  Restart route\n"
                  "F1  Controls\n"
@@ -3766,6 +3785,11 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             if (!sceneContext->simulationPaused && wParam == VK_SPACE && (lParam & (1ll << 30)) == 0)
             {
                 ++sceneContext->attackSequence;
+                return 0;
+            }
+            if (!sceneContext->simulationPaused && wParam == 'Q' && (lParam & (1ll << 30)) == 0)
+            {
+                ++sceneContext->parrySequence;
                 return 0;
             }
             if (!sceneContext->simulationPaused && SetDesktopMovementKey(*sceneContext, wParam, true))

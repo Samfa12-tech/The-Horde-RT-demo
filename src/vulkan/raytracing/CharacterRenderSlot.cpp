@@ -16,40 +16,80 @@ constexpr std::array<std::uint32_t, 40u> kLichStaffEmissiveVertices{{
     19154u, 19174u, 19792u, 20010u, 20011u, 20012u, 20385u, 20387u,
     20388u, 20389u, 20390u, 20625u, 20845u, 20846u, 21255u, 25309u}};
 
-horde::scene::SkeletonClip SkeletonClipForAnimation(horde::gameplay::EnemyAnimation animation)
+horde::scene::SkeletonClip SkeletonClipForAction(
+    horde::gameplay::EnemyCombatAction action,
+    horde::gameplay::EnemyAnimation animation)
 {
-    return animation == horde::gameplay::EnemyAnimation::Walking
-        ? horde::scene::SkeletonClip::Walking
-        : (animation == horde::gameplay::EnemyAnimation::Attack
-               ? horde::scene::SkeletonClip::Attack
-               : (animation == horde::gameplay::EnemyAnimation::Dead
-                      ? horde::scene::SkeletonClip::Dead
-                      : horde::scene::SkeletonClip::Idle));
+    using Action = horde::gameplay::EnemyCombatAction;
+    if (animation == horde::gameplay::EnemyAnimation::Dead)
+    {
+        return horde::scene::SkeletonClip::Dead;
+    }
+    switch (action)
+    {
+    case Action::AttackWindup:
+    case Action::AttackActive:
+    case Action::AttackRecovery:
+    case Action::Staggered:
+        return horde::scene::SkeletonClip::Attack;
+    case Action::Dead:
+        return horde::scene::SkeletonClip::Dead;
+    case Action::Locomotion:
+    default:
+        return animation == horde::gameplay::EnemyAnimation::Walking
+            ? horde::scene::SkeletonClip::Walking
+            : horde::scene::SkeletonClip::Idle;
+    }
 }
 
-float SkeletonTimeForAnimation(horde::gameplay::EnemyAnimation animation,
-                               float animationTime,
-                               float deadClipDuration)
+float SkeletonTimeForAction(horde::gameplay::EnemyCombatAction action,
+                            horde::gameplay::EnemyAnimation animation,
+                            float actionTime,
+                            float animationTime,
+                            float deadClipDuration)
 {
-    if (animation == horde::gameplay::EnemyAnimation::Walking)
-    {
-        return animationTime * 0.90f;
-    }
+    using Action = horde::gameplay::EnemyCombatAction;
     if (animation == horde::gameplay::EnemyAnimation::Dead && deadClipDuration > 0.0f)
     {
         return std::min(animationTime, deadClipDuration);
     }
-    return animationTime;
+    switch (action)
+    {
+    case Action::AttackWindup:
+        return std::clamp(actionTime, 0.0f, 1.12f);
+    case Action::AttackActive:
+        return 1.12f + std::clamp(actionTime, 0.0f, 0.18f);
+    case Action::AttackRecovery:
+        return 1.30f + std::clamp(actionTime, 0.0f, 1.50f);
+    case Action::Staggered:
+        return 1.20f;
+    case Action::Dead:
+        return deadClipDuration > 0.0f ? std::min(animationTime, deadClipDuration) : animationTime;
+    case Action::Locomotion:
+    default:
+        return animationTime * 0.90f;
+    }
 }
 
-VkTransformMatrixKHR SkeletonInstanceTransform(float x, float z, float facingRadians)
+VkTransformMatrixKHR SkeletonInstanceTransform(
+    const horde::gameplay::simulation::SkeletonEnemySnapshot& skeleton)
 {
+    const float staggerProgress = skeleton.action == horde::gameplay::EnemyCombatAction::Staggered
+        ? std::clamp(skeleton.actionTime / 0.80f, 0.0f, 1.0f)
+        : 0.0f;
+    const float recoil = std::sin(staggerProgress * 3.14159265f);
+    const float x = skeleton.x - std::sin(skeleton.facingRadians) * recoil * 0.12f;
+    const float z = skeleton.z - std::cos(skeleton.facingRadians) * recoil * 0.12f;
+    const float facingRadians = skeleton.facingRadians;
     const float enemyCos = std::cos(facingRadians);
     const float enemySin = std::sin(facingRadians);
+    const float lean = -0.16f * recoil;
+    const float leanCos = std::cos(lean);
+    const float leanSin = std::sin(lean);
     return {{
-        enemyCos, 0.0f, enemySin, x,
-        0.0f, 1.0f, 0.0f, -0.95f,
-        -enemySin, 0.0f, enemyCos, z}};
+        enemyCos, enemySin * leanSin, enemySin * leanCos, x,
+        0.0f, leanCos, -leanSin, -0.95f + recoil * 0.025f,
+        -enemySin, enemyCos * leanSin, enemyCos * leanCos, z}};
 }
 
 VkTransformMatrixKHR LichInstanceTransform(const horde::gameplay::LichSnapshot& lich)
@@ -83,40 +123,21 @@ std::array<float, 3u> TransformPoint(const VkTransformMatrixKHR& transform,
 
 } // namespace
 
-CharacterRenderPlan EvaluateCharacterRenderPlan(
-    const horde::gameplay::CombatSnapshot& combat,
-    const horde::gameplay::EnemyRosterSnapshot& roster,
-    const horde::gameplay::LichSnapshot& lich)
-{
-    CharacterRenderPlan plan;
-    plan.selectedLich = roster.selectedEnemy == horde::gameplay::EnemyKind::Lich;
-    plan.skeletonClip = SkeletonClipForAnimation(combat.enemyAnimation);
-    plan.skeletonTime = SkeletonTimeForAnimation(combat.enemyAnimation, combat.enemyAnimationTime, 0.0f);
-    plan.lichClip = lich.phase == horde::gameplay::LichPhase::Dead
-        ? horde::scene::SkinnedClip::Dead
-        : horde::scene::SkinnedClip::Idle;
-    plan.lichTime = lich.animationTime;
-
-    if (plan.selectedLich)
-    {
-        plan.transform = LichInstanceTransform(lich);
-    }
-    else
-    {
-        plan.transform = SkeletonInstanceTransform(combat.enemyX, combat.enemyZ, combat.enemyFacingRadians);
-    }
-    return plan;
-}
-
 CharacterFramePlan EvaluateCharacterFramePlan(
     const std::array<horde::gameplay::simulation::SkeletonEnemySnapshot,
                      horde::gameplay::simulation::kSkeletonEnemyCapacity>& skeletons,
     const std::size_t skeletonCount,
     const horde::gameplay::EnemyRosterSnapshot& roster,
+    const horde::gameplay::LichSnapshot& lich,
     const float skeletonDeadClipDuration)
 {
     CharacterFramePlan plan;
     plan.selectedLich = roster.selectedEnemy == horde::gameplay::EnemyKind::Lich;
+    plan.lichClip = lich.phase == horde::gameplay::LichPhase::Dead
+        ? horde::scene::SkinnedClip::Dead
+        : horde::scene::SkinnedClip::Idle;
+    plan.lichTime = lich.animationTime;
+    plan.lichTransform = LichInstanceTransform(lich);
     if (plan.selectedLich)
     {
         return plan;
@@ -127,10 +148,10 @@ CharacterFramePlan EvaluateCharacterFramePlan(
     {
         const auto& source = skeletons[skeletonIndex];
         auto& destination = plan.skeletons[skeletonIndex];
-        destination.clip = SkeletonClipForAnimation(source.animation);
-        destination.time = SkeletonTimeForAnimation(
-            source.animation, source.animationTime, skeletonDeadClipDuration);
-        destination.transform = SkeletonInstanceTransform(source.x, source.z, source.facingRadians);
+        destination.clip = SkeletonClipForAction(source.action, source.animation);
+        destination.time = SkeletonTimeForAction(
+            source.action, source.animation, source.actionTime, source.animationTime, skeletonDeadClipDuration);
+        destination.transform = SkeletonInstanceTransform(source);
         destination.poseBucket = static_cast<std::uint32_t>(plan.skeletonPoseBucketCount);
         for (std::size_t previousIndex = 0u; previousIndex < skeletonIndex; ++previousIndex)
         {
@@ -218,6 +239,26 @@ bool CharacterRenderSlot::UpdateLichStaffSample(std::string& diagnostic)
     return true;
 }
 
+bool CharacterRenderSlot::CacheFramePlan(
+    const std::array<horde::gameplay::simulation::SkeletonEnemySnapshot,
+                     horde::gameplay::simulation::kSkeletonEnemyCapacity>& skeletons,
+    const std::size_t skeletonCount,
+    const horde::gameplay::EnemyRosterSnapshot& roster,
+    const horde::gameplay::LichSnapshot& lich,
+    std::string& diagnostic)
+{
+    if (skeletonCount > kMaximumActiveSkeletons)
+    {
+        diagnostic = "CharacterRenderSlot supports at most two active skeletons; the frame exceeded that limit.";
+        return false;
+    }
+    cachedFramePlan_ = EvaluateCharacterFramePlan(
+        skeletons, skeletonCount, roster, lich, skeletonDeadClipDuration_);
+    skeletonPoseBucketCount_ = cachedFramePlan_.skeletonPoseBucketCount;
+    diagnostic.clear();
+    return true;
+}
+
 bool CharacterRenderSlot::PrepareFrame(
     const std::array<horde::gameplay::simulation::SkeletonEnemySnapshot,
                      horde::gameplay::simulation::kSkeletonEnemyCapacity>& skeletons,
@@ -228,17 +269,11 @@ bool CharacterRenderSlot::PrepareFrame(
     std::string& diagnostic)
 {
     pendingRefit_ = CharacterBlasRefit::None;
-    activeSkeletonCount_ = 0u;
-    skeletonPoseBucketCount_ = 0u;
-    if (skeletonCount > kMaximumActiveSkeletons)
+    if (!CacheFramePlan(skeletons, skeletonCount, roster, lich, diagnostic))
     {
-        diagnostic = "CharacterRenderSlot supports at most two active skeletons; the frame exceeded that limit.";
         return false;
     }
-    const CharacterFramePlan framePlan = EvaluateCharacterFramePlan(
-        skeletons, skeletonCount, roster, skeletonDeadClipDuration_);
-    activeSkeletonCount_ = framePlan.skeletonCount;
-    skeletonPoseBucketCount_ = framePlan.skeletonPoseBucketCount;
+    const CharacterFramePlan& framePlan = cachedFramePlan_;
     if (!framePlan.selectedLich)
     {
         for (std::size_t bucket = 0u; bucket < framePlan.skeletonPoseBucketCount; ++bucket)
@@ -282,11 +317,10 @@ bool CharacterRenderSlot::PrepareFrame(
     }
     else
     {
-        const CharacterRenderPlan lichPlan = EvaluateCharacterRenderPlan({}, roster, lich);
-        const int clipIndex = static_cast<int>(lichPlan.lichClip);
-        if (CharacterPoseNeedsRefresh(clipIndex, lichPlan.lichTime, lastLichClip_, lastLichUpdateTime_))
+        const int clipIndex = static_cast<int>(framePlan.lichClip);
+        if (CharacterPoseNeedsRefresh(clipIndex, framePlan.lichTime, lastLichClip_, lastLichUpdateTime_))
         {
-            if (!lichModel_.SkinTextured(lichPlan.lichClip, lichPlan.lichTime, lichSkinnedVertices_, diagnostic))
+            if (!lichModel_.SkinTextured(framePlan.lichClip, framePlan.lichTime, lichSkinnedVertices_, diagnostic))
             {
                 return false;
             }
@@ -297,7 +331,7 @@ bool CharacterRenderSlot::PrepareFrame(
             {
                 return false;
             }
-            lastLichUpdateTime_ = lichPlan.lichTime;
+            lastLichUpdateTime_ = framePlan.lichTime;
             lastLichClip_ = clipIndex;
             pendingRefit_ = CharacterBlasRefit::Lich;
         }
@@ -307,12 +341,7 @@ bool CharacterRenderSlot::PrepareFrame(
 }
 
 std::array<VkAccelerationStructureInstanceKHR, CharacterRenderSlot::kMaximumActiveSkeletons>
-CharacterRenderSlot::BuildActiveInstances(
-    const std::array<horde::gameplay::simulation::SkeletonEnemySnapshot,
-                     horde::gameplay::simulation::kSkeletonEnemyCapacity>& skeletons,
-    const std::size_t skeletonCount,
-    const horde::gameplay::EnemyRosterSnapshot& roster,
-    const horde::gameplay::LichSnapshot& lich) const
+CharacterRenderSlot::BuildActiveInstances() const
 {
     std::array<VkAccelerationStructureInstanceKHR, kMaximumActiveSkeletons> instances{};
     for (std::size_t index = 0u; index < instances.size(); ++index)
@@ -328,11 +357,10 @@ CharacterRenderSlot::BuildActiveInstances(
         instance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
         instance.accelerationStructureReference = skeletonGpus_[0].accelerationStructure.address;
     }
-    const CharacterFramePlan framePlan = EvaluateCharacterFramePlan(
-        skeletons, skeletonCount, roster, skeletonDeadClipDuration_);
+    const CharacterFramePlan& framePlan = cachedFramePlan_;
     if (framePlan.selectedLich)
     {
-        instances[0].transform = LichInstanceTransform(lich);
+        instances[0].transform = framePlan.lichTransform;
         instances[0].instanceCustomIndex = kTlasInstanceIndex;
         instances[0].mask = 0x01u;
         instances[0].accelerationStructureReference = lichGpu_.accelerationStructure.address;
@@ -377,9 +405,9 @@ void CharacterRenderSlot::DestroyGpuResources(const RtGpuResources& resources)
     lastLichUpdateTime_ = -1.0f;
     lastLichClip_ = -1;
     pendingRefit_ = CharacterBlasRefit::None;
-    activeSkeletonCount_ = 0u;
     skeletonPoseBucketCount_ = 0u;
     skeletonDeadClipDuration_ = 0.0f;
+    cachedFramePlan_ = {};
     lichStaffLocalSample_ = {{0.94f, 0.79f, 0.64f}};
 }
 

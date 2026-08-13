@@ -14,7 +14,6 @@ namespace
 
 constexpr float kMinimumPitch = -0.32f;
 constexpr float kMaximumPitch = 0.28f;
-constexpr float kSwordDurationSeconds = 0.56f;
 
 float FiniteOr(float value, float fallback)
 {
@@ -120,6 +119,13 @@ void GameSimulation::StepFixed(const InputSnapshot& input,
     const bool wasAlive = playerVitals_.Snapshot().phase == PlayerLifePhase::Alive;
     playerVitals_.Update(fixedDeltaSeconds);
     const bool playerAlive = playerVitals_.Snapshot().phase == PlayerLifePhase::Alive;
+    if (input.paused || !playerAlive)
+    {
+        lastConsumedAttackSequence_ += pendingAttackCommands_;
+        pendingAttackCommands_ = 0u;
+        lastConsumedParrySequence_ += pendingParryCommands_;
+        pendingParryCommands_ = 0u;
+    }
     if (!input.paused && playerAlive)
     {
         walkTime_ += fixedDeltaSeconds;
@@ -145,6 +151,7 @@ void GameSimulation::StepFixed(const InputSnapshot& input,
     if (wasAlive && playerVitals_.Snapshot().phase != PlayerLifePhase::Alive)
     {
         pendingAttackCommands_ = 0u;
+        pendingParryCommands_ = 0u;
     }
 
     RefreshSnapshot(input);
@@ -213,9 +220,11 @@ EntityId GameSimulation::EntityForEnemy(EnemyKind kind)
 void GameSimulation::IngestCommands(const InputSnapshot& input)
 {
     pendingAttackCommands_ += SequenceDelta(input.commands.attack, latestAttackSequence_);
+    pendingParryCommands_ += SequenceDelta(input.commands.parry, latestParrySequence_);
     pendingRouteResetCommands_ += SequenceDelta(input.commands.routeReset, latestRouteResetSequence_);
     pendingRetryCommands_ += SequenceDelta(input.commands.retry, latestRetrySequence_);
     latestAttackSequence_ = std::max(latestAttackSequence_, input.commands.attack);
+    latestParrySequence_ = std::max(latestParrySequence_, input.commands.parry);
     latestRouteResetSequence_ = std::max(latestRouteResetSequence_, input.commands.routeReset);
     latestRetrySequence_ = std::max(latestRetrySequence_, input.commands.retry);
 }
@@ -283,8 +292,8 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
     {
         cadence.Reset();
     }
-    playerAttackCooldownRemaining_ = 0.0f;
     pendingAttackCommands_ = 0u;
+    pendingParryCommands_ = 0u;
     retryCheckpoint_ = activeEnemyKind_ == EnemyKind::Lich ? 9 : 0;
     finaleCompletionEmitted_ = false;
     if (isRetry)
@@ -373,20 +382,31 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
         }
     }
 
-    playerAttackCooldownRemaining_ = std::max(0.0f, playerAttackCooldownRemaining_ - deltaSeconds);
-    bool lichHitRequested = false;
-    if (pendingAttackCommands_ > 0u && playerAttackCooldownRemaining_ <= 0.00001f)
+    const bool playerActionAvailable = swordCombat_.CanAcceptPlayerAction();
+    bool playerActionAccepted = false;
+    if (pendingAttackCommands_ > 0u)
     {
-        --pendingAttackCommands_;
-        ++lastConsumedAttackSequence_;
-        swordCombat_.RequestAttack();
-        playerAttackCooldownRemaining_ = kSwordDurationSeconds;
-        lichHitRequested = activeEnemyKind_ == EnemyKind::Lich;
-        Emit(GameplayEventType::PlayerSwing,
-             EntityId::Player,
-             EntityId::Invalid,
-             playerX_,
-             playerZ_);
+        lastConsumedAttackSequence_ += pendingAttackCommands_;
+        pendingAttackCommands_ = 0u;
+        if (playerActionAvailable)
+        {
+            swordCombat_.RequestAttack();
+            playerActionAccepted = true;
+            Emit(GameplayEventType::PlayerSwing,
+                 EntityId::Player,
+                 EntityId::Invalid,
+                 playerX_,
+                 playerZ_);
+        }
+    }
+    if (pendingParryCommands_ > 0u)
+    {
+        lastConsumedParrySequence_ += pendingParryCommands_;
+        pendingParryCommands_ = 0u;
+        if (playerActionAvailable && !playerActionAccepted)
+        {
+            swordCombat_.RequestParry();
+        }
     }
 
     const auto previousSkeletons = combatSnapshot_.combatants;
@@ -427,6 +447,14 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
         {
             skeletonDamageSource = entity;
         }
+        if (current.parrySuccessPulse)
+        {
+            Emit(GameplayEventType::PlayerParrySucceeded,
+                 EntityId::Player,
+                 entity,
+                 current.x,
+                 current.z);
+        }
         const bool skeletonWalking = activeEnemyKind_ == EnemyKind::Skeleton &&
                                      current.animation == EnemyAnimation::Walking;
         if (enemyFootsteps_[index].Update(deltaSeconds, skeletonWalking))
@@ -456,7 +484,13 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
         lineOfSight,
         activeEnemyKind_ == EnemyKind::Lich && finaleActive);
 
-    if (lichHitRequested && lichEncounter_.TryAcceptPlayerHit(playerX_, playerZ_))
+    if (activeEnemyKind_ == EnemyKind::Lich && combatSnapshot_.playerAttackPulse &&
+        SwordCombat::IsPlayerTargetInRangeCone(playerX_,
+                                                playerZ_,
+                                                playerYawRadians_,
+                                                lich.x,
+                                                lich.z) &&
+        lichEncounter_.TryAcceptPlayerHit(playerX_, playerZ_))
     {
         Emit(GameplayEventType::EnemyHit,
              EntityId::Player,
@@ -562,6 +596,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.tickIndex = tickIndex_;
     snapshot_.inputPublicationSequence = inputPublicationSequence_;
     snapshot_.lastConsumedAttackSequence = lastConsumedAttackSequence_;
+    snapshot_.lastConsumedParrySequence = lastConsumedParrySequence_;
     snapshot_.lastConsumedRouteResetSequence = lastConsumedRouteResetSequence_;
     snapshot_.lastConsumedRetrySequence = lastConsumedRetrySequence_;
     snapshot_.playerX = playerX_;
@@ -591,8 +626,13 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
         target.damageFlash = source.damageFlash;
         target.health = source.health;
         target.animation = source.animation;
+        target.action = source.action;
+        target.reaction = source.reaction;
+        target.actionTime = source.actionTime;
+        target.reactionTime = source.reactionTime;
         target.dead = source.health <= 0;
         target.playerHitPulse = source.playerHitPulse;
+        target.parrySuccessPulse = source.parrySuccessPulse;
     }
     snapshot_.activeEnemyId = EntityForEnemy(activeEnemyKind_);
     if (activeEnemyKind_ == EnemyKind::Skeleton)
@@ -614,6 +654,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.lantern = lanternSnapshot_;
     snapshot_.enemyRoster = enemyDirector_.Snapshot();
     snapshot_.swordCombat = combatSnapshot_;
+    snapshot_.playerCombat = combatSnapshot_.player;
     snapshot_.lich = lichEncounter_.Snapshot();
     snapshot_.playerVitals = playerVitals_.Snapshot();
     snapshot_.fixedStepAccumulatorSeconds = fixedStepRunner_.AccumulatorSeconds();

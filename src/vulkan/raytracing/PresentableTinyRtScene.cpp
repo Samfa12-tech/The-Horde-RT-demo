@@ -178,6 +178,54 @@ bool CreateShaderModule(VkDevice device, const std::uint32_t* code, std::size_t 
 
 } // namespace
 
+PlayerWeaponRenderPose EvaluatePlayerWeaponRenderPose(
+    const horde::gameplay::PlayerCombatSnapshot& playerCombat,
+    const float swordSwingRadians,
+    const float heldPropDepth)
+{
+    using PlayerAction = horde::gameplay::PlayerCombatAction;
+    float parryBlend = 0.0f;
+    switch (playerCombat.action)
+    {
+    case PlayerAction::ParryStartup:
+        parryBlend = std::clamp(playerCombat.actionTime / 0.04f, 0.0f, 1.0f);
+        break;
+    case PlayerAction::ParryActive:
+        parryBlend = 1.0f;
+        break;
+    case PlayerAction::ParryRecovery:
+        parryBlend = 1.0f - std::clamp(playerCombat.actionTime / 0.24f, 0.0f, 1.0f);
+        break;
+    default:
+        break;
+    }
+    parryBlend = parryBlend * parryBlend * (3.0f - 2.0f * parryBlend);
+    const float successJolt = playerCombat.reaction == horde::gameplay::CombatReaction::Parried
+        ? std::clamp(playerCombat.reactionTime / 0.12f, 0.0f, 1.0f)
+        : 0.0f;
+    const float swingAmount = std::clamp(-swordSwingRadians / 1.12f, 0.0f, 1.0f);
+    const float smoothSwing = swingAmount * swingAmount * (3.0f - 2.0f * swingAmount);
+    const std::array<float, 3u> swingHand{{
+        0.34f + (-0.08f - 0.34f) * smoothSwing,
+        -0.41f + (-0.47f + 0.41f) * smoothSwing,
+        heldPropDepth + (std::min(heldPropDepth, 1.00f) - heldPropDepth) * smoothSwing}};
+    const std::array<float, 3u> parryHand{{
+        -0.20f + 0.055f * successJolt,
+        -0.29f + 0.025f * successJolt,
+        std::min(heldPropDepth, 0.90f)}};
+
+    PlayerWeaponRenderPose pose;
+    for (std::size_t axis = 0u; axis < pose.rightHandLocal.size(); ++axis)
+    {
+        pose.rightHandLocal[axis] = swingHand[axis] +
+            (parryHand[axis] - swingHand[axis]) * parryBlend;
+    }
+    pose.swordRadians = swordSwingRadians + parryBlend * (-0.82f + 0.14f * successJolt);
+    pose.parryBlend = parryBlend;
+    pose.successJolt = successJolt;
+    return pose;
+}
+
 PresentableTinyRtScene::~PresentableTinyRtScene()
 {
     Destroy();
@@ -2367,6 +2415,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const float cameraZ = frame.cameraZ;
     const float walkAmount = frame.walkAmount;
     const horde::gameplay::CombatSnapshot& combat = frame.combat;
+    const horde::gameplay::PlayerCombatSnapshot& playerCombat = frame.playerCombat;
     const horde::gameplay::LanternSnapshot& lantern = frame.lantern;
     const horde::gameplay::EnemyRosterSnapshot& roster = frame.roster;
     const horde::gameplay::LichSnapshot& lich = frame.lich;
@@ -2474,12 +2523,10 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const Vec3 leftHandLocal = lerp(heldLeftHandLocal,
                                     loweredLeftHandLocal,
                                     std::clamp(lantern.leftArmLowerBlend, 0.0f, 1.0f));
-    const float swingAmount = std::clamp(-combat.swordSwingRadians / 1.12f, 0.0f, 1.0f);
-    const float smoothSwing = swingAmount * swingAmount * (3.0f - 2.0f * swingAmount);
+    const PlayerWeaponRenderPose weaponPose = EvaluatePlayerWeaponRenderPose(
+        playerCombat, combat.swordSwingRadians, heldPropDepth);
     const Vec3 rightShoulderLocal{0.25f, -0.44f + lowerBodyPose.pelvisBob * 0.35f, 0.39f + lowerBodyPose.leftStride * 0.018f};
-    const Vec3 rightHandLocal = lerp(Vec3{0.34f, -0.41f, heldPropDepth},
-                                     Vec3{-0.08f, -0.47f, std::min(heldPropDepth, 1.00f)},
-                                     smoothSwing);
+    const Vec3 rightHandLocal = weaponPose.rightHandLocal;
     const Vec3 leftElbowLocal = solveElbow(leftShoulderLocal, leftHandLocal, 0.53f, 0.53f, Vec3{-1.0f, -0.15f, 0.08f});
     const Vec3 rightElbowLocal = solveElbow(rightShoulderLocal, rightHandLocal, 0.53f, 0.53f, Vec3{1.0f, -0.20f, 0.10f});
     const Vec3 leftShoulder = toWorld(leftShoulderLocal);
@@ -2540,8 +2587,9 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                                 std::clamp(lantern.fallProgress, 0.0f, 1.0f));
     }
 
-    const float swordCos = std::cos(combat.swordSwingRadians);
-    const float swordSin = std::sin(combat.swordSwingRadians);
+    const float swordPoseRadians = weaponPose.swordRadians;
+    const float swordCos = std::cos(swordPoseRadians);
+    const float swordSin = std::sin(swordPoseRadians);
     const Vec3 swordColumnX = scaled(add(scaled(viewRight, swordCos), scaled(viewUp, swordSin)), torchScale);
     const Vec3 swordColumnY = scaled(add(scaled(viewRight, -swordSin), scaled(viewUp, swordCos)), torchScale);
     const Vec3 swordColumnZ = scaled(viewForward, torchScale);
@@ -2585,8 +2633,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     instances[1].instanceCustomIndex = 1u;
     instances[1].mask = 0x02u;
     instances[1].accelerationStructureReference = torchBlas_.address;
-    const auto characterInstances = characterSlot_.BuildActiveInstances(
-        frame.skeletonEnemies, frame.skeletonEnemyCount, roster, lich);
+    const auto characterInstances = characterSlot_.BuildActiveInstances();
     instances[CharacterRenderSlot::kTlasInstanceIndex] = characterInstances[0];
     instances[3] = instances[1];
     instances[3].instanceCustomIndex = 3u;

@@ -17,6 +17,7 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     frame.walkAmount = simulation.walkAmount;
     frame.outputExposure = outputExposure;
     frame.combat = simulation.swordCombat;
+    frame.playerCombat = simulation.playerCombat;
     frame.combat.damageFlash = simulation.playerVitals.damageFlash;
     frame.skeletonEnemies = simulation.skeletonEnemies;
     frame.skeletonEnemyCount = simulation.skeletonEnemyCount;
