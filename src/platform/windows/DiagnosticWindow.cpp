@@ -43,6 +43,7 @@
 
 #include "ui/DiagnosticOverlay.h"
 #include "gameplay/CorridorCollision.h"
+#include "gameplay/FeedbackTiming.h"
 #include "gameplay/ShowcaseBenchmark.h"
 #include "gameplay/ShowcaseCheckpoints.h"
 #include "gameplay/ShowcaseGameplay.h"
@@ -226,6 +227,7 @@ struct VulkanSurfaceContext
     std::uint64_t routeResetSequence = 0u;
     std::uint64_t retrySequence = 0u;
     int playerSwingVariant = 0;
+    horde::gameplay::DelayedGameplayFeedbackQueue delayedFeedback;
     // Legacy mirrors retained only for Win32 overlays, capture manifests, and
     // existing debug authoring controls. GameSimulation is gameplay authority.
     horde::gameplay::CombatSnapshot combatSnapshot;
@@ -856,6 +858,11 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
     using horde::gameplay::simulation::GameplayEvent;
     using horde::gameplay::simulation::GameplayEventType;
 
+    context.delayedFeedback.DrainDue(GetTickCount64(), [&context](const GameplayEvent& event)
+    {
+        PlayPositionalSoundEffect(context, "enemy_fall.wav", 0.36f, event);
+    });
+
     for (const GameplayEvent& event : context.simulation.Events().Events())
     {
         switch (event.type)
@@ -892,7 +899,15 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
             }
             else
             {
-                PlaySoundEffect(context, "sword_hit_1.wav");
+                PlayPositionalSoundEffect(context, "sword_hit_1.wav", 1.0f, event);
+            }
+            break;
+        case GameplayEventType::EnemyDefeated:
+            if (!context.delayedFeedback.Enqueue(
+                    event,
+                    GetTickCount64() + horde::gameplay::kEnemyImpactFallDelayMilliseconds))
+            {
+                LogWindowsAudio("delayed enemy-fall feedback queue overflowed; newest cue was dropped");
             }
             break;
         case GameplayEventType::LichChargeStarted:
@@ -1114,6 +1129,7 @@ void ResetRoute(VulkanSurfaceContext& context)
     context.endingOverlayDismissed = false;
     context.debugEnemyOverride = horde::gameplay::EnemyKind::None;
     context.debugValidationPoint = 0u;
+    context.delayedFeedback.Clear();
     context.simulation.ResetRoute();
     context.simulation.ClearEvents();
     context.simulationInput.moveForward = 0.0f;
@@ -1178,6 +1194,7 @@ bool ApplyPlayerRetryCheckpoint(VulkanSurfaceContext& context, const std::int32_
     {
         return false;
     }
+    context.delayedFeedback.Clear();
     context.simulation.RetryEncounter();
     context.simulation.ClearEvents();
     context.simulationInput.hasAuthoritativePlayerPose = false;
@@ -1425,7 +1442,8 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(
     snapshot.catchUpOverrunCount = simulation.catchUpOverrunCount;
     snapshot.queuedEventCount = simulation.queuedEventCount;
     snapshot.eventQueueHighWaterMark = simulation.eventQueueHighWaterMark;
-    snapshot.eventQueueOverflowCount = simulation.eventQueueOverflowCount;
+    snapshot.eventQueueOverflowCount =
+        simulation.eventQueueOverflowCount + context.delayedFeedback.OverflowCount();
     snapshot.inputPublicationSequence = simulation.inputPublicationSequence;
     snapshot.consumedAttackSequence = simulation.lastConsumedAttackSequence;
     snapshot.consumedParrySequence = simulation.lastConsumedParrySequence;

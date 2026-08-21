@@ -34,6 +34,7 @@
 #include "gameplay/SpatialAudio.h"
 #include "gameplay/SwordCombat.h"
 #include "gameplay/simulation/GameSimulation.h"
+#include "gameplay/simulation/BoundedTransportQueue.h"
 #include "gameplay/simulation/InputMailbox.h"
 #include "vulkan/GpuFrameTimer.h"
 #include "vulkan/RtCapabilityReport.h"
@@ -159,10 +160,8 @@ struct PlatformGameplayEvent
 };
 
 constexpr std::size_t kPlatformGameplayEventCapacity = 128u;
-std::array<PlatformGameplayEvent, kPlatformGameplayEventCapacity> gPlatformGameplayEvents{};
-std::size_t gPlatformGameplayEventHead = 0u;
-std::size_t gPlatformGameplayEventCount = 0u;
-std::uint64_t gPlatformGameplayEventOverflowCount = 0u;
+horde::gameplay::simulation::BoundedTransportQueue<
+    PlatformGameplayEvent, kPlatformGameplayEventCapacity> gPlatformGameplayEvents;
 std::mutex gPlatformGameplayEventMutex;
 
 uint64_t PackStereoGains(float left, float right)
@@ -179,14 +178,13 @@ std::uint64_t PublishInputLocked()
 void ClearPlatformGameplayEvents()
 {
     std::lock_guard<std::mutex> lock(gPlatformGameplayEventMutex);
-    gPlatformGameplayEventHead = 0u;
-    gPlatformGameplayEventCount = 0u;
+    gPlatformGameplayEvents.Clear();
 }
 
 std::uint64_t PlatformGameplayEventOverflowCount()
 {
     std::lock_guard<std::mutex> lock(gPlatformGameplayEventMutex);
-    return gPlatformGameplayEventOverflowCount;
+    return gPlatformGameplayEvents.OverflowCount();
 }
 
 void EnqueuePlatformGameplayEvent(const horde::gameplay::simulation::GameplayEvent& event)
@@ -201,15 +199,7 @@ void EnqueuePlatformGameplayEvent(const horde::gameplay::simulation::GameplayEve
         ((event.sequence & 0xffffffffu) << 32u);
 
     std::lock_guard<std::mutex> lock(gPlatformGameplayEventMutex);
-    if (gPlatformGameplayEventCount >= gPlatformGameplayEvents.size())
-    {
-        ++gPlatformGameplayEventOverflowCount;
-        return;
-    }
-    const std::size_t tail =
-        (gPlatformGameplayEventHead + gPlatformGameplayEventCount) % gPlatformGameplayEvents.size();
-    gPlatformGameplayEvents[tail] = {metadata, PackStereoGains(gains.left, gains.right)};
-    ++gPlatformGameplayEventCount;
+    gPlatformGameplayEvents.Push({metadata, PackStereoGains(gains.left, gains.right)});
 }
 
 void DrainSimulationEventsToPlatform()
@@ -2495,16 +2485,13 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_drainPlatformEvents(JNIEnv* env, jcl
     std::vector<jlong> packed;
     {
         std::lock_guard<std::mutex> lock(gPlatformGameplayEventMutex);
-        packed.reserve(gPlatformGameplayEventCount * 2u);
-        for (std::size_t index = 0u; index < gPlatformGameplayEventCount; ++index)
+        packed.reserve(gPlatformGameplayEvents.Size() * 2u);
+        for (const PlatformGameplayEvent& event : gPlatformGameplayEvents.Values())
         {
-            const PlatformGameplayEvent& event = gPlatformGameplayEvents[
-                (gPlatformGameplayEventHead + index) % gPlatformGameplayEvents.size()];
             packed.push_back(static_cast<jlong>(event.metadata));
             packed.push_back(static_cast<jlong>(event.stereoGains));
         }
-        gPlatformGameplayEventHead = 0u;
-        gPlatformGameplayEventCount = 0u;
+        gPlatformGameplayEvents.Clear();
     }
 
     jlongArray result = env->NewLongArray(static_cast<jsize>(packed.size()));

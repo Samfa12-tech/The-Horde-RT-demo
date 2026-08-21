@@ -69,6 +69,14 @@ Manual owner audio/haptic validation is **change-triggered, not milestone-trigge
 
 Current reconciliation classification: **YES** — listener-at-event-time routing changes can affect perceived spatial audio and feedback timing, so a final owner check is required on the final exact Android candidate. This decision is separate from owner-only signing recovery work in `docs/OWNER_RELEASE_SAFETY_CHECKLIST.md`.
 
+## Sustained phone-performance evidence decision - 2026-08-21
+
+The project owner confirmed that the former strict-below-20.000 ms rule was not a product requirement. It was an engineering guardrail selected during development. The promotion wording in the dated 2026-08-11 two-skeleton decision above remains an accurate record of the policy used for that candidate, but it is superseded for current and future development.
+
+Current phone reporting uses 16.667, 20.000, and 33.333 ms as descriptive approximately 60/50/30 FPS reference lines. Crossing 20.000 ms does not by itself fail a candidate. Standard evidence should preserve one-process sustained route order, temperatures, Android thermal status, GPU thermal power level when available, frame-time windows, honest RT presentation, and workload identity. Cooled or fresh-process samples are diagnostic controls and must not replace ordinary sustained behavior.
+
+Investigate exact matched regressions above 15%, unexplained frame-time spikes, growing heap/PSS/graphics allocation/thread/resource counts, changed workloads, crashes, invalid renderer state, or dishonest presentation. Do not spend repeated runs cooling the phone to manufacture a sub-20 result, and do not weaken RT, silently lower resolution, or conceal thermal/governor behavior. The current two-skeleton limit remains the validated development boundary rather than a permanent game-design ceiling; larger encounters, fire, water, improved lanterns, and a proper player model require separately measured scaling work.
+
 ## Target devices
 
 - Primary target: Samsung Galaxy S26 Ultra.

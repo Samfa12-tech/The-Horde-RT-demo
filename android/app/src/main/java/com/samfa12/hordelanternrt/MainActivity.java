@@ -94,6 +94,7 @@ public class MainActivity extends Activity {
     private static final int HAPTIC_DAMAGE = 1;
     private static final int HAPTIC_FATAL = 2;
     private static final int HAPTIC_PARRY = 3;
+    private static final long ENEMY_IMPACT_FALL_DELAY_MILLISECONDS = 140L;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final float[] viewControls = {0.0f, 0.0f, 1.8f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
@@ -145,6 +146,7 @@ public class MainActivity extends Activity {
     private boolean retryPending;
     private int lastPlayerLifePhase = PLAYER_ALIVE;
     private int lastPlayerVitality = 3;
+    private long delayedGameplayFeedbackGeneration;
     private final Runnable applyPendingRenderScale = () ->
             ProbeBridge.setRenderScale(preferences.getInt("render_scale", 100) / 100.0f);
 
@@ -631,6 +633,7 @@ public class MainActivity extends Activity {
     }
 
     private void resetRoute() {
+        ++delayedGameplayFeedbackGeneration;
         endingOverlayVisible = false;
         endingOverlayDismissed = false;
         for (int i = 0; i < viewControls.length; ++i) viewControls[i] = 0.0f;
@@ -731,6 +734,7 @@ public class MainActivity extends Activity {
             Toast.makeText(this, R.string.retry_unavailable, Toast.LENGTH_LONG).show();
             return;
         }
+        ++delayedGameplayFeedbackGeneration;
         retryPending = true;
         applyCheckpointViewPose(checkpoint);
         clearTouchState();
@@ -903,9 +907,14 @@ public class MainActivity extends Activity {
                         case PLATFORM_EVENT_ENEMY_DEFEATED:
                             // Preserve the authored separation between the sword impact
                             // and the fall cue while retaining the event's spatial gains.
+                            final long feedbackGeneration = delayedGameplayFeedbackGeneration;
                             handler.postDelayed(
-                                    () -> playSpatialSound("enemy_fall", 0.24f, stereoGains),
-                                    140L);
+                                    () -> {
+                                        if (feedbackGeneration == delayedGameplayFeedbackGeneration) {
+                                            playSpatialSound("enemy_fall", 0.24f, stereoGains);
+                                        }
+                                    },
+                                    ENEMY_IMPACT_FALL_DELAY_MILLISECONDS);
                             break;
                         case PLATFORM_EVENT_LICH_CHARGE_STARTED:
                             playSpatialSound("lich_charge", 0.38f, stereoGains);
@@ -1433,6 +1442,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onPause() {
         resumed = false;
+        ++delayedGameplayFeedbackGeneration;
         if (vibrator != null) vibrator.cancel();
         if (deathOverlayVisible || retryPending || endingOverlayVisible) {
             retryPending = false;

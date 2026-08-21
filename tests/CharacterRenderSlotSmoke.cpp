@@ -3,7 +3,9 @@
 
 #include <cmath>
 #include <filesystem>
+#include <fstream>
 #include <iostream>
+#include <sstream>
 #include <string>
 
 namespace
@@ -49,6 +51,14 @@ std::filesystem::path FindRepoRoot()
         candidate = candidate.parent_path();
     }
     return {};
+}
+
+std::string ReadTextFile(const std::filesystem::path& path)
+{
+    std::ifstream input(path, std::ios::binary);
+    std::ostringstream text;
+    text << input.rdbuf();
+    return text.str();
 }
 
 } // namespace
@@ -244,6 +254,27 @@ int main()
     ok &= Require(!root.empty(), "repo assets were not found");
     if (!root.empty())
     {
+        const std::string raygenSource = ReadTextFile(root / "shaders/raytracing/minimal.rgen");
+        const std::string sceneSource =
+            ReadTextFile(root / "src/vulkan/raytracing/PresentableTinyRtScene.cpp");
+        ok &= Require(raygenSource.find(
+                          "layout(std430, set = 0, binding = 10) readonly buffer SecondSkeletonVertices") !=
+                          std::string::npos,
+                      "raygen no longer declares the bounded second-skeleton pose buffer at binding 10");
+        ok &= Require(raygenSource.find("bool secondSkeletonPose = h.instance == 18;") !=
+                          std::string::npos &&
+                      raygenSource.find("secondSkeleton.vertices[firstVertex].normal") !=
+                          std::string::npos &&
+                      raygenSource.find(
+                          "secondSkeleton.vertices[firstVertex + 1].position.xyz - secondSkeleton.vertices[firstVertex].position.xyz") !=
+                          std::string::npos,
+                      "custom index 18 no longer selects second-pose shading and geometric-normal vertices");
+        ok &= Require(sceneSource.find("secondSkeletonWrite.dstBinding = 10u;") !=
+                          std::string::npos &&
+                      sceneSource.find("secondSkeletonWrite.pBufferInfo = &secondSkeletonBufferInfo;") !=
+                          std::string::npos,
+                      "CPU descriptor writes no longer bind the second skeleton GPU vertex buffer at binding 10");
+
         CharacterRenderSlot slot;
         std::string diagnostic;
         ok &= Require(slot.LoadAssets(

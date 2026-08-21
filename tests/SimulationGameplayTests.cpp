@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <iostream>
 
+#include "gameplay/simulation/BoundedTransportQueue.h"
 #include "gameplay/simulation/GameSimulation.h"
 
 namespace
@@ -74,6 +75,21 @@ int main()
           identityQueue[0].target == EntityId::Skeleton &&
           NearlyEqual(identityQueue[0].listenerX, -1.0f),
           "overflow must be explicit and must retain the ordered event identity without advancing sequence");
+
+    BoundedTransportQueue<GameplayEvent, 2u> platformQueue;
+    check(platformQueue.Push(first) && platformQueue.Push(second) &&
+          platformQueue.Size() == 2u && platformQueue.HighWaterMark() == 2u,
+          "platform transport queue must retain bounded publications in order");
+    check(!platformQueue.Push({}) && platformQueue.OverflowCount() == 1u &&
+          platformQueue.Size() == 2u && platformQueue[0].target == EntityId::Skeleton &&
+          platformQueue[1].target == EntityId::Lich &&
+          NearlyEqual(platformQueue[0].listenerX, -1.0f) &&
+          NearlyEqual(platformQueue[1].listenerX, -2.0f),
+          "platform transport overflow must be visible and must not overwrite queued events");
+    platformQueue.Clear();
+    check(platformQueue.Size() == 0u && platformQueue.OverflowCount() == 1u &&
+          platformQueue.HighWaterMark() == 2u,
+          "platform transport drain must clear entries without hiding overflow diagnostics");
 
     GameSimulationConfig listenerConfig;
     listenerConfig.movementSpeedMetresPerSecond = 30.0f;
@@ -359,6 +375,128 @@ int main()
           CountEvents(damageEvents.Events(), GameplayEventType::PlayerKilled) == 1u &&
           playerDamageEventsIdentifyTheirAttacker,
           "two entity-aware nonfatal hits must emit PlayerDamaged while the lethal hit emits only PlayerKilled");
+
+    GameSimulation skeletonFeedback;
+    InputSnapshot skeletonFeedbackInput;
+    skeletonFeedbackInput.damageEnabled = false;
+    bool sawEnemyFootstep = false;
+    bool sawEnemyAttackStarted = false;
+    bool skeletonFeedbackIdentityValid = true;
+    std::uint64_t previousSkeletonFeedbackSequence = 0u;
+    for (int frame = 0; frame < 900 && (!sawEnemyFootstep || !sawEnemyAttackStarted); ++frame)
+    {
+        skeletonFeedback.AdvanceFrame(
+            skeletonFeedbackInput, 1.0 / 60.0, static_cast<std::uint64_t>(frame + 1));
+        for (const GameplayEvent& event : skeletonFeedback.Events().Events())
+        {
+            skeletonFeedbackIdentityValid = skeletonFeedbackIdentityValid &&
+                event.sequence > previousSkeletonFeedbackSequence;
+            previousSkeletonFeedbackSequence = event.sequence;
+            if (event.type == GameplayEventType::EnemyFootstep)
+            {
+                sawEnemyFootstep = true;
+                skeletonFeedbackIdentityValid = skeletonFeedbackIdentityValid &&
+                    (event.source == EntityId::SkeletonA || event.source == EntityId::SkeletonB) &&
+                    event.target == EntityId::Invalid;
+            }
+            if (event.type == GameplayEventType::EnemyAttackStarted)
+            {
+                sawEnemyAttackStarted = true;
+                skeletonFeedbackIdentityValid = skeletonFeedbackIdentityValid &&
+                    (event.source == EntityId::SkeletonA || event.source == EntityId::SkeletonB) &&
+                    event.target == EntityId::Player;
+            }
+        }
+        skeletonFeedback.ClearEvents();
+    }
+    check(sawEnemyFootstep && sawEnemyAttackStarted && skeletonFeedbackIdentityValid,
+          "walking and attacking skeletons must emit ordered entity-aware footstep and attack events");
+
+    GameSimulation lichFeedback;
+    check(lichFeedback.ApplyShowcaseCheckpoint(9),
+          "mirror checkpoint import must initialise lich feedback coverage");
+    InputSnapshot lichFeedbackInput;
+    lichFeedbackInput.damageEnabled = false;
+    bool sawLichCharge = false;
+    bool sawLichImpact = false;
+    bool lichFeedbackIdentityValid = true;
+    std::uint64_t chargeSequence = 0u;
+    std::uint64_t impactSequence = 0u;
+    for (int frame = 0; frame < 900 && (!sawLichCharge || !sawLichImpact); ++frame)
+    {
+        lichFeedback.AdvanceFrame(
+            lichFeedbackInput, 1.0 / 60.0, static_cast<std::uint64_t>(frame + 1));
+        for (const GameplayEvent& event : lichFeedback.Events().Events())
+        {
+            if (event.type == GameplayEventType::LichChargeStarted)
+            {
+                sawLichCharge = true;
+                chargeSequence = event.sequence;
+                lichFeedbackIdentityValid = lichFeedbackIdentityValid &&
+                    event.source == EntityId::Lich && event.target == EntityId::Player &&
+                    event.intensity > 0.0f;
+            }
+            if (event.type == GameplayEventType::LichImpact)
+            {
+                sawLichImpact = true;
+                impactSequence = event.sequence;
+                lichFeedbackIdentityValid = lichFeedbackIdentityValid &&
+                    event.source == EntityId::Lich && event.target == EntityId::Player;
+            }
+        }
+        lichFeedback.ClearEvents();
+    }
+    check(sawLichCharge && sawLichImpact && chargeSequence < impactSequence &&
+          lichFeedbackIdentityValid,
+          "the lich must emit an ordered entity-aware charge then impact sequence");
+
+    GameSimulation lichDefeatFeedback;
+    check(lichDefeatFeedback.ApplyShowcaseCheckpoint(10),
+          "lich checkpoint import must initialise defeat-event coverage");
+    InputSnapshot lichDefeatInput;
+    lichDefeatInput.damageEnabled = false;
+    std::uint64_t lichAttackCommand = 0u;
+    std::size_t lichHitEventCount = 0u;
+    std::size_t lichDefeatedEventCount = 0u;
+    bool lichDefeatIdentityAndOrderValid = true;
+    for (int frame = 0; frame < 1200 && lichDefeatFeedback.Snapshot().lich.health > 0; ++frame)
+    {
+        const auto& before = lichDefeatFeedback.Snapshot();
+        lichDefeatInput.hasAuthoritativePlayerPose = true;
+        lichDefeatInput.authoritativePlayerX = before.lich.x;
+        lichDefeatInput.authoritativePlayerZ = before.lich.z;
+        if (before.playerCombat.action == PlayerCombatAction::Idle &&
+            before.lich.hitCooldownRemaining <= 0.00001f)
+        {
+            lichDefeatInput.commands.attack = ++lichAttackCommand;
+        }
+        lichDefeatFeedback.AdvanceFrame(
+            lichDefeatInput, 1.0 / 60.0, static_cast<std::uint64_t>(frame + 1));
+        GameplayEventType previousType = GameplayEventType::PlayerFootstep;
+        bool hasPrevious = false;
+        for (const GameplayEvent& event : lichDefeatFeedback.Events().Events())
+        {
+            if (event.type == GameplayEventType::EnemyHit && event.target == EntityId::Lich)
+            {
+                ++lichHitEventCount;
+                lichDefeatIdentityAndOrderValid = lichDefeatIdentityAndOrderValid &&
+                    event.source == EntityId::Player;
+            }
+            if (event.type == GameplayEventType::LichDefeated)
+            {
+                ++lichDefeatedEventCount;
+                lichDefeatIdentityAndOrderValid = lichDefeatIdentityAndOrderValid &&
+                    hasPrevious && previousType == GameplayEventType::EnemyHit &&
+                    event.source == EntityId::Player && event.target == EntityId::Lich;
+            }
+            previousType = event.type;
+            hasPrevious = true;
+        }
+        lichDefeatFeedback.ClearEvents();
+    }
+    check(lichDefeatFeedback.Snapshot().lich.health == 0 && lichHitEventCount == 3u &&
+          lichDefeatedEventCount == 1u && lichDefeatIdentityAndOrderValid,
+          "three accepted active-window hits must emit one ordered entity-aware lich defeat");
 
     GameSimulation retry;
     InputSnapshot finaleInput;
