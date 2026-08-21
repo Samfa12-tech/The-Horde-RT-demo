@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <iostream>
 
+#include "gameplay/simulation/BoundedTransportQueue.h"
 #include "gameplay/simulation/GameSimulation.h"
 
 namespace
@@ -45,23 +46,90 @@ int main()
     first.source = EntityId::Player;
     first.target = EntityId::Skeleton;
     first.worldX = 1.0f;
+    first.listenerX = -1.0f;
+    first.listenerZ = 2.0f;
+    first.listenerYawRadians = 0.25f;
     GameplayEvent second = first;
     second.target = EntityId::Lich;
     second.worldX = 2.0f;
+    second.listenerX = -2.0f;
+    second.listenerYawRadians = -0.50f;
     check(identityQueue.Push(first) && identityQueue.Push(second),
           "two same-type events must fit the bounded queue");
     check(identityQueue[0].sequence != identityQueue[1].sequence &&
           identityQueue[0].target == EntityId::Skeleton &&
           identityQueue[1].target == EntityId::Lich &&
-          identityQueue[0].worldX != identityQueue[1].worldX,
-          "same-type events must retain distinct sequences, entities, and positions");
+          identityQueue[0].worldX != identityQueue[1].worldX &&
+          identityQueue[0].listenerX != identityQueue[1].listenerX &&
+          identityQueue[0].listenerYawRadians != identityQueue[1].listenerYawRadians,
+          "same-type events must retain distinct sequences, entities, positions, and listener state");
     for (std::size_t i = identityQueue.Size(); i < BoundedGameplayEventQueue::kCapacity; ++i)
     {
         identityQueue.Push({});
     }
     check(!identityQueue.Push({}) && identityQueue.OverflowCount() == 1u &&
-          identityQueue.Size() == BoundedGameplayEventQueue::kCapacity,
-          "overflow must be explicit and must not overwrite an unrelated event");
+          identityQueue.Size() == BoundedGameplayEventQueue::kCapacity &&
+          identityQueue.HighWaterMark() == BoundedGameplayEventQueue::kCapacity &&
+          identityQueue.NextSequence() == BoundedGameplayEventQueue::kCapacity + 1u &&
+          identityQueue[0].source == EntityId::Player &&
+          identityQueue[0].target == EntityId::Skeleton &&
+          NearlyEqual(identityQueue[0].listenerX, -1.0f),
+          "overflow must be explicit and must retain the ordered event identity without advancing sequence");
+
+    BoundedTransportQueue<GameplayEvent, 2u> platformQueue;
+    check(platformQueue.Push(first) && platformQueue.Push(second) &&
+          platformQueue.Size() == 2u && platformQueue.HighWaterMark() == 2u,
+          "platform transport queue must retain bounded publications in order");
+    check(!platformQueue.Push({}) && platformQueue.OverflowCount() == 1u &&
+          platformQueue.Size() == 2u && platformQueue[0].target == EntityId::Skeleton &&
+          platformQueue[1].target == EntityId::Lich &&
+          NearlyEqual(platformQueue[0].listenerX, -1.0f) &&
+          NearlyEqual(platformQueue[1].listenerX, -2.0f),
+          "platform transport overflow must be visible and must not overwrite queued events");
+    platformQueue.Clear();
+    check(platformQueue.Size() == 0u && platformQueue.OverflowCount() == 1u &&
+          platformQueue.HighWaterMark() == 2u,
+          "platform transport drain must clear entries without hiding overflow diagnostics");
+
+    GameSimulationConfig listenerConfig;
+    listenerConfig.movementSpeedMetresPerSecond = 30.0f;
+    GameSimulation movingListeners(listenerConfig);
+    InputSnapshot movingListenerInput;
+    movingListenerInput.moveForward = 1.0f;
+    movingListenerInput.yawRadians = 0.15f;
+    movingListenerInput.damageEnabled = false;
+    const std::uint32_t listenerTicks = movingListeners.AdvanceFrame(
+        movingListenerInput,
+        0.100,
+        101u);
+    std::size_t movingFootstepCount = 0u;
+    std::uint64_t previousFootstepSequence = 0u;
+    bool movingFootstepsAreOrdered = true;
+    bool movingFootstepsCaptureCurrentListener = true;
+    bool atLeastOneListenerDiffersFromFrameEnd = false;
+    for (const GameplayEvent& event : movingListeners.Events().Events())
+    {
+        if (event.type != GameplayEventType::PlayerFootstep)
+        {
+            continue;
+        }
+        ++movingFootstepCount;
+        movingFootstepsAreOrdered = movingFootstepsAreOrdered &&
+            event.sequence > previousFootstepSequence;
+        movingFootstepsCaptureCurrentListener = movingFootstepsCaptureCurrentListener &&
+            event.source == EntityId::Player &&
+            event.target == EntityId::Invalid &&
+            NearlyEqual(event.listenerX, event.worldX) &&
+            NearlyEqual(event.listenerZ, event.worldZ) &&
+            NearlyEqual(event.listenerYawRadians, movingListenerInput.yawRadians);
+        atLeastOneListenerDiffersFromFrameEnd = atLeastOneListenerDiffersFromFrameEnd ||
+            !NearlyEqual(event.listenerX, movingListeners.Snapshot().playerX) ||
+            !NearlyEqual(event.listenerZ, movingListeners.Snapshot().playerZ);
+        previousFootstepSequence = event.sequence;
+    }
+    check(listenerTicks >= 3u && movingFootstepCount >= 2u && movingFootstepsAreOrdered &&
+          movingFootstepsCaptureCurrentListener && atLeastOneListenerDiffersFromFrameEnd,
+          "events from several fixed ticks in one moving frame must retain each contact's listener state");
 
     GameSimulation attacks;
     InputSnapshot attackInput;
@@ -83,8 +151,8 @@ int main()
         attacks.AdvanceFrame(attackInput, 1.0 / 60.0, 2u);
     }
     check(attacks.Snapshot().lastConsumedAttackSequence == 2u &&
-          CountEvents(attacks.Events(), GameplayEventType::PlayerSwing) == 2u,
-          "N and N+1 must both survive publication and serialize through the sword action");
+          CountEvents(attacks.Events(), GameplayEventType::PlayerSwing) == 1u,
+          "an unavailable attack command must be consumed once without delayed buffering");
 
     const auto swingEvents = attacks.Events().Events();
     std::uint64_t firstSwingSequence = 0u;
@@ -104,8 +172,8 @@ int main()
             }
         }
     }
-    check(firstSwingSequence != 0u && secondSwingSequence > firstSwingSequence,
-          "serialized swings must remain separate semantic events");
+    check(firstSwingSequence != 0u && secondSwingSequence == 0u,
+          "rejected unavailable swings must not emit a false semantic event");
     check(std::all_of(swingEvents.begin(), swingEvents.end(), [](const GameplayEvent& event)
           {
               return event.type != GameplayEventType::PlayerSwing || event.target == EntityId::Invalid;
@@ -225,6 +293,52 @@ int main()
     check(pairSwingCount == 2u && pairSwingsAreTargetless,
           "swing-intent events must stay targetless until an actual entity-aware hit resolves");
 
+    GameSimulation parrySimulation;
+    InputSnapshot parryInput;
+    parryInput.hasAuthoritativePlayerPose = true;
+    parryInput.authoritativePlayerX = -0.75f;
+    parryInput.authoritativePlayerZ = -3.20f;
+    parryInput.yawRadians = 0.0f;
+    parryInput.damageEnabled = true;
+    bool parryIssued = false;
+    for (int frame = 0; frame < 360 &&
+         CountEvents(parrySimulation.Events(), GameplayEventType::PlayerParrySucceeded) == 0u;
+         ++frame)
+    {
+        const auto& attacker = parrySimulation.Snapshot().skeletonEnemies[0];
+        if (!parryIssued && attacker.action == EnemyCombatAction::AttackWindup &&
+            attacker.actionTime >= 0.98f)
+        {
+            parryInput.commands.parry = 1u;
+            parryIssued = true;
+        }
+        parrySimulation.AdvanceFrame(parryInput, 1.0 / 60.0, frame + 1u);
+    }
+    const auto parryEvents = parrySimulation.Events().Events();
+    const auto parryEvent = std::find_if(parryEvents.begin(), parryEvents.end(), [](const GameplayEvent& event)
+    {
+        return event.type == GameplayEventType::PlayerParrySucceeded;
+    });
+    check(parrySimulation.Snapshot().lastConsumedParrySequence == 1u &&
+          parryEvent != parryEvents.end() &&
+          parryEvent->source == EntityId::Player &&
+          parryEvent->target == EntityId::SkeletonA &&
+          parrySimulation.Snapshot().playerVitals.vitality == PlayerVitals::kMaxVitality,
+          "a successful parry must consume its independent sequence, suppress damage, and emit one entity-aware event");
+    for (int frame = 0; frame < 10; ++frame)
+    {
+        parrySimulation.AdvanceFrame(parryInput, 1.0 / 60.0);
+    }
+    check(CountEvents(parrySimulation.Events(), GameplayEventType::PlayerParrySucceeded) == 1u,
+          "re-reading one parry sequence must not repeat its semantic event");
+
+    InputSnapshot spamParry = parryInput;
+    spamParry.commands.parry = 3u;
+    parrySimulation.AdvanceFrame(spamParry, 1.0 / 60.0);
+    check(parrySimulation.Snapshot().lastConsumedParrySequence == 3u &&
+          CountEvents(parrySimulation.Events(), GameplayEventType::PlayerParrySucceeded) == 1u,
+          "unavailable parry commands must be consumed without delayed buffering");
+
     pairInput.commands.retry = 1u;
     skeletonPair.AdvanceFrame(pairInput, 1.0 / 60.0);
     check(skeletonPair.Snapshot().activeSkeletonCount == 2u &&
@@ -245,10 +359,144 @@ int main()
     {
         damageEvents.AdvanceFrame(damageInput, 1.0 / 60.0, static_cast<std::uint64_t>(frame + 1));
     }
+    bool playerDamageEventsIdentifyTheirAttacker = true;
+    for (const GameplayEvent& event : damageEvents.Events().Events())
+    {
+        if (event.type == GameplayEventType::PlayerDamaged ||
+            event.type == GameplayEventType::PlayerKilled)
+        {
+            playerDamageEventsIdentifyTheirAttacker = playerDamageEventsIdentifyTheirAttacker &&
+                (event.source == EntityId::SkeletonA || event.source == EntityId::SkeletonB) &&
+                event.target == EntityId::Player;
+        }
+    }
     check(damageEvents.Snapshot().playerVitals.phase == PlayerLifePhase::Dying &&
           CountEvents(damageEvents.Events(), GameplayEventType::PlayerDamaged) == 2u &&
-          CountEvents(damageEvents.Events(), GameplayEventType::PlayerKilled) == 1u,
-          "two nonfatal hits must emit PlayerDamaged while the lethal hit emits only PlayerKilled");
+          CountEvents(damageEvents.Events(), GameplayEventType::PlayerKilled) == 1u &&
+          playerDamageEventsIdentifyTheirAttacker,
+          "two entity-aware nonfatal hits must emit PlayerDamaged while the lethal hit emits only PlayerKilled");
+
+    GameSimulation skeletonFeedback;
+    InputSnapshot skeletonFeedbackInput;
+    skeletonFeedbackInput.damageEnabled = false;
+    bool sawEnemyFootstep = false;
+    bool sawEnemyAttackStarted = false;
+    bool skeletonFeedbackIdentityValid = true;
+    std::uint64_t previousSkeletonFeedbackSequence = 0u;
+    for (int frame = 0; frame < 900 && (!sawEnemyFootstep || !sawEnemyAttackStarted); ++frame)
+    {
+        skeletonFeedback.AdvanceFrame(
+            skeletonFeedbackInput, 1.0 / 60.0, static_cast<std::uint64_t>(frame + 1));
+        for (const GameplayEvent& event : skeletonFeedback.Events().Events())
+        {
+            skeletonFeedbackIdentityValid = skeletonFeedbackIdentityValid &&
+                event.sequence > previousSkeletonFeedbackSequence;
+            previousSkeletonFeedbackSequence = event.sequence;
+            if (event.type == GameplayEventType::EnemyFootstep)
+            {
+                sawEnemyFootstep = true;
+                skeletonFeedbackIdentityValid = skeletonFeedbackIdentityValid &&
+                    (event.source == EntityId::SkeletonA || event.source == EntityId::SkeletonB) &&
+                    event.target == EntityId::Invalid;
+            }
+            if (event.type == GameplayEventType::EnemyAttackStarted)
+            {
+                sawEnemyAttackStarted = true;
+                skeletonFeedbackIdentityValid = skeletonFeedbackIdentityValid &&
+                    (event.source == EntityId::SkeletonA || event.source == EntityId::SkeletonB) &&
+                    event.target == EntityId::Player;
+            }
+        }
+        skeletonFeedback.ClearEvents();
+    }
+    check(sawEnemyFootstep && sawEnemyAttackStarted && skeletonFeedbackIdentityValid,
+          "walking and attacking skeletons must emit ordered entity-aware footstep and attack events");
+
+    GameSimulation lichFeedback;
+    check(lichFeedback.ApplyShowcaseCheckpoint(9),
+          "mirror checkpoint import must initialise lich feedback coverage");
+    InputSnapshot lichFeedbackInput;
+    lichFeedbackInput.damageEnabled = false;
+    bool sawLichCharge = false;
+    bool sawLichImpact = false;
+    bool lichFeedbackIdentityValid = true;
+    std::uint64_t chargeSequence = 0u;
+    std::uint64_t impactSequence = 0u;
+    for (int frame = 0; frame < 900 && (!sawLichCharge || !sawLichImpact); ++frame)
+    {
+        lichFeedback.AdvanceFrame(
+            lichFeedbackInput, 1.0 / 60.0, static_cast<std::uint64_t>(frame + 1));
+        for (const GameplayEvent& event : lichFeedback.Events().Events())
+        {
+            if (event.type == GameplayEventType::LichChargeStarted)
+            {
+                sawLichCharge = true;
+                chargeSequence = event.sequence;
+                lichFeedbackIdentityValid = lichFeedbackIdentityValid &&
+                    event.source == EntityId::Lich && event.target == EntityId::Player &&
+                    event.intensity > 0.0f;
+            }
+            if (event.type == GameplayEventType::LichImpact)
+            {
+                sawLichImpact = true;
+                impactSequence = event.sequence;
+                lichFeedbackIdentityValid = lichFeedbackIdentityValid &&
+                    event.source == EntityId::Lich && event.target == EntityId::Player;
+            }
+        }
+        lichFeedback.ClearEvents();
+    }
+    check(sawLichCharge && sawLichImpact && chargeSequence < impactSequence &&
+          lichFeedbackIdentityValid,
+          "the lich must emit an ordered entity-aware charge then impact sequence");
+
+    GameSimulation lichDefeatFeedback;
+    check(lichDefeatFeedback.ApplyShowcaseCheckpoint(10),
+          "lich checkpoint import must initialise defeat-event coverage");
+    InputSnapshot lichDefeatInput;
+    lichDefeatInput.damageEnabled = false;
+    std::uint64_t lichAttackCommand = 0u;
+    std::size_t lichHitEventCount = 0u;
+    std::size_t lichDefeatedEventCount = 0u;
+    bool lichDefeatIdentityAndOrderValid = true;
+    for (int frame = 0; frame < 1200 && lichDefeatFeedback.Snapshot().lich.health > 0; ++frame)
+    {
+        const auto& before = lichDefeatFeedback.Snapshot();
+        lichDefeatInput.hasAuthoritativePlayerPose = true;
+        lichDefeatInput.authoritativePlayerX = before.lich.x;
+        lichDefeatInput.authoritativePlayerZ = before.lich.z;
+        if (before.playerCombat.action == PlayerCombatAction::Idle &&
+            before.lich.hitCooldownRemaining <= 0.00001f)
+        {
+            lichDefeatInput.commands.attack = ++lichAttackCommand;
+        }
+        lichDefeatFeedback.AdvanceFrame(
+            lichDefeatInput, 1.0 / 60.0, static_cast<std::uint64_t>(frame + 1));
+        GameplayEventType previousType = GameplayEventType::PlayerFootstep;
+        bool hasPrevious = false;
+        for (const GameplayEvent& event : lichDefeatFeedback.Events().Events())
+        {
+            if (event.type == GameplayEventType::EnemyHit && event.target == EntityId::Lich)
+            {
+                ++lichHitEventCount;
+                lichDefeatIdentityAndOrderValid = lichDefeatIdentityAndOrderValid &&
+                    event.source == EntityId::Player;
+            }
+            if (event.type == GameplayEventType::LichDefeated)
+            {
+                ++lichDefeatedEventCount;
+                lichDefeatIdentityAndOrderValid = lichDefeatIdentityAndOrderValid &&
+                    hasPrevious && previousType == GameplayEventType::EnemyHit &&
+                    event.source == EntityId::Player && event.target == EntityId::Lich;
+            }
+            previousType = event.type;
+            hasPrevious = true;
+        }
+        lichDefeatFeedback.ClearEvents();
+    }
+    check(lichDefeatFeedback.Snapshot().lich.health == 0 && lichHitEventCount == 3u &&
+          lichDefeatedEventCount == 1u && lichDefeatIdentityAndOrderValid,
+          "three accepted active-window hits must emit one ordered entity-aware lich defeat");
 
     GameSimulation retry;
     InputSnapshot finaleInput;
@@ -268,8 +516,14 @@ int main()
     lichHitInput.authoritativePlayerZ = retry.Snapshot().lich.z;
     lichHitInput.commands.attack = 1u;
     retry.AdvanceFrame(lichHitInput, 1.0 / 60.0);
+    check(retry.Snapshot().lich.health == 3,
+          "the lich must not take damage on the swing input edge");
+    for (int frame = 0; frame < 20 && retry.Snapshot().lich.health == 3; ++frame)
+    {
+        retry.AdvanceFrame(lichHitInput, 1.0 / 60.0);
+    }
     check(retry.Snapshot().lich.health == 2,
-          "seam-persistence setup must damage the live lich exactly once");
+          "the live lich must take exactly one hit when the sword enters its active window");
 
     InputSnapshot outsideInput = lichHitInput;
     outsideInput.authoritativePlayerX = 50.0f;
@@ -311,6 +565,33 @@ int main()
           NearlyEqual(retry.Snapshot().playerZ, kPlayerSpawn.z) &&
           NearlyEqual(retry.Snapshot().playerPitchRadians, 0.0f),
           "a paused route reset must restore the live opening pose with zero pitch once");
+
+    GameSimulation deadRejectsParry;
+    InputSnapshot lethalInput;
+    lethalInput.hasAuthoritativePlayerPose = true;
+    lethalInput.authoritativePlayerX = -0.75f;
+    lethalInput.authoritativePlayerZ = -3.40f;
+    lethalInput.damageEnabled = true;
+    for (int frame = 0; frame < 700 && deadRejectsParry.Snapshot().playerAlive; ++frame)
+    {
+        deadRejectsParry.AdvanceFrame(lethalInput, 1.0 / 60.0);
+    }
+    lethalInput.commands.parry = 1u;
+    deadRejectsParry.AdvanceFrame(lethalInput, 1.0 / 60.0);
+    check(deadRejectsParry.Snapshot().lastConsumedParrySequence == 1u &&
+          deadRejectsParry.Snapshot().playerCombat.action == PlayerCombatAction::Idle,
+          "death-state parry input must be consumed without starting or buffering an action");
+
+    GameSimulation pausedRejectsParry;
+    InputSnapshot pausedParryInput;
+    pausedParryInput.paused = true;
+    pausedParryInput.commands.parry = 1u;
+    pausedRejectsParry.StepFixed(pausedParryInput);
+    pausedParryInput.paused = false;
+    pausedRejectsParry.StepFixed(pausedParryInput);
+    check(pausedRejectsParry.Snapshot().lastConsumedParrySequence == 1u &&
+          pausedRejectsParry.Snapshot().playerCombat.action == PlayerCombatAction::Idle,
+          "paused parry input must be consumed without starting after resume");
 
     GameSimulation resetParity;
     check(resetParity.ApplyShowcaseCheckpoint(0) &&

@@ -1,9 +1,9 @@
-# Horde Lantern RT - showcase alpha 0.1.3
+# Horde Lantern RT - showcase alpha 0.1.4
 
-Public package version: `0.1.3-alpha.1`
+Public package version: `0.1.4-alpha.1`
 Canonical downloads: https://samfa12.itch.io/the-horde
 
-Horde Lantern RT is a short native Vulkan hardware-ray-tracing technology demo for Android phone hardware and Windows RTX. Carry a lantern through a wet gothic ruin, fight a skeleton, watch the flame fail, cross a blue skylight chamber and four coloured-light bays, then defeat a floating, staff-lit lich and return dawn to the ruin.
+Horde Lantern RT is a short native Vulkan hardware-ray-tracing technology demo for Android phone hardware and Windows RTX. Carry a lantern through a wet gothic ruin, fight two skeletons with timed sword swings and parries, watch the flame fail, cross a blue skylight chamber and four coloured-light bays, then defeat a floating, staff-lit lich and return dawn to the ruin.
 
 ## This alpha proves
 
@@ -12,7 +12,8 @@ Horde Lantern RT is a short native Vulkan hardware-ray-tracing technology demo f
 - Honest swapchain presentation of the RT-produced image.
 - Phone-safe `rayQueryEXT` shading inside raygen rather than a raster fallback.
 - Moving lantern shadows, bounded coloured lighting, a hero mirror, wet stone, and emissive enemy effects.
-- One shared scene and gameplay route across Android and Windows.
+- One deterministic 60 Hz gameplay simulation and shared scene route across Android and Windows.
+- Two stable skeleton enemies with one attacker token, animation-owned contact, timed parry, stagger, and independent deaths.
 - A rebuilt low-poly player body with articulated walking, vitality, encounter retry, and a complete post-lich epilogue.
 
 ## Downloads
@@ -28,16 +29,16 @@ This demo is RT or nothing. Unsupported devices receive a clear diagnostic repor
 - Android packaging minimum is Android 7 / API 24, but only Samsung `SM-S948B` on Android 16 is currently device-certified. The driver must expose Vulkan acceleration structures, RT pipeline, ray query, buffer device address, deferred host operations, and required ASTC formats.
 - Windows requires 64-bit Windows 10/11 and a Vulkan driver exposing the same RT extension set. The validated GPU is an NVIDIA GeForce RTX 5050 Laptop GPU.
 
-At the recommended Android 75% RT scale, the 0.1.3 connected Debug gate completed all five measured checkpoints, all 13 replay waypoints, all 12 scene captures, and Home/resume with honest RT presentation. The measured checkpoints ranged from 7.096 to 15.727 ms; two later cool/status-0 lich samples measured 13.723 and 13.600 ms. The full 100% extent remains report-only and can fall below 50 FPS.
+At the recommended Android 75% RT scale, the exact 0.1.4 runtime candidate completed all six measured checkpoints, all 13 replay waypoints and captures, and Home/resume with honest RT presentation. Standard sustained medians ranged from 9.267 ms to 23.069 ms on the validated phone; the heaviest lich view was about 43 FPS after the phone reduced GPU frequency. The 100% extent remains report-only. These are exact-device observations, not a frame-rate promise for other phones.
 
 ## Controls
 
-- Android: left-side drag moves/strafe, right-side drag looks, `SWING` attacks, Android Back pauses/resumes.
-- Windows: `WASD` moves, left mouse drag looks, right mouse or Space attacks, Esc pauses, R restarts, F1/F2 show controls/diagnostics, and Alt+Enter toggles fullscreen.
+- Android: left-side drag moves/strafe, right-side drag looks, `SWING` attacks, `PARRY` defends against timed skeleton melee, and Android Back pauses/resumes.
+- Windows: `WASD` moves, left mouse drag looks, right mouse or Space attacks, `Q` parries, Esc pauses, R restarts, F1/F2 show controls/diagnostics, and Alt+Enter toggles fullscreen.
 
 ## Alpha scope
 
-This is a deliberately bounded technology showcase. It renders and animates one skinned enemy at a time: the skeleton owns the opening encounter and the CC0 Meshy lich owns the finale. Simultaneous hordes, water, and broader combat systems remain later measured slices.
+This is a deliberately bounded technology showcase. The opening encounter is capped at two skeletons and one attacker at a time; the CC0 Meshy lich remains singular in the finale. Larger hordes, fire/water expansion, and broader combat systems remain later measured slices.
 
 ## Credits
 

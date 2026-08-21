@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <string>
 
+#include "gameplay/SwordCombat.h"
 #include "vulkan/DeviceCapabilities.h"
 
 namespace horde::ui
@@ -35,6 +36,9 @@ struct DeveloperOverlaySnapshot
     std::uint32_t activeSkinnedEnemies = 0;
     std::uint32_t activeEnemyEntityCount = 0;
     std::int32_t attackerEntityId = -1;
+    gameplay::PlayerCombatAction playerCombatAction = gameplay::PlayerCombatAction::Idle;
+    gameplay::EnemyCombatAction attackerCombatAction = gameplay::EnemyCombatAction::Locomotion;
+    bool hasAttackerCombatAction = false;
     std::uint32_t skeletonPoseBucketCount = 0;
     int enemyHealth = -1;
     int playerVitality = 3;
@@ -56,6 +60,7 @@ struct DeveloperOverlaySnapshot
     std::uint64_t eventQueueOverflowCount = 0;
     std::uint64_t inputPublicationSequence = 0;
     std::uint64_t consumedAttackSequence = 0;
+    std::uint64_t consumedParrySequence = 0;
     std::uint64_t consumedRouteResetSequence = 0;
     std::uint64_t consumedRetrySequence = 0;
     bool presented = false;

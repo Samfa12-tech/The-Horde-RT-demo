@@ -13,11 +13,13 @@ Horde Lantern RT is a native Vulkan hardware-ray-tracing technology demo for And
 
 Showcase Alpha 0.1.3 adds a substantially rebuilt procedural player body with articulated walking, a three-point vitality/retry loop, and a complete post-lich dawn ending. The release-safe in-app benchmark and Samfa12 menu link remain available; detailed checkpoint, capture, and developer telemetry remain Debug-only.
 
-The current development foundation runs Windows and Android gameplay through one deterministic 60 Hz `GameSimulation`. Android input crosses JNI through a coherent snapshot mailbox with monotonic attack/reset/retry counters; ordered semantic events drive platform audio and haptics; and one shared adapter preserves the existing `RtSceneFrameInputs` renderer boundary. See `docs/SHARED_SIMULATION_FOUNDATION_2026-08-10.md`.
+The current development foundation runs Windows and Android gameplay through one deterministic 60 Hz `GameSimulation`. Android input crosses JNI through a coherent snapshot mailbox with independent monotonic swing/parry/reset/retry counters; ordered semantic events drive platform audio and haptics; and one shared adapter preserves the existing `RtSceneFrameInputs` renderer boundary. See `docs/SHARED_SIMULATION_FOUNDATION_2026-08-10.md`.
 
-The current development candidate builds the first bounded two-skeleton encounter on the checked renderer resource seam. Stable entities share a skeleton pose/BLAS when their actions match and use at most two pose buckets when they diverge; the lich remains singular. The scene now owns nine BLAS and nineteen physical TLAS slots, with unused slots masked. Its exact `SM-S948B` automated gate passed at 75%, including the two-enemy checkpoint and lich below 20 ms, plus 13 captures, replay, and lifecycle recovery. The owner then reported the hands-on two-enemy experience feels fine on that exact installed candidate. See `docs/TWO_SKELETON_COMBAT_ANDROID_VALIDATION_2026-08-12.md`.
+The current development foundation supports a bounded two-skeleton encounter: stable entities share a skeleton pose/BLAS when their actions match and use at most two pose buckets when they diverge; the lich remains singular. The scene owns nine BLAS and nineteen physical TLAS slots, with unused slots masked. Historical exact commit `b3428a7` passed the six-checkpoint `SM-S948B` 75% gate, 13 captures, replay, and Home/resume; the owner then reported that two-enemy play felt fine on that installed candidate. That evidence does not automatically prove later source revisions. See `docs/TWO_SKELETON_COMBAT_ANDROID_VALIDATION_2026-08-12.md`.
 
-After these foundations merged, the project owner reported that controls, audio, and haptics all worked correctly during a hands-on test on `SM-S948B`. This is owner-reported development-build evidence rather than a new exact-artifact check; the separate automated lich performance failure remains open. See `docs/RENDERER_RESOURCE_SLOTS_ANDROID_VALIDATION_2026-08-11.md`.
+The animation-owned combat/parry candidate at exact commit `daa5892` passed functional `SM-S948B` checks and recorded a 20.246 ms warm lich median under the then-current gate. The owner found parry timing good. Final exact reconciliation commit `547d89d` publishes Android parry on press-down, animates stagger, retains event-time spatial data, restores positional skeleton hit/fall parity on Windows, and uses bounded Android feedback transport. Its clean Full gate passed strict ASTC, honest presentation, replay, 13 captures, Home/resume, fresh 12/12 Debug and Release CTests, Android build/lint, and exact installed-APK matching. Sustained 75% lich measured 23.069 ms (~43.3 FPS) at GPU thermal power level 2 and is reported honestly in the 30-50 FPS band rather than failed against an arbitrary 20 ms line. The owner gave the final exact candidate a broad audio/haptic pass and explicitly observed its stagger-back/death sequence. No renderer slot, BLAS, pose bucket, runtime asset, or public-release identity was added. See `docs/ANIMATION_COMBAT_PARRY_SLICE_2026-08-13.md` and `docs/CURRENT_DEVELOPMENT_BASELINE_VALIDATION_2026-08-21.md`.
+
+Earlier 23.604 ms lich evidence was a real unmatched hot renderer-foundation run, not an unresolved current-candidate result: the provenance-bound cooled `b3428a7` A/B later measured 19.497/19.268 ms. The 20.246 ms `daa5892` result was a separate warm non-pass under the gate then in force. Both remain useful historical evidence; final current-source evidence is recorded separately.
 
 The APK declares Android 7 / API 24 as its packaging minimum, but hardware support is intentionally much narrower: the device and driver must expose Vulkan acceleration structures, ray-tracing pipeline, ray query, buffer device address, deferred host operations, and the required ASTC formats. Only `SM-S948B` on Android 16 is currently device-certified.
 
@@ -56,6 +58,7 @@ The staged Meshy sword LOD and torch study are not used by the runtime or includ
 - Left-side drag: walk and strafe
 - Right-side drag: 360-degree look
 - `SWING`: sword attack
+- `PARRY`: timed skeleton-strike parry
 - Android Back: pause/resume
 
 ### Windows
@@ -63,6 +66,7 @@ The staged Meshy sword LOD and torch study are not used by the runtime or includ
 - `WASD`: walk and strafe
 - Left mouse drag: look
 - Right mouse or `Space`: sword attack
+- `Q`: timed skeleton-strike parry
 - `Esc`: pause/resume
 - `R`: restart route
 - `F1`: controls
@@ -74,7 +78,7 @@ At zero vitality, `RETRY ENCOUNTER` restores the current encounter, `RESTART ROU
 
 ## Current validation
 
-The complete showcase route is Windows-validated and Android-device-validated on `SM-S948B`. Android selected strict environment and lich ASTC textures, honestly presented RT frames, survived pause/resume and Home/surface recreation, and completed the full hands-on route without a reported issue.
+The published Showcase Alpha 0.1.3 route is Windows-validated and Android-device-validated on `SM-S948B`. Android selected strict environment and lich ASTC textures, honestly presented RT frames, survived pause/resume and Home/surface recreation, and completed the full hands-on route without a reported issue. It remains a one-active-enemy public artifact; later two-enemy/parry work is development-only.
 
 The player-vitality/retry slice is host-validated by clean Windows Debug and Release builds, all seven CTests in both configurations, twelve fixed RT captures, clean Android Debug and unsigned Release builds across all four configured ABIs, and `lintRelease`. On `SM-S948B`, real skeleton/lich damage, death UI, native opening/mirror retry, 3/3 restoration, the complete showcase automation route, captures, and Home/resume RT presentation are also validated. The earlier owner report of perceived haptics was corrected on 2026-08-01 because haptics had not actually been checked. The audit revision adds direct `Vibrator` effects, an enabled settings toggle/preview, and view-feedback fallback; the exact installed Debug APK subsequently produced completed preview, Swing, damage, and fatal effects through the live encounter, and the owner confirmed the revised haptic was physically felt. See `docs/PLAYER_VITALITY_RETRY_SLICE_2026-07-31.md` and `docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md`.
 
@@ -85,7 +89,7 @@ Render scaling was verified at:
 | Scale | Android internal RT extent | Result |
 |---:|---:|---|
 | 100% | `1440x2980` | Full-extent/image check passed; exact two-skeleton candidate opening measured 18.674 ms median of three 120-frame averages, report-only |
-| 75% | `1080x2235` | Recommended tier; exact two-skeleton candidate measured 10.589 / 12.139 / 9.246 / 8.888 / 11.060 / 19.735 ms across the six-checkpoint gate, all below 20 ms at thermal status 0 |
+| 75% | `1080x2235` | Recommended tier; historical exact two-skeleton run measured 10.589 / 12.139 / 9.246 / 8.888 / 11.060 / 19.735 ms across six checkpoints at thermal status 0; these are workload measurements, not a universal pass/fail boundary |
 | 50% | `720x1490` | Initial-alpha opening diagnostic recorded 163.12 FPS / 6.13 ms; retained as historical evidence, not a complete-route baseline |
 
 Windows Release was launched from a clean extraction using only its packaged assets. It reported `RayTracingPipeline`, `RT scene presented: yes`, and live resolution/FPS/frame-time diagnostics. The 100% and 75% render targets were verified at `982x628` and `737x471` respectively.
@@ -176,7 +180,7 @@ With the authorised `SM-S948B` connected, run the milestone gate:
 .\tools\run-foundation-validation.ps1 -Mode Full
 ```
 
-`Full` adds the six-checkpoint 75% timing/replay gate, a separately reported 100% opening result, Home/resume evidence, and all 13 deterministic Android captures. Both modes write timestamped logs, manifests, hashes, PNGs, exact installed-APK/source/shader provenance, `summary.json`, and `validation.md` beneath ignored `reports/foundation-runs/`. Their ZIP/APK artifacts are marked unpublishable, stay out of `releases/candidates/`, are not signed, and do not read or require release-key secrets.
+`Full` adds the six-checkpoint sustained 75% timing/replay report, a separately labelled 100% opening result, Home/resume evidence, and all 13 deterministic Android captures. The current Vulkan-enabled host suites contain 12 CTests per Debug/Release configuration; the portable GitHub Actions lane runs its separate 8-test Vulkan-disabled subset. Timing output uses descriptive 16.667/20.000/33.333 ms reference lines (approximately 60/50/30 FPS); crossing one is reported rather than treated as an automatic product failure. Exact matched regressions above 15% require investigation. Both modes write timestamped logs, manifests, hashes, PNGs, exact installed-APK/source/shader provenance, `summary.json`, and `validation.md` beneath ignored `reports/foundation-runs/`. Their ZIP/APK artifacts are marked unpublishable, stay out of `releases/candidates/`, are not signed, and do not read or require release-key secrets.
 
 Check raygen staleness without modifying the embedded include:
 
@@ -240,6 +244,6 @@ After raygen edits, run `tools/compile-raygen.ps1`; use `tools/compile-raygen.ps
 
 The established route is Windows- and Android-device-validated: lower body and lantern drop, zig-zag shadows, blue skylight, bay-selected coloured torches, an open framed threshold, one hero mirror, and a sequential staff-lit lich finale. The newer body-and-ending slice adds the layered animated player, post-death sliding skylight, warm dawn reveal, and contextual ending; its host and exact-APK `SM-S948B` evidence are recorded in `docs/PLAYER_BODY_AND_FINALE_SLICE_2026-07-31.md`.
 
-Only one skinned enemy is animated, refit, and rendered at a time; the plural roster remains configurable for a future separately measured Horde slice.
+Showcase Alpha 0.1.3 animates, refits, and renders one skinned enemy at a time. Current development source is explicitly bounded to two simultaneous skeletons, two skeleton pose buckets, nine BLAS, and nineteen physical TLAS slots; the lich remains singular. No third enemy is permitted without a separately measured design.
 
 The 75% setting is the sustained phone recommendation. Preserve real RT at the documented quality tier; reduce bounded effect area or ray cost before considering any broader feature expansion.

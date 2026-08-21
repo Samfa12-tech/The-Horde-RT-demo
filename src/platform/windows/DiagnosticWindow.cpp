@@ -43,6 +43,7 @@
 
 #include "ui/DiagnosticOverlay.h"
 #include "gameplay/CorridorCollision.h"
+#include "gameplay/FeedbackTiming.h"
 #include "gameplay/ShowcaseBenchmark.h"
 #include "gameplay/ShowcaseCheckpoints.h"
 #include "gameplay/ShowcaseGameplay.h"
@@ -222,9 +223,11 @@ struct VulkanSurfaceContext
     horde::gameplay::simulation::InputSnapshot simulationInput;
     std::uint64_t inputPublicationSequence = 0u;
     std::uint64_t attackSequence = 0u;
+    std::uint64_t parrySequence = 0u;
     std::uint64_t routeResetSequence = 0u;
     std::uint64_t retrySequence = 0u;
     int playerSwingVariant = 0;
+    horde::gameplay::DelayedGameplayFeedbackQueue delayedFeedback;
     // Legacy mirrors retained only for Win32 overlays, capture manifests, and
     // existing debug authoring controls. GameSimulation is gameplay authority.
     horde::gameplay::CombatSnapshot combatSnapshot;
@@ -822,16 +825,15 @@ bool PlayXAudioFile(const std::filesystem::path& path, float leftGain, float rig
 void PlayPositionalSoundEffect(const VulkanSurfaceContext& context,
                                const char* filename,
                                float mixGain,
-                               float emitterX,
-                               float emitterZ)
+                               const horde::gameplay::simulation::GameplayEvent& event)
 {
     if (!context.sfxEnabled)
     {
         return;
     }
     const horde::gameplay::SpatialAudioGains gains = horde::gameplay::CalculateSpatialAudio(
-        {emitterX, emitterZ, mixGain, 1.0f, 14.0f},
-        {context.cameraX, context.cameraZ, context.cameraYaw});
+        {event.worldX, event.worldZ, mixGain, 1.0f, 14.0f},
+        {event.listenerX, event.listenerZ, event.listenerYawRadians});
     if (gains.left <= 0.0f && gains.right <= 0.0f)
     {
         return;
@@ -856,6 +858,11 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
     using horde::gameplay::simulation::GameplayEvent;
     using horde::gameplay::simulation::GameplayEventType;
 
+    context.delayedFeedback.DrainDue(GetTickCount64(), [&context](const GameplayEvent& event)
+    {
+        PlayPositionalSoundEffect(context, "enemy_fall.wav", 0.36f, event);
+    });
+
     for (const GameplayEvent& event : context.simulation.Events().Events())
     {
         switch (event.type)
@@ -872,39 +879,45 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
                             (context.playerSwingVariant++ & 1) == 0
                                 ? "sword_swing_1.wav" : "sword_swing_2.wav");
             break;
+        case GameplayEventType::PlayerParrySucceeded:
+            PlayPositionalSoundEffect(context, "sword_hit_2.wav", 1.0f, event);
+            break;
         case GameplayEventType::EnemyFootstep:
         {
             const char* clip = (context.enemyFootstepVariant++ & 1) == 0
                 ? "skeleton_step_1.wav" : "skeleton_step_2.wav";
-            PlayPositionalSoundEffect(context, clip, 1.0f, event.worldX, event.worldZ);
+            PlayPositionalSoundEffect(context, clip, 1.0f, event);
             break;
         }
         case GameplayEventType::EnemyAttackStarted:
-            PlayPositionalSoundEffect(context, "skeleton_attack.wav", 0.85f,
-                                      event.worldX, event.worldZ);
+            PlayPositionalSoundEffect(context, "skeleton_attack.wav", 0.85f, event);
             break;
         case GameplayEventType::EnemyHit:
             if (event.target == EntityId::Lich)
             {
-                PlayPositionalSoundEffect(context, "lich_hurt.wav", 0.95f,
-                                          event.worldX, event.worldZ);
+                PlayPositionalSoundEffect(context, "lich_hurt.wav", 0.95f, event);
             }
             else
             {
-                PlaySoundEffect(context, "sword_hit_1.wav");
+                PlayPositionalSoundEffect(context, "sword_hit_1.wav", 1.0f, event);
+            }
+            break;
+        case GameplayEventType::EnemyDefeated:
+            if (!context.delayedFeedback.Enqueue(
+                    event,
+                    GetTickCount64() + horde::gameplay::kEnemyImpactFallDelayMilliseconds))
+            {
+                LogWindowsAudio("delayed enemy-fall feedback queue overflowed; newest cue was dropped");
             }
             break;
         case GameplayEventType::LichChargeStarted:
-            PlayPositionalSoundEffect(context, "lich_charge.wav", 0.42f,
-                                      event.worldX, event.worldZ);
+            PlayPositionalSoundEffect(context, "lich_charge.wav", 0.42f, event);
             break;
         case GameplayEventType::LichImpact:
-            PlayPositionalSoundEffect(context, "lich_impact.wav", 0.55f,
-                                      event.worldX, event.worldZ);
+            PlayPositionalSoundEffect(context, "lich_impact.wav", 0.55f, event);
             break;
         case GameplayEventType::LichDefeated:
-            PlayPositionalSoundEffect(context, "lich_fall.wav", 0.36f,
-                                      event.worldX, event.worldZ);
+            PlayPositionalSoundEffect(context, "lich_fall.wav", 0.36f, event);
             break;
         case GameplayEventType::PlayerDamaged:
             UpdateVitalityHud(context);
@@ -1116,6 +1129,7 @@ void ResetRoute(VulkanSurfaceContext& context)
     context.endingOverlayDismissed = false;
     context.debugEnemyOverride = horde::gameplay::EnemyKind::None;
     context.debugValidationPoint = 0u;
+    context.delayedFeedback.Clear();
     context.simulation.ResetRoute();
     context.simulation.ClearEvents();
     context.simulationInput.moveForward = 0.0f;
@@ -1180,6 +1194,7 @@ bool ApplyPlayerRetryCheckpoint(VulkanSurfaceContext& context, const std::int32_
     {
         return false;
     }
+    context.delayedFeedback.Clear();
     context.simulation.RetryEncounter();
     context.simulation.ClearEvents();
     context.simulationInput.hasAuthoritativePlayerPose = false;
@@ -1427,9 +1442,11 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(
     snapshot.catchUpOverrunCount = simulation.catchUpOverrunCount;
     snapshot.queuedEventCount = simulation.queuedEventCount;
     snapshot.eventQueueHighWaterMark = simulation.eventQueueHighWaterMark;
-    snapshot.eventQueueOverflowCount = simulation.eventQueueOverflowCount;
+    snapshot.eventQueueOverflowCount =
+        simulation.eventQueueOverflowCount + context.delayedFeedback.OverflowCount();
     snapshot.inputPublicationSequence = simulation.inputPublicationSequence;
     snapshot.consumedAttackSequence = simulation.lastConsumedAttackSequence;
+    snapshot.consumedParrySequence = simulation.lastConsumedParrySequence;
     snapshot.consumedRouteResetSequence = simulation.lastConsumedRouteResetSequence;
     snapshot.consumedRetrySequence = simulation.lastConsumedRetrySequence;
     snapshot.internalWidth = capabilities.performance.internalRenderWidth;
@@ -1448,6 +1465,16 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(
     snapshot.attackerEntityId = simulation.skeletonAttackerId == horde::gameplay::simulation::EntityId::Invalid
         ? -1
         : static_cast<std::int32_t>(simulation.skeletonAttackerId);
+    snapshot.playerCombatAction = simulation.playerCombat.action;
+    for (std::size_t index = 0u; index < simulation.skeletonEnemyCount; ++index)
+    {
+        if (simulation.skeletonEnemies[index].id == simulation.skeletonAttackerId)
+        {
+            snapshot.attackerCombatAction = simulation.skeletonEnemies[index].action;
+            snapshot.hasAttackerCombatAction = true;
+            break;
+        }
+    }
     snapshot.skeletonPoseBucketCount = static_cast<std::uint32_t>(context.rtScene.SkeletonPoseBucketCount());
     snapshot.renderScale = context.renderScale;
     snapshot.fps = capabilities.performance.fps;
@@ -1686,6 +1713,7 @@ void UpdateDesktopSceneControls(VulkanSurfaceContext& context)
     input.paused = context.simulationPaused;
     input.damageEnabled = IsPlayerDamageEnabled(context);
     input.commands.attack = context.attackSequence;
+    input.commands.parry = context.parrySequence;
     input.commands.routeReset = context.routeResetSequence;
     input.commands.retry = context.retrySequence;
     input.hasAuthoritativePlayerPose = false;
@@ -1713,6 +1741,7 @@ void UpdateDesktopSceneControls(VulkanSurfaceContext& context)
         input.pitchRadians = -0.04f;
         input.lanternStrength = context.lanternStrength;
         input.commands.attack = context.attackSequence;
+        input.commands.parry = context.parrySequence;
         input.commands.routeReset = context.routeResetSequence;
         input.commands.retry = context.retrySequence;
         if (advance.replay.waypointReached || advance.lapStarted || advance.finished)
@@ -3336,6 +3365,7 @@ void ShowControlsHelp(HWND window)
                 "WASD  Move and strafe\n"
                 "Left mouse drag  360 camera look\n"
                 "Right mouse or Space  Swing sword\n"
+                "Q  Parry skeleton strike\n"
                 "Esc  Pause / resume\n"
                  "R  Restart route\n"
                  "F1  Controls\n"
@@ -3766,6 +3796,11 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             if (!sceneContext->simulationPaused && wParam == VK_SPACE && (lParam & (1ll << 30)) == 0)
             {
                 ++sceneContext->attackSequence;
+                return 0;
+            }
+            if (!sceneContext->simulationPaused && wParam == 'Q' && (lParam & (1ll << 30)) == 0)
+            {
+                ++sceneContext->parrySequence;
                 return 0;
             }
             if (!sceneContext->simulationPaused && SetDesktopMovementKey(*sceneContext, wParam, true))

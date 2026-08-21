@@ -52,8 +52,8 @@ All nine clips key translation, rotation, and scale on all 24 joints. There is n
 1. Source licence is CC0. The user supplied a Meshy workspace screenshot showing this exact lich asset with `Change License: CC0`; it is retained as `lich_placeholder_source_licence.png`, SHA-256 `6094E4D9A27A25022A1426C297F069DB60F779CC77526CFE6B154421F6DB96EE`.
 2. The derived mask and textured runtime are now active on Windows. Replace the thresholded placeholder with an art-authored mask if the staff/eye selection needs polish.
 3. Map only visually acceptable clips. The current asset has no direct replacement for the skeleton's attack clip.
-4. The 9,188-triangle model runs at a 30 Hz skin/BLAS-refit cadence and passed the target-phone gate on `SM-S948B`; keep one active skinned enemy until a separate multi-enemy measurement.
-5. Keep it in the shared one-active-skinned-enemy slot. The roster remains plural/configurable, but skeleton and lich are not rendered together in this goal.
+4. The 9,188-triangle model runs at a 30 Hz skin/BLAS-refit cadence and passed the target-phone gate on `SM-S948B`. The opening two-skeleton route was measured separately; the lich itself remains singular.
+5. Keep the lich on its singular primary character route. The opening pair uses the bounded two-skeleton route, but skeletons and the lich are not rendered together in the current design.
 6. If staff or robe deformation remains distracting in the final reveal, replace or re-rig the asset rather than expanding the runtime around a placeholder defect.
 
 ## Proposed credit if shipped

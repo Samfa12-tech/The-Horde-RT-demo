@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Horde Lantern RT Alpha</string>
-    <string name="alpha_version">SHOWCASE · ALPHA 0.1.3</string>
+    <string name="alpha_version">SHOWCASE · ALPHA 0.1.4</string>
     <string name="start_demo">ENTER THE RUIN</string>
     <string name="resume_demo">RESUME</string>
     <string name="restart_route">RESTART ROUTE</string>
@@ -14,6 +14,7 @@
     <string name="quit">QUIT DEMO</string>
     <string name="back">BACK</string>
     <string name="swing">SWING</string>
+    <string name="parry">PARRY</string>
     <string name="vitality_full">VITALITY  3 / 3</string>
     <string name="vitality_accessibility">Vitality %1$d of 3</string>
     <string name="ending_title">DAWN RETURNS</string>
@@ -45,7 +46,7 @@
     <string name="report_copy_failed">The benchmark report could not be copied.</string>
     <string name="report_saved">Benchmark report saved.</string>
     <string name="report_save_failed">The benchmark report could not be saved.</string>
-    <string name="controls_help">LEFT HALF\nDrag to walk and strafe\n\nRIGHT HALF\nDrag for 360° camera look\n\nSWING\nTap the amber button to attack\n\nMENU / BACK\nPause, restart, settings and diagnostics</string>
+    <string name="controls_help">LEFT HALF\nDrag to walk and strafe\n\nRIGHT HALF\nDrag for 360° camera look\n\nSWING\nTap the amber button to attack\n\nPARRY\nTap beside Swing to deflect a skeleton strike\n\nMENU / BACK\nPause, restart, settings and diagnostics</string>
     <string name="sfx_enabled">Sound effects</string>
     <string name="haptics_enabled">Vibration / haptics</string>
     <string name="sfx_volume">SFX volume</string>

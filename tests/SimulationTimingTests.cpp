@@ -34,6 +34,28 @@ SimulationSnapshot RunCadence(int frameRate, double seconds, float forward, floa
     return simulation.Snapshot();
 }
 
+SimulationSnapshot RunCombatCadence(int frameRate, bool insertHitch)
+{
+    GameSimulation simulation;
+    InputSnapshot input;
+    input.hasAuthoritativePlayerPose = true;
+    input.authoritativePlayerX = -0.75f;
+    input.authoritativePlayerZ = -3.20f;
+    input.yawRadians = 0.0f;
+    input.damageEnabled = false;
+    input.commands.attack = 1u;
+    const int ordinaryFrames = frameRate - (insertHitch ? 6 : 0);
+    for (int frame = 0; frame < ordinaryFrames; ++frame)
+    {
+        simulation.AdvanceFrame(input, 1.0 / static_cast<double>(frameRate), frame + 1u);
+        if (insertHitch && frame == frameRate / 4)
+        {
+            simulation.AdvanceFrame(input, 0.100, frameRate + 1u);
+        }
+    }
+    return simulation.Snapshot();
+}
+
 } // namespace
 
 int main()
@@ -106,6 +128,21 @@ int main()
           "a bounded 100 ms hitch must retain deterministic time and motion parity");
     check(hitch.Snapshot().catchUpOverrunCount == 0u,
           "an exactly 100 ms hitch must fit the supported catch-up bound");
+
+    const SimulationSnapshot combat30 = RunCombatCadence(30, false);
+    const SimulationSnapshot combat60 = RunCombatCadence(60, false);
+    const SimulationSnapshot combat120 = RunCombatCadence(120, false);
+    const SimulationSnapshot combatHitch = RunCombatCadence(60, true);
+    check(combat30.tickIndex == combat60.tickIndex && combat60.tickIndex == combat120.tickIndex &&
+          combatHitch.tickIndex == combat60.tickIndex &&
+          combat30.activeSkeletonCount == 1u &&
+          combat30.activeSkeletonCount == combat60.activeSkeletonCount &&
+          combat60.activeSkeletonCount == combat120.activeSkeletonCount &&
+          combat120.activeSkeletonCount == combatHitch.activeSkeletonCount &&
+          combat30.playerCombat.action == combat60.playerCombat.action &&
+          combat60.playerCombat.action == combat120.playerCombat.action &&
+          combat120.playerCombat.action == combatHitch.playerCombat.action,
+          "swing contact and action completion must retain 30/60/120 Hz and bounded-hitch parity");
 
     const SimulationSnapshot axial = RunCadence(60, 0.75, 1.0f, 0.0f);
     const SimulationSnapshot diagonal = RunCadence(60, 0.75, 1.0f, 1.0f);

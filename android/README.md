@@ -8,12 +8,12 @@ The `android/` module is the supported phone path for Horde Lantern RT. It owns 
 - JNI/Vulkan bridge: `app/src/main/cpp/android_probe_bridge.cpp`
 - Shared native source manifest: `../cmake/HordeRtSources.cmake`
 - Shared fixed-step gameplay authority: `../src/gameplay/simulation/GameSimulation.cpp`
-- Coherent JNI input publication through the two-slot `InputMailbox`, with monotonic attack/reset/retry counters
+- Coherent JNI input publication through the two-slot `InputMailbox`, with independent monotonic attack/parry/reset/retry counters
 - Ordered semantic gameplay events with per-event spatial gains drive SoundPool and haptics without collapsing repeated cues
 - Native Vulkan RT presentation through the Android swapchain
 - Optional Vulkan timestamp queries report a separate GPU RT command-buffer interval without changing CPU benchmark pass/fail
 - One frame in flight while the held-prop TLAS uses a host-written instance buffer
-- Portrait-first branded entry/pause/settings/controls/diagnostics/credits UI; touch movement/look and `SWING`; a bounded two-skeleton opening encounter followed by a singular lich route; layered articulated body/head with a smoothed walk gait, lantern-drop sequence, coloured bays, mirror, sliding-roof dawn reveal, and Continue/Begin Again/Quit ending; strict ASTC assets; and phone-safe ray-query shading inside `vkCmdTraceRaysKHR`
+- Portrait-first branded entry/pause/settings/controls/diagnostics/credits UI; touch movement/look plus `SWING` and `PARRY`; a bounded two-skeleton opening encounter followed by a singular lich route; layered articulated body/head with a smoothed walk gait, lantern-drop sequence, coloured bays, mirror, sliding-roof dawn reveal, and Continue/Begin Again/Quit ending; strict ASTC assets; and phone-safe ray-query shading inside `vkCmdTraceRaysKHR`
 - Persisted SFX volume, look sensitivity, compact HUD, and 50-100% RT render scale; seventeen FilmCow clips play through SoundPool
 - The in-app Credits & Licences panel carries Poly Haven, FilmCow, Hotstrike Studio, Meshy, and generated-icon provenance with the APK
 - Native libraries use a static C++ runtime plus 16 KiB ELF alignment; the packaging gate verifies 16 KiB APK/ELF alignment and rejects an r26 `libc++_shared.so`
@@ -42,7 +42,7 @@ Reports are stored under `files/reports/` in app-private storage and can be retr
 
 ## Repeatable showcase validation
 
-The debug build exposes thirteen deterministic native checkpoints and a 13-waypoint route replay. Run the standard six-checkpoint 75% timing, collision, strict-ASTC, and honest-presentation pass from the repository root:
+The debug build exposes thirteen deterministic native checkpoints and a 13-waypoint route replay. Run the standard six-checkpoint sustained 75% timing, collision, strict-ASTC, and honest-presentation report from the repository root. Timings are classified against descriptive 60/50/30 FPS reference lines; crossing 20.000 ms is not an automatic failure, while honest presentation/state failures and matched regressions above 15% still require action:
 
 ```powershell
 .\tools\run-android-showcase-validation.ps1
@@ -66,9 +66,11 @@ The complete showcase route is device-validated on `SM-S948B` in the debug packa
 
 The later debug automation baseline also passed live: five deterministic 75% checkpoints, report-only 100% opening, native state assertions, and all 13 replay waypoints. These cool thermal-status-0 results are regression evidence and do not replace the warm sustained certification above. See `../docs/ANDROID_SHOWCASE_AUTOMATION_VALIDATION_2026-07-17.md`.
 
-The 2026-08-11 shared-simulation/renderer development candidate subsequently verified strict ASTC, honest RT presentation, valid GPU timestamps, 13/13 replay, 12/12 captures, and Home/resume on `SM-S948B`. Its ordered 75% CPU medians were 10.327 / 7.109 / 8.353 / 11.220 / 23.604 ms, so lich failed the 20 ms gate and current sustained performance is not cleared. The owner separately reported that controls, audio, and haptics all worked correctly hands-on on the installed development build. That report is owner-reported local device evidence without a new exact-artifact check and does not alter the performance failure. See `../docs/RENDERER_RESOURCE_SLOTS_ANDROID_VALIDATION_2026-08-11.md`.
+The 2026-08-11 shared-simulation/renderer development candidate subsequently verified strict ASTC, honest RT presentation, valid GPU timestamps, 13/13 replay, 12/12 captures, and Home/resume on `SM-S948B`. Its ordered 75% CPU medians were 10.327 / 7.109 / 8.353 / 11.220 / 23.604 ms. This is real historical unmatched/hot evidence, but not an unresolved current failure: later exact cooled A/B is documented below. The owner separately reported that controls, audio, and haptics worked correctly hands-on on the installed development build. That report is owner-reported local-device evidence without a new exact-artifact check and does not certify later revisions. See `../docs/RENDERER_RESOURCE_SLOTS_ANDROID_VALIDATION_2026-08-11.md`.
 
 The exact 2026-08-12 two-skeleton candidate supersedes that performance failure. Matched cooled lich A/B measured 19.497 ms with GPU timestamps and 19.268 ms without; the 1.188% difference did not identify timing instrumentation as a material cause under the tested conditions. The full six-checkpoint 75% medians were 10.589 / 12.139 / 9.246 / 8.888 / 11.060 / 19.735 ms at thermal status 0, with strict ASTC and honest presentation. Replay, all 13 captures, report-only 100% opening at 18.674 ms, and Home/resume passed. The owner subsequently reported that hands-on play on the still-installed exact candidate feels fine. See `../docs/TWO_SKELETON_COMBAT_ANDROID_VALIDATION_2026-08-12.md`.
+
+That historical exact candidate is clean commit `b3428a7`; it does not validate the later animation/parry work. Exact clean `daa5892` passed functionality and recorded a 20.246 ms warm lich median under the then-current gate. The owner found parry timing good and requested touch-down dispatch. Final exact reconciliation runtime commit `547d89d` uses press-down parry, listener-at-event-time routing, bounded platform feedback, and animated stagger; its complete Full gate passed strict ASTC, honest presentation, fresh 12/12 Debug and Release CTests, Android build/lint, replay, 13 captures, Home/resume, and matching local/installed APK hashes. Sustained 75% lich was 23.069 ms in the descriptive 30-50 FPS band at GPU thermal power level 2. The owner gave the exact candidate a broad audio/haptic pass and explicitly observed its stagger-back/death sequence. Performance uses sustained evidence and descriptive 60/50/30 FPS bands rather than a hard 20 ms rule. Future manual owner audio/haptic checks are change-triggered rather than automatic per milestone. See `../docs/ANIMATION_COMBAT_PARRY_SLICE_2026-08-13.md`, `../docs/CURRENT_DEVELOPMENT_BASELINE_VALIDATION_2026-08-21.md`, and `../docs/OWNER_RELEASE_SAFETY_CHECKLIST.md`.
 
 The showcase release identity is `0.1.3-alpha.1` with `versionCode 4`. Public candidates must be signed by the established Horde release key, retain strict ASTC routing and 16 KiB compatibility, and pass `tools/package-signed-alpha.ps1`; never replace the existing update identity with a new keystore.
 

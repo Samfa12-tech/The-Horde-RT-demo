@@ -15,6 +15,19 @@
 namespace horde::vulkan::raytracing
 {
 
+struct PlayerWeaponRenderPose
+{
+    std::array<float, 3u> rightHandLocal{};
+    float swordRadians = 0.0f;
+    float parryBlend = 0.0f;
+    float successJolt = 0.0f;
+};
+
+PlayerWeaponRenderPose EvaluatePlayerWeaponRenderPose(
+    const horde::gameplay::PlayerCombatSnapshot& playerCombat,
+    float swordSwingRadians,
+    float heldPropDepth);
+
 struct RtSceneFrameInputs
 {
     float cameraYaw = 0.0f;
@@ -26,6 +39,7 @@ struct RtSceneFrameInputs
     float walkAmount = 0.0f;
     float outputExposure = 0.92f;
     horde::gameplay::CombatSnapshot combat{};
+    horde::gameplay::PlayerCombatSnapshot playerCombat{};
     std::array<horde::gameplay::simulation::SkeletonEnemySnapshot,
                horde::gameplay::simulation::kSkeletonEnemyCapacity> skeletonEnemies{};
     std::size_t skeletonEnemyCount = 0u;

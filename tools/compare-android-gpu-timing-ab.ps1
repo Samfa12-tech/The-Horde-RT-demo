@@ -3,7 +3,6 @@ param(
     [Parameter(Mandatory = $true)][string]$SecondRunDirectory,
     [ValidateRange(0.1, 10.0)][double]$MaximumStartingTemperatureDifferenceC = 2.0,
     [ValidateRange(0.0, 100.0)][double]$InvestigationThresholdPercent = 15.0,
-    [ValidateRange(1.0, 100.0)][double]$FrameGateMs = 20.0,
     [string]$OutputPath = (Join-Path $SecondRunDirectory "gpu-timing-ab-comparison.json")
 )
 
@@ -115,7 +114,6 @@ $thermalStatusDifference = [math]::Abs($enabled.startingThermalStatus - $disable
 if ($thermalStatusDifference -gt 1) { $mismatches.Add("Starting thermal status differs by more than one level.") }
 
 $comparisons = [Collections.Generic.List[object]]::new()
-$gateFailed = $false
 $investigationRequired = $false
 if ($mismatches.Count -eq 0) {
     for ($index = 0; $index -lt $enabled.timing.Count; ++$index) {
@@ -124,24 +122,23 @@ if ($mismatches.Count -eq 0) {
         $enabledMs = [double]$enabledRow.median_of_window_avgs_ms
         $disabledMs = [double]$disabledRow.median_of_window_avgs_ms
         $regressionPercent = $(if ($disabledMs -gt 0.0) { (($enabledMs / $disabledMs) - 1.0) * 100.0 } else { [double]::PositiveInfinity })
-        $rowGatePassed = $enabledMs -lt $FrameGateMs -and $disabledMs -lt $FrameGateMs
         $rowInvestigation = $regressionPercent -gt $InvestigationThresholdPercent
-        $gateFailed = $gateFailed -or -not $rowGatePassed
         $investigationRequired = $investigationRequired -or $rowInvestigation
         $comparisons.Add([PSCustomObject]@{
             checkpoint = $enabledRow.checkpoint
             enabledMedianMs = $enabledMs
             disabledMedianMs = $disabledMs
             enabledVersusDisabledPercent = [math]::Round($regressionPercent, 3)
-            belowFrameGate = $rowGatePassed
+            enabledMedianDerivedFps = [math]::Round(1000.0 / $enabledMs, 3)
+            disabledMedianDerivedFps = [math]::Round(1000.0 / $disabledMs, 3)
             investigationRequired = $rowInvestigation
         })
     }
 }
 
-$passed = $mismatches.Count -eq 0 -and -not $gateFailed -and -not $investigationRequired
+$passed = $mismatches.Count -eq 0 -and -not $investigationRequired
 $result = [ordered]@{
-    schema = 1
+    schema = 2
     passed = $passed
     enabledRun = $enabled.directory
     disabledRun = $disabled.directory
@@ -152,11 +149,9 @@ $result = [ordered]@{
     maximumStartingTemperatureDifferenceC = $MaximumStartingTemperatureDifferenceC
     startingTemperatureDifferencesC = $temperatureDifferences
     startingThermalStatusDifference = $thermalStatusDifference
-    frameGateMs = $FrameGateMs
     investigationThresholdPercent = $InvestigationThresholdPercent
     mismatches = @($mismatches)
     provenanceWarnings = @($provenanceWarnings)
-    gateFailed = $gateFailed
     investigationRequired = $investigationRequired
     checkpoints = @($comparisons)
 }

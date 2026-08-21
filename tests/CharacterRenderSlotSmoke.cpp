@@ -3,7 +3,9 @@
 
 #include <cmath>
 #include <filesystem>
+#include <fstream>
 #include <iostream>
+#include <sstream>
 #include <string>
 
 namespace
@@ -51,6 +53,14 @@ std::filesystem::path FindRepoRoot()
     return {};
 }
 
+std::string ReadTextFile(const std::filesystem::path& path)
+{
+    std::ifstream input(path, std::ios::binary);
+    std::ostringstream text;
+    text << input.rdbuf();
+    return text.str();
+}
+
 } // namespace
 
 int main()
@@ -60,18 +70,11 @@ int main()
 
     static_assert(CharacterRenderSlot::kTlasInstanceIndex == 2u);
     static_assert(CharacterRenderSlot::kSecondSkeletonTlasInstanceIndex == 18u);
-    static_assert(CharacterRenderSlot::kMaximumActiveCharacters == 2u);
     static_assert(CharacterRenderSlot::kMaximumSkeletonPoseBuckets == 2u);
     static_assert(PresentableTinyRtScene::kBlasCount == 9u);
     static_assert(PresentableTinyRtScene::kTlasInstanceCount == 19u);
 
     bool ok = true;
-    CombatSnapshot combat;
-    combat.enemyX = 1.25f;
-    combat.enemyZ = -6.5f;
-    combat.enemyFacingRadians = 0.0f;
-    combat.enemyAnimation = EnemyAnimation::Walking;
-    combat.enemyAnimationTime = 2.0f;
     EnemyRosterSnapshot roster;
     roster.selectedEnemy = EnemyKind::Skeleton;
     roster.renderedEnemyCapacity = 1u;
@@ -84,6 +87,7 @@ int main()
     skeletons[0].z = -4.65f;
     skeletons[0].animation = EnemyAnimation::Walking;
     skeletons[0].animationTime = 2.0f;
+    skeletons[0].action = EnemyCombatAction::Locomotion;
     skeletons[1] = skeletons[0];
     skeletons[1].id = simulation::EntityId::SkeletonB;
     skeletons[1].x = 0.75f;
@@ -97,27 +101,25 @@ int main()
                   adaptedFrame.skeletonEnemies[1].id == simulation::EntityId::SkeletonB,
                   "simulation adapter dropped the bounded skeleton entity snapshots");
 
-    CharacterRenderPlan skeletonPlan = EvaluateCharacterRenderPlan(combat, roster, lich);
-    ok &= Require(!skeletonPlan.selectedLich, "skeleton selection changed");
-    ok &= Require(skeletonPlan.skeletonClip == horde::scene::SkeletonClip::Walking,
-                  "walking clip mapping changed");
-    ok &= Require(Near(skeletonPlan.skeletonTime, 1.8f), "walking time multiplier changed");
-    ok &= Require(Near(skeletonPlan.transform.matrix[0][3], 1.25f) &&
-                  Near(skeletonPlan.transform.matrix[1][3], -0.95f) &&
-                  Near(skeletonPlan.transform.matrix[2][3], -6.5f),
-                  "skeleton transform changed");
+    PlayerCombatSnapshot playerCombat;
+    const PlayerWeaponRenderPose idleWeapon = EvaluatePlayerWeaponRenderPose(playerCombat, 0.0f, 1.05f);
+    ok &= Require(Near(idleWeapon.parryBlend, 0.0f) && Near(idleWeapon.swordRadians, 0.0f) &&
+                  Near(idleWeapon.rightHandLocal[0], 0.34f),
+                  "idle weapon pose changed while adding parry composition");
+    playerCombat.action = PlayerCombatAction::ParryActive;
+    const PlayerWeaponRenderPose activeParry = EvaluatePlayerWeaponRenderPose(playerCombat, 0.0f, 1.05f);
+    ok &= Require(Near(activeParry.parryBlend, 1.0f) && Near(activeParry.swordRadians, -0.82f) &&
+                  Near(activeParry.rightHandLocal[0], -0.20f),
+                  "active parry did not move the sword and right hand across the view");
+    playerCombat.reaction = CombatReaction::Parried;
+    playerCombat.reactionTime = 0.12f;
+    const PlayerWeaponRenderPose successfulParry = EvaluatePlayerWeaponRenderPose(playerCombat, 0.0f, 1.05f);
+    ok &= Require(Near(successfulParry.successJolt, 1.0f) &&
+                  successfulParry.swordRadians > activeParry.swordRadians &&
+                  successfulParry.rightHandLocal[0] > activeParry.rightHandLocal[0],
+                  "successful parry did not add the bounded procedural weapon jolt");
 
-    combat.enemyAnimation = EnemyAnimation::Attack;
-    combat.enemyAnimationTime = 0.4f;
-    skeletonPlan = EvaluateCharacterRenderPlan(combat, roster, lich);
-    ok &= Require(skeletonPlan.skeletonClip == horde::scene::SkeletonClip::Attack &&
-                  Near(skeletonPlan.skeletonTime, 0.4f),
-                  "attack clip mapping changed");
-    combat.enemyAnimation = EnemyAnimation::Dead;
-    ok &= Require(EvaluateCharacterRenderPlan(combat, roster, lich).skeletonClip == horde::scene::SkeletonClip::Dead,
-                  "dead clip mapping changed");
-
-    CharacterFramePlan sharedPlan = EvaluateCharacterFramePlan(skeletons, skeletons.size(), roster, 2.967f);
+    CharacterFramePlan sharedPlan = EvaluateCharacterFramePlan(skeletons, skeletons.size(), roster, lich, 2.967f);
     ok &= Require(sharedPlan.skeletonCount == 2u && sharedPlan.skeletonPoseBucketCount == 1u,
                   "matching skeleton poses did not share one bucket");
     ok &= Require(sharedPlan.skeletons[0].poseBucket == 0u && sharedPlan.skeletons[1].poseBucket == 0u,
@@ -126,11 +128,40 @@ int main()
                   Near(sharedPlan.skeletons[1].transform.matrix[0][3], 0.75f),
                   "two-skeleton transforms were not independent");
 
-    skeletons[1].animation = EnemyAnimation::Attack;
-    skeletons[1].animationTime = 0.4f;
-    const CharacterFramePlan splitPlan = EvaluateCharacterFramePlan(skeletons, skeletons.size(), roster, 2.967f);
+    skeletons[1].action = EnemyCombatAction::AttackActive;
+    skeletons[1].actionTime = 0.08f;
+    const CharacterFramePlan splitPlan = EvaluateCharacterFramePlan(skeletons, skeletons.size(), roster, lich, 2.967f);
     ok &= Require(splitPlan.skeletonPoseBucketCount == 2u && splitPlan.skeletons[1].poseBucket == 1u,
                   "divergent skeleton poses did not allocate the bounded second bucket");
+    ok &= Require(splitPlan.skeletons[1].clip == horde::scene::SkeletonClip::Attack &&
+                  Near(splitPlan.skeletons[1].time, 1.20f),
+                  "active phase did not map continuously through the authored Attack clip");
+    skeletons[1].action = EnemyCombatAction::Staggered;
+    skeletons[1].actionTime = 0.0f;
+    const CharacterFramePlan staggerStartPlan = EvaluateCharacterFramePlan(skeletons, skeletons.size(), roster, lich, 2.967f);
+    skeletons[1].actionTime = 0.14f;
+    const CharacterFramePlan staggerImpactPlan = EvaluateCharacterFramePlan(skeletons, skeletons.size(), roster, lich, 2.967f);
+    skeletons[1].actionTime = 0.80f;
+    const CharacterFramePlan staggerRecoveryPlan = EvaluateCharacterFramePlan(skeletons, skeletons.size(), roster, lich, 2.967f);
+    ok &= Require(Near(staggerStartPlan.skeletons[1].time, 1.20f) &&
+                  Near(staggerImpactPlan.skeletons[1].time, 1.48f) &&
+                  Near(staggerRecoveryPlan.skeletons[1].time, 2.80f),
+                  "stagger did not traverse the bounded authored Attack recovery from contact to rest");
+    ok &= Require(!Near(staggerImpactPlan.skeletons[1].transform.matrix[1][1], 1.0f) &&
+                  !Near(staggerImpactPlan.skeletons[1].transform.matrix[1][3], -0.95f) &&
+                  Near(staggerRecoveryPlan.skeletons[1].transform.matrix[1][1], 1.0f) &&
+                  Near(staggerRecoveryPlan.skeletons[1].transform.matrix[1][3], -0.95f),
+                  "stagger did not produce a bounded recoil and settle over its 800 ms action");
+    skeletons[0] = skeletons[1];
+    skeletons[0].id = simulation::EntityId::SkeletonA;
+    skeletons[0].x = -0.75f;
+    skeletons[1].x = 0.75f;
+    const CharacterFramePlan sharedStaggerPlan =
+        EvaluateCharacterFramePlan(skeletons, skeletons.size(), roster, lich, 2.967f);
+    ok &= Require(sharedStaggerPlan.skeletonPoseBucketCount == 1u &&
+                  sharedStaggerPlan.skeletons[0].poseBucket == 0u &&
+                  sharedStaggerPlan.skeletons[1].poseBucket == 0u,
+                  "matching stagger skeletons did not reuse the existing pose zero bucket");
 
     roster.selectedEnemy = EnemyKind::Lich;
     lich.phase = LichPhase::Charging;
@@ -140,16 +171,16 @@ int main()
     lich.facingRadians = 0.0f;
     lich.hitRecoil = 0.0f;
     lich.animationTime = 3.25f;
-    const CharacterRenderPlan lichPlan = EvaluateCharacterRenderPlan(combat, roster, lich);
+    const CharacterFramePlan lichPlan = EvaluateCharacterFramePlan(skeletons, 0u, roster, lich, 2.967f);
     ok &= Require(lichPlan.selectedLich && lichPlan.lichClip == horde::scene::SkinnedClip::Idle,
                   "living lich selection or clip changed");
     ok &= Require(Near(lichPlan.lichTime, 3.25f), "lich animation time changed");
-    ok &= Require(Near(lichPlan.transform.matrix[0][3], -32.2f) &&
-                  Near(lichPlan.transform.matrix[1][3], -0.77f) &&
-                  Near(lichPlan.transform.matrix[2][3], -13.1f),
+    ok &= Require(Near(lichPlan.lichTransform.matrix[0][3], -32.2f) &&
+                  Near(lichPlan.lichTransform.matrix[1][3], -0.77f) &&
+                  Near(lichPlan.lichTransform.matrix[2][3], -13.1f),
                   "lich transform changed");
     lich.phase = LichPhase::Dead;
-    ok &= Require(EvaluateCharacterRenderPlan(combat, roster, lich).lichClip == horde::scene::SkinnedClip::Dead,
+    ok &= Require(EvaluateCharacterFramePlan(skeletons, 0u, roster, lich, 2.967f).lichClip == horde::scene::SkinnedClip::Dead,
                   "lich death clip mapping changed");
 
     constexpr float interval = 1.0f / 30.0f;
@@ -179,7 +210,8 @@ int main()
         skeletons[1] = skeletons[0];
         skeletons[1].id = simulation::EntityId::SkeletonB;
         skeletons[1].x = 0.75f;
-        const auto sharedInstances = slot.BuildActiveInstances(skeletons, skeletons.size(), skeletonRoster, lich);
+        ok &= Require(slot.CacheFramePlan(skeletons, skeletons.size(), skeletonRoster, lich, diagnostic), diagnostic.c_str());
+        const auto sharedInstances = slot.BuildActiveInstances();
         ok &= Require(sharedInstances[0].mask == 0x01u && sharedInstances[1].mask == 0x01u,
                       "two active skeleton TLAS instances were not visible");
         ok &= Require(sharedInstances[0].instanceCustomIndex == 2u &&
@@ -187,13 +219,15 @@ int main()
                       sharedInstances[0].accelerationStructureReference == 101u &&
                       sharedInstances[1].accelerationStructureReference == 101u,
                       "matching skeleton instances did not share pose zero BLAS and shader route");
-        skeletons[1].animation = EnemyAnimation::Attack;
-        const auto splitInstances = slot.BuildActiveInstances(skeletons, skeletons.size(), skeletonRoster, lich);
+        skeletons[1].action = EnemyCombatAction::AttackWindup;
+        ok &= Require(slot.CacheFramePlan(skeletons, skeletons.size(), skeletonRoster, lich, diagnostic), diagnostic.c_str());
+        const auto splitInstances = slot.BuildActiveInstances();
         ok &= Require(splitInstances[1].instanceCustomIndex == 18u &&
                       splitInstances[1].accelerationStructureReference == 202u,
                       "divergent second skeleton did not select pose one BLAS and shader route");
         invalidRoster.selectedEnemy = EnemyKind::Lich;
-        const auto lichInstances = slot.BuildActiveInstances(skeletons, 0u, invalidRoster, lich);
+        ok &= Require(slot.CacheFramePlan(skeletons, 0u, invalidRoster, lich, diagnostic), diagnostic.c_str());
+        const auto lichInstances = slot.BuildActiveInstances();
         ok &= Require(lichInstances[0].accelerationStructureReference == 303u &&
                       lichInstances[0].mask == 0x01u && lichInstances[1].mask == 0u,
                       "singular lich route populated the second character slot");
@@ -201,11 +235,13 @@ int main()
                       HasInvertibleLinearTransform(lichInstances[1].transform),
                       "singular lich route emitted a non-invertible masked TLAS transform");
         skeletonRoster.selectedEnemy = EnemyKind::Skeleton;
-        const auto oneSkeletonInstances = slot.BuildActiveInstances(skeletons, 1u, skeletonRoster, lich);
+        ok &= Require(slot.CacheFramePlan(skeletons, 1u, skeletonRoster, lich, diagnostic), diagnostic.c_str());
+        const auto oneSkeletonInstances = slot.BuildActiveInstances();
         ok &= Require(oneSkeletonInstances[1].mask == 0u &&
                       HasInvertibleLinearTransform(oneSkeletonInstances[1].transform),
                       "unused second skeleton slot emitted a non-invertible TLAS transform");
-        const auto noSkeletonInstances = slot.BuildActiveInstances(skeletons, 0u, skeletonRoster, lich);
+        ok &= Require(slot.CacheFramePlan(skeletons, 0u, skeletonRoster, lich, diagnostic), diagnostic.c_str());
+        const auto noSkeletonInstances = slot.BuildActiveInstances();
         ok &= Require(noSkeletonInstances[0].mask == 0u && noSkeletonInstances[1].mask == 0u &&
                       noSkeletonInstances[0].instanceCustomIndex == 2u &&
                       noSkeletonInstances[1].instanceCustomIndex == 18u &&
@@ -218,6 +254,27 @@ int main()
     ok &= Require(!root.empty(), "repo assets were not found");
     if (!root.empty())
     {
+        const std::string raygenSource = ReadTextFile(root / "shaders/raytracing/minimal.rgen");
+        const std::string sceneSource =
+            ReadTextFile(root / "src/vulkan/raytracing/PresentableTinyRtScene.cpp");
+        ok &= Require(raygenSource.find(
+                          "layout(std430, set = 0, binding = 10) readonly buffer SecondSkeletonVertices") !=
+                          std::string::npos,
+                      "raygen no longer declares the bounded second-skeleton pose buffer at binding 10");
+        ok &= Require(raygenSource.find("bool secondSkeletonPose = h.instance == 18;") !=
+                          std::string::npos &&
+                      raygenSource.find("secondSkeleton.vertices[firstVertex].normal") !=
+                          std::string::npos &&
+                      raygenSource.find(
+                          "secondSkeleton.vertices[firstVertex + 1].position.xyz - secondSkeleton.vertices[firstVertex].position.xyz") !=
+                          std::string::npos,
+                      "custom index 18 no longer selects second-pose shading and geometric-normal vertices");
+        ok &= Require(sceneSource.find("secondSkeletonWrite.dstBinding = 10u;") !=
+                          std::string::npos &&
+                      sceneSource.find("secondSkeletonWrite.pBufferInfo = &secondSkeletonBufferInfo;") !=
+                          std::string::npos,
+                      "CPU descriptor writes no longer bind the second skeleton GPU vertex buffer at binding 10");
+
         CharacterRenderSlot slot;
         std::string diagnostic;
         ok &= Require(slot.LoadAssets(
@@ -234,12 +291,13 @@ int main()
         const float deadDuration = slot.SkeletonDeadClipDuration();
         ok &= Require(deadDuration > 0.0f, "skeleton Dead clip duration was not captured from the model");
         skeletons[0].animation = EnemyAnimation::Dead;
+        skeletons[0].action = EnemyCombatAction::Dead;
         skeletons[0].animationTime = deadDuration + 1.0f;
         skeletons[1] = skeletons[0];
         skeletons[1].id = simulation::EntityId::SkeletonB;
         skeletons[1].animationTime = deadDuration + 4.0f;
         const CharacterFramePlan finalDeadPlan =
-            EvaluateCharacterFramePlan(skeletons, skeletons.size(), spareCapacityRoster, deadDuration);
+            EvaluateCharacterFramePlan(skeletons, skeletons.size(), spareCapacityRoster, lich, deadDuration);
         ok &= Require(finalDeadPlan.skeletonPoseBucketCount == 1u &&
                       Near(finalDeadPlan.skeletons[0].time, deadDuration) &&
                       Near(finalDeadPlan.skeletons[1].time, deadDuration),

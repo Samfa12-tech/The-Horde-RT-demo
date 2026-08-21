@@ -34,16 +34,6 @@ constexpr bool HasCharacterBlasRefit(CharacterBlasRefit value, CharacterBlasRefi
     return (static_cast<unsigned>(value) & static_cast<unsigned>(flag)) != 0u;
 }
 
-struct CharacterRenderPlan
-{
-    bool selectedLich = false;
-    horde::scene::SkeletonClip skeletonClip = horde::scene::SkeletonClip::Idle;
-    float skeletonTime = 0.0f;
-    horde::scene::SkinnedClip lichClip = horde::scene::SkinnedClip::Idle;
-    float lichTime = 0.0f;
-    VkTransformMatrixKHR transform{};
-};
-
 struct SkeletonRenderPlan
 {
     horde::scene::SkeletonClip clip = horde::scene::SkeletonClip::Idle;
@@ -55,15 +45,13 @@ struct SkeletonRenderPlan
 struct CharacterFramePlan
 {
     bool selectedLich = false;
+    horde::scene::SkinnedClip lichClip = horde::scene::SkinnedClip::Idle;
+    float lichTime = 0.0f;
+    VkTransformMatrixKHR lichTransform{};
     std::array<SkeletonRenderPlan, horde::gameplay::simulation::kSkeletonEnemyCapacity> skeletons{};
     std::size_t skeletonCount = 0u;
     std::size_t skeletonPoseBucketCount = 0u;
 };
-
-CharacterRenderPlan EvaluateCharacterRenderPlan(
-    const horde::gameplay::CombatSnapshot& combat,
-    const horde::gameplay::EnemyRosterSnapshot& roster,
-    const horde::gameplay::LichSnapshot& lich);
 
 bool CharacterPoseNeedsRefresh(int requestedClip,
                                float requestedTime,
@@ -76,6 +64,7 @@ CharacterFramePlan EvaluateCharacterFramePlan(
                      horde::gameplay::simulation::kSkeletonEnemyCapacity>& skeletons,
     std::size_t skeletonCount,
     const horde::gameplay::EnemyRosterSnapshot& roster,
+    const horde::gameplay::LichSnapshot& lich,
     float skeletonDeadClipDuration);
 
 class CharacterRenderSlot
@@ -85,12 +74,17 @@ public:
     static constexpr std::uint32_t kSecondSkeletonTlasInstanceIndex = 18u;
     static constexpr std::uint32_t kMaximumActiveSkeletons = 2u;
     static constexpr std::uint32_t kMaximumSkeletonPoseBuckets = 2u;
-    static constexpr std::uint32_t kMaximumActiveCharacters = kMaximumActiveSkeletons;
 
     bool LoadAssets(const std::string& skeletonAssetPath,
                     const std::string& lichAssetPath,
                     std::string& diagnostic);
     bool PrepareInitialGeometry(std::string& diagnostic);
+    bool CacheFramePlan(const std::array<horde::gameplay::simulation::SkeletonEnemySnapshot,
+                                         horde::gameplay::simulation::kSkeletonEnemyCapacity>& skeletons,
+                        std::size_t skeletonCount,
+                        const horde::gameplay::EnemyRosterSnapshot& roster,
+                        const horde::gameplay::LichSnapshot& lich,
+                        std::string& diagnostic);
     bool PrepareFrame(const std::array<horde::gameplay::simulation::SkeletonEnemySnapshot,
                                        horde::gameplay::simulation::kSkeletonEnemyCapacity>& skeletons,
                       std::size_t skeletonCount,
@@ -99,16 +93,10 @@ public:
                       const RtGpuResources& resources,
                       std::string& diagnostic);
 
-    std::array<VkAccelerationStructureInstanceKHR, kMaximumActiveSkeletons> BuildActiveInstances(
-        const std::array<horde::gameplay::simulation::SkeletonEnemySnapshot,
-                         horde::gameplay::simulation::kSkeletonEnemyCapacity>& skeletons,
-        std::size_t skeletonCount,
-        const horde::gameplay::EnemyRosterSnapshot& roster,
-        const horde::gameplay::LichSnapshot& lich) const;
+    std::array<VkAccelerationStructureInstanceKHR, kMaximumActiveSkeletons> BuildActiveInstances() const;
     std::array<float, 3u> LichStaffWorldPosition(const horde::gameplay::LichSnapshot& lich) const;
 
     CharacterBlasRefit PendingRefit() const { return pendingRefit_; }
-    void ClearPendingRefit() { pendingRefit_ = CharacterBlasRefit::None; }
 
     RtUpdatableTriangleBlas& SkeletonGpu(std::size_t bucket = 0u) { return skeletonGpus_.at(bucket); }
     const RtUpdatableTriangleBlas& SkeletonGpu(std::size_t bucket = 0u) const { return skeletonGpus_.at(bucket); }
@@ -121,7 +109,6 @@ public:
     const std::vector<horde::scene::TexturedSkinnedRtVertex>& LichVertices() const { return lichSkinnedVertices_; }
     const std::array<float, 3u>& LichStaffLocalSample() const { return lichStaffLocalSample_; }
     float SkeletonDeadClipDuration() const { return skeletonDeadClipDuration_; }
-    std::size_t ActiveSkeletonCount() const { return activeSkeletonCount_; }
     std::size_t SkeletonPoseBucketCount() const { return skeletonPoseBucketCount_; }
 
     void DestroyGpuResources(const RtGpuResources& resources);
@@ -141,9 +128,9 @@ private:
     float lastLichUpdateTime_ = -1.0f;
     int lastLichClip_ = -1;
     CharacterBlasRefit pendingRefit_ = CharacterBlasRefit::None;
-    std::size_t activeSkeletonCount_ = 0u;
     std::size_t skeletonPoseBucketCount_ = 0u;
     float skeletonDeadClipDuration_ = 0.0f;
+    CharacterFramePlan cachedFramePlan_{};
 };
 
 } // namespace horde::vulkan::raytracing

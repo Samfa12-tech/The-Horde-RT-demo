@@ -1,4 +1,4 @@
-HORDE LANTERN RT - SHOWCASE ALPHA 0.1.3
+HORDE LANTERN RT - SHOWCASE ALPHA 0.1.4
 =======================================
 
 This is a native Vulkan hardware-ray-tracing technology demo from Samfa12.
@@ -16,6 +16,7 @@ CONTROLS
 - WASD: move and strafe
 - Left mouse drag: 360 camera look
 - Right mouse or Space: swing sword
+- Q: parry skeleton melee attacks
 - Esc: pause / resume
 - R: restart route
 - F1: controls
@@ -36,7 +37,8 @@ If the required hardware RT path is unavailable, the demo shows diagnostics
 and does not silently start a fallback renderer.
 
 SHOWCASE CONTENT
-- Skeleton encounter followed by a three-turn shadow corridor
+- Two-skeleton opening encounter followed by a three-turn shadow corridor
+- Animation-owned sword contact, timed parry, attacker stagger, and riposte window
 - Rebuilt low-poly coat/body with articulated first-person walking
 - Three-point vitality, encounter retry, and route restart flow
 - Blue skylight chamber and four bay-selected coloured torch environments
@@ -49,9 +51,9 @@ SHOWCASE CONTENT
 - Help > Credits & licences carries the main attribution inside the executable
 
 KNOWN ALPHA LIMITS
-- One skinned enemy is rendered and animated at a time.
+- The opening encounter is capped at two skeletons and one attacker at a time.
 - The lich is a CC0 Meshy placeholder with visible source-rig limitations.
-- Water, simultaneous hordes, and the staged textured sword remain deferred.
+- Larger hordes, fire/water expansion, and the staged textured sword remain deferred.
 - Only tested RT-capable hardware paths are supported.
 - See ASSET_LICENSES.md and ALPHA_RELEASE_NOTES.md.
 

@@ -9,6 +9,7 @@ namespace horde::gameplay::simulation
 struct SimulationCommandSequences
 {
     std::uint64_t attack = 0;
+    std::uint64_t parry = 0;
     std::uint64_t routeReset = 0;
     std::uint64_t retry = 0;
 };

@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-11
 
-**Status:** Host-, Android-performance-, and owner-hands-on-validated development candidate
+**Status:** Historical host-, Android-performance-, and owner-hands-on-validated development candidate (`b3428a7`); later source must be validated separately.
 
 **Publication:** None. Showcase Alpha 0.1.3 artifacts and itch builds remain unchanged.
 
@@ -33,7 +33,7 @@ The shader reads the bounded skeleton pose segment selected by instance custom i
 
 The developer overlay and Android state evidence report active enemy entities, attacker entity ID, and skeleton pose-bucket count. The default 75% device gate now measures six checkpoints: `opening`, `two-enemy-combat`, `worst-bend`, `skylight`, `green`, and `lich`. Deterministic capture order now contains 13 entries.
 
-Debug Android automation accepts `-GpuTiming Enabled|Disabled`. Disabled mode removes timestamp-query initialization, reset/writes, collection, and readback only; RT rendering and the strict below-20 ms CPU gate remain unchanged. Every run now:
+Debug Android automation accepts `-GpuTiming Enabled|Disabled`. Disabled mode removes timestamp-query initialization, reset/writes, collection, and readback only; RT rendering and the strict below-20 ms CPU gate remain unchanged. Every run in this historical candidate validation:
 
 - hashes the local Debug APK and installed `base.apk` and rejects a mismatch;
 - records source commit, dirty state, embedded raygen SHA-256, device, scale, checkpoints, and instrumentation mode;
@@ -61,7 +61,7 @@ The generated validation artifacts are evidence only:
 
 ## Android acceptance evidence
 
-After the phone was unlocked on 2026-08-12, the exact clean-commit Debug APK with SHA-256 `245c7526051b5323f9521ea3407b3c412908af427078148c9123a28296f7cafa` installed on `SM-S948B` and matched the installed `base.apk` byte-for-byte.
+After the phone was unlocked on 2026-08-12, exact clean commit `b3428a7` Debug APK SHA-256 `245c7526051b5323f9521ea3407b3c412908af427078148c9123a28296f7cafa` installed on `SM-S948B` and matched the installed `base.apk` byte-for-byte.
 
 - Matched cooled lich A/B: 19.497 ms with GPU timestamps, 19.268 ms without; 1.188% difference, comparator passed.
 - Six-checkpoint 75% medians: 10.589 / 12.139 / 9.246 / 8.888 / 11.060 / 19.735 ms; every checkpoint below 20 ms at thermal status 0.
@@ -72,4 +72,4 @@ After the phone was unlocked on 2026-08-12, the exact clean-commit Debug APK wit
 
 This matched pair did not identify GPU timestamp overhead as the material cause of the older hot 23.604 ms result, and the full run clears the automated phone-performance/presentation gate without weakening RT or raising the budget. See `TWO_SKELETON_COMBAT_ANDROID_VALIDATION_2026-08-12.md` for exact evidence and thermal qualification.
 
-On 2026-08-12, after the exact candidate remained installed and open for play, the owner reported that the hands-on experience "feels fine." This closes the broad subjective promotion gate for touch/camera comfort, live readability, and combat feel on the tested candidate. The short verdict is not a detailed cue-by-cue certification of positional audio or haptic distinction, and it does not generalise beyond `SM-S948B`.
+On 2026-08-12, after the exact candidate remained installed and open for play, the owner reported that the hands-on experience "feels fine." This closes the broad subjective promotion gate for touch/camera comfort, live readability, and combat feel on the tested candidate. The short verdict is not a detailed cue-by-cue certification of positional audio or haptic distinction, and it does not generalise beyond `SM-S948B`. It also does not validate the later `daa5892` animation/parry candidate or current `b9212e7+` press-edge source.
