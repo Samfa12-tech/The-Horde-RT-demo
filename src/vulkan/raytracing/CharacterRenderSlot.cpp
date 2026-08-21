@@ -16,6 +16,35 @@ constexpr std::array<std::uint32_t, 40u> kLichStaffEmissiveVertices{{
     19154u, 19174u, 19792u, 20010u, 20011u, 20012u, 20385u, 20387u,
     20388u, 20389u, 20390u, 20625u, 20845u, 20846u, 21255u, 25309u}};
 
+// A parry arrives at the skeleton attack contact pose.  There is no separate
+// stagger asset, so use the authored post-contact recovery as a short,
+// deterministic recoil/recovery motion rather than freezing the mesh for the
+// full gameplay stagger.  These are renderer-only sampling bounds; gameplay
+// remains authoritative for the 800 ms Staggered action.
+constexpr float kSkeletonAttackContactTime = 1.20f;
+constexpr float kSkeletonAttackRecoveryEndTime = 2.80f;
+constexpr float kSkeletonStaggerDuration = 0.80f;
+
+float SmoothStep01(const float value)
+{
+    const float clamped = std::clamp(value, 0.0f, 1.0f);
+    return clamped * clamped * (3.0f - 2.0f * clamped);
+}
+
+float SkeletonStaggerRecoil(const float actionTime)
+{
+    // The parry reads as a sharp, early knockback, then has enough time to
+    // settle before gameplay releases the attack token at 800 ms.
+    constexpr float kImpactDuration = 0.14f;
+    const float elapsed = std::clamp(actionTime, 0.0f, kSkeletonStaggerDuration);
+    if (elapsed <= kImpactDuration)
+    {
+        return SmoothStep01(elapsed / kImpactDuration);
+    }
+    return 1.0f - SmoothStep01((elapsed - kImpactDuration) /
+                               (kSkeletonStaggerDuration - kImpactDuration));
+}
+
 horde::scene::SkeletonClip SkeletonClipForAction(
     horde::gameplay::EnemyCombatAction action,
     horde::gameplay::EnemyAnimation animation)
@@ -62,7 +91,9 @@ float SkeletonTimeForAction(horde::gameplay::EnemyCombatAction action,
     case Action::AttackRecovery:
         return 1.30f + std::clamp(actionTime, 0.0f, 1.50f);
     case Action::Staggered:
-        return 1.20f;
+        return kSkeletonAttackContactTime +
+               (kSkeletonAttackRecoveryEndTime - kSkeletonAttackContactTime) *
+                   std::clamp(actionTime / kSkeletonStaggerDuration, 0.0f, 1.0f);
     case Action::Dead:
         return deadClipDuration > 0.0f ? std::min(animationTime, deadClipDuration) : animationTime;
     case Action::Locomotion:
@@ -74,21 +105,20 @@ float SkeletonTimeForAction(horde::gameplay::EnemyCombatAction action,
 VkTransformMatrixKHR SkeletonInstanceTransform(
     const horde::gameplay::simulation::SkeletonEnemySnapshot& skeleton)
 {
-    const float staggerProgress = skeleton.action == horde::gameplay::EnemyCombatAction::Staggered
-        ? std::clamp(skeleton.actionTime / 0.80f, 0.0f, 1.0f)
+    const float recoil = skeleton.action == horde::gameplay::EnemyCombatAction::Staggered
+        ? SkeletonStaggerRecoil(skeleton.actionTime)
         : 0.0f;
-    const float recoil = std::sin(staggerProgress * 3.14159265f);
-    const float x = skeleton.x - std::sin(skeleton.facingRadians) * recoil * 0.12f;
-    const float z = skeleton.z - std::cos(skeleton.facingRadians) * recoil * 0.12f;
+    const float x = skeleton.x - std::sin(skeleton.facingRadians) * recoil * 0.20f;
+    const float z = skeleton.z - std::cos(skeleton.facingRadians) * recoil * 0.20f;
     const float facingRadians = skeleton.facingRadians;
     const float enemyCos = std::cos(facingRadians);
     const float enemySin = std::sin(facingRadians);
-    const float lean = -0.16f * recoil;
+    const float lean = -0.30f * recoil;
     const float leanCos = std::cos(lean);
     const float leanSin = std::sin(lean);
     return {{
         enemyCos, enemySin * leanSin, enemySin * leanCos, x,
-        0.0f, leanCos, -leanSin, -0.95f + recoil * 0.025f,
+        0.0f, leanCos, -leanSin, -0.95f + recoil * 0.055f,
         -enemySin, enemyCos * leanSin, enemyCos * leanCos, z}};
 }
 

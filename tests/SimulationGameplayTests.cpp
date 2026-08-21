@@ -45,23 +45,75 @@ int main()
     first.source = EntityId::Player;
     first.target = EntityId::Skeleton;
     first.worldX = 1.0f;
+    first.listenerX = -1.0f;
+    first.listenerZ = 2.0f;
+    first.listenerYawRadians = 0.25f;
     GameplayEvent second = first;
     second.target = EntityId::Lich;
     second.worldX = 2.0f;
+    second.listenerX = -2.0f;
+    second.listenerYawRadians = -0.50f;
     check(identityQueue.Push(first) && identityQueue.Push(second),
           "two same-type events must fit the bounded queue");
     check(identityQueue[0].sequence != identityQueue[1].sequence &&
           identityQueue[0].target == EntityId::Skeleton &&
           identityQueue[1].target == EntityId::Lich &&
-          identityQueue[0].worldX != identityQueue[1].worldX,
-          "same-type events must retain distinct sequences, entities, and positions");
+          identityQueue[0].worldX != identityQueue[1].worldX &&
+          identityQueue[0].listenerX != identityQueue[1].listenerX &&
+          identityQueue[0].listenerYawRadians != identityQueue[1].listenerYawRadians,
+          "same-type events must retain distinct sequences, entities, positions, and listener state");
     for (std::size_t i = identityQueue.Size(); i < BoundedGameplayEventQueue::kCapacity; ++i)
     {
         identityQueue.Push({});
     }
     check(!identityQueue.Push({}) && identityQueue.OverflowCount() == 1u &&
-          identityQueue.Size() == BoundedGameplayEventQueue::kCapacity,
-          "overflow must be explicit and must not overwrite an unrelated event");
+          identityQueue.Size() == BoundedGameplayEventQueue::kCapacity &&
+          identityQueue.HighWaterMark() == BoundedGameplayEventQueue::kCapacity &&
+          identityQueue.NextSequence() == BoundedGameplayEventQueue::kCapacity + 1u &&
+          identityQueue[0].source == EntityId::Player &&
+          identityQueue[0].target == EntityId::Skeleton &&
+          NearlyEqual(identityQueue[0].listenerX, -1.0f),
+          "overflow must be explicit and must retain the ordered event identity without advancing sequence");
+
+    GameSimulationConfig listenerConfig;
+    listenerConfig.movementSpeedMetresPerSecond = 30.0f;
+    GameSimulation movingListeners(listenerConfig);
+    InputSnapshot movingListenerInput;
+    movingListenerInput.moveForward = 1.0f;
+    movingListenerInput.yawRadians = 0.15f;
+    movingListenerInput.damageEnabled = false;
+    const std::uint32_t listenerTicks = movingListeners.AdvanceFrame(
+        movingListenerInput,
+        0.100,
+        101u);
+    std::size_t movingFootstepCount = 0u;
+    std::uint64_t previousFootstepSequence = 0u;
+    bool movingFootstepsAreOrdered = true;
+    bool movingFootstepsCaptureCurrentListener = true;
+    bool atLeastOneListenerDiffersFromFrameEnd = false;
+    for (const GameplayEvent& event : movingListeners.Events().Events())
+    {
+        if (event.type != GameplayEventType::PlayerFootstep)
+        {
+            continue;
+        }
+        ++movingFootstepCount;
+        movingFootstepsAreOrdered = movingFootstepsAreOrdered &&
+            event.sequence > previousFootstepSequence;
+        movingFootstepsCaptureCurrentListener = movingFootstepsCaptureCurrentListener &&
+            event.source == EntityId::Player &&
+            event.target == EntityId::Invalid &&
+            NearlyEqual(event.listenerX, event.worldX) &&
+            NearlyEqual(event.listenerZ, event.worldZ) &&
+            NearlyEqual(event.listenerYawRadians, movingListenerInput.yawRadians);
+        atLeastOneListenerDiffersFromFrameEnd = atLeastOneListenerDiffersFromFrameEnd ||
+            !NearlyEqual(event.listenerX, movingListeners.Snapshot().playerX) ||
+            !NearlyEqual(event.listenerZ, movingListeners.Snapshot().playerZ);
+        previousFootstepSequence = event.sequence;
+    }
+    check(listenerTicks >= 3u && movingFootstepCount >= 2u && movingFootstepsAreOrdered &&
+          movingFootstepsCaptureCurrentListener && atLeastOneListenerDiffersFromFrameEnd,
+          "events from several fixed ticks in one moving frame must retain each contact's listener state");
 
     GameSimulation attacks;
     InputSnapshot attackInput;
@@ -291,10 +343,22 @@ int main()
     {
         damageEvents.AdvanceFrame(damageInput, 1.0 / 60.0, static_cast<std::uint64_t>(frame + 1));
     }
+    bool playerDamageEventsIdentifyTheirAttacker = true;
+    for (const GameplayEvent& event : damageEvents.Events().Events())
+    {
+        if (event.type == GameplayEventType::PlayerDamaged ||
+            event.type == GameplayEventType::PlayerKilled)
+        {
+            playerDamageEventsIdentifyTheirAttacker = playerDamageEventsIdentifyTheirAttacker &&
+                (event.source == EntityId::SkeletonA || event.source == EntityId::SkeletonB) &&
+                event.target == EntityId::Player;
+        }
+    }
     check(damageEvents.Snapshot().playerVitals.phase == PlayerLifePhase::Dying &&
           CountEvents(damageEvents.Events(), GameplayEventType::PlayerDamaged) == 2u &&
-          CountEvents(damageEvents.Events(), GameplayEventType::PlayerKilled) == 1u,
-          "two nonfatal hits must emit PlayerDamaged while the lethal hit emits only PlayerKilled");
+          CountEvents(damageEvents.Events(), GameplayEventType::PlayerKilled) == 1u &&
+          playerDamageEventsIdentifyTheirAttacker,
+          "two entity-aware nonfatal hits must emit PlayerDamaged while the lethal hit emits only PlayerKilled");
 
     GameSimulation retry;
     InputSnapshot finaleInput;

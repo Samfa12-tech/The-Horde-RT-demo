@@ -127,11 +127,31 @@ int main()
                   Near(splitPlan.skeletons[1].time, 1.20f),
                   "active phase did not map continuously through the authored Attack clip");
     skeletons[1].action = EnemyCombatAction::Staggered;
-    skeletons[1].actionTime = 0.40f;
-    const CharacterFramePlan staggerPlan = EvaluateCharacterFramePlan(skeletons, skeletons.size(), roster, lich, 2.967f);
-    ok &= Require(Near(staggerPlan.skeletons[1].time, 1.20f) &&
-                  !Near(staggerPlan.skeletons[1].transform.matrix[1][1], 1.0f),
-                  "stagger did not freeze near contact and apply bounded whole-instance recoil");
+    skeletons[1].actionTime = 0.0f;
+    const CharacterFramePlan staggerStartPlan = EvaluateCharacterFramePlan(skeletons, skeletons.size(), roster, lich, 2.967f);
+    skeletons[1].actionTime = 0.14f;
+    const CharacterFramePlan staggerImpactPlan = EvaluateCharacterFramePlan(skeletons, skeletons.size(), roster, lich, 2.967f);
+    skeletons[1].actionTime = 0.80f;
+    const CharacterFramePlan staggerRecoveryPlan = EvaluateCharacterFramePlan(skeletons, skeletons.size(), roster, lich, 2.967f);
+    ok &= Require(Near(staggerStartPlan.skeletons[1].time, 1.20f) &&
+                  Near(staggerImpactPlan.skeletons[1].time, 1.48f) &&
+                  Near(staggerRecoveryPlan.skeletons[1].time, 2.80f),
+                  "stagger did not traverse the bounded authored Attack recovery from contact to rest");
+    ok &= Require(!Near(staggerImpactPlan.skeletons[1].transform.matrix[1][1], 1.0f) &&
+                  !Near(staggerImpactPlan.skeletons[1].transform.matrix[1][3], -0.95f) &&
+                  Near(staggerRecoveryPlan.skeletons[1].transform.matrix[1][1], 1.0f) &&
+                  Near(staggerRecoveryPlan.skeletons[1].transform.matrix[1][3], -0.95f),
+                  "stagger did not produce a bounded recoil and settle over its 800 ms action");
+    skeletons[0] = skeletons[1];
+    skeletons[0].id = simulation::EntityId::SkeletonA;
+    skeletons[0].x = -0.75f;
+    skeletons[1].x = 0.75f;
+    const CharacterFramePlan sharedStaggerPlan =
+        EvaluateCharacterFramePlan(skeletons, skeletons.size(), roster, lich, 2.967f);
+    ok &= Require(sharedStaggerPlan.skeletonPoseBucketCount == 1u &&
+                  sharedStaggerPlan.skeletons[0].poseBucket == 0u &&
+                  sharedStaggerPlan.skeletons[1].poseBucket == 0u,
+                  "matching stagger skeletons did not reuse the existing pose zero bucket");
 
     roster.selectedEnemy = EnemyKind::Lich;
     lich.phase = LichPhase::Charging;

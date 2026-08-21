@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "gameplay/SpatialAudio.h"
+#include "gameplay/simulation/GameplayEvent.h"
 
 namespace
 {
@@ -43,6 +44,32 @@ int main()
     const SpatialAudioGains left = CalculateSpatialAudio({-1.0f, 0.0f}, origin);
     check(NearlyEqual(left.pan, -1.0f) && NearlyEqual(left.left, 1.0f) && left.right <= 0.0001f,
           "left emitter must pan fully left");
+
+    horde::gameplay::simulation::GameplayEvent earlierEvent;
+    earlierEvent.worldX = 2.0f;
+    earlierEvent.worldZ = -2.0f;
+    earlierEvent.listenerX = 0.0f;
+    earlierEvent.listenerZ = -2.0f;
+    earlierEvent.listenerYawRadians = 0.0f;
+    const SpatialAudioGains earlierEventGains = CalculateSpatialAudio(
+        {earlierEvent.worldX, earlierEvent.worldZ, 1.0f, 1.0f, 14.0f},
+        {earlierEvent.listenerX, earlierEvent.listenerZ, earlierEvent.listenerYawRadians});
+    horde::gameplay::simulation::GameplayEvent laterEvent = earlierEvent;
+    laterEvent.listenerX = 1.0f;
+    laterEvent.listenerYawRadians = 3.14159265359f;
+    const SpatialAudioGains laterEventGains = CalculateSpatialAudio(
+        {laterEvent.worldX, laterEvent.worldZ, 1.0f, 1.0f, 14.0f},
+        {laterEvent.listenerX, laterEvent.listenerZ, laterEvent.listenerYawRadians});
+    const SpatialAudioGains repeatedLaterEventGains = CalculateSpatialAudio(
+        {laterEvent.worldX, laterEvent.worldZ, 1.0f, 1.0f, 14.0f},
+        {laterEvent.listenerX, laterEvent.listenerZ, laterEvent.listenerYawRadians});
+    check(earlierEventGains.pan > 0.99f && laterEventGains.pan < -0.99f &&
+          StereoPower(laterEventGains) > StereoPower(earlierEventGains) &&
+          NearlyEqual(laterEventGains.left, repeatedLaterEventGains.left) &&
+          NearlyEqual(laterEventGains.right, repeatedLaterEventGains.right) &&
+          NearlyEqual(earlierEvent.worldX, laterEvent.worldX) &&
+          NearlyEqual(earlierEvent.worldZ, laterEvent.worldZ),
+          "event-time listener position/yaw must deterministically change pan and distance without changing the source");
 
     const SpatialAudioGains near = CalculateSpatialAudio({0.0f, -1.0f}, origin);
     const SpatialAudioGains far = CalculateSpatialAudio({0.0f, -4.0f}, origin);

@@ -189,12 +189,11 @@ std::uint64_t PlatformGameplayEventOverflowCount()
     return gPlatformGameplayEventOverflowCount;
 }
 
-void EnqueuePlatformGameplayEvent(const horde::gameplay::simulation::GameplayEvent& event,
-                                  const horde::gameplay::simulation::SimulationSnapshot& simulation)
+void EnqueuePlatformGameplayEvent(const horde::gameplay::simulation::GameplayEvent& event)
 {
     const horde::gameplay::SpatialAudioGains gains = horde::gameplay::CalculateSpatialAudio(
         {event.worldX, event.worldZ, std::max(0.0f, event.intensity), 1.0f, 14.0f},
-        {simulation.playerX, simulation.playerZ, simulation.playerYawRadians});
+        {event.listenerX, event.listenerZ, event.listenerYawRadians});
     const std::uint64_t metadata =
         static_cast<std::uint64_t>(event.type) |
         (static_cast<std::uint64_t>(event.source) << 8u) |
@@ -215,10 +214,9 @@ void EnqueuePlatformGameplayEvent(const horde::gameplay::simulation::GameplayEve
 
 void DrainSimulationEventsToPlatform()
 {
-    const horde::gameplay::simulation::SimulationSnapshot& simulation = gGameSimulation.Snapshot();
     for (const horde::gameplay::simulation::GameplayEvent& event : gGameSimulation.Events().Events())
     {
-        EnqueuePlatformGameplayEvent(event, simulation);
+        EnqueuePlatformGameplayEvent(event);
     }
     gGameSimulation.ClearEvents();
 }

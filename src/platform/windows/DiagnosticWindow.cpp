@@ -823,16 +823,15 @@ bool PlayXAudioFile(const std::filesystem::path& path, float leftGain, float rig
 void PlayPositionalSoundEffect(const VulkanSurfaceContext& context,
                                const char* filename,
                                float mixGain,
-                               float emitterX,
-                               float emitterZ)
+                               const horde::gameplay::simulation::GameplayEvent& event)
 {
     if (!context.sfxEnabled)
     {
         return;
     }
     const horde::gameplay::SpatialAudioGains gains = horde::gameplay::CalculateSpatialAudio(
-        {emitterX, emitterZ, mixGain, 1.0f, 14.0f},
-        {context.cameraX, context.cameraZ, context.cameraYaw});
+        {event.worldX, event.worldZ, mixGain, 1.0f, 14.0f},
+        {event.listenerX, event.listenerZ, event.listenerYawRadians});
     if (gains.left <= 0.0f && gains.right <= 0.0f)
     {
         return;
@@ -874,25 +873,22 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
                                 ? "sword_swing_1.wav" : "sword_swing_2.wav");
             break;
         case GameplayEventType::PlayerParrySucceeded:
-            PlayPositionalSoundEffect(context, "sword_hit_2.wav", 1.0f,
-                                      event.worldX, event.worldZ);
+            PlayPositionalSoundEffect(context, "sword_hit_2.wav", 1.0f, event);
             break;
         case GameplayEventType::EnemyFootstep:
         {
             const char* clip = (context.enemyFootstepVariant++ & 1) == 0
                 ? "skeleton_step_1.wav" : "skeleton_step_2.wav";
-            PlayPositionalSoundEffect(context, clip, 1.0f, event.worldX, event.worldZ);
+            PlayPositionalSoundEffect(context, clip, 1.0f, event);
             break;
         }
         case GameplayEventType::EnemyAttackStarted:
-            PlayPositionalSoundEffect(context, "skeleton_attack.wav", 0.85f,
-                                      event.worldX, event.worldZ);
+            PlayPositionalSoundEffect(context, "skeleton_attack.wav", 0.85f, event);
             break;
         case GameplayEventType::EnemyHit:
             if (event.target == EntityId::Lich)
             {
-                PlayPositionalSoundEffect(context, "lich_hurt.wav", 0.95f,
-                                          event.worldX, event.worldZ);
+                PlayPositionalSoundEffect(context, "lich_hurt.wav", 0.95f, event);
             }
             else
             {
@@ -900,16 +896,13 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
             }
             break;
         case GameplayEventType::LichChargeStarted:
-            PlayPositionalSoundEffect(context, "lich_charge.wav", 0.42f,
-                                      event.worldX, event.worldZ);
+            PlayPositionalSoundEffect(context, "lich_charge.wav", 0.42f, event);
             break;
         case GameplayEventType::LichImpact:
-            PlayPositionalSoundEffect(context, "lich_impact.wav", 0.55f,
-                                      event.worldX, event.worldZ);
+            PlayPositionalSoundEffect(context, "lich_impact.wav", 0.55f, event);
             break;
         case GameplayEventType::LichDefeated:
-            PlayPositionalSoundEffect(context, "lich_fall.wav", 0.36f,
-                                      event.worldX, event.worldZ);
+            PlayPositionalSoundEffect(context, "lich_fall.wav", 0.36f, event);
             break;
         case GameplayEventType::PlayerDamaged:
             UpdateVitalityHud(context);

@@ -44,6 +44,10 @@ struct GameplayEvent
     float worldX = 0.0f;
     float worldY = 0.0f;
     float worldZ = 0.0f;
+    // Fixed-tick listener state used when this event is spatialised later.
+    float listenerX = 0.0f;
+    float listenerZ = 0.0f;
+    float listenerYawRadians = 0.0f;
     float intensity = 1.0f;
     std::int32_t payload = 0;
 };

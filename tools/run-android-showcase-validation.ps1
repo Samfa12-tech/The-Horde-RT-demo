@@ -27,6 +27,8 @@ $outputDirectory = [IO.Path]::GetFullPath((Join-Path $OutputRoot "run-$runId"))
 $gpuTimingEnabled = $GpuTiming -eq "Enabled"
 $gpuTimingLabel = $GpuTiming.ToLowerInvariant()
 $gpuTimingArgument = $(if ($gpuTimingEnabled) { "true" } else { "false" })
+$hardBudgetMs = 20.0
+$lowHeadroomWarningMs = 18.5
 $sourceCommit = (& git -C $repoRoot rev-parse HEAD 2>&1 | Out-String).Trim()
 if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($sourceCommit)) { throw "Could not resolve the source Git commit." }
 $sourceDirty = -not [string]::IsNullOrWhiteSpace((& git -C $repoRoot status --porcelain 2>&1 | Out-String).Trim())
@@ -268,6 +270,15 @@ function Invoke-CheckpointBenchmark {
     $presented = @($samples | ForEach-Object { $_.Groups[7].Value }) -notcontains "0"
     $thermal = Get-ThermalStatus
     $battery = Get-BatteryTemperatureC
+    $budgetClassification = if (-not $EnforceBudget) {
+        "REPORT ONLY"
+    } elseif ($median -ge $hardBudgetMs) {
+        "FAIL"
+    } elseif ($median -ge $lowHeadroomWarningMs) {
+        "PASS - LOW HEADROOM"
+    } else {
+        "PASS"
+    }
     $row = [PSCustomObject]@{
         scale = $RequestedScale
         checkpoint = $Checkpoint
@@ -284,11 +295,17 @@ function Invoke-CheckpointBenchmark {
         presented = $presented
         timing_method = "cpu-present-loop"
         gpu_timing = $gpuTimingLabel
+        budget_classification = $budgetClassification
+        low_headroom_warning_ms = $lowHeadroomWarningMs
+        hard_budget_ms = $hardBudgetMs
     }
     $timingRows.Add($row)
     if ($actualZone -ne $checkpointZones[$Checkpoint]) { $failures.Add("$Checkpoint reported zone $actualZone.") }
     if (-not $presented) { $failures.Add("$Checkpoint did not retain honest RT presentation.") }
-    if ($EnforceBudget -and $median -ge 20.0) { $failures.Add("$Checkpoint median $median ms reached or exceeded the strict below-20 ms 75% gate.") }
+    if ($EnforceBudget -and $median -ge $hardBudgetMs) { $failures.Add("$Checkpoint median $median ms reached or exceeded the strict below-20 ms 75% gate.") }
+    elseif ($EnforceBudget -and $median -ge $lowHeadroomWarningMs) {
+        Write-Warning "$Checkpoint median $median ms passed the hard gate with low headroom (warning threshold $lowHeadroomWarningMs ms)."
+    }
     if ($EnforceBudget -and ($thermal -lt 0 -or $thermal -gt 3)) {
         $failures.Add("$Checkpoint thermal status $thermal was outside the required 0-3 range for the 75% gate.")
     }
@@ -427,7 +444,7 @@ try {
     Invoke-AdbText @("shell", "dumpsys", "battery") -AllowFailure | Set-Content -LiteralPath (Join-Path $outputDirectory "battery-after.txt") -Encoding utf8
     $timingRows | Export-Csv -LiteralPath (Join-Path $outputDirectory "timing.csv") -NoTypeInformation
     $metadata = [ordered]@{
-        schema = 5
+        schema = 6
         runId = $runId
         mode = $Mode
         scale = $Scale
@@ -457,9 +474,19 @@ try {
         captureManifest = $(if ($Capture) { "capture-manifest.json" } else { $null })
         lifecycle = $lifecycleEvidence
         timingMethod = "CPU wall-clock from frame start through vkQueuePresentKHR; not a Vulkan GPU timestamp"
+        performanceBudget = [ordered]@{
+            lowHeadroomWarningMs = $lowHeadroomWarningMs
+            hardFailureMs = $hardBudgetMs
+            lowHeadroomCheckpoints = @($timingRows | Where-Object {
+                $_.budget_classification -eq "PASS - LOW HEADROOM"
+            } | ForEach-Object { $_.checkpoint })
+        }
         failures = @($failures)
     }
     $metadata | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $outputDirectory "summary.json") -Encoding utf8
+    $timingSummary = @($timingRows | ForEach-Object {
+        "- $($_.scale)% $($_.checkpoint): $($_.median_of_window_avgs_ms) ms, $($_.budget_classification)"
+    }) -join "`n"
     @(
         "# Android showcase automation run $runId"
         ""
@@ -473,6 +500,12 @@ try {
         "- GPU timestamp instrumentation: $gpuTimingLabel (RT rendering unchanged)"
         "- Evidence type: automated deterministic checkpoint/replay evidence; visual quality and perceived spatial audio remain hands-on checks."
         "- Result: $(if ($failures.Count) { 'FAIL' } else { 'PASS' })"
+        ""
+        "## Timing classification"
+        ""
+        "Hard 75% gate: every required checkpoint must remain below $hardBudgetMs ms. Engineering warning: medians from $lowHeadroomWarningMs ms up to the hard gate pass with low headroom."
+        ""
+        $timingSummary
         ""
         "See ``timing.csv``, ``summary.json``, ``logcat.txt``, checkpoint state JSON, screenshots (when requested), and the private Vulkan capability report in this directory."
     ) | Set-Content -LiteralPath (Join-Path $outputDirectory "validation.md") -Encoding utf8

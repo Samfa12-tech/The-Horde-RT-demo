@@ -586,6 +586,9 @@ void GameSimulation::Emit(GameplayEventType type,
     event.target = target;
     event.worldX = x;
     event.worldZ = z;
+    event.listenerX = playerX_;
+    event.listenerZ = playerZ_;
+    event.listenerYawRadians = playerYawRadians_;
     event.intensity = intensity;
     event.payload = payload;
     events_.Push(event);
