@@ -27,8 +27,9 @@ $outputDirectory = [IO.Path]::GetFullPath((Join-Path $OutputRoot "run-$runId"))
 $gpuTimingEnabled = $GpuTiming -eq "Enabled"
 $gpuTimingLabel = $GpuTiming.ToLowerInvariant()
 $gpuTimingArgument = $(if ($gpuTimingEnabled) { "true" } else { "false" })
-$hardBudgetMs = 20.0
-$lowHeadroomWarningMs = 18.5
+$reference60FpsMs = 1000.0 / 60.0
+$reference50FpsMs = 20.0
+$reference30FpsMs = 1000.0 / 30.0
 $sourceCommit = (& git -C $repoRoot rev-parse HEAD 2>&1 | Out-String).Trim()
 if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($sourceCommit)) { throw "Could not resolve the source Git commit." }
 $sourceDirty = -not [string]::IsNullOrWhiteSpace((& git -C $repoRoot status --porcelain 2>&1 | Out-String).Trim())
@@ -53,6 +54,7 @@ $captureCheckpoints = @("opening", "skeleton", "worst-bend", "lantern-drop", "sk
 $timingRows = [System.Collections.Generic.List[object]]::new()
 $captureRecords = [System.Collections.Generic.List[object]]::new()
 $failures = [System.Collections.Generic.List[string]]::new()
+$warnings = [System.Collections.Generic.List[string]]::new()
 $initialWakefulness = ""
 $lifecycleEvidence = [ordered]@{
     requested = [bool]$Capture
@@ -95,6 +97,20 @@ function Get-ThermalStatus {
     $raw = Invoke-AdbText @("shell", "dumpsys", "thermalservice") -AllowFailure
     $match = [regex]::Match($raw, '(?m)^Thermal Status:\s*(\d+)\s*$')
     return $(if ($match.Success) { [int]$match.Groups[1].Value } else { -1 })
+}
+
+function Get-GpuThermalPowerLevel {
+    $raw = Invoke-AdbText @("shell", "cat", "/sys/class/kgsl/kgsl-3d0/thermal_pwrlevel") -AllowFailure
+    $parsed = 0
+    if ([int]::TryParse($raw.Trim(), [ref]$parsed)) { return $parsed }
+    return $null
+}
+
+function Get-PerformanceBand([double]$MedianMs) {
+    if ($MedianMs -le $reference60FpsMs) { return "60 FPS REFERENCE OR BETTER" }
+    if ($MedianMs -le $reference50FpsMs) { return "50-60 FPS REFERENCE BAND" }
+    if ($MedianMs -le $reference30FpsMs) { return "30-50 FPS REFERENCE BAND" }
+    return "BELOW 30 FPS REFERENCE"
 }
 
 function Get-BatteryTemperatureC {
@@ -248,7 +264,7 @@ function Start-AutomationSession {
 }
 
 function Invoke-CheckpointBenchmark {
-    param([string]$Checkpoint, [int]$RequestedScale, [bool]$EnforceBudget)
+    param([string]$Checkpoint, [int]$RequestedScale, [bool]$StandardRouteSample)
     if (-not $checkpointZones.ContainsKey($Checkpoint)) {
         throw "Unknown checkpoint '$Checkpoint'."
     }
@@ -270,15 +286,8 @@ function Invoke-CheckpointBenchmark {
     $presented = @($samples | ForEach-Object { $_.Groups[7].Value }) -notcontains "0"
     $thermal = Get-ThermalStatus
     $battery = Get-BatteryTemperatureC
-    $budgetClassification = if (-not $EnforceBudget) {
-        "REPORT ONLY"
-    } elseif ($median -ge $hardBudgetMs) {
-        "FAIL"
-    } elseif ($median -ge $lowHeadroomWarningMs) {
-        "PASS - LOW HEADROOM"
-    } else {
-        "PASS"
-    }
+    $gpuThermalPowerLevel = Get-GpuThermalPowerLevel
+    $performanceBand = Get-PerformanceBand -MedianMs $median
     $row = [PSCustomObject]@{
         scale = $RequestedScale
         checkpoint = $Checkpoint
@@ -295,19 +304,27 @@ function Invoke-CheckpointBenchmark {
         presented = $presented
         timing_method = "cpu-present-loop"
         gpu_timing = $gpuTimingLabel
-        budget_classification = $budgetClassification
-        low_headroom_warning_ms = $lowHeadroomWarningMs
-        hard_budget_ms = $hardBudgetMs
+        performance_band = $performanceBand
+        standard_route_sample = $StandardRouteSample
+        gpu_thermal_power_level = $gpuThermalPowerLevel
+        reference_60_fps_ms = [math]::Round($reference60FpsMs, 3)
+        reference_50_fps_ms = $reference50FpsMs
+        reference_30_fps_ms = [math]::Round($reference30FpsMs, 3)
+        # Kept so older report readers still find a classification column.
+        budget_classification = $performanceBand
     }
     $timingRows.Add($row)
     if ($actualZone -ne $checkpointZones[$Checkpoint]) { $failures.Add("$Checkpoint reported zone $actualZone.") }
     if (-not $presented) { $failures.Add("$Checkpoint did not retain honest RT presentation.") }
-    if ($EnforceBudget -and $median -ge $hardBudgetMs) { $failures.Add("$Checkpoint median $median ms reached or exceeded the strict below-20 ms 75% gate.") }
-    elseif ($EnforceBudget -and $median -ge $lowHeadroomWarningMs) {
-        Write-Warning "$Checkpoint median $median ms passed the hard gate with low headroom (warning threshold $lowHeadroomWarningMs ms)."
+    if ($StandardRouteSample -and ($thermal -lt 0 -or $thermal -gt 3)) {
+        $message = "$Checkpoint recorded Android thermal status $thermal; retain the timing as sustained-device evidence, but do not compare it with a materially different thermal state."
+        $warnings.Add($message)
+        Write-Warning $message
     }
-    if ($EnforceBudget -and ($thermal -lt 0 -or $thermal -gt 3)) {
-        $failures.Add("$Checkpoint thermal status $thermal was outside the required 0-3 range for the 75% gate.")
+    if ($StandardRouteSample -and $null -ne $gpuThermalPowerLevel -and $gpuThermalPowerLevel -gt 0) {
+        $message = "$Checkpoint recorded GPU thermal power level $gpuThermalPowerLevel; the device governor was limiting peak GPU performance."
+        $warnings.Add($message)
+        Write-Warning $message
     }
     $state = Get-ShowcaseState -Destination (Join-Path $outputDirectory "$Checkpoint-$RequestedScale-state.json")
     if ($state.status -ne "complete") { $failures.Add("$Checkpoint native state status was '$($state.status)'.") }
@@ -375,10 +392,10 @@ try {
 
     if ($Mode -in @("Benchmark", "Both")) {
         foreach ($checkpoint in $Checkpoints) {
-            Invoke-CheckpointBenchmark -Checkpoint $checkpoint -RequestedScale $Scale -EnforceBudget:($Scale -eq 75 -and $baselineCheckpoints -contains $checkpoint)
+            Invoke-CheckpointBenchmark -Checkpoint $checkpoint -RequestedScale $Scale -StandardRouteSample:($Scale -eq 75 -and $baselineCheckpoints -contains $checkpoint)
         }
         if ($Include100) {
-            Invoke-CheckpointBenchmark -Checkpoint "opening" -RequestedScale 100 -EnforceBudget:$false
+            Invoke-CheckpointBenchmark -Checkpoint "opening" -RequestedScale 100 -StandardRouteSample:$false
             Send-AutomationIntent -Checkpoint "opening" -RequestedScale $Scale
             Wait-ForLogPattern -Pattern "HORDE_BENCH begin generation=\d+ checkpoint=opening scale=$Scale" -Description "recommended scale restoration" | Out-Null
         }
@@ -444,7 +461,7 @@ try {
     Invoke-AdbText @("shell", "dumpsys", "battery") -AllowFailure | Set-Content -LiteralPath (Join-Path $outputDirectory "battery-after.txt") -Encoding utf8
     $timingRows | Export-Csv -LiteralPath (Join-Path $outputDirectory "timing.csv") -NoTypeInformation
     $metadata = [ordered]@{
-        schema = 6
+        schema = 7
         runId = $runId
         mode = $Mode
         scale = $Scale
@@ -474,13 +491,14 @@ try {
         captureManifest = $(if ($Capture) { "capture-manifest.json" } else { $null })
         lifecycle = $lifecycleEvidence
         timingMethod = "CPU wall-clock from frame start through vkQueuePresentKHR; not a Vulkan GPU timestamp"
-        performanceBudget = [ordered]@{
-            lowHeadroomWarningMs = $lowHeadroomWarningMs
-            hardFailureMs = $hardBudgetMs
-            lowHeadroomCheckpoints = @($timingRows | Where-Object {
-                $_.budget_classification -eq "PASS - LOW HEADROOM"
-            } | ForEach-Object { $_.checkpoint })
+        performanceReference = [ordered]@{
+            policy = "descriptive FPS-equivalent bands; no single frame-time threshold is a product acceptance gate"
+            sixtyFpsMs = [math]::Round($reference60FpsMs, 3)
+            fiftyFpsMs = $reference50FpsMs
+            thirtyFpsMs = [math]::Round($reference30FpsMs, 3)
+            matchedRegressionInvestigationPercent = 15.0
         }
+        warnings = @($warnings)
         failures = @($failures)
     }
     $metadata | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $outputDirectory "summary.json") -Encoding utf8
@@ -503,7 +521,7 @@ try {
         ""
         "## Timing classification"
         ""
-        "Hard 75% gate: every required checkpoint must remain below $hardBudgetMs ms. Engineering warning: medians from $lowHeadroomWarningMs ms up to the hard gate pass with low headroom."
+        "Descriptive references: 16.667 ms ~= 60 FPS, 20.000 ms = 50 FPS, and 33.333 ms ~= 30 FPS. Crossing a reference line is reported, not treated as an automatic product failure. Compare matched runs and investigate regressions above 15%."
         ""
         $timingSummary
         ""

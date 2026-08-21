@@ -156,7 +156,7 @@ Build encounter definitions, spawn groups, progression, save/checkpoint data, ad
 - Animation hit events fire once; off-angle and out-of-window swings miss.
 - Android settings expose an enabled-by-default haptics toggle whose activation provides an immediate preview; swing, damage, and fatal cues are distinguishable by hand on the physical device.
 - Add `two-enemy-combat`, `fire-room`, and `steaming-water` checkpoints to the Android evidence runner.
-- On `SM-S948B` at 75%: discard warm-up, retain three 120-frame windows, require honest presentation every frame, thermal status no worse than 3, and hard-gate the median window average below 20 ms. Investigate a matched-checkpoint regression above 15% even when under the hard gate.
+- Historical 2026-08-01 proposal: on `SM-S948B` at 75%, discard warm-up, retain three 120-frame windows, require honest presentation every frame, and hard-gate the median below 20 ms. The 2026-08-21 owner decision supersedes that last criterion: 20 ms is now a descriptive 50 FPS reference, sustained thermal/governor context is retained, and matched regressions above 15% are investigated.
 - Report 100% separately. Automation does not replace touch, animation readability, spatial audio, lifecycle, or thermal-comfort checks.
 - Update `docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md` whenever new device evidence is collected.
 

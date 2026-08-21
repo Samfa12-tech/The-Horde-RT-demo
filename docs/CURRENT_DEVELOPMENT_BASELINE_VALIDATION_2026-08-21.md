@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-21
 
-**Status:** Exact Android automation, full Windows Host validation, CI, and owner spatial-audio validation passed. Exact-candidate haptic confirmation remains pending.
+**Status:** Exact Android automation, full Windows Host validation, CI, and owner spatial-audio validation passed. Sustained phone performance is now reported as evidence rather than judged against the former hard 20 ms rule. Exact-candidate haptic confirmation remains pending.
 
 **Publication:** None. Showcase Alpha 0.1.3 artifacts, version identity, signing identity, and public downloads remain unchanged.
 
@@ -50,6 +50,7 @@ The diff from `b3428a7` adds animation-owned swing/parry/lich contact semantics,
 - GitHub Actions runs `32456717553` and `32457974761` passed the real eight-test portable `shared-gameplay` lane for draft PR 14 at the runtime/authority and evidence commits respectively.
 - The exact Windows Debug candidate produced 13/13 deterministic captures. All thirteen were pixel-identical to `reports/foundation-runs/run-20260813-204944/captures/windows`; overall matched capture timing changed from 6.0618 to 6.0531 ms (-0.144%).
 - The same Host run passed 13 Windows captures, clean Android Debug/unsigned Release and `lintRelease` across all four configured ABIs, validation packaging/licence checks, release identity checks, shader staleness, negative safety fixtures, and final evidence hashes.
+- After the performance-reporting scripts/docs changed, focused schema-7 phone run `run-20260821-182247` passed with exact local/installed APK hashes, honest presentation, an 11.303 ms opening median (60 FPS reference or better), thermal status 0, and GPU thermal power level 0. A fresh Host rerun `run-20260821-182339` passed shader/safety gates, builds, and all 12 Debug tests; Windows Smart App Control then refused to launch four newly linked Release test executables while the other eight passed. One unchanged-binary retry produced the same `BAD_COMMAND` launch refusal. No Windows Security setting was changed and this environmental refusal is not represented as a test failure in product code; the preceding canonical clean Host run remains the complete 12/12 Debug/Release evidence for the unchanged native source.
 
 ## Android exact candidate
 
@@ -61,16 +62,16 @@ After cooling, the exact installed APK ran the same six 75% checkpoint workloads
 
 | Checkpoint | Three 120-frame averages | Median | Classification | Thermal status |
 |---|---:|---:|---|---:|
-| lich | 19.522 / 19.695 / 19.702 ms | **19.695 ms** | PASS - LOW HEADROOM | 0 |
-| opening | 11.290 / 11.601 / 12.212 ms | **11.601 ms** | PASS | 0 |
-| two-enemy-combat | 14.358 / 14.310 / 14.227 ms | **14.310 ms** | PASS | 0 |
-| worst-bend | 10.696 / 12.658 / 14.890 ms | **12.658 ms** | PASS | 0 |
-| skylight | 8.637 / 8.887 / 8.856 ms | **8.856 ms** | PASS | 0 |
-| green | 11.079 / 11.053 / 11.055 ms | **11.055 ms** | PASS | 0 |
+| lich | 19.522 / 19.695 / 19.702 ms | **19.695 ms** | 50-60 FPS reference band | 0 |
+| opening | 11.290 / 11.601 / 12.212 ms | **11.601 ms** | 60 FPS reference or better | 0 |
+| two-enemy-combat | 14.358 / 14.310 / 14.227 ms | **14.310 ms** | 60 FPS reference or better | 0 |
+| worst-bend | 10.696 / 12.658 / 14.890 ms | **12.658 ms** | 60 FPS reference or better | 0 |
+| skylight | 8.637 / 8.887 / 8.856 ms | **8.856 ms** | 60 FPS reference or better | 0 |
+| green | 11.079 / 11.053 / 11.055 ms | **11.055 ms** | 60 FPS reference or better | 0 |
 
-Every required median remained strictly below 20.000 ms with honest presentation at thermal status 0. The 18.500 ms threshold is advisory only; lich correctly reports low headroom without weakening the hard gate or RT path.
+Every recorded median remained below the 20.000 ms / 50 FPS reference in this controlled order with honest presentation at thermal status 0. This is useful diagnostic evidence, but cooling and putting the heaviest checkpoint first do not describe an ordinary sustained play session and are no longer used to manufacture a binary pass.
 
-The report-only 100% opening median from the exact default-order run was **23.621 ms**. It is not part of the 75% pass/fail decision.
+The separately reported 100% opening median from the exact default-order run was **23.621 ms**.
 
 ## GPU-timing A/B
 
@@ -78,10 +79,30 @@ Matched cooled isolated lich runs used the same device, source, shader, APK, ins
 
 | GPU timestamps | Median | Classification |
 |---|---:|---|
-| Enabled | **19.686 ms** | PASS - LOW HEADROOM |
-| Disabled | **19.587 ms** | PASS - LOW HEADROOM |
+| Enabled | **19.686 ms** | 50-60 FPS reference band |
+| Disabled | **19.587 ms** | 50-60 FPS reference band |
 
 Enabled was 0.505% slower than disabled, below the 15% investigation threshold. The comparator passed and did not identify GPU timestamp instrumentation as a material cause.
+
+## Sustained performance attribution and revised policy
+
+The former strict-below-20 ms rule was an engineering guardrail chosen during development, not an owner requirement or a device/API constraint. Its useful meaning is simply the 50 FPS reference line. It is superseded by evidence-first reporting:
+
+- 16.667, 20.000, and 33.333 ms are descriptive approximately 60/50/30 FPS lines, not quality cliffs;
+- the standard six-checkpoint run stays in one process and reports sustained behavior, checkpoint order, battery/thermal context, and Adreno GPU thermal power level where readable;
+- a fresh-process or cooled result is labelled as a diagnostic control rather than substituted for sustained behavior;
+- exact matched regressions above 15% trigger investigation, not automatic rejection; growing memory/resource counts, changed workloads, crashes, invalid state, or dishonest presentation remain real failures;
+- 100% remains separate, and no automatic resolution reduction, RT weakening, or gate-raising is used to improve a label.
+
+Exact clean source `88868f4` with non-game Debug APK SHA-256 `fb3a5727a0f439f51482e569625a17252170c9c77b1b5232143d1751d01db37a` was installed byte-for-byte for the attribution runs. In sustained order `lich/opening/two-enemy/worst-bend/skylight/green`, medians were **19.669 / 20.962 / 21.610 / 17.698 / 17.487 / 20.656 ms** (`run-20260821-175811`) while battery temperature rose from about 33 C to 36 C. Temporarily changing Samsung's `restricted_device_performance` owner setting did not remove the pattern (`run-20260821-180228`); the original setting was restored.
+
+A one-process telemetry sweep showed the opening windows transition from **11.297 / 16.428 / 21.407 ms** and the final lich reach **39.438 / 36.380 / 34.803 ms**. Across that sweep, graphics allocation stayed about **233.9 to 233.2 MB**, native heap fluctuated within about **60-72 MB**, PSS/RSS stayed about **336-347 / 452-463 MB**, and threads moved from 31 to 29. There was no accumulating memory or resource-count signature.
+
+Repeated identical opening measurements then exposed the cause more directly. The first iteration held the GPU at **1300 MHz** for all 21 samples and produced roughly **11.3 ms** windows at GPU thermal power level 0. During the next iteration the GPU fell to **578-646 MHz**, thermal power level rose to 7, and the third window reached **23.552 ms**. Force-stopping and relaunching temporarily restored the fast opening even while warm: isolated opening medians were **11.370 ms at 35.1 C** (`run-20260821-180814`) and **11.346 ms at 37.1 C** (`run-20260821-181046`).
+
+This is strong evidence that the sustained slowdown was Samsung GPU governor/power-level behavior with a fresh-process boost, not game heap/graphics bloat. It does not prove the renderer has no future optimisation opportunities; it means those opportunities should be found through matched workload changes and scaling tests rather than repeated cooling loops.
+
+A Game Mode experiment was also rejected rather than retained. Standard and Performance modes were compared on an otherwise matched temporary build; Performance increased the lich median from **19.674 to 31.301 ms** (59.1%). All manifest/resource/GameState changes were reverted, the owner device-performance setting was restored, and the currently installed package is again not classified as an Android game.
 
 ## Two-enemy proof, replay, captures, and lifecycle
 
@@ -114,11 +135,11 @@ After this exact check passes, the accepted baseline is change-triggered rather 
 
 - Automated evidence proves only the exact source/APK/device/driver and recorded deterministic routes. It does not prove another device, subjective comfort, artistic quality, or untested future source.
 - Exact-candidate haptic perception remains pending; automation cannot replace it.
-- Lich passes below 20 ms only with low headroom; retain the 18.5 ms warning and investigate any matched regression above 15%.
+- Current sustained results cross the 20 ms / 50 FPS reference in several views as the device governor limits GPU frequency. Track this honestly and investigate matched source regressions above 15%; do not spend development cycles cooling the phone merely to obtain a pass label.
 - Hotstrike Studio skeleton finished-game use is credited, but public raw-source redistribution permission remains unresolved in GitHub issue 13. Do not publish source model files without explicit owner-approved resolution.
 - The owner-only signing backup/recovery checklist remains deliberately unchecked in `OWNER_RELEASE_SAFETY_CHECKLIST.md`. No signing secret was accessed, copied, or committed.
 - Published Showcase Alpha 0.1.3 artifacts were not rebuilt, replaced, signed, uploaded, or published by this work.
 
 ## Next milestone
 
-The master audit's proposed “explicit combat action states and animation events” milestone is already present in current source through animation-owned swing/parry/enemy phases. Do not reimplement it or raise the enemy ceiling. After this baseline closes, the next genuinely current gameplay/visual slice should be separately planned and phone-measured; bounded fire remains the leading deferred route item.
+The master audit's proposed “explicit combat action states and animation events” milestone is already present in current source through animation-owned swing/parry/enemy phases. Do not reimplement it. Two skeletons remain the validated ceiling of this milestone, but four/five enemies are a legitimate future game goal requiring a separately measured renderer/simulation design. Bounded fire, water, improved lanterns, and a proper player model remain future costs that should be evaluated through sustained scaling evidence rather than an immutable 20 ms rule.
