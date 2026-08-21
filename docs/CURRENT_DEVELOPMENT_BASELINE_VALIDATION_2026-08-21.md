@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-21
 
-**Status:** Exact Android automation and CI passed; full Windows Host promotion and owner audio/haptic baseline are pending the two explicit checks below.
+**Status:** Exact Android automation, full Windows Host validation, CI, and owner spatial-audio validation passed. Exact-candidate haptic confirmation remains pending.
 
 **Publication:** None. Showcase Alpha 0.1.3 artifacts, version identity, signing identity, and public downloads remain unchanged.
 
@@ -45,15 +45,11 @@ The diff from `b3428a7` adds animation-owned swing/parry/lich contact semantics,
 ## Host and CI
 
 - Shader staleness passed. Negative stale-shader, immutable-release, version-code, upload, and package-layout safety gates rejected their fixtures as expected.
-- Fresh Windows Debug built and passed 12/12 Vulkan-enabled CTests.
-- Fresh Windows Release built. Ten tests passed; Smart App Control blocked `horde_rt_combat_smoke.exe` and `horde_rt_showcase_benchmark_smoke.exe` before process launch. This is recorded as a local security-policy blocker, not a test failure or a green Host gate.
-- Rebuilding current source in the established Windows Release build directory then passed all 12/12 Vulkan-enabled CTests, including both programs that Smart App Control blocked only at their fresh ephemeral hashes. This proves the current Release test behavior but does not relabel the canonical fresh Host runner as passed.
+- Canonical clean Host run `reports/foundation-runs/run-20260821-170907` passed fresh Windows Debug and Release builds with 12/12 Vulkan-enabled CTests in each configuration. An earlier run had two Release programs blocked before launch by Smart App Control; the clean retry produced new hashes that launched normally without changing Windows Security.
 - A separate local portable configuration passed 8/8 Vulkan-disabled tests.
-- GitHub Actions run `32456717553` passed the real eight-test portable `shared-gameplay` lane for draft PR 14.
+- GitHub Actions runs `32456717553` and `32457974761` passed the real eight-test portable `shared-gameplay` lane for draft PR 14 at the runtime/authority and evidence commits respectively.
 - The exact Windows Debug candidate produced 13/13 deterministic captures. All thirteen were pixel-identical to `reports/foundation-runs/run-20260813-204944/captures/windows`; overall matched capture timing changed from 6.0618 to 6.0531 ms (-0.144%).
-- Unsigned Android Release assembly and `lintRelease` passed across all four configured ABIs.
-
-The complete Host foundation result remains **PENDING** until Windows Security permits the two freshly built Release test binaries to launch and the full runner completes without substitution.
+- The same Host run passed 13 Windows captures, clean Android Debug/unsigned Release and `lintRelease` across all four configured ABIs, validation packaging/licence checks, release identity checks, shader staleness, negative safety fixtures, and final evidence hashes.
 
 ## Android exact candidate
 
@@ -106,17 +102,18 @@ Primary ignored evidence bundles:
 
 `Audio/haptic manual revalidation required: YES` because listener-at-event-time routing materially changes the semantic data used for spatialisation on both platforms.
 
-The exact candidate is installed and open for one owner check covering Skeleton A/B direction/distance and footsteps/attacks, parry clang and strong short haptic, ordinary/fatal damage feedback, and the lich audio sequence.
+With the exact candidate still installed and open, the owner reported: “the audio sounds good.” This is owner-reported physical-device perception covering the requested spatial-audio check; automation alone did not establish it.
 
-**Spatial audio/haptic owner baseline: PENDING.**
+**Spatial audio owner baseline: PASSED.**
+
+**Haptic owner baseline on this exact candidate: PENDING.**
 
 After this exact check passes, the accepted baseline is change-triggered rather than milestone-triggered. Recheck only changes that can materially affect source/listener event data, spatialisation, audio cues/assets/backend/gain/timing, semantic event transport/mapping, haptic routing/pattern/intensity, or damage/death feedback. Unrelated RT, visual, UI, asset, build, packaging, documentation, telemetry, unrelated AI, or unrelated animation changes do not automatically invalidate it when automated contracts pass.
 
 ## Evidence boundary and remaining risks
 
 - Automated evidence proves only the exact source/APK/device/driver and recorded deterministic routes. It does not prove another device, subjective comfort, artistic quality, or untested future source.
-- Owner audio/haptic perception remains pending; automation cannot replace it.
-- Full Windows Host promotion remains pending the local Smart App Control unblock.
+- Exact-candidate haptic perception remains pending; automation cannot replace it.
 - Lich passes below 20 ms only with low headroom; retain the 18.5 ms warning and investigate any matched regression above 15%.
 - Hotstrike Studio skeleton finished-game use is credited, but public raw-source redistribution permission remains unresolved in GitHub issue 13. Do not publish source model files without explicit owner-approved resolution.
 - The owner-only signing backup/recovery checklist remains deliberately unchecked in `OWNER_RELEASE_SAFETY_CHECKLIST.md`. No signing secret was accessed, copied, or committed.
