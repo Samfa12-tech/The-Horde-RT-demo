@@ -67,7 +67,7 @@ Rendering maps these states onto existing sword/arm transforms and the existing 
 
 Manual owner audio/haptic validation is **change-triggered, not milestone-triggered**. Every milestone must state `Audio/haptic manual revalidation required: YES/NO` and a reason; the default is **NO**. A check is required only when a change can materially alter spatial-audio mathematics, listener state at event time, source identity/coordinates, attenuation/obstruction/pan, playback backend/gain/cues/assets, event transport/timing, haptic routing/cues/patterns/intensity, or player damage/death feedback semantics. Unrelated RT, visuals, UI, build, packaging, documentation, telemetry, unrelated AI, and unrelated animation changes do not trigger one when automated contracts pass and the semantic inputs are unchanged.
 
-Current reconciliation classification: **YES** — listener-at-event-time routing changes can affect perceived spatial audio and feedback timing, so a final owner check is required on the final exact Android candidate. This decision is separate from owner-only signing recovery work in `docs/OWNER_RELEASE_SAFETY_CHECKLIST.md`.
+Current reconciliation classification: **YES** — listener-at-event-time routing and platform feedback timing changed, so the final exact Android candidate required an owner check. The owner subsequently gave the exact candidate a broad “all good” audio/haptic verdict and explicitly observed its stagger-back/death sequence. The accepted baseline therefore returns to change-triggered testing. This decision is separate from owner-only signing recovery work in `docs/OWNER_RELEASE_SAFETY_CHECKLIST.md`.
 
 ## Sustained phone-performance evidence decision - 2026-08-21
 

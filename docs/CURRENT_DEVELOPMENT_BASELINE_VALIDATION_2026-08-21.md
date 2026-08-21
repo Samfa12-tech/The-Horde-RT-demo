@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-21
 
-**Status:** Final exact-source Windows/Android automation passed. Sustained phone performance is reported as evidence rather than judged against the former hard 20 ms rule. The final exact candidate's owner audio/haptic/stagger check remains pending.
+**Status:** Final exact-source Windows/Android automation and owner audio/haptic/stagger acceptance passed. Sustained phone performance is reported as evidence rather than judged against the former hard 20 ms rule.
 
 **Publication:** None. Showcase Alpha 0.1.3 artifacts, version identity, signing identity, and public downloads remain unchanged.
 
@@ -161,20 +161,22 @@ Primary ignored evidence bundles:
 
 `Audio/haptic manual revalidation required: YES` because listener-at-event-time routing, bounded Android event transport, and Windows skeleton hit/fall timing materially touch feedback delivery.
 
-With the earlier exact candidate still installed and open, the owner reported: “the audio sounds good.” This is valid physical-device evidence for that candidate, but the final `547d89d` transport/timing correction intentionally triggers one final check rather than silently inheriting it.
+With the earlier exact candidate still installed and open, the owner reported: “the audio sounds good.” After the final `547d89d` candidate was installed byte-for-byte and returned to a normal launch, the owner gave the requested broad verdict “all good” and specifically observed that a struck skeleton “staggers back and then shows death animation.” This closes perceived final-candidate feedback and stagger readability without pretending the owner acted as a calibrated spatial-audio instrument.
 
-**Final exact spatial-audio owner baseline: PENDING.**
+**Final exact spatial-audio owner baseline: PASSED.**
 
-**Final exact haptic owner baseline: PENDING.**
+**Final exact haptic owner baseline: PASSED.**
 
-**Final exact stagger-readability owner check: PENDING.**
+**Final exact stagger-readability owner check: PASSED.**
 
-After this exact check passes, the accepted baseline is change-triggered rather than milestone-triggered. Recheck only changes that can materially affect source/listener event data, spatialisation, audio cues/assets/backend/gain/timing, semantic event transport/mapping, haptic routing/pattern/intensity, or damage/death feedback. Unrelated RT, visual, UI, asset, build, packaging, documentation, telemetry, unrelated AI, or unrelated animation changes do not automatically invalidate it when automated contracts pass.
+The owner's broad pass is sufficient for the manual acceptance contract. The phrase “positional impact” was not independently understood or measured; here it means the hit sound being perceived from the skeleton's direction. Deterministic tests remain the precise evidence for source/listener propagation, left/right gain, attenuation, obstruction, entity identity, and ordered impact/fall timing.
+
+With this exact check passed, the accepted baseline is change-triggered rather than milestone-triggered. Recheck only changes that can materially affect source/listener event data, spatialisation, audio cues/assets/backend/gain/timing, semantic event transport/mapping, haptic routing/pattern/intensity, or damage/death feedback. Unrelated RT, visual, UI, asset, build, packaging, documentation, telemetry, unrelated AI, or unrelated animation changes do not automatically invalidate it when automated contracts pass.
 
 ## Evidence boundary and remaining risks
 
 - Automated evidence proves only the exact source/APK/device/driver and recorded deterministic routes. It does not prove another device, subjective comfort, artistic quality, or untested future source.
-- Final exact-candidate audio/haptic perception and stagger readability remain pending; automation cannot replace them.
+- The owner accepted final-candidate audio/haptic feedback and explicitly observed the stagger-back/death sequence. This does not quantify spatial accuracy, haptic intensity, or artistic quality on another device.
 - Current sustained results cross the 20 ms / 50 FPS reference in several views as the device governor limits GPU frequency. Track this honestly and investigate matched source regressions above 15%; do not spend development cycles cooling the phone merely to obtain a pass label.
 - Hotstrike Studio skeleton finished-game use is credited, but public raw-source redistribution permission remains unresolved in GitHub issue 13. Do not publish source model files without explicit owner-approved resolution.
 - The owner-only signing backup/recovery checklist remains deliberately unchecked in `OWNER_RELEASE_SAFETY_CHECKLIST.md`. No signing secret was accessed, copied, or committed.
