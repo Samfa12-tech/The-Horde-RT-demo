@@ -10,11 +10,11 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-if ($Version -match '^0\.1\.(?:1|2|3)(?:$|[-+.])') {
-    throw "The published 0.1.1, 0.1.2, and 0.1.3 release lines are immutable. Choose a new Version."
+if ($Version -match '^0\.1\.(?:1|2|3|4)(?:$|[-+.])') {
+    throw "The published 0.1.1 through 0.1.4 release lines are immutable. Choose a new Version."
 }
-if ($VersionCode -le 4) {
-    throw "VersionCode must be greater than the immutable published value 4."
+if ($VersionCode -le 5) {
+    throw "VersionCode must be greater than the immutable published value 5."
 }
 
 function Find-LatestVersionedTool {

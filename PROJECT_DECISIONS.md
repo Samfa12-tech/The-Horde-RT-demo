@@ -77,6 +77,10 @@ Current phone reporting uses 16.667, 20.000, and 33.333 ms as descriptive approx
 
 Investigate exact matched regressions above 15%, unexplained frame-time spikes, growing heap/PSS/graphics allocation/thread/resource counts, changed workloads, crashes, invalid renderer state, or dishonest presentation. Do not spend repeated runs cooling the phone to manufacture a sub-20 result, and do not weaken RT, silently lower resolution, or conceal thermal/governor behavior. The current two-skeleton limit remains the validated development boundary rather than a permanent game-design ceiling; larger encounters, fire, water, improved lanterns, and a proper player model require separately measured scaling work.
 
+## Showcase Alpha 0.1.4 publication decision - 2026-08-22
+
+The validated two-skeleton, animation-owned combat, timed-parry, stagger, and event-time feedback runtime is published as `0.1.4-alpha.1` on the existing itch Windows and Android channels. Android retains the established application ID, release certificate, and update identity at `versionCode 5`; Windows and Android build IDs are `#1903586` and `#1903587`. Release identity/packaging changes do not invalidate the exact `547d89d` runtime/device evidence, but the public signed APK itself remains a static/package-verified artifact until it is installed on the phone. The 0.1.1 through 0.1.4 lines are immutable and future Android updates require a version code greater than 5.
+
 ## Target devices
 
 - Primary target: Samsung Galaxy S26 Ultra.

@@ -1,6 +1,6 @@
 # Horde Lantern RT - Project Memory
 
-Last updated: 2026-08-21
+Last updated: 2026-08-22
 
 ## Identity and release state
 
@@ -8,22 +8,22 @@ Last updated: 2026-08-21
 - Purpose: native Vulkan hardware-ray-tracing game/technology demo.
 - Principle: **RT or nothing**; unsupported devices receive honest diagnostics, never a fake fallback.
 - Primary target: Android phone. Equal validation target: Windows RTX.
-- Current release: **Showcase Alpha 0.1.3**, package version `0.1.3-alpha.1`.
+- Current release: **Showcase Alpha 0.1.4**, package version `0.1.4-alpha.1`.
 - Canonical downloads: https://samfa12.itch.io/the-horde. Samfa12.com links to itch rather than hosting a second copy; the live `/games/` card, itch link, GitHub link, thumbnail, and released status were rendered and verified on 2026-07-15.
 - Source: https://github.com/Samfa12-tech/The-Horde-RT-demo.
-- Windows itch channel: upload `#18339908`, build `#1845895`, `windows-x64`.
-- Android itch channel: upload `#18341739`, build `#1845896`, `android`.
-- Signed Android APK SHA-256: `a4eb996104c03734a7fa8a16be1f8f701d5b19c861c066af002f96f9a199eee9`.
-- Windows ZIP SHA-256: `4ccc86bfab56beb9bce238f025afbf3afbf00589c8396ce937607ae1b95c274f`.
+- Windows itch channel: upload `#18339908`, build `#1903586`, `windows-x64`.
+- Android itch channel: upload `#18341739`, build `#1903587`, `android`.
+- Signed Android APK SHA-256: `ff549c2ab1c68fe7a36d4e45c966e664a5ec7e3f19fb8f416b7a6e8971db2e55`.
+- Windows ZIP SHA-256: `82ad58546864f55a6c61ead372811bbe3bebcf7066cb9f97c76008136a82c8b5`.
 - Signing certificate SHA-256: `8245277a11bca5576f116724507f799d6f4c178ce5fbb7e3981415c9e6b3c245`.
 - The release JKS and a local-only password note live together outside Git with restricted ACLs. An independent owner backup is still required.
-- Release proof: `docs/SHOWCASE_ALPHA_0_1_3_RELEASE_VALIDATION_2026-07-31.md`.
+- Release proof: `docs/SHOWCASE_ALPHA_0_1_4_RELEASE_VALIDATION_2026-08-22.md`.
 
 ## Locked creative direction
 
 - Historical gothic action demo: dark ruin, wet stone, fog, torch/lantern light, silhouettes, shadows, and obvious RT mood.
 - Lighting and atmosphere come before broader combat.
-- Showcase Alpha 0.1.3 preserves the one-active-enemy public loop. Current development source is separately bounded to two concurrent skeletons; do not add a third enemy, held guard, dodge, or broad AI without a later phone-measured plan.
+- Showcase Alpha 0.1.4 publishes the bounded two-skeleton/parry loop. Do not add a third enemy, held guard, dodge, or broad AI without a later phone-measured plan.
 - The authored coloured-light route is complete and published in Showcase Alpha 0.1.1; its design history is `docs/COLOURED_LIGHT_ROUTE_PLAN_2026-07-15.md` and its final evidence is in the Windows/Android/release validation records.
 
 ## Current renderer
@@ -48,7 +48,7 @@ Last updated: 2026-08-21
 - Player vitality is three points with a one-second damage lockout, short fatal hold, encounter retry, route restart, and platform-native death overlays.
 - The procedural sword swings independently of the torch and the lich requires three accepted hits with a two-second lockout. Its death now opens the roof, reveals warm dawn, and ends in a contextual Continue/Begin Again/Quit epilogue.
 - The skeleton uses Hotstrike Studio's base asset processed with Meshy. The CC0 Meshy lich uses restrained `Idle_02`/`Dead` skinning plus whole-instance hover/orbit; its visibly distorted walking clip is deliberately not presented.
-- Showcase Alpha 0.1.3 animates/refits/renders one skinned enemy at a time: skeleton in the opening route, lich after the skylight gate. Development source is capped at two skeletons, two pose buckets, nine BLAS, and nineteen physical TLAS slots; the lich remains singular.
+- Showcase Alpha 0.1.4 animates/refits/renders up to two skeletons in the opening encounter, with at most two pose buckets, nine BLAS, and nineteen physical TLAS slots; the later lich route remains singular.
 - Android: left drag movement/strafe, right drag 360 look, Swing and press-down Parry buttons, Android Back pause/resume.
 - Windows: WASD, left-drag look, right mouse/Space swing, Q parry, Esc pause/resume, R restart, F1 controls, F2 diagnostics, Debug-only F3 live developer overlay, Alt+Enter fullscreen.
 
@@ -69,6 +69,7 @@ Last updated: 2026-08-21
 ## Validated Android release state
 
 - Device: Samsung `SM-S948B`, Adreno 840, Vulkan 1.4.295, Android 16.
+- Showcase Alpha `0.1.4-alpha.1` / `versionCode 5` is published as Android itch build `#1903587`, SHA-256 `ff549c2ab1c68fe7a36d4e45c966e664a5ec7e3f19fb8f416b7a6e8971db2e55`. The exact public APK passed established-certificate, version, strict layout, static-runtime, 16 KiB APK/ELF, credit, and native-library checks. The phone was disconnected at publication, so signed-release installation remains unclaimed; exact runtime/device evidence belongs to the byte-matched final Debug candidate at `547d89d`.
 - The exact stable-key-signed 0.1.3 APK is published as build `#1845896`, `versionCode 4` / `versionName 0.1.3-alpha.1`. On 2026-08-01 the old stable 0.1.2 and Debug packages were removed, and the exact published APK was clean-installed on `SM-S948B`; the installed `base.apk` SHA-256 matched `a4eb996104c03734a7fa8a16be1f8f701d5b19c861c066af002f96f9a199eee9` byte-for-byte.
 - The signed Release selected strict ASTC, loaded all 17 SoundPool cues, visibly identified Alpha 0.1.3, explicitly rejected Debug capture automation, and honestly presented before and after Home/resume with no fatal marker. Evidence: `reports/release-smoke/android-signed-20260801-165934/` and `docs/SHOWCASE_ALPHA_0_1_3_RELEASE_VALIDATION_2026-07-31.md`.
 - The same feature source before the release-identity bump passed the full connected `SM-S948B` Debug gate, body/finale screenshots, real Continue and Begin Again actions, 13-waypoint replay, 12 captures, and Home/resume; see the 0.1.3 release proof for exact hashes and boundaries.
@@ -139,7 +140,7 @@ Last updated: 2026-08-21
 - Renderer composition reuses the existing sword/right arm and Attack clip. Stagger remains stationary in gameplay but procedurally moves the existing Attack clip from contact toward recovery with bounded whole-instance recoil/lean; it is not a frozen contact pose. `CharacterRenderSlot` now caches one frame plan for skin/refit and TLAS; nine BLAS, nineteen physical TLAS slots, and the two-pose-bucket ceiling remain unchanged.
 - Windows Debug/Release each pass all 12 CTests. The fresh Host foundation run `reports/foundation-runs/run-20260813-204944` passed shader staleness/negative gates, fresh builds/tests, 13 captures, Android Debug/Release/lint across four ABIs, packaging/licence checks, and evidence hashes. All 13 Windows captures are pixel-identical to the exact two-skeleton baseline; matched capture timing changed by 0.178%.
 - Exact clean `daa5892` Debug APK `a3eca0ed1ae49800541f1de95d329af8cb3bef50d53dac302a20238ade419302` installed byte-for-byte on `SM-S948B`. Strict ASTC, honest RT presentation, six checkpoint states, replay, 13 captures, and Home/resume passed; the warm 75% run was not a complete performance pass because lich measured 20.246 ms. The owner reported that parry timing felt good and requested press rather than release dispatch. The subsequent `ACTION_DOWN` source change was intentionally merged without rebuild, reinstall, or retest, so the installed exact-APK and hands-on evidence do not cover that follow-up revision.
-- Current reconciliation source includes Android press-down parry, animated skeleton stagger, listener-at-event-time feedback, bounded Android platform transport, and matched positional skeleton hit/fall routing on Windows. Final exact clean runtime commit `547d89d` / APK `f68fe4cccf2755ef579826080bf76364fe2a48744b23aba765df02a17e2d1dfa` passed the complete Full gate: matching installed APK, strict ASTC, honest RT presentation, 12/12 fresh Debug and Release CTests, Android build/lint, replay, 13 pixel-stable captures, and Home/resume. Sustained 75% medians were 11.340 / 12.145 / 9.267 / 10.375 / 13.035 / 23.069 ms; the last-in-order lich is retained as 30-50 FPS-band evidence at GPU thermal power level 2. Earlier exact `88868f4` diagnostics found flat graphics/native/PSS/RSS/thread state while Samsung reduced the GPU from 1300 MHz to 578-646 MHz at power level 7, supporting descriptive 60/50/30 FPS bands and matched-regression investigation instead of a hard 20 ms rule. The owner then reported “all good” on the exact final candidate and specifically observed the stagger-back/death sequence, closing the broad audio/haptic/stagger baseline without claiming calibrated positional accuracy. Published 0.1.3 artifacts remain unchanged. See `docs/CURRENT_DEVELOPMENT_BASELINE_VALIDATION_2026-08-21.md`.
+- Current reconciliation source includes Android press-down parry, animated skeleton stagger, listener-at-event-time feedback, bounded Android platform transport, and matched positional skeleton hit/fall routing on Windows. Final exact clean runtime commit `547d89d` / APK `f68fe4cccf2755ef579826080bf76364fe2a48744b23aba765df02a17e2d1dfa` passed the complete Full gate: matching installed APK, strict ASTC, honest RT presentation, 12/12 fresh Debug and Release CTests, Android build/lint, replay, 13 pixel-stable captures, and Home/resume. Sustained 75% medians were 11.340 / 12.145 / 9.267 / 10.375 / 13.035 / 23.069 ms; the last-in-order lich is retained as 30-50 FPS-band evidence at GPU thermal power level 2. Earlier exact `88868f4` diagnostics found flat graphics/native/PSS/RSS/thread state while Samsung reduced the GPU from 1300 MHz to 578-646 MHz at power level 7, supporting descriptive 60/50/30 FPS bands and matched-regression investigation instead of a hard 20 ms rule. The owner then reported “all good” on the exact final candidate and specifically observed the stagger-back/death sequence, closing the broad audio/haptic/stagger baseline without claiming calibrated positional accuracy. This runtime is now published in Showcase Alpha 0.1.4; see `docs/CURRENT_DEVELOPMENT_BASELINE_VALIDATION_2026-08-21.md` and `docs/SHOWCASE_ALPHA_0_1_4_RELEASE_VALIDATION_2026-08-22.md`.
 
 ## Audio/haptic manual-validation policy - locked 2026-08-21
 
