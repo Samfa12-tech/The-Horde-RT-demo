@@ -21,7 +21,7 @@ The default run:
 - requires a genuinely RT-produced frame to reach swapchain presentation;
 - measures `opening`, `two-enemy-combat`, `worst-bend`, `skylight`, `green`, and `lich` at 75%;
 - discards 120 warm-up frames, then records three consecutive 120-frame windows per checkpoint;
-- enforces the existing 20 ms median-of-window-averages gate and thermal status 0-3 ceiling for those six 75% checkpoints;
+- enforces the strict below-20.000 ms median-of-window-averages gate and thermal status 0-3 ceiling for those six 75% checkpoints; 18.500 ms inclusive to below 20.000 ms is `PASS - LOW HEADROOM`, while 20.000 ms or above is `FAIL`;
 - runs the deterministic 13-waypoint route through the finale;
 - checks the saved native state against the expected checkpoint, zone, window count, replay completion, and honest presentation state;
 - restores the screen to asleep if the script woke it, and always stops the debug app on exit.
@@ -87,7 +87,7 @@ Timing is CPU wall-clock time from frame start through `vkQueuePresentKHR`; it i
 
 The route replay uses the same shared walkable rectangles, obstacles, collision resolver, zone query, lantern/enemy updates, and rendered frame loop as normal play. Its fixed `0.032` world-unit step is independent of ADB gesture duration and display refresh rate. It detects stalls, wrong-zone arrivals, and failure to reach all 13 waypoints.
 
-It does not prove that touch controls feel good, that sound is audible or directional to a listener, that a screenshot looks artistically correct, or that lifecycle recovery works. Keep these short hands-on checks after meaningful input, audio, rendering, or lifecycle changes:
+It does not prove that touch controls feel good, that sound is audible or directional to a listener, or that a screenshot looks artistically correct. Its automated Home/resume check proves only the recorded lifecycle contract, not subjective comfort. Keep these short hands-on checks after meaningful input, visual, or lifecycle changes. Owner audio/haptic checks are separately change-triggered: every milestone must state `Audio/haptic manual revalidation required: YES/NO` with a reason, defaulting to `NO`; require `YES` only for material changes to spatialisation, source/listener event data, cue/backend/event/haptic routing, feedback timing, or damage/death semantics. The current reconciliation is `YES` because listener-at-event-time routing changes:
 
 1. Walk and look with both touch regions; fight both opening skeletons, then swing three accepted hits against the lich.
 2. Confirm the two skeletons remain readable, have distinguishable positional audio/haptic impacts, preserve corpse/survivor separation, and still retain the lich hit cries, charge/electricity, recoil, death, and moving roof.
@@ -97,4 +97,4 @@ It does not prove that touch controls feel good, that sound is audible or direct
 
 ## Current validation status
 
-The original shared checkpoint builders and route replay pass Windows host smoke tests. Android Debug and Release APKs compile with the automation enabled only for Debug. The first full live execution and a second corrected fast execution both passed on `SM-S948B`; see `ANDROID_SHOWCASE_AUTOMATION_VALIDATION_2026-07-17.md`. The later exact two-enemy run also passed the six-checkpoint 75% gate, matched GPU-timing A/B, 13-waypoint replay/captures, and Home/resume; see `TWO_SKELETON_COMBAT_ANDROID_VALIDATION_2026-08-12.md`. Hands-on Android showcase evidence remains recorded separately in `HORDE_SHOWCASE_ANDROID_VALIDATION_2026-07-17.md`.
+The original shared checkpoint builders and route replay pass Windows host smoke tests. Android Debug and Release APKs compile with the automation enabled only for Debug. The first full live execution and a second corrected fast execution both passed on `SM-S948B`; see `ANDROID_SHOWCASE_AUTOMATION_VALIDATION_2026-07-17.md`. Historical exact two-enemy commit `b3428a7` also passed the six-checkpoint 75% gate, matched GPU-timing A/B, 13-waypoint replay/captures, and Home/resume; see `TWO_SKELETON_COMBAT_ANDROID_VALIDATION_2026-08-12.md`. Exact `daa5892` later passed functionality/replay/captures/lifecycle but not the complete warm performance gate (lich 20.246 ms). Current `b9212e7+` press-edge/reconciliation source awaits final exact validation. Hands-on Android showcase evidence remains recorded separately in `HORDE_SHOWCASE_ANDROID_VALIDATION_2026-07-17.md`; owner-only release safety is in `OWNER_RELEASE_SAFETY_CHECKLIST.md`.

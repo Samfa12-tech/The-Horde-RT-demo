@@ -27,7 +27,7 @@ Parry uses its own monotonic input command. A skeleton strike succeeds as a parr
 
 ## Renderer
 
-The existing sword and right arm move across the view during parry; success adds a small bounded procedural jolt. Skeleton attack phases map to their existing Attack clip offsets, while stagger freezes at the contact pose and adds bounded whole-instance lean/recoil.
+The existing sword and right arm move across the view during parry; success adds a small bounded procedural jolt. Skeleton attack phases map to their existing Attack clip offsets. A stagger remains stationary to gameplay and token selection, but the existing Attack clip procedurally advances from contact toward recovery with a bounded whole-instance lean/recoil; the visible skeleton is not frozen at contact.
 
 The former parallel `CharacterRenderPlan` authority was removed. One cached `CharacterFramePlan` now drives both CPU skin/refit and TLAS routing. Matching skeleton poses still share one BLAS and divergent poses still use no more than two buckets. The renderer remains at nine BLAS and nineteen physical TLAS slots; the lich route remains singular and masked slots remain valid.
 
@@ -47,4 +47,4 @@ These results prove deterministic simulation, renderer contracts, platform compi
 
 The exact clean `daa5892` Debug APK (SHA-256 `a3eca0ed1ae49800541f1de95d329af8cb3bef50d53dac302a20238ade419302`) was installed byte-for-byte on `SM-S948B` and exercised by `reports/android-showcase-runs/run-20260821-160037`. Strict ASTC, honest RT presentation, all six checkpoint states, the 13-waypoint replay, all 13 captures, and Home/resume passed. Five 75% checkpoints remained below 20 ms; the lich median was 20.246 ms, so this warm run did not pass the strict complete performance gate. The report-only 100% opening median was 20.027 ms.
 
-The owner then reported that parry timing felt good in hands-on play, but that the Android button acted on release. The follow-up source revision publishes parry on `ACTION_DOWN` while retaining accessibility click activation and suppressing the matching release click. Per owner instruction, that press-edge revision was not rebuilt, reinstalled, or retested before merge; the installed APK and hands-on timing verdict therefore remain evidence for `daa5892`, not for the merged press-edge source.
+The owner then reported that parry timing felt good in hands-on play, but that the Android button acted on release. Commit `b9212e7` changed the Android command to `ACTION_DOWN` while retaining accessibility click activation and suppressing the matching release click. Per owner instruction, that press-edge revision was not rebuilt, reinstalled, or retested before merge; the installed APK and hands-on timing verdict therefore remain evidence for `daa5892`, not for `b9212e7+` current source. The current reconciliation also changes listener-at-event-time routing, so final host and exact-device revalidation is pending.
