@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-21
 
-**Status:** Exact Android automation, full Windows Host validation, CI, and owner spatial-audio validation passed. Sustained phone performance is now reported as evidence rather than judged against the former hard 20 ms rule. Exact-candidate haptic confirmation remains pending.
+**Status:** Final exact-source Windows/Android automation passed. Sustained phone performance is reported as evidence rather than judged against the former hard 20 ms rule. The final exact candidate's owner audio/haptic/stagger check remains pending.
 
 **Publication:** None. Showcase Alpha 0.1.3 artifacts, version identity, signing identity, and public downloads remain unchanged.
 
@@ -11,12 +11,27 @@
 - Starting local `main`: `b9212e77f7dd5eeb98a6527ff9b3c945ca90a820`.
 - Prior fully provenance-bound two-skeleton phone candidate: `b3428a7cb9b4f4d1ed3d77940bb7d4b177e4b5d6`.
 - Exact runtime/authority candidate: `4a4d360318d6b61900e51f3b2322afc47bcb48af`, clean at build and device validation time.
-- Runtime correction commit: `068ee50`.
+- Final exact runtime correction and validation commit: `547d89d00efa476b533176576c1cedc3a1d44cbd`, clean before and after the Full gate.
+- Principal runtime correction commits: `068ee50` and `547d89d`.
 - Embedded raygen SHA-256: `e0c79c848210a76d30e1036a67ded744dc9d51fe37827a52f89b5385028419d1`.
-- Debug APK SHA-256: `fa160e84ffd655a3504d4e19e5025b1addddc4f862586c38a2f5743811cd026a`.
+- Final Debug APK SHA-256: `f68fe4cccf2755ef579826080bf76364fe2a48744b23aba765df02a17e2d1dfa`.
 - Installed `base.apk` SHA-256: exact byte-for-byte match.
 
-The diff from `b3428a7` adds animation-owned swing/parry/lich contact semantics, Android press-down parry publication, the bounded animated stagger renderer mapping, event-time listener data, stronger tests and diagnostics, validation-tooling changes, and authority-document corrections. It does not change raygen/shader ABI, assets, published release artifacts, signing material, native RT dispatch, ray-query path tracing, recursion depth, ASTC policy, or presentation semantics.
+The diff from `b3428a7` adds animation-owned swing/parry/lich contact semantics, Android press-down parry publication, the bounded animated stagger renderer mapping, event-time listener data, matched platform skeleton-hit/fall routing, bounded Android transport, stronger tests and diagnostics, validation-tooling changes, and authority-document corrections. It does not change raygen/shader ABI, runtime model/audio assets, published release artifacts, signing material, native RT dispatch, ray-query path tracing, recursion depth, ASTC policy, or presentation semantics.
+
+The evidence-document commit necessarily follows the runtime commit it records. That documentation-only commit is not substituted for the exact installed runtime provenance above; the Full runner recorded `547d89d`, a clean tree, and the matching APK hashes directly.
+
+### Difference classification from the prior exact phone candidate
+
+| Category | Current differences |
+|---|---|
+| Gameplay-semantic | `SwordCombat` and `GameSimulation` action phases, active-window contact, parry/stagger, event-time listener state, snapshots and diagnostics. |
+| Renderer | `CharacterRenderSlot`, frame adapter, scene slot/descriptor/TLAS mapping, animated stagger composition, and overlay exposure. |
+| Shader | No later shader-source or ABI change; binding 10/custom index 18 and the embedded raygen identity were rechecked. |
+| Audio/event | Bounded ordered events, Android transport, Windows/Android positional cue mapping, fixed 140 ms impact/fall delay, and stale delayed-cue cancellation. |
+| Validation tooling | Schema-7 sustained performance bands, exact artifact/device provenance, capture comparison, and safety/package gates. |
+| Tests only | Mailbox, simulation/event, spatial audio/platform mapping, renderer/shader mapping, timing, route, and overlay regressions. |
+| Documentation only | Current authority, historical evidence qualifications, owner-test trigger policy, licensing risk, and signing-safety checklist. |
 
 ## Architecture
 
@@ -39,11 +54,15 @@ The diff from `b3428a7` adds animation-owned swing/parry/lich contact semantics,
 - Multiple fixed ticks inside one render frame retain distinct listener poses at event emission time.
 - Spatial-audio tests retain equal-power pan, deterministic left/right gains, distance rolloff, obstruction attenuation, and event-time listener position/yaw behavior without mutating the source position.
 - Event tests retain ordering, sequence, stable entity identity, targetless miss semantics, A/B hit/defeat ordering, fatal-versus-nonfatal damage semantics, and explicit overflow without overwrite.
+- Feedback tests cover skeleton footsteps/attack/hit/defeat, lich charge/impact/hit/defeat, both stable skeleton IDs, the exact 140 ms impact/fall boundary, retained event-time source/listener data, repeated same-type ordering, cancellation on reset/retry/lifecycle, and matching Windows/Android platform mappings.
+- Android's 128-entry handoff uses a fixed-capacity transport queue that drops only the newest event on overflow; the permanent overflow count remains visible in diagnostics.
 - The mailbox stress uses one writer, four synchronized readers, 125,000 publications, full-field coherence, per-reader monotonicity, final-publication visibility, and a 30-second watchdog.
 - Renderer tests cover swing/parry composition, animated stagger sampling/recoil/settle, shared stagger pose reuse, split pose buckets, masked slots, two TLAS transforms, and singular lich routing.
 
 ## Host and CI
 
+- Final Full run `reports/foundation-runs/run-20260821-184821` passed every stage from clean commit `547d89d`: shader staleness and negative fixtures, fresh Windows Debug/Release builds, 12/12 CTests in each configuration, 13 Windows captures, Android Debug/unsigned Release/lint across four ABIs, package/licence/release-identity safeguards, exact device automation, and final hashes.
+- The final 13 Windows captures are pixel-identical to the locked 13-capture baseline. Matched overall capture timing changed from 6.0618 to 6.05565 ms (-0.101%).
 - Shader staleness passed. Negative stale-shader, immutable-release, version-code, upload, and package-layout safety gates rejected their fixtures as expected.
 - Canonical clean Host run `reports/foundation-runs/run-20260821-170907` passed fresh Windows Debug and Release builds with 12/12 Vulkan-enabled CTests in each configuration. An earlier run had two Release programs blocked before launch by Smart App Control; the clean retry produced new hashes that launched normally without changing Windows Security.
 - A separate local portable configuration passed 8/8 Vulkan-disabled tests.
@@ -56,7 +75,24 @@ The diff from `b3428a7` adds animation-owned swing/parry/lich contact semantics,
 
 Device evidence is direct local automation on Samsung `SM-S948B`, Android 16/API 36, Adreno 840, driver 512.842.19, Vulkan 1.4.295. The local and installed exact Debug APK hashes matched. Strict environment/lich ASTC, `RayTracingPipeline`, and RT-produced swapchain presentation remained active.
 
-The first default-order run began at battery 29.0 C and ended at 37.0 C. Opening, two-enemy, worst-bend, skylight, and green passed, while last-in-order lich measured 23.568 ms and failed. That hot run is retained rather than relabelled. It separately passed the report-only 100% opening sample, deterministic replay, all captures, and lifecycle checks.
+### Final exact sustained Full run
+
+The standard single-process order was retained. The device stayed at Android thermal status 0 while Samsung's GPU thermal power level rose from 0 to 2. The lich crossed the descriptive 20 ms / 50 FPS line; it did not fail the run because state, workload, RT presentation, and provenance remained valid.
+
+| Checkpoint | Three 120-frame averages | Median | Derived FPS | Band | Thermal / GPU power |
+|---|---:|---:|---:|---|---:|
+| opening | 11.410 / 11.340 / 11.308 ms | **11.340 ms** | 88.183 | 60 FPS reference or better | 0 / 0 |
+| two-enemy-combat | 12.145 / 12.074 / 12.167 ms | **12.145 ms** | 82.338 | 60 FPS reference or better | 0 / 0 |
+| worst-bend | 9.159 / 9.267 / 9.439 ms | **9.267 ms** | 107.910 | 60 FPS reference or better | 0 / 1 |
+| skylight | 9.698 / 10.390 / 10.375 ms | **10.375 ms** | 96.386 | 60 FPS reference or better | 0 / 2 |
+| green | 13.035 / 13.423 / 12.999 ms | **13.035 ms** | 76.717 | 60 FPS reference or better | 0 / 2 |
+| lich | 23.604 / 22.943 / 23.069 ms | **23.069 ms** | 43.348 | 30-50 FPS reference band | 0 / 2 |
+
+The separately reported final 100% opening windows were 24.227 / 22.837 / 22.645 ms, with a **22.837 ms** median (43.789 FPS, 30-50 FPS reference band) at thermal status 0 / GPU power level 3.
+
+### Earlier attribution controls
+
+The first default-order run began at battery 29.0 C and ended at 37.0 C. Opening, two-enemy, worst-bend, skylight, and green passed, while last-in-order lich measured 23.568 ms and failed under the hard gate then in force. That historical result is retained rather than relabelled. It separately passed the report-only 100% opening sample, deterministic replay, all captures, and lifecycle checks.
 
 After cooling, the exact installed APK ran the same six 75% checkpoint workloads with lich first to control run-order heating:
 
@@ -71,7 +107,7 @@ After cooling, the exact installed APK ran the same six 75% checkpoint workloads
 
 Every recorded median remained below the 20.000 ms / 50 FPS reference in this controlled order with honest presentation at thermal status 0. This is useful diagnostic evidence, but cooling and putting the heaviest checkpoint first do not describe an ordinary sustained play session and are no longer used to manufacture a binary pass.
 
-The separately reported 100% opening median from the exact default-order run was **23.621 ms**.
+The separately reported 100% opening median from that earlier exact default-order run was **23.621 ms**.
 
 ## GPU-timing A/B
 
@@ -113,6 +149,8 @@ A Game Mode experiment was also rejected rather than retained. Standard and Perf
 
 Primary ignored evidence bundles:
 
+- final exact clean Full gate: `reports/foundation-runs/run-20260821-184821`;
+- final exact Android run: `reports/foundation-runs/run-20260821-184821/android-device/run-20260821-185117`;
 - full default-order functionality/captures/lifecycle and hot performance context: `reports/android-showcase-runs/run-20260821-163426`;
 - cooled six-checkpoint pass: `reports/android-showcase-runs/run-20260821-164739`;
 - matched timing-disabled lich: `reports/android-showcase-runs/run-20260821-165402`;
@@ -121,20 +159,22 @@ Primary ignored evidence bundles:
 
 ## Audio and haptics
 
-`Audio/haptic manual revalidation required: YES` because listener-at-event-time routing materially changes the semantic data used for spatialisation on both platforms.
+`Audio/haptic manual revalidation required: YES` because listener-at-event-time routing, bounded Android event transport, and Windows skeleton hit/fall timing materially touch feedback delivery.
 
-With the exact candidate still installed and open, the owner reported: “the audio sounds good.” This is owner-reported physical-device perception covering the requested spatial-audio check; automation alone did not establish it.
+With the earlier exact candidate still installed and open, the owner reported: “the audio sounds good.” This is valid physical-device evidence for that candidate, but the final `547d89d` transport/timing correction intentionally triggers one final check rather than silently inheriting it.
 
-**Spatial audio owner baseline: PASSED.**
+**Final exact spatial-audio owner baseline: PENDING.**
 
-**Haptic owner baseline on this exact candidate: PENDING.**
+**Final exact haptic owner baseline: PENDING.**
+
+**Final exact stagger-readability owner check: PENDING.**
 
 After this exact check passes, the accepted baseline is change-triggered rather than milestone-triggered. Recheck only changes that can materially affect source/listener event data, spatialisation, audio cues/assets/backend/gain/timing, semantic event transport/mapping, haptic routing/pattern/intensity, or damage/death feedback. Unrelated RT, visual, UI, asset, build, packaging, documentation, telemetry, unrelated AI, or unrelated animation changes do not automatically invalidate it when automated contracts pass.
 
 ## Evidence boundary and remaining risks
 
 - Automated evidence proves only the exact source/APK/device/driver and recorded deterministic routes. It does not prove another device, subjective comfort, artistic quality, or untested future source.
-- Exact-candidate haptic perception remains pending; automation cannot replace it.
+- Final exact-candidate audio/haptic perception and stagger readability remain pending; automation cannot replace them.
 - Current sustained results cross the 20 ms / 50 FPS reference in several views as the device governor limits GPU frequency. Track this honestly and investigate matched source regressions above 15%; do not spend development cycles cooling the phone merely to obtain a pass label.
 - Hotstrike Studio skeleton finished-game use is credited, but public raw-source redistribution permission remains unresolved in GitHub issue 13. Do not publish source model files without explicit owner-approved resolution.
 - The owner-only signing backup/recovery checklist remains deliberately unchecked in `OWNER_RELEASE_SAFETY_CHECKLIST.md`. No signing secret was accessed, copied, or committed.
