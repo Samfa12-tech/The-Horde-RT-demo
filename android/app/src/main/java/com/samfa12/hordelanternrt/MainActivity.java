@@ -113,6 +113,7 @@ public class MainActivity extends Activity {
     private TextView vitalityStatus;
     private Button attackButton;
     private Button parryButton;
+    private boolean parryRequestedOnTouchDown;
     private SoundPool soundPool;
     private Vibrator vibrator;
     private String reportText = "";
@@ -198,8 +199,33 @@ public class MainActivity extends Activity {
             ProbeBridge.requestAttack();
         });
         parryButton.setOnClickListener(view -> {
+            if (parryRequestedOnTouchDown) {
+                parryRequestedOnTouchDown = false;
+                return;
+            }
             if (menuVisible || diagnosticsVisible || deathOverlayVisible || ProbeBridge.getRuntimeState() != 1) return;
             ProbeBridge.requestParry();
+        });
+        parryButton.setOnTouchListener((view, event) -> {
+            switch (event.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    parryRequestedOnTouchDown = true;
+                    view.setPressed(true);
+                    if (!menuVisible && !diagnosticsVisible && !deathOverlayVisible && ProbeBridge.getRuntimeState() == 1) {
+                        ProbeBridge.requestParry();
+                    }
+                    return true;
+                case MotionEvent.ACTION_UP:
+                    view.setPressed(false);
+                    view.performClick();
+                    return true;
+                case MotionEvent.ACTION_CANCEL:
+                    parryRequestedOnTouchDown = false;
+                    view.setPressed(false);
+                    return true;
+                default:
+                    return true;
+            }
         });
         diagnosticsBack.setOnClickListener(view -> {
             playSound("ui_back", 0.18f);

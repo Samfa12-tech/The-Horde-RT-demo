@@ -20,7 +20,7 @@ Parry uses its own monotonic input command. A skeleton strike succeeds as a parr
 
 ## Platform and feedback
 
-- Android publishes `requestParry()` through the existing coherent JNI mailbox and adds a 104 x 72 dp `PARRY` button beside `SWING`. Both controls autosize their single-line labels and share the existing HUD/menu/death/automation visibility rules.
+- Android publishes `requestParry()` on the `PARRY` button's `ACTION_DOWN` edge through the existing coherent JNI mailbox; the click path remains available for accessibility activation without double-publication on touch release. The 104 x 72 dp button sits beside `SWING`; both controls autosize their single-line labels and share the existing HUD/menu/death/automation visibility rules.
 - Windows publishes the same independent command on non-repeating `Q` input.
 - Success reuses the existing `sword_hit_2` metal-impact cue. Android adds a distinct 34 ms amplitude-235 vibration, with platform fallbacks when amplitude control is unavailable.
 - Developer state exposes the last consumed parry sequence plus readable player and token-holder action phases.
@@ -43,6 +43,8 @@ The former parallel `CharacterRenderPlan` authority was removed. One cached `Cha
 
 These results prove deterministic simulation, renderer contracts, platform compilation, and unchanged deterministic imagery. They do not prove phone thermals, physical button reach, parry forgiveness, perceived telegraph/contact, clang/haptic distinction, or combat feel.
 
-## Device gate
+## Device evidence and press-edge boundary
 
-Pending exact-candidate `SM-S948B` validation. The required run is the standard six-checkpoint 75% gate below 20 ms at thermal status 0-3, with 100% reported separately, all 13 captures, replay, and Home/resume. The phone must remain awake/unlocked during automation. Hands-on parry feel remains an owner judgment after the exact APK is installed.
+The exact clean `daa5892` Debug APK (SHA-256 `a3eca0ed1ae49800541f1de95d329af8cb3bef50d53dac302a20238ade419302`) was installed byte-for-byte on `SM-S948B` and exercised by `reports/android-showcase-runs/run-20260821-160037`. Strict ASTC, honest RT presentation, all six checkpoint states, the 13-waypoint replay, all 13 captures, and Home/resume passed. Five 75% checkpoints remained below 20 ms; the lich median was 20.246 ms, so this warm run did not pass the strict complete performance gate. The report-only 100% opening median was 20.027 ms.
+
+The owner then reported that parry timing felt good in hands-on play, but that the Android button acted on release. The follow-up source revision publishes parry on `ACTION_DOWN` while retaining accessibility click activation and suppressing the matching release click. Per owner instruction, that press-edge revision was not rebuilt, reinstalled, or retested before merge; the installed APK and hands-on timing verdict therefore remain evidence for `daa5892`, not for the merged press-edge source.

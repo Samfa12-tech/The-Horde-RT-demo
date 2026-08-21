@@ -1,6 +1,6 @@
 # Horde Lantern RT - Project Memory
 
-Last updated: 2026-08-11
+Last updated: 2026-08-21
 
 ## Identity and release state
 
@@ -135,9 +135,10 @@ Last updated: 2026-08-11
 - `SwordCombat` now publishes explicit player swing/parry phases and skeleton locomotion/wind-up/active/recovery/stagger/dead actions. Sword and skeleton damage each resolve once on entry to their visible active window; off-angle, out-of-range, and recovery contacts miss.
 - Lich sword damage is no longer accepted on the command edge. The shared player active-contact pulse must pass the same range/cone test before the existing lich two-second lockout accepts one of its three hits.
 - Android and Windows publish an independent monotonic parry sequence. A 40 ms startup plus 220 ms active window can cancel a real frontal skeleton strike, emit `PlayerParrySucceeded`, and hold that attacker/token in an 800 ms stationary stagger. Failed parry completes 240 ms recovery; success permits a normal next-tick riposte. Unavailable and death-state inputs are consumed without buffering.
-- Android adds a 104 x 72 dp `PARRY` button beside `SWING`, reuses `sword_hit_2` for the clang, and routes success to a distinct short strong vibration. Windows binds `Q`. Diagnostics expose the consumed parry sequence and readable player/attacker action phases.
+- Android adds a 104 x 72 dp `PARRY` button beside `SWING`, publishes its monotonic command on touch-down while retaining accessibility click activation without release double-fire, reuses `sword_hit_2` for the clang, and routes success to a distinct short strong vibration. Windows binds `Q`. Diagnostics expose the consumed parry sequence and readable player/attacker action phases.
 - Renderer composition reuses the existing sword/right arm and Attack clip. Stagger freezes near contact with bounded whole-instance recoil/lean. `CharacterRenderSlot` now caches one frame plan for skin/refit and TLAS; nine BLAS, nineteen physical TLAS slots, and the two-pose-bucket ceiling remain unchanged.
-- Windows Debug/Release each pass all 12 CTests. The fresh Host foundation run `reports/foundation-runs/run-20260813-204944` passed shader staleness/negative gates, fresh builds/tests, 13 captures, Android Debug/Release/lint across four ABIs, packaging/licence checks, and evidence hashes. All 13 Windows captures are pixel-identical to the exact two-skeleton baseline; matched capture timing changed by 0.178%. Exact-device Android performance and hands-on parry feel remain separate gates until recorded.
+- Windows Debug/Release each pass all 12 CTests. The fresh Host foundation run `reports/foundation-runs/run-20260813-204944` passed shader staleness/negative gates, fresh builds/tests, 13 captures, Android Debug/Release/lint across four ABIs, packaging/licence checks, and evidence hashes. All 13 Windows captures are pixel-identical to the exact two-skeleton baseline; matched capture timing changed by 0.178%.
+- Exact clean `daa5892` Debug APK `a3eca0ed1ae49800541f1de95d329af8cb3bef50d53dac302a20238ade419302` installed byte-for-byte on `SM-S948B`. Strict ASTC, honest RT presentation, six checkpoint states, replay, 13 captures, and Home/resume passed; the warm 75% run was not a complete performance pass because lich measured 20.246 ms. The owner reported that parry timing felt good and requested press rather than release dispatch. The subsequent `ACTION_DOWN` source change was intentionally merged without rebuild, reinstall, or retest, so the installed exact-APK and hands-on evidence do not cover that follow-up revision.
 - Detailed implementation evidence: `docs/ANIMATION_COMBAT_PARRY_SLICE_2026-08-13.md`.
 
 ## Asset and licence state
