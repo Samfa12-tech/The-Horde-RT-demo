@@ -32,6 +32,7 @@ enum class GameplayEventType : std::uint8_t
     LichImpact,
     LichDefeated,
     FinaleCompleted,
+    PlayerParrySucceeded,
 };
 
 struct GameplayEvent

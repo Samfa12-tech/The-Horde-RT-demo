@@ -8,12 +8,12 @@ The `android/` module is the supported phone path for Horde Lantern RT. It owns 
 - JNI/Vulkan bridge: `app/src/main/cpp/android_probe_bridge.cpp`
 - Shared native source manifest: `../cmake/HordeRtSources.cmake`
 - Shared fixed-step gameplay authority: `../src/gameplay/simulation/GameSimulation.cpp`
-- Coherent JNI input publication through the two-slot `InputMailbox`, with monotonic attack/reset/retry counters
+- Coherent JNI input publication through the two-slot `InputMailbox`, with independent monotonic attack/parry/reset/retry counters
 - Ordered semantic gameplay events with per-event spatial gains drive SoundPool and haptics without collapsing repeated cues
 - Native Vulkan RT presentation through the Android swapchain
 - Optional Vulkan timestamp queries report a separate GPU RT command-buffer interval without changing CPU benchmark pass/fail
 - One frame in flight while the held-prop TLAS uses a host-written instance buffer
-- Portrait-first branded entry/pause/settings/controls/diagnostics/credits UI; touch movement/look and `SWING`; a bounded two-skeleton opening encounter followed by a singular lich route; layered articulated body/head with a smoothed walk gait, lantern-drop sequence, coloured bays, mirror, sliding-roof dawn reveal, and Continue/Begin Again/Quit ending; strict ASTC assets; and phone-safe ray-query shading inside `vkCmdTraceRaysKHR`
+- Portrait-first branded entry/pause/settings/controls/diagnostics/credits UI; touch movement/look plus `SWING` and `PARRY`; a bounded two-skeleton opening encounter followed by a singular lich route; layered articulated body/head with a smoothed walk gait, lantern-drop sequence, coloured bays, mirror, sliding-roof dawn reveal, and Continue/Begin Again/Quit ending; strict ASTC assets; and phone-safe ray-query shading inside `vkCmdTraceRaysKHR`
 - Persisted SFX volume, look sensitivity, compact HUD, and 50-100% RT render scale; seventeen FilmCow clips play through SoundPool
 - The in-app Credits & Licences panel carries Poly Haven, FilmCow, Hotstrike Studio, Meshy, and generated-icon provenance with the APK
 - Native libraries use a static C++ runtime plus 16 KiB ELF alignment; the packaging gate verifies 16 KiB APK/ELF alignment and rejects an r26 `libc++_shared.so`

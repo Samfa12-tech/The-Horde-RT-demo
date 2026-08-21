@@ -53,7 +53,15 @@ The renderer exposes two skeleton instances and no more than two measured pose b
 
 This candidate does not change `vkCmdTraceRaysKHR`, `rayQueryEXT`, recursion depth one, one frame in flight, strict ASTC, swapchain presentation semantics, release identity, or published artifacts. Host validation and explicit capture review are necessary but not sufficient: promotion requires matched cooled `SM-S948B` timing-enabled/disabled evidence, the six-checkpoint 75% gate below 20 ms, separate 100% reporting, lifecycle checks, and hands-on combat/readability/audio/haptic checks. More than two enemies remains out of scope.
 
-The automated `SM-S948B` requirements passed on 2026-08-12 for exact clean commit `b3428a7`: matched cooled lich A/B was 19.497 ms enabled / 19.268 ms disabled, all six 75% checkpoints stayed below 20 ms, 100% opening was reported separately, and replay, 13 captures, and Home/resume passed. Owner hands-on readability, cue distinction, comfort, and combat-feel judgment remains the final promotion boundary.
+The automated `SM-S948B` requirements passed on 2026-08-12 for exact clean commit `b3428a7`: matched cooled lich A/B was 19.497 ms enabled / 19.268 ms disabled, all six 75% checkpoints stayed below 20 ms, 100% opening was reported separately, and replay, 13 captures, and Home/resume passed. The owner then reported that hands-on play on the still-installed exact candidate “feels fine,” closing the broad two-enemy promotion boundary without independently certifying every positional-audio or haptic cue.
+
+## Animation-owned combat and timed-parry decision - 2026-08-13
+
+Player swing, parry, skeleton strike, and stagger timing belong to the shared fixed-step gameplay authority. Player swing uses wind-up/active/recovery boundaries `0-0.18 / 0.18-0.34 / 0.34-0.56 s`; skeleton melee uses `0-1.12 / 1.12-1.30 / 1.30-2.80 s`. Damage resolves once at visible active contact. The lich consumes the same player active-window range/cone contact pulse while retaining three health, its two-second accepted-hit lockout, recoil, cries, death, and finale.
+
+Parry is a separate monotonic edge command and a skeleton-only timed action: 40 ms startup, 220 ms active, and 240 ms failed recovery. Android publishes that edge on `PARRY` touch-down, while retaining click activation for accessibility without republishing on release; Windows continues to use non-repeating `Q` key-down. A real in-range frontal skeleton contact during the active phase emits one entity-aware success event, suppresses damage, and freezes that token holder for 800 ms. Successful recovery ends on the next fixed tick so a normal unassisted riposte may begin immediately. Unavailable inputs are consumed without buffering; parry never affects the lich.
+
+Rendering maps these states onto existing sword/arm transforms and the existing skeleton Attack clip. `CharacterRenderSlot` has one cached frame plan shared by skin/refit and TLAS routing. The fixed nine-BLAS, nineteen-slot TLAS, two-pose-bucket, recursion-one, strict-ASTC, one-frame-in-flight, and honest `vkCmdTraceRaysKHR` presentation contracts remain unchanged. Alpha 0.1.3 artifacts remain immutable and this milestone is not published automatically.
 
 ## Target devices
 

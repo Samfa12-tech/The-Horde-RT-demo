@@ -53,6 +53,9 @@ int main()
     snapshot.activeSkinnedEnemies = 2;
     snapshot.activeEnemyEntityCount = 2;
     snapshot.attackerEntityId = 2;
+    snapshot.playerCombatAction = horde::gameplay::PlayerCombatAction::ParryActive;
+    snapshot.attackerCombatAction = horde::gameplay::EnemyCombatAction::AttackActive;
+    snapshot.hasAttackerCombatAction = true;
     snapshot.skeletonPoseBucketCount = 2;
     snapshot.enemyHealth = 2;
     snapshot.renderScale = 0.75f;
@@ -71,6 +74,7 @@ int main()
     snapshot.eventQueueOverflowCount = 0;
     snapshot.inputPublicationSequence = 42;
     snapshot.consumedAttackSequence = 5;
+    snapshot.consumedParrySequence = 4;
     snapshot.consumedRouteResetSequence = 2;
     snapshot.consumedRetrySequence = 1;
     snapshot.presented = true;
@@ -84,9 +88,10 @@ int main()
     ok &= RequireContains(text, "SCENE finale  |  lantern settled  |  lich charging hp 2");
     ok &= RequireContains(text, "PLAYER dying  |  vitality 0/3  |  damage OFF");
     ok &= RequireContains(text, "SIM 1 ticks  |  accum 2.5 ms  |  overruns 2");
-    ok &= RequireContains(text, "EVENTS 3 queued / 7 high / 0 overflow  |  input 42  |  cmd 5/2/1");
+    ok &= RequireContains(text, "EVENTS 3 queued / 7 high / 0 overflow  |  input 42  |  cmd 5/4/2/1");
     ok &= RequireContains(text, "AS 9 BLAS / 1 TLAS / 19 inst  |  skinned 2");
-    ok &= RequireContains(text, "COMBAT 2 active  |  attacker 2  |  pose buckets 2");
+    ok &= RequireContains(text,
+                          "COMBAT 2 active  |  attacker 2  |  player parry-active  |  enemy attack-active  |  pose buckets 2");
     ok &= RequireContains(text, "MAT ASTC test route");
 
     snapshot.presented = false;
@@ -97,12 +102,15 @@ int main()
     snapshot.gpuRtTimingStatus = "Queue timestamps unsupported";
     snapshot.activeEnemyEntityCount = 0;
     snapshot.attackerEntityId = -1;
+    snapshot.playerCombatAction = horde::gameplay::PlayerCombatAction::Idle;
+    snapshot.hasAttackerCombatAction = false;
     snapshot.skeletonPoseBucketCount = 0;
     const std::string inactiveText = horde::ui::BuildDeveloperOverlayText(snapshot);
     ok &= RequireContains(inactiveText, "presented NO");
     ok &= RequireContains(inactiveText, "none inactive");
     ok &= RequireContains(inactiveText, "GPU RT N/A  |  Queue timestamps unsupported");
-    ok &= RequireContains(inactiveText, "COMBAT 0 active  |  attacker none  |  pose buckets 0");
+    ok &= RequireContains(inactiveText,
+                          "COMBAT 0 active  |  attacker none  |  player idle  |  enemy none  |  pose buckets 0");
     if (inactiveText.find(" hp ") != std::string::npos)
     {
         std::cerr << "Developer overlay printed health for an encounter without a health value.\n";

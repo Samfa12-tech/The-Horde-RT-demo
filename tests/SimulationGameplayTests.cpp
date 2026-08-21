@@ -83,8 +83,8 @@ int main()
         attacks.AdvanceFrame(attackInput, 1.0 / 60.0, 2u);
     }
     check(attacks.Snapshot().lastConsumedAttackSequence == 2u &&
-          CountEvents(attacks.Events(), GameplayEventType::PlayerSwing) == 2u,
-          "N and N+1 must both survive publication and serialize through the sword action");
+          CountEvents(attacks.Events(), GameplayEventType::PlayerSwing) == 1u,
+          "an unavailable attack command must be consumed once without delayed buffering");
 
     const auto swingEvents = attacks.Events().Events();
     std::uint64_t firstSwingSequence = 0u;
@@ -104,8 +104,8 @@ int main()
             }
         }
     }
-    check(firstSwingSequence != 0u && secondSwingSequence > firstSwingSequence,
-          "serialized swings must remain separate semantic events");
+    check(firstSwingSequence != 0u && secondSwingSequence == 0u,
+          "rejected unavailable swings must not emit a false semantic event");
     check(std::all_of(swingEvents.begin(), swingEvents.end(), [](const GameplayEvent& event)
           {
               return event.type != GameplayEventType::PlayerSwing || event.target == EntityId::Invalid;
@@ -225,6 +225,52 @@ int main()
     check(pairSwingCount == 2u && pairSwingsAreTargetless,
           "swing-intent events must stay targetless until an actual entity-aware hit resolves");
 
+    GameSimulation parrySimulation;
+    InputSnapshot parryInput;
+    parryInput.hasAuthoritativePlayerPose = true;
+    parryInput.authoritativePlayerX = -0.75f;
+    parryInput.authoritativePlayerZ = -3.20f;
+    parryInput.yawRadians = 0.0f;
+    parryInput.damageEnabled = true;
+    bool parryIssued = false;
+    for (int frame = 0; frame < 360 &&
+         CountEvents(parrySimulation.Events(), GameplayEventType::PlayerParrySucceeded) == 0u;
+         ++frame)
+    {
+        const auto& attacker = parrySimulation.Snapshot().skeletonEnemies[0];
+        if (!parryIssued && attacker.action == EnemyCombatAction::AttackWindup &&
+            attacker.actionTime >= 0.98f)
+        {
+            parryInput.commands.parry = 1u;
+            parryIssued = true;
+        }
+        parrySimulation.AdvanceFrame(parryInput, 1.0 / 60.0, frame + 1u);
+    }
+    const auto parryEvents = parrySimulation.Events().Events();
+    const auto parryEvent = std::find_if(parryEvents.begin(), parryEvents.end(), [](const GameplayEvent& event)
+    {
+        return event.type == GameplayEventType::PlayerParrySucceeded;
+    });
+    check(parrySimulation.Snapshot().lastConsumedParrySequence == 1u &&
+          parryEvent != parryEvents.end() &&
+          parryEvent->source == EntityId::Player &&
+          parryEvent->target == EntityId::SkeletonA &&
+          parrySimulation.Snapshot().playerVitals.vitality == PlayerVitals::kMaxVitality,
+          "a successful parry must consume its independent sequence, suppress damage, and emit one entity-aware event");
+    for (int frame = 0; frame < 10; ++frame)
+    {
+        parrySimulation.AdvanceFrame(parryInput, 1.0 / 60.0);
+    }
+    check(CountEvents(parrySimulation.Events(), GameplayEventType::PlayerParrySucceeded) == 1u,
+          "re-reading one parry sequence must not repeat its semantic event");
+
+    InputSnapshot spamParry = parryInput;
+    spamParry.commands.parry = 3u;
+    parrySimulation.AdvanceFrame(spamParry, 1.0 / 60.0);
+    check(parrySimulation.Snapshot().lastConsumedParrySequence == 3u &&
+          CountEvents(parrySimulation.Events(), GameplayEventType::PlayerParrySucceeded) == 1u,
+          "unavailable parry commands must be consumed without delayed buffering");
+
     pairInput.commands.retry = 1u;
     skeletonPair.AdvanceFrame(pairInput, 1.0 / 60.0);
     check(skeletonPair.Snapshot().activeSkeletonCount == 2u &&
@@ -268,8 +314,14 @@ int main()
     lichHitInput.authoritativePlayerZ = retry.Snapshot().lich.z;
     lichHitInput.commands.attack = 1u;
     retry.AdvanceFrame(lichHitInput, 1.0 / 60.0);
+    check(retry.Snapshot().lich.health == 3,
+          "the lich must not take damage on the swing input edge");
+    for (int frame = 0; frame < 20 && retry.Snapshot().lich.health == 3; ++frame)
+    {
+        retry.AdvanceFrame(lichHitInput, 1.0 / 60.0);
+    }
     check(retry.Snapshot().lich.health == 2,
-          "seam-persistence setup must damage the live lich exactly once");
+          "the live lich must take exactly one hit when the sword enters its active window");
 
     InputSnapshot outsideInput = lichHitInput;
     outsideInput.authoritativePlayerX = 50.0f;
@@ -311,6 +363,33 @@ int main()
           NearlyEqual(retry.Snapshot().playerZ, kPlayerSpawn.z) &&
           NearlyEqual(retry.Snapshot().playerPitchRadians, 0.0f),
           "a paused route reset must restore the live opening pose with zero pitch once");
+
+    GameSimulation deadRejectsParry;
+    InputSnapshot lethalInput;
+    lethalInput.hasAuthoritativePlayerPose = true;
+    lethalInput.authoritativePlayerX = -0.75f;
+    lethalInput.authoritativePlayerZ = -3.40f;
+    lethalInput.damageEnabled = true;
+    for (int frame = 0; frame < 700 && deadRejectsParry.Snapshot().playerAlive; ++frame)
+    {
+        deadRejectsParry.AdvanceFrame(lethalInput, 1.0 / 60.0);
+    }
+    lethalInput.commands.parry = 1u;
+    deadRejectsParry.AdvanceFrame(lethalInput, 1.0 / 60.0);
+    check(deadRejectsParry.Snapshot().lastConsumedParrySequence == 1u &&
+          deadRejectsParry.Snapshot().playerCombat.action == PlayerCombatAction::Idle,
+          "death-state parry input must be consumed without starting or buffering an action");
+
+    GameSimulation pausedRejectsParry;
+    InputSnapshot pausedParryInput;
+    pausedParryInput.paused = true;
+    pausedParryInput.commands.parry = 1u;
+    pausedRejectsParry.StepFixed(pausedParryInput);
+    pausedParryInput.paused = false;
+    pausedRejectsParry.StepFixed(pausedParryInput);
+    check(pausedRejectsParry.Snapshot().lastConsumedParrySequence == 1u &&
+          pausedRejectsParry.Snapshot().playerCombat.action == PlayerCombatAction::Idle,
+          "paused parry input must be consumed without starting after resume");
 
     GameSimulation resetParity;
     check(resetParity.ApplyShowcaseCheckpoint(0) &&

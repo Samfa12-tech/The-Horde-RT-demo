@@ -1,6 +1,6 @@
 # Horde Lantern RT - Project Memory
 
-Last updated: 2026-08-11
+Last updated: 2026-08-21
 
 ## Identity and release state
 
@@ -102,7 +102,7 @@ Last updated: 2026-08-11
 ## Shared deterministic simulation foundation
 
 - Windows and Android now consume one fixed 60 Hz `GameSimulation` for player pose/movement/collision, walk state, lantern, encounter selection, skeleton and lich actions, vitality/death/retry, finale progression, and semantic events.
-- Android JNI publishes complete `InputSnapshot` values through a reader-pinned two-slot mailbox; attack, route reset, and retry use monotonic counters so repeated requests cannot collapse into one boolean.
+- Android JNI publishes complete `InputSnapshot` values through a reader-pinned two-slot mailbox; swing, parry, route reset, and retry use independent monotonic counters so repeated requests cannot collapse into one boolean.
 - A fixed-capacity 64-event queue uses stable player/skeleton/lich IDs and unique event sequences. Windows maps drained events to XAudio; Android forwards ordered event records with per-event spatial gains to SoundPool and haptics. Nonfatal accepted hits emit `PlayerDamaged`; the lethal hit emits only `PlayerKilled`, preventing duplicate fatal feedback.
 - The shared fixed-step runner clamps a render contribution at 100 ms, permits up to eight catch-up ticks, reports overruns, normalises diagonal movement at 1.9 m/s, and resets its accumulator across pause/lifecycle/reset/retry/checkpoint transitions.
 - `SimulationFrameAdapter.cpp` is the single `SimulationSnapshot` to `RtSceneFrameInputs` conversion. `PresentableTinyRtScene`, shader ABI, raygen, RT dispatch/presentation, and public release identity remain unchanged.
@@ -129,6 +129,17 @@ Last updated: 2026-08-11
 - Host validation passed. Exact clean-commit `SM-S948B` evidence then passed matched cooled lich A/B (19.497 ms timing enabled / 19.268 ms disabled, 1.188% difference), all six 75% checkpoints below 20 ms, 13/13 replay/captures, 18.674 ms report-only 100% opening, and Home/resume. The owner subsequently reported that hands-on play on that still-installed exact candidate "feels fine," closing the broad subjective promotion gate without creating a detailed cue-by-cue audio/haptic certification. See `docs/TWO_SKELETON_COMBAT_ANDROID_VALIDATION_2026-08-12.md`.
 - PRs #10 and #11 merged to `main` at `6ec3119`. Final review preserved the historical 140 ms separation between Android sword impact and enemy-fall audio, exposed platform-event overflow in diagnostics, and removed duplicate lethal-hit haptics. The owner subsequently reported that controls, audio, and haptics all worked correctly hands-on on `SM-S948B`. This is owner-reported development-build evidence without a new exact-artifact check; the later exact automated two-skeleton gate separately clears performance/presentation, but neither result certifies comfort, spatial-audio quality, cue tuning, or exact hands-on artifact provenance.
 - Detailed implementation and validation evidence: `docs/RENDERER_RESOURCE_SLOTS_GPU_TIMING_2026-08-11.md`.
+
+## Animation-owned combat and timed parry - 2026-08-13
+
+- `SwordCombat` now publishes explicit player swing/parry phases and skeleton locomotion/wind-up/active/recovery/stagger/dead actions. Sword and skeleton damage each resolve once on entry to their visible active window; off-angle, out-of-range, and recovery contacts miss.
+- Lich sword damage is no longer accepted on the command edge. The shared player active-contact pulse must pass the same range/cone test before the existing lich two-second lockout accepts one of its three hits.
+- Android and Windows publish an independent monotonic parry sequence. A 40 ms startup plus 220 ms active window can cancel a real frontal skeleton strike, emit `PlayerParrySucceeded`, and hold that attacker/token in an 800 ms stationary stagger. Failed parry completes 240 ms recovery; success permits a normal next-tick riposte. Unavailable and death-state inputs are consumed without buffering.
+- Android adds a 104 x 72 dp `PARRY` button beside `SWING`, publishes its monotonic command on touch-down while retaining accessibility click activation without release double-fire, reuses `sword_hit_2` for the clang, and routes success to a distinct short strong vibration. Windows binds `Q`. Diagnostics expose the consumed parry sequence and readable player/attacker action phases.
+- Renderer composition reuses the existing sword/right arm and Attack clip. Stagger freezes near contact with bounded whole-instance recoil/lean. `CharacterRenderSlot` now caches one frame plan for skin/refit and TLAS; nine BLAS, nineteen physical TLAS slots, and the two-pose-bucket ceiling remain unchanged.
+- Windows Debug/Release each pass all 12 CTests. The fresh Host foundation run `reports/foundation-runs/run-20260813-204944` passed shader staleness/negative gates, fresh builds/tests, 13 captures, Android Debug/Release/lint across four ABIs, packaging/licence checks, and evidence hashes. All 13 Windows captures are pixel-identical to the exact two-skeleton baseline; matched capture timing changed by 0.178%.
+- Exact clean `daa5892` Debug APK `a3eca0ed1ae49800541f1de95d329af8cb3bef50d53dac302a20238ade419302` installed byte-for-byte on `SM-S948B`. Strict ASTC, honest RT presentation, six checkpoint states, replay, 13 captures, and Home/resume passed; the warm 75% run was not a complete performance pass because lich measured 20.246 ms. The owner reported that parry timing felt good and requested press rather than release dispatch. The subsequent `ACTION_DOWN` source change was intentionally merged without rebuild, reinstall, or retest, so the installed exact-APK and hands-on evidence do not cover that follow-up revision.
+- Detailed implementation evidence: `docs/ANIMATION_COMBAT_PARRY_SLICE_2026-08-13.md`.
 
 ## Asset and licence state
 

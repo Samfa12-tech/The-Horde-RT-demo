@@ -137,6 +137,143 @@ int main()
                                       std::abs(historical.combatants[0].z - (-4.65f)) < 0.0001f &&
                                       historical.combatants[1].health == 0;
     const bool strictNearestSelection = strictNearestTarget == 1 && strictAttacker.attackerIndex == 1;
+
+    // Player actions own their exact phase boundaries and resolve contact once.
+    horde::gameplay::SwordCombat actionTimeline;
+    actionTimeline.RequestAttack();
+    for (int tick = 0; tick < 17; ++tick)
+    {
+        actionTimeline.Update(0.01f, 0.0f, 1.85f, 0.0f);
+    }
+    const bool swingStillWindup = actionTimeline.Snapshot().player.action ==
+        horde::gameplay::PlayerCombatAction::SwingWindup;
+    actionTimeline.Update(0.01f, 0.0f, 1.85f, 0.0f);
+    const bool swingEnteredActive = actionTimeline.Snapshot().player.action ==
+        horde::gameplay::PlayerCombatAction::SwingActive &&
+        actionTimeline.Snapshot().playerAttackPulse;
+    for (int tick = 0; tick < 16; ++tick)
+    {
+        actionTimeline.Update(0.01f, 0.0f, 1.85f, 0.0f);
+    }
+    const bool swingEnteredRecovery = actionTimeline.Snapshot().player.action ==
+        horde::gameplay::PlayerCombatAction::SwingRecovery;
+    for (int tick = 0; tick < 22; ++tick)
+    {
+        actionTimeline.Update(0.01f, 0.0f, 1.85f, 0.0f);
+    }
+    const bool swingFinished = actionTimeline.Snapshot().player.action ==
+        horde::gameplay::PlayerCombatAction::Idle;
+
+    horde::gameplay::SwordCombat rearMiss;
+    rearMiss.Reset(1u);
+    rearMiss.RequestAttack();
+    for (int tick = 0; tick < 80; ++tick)
+    {
+        rearMiss.Update(0.01f, 0.0f, -3.20f, 3.14159265f);
+    }
+    const bool rearSwingMissed = rearMiss.Snapshot().combatants[0].health == 1;
+
+    const auto runParry = [](float playerX, float playerYaw, bool requestEarly)
+    {
+        horde::gameplay::SwordCombat parry;
+        const float playerZ = -3.20f;
+        bool requested = false;
+        bool succeeded = false;
+        bool damagePulse = false;
+        int staggeredIndex = -1;
+        for (int tick = 0; tick < 600 && !succeeded && !damagePulse; ++tick)
+        {
+            const auto& before = parry.Snapshot();
+            if (!requested &&
+                (requestEarly || (before.attackerIndex >= 0 &&
+                 before.combatants[static_cast<std::size_t>(before.attackerIndex)].action ==
+                     horde::gameplay::EnemyCombatAction::AttackWindup &&
+                 before.combatants[static_cast<std::size_t>(before.attackerIndex)].actionTime >= 0.98f)))
+            {
+                parry.RequestParry();
+                requested = true;
+            }
+            const auto& snapshot = parry.Update(dt, playerX, playerZ, playerYaw);
+            damagePulse = damagePulse || snapshot.playerHitPulse;
+            if (snapshot.parriedAttackerIndex >= 0)
+            {
+                succeeded = true;
+                staggeredIndex = snapshot.parriedAttackerIndex;
+            }
+        }
+        return std::array<int, 3>{succeeded ? 1 : 0, damagePulse ? 1 : 0, staggeredIndex};
+    };
+    const auto parryA = runParry(-0.75f, 0.0f, false);
+    const auto parryB = runParry(0.75f, 0.0f, false);
+    const auto earlyParry = runParry(-0.75f, 0.0f, true);
+    const auto rearParry = runParry(-0.75f, 3.14159265f, false);
+    const bool bothIdsParry = parryA[0] == 1 && parryA[2] == 0 &&
+                              parryB[0] == 1 && parryB[2] == 1;
+    const bool failedParriesDamage = earlyParry[0] == 0 && earlyParry[1] == 1 &&
+                                     rearParry[0] == 0 && rearParry[1] == 1;
+
+    horde::gameplay::SwordCombat stagger;
+    bool staggerSucceeded = false;
+    int heldIndex = -1;
+    for (int tick = 0; tick < 600 && !staggerSucceeded; ++tick)
+    {
+        const auto& before = stagger.Snapshot();
+        if (before.attackerIndex >= 0 &&
+            before.combatants[static_cast<std::size_t>(before.attackerIndex)].action ==
+                horde::gameplay::EnemyCombatAction::AttackWindup &&
+            before.combatants[static_cast<std::size_t>(before.attackerIndex)].actionTime >= 0.98f)
+        {
+            stagger.RequestParry();
+        }
+        const auto& snapshot = stagger.Update(dt, -0.75f, -3.20f, 0.0f);
+        if (snapshot.parriedAttackerIndex >= 0)
+        {
+            staggerSucceeded = true;
+            heldIndex = snapshot.parriedAttackerIndex;
+        }
+    }
+    bool tokenHeldThroughStagger = staggerSucceeded;
+    stagger.RequestAttack();
+    const auto& riposte = stagger.Update(dt, -0.75f, -3.20f, 0.0f);
+    const bool immediateRiposte = riposte.player.action ==
+        horde::gameplay::PlayerCombatAction::SwingWindup;
+    for (int tick = 0; tick < 94; ++tick)
+    {
+        const auto& snapshot = stagger.Update(dt, -0.75f, -3.20f, 0.0f);
+        tokenHeldThroughStagger = tokenHeldThroughStagger &&
+            snapshot.attackerIndex == heldIndex &&
+            snapshot.combatants[static_cast<std::size_t>(heldIndex)].action ==
+                horde::gameplay::EnemyCombatAction::Staggered;
+    }
+    const bool staggerNearlyComplete = stagger.Snapshot().combatants[static_cast<std::size_t>(heldIndex)].action ==
+        horde::gameplay::EnemyCombatAction::Staggered;
+    int staggerBoundaryTicks = 95;
+    while (staggerBoundaryTicks < 98 &&
+           stagger.Snapshot().combatants[static_cast<std::size_t>(heldIndex)].action ==
+               horde::gameplay::EnemyCombatAction::Staggered)
+    {
+        stagger.Update(dt, -0.75f, -3.20f, 0.0f);
+        ++staggerBoundaryTicks;
+    }
+    const bool staggerCompletedAtEightTenths = stagger.Snapshot().combatants[static_cast<std::size_t>(heldIndex)].action !=
+        horde::gameplay::EnemyCombatAction::Staggered && staggerBoundaryTicks <= 97;
+
+    horde::gameplay::SwordCombat lateParry;
+    bool lateSawDamage = false;
+    bool lateRequested = false;
+    bool lateSucceeded = false;
+    for (int tick = 0; tick < 500; ++tick)
+    {
+        if (lateSawDamage && !lateRequested)
+        {
+            lateParry.RequestParry();
+            lateRequested = true;
+        }
+        const auto& snapshot = lateParry.Update(dt, -0.75f, -3.20f, 0.0f);
+        lateSawDamage = lateSawDamage || snapshot.playerHitPulse;
+        lateSucceeded = lateSucceeded || snapshot.parriedAttackerIndex >= 0;
+    }
+    const bool lateParryFailed = lateSawDamage && lateRequested && !lateSucceeded;
     if (!exactSpawns || !exactHistoricalSpawn || !strictNearestSelection ||
         !sawSwing || !sawDeath || !deadPersisted || !singleTargetHit ||
         !clearedPair || !pairPersistsDead || !resetPair || !maintainedSeparation ||
@@ -144,7 +281,11 @@ int main()
         playerHitPulses < horde::gameplay::PlayerVitals::kMaxVitality ||
         acceptedPlayerHits != horde::gameplay::PlayerVitals::kMaxVitality ||
         attackedPlayer.Snapshot().phase != horde::gameplay::PlayerLifePhase::Dead ||
-        repeatedPlayerHitPulse || !stayedInsideArena || !idledBeyondDoor || idleWalkTransitions > 2)
+        repeatedPlayerHitPulse || !stayedInsideArena || !idledBeyondDoor || idleWalkTransitions > 2 ||
+        !swingStillWindup || !swingEnteredActive || !swingEnteredRecovery || !swingFinished ||
+        !rearSwingMissed || !bothIdsParry || !failedParriesDamage ||
+        !tokenHeldThroughStagger || !immediateRiposte || !staggerNearlyComplete ||
+        !staggerCompletedAtEightTenths || !lateParryFailed)
     {
         std::cerr << "Combat smoke failed: spawns=" << exactSpawns
                   << " historicalSpawn=" << exactHistoricalSpawn
@@ -156,7 +297,12 @@ int main()
                   << " enemyCollision=" << stayedInsideArena << " leash=" << idledBeyondDoor
                   << " hitPulses=" << playerHitPulses << " repeatedPulse=" << repeatedPlayerHitPulse
                   << " acceptedPlayerHits=" << acceptedPlayerHits
-                  << " idleWalkTransitions=" << idleWalkTransitions << '\n';
+                  << " idleWalkTransitions=" << idleWalkTransitions
+                  << " phases=" << swingStillWindup << swingEnteredActive << swingEnteredRecovery << swingFinished
+                  << " rearMiss=" << rearSwingMissed << " bothParry=" << bothIdsParry
+                  << " failedParries=" << failedParriesDamage << " tokenHeld=" << tokenHeldThroughStagger
+                  << " riposte=" << immediateRiposte << " staggerEdge=" << staggerNearlyComplete
+                  << staggerCompletedAtEightTenths << " late=" << lateParryFailed << '\n';
         return 1;
     }
     std::cout << "Combat smoke passed: two stable spawns, separation, one attacker, nearest-only hits, "

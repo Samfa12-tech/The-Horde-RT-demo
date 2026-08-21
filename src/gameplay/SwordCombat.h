@@ -19,6 +19,42 @@ enum class EnemyAnimation
     Dead
 };
 
+enum class PlayerCombatAction : std::uint8_t
+{
+    Idle,
+    SwingWindup,
+    SwingActive,
+    SwingRecovery,
+    ParryStartup,
+    ParryActive,
+    ParryRecovery,
+};
+
+enum class EnemyCombatAction : std::uint8_t
+{
+    Locomotion,
+    AttackWindup,
+    AttackActive,
+    AttackRecovery,
+    Staggered,
+    Dead,
+};
+
+enum class CombatReaction : std::uint8_t
+{
+    None,
+    Hit,
+    Parried,
+};
+
+struct PlayerCombatSnapshot
+{
+    PlayerCombatAction action = PlayerCombatAction::Idle;
+    CombatReaction reaction = CombatReaction::None;
+    float actionTime = 0.0f;
+    float reactionTime = 0.0f;
+};
+
 inline constexpr std::size_t kSkeletonCombatantCapacity = 2u;
 
 struct SkeletonCombatantSnapshot
@@ -30,12 +66,20 @@ struct SkeletonCombatantSnapshot
     float damageFlash = 0.0f;
     std::int32_t health = 1;
     EnemyAnimation animation = EnemyAnimation::Walking;
+    EnemyCombatAction action = EnemyCombatAction::Locomotion;
+    CombatReaction reaction = CombatReaction::None;
+    float actionTime = 0.0f;
+    float reactionTime = 0.0f;
     bool playerHitPulse = false;
+    bool parrySuccessPulse = false;
 };
 
 struct CombatSnapshot
 {
     float swordSwingRadians = 0.0f;
+    PlayerCombatSnapshot player{};
+    bool playerAttackPulse = false;
+    std::int32_t parriedAttackerIndex = -1;
 
     // Compatibility view of Skeleton A. New consumers should use combatants.
     float enemyX = -0.75f;
@@ -71,7 +115,7 @@ public:
         for (Combatant& combatant : combatants_)
         {
             combatant.health = 0;
-            combatant.phase = EnemyPhase::Dead;
+            combatant.action = EnemyCombatAction::Dead;
             combatant.animation = EnemyAnimation::Dead;
             combatant.walkAnimationHold = 0.0f;
         }
@@ -82,15 +126,16 @@ public:
         for (std::size_t index = 0u; index < combatantCount_; ++index)
         {
             Combatant& combatant = combatants_[index];
-            combatant.phase = EnemyPhase::Approach;
+            combatant.action = EnemyCombatAction::Locomotion;
             combatant.health = 1;
             combatant.walkAnimationHold = kWalkAnimationHold;
             combatant.animation = EnemyAnimation::Walking;
         }
         snapshot_ = {};
-        swordTime_ = kSwordDuration;
         attackQueued_ = false;
-        swordHitConsumed_ = false;
+        parryQueued_ = false;
+        player_ = {};
+        successfulParryEndsNextTick_ = false;
         attackerIndex_ = -1;
         PublishSnapshot();
     }
@@ -100,24 +145,48 @@ public:
         attackQueued_ = true;
     }
 
+    void RequestParry()
+    {
+        parryQueued_ = true;
+    }
+
+    bool CanAcceptPlayerAction() const
+    {
+        return player_.action == PlayerCombatAction::Idle || successfulParryEndsNextTick_;
+    }
+
+    static bool IsPlayerTargetInRangeCone(float playerX,
+                                          float playerZ,
+                                          float playerYaw,
+                                          float targetX,
+                                          float targetZ)
+    {
+        const float dx = targetX - playerX;
+        const float dz = targetZ - playerZ;
+        const float distance = std::hypot(dx, dz);
+        if (distance > kPlayerHitRange)
+        {
+            return false;
+        }
+        if (distance <= 0.0001f)
+        {
+            return true;
+        }
+        const float forwardX = std::sin(playerYaw);
+        const float forwardZ = -std::cos(playerYaw);
+        return (dx / distance) * forwardX + (dz / distance) * forwardZ >= kPlayerHitConeDot;
+    }
+
     std::int32_t PlayerSwingTargetIndex(float playerX, float playerZ, float playerYaw) const
     {
         std::int32_t targetIndex = -1;
         float targetDistance = 0.0f;
-        const float forwardX = std::sin(playerYaw);
-        const float forwardZ = -std::cos(playerYaw);
         for (std::size_t index = 0; index < combatantCount_; ++index)
         {
             const Combatant& combatant = combatants_[index];
             const float distance = std::hypot(combatant.x - playerX, combatant.z - playerZ);
-            if (combatant.health <= 0 || distance > kPlayerHitRange)
-            {
-                continue;
-            }
-            const float inverseDistance = distance > 0.0001f ? 1.0f / distance : 0.0f;
-            const float targetX = (combatant.x - playerX) * inverseDistance;
-            const float targetZ = (combatant.z - playerZ) * inverseDistance;
-            if (targetX * forwardX + targetZ * forwardZ < kPlayerHitConeDot)
+            if (combatant.health <= 0 ||
+                !IsPlayerTargetInRangeCone(playerX, playerZ, playerYaw, combatant.x, combatant.z))
             {
                 continue;
             }
@@ -133,30 +202,37 @@ public:
     const CombatSnapshot& Update(float deltaSeconds, float playerX, float playerZ, float playerYaw)
     {
         deltaSeconds = std::clamp(deltaSeconds, 0.0f, 0.05f);
+        snapshot_.playerAttackPulse = false;
+        snapshot_.parriedAttackerIndex = -1;
+        if (successfulParryEndsNextTick_)
+        {
+            player_ = {};
+            successfulParryEndsNextTick_ = false;
+        }
         for (Combatant& combatant : combatants_)
         {
             combatant.playerHitPulse = false;
+            combatant.parrySuccessPulse = false;
             combatant.damageFlash = std::max(0.0f, combatant.damageFlash - deltaSeconds * 2.8f);
             combatant.walkAnimationHold = std::max(0.0f, combatant.walkAnimationHold - deltaSeconds);
         }
 
-        if (attackQueued_ && swordTime_ >= kSwordDuration)
+        if (player_.action == PlayerCombatAction::Idle)
         {
-            swordTime_ = 0.0f;
-            swordHitConsumed_ = false;
+            if (attackQueued_)
+            {
+                player_.action = PlayerCombatAction::SwingWindup;
+                player_.actionTime = 0.0f;
+            }
+            else if (parryQueued_)
+            {
+                player_.action = PlayerCombatAction::ParryStartup;
+                player_.actionTime = 0.0f;
+            }
         }
         attackQueued_ = false;
-
-        if (swordTime_ < kSwordDuration)
-        {
-            swordTime_ = std::min(kSwordDuration, swordTime_ + deltaSeconds);
-            const float phase = swordTime_ / kSwordDuration;
-            snapshot_.swordSwingRadians = -1.12f * std::sin(phase * 3.14159265f);
-        }
-        else
-        {
-            snapshot_.swordSwingRadians = 0.0f;
-        }
+        parryQueued_ = false;
+        UpdatePlayerAction(deltaSeconds, playerX, playerZ, playerYaw);
 
         const ShowcaseZone playerZone = QueryShowcaseZone(playerX, playerZ);
         const bool playerInsideEnemyArena = playerZone == ShowcaseZone::Opening ||
@@ -181,8 +257,6 @@ public:
         }
 
         SelectAttacker(distances, playerInsideEnemyArena);
-        ResolveSwordHit(playerX, playerZ, playerYaw);
-
         for (std::size_t index = 0; index < combatantCount_; ++index)
         {
             UpdateCombatant(index,
@@ -190,7 +264,8 @@ public:
                             playerX,
                             playerZ,
                             distances[index],
-                            playerInsideEnemyArena);
+                            playerInsideEnemyArena,
+                            playerYaw);
         }
         ResolveCombatantSeparation(previousPositions);
         PublishSnapshot();
@@ -200,13 +275,6 @@ public:
     const CombatSnapshot& Snapshot() const { return snapshot_; }
 
 private:
-    enum class EnemyPhase
-    {
-        Approach,
-        Attack,
-        Dead
-    };
-
     struct Combatant
     {
         float x = 0.0f;
@@ -217,11 +285,88 @@ private:
         float damageFlash = 0.0f;
         float walkAnimationHold = kWalkAnimationHold;
         std::int32_t health = 1;
-        EnemyPhase phase = EnemyPhase::Approach;
+        EnemyCombatAction action = EnemyCombatAction::Locomotion;
+        CombatReaction reaction = CombatReaction::None;
+        float reactionTime = 0.0f;
         EnemyAnimation animation = EnemyAnimation::Walking;
-        bool playerHitApplied = false;
         bool playerHitPulse = false;
+        bool parrySuccessPulse = false;
     };
+
+    void UpdatePlayerAction(float deltaSeconds, float playerX, float playerZ, float playerYaw)
+    {
+        player_.reactionTime = std::max(0.0f, player_.reactionTime - deltaSeconds);
+        if (player_.reactionTime <= 0.0f)
+        {
+            player_.reaction = CombatReaction::None;
+        }
+        player_.actionTime += deltaSeconds;
+        switch (player_.action)
+        {
+        case PlayerCombatAction::SwingWindup:
+            if (player_.actionTime >= kSwingWindupDuration)
+            {
+                player_.action = PlayerCombatAction::SwingActive;
+                player_.actionTime -= kSwingWindupDuration;
+                snapshot_.playerAttackPulse = true;
+                ResolveSwordHit(playerX, playerZ, playerYaw);
+            }
+            break;
+        case PlayerCombatAction::SwingActive:
+            if (player_.actionTime >= kSwingActiveDuration)
+            {
+                player_.action = PlayerCombatAction::SwingRecovery;
+                player_.actionTime -= kSwingActiveDuration;
+            }
+            break;
+        case PlayerCombatAction::SwingRecovery:
+            if (player_.actionTime >= kSwingRecoveryDuration)
+            {
+                player_ = {};
+            }
+            break;
+        case PlayerCombatAction::ParryStartup:
+            if (player_.actionTime >= kParryStartupDuration)
+            {
+                player_.action = PlayerCombatAction::ParryActive;
+                player_.actionTime -= kParryStartupDuration;
+            }
+            break;
+        case PlayerCombatAction::ParryActive:
+            if (player_.actionTime >= kParryActiveDuration)
+            {
+                player_.action = PlayerCombatAction::ParryRecovery;
+                player_.actionTime -= kParryActiveDuration;
+            }
+            break;
+        case PlayerCombatAction::ParryRecovery:
+            if (player_.actionTime >= kParryRecoveryDuration)
+            {
+                player_ = {};
+            }
+            break;
+        case PlayerCombatAction::Idle:
+            player_.actionTime = 0.0f;
+            break;
+        }
+
+        float swingElapsed = 0.0f;
+        if (player_.action == PlayerCombatAction::SwingWindup)
+        {
+            swingElapsed = player_.actionTime;
+        }
+        else if (player_.action == PlayerCombatAction::SwingActive)
+        {
+            swingElapsed = kSwingWindupDuration + player_.actionTime;
+        }
+        else if (player_.action == PlayerCombatAction::SwingRecovery)
+        {
+            swingElapsed = kSwingWindupDuration + kSwingActiveDuration + player_.actionTime;
+        }
+        snapshot_.swordSwingRadians = swingElapsed > 0.0f
+            ? -1.12f * std::sin((swingElapsed / kSwordDuration) * 3.14159265f)
+            : 0.0f;
+    }
 
     void SelectAttacker(const std::array<float, kSkeletonCombatantCapacity>& distances,
                         bool playerInsideEnemyArena)
@@ -235,7 +380,8 @@ private:
         if (attackerIndex_ >= 0)
         {
             const Combatant& holder = combatants_[static_cast<std::size_t>(attackerIndex_)];
-            if (holder.health > 0 && holder.phase == EnemyPhase::Attack)
+            if (holder.health > 0 && holder.action != EnemyCombatAction::Locomotion &&
+                holder.action != EnemyCombatAction::Dead)
             {
                 return;
             }
@@ -260,11 +406,6 @@ private:
 
     void ResolveSwordHit(float playerX, float playerZ, float playerYaw)
     {
-        if (swordHitConsumed_ || swordTime_ < 0.18f || swordTime_ > 0.34f)
-        {
-            return;
-        }
-
         const std::int32_t targetIndex = PlayerSwingTargetIndex(playerX, playerZ, playerYaw);
         if (targetIndex < 0)
         {
@@ -272,12 +413,12 @@ private:
         }
         Combatant& target = combatants_[static_cast<std::size_t>(targetIndex)];
         target.health = 0;
-        target.phase = EnemyPhase::Dead;
+        target.action = EnemyCombatAction::Dead;
         target.phaseTime = 0.0f;
         target.animationTime = 0.0f;
         target.animation = EnemyAnimation::Dead;
-        target.playerHitApplied = false;
-        swordHitConsumed_ = true;
+        target.reaction = CombatReaction::Hit;
+        target.reactionTime = 1.0f;
         if (attackerIndex_ == targetIndex)
         {
             attackerIndex_ = -1;
@@ -289,15 +430,21 @@ private:
                          float playerX,
                          float playerZ,
                          float distance,
-                         bool playerInsideEnemyArena)
+                         bool playerInsideEnemyArena,
+                         float playerYaw)
     {
         Combatant& combatant = combatants_[index];
         combatant.phaseTime += deltaSeconds;
         combatant.animationTime += deltaSeconds;
-        if (combatant.health <= 0 || combatant.phase == EnemyPhase::Dead)
+        combatant.reactionTime = std::max(0.0f, combatant.reactionTime - deltaSeconds);
+        if (combatant.reactionTime <= 0.0f)
+        {
+            combatant.reaction = CombatReaction::None;
+        }
+        if (combatant.health <= 0 || combatant.action == EnemyCombatAction::Dead)
         {
             combatant.health = 0;
-            combatant.phase = EnemyPhase::Dead;
+            combatant.action = EnemyCombatAction::Dead;
             combatant.animation = EnemyAnimation::Dead;
             return;
         }
@@ -305,32 +452,30 @@ private:
         if (!playerInsideEnemyArena)
         {
             combatant.walkAnimationHold = 0.0f;
-            combatant.phase = EnemyPhase::Approach;
+            combatant.action = EnemyCombatAction::Locomotion;
             combatant.phaseTime = 0.0f;
             combatant.animationTime = 0.0f;
-            combatant.playerHitApplied = false;
             combatant.animation = EnemyAnimation::Idle;
             return;
         }
 
         const bool ownsAttackToken = attackerIndex_ == static_cast<std::int32_t>(index);
-        if (!ownsAttackToken && combatant.phase == EnemyPhase::Attack)
+        if (!ownsAttackToken && combatant.action != EnemyCombatAction::Locomotion &&
+            combatant.action != EnemyCombatAction::Dead)
         {
-            combatant.phase = EnemyPhase::Approach;
+            combatant.action = EnemyCombatAction::Locomotion;
             combatant.phaseTime = 0.0f;
             combatant.animationTime = 0.0f;
-            combatant.playerHitApplied = false;
         }
 
-        if (combatant.phase == EnemyPhase::Approach)
+        if (combatant.action == EnemyCombatAction::Locomotion)
         {
             if (ownsAttackToken && distance <= kEnemyAttackEnterRange)
             {
                 combatant.walkAnimationHold = 0.0f;
-                combatant.phase = EnemyPhase::Attack;
+                combatant.action = EnemyCombatAction::AttackWindup;
                 combatant.phaseTime = 0.0f;
                 combatant.animationTime = 0.0f;
-                combatant.playerHitApplied = false;
                 combatant.animation = EnemyAnimation::Attack;
             }
             else if (distance > kEnemyAttackRange)
@@ -362,20 +507,58 @@ private:
         }
 
         combatant.animation = EnemyAnimation::Attack;
-        if (!combatant.playerHitApplied && combatant.phaseTime >= 1.12f && distance <= 1.55f)
+        if (combatant.action == EnemyCombatAction::AttackWindup &&
+            combatant.phaseTime >= kEnemyAttackWindupDuration)
         {
-            combatant.playerHitApplied = true;
-            combatant.damageFlash = 1.0f;
-            combatant.playerHitPulse = true;
+            combatant.action = EnemyCombatAction::AttackActive;
+            combatant.phaseTime -= kEnemyAttackWindupDuration;
+            const bool inRange = distance <= kEnemyDamageRange;
+            if (inRange && player_.action == PlayerCombatAction::ParryActive &&
+                IsPlayerTargetInRangeCone(playerX, playerZ, playerYaw, combatant.x, combatant.z))
+            {
+                combatant.action = EnemyCombatAction::Staggered;
+                combatant.phaseTime = 0.0f;
+                combatant.reaction = CombatReaction::Parried;
+                combatant.reactionTime = kEnemyStaggerDuration;
+                combatant.parrySuccessPulse = true;
+                player_.action = PlayerCombatAction::ParryRecovery;
+                player_.actionTime = 0.0f;
+                player_.reaction = CombatReaction::Parried;
+                player_.reactionTime = kParryJoltDuration;
+                successfulParryEndsNextTick_ = true;
+                snapshot_.parriedAttackerIndex = static_cast<std::int32_t>(index);
+                return;
+            }
+            if (inRange)
+            {
+                combatant.damageFlash = 1.0f;
+                combatant.playerHitPulse = true;
+            }
         }
-        if (combatant.phaseTime >= kEnemyAttackDuration)
+        if (combatant.action == EnemyCombatAction::AttackActive &&
+            combatant.phaseTime >= kEnemyAttackActiveDuration)
         {
-            combatant.phase = EnemyPhase::Approach;
-            combatant.phaseTime = 0.0f;
-            combatant.animationTime = 0.0f;
-            combatant.playerHitApplied = false;
-            attackerIndex_ = -1;
+            combatant.action = EnemyCombatAction::AttackRecovery;
+            combatant.phaseTime -= kEnemyAttackActiveDuration;
         }
+        if (combatant.action == EnemyCombatAction::AttackRecovery &&
+            combatant.phaseTime >= kEnemyAttackRecoveryDuration)
+        {
+            FinishEnemyAction(combatant);
+        }
+        if (combatant.action == EnemyCombatAction::Staggered &&
+            combatant.phaseTime >= kEnemyStaggerDuration)
+        {
+            FinishEnemyAction(combatant);
+        }
+    }
+
+    void FinishEnemyAction(Combatant& combatant)
+    {
+        combatant.action = EnemyCombatAction::Locomotion;
+        combatant.phaseTime = 0.0f;
+        combatant.animationTime = 0.0f;
+        attackerIndex_ = -1;
     }
 
     void ResolveCombatantSeparation(
@@ -398,7 +581,9 @@ private:
         const float unitX = coincident ? 1.0f : dx / distance;
         const float unitZ = coincident ? 0.0f : dz / distance;
         const float correction = (kMinimumSeparation - distance) * 0.5f;
-        if (first.health <= 0)
+        const bool firstFixed = first.health <= 0 || first.action == EnemyCombatAction::Staggered;
+        const bool secondFixed = second.health <= 0 || second.action == EnemyCombatAction::Staggered;
+        if (firstFixed)
         {
             const float targetX = first.x + unitX * kMinimumSeparation;
             const float targetZ = first.z + unitZ * kMinimumSeparation;
@@ -414,7 +599,7 @@ private:
             }
             return;
         }
-        if (second.health <= 0)
+        if (secondFixed)
         {
             const float targetX = second.x - unitX * kMinimumSeparation;
             const float targetZ = second.z - unitZ * kMinimumSeparation;
@@ -477,6 +662,7 @@ private:
         snapshot_.encounterComplete = true;
         snapshot_.combatantCount = combatantCount_;
         snapshot_.attackerIndex = attackerIndex_;
+        snapshot_.player = player_;
         snapshot_.playerHitPulse = false;
         for (std::size_t index = 0; index < snapshot_.combatants.size(); ++index)
         {
@@ -485,6 +671,7 @@ private:
                 snapshot_.combatants[index] = {};
                 snapshot_.combatants[index].health = 0;
                 snapshot_.combatants[index].animation = EnemyAnimation::Dead;
+                snapshot_.combatants[index].action = EnemyCombatAction::Dead;
                 continue;
             }
             const Combatant& source = combatants_[index];
@@ -496,7 +683,12 @@ private:
             target.damageFlash = source.damageFlash;
             target.health = source.health;
             target.animation = source.animation;
+            target.action = source.action;
+            target.reaction = source.reaction;
+            target.actionTime = source.phaseTime;
+            target.reactionTime = source.reactionTime;
             target.playerHitPulse = source.playerHitPulse;
+            target.parrySuccessPulse = source.parrySuccessPulse;
             if (source.health > 0)
             {
                 ++snapshot_.aliveCount;
@@ -514,22 +706,37 @@ private:
         snapshot_.enemyAnimation = primary.animation;
     }
 
-    static constexpr float kSwordDuration = 0.56f;
+public:
+    static constexpr float kSwingWindupDuration = 0.18f;
+    static constexpr float kSwingActiveDuration = 0.16f;
+    static constexpr float kSwingRecoveryDuration = 0.22f;
+    static constexpr float kSwordDuration = kSwingWindupDuration + kSwingActiveDuration + kSwingRecoveryDuration;
     static constexpr float kPlayerHitRange = 1.72f;
     static constexpr float kPlayerHitConeDot = 0.52f;
+    static constexpr float kParryStartupDuration = 0.04f;
+    static constexpr float kParryActiveDuration = 0.22f;
+    static constexpr float kParryRecoveryDuration = 0.24f;
+    static constexpr float kEnemyAttackWindupDuration = 1.12f;
+    static constexpr float kEnemyAttackActiveDuration = 0.18f;
+    static constexpr float kEnemyAttackRecoveryDuration = 1.50f;
+    static constexpr float kEnemyStaggerDuration = 0.80f;
+
+private:
     static constexpr float kEnemyWalkSpeed = 0.62f;
     static constexpr float kEnemyAttackRange = 1.28f;
     static constexpr float kEnemyAttackEnterRange = 1.34f;
     static constexpr float kMinimumSeparation = 0.70f;
     static constexpr float kWalkAnimationHold = 0.24f;
-    static constexpr float kEnemyAttackDuration = 2.80f;
+    static constexpr float kEnemyDamageRange = 1.55f;
+    static constexpr float kParryJoltDuration = 0.12f;
 
     CombatSnapshot snapshot_{};
     std::array<Combatant, kSkeletonCombatantCapacity> combatants_{};
     std::size_t combatantCount_ = kSkeletonCombatantCapacity;
-    float swordTime_ = kSwordDuration;
     bool attackQueued_ = false;
-    bool swordHitConsumed_ = false;
+    bool parryQueued_ = false;
+    bool successfulParryEndsNextTick_ = false;
+    PlayerCombatSnapshot player_{};
     std::int32_t attackerIndex_ = -1;
 };
 

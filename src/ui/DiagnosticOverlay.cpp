@@ -9,6 +9,40 @@
 namespace horde::ui
 {
 
+namespace
+{
+
+const char* PlayerCombatActionName(const gameplay::PlayerCombatAction action)
+{
+    switch (action)
+    {
+    case gameplay::PlayerCombatAction::Idle: return "idle";
+    case gameplay::PlayerCombatAction::SwingWindup: return "swing-windup";
+    case gameplay::PlayerCombatAction::SwingActive: return "swing-active";
+    case gameplay::PlayerCombatAction::SwingRecovery: return "swing-recovery";
+    case gameplay::PlayerCombatAction::ParryStartup: return "parry-startup";
+    case gameplay::PlayerCombatAction::ParryActive: return "parry-active";
+    case gameplay::PlayerCombatAction::ParryRecovery: return "parry-recovery";
+    }
+    return "unknown";
+}
+
+const char* EnemyCombatActionName(const gameplay::EnemyCombatAction action)
+{
+    switch (action)
+    {
+    case gameplay::EnemyCombatAction::Locomotion: return "locomotion";
+    case gameplay::EnemyCombatAction::AttackWindup: return "attack-windup";
+    case gameplay::EnemyCombatAction::AttackActive: return "attack-active";
+    case gameplay::EnemyCombatAction::AttackRecovery: return "attack-recovery";
+    case gameplay::EnemyCombatAction::Staggered: return "staggered";
+    case gameplay::EnemyCombatAction::Dead: return "dead";
+    }
+    return "unknown";
+}
+
+} // namespace
+
 std::string BuildDiagnosticOverlayText(const vulkan::DeviceCapabilities& capabilities)
 {
     return vulkan::BuildCapabilityTextReport(capabilities);
@@ -60,7 +94,8 @@ std::string BuildDeveloperOverlayText(const DeveloperOverlaySnapshot& snapshot)
     out << "EVENTS " << snapshot.queuedEventCount << " queued / "
         << snapshot.eventQueueHighWaterMark << " high / " << snapshot.eventQueueOverflowCount
         << " overflow  |  input " << snapshot.inputPublicationSequence << "  |  cmd "
-        << snapshot.consumedAttackSequence << '/' << snapshot.consumedRouteResetSequence
+        << snapshot.consumedAttackSequence << '/' << snapshot.consumedParrySequence << '/'
+        << snapshot.consumedRouteResetSequence
         << '/' << snapshot.consumedRetrySequence << '\n';
     out << "AS " << snapshot.blasCount << " BLAS / " << snapshot.tlasCount << " TLAS / "
         << snapshot.tlasInstanceCount << " inst  |  skinned " << snapshot.activeSkinnedEnemies << '\n';
@@ -73,7 +108,10 @@ std::string BuildDeveloperOverlayText(const DeveloperOverlaySnapshot& snapshot)
     {
         out << "none";
     }
-    out << "  |  pose buckets " << snapshot.skeletonPoseBucketCount << '\n';
+    out << "  |  player " << PlayerCombatActionName(snapshot.playerCombatAction)
+        << "  |  enemy " << (snapshot.hasAttackerCombatAction
+            ? EnemyCombatActionName(snapshot.attackerCombatAction) : "none")
+        << "  |  pose buckets " << snapshot.skeletonPoseBucketCount << '\n';
     out << "MAT " << snapshot.materialEncoding;
     return out.str();
 }
