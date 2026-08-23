@@ -1,4 +1,4 @@
-HORDE LANTERN RT - SHOWCASE ALPHA 0.1.4
+HORDE LANTERN RT - SHOWCASE ALPHA 0.1.5
 =======================================
 
 This is a native Vulkan hardware-ray-tracing technology demo from Samfa12.
@@ -17,6 +17,9 @@ CONTROLS
 - Left mouse drag: 360 camera look
 - Right mouse or Space: swing sword
 - Q: parry skeleton melee attacks
+- Backbone / compatible controller: left stick move, right stick look,
+  RT attack, LT parry, B / Circle dodge, D-pad menus, A select,
+  Menu / Start pause
 - Esc: pause / resume
 - R: restart route
 - F1: controls
@@ -43,17 +46,21 @@ SHOWCASE CONTENT
 - Three-point vitality, encounter retry, and route restart flow
 - Blue skylight chamber and four bay-selected coloured torch environments
 - Open framed threshold, wet stone, and a single-bounce hero mirror
+- Ray-traced transparent roof-water streams, rounded catchment and drain runnel
+- Low, depth-clipped ritual ground mist in the lich room
+- Positional looping waterfall ambience
 - Floating staff-lit lich finale with violet charge electricity, three-hit combat,
   hit recoil/cry, death animation, opening roof, returning dawn, and epilogue
 - Native Vulkan BLAS/TLAS, RT pipeline/SBT and vkCmdTraceRaysKHR presentation
 - Phone-safe ray-query shading work inside raygen
-- Seventeen FilmCow UI, combat, movement, skeleton, and lich sound cues
+- Seventeen FilmCow UI, combat, movement, skeleton, and lich sound cues,
+  plus the credited DRAGON-STUDIO/Pixabay waterfall loop
 - Help > Credits & licences carries the main attribution inside the executable
 
 KNOWN ALPHA LIMITS
 - The opening encounter is capped at two skeletons and one attacker at a time.
 - The lich is a CC0 Meshy placeholder with visible source-rig limitations.
-- Larger hordes, fire/water expansion, and the staged textured sword remain deferred.
+- Larger hordes, broader fire/fluid simulation, and the staged textured sword remain deferred.
 - Only tested RT-capable hardware paths are supported.
 - See ASSET_LICENSES.md and ALPHA_RELEASE_NOTES.md.
 

@@ -217,6 +217,16 @@ int main()
               androidBridgeSource.find("gPlatformGameplayEvents.Push(") != std::string::npos &&
               androidBridgeSource.find("PlatformGameplayEventOverflowCount()") != std::string::npos,
               "Android must retain bounded ordered event transport with visible overflow");
+        check(windowsSource.find("waterfall_loop.wav") != std::string::npos &&
+              windowsSource.find("StartOrUpdateLoop") != std::string::npos &&
+              windowsSource.find("StopLoop") != std::string::npos,
+              "Windows waterfall ambience must be a controllable positional loop");
+        check(androidSource.find("waterfall_loop.wav") != std::string::npos &&
+              androidSource.find("setLooping(true)") != std::string::npos &&
+              androidSource.find("waterfallPlayer.pause()") != std::string::npos &&
+              androidSource.find("if (!waterfallPlayer.isPlaying()) waterfallPlayer.start();") != std::string::npos &&
+              androidBridgeSource.find("getWaterfallStereoGains") != std::string::npos,
+              "Android waterfall ambience must loop only while audible and consume native positional gains");
     }
 
     PlayerFootstepCadence footsteps;

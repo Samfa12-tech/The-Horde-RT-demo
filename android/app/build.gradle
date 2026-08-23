@@ -19,6 +19,7 @@ tasks.register('prepareRuntimeAssets', Sync) {
         include 'textures/meshy/lich_placeholder_v01/base-color-2048-astc6x6.ktx2'
         include 'textures/meshy/lich_placeholder_v01/emissive-2048-astc6x6.ktx2'
         include 'audio/filmcow/*.wav'
+        include 'audio/pixabay/waterfall_loop.wav'
     }
     into runtimeAssetsDir
 }
@@ -31,8 +32,8 @@ android {
         applicationId 'com.samfa12.hordelanternrt'
         minSdk 24
         targetSdk 34
-        versionCode 5
-        versionName '0.1.4-alpha.1'
+        versionCode 6
+        versionName '0.1.5-alpha.1'
 
         externalNativeBuild {
             cmake {

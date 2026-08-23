@@ -230,7 +230,16 @@ function Write-ValidationPackage {
     Copy-Item -LiteralPath $WindowsExe -Destination (Join-Path $windowsStage "HordeLanternRT.exe")
     Copy-Item -LiteralPath (Join-Path $repoRoot "release\windows\README.txt") -Destination (Join-Path $windowsStage "README.txt")
     Copy-Item -LiteralPath (Join-Path $repoRoot "ASSET_LICENSES.md") -Destination (Join-Path $windowsStage "ASSET_LICENSES.md")
-    Copy-Item -LiteralPath (Join-Path $repoRoot "docs\SHOWCASE_ALPHA_RELEASE_NOTES_2026-07-17.md") -Destination (Join-Path $windowsStage "ALPHA_RELEASE_NOTES.md")
+    $releaseNoteMatches = @(Get-ChildItem -LiteralPath (Join-Path $repoRoot "docs") -Filter "*RELEASE_NOTES*.md" -File |
+        Where-Object {
+            $text = Get-Content -LiteralPath $_.FullName -Raw
+            $text.Contains("Package version: ``$($script:sourcePackageVersion)``") -and
+                $text.Contains("Android version code: ``$($script:sourceVersionCode)``")
+        })
+    if ($releaseNoteMatches.Count -ne 1) {
+        throw "Expected exactly one release-note file for $($script:sourcePackageVersion) / Android versionCode $($script:sourceVersionCode); found $($releaseNoteMatches.Count)."
+    }
+    Copy-Item -LiteralPath $releaseNoteMatches[0].FullName -Destination (Join-Path $windowsStage "ALPHA_RELEASE_NOTES.md")
     $copies = @(
         @{ Source = "assets\models\enemies\meshy\skeleton_biped_merged_animations_v01.glb"; Destination = "assets\models\enemies\meshy" },
         @{ Source = "assets\models\enemies\meshy\lich_placeholder_merged_animations_v01.glb"; Destination = "assets\models\enemies\meshy" },
@@ -248,6 +257,9 @@ function Write-ValidationPackage {
     $audioDestination = Join-Path $windowsStage "assets\audio\filmcow"
     New-Item -ItemType Directory -Force -Path $audioDestination | Out-Null
     Copy-Item -Path (Join-Path $repoRoot "assets\audio\filmcow\*.wav") -Destination $audioDestination
+    $waterAudioDestination = Join-Path $windowsStage "assets\audio\pixabay"
+    New-Item -ItemType Directory -Force -Path $waterAudioDestination | Out-Null
+    Copy-Item -LiteralPath (Join-Path $repoRoot "assets\audio\pixabay\waterfall_loop.wav") -Destination $waterAudioDestination
     Compress-Archive -Path (Join-Path $windowsStage "*") -DestinationPath $windowsZip -CompressionLevel Optimal
     Copy-Item -LiteralPath $AndroidApk -Destination $androidValidationApk
     @(
@@ -278,7 +290,8 @@ function Test-ValidationPackages {
         "assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb",
         "assets/textures/meshy/lich_placeholder_v01/base-color-2048-rgba8.ktx2",
         "assets/textures/polyhaven/mobile_1k/diff-array-512.rgba",
-        "assets/audio/filmcow/sword_swing_1.wav"))
+        "assets/audio/filmcow/sword_swing_1.wav",
+        "assets/audio/pixabay/waterfall_loop.wav"))
 
     $entries = @(Assert-ZipContainsEntries -ArchivePath $androidValidationApk -PackageLabel "Android validation APK" -RequiredEntries @(
         "assets/textures/polyhaven/mobile_1k/diff-array-512-astc6x6.ktx2",
@@ -286,7 +299,8 @@ function Test-ValidationPackages {
         "assets/textures/polyhaven/mobile_1k/arm-array-512-astc6x6.ktx2",
         "assets/textures/meshy/lich_placeholder_v01/base-color-2048-astc6x6.ktx2",
         "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb",
-        "assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb"))
+        "assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb",
+        "assets/audio/pixabay/waterfall_loop.wav"))
     $nativeEntries = @($entries | Where-Object { $_ -match '^lib/.+\.so$' })
     if ($nativeEntries.Count -lt 1) { throw "Android validation APK contains no native runtime library." }
     if ($nativeEntries -match 'libc\+\+_shared\.so$') { throw "Android validation APK contains libc++_shared.so." }
@@ -304,7 +318,7 @@ function Test-ValidationPackages {
     $zipalign = Find-LatestVersionedTool -Root $buildToolsRoot -RelativeToolPath "zipalign.exe"
     $resources = (& $aapt2 dump resources $androidValidationApk 2>&1 | Out-String)
     if ($LASTEXITCODE -ne 0) { throw "aapt2 could not inspect Android validation resources." }
-    foreach ($marker in @("string/credits_body", "Hotstrike Studio", "FilmCow", "Meshy")) {
+    foreach ($marker in @("string/credits_body", "Hotstrike Studio", "FilmCow", "Meshy", "DRAGON-STUDIO", "Pixabay")) {
         if ($resources -notmatch [regex]::Escape($marker)) { throw "Android validation APK lacks credit marker: $marker" }
     }
     $manifest = (& $aapt2 dump xmltree --file AndroidManifest.xml $androidValidationApk 2>&1 | Out-String)
@@ -471,7 +485,7 @@ try {
                 throw "Windows validation binary version surfaces do not agree on $($script:sourcePackageVersion)."
             }
             $windowsBinaryText = [Text.Encoding]::ASCII.GetString([IO.File]::ReadAllBytes($windowsReleaseExe))
-            foreach ($marker in @("credits and licences", "Hotstrike Studio", "FilmCow", "Meshy")) {
+            foreach ($marker in @("credits and licences", "Hotstrike Studio", "FilmCow", "Meshy", "DRAGON-STUDIO", "Pixabay")) {
                 if ($windowsBinaryText -notmatch [regex]::Escape($marker)) { throw "Windows executable lacks credit marker: $marker" }
             }
         }

@@ -15,6 +15,13 @@
 namespace horde::vulkan::raytracing
 {
 
+enum class WaterQuality : std::uint32_t
+{
+    Off = 0u,
+    Mobile = 1u,
+    High = 2u,
+};
+
 struct PlayerWeaponRenderPose
 {
     std::array<float, 3u> rightHandLocal{};
@@ -38,6 +45,7 @@ struct RtSceneFrameInputs
     float cameraZ = 1.85f;
     float walkAmount = 0.0f;
     float outputExposure = 0.92f;
+    WaterQuality waterQuality = WaterQuality::High;
     horde::gameplay::CombatSnapshot combat{};
     horde::gameplay::PlayerCombatSnapshot playerCombat{};
     std::array<horde::gameplay::simulation::SkeletonEnemySnapshot,

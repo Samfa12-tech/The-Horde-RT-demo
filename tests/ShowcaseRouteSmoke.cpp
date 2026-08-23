@@ -114,6 +114,12 @@ int main()
     check(!IsShowcasePlayerPositionWalkable(-1.0f, 1.0f), "gallery table collision must remain");
     check(!IsShowcasePlayerPositionWalkable(-1.0f, -3.4f), "left arch-post collision must remain");
     check(!IsShowcasePlayerPositionWalkable(1.0f, -3.4f), "right arch-post collision must remain");
+    check(IsShowcasePlayerPositionWalkable(-1.80f, -15.20f),
+          "waterfall curtain must remain walk-through at the lantern trigger");
+    RoutePosition waterCrossing{-1.60f, -15.20f};
+    check(Move(waterCrossing, {-2.80f, -15.20f}) &&
+              NearlyEqual(waterCrossing.x, -2.80f),
+          "continuous east-to-west waterfall traversal must remain unobstructed");
 
     // Camera-held props keep their authored reach in open route space, but tuck
     // behind the camera collision boundary when looking directly into masonry.

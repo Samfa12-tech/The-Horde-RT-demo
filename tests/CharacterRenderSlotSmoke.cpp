@@ -73,6 +73,9 @@ int main()
     static_assert(CharacterRenderSlot::kMaximumSkeletonPoseBuckets == 2u);
     static_assert(PresentableTinyRtScene::kBlasCount == 9u);
     static_assert(PresentableTinyRtScene::kTlasInstanceCount == 19u);
+    static_assert(static_cast<std::uint32_t>(WaterQuality::Off) == 0u);
+    static_assert(static_cast<std::uint32_t>(WaterQuality::Mobile) == 1u);
+    static_assert(static_cast<std::uint32_t>(WaterQuality::High) == 2u);
 
     bool ok = true;
     EnemyRosterSnapshot roster;
@@ -100,6 +103,15 @@ int main()
                   adaptedFrame.skeletonEnemies[0].id == simulation::EntityId::SkeletonA &&
                   adaptedFrame.skeletonEnemies[1].id == simulation::EntityId::SkeletonB,
                   "simulation adapter dropped the bounded skeleton entity snapshots");
+    ok &= Require(adaptedFrame.waterQuality == WaterQuality::High,
+                  "simulation adapter default water quality must remain High on Windows/capture callers");
+    ok &= Require(BuildRtSceneFrameInputs(simulationSnapshot, 0.75f, WaterQuality::Off).waterQuality ==
+                      WaterQuality::Off &&
+                  BuildRtSceneFrameInputs(simulationSnapshot, 0.75f, WaterQuality::Mobile).waterQuality ==
+                      WaterQuality::Mobile &&
+                  BuildRtSceneFrameInputs(simulationSnapshot, 0.75f, WaterQuality::High).waterQuality ==
+                      WaterQuality::High,
+                  "simulation adapter did not preserve all three explicit RT water quality modes");
 
     PlayerCombatSnapshot playerCombat;
     const PlayerWeaponRenderPose idleWeapon = EvaluatePlayerWeaponRenderPose(playerCombat, 0.0f, 1.05f);
@@ -257,6 +269,12 @@ int main()
         const std::string raygenSource = ReadTextFile(root / "shaders/raytracing/minimal.rgen");
         const std::string sceneSource =
             ReadTextFile(root / "src/vulkan/raytracing/PresentableTinyRtScene.cpp");
+        const std::string windowsSource =
+            ReadTextFile(root / "src/platform/windows/DiagnosticWindow.cpp");
+        const std::string androidSource = ReadTextFile(
+            root / "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java");
+        const std::string androidBridgeSource =
+            ReadTextFile(root / "android/app/src/main/cpp/android_probe_bridge.cpp");
         ok &= Require(raygenSource.find(
                           "layout(std430, set = 0, binding = 10) readonly buffer SecondSkeletonVertices") !=
                           std::string::npos,
@@ -274,6 +292,79 @@ int main()
                       sceneSource.find("secondSkeletonWrite.pBufferInfo = &secondSkeletonBufferInfo;") !=
                           std::string::npos,
                       "CPU descriptor writes no longer bind the second skeleton GPU vertex buffer at binding 10");
+        constexpr std::array<const char*, 11u> cpuMaterialAbi{{
+            "SurfaceDryStone = 0u", "SurfaceWetCobble = 1u", "SurfaceMossyStone = 2u",
+            "SurfaceDampGround = 3u", "SurfaceAgedMetal = 4u", "SurfaceFlame = 5u",
+            "SurfaceDarkFigure = 6u", "SurfaceHiddenShell = 7u", "SurfaceMirror = 8u",
+            "SurfaceClearGlass = 9u", "SurfaceWater = 10u",
+        }};
+        constexpr std::array<const char*, 11u> shaderMaterialAbi{{
+            "kMaterialDryStone = 0;", "kMaterialWetCobble = 1;", "kMaterialMossyStone = 2;",
+            "kMaterialDampGround = 3;", "kMaterialAgedMetal = 4;", "kMaterialFlame = 5;",
+            "kMaterialDarkFigure = 6;", "kMaterialHiddenShell = 7;", "kMaterialMirror = 8;",
+            "kMaterialClearGlass = 9;", "kMaterialWater = 10;",
+        }};
+        for (std::size_t material = 0u; material < cpuMaterialAbi.size(); ++material)
+        {
+            ok &= Require(sceneSource.find(cpuMaterialAbi[material]) != std::string::npos &&
+                          raygenSource.find(shaderMaterialAbi[material]) != std::string::npos,
+                          "CPU/shader world material ABI changed while appending RT water");
+        }
+        ok &= Require(sceneSource.find("SurfaceWater = 10u") != std::string::npos &&
+                      sceneSource.find("SurfaceWater, SurfaceLeft") != std::string::npos &&
+                      sceneSource.find("worldSurfaceCodes.size() != sceneIndexCount / 3u") != std::string::npos &&
+                      sceneSource.find("waterStreams.size() == 3u") != std::string::npos &&
+                      sceneSource.find("falling water streams must retain real ten-centimetre air gaps") != std::string::npos,
+                      "world water must use separated metadata-backed geometry and retain the triangle-code contract");
+        ok &= Require(sceneSource.find("roundedCatchmentRim") != std::string::npos &&
+                      sceneSource.find("addWorldTriangle(waterImpactCentre") != std::string::npos &&
+                      sceneSource.find("runoffDrainLipX = -5.30f") != std::string::npos &&
+                      sceneSource.find("-5.16f, -1.035f") == std::string::npos,
+                      "floor water must use a rounded catchment and remain visible through the drain lip");
+        ok &= Require(raygenSource.find("const int kMaterialWater = 10;") != std::string::npos &&
+                      raygenSource.find("bool isThinWater") != std::string::npos &&
+                      raygenSource.find("material == kMaterialClearGlass || material == kMaterialWater") != std::string::npos &&
+                      raygenSource.find("vec4 lichGroundMist") != std::string::npos,
+                      "raygen must retain the RT water ABI, transparent visibility route, and bounded lich mist path");
+        ok &= Require(sceneSource.find("sizeof(ScenePushConstants) == 76u") != std::string::npos &&
+                      sceneSource.find("offsetof(ScenePushConstants, waterQuality) == 72u") != std::string::npos,
+                      "appended water quality changed the released CPU/raygen push ABI");
+        ok &= Require(raygenSource.find("waterSheetCoverage") == std::string::npos &&
+                      raygenSource.find("bool waterStreamExit") != std::string::npos &&
+                      raygenSource.find("controls.waterQuality < 0.5") != std::string::npos &&
+                      raygenSource.find("controls.waterQuality >= 1.5") != std::string::npos &&
+                      raygenSource.find("transmissionDirection, 12.0, 0x23u, true") != std::string::npos &&
+                      raygenSource.find("reflectionDirection, 12.0, 0x37u, false") != std::string::npos,
+                      "water quality must retain real ellipse refraction and bounded High/Mobile/Off query routes");
+        const std::size_t waterSecondaryBegin = raygenSource.find("vec3 waterSecondarySample");
+        const std::size_t waterSecondaryEnd = raygenSource.find("vec3 shadeThinWater", waterSecondaryBegin);
+        const std::string waterSecondary =
+            waterSecondaryBegin != std::string::npos && waterSecondaryEnd != std::string::npos
+                ? raygenSource.substr(waterSecondaryBegin, waterSecondaryEnd - waterSecondaryBegin)
+                : std::string{};
+        ok &= Require(!waterSecondary.empty() &&
+                      waterSecondary.find("traceScene(") == std::string::npos &&
+                      waterSecondary.find("visibility(") == std::string::npos &&
+                      waterSecondary.find("rayQuery") == std::string::npos &&
+                      waterSecondary.find("shadePrimary(") == std::string::npos,
+                      "water secondary shading must remain query-free and non-recursive");
+        ok &= Require(raygenSource.find("rayBoxInterval(rayOrigin, rayDirection") != std::string::npos &&
+                      raygenSource.find("const float sampleCount = 6.0") != std::string::npos &&
+                      raygenSource.find("color = color * lichMist.a + lichMist.rgb") != std::string::npos &&
+                      raygenSource.find("vec3(-36.65, -0.95, -18.15)") != std::string::npos,
+                      "lich mist must retain bounded fixed-step front-to-back integration");
+        ok &= Require(windowsSource.find("WaterQuality::High") != std::string::npos &&
+                      windowsSource.find("context.waterQuality = horde::vulkan::raytracing::WaterQuality::High") !=
+                          std::string::npos &&
+                      androidSource.find("WATER_QUALITY_MOBILE = 1") != std::string::npos &&
+                      androidSource.find("preferences.getInt(\"water_quality\", WATER_QUALITY_MOBILE)") !=
+                          std::string::npos,
+                      "platform water-quality defaults changed (Windows/capture High, Android Mobile)");
+        ok &= Require(androidBridgeSource.find("else if (context.routeReplayActive)\n") !=
+                          std::string::npos &&
+                      androidBridgeSource.find("context.routeReplayActive && !simulationPaused") ==
+                          std::string::npos,
+                      "authoritative Android route replay must not freeze behind menu/death pause state");
 
         CharacterRenderSlot slot;
         std::string diagnostic;

@@ -5,7 +5,8 @@ namespace horde::vulkan::raytracing
 
 RtSceneFrameInputs BuildRtSceneFrameInputs(
     const horde::gameplay::simulation::SimulationSnapshot& simulation,
-    const float outputExposure)
+    const float outputExposure,
+    const WaterQuality waterQuality)
 {
     RtSceneFrameInputs frame;
     frame.cameraYaw = simulation.playerYawRadians;
@@ -16,6 +17,7 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     frame.cameraZ = simulation.playerZ;
     frame.walkAmount = simulation.walkAmount;
     frame.outputExposure = outputExposure;
+    frame.waterQuality = waterQuality;
     frame.combat = simulation.swordCombat;
     frame.playerCombat = simulation.playerCombat;
     frame.combat.damageFlash = simulation.playerVitals.damageFlash;

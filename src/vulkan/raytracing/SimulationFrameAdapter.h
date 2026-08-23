@@ -10,6 +10,7 @@ namespace horde::vulkan::raytracing
 // shared simulation the sole gameplay authority on every platform.
 RtSceneFrameInputs BuildRtSceneFrameInputs(
     const horde::gameplay::simulation::SimulationSnapshot& simulation,
-    float outputExposure);
+    float outputExposure,
+    WaterQuality waterQuality = WaterQuality::High);
 
 } // namespace horde::vulkan::raytracing

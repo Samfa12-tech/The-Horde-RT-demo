@@ -37,7 +37,7 @@ inline constexpr std::array<ShowcaseCheckpoint, 13> kShowcaseCheckpoints{{
     {1, "skeleton", kSkeletonRoomCenter.x, kSkeletonRoomCenter.z, 0.0f, 0.0f, ShowcaseZone::SkeletonRoom, ShowcaseCheckpointPreset::Fresh},
     {2, "worst-bend", 4.20f, -10.00f, 0.0f, -0.04f, ShowcaseZone::ShadowCorridor, ShowcaseCheckpointPreset::Fresh},
     {3, "lantern-drop", -1.80f, -15.20f, -kHalfPi, -0.08f, ShowcaseZone::ShadowCorridor, ShowcaseCheckpointPreset::LanternTrigger},
-    {4, "skylight", -5.50f, -15.20f, 0.0f, 0.22f, ShowcaseZone::SkylightChamber, ShowcaseCheckpointPreset::LanternSettled},
+    {4, "skylight", -5.50f, -15.20f, kHalfPi, -0.16f, ShowcaseZone::SkylightChamber, ShowcaseCheckpointPreset::LanternSettled},
     {5, "yellow", -11.00f, -15.20f, -kHalfPi, -0.02f, ShowcaseZone::YellowTorchBay, ShowcaseCheckpointPreset::LanternSettled},
     {6, "blue", -16.00f, -15.20f, -kHalfPi, -0.02f, ShowcaseZone::BlueTorchBay, ShowcaseCheckpointPreset::LanternSettled},
     {7, "red", -21.00f, -15.20f, -kHalfPi, -0.02f, ShowcaseZone::RedTorchBay, ShowcaseCheckpointPreset::LanternSettled},

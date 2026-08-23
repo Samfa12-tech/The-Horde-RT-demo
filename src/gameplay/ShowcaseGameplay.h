@@ -199,11 +199,12 @@ constexpr SceneLightingState RouteLightForPosition(float x, float z)
     return RouteLightForZone(QueryShowcaseZone(x, z));
 }
 
-// The failure begins only near the western exit of the final zig-zag leg. It
-// therefore cannot fire while the player merely passes either earlier bend.
+// The roof-water drench begins only near the western exit of the final
+// zig-zag leg. It therefore cannot fire while the player merely passes either
+// earlier bend, and preserves the authored automatic gutter/drop timing.
 constexpr bool IsLanternFailureTriggerPosition(float x, float z)
 {
-    return x >= -2.50f && x <= -1.35f && z >= -16.40f && z <= -14.00f;
+    return x >= -2.48f && x <= -1.78f && z >= -16.40f && z <= -14.00f;
 }
 
 class LanternSequence

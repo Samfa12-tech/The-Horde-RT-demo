@@ -593,6 +593,95 @@ int main()
           pausedRejectsParry.Snapshot().playerCombat.action == PlayerCombatAction::Idle,
           "paused parry input must be consumed without starting after resume");
 
+    GameSimulation directionalDodge;
+    InputSnapshot dodgeInput;
+    dodgeInput.damageEnabled = false;
+    dodgeInput.moveForward = 1.0f;
+    dodgeInput.commands.dodge = 1u;
+    directionalDodge.StepFixed(dodgeInput);
+    dodgeInput.moveForward = 0.0f;
+    for (int tick = 1; tick < 12; ++tick)
+    {
+        directionalDodge.StepFixed(dodgeInput);
+    }
+    const float forwardDodgeDistance = std::hypot(
+        directionalDodge.Snapshot().playerX - kPlayerSpawn.x,
+        directionalDodge.Snapshot().playerZ - kPlayerSpawn.z);
+    check(directionalDodge.Snapshot().lastConsumedDodgeSequence == 1u &&
+          forwardDodgeDistance > 0.82f && forwardDodgeDistance < 0.98f &&
+          directionalDodge.Snapshot().playerZ < kPlayerSpawn.z,
+          "one dodge command must latch the left-stick direction and travel a bounded distance");
+    const float settledDodgeZ = directionalDodge.Snapshot().playerZ;
+    for (int tick = 0; tick < 12; ++tick)
+    {
+        directionalDodge.StepFixed(dodgeInput);
+    }
+    check(NearlyEqual(directionalDodge.Snapshot().playerZ, settledDodgeZ) &&
+          directionalDodge.Snapshot().lastConsumedDodgeSequence == 1u,
+          "re-reading one dodge sequence must not repeat movement");
+
+    GameSimulation diagonalDodge;
+    InputSnapshot diagonalDodgeInput;
+    diagonalDodgeInput.damageEnabled = false;
+    diagonalDodgeInput.moveForward = 1.0f;
+    diagonalDodgeInput.moveStrafe = 1.0f;
+    diagonalDodgeInput.commands.dodge = 1u;
+    diagonalDodge.StepFixed(diagonalDodgeInput);
+    diagonalDodgeInput.moveForward = 0.0f;
+    diagonalDodgeInput.moveStrafe = 0.0f;
+    for (int tick = 1; tick < 12; ++tick)
+    {
+        diagonalDodge.StepFixed(diagonalDodgeInput);
+    }
+    const float diagonalDistance = std::hypot(
+        diagonalDodge.Snapshot().playerX - kPlayerSpawn.x,
+        diagonalDodge.Snapshot().playerZ - kPlayerSpawn.z);
+    check(diagonalDistance > 0.82f && diagonalDistance < 0.98f,
+          "diagonal left-stick dodge direction must be normalized");
+
+    GameSimulation neutralDodge;
+    InputSnapshot neutralDodgeInput;
+    neutralDodgeInput.damageEnabled = false;
+    neutralDodgeInput.yawRadians = 1.57079632679f;
+    neutralDodgeInput.commands.dodge = 1u;
+    for (int tick = 0; tick < 12; ++tick)
+    {
+        neutralDodge.StepFixed(neutralDodgeInput);
+    }
+    check(neutralDodge.Snapshot().playerX > kPlayerSpawn.x + 0.82f &&
+          std::abs(neutralDodge.Snapshot().playerZ - kPlayerSpawn.z) < 0.04f,
+          "neutral-stick dodge must fall back to current facing");
+
+    GameSimulation collisionDodge(GameSimulationConfig{.playerStartX = 1.65f,
+                                                        .playerStartZ = 1.85f,
+                                                        .playerStartYawRadians = 0.0f});
+    InputSnapshot collisionDodgeInput;
+    collisionDodgeInput.damageEnabled = false;
+    collisionDodgeInput.moveStrafe = 1.0f;
+    collisionDodgeInput.commands.dodge = 1u;
+    for (int tick = 0; tick < 12; ++tick)
+    {
+        collisionDodge.StepFixed(collisionDodgeInput);
+        collisionDodgeInput.moveStrafe = 0.0f;
+    }
+    check(IsShowcasePlayerPositionWalkable(collisionDodge.Snapshot().playerX,
+                                           collisionDodge.Snapshot().playerZ) &&
+          collisionDodge.Snapshot().playerX < 1.85f,
+          "dodge displacement must remain inside the shared corridor collision route");
+
+    GameSimulation pausedRejectsDodge;
+    InputSnapshot pausedDodgeInput;
+    pausedDodgeInput.paused = true;
+    pausedDodgeInput.commands.dodge = 1u;
+    pausedRejectsDodge.StepFixed(pausedDodgeInput);
+    pausedDodgeInput.paused = false;
+    pausedRejectsDodge.StepFixed(pausedDodgeInput);
+    check(pausedRejectsDodge.Snapshot().lastConsumedDodgeSequence == 1u &&
+          !pausedRejectsDodge.Snapshot().dodgeActive &&
+          NearlyEqual(pausedRejectsDodge.Snapshot().playerX, kPlayerSpawn.x) &&
+          NearlyEqual(pausedRejectsDodge.Snapshot().playerZ, kPlayerSpawn.z),
+          "paused dodge input must be consumed without buffering movement after resume");
+
     GameSimulation resetParity;
     check(resetParity.ApplyShowcaseCheckpoint(0) &&
           NearlyEqual(resetParity.Snapshot().playerPitchRadians, -0.05f) &&

@@ -190,6 +190,10 @@ int main()
         {
             ++equivalentInput.commands.attack;
         }
+        if (frame == 24u || frame == 72u)
+        {
+            ++equivalentInput.commands.dodge;
+        }
         windowsStyle.AdvanceFrame(equivalentInput, 1.0 / 60.0, frame);
         mailbox.Publish(equivalentInput);
         const PublishedInput published = mailbox.ConsumeLatest();
@@ -203,7 +207,8 @@ int main()
           NearlyEqual(windowsSnapshot.playerZ, androidSnapshot.playerZ) &&
           windowsSnapshot.activeEnemyKind == androidSnapshot.activeEnemyKind &&
           windowsSnapshot.playerVitals.vitality == androidSnapshot.playerVitals.vitality &&
-          windowsSnapshot.lastConsumedAttackSequence == androidSnapshot.lastConsumedAttackSequence,
+          windowsSnapshot.lastConsumedAttackSequence == androidSnapshot.lastConsumedAttackSequence &&
+          windowsSnapshot.lastConsumedDodgeSequence == androidSnapshot.lastConsumedDodgeSequence,
           "equivalent direct Windows and coherent Android-mailbox input must produce the same simulation snapshot");
 
     if (!passed)

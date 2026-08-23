@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Horde Lantern RT Alpha</string>
-    <string name="alpha_version">SHOWCASE · ALPHA 0.1.4</string>
+    <string name="alpha_version">SHOWCASE · ALPHA 0.1.5</string>
     <string name="start_demo">ENTER THE RUIN</string>
     <string name="resume_demo">RESUME</string>
     <string name="restart_route">RESTART ROUTE</string>
@@ -52,7 +52,11 @@
     <string name="sfx_volume">SFX volume</string>
     <string name="look_sensitivity">Look sensitivity</string>
     <string name="render_scale">Render resolution</string>
+    <string name="water_quality">RT water: %1$s</string>
+    <string name="water_quality_off">Off</string>
+    <string name="water_quality_mobile">Mobile</string>
+    <string name="water_quality_high">High</string>
     <string name="show_hud">Show compact HUD</string>
     <string name="reset_defaults">RESET DEFAULTS</string>
-    <string name="credits_body">Environment materials: Poly Haven — CC0.\nhttps://polyhaven.com/\n\nSound effects: FilmCow Royalty Free Sound Effects Library — FilmCow custom royalty-free licence.\nhttps://filmcow.itch.io/filmcow-sfx\n\nSkeleton derivative: original Free Stylized Dark Fantasy Skeleton by Hotstrike Studio; texture, rig, and animation processing created with Meshy — CC BY 4.0.\nhttps://hotstrikestudio.itch.io/free-stylized-skeleton\n\nPlaceholder lich character created and animated with Meshy — CC0.\nhttps://www.meshy.ai/\n\nApplication icon created for this project with OpenAI image generation.\n\nFull provenance and licence details:\nhttps://github.com/Samfa12-tech/The-Horde-RT-demo/blob/main/ASSET_LICENSES.md</string>
+    <string name="credits_body">Environment materials: Poly Haven — CC0.\nhttps://polyhaven.com/\n\nSound effects: FilmCow Royalty Free Sound Effects Library — FilmCow custom royalty-free licence.\nhttps://filmcow.itch.io/filmcow-sfx\n\nWater Dripping by DRAGON-STUDIO via Pixabay — Pixabay Content License.\nhttps://pixabay.com/sound-effects/nature-water-dripping-364450/\n\nSkeleton derivative: original Free Stylized Dark Fantasy Skeleton by Hotstrike Studio; texture, rig, and animation processing created with Meshy — CC BY 4.0.\nhttps://hotstrikestudio.itch.io/free-stylized-skeleton\n\nPlaceholder lich character created and animated with Meshy — CC0.\nhttps://www.meshy.ai/\n\nApplication icon created for this project with OpenAI image generation.\n\nFull provenance and licence details:\nhttps://github.com/Samfa12-tech/The-Horde-RT-demo/blob/main/ASSET_LICENSES.md</string>
 </resources>

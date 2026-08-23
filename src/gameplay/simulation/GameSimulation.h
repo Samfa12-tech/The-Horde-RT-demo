@@ -90,16 +90,25 @@ private:
     std::uint64_t inputPublicationSequence_ = 0u;
     std::uint64_t latestAttackSequence_ = 0u;
     std::uint64_t latestParrySequence_ = 0u;
+    std::uint64_t latestDodgeSequence_ = 0u;
     std::uint64_t latestRouteResetSequence_ = 0u;
     std::uint64_t latestRetrySequence_ = 0u;
     std::uint64_t lastConsumedAttackSequence_ = 0u;
     std::uint64_t lastConsumedParrySequence_ = 0u;
+    std::uint64_t lastConsumedDodgeSequence_ = 0u;
     std::uint64_t lastConsumedRouteResetSequence_ = 0u;
     std::uint64_t lastConsumedRetrySequence_ = 0u;
     std::uint64_t pendingAttackCommands_ = 0u;
     std::uint64_t pendingParryCommands_ = 0u;
+    std::uint64_t pendingDodgeCommands_ = 0u;
     std::uint64_t pendingRouteResetCommands_ = 0u;
     std::uint64_t pendingRetryCommands_ = 0u;
+    float pendingDodgeForward_ = 0.0f;
+    float pendingDodgeStrafe_ = 0.0f;
+    float dodgeDirectionX_ = 0.0f;
+    float dodgeDirectionZ_ = -1.0f;
+    float dodgeRemainingSeconds_ = 0.0f;
+    float dodgeCooldownRemainingSeconds_ = 0.0f;
     bool finaleCompletionEmitted_ = false;
 };
 

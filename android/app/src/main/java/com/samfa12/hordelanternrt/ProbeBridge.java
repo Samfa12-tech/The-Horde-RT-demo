@@ -24,6 +24,7 @@ public final class ProbeBridge {
     public static native int retryEncounter();
     public static native void setSimulationPaused(boolean paused);
     public static native void setRenderScale(float scale);
+    public static native void setWaterQuality(int quality);
     public static native void setGpuTimingEnabled(boolean enabled);
     public static native boolean requestDebugCheckpoint(int checkpointId);
     public static native boolean requestDebugCaptureCheckpoint(int checkpointId);
@@ -34,5 +35,6 @@ public final class ProbeBridge {
     public static native String getBenchmarkProgress();
     public static native String getBenchmarkReport();
     public static native int getRuntimeState();
+    public static native long getWaterfallStereoGains();
     public static native long[] drainPlatformEvents();
 }

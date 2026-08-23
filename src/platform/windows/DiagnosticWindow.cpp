@@ -27,6 +27,7 @@
 #define NOMINMAX
 #endif
 #include <windows.h>
+#include <xinput.h>
 #include <bcrypt.h>
 #include <commdlg.h>
 #include <commctrl.h>
@@ -50,6 +51,7 @@
 #include "gameplay/SpatialAudio.h"
 #include "gameplay/SwordCombat.h"
 #include "gameplay/simulation/GameSimulation.h"
+#include "platform/windows/DesktopControllerInput.h"
 #include "vulkan/GpuFrameTimer.h"
 #include "vulkan/RtCapabilityReport.h"
 #include "vulkan/VulkanContext.h"
@@ -106,6 +108,7 @@ constexpr int kBenchmarkSaveButtonId = 122;
 constexpr int kBenchmarkBackButtonId = 123;
 constexpr int kVitalityHudControlId = 124;
 constexpr int kEndingBodyId = 125;
+constexpr int kWaterQualityButtonId = 126;
 constexpr int kMenuPauseId = 2001;
 constexpr int kMenuRestartId = 2002;
 constexpr int kMenuExitId = 2003;
@@ -200,7 +203,22 @@ struct VulkanSurfaceContext
     bool leftHeld = false;
     bool rightHeld = false;
     bool mouseLookActive = false;
+    bool mouseCursorHidden = false;
+    POINT mouseRestorePosition{};
     POINT lastMousePosition{};
+    float controllerForward = 0.0f;
+    float controllerStrafe = 0.0f;
+    float controllerLookHorizontal = 0.0f;
+    float controllerLookVertical = 0.0f;
+    WORD previousControllerButtons = 0u;
+    WORD previousXInputUiButtons = 0u;
+    DWORD previousLegacyControllerButtons = 0u;
+    DWORD previousLegacyUiButtons = 0u;
+    DWORD previousLegacyPov = JOY_POVCENTERED;
+    horde::platform::windows::ControllerTriggerLatch controllerTriggerLatch;
+    std::optional<DWORD> xInputUserIndex;
+    std::optional<UINT> legacyJoystickId;
+    horde::platform::windows::LegacyRightStickAxes legacyRightStickAxes;
     ULONGLONG lastControlTick = 0u;
     float cameraYaw = 0.0f;
     float cameraPitch = 0.0f;
@@ -217,6 +235,8 @@ struct VulkanSurfaceContext
     float outputExposure = 0.62f;
     float mouseSensitivity = 1.0f;
     float renderScale = 1.0f;
+    horde::vulkan::raytracing::WaterQuality waterQuality =
+        horde::vulkan::raytracing::WaterQuality::High;
     bool renderScaleDirty = false;
     WINDOWPLACEMENT windowedPlacement{sizeof(WINDOWPLACEMENT)};
     horde::gameplay::simulation::GameSimulation simulation;
@@ -224,6 +244,7 @@ struct VulkanSurfaceContext
     std::uint64_t inputPublicationSequence = 0u;
     std::uint64_t attackSequence = 0u;
     std::uint64_t parrySequence = 0u;
+    std::uint64_t dodgeSequence = 0u;
     std::uint64_t routeResetSequence = 0u;
     std::uint64_t retrySequence = 0u;
     int playerSwingVariant = 0;
@@ -474,6 +495,8 @@ void LoadSettings(VulkanSurfaceContext& context)
     context.mouseSensitivity = static_cast<float>(sensitivity) / 100.0f;
     const int renderScale = std::clamp(static_cast<int>(GetPrivateProfileIntA("display", "renderScale", 100, path.c_str())), 50, 100);
     context.renderScale = static_cast<float>(renderScale) / 100.0f;
+    const int waterQuality = std::clamp(static_cast<int>(GetPrivateProfileIntA("display", "waterQuality", 2, path.c_str())), 0, 2);
+    context.waterQuality = static_cast<horde::vulkan::raytracing::WaterQuality>(waterQuality);
 }
 
 void SaveSettings(const VulkanSurfaceContext& context)
@@ -484,6 +507,8 @@ void SaveSettings(const VulkanSurfaceContext& context)
     WritePrivateProfileStringA("controls", "lookSensitivity", sensitivity.c_str(), path.c_str());
     const std::string renderScale = std::to_string(static_cast<int>(std::round(context.renderScale * 100.0f)));
     WritePrivateProfileStringA("display", "renderScale", renderScale.c_str(), path.c_str());
+    const std::string waterQuality = std::to_string(static_cast<int>(context.waterQuality));
+    WritePrivateProfileStringA("display", "waterQuality", waterQuality.c_str(), path.c_str());
 }
 
 void LogWindowsAudio(const std::string& message)
@@ -612,6 +637,86 @@ public:
         }
     }
 
+    bool StartOrUpdateLoop(const std::string_view key,
+                           const std::filesystem::path& path,
+                           float leftGain,
+                           float rightGain)
+    {
+        if (engine_ == nullptr || masteringVoice_ == nullptr)
+        {
+            LogFailureOnce("XAudio2 unavailable for loop " + path.string());
+            return false;
+        }
+        for (ActiveVoice& active : activeVoices_)
+        {
+            if (active.loopKey == key)
+            {
+                return SetVoiceMatrix(active.voice, leftGain, rightGain, path);
+            }
+        }
+
+        const std::shared_ptr<const LoadedWave> wave = Load(path);
+        if (!wave || wave->format.nChannels != 1u || wave->samples.size() > UINT32_MAX)
+        {
+            LogFailureOnce("unsupported or unreadable mono loop WAV: " + path.string());
+            return false;
+        }
+        IXAudio2SourceVoice* voice = nullptr;
+        const HRESULT sourceResult = engine_->CreateSourceVoice(&voice, &wave->format);
+        if (FAILED(sourceResult) || voice == nullptr)
+        {
+            LogFailureOnce("CreateSourceVoice failed for loop, HRESULT=" +
+                           std::to_string(static_cast<long>(sourceResult)) + ": " + path.string());
+            return false;
+        }
+        if (!SetVoiceMatrix(voice, leftGain, rightGain, path))
+        {
+            voice->DestroyVoice();
+            return false;
+        }
+        const XAUDIO2_BUFFER buffer{
+            0u,
+            static_cast<UINT32>(wave->samples.size()),
+            wave->samples.data(),
+            0u,
+            0u,
+            0u,
+            0u,
+            XAUDIO2_LOOP_INFINITE,
+            nullptr};
+        const HRESULT submitResult = voice->SubmitSourceBuffer(&buffer);
+        const HRESULT startResult = SUCCEEDED(submitResult) ? voice->Start() : E_FAIL;
+        if (FAILED(submitResult) || FAILED(startResult))
+        {
+            LogFailureOnce("loop voice submit/start failed, HRESULT=" +
+                           std::to_string(static_cast<long>(FAILED(submitResult) ? submitResult : startResult)) +
+                           ": " + path.string());
+            voice->DestroyVoice();
+            return false;
+        }
+        activeVoices_.push_back({voice, wave, path.filename().string(), std::string(key)});
+        LogWindowsAudio("positional loop started: " + path.filename().string());
+        return true;
+    }
+
+    void StopLoop(const std::string_view key)
+    {
+        for (auto it = activeVoices_.begin(); it != activeVoices_.end();)
+        {
+            if (it->loopKey == key)
+            {
+                it->voice->Stop(0u);
+                it->voice->FlushSourceBuffers();
+                it->voice->DestroyVoice();
+                it = activeVoices_.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
+        }
+    }
+
     bool Play(const std::filesystem::path& path, float leftGain, float rightGain)
     {
         if (engine_ == nullptr || masteringVoice_ == nullptr)
@@ -681,7 +786,7 @@ public:
             return false;
         }
         const std::string filename = path.filename().string();
-        activeVoices_.push_back({voice, wave, filename});
+        activeVoices_.push_back({voice, wave, filename, {}});
         if (!successfulVoiceLogged_)
         {
             successfulVoiceLogged_ = true;
@@ -704,7 +809,34 @@ private:
         IXAudio2SourceVoice* voice = nullptr;
         std::shared_ptr<const LoadedWave> wave;
         std::string filename;
+        std::string loopKey;
     };
+
+    bool SetVoiceMatrix(IXAudio2SourceVoice* voice,
+                        float leftGain,
+                        float rightGain,
+                        const std::filesystem::path& path)
+    {
+        std::vector<float> matrix(outputChannels_, 0.0f);
+        if (outputChannels_ == 1u)
+        {
+            matrix[0] = std::max(leftGain, rightGain);
+        }
+        else
+        {
+            matrix[0] = std::clamp(leftGain, 0.0f, 1.0f);
+            matrix[1] = std::clamp(rightGain, 0.0f, 1.0f);
+        }
+        const HRESULT result = voice->SetOutputMatrix(
+            masteringVoice_, 1u, outputChannels_, matrix.data());
+        if (FAILED(result))
+        {
+            LogFailureOnce("SetOutputMatrix failed, HRESULT=" +
+                           std::to_string(static_cast<long>(result)) + ": " + path.string());
+            return false;
+        }
+        return true;
+    }
 
     std::shared_ptr<const LoadedWave> Load(const std::filesystem::path& path)
     {
@@ -820,6 +952,30 @@ bool PlayXAudioFile(const std::filesystem::path& path, float leftGain, float rig
     return SpatialAudioEngine().Play(path,
                                      std::clamp(leftGain, 0.0f, 1.0f),
                                      std::clamp(rightGain, 0.0f, 1.0f));
+}
+
+void UpdateWaterfallAmbience(const VulkanSurfaceContext& context)
+{
+    constexpr std::string_view loopKey = "waterfall";
+    PositionalAudioEngine& engine = SpatialAudioEngine();
+    if (!context.sfxEnabled || context.simulationPaused)
+    {
+        engine.StopLoop(loopKey);
+        return;
+    }
+    const horde::gameplay::simulation::SimulationSnapshot& simulation =
+        context.simulation.Snapshot();
+    const horde::gameplay::SpatialAudioGains gains = horde::gameplay::CalculateSpatialAudio(
+        {-2.32f, -15.26f, 0.52f, 0.65f, 10.0f},
+        {simulation.playerX, simulation.playerZ, simulation.playerYawRadians});
+    const std::filesystem::path path =
+        ResolveAssetRoot() / "audio/pixabay/waterfall_loop.wav";
+    if (gains.left <= 0.0f && gains.right <= 0.0f)
+    {
+        engine.StopLoop(loopKey);
+        return;
+    }
+    engine.StartOrUpdateLoop(loopKey, path, gains.left, gains.right);
 }
 
 void PlayPositionalSoundEffect(const VulkanSurfaceContext& context,
@@ -953,6 +1109,13 @@ void UpdateSettingsLabels(VulkanSurfaceContext& context)
         const std::string label = std::string("LOOK SENSITIVITY: ") + value;
         SetWindowTextA(sensitivity, label.c_str());
     }
+    if (HWND water = GetDlgItem(context.windowHandle, kWaterQualityButtonId))
+    {
+        const char* value = context.waterQuality == horde::vulkan::raytracing::WaterQuality::High ? "HIGH" :
+                            (context.waterQuality == horde::vulkan::raytracing::WaterQuality::Mobile ? "MOBILE" : "OFF");
+        const std::string label = std::string("RT WATER: ") + value;
+        SetWindowTextA(water, label.c_str());
+    }
     if (HWND fullscreen = GetDlgItem(context.windowHandle, kFullscreenButtonId))
     {
         SetWindowTextA(fullscreen, context.fullscreen ? "DISPLAY: FULLSCREEN" : "DISPLAY: WINDOWED");
@@ -998,11 +1161,14 @@ bool IsPlayerDamageEnabled(const VulkanSurfaceContext& context)
            GetPropA(context.windowHandle, kCaptureModeProperty) == nullptr;
 }
 
-void MirrorSimulationSnapshot(VulkanSurfaceContext& context)
+void MirrorSimulationSnapshot(VulkanSurfaceContext& context, const bool mirrorView = true)
 {
     const horde::gameplay::simulation::SimulationSnapshot& snapshot = context.simulation.Snapshot();
-    context.cameraYaw = snapshot.playerYawRadians;
-    context.cameraPitch = snapshot.playerPitchRadians;
+    if (mirrorView)
+    {
+        context.cameraYaw = snapshot.playerYawRadians;
+        context.cameraPitch = snapshot.playerPitchRadians;
+    }
     context.walkTime = snapshot.walkTime;
     context.walkVisualAmount = snapshot.walkAmount;
     context.cameraX = snapshot.playerX;
@@ -1030,8 +1196,8 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
     {
         SetControlVisible(context.windowHandle, id, fullPauseMenuVisible);
     }
-    for (const int id : {kSettingsTitleId, kSfxButtonId, kSensitivityButtonId, kRenderScaleLabelId,
-                         kRenderScaleSliderId, kFullscreenButtonId, kSettingsBackButtonId})
+    for (const int id : {kSettingsTitleId, kSfxButtonId, kSensitivityButtonId, kWaterQualityButtonId, kRenderScaleLabelId,
+                          kRenderScaleSliderId, kFullscreenButtonId, kSettingsBackButtonId})
     {
         SetControlVisible(context.windowHandle, id, context.settingsVisible);
     }
@@ -1686,10 +1852,360 @@ void ClearDesktopInput(VulkanSurfaceContext& context)
     context.leftHeld = false;
     context.rightHeld = false;
     context.mouseLookActive = false;
+    context.controllerForward = 0.0f;
+    context.controllerStrafe = 0.0f;
+    context.controllerLookHorizontal = 0.0f;
+    context.controllerLookVertical = 0.0f;
+    context.previousControllerButtons = 0u;
+    context.previousLegacyControllerButtons = 0u;
+    context.controllerTriggerLatch = {};
+    context.xInputUserIndex.reset();
+    context.legacyJoystickId.reset();
+    context.legacyRightStickAxes = {};
+    ClipCursor(nullptr);
+    if (context.mouseCursorHidden)
+    {
+        ShowCursor(TRUE);
+        SetCursorPos(context.mouseRestorePosition.x, context.mouseRestorePosition.y);
+        context.mouseCursorHidden = false;
+    }
     if (GetCapture() == context.windowHandle)
     {
         ReleaseCapture();
     }
+}
+
+std::vector<HWND> VisibleControllerMenuControls(const VulkanSurfaceContext& context)
+{
+    constexpr std::array<int, 17u> controlIds{{
+        kResumeButtonId, kRestartButtonId, kControlsButtonId, kSettingsButtonId,
+        kDiagnosticsButtonId, kRunBenchmarkButtonId, kMoreBySamfa12ButtonId,
+        kExitButtonId, kSfxButtonId, kSensitivityButtonId, kWaterQualityButtonId,
+        kRenderScaleSliderId, kFullscreenButtonId, kSettingsBackButtonId,
+        kBenchmarkCopyButtonId, kBenchmarkSaveButtonId, kBenchmarkBackButtonId,
+    }};
+    std::vector<HWND> controls;
+    controls.reserve(controlIds.size());
+    for (const int id : controlIds)
+    {
+        HWND control = GetDlgItem(context.windowHandle, id);
+        if (control != nullptr && IsWindowVisible(control) && IsWindowEnabled(control))
+        {
+            controls.push_back(control);
+        }
+    }
+    return controls;
+}
+
+void NavigateControllerMenu(VulkanSurfaceContext& context, const int direction)
+{
+    const std::vector<HWND> controls = VisibleControllerMenuControls(context);
+    if (controls.empty())
+    {
+        return;
+    }
+    HWND focused = GetFocus();
+    auto found = std::find(controls.begin(), controls.end(), focused);
+    std::size_t index = found == controls.end()
+        ? (direction < 0 ? controls.size() - 1u : 0u)
+        : static_cast<std::size_t>(std::distance(controls.begin(), found));
+    if (found != controls.end())
+    {
+        index = direction < 0
+            ? (index + controls.size() - 1u) % controls.size()
+            : (index + 1u) % controls.size();
+    }
+    SetFocus(controls[index]);
+    PlaySoundEffect(context, "ui_select.wav");
+}
+
+void CancelControllerMenu(VulkanSurfaceContext& context)
+{
+    int command = kResumeButtonId;
+    if (context.settingsVisible)
+    {
+        command = kSettingsBackButtonId;
+    }
+    else if (context.diagnosticsVisible)
+    {
+        command = kMenuDiagnosticsId;
+    }
+    else if (context.benchmarkReportVisible)
+    {
+        command = kBenchmarkBackButtonId;
+    }
+    PostMessageA(context.windowHandle, WM_COMMAND, MAKEWPARAM(command, BN_CLICKED), 0);
+}
+
+bool AdjustFocusedControllerSlider(VulkanSurfaceContext& context, const bool increase)
+{
+    HWND focused = GetFocus();
+    HWND slider = GetDlgItem(context.windowHandle, kRenderScaleSliderId);
+    if (focused != slider || slider == nullptr)
+    {
+        return false;
+    }
+    const int current = static_cast<int>(SendMessageA(slider, TBM_GETPOS, 0, 0));
+    const int next = horde::platform::windows::StepControllerSlider(current, increase);
+    if (next != current)
+    {
+        SendMessageA(slider, TBM_SETPOS, TRUE, next);
+        SendMessageA(context.windowHandle, WM_HSCROLL,
+                     MAKEWPARAM(TB_ENDTRACK, next),
+                     reinterpret_cast<LPARAM>(slider));
+        PlaySoundEffect(context, "ui_select.wav");
+    }
+    return true;
+}
+
+void HandleControllerMenuEdges(
+    VulkanSurfaceContext& context,
+    const horde::platform::windows::ControllerMenuEdges& edges)
+{
+    if (edges.togglePause)
+    {
+        PostMessageA(context.windowHandle, WM_COMMAND,
+                     MAKEWPARAM(kMenuPauseId, BN_CLICKED), 0);
+        return;
+    }
+    if (!context.simulationPaused)
+    {
+        return;
+    }
+    if (edges.decrease || edges.increase)
+    {
+        if (!AdjustFocusedControllerSlider(context, edges.increase))
+        {
+            NavigateControllerMenu(context, edges.increase ? 1 : -1);
+        }
+    }
+    else if (edges.previous)
+    {
+        NavigateControllerMenu(context, -1);
+    }
+    else if (edges.next)
+    {
+        NavigateControllerMenu(context, 1);
+    }
+    else if (edges.confirm)
+    {
+        HWND focused = GetFocus();
+        const std::vector<HWND> controls = VisibleControllerMenuControls(context);
+        if (std::find(controls.begin(), controls.end(), focused) == controls.end())
+        {
+            if (!controls.empty()) SetFocus(controls.front());
+        }
+        else
+        {
+            SendMessageA(focused, BM_CLICK, 0, 0);
+        }
+    }
+    else if (edges.cancel)
+    {
+        CancelControllerMenu(context);
+    }
+}
+
+using XInputGetStateProc = DWORD(WINAPI*)(DWORD, XINPUT_STATE*);
+
+void PollDesktopController(VulkanSurfaceContext& context)
+{
+    static XInputGetStateProc getState = []() -> XInputGetStateProc
+    {
+        for (const wchar_t* library : {L"xinput1_4.dll", L"xinput9_1_0.dll", L"xinput1_3.dll"})
+        {
+            if (HMODULE module = LoadLibraryW(library))
+            {
+                if (auto proc = reinterpret_cast<XInputGetStateProc>(GetProcAddress(module, "XInputGetState"))) return proc;
+            }
+        }
+        return nullptr;
+    }();
+    XINPUT_STATE state{};
+    std::optional<DWORD> xinputUser;
+    if (getState != nullptr)
+    {
+        if (context.xInputUserIndex.has_value() &&
+            getState(*context.xInputUserIndex, &state) == ERROR_SUCCESS)
+        {
+            xinputUser = context.xInputUserIndex;
+        }
+        else
+        {
+            for (DWORD user = 0u; user < XUSER_MAX_COUNT; ++user)
+            {
+                if (getState(user, &state) == ERROR_SUCCESS)
+                {
+                    xinputUser = user;
+                    break;
+                }
+            }
+        }
+    }
+    const bool xinputConnected = xinputUser.has_value();
+    if (!xinputConnected)
+    {
+        context.xInputUserIndex.reset();
+        JOYINFOEX legacy{};
+        const auto pollLegacy = [&legacy](const UINT joystick)
+        {
+            legacy = {};
+            legacy.dwSize = sizeof(legacy);
+            legacy.dwFlags = JOY_RETURNALL;
+            return joyGetPosEx(joystick, &legacy) == JOYERR_NOERROR;
+        };
+        std::optional<UINT> joystick;
+        if (context.legacyJoystickId.has_value() && pollLegacy(*context.legacyJoystickId))
+        {
+            joystick = context.legacyJoystickId;
+        }
+        else
+        {
+            for (UINT candidate = 0u; candidate < joyGetNumDevs(); ++candidate)
+            {
+                if (pollLegacy(candidate))
+                {
+                    joystick = candidate;
+                    break;
+                }
+            }
+        }
+        if (!joystick.has_value())
+        {
+            context.controllerStrafe = 0.0f;
+            context.controllerForward = 0.0f;
+            context.controllerLookHorizontal = 0.0f;
+            context.controllerLookVertical = 0.0f;
+            context.previousControllerButtons = 0u;
+            context.previousLegacyUiButtons = 0u;
+            context.previousLegacyPov = JOY_POVCENTERED;
+            context.legacyJoystickId.reset();
+            context.legacyRightStickAxes = {};
+            return;
+        }
+        JOYCAPSA caps{};
+        if (joyGetDevCapsA(*joystick, &caps, sizeof(caps)) != JOYERR_NOERROR)
+        {
+            return;
+        }
+        const auto normaliseRaw = [](const DWORD value, const UINT minimum, const UINT maximum)
+        {
+            const float centered = (float(value) - (float(minimum) + float(maximum)) * 0.5f) / std::max(1.0f, (float(maximum) - float(minimum)) * 0.5f);
+            return std::clamp(centered, -1.0f, 1.0f);
+        };
+        const auto applyDeadzone = [](const float value)
+        {
+            return std::abs(value) > 0.16f ? value : 0.0f;
+        };
+        context.controllerStrafe = applyDeadzone(normaliseRaw(legacy.dwXpos, caps.wXmin, caps.wXmax));
+        context.controllerForward = -applyDeadzone(normaliseRaw(legacy.dwYpos, caps.wYmin, caps.wYmax));
+
+        const horde::platform::windows::LegacyAxisSample axisSample{
+            .z = normaliseRaw(legacy.dwZpos, caps.wZmin, caps.wZmax),
+            .r = normaliseRaw(legacy.dwRpos, caps.wRmin, caps.wRmax),
+            .u = normaliseRaw(legacy.dwUpos, caps.wUmin, caps.wUmax),
+            .v = normaliseRaw(legacy.dwVpos, caps.wVmin, caps.wVmax),
+            .hasZ = (caps.wCaps & JOYCAPS_HASZ) != 0u && caps.wZmax > caps.wZmin,
+            .hasR = (caps.wCaps & JOYCAPS_HASR) != 0u && caps.wRmax > caps.wRmin,
+            .hasU = (caps.wCaps & JOYCAPS_HASU) != 0u && caps.wUmax > caps.wUmin,
+            .hasV = (caps.wCaps & JOYCAPS_HASV) != 0u && caps.wVmax > caps.wVmin,
+        };
+        const horde::platform::windows::LegacyControllerIdentity identity{
+            .vendorId = caps.wMid,
+            .productId = caps.wPid,
+            .productName = caps.szPname,
+        };
+        if (context.legacyJoystickId != joystick ||
+            context.legacyRightStickAxes.horizontal == horde::platform::windows::LegacyAxis::None)
+        {
+            context.legacyRightStickAxes =
+                horde::platform::windows::SelectLegacyRightStickAxes(axisSample, identity);
+            context.previousControllerButtons = 0u;
+            context.previousLegacyControllerButtons = 0u;
+            context.previousLegacyUiButtons = legacy.dwButtons;
+            context.previousLegacyPov = legacy.dwPOV;
+            context.controllerTriggerLatch = {};
+            std::ostringstream controllerDiagnostic;
+            controllerDiagnostic << "WinMM controller connected: id=" << *joystick
+                                 << ", vendor=0x" << std::hex << caps.wMid
+                                 << ", product=0x" << caps.wPid << std::dec
+                                 << ", name=" << caps.szPname
+                                 << ", axes=" << caps.wNumAxes
+                                 << ", buttons=" << caps.wNumButtons
+                                 << ", look=" << static_cast<int>(context.legacyRightStickAxes.horizontal)
+                                 << '/' << static_cast<int>(context.legacyRightStickAxes.vertical);
+            LogWindowsAudio(controllerDiagnostic.str());
+        }
+        context.legacyJoystickId = joystick;
+        context.controllerLookHorizontal = applyDeadzone(horde::platform::windows::LegacyAxisValue(
+            axisSample, context.legacyRightStickAxes.horizontal));
+        context.controllerLookVertical = applyDeadzone(horde::platform::windows::LegacyAxisValue(
+            axisSample, context.legacyRightStickAxes.vertical));
+        const horde::platform::windows::ControllerActionEdges edges =
+            horde::platform::windows::MapLegacyControllerEdges(
+                legacy.dwButtons, context.previousLegacyControllerButtons, identity);
+        if (!context.simulationPaused)
+        {
+            if (edges.attackPressed) ++context.attackSequence;
+            if (edges.parryPressed) ++context.parrySequence;
+            if (edges.dodgePressed) ++context.dodgeSequence;
+        }
+        const horde::platform::windows::ControllerMenuEdges menuEdges =
+            horde::platform::windows::MapLegacyControllerMenuEdges(
+                legacy.dwButtons, context.previousLegacyUiButtons,
+                legacy.dwPOV, context.previousLegacyPov, identity);
+        context.previousLegacyControllerButtons = legacy.dwButtons;
+        context.previousLegacyUiButtons = legacy.dwButtons;
+        context.previousLegacyPov = legacy.dwPOV;
+        HandleControllerMenuEdges(context, menuEdges);
+        return;
+    }
+    if (context.xInputUserIndex != xinputUser)
+    {
+        context.previousControllerButtons = 0u;
+        context.previousXInputUiButtons = state.Gamepad.wButtons;
+        context.previousLegacyControllerButtons = 0u;
+        context.controllerTriggerLatch = {};
+    }
+    context.xInputUserIndex = xinputUser;
+    context.legacyJoystickId.reset();
+    context.legacyRightStickAxes = {};
+    context.previousLegacyUiButtons = 0u;
+    context.previousLegacyPov = JOY_POVCENTERED;
+    const auto axis = [](SHORT value, SHORT deadzone)
+    {
+        const float magnitude = static_cast<float>(value) / 32767.0f;
+        return std::abs(magnitude) > static_cast<float>(deadzone) / 32767.0f ? magnitude : 0.0f;
+    };
+    context.controllerStrafe = axis(state.Gamepad.sThumbLX, XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
+    context.controllerForward = axis(state.Gamepad.sThumbLY, XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
+    context.controllerLookHorizontal = axis(state.Gamepad.sThumbRX, XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE);
+    context.controllerLookVertical = -axis(state.Gamepad.sThumbRY, XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE);
+    const WORD pressed = state.Gamepad.wButtons & ~context.previousControllerButtons;
+    const horde::platform::windows::ControllerActionEdges triggerEdges =
+        horde::platform::windows::UpdateXInputTriggerEdges(
+            state.Gamepad.bLeftTrigger,
+            state.Gamepad.bRightTrigger,
+            context.controllerTriggerLatch);
+    if (!context.simulationPaused)
+    {
+        if (triggerEdges.attackPressed) ++context.attackSequence;
+        if (triggerEdges.parryPressed) ++context.parrySequence;
+        if ((pressed & XINPUT_GAMEPAD_B) != 0u) ++context.dodgeSequence;
+    }
+    const WORD uiPressed = state.Gamepad.wButtons & ~context.previousXInputUiButtons;
+    const horde::platform::windows::ControllerMenuEdges menuEdges{
+        .previous = (uiPressed & XINPUT_GAMEPAD_DPAD_UP) != 0u,
+        .next = (uiPressed & XINPUT_GAMEPAD_DPAD_DOWN) != 0u,
+        .decrease = (uiPressed & XINPUT_GAMEPAD_DPAD_LEFT) != 0u,
+        .increase = (uiPressed & XINPUT_GAMEPAD_DPAD_RIGHT) != 0u,
+        .confirm = (uiPressed & XINPUT_GAMEPAD_A) != 0u,
+        .cancel = (uiPressed & XINPUT_GAMEPAD_B) != 0u,
+        .togglePause = (uiPressed & XINPUT_GAMEPAD_START) != 0u,
+    };
+    context.previousControllerButtons = state.Gamepad.wButtons;
+    context.previousXInputUiButtons = state.Gamepad.wButtons;
+    HandleControllerMenuEdges(context, menuEdges);
 }
 
 void UpdateDesktopSceneControls(VulkanSurfaceContext& context)
@@ -1706,6 +2222,19 @@ void UpdateDesktopSceneControls(VulkanSurfaceContext& context)
     context.lastControlTick = now;
     context.frameDeltaSeconds = deltaSeconds;
 
+    if (!context.simulationPaused)
+    {
+        const horde::platform::windows::ControllerView view =
+            horde::platform::windows::ApplyControllerLook(
+                context.cameraYaw,
+                context.cameraPitch,
+                context.controllerLookHorizontal,
+                context.controllerLookVertical,
+                deltaSeconds);
+        context.cameraYaw = view.yawRadians;
+        context.cameraPitch = view.pitchRadians;
+    }
+
     horde::gameplay::simulation::InputSnapshot input = context.simulationInput;
     input.yawRadians = context.cameraYaw;
     input.pitchRadians = context.cameraPitch;
@@ -1714,13 +2243,14 @@ void UpdateDesktopSceneControls(VulkanSurfaceContext& context)
     input.damageEnabled = IsPlayerDamageEnabled(context);
     input.commands.attack = context.attackSequence;
     input.commands.parry = context.parrySequence;
+    input.commands.dodge = context.dodgeSequence;
     input.commands.routeReset = context.routeResetSequence;
     input.commands.retry = context.retrySequence;
     input.hasAuthoritativePlayerPose = false;
     input.moveForward = (context.forwardHeld ? 1.0f : 0.0f) -
-                        (context.backwardHeld ? 1.0f : 0.0f);
+                        (context.backwardHeld ? 1.0f : 0.0f) + context.controllerForward;
     input.moveStrafe = (context.rightHeld ? 1.0f : 0.0f) -
-                       (context.leftHeld ? 1.0f : 0.0f);
+                       (context.leftHeld ? 1.0f : 0.0f) + context.controllerStrafe;
 
     if (context.benchmark.IsRunning())
     {
@@ -1742,6 +2272,7 @@ void UpdateDesktopSceneControls(VulkanSurfaceContext& context)
         input.lanternStrength = context.lanternStrength;
         input.commands.attack = context.attackSequence;
         input.commands.parry = context.parrySequence;
+        input.commands.dodge = context.dodgeSequence;
         input.commands.routeReset = context.routeResetSequence;
         input.commands.retry = context.retrySequence;
         if (advance.replay.waypointReached || advance.lapStarted || advance.finished)
@@ -1754,7 +2285,11 @@ void UpdateDesktopSceneControls(VulkanSurfaceContext& context)
     context.simulation.AdvanceFrame(input,
                                     context.frameDeltaSeconds,
                                     ++context.inputPublicationSequence);
-    MirrorSimulationSnapshot(context);
+    // Camera yaw/pitch are continuous platform input targets. A render frame
+    // may not produce a 60 Hz simulation tick, so copying the previous fixed
+    // snapshot back here would erase right-stick and mouse look accumulated
+    // between ticks. Reset/checkpoint paths still request a full view mirror.
+    MirrorSimulationSnapshot(context, false);
     if (context.simulation.Snapshot().playerVitals.vitality != previousVitality ||
         context.simulation.Snapshot().playerVitals.phase != previousLifePhase)
     {
@@ -2465,7 +3000,9 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
     if (useRtFrame)
     {
         SpatialAudioEngine().Update();
+        PollDesktopController(ctx);
         UpdateDesktopSceneControls(ctx);
+        UpdateWaterfallAmbience(ctx);
         const horde::gameplay::simulation::SimulationSnapshot& simulation =
             ctx.simulation.Snapshot();
         if (simulation.playerVitals.phase == horde::gameplay::PlayerLifePhase::Dead)
@@ -2478,7 +3015,8 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         }
         DrainGameplayEvents(ctx);
         horde::vulkan::raytracing::RtSceneFrameInputs frameInputs =
-            horde::vulkan::raytracing::BuildRtSceneFrameInputs(simulation, ctx.outputExposure);
+            horde::vulkan::raytracing::BuildRtSceneFrameInputs(
+                simulation, ctx.outputExposure, ctx.waterQuality);
         if (ctx.debugEnemyOverride != horde::gameplay::EnemyKind::None)
         {
             // Debug-only renderer inspection remains non-authoritative gameplay.
@@ -2839,6 +3377,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     {
         context.renderScale = 1.0f;
         context.outputExposure = 0.62f;
+        context.waterQuality = horde::vulkan::raytracing::WaterQuality::High;
         context.sfxEnabled = false;
         context.simulationPaused = true;
         context.pauseMenuVisible = false;
@@ -3187,7 +3726,7 @@ void ApplyDpiScaledFonts(HWND window)
                          kControlsButtonId, kSettingsButtonId, kDiagnosticsButtonId, kRunBenchmarkButtonId,
                          kMoreBySamfa12ButtonId, kExitButtonId, kBenchmarkTitleId,
                          kBenchmarkCopyButtonId, kBenchmarkSaveButtonId, kBenchmarkBackButtonId,
-                         kSettingsTitleId, kSfxButtonId, kSensitivityButtonId, kRenderScaleLabelId,
+                         kSettingsTitleId, kSfxButtonId, kSensitivityButtonId, kWaterQualityButtonId, kRenderScaleLabelId,
                          kRenderScaleSliderId, kFullscreenButtonId, kSettingsBackButtonId})
     {
         if (HWND control = GetDlgItem(window, id))
@@ -3339,11 +3878,11 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
 
     const int labelHeight = ScaleForDpi(window, 26);
     const int sliderHeight = ScaleForDpi(window, 38);
-    const int settingsTotal = titleHeight + 4 * buttonHeight + labelHeight + sliderHeight + 5 * gap;
+    const int settingsTotal = titleHeight + 5 * buttonHeight + labelHeight + sliderHeight + 6 * gap;
     y = std::max(ScaleForDpi(window, 54), (height - settingsTotal) / 2);
     if (HWND title = GetDlgItem(window, kSettingsTitleId)) MoveWindow(title, pauseX, y, buttonWidth, titleHeight, TRUE);
     y += titleAdvance;
-    for (const int id : {kSfxButtonId, kSensitivityButtonId})
+    for (const int id : {kSfxButtonId, kSensitivityButtonId, kWaterQualityButtonId})
     {
         if (HWND control = GetDlgItem(window, id)) MoveWindow(control, pauseX, y, buttonWidth, buttonHeight, TRUE);
         y += buttonHeight + gap;
@@ -3366,6 +3905,11 @@ void ShowControlsHelp(HWND window)
                 "Left mouse drag  360 camera look\n"
                 "Right mouse or Space  Swing sword\n"
                 "Q  Parry skeleton strike\n"
+                "Controller left stick  Move and strafe\n"
+                "Controller right stick  Camera look\n"
+                "RT  Attack    LT  Parry    B / Circle  Dodge\n"
+                "D-pad  Navigate menus    A  Select    B / Circle  Back\n"
+                "Menu / Start  Pause / resume\n"
                 "Esc  Pause / resume\n"
                  "R  Restart route\n"
                  "F1  Controls\n"
@@ -3383,6 +3927,7 @@ void ShowCredits(HWND window)
     MessageBoxA(window,
                 "Environment materials: Poly Haven (CC0).\n"
                 "Sound effects: FilmCow Royalty Free Sound Effects Library.\n"
+                "Water Dripping by DRAGON-STUDIO via Pixabay (Pixabay Content License).\n"
                 "Skeleton derivative: original by Hotstrike Studio; texture, rig, and animation processing created with Meshy (CC BY 4.0).\n"
                 "Placeholder lich character created and animated with Meshy (CC0).\n"
                 "Application icon created for this project with OpenAI image generation.\n\n"
@@ -3575,6 +4120,17 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             case kSensitivityButtonId:
                 sceneContext->mouseSensitivity = sceneContext->mouseSensitivity < 0.8f ? 1.0f :
                                                  (sceneContext->mouseSensitivity < 1.2f ? 1.35f : 0.70f);
+                SaveSettings(*sceneContext);
+                UpdateSettingsLabels(*sceneContext);
+                PlaySoundEffect(*sceneContext, "ui_select.wav");
+                return 0;
+            case kWaterQualityButtonId:
+                sceneContext->waterQuality =
+                    sceneContext->waterQuality == horde::vulkan::raytracing::WaterQuality::High
+                        ? horde::vulkan::raytracing::WaterQuality::Mobile
+                        : (sceneContext->waterQuality == horde::vulkan::raytracing::WaterQuality::Mobile
+                               ? horde::vulkan::raytracing::WaterQuality::Off
+                               : horde::vulkan::raytracing::WaterQuality::High);
                 SaveSettings(*sceneContext);
                 UpdateSettingsLabels(*sceneContext);
                 PlaySoundEffect(*sceneContext, "ui_select.wav");
@@ -3823,10 +4379,21 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         {
             SetFocus(hWnd);
             SetCapture(hWnd);
+            GetCursorPos(&sceneContext->mouseRestorePosition);
+            ShowCursor(FALSE);
+            sceneContext->mouseCursorHidden = true;
             sceneContext->mouseLookActive = true;
-            sceneContext->lastMousePosition = {
-                static_cast<LONG>(static_cast<short>(LOWORD(lParam))),
-                static_cast<LONG>(static_cast<short>(HIWORD(lParam)))};
+            RECT clientRect{};
+            GetClientRect(hWnd, &clientRect);
+            POINT centre{(clientRect.right - clientRect.left) / 2, (clientRect.bottom - clientRect.top) / 2};
+            sceneContext->lastMousePosition = centre;
+            POINT screenCentre = centre;
+            ClientToScreen(hWnd, &screenCentre);
+            RECT screenRect{clientRect};
+            ClientToScreen(hWnd, reinterpret_cast<POINT*>(&screenRect.left));
+            ClientToScreen(hWnd, reinterpret_cast<POINT*>(&screenRect.right));
+            ClipCursor(&screenRect);
+            SetCursorPos(screenCentre.x, screenCentre.y);
             return 0;
         }
         break;
@@ -3852,18 +4419,20 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             sceneContext->lastMousePosition = currentMousePosition;
             sceneContext->cameraYaw += static_cast<float>(deltaX) * 0.0036f * sceneContext->mouseSensitivity;
             sceneContext->cameraPitch = std::clamp(sceneContext->cameraPitch - static_cast<float>(deltaY) * 0.0028f * sceneContext->mouseSensitivity, -0.32f, 0.28f);
+            RECT clientRect{};
+            GetClientRect(hWnd, &clientRect);
+            const POINT centre{(clientRect.right - clientRect.left) / 2, (clientRect.bottom - clientRect.top) / 2};
+            sceneContext->lastMousePosition = centre;
+            POINT screenCentre = centre;
+            ClientToScreen(hWnd, &screenCentre);
+            SetCursorPos(screenCentre.x, screenCentre.y);
             return 0;
         }
         break;
-    case WM_LBUTTONUP:
     case WM_CAPTURECHANGED:
         if (sceneContext && sceneContext->controlsEnabled)
         {
-            sceneContext->mouseLookActive = false;
-            if (GetCapture() == hWnd)
-            {
-                ReleaseCapture();
-            }
+            ClearDesktopInput(*sceneContext);
             return 0;
         }
         break;
@@ -3979,6 +4548,59 @@ HMENU CreateApplicationMenu()
     return bar;
 }
 
+LRESULT CALLBACK ControllerFocusOutlineSubclass(
+    HWND control,
+    UINT message,
+    WPARAM wParam,
+    LPARAM lParam,
+    UINT_PTR subclassId,
+    DWORD_PTR referenceData)
+{
+    (void)referenceData;
+    if (message == WM_NCDESTROY)
+    {
+        RemoveWindowSubclass(control, ControllerFocusOutlineSubclass, subclassId);
+        return DefSubclassProc(control, message, wParam, lParam);
+    }
+
+    const LRESULT result = DefSubclassProc(control, message, wParam, lParam);
+    if (message == WM_SETFOCUS || message == WM_KILLFOCUS)
+    {
+        InvalidateRect(control, nullptr, TRUE);
+        UpdateWindow(control);
+    }
+    if (message == WM_PAINT && GetFocus() == control)
+    {
+        HDC dc = GetDC(control);
+        if (dc != nullptr)
+        {
+            RECT border{};
+            GetClientRect(control, &border);
+            static HBRUSH gold = CreateSolidBrush(RGB(255, 177, 55));
+            static HBRUSH brightGold = CreateSolidBrush(RGB(255, 221, 137));
+            FrameRect(dc, &border, gold);
+            InflateRect(&border, -1, -1);
+            FrameRect(dc, &border, gold);
+            InflateRect(&border, -1, -1);
+            FrameRect(dc, &border, brightGold);
+            ReleaseDC(control, dc);
+        }
+    }
+    return result;
+}
+
+void InstallControllerFocusOutline(HWND control)
+{
+    if (control != nullptr)
+    {
+        constexpr UINT_PTR kControllerFocusOutlineSubclassId = 1u;
+        SetWindowSubclass(control,
+                          ControllerFocusOutlineSubclass,
+                          kControllerFocusOutlineSubclassId,
+                          0u);
+    }
+}
+
 int CreateAndShowWindow(const std::string& diagnosticText,
                         horde::vulkan::DeviceCapabilities& capabilities,
                         const std::filesystem::path& textReportPath,
@@ -4078,6 +4700,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
         HWND control = CreateWindowExA(0, "BUTTON", text, WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON,
                                        0, 0, 100, 38, hWnd,
                                        reinterpret_cast<HMENU>(static_cast<INT_PTR>(id)), instance, nullptr);
+        InstallControllerFocusOutline(control);
         return control;
     };
 
@@ -4110,11 +4733,13 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     createStatic(kSettingsTitleId, "SETTINGS  |  SAVED BESIDE THE DEMO", SS_CENTER | SS_CENTERIMAGE);
     createButton(kSfxButtonId, "SOUND EFFECTS: ON");
     createButton(kSensitivityButtonId, "LOOK SENSITIVITY: NORMAL");
+    createButton(kWaterQualityButtonId, "RT WATER: HIGH");
     createStatic(kRenderScaleLabelId, "RENDER RESOLUTION: 100%", SS_CENTER | SS_CENTERIMAGE);
     HWND renderScaleSlider = CreateWindowExA(0, TRACKBAR_CLASSA, "",
                                               WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_AUTOTICKS,
                                               0, 0, 100, 38, hWnd,
                                               reinterpret_cast<HMENU>(static_cast<INT_PTR>(kRenderScaleSliderId)), instance, nullptr);
+    InstallControllerFocusOutline(renderScaleSlider);
     SendMessageA(renderScaleSlider, TBM_SETRANGE, TRUE, MAKELPARAM(50, 100));
     SendMessageA(renderScaleSlider, TBM_SETTICFREQ, 10, 0);
     SendMessageA(renderScaleSlider, TBM_SETPOS, TRUE, 100);

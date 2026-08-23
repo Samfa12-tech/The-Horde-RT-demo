@@ -36,6 +36,7 @@ InputSnapshot MakeSnapshot(std::uint64_t sequence)
     input.hasAuthoritativePlayerPose = (sequence & 2u) != 0u;
     input.commands.attack = sequence;
     input.commands.parry = sequence + 7u;
+    input.commands.dodge = sequence + 9u;
     input.commands.routeReset = sequence + 11u;
     input.commands.retry = sequence + 29u;
     return input;
@@ -63,6 +64,7 @@ bool MatchesSequence(const PublishedInput& published)
            actual.hasAuthoritativePlayerPose == expected.hasAuthoritativePlayerPose &&
            actual.commands.attack == expected.commands.attack &&
            actual.commands.parry == expected.commands.parry &&
+           actual.commands.dodge == expected.commands.dodge &&
            actual.commands.routeReset == expected.commands.routeReset &&
            actual.commands.retry == expected.commands.retry;
 }

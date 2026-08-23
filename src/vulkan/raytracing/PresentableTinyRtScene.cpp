@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <cstddef>
 #include <cstring>
 #include <fstream>
 #include <utility>
@@ -38,7 +39,13 @@ struct ScenePushConstants
     float finaleSkylightOpen = 0.0f;
     float finaleDawnReveal = 0.0f;
     float heldPropDepth = 1.05f;
+    float waterQuality = 2.0f;
 };
+
+static_assert(sizeof(ScenePushConstants) == 76u,
+              "CPU and raygen push-constant ABI must remain 19 packed floats");
+static_assert(offsetof(ScenePushConstants, waterQuality) == 72u,
+              "water quality must stay appended after every released push field");
 
 // Generated from shaders/raytracing/minimal.rgen with glslangValidator -V -Os.
 // Keep this embedded so the Android RT scene remains a self-contained native build.
@@ -970,6 +977,9 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         SurfaceHiddenShell = 7u,
         SurfaceMirror = 8u,
         SurfaceClearGlass = 9u,
+        // Keep the existing CPU/shader material ABI stable. Water is appended
+        // because every world primitive reads this numeric code in raygen.
+        SurfaceWater = 10u,
     };
     enum SurfaceNormal : std::uint32_t
     {
@@ -1010,6 +1020,15 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         const std::uint32_t code = surfaceCode(material, normal);
         worldSurfaceCodes.push_back(code);
         worldSurfaceCodes.push_back(code);
+    };
+    const auto addWorldTriangle = [&addTriangle, &worldSurfaceCodes, &surfaceCode](
+                                      const Vertex& a,
+                                      const Vertex& b,
+                                      const Vertex& c,
+                                      SurfaceMaterial material,
+                                      SurfaceNormal normal) {
+        addTriangle(a, b, c);
+        worldSurfaceCodes.push_back(surfaceCode(material, normal));
     };
     const auto addWorldBox = [&addWorldQuad](float minX, float minY, float minZ,
                                              float maxX, float maxY, float maxZ,
@@ -1162,7 +1181,18 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     addRouteFloor(3.60f, -15.2f, 6.0f, -10.0f, SurfaceWetCobble);
     addRouteCeiling(3.60f, -15.2f, 6.0f, -10.0f);
     addRouteFloor(-2.50f, -16.4f, 4.80f, -14.0f, SurfaceWetCobble);
-    addRouteCeiling(-2.50f, -16.4f, 4.80f, -14.0f);
+    // A broken roof slot turns the former abstract lantern failure into a
+    // physical drench at the final zig-zag exit. The rim is deliberately
+    // inside the existing route envelope so collision and replay remain
+    // unchanged while primary, reflection, and transmission rays see depth.
+    constexpr float waterSlotMinX = -2.48f;
+    constexpr float waterSlotMaxX = -1.58f;
+    constexpr float waterSlotMinZ = -15.65f;
+    constexpr float waterSlotMaxZ = -14.72f;
+    addRouteCeiling(-2.50f, -16.4f, waterSlotMinX, -14.0f);
+    addRouteCeiling(waterSlotMaxX, -16.4f, 4.80f, -14.0f);
+    addRouteCeiling(waterSlotMinX, -16.4f, waterSlotMaxX, waterSlotMinZ);
+    addRouteCeiling(waterSlotMinX, waterSlotMaxZ, waterSlotMaxX, -14.0f);
 
     // Outer perimeter of the corridor union. Open seams at x=-2.5 and x=-8.5
     // connect directly into the skylight room and torch passage respectively.
@@ -1181,6 +1211,140 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     addRouteWallZ(-14.0f, -2.50f, 3.60f, SurfaceBack);
     addRouteWallX(4.80f, -16.4f, -15.2f, SurfaceLeft);
     addRouteWallZ(-16.4f, -2.50f, 4.80f, SurfaceForward);
+
+    constexpr float waterShaftBase = routeCeiling - 0.02f;
+    addWorldBox(waterSlotMinX - 0.16f, waterShaftBase, waterSlotMinZ - 0.16f,
+                waterSlotMinX, 2.18f, waterSlotMaxZ + 0.16f, SurfaceMossyStone);
+    addWorldBox(waterSlotMaxX, waterShaftBase, waterSlotMinZ - 0.16f,
+                waterSlotMaxX + 0.16f, 2.18f, waterSlotMaxZ + 0.16f, SurfaceMossyStone);
+    addWorldBox(waterSlotMinX, waterShaftBase, waterSlotMinZ - 0.16f,
+                waterSlotMaxX, 2.18f, waterSlotMinZ, SurfaceMossyStone);
+    addWorldBox(waterSlotMinX, waterShaftBase, waterSlotMaxZ,
+                waterSlotMaxX, 2.18f, waterSlotMaxZ + 0.16f, SurfaceMossyStone);
+
+    // Three closed, faceted streams replace the former broad water cards. The
+    // eight-sided elliptical rings have real depth for Fresnel/refraction and
+    // real air gaps between them; no shader coverage mask or overlay is used.
+    // The main thin stream brushes the authored z=-15.20 route while two narrow
+    // satellites break up its silhouette without sealing the doorway. All three
+    // share a linear taper: falling water accelerates and narrows toward the pool,
+    // and the shader can solve the matching elliptical exit surface exactly.
+    struct WaterStream
+    {
+        float centreZ;
+        float radiusX;
+        float radiusZ;
+    };
+    constexpr std::array<float, 6u> waterStreamY{{2.16f, 1.58f, 1.01f, 0.43f, -0.18f, -0.91f}};
+    constexpr std::array<float, 8u> ringCos{{
+        1.0f, 0.70710678f, 0.0f, -0.70710678f,
+        -1.0f, -0.70710678f, 0.0f, 0.70710678f,
+    }};
+    constexpr std::array<float, 8u> ringSin{{
+        0.0f, 0.70710678f, 1.0f, 0.70710678f,
+        0.0f, -0.70710678f, -1.0f, -0.70710678f,
+    }};
+    constexpr std::array<WaterStream, 3u> waterStreams{{
+        {-15.26f, 0.006f, 0.065f},
+        {-15.44f, 0.003f, 0.014f},
+        {-15.06f, 0.003f, 0.012f},
+    }};
+    static_assert(waterStreamY.size() == 6u && ringCos.size() == 8u &&
+                  waterStreams.size() == 3u,
+                  "falling water must retain six rings and three eight-facet streams");
+    static_assert((-15.26f - 0.065f) - (-15.44f + 0.014f) > 0.10f &&
+                  (-15.06f - 0.012f) - (-15.26f + 0.065f) > 0.10f,
+                  "falling water streams must retain real ten-centimetre air gaps");
+    for (const WaterStream& stream : waterStreams)
+    {
+        std::array<std::array<Vertex, 8u>, 6u> rings{};
+        for (std::size_t level = 0u; level < waterStreamY.size(); ++level)
+        {
+            const float fallProgress = std::clamp(
+                (waterStreamY[level] + 0.91f) / (2.16f + 0.91f), 0.0f, 1.0f);
+            const float radiusScale = 0.70f + fallProgress * 0.30f;
+            for (std::size_t facet = 0u; facet < ringCos.size(); ++facet)
+            {
+                rings[level][facet] = Vertex{{
+                    -2.32f + ringCos[facet] * stream.radiusX * radiusScale,
+                    waterStreamY[level],
+                    stream.centreZ + ringSin[facet] * stream.radiusZ * radiusScale,
+                }};
+            }
+        }
+        for (std::size_t segment = 0u; segment + 1u < waterStreamY.size(); ++segment)
+        {
+            for (std::size_t facet = 0u; facet < ringCos.size(); ++facet)
+            {
+                const std::size_t nextFacet = (facet + 1u) % ringCos.size();
+                addWorldQuad(rings[segment + 1u][facet], rings[segment][facet],
+                             rings[segment][nextFacet], rings[segment + 1u][nextFacet],
+                             SurfaceWater, SurfaceLeft);
+            }
+        }
+    }
+    // A rounded, slightly irregular catchment sits over the wet cobbles. The
+    // sixteen-triangle fan keeps a natural curved silhouette without a texture,
+    // alpha card, collision change, or screen-space mask.
+    constexpr Vertex waterImpactCentre{{-2.32f, -0.925f, -15.26f}};
+    constexpr std::array<std::array<float, 2u>, 16u> roundedCatchmentRim{{
+        {{-2.32f, -14.72f}}, {{-2.13f, -14.77f}},
+        {{-1.96f, -14.90f}}, {{-1.85f, -15.06f}},
+        {{-1.82f, -15.26f}}, {{-1.86f, -15.47f}},
+        {{-1.98f, -15.65f}}, {{-2.15f, -15.76f}},
+        {{-2.35f, -15.80f}}, {{-2.55f, -15.75f}},
+        {{-2.73f, -15.61f}}, {{-2.83f, -15.42f}},
+        {{-2.86f, -15.21f}}, {{-2.79f, -14.99f}},
+        {{-2.65f, -14.83f}}, {{-2.48f, -14.74f}},
+    }};
+    for (std::size_t point = 0u; point < roundedCatchmentRim.size(); ++point)
+    {
+        const std::size_t next = (point + 1u) % roundedCatchmentRim.size();
+        const Vertex rimA{{roundedCatchmentRim[point][0], -0.925f,
+                           roundedCatchmentRim[point][1]}};
+        const Vertex rimB{{roundedCatchmentRim[next][0], -0.925f,
+                           roundedCatchmentRim[next][1]}};
+        addWorldTriangle(waterImpactCentre, rimA, rimB, SurfaceWater, SurfaceUp);
+    }
+
+    // The catchment spills into a shallow stone runnel that narrows toward a
+    // real recessed drain in the skylight chamber. These connected surfaces
+    // remain above the collision floor and therefore do not alter traversal.
+    addWorldQuad({{-2.48f, -0.924f, -14.96f}}, {{-2.48f, -0.924f, -15.54f}},
+                 {{-3.10f, -0.926f, -15.48f}}, {{-3.10f, -0.926f, -15.02f}},
+                 SurfaceWater, SurfaceUp);
+    addWorldQuad({{-3.10f, -0.926f, -15.02f}}, {{-3.10f, -0.926f, -15.48f}},
+                 {{-3.72f, -0.928f, -15.46f}}, {{-3.72f, -0.928f, -14.98f}},
+                 SurfaceWater, SurfaceUp);
+    addWorldQuad({{-3.72f, -0.928f, -14.98f}}, {{-3.72f, -0.928f, -15.46f}},
+                 {{-4.35f, -0.930f, -15.40f}}, {{-4.35f, -0.930f, -15.05f}},
+                 SurfaceWater, SurfaceUp);
+    addWorldQuad({{-4.35f, -0.930f, -15.05f}}, {{-4.35f, -0.930f, -15.40f}},
+                 {{-4.88f, -0.931f, -15.36f}}, {{-4.88f, -0.931f, -15.08f}},
+                 SurfaceWater, SurfaceUp);
+    constexpr float runoffDrainLipX = -5.30f;
+    addWorldQuad({{-4.88f, -0.931f, -15.08f}}, {{-4.88f, -0.931f, -15.36f}},
+                 {{runoffDrainLipX, -0.932f, -15.33f}},
+                 {{runoffDrainLipX, -0.932f, -15.11f}}, SurfaceWater, SurfaceUp);
+    // The final film folds below the grate instead of being buried beneath the
+    // cobbles before it arrives. Its upper edge overlaps the drain throat.
+    addWorldQuad({{runoffDrainLipX, -0.932f, -15.11f}},
+                 {{runoffDrainLipX, -0.932f, -15.33f}},
+                 {{-5.38f, -1.08f, -15.30f}}, {{-5.38f, -1.08f, -15.14f}},
+                 SurfaceWater, SurfaceUp);
+
+    // Dark throat and metal crossbars make the sink legible through the clear
+    // runoff while the final sloped water surface visibly disappears below
+    // the floor plane.
+    addWorldQuad({{-5.30f, -0.944f, -14.94f}}, {{-4.91f, -0.944f, -14.94f}},
+                 {{-4.91f, -0.944f, -15.46f}}, {{-5.30f, -0.944f, -15.46f}},
+                 SurfaceDarkFigure, SurfaceUp);
+    for (std::uint32_t bar = 0u; bar < 4u; ++bar)
+    {
+        const float drainZ = -15.40f + static_cast<float>(bar) * 0.14f;
+        addWorldBox(-5.31f, -0.922f, drainZ, -4.90f, -0.900f, drainZ + 0.028f,
+                    SurfaceAgedMetal);
+    }
 
     // A shallow barred recess at the first bend creates strong moving shadow
     // lines while remaining outside the shared walkable rectangles.
@@ -2923,8 +3087,9 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                                             staffWorldPosition[1],
                                             staffWorldPosition[2],
                                             std::clamp(frame.lich.finaleSkylightOpenProgress, 0.0f, 1.0f),
-                                            std::clamp(frame.lich.finaleDawnRevealProgress, 0.0f, 1.0f),
-                                            heldPropDepth};
+                                             std::clamp(frame.lich.finaleDawnRevealProgress, 0.0f, 1.0f),
+                                             heldPropDepth,
+                                             static_cast<float>(frame.waterQuality)};
     lastOutputRedBlueSwapApplied_ = pushConstants.outputRedBlueSwap > 0.5f;
     vkCmdPushConstants(commandBuffer,
                        pipelineLayout_,

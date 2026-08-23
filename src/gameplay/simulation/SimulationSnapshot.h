@@ -38,6 +38,7 @@ struct SimulationSnapshot
     std::uint64_t inputPublicationSequence = 0;
     std::uint64_t lastConsumedAttackSequence = 0;
     std::uint64_t lastConsumedParrySequence = 0;
+    std::uint64_t lastConsumedDodgeSequence = 0;
     std::uint64_t lastConsumedRouteResetSequence = 0;
     std::uint64_t lastConsumedRetrySequence = 0;
 
@@ -49,6 +50,8 @@ struct SimulationSnapshot
     float walkTime = 0.0f;
     float walkAmount = 0.0f;
     float lanternStrength = 1.8f;
+    float dodgeCooldownRemainingSeconds = 0.0f;
+    bool dodgeActive = false;
 
     ShowcaseZone zone = ShowcaseZone::Opening;
     EnemyKind activeEnemyKind = EnemyKind::Skeleton;

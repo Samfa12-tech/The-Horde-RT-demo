@@ -115,7 +115,7 @@ try {
     }
 }
 $windowsBinaryText = [Text.Encoding]::ASCII.GetString([IO.File]::ReadAllBytes($windowsExe))
-foreach ($creditMarker in @("credits and licences", "Hotstrike Studio", "FilmCow", "Meshy")) {
+foreach ($creditMarker in @("credits and licences", "Hotstrike Studio", "FilmCow", "Meshy", "DRAGON-STUDIO", "Pixabay")) {
     if ($windowsBinaryText -notmatch [regex]::Escape($creditMarker)) {
         throw "Windows executable is missing in-app credit marker: $creditMarker"
     }
@@ -164,6 +164,9 @@ foreach ($copy in $assetCopies) {
 $audioDestination = Join-Path $windowsStage "assets\audio\filmcow"
 New-Item -ItemType Directory -Force -Path $audioDestination | Out-Null
 Copy-Item -Path (Join-Path $repoRoot "assets\audio\filmcow\*.wav") -Destination $audioDestination
+$waterAudioDestination = Join-Path $windowsStage "assets\audio\pixabay"
+New-Item -ItemType Directory -Force -Path $waterAudioDestination | Out-Null
+Copy-Item -LiteralPath (Join-Path $repoRoot "assets\audio\pixabay\waterfall_loop.wav") -Destination $waterAudioDestination
 
 $windowsZip = Join-Path $outputFull "$baseName-Windows-x64.zip"
 if (Test-Path -LiteralPath $windowsZip) { Remove-Item -LiteralPath $windowsZip -Force }
@@ -209,7 +212,7 @@ $aapt2 = Find-LatestVersionedTool -Root $androidBuildTools -RelativeToolPath "aa
 $zipalign = Find-LatestVersionedTool -Root $androidBuildTools -RelativeToolPath "zipalign.exe"
 $androidResources = (& $aapt2 dump resources $androidCandidate 2>&1 | Out-String)
 if ($LASTEXITCODE -ne 0) { throw "Failed to inspect Android resources in $androidCandidate" }
-foreach ($creditMarker in @("string/credits_body", "Hotstrike Studio", "FilmCow", "Meshy")) {
+foreach ($creditMarker in @("string/credits_body", "Hotstrike Studio", "FilmCow", "Meshy", "DRAGON-STUDIO", "Pixabay")) {
     if ($androidResources -notmatch [regex]::Escape($creditMarker)) {
         throw "Android candidate is missing in-app credit marker: $creditMarker"
     }
@@ -235,6 +238,10 @@ if ($LASTEXITCODE -ne 0) {
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $apkArchive = [IO.Compression.ZipFile]::OpenRead($androidCandidate)
 try {
+    $apkEntryNames = @($apkArchive.Entries | ForEach-Object FullName)
+    if ($apkEntryNames -notcontains 'assets/audio/pixabay/waterfall_loop.wav') {
+        throw "Android candidate is missing the licensed waterfall loop."
+    }
     $nativeEntries = @($apkArchive.Entries | Where-Object { $_.FullName -match '^lib/.+\.so$' } | ForEach-Object FullName)
     if ($nativeEntries.Count -lt 1) {
         throw "Android candidate does not contain a native runtime library."
@@ -277,7 +284,8 @@ try {
         "assets/textures/meshy/lich_placeholder_v01/base-color-2048-rgba8.ktx2",
         "assets/textures/meshy/lich_placeholder_v01/emissive-2048-rgba8.ktx2",
         "assets/textures/polyhaven/mobile_1k/diff-array-512.rgba",
-        "assets/audio/filmcow/sword_swing_1.wav"
+        "assets/audio/filmcow/sword_swing_1.wav",
+        "assets/audio/pixabay/waterfall_loop.wav"
     )) {
         if ($entryNames -notcontains $required) { throw "Windows zip is missing required entry: $required" }
     }

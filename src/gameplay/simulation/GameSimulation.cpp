@@ -14,6 +14,9 @@ namespace
 
 constexpr float kMinimumPitch = -0.32f;
 constexpr float kMaximumPitch = 0.28f;
+constexpr float kDodgeDurationSeconds = 0.20f;
+constexpr float kDodgeDistanceMetres = 0.90f;
+constexpr float kDodgeCooldownSeconds = 0.55f;
 
 float FiniteOr(float value, float fallback)
 {
@@ -125,6 +128,9 @@ void GameSimulation::StepFixed(const InputSnapshot& input,
         pendingAttackCommands_ = 0u;
         lastConsumedParrySequence_ += pendingParryCommands_;
         pendingParryCommands_ = 0u;
+        lastConsumedDodgeSequence_ += pendingDodgeCommands_;
+        pendingDodgeCommands_ = 0u;
+        dodgeRemainingSeconds_ = 0.0f;
     }
     if (!input.paused && playerAlive)
     {
@@ -152,6 +158,8 @@ void GameSimulation::StepFixed(const InputSnapshot& input,
     {
         pendingAttackCommands_ = 0u;
         pendingParryCommands_ = 0u;
+        pendingDodgeCommands_ = 0u;
+        dodgeRemainingSeconds_ = 0.0f;
     }
 
     RefreshSnapshot(input);
@@ -221,10 +229,21 @@ void GameSimulation::IngestCommands(const InputSnapshot& input)
 {
     pendingAttackCommands_ += SequenceDelta(input.commands.attack, latestAttackSequence_);
     pendingParryCommands_ += SequenceDelta(input.commands.parry, latestParrySequence_);
+    const std::uint64_t dodgeDelta = SequenceDelta(input.commands.dodge, latestDodgeSequence_);
+    if (dodgeDelta > 0u)
+    {
+        pendingDodgeCommands_ += dodgeDelta;
+        // Capture the coherent left-stick publication associated with the
+        // button edge; releasing the stick before the next fixed tick cannot
+        // change the requested dodge direction.
+        pendingDodgeForward_ = std::clamp(FiniteOr(input.moveForward, 0.0f), -1.0f, 1.0f);
+        pendingDodgeStrafe_ = std::clamp(FiniteOr(input.moveStrafe, 0.0f), -1.0f, 1.0f);
+    }
     pendingRouteResetCommands_ += SequenceDelta(input.commands.routeReset, latestRouteResetSequence_);
     pendingRetryCommands_ += SequenceDelta(input.commands.retry, latestRetrySequence_);
     latestAttackSequence_ = std::max(latestAttackSequence_, input.commands.attack);
     latestParrySequence_ = std::max(latestParrySequence_, input.commands.parry);
+    latestDodgeSequence_ = std::max(latestDodgeSequence_, input.commands.dodge);
     latestRouteResetSequence_ = std::max(latestRouteResetSequence_, input.commands.routeReset);
     latestRetrySequence_ = std::max(latestRetrySequence_, input.commands.retry);
 }
@@ -294,6 +313,9 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
     }
     pendingAttackCommands_ = 0u;
     pendingParryCommands_ = 0u;
+    pendingDodgeCommands_ = 0u;
+    dodgeRemainingSeconds_ = 0.0f;
+    dodgeCooldownRemainingSeconds_ = 0.0f;
     retryCheckpoint_ = activeEnemyKind_ == EnemyKind::Lich ? 9 : 0;
     finaleCompletionEmitted_ = false;
     if (isRetry)
@@ -315,6 +337,36 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
     const float previousX = playerX_;
     const float previousZ = playerZ_;
 
+    dodgeCooldownRemainingSeconds_ = std::max(
+        0.0f, dodgeCooldownRemainingSeconds_ - deltaSeconds);
+    if (pendingDodgeCommands_ > 0u)
+    {
+        lastConsumedDodgeSequence_ += pendingDodgeCommands_;
+        pendingDodgeCommands_ = 0u;
+        if (dodgeRemainingSeconds_ <= 0.0f && dodgeCooldownRemainingSeconds_ <= 0.0f)
+        {
+            float forward = pendingDodgeForward_;
+            float strafe = pendingDodgeStrafe_;
+            float magnitude = std::hypot(forward, strafe);
+            if (magnitude < 0.16f)
+            {
+                forward = 1.0f;
+                strafe = 0.0f;
+                magnitude = 1.0f;
+            }
+            forward /= magnitude;
+            strafe /= magnitude;
+            const float forwardX = std::sin(playerYawRadians_);
+            const float forwardZ = -std::cos(playerYawRadians_);
+            const float rightX = std::cos(playerYawRadians_);
+            const float rightZ = std::sin(playerYawRadians_);
+            dodgeDirectionX_ = forwardX * forward + rightX * strafe;
+            dodgeDirectionZ_ = forwardZ * forward + rightZ * strafe;
+            dodgeRemainingSeconds_ = kDodgeDurationSeconds;
+            dodgeCooldownRemainingSeconds_ = kDodgeCooldownSeconds;
+        }
+    }
+
     float movementIntent = 0.0f;
     if (input.hasAuthoritativePlayerPose)
     {
@@ -323,24 +375,36 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
     }
     else
     {
-        float forward = std::clamp(FiniteOr(input.moveForward, 0.0f), -1.0f, 1.0f);
-        float strafe = std::clamp(FiniteOr(input.moveStrafe, 0.0f), -1.0f, 1.0f);
-        const float magnitude = std::sqrt(forward * forward + strafe * strafe);
-        movementIntent = std::min(1.0f, magnitude);
-        if (magnitude > 1.0f)
+        if (dodgeRemainingSeconds_ > 0.0f)
         {
-            forward /= magnitude;
-            strafe /= magnitude;
+            const float dodgeStepSeconds = std::min(deltaSeconds, dodgeRemainingSeconds_);
+            const float dodgeSpeed = kDodgeDistanceMetres / kDodgeDurationSeconds;
+            playerX_ += dodgeDirectionX_ * dodgeSpeed * dodgeStepSeconds;
+            playerZ_ += dodgeDirectionZ_ * dodgeSpeed * dodgeStepSeconds;
+            dodgeRemainingSeconds_ = std::max(0.0f, dodgeRemainingSeconds_ - dodgeStepSeconds);
+            movementIntent = 1.0f;
         }
+        else
+        {
+            float forward = std::clamp(FiniteOr(input.moveForward, 0.0f), -1.0f, 1.0f);
+            float strafe = std::clamp(FiniteOr(input.moveStrafe, 0.0f), -1.0f, 1.0f);
+            const float magnitude = std::sqrt(forward * forward + strafe * strafe);
+            movementIntent = std::min(1.0f, magnitude);
+            if (magnitude > 1.0f)
+            {
+                forward /= magnitude;
+                strafe /= magnitude;
+            }
 
-        const float forwardX = std::sin(playerYawRadians_);
-        const float forwardZ = -std::cos(playerYawRadians_);
-        const float rightX = std::cos(playerYawRadians_);
-        const float rightZ = std::sin(playerYawRadians_);
-        playerX_ += (forwardX * forward + rightX * strafe) *
-                    config_.movementSpeedMetresPerSecond * deltaSeconds;
-        playerZ_ += (forwardZ * forward + rightZ * strafe) *
-                    config_.movementSpeedMetresPerSecond * deltaSeconds;
+            const float forwardX = std::sin(playerYawRadians_);
+            const float forwardZ = -std::cos(playerYawRadians_);
+            const float rightX = std::cos(playerYawRadians_);
+            const float rightZ = std::sin(playerYawRadians_);
+            playerX_ += (forwardX * forward + rightX * strafe) *
+                        config_.movementSpeedMetresPerSecond * deltaSeconds;
+            playerZ_ += (forwardZ * forward + rightZ * strafe) *
+                        config_.movementSpeedMetresPerSecond * deltaSeconds;
+        }
         ResolveCorridorPlayerCollision(previousX, previousZ, playerX_, playerZ_);
     }
 
@@ -600,6 +664,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.inputPublicationSequence = inputPublicationSequence_;
     snapshot_.lastConsumedAttackSequence = lastConsumedAttackSequence_;
     snapshot_.lastConsumedParrySequence = lastConsumedParrySequence_;
+    snapshot_.lastConsumedDodgeSequence = lastConsumedDodgeSequence_;
     snapshot_.lastConsumedRouteResetSequence = lastConsumedRouteResetSequence_;
     snapshot_.lastConsumedRetrySequence = lastConsumedRetrySequence_;
     snapshot_.playerX = playerX_;
@@ -609,6 +674,8 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.walkTime = walkTime_;
     snapshot_.walkAmount = walkVisualAmount_;
     snapshot_.lanternStrength = std::clamp(FiniteOr(input.lanternStrength, 1.8f), 0.65f, 2.4f);
+    snapshot_.dodgeActive = dodgeRemainingSeconds_ > 0.0f;
+    snapshot_.dodgeCooldownRemainingSeconds = dodgeCooldownRemainingSeconds_;
     snapshot_.zone = QueryShowcaseZone(playerX_, playerZ_);
     snapshot_.activeEnemyKind = activeEnemyKind_;
     snapshot_.skeletonEnemyCount = combatSnapshot_.combatantCount;

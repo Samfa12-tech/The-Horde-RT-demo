@@ -5,7 +5,7 @@ if(POLICY CMP0091)
 endif()
 
 project(HordeLanternRT
-    VERSION 0.1.4
+    VERSION 0.1.5
     DESCRIPTION "Native Vulkan hardware ray tracing technology demo"
     LANGUAGES CXX
 )
@@ -127,6 +127,10 @@ if(BUILD_TESTING)
     add_executable(horde_rt_input_mailbox_stress tests/InputMailboxStress.cpp)
     target_include_directories(horde_rt_input_mailbox_stress PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_input_mailbox_stress COMMAND horde_rt_input_mailbox_stress)
+
+    add_executable(horde_rt_desktop_controller_input_tests tests/DesktopControllerInputTests.cpp)
+    target_include_directories(horde_rt_desktop_controller_input_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_desktop_controller_input_tests COMMAND horde_rt_desktop_controller_input_tests)
 
     add_executable(horde_rt_gpu_timestamp_math_tests tests/GpuTimestampMathTests.cpp)
     target_include_directories(horde_rt_gpu_timestamp_math_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)

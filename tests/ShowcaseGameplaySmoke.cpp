@@ -19,6 +19,8 @@ bool NearlyEqual(float left, float right, float epsilon = 0.001f)
 int main()
 {
     using namespace horde::gameplay;
+    static_assert(LanternSequence::kReleaseTime == 0.70f);
+    static_assert(LanternSequence::kSettleTime == 1.15f);
     bool passed = true;
     const auto check = [&passed](bool condition, const char* message) {
         if (!condition)
@@ -166,12 +168,23 @@ int main()
                   "finale-roof checkpoint must retain the dead lich, open the roof, and stay before the ending overlay");
         }
     }
+    check(kShowcaseCheckpoints[3].id == 3 &&
+          std::string(kShowcaseCheckpoints[3].name) == "lantern-drop",
+          "water drench validation must retain checkpoint 3 name lantern-drop");
 
     LanternSequence lantern;
     lantern.Update(0.05f, 4.0f, -15.2f);
     check(lantern.Snapshot().phase == LanternPhase::Held, "early bends must not trigger lantern failure");
-    lantern.Update(0.01f, -1.5f, -15.2f, -0.4f, 0.1f);
-    check(lantern.Snapshot().phase == LanternPhase::Guttering, "final west leg must trigger guttering");
+    lantern.Update(0.01f, -2.49f, -15.2f);
+    check(lantern.Snapshot().phase == LanternPhase::Held, "waterfall trigger must remain west-bounded");
+    lantern.Update(0.01f, -1.77f, -15.2f);
+    check(lantern.Snapshot().phase == LanternPhase::Held, "waterfall trigger must remain east-bounded");
+    lantern.Update(0.01f, -1.80f, -16.41f);
+    check(lantern.Snapshot().phase == LanternPhase::Held, "waterfall trigger must remain south-bounded");
+    lantern.Update(0.01f, -1.80f, -13.99f);
+    check(lantern.Snapshot().phase == LanternPhase::Held, "waterfall trigger must remain north-bounded");
+    lantern.Update(0.01f, -1.80f, -15.2f, -0.4f, 0.1f);
+    check(lantern.Snapshot().phase == LanternPhase::Guttering, "waterfall drench must trigger guttering");
     for (int i = 0; i < 68; ++i)
     {
         lantern.Update(0.01f, -5.5f, -15.2f, -0.7f, 0.2f);

@@ -15,17 +15,17 @@ This is a supporting production/tooling plan for the current **Windows-validated
 - Priority 5 is complete as `tools/run-foundation-validation.ps1 -Mode Host|Full`: fresh dual-configuration Windows builds/tests, clean Android builds/lint, shader-staleness, package/layout, asset/licence, release-identity, hashes, Windows capture, and the connected-phone evidence gate share one timestamped report contract.
 - Priority 4 has a shared compact formatter and Debug-only live overlay. Windows F3 and the Android long-press surface are device-validated; Release omits/rejects engineering automation paths.
 - The engineering checkpoint surface remains Debug-only. A separate release-safe two-pass in-app benchmark now reuses the shared route and produces player-exportable reports without exposing checkpoint controls.
-- Priority 6's deterministic still-capture portion is complete for all 12 shared checkpoints on Windows and Android. Video, presentation orbit camera, and comparison-view UI remain deferred.
+- Priority 6's deterministic still-capture portion is complete for all 13 shared checkpoints on Windows and Android. Video, presentation orbit camera, and comparison-view UI remain deferred.
 
 ### 1. Deterministic showcase mode — complete
 
-- Twelve named checkpoints now cover Opening, Skeleton, Lantern Drop, Skylight, each coloured-light bay, Mirror, Lich, and Finale Roof.
+- Thirteen named checkpoints now cover Opening, Skeleton, Lantern Drop, Skylight, each coloured-light bay, Mirror, Lich, Finale Roof, and the explicit two-enemy combat view.
 - Lighting, enemy, lantern, roof, and encounter states are reproducibly selectable in Android Debug and host-tested shared code.
 - Keep normal player traversal intact; checkpoints are for development, validation, and presentation.
 
 ### 2. Repeatable measurement — complete on Windows and Android
 
-- A fixed 13-waypoint route and default five-checkpoint benchmark cover the important showcase cost centres.
+- A fixed 13-waypoint route and default six-checkpoint benchmark cover the important showcase cost centres.
 - Evidence records render scale, internal resolution, frame time, derived FPS, thermal/battery state, RT mode, active skinned-enemy count, and presentation status.
 - Preserve separate 100% and recommended 75% Android results.
 - The in-app benchmark runs one visible warm-up lap and one measured lap, aggregates overall and per-zone timing, requires honest RT presentation, and emits selectable text plus JSON. Windows Release and Android device lifecycle/export are live-validated.
@@ -52,7 +52,7 @@ This is a supporting production/tooling plan for the current **Windows-validated
 
 ### 6. Capture and presentation — deterministic screenshots complete; video/orbit pending
 
-- Windows Debug `--capture-showcase <directory>` and Android Debug capture intents produce all 12 shared scene-only checkpoints with fixed animation time, settling frames, honest presentation, camera/state/build/shader/GPU/extent/colour-route metadata, and PNG SHA-256. Release rejects both automation paths.
+- Windows Debug `--capture-showcase <directory>` and Android Debug capture intents produce all 13 shared scene-only checkpoints with fixed animation time, settling frames, honest presentation, camera/state/build/shader/GPU/extent/colour-route metadata, and PNG SHA-256. Release rejects both automation paths.
 - Windows captures read back the RT storage image and encode PNG through WIC, applying red/blue normalization only for the raw-copy BGRA route. Android hides menu, touch, HUD, diagnostics, and developer overlays before stable-frame ADB capture.
 - Short video, a presentation/orbit camera, and optional render-scale comparison views remain explicitly deferred.
 

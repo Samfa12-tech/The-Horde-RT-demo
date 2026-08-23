@@ -141,6 +141,7 @@ horde::gameplay::simulation::InputSnapshot gInputPublisherState = []
 }();
 std::atomic<int> gRuntimeState{0}; // 0 starting/stopped, 1 honestly presented RT, 2 unsupported, 3 render error.
 std::atomic<float> gRequestedRenderScale{1.0f};
+std::atomic<int> gRequestedWaterQuality{1};
 std::atomic<bool> gRequestedGpuFrameTimingEnabled{true};
 std::atomic<std::int32_t> gBenchmarkCheckpointRequested{-1};
 std::atomic<std::int32_t> gCaptureCheckpointRequested{-1};
@@ -152,6 +153,7 @@ std::atomic<int> gPlayerVitality{horde::gameplay::PlayerVitals::kMaxVitality};
 std::atomic<int> gPlayerLifePhase{static_cast<int>(horde::gameplay::PlayerLifePhase::Alive)};
 std::atomic<std::int32_t> gPlayerRetryCheckpoint{0};
 std::atomic<int> gFinaleEndingPhase{static_cast<int>(horde::gameplay::FinaleEndingPhase::Inactive)};
+std::atomic<std::uint64_t> gWaterfallStereoGains{0u};
 
 struct PlatformGameplayEvent
 {
@@ -221,6 +223,13 @@ void PublishSimulationUiState()
     gPlayerRetryCheckpoint.store(simulation.retryCheckpoint, std::memory_order_release);
     gFinaleEndingPhase.store(
         static_cast<int>(simulation.lich.finaleEndingPhase),
+        std::memory_order_release);
+    const horde::gameplay::SpatialAudioGains waterfallGains =
+        horde::gameplay::CalculateSpatialAudio(
+            {-2.32f, -15.26f, 0.52f, 0.65f, 10.0f},
+            {simulation.playerX, simulation.playerZ, simulation.playerYawRadians});
+    gWaterfallStereoGains.store(
+        PackStereoGains(waterfallGains.left, waterfallGains.right),
         std::memory_order_release);
 }
 
@@ -1675,8 +1684,11 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
                 PublishBenchmarkProgress(context);
             }
         }
-        else if (context.routeReplayActive && !simulationPaused)
+        else if (context.routeReplayActive)
         {
+            // Debug route replay owns an authoritative pose and fixed step. It
+            // must keep advancing even if a menu/death overlay published a
+            // paused input snapshot immediately before the automation intent.
             const horde::gameplay::ShowcaseReplaySnapshot& replay = context.routeReplay.Update();
             simulationInput.paused = false;
             simulationInput.damageEnabled = false;
@@ -1740,7 +1752,9 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
         const horde::vulkan::raytracing::RtSceneFrameInputs frameInputs =
             horde::vulkan::raytracing::BuildRtSceneFrameInputs(
                 gGameSimulation.Snapshot(),
-                context.outputExposure);
+                context.outputExposure,
+                static_cast<horde::vulkan::raytracing::WaterQuality>(
+                    std::clamp(gRequestedWaterQuality.load(std::memory_order_acquire), 0, 2)));
         std::string diagnostic;
         gpuTimingRecording = context.gpuFrameTimingEnabled &&
             context.gpuFrameTimer.RecordBegin(context.commandBuffers[imageIndex], context.currentFrame);
@@ -2378,6 +2392,12 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_setRenderScale(JNIEnv*, jclass, jflo
 }
 
 extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_setWaterQuality(JNIEnv*, jclass, jint quality)
+{
+    gRequestedWaterQuality.store(std::clamp(static_cast<int>(quality), 0, 2), std::memory_order_release);
+}
+
+extern "C" JNIEXPORT void JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_setGpuTimingEnabled(JNIEnv*, jclass, jboolean enabled)
 {
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS)
@@ -2477,6 +2497,12 @@ extern "C" JNIEXPORT jint JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_getRuntimeState(JNIEnv*, jclass)
 {
     return static_cast<jint>(gRuntimeState.load(std::memory_order_acquire));
+}
+
+extern "C" JNIEXPORT jlong JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getWaterfallStereoGains(JNIEnv*, jclass)
+{
+    return static_cast<jlong>(gWaterfallStereoGains.load(std::memory_order_acquire));
 }
 
 extern "C" JNIEXPORT jlongArray JNICALL

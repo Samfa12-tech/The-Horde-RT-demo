@@ -59,6 +59,7 @@ layout(push_constant) uniform SceneControls
     float finaleSkylightOpen;
     float finaleDawnReveal;
     float heldPropDepth;
+    float waterQuality;
 } controls;
 
 struct HitInfo
@@ -88,6 +89,7 @@ const int kMaterialDarkFigure = 6;
 const int kMaterialHiddenShell = 7;
 const int kMaterialMirror = 8;
 const int kMaterialClearGlass = 9;
+const int kMaterialWater = 10;
 
 vec3 skyColor(vec3 d)
 {
@@ -118,6 +120,163 @@ vec3 normalForSurfaceCode(uint code)
     if (normalCode == 4u) return vec3(0.0, 0.0, 1.0);
     if (normalCode == 5u) return vec3(0.0, 0.0, -1.0);
     return normalize(vec3(0.46, 0.42, 0.0));
+}
+
+const float kWaterStreamBottomY = -0.91;
+const float kWaterStreamTopY = 2.16;
+const float kWaterStreamBottomScale = 0.70;
+const float kWaterStreamTaperSlope = 0.30 / (kWaterStreamTopY - kWaterStreamBottomY);
+
+float waterStreamScale(float y)
+{
+    return kWaterStreamBottomScale
+        + clamp(y - kWaterStreamBottomY, 0.0,
+                kWaterStreamTopY - kWaterStreamBottomY)
+        * kWaterStreamTaperSlope;
+}
+
+void waterStreamProfile(vec3 p, out float centreZ, out float radiusX,
+                        out float radiusZ)
+{
+    float scale = waterStreamScale(p.y);
+    centreZ = -15.26;
+    radiusX = 0.006;
+    radiusZ = 0.065;
+    float nearest = abs(p.z - centreZ) / (radiusZ * scale);
+    float candidate = abs(p.z + 15.44) / (0.014 * scale);
+    if (candidate < nearest)
+    {
+        centreZ = -15.44;
+        radiusX = 0.003;
+        radiusZ = 0.014;
+        nearest = candidate;
+    }
+    candidate = abs(p.z + 15.06) / (0.012 * scale);
+    if (candidate < nearest)
+    {
+        centreZ = -15.06;
+        radiusX = 0.003;
+        radiusZ = 0.012;
+    }
+}
+
+vec3 waterBaseNormal(vec3 p, vec3 geometricNormal)
+{
+    vec3 authoredNormal = normalize(geometricNormal);
+    if (abs(authoredNormal.y) > 0.65)
+    {
+        return authoredNormal;
+    }
+
+    // Geometry and shading share a fixed centreline and common linear taper.
+    // This implicit-gradient normal makes the eight-sided phone-safe mesh read
+    // as a smooth falling sheet, including its slight acceleration taper.
+    float centreZ = 0.0;
+    float radiusX = 0.0;
+    float radiusZ = 0.0;
+    waterStreamProfile(p, centreZ, radiusX, radiusZ);
+    float scale = waterStreamScale(p.y);
+    vec3 radialGradient = vec3((p.x + 2.32) / (radiusX * radiusX),
+                               -scale * kWaterStreamTaperSlope,
+                               (p.z - centreZ) / (radiusZ * radiusZ));
+    return normalize(radialGradient);
+}
+
+vec3 waterSurfaceNormal(vec3 p, vec3 geometricNormal)
+{
+    vec3 n = waterBaseNormal(p, geometricNormal);
+    bool runoff = abs(n.y) > 0.65;
+    bool catchment = runoff && p.x > -2.88;
+    if (catchment)
+    {
+        // The roof stream transfers momentum into concentric capillary waves in
+        // the real catchment geometry. These normals drive the same bounded RT
+        // reflection/refraction paths; no screen-space ring is composited later.
+        vec2 impactOffset = p.xz - vec2(-2.32, -15.26);
+        float impactDistance = length(impactOffset);
+        vec2 radial = impactOffset / max(impactDistance, 0.001);
+        float angularWarp = sin(atan(impactOffset.y, impactOffset.x) * 3.0
+                              + controls.time * 0.37) * 0.28;
+        float ripple = sin(impactDistance * 31.0 - controls.time * 6.2
+                           + angularWarp);
+        float rippleEnvelope = 1.0 - smoothstep(0.07, 0.72, impactDistance);
+        vec3 radialDirection = vec3(radial.x, 0.0, radial.y);
+        return normalize(n + radialDirection * ripple * rippleEnvelope * 0.020
+                           + vec3(0.006 * sin(p.z * 23.0 - controls.time * 3.7),
+                                  0.0,
+                                  0.004 * sin(p.x * 29.0 + controls.time * 4.1)));
+    }
+    vec3 flow = runoff ? vec3(-1.0, 0.0, 0.0) : vec3(0.0, -1.0, 0.0);
+    vec3 across = normalize(cross(flow, n));
+    float alongPosition = dot(p, flow);
+    float acrossPosition = dot(p, across);
+    float slopeA = sin(alongPosition * 3.6 - controls.time * 4.0
+                     + sin(acrossPosition * 1.7) * 0.24);
+    float slopeB = sin(alongPosition * 7.1 - controls.time * 6.8
+                     + acrossPosition * 2.9);
+    float amplitude = runoff ? 0.008 : 0.018;
+    return normalize(n + flow * slopeA * amplitude
+                       + across * slopeB * amplitude * 0.65);
+}
+
+bool waterStreamExit(vec3 entryPoint, vec3 insideDirection,
+                     out vec3 exitPoint, out vec3 exitOutwardNormal,
+                     out float waterDistance)
+{
+    float centreZ = 0.0;
+    float radiusX = 0.0;
+    float radiusZ = 0.0;
+    waterStreamProfile(entryPoint, centreZ, radiusX, radiusZ);
+
+    // The stream is the exact implicit surface
+    //   dx^2/rx^2 + dz^2/rz^2 - scale(y)^2 = 0.
+    // Since scale(y) is linear, substituting the ray produces a quadratic even
+    // when the camera ray has a vertical component. The farther positive root
+    // is the real back interface of the closed stream.
+    vec3 insideStart = entryPoint + insideDirection * 0.0004;
+    float localX = insideStart.x + 2.32;
+    float localZ = insideStart.z - centreZ;
+    float inverseRadiusXSquared = 1.0 / (radiusX * radiusX);
+    float inverseRadiusZSquared = 1.0 / (radiusZ * radiusZ);
+    float scale = waterStreamScale(insideStart.y);
+    float scaleRate = kWaterStreamTaperSlope * insideDirection.y;
+    float a = insideDirection.x * insideDirection.x * inverseRadiusXSquared
+            + insideDirection.z * insideDirection.z * inverseRadiusZSquared
+            - scaleRate * scaleRate;
+    float b = 2.0 * (localX * insideDirection.x * inverseRadiusXSquared
+                   + localZ * insideDirection.z * inverseRadiusZSquared
+                   - scale * scaleRate);
+    float c = localX * localX * inverseRadiusXSquared
+            + localZ * localZ * inverseRadiusZSquared - scale * scale;
+    float discriminant = b * b - 4.0 * a * c;
+    if (a <= 0.000001 || discriminant < 0.0)
+    {
+        exitPoint = entryPoint;
+        exitOutwardNormal = waterBaseNormal(entryPoint, vec3(1.0, 0.0, 0.0));
+        waterDistance = 0.0;
+        return false;
+    }
+
+    float root = sqrt(discriminant);
+    float firstDistance = (-b - root) / (2.0 * a);
+    float secondDistance = (-b + root) / (2.0 * a);
+    float exitDistance = max(firstDistance, secondDistance);
+    if (exitDistance <= 0.0002 || exitDistance > 0.20)
+    {
+        exitPoint = entryPoint;
+        exitOutwardNormal = waterBaseNormal(entryPoint, vec3(1.0, 0.0, 0.0));
+        waterDistance = 0.0;
+        return false;
+    }
+
+    exitPoint = insideStart + insideDirection * exitDistance;
+    float exitScale = waterStreamScale(exitPoint.y);
+    exitOutwardNormal = normalize(vec3(
+        (exitPoint.x + 2.32) * inverseRadiusXSquared,
+        -exitScale * kWaterStreamTaperSlope,
+        (exitPoint.z - centreZ) * inverseRadiusZSquared));
+    waterDistance = exitDistance + 0.0004;
+    return true;
 }
 
 void materialForPrimitive(int primitive,
@@ -332,9 +491,18 @@ void materialForPrimitive(int primitive,
         base = vec3(0.32, 0.48, 0.52);
         reflectivity = 0.22;
     }
+    else if (material == kMaterialWater)
+    {
+        base = vec3(1.0);
+        geometricNormal = waterBaseNormal(p, geometricNormal);
+        normal = waterSurfaceNormal(p, geometricNormal);
+        metallic = 0.0;
+        reflectivity = 0.0204;
+    }
 }
 
-HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask)
+HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
+                   bool ignoreWater)
 {
     HitInfo h;
     h.hit = false;
@@ -351,8 +519,24 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask)
     h.emissive = 0.0;
 
     rayQueryEXT query;
-    rayQueryInitializeEXT(query, topLevelAS, gl_RayFlagsOpaqueEXT, mask, origin, 0.002, direction, maxDistance);
-    while (rayQueryProceedEXT(query)) {}
+    uint rayFlags = ignoreWater ? gl_RayFlagsNoneEXT : gl_RayFlagsOpaqueEXT;
+    rayQueryInitializeEXT(query, topLevelAS, rayFlags, mask, origin, 0.002, direction, maxDistance);
+    while (rayQueryProceedEXT(query))
+    {
+        if (!ignoreWater ||
+            rayQueryGetIntersectionTypeEXT(query, false) != gl_RayQueryCandidateIntersectionTriangleEXT)
+        {
+            continue;
+        }
+        int candidateInstance = int(rayQueryGetIntersectionInstanceCustomIndexEXT(query, false));
+        int candidatePrimitive = rayQueryGetIntersectionPrimitiveIndexEXT(query, false);
+        bool candidateIsWater = candidateInstance == 0 &&
+            int(worldSurfaces.codes[candidatePrimitive] & 0xffu) == kMaterialWater;
+        if (!candidateIsWater)
+        {
+            rayQueryConfirmIntersectionEXT(query);
+        }
+    }
 
     if (rayQueryGetIntersectionTypeEXT(query, true) != gl_RayQueryCommittedIntersectionNoneEXT)
     {
@@ -433,7 +617,7 @@ float visibilityMask(vec3 origin, vec3 direction, float maxDistance, uint mask)
         if (instance == 0)
         {
             int material = int(worldSurfaces.codes[primitive] & 0xffu);
-            transparentWorldPane = material == kMaterialClearGlass;
+            transparentWorldPane = material == kMaterialClearGlass || material == kMaterialWater;
         }
         if (!transparentWorldPane)
         {
@@ -472,6 +656,13 @@ vec3 bounceSample(HitInfo h, vec3 incoming, bool lightAwareMirror)
     if (h.emissive > 0.0)
     {
         return h.base * h.emissive;
+    }
+    if (h.instance == 0 && h.material == kMaterialWater)
+    {
+        // Water secondary hits deliberately stop here. Primary water shading
+        // owns its one reflection and one transmission query, so this keeps
+        // water-on-water paths bounded and deterministic on the phone.
+        return skyColor(incoming) * 0.18 + h.base * 0.35;
     }
     if (!lightAwareMirror)
     {
@@ -522,6 +713,202 @@ vec3 bounceSample(HitInfo h, vec3 incoming, bool lightAwareMirror)
     return h.base * (0.008 + localLightColor * diffuse * attenuation * lightVisibility * localLightStrength * 2.25);
 }
 
+vec3 currentTorchLightPosition()
+{
+    vec3 forward = normalize(vec3(sin(controls.yaw), -0.05 + controls.pitch,
+                                  -cos(controls.yaw)));
+    vec3 right = normalize(cross(forward, vec3(0.0, 1.0, 0.0)));
+    vec3 up = normalize(cross(right, forward));
+    float movement = max(controls.walkAmount, 0.2);
+    float sway = sin(controls.time * 6.2) * 0.035 * movement;
+    float bob = abs(sin(controls.time * 6.2)) * 0.025 * movement;
+    return vec3(controls.cameraX, 0.58, controls.cameraZ)
+         + right * (-0.34 - sway) + up * (-0.12 + bob)
+         + forward * controls.heldPropDepth;
+}
+
+vec3 waterSecondarySample(HitInfo h, vec3 incoming)
+{
+    // Water exists only at the drench, catchment and skylight runnel. Shade its
+    // bounded secondary hit with those two relevant lights, analytically and
+    // without spawning another reflection or shadow ray.
+    if (!h.hit)
+    {
+        return skyColor(incoming);
+    }
+    if (h.emissive > 0.0)
+    {
+        return h.base * h.emissive;
+    }
+    if (h.instance == 0 && h.material == kMaterialWater)
+    {
+        return skyColor(reflect(incoming, h.geometricNormal)) * 0.06 + vec3(0.008);
+    }
+
+    vec3 normal = dot(h.normal, -incoming) < 0.0 ? -h.normal : h.normal;
+    float reflective = max(h.metallic, h.reflectivity);
+    vec3 color = h.base * vec3(0.025, 0.028, 0.032);
+
+    vec3 skyVector = vec3(-5.50, 2.62, -15.20) - h.position;
+    vec3 skyDirection = skyVector / max(length(skyVector), 0.001);
+    vec3 skyRadiance = vec3(0.28, 0.44, 0.72);
+    float skyDiffuse = max(dot(normal, skyDirection), 0.0);
+    float skySpecular = pow(max(dot(normal, normalize(skyDirection - incoming)), 0.0),
+                            mix(12.0, 96.0, reflective));
+    color += h.base * skyRadiance * skyDiffuse * 0.86;
+    color += skyRadiance * skySpecular * mix(0.025, 0.44, reflective);
+
+    vec3 torchVector = currentTorchLightPosition() - h.position;
+    float torchDistance = length(torchVector);
+    vec3 torchDirection = torchVector / max(torchDistance, 0.001);
+    float torchAttenuation = controls.lantern /
+        (1.0 + torchDistance * torchDistance * 0.58);
+    float torchDiffuse = max(dot(normal, torchDirection), 0.0);
+    float torchSpecular = pow(max(dot(reflect(-torchDirection, normal), -incoming), 0.0),
+                              mix(34.0, 5.0, reflective));
+    vec3 torchColor = vec3(1.0, 0.28, 0.055);
+    float flamePulse = 0.84 + 0.16 * sin(controls.time * 15.0);
+    color += h.base * torchColor * torchDiffuse * torchAttenuation * flamePulse * 2.65;
+    color += torchColor * torchSpecular * torchAttenuation * (0.12 + reflective * 1.04);
+
+    float fog = 1.0 - exp(-h.t * h.t * 0.012);
+    color = mix(color, vec3(0.036, 0.046, 0.064), fog);
+    color += torchColor * 0.16 * clamp(controls.lantern, 0.0, 1.0) * exp(-h.t * 0.24);
+    return color;
+}
+
+vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
+{
+    vec3 baseNormal = waterBaseNormal(h.position, h.geometricNormal);
+    vec3 geometricNormal = dot(baseNormal, -rayDirection) < 0.0
+        ? -baseNormal : baseNormal;
+    vec3 surfaceNormal = dot(h.normal, -rayDirection) < 0.0 ? -h.normal : h.normal;
+
+    const float waterIor = 1.333;
+    const float inverseWaterIor = 0.7501875;
+    bool runoff = abs(geometricNormal.y) > 0.65;
+
+    // Air -> water at the real primary interface.
+    vec3 insideDirection = rayDirection;
+    vec3 transmissionDirection = rayDirection;
+    vec3 exitSurfaceNormal = surfaceNormal;
+    vec3 exitPoint = h.position;
+    float waterPathLength = 0.0;
+    bool transmissionAvailable = true;
+    if (controls.waterQuality >= 0.5)
+    {
+        insideDirection = refract(rayDirection, surfaceNormal, inverseWaterIor);
+        if (dot(insideDirection, insideDirection) < 0.25)
+        {
+            insideDirection = rayDirection;
+        }
+
+        if (runoff)
+        {
+            // The catchment and runnel are a six-millimetre parallel film.
+            waterPathLength = 0.006 /
+                max(-dot(insideDirection, geometricNormal), 0.18);
+            exitPoint += insideDirection * waterPathLength;
+            exitSurfaceNormal = waterSurfaceNormal(
+                exitPoint + vec3(-0.08, 0.0, 0.012), geometricNormal);
+        }
+        else
+        {
+            // The falling streams are closed tapered ellipses. Solve the actual
+            // far interface instead of treating the front facet as a short slab;
+            // that old mismatch collapsed the refracted view into a dark column.
+            vec3 exitOutwardNormal = geometricNormal;
+            if (waterStreamExit(h.position, insideDirection, exitPoint,
+                                exitOutwardNormal, waterPathLength))
+            {
+                exitSurfaceNormal = waterSurfaceNormal(
+                    exitPoint + vec3(0.0, -0.08, 0.0), exitOutwardNormal);
+            }
+            else
+            {
+                // Degenerate near-grazing rays keep a bounded thin-sheet
+                // approximation instead of producing NaNs or an unbounded path.
+                waterPathLength = 0.010 /
+                    max(-dot(insideDirection, geometricNormal), 0.18);
+                exitPoint += insideDirection * waterPathLength;
+                exitSurfaceNormal = surfaceNormal;
+            }
+        }
+        if (dot(exitSurfaceNormal, -insideDirection) < 0.0)
+        {
+            exitSurfaceNormal = -exitSurfaceNormal;
+        }
+        transmissionDirection = refract(insideDirection, exitSurfaceNormal, waterIor);
+        if (dot(transmissionDirection, transmissionDirection) < 0.25)
+        {
+            // Total internal reflection has no transmitted path. High mode still
+            // traces its one reflected ray; Mobile uses analytic reflection.
+            transmissionAvailable = false;
+        }
+    }
+    vec3 transmitted = vec3(0.0);
+    if (transmissionAvailable)
+    {
+        HitInfo transmittedHit = traceScene(exitPoint + transmissionDirection * 0.004,
+                                             transmissionDirection, 12.0, 0x23u, true);
+        transmitted = waterSecondarySample(transmittedHit, transmissionDirection);
+        transmitted *= exp(-vec3(0.060, 0.018, 0.008) * waterPathLength);
+    }
+    if (controls.waterQuality < 0.5)
+    {
+        return transmitted;
+    }
+
+    vec3 reflectionDirection = reflect(rayDirection, surfaceNormal);
+    vec3 reflected = skyColor(reflectionDirection);
+    if (controls.waterQuality >= 1.5)
+    {
+        HitInfo reflectedHit = traceScene(h.position + geometricNormal * 0.006,
+                                          reflectionDirection, 12.0, 0x37u, false);
+        reflected = waterSecondarySample(reflectedHit, reflectionDirection);
+    }
+
+    float viewCosine = clamp(dot(surfaceNormal, -rayDirection), 0.0, 1.0);
+    float fresnel = transmissionAvailable
+        ? 0.0204 + 0.9796 * pow(1.0 - viewCosine, 5.0) : 1.0;
+    vec3 toTorch = currentTorchLightPosition() - h.position;
+    float torchDistanceSquared = max(dot(toTorch, toTorch), 0.001);
+    vec3 torchHalf = normalize(toTorch * inversesqrt(torchDistanceSquared) - rayDirection);
+    float torchHighlight = pow(max(dot(surfaceNormal, torchHalf), 0.0), 72.0);
+    vec3 skyDirection = normalize(vec3(-5.50, 2.62, -15.20) - h.position);
+    float skyHighlight = pow(max(dot(surfaceNormal,
+        normalize(skyDirection - rayDirection)), 0.0), 96.0);
+    vec3 interfaceLight = vec3(1.0, 0.28, 0.055) * torchHighlight
+        * controls.lantern / (1.0 + torchDistanceSquared * 0.58) * 3.2;
+    interfaceLight += vec3(0.28, 0.44, 0.72) * skyHighlight * 0.10;
+    if (runoff && h.position.x > -2.88)
+    {
+        float impactDistance = length(h.position.xz - vec2(-2.32, -15.26));
+        float impactCrest = pow(0.5 + 0.5 * sin(
+            impactDistance * 31.0 - controls.time * 6.2), 8.0)
+            * (1.0 - smoothstep(0.07, 0.68, impactDistance));
+        float impactCore = 1.0 - smoothstep(0.04, 0.22, impactDistance);
+        vec3 impactLight = mix(vec3(0.20, 0.31, 0.46),
+                               vec3(0.82, 0.42, 0.16),
+                               clamp(controls.lantern * 0.38, 0.0, 0.52));
+        interfaceLight += impactLight * (impactCrest * 0.12 + impactCore * 0.045);
+    }
+    float surfaceTurbulence = clamp(length(surfaceNormal - exitSurfaceNormal) * 5.0, 0.0, 1.0);
+    vec3 surfaceRadiance = mix(transmitted, reflected, fresnel) + interfaceLight;
+    // Entrained micro-bubbles are what make a real falling stream visible at
+    // near-normal incidence. Keep this single-scattering term low and confined
+    // to actual water geometry; the background remains dominant and refracted.
+    float breakup = clamp(0.56
+        + sin(h.position.y * 7.3 - controls.time * 5.1) * 0.27
+        + sin(h.position.y * 13.7 + h.position.z * 17.0
+              - controls.time * 8.4) * 0.17, 0.0, 1.0);
+    float entrainedAir = runoff ? 0.004
+        : 0.010 + pow(breakup, 3.0) * 0.028 + surfaceTurbulence * 0.010;
+    vec3 scatteringRadiance = mix(vec3(0.22, 0.25, 0.28), vec3(0.50, 0.32, 0.16),
+                                  clamp(controls.lantern * 0.22, 0.0, 0.52));
+    return mix(surfaceRadiance, scatteringRadiance, entrainedAir);
+}
+
 vec3 shadePrimary(HitInfo h, vec3 rayDirection)
 {
     if (!h.hit)
@@ -546,7 +933,8 @@ vec3 shadePrimary(HitInfo h, vec3 rayDirection)
         // outgoing direction remains parallel, while an RT query supplies what is
         // genuinely behind the glass. Schlick Fresnel adds a readable reflection
         // without pretending this single surface is a thick dielectric volume.
-        HitInfo transmittedHit = traceScene(h.position + rayDirection * 0.012, rayDirection, 10000.0, 0x23u);
+        HitInfo transmittedHit = traceScene(h.position + rayDirection * 0.012,
+                                            rayDirection, 10000.0, 0x23u, false);
         vec3 transmitted = transmittedHit.hit ? bounceSample(transmittedHit, rayDirection, false) : skyColor(rayDirection);
         vec3 tint = vec3(0.82, 0.94, 1.0);
         float viewCosine = clamp(dot(h.geometricNormal, -rayDirection), 0.0, 1.0);
@@ -554,6 +942,12 @@ vec3 shadePrimary(HitInfo h, vec3 rayDirection)
         vec3 reflected = skyColor(reflect(rayDirection, h.geometricNormal));
         float transmission = 0.88;
         return mix(transmitted * tint * transmission, reflected, fresnel);
+    }
+
+    bool isThinWater = h.instance == 0 && h.material == kMaterialWater;
+    if (isThinWater)
+    {
+        return shadeThinWater(h, rayDirection);
     }
 
     vec3 warm = vec3(1.0, 0.28, 0.055);
@@ -644,7 +1038,8 @@ vec3 shadePrimary(HitInfo h, vec3 rayDirection)
     bool wantsPlayerReflection = reflective > 0.38 ||
         (h.instance == 0 && h.material == kMaterialWetCobble && puddleMask(h.position) > 0.05);
     uint bounceMask = wantsPlayerReflection ? 0x37u : 0x23u;
-    HitInfo bounceHit = traceScene(offsetRayOrigin(h, bounceDirection), bounceDirection, 12.0, bounceMask);
+    HitInfo bounceHit = traceScene(offsetRayOrigin(h, bounceDirection), bounceDirection,
+                                   12.0, bounceMask, false);
     vec3 bounce = bounceSample(bounceHit, bounceDirection, wantsPlayerReflection);
 
     vec3 color = h.base * vec3(0.025, 0.028, 0.032);
@@ -728,6 +1123,104 @@ vec3 staffElectricity(vec3 rayOrigin, vec3 rayDirection, float sceneDepth)
     return vec3(0.72, 0.10, 1.45) * (bolt + corona * 0.72) * (0.42 + charge * 2.65) * flicker;
 }
 
+bool rayBoxInterval(vec3 origin, vec3 direction, vec3 boundsMin, vec3 boundsMax,
+                    out float intervalStart, out float intervalEnd)
+{
+    // Avoid infinities for rays parallel to one of the room planes without
+    // changing the sign of any non-zero direction component.
+    vec3 safeDirection = sign(direction + vec3(0.0000001))
+        * max(abs(direction), vec3(0.0001));
+    vec3 first = (boundsMin - origin) / safeDirection;
+    vec3 second = (boundsMax - origin) / safeDirection;
+    vec3 nearPlane = min(first, second);
+    vec3 farPlane = max(first, second);
+    intervalStart = max(max(nearPlane.x, nearPlane.y), nearPlane.z);
+    intervalEnd = min(min(farPlane.x, farPlane.y), farPlane.z);
+    return intervalEnd > max(intervalStart, 0.0);
+}
+
+vec4 lichMistSample(vec3 p)
+{
+    // Broad, low-frequency world-space curls move slowly enough to read as a
+    // coherent ground layer rather than screen-space violet noise.
+    float curlA = sin(p.x * 1.32 + p.z * 0.86 + controls.time * 0.19
+                    + sin(p.z * 0.71 - controls.time * 0.11) * 0.72);
+    float curlB = sin(p.x * -0.63 + p.z * 1.57 - controls.time * 0.14
+                    + sin(p.x * 0.84 + controls.time * 0.09) * 0.58);
+    float flowNoise = clamp(0.54 + curlA * 0.23 + curlB * 0.19, 0.12, 1.0);
+
+    float floorHeight = clamp(p.y + 0.95, 0.0, 1.15);
+    float heightFalloff = exp(-floorHeight * 3.25)
+        * (1.0 - smoothstep(0.82, 1.12, floorHeight));
+    vec2 fromLich = p.xz - vec2(-32.20, -13.10);
+    float ritualFocus = 1.0 - smoothstep(1.25, 3.05, length(fromLich));
+    float dawnFade = 1.0 - 0.78 * smoothstep(0.12, 1.0, controls.finaleDawnReveal);
+    float density = (0.080 + ritualFocus * 0.27) * heightFalloff
+        * flowNoise * dawnFade;
+
+    vec3 staff = vec3(controls.staffX, controls.staffY, controls.staffZ);
+    float staffGlow = controls.staffLightStrength /
+        (1.0 + dot(p - staff, p - staff) * 1.15);
+    vec3 ambientScattering = vec3(0.45, 0.60, 0.80);
+    vec3 ritualScattering = vec3(0.75, 0.16, 1.00);
+    vec3 incidentLight = ambientScattering
+        + ritualScattering * clamp(staffGlow * 1.35, 0.0, 1.8);
+    // RGB stores in-scattering per metre and A stores extinction per metre.
+    return vec4(incidentLight * density * 0.82, density);
+}
+
+void integrateLichMistSample(vec4 sampleValue, float stepLength,
+                             inout vec3 scattered, inout float transmittance)
+{
+    scattered += transmittance * sampleValue.rgb * stepLength;
+    transmittance *= exp(-sampleValue.a * stepLength);
+}
+
+vec4 lichGroundMist(vec3 rayOrigin, vec3 rayDirection, float sceneDepth)
+{
+    if (controls.enemyKind < 0.5)
+    {
+        return vec4(0.0, 0.0, 0.0, 1.0);
+    }
+
+    float marchStart = 0.0;
+    float marchEnd = 0.0;
+    // The volume is confined to the final room and to the lowest 1.15 m above
+    // its floor. Intersecting this box first concentrates every deterministic
+    // sample in actual mist instead of stepping sparsely through empty air.
+    if (!rayBoxInterval(rayOrigin, rayDirection,
+                        vec3(-36.65, -0.95, -18.15),
+                        vec3(-30.65,  0.20, -12.25),
+                        marchStart, marchEnd))
+    {
+        return vec4(0.0, 0.0, 0.0, 1.0);
+    }
+    marchStart = max(marchStart, 0.0);
+    marchEnd = min(marchEnd, sceneDepth);
+    if (marchEnd <= marchStart + 0.01)
+    {
+        return vec4(0.0, 0.0, 0.0, 1.0);
+    }
+
+    const float sampleCount = 6.0;
+    float stepLength = (marchEnd - marchStart) / sampleCount;
+    vec3 scattered = vec3(0.0);
+    float transmittance = 1.0;
+    integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+        * (marchStart + stepLength * 0.5)), stepLength, scattered, transmittance);
+    integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+        * (marchStart + stepLength * 1.5)), stepLength, scattered, transmittance);
+    integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+        * (marchStart + stepLength * 2.5)), stepLength, scattered, transmittance);
+    integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+        * (marchStart + stepLength * 3.5)), stepLength, scattered, transmittance);
+    integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+        * (marchStart + stepLength * 4.5)), stepLength, scattered, transmittance);
+    integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+        * (marchStart + stepLength * 5.5)), stepLength, scattered, transmittance);
+    return vec4(scattered, transmittance);
+}
+
 vec3 toneMapAces(vec3 color)
 {
     const float a = 2.51;
@@ -768,8 +1261,11 @@ void main()
     // the cull boundary upward when looking down so the body never shears off.
     float playerPrimaryStart = clamp(0.68 + controls.pitch, 0.34, 0.82);
     uint primaryMask = uv.y > playerPrimaryStart ? 0x27u : 0x23u;
-    HitInfo primary = traceScene(origin, rayDirection, 10000.0, primaryMask);
+    HitInfo primary = traceScene(origin, rayDirection, 10000.0, primaryMask,
+                                 controls.waterQuality < 0.5);
     vec3 color = shadePrimary(primary, rayDirection);
+    vec4 lichMist = lichGroundMist(origin, rayDirection, primary.t);
+    color = color * lichMist.a + lichMist.rgb;
     color += staffElectricity(origin, rayDirection, primary.t);
 
     vec2 centered = uv * 2.0 - 1.0;

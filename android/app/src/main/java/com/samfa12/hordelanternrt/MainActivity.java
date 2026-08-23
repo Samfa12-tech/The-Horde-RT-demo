@@ -14,6 +14,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.media.AudioAttributes;
+import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.net.Uri;
 import android.os.Build;
@@ -90,6 +91,9 @@ public class MainActivity extends Activity {
     private static final int PLAYER_DYING = 1;
     private static final int PLAYER_DEAD = 2;
     private static final int FINALE_ENDING_COMPLETE = 4;
+    private static final int WATER_QUALITY_OFF = 0;
+    private static final int WATER_QUALITY_MOBILE = 1;
+    private static final int WATER_QUALITY_HIGH = 2;
     private static final int HAPTIC_SWING = 0;
     private static final int HAPTIC_DAMAGE = 1;
     private static final int HAPTIC_FATAL = 2;
@@ -116,6 +120,7 @@ public class MainActivity extends Activity {
     private Button parryButton;
     private boolean parryRequestedOnTouchDown;
     private SoundPool soundPool;
+    private MediaPlayer waterfallPlayer;
     private Vibrator vibrator;
     private String reportText = "";
     private boolean resumed;
@@ -159,6 +164,7 @@ public class MainActivity extends Activity {
         preferences = getSharedPreferences(PREFS, MODE_PRIVATE);
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         ProbeBridge.setRenderScale(preferences.getInt("render_scale", 100) / 100.0f);
+        ProbeBridge.setWaterQuality(preferences.getInt("water_quality", WATER_QUALITY_MOBILE));
         consumeDebugAutomationIntent(getIntent());
 
         surfaceView = findViewById(R.id.scene_surface);
@@ -569,6 +575,19 @@ public class MainActivity extends Activity {
                     handler.postDelayed(applyPendingRenderScale, 350L);
                 });
 
+        final int waterQuality = Math.max(WATER_QUALITY_OFF, Math.min(WATER_QUALITY_HIGH,
+                preferences.getInt("water_quality", WATER_QUALITY_MOBILE)));
+        final String waterQualityName = waterQuality == WATER_QUALITY_HIGH ? getString(R.string.water_quality_high) :
+                (waterQuality == WATER_QUALITY_MOBILE ? getString(R.string.water_quality_mobile) :
+                        getString(R.string.water_quality_off));
+        addMenuButton(panel, getString(R.string.water_quality, waterQualityName), () -> {
+            final int nextQuality = waterQuality == WATER_QUALITY_HIGH ? WATER_QUALITY_MOBILE :
+                    (waterQuality == WATER_QUALITY_MOBILE ? WATER_QUALITY_OFF : WATER_QUALITY_HIGH);
+            preferences.edit().putInt("water_quality", nextQuality).apply();
+            ProbeBridge.setWaterQuality(nextQuality);
+            showSettings();
+        });
+
         final CheckBox hapticsEnabled = new CheckBox(this);
         hapticsEnabled.setText(R.string.haptics_enabled);
         hapticsEnabled.setTextColor(0xFFFFE5BA);
@@ -595,6 +614,7 @@ public class MainActivity extends Activity {
                     preferences.edit().clear().apply();
                     handler.removeCallbacks(applyPendingRenderScale);
                     ProbeBridge.setRenderScale(1.0f);
+                    ProbeBridge.setWaterQuality(WATER_QUALITY_MOBILE);
                     showSettings();
                 },
                 getString(R.string.back), () -> showMainMenu(false));
@@ -933,6 +953,7 @@ public class MainActivity extends Activity {
                             break;
                     }
                 }
+                updateWaterfallLoop();
                 if (diagnosticsVisible && ++diagnosticsRefreshTick >= 5) {
                     diagnosticsRefreshTick = 0;
                     refreshDiagnosticsText();
@@ -1136,6 +1157,57 @@ public class MainActivity extends Activity {
         loadSound("lich_impact", "audio/filmcow/lich_impact.wav");
         loadSound("lich_fall", "audio/filmcow/lich_fall.wav");
         loadSound("lich_hurt", "audio/filmcow/lich_hurt.wav");
+        initialiseWaterfallLoop(attributes);
+    }
+
+    private void initialiseWaterfallLoop(final AudioAttributes attributes) {
+        final File audioDirectory = new File(getCacheDir(), "alpha_sfx");
+        final File stagedLoop = new File(audioDirectory, "waterfall_loop.wav");
+        if (!audioDirectory.exists() && !audioDirectory.mkdirs()) {
+            Log.e(TAG, "Could not create the waterfall audio cache directory.");
+            return;
+        }
+        try (InputStream source = getAssets().open("audio/pixabay/waterfall_loop.wav");
+             FileOutputStream output = new FileOutputStream(stagedLoop, false)) {
+            final byte[] buffer = new byte[16 * 1024];
+            int read;
+            while ((read = source.read(buffer)) != -1) output.write(buffer, 0, read);
+
+            waterfallPlayer = new MediaPlayer();
+            waterfallPlayer.setAudioAttributes(attributes);
+            waterfallPlayer.setDataSource(stagedLoop.getAbsolutePath());
+            waterfallPlayer.setLooping(true);
+            waterfallPlayer.setVolume(0.0f, 0.0f);
+            waterfallPlayer.prepare();
+        } catch (final Exception exception) {
+            Log.e(TAG, "Failed to initialise the waterfall loop.", exception);
+            if (waterfallPlayer != null) {
+                waterfallPlayer.release();
+                waterfallPlayer = null;
+            }
+        }
+    }
+
+    private void updateWaterfallLoop() {
+        if (waterfallPlayer == null) return;
+        final boolean audible = resumed && surfaceStarted && !menuVisible && !diagnosticsVisible &&
+                !benchmarkRunning && preferences.getBoolean("sfx_enabled", true);
+        if (!audible) {
+            waterfallPlayer.setVolume(0.0f, 0.0f);
+            if (waterfallPlayer.isPlaying()) waterfallPlayer.pause();
+            return;
+        }
+
+        final long packedStereoGains = ProbeBridge.getWaterfallStereoGains();
+        final float leftScale = clamp(
+                Float.intBitsToFloat((int) packedStereoGains), 0.0f, 1.0f);
+        final float rightScale = clamp(
+                Float.intBitsToFloat((int) (packedStereoGains >>> 32)), 0.0f, 1.0f);
+        final float userGain = preferences.getInt("sfx_volume", 70) / 100.0f;
+        waterfallPlayer.setVolume(
+                clamp(userGain * leftScale, 0.0f, 1.0f),
+                clamp(userGain * rightScale, 0.0f, 1.0f));
+        if (!waterfallPlayer.isPlaying()) waterfallPlayer.start();
     }
 
     private void loadSound(final String key, final String assetPath) {
@@ -1442,6 +1514,10 @@ public class MainActivity extends Activity {
     @Override
     protected void onPause() {
         resumed = false;
+        if (waterfallPlayer != null) {
+            waterfallPlayer.setVolume(0.0f, 0.0f);
+            if (waterfallPlayer.isPlaying()) waterfallPlayer.pause();
+        }
         ++delayedGameplayFeedbackGeneration;
         if (vibrator != null) vibrator.cancel();
         if (deathOverlayVisible || retryPending || endingOverlayVisible) {
@@ -1473,6 +1549,10 @@ public class MainActivity extends Activity {
         }
         stopSurface();
         if (soundPool != null) soundPool.release();
+        if (waterfallPlayer != null) {
+            waterfallPlayer.release();
+            waterfallPlayer = null;
+        }
         super.onDestroy();
     }
 }
