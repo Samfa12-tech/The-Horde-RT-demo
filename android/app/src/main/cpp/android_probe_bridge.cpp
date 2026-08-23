@@ -36,6 +36,7 @@
 #include "gameplay/simulation/GameSimulation.h"
 #include "gameplay/simulation/BoundedTransportQueue.h"
 #include "gameplay/simulation/InputMailbox.h"
+#include "platform/android/AndroidRtLabState.h"
 #include "vulkan/GpuFrameTimer.h"
 #include "vulkan/RtCapabilityReport.h"
 #include "vulkan/VulkanContext.h"
@@ -143,6 +144,14 @@ std::atomic<int> gRuntimeState{0}; // 0 starting/stopped, 1 honestly presented R
 std::atomic<float> gRequestedRenderScale{1.0f};
 std::atomic<int> gRequestedWaterQuality{1};
 std::atomic<bool> gRequestedGpuFrameTimingEnabled{true};
+// The sole Android-owned RT tuning state. The render thread takes one coherent
+// copy per frame while JNI setters publish complete, clamped updates.
+horde::platform::android::AndroidRtLabState gRtLabState;
+std::atomic<bool> gRtLabDebugAutomationSession{false};
+std::atomic<bool> gRtLabBenchmarkRoute{false};
+std::atomic<bool> gRtLabUnlockEligible{false};
+std::atomic<float> gRtLabGpuFrameTimeMs{0.0f};
+std::atomic<std::uint64_t> gRtLabGpuSampleCount{0u};
 std::atomic<std::int32_t> gBenchmarkCheckpointRequested{-1};
 std::atomic<std::int32_t> gCaptureCheckpointRequested{-1};
 std::atomic<bool> gRouteReplayRequested{false};
@@ -1345,6 +1354,8 @@ void RefreshGpuTimingTelemetry(
         context.capabilities.performance.gpuRt = {};
         context.capabilities.performance.gpuRt.status =
             "Disabled for matched benchmark A/B; RT rendering is unchanged.";
+        gRtLabGpuFrameTimeMs.store(0.0f, std::memory_order_release);
+        gRtLabGpuSampleCount.store(0u, std::memory_order_release);
         return;
     }
     if (completedSample.has_value())
@@ -1367,6 +1378,8 @@ void RefreshGpuTimingTelemetry(
     output.sampleCount = context.gpuFrameTimingSampleCount;
     output.unavailableCount = timer.unavailableResultCount;
     output.errorCount = timer.errorCount;
+    gRtLabGpuFrameTimeMs.store(output.valid ? output.latestMs : 0.0f, std::memory_order_release);
+    gRtLabGpuSampleCount.store(output.sampleCount, std::memory_order_release);
 }
 
 bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
@@ -1749,12 +1762,26 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
 
         DrainSimulationEventsToPlatform();
         PublishSimulationUiState();
+        const horde::gameplay::simulation::SimulationSnapshot& renderedSimulation =
+            gGameSimulation.Snapshot();
+        const bool benchmarkActive = context.benchmarkSampling || context.inAppBenchmark.IsRunning();
+        gRtLabUnlockEligible.store(
+            horde::platform::android::ShouldPersistRtLabUnlock({
+                renderedSimulation.finaleComplete,
+                gRtLabDebugAutomationSession.load(std::memory_order_acquire) ||
+                    gRtLabBenchmarkRoute.load(std::memory_order_acquire),
+                context.captureActive,
+                context.routeReplayActive,
+                benchmarkActive}),
+            std::memory_order_release);
+        const horde::vulkan::raytracing::RtSceneTuning rtLabTuning = gRtLabState.Snapshot();
         const horde::vulkan::raytracing::RtSceneFrameInputs frameInputs =
             horde::vulkan::raytracing::BuildRtSceneFrameInputs(
-                gGameSimulation.Snapshot(),
+                renderedSimulation,
                 context.outputExposure,
                 static_cast<horde::vulkan::raytracing::WaterQuality>(
-                    std::clamp(gRequestedWaterQuality.load(std::memory_order_acquire), 0, 2)));
+                    std::clamp(gRequestedWaterQuality.load(std::memory_order_acquire), 0, 2)),
+                rtLabTuning);
         std::string diagnostic;
         gpuTimingRecording = context.gpuFrameTimingEnabled &&
             context.gpuFrameTimer.RecordBegin(context.commandBuffers[imageIndex], context.currentFrame);
@@ -2327,6 +2354,9 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestParry(JNIEnv*, jclass)
 extern "C" JNIEXPORT void JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_requestRouteReset(JNIEnv*, jclass)
 {
+    gRtLabState.Reset();
+    gRtLabUnlockEligible.store(false, std::memory_order_release);
+    gRtLabBenchmarkRoute.store(false, std::memory_order_release);
     std::lock_guard<std::mutex> lock(gInputPublisherMutex);
     if (gInputPublisherState.commands.routeReset != UINT64_MAX)
     {
@@ -2398,6 +2428,91 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_setWaterQuality(JNIEnv*, jclass, jin
 }
 
 extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_setRtSceneTuning(
+    JNIEnv*,
+    jclass,
+    jfloat waterfallWidthScale,
+    jboolean roofOverrideEnabled,
+    jfloat roofOpen,
+    jboolean dawnOverrideEnabled,
+    jfloat dawnReveal,
+    jfloat fogDensityScale)
+{
+    gRtLabState.SetScene(
+        static_cast<float>(waterfallWidthScale),
+        roofOverrideEnabled == JNI_TRUE,
+        static_cast<float>(roofOpen),
+        dawnOverrideEnabled == JNI_TRUE,
+        static_cast<float>(dawnReveal),
+        static_cast<float>(fogDensityScale));
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_setRtLightTuning(
+    JNIEnv*, jclass, jint group, jfloat hueDegrees, jfloat intensityScale)
+{
+    if (group < 0) return;
+    gRtLabState.SetLight(
+        static_cast<std::uint32_t>(group),
+        static_cast<float>(hueDegrees),
+        static_cast<float>(intensityScale));
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_setRtWorkloadPreset(JNIEnv*, jclass, jint preset)
+{
+    gRtLabState.SetWorkload(static_cast<std::int32_t>(preset));
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_resetRtSceneTuning(JNIEnv*, jclass)
+{
+    gRtLabState.Reset();
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_markRtLabDebugAutomation(JNIEnv*, jclass)
+{
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS)
+    gRtLabDebugAutomationSession.store(true, std::memory_order_release);
+#endif
+}
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_isRtLabUnlockEligible(JNIEnv*, jclass)
+{
+    const bool eligible = gRtLabUnlockEligible.load(std::memory_order_acquire) &&
+        !gRtLabDebugAutomationSession.load(std::memory_order_acquire) &&
+        !gRtLabBenchmarkRoute.load(std::memory_order_acquire);
+    return eligible ? JNI_TRUE : JNI_FALSE;
+}
+
+extern "C" JNIEXPORT jfloat JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getRtGpuFrameTimeMilliseconds(JNIEnv*, jclass)
+{
+    return static_cast<jfloat>(gRtLabGpuFrameTimeMs.load(std::memory_order_acquire));
+}
+
+extern "C" JNIEXPORT jlong JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getRtGpuSampleCount(JNIEnv*, jclass)
+{
+    return static_cast<jlong>(gRtLabGpuSampleCount.load(std::memory_order_acquire));
+}
+
+extern "C" JNIEXPORT jint JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getCurrentRenderScalePercent(JNIEnv*, jclass)
+{
+    return static_cast<jint>(std::lround(
+        gRequestedRenderScale.load(std::memory_order_acquire) * 100.0f));
+}
+
+extern "C" JNIEXPORT jint JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getCurrentWaterQuality(JNIEnv*, jclass)
+{
+    return static_cast<jint>(gRequestedWaterQuality.load(std::memory_order_acquire));
+}
+
+extern "C" JNIEXPORT void JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_setGpuTimingEnabled(JNIEnv*, jclass, jboolean enabled)
 {
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS)
@@ -2462,6 +2577,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestBenchmark(JNIEnv*, jclass)
         return JNI_FALSE;
     }
     gInAppBenchmarkCancelRequested.store(false, std::memory_order_release);
+    gRtLabBenchmarkRoute.store(true, std::memory_order_release);
     gInAppBenchmarkStatus.store(1, std::memory_order_release);
     gInAppBenchmarkRequested.store(true, std::memory_order_release);
     return JNI_TRUE;

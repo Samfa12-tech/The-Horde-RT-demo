@@ -25,6 +25,19 @@ public final class ProbeBridge {
     public static native void setSimulationPaused(boolean paused);
     public static native void setRenderScale(float scale);
     public static native void setWaterQuality(int quality);
+    public static native void setRtSceneTuning(float waterfallWidthScale,
+                                                boolean roofOverrideEnabled, float roofOpen,
+                                                boolean dawnOverrideEnabled, float dawnReveal,
+                                                float fogDensityScale);
+    public static native void setRtLightTuning(int group, float hueDegrees, float intensityScale);
+    public static native void setRtWorkloadPreset(int preset);
+    public static native void resetRtSceneTuning();
+    public static native void markRtLabDebugAutomation();
+    public static native boolean isRtLabUnlockEligible();
+    public static native float getRtGpuFrameTimeMilliseconds();
+    public static native long getRtGpuSampleCount();
+    public static native int getCurrentRenderScalePercent();
+    public static native int getCurrentWaterQuality();
     public static native void setGpuTimingEnabled(boolean enabled);
     public static native boolean requestDebugCheckpoint(int checkpointId);
     public static native boolean requestDebugCaptureCheckpoint(int checkpointId);

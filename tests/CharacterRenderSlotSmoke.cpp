@@ -1,13 +1,16 @@
 #include "vulkan/raytracing/CharacterRenderSlot.h"
 #include "vulkan/raytracing/RtSceneTuning.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
+#include "platform/android/AndroidRtLabState.h"
 
 #include <cmath>
+#include <atomic>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <thread>
 
 namespace
 {
@@ -79,7 +82,82 @@ int main()
     static_assert(static_cast<std::uint32_t>(RtWorkloadPreset::Authored) == 1u);
     static_assert(static_cast<std::uint32_t>(RtWorkloadPreset::Max) == 2u);
 
+    using horde::platform::android::AndroidRtLabState;
+    using horde::platform::android::RtLabUnlockDecisionInputs;
+    using horde::platform::android::ShouldPersistRtLabUnlock;
+
+    AndroidRtLabState androidTuning;
+    RtSceneTuning androidUnclamped;
+    androidUnclamped.waterfallWidthScale = 3.0f;
+    androidUnclamped.finaleRoofOpenOverride = -1.0f;
+    androidUnclamped.finaleDawnRevealOverride = 2.0f;
+    androidUnclamped.fogDensityScale = -1.0f;
+    androidUnclamped.lights[static_cast<std::size_t>(RtLightGroup::Staff)] = {999.0f, 3.0f};
+    androidUnclamped.workloadPreset = RtWorkloadPreset::Max;
+    androidTuning.Replace(androidUnclamped);
+    const RtSceneTuning androidClamped = androidTuning.Snapshot();
     bool ok = true;
+    ok &= Require(Near(androidClamped.waterfallWidthScale, 2.0f) &&
+                      Near(*androidClamped.finaleRoofOpenOverride, 0.0f) &&
+                      Near(*androidClamped.finaleDawnRevealOverride, 1.0f) &&
+                      Near(androidClamped.fogDensityScale, 0.0f) &&
+                      Near(androidClamped.lights[static_cast<std::size_t>(RtLightGroup::Staff)].hueDegrees, 180.0f) &&
+                      Near(androidClamped.lights[static_cast<std::size_t>(RtLightGroup::Staff)].intensityScale, 2.0f) &&
+                      androidClamped.workloadPreset == RtWorkloadPreset::Max,
+                  "Android RT Lab publication did not atomically clamp a complete tuning snapshot");
+    androidTuning.Reset();
+    const RtSceneTuning androidReset = androidTuning.Snapshot();
+    ok &= Require(Near(androidReset.waterfallWidthScale, 1.0f) &&
+                      !androidReset.finaleRoofOpenOverride.has_value() &&
+                      !androidReset.finaleDawnRevealOverride.has_value() &&
+                      Near(androidReset.fogDensityScale, 1.0f) &&
+                      androidReset.workloadPreset == RtWorkloadPreset::Authored,
+                  "Android RT Lab route reset did not restore authored tuning");
+
+    RtSceneTuning coherentA;
+    coherentA.waterfallWidthScale = 0.25f;
+    coherentA.fogDensityScale = 0.0f;
+    coherentA.lights[static_cast<std::size_t>(RtLightGroup::Torch)] = {-180.0f, 0.0f};
+    coherentA.workloadPreset = RtWorkloadPreset::Lean;
+    RtSceneTuning coherentB;
+    coherentB.waterfallWidthScale = 2.0f;
+    coherentB.fogDensityScale = 2.0f;
+    coherentB.lights[static_cast<std::size_t>(RtLightGroup::Torch)] = {180.0f, 2.0f};
+    coherentB.workloadPreset = RtWorkloadPreset::Max;
+    androidTuning.Replace(coherentA);
+    std::atomic<bool> coherentPublication{true};
+    std::thread tuningWriter([&]
+    {
+        for (int iteration = 0; iteration < 2000; ++iteration)
+        {
+            androidTuning.Replace((iteration & 1) == 0 ? coherentB : coherentA);
+        }
+    });
+    for (int iteration = 0; iteration < 2000; ++iteration)
+    {
+        const RtSceneTuning sample = androidTuning.Snapshot();
+        const bool isA = Near(sample.waterfallWidthScale, 0.25f) &&
+            Near(sample.fogDensityScale, 0.0f) &&
+            Near(sample.lights[0].hueDegrees, -180.0f) &&
+            sample.workloadPreset == RtWorkloadPreset::Lean;
+        const bool isB = Near(sample.waterfallWidthScale, 2.0f) &&
+            Near(sample.fogDensityScale, 2.0f) &&
+            Near(sample.lights[0].hueDegrees, 180.0f) &&
+            sample.workloadPreset == RtWorkloadPreset::Max;
+        if (!isA && !isB) coherentPublication.store(false, std::memory_order_release);
+    }
+    tuningWriter.join();
+    ok &= Require(coherentPublication.load(std::memory_order_acquire),
+                  "Android renderer observed a torn RT Lab tuning publication");
+
+    ok &= Require(ShouldPersistRtLabUnlock({true, false, false, false, false}) &&
+                      !ShouldPersistRtLabUnlock({false, false, false, false, false}) &&
+                      !ShouldPersistRtLabUnlock({true, true, false, false, false}) &&
+                      !ShouldPersistRtLabUnlock({true, false, true, false, false}) &&
+                      !ShouldPersistRtLabUnlock({true, false, false, true, false}) &&
+                      !ShouldPersistRtLabUnlock({true, false, false, false, true}),
+                  "Android RT Lab unlock was not restricted to genuine live finale completion");
+
     ok &= Require(PresentableTinyRtScene::kBlasCount == 10u &&
                       PresentableTinyRtScene::kTlasInstanceCount == 20u,
                   "RT lab waterfall must report its dedicated tenth BLAS and twentieth TLAS instance");
@@ -366,6 +444,8 @@ int main()
             root / "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java");
         const std::string androidBridgeSource =
             ReadTextFile(root / "android/app/src/main/cpp/android_probe_bridge.cpp");
+        const std::string androidJavaBridgeSource = ReadTextFile(
+            root / "android/app/src/main/java/com/samfa12/hordelanternrt/ProbeBridge.java");
         ok &= Require(raygenSource.find(
                           "layout(std430, set = 0, binding = 10) readonly buffer SecondSkeletonVertices") !=
                           std::string::npos,
@@ -500,6 +580,28 @@ int main()
                       androidBridgeSource.find("context.routeReplayActive && !simulationPaused") ==
                           std::string::npos,
                       "authoritative Android route replay must not freeze behind menu/death pause state");
+        ok &= Require(androidBridgeSource.find("AndroidRtLabState gRtLabState;") != std::string::npos &&
+                      androidBridgeSource.find("const horde::vulkan::raytracing::RtSceneTuning rtLabTuning = gRtLabState.Snapshot();") != std::string::npos &&
+                      androidBridgeSource.find("rtLabTuning);") != std::string::npos &&
+                      androidBridgeSource.find("gRtLabState.Reset();") != std::string::npos,
+                      "Android renderer must consume exactly one mutex-protected RT tuning snapshot and reset it with the route");
+        ok &= Require(androidSource.find("PREF_RT_LAB_UNLOCKED = \"rt_lab_unlocked\"") != std::string::npos &&
+                      androidSource.find(".putBoolean(PREF_RT_LAB_UNLOCKED, rtLabUnlocked)") != std::string::npos &&
+                      androidSource.find("ProbeBridge.isRtLabUnlockEligible()") != std::string::npos &&
+                      androidSource.find("handler.postDelayed(this, 250L)") != std::string::npos &&
+                      androidSource.find("slider.setMinimumHeight(dp(48))") != std::string::npos &&
+                      androidSource.find("private void showRtLab()") != std::string::npos &&
+                      androidSource.find("ProbeBridge.setSimulationPaused(true)") != std::string::npos,
+                      "Android RT Lab must preserve progress through settings reset and expose a live paused 48dp panel");
+        ok &= Require(androidJavaBridgeSource.find("setRtSceneTuning") != std::string::npos &&
+                      androidJavaBridgeSource.find("setRtLightTuning") != std::string::npos &&
+                      androidJavaBridgeSource.find("setRtWorkloadPreset") != std::string::npos &&
+                      androidJavaBridgeSource.find("resetRtSceneTuning") != std::string::npos &&
+                      androidJavaBridgeSource.find("getRtGpuFrameTimeMilliseconds") != std::string::npos &&
+                      androidJavaBridgeSource.find("getRtGpuSampleCount") != std::string::npos &&
+                      androidJavaBridgeSource.find("getCurrentRenderScalePercent") != std::string::npos &&
+                      androidJavaBridgeSource.find("getCurrentWaterQuality") != std::string::npos,
+                      "ProbeBridge does not expose the typed RT Lab tuning and telemetry API");
 
         CharacterRenderSlot slot;
         std::string diagnostic;

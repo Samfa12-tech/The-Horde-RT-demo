@@ -52,11 +52,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Locale;
 import java.util.Set;
 
 public class MainActivity extends Activity {
     private static final String TAG = "HordeLanternAudio";
     private static final String PREFS = "horde_lantern_alpha_settings";
+    private static final String PREF_RT_LAB_UNLOCKED = "rt_lab_unlocked";
     private static final String REPORT_DIRECTORY = "reports";
     private static final String TEXT_REPORT_FILE = "vulkan_capability_report.txt";
     private static final String JSON_REPORT_FILE = "vulkan_capability_report.json";
@@ -71,6 +73,15 @@ public class MainActivity extends Activity {
     private static final String EXTRA_DEBUG_AUTOSTART = "horde.debug.autostart";
     private static final String EXTRA_DEBUG_OVERLAY = "horde.debug.overlay";
     private static final String EXTRA_DEBUG_GPU_TIMING = "horde.debug.gpu_timing";
+    private static final String EXTRA_DEBUG_RT_LAB = "horde.debug.rt_lab";
+    private static final String EXTRA_DEBUG_RT_WATERFALL = "horde.debug.rt_waterfall_width";
+    private static final String EXTRA_DEBUG_RT_ROOF = "horde.debug.rt_roof_open";
+    private static final String EXTRA_DEBUG_RT_DAWN = "horde.debug.rt_dawn_reveal";
+    private static final String EXTRA_DEBUG_RT_FOG = "horde.debug.rt_fog_density";
+    private static final String EXTRA_DEBUG_RT_LIGHT_GROUP = "horde.debug.rt_light_group";
+    private static final String EXTRA_DEBUG_RT_LIGHT_HUE = "horde.debug.rt_light_hue";
+    private static final String EXTRA_DEBUG_RT_LIGHT_INTENSITY = "horde.debug.rt_light_intensity";
+    private static final String EXTRA_DEBUG_RT_WORKLOAD = "horde.debug.rt_workload";
     private static final String DEBUG_RETRY_ACTION =
             "com.samfa12.hordelanternrt.DEBUG_RETRY_ENCOUNTER";
     private static final int REQUEST_SAVE_BENCHMARK = 7101;
@@ -148,12 +159,45 @@ public class MainActivity extends Activity {
     private boolean deathOverlayVisible;
     private boolean endingOverlayVisible;
     private boolean endingOverlayDismissed;
+    private boolean rtLabUnlocked;
+    private boolean rtLabNewlyUnlocked;
+    private boolean debugRtLabAccess;
+    private boolean rtLabVisible;
+    private boolean rtLabReturnToEnding;
+    private TextView rtLabTelemetry;
+    private int rtWaterfallWidthPercent = 100;
+    private boolean rtRoofOverrideEnabled;
+    private int rtRoofOpenPercent;
+    private boolean rtDawnOverrideEnabled;
+    private int rtDawnRevealPercent;
+    private int rtFogDensityPercent = 100;
+    private int rtLightGroup;
+    private final int[] rtLightHueDegrees = {0, 0, 0, 0};
+    private final int[] rtLightIntensityPercent = {100, 100, 100, 100};
+    private int rtWorkloadPreset = 1;
     private boolean retryPending;
     private int lastPlayerLifePhase = PLAYER_ALIVE;
     private int lastPlayerVitality = 3;
     private long delayedGameplayFeedbackGeneration;
     private final Runnable applyPendingRenderScale = () ->
             ProbeBridge.setRenderScale(preferences.getInt("render_scale", 100) / 100.0f);
+    private final Runnable refreshRtLabTelemetry = new Runnable() {
+        @Override public void run() {
+            if (!rtLabVisible || rtLabTelemetry == null) return;
+            final float gpuMs = ProbeBridge.getRtGpuFrameTimeMilliseconds();
+            final long samples = ProbeBridge.getRtGpuSampleCount();
+            final int renderScale = ProbeBridge.getCurrentRenderScalePercent();
+            final int waterQuality = ProbeBridge.getCurrentWaterQuality();
+            final String waterName = waterQuality == WATER_QUALITY_HIGH ? getString(R.string.water_quality_high) :
+                    (waterQuality == WATER_QUALITY_MOBILE ? getString(R.string.water_quality_mobile) :
+                            getString(R.string.water_quality_off));
+            rtLabTelemetry.setText(samples > 0
+                    ? getString(R.string.rt_lab_telemetry,
+                            String.format(Locale.US, "%.2f", gpuMs), samples, renderScale, waterName)
+                    : getString(R.string.rt_lab_telemetry_warming, renderScale, waterName));
+            handler.postDelayed(this, 250L);
+        }
+    };
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -162,7 +206,9 @@ public class MainActivity extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_main);
         preferences = getSharedPreferences(PREFS, MODE_PRIVATE);
+        rtLabUnlocked = preferences.getBoolean(PREF_RT_LAB_UNLOCKED, false);
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        ProbeBridge.resetRtSceneTuning();
         ProbeBridge.setRenderScale(preferences.getInt("render_scale", 100) / 100.0f);
         ProbeBridge.setWaterQuality(preferences.getInt("water_quality", WATER_QUALITY_MOBILE));
         consumeDebugAutomationIntent(getIntent());
@@ -386,6 +432,9 @@ public class MainActivity extends Activity {
     }
 
     private void showMainMenu(final boolean firstLaunch) {
+        rtLabVisible = false;
+        rtLabTelemetry = null;
+        handler.removeCallbacks(refreshRtLabTelemetry);
         benchmarkReportVisible = false;
         diagnosticsVisible = false;
         diagnosticsPanel.setVisibility(View.GONE);
@@ -420,6 +469,9 @@ public class MainActivity extends Activity {
         addMenuButtonRow(panel,
                 getString(R.string.settings), this::showSettings,
                 getString(R.string.technical_info), () -> showDiagnostics(false));
+        if (rtLabUnlocked || debugRtLabAccess) {
+            addMenuButton(panel, getString(R.string.rt_lab), () -> openRtLab(false));
+        }
         addMenuButton(panel, getString(R.string.run_benchmark), this::startBenchmark);
         addMenuButton(panel, getString(R.string.more_by_samfa12), this::openSamfa12Website);
         addMenuButtonRow(panel,
@@ -611,7 +663,9 @@ public class MainActivity extends Activity {
 
         addMenuButtonRow(panel,
                 getString(R.string.reset_defaults), () -> {
-                    preferences.edit().clear().apply();
+                    preferences.edit().clear()
+                            .putBoolean(PREF_RT_LAB_UNLOCKED, rtLabUnlocked)
+                            .apply();
                     handler.removeCallbacks(applyPendingRenderScale);
                     ProbeBridge.setRenderScale(1.0f);
                     ProbeBridge.setWaterQuality(WATER_QUALITY_MOBILE);
@@ -656,10 +710,12 @@ public class MainActivity extends Activity {
         ++delayedGameplayFeedbackGeneration;
         endingOverlayVisible = false;
         endingOverlayDismissed = false;
+        rtLabNewlyUnlocked = false;
         for (int i = 0; i < viewControls.length; ++i) viewControls[i] = 0.0f;
         viewControls[2] = 1.8f;
         activePointers[0] = -1;
         activePointers[1] = -1;
+        restoreAuthoredRtLabTuning();
         ProbeBridge.requestRouteReset();
         pushViewControls();
     }
@@ -719,20 +775,212 @@ public class MainActivity extends Activity {
         menuScrim.setVisibility(View.VISIBLE);
         menuScrim.removeAllViews();
 
-        final LinearLayout panel = createPanel(getString(R.string.ending_title),
-                getString(R.string.ending_subtitle));
+        final boolean labAvailable = rtLabUnlocked || debugRtLabAccess;
+        final LinearLayout panel = createPanel(
+                rtLabNewlyUnlocked ? getString(R.string.rt_lab_unlocked) : getString(R.string.ending_title),
+                rtLabNewlyUnlocked ? getString(R.string.rt_lab_unlocked_subtitle) : getString(R.string.ending_subtitle));
         addBody(panel, getString(R.string.ending_body));
+        if (labAvailable) {
+            addMenuButton(panel, getString(R.string.open_rt_lab), () -> openRtLab(true));
+        }
         addMenuButtonRow(panel,
-                getString(R.string.continue_in_ruin), this::continueAfterEnding,
+                getString(R.string.continue_label), this::continueAfterEnding,
                 getString(R.string.begin_again), this::restartAfterEnding);
         addMenuButton(panel, getString(R.string.quit), this::finishAndRemoveTask);
         attachPanel(panel);
+    }
+
+    private boolean persistRtLabUnlockIfEligible() {
+        if (rtLabUnlocked || !ProbeBridge.isRtLabUnlockEligible()) return false;
+        rtLabUnlocked = true;
+        rtLabNewlyUnlocked = true;
+        preferences.edit().putBoolean(PREF_RT_LAB_UNLOCKED, true).apply();
+        return true;
+    }
+
+    private void openRtLab(final boolean returnToEnding) {
+        playSound("ui_select", 0.18f);
+        rtLabReturnToEnding = returnToEnding;
+        if (returnToEnding) endingOverlayVisible = false;
+        showRtLab();
+    }
+
+    private void showRtLab() {
+        rtLabVisible = true;
+        menuVisible = true;
+        diagnosticsVisible = false;
+        ProbeBridge.setSimulationPaused(true);
+        clearTouchState();
+        attackButton.setVisibility(View.GONE);
+        parryButton.setVisibility(View.GONE);
+        menuButton.setVisibility(View.GONE);
+        rtStatus.setVisibility(View.GONE);
+        vitalityStatus.setVisibility(View.GONE);
+        developerOverlay.setVisibility(View.GONE);
+        diagnosticsPanel.setVisibility(View.GONE);
+        menuScrim.setVisibility(View.VISIBLE);
+        menuScrim.removeAllViews();
+
+        final LinearLayout panel = createRtLabPanel();
+        addBody(panel, getString(R.string.rt_lab_body));
+        addRtLabSlider(panel, getString(R.string.rt_lab_waterfall_width),
+                rtWaterfallWidthPercent, 25, 200, "%", value -> {
+                    rtWaterfallWidthPercent = value;
+                    publishRtSceneTuning();
+                });
+        addRtLabSlider(panel, getString(R.string.rt_lab_roof_open),
+                rtRoofOpenPercent, 0, 100, "%", value -> {
+                    rtRoofOverrideEnabled = true;
+                    rtRoofOpenPercent = value;
+                    publishRtSceneTuning();
+                });
+        addRtLabSlider(panel, getString(R.string.rt_lab_dawn_reveal),
+                rtDawnRevealPercent, 0, 100, "%", value -> {
+                    rtDawnOverrideEnabled = true;
+                    rtDawnRevealPercent = value;
+                    publishRtSceneTuning();
+                });
+        addRtLabSlider(panel, getString(R.string.rt_lab_fog_density),
+                rtFogDensityPercent, 0, 200, "%", value -> {
+                    rtFogDensityPercent = value;
+                    publishRtSceneTuning();
+                });
+
+        addMenuButton(panel, getString(R.string.rt_lab_light_group, rtLightGroupName()), () -> {
+            rtLightGroup = (rtLightGroup + 1) % rtLightHueDegrees.length;
+            showRtLab();
+        });
+        addRtLabSlider(panel, getString(R.string.rt_lab_light_hue),
+                rtLightHueDegrees[rtLightGroup], -180, 180, "°", value -> {
+                    rtLightHueDegrees[rtLightGroup] = value;
+                    publishRtLightTuning();
+                });
+        addRtLabSlider(panel, getString(R.string.rt_lab_light_intensity),
+                rtLightIntensityPercent[rtLightGroup], 0, 200, "%", value -> {
+                    rtLightIntensityPercent[rtLightGroup] = value;
+                    publishRtLightTuning();
+                });
+
+        addWorkloadSelector(panel);
+
+        rtLabTelemetry = new TextView(this);
+        rtLabTelemetry.setTextColor(0xFFD8F0D0);
+        rtLabTelemetry.setTextSize(11);
+        rtLabTelemetry.setTypeface(Typeface.MONOSPACE);
+        rtLabTelemetry.setMinHeight(dp(48));
+        rtLabTelemetry.setGravity(Gravity.CENTER_VERTICAL);
+        rtLabTelemetry.setPadding(0, dp(8), 0, dp(8));
+        panel.addView(rtLabTelemetry, matchWrap());
+
+        addMenuButtonRow(panel,
+                getString(R.string.restore_authored), () -> {
+                    restoreAuthoredRtLabTuning();
+                    showRtLab();
+                },
+                getString(R.string.back), this::closeRtLab);
+        attachPanel(panel);
+        handler.removeCallbacks(refreshRtLabTelemetry);
+        handler.post(refreshRtLabTelemetry);
+    }
+
+    private LinearLayout createRtLabPanel() {
+        final LinearLayout panel = createPanel(getString(R.string.rt_lab), getString(R.string.rt_lab_eyebrow));
+        final GradientDrawable background = new GradientDrawable();
+        background.setColor(0xD91A1510);
+        background.setCornerRadius(dp(4));
+        background.setStroke(dp(1), 0xFFB17A35);
+        panel.setBackground(background);
+        return panel;
+    }
+
+    private void addWorkloadSelector(final LinearLayout panel) {
+        final TextView label = new TextView(this);
+        label.setText(getString(R.string.rt_lab_workload));
+        label.setTextColor(0xFFFFE5BA);
+        label.setTextSize(15);
+        label.setPadding(0, dp(8), 0, 0);
+        panel.addView(label, matchWrap());
+
+        final LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        final String[] names = {getString(R.string.rt_lab_lean), getString(R.string.rt_lab_authored),
+                getString(R.string.rt_lab_max)};
+        for (int preset = 0; preset < names.length; ++preset) {
+            final int selectedPreset = preset;
+            final Button button = createMenuButton(
+                    (rtWorkloadPreset == preset ? "● " : "") + names[preset], () -> {
+                        rtWorkloadPreset = selectedPreset;
+                        ProbeBridge.setRtWorkloadPreset(selectedPreset);
+                        showRtLab();
+                    });
+            final LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, dp(48), 1.0f);
+            if (preset > 0) params.leftMargin = dp(6);
+            row.addView(button, params);
+        }
+        final LinearLayout.LayoutParams rowParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, dp(48));
+        rowParams.topMargin = dp(6);
+        panel.addView(row, rowParams);
+    }
+
+    private void closeRtLab() {
+        playSound("ui_back", 0.18f);
+        rtLabVisible = false;
+        rtLabTelemetry = null;
+        handler.removeCallbacks(refreshRtLabTelemetry);
+        if (rtLabReturnToEnding) {
+            endingOverlayVisible = false;
+            showEndingOverlay();
+        } else {
+            showMainMenu(false);
+        }
+    }
+
+    private String rtLightGroupName() {
+        switch (rtLightGroup) {
+            case 1: return getString(R.string.rt_lab_skylight);
+            case 2: return getString(R.string.rt_lab_passage);
+            case 3: return getString(R.string.rt_lab_staff);
+            default: return getString(R.string.rt_lab_torch);
+        }
+    }
+
+    private void publishRtSceneTuning() {
+        ProbeBridge.setRtSceneTuning(
+                rtWaterfallWidthPercent / 100.0f,
+                rtRoofOverrideEnabled, rtRoofOpenPercent / 100.0f,
+                rtDawnOverrideEnabled, rtDawnRevealPercent / 100.0f,
+                rtFogDensityPercent / 100.0f);
+    }
+
+    private void publishRtLightTuning() {
+        ProbeBridge.setRtLightTuning(
+                rtLightGroup,
+                rtLightHueDegrees[rtLightGroup],
+                rtLightIntensityPercent[rtLightGroup] / 100.0f);
+    }
+
+    private void restoreAuthoredRtLabTuning() {
+        rtWaterfallWidthPercent = 100;
+        rtRoofOverrideEnabled = false;
+        rtRoofOpenPercent = 0;
+        rtDawnOverrideEnabled = false;
+        rtDawnRevealPercent = 0;
+        rtFogDensityPercent = 100;
+        rtLightGroup = 0;
+        for (int index = 0; index < rtLightHueDegrees.length; ++index) {
+            rtLightHueDegrees[index] = 0;
+            rtLightIntensityPercent[index] = 100;
+        }
+        rtWorkloadPreset = 1;
+        ProbeBridge.resetRtSceneTuning();
     }
 
     private void continueAfterEnding() {
         playSound("ui_select", 0.18f);
         endingOverlayVisible = false;
         endingOverlayDismissed = true;
+        rtLabNewlyUnlocked = false;
         firstMenu = false;
         hideMenu();
     }
@@ -811,7 +1059,13 @@ public class MainActivity extends Activity {
                         parryButton.setVisibility(View.GONE);
                     }
                     if (lifePhase == PLAYER_DEAD) showDeathOverlay();
-                    if (finaleEndingPhase == FINALE_ENDING_COMPLETE) showEndingOverlay();
+                    if (finaleEndingPhase == FINALE_ENDING_COMPLETE) {
+                        final boolean unlockGranted = persistRtLabUnlockIfEligible();
+                        if (unlockGranted && endingOverlayVisible) {
+                            endingOverlayVisible = false;
+                        }
+                        showEndingOverlay();
+                    }
                     if (debugAutomationAutostart && menuVisible && !deathOverlayVisible && !endingOverlayVisible) hideMenu();
                     if (pendingDebugCheckpoint >= 0) {
                         applyCheckpointViewPose(pendingDebugCheckpoint);
@@ -1043,6 +1297,40 @@ public class MainActivity extends Activity {
         }
         final boolean gpuTimingEnabled = intent.getBooleanExtra(EXTRA_DEBUG_GPU_TIMING, true);
         ProbeBridge.setGpuTimingEnabled(gpuTimingEnabled);
+        final boolean hasRtLabIntent = intent.getBooleanExtra(EXTRA_DEBUG_RT_LAB, false) ||
+                intent.hasExtra(EXTRA_DEBUG_RT_WATERFALL) || intent.hasExtra(EXTRA_DEBUG_RT_ROOF) ||
+                intent.hasExtra(EXTRA_DEBUG_RT_DAWN) || intent.hasExtra(EXTRA_DEBUG_RT_FOG) ||
+                intent.hasExtra(EXTRA_DEBUG_RT_LIGHT_GROUP) || intent.hasExtra(EXTRA_DEBUG_RT_LIGHT_HUE) ||
+                intent.hasExtra(EXTRA_DEBUG_RT_LIGHT_INTENSITY) || intent.hasExtra(EXTRA_DEBUG_RT_WORKLOAD);
+        if (hasRtLabIntent) {
+            debugRtLabAccess = true;
+            rtWaterfallWidthPercent = Math.max(25, Math.min(200,
+                    intent.getIntExtra(EXTRA_DEBUG_RT_WATERFALL, rtWaterfallWidthPercent)));
+            if (intent.hasExtra(EXTRA_DEBUG_RT_ROOF)) {
+                rtRoofOverrideEnabled = true;
+                rtRoofOpenPercent = Math.max(0, Math.min(100, intent.getIntExtra(EXTRA_DEBUG_RT_ROOF, 0)));
+            }
+            if (intent.hasExtra(EXTRA_DEBUG_RT_DAWN)) {
+                rtDawnOverrideEnabled = true;
+                rtDawnRevealPercent = Math.max(0, Math.min(100, intent.getIntExtra(EXTRA_DEBUG_RT_DAWN, 0)));
+            }
+            rtFogDensityPercent = Math.max(0, Math.min(200,
+                    intent.getIntExtra(EXTRA_DEBUG_RT_FOG, rtFogDensityPercent)));
+            rtLightGroup = Math.max(0, Math.min(3,
+                    intent.getIntExtra(EXTRA_DEBUG_RT_LIGHT_GROUP, rtLightGroup)));
+            rtLightHueDegrees[rtLightGroup] = Math.max(-180, Math.min(180,
+                    intent.getIntExtra(EXTRA_DEBUG_RT_LIGHT_HUE, rtLightHueDegrees[rtLightGroup])));
+            rtLightIntensityPercent[rtLightGroup] = Math.max(0, Math.min(200,
+                    intent.getIntExtra(EXTRA_DEBUG_RT_LIGHT_INTENSITY, rtLightIntensityPercent[rtLightGroup])));
+            rtWorkloadPreset = Math.max(0, Math.min(2,
+                    intent.getIntExtra(EXTRA_DEBUG_RT_WORKLOAD, rtWorkloadPreset)));
+            publishRtSceneTuning();
+            publishRtLightTuning();
+            ProbeBridge.setRtWorkloadPreset(rtWorkloadPreset);
+        }
+        if (requestedCheckpoint >= 0 || requestedReplay || hasRtLabIntent) {
+            ProbeBridge.markRtLabDebugAutomation();
+        }
         if (requestedCheckpoint >= 0) {
             pendingDebugCheckpoint = requestedCheckpoint;
             pendingDebugCapture = requestedCapture;
@@ -1057,7 +1345,8 @@ public class MainActivity extends Activity {
         if (debugAutomationAutostart) {
             Log.i(TAG, "Accepted debug automation intent: checkpoint=" + requestedCheckpoint +
                     " capture=" + requestedCapture + " replay=" + requestedReplay + " scale=" + requestedScale +
-                    " gpuTiming=" + (gpuTimingEnabled ? "enabled" : "disabled"));
+                    " gpuTiming=" + (gpuTimingEnabled ? "enabled" : "disabled") +
+                    " rtLab=" + hasRtLabIntent);
         }
     }
 
@@ -1388,6 +1677,32 @@ public class MainActivity extends Activity {
         panel.addView(slider, matchWrap());
     }
 
+    private void addRtLabSlider(final LinearLayout panel, final String title, final int value,
+                                final int min, final int max, final String suffix,
+                                final IntSettingListener listener) {
+        final TextView label = new TextView(this);
+        label.setText(getString(R.string.rt_lab_slider_value, title, value, suffix));
+        label.setTextColor(0xFFFFE5BA);
+        label.setTextSize(15);
+        label.setPadding(0, dp(8), 0, 0);
+        panel.addView(label, matchWrap());
+        final SeekBar slider = new SeekBar(this);
+        slider.setMax(max - min);
+        slider.setProgress(value - min);
+        slider.setMinimumHeight(dp(48));
+        slider.setContentDescription(title);
+        slider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(final SeekBar seekBar, final int progress, final boolean fromUser) {
+                final int current = progress + min;
+                label.setText(getString(R.string.rt_lab_slider_value, title, current, suffix));
+                if (fromUser) listener.onChanged(current);
+            }
+            @Override public void onStartTrackingTouch(final SeekBar seekBar) {}
+            @Override public void onStopTrackingTouch(final SeekBar seekBar) {}
+        });
+        panel.addView(slider, matchWrap());
+    }
+
     private void styleActionButton(final Button button, final int fill, final int text) {
         final GradientDrawable background = new GradientDrawable();
         background.setColor(fill);
@@ -1463,6 +1778,10 @@ public class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
+        if (rtLabVisible) {
+            closeRtLab();
+            return;
+        }
         if (deathOverlayVisible) {
             return;
         }
@@ -1502,6 +1821,7 @@ public class MainActivity extends Activity {
         resumed = true;
         enterImmersiveMode();
         startSurfaceIfReady();
+        if (rtLabVisible) handler.post(refreshRtLabTelemetry);
     }
 
     @Override
@@ -1509,11 +1829,15 @@ public class MainActivity extends Activity {
         super.onNewIntent(intent);
         setIntent(intent);
         consumeDebugAutomationIntent(intent);
+        if (debugRtLabAccess && menuVisible && !deathOverlayVisible && !endingOverlayVisible) {
+            showMainMenu(false);
+        }
     }
 
     @Override
     protected void onPause() {
         resumed = false;
+        handler.removeCallbacks(refreshRtLabTelemetry);
         if (waterfallPlayer != null) {
             waterfallPlayer.setVolume(0.0f, 0.0f);
             if (waterfallPlayer.isPlaying()) waterfallPlayer.pause();
