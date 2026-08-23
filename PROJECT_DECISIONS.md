@@ -81,6 +81,14 @@ Investigate exact matched regressions above 15%, unexplained frame-time spikes, 
 
 The validated two-skeleton, animation-owned combat, timed-parry, stagger, and event-time feedback runtime is published as `0.1.4-alpha.1` on the existing itch Windows and Android channels. Android retains the established application ID, release certificate, and update identity at `versionCode 5`; Windows and Android build IDs are `#1903586` and `#1903587`. Release identity/packaging changes do not invalidate the exact `547d89d` runtime/device evidence, but the public signed APK itself remains a static/package-verified artifact until it is installed on the phone. The 0.1.1 through 0.1.4 lines are immutable and future Android updates require a version code greater than 5.
 
+## Showcase Alpha 0.1.5 publication decision - 2026-08-23
+
+Publish the accepted bounded water/mist/controller slice as `0.1.5-alpha.1` on the existing itch channels: Windows build `#1908330`, Android build `#1908331`, Android `versionCode 6`. Water remains real RT world geometry and bounded ray-query optics rather than a fluid simulation, raster fallback, SSR, or overlay. The lich volume remains ground-clipped and sightline-preserving. Directional dodge stays shared-gameplay state, while the exact owner-tested Backbone identity uses the measured WinMM controls and retains mouse/keyboard support.
+
+The exact Windows ZIP and established-certificate Android APK are the published artifacts. The signed APK is installed and byte-matched on raw model code `SM-S948B`; strict ASTC and honest RT presentation pass before and after Home/resume. Because the feature slice added a positional loop and changed listener movement, manual audio validation was required and the owner accepted the exact Windows candidate. The later Android MediaPlayer lifecycle correction is covered by source contracts and release lifecycle smoke, but no claim is made that its audible pause/resume transition was separately heard on Android.
+
+The 0.1.1 through 0.1.5 lines are immutable and future Android updates require `versionCode > 6`. A shared `tools/release-version-policy.ps1` now owns this rule for unsigned packaging, signed packaging, and Butler upload so the three entrypoints cannot drift independently.
+
 ## Target devices
 
 - Primary target: Samsung Galaxy S26 Ultra.

@@ -4,14 +4,14 @@ Horde Lantern RT is a native Vulkan hardware-ray-tracing technology demo for And
 
 - Public alpha: https://samfa12.itch.io/the-horde
 - Source repository: https://github.com/Samfa12-tech/The-Horde-RT-demo
-- Current package version: `0.1.4-alpha.1`
-- Current itch builds: Windows `#1903586`; Android `#1903587`
-- Published SHA-256: Windows `82ad58546864f55a6c61ead372811bbe3bebcf7066cb9f97c76008136a82c8b5`; Android `ff549c2ab1c68fe7a36d4e45c966e664a5ec7e3f19fb8f416b7a6e8971db2e55`
+- Current package version: `0.1.5-alpha.1`
+- Current itch builds: Windows `#1908330`; Android `#1908331`
+- Published SHA-256: Windows `631b9f01a4d348e18733c989ebacc9c32ce9005ac9498e49e8757a0a36411166`; Android `1e81238a6e1b0e934c50eb15e80fc8efd39c06f16ca8960c428b22e5f5d5a7f2`
 - Primary validated phone: Samsung `SM-S948B` / Adreno 840
-- Exact Android device baseline: the runtime now published in `0.1.4` was installed byte-for-byte as the final Debug candidate on `SM-S948B`, with strict ASTC, honest RT presentation, replay, captures, lifecycle, and owner feedback. The public signed APK passed certificate/package checks but was published while the phone was disconnected.
+- Exact Android release baseline: the stable-key-signed `0.1.5` APK was installed on `SM-S948B`, pulled back byte-for-byte, and matched the published candidate. Strict ASTC and honest RT presentation passed before and after Home/resume.
 - Validated Windows GPU: NVIDIA GeForce RTX 5050 Laptop GPU
 
-Showcase Alpha 0.1.4 publishes the shared deterministic simulation, bounded two-skeleton encounter, animation-owned sword contact, timed parry, visible stagger, and entity-aware positional feedback on top of the 0.1.3 body/vitality/dawn route. The release-safe in-app benchmark and Samfa12 menu link remain available; detailed checkpoint, capture, and developer telemetry remain Debug-only.
+Showcase Alpha 0.1.5 adds a clear RT roof-water curtain that extinguishes the lantern, a rounded catchment and drain-connected runoff, bounded lich-room ground mist, positional waterfall ambience, Windows Backbone/controller support, controller menu navigation, and collision-safe directional dodge. It preserves the shared deterministic simulation, bounded two-skeleton encounter, timed parry, visible stagger, release-safe benchmark, and Debug-only checkpoint/capture telemetry.
 
 The current development foundation runs Windows and Android gameplay through one deterministic 60 Hz `GameSimulation`. Android input crosses JNI through a coherent snapshot mailbox with independent monotonic swing/parry/reset/retry counters; ordered semantic events drive platform audio and haptics; and one shared adapter preserves the existing `RtSceneFrameInputs` renderer boundary. See `docs/SHARED_SIMULATION_FOUNDATION_2026-08-10.md`.
 
@@ -40,14 +40,15 @@ The demo uses Vulkan acceleration structures, an RT pipeline and shader binding 
 - Persisted 50-100% RT render-resolution scale, defaulting to 100%.
 - Android SFX volume and compact-HUD settings; Windows SFX, sensitivity, display-mode, and render-scale settings.
 - Collision-safe starting chamber and material gallery, a leashed skeleton encounter, and a three-turn moving-shadow corridor.
-- Lantern failure and drop, blue skylight chamber, yellow/blue/deep-red/restrained-green torch bays, open threshold, wet stone, fog, and a single-bounce hero mirror.
+- A roof-water drench that gutters and drops the lantern, clear RT reflection/refraction, a rounded catchment and drain-connected runnel, blue skylight chamber, four coloured-light bays, wet stone, fog, and a single-bounce hero mirror.
+- Low depth-clipped blue-grey ritual mist in the lich room, bounded to preserve the enemy, sword, and opening-roof sightlines.
 - A low-poly held torch with wooden shaft, iron cage, and layered emissive flame volumes.
 - A complete camera-relative RT player body with a layered travelling coat, shoulder/collar/belt/strap/tail detail, bevelled articulated limbs, two-bone-IK arms, pelvis sway, torso counter-twist, knee bend, foot lift, heel-to-toe walking, held torch/sword, and wall-aware prop retraction.
 - A Hotstrike Studio skeleton derivative followed sequentially by a CC0 Meshy placeholder lich with emissive staff/eyes, charge electricity, spatial audio, three-hit combat, death animation, a physical sliding roof, a moonlight-to-dawn RT reveal, and a contextual ending with continue/restart/quit.
 - Three player vitality per encounter, one-second post-hit invulnerability, an RT-visible fatal hold, and death-menu retry at the safe opening or mirror checkpoint.
-- Seventeen FilmCow UI, sword, movement, skeleton, and lich reaction/attack WAV cues.
+- Seventeen FilmCow UI, sword, movement, skeleton, and lich reaction/attack WAV cues, plus one positional DRAGON-STUDIO/Pixabay waterfall loop.
 
-The signed Android APK contains both enemy GLBs, strict ASTC KTX2 environment and lich textures, seventeen FilmCow WAVs, four ABI libraries, and launcher assets. The Windows ZIP contains `HordeLanternRT.exe`, an executable-relative `assets/` tree, release notes, controls, and `ASSET_LICENSES.md`.
+The signed Android APK contains both enemy GLBs, strict ASTC KTX2 environment and lich textures, seventeen FilmCow WAVs, the Pixabay waterfall loop, four ABI libraries, and launcher assets. The Windows ZIP contains `HordeLanternRT.exe`, an executable-relative `assets/` tree including the same audio, release notes, controls, and `ASSET_LICENSES.md`.
 
 The staged Meshy sword LOD and torch study are not used by the runtime or included in either download. Their metadata is retained for later measured GLB/PBR work.
 
@@ -73,12 +74,13 @@ The staged Meshy sword LOD and torch study are not used by the runtime or includ
 - `F2`: RT diagnostics
 - `F3`: live non-pausing developer overlay (Debug builds only)
 - `Alt+Enter`: fullscreen/windowed
+- Backbone/controller: left stick move, right stick look, RT attack, LT parry, B/Circle directional dodge, D-pad menus, A select, Menu/Start pause
 
 At zero vitality, `RETRY ENCOUNTER` restores the current encounter, `RESTART ROUTE` returns to the opening, and Back/`Esc` cannot resume a dead player.
 
 ## Current validation
 
-The published Showcase Alpha 0.1.4 packages contain the validated two-skeleton/parry runtime. The final exact Debug candidate was Android-device-validated on `SM-S948B`; the exact public signed APK was statically verified but not installed because the phone was disconnected at publication. Windows `0.1.4` was launched from the exact portable ZIP and honestly presented the RT scene. See `docs/SHOWCASE_ALPHA_0_1_4_RELEASE_VALIDATION_2026-08-22.md`.
+The published Showcase Alpha 0.1.5 packages contain the accepted water/mist/controller/audio slice. The exact signed APK is byte-matched and lifecycle-smoked on `SM-S948B`; the exact Windows ZIP launched from a clean extraction and honestly presented the RT scene. See `docs/SHOWCASE_ALPHA_0_1_5_RELEASE_VALIDATION_2026-08-23.md` and `docs/RT_WATERFALL_LICH_MIST_VALIDATION_2026-08-23.md`.
 
 The player-vitality/retry slice is host-validated by clean Windows Debug and Release builds, all seven CTests in both configurations, twelve fixed RT captures, clean Android Debug and unsigned Release builds across all four configured ABIs, and `lintRelease`. On `SM-S948B`, real skeleton/lich damage, death UI, native opening/mirror retry, 3/3 restoration, the complete showcase automation route, captures, and Home/resume RT presentation are also validated. The earlier owner report of perceived haptics was corrected on 2026-08-01 because haptics had not actually been checked. The audit revision adds direct `Vibrator` effects, an enabled settings toggle/preview, and view-feedback fallback; the exact installed Debug APK subsequently produced completed preview, Swing, damage, and fatal effects through the live encounter, and the owner confirmed the revised haptic was physically felt. See `docs/PLAYER_VITALITY_RETRY_SLICE_2026-07-31.md` and `docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md`.
 
@@ -144,7 +146,7 @@ Look for:
 
 - `PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2)`
 - `RT frame reached Android swapchain presentation.`
-- `SFX loaded` IDs 1 through 17
+- `SFX loaded` IDs 1 through 17; the waterfall loop is separately owned by Android `MediaPlayer`
 
 Debug builds expose reports with `adb shell run-as`; release builds deliberately do not set `android:debuggable`.
 
@@ -180,7 +182,7 @@ With the authorised `SM-S948B` connected, run the milestone gate:
 .\tools\run-foundation-validation.ps1 -Mode Full
 ```
 
-`Full` adds the six-checkpoint sustained 75% timing/replay report, a separately labelled 100% opening result, Home/resume evidence, and all 13 deterministic Android captures. The current Vulkan-enabled host suites contain 12 CTests per Debug/Release configuration; the portable GitHub Actions lane runs its separate 8-test Vulkan-disabled subset. Timing output uses descriptive 16.667/20.000/33.333 ms reference lines (approximately 60/50/30 FPS); crossing one is reported rather than treated as an automatic product failure. Exact matched regressions above 15% require investigation. Both modes write timestamped logs, manifests, hashes, PNGs, exact installed-APK/source/shader provenance, `summary.json`, and `validation.md` beneath ignored `reports/foundation-runs/`. Their ZIP/APK artifacts are marked unpublishable, stay out of `releases/candidates/`, are not signed, and do not read or require release-key secrets.
+`Full` adds the six-checkpoint sustained 75% timing/replay report, a separately labelled 100% opening result, Home/resume evidence, and all 13 deterministic Android captures. The current Vulkan-enabled host suites contain 13 CTests per Debug/Release configuration; the portable GitHub Actions lane runs its separate 9-test Vulkan-disabled subset. Timing output uses descriptive 16.667/20.000/33.333 ms reference lines (approximately 60/50/30 FPS); crossing one is reported rather than treated as an automatic product failure. Exact matched regressions above 15% require investigation. Both modes write timestamped logs, manifests, hashes, PNGs, exact installed-APK/source/shader provenance, `summary.json`, and `validation.md` beneath ignored `reports/foundation-runs/`. Their ZIP/APK artifacts are marked unpublishable, stay out of `releases/candidates/`, are not signed, and do not read or require release-key secrets.
 
 Check raygen staleness without modifying the embedded include:
 
@@ -209,7 +211,7 @@ For a signed rebuild:
 
 The packaging and push scripts securely prompt for signing secrets, reject debug/unsigned Android candidates, verify hashes, and keep Windows and Android on separate itch channels. Add `-ConfirmPush` only after the preflight passes.
 
-There are no packaging version defaults: candidate scripts require explicit `Version` and `VersionCode`, reject the immutable published `0.1.1` through `0.1.4` lines, and require Android `versionCode > 5`. The itch push script rejects another upload on any of those release lines before contacting Butler. A future public build must first bump CMake/Windows/Android/package metadata, provide matching release notes, and update the guarded candidate hashes.
+There are no packaging version defaults: candidate scripts require explicit `Version` and `VersionCode`, reject the immutable published `0.1.1` through `0.1.5` lines, and require Android `versionCode > 6`. One shared policy helper owns these rules for packaging, signing, and itch upload. A future public build must first bump CMake/Windows/Android/package metadata, provide matching release notes, and update the guarded candidate hashes.
 
 Android native code is linked for 16 KiB page compatibility. The release uses a static C++ runtime, 16 KiB ELF `LOAD` alignment, and AGP 8.7.2 APK alignment; `package-alpha.ps1` rejects candidates that fail either APK or ELF verification or reintroduce `libc++_shared.so` from the r26 NDK.
 
@@ -223,6 +225,7 @@ All shipped third-party assets are recorded in `ASSET_LICENSES.md`. The current 
 - Free Stylized Skeleton by Hotstrike Studio, modified through Meshy; the release uses the conservative Meshy Free-plan CC BY 4.0 attribution route.
 - The active placeholder lich created and animated with Meshy under CC0; the retained licence screenshot and hash are recorded in `ASSET_LICENSES.md`.
 - A bounded FilmCow Recorded SFX subset under FilmCow's custom royalty-free project-use terms.
+- “Water Dripping” by DRAGON-STUDIO under the Pixabay Content License, processed into the shipped positional loop.
 
 Do not redistribute source assets as standalone asset packs. Preserve the public Hotstrike/Meshy credit and the full licence manifest with releases.
 

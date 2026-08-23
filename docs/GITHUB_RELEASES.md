@@ -9,14 +9,14 @@ GitHub Packages is intended for package registries such as container images, npm
 Run this from the repository root on the Windows machine that contains the validated files in `releases/candidates/`:
 
 ```powershell
-.\tools\publish-github-release.ps1 -Version '0.1.3-alpha.1'
+.\tools\publish-github-release.ps1 -Version '<version>'
 ```
 
 The publisher expects:
 
 ```text
-releases/candidates/Horde-Lantern-RT-Alpha-0.1.3-alpha.1-Windows-x64.zip
-releases/candidates/Horde-Lantern-RT-Alpha-0.1.3-alpha.1-Android.apk
+releases/candidates/Horde-Lantern-RT-Alpha-<version>-Windows-x64.zip
+releases/candidates/Horde-Lantern-RT-Alpha-<version>-Android.apk
 releases/candidates/SHA256SUMS.txt
 ```
 
@@ -34,14 +34,14 @@ Use a reviewed release-notes file when available:
 
 ```powershell
 .\tools\publish-github-release.ps1 `
-  -Version '0.1.3-alpha.1' `
-  -NotesFile '.\docs\SHOWCASE_ALPHA_RELEASE_NOTES_2026-07-31.md'
+  -Version '<version>' `
+  -NotesFile '.\docs\<release-notes-file>.md'
 ```
 
 Create a draft instead of immediately publishing:
 
 ```powershell
-.\tools\publish-github-release.ps1 -Version '0.1.3-alpha.1' -Draft
+.\tools\publish-github-release.ps1 -Version '<version>' -Draft
 ```
 
 ## Authentication

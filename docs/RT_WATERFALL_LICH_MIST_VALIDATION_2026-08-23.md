@@ -85,3 +85,13 @@ The deterministic replay reached 13/13 waypoints and ended in `finale`; all 13 s
 - No haptic cue or routing changed.
 
 No deployment or public package was produced.
+
+## Publication follow-up - 2026-08-23
+
+The sentence above remains the boundary of the original candidate-validation pass. The reviewed slice was subsequently committed, line-ending-safe on clean Windows checkouts, fast-forwarded to `main`, and published as Showcase Alpha `0.1.5-alpha.1` after fresh merged-source, exact package, and exact signed-device checks.
+
+- Source: feature commit `2bda83a`; merged/published runtime source `172bb0a`.
+- Windows: itch build `#1908330`, ZIP SHA-256 `631b9f01a4d348e18733c989ebacc9c32ce9005ac9498e49e8757a0a36411166`.
+- Android: itch build `#1908331`, stable-key-signed APK SHA-256 `1e81238a6e1b0e934c50eb15e80fc8efd39c06f16ca8960c428b22e5f5d5a7f2`, byte-matched after installation on `SM-S948B`.
+
+See `SHOWCASE_ALPHA_0_1_5_RELEASE_VALIDATION_2026-08-23.md` for the complete release and public-page evidence.

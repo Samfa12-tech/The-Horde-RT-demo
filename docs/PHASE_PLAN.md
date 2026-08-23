@@ -1,6 +1,6 @@
 # Phase Plan
 
-> This file records the implementation sequence. Earlier “next” and “deferred” statements are preserved as dated history; the rebuilt player, vitality/retry loop, complete dawn ending, and foundation tooling are published in Showcase Alpha 0.1.3. Current priorities are indexed by `DOCUMENTATION_CHECKPOINT_2026-07-17.md`.
+> This file records the implementation sequence. Earlier “next” and “deferred” statements are preserved as dated history; the rebuilt player, vitality/retry loop, complete dawn ending, two-skeleton/parry slice, and bounded waterfall/mist/controller slice are published through Showcase Alpha 0.1.5. Current priorities are indexed by `DOCUMENTATION_CHECKPOINT_2026-07-17.md`.
 
 ## Phase 0 - Vulkan RT capability proof: complete
 
@@ -103,6 +103,15 @@ The planned stained transmission pane was rejected during hands-on review and re
 Final route and release evidence: `docs/HORDE_SHOWCASE_WINDOWS_VALIDATION_2026-07-16.md`, `docs/HORDE_SHOWCASE_ANDROID_VALIDATION_2026-07-17.md`, and `docs/SHOWCASE_ALPHA_RELEASE_VALIDATION_2026-07-17.md`.
 
 The runtime-only Android asset task is complete and reduced the debug APK from 93,855,324 to 46,793,811 bytes.
+
+## Showcase Alpha 0.1.5 - complete and published 2026-08-23
+
+- Added a narrow roof-fed water curtain made from real world-BLAS geometry, with clear bounded RT reflection/refraction, a rounded catchment, drain-connected runoff, and no collision or fluid simulation.
+- Preserved the automatic 0.70-second gutter and 1.15-second settled-lantern sequence at the terminal zig-zag exit.
+- Added low deterministic depth-clipped ritual mist around the singular lich without obscuring the sword, enemy silhouette, or dawn roof.
+- Added the licensed positional waterfall loop, shared collision-safe directional dodge, and owner-tested Windows Backbone/controller input and menu navigation.
+- Kept `vkCmdTraceRaysKHR`, recursion depth one, strict ASTC, fixed BLAS/TLAS capacity, one-frame ownership, and shared 60 Hz gameplay authority unchanged.
+- Published Windows itch build `#1908330` and Android build `#1908331`; exact artifact and device evidence is in `SHOWCASE_ALPHA_0_1_5_RELEASE_VALIDATION_2026-08-23.md`.
 
 ## Next support milestones
 

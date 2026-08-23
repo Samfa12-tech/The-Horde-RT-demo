@@ -9,13 +9,8 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-
-if ($Version -match '^0\.1\.(?:1|2|3|4)(?:$|[-+.])') {
-    throw "The published 0.1.1 through 0.1.4 release lines are immutable. Choose a new Version."
-}
-if ($VersionCode -le 5) {
-    throw "VersionCode must be greater than the immutable published value 5."
-}
+. (Join-Path $PSScriptRoot "release-version-policy.ps1")
+Assert-HordeReleaseVersionIsMutable -Version $Version -VersionCode $VersionCode
 
 function Find-LatestVersionedTool {
     param(
