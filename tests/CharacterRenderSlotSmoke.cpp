@@ -445,6 +445,16 @@ int main()
                       raygenSource.find("kLightPassage") != std::string::npos &&
                       raygenSource.find("kLightStaff") != std::string::npos,
                       "RT light groups need centralized zero-preserving hue/intensity tuning and fog scaling");
+        ok &= Require(raygenSource.find(
+                          "vec3 authoredStaffEmission = mix(albedo * 0.72, vec3(0.72, 0.12, 1.0), glowMask);") !=
+                          std::string::npos &&
+                      raygenSource.find(
+                          "h.base = glowMask > 0.0 ? tunedLightColor(authoredStaffEmission, kLightStaff)") !=
+                          std::string::npos &&
+                      raygenSource.find(
+                          "vec3 violetEmission = tunedLightColor(vec3(0.72, 0.12, 1.0), kLightStaff);") ==
+                          std::string::npos,
+                      "zero staff intensity must zero the complete partial-glow lich emissive radiance");
         ok &= Require(raygenSource.find("bool leanWorkload = controls.workloadPreset < 0.5;") != std::string::npos &&
                       raygenSource.find("bool maxWorkload = controls.workloadPreset >= 1.5;") != std::string::npos &&
                       raygenSource.find("if (!leanWorkload)") != std::string::npos &&

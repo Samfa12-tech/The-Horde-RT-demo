@@ -667,8 +667,9 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
                 vec3 albedo = texture(lichBaseColor, vec3(uv, 0.0)).rgb;
                 vec3 glow = texture(lichEmissive, vec3(uv, 0.0)).rgb;
                 float glowMask = smoothstep(0.025, 0.50, max(glow.r, max(glow.g, glow.b)));
-                vec3 violetEmission = tunedLightColor(vec3(0.72, 0.12, 1.0), kLightStaff);
-                h.base = mix(albedo * 0.72, violetEmission, glowMask);
+                vec3 authoredStaffEmission = mix(albedo * 0.72, vec3(0.72, 0.12, 1.0), glowMask);
+                h.base = glowMask > 0.0 ? tunedLightColor(authoredStaffEmission, kLightStaff)
+                                        : albedo * 0.72;
                 h.emissive = glowMask * (3.8 + controls.staffLightStrength * 2.3);
             }
         }
