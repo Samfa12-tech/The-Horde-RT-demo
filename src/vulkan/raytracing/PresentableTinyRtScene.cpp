@@ -291,6 +291,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     instanceBuffer_ = std::exchange(other.instanceBuffer_, Buffer{});
     worldSurfaceBuffer_ = std::exchange(other.worldSurfaceBuffer_, Buffer{});
     blas_ = std::exchange(other.blas_, AccelerationStructure{});
+    waterfallBlas_ = std::exchange(other.waterfallBlas_, AccelerationStructure{});
     finaleRoofBlas_ = std::exchange(other.finaleRoofBlas_, AccelerationStructure{});
     torchBlas_ = std::exchange(other.torchBlas_, AccelerationStructure{});
     swordBlas_ = std::exchange(other.swordBlas_, AccelerationStructure{});
@@ -429,6 +430,7 @@ void PresentableTinyRtScene::Destroy()
     DestroyAccelerationStructure(swordBlas_);
     DestroyAccelerationStructure(torchBlas_);
     DestroyAccelerationStructure(finaleRoofBlas_);
+    DestroyAccelerationStructure(waterfallBlas_);
     DestroyAccelerationStructure(blas_);
     DestroyBuffer(worldSurfaceBuffer_);
     DestroyBuffer(instanceBuffer_);
@@ -973,10 +975,14 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     };
     std::vector<Vertex> vertices;
     std::vector<std::uint32_t> indices;
+    std::vector<Vertex> waterfallVertices;
+    std::vector<std::uint32_t> waterfallIndices;
     std::vector<std::uint32_t> worldSurfaceCodes;
     vertices.reserve(3072u);
     indices.reserve(4608u);
     worldSurfaceCodes.reserve(1536u);
+    waterfallVertices.reserve(144u);
+    waterfallIndices.reserve(240u);
 
     enum SurfaceMaterial : std::uint32_t
     {
@@ -1022,6 +1028,19 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         vertices.push_back(b);
         vertices.push_back(c);
         indices.insert(indices.end(), {base, base + 1u, base + 2u});
+    };
+    const auto addWaterfallQuad = [&waterfallVertices, &waterfallIndices](
+                                      const Vertex& a,
+                                      const Vertex& b,
+                                      const Vertex& c,
+                                      const Vertex& d) {
+        const std::uint32_t base = static_cast<std::uint32_t>(waterfallVertices.size());
+        waterfallVertices.push_back(a);
+        waterfallVertices.push_back(b);
+        waterfallVertices.push_back(c);
+        waterfallVertices.push_back(d);
+        waterfallIndices.insert(
+            waterfallIndices.end(), {base, base + 1u, base + 2u, base, base + 2u, base + 3u});
     };
     const auto addWorldQuad = [&addQuad, &worldSurfaceCodes, &surfaceCode](const Vertex& a,
                                                                           const Vertex& b,
@@ -1235,7 +1254,10 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     addWorldBox(waterSlotMinX, waterShaftBase, waterSlotMaxZ,
                 waterSlotMaxX, 2.18f, waterSlotMaxZ + 0.16f, SurfaceMossyStone);
 
-    // Three closed, faceted streams replace the former broad water cards. The
+    // Only the three falling streams live in this dedicated local-space mesh.
+    // Catchment, runnel and drain stay in the static world and collision is
+    // unchanged. The TLAS transform scales local X around the authored centre.
+    // The closed, faceted streams replace the former broad water cards. The
     // eight-sided elliptical rings have real depth for Fresnel/refraction and
     // real air gaps between them; no shader coverage mask or overlay is used.
     // The main thin stream brushes the authored z=-15.20 route while two narrow
@@ -1279,9 +1301,9 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
             for (std::size_t facet = 0u; facet < ringCos.size(); ++facet)
             {
                 rings[level][facet] = Vertex{{
-                    -2.32f + ringCos[facet] * stream.radiusX * radiusScale,
+                    ringCos[facet] * stream.radiusX * radiusScale,
                     waterStreamY[level],
-                    stream.centreZ + ringSin[facet] * stream.radiusZ * radiusScale,
+                    (stream.centreZ + 15.26f) + ringSin[facet] * stream.radiusZ * radiusScale,
                 }};
             }
         }
@@ -1290,9 +1312,8 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
             for (std::size_t facet = 0u; facet < ringCos.size(); ++facet)
             {
                 const std::size_t nextFacet = (facet + 1u) % ringCos.size();
-                addWorldQuad(rings[segment + 1u][facet], rings[segment][facet],
-                             rings[segment][nextFacet], rings[segment + 1u][nextFacet],
-                             SurfaceWater, SurfaceLeft);
+                addWaterfallQuad(rings[segment + 1u][facet], rings[segment][facet],
+                                 rings[segment][nextFacet], rings[segment + 1u][nextFacet]);
             }
         }
     }
@@ -1460,6 +1481,12 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         return false;
     }
 
+    const std::uint32_t waterfallFirstVertex = static_cast<std::uint32_t>(vertices.size());
+    const std::uint32_t waterfallIndexOffset = static_cast<std::uint32_t>(indices.size());
+    vertices.insert(vertices.end(), waterfallVertices.begin(), waterfallVertices.end());
+    indices.insert(indices.end(), waterfallIndices.begin(), waterfallIndices.end());
+    const std::uint32_t waterfallIndexCount = static_cast<std::uint32_t>(indices.size());
+
     // Closed-position sliding roof slab. Its TLAS transform moves west after
     // the lich's death animation, physically exposing the sky to primary and
     // visibility rays rather than fading a ceiling texture away.
@@ -1583,7 +1610,10 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         addTriangle(limbBase, limbRings[0u][next], limbRings[0u][side]);
         addTriangle(limbTip, limbRings[3u][side], limbRings[3u][next]);
     }
-    const std::uint32_t finaleRoofPrimitiveCount = (finaleRoofIndexCount - sceneIndexCount) / 3u;
+    const std::uint32_t waterfallPrimitiveCount =
+        (waterfallIndexCount - waterfallIndexOffset) / 3u;
+    const std::uint32_t finaleRoofPrimitiveCount =
+        (finaleRoofIndexCount - waterfallIndexCount) / 3u;
     const std::uint32_t torchPrimitiveCount = (torchIndexCount - finaleRoofIndexCount) / 3u;
     const std::uint32_t swordPrimitiveCount = (swordIndexCount - torchIndexCount) / 3u;
     const std::uint32_t playerBodyPrimitiveCount = (playerBodyIndexCount - swordIndexCount) / 3u;
@@ -1693,9 +1723,70 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     blasAddressInfo.accelerationStructure = blas_.handle;
     blas_.address = vkGetAccelerationStructureDeviceAddressKHR_(device_, &blasAddressInfo);
 
+    VkAccelerationStructureBuildRangeInfoKHR waterfallRange{};
+    waterfallRange.primitiveCount = waterfallPrimitiveCount;
+    waterfallRange.primitiveOffset = waterfallIndexOffset * sizeof(std::uint32_t);
+    waterfallRange.firstVertex = waterfallFirstVertex;
+    VkAccelerationStructureBuildGeometryInfoKHR waterfallBuildInfo{
+        VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR};
+    waterfallBuildInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+    waterfallBuildInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
+    waterfallBuildInfo.geometryCount = 1u;
+    waterfallBuildInfo.pGeometries = &blasGeometry;
+    VkAccelerationStructureBuildSizesInfoKHR waterfallSizes{
+        VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR};
+    vkGetAccelerationStructureBuildSizesKHR_(device_, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR,
+                                             &waterfallBuildInfo, &waterfallPrimitiveCount,
+                                             &waterfallSizes);
+    if (!CreateBuffer(waterfallSizes.accelerationStructureSize,
+                      VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR,
+                      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                      true,
+                      waterfallBlas_.backing,
+                      diagnostic))
+    {
+        return false;
+    }
+    VkAccelerationStructureCreateInfoKHR waterfallCreateInfo{
+        VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR};
+    waterfallCreateInfo.buffer = waterfallBlas_.backing.buffer;
+    waterfallCreateInfo.size = waterfallSizes.accelerationStructureSize;
+    waterfallCreateInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+    if (vkCreateAccelerationStructureKHR_(device_, &waterfallCreateInfo, nullptr,
+                                          &waterfallBlas_.handle) != VK_SUCCESS)
+    {
+        diagnostic = "Failed to create dedicated waterfall BLAS.";
+        return false;
+    }
+    Buffer waterfallScratch;
+    if (!CreateBuffer(waterfallSizes.buildScratchSize,
+                      VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                      true,
+                      waterfallScratch,
+                      diagnostic))
+    {
+        return false;
+    }
+    waterfallBuildInfo.dstAccelerationStructure = waterfallBlas_.handle;
+    waterfallBuildInfo.scratchData.deviceAddress = waterfallScratch.address;
+    const VkAccelerationStructureBuildRangeInfoKHR* waterfallRanges[] = {&waterfallRange};
+    BlasBuildData waterfallBuildData{this, &waterfallBuildInfo, waterfallRanges};
+    if (!RunOneTimeCommands(buildBlas, &waterfallBuildData, diagnostic))
+    {
+        DestroyBuffer(waterfallScratch);
+        return false;
+    }
+    DestroyBuffer(waterfallScratch);
+    VkAccelerationStructureDeviceAddressInfoKHR waterfallAddressInfo{
+        VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR};
+    waterfallAddressInfo.accelerationStructure = waterfallBlas_.handle;
+    waterfallBlas_.address =
+        vkGetAccelerationStructureDeviceAddressKHR_(device_, &waterfallAddressInfo);
+
     VkAccelerationStructureBuildRangeInfoKHR finaleRoofRange{};
     finaleRoofRange.primitiveCount = finaleRoofPrimitiveCount;
-    finaleRoofRange.primitiveOffset = sceneIndexCount * sizeof(std::uint32_t);
+    finaleRoofRange.primitiveOffset = waterfallIndexCount * sizeof(std::uint32_t);
     finaleRoofRange.firstVertex = 0u;
     VkAccelerationStructureBuildGeometryInfoKHR finaleRoofBuildInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR};
     finaleRoofBuildInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
@@ -2203,6 +2294,14 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     instances[18] = instances[2];
     instances[18].instanceCustomIndex = CharacterRenderSlot::kSecondSkeletonTlasInstanceIndex;
     instances[18].mask = 0u;
+    instances[19] = instances[0];
+    instances[19].instanceCustomIndex = 19u;
+    instances[19].mask = 0x01u;
+    instances[19].accelerationStructureReference = waterfallBlas_.address;
+    instances[19].transform = {{
+        1.0f, 0.0f, 0.0f, -2.32f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, -15.26f}};
     if (!CreateBuffer(sizeof(instances), VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, instanceBuffer_, diagnostic))
     {
         return false;
@@ -2596,6 +2695,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const horde::gameplay::LanternSnapshot& lantern = frame.lantern;
     const horde::gameplay::EnemyRosterSnapshot& roster = frame.roster;
     const horde::gameplay::LichSnapshot& lich = frame.lich;
+    const float waterfallWidthScale = ClampRtSceneTuning(frame.tuning).waterfallWidthScale;
     const auto& skeletonGpu = characterSlot_.SkeletonGpu(0u);
     const auto& secondSkeletonGpu = characterSlot_.SkeletonGpu(1u);
     const auto& lichGpu = characterSlot_.LichGpu();
@@ -2604,7 +2704,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         skeletonGpu.accelerationStructure.handle == VK_NULL_HANDLE ||
         secondSkeletonGpu.accelerationStructure.handle == VK_NULL_HANDLE ||
         lichGpu.accelerationStructure.handle == VK_NULL_HANDLE ||
-        finaleRoofBlas_.handle == VK_NULL_HANDLE ||
+        finaleRoofBlas_.handle == VK_NULL_HANDLE || waterfallBlas_.handle == VK_NULL_HANDLE ||
         swordBlas_.handle == VK_NULL_HANDLE ||
         playerBodyBlas_.handle == VK_NULL_HANDLE || playerLimbBlas_.handle == VK_NULL_HANDLE ||
         tlas_.handle == VK_NULL_HANDLE || skeletonGpu.updateScratch.address == 0u ||
@@ -2890,6 +2990,14 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         0.0f, 1.0f, 0.0f, 0.0f,
         0.0f, 0.0f, 1.0f, 0.0f}};
     instances[CharacterRenderSlot::kSecondSkeletonTlasInstanceIndex] = characterInstances[1];
+    instances[19] = instances[0];
+    instances[19].instanceCustomIndex = 19u;
+    instances[19].mask = 0x01u;
+    instances[19].accelerationStructureReference = waterfallBlas_.address;
+    instances[19].transform = {{
+        waterfallWidthScale, 0.0f, 0.0f, -2.32f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, -15.26f}};
     if (!WriteBuffer(instanceBuffer_, instances.data(), sizeof(instances), "animated TLAS instance", diagnostic))
     {
         return false;
@@ -3104,8 +3212,8 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                                             staffWorldPosition[0],
                                             staffWorldPosition[1],
                                             staffWorldPosition[2],
-                                            std::clamp(ResolveRtFinaleRoofOpen(frame.lich.finaleSkylightOpenProgress, tuning), 0.0f, 1.0f),
-                                             std::clamp(ResolveRtFinaleDawnReveal(frame.lich.finaleDawnRevealProgress, tuning), 0.0f, 1.0f),
+                                             std::clamp(frame.lich.finaleSkylightOpenProgress, 0.0f, 1.0f),
+                                             std::clamp(frame.lich.finaleDawnRevealProgress, 0.0f, 1.0f),
                                              heldPropDepth,
                                              static_cast<float>(frame.waterQuality),
                                              tuning.waterfallWidthScale,

@@ -69,9 +69,9 @@ public:
         std::vector<std::uint8_t> rgba;
     };
 
-    static constexpr std::uint32_t kBlasCount = 9u;
+    static constexpr std::uint32_t kBlasCount = 10u;
     static constexpr std::uint32_t kTlasCount = 1u;
-    static constexpr std::uint32_t kTlasInstanceCount = 19u;
+    static constexpr std::uint32_t kTlasInstanceCount = 20u;
 
     PresentableTinyRtScene() = default;
     ~PresentableTinyRtScene();
@@ -193,6 +193,7 @@ private:
     Buffer instanceBuffer_;
     Buffer worldSurfaceBuffer_;
     AccelerationStructure blas_;
+    AccelerationStructure waterfallBlas_;
     AccelerationStructure finaleRoofBlas_;
     AccelerationStructure torchBlas_;
     AccelerationStructure swordBlas_;

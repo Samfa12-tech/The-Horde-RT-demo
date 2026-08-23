@@ -72,8 +72,6 @@ int main()
     static_assert(CharacterRenderSlot::kTlasInstanceIndex == 2u);
     static_assert(CharacterRenderSlot::kSecondSkeletonTlasInstanceIndex == 18u);
     static_assert(CharacterRenderSlot::kMaximumSkeletonPoseBuckets == 2u);
-    static_assert(PresentableTinyRtScene::kBlasCount == 9u);
-    static_assert(PresentableTinyRtScene::kTlasInstanceCount == 19u);
     static_assert(static_cast<std::uint32_t>(WaterQuality::Off) == 0u);
     static_assert(static_cast<std::uint32_t>(WaterQuality::Mobile) == 1u);
     static_assert(static_cast<std::uint32_t>(WaterQuality::High) == 2u);
@@ -82,6 +80,9 @@ int main()
     static_assert(static_cast<std::uint32_t>(RtWorkloadPreset::Max) == 2u);
 
     bool ok = true;
+    ok &= Require(PresentableTinyRtScene::kBlasCount == 10u &&
+                      PresentableTinyRtScene::kTlasInstanceCount == 20u,
+                  "RT lab waterfall must report its dedicated tenth BLAS and twentieth TLAS instance");
     const RtSceneTuning authoredTuning;
     ok &= Require(Near(authoredTuning.waterfallWidthScale, 1.0f) &&
                       !authoredTuning.finaleRoofOpenOverride.has_value() &&
@@ -401,7 +402,8 @@ int main()
                           "CPU/shader world material ABI changed while appending RT water");
         }
         ok &= Require(sceneSource.find("SurfaceWater = 10u") != std::string::npos &&
-                      sceneSource.find("SurfaceWater, SurfaceLeft") != std::string::npos &&
+                      sceneSource.find("SurfaceWater, SurfaceUp") != std::string::npos &&
+                      sceneSource.find("addWaterfallQuad") != std::string::npos &&
                       sceneSource.find("worldSurfaceCodes.size() != sceneIndexCount / 3u") != std::string::npos &&
                       sceneSource.find("waterStreams.size() == 3u") != std::string::npos &&
                       sceneSource.find("falling water streams must retain real ten-centimetre air gaps") != std::string::npos,
@@ -423,6 +425,35 @@ int main()
                       raygenSource.find("float waterfallWidthScale;") != std::string::npos &&
                       raygenSource.find("float workloadPreset;") != std::string::npos,
                       "RT lab tuning did not append its eleven floats after the released water-quality ABI");
+        ok &= Require(sceneSource.find("waterfallBlas_") != std::string::npos &&
+                      sceneSource.find("instances[19].instanceCustomIndex = 19u;") != std::string::npos &&
+                      sceneSource.find("instances[19].accelerationStructureReference = waterfallBlas_.address;") != std::string::npos &&
+                      sceneSource.find("const float waterfallWidthScale = ClampRtSceneTuning(frame.tuning).waterfallWidthScale;") != std::string::npos &&
+                      sceneSource.find("waterfallWidthScale, 0.0f, 0.0f, -2.32f") != std::string::npos,
+                      "falling streams must use a dedicated local-space BLAS and a non-degenerate tuned TLAS transform");
+        ok &= Require(raygenSource.find("const int kWaterfallInstance = 19;") != std::string::npos &&
+                      raygenSource.find("candidateInstance == kWaterfallInstance") != std::string::npos &&
+                      raygenSource.find("instance == kWaterfallInstance") != std::string::npos &&
+                      raygenSource.find("radiusX *= controls.waterfallWidthScale;") != std::string::npos &&
+                      raygenSource.find("bool isThinWater = h.material == kMaterialWater;") != std::string::npos,
+                      "dedicated waterfall hits must remain transparent water with width-matched shader profiles");
+        ok &= Require(raygenSource.find("vec3 tunedLightColor(vec3 authoredColor, int group)") != std::string::npos &&
+                      raygenSource.find("if (maximum <= 0.0 || intensityScale <= 0.0)") != std::string::npos &&
+                      raygenSource.find("controls.fogDensityScale") != std::string::npos &&
+                      raygenSource.find("kLightTorch") != std::string::npos &&
+                      raygenSource.find("kLightSkylight") != std::string::npos &&
+                      raygenSource.find("kLightPassage") != std::string::npos &&
+                      raygenSource.find("kLightStaff") != std::string::npos,
+                      "RT light groups need centralized zero-preserving hue/intensity tuning and fog scaling");
+        ok &= Require(raygenSource.find("bool leanWorkload = controls.workloadPreset < 0.5;") != std::string::npos &&
+                      raygenSource.find("bool maxWorkload = controls.workloadPreset >= 1.5;") != std::string::npos &&
+                      raygenSource.find("if (!leanWorkload)") != std::string::npos &&
+                      raygenSource.find("if (maxWorkload)") != std::string::npos &&
+                      raygenSource.find("const float sampleCount = 2.0;") != std::string::npos &&
+                      raygenSource.find("const float sampleCount = 6.0;") != std::string::npos &&
+                      raygenSource.find("const float sampleCount = 8.0;") != std::string::npos &&
+                      raygenSource.find("stepLength * 7.5") != std::string::npos,
+                      "Lean/Authored/Max must deterministically select no-bounce 2, authored 6, and dual-visibility 8 work");
         ok &= Require(raygenSource.find("waterSheetCoverage") == std::string::npos &&
                       raygenSource.find("bool waterStreamExit") != std::string::npos &&
                       raygenSource.find("controls.waterQuality < 0.5") != std::string::npos &&

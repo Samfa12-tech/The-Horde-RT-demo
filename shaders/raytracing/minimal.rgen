@@ -101,6 +101,54 @@ const int kMaterialHiddenShell = 7;
 const int kMaterialMirror = 8;
 const int kMaterialClearGlass = 9;
 const int kMaterialWater = 10;
+const int kWaterfallInstance = 19;
+const int kLightTorch = 0;
+const int kLightSkylight = 1;
+const int kLightPassage = 2;
+const int kLightStaff = 3;
+
+vec2 lightTuning(int group)
+{
+    if (group == kLightTorch)
+        return vec2(controls.torchHueDegrees, controls.torchIntensityScale);
+    if (group == kLightSkylight)
+        return vec2(controls.skylightHueDegrees, controls.skylightIntensityScale);
+    if (group == kLightPassage)
+        return vec2(controls.passageHueDegrees, controls.passageIntensityScale);
+    return vec2(controls.staffHueDegrees, controls.staffIntensityScale);
+}
+
+vec3 tunedLightColor(vec3 authoredColor, int group)
+{
+    vec2 tuning = lightTuning(group);
+    float maximum = max(authoredColor.r, max(authoredColor.g, authoredColor.b));
+    float intensityScale = tuning.y;
+    if (maximum <= 0.0 || intensityScale <= 0.0)
+    {
+        return vec3(0.0);
+    }
+    if (abs(tuning.x) <= 0.0001)
+    {
+        return authoredColor * intensityScale;
+    }
+
+    float minimum = min(authoredColor.r, min(authoredColor.g, authoredColor.b));
+    float chroma = maximum - minimum;
+    float hue = 0.0;
+    if (chroma > 0.000001)
+    {
+        hue = authoredColor.r >= maximum
+            ? (authoredColor.g - authoredColor.b) / chroma
+            : (authoredColor.g >= maximum
+                ? 2.0 + (authoredColor.b - authoredColor.r) / chroma
+                : 4.0 + (authoredColor.r - authoredColor.g) / chroma);
+        hue = fract(hue / 6.0 + tuning.x / 360.0);
+    }
+    float saturation = chroma / maximum;
+    vec3 phase = abs(fract(hue + vec3(0.0, 2.0 / 3.0, 1.0 / 3.0)) * 6.0 - 3.0);
+    vec3 rotated = maximum * mix(vec3(1.0), clamp(phase - 1.0, 0.0, 1.0), saturation);
+    return rotated * intensityScale;
+}
 
 vec3 skyColor(vec3 d)
 {
@@ -112,7 +160,7 @@ vec3 skyColor(vec3 d)
     sky += vec3(0.52, 0.62, 0.82) * moonDisc;
     sky += vec3(0.10, 0.14, 0.23) * moonHalo;
     sky += vec3(0.045, 0.018, 0.008) * smoothstep(-0.35, 0.15, -d.y);
-    return sky;
+    return tunedLightColor(sky, kLightSkylight);
 }
 
 float puddleMask(vec3 p)
@@ -169,6 +217,7 @@ void waterStreamProfile(vec3 p, out float centreZ, out float radiusX,
         radiusX = 0.003;
         radiusZ = 0.012;
     }
+    radiusX *= controls.waterfallWidthScale;
 }
 
 vec3 waterBaseNormal(vec3 p, vec3 geometricNormal)
@@ -302,6 +351,17 @@ void materialForPrimitive(int primitive,
                           out float emissive)
 {
     material = -1;
+    if (instance == kWaterfallInstance)
+    {
+        material = kMaterialWater;
+        geometricNormal = waterBaseNormal(p, vec3(1.0, 0.0, 0.0));
+        normal = waterSurfaceNormal(p, geometricNormal);
+        base = vec3(1.0);
+        metallic = 0.0;
+        reflectivity = 0.0204;
+        emissive = 0.0;
+        return;
+    }
     if (instance == 1)
     {
         vec3 cameraForward = normalize(vec3(sin(controls.yaw), -0.05 + controls.pitch, -cos(controls.yaw)));
@@ -331,7 +391,9 @@ void materialForPrimitive(int primitive,
         {
             bool innerFlame = primitive >= 92;
             float flicker = sin(controls.time * 17.0 + float(primitive) * 1.7);
-            base = innerFlame ? vec3(1.0, 0.56, 0.055) : vec3(1.0, 0.105, 0.008);
+            base = tunedLightColor(
+                innerFlame ? vec3(1.0, 0.56, 0.055) : vec3(1.0, 0.105, 0.008),
+                kLightTorch);
             emissive = controls.lantern * ((innerFlame ? 3.6 : 2.75) + 0.35 * flicker);
             if (controls.lantern <= 0.001)
             {
@@ -473,9 +535,10 @@ void materialForPrimitive(int primitive,
     }
     else if (material == kMaterialFlame)
     {
-        base = p.x < -23.5 ? vec3(0.19, 0.95, 0.26) :
-               (p.x < -18.5 ? vec3(1.0, 0.055, 0.018) :
-               (p.x < -13.5 ? vec3(0.055, 0.24, 1.0) : vec3(1.0, 0.44, 0.055)));
+        vec3 authoredFlame = p.x < -23.5 ? vec3(0.19, 0.95, 0.26) :
+                              (p.x < -18.5 ? vec3(1.0, 0.055, 0.018) :
+                              (p.x < -13.5 ? vec3(0.055, 0.24, 1.0) : vec3(1.0, 0.44, 0.055)));
+        base = tunedLightColor(authoredFlame, kLightPassage);
         emissive = 2.2 + 0.45 * sin((p.y + p.x) * 35.0 + controls.time * 18.0);
     }
     else if (material == kMaterialMirror)
@@ -541,8 +604,9 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
         }
         int candidateInstance = int(rayQueryGetIntersectionInstanceCustomIndexEXT(query, false));
         int candidatePrimitive = rayQueryGetIntersectionPrimitiveIndexEXT(query, false);
-        bool candidateIsWater = candidateInstance == 0 &&
-            int(worldSurfaces.codes[candidatePrimitive] & 0xffu) == kMaterialWater;
+        bool candidateIsWater = candidateInstance == kWaterfallInstance ||
+            (candidateInstance == 0 &&
+             int(worldSurfaces.codes[candidatePrimitive] & 0xffu) == kMaterialWater);
         if (!candidateIsWater)
         {
             rayQueryConfirmIntersectionEXT(query);
@@ -603,7 +667,7 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
                 vec3 albedo = texture(lichBaseColor, vec3(uv, 0.0)).rgb;
                 vec3 glow = texture(lichEmissive, vec3(uv, 0.0)).rgb;
                 float glowMask = smoothstep(0.025, 0.50, max(glow.r, max(glow.g, glow.b)));
-                vec3 violetEmission = vec3(0.72, 0.12, 1.0);
+                vec3 violetEmission = tunedLightColor(vec3(0.72, 0.12, 1.0), kLightStaff);
                 h.base = mix(albedo * 0.72, violetEmission, glowMask);
                 h.emissive = glowMask * (3.8 + controls.staffLightStrength * 2.3);
             }
@@ -624,7 +688,7 @@ float visibilityMask(vec3 origin, vec3 direction, float maxDistance, uint mask)
         }
         int instance = int(rayQueryGetIntersectionInstanceCustomIndexEXT(query, false));
         int primitive = rayQueryGetIntersectionPrimitiveIndexEXT(query, false);
-        bool transparentWorldPane = false;
+        bool transparentWorldPane = instance == kWaterfallInstance;
         if (instance == 0)
         {
             int material = int(worldSurfaces.codes[primitive] & 0xffu);
@@ -668,7 +732,7 @@ vec3 bounceSample(HitInfo h, vec3 incoming, bool lightAwareMirror)
     {
         return h.base * h.emissive;
     }
-    if (h.instance == 0 && h.material == kMaterialWater)
+    if (h.material == kMaterialWater)
     {
         // Water secondary hits deliberately stop here. Primary water shading
         // owns its one reflection and one transmission query, so this keeps
@@ -694,7 +758,7 @@ vec3 bounceSample(HitInfo h, vec3 incoming, bool lightAwareMirror)
         + cameraRight * (-0.34 - torchSway) + cameraUp * (-0.40 + torchBob) +
           cameraForward * controls.heldPropDepth;
     vec3 localLightPosition = torchGripPosition + cameraUp * 0.28;
-    vec3 localLightColor = vec3(1.0, 0.28, 0.055);
+    vec3 localLightColor = tunedLightColor(vec3(1.0, 0.28, 0.055), kLightTorch);
     float localLightStrength = controls.lantern;
     if (controls.cameraX <= -8.5 && controls.cameraX >= -28.5 &&
         controls.cameraZ >= -16.8 && controls.cameraZ <= -13.6)
@@ -703,15 +767,16 @@ vec3 bounceSample(HitInfo h, vec3 incoming, bool lightAwareMirror)
                      (controls.cameraX > -18.5 ? -16.0 :
                      (controls.cameraX > -23.5 ? -21.0 : -26.0));
         localLightPosition = vec3(bayX, 0.67, -13.98);
-        localLightColor = bayX > -13.5 ? vec3(1.0, 0.42, 0.06) :
-                          (bayX > -18.5 ? vec3(0.055, 0.22, 1.0) :
-                          (bayX > -23.5 ? vec3(1.0, 0.045, 0.018) : vec3(0.16, 0.78, 0.22)));
+        vec3 authoredPassageColor = bayX > -13.5 ? vec3(1.0, 0.42, 0.06) :
+                                      (bayX > -18.5 ? vec3(0.055, 0.22, 1.0) :
+                                      (bayX > -23.5 ? vec3(1.0, 0.045, 0.018) : vec3(0.16, 0.78, 0.22)));
+        localLightColor = tunedLightColor(authoredPassageColor, kLightPassage);
         localLightStrength = 1.0;
     }
     if (controls.enemyKind > 0.5 && controls.staffLightStrength > 0.001)
     {
         localLightPosition = vec3(controls.staffX, controls.staffY, controls.staffZ);
-        localLightColor = vec3(0.58, 0.10, 1.0);
+        localLightColor = tunedLightColor(vec3(0.58, 0.10, 1.0), kLightStaff);
         localLightStrength = controls.staffLightStrength;
     }
 
@@ -751,7 +816,7 @@ vec3 waterSecondarySample(HitInfo h, vec3 incoming)
     {
         return h.base * h.emissive;
     }
-    if (h.instance == 0 && h.material == kMaterialWater)
+    if (h.material == kMaterialWater)
     {
         return skyColor(reflect(incoming, h.geometricNormal)) * 0.06 + vec3(0.008);
     }
@@ -762,7 +827,7 @@ vec3 waterSecondarySample(HitInfo h, vec3 incoming)
 
     vec3 skyVector = vec3(-5.50, 2.62, -15.20) - h.position;
     vec3 skyDirection = skyVector / max(length(skyVector), 0.001);
-    vec3 skyRadiance = vec3(0.28, 0.44, 0.72);
+    vec3 skyRadiance = tunedLightColor(vec3(0.28, 0.44, 0.72), kLightSkylight);
     float skyDiffuse = max(dot(normal, skyDirection), 0.0);
     float skySpecular = pow(max(dot(normal, normalize(skyDirection - incoming)), 0.0),
                             mix(12.0, 96.0, reflective));
@@ -777,13 +842,13 @@ vec3 waterSecondarySample(HitInfo h, vec3 incoming)
     float torchDiffuse = max(dot(normal, torchDirection), 0.0);
     float torchSpecular = pow(max(dot(reflect(-torchDirection, normal), -incoming), 0.0),
                               mix(34.0, 5.0, reflective));
-    vec3 torchColor = vec3(1.0, 0.28, 0.055);
+    vec3 torchColor = tunedLightColor(vec3(1.0, 0.28, 0.055), kLightTorch);
     float flamePulse = 0.84 + 0.16 * sin(controls.time * 15.0);
     color += h.base * torchColor * torchDiffuse * torchAttenuation * flamePulse * 2.65;
     color += torchColor * torchSpecular * torchAttenuation * (0.12 + reflective * 1.04);
 
-    float fog = 1.0 - exp(-h.t * h.t * 0.012);
-    color = mix(color, vec3(0.036, 0.046, 0.064), fog);
+    float fog = 1.0 - exp(-h.t * h.t * 0.012 * controls.fogDensityScale);
+    color = mix(color, tunedLightColor(vec3(0.036, 0.046, 0.064), kLightSkylight), fog);
     color += torchColor * 0.16 * clamp(controls.lantern, 0.0, 1.0) * exp(-h.t * 0.24);
     return color;
 }
@@ -889,9 +954,9 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
     vec3 skyDirection = normalize(vec3(-5.50, 2.62, -15.20) - h.position);
     float skyHighlight = pow(max(dot(surfaceNormal,
         normalize(skyDirection - rayDirection)), 0.0), 96.0);
-    vec3 interfaceLight = vec3(1.0, 0.28, 0.055) * torchHighlight
+    vec3 interfaceLight = tunedLightColor(vec3(1.0, 0.28, 0.055), kLightTorch) * torchHighlight
         * controls.lantern / (1.0 + torchDistanceSquared * 0.58) * 3.2;
-    interfaceLight += vec3(0.28, 0.44, 0.72) * skyHighlight * 0.10;
+    interfaceLight += tunedLightColor(vec3(0.28, 0.44, 0.72), kLightSkylight) * skyHighlight * 0.10;
     if (runoff && h.position.x > -2.88)
     {
         float impactDistance = length(h.position.xz - vec2(-2.32, -15.26));
@@ -899,8 +964,8 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
             impactDistance * 31.0 - controls.time * 6.2), 8.0)
             * (1.0 - smoothstep(0.07, 0.68, impactDistance));
         float impactCore = 1.0 - smoothstep(0.04, 0.22, impactDistance);
-        vec3 impactLight = mix(vec3(0.20, 0.31, 0.46),
-                               vec3(0.82, 0.42, 0.16),
+        vec3 impactLight = mix(tunedLightColor(vec3(0.20, 0.31, 0.46), kLightSkylight),
+                               tunedLightColor(vec3(0.82, 0.42, 0.16), kLightTorch),
                                clamp(controls.lantern * 0.38, 0.0, 0.52));
         interfaceLight += impactLight * (impactCrest * 0.12 + impactCore * 0.045);
     }
@@ -915,7 +980,8 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
               - controls.time * 8.4) * 0.17, 0.0, 1.0);
     float entrainedAir = runoff ? 0.004
         : 0.010 + pow(breakup, 3.0) * 0.028 + surfaceTurbulence * 0.010;
-    vec3 scatteringRadiance = mix(vec3(0.22, 0.25, 0.28), vec3(0.50, 0.32, 0.16),
+    vec3 scatteringRadiance = mix(tunedLightColor(vec3(0.22, 0.25, 0.28), kLightSkylight),
+                                  tunedLightColor(vec3(0.50, 0.32, 0.16), kLightTorch),
                                   clamp(controls.lantern * 0.22, 0.0, 0.52));
     return mix(surfaceRadiance, scatteringRadiance, entrainedAir);
 }
@@ -928,8 +994,10 @@ vec3 shadePrimary(HitInfo h, vec3 rayDirection)
         bool cameraInFinale = controls.cameraX >= -36.9 && controls.cameraX <= -30.5 &&
                               controls.cameraZ >= -18.4 && controls.cameraZ <= -12.0;
         float dawn = cameraInFinale ? smoothstep(0.0, 1.0, controls.finaleDawnReveal) : 0.0;
-        vec3 dawnSky = mix(vec3(0.34, 0.14, 0.09), vec3(1.05, 0.52, 0.22),
-                           smoothstep(-0.12, 0.52, rayDirection.y));
+        vec3 dawnSky = tunedLightColor(
+            mix(vec3(0.34, 0.14, 0.09), vec3(1.05, 0.52, 0.22),
+                smoothstep(-0.12, 0.52, rayDirection.y)),
+            kLightSkylight);
         return mix(nightSky, dawnSky, dawn);
     }
     if (h.emissive > 0.0)
@@ -955,14 +1023,16 @@ vec3 shadePrimary(HitInfo h, vec3 rayDirection)
         return mix(transmitted * tint * transmission, reflected, fresnel);
     }
 
-    bool isThinWater = h.instance == 0 && h.material == kMaterialWater;
+    bool isThinWater = h.material == kMaterialWater;
     if (isThinWater)
     {
         return shadeThinWater(h, rayDirection);
     }
 
-    vec3 warm = vec3(1.0, 0.28, 0.055);
-    vec3 cold = vec3(0.15, 0.20, 0.28);
+    vec3 warm = tunedLightColor(vec3(1.0, 0.28, 0.055), kLightTorch);
+    vec3 cold = tunedLightColor(vec3(0.15, 0.20, 0.28), kLightSkylight);
+    bool leanWorkload = controls.workloadPreset < 0.5;
+    bool maxWorkload = controls.workloadPreset >= 1.5;
     float flamePulse = 0.84 + 0.16 * sin(controls.time * 15.0);
     vec3 cameraForward = normalize(vec3(sin(controls.yaw), -0.05 + controls.pitch, -cos(controls.yaw)));
     vec3 cameraRight = normalize(cross(cameraForward, vec3(0.0, 1.0, 0.0)));
@@ -987,15 +1057,16 @@ vec3 shadePrimary(HitInfo h, vec3 rayDirection)
                      (controls.cameraX > -18.5 ? -16.0 :
                      (controls.cameraX > -23.5 ? -21.0 : -26.0));
         localLightPosition = vec3(bayX, 0.67, -13.98);
-        localLightColor = bayX > -13.5 ? vec3(1.0, 0.42, 0.06) :
-                          (bayX > -18.5 ? vec3(0.055, 0.22, 1.0) :
-                          (bayX > -23.5 ? vec3(1.0, 0.045, 0.018) : vec3(0.16, 0.78, 0.22)));
+        vec3 authoredPassageColor = bayX > -13.5 ? vec3(1.0, 0.42, 0.06) :
+                                      (bayX > -18.5 ? vec3(0.055, 0.22, 1.0) :
+                                      (bayX > -23.5 ? vec3(1.0, 0.045, 0.018) : vec3(0.16, 0.78, 0.22)));
+        localLightColor = tunedLightColor(authoredPassageColor, kLightPassage);
         localLightStrength = 1.0;
     }
     if (controls.enemyKind > 0.5 && controls.staffLightStrength > 0.001)
     {
         localLightPosition = vec3(controls.staffX, controls.staffY, controls.staffZ);
-        localLightColor = vec3(0.58, 0.10, 1.0);
+        localLightColor = tunedLightColor(vec3(0.58, 0.10, 1.0), kLightStaff);
         localLightStrength = controls.staffLightStrength;
     }
     vec3 toTorch = localLightPosition - h.position;
@@ -1007,6 +1078,15 @@ vec3 shadePrimary(HitInfo h, vec3 rayDirection)
     float sampleDistance = length(sampleVector);
     vec3 torchSampleDirection = sampleVector / max(sampleDistance, 0.001);
     float torchVisibility = visibility(offsetRayOrigin(h, torchSampleDirection), torchSampleDirection, sampleDistance - 0.02);
+    if (maxWorkload)
+    {
+        vec3 otherSampleVector = localLightPosition + areaOffsets[1 - areaIndex] - h.position;
+        float otherSampleDistance = length(otherSampleVector);
+        vec3 otherSampleDirection = otherSampleVector / max(otherSampleDistance, 0.001);
+        float otherVisibility = visibility(offsetRayOrigin(h, otherSampleDirection),
+                                           otherSampleDirection, otherSampleDistance - 0.02);
+        torchVisibility = 0.5 * (torchVisibility + otherVisibility);
+    }
     float torchDiffuse = max(dot(h.normal, torchDirection), 0.0);
     float reflective = max(h.metallic, h.reflectivity);
     float torchSpec = pow(max(dot(reflect(-torchDirection, h.normal), -rayDirection), 0.0), mix(34.0, 5.0, reflective));
@@ -1026,7 +1106,20 @@ vec3 shadePrimary(HitInfo h, vec3 rayDirection)
     bool usesPhysicalAperture = inSkylightChamber || finaleSkylightActive;
     vec3 skyDirection = usesPhysicalAperture ? skyVector / max(skyDistance, 0.001) : kMoonDirection;
     float moonVisibility = visibility(offsetRayOrigin(h, skyDirection), skyDirection,
-                                      usesPhysicalAperture ? skyDistance - 0.02 : 18.0);
+                                       usesPhysicalAperture ? skyDistance - 0.02 : 18.0);
+    if (maxWorkload)
+    {
+        vec3 otherSkyTarget = finaleSkylightActive
+            ? (skySample == 0 ? vec3(-33.05, 2.76, -14.38) : vec3(-34.35, 2.76, -16.02))
+            : (skySample == 0 ? vec3(-4.85, 2.62, -14.35) : vec3(-6.15, 2.62, -16.05));
+        vec3 otherSkyVector = otherSkyTarget - h.position;
+        float otherSkyDistance = length(otherSkyVector);
+        vec3 otherSkyDirection = usesPhysicalAperture
+            ? otherSkyVector / max(otherSkyDistance, 0.001) : kMoonDirection;
+        float otherSkyVisibility = visibility(offsetRayOrigin(h, otherSkyDirection), otherSkyDirection,
+                                              usesPhysicalAperture ? otherSkyDistance - 0.02 : 18.0);
+        moonVisibility = 0.5 * (moonVisibility + otherSkyVisibility);
+    }
     float finaleLightGain = finaleSkylightActive
         ? smoothstep(0.0, 0.88, controls.finaleSkylightOpen) : 1.0;
     if (finaleSkylightActive)
@@ -1037,21 +1130,28 @@ vec3 shadePrimary(HitInfo h, vec3 rayDirection)
     vec3 moonHalf = normalize(skyDirection - rayDirection);
     float moonSpecular = pow(max(dot(h.normal, moonHalf), 0.0), mix(12.0, 96.0, reflective));
     float moonFresnel = pow(1.0 - max(dot(h.normal, -rayDirection), 0.0), 5.0);
-    vec3 finaleRadiance = mix(vec3(0.38, 0.52, 0.76), vec3(1.12, 0.54, 0.23),
-                              smoothstep(0.0, 1.0, controls.finaleDawnReveal));
-    vec3 moonRadiance = finaleSkylightActive ? finaleRadiance :
-                        (inSkylightChamber ? vec3(0.28, 0.44, 0.72) : vec3(0.26, 0.34, 0.48));
+    vec3 finaleRadiance = tunedLightColor(
+        mix(vec3(0.38, 0.52, 0.76), vec3(1.12, 0.54, 0.23),
+            smoothstep(0.0, 1.0, controls.finaleDawnReveal)),
+        kLightSkylight);
+    vec3 moonRadiance = finaleSkylightActive ? finaleRadiance : tunedLightColor(
+        inSkylightChamber ? vec3(0.28, 0.44, 0.72) : vec3(0.26, 0.34, 0.48),
+        kLightSkylight);
 
     // Keep the one RT bounce deterministic. The previous time-varying hemisphere sample was the main source of shimmer.
-    vec3 bounceDirection = reflective > 0.38
-        ? reflect(rayDirection, h.normal)
-        : normalize(h.normal + vec3(0.18, 0.58, -0.34));
-    bool wantsPlayerReflection = reflective > 0.38 ||
-        (h.instance == 0 && h.material == kMaterialWetCobble && puddleMask(h.position) > 0.05);
-    uint bounceMask = wantsPlayerReflection ? 0x37u : 0x23u;
-    HitInfo bounceHit = traceScene(offsetRayOrigin(h, bounceDirection), bounceDirection,
-                                   12.0, bounceMask, false);
-    vec3 bounce = bounceSample(bounceHit, bounceDirection, wantsPlayerReflection);
+    vec3 bounce = vec3(0.0);
+    if (!leanWorkload)
+    {
+        vec3 bounceDirection = reflective > 0.38
+            ? reflect(rayDirection, h.normal)
+            : normalize(h.normal + vec3(0.18, 0.58, -0.34));
+        bool wantsPlayerReflection = reflective > 0.38 ||
+            (h.instance == 0 && h.material == kMaterialWetCobble && puddleMask(h.position) > 0.05);
+        uint bounceMask = wantsPlayerReflection ? 0x37u : 0x23u;
+        HitInfo bounceHit = traceScene(offsetRayOrigin(h, bounceDirection), bounceDirection,
+                                       12.0, bounceMask, false);
+        bounce = bounceSample(bounceHit, bounceDirection, wantsPlayerReflection);
+    }
 
     vec3 color = h.base * vec3(0.025, 0.028, 0.032);
     color += h.base * localLightColor * torchDiffuse * torchAttenuation * torchVisibility * localLightStrength * flamePulse * 2.65;
@@ -1070,8 +1170,11 @@ vec3 shadePrimary(HitInfo h, vec3 rayDirection)
         color += bounce * puddle * 0.46;
     }
 
-    float fog = 1.0 - exp(-h.t * h.t * 0.012);
-    vec3 fogColor = mix(vec3(0.028, 0.034, 0.046), vec3(0.052, 0.064, 0.086), moonVisibility * moonDiffuse * 0.55);
+    float fog = 1.0 - exp(-h.t * h.t * 0.012 * controls.fogDensityScale);
+    vec3 fogColor = tunedLightColor(
+        mix(vec3(0.028, 0.034, 0.046), vec3(0.052, 0.064, 0.086),
+            moonVisibility * moonDiffuse * 0.55),
+        kLightSkylight);
     color = mix(color, fogColor, fog);
     // This close-range haze belongs to the selected local emitter. Keeping the
     // old unconditional warm term made the lantern-off skylight chamber brown
@@ -1131,7 +1234,8 @@ vec3 staffElectricity(vec3 rayOrigin, vec3 rayDirection, float sceneDepth)
     float corona = (1.0 - smoothstep(0.035, 0.24, staffDistance)) * coronaVisible;
     float charge = clamp(controls.staffLightStrength / 2.2, 0.0, 1.0);
     float flicker = 0.88 + 0.12 * sin(phase * 1.91);
-    return vec3(0.72, 0.10, 1.45) * (bolt + corona * 0.72) * (0.42 + charge * 2.65) * flicker;
+    return tunedLightColor(vec3(0.72, 0.10, 1.45), kLightStaff)
+        * (bolt + corona * 0.72) * (0.42 + charge * 2.65) * flicker;
 }
 
 bool rayBoxInterval(vec3 origin, vec3 direction, vec3 boundsMin, vec3 boundsMax,
@@ -1172,8 +1276,8 @@ vec4 lichMistSample(vec3 p)
     vec3 staff = vec3(controls.staffX, controls.staffY, controls.staffZ);
     float staffGlow = controls.staffLightStrength /
         (1.0 + dot(p - staff, p - staff) * 1.15);
-    vec3 ambientScattering = vec3(0.45, 0.60, 0.80);
-    vec3 ritualScattering = vec3(0.75, 0.16, 1.00);
+    vec3 ambientScattering = tunedLightColor(vec3(0.45, 0.60, 0.80), kLightSkylight);
+    vec3 ritualScattering = tunedLightColor(vec3(0.75, 0.16, 1.00), kLightStaff);
     vec3 incidentLight = ambientScattering
         + ritualScattering * clamp(staffGlow * 1.35, 0.0, 1.8);
     // RGB stores in-scattering per metre and A stores extinction per metre.
@@ -1213,22 +1317,55 @@ vec4 lichGroundMist(vec3 rayOrigin, vec3 rayDirection, float sceneDepth)
         return vec4(0.0, 0.0, 0.0, 1.0);
     }
 
-    const float sampleCount = 6.0;
-    float stepLength = (marchEnd - marchStart) / sampleCount;
     vec3 scattered = vec3(0.0);
     float transmittance = 1.0;
-    integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
-        * (marchStart + stepLength * 0.5)), stepLength, scattered, transmittance);
-    integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
-        * (marchStart + stepLength * 1.5)), stepLength, scattered, transmittance);
-    integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
-        * (marchStart + stepLength * 2.5)), stepLength, scattered, transmittance);
-    integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
-        * (marchStart + stepLength * 3.5)), stepLength, scattered, transmittance);
-    integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
-        * (marchStart + stepLength * 4.5)), stepLength, scattered, transmittance);
-    integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
-        * (marchStart + stepLength * 5.5)), stepLength, scattered, transmittance);
+    if (controls.workloadPreset < 0.5)
+    {
+        const float sampleCount = 2.0;
+        float stepLength = (marchEnd - marchStart) / sampleCount;
+        integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+            * (marchStart + stepLength * 0.5)), stepLength, scattered, transmittance);
+        integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+            * (marchStart + stepLength * 1.5)), stepLength, scattered, transmittance);
+    }
+    else if (controls.workloadPreset < 1.5)
+    {
+        const float sampleCount = 6.0;
+        float stepLength = (marchEnd - marchStart) / sampleCount;
+        integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+            * (marchStart + stepLength * 0.5)), stepLength, scattered, transmittance);
+        integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+            * (marchStart + stepLength * 1.5)), stepLength, scattered, transmittance);
+        integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+            * (marchStart + stepLength * 2.5)), stepLength, scattered, transmittance);
+        integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+            * (marchStart + stepLength * 3.5)), stepLength, scattered, transmittance);
+        integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+            * (marchStart + stepLength * 4.5)), stepLength, scattered, transmittance);
+        integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+            * (marchStart + stepLength * 5.5)), stepLength, scattered, transmittance);
+    }
+    else
+    {
+        const float sampleCount = 8.0;
+        float stepLength = (marchEnd - marchStart) / sampleCount;
+        integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+            * (marchStart + stepLength * 0.5)), stepLength, scattered, transmittance);
+        integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+            * (marchStart + stepLength * 1.5)), stepLength, scattered, transmittance);
+        integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+            * (marchStart + stepLength * 2.5)), stepLength, scattered, transmittance);
+        integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+            * (marchStart + stepLength * 3.5)), stepLength, scattered, transmittance);
+        integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+            * (marchStart + stepLength * 4.5)), stepLength, scattered, transmittance);
+        integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+            * (marchStart + stepLength * 5.5)), stepLength, scattered, transmittance);
+        integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+            * (marchStart + stepLength * 6.5)), stepLength, scattered, transmittance);
+        integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+            * (marchStart + stepLength * 7.5)), stepLength, scattered, transmittance);
+    }
     return vec4(scattered, transmittance);
 }
 
