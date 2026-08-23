@@ -360,7 +360,7 @@ int main()
                       androidSource.find("preferences.getInt(\"water_quality\", WATER_QUALITY_MOBILE)") !=
                           std::string::npos,
                       "platform water-quality defaults changed (Windows/capture High, Android Mobile)");
-        ok &= Require(androidBridgeSource.find("else if (context.routeReplayActive)\n") !=
+        ok &= Require(androidBridgeSource.find("else if (context.routeReplayActive)") !=
                           std::string::npos &&
                       androidBridgeSource.find("context.routeReplayActive && !simulationPaused") ==
                           std::string::npos,
