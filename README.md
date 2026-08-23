@@ -8,7 +8,7 @@ Horde Lantern RT is a native Vulkan hardware-ray-tracing technology demo for And
 - Current itch builds: Windows `#1908330`; Android `#1908331`
 - Published SHA-256: Windows `631b9f01a4d348e18733c989ebacc9c32ce9005ac9498e49e8757a0a36411166`; Android `1e81238a6e1b0e934c50eb15e80fc8efd39c06f16ca8960c428b22e5f5d5a7f2`
 - Primary validated phone: Samsung `SM-S948B` / Adreno 840
-- Exact Android release baseline: the stable-key-signed `0.1.5` APK was installed on `SM-S948B`, pulled back byte-for-byte, and matched the published candidate. Strict ASTC and honest RT presentation passed before and after Home/resume.
+- Exact Android release baseline: the stable-key-signed `0.1.5` APK was installed on `SM-S948B`, pulled back byte-for-byte, and matched the published candidate. Strict ASTC and honest RT presentation passed before and after Home/resume; the owner approved waterfall audio and confirmed good haptics plus working pause/resume on that exact installed release.
 - Validated Windows GPU: NVIDIA GeForce RTX 5050 Laptop GPU
 
 Showcase Alpha 0.1.5 adds a clear RT roof-water curtain that extinguishes the lantern, a rounded catchment and drain-connected runoff, bounded lich-room ground mist, positional waterfall ambience, Windows Backbone/controller support, controller menu navigation, and collision-safe directional dodge. It preserves the shared deterministic simulation, bounded two-skeleton encounter, timed parry, visible stagger, release-safe benchmark, and Debug-only checkpoint/capture telemetry.

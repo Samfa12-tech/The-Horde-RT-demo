@@ -37,7 +37,7 @@ The published ZIP was extracted to `reports/release-smoke/windows-0.1.5-20260823
 
 The exact signed APK upgraded successfully on `SM-S948B`. The installed `base.apk` was pulled to `reports/release-smoke/android-signed-0.1.5-20260823-203208/` and matched the candidate SHA-256 byte-for-byte. Package state reported `versionName=0.1.5-alpha.1` and `versionCode=6`. Scoped logs recorded two strict-ASTC markers and two honest RT swapchain-presentation markers across launch and Home/resume, with zero fatal markers.
 
-This is exact release installation, package, renderer, and lifecycle evidence. It is not a new signed-build performance run, hands-on phone artistic approval, or a separately heard Android waterfall pause/resume test.
+This is exact release installation, package, renderer, and lifecycle evidence. It is not a new signed-build performance run or hands-on phone artistic approval. After publication, with this exact signed release still installed, the owner confirmed that the waterfall audio, haptics, and pause/resume behavior all work correctly on the physical device.
 
 ## Itch publication and page
 
@@ -50,7 +50,7 @@ The update preserves the existing public visibility, video, platform flags, inst
 
 ## Audio/haptic classification
 
-`Audio/haptic manual revalidation required: YES` - this slice adds a positional waterfall loop, platform playback ownership, and directional dodge that changes listener position. The owner accepted the exact final Windows candidate, including overall audio and the full water/mist/controller path. The subsequent Android MediaPlayer lifecycle correction is source-contract and release-lifecycle validated, but audible Android pause/resume behavior was not separately heard; no haptic routing or cue changed.
+`Audio/haptic manual revalidation required: YES - PASSED` - this slice adds a positional waterfall loop, platform playback ownership, and directional dodge that changes listener position. The owner accepted the exact final Windows candidate, including overall audio and the full water/mist/controller path, then confirmed the exact installed Android release's waterfall audio and pause/resume behavior. The owner also reconfirmed that haptics remain good; no haptic routing or cue changed in this release.
 
 ## Remaining owner-only item
 

@@ -95,3 +95,5 @@ The sentence above remains the boundary of the original candidate-validation pas
 - Android: itch build `#1908331`, stable-key-signed APK SHA-256 `1e81238a6e1b0e934c50eb15e80fc8efd39c06f16ca8960c428b22e5f5d5a7f2`, byte-matched after installation on `SM-S948B`.
 
 See `SHOWCASE_ALPHA_0_1_5_RELEASE_VALIDATION_2026-08-23.md` for the complete release and public-page evidence.
+
+With the exact byte-matched signed release still installed on `SM-S948B`, the owner subsequently approved the waterfall audio and confirmed that haptics and pause/resume work correctly. This closes the change-triggered Android audio/haptic/lifecycle owner gate without claiming a calibrated pan or loop-seam score.

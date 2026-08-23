@@ -26,6 +26,6 @@ Android version code: `6`
 
 - The owner accepted the exact Windows water/mist/controller candidate in hands-on play.
 - The exact Android Debug candidate passed strict ASTC, honest RT presentation, focused measurements, the 13-waypoint replay, all 13 captures, and Home/resume. The public signed APK was subsequently installed and pulled back byte-for-byte on `SM-S948B`, with strict ASTC and honest presentation across Home/resume.
-- `Audio/haptic manual revalidation required: YES` because this release adds a positional loop and dodge changes listener position. The owner completed a broad exact-Windows-candidate pass; no haptic cue or routing changed.
+- `Audio/haptic manual revalidation required: YES - PASSED` because this release adds a positional loop and dodge changes listener position. The owner approved the exact Windows candidate, then confirmed waterfall audio, haptics, and pause/resume on the exact installed Android release; no haptic cue or routing changed.
 
 Published itch builds are Windows `#1908330` and Android `#1908331`. See `SHOWCASE_ALPHA_0_1_5_RELEASE_VALIDATION_2026-08-23.md` for exact hashes and evidence, and `ASSET_LICENSES.md` for asset provenance and licence terms.
