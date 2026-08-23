@@ -1,4 +1,5 @@
 #include "vulkan/raytracing/CharacterRenderSlot.h"
+#include "vulkan/raytracing/RtSceneTuning.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
 
 #include <cmath>
@@ -76,8 +77,82 @@ int main()
     static_assert(static_cast<std::uint32_t>(WaterQuality::Off) == 0u);
     static_assert(static_cast<std::uint32_t>(WaterQuality::Mobile) == 1u);
     static_assert(static_cast<std::uint32_t>(WaterQuality::High) == 2u);
+    static_assert(static_cast<std::uint32_t>(RtWorkloadPreset::Lean) == 0u);
+    static_assert(static_cast<std::uint32_t>(RtWorkloadPreset::Authored) == 1u);
+    static_assert(static_cast<std::uint32_t>(RtWorkloadPreset::Max) == 2u);
 
     bool ok = true;
+    const RtSceneTuning authoredTuning;
+    ok &= Require(Near(authoredTuning.waterfallWidthScale, 1.0f) &&
+                      !authoredTuning.finaleRoofOpenOverride.has_value() &&
+                      !authoredTuning.finaleDawnRevealOverride.has_value() &&
+                      Near(authoredTuning.fogDensityScale, 1.0f) &&
+                      authoredTuning.workloadPreset == RtWorkloadPreset::Authored,
+                  "authored RT tuning defaults changed the released scene baseline");
+    for (const RtLightTuning& light : authoredTuning.lights)
+    {
+        ok &= Require(Near(light.hueDegrees, 0.0f) && Near(light.intensityScale, 1.0f),
+                      "authored RT light tuning defaults changed the released scene baseline");
+    }
+
+    RtSceneTuning unclampedLow = authoredTuning;
+    unclampedLow.waterfallWidthScale = 0.0f;
+    unclampedLow.finaleRoofOpenOverride = -1.0f;
+    unclampedLow.finaleDawnRevealOverride = -1.0f;
+    unclampedLow.fogDensityScale = -1.0f;
+    for (RtLightTuning& light : unclampedLow.lights)
+    {
+        light.hueDegrees = -999.0f;
+        light.intensityScale = -1.0f;
+    }
+    const RtSceneTuning clampedLow = ClampRtSceneTuning(unclampedLow);
+    ok &= Require(Near(clampedLow.waterfallWidthScale, 0.25f) &&
+                      Near(*clampedLow.finaleRoofOpenOverride, 0.0f) &&
+                      Near(*clampedLow.finaleDawnRevealOverride, 0.0f) &&
+                      Near(clampedLow.fogDensityScale, 0.0f),
+                  "RT tuning lower bounds did not preserve the approved minimums");
+    for (const RtLightTuning& light : clampedLow.lights)
+    {
+        ok &= Require(Near(light.hueDegrees, -180.0f) && Near(light.intensityScale, 0.0f),
+                      "RT light tuning lower bounds did not preserve the approved minimums");
+    }
+
+    RtSceneTuning unclampedHigh = authoredTuning;
+    unclampedHigh.waterfallWidthScale = 3.0f;
+    unclampedHigh.finaleRoofOpenOverride = 2.0f;
+    unclampedHigh.finaleDawnRevealOverride = 2.0f;
+    unclampedHigh.fogDensityScale = 3.0f;
+    for (RtLightTuning& light : unclampedHigh.lights)
+    {
+        light.hueDegrees = 999.0f;
+        light.intensityScale = 3.0f;
+    }
+    const RtSceneTuning clampedHigh = ClampRtSceneTuning(unclampedHigh);
+    ok &= Require(Near(clampedHigh.waterfallWidthScale, 2.0f) &&
+                      Near(*clampedHigh.finaleRoofOpenOverride, 1.0f) &&
+                      Near(*clampedHigh.finaleDawnRevealOverride, 1.0f) &&
+                      Near(clampedHigh.fogDensityScale, 2.0f),
+                  "RT tuning upper bounds did not preserve the approved maximums");
+    for (const RtLightTuning& light : clampedHigh.lights)
+    {
+        ok &= Require(Near(light.hueDegrees, 180.0f) && Near(light.intensityScale, 2.0f),
+                      "RT light tuning upper bounds did not preserve the approved maximums");
+    }
+
+    RtSceneTuning independentLights = authoredTuning;
+    independentLights.lights[static_cast<std::size_t>(RtLightGroup::Torch)] = {45.0f, 0.75f};
+    independentLights.lights[static_cast<std::size_t>(RtLightGroup::Staff)] = {-90.0f, 1.50f};
+    const RtSceneTuning resolvedLights = ClampRtSceneTuning(independentLights);
+    ok &= Require(Near(resolvedLights.lights[static_cast<std::size_t>(RtLightGroup::Torch)].hueDegrees, 45.0f) &&
+                      Near(resolvedLights.lights[static_cast<std::size_t>(RtLightGroup::Torch)].intensityScale, 0.75f) &&
+                      Near(resolvedLights.lights[static_cast<std::size_t>(RtLightGroup::Skylight)].hueDegrees, 0.0f) &&
+                      Near(resolvedLights.lights[static_cast<std::size_t>(RtLightGroup::Skylight)].intensityScale, 1.0f) &&
+                      Near(resolvedLights.lights[static_cast<std::size_t>(RtLightGroup::Passage)].hueDegrees, 0.0f) &&
+                      Near(resolvedLights.lights[static_cast<std::size_t>(RtLightGroup::Passage)].intensityScale, 1.0f) &&
+                      Near(resolvedLights.lights[static_cast<std::size_t>(RtLightGroup::Staff)].hueDegrees, -90.0f) &&
+                      Near(resolvedLights.lights[static_cast<std::size_t>(RtLightGroup::Staff)].intensityScale, 1.50f),
+                  "RT light groups did not remain independently tunable");
+
     EnemyRosterSnapshot roster;
     roster.selectedEnemy = EnemyKind::Skeleton;
     roster.renderedEnemyCapacity = 1u;
@@ -98,6 +173,8 @@ int main()
     simulation::SimulationSnapshot simulationSnapshot;
     simulationSnapshot.skeletonEnemies = skeletons;
     simulationSnapshot.skeletonEnemyCount = skeletons.size();
+    simulationSnapshot.lich.finaleSkylightOpenProgress = 0.35f;
+    simulationSnapshot.lich.finaleDawnRevealProgress = 0.65f;
     const RtSceneFrameInputs adaptedFrame = BuildRtSceneFrameInputs(simulationSnapshot, 0.75f);
     ok &= Require(adaptedFrame.skeletonEnemyCount == 2u &&
                   adaptedFrame.skeletonEnemies[0].id == simulation::EntityId::SkeletonA &&
@@ -112,6 +189,19 @@ int main()
                   BuildRtSceneFrameInputs(simulationSnapshot, 0.75f, WaterQuality::High).waterQuality ==
                       WaterQuality::High,
                   "simulation adapter did not preserve all three explicit RT water quality modes");
+    RtSceneTuning finaleOverrides;
+    finaleOverrides.finaleRoofOpenOverride = 0.9f;
+    finaleOverrides.finaleDawnRevealOverride = 0.1f;
+    const RtSceneFrameInputs overriddenFrame = BuildRtSceneFrameInputs(simulationSnapshot, 0.75f, finaleOverrides);
+    ok &= Require(Near(overriddenFrame.lich.finaleSkylightOpenProgress, 0.9f) &&
+                      Near(overriddenFrame.lich.finaleDawnRevealProgress, 0.1f) &&
+                      Near(simulationSnapshot.lich.finaleSkylightOpenProgress, 0.35f) &&
+                      Near(simulationSnapshot.lich.finaleDawnRevealProgress, 0.65f),
+                  "RT finale overrides did not resolve into a renderer copy without mutating the simulation snapshot");
+    const RtSceneFrameInputs authoredFinaleFrame = BuildRtSceneFrameInputs(simulationSnapshot, 0.75f, authoredTuning);
+    ok &= Require(Near(authoredFinaleFrame.lich.finaleSkylightOpenProgress, 0.35f) &&
+                      Near(authoredFinaleFrame.lich.finaleDawnRevealProgress, 0.65f),
+                  "absent RT finale overrides did not preserve the authored simulation finale state");
 
     PlayerCombatSnapshot playerCombat;
     const PlayerWeaponRenderPose idleWeapon = EvaluatePlayerWeaponRenderPose(playerCombat, 0.0f, 1.05f);
@@ -326,9 +416,13 @@ int main()
                       raygenSource.find("material == kMaterialClearGlass || material == kMaterialWater") != std::string::npos &&
                       raygenSource.find("vec4 lichGroundMist") != std::string::npos,
                       "raygen must retain the RT water ABI, transparent visibility route, and bounded lich mist path");
-        ok &= Require(sceneSource.find("sizeof(ScenePushConstants) == 76u") != std::string::npos &&
-                      sceneSource.find("offsetof(ScenePushConstants, waterQuality) == 72u") != std::string::npos,
-                      "appended water quality changed the released CPU/raygen push ABI");
+        ok &= Require(sceneSource.find("sizeof(ScenePushConstants) == 120u") != std::string::npos &&
+                      sceneSource.find("offsetof(ScenePushConstants, waterQuality) == 72u") != std::string::npos &&
+                      sceneSource.find("offsetof(ScenePushConstants, waterfallWidthScale) == 76u") != std::string::npos &&
+                      raygenSource.find("float waterQuality;") != std::string::npos &&
+                      raygenSource.find("float waterfallWidthScale;") != std::string::npos &&
+                      raygenSource.find("float workloadPreset;") != std::string::npos,
+                      "RT lab tuning did not append its eleven floats after the released water-quality ABI");
         ok &= Require(raygenSource.find("waterSheetCoverage") == std::string::npos &&
                       raygenSource.find("bool waterStreamExit") != std::string::npos &&
                       raygenSource.find("controls.waterQuality < 0.5") != std::string::npos &&

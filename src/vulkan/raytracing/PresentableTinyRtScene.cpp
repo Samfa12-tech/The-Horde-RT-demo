@@ -40,12 +40,25 @@ struct ScenePushConstants
     float finaleDawnReveal = 0.0f;
     float heldPropDepth = 1.05f;
     float waterQuality = 2.0f;
+    float waterfallWidthScale = 1.0f;
+    float fogDensityScale = 1.0f;
+    float torchHueDegrees = 0.0f;
+    float torchIntensityScale = 1.0f;
+    float skylightHueDegrees = 0.0f;
+    float skylightIntensityScale = 1.0f;
+    float passageHueDegrees = 0.0f;
+    float passageIntensityScale = 1.0f;
+    float staffHueDegrees = 0.0f;
+    float staffIntensityScale = 1.0f;
+    float workloadPreset = 1.0f;
 };
 
-static_assert(sizeof(ScenePushConstants) == 76u,
-              "CPU and raygen push-constant ABI must remain 19 packed floats");
+static_assert(sizeof(ScenePushConstants) == 120u,
+              "CPU and raygen push-constant ABI must remain 30 packed floats");
 static_assert(offsetof(ScenePushConstants, waterQuality) == 72u,
               "water quality must stay appended after every released push field");
+static_assert(offsetof(ScenePushConstants, waterfallWidthScale) == 76u,
+              "RT lab tuning must append after the released water-quality field");
 
 // Generated from shaders/raytracing/minimal.rgen with glslangValidator -V -Os.
 // Keep this embedded so the Android RT scene remains a self-contained native build.
@@ -3071,6 +3084,11 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
     const std::array<float, 3u> staffWorldPosition = characterSlot_.LichStaffWorldPosition(frame.lich);
     const float heldPropDepth = horde::gameplay::ComputeShowcaseHeldPropDepth(
         frame.cameraX, frame.cameraZ, std::sin(frame.cameraYaw), -std::cos(frame.cameraYaw));
+    const RtSceneTuning tuning = ClampRtSceneTuning(frame.tuning);
+    const RtLightTuning& torchTuning = tuning.lights[static_cast<std::size_t>(RtLightGroup::Torch)];
+    const RtLightTuning& skylightTuning = tuning.lights[static_cast<std::size_t>(RtLightGroup::Skylight)];
+    const RtLightTuning& passageTuning = tuning.lights[static_cast<std::size_t>(RtLightGroup::Passage)];
+    const RtLightTuning& staffTuning = tuning.lights[static_cast<std::size_t>(RtLightGroup::Staff)];
     const ScenePushConstants pushConstants{frame.cameraYaw,
                                            frame.cameraPitch,
                                            frame.lanternStrength,
@@ -3086,10 +3104,21 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                                             staffWorldPosition[0],
                                             staffWorldPosition[1],
                                             staffWorldPosition[2],
-                                            std::clamp(frame.lich.finaleSkylightOpenProgress, 0.0f, 1.0f),
-                                             std::clamp(frame.lich.finaleDawnRevealProgress, 0.0f, 1.0f),
+                                            std::clamp(ResolveRtFinaleRoofOpen(frame.lich.finaleSkylightOpenProgress, tuning), 0.0f, 1.0f),
+                                             std::clamp(ResolveRtFinaleDawnReveal(frame.lich.finaleDawnRevealProgress, tuning), 0.0f, 1.0f),
                                              heldPropDepth,
-                                             static_cast<float>(frame.waterQuality)};
+                                             static_cast<float>(frame.waterQuality),
+                                             tuning.waterfallWidthScale,
+                                             tuning.fogDensityScale,
+                                             torchTuning.hueDegrees,
+                                             torchTuning.intensityScale,
+                                             skylightTuning.hueDegrees,
+                                             skylightTuning.intensityScale,
+                                             passageTuning.hueDegrees,
+                                             passageTuning.intensityScale,
+                                             staffTuning.hueDegrees,
+                                             staffTuning.intensityScale,
+                                             static_cast<float>(tuning.workloadPreset)};
     lastOutputRedBlueSwapApplied_ = pushConstants.outputRedBlueSwap > 0.5f;
     vkCmdPushConstants(commandBuffer,
                        pipelineLayout_,

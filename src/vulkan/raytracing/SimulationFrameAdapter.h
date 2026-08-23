@@ -13,4 +13,16 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     float outputExposure,
     WaterQuality waterQuality = WaterQuality::High);
 
+RtSceneFrameInputs BuildRtSceneFrameInputs(
+    const horde::gameplay::simulation::SimulationSnapshot& simulation,
+    float outputExposure,
+    const RtSceneTuning& tuning,
+    WaterQuality waterQuality = WaterQuality::High);
+
+RtSceneFrameInputs BuildRtSceneFrameInputs(
+    const horde::gameplay::simulation::SimulationSnapshot& simulation,
+    float outputExposure,
+    WaterQuality waterQuality,
+    const RtSceneTuning& tuning);
+
 } // namespace horde::vulkan::raytracing

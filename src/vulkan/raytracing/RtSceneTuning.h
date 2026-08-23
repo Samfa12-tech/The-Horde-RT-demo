@@ -1,0 +1,79 @@
+#pragma once
+
+#include <algorithm>
+#include <array>
+#include <cstddef>
+#include <cstdint>
+#include <optional>
+
+namespace horde::vulkan::raytracing
+{
+
+enum class RtWorkloadPreset : std::uint32_t
+{
+    Lean = 0u,
+    Authored = 1u,
+    Max = 2u,
+};
+
+enum class RtLightGroup : std::uint32_t
+{
+    Torch = 0u,
+    Skylight = 1u,
+    Passage = 2u,
+    Staff = 3u,
+};
+
+constexpr std::size_t kRtLightGroupCount = 4u;
+
+struct RtLightTuning
+{
+    float hueDegrees = 0.0f;
+    float intensityScale = 1.0f;
+};
+
+struct RtSceneTuning
+{
+    float waterfallWidthScale = 1.0f;
+    std::optional<float> finaleRoofOpenOverride;
+    std::optional<float> finaleDawnRevealOverride;
+    float fogDensityScale = 1.0f;
+    std::array<RtLightTuning, kRtLightGroupCount> lights{};
+    RtWorkloadPreset workloadPreset = RtWorkloadPreset::Authored;
+};
+
+inline RtSceneTuning ClampRtSceneTuning(RtSceneTuning tuning)
+{
+    tuning.waterfallWidthScale = std::clamp(tuning.waterfallWidthScale, 0.25f, 2.0f);
+    if (tuning.finaleRoofOpenOverride.has_value())
+    {
+        *tuning.finaleRoofOpenOverride = std::clamp(*tuning.finaleRoofOpenOverride, 0.0f, 1.0f);
+    }
+    if (tuning.finaleDawnRevealOverride.has_value())
+    {
+        *tuning.finaleDawnRevealOverride = std::clamp(*tuning.finaleDawnRevealOverride, 0.0f, 1.0f);
+    }
+    tuning.fogDensityScale = std::clamp(tuning.fogDensityScale, 0.0f, 2.0f);
+    for (RtLightTuning& light : tuning.lights)
+    {
+        light.hueDegrees = std::clamp(light.hueDegrees, -180.0f, 180.0f);
+        light.intensityScale = std::clamp(light.intensityScale, 0.0f, 2.0f);
+    }
+    return tuning;
+}
+
+inline float ResolveRtFinaleRoofOpen(const float authoredValue, const RtSceneTuning& tuning)
+{
+    return tuning.finaleRoofOpenOverride.has_value()
+               ? std::clamp(*tuning.finaleRoofOpenOverride, 0.0f, 1.0f)
+               : authoredValue;
+}
+
+inline float ResolveRtFinaleDawnReveal(const float authoredValue, const RtSceneTuning& tuning)
+{
+    return tuning.finaleDawnRevealOverride.has_value()
+               ? std::clamp(*tuning.finaleDawnRevealOverride, 0.0f, 1.0f)
+               : authoredValue;
+}
+
+} // namespace horde::vulkan::raytracing

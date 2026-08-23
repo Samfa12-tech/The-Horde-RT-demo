@@ -60,6 +60,17 @@ layout(push_constant) uniform SceneControls
     float finaleDawnReveal;
     float heldPropDepth;
     float waterQuality;
+    float waterfallWidthScale;
+    float fogDensityScale;
+    float torchHueDegrees;
+    float torchIntensityScale;
+    float skylightHueDegrees;
+    float skylightIntensityScale;
+    float passageHueDegrees;
+    float passageIntensityScale;
+    float staffHueDegrees;
+    float staffIntensityScale;
+    float workloadPreset;
 } controls;
 
 struct HitInfo

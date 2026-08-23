@@ -11,6 +11,7 @@
 #include "gameplay/ShowcaseGameplay.h"
 #include "vulkan/raytracing/CharacterRenderSlot.h"
 #include "vulkan/raytracing/RtGpuResources.h"
+#include "vulkan/raytracing/RtSceneTuning.h"
 
 namespace horde::vulkan::raytracing
 {
@@ -46,6 +47,7 @@ struct RtSceneFrameInputs
     float walkAmount = 0.0f;
     float outputExposure = 0.92f;
     WaterQuality waterQuality = WaterQuality::High;
+    RtSceneTuning tuning{};
     horde::gameplay::CombatSnapshot combat{};
     horde::gameplay::PlayerCombatSnapshot playerCombat{};
     std::array<horde::gameplay::simulation::SkeletonEnemySnapshot,
