@@ -84,7 +84,9 @@ At zero vitality, `RETRY ENCOUNTER` restores the current encounter, `RESTART ROU
 
 ## Current validation
 
-The published Showcase Alpha 0.1.5 packages contain the accepted water/mist/controller/audio slice. The exact signed APK is byte-matched and lifecycle-smoked on `SM-S948B`; the exact Windows ZIP launched from a clean extraction and honestly presented the RT scene. See `docs/SHOWCASE_ALPHA_0_1_5_RELEASE_VALIDATION_2026-08-23.md` and `docs/RT_WATERFALL_LICH_MIST_VALIDATION_2026-08-23.md`.
+Showcase Alpha 1.5.2 is the current published release. Exact source Host runs `run-20260825-073343` and `run-20260825-074907` passed the complete seven-stage gate. The exact published Windows ZIP launched from an isolated extraction, selected `RayTracingPipeline`, honestly presented the RT scene, and exited cleanly. The exact signed Android APK passed certificate, identity, package-layout, native-library, asset/licence, and 16 KiB compatibility guards, but no ADB device was connected at publication; no exact signed-1.5.2 install, pullback, runtime, lifecycle, performance, or owner-feel claim is made. See `docs/SHOWCASE_ALPHA_1_5_2_RELEASE_VALIDATION_2026-08-25.md`.
+
+The historical Showcase Alpha 0.1.5 packages introduced the accepted water/mist/controller/audio slice. That exact signed APK remains the latest public package installed, byte-matched, and lifecycle-smoked on `SM-S948B`. See `docs/SHOWCASE_ALPHA_0_1_5_RELEASE_VALIDATION_2026-08-23.md` and `docs/RT_WATERFALL_LICH_MIST_VALIDATION_2026-08-23.md`.
 
 The player-vitality/retry slice is host-validated by clean Windows Debug and Release builds, all seven CTests in both configurations, twelve fixed RT captures, clean Android Debug and unsigned Release builds across all four configured ABIs, and `lintRelease`. On `SM-S948B`, real skeleton/lich damage, death UI, native opening/mirror retry, 3/3 restoration, the complete showcase automation route, captures, and Home/resume RT presentation are also validated. The earlier owner report of perceived haptics was corrected on 2026-08-01 because haptics had not actually been checked. The audit revision adds direct `Vibrator` effects, an enabled settings toggle/preview, and view-feedback fallback; the exact installed Debug APK subsequently produced completed preview, Swing, damage, and fatal effects through the live encounter, and the owner confirmed the revised haptic was physically felt. See `docs/PLAYER_VITALITY_RETRY_SLICE_2026-07-31.md` and `docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md`.
 
@@ -98,12 +100,16 @@ Render scaling was verified at:
 | 75% | `1080x2235` | Recommended tier; historical exact two-skeleton run measured 10.589 / 12.139 / 9.246 / 8.888 / 11.060 / 19.735 ms across six checkpoints at thermal status 0; these are workload measurements, not a universal pass/fail boundary |
 | 50% | `720x1490` | Initial-alpha opening diagnostic recorded 163.12 FPS / 6.13 ms; retained as historical evidence, not a complete-route baseline |
 
-Windows Release was launched from a clean extraction using only its packaged assets. It reported `RayTracingPipeline`, `RT scene presented: yes`, and live resolution/FPS/frame-time diagnostics. The 100% and 75% render targets were verified at `982x628` and `737x471` respectively.
+The exact published 1.5.2 Windows ZIP was launched from a clean extraction using only packaged assets. It reported file/product version `1.5.2`, selected `RayTracingPipeline`, dispatched `1232x803`, set `RT scene presented: yes`, and exited cleanly. Earlier scale validation verified the 100% and 75% render targets at `982x628` and `737x471` respectively.
 
 The in-app benchmark is live-validated on both targets. Windows Release completed 26/26 waypoints with honest RT presentation on every measured frame, copied the full report, and wrote parseable timestamped text/JSON. On `SM-S948B`, Android completed the same 1,838-frame measured lap at 100% and 75%, passed Back/Home recovery and its 1.7-font report layout, and opened the document picker with the expected export filename.
 
 See:
 
+- `docs/SHOWCASE_ALPHA_1_5_2_RELEASE_VALIDATION_2026-08-25.md`
+- `docs/SHOWCASE_ALPHA_1_5_2_RELEASE_NOTES_2026-08-25.md`
+- `docs/WATER_TRANSMISSION_SHADOW_VALIDATION_2026-08-24.md`
+- `docs/RT_LAB_VALIDATION_2026-08-24.md`
 - `docs/DOCUMENTATION_CHECKPOINT_2026-07-17.md`
 - `docs/HORDE_SHOWCASE_WINDOWS_VALIDATION_2026-07-16.md`
 - `docs/HORDE_SHOWCASE_ANDROID_VALIDATION_2026-07-17.md`
@@ -259,6 +265,6 @@ After raygen edits, run `tools/compile-raygen.ps1`; use `tools/compile-raygen.ps
 
 The established route is Windows- and Android-device-validated: lower body and lantern drop, zig-zag shadows, blue skylight, bay-selected coloured torches, an open framed threshold, one hero mirror, and a sequential staff-lit lich finale. The newer body-and-ending slice adds the layered animated player, post-death sliding skylight, warm dawn reveal, and contextual ending; its host and exact-APK `SM-S948B` evidence are recorded in `docs/PLAYER_BODY_AND_FINALE_SLICE_2026-07-31.md`.
 
-Showcase Alpha 0.1.4 animates, refits, and renders up to two simultaneous skeletons with at most two skeleton pose buckets, nine BLAS, and nineteen physical TLAS slots; the later lich route remains singular. No third enemy is permitted without a separately measured design.
+Showcase Alpha 1.5.2 retains the two-skeleton system first published in 0.1.4: at most two simultaneous skeletons, two skeleton pose buckets, nine character/environment BLAS plus the dedicated water geometry route, and twenty physical TLAS slots; the later lich route remains singular. No third enemy is permitted without a separately measured design.
 
 The 75% setting is the sustained phone recommendation. Preserve real RT at the documented quality tier; reduce bounded effect area or ray cost before considering any broader feature expansion.

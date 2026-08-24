@@ -1,6 +1,6 @@
 # Phase Plan
 
-> This file records the implementation sequence. Earlier “next” and “deferred” statements are preserved as dated history; the rebuilt player, vitality/retry loop, complete dawn ending, two-skeleton/parry slice, and bounded waterfall/mist/controller slice are published through Showcase Alpha 0.1.5. Current priorities are indexed by `DOCUMENTATION_CHECKPOINT_2026-07-17.md`.
+> This file records the implementation sequence. Earlier “next” and “deferred” statements are preserved as dated history; the rebuilt player, vitality/retry loop, complete dawn ending, two-skeleton/parry slice, bounded waterfall/mist/controller slice, corrected general water lighting, and cross-platform RT Lab are published through Showcase Alpha 1.5.2. Current authority and open evidence boundaries are indexed by `DOCUMENTATION_CHECKPOINT_2026-07-17.md`.
 
 ## Phase 0 - Vulkan RT capability proof: complete
 
@@ -113,10 +113,19 @@ The runtime-only Android asset task is complete and reduced the debug APK from 9
 - Kept `vkCmdTraceRaysKHR`, recursion depth one, strict ASTC, fixed BLAS/TLAS capacity, one-frame ownership, and shared 60 Hz gameplay authority unchanged.
 - Published Windows itch build `#1908330` and Android build `#1908331`; exact artifact and device evidence is in `SHOWCASE_ALPHA_0_1_5_RELEASE_VALIDATION_2026-08-23.md`.
 
-## Next support milestones
+## Showcase Alpha 1.5.2 - complete and published 2026-08-25
 
-1. Developer overlay/state visibility — Windows complete/live-validated; Android Debug plumbing compiled, device validation pending.
-2. Player-facing two-pass benchmark/report export — Windows complete/live-validated; Android Debug/Release/lint pass, device validation pending.
-3. Integrated cross-platform clean-build, test, shader-staleness, asset/licence, and package verification.
-4. Fixed video/presentation capture.
-5. Only then, a separately scoped gameplay or multi-enemy slice with phone measurements.
+- Replaced waterfall-specific transport approximations with terminal shared material, active-light, visibility, atmosphere, and physical roof/player occlusion for refracted and reflected opaque hits.
+- Preserved a finite phone-safe ray-query budget: one water-interface reflection, bounded transmission, terminal secondary shading, and no water-on-water recursion or hidden second glossy bounce.
+- Published the persistent post-lich RT Lab on Windows and Android, including real waterfall cross-lane width, finale roof/dawn, fog, isolated light groups, and Lean/Authored/Max workload controls.
+- Fixed post-finale RT Lab overlay ownership on both platforms and Windows trackbar repaint/vertical scrolling after pause-menu entry.
+- Published Windows itch build `#1913191` and Android build `#1913192`. Exact Host, package, public-channel, and Windows RT evidence is in `SHOWCASE_ALPHA_1_5_2_RELEASE_VALIDATION_2026-08-25.md`.
+- The exact signed 1.5.2 Android package passed static/certificate guards but was not installed because no ADB device was connected. The later RT Lab ownership/width fixes therefore retain a clearly documented exact-fixed-APK phone acceptance gate.
+
+## Current follow-up gates
+
+1. Install the exact signed 1.5.2 APK on the authorised `SM-S948B`, pull it back byte-for-byte, and verify strict ASTC, honest RT presentation, genuine-finale RT Lab retention/Back behavior, waterfall width, and Home/resume without treating earlier Debug evidence as signed-package proof.
+2. Preserve the completed integrated clean-build, test, shader-staleness, asset/licence, package, deterministic capture, developer-overlay, and player-benchmark foundations.
+3. Resolve the separate Hotstrike raw-source redistribution permission/history question and maintain an independent owner backup of the Android release key.
+4. Fixed video/presentation capture and a presentation/orbit camera remain optional tooling work.
+5. Any broader gameplay or multi-enemy slice requires a separately scoped renderer/simulation design and fresh phone measurement.

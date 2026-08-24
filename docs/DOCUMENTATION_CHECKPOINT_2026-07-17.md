@@ -55,7 +55,7 @@ The following dated families are intentionally preserved rather than rewritten: 
 
 - Independently back up the release JKS and both passwords.
 - Keep the Hotstrike public raw-GLB/history permission question open until the creator responds or the owner chooses remediation.
-- Do not raise the one-active-skinned-enemy limit without a dedicated phone measurement.
+- Do not raise the validated two-skeleton/two-pose-bucket ceiling without a separately designed and measured phone gate; the later lich remains singular.
 - Precise waterfall stereo direction, loop seam, and Android audible pause/resume were not separately scored; source contracts, native gains, packaging, and lifecycle behavior are verified.
 - A separately authored full-character rig, encounters above two skeletons, broader AI, held block, broad fluid simulation, and the staged textured sword runtime remain deferred.
 - The developer overlay is device-validated on Windows and Android. Integrated clean-build/package/stale-shader/licence gates and fixed PNG capture are complete; video and orbit-camera presentation remain tooling deferrals.
@@ -68,5 +68,5 @@ The following dated families are intentionally preserved rather than rewritten: 
 - Verified all Markdown links resolve.
 - Preserved dated evidence, corrected living package commands/counts/feature descriptions, promoted the reviewed automation digest, and separated cool automation from warm certification.
 - Verified current source/package version surfaces agree on 1.5.2 / Android code 7. Release source `f4891c4` produced the exact published artifacts recorded in the 1.5.2 release validation.
-- Rebuilt Android Debug/Release, passed Release lint, and verified the automation-only `singleTop` launch mode exists in Debug's merged manifest but not Release's. Windows Debug/Release builds and all seven CTests pass.
+- Exact 1.5.2 source Host run `run-20260825-073343` and final post-publication run `run-20260825-074907` rebuilt Android Debug/unsigned Release, passed Release lint, and passed fresh Windows Debug/Release 13/13 CTests plus all 13 deterministic captures and package/licence/evidence checks.
 - The 2026-08-25 itch channel update preserves the existing public page while publishing the 1.5.2 Windows and Android downloads. The repository's prepared page copy is current, but no authenticated description Save was requested or performed; anonymous artifact verification belongs to the 1.5.2 release record.

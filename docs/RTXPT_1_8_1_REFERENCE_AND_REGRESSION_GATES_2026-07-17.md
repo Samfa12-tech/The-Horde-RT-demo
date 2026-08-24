@@ -82,7 +82,7 @@ Every meaningful renderer, shader, asset-format, or lighting change must pass th
 
 - Keep the current Android 75% sustained route as the primary gate.
 - Retain three consecutive 120-frame window values, the median-of-window-averages, derived FPS, thermal status, device, render scale, shader hash, and build identity.
-- Treat the current phone route and one-active-skinned-enemy limit as the baseline. Do not spend its margin on broader AI, a second active skinned enemy, or unrelated effects.
+- Treat the current phone route and validated two-skeleton/two-pose-bucket ceiling as the baseline. Do not spend its measured margin on broader AI, a third active skinned enemy, or unrelated effects without a separately scoped phone gate.
 - Treat Windows timing as useful for diagnosis, not proof of phone readiness. Note frame caps explicitly.
 - Prefer a small isolated change with before/after evidence over a broad renderer rewrite.
 

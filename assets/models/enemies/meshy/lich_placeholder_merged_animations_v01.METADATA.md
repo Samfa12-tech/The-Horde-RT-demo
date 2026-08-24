@@ -4,7 +4,7 @@
 
 - User-supplied file: `Meshy_AI_Meshy_Merged_Animations.glb`.
 - Staged destination: `lich_placeholder_merged_animations_v01.glb`.
-- Role: active published placeholder for the final emissive enemy. It is included in Windows and signed Android 0.1.1 packages and is device-validated on `SM-S948B` at the one-active-skinned-enemy limit.
+- Role: active published placeholder for the final singular emissive enemy. It is included in current Windows and signed Android 1.5.2 packages; the asset/runtime route is device-validated on `SM-S948B`, while the exact signed 1.5.2 APK was not installed at publication.
 - Source size: 14,940,452 bytes.
 - SHA-256: `049979A83ACA55358F54AF8D3AF1F7D518607BEF634474A4EF015BFDFF947A42`.
 - glTF 2.0 / GLB v2, exported by Blender glTF I/O 4.2.57.

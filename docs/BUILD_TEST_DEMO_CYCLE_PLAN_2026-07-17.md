@@ -48,7 +48,7 @@ This is a supporting production/tooling plan for the current **Windows-validated
 - The gate produces timestamped logs, source/build/asset/APK/ZIP/licence hashes, summaries, manifests, PNGs, and validation-only packages beneath ignored `reports/foundation-runs/`.
 - Validation artifacts are explicitly unpublishable, never enter `releases/candidates/`, and use an unsigned validation-only Android build without reading or requiring release secrets.
 - Negative fixtures prove rejection of stale embedded SPIR-V, missing licences/assets, invalid ZIP root layout, immutable 0.1.1 through 0.1.5 identities, old Android version codes, and another upload on a published line before Butler is contacted.
-- Future candidate packaging requires explicit `Version` and `VersionCode`, uses one shared policy across package/sign/push entrypoints, rejects the immutable published 0.1.1 through 0.1.5 lines, and requires `versionCode > 6`.
+- Future candidate packaging requires explicit `Version` and `VersionCode`, uses one shared policy across package/sign/push entrypoints, rejects the immutable published 0.1.1 through 0.1.5 and 1.5.2 lines, and requires `versionCode > 7`.
 
 ### 6. Capture and presentation — deterministic screenshots complete; video/orbit pending
 
@@ -66,7 +66,7 @@ This is a supporting production/tooling plan for the current **Windows-validated
 
 - Keep real `vkCmdTraceRaysKHR` swapchain presentation and honest `rtScene.presented` reporting.
 - Keep the phone-safe `rayQueryEXT` path unless a stronger RT path is proven on-device.
-- Keep one active skinned enemy until a separate multi-enemy phone measurement passes.
+- Keep the validated ceiling of two simultaneous skeletons with at most two pose buckets and one later singular lich; any third/fourth enemy requires a separately measured renderer/simulation design and phone pass.
 - Measure each meaningful renderer change on the phone at the recommended tier before expanding effects or gameplay.
 - Do not add fake raster, screen-space, baked, browser, or overlay substitutes for RT proof.
 
