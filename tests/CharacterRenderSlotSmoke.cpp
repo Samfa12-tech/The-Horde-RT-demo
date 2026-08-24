@@ -621,9 +621,15 @@ int main()
                       androidValidationSource.find(
                           "if ($RtWorkload -ge 0) { Invoke-AdbText @(\"logcat\", \"-c\")") !=
                           std::string::npos &&
+                      androidValidationSource.find(
+                          "[math]::Abs(([double]$state.renderScale * 100.0) - [double]$RequestedScale)") !=
+                          std::string::npos &&
+                      androidValidationSource.find(
+                          "[int]$state.waterQuality -ne $rtLabExpectedWaterQuality") !=
+                          std::string::npos &&
                       androidBridgeSource.find("\\\"waterQuality\\\":") != std::string::npos &&
                       androidBridgeSource.find("\\\"rtLab\\\":") != std::string::npos,
-                      "Android validation must retain matched Authored/Max RT Lab evidence with explicit renderer state");
+                      "Android validation must reject matched RT Lab evidence when applied scale or water quality drifts");
 
         CharacterRenderSlot slot;
         std::string diagnostic;

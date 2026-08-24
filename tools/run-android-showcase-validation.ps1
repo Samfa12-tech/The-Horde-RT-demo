@@ -53,6 +53,7 @@ $checkpointZones = @{
 $baselineCheckpoints = @("opening", "two-enemy-combat", "worst-bend", "skylight", "green", "lich")
 $captureCheckpoints = @("opening", "skeleton", "worst-bend", "lantern-drop", "skylight", "yellow", "blue", "red", "green", "mirror", "lich", "finale-roof", "two-enemy-combat")
 $rtLabComparisonCheckpoints = @('lantern-drop', 'skylight', 'finale-roof')
+$rtLabExpectedWaterQuality = 1
 $timingRows = [System.Collections.Generic.List[object]]::new()
 $captureRecords = [System.Collections.Generic.List[object]]::new()
 $failures = [System.Collections.Generic.List[string]]::new()
@@ -349,6 +350,13 @@ function Invoke-CheckpointBenchmark {
     if ($state.gpuTimingMode -ne $gpuTimingLabel) { $failures.Add("$Checkpoint native state reported GPU timing '$($state.gpuTimingMode)' instead of '$gpuTimingLabel'.") }
     if ($RtWorkload -ge 0 -and [int]$state.rtLab.workloadPreset -ne $RtWorkload) {
         $failures.Add("$Checkpoint $RtLabProfile state reported workload $($state.rtLab.workloadPreset) instead of $RtWorkload.")
+    }
+    if ($RtWorkload -ge 0 -and
+        [math]::Abs(([double]$state.renderScale * 100.0) - [double]$RequestedScale) -gt 0.01) {
+        $failures.Add("$Checkpoint $RtLabProfile state reported render scale $($state.renderScale) instead of $RequestedScale%.")
+    }
+    if ($RtWorkload -ge 0 -and [int]$state.waterQuality -ne $rtLabExpectedWaterQuality) {
+        $failures.Add("$Checkpoint $RtLabProfile state reported water quality $($state.waterQuality) instead of Mobile ($rtLabExpectedWaterQuality).")
     }
     if ($Checkpoint -eq "two-enemy-combat") {
         if ([int]$state.activeEnemyEntities -ne 2) { $failures.Add("Two-enemy checkpoint reported $($state.activeEnemyEntities) active enemy entities instead of 2.") }
