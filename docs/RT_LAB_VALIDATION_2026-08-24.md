@@ -1,10 +1,10 @@
 # Unlockable RT Lab Validation — 2026-08-24
 
-## Final-review artifact supersession
+## Final-review artifact closure
 
 Final whole-branch review removed the two Android RT Lab-only `ui_select` / `ui_back` playback calls under a focused source-region RED/GREEN contract. The corrected clean runtime source is `e37a3bad2cfd4c91f17a642f92fab12bc459ae8a`; its rebuilt Debug APK SHA-256 is `cab1c5c7f12ae4851a65e6ae9b2774c268abd2caa8a10e568e71f1f300db8aeb`.
 
-Debug and Release each pass all 13 CTests; Android Debug/unsigned Release/lint and shader freshness also pass. The exact-phone rerun is pending because `adb devices -l` is currently empty even after an ADB daemon restart and a bounded reconnect monitor. Accordingly, the `c0d3539` / `0efdb2...` phone runs retained below are historical evidence for the immediately preceding candidate, not final-artifact evidence for `e37a3ba`. They are superseded for final acceptance until the same standard and Lean/Authored/Max runs pass on the corrected APK.
+Debug and Release each pass all 13 CTests; Android Debug/unsigned Release/lint and shader freshness also pass. After the authorised phone reconnected, the corrected APK was installed and pulled back byte-for-byte, then passed the full authored route in `run-20260824-203215` and all nine matched workload cases in `run-20260824-203502`. The earlier `c0d3539` / `0efdb2...` runs remain historical evidence for the immediately preceding candidate and are superseded by these final-artifact runs.
 
 Audio/haptic manual revalidation required: **NO** — the corrected Android RT Lab open/back paths are now source-proven silent, while existing non-lab menu/audio behavior is unchanged.
 
@@ -16,8 +16,8 @@ This is a development-candidate validation record. No version was changed, no re
 
 ## Candidate identity
 
-- Final runtime/UI source used for exact-phone evidence: clean commit `c0d35396705cb4e807c6e862ef0542785cfc1e6a`.
-- Final Debug APK SHA-256: `0efdb2081410cfa208b686332d02c15a15c15bd7711692dbf0b8190ed4f2120a`.
+- Final runtime/UI source used for exact-phone evidence: `e37a3bad2cfd4c91f17a642f92fab12bc459ae8a`; the clean evidence HEAD was documentation-only `e07475409f034cec2cec28c4d25dcc0b2f8fb72a` and did not alter the APK.
+- Final Debug APK SHA-256: `cab1c5c7f12ae4851a65e6ae9b2774c268abd2caa8a10e568e71f1f300db8aeb` (59,661,575 bytes).
 - Pulled installed `base.apk` SHA-256: the same value, byte-for-byte.
 - Embedded raygen include SHA-256: `60e33f2b81450cc8f76a07b809893dbc5473a4d2fd5bd2d0489df65c1db3f7ea`.
 - Compiled raygen SPIR-V SHA-256: `ef827b71e240cfef50fad601985b0d8c03dc06c4fd40ef4116b6831c0620f19b`.
@@ -41,6 +41,8 @@ Run `reports/foundation-runs/run-20260824-185921` passed from a clean `c0d3539` 
 - Android `assembleDebug`, unsigned `assembleRelease`, and `lintRelease` passed for the four configured ABIs.
 - Negative release-safety, validation-package/licence, and evidence-hash stages passed.
 - The generated validation artifacts are explicitly marked `UNPUBLISHABLE`.
+
+After the final Android-silence review fix, the focused source-region contract passed, incremental Windows Debug and Release builds each passed all 13 CTests, Android `assembleDebug`, unsigned `assembleRelease`, and `lint` passed, and raygen freshness passed. The fix changes only two Android Java playback calls; the final exact-phone runs below bind the rebuilt APK to the corrected runtime.
 
 NVIDIA Nsight is not installed, so register pressure was not numerically measured. Shader structure, host contracts, Windows GPU timing, and exact-phone matched timing are the available evidence.
 
@@ -75,21 +77,21 @@ Before every device mutation, `adb devices -l` was checked for exactly one autho
 The final untuned command was:
 
 ```powershell
-.\tools\run-android-showcase-validation.ps1 -Mode Both -Scale 75 -GpuTiming Enabled -Capture -SkipBuild -TimeoutSeconds 180
+.\tools\run-android-showcase-validation.ps1 -Mode Both -Scale 75 -GpuTiming Enabled -Capture -SkipBuild -SkipInstall -TimeoutSeconds 180
 ```
 
-Run `reports/android-showcase-runs/run-20260824-185039` passed on the exact final APK. It retained 75% render scale, Mobile water, Authored workload, strict ASTC, honest RT presentation, the 13-waypoint replay, all 13 captures, and Home/resume surface recreation.
+Run `reports/android-showcase-runs/run-20260824-203215` passed on the exact final APK. It retained 75% render scale, Mobile water, Authored workload, strict ASTC, honest RT presentation, the 13-waypoint replay, all 13 captures, and Home/resume surface recreation.
 
 | Standard checkpoint | Median of three 120-frame window averages | Reference band | GPU power level |
 |---|---:|---|---:|
-| Opening | 21.096 ms | 30–50 FPS | 3 |
-| Two-enemy combat | 20.816 ms | 30–50 FPS | 3 |
-| Worst bend | 17.107 ms | 50–60 FPS | 4 |
-| Skylight | 19.859 ms | 50–60 FPS | 2 |
-| Green passage | 20.206 ms | 30–50 FPS | 3 |
-| Lich | 33.781 ms | Below 30 FPS reference | 3 |
+| Opening | 16.955 ms | 50–60 FPS | 1 |
+| Two-enemy combat | 19.581 ms | 50–60 FPS | 2 |
+| Worst bend | 17.247 ms | 50–60 FPS | 2 |
+| Skylight | 19.353 ms | 50–60 FPS | 3 |
+| Green passage | 20.147 ms | 30–50 FPS | 2 |
+| Lich | 34.339 ms | Below 30 FPS reference | 2 |
 
-This was a sustained hot run, not a cooled peak result. Android thermal status was 3 before and after; current HAL AP/BAT/SKIN moved from 51.6/44.2/44.5 C to 51.8/44.5/44.7 C. The lich result is reported as measured and is not converted into a false pass/fail threshold.
+Android thermal status was 0 before and after; current HAL AP/BAT/SKIN moved from 36.6/31.1/33.6 C to 45.7/36.7/39.2 C, while row-level Samsung GPU thermal power level rose through 1–3. The lich result is reported as measured and is not converted into a false pass/fail threshold.
 
 ## Exact-phone matched workload comparison
 
@@ -99,15 +101,15 @@ The same installed APK then ran:
 .\tools\run-android-showcase-validation.ps1 -Mode Benchmark -Scale 75 -Checkpoints @() -GpuTiming Enabled -RtLabWorkloadComparison -SkipBuild -SkipInstall -TimeoutSeconds 180
 ```
 
-Run `reports/android-showcase-runs/run-20260824-185530` passed all nine cases. Every saved state reported 75% scale, water quality 1 (Mobile), the requested workload 0/1/2, the expected checkpoint/zone, and `presented: true`.
+Run `reports/android-showcase-runs/run-20260824-203502` passed all nine cases. Every saved state reported 75% scale, water quality 1 (Mobile), the requested workload 0/1/2, the expected checkpoint/zone, and `presented: true`.
 
 | View | Lean | Authored | Max | Lean vs Authored | Max vs Authored |
 |---|---:|---:|---:|---:|---:|
-| Waterfall (`lantern-drop`) | 21.370 ms | 23.116 ms | 30.276 ms | -7.6% | +31.0% |
-| Skylight | 18.225 ms | 24.904 ms | 30.467 ms | -26.8% | +22.3% |
-| Finale roof | 13.008 ms | 17.857 ms | 21.658 ms | -27.2% | +21.3% |
+| Waterfall (`lantern-drop`) | 20.162 ms | 17.954 ms | 30.547 ms | +12.3% | +70.1% |
+| Skylight | 17.861 ms | 23.713 ms | 28.070 ms | -24.7% | +18.4% |
+| Finale roof | 13.080 ms | 18.875 ms | 21.875 ms | -30.7% | +15.9% |
 
-Thermal status stayed 2. Current HAL AP/BAT/SKIN moved from 43.4/41.6/41.1 C to 46.9/42.1/42.2 C; individual rows recorded Samsung GPU thermal power levels 5–6. These are matched sustained measurements on this exact device/artifact, not universal phone targets. The runner intentionally orders profiles per checkpoint and uses three windows for each; it does not silently alter RT, resolution, or water quality.
+Thermal status stayed 0. Current HAL AP/BAT/SKIN moved from 42.7/36.7/38.3 C to 42.2/36.6/38.2 C; the first Authored waterfall row recorded Samsung GPU thermal power level 0 and later rows recorded levels 5–6. These are matched sustained measurements on this exact device/artifact, not universal phone targets. The waterfall Lean row was 12.3% slower than Authored in this ordered run, so the evidence does not claim monotonic cost on every thermally governed sample; Skylight and Finale retained the expected ordering. The runner varies profile order per checkpoint, uses three windows for each, and does not silently alter RT, resolution, or water quality.
 
 ## Unlock, reset, and persistence acceptance
 
@@ -115,7 +117,7 @@ Current automation proves the following without manufacturing progress:
 
 - Fresh isolated Debug package state began without `rt_lab_unlocked`; the ordinary release package and its progress were never cleared or modified.
 - Android and Windows host contracts accept only genuine live `finaleComplete` and reject checkpoint, capture, replay, benchmark, and Debug-injection contexts.
-- Debug checkpoint/tuning runs completed without creating `rt_lab_unlocked` in the Debug package preferences.
+- Debug checkpoint/tuning runs completed without creating `rt_lab_unlocked` in the Debug package preferences, checked both before and after the final standard/matched runs.
 - Ordinary settings persistence preserves the independent progress key, while process/route reset restores authored tuning and leaves progress separate.
 - The panel routes simulation through the existing paused input while Vulkan rendering, swapchain presentation, and telemetry continue.
 
