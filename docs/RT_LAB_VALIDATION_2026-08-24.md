@@ -1,5 +1,13 @@
 # Unlockable RT Lab Validation — 2026-08-24
 
+## Final-review artifact supersession
+
+Final whole-branch review removed the two Android RT Lab-only `ui_select` / `ui_back` playback calls under a focused source-region RED/GREEN contract. The corrected clean runtime source is `e37a3bad2cfd4c91f17a642f92fab12bc459ae8a`; its rebuilt Debug APK SHA-256 is `cab1c5c7f12ae4851a65e6ae9b2774c268abd2caa8a10e568e71f1f300db8aeb`.
+
+Debug and Release each pass all 13 CTests; Android Debug/unsigned Release/lint and shader freshness also pass. The exact-phone rerun is pending because `adb devices -l` is currently empty even after an ADB daemon restart and a bounded reconnect monitor. Accordingly, the `c0d3539` / `0efdb2...` phone runs retained below are historical evidence for the immediately preceding candidate, not final-artifact evidence for `e37a3ba`. They are superseded for final acceptance until the same standard and Lean/Authored/Max runs pass on the corrected APK.
+
+Audio/haptic manual revalidation required: **NO** — the corrected Android RT Lab open/back paths are now source-proven silent, while existing non-lab menu/audio behavior is unchanged.
+
 ## Result
 
 The post-lich RT Lab implementation passes the current automated host, Windows renderer, Android build, and exact-phone gates. The lab keeps gameplay paused while hardware-RT presentation continues, exposes truthful scene/light/workload controls, and leaves render scale and water quality under Settings.
