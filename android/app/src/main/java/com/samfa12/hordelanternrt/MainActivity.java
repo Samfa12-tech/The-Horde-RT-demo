@@ -26,6 +26,7 @@ import android.os.Vibrator;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.HapticFeedbackConstants;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -902,7 +903,7 @@ public class MainActivity extends Activity {
         panel.addView(label, matchWrap());
 
         final LinearLayout row = new LinearLayout(this);
-        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setOrientation(LinearLayout.VERTICAL);
         final String[] names = {getString(R.string.rt_lab_lean), getString(R.string.rt_lab_authored),
                 getString(R.string.rt_lab_max)};
         for (int preset = 0; preset < names.length; ++preset) {
@@ -913,12 +914,20 @@ public class MainActivity extends Activity {
                         ProbeBridge.setRtWorkloadPreset(selectedPreset);
                         showRtLab();
                     });
-            final LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, dp(48), 1.0f);
-            if (preset > 0) params.leftMargin = dp(6);
+            button.setSingleLine(true);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                button.setAutoSizeTextTypeUniformWithConfiguration(
+                        10, 15, 1, TypedValue.COMPLEX_UNIT_SP);
+            } else {
+                button.setTextSize(10);
+            }
+            final LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, dp(48));
+            if (preset > 0) params.topMargin = dp(6);
             row.addView(button, params);
         }
         final LinearLayout.LayoutParams rowParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, dp(48));
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         rowParams.topMargin = dp(6);
         panel.addView(row, rowParams);
     }

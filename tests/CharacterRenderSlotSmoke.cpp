@@ -592,6 +592,13 @@ int main()
                       androidSource.find("ProbeBridge.isRtLabUnlockEligible()") != std::string::npos &&
                       androidSource.find("handler.postDelayed(this, 250L)") != std::string::npos &&
                       androidSource.find("slider.setMinimumHeight(dp(48))") != std::string::npos &&
+                      androidSource.find("button.setSingleLine(true)") != std::string::npos &&
+                      androidSource.find("button.setAutoSizeTextTypeUniformWithConfiguration(") !=
+                          std::string::npos &&
+                      androidSource.find("row.setOrientation(LinearLayout.VERTICAL)") !=
+                          std::string::npos &&
+                      androidSource.find("LinearLayout.LayoutParams.MATCH_PARENT, dp(48)") !=
+                          std::string::npos &&
                       androidSource.find("private void showRtLab()") != std::string::npos &&
                       androidSource.find("ProbeBridge.setSimulationPaused(true)") != std::string::npos,
                       "Android RT Lab must preserve progress through settings reset and expose a live paused 48dp panel");
