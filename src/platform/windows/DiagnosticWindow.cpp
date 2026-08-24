@@ -1641,7 +1641,7 @@ void ShowDeathMenu(VulkanSurfaceContext& context)
 void ShowEndingMenu(VulkanSurfaceContext& context)
 {
     if (context.endingOverlayVisible || context.endingOverlayDismissed ||
-        context.deathOverlayVisible || context.benchmark.IsRunning() ||
+        context.deathOverlayVisible || context.rtLabVisible || context.benchmark.IsRunning() ||
         GetPropA(context.windowHandle, kCaptureModeProperty) != nullptr)
     {
         return;
@@ -4341,6 +4341,13 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
                 const bool inside = controlY >= panelY + ScaleForDpi(window, 8) &&
                     controlY + controlHeight <= panelY + panelHeight - ScaleForDpi(window, 8);
                 ShowWindow(control, inside ? SW_SHOW : SW_HIDE);
+                if (inside)
+                {
+                    // Trackbars that were hidden while scrolling must repaint
+                    // immediately when they re-enter the clipped lab panel.
+                    RedrawWindow(control, nullptr, nullptr,
+                                 RDW_INVALIDATE | RDW_ERASE | RDW_UPDATENOW | RDW_FRAME);
+                }
             }
         };
         place(kRtLabTitleId, 0, titleHeight);
@@ -4504,8 +4511,21 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
     case WM_MOUSEWHEEL:
         if (sceneContext && sceneContext->rtLabVisible)
         {
-            SendMessageA(hWnd, WM_VSCROLL,
-                GET_WHEEL_DELTA_WPARAM(wParam) > 0 ? SB_LINEUP : SB_LINEDOWN, 0);
+            UINT configuredLines = 3u;
+            SystemParametersInfoA(SPI_GETWHEELSCROLLLINES, 0u, &configuredLines, 0u);
+            const int wheelDelta = GET_WHEEL_DELTA_WPARAM(wParam);
+            const int wheelSteps = std::max(1, std::abs(wheelDelta) / WHEEL_DELTA);
+            if (configuredLines == WHEEL_PAGESCROLL)
+            {
+                for (int step = 0; step < wheelSteps; ++step)
+                    SendMessageA(hWnd, WM_VSCROLL, wheelDelta > 0 ? SB_PAGEUP : SB_PAGEDOWN, 0);
+            }
+            else
+            {
+                const int lineCount = std::clamp(static_cast<int>(configuredLines), 1, 12);
+                for (int line = 0; line < lineCount * wheelSteps; ++line)
+                    SendMessageA(hWnd, WM_VSCROLL, wheelDelta > 0 ? SB_LINEUP : SB_LINEDOWN, 0);
+            }
             return 0;
         }
         break;
@@ -4514,21 +4534,32 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         {
             SCROLLINFO scroll{sizeof(SCROLLINFO), SIF_ALL};
             GetScrollInfo(hWnd, SB_VERT, &scroll);
-            int next = sceneContext->rtLabScrollOffset;
+            using horde::platform::windows::RtLabScrollAction;
+            RtLabScrollAction action = RtLabScrollAction::Thumb;
+            bool handled = true;
             switch (LOWORD(wParam))
             {
-            case SB_TOP: next = 0; break;
-            case SB_BOTTOM: next = scroll.nMax - static_cast<int>(scroll.nPage) + 1; break;
-            case SB_LINEUP: next -= ScaleForDpi(hWnd, 36); break;
-            case SB_LINEDOWN: next += ScaleForDpi(hWnd, 36); break;
-            case SB_PAGEUP: next -= static_cast<int>(scroll.nPage); break;
-            case SB_PAGEDOWN: next += static_cast<int>(scroll.nPage); break;
+            case SB_TOP: action = RtLabScrollAction::Top; break;
+            case SB_BOTTOM: action = RtLabScrollAction::Bottom; break;
+            case SB_LINEUP: action = RtLabScrollAction::LineUp; break;
+            case SB_LINEDOWN: action = RtLabScrollAction::LineDown; break;
+            case SB_PAGEUP: action = RtLabScrollAction::PageUp; break;
+            case SB_PAGEDOWN: action = RtLabScrollAction::PageDown; break;
             case SB_THUMBPOSITION:
-            case SB_THUMBTRACK: next = scroll.nTrackPos; break;
-            default: break;
+            case SB_THUMBTRACK: action = RtLabScrollAction::Thumb; break;
+            default: handled = false; break;
             }
             const int maximum = std::max(0, scroll.nMax - static_cast<int>(scroll.nPage) + 1);
-            sceneContext->rtLabScrollOffset = std::clamp(next, 0, maximum);
+            if (handled)
+            {
+                sceneContext->rtLabScrollOffset = horde::platform::windows::StepRtLabScroll(
+                    sceneContext->rtLabScrollOffset,
+                    maximum,
+                    ScaleForDpi(hWnd, 36),
+                    static_cast<int>(scroll.nPage),
+                    action,
+                    scroll.nTrackPos);
+            }
             RECT client{};
             GetClientRect(hWnd, &client);
             LayoutOverlayControls(hWnd, client.right, client.bottom);
@@ -4785,6 +4816,15 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 (lParam & (1ll << 30)) == 0)
             {
                 NavigateControllerMenu(*sceneContext, wParam == VK_UP ? -1 : 1);
+                return 0;
+            }
+            if (sceneContext->rtLabVisible &&
+                (wParam == VK_PRIOR || wParam == VK_NEXT || wParam == VK_HOME || wParam == VK_END) &&
+                (lParam & (1ll << 30)) == 0)
+            {
+                const WPARAM scrollCommand = wParam == VK_PRIOR ? SB_PAGEUP :
+                    (wParam == VK_NEXT ? SB_PAGEDOWN : (wParam == VK_HOME ? SB_TOP : SB_BOTTOM));
+                SendMessageA(hWnd, WM_VSCROLL, scrollCommand, 0);
                 return 0;
             }
             if (sceneContext->simulationPaused && (wParam == VK_LEFT || wParam == VK_RIGHT) &&
@@ -5171,9 +5211,19 @@ LRESULT CALLBACK ControllerFocusOutlineSubclass(
     if ((message == WM_KEYDOWN || message == WM_SYSKEYDOWN) &&
         (wParam == VK_TAB || wParam == VK_UP || wParam == VK_DOWN ||
          wParam == VK_LEFT || wParam == VK_RIGHT || wParam == VK_RETURN ||
-         wParam == VK_ESCAPE))
+         wParam == VK_ESCAPE || wParam == VK_PRIOR || wParam == VK_NEXT ||
+         wParam == VK_HOME || wParam == VK_END))
     {
         return SendMessageA(GetParent(control), message, wParam, lParam);
+    }
+    if (message == WM_MOUSEWHEEL)
+    {
+        HWND parent = GetParent(control);
+        auto* context = reinterpret_cast<VulkanSurfaceContext*>(GetWindowLongPtrA(parent, GWLP_USERDATA));
+        if (context != nullptr && context->rtLabVisible)
+        {
+            return SendMessageA(parent, message, wParam, lParam);
+        }
     }
 
     const LRESULT result = DefSubclassProc(control, message, wParam, lParam);
@@ -5238,7 +5288,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     }
 
     const UINT systemDpi = GetDpiForSystem();
-    constexpr DWORD windowStyle = WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN;
+    constexpr DWORD windowStyle = WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_VSCROLL;
     int windowWidth = MulDiv(1000, static_cast<int>(systemDpi == 0u ? kDefaultDpi : systemDpi), static_cast<int>(kDefaultDpi));
     int windowHeight = MulDiv(700, static_cast<int>(systemDpi == 0u ? kDefaultDpi : systemDpi), static_cast<int>(kDefaultDpi));
     if (captureDirectory != nullptr)
@@ -5380,7 +5430,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     const auto createRtLabSlider = [&](const int id, const int minimum, const int maximum, const int position)
     {
         HWND slider = CreateWindowExA(0, TRACKBAR_CLASSA, "",
-            WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_AUTOTICKS | TBS_TRANSPARENTBKGND,
+            WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_AUTOTICKS,
             0, 0, 100, 38, hWnd,
             reinterpret_cast<HMENU>(static_cast<INT_PTR>(id)), instance, nullptr);
         InstallControllerFocusOutline(slider);

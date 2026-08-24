@@ -121,7 +121,7 @@ Current automation proves the following without manufacturing progress:
 - Ordinary settings persistence preserves the independent progress key, while process/route reset restores authored tuning and leaves progress separate.
 - The panel routes simulation through the existing paused input while Vulkan rendering, swapchain presentation, and telemetry continue.
 
-The following player-flow checks remain owner-only/open for this candidate: complete the finale through normal gameplay, observe the first `RT LAB UNLOCKED` card, relaunch, use Begin Again, and use ordinary Reset Defaults while confirming the persisted lab remains available. Debug checkpoints/replay were deliberately not used as evidence for this genuine unlock. Windows persistence contracts were verified without overwriting the owner's existing INI.
+The owner subsequently completed the finale on exact development Debug APK `326e024adcb8d5bfb9c5a66fecde9fbb137f19af44cda5c203468fb21dde76d7` and exposed a genuine player-flow defect: selecting `OPEN RT LAB` showed the panel momentarily, then returned to the ending card. The later process exit is not crash evidence; Codex force-stopped the package as cleanup while the owner was still testing. Relaunch, Begin Again, Reset Defaults, and fixed-APK phone confirmation remain owner-only/open. Debug checkpoints/replay were deliberately not used as evidence for the genuine unlock.
 
 After device evidence, the side-by-side Debug package was force-stopped and uninstalled. `pm path com.samfa12.hordelanternrt.debug` is empty; the existing release package remains present. This restores the phone's original no-Debug-package state without touching release progress.
 
@@ -133,3 +133,53 @@ After device evidence, the side-by-side Debug package was force-stopped and unin
 - Genuine unlock presentation and long-term player-facing persistence remain the owner gameplay checks listed above.
 
 Audio/haptic manual revalidation required: **NO** — the change is renderer tuning, UI, persistence, and Debug evidence automation only. It does not change sound assets, gains, cues, listener/source event-time data, spatialisation, event transport/timing, haptic routing/patterns/intensity, or player damage/death feedback.
+
+## Post-validation general water-lighting work
+
+The exact RT Lab artifact and timing matrix above remain historical evidence for their stated source. Later 2026-08-24 development first added bounded visibility to the refracted hit, then rejected fixed water-only light transport after owner screenshots showed that it filled the player shadow. Current source routes refracted/reflected opaque hits and water-interface highlights through terminal shared active-light/visibility code, explicitly filters transparent candidates, preserves accumulated path distance, and sends the directional moon through physical roof geometry. RT Lab water-width controls, workload state, unlock persistence, and UI behavior are unchanged.
+
+Earlier exact `SM-S948B` APKs remain historical evidence for their own shaders. The final general-light shader subsequently passed exact Debug install/hash, focused Mobile timing, replay, all 13 captures, and Home/resume on 2026-08-25 in `run-20260825-041641`, with a no-rebuild repeat in `run-20260825-042147`. See `WATER_TRANSMISSION_SHADOW_VALIDATION_2026-08-24.md` for the current artifact identity, inspected captures, and the retained bounded RT performance cost.
+
+## Post-lich RT Lab persistence correction - 2026-08-25
+
+Root cause was Android UI state ownership, not Vulkan rendering or a controller edge. `openRtLab(true)` cleared `endingOverlayVisible` and built the lab, but the recurring runtime poll continued to observe `FINALE_ENDING_COMPLETE` and call `showEndingOverlay()`. Because that function did not guard `rtLabVisible`, it removed the lab views and rebuilt the ending card on the next poll.
+
+A focused `CharacterRenderSlotSmoke` contract was added first and observed RED with `Android finale polling must not replace an open RT Lab with the ending overlay`. The minimal production change adds `rtLabVisible` to `showEndingOverlay()`'s early-return guard. The same focused test then passed. Closing RT Lab remains intentional: `closeRtLab()` clears `rtLabVisible` before restoring the ending card.
+
+Fresh local evidence for the fix:
+
+- Fresh Host run `reports/foundation-runs/run-20260825-043837/` passed shader freshness/negative fixtures, fresh Debug and Release 13/13 CTests, all 13 Windows RT captures, clean Android Debug/unsigned Release/lint, validation packaging/licences, and evidence hashes.
+- The Host run's uninstalled Android Debug candidate is 60,054,844 bytes with SHA-256 `1deda67650a0a6d818669d469e4b5b7127fee5a461fbeac3f427a96b08821a62`.
+- The complete Windows Debug solution built.
+- A headed `--debug-rt-lab` run retained the live lab for a five-second hold spanning many UI polling intervals. UI Automation still found the RT Lab title, live GPU telemetry reporting 453 samples, and seven visible tuning labels/controls; the process was then closed.
+- Desktop screen-copy of the native hardware-RT window was black, so it is not used as visual evidence.
+- `adb devices -l` had no target. The candidate was not installed or exercised on Android, and no fixed-APK device claim is made.
+
+Audio/haptic manual revalidation required: **NO** — the correction changes only ending/lab overlay gating. It does not alter cues, playback, event timing, spatialisation, listener/source data, haptic routing, patterns, or gameplay feedback.
+
+## Windows RT Lab usability and truthful waterfall width - 2026-08-25
+
+Owner testing exposed three related Windows issues: wheel scrolling was unreliable while a trackbar held focus, trackbars painted as black/stale boxes on initial open and disappeared after scrolling down then back up, and `WATERFALL WIDTH` did not visibly widen the falling curtain.
+
+The confirmed causes were native UI/render ownership and axis semantics:
+
+- wheel input commonly reached the focused child trackbar instead of the top-level vertical scroll handler;
+- `TBS_TRANSPARENTBKGND` asked sibling trackbars to reproduce a Vulkan/layered-parent background that the Win32 parent did not paint, and hide/show scrolling had no guaranteed child redraw;
+- the width value was connected through UI, frame tuning, TLAS, push constants, and shader, but it scaled world X. At `lantern-drop` the player looks along world X, so this changed only the few-millimetre transmission depth while visible screen width remained on world Z.
+
+The correction keeps one scroll owner, gives the window a real vertical-scroll style, forwards focused-child wheel input, adds Page Up/Down and Home/End, redraws controls as they re-enter the panel, and removes transparent trackbar painting. `ResolveWaterfallCurtainScale` now leaves depth and height at 1.0 and applies the clamped 25–200% value to cross-lane world Z on waterfall instance 19. Raygen scales the three streams' Z centres and radii by the same value; catchment, runnel, drain, roof slot, and collision stay fixed.
+
+TDD and visual evidence:
+
+- `CharacterRenderSlotSmoke` first failed to compile because the wished-for `WaterfallCurtainScale`/`ResolveWaterfallCurtainScale` behavior did not exist. It now proves 25% and 200% tune only the cross-lane component.
+- `DesktopControllerInputTests` first failed to compile because the wished-for bounded line/page/thumb scrolling seam did not exist. It now covers all scroll actions and bounds.
+- Before the fix, headed screenshot `build/rt-lab-ui-repro-20260825/before.png` captured black rectangles, duplicated label pixels, and missing slider tracks/thumbs.
+- After the fix, `build/rt-lab-ui-repro-20260825/after-open.png` captured all six native tracks/thumbs immediately on open. The owner then manually scrolled down/up and accepted the repaired repaint behavior, and separately accepted the visible waterfall-width response.
+
+Fresh exact-source Host run `reports/foundation-runs/run-20260825-070928/` passed all seven stages: shader freshness and negative fixtures, fresh Windows Debug and Release 13/13 CTests, 13 deterministic Windows captures, clean Android Debug/unsigned Release/lint for all configured ABIs, validation packaging/licences, and evidence hashes. The generated Windows validation-stage executable SHA-256 is `142596081ae53352fba995ab50630e01b91fc98595ae25415bcd0422a96a6240`. The uninstalled Android Debug APK is 60,060,508 bytes with SHA-256 `1d7079004979c5afa54bece8a10543ec2b27b8d7310d9c49820aae6fdda884ed`.
+
+Final inventory showed one authorised ADB target, serial `R5GL219SZGK`, raw model `SM-S948B`. It was not installed to, launched, stopped, or tested for this correction. The clean Android build proves compilation/package integration only; exact fixed-APK phone behavior remains pending. All temporary Windows game processes were closed after testing.
+
+Audio/haptic manual revalidation required: **NO** — these changes affect RT Lab scrolling/control painting and the waterfall transform/profile axis only. They do not change cues, assets, gain, listener/source event-time data, spatialisation, event transport/timing, haptic routing/patterns/intensity, or player damage/death feedback.
+
+The final release review found the same recurring-finale ownership risk on Windows: `ShowEndingMenu()` was still called every frame after completion without an `rtLabVisible` guard. A focused `DesktopControllerInputTests` contract first failed with `Windows finale polling must not replace or mutate an open RT Lab`; the minimal guard was then added and the focused test passed. This aligns both platforms without changing the accepted lab controls, RT rendering, audio, or haptics.

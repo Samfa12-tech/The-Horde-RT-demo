@@ -1217,9 +1217,12 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     // physical drench at the final zig-zag exit. The rim is deliberately
     // inside the existing route envelope so collision and replay remain
     // unchanged while primary, reflection, and transmission rays see depth.
-    constexpr float waterSlotMinX = -2.48f;
+    // Extend the irregular breach to contain the actual kMoonDirection
+    // footprint at the catchment. The moon ray now reaches the cobbles through
+    // geometry and can be blocked by the player; no water-only light is added.
+    constexpr float waterSlotMinX = -2.90f;
     constexpr float waterSlotMaxX = -1.58f;
-    constexpr float waterSlotMinZ = -15.65f;
+    constexpr float waterSlotMinZ = -16.10f;
     constexpr float waterSlotMaxZ = -14.72f;
     addRouteCeiling(-2.50f, -16.4f, waterSlotMinX, -14.0f);
     addRouteCeiling(waterSlotMaxX, -16.4f, 4.80f, -14.0f);
@@ -2695,7 +2698,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const horde::gameplay::LanternSnapshot& lantern = frame.lantern;
     const horde::gameplay::EnemyRosterSnapshot& roster = frame.roster;
     const horde::gameplay::LichSnapshot& lich = frame.lich;
-    const float waterfallWidthScale = ClampRtSceneTuning(frame.tuning).waterfallWidthScale;
+    const WaterfallCurtainScale waterfallScale = ResolveWaterfallCurtainScale(frame.tuning);
     const auto& skeletonGpu = characterSlot_.SkeletonGpu(0u);
     const auto& secondSkeletonGpu = characterSlot_.SkeletonGpu(1u);
     const auto& lichGpu = characterSlot_.LichGpu();
@@ -2995,9 +2998,9 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     instances[19].mask = 0x01u;
     instances[19].accelerationStructureReference = waterfallBlas_.address;
     instances[19].transform = {{
-        waterfallWidthScale, 0.0f, 0.0f, -2.32f,
-        0.0f, 1.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, -15.26f}};
+        waterfallScale.depth, 0.0f, 0.0f, -2.32f,
+        0.0f, waterfallScale.vertical, 0.0f, 0.0f,
+        0.0f, 0.0f, waterfallScale.crossLane, -15.26f}};
     if (!WriteBuffer(instanceBuffer_, instances.data(), sizeof(instances), "animated TLAS instance", diagnostic))
     {
         return false;

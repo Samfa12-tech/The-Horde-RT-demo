@@ -62,6 +62,21 @@ inline RtSceneTuning ClampRtSceneTuning(RtSceneTuning tuning)
     return tuning;
 }
 
+struct WaterfallCurtainScale
+{
+    float depth = 1.0f;
+    float vertical = 1.0f;
+    float crossLane = 1.0f;
+};
+
+inline WaterfallCurtainScale ResolveWaterfallCurtainScale(const RtSceneTuning& tuning)
+{
+    // The player approaches the curtain along world X, so world Z is its
+    // visible width across the terminal lane. Keep the millimetre-thin depth
+    // unchanged and apply the lab control only to that cross-lane span.
+    return {1.0f, 1.0f, ClampRtSceneTuning(tuning).waterfallWidthScale};
+}
+
 inline float ResolveRtFinaleRoofOpen(const float authoredValue, const RtSceneTuning& tuning)
 {
     return tuning.finaleRoofOpenOverride.has_value()

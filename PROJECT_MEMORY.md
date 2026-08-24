@@ -1,6 +1,6 @@
 # Horde Lantern RT - Project Memory
 
-Last updated: 2026-08-23
+Last updated: 2026-08-25
 
 ## Identity and release state
 
@@ -37,8 +37,8 @@ Last updated: 2026-08-23
 - `RtGpuResources` owns checked buffer operations, acceleration-structure lifetime helpers, and updatable-BLAS state without taking ownership of the platform device; BLAS sizing/build/refit recording remains in the scene. `CharacterRenderSlot` owns two bounded skeleton pose/BLAS routes plus the singular lich route.
 - Supported graphics queues expose a separately labelled Vulkan GPU RT command-buffer interval from top-of-pipe to bottom-of-pipe around acceleration-structure, trace, barrier, and copy/blit recording. It does not replace CPU frame time or include presentation/display latency; unsupported timestamp queues report `N/A` without affecting rendering.
 - Android uses strict ASTC KTX2 arrays: ASTC 6x6 diffuse/ARM and ASTC 4x4 normals. Windows uses executable-relative raw RGBA8 arrays.
-- `SurfaceWater = 10` is appended without renumbering the material ABI. Primary High water uses one bounded reflection and transmission query; Mobile uses one bounded transmission query plus analytic reflection; secondary water is query-free. Lich mist is a six-step depth-clipped final-room volume.
-- The unreachable stained-glass material route has been removed from the CPU material table and raygen. The retained open threshold and live clear-glass route are unchanged. The regenerated raygen is 71,180 SPIR-V bytes / 3,978 instructions / 557 branch operations / 6 loops / 212 selection merges, down from 71,908 / 4,025 / 568 / 6 / 216, with bit-exact fixed Windows captures and non-regressing Windows/phone timing.
+- `SurfaceWater = 10` is appended without renumbering the material ABI. Refracted and High reflected opaque hits share terminal ordinary material/direct/shadow/fog shading, while the water interface owns the sole bounded reflection; interface highlights share selected lights and visibility. Transparent filtering uses `gl_RayFlagsNoOpaqueEXT`, accumulated distance includes the primary segment, and the directional moon traverses physical roof/player geometry. Water-on-water secondary hits remain non-recursive. Fresh Host/deterministic Windows and exact `SM-S948B` Debug evidence pass; the owner accepted the moving Windows result. The repeated 75% Mobile medians are approximately 27.8 ms waterfall, 19.0 ms skylight, and 30.8 ms lich. The investigated real-light cost is retained rather than hidden by reducing RT quality or resolution. Lich mist is a six-step depth-clipped final-room volume.
+- The unreachable stained-glass material route has been removed from the CPU material table and raygen. The retained open threshold and live clear-glass route are unchanged. Current generated-shader identity and phone/Windows measurements belong in the dated renderer validation notes rather than this rolling memory.
 
 ## Current alpha scene and controls
 
@@ -56,6 +56,7 @@ Last updated: 2026-08-23
 ## UI, settings, diagnostics, and audio
 
 - Both platforms have branded entry, pause, controls, settings, RT diagnostics, restart, and quit flows.
+- Post-lich RT Lab owns the overlay while it is open. Android finale polling must include `rtLabVisible` in the ending-overlay guard so the recurring completed-finale poll cannot clear the lab views and rebuild the ending card. The owner exposed this on exact Debug APK `326e024adcb8d5bfb9c5a66fecde9fbb137f19af44cda5c203468fb21dde76d7`; the later process exit was Codex cleanup, not crash evidence. Windows transparent trackbars were separately found to paint stale Vulkan/layered-parent content after open and scroll hide/show, while focused children consumed wheel input. They now use opaque native painting, explicit redraw, routed wheel/page scrolling, and a real vertical-scroll window style. The width control now scales world-Z cross-lane waterfall geometry and matching shader profiles instead of imperceptible world-X depth. Owner Windows acceptance passed; Host run `run-20260825-070928` passed with Debug APK `1d7079004979c5afa54bece8a10543ec2b27b8d7310d9c49820aae6fdda884ed`, but fixed-APK phone confirmation remains pending.
 - Both platform menus expose a release-safe two-pass benchmark: pass 1 warms the deterministic 13-waypoint route, pass 2 measures it, and completion produces a selectable/copyable/exportable text report plus automatically archived JSON evidence. Windows and `SM-S948B` Android device validation pass.
 - Both platform menus include `More by Samfa12`, which opens https://samfa12.com/ in the system browser.
 - Technical output stays tucked away unless requested or startup fails.

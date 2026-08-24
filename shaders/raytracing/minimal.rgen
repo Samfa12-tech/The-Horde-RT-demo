@@ -198,26 +198,28 @@ void waterStreamProfile(vec3 p, out float centreZ, out float radiusX,
                         out float radiusZ)
 {
     float scale = waterStreamScale(p.y);
+    float widthScale = controls.waterfallWidthScale;
     centreZ = -15.26;
     radiusX = 0.006;
-    radiusZ = 0.065;
+    radiusZ = 0.065 * widthScale;
     float nearest = abs(p.z - centreZ) / (radiusZ * scale);
-    float candidate = abs(p.z + 15.44) / (0.014 * scale);
+    float sideCentreZ = -15.26 + (-15.44 + 15.26) * widthScale;
+    float candidate = abs(p.z - sideCentreZ) / (0.014 * widthScale * scale);
     if (candidate < nearest)
     {
-        centreZ = -15.44;
+        centreZ = sideCentreZ;
         radiusX = 0.003;
-        radiusZ = 0.014;
+        radiusZ = 0.014 * widthScale;
         nearest = candidate;
     }
-    candidate = abs(p.z + 15.06) / (0.012 * scale);
+    sideCentreZ = -15.26 + (-15.06 + 15.26) * widthScale;
+    candidate = abs(p.z - sideCentreZ) / (0.012 * widthScale * scale);
     if (candidate < nearest)
     {
-        centreZ = -15.06;
+        centreZ = sideCentreZ;
         radiusX = 0.003;
-        radiusZ = 0.012;
+        radiusZ = 0.012 * widthScale;
     }
-    radiusX *= controls.waterfallWidthScale;
 }
 
 vec3 waterBaseNormal(vec3 p, vec3 geometricNormal)
@@ -593,7 +595,7 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
     h.emissive = 0.0;
 
     rayQueryEXT query;
-    uint rayFlags = ignoreWater ? gl_RayFlagsNoneEXT : gl_RayFlagsOpaqueEXT;
+    uint rayFlags = ignoreWater ? gl_RayFlagsNoOpaqueEXT : gl_RayFlagsOpaqueEXT;
     rayQueryInitializeEXT(query, topLevelAS, rayFlags, mask, origin, 0.002, direction, maxDistance);
     while (rayQueryProceedEXT(query))
     {
@@ -680,7 +682,7 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
 float visibilityMask(vec3 origin, vec3 direction, float maxDistance, uint mask)
 {
     rayQueryEXT query;
-    rayQueryInitializeEXT(query, topLevelAS, gl_RayFlagsNoneEXT, mask, origin, 0.0015, direction, max(maxDistance, 0.004));
+    rayQueryInitializeEXT(query, topLevelAS, gl_RayFlagsNoOpaqueEXT, mask, origin, 0.0015, direction, max(maxDistance, 0.004));
     while (rayQueryProceedEXT(query))
     {
         if (rayQueryGetIntersectionTypeEXT(query, false) != gl_RayQueryCandidateIntersectionTriangleEXT)
@@ -712,15 +714,16 @@ vec3 offsetRayOrigin(HitInfo h, vec3 direction)
 float visibility(vec3 origin, vec3 direction, float maxDistance)
 {
     // Held prop meshes stay excluded from their own direct-light estimate. The
-    // world uses bit 0x01 and the separate player body uses bit 0x04. Keep real
-    // player shadow queries in the lower third where the first-person body and
-    // nearby receiving surfaces live, avoiding a mobile traversal cost on the
-    // upper view that cannot visibly read as player self-shadowing.
+    // world uses bit 0x01 and the separate player body uses bit 0x04. Visibility
+    // is a world-space property: never change the caster set based on screen Y,
+    // because the same water or stone receiver must keep its shadow when the
+    // camera, placement, or reflected/refracted view changes.
     // Instance 16 is reflection-only for primary rays, but participates here so
     // the player's head casts real shadows. Instance 17 is the moving roof slab.
-    uint visibilityRayMask = gl_LaunchIDEXT.y * 100u >= gl_LaunchSizeEXT.y * 68u ? 0x35u : 0x31u;
-    return visibilityMask(origin, direction, maxDistance, visibilityRayMask);
+    return visibilityMask(origin, direction, maxDistance, 0x35u);
 }
+
+void activeLocalLight(out vec3 position, out vec3 color, out float strength);
 
 vec3 bounceSample(HitInfo h, vec3 incoming, bool lightAwareMirror)
 {
@@ -749,37 +752,10 @@ vec3 bounceSample(HitInfo h, vec3 incoming, bool lightAwareMirror)
     // constant moon term made reflected characters look studio-lit even after
     // the lantern had gone out. Use only a very low ambient floor plus the same
     // currently active local emitter, with one bounded visibility query.
-    vec3 cameraForward = normalize(vec3(sin(controls.yaw), -0.05 + controls.pitch, -cos(controls.yaw)));
-    vec3 cameraRight = normalize(cross(cameraForward, vec3(0.0, 1.0, 0.0)));
-    vec3 cameraUp = normalize(cross(cameraRight, cameraForward));
-    float movement = max(controls.walkAmount, 0.2);
-    float torchSway = sin(controls.time * 6.2) * 0.035 * movement;
-    float torchBob = abs(sin(controls.time * 6.2)) * 0.025 * movement;
-    vec3 torchGripPosition = vec3(controls.cameraX, 0.58, controls.cameraZ)
-        + cameraRight * (-0.34 - torchSway) + cameraUp * (-0.40 + torchBob) +
-          cameraForward * controls.heldPropDepth;
-    vec3 localLightPosition = torchGripPosition + cameraUp * 0.28;
-    vec3 localLightColor = tunedLightColor(vec3(1.0, 0.28, 0.055), kLightTorch);
-    float localLightStrength = controls.lantern;
-    if (controls.cameraX <= -8.5 && controls.cameraX >= -28.5 &&
-        controls.cameraZ >= -16.8 && controls.cameraZ <= -13.6)
-    {
-        float bayX = controls.cameraX > -13.5 ? -11.0 :
-                     (controls.cameraX > -18.5 ? -16.0 :
-                     (controls.cameraX > -23.5 ? -21.0 : -26.0));
-        localLightPosition = vec3(bayX, 0.67, -13.98);
-        vec3 authoredPassageColor = bayX > -13.5 ? vec3(1.0, 0.42, 0.06) :
-                                      (bayX > -18.5 ? vec3(0.055, 0.22, 1.0) :
-                                      (bayX > -23.5 ? vec3(1.0, 0.045, 0.018) : vec3(0.16, 0.78, 0.22)));
-        localLightColor = tunedLightColor(authoredPassageColor, kLightPassage);
-        localLightStrength = 1.0;
-    }
-    if (controls.enemyKind > 0.5 && controls.staffLightStrength > 0.001)
-    {
-        localLightPosition = vec3(controls.staffX, controls.staffY, controls.staffZ);
-        localLightColor = tunedLightColor(vec3(0.58, 0.10, 1.0), kLightStaff);
-        localLightStrength = controls.staffLightStrength;
-    }
+    vec3 localLightPosition;
+    vec3 localLightColor;
+    float localLightStrength;
+    activeLocalLight(localLightPosition, localLightColor, localLightStrength);
 
     vec3 toLight = localLightPosition - h.position;
     float lightDistance = length(toLight);
@@ -804,11 +780,142 @@ vec3 currentTorchLightPosition()
          + forward * controls.heldPropDepth;
 }
 
-vec3 waterSecondarySample(HitInfo h, vec3 incoming)
+void activeLocalLight(out vec3 position, out vec3 color, out float strength)
 {
-    // Water exists only at the drench, catchment and skylight runnel. Shade its
-    // bounded secondary hit with those two relevant lights, analytically and
-    // without spawning another reflection or shadow ray.
+    position = currentTorchLightPosition();
+    color = tunedLightColor(vec3(1.0, 0.28, 0.055), kLightTorch);
+    strength = controls.lantern;
+    if (controls.cameraX <= -8.5 && controls.cameraX >= -28.5 &&
+        controls.cameraZ >= -16.8 && controls.cameraZ <= -13.6)
+    {
+        float bayX = controls.cameraX > -13.5 ? -11.0 :
+                     (controls.cameraX > -18.5 ? -16.0 :
+                     (controls.cameraX > -23.5 ? -21.0 : -26.0));
+        position = vec3(bayX, 0.67, -13.98);
+        vec3 authoredColor = bayX > -13.5 ? vec3(1.0, 0.42, 0.06) :
+                             (bayX > -18.5 ? vec3(0.055, 0.22, 1.0) :
+                             (bayX > -23.5 ? vec3(1.0, 0.045, 0.018) :
+                                             vec3(0.16, 0.78, 0.22)));
+        color = tunedLightColor(authoredColor, kLightPassage);
+        strength = 1.0;
+    }
+    if (controls.enemyKind > 0.5 && controls.staffLightStrength > 0.001)
+    {
+        position = vec3(controls.staffX, controls.staffY, controls.staffZ);
+        color = tunedLightColor(vec3(0.58, 0.10, 1.0), kLightStaff);
+        strength = controls.staffLightStrength;
+    }
+}
+
+void activeSkyLight(vec3 surfacePosition, int sampleIndex, out vec3 direction,
+                    out float distance, out vec3 radiance, out float gain)
+{
+    bool inSkylightChamber = surfacePosition.x >= -8.5 && surfacePosition.x <= -2.5 &&
+                             surfacePosition.z >= -18.0 && surfacePosition.z <= -12.4;
+    bool inFinaleChamber = surfacePosition.x >= -36.9 && surfacePosition.x <= -30.5 &&
+                           surfacePosition.z >= -18.4 && surfacePosition.z <= -12.0;
+    bool finaleActive = inFinaleChamber && controls.finaleSkylightOpen > 0.001;
+    vec3 target = finaleActive
+        ? (sampleIndex == 0 ? vec3(-34.35, 2.76, -16.02) : vec3(-33.05, 2.76, -14.38))
+        : vec3(0.0);
+    vec3 toSky = target - surfacePosition;
+    // The moon is an ordinary directional emitter. Roof slabs, apertures,
+    // characters and moving geometry decide visibility through the shared RT
+    // query; no room-coordinate light target is allowed to bypass them. The
+    // finale remains a bounded authored dawn aperture while its roof animates.
+    distance = finaleActive ? length(toSky) : 18.0;
+    direction = finaleActive ? toSky / max(distance, 0.001) : kMoonDirection;
+    gain = finaleActive ? smoothstep(0.0, 0.88, controls.finaleSkylightOpen) : 1.0;
+    vec3 finaleRadiance = tunedLightColor(
+        mix(vec3(0.38, 0.52, 0.76), vec3(1.12, 0.54, 0.23),
+            smoothstep(0.0, 1.0, controls.finaleDawnReveal)),
+        kLightSkylight);
+    radiance = finaleActive ? finaleRadiance : tunedLightColor(
+        inSkylightChamber ? vec3(0.28, 0.44, 0.72) : vec3(0.26, 0.34, 0.48),
+        kLightSkylight);
+}
+
+vec3 shadeOpaqueDirect(HitInfo h, vec3 rayDirection, bool dualVisibility,
+                       out float localVisibility, out float skyVisibility,
+                       out float skyDiffuse, out vec3 localColor,
+                       out float localStrength)
+{
+    vec3 localPosition;
+    activeLocalLight(localPosition, localColor, localStrength);
+    vec3 localVector = localPosition - h.position;
+    float localDistance = length(localVector);
+    vec3 localDirection = localVector / max(localDistance, 0.001);
+    const vec3 areaOffsets[2] = vec3[2](vec3(-0.075, 0.03, -0.045),
+                                        vec3(0.070, 0.10, 0.060));
+    int sampleIndex = int((gl_LaunchIDEXT.x + gl_LaunchIDEXT.y) & 1u);
+    vec3 sampleVector = localPosition + areaOffsets[sampleIndex] - h.position;
+    float sampleDistance = length(sampleVector);
+    vec3 sampleDirection = sampleVector / max(sampleDistance, 0.001);
+    localVisibility = localStrength > 0.001
+        ? visibility(offsetRayOrigin(h, sampleDirection), sampleDirection,
+                     sampleDistance - 0.02) : 0.0;
+    if (dualVisibility && localStrength > 0.001)
+    {
+        vec3 otherVector = localPosition + areaOffsets[1 - sampleIndex] - h.position;
+        float otherDistance = length(otherVector);
+        vec3 otherDirection = otherVector / max(otherDistance, 0.001);
+        localVisibility = 0.5 * (localVisibility + visibility(
+            offsetRayOrigin(h, otherDirection), otherDirection, otherDistance - 0.02));
+    }
+
+    vec3 skyDirection;
+    float skyDistance;
+    vec3 skyRadiance;
+    float skyGain;
+    activeSkyLight(h.position, sampleIndex, skyDirection, skyDistance, skyRadiance, skyGain);
+    skyVisibility = visibility(offsetRayOrigin(h, skyDirection), skyDirection,
+                               skyDistance - 0.02) * skyGain;
+    if (dualVisibility)
+    {
+        vec3 otherSkyDirection;
+        float otherSkyDistance;
+        vec3 otherSkyRadiance;
+        float otherSkyGain;
+        activeSkyLight(h.position, 1 - sampleIndex, otherSkyDirection,
+                       otherSkyDistance, otherSkyRadiance, otherSkyGain);
+        float otherVisibility = visibility(offsetRayOrigin(h, otherSkyDirection),
+                                           otherSkyDirection,
+                                           otherSkyDistance - 0.02) * otherSkyGain;
+        skyVisibility = 0.5 * (skyVisibility + otherVisibility);
+        skyRadiance = 0.5 * (skyRadiance + otherSkyRadiance);
+    }
+
+    float reflective = max(h.metallic, h.reflectivity);
+    float localDiffuse = max(dot(h.normal, localDirection), 0.0);
+    float localSpecular = pow(max(dot(reflect(-localDirection, h.normal),
+                                      -rayDirection), 0.0),
+                              mix(34.0, 5.0, reflective));
+    float localAttenuation = 1.0 / (1.0 + localDistance * localDistance * 0.58);
+    float flamePulse = 0.84 + 0.16 * sin(controls.time * 15.0);
+    skyDiffuse = max(dot(h.normal, skyDirection), 0.0);
+    vec3 skyHalf = normalize(skyDirection - rayDirection);
+    float skySpecular = pow(max(dot(h.normal, skyHalf), 0.0),
+                            mix(12.0, 96.0, reflective));
+    float skyFresnel = pow(1.0 - max(dot(h.normal, -rayDirection), 0.0), 5.0);
+    vec3 cold = tunedLightColor(vec3(0.15, 0.20, 0.28), kLightSkylight);
+
+    vec3 color = h.base * vec3(0.025, 0.028, 0.032);
+    color += h.base * localColor * localDiffuse * localAttenuation * localVisibility
+        * localStrength * flamePulse * 2.65;
+    color += localColor * localSpecular * localAttenuation * localVisibility
+        * localStrength * (0.12 + reflective * 1.04);
+    color += h.base * cold * skyDiffuse * skyVisibility * 0.10;
+    color += h.base * skyRadiance * skyDiffuse * skyVisibility * 0.86;
+    color += skyRadiance * skySpecular * skyVisibility
+        * mix(0.025, 0.44, reflective) * (0.45 + 0.55 * skyFresnel);
+    return color;
+}
+
+vec3 shadeOpaqueSecondary(HitInfo h, vec3 incoming)
+{
+    // This is the terminal radiance evaluation for a reflected water ray. It
+    // shares the ordinary material and active-light BRDF plus real shadow rays,
+    // but never traces another reflection, refraction or indirect bounce.
     if (!h.hit)
     {
         return skyColor(incoming);
@@ -821,38 +928,25 @@ vec3 waterSecondarySample(HitInfo h, vec3 incoming)
     {
         return skyColor(reflect(incoming, h.geometricNormal)) * 0.06 + vec3(0.008);
     }
-
-    vec3 normal = dot(h.normal, -incoming) < 0.0 ? -h.normal : h.normal;
-    float reflective = max(h.metallic, h.reflectivity);
-    vec3 color = h.base * vec3(0.025, 0.028, 0.032);
-
-    vec3 skyVector = vec3(-5.50, 2.62, -15.20) - h.position;
-    vec3 skyDirection = skyVector / max(length(skyVector), 0.001);
-    vec3 skyRadiance = tunedLightColor(vec3(0.28, 0.44, 0.72), kLightSkylight);
-    float skyDiffuse = max(dot(normal, skyDirection), 0.0);
-    float skySpecular = pow(max(dot(normal, normalize(skyDirection - incoming)), 0.0),
-                            mix(12.0, 96.0, reflective));
-    color += h.base * skyRadiance * skyDiffuse * 0.86;
-    color += skyRadiance * skySpecular * mix(0.025, 0.44, reflective);
-
-    vec3 torchVector = currentTorchLightPosition() - h.position;
-    float torchDistance = length(torchVector);
-    vec3 torchDirection = torchVector / max(torchDistance, 0.001);
-    float torchAttenuation = controls.lantern /
-        (1.0 + torchDistance * torchDistance * 0.58);
-    float torchDiffuse = max(dot(normal, torchDirection), 0.0);
-    float torchSpecular = pow(max(dot(reflect(-torchDirection, normal), -incoming), 0.0),
-                              mix(34.0, 5.0, reflective));
-    vec3 torchColor = tunedLightColor(vec3(1.0, 0.28, 0.055), kLightTorch);
-    float flamePulse = 0.84 + 0.16 * sin(controls.time * 15.0);
-    color += h.base * torchColor * torchDiffuse * torchAttenuation * flamePulse * 2.65;
-    color += torchColor * torchSpecular * torchAttenuation * (0.12 + reflective * 1.04);
-
+    float localVisibility;
+    float skyVisibility;
+    float skyDiffuse;
+    vec3 localColor;
+    float localStrength;
+    vec3 color = shadeOpaqueDirect(h, incoming, false, localVisibility,
+                                   skyVisibility, skyDiffuse, localColor,
+                                   localStrength);
     float fog = 1.0 - exp(-h.t * h.t * 0.012 * controls.fogDensityScale);
-    color = mix(color, tunedLightColor(vec3(0.036, 0.046, 0.064), kLightSkylight), fog);
-    color += torchColor * 0.16 * clamp(controls.lantern, 0.0, 1.0) * exp(-h.t * 0.24);
+    vec3 fogColor = tunedLightColor(
+        mix(vec3(0.028, 0.034, 0.046), vec3(0.052, 0.064, 0.086),
+            skyVisibility * skyDiffuse * 0.55),
+        kLightSkylight);
+    color = mix(color, fogColor, fog);
+    color += localColor * 0.16 * clamp(localStrength, 0.0, 1.0) * exp(-h.t * 0.24);
     return color;
 }
+
+vec3 shadeOpaquePrimary(HitInfo h, vec3 rayDirection);
 
 vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
 {
@@ -928,7 +1022,8 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
     {
         HitInfo transmittedHit = traceScene(exitPoint + transmissionDirection * 0.004,
                                              transmissionDirection, 12.0, 0x23u, true);
-        transmitted = waterSecondarySample(transmittedHit, transmissionDirection);
+        transmittedHit.t += h.t + waterPathLength;
+        transmitted = shadeOpaqueSecondary(transmittedHit, transmissionDirection);
         transmitted *= exp(-vec3(0.060, 0.018, 0.008) * waterPathLength);
     }
     if (controls.waterQuality < 0.5)
@@ -942,22 +1037,51 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
     {
         HitInfo reflectedHit = traceScene(h.position + geometricNormal * 0.006,
                                           reflectionDirection, 12.0, 0x37u, false);
-        reflected = waterSecondarySample(reflectedHit, reflectionDirection);
+        reflectedHit.t += h.t;
+        reflected = shadeOpaqueSecondary(reflectedHit, reflectionDirection);
     }
 
     float viewCosine = clamp(dot(surfaceNormal, -rayDirection), 0.0, 1.0);
     float fresnel = transmissionAvailable
         ? 0.0204 + 0.9796 * pow(1.0 - viewCosine, 5.0) : 1.0;
-    vec3 toTorch = currentTorchLightPosition() - h.position;
-    float torchDistanceSquared = max(dot(toTorch, toTorch), 0.001);
-    vec3 torchHalf = normalize(toTorch * inversesqrt(torchDistanceSquared) - rayDirection);
-    float torchHighlight = pow(max(dot(surfaceNormal, torchHalf), 0.0), 72.0);
-    vec3 skyDirection = normalize(vec3(-5.50, 2.62, -15.20) - h.position);
+    vec3 localPosition;
+    vec3 localColor;
+    float localStrength;
+    activeLocalLight(localPosition, localColor, localStrength);
+    vec3 toLocal = localPosition - h.position;
+    float localDistanceSquared = max(dot(toLocal, toLocal), 0.001);
+    float localDistance = sqrt(localDistanceSquared);
+    vec3 localDirection = toLocal / localDistance;
+    vec3 localHalf = normalize(localDirection - rayDirection);
+    float localHighlight = pow(max(dot(surfaceNormal, localHalf), 0.0), 72.0);
+    // The six-millimetre catchment/runoff film is roughened by impact ripples
+    // and moving cobbles underneath it. Give only that horizontal water a broad
+    // view-dependent local-light lobe so Mobile's analytic reflection does not turn
+    // the pool and drain runnel black at approach angles. This remains an
+    // interface reflection, now shadowed by the same world/player geometry as
+    // every ordinary direct-light sample.
+    float runoffLocalHighlight = runoff
+        ? pow(max(dot(surfaceNormal, localHalf), 0.0), 14.0) : 0.0;
+    float localInterfaceVisibility = localStrength > 0.001
+        ? visibility(offsetRayOrigin(h, localDirection), localDirection,
+                     localDistance - 0.02) : 0.0;
+    int skySample = int((gl_LaunchIDEXT.x + gl_LaunchIDEXT.y) & 1u);
+    vec3 skyDirection;
+    float skyDistance;
+    vec3 skyRadiance;
+    float skyGain;
+    activeSkyLight(h.position, skySample, skyDirection, skyDistance,
+                   skyRadiance, skyGain);
+    float skyInterfaceVisibility = visibility(offsetRayOrigin(h, skyDirection),
+                                              skyDirection, skyDistance - 0.02)
+        * skyGain;
     float skyHighlight = pow(max(dot(surfaceNormal,
         normalize(skyDirection - rayDirection)), 0.0), 96.0);
-    vec3 interfaceLight = tunedLightColor(vec3(1.0, 0.28, 0.055), kLightTorch) * torchHighlight
-        * controls.lantern / (1.0 + torchDistanceSquared * 0.58) * 3.2;
-    interfaceLight += tunedLightColor(vec3(0.28, 0.44, 0.72), kLightSkylight) * skyHighlight * 0.10;
+    vec3 interfaceLight = localColor
+        * (localHighlight * 3.2 + runoffLocalHighlight * 1.15)
+        * localStrength * localInterfaceVisibility
+        / (1.0 + localDistanceSquared * 0.58);
+    interfaceLight += skyRadiance * skyHighlight * skyInterfaceVisibility * 0.10;
     if (runoff && h.position.x > -2.88)
     {
         float impactDistance = length(h.position.xz - vec2(-2.32, -15.26));
@@ -965,9 +1089,8 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
             impactDistance * 31.0 - controls.time * 6.2), 8.0)
             * (1.0 - smoothstep(0.07, 0.68, impactDistance));
         float impactCore = 1.0 - smoothstep(0.04, 0.22, impactDistance);
-        vec3 impactLight = mix(tunedLightColor(vec3(0.20, 0.31, 0.46), kLightSkylight),
-                               tunedLightColor(vec3(0.82, 0.42, 0.16), kLightTorch),
-                               clamp(controls.lantern * 0.38, 0.0, 0.52));
+        vec3 impactLight = skyRadiance * skyInterfaceVisibility * 0.44
+            + localColor * localStrength * localInterfaceVisibility * 0.24;
         interfaceLight += impactLight * (impactCrest * 0.12 + impactCore * 0.045);
     }
     float surfaceTurbulence = clamp(length(surfaceNormal - exitSurfaceNormal) * 5.0, 0.0, 1.0);
@@ -981,13 +1104,12 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
               - controls.time * 8.4) * 0.17, 0.0, 1.0);
     float entrainedAir = runoff ? 0.004
         : 0.010 + pow(breakup, 3.0) * 0.028 + surfaceTurbulence * 0.010;
-    vec3 scatteringRadiance = mix(tunedLightColor(vec3(0.22, 0.25, 0.28), kLightSkylight),
-                                  tunedLightColor(vec3(0.50, 0.32, 0.16), kLightTorch),
-                                  clamp(controls.lantern * 0.22, 0.0, 0.52));
+    vec3 scatteringRadiance = skyRadiance * skyInterfaceVisibility * 0.38
+        + localColor * localStrength * localInterfaceVisibility * 0.18;
     return mix(surfaceRadiance, scatteringRadiance, entrainedAir);
 }
 
-vec3 shadePrimary(HitInfo h, vec3 rayDirection)
+vec3 shadeOpaquePrimary(HitInfo h, vec3 rayDirection)
 {
     if (!h.hit)
     {
@@ -1006,139 +1128,17 @@ vec3 shadePrimary(HitInfo h, vec3 rayDirection)
         return h.base * h.emissive;
     }
 
-    bool isThinGlass = h.instance == 0 && h.material == kMaterialClearGlass;
-    if (isThinGlass)
-    {
-        // This showcase pane is intentionally modelled as thin transmission: the
-        // outgoing direction remains parallel, while an RT query supplies what is
-        // genuinely behind the glass. Schlick Fresnel adds a readable reflection
-        // without pretending this single surface is a thick dielectric volume.
-        HitInfo transmittedHit = traceScene(h.position + rayDirection * 0.012,
-                                            rayDirection, 10000.0, 0x23u, false);
-        vec3 transmitted = transmittedHit.hit ? bounceSample(transmittedHit, rayDirection, false) : skyColor(rayDirection);
-        vec3 tint = vec3(0.82, 0.94, 1.0);
-        float viewCosine = clamp(dot(h.geometricNormal, -rayDirection), 0.0, 1.0);
-        float fresnel = 0.04 + 0.96 * pow(1.0 - viewCosine, 5.0);
-        vec3 reflected = skyColor(reflect(rayDirection, h.geometricNormal));
-        float transmission = 0.88;
-        return mix(transmitted * tint * transmission, reflected, fresnel);
-    }
-
-    bool isThinWater = h.material == kMaterialWater;
-    if (isThinWater)
-    {
-        return shadeThinWater(h, rayDirection);
-    }
-
-    vec3 warm = tunedLightColor(vec3(1.0, 0.28, 0.055), kLightTorch);
-    vec3 cold = tunedLightColor(vec3(0.15, 0.20, 0.28), kLightSkylight);
     bool leanWorkload = controls.workloadPreset < 0.5;
     bool maxWorkload = controls.workloadPreset >= 1.5;
-    float flamePulse = 0.84 + 0.16 * sin(controls.time * 15.0);
-    vec3 cameraForward = normalize(vec3(sin(controls.yaw), -0.05 + controls.pitch, -cos(controls.yaw)));
-    vec3 cameraRight = normalize(cross(cameraForward, vec3(0.0, 1.0, 0.0)));
-    vec3 cameraUp = normalize(cross(cameraRight, cameraForward));
-    float movement = max(controls.walkAmount, 0.2);
-    float torchSway = sin(controls.time * 6.2) * 0.035 * movement;
-    float torchBob = abs(sin(controls.time * 6.2)) * 0.025 * movement;
-    vec3 torchGripPosition = vec3(controls.cameraX, 0.58, controls.cameraZ)
-        + cameraRight * (-0.34 - torchSway) + cameraUp * (-0.40 + torchBob) +
-          cameraForward * controls.heldPropDepth;
-    // One selected analytic light is active at a time. Before the chromatic
-    // passage it follows the held flame. In the four bays it snaps at authored
-    // five-metre boundaries to the corresponding physical wall flame.
-    vec3 localLightPosition = torchGripPosition + cameraUp * 0.28;
-    vec3 localLightColor = warm;
-    float localLightStrength = controls.lantern;
-    bool inTorchPassage = controls.cameraX <= -8.5 && controls.cameraX >= -28.5 &&
-                           controls.cameraZ >= -16.8 && controls.cameraZ <= -13.6;
-    if (inTorchPassage)
-    {
-        float bayX = controls.cameraX > -13.5 ? -11.0 :
-                     (controls.cameraX > -18.5 ? -16.0 :
-                     (controls.cameraX > -23.5 ? -21.0 : -26.0));
-        localLightPosition = vec3(bayX, 0.67, -13.98);
-        vec3 authoredPassageColor = bayX > -13.5 ? vec3(1.0, 0.42, 0.06) :
-                                      (bayX > -18.5 ? vec3(0.055, 0.22, 1.0) :
-                                      (bayX > -23.5 ? vec3(1.0, 0.045, 0.018) : vec3(0.16, 0.78, 0.22)));
-        localLightColor = tunedLightColor(authoredPassageColor, kLightPassage);
-        localLightStrength = 1.0;
-    }
-    if (controls.enemyKind > 0.5 && controls.staffLightStrength > 0.001)
-    {
-        localLightPosition = vec3(controls.staffX, controls.staffY, controls.staffZ);
-        localLightColor = tunedLightColor(vec3(0.58, 0.10, 1.0), kLightStaff);
-        localLightStrength = controls.staffLightStrength;
-    }
-    vec3 toTorch = localLightPosition - h.position;
-    float torchDistance = length(toTorch);
-    vec3 torchDirection = toTorch / max(torchDistance, 0.001);
-    const vec3 areaOffsets[2] = vec3[2](vec3(-0.075, 0.03, -0.045), vec3(0.070, 0.10, 0.060));
-    int areaIndex = int((gl_LaunchIDEXT.x + gl_LaunchIDEXT.y) & 1u);
-    vec3 sampleVector = localLightPosition + areaOffsets[areaIndex] - h.position;
-    float sampleDistance = length(sampleVector);
-    vec3 torchSampleDirection = sampleVector / max(sampleDistance, 0.001);
-    float torchVisibility = visibility(offsetRayOrigin(h, torchSampleDirection), torchSampleDirection, sampleDistance - 0.02);
-    if (maxWorkload)
-    {
-        vec3 otherSampleVector = localLightPosition + areaOffsets[1 - areaIndex] - h.position;
-        float otherSampleDistance = length(otherSampleVector);
-        vec3 otherSampleDirection = otherSampleVector / max(otherSampleDistance, 0.001);
-        float otherVisibility = visibility(offsetRayOrigin(h, otherSampleDirection),
-                                           otherSampleDirection, otherSampleDistance - 0.02);
-        torchVisibility = 0.5 * (torchVisibility + otherVisibility);
-    }
-    float torchDiffuse = max(dot(h.normal, torchDirection), 0.0);
     float reflective = max(h.metallic, h.reflectivity);
-    float torchSpec = pow(max(dot(reflect(-torchDirection, h.normal), -rayDirection), 0.0), mix(34.0, 5.0, reflective));
-    float torchAttenuation = 1.0 / (1.0 + torchDistance * torchDistance * 0.58);
-
-    bool inSkylightChamber = h.position.x >= -8.5 && h.position.x <= -2.5 &&
-                             h.position.z >= -18.0 && h.position.z <= -12.4;
-    bool inFinaleChamber = h.position.x >= -36.9 && h.position.x <= -30.5 &&
-                           h.position.z >= -18.4 && h.position.z <= -12.0;
-    bool finaleSkylightActive = inFinaleChamber && controls.finaleSkylightOpen > 0.001;
-    int skySample = int((gl_LaunchIDEXT.x + gl_LaunchIDEXT.y) & 1u);
-    vec3 skyTarget = finaleSkylightActive
-        ? (skySample == 0 ? vec3(-34.35, 2.76, -16.02) : vec3(-33.05, 2.76, -14.38))
-        : (skySample == 0 ? vec3(-6.15, 2.62, -16.05) : vec3(-4.85, 2.62, -14.35));
-    vec3 skyVector = skyTarget - h.position;
-    float skyDistance = length(skyVector);
-    bool usesPhysicalAperture = inSkylightChamber || finaleSkylightActive;
-    vec3 skyDirection = usesPhysicalAperture ? skyVector / max(skyDistance, 0.001) : kMoonDirection;
-    float moonVisibility = visibility(offsetRayOrigin(h, skyDirection), skyDirection,
-                                       usesPhysicalAperture ? skyDistance - 0.02 : 18.0);
-    if (maxWorkload)
-    {
-        vec3 otherSkyTarget = finaleSkylightActive
-            ? (skySample == 0 ? vec3(-33.05, 2.76, -14.38) : vec3(-34.35, 2.76, -16.02))
-            : (skySample == 0 ? vec3(-4.85, 2.62, -14.35) : vec3(-6.15, 2.62, -16.05));
-        vec3 otherSkyVector = otherSkyTarget - h.position;
-        float otherSkyDistance = length(otherSkyVector);
-        vec3 otherSkyDirection = usesPhysicalAperture
-            ? otherSkyVector / max(otherSkyDistance, 0.001) : kMoonDirection;
-        float otherSkyVisibility = visibility(offsetRayOrigin(h, otherSkyDirection), otherSkyDirection,
-                                              usesPhysicalAperture ? otherSkyDistance - 0.02 : 18.0);
-        moonVisibility = 0.5 * (moonVisibility + otherSkyVisibility);
-    }
-    float finaleLightGain = finaleSkylightActive
-        ? smoothstep(0.0, 0.88, controls.finaleSkylightOpen) : 1.0;
-    if (finaleSkylightActive)
-    {
-        moonVisibility *= finaleLightGain;
-    }
-    float moonDiffuse = max(dot(h.normal, skyDirection), 0.0);
-    vec3 moonHalf = normalize(skyDirection - rayDirection);
-    float moonSpecular = pow(max(dot(h.normal, moonHalf), 0.0), mix(12.0, 96.0, reflective));
-    float moonFresnel = pow(1.0 - max(dot(h.normal, -rayDirection), 0.0), 5.0);
-    vec3 finaleRadiance = tunedLightColor(
-        mix(vec3(0.38, 0.52, 0.76), vec3(1.12, 0.54, 0.23),
-            smoothstep(0.0, 1.0, controls.finaleDawnReveal)),
-        kLightSkylight);
-    vec3 moonRadiance = finaleSkylightActive ? finaleRadiance : tunedLightColor(
-        inSkylightChamber ? vec3(0.28, 0.44, 0.72) : vec3(0.26, 0.34, 0.48),
-        kLightSkylight);
-
+    float localVisibility;
+    float skyVisibility;
+    float skyDiffuse;
+    vec3 localLightColor;
+    float localLightStrength;
+    vec3 color = shadeOpaqueDirect(h, rayDirection, maxWorkload,
+                                   localVisibility, skyVisibility, skyDiffuse,
+                                   localLightColor, localLightStrength);
     // Keep the one RT bounce deterministic. The previous time-varying hemisphere sample was the main source of shimmer.
     vec3 bounce = vec3(0.0);
     if (!leanWorkload)
@@ -1154,12 +1154,6 @@ vec3 shadePrimary(HitInfo h, vec3 rayDirection)
         bounce = bounceSample(bounceHit, bounceDirection, wantsPlayerReflection);
     }
 
-    vec3 color = h.base * vec3(0.025, 0.028, 0.032);
-    color += h.base * localLightColor * torchDiffuse * torchAttenuation * torchVisibility * localLightStrength * flamePulse * 2.65;
-    color += localLightColor * torchSpec * torchAttenuation * torchVisibility * localLightStrength * (0.12 + reflective * 1.04);
-    color += h.base * cold * moonDiffuse * moonVisibility * 0.10;
-    color += h.base * moonRadiance * moonDiffuse * moonVisibility * 0.86;
-    color += moonRadiance * moonSpecular * moonVisibility * mix(0.025, 0.44, reflective) * (0.45 + 0.55 * moonFresnel);
     color += h.base * bounce * (0.10 + reflective * 0.16);
     float reflectionGain = h.instance == 0 && h.material == kMaterialMirror ? 0.82 : 0.32;
     color += bounce * reflective * reflectionGain;
@@ -1167,14 +1161,14 @@ vec3 shadePrimary(HitInfo h, vec3 rayDirection)
     if (h.instance == 0 && h.material == kMaterialWetCobble)
     {
         float puddle = puddleMask(h.position);
-        color += localLightColor * puddle * torchVisibility * localLightStrength * 0.28;
+        color += localLightColor * puddle * localVisibility * localLightStrength * 0.28;
         color += bounce * puddle * 0.46;
     }
 
     float fog = 1.0 - exp(-h.t * h.t * 0.012 * controls.fogDensityScale);
     vec3 fogColor = tunedLightColor(
         mix(vec3(0.028, 0.034, 0.046), vec3(0.052, 0.064, 0.086),
-            moonVisibility * moonDiffuse * 0.55),
+            skyVisibility * skyDiffuse * 0.55),
         kLightSkylight);
     color = mix(color, fogColor, fog);
     // This close-range haze belongs to the selected local emitter. Keeping the
@@ -1182,6 +1176,41 @@ vec3 shadePrimary(HitInfo h, vec3 rayDirection)
     // and also contaminated every authored bay colour.
     color += localLightColor * 0.16 * clamp(localLightStrength, 0.0, 1.0) * exp(-h.t * 0.24);
     return color;
+}
+
+vec3 shadePrimary(HitInfo h, vec3 rayDirection)
+{
+    if (!h.hit || h.emissive > 0.0)
+    {
+        return shadeOpaquePrimary(h, rayDirection);
+    }
+
+    bool isThinGlass = h.instance == 0 && h.material == kMaterialClearGlass;
+    if (isThinGlass)
+    {
+        // This showcase pane is intentionally modelled as thin transmission: the
+        // outgoing direction remains parallel, while an RT query supplies what is
+        // genuinely behind the glass. Schlick Fresnel adds a readable reflection
+        // without pretending this single surface is a thick dielectric volume.
+        HitInfo transmittedHit = traceScene(h.position + rayDirection * 0.012,
+                                            rayDirection, 10000.0, 0x23u, false);
+        vec3 transmitted = transmittedHit.hit
+            ? bounceSample(transmittedHit, rayDirection, false) : skyColor(rayDirection);
+        vec3 tint = vec3(0.82, 0.94, 1.0);
+        float viewCosine = clamp(dot(h.geometricNormal, -rayDirection), 0.0, 1.0);
+        float fresnel = 0.04 + 0.96 * pow(1.0 - viewCosine, 5.0);
+        vec3 reflected = skyColor(reflect(rayDirection, h.geometricNormal));
+        float transmission = 0.88;
+        return mix(transmitted * tint * transmission, reflected, fresnel);
+    }
+
+    bool isThinWater = h.material == kMaterialWater;
+    if (isThinWater)
+    {
+        return shadeThinWater(h, rayDirection);
+    }
+
+    return shadeOpaquePrimary(h, rayDirection);
 }
 
 float raySegmentGlow(vec3 rayOrigin, vec3 rayDirection, vec3 segmentStart, vec3 segmentEnd,

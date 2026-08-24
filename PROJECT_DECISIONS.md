@@ -89,6 +89,24 @@ The exact Windows ZIP and established-certificate Android APK are the published 
 
 The 0.1.1 through 0.1.5 lines are immutable and future Android updates require `versionCode > 6`. A shared `tools/release-version-policy.ps1` now owns this rule for unsigned packaging, signed packaging, and Butler upload so the three entrypoints cannot drift independently.
 
+## General RT water-lighting decision - 2026-08-24
+
+Water must consume the same active lights, material response, world/player visibility, and atmosphere as ordinary opaque geometry. Refracted and High-quality reflected opaque hits use the terminal direct-light path with no further bounce: the water interface already owns the bounded reflection, so evaluating the submerged receiver as another glossy primary double-counts reflection and fills real shadows. Interface highlights sample the same active local and sky lights with real visibility. Water-on-water secondary hits terminate without recursion.
+
+Do not restore fixed water-only torch/moon transport percentages, waterfall-coordinate light targets, or screen-position-dependent shadow-caster masks. Transparent filtering must force opaque BLAS triangles through candidate handling, secondary path distance must include the primary segment, and the directional moon must be occluded by real roof/player geometry. Those rules make the result portable across camera, light, water, and material placement. The bounded ray budget is an explicit engine-quality choice and must be measured on Android before release; never hide it by lowering RT quality or resolution. Preserve `vkCmdTraceRaysKHR`, `rayQueryEXT`, pipeline recursion depth one, High/Mobile/Off identities, strict ASTC, TLAS count, and gameplay authority. See `docs/WATER_TRANSMISSION_SHADOW_VALIDATION_2026-08-24.md`.
+
+The exact `SM-S948B` measurement completed on 2026-08-25. Two same-APK runs repeated approximately 27.8 ms at `lantern-drop` and 19.0 ms at `skylight`; the former is about 51% slower than the rejected fixed-transport candidate but remains in the descriptive 30-50 FPS band. The stable regression is accepted as the bounded cost of real transmitted-receiver and water-interface light visibility. Do not replace it with fixed transport, remove the required visibility, or lower RT quality/render scale merely to recover the older number.
+
+## Post-finale RT Lab overlay ownership decision - 2026-08-25
+
+An open RT Lab owns the menu scrim until the player explicitly selects Back. Android's recurring completed-finale poll must not call `showEndingOverlay()` while `rtLabVisible` is true; otherwise it removes the newly created lab views and immediately rebuilds the ending card. Windows applies the same ownership rule in `ShowEndingMenu()` so its per-frame finale poll cannot mutate overlay state behind an open lab. Closing the lab clears `rtLabVisible` first and may then deliberately restore the ending overlay. Keep this as an explicit host contract because Debug checkpoint automation does not exercise a genuine persisted finale unlock. The source fixes are Android-built and Windows-lab checked, but Android still requires an exact fixed-APK phone retest before device acceptance.
+
+## RT Lab waterfall-width and Windows control ownership decision - 2026-08-25
+
+`WATERFALL WIDTH` means the visible span across the terminal lane. The player approaches along world X, so the control scales world Z on dedicated waterfall TLAS instance 19; it must not scale the millimetre-thin world-X transmission depth. Raygen stream centres and Z radii use the same clamped scale so intersection geometry, normals, reflection, and refraction remain physically aligned. The catchment, runnel, drain, collision, and roof slot stay fixed.
+
+Windows owns vertical RT Lab scrolling at the top-level window. Focused child controls forward wheel input there, Page Up/Down and Home/End remain available, and the window carries a real vertical-scroll style. Trackbars are opaque native controls and are redrawn when returning from a hidden scrolled state; transparent sibling painting over the layered panel is prohibited because it copies stale Vulkan/label pixels and loses the track/thumb.
+
 ## Target devices
 
 - Primary target: Samsung Galaxy S26 Ultra.

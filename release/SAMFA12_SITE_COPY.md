@@ -1,11 +1,15 @@
-# Horde Lantern RT - Showcase Alpha 0.1.5
+# Horde Lantern RT - Showcase Alpha 1.5.2
 
-Public package version: `0.1.5-alpha.1`
+Public package version: `1.5.2`
 Canonical downloads: https://samfa12.itch.io/the-horde
 
 Horde Lantern RT is a short native Vulkan hardware-ray-tracing action showcase for compatible Android phones and Windows RT GPUs. Carry a lantern through a wet gothic ruin, fight two skeletons with timed sword contact and parries, then cross a clear roof-water curtain that extinguishes the flame. Follow the reflected runoff to its drain, move through four coloured-light studies, and defeat a staff-lit lich surrounded by cold ritual ground mist before dawn returns to the ruin.
 
-## Showcase Alpha 0.1.5
+## Showcase Alpha 1.5.2
+
+- Unlock the cross-platform RT Lab after defeating the lich, then tune the live waterfall span, finale roof and dawn, ritual fog, authored light groups, and bounded RT workload while the native ray-traced scene keeps rendering.
+- Water now uses the same active lights, material response, atmosphere, and real ray-traced world/player visibility as ordinary opaque surfaces through both refraction and High-quality reflection.
+- Improved RT Lab scrolling and controller/keyboard navigation on Windows, with reliable slider repaint after scrolling and reopening.
 
 - Real world-BLAS waterfall geometry: three broken roof streams, a rounded catchment, connected floor runoff, and a recessed barred drain.
 - Dynamic clear-water reflection and refraction using water IOR, Schlick Fresnel, Beer-Lambert absorption, animated flow normals, and bounded ray queries.
@@ -33,7 +37,7 @@ This project is RT or nothing. Unsupported devices receive a clear diagnostic re
 - Android: stable-key-signed APK. Packaging supports Android 7/API 24 and later, but hardware compatibility is deliberately much narrower. Samsung raw model code `SM-S948B` / Adreno 840 on Android 16 is the current certified target; 75% RT resolution with Mobile water is recommended.
 - Source and issue tracking: https://github.com/Samfa12-tech/The-Horde-RT-demo
 
-On the exact `SM-S948B` Debug candidate at the recommended 75% RT scale, median CPU-present-loop measurements were 12.541 ms at the waterfall drench, 11.363 ms in the no-torch skylight view, and 20.457 ms in the heaviest misted lich view. The same candidate completed the 13-waypoint replay, all 13 captures, and Home/resume with honest RT presentation. These are exact-device observations, not frame-rate promises for other phones.
+On the measured `SM-S948B` development candidate at the recommended 75% RT scale, repeated median CPU-present-loop measurements were approximately 27.8 ms at the waterfall drench, 19.0 ms in the no-torch skylight view, and 30.8 ms in the heaviest misted lich view. The increased waterfall cost is the bounded price of real transmitted-surface and interface-light visibility; RT quality and resolution were not reduced to conceal it. These are exact-device observations, not frame-rate promises for other phones.
 
 ## Controls
 

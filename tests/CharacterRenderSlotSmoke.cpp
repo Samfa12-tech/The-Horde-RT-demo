@@ -218,6 +218,16 @@ int main()
                       "RT light tuning upper bounds did not preserve the approved maximums");
     }
 
+    const WaterfallCurtainScale narrowCurtain = ResolveWaterfallCurtainScale(clampedLow);
+    const WaterfallCurtainScale wideCurtain = ResolveWaterfallCurtainScale(clampedHigh);
+    ok &= Require(Near(narrowCurtain.depth, 1.0f) &&
+                      Near(narrowCurtain.vertical, 1.0f) &&
+                      Near(narrowCurtain.crossLane, 0.25f) &&
+                      Near(wideCurtain.depth, 1.0f) &&
+                      Near(wideCurtain.vertical, 1.0f) &&
+                      Near(wideCurtain.crossLane, 2.0f),
+                  "waterfall width tuning must change the visible cross-lane span without changing depth");
+
     RtSceneTuning independentLights = authoredTuning;
     independentLights.lights[static_cast<std::size_t>(RtLightGroup::Torch)] = {45.0f, 0.75f};
     independentLights.lights[static_cast<std::size_t>(RtLightGroup::Staff)] = {-90.0f, 1.50f};
@@ -510,13 +520,14 @@ int main()
         ok &= Require(sceneSource.find("waterfallBlas_") != std::string::npos &&
                       sceneSource.find("instances[19].instanceCustomIndex = 19u;") != std::string::npos &&
                       sceneSource.find("instances[19].accelerationStructureReference = waterfallBlas_.address;") != std::string::npos &&
-                      sceneSource.find("const float waterfallWidthScale = ClampRtSceneTuning(frame.tuning).waterfallWidthScale;") != std::string::npos &&
-                      sceneSource.find("waterfallWidthScale, 0.0f, 0.0f, -2.32f") != std::string::npos,
+                      sceneSource.find("ResolveWaterfallCurtainScale(frame.tuning)") != std::string::npos &&
+                      sceneSource.find("0.0f, 0.0f, waterfallScale.crossLane, -15.26f") != std::string::npos,
                       "falling streams must use a dedicated local-space BLAS and a non-degenerate tuned TLAS transform");
         ok &= Require(raygenSource.find("const int kWaterfallInstance = 19;") != std::string::npos &&
                       raygenSource.find("candidateInstance == kWaterfallInstance") != std::string::npos &&
                       raygenSource.find("instance == kWaterfallInstance") != std::string::npos &&
-                      raygenSource.find("radiusX *= controls.waterfallWidthScale;") != std::string::npos &&
+                      raygenSource.find("radiusZ = 0.065 * widthScale;") != std::string::npos &&
+                      raygenSource.find("(-15.44 + 15.26) * widthScale") != std::string::npos &&
                       raygenSource.find("bool isThinWater = h.material == kMaterialWater;") != std::string::npos,
                       "dedicated waterfall hits must remain transparent water with width-matched shader profiles");
         ok &= Require(raygenSource.find("vec3 tunedLightColor(vec3 authoredColor, int group)") != std::string::npos &&
@@ -540,7 +551,7 @@ int main()
         ok &= Require(raygenSource.find("bool leanWorkload = controls.workloadPreset < 0.5;") != std::string::npos &&
                       raygenSource.find("bool maxWorkload = controls.workloadPreset >= 1.5;") != std::string::npos &&
                       raygenSource.find("if (!leanWorkload)") != std::string::npos &&
-                      raygenSource.find("if (maxWorkload)") != std::string::npos &&
+                      raygenSource.find("if (dualVisibility)") != std::string::npos &&
                       raygenSource.find("const float sampleCount = 2.0;") != std::string::npos &&
                       raygenSource.find("const float sampleCount = 6.0;") != std::string::npos &&
                       raygenSource.find("const float sampleCount = 8.0;") != std::string::npos &&
@@ -553,18 +564,117 @@ int main()
                       raygenSource.find("transmissionDirection, 12.0, 0x23u, true") != std::string::npos &&
                       raygenSource.find("reflectionDirection, 12.0, 0x37u, false") != std::string::npos,
                       "water quality must retain real ellipse refraction and bounded High/Mobile/Off query routes");
-        const std::size_t waterSecondaryBegin = raygenSource.find("vec3 waterSecondarySample");
-        const std::size_t waterSecondaryEnd = raygenSource.find("vec3 shadeThinWater", waterSecondaryBegin);
-        const std::string waterSecondary =
-            waterSecondaryBegin != std::string::npos && waterSecondaryEnd != std::string::npos
-                ? raygenSource.substr(waterSecondaryBegin, waterSecondaryEnd - waterSecondaryBegin)
+        ok &= Require(raygenSource.find("void activeLocalLight(") != std::string::npos &&
+                      raygenSource.find("void activeSkyLight(") != std::string::npos &&
+                      raygenSource.find("vec3 shadeOpaqueDirect(") != std::string::npos &&
+                      raygenSource.find("vec3 shadeOpaqueSecondary(") != std::string::npos,
+                      "opaque and water paths must share active local/sky light selection and direct RT shading");
+        ok &= Require(raygenSource.find(
+                          "direction = finaleActive ? toSky / max(distance, 0.001) : kMoonDirection;") !=
+                          std::string::npos &&
+                      raygenSource.find("bool physicalAperture = inSkylightChamber") == std::string::npos &&
+                      sceneSource.find("constexpr float waterSlotMinX = -2.90f;") != std::string::npos &&
+                      sceneSource.find("constexpr float waterSlotMinZ = -16.10f;") != std::string::npos,
+                      "ordinary moon lighting must traverse real roof geometry and reach the water-slot footprint");
+        ok &= Require(raygenSource.find("return visibilityMask(origin, direction, maxDistance, 0x35u);") !=
+                          std::string::npos &&
+                      raygenSource.find("gl_LaunchIDEXT.y * 100u") == std::string::npos,
+                      "direct RT visibility must include player/world shadow casters independent of screen position");
+        ok &= Require(raygenSource.find(
+                          "uint rayFlags = ignoreWater ? gl_RayFlagsNoOpaqueEXT : gl_RayFlagsOpaqueEXT;") !=
+                          std::string::npos &&
+                      raygenSource.find(
+                          "rayQueryInitializeEXT(query, topLevelAS, gl_RayFlagsNoOpaqueEXT, mask") !=
+                          std::string::npos,
+                      "water/glass filtering must force opaque BLAS triangles through candidate handling");
+        ok &= Require(raygenSource.find("vec3 waterTransmissionSample") == std::string::npos &&
+                      raygenSource.find("float waterMoonVisibility") == std::string::npos &&
+                      raygenSource.find("torchTransport") == std::string::npos &&
+                      raygenSource.find("skyTransport") == std::string::npos &&
+                      raygenSource.find("transmitted = shadeOpaqueSecondary(transmittedHit, transmissionDirection);") !=
+                          std::string::npos &&
+                      raygenSource.find("transmitted = shadeOpaquePrimary(transmittedHit, transmissionDirection);") ==
+                          std::string::npos,
+                      "refracted ground must share terminal opaque RT lighting without a second glossy bounce");
+        const std::size_t waterPrimaryBegin = raygenSource.find("vec3 shadeThinWater");
+        const std::size_t waterPrimaryEnd =
+            raygenSource.find("vec3 shadeOpaquePrimary(HitInfo h, vec3 rayDirection)\n{",
+                              waterPrimaryBegin);
+        const std::string waterPrimary =
+            waterPrimaryBegin != std::string::npos && waterPrimaryEnd != std::string::npos
+                ? raygenSource.substr(waterPrimaryBegin, waterPrimaryEnd - waterPrimaryBegin)
                 : std::string{};
-        ok &= Require(!waterSecondary.empty() &&
-                      waterSecondary.find("traceScene(") == std::string::npos &&
-                      waterSecondary.find("visibility(") == std::string::npos &&
-                      waterSecondary.find("rayQuery") == std::string::npos &&
-                      waterSecondary.find("shadePrimary(") == std::string::npos,
-                      "water secondary shading must remain query-free and non-recursive");
+        ok &= Require(!waterPrimary.empty() &&
+                      waterPrimary.find("float runoffLocalHighlight = runoff") != std::string::npos &&
+                      waterPrimary.find("pow(max(dot(surfaceNormal, localHalf), 0.0), 14.0)") !=
+                          std::string::npos &&
+                      waterPrimary.find("localHighlight * 3.2 + runoffLocalHighlight * 1.15") !=
+                          std::string::npos &&
+                      waterPrimary.find("float localInterfaceVisibility = localStrength > 0.001") !=
+                          std::string::npos &&
+                      waterPrimary.find("float skyInterfaceVisibility = visibility(") != std::string::npos &&
+                      waterPrimary.find("vec3(-5.50, 2.62, -15.20)") == std::string::npos &&
+                      waterPrimary.find("tunedLightColor(vec3(1.0, 0.28, 0.055), kLightTorch)") ==
+                          std::string::npos,
+                      "water interface lighting must retain the broad runoff lobe while using real shared lights and visibility");
+        ok &= Require(raygenSource.find("vec3 waterSecondarySample") == std::string::npos &&
+                      waterPrimary.find("reflected = shadeOpaqueSecondary(reflectedHit, reflectionDirection);") !=
+                          std::string::npos,
+                      "reflected water must use bounded shared opaque direct lighting without the waterfall-only secondary shader");
+        ok &= Require(waterPrimary.find("transmittedHit.t += h.t + waterPathLength;") !=
+                          std::string::npos &&
+                      waterPrimary.find("reflectedHit.t += h.t;") != std::string::npos,
+                      "secondary water hits must preserve accumulated camera-path distance for fog and distance lighting");
+        const std::size_t opaqueSecondaryBegin = raygenSource.find("vec3 shadeOpaqueSecondary(");
+        const std::size_t opaqueSecondaryEnd =
+            raygenSource.find("vec3 shadeThinWater", opaqueSecondaryBegin);
+        const std::string opaqueSecondary =
+            opaqueSecondaryBegin != std::string::npos && opaqueSecondaryEnd != std::string::npos
+                ? raygenSource.substr(opaqueSecondaryBegin,
+                                      opaqueSecondaryEnd - opaqueSecondaryBegin)
+                : std::string{};
+        ok &= Require(!opaqueSecondary.empty() &&
+                      opaqueSecondary.find("traceScene(") == std::string::npos &&
+                      opaqueSecondary.find("shadePrimary(") == std::string::npos &&
+                      opaqueSecondary.find("shadeOpaqueDirect(") != std::string::npos &&
+                      opaqueSecondary.find("h.material == kMaterialWater") != std::string::npos,
+                      "reflected secondary shading may cast bounded direct visibility rays but must not recurse or trace another bounce");
+        const std::size_t opaquePrimaryBegin = waterPrimaryEnd;
+        const std::size_t opaquePrimaryEnd =
+            raygenSource.find("vec3 shadePrimary(HitInfo h, vec3 rayDirection)",
+                              opaquePrimaryBegin);
+        const std::string opaquePrimary =
+            opaquePrimaryBegin != std::string::npos && opaquePrimaryEnd != std::string::npos
+                ? raygenSource.substr(opaquePrimaryBegin,
+                                      opaquePrimaryEnd - opaquePrimaryBegin)
+                : std::string{};
+        const std::string primaryDispatch =
+            opaquePrimaryEnd != std::string::npos
+                ? raygenSource.substr(opaquePrimaryEnd,
+                                      raygenSource.find("float raySegmentGlow", opaquePrimaryEnd) -
+                                          opaquePrimaryEnd)
+                : std::string{};
+        const std::size_t opaqueDirectBegin = raygenSource.find("vec3 shadeOpaqueDirect(");
+        const std::size_t opaqueDirectEnd =
+            raygenSource.find("vec3 shadeOpaqueSecondary(", opaqueDirectBegin);
+        const std::string opaqueDirect =
+            opaqueDirectBegin != std::string::npos && opaqueDirectEnd != std::string::npos
+                ? raygenSource.substr(opaqueDirectBegin, opaqueDirectEnd - opaqueDirectBegin)
+                : std::string{};
+        ok &= Require(!opaqueDirect.empty() &&
+                      opaqueDirect.find("localVisibility = localStrength > 0.001") !=
+                          std::string::npos &&
+                      opaqueDirect.find("skyVisibility = visibility(") != std::string::npos &&
+                      !opaquePrimary.empty() &&
+                      opaquePrimary.find("shadeOpaqueDirect(h, rayDirection, maxWorkload") !=
+                          std::string::npos &&
+                      opaquePrimary.find("HitInfo bounceHit = traceScene(") != std::string::npos &&
+                      !primaryDispatch.empty() &&
+                      primaryDispatch.find("return shadeThinWater(h, rayDirection);") !=
+                          std::string::npos &&
+                      primaryDispatch.find("return shadeOpaquePrimary(h, rayDirection);") !=
+                          std::string::npos,
+                      "primary and refracted opaque hits must share real direct visibility and bounded bounce shading");
         ok &= Require(raygenSource.find("rayBoxInterval(rayOrigin, rayDirection") != std::string::npos &&
                       raygenSource.find("const float sampleCount = 6.0") != std::string::npos &&
                       raygenSource.find("color = color * lichMist.a + lichMist.rgb") != std::string::npos &&
@@ -602,6 +712,18 @@ int main()
                       androidSource.find("private void showRtLab()") != std::string::npos &&
                       androidSource.find("ProbeBridge.setSimulationPaused(true)") != std::string::npos,
                       "Android RT Lab must preserve progress through settings reset and expose a live paused 48dp panel");
+        const std::size_t androidShowEndingBegin =
+            androidSource.find("private void showEndingOverlay()");
+        const std::size_t androidShowEndingEnd =
+            androidSource.find("private boolean persistRtLabUnlockIfEligible()", androidShowEndingBegin);
+        const std::string androidShowEnding =
+            androidShowEndingBegin != std::string::npos && androidShowEndingEnd != std::string::npos
+                ? androidSource.substr(androidShowEndingBegin,
+                                       androidShowEndingEnd - androidShowEndingBegin)
+                : std::string{};
+        ok &= Require(!androidShowEnding.empty() &&
+                      androidShowEnding.find("rtLabVisible") != std::string::npos,
+                      "Android finale polling must not replace an open RT Lab with the ending overlay");
         const std::size_t androidOpenRtLabBegin = androidSource.find("private void openRtLab(");
         const std::size_t androidOpenRtLabEnd = androidSource.find("private void showRtLab(", androidOpenRtLabBegin);
         const std::size_t androidCloseRtLabBegin = androidSource.find("private void closeRtLab(");

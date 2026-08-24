@@ -28,6 +28,8 @@ using horde::platform::windows::RtLabControlRange;
 using horde::platform::windows::RtLabUnlockContext;
 using horde::platform::windows::CanPersistRtLabUnlock;
 using horde::platform::windows::StepRtLabControl;
+using horde::platform::windows::StepRtLabScroll;
+using horde::platform::windows::RtLabScrollAction;
 using horde::platform::windows::WrapRtLabFocus;
 using horde::platform::windows::ShouldPlayControllerMenuSound;
 
@@ -96,6 +98,14 @@ int main()
             "roof/dawn and fog/light controls must use their truthful bounds");
     Require(WrapRtLabFocus(0u, -1, 4u) == 3u && WrapRtLabFocus(3u, 1, 4u) == 0u,
             "keyboard/controller focus must wrap in both directions");
+    Require(StepRtLabScroll(120, 600, 36, 240, RtLabScrollAction::LineDown) == 156 &&
+            StepRtLabScroll(120, 600, 36, 240, RtLabScrollAction::LineUp) == 84 &&
+            StepRtLabScroll(120, 600, 36, 240, RtLabScrollAction::PageDown) == 360 &&
+            StepRtLabScroll(120, 600, 36, 240, RtLabScrollAction::PageUp) == 0 &&
+            StepRtLabScroll(120, 600, 36, 240, RtLabScrollAction::Top) == 0 &&
+            StepRtLabScroll(120, 600, 36, 240, RtLabScrollAction::Bottom) == 600 &&
+            StepRtLabScroll(120, 600, 36, 240, RtLabScrollAction::Thumb, 345) == 345,
+            "RT Lab line, page, thumb, and boundary scrolling must remain reachable and clamped");
     Require(ShouldPlayControllerMenuSound(false) && !ShouldPlayControllerMenuSound(true),
             "ordinary menu navigation may retain feedback while every RT Lab interaction stays silent");
 
@@ -249,6 +259,12 @@ int main()
             windowsSource.find("RESTORE AUTHORED") != std::string::npos &&
             windowsSource.find("lastRtLabTelemetryTick < 250u") != std::string::npos,
             "Windows RT Lab must expose completion actions, authored reset, and four-Hz live telemetry");
+    const std::size_t endingMenuBegin = windowsSource.find("void ShowEndingMenu(");
+    const std::size_t endingMenuEnd = windowsSource.find("bool ApplyPlayerRetryCheckpoint(", endingMenuBegin);
+    Require(endingMenuBegin != std::string::npos && endingMenuEnd != std::string::npos &&
+            windowsSource.substr(endingMenuBegin, endingMenuEnd - endingMenuBegin)
+                    .find("context.rtLabVisible") != std::string::npos,
+            "Windows finale polling must not replace or mutate an open RT Lab");
     Require(windowsSource.find("WrapRtLabFocus(index, direction, controls.size())") != std::string::npos &&
             windowsSource.find("ShouldPlayControllerMenuSound(context.rtLabVisible)") != std::string::npos,
             "production RT Lab focus and silent navigation must use the behavior-tested seams");

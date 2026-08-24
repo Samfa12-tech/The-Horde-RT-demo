@@ -761,7 +761,7 @@ public class MainActivity extends Activity {
 
     private void showEndingOverlay() {
         if (endingOverlayVisible || endingOverlayDismissed || deathOverlayVisible ||
-                benchmarkRunning || debugCaptureUiSuppressed) return;
+                rtLabVisible || benchmarkRunning || debugCaptureUiSuppressed) return;
         endingOverlayVisible = true;
         menuVisible = true;
         ProbeBridge.setSimulationPaused(true);
