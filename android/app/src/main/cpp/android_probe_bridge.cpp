@@ -567,6 +567,7 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
     const horde::gameplay::EnemyRosterSnapshot& roster = simulation.enemyRoster;
     const horde::gameplay::ShowcaseReplaySnapshot& replay = context.routeReplay.Snapshot();
     const horde::gameplay::PlayerVitalsSnapshot& playerVitals = simulation.playerVitals;
+    const horde::vulkan::raytracing::RtSceneTuning rtLab = gRtLabState.Snapshot();
     const bool playerDamageEnabled =
         playerVitals.phase == horde::gameplay::PlayerLifePhase::Alive &&
         !simulation.paused &&
@@ -588,6 +589,14 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
          << ", \"damageEnabled\": " << (playerDamageEnabled ? "true" : "false") << "},\n"
          << "  \"zone\": \"" << horde::gameplay::ShowcaseZoneName(zone) << "\",\n"
          << "  \"renderScale\": " << context.renderScale << ",\n"
+         << "  \"waterQuality\": " << gRequestedWaterQuality.load(std::memory_order_acquire) << ",\n"
+         << "  \"rtLab\": {\"waterfallWidthScale\": " << rtLab.waterfallWidthScale
+         << ", \"roofOverrideEnabled\": " << (rtLab.finaleRoofOpenOverride.has_value() ? "true" : "false")
+         << ", \"roofOpen\": " << rtLab.finaleRoofOpenOverride.value_or(-1.0f)
+         << ", \"dawnOverrideEnabled\": " << (rtLab.finaleDawnRevealOverride.has_value() ? "true" : "false")
+         << ", \"dawnReveal\": " << rtLab.finaleDawnRevealOverride.value_or(-1.0f)
+         << ", \"fogDensityScale\": " << rtLab.fogDensityScale
+         << ", \"workloadPreset\": " << static_cast<std::int32_t>(rtLab.workloadPreset) << "},\n"
          << "  \"internalExtent\": {\"width\": " << context.capabilities.performance.internalRenderWidth
          << ", \"height\": " << context.capabilities.performance.internalRenderHeight << "},\n"
          << "  \"presented\": " << (context.capabilities.rtScene.presented ? "true" : "false") << ",\n"

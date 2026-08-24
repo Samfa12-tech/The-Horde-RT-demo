@@ -446,6 +446,8 @@ int main()
             ReadTextFile(root / "android/app/src/main/cpp/android_probe_bridge.cpp");
         const std::string androidJavaBridgeSource = ReadTextFile(
             root / "android/app/src/main/java/com/samfa12/hordelanternrt/ProbeBridge.java");
+        const std::string androidValidationSource =
+            ReadTextFile(root / "tools/run-android-showcase-validation.ps1");
         ok &= Require(raygenSource.find(
                           "layout(std430, set = 0, binding = 10) readonly buffer SecondSkeletonVertices") !=
                           std::string::npos,
@@ -602,6 +604,19 @@ int main()
                       androidJavaBridgeSource.find("getCurrentRenderScalePercent") != std::string::npos &&
                       androidJavaBridgeSource.find("getCurrentWaterQuality") != std::string::npos,
                       "ProbeBridge does not expose the typed RT Lab tuning and telemetry API");
+        ok &= Require(androidValidationSource.find("[switch]$RtLabWorkloadComparison") != std::string::npos &&
+                      androidValidationSource.find("@('lantern-drop', 'skylight', 'finale-roof')") !=
+                          std::string::npos &&
+                      androidValidationSource.find("horde.debug.rt_workload") != std::string::npos &&
+                      androidValidationSource.find("@{ name = 'lean'; workload = 0 }") !=
+                          std::string::npos &&
+                      androidValidationSource.find("rt_lab_profile") != std::string::npos &&
+                      androidValidationSource.find(
+                          "if ($RtWorkload -ge 0) { Invoke-AdbText @(\"logcat\", \"-c\")") !=
+                          std::string::npos &&
+                      androidBridgeSource.find("\\\"waterQuality\\\":") != std::string::npos &&
+                      androidBridgeSource.find("\\\"rtLab\\\":") != std::string::npos,
+                      "Android validation must retain matched Authored/Max RT Lab evidence with explicit renderer state");
 
         CharacterRenderSlot slot;
         std::string diagnostic;

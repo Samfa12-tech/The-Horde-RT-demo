@@ -8,6 +8,7 @@ param(
     [string]$GpuTiming = "Enabled",
     [switch]$Include100,
     [switch]$Capture,
+    [switch]$RtLabWorkloadComparison,
     [switch]$SkipBuild,
     [switch]$SkipInstall,
     [ValidateRange(30, 300)]
@@ -51,6 +52,7 @@ $checkpointZones = @{
 }
 $baselineCheckpoints = @("opening", "two-enemy-combat", "worst-bend", "skylight", "green", "lich")
 $captureCheckpoints = @("opening", "skeleton", "worst-bend", "lantern-drop", "skylight", "yellow", "blue", "red", "green", "mirror", "lich", "finale-roof", "two-enemy-combat")
+$rtLabComparisonCheckpoints = @('lantern-drop', 'skylight', 'finale-roof')
 $timingRows = [System.Collections.Generic.List[object]]::new()
 $captureRecords = [System.Collections.Generic.List[object]]::new()
 $failures = [System.Collections.Generic.List[string]]::new()
@@ -174,12 +176,17 @@ function Save-Screenshot {
 }
 
 function Send-AutomationIntent {
-    param([string]$Checkpoint, [int]$RequestedScale, [switch]$Replay, [switch]$CaptureOnly)
+    param([string]$Checkpoint, [int]$RequestedScale, [switch]$Replay, [switch]$CaptureOnly,
+          [int]$RtWorkload = -1)
     $arguments = @("shell", "am", "start", "--activity-single-top", "-n", $activityName,
                    "--ei", "horde.debug.scale", "$RequestedScale",
                    "--ez", "horde.debug.autostart", "true",
                    "--ez", "horde.debug.overlay", "false",
                    "--ez", "horde.debug.gpu_timing", $gpuTimingArgument)
+    if ($RtWorkload -ge 0) {
+        $arguments += @("--ez", "horde.debug.rt_lab", "true",
+                        "--ei", "horde.debug.rt_workload", "$RtWorkload")
+    }
     if ($Replay) {
         $arguments += @("--ez", "horde.debug.replay", "true")
     } else {
@@ -264,12 +271,14 @@ function Start-AutomationSession {
 }
 
 function Invoke-CheckpointBenchmark {
-    param([string]$Checkpoint, [int]$RequestedScale, [bool]$StandardRouteSample)
+    param([string]$Checkpoint, [int]$RequestedScale, [bool]$StandardRouteSample,
+          [string]$RtLabProfile = "authored-standard", [int]$RtWorkload = -1)
     if (-not $checkpointZones.ContainsKey($Checkpoint)) {
         throw "Unknown checkpoint '$Checkpoint'."
     }
-    Write-Host "Benchmarking $Checkpoint at $RequestedScale% with GPU timing $gpuTimingLabel..."
-    Send-AutomationIntent -Checkpoint $Checkpoint -RequestedScale $RequestedScale
+    Write-Host "Benchmarking $Checkpoint at $RequestedScale% with GPU timing $gpuTimingLabel ($RtLabProfile)..."
+    if ($RtWorkload -ge 0) { Invoke-AdbText @("logcat", "-c") | Out-Null }
+    Send-AutomationIntent -Checkpoint $Checkpoint -RequestedScale $RequestedScale -RtWorkload $RtWorkload
     $escapedName = [regex]::Escape($Checkpoint)
     $log = Wait-ForLogPattern -Pattern "HORDE_BENCH complete generation=\d+ checkpoint=$escapedName scale=$RequestedScale windows=3" -Description "$Checkpoint benchmark completion"
     $beginMatches = [regex]::Matches($log, "HORDE_BENCH begin generation=(\d+) checkpoint=$escapedName scale=$RequestedScale")
@@ -290,6 +299,7 @@ function Invoke-CheckpointBenchmark {
     $performanceBand = Get-PerformanceBand -MedianMs $median
     $row = [PSCustomObject]@{
         scale = $RequestedScale
+        rt_lab_profile = $RtLabProfile
         checkpoint = $Checkpoint
         expected_zone = $checkpointZones[$Checkpoint]
         actual_zone = $actualZone
@@ -326,12 +336,20 @@ function Invoke-CheckpointBenchmark {
         $warnings.Add($message)
         Write-Warning $message
     }
-    $state = Get-ShowcaseState -Destination (Join-Path $outputDirectory "$Checkpoint-$RequestedScale-state.json")
+    $stateName = $(if ($RtLabProfile -eq "authored-standard") {
+        "$Checkpoint-$RequestedScale-state.json"
+    } else {
+        "$RtLabProfile-$Checkpoint-$RequestedScale-state.json"
+    })
+    $state = Get-ShowcaseState -Destination (Join-Path $outputDirectory $stateName)
     if ($state.status -ne "complete") { $failures.Add("$Checkpoint native state status was '$($state.status)'.") }
     if ($state.checkpoint -ne $Checkpoint) { $failures.Add("$Checkpoint native state identified '$($state.checkpoint)'.") }
     if ($state.zone -ne $checkpointZones[$Checkpoint]) { $failures.Add("$Checkpoint native state reported zone '$($state.zone)'.") }
     if (-not $state.presented) { $failures.Add("$Checkpoint native state did not retain honest RT presentation.") }
     if ($state.gpuTimingMode -ne $gpuTimingLabel) { $failures.Add("$Checkpoint native state reported GPU timing '$($state.gpuTimingMode)' instead of '$gpuTimingLabel'.") }
+    if ($RtWorkload -ge 0 -and [int]$state.rtLab.workloadPreset -ne $RtWorkload) {
+        $failures.Add("$Checkpoint $RtLabProfile state reported workload $($state.rtLab.workloadPreset) instead of $RtWorkload.")
+    }
     if ($Checkpoint -eq "two-enemy-combat") {
         if ([int]$state.activeEnemyEntities -ne 2) { $failures.Add("Two-enemy checkpoint reported $($state.activeEnemyEntities) active enemy entities instead of 2.") }
         if ([int]$state.skeletonPoseBuckets -lt 1 -or [int]$state.skeletonPoseBuckets -gt 2) {
@@ -447,6 +465,23 @@ try {
         $captureManifest | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath (Join-Path $outputDirectory "capture-manifest.json") -Encoding utf8
     }
 
+    if ($RtLabWorkloadComparison) {
+        $comparisonOrder = @(
+            @{ checkpoint = 'lantern-drop'; profiles = @(@{ name = 'authored'; workload = 1 }, @{ name = 'max'; workload = 2 }, @{ name = 'lean'; workload = 0 }) },
+            @{ checkpoint = 'skylight'; profiles = @(@{ name = 'max'; workload = 2 }, @{ name = 'lean'; workload = 0 }, @{ name = 'authored'; workload = 1 }) },
+            @{ checkpoint = 'finale-roof'; profiles = @(@{ name = 'lean'; workload = 0 }, @{ name = 'authored'; workload = 1 }, @{ name = 'max'; workload = 2 }) }
+        )
+        foreach ($pair in $comparisonOrder) {
+            if ($rtLabComparisonCheckpoints -notcontains $pair.checkpoint) {
+                throw "Unknown RT Lab comparison checkpoint '$($pair.checkpoint)'."
+            }
+            foreach ($profile in $pair.profiles) {
+                Invoke-CheckpointBenchmark -Checkpoint $pair.checkpoint -RequestedScale $Scale `
+                    -StandardRouteSample:$false -RtLabProfile $profile.name -RtWorkload $profile.workload
+            }
+        }
+    }
+
     $finalLog = Get-ScopedLogcat
     $finalLog | Set-Content -LiteralPath (Join-Path $outputDirectory "logcat.txt") -Encoding utf8
     $crashPattern = "FATAL EXCEPTION|Fatal signal|renderer initialisation failed|Diagnostic surface render loop ended unexpectedly|Failed to apply requested RT render scale"
@@ -466,6 +501,8 @@ try {
         mode = $Mode
         scale = $Scale
         include100 = [bool]$Include100
+        rtLabWorkloadComparison = [bool]$RtLabWorkloadComparison
+        rtLabComparisonCheckpoints = $(if ($RtLabWorkloadComparison) { $rtLabComparisonCheckpoints } else { @() })
         checkpoints = $Checkpoints
         gpuTiming = $gpuTimingLabel
         deviceSerial = $serial
@@ -503,7 +540,7 @@ try {
     }
     $metadata | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $outputDirectory "summary.json") -Encoding utf8
     $timingSummary = @($timingRows | ForEach-Object {
-        "- $($_.scale)% $($_.checkpoint): $($_.median_of_window_avgs_ms) ms, $($_.budget_classification)"
+        "- $($_.scale)% $($_.checkpoint) [$($_.rt_lab_profile)]: $($_.median_of_window_avgs_ms) ms, $($_.budget_classification)"
     }) -join "`n"
     @(
         "# Android showcase automation run $runId"
