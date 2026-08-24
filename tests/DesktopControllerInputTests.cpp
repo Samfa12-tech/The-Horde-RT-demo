@@ -1,4 +1,5 @@
 #include "platform/windows/DesktopControllerInput.h"
+#include "platform/windows/WindowsRtLabState.h"
 
 #include <cstdlib>
 #include <filesystem>
@@ -23,6 +24,11 @@ using horde::platform::windows::ApplyControllerLook;
 using horde::platform::windows::StepControllerSlider;
 using horde::platform::windows::UpdateXInputTriggerEdges;
 using horde::platform::windows::SelectLegacyRightStickAxes;
+using horde::platform::windows::RtLabControlRange;
+using horde::platform::windows::RtLabUnlockContext;
+using horde::platform::windows::CanPersistRtLabUnlock;
+using horde::platform::windows::StepRtLabControl;
+using horde::platform::windows::WrapRtLabFocus;
 
 void Require(const bool condition, const std::string_view message)
 {
@@ -66,6 +72,30 @@ std::string ReadWindowsSource()
 
 int main()
 {
+    Require(CanPersistRtLabUnlock({.finaleComplete = true}),
+            "a genuine live finale completion must persist the RT Lab unlock");
+    Require(!CanPersistRtLabUnlock({.finaleComplete = false}) &&
+            !CanPersistRtLabUnlock({.finaleComplete = true, .capture = true}) &&
+            !CanPersistRtLabUnlock({.finaleComplete = true, .checkpoint = true}) &&
+            !CanPersistRtLabUnlock({.finaleComplete = true, .replay = true}) &&
+            !CanPersistRtLabUnlock({.finaleComplete = true, .benchmark = true}) &&
+            !CanPersistRtLabUnlock({.finaleComplete = true, .debugInjection = true}),
+            "capture, checkpoint, replay, benchmark, and debug routes must never persist progress");
+
+    Require(StepRtLabControl(100, true, RtLabControlRange::WaterfallPercent) == 105 &&
+            StepRtLabControl(25, false, RtLabControlRange::WaterfallPercent) == 25 &&
+            StepRtLabControl(200, true, RtLabControlRange::WaterfallPercent) == 200,
+            "waterfall stepping must use five-point increments inside 25-200 percent");
+    Require(StepRtLabControl(0, true, RtLabControlRange::HueDegrees) == 5 &&
+            StepRtLabControl(-180, false, RtLabControlRange::HueDegrees) == -180 &&
+            StepRtLabControl(180, true, RtLabControlRange::HueDegrees) == 180,
+            "hue stepping must clamp to minus/plus 180 degrees");
+    Require(StepRtLabControl(0, true, RtLabControlRange::UnitPercent) == 5 &&
+            StepRtLabControl(200, true, RtLabControlRange::DoublePercent) == 200,
+            "roof/dawn and fog/light controls must use their truthful bounds");
+    Require(WrapRtLabFocus(0u, -1, 4u) == 3u && WrapRtLabFocus(3u, 1, 4u) == 0u,
+            "keyboard/controller focus must wrap in both directions");
+
     constexpr LegacyControllerIdentity capturedBackbone{
         .vendorId = 0x358au,
         .productId = 0x0204u,
@@ -203,6 +233,19 @@ int main()
             windowsSource.find("WM_SETFOCUS") != std::string::npos &&
             windowsSource.find("FrameRect") != std::string::npos,
             "controller-selectable menu controls must draw a persistent focus outline");
+    Require(windowsSource.find("GetPrivateProfileIntA(\"progress\", \"rtLabUnlocked\"") != std::string::npos &&
+            windowsSource.find("WritePrivateProfileStringA(\"progress\", \"rtLabUnlocked\"") != std::string::npos &&
+            windowsSource.find("CanPersistRtLabUnlock(decision)") != std::string::npos,
+            "Windows RT Lab progress must use its independent INI section and the genuine-finale decision");
+    Require(windowsSource.find("simulation, ctx.outputExposure, ctx.waterQuality, ctx.rtSceneTuning") != std::string::npos &&
+            windowsSource.find("context.rtSceneTuning = {};") != std::string::npos &&
+            windowsSource.find("context.simulationPaused = pauseVisible || context.settingsVisible || context.rtLabVisible") != std::string::npos,
+            "Windows RT Lab must pass route-local tuning to the renderer while pausing only simulation");
+    Require(windowsSource.find("RT LAB UNLOCKED") != std::string::npos &&
+            windowsSource.find("OPEN RT LAB") != std::string::npos &&
+            windowsSource.find("RESTORE AUTHORED") != std::string::npos &&
+            windowsSource.find("lastRtLabTelemetryTick < 250u") != std::string::npos,
+            "Windows RT Lab must expose completion actions, authored reset, and four-Hz live telemetry");
 
     ControllerTriggerLatch triggerLatch{};
     const ControllerActionEdges firstTriggers = UpdateXInputTriggerEdges(0u, 255u, triggerLatch);

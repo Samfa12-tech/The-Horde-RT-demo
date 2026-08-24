@@ -5,6 +5,7 @@
 #include <chrono>
 #include <cmath>
 #include <cstdint>
+#include <cstdlib>
 #include <cstring>
 #include <ctime>
 #include <filesystem>
@@ -18,6 +19,7 @@
 #include <sstream>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #ifndef WIN32_LEAN_AND_MEAN
@@ -52,6 +54,7 @@
 #include "gameplay/SwordCombat.h"
 #include "gameplay/simulation/GameSimulation.h"
 #include "platform/windows/DesktopControllerInput.h"
+#include "platform/windows/WindowsRtLabState.h"
 #include "vulkan/GpuFrameTimer.h"
 #include "vulkan/RtCapabilityReport.h"
 #include "vulkan/VulkanContext.h"
@@ -109,6 +112,26 @@ constexpr int kBenchmarkBackButtonId = 123;
 constexpr int kVitalityHudControlId = 124;
 constexpr int kEndingBodyId = 125;
 constexpr int kWaterQualityButtonId = 126;
+constexpr int kRtLabButtonId = 127;
+constexpr int kRtLabPanelId = 128;
+constexpr int kRtLabTitleId = 129;
+constexpr int kRtLabTelemetryId = 130;
+constexpr int kRtLabWaterfallLabelId = 131;
+constexpr int kRtLabWaterfallSliderId = 132;
+constexpr int kRtLabRoofLabelId = 133;
+constexpr int kRtLabRoofSliderId = 134;
+constexpr int kRtLabDawnLabelId = 135;
+constexpr int kRtLabDawnSliderId = 136;
+constexpr int kRtLabFogLabelId = 137;
+constexpr int kRtLabFogSliderId = 138;
+constexpr int kRtLabLightGroupButtonId = 139;
+constexpr int kRtLabHueLabelId = 140;
+constexpr int kRtLabHueSliderId = 141;
+constexpr int kRtLabIntensityLabelId = 142;
+constexpr int kRtLabIntensitySliderId = 143;
+constexpr int kRtLabWorkloadButtonId = 144;
+constexpr int kRtLabRestoreButtonId = 145;
+constexpr int kRtLabBackButtonId = 146;
 constexpr int kMenuPauseId = 2001;
 constexpr int kMenuRestartId = 2002;
 constexpr int kMenuExitId = 2003;
@@ -137,6 +160,16 @@ struct CaptureLaunchOptions
     std::filesystem::path outputDirectory;
     std::string error;
 };
+
+#if defined(_DEBUG)
+struct RtLabDebugLaunchOptions
+{
+    bool requested = false;
+    horde::vulkan::raytracing::RtSceneTuning tuning{};
+    horde::vulkan::raytracing::RtLightGroup lightGroup =
+        horde::vulkan::raytracing::RtLightGroup::Torch;
+};
+#endif
 
 struct ShowcaseCaptureRecord
 {
@@ -192,6 +225,17 @@ struct VulkanSurfaceContext
     bool settingsVisible = false;
     bool diagnosticsVisible = false;
     bool benchmarkReportVisible = false;
+    bool rtLabVisible = false;
+    bool rtLabUnlocked = false;
+    bool rtLabJustUnlocked = false;
+    bool rtLabOpenedFromEnding = false;
+    bool rtLabRouteTainted = false;
+    bool rtLabDebugInjection = false;
+    int rtLabScrollOffset = 0;
+    horde::vulkan::raytracing::RtLightGroup rtLabLightGroup =
+        horde::vulkan::raytracing::RtLightGroup::Torch;
+    horde::vulkan::raytracing::RtSceneTuning rtSceneTuning{};
+    ULONGLONG lastRtLabTelemetryTick = 0u;
 #if defined(_DEBUG)
     bool developerOverlayVisible = false;
     ULONGLONG lastDeveloperOverlayTick = 0u;
@@ -270,6 +314,7 @@ struct VulkanSurfaceContext
 bool WriteReportFile(const std::filesystem::path& path, const std::string& data);
 void ClearDesktopInput(VulkanSurfaceContext& context);
 void UpdateVitalityHud(VulkanSurfaceContext& context);
+int ScaleForDpi(HWND window, int logicalPixels);
 void LayoutOverlayControls(HWND window, int width, int height);
 std::string WindowSafeText(const std::string& value);
 
@@ -490,6 +535,8 @@ std::filesystem::path SettingsPath()
 void LoadSettings(VulkanSurfaceContext& context)
 {
     const std::string path = SettingsPath().string();
+    // Progress is deliberately loaded independently from ordinary display/audio settings.
+    context.rtLabUnlocked = GetPrivateProfileIntA("progress", "rtLabUnlocked", 0, path.c_str()) != 0;
     context.sfxEnabled = GetPrivateProfileIntA("audio", "sfx", 1, path.c_str()) != 0;
     const int sensitivity = std::clamp(static_cast<int>(GetPrivateProfileIntA("controls", "lookSensitivity", 100, path.c_str())), 60, 150);
     context.mouseSensitivity = static_cast<float>(sensitivity) / 100.0f;
@@ -497,6 +544,92 @@ void LoadSettings(VulkanSurfaceContext& context)
     context.renderScale = static_cast<float>(renderScale) / 100.0f;
     const int waterQuality = std::clamp(static_cast<int>(GetPrivateProfileIntA("display", "waterQuality", 2, path.c_str())), 0, 2);
     context.waterQuality = static_cast<horde::vulkan::raytracing::WaterQuality>(waterQuality);
+}
+
+#if defined(_DEBUG)
+RtLabDebugLaunchOptions ParseRtLabDebugLaunchOptions()
+{
+    RtLabDebugLaunchOptions options;
+    int count = 0;
+    LPWSTR* arguments = CommandLineToArgvW(GetCommandLineW(), &count);
+    if (arguments == nullptr) return options;
+    const auto readFloat = [&](const int index, float& output)
+    {
+        if (index + 1 >= count) return false;
+        wchar_t* end = nullptr;
+        const float value = std::wcstof(arguments[index + 1], &end);
+        if (end == arguments[index + 1] || *end != L'\0') return false;
+        output = value;
+        return true;
+    };
+    for (int index = 1; index < count; ++index)
+    {
+        const std::wstring_view argument(arguments[index]);
+        if (argument == L"--debug-rt-lab")
+        {
+            options.requested = true;
+        }
+        else if (argument == L"--rt-lab-waterfall")
+        {
+            float value = 100.0f;
+            if (readFloat(index, value)) options.tuning.waterfallWidthScale = value / 100.0f, ++index;
+        }
+        else if (argument == L"--rt-lab-roof")
+        {
+            float value = 100.0f;
+            if (readFloat(index, value)) options.tuning.finaleRoofOpenOverride = value / 100.0f, ++index;
+        }
+        else if (argument == L"--rt-lab-dawn")
+        {
+            float value = 100.0f;
+            if (readFloat(index, value)) options.tuning.finaleDawnRevealOverride = value / 100.0f, ++index;
+        }
+        else if (argument == L"--rt-lab-fog")
+        {
+            float value = 100.0f;
+            if (readFloat(index, value)) options.tuning.fogDensityScale = value / 100.0f, ++index;
+        }
+        else if (argument == L"--rt-lab-light")
+        {
+            if (index + 1 < count)
+            {
+                const std::wstring_view value(arguments[++index]);
+                options.lightGroup = value == L"skylight" ? horde::vulkan::raytracing::RtLightGroup::Skylight :
+                    (value == L"passage" ? horde::vulkan::raytracing::RtLightGroup::Passage :
+                     (value == L"staff" ? horde::vulkan::raytracing::RtLightGroup::Staff :
+                                          horde::vulkan::raytracing::RtLightGroup::Torch));
+            }
+        }
+        else if (argument == L"--rt-lab-hue" || argument == L"--rt-lab-intensity")
+        {
+            float value = argument == L"--rt-lab-hue" ? 0.0f : 100.0f;
+            if (readFloat(index, value))
+            {
+                auto& light = options.tuning.lights[static_cast<std::size_t>(options.lightGroup)];
+                if (argument == L"--rt-lab-hue") light.hueDegrees = value;
+                else light.intensityScale = value / 100.0f;
+                ++index;
+            }
+        }
+        else if (argument == L"--rt-lab-workload" && index + 1 < count)
+        {
+            const std::wstring_view value(arguments[++index]);
+            options.tuning.workloadPreset = value == L"lean" ? horde::vulkan::raytracing::RtWorkloadPreset::Lean :
+                (value == L"max" ? horde::vulkan::raytracing::RtWorkloadPreset::Max :
+                                   horde::vulkan::raytracing::RtWorkloadPreset::Authored);
+        }
+    }
+    LocalFree(arguments);
+    options.tuning = horde::vulkan::raytracing::ClampRtSceneTuning(options.tuning);
+    return options;
+}
+#endif
+
+void SaveRtLabProgress(const VulkanSurfaceContext& context)
+{
+    const std::string path = SettingsPath().string();
+    WritePrivateProfileStringA("progress", "rtLabUnlocked",
+                               context.rtLabUnlocked ? "1" : "0", path.c_str());
 }
 
 void SaveSettings(const VulkanSurfaceContext& context)
@@ -1141,6 +1274,95 @@ void UpdateSettingsLabels(VulkanSurfaceContext& context)
     }
 }
 
+const char* RtLightGroupName(const horde::vulkan::raytracing::RtLightGroup group)
+{
+    using horde::vulkan::raytracing::RtLightGroup;
+    switch (group)
+    {
+    case RtLightGroup::Skylight: return "SKYLIGHT";
+    case RtLightGroup::Passage: return "PASSAGE";
+    case RtLightGroup::Staff: return "STAFF";
+    default: return "TORCH";
+    }
+}
+
+const char* RtWorkloadName(const horde::vulkan::raytracing::RtWorkloadPreset preset)
+{
+    using horde::vulkan::raytracing::RtWorkloadPreset;
+    switch (preset)
+    {
+    case RtWorkloadPreset::Lean: return "LEAN";
+    case RtWorkloadPreset::Max: return "MAX";
+    default: return "AUTHORED";
+    }
+}
+
+void UpdateRtLabTelemetry(VulkanSurfaceContext& context, const bool force = false)
+{
+    if (!context.rtLabVisible) return;
+    const ULONGLONG now = GetTickCount64();
+    if (!force && now - context.lastRtLabTelemetryTick < 250u) return;
+    context.lastRtLabTelemetryTick = now;
+    std::ostringstream text;
+    text << std::fixed << std::setprecision(2) << "GPU RT: ";
+    if (context.gpuRtTiming.valid)
+    {
+        text << context.gpuRtTiming.latestMs << " ms  |  "
+             << context.gpuRtTiming.sampleCount << " samples";
+    }
+    else
+    {
+        text << "warming up  |  " << context.gpuRtTiming.sampleCount << " samples";
+    }
+    text << "  |  SCALE " << static_cast<int>(std::lround(context.renderScale * 100.0f)) << "%  |  WATER ";
+    text << (context.waterQuality == horde::vulkan::raytracing::WaterQuality::High ? "HIGH" :
+             (context.waterQuality == horde::vulkan::raytracing::WaterQuality::Mobile ? "MOBILE" : "OFF"));
+    if (HWND control = GetDlgItem(context.windowHandle, kRtLabTelemetryId))
+    {
+        SetWindowTextA(control, text.str().c_str());
+    }
+}
+
+void UpdateRtLabLabels(VulkanSurfaceContext& context)
+{
+    const auto setText = [&](const int id, const std::string& text)
+    {
+        if (HWND control = GetDlgItem(context.windowHandle, id)) SetWindowTextA(control, text.c_str());
+    };
+    const auto setSlider = [&](const int id, const int value)
+    {
+        if (HWND control = GetDlgItem(context.windowHandle, id)) SendMessageA(control, TBM_SETPOS, TRUE, value);
+    };
+    const auto& tuning = context.rtSceneTuning;
+    const int waterfall = static_cast<int>(std::lround(tuning.waterfallWidthScale * 100.0f));
+    setText(kRtLabWaterfallLabelId, "WATERFALL WIDTH: " + std::to_string(waterfall) + "%");
+    setSlider(kRtLabWaterfallSliderId, waterfall);
+    const int roof = static_cast<int>(std::lround(tuning.finaleRoofOpenOverride.value_or(1.0f) * 100.0f));
+    setText(kRtLabRoofLabelId, tuning.finaleRoofOpenOverride.has_value()
+        ? "FINALE ROOF OPEN: " + std::to_string(roof) + "%"
+        : "FINALE ROOF: AUTHORED (ADJUST TO OVERRIDE)");
+    setSlider(kRtLabRoofSliderId, roof);
+    const int dawn = static_cast<int>(std::lround(tuning.finaleDawnRevealOverride.value_or(1.0f) * 100.0f));
+    setText(kRtLabDawnLabelId, tuning.finaleDawnRevealOverride.has_value()
+        ? "FINALE DAWN: " + std::to_string(dawn) + "%"
+        : "FINALE DAWN: AUTHORED (ADJUST TO OVERRIDE)");
+    setSlider(kRtLabDawnSliderId, dawn);
+    const int fog = static_cast<int>(std::lround(tuning.fogDensityScale * 100.0f));
+    setText(kRtLabFogLabelId, "FOG DENSITY: " + std::to_string(fog) + "%");
+    setSlider(kRtLabFogSliderId, fog);
+
+    const auto& light = tuning.lights[static_cast<std::size_t>(context.rtLabLightGroup)];
+    setText(kRtLabLightGroupButtonId, std::string("LIGHT GROUP: ") + RtLightGroupName(context.rtLabLightGroup));
+    const int hue = static_cast<int>(std::lround(light.hueDegrees));
+    setText(kRtLabHueLabelId, "LIGHT HUE SHIFT: " + std::to_string(hue) + " DEG");
+    setSlider(kRtLabHueSliderId, hue);
+    const int intensity = static_cast<int>(std::lround(light.intensityScale * 100.0f));
+    setText(kRtLabIntensityLabelId, "LIGHT INTENSITY: " + std::to_string(intensity) + "%");
+    setSlider(kRtLabIntensitySliderId, intensity);
+    setText(kRtLabWorkloadButtonId, std::string("RT WORKLOAD: ") + RtWorkloadName(tuning.workloadPreset));
+    UpdateRtLabTelemetry(context, true);
+}
+
 void UpdateVitalityHud(VulkanSurfaceContext& context)
 {
     const horde::gameplay::PlayerVitalsSnapshot& vitals = context.simulation.Snapshot().playerVitals;
@@ -1184,7 +1406,8 @@ void MirrorSimulationSnapshot(VulkanSurfaceContext& context, const bool mirrorVi
 void ApplyOverlayState(VulkanSurfaceContext& context)
 {
     const bool pauseVisible = context.pauseMenuVisible && !context.settingsVisible &&
-                              !context.diagnosticsVisible && !context.benchmarkReportVisible;
+                              !context.diagnosticsVisible && !context.benchmarkReportVisible &&
+                              !context.rtLabVisible;
     for (const int id : {kPauseTitleId, kResumeButtonId, kRestartButtonId, kExitButtonId})
     {
         SetControlVisible(context.windowHandle, id, pauseVisible);
@@ -1196,6 +1419,9 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
     {
         SetControlVisible(context.windowHandle, id, fullPauseMenuVisible);
     }
+    const bool rtLabAccess = context.rtLabUnlocked || context.rtLabDebugInjection;
+    SetControlVisible(context.windowHandle, kRtLabButtonId,
+                      pauseVisible && rtLabAccess && !context.deathOverlayVisible);
     for (const int id : {kSettingsTitleId, kSfxButtonId, kSensitivityButtonId, kWaterQualityButtonId, kRenderScaleLabelId,
                           kRenderScaleSliderId, kFullscreenButtonId, kSettingsBackButtonId})
     {
@@ -1208,19 +1434,31 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
     {
         SetControlVisible(context.windowHandle, id, context.benchmarkReportVisible);
     }
+    for (const int id : {kRtLabPanelId, kRtLabTitleId, kRtLabTelemetryId,
+                         kRtLabWaterfallLabelId, kRtLabWaterfallSliderId,
+                         kRtLabRoofLabelId, kRtLabRoofSliderId,
+                         kRtLabDawnLabelId, kRtLabDawnSliderId,
+                         kRtLabFogLabelId, kRtLabFogSliderId,
+                         kRtLabLightGroupButtonId, kRtLabHueLabelId, kRtLabHueSliderId,
+                         kRtLabIntensityLabelId, kRtLabIntensitySliderId,
+                         kRtLabWorkloadButtonId, kRtLabRestoreButtonId, kRtLabBackButtonId})
+    {
+        SetControlVisible(context.windowHandle, id, context.rtLabVisible);
+    }
     SetControlVisible(context.windowHandle, kHudControlId,
-                      !context.diagnosticsVisible && !context.benchmarkReportVisible);
+                      !context.diagnosticsVisible && !context.benchmarkReportVisible && !context.rtLabVisible);
     SetControlVisible(context.windowHandle, kVitalityHudControlId,
                       !pauseVisible && !context.settingsVisible && !context.diagnosticsVisible &&
-                          !context.benchmarkReportVisible && !context.benchmark.IsRunning());
+                          !context.benchmarkReportVisible && !context.benchmark.IsRunning() &&
+                          !context.rtLabVisible);
 #if defined(_DEBUG)
     SetControlVisible(context.windowHandle, kDeveloperOverlayId,
                        context.developerOverlayVisible && !pauseVisible && !context.benchmarkReportVisible &&
                            !context.settingsVisible && !context.diagnosticsVisible &&
-                           !context.benchmark.IsRunning());
+                           !context.benchmark.IsRunning() && !context.rtLabVisible);
 #endif
     const bool wasSimulationPaused = context.simulationPaused;
-    context.simulationPaused = pauseVisible || context.settingsVisible ||
+    context.simulationPaused = pauseVisible || context.settingsVisible || context.rtLabVisible ||
                                context.diagnosticsVisible || context.benchmarkReportVisible;
     context.simulationInput.paused = context.simulationPaused;
     if (context.simulationPaused != wasSimulationPaused)
@@ -1242,16 +1480,65 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
         SetWindowTextA(title, context.deathOverlayVisible
             ? "YOU FELL  |  THE RUIN CLAIMS ANOTHER LIGHT."
             : (context.endingOverlayVisible
-                ? "DAWN RETURNS  |  THE LAST LANTERN HAS DONE ITS WORK"
+                ? (context.rtLabJustUnlocked ? "RT LAB UNLOCKED" : "DAWN RETURNS  |  THE LAST LANTERN HAS DONE ITS WORK")
                 : "HORDE LANTERN RT  |  SHOWCASE ALPHA"));
     }
     if (HWND resume = GetDlgItem(context.windowHandle, kResumeButtonId))
     {
         SetWindowTextA(resume, context.deathOverlayVisible
             ? "RETRY ENCOUNTER"
-            : (context.endingOverlayVisible ? "CONTINUE IN THE RUIN" : "ENTER THE RUIN / RESUME"));
+            : (context.endingOverlayVisible ? "CONTINUE" : "ENTER THE RUIN / RESUME"));
+    }
+    if (HWND restart = GetDlgItem(context.windowHandle, kRestartButtonId))
+    {
+        SetWindowTextA(restart, context.endingOverlayVisible ? "BEGIN AGAIN" : "RESTART ROUTE");
+    }
+    if (HWND lab = GetDlgItem(context.windowHandle, kRtLabButtonId))
+    {
+        SetWindowTextA(lab, context.endingOverlayVisible ? "OPEN RT LAB" : "RT LAB");
+    }
+    if (HWND body = GetDlgItem(context.windowHandle, kEndingBodyId))
+    {
+        SetWindowTextA(body, context.rtLabJustUnlocked
+            ? "The lich is defeated. The renderer controls used to shape this ruin are now yours.\r\n\r\n"
+              "Tune true RT geometry, light, fog, and workload while the scene continues to render."
+            : "The old guard bound the lich beneath this ruin and left one lantern to guide whoever came after.\r\n\r\n"
+              "Its flame died when the final seal opened. Now the staff is silent, the roof gives way, and stolen morning returns to the halls.");
     }
     UpdateSettingsLabels(context);
+    if (context.rtLabVisible) UpdateRtLabLabels(context);
+}
+
+void OpenRtLab(VulkanSurfaceContext& context)
+{
+    if (!context.rtLabUnlocked && !context.rtLabDebugInjection) return;
+    context.rtLabOpenedFromEnding = context.endingOverlayVisible;
+    context.rtLabVisible = true;
+    context.pauseMenuVisible = false;
+    context.settingsVisible = false;
+    context.diagnosticsVisible = false;
+    context.benchmarkReportVisible = false;
+    context.rtLabScrollOffset = 0;
+    ApplyOverlayState(context);
+    RECT client{};
+    GetClientRect(context.windowHandle, &client);
+    LayoutOverlayControls(context.windowHandle, client.right, client.bottom);
+    SetFocus(GetDlgItem(context.windowHandle, kRtLabWaterfallSliderId));
+}
+
+void CloseRtLab(VulkanSurfaceContext& context)
+{
+    context.rtLabVisible = false;
+    context.pauseMenuVisible = true;
+    if (!context.rtLabOpenedFromEnding)
+    {
+        context.endingOverlayVisible = false;
+    }
+    ApplyOverlayState(context);
+    RECT client{};
+    GetClientRect(context.windowHandle, &client);
+    LayoutOverlayControls(context.windowHandle, client.right, client.bottom);
+    SetFocus(GetDlgItem(context.windowHandle, kRtLabButtonId));
 }
 
 void ShowPauseMenu(VulkanSurfaceContext& context, const bool visible)
@@ -1295,6 +1582,12 @@ void ResetRoute(VulkanSurfaceContext& context)
     context.endingOverlayDismissed = false;
     context.debugEnemyOverride = horde::gameplay::EnemyKind::None;
     context.debugValidationPoint = 0u;
+    context.rtSceneTuning = {};
+    context.rtLabLightGroup = horde::vulkan::raytracing::RtLightGroup::Torch;
+    context.rtLabVisible = false;
+    context.rtLabOpenedFromEnding = false;
+    context.rtLabJustUnlocked = false;
+    context.rtLabRouteTainted = false;
     context.delayedFeedback.Clear();
     context.simulation.ResetRoute();
     context.simulation.ClearEvents();
@@ -1305,6 +1598,24 @@ void ResetRoute(VulkanSurfaceContext& context)
     MirrorSimulationSnapshot(context);
     ClearDesktopInput(context);
     UpdateVitalityHud(context);
+}
+
+void TryGrantRtLabUnlock(VulkanSurfaceContext& context, const bool finaleComplete)
+{
+    const horde::platform::windows::RtLabUnlockContext decision{
+        .finaleComplete = finaleComplete,
+        .capture = GetPropA(context.windowHandle, kCaptureModeProperty) != nullptr,
+        .checkpoint = context.rtLabRouteTainted,
+        .replay = false,
+        .benchmark = context.benchmark.IsRunning(),
+        .debugInjection = context.rtLabDebugInjection,
+    };
+    if (!context.rtLabUnlocked && horde::platform::windows::CanPersistRtLabUnlock(decision))
+    {
+        context.rtLabUnlocked = true;
+        context.rtLabJustUnlocked = true;
+        SaveRtLabProgress(context);
+    }
 }
 
 void ShowDeathMenu(VulkanSurfaceContext& context)
@@ -1434,6 +1745,7 @@ void StartBenchmark(VulkanSurfaceContext& context)
 {
     ResetRoute(context);
     context.benchmark.Start();
+    context.rtLabRouteTainted = true;
     context.benchmarkCompletionHandled = false;
     context.benchmarkReport.clear();
     context.benchmarkJsonReport.clear();
@@ -1877,19 +2189,29 @@ void ClearDesktopInput(VulkanSurfaceContext& context)
 
 std::vector<HWND> VisibleControllerMenuControls(const VulkanSurfaceContext& context)
 {
-    constexpr std::array<int, 17u> controlIds{{
+    constexpr std::array<int, 28u> controlIds{{
         kResumeButtonId, kRestartButtonId, kControlsButtonId, kSettingsButtonId,
-        kDiagnosticsButtonId, kRunBenchmarkButtonId, kMoreBySamfa12ButtonId,
+        kRtLabButtonId, kDiagnosticsButtonId, kRunBenchmarkButtonId, kMoreBySamfa12ButtonId,
         kExitButtonId, kSfxButtonId, kSensitivityButtonId, kWaterQualityButtonId,
         kRenderScaleSliderId, kFullscreenButtonId, kSettingsBackButtonId,
         kBenchmarkCopyButtonId, kBenchmarkSaveButtonId, kBenchmarkBackButtonId,
+        kRtLabWaterfallSliderId, kRtLabRoofSliderId, kRtLabDawnSliderId,
+        kRtLabFogSliderId, kRtLabLightGroupButtonId, kRtLabHueSliderId,
+        kRtLabIntensitySliderId, kRtLabWorkloadButtonId, kRtLabRestoreButtonId,
+        kRtLabBackButtonId,
     }};
     std::vector<HWND> controls;
     controls.reserve(controlIds.size());
     for (const int id : controlIds)
     {
         HWND control = GetDlgItem(context.windowHandle, id);
-        if (control != nullptr && IsWindowVisible(control) && IsWindowEnabled(control))
+        const bool labControl = id == kRtLabWaterfallSliderId || id == kRtLabRoofSliderId ||
+            id == kRtLabDawnSliderId || id == kRtLabFogSliderId ||
+            id == kRtLabLightGroupButtonId || id == kRtLabHueSliderId ||
+            id == kRtLabIntensitySliderId || id == kRtLabWorkloadButtonId ||
+            id == kRtLabRestoreButtonId || id == kRtLabBackButtonId;
+        if (control != nullptr && IsWindowEnabled(control) &&
+            (IsWindowVisible(control) || (context.rtLabVisible && labControl)))
         {
             controls.push_back(control);
         }
@@ -1915,6 +2237,26 @@ void NavigateControllerMenu(VulkanSurfaceContext& context, const int direction)
             ? (index + controls.size() - 1u) % controls.size()
             : (index + 1u) % controls.size();
     }
+    if (context.rtLabVisible)
+    {
+        RECT focusedRect{};
+        RECT panelRect{};
+        GetWindowRect(controls[index], &focusedRect);
+        GetWindowRect(GetDlgItem(context.windowHandle, kRtLabPanelId), &panelRect);
+        MapWindowPoints(HWND_DESKTOP, context.windowHandle,
+                        reinterpret_cast<POINT*>(&focusedRect), 2);
+        MapWindowPoints(HWND_DESKTOP, context.windowHandle,
+                        reinterpret_cast<POINT*>(&panelRect), 2);
+        if (focusedRect.top < panelRect.top + ScaleForDpi(context.windowHandle, 8))
+            context.rtLabScrollOffset = std::max(0, context.rtLabScrollOffset -
+                static_cast<int>(panelRect.top + ScaleForDpi(context.windowHandle, 8) - focusedRect.top));
+        else if (focusedRect.bottom > panelRect.bottom - ScaleForDpi(context.windowHandle, 8))
+            context.rtLabScrollOffset += static_cast<int>(focusedRect.bottom -
+                (panelRect.bottom - ScaleForDpi(context.windowHandle, 8)));
+        RECT client{};
+        GetClientRect(context.windowHandle, &client);
+        LayoutOverlayControls(context.windowHandle, client.right, client.bottom);
+    }
     SetFocus(controls[index]);
     PlaySoundEffect(context, "ui_select.wav");
 }
@@ -1922,7 +2264,11 @@ void NavigateControllerMenu(VulkanSurfaceContext& context, const int direction)
 void CancelControllerMenu(VulkanSurfaceContext& context)
 {
     int command = kResumeButtonId;
-    if (context.settingsVisible)
+    if (context.rtLabVisible)
+    {
+        command = kRtLabBackButtonId;
+    }
+    else if (context.settingsVisible)
     {
         command = kSettingsBackButtonId;
     }
@@ -1940,19 +2286,54 @@ void CancelControllerMenu(VulkanSurfaceContext& context)
 bool AdjustFocusedControllerSlider(VulkanSurfaceContext& context, const bool increase)
 {
     HWND focused = GetFocus();
-    HWND slider = GetDlgItem(context.windowHandle, kRenderScaleSliderId);
-    if (focused != slider || slider == nullptr)
+    if (focused == nullptr)
     {
         return false;
     }
-    const int current = static_cast<int>(SendMessageA(slider, TBM_GETPOS, 0, 0));
-    const int next = horde::platform::windows::StepControllerSlider(current, increase);
+    const int id = GetDlgCtrlID(focused);
+    if (id == kRtLabLightGroupButtonId)
+    {
+        const std::uint32_t count = static_cast<std::uint32_t>(horde::vulkan::raytracing::kRtLightGroupCount);
+        const std::uint32_t current = static_cast<std::uint32_t>(context.rtLabLightGroup);
+        context.rtLabLightGroup = static_cast<horde::vulkan::raytracing::RtLightGroup>(
+            increase ? (current + 1u) % count : (current + count - 1u) % count);
+        UpdateRtLabLabels(context);
+        PlaySoundEffect(context, "ui_select.wav");
+        return true;
+    }
+    if (id == kRtLabWorkloadButtonId)
+    {
+        const int current = static_cast<int>(context.rtSceneTuning.workloadPreset);
+        context.rtSceneTuning.workloadPreset = static_cast<horde::vulkan::raytracing::RtWorkloadPreset>(
+            std::clamp(current + (increase ? 1 : -1), 0, 2));
+        UpdateRtLabLabels(context);
+        PlaySoundEffect(context, "ui_select.wav");
+        return true;
+    }
+    horde::platform::windows::RtLabControlRange range =
+        horde::platform::windows::RtLabControlRange::DoublePercent;
+    bool rtLabSlider = true;
+    switch (id)
+    {
+    case kRtLabWaterfallSliderId: range = horde::platform::windows::RtLabControlRange::WaterfallPercent; break;
+    case kRtLabRoofSliderId:
+    case kRtLabDawnSliderId: range = horde::platform::windows::RtLabControlRange::UnitPercent; break;
+    case kRtLabFogSliderId:
+    case kRtLabIntensitySliderId: range = horde::platform::windows::RtLabControlRange::DoublePercent; break;
+    case kRtLabHueSliderId: range = horde::platform::windows::RtLabControlRange::HueDegrees; break;
+    default: rtLabSlider = false; break;
+    }
+    if (!rtLabSlider && id != kRenderScaleSliderId) return false;
+    const int current = static_cast<int>(SendMessageA(focused, TBM_GETPOS, 0, 0));
+    const int next = rtLabSlider
+        ? horde::platform::windows::StepRtLabControl(current, increase, range)
+        : horde::platform::windows::StepControllerSlider(current, increase);
     if (next != current)
     {
-        SendMessageA(slider, TBM_SETPOS, TRUE, next);
+        SendMessageA(focused, TBM_SETPOS, TRUE, next);
         SendMessageA(context.windowHandle, WM_HSCROLL,
                      MAKEWPARAM(TB_ENDTRACK, next),
-                     reinterpret_cast<LPARAM>(slider));
+                     reinterpret_cast<LPARAM>(focused));
         PlaySoundEffect(context, "ui_select.wav");
     }
     return true;
@@ -1964,6 +2345,11 @@ void HandleControllerMenuEdges(
 {
     if (edges.togglePause)
     {
+        if (context.rtLabVisible)
+        {
+            CloseRtLab(context);
+            return;
+        }
         PostMessageA(context.windowHandle, WM_COMMAND,
                      MAKEWPARAM(kMenuPauseId, BN_CLICKED), 0);
         return;
@@ -3011,12 +3397,13 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         }
         if (simulation.finaleComplete)
         {
+            TryGrantRtLabUnlock(ctx, true);
             ShowEndingMenu(ctx);
         }
         DrainGameplayEvents(ctx);
         horde::vulkan::raytracing::RtSceneFrameInputs frameInputs =
             horde::vulkan::raytracing::BuildRtSceneFrameInputs(
-                simulation, ctx.outputExposure, ctx.waterQuality);
+                simulation, ctx.outputExposure, ctx.waterQuality, ctx.rtSceneTuning);
         if (ctx.debugEnemyOverride != horde::gameplay::EnemyKind::None)
         {
             // Debug-only renderer inspection remains non-authoritative gameplay.
@@ -3373,6 +3760,16 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     VulkanSurfaceContext context;
     context.windowHandle = hWnd;
     LoadSettings(context);
+#if defined(_DEBUG)
+    const RtLabDebugLaunchOptions rtLabDebug = ParseRtLabDebugLaunchOptions();
+    if (rtLabDebug.requested)
+    {
+        context.rtLabDebugInjection = true;
+        context.rtLabRouteTainted = true;
+        context.rtSceneTuning = rtLabDebug.tuning;
+        context.rtLabLightGroup = rtLabDebug.lightGroup;
+    }
+#endif
     if (captureDirectory != nullptr)
     {
         context.renderScale = 1.0f;
@@ -3471,7 +3868,11 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         if (captureDirectory == nullptr)
         {
             ApplyOverlayState(context);
-            SetFocus(GetDlgItem(hWnd, kResumeButtonId));
+#if defined(_DEBUG)
+            if (context.rtLabDebugInjection) OpenRtLab(context);
+            else
+#endif
+                SetFocus(GetDlgItem(hWnd, kResumeButtonId));
         }
     }
 
@@ -3562,6 +3963,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             break;
         }
         capabilities.performance.gpuRt = context.gpuRtTiming;
+        UpdateRtLabTelemetry(context);
         const auto frameEnd = std::chrono::steady_clock::now();
         const double frameTimeMs = std::chrono::duration<double, std::milli>(frameEnd - frameStart).count();
         if (benchmarkFrame)
@@ -3727,7 +4129,13 @@ void ApplyDpiScaledFonts(HWND window)
                          kMoreBySamfa12ButtonId, kExitButtonId, kBenchmarkTitleId,
                          kBenchmarkCopyButtonId, kBenchmarkSaveButtonId, kBenchmarkBackButtonId,
                          kSettingsTitleId, kSfxButtonId, kSensitivityButtonId, kWaterQualityButtonId, kRenderScaleLabelId,
-                         kRenderScaleSliderId, kFullscreenButtonId, kSettingsBackButtonId})
+                         kRenderScaleSliderId, kFullscreenButtonId, kSettingsBackButtonId,
+                         kRtLabTitleId, kRtLabTelemetryId, kRtLabWaterfallLabelId, kRtLabWaterfallSliderId,
+                         kRtLabRoofLabelId, kRtLabRoofSliderId, kRtLabDawnLabelId, kRtLabDawnSliderId,
+                         kRtLabFogLabelId, kRtLabFogSliderId, kRtLabLightGroupButtonId,
+                         kRtLabHueLabelId, kRtLabHueSliderId, kRtLabIntensityLabelId,
+                         kRtLabIntensitySliderId, kRtLabWorkloadButtonId,
+                         kRtLabRestoreButtonId, kRtLabBackButtonId})
     {
         if (HWND control = GetDlgItem(window, id))
         {
@@ -3843,9 +4251,10 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
     const bool compactOverlayLayout = layoutContext != nullptr &&
                                       (layoutContext->deathOverlayVisible || endingLayout);
     const int endingBodyHeight = endingLayout ? ScaleForDpi(window, 132) : 0;
+    const int compactButtonCount = endingLayout ? 4 : 3;
     const int pauseTotal = compactOverlayLayout
-        ? titleHeight + endingBodyHeight + (endingLayout ? gap : 0) + 3 * buttonHeight + 3 * gap
-        : titleHeight + 8 * buttonHeight + 7 * gap;
+        ? titleHeight + endingBodyHeight + (endingLayout ? gap : 0) + compactButtonCount * buttonHeight + compactButtonCount * gap
+        : titleHeight + 9 * buttonHeight + 8 * gap;
     const int pauseX = (width - buttonWidth) / 2;
     int y = std::max(ScaleForDpi(window, 54), (height - pauseTotal) / 2);
     if (HWND title = GetDlgItem(window, kPauseTitleId)) MoveWindow(title, pauseX, y, buttonWidth, titleHeight, TRUE);
@@ -3860,15 +4269,16 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
     }
     if (compactOverlayLayout)
     {
-        for (const int id : {kResumeButtonId, kRestartButtonId, kExitButtonId})
+        for (const int id : {kRtLabButtonId, kResumeButtonId, kRestartButtonId, kExitButtonId})
         {
+            if (!endingLayout && id == kRtLabButtonId) continue;
             if (HWND control = GetDlgItem(window, id)) MoveWindow(control, pauseX, y, buttonWidth, buttonHeight, TRUE);
             y += buttonHeight + gap;
         }
     }
     else
     {
-        for (const int id : {kResumeButtonId, kRestartButtonId, kControlsButtonId, kSettingsButtonId,
+        for (const int id : {kResumeButtonId, kRestartButtonId, kControlsButtonId, kSettingsButtonId, kRtLabButtonId,
                              kDiagnosticsButtonId, kRunBenchmarkButtonId, kMoreBySamfa12ButtonId, kExitButtonId})
         {
             if (HWND control = GetDlgItem(window, id)) MoveWindow(control, pauseX, y, buttonWidth, buttonHeight, TRUE);
@@ -3895,6 +4305,80 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
     {
         if (HWND control = GetDlgItem(window, id)) MoveWindow(control, pauseX, y, buttonWidth, buttonHeight, TRUE);
         y += buttonHeight + gap;
+    }
+
+    if (layoutContext != nullptr && layoutContext->rtLabVisible)
+    {
+        auto* mutableContext = const_cast<VulkanSurfaceContext*>(layoutContext);
+        const int panelWidth = std::min(ScaleForDpi(window, 680), std::max(ScaleForDpi(window, 300), width - inset * 2));
+        const int panelHeight = std::min(ScaleForDpi(window, 650), std::max(ScaleForDpi(window, 260), height - inset * 2));
+        const int panelX = (width - panelWidth) / 2;
+        const int panelY = (height - panelHeight) / 2;
+        if (HWND panel = GetDlgItem(window, kRtLabPanelId))
+        {
+            MoveWindow(panel, panelX, panelY, panelWidth, panelHeight, TRUE);
+            SetWindowPos(panel, HWND_BOTTOM, panelX, panelY, panelWidth, panelHeight, SWP_NOACTIVATE);
+        }
+        const int contentHeight = ScaleForDpi(window, 840);
+        const int maxScroll = std::max(0, contentHeight - panelHeight + ScaleForDpi(window, 28));
+        mutableContext->rtLabScrollOffset = std::clamp(mutableContext->rtLabScrollOffset, 0, maxScroll);
+        SCROLLINFO scroll{sizeof(SCROLLINFO), SIF_RANGE | SIF_PAGE | SIF_POS};
+        scroll.nMin = 0;
+        scroll.nMax = contentHeight;
+        scroll.nPage = static_cast<UINT>(panelHeight);
+        scroll.nPos = mutableContext->rtLabScrollOffset;
+        SetScrollInfo(window, SB_VERT, &scroll, TRUE);
+        ShowScrollBar(window, SB_VERT, maxScroll > 0);
+
+        const int contentX = panelX + ScaleForDpi(window, 28);
+        const int contentWidth = panelWidth - ScaleForDpi(window, 56);
+        const int contentTop = panelY + ScaleForDpi(window, 18) - mutableContext->rtLabScrollOffset;
+        const int smallGap = ScaleForDpi(window, 4);
+        const auto place = [&](const int id, const int offset, const int controlHeight)
+        {
+            if (HWND control = GetDlgItem(window, id))
+            {
+                const int controlY = contentTop + ScaleForDpi(window, offset);
+                MoveWindow(control, contentX, controlY, contentWidth, controlHeight, TRUE);
+                const bool inside = controlY >= panelY + ScaleForDpi(window, 8) &&
+                    controlY + controlHeight <= panelY + panelHeight - ScaleForDpi(window, 8);
+                ShowWindow(control, inside ? SW_SHOW : SW_HIDE);
+            }
+        };
+        place(kRtLabTitleId, 0, titleHeight);
+        place(kRtLabTelemetryId, 50, labelHeight);
+        int labY = 84;
+        for (const auto [labelId, sliderId] : std::array<std::pair<int, int>, 4>{{
+                 {kRtLabWaterfallLabelId, kRtLabWaterfallSliderId},
+                 {kRtLabRoofLabelId, kRtLabRoofSliderId},
+                 {kRtLabDawnLabelId, kRtLabDawnSliderId},
+                 {kRtLabFogLabelId, kRtLabFogSliderId}}})
+        {
+            place(labelId, labY, labelHeight);
+            labY += 26;
+            place(sliderId, labY, sliderHeight);
+            labY += 46;
+        }
+        place(kRtLabLightGroupButtonId, labY, buttonHeight);
+        labY += 48;
+        place(kRtLabHueLabelId, labY, labelHeight);
+        labY += 26;
+        place(kRtLabHueSliderId, labY, sliderHeight);
+        labY += 46;
+        place(kRtLabIntensityLabelId, labY, labelHeight);
+        labY += 26;
+        place(kRtLabIntensitySliderId, labY, sliderHeight);
+        labY += 48;
+        place(kRtLabWorkloadButtonId, labY, buttonHeight);
+        labY += 46;
+        place(kRtLabRestoreButtonId, labY, buttonHeight);
+        labY += 46;
+        place(kRtLabBackButtonId, labY, buttonHeight);
+        (void)smallGap;
+    }
+    else
+    {
+        ShowScrollBar(window, SB_VERT, FALSE);
     }
 }
 
@@ -4019,6 +4503,40 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
     auto* sceneContext = reinterpret_cast<VulkanSurfaceContext*>(GetWindowLongPtrA(hWnd, GWLP_USERDATA));
     switch (message)
     {
+    case WM_MOUSEWHEEL:
+        if (sceneContext && sceneContext->rtLabVisible)
+        {
+            SendMessageA(hWnd, WM_VSCROLL,
+                GET_WHEEL_DELTA_WPARAM(wParam) > 0 ? SB_LINEUP : SB_LINEDOWN, 0);
+            return 0;
+        }
+        break;
+    case WM_VSCROLL:
+        if (sceneContext && sceneContext->rtLabVisible)
+        {
+            SCROLLINFO scroll{sizeof(SCROLLINFO), SIF_ALL};
+            GetScrollInfo(hWnd, SB_VERT, &scroll);
+            int next = sceneContext->rtLabScrollOffset;
+            switch (LOWORD(wParam))
+            {
+            case SB_TOP: next = 0; break;
+            case SB_BOTTOM: next = scroll.nMax - static_cast<int>(scroll.nPage) + 1; break;
+            case SB_LINEUP: next -= ScaleForDpi(hWnd, 36); break;
+            case SB_LINEDOWN: next += ScaleForDpi(hWnd, 36); break;
+            case SB_PAGEUP: next -= static_cast<int>(scroll.nPage); break;
+            case SB_PAGEDOWN: next += static_cast<int>(scroll.nPage); break;
+            case SB_THUMBPOSITION:
+            case SB_THUMBTRACK: next = scroll.nTrackPos; break;
+            default: break;
+            }
+            const int maximum = std::max(0, scroll.nMax - static_cast<int>(scroll.nPage) + 1);
+            sceneContext->rtLabScrollOffset = std::clamp(next, 0, maximum);
+            RECT client{};
+            GetClientRect(hWnd, &client);
+            LayoutOverlayControls(hWnd, client.right, client.bottom);
+            return 0;
+        }
+        break;
     case WM_HSCROLL:
         if (sceneContext && reinterpret_cast<HWND>(lParam) == GetDlgItem(hWnd, kRenderScaleSliderId))
         {
@@ -4030,6 +4548,32 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 sceneContext->renderScaleDirty = true;
                 SaveSettings(*sceneContext);
             }
+            return 0;
+        }
+        if (sceneContext && sceneContext->rtLabVisible && lParam != 0)
+        {
+            HWND slider = reinterpret_cast<HWND>(lParam);
+            const int id = GetDlgCtrlID(slider);
+            const int value = static_cast<int>(SendMessageA(slider, TBM_GETPOS, 0, 0));
+            auto& tuning = sceneContext->rtSceneTuning;
+            switch (id)
+            {
+            case kRtLabWaterfallSliderId: tuning.waterfallWidthScale = static_cast<float>(value) / 100.0f; break;
+            case kRtLabRoofSliderId: tuning.finaleRoofOpenOverride = static_cast<float>(value) / 100.0f; break;
+            case kRtLabDawnSliderId: tuning.finaleDawnRevealOverride = static_cast<float>(value) / 100.0f; break;
+            case kRtLabFogSliderId: tuning.fogDensityScale = static_cast<float>(value) / 100.0f; break;
+            case kRtLabHueSliderId:
+                tuning.lights[static_cast<std::size_t>(sceneContext->rtLabLightGroup)].hueDegrees =
+                    static_cast<float>(value);
+                break;
+            case kRtLabIntensitySliderId:
+                tuning.lights[static_cast<std::size_t>(sceneContext->rtLabLightGroup)].intensityScale =
+                    static_cast<float>(value) / 100.0f;
+                break;
+            default: break;
+            }
+            tuning = horde::vulkan::raytracing::ClampRtSceneTuning(tuning);
+            UpdateRtLabLabels(*sceneContext);
             return 0;
         }
         break;
@@ -4049,8 +4593,10 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 return 0;
             }
             const int commandId = LOWORD(wParam);
-            if ((sceneContext->deathOverlayVisible || sceneContext->endingOverlayVisible) &&
+            if (!sceneContext->rtLabVisible &&
+                (sceneContext->deathOverlayVisible || sceneContext->endingOverlayVisible) &&
                 commandId != kResumeButtonId && commandId != kRestartButtonId &&
+                commandId != kRtLabButtonId && commandId != kRtLabBackButtonId &&
                 commandId != kMenuRestartId && commandId != kExitButtonId &&
                 commandId != kMenuExitId)
             {
@@ -4097,6 +4643,39 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 return 0;
             case kSettingsButtonId:
                 OpenSettings(*sceneContext);
+                return 0;
+            case kRtLabButtonId:
+                PlaySoundEffect(*sceneContext, "ui_select.wav");
+                OpenRtLab(*sceneContext);
+                return 0;
+            case kRtLabLightGroupButtonId:
+                sceneContext->rtLabLightGroup = static_cast<horde::vulkan::raytracing::RtLightGroup>(
+                    (static_cast<std::uint32_t>(sceneContext->rtLabLightGroup) + 1u) %
+                    static_cast<std::uint32_t>(horde::vulkan::raytracing::kRtLightGroupCount));
+                UpdateRtLabLabels(*sceneContext);
+                PlaySoundEffect(*sceneContext, "ui_select.wav");
+                return 0;
+            case kRtLabWorkloadButtonId:
+            {
+                using horde::vulkan::raytracing::RtWorkloadPreset;
+                sceneContext->rtSceneTuning.workloadPreset =
+                    sceneContext->rtSceneTuning.workloadPreset == RtWorkloadPreset::Lean
+                        ? RtWorkloadPreset::Authored
+                        : (sceneContext->rtSceneTuning.workloadPreset == RtWorkloadPreset::Authored
+                               ? RtWorkloadPreset::Max : RtWorkloadPreset::Lean);
+                UpdateRtLabLabels(*sceneContext);
+                PlaySoundEffect(*sceneContext, "ui_select.wav");
+                return 0;
+            }
+            case kRtLabRestoreButtonId:
+                sceneContext->rtSceneTuning = {};
+                sceneContext->rtLabLightGroup = horde::vulkan::raytracing::RtLightGroup::Torch;
+                UpdateRtLabLabels(*sceneContext);
+                PlaySoundEffect(*sceneContext, "ui_select.wav");
+                return 0;
+            case kRtLabBackButtonId:
+                CloseRtLab(*sceneContext);
+                PlaySoundEffect(*sceneContext, "ui_back.wav");
                 return 0;
             case kDiagnosticsButtonId:
             case kMenuDiagnosticsId:
@@ -4203,6 +4782,31 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
     case WM_SYSKEYDOWN:
         if (sceneContext && sceneContext->controlsEnabled)
         {
+            if (sceneContext->simulationPaused && wParam == VK_TAB && (lParam & (1ll << 30)) == 0)
+            {
+                NavigateControllerMenu(*sceneContext,
+                    (GetKeyState(VK_SHIFT) & 0x8000) != 0 ? -1 : 1);
+                return 0;
+            }
+            if (sceneContext->simulationPaused && (wParam == VK_UP || wParam == VK_DOWN) &&
+                (lParam & (1ll << 30)) == 0)
+            {
+                NavigateControllerMenu(*sceneContext, wParam == VK_UP ? -1 : 1);
+                return 0;
+            }
+            if (sceneContext->simulationPaused && (wParam == VK_LEFT || wParam == VK_RIGHT) &&
+                (lParam & (1ll << 30)) == 0)
+            {
+                if (!AdjustFocusedControllerSlider(*sceneContext, wParam == VK_RIGHT))
+                    NavigateControllerMenu(*sceneContext, wParam == VK_RIGHT ? 1 : -1);
+                return 0;
+            }
+            if (sceneContext->simulationPaused && wParam == VK_RETURN &&
+                (GetKeyState(VK_MENU) & 0x8000) == 0 && (lParam & (1ll << 30)) == 0)
+            {
+                if (HWND focused = GetFocus()) SendMessageA(focused, BM_CLICK, 0, 0);
+                return 0;
+            }
             if (sceneContext->simulation.Snapshot().playerVitals.phase != horde::gameplay::PlayerLifePhase::Alive)
             {
                 if (wParam == VK_F4 && (GetKeyState(VK_MENU) & 0x8000) != 0)
@@ -4213,6 +4817,11 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             }
             if (wParam == VK_ESCAPE)
             {
+                if (sceneContext->rtLabVisible)
+                {
+                    CloseRtLab(*sceneContext);
+                    return 0;
+                }
                 if (sceneContext->benchmark.IsRunning())
                 {
                     CancelBenchmark(*sceneContext, true);
@@ -4243,6 +4852,10 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 return 0;
             }
 #if defined(_DEBUG)
+            if ((wParam >= VK_F5 && wParam <= VK_F9) || wParam == VK_F11)
+            {
+                sceneContext->rtLabRouteTainted = true;
+            }
             if (wParam == VK_F3 && (lParam & (1ll << 30)) == 0)
             {
                 ToggleDeveloperOverlay(*sceneContext);
@@ -4562,6 +5175,13 @@ LRESULT CALLBACK ControllerFocusOutlineSubclass(
         RemoveWindowSubclass(control, ControllerFocusOutlineSubclass, subclassId);
         return DefSubclassProc(control, message, wParam, lParam);
     }
+    if ((message == WM_KEYDOWN || message == WM_SYSKEYDOWN) &&
+        (wParam == VK_TAB || wParam == VK_UP || wParam == VK_DOWN ||
+         wParam == VK_LEFT || wParam == VK_RIGHT || wParam == VK_RETURN ||
+         wParam == VK_ESCAPE))
+    {
+        return SendMessageA(GetParent(control), message, wParam, lParam);
+    }
 
     const LRESULT result = DefSubclassProc(control, message, wParam, lParam);
     if (message == WM_SETFOCUS || message == WM_KILLFOCUS)
@@ -4722,6 +5342,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     createButton(kRestartButtonId, "RESTART ROUTE");
     createButton(kControlsButtonId, "CONTROLS");
     createButton(kSettingsButtonId, "SETTINGS");
+    createButton(kRtLabButtonId, "RT LAB");
     createButton(kDiagnosticsButtonId, "RT DIAGNOSTICS");
     createButton(kRunBenchmarkButtonId, "RUN BENCHMARK");
     createButton(kMoreBySamfa12ButtonId, "MORE BY SAMFA12");
@@ -4745,6 +5366,53 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     SendMessageA(renderScaleSlider, TBM_SETPOS, TRUE, 100);
     createButton(kFullscreenButtonId, "DISPLAY: WINDOWED");
     createButton(kSettingsBackButtonId, "BACK");
+
+    HWND rtLabPanel = CreateWindowExA(WS_EX_LAYERED, "STATIC", "",
+        WS_CHILD | WS_VISIBLE | SS_BLACKRECT,
+        0, 0, 100, 100, hWnd,
+        reinterpret_cast<HMENU>(static_cast<INT_PTR>(kRtLabPanelId)), instance, nullptr);
+    if (rtLabPanel != nullptr) SetLayeredWindowAttributes(rtLabPanel, 0, 218u, LWA_ALPHA);
+    createStatic(kRtLabTitleId, "RT LAB  |  LIVE VULKAN RAY TRACING", SS_CENTER | SS_CENTERIMAGE);
+    createStatic(kRtLabTelemetryId, "GPU RT: WARMING UP", SS_CENTER | SS_CENTERIMAGE);
+    createStatic(kRtLabWaterfallLabelId, "WATERFALL WIDTH: 100%", SS_LEFT | SS_CENTERIMAGE);
+    createStatic(kRtLabRoofLabelId, "FINALE ROOF: AUTHORED (ADJUST TO OVERRIDE)", SS_LEFT | SS_CENTERIMAGE);
+    createStatic(kRtLabDawnLabelId, "FINALE DAWN: AUTHORED (ADJUST TO OVERRIDE)", SS_LEFT | SS_CENTERIMAGE);
+    createStatic(kRtLabFogLabelId, "FOG DENSITY: 100%", SS_LEFT | SS_CENTERIMAGE);
+    createButton(kRtLabLightGroupButtonId, "LIGHT GROUP: TORCH");
+    createStatic(kRtLabHueLabelId, "LIGHT HUE SHIFT: 0 DEG", SS_LEFT | SS_CENTERIMAGE);
+    createStatic(kRtLabIntensityLabelId, "LIGHT INTENSITY: 100%", SS_LEFT | SS_CENTERIMAGE);
+    createButton(kRtLabWorkloadButtonId, "RT WORKLOAD: AUTHORED");
+    createButton(kRtLabRestoreButtonId, "RESTORE AUTHORED");
+    createButton(kRtLabBackButtonId, "BACK");
+    const auto createRtLabSlider = [&](const int id, const int minimum, const int maximum, const int position)
+    {
+        HWND slider = CreateWindowExA(0, TRACKBAR_CLASSA, "",
+            WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_AUTOTICKS | TBS_TRANSPARENTBKGND,
+            0, 0, 100, 38, hWnd,
+            reinterpret_cast<HMENU>(static_cast<INT_PTR>(id)), instance, nullptr);
+        InstallControllerFocusOutline(slider);
+        SendMessageA(slider, TBM_SETRANGE, TRUE, MAKELPARAM(minimum, maximum));
+        SendMessageA(slider, TBM_SETTICFREQ, 25, 0);
+        SendMessageA(slider, TBM_SETPOS, TRUE, position);
+        return slider;
+    };
+    createRtLabSlider(kRtLabWaterfallSliderId, 25, 200, 100);
+    createRtLabSlider(kRtLabRoofSliderId, 0, 100, 100);
+    createRtLabSlider(kRtLabDawnSliderId, 0, 100, 100);
+    createRtLabSlider(kRtLabFogSliderId, 0, 200, 100);
+    createRtLabSlider(kRtLabHueSliderId, -180, 180, 0);
+    createRtLabSlider(kRtLabIntensitySliderId, 0, 200, 100);
+    for (const int id : {kRtLabPanelId, kRtLabTitleId, kRtLabTelemetryId,
+                         kRtLabWaterfallLabelId, kRtLabWaterfallSliderId,
+                         kRtLabRoofLabelId, kRtLabRoofSliderId,
+                         kRtLabDawnLabelId, kRtLabDawnSliderId,
+                         kRtLabFogLabelId, kRtLabFogSliderId,
+                         kRtLabLightGroupButtonId, kRtLabHueLabelId, kRtLabHueSliderId,
+                         kRtLabIntensityLabelId, kRtLabIntensitySliderId,
+                         kRtLabWorkloadButtonId, kRtLabRestoreButtonId, kRtLabBackButtonId})
+    {
+        if (HWND control = GetDlgItem(hWnd, id)) ShowWindow(control, SW_HIDE);
+    }
 
     ApplyDpiScaledFonts(hWnd);
 
