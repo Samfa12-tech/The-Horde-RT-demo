@@ -39,6 +39,14 @@ Useful focused runs:
 .\tools\run-android-showcase-validation.ps1 -Mode Replay -SkipBuild -SkipInstall
 ```
 
+For an RT Lab workload comparison on one exact Debug APK, leave the ordinary checkpoint list empty and request the matched profile matrix:
+
+```powershell
+.\tools\run-android-showcase-validation.ps1 -Mode Benchmark -Scale 75 -Checkpoints @() -GpuTiming Enabled -RtLabWorkloadComparison -SkipBuild -SkipInstall
+```
+
+The runner measures Lean, Authored, and Max at `lantern-drop`, `skylight`, and `finale-roof`. It verifies the requested workload plus unchanged render scale/water quality in each native state file and requires honest RT presentation. Profile order is deliberately varied by checkpoint to reduce a simple run-order bias. This Debug-only injection marks the route ineligible for unlock persistence and must never be used as genuine-finale evidence.
+
 GPU timestamp queries remain enabled by default. For a matched instrumentation A/B, cool the phone back to the same thermal status and comparable reported temperatures before each run, use the same freshly built APK, checkpoint order, scale, and background state, and run separate cold app sessions:
 
 ```powershell
@@ -80,6 +88,7 @@ Each run creates a unique ignored working directory under `reports/android-showc
 - private Vulkan capability reports;
 - matching local/installed APK hashes, source commit/dirty state, embedded raygen hash, package/build/device properties, and before/after raw battery and thermal dumps;
 - optional fixed checkpoint screenshots.
+- when `-RtLabWorkloadComparison` is requested, nine profile-labelled timing rows and matching native tuning state files.
 
 `reports/` is Git-ignored so routine runs do not dirty the repository. Promote only a reviewed result into a dated `docs/` validation record when it represents a milestone or release gate.
 

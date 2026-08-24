@@ -15,7 +15,7 @@ Showcase Alpha 0.1.5 adds a clear RT roof-water curtain that extinguishes the la
 
 The current development foundation runs Windows and Android gameplay through one deterministic 60 Hz `GameSimulation`. Android input crosses JNI through a coherent snapshot mailbox with independent monotonic swing/parry/reset/retry counters; ordered semantic events drive platform audio and haptics; and one shared adapter preserves the existing `RtSceneFrameInputs` renderer boundary. See `docs/SHARED_SIMULATION_FOUNDATION_2026-08-10.md`.
 
-The current development foundation supports a bounded two-skeleton encounter: stable entities share a skeleton pose/BLAS when their actions match and use at most two pose buckets when they diverge; the lich remains singular. The scene owns nine BLAS and nineteen physical TLAS slots, with unused slots masked. Historical exact commit `b3428a7` passed the six-checkpoint `SM-S948B` 75% gate, 13 captures, replay, and Home/resume; the owner then reported that two-enemy play felt fine on that installed candidate. That evidence does not automatically prove later source revisions. See `docs/TWO_SKELETON_COMBAT_ANDROID_VALIDATION_2026-08-12.md`.
+The current development foundation supports a bounded two-skeleton encounter: stable entities share a skeleton pose/BLAS when their actions match and use at most two pose buckets when they diverge; the lich remains singular. The scene owns ten BLAS and twenty physical TLAS slots, including the independently transformable waterfall-stream instance, with unused slots masked. Historical exact commit `b3428a7` passed the six-checkpoint `SM-S948B` 75% gate, 13 captures, replay, and Home/resume; the owner then reported that two-enemy play felt fine on that installed candidate. That evidence does not automatically prove later source revisions. See `docs/TWO_SKELETON_COMBAT_ANDROID_VALIDATION_2026-08-12.md`.
 
 The animation-owned combat/parry candidate at exact commit `daa5892` passed functional `SM-S948B` checks and recorded a 20.246 ms warm lich median under the then-current gate. The owner found parry timing good. Final exact reconciliation commit `547d89d` publishes Android parry on press-down, animates stagger, retains event-time spatial data, restores positional skeleton hit/fall parity on Windows, and uses bounded Android feedback transport. Its clean Full gate passed strict ASTC, honest presentation, replay, 13 captures, Home/resume, fresh 12/12 Debug and Release CTests, Android build/lint, and exact installed-APK matching. Sustained 75% lich measured 23.069 ms (~43.3 FPS) at GPU thermal power level 2 and is reported honestly in the 30-50 FPS band rather than failed against an arbitrary 20 ms line. The owner gave the final exact candidate a broad audio/haptic pass and explicitly observed its stagger-back/death sequence. No renderer slot, BLAS, pose bucket, or runtime asset was added; Showcase Alpha 0.1.4 later changed release identity and packaging only. See `docs/ANIMATION_COMBAT_PARRY_SLICE_2026-08-13.md`, `docs/CURRENT_DEVELOPMENT_BASELINE_VALIDATION_2026-08-21.md`, and `docs/SHOWCASE_ALPHA_0_1_4_RELEASE_VALIDATION_2026-08-22.md`.
 
@@ -47,6 +47,7 @@ The demo uses Vulkan acceleration structures, an RT pipeline and shader binding 
 - A Hotstrike Studio skeleton derivative followed sequentially by a CC0 Meshy placeholder lich with emissive staff/eyes, charge electricity, spatial audio, three-hit combat, death animation, a physical sliding roof, a moonlight-to-dawn RT reveal, and a contextual ending with continue/restart/quit.
 - Three player vitality per encounter, one-second post-hit invulnerability, an RT-visible fatal hold, and death-menu retry at the safe opening or mirror checkpoint.
 - Seventeen FilmCow UI, sword, movement, skeleton, and lich reaction/attack WAV cues, plus one positional DRAGON-STUDIO/Pixabay waterfall loop.
+- A permanent post-lich RT Lab on Windows and Android. It pauses gameplay while RT presentation continues and tunes waterfall width, finale roof/dawn, fog, four isolated light groups, and Lean/Authored/Max workloads. Unlock progress persists; tuning resets to authored values on route/process restart. Render scale and RT-water quality remain in Settings.
 
 The signed Android APK contains both enemy GLBs, strict ASTC KTX2 environment and lich textures, seventeen FilmCow WAVs, the Pixabay waterfall loop, four ABI libraries, and launcher assets. The Windows ZIP contains `HordeLanternRT.exe`, an executable-relative `assets/` tree including the same audio, release notes, controls, and `ASSET_LICENSES.md`.
 
@@ -157,6 +158,14 @@ For repeatable Android checkpoint timing and deterministic route-collision repla
 ```
 
 The debug-only runner collects a timestamped evidence bundle without changing the public release path. See `docs/ANDROID_SHOWCASE_AUTOMATION_2026-07-17.md`.
+
+For a matched Debug-only RT Lab workload comparison on the same installed APK:
+
+```powershell
+.\tools\run-android-showcase-validation.ps1 -Mode Benchmark -Scale 75 -Checkpoints @() -GpuTiming Enabled -RtLabWorkloadComparison -SkipBuild -SkipInstall
+```
+
+This compares Lean/Authored/Max at the waterfall, skylight, and finale without persisting an unlock. See `docs/RT_LAB_VALIDATION_2026-08-24.md`.
 
 For focused real-enemy vitality, death-menu, and encounter-retry evidence on the installed Debug APK, run:
 

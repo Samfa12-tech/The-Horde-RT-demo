@@ -13,7 +13,7 @@ The `android/` module is the supported phone path for Horde Lantern RT. It owns 
 - Native Vulkan RT presentation through the Android swapchain
 - Optional Vulkan timestamp queries report a separate GPU RT command-buffer interval without changing CPU benchmark pass/fail
 - One frame in flight while the held-prop TLAS uses a host-written instance buffer
-- Portrait-first branded entry/pause/settings/controls/diagnostics/credits UI; touch movement/look plus `SWING` and `PARRY`; a bounded two-skeleton opening encounter followed by a singular lich route; layered articulated body/head with a smoothed walk gait, roof-water drench and lantern drop, rounded catchment/drain runnel, coloured bays, mirror, low ritual mist, sliding-roof dawn reveal, and Continue/Begin Again/Quit ending; strict ASTC assets; and phone-safe ray-query shading inside `vkCmdTraceRaysKHR`
+- Portrait-first branded entry/pause/settings/controls/diagnostics/credits UI; touch movement/look plus `SWING` and `PARRY`; a bounded two-skeleton opening encounter followed by a singular lich route; layered articulated body/head with a smoothed walk gait, roof-water drench and lantern drop, rounded catchment/drain runnel, coloured bays, mirror, low ritual mist, sliding-roof dawn reveal, and Continue/Begin Again/Quit ending; a persistent post-lich RT Lab with route-local tuning; strict ASTC assets; and phone-safe ray-query shading inside `vkCmdTraceRaysKHR`
 - Persisted SFX volume, look sensitivity, compact HUD, 50-100% RT render scale, and `High / Mobile / Off` RT-water quality; seventeen FilmCow clips play through SoundPool and the positional DRAGON-STUDIO/Pixabay waterfall loop uses a lifecycle-paused MediaPlayer
 - The in-app Credits & Licences panel carries Poly Haven, FilmCow, DRAGON-STUDIO/Pixabay, Hotstrike Studio, Meshy, and generated-icon provenance with the APK
 - Native libraries use a static C++ runtime plus 16 KiB ELF alignment; the packaging gate verifies 16 KiB APK/ELF alignment and rejects an r26 `libc++_shared.so`
@@ -49,6 +49,8 @@ The debug build exposes thirteen deterministic native checkpoints and a 13-waypo
 ```
 
 Add `-Include100 -Capture` for the report-only 100% opening check and post-timing screenshots. Evidence is written to a unique ignored `reports/android-showcase-runs/run-<timestamp>/` directory. Release builds reject the debug automation request path. See `../docs/ANDROID_SHOWCASE_AUTOMATION_2026-07-17.md` for checkpoints, evidence semantics, and the remaining hands-on checks.
+
+Use `-RtLabWorkloadComparison` with an empty standard checkpoint list for a matched Debug-only Lean/Authored/Max comparison at `lantern-drop`, `skylight`, and `finale-roof`. The runner verifies the applied native workload, render scale, water quality, checkpoint, and honest presentation for every row. Debug access/tuning never writes the permanent unlock. See `../docs/RT_LAB_VALIDATION_2026-08-24.md`.
 
 After vitality or encounter-retry changes, run `.\tools\run-android-vitality-validation.ps1 -SkipInstall`. It waits for real post-benchmark skeleton and lich attacks, verifies the Android death actions, invokes the Debug-only receiver through the production Java retry handler, and preserves a timestamped `reports/android-vitality-runs/` evidence bundle. It does not inject damage or claim human touch/haptic validation.
 
