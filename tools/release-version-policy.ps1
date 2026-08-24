@@ -1,5 +1,5 @@
 $script:HordeLatestPublishedAlphaPatch = 5
-$script:HordeLatestPublishedVersionCode = 6
+$script:HordeLatestPublishedVersionCode = 7
 
 function Assert-HordeReleaseVersionIsMutable {
     param(
@@ -8,10 +8,10 @@ function Assert-HordeReleaseVersionIsMutable {
         [switch]$UploadOnly
     )
 
-    $immutablePattern = '^0\.1\.(?:1|2|3|4|5)(?:$|[-+.])'
+    $immutablePattern = '^(?:0\.1\.(?:1|2|3|4|5)|1\.5\.2)(?:$|[-+.])'
     if ($Version -match $immutablePattern) {
         $action = if ($UploadOnly) { "Refusing another upload." } else { "Choose a new Version." }
-        throw "The published 0.1.1 through 0.1.$script:HordeLatestPublishedAlphaPatch release lines are immutable. $action"
+        throw "The published 0.1.1 through 0.1.$script:HordeLatestPublishedAlphaPatch and 1.5.2 release lines are immutable. $action"
     }
     if (-not $UploadOnly -and $VersionCode -le $script:HordeLatestPublishedVersionCode) {
         throw "VersionCode must be greater than the immutable published value $script:HordeLatestPublishedVersionCode."

@@ -4,16 +4,16 @@ Horde Lantern RT is a native Vulkan hardware-ray-tracing technology demo for And
 
 - Public alpha: https://samfa12.itch.io/the-horde
 - Source repository: https://github.com/Samfa12-tech/The-Horde-RT-demo
-- Current package version: `0.1.5-alpha.1`
-- Current itch builds: Windows `#1908330`; Android `#1908331`
-- Published SHA-256: Windows `631b9f01a4d348e18733c989ebacc9c32ce9005ac9498e49e8757a0a36411166`; Android `1e81238a6e1b0e934c50eb15e80fc8efd39c06f16ca8960c428b22e5f5d5a7f2`
+- Current package version: `1.5.2`
+- Current itch builds: Windows `#1913191`; Android `#1913192`
+- Published SHA-256: Windows `fd929f1972c4587c6720013eb0586934ab72924c5f8f9c50ec8576a23a57690d`; Android `19593f9d8902052cb54f9b989f9646ec8cad97063db5d882e1487dd56a671182`
 - Primary validated phone: Samsung `SM-S948B` / Adreno 840
-- Exact Android release baseline: the stable-key-signed `0.1.5` APK was installed on `SM-S948B`, pulled back byte-for-byte, and matched the published candidate. Strict ASTC and honest RT presentation passed before and after Home/resume; the owner approved waterfall audio and confirmed good haptics plus working pause/resume on that exact installed release.
+- Exact Android device baseline: the stable-key-signed `0.1.5` APK remains the latest public release installed and pulled back byte-for-byte on `SM-S948B`. The published `1.5.2` APK passed certificate/package checks, but no phone was connected at publication, so no exact `1.5.2` signed-device or lifecycle claim is made.
 - Validated Windows GPU: NVIDIA GeForce RTX 5050 Laptop GPU
 
-Showcase Alpha 0.1.5 adds a clear RT roof-water curtain that extinguishes the lantern, a rounded catchment and drain-connected runoff, bounded lich-room ground mist, positional waterfall ambience, Windows Backbone/controller support, controller menu navigation, and collision-safe directional dodge. It preserves the shared deterministic simulation, bounded two-skeleton encounter, timed parry, visible stagger, release-safe benchmark, and Debug-only checkpoint/capture telemetry.
+Showcase Alpha 1.5.2 publishes the unlockable cross-platform RT Lab and the corrected general water-light transport on top of the clear roof-water curtain, rounded catchment/drain runoff, lich mist, positional waterfall ambience, controller path, dodge, two-skeleton encounter, timed parry, and dawn finale. The Windows lab now scrolls and repaints reliably, the width control changes the visible waterfall span, and open RT Labs own the post-finale overlay on both platforms.
 
-Current development source removes the waterfall-only lighting approximation and the hidden second glossy bounce on submerged cobble. Refracted and reflected opaque hits use terminal shared active-light/material/shadow logic, transparent candidates are explicitly filtered, path distance is accumulated, interface highlights use the same visible lights, and the directional moon traverses physical roof/player geometry. The ray budget remains finite and water-on-water paths do not recurse. Deterministic Windows, fresh Host, and exact `SM-S948B` Debug evidence pass; the owner accepted the moving Windows result. The repeated phone medians are approximately 27.8 ms at `lantern-drop`, 19.0 ms at `skylight`, and 30.8 ms at `lich`, with the bounded real-light waterfall cost retained rather than hidden through a quality or resolution reduction. See `docs/WATER_TRANSMISSION_SHADOW_VALIDATION_2026-08-24.md`.
+The 1.5.2 water path removes the waterfall-only lighting approximation and hidden second glossy bounce on submerged cobble. Refracted and reflected opaque hits use terminal shared active-light/material/shadow logic, transparent candidates are explicitly filtered, path distance is accumulated, interface highlights use the same visible lights, and the directional moon traverses physical roof/player geometry. The ray budget remains finite and water-on-water paths do not recurse. Deterministic Windows, fresh Host, and exact `SM-S948B` Debug evidence pass; the owner accepted the moving Windows result. Repeated phone medians are approximately 27.8 ms at `lantern-drop`, 19.0 ms at `skylight`, and 30.8 ms at `lich`, with the bounded real-light cost retained rather than hidden through a quality or resolution reduction. See `docs/WATER_TRANSMISSION_SHADOW_VALIDATION_2026-08-24.md` and `docs/SHOWCASE_ALPHA_1_5_2_RELEASE_VALIDATION_2026-08-25.md`.
 
 The current development foundation runs Windows and Android gameplay through one deterministic 60 Hz `GameSimulation`. Android input crosses JNI through a coherent snapshot mailbox with independent monotonic swing/parry/reset/retry counters; ordered semantic events drive platform audio and haptics; and one shared adapter preserves the existing `RtSceneFrameInputs` renderer boundary. See `docs/SHARED_SIMULATION_FOUNDATION_2026-08-10.md`.
 
@@ -223,7 +223,7 @@ For a signed rebuild:
 
 The packaging and push scripts securely prompt for signing secrets, reject debug/unsigned Android candidates, verify hashes, and keep Windows and Android on separate itch channels. Add `-ConfirmPush` only after the preflight passes.
 
-There are no packaging version defaults: candidate scripts require explicit `Version` and `VersionCode`, reject the immutable published `0.1.1` through `0.1.5` lines, and require Android `versionCode > 6`. One shared policy helper owns these rules for packaging, signing, and itch upload. A future public build must first bump CMake/Windows/Android/package metadata, provide matching release notes, and update the guarded candidate hashes.
+There are no packaging version defaults: candidate scripts require explicit `Version` and `VersionCode`, reject the immutable published `0.1.1` through `0.1.5` and `1.5.2` lines, and require Android `versionCode > 7`. One shared policy helper owns these rules for packaging, signing, and itch upload. A future public build must first bump CMake/Windows/Android/package metadata, provide matching release notes, and update the guarded candidate hashes.
 
 Android native code is linked for 16 KiB page compatibility. The release uses a static C++ runtime, 16 KiB ELF `LOAD` alignment, and AGP 8.7.2 APK alignment; `package-alpha.ps1` rejects candidates that fail either APK or ELF verification or reintroduce `libc++_shared.so` from the r26 NDK.
 

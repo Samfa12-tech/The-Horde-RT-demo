@@ -107,6 +107,12 @@ An open RT Lab owns the menu scrim until the player explicitly selects Back. And
 
 Windows owns vertical RT Lab scrolling at the top-level window. Focused child controls forward wheel input there, Page Up/Down and Home/End remain available, and the window carries a real vertical-scroll style. Trackbars are opaque native controls and are redrawn when returning from a hidden scrolled state; transparent sibling painting over the layered panel is prohibited because it copies stale Vulkan/label pixels and loses the track/thumb.
 
+## Showcase Alpha 1.5.2 publication decision - 2026-08-25
+
+Publish the reviewed RT Lab and general water-light correction as literal package version `1.5.2`, Android `versionCode 7`, on the existing itch channels. Source `f4891c4` is the release provenance. Windows build `#1913191` and Android build `#1913192` are active at user version `1.5.2`; their exact SHA-256 values are recorded in the release validation.
+
+The Windows package passed a fresh isolated launch with `RayTracingPipeline`, honest swapchain presentation, and exit code 0. The Android package passed the established certificate and static/package compatibility guards, but ADB exposed no device at publication; do not infer an exact signed-device, pullback, lifecycle, performance, or owner-feel pass. The 0.1.1 through 0.1.5 and 1.5.2 lines are immutable, and the next Android update requires `versionCode > 7`.
+
 ## Target devices
 
 - Primary target: Samsung Galaxy S26 Ultra.

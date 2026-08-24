@@ -1,6 +1,6 @@
 # Windows RT Device Compatibility Record
 
-Last updated: 2026-08-23
+Last updated: 2026-08-25
 
 This is the living compatibility record for the Horde Lantern RT Windows build. A GPU is marked as working only when the project selects `RayTracingPipeline`, creates the required Vulkan RT path, and presents RT-produced frames through the swapchain. DirectX feature level, vendor marketing, or merely launching the executable are not sufficient on their own.
 
@@ -18,7 +18,7 @@ The Android record remains in [`ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md`](ANDR
 
 | Device / GPU | Status | Build and render tier | Key result |
 |---|---|---|---|
-| NVIDIA GeForce RTX 5050 Laptop GPU | Works - locally tested | `0.1.5-alpha.1`, 100%, `1232x803` | Exact published ZIP; `RayTracingPipeline`; honest swapchain presentation |
+| NVIDIA GeForce RTX 5050 Laptop GPU | Works - locally tested | `1.5.2`, 100%, `1232x803` | Exact published ZIP; `RayTracingPipeline`; honest swapchain presentation |
 | HP EliteBook 845 14-inch G11 / AMD Radeon 780M integrated graphics | Works - locally tested | `0.1.3-alpha.1`, 100%, `1484x991` | `RayTracingPipeline`; 1,838 measured frames; 10.222 ms median / 97.828 FPS; 59.650 FPS 1% low |
 
 ## Confirmed evidence
@@ -63,6 +63,15 @@ This is a notably stronger result than a launch-only test: the machine completed
 - **RT result:** NVIDIA GeForce RTX 5050 Laptop GPU; internal extent `1232x803`; `RayTracingPipeline`; `RT scene status: Presented via swapchain`; `RT scene presented: yes`.
 - **Lifecycle:** The main window closed normally with exit code 0.
 - **Qualification:** This confirms the exact published package, asset layout, Vulkan RT selection, and honest presentation on the dedicated Windows reference. It is not a fresh sustained benchmark or proof for another GPU/driver.
+
+#### Showcase Alpha 1.5.2 exact packaged smoke - 2026-08-25
+
+- **Build/artifact:** `1.5.2`; exact published Windows ZIP SHA-256 `fd929f1972c4587c6720013eb0586934ab72924c5f8f9c50ec8576a23a57690d`; itch build `#1913191`.
+- **Package isolation:** Extracted to `reports/release-smoke/windows-1.5.2-20260825-074305/` and launched using only packaged files.
+- **Identity:** File and product version `1.5.2`.
+- **RT result:** NVIDIA GeForce RTX 5050 Laptop GPU; `RayTracingPipeline`; `RT scene presented: yes` after successful swapchain presentation.
+- **Lifecycle:** The hidden validation window received `WM_CLOSE` and exited normally with code 0; no game process was left running.
+- **Qualification:** This confirms the exact published package, asset layout, Vulkan RT selection, and honest presentation. It is not a fresh sustained benchmark, a new artistic review, or proof for another GPU/driver.
 
 ## Interpretation rules
 

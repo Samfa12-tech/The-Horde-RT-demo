@@ -1,17 +1,19 @@
 # Documentation checkpoint - 2026-07-17
 
-Last updated: 2026-08-23
+Last updated: 2026-08-25
 
 ## Purpose
 
-This is the consolidation map after Showcase Alpha 0.1.5 publication. It distinguishes current authority from dated implementation history so old “pending” language is not mistaken for the present backlog.
+This is the consolidation map after Showcase Alpha 1.5.2 publication. It distinguishes current authority from dated implementation history so old “pending” language is not mistaken for the present backlog.
 
 ## Current release authority
 
 | Claim | Authoritative record |
 |---|---|
-| Published artifacts, hashes, certificate, itch builds, public-page verification, and exact signed Android smoke | `SHOWCASE_ALPHA_0_1_5_RELEASE_VALIDATION_2026-08-23.md` |
-| Public release contents and known limits | `SHOWCASE_ALPHA_0_1_5_RELEASE_NOTES_2026-08-23.md` |
+| Published artifacts, hashes, certificate, itch builds, Windows smoke, and Android evidence boundary | `SHOWCASE_ALPHA_1_5_2_RELEASE_VALIDATION_2026-08-25.md` |
+| Public release contents and known limits | `SHOWCASE_ALPHA_1_5_2_RELEASE_NOTES_2026-08-25.md` |
+| RT Lab implementation, controls, performance, and owner Windows acceptance | `RT_LAB_VALIDATION_2026-08-24.md` |
+| General water-light transport, shadows, bounded queries, and phone measurements | `WATER_TRANSMISSION_SHADOW_VALIDATION_2026-08-24.md` |
 | RT waterfall, catchment/drain, lich mist, controller, dodge, and positional-loop implementation evidence | `RT_WATERFALL_LICH_MIST_VALIDATION_2026-08-23.md` |
 | Player vitality/retry implementation and evidence boundary | `PLAYER_VITALITY_RETRY_SLICE_2026-07-31.md` |
 | Rebuilt player body, gait, dawn ending, and exact Debug device evidence | `PLAYER_BODY_AND_FINALE_SLICE_2026-07-31.md` |
@@ -28,8 +30,8 @@ This is the consolidation map after Showcase Alpha 0.1.5 publication. It disting
 
 ## Consolidated current state
 
-- Public version: Showcase Alpha 0.1.5 / `0.1.5-alpha.1`; Android `versionCode 6`.
-- Itch builds: Windows `#1908330`, Android `#1908331`.
+- Public version: Showcase Alpha 1.5.2 / `1.5.2`; Android `versionCode 7`.
+- Itch builds: Windows `#1913191`, Android `#1913192`.
 - Route: two skeletons -> shadow corridor -> roof-water drench/lantern drop -> rounded catchment and drain runoff -> blue skylight -> four coloured bays -> open threshold -> hero mirror -> misted staff-lit lich -> opening roof -> returning dawn -> epilogue.
 - The stained pane remains rejected. The water is a narrow real-geometry RT feature with bounded reflection/transmission, not a broad fluid simulation.
 - Player body includes a layered travelling coat, articulated capsule arms and legs, pelvis/boots, foot lift/toe roll, restrained torso counter-rotation, head shadow/reflection, and wall-aware props.
@@ -41,7 +43,7 @@ This is the consolidation map after Showcase Alpha 0.1.5 publication. It disting
 - A separate player-facing benchmark is release-safe on both platforms: one warm-up lap plus one measured 13-waypoint lap, followed by a selectable/copyable/exportable report and archived JSON. Windows and `SM-S948B` Android device validation pass; see the dated in-app benchmark validation records.
 - The integrated `Host|Full` foundation gate is complete. It owns clean cross-platform builds/tests, stale-shader and package/licence/identity checks, validation-only artifacts and hashes, 13 deterministic Windows captures, and the connected-phone replay/lifecycle/13-capture evidence path.
 - The unreachable stained-glass material route was removed after a bounded A/B: SPIR-V structure improved, all 12 Windows images were bit-exact, Windows median timing was unchanged, and all five comparable-temperature Android 75% checkpoints improved within the required non-regression rule.
-- The exact published signed Android APK was clean-installed on `SM-S948B` on 2026-08-01 after removing the old stable and Debug packages. Its installed hash matched the release candidate byte-for-byte; strict ASTC, 17/17 SFX loads, Release automation rejection, honest presentation, and Home/resume passed.
+- The 1.5.2 Windows ZIP passed an isolated exact-package launch with honest RT presentation and clean exit. The exact 1.5.2 Android APK passed certificate/package guards but was not installed because no ADB device was connected; 0.1.5 remains the latest public signed APK byte-matched and lifecycle-tested on `SM-S948B`.
 
 ## Historical records
 
@@ -57,14 +59,14 @@ The following dated families are intentionally preserved rather than rewritten: 
 - Precise waterfall stereo direction, loop seam, and Android audible pause/resume were not separately scored; source contracts, native gains, packaging, and lifecycle behavior are verified.
 - A separately authored full-character rig, encounters above two skeletons, broader AI, held block, broad fluid simulation, and the staged textured sword runtime remain deferred.
 - The developer overlay is device-validated on Windows and Android. Integrated clean-build/package/stale-shader/licence gates and fixed PNG capture are complete; video and orbit-camera presentation remain tooling deferrals.
-- Future publishing must explicitly supply and bump all version surfaces and Android `versionCode > 6`; the shared release-version policy rejects the immutable published 0.1.1 through 0.1.5 lines before packaging/upload work.
+- Future publishing must explicitly supply and bump all version surfaces and Android `versionCode > 7`; the shared release-version policy rejects the immutable published 0.1.1 through 0.1.5 and 1.5.2 lines before packaging/upload work.
 - The unchecked historical `v0.1.0-alpha.1` tag task is superseded; do not create a retroactive tag on a later commit.
 
 ## Audit scope and outcome
 
-- Re-audited the living repository authorities, Windows release README, package guards, licence markers, and current source/package metadata on 2026-08-23.
+- Re-audited the living repository authorities, Windows release README, package guards, licence markers, and current source/package metadata on 2026-08-25.
 - Verified all Markdown links resolve.
 - Preserved dated evidence, corrected living package commands/counts/feature descriptions, promoted the reviewed automation digest, and separated cool automation from warm certification.
-- Verified current source/package version surfaces agree on 0.1.5 / Android code 6. Feature source `2bda83a` and line-ending-safe merged `main` source `172bb0a` produced the exact published artifacts recorded in the 0.1.5 release validation.
+- Verified current source/package version surfaces agree on 1.5.2 / Android code 7. Release source `f4891c4` produced the exact published artifacts recorded in the 1.5.2 release validation.
 - Rebuilt Android Debug/Release, passed Release lint, and verified the automation-only `singleTop` launch mode exists in Debug's merged manifest but not Release's. Windows Debug/Release builds and all seven CTests pass.
-- The 2026-08-23 itch update retains platforms, video, links, licences, AI disclosure, install instructions, and visibility while publishing the 0.1.5 copy and Gamepad input metadata from `release/SAMFA12_SITE_COPY.md`. Anonymous verification belongs to the 0.1.5 release record.
+- The 2026-08-25 itch channel update preserves the existing public page while publishing the 1.5.2 Windows and Android downloads. The repository's prepared page copy is current, but no authenticated description Save was requested or performed; anonymous artifact verification belongs to the 1.5.2 release record.

@@ -8,22 +8,22 @@ Last updated: 2026-08-25
 - Purpose: native Vulkan hardware-ray-tracing game/technology demo.
 - Principle: **RT or nothing**; unsupported devices receive honest diagnostics, never a fake fallback.
 - Primary target: Android phone. Equal validation target: Windows RTX.
-- Current release: **Showcase Alpha 0.1.5**, package version `0.1.5-alpha.1`, Android `versionCode 6`.
+- Current release: **Showcase Alpha 1.5.2**, package version `1.5.2`, Android `versionCode 7`.
 - Canonical downloads: https://samfa12.itch.io/the-horde. Samfa12.com links to itch rather than hosting a second copy; the live `/games/` card, itch link, GitHub link, thumbnail, and released status were rendered and verified on 2026-07-15.
 - Source: https://github.com/Samfa12-tech/The-Horde-RT-demo.
-- Windows itch channel: upload `#18339908`, build `#1908330`, `windows-x64`.
-- Android itch channel: upload `#18341739`, build `#1908331`, `android`.
-- Signed Android APK SHA-256: `1e81238a6e1b0e934c50eb15e80fc8efd39c06f16ca8960c428b22e5f5d5a7f2`.
-- Windows ZIP SHA-256: `631b9f01a4d348e18733c989ebacc9c32ce9005ac9498e49e8757a0a36411166`.
+- Windows itch channel: upload `#18339908`, build `#1913191`, `windows-x64`.
+- Android itch channel: upload `#18341739`, build `#1913192`, `android`.
+- Signed Android APK SHA-256: `19593f9d8902052cb54f9b989f9646ec8cad97063db5d882e1487dd56a671182`.
+- Windows ZIP SHA-256: `fd929f1972c4587c6720013eb0586934ab72924c5f8f9c50ec8576a23a57690d`.
 - Signing certificate SHA-256: `8245277a11bca5576f116724507f799d6f4c178ce5fbb7e3981415c9e6b3c245`.
 - The release JKS and a local-only password note live together outside Git with restricted ACLs. An independent owner backup is still required.
-- Release proof: `docs/SHOWCASE_ALPHA_0_1_5_RELEASE_VALIDATION_2026-08-23.md`.
+- Release proof: `docs/SHOWCASE_ALPHA_1_5_2_RELEASE_VALIDATION_2026-08-25.md`.
 
 ## Locked creative direction
 
 - Historical gothic action demo: dark ruin, wet stone, fog, torch/lantern light, silhouettes, shadows, and obvious RT mood.
 - Lighting and atmosphere come before broader combat.
-- Showcase Alpha 0.1.5 publishes the bounded two-skeleton/parry loop, collision-safe directional dodge, clear roof-water drench/catchment/drain, lich ground mist, positional waterfall ambience, and Windows controller path. Do not add a third enemy, held guard, broad AI, or fluid simulation without a later phone-measured plan.
+- Showcase Alpha 1.5.2 publishes the bounded two-skeleton/parry loop, directional dodge, clear roof-water drench/catchment/drain, lich ground mist, positional waterfall ambience, cross-platform RT Lab, corrected general RT water lighting, and Windows controller path. Do not add a third enemy, held guard, broad AI, or fluid simulation without a later phone-measured plan.
 - The authored coloured-light route is complete and published in Showcase Alpha 0.1.1; its design history is `docs/COLOURED_LIGHT_ROUTE_PLAN_2026-07-15.md` and its final evidence is in the Windows/Android/release validation records.
 
 ## Current renderer
@@ -56,7 +56,7 @@ Last updated: 2026-08-25
 ## UI, settings, diagnostics, and audio
 
 - Both platforms have branded entry, pause, controls, settings, RT diagnostics, restart, and quit flows.
-- Post-lich RT Lab owns the overlay while it is open. Android finale polling must include `rtLabVisible` in the ending-overlay guard so the recurring completed-finale poll cannot clear the lab views and rebuild the ending card. The owner exposed this on exact Debug APK `326e024adcb8d5bfb9c5a66fecde9fbb137f19af44cda5c203468fb21dde76d7`; the later process exit was Codex cleanup, not crash evidence. Windows transparent trackbars were separately found to paint stale Vulkan/layered-parent content after open and scroll hide/show, while focused children consumed wheel input. They now use opaque native painting, explicit redraw, routed wheel/page scrolling, and a real vertical-scroll window style. The width control now scales world-Z cross-lane waterfall geometry and matching shader profiles instead of imperceptible world-X depth. Owner Windows acceptance passed; Host run `run-20260825-070928` passed with Debug APK `1d7079004979c5afa54bece8a10543ec2b27b8d7310d9c49820aae6fdda884ed`, but fixed-APK phone confirmation remains pending.
+- Post-lich RT Lab owns the overlay while it is open. Android `showEndingOverlay()` and Windows `ShowEndingMenu()` both guard `rtLabVisible` so recurring completed-finale polling cannot replace or mutate the lab. The owner exposed the Android issue on exact Debug APK `326e024adcb8d5bfb9c5a66fecde9fbb137f19af44cda5c203468fb21dde76d7`; the later process exit was Codex cleanup, not crash evidence. Windows trackbars now use opaque native painting, explicit redraw, routed wheel/page scrolling, and a real vertical-scroll style. Waterfall width scales world-Z cross-lane geometry and matching shader profiles instead of imperceptible world-X depth. Owner Windows acceptance and fresh Host validation pass; exact fixed-APK phone confirmation remains pending because no device was connected for the signed 1.5.2 release smoke.
 - Both platform menus expose a release-safe two-pass benchmark: pass 1 warms the deterministic 13-waypoint route, pass 2 measures it, and completion produces a selectable/copyable/exportable text report plus automatically archived JSON evidence. Windows and `SM-S948B` Android device validation pass.
 - Both platform menus include `More by Samfa12`, which opens https://samfa12.com/ in the system browser.
 - Technical output stays tucked away unless requested or startup fails.
@@ -71,6 +71,7 @@ Last updated: 2026-08-25
 ## Validated Android release state
 
 - Device: Samsung `SM-S948B`, Adreno 840, Vulkan 1.4.295, Android 16.
+- Showcase Alpha `1.5.2` / `versionCode 7` is published as Android itch build `#1913192`, SHA-256 `19593f9d8902052cb54f9b989f9646ec8cad97063db5d882e1487dd56a671182`. The exact APK passed the established certificate, version, layout, static-runtime, 16 KiB APK/ELF, credit, waterfall-asset, and native-library guards. No ADB device was connected at publication, so it has no exact signed-device, pullback, lifecycle, performance, or owner-feel claim.
 - Showcase Alpha `0.1.5-alpha.1` / `versionCode 6` is published as Android itch build `#1908331`, SHA-256 `1e81238a6e1b0e934c50eb15e80fc8efd39c06f16ca8960c428b22e5f5d5a7f2`. The exact public APK passed established-certificate, version, strict layout, static-runtime, 16 KiB APK/ELF, credit, waterfall-asset, and native-library checks. It was installed on `SM-S948B`, pulled back byte-for-byte, and passed strict ASTC plus honest presentation before and after Home/resume. With that exact release still installed, the owner approved waterfall audio and confirmed good haptics and working pause/resume, closing the change-triggered feedback gate.
 - The exact stable-key-signed 0.1.3 APK is published as build `#1845896`, `versionCode 4` / `versionName 0.1.3-alpha.1`. On 2026-08-01 the old stable 0.1.2 and Debug packages were removed, and the exact published APK was clean-installed on `SM-S948B`; the installed `base.apk` SHA-256 matched `a4eb996104c03734a7fa8a16be1f8f701d5b19c861c066af002f96f9a199eee9` byte-for-byte.
 - The signed Release selected strict ASTC, loaded all 17 SoundPool cues, visibly identified Alpha 0.1.3, explicitly rejected Debug capture automation, and honestly presented before and after Home/resume with no fatal marker. Evidence: `reports/release-smoke/android-signed-20260801-165934/` and `docs/SHOWCASE_ALPHA_0_1_3_RELEASE_VALIDATION_2026-07-31.md`.
