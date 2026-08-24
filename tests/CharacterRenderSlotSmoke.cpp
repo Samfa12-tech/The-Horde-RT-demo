@@ -602,6 +602,22 @@ int main()
                       androidSource.find("private void showRtLab()") != std::string::npos &&
                       androidSource.find("ProbeBridge.setSimulationPaused(true)") != std::string::npos,
                       "Android RT Lab must preserve progress through settings reset and expose a live paused 48dp panel");
+        const std::size_t androidOpenRtLabBegin = androidSource.find("private void openRtLab(");
+        const std::size_t androidOpenRtLabEnd = androidSource.find("private void showRtLab(", androidOpenRtLabBegin);
+        const std::size_t androidCloseRtLabBegin = androidSource.find("private void closeRtLab(");
+        const std::size_t androidCloseRtLabEnd = androidSource.find("private String rtLightGroupName(", androidCloseRtLabBegin);
+        const std::string androidOpenRtLab =
+            androidOpenRtLabBegin != std::string::npos && androidOpenRtLabEnd != std::string::npos
+                ? androidSource.substr(androidOpenRtLabBegin, androidOpenRtLabEnd - androidOpenRtLabBegin)
+                : std::string{};
+        const std::string androidCloseRtLab =
+            androidCloseRtLabBegin != std::string::npos && androidCloseRtLabEnd != std::string::npos
+                ? androidSource.substr(androidCloseRtLabBegin, androidCloseRtLabEnd - androidCloseRtLabBegin)
+                : std::string{};
+        ok &= Require(!androidOpenRtLab.empty() && !androidCloseRtLab.empty() &&
+                      androidOpenRtLab.find("playSound(") == std::string::npos &&
+                      androidCloseRtLab.find("playSound(") == std::string::npos,
+                      "Android RT Lab open/back interactions must remain silent without changing ordinary menu audio");
         ok &= Require(androidJavaBridgeSource.find("setRtSceneTuning") != std::string::npos &&
                       androidJavaBridgeSource.find("setRtLightTuning") != std::string::npos &&
                       androidJavaBridgeSource.find("setRtWorkloadPreset") != std::string::npos &&

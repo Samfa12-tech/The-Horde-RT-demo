@@ -800,7 +800,6 @@ public class MainActivity extends Activity {
     }
 
     private void openRtLab(final boolean returnToEnding) {
-        playSound("ui_select", 0.18f);
         rtLabReturnToEnding = returnToEnding;
         if (returnToEnding) endingOverlayVisible = false;
         showRtLab();
@@ -933,7 +932,6 @@ public class MainActivity extends Activity {
     }
 
     private void closeRtLab() {
-        playSound("ui_back", 0.18f);
         rtLabVisible = false;
         rtLabTelemetry = null;
         handler.removeCallbacks(refreshRtLabTelemetry);
