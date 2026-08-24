@@ -2233,9 +2233,7 @@ void NavigateControllerMenu(VulkanSurfaceContext& context, const int direction)
         : static_cast<std::size_t>(std::distance(controls.begin(), found));
     if (found != controls.end())
     {
-        index = direction < 0
-            ? (index + controls.size() - 1u) % controls.size()
-            : (index + 1u) % controls.size();
+        index = horde::platform::windows::WrapRtLabFocus(index, direction, controls.size());
     }
     if (context.rtLabVisible)
     {
@@ -2258,7 +2256,8 @@ void NavigateControllerMenu(VulkanSurfaceContext& context, const int direction)
         LayoutOverlayControls(context.windowHandle, client.right, client.bottom);
     }
     SetFocus(controls[index]);
-    PlaySoundEffect(context, "ui_select.wav");
+    if (horde::platform::windows::ShouldPlayControllerMenuSound(context.rtLabVisible))
+        PlaySoundEffect(context, "ui_select.wav");
 }
 
 void CancelControllerMenu(VulkanSurfaceContext& context)
@@ -2298,7 +2297,6 @@ bool AdjustFocusedControllerSlider(VulkanSurfaceContext& context, const bool inc
         context.rtLabLightGroup = static_cast<horde::vulkan::raytracing::RtLightGroup>(
             increase ? (current + 1u) % count : (current + count - 1u) % count);
         UpdateRtLabLabels(context);
-        PlaySoundEffect(context, "ui_select.wav");
         return true;
     }
     if (id == kRtLabWorkloadButtonId)
@@ -2307,7 +2305,6 @@ bool AdjustFocusedControllerSlider(VulkanSurfaceContext& context, const bool inc
         context.rtSceneTuning.workloadPreset = static_cast<horde::vulkan::raytracing::RtWorkloadPreset>(
             std::clamp(current + (increase ? 1 : -1), 0, 2));
         UpdateRtLabLabels(context);
-        PlaySoundEffect(context, "ui_select.wav");
         return true;
     }
     horde::platform::windows::RtLabControlRange range =
@@ -2334,7 +2331,8 @@ bool AdjustFocusedControllerSlider(VulkanSurfaceContext& context, const bool inc
         SendMessageA(context.windowHandle, WM_HSCROLL,
                      MAKEWPARAM(TB_ENDTRACK, next),
                      reinterpret_cast<LPARAM>(focused));
-        PlaySoundEffect(context, "ui_select.wav");
+        if (horde::platform::windows::ShouldPlayControllerMenuSound(context.rtLabVisible))
+            PlaySoundEffect(context, "ui_select.wav");
     }
     return true;
 }
@@ -4645,7 +4643,6 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 OpenSettings(*sceneContext);
                 return 0;
             case kRtLabButtonId:
-                PlaySoundEffect(*sceneContext, "ui_select.wav");
                 OpenRtLab(*sceneContext);
                 return 0;
             case kRtLabLightGroupButtonId:
@@ -4653,7 +4650,6 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                     (static_cast<std::uint32_t>(sceneContext->rtLabLightGroup) + 1u) %
                     static_cast<std::uint32_t>(horde::vulkan::raytracing::kRtLightGroupCount));
                 UpdateRtLabLabels(*sceneContext);
-                PlaySoundEffect(*sceneContext, "ui_select.wav");
                 return 0;
             case kRtLabWorkloadButtonId:
             {
@@ -4664,18 +4660,15 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                         : (sceneContext->rtSceneTuning.workloadPreset == RtWorkloadPreset::Authored
                                ? RtWorkloadPreset::Max : RtWorkloadPreset::Lean);
                 UpdateRtLabLabels(*sceneContext);
-                PlaySoundEffect(*sceneContext, "ui_select.wav");
                 return 0;
             }
             case kRtLabRestoreButtonId:
                 sceneContext->rtSceneTuning = {};
                 sceneContext->rtLabLightGroup = horde::vulkan::raytracing::RtLightGroup::Torch;
                 UpdateRtLabLabels(*sceneContext);
-                PlaySoundEffect(*sceneContext, "ui_select.wav");
                 return 0;
             case kRtLabBackButtonId:
                 CloseRtLab(*sceneContext);
-                PlaySoundEffect(*sceneContext, "ui_back.wav");
                 return 0;
             case kDiagnosticsButtonId:
             case kMenuDiagnosticsId:

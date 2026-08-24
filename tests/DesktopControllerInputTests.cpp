@@ -29,6 +29,7 @@ using horde::platform::windows::RtLabUnlockContext;
 using horde::platform::windows::CanPersistRtLabUnlock;
 using horde::platform::windows::StepRtLabControl;
 using horde::platform::windows::WrapRtLabFocus;
+using horde::platform::windows::ShouldPlayControllerMenuSound;
 
 void Require(const bool condition, const std::string_view message)
 {
@@ -95,6 +96,8 @@ int main()
             "roof/dawn and fog/light controls must use their truthful bounds");
     Require(WrapRtLabFocus(0u, -1, 4u) == 3u && WrapRtLabFocus(3u, 1, 4u) == 0u,
             "keyboard/controller focus must wrap in both directions");
+    Require(ShouldPlayControllerMenuSound(false) && !ShouldPlayControllerMenuSound(true),
+            "ordinary menu navigation may retain feedback while every RT Lab interaction stays silent");
 
     constexpr LegacyControllerIdentity capturedBackbone{
         .vendorId = 0x358au,
@@ -246,6 +249,18 @@ int main()
             windowsSource.find("RESTORE AUTHORED") != std::string::npos &&
             windowsSource.find("lastRtLabTelemetryTick < 250u") != std::string::npos,
             "Windows RT Lab must expose completion actions, authored reset, and four-Hz live telemetry");
+    Require(windowsSource.find("WrapRtLabFocus(index, direction, controls.size())") != std::string::npos &&
+            windowsSource.find("ShouldPlayControllerMenuSound(context.rtLabVisible)") != std::string::npos,
+            "production RT Lab focus and silent navigation must use the behavior-tested seams");
+    const std::size_t labCommandsBegin = windowsSource.find("case kRtLabButtonId:");
+    const std::size_t labCommandsEnd = windowsSource.find("case kDiagnosticsButtonId:", labCommandsBegin);
+    const std::size_t labFunctionsBegin = windowsSource.find("void OpenRtLab(");
+    const std::size_t labFunctionsEnd = windowsSource.find("void ShowPauseMenu(", labFunctionsBegin);
+    Require(labCommandsBegin != std::string::npos && labCommandsEnd != std::string::npos &&
+            windowsSource.substr(labCommandsBegin, labCommandsEnd - labCommandsBegin).find("PlaySoundEffect") == std::string::npos &&
+            labFunctionsBegin != std::string::npos && labFunctionsEnd != std::string::npos &&
+            windowsSource.substr(labFunctionsBegin, labFunctionsEnd - labFunctionsBegin).find("PlaySoundEffect") == std::string::npos,
+            "opening, adjusting, restoring, and closing the RT Lab must not add audio behavior");
 
     ControllerTriggerLatch triggerLatch{};
     const ControllerActionEdges firstTriggers = UpdateXInputTriggerEdges(0u, 255u, triggerLatch);

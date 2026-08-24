@@ -53,4 +53,9 @@ inline std::size_t WrapRtLabFocus(
     return direction < 0 ? (current + count - 1u) % count : (current + 1u) % count;
 }
 
+inline bool ShouldPlayControllerMenuSound(const bool rtLabVisible)
+{
+    return !rtLabVisible;
+}
+
 } // namespace horde::platform::windows
