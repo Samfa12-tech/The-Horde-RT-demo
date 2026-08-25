@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "asset": "bad-scale",
+  "metresPerUnit": -1.0,
+  "coordinateSystem": { "up": "+Y", "forward": "+Z" },
+  "budgets": { "maxVertices": 16, "maxIndices": 24, "maxPrimitives": 4, "maxMaterials": 4, "maxTextureLayersPerKind": 4 },
+  "lods": [{ "name": "lod0", "maxTriangles": 8 }],
+  "requiredSockets": ["grip"],
+  "runtimeTextureProfile": { "android": "astc", "windows": "rgba8", "mipmapped": true },
+  "materialOverrides": []
+}

@@ -114,6 +114,13 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AN
 endif()
 
 if(BUILD_TESTING)
+    add_executable(horde_rt_static_gltf_asset_tests tests/StaticGltfAssetTests.cpp)
+    target_include_directories(horde_rt_static_gltf_asset_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_compile_definitions(horde_rt_static_gltf_asset_tests PRIVATE
+        HORDE_RT_STATIC_GLTF_FIXTURE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/static-gltf"
+    )
+    add_test(NAME horde_rt_static_gltf_asset_tests COMMAND horde_rt_static_gltf_asset_tests)
+
     add_executable(horde_rt_simulation_timing_tests tests/SimulationTimingTests.cpp)
     target_include_directories(horde_rt_simulation_timing_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_link_libraries(horde_rt_simulation_timing_tests PRIVATE horde_gameplay_simulation)
