@@ -152,7 +152,7 @@ if(BUILD_TESTING)
     # lane configures BUILD_TESTING on Linux as well as the Windows Host gate.
     try_compile(HORDE_RT_LEGACY_TORCH_FAILURE_IDENTIFIERS_COMPILED
         "${CMAKE_BINARY_DIR}/CMakeFiles/torch_failure_terminology_legacy"
-        SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/torch_failure_terminology_legacy.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/torch_failure_terminology_legacy.cpp"
         CMAKE_FLAGS
             "-DCMAKE_CXX_STANDARD:STRING=20"
             "-DCMAKE_CXX_STANDARD_REQUIRED:BOOL=ON"
