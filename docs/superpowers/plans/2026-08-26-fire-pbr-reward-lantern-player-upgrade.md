@@ -86,7 +86,7 @@
 
 ---
 
-## Milestone 0: No-Behaviour Semantic and Shader-Maintainability Baseline
+## Task 1 — Milestone 0: No-Behaviour Semantic and Shader-Maintainability Baseline
 
 **Scope:** Disambiguate the original torch failure from the new reward lantern and create maintainable shader include boundaries without changing ABI, captures, gameplay, or assets.
 
@@ -117,7 +117,7 @@
 
 **Exit:** Clean Host PASS, bit-exact captures, no asset generation, and no visual/runtime behavior change.
 
-## Milestone 1: Static GLB/PBR Contract and Generic RT Metadata
+## Task 2 — Milestone 1: Static GLB/PBR Contract and Generic RT Metadata
 
 **Scope:** Add a narrow validated asset reader/compiler and a fixed-capacity generic static RT route, then render the staged sword in a development-only inspection checkpoint.
 
@@ -167,7 +167,7 @@
 
 **Exit:** Both new CTests pass in Debug/Release, Host gate passes, the staged sword is generic-path-only, source assets remain unshipped, and exact-phone resource/performance evidence is recorded.
 
-## Milestone 2: Shared Held-Item Sockets and Production Sword/Torch
+## Task 3 — Milestone 2: Shared Held-Item Sockets and Production Sword/Torch
 
 **Scope:** Create one item transform path for sword, original torch, and future reward lantern; promote accepted PBR sword/torch assets and remove their procedural geometry after parity.
 
@@ -210,7 +210,7 @@
 
 **Exit:** Sword and torch use the same generic asset/socket path, hands/grips stay coherent, the roof-water sequence is unchanged, package/licence gates pass, and exact-phone visual/performance evidence is accepted.
 
-## Milestone 3: Reusable World-Space Fire Emitter
+## Task 4 — Milestone 3: Reusable World-Space Fire Emitter
 
 **Scope:** Replace the temporary layered flame proof with a bounded deterministic emitter used by the opening torch and later by the reward lantern.
 
@@ -254,7 +254,7 @@
 
 **Exit:** The opening torch is the production fire proof; it remains deterministic, reflected, depth-occluded, and phone-measured through a reusable emitter path.
 
-## Milestone 4: Skinned Player, Animation Layers, IK, and Real Bone Sockets
+## Task 5 — Milestone 4: Skinned Player, Animation Layers, IK, and Real Bone Sockets
 
 **Scope:** Replace the procedural player with one original full-body first-person-compatible skinned character while preserving combat authority and the held-item contract.
 
@@ -298,7 +298,7 @@
 
 **Exit:** A single skinned player owns visible body/hands/sockets, procedural player instances are retired, the TLAS remains capped at 20, and exact-phone motion/performance/lifecycle evidence is accepted.
 
-## Milestone 5: Reusable Bounded Dielectric Transport
+## Task 6 — Milestone 5: Reusable Bounded Dielectric Transport
 
 **Scope:** Generalize shared Fresnel/terminal-hit/visibility plumbing without destabilizing water, then add closed-volume glass transport for generic materials.
 
@@ -340,7 +340,7 @@
 
 **Exit:** Water remains accepted, the generic dielectric fixture reads as real glass on both targets, and the phone budget is documented before lantern integration.
 
-## Milestone 6: Gothic Chest and Icon-Faithful Reward Lantern Assets
+## Task 7 — Milestone 6: Gothic Chest and Icon-Faithful Reward Lantern Assets
 
 **Scope:** Produce validated chest and lantern assets through the same static GLB/PBR/material path, with clean rigid parts, sockets, and closed glass.
 
@@ -378,7 +378,7 @@
 
 **Exit:** Chest and lantern pass the same asset contract as sword/torch, glass is physically separate/closed, silhouette matches the reference family, licences are complete, and both packages contain runtime assets only.
 
-## Milestone 7: Reward Interaction, High/Low Carry, Finale Extraction, and Pendulum
+## Task 8 — Milestone 7: Reward Interaction, High/Low Carry, Finale Extraction, and Pendulum
 
 **Scope:** Add shared commands and route-local chest/lantern progression, extract finale sequencing from lich combat, drive the player IK, and simulate responsive lantern motion at fixed 60 Hz.
 
@@ -435,7 +435,7 @@
 
 **Exit:** Reward sequence, high/low carry, and pendulum are deterministic and platform-shared; ending overlays wait correctly; exact-phone hands-on interaction/motion/lifecycle review passes.
 
-## Milestone 8: Consolidation, Full Evidence, and Owner Candidate
+## Task 9 — Milestone 8: Consolidation, Full Evidence, and Owner Candidate
 
 **Scope:** Remove temporary paths, reconcile authority, run the full matrix, and present an exact unpublishable candidate for owner review. Release work remains separately gated.
 
