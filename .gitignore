@@ -12,6 +12,7 @@ shaders/raytracing/*.spv
 *.vcxproj.user
 .idea/
 .vscode/
+.worktrees/
 CMakeUserPresets.json
 android/local.properties
 *.apk
