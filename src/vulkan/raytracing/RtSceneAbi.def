@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "capacities": {
+    "instanceMetadata": 20,
+    "staticAssets": 8,
+    "primitives": 32,
+    "materials": 32,
+    "textureLayers": 16
+  },
+  "bindings": {
+    "instanceMetadata": 11,
+    "primitiveMetadata": 12,
+    "materials": 13,
+    "staticVertices": 14,
+    "staticIndices": 15,
+    "baseColorTextures": 16,
+    "normalTextures": 17,
+    "ormTextures": 18,
+    "emissiveTextures": 19
+  },
+  "instanceFlags": {
+    "staticPbr": 1,
+    "emissive": 2,
+    "transmissive": 4
+  },
+  "materialFlags": {
+    "doubleSided": 1,
+    "alpha": 2,
+    "transmission": 4
+  }
+}

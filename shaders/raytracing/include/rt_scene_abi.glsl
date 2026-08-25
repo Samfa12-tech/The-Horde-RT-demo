@@ -35,6 +35,8 @@ layout(std430, set = 0, binding = 10) readonly buffer SecondSkeletonVertices
     SkeletonVertex vertices[];
 } secondSkeleton;
 
+#include "rt_scene_abi.generated.glsl"
+
 layout(push_constant) uniform SceneControls
 {
     float yaw;

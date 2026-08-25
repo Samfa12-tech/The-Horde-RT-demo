@@ -116,6 +116,14 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AN
 endif()
 
 if(BUILD_TESTING)
+    add_executable(horde_rt_scene_abi_tests tests/RtSceneAbiTests.cpp)
+    target_include_directories(horde_rt_scene_abi_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_sources(horde_rt_scene_abi_tests PRIVATE
+        src/vulkan/raytracing/RtStaticMeshSlot.cpp
+        src/vulkan/raytracing/RtTextureArrays.cpp
+    )
+    add_test(NAME horde_rt_scene_abi_tests COMMAND horde_rt_scene_abi_tests)
+
     add_executable(horde_rt_static_gltf_asset_tests tests/StaticGltfAssetTests.cpp)
     target_include_directories(horde_rt_static_gltf_asset_tests PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
