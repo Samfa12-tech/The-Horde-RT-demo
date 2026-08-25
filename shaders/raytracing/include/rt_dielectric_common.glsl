@@ -262,4 +262,3 @@ vec3 shadePrimary(HitInfo h, vec3 rayDirection)
 
     return shadeOpaquePrimary(h, rayDirection);
 }
-
