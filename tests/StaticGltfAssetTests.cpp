@@ -329,7 +329,7 @@ void TestBudgetFailures(const std::filesystem::path& temporaryRoot,
 
     const auto twoMaterials = RewriteGlb(
         temporaryRoot, "material-overflow.glb", "}],\"meshes\"",
-        "},{\"name\":\"UnusedMaterial\",\"pbrMetallicRoughness\":{\"baseColorFactor\":[1,1,1,1],\"metallicFactor\":0,\"roughnessFactor\":1}}],\"meshes\"
+        "},{\"name\":\"UnusedMaterial\",\"pbrMetallicRoughness\":{\"baseColorFactor\":[1,1,1,1],\"metallicFactor\":0,\"roughnessFactor\":1}}],\"meshes\""
     );
     const auto materialManifest = RewriteManifest(
         temporaryRoot, "material-budget.manifest.json", "\"maxMaterials\": 4", "\"maxMaterials\": 1");

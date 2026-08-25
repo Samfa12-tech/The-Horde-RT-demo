@@ -54,6 +54,8 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS)
     target_include_directories(horde_rt_probe_core
         PUBLIC
             ${CMAKE_CURRENT_SOURCE_DIR}/src
+        PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}
     )
     target_compile_features(horde_rt_probe_core PUBLIC cxx_std_20)
     target_link_libraries(horde_rt_probe_core PUBLIC Vulkan::Vulkan horde_gameplay_simulation)
@@ -115,7 +117,16 @@ endif()
 
 if(BUILD_TESTING)
     add_executable(horde_rt_static_gltf_asset_tests tests/StaticGltfAssetTests.cpp)
-    target_include_directories(horde_rt_static_gltf_asset_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_include_directories(horde_rt_static_gltf_asset_tests PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_SOURCE_DIR}
+    )
+    target_sources(horde_rt_static_gltf_asset_tests PRIVATE
+        src/scene/assets/AssetManifest.cpp
+        src/scene/assets/AssetValidation.cpp
+        src/scene/assets/GltfDocument.cpp
+        src/scene/assets/StaticMeshAsset.cpp
+    )
     target_compile_definitions(horde_rt_static_gltf_asset_tests PRIVATE
         HORDE_RT_STATIC_GLTF_FIXTURE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/static-gltf"
     )

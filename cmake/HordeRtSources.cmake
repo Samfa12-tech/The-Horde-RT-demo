@@ -6,6 +6,10 @@ set(HORDE_RT_PACKAGE_VERSION "1.5.2")
 set(HORDE_RT_CORE_RELATIVE_SOURCES
     gameplay/simulation/GameSimulation.cpp
     gameplay/ShowcaseBenchmark.cpp
+    scene/assets/AssetManifest.cpp
+    scene/assets/AssetValidation.cpp
+    scene/assets/GltfDocument.cpp
+    scene/assets/StaticMeshAsset.cpp
     vulkan/DeviceCapabilities.cpp
     vulkan/RtCapabilityReport.cpp
     vulkan/GpuFrameTimer.cpp

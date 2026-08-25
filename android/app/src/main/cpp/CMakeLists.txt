@@ -23,6 +23,7 @@ add_library(horde_rt_probe_android
 
 target_include_directories(horde_rt_probe_android PRIVATE
     "${HORDE_RT_REPO_ROOT}/src"
+    "${HORDE_RT_REPO_ROOT}"
 )
 
 target_compile_features(horde_rt_probe_android PRIVATE cxx_std_20)
