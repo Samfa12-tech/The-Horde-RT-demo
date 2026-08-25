@@ -284,6 +284,11 @@ try {
     )) {
         if ($entryNames -notcontains $required) { throw "Windows zip is missing required entry: $required" }
     }
+    foreach ($forbidden in @("assets/models/weapons/", "runtime-development", "gothic_arming_sword")) {
+        if (@($entryNames | Where-Object { $_ -like "*$forbidden*" }).Count -ne 0) {
+            throw "Windows zip contains forbidden development static asset content: $forbidden"
+        }
+    }
 } finally {
     $archive.Dispose()
 }

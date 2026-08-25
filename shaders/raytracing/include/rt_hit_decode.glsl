@@ -452,6 +452,80 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
         h.instance = int(rayQueryGetIntersectionInstanceCustomIndexEXT(query, true));
         h.position = origin + direction * h.t;
         materialForPrimitive(h.primitive, h.instance, h.position, h.material, h.normal, h.geometricNormal, h.base, h.metallic, h.reflectivity, h.emissive);
+        RtInstanceMetadata instanceMetadata = rtInstances.values[h.instance];
+        if ((instanceMetadata.geometry.w & kRtInstanceFlagStaticPbr) != 0u)
+        {
+            uint geometryIndex = rayQueryGetIntersectionGeometryIndexEXT(query, true);
+            if (geometryIndex < instanceMetadata.geometry.y)
+            {
+                RtPrimitiveMetadata primitiveMetadata =
+                    rtPrimitives.values[instanceMetadata.geometry.x + geometryIndex];
+                uint triangleIndex = primitiveMetadata.geometry.y + uint(h.primitive) * 3u;
+                uint i0 = primitiveMetadata.geometry.x + rtStaticIndices.values[triangleIndex];
+                uint i1 = primitiveMetadata.geometry.x + rtStaticIndices.values[triangleIndex + 1u];
+                uint i2 = primitiveMetadata.geometry.x + rtStaticIndices.values[triangleIndex + 2u];
+                vec2 bary = rayQueryGetIntersectionBarycentricsEXT(query, true);
+                vec3 weights = vec3(1.0 - bary.x - bary.y, bary.x, bary.y);
+                StaticRtVertex v0 = rtStaticVertices.values[i0];
+                StaticRtVertex v1 = rtStaticVertices.values[i1];
+                StaticRtVertex v2 = rtStaticVertices.values[i2];
+                vec2 uv = v0.uv0.xy * weights.x + v1.uv0.xy * weights.y +
+                          v2.uv0.xy * weights.z;
+                mat3 objectToWorld = mat3(rayQueryGetIntersectionObjectToWorldEXT(query, true));
+                mat3 normalToWorld = transpose(inverse(objectToWorld));
+                vec3 localNormal = normalize(v0.normal.xyz * weights.x +
+                                             v1.normal.xyz * weights.y +
+                                             v2.normal.xyz * weights.z);
+                vec4 localTangent = v0.tangent * weights.x +
+                                    v1.tangent * weights.y +
+                                    v2.tangent * weights.z;
+                vec3 worldNormal = normalize(normalToWorld * localNormal);
+                vec3 worldTangent = normalize(objectToWorld * localTangent.xyz);
+                vec3 worldBitangent = normalize(cross(worldNormal, worldTangent)) *
+                                      (localTangent.w < 0.0 ? -1.0 : 1.0);
+                RtMaterialGpu staticMaterial =
+                    rtMaterials.values[primitiveMetadata.geometry.w];
+                vec3 sampledNormal = (staticMaterial.materialFlags.x &
+                    kRtMaterialFlagNormalTexture) != 0u
+                    ? texture(rtNormalTextures,
+                        vec3(uv, float(staticMaterial.textureLayers.y))).xyz * 2.0 - 1.0
+                    : vec3(0.0, 0.0, 1.0);
+                h.normal = normalize(worldTangent * sampledNormal.x +
+                                     worldBitangent * sampledNormal.y +
+                                     worldNormal * sampledNormal.z);
+                vec3 p0 = objectToWorld * v0.position.xyz;
+                vec3 p1 = objectToWorld * v1.position.xyz;
+                vec3 p2 = objectToWorld * v2.position.xyz;
+                h.geometricNormal = normalize(cross(p1 - p0, p2 - p0));
+                vec4 baseSample = (staticMaterial.materialFlags.x &
+                    kRtMaterialFlagBaseColorTexture) != 0u
+                    ? texture(rtBaseColorTextures,
+                        vec3(uv, float(staticMaterial.textureLayers.x)))
+                    : vec4(1.0);
+                vec3 orm = (staticMaterial.materialFlags.x &
+                    kRtMaterialFlagOrmTexture) != 0u
+                    ? texture(rtOrmTextures,
+                        vec3(uv, float(staticMaterial.textureLayers.z))).rgb
+                    : vec3(1.0);
+                vec3 emissiveSample = (staticMaterial.materialFlags.x &
+                    kRtMaterialFlagEmissiveTexture) != 0u
+                    ? texture(rtEmissiveTextures,
+                        vec3(uv, float(staticMaterial.textureLayers.w))).rgb
+                    : vec3(1.0);
+                h.material = 100 + int(primitiveMetadata.geometry.w);
+                h.base = baseSample.rgb * staticMaterial.baseColorFactor.rgb *
+                         mix(1.0, orm.r, staticMaterial.metallicRoughnessOcclusionTransmission.z);
+                h.metallic = clamp(orm.b *
+                    staticMaterial.metallicRoughnessOcclusionTransmission.x, 0.0, 1.0);
+                float roughness = clamp(orm.g *
+                    staticMaterial.metallicRoughnessOcclusionTransmission.y, 0.04, 1.0);
+                h.reflectivity = mix(0.04, 0.92, h.metallic) * (1.0 - roughness * 0.45);
+                vec3 emission = emissiveSample * staticMaterial.emissiveFactorStrength.rgb *
+                                staticMaterial.emissiveFactorStrength.w;
+                h.emissive = max(emission.r, max(emission.g, emission.b));
+                if (h.emissive > 0.0001) h.base = emission / h.emissive;
+            }
+        }
         if (h.instance == 2 || h.instance == 18)
         {
             const int firstVertex = h.primitive * 3;

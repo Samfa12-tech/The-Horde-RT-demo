@@ -26,6 +26,10 @@
   "materialFlags": {
     "doubleSided": 1,
     "alpha": 2,
-    "transmission": 4
+    "transmission": 4,
+    "baseColorTexture": 8,
+    "normalTexture": 16,
+    "ormTexture": 32,
+    "emissiveTexture": 64
   }
 }

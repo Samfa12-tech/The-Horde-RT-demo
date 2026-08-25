@@ -10,7 +10,8 @@ namespace horde::vulkan::raytracing
 namespace
 {
 
-RtMaterialGpu ConvertMaterial(const horde::scene::assets::StaticMaterial& source)
+RtMaterialGpu ConvertMaterial(const horde::scene::assets::StaticMaterial& source,
+                              const std::array<std::uint32_t, 4u>& textureLayers)
 {
     RtMaterialGpu result{};
     result.baseColorFactor = source.baseColorFactor;
@@ -25,12 +26,16 @@ RtMaterialGpu ConvertMaterial(const horde::scene::assets::StaticMaterial& source
     result.attenuationColor = {{
         source.attenuationColor[0], source.attenuationColor[1],
         source.attenuationColor[2], 0.0f}};
-    result.textureLayers = {{
-        static_cast<std::uint32_t>(std::max(source.baseColorTexture, 0)),
-        static_cast<std::uint32_t>(std::max(source.normalTexture, 0)),
-        static_cast<std::uint32_t>(std::max(source.ormTexture, 0)),
-        static_cast<std::uint32_t>(std::max(source.emissiveTexture, 0))}};
+    result.textureLayers = textureLayers;
     result.materialFlags[0] = source.flags;
+    if (source.baseColorTexture >= 0)
+        result.materialFlags[0] |= static_cast<std::uint32_t>(RtMaterialFlag::BaseColorTexture);
+    if (source.normalTexture >= 0)
+        result.materialFlags[0] |= static_cast<std::uint32_t>(RtMaterialFlag::NormalTexture);
+    if (source.ormTexture >= 0)
+        result.materialFlags[0] |= static_cast<std::uint32_t>(RtMaterialFlag::OrmTexture);
+    if (source.emissiveTexture >= 0)
+        result.materialFlags[0] |= static_cast<std::uint32_t>(RtMaterialFlag::EmissiveTexture);
     return result;
 }
 
@@ -44,6 +49,7 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
     materials_.clear();
     vertices_.clear();
     indices_.clear();
+    geometryTransforms_.clear();
     measurements_ = {};
 
     std::array<bool, kRtInstanceMetadataCapacity> occupied{};
@@ -83,6 +89,7 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
         std::uint32_t primitiveCount;
     };
     std::unordered_map<const horde::scene::assets::StaticMeshAsset*, AssetRoute> routes;
+    std::array<std::uint32_t, 4u> nextTextureLayers{};
     for (std::size_t assetIndex = 0u; assetIndex < uniqueAssets.size(); ++assetIndex)
     {
         const auto& asset = *uniqueAssets[assetIndex];
@@ -108,7 +115,42 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
         const std::uint32_t primitiveBase = static_cast<std::uint32_t>(primitiveMetadata_.size());
         vertices_.insert(vertices_.end(), asset.vertices.begin(), asset.vertices.end());
         indices_.insert(indices_.end(), asset.indices.begin(), asset.indices.end());
-        for (const auto& sourceMaterial : asset.materials) materials_.push_back(ConvertMaterial(sourceMaterial));
+        std::array<std::unordered_map<std::int32_t, std::uint32_t>, 4u> textureRoutes;
+        const auto routeTexture = [&textureRoutes, &nextTextureLayers, &diagnostic](
+            std::size_t category,
+            std::int32_t sourceTexture,
+            const char* categoryName,
+            std::uint32_t& layer) {
+            if (sourceTexture < 0)
+            {
+                layer = 0u;
+                return true;
+            }
+            auto [entry, inserted] = textureRoutes[category].try_emplace(
+                sourceTexture, nextTextureLayers[category]);
+            if (inserted)
+            {
+                if (nextTextureLayers[category] >= kRtTextureLayerCapacity)
+                {
+                    diagnostic = std::string("RtStaticMeshSlot capacity overflow: ") +
+                                 categoryName + " texture layers exceed 16.";
+                    return false;
+                }
+                ++nextTextureLayers[category];
+            }
+            layer = entry->second;
+            return true;
+        };
+        for (const auto& sourceMaterial : asset.materials)
+        {
+            std::array<std::uint32_t, 4u> layers{};
+            if (!routeTexture(0u, sourceMaterial.baseColorTexture, "baseColor", layers[0]) ||
+                !routeTexture(1u, sourceMaterial.normalTexture, "normal", layers[1]) ||
+                !routeTexture(2u, sourceMaterial.ormTexture, "ORM", layers[2]) ||
+                !routeTexture(3u, sourceMaterial.emissiveTexture, "emissive", layers[3]))
+                return false;
+            materials_.push_back(ConvertMaterial(sourceMaterial, layers));
+        }
         for (const auto& primitive : asset.primitives)
         {
             if (primitive.materialIndex >= asset.materials.size())
@@ -121,6 +163,16 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
                 indexBase + primitive.indexOffset,
                 primitive.indexCount,
                 materialBase + primitive.materialIndex});
+            if (primitive.nodeTransformIndex >= asset.nodeTransforms.size())
+            {
+                diagnostic = "RtStaticMeshSlot primitive references an out-of-range node transform.";
+                return false;
+            }
+            const auto& matrix = asset.nodeTransforms[primitive.nodeTransformIndex].world;
+            geometryTransforms_.push_back({{
+                matrix[0], matrix[4], matrix[8], matrix[12],
+                matrix[1], matrix[5], matrix[9], matrix[13],
+                matrix[2], matrix[6], matrix[10], matrix[14]}});
         }
         routes.emplace(&asset, AssetRoute{
             static_cast<std::uint32_t>(assetIndex), primitiveBase,

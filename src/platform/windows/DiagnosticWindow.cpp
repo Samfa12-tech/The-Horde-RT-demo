@@ -46,6 +46,7 @@
 
 #include "ui/DiagnosticOverlay.h"
 #include "gameplay/CorridorCollision.h"
+#include "gameplay/DevelopmentCheckpoints.h"
 #include "gameplay/FeedbackTiming.h"
 #include "gameplay/ShowcaseBenchmark.h"
 #include "gameplay/ShowcaseCheckpoints.h"
@@ -59,6 +60,7 @@
 #include "vulkan/RtCapabilityReport.h"
 #include "vulkan/VulkanContext.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
+#include "vulkan/raytracing/DevelopmentStaticAssetPolicy.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
 
 #ifndef HORDE_RT_BUILD_ID
@@ -158,6 +160,7 @@ struct CaptureLaunchOptions
 {
     bool requested = false;
     std::filesystem::path outputDirectory;
+    std::string developmentCheckpoint;
     std::string error;
 };
 
@@ -219,6 +222,7 @@ struct VulkanSurfaceContext
     std::uint64_t gpuFrameTimingSampleCount = 0u;
     std::uint64_t gpuFrameSubmissionSequence = 0u;
     bool useRtPath = false;
+    std::string developmentCheckpoint;
     bool controlsEnabled = false;
     bool simulationPaused = true;
     bool pauseMenuVisible = true;
@@ -330,7 +334,23 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     }
     for (int index = 1; index < argumentCount; ++index)
     {
-        if (std::wstring_view(arguments[index]) != L"--capture-showcase")
+        const std::wstring_view argument(arguments[index]);
+        if (argument == L"--development-checkpoint")
+        {
+            if (!options.developmentCheckpoint.empty())
+            {
+                options.error = "--development-checkpoint may only be specified once.";
+                break;
+            }
+            if (index + 1 >= argumentCount || arguments[index + 1][0] == L'-')
+            {
+                options.error = "--development-checkpoint requires a checkpoint name.";
+                break;
+            }
+            options.developmentCheckpoint = std::filesystem::path(arguments[++index]).string();
+            continue;
+        }
+        if (argument != L"--capture-showcase")
         {
             continue;
         }
@@ -347,6 +367,11 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
         options.requested = true;
         options.outputDirectory = std::filesystem::absolute(std::filesystem::path(arguments[++index]));
     }
+    if (options.error.empty() && !options.developmentCheckpoint.empty() && !options.requested)
+        options.error = "--development-checkpoint requires --capture-showcase.";
+    if (options.error.empty() && !options.developmentCheckpoint.empty() &&
+        horde::gameplay::FindDevelopmentCheckpoint(options.developmentCheckpoint) == nullptr)
+        options.error = "Unknown development checkpoint: " + options.developmentCheckpoint;
     LocalFree(arguments);
     return options;
 }
@@ -3205,6 +3230,15 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx)
     }
 
     const std::filesystem::path assetRoot = ResolveAssetRoot();
+    std::string developmentStaticAssetDirectory;
+#if defined(_DEBUG) && defined(HORDE_RT_SOURCE_DIR)
+    developmentStaticAssetDirectory =
+        horde::vulkan::raytracing::ResolveDevelopmentStaticAssetDirectory(
+            true,
+            horde::vulkan::raytracing::UseGenericStaticAssetForCheckpoint(
+                ctx.developmentCheckpoint),
+            HORDE_RT_SOURCE_DIR).string();
+#endif
     const VkExtent2D renderExtent = ScaledRenderExtent(ctx.swapchainExtent, ctx.renderScale);
     std::string diagnostic;
     if (!ctx.rtScene.Initialise(ctx.instance,
@@ -3218,7 +3252,8 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx)
                                 (assetRoot / "models/enemies/meshy/lich_placeholder_merged_animations_v01.glb").string(),
                                 (assetRoot / "textures/polyhaven/mobile_1k").string(),
                                 (assetRoot / "textures/meshy/lich_placeholder_v01").string(),
-                                diagnostic))
+                                diagnostic,
+                                developmentStaticAssetDirectory))
     {
         std::cerr << "Failed to initialise presentable RT scene: " << diagnostic << '\n';
         MessageBoxA(ctx.windowHandle,
@@ -3238,6 +3273,20 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx)
               << "RT render scale " << std::round(ctx.renderScale * 100.0f) << "%: "
               << renderExtent.width << 'x' << renderExtent.height << " -> "
               << ctx.swapchainExtent.width << 'x' << ctx.swapchainExtent.height << '\n' << std::flush;
+    if (ctx.rtScene.GenericStaticAssetEnabled())
+    {
+        const auto& measurements = ctx.rtScene.StaticMeshMeasurements();
+        std::cout << "Development static RT asset: vertexBytes=" << measurements.vertexBytes
+                  << ", indexBytes=" << measurements.indexBytes
+                  << ", materialBytes=" << measurements.materialBytes
+                  << ", instanceMetadataBytes=" << measurements.instanceMetadataBytes
+                  << ", primitiveMetadataBytes=" << measurements.primitiveMetadataBytes
+                  << ", descriptors=" << measurements.descriptorCount
+                  << ", textureBytes=" << ctx.rtScene.StaticTextureBytes()
+                  << ", blasBytes=" << ctx.rtScene.StaticMeshBlasBytes()
+                  << ", blasBuildMs=" << ctx.rtScene.StaticMeshBlasBuildMilliseconds()
+                  << '\n' << std::flush;
+    }
 
     return true;
 }
@@ -3625,6 +3674,18 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
              << ", \"timestampPeriodNanoseconds\": "
              << context.gpuRtTiming.timestampPeriodNanoseconds << "}\n"
              << "  },\n"
+             << "  \"staticRtAsset\": {\"enabled\": "
+             << (context.rtScene.GenericStaticAssetEnabled() ? "true" : "false")
+             << ", \"vertexBytes\": " << context.rtScene.StaticMeshMeasurements().vertexBytes
+             << ", \"indexBytes\": " << context.rtScene.StaticMeshMeasurements().indexBytes
+             << ", \"materialBytes\": " << context.rtScene.StaticMeshMeasurements().materialBytes
+             << ", \"instanceMetadataBytes\": " << context.rtScene.StaticMeshMeasurements().instanceMetadataBytes
+             << ", \"primitiveMetadataBytes\": " << context.rtScene.StaticMeshMeasurements().primitiveMetadataBytes
+             << ", \"textureBytes\": " << context.rtScene.StaticTextureBytes()
+             << ", \"descriptorCount\": " << context.rtScene.StaticMeshMeasurements().descriptorCount
+             << ", \"blasBytes\": " << context.rtScene.StaticMeshBlasBytes()
+             << ", \"blasBuildMilliseconds\": " << context.rtScene.StaticMeshBlasBuildMilliseconds()
+             << "},\n"
              << "  \"error\": " << (error.empty() ? "null" : "\"" + JsonEscape(error) + "\"") << ",\n"
              << "  \"captures\": [\n";
     for (std::size_t index = 0; index < captures.size(); ++index)
@@ -3672,7 +3733,37 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
     }
 
     std::vector<ShowcaseCaptureRecord> captures;
-    captures.reserve(horde::gameplay::kShowcaseCheckpoints.size());
+    std::vector<const horde::gameplay::ShowcaseCheckpoint*> checkpoints;
+    horde::gameplay::ShowcaseCheckpoint developmentShowcase{};
+    if (!context.developmentCheckpoint.empty())
+    {
+        const auto* development =
+            horde::gameplay::FindDevelopmentCheckpoint(context.developmentCheckpoint);
+        const auto* base = development == nullptr
+            ? nullptr
+            : horde::gameplay::FindShowcaseCheckpoint(development->baseShowcaseCheckpointId);
+        if (development == nullptr || base == nullptr)
+        {
+            std::cerr << "Development checkpoint contract could not resolve its base checkpoint.\n";
+            return 1;
+        }
+        developmentShowcase = {
+            development->id,
+            development->name.data(),
+            development->cameraX,
+            development->cameraZ,
+            development->yaw,
+            development->pitch,
+            base->expectedZone,
+            base->preset};
+        checkpoints.push_back(&developmentShowcase);
+    }
+    else
+    {
+        for (const auto& checkpoint : horde::gameplay::kShowcaseCheckpoints)
+            checkpoints.push_back(&checkpoint);
+    }
+    captures.reserve(checkpoints.size());
     auto fail = [&](const std::string& diagnostic) {
         WriteCaptureManifest(outputDirectory, context, capabilities, captures, false, diagnostic);
         std::cerr << "Showcase capture failed: " << diagnostic << '\n';
@@ -3684,9 +3775,23 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
     }
 
     const VkClearColorValue clearColor = ClearColorForMode(capabilities.rtMode);
-    for (const horde::gameplay::ShowcaseCheckpoint& checkpoint : horde::gameplay::kShowcaseCheckpoints)
+    for (const horde::gameplay::ShowcaseCheckpoint* checkpointPointer : checkpoints)
     {
-        ApplyCaptureCheckpoint(context, checkpoint);
+        const horde::gameplay::ShowcaseCheckpoint& checkpoint = *checkpointPointer;
+        if (checkpoint.id == 100)
+        {
+            const auto* development =
+                horde::gameplay::FindDevelopmentCheckpoint(context.developmentCheckpoint);
+            const auto* base = horde::gameplay::FindShowcaseCheckpoint(
+                development->baseShowcaseCheckpointId);
+            ApplyCaptureCheckpoint(context, *base);
+            DebugWarpSimulation(context, checkpoint.x, checkpoint.z,
+                                checkpoint.yaw, checkpoint.pitch);
+        }
+        else
+        {
+            ApplyCaptureCheckpoint(context, checkpoint);
+        }
         std::vector<double> frameTimesMs;
         frameTimesMs.reserve(kCaptureSettlingFrames);
         for (int frame = 0; frame < kCaptureSettlingFrames; ++frame)
@@ -3753,10 +3858,12 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                                  horde::vulkan::DeviceCapabilities& capabilities,
                                  const std::filesystem::path& textReportPath,
                                  const std::filesystem::path& jsonReportPath,
-                                 const std::filesystem::path* captureDirectory)
+                                 const std::filesystem::path* captureDirectory,
+                                 const std::string* developmentCheckpoint)
 {
     VulkanSurfaceContext context;
     context.windowHandle = hWnd;
+    if (developmentCheckpoint != nullptr) context.developmentCheckpoint = *developmentCheckpoint;
     LoadSettings(context);
 #if defined(_DEBUG)
     const RtLabDebugLaunchOptions rtLabDebug = ParseRtLabDebugLaunchOptions();
@@ -5268,7 +5375,8 @@ int CreateAndShowWindow(const std::string& diagnosticText,
                         horde::vulkan::DeviceCapabilities& capabilities,
                         const std::filesystem::path& textReportPath,
                         const std::filesystem::path& jsonReportPath,
-                        const std::filesystem::path* captureDirectory)
+                        const std::filesystem::path* captureDirectory,
+                        const std::string* developmentCheckpoint)
 {
     const HINSTANCE instance = GetModuleHandleA(nullptr);
     INITCOMMONCONTROLSEX commonControls{sizeof(INITCOMMONCONTROLSEX), ICC_BAR_CLASSES};
@@ -5502,7 +5610,8 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     }
 
     const int result = RunDiagnosticSwapchainWindow(
-        hWnd, capabilities, textReportPath, jsonReportPath, captureDirectory);
+        hWnd, capabilities, textReportPath, jsonReportPath, captureDirectory,
+        developmentCheckpoint);
     if (captureDirectory != nullptr && IsWindow(hWnd))
     {
         DestroyWindow(hWnd);
@@ -5576,7 +5685,11 @@ int RunDiagnosticWindow(const int showCommand)
     const std::filesystem::path* captureDirectory = launchOptions.requested
         ? &launchOptions.outputDirectory
         : nullptr;
-    return CreateAndShowWindow(diagnosticText, capabilities, textReportPath, jsonReportPath, captureDirectory);
+    const std::string* developmentCheckpoint = launchOptions.developmentCheckpoint.empty()
+        ? nullptr
+        : &launchOptions.developmentCheckpoint;
+    return CreateAndShowWindow(diagnosticText, capabilities, textReportPath, jsonReportPath,
+                               captureDirectory, developmentCheckpoint);
 }
 
 } // namespace horde::platform::windows

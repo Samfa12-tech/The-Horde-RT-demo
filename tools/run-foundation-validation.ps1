@@ -292,6 +292,11 @@ function Test-ValidationPackages {
         "assets/textures/polyhaven/mobile_1k/diff-array-512.rgba",
         "assets/audio/filmcow/sword_swing_1.wav",
         "assets/audio/pixabay/waterfall_loop.wav"))
+    foreach ($forbidden in @("assets/models/weapons/", "runtime-development", "gothic_arming_sword")) {
+        if (@($entries | Where-Object { $_ -like "*$forbidden*" }).Count -ne 0) {
+            throw "Windows validation zip contains forbidden development static asset content: $forbidden"
+        }
+    }
 
     $entries = @(Assert-ZipContainsEntries -ArchivePath $androidValidationApk -PackageLabel "Android validation APK" -RequiredEntries @(
         "assets/textures/polyhaven/mobile_1k/diff-array-512-astc6x6.ktx2",
@@ -301,6 +306,11 @@ function Test-ValidationPackages {
         "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb",
         "assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb",
         "assets/audio/pixabay/waterfall_loop.wav"))
+    foreach ($forbidden in @("assets/models/weapons/", "runtime-development", "gothic_arming_sword")) {
+        if (@($entries | Where-Object { $_ -like "*$forbidden*" }).Count -ne 0) {
+            throw "Android validation APK contains forbidden development static asset content: $forbidden"
+        }
+    }
     $nativeEntries = @($entries | Where-Object { $_ -match '^lib/.+\.so$' })
     if ($nativeEntries.Count -lt 1) { throw "Android validation APK contains no native runtime library." }
     if ($nativeEntries -match 'libc\+\+_shared\.so$') { throw "Android validation APK contains libc++_shared.so." }

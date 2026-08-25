@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "asset": "gothic-arming-sword-rh-lod1-development-proof",
+  "metresPerUnit": 1.0,
+  "coordinateSystem": { "up": "+Y", "forward": "+Z" },
+  "budgets": {
+    "maxVertices": 9000,
+    "maxIndices": 38000,
+    "maxPrimitives": 4,
+    "maxMaterials": 4,
+    "maxTextureLayersPerKind": 4
+  },
+  "lods": [{ "name": "lod1", "maxTriangles": 13000 }],
+  "requiredSockets": ["grip"],
+  "runtimeTextureProfile": {
+    "android": "astc",
+    "windows": "rgba8",
+    "mipmapped": true,
+    "resolution": 512
+  },
+  "materialOverrides": [],
+  "distribution": "development-only",
+  "licenceStatus": "Meshy account-plan verification unresolved; do not package or ship"
+}

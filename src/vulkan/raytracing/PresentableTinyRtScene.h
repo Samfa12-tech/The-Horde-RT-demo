@@ -12,6 +12,7 @@
 #include "vulkan/raytracing/CharacterRenderSlot.h"
 #include "vulkan/raytracing/RtGpuResources.h"
 #include "vulkan/raytracing/RtSceneTuning.h"
+#include "vulkan/raytracing/RtStaticMeshSlot.h"
 
 namespace horde::vulkan::raytracing
 {
@@ -92,7 +93,8 @@ public:
                     const std::string& lichAssetPath,
                     const std::string& materialAssetDirectory,
                     const std::string& lichTextureDirectory,
-                    std::string& diagnostic);
+                    std::string& diagnostic,
+                    const std::string& developmentStaticAssetDirectory = {});
 
     void Destroy();
 
@@ -103,6 +105,11 @@ public:
     std::uint32_t TlasCount() const { return ready_ ? kTlasCount : 0u; }
     std::uint32_t TlasInstanceCount() const { return ready_ ? kTlasInstanceCount : 0u; }
     std::size_t SkeletonPoseBucketCount() const { return characterSlot_.SkeletonPoseBucketCount(); }
+    bool GenericStaticAssetEnabled() const { return genericStaticAssetEnabled_; }
+    const RtStaticMeshMeasurements& StaticMeshMeasurements() const { return staticMeshSlot_.Measurements(); }
+    VkDeviceSize StaticMeshBlasBytes() const { return staticMeshBlasBytes_; }
+    VkDeviceSize StaticTextureBytes() const { return staticTextureBytes_; }
+    double StaticMeshBlasBuildMilliseconds() const { return staticMeshBlasBuildMilliseconds_; }
 
     bool RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                             VkImage swapchainImage,
@@ -151,6 +158,8 @@ private:
     bool SupportsTextureArrayFormat(VkFormat format) const;
     bool CreateMaterialTextures(const std::string& directory, std::string& diagnostic);
     bool CreateLichTextures(const std::string& directory, std::string& diagnostic);
+    bool LoadDevelopmentStaticAsset(const std::string& directory, std::string& diagnostic);
+    bool CreateStaticMeshResources(std::string& diagnostic);
     bool BuildAccelerationStructures(std::string& diagnostic);
     bool CreateDescriptors(std::string& diagnostic);
     bool CreatePipeline(std::string& diagnostic);
@@ -184,6 +193,10 @@ private:
     TextureArray materialArm_;
     TextureArray lichBaseColor_;
     TextureArray lichEmissive_;
+    TextureArray staticBaseColor_;
+    TextureArray staticNormal_;
+    TextureArray staticOrm_;
+    TextureArray staticEmissive_;
     VkSampler materialSampler_ = VK_NULL_HANDLE;
     std::string materialEncoding_;
 
@@ -192,6 +205,12 @@ private:
     Buffer transformBuffer_;
     Buffer instanceBuffer_;
     Buffer worldSurfaceBuffer_;
+    Buffer staticVertexBuffer_;
+    Buffer staticIndexBuffer_;
+    Buffer staticGeometryTransformBuffer_;
+    Buffer instanceMetadataBuffer_;
+    Buffer primitiveMetadataBuffer_;
+    Buffer materialMetadataBuffer_;
     AccelerationStructure blas_;
     AccelerationStructure waterfallBlas_;
     AccelerationStructure finaleRoofBlas_;
@@ -203,6 +222,13 @@ private:
     Buffer tlasUpdateScratch_;
     RtGpuResources gpuResources_;
     CharacterRenderSlot characterSlot_;
+    horde::scene::assets::StaticMeshAsset developmentStaticAsset_;
+    std::string developmentStaticAssetDirectory_;
+    RtStaticMeshSlot staticMeshSlot_;
+    bool genericStaticAssetEnabled_ = false;
+    VkDeviceSize staticMeshBlasBytes_ = 0u;
+    VkDeviceSize staticTextureBytes_ = 0u;
+    double staticMeshBlasBuildMilliseconds_ = 0.0;
 
     VkDescriptorSetLayout descriptorSetLayout_ = VK_NULL_HANDLE;
     VkDescriptorPool descriptorPool_ = VK_NULL_HANDLE;

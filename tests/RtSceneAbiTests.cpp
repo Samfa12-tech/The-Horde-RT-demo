@@ -29,6 +29,13 @@ horde::scene::assets::StaticMeshAsset MakeAsset(std::size_t primitiveCount,
                                                  std::size_t materialCount)
 {
     horde::scene::assets::StaticMeshAsset asset;
+    horde::scene::assets::StaticNodeTransform root;
+    root.name = "Root";
+    root.world = {{1.0f, 0.0f, 0.0f, 0.0f,
+                   0.0f, 1.0f, 0.0f, 0.0f,
+                   0.0f, 0.0f, 1.0f, 0.0f,
+                   0.0f, 0.0f, 0.0f, 1.0f}};
+    asset.nodeTransforms.push_back(root);
     asset.vertices.resize(primitiveCount * 3u);
     asset.indices.resize(primitiveCount * 3u);
     asset.materials.resize(materialCount);
@@ -98,7 +105,11 @@ void TestGeneratedConstants()
           "instance flag enum agrees with hand-checked literals");
     Check(static_cast<std::uint32_t>(RtMaterialFlag::DoubleSided) == 1u &&
               static_cast<std::uint32_t>(RtMaterialFlag::Alpha) == 2u &&
-              static_cast<std::uint32_t>(RtMaterialFlag::Transmission) == 4u,
+              static_cast<std::uint32_t>(RtMaterialFlag::Transmission) == 4u &&
+              static_cast<std::uint32_t>(RtMaterialFlag::BaseColorTexture) == 8u &&
+              static_cast<std::uint32_t>(RtMaterialFlag::NormalTexture) == 16u &&
+              static_cast<std::uint32_t>(RtMaterialFlag::OrmTexture) == 32u &&
+              static_cast<std::uint32_t>(RtMaterialFlag::EmissiveTexture) == 64u,
           "material flag enum agrees with hand-checked literals");
 }
 
@@ -106,6 +117,12 @@ void TestGenericRegistrationAndMeasurements()
 {
     using namespace horde::vulkan::raytracing;
     auto asset = MakeAsset(2u, 2u);
+    asset.materials[0].baseColorTexture = 2;
+    asset.materials[0].normalTexture = 5;
+    asset.materials[0].ormTexture = 7;
+    asset.materials[0].emissiveTexture = 11;
+    asset.materials[1].baseColorTexture = 2;
+    asset.materials[1].normalTexture = 9;
     const StaticRtAssetRegistration request{
         3u, 0x10203040u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 7u, &asset};
     RtStaticMeshSlot slot;
@@ -125,6 +142,17 @@ void TestGenericRegistrationAndMeasurements()
               slot.PrimitiveMetadata()[1].indexCount == 3u &&
               slot.PrimitiveMetadata()[1].materialIndex == 1u,
           "geometryIndex can select a primitive and its material record");
+    Check(slot.GeometryTransforms().size() == 2u &&
+              slot.GeometryTransforms()[0] == std::array<float, 12u>{{
+                  1.0f, 0.0f, 0.0f, 0.0f,
+                  0.0f, 1.0f, 0.0f, 0.0f,
+                  0.0f, 0.0f, 1.0f, 0.0f}},
+          "multi-geometry BLAS transforms retain each primitive node matrix");
+    Check(slot.Materials()[0].textureLayers == std::array<std::uint32_t, 4u>{{0u, 0u, 0u, 0u}} &&
+              slot.Materials()[1].textureLayers == std::array<std::uint32_t, 4u>{{0u, 1u, 0u, 0u}} &&
+              slot.Materials()[0].materialFlags[0] == (8u | 16u | 32u | 64u) &&
+              slot.Materials()[1].materialFlags[0] == (8u | 16u),
+          "texture layers are dense per PBR category and presence is explicit");
     Check(slot.Measurements().vertexBytes == 6u * 64u &&
               slot.Measurements().indexBytes == 6u * 4u &&
               slot.Measurements().materialBytes == 2u * 112u &&

@@ -3,13 +3,16 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <chrono>
 #include <cstddef>
 #include <cstring>
+#include <filesystem>
 #include <fstream>
 #include <utility>
 #include <vector>
 
 #include "gameplay/CorridorCollision.h"
+#include "scene/assets/AssetManifest.h"
 
 namespace horde::vulkan::raytracing
 {
@@ -283,6 +286,10 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     materialArm_ = std::exchange(other.materialArm_, TextureArray{});
     lichBaseColor_ = std::exchange(other.lichBaseColor_, TextureArray{});
     lichEmissive_ = std::exchange(other.lichEmissive_, TextureArray{});
+    staticBaseColor_ = std::exchange(other.staticBaseColor_, TextureArray{});
+    staticNormal_ = std::exchange(other.staticNormal_, TextureArray{});
+    staticOrm_ = std::exchange(other.staticOrm_, TextureArray{});
+    staticEmissive_ = std::exchange(other.staticEmissive_, TextureArray{});
     materialSampler_ = std::exchange(other.materialSampler_, VK_NULL_HANDLE);
     materialEncoding_ = std::move(other.materialEncoding_);
     vertexBuffer_ = std::exchange(other.vertexBuffer_, Buffer{});
@@ -290,6 +297,12 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     transformBuffer_ = std::exchange(other.transformBuffer_, Buffer{});
     instanceBuffer_ = std::exchange(other.instanceBuffer_, Buffer{});
     worldSurfaceBuffer_ = std::exchange(other.worldSurfaceBuffer_, Buffer{});
+    staticVertexBuffer_ = std::exchange(other.staticVertexBuffer_, Buffer{});
+    staticIndexBuffer_ = std::exchange(other.staticIndexBuffer_, Buffer{});
+    staticGeometryTransformBuffer_ = std::exchange(other.staticGeometryTransformBuffer_, Buffer{});
+    instanceMetadataBuffer_ = std::exchange(other.instanceMetadataBuffer_, Buffer{});
+    primitiveMetadataBuffer_ = std::exchange(other.primitiveMetadataBuffer_, Buffer{});
+    materialMetadataBuffer_ = std::exchange(other.materialMetadataBuffer_, Buffer{});
     blas_ = std::exchange(other.blas_, AccelerationStructure{});
     waterfallBlas_ = std::exchange(other.waterfallBlas_, AccelerationStructure{});
     finaleRoofBlas_ = std::exchange(other.finaleRoofBlas_, AccelerationStructure{});
@@ -301,6 +314,13 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     tlasUpdateScratch_ = std::exchange(other.tlasUpdateScratch_, Buffer{});
     characterSlot_ = std::move(other.characterSlot_);
     other.characterSlot_ = {};
+    developmentStaticAsset_ = std::move(other.developmentStaticAsset_);
+    developmentStaticAssetDirectory_ = std::move(other.developmentStaticAssetDirectory_);
+    staticMeshSlot_ = std::move(other.staticMeshSlot_);
+    genericStaticAssetEnabled_ = std::exchange(other.genericStaticAssetEnabled_, false);
+    staticMeshBlasBytes_ = std::exchange(other.staticMeshBlasBytes_, 0u);
+    staticTextureBytes_ = std::exchange(other.staticTextureBytes_, 0u);
+    staticMeshBlasBuildMilliseconds_ = std::exchange(other.staticMeshBlasBuildMilliseconds_, 0.0);
     descriptorSetLayout_ = std::exchange(other.descriptorSetLayout_, VK_NULL_HANDLE);
     descriptorPool_ = std::exchange(other.descriptorPool_, VK_NULL_HANDLE);
     descriptorSet_ = std::exchange(other.descriptorSet_, VK_NULL_HANDLE);
@@ -338,7 +358,8 @@ bool PresentableTinyRtScene::Initialise(VkInstance instance,
                                         const std::string& lichAssetPath,
                                         const std::string& materialAssetDirectory,
                                         const std::string& lichTextureDirectory,
-                                        std::string& diagnostic)
+                                        std::string& diagnostic,
+                                        const std::string& developmentStaticAssetDirectory)
 {
     Destroy();
 
@@ -374,9 +395,11 @@ bool PresentableTinyRtScene::Initialise(VkInstance instance,
         return false;
     }
     gpuResources_.Bind(physicalDevice_, device_, vkDestroyAccelerationStructureKHR_, vkGetBufferDeviceAddressKHR_);
-    if (!CreateStorageImage(diagnostic) ||
+    if (!LoadDevelopmentStaticAsset(developmentStaticAssetDirectory, diagnostic) ||
+        !CreateStorageImage(diagnostic) ||
         !CreateMaterialTextures(materialAssetDirectory, diagnostic) ||
         !CreateLichTextures(lichTextureDirectory, diagnostic) ||
+        !CreateStaticMeshResources(diagnostic) ||
         !BuildAccelerationStructures(diagnostic) ||
         !CreateDescriptors(diagnostic) ||
         !CreatePipeline(diagnostic) ||
@@ -433,6 +456,12 @@ void PresentableTinyRtScene::Destroy()
     DestroyAccelerationStructure(waterfallBlas_);
     DestroyAccelerationStructure(blas_);
     DestroyBuffer(worldSurfaceBuffer_);
+    DestroyBuffer(materialMetadataBuffer_);
+    DestroyBuffer(primitiveMetadataBuffer_);
+    DestroyBuffer(instanceMetadataBuffer_);
+    DestroyBuffer(staticIndexBuffer_);
+    DestroyBuffer(staticGeometryTransformBuffer_);
+    DestroyBuffer(staticVertexBuffer_);
     DestroyBuffer(instanceBuffer_);
     DestroyBuffer(transformBuffer_);
     DestroyBuffer(indexBuffer_);
@@ -448,7 +477,18 @@ void PresentableTinyRtScene::Destroy()
     DestroyTextureArray(materialDiffuse_);
     DestroyTextureArray(lichEmissive_);
     DestroyTextureArray(lichBaseColor_);
+    DestroyTextureArray(staticEmissive_);
+    DestroyTextureArray(staticOrm_);
+    DestroyTextureArray(staticNormal_);
+    DestroyTextureArray(staticBaseColor_);
     materialEncoding_.clear();
+    developmentStaticAsset_ = {};
+    developmentStaticAssetDirectory_.clear();
+    staticMeshSlot_ = {};
+    genericStaticAssetEnabled_ = false;
+    staticMeshBlasBytes_ = 0u;
+    staticTextureBytes_ = 0u;
+    staticMeshBlasBuildMilliseconds_ = 0.0;
 
     if (storageImageView_ != VK_NULL_HANDLE)
     {
@@ -721,7 +761,16 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
         diagnostic = "Failed to read PBR texture array: " + path;
         return false;
     }
+    struct MipPayload
+    {
+        VkDeviceSize bufferOffset = 0u;
+        VkDeviceSize layerByteSize = 0u;
+        std::uint32_t width = 0u;
+        std::uint32_t height = 0u;
+    };
+    std::vector<MipPayload> mipPayloads;
     std::vector<std::uint8_t> pixels;
+    std::uint32_t mipLevels = 1u;
     if (ktx2)
     {
         constexpr std::array<std::uint8_t, 12u> identifier{{0xABu, 0x4Bu, 0x54u, 0x58u, 0x20u, 0x32u, 0x30u, 0xBBu, 0x0Du, 0x0Au, 0x1Au, 0x0Au}};
@@ -735,24 +784,46 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
             if (offset + sizeof(value) <= fileBytes.size()) std::memcpy(&value, fileBytes.data() + offset, sizeof(value));
             return value;
         };
-        const std::uint64_t levelOffset = read64(80u);
-        const std::uint64_t levelLength = read64(88u);
-        const std::uint64_t levelUncompressedLength = read64(96u);
-        const bool validHeader = fileBytes.size() >= 104u &&
+        mipLevels = read32(40u);
+        const bool validHeader = mipLevels > 0u && mipLevels <= 16u &&
+                                 fileBytes.size() >= 80u + static_cast<std::size_t>(mipLevels) * 24u &&
                                  std::equal(identifier.begin(), identifier.end(), fileBytes.begin()) &&
                                  read32(12u) == static_cast<std::uint32_t>(format) && read32(16u) == 1u &&
                                  read32(20u) == width && read32(24u) == height && read32(28u) == 0u &&
-                                 read32(32u) == (layers == 1u ? 0u : layers) && read32(36u) == 1u && read32(40u) == 1u &&
-                                 read32(44u) == 0u && levelLength == byteSize &&
-                                 levelUncompressedLength == byteSize && levelOffset <= fileBytes.size() &&
-                                 levelLength <= fileBytes.size() - static_cast<std::size_t>(levelOffset);
+                                 (read32(32u) == layers || (layers == 1u && read32(32u) == 0u)) &&
+                                 read32(36u) == 1u &&
+                                 read32(44u) == 0u;
         if (!validHeader)
         {
             diagnostic = "PBR KTX2 array has an unsupported header, format, or payload size: " + path;
             return false;
         }
-        pixels.assign(fileBytes.begin() + static_cast<std::ptrdiff_t>(levelOffset),
-                      fileBytes.begin() + static_cast<std::ptrdiff_t>(levelOffset + levelLength));
+        for (std::uint32_t level = 0u; level < mipLevels; ++level)
+        {
+            const std::size_t entry = 80u + static_cast<std::size_t>(level) * 24u;
+            const std::uint64_t levelOffset = read64(entry);
+            const std::uint64_t levelLength = read64(entry + 8u);
+            const std::uint64_t levelUncompressedLength = read64(entry + 16u);
+            const std::uint32_t mipWidth = std::max(width >> level, 1u);
+            const std::uint32_t mipHeight = std::max(height >> level, 1u);
+            const VkDeviceSize mipLayerBytes = astc4
+                ? static_cast<VkDeviceSize>((mipWidth + 3u) / 4u) * ((mipHeight + 3u) / 4u) * 16u
+                : (astc6
+                       ? static_cast<VkDeviceSize>((mipWidth + 5u) / 6u) * ((mipHeight + 5u) / 6u) * 16u
+                       : static_cast<VkDeviceSize>(mipWidth) * mipHeight * 4u);
+            const VkDeviceSize expectedLevelBytes = mipLayerBytes * layers;
+            if (levelLength != expectedLevelBytes || levelUncompressedLength != expectedLevelBytes ||
+                levelOffset > fileBytes.size() || levelLength > fileBytes.size() - static_cast<std::size_t>(levelOffset))
+            {
+                diagnostic = "PBR KTX2 array has an unsupported mip payload size: " + path;
+                return false;
+            }
+            const VkDeviceSize destinationOffset = pixels.size();
+            pixels.insert(pixels.end(),
+                          fileBytes.begin() + static_cast<std::ptrdiff_t>(levelOffset),
+                          fileBytes.begin() + static_cast<std::ptrdiff_t>(levelOffset + levelLength));
+            mipPayloads.push_back({destinationOffset, mipLayerBytes, mipWidth, mipHeight});
+        }
     }
     else
     {
@@ -762,11 +833,13 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
             return false;
         }
         pixels = std::move(fileBytes);
+        mipPayloads.push_back({0u, layerByteSize, width, height});
     }
 
     Buffer staging;
-    if (!CreateBuffer(byteSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, false, staging, diagnostic)) return false;
-    if (!WriteBuffer(staging, pixels.data(), byteSize, "PBR texture staging", diagnostic))
+    const VkDeviceSize uploadByteSize = pixels.size();
+    if (!CreateBuffer(uploadByteSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, false, staging, diagnostic)) return false;
+    if (!WriteBuffer(staging, pixels.data(), uploadByteSize, "PBR texture staging", diagnostic))
     {
         DestroyBuffer(staging);
         return false;
@@ -776,7 +849,7 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
     imageInfo.imageType = VK_IMAGE_TYPE_2D;
     imageInfo.format = format;
     imageInfo.extent = {width, height, 1u};
-    imageInfo.mipLevels = 1u;
+    imageInfo.mipLevels = mipLevels;
     imageInfo.arrayLayers = layers;
     imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
     imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
@@ -807,11 +880,10 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
         PresentableTinyRtScene* scene;
         Buffer* staging;
         TextureArray* texture;
-        VkDeviceSize layerByteSize;
-        std::uint32_t width;
-        std::uint32_t height;
+        const std::vector<MipPayload>* mipPayloads;
+        std::uint32_t mipLevels;
         std::uint32_t layers;
-    } upload{this, &staging, &texture, layerByteSize, width, height, layers};
+    } upload{this, &staging, &texture, &mipPayloads, mipLevels, layers};
     const auto recordUpload = [](VkCommandBuffer commandBuffer, void* userData) {
         auto* data = static_cast<UploadData*>(userData);
         VkImageMemoryBarrier toTransfer{VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER};
@@ -820,15 +892,22 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
         toTransfer.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
         toTransfer.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
         toTransfer.image = data->texture->image;
-        toTransfer.subresourceRange = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, 1u, 0u, data->layers};
+        toTransfer.subresourceRange = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, data->mipLevels, 0u, data->layers};
         toTransfer.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
         vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0u, 0u, nullptr, 0u, nullptr, 1u, &toTransfer);
-        std::vector<VkBufferImageCopy> copies(data->layers);
-        for (std::uint32_t layer = 0u; layer < data->layers; ++layer)
+        std::vector<VkBufferImageCopy> copies;
+        copies.reserve(static_cast<std::size_t>(data->mipLevels) * data->layers);
+        for (std::uint32_t level = 0u; level < data->mipLevels; ++level)
         {
-            copies[layer].bufferOffset = static_cast<VkDeviceSize>(layer) * data->layerByteSize;
-            copies[layer].imageSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, layer, 1u};
-            copies[layer].imageExtent = {data->width, data->height, 1u};
+            const MipPayload& mip = (*data->mipPayloads)[level];
+            for (std::uint32_t layer = 0u; layer < data->layers; ++layer)
+            {
+                VkBufferImageCopy copy{};
+                copy.bufferOffset = mip.bufferOffset + static_cast<VkDeviceSize>(layer) * mip.layerByteSize;
+                copy.imageSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, level, layer, 1u};
+                copy.imageExtent = {mip.width, mip.height, 1u};
+                copies.push_back(copy);
+            }
         }
         vkCmdCopyBufferToImage(commandBuffer, data->staging->buffer, data->texture->image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, static_cast<std::uint32_t>(copies.size()), copies.data());
         VkImageMemoryBarrier toShader = toTransfer;
@@ -846,7 +925,7 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
     viewInfo.image = texture.image;
     viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
     viewInfo.format = format;
-    viewInfo.subresourceRange = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, 1u, 0u, layers};
+    viewInfo.subresourceRange = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, mipLevels, 0u, layers};
     if (vkCreateImageView(device_, &viewInfo, nullptr, &texture.view) != VK_SUCCESS)
     {
         DestroyTextureArray(texture);
@@ -924,6 +1003,7 @@ bool PresentableTinyRtScene::CreateMaterialTextures(const std::string& directory
     sampler.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
     sampler.addressModeU = sampler.addressModeV = sampler.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
     sampler.maxAnisotropy = 1.0f;
+    sampler.maxLod = VK_LOD_CLAMP_NONE;
     if (vkCreateSampler(device_, &sampler, nullptr, &materialSampler_) != VK_SUCCESS)
     {
         diagnostic = "Failed to create PBR material sampler.";
@@ -958,6 +1038,113 @@ bool PresentableTinyRtScene::CreateLichTextures(const std::string& directory, st
         return false;
     }
     materialEncoding_ += " + raw RGBA8 KTX2 lich";
+#endif
+    return true;
+}
+
+bool PresentableTinyRtScene::LoadDevelopmentStaticAsset(const std::string& directory,
+                                                        std::string& diagnostic)
+{
+    genericStaticAssetEnabled_ = !directory.empty();
+    developmentStaticAssetDirectory_ = directory;
+    developmentStaticAsset_ = {};
+    if (!genericStaticAssetEnabled_)
+    {
+        return staticMeshSlot_.Initialize({}, diagnostic);
+    }
+
+    const std::filesystem::path assetDirectory(directory);
+    horde::scene::assets::AssetManifest manifest;
+    if (!horde::scene::assets::AssetManifest::Load(
+            assetDirectory / "asset.manifest.json", manifest, diagnostic) ||
+        !horde::scene::assets::StaticMeshAsset::Load(
+            assetDirectory / "gothic_arming_sword_rh_lod1.runtime.glb",
+            manifest,
+            developmentStaticAsset_,
+            diagnostic))
+    {
+        return false;
+    }
+    constexpr StaticRtAssetRegistration registration{
+        3u,
+        0x53574f52u,
+        static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
+        0u,
+        nullptr};
+    StaticRtAssetRegistration resolved = registration;
+    resolved.asset = &developmentStaticAsset_;
+    return staticMeshSlot_.Initialize(std::span<const StaticRtAssetRegistration>(&resolved, 1u),
+                                      diagnostic);
+}
+
+bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
+{
+    const VkMemoryPropertyFlags uploadMemory =
+        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+    const auto& instances = staticMeshSlot_.InstanceMetadata();
+    const auto& primitives = staticMeshSlot_.PrimitiveMetadata();
+    const auto& materials = staticMeshSlot_.Materials();
+    const auto& vertices = staticMeshSlot_.Vertices();
+    const auto& indices = staticMeshSlot_.Indices();
+    const auto& geometryTransforms = staticMeshSlot_.GeometryTransforms();
+    const auto createAndWrite = [this, uploadMemory, &diagnostic](
+        const void* data,
+        VkDeviceSize size,
+        VkBufferUsageFlags usage,
+        bool address,
+        const char* label,
+        Buffer& buffer) {
+        const std::array<std::uint8_t, 16u> zeros{};
+        const VkDeviceSize actualSize = std::max<VkDeviceSize>(size, zeros.size());
+        if (!CreateBuffer(actualSize, usage, uploadMemory, address, buffer, diagnostic)) return false;
+        return WriteBuffer(buffer, size == 0u ? zeros.data() : data, actualSize, label, diagnostic);
+    };
+
+    const VkBufferUsageFlags storage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
+    const VkBufferUsageFlags geometry = storage |
+        VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR;
+    if (!createAndWrite(instances.data(), sizeof(instances), storage, false,
+                        "RT instance metadata", instanceMetadataBuffer_) ||
+        !createAndWrite(primitives.data(), primitives.size() * sizeof(RtPrimitiveMetadata),
+                        storage, false, "RT primitive metadata", primitiveMetadataBuffer_) ||
+        !createAndWrite(materials.data(), materials.size() * sizeof(RtMaterialGpu),
+                        storage, false, "RT material metadata", materialMetadataBuffer_) ||
+        !createAndWrite(vertices.data(),
+                        vertices.size() * sizeof(horde::scene::assets::StaticRtVertex),
+                        geometry, true, "static RT vertices", staticVertexBuffer_) ||
+        !createAndWrite(indices.data(), indices.size() * sizeof(std::uint32_t),
+                        geometry, true, "static RT indices", staticIndexBuffer_) ||
+        !createAndWrite(geometryTransforms.data(),
+                        geometryTransforms.size() * sizeof(geometryTransforms.front()),
+                        VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
+                        true, "static RT geometry transforms",
+                        staticGeometryTransformBuffer_))
+    {
+        return false;
+    }
+
+    if (!genericStaticAssetEnabled_) return true;
+    for (std::uint32_t dimension = 512u; dimension > 0u; dimension >>= 1u)
+        staticTextureBytes_ += static_cast<VkDeviceSize>(dimension) * dimension * 4u * 4u;
+    const std::filesystem::path assetDirectory(developmentStaticAssetDirectory_);
+    const auto path = [&assetDirectory](const char* name) {
+        return (assetDirectory / name).string();
+    };
+#if defined(__ANDROID__)
+    diagnostic = "Development static assets cannot be enabled in an Android package.";
+    return false;
+#else
+    if (!CreateTexture(path("base-color.windows.ktx2"), VK_FORMAT_R8G8B8A8_SRGB,
+                       512u, 512u, 1u, staticBaseColor_, diagnostic) ||
+        !CreateTexture(path("normal.windows.ktx2"), VK_FORMAT_R8G8B8A8_UNORM,
+                       512u, 512u, 1u, staticNormal_, diagnostic) ||
+        !CreateTexture(path("orm.windows.ktx2"), VK_FORMAT_R8G8B8A8_UNORM,
+                       512u, 512u, 1u, staticOrm_, diagnostic) ||
+        !CreateTexture(path("emissive.windows.ktx2"), VK_FORMAT_R8G8B8A8_SRGB,
+                       512u, 512u, 1u, staticEmissive_, diagnostic))
+    {
+        return false;
+    }
 #endif
     return true;
 }
@@ -1899,17 +2086,74 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     torchBlasAddressInfo.accelerationStructure = torchBlas_.handle;
     torchBlas_.address = vkGetAccelerationStructureDeviceAddressKHR_(device_, &torchBlasAddressInfo);
 
-    VkAccelerationStructureBuildRangeInfoKHR swordRange{};
-    swordRange.primitiveCount = swordPrimitiveCount;
-    swordRange.primitiveOffset = torchIndexCount * sizeof(std::uint32_t);
-    swordRange.firstVertex = 0u;
+    std::vector<VkAccelerationStructureGeometryKHR> swordGeometries;
+    std::vector<VkAccelerationStructureBuildRangeInfoKHR> swordRanges;
+    std::vector<std::uint32_t> swordPrimitiveCounts;
+    if (genericStaticAssetEnabled_)
+    {
+        const auto& primitiveMetadata = staticMeshSlot_.PrimitiveMetadata();
+        const auto& staticVertices = staticMeshSlot_.Vertices();
+        swordGeometries.reserve(primitiveMetadata.size());
+        swordRanges.reserve(primitiveMetadata.size());
+        swordPrimitiveCounts.reserve(primitiveMetadata.size());
+        for (std::size_t geometryIndex = 0u; geometryIndex < primitiveMetadata.size(); ++geometryIndex)
+        {
+            const RtPrimitiveMetadata& primitive = primitiveMetadata[geometryIndex];
+            const std::uint32_t nextVertexOffset = geometryIndex + 1u < primitiveMetadata.size()
+                ? primitiveMetadata[geometryIndex + 1u].vertexOffset
+                : static_cast<std::uint32_t>(staticVertices.size());
+            if (nextVertexOffset <= primitive.vertexOffset || primitive.indexCount == 0u)
+            {
+                diagnostic = "Static RT BLAS primitive has an empty geometry range.";
+                return false;
+            }
+            VkAccelerationStructureGeometryKHR geometry{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
+            geometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
+            geometry.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
+            geometry.geometry.triangles.sType =
+                VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
+            geometry.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
+            geometry.geometry.triangles.vertexData.deviceAddress =
+                staticVertexBuffer_.address +
+                static_cast<VkDeviceSize>(primitive.vertexOffset) *
+                    sizeof(horde::scene::assets::StaticRtVertex);
+            geometry.geometry.triangles.vertexStride =
+                sizeof(horde::scene::assets::StaticRtVertex);
+            geometry.geometry.triangles.maxVertex =
+                nextVertexOffset - primitive.vertexOffset - 1u;
+            geometry.geometry.triangles.indexType = VK_INDEX_TYPE_UINT32;
+            geometry.geometry.triangles.indexData.deviceAddress =
+                staticIndexBuffer_.address +
+                static_cast<VkDeviceSize>(primitive.indexOffset) * sizeof(std::uint32_t);
+            geometry.geometry.triangles.transformData.deviceAddress =
+                staticGeometryTransformBuffer_.address +
+                static_cast<VkDeviceSize>(geometryIndex) * sizeof(VkTransformMatrixKHR);
+            swordGeometries.push_back(geometry);
+            VkAccelerationStructureBuildRangeInfoKHR range{};
+            range.primitiveCount = primitive.indexCount / 3u;
+            swordRanges.push_back(range);
+            swordPrimitiveCounts.push_back(range.primitiveCount);
+        }
+    }
+    else
+    {
+        swordGeometries.push_back(blasGeometry);
+        VkAccelerationStructureBuildRangeInfoKHR range{};
+        range.primitiveCount = swordPrimitiveCount;
+        range.primitiveOffset = torchIndexCount * sizeof(std::uint32_t);
+        swordRanges.push_back(range);
+        swordPrimitiveCounts.push_back(swordPrimitiveCount);
+    }
     VkAccelerationStructureBuildGeometryInfoKHR swordBlasBuildInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR};
     swordBlasBuildInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
     swordBlasBuildInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
-    swordBlasBuildInfo.geometryCount = 1u;
-    swordBlasBuildInfo.pGeometries = &blasGeometry;
+    swordBlasBuildInfo.geometryCount = static_cast<std::uint32_t>(swordGeometries.size());
+    swordBlasBuildInfo.pGeometries = swordGeometries.data();
     VkAccelerationStructureBuildSizesInfoKHR swordBlasSizes{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR};
-    vkGetAccelerationStructureBuildSizesKHR_(device_, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &swordBlasBuildInfo, &swordPrimitiveCount, &swordBlasSizes);
+    vkGetAccelerationStructureBuildSizesKHR_(device_, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR,
+                                             &swordBlasBuildInfo, swordPrimitiveCounts.data(),
+                                             &swordBlasSizes);
+    if (genericStaticAssetEnabled_) staticMeshBlasBytes_ = swordBlasSizes.accelerationStructureSize;
     if (!CreateBuffer(swordBlasSizes.accelerationStructureSize,
                       VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR,
                       VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
@@ -1940,12 +2184,21 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     }
     swordBlasBuildInfo.dstAccelerationStructure = swordBlas_.handle;
     swordBlasBuildInfo.scratchData.deviceAddress = swordBlasScratch.address;
-    const VkAccelerationStructureBuildRangeInfoKHR* swordBlasRanges[] = {&swordRange};
-    BlasBuildData swordBlasBuildData{this, &swordBlasBuildInfo, swordBlasRanges};
+    std::vector<const VkAccelerationStructureBuildRangeInfoKHR*> swordBlasRangePointers;
+    swordBlasRangePointers.reserve(swordRanges.size());
+    for (const auto& range : swordRanges) swordBlasRangePointers.push_back(&range);
+    BlasBuildData swordBlasBuildData{this, &swordBlasBuildInfo, swordBlasRangePointers.data()};
+    const auto staticBlasBuildStart = std::chrono::steady_clock::now();
     if (!RunOneTimeCommands(buildBlas, &swordBlasBuildData, diagnostic))
     {
         DestroyBuffer(swordBlasScratch);
         return false;
+    }
+    if (genericStaticAssetEnabled_)
+    {
+        staticMeshBlasBuildMilliseconds_ =
+            std::chrono::duration<double, std::milli>(
+                std::chrono::steady_clock::now() - staticBlasBuildStart).count();
     }
     DestroyBuffer(swordBlasScratch);
     VkAccelerationStructureDeviceAddressInfoKHR swordBlasAddressInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR};
@@ -2383,7 +2636,7 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
     const auto& skeletonVertexBuffer_ = characterSlot_.SkeletonGpu(0u).vertices;
     const auto& secondSkeletonVertexBuffer = characterSlot_.SkeletonGpu(1u).vertices;
     const auto& lichVertexBuffer_ = characterSlot_.LichGpu().vertices;
-    const std::array<VkDescriptorSetLayoutBinding, 11u> bindings{{
+    const std::array<VkDescriptorSetLayoutBinding, 20u> bindings{{
         {0u, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, nullptr},
         {1u, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
         {2u, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
@@ -2395,6 +2648,15 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
         {8u, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
         {9u, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
         {10u, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
+        {kRtBindingInstanceMetadata, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
+        {kRtBindingPrimitiveMetadata, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
+        {kRtBindingMaterials, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
+        {kRtBindingStaticVertices, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
+        {kRtBindingStaticIndices, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
+        {kRtBindingBaseColorTextures, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
+        {kRtBindingNormalTextures, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
+        {kRtBindingOrmTextures, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
+        {kRtBindingEmissiveTextures, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
     }};
     const VkDescriptorSetLayoutCreateInfo layoutInfo{
         VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
@@ -2411,8 +2673,8 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
     const std::array<VkDescriptorPoolSize, 4u> poolSizes{{
         {VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1u},
         {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1u},
-        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 4u},
-        {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 5u},
+        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 9u},
+        {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 9u},
     }};
     const VkDescriptorPoolCreateInfo poolInfo{
         VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
@@ -2481,6 +2743,27 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
     secondSkeletonWrite.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     secondSkeletonWrite.pBufferInfo = &secondSkeletonBufferInfo;
 
+    const auto bufferWrite = [this](std::uint32_t binding,
+                                    const VkDescriptorBufferInfo* info) {
+        VkWriteDescriptorSet write{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
+        write.dstSet = descriptorSet_;
+        write.dstBinding = binding;
+        write.descriptorCount = 1u;
+        write.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+        write.pBufferInfo = info;
+        return write;
+    };
+    const VkDescriptorBufferInfo instanceMetadataInfo{
+        instanceMetadataBuffer_.buffer, 0u, instanceMetadataBuffer_.size};
+    const VkDescriptorBufferInfo primitiveMetadataInfo{
+        primitiveMetadataBuffer_.buffer, 0u, primitiveMetadataBuffer_.size};
+    const VkDescriptorBufferInfo materialMetadataInfo{
+        materialMetadataBuffer_.buffer, 0u, materialMetadataBuffer_.size};
+    const VkDescriptorBufferInfo staticVertexInfo{
+        staticVertexBuffer_.buffer, 0u, staticVertexBuffer_.size};
+    const VkDescriptorBufferInfo staticIndexInfo{
+        staticIndexBuffer_.buffer, 0u, staticIndexBuffer_.size};
+
     VkDescriptorBufferInfo lichBufferInfo{};
     lichBufferInfo.buffer = lichVertexBuffer_.buffer;
     lichBufferInfo.offset = 0u;
@@ -2508,6 +2791,18 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
     const VkDescriptorImageInfo armInfo{materialSampler_, materialArm_.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
     const VkDescriptorImageInfo lichBaseInfo{materialSampler_, lichBaseColor_.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
     const VkDescriptorImageInfo lichEmissiveInfo{materialSampler_, lichEmissive_.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
+    const VkDescriptorImageInfo staticBaseInfo{
+        materialSampler_, genericStaticAssetEnabled_ ? staticBaseColor_.view : materialDiffuse_.view,
+        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
+    const VkDescriptorImageInfo staticNormalInfo{
+        materialSampler_, genericStaticAssetEnabled_ ? staticNormal_.view : materialNormal_.view,
+        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
+    const VkDescriptorImageInfo staticOrmInfo{
+        materialSampler_, genericStaticAssetEnabled_ ? staticOrm_.view : materialArm_.view,
+        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
+    const VkDescriptorImageInfo staticEmissiveInfo{
+        materialSampler_, genericStaticAssetEnabled_ ? staticEmissive_.view : lichEmissive_.view,
+        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
     const auto sampledWrite = [this](std::uint32_t binding, const VkDescriptorImageInfo* info) {
         VkWriteDescriptorSet write{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
         write.dstSet = descriptorSet_;
@@ -2517,11 +2812,20 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
         write.pImageInfo = info;
         return write;
     };
-    const std::array<VkWriteDescriptorSet, 11u> writes{{accelerationStructureWrite, imageWrite, skeletonWrite,
+    const std::array<VkWriteDescriptorSet, 20u> writes{{accelerationStructureWrite, imageWrite, skeletonWrite,
                                                        sampledWrite(3u, &diffuseInfo), sampledWrite(4u, &normalInfo), sampledWrite(5u, &armInfo),
                                                        worldSurfaceWrite, lichBufferWrite,
                                                        sampledWrite(8u, &lichBaseInfo), sampledWrite(9u, &lichEmissiveInfo),
-                                                       secondSkeletonWrite}};
+                                                       secondSkeletonWrite,
+                                                       bufferWrite(kRtBindingInstanceMetadata, &instanceMetadataInfo),
+                                                       bufferWrite(kRtBindingPrimitiveMetadata, &primitiveMetadataInfo),
+                                                       bufferWrite(kRtBindingMaterials, &materialMetadataInfo),
+                                                       bufferWrite(kRtBindingStaticVertices, &staticVertexInfo),
+                                                       bufferWrite(kRtBindingStaticIndices, &staticIndexInfo),
+                                                       sampledWrite(kRtBindingBaseColorTextures, &staticBaseInfo),
+                                                       sampledWrite(kRtBindingNormalTextures, &staticNormalInfo),
+                                                       sampledWrite(kRtBindingOrmTextures, &staticOrmInfo),
+                                                       sampledWrite(kRtBindingEmissiveTextures, &staticEmissiveInfo)}};
     vkUpdateDescriptorSets(device_, static_cast<std::uint32_t>(writes.size()), writes.data(), 0u, nullptr);
 
     diagnostic.clear();
@@ -2873,8 +3177,18 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const Vec3 swordColumnX = scaled(add(scaled(viewRight, swordCos), scaled(viewUp, swordSin)), torchScale);
     const Vec3 swordColumnY = scaled(add(scaled(viewRight, -swordSin), scaled(viewUp, swordCos)), torchScale);
     const Vec3 swordColumnZ = scaled(viewForward, torchScale);
-    // Local sword grip is (1.47, -0.485, 0), so T = hand - M * grip.
-    const Vec3 swordTranslation = add(add(rightHand, scaled(swordColumnX, -1.47f)), scaled(swordColumnY, 0.485f));
+    Vec3 swordGrip{{1.47f, -0.485f, 0.0f}};
+    if (genericStaticAssetEnabled_ && !developmentStaticAsset_.sockets.empty())
+    {
+        const auto& socket = developmentStaticAsset_.sockets.front().world;
+        swordGrip = {{socket[12], socket[13], socket[14]}};
+    }
+    // Place either held mesh by its authored grip socket without changing the
+    // physical sword TLAS slot or the simulation-owned hand pose.
+    const Vec3 swordTranslation = add(
+        add(add(rightHand, scaled(swordColumnX, -swordGrip[0])),
+            scaled(swordColumnY, -swordGrip[1])),
+        scaled(swordColumnZ, -swordGrip[2]));
 
     if (!characterSlot_.PrepareFrame(frame.skeletonEnemies,
                                      frame.skeletonEnemyCount,

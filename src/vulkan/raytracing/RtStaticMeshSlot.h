@@ -45,6 +45,10 @@ public:
     const std::vector<RtMaterialGpu>& Materials() const { return materials_; }
     const std::vector<horde::scene::assets::StaticRtVertex>& Vertices() const { return vertices_; }
     const std::vector<std::uint32_t>& Indices() const { return indices_; }
+    const std::vector<std::array<float, 12u>>& GeometryTransforms() const
+    {
+        return geometryTransforms_;
+    }
     const RtStaticMeshMeasurements& Measurements() const { return measurements_; }
 
 private:
@@ -53,6 +57,7 @@ private:
     std::vector<RtMaterialGpu> materials_;
     std::vector<horde::scene::assets::StaticRtVertex> vertices_;
     std::vector<std::uint32_t> indices_;
+    std::vector<std::array<float, 12u>> geometryTransforms_;
     RtStaticMeshMeasurements measurements_{};
 };
 

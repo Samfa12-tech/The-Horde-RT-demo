@@ -67,6 +67,10 @@ enum class RtMaterialFlag : std::uint32_t
     DoubleSided = $($m.doubleSided)u,
     Alpha = $($m.alpha)u,
     Transmission = $($m.transmission)u,
+    BaseColorTexture = $($m.baseColorTexture)u,
+    NormalTexture = $($m.normalTexture)u,
+    OrmTexture = $($m.ormTexture)u,
+    EmissiveTexture = $($m.emissiveTexture)u,
 };
 
 struct alignas(16) RtInstanceMetadata
@@ -122,6 +126,10 @@ const uint kRtInstanceFlagTransmissive = $($i.transmissive)u;
 const uint kRtMaterialFlagDoubleSided = $($m.doubleSided)u;
 const uint kRtMaterialFlagAlpha = $($m.alpha)u;
 const uint kRtMaterialFlagTransmission = $($m.transmission)u;
+const uint kRtMaterialFlagBaseColorTexture = $($m.baseColorTexture)u;
+const uint kRtMaterialFlagNormalTexture = $($m.normalTexture)u;
+const uint kRtMaterialFlagOrmTexture = $($m.ormTexture)u;
+const uint kRtMaterialFlagEmissiveTexture = $($m.emissiveTexture)u;
 
 struct RtInstanceMetadata
 {
