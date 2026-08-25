@@ -182,7 +182,7 @@ int main()
     equivalentInput.moveStrafe = -0.31f;
     equivalentInput.yawRadians = 0.38f;
     equivalentInput.pitchRadians = -0.07f;
-    equivalentInput.lanternStrength = 1.8f;
+    equivalentInput.torchLightStrength = 1.8f;
     equivalentInput.damageEnabled = false;
     for (std::uint64_t frame = 1u; frame <= 90u; ++frame)
     {

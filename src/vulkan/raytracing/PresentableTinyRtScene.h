@@ -40,7 +40,7 @@ struct RtSceneFrameInputs
 {
     float cameraYaw = 0.0f;
     float cameraPitch = 0.0f;
-    float lanternStrength = 1.0f;
+    float torchLightStrength = 1.0f;
     float walkTime = 0.0f;
     float cameraX = 0.0f;
     float cameraZ = 1.85f;
@@ -53,7 +53,7 @@ struct RtSceneFrameInputs
     std::array<horde::gameplay::simulation::SkeletonEnemySnapshot,
                horde::gameplay::simulation::kSkeletonEnemyCapacity> skeletonEnemies{};
     std::size_t skeletonEnemyCount = 0u;
-    horde::gameplay::LanternSnapshot lantern{};
+    horde::gameplay::TorchFailureSnapshot torchFailure{};
     horde::gameplay::EnemyRosterSnapshot roster{};
     horde::gameplay::LichSnapshot lich{};
 };

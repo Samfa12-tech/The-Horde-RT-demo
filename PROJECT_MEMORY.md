@@ -42,9 +42,9 @@ Last updated: 2026-08-25
 
 ## Current alpha scene and controls
 
-- The complete route is two-skeleton encounter -> three-turn moving-shadow corridor -> roof-water drench/lantern drop -> rounded catchment and drain runoff -> blue skylight -> yellow/blue/red/green bays -> open framed threshold -> light-aware hero mirror -> misted staff-lit lich -> opening roof -> returning dawn -> epilogue.
+- The complete route is two-skeleton encounter -> three-turn moving-shadow corridor -> roof-water drench/original torch failure at historical `lantern-drop` -> rounded catchment and drain runoff -> blue skylight -> yellow/blue/red/green bays -> open framed threshold -> light-aware hero mirror -> misted staff-lit lich -> opening roof -> returning dawn -> epilogue.
 - The rejected stained pane is not present. The water slice is a narrow architectural feature with no fluid simulation, collision, or movement slowdown.
-- The held and dropped lantern are RT geometry. Visible flame and direct-light contribution both reach zero after the authored fall; the old fullscreen overlay must not return.
+- The held and dropped torch are RT geometry. Visible flame and direct-light contribution both reach zero after the authored fall; the old fullscreen overlay must not return.
 - The rebuilt low-poly player uses a layered travelling coat, shaped shoulders/belt/collar/tails, articulated capsule arms and legs, pelvis/boots, foot lift and toe roll, torso counter-rotation, a head shadow/reflection instance, and wall-aware held-prop retraction.
 - Player vitality is three points with a one-second damage lockout, short fatal hold, encounter retry, route restart, and platform-native death overlays.
 - The procedural sword swings independently of the torch and the lich requires three accepted hits with a two-second lockout. Its death now opens the roof, reveals warm dawn, and ends in a contextual Continue/Begin Again/Quit epilogue.
@@ -227,9 +227,9 @@ Last updated: 2026-08-25
 
 ## Windows-first complete showcase route - 2026-07-16
 
-- The playable route now sequences skeleton -> deterministic lantern gutter/drop -> bounded blue skylight -> yellow/blue/deep-red/restrained-green torch bays -> open framed threshold -> light-aware one-bounce hero mirror -> floating staff-lit lich -> post-death sliding skylight.
-- Player presence is complete with a reusable-BLAS leather pelvis, articulated thighs/shins/boots, procedural gait, exact retained hand grips, and reset-only lantern failure/lowered left arm.
-- `ShowcaseGameplay.h` owns deterministic lantern, lower-body, lighting, plural roster/director, and lich charge/recovery state. Only one skinned enemy is selected/rendered/refit at once; the capacity remains configurable for later Horde measurements.
+- The playable route now sequences skeleton -> deterministic torch gutter/drop -> bounded blue skylight -> yellow/blue/deep-red/restrained-green torch bays -> open framed threshold -> light-aware one-bounce hero mirror -> floating staff-lit lich -> post-death sliding skylight.
+- Player presence is complete with a reusable-BLAS leather pelvis, articulated thighs/shins/boots, procedural gait, exact retained hand grips, and reset-only torch failure/lowered left arm.
+- `ShowcaseGameplay.h` owns deterministic torch-failure, lower-body, lighting, plural roster/director, and lich charge/recovery state. Only one skinned enemy is selected/rendered/refit at once; the capacity remains configurable for later Horde measurements.
 - The lich uses continuous living `Idle_02` and non-looping `Dead` clips; whole-instance hover/orbit replaces the visibly distorted walking clip. Its separate 48-byte UV stream, raw Windows KTX2, strict Android ASTC 6x6, derived violet emissive map, and forty skin-weighted staff vertices drive the visible staff light/electricity. It takes three hits with a two-second lockout; each accepted hit produces recoil plus a positional cry, and death opens the finale roof over 4.5 seconds.
 - Player travel and skeleton cadence now produce accepted audible footsteps. Skeleton and lich spatial cues share equal-power pan, distance rolloff, and route-obstruction attenuation through XAudio2 on Windows and published left/right SoundPool gains on Android. Android playback passed hands-on testing, while perceived stereo directionality and distance remain explicitly uncertified.
 - Windows Debug/Release and all five CTests pass, and the final hands-on Windows route/audio/combat verdict passed. The complete route is also device-validated on `SM-S948B`: strict environment/lich ASTC, honest RT presentation, full hands-on traversal, lifecycle recovery, and controlled warm 75% measurements all pass. Every required zone's median of three 120-frame average windows was below 13.7 ms at thermal status 3; see `docs/HORDE_SHOWCASE_ANDROID_VALIDATION_2026-07-17.md`. Label this state **Windows-validated / Android-device-validated**.

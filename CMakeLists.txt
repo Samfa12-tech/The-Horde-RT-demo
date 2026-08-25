@@ -148,6 +148,16 @@ if(BUILD_TESTING)
     target_include_directories(horde_rt_showcase_gameplay_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_showcase_gameplay_smoke COMMAND horde_rt_showcase_gameplay_smoke)
 
+    add_test(
+        NAME horde_rt_torch_failure_terminology_negative
+        COMMAND ${CMAKE_COMMAND}
+            -DCXX_COMPILER=${CMAKE_CXX_COMPILER}
+            -DCXX_COMPILER_ID=${CMAKE_CXX_COMPILER_ID}
+            -DSOURCE_DIRECTORY=${CMAKE_CURRENT_SOURCE_DIR}
+            -DFIXTURE=${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/torch_failure_terminology_legacy.cpp
+            -P ${CMAKE_CURRENT_SOURCE_DIR}/tests/RunCompilerNegativeFixture.cmake
+    )
+
     add_executable(horde_rt_spatial_audio_smoke tests/SpatialAudioSmoke.cpp)
     target_include_directories(horde_rt_spatial_audio_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_spatial_audio_smoke COMMAND horde_rt_spatial_audio_smoke)

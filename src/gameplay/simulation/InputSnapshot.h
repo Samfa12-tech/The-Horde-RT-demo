@@ -24,7 +24,7 @@ struct InputSnapshot
     float moveStrafe = 0.0f;
     float yawRadians = 0.0f;
     float pitchRadians = 0.0f;
-    float lanternStrength = 1.8f;
+    float torchLightStrength = 1.8f;
     float authoritativePlayerX = 0.0f;
     float authoritativePlayerZ = 0.0f;
     bool paused = false;

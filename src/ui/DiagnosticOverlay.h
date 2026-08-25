@@ -22,7 +22,7 @@ struct DeveloperOverlaySnapshot
     std::string rtMode;
     std::string routeZone;
     std::string materialEncoding;
-    std::string lanternPhase;
+    std::string torchFailurePhase;
     std::string selectedEnemy;
     std::string encounterPhase;
     std::string playerLifePhase = "alive";

@@ -78,7 +78,7 @@ std::string BuildDeveloperOverlayText(const DeveloperOverlaySnapshot& snapshot)
     {
         out << "GPU RT N/A  |  " << snapshot.gpuRtTimingStatus << '\n';
     }
-    out << "SCENE " << snapshot.routeZone << "  |  lantern " << snapshot.lanternPhase
+    out << "SCENE " << snapshot.routeZone << "  |  torch failure " << snapshot.torchFailurePhase
         << "  |  " << snapshot.selectedEnemy << ' ' << snapshot.encounterPhase;
     if (snapshot.enemyHealth >= 0)
     {

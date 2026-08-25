@@ -136,7 +136,7 @@ std::mutex gInputPublisherMutex;
 horde::gameplay::simulation::InputSnapshot gInputPublisherState = []
 {
     horde::gameplay::simulation::InputSnapshot input;
-    input.lanternStrength = 1.8f;
+    input.torchLightStrength = 1.8f;
     input.paused = true;
     return input;
 }();
@@ -307,7 +307,7 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(const Swapchai
     snapshot.routeZone = horde::gameplay::ShowcaseZoneName(
         simulation.zone);
     snapshot.materialEncoding = context.rtScene.MaterialEncoding();
-    snapshot.lanternPhase = horde::gameplay::LanternPhaseName(simulation.lantern.phase);
+    snapshot.torchFailurePhase = horde::gameplay::TorchFailurePhaseName(simulation.torchFailure.phase);
     snapshot.selectedEnemy = horde::gameplay::EnemyKindName(roster.selectedEnemy);
     snapshot.encounterPhase = encounter ? EncounterStatusName(encounter->status) : "inactive";
     if (roster.selectedEnemy == horde::gameplay::EnemyKind::Lich)
@@ -612,7 +612,7 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
              context.rtScene.DispatchExtent().height == context.swapchainExtent.height ? "true" : "false") << ",\n"
          << "  \"animationTime\": " << simulation.walkTime << ",\n"
          << "  \"captureStableFrames\": " << context.capturePresentedFrames << ",\n"
-         << "  \"lanternPhase\": \"" << horde::gameplay::LanternPhaseName(simulation.lantern.phase) << "\",\n"
+         << "  \"torchFailurePhase\": \"" << horde::gameplay::TorchFailurePhaseName(simulation.torchFailure.phase) << "\",\n"
          << "  \"selectedEnemy\": \"" << horde::gameplay::EnemyKindName(roster.selectedEnemy) << "\",\n"
          << "  \"activeSkinnedEnemies\": "
          << (simulation.activeEnemyKind == horde::gameplay::EnemyKind::Skeleton
@@ -2326,13 +2326,13 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_stopDiagnosticSurface(JNIEnv*, jclas
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_samfa12_hordelanternrt_ProbeBridge_setViewControls(JNIEnv*, jclass, jfloat yaw, jfloat pitch, jfloat lanternStrength, jfloat moveStrafe, jfloat moveForward)
+Java_com_samfa12_hordelanternrt_ProbeBridge_setViewControls(JNIEnv*, jclass, jfloat yaw, jfloat pitch, jfloat torchLightStrength, jfloat moveStrafe, jfloat moveForward)
 {
     std::lock_guard<std::mutex> lock(gInputPublisherMutex);
     gInputPublisherState.yawRadians = static_cast<float>(yaw);
     gInputPublisherState.pitchRadians = std::clamp(static_cast<float>(pitch), -0.32f, 0.28f);
-    gInputPublisherState.lanternStrength =
-        std::clamp(static_cast<float>(lanternStrength), 0.65f, 2.4f);
+    gInputPublisherState.torchLightStrength =
+        std::clamp(static_cast<float>(torchLightStrength), 0.65f, 2.4f);
     gInputPublisherState.moveStrafe = std::clamp(static_cast<float>(moveStrafe), -1.0f, 1.0f);
     gInputPublisherState.moveForward = std::clamp(static_cast<float>(moveForward), -1.0f, 1.0f);
     PublishInputLocked();

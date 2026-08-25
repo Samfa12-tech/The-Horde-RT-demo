@@ -49,7 +49,7 @@ struct SimulationSnapshot
     float playerTravelledThisTick = 0.0f;
     float walkTime = 0.0f;
     float walkAmount = 0.0f;
-    float lanternStrength = 1.8f;
+    float torchLightStrength = 1.8f;
     float dodgeCooldownRemainingSeconds = 0.0f;
     bool dodgeActive = false;
 
@@ -67,7 +67,7 @@ struct SimulationSnapshot
     bool playerAlive = true;
     bool finaleComplete = false;
 
-    LanternSnapshot lantern{};
+    TorchFailureSnapshot torchFailure{};
     EnemyRosterSnapshot enemyRoster{};
     CombatSnapshot swordCombat{};
     PlayerCombatSnapshot playerCombat{};

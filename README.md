@@ -263,7 +263,7 @@ After raygen edits, run `tools/compile-raygen.ps1`; use `tools/compile-raygen.ps
 
 ## Showcase route status
 
-The established route is Windows- and Android-device-validated: lower body and lantern drop, zig-zag shadows, blue skylight, bay-selected coloured torches, an open framed threshold, one hero mirror, and a sequential staff-lit lich finale. The newer body-and-ending slice adds the layered animated player, post-death sliding skylight, warm dawn reveal, and contextual ending; its host and exact-APK `SM-S948B` evidence are recorded in `docs/PLAYER_BODY_AND_FINALE_SLICE_2026-07-31.md`.
+The established route is Windows- and Android-device-validated: lower body and the original torch failure at the historical `lantern-drop` checkpoint, zig-zag shadows, blue skylight, bay-selected coloured torches, an open framed threshold, one hero mirror, and a sequential staff-lit lich finale. The newer body-and-ending slice adds the layered animated player, post-death sliding skylight, warm dawn reveal, and contextual ending; its host and exact-APK `SM-S948B` evidence are recorded in `docs/PLAYER_BODY_AND_FINALE_SLICE_2026-07-31.md`.
 
 Showcase Alpha 1.5.2 retains the two-skeleton system first published in 0.1.4: at most two simultaneous skeletons, two skeleton pose buckets, nine character/environment BLAS plus the dedicated water geometry route, and twenty physical TLAS slots; the later lich route remains singular. No third enemy is permitted without a separately measured design.
 

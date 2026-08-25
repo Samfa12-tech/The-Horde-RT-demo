@@ -546,7 +546,7 @@ int main()
           retry.Snapshot().activeEnemyKind == EnemyKind::Lich &&
           NearlyEqual(retry.Snapshot().playerX, -33.70f) &&
           NearlyEqual(retry.Snapshot().playerZ, -15.20f) &&
-          retry.Snapshot().lantern.phase == LanternPhase::Settled &&
+          retry.Snapshot().torchFailure.phase == TorchFailurePhase::Settled &&
           retry.Snapshot().lich.phase != LichPhase::Dormant &&
           retry.Snapshot().playerVitals.vitality == PlayerVitals::kMaxVitality,
           "retry must restore the authored mirror player, lantern, lich, and vitality state exactly once");

@@ -67,7 +67,7 @@ private:
     SimulationSnapshot snapshot_{};
     InputSnapshot lastInput_{};
 
-    LanternSequence lantern_{};
+    TorchFailureSequence torchFailure_{};
     EnemyDirector enemyDirector_{};
     SwordCombat swordCombat_{};
     LichEncounter lichEncounter_{};
@@ -75,7 +75,7 @@ private:
     TravelFootstepCadence playerFootsteps_{};
     std::array<PlayerFootstepCadence, kSkeletonEnemyCapacity> enemyFootsteps_{};
     CombatSnapshot combatSnapshot_{};
-    LanternSnapshot lanternSnapshot_{};
+    TorchFailureSnapshot torchFailureSnapshot_{};
     EnemyKind activeEnemyKind_ = EnemyKind::Skeleton;
 
     float playerX_ = 0.0f;

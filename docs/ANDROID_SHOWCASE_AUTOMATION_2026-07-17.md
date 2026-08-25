@@ -67,8 +67,8 @@ The standard order is intentionally one sustained app process. Do not force-stop
 | `skeleton` | Fresh skeleton-room encounter view |
 | `two-enemy-combat` | Fresh two-skeleton encounter at its deterministic measurement pose |
 | `worst-bend` | Fresh zig-zag corner |
-| `lantern-drop` | Lantern failure triggered |
-| `skylight` | Lantern settled; skylight chamber |
+| `lantern-drop` | Original torch failure triggered |
+| `skylight` | Original torch settled; skylight chamber |
 | `yellow`, `blue`, `red`, `green` | Lantern settled; selected coloured-light bay |
 | `mirror` | Lich selected and active; mirror composition |
 | `lich` | Lich selected and active; finale combat view |
@@ -102,7 +102,7 @@ It does not prove that touch controls feel good, that sound is audible or direct
 
 1. Walk and look with both touch regions; fight both opening skeletons, then swing three accepted hits against the lich.
 2. Confirm the two skeletons remain readable, have distinguishable positional audio/haptic impacts, preserve corpse/survivor separation, and still retain the lich hit cries, charge/electricity, recoil, death, and moving roof.
-3. Inspect zig-zag seams, lantern drop, skylight depth, four light colours, mirror exposure, wet floor, player shadow, and prop wall retraction.
+3. Inspect zig-zag seams, the original torch drop at historical `lantern-drop`, skylight depth, four light colours, mirror exposure, wet floor, player shadow, and prop wall retraction.
 4. Exercise pause/resume and Home/surface recreation.
 5. Confirm the phone remains comfortable and responsive at the recommended 75% tier.
 

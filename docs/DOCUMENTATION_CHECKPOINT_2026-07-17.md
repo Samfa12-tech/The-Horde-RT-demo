@@ -32,7 +32,7 @@ This is the consolidation map after Showcase Alpha 1.5.2 publication. It disting
 
 - Public version: Showcase Alpha 1.5.2 / `1.5.2`; Android `versionCode 7`.
 - Itch builds: Windows `#1913191`, Android `#1913192`.
-- Route: two skeletons -> shadow corridor -> roof-water drench/lantern drop -> rounded catchment and drain runoff -> blue skylight -> four coloured bays -> open threshold -> hero mirror -> misted staff-lit lich -> opening roof -> returning dawn -> epilogue.
+- Route: two skeletons -> shadow corridor -> roof-water drench/original torch failure at historical `lantern-drop` -> rounded catchment and drain runoff -> blue skylight -> four coloured bays -> open threshold -> hero mirror -> misted staff-lit lich -> opening roof -> returning dawn -> epilogue.
 - The stained pane remains rejected. The water is a narrow real-geometry RT feature with bounded reflection/transmission, not a broad fluid simulation.
 - Player body includes a layered travelling coat, articulated capsule arms and legs, pelvis/boots, foot lift/toe roll, restrained torso counter-rotation, head shadow/reflection, and wall-aware props.
 - Player vitality/death/retry is implemented: three points, a one-second damage lockout, short fatal hold, encounter retry, full-route restart, and platform-native death overlays.

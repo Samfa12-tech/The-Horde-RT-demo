@@ -13,8 +13,8 @@ enum class ShowcaseCheckpointPreset
 {
     Fresh,
     TwoSkeletonCombat,
-    LanternTrigger,
-    LanternSettled,
+    TorchFailureTrigger,
+    TorchFailureSettled,
     LichActive,
     FinaleRoofOpen,
 };
@@ -36,12 +36,12 @@ inline constexpr std::array<ShowcaseCheckpoint, 13> kShowcaseCheckpoints{{
     {0, "opening", 0.0f, 1.85f, 0.0f, -0.05f, ShowcaseZone::Opening, ShowcaseCheckpointPreset::Fresh},
     {1, "skeleton", kSkeletonRoomCenter.x, kSkeletonRoomCenter.z, 0.0f, 0.0f, ShowcaseZone::SkeletonRoom, ShowcaseCheckpointPreset::Fresh},
     {2, "worst-bend", 4.20f, -10.00f, 0.0f, -0.04f, ShowcaseZone::ShadowCorridor, ShowcaseCheckpointPreset::Fresh},
-    {3, "lantern-drop", -1.80f, -15.20f, -kHalfPi, -0.08f, ShowcaseZone::ShadowCorridor, ShowcaseCheckpointPreset::LanternTrigger},
-    {4, "skylight", -5.50f, -15.20f, kHalfPi, -0.16f, ShowcaseZone::SkylightChamber, ShowcaseCheckpointPreset::LanternSettled},
-    {5, "yellow", -11.00f, -15.20f, -kHalfPi, -0.02f, ShowcaseZone::YellowTorchBay, ShowcaseCheckpointPreset::LanternSettled},
-    {6, "blue", -16.00f, -15.20f, -kHalfPi, -0.02f, ShowcaseZone::BlueTorchBay, ShowcaseCheckpointPreset::LanternSettled},
-    {7, "red", -21.00f, -15.20f, -kHalfPi, -0.02f, ShowcaseZone::RedTorchBay, ShowcaseCheckpointPreset::LanternSettled},
-    {8, "green", -26.00f, -15.20f, -kHalfPi, -0.02f, ShowcaseZone::GreenTorchBay, ShowcaseCheckpointPreset::LanternSettled},
+    {3, "lantern-drop", -1.80f, -15.20f, -kHalfPi, -0.08f, ShowcaseZone::ShadowCorridor, ShowcaseCheckpointPreset::TorchFailureTrigger},
+    {4, "skylight", -5.50f, -15.20f, kHalfPi, -0.16f, ShowcaseZone::SkylightChamber, ShowcaseCheckpointPreset::TorchFailureSettled},
+    {5, "yellow", -11.00f, -15.20f, -kHalfPi, -0.02f, ShowcaseZone::YellowTorchBay, ShowcaseCheckpointPreset::TorchFailureSettled},
+    {6, "blue", -16.00f, -15.20f, -kHalfPi, -0.02f, ShowcaseZone::BlueTorchBay, ShowcaseCheckpointPreset::TorchFailureSettled},
+    {7, "red", -21.00f, -15.20f, -kHalfPi, -0.02f, ShowcaseZone::RedTorchBay, ShowcaseCheckpointPreset::TorchFailureSettled},
+    {8, "green", -26.00f, -15.20f, -kHalfPi, -0.02f, ShowcaseZone::GreenTorchBay, ShowcaseCheckpointPreset::TorchFailureSettled},
     {9, "mirror", -33.70f, -15.20f, -kHalfPi, 0.0f, ShowcaseZone::Finale, ShowcaseCheckpointPreset::LichActive},
     {10, "lich", -33.25f, -14.25f, 2.52f, 0.0f, ShowcaseZone::Finale, ShowcaseCheckpointPreset::LichActive},
     {11, "finale-roof", -35.50f, -15.20f, kHalfPi, 0.28f, ShowcaseZone::Finale, ShowcaseCheckpointPreset::FinaleRoofOpen},
@@ -85,8 +85,8 @@ constexpr const ShowcaseCheckpoint* FindShowcaseCheckpoint(const char* name)
 
 struct ShowcaseCheckpointState
 {
-    LanternSequence lantern;
-    LanternSnapshot lanternSnapshot;
+    TorchFailureSequence torchFailure;
+    TorchFailureSnapshot torchFailureSnapshot;
     EnemyDirector enemyDirector;
     LichEncounter lichEncounter;
     EnemyKind activeEnemyKind = EnemyKind::Skeleton;
@@ -96,12 +96,12 @@ inline void AdvanceLanternToSettled(ShowcaseCheckpointState& state)
 {
     constexpr float triggerX = -1.80f;
     constexpr float triggerZ = -15.20f;
-    state.lantern.Update(0.01f, triggerX, triggerZ, -kHalfPi, -0.08f);
+    state.torchFailure.Update(0.01f, triggerX, triggerZ, -kHalfPi, -0.08f);
     for (int frame = 0; frame < 25; ++frame)
     {
-        state.lantern.Update(0.05f, triggerX, triggerZ, -kHalfPi, -0.08f);
+        state.torchFailure.Update(0.05f, triggerX, triggerZ, -kHalfPi, -0.08f);
     }
-    state.lanternSnapshot = state.lantern.Snapshot();
+    state.torchFailureSnapshot = state.torchFailure.Snapshot();
 }
 
 inline void AdvanceLichToActive(ShowcaseCheckpointState& state, const ShowcaseCheckpoint& checkpoint)
@@ -144,15 +144,15 @@ inline ShowcaseCheckpointState BuildShowcaseCheckpointState(const ShowcaseCheckp
 {
     ShowcaseCheckpointState state;
     state.enemyDirector.Reset();
-    state.lantern.Reset();
+    state.torchFailure.Reset();
     state.lichEncounter.Reset();
 
-    if (checkpoint.preset == ShowcaseCheckpointPreset::LanternTrigger)
+    if (checkpoint.preset == ShowcaseCheckpointPreset::TorchFailureTrigger)
     {
-        state.lanternSnapshot = state.lantern.Update(
+        state.torchFailureSnapshot = state.torchFailure.Update(
             0.01f, checkpoint.x, checkpoint.z, checkpoint.yaw, checkpoint.pitch);
     }
-    else if (checkpoint.preset == ShowcaseCheckpointPreset::LanternSettled ||
+    else if (checkpoint.preset == ShowcaseCheckpointPreset::TorchFailureSettled ||
              checkpoint.preset == ShowcaseCheckpointPreset::LichActive ||
              checkpoint.preset == ShowcaseCheckpointPreset::FinaleRoofOpen)
     {
@@ -172,14 +172,14 @@ inline ShowcaseCheckpointState BuildShowcaseCheckpointState(const ShowcaseCheckp
     return state;
 }
 
-constexpr const char* LanternPhaseName(LanternPhase phase)
+constexpr const char* TorchFailurePhaseName(TorchFailurePhase phase)
 {
     switch (phase)
     {
-    case LanternPhase::Held: return "held";
-    case LanternPhase::Guttering: return "guttering";
-    case LanternPhase::Falling: return "falling";
-    case LanternPhase::Settled: return "settled";
+    case TorchFailurePhase::Held: return "held";
+    case TorchFailurePhase::Guttering: return "guttering";
+    case TorchFailurePhase::Falling: return "falling";
+    case TorchFailurePhase::Settled: return "settled";
     default: return "unknown";
     }
 }

@@ -19,8 +19,8 @@ bool NearlyEqual(float left, float right, float epsilon = 0.001f)
 int main()
 {
     using namespace horde::gameplay;
-    static_assert(LanternSequence::kReleaseTime == 0.70f);
-    static_assert(LanternSequence::kSettleTime == 1.15f);
+    static_assert(TorchFailureSequence::kReleaseTime == 0.70f);
+    static_assert(TorchFailureSequence::kSettleTime == 1.15f);
     bool passed = true;
     const auto check = [&passed](bool condition, const char* message) {
         if (!condition)
@@ -112,10 +112,10 @@ int main()
         const ShowcaseCheckpointState skeletonRetryState = BuildShowcaseCheckpointState(*skeletonRetry);
         const ShowcaseCheckpointState lichRetryState = BuildShowcaseCheckpointState(*lichRetry);
         check(skeletonRetryState.activeEnemyKind == EnemyKind::Skeleton &&
-              skeletonRetryState.lanternSnapshot.phase == LanternPhase::Held,
+              skeletonRetryState.torchFailureSnapshot.phase == TorchFailurePhase::Held,
               "skeleton retry must restore the fresh opening encounter");
         check(lichRetryState.activeEnemyKind == EnemyKind::Lich &&
-              lichRetryState.lanternSnapshot.phase == LanternPhase::Settled &&
+              lichRetryState.torchFailureSnapshot.phase == TorchFailurePhase::Settled &&
               lichRetryState.lichEncounter.Snapshot().phase != LichPhase::Dormant,
               "lich retry must restore settled lantern and an active lich");
     }
@@ -138,18 +138,18 @@ int main()
         }
 
         const ShowcaseCheckpointState state = BuildShowcaseCheckpointState(checkpoint);
-        if (checkpoint.preset == ShowcaseCheckpointPreset::LanternTrigger)
+        if (checkpoint.preset == ShowcaseCheckpointPreset::TorchFailureTrigger)
         {
-            check(state.lanternSnapshot.phase == LanternPhase::Guttering,
+            check(state.torchFailureSnapshot.phase == TorchFailurePhase::Guttering,
                   "lantern-drop checkpoint must begin the authored gutter");
         }
-        if (checkpoint.preset == ShowcaseCheckpointPreset::LanternSettled ||
+        if (checkpoint.preset == ShowcaseCheckpointPreset::TorchFailureSettled ||
             checkpoint.preset == ShowcaseCheckpointPreset::LichActive ||
             checkpoint.preset == ShowcaseCheckpointPreset::FinaleRoofOpen)
         {
-            check(state.lanternSnapshot.phase == LanternPhase::Settled &&
-                  state.lanternSnapshot.flameStrength == 0.0f &&
-                  state.lanternSnapshot.leftArmLowerBlend == 1.0f,
+            check(state.torchFailureSnapshot.phase == TorchFailurePhase::Settled &&
+                  state.torchFailureSnapshot.flameStrength == 0.0f &&
+                  state.torchFailureSnapshot.leftArmLowerBlend == 1.0f,
                   "post-drop checkpoints must prime a dark settled lantern and lowered arm");
         }
         if (checkpoint.preset == ShowcaseCheckpointPreset::LichActive)
@@ -172,43 +172,43 @@ int main()
           std::string(kShowcaseCheckpoints[3].name) == "lantern-drop",
           "water drench validation must retain checkpoint 3 name lantern-drop");
 
-    LanternSequence lantern;
-    lantern.Update(0.05f, 4.0f, -15.2f);
-    check(lantern.Snapshot().phase == LanternPhase::Held, "early bends must not trigger lantern failure");
-    lantern.Update(0.01f, -2.49f, -15.2f);
-    check(lantern.Snapshot().phase == LanternPhase::Held, "waterfall trigger must remain west-bounded");
-    lantern.Update(0.01f, -1.77f, -15.2f);
-    check(lantern.Snapshot().phase == LanternPhase::Held, "waterfall trigger must remain east-bounded");
-    lantern.Update(0.01f, -1.80f, -16.41f);
-    check(lantern.Snapshot().phase == LanternPhase::Held, "waterfall trigger must remain south-bounded");
-    lantern.Update(0.01f, -1.80f, -13.99f);
-    check(lantern.Snapshot().phase == LanternPhase::Held, "waterfall trigger must remain north-bounded");
-    lantern.Update(0.01f, -1.80f, -15.2f, -0.4f, 0.1f);
-    check(lantern.Snapshot().phase == LanternPhase::Guttering, "waterfall drench must trigger guttering");
+    TorchFailureSequence torchFailure;
+    torchFailure.Update(0.05f, 4.0f, -15.2f);
+    check(torchFailure.Snapshot().phase == TorchFailurePhase::Held, "early bends must not trigger torch failure");
+    torchFailure.Update(0.01f, -2.49f, -15.2f);
+    check(torchFailure.Snapshot().phase == TorchFailurePhase::Held, "waterfall trigger must remain west-bounded");
+    torchFailure.Update(0.01f, -1.77f, -15.2f);
+    check(torchFailure.Snapshot().phase == TorchFailurePhase::Held, "waterfall trigger must remain east-bounded");
+    torchFailure.Update(0.01f, -1.80f, -16.41f);
+    check(torchFailure.Snapshot().phase == TorchFailurePhase::Held, "waterfall trigger must remain south-bounded");
+    torchFailure.Update(0.01f, -1.80f, -13.99f);
+    check(torchFailure.Snapshot().phase == TorchFailurePhase::Held, "waterfall trigger must remain north-bounded");
+    torchFailure.Update(0.01f, -1.80f, -15.2f, -0.4f, 0.1f);
+    check(torchFailure.Snapshot().phase == TorchFailurePhase::Guttering, "waterfall drench must trigger guttering");
     for (int i = 0; i < 68; ++i)
     {
-        lantern.Update(0.01f, -5.5f, -15.2f, -0.7f, 0.2f);
+        torchFailure.Update(0.01f, -5.5f, -15.2f, -0.7f, 0.2f);
     }
-    check(lantern.Snapshot().heldByPlayer, "lantern must remain held before 0.70 seconds");
-    lantern.Update(0.02f, -5.4f, -15.1f, -0.8f, 0.25f);
-    check(lantern.Snapshot().phase == LanternPhase::Falling && !lantern.Snapshot().heldByPlayer,
-          "lantern must release at 0.70 seconds");
-    check(NearlyEqual(lantern.Snapshot().droppedX, -5.4f) &&
-          NearlyEqual(lantern.Snapshot().droppedZ, -15.1f) &&
-          NearlyEqual(lantern.Snapshot().droppedYawRadians, -0.8f) &&
-          NearlyEqual(lantern.Snapshot().droppedViewPitchRadians, 0.25f),
+    check(torchFailure.Snapshot().heldByPlayer, "torch must remain held before 0.70 seconds");
+    torchFailure.Update(0.02f, -5.4f, -15.1f, -0.8f, 0.25f);
+    check(torchFailure.Snapshot().phase == TorchFailurePhase::Falling && !torchFailure.Snapshot().heldByPlayer,
+          "torch must release at 0.70 seconds");
+    check(NearlyEqual(torchFailure.Snapshot().droppedX, -5.4f) &&
+          NearlyEqual(torchFailure.Snapshot().droppedZ, -15.1f) &&
+          NearlyEqual(torchFailure.Snapshot().droppedYawRadians, -0.8f) &&
+          NearlyEqual(torchFailure.Snapshot().droppedViewPitchRadians, 0.25f),
           "release pose must follow the latest player pose and then freeze");
     for (int i = 0; i < 50; ++i)
     {
-        lantern.Update(0.01f, -5.5f, -15.2f);
+        torchFailure.Update(0.01f, -5.5f, -15.2f);
     }
-    check(lantern.Snapshot().phase == LanternPhase::Settled && NearlyEqual(lantern.Snapshot().fallProgress, 1.0f),
-          "lantern must settle after the authored fall");
-    check(NearlyEqual(lantern.Snapshot().leftArmLowerBlend, 1.0f), "left arm must finish lowering by 1.20 seconds");
-    check(NearlyEqual(lantern.Snapshot().flameStrength, 0.0f), "settled lantern must not emit");
-    lantern.Reset();
-    check(lantern.Snapshot().phase == LanternPhase::Held && !lantern.Snapshot().triggered,
-          "reset must restore held untriggered lantern");
+    check(torchFailure.Snapshot().phase == TorchFailurePhase::Settled && NearlyEqual(torchFailure.Snapshot().fallProgress, 1.0f),
+          "torch must settle after the authored fall");
+    check(NearlyEqual(torchFailure.Snapshot().leftArmLowerBlend, 1.0f), "left arm must finish lowering by 1.20 seconds");
+    check(NearlyEqual(torchFailure.Snapshot().flameStrength, 0.0f), "settled torch must not emit");
+    torchFailure.Reset();
+    check(torchFailure.Snapshot().phase == TorchFailurePhase::Held && !torchFailure.Snapshot().triggered,
+          "reset must restore held untriggered torch");
 
     const LowerBodyPoseState standingPose = EvaluateLowerBodyPose(0.25f, 0.0f);
     const LowerBodyPoseState walkingPose = EvaluateLowerBodyPose(0.25f, 1.0f);

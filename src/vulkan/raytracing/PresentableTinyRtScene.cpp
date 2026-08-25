@@ -2695,7 +2695,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const float walkAmount = frame.walkAmount;
     const horde::gameplay::CombatSnapshot& combat = frame.combat;
     const horde::gameplay::PlayerCombatSnapshot& playerCombat = frame.playerCombat;
-    const horde::gameplay::LanternSnapshot& lantern = frame.lantern;
+    const horde::gameplay::TorchFailureSnapshot& torchFailure = frame.torchFailure;
     const horde::gameplay::EnemyRosterSnapshot& roster = frame.roster;
     const horde::gameplay::LichSnapshot& lich = frame.lich;
     const WaterfallCurtainScale waterfallScale = ResolveWaterfallCurtainScale(frame.tuning);
@@ -2802,7 +2802,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const Vec3 loweredLeftHandLocal{-0.31f, -0.92f, 0.27f};
     const Vec3 leftHandLocal = lerp(heldLeftHandLocal,
                                     loweredLeftHandLocal,
-                                    std::clamp(lantern.leftArmLowerBlend, 0.0f, 1.0f));
+                                    std::clamp(torchFailure.leftArmLowerBlend, 0.0f, 1.0f));
     const PlayerWeaponRenderPose weaponPose = EvaluatePlayerWeaponRenderPose(
         playerCombat, combat.swordSwingRadians, heldPropDepth);
     const Vec3 rightShoulderLocal{0.25f, -0.44f + lowerBodyPose.pelvisBob * 0.35f, 0.39f + lowerBodyPose.leftStride * 0.018f};
@@ -2824,28 +2824,28 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     Vec3 finalTorchColumnX = torchColumnX;
     Vec3 finalTorchColumnY = torchColumnY;
     Vec3 finalTorchColumnZ = torchColumnZ;
-    if (!lantern.heldByPlayer)
+    if (!torchFailure.heldByPlayer)
     {
-        const float releaseYawCos = std::cos(lantern.droppedYawRadians);
-        const float releaseYawSin = std::sin(lantern.droppedYawRadians);
+        const float releaseYawCos = std::cos(torchFailure.droppedYawRadians);
+        const float releaseYawSin = std::sin(torchFailure.droppedYawRadians);
         const Vec3 releaseBodyForward{releaseYawSin, 0.0f, -releaseYawCos};
         const Vec3 releaseBodyRight{releaseYawCos, 0.0f, releaseYawSin};
         const Vec3 releaseViewForward = normalize(Vec3{
             releaseYawSin,
-            -0.05f + std::clamp(lantern.droppedViewPitchRadians, -0.32f, 0.28f),
+            -0.05f + std::clamp(torchFailure.droppedViewPitchRadians, -0.32f, 0.28f),
             -releaseYawCos});
         const Vec3 releaseViewRight = normalize(cross(releaseViewForward, worldUp));
         const Vec3 releaseViewUp = normalize(cross(releaseViewRight, releaseViewForward));
         const float releaseDepth = horde::gameplay::ComputeShowcaseHeldPropDepth(
-            lantern.droppedX, lantern.droppedZ, releaseBodyForward[0], releaseBodyForward[2]);
-        const Vec3 releaseEye{lantern.droppedX, 0.58f, lantern.droppedZ};
+            torchFailure.droppedX, torchFailure.droppedZ, releaseBodyForward[0], releaseBodyForward[2]);
+        const Vec3 releaseEye{torchFailure.droppedX, 0.58f, torchFailure.droppedZ};
         const Vec3 releaseLeftHand = add(
             add(add(releaseEye, scaled(releaseViewRight, -0.34f)), scaled(releaseViewUp, -0.40f)),
             scaled(releaseViewForward, releaseDepth));
         const Vec3 releaseTorchColumnY = scaled(releaseViewUp, torchScale);
         const Vec3 releaseTorchTranslation = add(releaseLeftHand, scaled(releaseTorchColumnY, 0.22f));
-        const float pitchCos = std::cos(lantern.droppedPitchRadians);
-        const float pitchSin = std::sin(lantern.droppedPitchRadians);
+        const float pitchCos = std::cos(torchFailure.droppedPitchRadians);
+        const float pitchSin = std::sin(torchFailure.droppedPitchRadians);
         finalTorchColumnX = scaled(releaseBodyRight, torchScale);
         finalTorchColumnY = scaled(add(scaled(worldUp, pitchCos), scaled(releaseBodyForward, pitchSin)), torchScale);
         finalTorchColumnZ = scaled(add(scaled(releaseBodyForward, pitchCos), scaled(worldUp, -pitchSin)), torchScale);
@@ -2854,7 +2854,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         // the 1.36 rad pitch, so placing that origin exactly at floor height
         // buries the readable cage and shaft.
         Vec3 settledPosition = add(
-            add(Vec3{lantern.droppedX, lantern.droppedY, lantern.droppedZ}, scaled(worldUp, 0.13f)),
+            add(Vec3{torchFailure.droppedX, torchFailure.droppedY, torchFailure.droppedZ}, scaled(worldUp, 0.13f)),
             add(scaled(releaseBodyRight, -0.34f), scaled(releaseBodyForward, 0.78f)));
         // The trigger occupies the western route edge and the player may face
         // any direction when it fires. Keep the settled prop inside a compact
@@ -2864,7 +2864,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         settledPosition[2] = std::clamp(settledPosition[2], -16.18f, -14.22f);
         torchTranslation = lerp(releaseTorchTranslation,
                                 settledPosition,
-                                std::clamp(lantern.fallProgress, 0.0f, 1.0f));
+                                std::clamp(torchFailure.fallProgress, 0.0f, 1.0f));
     }
 
     const float swordPoseRadians = weaponPose.swordRadians;
@@ -3202,7 +3202,7 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
     const RtLightTuning& staffTuning = tuning.lights[static_cast<std::size_t>(RtLightGroup::Staff)];
     const ScenePushConstants pushConstants{frame.cameraYaw,
                                            frame.cameraPitch,
-                                           frame.lanternStrength,
+                                           frame.torchLightStrength,
                                            frame.walkTime,
                                            frame.cameraX,
                                            frame.cameraZ,

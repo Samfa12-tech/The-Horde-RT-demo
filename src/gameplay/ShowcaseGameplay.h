@@ -11,7 +11,7 @@
 namespace horde::gameplay
 {
 
-enum class LanternPhase
+enum class TorchFailurePhase
 {
     Held,
     Guttering,
@@ -19,9 +19,9 @@ enum class LanternPhase
     Settled,
 };
 
-struct LanternSnapshot
+struct TorchFailureSnapshot
 {
-    LanternPhase phase = LanternPhase::Held;
+    TorchFailurePhase phase = TorchFailurePhase::Held;
     float phaseTime = 0.0f;
     float sequenceTime = 0.0f;
     float flameStrength = 1.0f;
@@ -207,10 +207,10 @@ constexpr bool IsLanternFailureTriggerPosition(float x, float z)
     return x >= -2.48f && x <= -1.78f && z >= -16.40f && z <= -14.00f;
 }
 
-class LanternSequence
+class TorchFailureSequence
 {
 public:
-    const LanternSnapshot& Update(float deltaSeconds, float playerX, float playerZ,
+    const TorchFailureSnapshot& Update(float deltaSeconds, float playerX, float playerZ,
                                   float playerYawRadians = 0.0f,
                                   float playerViewPitchRadians = 0.0f)
     {
@@ -218,7 +218,7 @@ public:
         if (!snapshot_.triggered && IsLanternFailureTriggerPosition(playerX, playerZ))
         {
             snapshot_.triggered = true;
-            snapshot_.phase = LanternPhase::Guttering;
+            snapshot_.phase = TorchFailurePhase::Guttering;
             snapshot_.phaseTime = 0.0f;
             snapshot_.sequenceTime = 0.0f;
             snapshot_.droppedX = playerX;
@@ -238,7 +238,7 @@ public:
 
         if (snapshot_.sequenceTime < kReleaseTime)
         {
-            snapshot_.phase = LanternPhase::Guttering;
+            snapshot_.phase = TorchFailurePhase::Guttering;
             snapshot_.phaseTime = snapshot_.sequenceTime;
             snapshot_.heldByPlayer = true;
             snapshot_.droppedX = playerX;
@@ -265,7 +265,7 @@ public:
                 snapshot_.droppedYawRadians = playerYawRadians;
                 snapshot_.droppedViewPitchRadians = playerViewPitchRadians;
             }
-            snapshot_.phase = LanternPhase::Falling;
+            snapshot_.phase = TorchFailurePhase::Falling;
             snapshot_.phaseTime = snapshot_.sequenceTime - kReleaseTime;
             snapshot_.heldByPlayer = false;
             snapshot_.flameStrength = 0.0f;
@@ -273,7 +273,7 @@ public:
         }
         else
         {
-            snapshot_.phase = LanternPhase::Settled;
+            snapshot_.phase = TorchFailurePhase::Settled;
             snapshot_.phaseTime = snapshot_.sequenceTime - kSettleTime;
             snapshot_.heldByPlayer = false;
             snapshot_.flameStrength = 0.0f;
@@ -292,7 +292,7 @@ public:
         snapshot_ = {};
     }
 
-    const LanternSnapshot& Snapshot() const { return snapshot_; }
+    const TorchFailureSnapshot& Snapshot() const { return snapshot_; }
 
     static constexpr float kReleaseTime = 0.70f;
     static constexpr float kFallDuration = 0.45f;
@@ -307,7 +307,7 @@ private:
         return value * value * (3.0f - 2.0f * value);
     }
 
-    LanternSnapshot snapshot_{};
+    TorchFailureSnapshot snapshot_{};
 };
 
 enum class EnemyKind

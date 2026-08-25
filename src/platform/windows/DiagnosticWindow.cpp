@@ -174,7 +174,7 @@ struct RtLabDebugLaunchOptions
 struct ShowcaseCaptureRecord
 {
     const horde::gameplay::ShowcaseCheckpoint* checkpoint = nullptr;
-    std::string lanternPhase;
+    std::string torchFailurePhase;
     std::string selectedEnemy;
     std::string lichPhase;
     float finaleSkylightOpenProgress = 0.0f;
@@ -266,7 +266,7 @@ struct VulkanSurfaceContext
     ULONGLONG lastControlTick = 0u;
     float cameraYaw = 0.0f;
     float cameraPitch = 0.0f;
-    float lanternStrength = 1.8f;
+    float torchLightStrength = 1.8f;
     float walkTime = 0.0f;
     float walkVisualAmount = 0.0f;
     float cameraX = 0.0f;
@@ -300,7 +300,7 @@ struct VulkanSurfaceContext
     bool endingOverlayVisible = false;
     bool endingOverlayDismissed = false;
     std::int32_t playerRetryCheckpoint = 0;
-    horde::gameplay::LanternSnapshot lanternSnapshot;
+    horde::gameplay::TorchFailureSnapshot torchFailureSnapshot;
     horde::gameplay::EnemyKind activeEnemyKind = horde::gameplay::EnemyKind::Skeleton;
     horde::gameplay::EnemyKind debugEnemyOverride = horde::gameplay::EnemyKind::None;
     uint32_t debugValidationPoint = 0u;
@@ -1398,7 +1398,7 @@ void MirrorSimulationSnapshot(VulkanSurfaceContext& context, const bool mirrorVi
     context.walkAmount = snapshot.walkAmount;
     context.playerTravelledThisFrame = snapshot.playerTravelledThisTick;
     context.combatSnapshot = snapshot.swordCombat;
-    context.lanternSnapshot = snapshot.lantern;
+    context.torchFailureSnapshot = snapshot.torchFailure;
     context.activeEnemyKind = snapshot.activeEnemyKind;
     context.playerRetryCheckpoint = snapshot.retryCheckpoint;
 }
@@ -1576,7 +1576,7 @@ void ShowPauseMenu(VulkanSurfaceContext& context, const bool visible)
 
 void ResetRoute(VulkanSurfaceContext& context)
 {
-    context.lanternStrength = 1.8f;
+    context.torchLightStrength = 1.8f;
     context.deathOverlayVisible = false;
     context.endingOverlayVisible = false;
     context.endingOverlayDismissed = false;
@@ -1593,7 +1593,7 @@ void ResetRoute(VulkanSurfaceContext& context)
     context.simulation.ClearEvents();
     context.simulationInput.moveForward = 0.0f;
     context.simulationInput.moveStrafe = 0.0f;
-    context.simulationInput.lanternStrength = context.lanternStrength;
+    context.simulationInput.torchLightStrength = context.torchLightStrength;
     context.simulationInput.hasAuthoritativePlayerPose = false;
     MirrorSimulationSnapshot(context);
     ClearDesktopInput(context);
@@ -1902,7 +1902,7 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(
     snapshot.routeZone = horde::gameplay::ShowcaseZoneName(
         horde::gameplay::QueryShowcaseZone(context.cameraX, context.cameraZ));
     snapshot.materialEncoding = context.rtScene.MaterialEncoding();
-    snapshot.lanternPhase = horde::gameplay::LanternPhaseName(context.lanternSnapshot.phase);
+    snapshot.torchFailurePhase = horde::gameplay::TorchFailurePhaseName(context.torchFailureSnapshot.phase);
     snapshot.selectedEnemy = horde::gameplay::EnemyKindName(roster.selectedEnemy);
     snapshot.encounterPhase = encounter ? EncounterStatusName(encounter->status) : "inactive";
     if (roster.selectedEnemy == horde::gameplay::EnemyKind::Lich)
@@ -2622,7 +2622,7 @@ void UpdateDesktopSceneControls(VulkanSurfaceContext& context)
     horde::gameplay::simulation::InputSnapshot input = context.simulationInput;
     input.yawRadians = context.cameraYaw;
     input.pitchRadians = context.cameraPitch;
-    input.lanternStrength = context.lanternStrength;
+    input.torchLightStrength = context.torchLightStrength;
     input.paused = context.simulationPaused;
     input.damageEnabled = IsPlayerDamageEnabled(context);
     input.commands.attack = context.attackSequence;
@@ -2653,7 +2653,7 @@ void UpdateDesktopSceneControls(VulkanSurfaceContext& context)
         input.authoritativePlayerZ = advance.replay.z;
         input.yawRadians = advance.replay.yaw;
         input.pitchRadians = -0.04f;
-        input.lanternStrength = context.lanternStrength;
+        input.torchLightStrength = context.torchLightStrength;
         input.commands.attack = context.attackSequence;
         input.commands.parry = context.parrySequence;
         input.commands.dodge = context.dodgeSequence;
@@ -2696,7 +2696,7 @@ void DebugWarpSimulation(VulkanSurfaceContext& context,
     input.authoritativePlayerZ = z;
     input.yawRadians = yaw;
     input.pitchRadians = pitch;
-    input.lanternStrength = context.lanternStrength;
+    input.torchLightStrength = context.torchLightStrength;
     context.simulation.StepFixed(input, 0.0f, ++context.inputPublicationSequence);
     context.simulation.ResetTiming();
     context.simulation.ClearEvents();
@@ -3526,8 +3526,8 @@ const char* CapturePresetName(const horde::gameplay::ShowcaseCheckpointPreset pr
     switch (preset)
     {
     case horde::gameplay::ShowcaseCheckpointPreset::Fresh: return "fresh";
-    case horde::gameplay::ShowcaseCheckpointPreset::LanternTrigger: return "lantern-trigger";
-    case horde::gameplay::ShowcaseCheckpointPreset::LanternSettled: return "lantern-settled";
+    case horde::gameplay::ShowcaseCheckpointPreset::TorchFailureTrigger: return "torch-failure-trigger";
+    case horde::gameplay::ShowcaseCheckpointPreset::TorchFailureSettled: return "torch-failure-settled";
     case horde::gameplay::ShowcaseCheckpointPreset::LichActive: return "lich-active";
     case horde::gameplay::ShowcaseCheckpointPreset::FinaleRoofOpen: return "finale-roof-open";
     default: return "unknown";
@@ -3545,7 +3545,7 @@ void ApplyCaptureCheckpoint(VulkanSurfaceContext& context,
     context.simulationInput.paused = true;
     context.simulationInput.damageEnabled = false;
     context.simulationInput.hasAuthoritativePlayerPose = false;
-    context.simulationInput.lanternStrength = context.lanternStrength;
+    context.simulationInput.torchLightStrength = context.torchLightStrength;
     context.simulation.AdvanceFrame(context.simulationInput,
                                     0.0,
                                     ++context.inputPublicationSequence);
@@ -3638,7 +3638,7 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                  << "      \"zone\": \"" << horde::gameplay::ShowcaseZoneName(checkpoint.expectedZone) << "\",\n"
                  << "      \"camera\": {\"x\": " << checkpoint.x << ", \"z\": " << checkpoint.z
                  << ", \"yaw\": " << checkpoint.yaw << ", \"pitch\": " << checkpoint.pitch << "},\n"
-                 << "      \"state\": {\"lanternPhase\": \"" << capture.lanternPhase
+                 << "      \"state\": {\"torchFailurePhase\": \"" << capture.torchFailurePhase
                  << "\", \"selectedEnemy\": \"" << capture.selectedEnemy
                  << "\", \"lichPhase\": \"" << capture.lichPhase
                  << "\", \"finaleSkylightOpenProgress\": " << capture.finaleSkylightOpenProgress << "},\n"
@@ -3722,7 +3722,7 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         ShowcaseCaptureRecord record;
         record.checkpoint = &checkpoint;
         const horde::gameplay::simulation::SimulationSnapshot& simulation = context.simulation.Snapshot();
-        record.lanternPhase = horde::gameplay::LanternPhaseName(simulation.lantern.phase);
+        record.torchFailurePhase = horde::gameplay::TorchFailurePhaseName(simulation.torchFailure.phase);
         record.selectedEnemy = horde::gameplay::EnemyKindName(simulation.enemyRoster.selectedEnemy);
         record.lichPhase = horde::gameplay::LichPhaseName(simulation.lich.phase);
         record.finaleSkylightOpenProgress = simulation.lich.finaleSkylightOpenProgress;

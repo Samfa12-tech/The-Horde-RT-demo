@@ -51,7 +51,7 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
     enemyDirector_.Reset();
     activeEnemyKind_ = enemyDirector_.Snapshot().selectedEnemy;
     combatSnapshot_ = swordCombat_.Snapshot();
-    lanternSnapshot_ = lantern_.Snapshot();
+    torchFailureSnapshot_ = torchFailure_.Snapshot();
     RefreshSnapshot(lastInput_);
 }
 
@@ -136,7 +136,7 @@ void GameSimulation::StepFixed(const InputSnapshot& input,
     {
         walkTime_ += fixedDeltaSeconds;
         UpdateMovement(input, fixedDeltaSeconds);
-        lanternSnapshot_ = lantern_.Update(fixedDeltaSeconds,
+        torchFailureSnapshot_ = torchFailure_.Update(fixedDeltaSeconds,
                                            playerX_,
                                            playerZ_,
                                            playerYawRadians_,
@@ -283,8 +283,8 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
     playerPitchRadians_ = checkpoint->pitch;
     walkTime_ = 0.0f;
     walkVisualAmount_ = 0.0f;
-    lantern_ = state.lantern;
-    lanternSnapshot_ = lantern_.Snapshot();
+    torchFailure_ = state.torchFailure;
+    torchFailureSnapshot_ = torchFailure_.Snapshot();
     enemyDirector_ = state.enemyDirector;
     activeEnemyKind_ = state.activeEnemyKind;
     lichEncounter_ = state.lichEncounter;
@@ -673,7 +673,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.playerPitchRadians = playerPitchRadians_;
     snapshot_.walkTime = walkTime_;
     snapshot_.walkAmount = walkVisualAmount_;
-    snapshot_.lanternStrength = std::clamp(FiniteOr(input.lanternStrength, 1.8f), 0.65f, 2.4f);
+    snapshot_.torchLightStrength = std::clamp(FiniteOr(input.torchLightStrength, 1.8f), 0.65f, 2.4f);
     snapshot_.dodgeActive = dodgeRemainingSeconds_ > 0.0f;
     snapshot_.dodgeCooldownRemainingSeconds = dodgeCooldownRemainingSeconds_;
     snapshot_.zone = QueryShowcaseZone(playerX_, playerZ_);
@@ -721,7 +721,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.paused = input.paused;
     snapshot_.playerAlive = playerVitals_.Snapshot().phase == PlayerLifePhase::Alive;
     snapshot_.finaleComplete = lichEncounter_.Snapshot().finaleEndingPhase == FinaleEndingPhase::Complete;
-    snapshot_.lantern = lanternSnapshot_;
+    snapshot_.torchFailure = torchFailureSnapshot_;
     snapshot_.enemyRoster = enemyDirector_.Snapshot();
     snapshot_.swordCombat = combatSnapshot_;
     snapshot_.playerCombat = combatSnapshot_.player;

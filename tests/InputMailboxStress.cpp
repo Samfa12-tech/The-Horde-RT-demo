@@ -28,7 +28,7 @@ InputSnapshot MakeSnapshot(std::uint64_t sequence)
     input.moveStrafe = -value;
     input.yawRadians = value * 2.0f;
     input.pitchRadians = value * -3.0f;
-    input.lanternStrength = value + 0.25f;
+    input.torchLightStrength = value + 0.25f;
     input.authoritativePlayerX = value + 0.5f;
     input.authoritativePlayerZ = value - 0.5f;
     input.paused = (sequence & 1u) != 0u;
@@ -56,7 +56,7 @@ bool MatchesSequence(const PublishedInput& published)
            actual.moveStrafe == expected.moveStrafe &&
            actual.yawRadians == expected.yawRadians &&
            actual.pitchRadians == expected.pitchRadians &&
-           actual.lanternStrength == expected.lanternStrength &&
+           actual.torchLightStrength == expected.torchLightStrength &&
            actual.authoritativePlayerX == expected.authoritativePlayerX &&
            actual.authoritativePlayerZ == expected.authoritativePlayerZ &&
            actual.paused == expected.paused &&

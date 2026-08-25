@@ -29,7 +29,7 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     RtSceneFrameInputs frame;
     frame.cameraYaw = simulation.playerYawRadians;
     frame.cameraPitch = simulation.playerPitchRadians;
-    frame.lanternStrength = simulation.lanternStrength * simulation.lantern.flameStrength;
+    frame.torchLightStrength = simulation.torchLightStrength * simulation.torchFailure.flameStrength;
     frame.walkTime = simulation.walkTime;
     frame.cameraX = simulation.playerX;
     frame.cameraZ = simulation.playerZ;
@@ -42,7 +42,7 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     frame.combat.damageFlash = simulation.playerVitals.damageFlash;
     frame.skeletonEnemies = simulation.skeletonEnemies;
     frame.skeletonEnemyCount = simulation.skeletonEnemyCount;
-    frame.lantern = simulation.lantern;
+    frame.torchFailure = simulation.torchFailure;
     frame.roster = simulation.enemyRoster;
     frame.lich = simulation.lich;
     frame.lich.finaleSkylightOpenProgress = ResolveRtFinaleRoofOpen(

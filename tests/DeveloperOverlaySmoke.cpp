@@ -36,7 +36,7 @@ int main()
     snapshot.rtMode = "RayTracingPipeline";
     snapshot.routeZone = "finale";
     snapshot.materialEncoding = "ASTC test route";
-    snapshot.lanternPhase = "settled";
+    snapshot.torchFailurePhase = "settled";
     snapshot.selectedEnemy = "lich";
     snapshot.encounterPhase = "charging";
     snapshot.playerLifePhase = "dying";
@@ -85,7 +85,7 @@ int main()
     ok &= RequireContains(text, "RT RayTracingPipeline  |  presented YES  |  scale 75%");
     ok &= RequireContains(text, "FRAME 11.9 ms  |  83.8 FPS  |  1080x2235 -> 1440x2980");
     ok &= RequireContains(text, "GPU RT 7.4 ms  |  avg 7.8 ms  |  120 samples");
-    ok &= RequireContains(text, "SCENE finale  |  lantern settled  |  lich charging hp 2");
+    ok &= RequireContains(text, "SCENE finale  |  torch failure settled  |  lich charging hp 2");
     ok &= RequireContains(text, "PLAYER dying  |  vitality 0/3  |  damage OFF");
     ok &= RequireContains(text, "SIM 1 ticks  |  accum 2.5 ms  |  overruns 2");
     ok &= RequireContains(text, "EVENTS 3 queued / 7 high / 0 overflow  |  input 42  |  cmd 5/4/2/1");
