@@ -117,7 +117,7 @@ int main()
         check(lichRetryState.activeEnemyKind == EnemyKind::Lich &&
               lichRetryState.torchFailureSnapshot.phase == TorchFailurePhase::Settled &&
               lichRetryState.lichEncounter.Snapshot().phase != LichPhase::Dormant,
-              "lich retry must restore settled lantern and an active lich");
+              "lich retry must restore settled torch failure and an active lich");
     }
 
     for (std::size_t i = 0; i < kShowcaseCheckpoints.size(); ++i)
@@ -141,7 +141,7 @@ int main()
         if (checkpoint.preset == ShowcaseCheckpointPreset::TorchFailureTrigger)
         {
             check(state.torchFailureSnapshot.phase == TorchFailurePhase::Guttering,
-                  "lantern-drop checkpoint must begin the authored gutter");
+                  "historical lantern-drop checkpoint must begin the authored gutter");
         }
         if (checkpoint.preset == ShowcaseCheckpointPreset::TorchFailureSettled ||
             checkpoint.preset == ShowcaseCheckpointPreset::LichActive ||
@@ -150,7 +150,7 @@ int main()
             check(state.torchFailureSnapshot.phase == TorchFailurePhase::Settled &&
                   state.torchFailureSnapshot.flameStrength == 0.0f &&
                   state.torchFailureSnapshot.leftArmLowerBlend == 1.0f,
-                  "post-drop checkpoints must prime a dark settled lantern and lowered arm");
+                  "post-drop checkpoints must prime a dark settled torch failure and lowered arm");
         }
         if (checkpoint.preset == ShowcaseCheckpointPreset::LichActive)
         {
@@ -170,7 +170,7 @@ int main()
     }
     check(kShowcaseCheckpoints[3].id == 3 &&
           std::string(kShowcaseCheckpoints[3].name) == "lantern-drop",
-          "water drench validation must retain checkpoint 3 name lantern-drop");
+          "water drench validation must retain historical checkpoint 3 name lantern-drop");
 
     TorchFailureSequence torchFailure;
     torchFailure.Update(0.05f, 4.0f, -15.2f);
@@ -453,6 +453,6 @@ int main()
     {
         return 1;
     }
-    std::cout << "Showcase gameplay smoke passed: lantern, gated roster, and lich finale state.\n";
+    std::cout << "Showcase gameplay smoke passed: torch failure, gated roster, and lich finale state.\n";
     return 0;
 }

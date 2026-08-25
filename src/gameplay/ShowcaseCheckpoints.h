@@ -92,7 +92,7 @@ struct ShowcaseCheckpointState
     EnemyKind activeEnemyKind = EnemyKind::Skeleton;
 };
 
-inline void AdvanceLanternToSettled(ShowcaseCheckpointState& state)
+inline void AdvanceTorchFailureToSettled(ShowcaseCheckpointState& state)
 {
     constexpr float triggerX = -1.80f;
     constexpr float triggerZ = -15.20f;
@@ -156,7 +156,7 @@ inline ShowcaseCheckpointState BuildShowcaseCheckpointState(const ShowcaseCheckp
              checkpoint.preset == ShowcaseCheckpointPreset::LichActive ||
              checkpoint.preset == ShowcaseCheckpointPreset::FinaleRoofOpen)
     {
-        AdvanceLanternToSettled(state);
+        AdvanceTorchFailureToSettled(state);
     }
 
     state.enemyDirector.Update(checkpoint.x, checkpoint.z);

@@ -4944,7 +4944,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             if (wParam == VK_F9)
             {
                 // Inspect the settled prop from inside the same corridor leg
-                // without resetting the already-triggered lantern sequence.
+                // without resetting the already-triggered torch-failure sequence.
                 DebugWarpSimulation(*sceneContext, 1.20f, -15.20f,
                                     -1.57079632679f, -0.32f);
                 return 0;

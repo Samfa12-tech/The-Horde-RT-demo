@@ -1213,7 +1213,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     addRouteFloor(3.60f, -15.2f, 6.0f, -10.0f, SurfaceWetCobble);
     addRouteCeiling(3.60f, -15.2f, 6.0f, -10.0f);
     addRouteFloor(-2.50f, -16.4f, 4.80f, -14.0f, SurfaceWetCobble);
-    // A broken roof slot turns the former abstract lantern failure into a
+    // A broken roof slot turns the former abstract torch failure into a
     // physical drench at the final zig-zag exit. The rim is deliberately
     // inside the existing route envelope so collision and replay remain
     // unchanged while primary, reflection, and transmission rays see depth.
@@ -1395,7 +1395,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     }
 
     // Keep the turns open and let the wall returns plus barred recess cast the
-    // large lantern shadows. Earlier low lintel boxes crossed the route walls,
+    // large torch shadows. Earlier low lintel boxes crossed the route walls,
     // producing the dark overhead slabs and coplanar striping seen in validation.
 
     // The skylight chamber floor is damp stone. Four roof slabs leave the

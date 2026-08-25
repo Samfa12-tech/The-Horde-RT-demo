@@ -29,6 +29,6 @@ Windows is the secondary/equal hardware target for this phase.
 
 - At most two simultaneous skeletons and one singular lich route; timed parry affects skeleton melee only, with no larger horde AI or held guard.
 - No fake RT or non-Vulkan success fallback.
-- The complete route includes a roof-water drench and lantern drop, clear RT streams with a rounded catchment and drain runnel, blue skylight, four selected coloured-light bays, an open framed threshold, a live-lighting single-bounce hero mirror, and a misted staff-lit lich/sliding-roof finale. The rejected stained pane remains absent; broad fluid simulation is deferred.
+- The complete route includes a roof-water drench and torch failure, clear RT streams with a rounded catchment and drain runnel, blue skylight, four selected coloured-light bays, an open framed threshold, a live-lighting single-bounce hero mirror, and a misted staff-lit lich/sliding-roof finale. The rejected stained pane remains absent; broad fluid simulation is deferred.
 
 Windows remains the equal validation target, but phone-safe renderer and asset decisions remain authoritative.

@@ -202,7 +202,7 @@ constexpr SceneLightingState RouteLightForPosition(float x, float z)
 // The roof-water drench begins only near the western exit of the final
 // zig-zag leg. It therefore cannot fire while the player merely passes either
 // earlier bend, and preserves the authored automatic gutter/drop timing.
-constexpr bool IsLanternFailureTriggerPosition(float x, float z)
+constexpr bool IsTorchFailureTriggerPosition(float x, float z)
 {
     return x >= -2.48f && x <= -1.78f && z >= -16.40f && z <= -14.00f;
 }
@@ -215,7 +215,7 @@ public:
                                   float playerViewPitchRadians = 0.0f)
     {
         deltaSeconds = std::clamp(deltaSeconds, 0.0f, 0.05f);
-        if (!snapshot_.triggered && IsLanternFailureTriggerPosition(playerX, playerZ))
+        if (!snapshot_.triggered && IsTorchFailureTriggerPosition(playerX, playerZ))
         {
             snapshot_.triggered = true;
             snapshot_.phase = TorchFailurePhase::Guttering;

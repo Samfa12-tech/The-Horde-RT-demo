@@ -148,15 +148,27 @@ if(BUILD_TESTING)
     target_include_directories(horde_rt_showcase_gameplay_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_showcase_gameplay_smoke COMMAND horde_rt_showcase_gameplay_smoke)
 
-    add_test(
-        NAME horde_rt_torch_failure_terminology_negative
-        COMMAND ${CMAKE_COMMAND}
-            -DCXX_COMPILER=${CMAKE_CXX_COMPILER}
-            -DCXX_COMPILER_ID=${CMAKE_CXX_COMPILER_ID}
-            -DSOURCE_DIRECTORY=${CMAKE_CURRENT_SOURCE_DIR}
-            -DFIXTURE=${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/torch_failure_terminology_legacy.cpp
-            -P ${CMAKE_CURRENT_SOURCE_DIR}/tests/RunCompilerNegativeFixture.cmake
+    # This must use CMake's configured compiler and generator: the shared host
+    # lane configures BUILD_TESTING on Linux as well as the Windows Host gate.
+    try_compile(HORDE_RT_LEGACY_TORCH_FAILURE_IDENTIFIERS_COMPILED
+        "${CMAKE_BINARY_DIR}/CMakeFiles/torch_failure_terminology_legacy"
+        SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/torch_failure_terminology_legacy.cpp"
+        CMAKE_FLAGS
+            "-DCMAKE_CXX_STANDARD:STRING=20"
+            "-DCMAKE_CXX_STANDARD_REQUIRED:BOOL=ON"
+            "-DINCLUDE_DIRECTORIES:STRING=${CMAKE_CURRENT_SOURCE_DIR}/src"
+        OUTPUT_VARIABLE HORDE_RT_LEGACY_TORCH_FAILURE_IDENTIFIERS_OUTPUT
     )
+    if(HORDE_RT_LEGACY_TORCH_FAILURE_IDENTIFIERS_COMPILED)
+        message(FATAL_ERROR "Legacy torch-failure identifiers unexpectedly compiled.\n${HORDE_RT_LEGACY_TORCH_FAILURE_IDENTIFIERS_OUTPUT}")
+    endif()
+    foreach(legacy_identifier IN ITEMS LanternPhase LanternSnapshot LanternSequence lanternStrength)
+        string(FIND "${HORDE_RT_LEGACY_TORCH_FAILURE_IDENTIFIERS_OUTPUT}" "${legacy_identifier}" legacy_identifier_offset)
+        if(legacy_identifier_offset EQUAL -1)
+            message(FATAL_ERROR "Compiler rejection did not identify legacy identifier ${legacy_identifier}.\n${HORDE_RT_LEGACY_TORCH_FAILURE_IDENTIFIERS_OUTPUT}")
+        endif()
+    endforeach()
+    message(STATUS "Legacy torch-failure identifiers were rejected by the configured ${CMAKE_CXX_COMPILER_ID} compiler.")
 
     add_executable(horde_rt_spatial_audio_smoke tests/SpatialAudioSmoke.cpp)
     target_include_directories(horde_rt_spatial_audio_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)

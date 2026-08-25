@@ -549,7 +549,7 @@ int main()
           retry.Snapshot().torchFailure.phase == TorchFailurePhase::Settled &&
           retry.Snapshot().lich.phase != LichPhase::Dormant &&
           retry.Snapshot().playerVitals.vitality == PlayerVitals::kMaxVitality,
-          "retry must restore the authored mirror player, lantern, lich, and vitality state exactly once");
+          "retry must restore the authored mirror player, torch failure, lich, and vitality state exactly once");
     retry.AdvanceFrame(finaleInput, 1.0 / 60.0);
     check(retry.Snapshot().retryGeneration == 1u,
           "re-reading the same retry sequence must not apply a second retry");
