@@ -369,6 +369,24 @@ try {
                     -OutputDirectory (Join-Path $shaderDirectory "negative-check") `
                     -EmbeddedIncludePath $staleInclude
             } 'stale'
+            $trackedShaderInclude = Join-Path $repoRoot "shaders\raytracing\include\rt_atmosphere.glsl"
+            $trackedShaderIncludeOriginal = [IO.File]::ReadAllText($trackedShaderInclude)
+            try {
+                [IO.File]::WriteAllText(
+                    $trackedShaderInclude,
+                    $trackedShaderIncludeOriginal + "`n// foundation include-staleness negative fixture`n",
+                    [Text.UTF8Encoding]::new($false))
+                Assert-ExpectedFailure {
+                    & (Join-Path $PSScriptRoot "compile-raygen.ps1") -Check `
+                        -OutputDirectory (Join-Path $shaderDirectory "negative-tracked-include")
+                } 'stale'
+            }
+            finally {
+                [IO.File]::WriteAllText(
+                    $trackedShaderInclude,
+                    $trackedShaderIncludeOriginal,
+                    [Text.UTF8Encoding]::new($false))
+            }
             Assert-ExpectedFailure {
                 & (Join-Path $PSScriptRoot "package-alpha.ps1") -Version "0.1.1-alpha.1" -VersionCode 4
             } 'immutable'

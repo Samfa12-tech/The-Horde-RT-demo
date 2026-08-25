@@ -445,7 +445,23 @@ int main()
     ok &= Require(!root.empty(), "repo assets were not found");
     if (!root.empty())
     {
-        const std::string raygenSource = ReadTextFile(root / "shaders/raytracing/minimal.rgen");
+        const std::filesystem::path raygenDirectory = root / "shaders/raytracing";
+        const std::string hitDecodeSource =
+            ReadTextFile(raygenDirectory / "include/rt_hit_decode.glsl");
+        std::string lightingSource =
+            ReadTextFile(raygenDirectory / "include/rt_lighting.glsl");
+        const std::string hitDecodeInclude = "#include \"rt_hit_decode.glsl\"";
+        const std::size_t hitDecodeIncludeOffset = lightingSource.find(hitDecodeInclude);
+        if (hitDecodeIncludeOffset != std::string::npos)
+        {
+            lightingSource.replace(hitDecodeIncludeOffset, hitDecodeInclude.size(), hitDecodeSource);
+        }
+        const std::string raygenSource =
+            ReadTextFile(raygenDirectory / "minimal.rgen") +
+            ReadTextFile(raygenDirectory / "include/rt_scene_abi.glsl") +
+            lightingSource +
+            ReadTextFile(raygenDirectory / "include/rt_dielectric_common.glsl") +
+            ReadTextFile(raygenDirectory / "include/rt_atmosphere.glsl");
         const std::string sceneSource =
             ReadTextFile(root / "src/vulkan/raytracing/PresentableTinyRtScene.cpp");
         const std::string windowsSource =

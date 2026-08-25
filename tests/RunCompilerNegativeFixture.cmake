@@ -6,15 +6,27 @@ if(NOT CXX_COMPILER_ID STREQUAL "MSVC")
     message(FATAL_ERROR "Compiler-negative fixture is currently defined for the Windows MSVC Host gate.")
 endif()
 
-set(object_file "${CMAKE_CURRENT_BINARY_DIR}/torch_failure_terminology_legacy.obj")
+set(fixture_project "$ENV{TEMP}/horde-torch-failure-legacy-fixture")
+file(REMOVE_RECURSE "${fixture_project}")
+file(MAKE_DIRECTORY "${fixture_project}")
+file(WRITE "${fixture_project}/CMakeLists.txt"
+"cmake_minimum_required(VERSION 3.22)\nproject(torch_failure_terminology_legacy LANGUAGES CXX)\nadd_executable(torch_failure_terminology_legacy \"${FIXTURE}\")\ntarget_include_directories(torch_failure_terminology_legacy PRIVATE \"${SOURCE_DIRECTORY}/src\")\ntarget_compile_features(torch_failure_terminology_legacy PRIVATE cxx_std_20)\n")
 execute_process(
-    COMMAND "${CXX_COMPILER}" /nologo /std:c++20 /EHsc "/I${SOURCE_DIRECTORY}/src" /c "${FIXTURE}" "/Fo${object_file}"
+    COMMAND "${CMAKE_COMMAND}" -S "${fixture_project}" -B "${fixture_project}/build" -G "Visual Studio 17 2022" -A x64
+    RESULT_VARIABLE configure_result
+    OUTPUT_VARIABLE configure_stdout
+    ERROR_VARIABLE configure_stderr
+)
+if(NOT configure_result EQUAL 0)
+    message(FATAL_ERROR "Could not configure compiler-negative fixture.\n${configure_stdout}${configure_stderr}")
+endif()
+execute_process(
+    COMMAND "${CMAKE_COMMAND}" --build "${fixture_project}/build" --config Debug
     RESULT_VARIABLE compile_result
     OUTPUT_VARIABLE compile_stdout
     ERROR_VARIABLE compile_stderr
 )
-
-file(REMOVE "${object_file}")
+file(REMOVE_RECURSE "${fixture_project}")
 if(compile_result EQUAL 0)
     message(FATAL_ERROR "Legacy torch-failure identifiers unexpectedly compiled.\n${compile_stdout}${compile_stderr}")
 endif()

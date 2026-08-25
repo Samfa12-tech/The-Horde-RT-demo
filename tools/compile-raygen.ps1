@@ -26,6 +26,47 @@ if (-not (Test-Path -LiteralPath $disassembler))
 
 $source = Join-Path $repoRoot 'shaders\raytracing\minimal.rgen'
 $include = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalRayGenShader.inc'
+
+function Resolve-RaygenIncludes
+{
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path,
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [System.Collections.Generic.HashSet[string]]$ActivePaths,
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [System.Collections.Generic.List[string]]$Dependencies
+    )
+
+    $fullPath = [IO.Path]::GetFullPath($Path)
+    if (-not (Test-Path -LiteralPath $fullPath -PathType Leaf))
+    {
+        throw "Raygen source dependency was not found: $fullPath"
+    }
+    if (-not $ActivePaths.Add($fullPath))
+    {
+        throw "Raygen source include cycle detected at $fullPath"
+    }
+
+    $Dependencies.Add($fullPath)
+
+    $output = [Text.StringBuilder]::new()
+    $directory = Split-Path -Parent $fullPath
+    foreach ($line in [IO.File]::ReadAllLines($fullPath))
+    {
+        if ($line -match '^\s*#include\s+"([^"]+)"\s*$')
+        {
+            [void]$output.Append((Resolve-RaygenIncludes -Path (Join-Path $directory $Matches[1]) -ActivePaths $ActivePaths -Dependencies $Dependencies))
+            continue
+        }
+        [void]$output.AppendLine($line)
+    }
+
+    [void]$ActivePaths.Remove($fullPath)
+    return $output.ToString()
+}
 $hasIncludeOverride = -not [string]::IsNullOrWhiteSpace($EmbeddedIncludePath)
 if ($hasIncludeOverride -and -not $Check)
 {
@@ -61,8 +102,24 @@ else
     $spirv = Join-Path $repoRoot 'shaders\raytracing\minimal.rgen.spv'
     $disassembly = Join-Path ([IO.Path]::GetTempPath()) ("horde-raygen-{0}.spvasm" -f [guid]::NewGuid().ToString('N'))
 }
+$resolvedSourcePath = Join-Path (Split-Path -Parent $spirv) 'minimal.rgen.resolved'
+$activePaths = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+$dependencies = [System.Collections.Generic.List[string]]::new()
+[IO.File]::WriteAllText(
+    $resolvedSourcePath,
+    (Resolve-RaygenIncludes -Path $source -ActivePaths $activePaths -Dependencies $dependencies),
+    [Text.UTF8Encoding]::new($false))
+$dependencyHashes = foreach ($dependency in $dependencies)
+{
+    [ordered]@{
+        path = [IO.Path]::GetRelativePath($repoRoot, $dependency).Replace('\', '/')
+        sha256 = (Get-FileHash -LiteralPath $dependency -Algorithm SHA256).Hash.ToLowerInvariant()
+    }
+}
+$dependencyManifest = $dependencyHashes | ConvertTo-Json -Compress
+$dependencyHash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($dependencyManifest))).ToLowerInvariant()
 
-& $validator -V --target-env vulkan1.2 -Os -S rgen -o $spirv $source
+& $validator -V --target-env vulkan1.2 -Os -S rgen -o $spirv $resolvedSourcePath
 if ($LASTEXITCODE -ne 0)
 {
     throw "Raygen compilation failed with exit code $LASTEXITCODE"
@@ -94,12 +151,20 @@ $branchOperationCount = @($assemblyLines | Where-Object { $_ -match '\bOp(?:Bran
 $loopCount = @($assemblyLines | Where-Object { $_ -match '\bOpLoopMerge\b' }).Count
 $selectionMergeCount = @($assemblyLines | Where-Object { $_ -match '\bOpSelectionMerge\b' }).Count
 $spirvHash = (Get-FileHash -LiteralPath $spirv -Algorithm SHA256).Hash.ToLowerInvariant()
-$sourceHash = (Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash.ToLowerInvariant()
+$sourceHash = $dependencyHash
 $includeHash = (Get-FileHash -LiteralPath $include -Algorithm SHA256).Hash.ToLowerInvariant()
 
 if ($Check)
 {
     $includeText = Get-Content -LiteralPath $include -Raw
+    $embeddedDependencyHash = [regex]::Match(
+        $includeText,
+        '^// Raygen dependency SHA-256: ([0-9a-f]{64})\s*$',
+        [Text.RegularExpressions.RegexOptions]::Multiline).Groups[1].Value
+    if ([string]::IsNullOrWhiteSpace($embeddedDependencyHash))
+    {
+        throw "Embedded raygen include has no dependency hash: $include"
+    }
     $includeMatches = [regex]::Matches($includeText, '0x([0-9a-fA-F]{8})u')
     if ($includeMatches.Count -eq 0)
     {
@@ -109,7 +174,7 @@ if ($Check)
     {
         [Convert]::ToUInt32($match.Groups[1].Value, 16)
     }
-    $matchesEmbedded = $embeddedWords.Count -eq $wordValues.Count
+    $matchesEmbedded = $embeddedDependencyHash -eq $dependencyHash -and $embeddedWords.Count -eq $wordValues.Count
     if ($matchesEmbedded)
     {
         for ($index = 0; $index -lt $wordValues.Count; $index++)
@@ -125,6 +190,8 @@ if ($Check)
     $stats = [ordered]@{
         source = $source
         sourceSha256 = $sourceHash
+        dependencies = $dependencyHashes
+        dependencySha256 = $dependencyHash
         compiledSpirv = $spirv
         compiledSpirvSha256 = $spirvHash
         embeddedInclude = $include
@@ -143,7 +210,7 @@ if ($Check)
         ($stats | ConvertTo-Json),
         [Text.UTF8Encoding]::new($false))
     Write-Output ("Raygen check artifacts: {0}" -f $outputFull)
-    Write-Output ("Source SHA-256: {0}; embedded include SHA-256: {1}" -f $sourceHash, $includeHash)
+    Write-Output ("Source dependency SHA-256: {0}; embedded include SHA-256: {1}" -f $sourceHash, $includeHash)
     Write-Output ("SPIR-V bytes: {0}; words: {1}; instructions: {2}; branch operations: {3}; loops: {4}; selection merges: {5}; SHA-256: {6}" -f $bytes.Length, $wordValues.Count, $instructionCount, $branchOperationCount, $loopCount, $selectionMergeCount, $spirvHash)
     if (-not $matchesEmbedded)
     {
@@ -165,13 +232,17 @@ $lines = for ($index = 0; $index -lt $words.Count; $index += 8)
 
 [System.IO.File]::WriteAllText(
     $include,
-    ($lines -join "`n") + "`n",
+    "// Raygen dependency SHA-256: $dependencyHash`n" + ($lines -join "`n") + "`n",
     [System.Text.UTF8Encoding]::new($false))
 
 if (Test-Path -LiteralPath $disassembly)
 {
     Remove-Item -LiteralPath $disassembly -Force
 }
+if (Test-Path -LiteralPath $resolvedSourcePath)
+{
+    Remove-Item -LiteralPath $resolvedSourcePath -Force
+}
 Write-Output "Generated $include"
-Write-Output ("Source SHA-256: {0}; embedded include SHA-256 before generation: {1}" -f $sourceHash, $includeHash)
+Write-Output ("Source dependency SHA-256: {0}; embedded include SHA-256 before generation: {1}" -f $sourceHash, $includeHash)
 Write-Output ("SPIR-V bytes: {0}; words: {1}; instructions: {2}; branch operations: {3}; loops: {4}; selection merges: {5}; SHA-256: {6}" -f $bytes.Length, $wordValues.Count, $instructionCount, $branchOperationCount, $loopCount, $selectionMergeCount, $spirvHash)

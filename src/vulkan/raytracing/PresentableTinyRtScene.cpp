@@ -23,7 +23,7 @@ struct ScenePushConstants
 {
     float yaw = 0.0f;
     float pitch = 0.0f;
-    float lantern = 1.0f;
+    float torchLight = 1.0f;
     float time = 0.0f;
     float cameraX = 0.0f;
     float cameraZ = 1.85f;
