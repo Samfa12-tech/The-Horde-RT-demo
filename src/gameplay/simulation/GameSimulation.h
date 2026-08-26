@@ -7,6 +7,7 @@
 #include "gameplay/SpatialAudio.h"
 #include "gameplay/SwordCombat.h"
 #include "gameplay/items/HeldItemState.h"
+#include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/simulation/FixedStepRunner.h"
 #include "gameplay/simulation/GameplayEvent.h"
 #include "gameplay/simulation/InputSnapshot.h"
@@ -53,6 +54,7 @@ private:
     bool ApplyCheckpoint(std::int32_t checkpointId, bool isRetry);
     void UpdateMovement(const InputSnapshot& input, float deltaSeconds);
     void UpdateEncounters(const InputSnapshot& input, float deltaSeconds);
+    void ResolveHeldItems();
     void Emit(GameplayEventType type,
               EntityId source,
               EntityId target,
@@ -79,6 +81,7 @@ private:
     TorchFailureSnapshot torchFailureSnapshot_{};
     horde::gameplay::items::HeldItemStates heldItems_ =
         horde::gameplay::items::MakeDefaultHeldItemStates();
+    horde::gameplay::items::HeldItemFixedStepState heldItemFixedStepState_{};
     EnemyKind activeEnemyKind_ = EnemyKind::Skeleton;
 
     float playerX_ = 0.0f;

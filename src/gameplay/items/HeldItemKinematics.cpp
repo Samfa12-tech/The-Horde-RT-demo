@@ -39,6 +39,60 @@ HeldItemTransform InverseRigidTransform(const HeldItemTransform& transform)
     return result;
 }
 
+using Vec3 = std::array<float, 3u>;
+
+Vec3 Add(const Vec3& left, const Vec3& right)
+{
+    return {{left[0] + right[0], left[1] + right[1], left[2] + right[2]}};
+}
+
+Vec3 Scale(const Vec3& value, const float scale)
+{
+    return {{value[0] * scale, value[1] * scale, value[2] * scale}};
+}
+
+Vec3 Lerp(const Vec3& from, const Vec3& to, const float amount)
+{
+    return Add(from, Scale(Add(to, Scale(from, -1.0f)), amount));
+}
+
+Vec3 Cross(const Vec3& left, const Vec3& right)
+{
+    return {{left[1] * right[2] - left[2] * right[1],
+             left[2] * right[0] - left[0] * right[2],
+             left[0] * right[1] - left[1] * right[0]}};
+}
+
+Vec3 Normalize(const Vec3& value)
+{
+    const float length = std::sqrt(value[0] * value[0] + value[1] * value[1] +
+                                   value[2] * value[2]);
+    return length > 0.000001f ? Scale(value, 1.0f / length)
+                              : Vec3{{0.0f, 1.0f, 0.0f}};
+}
+
+HeldItemTransform WorldFromAxes(const Vec3& x,
+                                const Vec3& y,
+                                const Vec3& z,
+                                const Vec3& translation)
+{
+    return {{x[0], x[1], x[2], 0.0f,
+             y[0], y[1], y[2], 0.0f,
+             z[0], z[1], z[2], 0.0f,
+             translation[0], translation[1], translation[2], 1.0f}};
+}
+
+Vec3 TranslationOf(const HeldItemTransform& transform)
+{
+    return {{transform[12], transform[13], transform[14]}};
+}
+
+Vec3 ColumnOf(const HeldItemTransform& transform, const std::size_t column)
+{
+    return {{transform[column * 4u], transform[column * 4u + 1u],
+             transform[column * 4u + 2u]}};
+}
+
 } // namespace
 
 HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
@@ -203,6 +257,124 @@ HeldItemTransform SelectHandSocketTransform(const HeldHand hand,
                                             const HeldItemTransform& worldFromRightHand)
 {
     return hand == HeldHand::LeftHand ? worldFromLeftHand : worldFromRightHand;
+}
+
+bool ResolveHeldItemsFixedStep(HeldItemStates& items,
+                               const HeldItemFixedStepInput& input,
+                               const std::uint64_t tick,
+                               HeldItemFixedStepState& state,
+                               std::string& diagnostic)
+{
+    state.kinematics = EvaluateHeldItemKinematics({
+        input.playerX,
+        input.playerZ,
+        input.playerYawRadians,
+        input.walkTime,
+        input.walkAmount,
+        input.torchFailure,
+        input.playerCombat,
+        input.swordSwingRadians});
+
+    constexpr Vec3 worldUp{{0.0f, 1.0f, 0.0f}};
+    const float pitch = std::clamp(input.playerPitchRadians, -0.32f, 0.28f);
+    const Vec3 viewForward = Normalize({{
+        std::sin(input.playerYawRadians), -0.05f + pitch,
+        -std::cos(input.playerYawRadians)}});
+    const Vec3 viewRight = Normalize(Cross(viewForward, worldUp));
+    const Vec3 viewUp = Normalize(Cross(viewRight, viewForward));
+    const Vec3 eye{{input.playerX, 0.58f, input.playerZ}};
+    const auto toWorld = [&](const std::array<float, 3u>& local) {
+        return Add(Add(Add(eye, Scale(viewRight, local[0])),
+                       Scale(viewUp, local[1])),
+                   Scale(viewForward, local[2]));
+    };
+
+    const Vec3 leftHand = toWorld(state.kinematics.leftHandLocal);
+    const Vec3 rightHand = toWorld(state.kinematics.rightHandLocal);
+    const HeldItemTransform worldFromLeftHand = WorldFromAxes(
+        viewRight, viewUp, Scale(viewForward, -1.0f), leftHand);
+    HeldItemTransform heldWorldFromTorch{};
+    if (!ComposeWorldFromItem(worldFromLeftHand,
+                              OriginalTorchGripSocketTransform(),
+                              heldWorldFromTorch,
+                              diagnostic))
+    {
+        return false;
+    }
+
+    if (input.torchFailure.heldByPlayer)
+    {
+        UpdateHeldItemParent(items[0], HeldItemParentMode::HandSocket,
+                             tick, heldWorldFromTorch);
+    }
+    else if (items[0].parentMode == HeldItemParentMode::HandSocket)
+    {
+        // The transition tick deliberately publishes the previous resolved
+        // hand attachment as both the detach basis and current trajectory
+        // matrix. This makes the sampled boundary exactly continuous even
+        // when gait sway/bob was non-zero on the previous fixed tick.
+        UpdateHeldItemParent(items[0], HeldItemParentMode::AuthoredWorldTrajectory,
+                             tick, items[0].worldFromItem);
+    }
+    else
+    {
+        const float progress = std::clamp(input.torchFailure.fallProgress, 0.0f, 1.0f);
+        const float releaseYawCos = std::cos(input.torchFailure.droppedYawRadians);
+        const float releaseYawSin = std::sin(input.torchFailure.droppedYawRadians);
+        const Vec3 releaseBodyForward{{releaseYawSin, 0.0f, -releaseYawCos}};
+        const Vec3 releaseBodyRight{{releaseYawCos, 0.0f, releaseYawSin}};
+        const float pitchCos = std::cos(input.torchFailure.droppedPitchRadians);
+        const float pitchSin = std::sin(input.torchFailure.droppedPitchRadians);
+        const Vec3 restingX = releaseBodyRight;
+        const Vec3 restingY = Normalize(Add(Scale(worldUp, pitchCos),
+                                            Scale(releaseBodyForward, pitchSin)));
+        const Vec3 restingZ = Normalize(Add(Scale(releaseBodyForward, pitchCos),
+                                            Scale(worldUp, -pitchSin)));
+        const Vec3 fallingX = Normalize(Lerp(ColumnOf(items[0].worldFromDetach, 0u),
+                                             restingX, progress));
+        const Vec3 fallingY = Normalize(Lerp(ColumnOf(items[0].worldFromDetach, 1u),
+                                             restingY, progress));
+        const Vec3 fallingZ = Normalize(Lerp(ColumnOf(items[0].worldFromDetach, 2u),
+                                             Scale(restingZ, -1.0f), progress));
+        Vec3 settledPosition = Add(
+            Add(Vec3{{input.torchFailure.droppedX,
+                      input.torchFailure.droppedY,
+                      input.torchFailure.droppedZ}},
+                Scale(worldUp, 0.13f)),
+            Add(Scale(releaseBodyRight, -0.34f),
+                Scale(releaseBodyForward, 0.78f)));
+        settledPosition[0] = std::clamp(settledPosition[0], -2.28f, 4.58f);
+        settledPosition[2] = std::clamp(settledPosition[2], -16.18f, -14.22f);
+        const HeldItemTransform worldFromTorch = WorldFromAxes(
+            fallingX, fallingY, fallingZ,
+            Lerp(TranslationOf(items[0].worldFromDetach), settledPosition, progress));
+        UpdateHeldItemParent(items[0], HeldItemParentMode::AuthoredWorldTrajectory,
+                             tick, worldFromTorch);
+    }
+
+    const float swordRadians = state.kinematics.swordRadians;
+    const float swordCos = std::cos(swordRadians);
+    const float swordSin = std::sin(swordRadians);
+    const Vec3 swordAxisX = Normalize(Add(Scale(viewRight, swordCos),
+                                          Scale(viewUp, swordSin)));
+    const Vec3 swordAxisY = Normalize(Add(Scale(viewRight, -swordSin),
+                                          Scale(viewUp, swordCos)));
+    HeldItemTransform worldFromSword{};
+    if (!ComposeWorldFromItem(
+            WorldFromAxes(swordAxisX, swordAxisY, Scale(viewForward, -1.0f), rightHand),
+            SwordGripSocketTransform(), worldFromSword, diagnostic))
+    {
+        return false;
+    }
+    UpdateHeldItemParent(items[1], HeldItemParentMode::HandSocket,
+                         tick, worldFromSword);
+
+    return ComposeHeldLightState(items[0].worldFromItem,
+                                 OriginalTorchFlameSocketTransform(),
+                                 OriginalTorchLightSocketTransform(),
+                                 input.torchFailure.flameStrength,
+                                 state.light,
+                                 diagnostic);
 }
 
 } // namespace horde::gameplay::items

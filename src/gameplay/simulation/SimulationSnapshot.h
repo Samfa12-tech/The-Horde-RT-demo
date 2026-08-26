@@ -7,6 +7,7 @@
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/SwordCombat.h"
 #include "gameplay/items/HeldItemState.h"
+#include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/simulation/GameplayEvent.h"
 
 namespace horde::gameplay::simulation
@@ -71,6 +72,8 @@ struct SimulationSnapshot
     TorchFailureSnapshot torchFailure{};
     horde::gameplay::items::HeldItemStates heldItems =
         horde::gameplay::items::MakeDefaultHeldItemStates();
+    horde::gameplay::items::HeldItemKinematicsState heldItemKinematics{};
+    horde::gameplay::items::HeldLightState heldLight{};
     EnemyRosterSnapshot enemyRoster{};
     CombatSnapshot swordCombat{};
     PlayerCombatSnapshot playerCombat{};

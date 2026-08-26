@@ -32,11 +32,13 @@ set(HORDE_RT_SOURCE_FILES)
 foreach(source IN LISTS HORDE_RT_CORE_RELATIVE_SOURCES)
     list(APPEND HORDE_RT_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/${source}")
 endforeach()
-list(FILTER HORDE_RT_SOURCE_FILES EXCLUDE REGEX "/gameplay/(simulation/GameSimulation|items/HeldItemState)\\.cpp$")
+list(FILTER HORDE_RT_SOURCE_FILES EXCLUDE REGEX "/gameplay/(simulation/GameSimulation|items/(HeldItemState|HeldItemKinematics|HeldLightState))\\.cpp$")
 
 add_library(horde_gameplay_simulation STATIC
     src/gameplay/simulation/GameSimulation.cpp
     src/gameplay/items/HeldItemState.cpp
+    src/gameplay/items/HeldItemKinematics.cpp
+    src/gameplay/items/HeldLightState.cpp
 )
 target_include_directories(horde_gameplay_simulation
     PUBLIC
@@ -127,9 +129,6 @@ if(BUILD_TESTING)
         src/scene/assets/AssetValidation.cpp
         src/scene/assets/GltfDocument.cpp
         src/scene/assets/StaticMeshAsset.cpp
-        src/gameplay/items/HeldItemState.cpp
-        src/gameplay/items/HeldLightState.cpp
-        src/gameplay/items/HeldItemKinematics.cpp
         src/vulkan/raytracing/HeldItemRenderSlot.cpp
         src/vulkan/raytracing/RtStaticMeshSlot.cpp
     )

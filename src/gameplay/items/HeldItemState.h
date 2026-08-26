@@ -34,6 +34,7 @@ struct HeldItemState
     HeldHand hand = HeldHand::LeftHand;
     HeldItemParentMode parentMode = HeldItemParentMode::HandSocket;
     HeldItemTransform worldFromItem{};
+    HeldItemTransform worldFromDetach{};
     std::uint64_t detachTick = 0u;
     bool detached = false;
 };
@@ -41,6 +42,10 @@ struct HeldItemState
 using HeldItemStates = std::array<HeldItemState, 2u>;
 
 HeldItemTransform IdentityHeldItemTransform();
+HeldItemTransform OriginalTorchGripSocketTransform();
+HeldItemTransform OriginalTorchFlameSocketTransform();
+HeldItemTransform OriginalTorchLightSocketTransform();
+HeldItemTransform SwordGripSocketTransform();
 HeldItemState MakeHeldItemState(HeldItemId id, HeldHand hand);
 HeldItemStates MakeDefaultHeldItemStates();
 void UpdateHeldItemParent(HeldItemState& item,

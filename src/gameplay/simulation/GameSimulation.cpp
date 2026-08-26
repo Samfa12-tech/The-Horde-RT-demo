@@ -52,6 +52,7 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
     activeEnemyKind_ = enemyDirector_.Snapshot().selectedEnemy;
     combatSnapshot_ = swordCombat_.Snapshot();
     torchFailureSnapshot_ = torchFailure_.Snapshot();
+    ResolveHeldItems();
     RefreshSnapshot(lastInput_);
 }
 
@@ -141,14 +142,8 @@ void GameSimulation::StepFixed(const InputSnapshot& input,
                                            playerZ_,
                                            playerYawRadians_,
                                            playerPitchRadians_);
-        horde::gameplay::items::UpdateHeldItemParent(
-            heldItems_[0],
-            torchFailureSnapshot_.heldByPlayer
-                ? horde::gameplay::items::HeldItemParentMode::HandSocket
-                : horde::gameplay::items::HeldItemParentMode::AuthoredWorldTrajectory,
-            tickIndex_,
-            heldItems_[0].worldFromItem);
         UpdateEncounters(input, fixedDeltaSeconds);
+        ResolveHeldItems();
     }
     else
     {
@@ -196,6 +191,7 @@ void GameSimulation::ResetRoute()
                                            playerX_,
                                            playerZ_,
                                            playerYawRadians_);
+    ResolveHeldItems();
     RefreshSnapshot(lastInput_);
 }
 
@@ -332,9 +328,30 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
         ++retryGeneration_;
     }
     fixedStepRunner_.ResetAccumulator();
+    ResolveHeldItems();
     RefreshSnapshot(lastInput_);
     snapshot_.eventsEmittedThisTick = 0u;
     return true;
+}
+
+void GameSimulation::ResolveHeldItems()
+{
+    std::string diagnostic;
+    const horde::gameplay::items::HeldItemFixedStepInput input{
+        playerX_,
+        playerZ_,
+        playerYawRadians_,
+        playerPitchRadians_,
+        walkTime_,
+        walkVisualAmount_,
+        torchFailureSnapshot_,
+        combatSnapshot_.player,
+        combatSnapshot_.swordSwingRadians};
+    // Every socket contract is a checked rigid transform. A failure would
+    // indicate a source-code contract violation; preserve the last immutable
+    // state rather than publishing a renderer-authored fallback.
+    horde::gameplay::items::ResolveHeldItemsFixedStep(
+        heldItems_, input, tickIndex_, heldItemFixedStepState_, diagnostic);
 }
 
 void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSeconds)
@@ -732,6 +749,8 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.finaleComplete = lichEncounter_.Snapshot().finaleEndingPhase == FinaleEndingPhase::Complete;
     snapshot_.torchFailure = torchFailureSnapshot_;
     snapshot_.heldItems = heldItems_;
+    snapshot_.heldItemKinematics = heldItemFixedStepState_.kinematics;
+    snapshot_.heldLight = heldItemFixedStepState_.light;
     snapshot_.enemyRoster = enemyDirector_.Snapshot();
     snapshot_.swordCombat = combatSnapshot_;
     snapshot_.playerCombat = combatSnapshot_.player;

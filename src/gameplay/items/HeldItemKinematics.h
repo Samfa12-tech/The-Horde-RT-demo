@@ -1,5 +1,6 @@
 #pragma once
 
+#include "gameplay/items/HeldLightState.h"
 #include "gameplay/items/HeldItemState.h"
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/SwordCombat.h"
@@ -44,6 +45,25 @@ struct HeldItemKinematicsState
     float successJolt = 0.0f;
 };
 
+struct HeldItemFixedStepInput
+{
+    float playerX = 0.0f;
+    float playerZ = 1.85f;
+    float playerYawRadians = 0.0f;
+    float playerPitchRadians = -0.05f;
+    float walkTime = 0.0f;
+    float walkAmount = 0.0f;
+    TorchFailureSnapshot torchFailure{};
+    PlayerCombatSnapshot playerCombat{};
+    float swordSwingRadians = 0.0f;
+};
+
+struct HeldItemFixedStepState
+{
+    HeldItemKinematicsState kinematics{};
+    HeldLightState light{};
+};
+
 HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
                                    float swordSwingRadians,
                                    float heldPropDepth);
@@ -68,5 +88,11 @@ HeldItemTransform MultiplyHeldItemTransforms(const HeldItemTransform& left,
 HeldItemTransform SelectHandSocketTransform(HeldHand hand,
                                             const HeldItemTransform& worldFromLeftHand,
                                             const HeldItemTransform& worldFromRightHand);
+
+bool ResolveHeldItemsFixedStep(HeldItemStates& items,
+                               const HeldItemFixedStepInput& input,
+                               std::uint64_t tick,
+                               HeldItemFixedStepState& state,
+                               std::string& diagnostic);
 
 } // namespace horde::gameplay::items

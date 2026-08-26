@@ -12,12 +12,47 @@ HeldItemTransform IdentityHeldItemTransform()
         0.0f, 0.0f, 0.0f, 1.0f}};
 }
 
+namespace
+{
+
+HeldItemTransform TranslationTransform(const float x, const float y, const float z)
+{
+    HeldItemTransform result = IdentityHeldItemTransform();
+    result[12] = x;
+    result[13] = y;
+    result[14] = z;
+    return result;
+}
+
+} // namespace
+
+HeldItemTransform OriginalTorchGripSocketTransform()
+{
+    return TranslationTransform(0.0f, 0.24f, 0.0f);
+}
+
+HeldItemTransform OriginalTorchFlameSocketTransform()
+{
+    return TranslationTransform(0.0f, 0.765f, 0.0f);
+}
+
+HeldItemTransform OriginalTorchLightSocketTransform()
+{
+    return TranslationTransform(0.0f, 0.735f, 0.025f);
+}
+
+HeldItemTransform SwordGripSocketTransform()
+{
+    return TranslationTransform(0.0f, 0.135f, 0.0f);
+}
+
 HeldItemState MakeHeldItemState(const HeldItemId id, const HeldHand hand)
 {
     HeldItemState result;
     result.id = id;
     result.hand = hand;
     result.worldFromItem = IdentityHeldItemTransform();
+    result.worldFromDetach = IdentityHeldItemTransform();
     return result;
 }
 
@@ -39,6 +74,7 @@ void UpdateHeldItemParent(HeldItemState& item,
     {
         item.detached = true;
         item.detachTick = tick;
+        item.worldFromDetach = item.worldFromItem;
     }
     item.parentMode = parentMode;
     item.worldFromItem = resolvedWorldFromItem;
