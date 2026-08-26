@@ -83,8 +83,10 @@ void TestAbiLayout()
           "RtPrimitiveMetadata CPU offsets match one GLSL uvec4 field");
     Check(sizeof(RtDielectricDiagnostics) == 16u &&
               offsetof(RtDielectricDiagnostics, transportOverflowCount) == 0u &&
-              offsetof(RtDielectricDiagnostics, shadowOverflowCount) == 4u,
-          "dielectric diagnostics append one fixed writable uvec4 without changing material stride");
+              offsetof(RtDielectricDiagnostics, shadowOverflowCount) == 4u &&
+              offsetof(RtDielectricDiagnostics, secondaryDielectricRejectCount) == 8u &&
+              offsetof(RtDielectricDiagnostics, unclosedVolumeCount) == 12u,
+          "dielectric diagnostics distinguish bounded overflow, secondary rejection, and unclosed volume without changing the fixed uvec4");
 
     Check(sizeof(RtMaterialGpu) == 112u && alignof(RtMaterialGpu) == 16u,
           "RtMaterialGpu is seven aligned vec4/uvec4 fields");

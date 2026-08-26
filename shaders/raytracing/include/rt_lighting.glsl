@@ -65,114 +65,202 @@ float puddleMask(vec3 p)
 #include "rt_hit_decode.glsl"
 vec3 dielectricBeerLambert(vec3 attenuationColor, float pathLength,
                            float attenuationDistance);
+float dielectricRayEpsilon(vec3 position, float interfaceDistance);
 
 const int kMobileShadowInterfaces = 4;
 const int kHighShadowInterfaces = 8;
+const int kMobileShadowVolumes = 2;
+const int kHighShadowVolumes = 4;
+
+struct ShadowHit
+{
+    bool hit;
+    bool transparent;
+    bool thinWall;
+    bool entering;
+    float t;
+    uint instance;
+    uint material;
+    float transmission;
+    vec3 tint;
+    vec3 attenuationColor;
+    float attenuationDistance;
+};
+
+ShadowHit traceNearestShadowHit(vec3 origin, vec3 direction,
+                                float maxDistance, uint mask,
+                                float minimumDistance)
+{
+    ShadowHit result;
+    result.hit = false;
+    result.transparent = false;
+    result.thinWall = false;
+    result.entering = true;
+    result.t = maxDistance;
+    result.instance = 0u;
+    result.material = 0u;
+    result.transmission = 0.0;
+    result.tint = vec3(1.0);
+    result.attenuationColor = vec3(1.0);
+    result.attenuationDistance = 0.0;
+
+    rayQueryEXT query;
+    rayQueryInitializeEXT(query, topLevelAS, gl_RayFlagsNoOpaqueEXT, mask,
+                          origin, max(minimumDistance, 0.000001), direction,
+                          max(maxDistance, 0.000004));
+    while (rayQueryProceedEXT(query))
+    {
+        if (rayQueryGetIntersectionTypeEXT(query, false) !=
+            gl_RayQueryCandidateIntersectionTriangleEXT)
+            continue;
+        int candidateInstance = int(
+            rayQueryGetIntersectionInstanceCustomIndexEXT(query, false));
+        int candidatePrimitive = rayQueryGetIntersectionPrimitiveIndexEXT(query, false);
+        bool transparentWorldPane = candidateInstance == kWaterfallInstance;
+        if (candidateInstance == 0)
+        {
+            int material = int(worldSurfaces.codes[candidatePrimitive] & 0xffu);
+            transparentWorldPane = material == kMaterialClearGlass ||
+                                   material == kMaterialWater;
+        }
+        if (!transparentWorldPane)
+            rayQueryConfirmIntersectionEXT(query);
+    }
+
+    if (rayQueryGetIntersectionTypeEXT(query, true) ==
+        gl_RayQueryCommittedIntersectionNoneEXT)
+        return result;
+
+    result.hit = true;
+    result.t = rayQueryGetIntersectionTEXT(query, true);
+    result.instance = uint(
+        rayQueryGetIntersectionInstanceCustomIndexEXT(query, true));
+    result.entering = rayQueryGetIntersectionFrontFaceEXT(query, true);
+    RtInstanceMetadata instanceMetadata = rtInstances.values[result.instance];
+    if ((instanceMetadata.flags & kRtInstanceFlagStaticPbr) == 0u)
+        return result;
+    uint geometryIndex = rayQueryGetIntersectionGeometryIndexEXT(query, true);
+    if (geometryIndex >= instanceMetadata.primitiveCount)
+        return result;
+    RtPrimitiveMetadata primitiveMetadata = rtPrimitives.values[
+        instanceMetadata.primitiveBase + geometryIndex];
+    RtMaterialGpu material = rtMaterials.values[primitiveMetadata.materialIndex];
+    float transmission = clamp(
+        material.metallicRoughnessOcclusionTransmission.w, 0.0, 1.0);
+    float metallic = clamp(
+        material.metallicRoughnessOcclusionTransmission.x, 0.0, 1.0);
+    bool materialTransmits =
+        (material.materialFlags.x & kRtMaterialFlagTransmission) != 0u &&
+        transmission > 0.001 && metallic <= 0.5;
+    if (!materialTransmits)
+        return result;
+    result.transparent = true;
+    result.thinWall =
+        (material.materialFlags.x & kRtMaterialFlagThinWall) != 0u;
+    result.material = primitiveMetadata.materialIndex;
+    result.transmission = transmission;
+    result.tint = clamp(material.baseColorFactor.rgb, vec3(0.0), vec3(1.0));
+    result.attenuationColor = clamp(
+        material.attenuationColor.rgb, vec3(0.0), vec3(1.0));
+    result.attenuationDistance =
+        material.iorThicknessAttenuationDistance.z;
+    return result;
+}
 
 vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
                              float maxDistance, uint mask)
 {
-    rayQueryEXT query;
-    rayQueryInitializeEXT(query, topLevelAS, gl_RayFlagsNoOpaqueEXT, mask, origin, 0.0015, direction, max(maxDistance, 0.004));
     int interfaceBudget = controls.waterQuality >= 1.5
         ? kHighShadowInterfaces : kMobileShadowInterfaces;
+    int volumeBudget = controls.waterQuality >= 1.5
+        ? kHighShadowVolumes : kMobileShadowVolumes;
     int interfaceCount = 0;
-    uint openMaterial = 0xffffffffu;
-    float volumeEntryDistance = 0.0;
-    vec4 volumeAttenuation = vec4(1.0, 1.0, 1.0, 0.0);
+    uint volumeInstances[kHighShadowVolumes];
+    uint volumeMaterials[kHighShadowVolumes];
+    float volumeEntryDistances[kHighShadowVolumes];
+    vec4 volumeAttenuation[kHighShadowVolumes];
+    int volumeDepth = 0;
     vec3 transmittance = vec3(1.0);
-    while (rayQueryProceedEXT(query))
+    vec3 currentOrigin = origin;
+    float travelledDistance = 0.0;
+    float remainingDistance = max(maxDistance, 0.0);
+    for (int traversal = 0; traversal <= kHighShadowInterfaces; ++traversal)
     {
-        if (rayQueryGetIntersectionTypeEXT(query, false) != gl_RayQueryCandidateIntersectionTriangleEXT)
+        if (remainingDistance <= 0.0)
         {
-            continue;
-        }
-        int instance = int(rayQueryGetIntersectionInstanceCustomIndexEXT(query, false));
-        int primitive = rayQueryGetIntersectionPrimitiveIndexEXT(query, false);
-        bool transparentWorldPane = instance == kWaterfallInstance;
-        if (instance == 0)
-        {
-            int material = int(worldSurfaces.codes[primitive] & 0xffu);
-            transparentWorldPane = material == kMaterialClearGlass || material == kMaterialWater;
-        }
-        if (transparentWorldPane) continue;
-
-        bool transparentStaticMaterial = false;
-        RtInstanceMetadata candidateInstance = rtInstances.values[instance];
-        if ((candidateInstance.flags & kRtInstanceFlagStaticPbr) != 0u)
-        {
-            uint geometryIndex = rayQueryGetIntersectionGeometryIndexEXT(query, false);
-            if (geometryIndex < candidateInstance.primitiveCount)
+            if (volumeDepth > 0)
             {
-                RtPrimitiveMetadata candidatePrimitive = rtPrimitives.values[
-                    candidateInstance.primitiveBase + geometryIndex];
-                RtMaterialGpu candidateMaterial =
-                    rtMaterials.values[candidatePrimitive.materialIndex];
-                bool materialTransmits =
-                    (candidateMaterial.materialFlags.x & kRtMaterialFlagTransmission) != 0u &&
-                    candidateMaterial.metallicRoughnessOcclusionTransmission.w > 0.001;
-                bool metallicBlocker =
-                    candidateMaterial.metallicRoughnessOcclusionTransmission.x > 0.5;
-                if (materialTransmits && !metallicBlocker)
-                {
-                    if (interfaceCount >= interfaceBudget)
-                    {
-                        atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);
-                        transmittance *= vec3(0.08);
-                        break;
-                    }
-                    ++interfaceCount;
-                    transparentStaticMaterial = true;
-                    float transmission = clamp(
-                        candidateMaterial.metallicRoughnessOcclusionTransmission.w,
-                        0.0, 1.0);
-                    bool thinWall = (candidateMaterial.materialFlags.x &
-                        kRtMaterialFlagThinWall) != 0u;
-                    float candidateDistance =
-                        rayQueryGetIntersectionTEXT(query, false);
-                    if (thinWall)
-                    {
-                        transmittance *= transmission * mix(
-                            vec3(1.0), candidateMaterial.baseColorFactor.rgb, 0.12);
-                    }
-                    else if (openMaterial == candidatePrimitive.materialIndex)
-                    {
-                        float pathLength = max(
-                            candidateDistance - volumeEntryDistance, 0.0);
-                        transmittance *= dielectricBeerLambert(
-                            volumeAttenuation.rgb, pathLength,
-                            volumeAttenuation.a);
-                        openMaterial = 0xffffffffu;
-                    }
-                    else if (openMaterial == 0xffffffffu)
-                    {
-                        openMaterial = candidatePrimitive.materialIndex;
-                        volumeEntryDistance = candidateDistance;
-                        volumeAttenuation = vec4(
-                            candidateMaterial.attenuationColor.rgb,
-                            candidateMaterial.iorThicknessAttenuationDistance.z);
-                        transmittance *= transmission;
-                    }
-                    else
-                    {
-                        atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);
-                        transmittance *= vec3(0.08);
-                        break;
-                    }
-                }
+                atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);
+                transmittance *= vec3(0.08);
             }
+            return clamp(transmittance, vec3(0.0), vec3(1.0));
         }
-        if (!transparentStaticMaterial)
+        float epsilon = dielectricRayEpsilon(currentOrigin, travelledDistance);
+        ShadowHit nearest = traceNearestShadowHit(
+            currentOrigin, direction, remainingDistance, mask, epsilon * 0.5);
+        if (!nearest.hit)
         {
-            rayQueryConfirmIntersectionEXT(query);
+            if (volumeDepth > 0)
+            {
+                atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);
+                transmittance *= vec3(0.08);
+            }
+            return clamp(transmittance, vec3(0.0), vec3(1.0));
         }
+        if (!nearest.transparent)
+            return vec3(0.0);
+        if (interfaceCount >= interfaceBudget)
+        {
+            atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);
+            return clamp(transmittance * vec3(0.08), vec3(0.0), vec3(1.0));
+        }
+        ++interfaceCount;
+        float absoluteDistance = travelledDistance + nearest.t;
+        if (nearest.thinWall)
+        {
+            transmittance *= nearest.transmission *
+                mix(vec3(1.0), nearest.tint, 0.12);
+        }
+        else if (nearest.entering)
+        {
+            if (volumeDepth >= volumeBudget)
+            {
+                atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);
+                return clamp(transmittance * vec3(0.08), vec3(0.0), vec3(1.0));
+            }
+            volumeInstances[volumeDepth] = nearest.instance;
+            volumeMaterials[volumeDepth] = nearest.material;
+            volumeEntryDistances[volumeDepth] = absoluteDistance;
+            volumeAttenuation[volumeDepth] = vec4(
+                nearest.attenuationColor, nearest.attenuationDistance);
+            ++volumeDepth;
+            transmittance *= nearest.transmission;
+        }
+        else
+        {
+            if (volumeDepth <= 0 ||
+                volumeInstances[volumeDepth - 1] != nearest.instance ||
+                volumeMaterials[volumeDepth - 1] != nearest.material)
+            {
+                atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);
+                return clamp(transmittance * vec3(0.08), vec3(0.0), vec3(1.0));
+            }
+            --volumeDepth;
+            vec4 attenuation = volumeAttenuation[volumeDepth];
+            transmittance *= dielectricBeerLambert(
+                attenuation.rgb,
+                max(absoluteDistance - volumeEntryDistances[volumeDepth], 0.0),
+                attenuation.a);
+        }
+
+        vec3 hitPosition = currentOrigin + direction * nearest.t;
+        epsilon = dielectricRayEpsilon(hitPosition, absoluteDistance);
+        currentOrigin = hitPosition + direction * epsilon;
+        travelledDistance = absoluteDistance + epsilon;
+        remainingDistance = max(maxDistance - travelledDistance, 0.0);
     }
-    if (rayQueryGetIntersectionTypeEXT(query, true) !=
-        gl_RayQueryCommittedIntersectionNoneEXT)
-    {
-        return vec3(0.0);
-    }
-    return clamp(transmittance, vec3(0.0), vec3(1.0));
+    atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);
+    return clamp(transmittance * vec3(0.08), vec3(0.0), vec3(1.0));
 }
 
 float visibilityMask(vec3 origin, vec3 direction, float maxDistance, uint mask)
@@ -227,21 +315,21 @@ float transparentVisibility(vec3 origin, vec3 direction, float maxDistance)
 
 const int kShadowSampleCapacity = 4;
 
-vec4 transparentVisibilityBatch(vec3 origins[kShadowSampleCapacity],
-                                vec3 directions[kShadowSampleCapacity],
-                                float distances[kShadowSampleCapacity],
-                                bvec4 enabled)
+mat4 transparentTransmittanceBatch(vec3 origins[kShadowSampleCapacity],
+                                   vec3 directions[kShadowSampleCapacity],
+                                   float distances[kShadowSampleCapacity],
+                                   bvec4 enabled)
 {
     // glslang inlines every rayQuery helper into raygen. Keeping the four
     // direct-light samples in one bounded loop preserves the exact queries
     // while avoiding separately expanded copies of the material traversal.
-    vec4 result = vec4(0.0);
+    mat4 result = mat4(0.0);
     for (int shadowSample = 0; shadowSample < kShadowSampleCapacity; ++shadowSample)
     {
         if (!enabled[shadowSample]) continue;
-        result[shadowSample] = transparentVisibility(
+        result[shadowSample] = vec4(shadowTransmittanceMask(
             origins[shadowSample], directions[shadowSample],
-            distances[shadowSample]);
+            distances[shadowSample], 0x35u), 1.0);
     }
     return result;
 }
@@ -285,11 +373,13 @@ vec3 bounceSample(HitInfo h, vec3 incoming, bool lightAwareMirror)
     vec3 toLight = localLightPosition - h.position;
     float lightDistance = length(toLight);
     vec3 lightDirection = toLight / max(lightDistance, 0.001);
-    float lightVisibility = visibility(offsetRayOrigin(h, lightDirection), lightDirection, lightDistance - 0.02);
+    vec3 lightTransmittance = shadowTransmittanceMask(
+        offsetRayOrigin(h, lightDirection), lightDirection,
+        lightDistance - 0.02, 0x35u);
     float diffuse = max(dot(h.normal, lightDirection), 0.0);
     float attenuation = 1.0 / (1.0 + lightDistance * lightDistance * 0.58);
     vec3 authoredDirect = h.base *
-        (0.008 + localLightColor * diffuse * attenuation * lightVisibility *
+        (0.008 + localLightColor * lightTransmittance * diffuse * attenuation *
          localLightStrength * 2.25);
     return authoredDirect + fireEmitterDirectLighting(h, incoming, false, false);
 }
@@ -344,27 +434,29 @@ vec3 fireEmitterDirectLighting(HitInfo h, vec3 rayDirection, bool dualVisibility
         vec3 sampleVector = lightPosition + areaOffsets[sampleIndex] - h.position;
         float sampleDistance = length(sampleVector);
         vec3 sampleDirection = sampleVector / max(sampleDistance, 0.001);
-        float lightVisibility = visibility(offsetRayOrigin(h, sampleDirection),
-                                           sampleDirection, sampleDistance - 0.02);
+        vec3 lightTransmittance = shadowTransmittanceMask(
+            offsetRayOrigin(h, sampleDirection), sampleDirection,
+            sampleDistance - 0.02, 0x35u);
         if (dualVisibility)
         {
             vec3 otherVector = lightPosition + areaOffsets[1 - sampleIndex] - h.position;
             float otherDistance = length(otherVector);
             vec3 otherDirection = otherVector / max(otherDistance, 0.001);
-            lightVisibility = 0.5 * (lightVisibility + visibility(
-                offsetRayOrigin(h, otherDirection), otherDirection,
-                otherDistance - 0.02));
+            lightTransmittance = 0.5 * (lightTransmittance +
+                shadowTransmittanceMask(
+                    offsetRayOrigin(h, otherDirection), otherDirection,
+                    otherDistance - 0.02, 0x35u));
         }
         float attenuation = 1.0 / (1.0 + lightDistance * lightDistance * 0.58);
         float diffuse = max(dot(h.normal, lightDirection), 0.0);
-        result += h.base * lightColor * diffuse * attenuation * lightVisibility *
+        result += h.base * lightColor * lightTransmittance * diffuse * attenuation *
                   strength * 2.65;
         if (allowAnalyticSpecular)
         {
             float specular = pow(max(dot(reflect(-lightDirection, h.normal),
                                          -rayDirection), 0.0),
                                  mix(34.0, 5.0, reflective));
-            result += lightColor * specular * attenuation * lightVisibility *
+            result += lightColor * lightTransmittance * specular * attenuation *
                       strength * (0.12 + reflective * 1.04);
         }
     }
@@ -447,17 +539,19 @@ vec3 shadeOpaqueDirect(HitInfo h, vec3 rayDirection, bool dualVisibility,
     float visibilityDistances[kShadowSampleCapacity] = float[kShadowSampleCapacity](
         sampleDistance - 0.02, otherDistance - 0.02,
         skyDistance - 0.02, otherSkyDistance - 0.02);
-    vec4 visibilitySamples = transparentVisibilityBatch(
+    mat4 transmittanceSamples = transparentTransmittanceBatch(
         visibilityOrigins, visibilityDirections, visibilityDistances,
         bvec4(localStrength > 0.001,
               dualVisibility && localStrength > 0.001, true, dualVisibility));
-    localVisibility = dualVisibility
-        ? 0.5 * (visibilitySamples.x + visibilitySamples.y)
-        : visibilitySamples.x;
-    visibilitySamples.zw *= vec2(skyGain, otherSkyGain);
-    skyVisibility = dualVisibility
-        ? 0.5 * (visibilitySamples.z + visibilitySamples.w)
-        : visibilitySamples.z;
+    vec3 localTransmittance = dualVisibility
+        ? 0.5 * (transmittanceSamples[0].xyz + transmittanceSamples[1].xyz)
+        : transmittanceSamples[0].xyz;
+    vec3 skyTransmittance = dualVisibility
+        ? 0.5 * (transmittanceSamples[2].xyz * skyGain +
+                 transmittanceSamples[3].xyz * otherSkyGain)
+        : transmittanceSamples[2].xyz * skyGain;
+    localVisibility = dot(localTransmittance, vec3(0.2126, 0.7152, 0.0722));
+    skyVisibility = dot(skyTransmittance, vec3(0.2126, 0.7152, 0.0722));
 
     float reflective = max(h.metallic, h.reflectivity);
     float localDiffuse = max(dot(h.normal, localDirection), 0.0);
@@ -475,13 +569,13 @@ vec3 shadeOpaqueDirect(HitInfo h, vec3 rayDirection, bool dualVisibility,
     vec3 color = h.base * vec3(0.025, 0.028, 0.032);
     color += fireEmitterDirectLighting(
         h, rayDirection, dualVisibility, allowAnalyticFireSpecular);
-    color += h.base * localColor * localDiffuse * localAttenuation * localVisibility
+    color += h.base * localColor * localTransmittance * localDiffuse * localAttenuation
         * localStrength * 2.65;
-    color += localColor * localSpecular * localAttenuation * localVisibility
+    color += localColor * localTransmittance * localSpecular * localAttenuation
         * localStrength * (0.12 + reflective * 1.04);
-    color += h.base * cold * skyDiffuse * skyVisibility * 0.10;
-    color += h.base * skyRadiance * skyDiffuse * skyVisibility * 0.86;
-    color += skyRadiance * skySpecular * skyVisibility
+    color += h.base * cold * skyTransmittance * skyDiffuse * 0.10;
+    color += h.base * skyRadiance * skyTransmittance * skyDiffuse * 0.86;
+    color += skyRadiance * skyTransmittance * skySpecular
         * mix(0.025, 0.44, reflective) * (0.45 + 0.55 * skyFresnel);
     return color;
 }

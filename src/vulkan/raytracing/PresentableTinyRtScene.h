@@ -138,6 +138,14 @@ public:
     {
         return dielectricShadowOverflowCount_;
     }
+    std::uint32_t DielectricSecondaryRejectCount() const
+    {
+        return dielectricSecondaryRejectCount_;
+    }
+    std::uint32_t DielectricUnclosedVolumeCount() const
+    {
+        return dielectricUnclosedVolumeCount_;
+    }
     bool GenericStaticAssetEnabled() const { return genericStaticAssetEnabled_; }
     const RtStaticMeshMeasurements& StaticMeshMeasurements() const { return staticMeshSlot_.Measurements(); }
     VkDeviceSize StaticMeshBlasBytes() const { return staticMeshBlasBytes_; }
@@ -294,6 +302,8 @@ private:
     float playerMaxSocketErrorMetres_ = 0.0f;
     std::uint32_t dielectricTransportOverflowCount_ = 0u;
     std::uint32_t dielectricShadowOverflowCount_ = 0u;
+    std::uint32_t dielectricSecondaryRejectCount_ = 0u;
+    std::uint32_t dielectricUnclosedVolumeCount_ = 0u;
     std::string developmentStaticAssetDirectory_;
     std::string staticTextureDirectory_;
     RtStaticMeshSlot staticMeshSlot_;

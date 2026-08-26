@@ -589,7 +589,8 @@ int main()
                       "floor water must use a rounded catchment and remain visible through the drain lip");
         ok &= Require(raygenSource.find("const int kMaterialWater = 10;") != std::string::npos &&
                       raygenSource.find("bool isThinWater") != std::string::npos &&
-                      raygenSource.find("material == kMaterialClearGlass || material == kMaterialWater") != std::string::npos &&
+                      raygenSource.find("material == kMaterialClearGlass") != std::string::npos &&
+                      raygenSource.find("material == kMaterialWater") != std::string::npos &&
                       raygenSource.find("vec4 lichGroundMist") != std::string::npos,
                       "raygen must retain the RT water ABI, transparent visibility route, and bounded lich mist path");
         ok &= Require(sceneSource.find("sizeof(ScenePushConstants) == 120u") != std::string::npos &&
@@ -643,8 +644,10 @@ int main()
                       raygenSource.find("bool waterStreamExit") != std::string::npos &&
                       raygenSource.find("controls.waterQuality < 0.5") != std::string::npos &&
                       raygenSource.find("controls.waterQuality >= 1.5") != std::string::npos &&
-                      raygenSource.find("transmissionDirection, 12.0, 0x23u, true") != std::string::npos &&
-                      raygenSource.find("reflectionDirection, 12.0, 0x37u, false") != std::string::npos,
+                      raygenSource.find("transmissionDirection, 12.0, 0x23u,") != std::string::npos &&
+                      raygenSource.find("0.002, true, false") != std::string::npos &&
+                      raygenSource.find("reflectionDirection, 12.0, 0x37u,") != std::string::npos &&
+                      raygenSource.find("0.002, false, false") != std::string::npos,
                       "water quality must retain real ellipse refraction and bounded High/Mobile/Off query routes");
         ok &= Require(raygenSource.find("void activeLocalLight(") != std::string::npos &&
                       raygenSource.find("void activeSkyLight(") != std::string::npos &&
@@ -692,9 +695,9 @@ int main()
                           std::string::npos &&
                       waterPrimary.find("localHighlight * 3.2 + runoffLocalHighlight * 1.15") !=
                           std::string::npos &&
-                      waterPrimary.find("float localInterfaceVisibility = localStrength > 0.001") !=
+                      waterPrimary.find("vec3 localInterfaceTransmittance = localStrength > 0.001") !=
                           std::string::npos &&
-                      waterPrimary.find("float skyInterfaceVisibility = visibility(") != std::string::npos &&
+                      waterPrimary.find("vec3 skyInterfaceTransmittance = shadowTransmittanceMask(") != std::string::npos &&
                       waterPrimary.find("vec3(-5.50, 2.62, -15.20)") == std::string::npos &&
                       waterPrimary.find("tunedLightColor(vec3(1.0, 0.28, 0.055), kLightTorch)") ==
                           std::string::npos,
@@ -710,20 +713,35 @@ int main()
                       raygenSource.find("const int kHighDielectricVolumes = 4;") != std::string::npos &&
                       raygenSource.find("segmentLength = currentHit.t;") != std::string::npos &&
                       raygenSource.find("atomicAdd(rtDielectricDiagnostics.value.transportOverflowCount, 1u);") != std::string::npos &&
+                      raygenSource.find("atomicAdd(rtDielectricDiagnostics.value.secondaryDielectricRejectCount, 1u);") != std::string::npos &&
+                      raygenSource.find("atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);") != std::string::npos &&
+                      raygenSource.find("dielectricEffectiveFresnel(") != std::string::npos &&
+                      raygenSource.find("dielectricRayEpsilon(") != std::string::npos &&
+                      raygenSource.find("float minimumDistance") != std::string::npos &&
                       raygenSource.find("shadeTerminalOpaqueEmissive") != std::string::npos &&
                       raygenSource.find("kRtMaterialFlagThinWall") != std::string::npos &&
                       raygenSource.find("shadeBoundedDielectric(nextHit") == std::string::npos,
                       "generic dielectric transport must use actual hit distance, explicit phone/high budgets, thin-wall ABI intent, and one terminal non-recursive evaluator");
         ok &= Require(raygenSource.find("vec3 shadowTransmittanceMask(") != std::string::npos &&
-                      raygenSource.find("vec4 transparentVisibilityBatch(") != std::string::npos &&
+                      raygenSource.find("struct ShadowHit") != std::string::npos &&
+                      raygenSource.find("ShadowHit traceNearestShadowHit(") != std::string::npos &&
+                      raygenSource.find("mat4 transparentTransmittanceBatch(") != std::string::npos &&
                       raygenSource.find("const int kShadowSampleCapacity = 4;") != std::string::npos &&
                       raygenSource.find("const int kMobileShadowInterfaces = 4;") != std::string::npos &&
                       raygenSource.find("const int kHighShadowInterfaces = 8;") != std::string::npos &&
-                      raygenSource.find("candidateMaterial.metallicRoughnessOcclusionTransmission.x") != std::string::npos &&
+                      raygenSource.find("material.metallicRoughnessOcclusionTransmission.x") != std::string::npos &&
                       raygenSource.find("dielectricBeerLambert(") != std::string::npos &&
                       raygenSource.find("atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);") != std::string::npos &&
-                      raygenSource.find("if (interfaceCount >= interfaceBudget)") != std::string::npos,
-                      "straight shadow queries must transmit through finite generic dielectric layers while keeping metallic blockers and mobile/high interface ceilings");
+                      raygenSource.find("if (interfaceCount >= interfaceBudget)") != std::string::npos &&
+                      raygenSource.find("lightTransmittance = shadowTransmittanceMask(") != std::string::npos,
+                      "nearest committed shadow traversal must retain RGB through local, sky, and fire lighting while keeping metallic blockers and mobile/high ceilings");
+        ok &= Require(sceneSource.find("secondaryDielectricRejectCount") != std::string::npos &&
+                      sceneSource.find("unclosedVolumeCount") != std::string::npos &&
+                      windowsSource.find("secondaryDielectricRejectCount") != std::string::npos &&
+                      windowsSource.find("unclosedVolumeCount") != std::string::npos &&
+                      androidBridgeSource.find("dielectricSecondaryRejectCount") != std::string::npos &&
+                      androidBridgeSource.find("dielectricUnclosedVolumeCount") != std::string::npos,
+                      "CPU and platform diagnostics must expose secondary dielectric rejection separately from overflow and unclosed-volume fallback");
         ok &= Require(waterPrimary.find("transmittedHit.t += h.t + waterPathLength;") !=
                           std::string::npos &&
                       waterPrimary.find("float reflectedLocalDistance = reflectedHit.hit ? reflectedHit.t : 12.0;") !=
@@ -772,7 +790,7 @@ int main()
         ok &= Require(!opaqueDirect.empty() &&
                       opaqueDirect.find("bvec4(localStrength > 0.001") !=
                           std::string::npos &&
-                      opaqueDirect.find("vec4 visibilitySamples = transparentVisibilityBatch(") != std::string::npos &&
+                      opaqueDirect.find("mat4 transmittanceSamples = transparentTransmittanceBatch(") != std::string::npos &&
                       !opaquePrimary.empty() &&
                       opaquePrimary.find("shadeOpaqueDirect(h, rayDirection, maxWorkload") !=
                           std::string::npos &&
@@ -808,7 +826,7 @@ int main()
                       fireDirect.find("rtFireEmitters.values[emitterIndex]") != std::string::npos &&
                       fireDirect.find("emitter.lightPositionStrength.xyz") != std::string::npos &&
                       fireDirect.find("emitter.colourIntensity.rgb") != std::string::npos &&
-                      fireDirect.find("visibility(") != std::string::npos &&
+                      fireDirect.find("shadowTransmittanceMask(") != std::string::npos &&
                       raygenSource.find("findFireEmitter(1u") == std::string::npos &&
                       raygenSource.find("currentTorchLightPosition") == std::string::npos &&
                       raygenSource.find("sin(controls.time * 15.0)") == std::string::npos &&

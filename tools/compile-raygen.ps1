@@ -23,6 +23,16 @@ if (-not (Test-Path -LiteralPath $disassembler))
 {
     throw "spirv-dis was not found at $disassembler"
 }
+$spirvOptimizer = Join-Path $VulkanSdk 'Bin\spirv-opt.exe'
+if (-not (Test-Path -LiteralPath $spirvOptimizer))
+{
+    throw "spirv-opt was not found at $spirvOptimizer"
+}
+$spirvValidator = Join-Path $VulkanSdk 'Bin\spirv-val.exe'
+if (-not (Test-Path -LiteralPath $spirvValidator))
+{
+    throw "spirv-val was not found at $spirvValidator"
+}
 
 $source = Join-Path $repoRoot 'shaders\raytracing\minimal.rgen'
 $include = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalRayGenShader.inc'
@@ -119,10 +129,33 @@ $dependencyHashes = foreach ($dependency in $dependencies)
 $dependencyManifest = $dependencyHashes | ConvertTo-Json -Compress
 $dependencyHash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($dependencyManifest))).ToLowerInvariant()
 
-& $validator -V --target-env vulkan1.2 -Os -S rgen -o $spirv $resolvedSourcePath
+$unoptimizedSpirv = Join-Path ([IO.Path]::GetTempPath()) `
+    ("horde-raygen-unoptimized-{0}.spv" -f [guid]::NewGuid().ToString('N'))
+& $validator -V --target-env vulkan1.2 -S rgen -o $unoptimizedSpirv $resolvedSourcePath
 if ($LASTEXITCODE -ne 0)
 {
     throw "Raygen compilation failed with exit code $LASTEXITCODE"
+}
+& $spirvOptimizer `
+    --eliminate-dead-functions `
+    --eliminate-dead-code-aggressive `
+    --ccp `
+    --simplify-instructions `
+    --redundancy-elimination `
+    --eliminate-local-single-block `
+    --eliminate-local-single-store `
+    --eliminate-dead-inserts `
+    --compact-ids `
+    $unoptimizedSpirv -o $spirv
+if ($LASTEXITCODE -ne 0)
+{
+    throw "Raygen function-preserving optimization failed with exit code $LASTEXITCODE"
+}
+Remove-Item -LiteralPath $unoptimizedSpirv -Force
+& $spirvValidator --target-env vulkan1.2 $spirv
+if ($LASTEXITCODE -ne 0)
+{
+    throw "Raygen SPIR-V validation failed with exit code $LASTEXITCODE"
 }
 
 $bytes = [System.IO.File]::ReadAllBytes($spirv)
@@ -150,6 +183,17 @@ $instructionCount = @($assemblyLines | Where-Object { $_ -match '^\s*(?:%\S+\s*=
 $branchOperationCount = @($assemblyLines | Where-Object { $_ -match '\bOp(?:Branch|BranchConditional|Switch)\b' }).Count
 $loopCount = @($assemblyLines | Where-Object { $_ -match '\bOpLoopMerge\b' }).Count
 $selectionMergeCount = @($assemblyLines | Where-Object { $_ -match '\bOpSelectionMerge\b' }).Count
+$functionCount = @($assemblyLines | Where-Object { $_ -match '\bOpFunction\b' }).Count
+$functionCallCount = @($assemblyLines | Where-Object { $_ -match '\bOpFunctionCall\b' }).Count
+$rayQueryInitializationCount = @($assemblyLines | Where-Object {
+    $_ -match '\bOpRayQueryInitializeKHR\b'
+}).Count
+$optimizerPreservedFunctions = $functionCallCount -gt 0 -and $rayQueryInitializationCount -le 4
+if (-not $optimizerPreservedFunctions)
+{
+    throw ("Raygen optimizer cloned bounded traversal: functions={0}, calls={1}, ray-query sites={2}." -f `
+        $functionCount, $functionCallCount, $rayQueryInitializationCount)
+}
 $spirvHash = (Get-FileHash -LiteralPath $spirv -Algorithm SHA256).Hash.ToLowerInvariant()
 $sourceHash = $dependencyHash
 $includeHash = (Get-FileHash -LiteralPath $include -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -202,6 +246,10 @@ if ($Check)
         branchOperations = $branchOperationCount
         loops = $loopCount
         selectionMerges = $selectionMergeCount
+        functions = $functionCount
+        functionCalls = $functionCallCount
+        rayQueryInitializations = $rayQueryInitializationCount
+        optimizerPreservedFunctions = $optimizerPreservedFunctions
         matchesEmbeddedWords = $matchesEmbedded
     }
     $statsPath = Join-Path $outputFull 'raygen-stats.json'
@@ -212,6 +260,8 @@ if ($Check)
     Write-Output ("Raygen check artifacts: {0}" -f $outputFull)
     Write-Output ("Source dependency SHA-256: {0}; embedded include SHA-256: {1}" -f $sourceHash, $includeHash)
     Write-Output ("SPIR-V bytes: {0}; words: {1}; instructions: {2}; branch operations: {3}; loops: {4}; selection merges: {5}; SHA-256: {6}" -f $bytes.Length, $wordValues.Count, $instructionCount, $branchOperationCount, $loopCount, $selectionMergeCount, $spirvHash)
+    Write-Output ("Function-preserving optimizer: functions={0}; calls={1}; ray-query sites={2}" -f `
+        $functionCount, $functionCallCount, $rayQueryInitializationCount)
     if (-not $matchesEmbedded)
     {
         throw 'Embedded raygen SPIR-V is stale. Run tools\compile-raygen.ps1 and rebuild.'
@@ -246,3 +296,5 @@ if (Test-Path -LiteralPath $resolvedSourcePath)
 Write-Output "Generated $include"
 Write-Output ("Source dependency SHA-256: {0}; embedded include SHA-256 before generation: {1}" -f $sourceHash, $includeHash)
 Write-Output ("SPIR-V bytes: {0}; words: {1}; instructions: {2}; branch operations: {3}; loops: {4}; selection merges: {5}; SHA-256: {6}" -f $bytes.Length, $wordValues.Count, $instructionCount, $branchOperationCount, $loopCount, $selectionMergeCount, $spirvHash)
+Write-Output ("Function-preserving optimizer: functions={0}; calls={1}; ray-query sites={2}" -f `
+    $functionCount, $functionCallCount, $rayQueryInitializationCount)

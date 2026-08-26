@@ -349,7 +349,8 @@ void materialForPrimitive(int primitive,
 }
 
 HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
-                   bool ignoreWater, bool ignorePlayerNearFace)
+                   float minimumDistance, bool ignoreWater,
+                   bool ignorePlayerNearFace)
 {
     HitInfo h;
     h.hit = false;
@@ -375,7 +376,8 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
     rayQueryEXT query;
     uint rayFlags = (ignoreWater || ignorePlayerNearFace)
         ? gl_RayFlagsNoOpaqueEXT : gl_RayFlagsOpaqueEXT;
-    rayQueryInitializeEXT(query, topLevelAS, rayFlags, mask, origin, 0.002, direction, maxDistance);
+    rayQueryInitializeEXT(query, topLevelAS, rayFlags, mask, origin,
+                          max(minimumDistance, 0.000001), direction, maxDistance);
     while (rayQueryProceedEXT(query))
     {
         if ((!ignoreWater && !ignorePlayerNearFace) ||

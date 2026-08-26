@@ -42,23 +42,25 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     vec3 firstNormal = dot(rayDirection, firstOutward) < 0.0
         ? firstOutward : -firstOutward;
     float firstCosine = clamp(dot(firstNormal, -rayDirection), 0.0, 1.0);
-    float firstFresnel = dielectricSchlick(firstCosine, 1.0, firstHit.ior);
-    firstFresnel = mix(firstFresnel,
-        min(1.0, firstFresnel + firstHit.roughness * 0.12),
-        firstHit.roughness * 0.35);
+    float firstFresnel = dielectricEffectiveFresnel(
+        firstCosine, 1.0, firstHit.ior, firstHit.roughness);
 
     vec3 reflectionDirection = roughDielectricDirection(
         reflect(rayDirection, firstNormal), firstNormal,
         firstHit.position, firstHit.roughness);
+    float reflectionEpsilon = dielectricRayEpsilon(
+        firstHit.position, firstHit.t);
     HitInfo reflectedHit = traceScene(
-        firstHit.position + reflectionDirection * 0.004,
-        reflectionDirection, 12.0, 0x37u, false, false);
+        advanceDielectricRayOrigin(firstHit.position, firstOutward,
+                                   reflectionDirection, reflectionEpsilon),
+        reflectionDirection, 12.0, 0x37u, reflectionEpsilon * 0.5,
+        false, false);
     reflectedHit.t += firstHit.t;
     vec3 reflected;
     if (isGenericDielectric(reflectedHit) ||
         (reflectedHit.hit && reflectedHit.material == kMaterialWater))
     {
-        atomicAdd(rtDielectricDiagnostics.value.transportOverflowCount, 1u);
+        atomicAdd(rtDielectricDiagnostics.value.secondaryDielectricRejectCount, 1u);
         reflected = skyColor(reflectionDirection) * 0.18 +
             (reflectedHit.hit ? reflectedHit.base * 0.12 : vec3(0.0));
     }
@@ -97,9 +99,18 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
         }
         if (!isGenericDielectric(currentHit))
         {
-            currentHit.t = totalDistance;
-            transmitted = throughput *
-                shadeTerminalOpaqueEmissive(currentHit, transmissionDirection);
+            if (volumeDepth > 0)
+            {
+                atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);
+                transmitted = dielectricOverflowFallback(
+                    transmissionDirection, throughput);
+            }
+            else
+            {
+                currentHit.t = totalDistance;
+                transmitted = throughput *
+                    shadeTerminalOpaqueEmissive(currentHit, transmissionDirection);
+            }
             terminalResolved = true;
             break;
         }
@@ -117,7 +128,8 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
         float transmittedIor = entering ? currentHit.ior
             : (volumeDepth > 1 ? volumeIors[volumeDepth - 2] : 1.0);
         float cosine = clamp(dot(orientedNormal, -transmissionDirection), 0.0, 1.0);
-        float fresnel = dielectricSchlick(cosine, incidentIor, transmittedIor);
+        float fresnel = dielectricEffectiveFresnel(
+            cosine, incidentIor, transmittedIor, currentHit.roughness);
         vec3 idealTransmission = thinWall
             ? transmissionDirection
             : refract(transmissionDirection, orientedNormal,
@@ -162,12 +174,20 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
             transmissionDirection = roughDielectricDirection(
                 idealTransmission, -orientedNormal,
                 currentHit.position, currentHit.roughness);
-            throughput *= currentHit.transmission * (1.0 - fresnel);
+            throughput *= clamp(currentHit.transmission, 0.0, 1.0) *
+                (1.0 - fresnel);
         }
 
+        float epsilon = dielectricRayEpsilon(
+            currentHit.position, totalDistance);
+        vec3 nextOrigin = advanceDielectricRayOrigin(
+            currentHit.position, outwardNormal, transmissionDirection, epsilon);
+        float advancedDistance = max(
+            dot(nextOrigin - currentHit.position, transmissionDirection), 0.0);
         HitInfo nextHit = traceScene(
-            currentHit.position + transmissionDirection * 0.004,
-            transmissionDirection, 10000.0, 0x23u, false, false);
+            nextOrigin, transmissionDirection, 10000.0, 0x23u,
+            epsilon * 0.5, false, false);
+        nextHit.t += advancedDistance;
         totalDistance += nextHit.t;
         currentHit = nextHit;
     }
@@ -180,7 +200,5 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     }
     // Roughness changes the same bounded reflection/transmission response; it
     // never switches to a screen sample or adds a recursive glossy path.
-    float reflectionWeight = clamp(firstFresnel + firstHit.roughness * 0.035, 0.0, 1.0);
-    if (overflowed) reflectionWeight = max(reflectionWeight, 0.08);
-    return reflected * reflectionWeight + transmitted;
+    return reflected * firstFresnel + transmitted;
 }

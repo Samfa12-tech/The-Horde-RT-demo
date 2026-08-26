@@ -32,7 +32,7 @@ void main()
     float playerPrimaryStart = clamp(0.68 + controls.pitch, 0.34, 0.82);
     uint primaryMask = uv.y > playerPrimaryStart ? 0x27u : 0x23u;
     HitInfo primary = traceScene(origin, rayDirection, 10000.0, primaryMask,
-                                 controls.waterQuality < 0.5, true);
+                                 0.002, controls.waterQuality < 0.5, true);
     vec3 color = shadePrimary(primary, rayDirection);
     vec4 fireVolume = integrateFireEmitters(
         origin, rayDirection, primary.hit ? primary.t : 10000.0, false);

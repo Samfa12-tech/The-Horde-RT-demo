@@ -15,6 +15,35 @@ float dielectricSchlick(float incidentCosine, float incidentIor, float transmitt
     return dielectricSchlickFromR0(incidentCosine, ratio * ratio);
 }
 
+float dielectricEffectiveFresnel(float incidentCosine, float incidentIor,
+                                  float transmittedIor, float roughness)
+{
+    float smoothFresnel = dielectricSchlick(
+        incidentCosine, incidentIor, transmittedIor);
+    float normalFresnel = dielectricSchlick(
+        1.0, incidentIor, transmittedIor);
+    float clampedRoughness = clamp(roughness, 0.0, 1.0);
+    float roughnessBlend = clampedRoughness * clampedRoughness * 0.25;
+    return clamp(mix(smoothFresnel, normalFresnel, roughnessBlend), 0.0, 1.0);
+}
+
+float dielectricRayEpsilon(vec3 position, float interfaceDistance)
+{
+    float maximumCoordinate = max(max(abs(position.x), abs(position.y)),
+                                  max(abs(position.z), 1.0));
+    return clamp(max(0.00002,
+                     max(maximumCoordinate * 0.000002,
+                         abs(interfaceDistance) * 0.0000001)),
+                 0.00002, 0.00025);
+}
+
+vec3 advanceDielectricRayOrigin(vec3 position, vec3 geometricNormal,
+                                vec3 direction, float epsilon)
+{
+    float side = dot(geometricNormal, direction) >= 0.0 ? 1.0 : -1.0;
+    return position + geometricNormal * side * epsilon + direction * epsilon;
+}
+
 vec3 dielectricBeerLambert(vec3 attenuationColor, float pathLength,
                            float attenuationDistance)
 {
@@ -99,7 +128,8 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
     if (transmissionAvailable)
     {
         HitInfo transmittedHit = traceScene(exitPoint + transmissionDirection * 0.004,
-                                             transmissionDirection, 12.0, 0x23u, true, false);
+                                             transmissionDirection, 12.0, 0x23u,
+                                             0.002, true, false);
         transmittedHit.t += h.t + waterPathLength;
         transmitted = shadeOpaqueSecondary(transmittedHit, transmissionDirection);
         transmitted *= exp(-vec3(0.060, 0.018, 0.008) * waterPathLength);
@@ -115,7 +145,8 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
     if (controls.waterQuality >= 1.5)
     {
         HitInfo reflectedHit = traceScene(h.position + geometricNormal * 0.006,
-                                          reflectionDirection, 12.0, 0x37u, false, false);
+                                          reflectionDirection, 12.0, 0x37u,
+                                          0.002, false, false);
         float reflectedLocalDistance = reflectedHit.hit ? reflectedHit.t : 12.0;
         reflectedHit.t += h.t;
         reflected = shadeOpaqueSecondary(reflectedHit, reflectionDirection);
@@ -148,9 +179,10 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
     // every ordinary direct-light sample.
     float runoffLocalHighlight = runoff
         ? pow(max(dot(surfaceNormal, localHalf), 0.0), 14.0) : 0.0;
-    float localInterfaceVisibility = localStrength > 0.001
-        ? visibility(offsetRayOrigin(h, localDirection), localDirection,
-                     localDistance - 0.02) : 0.0;
+    vec3 localInterfaceTransmittance = localStrength > 0.001
+        ? shadowTransmittanceMask(offsetRayOrigin(h, localDirection),
+                                  localDirection, localDistance - 0.02, 0x35u)
+        : vec3(0.0);
     int skySample = int((gl_LaunchIDEXT.x + gl_LaunchIDEXT.y) & 1u);
     vec3 skyDirection;
     float skyDistance;
@@ -158,18 +190,18 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
     float skyGain;
     activeSkyLight(h.position, skySample, skyDirection, skyDistance,
                    skyRadiance, skyGain);
-    float skyInterfaceVisibility = visibility(offsetRayOrigin(h, skyDirection),
-                                              skyDirection, skyDistance - 0.02)
-        * skyGain;
+    vec3 skyInterfaceTransmittance = shadowTransmittanceMask(
+        offsetRayOrigin(h, skyDirection), skyDirection,
+        skyDistance - 0.02, 0x35u) * skyGain;
     float skyHighlight = pow(max(dot(surfaceNormal,
         normalize(skyDirection - rayDirection)), 0.0), 96.0);
-    vec3 interfaceLight = localColor
+    vec3 interfaceLight = localColor * localInterfaceTransmittance
         * (localHighlight * 3.2 + runoffLocalHighlight * 1.15)
-        * localStrength * localInterfaceVisibility
+        * localStrength
         / (1.0 + localDistanceSquared * 0.58);
     interfaceLight += fireEmitterDirectLighting(
         h, rayDirection, false, !fireRayReflectionOwned);
-    interfaceLight += skyRadiance * skyHighlight * skyInterfaceVisibility * 0.10;
+    interfaceLight += skyRadiance * skyInterfaceTransmittance * skyHighlight * 0.10;
     if (runoff && h.position.x > -2.88)
     {
         float impactDistance = length(h.position.xz - vec2(-2.32, -15.26));
@@ -177,8 +209,8 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
             impactDistance * 31.0 - controls.time * 6.2), 8.0)
             * (1.0 - smoothstep(0.07, 0.68, impactDistance));
         float impactCore = 1.0 - smoothstep(0.04, 0.22, impactDistance);
-        vec3 impactLight = skyRadiance * skyInterfaceVisibility * 0.44
-            + localColor * localStrength * localInterfaceVisibility * 0.24;
+        vec3 impactLight = skyRadiance * skyInterfaceTransmittance * 0.44
+            + localColor * localInterfaceTransmittance * localStrength * 0.24;
         interfaceLight += impactLight * (impactCrest * 0.12 + impactCore * 0.045);
     }
     float surfaceTurbulence = clamp(length(surfaceNormal - exitSurfaceNormal) * 5.0, 0.0, 1.0);
@@ -192,8 +224,8 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
               - controls.time * 8.4) * 0.17, 0.0, 1.0);
     float entrainedAir = runoff ? 0.004
         : 0.010 + pow(breakup, 3.0) * 0.028 + surfaceTurbulence * 0.010;
-    vec3 scatteringRadiance = skyRadiance * skyInterfaceVisibility * 0.38
-        + localColor * localStrength * localInterfaceVisibility * 0.18;
+    vec3 scatteringRadiance = skyRadiance * skyInterfaceTransmittance * 0.38
+        + localColor * localInterfaceTransmittance * localStrength * 0.18;
     return mix(surfaceRadiance, scatteringRadiance, entrainedAir);
 }
 
@@ -239,7 +271,7 @@ vec3 shadeOpaquePrimary(HitInfo h, vec3 rayDirection)
             : normalize(h.normal + vec3(0.18, 0.58, -0.34));
         uint bounceMask = wantsPlayerReflection ? 0x37u : 0x23u;
         HitInfo bounceHit = traceScene(offsetRayOrigin(h, bounceDirection), bounceDirection,
-                                       12.0, bounceMask, false, false);
+                                       12.0, bounceMask, 0.002, false, false);
         bounce = bounceSample(bounceHit, bounceDirection, wantsPlayerReflection);
         if (wantsPlayerReflection)
         {
@@ -295,7 +327,8 @@ vec3 shadePrimary(HitInfo h, vec3 rayDirection)
         // genuinely behind the glass. Schlick Fresnel adds a readable reflection
         // without pretending this single surface is a thick dielectric volume.
         HitInfo transmittedHit = traceScene(h.position + rayDirection * 0.012,
-                                            rayDirection, 10000.0, 0x23u, false, false);
+                                            rayDirection, 10000.0, 0x23u,
+                                            0.002, false, false);
         vec3 transmitted = transmittedHit.hit
             ? bounceSample(transmittedHit, rayDirection, false) : skyColor(rayDirection);
         vec3 tint = vec3(0.82, 0.94, 1.0);

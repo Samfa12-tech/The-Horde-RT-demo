@@ -77,8 +77,8 @@
       "fields": [
         { "name": "transportOverflowCount", "type": "uint", "offset": 0 },
         { "name": "shadowOverflowCount", "type": "uint", "offset": 4 },
-        { "name": "reserved0", "type": "uint", "offset": 8 },
-        { "name": "reserved1", "type": "uint", "offset": 12 }
+        { "name": "secondaryDielectricRejectCount", "type": "uint", "offset": 8 },
+        { "name": "unclosedVolumeCount", "type": "uint", "offset": 12 }
       ]
     },
     {
