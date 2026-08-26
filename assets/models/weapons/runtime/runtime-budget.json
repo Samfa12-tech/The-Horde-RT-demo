@@ -1,0 +1,122 @@
+{
+  "schema": 1,
+  "status": "production-cc-by-4.0",
+  "source": {
+    "file": "gothic-arming-sword-rh-lod0.glb",
+    "bytes": 621220,
+    "sha256": "477ff6c53c4b407bc16e9e84d16aaf47dc72131b812debf2b92d0ab2fcfab5c1",
+    "validatorVersion": "2.0.0-dev.3.10",
+    "reviewedWarningCodes": []
+  },
+  "runtime": {
+    "file": "gothic-arming-sword-rh-lod0.runtime.glb",
+    "bytes": 621220,
+    "sha256": "477ff6c53c4b407bc16e9e84d16aaf47dc72131b812debf2b92d0ab2fcfab5c1",
+    "vertices": 11424,
+    "indices": 34497,
+    "triangles": 11499,
+    "primitives": 1,
+    "materials": 1,
+    "maxAttributes": 4,
+    "sourceResolutionImagePayloads": 0,
+    "validatorVersion": "2.0.0-dev.3.10"
+  },
+  "textures": [
+    {
+      "category": "base-color",
+      "platform": "windows",
+      "format": "R8G8B8A8_SRGB",
+      "layers": 1,
+      "width": 1024,
+      "height": 1024,
+      "mipmapped": true,
+      "bytes": 5592908,
+      "sha256": "63585635534b1a35d6b825a631c1326c6193a438468814a33efd10a67c4a8d7d",
+      "file": "base-color.windows.ktx2"
+    },
+    {
+      "category": "base-color",
+      "platform": "android",
+      "format": "ASTC_6x6_SRGB_BLOCK",
+      "layers": 1,
+      "width": 1024,
+      "height": 1024,
+      "mipmapped": true,
+      "bytes": 626752,
+      "sha256": "c4d0d65cfb957624c06bacac0da123b27cce74f6b968f3a696e970068e35a5aa",
+      "file": "base-color.android.ktx2"
+    },
+    {
+      "category": "normal",
+      "platform": "windows",
+      "format": "R8G8B8A8_UNORM",
+      "layers": 1,
+      "width": 1024,
+      "height": 1024,
+      "mipmapped": true,
+      "bytes": 5592908,
+      "sha256": "a345e2dd34938acf398a9c995fd020a2b5effb2663118169fe56b4d21e77ae1f",
+      "file": "normal.windows.ktx2"
+    },
+    {
+      "category": "normal",
+      "platform": "android",
+      "format": "ASTC_4x4_UNORM_BLOCK",
+      "layers": 1,
+      "width": 1024,
+      "height": 1024,
+      "mipmapped": true,
+      "bytes": 1398592,
+      "sha256": "6e43ca0cfcd803bf1df7183712501442795bfcb06c53e5c3be88c0560540ee01",
+      "file": "normal.android.ktx2"
+    },
+    {
+      "category": "orm",
+      "platform": "windows",
+      "format": "R8G8B8A8_UNORM",
+      "layers": 1,
+      "width": 1024,
+      "height": 1024,
+      "mipmapped": true,
+      "bytes": 5592908,
+      "sha256": "4718aab0110e740993dce62676ba1b2d70cea81576b91e0e801d3a3c5b4db511",
+      "file": "orm.windows.ktx2"
+    },
+    {
+      "category": "orm",
+      "platform": "android",
+      "format": "ASTC_6x6_UNORM_BLOCK",
+      "layers": 1,
+      "width": 1024,
+      "height": 1024,
+      "mipmapped": true,
+      "bytes": 626752,
+      "sha256": "7301dbcb51c0eb9bf4fc851ab5f56949b6439a2143d100f73588c38f735a8dd2",
+      "file": "orm.android.ktx2"
+    },
+    {
+      "category": "emissive",
+      "platform": "windows",
+      "format": "R8G8B8A8_SRGB",
+      "layers": 1,
+      "width": 1024,
+      "height": 1024,
+      "mipmapped": true,
+      "bytes": 5592908,
+      "sha256": "c642d3972a14bf477d88f2ecb34ffc177ad4dc6308dfe8f507af6033c292dd56",
+      "file": "emissive.windows.ktx2"
+    },
+    {
+      "category": "emissive",
+      "platform": "android",
+      "format": "ASTC_6x6_SRGB_BLOCK",
+      "layers": 1,
+      "width": 1024,
+      "height": 1024,
+      "mipmapped": true,
+      "bytes": 626752,
+      "sha256": "da5ee0baa4e6b84280a1b9ae077954c4658a4e7fff1da03212d220d282f9542a",
+      "file": "emissive.android.ktx2"
+    }
+  ]
+}

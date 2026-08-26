@@ -9,7 +9,9 @@ param(
     [string[]]$MetallicImage = @(),
     [string[]]$EmissiveImage = @(),
     [string[]]$ReviewedValidatorIssueCodes = @(),
-    [int]$TextureResolution = 512
+    [int]$TextureResolution = 512,
+    [switch]$PreserveAuthoredSockets,
+    [string]$RuntimeStatus = "development-only-license-unresolved"
 )
 
 $ErrorActionPreference = "Stop"
@@ -138,13 +140,18 @@ $runtimePath = Join-Path $outputRoot $runtimeName
 $blender = "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe"
 if (-not (Test-Path -LiteralPath $blender)) { throw "Blender 5.2 is required for audited tangent/socket conversion." }
 $temporaryPaths = [Collections.Generic.List[string]]::new()
-$socketGlb = Join-Path $outputRoot "conversion-with-socket.glb"
-$temporaryPaths.Add($socketGlb)
-# Blender Z-up -0.78 exports as glTF +Y-up -0.78, matching the hilt.
-& $blender --background --python (Join-Path $PSScriptRoot "add-gltf-socket.py") -- `
-    $sourcePath $socketGlb grip 0 0 -0.78
-if ($LASTEXITCODE -ne 0) { throw "Blender tangent/socket conversion failed." }
-Copy-Item -LiteralPath $socketGlb -Destination $runtimePath -Force
+if ($PreserveAuthoredSockets) {
+    Copy-Item -LiteralPath $sourcePath -Destination $runtimePath -Force
+} else {
+    $socketGlb = Join-Path $outputRoot "conversion-with-socket.glb"
+    $temporaryPaths.Add($socketGlb)
+    # Legacy development sword path retained for the Task 2 proof. Production
+    # held items arrive with reviewed exact-case sockets and use the generic path.
+    & $blender --background --python (Join-Path $PSScriptRoot "add-gltf-socket.py") -- `
+        $sourcePath $socketGlb grip 0 0 -0.78
+    if ($LASTEXITCODE -ne 0) { throw "Blender tangent/socket conversion failed." }
+    Copy-Item -LiteralPath $socketGlb -Destination $runtimePath -Force
+}
 
 $runtimeReportPath = Join-Path $outputRoot "validator-runtime.json"
 $runtimeReport = Invoke-Validator $runtimePath $runtimeReportPath $ReviewedValidatorIssueCodes
@@ -221,7 +228,7 @@ $sourceFile = Get-Item -LiteralPath $sourcePath
 $runtimeFile = Get-Item -LiteralPath $runtimePath
 $budgetReport = [ordered]@{
     schema = 1
-    status = "development-only-license-unresolved"
+    status = $RuntimeStatus
     source = [ordered]@{
         file = $sourceFile.Name
         bytes = $sourceFile.Length
@@ -253,6 +260,6 @@ if ([IO.Path]::GetFullPath($manifestPath) -ne [IO.Path]::GetFullPath($manifestDe
 foreach ($temporaryPath in $temporaryPaths) {
     if (Test-Path -LiteralPath $temporaryPath) { Remove-Item -LiteralPath $temporaryPath -Force }
 }
-Write-Output "Prepared development-only static RT asset: $runtimePath"
+Write-Output "Prepared static RT asset ($RuntimeStatus): $runtimePath"
 Write-Output "Validator reports: $sourceReportPath ; $runtimeReportPath"
 Write-Output "Runtime budget report: $budgetPath"

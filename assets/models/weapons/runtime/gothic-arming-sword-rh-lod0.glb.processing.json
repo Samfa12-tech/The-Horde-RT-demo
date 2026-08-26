@@ -1,0 +1,23 @@
+{
+  "kind": "sword",
+  "source": "sword-meshy7-ultra-refined-pbr.glb",
+  "runtime": "gothic-arming-sword-rh-lod0.glb",
+  "sourceTriangles": 2163154,
+  "runtimeTriangles": 11499,
+  "runtimeVertices": 11214,
+  "dimensionsMetres": [
+    0.2236979976296425,
+    0.04857284016907215,
+    1.0505316333437804
+  ],
+  "upAxis": "+Y",
+  "forwardAxis": "+Z",
+  "sockets": {
+    "Grip": [
+      0.0,
+      0.0,
+      0.135
+    ]
+  },
+  "processing": "PCA axis normalization, metre-scale normalization, reviewed Blender collapse remesh, preserved UV/material regions, generated tangents"
+}
