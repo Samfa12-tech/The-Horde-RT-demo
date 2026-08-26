@@ -63,10 +63,24 @@ float puddleMask(vec3 p)
 }
 
 #include "rt_hit_decode.glsl"
-float visibilityMask(vec3 origin, vec3 direction, float maxDistance, uint mask)
+vec3 dielectricBeerLambert(vec3 attenuationColor, float pathLength,
+                           float attenuationDistance);
+
+const int kMobileShadowInterfaces = 4;
+const int kHighShadowInterfaces = 8;
+
+vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
+                             float maxDistance, uint mask)
 {
     rayQueryEXT query;
     rayQueryInitializeEXT(query, topLevelAS, gl_RayFlagsNoOpaqueEXT, mask, origin, 0.0015, direction, max(maxDistance, 0.004));
+    int interfaceBudget = controls.waterQuality >= 1.5
+        ? kHighShadowInterfaces : kMobileShadowInterfaces;
+    int interfaceCount = 0;
+    uint openMaterial = 0xffffffffu;
+    float volumeEntryDistance = 0.0;
+    vec4 volumeAttenuation = vec4(1.0, 1.0, 1.0, 0.0);
+    vec3 transmittance = vec3(1.0);
     while (rayQueryProceedEXT(query))
     {
         if (rayQueryGetIntersectionTypeEXT(query, false) != gl_RayQueryCandidateIntersectionTriangleEXT)
@@ -81,12 +95,107 @@ float visibilityMask(vec3 origin, vec3 direction, float maxDistance, uint mask)
             int material = int(worldSurfaces.codes[primitive] & 0xffu);
             transparentWorldPane = material == kMaterialClearGlass || material == kMaterialWater;
         }
-        if (!transparentWorldPane)
+        if (transparentWorldPane) continue;
+
+        bool transparentStaticMaterial = false;
+        RtInstanceMetadata candidateInstance = rtInstances.values[instance];
+        if ((candidateInstance.flags & kRtInstanceFlagStaticPbr) != 0u)
+        {
+            uint geometryIndex = rayQueryGetIntersectionGeometryIndexEXT(query, false);
+            if (geometryIndex < candidateInstance.primitiveCount)
+            {
+                RtPrimitiveMetadata candidatePrimitive = rtPrimitives.values[
+                    candidateInstance.primitiveBase + geometryIndex];
+                RtMaterialGpu candidateMaterial =
+                    rtMaterials.values[candidatePrimitive.materialIndex];
+                bool materialTransmits =
+                    (candidateMaterial.materialFlags.x & kRtMaterialFlagTransmission) != 0u &&
+                    candidateMaterial.metallicRoughnessOcclusionTransmission.w > 0.001;
+                bool metallicBlocker =
+                    candidateMaterial.metallicRoughnessOcclusionTransmission.x > 0.5;
+                if (materialTransmits && !metallicBlocker)
+                {
+                    if (interfaceCount >= interfaceBudget)
+                    {
+                        transmittance *= vec3(0.08);
+                        break;
+                    }
+                    ++interfaceCount;
+                    transparentStaticMaterial = true;
+                    float transmission = clamp(
+                        candidateMaterial.metallicRoughnessOcclusionTransmission.w,
+                        0.0, 1.0);
+                    bool thinWall = (candidateMaterial.materialFlags.x &
+                        kRtMaterialFlagThinWall) != 0u;
+                    float candidateDistance =
+                        rayQueryGetIntersectionTEXT(query, false);
+                    if (thinWall)
+                    {
+                        transmittance *= transmission * mix(
+                            vec3(1.0), candidateMaterial.baseColorFactor.rgb, 0.12);
+                    }
+                    else if (openMaterial == candidatePrimitive.materialIndex)
+                    {
+                        float pathLength = max(
+                            candidateDistance - volumeEntryDistance, 0.0);
+                        transmittance *= dielectricBeerLambert(
+                            volumeAttenuation.rgb, pathLength,
+                            volumeAttenuation.a);
+                        openMaterial = 0xffffffffu;
+                    }
+                    else if (openMaterial == 0xffffffffu)
+                    {
+                        openMaterial = candidatePrimitive.materialIndex;
+                        volumeEntryDistance = candidateDistance;
+                        volumeAttenuation = vec4(
+                            candidateMaterial.attenuationColor.rgb,
+                            candidateMaterial.iorThicknessAttenuationDistance.z);
+                        transmittance *= transmission;
+                    }
+                    else
+                    {
+                        transmittance *= vec3(0.08);
+                        break;
+                    }
+                }
+            }
+        }
+        if (!transparentStaticMaterial)
         {
             rayQueryConfirmIntersectionEXT(query);
         }
     }
-    return rayQueryGetIntersectionTypeEXT(query, true) == gl_RayQueryCommittedIntersectionNoneEXT ? 1.0 : 0.0;
+    if (rayQueryGetIntersectionTypeEXT(query, true) !=
+        gl_RayQueryCommittedIntersectionNoneEXT)
+    {
+        return vec3(0.0);
+    }
+    return clamp(transmittance, vec3(0.0), vec3(1.0));
+}
+
+float visibilityMask(vec3 origin, vec3 direction, float maxDistance, uint mask)
+{
+    rayQueryEXT query;
+    rayQueryInitializeEXT(query, topLevelAS, gl_RayFlagsNoOpaqueEXT, mask,
+                          origin, 0.0015, direction, max(maxDistance, 0.004));
+    while (rayQueryProceedEXT(query))
+    {
+        if (rayQueryGetIntersectionTypeEXT(query, false) !=
+            gl_RayQueryCandidateIntersectionTriangleEXT)
+            continue;
+        int instance = int(rayQueryGetIntersectionInstanceCustomIndexEXT(query, false));
+        int primitive = rayQueryGetIntersectionPrimitiveIndexEXT(query, false);
+        bool transparentWorldPane = instance == kWaterfallInstance;
+        if (instance == 0)
+        {
+            int material = int(worldSurfaces.codes[primitive] & 0xffu);
+            transparentWorldPane = material == kMaterialClearGlass ||
+                                   material == kMaterialWater;
+        }
+        if (!transparentWorldPane) rayQueryConfirmIntersectionEXT(query);
+    }
+    return rayQueryGetIntersectionTypeEXT(query, true) ==
+        gl_RayQueryCommittedIntersectionNoneEXT ? 1.0 : 0.0;
 }
 
 vec3 offsetRayOrigin(HitInfo h, vec3 direction)
@@ -105,6 +214,13 @@ float visibility(vec3 origin, vec3 direction, float maxDistance)
     // Instance 16 is reflection-only for primary rays, but participates here so
     // the player's head casts real shadows. Instance 17 is the moving roof slab.
     return visibilityMask(origin, direction, maxDistance, 0x35u);
+}
+
+float transparentVisibility(vec3 origin, vec3 direction, float maxDistance)
+{
+    vec3 transmittance = shadowTransmittanceMask(
+        origin, direction, maxDistance, 0x35u);
+    return dot(transmittance, vec3(0.2126, 0.7152, 0.0722));
 }
 
 void activeLocalLight(out vec3 position, out vec3 color, out float strength);
@@ -278,14 +394,14 @@ vec3 shadeOpaqueDirect(HitInfo h, vec3 rayDirection, bool dualVisibility,
     float sampleDistance = length(sampleVector);
     vec3 sampleDirection = sampleVector / max(sampleDistance, 0.001);
     localVisibility = localStrength > 0.001
-        ? visibility(offsetRayOrigin(h, sampleDirection), sampleDirection,
+        ? transparentVisibility(offsetRayOrigin(h, sampleDirection), sampleDirection,
                      sampleDistance - 0.02) : 0.0;
     if (dualVisibility && localStrength > 0.001)
     {
         vec3 otherVector = localPosition + areaOffsets[1 - sampleIndex] - h.position;
         float otherDistance = length(otherVector);
         vec3 otherDirection = otherVector / max(otherDistance, 0.001);
-        localVisibility = 0.5 * (localVisibility + visibility(
+        localVisibility = 0.5 * (localVisibility + transparentVisibility(
             offsetRayOrigin(h, otherDirection), otherDirection, otherDistance - 0.02));
     }
 
@@ -294,7 +410,7 @@ vec3 shadeOpaqueDirect(HitInfo h, vec3 rayDirection, bool dualVisibility,
     vec3 skyRadiance;
     float skyGain;
     activeSkyLight(h.position, sampleIndex, skyDirection, skyDistance, skyRadiance, skyGain);
-    skyVisibility = visibility(offsetRayOrigin(h, skyDirection), skyDirection,
+    skyVisibility = transparentVisibility(offsetRayOrigin(h, skyDirection), skyDirection,
                                skyDistance - 0.02) * skyGain;
     if (dualVisibility)
     {
@@ -304,7 +420,7 @@ vec3 shadeOpaqueDirect(HitInfo h, vec3 rayDirection, bool dualVisibility,
         float otherSkyGain;
         activeSkyLight(h.position, 1 - sampleIndex, otherSkyDirection,
                        otherSkyDistance, otherSkyRadiance, otherSkyGain);
-        float otherVisibility = visibility(offsetRayOrigin(h, otherSkyDirection),
+        float otherVisibility = transparentVisibility(offsetRayOrigin(h, otherSkyDirection),
                                            otherSkyDirection,
                                            otherSkyDistance - 0.02) * otherSkyGain;
         skyVisibility = 0.5 * (skyVisibility + otherVisibility);

@@ -689,6 +689,13 @@ int main()
                       raygenSource.find("kRtMaterialFlagThinWall") != std::string::npos &&
                       raygenSource.find("shadeBoundedDielectric(nextHit") == std::string::npos,
                       "generic dielectric transport must use actual hit distance, explicit phone/high budgets, thin-wall ABI intent, and one terminal non-recursive evaluator");
+        ok &= Require(raygenSource.find("vec3 shadowTransmittanceMask(") != std::string::npos &&
+                      raygenSource.find("const int kMobileShadowInterfaces = 4;") != std::string::npos &&
+                      raygenSource.find("const int kHighShadowInterfaces = 8;") != std::string::npos &&
+                      raygenSource.find("candidateMaterial.metallicRoughnessOcclusionTransmission.x") != std::string::npos &&
+                      raygenSource.find("dielectricBeerLambert(") != std::string::npos &&
+                      raygenSource.find("if (interfaceCount >= interfaceBudget)") != std::string::npos,
+                      "straight shadow queries must transmit through finite generic dielectric layers while keeping metallic blockers and mobile/high interface ceilings");
         ok &= Require(waterPrimary.find("transmittedHit.t += h.t + waterPathLength;") !=
                           std::string::npos &&
                       waterPrimary.find("float reflectedLocalDistance = reflectedHit.hit ? reflectedHit.t : 12.0;") !=
@@ -737,7 +744,7 @@ int main()
         ok &= Require(!opaqueDirect.empty() &&
                       opaqueDirect.find("localVisibility = localStrength > 0.001") !=
                           std::string::npos &&
-                      opaqueDirect.find("skyVisibility = visibility(") != std::string::npos &&
+                      opaqueDirect.find("skyVisibility = transparentVisibility(") != std::string::npos &&
                       !opaquePrimary.empty() &&
                       opaquePrimary.find("shadeOpaqueDirect(h, rayDirection, maxWorkload") !=
                           std::string::npos &&
