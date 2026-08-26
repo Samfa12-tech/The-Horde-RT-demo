@@ -363,7 +363,14 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
     h.base = vec3(0.0);
     h.metallic = 0.0;
     h.reflectivity = 0.0;
+    h.roughness = 1.0;
     h.emissive = 0.0;
+    h.transmission = 0.0;
+    h.ior = 1.5;
+    h.thickness = 0.0;
+    h.attenuationDistance = 0.0;
+    h.attenuationColor = vec3(1.0);
+    h.materialFlags = 0u;
 
     rayQueryEXT query;
     uint rayFlags = (ignoreWater || ignorePlayerNearFace)
@@ -477,7 +484,16 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
                     staticMaterial.metallicRoughnessOcclusionTransmission.x, 0.0, 1.0);
                 float roughness = clamp(orm.g *
                     staticMaterial.metallicRoughnessOcclusionTransmission.y, 0.04, 1.0);
+                h.roughness = roughness;
                 h.reflectivity = mix(0.04, 0.92, h.metallic) * (1.0 - roughness * 0.45);
+                h.transmission = clamp(
+                    staticMaterial.metallicRoughnessOcclusionTransmission.w, 0.0, 1.0);
+                h.ior = clamp(staticMaterial.iorThicknessAttenuationDistance.x, 1.0, 4.0);
+                h.thickness = max(staticMaterial.iorThicknessAttenuationDistance.y, 0.0);
+                h.attenuationDistance = staticMaterial.iorThicknessAttenuationDistance.z;
+                h.attenuationColor = clamp(staticMaterial.attenuationColor.rgb,
+                                            vec3(0.0), vec3(1.0));
+                h.materialFlags = staticMaterial.materialFlags.x;
                 vec3 emission = emissiveSample * staticMaterial.emissiveFactorStrength.rgb *
                                 staticMaterial.emissiveFactorStrength.w;
                 h.emissive = max(emission.r, max(emission.g, emission.b));

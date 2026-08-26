@@ -502,6 +502,7 @@ int main()
             lightingSource +
             fireSource +
             ReadTextFile(raygenDirectory / "include/rt_dielectric_common.glsl") +
+            ReadTextFile(raygenDirectory / "include/rt_dielectric_transport.glsl") +
             ReadTextFile(raygenDirectory / "include/rt_atmosphere.glsl");
         const std::string sceneSource =
             ReadTextFile(root / "src/vulkan/raytracing/PresentableTinyRtScene.cpp");
@@ -678,6 +679,16 @@ int main()
                       waterPrimary.find("reflected = shadeOpaqueSecondary(reflectedHit, reflectionDirection);") !=
                           std::string::npos,
                       "reflected water must use bounded shared opaque direct lighting without the waterfall-only secondary shader");
+        ok &= Require(raygenSource.find("vec3 shadeBoundedDielectric(") != std::string::npos &&
+                      raygenSource.find("const int kMobileDielectricInterfaces = 4;") != std::string::npos &&
+                      raygenSource.find("const int kHighDielectricInterfaces = 8;") != std::string::npos &&
+                      raygenSource.find("const int kMobileDielectricVolumes = 2;") != std::string::npos &&
+                      raygenSource.find("const int kHighDielectricVolumes = 4;") != std::string::npos &&
+                      raygenSource.find("segmentLength = currentHit.t;") != std::string::npos &&
+                      raygenSource.find("shadeTerminalOpaqueEmissive") != std::string::npos &&
+                      raygenSource.find("kRtMaterialFlagThinWall") != std::string::npos &&
+                      raygenSource.find("shadeBoundedDielectric(nextHit") == std::string::npos,
+                      "generic dielectric transport must use actual hit distance, explicit phone/high budgets, thin-wall ABI intent, and one terminal non-recursive evaluator");
         ok &= Require(waterPrimary.find("transmittedHit.t += h.t + waterPathLength;") !=
                           std::string::npos &&
                       waterPrimary.find("float reflectedLocalDistance = reflectedHit.hit ? reflectedHit.t : 12.0;") !=

@@ -84,7 +84,14 @@ struct HitInfo
     vec3 base;
     float metallic;
     float reflectivity;
+    float roughness;
     float emissive;
+    float transmission;
+    float ior;
+    float thickness;
+    float attenuationDistance;
+    vec3 attenuationColor;
+    uint materialFlags;
 };
 
 const vec3 kMoonDirection = vec3(-0.180027, 0.930140, -0.320048);

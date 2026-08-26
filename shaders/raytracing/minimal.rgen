@@ -5,6 +5,7 @@
 #include "include/rt_scene_abi.glsl"
 #include "include/rt_lighting.glsl"
 #include "include/rt_dielectric_common.glsl"
+#include "include/rt_dielectric_transport.glsl"
 #include "include/rt_atmosphere.glsl"
 
 void main()

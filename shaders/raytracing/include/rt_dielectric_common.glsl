@@ -1,3 +1,5 @@
+vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection);
+
 float dielectricSchlickFromR0(float incidentCosine, float r0)
 {
     float cosine = clamp(incidentCosine, 0.0, 1.0);
@@ -277,6 +279,12 @@ vec3 shadePrimary(HitInfo h, vec3 rayDirection)
     if (!h.hit || h.emissive > 0.0)
     {
         return shadeOpaquePrimary(h, rayDirection);
+    }
+
+    if (h.transmission > 0.001 &&
+        (h.materialFlags & kRtMaterialFlagTransmission) != 0u)
+    {
+        return shadeBoundedDielectric(h, rayDirection);
     }
 
     bool isThinGlass = h.instance == 0 && h.material == kMaterialClearGlass;
