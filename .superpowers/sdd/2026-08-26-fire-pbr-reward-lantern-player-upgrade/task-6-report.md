@@ -476,3 +476,92 @@ The exact unsigned, unpublishable Android validation artifact is:
 Final `adb devices -l` returned an empty device list. No installation or phone-runtime evidence is claimed; exact `SM-S948B` acceptance remains the existing hard Task 9 gate. Hands-on perceived glass quality remains an owner boundary. Task 5's two-cut combo owner audio/haptic replay remains separately open and unchanged.
 
 Audio/haptic manual revalidation required: NO — this milestone changes material transport and shader visibility only; audio/haptic state, event timing, playback, spatialisation, and feedback semantics are unchanged.
+
+
+## Fix Round 4 — runtime-float transform and weld-domain safety parity
+
+Date: 2026-08-27 (Australia/Sydney)
+
+This strictly numeric round supersedes Fix Round 3's claims about offline float conversion, transform arithmetic, bucket origin, and coordinate-range safety. It does not change shaders, generated ABI, descriptor bindings, the 124-byte push block, dual-pipeline selection, glass transport, capture routes, or diagnostics.
+
+### Commits and behavioral RED evidence
+
+- `ac59543` — `test: define dielectric numeric parity and safety`
+- `6a5ea7e` — `fix: align dielectric numeric domains`
+- `0911fde` — `chore: ignore generated Python bytecode`
+
+The shared tracked RED contracts demonstrated the reviewed defects before implementation:
+
+- the old offline bucket rule rejected the exact representable value immediately inside the negative `-2^63` cell boundary;
+- the old runtime accepted GLBs whose first representable baked float crossed either positive or negative safe-domain boundary;
+- a closed shell split between cgltf-equivalent parent/child TRS and matrix paths failed offline with eight boundary edges because Python regrouped the float expressions;
+- positive `1e-50` `metresPerUnit` rounded to float32 zero offline but was not rejected at the manifest boundary;
+- runtime NaN/+infinity/-infinity POSITION data reached the later topology bucket path after bounds processing instead of an early finite-domain rejection;
+- the runtime NaN manifest classification did not match the audited metres-per-unit rejection.
+
+These are behavioral/reference tests against real GLBs, the runtime loader, the offline CLI, and one exact shared numeric case file; none are source-string assertions.
+
+### Exact runtime-float transform contract
+
+The complete relevant cgltf implementation in `third_party/cgltf/cgltf.h` was read before the offline implementation changed. Offline validation now mirrors it expression-for-expression:
+
+1. JSON translation, rotation, scale, and matrix inputs round to float32 exactly as cgltf storage does.
+2. `cgltf_node_transform_local` TRS products, left-associated additions/subtractions, and output scales round after every `cgltf_float` operation; Python does not regroup quaternion terms or use implicit double/FMA arithmetic.
+3. `cgltf_node_transform_world` begins with the node-local matrix, applies each parent in ancestor order with the same three-product column expressions, then performs the three separate parent-translation additions.
+4. StaticMeshAsset point baking is matched in the original order: each matrix/point product is multiplied by the runtime-float `metresPerUnit`, the world translation is independently multiplied into metres, and the four terms are added left-associatively in float32.
+5. `metresPerUnit` itself first converts to exact runtime float32 and is then revalidated as finite and greater than zero. Positive underflow, runtime-float overflow, and NaN therefore have the same manifest classification as runtime.
+
+The large legal transformed fixture uses paired parent and child transforms: one half supplies rotated/scaled/translated TRS, and the other supplies the exact cgltf float32 matrices. Runtime asserts the two baked world matrices are bit-identical. Runtime and offline then both accept the joined shell, and offline reports exactly one canonical closed/manifold component at the 10 micrometre maximum weld clamp.
+
+### Finite exclusive cell-domain contract
+
+Every runtime baked POSITION coordinate is now checked before it contributes to global bounds. Thick-material aggregation defensively repeats the same check before its material bounds. Offline checks transformed thick POSITION data before `min`, `max`, lexicographic ordering, or bucket conversion. Diagnostics name material, node, mesh where available, and primitive, identify the finite deterministic weld domain, and prescribe keeping baked metre-space coordinates strictly inside the boundary.
+
+The shared constants are the 0.1 micrometre minimum tolerance, 10 micrometre maximum tolerance, and the exactly representable hexadecimal-double exclusive limit `0x1p63`. A coordinate is safe only when its minimum-tolerance scaled value is finite and strictly greater than `-2^63` and strictly less than `2^63`. The same exact predicate is repeated immediately before every floor/int64 conversion; it is not derived from a rounded `double(INT64_MAX - 1)` value.
+
+Buckets now use a fixed zero metre-space origin and signed int64 cells. Neighbor traversal guards both `INT64_MIN` and `INT64_MAX` before addition. This grid shift does not change the established geometry rule: all 27 adjacent/current buckets are still searched, welding still requires explicit Euclidean distance no greater than tolerance, only canonical representatives enter buckets, and nearest representative plus stable id remains the tie rule. The prior seam, diagonal, reorder, proximity-chain, 50 micrometre pane, split-shell, multi-shell, winding, and negative-transform fixtures all retain their outcomes.
+
+The shared exact-double file covers `nextafter`, exact, and next-after-outside values at both signed boundaries. The GLB suite additionally covers the nearest runtime-float POSITION immediately inside, the first runtime-float crossing, and an outside value on both signs. Inside shells pass as one component; crossing/outside shells reject before bounds; NaN, positive infinity, and negative infinity reject with the same finite-domain classification.
+
+### Focused safety and parity verification
+
+Final implementation-head focused tests passed:
+
+- Debug runtime plus offline topology CTests: 2/2 in 11.52 s;
+- Release runtime plus offline topology CTests: 2/2 in 6.45 s;
+- direct offline numeric/reference and full fixture suite: pass;
+- exact runtime TRS/matrix world-bit assertion and shared six-case cell boundary file: pass.
+
+MSVC AddressSanitizer was available. A separate Debug ASan build ran the complete static-GLB asset contract, including NaN/+infinity/-infinity POSITION and all six boundary GLBs, with no sanitizer report. The normal Debug configuration also retained its runtime checks; there is no pre-floor invalid float-to-int conversion on either route.
+
+### Shader, capture, Host, package, and device invariants
+
+Fresh normal Host run `reports/foundation-runs/run-20260827-034316` passed at exact commit `0911fde17c147e236cde14a97b68a15d3846a804`:
+
+- shader freshness, compiler strategy, ABI generator, and all negative safety gates: pass;
+- Windows Debug: 27/27 in 114.85 s;
+- Windows Release: 27/27 in 66.79 s;
+- deterministic Windows captures: 13 honestly presented RT frames;
+- independent literal SHA-256 comparison with reviewed Task 5 `run-20260826-213806`: exact 13/13, not a channel-tolerance result;
+- all six hidden-route dielectric counters: zero;
+- hidden aggregate timing: 6.050200 ms median versus 6.050300 ms baseline (`-0.002%`), GPU RT-command-buffer average 1.228823 ms over 155 samples;
+- Android clean Debug, unsigned Release, and Release lint: `BUILD SUCCESSFUL in 3m 17s`, 100 actionable tasks (98 executed, two up-to-date);
+- Windows/Android package and dielectric-fixture licence gate: pass;
+- evidence hashing: pass; worktree status before and after the gate: clean.
+
+Shader source, includes, generated ABI, and embedded artifacts have no diff from the reviewed pre-round head. Fresh measurements remain:
+
+| Variant | Bytes | Instructions | Branch ops | Loops | Selections | Functions/calls | Static query sites | SHA-256 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| generic | 789,228 | 43,514 | 6,263 | 89 | 2,556 | 1 / 0 | 29 | `f29f2f537883d9e5deb5d56ad74a1cf35b3e88ed16f773e26e8c5092c704f594` |
+| legacy-inactive | 778,136 | 42,847 | 6,155 | 89 | 2,520 | 1 / 0 | 29 | `ac99c30e6f857593df534567a4b5c9efadddc6d8ff92c47b7e033d836edc6ed4` |
+
+The exact unsigned, unpublishable Android validation artifact is:
+
+- `reports/foundation-runs/run-20260827-034316/artifacts/Horde-Lantern-RT-validation-20260827-034316-Android-UNSIGNED-DO-NOT-PUBLISH.apk`
+- 74,611,276 bytes
+- SHA-256 `19560fc25cdf751c712fab3a2dc48336cb5189b5342cf5043edef9068e2469c8`
+
+Final `adb devices -l` returned an empty device list. No artifact was installed, and no phone parity, matched Mobile/High 75%, separate 100%, warm timing/thermal/GPU-power/resources, or Home/resume evidence is claimed. Exact `SM-S948B` Task 6 acceptance remains the hard Task 9 gate. Hands-on perceived glass quality remains an owner boundary. Task 5's two-cut combo owner audio/haptic replay remains separately open and unchanged.
+
+Audio/haptic manual revalidation required: NO — this milestone changes material transport and shader visibility only; audio/haptic state, event timing, playback, spatialisation, and feedback semantics are unchanged.
