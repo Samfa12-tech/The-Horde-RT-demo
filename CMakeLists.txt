@@ -32,10 +32,11 @@ set(HORDE_RT_SOURCE_FILES)
 foreach(source IN LISTS HORDE_RT_CORE_RELATIVE_SOURCES)
     list(APPEND HORDE_RT_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/${source}")
 endforeach()
-list(FILTER HORDE_RT_SOURCE_FILES EXCLUDE REGEX "/gameplay/simulation/GameSimulation\\.cpp$")
+list(FILTER HORDE_RT_SOURCE_FILES EXCLUDE REGEX "/gameplay/(simulation/GameSimulation|items/HeldItemState)\\.cpp$")
 
 add_library(horde_gameplay_simulation STATIC
     src/gameplay/simulation/GameSimulation.cpp
+    src/gameplay/items/HeldItemState.cpp
 )
 target_include_directories(horde_gameplay_simulation
     PUBLIC
@@ -124,6 +125,7 @@ if(BUILD_TESTING)
         src/gameplay/items/HeldItemKinematics.cpp
         src/vulkan/raytracing/HeldItemRenderSlot.cpp
     )
+    target_link_libraries(horde_rt_held_item_socket_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_held_item_socket_tests COMMAND horde_rt_held_item_socket_tests)
 
     add_executable(horde_rt_development_static_asset_tests tests/DevelopmentStaticAssetTests.cpp)

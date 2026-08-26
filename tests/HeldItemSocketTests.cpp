@@ -1,5 +1,7 @@
 #include "gameplay/items/HeldItemKinematics.h"
+#include "gameplay/items/HeldLightState.h"
 #include "gameplay/items/HeldItemState.h"
+#include "gameplay/simulation/GameSimulation.h"
 #include "vulkan/raytracing/HeldItemRenderSlot.h"
 
 #include <array>
@@ -165,6 +167,68 @@ void TestRenderSlotConvertsGenericTransformWithoutItemBranches()
           "generic held-item render slot must preserve matrix translation in Vulkan 3x4 order");
 }
 
+void TestFlameAndLightSocketsFollowTheComposedItem()
+{
+    const HeldItemTransform worldFromTorch = Translation(10.0f, 2.0f, -4.0f);
+    const HeldItemTransform itemFromFlame = Translation(0.0f, 0.7f, 0.0f);
+    const HeldItemTransform itemFromLight = Translation(0.0f, 0.8f, 0.1f);
+    horde::gameplay::items::HeldLightState light{};
+    std::string diagnostic;
+    Check(horde::gameplay::items::ComposeHeldLightState(
+              worldFromTorch, itemFromFlame, itemFromLight, 0.65f, light, diagnostic),
+          "rigid Flame and Light sockets must compose from the generic item transform");
+    Check(Near(light.worldFromFlame[12], 10.0f) && Near(light.worldFromFlame[13], 2.7f) &&
+              Near(light.worldFromLight[13], 2.8f) && Near(light.worldFromLight[14], -3.9f) &&
+              Near(light.flameStrength, 0.65f) && light.active,
+          "engine flame and light state must follow authored sockets without flame geometry");
+}
+
+void TestSimulationOwnsResetAndCheckpointParentState()
+{
+    horde::gameplay::simulation::GameSimulation simulation;
+    Check(simulation.Snapshot().heldItems[0].parentMode == HeldItemParentMode::HandSocket &&
+              simulation.Snapshot().heldItems[1].parentMode == HeldItemParentMode::HandSocket,
+          "fresh shared simulation must author both held attachments");
+    Check(simulation.ApplyShowcaseCheckpoint(4),
+          "the original post-drop showcase checkpoint must import");
+    Check(simulation.Snapshot().heldItems[0].parentMode ==
+              HeldItemParentMode::AuthoredWorldTrajectory &&
+              simulation.Snapshot().heldItems[0].detached &&
+              simulation.Snapshot().heldItems[1].parentMode == HeldItemParentMode::HandSocket,
+          "post-drop checkpoint must import torch parent state through shared simulation");
+    simulation.ResetRoute();
+    Check(simulation.Snapshot().heldItems[0].parentMode == HeldItemParentMode::HandSocket &&
+              !simulation.Snapshot().heldItems[0].detached,
+          "shared route reset must reattach the original torch");
+}
+
+void TestSharedKinematicsOwnsWallDepthHandsAndSwordPose()
+{
+    horde::gameplay::items::HeldItemKinematicsInput input;
+    input.cameraX = 0.0f;
+    input.cameraZ = 1.85f;
+    input.cameraYawRadians = 0.0f;
+    input.walkTime = 0.0f;
+    input.walkAmount = 0.0f;
+    const auto idle = horde::gameplay::items::EvaluateHeldItemKinematics(input);
+    Check(Near(idle.heldPropDepth, 0.975f) &&
+              Near(idle.leftHandLocal[0], -0.34f) && Near(idle.leftHandLocal[1], -0.40f) &&
+              Near(idle.leftHandLocal[2], idle.heldPropDepth) &&
+              Near(idle.rightHandLocal[0], 0.34f) && Near(idle.rightHandLocal[1], -0.41f) &&
+              Near(idle.rightHandLocal[2], idle.heldPropDepth),
+          "shared kinematics must own the unchanged wall-aware idle hand targets");
+
+    input.torchFailure.leftArmLowerBlend = 1.0f;
+    input.playerCombat.action = horde::gameplay::PlayerCombatAction::ParryActive;
+    const auto loweredAndParrying = horde::gameplay::items::EvaluateHeldItemKinematics(input);
+    Check(Near(loweredAndParrying.leftHandLocal[0], -0.31f) &&
+              Near(loweredAndParrying.leftHandLocal[1], -0.92f) &&
+              Near(loweredAndParrying.leftHandLocal[2], 0.27f) &&
+              Near(loweredAndParrying.rightHandLocal[0], -0.20f) &&
+              Near(loweredAndParrying.swordRadians, -0.82f),
+          "torch lowering and sword parry must share the authored hand-target evaluator");
+}
+
 } // namespace
 
 int main()
@@ -177,6 +241,9 @@ int main()
     TestTorchDetachesOnceWithTransformContinuity();
     TestResetAndCheckpointImportRestoreParentContracts();
     TestRenderSlotConvertsGenericTransformWithoutItemBranches();
+    TestFlameAndLightSocketsFollowTheComposedItem();
+    TestSimulationOwnsResetAndCheckpointParentState();
+    TestSharedKinematicsOwnsWallDepthHandsAndSwordPose();
     if (failures == 0)
     {
         std::cout << "Held-item socket contracts passed.\n";

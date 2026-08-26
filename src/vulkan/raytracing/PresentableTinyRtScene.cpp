@@ -1,5 +1,7 @@
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
 
+#include "gameplay/items/HeldItemKinematics.h"
+
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -206,47 +208,13 @@ PlayerWeaponRenderPose EvaluatePlayerWeaponRenderPose(
     const float swordSwingRadians,
     const float heldPropDepth)
 {
-    using PlayerAction = horde::gameplay::PlayerCombatAction;
-    float parryBlend = 0.0f;
-    switch (playerCombat.action)
-    {
-    case PlayerAction::ParryStartup:
-        parryBlend = std::clamp(playerCombat.actionTime / 0.04f, 0.0f, 1.0f);
-        break;
-    case PlayerAction::ParryActive:
-        parryBlend = 1.0f;
-        break;
-    case PlayerAction::ParryRecovery:
-        parryBlend = 1.0f - std::clamp(playerCombat.actionTime / 0.24f, 0.0f, 1.0f);
-        break;
-    default:
-        break;
-    }
-    parryBlend = parryBlend * parryBlend * (3.0f - 2.0f * parryBlend);
-    const float successJolt = playerCombat.reaction == horde::gameplay::CombatReaction::Parried
-        ? std::clamp(playerCombat.reactionTime / 0.12f, 0.0f, 1.0f)
-        : 0.0f;
-    const float swingAmount = std::clamp(-swordSwingRadians / 1.12f, 0.0f, 1.0f);
-    const float smoothSwing = swingAmount * swingAmount * (3.0f - 2.0f * swingAmount);
-    const std::array<float, 3u> swingHand{{
-        0.34f + (-0.08f - 0.34f) * smoothSwing,
-        -0.41f + (-0.47f + 0.41f) * smoothSwing,
-        heldPropDepth + (std::min(heldPropDepth, 1.00f) - heldPropDepth) * smoothSwing}};
-    const std::array<float, 3u> parryHand{{
-        -0.20f + 0.055f * successJolt,
-        -0.29f + 0.025f * successJolt,
-        std::min(heldPropDepth, 0.90f)}};
-
-    PlayerWeaponRenderPose pose;
-    for (std::size_t axis = 0u; axis < pose.rightHandLocal.size(); ++axis)
-    {
-        pose.rightHandLocal[axis] = swingHand[axis] +
-            (parryHand[axis] - swingHand[axis]) * parryBlend;
-    }
-    pose.swordRadians = swordSwingRadians + parryBlend * (-0.82f + 0.14f * successJolt);
-    pose.parryBlend = parryBlend;
-    pose.successJolt = successJolt;
-    return pose;
+    const horde::gameplay::items::HeldSwordPose sharedPose =
+        horde::gameplay::items::EvaluateHeldSwordPose(
+            playerCombat, swordSwingRadians, heldPropDepth);
+    return {sharedPose.rightHandLocal,
+            sharedPose.swordRadians,
+            sharedPose.parryBlend,
+            sharedPose.successJolt};
 }
 
 PresentableTinyRtScene::~PresentableTinyRtScene()
@@ -3097,28 +3065,21 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             xAxis[2] * radius, yAxis[2] * radius, zAxis[2] * length, start[2]}};
     };
 
-    const float movement = std::max(std::clamp(walkAmount, 0.0f, 1.0f), 0.2f);
     constexpr float torchScale = 0.56f;
-    const float torchSway = std::sin(walkTime * 6.2f) * 0.035f * movement;
-    const float torchBob = std::abs(std::sin(walkTime * 6.2f)) * 0.025f * movement;
-    // Held props are authored about a metre in front of the camera. Sample the
-    // shared route collision union along the horizontal view direction and tuck
-    // both hands back before that reach crosses a wall or preserved obstacle.
-    // This keeps the physical BLAS props on the player's side of masonry.
-    const float heldPropDepth = horde::gameplay::ComputeShowcaseHeldPropDepth(
-        cameraX, cameraZ, bodyForward[0], bodyForward[2]);
-    // Keep the visible grip line above the bottom crop and far enough forward
-    // that the held props read at a natural first-person scale on a tall phone.
-    const Vec3 leftShoulderLocal{-0.25f, -0.44f + lowerBodyPose.pelvisBob * 0.35f, 0.39f - lowerBodyPose.leftStride * 0.018f};
-    const Vec3 heldLeftHandLocal{-0.34f - torchSway, -0.40f + torchBob, heldPropDepth};
-    const Vec3 loweredLeftHandLocal{-0.31f, -0.92f, 0.27f};
-    const Vec3 leftHandLocal = lerp(heldLeftHandLocal,
-                                    loweredLeftHandLocal,
-                                    std::clamp(torchFailure.leftArmLowerBlend, 0.0f, 1.0f));
-    const PlayerWeaponRenderPose weaponPose = EvaluatePlayerWeaponRenderPose(
-        playerCombat, combat.swordSwingRadians, heldPropDepth);
-    const Vec3 rightShoulderLocal{0.25f, -0.44f + lowerBodyPose.pelvisBob * 0.35f, 0.39f + lowerBodyPose.leftStride * 0.018f};
-    const Vec3 rightHandLocal = weaponPose.rightHandLocal;
+    const horde::gameplay::items::HeldItemKinematicsState heldKinematics =
+        horde::gameplay::items::EvaluateHeldItemKinematics({
+            cameraX,
+            cameraZ,
+            cameraYaw,
+            walkTime,
+            walkAmount,
+            torchFailure,
+            playerCombat,
+            combat.swordSwingRadians});
+    const Vec3 leftShoulderLocal = heldKinematics.leftShoulderLocal;
+    const Vec3 leftHandLocal = heldKinematics.leftHandLocal;
+    const Vec3 rightShoulderLocal = heldKinematics.rightShoulderLocal;
+    const Vec3 rightHandLocal = heldKinematics.rightHandLocal;
     const Vec3 leftElbowLocal = solveElbow(leftShoulderLocal, leftHandLocal, 0.53f, 0.53f, Vec3{-1.0f, -0.15f, 0.08f});
     const Vec3 rightElbowLocal = solveElbow(rightShoulderLocal, rightHandLocal, 0.53f, 0.53f, Vec3{1.0f, -0.20f, 0.10f});
     const Vec3 leftShoulder = toWorld(leftShoulderLocal);
@@ -3179,7 +3140,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                                 std::clamp(torchFailure.fallProgress, 0.0f, 1.0f));
     }
 
-    const float swordPoseRadians = weaponPose.swordRadians;
+    const float swordPoseRadians = heldKinematics.swordRadians;
     const float swordCos = std::cos(swordPoseRadians);
     const float swordSin = std::sin(swordPoseRadians);
     const Vec3 swordColumnX = scaled(add(scaled(viewRight, swordCos), scaled(viewUp, swordSin)), torchScale);

@@ -141,6 +141,13 @@ void GameSimulation::StepFixed(const InputSnapshot& input,
                                            playerZ_,
                                            playerYawRadians_,
                                            playerPitchRadians_);
+        horde::gameplay::items::UpdateHeldItemParent(
+            heldItems_[0],
+            torchFailureSnapshot_.heldByPlayer
+                ? horde::gameplay::items::HeldItemParentMode::HandSocket
+                : horde::gameplay::items::HeldItemParentMode::AuthoredWorldTrajectory,
+            tickIndex_,
+            heldItems_[0].worldFromItem);
         UpdateEncounters(input, fixedDeltaSeconds);
     }
     else
@@ -285,6 +292,8 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
     walkVisualAmount_ = 0.0f;
     torchFailure_ = state.torchFailure;
     torchFailureSnapshot_ = torchFailure_.Snapshot();
+    horde::gameplay::items::ImportHeldItemCheckpoint(
+        heldItems_, torchFailureSnapshot_.heldByPlayer, tickIndex_);
     enemyDirector_ = state.enemyDirector;
     activeEnemyKind_ = state.activeEnemyKind;
     lichEncounter_ = state.lichEncounter;
@@ -722,6 +731,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.playerAlive = playerVitals_.Snapshot().phase == PlayerLifePhase::Alive;
     snapshot_.finaleComplete = lichEncounter_.Snapshot().finaleEndingPhase == FinaleEndingPhase::Complete;
     snapshot_.torchFailure = torchFailureSnapshot_;
+    snapshot_.heldItems = heldItems_;
     snapshot_.enemyRoster = enemyDirector_.Snapshot();
     snapshot_.swordCombat = combatSnapshot_;
     snapshot_.playerCombat = combatSnapshot_.player;

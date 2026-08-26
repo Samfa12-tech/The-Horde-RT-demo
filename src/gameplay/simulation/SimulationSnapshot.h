@@ -6,6 +6,7 @@
 
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/SwordCombat.h"
+#include "gameplay/items/HeldItemState.h"
 #include "gameplay/simulation/GameplayEvent.h"
 
 namespace horde::gameplay::simulation
@@ -68,6 +69,8 @@ struct SimulationSnapshot
     bool finaleComplete = false;
 
     TorchFailureSnapshot torchFailure{};
+    horde::gameplay::items::HeldItemStates heldItems =
+        horde::gameplay::items::MakeDefaultHeldItemStates();
     EnemyRosterSnapshot enemyRoster{};
     CombatSnapshot swordCombat{};
     PlayerCombatSnapshot playerCombat{};

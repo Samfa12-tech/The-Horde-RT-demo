@@ -6,6 +6,7 @@
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/SpatialAudio.h"
 #include "gameplay/SwordCombat.h"
+#include "gameplay/items/HeldItemState.h"
 #include "gameplay/simulation/FixedStepRunner.h"
 #include "gameplay/simulation/GameplayEvent.h"
 #include "gameplay/simulation/InputSnapshot.h"
@@ -76,6 +77,8 @@ private:
     std::array<PlayerFootstepCadence, kSkeletonEnemyCapacity> enemyFootsteps_{};
     CombatSnapshot combatSnapshot_{};
     TorchFailureSnapshot torchFailureSnapshot_{};
+    horde::gameplay::items::HeldItemStates heldItems_ =
+        horde::gameplay::items::MakeDefaultHeldItemStates();
     EnemyKind activeEnemyKind_ = EnemyKind::Skeleton;
 
     float playerX_ = 0.0f;

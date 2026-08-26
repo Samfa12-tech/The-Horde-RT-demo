@@ -5,6 +5,9 @@ set(HORDE_RT_PACKAGE_VERSION "1.5.2")
 
 set(HORDE_RT_CORE_RELATIVE_SOURCES
     gameplay/simulation/GameSimulation.cpp
+    gameplay/items/HeldItemState.cpp
+    gameplay/items/HeldLightState.cpp
+    gameplay/items/HeldItemKinematics.cpp
     gameplay/ShowcaseBenchmark.cpp
     scene/assets/AssetManifest.cpp
     scene/assets/AssetValidation.cpp
@@ -16,6 +19,7 @@ set(HORDE_RT_CORE_RELATIVE_SOURCES
     vulkan/VulkanContext.cpp
     vulkan/raytracing/RayTracingRequirements.cpp
     vulkan/raytracing/RtGpuResources.cpp
+    vulkan/raytracing/HeldItemRenderSlot.cpp
     vulkan/raytracing/RtStaticMeshSlot.cpp
     vulkan/raytracing/RtTextureArrays.cpp
     vulkan/raytracing/CharacterRenderSlot.cpp
