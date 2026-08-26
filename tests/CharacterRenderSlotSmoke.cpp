@@ -657,7 +657,12 @@ int main()
                       "reflected water must use bounded shared opaque direct lighting without the waterfall-only secondary shader");
         ok &= Require(waterPrimary.find("transmittedHit.t += h.t + waterPathLength;") !=
                           std::string::npos &&
-                      waterPrimary.find("reflectedHit.t += h.t;") != std::string::npos,
+                      waterPrimary.find("float reflectedLocalDistance = reflectedHit.hit ? reflectedHit.t : 12.0;") !=
+                          std::string::npos &&
+                      waterPrimary.find("reflectedHit.t += h.t;") != std::string::npos &&
+                      waterPrimary.find("min(reflectedLocalDistance, 12.0)") != std::string::npos &&
+                      waterPrimary.find("min(reflectedHit.hit ? reflectedHit.t : 12.0, 12.0)") ==
+                          std::string::npos,
                       "secondary water hits must preserve accumulated camera-path distance for fog and distance lighting");
         const std::size_t opaqueSecondaryBegin = raygenSource.find("vec3 shadeOpaqueSecondary(");
         const std::size_t opaqueSecondaryEnd =
@@ -722,12 +727,34 @@ int main()
                           std::string::npos &&
                       raygenSource.find("emberDistance < maximumDistance") != std::string::npos,
                       "fire must be a bounded world-space volume and depth-clip analytic embers at the physical hit");
-        ok &= Require(raygenSource.find("findFireEmitter(1u, torch)") != std::string::npos &&
-                      raygenSource.find("torch.lightPositionStrength.xyz") != std::string::npos &&
-                      raygenSource.find("torch.colourIntensity.rgb") != std::string::npos &&
+        const std::size_t fireDirectBegin = raygenSource.find("vec3 fireEmitterDirectLighting(");
+        const std::size_t fireDirectEnd =
+            raygenSource.find("void activeSkyLight(", fireDirectBegin);
+        const std::string fireDirect =
+            fireDirectBegin != std::string::npos && fireDirectEnd != std::string::npos
+                ? raygenSource.substr(fireDirectBegin, fireDirectEnd - fireDirectBegin)
+                : std::string{};
+        ok &= Require(!fireDirect.empty() &&
+                      fireDirect.find("emitterIndex < kRtActiveFireEmitterCapacity") != std::string::npos &&
+                      fireDirect.find("rtFireEmitters.values[emitterIndex]") != std::string::npos &&
+                      fireDirect.find("emitter.lightPositionStrength.xyz") != std::string::npos &&
+                      fireDirect.find("emitter.colourIntensity.rgb") != std::string::npos &&
+                      fireDirect.find("visibility(") != std::string::npos &&
+                      raygenSource.find("findFireEmitter(1u") == std::string::npos &&
+                      raygenSource.find("currentTorchLightPosition") == std::string::npos &&
                       raygenSource.find("sin(controls.time * 15.0)") == std::string::npos &&
                       raygenSource.find("sin(controls.time * 17.0") == std::string::npos,
-                      "the exact Light socket, visible core, and direct light must share deterministic emitter flicker");
+                      "every selected emitter must use its own Light socket, correlated colour/strength, and real visibility without stable-ID-1 assumptions");
+        ok &= Require(waterPrimary.find("bool fireRayReflectionOwned = controls.waterQuality >= 1.5;") !=
+                          std::string::npos &&
+                      waterPrimary.find("fireEmitterDirectLighting(\n        h, rayDirection, false, !fireRayReflectionOwned)") !=
+                          std::string::npos &&
+                      opaquePrimary.find("bool fireRayReflectionOwned = !leanWorkload && wantsPlayerReflection;") !=
+                          std::string::npos &&
+                      opaquePrimary.find("maxWorkload, !fireRayReflectionOwned") !=
+                          std::string::npos &&
+                      fireDirect.find("if (allowAnalyticSpecular)") != std::string::npos,
+                      "ray-integrated fire reflection must exclusively own emitter specular while direct diffuse and shadowing remain active");
         ok &= Require(raygenSource.find("bool reflectionPath") != std::string::npos &&
                       raygenSource.find("reflected = reflected * reflectedFire.a + reflectedFire.rgb") !=
                           std::string::npos &&

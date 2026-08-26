@@ -180,6 +180,24 @@ bool TestDistanceTieBreaksByStableEmitterId()
                    "distance ties must be resolved by stable emitter ID independent of input order");
 }
 
+bool TestNearEqualDistancesStillSelectTheExactlyNearestEmitters()
+{
+    std::array<FireEmitterState, 3u> emitters{{
+        Emitter(10u, 1.0000004f, ShowcaseZone::Opening),
+        Emitter(30u, 1.0000000f, ShowcaseZone::Opening),
+        Emitter(20u, 1.0000002f, ShowcaseZone::Opening)}};
+    FireEmitterUpload upload;
+    std::string diagnostic;
+    const bool built = BuildFireEmitterUpload(
+        emitters, {{0.0f, 1.0f, 0.0f}, ShowcaseZone::Opening, 4.0f},
+        {}, FireEmitterQuality::High, upload, diagnostic);
+    return Require(built, "near-equal emitter selection must build") &&
+           Require(upload.activeCount == 2u,
+                   "near-equal selection must retain the bounded two-emitter budget") &&
+           Require(upload.selectedStableIds[0] == 20u && upload.selectedStableIds[1] == 30u,
+                   "sub-micrometre distance differences must select the exactly nearest emitters before stable-ID publication");
+}
+
 bool TestTorchExtinguishZerosStrengthWithoutChangingTransforms()
 {
     FireEmitterState emitter = MakeOpeningTorchFireEmitter();
@@ -318,6 +336,7 @@ int main()
     ok &= TestResetAndCheckpointImportRestoreExactState();
     ok &= TestStableCameraAndZoneSelection();
     ok &= TestDistanceTieBreaksByStableEmitterId();
+    ok &= TestNearEqualDistancesStillSelectTheExactlyNearestEmitters();
     ok &= TestTorchExtinguishZerosStrengthWithoutChangingTransforms();
     ok &= TestAuthoredTorchUsesPlausibleWarmBlackBodyColour();
     ok &= TestActualPivotAccelerationDrivesBoundedMotionResponse();
