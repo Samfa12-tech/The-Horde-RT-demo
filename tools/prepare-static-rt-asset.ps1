@@ -155,6 +155,10 @@ if ($PreserveAuthoredSockets) {
 
 $runtimeReportPath = Join-Path $outputRoot "validator-runtime.json"
 $runtimeReport = Invoke-Validator $runtimePath $runtimeReportPath $ReviewedValidatorIssueCodes
+& py -3 (Join-Path $PSScriptRoot "validate-dielectric-topology.py") $runtimePath $manifestPath
+if ($LASTEXITCODE -ne 0) {
+    throw "Offline dielectric topology validation rejected $runtimePath."
+}
 if ($runtimeReport.info.totalVertexCount -gt $manifestData.budgets.maxVertices) {
     throw "Runtime GLB exceeds manifest maxVertices capacity."
 }

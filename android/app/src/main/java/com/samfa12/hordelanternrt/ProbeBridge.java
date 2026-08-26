@@ -31,6 +31,7 @@ public final class ProbeBridge {
                                                 float fogDensityScale);
     public static native void setRtLightTuning(int group, float hueDegrees, float intensityScale);
     public static native void setRtFireTuning(float strengthScale, float turbulenceScale, float smokeScale);
+    public static native void setRtGlassTuning(boolean visible, float transmission, float ior, float roughness);
     public static native void setRtWorkloadPreset(int preset);
     public static native void resetRtSceneTuning();
     public static native void markRtLabDebugAutomation();

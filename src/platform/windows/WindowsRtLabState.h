@@ -28,6 +28,7 @@ enum class RtLabControlRange
     UnitPercent,
     DoublePercent,
     HueDegrees,
+    IorHundredths,
 };
 
 enum class RtLabScrollAction
@@ -50,6 +51,7 @@ inline int StepRtLabControl(const int value, const bool increase, const RtLabCon
     case RtLabControlRange::WaterfallPercent: minimum = 25; break;
     case RtLabControlRange::UnitPercent: maximum = 100; break;
     case RtLabControlRange::HueDegrees: minimum = -180; maximum = 180; break;
+    case RtLabControlRange::IorHundredths: minimum = 100; maximum = 250; break;
     case RtLabControlRange::DoublePercent: break;
     }
     return std::clamp(value + (increase ? 5 : -5), minimum, maximum);

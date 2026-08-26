@@ -26,9 +26,7 @@ vec3 roughDielectricDirection(vec3 idealDirection, vec3 surfaceNormal,
 
 vec3 dielectricOverflowFallback(vec3 direction, vec3 throughput)
 {
-    // Bounded and conspicuous in Debug captures without becoming an emissive
-    // production effect. A future writable diagnostics buffer may count this
-    // exact branch without changing the transport decision.
+    // Bounded and conspicuous in captures without becoming an emissive effect.
     return throughput * (skyColor(direction) * 0.12 + vec3(0.028, 0.009, 0.036));
 }
 
@@ -60,6 +58,7 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     if (isGenericDielectric(reflectedHit) ||
         (reflectedHit.hit && reflectedHit.material == kMaterialWater))
     {
+        atomicAdd(rtDielectricDiagnostics.value.transportOverflowCount, 1u);
         reflected = skyColor(reflectionDirection) * 0.18 +
             (reflectedHit.hit ? reflectedHit.base * 0.12 : vec3(0.0));
     }
@@ -86,14 +85,9 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     bool terminalResolved = false;
     bool overflowed = false;
 
-    for (int interfaceIndex = 0; interfaceIndex < kHighDielectricInterfaces;
+    for (int interfaceIndex = 0; interfaceIndex <= kHighDielectricInterfaces;
          ++interfaceIndex)
     {
-        if (interfaceIndex >= interfaceBudget)
-        {
-            overflowed = true;
-            break;
-        }
         float segmentLength = currentHit.t;
         if (interfaceIndex > 0 && volumeDepth > 0)
         {
@@ -107,6 +101,11 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
             transmitted = throughput *
                 shadeTerminalOpaqueEmissive(currentHit, transmissionDirection);
             terminalResolved = true;
+            break;
+        }
+        if (interfaceIndex >= interfaceBudget)
+        {
+            overflowed = true;
             break;
         }
 
@@ -175,6 +174,8 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
 
     if (!terminalResolved)
     {
+        overflowed = true;
+        atomicAdd(rtDielectricDiagnostics.value.transportOverflowCount, 1u);
         transmitted = dielectricOverflowFallback(transmissionDirection, throughput);
     }
     // Roughness changes the same bounded reflection/transmission response; it

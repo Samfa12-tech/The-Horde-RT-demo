@@ -39,6 +39,8 @@ function Test-HeldItemPackage {
             "$AssetPrefix/models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb",
             "$AssetPrefix/models/props/runtime/asset.manifest.json",
             "$AssetPrefix/models/props/runtime/gothic-hand-torch-lod0.runtime.glb",
+            "$AssetPrefix/models/props/runtime/dielectric-fixture/asset.manifest.json",
+            "$AssetPrefix/models/props/runtime/dielectric-fixture/closed-glass-lod0.runtime.glb",
             "$AssetPrefix/models/player/runtime/asset.manifest.json",
             "$AssetPrefix/models/player/runtime/clip-manifest.json",
             "$AssetPrefix/models/player/runtime/gothic-traveller-lod0.runtime.glb",

@@ -86,7 +86,7 @@ public:
         std::vector<std::uint8_t> rgba;
     };
 
-    static constexpr std::uint32_t kBlasCount = 11u;
+    static constexpr std::uint32_t kBlasCount = 12u;
     static constexpr std::uint32_t kTlasCount = 1u;
     static constexpr std::uint32_t kTlasInstanceCount = 20u;
 
@@ -130,6 +130,14 @@ public:
             ? 0.0 : playerSkinTotalMilliseconds_ / static_cast<double>(playerSkinUpdateCount_);
     }
     float PlayerMaxSocketErrorMetres() const { return playerMaxSocketErrorMetres_; }
+    std::uint32_t DielectricTransportOverflowCount() const
+    {
+        return dielectricTransportOverflowCount_;
+    }
+    std::uint32_t DielectricShadowOverflowCount() const
+    {
+        return dielectricShadowOverflowCount_;
+    }
     bool GenericStaticAssetEnabled() const { return genericStaticAssetEnabled_; }
     const RtStaticMeshMeasurements& StaticMeshMeasurements() const { return staticMeshSlot_.Measurements(); }
     VkDeviceSize StaticMeshBlasBytes() const { return staticMeshBlasBytes_; }
@@ -181,6 +189,12 @@ private:
                      VkDeviceSize size,
                      const char* label,
                      std::string& diagnostic) const;
+    bool ReadBuffer(const Buffer& buffer,
+                    VkDeviceSize offset,
+                    void* data,
+                    VkDeviceSize size,
+                    const char* label,
+                    std::string& diagnostic) const;
     bool CreateStorageImage(std::string& diagnostic);
     bool CreateTextureArray(const std::string& path, VkFormat format, TextureArray& texture, std::string& diagnostic);
     bool CreateTexture(const std::string& path,
@@ -250,11 +264,13 @@ private:
     Buffer instanceMetadataBuffer_;
     Buffer primitiveMetadataBuffer_;
     Buffer materialMetadataBuffer_;
+    Buffer dielectricDiagnosticsBuffer_;
     AccelerationStructure blas_;
     AccelerationStructure waterfallBlas_;
     AccelerationStructure finaleRoofBlas_;
     AccelerationStructure torchBlas_;
     AccelerationStructure swordBlas_;
+    AccelerationStructure dielectricFixtureBlas_;
     AccelerationStructure playerBodyBlas_;
     AccelerationStructure playerLimbBlas_;
     AccelerationStructure skinnedPlayerBlas_;
@@ -267,13 +283,17 @@ private:
     horde::scene::assets::StaticMeshAsset developmentStaticAsset_;
     horde::scene::assets::StaticMeshAsset productionTorchAsset_;
     horde::scene::assets::StaticMeshAsset productionPlayerAsset_;
+    horde::scene::assets::StaticMeshAsset productionDielectricFixtureAsset_;
     std::vector<horde::scene::assets::StaticRtVertex> skinnedPlayerUpload_;
     std::uint32_t playerStaticVertexBase_ = 0u;
+    std::uint32_t dielectricFixtureMaterialIndex_ = 0u;
     PlayerCpuSkinCadence playerCpuSkinCadence_ = PlayerCpuSkinCadence::Hz60;
     PlayerRenderRoute measuredPlayerRoute_ = PlayerRenderRoute::Procedural;
     std::uint64_t playerSkinUpdateCount_ = 0u;
     double playerSkinTotalMilliseconds_ = 0.0;
     float playerMaxSocketErrorMetres_ = 0.0f;
+    std::uint32_t dielectricTransportOverflowCount_ = 0u;
+    std::uint32_t dielectricShadowOverflowCount_ = 0u;
     std::string developmentStaticAssetDirectory_;
     std::string staticTextureDirectory_;
     RtStaticMeshSlot staticMeshSlot_;

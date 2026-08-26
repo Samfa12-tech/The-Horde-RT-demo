@@ -178,6 +178,10 @@ public class MainActivity extends Activity {
     private int rtFireStrengthPercent = 100;
     private int rtFireTurbulencePercent = 100;
     private int rtFireSmokePercent = 100;
+    private int rtGlassVisibilityPercent;
+    private int rtGlassTransmissionPercent = 94;
+    private int rtGlassIorHundredths = 152;
+    private int rtGlassRoughnessPercent = 12;
     private int rtLightGroup;
     private final int[] rtLightHueDegrees = {0, 0, 0, 0};
     private final int[] rtLightIntensityPercent = {100, 100, 100, 100};
@@ -323,6 +327,8 @@ public class MainActivity extends Activity {
                     && stageAsset("models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb", "models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb")
                     && stageAsset("models/props/runtime/asset.manifest.json", "models/props/runtime/asset.manifest.json")
                     && stageAsset("models/props/runtime/gothic-hand-torch-lod0.runtime.glb", "models/props/runtime/gothic-hand-torch-lod0.runtime.glb")
+                    && stageAsset("models/props/runtime/dielectric-fixture/asset.manifest.json", "models/props/runtime/dielectric-fixture/asset.manifest.json")
+                    && stageAsset("models/props/runtime/dielectric-fixture/closed-glass-lod0.runtime.glb", "models/props/runtime/dielectric-fixture/closed-glass-lod0.runtime.glb")
                     && stageAsset("models/player/runtime/asset.manifest.json", "models/player/runtime/asset.manifest.json")
                     && stageAsset("models/player/runtime/clip-manifest.json", "models/player/runtime/clip-manifest.json")
                     && stageAsset("models/player/runtime/gothic-traveller-lod0.runtime.glb", "models/player/runtime/gothic-traveller-lod0.runtime.glb")
@@ -880,6 +886,26 @@ public class MainActivity extends Activity {
                     rtFireSmokePercent = value;
                     publishRtFireTuning();
                 });
+        addRtLabSlider(panel, getString(R.string.rt_lab_glass_visibility),
+                rtGlassVisibilityPercent, 0, 100, "%", value -> {
+                    rtGlassVisibilityPercent = value;
+                    publishRtGlassTuning();
+                });
+        addRtLabSlider(panel, getString(R.string.rt_lab_glass_transmission),
+                rtGlassTransmissionPercent, 0, 100, "%", value -> {
+                    rtGlassTransmissionPercent = value;
+                    publishRtGlassTuning();
+                });
+        addRtLabSlider(panel, getString(R.string.rt_lab_glass_ior),
+                rtGlassIorHundredths, 100, 250, "", value -> {
+                    rtGlassIorHundredths = value;
+                    publishRtGlassTuning();
+                });
+        addRtLabSlider(panel, getString(R.string.rt_lab_glass_roughness),
+                rtGlassRoughnessPercent, 0, 100, "%", value -> {
+                    rtGlassRoughnessPercent = value;
+                    publishRtGlassTuning();
+                });
 
         addMenuButton(panel, getString(R.string.rt_lab_light_group, rtLightGroupName()), () -> {
             rtLightGroup = (rtLightGroup + 1) % rtLightHueDegrees.length;
@@ -1009,6 +1035,14 @@ public class MainActivity extends Activity {
                 rtFireSmokePercent / 100.0f);
     }
 
+    private void publishRtGlassTuning() {
+        ProbeBridge.setRtGlassTuning(
+                rtGlassVisibilityPercent > 0,
+                rtGlassTransmissionPercent / 100.0f,
+                rtGlassIorHundredths / 100.0f,
+                rtGlassRoughnessPercent / 100.0f);
+    }
+
     private void restoreAuthoredRtLabTuning() {
         rtWaterfallWidthPercent = 100;
         rtRoofOverrideEnabled = false;
@@ -1019,6 +1053,10 @@ public class MainActivity extends Activity {
         rtFireStrengthPercent = 100;
         rtFireTurbulencePercent = 100;
         rtFireSmokePercent = 100;
+        rtGlassVisibilityPercent = 0;
+        rtGlassTransmissionPercent = 94;
+        rtGlassIorHundredths = 152;
+        rtGlassRoughnessPercent = 12;
         rtLightGroup = 0;
         for (int index = 0; index < rtLightHueDegrees.length; ++index) {
             rtLightHueDegrees[index] = 0;

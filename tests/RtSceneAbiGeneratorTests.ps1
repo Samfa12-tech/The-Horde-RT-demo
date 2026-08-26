@@ -7,6 +7,11 @@ $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) ("horde-rt-abi-generator-"
 New-Item -ItemType Directory -Path $temporaryRoot | Out-Null
 try {
     & (Join-Path $repoRoot "tools\generate-rt-scene-abi.ps1") -Check
+    $generatedGlsl = Get-Content -LiteralPath (Join-Path $repoRoot "shaders\raytracing\include\rt_scene_abi.generated.glsl") -Raw
+    if ($generatedGlsl -notmatch 'binding = 11\) readonly buffer RtInstanceMetadataBuffer' -or
+        $generatedGlsl -notmatch 'binding = 22\) restrict buffer RtDielectricDiagnosticsBuffer') {
+        throw "Dielectric diagnostics must append a writable binding without aliasing read-only instance metadata."
+    }
 
     $definition = Get-Content -LiteralPath (Join-Path $repoRoot "src\vulkan\raytracing\RtSceneAbi.def") -Raw | ConvertFrom-Json
     $definition | Add-Member -Force -NotePropertyName records -NotePropertyValue @(

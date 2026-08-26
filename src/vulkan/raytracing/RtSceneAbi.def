@@ -20,7 +20,8 @@
     "ormTextures": 18,
     "emissiveTextures": 19,
     "heldLight": 20,
-    "fireEmitters": 21
+    "fireEmitters": 21,
+    "dielectricDiagnostics": 22
   },
   "instanceFlags": {
     "staticPbr": 1,
@@ -69,6 +70,15 @@
         { "name": "indexOffset", "type": "uint", "offset": 4 },
         { "name": "indexCount", "type": "uint", "offset": 8 },
         { "name": "materialIndex", "type": "uint", "offset": 12 }
+      ]
+    },
+    {
+      "name": "RtDielectricDiagnostics", "alignment": 16, "size": 16,
+      "fields": [
+        { "name": "transportOverflowCount", "type": "uint", "offset": 0 },
+        { "name": "shadowOverflowCount", "type": "uint", "offset": 4 },
+        { "name": "reserved0", "type": "uint", "offset": 8 },
+        { "name": "reserved1", "type": "uint", "offset": 12 }
       ]
     },
     {

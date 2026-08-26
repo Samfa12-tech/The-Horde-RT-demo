@@ -36,6 +36,10 @@
     <string name="rt_lab_fire_strength">Flame strength</string>
     <string name="rt_lab_fire_turbulence">Flame turbulence</string>
     <string name="rt_lab_fire_smoke">Flame smoke</string>
+    <string name="rt_lab_glass_visibility">Glass fixture visibility</string>
+    <string name="rt_lab_glass_transmission">Glass transmission</string>
+    <string name="rt_lab_glass_ior">Glass IOR · 100 = 1.00</string>
+    <string name="rt_lab_glass_roughness">Glass roughness</string>
     <string name="rt_lab_light_group">LIGHT GROUP · %1$s</string>
     <string name="rt_lab_light_hue">Light hue shift</string>
     <string name="rt_lab_light_intensity">Light intensity</string>

@@ -96,6 +96,10 @@ int main()
     androidUnclamped.fireStrengthScale = 3.0f;
     androidUnclamped.fireTurbulenceScale = -1.0f;
     androidUnclamped.fireSmokeScale = 3.0f;
+    androidUnclamped.glassTransmission = 3.0f;
+    androidUnclamped.glassIor = -1.0f;
+    androidUnclamped.glassRoughness = 3.0f;
+    androidUnclamped.glassFixtureVisible = true;
     androidUnclamped.lights[static_cast<std::size_t>(RtLightGroup::Staff)] = {999.0f, 3.0f};
     androidUnclamped.workloadPreset = RtWorkloadPreset::Max;
     androidTuning.Replace(androidUnclamped);
@@ -108,6 +112,10 @@ int main()
                       Near(androidClamped.fireStrengthScale, 2.0f) &&
                       Near(androidClamped.fireTurbulenceScale, 0.0f) &&
                       Near(androidClamped.fireSmokeScale, 2.0f) &&
+                      Near(androidClamped.glassTransmission, 1.0f) &&
+                      Near(androidClamped.glassIor, 1.0f) &&
+                      Near(androidClamped.glassRoughness, 1.0f) &&
+                      androidClamped.glassFixtureVisible &&
                       Near(androidClamped.lights[static_cast<std::size_t>(RtLightGroup::Staff)].hueDegrees, 180.0f) &&
                       Near(androidClamped.lights[static_cast<std::size_t>(RtLightGroup::Staff)].intensityScale, 2.0f) &&
                       androidClamped.workloadPreset == RtWorkloadPreset::Max,
@@ -127,6 +135,10 @@ int main()
                       Near(androidReset.fireStrengthScale, 1.0f) &&
                       Near(androidReset.fireTurbulenceScale, 1.0f) &&
                       Near(androidReset.fireSmokeScale, 1.0f) &&
+                      Near(androidReset.glassTransmission, 0.94f) &&
+                      Near(androidReset.glassIor, 1.52f) &&
+                      Near(androidReset.glassRoughness, 0.12f) &&
+                      !androidReset.glassFixtureVisible &&
                       androidReset.workloadPreset == RtWorkloadPreset::Authored,
                   "Android RT Lab route reset did not restore authored tuning");
 
@@ -174,9 +186,9 @@ int main()
                       !ShouldPersistRtLabUnlock({true, false, false, false, true}),
                   "Android RT Lab unlock was not restricted to genuine live finale completion");
 
-    ok &= Require(PresentableTinyRtScene::kBlasCount == 11u &&
+    ok &= Require(PresentableTinyRtScene::kBlasCount == 12u &&
                       PresentableTinyRtScene::kTlasInstanceCount == 20u,
-                  "skinned player must add one updateable BLAS while TLAS remains capped at twenty instances");
+                  "skinned player and generic dielectric fixture must add bounded BLAS resources while TLAS remains capped at twenty instances");
     const DynamicBlasToTlasDependency noDynamicBlasDependency =
         BuildDynamicBlasToTlasDependency({});
     const DynamicBlasToTlasDependency playerOnlyDependency =
@@ -215,6 +227,9 @@ int main()
     unclampedLow.finaleRoofOpenOverride = -1.0f;
     unclampedLow.finaleDawnRevealOverride = -1.0f;
     unclampedLow.fogDensityScale = -1.0f;
+    unclampedLow.glassTransmission = -1.0f;
+    unclampedLow.glassIor = -1.0f;
+    unclampedLow.glassRoughness = -1.0f;
     for (RtLightTuning& light : unclampedLow.lights)
     {
         light.hueDegrees = -999.0f;
@@ -224,7 +239,10 @@ int main()
     ok &= Require(Near(clampedLow.waterfallWidthScale, 0.25f) &&
                       Near(*clampedLow.finaleRoofOpenOverride, 0.0f) &&
                       Near(*clampedLow.finaleDawnRevealOverride, 0.0f) &&
-                      Near(clampedLow.fogDensityScale, 0.0f),
+                      Near(clampedLow.fogDensityScale, 0.0f) &&
+                      Near(clampedLow.glassTransmission, 0.0f) &&
+                      Near(clampedLow.glassIor, 1.0f) &&
+                      Near(clampedLow.glassRoughness, 0.0f),
                   "RT tuning lower bounds did not preserve the approved minimums");
     for (const RtLightTuning& light : clampedLow.lights)
     {
@@ -237,6 +255,9 @@ int main()
     unclampedHigh.finaleRoofOpenOverride = 2.0f;
     unclampedHigh.finaleDawnRevealOverride = 2.0f;
     unclampedHigh.fogDensityScale = 3.0f;
+    unclampedHigh.glassTransmission = 3.0f;
+    unclampedHigh.glassIor = 3.0f;
+    unclampedHigh.glassRoughness = 3.0f;
     for (RtLightTuning& light : unclampedHigh.lights)
     {
         light.hueDegrees = 999.0f;
@@ -246,7 +267,10 @@ int main()
     ok &= Require(Near(clampedHigh.waterfallWidthScale, 2.0f) &&
                       Near(*clampedHigh.finaleRoofOpenOverride, 1.0f) &&
                       Near(*clampedHigh.finaleDawnRevealOverride, 1.0f) &&
-                      Near(clampedHigh.fogDensityScale, 2.0f),
+                      Near(clampedHigh.fogDensityScale, 2.0f) &&
+                      Near(clampedHigh.glassTransmission, 1.0f) &&
+                      Near(clampedHigh.glassIor, 2.5f) &&
+                      Near(clampedHigh.glassRoughness, 1.0f),
                   "RT tuning upper bounds did not preserve the approved maximums");
     for (const RtLightTuning& light : clampedHigh.lights)
     {
@@ -578,7 +602,7 @@ int main()
         ok &= Require(sceneSource.find("waterfallBlas_") != std::string::npos &&
                       sceneSource.find("instances[19].instanceCustomIndex = 19u;") != std::string::npos &&
                       sceneSource.find("instances[19].accelerationStructureReference = waterfallBlas_.address;") != std::string::npos &&
-                      sceneSource.find("ResolveWaterfallCurtainScale(frame.tuning)") != std::string::npos &&
+                      sceneSource.find("ResolveWaterfallCurtainScale(clampedTuning)") != std::string::npos &&
                       sceneSource.find("0.0f, 0.0f, waterfallScale.crossLane, -15.26f") != std::string::npos,
                       "falling streams must use a dedicated local-space BLAS and a non-degenerate tuned TLAS transform");
         ok &= Require(raygenSource.find("const int kWaterfallInstance = 19;") != std::string::npos &&
@@ -685,15 +709,19 @@ int main()
                       raygenSource.find("const int kMobileDielectricVolumes = 2;") != std::string::npos &&
                       raygenSource.find("const int kHighDielectricVolumes = 4;") != std::string::npos &&
                       raygenSource.find("segmentLength = currentHit.t;") != std::string::npos &&
+                      raygenSource.find("atomicAdd(rtDielectricDiagnostics.value.transportOverflowCount, 1u);") != std::string::npos &&
                       raygenSource.find("shadeTerminalOpaqueEmissive") != std::string::npos &&
                       raygenSource.find("kRtMaterialFlagThinWall") != std::string::npos &&
                       raygenSource.find("shadeBoundedDielectric(nextHit") == std::string::npos,
                       "generic dielectric transport must use actual hit distance, explicit phone/high budgets, thin-wall ABI intent, and one terminal non-recursive evaluator");
         ok &= Require(raygenSource.find("vec3 shadowTransmittanceMask(") != std::string::npos &&
+                      raygenSource.find("vec4 transparentVisibilityBatch(") != std::string::npos &&
+                      raygenSource.find("const int kShadowSampleCapacity = 4;") != std::string::npos &&
                       raygenSource.find("const int kMobileShadowInterfaces = 4;") != std::string::npos &&
                       raygenSource.find("const int kHighShadowInterfaces = 8;") != std::string::npos &&
                       raygenSource.find("candidateMaterial.metallicRoughnessOcclusionTransmission.x") != std::string::npos &&
                       raygenSource.find("dielectricBeerLambert(") != std::string::npos &&
+                      raygenSource.find("atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);") != std::string::npos &&
                       raygenSource.find("if (interfaceCount >= interfaceBudget)") != std::string::npos,
                       "straight shadow queries must transmit through finite generic dielectric layers while keeping metallic blockers and mobile/high interface ceilings");
         ok &= Require(waterPrimary.find("transmittedHit.t += h.t + waterPathLength;") !=
@@ -742,9 +770,9 @@ int main()
                 ? raygenSource.substr(opaqueDirectBegin, opaqueDirectEnd - opaqueDirectBegin)
                 : std::string{};
         ok &= Require(!opaqueDirect.empty() &&
-                      opaqueDirect.find("localVisibility = localStrength > 0.001") !=
+                      opaqueDirect.find("bvec4(localStrength > 0.001") !=
                           std::string::npos &&
-                      opaqueDirect.find("skyVisibility = transparentVisibility(") != std::string::npos &&
+                      opaqueDirect.find("vec4 visibilitySamples = transparentVisibilityBatch(") != std::string::npos &&
                       !opaquePrimary.empty() &&
                       opaquePrimary.find("shadeOpaqueDirect(h, rayDirection, maxWorkload") !=
                           std::string::npos &&
@@ -808,6 +836,16 @@ int main()
                           std::string::npos &&
                       sceneSource.find("outputRedBlueSwap") != std::string::npos,
                       "the static core must stay tiny and BGRA presentation compensation must remain live");
+        ok &= Require(sceneSource.find("closed-glass-lod0.runtime.glb") != std::string::npos &&
+                      sceneSource.find("dielectricFixtureBlas_") != std::string::npos &&
+                      sceneSource.find("instances[5].accelerationStructureReference = dielectricFixtureBlas_.address;") != std::string::npos &&
+                      sceneSource.find("frameInstanceMetadata[5u].flags = 0u;") != std::string::npos &&
+                      sceneSource.find("clampedTuning.glassFixtureVisible") != std::string::npos,
+                      "closed dielectric fixture must use the imported static-PBR/BLAS route and stay absent from authored captures");
+        ok &= Require(windowsSource.find("FindDevelopmentCheckpoint(ctx.developmentCheckpoint)") !=
+                          std::string::npos &&
+                      windowsSource.find("development->usesGlassFixture") != std::string::npos,
+                      "all bounded glass development checkpoints must enable the same imported fixture route");
         ok &= Require(windowsSource.find("WaterQuality::High") != std::string::npos &&
                       windowsSource.find("context.waterQuality = horde::vulkan::raytracing::WaterQuality::High") !=
                           std::string::npos &&
@@ -832,6 +870,13 @@ int main()
                       androidSource.find("rtFireTurbulencePercent") != std::string::npos &&
                       androidSource.find("rtFireSmokePercent") != std::string::npos,
                       "Android RT Lab must expose authored-default strength, turbulence, and smoke controls");
+        ok &= Require(androidBridgeSource.find("gRtLabState.SetGlass(") != std::string::npos &&
+                      androidJavaBridgeSource.find("setRtGlassTuning") != std::string::npos &&
+                      androidSource.find("publishRtGlassTuning()") != std::string::npos &&
+                      androidSource.find("rtGlassTransmissionPercent") != std::string::npos &&
+                      androidSource.find("rtGlassIorHundredths") != std::string::npos &&
+                      androidSource.find("rtGlassRoughnessPercent") != std::string::npos,
+                      "Android RT Lab must expose generic fixture visibility, transmission, IOR, and roughness controls");
         ok &= Require(windowsSource.find("kRtLabFireStrengthSliderId") != std::string::npos &&
                       windowsSource.find("kRtLabFireTurbulenceSliderId") != std::string::npos &&
                       windowsSource.find("kRtLabFireSmokeSliderId") != std::string::npos &&
@@ -839,6 +884,14 @@ int main()
                       windowsSource.find("tuning.fireTurbulenceScale") != std::string::npos &&
                       windowsSource.find("tuning.fireSmokeScale") != std::string::npos,
                       "Windows RT Lab must expose authored-default strength, turbulence, and smoke controls");
+        ok &= Require(windowsSource.find("kRtLabGlassVisibilitySliderId") != std::string::npos &&
+                      windowsSource.find("kRtLabGlassTransmissionSliderId") != std::string::npos &&
+                      windowsSource.find("kRtLabGlassIorSliderId") != std::string::npos &&
+                      windowsSource.find("kRtLabGlassRoughnessSliderId") != std::string::npos &&
+                      windowsSource.find("tuning.glassTransmission") != std::string::npos &&
+                      windowsSource.find("tuning.glassIor") != std::string::npos &&
+                      windowsSource.find("tuning.glassRoughness") != std::string::npos,
+                      "Windows RT Lab must expose bounded reusable dielectric controls");
         ok &= Require(androidSource.find("PREF_RT_LAB_UNLOCKED = \"rt_lab_unlocked\"") != std::string::npos &&
                       androidSource.find(".putBoolean(PREF_RT_LAB_UNLOCKED, rtLabUnlocked)") != std::string::npos &&
                       androidSource.find("ProbeBridge.isRtLabUnlockEligible()") != std::string::npos &&

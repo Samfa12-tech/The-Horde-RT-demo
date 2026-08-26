@@ -118,6 +118,7 @@ inline constexpr std::uint32_t kRtBindingOrmTextures = $($b.ormTextures)u;
 inline constexpr std::uint32_t kRtBindingEmissiveTextures = $($b.emissiveTextures)u;
 inline constexpr std::uint32_t kRtBindingHeldLight = $($b.heldLight)u;
 inline constexpr std::uint32_t kRtBindingFireEmitters = $($b.fireEmitters)u;
+inline constexpr std::uint32_t kRtBindingDielectricDiagnostics = $($b.dielectricDiagnostics)u;
 
 enum class RtInstanceFlag : std::uint32_t
 {
@@ -202,6 +203,10 @@ layout(std430, set = 0, binding = $($b.fireEmitters)) readonly buffer RtFireEmit
 {
     RtFireEmitterGpu values[$($c.fireEmitters)];
 } rtFireEmitters;
+layout(std430, set = 0, binding = $($b.dielectricDiagnostics)) restrict buffer RtDielectricDiagnosticsBuffer
+{
+    RtDielectricDiagnostics value;
+} rtDielectricDiagnostics;
 "@
 
 function Normalize-Newlines([string]$text) { return $text.Replace("`r`n", "`n").TrimEnd("`r", "`n") + "`n" }

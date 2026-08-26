@@ -37,8 +37,8 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 9u,
-          "nine isolated render-development checkpoints are exposed");
+    Check(kDevelopmentCheckpoints.size() == 11u,
+          "eleven isolated render-development checkpoints are exposed");
     const DevelopmentCheckpoint* checkpoint = FindDevelopmentCheckpoint("pbr-sword-closeup");
     Check(checkpoint != nullptr && checkpoint->id == 100 && checkpoint->baseShowcaseCheckpointId == 0 &&
               checkpoint->name == std::string_view("pbr-sword-closeup") &&
@@ -73,6 +73,16 @@ int main()
               upward != nullptr && upward->id == 108 &&
               upward->combatPose == DevelopmentCombatPose::UpwardSliceActive,
           "authoritative downward/upward owner regression poses have stable debug identities");
+    const DevelopmentCheckpoint* glass =
+        FindDevelopmentCheckpoint("glass-transport");
+    Check(glass != nullptr && glass->id == 109 && glass->baseShowcaseCheckpointId == 4 &&
+              glass->usesGlassFixture,
+          "generic dielectric inspection has a stable debug identity and explicitly enables its fixture");
+    const DevelopmentCheckpoint* glassFire =
+        FindDevelopmentCheckpoint("glass-fire-transport");
+    Check(glassFire != nullptr && glassFire->id == 110 &&
+              glassFire->baseShowcaseCheckpointId == 0 && glassFire->usesGlassFixture,
+          "fire-on dielectric proof reuses the exact imported fixture and camera");
     horde::gameplay::simulation::GameSimulation stagedDownward;
     horde::gameplay::simulation::GameSimulation stagedUpward;
     DevelopmentCheckpointStageEvidence downwardEvidence{};

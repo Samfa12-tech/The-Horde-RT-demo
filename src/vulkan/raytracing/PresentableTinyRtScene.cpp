@@ -276,11 +276,15 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     instanceMetadataBuffer_ = std::exchange(other.instanceMetadataBuffer_, Buffer{});
     primitiveMetadataBuffer_ = std::exchange(other.primitiveMetadataBuffer_, Buffer{});
     materialMetadataBuffer_ = std::exchange(other.materialMetadataBuffer_, Buffer{});
+    dielectricDiagnosticsBuffer_ =
+        std::exchange(other.dielectricDiagnosticsBuffer_, Buffer{});
     blas_ = std::exchange(other.blas_, AccelerationStructure{});
     waterfallBlas_ = std::exchange(other.waterfallBlas_, AccelerationStructure{});
     finaleRoofBlas_ = std::exchange(other.finaleRoofBlas_, AccelerationStructure{});
     torchBlas_ = std::exchange(other.torchBlas_, AccelerationStructure{});
     swordBlas_ = std::exchange(other.swordBlas_, AccelerationStructure{});
+    dielectricFixtureBlas_ =
+        std::exchange(other.dielectricFixtureBlas_, AccelerationStructure{});
     playerBodyBlas_ = std::exchange(other.playerBodyBlas_, AccelerationStructure{});
     playerLimbBlas_ = std::exchange(other.playerLimbBlas_, AccelerationStructure{});
     skinnedPlayerBlas_ = std::exchange(other.skinnedPlayerBlas_, AccelerationStructure{});
@@ -295,13 +299,21 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     developmentStaticAsset_ = std::move(other.developmentStaticAsset_);
     productionTorchAsset_ = std::move(other.productionTorchAsset_);
     productionPlayerAsset_ = std::move(other.productionPlayerAsset_);
+    productionDielectricFixtureAsset_ =
+        std::move(other.productionDielectricFixtureAsset_);
     skinnedPlayerUpload_ = std::move(other.skinnedPlayerUpload_);
     playerStaticVertexBase_ = std::exchange(other.playerStaticVertexBase_, 0u);
+    dielectricFixtureMaterialIndex_ =
+        std::exchange(other.dielectricFixtureMaterialIndex_, 0u);
     playerCpuSkinCadence_ = std::exchange(other.playerCpuSkinCadence_, PlayerCpuSkinCadence::Hz60);
     measuredPlayerRoute_ = std::exchange(other.measuredPlayerRoute_, PlayerRenderRoute::Procedural);
     playerSkinUpdateCount_ = std::exchange(other.playerSkinUpdateCount_, 0u);
     playerSkinTotalMilliseconds_ = std::exchange(other.playerSkinTotalMilliseconds_, 0.0);
     playerMaxSocketErrorMetres_ = std::exchange(other.playerMaxSocketErrorMetres_, 0.0f);
+    dielectricTransportOverflowCount_ =
+        std::exchange(other.dielectricTransportOverflowCount_, 0u);
+    dielectricShadowOverflowCount_ =
+        std::exchange(other.dielectricShadowOverflowCount_, 0u);
     developmentStaticAssetDirectory_ = std::move(other.developmentStaticAssetDirectory_);
     staticTextureDirectory_ = std::move(other.staticTextureDirectory_);
     staticMeshSlot_ = std::move(other.staticMeshSlot_);
@@ -446,6 +458,7 @@ void PresentableTinyRtScene::Destroy()
     DestroyAccelerationStructure(skinnedPlayerBlas_);
     DestroyAccelerationStructure(playerLimbBlas_);
     DestroyAccelerationStructure(playerBodyBlas_);
+    DestroyAccelerationStructure(dielectricFixtureBlas_);
     DestroyAccelerationStructure(swordBlas_);
     DestroyAccelerationStructure(torchBlas_);
     DestroyAccelerationStructure(finaleRoofBlas_);
@@ -453,6 +466,7 @@ void PresentableTinyRtScene::Destroy()
     DestroyAccelerationStructure(blas_);
     DestroyBuffer(worldSurfaceBuffer_);
     DestroyBuffer(materialMetadataBuffer_);
+    DestroyBuffer(dielectricDiagnosticsBuffer_);
     DestroyBuffer(primitiveMetadataBuffer_);
     DestroyBuffer(instanceMetadataBuffer_);
     DestroyBuffer(staticIndexBuffer_);
@@ -483,10 +497,13 @@ void PresentableTinyRtScene::Destroy()
     developmentStaticAsset_ = {};
     productionTorchAsset_ = {};
     productionPlayerAsset_ = {};
-    productionPlayerAsset_ = {};
+    productionDielectricFixtureAsset_ = {};
     playerRenderSlot_ = {};
     skinnedPlayerUpload_.clear();
     playerStaticVertexBase_ = 0u;
+    dielectricFixtureMaterialIndex_ = 0u;
+    dielectricTransportOverflowCount_ = 0u;
+    dielectricShadowOverflowCount_ = 0u;
     developmentStaticAssetDirectory_.clear();
     staticTextureDirectory_.clear();
     staticMeshSlot_ = {};
@@ -571,6 +588,32 @@ bool PresentableTinyRtScene::WriteBuffer(const Buffer& buffer,
                                          std::string& diagnostic) const
 {
     return gpuResources_.WriteBuffer(buffer, data, size, label, diagnostic);
+}
+
+bool PresentableTinyRtScene::ReadBuffer(const Buffer& buffer,
+                                        const VkDeviceSize offset,
+                                        void* data,
+                                        const VkDeviceSize size,
+                                        const char* label,
+                                        std::string& diagnostic) const
+{
+    if (buffer.memory == VK_NULL_HANDLE || data == nullptr || size == 0u ||
+        offset > buffer.size || size > buffer.size - offset)
+    {
+        diagnostic = std::string("Invalid ") + label + " readback.";
+        return false;
+    }
+    void* mapped = nullptr;
+    if (vkMapMemory(device_, buffer.memory, 0u, buffer.size, 0u, &mapped) != VK_SUCCESS ||
+        mapped == nullptr)
+    {
+        diagnostic = std::string("Failed to map ") + label + " memory for readback.";
+        return false;
+    }
+    std::memcpy(data, static_cast<const std::uint8_t*>(mapped) + offset,
+                static_cast<std::size_t>(size));
+    vkUnmapMemory(device_, buffer.memory);
+    return true;
 }
 
 VkDeviceAddress PresentableTinyRtScene::BufferAddress(VkBuffer buffer) const
@@ -1071,9 +1114,12 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     const auto swordDirectory = root / "models/weapons/runtime";
     const auto torchDirectory = root / "models/props/runtime";
     const auto playerDirectory = root / "models/player/runtime";
+    const auto dielectricDirectory =
+        root / "models/props/runtime/dielectric-fixture";
     horde::scene::assets::AssetManifest swordManifest;
     horde::scene::assets::AssetManifest torchManifest;
     horde::scene::assets::AssetManifest playerManifest;
+    horde::scene::assets::AssetManifest dielectricManifest;
     if (!horde::scene::assets::AssetManifest::Load(
             swordDirectory / "asset.manifest.json", swordManifest, diagnostic) ||
         !horde::scene::assets::StaticMeshAsset::Load(
@@ -1094,16 +1140,26 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             playerDirectory / "gothic-traveller-lod0.runtime.glb",
             playerManifest, productionPlayerAsset_, diagnostic) ||
         !playerRenderSlot_.LoadAsset(
-            (playerDirectory / "gothic-traveller-lod0.runtime.glb").string(), diagnostic))
+            (playerDirectory / "gothic-traveller-lod0.runtime.glb").string(), diagnostic) ||
+        !horde::scene::assets::AssetManifest::Load(
+            dielectricDirectory / "asset.manifest.json",
+            dielectricManifest, diagnostic) ||
+        !horde::scene::assets::StaticMeshAsset::Load(
+            dielectricDirectory / "closed-glass-lod0.runtime.glb",
+            dielectricManifest, productionDielectricFixtureAsset_, diagnostic))
         return false;
     staticTextureDirectory_ = (root / "textures/held-items/runtime").string();
-    std::array<StaticRtAssetRegistration, 3u> registrations{{
+    std::array<StaticRtAssetRegistration, 4u> registrations{{
         {3u, 0x53574f52u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
          0u, &developmentStaticAsset_},
         {1u, 0x544f5243u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
          1u, &productionTorchAsset_},
         {4u, 0x504c4159u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
          0u, &productionPlayerAsset_},
+        {5u, 0x474c4153u,
+         static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr) |
+             static_cast<std::uint32_t>(RtInstanceFlag::Transmissive),
+         0u, &productionDielectricFixtureAsset_},
     }};
     if (!staticMeshSlot_.Initialize(registrations, diagnostic)) return false;
     const RtInstanceMetadata playerMetadata = staticMeshSlot_.InstanceMetadata()[4u];
@@ -1115,6 +1171,16 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     }
     playerStaticVertexBase_ =
         staticMeshSlot_.PrimitiveMetadata()[playerMetadata.primitiveBase].vertexOffset;
+    const RtInstanceMetadata dielectricMetadata =
+        staticMeshSlot_.InstanceMetadata()[5u];
+    if (dielectricMetadata.primitiveCount != 1u ||
+        dielectricMetadata.primitiveBase >= staticMeshSlot_.PrimitiveMetadata().size())
+    {
+        diagnostic = "Runtime dielectric fixture static-PBR primitive metadata is incomplete.";
+        return false;
+    }
+    dielectricFixtureMaterialIndex_ = staticMeshSlot_.PrimitiveMetadata()[
+        dielectricMetadata.primitiveBase].materialIndex;
     if (playerRenderSlot_.UniqueVertices().size() > productionPlayerAsset_.vertices.size())
     {
         diagnostic = "Runtime player skinned/static vertex streams do not share ordering.";
@@ -1133,6 +1199,7 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
     const auto& vertices = staticMeshSlot_.Vertices();
     const auto& indices = staticMeshSlot_.Indices();
     const auto& geometryTransforms = staticMeshSlot_.GeometryTransforms();
+    const RtDielectricDiagnostics dielectricDiagnostics{};
     const auto createAndWrite = [this, uploadMemory, &diagnostic](
         const void* data,
         VkDeviceSize size,
@@ -1155,6 +1222,9 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
                         storage, false, "RT primitive metadata", primitiveMetadataBuffer_) ||
         !createAndWrite(materials.data(), materials.size() * sizeof(RtMaterialGpu),
                         storage, false, "RT material metadata", materialMetadataBuffer_) ||
+        !createAndWrite(&dielectricDiagnostics, sizeof(dielectricDiagnostics),
+                        storage, false, "dielectric diagnostics",
+                        dielectricDiagnosticsBuffer_) ||
         !createAndWrite(vertices.data(),
                         vertices.size() * sizeof(horde::scene::assets::StaticRtVertex),
                         geometry, true, "static RT vertices", staticVertexBuffer_) ||
@@ -2181,6 +2251,69 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         return true;
     };
 
+    const auto buildRegisteredStaticBlas = [this, &appendStaticGeometries, &buildBlas, &diagnostic](
+        const std::uint32_t instanceCustomIndex,
+        const char* label,
+        AccelerationStructure& accelerationStructure) {
+        std::vector<VkAccelerationStructureGeometryKHR> geometries;
+        std::vector<VkAccelerationStructureBuildRangeInfoKHR> ranges;
+        std::vector<std::uint32_t> primitiveCounts;
+        if (!appendStaticGeometries(
+                instanceCustomIndex, geometries, ranges, primitiveCounts))
+            return false;
+        VkAccelerationStructureBuildGeometryInfoKHR buildInfo{
+            VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR};
+        buildInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+        buildInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
+        buildInfo.geometryCount = static_cast<std::uint32_t>(geometries.size());
+        buildInfo.pGeometries = geometries.data();
+        VkAccelerationStructureBuildSizesInfoKHR sizes{
+            VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR};
+        vkGetAccelerationStructureBuildSizesKHR_(
+            device_, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR,
+            &buildInfo, primitiveCounts.data(), &sizes);
+        if (!CreateBuffer(sizes.accelerationStructureSize,
+                          VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR,
+                          VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                          true, accelerationStructure.backing, diagnostic))
+            return false;
+        VkAccelerationStructureCreateInfoKHR createInfo{
+            VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR};
+        createInfo.buffer = accelerationStructure.backing.buffer;
+        createInfo.size = sizes.accelerationStructureSize;
+        createInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+        if (vkCreateAccelerationStructureKHR_(
+                device_, &createInfo, nullptr, &accelerationStructure.handle) != VK_SUCCESS)
+        {
+            diagnostic = std::string("Failed to create ") + label + " BLAS.";
+            return false;
+        }
+        Buffer scratch;
+        if (!CreateBuffer(sizes.buildScratchSize,
+                          VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                          VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                          true, scratch, diagnostic))
+            return false;
+        buildInfo.dstAccelerationStructure = accelerationStructure.handle;
+        buildInfo.scratchData.deviceAddress = scratch.address;
+        std::vector<const VkAccelerationStructureBuildRangeInfoKHR*> rangePointers;
+        rangePointers.reserve(ranges.size());
+        for (const auto& range : ranges) rangePointers.push_back(&range);
+        BlasBuildData buildData{this, &buildInfo, rangePointers.data()};
+        if (!RunOneTimeCommands(buildBlas, &buildData, diagnostic))
+        {
+            DestroyBuffer(scratch);
+            return false;
+        }
+        DestroyBuffer(scratch);
+        VkAccelerationStructureDeviceAddressInfoKHR addressInfo{
+            VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR};
+        addressInfo.accelerationStructure = accelerationStructure.handle;
+        accelerationStructure.address = vkGetAccelerationStructureDeviceAddressKHR_(
+            device_, &addressInfo);
+        return accelerationStructure.address != 0u;
+    };
+
     std::vector<VkAccelerationStructureGeometryKHR> torchGeometries;
     std::vector<VkAccelerationStructureBuildRangeInfoKHR> torchRanges;
     std::vector<std::uint32_t> torchPrimitiveCounts;
@@ -2354,6 +2487,10 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     VkAccelerationStructureDeviceAddressInfoKHR swordBlasAddressInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR};
     swordBlasAddressInfo.accelerationStructure = swordBlas_.handle;
     swordBlas_.address = vkGetAccelerationStructureDeviceAddressKHR_(device_, &swordBlasAddressInfo);
+
+    if (!buildRegisteredStaticBlas(
+            5u, "generic dielectric fixture", dielectricFixtureBlas_))
+        return false;
 
     VkAccelerationStructureBuildRangeInfoKHR playerBodyRange{};
     playerBodyRange.primitiveCount = playerBodyPrimitiveCount;
@@ -2750,6 +2887,14 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
             0.0f, 0.07f, 0.0f, 0.0f,
             0.0f, 0.0f, 0.40f, 0.0f}};
     }
+    instances[5] = instances[0];
+    instances[5].instanceCustomIndex = 5u;
+    instances[5].mask = 0u;
+    instances[5].accelerationStructureReference = dielectricFixtureBlas_.address;
+    instances[5].transform = {{
+        0.20f, 0.0f, 0.0f, -9.10f,
+        0.0f, 1.25f, 0.0f, -0.325f,
+        0.0f, 0.0f, 0.75f, -15.20f}};
     instances[9].accelerationStructureReference = playerLimbBlas_.address;
     instances[16].mask = 0x10u;
     instances[17] = instances[0];
@@ -2845,7 +2990,7 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
     const auto& skeletonVertexBuffer_ = characterSlot_.SkeletonGpu(0u).vertices;
     const auto& secondSkeletonVertexBuffer = characterSlot_.SkeletonGpu(1u).vertices;
     const auto& lichVertexBuffer_ = characterSlot_.LichGpu().vertices;
-    const std::array<VkDescriptorSetLayoutBinding, 22u> bindings{{
+    const std::array<VkDescriptorSetLayoutBinding, 23u> bindings{{
         {0u, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, nullptr},
         {1u, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
         {2u, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
@@ -2868,6 +3013,7 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
         {kRtBindingEmissiveTextures, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
         {kRtBindingHeldLight, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
         {kRtBindingFireEmitters, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
+        {kRtBindingDielectricDiagnostics, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
     }};
     const VkDescriptorSetLayoutCreateInfo layoutInfo{
         VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
@@ -2884,7 +3030,7 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
     const std::array<VkDescriptorPoolSize, 4u> poolSizes{{
         {VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1u},
         {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1u},
-        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 11u},
+        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 12u},
         {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 9u},
     }};
     const VkDescriptorPoolCreateInfo poolInfo{
@@ -2978,6 +3124,8 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
         heldLightBuffer_.buffer, 0u, heldLightBuffer_.size};
     const VkDescriptorBufferInfo fireEmitterInfo{
         fireEmitterBuffer_.buffer, 0u, fireEmitterBuffer_.size};
+    const VkDescriptorBufferInfo dielectricDiagnosticsInfo{
+        dielectricDiagnosticsBuffer_.buffer, 0u, dielectricDiagnosticsBuffer_.size};
 
     VkDescriptorBufferInfo lichBufferInfo{};
     lichBufferInfo.buffer = lichVertexBuffer_.buffer;
@@ -3027,7 +3175,7 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
         write.pImageInfo = info;
         return write;
     };
-    const std::array<VkWriteDescriptorSet, 22u> writes{{accelerationStructureWrite, imageWrite, skeletonWrite,
+    const std::array<VkWriteDescriptorSet, 23u> writes{{accelerationStructureWrite, imageWrite, skeletonWrite,
                                                        sampledWrite(3u, &diffuseInfo), sampledWrite(4u, &normalInfo), sampledWrite(5u, &armInfo),
                                                        worldSurfaceWrite, lichBufferWrite,
                                                        sampledWrite(8u, &lichBaseInfo), sampledWrite(9u, &lichEmissiveInfo),
@@ -3042,7 +3190,8 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
                                                        sampledWrite(kRtBindingOrmTextures, &staticOrmInfo),
                                                        sampledWrite(kRtBindingEmissiveTextures, &staticEmissiveInfo),
                                                        bufferWrite(kRtBindingHeldLight, &heldLightInfo),
-                                                       bufferWrite(kRtBindingFireEmitters, &fireEmitterInfo)}};
+                                                       bufferWrite(kRtBindingFireEmitters, &fireEmitterInfo),
+                                                       bufferWrite(kRtBindingDielectricDiagnostics, &dielectricDiagnosticsInfo)}};
     vkUpdateDescriptorSets(device_, static_cast<std::uint32_t>(writes.size()), writes.data(), 0u, nullptr);
 
     diagnostic.clear();
@@ -3208,9 +3357,13 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                                                      const RtSceneFrameInputs& frame,
                                                      std::string& diagnostic)
 {
-    if (frame.playerRenderRoute != measuredPlayerRoute_)
+    const RtSceneTuning clampedTuning = ClampRtSceneTuning(frame.tuning);
+    const PlayerRenderRoute effectivePlayerRenderRoute =
+        clampedTuning.glassFixtureVisible
+        ? PlayerRenderRoute::Skinned : frame.playerRenderRoute;
+    if (effectivePlayerRenderRoute != measuredPlayerRoute_)
     {
-        measuredPlayerRoute_ = frame.playerRenderRoute;
+        measuredPlayerRoute_ = effectivePlayerRenderRoute;
         playerSkinUpdateCount_ = 0u;
         playerSkinTotalMilliseconds_ = 0.0;
         playerMaxSocketErrorMetres_ = 0.0f;
@@ -3226,12 +3379,13 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const horde::gameplay::TorchFailureSnapshot& torchFailure = frame.torchFailure;
     const horde::gameplay::EnemyRosterSnapshot& roster = frame.roster;
     const horde::gameplay::LichSnapshot& lich = frame.lich;
-    const WaterfallCurtainScale waterfallScale = ResolveWaterfallCurtainScale(frame.tuning);
+    const WaterfallCurtainScale waterfallScale = ResolveWaterfallCurtainScale(clampedTuning);
     const auto& skeletonGpu = characterSlot_.SkeletonGpu(0u);
     const auto& secondSkeletonGpu = characterSlot_.SkeletonGpu(1u);
     const auto& lichGpu = characterSlot_.LichGpu();
     if (instanceBuffer_.memory == VK_NULL_HANDLE || heldLightBuffer_.memory == VK_NULL_HANDLE ||
         fireEmitterBuffer_.memory == VK_NULL_HANDLE ||
+        dielectricDiagnosticsBuffer_.memory == VK_NULL_HANDLE ||
         skeletonGpu.vertices.memory == VK_NULL_HANDLE ||
         secondSkeletonGpu.vertices.memory == VK_NULL_HANDLE ||
         skeletonGpu.accelerationStructure.handle == VK_NULL_HANDLE ||
@@ -3239,6 +3393,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         lichGpu.accelerationStructure.handle == VK_NULL_HANDLE ||
         finaleRoofBlas_.handle == VK_NULL_HANDLE || waterfallBlas_.handle == VK_NULL_HANDLE ||
         swordBlas_.handle == VK_NULL_HANDLE ||
+        dielectricFixtureBlas_.handle == VK_NULL_HANDLE ||
         playerBodyBlas_.handle == VK_NULL_HANDLE || playerLimbBlas_.handle == VK_NULL_HANDLE ||
         skinnedPlayerBlas_.handle == VK_NULL_HANDLE ||
         skinnedPlayerBlasUpdateScratch_.address == 0u ||
@@ -3329,7 +3484,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     Vec3 skinnedPlayerRootWorld{
         animatedBodyOrigin[0], animatedBodyOrigin[1] - 1.8f,
         animatedBodyOrigin[2]};
-    if (frame.playerRenderRoute == PlayerRenderRoute::Skinned)
+    if (effectivePlayerRenderRoute == PlayerRenderRoute::Skinned)
     {
         const auto playerSkinBegin = std::chrono::steady_clock::now();
         std::array<float, 3u> rigShoulderCenter{};
@@ -3506,12 +3661,12 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     instances[3].transform = heldItemInstanceTransform(renderHeldItems[1]);
     instances[4] = instances[0];
     instances[4].instanceCustomIndex = 4u;
-    const PlayerRouteMasks playerRouteMasks = BuildPlayerRouteMasks(frame.playerRenderRoute);
+    const PlayerRouteMasks playerRouteMasks = BuildPlayerRouteMasks(effectivePlayerRenderRoute);
     instances[4].mask = playerRouteMasks.instanceMasks[4];
     instances[4].accelerationStructureReference =
-        frame.playerRenderRoute == PlayerRenderRoute::Skinned
+        effectivePlayerRenderRoute == PlayerRenderRoute::Skinned
         ? skinnedPlayerBlas_.address : playerBodyBlas_.address;
-    instances[4].transform = frame.playerRenderRoute == PlayerRenderRoute::Skinned
+    instances[4].transform = effectivePlayerRenderRoute == PlayerRenderRoute::Skinned
         ? VkTransformMatrixKHR{{
             animatedBodyRight[0], 0.0f, animatedBodyForward[0], skinnedPlayerRootWorld[0],
             animatedBodyRight[1], 1.0f, animatedBodyForward[1], skinnedPlayerRootWorld[1],
@@ -3570,6 +3725,17 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const Vec3 headTop = add(add(animatedBodyOrigin, Vec3{0.0f, 0.15f, 0.0f}), scaled(animatedBodyForward, 0.20f));
     instances[16].transform = segmentTransform(headBase, headTop, 0.145f);
     instances[16].mask = playerRouteMasks.instanceMasks[16];
+    if (clampedTuning.glassFixtureVisible)
+    {
+        instances[5] = instances[0];
+        instances[5].instanceCustomIndex = 5u;
+        instances[5].mask = 0x01u;
+        instances[5].accelerationStructureReference = dielectricFixtureBlas_.address;
+        instances[5].transform = {{
+            0.20f, 0.0f, 0.0f, -9.10f,
+            0.0f, 1.25f, 0.0f, -0.325f,
+            0.0f, 0.0f, 0.75f, -15.20f}};
+    }
     instances[17] = instances[0];
     instances[17].instanceCustomIndex = 17u;
     instances[17].mask = 0x20u;
@@ -3593,7 +3759,6 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         frame.heldLight.worldFromLight[14],
         frame.heldLight.active ? frame.torchLightStrength : 0.0f}};
     FireEmitterUpload fireEmitterUpload;
-    const RtSceneTuning clampedTuning = ClampRtSceneTuning(frame.tuning);
     const FireEmitterTuning fireTuning{
         frame.torchLightStrength * clampedTuning.fireStrengthScale,
         clampedTuning.fireTurbulenceScale,
@@ -3613,9 +3778,32 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     {
         return false;
     }
+    RtDielectricDiagnostics previousDielectricDiagnostics{};
+    if (!ReadBuffer(dielectricDiagnosticsBuffer_, 0u,
+                    &previousDielectricDiagnostics, sizeof(previousDielectricDiagnostics),
+                    "dielectric diagnostics", diagnostic))
+        return false;
+    dielectricTransportOverflowCount_ = previousDielectricDiagnostics.transportOverflowCount;
+    dielectricShadowOverflowCount_ = previousDielectricDiagnostics.shadowOverflowCount;
+    const RtDielectricDiagnostics clearedDielectricDiagnostics{};
     auto frameInstanceMetadata = staticMeshSlot_.InstanceMetadata();
-    if (frame.playerRenderRoute == PlayerRenderRoute::Procedural)
+    if (effectivePlayerRenderRoute == PlayerRenderRoute::Procedural)
+    {
         frameInstanceMetadata[4u].flags = 0u;
+        frameInstanceMetadata[5u].flags = 0u;
+    }
+    auto frameMaterials = staticMeshSlot_.Materials();
+    if (dielectricFixtureMaterialIndex_ >= frameMaterials.size())
+    {
+        diagnostic = "Runtime dielectric fixture material metadata is unavailable.";
+        return false;
+    }
+    RtMaterialGpu& fixtureMaterial = frameMaterials[dielectricFixtureMaterialIndex_];
+    fixtureMaterial.metallicRoughnessOcclusionTransmission[1] =
+        clampedTuning.glassRoughness;
+    fixtureMaterial.metallicRoughnessOcclusionTransmission[3] =
+        clampedTuning.glassTransmission;
+    fixtureMaterial.iorThicknessAttenuationDistance[0] = clampedTuning.glassIor;
     if (!WriteBuffer(heldLightBuffer_, &heldLightGpu, sizeof(heldLightGpu),
                      "held light", diagnostic) ||
         !WriteBuffer(fireEmitterBuffer_, fireEmitterUpload.emitters.data(),
@@ -3623,14 +3811,21 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         !WriteBuffer(instanceBuffer_, instances.data(), sizeof(instances),
                      "animated TLAS instance", diagnostic) ||
         !WriteBuffer(instanceMetadataBuffer_, frameInstanceMetadata.data(),
-                     sizeof(frameInstanceMetadata), "player route metadata", diagnostic))
+                     sizeof(frameInstanceMetadata), "player route metadata", diagnostic) ||
+        !WriteBuffer(materialMetadataBuffer_, frameMaterials.data(),
+                     frameMaterials.size() * sizeof(RtMaterialGpu),
+                     "RT Lab dielectric material", diagnostic) ||
+        !WriteBuffer(dielectricDiagnosticsBuffer_, &clearedDielectricDiagnostics,
+                     sizeof(clearedDielectricDiagnostics),
+                     "dielectric diagnostics reset", diagnostic))
     {
         return false;
     }
 
     VkMemoryBarrier hostWriteBarrier{VK_STRUCTURE_TYPE_MEMORY_BARRIER};
     hostWriteBarrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;
-    hostWriteBarrier.dstAccessMask = VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR | VK_ACCESS_SHADER_READ_BIT;
+    hostWriteBarrier.dstAccessMask = VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR |
+                                     VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT;
     vkCmdPipelineBarrier(commandBuffer,
                          VK_PIPELINE_STAGE_HOST_BIT,
                          VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR |

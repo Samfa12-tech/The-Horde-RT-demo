@@ -126,6 +126,7 @@ struct SwapchainContext
     std::string activeBenchmarkName;
     horde::vulkan::raytracing::PlayerRenderRoute playerRenderRoute =
         horde::vulkan::raytracing::PlayerRenderRoute::Procedural;
+    bool glassFixtureRequested = false;
     std::uint32_t benchmarkGeneration = 0u;
     std::uint32_t benchmarkWarmupFrames = 0u;
     std::uint32_t benchmarkSampleFrames = 0u;
@@ -620,7 +621,9 @@ bool ResolveDebugCheckpoint(const std::int32_t id, DebugCheckpointSelection& sel
                             development->yaw, development->pitch,
                             base->expectedZone, base->preset};
     selection.simulationCheckpointId = base->id;
-    selection.playerRoute = development->name.starts_with("player-body-")
+    selection.playerRoute =
+        (development->name.starts_with("player-body-") ||
+         development->usesGlassFixture)
         ? horde::vulkan::raytracing::PlayerRenderRoute::Skinned
         : horde::vulkan::raytracing::PlayerRenderRoute::Procedural;
     selection.development = development;
@@ -710,6 +713,10 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
          << ", \"fireStrengthScale\": " << rtLab.fireStrengthScale
          << ", \"fireTurbulenceScale\": " << rtLab.fireTurbulenceScale
          << ", \"fireSmokeScale\": " << rtLab.fireSmokeScale
+         << ", \"glassVisible\": " << (rtLab.glassFixtureVisible ? "true" : "false")
+         << ", \"glassTransmission\": " << rtLab.glassTransmission
+         << ", \"glassIor\": " << rtLab.glassIor
+         << ", \"glassRoughness\": " << rtLab.glassRoughness
          << ", \"workloadPreset\": " << static_cast<std::int32_t>(rtLab.workloadPreset) << "},\n"
          << "  \"internalExtent\": {\"width\": " << context.capabilities.performance.internalRenderWidth
          << ", \"height\": " << context.capabilities.performance.internalRenderHeight << "},\n"
@@ -721,6 +728,10 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
          << "  \"playerSkinUpdates\": " << context.rtScene.PlayerSkinUpdateCount() << ",\n"
          << "  \"playerSkinCpuAverageMs\": " << context.rtScene.PlayerSkinAverageMilliseconds() << ",\n"
          << "  \"playerMaxSocketErrorM\": " << context.rtScene.PlayerMaxSocketErrorMetres() << ",\n"
+         << "  \"dielectricTransportOverflowCount\": "
+         << context.rtScene.DielectricTransportOverflowCount() << ",\n"
+         << "  \"dielectricShadowOverflowCount\": "
+         << context.rtScene.DielectricShadowOverflowCount() << ",\n"
          << "  \"tlasInstanceCount\": " << context.rtScene.TlasInstanceCount() << ",\n"
          << "  \"buildIdentity\": \"" << HORDE_RT_BUILD_ID << " DEBUG\",\n"
          << "  \"shaderIdentity\": \"" << std::string(HORDE_RT_RAYGEN_SHA256).substr(0u, 12u) << "\",\n"
@@ -769,6 +780,8 @@ void ApplyBenchmarkCheckpoint(SwapchainContext& context, const DebugCheckpointSe
     context.activeBenchmarkCheckpoint = checkpoint.id;
     context.activeBenchmarkName = checkpoint.name;
     context.playerRenderRoute = selection.playerRoute;
+    context.glassFixtureRequested =
+        selection.development != nullptr && selection.development->usesGlassFixture;
     context.routeReplayActive = false;
     context.captureActive = false;
     context.capturePresentedFrames = 0u;
@@ -795,6 +808,8 @@ void ApplyCaptureCheckpoint(SwapchainContext& context, const DebugCheckpointSele
     context.activeBenchmarkCheckpoint = checkpoint.id;
     context.activeBenchmarkName = checkpoint.name;
     context.playerRenderRoute = selection.playerRoute;
+    context.glassFixtureRequested =
+        selection.development != nullptr && selection.development->usesGlassFixture;
     context.routeReplayActive = false;
     context.benchmarkSampling = false;
     context.captureActive = true;
@@ -817,6 +832,7 @@ void ApplyRouteReplay(SwapchainContext& context)
     context.activeBenchmarkCheckpoint = -1;
     context.activeBenchmarkName.clear();
     context.playerRenderRoute = horde::vulkan::raytracing::PlayerRenderRoute::Procedural;
+    context.glassFixtureRequested = false;
     context.benchmarkSampling = false;
     context.captureActive = false;
     context.capturePresentedFrames = 0u;
@@ -1921,6 +1937,8 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
                     std::clamp(gRequestedWaterQuality.load(std::memory_order_acquire), 0, 2)),
                 rtLabTuning);
         frameInputs.playerRenderRoute = context.playerRenderRoute;
+        if (context.glassFixtureRequested)
+            frameInputs.tuning.glassFixtureVisible = true;
         std::string diagnostic;
         gpuTimingRecording = context.gpuFrameTimingEnabled &&
             context.gpuFrameTimer.RecordBegin(context.commandBuffers[imageIndex], context.currentFrame);
@@ -2603,6 +2621,17 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_setRtFireTuning(
         static_cast<float>(strengthScale),
         static_cast<float>(turbulenceScale),
         static_cast<float>(smokeScale));
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_setRtGlassTuning(
+    JNIEnv*, jclass, jboolean visible, jfloat transmission, jfloat ior, jfloat roughness)
+{
+    gRtLabState.SetGlass(
+        visible == JNI_TRUE,
+        static_cast<float>(transmission),
+        static_cast<float>(ior),
+        static_cast<float>(roughness));
 }
 
 extern "C" JNIEXPORT void JNICALL

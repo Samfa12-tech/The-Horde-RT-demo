@@ -24,9 +24,10 @@ struct DevelopmentCheckpoint
     float yaw;
     float pitch;
     DevelopmentCombatPose combatPose = DevelopmentCombatPose::Rest;
+    bool usesGlassFixture = false;
 };
 
-inline constexpr std::array<DevelopmentCheckpoint, 9u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 11u> kDevelopmentCheckpoints{{
     {100, "pbr-sword-closeup", 0, 0.0f, 1.85f, 0.0f, -0.18f},
     {101, "pbr-torch-fire", 0, 0.0f, 1.85f, 0.0f, -0.14f},
     {102, "player-body-grips", 0, 0.0f, 1.85f, 0.0f, -0.32f},
@@ -38,6 +39,10 @@ inline constexpr std::array<DevelopmentCheckpoint, 9u> kDevelopmentCheckpoints{{
      DevelopmentCombatPose::DownwardCutActive},
     {108, "player-body-upward-slice", 0, 0.0f, 1.85f, 0.0f, -0.28f,
      DevelopmentCombatPose::UpwardSliceActive},
+    {109, "glass-transport", 4, -7.60f, -15.20f, -1.57079632679f, -0.05f,
+     DevelopmentCombatPose::Rest, true},
+    {110, "glass-fire-transport", 0, -7.60f, -15.20f, -1.57079632679f, -0.05f,
+     DevelopmentCombatPose::Rest, true},
 }};
 
 constexpr const DevelopmentCheckpoint* FindDevelopmentCheckpoint(std::string_view name)

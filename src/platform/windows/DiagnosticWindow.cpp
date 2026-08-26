@@ -141,6 +141,14 @@ constexpr int kRtLabFireTurbulenceLabelId = 149;
 constexpr int kRtLabFireTurbulenceSliderId = 150;
 constexpr int kRtLabFireSmokeLabelId = 151;
 constexpr int kRtLabFireSmokeSliderId = 152;
+constexpr int kRtLabGlassVisibilityLabelId = 153;
+constexpr int kRtLabGlassVisibilitySliderId = 154;
+constexpr int kRtLabGlassTransmissionLabelId = 155;
+constexpr int kRtLabGlassTransmissionSliderId = 156;
+constexpr int kRtLabGlassIorLabelId = 157;
+constexpr int kRtLabGlassIorSliderId = 158;
+constexpr int kRtLabGlassRoughnessLabelId = 159;
+constexpr int kRtLabGlassRoughnessSliderId = 160;
 constexpr int kMenuPauseId = 2001;
 constexpr int kMenuRestartId = 2002;
 constexpr int kMenuExitId = 2003;
@@ -1392,6 +1400,23 @@ void UpdateRtLabLabels(VulkanSurfaceContext& context)
     const int fireSmoke = static_cast<int>(std::lround(tuning.fireSmokeScale * 100.0f));
     setText(kRtLabFireSmokeLabelId, "FLAME SMOKE: " + std::to_string(fireSmoke) + "%");
     setSlider(kRtLabFireSmokeSliderId, fireSmoke);
+    const int glassVisibility = tuning.glassFixtureVisible ? 100 : 0;
+    setText(kRtLabGlassVisibilityLabelId,
+            std::string("GLASS FIXTURE: ") + (glassVisibility != 0 ? "VISIBLE" : "HIDDEN"));
+    setSlider(kRtLabGlassVisibilitySliderId, glassVisibility);
+    const int glassTransmission = static_cast<int>(std::lround(tuning.glassTransmission * 100.0f));
+    setText(kRtLabGlassTransmissionLabelId,
+            "GLASS TRANSMISSION: " + std::to_string(glassTransmission) + "%");
+    setSlider(kRtLabGlassTransmissionSliderId, glassTransmission);
+    const int glassIor = static_cast<int>(std::lround(tuning.glassIor * 100.0f));
+    setText(kRtLabGlassIorLabelId,
+            "GLASS IOR: " + std::to_string(glassIor / 100) + "." +
+            (glassIor % 100 < 10 ? "0" : "") + std::to_string(glassIor % 100));
+    setSlider(kRtLabGlassIorSliderId, glassIor);
+    const int glassRoughness = static_cast<int>(std::lround(tuning.glassRoughness * 100.0f));
+    setText(kRtLabGlassRoughnessLabelId,
+            "GLASS ROUGHNESS: " + std::to_string(glassRoughness) + "%");
+    setSlider(kRtLabGlassRoughnessSliderId, glassRoughness);
 
     const auto& light = tuning.lights[static_cast<std::size_t>(context.rtLabLightGroup)];
     setText(kRtLabLightGroupButtonId, std::string("LIGHT GROUP: ") + RtLightGroupName(context.rtLabLightGroup));
@@ -1484,6 +1509,10 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
                          kRtLabFireStrengthLabelId, kRtLabFireStrengthSliderId,
                          kRtLabFireTurbulenceLabelId, kRtLabFireTurbulenceSliderId,
                          kRtLabFireSmokeLabelId, kRtLabFireSmokeSliderId,
+                         kRtLabGlassVisibilityLabelId, kRtLabGlassVisibilitySliderId,
+                         kRtLabGlassTransmissionLabelId, kRtLabGlassTransmissionSliderId,
+                         kRtLabGlassIorLabelId, kRtLabGlassIorSliderId,
+                         kRtLabGlassRoughnessLabelId, kRtLabGlassRoughnessSliderId,
                          kRtLabLightGroupButtonId, kRtLabHueLabelId, kRtLabHueSliderId,
                          kRtLabIntensityLabelId, kRtLabIntensitySliderId,
                          kRtLabWorkloadButtonId, kRtLabRestoreButtonId, kRtLabBackButtonId})
@@ -2234,7 +2263,7 @@ void ClearDesktopInput(VulkanSurfaceContext& context)
 
 std::vector<HWND> VisibleControllerMenuControls(const VulkanSurfaceContext& context)
 {
-    constexpr std::array<int, 31u> controlIds{{
+    constexpr std::array<int, 35u> controlIds{{
         kResumeButtonId, kRestartButtonId, kControlsButtonId, kSettingsButtonId,
         kRtLabButtonId, kDiagnosticsButtonId, kRunBenchmarkButtonId, kMoreBySamfa12ButtonId,
         kExitButtonId, kSfxButtonId, kSensitivityButtonId, kWaterQualityButtonId,
@@ -2242,7 +2271,9 @@ std::vector<HWND> VisibleControllerMenuControls(const VulkanSurfaceContext& cont
         kBenchmarkCopyButtonId, kBenchmarkSaveButtonId, kBenchmarkBackButtonId,
         kRtLabWaterfallSliderId, kRtLabRoofSliderId, kRtLabDawnSliderId,
         kRtLabFogSliderId, kRtLabFireStrengthSliderId, kRtLabFireTurbulenceSliderId,
-        kRtLabFireSmokeSliderId, kRtLabLightGroupButtonId, kRtLabHueSliderId,
+        kRtLabFireSmokeSliderId, kRtLabGlassVisibilitySliderId,
+        kRtLabGlassTransmissionSliderId, kRtLabGlassIorSliderId,
+        kRtLabGlassRoughnessSliderId, kRtLabLightGroupButtonId, kRtLabHueSliderId,
         kRtLabIntensitySliderId, kRtLabWorkloadButtonId, kRtLabRestoreButtonId,
         kRtLabBackButtonId,
     }};
@@ -2254,7 +2285,9 @@ std::vector<HWND> VisibleControllerMenuControls(const VulkanSurfaceContext& cont
         const bool labControl = id == kRtLabWaterfallSliderId || id == kRtLabRoofSliderId ||
             id == kRtLabDawnSliderId || id == kRtLabFogSliderId ||
             id == kRtLabFireStrengthSliderId || id == kRtLabFireTurbulenceSliderId ||
-            id == kRtLabFireSmokeSliderId ||
+            id == kRtLabFireSmokeSliderId || id == kRtLabGlassVisibilitySliderId ||
+            id == kRtLabGlassTransmissionSliderId || id == kRtLabGlassIorSliderId ||
+            id == kRtLabGlassRoughnessSliderId ||
             id == kRtLabLightGroupButtonId || id == kRtLabHueSliderId ||
             id == kRtLabIntensitySliderId || id == kRtLabWorkloadButtonId ||
             id == kRtLabRestoreButtonId || id == kRtLabBackButtonId;
@@ -2362,7 +2395,13 @@ bool AdjustFocusedControllerSlider(VulkanSurfaceContext& context, const bool inc
     {
     case kRtLabWaterfallSliderId: range = horde::platform::windows::RtLabControlRange::WaterfallPercent; break;
     case kRtLabRoofSliderId:
-    case kRtLabDawnSliderId: range = horde::platform::windows::RtLabControlRange::UnitPercent; break;
+    case kRtLabDawnSliderId:
+    case kRtLabGlassVisibilitySliderId:
+    case kRtLabGlassTransmissionSliderId:
+    case kRtLabGlassRoughnessSliderId:
+        range = horde::platform::windows::RtLabControlRange::UnitPercent; break;
+    case kRtLabGlassIorSliderId:
+        range = horde::platform::windows::RtLabControlRange::IorHundredths; break;
     case kRtLabFogSliderId:
     case kRtLabFireStrengthSliderId:
     case kRtLabFireTurbulenceSliderId:
@@ -3482,13 +3521,19 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         horde::vulkan::raytracing::RtSceneFrameInputs frameInputs =
             horde::vulkan::raytracing::BuildRtSceneFrameInputs(
                 simulation, ctx.outputExposure, ctx.waterQuality, ctx.rtSceneTuning);
-        // Developer A/B: the deterministic player-body-grips checkpoint opts
-        // into the authored skinned route. Every other route retains the
-        // established procedural phone-safe fallback until exact-device review.
+        // Development-only player/glass proofs share the skinned route because
+        // the generic fixture owns procedural slot 5. Authored captures retain
+        // the established procedural phone-safe fallback.
+        const horde::gameplay::DevelopmentCheckpoint* development =
+            horde::gameplay::FindDevelopmentCheckpoint(ctx.developmentCheckpoint);
+        const bool usesGlassFixture =
+            development != nullptr && development->usesGlassFixture;
         frameInputs.playerRenderRoute =
-            ctx.developmentCheckpoint.starts_with("player-body-")
+            (ctx.developmentCheckpoint.starts_with("player-body-") || usesGlassFixture)
             ? horde::vulkan::raytracing::PlayerRenderRoute::Skinned
             : horde::vulkan::raytracing::PlayerRenderRoute::Procedural;
+        if (usesGlassFixture)
+            frameInputs.tuning.glassFixtureVisible = true;
         if (ctx.debugEnemyOverride != horde::gameplay::EnemyKind::None)
         {
             // Debug-only renderer inspection remains non-authoritative gameplay.
@@ -3731,6 +3776,10 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
              << ", \"torchBlasBuildMilliseconds\": "
              << context.rtScene.StaticMeshTorchBlasBuildMilliseconds()
              << "},\n"
+             << "  \"dielectricDiagnostics\": {\"transportOverflowCount\": "
+             << context.rtScene.DielectricTransportOverflowCount()
+             << ", \"shadowOverflowCount\": "
+             << context.rtScene.DielectricShadowOverflowCount() << "},\n"
              << "  \"error\": " << (error.empty() ? "null" : "\"" + JsonEscape(error) + "\"") << ",\n"
              << "  \"captures\": [\n";
     for (std::size_t index = 0; index < captures.size(); ++index)
@@ -4299,6 +4348,10 @@ void ApplyDpiScaledFonts(HWND window)
                          kRtLabFireStrengthLabelId, kRtLabFireStrengthSliderId,
                          kRtLabFireTurbulenceLabelId, kRtLabFireTurbulenceSliderId,
                          kRtLabFireSmokeLabelId, kRtLabFireSmokeSliderId,
+                         kRtLabGlassVisibilityLabelId, kRtLabGlassVisibilitySliderId,
+                         kRtLabGlassTransmissionLabelId, kRtLabGlassTransmissionSliderId,
+                         kRtLabGlassIorLabelId, kRtLabGlassIorSliderId,
+                         kRtLabGlassRoughnessLabelId, kRtLabGlassRoughnessSliderId,
                          kRtLabHueLabelId, kRtLabHueSliderId, kRtLabIntensityLabelId,
                          kRtLabIntensitySliderId, kRtLabWorkloadButtonId,
                          kRtLabRestoreButtonId, kRtLabBackButtonId})
@@ -4485,7 +4538,7 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
             MoveWindow(panel, panelX, panelY, panelWidth, panelHeight, TRUE);
             SetWindowPos(panel, HWND_BOTTOM, panelX, panelY, panelWidth, panelHeight, SWP_NOACTIVATE);
         }
-        const int contentHeight = ScaleForDpi(window, 1056);
+        const int contentHeight = ScaleForDpi(window, 1344);
         const int maxScroll = std::max(0, contentHeight - panelHeight + ScaleForDpi(window, 28));
         mutableContext->rtLabScrollOffset = std::clamp(mutableContext->rtLabScrollOffset, 0, maxScroll);
         SCROLLINFO scroll{sizeof(SCROLLINFO), SIF_RANGE | SIF_PAGE | SIF_POS};
@@ -4521,14 +4574,18 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
         place(kRtLabTitleId, 0, titleHeight);
         place(kRtLabTelemetryId, 50, labelHeight);
         int labY = 84;
-        for (const auto [labelId, sliderId] : std::array<std::pair<int, int>, 7>{{
+        for (const auto [labelId, sliderId] : std::array<std::pair<int, int>, 11>{{
                  {kRtLabWaterfallLabelId, kRtLabWaterfallSliderId},
                  {kRtLabRoofLabelId, kRtLabRoofSliderId},
                  {kRtLabDawnLabelId, kRtLabDawnSliderId},
                  {kRtLabFogLabelId, kRtLabFogSliderId},
                  {kRtLabFireStrengthLabelId, kRtLabFireStrengthSliderId},
                  {kRtLabFireTurbulenceLabelId, kRtLabFireTurbulenceSliderId},
-                 {kRtLabFireSmokeLabelId, kRtLabFireSmokeSliderId}}})
+                 {kRtLabFireSmokeLabelId, kRtLabFireSmokeSliderId},
+                 {kRtLabGlassVisibilityLabelId, kRtLabGlassVisibilitySliderId},
+                 {kRtLabGlassTransmissionLabelId, kRtLabGlassTransmissionSliderId},
+                 {kRtLabGlassIorLabelId, kRtLabGlassIorSliderId},
+                 {kRtLabGlassRoughnessLabelId, kRtLabGlassRoughnessSliderId}}})
         {
             place(labelId, labY, labelHeight);
             labY += 26;
@@ -4768,6 +4825,10 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             case kRtLabFireStrengthSliderId: tuning.fireStrengthScale = static_cast<float>(value) / 100.0f; break;
             case kRtLabFireTurbulenceSliderId: tuning.fireTurbulenceScale = static_cast<float>(value) / 100.0f; break;
             case kRtLabFireSmokeSliderId: tuning.fireSmokeScale = static_cast<float>(value) / 100.0f; break;
+            case kRtLabGlassVisibilitySliderId: tuning.glassFixtureVisible = value > 0; break;
+            case kRtLabGlassTransmissionSliderId: tuning.glassTransmission = static_cast<float>(value) / 100.0f; break;
+            case kRtLabGlassIorSliderId: tuning.glassIor = static_cast<float>(value) / 100.0f; break;
+            case kRtLabGlassRoughnessSliderId: tuning.glassRoughness = static_cast<float>(value) / 100.0f; break;
             case kRtLabHueSliderId:
                 tuning.lights[static_cast<std::size_t>(sceneContext->rtLabLightGroup)].hueDegrees =
                     static_cast<float>(value);
@@ -5602,6 +5663,10 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     createStatic(kRtLabFireStrengthLabelId, "FLAME STRENGTH: 100%", SS_LEFT | SS_CENTERIMAGE);
     createStatic(kRtLabFireTurbulenceLabelId, "FLAME TURBULENCE: 100%", SS_LEFT | SS_CENTERIMAGE);
     createStatic(kRtLabFireSmokeLabelId, "FLAME SMOKE: 100%", SS_LEFT | SS_CENTERIMAGE);
+    createStatic(kRtLabGlassVisibilityLabelId, "GLASS FIXTURE: HIDDEN", SS_LEFT | SS_CENTERIMAGE);
+    createStatic(kRtLabGlassTransmissionLabelId, "GLASS TRANSMISSION: 94%", SS_LEFT | SS_CENTERIMAGE);
+    createStatic(kRtLabGlassIorLabelId, "GLASS IOR: 1.52", SS_LEFT | SS_CENTERIMAGE);
+    createStatic(kRtLabGlassRoughnessLabelId, "GLASS ROUGHNESS: 12%", SS_LEFT | SS_CENTERIMAGE);
     createButton(kRtLabLightGroupButtonId, "LIGHT GROUP: TORCH");
     createStatic(kRtLabHueLabelId, "LIGHT HUE SHIFT: 0 DEG", SS_LEFT | SS_CENTERIMAGE);
     createStatic(kRtLabIntensityLabelId, "LIGHT INTENSITY: 100%", SS_LEFT | SS_CENTERIMAGE);
@@ -5627,6 +5692,10 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     createRtLabSlider(kRtLabFireStrengthSliderId, 0, 200, 100);
     createRtLabSlider(kRtLabFireTurbulenceSliderId, 0, 200, 100);
     createRtLabSlider(kRtLabFireSmokeSliderId, 0, 200, 100);
+    createRtLabSlider(kRtLabGlassVisibilitySliderId, 0, 100, 0);
+    createRtLabSlider(kRtLabGlassTransmissionSliderId, 0, 100, 94);
+    createRtLabSlider(kRtLabGlassIorSliderId, 100, 250, 152);
+    createRtLabSlider(kRtLabGlassRoughnessSliderId, 0, 100, 12);
     createRtLabSlider(kRtLabHueSliderId, -180, 180, 0);
     createRtLabSlider(kRtLabIntensitySliderId, 0, 200, 100);
     for (const int id : {kRtLabPanelId, kRtLabTitleId, kRtLabTelemetryId,
@@ -5637,6 +5706,10 @@ int CreateAndShowWindow(const std::string& diagnosticText,
                          kRtLabFireStrengthLabelId, kRtLabFireStrengthSliderId,
                          kRtLabFireTurbulenceLabelId, kRtLabFireTurbulenceSliderId,
                          kRtLabFireSmokeLabelId, kRtLabFireSmokeSliderId,
+                         kRtLabGlassVisibilityLabelId, kRtLabGlassVisibilitySliderId,
+                         kRtLabGlassTransmissionLabelId, kRtLabGlassTransmissionSliderId,
+                         kRtLabGlassIorLabelId, kRtLabGlassIorSliderId,
+                         kRtLabGlassRoughnessLabelId, kRtLabGlassRoughnessSliderId,
                          kRtLabLightGroupButtonId, kRtLabHueLabelId, kRtLabHueSliderId,
                          kRtLabIntensityLabelId, kRtLabIntensitySliderId,
                          kRtLabWorkloadButtonId, kRtLabRestoreButtonId, kRtLabBackButtonId})

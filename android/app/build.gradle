@@ -22,6 +22,8 @@ tasks.register('prepareRuntimeAssets', Sync) {
         include 'models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb'
         include 'models/props/runtime/asset.manifest.json'
         include 'models/props/runtime/gothic-hand-torch-lod0.runtime.glb'
+        include 'models/props/runtime/dielectric-fixture/asset.manifest.json'
+        include 'models/props/runtime/dielectric-fixture/closed-glass-lod0.runtime.glb'
         include 'models/player/runtime/asset.manifest.json'
         include 'models/player/runtime/clip-manifest.json'
         include 'models/player/runtime/gothic-traveller-lod0.runtime.glb'

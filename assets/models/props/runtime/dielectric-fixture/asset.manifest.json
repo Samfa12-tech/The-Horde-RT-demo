@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "asset": "generic-closed-dielectric-fixture",
+  "metresPerUnit": 1.0,
+  "coordinateSystem": { "up": "+Y", "forward": "+Z" },
+  "budgets": {
+    "maxVertices": 8,
+    "maxIndices": 36,
+    "maxPrimitives": 1,
+    "maxMaterials": 1,
+    "maxTextureLayersPerKind": 1
+  },
+  "lods": [{ "name": "lod0", "maxTriangles": 12 }],
+  "requiredSockets": [],
+  "runtimeTextureProfile": {
+    "android": "astc",
+    "windows": "rgba8",
+    "mipmapped": true
+  },
+  "materialOverrides": []
+}

@@ -81,6 +81,10 @@ void TestAbiLayout()
               offsetof(RtPrimitiveMetadata, indexCount) == 8u &&
               offsetof(RtPrimitiveMetadata, materialIndex) == 12u,
           "RtPrimitiveMetadata CPU offsets match one GLSL uvec4 field");
+    Check(sizeof(RtDielectricDiagnostics) == 16u &&
+              offsetof(RtDielectricDiagnostics, transportOverflowCount) == 0u &&
+              offsetof(RtDielectricDiagnostics, shadowOverflowCount) == 4u,
+          "dielectric diagnostics append one fixed writable uvec4 without changing material stride");
 
     Check(sizeof(RtMaterialGpu) == 112u && alignof(RtMaterialGpu) == 16u,
           "RtMaterialGpu is seven aligned vec4/uvec4 fields");
@@ -109,8 +113,9 @@ void TestGeneratedConstants()
               kRtBindingMaterials == 13u && kRtBindingStaticVertices == 14u &&
               kRtBindingStaticIndices == 15u && kRtBindingBaseColorTextures == 16u &&
               kRtBindingNormalTextures == 17u && kRtBindingOrmTextures == 18u &&
-              kRtBindingEmissiveTextures == 19u && kRtBindingHeldLight == 20u,
-          "descriptor bindings append contiguously through held light without changing 0-19");
+              kRtBindingEmissiveTextures == 19u && kRtBindingHeldLight == 20u &&
+              kRtBindingFireEmitters == 21u && kRtBindingDielectricDiagnostics == 22u,
+          "descriptor bindings append dielectric diagnostics at 22 without changing 0-21");
     Check(static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr) == 1u &&
               static_cast<std::uint32_t>(RtInstanceFlag::Emissive) == 2u &&
               static_cast<std::uint32_t>(RtInstanceFlag::Transmissive) == 4u,

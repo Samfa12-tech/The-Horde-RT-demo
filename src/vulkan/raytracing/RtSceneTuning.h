@@ -43,6 +43,10 @@ struct RtSceneTuning
     float fireStrengthScale = 1.0f;
     float fireTurbulenceScale = 1.0f;
     float fireSmokeScale = 1.0f;
+    float glassTransmission = 0.94f;
+    float glassIor = 1.52f;
+    float glassRoughness = 0.12f;
+    bool glassFixtureVisible = false;
 };
 
 inline RtSceneTuning ClampRtSceneTuning(RtSceneTuning tuning)
@@ -65,6 +69,9 @@ inline RtSceneTuning ClampRtSceneTuning(RtSceneTuning tuning)
     tuning.fireStrengthScale = std::clamp(tuning.fireStrengthScale, 0.0f, 2.0f);
     tuning.fireTurbulenceScale = std::clamp(tuning.fireTurbulenceScale, 0.0f, 2.0f);
     tuning.fireSmokeScale = std::clamp(tuning.fireSmokeScale, 0.0f, 2.0f);
+    tuning.glassTransmission = std::clamp(tuning.glassTransmission, 0.0f, 1.0f);
+    tuning.glassIor = std::clamp(tuning.glassIor, 1.0f, 2.5f);
+    tuning.glassRoughness = std::clamp(tuning.glassRoughness, 0.0f, 1.0f);
     return tuning;
 }
 

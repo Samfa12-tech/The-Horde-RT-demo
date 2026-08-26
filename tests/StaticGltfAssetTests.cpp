@@ -17,6 +17,7 @@ namespace
 
 int failures = 0;
 const std::filesystem::path kFixtureRoot{HORDE_RT_STATIC_GLTF_FIXTURE_DIR};
+const std::filesystem::path kDielectricFixtureRoot{HORDE_RT_DIELECTRIC_FIXTURE_DIR};
 
 void Check(bool condition, std::string_view message)
 {
@@ -631,6 +632,24 @@ void TestBudgetFailures(const std::filesystem::path& temporaryRoot,
     (void)validManifest;
 }
 
+void TestProductionDielectricFixture()
+{
+    horde::scene::assets::AssetManifest manifest;
+    horde::scene::assets::StaticMeshAsset asset;
+    std::string diagnostic;
+    Check(horde::scene::assets::AssetManifest::Load(
+              kDielectricFixtureRoot / "asset.manifest.json", manifest, diagnostic),
+          std::string("production dielectric manifest loads: ") + diagnostic);
+    Check(horde::scene::assets::StaticMeshAsset::Load(
+              kDielectricFixtureRoot / "closed-glass-lod0.runtime.glb",
+              manifest, asset, diagnostic),
+          std::string("closed/manifold production dielectric fixture loads: ") + diagnostic);
+    Check(asset.primitives.size() == 1u && asset.materials.size() == 1u &&
+              asset.indices.size() == 36u && asset.materials[0].transmissionFactor > 0.9f &&
+              asset.materials[0].thicknessFactor > 0.0f && asset.materials[0].ior > 1.0f,
+          "production dielectric fixture keeps one closed twelve-triangle volume and KHR material properties");
+}
+
 } // namespace
 
 int main()
@@ -641,6 +660,7 @@ int main()
     std::filesystem::create_directories(temporaryRoot);
 
     TestManifestContract(temporaryRoot);
+    TestProductionDielectricFixture();
 
     horde::scene::assets::AssetManifest manifest;
     std::string diagnostic;

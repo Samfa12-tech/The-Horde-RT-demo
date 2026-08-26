@@ -117,6 +117,7 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
                 {
                     if (interfaceCount >= interfaceBudget)
                     {
+                        atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);
                         transmittance *= vec3(0.08);
                         break;
                     }
@@ -154,6 +155,7 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
                     }
                     else
                     {
+                        atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);
                         transmittance *= vec3(0.08);
                         break;
                     }
@@ -221,6 +223,27 @@ float transparentVisibility(vec3 origin, vec3 direction, float maxDistance)
     vec3 transmittance = shadowTransmittanceMask(
         origin, direction, maxDistance, 0x35u);
     return dot(transmittance, vec3(0.2126, 0.7152, 0.0722));
+}
+
+const int kShadowSampleCapacity = 4;
+
+vec4 transparentVisibilityBatch(vec3 origins[kShadowSampleCapacity],
+                                vec3 directions[kShadowSampleCapacity],
+                                float distances[kShadowSampleCapacity],
+                                bvec4 enabled)
+{
+    // glslang inlines every rayQuery helper into raygen. Keeping the four
+    // direct-light samples in one bounded loop preserves the exact queries
+    // while avoiding separately expanded copies of the material traversal.
+    vec4 result = vec4(0.0);
+    for (int shadowSample = 0; shadowSample < kShadowSampleCapacity; ++shadowSample)
+    {
+        if (!enabled[shadowSample]) continue;
+        result[shadowSample] = transparentVisibility(
+            origins[shadowSample], directions[shadowSample],
+            distances[shadowSample]);
+    }
+    return result;
 }
 
 void activeLocalLight(out vec3 position, out vec3 color, out float strength);
@@ -393,39 +416,48 @@ vec3 shadeOpaqueDirect(HitInfo h, vec3 rayDirection, bool dualVisibility,
     vec3 sampleVector = localPosition + areaOffsets[sampleIndex] - h.position;
     float sampleDistance = length(sampleVector);
     vec3 sampleDirection = sampleVector / max(sampleDistance, 0.001);
-    localVisibility = localStrength > 0.001
-        ? transparentVisibility(offsetRayOrigin(h, sampleDirection), sampleDirection,
-                     sampleDistance - 0.02) : 0.0;
+    vec3 otherDirection = sampleDirection;
+    float otherDistance = sampleDistance;
     if (dualVisibility && localStrength > 0.001)
     {
         vec3 otherVector = localPosition + areaOffsets[1 - sampleIndex] - h.position;
-        float otherDistance = length(otherVector);
-        vec3 otherDirection = otherVector / max(otherDistance, 0.001);
-        localVisibility = 0.5 * (localVisibility + transparentVisibility(
-            offsetRayOrigin(h, otherDirection), otherDirection, otherDistance - 0.02));
+        otherDistance = length(otherVector);
+        otherDirection = otherVector / max(otherDistance, 0.001);
     }
-
     vec3 skyDirection;
     float skyDistance;
     vec3 skyRadiance;
     float skyGain;
     activeSkyLight(h.position, sampleIndex, skyDirection, skyDistance, skyRadiance, skyGain);
-    skyVisibility = transparentVisibility(offsetRayOrigin(h, skyDirection), skyDirection,
-                               skyDistance - 0.02) * skyGain;
+    vec3 otherSkyDirection = skyDirection;
+    float otherSkyDistance = skyDistance;
+    float otherSkyGain = skyGain;
     if (dualVisibility)
     {
-        vec3 otherSkyDirection;
-        float otherSkyDistance;
         vec3 otherSkyRadiance;
-        float otherSkyGain;
         activeSkyLight(h.position, 1 - sampleIndex, otherSkyDirection,
                        otherSkyDistance, otherSkyRadiance, otherSkyGain);
-        float otherVisibility = transparentVisibility(offsetRayOrigin(h, otherSkyDirection),
-                                           otherSkyDirection,
-                                           otherSkyDistance - 0.02) * otherSkyGain;
-        skyVisibility = 0.5 * (skyVisibility + otherVisibility);
         skyRadiance = 0.5 * (skyRadiance + otherSkyRadiance);
     }
+    vec3 visibilityOrigins[kShadowSampleCapacity] = vec3[kShadowSampleCapacity](
+        offsetRayOrigin(h, sampleDirection), offsetRayOrigin(h, otherDirection),
+        offsetRayOrigin(h, skyDirection), offsetRayOrigin(h, otherSkyDirection));
+    vec3 visibilityDirections[kShadowSampleCapacity] = vec3[kShadowSampleCapacity](
+        sampleDirection, otherDirection, skyDirection, otherSkyDirection);
+    float visibilityDistances[kShadowSampleCapacity] = float[kShadowSampleCapacity](
+        sampleDistance - 0.02, otherDistance - 0.02,
+        skyDistance - 0.02, otherSkyDistance - 0.02);
+    vec4 visibilitySamples = transparentVisibilityBatch(
+        visibilityOrigins, visibilityDirections, visibilityDistances,
+        bvec4(localStrength > 0.001,
+              dualVisibility && localStrength > 0.001, true, dualVisibility));
+    localVisibility = dualVisibility
+        ? 0.5 * (visibilitySamples.x + visibilitySamples.y)
+        : visibilitySamples.x;
+    visibilitySamples.zw *= vec2(skyGain, otherSkyGain);
+    skyVisibility = dualVisibility
+        ? 0.5 * (visibilitySamples.z + visibilitySamples.w)
+        : visibilitySamples.z;
 
     float reflective = max(h.metallic, h.reflectivity);
     float localDiffuse = max(dot(h.normal, localDirection), 0.0);

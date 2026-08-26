@@ -188,6 +188,7 @@ if(BUILD_TESTING)
     )
     target_compile_definitions(horde_rt_static_gltf_asset_tests PRIVATE
         HORDE_RT_STATIC_GLTF_FIXTURE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/static-gltf"
+        HORDE_RT_DIELECTRIC_FIXTURE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets/models/props/runtime/dielectric-fixture"
     )
     add_test(NAME horde_rt_static_gltf_asset_tests COMMAND horde_rt_static_gltf_asset_tests)
 
@@ -208,12 +209,16 @@ if(BUILD_TESTING)
         add_test(NAME horde_rt_static_preparation_colliding_lod_policy_tests
             COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
                 ${CMAKE_CURRENT_SOURCE_DIR}/tests/StaticAssetPreparationPolicyTests.ps1 -Mode CollidingLod)
+        add_test(NAME horde_rt_dielectric_topology_tool_tests
+            COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
+                ${CMAKE_CURRENT_SOURCE_DIR}/tests/DielectricTopologyToolTests.ps1)
         set_tests_properties(
             horde_rt_scene_abi_generator_tests
             horde_rt_static_texture_array_tool_tests
             horde_rt_static_preparation_lod_policy_tests
             horde_rt_static_preparation_skip_policy_tests
             horde_rt_static_preparation_colliding_lod_policy_tests
+            horde_rt_dielectric_topology_tool_tests
             PROPERTIES TIMEOUT 120)
     endif()
 

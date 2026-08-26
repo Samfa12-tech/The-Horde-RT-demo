@@ -80,6 +80,19 @@ public:
         tuning_ = vulkan::raytracing::ClampRtSceneTuning(tuning_);
     }
 
+    void SetGlass(const bool visible,
+                  const float transmission,
+                  const float ior,
+                  const float roughness)
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        tuning_.glassFixtureVisible = visible;
+        tuning_.glassTransmission = transmission;
+        tuning_.glassIor = ior;
+        tuning_.glassRoughness = roughness;
+        tuning_ = vulkan::raytracing::ClampRtSceneTuning(tuning_);
+    }
+
     void SetWorkload(const std::int32_t preset)
     {
         std::lock_guard<std::mutex> lock(mutex_);
