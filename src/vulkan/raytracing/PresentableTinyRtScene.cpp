@@ -3738,7 +3738,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         instances[5].mask = 0x01u;
         instances[5].accelerationStructureReference = dielectricFixtureBlas_.address;
         instances[5].transform = {{
-            0.20f, 0.0f, 0.0f, -9.10f,
+            0.20f * clampedTuning.glassDepthScale, 0.0f, 0.0f, -9.10f,
             0.0f, 1.25f, 0.0f, -0.325f,
             0.0f, 0.0f, 0.75f, -15.20f}};
     }
@@ -3813,6 +3813,11 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     fixtureMaterial.metallicRoughnessOcclusionTransmission[3] =
         clampedTuning.glassTransmission;
     fixtureMaterial.iorThicknessAttenuationDistance[0] = clampedTuning.glassIor;
+    fixtureMaterial.iorThicknessAttenuationDistance[2] =
+        clampedTuning.glassAttenuationDistance;
+    fixtureMaterial.attenuationColor[0] = clampedTuning.glassAttenuationColor[0];
+    fixtureMaterial.attenuationColor[1] = clampedTuning.glassAttenuationColor[1];
+    fixtureMaterial.attenuationColor[2] = clampedTuning.glassAttenuationColor[2];
     if (!WriteBuffer(heldLightBuffer_, &heldLightGpu, sizeof(heldLightGpu),
                      "held light", diagnostic) ||
         !WriteBuffer(fireEmitterBuffer_, fireEmitterUpload.emitters.data(),

@@ -25,9 +25,12 @@ struct DevelopmentCheckpoint
     float pitch;
     DevelopmentCombatPose combatPose = DevelopmentCombatPose::Rest;
     bool usesGlassFixture = false;
+    float glassDepthScale = 1.0f;
+    std::array<float, 3u> glassAttenuationColor{{0.72f, 0.90f, 1.0f}};
+    float glassAttenuationDistance = 2.4f;
 };
 
-inline constexpr std::array<DevelopmentCheckpoint, 11u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 14u> kDevelopmentCheckpoints{{
     {100, "pbr-sword-closeup", 0, 0.0f, 1.85f, 0.0f, -0.18f},
     {101, "pbr-torch-fire", 0, 0.0f, 1.85f, 0.0f, -0.14f},
     {102, "player-body-grips", 0, 0.0f, 1.85f, 0.0f, -0.32f},
@@ -42,6 +45,12 @@ inline constexpr std::array<DevelopmentCheckpoint, 11u> kDevelopmentCheckpoints{
     {109, "glass-transport", 4, -7.60f, -15.20f, -1.57079632679f, -0.05f,
      DevelopmentCombatPose::Rest, true},
     {110, "glass-fire-transport", 0, -7.60f, -15.20f, -1.57079632679f, -0.05f,
+     DevelopmentCombatPose::Rest, true},
+    {111, "glass-tinted-transport", 0, -7.60f, -15.20f, -1.57079632679f, -0.05f,
+     DevelopmentCombatPose::Rest, true, 1.0f, {{0.12f, 0.82f, 0.28f}}, 0.30f},
+    {112, "glass-millimetre-closed", 4, -7.60f, -15.20f, -1.57079632679f, -0.05f,
+     DevelopmentCombatPose::Rest, true, 0.005f},
+    {113, "glass-edge-fresnel", 4, -7.60f, -13.25f, -2.28f, -0.05f,
      DevelopmentCombatPose::Rest, true},
 }};
 

@@ -127,6 +127,9 @@ struct SwapchainContext
     horde::vulkan::raytracing::PlayerRenderRoute playerRenderRoute =
         horde::vulkan::raytracing::PlayerRenderRoute::Procedural;
     bool glassFixtureRequested = false;
+    float glassDepthScale = 1.0f;
+    std::array<float, 3u> glassAttenuationColor{{0.72f, 0.90f, 1.0f}};
+    float glassAttenuationDistance = 2.4f;
     std::uint32_t benchmarkGeneration = 0u;
     std::uint32_t benchmarkWarmupFrames = 0u;
     std::uint32_t benchmarkSampleFrames = 0u;
@@ -786,6 +789,12 @@ void ApplyBenchmarkCheckpoint(SwapchainContext& context, const DebugCheckpointSe
     context.playerRenderRoute = selection.playerRoute;
     context.glassFixtureRequested =
         selection.development != nullptr && selection.development->usesGlassFixture;
+    if (context.glassFixtureRequested)
+    {
+        context.glassDepthScale = selection.development->glassDepthScale;
+        context.glassAttenuationColor = selection.development->glassAttenuationColor;
+        context.glassAttenuationDistance = selection.development->glassAttenuationDistance;
+    }
     context.routeReplayActive = false;
     context.captureActive = false;
     context.capturePresentedFrames = 0u;
@@ -814,6 +823,12 @@ void ApplyCaptureCheckpoint(SwapchainContext& context, const DebugCheckpointSele
     context.playerRenderRoute = selection.playerRoute;
     context.glassFixtureRequested =
         selection.development != nullptr && selection.development->usesGlassFixture;
+    if (context.glassFixtureRequested)
+    {
+        context.glassDepthScale = selection.development->glassDepthScale;
+        context.glassAttenuationColor = selection.development->glassAttenuationColor;
+        context.glassAttenuationDistance = selection.development->glassAttenuationDistance;
+    }
     context.routeReplayActive = false;
     context.benchmarkSampling = false;
     context.captureActive = true;
@@ -837,6 +852,9 @@ void ApplyRouteReplay(SwapchainContext& context)
     context.activeBenchmarkName.clear();
     context.playerRenderRoute = horde::vulkan::raytracing::PlayerRenderRoute::Procedural;
     context.glassFixtureRequested = false;
+    context.glassDepthScale = 1.0f;
+    context.glassAttenuationColor = {{0.72f, 0.90f, 1.0f}};
+    context.glassAttenuationDistance = 2.4f;
     context.benchmarkSampling = false;
     context.captureActive = false;
     context.capturePresentedFrames = 0u;
@@ -1942,7 +1960,12 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
                 rtLabTuning);
         frameInputs.playerRenderRoute = context.playerRenderRoute;
         if (context.glassFixtureRequested)
+        {
             frameInputs.tuning.glassFixtureVisible = true;
+            frameInputs.tuning.glassDepthScale = context.glassDepthScale;
+            frameInputs.tuning.glassAttenuationColor = context.glassAttenuationColor;
+            frameInputs.tuning.glassAttenuationDistance = context.glassAttenuationDistance;
+        }
         std::string diagnostic;
         gpuTimingRecording = context.gpuFrameTimingEnabled &&
             context.gpuFrameTimer.RecordBegin(context.commandBuffers[imageIndex], context.currentFrame);

@@ -47,6 +47,9 @@ struct RtSceneTuning
     float glassIor = 1.52f;
     float glassRoughness = 0.12f;
     bool glassFixtureVisible = false;
+    std::array<float, 3u> glassAttenuationColor{{0.72f, 0.90f, 1.0f}};
+    float glassAttenuationDistance = 2.4f;
+    float glassDepthScale = 1.0f;
 };
 
 inline RtSceneTuning ClampRtSceneTuning(RtSceneTuning tuning)
@@ -72,6 +75,11 @@ inline RtSceneTuning ClampRtSceneTuning(RtSceneTuning tuning)
     tuning.glassTransmission = std::clamp(tuning.glassTransmission, 0.0f, 1.0f);
     tuning.glassIor = std::clamp(tuning.glassIor, 1.0f, 2.5f);
     tuning.glassRoughness = std::clamp(tuning.glassRoughness, 0.0f, 1.0f);
+    for (float& channel : tuning.glassAttenuationColor)
+        channel = std::clamp(channel, 0.0f, 1.0f);
+    tuning.glassAttenuationDistance =
+        std::clamp(tuning.glassAttenuationDistance, 0.0f, 100.0f);
+    tuning.glassDepthScale = std::clamp(tuning.glassDepthScale, 0.005f, 1.0f);
     return tuning;
 }
 

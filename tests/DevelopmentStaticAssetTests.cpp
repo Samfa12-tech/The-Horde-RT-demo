@@ -37,8 +37,8 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 11u,
-          "eleven isolated render-development checkpoints are exposed");
+    Check(kDevelopmentCheckpoints.size() == 14u,
+          "fourteen isolated render-development checkpoints are exposed");
     const DevelopmentCheckpoint* checkpoint = FindDevelopmentCheckpoint("pbr-sword-closeup");
     Check(checkpoint != nullptr && checkpoint->id == 100 && checkpoint->baseShowcaseCheckpointId == 0 &&
               checkpoint->name == std::string_view("pbr-sword-closeup") &&
@@ -83,6 +83,27 @@ int main()
     Check(glassFire != nullptr && glassFire->id == 110 &&
               glassFire->baseShowcaseCheckpointId == 0 && glassFire->usesGlassFixture,
           "fire-on dielectric proof reuses the exact imported fixture and camera");
+    const DevelopmentCheckpoint* tintedGlass =
+        FindDevelopmentCheckpoint("glass-tinted-transport");
+    Check(tintedGlass != nullptr && tintedGlass->id == 111 &&
+              tintedGlass->baseShowcaseCheckpointId == 0 && tintedGlass->usesGlassFixture &&
+              tintedGlass->glassAttenuationColor[0] < 0.2f &&
+              tintedGlass->glassAttenuationColor[1] > 0.7f &&
+              tintedGlass->glassAttenuationDistance < 0.5f,
+          "tinted dielectric proof has an intentionally channel-separated Beer-Lambert profile");
+    const DevelopmentCheckpoint* millimetreGlass =
+        FindDevelopmentCheckpoint("glass-millimetre-closed");
+    Check(millimetreGlass != nullptr && millimetreGlass->id == 112 &&
+              millimetreGlass->baseShowcaseCheckpointId == 4 &&
+              millimetreGlass->usesGlassFixture &&
+              millimetreGlass->glassDepthScale == 0.005f,
+          "millimetre dielectric proof scales the same 0.2 m closed fixture to exactly 1 mm");
+    const DevelopmentCheckpoint* edgeGlass =
+        FindDevelopmentCheckpoint("glass-edge-fresnel");
+    Check(edgeGlass != nullptr && edgeGlass->id == 113 &&
+              edgeGlass->baseShowcaseCheckpointId == 4 && edgeGlass->usesGlassFixture &&
+              edgeGlass->yaw < -2.0f,
+          "edge Fresnel proof retains a stable glancing camera and imported fixture route");
     horde::gameplay::simulation::GameSimulation stagedDownward;
     horde::gameplay::simulation::GameSimulation stagedUpward;
     DevelopmentCheckpointStageEvidence downwardEvidence{};

@@ -55,6 +55,11 @@ $checkpointZones = @{
     "player-body-owner-feedback" = "opening"
     "player-body-downward-cut" = "opening"
     "player-body-upward-slice" = "opening"
+    "glass-transport" = "skylight-chamber"
+    "glass-fire-transport" = "opening"
+    "glass-tinted-transport" = "opening"
+    "glass-millimetre-closed" = "skylight-chamber"
+    "glass-edge-fresnel" = "skylight-chamber"
 }
 $baselineCheckpoints = @("opening", "two-enemy-combat", "worst-bend", "skylight", "green", "lich")
 $captureCheckpoints = @("opening", "skeleton", "worst-bend", "lantern-drop", "skylight", "yellow", "blue", "red", "green", "mirror", "lich", "finale-roof", "two-enemy-combat")

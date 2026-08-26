@@ -100,6 +100,9 @@ int main()
     androidUnclamped.glassIor = -1.0f;
     androidUnclamped.glassRoughness = 3.0f;
     androidUnclamped.glassFixtureVisible = true;
+    androidUnclamped.glassAttenuationColor = {-1.0f, 0.5f, 3.0f};
+    androidUnclamped.glassAttenuationDistance = -2.0f;
+    androidUnclamped.glassDepthScale = 4.0f;
     androidUnclamped.lights[static_cast<std::size_t>(RtLightGroup::Staff)] = {999.0f, 3.0f};
     androidUnclamped.workloadPreset = RtWorkloadPreset::Max;
     androidTuning.Replace(androidUnclamped);
@@ -116,6 +119,11 @@ int main()
                       Near(androidClamped.glassIor, 1.0f) &&
                       Near(androidClamped.glassRoughness, 1.0f) &&
                       androidClamped.glassFixtureVisible &&
+                      Near(androidClamped.glassAttenuationColor[0], 0.0f) &&
+                      Near(androidClamped.glassAttenuationColor[1], 0.5f) &&
+                      Near(androidClamped.glassAttenuationColor[2], 1.0f) &&
+                      Near(androidClamped.glassAttenuationDistance, 0.0f) &&
+                      Near(androidClamped.glassDepthScale, 1.0f) &&
                       Near(androidClamped.lights[static_cast<std::size_t>(RtLightGroup::Staff)].hueDegrees, 180.0f) &&
                       Near(androidClamped.lights[static_cast<std::size_t>(RtLightGroup::Staff)].intensityScale, 2.0f) &&
                       androidClamped.workloadPreset == RtWorkloadPreset::Max,
@@ -139,6 +147,11 @@ int main()
                       Near(androidReset.glassIor, 1.52f) &&
                       Near(androidReset.glassRoughness, 0.12f) &&
                       !androidReset.glassFixtureVisible &&
+                      Near(androidReset.glassAttenuationColor[0], 0.72f) &&
+                      Near(androidReset.glassAttenuationColor[1], 0.90f) &&
+                      Near(androidReset.glassAttenuationColor[2], 1.0f) &&
+                      Near(androidReset.glassAttenuationDistance, 2.4f) &&
+                      Near(androidReset.glassDepthScale, 1.0f) &&
                       androidReset.workloadPreset == RtWorkloadPreset::Authored,
                   "Android RT Lab route reset did not restore authored tuning");
 

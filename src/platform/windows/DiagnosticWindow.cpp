@@ -3533,7 +3533,14 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             ? horde::vulkan::raytracing::PlayerRenderRoute::Skinned
             : horde::vulkan::raytracing::PlayerRenderRoute::Procedural;
         if (usesGlassFixture)
+        {
             frameInputs.tuning.glassFixtureVisible = true;
+            frameInputs.tuning.glassDepthScale = development->glassDepthScale;
+            frameInputs.tuning.glassAttenuationColor =
+                development->glassAttenuationColor;
+            frameInputs.tuning.glassAttenuationDistance =
+                development->glassAttenuationDistance;
+        }
         if (ctx.debugEnemyOverride != horde::gameplay::EnemyKind::None)
         {
             // Debug-only renderer inspection remains non-authoritative gameplay.
