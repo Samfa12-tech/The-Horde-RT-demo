@@ -536,6 +536,16 @@ try {
                 else { Remove-Item Env:\HORDE_VALIDATION_UNSIGNED -ErrorAction SilentlyContinue }
                 Pop-Location
             }
+            $windowsPowerShell = (Get-Command powershell -ErrorAction Stop).Source
+            foreach ($assetMathConfiguration in @("Debug", "Release")) {
+                Invoke-CheckedNative $windowsPowerShell @(
+                    "-NoProfile",
+                    "-File", (Join-Path $repoRoot "tests\AssetMathCompilerContractTests.ps1"),
+                    "-Configuration", $assetMathConfiguration,
+                    "-SkipAndroidBuild",
+                    "-OutputDirectory", (Join-Path $runDirectory "asset-math-compiler-contract\$($assetMathConfiguration.ToLowerInvariant())")
+                )
+            }
         }
 
         $windowsReleaseExe = Join-Path $windowsBuild "Release\HordeLanternRT.exe"

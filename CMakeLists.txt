@@ -28,6 +28,8 @@ option(HORDE_RT_BUILD_VULKAN_TARGETS "Build targets that require a Vulkan SDK" O
 include(CTest)
 
 include(cmake/HordeRtSources.cmake)
+include(cmake/HordeRtStrictAssetMath.cmake)
+horde_rt_enable_strict_asset_math("${CMAKE_CURRENT_SOURCE_DIR}")
 set(HORDE_RT_SOURCE_FILES)
 foreach(source IN LISTS HORDE_RT_CORE_RELATIVE_SOURCES)
     list(APPEND HORDE_RT_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/${source}")

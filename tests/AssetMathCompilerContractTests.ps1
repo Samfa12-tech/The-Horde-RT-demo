@@ -11,6 +11,7 @@ Set-StrictMode -Version Latest
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $androidRoot = Join-Path $repoRoot "android"
+$nativeConfiguration = $(if ($Configuration -eq "Release") { "RelWithDebInfo" } else { $Configuration })
 if ([string]::IsNullOrWhiteSpace($OutputDirectory)) {
     $OutputDirectory = Join-Path $repoRoot "build\asset-math-compiler-contract\$($Configuration.ToLowerInvariant())"
 }
@@ -50,11 +51,17 @@ function Get-ObjectPath {
     if (-not $match.Success) {
         throw "Could not parse the $SourceLeaf object path from the real compile command."
     }
-    $relativeOrAbsolute = $(if ($match.Groups[1].Success) { $match.Groups[1].Value } else { $match.Groups[2].Value })
+    [string]$relativeOrAbsolute = $(if ($match.Groups[1].Success) { $match.Groups[1].Value } else { $match.Groups[2].Value })
     if ([IO.Path]::IsPathRooted($relativeOrAbsolute)) {
         return [IO.Path]::GetFullPath($relativeOrAbsolute)
     }
-    return [IO.Path]::GetFullPath((Join-Path $CompileEntry.directory $relativeOrAbsolute))
+    [string]$compileDirectory = $CompileEntry.directory
+    [string]$combinedPath = Join-Path $compileDirectory $relativeOrAbsolute
+    try {
+        return [IO.Path]::GetFullPath($combinedPath)
+    } catch {
+        throw "Invalid $SourceLeaf object path from compile database: directory='$compileDirectory'; object='$relativeOrAbsolute'; combined='$combinedPath'. $($_.Exception.Message)"
+    }
 }
 
 function Get-AuditedSymbol {
@@ -113,21 +120,25 @@ if (-not $SkipAndroidBuild) {
     Push-Location $androidRoot
     try {
         $gradle = Join-Path $androidRoot "gradlew.bat"
-        Invoke-CheckedNative $gradle ":app:buildCMake$Configuration[arm64-v8a]" "--console=plain"
+        Invoke-CheckedNative $gradle ":app:buildCMake$nativeConfiguration[arm64-v8a]" "--console=plain"
     } finally {
         Pop-Location
     }
 }
 
-$compileDatabaseCandidates = Get-ChildItem -LiteralPath (Join-Path $androidRoot "app\.cxx\$Configuration") `
+$compileDatabaseCandidates = Get-ChildItem -LiteralPath (Join-Path $androidRoot "app\.cxx\$nativeConfiguration") `
     -Filter compile_commands.json -File -Recurse | Sort-Object LastWriteTimeUtc -Descending
 if ($compileDatabaseCandidates.Count -eq 0) {
-    throw "No normal Gradle/CMake $Configuration ARM64 compile database exists. Run without -SkipAndroidBuild."
+    throw "No normal Gradle/CMake $nativeConfiguration ARM64 compile database exists. Run without -SkipAndroidBuild."
 }
 
 $selected = $null
 foreach ($candidate in $compileDatabaseCandidates) {
-    $entries = @(Get-Content -LiteralPath $candidate.FullName -Raw | ConvertFrom-Json)
+    # Windows PowerShell 5.1 can retain the top-level JSON array as one pipeline
+    # object. Enumerate it explicitly so filtering never accepts the whole
+    # compile database merely because one member path matches.
+    $parsedEntries = Get-Content -LiteralPath $candidate.FullName -Raw | ConvertFrom-Json
+    $entries = @($parsedEntries | ForEach-Object { $_ })
     $gltfEntries = @($entries | Where-Object { $_.file -like '*\src\scene\assets\GltfDocument.cpp' -and $_.command -match '--target=aarch64' })
     $staticEntries = @($entries | Where-Object { $_.file -like '*\src\scene\assets\StaticMeshAsset.cpp' -and $_.command -match '--target=aarch64' })
     if ($gltfEntries.Count -eq 1 -and $staticEntries.Count -eq 1) {
@@ -143,8 +154,8 @@ if ($null -eq $selected) {
     throw "No normal Gradle/CMake ARM64 compile database contains exactly one instance of both audited production sources."
 }
 
-$compilerPath = Get-CommandExecutable $selected.gltf.command
-if ($compilerPath -cne (Get-CommandExecutable $selected.staticMesh.command)) {
+$compilerPath = Get-CommandExecutable ([string]($selected.gltf.command))
+if ($compilerPath -cne (Get-CommandExecutable ([string]($selected.staticMesh.command)))) {
     throw "The audited production sources were not compiled by the same compiler."
 }
 $objdumpPath = Join-Path (Split-Path -Parent $compilerPath) "llvm-objdump.exe"
@@ -152,8 +163,8 @@ if (-not (Test-Path -LiteralPath $objdumpPath -PathType Leaf)) {
     throw "Could not find llvm-objdump beside the real Android compiler: $objdumpPath"
 }
 
-$gltfObject = Get-ObjectPath $selected.gltf "GltfDocument.cpp"
-$staticObject = Get-ObjectPath $selected.staticMesh "StaticMeshAsset.cpp"
+$gltfObject = Get-ObjectPath -CompileEntry ($selected.gltf) -SourceLeaf "GltfDocument.cpp"
+$staticObject = Get-ObjectPath -CompileEntry ($selected.staticMesh) -SourceLeaf "StaticMeshAsset.cpp"
 foreach ($objectPath in @($gltfObject, $staticObject)) {
     if (-not (Test-Path -LiteralPath $objectPath -PathType Leaf)) {
         throw "Normal Gradle/CMake object is missing: $objectPath"
@@ -223,6 +234,7 @@ $evidence = [ordered]@{
     schemaVersion = 1
     passed = ($failures.Count -eq 0)
     configuration = $Configuration
+    nativeConfiguration = $nativeConfiguration
     compileDatabase = $selected.path
     compilerPath = $compilerPath
     compilerVersion = $compilerVersion

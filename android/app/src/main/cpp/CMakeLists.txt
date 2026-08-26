@@ -6,6 +6,8 @@ option(HORDE_RT_DEBUG_CHECKPOINTS "Enable debug-only showcase checkpoint and rep
 
 get_filename_component(HORDE_RT_REPO_ROOT "${CMAKE_CURRENT_LIST_DIR}/../../../../.." ABSOLUTE)
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtSources.cmake")
+include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtStrictAssetMath.cmake")
+horde_rt_enable_strict_asset_math("${HORDE_RT_REPO_ROOT}")
 set(HORDE_RT_EMBEDDED_RAYGEN "${HORDE_RT_REPO_ROOT}/src/vulkan/raytracing/MinimalRayGenShader.inc")
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${HORDE_RT_EMBEDDED_RAYGEN}")
 file(SHA256 "${HORDE_RT_EMBEDDED_RAYGEN}" HORDE_RT_RAYGEN_SHA256)
