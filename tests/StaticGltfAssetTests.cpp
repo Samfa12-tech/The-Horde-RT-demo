@@ -327,6 +327,23 @@ void ExpectAssetFailure(const std::filesystem::path& path,
               " expected '" + std::string(expected) + "' got '" + diagnostic + "'");
 }
 
+void ExpectAssetFailureContains(
+    const std::filesystem::path& path,
+    const horde::scene::assets::AssetManifest& manifest,
+    std::initializer_list<std::string_view> expectedFragments)
+{
+    horde::scene::assets::StaticMeshAsset asset;
+    std::string diagnostic;
+    Check(!horde::scene::assets::StaticMeshAsset::Load(path, manifest, asset, diagnostic),
+          std::string("asset must fail: ") + path.filename().string());
+    for (const std::string_view fragment : expectedFragments)
+    {
+        Check(diagnostic.find(fragment) != std::string::npos,
+              std::string("asset diagnostic for ") + path.filename().string() +
+                  " must contain '" + std::string(fragment) + "', got '" + diagnostic + "'");
+    }
+}
+
 void TestManifestContract(const std::filesystem::path& temporaryRoot)
 {
     using horde::scene::assets::AssetManifest;
@@ -449,29 +466,33 @@ void TestThickDielectricTopology(const std::filesystem::path& temporaryRoot,
 
     const auto open = WriteClosedDielectricGlb(
         temporaryRoot, "open-dielectric-lod0.runtime.glb", true, false);
-    ExpectAssetFailure(
+    ExpectAssetFailureContains(
         open, manifest,
-        "Static GLB thick transmissive material 'ClosedGlass' is open: boundary edge is referenced once. Use closed manifold geometry or set thinWall in the audited material override.");
+        {"material 'ClosedGlass' component 1", "node 'Root' primitive 0",
+         "boundary edge", "set thinWall"});
 
     const auto nonManifold = WriteClosedDielectricGlb(
         temporaryRoot, "non-manifold-dielectric-lod0.runtime.glb", false, true);
-    ExpectAssetFailure(
+    ExpectAssetFailureContains(
         nonManifold, manifest,
-        "Static GLB thick transmissive material 'ClosedGlass' is non-manifold: an edge is referenced more than twice.");
+        {"material 'ClosedGlass' component 1", "node 'Root' primitive 0",
+         "referenced more than twice"});
 
     const auto inward = WriteClosedDielectricGlb(
         temporaryRoot, "inward-dielectric-lod0.runtime.glb", false, false,
         true, 1.0f, 1);
-    ExpectAssetFailure(
+    ExpectAssetFailureContains(
         inward, manifest,
-        "Static GLB thick transmissive material 'ClosedGlass' is inward-wound after baked node transforms; reverse every triangle winding so normals face outward.");
+        {"material 'ClosedGlass' component 1", "node 'Root' primitive 0",
+         "inward-wound after baked node transforms", "reverse every triangle winding"});
 
     const auto flipped = WriteClosedDielectricGlb(
         temporaryRoot, "single-face-flipped-dielectric-lod0.runtime.glb", false,
         false, true, 1.0f, 2);
-    ExpectAssetFailure(
+    ExpectAssetFailureContains(
         flipped, manifest,
-        "Static GLB thick transmissive material 'ClosedGlass' has inconsistent winding: each shared edge must be used once in each direction.");
+        {"material 'ClosedGlass' component 1", "node 'Root' primitive 0",
+         "used once in each direction"});
 
     const auto transformed = WriteClosedDielectricGlb(
         temporaryRoot, "valid-transformed-dielectric-lod0.runtime.glb", false,
@@ -758,6 +779,61 @@ void TestProductionDielectricFixture()
           "production dielectric fixture keeps one closed twelve-triangle volume and KHR material properties");
 }
 
+void TestRuntimeOfflineDielectricComponentParity()
+{
+    horde::scene::assets::AssetManifest manifest;
+    horde::scene::assets::StaticMeshAsset asset;
+    std::string diagnostic;
+    const std::filesystem::path fixtureRoot =
+        kFixtureRoot.parent_path() / "dielectric-topology";
+    Check(horde::scene::assets::AssetManifest::Load(
+              fixtureRoot / "asset.manifest.json",
+              manifest, diagnostic),
+          std::string("dielectric topology parity manifest loads: ") + diagnostic);
+
+    const auto expectPass = [&](std::string_view name) {
+        diagnostic.clear();
+        Check(horde::scene::assets::StaticMeshAsset::Load(
+                  fixtureRoot / name, manifest, asset, diagnostic),
+              std::string("runtime/offline parity fixture must pass: ") +
+                  std::string(name) + ": " + diagnostic);
+    };
+    expectPass("closed-dielectric-lod0.runtime.glb");
+    expectPass("split-shell-dielectric-lod0.runtime.glb");
+    expectPass("disconnected-shells-dielectric-lod0.runtime.glb");
+    expectPass("valid-transformed-dielectric-lod0.runtime.glb");
+    expectPass("millimetre-dielectric-lod0.runtime.glb");
+
+    ExpectAssetFailureContains(
+        fixtureRoot / "open-dielectric-lod0.runtime.glb", manifest,
+        {"material 'GenericClosedGlass' component 1",
+         "node 'GenericDielectricFixture' primitive 0", "boundary edge"});
+    ExpectAssetFailureContains(
+        fixtureRoot / "non-manifold-dielectric-lod0.runtime.glb", manifest,
+        {"material 'GenericClosedGlass' component 1",
+         "node 'GenericDielectricFixture' primitive 0", "referenced more than twice"});
+    ExpectAssetFailureContains(
+        fixtureRoot / "inward-dielectric-lod0.runtime.glb", manifest,
+        {"material 'GenericClosedGlass' component 1",
+         "node 'GenericDielectricFixture' primitive 0", "inward-wound"});
+    ExpectAssetFailureContains(
+        fixtureRoot / "single-face-flipped-dielectric-lod0.runtime.glb", manifest,
+        {"material 'GenericClosedGlass' component 1",
+         "node 'GenericDielectricFixture' primitive 0", "used once in each direction"});
+    ExpectAssetFailureContains(
+        fixtureRoot / "mixed-orientation-shells-dielectric-lod0.runtime.glb", manifest,
+        {"material 'GenericClosedGlass' component 2",
+         "node 'SmallInwardShell' primitive 1", "inward-wound"});
+    ExpectAssetFailureContains(
+        fixtureRoot / "split-flipped-face-dielectric-lod0.runtime.glb", manifest,
+        {"material 'GenericClosedGlass' component 1",
+         "node 'SplitFlippedA' primitive 0", "node 'SplitFlippedB' primitive 1",
+         "used once in each direction"});
+    ExpectAssetFailure(
+        fixtureRoot / "negative-scale-dielectric-lod0.runtime.glb", manifest,
+        "Static GLB node 'GenericDielectricFixture' has a negative-determinant transform; bake the reflection and reverse triangle winding/normals before runtime import.");
+}
+
 } // namespace
 
 int main()
@@ -769,6 +845,7 @@ int main()
 
     TestManifestContract(temporaryRoot);
     TestProductionDielectricFixture();
+    TestRuntimeOfflineDielectricComponentParity();
 
     horde::scene::assets::AssetManifest manifest;
     std::string diagnostic;

@@ -32,6 +32,10 @@ Invoke-ExpectedValidation "valid-transformed-dielectric-lod0.runtime.glb" 0 "clo
 Invoke-ExpectedValidation "millimetre-dielectric-lod0.runtime.glb" 0 "closed/manifold"
 Invoke-ExpectedValidation "transmission-only-lod0.runtime.glb" 0 "0 closed/manifold"
 Invoke-ExpectedValidation "zero-thickness-lod0.runtime.glb" 0 "0 closed/manifold"
+Invoke-ExpectedValidation "split-shell-dielectric-lod0.runtime.glb" 0 "1 closed/manifold thick component(s)"
+Invoke-ExpectedValidation "disconnected-shells-dielectric-lod0.runtime.glb" 0 "2 closed/manifold thick component(s)"
+Invoke-ExpectedValidation "mixed-orientation-shells-dielectric-lod0.runtime.glb" 2 "component 2"
+Invoke-ExpectedValidation "split-flipped-face-dielectric-lod0.runtime.glb" 2 "component 1"
 
 $preparationSource = Get-Content -LiteralPath (Join-Path $repoRoot "tools\prepare-static-rt-asset.ps1") -Raw
 if ($preparationSource -notmatch "validate-dielectric-topology\.py") {

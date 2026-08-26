@@ -113,16 +113,110 @@ def write_glb(output, mesh_indices, node_fields=None, include_volume=True,
     print(output)
 
 
+def write_component_fixture(output, parts):
+    """Write thick-glass triangles split across independently transformed primitives."""
+    binary = bytearray()
+    for values in positions:
+        binary.extend(struct.pack("<3f", *values))
+    normal_offset = len(binary)
+    for values in normals:
+        binary.extend(struct.pack("<3f", *values))
+    uv_offset = len(binary)
+    for values in uvs:
+        binary.extend(struct.pack("<2f", *values))
+
+    buffer_views = [
+        {"buffer": 0, "byteOffset": 0, "byteLength": 96, "target": 34962},
+        {"buffer": 0, "byteOffset": normal_offset, "byteLength": 96, "target": 34962},
+        {"buffer": 0, "byteOffset": uv_offset, "byteLength": 64, "target": 34962},
+    ]
+    accessors = [
+        {"bufferView": 0, "componentType": 5126, "count": 8, "type": "VEC3",
+         "min": [-0.5, -0.5, -0.5], "max": [0.5, 0.5, 0.5]},
+        {"bufferView": 1, "componentType": 5126, "count": 8, "type": "VEC3"},
+        {"bufferView": 2, "componentType": 5126, "count": 8, "type": "VEC2"},
+    ]
+    meshes = []
+    nodes = []
+    for part_index, part in enumerate(parts):
+        while len(binary) % 4:
+            binary.append(0)
+        index_offset = len(binary)
+        for value in part["indices"]:
+            binary.extend(struct.pack("<H", value))
+        view_index = len(buffer_views)
+        accessor_index = len(accessors)
+        buffer_views.append({
+            "buffer": 0, "byteOffset": index_offset,
+            "byteLength": len(part["indices"]) * 2, "target": 34963,
+        })
+        accessors.append({
+            "bufferView": view_index, "componentType": 5123,
+            "count": len(part["indices"]), "type": "SCALAR",
+        })
+        meshes.append({"name": part["name"], "primitives": [{
+            "attributes": {"POSITION": 0, "NORMAL": 1, "TEXCOORD_0": 2},
+            "indices": accessor_index, "material": 0, "mode": 4,
+        }]})
+        node = {"name": part["name"], "mesh": part_index}
+        node.update(part.get("node", {}))
+        nodes.append(node)
+    while len(binary) % 4:
+        binary.append(0)
+
+    document = {
+        "asset": {"version": "2.0", "generator": "Horde RT dielectric component fixtures"},
+        "extensionsUsed": [
+            "KHR_materials_transmission", "KHR_materials_volume", "KHR_materials_ior"],
+        "extensionsRequired": [
+            "KHR_materials_transmission", "KHR_materials_volume", "KHR_materials_ior"],
+        "buffers": [{"byteLength": len(binary)}],
+        "bufferViews": buffer_views,
+        "accessors": accessors,
+        "materials": [{
+            "name": "GenericClosedGlass", "doubleSided": True,
+            "pbrMetallicRoughness": {
+                "baseColorFactor": [0.82, 0.94, 1.0, 1.0],
+                "metallicFactor": 0.0, "roughnessFactor": 0.12,
+            },
+            "extensions": {
+                "KHR_materials_transmission": {"transmissionFactor": 0.94},
+                "KHR_materials_volume": {
+                    "thicknessFactor": 1.0, "attenuationDistance": 2.4,
+                    "attenuationColor": [0.72, 0.90, 1.0],
+                },
+                "KHR_materials_ior": {"ior": 1.52},
+            },
+        }],
+        "meshes": meshes,
+        "nodes": nodes,
+        "scenes": [{"nodes": list(range(len(nodes)))}],
+        "scene": 0,
+    }
+    json_bytes = json.dumps(document, separators=(",", ":")).encode("utf-8")
+    while len(json_bytes) % 4:
+        json_bytes += b" "
+    total_length = 12 + 8 + len(json_bytes) + 8 + len(binary)
+    glb = bytearray(struct.pack("<III", 0x46546C67, 2, total_length))
+    glb.extend(struct.pack("<II", len(json_bytes), 0x4E4F534A))
+    glb.extend(json_bytes)
+    glb.extend(struct.pack("<II", len(binary), 0x004E4942))
+    glb.extend(binary)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_bytes(glb)
+    print(output)
+
+
 manifest = {
     "schema": 1,
     "asset": "generic-dielectric-topology-fixtures",
     "metresPerUnit": 1.0,
     "coordinateSystem": {"up": "+Y", "forward": "+Z"},
     "budgets": {
-        "maxVertices": 8, "maxIndices": 48, "maxPrimitives": 1,
+        "maxVertices": 32, "maxIndices": 96, "maxPrimitives": 4,
         "maxMaterials": 1, "maxTextureLayersPerKind": 1,
     },
-    "lods": [{"name": "lod0", "maxTriangles": 16}],
+    "lods": [{"name": "lod0", "maxTriangles": 32}],
     "requiredSockets": [],
     "runtimeTextureProfile": {"android": "astc", "windows": "rgba8", "mipmapped": True},
     "materialOverrides": [],
@@ -153,6 +247,34 @@ write_glb(TEST_OUTPUT / "transmission-only-lod0.runtime.glb", indices,
           include_volume=False)
 write_glb(TEST_OUTPUT / "zero-thickness-lod0.runtime.glb", indices,
           thickness_factor=0.0)
+write_component_fixture(
+    TEST_OUTPUT / "split-shell-dielectric-lod0.runtime.glb", [
+        {"name": "SplitShellA", "indices": indices[:18]},
+        {"name": "SplitShellB", "indices": indices[18:],
+         "node": {"translation": [0.00000004, 0, 0]}},
+    ])
+write_component_fixture(
+    TEST_OUTPUT / "disconnected-shells-dielectric-lod0.runtime.glb", [
+        {"name": "NearbyShellA", "indices": indices,
+         "node": {"scale": [0.001, 0.001, 0.001]}},
+        {"name": "NearbyShellB", "indices": indices,
+         "node": {"scale": [0.001, 0.001, 0.001],
+                  "translation": [0.00105, 0, 0]}},
+    ])
+write_component_fixture(
+    TEST_OUTPUT / "mixed-orientation-shells-dielectric-lod0.runtime.glb", [
+        {"name": "LargeOutwardShell", "indices": indices,
+         "node": {"scale": [2, 2, 2]}},
+        {"name": "SmallInwardShell", "indices": inward_indices,
+         "node": {"scale": [0.5, 0.5, 0.5], "translation": [4, 0, 0]}},
+    ])
+split_flipped = list(indices)
+split_flipped[1], split_flipped[2] = split_flipped[2], split_flipped[1]
+write_component_fixture(
+    TEST_OUTPUT / "split-flipped-face-dielectric-lod0.runtime.glb", [
+        {"name": "SplitFlippedA", "indices": split_flipped[:18]},
+        {"name": "SplitFlippedB", "indices": split_flipped[18:]},
+    ])
 TEST_OUTPUT.mkdir(parents=True, exist_ok=True)
 (TEST_OUTPUT / "asset.manifest.json").write_text(
     json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
