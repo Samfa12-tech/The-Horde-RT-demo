@@ -361,6 +361,10 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
         std::exchange(other.dielectricSecondaryRejectCount_, 0u);
     dielectricUnclosedVolumeCount_ =
         std::exchange(other.dielectricUnclosedVolumeCount_, 0u);
+    dielectricPrimaryUnclosedVolumeCount_ =
+        std::exchange(other.dielectricPrimaryUnclosedVolumeCount_, 0u);
+    dielectricShadowUnclosedVolumeCount_ =
+        std::exchange(other.dielectricShadowUnclosedVolumeCount_, 0u);
     developmentStaticAssetDirectory_ = std::move(other.developmentStaticAssetDirectory_);
     staticTextureDirectory_ = std::move(other.staticTextureDirectory_);
     staticMeshSlot_ = std::move(other.staticMeshSlot_);
@@ -570,6 +574,8 @@ void PresentableTinyRtScene::Destroy()
     dielectricShadowOverflowCount_ = 0u;
     dielectricSecondaryRejectCount_ = 0u;
     dielectricUnclosedVolumeCount_ = 0u;
+    dielectricPrimaryUnclosedVolumeCount_ = 0u;
+    dielectricShadowUnclosedVolumeCount_ = 0u;
     developmentStaticAssetDirectory_.clear();
     staticTextureDirectory_.clear();
     staticMeshSlot_ = {};
@@ -3906,6 +3912,10 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     dielectricSecondaryRejectCount_ =
         previousDielectricDiagnostics.secondaryDielectricRejectCount;
     dielectricUnclosedVolumeCount_ = previousDielectricDiagnostics.unclosedVolumeCount;
+    dielectricPrimaryUnclosedVolumeCount_ =
+        previousDielectricDiagnostics.primaryUnclosedVolumeCount;
+    dielectricShadowUnclosedVolumeCount_ =
+        previousDielectricDiagnostics.shadowUnclosedVolumeCount;
     const RtDielectricDiagnostics clearedDielectricDiagnostics{};
     auto frameInstanceMetadata = staticMeshSlot_.InstanceMetadata();
     if (effectivePlayerRenderRoute == PlayerRenderRoute::Procedural)

@@ -102,6 +102,7 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
             if (volumeDepth > 0)
             {
                 atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);
+                atomicAdd(rtDielectricDiagnostics.value.primaryUnclosedVolumeCount, 1u);
                 transmitted = dielectricOverflowFallback(
                     transmissionDirection, throughput);
             }

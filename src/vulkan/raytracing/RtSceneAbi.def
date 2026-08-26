@@ -73,12 +73,16 @@
       ]
     },
     {
-      "name": "RtDielectricDiagnostics", "alignment": 16, "size": 16,
+      "name": "RtDielectricDiagnostics", "alignment": 16, "size": 32,
       "fields": [
         { "name": "transportOverflowCount", "type": "uint", "offset": 0 },
         { "name": "shadowOverflowCount", "type": "uint", "offset": 4 },
         { "name": "secondaryDielectricRejectCount", "type": "uint", "offset": 8 },
-        { "name": "unclosedVolumeCount", "type": "uint", "offset": 12 }
+        { "name": "unclosedVolumeCount", "type": "uint", "offset": 12 },
+        { "name": "primaryUnclosedVolumeCount", "type": "uint", "offset": 16 },
+        { "name": "shadowUnclosedVolumeCount", "type": "uint", "offset": 20 },
+        { "name": "reserved0", "type": "uint", "offset": 24 },
+        { "name": "reserved1", "type": "uint", "offset": 28 }
       ]
     },
     {

@@ -191,6 +191,7 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
             if (volumeDepth > 0)
             {
                 atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);
+                atomicAdd(rtDielectricDiagnostics.value.shadowUnclosedVolumeCount, 1u);
                 transmittance *= vec3(0.08);
             }
             return clamp(transmittance, vec3(0.0), vec3(1.0));
@@ -204,6 +205,7 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
             if (volumeDepth > 0)
             {
                 atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);
+                atomicAdd(rtDielectricDiagnostics.value.shadowUnclosedVolumeCount, 1u);
                 transmittance *= vec3(0.08);
             }
             return clamp(transmittance, vec3(0.0), vec3(1.0));
@@ -244,6 +246,7 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
                 volumeMaterials[volumeDepth - 1] != nearest.material)
             {
                 atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);
+                atomicAdd(rtDielectricDiagnostics.value.shadowUnclosedVolumeCount, 1u);
                 return clamp(transmittance * vec3(0.08), vec3(0.0), vec3(1.0));
             }
             --volumeDepth;
