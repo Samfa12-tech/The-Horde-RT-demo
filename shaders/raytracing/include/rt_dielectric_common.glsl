@@ -83,16 +83,18 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
 
     vec3 reflectionDirection = reflect(rayDirection, surfaceNormal);
     vec3 reflected = skyColor(reflectionDirection);
+    bool fireRayReflectionOwned = controls.waterQuality >= 1.5;
     if (controls.waterQuality >= 1.5)
     {
         HitInfo reflectedHit = traceScene(h.position + geometricNormal * 0.006,
                                           reflectionDirection, 12.0, 0x37u, false);
+        float reflectedLocalDistance = reflectedHit.hit ? reflectedHit.t : 12.0;
         reflectedHit.t += h.t;
         reflected = shadeOpaqueSecondary(reflectedHit, reflectionDirection);
         vec4 reflectedFire = integrateFireEmitters(
             h.position + geometricNormal * 0.006,
             reflectionDirection,
-            min(reflectedHit.hit ? reflectedHit.t : 12.0, 12.0),
+            min(reflectedLocalDistance, 12.0),
             true);
         reflected = reflected * reflectedFire.a + reflectedFire.rgb;
     }
@@ -137,6 +139,8 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
         * (localHighlight * 3.2 + runoffLocalHighlight * 1.15)
         * localStrength * localInterfaceVisibility
         / (1.0 + localDistanceSquared * 0.58);
+    interfaceLight += fireEmitterDirectLighting(
+        h, rayDirection, false, !fireRayReflectionOwned);
     interfaceLight += skyRadiance * skyHighlight * skyInterfaceVisibility * 0.10;
     if (runoff && h.position.x > -2.88)
     {
@@ -187,12 +191,15 @@ vec3 shadeOpaquePrimary(HitInfo h, vec3 rayDirection)
     bool leanWorkload = controls.workloadPreset < 0.5;
     bool maxWorkload = controls.workloadPreset >= 1.5;
     float reflective = max(h.metallic, h.reflectivity);
+    bool wantsPlayerReflection = reflective > 0.38 ||
+        (h.instance == 0 && h.material == kMaterialWetCobble && puddleMask(h.position) > 0.05);
+    bool fireRayReflectionOwned = !leanWorkload && wantsPlayerReflection;
     float localVisibility;
     float skyVisibility;
     float skyDiffuse;
     vec3 localLightColor;
     float localLightStrength;
-    vec3 color = shadeOpaqueDirect(h, rayDirection, maxWorkload,
+    vec3 color = shadeOpaqueDirect(h, rayDirection, maxWorkload, !fireRayReflectionOwned,
                                    localVisibility, skyVisibility, skyDiffuse,
                                    localLightColor, localLightStrength);
     // Keep the one RT bounce deterministic. The previous time-varying hemisphere sample was the main source of shimmer.
@@ -202,8 +209,6 @@ vec3 shadeOpaquePrimary(HitInfo h, vec3 rayDirection)
         vec3 bounceDirection = reflective > 0.38
             ? reflect(rayDirection, h.normal)
             : normalize(h.normal + vec3(0.18, 0.58, -0.34));
-        bool wantsPlayerReflection = reflective > 0.38 ||
-            (h.instance == 0 && h.material == kMaterialWetCobble && puddleMask(h.position) > 0.05);
         uint bounceMask = wantsPlayerReflection ? 0x37u : 0x23u;
         HitInfo bounceHit = traceScene(offsetRayOrigin(h, bounceDirection), bounceDirection,
                                        12.0, bounceMask, false);

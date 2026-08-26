@@ -108,6 +108,8 @@ float visibility(vec3 origin, vec3 direction, float maxDistance)
 }
 
 void activeLocalLight(out vec3 position, out vec3 color, out float strength);
+vec3 fireEmitterDirectLighting(HitInfo h, vec3 rayDirection, bool dualVisibility,
+                               bool allowAnalyticSpecular);
 
 vec3 bounceSample(HitInfo h, vec3 incoming, bool lightAwareMirror)
 {
@@ -147,26 +149,17 @@ vec3 bounceSample(HitInfo h, vec3 incoming, bool lightAwareMirror)
     float lightVisibility = visibility(offsetRayOrigin(h, lightDirection), lightDirection, lightDistance - 0.02);
     float diffuse = max(dot(h.normal, lightDirection), 0.0);
     float attenuation = 1.0 / (1.0 + lightDistance * lightDistance * 0.58);
-    return h.base * (0.008 + localLightColor * diffuse * attenuation * lightVisibility * localLightStrength * 2.25);
-}
-
-vec3 currentTorchLightPosition()
-{
-    RtFireEmitterGpu torch;
-    return findFireEmitter(1u, torch)
-        ? torch.lightPositionStrength.xyz
-        : vec3(0.0);
+    vec3 authoredDirect = h.base *
+        (0.008 + localLightColor * diffuse * attenuation * lightVisibility *
+         localLightStrength * 2.25);
+    return authoredDirect + fireEmitterDirectLighting(h, incoming, false, false);
 }
 
 void activeLocalLight(out vec3 position, out vec3 color, out float strength)
 {
-    position = currentTorchLightPosition();
-    RtFireEmitterGpu torch;
-    bool torchActive = findFireEmitter(1u, torch);
-    color = torchActive
-        ? tunedLightColor(torch.colourIntensity.rgb, kLightTorch)
-        : vec3(0.0);
-    strength = torchActive ? torch.lightPositionStrength.w : 0.0;
+    position = vec3(0.0);
+    color = vec3(0.0);
+    strength = 0.0;
     if (controls.cameraX <= -8.5 && controls.cameraX >= -28.5 &&
         controls.cameraZ >= -16.8 && controls.cameraZ <= -13.6)
     {
@@ -187,6 +180,56 @@ void activeLocalLight(out vec3 position, out vec3 color, out float strength)
         color = tunedLightColor(vec3(0.58, 0.10, 1.0), kLightStaff);
         strength = controls.staffLightStrength;
     }
+}
+
+vec3 fireEmitterDirectLighting(HitInfo h, vec3 rayDirection, bool dualVisibility,
+                               bool allowAnalyticSpecular)
+{
+    const vec3 areaOffsets[2] = vec3[2](vec3(-0.075, 0.03, -0.045),
+                                        vec3(0.070, 0.10, 0.060));
+    int sampleIndex = int((gl_LaunchIDEXT.x + gl_LaunchIDEXT.y) & 1u);
+    float reflective = max(h.metallic, h.reflectivity);
+    vec3 result = vec3(0.0);
+    for (uint emitterIndex = 0u; emitterIndex < kRtActiveFireEmitterCapacity;
+         ++emitterIndex)
+    {
+        RtFireEmitterGpu emitter = rtFireEmitters.values[emitterIndex];
+        float strength = emitter.lightPositionStrength.w;
+        if (emitter.identity.x == 0u || strength <= 0.001) continue;
+
+        vec3 lightPosition = emitter.lightPositionStrength.xyz;
+        vec3 lightColor = tunedLightColor(emitter.colourIntensity.rgb, kLightTorch);
+        vec3 toLight = lightPosition - h.position;
+        float lightDistance = length(toLight);
+        vec3 lightDirection = toLight / max(lightDistance, 0.001);
+        vec3 sampleVector = lightPosition + areaOffsets[sampleIndex] - h.position;
+        float sampleDistance = length(sampleVector);
+        vec3 sampleDirection = sampleVector / max(sampleDistance, 0.001);
+        float lightVisibility = visibility(offsetRayOrigin(h, sampleDirection),
+                                           sampleDirection, sampleDistance - 0.02);
+        if (dualVisibility)
+        {
+            vec3 otherVector = lightPosition + areaOffsets[1 - sampleIndex] - h.position;
+            float otherDistance = length(otherVector);
+            vec3 otherDirection = otherVector / max(otherDistance, 0.001);
+            lightVisibility = 0.5 * (lightVisibility + visibility(
+                offsetRayOrigin(h, otherDirection), otherDirection,
+                otherDistance - 0.02));
+        }
+        float attenuation = 1.0 / (1.0 + lightDistance * lightDistance * 0.58);
+        float diffuse = max(dot(h.normal, lightDirection), 0.0);
+        result += h.base * lightColor * diffuse * attenuation * lightVisibility *
+                  strength * 2.65;
+        if (allowAnalyticSpecular)
+        {
+            float specular = pow(max(dot(reflect(-lightDirection, h.normal),
+                                         -rayDirection), 0.0),
+                                 mix(34.0, 5.0, reflective));
+            result += lightColor * specular * attenuation * lightVisibility *
+                      strength * (0.12 + reflective * 1.04);
+        }
+    }
+    return result;
 }
 
 void activeSkyLight(vec3 surfacePosition, int sampleIndex, out vec3 direction,
@@ -218,6 +261,7 @@ void activeSkyLight(vec3 surfacePosition, int sampleIndex, out vec3 direction,
 }
 
 vec3 shadeOpaqueDirect(HitInfo h, vec3 rayDirection, bool dualVisibility,
+                       bool allowAnalyticFireSpecular,
                        out float localVisibility, out float skyVisibility,
                        out float skyDiffuse, out vec3 localColor,
                        out float localStrength)
@@ -281,6 +325,8 @@ vec3 shadeOpaqueDirect(HitInfo h, vec3 rayDirection, bool dualVisibility,
     vec3 cold = tunedLightColor(vec3(0.15, 0.20, 0.28), kLightSkylight);
 
     vec3 color = h.base * vec3(0.025, 0.028, 0.032);
+    color += fireEmitterDirectLighting(
+        h, rayDirection, dualVisibility, allowAnalyticFireSpecular);
     color += h.base * localColor * localDiffuse * localAttenuation * localVisibility
         * localStrength * 2.65;
     color += localColor * localSpecular * localAttenuation * localVisibility
@@ -314,7 +360,7 @@ vec3 shadeOpaqueSecondary(HitInfo h, vec3 incoming)
     float skyDiffuse;
     vec3 localColor;
     float localStrength;
-    vec3 color = shadeOpaqueDirect(h, incoming, false, localVisibility,
+    vec3 color = shadeOpaqueDirect(h, incoming, false, false, localVisibility,
                                    skyVisibility, skyDiffuse, localColor,
                                    localStrength);
     float fog = 1.0 - exp(-h.t * h.t * 0.012 * controls.fogDensityScale);
