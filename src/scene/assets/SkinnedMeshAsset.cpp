@@ -1114,7 +1114,18 @@ bool SkinnedMeshAsset::SkinPlayerUniqueTextured(
                          upperName + "/" + lowerName + "/" + handName;
             return false;
         }
-        const Vec3 shoulder{globals[upperNode].m[12], globals[upperNode].m[13], globals[upperNode].m[14]};
+        Vec3 shoulder{globals[upperNode].m[12], globals[upperNode].m[13], globals[upperNode].m[14]};
+        if (arm.shoulderTargetEnabled)
+        {
+            const Vec3 shoulderTarget{arm.shoulder[0], arm.shoulder[1], arm.shoulder[2]};
+            const Vec3 shoulderDelta = Subtract(shoulderTarget, shoulder);
+            const Matrix shoulderTranslation = LocalMatrix(
+                shoulderDelta, Quat{}, Vec3{1.0f, 1.0f, 1.0f});
+            for (std::size_t node = 0u; node < globals.size(); ++node)
+                if (isDescendant(node, upperNode))
+                    globals[node] = Multiply(shoulderTranslation, globals[node]);
+            shoulder = shoulderTarget;
+        }
         const Vec3 originalElbow{globals[lowerNode].m[12], globals[lowerNode].m[13], globals[lowerNode].m[14]};
         const Vec3 originalHand{globals[handNode].m[12], globals[handNode].m[13], globals[handNode].m[14]};
         const float bindUpperLength = std::max(Length(Subtract(originalElbow, shoulder)), 0.0001f);

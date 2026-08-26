@@ -86,6 +86,26 @@ int main()
                  layered.visibility.shadowVisible && layered.visibility.reflectionVisible,
                  "head masking must affect first-person primary rays only")) return 1;
 
+    const auto ownerFeedbackPose = horde::gameplay::items::EvaluateHeldItemKinematics({});
+    const float shoulderWidth = ownerFeedbackPose.rightShoulderLocal[0] -
+                                ownerFeedbackPose.leftShoulderLocal[0];
+    const float handSeparation = ownerFeedbackPose.rightHandLocal[0] -
+                                 ownerFeedbackPose.leftHandLocal[0];
+    if (!Require(shoulderWidth >= 0.68f && handSeparation >= 0.82f,
+                 "first-person rest pose must retain lateral shoulder roots and torso space")) return 1;
+    const TwoBoneIkSolution ownerLeftArm = SolveTwoBoneIk(
+        ownerFeedbackPose.leftShoulderLocal, ownerFeedbackPose.leftHandLocal,
+        {{-0.9f, -0.1f, 0.4f}}, 0.53f, 0.53f);
+    const TwoBoneIkSolution ownerRightArm = SolveTwoBoneIk(
+        ownerFeedbackPose.rightShoulderLocal, ownerFeedbackPose.rightHandLocal,
+        {{0.9f, -0.1f, 0.4f}}, 0.53f, 0.53f);
+    if (!Require(ownerLeftArm.elbow[0] <= -0.30f && ownerRightArm.elbow[0] >= 0.30f,
+                 "first-person upper arms must remain separate left/right chains")) return 1;
+    const auto swordAxis = horde::gameplay::items::EvaluateSwordBladeAxisInView(
+        ownerFeedbackPose.swordRadians, ownerFeedbackPose.swordForwardRadians);
+    if (!Require(swordAxis[0] <= -0.12f && swordAxis[2] >= 0.10f && swordAxis[1] > 0.90f,
+                 "resting sword axis must carry a restrained inward and forward combat cant")) return 1;
+
     const float previousPose = layered.lanternPoseBlend;
     input.lanternPoseTarget = 0.0f;
     state.StepFixed(input, 1.0f / 60.0f);

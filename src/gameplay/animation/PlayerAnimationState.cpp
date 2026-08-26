@@ -92,10 +92,10 @@ void PlayerAnimationState::StepFixed(const PlayerAnimationInput& input,
         fixedDeltaSeconds * kLanternPoseBlendRatePerSecond);
     snapshot_.leftIk.shoulder = input.heldItemKinematics.leftShoulderLocal;
     snapshot_.leftIk.target = input.heldItemKinematics.leftHandLocal;
-    snapshot_.leftIk.pole = {{-0.8f, -0.1f, 0.45f}};
+    snapshot_.leftIk.pole = {{-0.95f, -0.1f, 0.42f}};
     snapshot_.rightIk.shoulder = input.heldItemKinematics.rightShoulderLocal;
     snapshot_.rightIk.target = input.heldItemKinematics.rightHandLocal;
-    snapshot_.rightIk.pole = {{0.8f, -0.1f, 0.45f}};
+    snapshot_.rightIk.pole = {{0.95f, -0.1f, 0.42f}};
 }
 
 void PlayerAnimationState::Reset()

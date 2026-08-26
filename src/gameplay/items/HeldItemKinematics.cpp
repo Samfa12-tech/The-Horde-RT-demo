@@ -11,6 +11,9 @@ namespace horde::gameplay::items
 namespace
 {
 
+constexpr float kSwordRestInwardRadians = 0.16f;
+constexpr float kSwordRestForwardRadians = 0.13f;
+
 float DotColumn(const HeldItemTransform& transform,
                 const std::size_t leftColumn,
                 const std::size_t rightColumn)
@@ -121,11 +124,11 @@ HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
     const float swingAmount = std::clamp(-swordSwingRadians / 1.12f, 0.0f, 1.0f);
     const float smoothSwing = swingAmount * swingAmount * (3.0f - 2.0f * swingAmount);
     const std::array<float, 3u> swingHand{{
-        0.34f + (-0.08f - 0.34f) * smoothSwing,
+        0.44f + (-0.08f - 0.44f) * smoothSwing,
         -0.41f + (-0.47f + 0.41f) * smoothSwing,
         heldPropDepth + (std::min(heldPropDepth, 1.00f) - heldPropDepth) * smoothSwing}};
     const std::array<float, 3u> parryHand{{
-        -0.20f + 0.055f * successJolt,
+        -0.16f + 0.055f * successJolt,
         -0.29f + 0.025f * successJolt,
         std::min(heldPropDepth, 0.90f)}};
 
@@ -135,10 +138,22 @@ HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
         pose.rightHandLocal[axis] = swingHand[axis] +
             (parryHand[axis] - swingHand[axis]) * parryBlend;
     }
-    pose.swordRadians = swordSwingRadians + parryBlend * (-0.82f + 0.14f * successJolt);
+    pose.swordRadians = kSwordRestInwardRadians + swordSwingRadians +
+                        parryBlend * (-0.82f + 0.14f * successJolt);
+    pose.swordForwardRadians = kSwordRestForwardRadians;
     pose.parryBlend = parryBlend;
     pose.successJolt = successJolt;
     return pose;
+}
+
+std::array<float, 3u> EvaluateSwordBladeAxisInView(
+    const float inwardRadians,
+    const float forwardRadians)
+{
+    const float forwardCos = std::cos(forwardRadians);
+    return {{-std::sin(inwardRadians) * forwardCos,
+             std::cos(inwardRadians) * forwardCos,
+             std::sin(forwardRadians)}};
 }
 
 HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput& input)
@@ -152,19 +167,19 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
     const float torchSway = std::sin(input.walkTime * 6.2f) * 0.035f * movement;
     const float torchBob = std::abs(std::sin(input.walkTime * 6.2f)) * 0.025f * movement;
     const std::array<float, 3u> heldLeftHand{{
-        -0.34f - torchSway, -0.40f + torchBob, heldPropDepth}};
-    constexpr std::array<float, 3u> loweredLeftHand{{-0.31f, -0.92f, 0.27f}};
+        -0.44f - torchSway, -0.40f + torchBob, heldPropDepth}};
+    constexpr std::array<float, 3u> loweredLeftHand{{-0.39f, -0.92f, 0.27f}};
     const float lowerBlend = std::clamp(input.torchFailure.leftArmLowerBlend, 0.0f, 1.0f);
     const HeldSwordPose sword = EvaluateHeldSwordPose(
         input.playerCombat, input.swordSwingRadians, heldPropDepth);
 
     HeldItemKinematicsState result;
     result.leftShoulderLocal = {{
-        -0.25f,
+        -0.36f,
         -0.44f + lowerBodyPose.pelvisBob * 0.35f,
         0.39f - lowerBodyPose.leftStride * 0.018f}};
     result.rightShoulderLocal = {{
-        0.25f,
+        0.36f,
         -0.44f + lowerBodyPose.pelvisBob * 0.35f,
         0.39f + lowerBodyPose.leftStride * 0.018f}};
     for (std::size_t axis = 0u; axis < result.leftHandLocal.size(); ++axis)
@@ -175,6 +190,7 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
     result.rightHandLocal = sword.rightHandLocal;
     result.heldPropDepth = heldPropDepth;
     result.swordRadians = sword.swordRadians;
+    result.swordForwardRadians = sword.swordForwardRadians;
     result.parryBlend = sword.parryBlend;
     result.successJolt = sword.successJolt;
     return result;
@@ -355,13 +371,18 @@ bool ResolveHeldItemsFixedStep(HeldItemStates& items,
     const float swordRadians = state.kinematics.swordRadians;
     const float swordCos = std::cos(swordRadians);
     const float swordSin = std::sin(swordRadians);
-    const Vec3 swordAxisX = Normalize(Add(Scale(viewRight, swordCos),
-                                          Scale(viewUp, swordSin)));
-    const Vec3 swordAxisY = Normalize(Add(Scale(viewRight, -swordSin),
-                                          Scale(viewUp, swordCos)));
+    const Vec3 swordAxisXRoll = Normalize(Add(Scale(viewRight, swordCos),
+                                              Scale(viewUp, swordSin)));
+    const auto swordBladeInView = EvaluateSwordBladeAxisInView(
+        swordRadians, state.kinematics.swordForwardRadians);
+    const Vec3 swordAxisY = Normalize(Add(
+        Add(Scale(viewRight, swordBladeInView[0]), Scale(viewUp, swordBladeInView[1])),
+        Scale(viewForward, swordBladeInView[2])));
+    const Vec3 swordAxisZ = Normalize(Cross(swordAxisXRoll, swordAxisY));
+    const Vec3 swordAxisX = Normalize(Cross(swordAxisY, swordAxisZ));
     HeldItemTransform worldFromSword{};
     if (!ComposeWorldFromItem(
-            WorldFromAxes(swordAxisX, swordAxisY, Scale(viewForward, -1.0f), rightHand),
+            WorldFromAxes(swordAxisX, swordAxisY, swordAxisZ, rightHand),
             SwordGripSocketTransform(), worldFromSword, diagnostic))
     {
         return false;

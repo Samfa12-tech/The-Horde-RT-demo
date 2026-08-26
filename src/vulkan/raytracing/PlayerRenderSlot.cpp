@@ -256,6 +256,8 @@ bool PlayerRenderSlot::PreparePose(
         horde::scene::SkinnedArmIkTarget result;
         result.target = source.target;
         result.pole = source.pole;
+        result.shoulder = source.shoulder;
+        result.shoulderTargetEnabled = true;
         return result;
     };
     const horde::scene::SkinnedArmIkTarget left = target(animation.leftIk);

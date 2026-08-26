@@ -66,6 +66,8 @@ struct SkinnedArmIkTarget
 {
     std::array<float, 3u> target{};
     std::array<float, 3u> pole{};
+    std::array<float, 3u> shoulder{};
+    bool shoulderTargetEnabled = false;
 };
 
 struct SkinnedPlayerSockets

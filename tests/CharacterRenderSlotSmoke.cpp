@@ -311,13 +311,13 @@ int main()
 
     PlayerCombatSnapshot playerCombat;
     const PlayerWeaponRenderPose idleWeapon = EvaluatePlayerWeaponRenderPose(playerCombat, 0.0f, 1.05f);
-    ok &= Require(Near(idleWeapon.parryBlend, 0.0f) && Near(idleWeapon.swordRadians, 0.0f) &&
-                  Near(idleWeapon.rightHandLocal[0], 0.34f),
-                  "idle weapon pose changed while adding parry composition");
+    ok &= Require(Near(idleWeapon.parryBlend, 0.0f) && Near(idleWeapon.swordRadians, 0.16f) &&
+                  Near(idleWeapon.rightHandLocal[0], 0.44f),
+                  "idle weapon pose must retain the owner-reviewed lateral/canted composition");
     playerCombat.action = PlayerCombatAction::ParryActive;
     const PlayerWeaponRenderPose activeParry = EvaluatePlayerWeaponRenderPose(playerCombat, 0.0f, 1.05f);
-    ok &= Require(Near(activeParry.parryBlend, 1.0f) && Near(activeParry.swordRadians, -0.82f) &&
-                  Near(activeParry.rightHandLocal[0], -0.20f),
+    ok &= Require(Near(activeParry.parryBlend, 1.0f) && Near(activeParry.swordRadians, -0.66f) &&
+                  Near(activeParry.rightHandLocal[0], -0.16f),
                   "active parry did not move the sword and right hand across the view");
     playerCombat.reaction = CombatReaction::Parried;
     playerCombat.reactionTime = 0.12f;

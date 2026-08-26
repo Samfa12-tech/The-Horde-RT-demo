@@ -1327,6 +1327,7 @@ public class MainActivity extends Activity {
             case "two-enemy-combat": return 12;
             case "player-body-grips": return 102;
             case "player-fallback-grips": return 105;
+            case "player-body-owner-feedback": return 106;
             default: return -1;
         }
     }

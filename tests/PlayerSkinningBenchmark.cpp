@@ -80,13 +80,20 @@ int main()
             std::cerr << diagnostic << '\n';
             return 2;
         }
-        animation.leftIk.target = {{leftShoulder[12] - 0.09f,
-                                    leftShoulder[13] + 0.04f,
-                                    leftShoulder[14] + 0.66f}};
+        const float shoulderCenterX = 0.5f * (leftShoulder[12] + rightShoulder[12]);
+        const float shoulderCenterY = 0.5f * (leftShoulder[13] + rightShoulder[13]);
+        const float shoulderCenterZ = 0.5f * (leftShoulder[14] + rightShoulder[14]);
+        animation.leftIk.shoulder = {{shoulderCenterX - 0.36f,
+                                     shoulderCenterY, shoulderCenterZ}};
+        animation.rightIk.shoulder = {{shoulderCenterX + 0.36f,
+                                      shoulderCenterY, shoulderCenterZ}};
+        animation.leftIk.target = {{animation.leftIk.shoulder[0] - 0.08f,
+                                    animation.leftIk.shoulder[1] + 0.04f,
+                                    animation.leftIk.shoulder[2] + 0.66f}};
         animation.leftIk.pole = {{-0.8f, -0.1f, 0.45f}};
-        animation.rightIk.target = {{rightShoulder[12] + 0.09f,
-                                     rightShoulder[13] + 0.03f,
-                                     rightShoulder[14] + 0.66f}};
+        animation.rightIk.target = {{animation.rightIk.shoulder[0] + 0.08f,
+                                     animation.rightIk.shoulder[1] + 0.03f,
+                                     animation.rightIk.shoulder[2] + 0.66f}};
         animation.rightIk.pole = {{0.8f, -0.1f, 0.45f}};
 
         bool updated30 = false;

@@ -29,6 +29,7 @@ struct HeldSwordPose
 {
     std::array<float, 3u> rightHandLocal{};
     float swordRadians = 0.0f;
+    float swordForwardRadians = 0.0f;
     float parryBlend = 0.0f;
     float successJolt = 0.0f;
 };
@@ -41,6 +42,7 @@ struct HeldItemKinematicsState
     std::array<float, 3u> rightHandLocal{};
     float heldPropDepth = 1.05f;
     float swordRadians = 0.0f;
+    float swordForwardRadians = 0.0f;
     float parryBlend = 0.0f;
     float successJolt = 0.0f;
 };
@@ -67,6 +69,9 @@ struct HeldItemFixedStepState
 HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
                                    float swordSwingRadians,
                                    float heldPropDepth);
+
+std::array<float, 3u> EvaluateSwordBladeAxisInView(float inwardRadians,
+                                                   float forwardRadians);
 
 HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput& input);
 
