@@ -26,6 +26,8 @@ The mutually exclusive procedural route is therefore retained. The skinned route
 - `b7b4ea2` — `test: validate relative combo capture edges`
 - `cf20064` — `test: keep player socket fixture in rig space`
 - `127ca80` — `docs: finalize skinned player validation report`
+- `3bf305d` — `docs: record final skinned player phone evidence`
+- `139b828` — `fix(rt): synchronize player BLAS and stabilize grip bases`
 
 The final documentation commit is recorded in the handoff after this report is committed.
 
@@ -33,8 +35,8 @@ The final documentation commit is recorded in the handoff after this report is c
 
 - `SkinnedMeshAsset` is the reusable skinned-biped seam. Existing skeleton/lich output and the one-to-two skeleton pose-bucket behavior remain unchanged.
 - Immutable `PlayerAnimationSnapshot` state advances only through the shared 60 Hz `GameSimulation` fixed step. It carries locomotion clip/blend/time, upper-body action/time, reaction, lantern blend, left/right IK targets, and visibility metadata. Reset/import/freeze and 30/60/120 render delivery are deterministic.
-- `HeldItemKinematics` owns lateral shoulders, hand targets, wall retraction, torch drop, sword/parry pose, and combat arcs. `PlayerRenderSlot` transforms the complete shoulder-to-target chain into rig space, solves both two-bone chains, skins the mesh, and composes held items from final `LeftHand`/`RightHand` bone sockets.
-- Socket error is measured after the final bone/socket composition. The bound remains 0.015 m; measured Windows cadence error was 0.000010 m and exact-phone state serialized 0.0000 m.
+- `HeldItemKinematics` owns lateral shoulders, hand targets, wall retraction, torch drop, sword/parry pose, and combat arcs. The fixed-step animation snapshot also carries authoritative left/right Grip basis vectors. `PlayerRenderSlot` transforms the complete shoulder-to-target/basis chain into rig space, solves both two-bone chains, rotates the actual hand joints through the stable rest basis, skins the mesh, and composes held items from final `LeftHand`/`RightHand` bone sockets.
+- Final Grip agreement is measured after item composition in both position and orientation. The position bound remains 0.015 m and the orientation ceiling is 0.02 rad. Fix-round Windows maxima were 0.000005696 m and 0.00059802 rad; exact-phone state serialized 0.0000 m position error.
 - Body, Head, and NearFace primitives have explicit metadata. Head/NearFace are excluded only from first-person primary rays and retain intended shadow/reflection participation.
 - CPU skinning updates the bounded player vertex range and refits one player BLAS. Compute skinning was not added.
 
@@ -126,6 +128,15 @@ Fresh corrected Windows owner captures are under `.superpowers/sdd/2026-08-26-fi
 
 Visual inspection confirms distinct lower-left/lower-right arm chains, torso space, torch left, thin edge-forward sword right, a readable downward diagonal, and an inward upward slice without head/camera intersection.
 
+## Fix Round 1 — synchronization and deterministic Grip basis
+
+Systematic RED/GREEN coverage addressed both review findings without offset compensation or tolerance weakening:
+
+- The player-only dynamic-BLAS contract initially failed with `a player-only BLAS update must record the precise AS-write-to-AS-read dependency before TLAS without overbarriering idle frames`. The renderer now builds one exact dependency predicate from player, skeleton bucket 0/1, and lich update flags. Immediately before TLAS update it emits acceleration-structure-build -> acceleration-structure-build, acceleration-structure WRITE -> READ only when at least one dynamic BLAS was recorded. Idle frames do not receive the barrier.
+- The startup-order regression initially measured rest orientation 0.000488281 rad versus 0.550461 rad after a downward-first startup and 0.289863 rad after an upward-first startup. `PlayerRenderSlot` no longer calibrates from its first delivered render pose. Asset load deterministically derives and validates the canonical idle/rest hand-bone-to-Grip bases, and later poses apply gameplay-authored Grip deltas through the actual wrist joints.
+- The non-tautological real-rig contract resolves direct rest/down/up checkpoints, reload/reset, import-backed checkpoint state, repeated frozen snapshots, and different first-pose orderings. It then composes the actual held-item `Grip` socket and compares it with the independent authoritative held-item transform. Final maxima were rest `0.000000119 m / 0.00059802 rad`, downward `0.000005696 m / 0.000488281 rad`, and upward `0.000002901 m / 0.00059802 rad`.
+- Focused fresh Debug and Release runs each passed 3/3: player animation authority, real skinned model/final Grip, and renderer update/barrier seam. Combo semantics and platform dispatch were not changed in this fix.
+
 ## Exact `SM-S948B` evidence
 
 The final exact-device evidence used the sole authorised serial `R5GL219SZGK`, raw model `SM-S948B`, Android 16/API 36, and Adreno 840. Clean source `127ca8067b638edf191355f4cf6c9dd14be5fcda` produced a Debug APK whose local and installed `base.apk` SHA-256 both equal `5456e211501d039b73daa8b168415127beef36c2a733d172707d4ca9c347427d`.
@@ -152,13 +163,17 @@ The reverse-order warmed A/B route `reports/android-showcase-runs/run-20260826-2
 
 A separate live two-tap replay is preserved under `.superpowers/sdd/2026-08-26-fire-pbr-reward-lantern-player-upgrade/evidence/task-5/android-live-combo-20260826-202903/`. Attack sequences 160 and 163 identified downward/upward cuts 1/2; each was accepted once, enqueued once, drained once, and reached Java sound/haptic dispatch once. Counts remained 2/2/2 across Home/resume, proving no lifecycle duplication. The log SHA-256 is `c61364b3df28213b8fab8a65624e06184bbedc9355a6f1b89bd7fbaed811e8d0`. This is dispatch evidence, not proof of owner-perceived audio or haptic quality.
 
+The Fix Round 1 exact-device repeat is `reports/android-showcase-runs/run-20260826-215512`. Clean source `139b82831bc3f5011c2ee1234692ad03e9d48c6e` produced Debug APK SHA-256 `1c0eec521367b2710db607d13cdb963996c5c3fddb73660ee447f6608ccdf785`; installed `base.apk` matched exactly. The focused run passed strict ASTC, `RayTracingPipeline`, honest RT presentation, 1080x2235 internal extent at 75%, 20 TLAS instances, 60 Hz selected player skin/refit, serialized 0.0000 m socket error, all four fallback/rest/down/up captures, relative 1/2 attack-edge and 1/2 swing-event checkpoint staging, and Home/resume.
+
+Matched fallback/skinned medians were 36.750/42.040 ms, a +14.39% delta below the 15% investigation threshold. Thermal status and Samsung GPU thermal power level stayed 0. Native heap changed 219244 -> 221136 KB (+0.86%), while Graphics 252096 -> 233604 KB, PSS 517631 -> 501788 KB, RSS 633916 -> 613112 KB, and process thread records 35 -> 33 declined. Agent inspection of the four exact-phone images confirms the actual textured hands remain attached to their props, the sword presents its thin cutting edge in rest/down/up, the arms remain separately rooted, and the portrait captures remain free of head/camera intersection. This does not constitute owner subjective art/motion acceptance.
+
 ## Automated validation
 
 Focused RED/GREEN coverage includes clip mapping, locomotion/combat precedence, down/up continuity, late-chain rejection, exact once swing/hit/event identity, pause/resume non-duplication, reset/import/freeze, lantern high/low continuity, IK reach/clamp, real bone sockets, pitch/wall basis stability, full-arc safe framing, primary-ray masking, route mutual exclusion, TLAS count, and 30/60/120 equivalence.
 
 The initial fresh full run `run-20260826-193132` exposed a 1.195 m socket error only in `horde_rt_skinned_character_model_smoke`. Systematic instrumentation traced the complete target -> model/root -> joint local/global -> world -> socket chain. Production transforms both shoulder and target together and the phone measured zero error; the smoke fixture had converted the hand target to rig space while leaving the shoulder in view space after shoulder targeting was enabled. A RED relative shoulder-to-target regression preceded the single test-fixture correction. No production offset was added and the 0.015 m tolerance was not weakened.
 
-The final coherent full Host run is `reports/foundation-runs/run-20260826-194410` at clean implementation head `cf20064801e9e87c3352151f888bc48cda80aa8b`:
+The final coherent Fix Round 1 full Host run is `reports/foundation-runs/run-20260826-213806` at clean implementation head `139b82831bc3f5011c2ee1234692ad03e9d48c6e`:
 
 - shader freshness and both negative safety gates: pass;
 - fresh Windows Debug: 24/24 CTests;
