@@ -249,7 +249,7 @@ Every nonzero counter has a distinct meaning:
 - **Transport overflow** means TIR/roughness/internal-edge continuation consumed the fixed 4/8 interface budget and selected the deterministic bounded fallback. It is 106 for the settled standard view and 94 for the fire/tinted views; it is zero for the 1 mm direct-view and edge checkpoints.
 - **Shadow overflow** is zero in every checkpoint, proving sampled local/skylight/fire shadow paths stayed within their fixed 4/8 interface ceilings.
 - **Secondary rejection** means the single allowed terminal reflection query hit the same generic dielectric and was rejected instead of recursively evaluating it. Counts are 11 standard, 10 fire/tinted, 32 for the 1 mm view, and zero edge.
-- **Unclosed volume** means a refracted path reached an ordinary terminal with its closed-volume stack still nonempty and was deterministically rejected. Temporary instrumentation first proved all 38 probed events were ordinary-terminal-with-open-stack, not no-hit. A second probe recorded first-interface incidence: maximum cosine 0.185004 and summed cosine 0.900348 over 38 events, mean 0.023693. Thus these are recorded silhouette/grazing paths, not an unexplained central miss. The final standard count is 36; camera/fire sampling changes make fire and tinted 53; the deliberately grazing edge checkpoint is 500. The same closed fixture scaled to exactly 1 mm has zero unclosed events in direct through-view. Temporary probe encoding was removed; the table contains the restored split counters.
+- **Unclosed volume** means a refracted path reached an ordinary terminal with its closed-volume stack still nonempty and was deterministically rejected. Temporary instrumentation first proved all 38 probed events were ordinary-terminal-with-open-stack, not no-hit. A second route-unattributed probe recorded first-interface incidence: maximum cosine 0.185004 and summed cosine 0.900359 over 38 events, mean 0.023694. That retained probe established grazing incidence for its sampled aggregate, but it could not distinguish primary from shadow traversal and therefore does not support attributing every aggregate unclosed event to the primary route. The final standard aggregate count is 36; camera/fire sampling changes make fire and tinted 53; the deliberately grazing edge checkpoint is 500. The same closed fixture scaled to exactly 1 mm has zero unclosed events in direct through-view. Temporary probe encoding was removed; Fix Round 2 below records persistent route-specific counters.
 
 Reducing the normal bias to one eighth increased the standard probe from 36 to 38 unclosed events, so that hypothesis was rejected and the full bounded normal-aware bias retained. The corrected edge checkpoint yaw is -0.65 radians; its fixture is actually in view and intentionally exercises silhouette/Fresnel behavior rather than looking away.
 
@@ -284,5 +284,107 @@ The generated Android validation APK is deliberately unsigned and unpublishable:
 Final `adb devices -l` again returned an empty device list. No exact artifact was installed and no phone parity, matched Mobile/High 75%, separate 100%, warmed timing/thermal/GPU-power/resources, or Home/resume evidence is claimed. Exact `SM-S948B` Task 6 device acceptance remains a hard Task 9 gate.
 
 Task 5's two-cut combo owner audio/haptic replay remains separately open and was not changed by this fix round.
+
+Audio/haptic manual revalidation required: NO — this milestone changes material transport and shader visibility only; audio/haptic state, event timing, playback, spatialisation, and feedback semantics are unchanged.
+
+## Fix Round 2 — component topology parity and route-specific diagnostics
+
+Date: 2026-08-27 (Australia/Sydney)
+
+This section supersedes the earlier thick-topology scope, diagnostic-record size, counter table, shader identity, and final-gate details. The implementation head before this report update is `b994205d2f6513d5e5a8db3235ead1ffbf7a0f65`.
+
+### Fix commits
+
+- `9f7fa15` — `test: define dielectric component topology parity`
+- `b961217` — `fix: validate dielectric topology by component`
+- `aadc9b1` — `test: define split unclosed diagnostics`
+- `b994205` — `fix: split persistent unclosed diagnostics`
+
+The topology RED tests showed two distinct defects: the old offline route rejected a valid closed shell split across primitives/nodes as eight boundary edges, while the old runtime route accepted a material containing one large outward shell and one smaller inward shell because their signed volumes were summed at material scope. The diagnostic RED tests also proved the generated ABI and both platform manifests had only the aggregate terminal-open-volume count.
+
+### Component-aware runtime/offline topology contract
+
+Runtime and offline preparation now aggregate every baked triangle sharing a real thick dielectric material before validating topology. They weld equivalent baked positions across primitive-local and node-local vertex identities using the same deterministic material-bounds-relative quantized key. The documented tolerance is `clamp(max material extent * 1e-6, 1e-7 m, 1e-5 m)`: 0.1–10 micrometres. Its origin is the material's baked bounds minimum, so the key is deterministic and scale-aware. This closes transform-rounding seams without merging the deliberately separate shells in the 50-micrometre-gap fixture.
+
+Triangles are partitioned into edge-connected components after welding. Every component independently requires each undirected edge exactly twice, once in each direction, and a finite positive signed volume. Diagnostics identify material, component number, and contributing node/primitive sources, then prescribe closing/welding, repairing winding, baking a reflected transform with reversed winding/normals, or using audited `thinWall=true` only for an intentional pane. Negative-determinant transforms remain an actionable rejection before baked topology acceptance.
+
+Runtime/offline parity uses the same tracked fixtures and now proves:
+
+- a valid closed shell split across two nodes/primitives passes;
+- two disconnected outward shells sharing one material pass, including the close-separation weld guard;
+- one large outward shell plus a smaller inward shell sharing one material fails on component 2;
+- one component with a single flipped face fails;
+- valid baked positive transforms pass, while inward winding, open/non-manifold topology, and negative-determinant transforms fail.
+
+### Append-only diagnostic ABI
+
+Descriptor binding 22 and all original offsets retain their meanings. `RtDielectricDiagnostics` expands from 16 to 32 bytes at 16-byte alignment:
+
+| Offset | Field | Meaning |
+| ---: | --- | --- |
+| 0 | `transportOverflowCount` | primary bounded transport exhausted its interface budget |
+| 4 | `shadowOverflowCount` | transparent-shadow traversal exhausted its interface budget |
+| 8 | `secondaryDielectricRejectCount` | the one terminal reflection hit a dielectric and was rejected rather than recursed |
+| 12 | `unclosedVolumeCount` | backward-compatible total terminal-with-open-volume count |
+| 16 | `primaryUnclosedVolumeCount` | total subset emitted by primary dielectric transport |
+| 20 | `shadowUnclosedVolumeCount` | total subset emitted by transparent-shadow traversal |
+| 24, 28 | reserved | zeroed append-only capacity |
+
+Every terminal-open-volume rejection increments the legacy total and exactly one route-specific counter. Generated CPU/GLSL ABI, allocation, clear, readback, move/reset state, Windows nested capture manifests, and Android flat debug state all use the expanded record. The push block remains 124 bytes; `vulkaninfoSDK` still reports `maxPushConstantsSize = 256` on the exact Windows device, above the 124-byte requirement and 128-byte project ceiling.
+
+### Shader re-attribution
+
+The two new atomic route counters add 3,552 bytes and 136 instructions to each fully inlined variant. Branches, loops, selections, query-site counts, sample counts, physical budgets, and dual-pipeline selection are unchanged from Fix Round 1.
+
+| Variant | Bytes | Instructions | Branch ops | Loops | Selections | Functions/calls | Static query sites |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| generic | 789,228 | 43,514 | 6,263 | 89 | 2,556 | 1 / 0 | 29 |
+| legacy-inactive | 778,136 | 42,847 | 6,155 | 89 | 2,520 | 1 / 0 | 29 |
+
+Generic identity: dependency SHA-256 `0ea1b4af94d90eb9efce2359280d9506ef22598e97f5e7e87a4e28c8a35fc84d`; embedded include SHA-256 `406bcec3524f7b6adf0280de218718b478d9505eabf499f28bf449e43a797236`; SPIR-V SHA-256 `f29f2f537883d9e5deb5d56ad74a1cf35b3e88ed16f773e26e8c5092c704f594`.
+
+Legacy-inactive identity: dependency SHA-256 `71d07d1670d820efb65566a7b2e38031361cec19e9ad3f4e96b8bdf4c993363b`; embedded include SHA-256 `4be7cfd27a83b695b5b1a7e3767ad1982094a020d5e661135d9f19e02e0a1644`; SPIR-V SHA-256 `ac99c30e6f857593df534567a4b5c9efadddc6d8ff92c47b7e033d836edc6ed4`.
+
+Both remain driver-safe, fully inlined, and complete real RTX `vkCmdTraceRaysKHR` captures. There is no new shader cliff: the added diagnostics did not duplicate includes/helpers or change loop/query structure.
+
+### Route-split glass checkpoint evidence
+
+All checkpoints are 960x540 at render scale 1.0, honestly presented on `NVIDIA GeForce RTX 5050 Laptop GPU`, with normalized `outputRedBlueSwap`. Counter order below is deliberately explicit: transport overflow, shadow overflow, secondary dielectric reject, legacy total unclosed, primary unclosed, shadow unclosed.
+
+| Checkpoint | PNG SHA-256 | Median ms | GPU RT avg ms | Transport | Shadow overflow | Secondary | Total unclosed | Primary unclosed | Shadow unclosed |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| no-fire/skylight `glass-transport`, warmed | `89f3d9956711ab33291b42b453ba50ae8ba3bb03107f8d797bbce97ac6f12401` | 6.047950 | 0.984268 | 106 | 0 | 11 | 36 | 3 | 33 |
+| fire-on `glass-fire-transport` | `3594ad3ab7e091e87771e66e8e4fd81e5d456748fe328427c4980560838abbc2` | 6.089800 | 1.290121 | 94 | 0 | 10 | 53 | 2 | 51 |
+| tinted/fire `glass-tinted-transport` | `722f76f445c17013e15be9688840213a886d8462375d13324c1ac0ff4407b0e8` | 6.064550 | 1.240553 | 94 | 0 | 10 | 53 | 2 | 51 |
+| 1 mm closed `glass-millimetre-closed` | `89371829197fed0b73c26757d4e20cb2b9e25d047b7cc5ef7788b3b0618e1a79` | 6.060700 | 0.953594 | 0 | 0 | 32 | 0 | 0 | 0 |
+| edge/Fresnel `glass-edge-fresnel` | `3d44dc40efa662009473265ba7567da77c651a60bbf455c73371a3b496df4526` | 6.065750 | 0.842464 | 0 | 0 | 0 | 500 | 475 | 25 |
+
+The standard closed fixture's aggregate 36 is therefore not a primary-only grazing result: three rejections came from primary transport and 33 from transparent-shadow traversal. Fire and tinted each split 2 primary / 51 shadow. The deliberate edge checkpoint splits 475 primary / 25 shadow. These counters diagnose bounded route termination; they do not by themselves establish a geometric cause. The earlier temporary aggregate incidence probe had the corrected sum 0.900359 and mean 0.023694, but lacked route identity and is not used to infer primary grazing from shadow counts. The 1 mm closed-volume proof has zero primary and shadow unclosed events; its 32 secondary rejects are the intentional one-terminal-reflection non-recursion rule. Transport overflow remains deterministic bounded fallback, shadow overflow remains zero in every checkpoint, and secondary rejection remains distinct from both interface overflow and terminal-open-volume rejection.
+
+### Exact inactive identity and final gates
+
+Fresh full run `reports/foundation-runs/run-20260827-022655` passed at exact implementation commit `b994205d2f6513d5e5a8db3235ead1ffbf7a0f65`:
+
+- shader freshness for generic/legacy and tracked-include/compiler/package negative gates: pass;
+- Windows Debug: 27/27, 112.29 s;
+- Windows Release: 27/27, 59.14 s;
+- fixed Windows captures: 13/13 honestly presented;
+- independent literal SHA-256 comparison against reviewed Task 5 run `run-20260826-213806`: 13/13 exact, with all six dielectric counters zero;
+- hidden-run aggregate timing: 6.054200 ms median, GPU RT-command-buffer average 1.374902 ms over 156/155 samples;
+- Android clean Debug, unsigned Release, Release lint: `BUILD SUCCESSFUL in 3m 10s`, 100 actionable tasks (98 executed, two up-to-date);
+- Windows/Android package and dielectric-fixture licence gate: pass;
+- evidence hashing: pass; status before/after the gate: clean.
+
+Final focused coverage passed Debug 8/8 in 18.59 s and Release 8/8 in 18.05 s: dielectric math, development fixture/checkpoints, scene ABI, static GLB/runtime validation, ABI generator, compiler strategy/negative proof, offline topology, and character/render-slot integration.
+
+The exact unsigned, unpublishable Android validation artifact is:
+
+- `reports/foundation-runs/run-20260827-022655/artifacts/Horde-Lantern-RT-validation-20260827-022655-Android-UNSIGNED-DO-NOT-PUBLISH.apk`
+- 74,491,708 bytes
+- SHA-256 `5b512b0b99236b4b686d187c4396913caaaef80d739f38d2a95531a8443609c8`
+
+Final `adb devices -l` returned an empty device list. No exact artifact was installed and no phone parity, matched Mobile/High 75%, separate 100%, warmed timing/thermal/GPU-power/resources, or Home/resume evidence is claimed. Exact `SM-S948B` Task 6 device acceptance remains a hard Task 9 gate.
+
+Automated capture inspection verifies route, structure, hashes, counters, and timing only. Hands-on perceived glass quality remains an owner boundary. Task 5's two-cut combo owner audio/haptic replay remains separately open and was not changed by this fix round.
 
 Audio/haptic manual revalidation required: NO — this milestone changes material transport and shader visibility only; audio/haptic state, event timing, playback, spatialisation, and feedback semantics are unchanged.
