@@ -36,7 +36,8 @@
     "ormTexture": 32,
     "emissiveTexture": 64,
     "headPrimaryMasked": 128,
-    "nearFacePrimaryMasked": 256
+    "nearFacePrimaryMasked": 256,
+    "thinWall": 512
   },
   "records": [
     {

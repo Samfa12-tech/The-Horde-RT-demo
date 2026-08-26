@@ -121,7 +121,8 @@ void TestGeneratedConstants()
               static_cast<std::uint32_t>(RtMaterialFlag::BaseColorTexture) == 8u &&
               static_cast<std::uint32_t>(RtMaterialFlag::NormalTexture) == 16u &&
               static_cast<std::uint32_t>(RtMaterialFlag::OrmTexture) == 32u &&
-              static_cast<std::uint32_t>(RtMaterialFlag::EmissiveTexture) == 64u,
+              static_cast<std::uint32_t>(RtMaterialFlag::EmissiveTexture) == 64u &&
+              static_cast<std::uint32_t>(RtMaterialFlag::ThinWall) == 512u,
           "material flag enum agrees with hand-checked literals");
 }
 

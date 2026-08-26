@@ -55,6 +55,20 @@ void WriteFloat(std::vector<std::uint8_t>& bytes, std::size_t offset, float valu
     std::memcpy(bytes.data() + offset, &value, sizeof(value));
 }
 
+void AppendFloat(std::vector<std::uint8_t>& bytes, float value)
+{
+    static_assert(sizeof(float) == 4u);
+    const auto offset = bytes.size();
+    bytes.resize(offset + sizeof(value));
+    std::memcpy(bytes.data() + offset, &value, sizeof(value));
+}
+
+void AppendU16(std::vector<std::uint8_t>& bytes, std::uint16_t value)
+{
+    bytes.push_back(static_cast<std::uint8_t>(value & 0xffu));
+    bytes.push_back(static_cast<std::uint8_t>((value >> 8u) & 0xffu));
+}
+
 bool NearlyEqual(float actual, float expected, float epsilon = 0.00001f)
 {
     return std::abs(actual - expected) <= epsilon;
@@ -145,6 +159,80 @@ std::filesystem::path RewriteManifest(const std::filesystem::path& root,
     return path;
 }
 
+std::filesystem::path WriteClosedDielectricGlb(const std::filesystem::path& root,
+                                               std::string_view name,
+                                               bool omitFrontFace,
+                                               bool duplicateBottomTriangle)
+{
+    constexpr std::array<std::array<float, 3u>, 8u> positions{{
+        {{-0.5f, -0.5f, -0.5f}}, {{0.5f, -0.5f, -0.5f}},
+        {{0.5f, 0.5f, -0.5f}}, {{-0.5f, 0.5f, -0.5f}},
+        {{-0.5f, -0.5f, 0.5f}}, {{0.5f, -0.5f, 0.5f}},
+        {{0.5f, 0.5f, 0.5f}}, {{-0.5f, 0.5f, 0.5f}}}};
+    constexpr std::array<std::uint16_t, 36u> closedIndices{{
+        0, 2, 1, 0, 3, 2,
+        4, 5, 6, 4, 6, 7,
+        0, 4, 7, 0, 7, 3,
+        1, 2, 6, 1, 6, 5,
+        0, 1, 5, 0, 5, 4,
+        3, 7, 6, 3, 6, 2}};
+    std::vector<std::uint16_t> indices(closedIndices.begin(), closedIndices.end());
+    if (omitFrontFace) indices.erase(indices.begin() + 6, indices.begin() + 12);
+    if (duplicateBottomTriangle) indices.insert(indices.end(), {0u, 1u, 5u});
+
+    std::vector<std::uint8_t> binary;
+    for (const auto& p : positions)
+        for (float value : p) AppendFloat(binary, value);
+    const std::size_t normalOffset = binary.size();
+    for (const auto& p : positions)
+    {
+        const float length = std::sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
+        AppendFloat(binary, p[0] / length);
+        AppendFloat(binary, p[1] / length);
+        AppendFloat(binary, p[2] / length);
+    }
+    const std::size_t uvOffset = binary.size();
+    for (std::size_t vertex = 0u; vertex < positions.size(); ++vertex)
+    {
+        AppendFloat(binary, (vertex & 1u) != 0u ? 1.0f : 0.0f);
+        AppendFloat(binary, (vertex & 2u) != 0u ? 1.0f : 0.0f);
+    }
+    const std::size_t indexOffset = binary.size();
+    for (std::uint16_t index : indices) AppendU16(binary, index);
+
+    const std::string json =
+        "{\"asset\":{\"version\":\"2.0\"},"
+        "\"extensionsUsed\":[\"KHR_materials_transmission\",\"KHR_materials_volume\",\"KHR_materials_ior\"],"
+        "\"extensionsRequired\":[\"KHR_materials_transmission\",\"KHR_materials_volume\",\"KHR_materials_ior\"],"
+        "\"buffers\":[{\"byteLength\":" + std::to_string(binary.size()) + "}],"
+        "\"bufferViews\":["
+        "{\"buffer\":0,\"byteOffset\":0,\"byteLength\":96,\"target\":34962},"
+        "{\"buffer\":0,\"byteOffset\":" + std::to_string(normalOffset) +
+            ",\"byteLength\":96,\"target\":34962},"
+        "{\"buffer\":0,\"byteOffset\":" + std::to_string(uvOffset) +
+            ",\"byteLength\":64,\"target\":34962},"
+        "{\"buffer\":0,\"byteOffset\":" + std::to_string(indexOffset) +
+            ",\"byteLength\":" + std::to_string(indices.size() * 2u) +
+            ",\"target\":34963}],"
+        "\"accessors\":["
+        "{\"bufferView\":0,\"componentType\":5126,\"count\":8,\"type\":\"VEC3\",\"min\":[-0.5,-0.5,-0.5],\"max\":[0.5,0.5,0.5]},"
+        "{\"bufferView\":1,\"componentType\":5126,\"count\":8,\"type\":\"VEC3\"},"
+        "{\"bufferView\":2,\"componentType\":5126,\"count\":8,\"type\":\"VEC2\"},"
+        "{\"bufferView\":3,\"componentType\":5123,\"count\":" +
+            std::to_string(indices.size()) + ",\"type\":\"SCALAR\"}],"
+        "\"materials\":[{\"name\":\"ClosedGlass\",\"doubleSided\":true,"
+        "\"pbrMetallicRoughness\":{\"baseColorFactor\":[0.92,0.97,1,1],\"metallicFactor\":0,\"roughnessFactor\":0.12},"
+        "\"extensions\":{\"KHR_materials_transmission\":{\"transmissionFactor\":0.94},"
+        "\"KHR_materials_volume\":{\"thicknessFactor\":1,\"attenuationDistance\":2,\"attenuationColor\":[0.75,0.9,1]},"
+        "\"KHR_materials_ior\":{\"ior\":1.52}}}],"
+        "\"meshes\":[{\"primitives\":[{\"attributes\":{\"POSITION\":0,\"NORMAL\":1,\"TEXCOORD_0\":2},"
+        "\"indices\":3,\"material\":0,\"mode\":4}]}],"
+        "\"nodes\":[{\"name\":\"Root\",\"mesh\":0},{\"name\":\"grip\"}],\"scenes\":[{\"nodes\":[0,1]}],\"scene\":0}";
+    const auto path = root / name;
+    WriteGlb(path, json, std::move(binary));
+    return path;
+}
+
 void ExpectManifestFailure(const std::filesystem::path& path, std::string_view expected)
 {
     horde::scene::assets::AssetManifest manifest;
@@ -192,8 +280,16 @@ void TestManifestContract(const std::filesystem::path& temporaryRoot)
           "runtime texture profile is retained");
     Check(manifest.materialOverrides.size() == 1u &&
               manifest.materialOverrides[0].material == "FixtureMaterial" &&
-              manifest.materialOverrides[0].emissiveStrength == 2.0f,
-          "material override is retained");
+              manifest.materialOverrides[0].emissiveStrength == 2.0f &&
+              manifest.materialOverrides[0].transmissionFactor == 0.73f &&
+              manifest.materialOverrides[0].ior == 1.61f &&
+              manifest.materialOverrides[0].thicknessFactor == 0.42f &&
+              manifest.materialOverrides[0].attenuationDistance == 2.5f &&
+              manifest.materialOverrides[0].attenuationColor ==
+                  std::array<float, 3u>{{0.8f, 0.9f, 1.0f}} &&
+              manifest.materialOverrides[0].roughnessFactor == 0.18f &&
+              manifest.materialOverrides[0].thinWall,
+          "dielectric material overrides are retained");
 
     ExpectManifestFailure(kFixtureRoot / "bad-schema.manifest.json",
                           "Asset manifest schema must be 1.");
@@ -249,18 +345,49 @@ void TestAcceptedStaticGlbContract(const horde::scene::assets::AssetManifest& ma
         const auto& material = asset.materials[0];
         Check(material.baseColorFactor == std::array<float, 4u>{{0.2f, 0.3f, 0.4f, 0.8f}},
               "base colour factor is decoded");
-        Check(material.metallicFactor == 0.7f && material.roughnessFactor == 0.25f &&
+        Check(material.metallicFactor == 0.7f && material.roughnessFactor == 0.18f &&
                   material.occlusionStrength == 0.6f,
               "metallic, roughness, and occlusion factors are decoded");
-        Check(material.transmissionFactor == 0.4f && material.ior == 1.7f &&
-                  material.thicknessFactor == 0.5f && material.attenuationDistance == 3.0f,
-              "KHR transmission, IOR, and volume fields are decoded");
+        Check(material.transmissionFactor == 0.73f && material.ior == 1.61f &&
+                  material.thicknessFactor == 0.42f && material.attenuationDistance == 2.5f &&
+                  material.attenuationColor == std::array<float, 3u>{{0.8f, 0.9f, 1.0f}} &&
+                  material.roughnessFactor == 0.18f,
+              "KHR dielectric fields are decoded and audited sidecar overrides are applied");
         Check(material.emissiveStrength == 2.0f,
               "audited manifest material override replaces KHR emissive strength");
+        Check((material.flags & 512u) != 0u,
+              "thin-wall sidecar intent reaches the generated material ABI flag");
         Check(material.baseColorTexture == 0 && material.normalTexture == 0 &&
                   material.ormTexture == 0 && material.emissiveTexture == 0,
               "four runtime texture categories receive deterministic layers");
     }
+}
+
+void TestThickDielectricTopology(const std::filesystem::path& temporaryRoot,
+                                 const horde::scene::assets::AssetManifest& sourceManifest)
+{
+    auto manifest = sourceManifest;
+    manifest.materialOverrides.clear();
+    manifest.budgets.maxIndices = 48u;
+    manifest.lods[0].maxTriangles = 16u;
+    horde::scene::assets::StaticMeshAsset asset;
+    std::string diagnostic;
+    const auto closed = WriteClosedDielectricGlb(
+        temporaryRoot, "closed-dielectric-lod0.runtime.glb", false, false);
+    Check(horde::scene::assets::StaticMeshAsset::Load(closed, manifest, asset, diagnostic),
+          std::string("closed manifold thick dielectric loads: ") + diagnostic);
+
+    const auto open = WriteClosedDielectricGlb(
+        temporaryRoot, "open-dielectric-lod0.runtime.glb", true, false);
+    ExpectAssetFailure(
+        open, manifest,
+        "Static GLB thick transmissive material 'ClosedGlass' is open: boundary edge is referenced once. Use closed manifold geometry or set thinWall in the audited material override.");
+
+    const auto nonManifold = WriteClosedDielectricGlb(
+        temporaryRoot, "non-manifold-dielectric-lod0.runtime.glb", false, true);
+    ExpectAssetFailure(
+        nonManifold, manifest,
+        "Static GLB thick transmissive material 'ClosedGlass' is non-manifold: an edge is referenced more than twice.");
 }
 
 void TestBakedNodeTransformAndUnitScale(const std::filesystem::path& temporaryRoot)
@@ -526,6 +653,7 @@ int main()
     else
     {
         TestAcceptedStaticGlbContract(manifest);
+        TestThickDielectricTopology(temporaryRoot, manifest);
         TestBakedNodeTransformAndUnitScale(temporaryRoot);
         TestExactLodSuffixSelection(temporaryRoot);
         TestMalformedAndUnsupportedGlbs(temporaryRoot, manifest);

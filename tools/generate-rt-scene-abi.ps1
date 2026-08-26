@@ -137,6 +137,7 @@ enum class RtMaterialFlag : std::uint32_t
     EmissiveTexture = $($m.emissiveTexture)u,
     HeadPrimaryMasked = $($m.headPrimaryMasked)u,
     NearFacePrimaryMasked = $($m.nearFacePrimaryMasked)u,
+    ThinWall = $($m.thinWall)u,
 };
 
 $cpuRecords
@@ -166,6 +167,7 @@ const uint kRtMaterialFlagOrmTexture = $($m.ormTexture)u;
 const uint kRtMaterialFlagEmissiveTexture = $($m.emissiveTexture)u;
 const uint kRtMaterialFlagHeadPrimaryMasked = $($m.headPrimaryMasked)u;
 const uint kRtMaterialFlagNearFacePrimaryMasked = $($m.nearFacePrimaryMasked)u;
+const uint kRtMaterialFlagThinWall = $($m.thinWall)u;
 
 $glslRecords
 layout(std430, set = 0, binding = $($b.instanceMetadata)) readonly buffer RtInstanceMetadataBuffer

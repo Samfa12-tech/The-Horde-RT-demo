@@ -1,5 +1,7 @@
 #include "scene/assets/AssetManifest.h"
 
+#include <algorithm>
+#include <array>
 #include <cmath>
 #include <fstream>
 #include <limits>
@@ -111,6 +113,37 @@ bool ExtractBool(std::string_view text, std::string_view key, bool& value)
     return true;
 }
 
+bool HasKey(std::string_view text, std::string_view key)
+{
+    return text.find("\"" + std::string(key) + "\"") != std::string_view::npos;
+}
+
+bool ExtractFloat3(std::string_view text, std::string_view key,
+                   std::array<float, 3u>& values)
+{
+    std::string_view section;
+    if (!FindDelimited(text, key, '[', ']', section)) return false;
+    const std::regex number(
+        "[-+]?(?:[0-9]+\\.?[0-9]*|\\.[0-9]+)(?:[eE][-+]?[0-9]+)?");
+    std::size_t index = 0u;
+    for (std::cregex_iterator it(section.data(), section.data() + section.size(), number), end;
+         it != end; ++it)
+    {
+        if (index >= values.size()) return false;
+        try
+        {
+            const double value = std::stod((*it)[0].str());
+            if (!std::isfinite(value)) return false;
+            values[index++] = static_cast<float>(value);
+        }
+        catch (...)
+        {
+            return false;
+        }
+    }
+    return index == values.size();
+}
+
 std::vector<std::string_view> ObjectElements(std::string_view array)
 {
     std::vector<std::string_view> result;
@@ -214,15 +247,71 @@ bool AssetManifest::Load(const std::filesystem::path& path,
     for (const std::string_view sourceOverride : ObjectElements(materialOverrides))
     {
         MaterialOverride materialOverride;
-        double emissiveStrength = 0.0;
-        if (!ExtractString(sourceOverride, "material", materialOverride.material) ||
-            !ExtractNumber(sourceOverride, "emissiveStrength", emissiveStrength) ||
-            !std::isfinite(emissiveStrength) || emissiveStrength < 0.0)
+        if (!ExtractString(sourceOverride, "material", materialOverride.material))
         {
             diagnostic = "Asset manifest contains an invalid material override.";
             return false;
         }
-        materialOverride.emissiveStrength = static_cast<float>(emissiveStrength);
+        const auto optionalNumber = [&](std::string_view key, float& destination,
+                                        bool& present, double minimum,
+                                        double maximum) {
+            present = HasKey(sourceOverride, key);
+            if (!present) return true;
+            double value = 0.0;
+            if (!ExtractNumber(sourceOverride, key, value) || !std::isfinite(value) ||
+                value < minimum || value > maximum)
+                return false;
+            destination = static_cast<float>(value);
+            return true;
+        };
+        if (!optionalNumber("emissiveStrength", materialOverride.emissiveStrength,
+                            materialOverride.hasEmissiveStrength, 0.0,
+                            std::numeric_limits<double>::max()) ||
+            !optionalNumber("transmissionFactor", materialOverride.transmissionFactor,
+                            materialOverride.hasTransmissionFactor, 0.0, 1.0) ||
+            !optionalNumber("ior", materialOverride.ior,
+                            materialOverride.hasIor, 1.0, 4.0) ||
+            !optionalNumber("thicknessFactor", materialOverride.thicknessFactor,
+                            materialOverride.hasThicknessFactor, 0.0,
+                            std::numeric_limits<double>::max()) ||
+            !optionalNumber("attenuationDistance", materialOverride.attenuationDistance,
+                            materialOverride.hasAttenuationDistance,
+                            std::numeric_limits<double>::min(),
+                            std::numeric_limits<double>::max()) ||
+            !optionalNumber("roughnessFactor", materialOverride.roughnessFactor,
+                            materialOverride.hasRoughnessFactor, 0.0, 1.0))
+        {
+            diagnostic = "Asset manifest contains an invalid material override.";
+            return false;
+        }
+        materialOverride.hasAttenuationColor = HasKey(sourceOverride, "attenuationColor");
+        if (materialOverride.hasAttenuationColor &&
+            (!ExtractFloat3(sourceOverride, "attenuationColor",
+                            materialOverride.attenuationColor) ||
+             std::any_of(materialOverride.attenuationColor.begin(),
+                         materialOverride.attenuationColor.end(),
+                         [](float channel) { return channel < 0.0f || channel > 1.0f; })))
+        {
+            diagnostic = "Asset manifest contains an invalid material override.";
+            return false;
+        }
+        materialOverride.hasThinWall = HasKey(sourceOverride, "thinWall");
+        if (materialOverride.hasThinWall &&
+            !ExtractBool(sourceOverride, "thinWall", materialOverride.thinWall))
+        {
+            diagnostic = "Asset manifest contains an invalid material override.";
+            return false;
+        }
+        if (!materialOverride.hasEmissiveStrength &&
+            !materialOverride.hasTransmissionFactor && !materialOverride.hasIor &&
+            !materialOverride.hasThicknessFactor &&
+            !materialOverride.hasAttenuationDistance &&
+            !materialOverride.hasAttenuationColor &&
+            !materialOverride.hasRoughnessFactor && !materialOverride.hasThinWall)
+        {
+            diagnostic = "Asset manifest contains an invalid material override.";
+            return false;
+        }
         manifest.materialOverrides.push_back(std::move(materialOverride));
     }
 

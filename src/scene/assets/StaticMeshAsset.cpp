@@ -257,6 +257,77 @@ bool IsFiniteMaterial(const StaticMaterial& material)
             material.attenuationDistance == std::numeric_limits<float>::max());
 }
 
+using QuantizedPosition = std::array<std::int64_t, 3u>;
+using UndirectedEdge = std::pair<QuantizedPosition, QuantizedPosition>;
+
+QuantizedPosition QuantizePosition(const StaticRtVertex& vertex)
+{
+    constexpr double precision = 100000.0;
+    return {{
+        static_cast<std::int64_t>(std::llround(vertex.position[0] * precision)),
+        static_cast<std::int64_t>(std::llround(vertex.position[1] * precision)),
+        static_cast<std::int64_t>(std::llround(vertex.position[2] * precision))}};
+}
+
+bool ValidateThickDielectricTopology(const StaticMeshAsset& asset,
+                                     std::string& diagnostic)
+{
+    constexpr std::uint32_t thinWallFlag = 512u;
+    for (std::size_t materialIndex = 0u; materialIndex < asset.materials.size(); ++materialIndex)
+    {
+        const StaticMaterial& material = asset.materials[materialIndex];
+        if (material.transmissionFactor <= 0.0f || material.thicknessFactor <= 0.0f ||
+            (material.flags & thinWallFlag) != 0u)
+            continue;
+        std::map<UndirectedEdge, std::uint32_t> edgeReferences;
+        for (const StaticPrimitiveRecord& primitive : asset.primitives)
+        {
+            if (primitive.materialIndex != materialIndex) continue;
+            for (std::uint32_t index = 0u; index < primitive.indexCount; index += 3u)
+            {
+                std::array<QuantizedPosition, 3u> triangle{};
+                for (std::size_t corner = 0u; corner < triangle.size(); ++corner)
+                {
+                    const std::uint32_t localVertex =
+                        asset.indices[primitive.indexOffset + index + corner];
+                    triangle[corner] = QuantizePosition(
+                        asset.vertices[primitive.vertexOffset + localVertex]);
+                }
+                for (std::size_t edge = 0u; edge < triangle.size(); ++edge)
+                {
+                    QuantizedPosition a = triangle[edge];
+                    QuantizedPosition b = triangle[(edge + 1u) % triangle.size()];
+                    if (b < a) std::swap(a, b);
+                    if (a == b)
+                    {
+                        diagnostic = "Static GLB thick transmissive material '" +
+                            material.name + "' contains a degenerate triangle edge.";
+                        return false;
+                    }
+                    ++edgeReferences[{a, b}];
+                }
+            }
+        }
+        for (const auto& [edge, references] : edgeReferences)
+        {
+            (void)edge;
+            if (references == 1u)
+            {
+                diagnostic = "Static GLB thick transmissive material '" + material.name +
+                    "' is open: boundary edge is referenced once. Use closed manifold geometry or set thinWall in the audited material override.";
+                return false;
+            }
+            if (references > 2u)
+            {
+                diagnostic = "Static GLB thick transmissive material '" + material.name +
+                    "' is non-manifold: an edge is referenced more than twice.";
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 bool ValidateUnsupportedFeatures(const cgltf_data& data, std::string& diagnostic)
 {
     for (std::size_t accessorIndex = 0u; accessorIndex < data.accessors_count; ++accessorIndex)
@@ -368,8 +439,29 @@ bool StaticMeshAsset::Load(const std::filesystem::path& runtimeGlb,
         for (const MaterialOverride& materialOverride : manifest.materialOverrides)
         {
             if (materialOverride.material == material.name)
-                material.emissiveStrength = materialOverride.emissiveStrength;
+            {
+                if (materialOverride.hasEmissiveStrength)
+                    material.emissiveStrength = materialOverride.emissiveStrength;
+                if (materialOverride.hasTransmissionFactor)
+                    material.transmissionFactor = materialOverride.transmissionFactor;
+                if (materialOverride.hasIor) material.ior = materialOverride.ior;
+                if (materialOverride.hasThicknessFactor)
+                    material.thicknessFactor = materialOverride.thicknessFactor;
+                if (materialOverride.hasAttenuationDistance)
+                    material.attenuationDistance = materialOverride.attenuationDistance;
+                if (materialOverride.hasAttenuationColor)
+                    material.attenuationColor = materialOverride.attenuationColor;
+                if (materialOverride.hasRoughnessFactor)
+                    material.roughnessFactor = materialOverride.roughnessFactor;
+                if (materialOverride.hasThinWall)
+                {
+                    if (materialOverride.thinWall) material.flags |= 512u;
+                    else material.flags &= ~512u;
+                }
+            }
         }
+        if (material.transmissionFactor > 0.0f) material.flags |= 4u;
+        else material.flags &= ~4u;
         if (!IsFiniteMaterial(material))
         {
             diagnostic = "Static GLB material " + std::to_string(materialIndex) +
@@ -626,6 +718,7 @@ bool StaticMeshAsset::Load(const std::filesystem::path& runtimeGlb,
         diagnostic = "Static GLB failed cgltf structural validation.";
         return false;
     }
+    if (!ValidateThickDielectricTopology(asset, diagnostic)) return false;
     diagnostic.clear();
     return true;
 }

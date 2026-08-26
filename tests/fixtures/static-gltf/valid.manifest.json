@@ -23,6 +23,16 @@
     "mipmapped": true
   },
   "materialOverrides": [
-    { "material": "FixtureMaterial", "emissiveStrength": 2.0 }
+    {
+      "material": "FixtureMaterial",
+      "emissiveStrength": 2.0,
+      "transmissionFactor": 0.73,
+      "ior": 1.61,
+      "thicknessFactor": 0.42,
+      "attenuationDistance": 2.5,
+      "attenuationColor": [0.8, 0.9, 1.0],
+      "roughnessFactor": 0.18,
+      "thinWall": true
+    }
   ]
 }
