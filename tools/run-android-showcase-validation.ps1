@@ -61,10 +61,12 @@ $captureCheckpoints = @("opening", "skeleton", "worst-bend", "lantern-drop", "sk
 if ($CaptureSelection.Count -gt 0) { $captureCheckpoints = @($CaptureSelection) }
 $combatCaptureExpectations = @{
     "player-body-downward-cut" = @{
-        action = "swing-active"; animationTime = 0.2500; consumedAttackSequence = 1
+        action = "swing-active"; animationTime = 0.2500; minimumConsumedAttackSequence = 1
+        stagedAttackEdges = 1; stagedSwingEvents = 1
     }
     "player-body-upward-slice" = @{
-        action = "upward-active"; animationTime = 0.5167; consumedAttackSequence = 2
+        action = "upward-active"; animationTime = 0.5167; minimumConsumedAttackSequence = 2
+        stagedAttackEdges = 2; stagedSwingEvents = 2
     }
 }
 $rtLabComparisonCheckpoints = @('lantern-drop', 'skylight', 'finale-roof')
@@ -239,8 +241,12 @@ function Invoke-CaptureCheckpoint {
             [double]$state.playerCombat.actionTime -gt 0.10) {
             $failures.Add("$Checkpoint capture combat phase '$($state.playerCombat.action)' at $($state.playerCombat.actionTime) s did not match the staged active phase.")
         }
-        if ([int64]$state.playerCombat.lastConsumedAttackSequence -ne [int64]$expectedCombat.consumedAttackSequence) {
-            $failures.Add("$Checkpoint capture consumed attack sequence $($state.playerCombat.lastConsumedAttackSequence) instead of $($expectedCombat.consumedAttackSequence).")
+        if ([int64]$state.playerCombat.lastConsumedAttackSequence -lt [int64]$expectedCombat.minimumConsumedAttackSequence) {
+            $failures.Add("$Checkpoint capture consumed attack sequence $($state.playerCombat.lastConsumedAttackSequence), below the required monotonic minimum $($expectedCombat.minimumConsumedAttackSequence).")
+        }
+        $stagePattern = "HORDE_COMBO_STAGE checkpoint=$escapedName staged=1 consumed_attack_edges=$($expectedCombat.stagedAttackEdges) player_swing_events=$($expectedCombat.stagedSwingEvents) enemy_hit_events=0 action=$($expectedCombat.action) action_time=[0-9.]+ events_cleared=1"
+        if ($log -notmatch $stagePattern) {
+            $failures.Add("$Checkpoint did not log its relative attack-edge and exact-once swing-event staging contract.")
         }
     } elseif ([double]$state.animationTime -ne 0.0) {
         $failures.Add("$Checkpoint capture animation time was not fixed at zero.")
