@@ -11,8 +11,8 @@ namespace horde::gameplay::items
 namespace
 {
 
-constexpr float kSwordRestInwardRadians = 0.16f;
-constexpr float kSwordRestForwardRadians = 0.13f;
+constexpr float kSwordRestInwardRadians = 0.20f;
+constexpr float kSwordRestForwardRadians = 0.14f;
 
 float DotColumn(const HeldItemTransform& transform,
                 const std::size_t leftColumn,
@@ -124,7 +124,7 @@ HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
     const float swingAmount = std::clamp(-swordSwingRadians / 1.12f, 0.0f, 1.0f);
     const float smoothSwing = swingAmount * swingAmount * (3.0f - 2.0f * swingAmount);
     const std::array<float, 3u> swingHand{{
-        0.44f + (-0.08f - 0.44f) * smoothSwing,
+        0.43f + (-0.08f - 0.43f) * smoothSwing,
         -0.41f + (-0.47f + 0.41f) * smoothSwing,
         heldPropDepth + (std::min(heldPropDepth, 1.00f) - heldPropDepth) * smoothSwing}};
     const std::array<float, 3u> parryHand{{
@@ -167,8 +167,8 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
     const float torchSway = std::sin(input.walkTime * 6.2f) * 0.035f * movement;
     const float torchBob = std::abs(std::sin(input.walkTime * 6.2f)) * 0.025f * movement;
     const std::array<float, 3u> heldLeftHand{{
-        -0.44f - torchSway, -0.40f + torchBob, heldPropDepth}};
-    constexpr std::array<float, 3u> loweredLeftHand{{-0.39f, -0.92f, 0.27f}};
+        -0.39f - torchSway, -0.40f + torchBob, heldPropDepth}};
+    constexpr std::array<float, 3u> loweredLeftHand{{-0.36f, -0.92f, 0.27f}};
     const float lowerBlend = std::clamp(input.torchFailure.leftArmLowerBlend, 0.0f, 1.0f);
     const HeldSwordPose sword = EvaluateHeldSwordPose(
         input.playerCombat, input.swordSwingRadians, heldPropDepth);
