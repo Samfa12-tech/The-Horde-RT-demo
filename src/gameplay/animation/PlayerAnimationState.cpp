@@ -42,6 +42,9 @@ PlayerCombatLayer EvaluatePlayerCombatLayer(
     constexpr float parryTotal = kPlayerParryStartupSeconds +
                                  kPlayerParryActiveSeconds +
                                  kPlayerParryRecoverySeconds;
+    constexpr float upwardSliceTotal = kPlayerUpwardSliceWindupSeconds +
+                                       kPlayerUpwardSliceActiveSeconds +
+                                       kPlayerUpwardSliceRecoverySeconds;
     switch (combat.action)
     {
     case horde::gameplay::PlayerCombatAction::SwingWindup:
@@ -55,6 +58,21 @@ PlayerCombatLayer EvaluatePlayerCombatLayer(
         layer = {PlayerUpperBodyAction::Sword,
                  Normalized(kPlayerSwingWindupSeconds + kPlayerSwingActiveSeconds + time,
                             swingTotal), 1.0f};
+        break;
+    case horde::gameplay::PlayerCombatAction::UpwardSliceWindup:
+        layer = {PlayerUpperBodyAction::UpwardSlice,
+                 Normalized(time, upwardSliceTotal), 1.0f};
+        break;
+    case horde::gameplay::PlayerCombatAction::UpwardSliceActive:
+        layer = {PlayerUpperBodyAction::UpwardSlice,
+                 Normalized(kPlayerUpwardSliceWindupSeconds + time,
+                            upwardSliceTotal), 1.0f};
+        break;
+    case horde::gameplay::PlayerCombatAction::UpwardSliceRecovery:
+        layer = {PlayerUpperBodyAction::UpwardSlice,
+                 Normalized(kPlayerUpwardSliceWindupSeconds +
+                                kPlayerUpwardSliceActiveSeconds + time,
+                            upwardSliceTotal), 1.0f};
         break;
     case horde::gameplay::PlayerCombatAction::ParryStartup:
         layer = {PlayerUpperBodyAction::Parry, Normalized(time, parryTotal), 1.0f};

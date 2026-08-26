@@ -25,9 +25,19 @@ enum class PlayerCombatAction : std::uint8_t
     SwingWindup,
     SwingActive,
     SwingRecovery,
+    UpwardSliceWindup,
+    UpwardSliceActive,
+    UpwardSliceRecovery,
     ParryStartup,
     ParryActive,
     ParryRecovery,
+};
+
+enum class PlayerAttackCut : std::uint8_t
+{
+    None,
+    DownwardCut,
+    UpwardSlice,
 };
 
 enum class EnemyCombatAction : std::uint8_t
@@ -53,6 +63,7 @@ struct PlayerCombatSnapshot
     CombatReaction reaction = CombatReaction::None;
     float actionTime = 0.0f;
     float reactionTime = 0.0f;
+    bool comboQueued = false;
 };
 
 inline constexpr std::size_t kSkeletonCombatantCapacity = 2u;
@@ -79,6 +90,7 @@ struct CombatSnapshot
     float swordSwingRadians = 0.0f;
     PlayerCombatSnapshot player{};
     bool playerAttackPulse = false;
+    PlayerAttackCut playerAttackCut = PlayerAttackCut::None;
     std::int32_t parriedAttackerIndex = -1;
 
     // Compatibility view of Skeleton A. New consumers should use combatants.
@@ -140,9 +152,19 @@ public:
         PublishSnapshot();
     }
 
-    void RequestAttack()
+    PlayerAttackCut RequestAttack()
     {
-        attackQueued_ = true;
+        if (CanAcceptUpwardSlice())
+        {
+            player_.comboQueued = true;
+            return PlayerAttackCut::UpwardSlice;
+        }
+        if (player_.action == PlayerCombatAction::Idle || successfulParryEndsNextTick_)
+        {
+            attackQueued_ = true;
+            return PlayerAttackCut::DownwardCut;
+        }
+        return PlayerAttackCut::None;
     }
 
     void RequestParry()
@@ -153,6 +175,16 @@ public:
     bool CanAcceptPlayerAction() const
     {
         return player_.action == PlayerCombatAction::Idle || successfulParryEndsNextTick_;
+    }
+
+    bool CanAcceptAttack() const
+    {
+        return CanAcceptPlayerAction() || CanAcceptUpwardSlice();
+    }
+
+    bool CanAcceptParry() const
+    {
+        return CanAcceptPlayerAction();
     }
 
     static bool IsPlayerTargetInRangeCone(float playerX,
@@ -203,6 +235,7 @@ public:
     {
         deltaSeconds = std::clamp(deltaSeconds, 0.0f, 0.05f);
         snapshot_.playerAttackPulse = false;
+        snapshot_.playerAttackCut = PlayerAttackCut::None;
         snapshot_.parriedAttackerIndex = -1;
         if (successfulParryEndsNextTick_)
         {
@@ -309,18 +342,50 @@ private:
                 player_.action = PlayerCombatAction::SwingActive;
                 player_.actionTime -= kSwingWindupDuration;
                 snapshot_.playerAttackPulse = true;
+                snapshot_.playerAttackCut = PlayerAttackCut::DownwardCut;
                 ResolveSwordHit(playerX, playerZ, playerYaw);
             }
             break;
         case PlayerCombatAction::SwingActive:
             if (player_.actionTime >= kSwingActiveDuration)
             {
-                player_.action = PlayerCombatAction::SwingRecovery;
                 player_.actionTime -= kSwingActiveDuration;
+                if (player_.comboQueued)
+                {
+                    player_.comboQueued = false;
+                    player_.action = PlayerCombatAction::UpwardSliceWindup;
+                }
+                else
+                {
+                    player_.action = PlayerCombatAction::SwingRecovery;
+                }
             }
             break;
         case PlayerCombatAction::SwingRecovery:
             if (player_.actionTime >= kSwingRecoveryDuration)
+            {
+                player_ = {};
+            }
+            break;
+        case PlayerCombatAction::UpwardSliceWindup:
+            if (player_.actionTime >= kUpwardSliceWindupDuration)
+            {
+                player_.action = PlayerCombatAction::UpwardSliceActive;
+                player_.actionTime -= kUpwardSliceWindupDuration;
+                snapshot_.playerAttackPulse = true;
+                snapshot_.playerAttackCut = PlayerAttackCut::UpwardSlice;
+                ResolveSwordHit(playerX, playerZ, playerYaw);
+            }
+            break;
+        case PlayerCombatAction::UpwardSliceActive:
+            if (player_.actionTime >= kUpwardSliceActiveDuration)
+            {
+                player_.action = PlayerCombatAction::UpwardSliceRecovery;
+                player_.actionTime -= kUpwardSliceActiveDuration;
+            }
+            break;
+        case PlayerCombatAction::UpwardSliceRecovery:
+            if (player_.actionTime >= kUpwardSliceRecoveryDuration)
             {
                 player_ = {};
             }
@@ -363,9 +428,44 @@ private:
         {
             swingElapsed = kSwingWindupDuration + kSwingActiveDuration + player_.actionTime;
         }
-        snapshot_.swordSwingRadians = swingElapsed > 0.0f
-            ? -1.12f * std::sin((swingElapsed / kSwordDuration) * 3.14159265f)
-            : 0.0f;
+        if (player_.action == PlayerCombatAction::UpwardSliceWindup)
+        {
+            const float amount = SmoothStep(player_.actionTime / kUpwardSliceWindupDuration);
+            snapshot_.swordSwingRadians =
+                kUpwardSliceTransitionRadians +
+                (kUpwardSliceStartRadians - kUpwardSliceTransitionRadians) * amount;
+        }
+        else if (player_.action == PlayerCombatAction::UpwardSliceActive)
+        {
+            const float amount = SmoothStep(player_.actionTime / kUpwardSliceActiveDuration);
+            snapshot_.swordSwingRadians = kUpwardSliceStartRadians +
+                (kUpwardSliceEndRadians - kUpwardSliceStartRadians) * amount;
+        }
+        else if (player_.action == PlayerCombatAction::UpwardSliceRecovery)
+        {
+            const float amount = SmoothStep(player_.actionTime / kUpwardSliceRecoveryDuration);
+            snapshot_.swordSwingRadians = kUpwardSliceEndRadians * (1.0f - amount);
+        }
+        else
+        {
+            snapshot_.swordSwingRadians = swingElapsed > 0.0f
+                ? -1.12f * std::sin((swingElapsed / kSwordDuration) * 3.14159265f)
+                : 0.0f;
+        }
+    }
+
+    bool CanAcceptUpwardSlice() const
+    {
+        return player_.action == PlayerCombatAction::SwingActive &&
+               player_.actionTime >= kUpwardSliceAcceptOpen &&
+               player_.actionTime <= kUpwardSliceAcceptClose &&
+               !player_.comboQueued;
+    }
+
+    static float SmoothStep(const float value)
+    {
+        const float amount = std::clamp(value, 0.0f, 1.0f);
+        return amount * amount * (3.0f - 2.0f * amount);
     }
 
     void SelectAttacker(const std::array<float, kSkeletonCombatantCapacity>& distances,
@@ -711,6 +811,11 @@ public:
     static constexpr float kSwingActiveDuration = 0.16f;
     static constexpr float kSwingRecoveryDuration = 0.22f;
     static constexpr float kSwordDuration = kSwingWindupDuration + kSwingActiveDuration + kSwingRecoveryDuration;
+    static constexpr float kUpwardSliceAcceptOpen = 0.0f;
+    static constexpr float kUpwardSliceAcceptClose = kSwingActiveDuration;
+    static constexpr float kUpwardSliceWindupDuration = 0.10f;
+    static constexpr float kUpwardSliceActiveDuration = 0.18f;
+    static constexpr float kUpwardSliceRecoveryDuration = 0.24f;
     static constexpr float kPlayerHitRange = 1.72f;
     static constexpr float kPlayerHitConeDot = 0.52f;
     static constexpr float kParryStartupDuration = 0.04f;
@@ -722,6 +827,9 @@ public:
     static constexpr float kEnemyStaggerDuration = 0.80f;
 
 private:
+    static constexpr float kUpwardSliceTransitionRadians = -1.057f;
+    static constexpr float kUpwardSliceStartRadians = -1.12f;
+    static constexpr float kUpwardSliceEndRadians = 0.78f;
     static constexpr float kEnemyWalkSpeed = 0.62f;
     static constexpr float kEnemyAttackRange = 1.28f;
     static constexpr float kEnemyAttackEnterRange = 1.34f;

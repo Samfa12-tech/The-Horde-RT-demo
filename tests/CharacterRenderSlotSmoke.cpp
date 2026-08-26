@@ -312,8 +312,8 @@ int main()
     PlayerCombatSnapshot playerCombat;
     const PlayerWeaponRenderPose idleWeapon = EvaluatePlayerWeaponRenderPose(playerCombat, 0.0f, 1.05f);
     ok &= Require(Near(idleWeapon.parryBlend, 0.0f) && Near(idleWeapon.swordRadians, 0.20f) &&
-                  Near(idleWeapon.rightHandLocal[0], 0.43f),
-                  "idle weapon pose must retain the owner-reviewed lateral/canted composition");
+                  Near(idleWeapon.rightHandLocal[0], 0.25f),
+                  "idle weapon pose must retain the owner-reviewed safe-frame/canted composition");
     playerCombat.action = PlayerCombatAction::ParryActive;
     const PlayerWeaponRenderPose activeParry = EvaluatePlayerWeaponRenderPose(playerCombat, 0.0f, 1.05f);
     ok &= Require(Near(activeParry.parryBlend, 1.0f) && Near(activeParry.swordRadians, -0.62f) &&

@@ -124,7 +124,7 @@ HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
     const float swingAmount = std::clamp(-swordSwingRadians / 1.12f, 0.0f, 1.0f);
     const float smoothSwing = swingAmount * swingAmount * (3.0f - 2.0f * swingAmount);
     const std::array<float, 3u> swingHand{{
-        0.43f + (-0.08f - 0.43f) * smoothSwing,
+        0.25f + (-0.08f - 0.25f) * smoothSwing,
         -0.41f + (-0.47f + 0.41f) * smoothSwing,
         heldPropDepth + (std::min(heldPropDepth, 1.00f) - heldPropDepth) * smoothSwing}};
     const std::array<float, 3u> parryHand{{
@@ -156,6 +156,83 @@ std::array<float, 3u> EvaluateSwordBladeAxisInView(
              std::sin(forwardRadians)}};
 }
 
+SwordGripBasisInView EvaluateSwordGripBasisInView(
+    const float inwardRadians,
+    const float forwardRadians,
+    const float gripRollRadians)
+{
+    const float swordCos = std::cos(inwardRadians);
+    const float swordSin = std::sin(inwardRadians);
+    const Vec3 unrolledEdge{{swordCos, swordSin, 0.0f}};
+    const Vec3 bladeAxis = EvaluateSwordBladeAxisInView(inwardRadians, forwardRadians);
+    // View right/up/forward is a left-handed coordinate frame because world
+    // forward points down -Z. Negate the algebraic cross product so the
+    // authored +X/+Y/+Z Grip basis remains right-handed once mapped to world.
+    const Vec3 unrolledFlat = Scale(Normalize(Cross(unrolledEdge, bladeAxis)), -1.0f);
+    const float rollCos = std::cos(gripRollRadians);
+    const float rollSin = std::sin(gripRollRadians);
+    SwordGripBasisInView result;
+    result.edgeDirection = Normalize(Add(Scale(unrolledEdge, rollCos),
+                                         Scale(unrolledFlat, -rollSin)));
+    result.bladeAxis = bladeAxis;
+    result.flatNormal = Normalize(Add(Scale(unrolledFlat, rollCos),
+                                      Scale(unrolledEdge, rollSin)));
+    return result;
+}
+
+FirstPersonSafeFrame EvaluateOwnerFeedbackPortraitSafeFrame(
+    const HeldItemKinematicsState& kinematics,
+    const float portraitAspect)
+{
+    FirstPersonSafeFrame result;
+    result.minimumNdcX = 1.0e9f;
+    result.maximumNdcX = -1.0e9f;
+    const float aspect = std::max(portraitAspect, 0.1f);
+    const auto include = [&](const Vec3& point)
+    {
+        const float depth = std::max(point[2], 0.05f);
+        const float ndcX = 1.22f * point[0] / (depth * aspect);
+        result.minimumNdcX = std::min(result.minimumNdcX, ndcX);
+        result.maximumNdcX = std::max(result.maximumNdcX, ndcX);
+    };
+
+    constexpr float torchRadius = 0.068f;
+    include({{kinematics.leftHandLocal[0] - torchRadius,
+              kinematics.leftHandLocal[1], kinematics.leftHandLocal[2]}});
+    include({{kinematics.leftHandLocal[0] + torchRadius,
+              kinematics.leftHandLocal[1], kinematics.leftHandLocal[2]}});
+    result.includesTorchGrip = true;
+    include({{kinematics.leftHandLocal[0], kinematics.leftHandLocal[1] + 0.525f,
+              kinematics.leftHandLocal[2]}});
+    result.includesFlame = true;
+    include({{kinematics.leftHandLocal[0], kinematics.leftHandLocal[1] + 0.495f,
+              kinematics.leftHandLocal[2] - 0.025f}});
+    result.includesLight = true;
+
+    const SwordGripBasisInView basis = EvaluateSwordGripBasisInView(
+        kinematics.swordRadians, kinematics.swordForwardRadians,
+        kSwordGripRollRadians);
+    const Vec3 grip = kinematics.rightHandLocal;
+    include(grip);
+    result.includesSwordGrip = true;
+    // Runtime sword GLB audited bounds relative to its Grip: blade-long +Y
+    // [-0.135, 0.915], edge +X +/-0.112, flat +Z +/-0.025 metres.
+    for (const float edge : {-0.112f, 0.112f})
+    {
+        for (const float blade : {-0.135f, 0.915f})
+        {
+            for (const float flat : {-0.025f, 0.025f})
+            {
+                include(Add(grip, Add(Scale(basis.edgeDirection, edge),
+                                      Add(Scale(basis.bladeAxis, blade),
+                                          Scale(basis.flatNormal, flat)))));
+            }
+        }
+    }
+    result.includesBladeBounds = true;
+    return result;
+}
+
 HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput& input)
 {
     const float forwardX = std::sin(input.cameraYawRadians);
@@ -167,7 +244,7 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
     const float torchSway = std::sin(input.walkTime * 6.2f) * 0.035f * movement;
     const float torchBob = std::abs(std::sin(input.walkTime * 6.2f)) * 0.025f * movement;
     const std::array<float, 3u> heldLeftHand{{
-        -0.39f - torchSway, -0.40f + torchBob, heldPropDepth}};
+        -0.24f - torchSway, -0.40f + torchBob, heldPropDepth}};
     constexpr std::array<float, 3u> loweredLeftHand{{-0.36f, -0.92f, 0.27f}};
     const float lowerBlend = std::clamp(input.torchFailure.leftArmLowerBlend, 0.0f, 1.0f);
     const HeldSwordPose sword = EvaluateHeldSwordPose(
@@ -368,21 +445,24 @@ bool ResolveHeldItemsFixedStep(HeldItemStates& items,
                              tick, worldFromTorch);
     }
 
-    const float swordRadians = state.kinematics.swordRadians;
-    const float swordCos = std::cos(swordRadians);
-    const float swordSin = std::sin(swordRadians);
-    const Vec3 swordAxisXRoll = Normalize(Add(Scale(viewRight, swordCos),
-                                              Scale(viewUp, swordSin)));
-    const auto swordBladeInView = EvaluateSwordBladeAxisInView(
-        swordRadians, state.kinematics.swordForwardRadians);
+    const SwordGripBasisInView swordBasis = EvaluateSwordGripBasisInView(
+        state.kinematics.swordRadians, state.kinematics.swordForwardRadians,
+        kSwordGripRollRadians);
+    const Vec3 swordEdge = Normalize(Add(
+        Add(Scale(viewRight, swordBasis.edgeDirection[0]),
+            Scale(viewUp, swordBasis.edgeDirection[1])),
+        Scale(viewForward, swordBasis.edgeDirection[2])));
+    const auto& swordBladeInView = swordBasis.bladeAxis;
     const Vec3 swordAxisY = Normalize(Add(
         Add(Scale(viewRight, swordBladeInView[0]), Scale(viewUp, swordBladeInView[1])),
         Scale(viewForward, swordBladeInView[2])));
-    const Vec3 swordAxisZ = Normalize(Cross(swordAxisXRoll, swordAxisY));
-    const Vec3 swordAxisX = Normalize(Cross(swordAxisY, swordAxisZ));
+    const Vec3 swordFlat = Normalize(Add(
+        Add(Scale(viewRight, swordBasis.flatNormal[0]),
+            Scale(viewUp, swordBasis.flatNormal[1])),
+        Scale(viewForward, swordBasis.flatNormal[2])));
     HeldItemTransform worldFromSword{};
     if (!ComposeWorldFromItem(
-            WorldFromAxes(swordAxisX, swordAxisY, swordAxisZ, rightHand),
+            WorldFromAxes(swordEdge, swordAxisY, swordFlat, rightHand),
             SwordGripSocketTransform(), worldFromSword, diagnostic))
     {
         return false;

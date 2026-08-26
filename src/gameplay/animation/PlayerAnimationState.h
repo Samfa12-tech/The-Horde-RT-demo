@@ -12,6 +12,9 @@ namespace horde::gameplay::animation
 inline constexpr float kPlayerSwingWindupSeconds = 0.18f;
 inline constexpr float kPlayerSwingActiveSeconds = 0.16f;
 inline constexpr float kPlayerSwingRecoverySeconds = 0.22f;
+inline constexpr float kPlayerUpwardSliceWindupSeconds = 0.10f;
+inline constexpr float kPlayerUpwardSliceActiveSeconds = 0.18f;
+inline constexpr float kPlayerUpwardSliceRecoverySeconds = 0.24f;
 inline constexpr float kPlayerParryStartupSeconds = 0.04f;
 inline constexpr float kPlayerParryActiveSeconds = 0.22f;
 inline constexpr float kPlayerParryRecoverySeconds = 0.24f;
@@ -27,6 +30,7 @@ enum class PlayerUpperBodyAction : std::uint8_t
 {
     None,
     Sword,
+    UpwardSlice,
     Parry,
 };
 

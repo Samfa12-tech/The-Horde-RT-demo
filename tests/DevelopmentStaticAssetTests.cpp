@@ -1,4 +1,5 @@
 #include "gameplay/DevelopmentCheckpoints.h"
+#include "gameplay/DevelopmentCheckpointSimulation.h"
 #include "gameplay/ShowcaseCheckpoints.h"
 #include "vulkan/raytracing/DevelopmentStaticAssetPolicy.h"
 
@@ -36,8 +37,8 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 7u,
-          "seven isolated render-development checkpoints are exposed");
+    Check(kDevelopmentCheckpoints.size() == 9u,
+          "nine isolated render-development checkpoints are exposed");
     const DevelopmentCheckpoint* checkpoint = FindDevelopmentCheckpoint("pbr-sword-closeup");
     Check(checkpoint != nullptr && checkpoint->id == 100 && checkpoint->baseShowcaseCheckpointId == 0 &&
               checkpoint->name == std::string_view("pbr-sword-closeup") &&
@@ -63,6 +64,27 @@ int main()
     Check(ownerFeedback != nullptr && ownerFeedback->id == 106 &&
               ownerFeedback->baseShowcaseCheckpointId == 0 && ownerFeedback->pitch < -0.25f,
           "owner arm-root and sword-cant regression has a stable first-person checkpoint");
+    const DevelopmentCheckpoint* downward =
+        FindDevelopmentCheckpoint("player-body-downward-cut");
+    const DevelopmentCheckpoint* upward =
+        FindDevelopmentCheckpoint("player-body-upward-slice");
+    Check(downward != nullptr && downward->id == 107 &&
+              downward->combatPose == DevelopmentCombatPose::DownwardCutActive &&
+              upward != nullptr && upward->id == 108 &&
+              upward->combatPose == DevelopmentCombatPose::UpwardSliceActive,
+          "authoritative downward/upward owner regression poses have stable debug identities");
+    horde::gameplay::simulation::GameSimulation stagedDownward;
+    horde::gameplay::simulation::GameSimulation stagedUpward;
+    Check(downward != nullptr &&
+              StageDevelopmentCheckpointSimulation(stagedDownward, *downward) &&
+              stagedDownward.Snapshot().playerCombat.action ==
+                  PlayerCombatAction::SwingActive && stagedDownward.Events().Empty(),
+          "downward capture must stage and freeze shared fixed-step combat without stale feedback");
+    Check(upward != nullptr &&
+              StageDevelopmentCheckpointSimulation(stagedUpward, *upward) &&
+              stagedUpward.Snapshot().playerCombat.action ==
+                  PlayerCombatAction::UpwardSliceActive && stagedUpward.Events().Empty(),
+          "upward capture must stage and freeze shared fixed-step combat without stale feedback");
     Check(FindDevelopmentCheckpoint("opening") == nullptr,
           "release checkpoint names cannot resolve through the development lookup");
 

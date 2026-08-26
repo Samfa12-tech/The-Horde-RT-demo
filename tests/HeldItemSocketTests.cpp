@@ -105,7 +105,7 @@ HeldItemTransform ExpectedHeldTorchFromFixedSnapshot(
     const float heldDepth = horde::gameplay::ComputeShowcaseHeldPropDepth(
         snapshot.playerX, snapshot.playerZ,
         std::sin(snapshot.playerYawRadians), -std::cos(snapshot.playerYawRadians));
-    const std::array<float, 3u> localHand{{-0.39f - sway, -0.40f + bob, heldDepth}};
+    const std::array<float, 3u> localHand{{-0.24f - sway, -0.40f + bob, heldDepth}};
     const std::array<float, 3u> eye{{snapshot.playerX, 0.58f, snapshot.playerZ}};
     const auto hand = Add(Add(Add(eye, Scale(right, localHand[0])),
                               Scale(up, localHand[1])),
@@ -256,7 +256,7 @@ void TestRealFixedTickTorchDetachIsIndependentlyTransformContinuous()
           "the real torch failure sequence must detach once on its shared fixed tick");
     const HeldItemTransform expectedHeld = ExpectedHeldTorchFromFixedSnapshot(
         beforeRelease, grip->world);
-    Check(std::abs(expectedHeld[12] - (-2.16f - 0.39f)) > 0.001f &&
+    Check(std::abs(expectedHeld[12] - (-2.16f - 0.24f)) > 0.001f &&
               std::abs(expectedHeld[13] - (0.58f - 0.40f)) > 0.001f,
           "the independent pre-release fixture must contain real pitch plus sway/bob");
     Check(TransformNear(beforeRelease.heldItems[0].worldFromItem, expectedHeld),
@@ -428,11 +428,11 @@ void TestSharedKinematicsOwnsWallDepthHandsAndSwordPose()
     input.walkAmount = 0.0f;
     const auto idle = horde::gameplay::items::EvaluateHeldItemKinematics(input);
     Check(Near(idle.heldPropDepth, 0.975f) &&
-              Near(idle.leftHandLocal[0], -0.39f) && Near(idle.leftHandLocal[1], -0.40f) &&
+              Near(idle.leftHandLocal[0], -0.24f) && Near(idle.leftHandLocal[1], -0.40f) &&
               Near(idle.leftHandLocal[2], idle.heldPropDepth) &&
-              Near(idle.rightHandLocal[0], 0.43f) && Near(idle.rightHandLocal[1], -0.41f) &&
+              Near(idle.rightHandLocal[0], 0.25f) && Near(idle.rightHandLocal[1], -0.41f) &&
               Near(idle.rightHandLocal[2], idle.heldPropDepth),
-          "shared kinematics must own the unchanged wall-aware idle hand targets");
+          "shared kinematics must own the safe-frame wall-aware idle hand targets");
 
     input.torchFailure.leftArmLowerBlend = 1.0f;
     input.playerCombat.action = horde::gameplay::PlayerCombatAction::ParryActive;

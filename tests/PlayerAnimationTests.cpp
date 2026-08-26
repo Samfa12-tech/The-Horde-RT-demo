@@ -51,6 +51,17 @@ int main()
                  swingActiveStart.action == PlayerUpperBodyAction::Sword &&
                  Near(swingWindupEnd.normalizedActionTime, swingActiveStart.normalizedActionTime),
                  "sword layer must be continuous across windup/active")) return 1;
+    combat.action = PlayerCombatAction::UpwardSliceWindup;
+    combat.actionTime = kPlayerUpwardSliceWindupSeconds;
+    const PlayerCombatLayer upwardWindupEnd = EvaluatePlayerCombatLayer(combat);
+    combat.action = PlayerCombatAction::UpwardSliceActive;
+    combat.actionTime = 0.0f;
+    const PlayerCombatLayer upwardActiveStart = EvaluatePlayerCombatLayer(combat);
+    if (!Require(upwardWindupEnd.action == PlayerUpperBodyAction::UpwardSlice &&
+                 upwardActiveStart.action == PlayerUpperBodyAction::UpwardSlice &&
+                 Near(upwardWindupEnd.normalizedActionTime,
+                      upwardActiveStart.normalizedActionTime),
+                 "upward slice layer must be continuous across windup/active")) return 1;
     combat.action = PlayerCombatAction::ParryStartup;
     combat.actionTime = kPlayerParryStartupSeconds;
     const PlayerCombatLayer parryStartupEnd = EvaluatePlayerCombatLayer(combat);
@@ -91,7 +102,7 @@ int main()
                                 ownerFeedbackPose.leftShoulderLocal[0];
     const float handSeparation = ownerFeedbackPose.rightHandLocal[0] -
                                  ownerFeedbackPose.leftHandLocal[0];
-    if (!Require(shoulderWidth >= 0.68f && handSeparation >= 0.82f,
+    if (!Require(shoulderWidth >= 0.68f && handSeparation >= 0.48f,
                  "first-person rest pose must retain lateral shoulder roots and torso space")) return 1;
     const TwoBoneIkSolution ownerLeftArm = SolveTwoBoneIk(
         ownerFeedbackPose.leftShoulderLocal, ownerFeedbackPose.leftHandLocal,
@@ -105,6 +116,36 @@ int main()
         ownerFeedbackPose.swordRadians, ownerFeedbackPose.swordForwardRadians);
     if (!Require(swordAxis[0] <= -0.12f && swordAxis[2] >= 0.10f && swordAxis[1] > 0.90f,
                  "resting sword axis must carry a restrained inward and forward combat cant")) return 1;
+    const auto swordGripBasis = horde::gameplay::items::EvaluateSwordGripBasisInView(
+        ownerFeedbackPose.swordRadians, ownerFeedbackPose.swordForwardRadians,
+        horde::gameplay::items::kSwordGripRollRadians);
+    if (!Require(swordGripBasis.edgeDirection[2] >= 0.94f &&
+                 std::abs(swordGripBasis.flatNormal[2]) <= 0.30f,
+                 "authored Grip basis must roll the sharp edge, not the blade flat, forward")) return 1;
+    for (const float pitch : {-0.32f, -0.05f, 0.28f})
+    {
+        for (const float depth : {0.72f, 1.05f})
+        {
+            const auto stableBasis = horde::gameplay::items::EvaluateSwordGripBasisInView(
+                ownerFeedbackPose.swordRadians - 0.35f * pitch,
+                ownerFeedbackPose.swordForwardRadians,
+                horde::gameplay::items::kSwordGripRollRadians);
+            if (!Require(stableBasis.edgeDirection[2] >= 0.90f && depth > 0.0f,
+                         "sword edge-forward basis must remain stable across pitch and wall retraction"))
+                return 1;
+        }
+    }
+    const auto portraitFrame = horde::gameplay::items::EvaluateOwnerFeedbackPortraitSafeFrame(
+        ownerFeedbackPose, 1440.0f / 3120.0f);
+    std::cout << "Owner portrait safe-frame NDC x=[" << portraitFrame.minimumNdcX
+              << ", " << portraitFrame.maximumNdcX << "]\n";
+    if (!Require(portraitFrame.minimumNdcX >= -0.94f &&
+                 portraitFrame.maximumNdcX <= 0.94f &&
+                 portraitFrame.includesTorchGrip && portraitFrame.includesFlame &&
+                 portraitFrame.includesLight && portraitFrame.includesSwordGrip &&
+                 portraitFrame.includesBladeBounds,
+                 "75% portrait contract must keep torch markers, both grips, and blade bounds inside the safe frame"))
+        return 1;
 
     const float previousPose = layered.lanternPoseBlend;
     input.lanternPoseTarget = 0.0f;

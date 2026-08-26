@@ -160,6 +160,7 @@ if(BUILD_TESTING)
 
     add_executable(horde_rt_development_static_asset_tests tests/DevelopmentStaticAssetTests.cpp)
     target_include_directories(horde_rt_development_static_asset_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(horde_rt_development_static_asset_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_development_static_asset_tests COMMAND horde_rt_development_static_asset_tests)
 
     add_executable(horde_rt_scene_abi_tests tests/RtSceneAbiTests.cpp)

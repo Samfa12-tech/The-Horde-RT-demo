@@ -28,6 +28,7 @@
 #include "ui/DiagnosticOverlay.h"
 #include "gameplay/CorridorCollision.h"
 #include "gameplay/DevelopmentCheckpoints.h"
+#include "gameplay/DevelopmentCheckpointSimulation.h"
 #include "gameplay/ShowcaseBenchmark.h"
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/ShowcaseCheckpoints.h"
@@ -567,6 +568,7 @@ struct DebugCheckpointSelection
     std::int32_t simulationCheckpointId = -1;
     horde::vulkan::raytracing::PlayerRenderRoute playerRoute =
         horde::vulkan::raytracing::PlayerRenderRoute::Procedural;
+    const horde::gameplay::DevelopmentCheckpoint* development = nullptr;
 };
 
 bool ResolveDebugCheckpoint(const std::int32_t id, DebugCheckpointSelection& selection)
@@ -590,11 +592,18 @@ bool ResolveDebugCheckpoint(const std::int32_t id, DebugCheckpointSelection& sel
     selection.playerRoute = development->name.starts_with("player-body-")
         ? horde::vulkan::raytracing::PlayerRenderRoute::Skinned
         : horde::vulkan::raytracing::PlayerRenderRoute::Procedural;
+    selection.development = development;
     return true;
 }
 
 void ApplyDebugCheckpointSimulation(const DebugCheckpointSelection& selection)
 {
+    if (selection.development != nullptr)
+    {
+        (void)horde::gameplay::StageDevelopmentCheckpointSimulation(
+            gGameSimulation, *selection.development);
+        return;
+    }
     gGameSimulation.ApplyShowcaseCheckpoint(selection.simulationCheckpointId);
     if (selection.checkpoint.id == selection.simulationCheckpointId)
         return;

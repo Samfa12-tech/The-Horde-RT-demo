@@ -324,6 +324,13 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
     {
         cadence.Reset();
     }
+    // A reset/retry wins this tick, but every coherent monotonic edge that
+    // arrived with it is still consumed exactly once. Advancing the consumed
+    // sequences prevents pause/Home/ending polling from replaying a discarded
+    // attack after the imported world state resumes.
+    lastConsumedAttackSequence_ += pendingAttackCommands_;
+    lastConsumedParrySequence_ += pendingParryCommands_;
+    lastConsumedDodgeSequence_ += pendingDodgeCommands_;
     pendingAttackCommands_ = 0u;
     pendingParryCommands_ = 0u;
     pendingDodgeCommands_ = 0u;
@@ -507,28 +514,34 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
         }
     }
 
-    const bool playerActionAvailable = swordCombat_.CanAcceptPlayerAction();
+    const bool attackAvailable = swordCombat_.CanAcceptAttack();
+    const bool parryAvailable = swordCombat_.CanAcceptParry();
     bool playerActionAccepted = false;
     if (pendingAttackCommands_ > 0u)
     {
         lastConsumedAttackSequence_ += pendingAttackCommands_;
         pendingAttackCommands_ = 0u;
-        if (playerActionAvailable)
+        if (attackAvailable)
         {
-            swordCombat_.RequestAttack();
-            playerActionAccepted = true;
-            Emit(GameplayEventType::PlayerSwing,
-                 EntityId::Player,
-                 EntityId::Invalid,
-                 playerX_,
-                 playerZ_);
+            const PlayerAttackCut acceptedCut = swordCombat_.RequestAttack();
+            if (acceptedCut != PlayerAttackCut::None)
+            {
+                playerActionAccepted = true;
+                Emit(GameplayEventType::PlayerSwing,
+                     EntityId::Player,
+                     EntityId::Invalid,
+                     playerX_,
+                     playerZ_,
+                     1.0f,
+                     static_cast<std::int32_t>(acceptedCut));
+            }
         }
     }
     if (pendingParryCommands_ > 0u)
     {
         lastConsumedParrySequence_ += pendingParryCommands_;
         pendingParryCommands_ = 0u;
-        if (playerActionAvailable && !playerActionAccepted)
+        if (parryAvailable && !playerActionAccepted)
         {
             swordCombat_.RequestParry();
         }

@@ -1328,6 +1328,8 @@ public class MainActivity extends Activity {
             case "player-body-grips": return 102;
             case "player-fallback-grips": return 105;
             case "player-body-owner-feedback": return 106;
+            case "player-body-downward-cut": return 107;
+            case "player-body-upward-slice": return 108;
             default: return -1;
         }
     }

@@ -164,6 +164,64 @@ int main()
     const bool swingFinished = actionTimeline.Snapshot().player.action ==
         horde::gameplay::PlayerCombatAction::Idle;
 
+    // A second attack edge accepted during the first active cut owns a distinct
+    // upward slice. Its transition is continuous and each cut publishes one
+    // and only one authoritative contact pulse.
+    horde::gameplay::SwordCombat comboTimeline;
+    const auto firstCut = comboTimeline.RequestAttack();
+    int downwardPulses = 0;
+    int upwardPulses = 0;
+    bool queuedDuringActive = false;
+    bool continuousComboTransition = true;
+    float previousSwordRadians = comboTimeline.Snapshot().swordSwingRadians;
+    horde::gameplay::PlayerCombatAction previousComboAction =
+        comboTimeline.Snapshot().player.action;
+    for (int tick = 0; tick < 140; ++tick)
+    {
+        const auto& before = comboTimeline.Snapshot();
+        if (!queuedDuringActive &&
+            before.player.action == horde::gameplay::PlayerCombatAction::SwingActive &&
+            before.player.actionTime >= 0.05f)
+        {
+            queuedDuringActive = comboTimeline.CanAcceptAttack() &&
+                comboTimeline.RequestAttack() == horde::gameplay::PlayerAttackCut::UpwardSlice;
+        }
+        const auto& snapshot = comboTimeline.Update(0.01f, 0.0f, 1.85f, 0.0f);
+        if (snapshot.playerAttackPulse)
+        {
+            downwardPulses += snapshot.playerAttackCut ==
+                horde::gameplay::PlayerAttackCut::DownwardCut ? 1 : 0;
+            upwardPulses += snapshot.playerAttackCut ==
+                horde::gameplay::PlayerAttackCut::UpwardSlice ? 1 : 0;
+        }
+        if (previousComboAction == horde::gameplay::PlayerCombatAction::SwingActive &&
+            snapshot.player.action == horde::gameplay::PlayerCombatAction::UpwardSliceWindup)
+        {
+            continuousComboTransition = continuousComboTransition &&
+                std::abs(snapshot.swordSwingRadians - previousSwordRadians) < 0.12f;
+        }
+        previousComboAction = snapshot.player.action;
+        previousSwordRadians = snapshot.swordSwingRadians;
+    }
+    const bool comboFinished = firstCut == horde::gameplay::PlayerAttackCut::DownwardCut &&
+                               queuedDuringActive && downwardPulses == 1 && upwardPulses == 1 &&
+                               continuousComboTransition &&
+                               comboTimeline.Snapshot().player.action ==
+                                   horde::gameplay::PlayerCombatAction::Idle;
+    comboTimeline.Reset();
+    const bool comboReset = comboTimeline.Snapshot().player.action ==
+                                horde::gameplay::PlayerCombatAction::Idle &&
+                            !comboTimeline.Snapshot().player.comboQueued;
+
+    horde::gameplay::SwordCombat lateCombo;
+    lateCombo.RequestAttack();
+    while (lateCombo.Snapshot().player.action !=
+           horde::gameplay::PlayerCombatAction::SwingRecovery)
+    {
+        lateCombo.Update(0.01f, 0.0f, 1.85f, 0.0f);
+    }
+    const bool lateSecondCutRejected = !lateCombo.CanAcceptAttack();
+
     horde::gameplay::SwordCombat rearMiss;
     rearMiss.Reset(1u);
     rearMiss.RequestAttack();
@@ -285,7 +343,8 @@ int main()
         !swingStillWindup || !swingEnteredActive || !swingEnteredRecovery || !swingFinished ||
         !rearSwingMissed || !bothIdsParry || !failedParriesDamage ||
         !tokenHeldThroughStagger || !immediateRiposte || !staggerNearlyComplete ||
-        !staggerCompletedAtEightTenths || !lateParryFailed)
+        !staggerCompletedAtEightTenths || !lateParryFailed || !comboFinished ||
+        !comboReset || !lateSecondCutRejected)
     {
         std::cerr << "Combat smoke failed: spawns=" << exactSpawns
                   << " historicalSpawn=" << exactHistoricalSpawn
@@ -302,7 +361,8 @@ int main()
                   << " rearMiss=" << rearSwingMissed << " bothParry=" << bothIdsParry
                   << " failedParries=" << failedParriesDamage << " tokenHeld=" << tokenHeldThroughStagger
                   << " riposte=" << immediateRiposte << " staggerEdge=" << staggerNearlyComplete
-                  << staggerCompletedAtEightTenths << " late=" << lateParryFailed << '\n';
+                  << staggerCompletedAtEightTenths << " late=" << lateParryFailed
+                  << " combo=" << comboFinished << comboReset << lateSecondCutRejected << '\n';
         return 1;
     }
     std::cout << "Combat smoke passed: two stable spawns, separation, one attacker, nearest-only hits, "

@@ -20,6 +20,9 @@ const char* PlayerCombatActionName(const gameplay::PlayerCombatAction action)
     case gameplay::PlayerCombatAction::SwingWindup: return "swing-windup";
     case gameplay::PlayerCombatAction::SwingActive: return "swing-active";
     case gameplay::PlayerCombatAction::SwingRecovery: return "swing-recovery";
+    case gameplay::PlayerCombatAction::UpwardSliceWindup: return "upward-windup";
+    case gameplay::PlayerCombatAction::UpwardSliceActive: return "upward-active";
+    case gameplay::PlayerCombatAction::UpwardSliceRecovery: return "upward-recovery";
     case gameplay::PlayerCombatAction::ParryStartup: return "parry-startup";
     case gameplay::PlayerCombatAction::ParryActive: return "parry-active";
     case gameplay::PlayerCombatAction::ParryRecovery: return "parry-recovery";

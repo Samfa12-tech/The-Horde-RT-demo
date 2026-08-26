@@ -13,6 +13,8 @@
 namespace horde::gameplay::items
 {
 
+inline constexpr float kSwordGripRollRadians = 1.3962634f;
+
 struct HeldItemKinematicsInput
 {
     float cameraX = 0.0f;
@@ -66,12 +68,41 @@ struct HeldItemFixedStepState
     HeldLightState light{};
 };
 
+struct SwordGripBasisInView
+{
+    // The authored sword is +Y blade-long, +X toward its sharpened edges,
+    // and +Z normal to the broad flat. These axes are expressed in view
+    // right/up/forward coordinates after the RightHand Grip roll.
+    std::array<float, 3u> edgeDirection{};
+    std::array<float, 3u> bladeAxis{};
+    std::array<float, 3u> flatNormal{};
+};
+
+struct FirstPersonSafeFrame
+{
+    float minimumNdcX = 0.0f;
+    float maximumNdcX = 0.0f;
+    bool includesTorchGrip = false;
+    bool includesFlame = false;
+    bool includesLight = false;
+    bool includesSwordGrip = false;
+    bool includesBladeBounds = false;
+};
+
 HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
                                    float swordSwingRadians,
                                    float heldPropDepth);
 
 std::array<float, 3u> EvaluateSwordBladeAxisInView(float inwardRadians,
                                                    float forwardRadians);
+
+SwordGripBasisInView EvaluateSwordGripBasisInView(float inwardRadians,
+                                                  float forwardRadians,
+                                                  float gripRollRadians);
+
+FirstPersonSafeFrame EvaluateOwnerFeedbackPortraitSafeFrame(
+    const HeldItemKinematicsState& kinematics,
+    float portraitAspect);
 
 HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput& input);
 

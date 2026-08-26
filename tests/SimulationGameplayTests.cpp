@@ -180,6 +180,95 @@ int main()
           }),
           "an out-of-range player swing must not falsely claim a skeleton target");
 
+    GameSimulation chainedAttack;
+    InputSnapshot chainedInput;
+    chainedInput.hasAuthoritativePlayerPose = true;
+    chainedInput.authoritativePlayerX = 0.0f;
+    chainedInput.authoritativePlayerZ = -3.20f;
+    chainedInput.damageEnabled = false;
+    chainedInput.commands.attack = 1u;
+    chainedAttack.StepFixed(chainedInput);
+    while (chainedAttack.Snapshot().playerCombat.action != PlayerCombatAction::SwingActive)
+    {
+        chainedAttack.StepFixed(chainedInput);
+    }
+    chainedInput.commands.attack = 2u;
+    chainedAttack.StepFixed(chainedInput);
+    for (int tick = 0; tick < 60; ++tick)
+    {
+        chainedAttack.StepFixed(chainedInput);
+    }
+    std::size_t chainedSwingCount = 0u;
+    std::size_t chainedHitCount = 0u;
+    std::array<std::int32_t, 2u> chainedSwingPayloads{};
+    for (const GameplayEvent& event : chainedAttack.Events().Events())
+    {
+        if (event.type == GameplayEventType::PlayerSwing && chainedSwingCount < 2u)
+        {
+            chainedSwingPayloads[chainedSwingCount++] = event.payload;
+        }
+        if (event.type == GameplayEventType::EnemyHit) ++chainedHitCount;
+    }
+    check(chainedAttack.Snapshot().lastConsumedAttackSequence == 2u &&
+          chainedSwingCount == 2u && chainedSwingPayloads[0] == 1 &&
+          chainedSwingPayloads[1] == 2 && chainedHitCount == 2u &&
+          chainedAttack.Snapshot().openingEncounterComplete,
+          "downward then upward cut must consume two edges and publish one identified swing/hit per cut");
+
+    GameSimulation pausedChain;
+    InputSnapshot pausedChainInput;
+    pausedChainInput.damageEnabled = false;
+    pausedChainInput.commands.attack = 1u;
+    pausedChain.StepFixed(pausedChainInput);
+    while (pausedChain.Snapshot().playerCombat.action != PlayerCombatAction::SwingActive)
+    {
+        pausedChain.StepFixed(pausedChainInput);
+    }
+    pausedChainInput.paused = true;
+    pausedChainInput.commands.attack = 2u;
+    pausedChain.StepFixed(pausedChainInput);
+    pausedChainInput.paused = false;
+    pausedChain.StepFixed(pausedChainInput);
+    check(pausedChain.Snapshot().lastConsumedAttackSequence == 2u &&
+          CountEvents(pausedChain.Events(), GameplayEventType::PlayerSwing) == 1u,
+          "a chained edge consumed while paused must not replay or duplicate after resume");
+
+    const auto deliverChainedAttack = [](const int renderRate)
+    {
+        GameSimulation delivered;
+        InputSnapshot input;
+        input.hasAuthoritativePlayerPose = true;
+        input.authoritativePlayerX = 0.0f;
+        input.authoritativePlayerZ = -3.20f;
+        input.damageEnabled = false;
+        input.commands.attack = 1u;
+        bool secondEdgePublished = false;
+        for (int frame = 0; frame < renderRate * 2; ++frame)
+        {
+            if (!secondEdgePublished &&
+                delivered.Snapshot().playerCombat.action == PlayerCombatAction::SwingActive)
+            {
+                input.commands.attack = 2u;
+                secondEdgePublished = true;
+            }
+            delivered.AdvanceFrame(input, 1.0 / static_cast<double>(renderRate));
+        }
+        return std::array<std::uint64_t, 5u>{
+            delivered.Snapshot().tickIndex,
+            delivered.Snapshot().lastConsumedAttackSequence,
+            static_cast<std::uint64_t>(delivered.Snapshot().playerCombat.action),
+            CountEvents(delivered.Events(), GameplayEventType::PlayerSwing),
+            CountEvents(delivered.Events(), GameplayEventType::EnemyHit)};
+    };
+    const auto chainedAt30 = deliverChainedAttack(30);
+    const auto chainedAt60 = deliverChainedAttack(60);
+    const auto chainedAt120 = deliverChainedAttack(120);
+    check(chainedAt30 == chainedAt60 && chainedAt60 == chainedAt120 &&
+          chainedAt60[0] == 120u && chainedAt60[1] == 2u &&
+          chainedAt60[2] == static_cast<std::uint64_t>(PlayerCombatAction::Idle) &&
+          chainedAt60[3] == 2u && chainedAt60[4] == 2u,
+          "30/60/120 render delivery must produce the same fixed-step two-cut commands, hits, and final phase");
+
     GameSimulation skeletonPair;
     InputSnapshot pairInput;
     pairInput.hasAuthoritativePlayerPose = true;
@@ -760,11 +849,12 @@ int main()
     pausedRetryInput.commands.retry = 1u;
     pausedRetry.AdvanceFrame(pausedRetryInput, 1.0);
     check(pausedRetry.Snapshot().lastConsumedRetrySequence == 1u &&
+          pausedRetry.Snapshot().lastConsumedAttackSequence == 1u &&
           pausedRetry.Snapshot().retryGeneration == 1u &&
           pausedRetry.Events().Empty() &&
           NearlyEqual(pausedRetry.Snapshot().playerX, -33.70f) &&
           NearlyEqual(pausedRetry.Snapshot().playerZ, -15.20f),
-          "paused retry must apply immediately, discard stale events, and clear catch-up time");
+          "paused retry must consume the competing attack exactly once, discard stale events, and clear catch-up time");
 
     if (!passed)
     {

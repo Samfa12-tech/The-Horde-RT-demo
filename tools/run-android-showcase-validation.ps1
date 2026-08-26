@@ -53,6 +53,8 @@ $checkpointZones = @{
     "player-body-grips" = "opening"
     "player-fallback-grips" = "opening"
     "player-body-owner-feedback" = "opening"
+    "player-body-downward-cut" = "opening"
+    "player-body-upward-slice" = "opening"
 }
 $baselineCheckpoints = @("opening", "two-enemy-combat", "worst-bend", "skylight", "green", "lich")
 $captureCheckpoints = @("opening", "skeleton", "worst-bend", "lantern-drop", "skylight", "yellow", "blue", "red", "green", "mirror", "lich", "finale-roof", "two-enemy-combat")
@@ -220,7 +222,7 @@ function Invoke-CaptureCheckpoint {
     if (-not $state.presented) { $failures.Add("$Checkpoint capture did not retain honest RT presentation.") }
     if ([int]$state.captureStableFrames -lt 12) { $failures.Add("$Checkpoint capture had only $($state.captureStableFrames) stable presented frames.") }
     if ([double]$state.animationTime -ne 0.0) { $failures.Add("$Checkpoint capture animation time was not fixed at zero.") }
-    if ($Checkpoint -in @("player-body-grips", "player-body-owner-feedback")) {
+    if ($Checkpoint -in @("player-body-grips", "player-body-owner-feedback", "player-body-downward-cut", "player-body-upward-slice")) {
         if ($state.playerRenderRoute -ne "skinned") { $failures.Add("Skinned player capture reported route '$($state.playerRenderRoute)'.") }
         if ([int]$state.playerSkinCadenceHz -ne 60 -or [int64]$state.playerSkinUpdates -lt 1) {
             $failures.Add("Skinned player capture did not prove the selected 60 Hz CPU update route.")
@@ -372,7 +374,7 @@ function Invoke-CheckpointBenchmark {
     if ($state.zone -ne $checkpointZones[$Checkpoint]) { $failures.Add("$Checkpoint native state reported zone '$($state.zone)'.") }
     if (-not $state.presented) { $failures.Add("$Checkpoint native state did not retain honest RT presentation.") }
     if ($state.gpuTimingMode -ne $gpuTimingLabel) { $failures.Add("$Checkpoint native state reported GPU timing '$($state.gpuTimingMode)' instead of '$gpuTimingLabel'.") }
-    if ($Checkpoint -in @("player-body-grips", "player-body-owner-feedback")) {
+    if ($Checkpoint -in @("player-body-grips", "player-body-owner-feedback", "player-body-downward-cut", "player-body-upward-slice")) {
         if ($state.playerRenderRoute -ne "skinned" -or [int]$state.playerSkinCadenceHz -ne 60 -or
             [int64]$state.playerSkinUpdates -lt 1 -or [double]$state.playerMaxSocketErrorM -gt 0.015) {
             $failures.Add("Skinned player benchmark did not retain its 60 Hz route and socket contract.")

@@ -47,6 +47,7 @@
 #include "ui/DiagnosticOverlay.h"
 #include "gameplay/CorridorCollision.h"
 #include "gameplay/DevelopmentCheckpoints.h"
+#include "gameplay/DevelopmentCheckpointSimulation.h"
 #include "gameplay/FeedbackTiming.h"
 #include "gameplay/ShowcaseBenchmark.h"
 #include "gameplay/ShowcaseCheckpoints.h"
@@ -3826,11 +3827,21 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         {
             const auto* development =
                 horde::gameplay::FindDevelopmentCheckpoint(context.developmentCheckpoint);
-            const auto* base = horde::gameplay::FindShowcaseCheckpoint(
-                development->baseShowcaseCheckpointId);
-            ApplyCaptureCheckpoint(context, *base);
-            DebugWarpSimulation(context, checkpoint.x, checkpoint.z,
-                                checkpoint.yaw, checkpoint.pitch);
+            if (development == nullptr ||
+                !horde::gameplay::StageDevelopmentCheckpointSimulation(
+                    context.simulation, *development))
+            {
+                return fail(std::string("Development checkpoint '") + checkpoint.name +
+                            "' could not stage its authoritative combat pose.");
+            }
+            context.simulation.ResetTiming();
+            context.simulation.ClearEvents();
+            context.frameDeltaSeconds = 0.0f;
+            context.simulationPaused = true;
+            context.simulationInput.paused = true;
+            context.simulationInput.damageEnabled = false;
+            context.simulationInput.hasAuthoritativePlayerPose = false;
+            MirrorSimulationSnapshot(context);
         }
         else
         {
