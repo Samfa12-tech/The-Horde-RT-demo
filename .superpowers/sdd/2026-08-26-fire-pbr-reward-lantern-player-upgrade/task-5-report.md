@@ -4,12 +4,9 @@ Date: 2026-08-26 (Australia/Sydney)
 
 ## Status
 
-Task 5's implementation and host/build gates are complete. The feature worktree contains an original reusable PBR biped, shared fixed-step player animation and two-cut combat authority, real hand-bone IK/sockets, first-person primary-ray masking, a measured 60 Hz CPU-skin/dynamic-BLAS-refit route, and deterministic owner-feedback captures.
+Task 5's implementation, host/build gates, and exact-device automated gates are complete. The feature worktree contains an original reusable PBR biped, shared fixed-step player animation and two-cut combat authority, real hand-bone IK/sockets, first-person primary-ray masking, a measured 60 Hz CPU-skin/dynamic-BLAS-refit route, and deterministic owner-feedback captures.
 
-Task 5's final acceptance remains open for two explicit reasons:
-
-1. The last exact-device run completed artifact parity, strict ASTC, honest RT presentation, matched A/B timing, four corrected captures, and Home/resume, but its runner reported a false failure because it compared the second staged checkpoint with an absolute process-wide attack sequence. The runner was corrected to compare checkpoint-relative edges, but `adb devices -l` exposed zero devices before that script-only revision could be rerun.
-2. Owner subjective art/motion review and the now-required manual audio/haptic replay for the two-cut chain remain pending.
+Task 5's final acceptance remains open only for owner subjective art/motion review and the now-required perceived audio/haptic replay for the two-cut chain. Automated exact-device evidence proves that each cut reaches the existing sound/haptic dispatch once, but it cannot establish what the owner heard or felt.
 
 The mutually exclusive procedural route is therefore retained. The skinned route occupies TLAS slot 4, masks procedural slots 5–16, and preserves the 20-instance cap. No publish, signing, versioning, upload, or deployment occurred.
 
@@ -28,6 +25,7 @@ The mutually exclusive procedural route is therefore retained. The skinned route
 - `547eccd` — `fix: keep chained player cuts phone-safe`
 - `b7b4ea2` — `test: validate relative combo capture edges`
 - `cf20064` — `test: keep player socket fixture in rig space`
+- `127ca80` — `docs: finalize skinned player validation report`
 
 The final documentation commit is recorded in the handoff after this report is committed.
 
@@ -58,7 +56,7 @@ A second monotonic attack edge is accepted exactly once only while the first cut
 
 The accepted `PlayerSwing` payload identifies downward/upward cuts as 1/2. A late second edge is consumed under the documented normal unavailable-command behavior and is not buffered into a later false action. Tests require two accepted edges to publish exactly two swing events and two hit events, transition angle discontinuity below 0.12 rad, no duplication across pause/resume, exact reset/import behavior, and equivalent commands/events/final phase under 30/60/120 render delivery.
 
-Android and Windows continue to drain the same ordered shared `PlayerSwing` records. Inspection confirms each accepted record maps once to existing swing playback; Android also maps each record once to the established swing haptic. No new audio or haptic asset was added. A live exact-phone two-cut feedback replay could not be completed after the device disconnected, so manual revalidation remains open.
+Android and Windows continue to drain the same ordered shared `PlayerSwing` records. Inspection confirms each accepted record maps once to existing swing playback; Android also maps each record once to the established swing haptic. No new audio or haptic asset was added. An exact-phone live replay proved one native enqueue, one native drain, and one Java sound/haptic dispatch for each accepted cut, with no replay across Home/resume. Manual perceived audio/haptic revalidation remains open.
 
 ## Owner-feedback geometry contracts
 
@@ -130,26 +128,29 @@ Visual inspection confirms distinct lower-left/lower-right arm chains, torso spa
 
 ## Exact `SM-S948B` evidence
 
-The final corrected exact-device run is `reports/android-showcase-runs/run-20260826-192607`:
+The final exact-device evidence used the sole authorised serial `R5GL219SZGK`, raw model `SM-S948B`, Android 16/API 36, and Adreno 840. Clean source `127ca8067b638edf191355f4cf6c9dd14be5fcda` produced a Debug APK whose local and installed `base.apk` SHA-256 both equal `5456e211501d039b73daa8b168415127beef36c2a733d172707d4ca9c347427d`.
 
-- serial `R5GL219SZGK`; raw model `SM-S948B`; Android 16/API 36; Adreno 840;
-- clean production source `547eccdd8d039fde9e3342a642662c40eca861ac`;
-- local and installed Debug APK SHA-256 both `bceeb06ec90d003e848e78c576b83a9376548a5ad1e6c3f698b2c675cba87b96`;
-- later commits `b7b4ea2` and `cf20064` change only the host runner and a host smoke-test fixture, so packaged inputs are unchanged;
-- strict ASTC and honest RT presentation retained at 75%/Mobile/Authored, internal extent 1080x2235, swapchain 1440x2980, TLAS count 20;
-- selected player cadence 60 Hz; benchmark state CPU pose/IK/skin average 3.1066 ms; maximum socket error 0.0000 m;
-- fallback windows 36.736 / 45.699 / 36.638 ms, median 36.736 ms;
-- skinned windows 42.131 / 42.176 / 42.199 ms, median 42.176 ms;
-- matched median delta +14.81%, below but close to the 15% investigation threshold;
-- timing rows recorded Android thermal status 0 and Samsung GPU thermal power level 0, with battery 34.0 to 35.3 C; the broader route ended at thermal status 1;
-- Graphics 252096 -> 233604 KB, PSS 539029 -> 510628 KB, RSS 650440 -> 623856 KB, native heap 236052 -> 224088 KB, and process thread records 35 -> 33: no growth signature;
-- Home/resume recreated the surface and honestly presented again.
+The corrected standard route `reports/android-showcase-runs/run-20260826-201809` passed:
 
-Four 75% captures were preserved: matched procedural fallback, corrected rest, downward cut, and upward slice. Agent inspection matches the Windows composition findings and keeps all intended props/blade bounds on screen.
+- strict ASTC, `RayTracingPipeline`, honest RT presentation, the full 13-waypoint replay, 13/13 captures, and Home/resume with a new honestly presented frame;
+- six 75% timing medians of 36.115, 36.327, 27.970, 25.898, 26.306, and 38.539 ms in checkpoint order;
+- timing rows at Android thermal status 0 and Samsung GPU thermal power level 0, with battery 30.3 to 36.2 C; the full route ended at thermal status 2;
+- native heap 215404 -> 240496 KB (+11.65%), Graphics 252096 -> 233644 KB, PSS 515775 -> 519139 KB (+0.65%), RSS 629096 -> 629924 KB (+0.13%), and process thread records 35 -> 32: no accumulating resource signature.
 
-The staged shared checkpoint evidence recorded one consumed edge/one swing event for the downward capture, and two consumed edges/two swing events for the upward capture. Enemy-hit count is zero in these frozen opening views because no target is in range; shared host tests separately prove two in-range hit events. Checkpoint staging deliberately clears feedback before freezing.
+The corrected owner-feedback A/B route `reports/android-showcase-runs/run-20260826-202304` also passed:
 
-The run summary is marked `FAIL` only because the old runner expected the upward checkpoint's absolute process-wide consumed sequence to equal 2 after the earlier downward checkpoint had already incremented it. `b7b4ea2` adds the non-tautological relative-edge comparison. The device disconnected before a clean rerun or live two-cut audio/haptic transport replay; the latest `adb devices -l` output is empty. A reverse-order warmed repeat is also unavailable, so the single +14.81% matched sample is reported honestly rather than generalized.
+- matched procedural fallback windows 36.729 / 43.623 / 66.352 ms, median 43.623 ms;
+- skinned windows 52.069 / 46.358 / 43.823 ms, median 46.358 ms, a +6.27% matched delta;
+- selected 60 Hz player cadence, 20 TLAS instances, 0.6434 ms average CPU pose/IK/skin cost, and 0.0000 m maximum socket error;
+- one relative edge/one swing for the downward checkpoint and two relative edges/two swings for the upward checkpoint;
+- four deterministic 75% captures covering matched fallback, corrected rest, downward cut, and upward slice;
+- Home/resume and resource stability, with no growth signature.
+
+Direct inspection confirms that the rest view has lateral shoulder/forearm chains and clear torso space, the torch stays left, and the sword presents its thin edge forward on the right. The downward diagonal and inward/upward slice remain inside the portrait frame without camera/head intersection.
+
+The reverse-order warmed A/B route `reports/android-showcase-runs/run-20260826-202447` passed at thermal status 2: skinned median 49.275 ms versus fallback 42.984 ms, a +14.64% delta below the 15% investigation threshold. Samsung GPU thermal power level was 1 for both routes; battery was 39.6/39.8 C. Native heap, Graphics, PSS, RSS, and thread records all decreased across the repeat, so no unexplained greater-than-15% regression or accumulating resource failure persisted.
+
+A separate live two-tap replay is preserved under `.superpowers/sdd/2026-08-26-fire-pbr-reward-lantern-player-upgrade/evidence/task-5/android-live-combo-20260826-202903/`. Attack sequences 160 and 163 identified downward/upward cuts 1/2; each was accepted once, enqueued once, drained once, and reached Java sound/haptic dispatch once. Counts remained 2/2/2 across Home/resume, proving no lifecycle duplication. The log SHA-256 is `c61364b3df28213b8fab8a65624e06184bbedc9355a6f1b89bd7fbaed811e8d0`. This is dispatch evidence, not proof of owner-perceived audio or haptic quality.
 
 ## Automated validation
 
@@ -172,10 +173,9 @@ Raygen remained fresh: 494,096 bytes, 123,524 words, 27,665 instructions, 3,937 
 
 ## Remaining acceptance boundaries
 
-- Reconnect exactly one authorised `SM-S948B`, rebuild/install the unchanged production inputs with the corrected runner, and rerun the standard route/replay, relative staged edges, live two-cut platform feedback, Home/resume non-duplication, and a reverse-order warmed A/B sample.
 - Owner must review the exact corrected phone rest/down/up art and motion. Automation and agent inspection do not establish subjective acceptance.
-- Manual audio/haptic revalidation is required for the new accepted second-cut timing and identity.
-- Retain the procedural fallback until those checks pass; the planned retirement commit is intentionally absent.
+- Manual perceived audio/haptic revalidation is required for the new accepted second-cut timing and identity; automated once-only dispatch has passed.
+- Retain the procedural fallback until owner acceptance; the planned retirement commit is intentionally absent.
 - CPU skin timing is direct; Vulkan frame/GPU timing includes BLAS refit, but no standalone GPU-refit timestamp was added.
 
 Audio/haptic manual revalidation required: YES — the chained upward slice changes accepted attack timing and attack event identity/timing even though playback backends/assets are unchanged.
