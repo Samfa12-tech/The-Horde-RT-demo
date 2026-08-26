@@ -110,7 +110,11 @@ try {
     }
 }
 $windowsBinaryText = [Text.Encoding]::ASCII.GetString([IO.File]::ReadAllBytes($windowsExe))
-foreach ($creditMarker in @("credits and licences", "Hotstrike Studio", "FilmCow", "Meshy", "DRAGON-STUDIO", "Pixabay")) {
+foreach ($creditMarker in @(
+    "credits and licences", "Hotstrike Studio", "FilmCow", "Meshy", "DRAGON-STUDIO", "Pixabay",
+    "Production Gothic arming sword created with Meshy; runtime processing by Samfa12/Codex",
+    "Production medieval hand torch created with Meshy; runtime processing by Samfa12/Codex"
+)) {
     if ($windowsBinaryText -notmatch [regex]::Escape($creditMarker)) {
         throw "Windows executable is missing in-app credit marker: $creditMarker"
     }
@@ -216,11 +220,19 @@ $aapt2 = Find-LatestVersionedTool -Root $androidBuildTools -RelativeToolPath "aa
 $zipalign = Find-LatestVersionedTool -Root $androidBuildTools -RelativeToolPath "zipalign.exe"
 $androidResources = (& $aapt2 dump resources $androidCandidate 2>&1 | Out-String)
 if ($LASTEXITCODE -ne 0) { throw "Failed to inspect Android resources in $androidCandidate" }
-foreach ($creditMarker in @("string/credits_body", "Hotstrike Studio", "FilmCow", "Meshy", "DRAGON-STUDIO", "Pixabay")) {
+foreach ($creditMarker in @(
+    "string/credits_body", "Hotstrike Studio", "FilmCow", "Meshy", "DRAGON-STUDIO", "Pixabay",
+    "Production Gothic arming sword created with Meshy; runtime processing by Samfa12/Codex",
+    "Production medieval hand torch created with Meshy; runtime processing by Samfa12/Codex"
+)) {
     if ($androidResources -notmatch [regex]::Escape($creditMarker)) {
         throw "Android candidate is missing in-app credit marker: $creditMarker"
     }
 }
+
+& (Join-Path $repoRoot "tools\test-held-item-package-contract.ps1") `
+    -AndroidApkPath $androidCandidate -WindowsZipPath $windowsZip
+if ($LASTEXITCODE -ne 0) { throw "Held-item package attribution contract failed." }
 $androidManifest = (& $aapt2 dump xmltree --file AndroidManifest.xml $androidCandidate 2>&1 | Out-String)
 if ($LASTEXITCODE -ne 0) { throw "Failed to inspect the Android manifest in $androidCandidate" }
 $escapedVersion = [regex]::Escape($Version)

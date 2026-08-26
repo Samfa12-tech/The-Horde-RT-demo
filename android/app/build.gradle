@@ -27,6 +27,9 @@ tasks.register('prepareRuntimeAssets', Sync) {
         include 'audio/filmcow/*.wav'
         include 'audio/pixabay/waterfall_loop.wav'
     }
+    from('../..') {
+        include 'ASSET_LICENSES.md'
+    }
     into runtimeAssetsDir
 }
 

@@ -327,6 +327,7 @@ function Test-ValidationPackages {
         "assets/textures/held-items/runtime/normal.android.ktx2",
         "assets/textures/held-items/runtime/orm.android.ktx2",
         "assets/textures/held-items/runtime/emissive.android.ktx2",
+        "assets/ASSET_LICENSES.md",
         "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb",
         "assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb",
         "assets/audio/pixabay/waterfall_loop.wav"))
@@ -352,9 +353,16 @@ function Test-ValidationPackages {
     $zipalign = Find-LatestVersionedTool -Root $buildToolsRoot -RelativeToolPath "zipalign.exe"
     $resources = (& $aapt2 dump resources $androidValidationApk 2>&1 | Out-String)
     if ($LASTEXITCODE -ne 0) { throw "aapt2 could not inspect Android validation resources." }
-    foreach ($marker in @("string/credits_body", "Hotstrike Studio", "FilmCow", "Meshy", "DRAGON-STUDIO", "Pixabay")) {
+    foreach ($marker in @(
+        "string/credits_body", "Hotstrike Studio", "FilmCow", "Meshy", "DRAGON-STUDIO", "Pixabay",
+        "Production Gothic arming sword created with Meshy; runtime processing by Samfa12/Codex",
+        "Production medieval hand torch created with Meshy; runtime processing by Samfa12/Codex"
+    )) {
         if ($resources -notmatch [regex]::Escape($marker)) { throw "Android validation APK lacks credit marker: $marker" }
     }
+    & (Join-Path $PSScriptRoot "test-held-item-package-contract.ps1") `
+        -AndroidApkPath $androidValidationApk -WindowsZipPath $windowsZip
+    if ($LASTEXITCODE -ne 0) { throw "Held-item validation package contract failed." }
     $manifest = (& $aapt2 dump xmltree --file AndroidManifest.xml $androidValidationApk 2>&1 | Out-String)
     if ($LASTEXITCODE -ne 0) { throw "aapt2 could not inspect Android validation manifest." }
     $escapedSourceVersion = [regex]::Escape($script:sourcePackageVersion)
@@ -543,7 +551,11 @@ try {
                 throw "Windows validation binary version surfaces do not agree on $($script:sourcePackageVersion)."
             }
             $windowsBinaryText = [Text.Encoding]::ASCII.GetString([IO.File]::ReadAllBytes($windowsReleaseExe))
-            foreach ($marker in @("credits and licences", "Hotstrike Studio", "FilmCow", "Meshy", "DRAGON-STUDIO", "Pixabay")) {
+            foreach ($marker in @(
+                "credits and licences", "Hotstrike Studio", "FilmCow", "Meshy", "DRAGON-STUDIO", "Pixabay",
+                "Production Gothic arming sword created with Meshy; runtime processing by Samfa12/Codex",
+                "Production medieval hand torch created with Meshy; runtime processing by Samfa12/Codex"
+            )) {
                 if ($windowsBinaryText -notmatch [regex]::Escape($marker)) { throw "Windows executable lacks credit marker: $marker" }
             }
         }

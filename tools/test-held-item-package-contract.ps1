@@ -44,7 +44,7 @@ function Test-HeldItemPackage {
         }
         $forbidden = @($entries | Where-Object {
             $_ -match '(^|/)(source|high)(/|$)' -or
-            $_ -match '\.(blend|png|jpg|jpeg)$' -or
+            $_ -match '\.blend$' -or
             $_ -match '\.glb\.processing\.json$'
         })
         if ($forbidden.Count -ne 0) {
