@@ -111,9 +111,19 @@ void PlayerAnimationState::StepFixed(const PlayerAnimationInput& input,
     snapshot_.leftIk.shoulder = input.heldItemKinematics.leftShoulderLocal;
     snapshot_.leftIk.target = input.heldItemKinematics.leftHandLocal;
     snapshot_.leftIk.pole = {{-0.95f, -0.1f, 0.42f}};
+    snapshot_.leftIk.gripX = {{1.0f, 0.0f, 0.0f}};
+    snapshot_.leftIk.gripY = {{0.0f, 1.0f, 0.0f}};
+    snapshot_.leftIk.gripZ = {{0.0f, 0.0f, -1.0f}};
     snapshot_.rightIk.shoulder = input.heldItemKinematics.rightShoulderLocal;
     snapshot_.rightIk.target = input.heldItemKinematics.rightHandLocal;
     snapshot_.rightIk.pole = {{0.95f, -0.1f, 0.42f}};
+    const auto swordGrip = horde::gameplay::items::EvaluateSwordGripBasisInView(
+        input.heldItemKinematics.swordRadians,
+        input.heldItemKinematics.swordForwardRadians,
+        horde::gameplay::items::kSwordGripRollRadians);
+    snapshot_.rightIk.gripX = swordGrip.edgeDirection;
+    snapshot_.rightIk.gripY = swordGrip.bladeAxis;
+    snapshot_.rightIk.gripZ = swordGrip.flatNormal;
 }
 
 void PlayerAnimationState::Reset()

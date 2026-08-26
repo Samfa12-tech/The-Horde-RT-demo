@@ -14,6 +14,12 @@ struct PlayerArmIkTarget
     PlayerIkVector shoulder{};
     PlayerIkVector target{};
     PlayerIkVector pole{{0.0f, 0.0f, 1.0f}};
+    // Gameplay-authored Grip basis in view-local coordinates. The renderer
+    // transforms these vectors into player space and uses a stable rest
+    // bone-to-Grip basis to orient the actual hand joint.
+    PlayerIkVector gripX{{1.0f, 0.0f, 0.0f}};
+    PlayerIkVector gripY{{0.0f, 1.0f, 0.0f}};
+    PlayerIkVector gripZ{{0.0f, 0.0f, -1.0f}};
     float upperArmLength = 0.42f;
     float lowerArmLength = 0.40f;
 

@@ -1,9 +1,12 @@
 #include "scene/SkeletonBipedModel.h"
 #include "scene/assets/AssetManifest.h"
 #include "scene/assets/StaticMeshAsset.h"
+#include "gameplay/DevelopmentCheckpointSimulation.h"
 #include "gameplay/simulation/GameSimulation.h"
 #include "vulkan/raytracing/PlayerRenderSlot.h"
 
+#include <algorithm>
+#include <array>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
@@ -50,6 +53,203 @@ bool FiniteTexturedVertices(const std::vector<horde::scene::TexturedSkinnedRtVer
         if (vertex.texcoord[2] != 0.0f || vertex.texcoord[3] != 0.0f) return false;
     }
     return sawDistinctUv;
+}
+
+using Vec3 = std::array<float, 3u>;
+using HeldItemTransform = horde::gameplay::items::HeldItemTransform;
+
+Vec3 Scale(const Vec3& value, const float scale)
+{
+    return {{value[0] * scale, value[1] * scale, value[2] * scale}};
+}
+
+float Dot(const Vec3& left, const Vec3& right)
+{
+    return left[0] * right[0] + left[1] * right[1] + left[2] * right[2];
+}
+
+Vec3 Cross(const Vec3& left, const Vec3& right)
+{
+    return {{left[1] * right[2] - left[2] * right[1],
+             left[2] * right[0] - left[0] * right[2],
+             left[0] * right[1] - left[1] * right[0]}};
+}
+
+Vec3 Normalise(const Vec3& value)
+{
+    const float length = std::sqrt(std::max(Dot(value, value), 0.0000001f));
+    return Scale(value, 1.0f / length);
+}
+
+struct TestRigFrame
+{
+    horde::gameplay::animation::PlayerAnimationSnapshot animation{};
+    Vec3 bodyRight{};
+    Vec3 bodyForward{};
+    Vec3 playerRootWorld{};
+};
+
+TestRigFrame BuildRigFrame(
+    const horde::gameplay::simulation::SimulationSnapshot& source,
+    const horde::scene::SkinnedNodeTransform& leftArmBase,
+    const horde::scene::SkinnedNodeTransform& rightArmBase)
+{
+    TestRigFrame result;
+    result.animation = source.playerAnimation;
+    const Vec3 worldUp{{0.0f, 1.0f, 0.0f}};
+    const Vec3 bodyForward{{std::sin(source.playerYawRadians), 0.0f,
+                            -std::cos(source.playerYawRadians)}};
+    const Vec3 bodyRight{{std::cos(source.playerYawRadians), 0.0f,
+                          std::sin(source.playerYawRadians)}};
+    const auto lowerBody = horde::gameplay::EvaluateLowerBodyPose(
+        source.walkTime, source.walkAmount);
+    result.bodyForward = Normalise({{
+        bodyForward[0] * std::cos(lowerBody.torsoTwistRadians) +
+            bodyRight[0] * std::sin(lowerBody.torsoTwistRadians),
+        0.0f,
+        bodyForward[2] * std::cos(lowerBody.torsoTwistRadians) +
+            bodyRight[2] * std::sin(lowerBody.torsoTwistRadians)}});
+    result.bodyRight = Normalise({{
+        bodyRight[0] * std::cos(lowerBody.torsoTwistRadians) -
+            bodyForward[0] * std::sin(lowerBody.torsoTwistRadians),
+        0.0f,
+        bodyRight[2] * std::cos(lowerBody.torsoTwistRadians) -
+            bodyForward[2] * std::sin(lowerBody.torsoTwistRadians)}});
+    const Vec3 eye{{source.playerX, 0.58f, source.playerZ}};
+    const Vec3 viewForward = Normalise({{
+        std::sin(source.playerYawRadians),
+        -0.05f + std::clamp(source.playerPitchRadians, -0.32f, 0.28f),
+        -std::cos(source.playerYawRadians)}});
+    const Vec3 viewRight = Normalise(Cross(viewForward, worldUp));
+    const Vec3 viewUp = Normalise(Cross(viewRight, viewForward));
+    const auto toWorld = [&eye, &viewRight, &viewUp, &viewForward](const Vec3& local) {
+        return Vec3{{eye[0] + viewRight[0] * local[0] + viewUp[0] * local[1] +
+                         viewForward[0] * local[2],
+                     eye[1] + viewRight[1] * local[0] + viewUp[1] * local[1] +
+                         viewForward[1] * local[2],
+                     eye[2] + viewRight[2] * local[0] + viewUp[2] * local[1] +
+                         viewForward[2] * local[2]}};
+    };
+    const Vec3 leftShoulder = toWorld(source.playerAnimation.leftIk.shoulder);
+    const Vec3 rightShoulder = toWorld(source.playerAnimation.rightIk.shoulder);
+    const Vec3 leftHand = toWorld(source.playerAnimation.leftIk.target);
+    const Vec3 rightHand = toWorld(source.playerAnimation.rightIk.target);
+    const Vec3 rigCenter{{
+        (leftArmBase[12] + rightArmBase[12]) * 0.5f,
+        (leftArmBase[13] + rightArmBase[13]) * 0.5f,
+        (leftArmBase[14] + rightArmBase[14]) * 0.5f}};
+    const Vec3 intendedCenter = Scale(
+        {{leftShoulder[0] + rightShoulder[0],
+          leftShoulder[1] + rightShoulder[1],
+          leftShoulder[2] + rightShoulder[2]}}, 0.5f);
+    result.playerRootWorld = {{
+        intendedCenter[0] - result.bodyRight[0] * rigCenter[0] -
+            result.bodyForward[0] * rigCenter[2],
+        intendedCenter[1] - rigCenter[1],
+        intendedCenter[2] - result.bodyRight[2] * rigCenter[0] -
+            result.bodyForward[2] * rigCenter[2]}};
+    const auto worldPointToPlayer = [&result](const Vec3& world) {
+        const Vec3 delta{{world[0] - result.playerRootWorld[0],
+                          world[1] - result.playerRootWorld[1],
+                          world[2] - result.playerRootWorld[2]}};
+        return Vec3{{Dot(delta, result.bodyRight), delta[1],
+                     Dot(delta, result.bodyForward)}};
+    };
+    const auto viewVectorToPlayer = [&result, &viewRight, &viewUp,
+                                     &viewForward](const Vec3& view) {
+        const Vec3 world{{viewRight[0] * view[0] + viewUp[0] * view[1] +
+                              viewForward[0] * view[2],
+                          viewRight[1] * view[0] + viewUp[1] * view[1] +
+                              viewForward[1] * view[2],
+                          viewRight[2] * view[0] + viewUp[2] * view[1] +
+                              viewForward[2] * view[2]}};
+        return Vec3{{Dot(world, result.bodyRight), world[1],
+                     Dot(world, result.bodyForward)}};
+    };
+    result.animation.leftIk.shoulder = worldPointToPlayer(leftShoulder);
+    result.animation.leftIk.target = worldPointToPlayer(leftHand);
+    result.animation.leftIk.pole = viewVectorToPlayer(source.playerAnimation.leftIk.pole);
+    result.animation.leftIk.gripX = viewVectorToPlayer(source.playerAnimation.leftIk.gripX);
+    result.animation.leftIk.gripY = viewVectorToPlayer(source.playerAnimation.leftIk.gripY);
+    result.animation.leftIk.gripZ = viewVectorToPlayer(source.playerAnimation.leftIk.gripZ);
+    result.animation.rightIk.shoulder = worldPointToPlayer(rightShoulder);
+    result.animation.rightIk.target = worldPointToPlayer(rightHand);
+    result.animation.rightIk.pole = viewVectorToPlayer(source.playerAnimation.rightIk.pole);
+    result.animation.rightIk.gripX = viewVectorToPlayer(source.playerAnimation.rightIk.gripX);
+    result.animation.rightIk.gripY = viewVectorToPlayer(source.playerAnimation.rightIk.gripY);
+    result.animation.rightIk.gripZ = viewVectorToPlayer(source.playerAnimation.rightIk.gripZ);
+    return result;
+}
+
+HeldItemTransform GripTransform(const Vec3& x,
+                                const Vec3& y,
+                                const Vec3& z,
+                                const Vec3& position)
+{
+    return {{x[0], x[1], x[2], 0.0f,
+             y[0], y[1], y[2], 0.0f,
+             z[0], z[1], z[2], 0.0f,
+             position[0], position[1], position[2], 1.0f}};
+}
+
+HeldItemTransform RigidWorldBoneTransform(
+    const horde::scene::SkinnedNodeTransform& bone,
+    const TestRigFrame& frame)
+{
+    const auto toWorld = [&frame](const Vec3& local) {
+        return Vec3{{frame.bodyRight[0] * local[0] + frame.bodyForward[0] * local[2],
+                     local[1],
+                     frame.bodyRight[2] * local[0] + frame.bodyForward[2] * local[2]}};
+    };
+    Vec3 x = Normalise(toWorld({{bone[0], bone[1], bone[2]}}));
+    const Vec3 rawY = toWorld({{bone[4], bone[5], bone[6]}});
+    Vec3 y = Normalise({{rawY[0] - x[0] * Dot(rawY, x),
+                         rawY[1] - x[1] * Dot(rawY, x),
+                         rawY[2] - x[2] * Dot(rawY, x)}});
+    Vec3 z = Normalise(Cross(x, y));
+    const Vec3 rawZ = toWorld({{bone[8], bone[9], bone[10]}});
+    if (Dot(z, rawZ) < 0.0f)
+    {
+        y = Scale(y, -1.0f);
+        z = Scale(z, -1.0f);
+    }
+    const Vec3 localPosition{{bone[12], bone[13], bone[14]}};
+    const Vec3 worldOffset = toWorld(localPosition);
+    const Vec3 position{{frame.playerRootWorld[0] + worldOffset[0],
+                         frame.playerRootWorld[1] + worldOffset[1],
+                         frame.playerRootWorld[2] + worldOffset[2]}};
+    HeldItemTransform result = GripTransform(x, y, z, position);
+    return result;
+}
+
+HeldItemTransform FinalGrip(const horde::gameplay::items::HeldItemState& item)
+{
+    return horde::gameplay::items::MultiplyHeldItemTransforms(
+        item.worldFromItem,
+        item.id == horde::gameplay::items::HeldItemId::OriginalTorch
+            ? horde::gameplay::items::OriginalTorchGripSocketTransform()
+            : horde::gameplay::items::SwordGripSocketTransform());
+}
+
+float PositionError(const HeldItemTransform& left, const HeldItemTransform& right)
+{
+    return std::hypot(std::hypot(left[12] - right[12], left[13] - right[13]),
+                      left[14] - right[14]);
+}
+
+float OrientationError(const HeldItemTransform& left, const HeldItemTransform& right)
+{
+    float maximum = 0.0f;
+    for (std::size_t column = 0u; column < 3u; ++column)
+    {
+        const std::size_t offset = column * 4u;
+        const float cosine = std::clamp(
+            left[offset] * right[offset] + left[offset + 1u] * right[offset + 1u] +
+                left[offset + 2u] * right[offset + 2u],
+            -1.0f, 1.0f);
+        maximum = std::max(maximum, std::acos(cosine));
+    }
+    return maximum;
 }
 
 } // namespace
@@ -131,9 +331,9 @@ int main()
 
     SkinnedNodeTransform leftArmBase{};
     SkinnedNodeTransform rightArmBase{};
-    if (!Require(player.NodeTransform(SkinnedClip::Idle, 0.25f, "LeftArm", leftArmBase, diagnostic),
+    if (!Require(player.NodeTransform(SkinnedClip::Idle, 0.0f, "LeftArm", leftArmBase, diagnostic),
                  diagnostic.c_str()) ||
-        !Require(player.NodeTransform(SkinnedClip::Idle, 0.25f, "RightArm", rightArmBase, diagnostic),
+        !Require(player.NodeTransform(SkinnedClip::Idle, 0.0f, "RightArm", rightArmBase, diagnostic),
                  diagnostic.c_str())) return 1;
     const SkinnedArmIkTarget leftTarget{{{leftArmBase[12] - 0.12f, leftArmBase[13] - 0.20f,
                                            leftArmBase[14] + 0.28f}},
@@ -221,6 +421,168 @@ int main()
                  playerSlot.LeftSocketErrorMetres() <= 0.015f &&
                  playerSlot.RightSocketErrorMetres() <= 0.015f,
                  "authoritative held-item targets must drive the final rig bone sockets")) return 1;
+
+    const auto* restCheckpoint = horde::gameplay::FindDevelopmentCheckpoint(106);
+    const auto* downCheckpoint = horde::gameplay::FindDevelopmentCheckpoint(107);
+    const auto* upCheckpoint = horde::gameplay::FindDevelopmentCheckpoint(108);
+    horde::gameplay::simulation::GameSimulation restSimulation;
+    horde::gameplay::simulation::GameSimulation downSimulation;
+    horde::gameplay::simulation::GameSimulation upSimulation;
+    if (!Require(restCheckpoint != nullptr && downCheckpoint != nullptr &&
+                 upCheckpoint != nullptr &&
+                 horde::gameplay::StageDevelopmentCheckpointSimulation(
+                     restSimulation, *restCheckpoint) &&
+                 horde::gameplay::StageDevelopmentCheckpointSimulation(
+                     downSimulation, *downCheckpoint) &&
+                 horde::gameplay::StageDevelopmentCheckpointSimulation(
+                     upSimulation, *upCheckpoint),
+                 "rest/down/up direct checkpoints must import and freeze deterministically"))
+        return 1;
+
+    struct ResolvedPlayerPose
+    {
+        horde::gameplay::items::HeldItemStates authoritative{};
+        horde::gameplay::items::HeldItemStates rendered{};
+        float maximumPositionErrorMetres = 0.0f;
+        float maximumOrientationErrorRadians = 0.0f;
+    };
+    const auto resolvePlayerPose = [&](horde::vulkan::raytracing::PlayerRenderSlot& slot,
+                                       const horde::gameplay::simulation::SimulationSnapshot& source,
+                                       const std::uint64_t tick,
+                                       ResolvedPlayerPose& result) {
+        const TestRigFrame rig = BuildRigFrame(source, leftArmBase, rightArmBase);
+        bool updated = false;
+        if (!slot.PreparePose(rig.animation, tick,
+                              horde::vulkan::raytracing::PlayerCpuSkinCadence::Hz60,
+                              updated, diagnostic) || !updated)
+            return false;
+        result.authoritative = source.heldItems;
+        const auto& bones = slot.BoneSockets();
+        if (!slot.ResolveHeldItemVisuals(
+                result.authoritative,
+                RigidWorldBoneTransform(bones.leftHand, rig),
+                RigidWorldBoneTransform(bones.rightHand, rig),
+                result.rendered, diagnostic))
+            return false;
+        result.maximumPositionErrorMetres = 0.0f;
+        result.maximumOrientationErrorRadians = 0.0f;
+        for (std::size_t item = 0u; item < result.rendered.size(); ++item)
+        {
+            const HeldItemTransform intendedGrip = FinalGrip(result.authoritative[item]);
+            const HeldItemTransform finalGrip = FinalGrip(result.rendered[item]);
+            result.maximumPositionErrorMetres = std::max(
+                result.maximumPositionErrorMetres,
+                PositionError(intendedGrip, finalGrip));
+            result.maximumOrientationErrorRadians = std::max(
+                result.maximumOrientationErrorRadians,
+                OrientationError(intendedGrip, finalGrip));
+        }
+        return true;
+    };
+
+    horde::vulkan::raytracing::PlayerRenderSlot restFirstSlot;
+    horde::vulkan::raytracing::PlayerRenderSlot downFirstSlot;
+    horde::vulkan::raytracing::PlayerRenderSlot upFirstSlot;
+    horde::vulkan::raytracing::PlayerRenderSlot resetSlot;
+    horde::vulkan::raytracing::PlayerRenderSlot frozenSlot;
+    if (!restFirstSlot.LoadAsset(playerPath.string(), diagnostic) ||
+        !downFirstSlot.LoadAsset(playerPath.string(), diagnostic) ||
+        !upFirstSlot.LoadAsset(playerPath.string(), diagnostic) ||
+        !resetSlot.LoadAsset(playerPath.string(), diagnostic) ||
+        !frozenSlot.LoadAsset(playerPath.string(), diagnostic))
+    {
+        std::cerr << "FAIL: stable rest basis load: " << diagnostic << '\n';
+        return 1;
+    }
+
+    ResolvedPlayerPose restInitial;
+    ResolvedPlayerPose downInitial;
+    ResolvedPlayerPose upInitial;
+    ResolvedPlayerPose ignoredResetInitial;
+    ResolvedPlayerPose frozenDownInitial;
+    if (!resolvePlayerPose(restFirstSlot, restSimulation.Snapshot(), 1u, restInitial) ||
+        !resolvePlayerPose(downFirstSlot, downSimulation.Snapshot(), 1u, downInitial) ||
+        !resolvePlayerPose(upFirstSlot, upSimulation.Snapshot(), 1u, upInitial) ||
+        !resolvePlayerPose(resetSlot, downSimulation.Snapshot(), 1u,
+                           ignoredResetInitial) ||
+        !resolvePlayerPose(frozenSlot, downSimulation.Snapshot(), 1u,
+                           frozenDownInitial))
+    {
+        std::cerr << "FAIL: initial stable-basis pose: " << diagnostic << '\n';
+        return 1;
+    }
+
+    if (!resetSlot.LoadAsset(playerPath.string(), diagnostic))
+    {
+        std::cerr << "FAIL: stable-basis reset: " << diagnostic << '\n';
+        return 1;
+    }
+    ResolvedPlayerPose restAfterRestFirst;
+    ResolvedPlayerPose restAfterDownFirst;
+    ResolvedPlayerPose restAfterUpFirst;
+    ResolvedPlayerPose restAfterReset;
+    ResolvedPlayerPose frozenDownRepeated;
+    if (!resolvePlayerPose(restFirstSlot, restSimulation.Snapshot(), 2u,
+                           restAfterRestFirst) ||
+        !resolvePlayerPose(downFirstSlot, restSimulation.Snapshot(), 2u,
+                           restAfterDownFirst) ||
+        !resolvePlayerPose(upFirstSlot, restSimulation.Snapshot(), 2u,
+                           restAfterUpFirst) ||
+        !resolvePlayerPose(resetSlot, restSimulation.Snapshot(), 2u,
+                           restAfterReset) ||
+        !resolvePlayerPose(frozenSlot, downSimulation.Snapshot(), 2u,
+                           frozenDownRepeated))
+    {
+        std::cerr << "FAIL: ordered stable-basis rest pose: " << diagnostic << '\n';
+        return 1;
+    }
+
+    const auto agreesWithAuthoritativeGrip = [](const ResolvedPlayerPose& pose) {
+        return pose.maximumPositionErrorMetres <= 0.015f &&
+               pose.maximumOrientationErrorRadians <=
+                   horde::vulkan::raytracing::kPlayerGripOrientationToleranceRadians;
+    };
+    if (!Require(agreesWithAuthoritativeGrip(restInitial) &&
+                 agreesWithAuthoritativeGrip(downInitial) &&
+                 agreesWithAuthoritativeGrip(upInitial) &&
+                 agreesWithAuthoritativeGrip(restAfterRestFirst) &&
+                 agreesWithAuthoritativeGrip(restAfterReset),
+                 "final composed item Grip must agree with the authoritative hand pivot in position and orientation"))
+        return 1;
+    std::cout << "Stable final Grip agreement rest="
+              << restInitial.maximumPositionErrorMetres << "m/"
+              << restInitial.maximumOrientationErrorRadians << "rad down="
+              << downInitial.maximumPositionErrorMetres << "m/"
+              << downInitial.maximumOrientationErrorRadians << "rad up="
+              << upInitial.maximumPositionErrorMetres << "m/"
+              << upInitial.maximumOrientationErrorRadians << "rad\n";
+
+    const auto sameFinalGrips = [](const ResolvedPlayerPose& left,
+                                   const ResolvedPlayerPose& right) {
+        for (std::size_t item = 0u; item < left.rendered.size(); ++item)
+        {
+            const HeldItemTransform leftGrip = FinalGrip(left.rendered[item]);
+            const HeldItemTransform rightGrip = FinalGrip(right.rendered[item]);
+            if (PositionError(leftGrip, rightGrip) > 0.0001f ||
+                OrientationError(leftGrip, rightGrip) > 0.001f)
+                return false;
+        }
+        return true;
+    };
+    if (!agreesWithAuthoritativeGrip(restAfterDownFirst) ||
+        !agreesWithAuthoritativeGrip(restAfterUpFirst) ||
+        !sameFinalGrips(restAfterRestFirst, restAfterDownFirst) ||
+        !sameFinalGrips(restAfterRestFirst, restAfterUpFirst) ||
+        !sameFinalGrips(restAfterRestFirst, restAfterReset) ||
+        !sameFinalGrips(frozenDownInitial, frozenDownRepeated))
+    {
+        std::cerr << "FAIL: player rest Grip basis depends on first rendered checkpoint: "
+                  << "rest=" << restAfterRestFirst.maximumOrientationErrorRadians
+                  << " down-first=" << restAfterDownFirst.maximumOrientationErrorRadians
+                  << " up-first=" << restAfterUpFirst.maximumOrientationErrorRadians
+                  << " reset=" << restAfterReset.maximumOrientationErrorRadians << '\n';
+        return 1;
+    }
 
     SkinnedCharacterModel lich;
     const auto lichPath = root / "assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb";

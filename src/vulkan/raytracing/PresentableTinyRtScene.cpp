@@ -1,4 +1,5 @@
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
+#include "vulkan/raytracing/DynamicBlasSynchronization.h"
 
 #include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/items/HeldLightState.h"
@@ -3363,9 +3364,15 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         rigAnimation.leftIk.shoulder = worldPointToPlayer(leftShoulder);
         rigAnimation.leftIk.target = worldPointToPlayer(leftHand);
         rigAnimation.leftIk.pole = viewVectorToPlayer(frame.playerAnimation.leftIk.pole);
+        rigAnimation.leftIk.gripX = viewVectorToPlayer(frame.playerAnimation.leftIk.gripX);
+        rigAnimation.leftIk.gripY = viewVectorToPlayer(frame.playerAnimation.leftIk.gripY);
+        rigAnimation.leftIk.gripZ = viewVectorToPlayer(frame.playerAnimation.leftIk.gripZ);
         rigAnimation.rightIk.shoulder = worldPointToPlayer(rightShoulder);
         rigAnimation.rightIk.target = worldPointToPlayer(rightHand);
         rigAnimation.rightIk.pole = viewVectorToPlayer(frame.playerAnimation.rightIk.pole);
+        rigAnimation.rightIk.gripX = viewVectorToPlayer(frame.playerAnimation.rightIk.gripX);
+        rigAnimation.rightIk.gripY = viewVectorToPlayer(frame.playerAnimation.rightIk.gripY);
+        rigAnimation.rightIk.gripZ = viewVectorToPlayer(frame.playerAnimation.rightIk.gripZ);
         if (!playerRenderSlot_.PreparePose(rigAnimation, frame.tickIndex,
                                            playerCpuSkinCadence_, updateSkinnedPlayer,
                                            diagnostic))
@@ -3734,24 +3741,6 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
 
     }
 
-    if (updateSkeletonPose0 || updateSkeletonPose1)
-    {
-        VkMemoryBarrier skeletonBuildBarrier{VK_STRUCTURE_TYPE_MEMORY_BARRIER};
-        skeletonBuildBarrier.srcAccessMask = VK_ACCESS_ACCELERATION_STRUCTURE_WRITE_BIT_KHR;
-        skeletonBuildBarrier.dstAccessMask = VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR;
-        vkCmdPipelineBarrier(commandBuffer,
-                             VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR |
-                                 VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
-                             VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR,
-                             0u,
-                             1u,
-                             &skeletonBuildBarrier,
-                             0u,
-                             nullptr,
-                             0u,
-                             nullptr);
-    }
-
     if (updateLich)
     {
         VkAccelerationStructureGeometryKHR lichGeometry{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
@@ -3777,15 +3766,22 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         const VkAccelerationStructureBuildRangeInfoKHR* lichRanges[] = {&lichRange};
         vkCmdBuildAccelerationStructuresKHR_(commandBuffer, 1u, &lichUpdateInfo, lichRanges);
 
-        VkMemoryBarrier lichBuildBarrier{VK_STRUCTURE_TYPE_MEMORY_BARRIER};
-        lichBuildBarrier.srcAccessMask = VK_ACCESS_ACCELERATION_STRUCTURE_WRITE_BIT_KHR;
-        lichBuildBarrier.dstAccessMask = VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR;
+    }
+
+    const DynamicBlasToTlasDependency blasToTlasDependency =
+        BuildDynamicBlasToTlasDependency({
+            updateSkinnedPlayer, updateSkeletonPose0, updateSkeletonPose1, updateLich});
+    if (blasToTlasDependency.required)
+    {
+        VkMemoryBarrier dynamicBlasBuildBarrier{VK_STRUCTURE_TYPE_MEMORY_BARRIER};
+        dynamicBlasBuildBarrier.srcAccessMask = blasToTlasDependency.sourceAccessMask;
+        dynamicBlasBuildBarrier.dstAccessMask = blasToTlasDependency.destinationAccessMask;
         vkCmdPipelineBarrier(commandBuffer,
-                             VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR | VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
-                             VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR,
+                             blasToTlasDependency.sourceStageMask,
+                             blasToTlasDependency.destinationStageMask,
                              0u,
                              1u,
-                             &lichBuildBarrier,
+                             &dynamicBlasBuildBarrier,
                              0u,
                              nullptr,
                              0u,

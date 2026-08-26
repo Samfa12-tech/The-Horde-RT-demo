@@ -14,6 +14,7 @@ namespace horde::vulkan::raytracing
 {
 
 inline constexpr float kPlayerGripSocketToleranceMetres = 0.015f;
+inline constexpr float kPlayerGripOrientationToleranceRadians = 0.02f;
 
 enum class PlayerRenderRoute : std::uint8_t
 {
@@ -64,6 +65,16 @@ bool ResolvePlayerHeldItemVisuals(
     const horde::gameplay::items::HeldItemTransform& worldFromRightHandBone,
     horde::gameplay::items::HeldItemStates& renderItems,
     std::string& diagnostic);
+
+struct PlayerGripAgreement
+{
+    float positionErrorMetres = 0.0f;
+    float orientationErrorRadians = 0.0f;
+};
+
+PlayerGripAgreement MeasurePlayerGripAgreement(
+    const horde::gameplay::items::HeldItemState& authoritativeItem,
+    const horde::gameplay::items::HeldItemState& renderedItem);
 
 enum class PlayerCpuSkinCadence : std::uint8_t
 {
@@ -116,8 +127,12 @@ public:
     const horde::scene::SkinnedPlayerSockets& BoneSockets() const { return sockets_; }
     float LeftSocketErrorMetres() const { return leftSocketErrorMetres_; }
     float RightSocketErrorMetres() const { return rightSocketErrorMetres_; }
+    const PlayerGripAgreement& LeftGripAgreement() const { return leftGripAgreement_; }
+    const PlayerGripAgreement& RightGripAgreement() const { return rightGripAgreement_; }
 
 private:
+    bool DeriveStableRestGripBases(std::string& diagnostic);
+
     horde::scene::SkinnedMeshAsset asset_;
     std::vector<horde::scene::TexturedSkinnedRtVertex> uniqueVertices_;
     horde::scene::SkinnedPlayerSockets sockets_{};
@@ -128,8 +143,17 @@ private:
         horde::gameplay::items::IdentityHeldItemTransform();
     horde::gameplay::items::HeldItemTransform rightBoneFromGripSocket_ =
         horde::gameplay::items::IdentityHeldItemTransform();
-    bool leftSocketCalibrated_ = false;
-    bool rightSocketCalibrated_ = false;
+    horde::gameplay::items::HeldItemTransform leftRestHandOrientation_ =
+        horde::gameplay::items::IdentityHeldItemTransform();
+    horde::gameplay::items::HeldItemTransform rightRestHandOrientation_ =
+        horde::gameplay::items::IdentityHeldItemTransform();
+    horde::gameplay::items::HeldItemTransform leftRestGripBasisInPlayer_ =
+        horde::gameplay::items::IdentityHeldItemTransform();
+    horde::gameplay::items::HeldItemTransform rightRestGripBasisInPlayer_ =
+        horde::gameplay::items::IdentityHeldItemTransform();
+    PlayerGripAgreement leftGripAgreement_{};
+    PlayerGripAgreement rightGripAgreement_{};
+    bool stableGripBasesReady_ = false;
 };
 
 } // namespace horde::vulkan::raytracing

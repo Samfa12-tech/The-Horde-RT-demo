@@ -68,6 +68,8 @@ struct SkinnedArmIkTarget
     std::array<float, 3u> pole{};
     std::array<float, 3u> shoulder{};
     bool shoulderTargetEnabled = false;
+    SkinnedNodeTransform handOrientation{};
+    bool handOrientationTargetEnabled = false;
 };
 
 struct SkinnedPlayerSockets

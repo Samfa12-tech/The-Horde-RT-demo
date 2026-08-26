@@ -1,4 +1,5 @@
 #include "vulkan/raytracing/CharacterRenderSlot.h"
+#include "vulkan/raytracing/DynamicBlasSynchronization.h"
 #include "vulkan/raytracing/RtSceneTuning.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
 #include "platform/android/AndroidRtLabState.h"
@@ -176,6 +177,26 @@ int main()
     ok &= Require(PresentableTinyRtScene::kBlasCount == 11u &&
                       PresentableTinyRtScene::kTlasInstanceCount == 20u,
                   "skinned player must add one updateable BLAS while TLAS remains capped at twenty instances");
+    const DynamicBlasToTlasDependency noDynamicBlasDependency =
+        BuildDynamicBlasToTlasDependency({});
+    const DynamicBlasToTlasDependency playerOnlyDependency =
+        BuildDynamicBlasToTlasDependency({true, false, false, false});
+    const DynamicBlasToTlasDependency skeletonOnlyDependency =
+        BuildDynamicBlasToTlasDependency({false, true, false, false});
+    const DynamicBlasToTlasDependency lichOnlyDependency =
+        BuildDynamicBlasToTlasDependency({false, false, false, true});
+    ok &= Require(!noDynamicBlasDependency.required &&
+                      playerOnlyDependency.required &&
+                      skeletonOnlyDependency.required && lichOnlyDependency.required &&
+                      playerOnlyDependency.sourceStageMask ==
+                          VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR &&
+                      playerOnlyDependency.destinationStageMask ==
+                          VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR &&
+                      playerOnlyDependency.sourceAccessMask ==
+                          VK_ACCESS_ACCELERATION_STRUCTURE_WRITE_BIT_KHR &&
+                      playerOnlyDependency.destinationAccessMask ==
+                          VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR,
+                  "a player-only BLAS update must record the precise AS-write-to-AS-read dependency before TLAS without overbarriering idle frames");
     const RtSceneTuning authoredTuning;
     ok &= Require(Near(authoredTuning.waterfallWidthScale, 1.0f) &&
                       !authoredTuning.finaleRoofOpenOverride.has_value() &&

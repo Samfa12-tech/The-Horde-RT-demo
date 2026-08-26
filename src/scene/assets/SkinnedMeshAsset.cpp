@@ -490,6 +490,49 @@ Matrix ScaleAlongAxisAroundPoint(Vec3 axis, const float scale, const Vec3& pivot
     return result;
 }
 
+Matrix RigidRotation(const Matrix& source)
+{
+    const Vec3 x = Normalise(Vec3{source.m[0], source.m[1], source.m[2]});
+    const Vec3 rawY{source.m[4], source.m[5], source.m[6]};
+    Vec3 y = Normalise(Subtract(rawY, Scale(x, Dot(rawY, x))));
+    Vec3 z = Normalise(Cross(x, y));
+    const Vec3 rawZ{source.m[8], source.m[9], source.m[10]};
+    if (Dot(z, rawZ) < 0.0f)
+    {
+        y = Scale(y, -1.0f);
+        z = Scale(z, -1.0f);
+    }
+    Matrix result{};
+    result.m = {{x.x, x.y, x.z, 0.0f,
+                 y.x, y.y, y.z, 0.0f,
+                 z.x, z.y, z.z, 0.0f,
+                 0.0f, 0.0f, 0.0f, 1.0f}};
+    return result;
+}
+
+Matrix RotationTranspose(const Matrix& rotation)
+{
+    Matrix result{};
+    result.m = {{rotation.m[0], rotation.m[4], rotation.m[8], 0.0f,
+                 rotation.m[1], rotation.m[5], rotation.m[9], 0.0f,
+                 rotation.m[2], rotation.m[6], rotation.m[10], 0.0f,
+                 0.0f, 0.0f, 0.0f, 1.0f}};
+    return result;
+}
+
+Matrix RotationDeltaAroundPoint(const Matrix& current,
+                                const Matrix& desired,
+                                const Vec3& pivot)
+{
+    Matrix delta = Multiply(RigidRotation(desired),
+                            RotationTranspose(RigidRotation(current)));
+    const Vec3 rotatedPivot = TransformVector(delta, pivot);
+    delta.m[12] = pivot.x - rotatedPivot.x;
+    delta.m[13] = pivot.y - rotatedPivot.y;
+    delta.m[14] = pivot.z - rotatedPivot.z;
+    return delta;
+}
+
 const SkinnedClipSet& PlayerLocomotionClipSet()
 {
     // Combat actions are authoritative procedural/IK layers. The reusable
@@ -1180,6 +1223,16 @@ bool SkinnedMeshAsset::SkinPlayerUniqueTextured(
             ScaleAlongAxisAroundPoint(rotatedLowerDirection, lowerStretch, rotatedElbow));
         for (std::size_t node = 0u; node < globals.size(); ++node)
             if (isDescendant(node, lowerNode)) globals[node] = Multiply(lowerDelta, globals[node]);
+        if (arm.handOrientationTargetEnabled)
+        {
+            Matrix desired{};
+            desired.m = arm.handOrientation;
+            const Matrix wristDelta = RotationDeltaAroundPoint(
+                globals[handNode], desired, solvedHand);
+            for (std::size_t node = 0u; node < globals.size(); ++node)
+                if (isDescendant(node, handNode))
+                    globals[node] = Multiply(wristDelta, globals[node]);
+        }
         socket = globals[handNode].m;
         return true;
     };

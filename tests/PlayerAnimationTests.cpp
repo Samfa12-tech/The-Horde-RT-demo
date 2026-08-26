@@ -92,6 +92,18 @@ int main()
     if (!Require(layered.leftIk.target == input.heldItemKinematics.leftHandLocal &&
                  layered.rightIk.target == input.heldItemKinematics.rightHandLocal,
                  "held-item kinematics must author both hand targets")) return 1;
+    const auto layeredSwordBasis = horde::gameplay::items::EvaluateSwordGripBasisInView(
+        input.heldItemKinematics.swordRadians,
+        input.heldItemKinematics.swordForwardRadians,
+        horde::gameplay::items::kSwordGripRollRadians);
+    if (!Require(layered.leftIk.gripX == std::array<float, 3u>{{1.0f, 0.0f, 0.0f}} &&
+                 layered.leftIk.gripY == std::array<float, 3u>{{0.0f, 1.0f, 0.0f}} &&
+                 layered.leftIk.gripZ == std::array<float, 3u>{{0.0f, 0.0f, -1.0f}} &&
+                 layered.rightIk.gripX == layeredSwordBasis.edgeDirection &&
+                 layered.rightIk.gripY == layeredSwordBasis.bladeAxis &&
+                 layered.rightIk.gripZ == layeredSwordBasis.flatNormal,
+                 "fixed-step animation authority must publish both deterministic Grip bases"))
+        return 1;
     if (!Require(!layered.visibility.headPrimaryVisible &&
                  !layered.visibility.nearFacePrimaryVisible &&
                  layered.visibility.shadowVisible && layered.visibility.reflectionVisible,
@@ -335,6 +347,30 @@ int main()
                  Near(renderItems[1].worldFromItem[13], rightBone[13] - 0.135f),
                  "attached held-item visuals must compose from final LeftHand/RightHand bone sockets"))
         return 1;
+    HeldItemStates gripAlignedItems = MakeDefaultHeldItemStates();
+    if (!Require(ComposeWorldFromItem(
+                     leftBone, OriginalTorchGripSocketTransform(),
+                     gripAlignedItems[0].worldFromItem, socketDiagnostic) &&
+                 ComposeWorldFromItem(
+                     rightBone, SwordGripSocketTransform(),
+                     gripAlignedItems[1].worldFromItem, socketDiagnostic) &&
+                 ResolvePlayerHeldItemVisuals(
+                     gripAlignedItems, leftBone, rightBone,
+                     renderItems, socketDiagnostic),
+                 "aligned authoritative Grip fixture must compose"))
+        return 1;
+    const PlayerGripAgreement leftGripAgreement = MeasurePlayerGripAgreement(
+        gripAlignedItems[0], renderItems[0]);
+    const PlayerGripAgreement rightGripAgreement = MeasurePlayerGripAgreement(
+        gripAlignedItems[1], renderItems[1]);
+    if (!Require(leftGripAgreement.positionErrorMetres <=
+                     kPlayerGripSocketToleranceMetres &&
+                 rightGripAgreement.positionErrorMetres <=
+                     kPlayerGripSocketToleranceMetres &&
+                 leftGripAgreement.orientationErrorRadians <= 0.0005f &&
+                 rightGripAgreement.orientationErrorRadians <= 0.0005f,
+                 "post-composition Grip metric must include final position and orientation"))
+        return 1;
     authoritativeItems[0].parentMode = HeldItemParentMode::AuthoredWorldTrajectory;
     authoritativeItems[0].worldFromItem[12] = 4.0f;
     if (!Require(ResolvePlayerHeldItemVisuals(authoritativeItems, leftBone, rightBone,
@@ -343,24 +379,6 @@ int main()
                  "detached torch visuals must retain the authoritative world trajectory"))
         return 1;
 
-    authoritativeItems = MakeDefaultHeldItemStates();
-    PlayerRenderSlot calibratedSlot;
-    if (!Require(calibratedSlot.ResolveHeldItemVisuals(
-                     authoritativeItems, leftBone, rightBone,
-                     renderItems, socketDiagnostic) &&
-                 Near(renderItems[0].worldFromItem[12], 0.0f) &&
-                 Near(renderItems[1].worldFromItem[12], 0.0f),
-                 "bone-local grip correction must preserve the established visual basis at calibration"))
-        return 1;
-    leftBone[12] += 0.06f;
-    rightBone[12] -= 0.04f;
-    if (!Require(calibratedSlot.ResolveHeldItemVisuals(
-                     authoritativeItems, leftBone, rightBone,
-                     renderItems, socketDiagnostic) &&
-                 Near(renderItems[0].worldFromItem[12], 0.06f) &&
-                 Near(renderItems[1].worldFromItem[12], -0.04f),
-                 "calibrated held-item visuals must follow subsequent final bone motion"))
-        return 1;
     if (!Require(ChoosePlayerCpuCadence({0.18, 0.31, 0.018f, 0.004f}) ==
                      PlayerCpuSkinCadence::Hz60 &&
                  ChoosePlayerCpuCadence({0.18, 0.31, 0.004f, 0.003f}) ==
