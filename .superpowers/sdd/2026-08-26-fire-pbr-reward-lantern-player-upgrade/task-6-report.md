@@ -145,6 +145,7 @@ Task 5's two-cut combo owner audio/haptic replay remains independently open; Tas
 
 Audio/haptic manual revalidation required: NO — this milestone changes material transport and shader visibility only; audio/haptic state, event timing, playback, spatialisation, and feedback semantics are unchanged.
 
+
 ## Fix Round 1 — deterministic ordering, energy, thin defaults, winding, and exact identity
 
 Date: 2026-08-27 (Australia/Sydney)
@@ -563,5 +564,90 @@ The exact unsigned, unpublishable Android validation artifact is:
 - SHA-256 `19560fc25cdf751c712fab3a2dc48336cb5189b5342cf5043edef9068e2469c8`
 
 Final `adb devices -l` returned an empty device list. No artifact was installed, and no phone parity, matched Mobile/High 75%, separate 100%, warm timing/thermal/GPU-power/resources, or Home/resume evidence is claimed. Exact `SM-S948B` Task 6 acceptance remains the hard Task 9 gate. Hands-on perceived glass quality remains an owner boundary. Task 5's two-cut combo owner audio/haptic replay remains separately open and unchanged.
+
+Audio/haptic manual revalidation required: NO — this milestone changes material transport and shader visibility only; audio/haptic state, event timing, playback, spatialisation, and feedback semantics are unchanged.
+
+
+## Fix Round 5 — cross-target non-contracted transform arithmetic
+
+Date: 2026-08-27 (Australia/Sydney)
+
+This final round closes the remaining compiler-semantic parity risk. It changes only build policy, its executable object-code gate, and validation orchestration. Shader source, generated ABI, descriptor bindings, push constants, dual-pipeline selection, glass transport/diagnostics, and fixture geometry are unchanged from `1c91d42`.
+
+### Commits and RED object-code proof
+
+- `520fcc1` — `test: gate strict asset transform arithmetic`
+- `6c261d2` — `fix: enforce strict asset transform arithmetic`
+
+The implementation-unit audit found exactly two production translation units:
+
+- `src/scene/assets/GltfDocument.cpp` defines `CGLTF_IMPLEMENTATION`, so it owns the real `cgltf_node_transform_local` and `cgltf_node_transform_world` bodies used by runtime and tests;
+- `src/scene/assets/StaticMeshAsset.cpp` owns the local `TransformPoint` baked-position arithmetic and calls the cgltf world transform. `AssetValidation.cpp` calls the out-of-line cgltf implementation but does not implement or inline those transform bodies.
+
+The new executable gate first ran against the prior normal Gradle/CMake ARM64 Debug objects. It failed for the intended behavioral reason, recorded exact compile commands/object hashes, and did not inspect a surrogate:
+
+| Prior object | SHA-256 | Audited contracted instructions |
+| --- | --- | --- |
+| `GltfDocument.cpp.o` | `8024a6d8b4307b5e7af1efdaef5b71e1adf3e5665985d7cdd6995bb216b37315` | local: 11 (`fmsub`, `fnmsub`, `fmadd`); world: 16 (`fmadd`, `fmla`) |
+| `StaticMeshAsset.cpp.o` | `3d4154e2b4ecf2ced0c6efeb008efa2bbf429304927767d623635e8f68152d44` | `TransformPoint`: 4 (`fmadd`, `fmla`) |
+
+Both prior compile commands also lacked `-fno-fast-math` and `-ffp-contract=off`; the local quaternion transform had zero separate subtract instructions. This is the retained RED evidence for the Android contraction mismatch.
+
+### Narrow compiler policy and executable gate
+
+`cmake/HordeRtStrictAssetMath.cmake` applies a source property to those two absolute production sources in both the root and Android CMake directories. Therefore it covers the renderer library and every root test target that recompiles either source, while leaving unrelated renderer hot paths alone:
+
+- MSVC: `/fp:strict`;
+- Android Clang, other Clang, AppleClang, and GCC: `-fno-fast-math -ffp-contract=off`;
+- an unrecognized compiler fails CMake configuration instead of silently using an unaudited floating-point contract.
+
+`tests/AssetMathCompilerContractTests.ps1` builds the real `arm64-v8a` object through the normal Gradle/CMake native task unless explicitly reusing a just-clean-built artifact. It selects the actual compile database, resolves the exact object paths from each compile command, uses the NDK's sibling `llvm-objdump`, and isolates the exact demangled symbol ranges. It rejects `fmadd`, `fmsub`, `fnmadd`, `fnmsub`, `fmla`, and `fmls` families, requires separate multiply/add operations and a separate subtract in the local quaternion transform, validates the strict flags, and records compiler version, full compile commands, object SHA-256 values, disassembly, per-symbol counts, and failures in JSON. The fresh Host gate runs this audit for both Android Debug and Release/RelWithDebInfo after the all-ABI clean build.
+
+Fresh NDK r26.1.10909125 / Android Clang 17.0.2 evidence is in `reports/foundation-runs/run-20260827-042208/asset-math-compiler-contract`:
+
+| ARM64 configuration/object | SHA-256 |
+| --- | --- |
+| Debug `GltfDocument.cpp.o` | `5db20c11b847486b1ee5de8ae7df55781e0435733021e86fd4f39ea3c5a36f69` |
+| Debug `StaticMeshAsset.cpp.o` | `017438289fdceffd649ecc5c8d847a221ff3814a7858cfdc9851fb875569c4a6` |
+| RelWithDebInfo `GltfDocument.cpp.o` | `fb3aaaf4b5f89b9a456de73f396b9e4b0f56ab85bf6ffba07511576a5a2bdc34` |
+| RelWithDebInfo `StaticMeshAsset.cpp.o` | `f9bc43e913accbb53aba74caed39d76349c7efaded874389c8bec6c439bc4560` |
+
+Debug and RelWithDebInfo produce the same audited structure: local 62 instructions with 18 separate multiplies, six adds, eight subtracts; world 94 with 24 multiplies and 18 adds; `TransformPoint` 30 with 12 multiplies and six adds. Every contracted-instruction list is empty. All eight actual Android compile databases (four ABIs times Debug/RelWithDebInfo) contain both required flags on both audited sources, no fast-math enablement, and present built objects.
+
+Fresh MSVC 19.44.35227 TLogs from `horde_rt_probe_core`, `horde_rt_held_item_socket_tests`, and `horde_rt_static_gltf_asset_tests` record `/fp:strict` for both audited sources in Debug and Release. Exact-range COFF disassembly also contains zero contracted instructions. Debug local/world/point separate multiply-add-subtract counts are `45/3/9`, `9/9/0`, and `18/9/0`; Release counts are `45/3/9`, `36/27/0`, and `18/9/0`.
+
+### Behavioral parity, safety, and full validation
+
+The existing real strict C++ static-GLB test and offline validator both retain the complete Fix Round 4 suite. In particular, the large legal rotated high-scale TRS and equivalent matrix paths still produce bit-identical runtime world matrices and the same accepted single canonical component offline. The minimum/maximum clamp seams, 50 micrometre disconnected-pane guard, reordered nodes/primitives, float underflow/overflow/NaN manifests, NaN/+infinity/-infinity POSITION data, and six exclusive cell-boundary cases retain matched outcomes.
+
+Focused implementation-head verification:
+
+- Debug runtime plus offline topology: 2/2 passed in 11.74 s;
+- Release runtime plus offline topology: 2/2 passed in 6.39 s;
+- ARM64 Debug and Release/RelWithDebInfo object-code gates: pass;
+- MSVC AddressSanitizer Debug static-GLB malformed-coordinate suite: pass in 0.62 s after exposing the installed VS ASan runtime DLL on `PATH`; no sanitizer report;
+- QEMU `qemu-aarch64` and `qemu-aarch64-static`: not installed, so no emulator was installed or used.
+
+Fresh normal Host run `reports/foundation-runs/run-20260827-042208` passed at exact implementation commit `6c261d272130539e349ea296b413db5a6cfbbe24`:
+
+- shader freshness, fully inlined compiler strategy, generated ABI, topology, tracked-include, packaging, and negative safety gates: pass;
+- Windows Debug: 27/27 in 108.50 s;
+- Windows Release: 27/27 in 60.86 s;
+- deterministic Windows captures: 13 honestly presented RT frames;
+- independent literal SHA-256 comparison with reviewed Task 5 `run-20260826-213806`: exact 13/13, with maximum channel difference zero at every checkpoint;
+- hidden-route dielectric counters in unambiguous record order: transport overflow 0, shadow overflow 0, secondary dielectric rejection 0, aggregate unclosed volume 0, primary unclosed volume 0, shadow unclosed volume 0;
+- hidden aggregate timing: 6.051600 ms median; GPU RT-command-buffer average 1.160157 ms over 155 samples; versus the Task 5 matched median 6.050300 ms, `+0.021%`;
+- Android all four ABIs, clean Debug, unsigned Release, and Release lint: `BUILD SUCCESSFUL in 5m 02s`, 100 actionable tasks (98 executed, two up-to-date);
+- both post-clean ARM64 disassembly/flag gates, validation package/licence gate, and evidence hashing: pass; worktree status before and after the run: clean.
+
+Shader source, includes, generated ABI, and embedded artifacts have no diff from `1c91d42`. The unchanged generic artifact remains 789,228 bytes / 43,514 instructions / 6,263 branch operations / 89 loops / SHA-256 `f29f2f537883d9e5deb5d56ad74a1cf35b3e88ed16f773e26e8c5092c704f594`. The unchanged legacy-inactive artifact remains 778,136 bytes / 42,847 instructions / 6,155 branch operations / 89 loops / SHA-256 `ac99c30e6f857593df534567a4b5c9efadddc6d8ff92c47b7e033d836edc6ed4`.
+
+The exact unsigned, unpublishable Android validation artifact is:
+
+- `reports/foundation-runs/run-20260827-042208/artifacts/Horde-Lantern-RT-validation-20260827-042208-Android-UNSIGNED-DO-NOT-PUBLISH.apk`
+- 74,611,228 bytes
+- SHA-256 `95b4070e0aa5ca5a149291ee4300c3281d38b2422c73ad89f256b2fe102ca0c6`
+
+Final `adb devices -l` returned an empty device list. No artifact was installed and no ARM64 contract executable could be run on the authorized `SM-S948B`. Adding a separate JNI/test executable was not necessary to resolve code ambiguity: the preserved normal APK contains the exact audited production objects, both ARM64 configurations have symbol-range disassembly proof, and the real production C++ fixtures pass. Exact phone execution, artifact parity, Mobile/High 75%, separate 100%, warmed timing/thermal/GPU-power/resources, and Home/resume remain the hard Task 9 device gate. No device evidence is claimed. Hands-on perceived glass quality remains an owner boundary. Task 5's two-cut combo owner audio/haptic replay remains separately open and unchanged.
 
 Audio/haptic manual revalidation required: NO — this milestone changes material transport and shader visibility only; audio/haptic state, event timing, playback, spatialisation, and feedback semantics are unchanged.
