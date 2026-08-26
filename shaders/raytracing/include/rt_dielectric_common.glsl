@@ -1,3 +1,29 @@
+float dielectricSchlickFromR0(float incidentCosine, float r0)
+{
+    float cosine = clamp(incidentCosine, 0.0, 1.0);
+    float reflectance = clamp(r0, 0.0, 1.0);
+    return reflectance + (1.0 - reflectance) * pow(1.0 - cosine, 5.0);
+}
+
+float dielectricSchlick(float incidentCosine, float incidentIor, float transmittedIor)
+{
+    float etaI = clamp(incidentIor, 1.0, 4.0);
+    float etaT = clamp(transmittedIor, 1.0, 4.0);
+    float ratio = (etaI - etaT) / max(etaI + etaT, 0.000001);
+    return dielectricSchlickFromR0(incidentCosine, ratio * ratio);
+}
+
+vec3 dielectricBeerLambert(vec3 attenuationColor, float pathLength,
+                           float attenuationDistance)
+{
+    if (attenuationDistance <= 0.0 || isinf(attenuationDistance))
+    {
+        return vec3(1.0);
+    }
+    float distanceRatio = max(pathLength, 0.0) / max(attenuationDistance, 0.000001);
+    return pow(clamp(attenuationColor, vec3(0.0), vec3(1.0)), vec3(distanceRatio));
+}
+
 vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
 {
     vec3 baseNormal = waterBaseNormal(h.position, h.geometricNormal);
@@ -101,7 +127,7 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
 
     float viewCosine = clamp(dot(surfaceNormal, -rayDirection), 0.0, 1.0);
     float fresnel = transmissionAvailable
-        ? 0.0204 + 0.9796 * pow(1.0 - viewCosine, 5.0) : 1.0;
+        ? dielectricSchlickFromR0(viewCosine, 0.0204) : 1.0;
     vec3 localPosition;
     vec3 localColor;
     float localStrength;
@@ -266,7 +292,7 @@ vec3 shadePrimary(HitInfo h, vec3 rayDirection)
             ? bounceSample(transmittedHit, rayDirection, false) : skyColor(rayDirection);
         vec3 tint = vec3(0.82, 0.94, 1.0);
         float viewCosine = clamp(dot(h.geometricNormal, -rayDirection), 0.0, 1.0);
-        float fresnel = 0.04 + 0.96 * pow(1.0 - viewCosine, 5.0);
+        float fresnel = dielectricSchlickFromR0(viewCosine, 0.04);
         vec3 reflected = skyColor(reflect(rayDirection, h.geometricNormal));
         float transmission = 0.88;
         return mix(transmitted * tint * transmission, reflected, fresnel);

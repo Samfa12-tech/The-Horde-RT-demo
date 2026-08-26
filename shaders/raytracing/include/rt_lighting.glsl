@@ -373,4 +373,11 @@ vec3 shadeOpaqueSecondary(HitInfo h, vec3 incoming)
     return color;
 }
 
+vec3 shadeTerminalOpaqueEmissive(HitInfo h, vec3 incoming)
+{
+    // Generic terminal path: opaque/emissive lighting is evaluated once and
+    // may cast visibility rays, but it never owns another glossy transport ray.
+    return shadeOpaqueSecondary(h, incoming);
+}
+
 vec3 shadeOpaquePrimary(HitInfo h, vec3 rayDirection);
