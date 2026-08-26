@@ -1,0 +1,57 @@
+{
+  "sourceRig": "player-rigged.glb",
+  "sourceWalk": "player-walking.glb",
+  "runtime": "gothic-traveller-lod0.runtime.glb",
+  "triangles": 15595,
+  "vertices": 20896,
+  "heightMetres": 1.8000002951953888,
+  "upAxis": "+Y",
+  "forwardAxis": "+Z",
+  "origin": "ground-centred within rigging tolerance",
+  "bones": [
+    "Hips",
+    "LeftUpLeg",
+    "LeftLeg",
+    "LeftFoot",
+    "LeftToeBase",
+    "RightUpLeg",
+    "RightLeg",
+    "RightFoot",
+    "RightToeBase",
+    "Spine02",
+    "Spine01",
+    "Spine",
+    "LeftShoulder",
+    "LeftArm",
+    "LeftForeArm",
+    "LeftHand",
+    "RightShoulder",
+    "RightArm",
+    "RightForeArm",
+    "RightHand",
+    "neck",
+    "Head",
+    "head_end",
+    "headfront"
+  ],
+  "clips": [
+    "Idle",
+    "Walking"
+  ],
+  "clipFrames": {
+    "Idle": [
+      1,
+      31
+    ],
+    "Walking": [
+      0.8000000715255737,
+      25.60000228881836
+    ]
+  },
+  "primitiveSemantics": {
+    "BodyPrimaryVisible": 13534,
+    "HeadPrimaryMasked": 1813,
+    "NearFacePrimaryMasked": 248
+  },
+  "processing": "texture-before-rig PBR UV transfer, idle/walk-only clip packaging, semantic material primitives, generated tangents, 4x4 embedded identity textures"
+}

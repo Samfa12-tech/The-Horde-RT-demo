@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "asset": "gothic-traveller-lod0",
+  "metresPerUnit": 1.0,
+  "coordinateSystem": { "up": "+Y", "forward": "+Z" },
+  "budgets": {
+    "maxVertices": 22000,
+    "maxIndices": 48000,
+    "maxPrimitives": 3,
+    "maxMaterials": 3,
+    "maxTextureLayersPerKind": 3
+  },
+  "lods": [{ "name": "lod0", "maxTriangles": 16000 }],
+  "requiredSockets": ["LeftHand", "RightHand"],
+  "runtimeTextureProfile": {
+    "android": "astc",
+    "windows": "rgba8",
+    "mipmapped": true,
+    "resolution": 1024
+  },
+  "materialOverrides": [],
+  "distribution": "runtime",
+  "licenceStatus": "Meshy output distributed conservatively under CC BY 4.0; attribution in ASSET_LICENSES.md"
+}

@@ -1,6 +1,6 @@
 # Models
 
-Source art includes staged Meshy sword and torch studies under `weapons/meshy/` and `props/meshy/`, plus two sequential runtime enemies under `enemies/meshy/`: the Hotstrike Studio skeleton derivative processed with Meshy and the CC0 Meshy placeholder lich. The sword and torch GLBs are not runtime-integrated or distributed; the live torch is compact procedural RT geometry derived from the approved silhouette direction.
+Source art includes staged legacy Meshy sword and torch studies under `weapons/meshy/` and `props/meshy/`, audited production assets under the `weapons/source`, `props/source`, and `player/source` routes, and two sequential runtime enemies under `enemies/meshy/`: the Hotstrike Studio skeleton derivative processed with Meshy and the CC0 Meshy placeholder lich. Production packages include only bounded runtime GLBs, manifests, platform texture arrays, and attribution; source/high files remain Git-LFS evidence and are excluded.
 
 Future model rules:
 

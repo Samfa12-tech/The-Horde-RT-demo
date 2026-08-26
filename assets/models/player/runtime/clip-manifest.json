@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "asset": "gothic-traveller-lod0.runtime.glb",
+  "clips": [
+    { "slot": "Idle", "source": "rigged rest pose", "loops": true, "required": true },
+    { "slot": "Walking", "source": "Meshy basic walking", "loops": true, "required": true }
+  ],
+  "excluded": ["running", "attack", "death"],
+  "combatTimingAuthority": "SwordCombat/GameSimulation",
+  "requiredHandBones": ["LeftHand", "RightHand"],
+  "primitiveSemantics": [
+    { "material": "BodyPrimaryVisible", "firstPersonPrimary": true, "shadow": true, "reflection": true },
+    { "material": "HeadPrimaryMasked", "firstPersonPrimary": false, "shadow": true, "reflection": true },
+    { "material": "NearFacePrimaryMasked", "firstPersonPrimary": false, "shadow": true, "reflection": true }
+  ]
+}
