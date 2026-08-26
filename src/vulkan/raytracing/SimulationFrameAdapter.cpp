@@ -48,6 +48,9 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     frame.heldLight = simulation.heldLight;
     frame.roster = simulation.enemyRoster;
     frame.lich = simulation.lich;
+    frame.zone = simulation.zone;
+    frame.fireEmitters = simulation.fireEmitters;
+    frame.fireEmitterCount = simulation.fireEmitterCount;
     frame.lich.finaleSkylightOpenProgress = ResolveRtFinaleRoofOpen(
         simulation.lich.finaleSkylightOpenProgress, frame.tuning);
     frame.lich.finaleDawnRevealProgress = ResolveRtFinaleDawnReveal(

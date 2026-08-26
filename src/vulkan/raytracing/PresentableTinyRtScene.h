@@ -13,6 +13,7 @@
 #include "gameplay/items/HeldItemState.h"
 #include "gameplay/items/HeldLightState.h"
 #include "vulkan/raytracing/CharacterRenderSlot.h"
+#include "vulkan/raytracing/FireEmitterBuffer.h"
 #include "vulkan/raytracing/HeldItemBlasMeasurements.h"
 #include "vulkan/raytracing/RtGpuResources.h"
 #include "vulkan/raytracing/RtSceneTuning.h"
@@ -64,6 +65,10 @@ struct RtSceneFrameInputs
     horde::gameplay::items::HeldLightState heldLight{};
     horde::gameplay::EnemyRosterSnapshot roster{};
     horde::gameplay::LichSnapshot lich{};
+    horde::gameplay::ShowcaseZone zone = horde::gameplay::ShowcaseZone::Opening;
+    std::array<horde::gameplay::effects::FireEmitterState,
+               horde::gameplay::effects::kFireEmitterCapacity> fireEmitters{};
+    std::size_t fireEmitterCount = 0u;
 };
 
 class PresentableTinyRtScene
@@ -225,6 +230,7 @@ private:
     Buffer transformBuffer_;
     Buffer instanceBuffer_;
     Buffer heldLightBuffer_;
+    Buffer fireEmitterBuffer_;
     Buffer worldSurfaceBuffer_;
     Buffer staticVertexBuffer_;
     Buffer staticIndexBuffer_;

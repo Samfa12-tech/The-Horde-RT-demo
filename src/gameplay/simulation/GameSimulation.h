@@ -6,6 +6,7 @@
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/SpatialAudio.h"
 #include "gameplay/SwordCombat.h"
+#include "gameplay/effects/FireEmitterState.h"
 #include "gameplay/items/HeldItemState.h"
 #include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/simulation/FixedStepRunner.h"
@@ -55,6 +56,7 @@ private:
     void UpdateMovement(const InputSnapshot& input, float deltaSeconds);
     void UpdateEncounters(const InputSnapshot& input, float deltaSeconds);
     void ResolveHeldItems();
+    void ResolveFireEmitters(float fixedDeltaSeconds);
     void Emit(GameplayEventType type,
               EntityId source,
               EntityId target,
@@ -82,6 +84,10 @@ private:
     horde::gameplay::items::HeldItemStates heldItems_ =
         horde::gameplay::items::MakeDefaultHeldItemStates();
     horde::gameplay::items::HeldItemFixedStepState heldItemFixedStepState_{};
+    std::array<horde::gameplay::effects::FireEmitterState,
+               horde::gameplay::effects::kFireEmitterCapacity> fireEmitters_{{
+        horde::gameplay::effects::MakeOpeningTorchFireEmitter()}};
+    std::size_t fireEmitterCount_ = 1u;
     EnemyKind activeEnemyKind_ = EnemyKind::Skeleton;
 
     float playerX_ = 0.0f;

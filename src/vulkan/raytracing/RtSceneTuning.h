@@ -40,6 +40,9 @@ struct RtSceneTuning
     float fogDensityScale = 1.0f;
     std::array<RtLightTuning, kRtLightGroupCount> lights{};
     RtWorkloadPreset workloadPreset = RtWorkloadPreset::Authored;
+    float fireStrengthScale = 1.0f;
+    float fireTurbulenceScale = 1.0f;
+    float fireSmokeScale = 1.0f;
 };
 
 inline RtSceneTuning ClampRtSceneTuning(RtSceneTuning tuning)
@@ -59,6 +62,9 @@ inline RtSceneTuning ClampRtSceneTuning(RtSceneTuning tuning)
         light.hueDegrees = std::clamp(light.hueDegrees, -180.0f, 180.0f);
         light.intensityScale = std::clamp(light.intensityScale, 0.0f, 2.0f);
     }
+    tuning.fireStrengthScale = std::clamp(tuning.fireStrengthScale, 0.0f, 2.0f);
+    tuning.fireTurbulenceScale = std::clamp(tuning.fireTurbulenceScale, 0.0f, 2.0f);
+    tuning.fireSmokeScale = std::clamp(tuning.fireSmokeScale, 0.0f, 2.0f);
     return tuning;
 }
 

@@ -5,7 +5,9 @@
     "staticAssets": 8,
     "primitives": 32,
     "materials": 32,
-    "textureLayers": 16
+    "textureLayers": 16,
+    "fireEmitters": 4,
+    "activeFireEmitters": 2
   },
   "bindings": {
     "instanceMetadata": 11,
@@ -17,7 +19,8 @@
     "normalTextures": 17,
     "ormTextures": 18,
     "emissiveTextures": 19,
-    "heldLight": 20
+    "heldLight": 20,
+    "fireEmitters": 21
   },
   "instanceFlags": {
     "staticPbr": 1,
@@ -81,6 +84,21 @@
       "name": "RtHeldLightGpu", "alignment": 16, "size": 16,
       "fields": [
         { "name": "positionStrength", "type": "float4", "offset": 0 }
+      ]
+    },
+    {
+      "name": "RtFireEmitterGpu", "alignment": 16, "size": 160,
+      "fields": [
+        { "name": "worldFromLocal0", "type": "float4", "offset": 0 },
+        { "name": "worldFromLocal1", "type": "float4", "offset": 16 },
+        { "name": "worldFromLocal2", "type": "float4", "offset": 32 },
+        { "name": "worldFromLocal3", "type": "float4", "offset": 48 },
+        { "name": "lightPositionStrength", "type": "float4", "offset": 64 },
+        { "name": "colourIntensity", "type": "float4", "offset": 80 },
+        { "name": "shape", "type": "float4", "offset": 96 },
+        { "name": "animation", "type": "float4", "offset": 112 },
+        { "name": "smokeEmbers", "type": "float4", "offset": 128 },
+        { "name": "identity", "type": "uint4", "offset": 144 }
       ]
     }
   ]

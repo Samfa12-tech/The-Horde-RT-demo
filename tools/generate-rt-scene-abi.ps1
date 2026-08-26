@@ -104,6 +104,8 @@ inline constexpr std::uint32_t kRtStaticAssetCapacity = $($c.staticAssets)u;
 inline constexpr std::uint32_t kRtPrimitiveMetadataCapacity = $($c.primitives)u;
 inline constexpr std::uint32_t kRtMaterialCapacity = $($c.materials)u;
 inline constexpr std::uint32_t kRtTextureLayerCapacity = $($c.textureLayers)u;
+inline constexpr std::uint32_t kRtFireEmitterCapacity = $($c.fireEmitters)u;
+inline constexpr std::uint32_t kRtActiveFireEmitterCapacity = $($c.activeFireEmitters)u;
 
 inline constexpr std::uint32_t kRtBindingInstanceMetadata = $($b.instanceMetadata)u;
 inline constexpr std::uint32_t kRtBindingPrimitiveMetadata = $($b.primitiveMetadata)u;
@@ -115,6 +117,7 @@ inline constexpr std::uint32_t kRtBindingNormalTextures = $($b.normalTextures)u;
 inline constexpr std::uint32_t kRtBindingOrmTextures = $($b.ormTextures)u;
 inline constexpr std::uint32_t kRtBindingEmissiveTextures = $($b.emissiveTextures)u;
 inline constexpr std::uint32_t kRtBindingHeldLight = $($b.heldLight)u;
+inline constexpr std::uint32_t kRtBindingFireEmitters = $($b.fireEmitters)u;
 
 enum class RtInstanceFlag : std::uint32_t
 {
@@ -146,6 +149,8 @@ const uint kRtStaticAssetCapacity = $($c.staticAssets)u;
 const uint kRtPrimitiveMetadataCapacity = $($c.primitives)u;
 const uint kRtMaterialCapacity = $($c.materials)u;
 const uint kRtTextureLayerCapacity = $($c.textureLayers)u;
+const uint kRtFireEmitterCapacity = $($c.fireEmitters)u;
+const uint kRtActiveFireEmitterCapacity = $($c.activeFireEmitters)u;
 
 const uint kRtInstanceFlagStaticPbr = $($i.staticPbr)u;
 const uint kRtInstanceFlagEmissive = $($i.emissive)u;
@@ -187,6 +192,10 @@ layout(std430, set = 0, binding = $($b.heldLight)) readonly buffer RtHeldLightBu
 {
     RtHeldLightGpu value;
 } rtHeldLight;
+layout(std430, set = 0, binding = $($b.fireEmitters)) readonly buffer RtFireEmitterBuffer
+{
+    RtFireEmitterGpu values[$($c.fireEmitters)];
+} rtFireEmitters;
 "@
 
 function Normalize-Newlines([string]$text) { return $text.Replace("`r`n", "`n").TrimEnd("`r", "`n") + "`n" }

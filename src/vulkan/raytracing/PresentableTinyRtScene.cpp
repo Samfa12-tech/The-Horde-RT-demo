@@ -267,6 +267,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     transformBuffer_ = std::exchange(other.transformBuffer_, Buffer{});
     instanceBuffer_ = std::exchange(other.instanceBuffer_, Buffer{});
     heldLightBuffer_ = std::exchange(other.heldLightBuffer_, Buffer{});
+    fireEmitterBuffer_ = std::exchange(other.fireEmitterBuffer_, Buffer{});
     worldSurfaceBuffer_ = std::exchange(other.worldSurfaceBuffer_, Buffer{});
     staticVertexBuffer_ = std::exchange(other.staticVertexBuffer_, Buffer{});
     staticIndexBuffer_ = std::exchange(other.staticIndexBuffer_, Buffer{});
@@ -442,6 +443,7 @@ void PresentableTinyRtScene::Destroy()
     DestroyBuffer(staticGeometryTransformBuffer_);
     DestroyBuffer(staticVertexBuffer_);
     DestroyBuffer(heldLightBuffer_);
+    DestroyBuffer(fireEmitterBuffer_);
     DestroyBuffer(instanceBuffer_);
     DestroyBuffer(transformBuffer_);
     DestroyBuffer(indexBuffer_);
@@ -1861,17 +1863,23 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         !CreateBuffer(sizeof(transform), VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, transformBuffer_, diagnostic) ||
         !CreateBuffer(sizeof(RtHeldLightGpu), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                       uploadMemory, false, heldLightBuffer_, diagnostic) ||
+        !CreateBuffer(sizeof(RtFireEmitterGpu) * kRtFireEmitterCapacity,
+                      VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                      uploadMemory, false, fireEmitterBuffer_, diagnostic) ||
         !CreateBuffer(worldSurfaceBufferSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, uploadMemory, false, worldSurfaceBuffer_, diagnostic))
     {
         return false;
     }
 
     const RtHeldLightGpu initialHeldLight{};
+    const std::array<RtFireEmitterGpu, kRtFireEmitterCapacity> initialFireEmitters{};
     if (!WriteBuffer(vertexBuffer_, vertices.data(), vertexBufferSize, "world vertex", diagnostic) ||
         !WriteBuffer(indexBuffer_, indices.data(), indexBufferSize, "world index", diagnostic) ||
         !WriteBuffer(transformBuffer_, &transform, sizeof(transform), "world transform", diagnostic) ||
         !WriteBuffer(heldLightBuffer_, &initialHeldLight, sizeof(initialHeldLight),
                      "held light", diagnostic) ||
+        !WriteBuffer(fireEmitterBuffer_, initialFireEmitters.data(), sizeof(initialFireEmitters),
+                     "fire emitters", diagnostic) ||
         !WriteBuffer(worldSurfaceBuffer_, worldSurfaceCodes.data(), worldSurfaceBufferSize,
                      "world surface metadata", diagnostic))
     {
@@ -2729,7 +2737,7 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
     const auto& skeletonVertexBuffer_ = characterSlot_.SkeletonGpu(0u).vertices;
     const auto& secondSkeletonVertexBuffer = characterSlot_.SkeletonGpu(1u).vertices;
     const auto& lichVertexBuffer_ = characterSlot_.LichGpu().vertices;
-    const std::array<VkDescriptorSetLayoutBinding, 21u> bindings{{
+    const std::array<VkDescriptorSetLayoutBinding, 22u> bindings{{
         {0u, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, nullptr},
         {1u, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
         {2u, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
@@ -2751,6 +2759,7 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
         {kRtBindingOrmTextures, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
         {kRtBindingEmissiveTextures, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
         {kRtBindingHeldLight, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
+        {kRtBindingFireEmitters, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
     }};
     const VkDescriptorSetLayoutCreateInfo layoutInfo{
         VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
@@ -2767,7 +2776,7 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
     const std::array<VkDescriptorPoolSize, 4u> poolSizes{{
         {VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1u},
         {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1u},
-        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 10u},
+        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 11u},
         {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 9u},
     }};
     const VkDescriptorPoolCreateInfo poolInfo{
@@ -2859,6 +2868,8 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
         staticIndexBuffer_.buffer, 0u, staticIndexBuffer_.size};
     const VkDescriptorBufferInfo heldLightInfo{
         heldLightBuffer_.buffer, 0u, heldLightBuffer_.size};
+    const VkDescriptorBufferInfo fireEmitterInfo{
+        fireEmitterBuffer_.buffer, 0u, fireEmitterBuffer_.size};
 
     VkDescriptorBufferInfo lichBufferInfo{};
     lichBufferInfo.buffer = lichVertexBuffer_.buffer;
@@ -2908,7 +2919,7 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
         write.pImageInfo = info;
         return write;
     };
-    const std::array<VkWriteDescriptorSet, 21u> writes{{accelerationStructureWrite, imageWrite, skeletonWrite,
+    const std::array<VkWriteDescriptorSet, 22u> writes{{accelerationStructureWrite, imageWrite, skeletonWrite,
                                                        sampledWrite(3u, &diffuseInfo), sampledWrite(4u, &normalInfo), sampledWrite(5u, &armInfo),
                                                        worldSurfaceWrite, lichBufferWrite,
                                                        sampledWrite(8u, &lichBaseInfo), sampledWrite(9u, &lichEmissiveInfo),
@@ -2922,7 +2933,8 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
                                                        sampledWrite(kRtBindingNormalTextures, &staticNormalInfo),
                                                        sampledWrite(kRtBindingOrmTextures, &staticOrmInfo),
                                                        sampledWrite(kRtBindingEmissiveTextures, &staticEmissiveInfo),
-                                                       bufferWrite(kRtBindingHeldLight, &heldLightInfo)}};
+                                                       bufferWrite(kRtBindingHeldLight, &heldLightInfo),
+                                                       bufferWrite(kRtBindingFireEmitters, &fireEmitterInfo)}};
     vkUpdateDescriptorSets(device_, static_cast<std::uint32_t>(writes.size()), writes.data(), 0u, nullptr);
 
     diagnostic.clear();
@@ -3104,6 +3116,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const auto& secondSkeletonGpu = characterSlot_.SkeletonGpu(1u);
     const auto& lichGpu = characterSlot_.LichGpu();
     if (instanceBuffer_.memory == VK_NULL_HANDLE || heldLightBuffer_.memory == VK_NULL_HANDLE ||
+        fireEmitterBuffer_.memory == VK_NULL_HANDLE ||
         skeletonGpu.vertices.memory == VK_NULL_HANDLE ||
         secondSkeletonGpu.vertices.memory == VK_NULL_HANDLE ||
         skeletonGpu.accelerationStructure.handle == VK_NULL_HANDLE ||
@@ -3329,8 +3342,31 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         frame.heldLight.worldFromLight[13],
         frame.heldLight.worldFromLight[14],
         frame.heldLight.active ? frame.torchLightStrength : 0.0f}};
+    FireEmitterUpload fireEmitterUpload;
+    const RtSceneTuning clampedTuning = ClampRtSceneTuning(frame.tuning);
+    const FireEmitterTuning fireTuning{
+        frame.torchLightStrength * clampedTuning.fireStrengthScale,
+        clampedTuning.fireTurbulenceScale,
+        clampedTuning.fireSmokeScale};
+    const FireEmitterQuality fireQuality = frame.waterQuality == WaterQuality::High
+        ? FireEmitterQuality::High
+        : FireEmitterQuality::Mobile;
+    if (!BuildFireEmitterUpload(
+            std::span<const horde::gameplay::effects::FireEmitterState>(
+                frame.fireEmitters.data(),
+                std::min(frame.fireEmitterCount, frame.fireEmitters.size())),
+            {{frame.cameraX, 0.58f, frame.cameraZ}, frame.zone, 24.0f},
+            fireTuning,
+            fireQuality,
+            fireEmitterUpload,
+            diagnostic))
+    {
+        return false;
+    }
     if (!WriteBuffer(heldLightBuffer_, &heldLightGpu, sizeof(heldLightGpu),
                      "held light", diagnostic) ||
+        !WriteBuffer(fireEmitterBuffer_, fireEmitterUpload.emitters.data(),
+                     sizeof(fireEmitterUpload.emitters), "fire emitters", diagnostic) ||
         !WriteBuffer(instanceBuffer_, instances.data(), sizeof(instances),
                      "animated TLAS instance", diagnostic))
     {

@@ -6,6 +6,7 @@
 
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/SwordCombat.h"
+#include "gameplay/effects/FireEmitterState.h"
 #include "gameplay/items/HeldItemState.h"
 #include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/simulation/GameplayEvent.h"
@@ -79,6 +80,10 @@ struct SimulationSnapshot
     PlayerCombatSnapshot playerCombat{};
     LichSnapshot lich{};
     PlayerVitalsSnapshot playerVitals{};
+
+    std::array<horde::gameplay::effects::FireEmitterState,
+               horde::gameplay::effects::kFireEmitterCapacity> fireEmitters{};
+    std::size_t fireEmitterCount = 0u;
 
     std::uint32_t simulationTicksThisFrame = 0;
     double fixedStepAccumulatorSeconds = 0.0;

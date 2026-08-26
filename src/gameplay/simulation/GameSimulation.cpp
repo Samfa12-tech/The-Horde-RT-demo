@@ -53,6 +53,7 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
     combatSnapshot_ = swordCombat_.Snapshot();
     torchFailureSnapshot_ = torchFailure_.Snapshot();
     ResolveHeldItems();
+    ResolveFireEmitters(0.0f);
     RefreshSnapshot(lastInput_);
 }
 
@@ -144,6 +145,7 @@ void GameSimulation::StepFixed(const InputSnapshot& input,
                                            playerPitchRadians_);
         UpdateEncounters(input, fixedDeltaSeconds);
         ResolveHeldItems();
+        ResolveFireEmitters(fixedDeltaSeconds);
     }
     else
     {
@@ -192,6 +194,8 @@ void GameSimulation::ResetRoute()
                                            playerZ_,
                                            playerYawRadians_);
     ResolveHeldItems();
+    horde::gameplay::effects::ResetFireEmitter(fireEmitters_[0]);
+    ResolveFireEmitters(0.0f);
     RefreshSnapshot(lastInput_);
 }
 
@@ -329,6 +333,8 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
     }
     fixedStepRunner_.ResetAccumulator();
     ResolveHeldItems();
+    horde::gameplay::effects::ResetFireEmitter(fireEmitters_[0]);
+    ResolveFireEmitters(0.0f);
     RefreshSnapshot(lastInput_);
     snapshot_.eventsEmittedThisTick = 0u;
     return true;
@@ -352,6 +358,18 @@ void GameSimulation::ResolveHeldItems()
     // state rather than publishing a renderer-authored fallback.
     horde::gameplay::items::ResolveHeldItemsFixedStep(
         heldItems_, input, tickIndex_, heldItemFixedStepState_, diagnostic);
+}
+
+void GameSimulation::ResolveFireEmitters(const float fixedDeltaSeconds)
+{
+    horde::gameplay::effects::StepFireEmitterFixed(
+        fireEmitters_[0],
+        {heldItemFixedStepState_.light.worldFromFlame,
+         heldItemFixedStepState_.light.worldFromLight,
+         torchFailureSnapshot_.flameStrength,
+         1.0f,
+         QueryShowcaseZone(playerX_, playerZ_)},
+        fixedDeltaSeconds);
 }
 
 void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSeconds)
@@ -756,6 +774,8 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.playerCombat = combatSnapshot_.player;
     snapshot_.lich = lichEncounter_.Snapshot();
     snapshot_.playerVitals = playerVitals_.Snapshot();
+    snapshot_.fireEmitters = fireEmitters_;
+    snapshot_.fireEmitterCount = fireEmitterCount_;
     snapshot_.fixedStepAccumulatorSeconds = fixedStepRunner_.AccumulatorSeconds();
     snapshot_.catchUpOverrunCount = fixedStepRunner_.OverrunCount();
     snapshot_.queuedEventCount = events_.Size();
