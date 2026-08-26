@@ -118,14 +118,25 @@ endif()
 
 if(BUILD_TESTING)
     add_executable(horde_rt_held_item_socket_tests tests/HeldItemSocketTests.cpp)
-    target_include_directories(horde_rt_held_item_socket_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_include_directories(horde_rt_held_item_socket_tests PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_SOURCE_DIR}
+    )
     target_sources(horde_rt_held_item_socket_tests PRIVATE
+        src/scene/assets/AssetManifest.cpp
+        src/scene/assets/AssetValidation.cpp
+        src/scene/assets/GltfDocument.cpp
+        src/scene/assets/StaticMeshAsset.cpp
         src/gameplay/items/HeldItemState.cpp
         src/gameplay/items/HeldLightState.cpp
         src/gameplay/items/HeldItemKinematics.cpp
         src/vulkan/raytracing/HeldItemRenderSlot.cpp
+        src/vulkan/raytracing/RtStaticMeshSlot.cpp
     )
     target_link_libraries(horde_rt_held_item_socket_tests PRIVATE horde_gameplay_simulation)
+    target_compile_definitions(horde_rt_held_item_socket_tests PRIVATE
+        HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
+    )
     add_test(NAME horde_rt_held_item_socket_tests COMMAND horde_rt_held_item_socket_tests)
 
     add_executable(horde_rt_development_static_asset_tests tests/DevelopmentStaticAssetTests.cpp)

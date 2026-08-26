@@ -3,10 +3,12 @@
 #include "gameplay/items/HeldItemState.h"
 #include "gameplay/simulation/GameSimulation.h"
 #include "vulkan/raytracing/HeldItemRenderSlot.h"
+#include "vulkan/raytracing/RtStaticMeshSlot.h"
 
 #include <array>
 #include <cmath>
 #include <cstdint>
+#include <filesystem>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -229,6 +231,117 @@ void TestSharedKinematicsOwnsWallDepthHandsAndSwordPose()
           "torch lowering and sword parry must share the authored hand-target evaluator");
 }
 
+void TestProductionSwordAssetMeetsGenericSocketAndPbrBudget()
+{
+    const std::filesystem::path root = HORDE_RT_SOURCE_DIR;
+    const auto directory = root / "assets/models/weapons/runtime";
+    horde::scene::assets::AssetManifest manifest;
+    horde::scene::assets::StaticMeshAsset asset;
+    std::string diagnostic;
+    Check(horde::scene::assets::AssetManifest::Load(
+              directory / "asset.manifest.json", manifest, diagnostic),
+          "production sword manifest must load through the real schema parser");
+    Check(horde::scene::assets::StaticMeshAsset::Load(
+              directory / "gothic-arming-sword-rh-lod0.runtime.glb",
+              manifest,
+              asset,
+              diagnostic),
+          "production sword GLB must load through the generic static PBR reader");
+    if (!asset.indices.empty())
+    {
+        const std::size_t triangles = asset.indices.size() / 3u;
+        Check(triangles >= 8000u && triangles <= 12500u && asset.materials.size() <= 2u,
+              "production sword must stay inside the approved runtime triangle/material budget");
+        const auto* grip = horde::gameplay::items::FindHeldItemSocket(asset.sockets, "Grip");
+        Check(grip != nullptr &&
+                  horde::gameplay::items::ValidateHeldItemSocketTransform(
+                      grip->world, diagnostic),
+              "production sword must retain an exact rigid Grip socket");
+        Check(asset.materials[0].emissiveTexture < 0 &&
+                  asset.materials[0].emissiveFactor == std::array<float, 3u>{},
+              "production sword must not carry emissive or magical material data");
+    }
+}
+
+void TestProductionTorchAssetMeetsGenericSocketAndPbrBudget()
+{
+    const std::filesystem::path root = HORDE_RT_SOURCE_DIR;
+    const auto directory = root / "assets/models/props/runtime";
+    horde::scene::assets::AssetManifest manifest;
+    horde::scene::assets::StaticMeshAsset asset;
+    std::string diagnostic;
+    Check(horde::scene::assets::AssetManifest::Load(
+              directory / "asset.manifest.json", manifest, diagnostic),
+          "production torch manifest must load through the real schema parser");
+    Check(horde::scene::assets::StaticMeshAsset::Load(
+              directory / "gothic-hand-torch-lod0.runtime.glb",
+              manifest,
+              asset,
+              diagnostic),
+          "production torch GLB must load through the generic static PBR reader");
+    if (!asset.indices.empty())
+    {
+        const std::size_t triangles = asset.indices.size() / 3u;
+        Check(triangles >= 3000u && triangles <= 6000u && asset.materials.size() <= 2u,
+              "production torch must stay inside the approved runtime triangle/material budget");
+        for (const char* socketName : {"Grip", "Flame", "Light"})
+        {
+            const auto* socket = horde::gameplay::items::FindHeldItemSocket(asset.sockets, socketName);
+            Check(socket != nullptr &&
+                      horde::gameplay::items::ValidateHeldItemSocketTransform(
+                          socket->world, diagnostic),
+                  "production torch must retain exact rigid Grip, Flame, and Light sockets");
+        }
+        Check(asset.materials[0].emissiveTexture < 0 &&
+                  asset.materials[0].emissiveFactor == std::array<float, 3u>{},
+              "production torch body must not carry flame geometry or emissive material data");
+    }
+}
+
+void TestProductionAssetsShareOneGenericStaticSlot()
+{
+    const std::filesystem::path root = HORDE_RT_SOURCE_DIR;
+    horde::scene::assets::AssetManifest swordManifest;
+    horde::scene::assets::AssetManifest torchManifest;
+    horde::scene::assets::StaticMeshAsset sword;
+    horde::scene::assets::StaticMeshAsset torch;
+    std::string diagnostic;
+    const auto swordDirectory = root / "assets/models/weapons/runtime";
+    const auto torchDirectory = root / "assets/models/props/runtime";
+    Check(horde::scene::assets::AssetManifest::Load(
+              swordDirectory / "asset.manifest.json", swordManifest, diagnostic) &&
+              horde::scene::assets::StaticMeshAsset::Load(
+                  swordDirectory / "gothic-arming-sword-rh-lod0.runtime.glb",
+                  swordManifest, sword, diagnostic) &&
+              horde::scene::assets::AssetManifest::Load(
+                  torchDirectory / "asset.manifest.json", torchManifest, diagnostic) &&
+              horde::scene::assets::StaticMeshAsset::Load(
+                  torchDirectory / "gothic-hand-torch-lod0.runtime.glb",
+                  torchManifest, torch, diagnostic),
+          "both production assets must load before generic slot registration");
+    std::array<horde::vulkan::raytracing::StaticRtAssetRegistration, 2u> registrations{{
+        {3u, 0x53574f52u,
+         static_cast<std::uint32_t>(horde::vulkan::raytracing::RtInstanceFlag::StaticPbr),
+         0u, &sword},
+        {1u, 0x544f5243u,
+         static_cast<std::uint32_t>(horde::vulkan::raytracing::RtInstanceFlag::StaticPbr),
+         1u, &torch},
+    }};
+    horde::vulkan::raytracing::RtStaticMeshSlot slot;
+    Check(slot.Initialize(registrations, diagnostic),
+          "sword and torch must register through one generic static PBR slot");
+    const auto& metadata = slot.InstanceMetadata();
+    Check(metadata[3].primitiveCount == sword.primitives.size() &&
+              metadata[1].primitiveCount == torch.primitives.size() &&
+              metadata[1].emitterIndex == 1u &&
+              metadata[3].emitterIndex == 0u,
+          "generic registrations must retain stable TLAS routes and engine-emitter ownership");
+    const auto counts = slot.TextureArrayCounts();
+    Check(counts.baseColor == 2u && counts.normal == 2u && counts.orm == 2u &&
+              counts.emissive == 0u,
+          "generic material routing must match the audited shared texture array layers");
+}
+
 } // namespace
 
 int main()
@@ -244,6 +357,9 @@ int main()
     TestFlameAndLightSocketsFollowTheComposedItem();
     TestSimulationOwnsResetAndCheckpointParentState();
     TestSharedKinematicsOwnsWallDepthHandsAndSwordPose();
+    TestProductionSwordAssetMeetsGenericSocketAndPbrBudget();
+    TestProductionTorchAssetMeetsGenericSocketAndPbrBudget();
+    TestProductionAssetsShareOneGenericStaticSlot();
     if (failures == 0)
     {
         std::cout << "Held-item socket contracts passed.\n";

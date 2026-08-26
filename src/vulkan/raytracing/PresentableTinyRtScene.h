@@ -9,6 +9,7 @@
 
 #include "gameplay/SwordCombat.h"
 #include "gameplay/ShowcaseGameplay.h"
+#include "gameplay/items/HeldItemState.h"
 #include "vulkan/raytracing/CharacterRenderSlot.h"
 #include "vulkan/raytracing/RtGpuResources.h"
 #include "vulkan/raytracing/RtSceneTuning.h"
@@ -55,6 +56,7 @@ struct RtSceneFrameInputs
                horde::gameplay::simulation::kSkeletonEnemyCapacity> skeletonEnemies{};
     std::size_t skeletonEnemyCount = 0u;
     horde::gameplay::TorchFailureSnapshot torchFailure{};
+    horde::gameplay::items::HeldItemStates heldItems{};
     horde::gameplay::EnemyRosterSnapshot roster{};
     horde::gameplay::LichSnapshot lich{};
 };
@@ -94,7 +96,8 @@ public:
                     const std::string& materialAssetDirectory,
                     const std::string& lichTextureDirectory,
                     std::string& diagnostic,
-                    const std::string& developmentStaticAssetDirectory = {});
+                    const std::string& developmentStaticAssetDirectory = {},
+                    const std::string& productionAssetRoot = {});
 
     void Destroy();
 
@@ -158,7 +161,9 @@ private:
     bool SupportsTextureArrayFormat(VkFormat format) const;
     bool CreateMaterialTextures(const std::string& directory, std::string& diagnostic);
     bool CreateLichTextures(const std::string& directory, std::string& diagnostic);
-    bool LoadDevelopmentStaticAsset(const std::string& directory, std::string& diagnostic);
+    bool LoadStaticHeldItemAssets(const std::string& developmentDirectory,
+                                  const std::string& productionAssetRoot,
+                                  std::string& diagnostic);
     bool CreateStaticMeshResources(std::string& diagnostic);
     bool BuildAccelerationStructures(std::string& diagnostic);
     bool CreateDescriptors(std::string& diagnostic);
@@ -223,9 +228,12 @@ private:
     RtGpuResources gpuResources_;
     CharacterRenderSlot characterSlot_;
     horde::scene::assets::StaticMeshAsset developmentStaticAsset_;
+    horde::scene::assets::StaticMeshAsset productionTorchAsset_;
     std::string developmentStaticAssetDirectory_;
+    std::string staticTextureDirectory_;
     RtStaticMeshSlot staticMeshSlot_;
     bool genericStaticAssetEnabled_ = false;
+    bool productionHeldItemAssetsEnabled_ = false;
     VkDeviceSize staticMeshBlasBytes_ = 0u;
     VkDeviceSize staticTextureBytes_ = 0u;
     double staticMeshBlasBuildMilliseconds_ = 0.0;

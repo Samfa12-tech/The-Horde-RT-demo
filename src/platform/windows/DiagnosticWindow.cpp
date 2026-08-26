@@ -223,6 +223,7 @@ struct VulkanSurfaceContext
     std::uint64_t gpuFrameSubmissionSequence = 0u;
     bool useRtPath = false;
     std::string developmentCheckpoint;
+    std::string lastRtFrameError;
     bool controlsEnabled = false;
     bool simulationPaused = true;
     bool pauseMenuVisible = true;
@@ -3253,7 +3254,8 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx)
                                 (assetRoot / "textures/polyhaven/mobile_1k").string(),
                                 (assetRoot / "textures/meshy/lich_placeholder_v01").string(),
                                 diagnostic,
-                                developmentStaticAssetDirectory))
+                                developmentStaticAssetDirectory,
+                                assetRoot.string()))
     {
         std::cerr << "Failed to initialise presentable RT scene: " << diagnostic << '\n';
         MessageBoxA(ctx.windowHandle,
@@ -3478,6 +3480,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
                 ctx.gpuFrameTimer.CancelRecording(ctx.currentFrame);
             }
             std::cerr << "Failed to record RT frame: " << diagnostic << '\n';
+            ctx.lastRtFrameError = diagnostic;
             return false;
         }
         if (gpuTimingRecording &&
@@ -3778,7 +3781,7 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
     for (const horde::gameplay::ShowcaseCheckpoint* checkpointPointer : checkpoints)
     {
         const horde::gameplay::ShowcaseCheckpoint& checkpoint = *checkpointPointer;
-        if (checkpoint.id == 100)
+        if (checkpoint.id >= 100)
         {
             const auto* development =
                 horde::gameplay::FindDevelopmentCheckpoint(context.developmentCheckpoint);
@@ -3801,7 +3804,10 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             if (!RenderFrame(context, clearColor, rtFramePresented) || !rtFramePresented)
             {
                 return fail(std::string("Checkpoint '") + checkpoint.name +
-                            "' did not reach a successful RT swapchain presentation.");
+                            "' did not reach a successful RT swapchain presentation" +
+                            (context.lastRtFrameError.empty()
+                                ? "."
+                                : ": " + context.lastRtFrameError));
             }
             const auto frameEnd = std::chrono::steady_clock::now();
             frameTimesMs.push_back(std::chrono::duration<double, std::milli>(frameEnd - frameStart).count());

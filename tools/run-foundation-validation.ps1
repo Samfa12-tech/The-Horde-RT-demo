@@ -247,7 +247,16 @@ function Write-ValidationPackage {
         @{ Source = "assets\textures\meshy\lich_placeholder_v01\emissive-2048-rgba8.ktx2"; Destination = "assets\textures\meshy\lich_placeholder_v01" },
         @{ Source = "assets\textures\polyhaven\mobile_1k\diff-array-512.rgba"; Destination = "assets\textures\polyhaven\mobile_1k" },
         @{ Source = "assets\textures\polyhaven\mobile_1k\normal-array-512.rgba"; Destination = "assets\textures\polyhaven\mobile_1k" },
-        @{ Source = "assets\textures\polyhaven\mobile_1k\arm-array-512.rgba"; Destination = "assets\textures\polyhaven\mobile_1k" }
+        @{ Source = "assets\textures\polyhaven\mobile_1k\arm-array-512.rgba"; Destination = "assets\textures\polyhaven\mobile_1k" },
+        @{ Source = "assets\models\weapons\runtime\asset.manifest.json"; Destination = "assets\models\weapons\runtime" },
+        @{ Source = "assets\models\weapons\runtime\gothic-arming-sword-rh-lod0.runtime.glb"; Destination = "assets\models\weapons\runtime" },
+        @{ Source = "assets\models\props\runtime\asset.manifest.json"; Destination = "assets\models\props\runtime" },
+        @{ Source = "assets\models\props\runtime\gothic-hand-torch-lod0.runtime.glb"; Destination = "assets\models\props\runtime" },
+        @{ Source = "assets\textures\held-items\runtime\asset.manifest.json"; Destination = "assets\textures\held-items\runtime" },
+        @{ Source = "assets\textures\held-items\runtime\base-color.windows.ktx2"; Destination = "assets\textures\held-items\runtime" },
+        @{ Source = "assets\textures\held-items\runtime\normal.windows.ktx2"; Destination = "assets\textures\held-items\runtime" },
+        @{ Source = "assets\textures\held-items\runtime\orm.windows.ktx2"; Destination = "assets\textures\held-items\runtime" },
+        @{ Source = "assets\textures\held-items\runtime\emissive.windows.ktx2"; Destination = "assets\textures\held-items\runtime" }
     )
     foreach ($copy in $copies) {
         $destination = Join-Path $windowsStage $copy.Destination
@@ -290,9 +299,15 @@ function Test-ValidationPackages {
         "assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb",
         "assets/textures/meshy/lich_placeholder_v01/base-color-2048-rgba8.ktx2",
         "assets/textures/polyhaven/mobile_1k/diff-array-512.rgba",
+        "assets/models/weapons/runtime/asset.manifest.json",
+        "assets/models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb",
+        "assets/models/props/runtime/asset.manifest.json",
+        "assets/models/props/runtime/gothic-hand-torch-lod0.runtime.glb",
+        "assets/textures/held-items/runtime/asset.manifest.json",
+        "assets/textures/held-items/runtime/base-color.windows.ktx2",
         "assets/audio/filmcow/sword_swing_1.wav",
         "assets/audio/pixabay/waterfall_loop.wav"))
-    foreach ($forbidden in @("assets/models/weapons/", "runtime-development", "gothic_arming_sword")) {
+    foreach ($forbidden in @("/source/", "/high/", "runtime-development", "gothic_arming_sword", ".android.ktx2")) {
         if (@($entries | Where-Object { $_ -like "*$forbidden*" }).Count -ne 0) {
             throw "Windows validation zip contains forbidden development static asset content: $forbidden"
         }
@@ -303,10 +318,19 @@ function Test-ValidationPackages {
         "assets/textures/polyhaven/mobile_1k/normal-array-512-astc4x4.ktx2",
         "assets/textures/polyhaven/mobile_1k/arm-array-512-astc6x6.ktx2",
         "assets/textures/meshy/lich_placeholder_v01/base-color-2048-astc6x6.ktx2",
+        "assets/models/weapons/runtime/asset.manifest.json",
+        "assets/models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb",
+        "assets/models/props/runtime/asset.manifest.json",
+        "assets/models/props/runtime/gothic-hand-torch-lod0.runtime.glb",
+        "assets/textures/held-items/runtime/asset.manifest.json",
+        "assets/textures/held-items/runtime/base-color.android.ktx2",
+        "assets/textures/held-items/runtime/normal.android.ktx2",
+        "assets/textures/held-items/runtime/orm.android.ktx2",
+        "assets/textures/held-items/runtime/emissive.android.ktx2",
         "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb",
         "assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb",
         "assets/audio/pixabay/waterfall_loop.wav"))
-    foreach ($forbidden in @("assets/models/weapons/", "runtime-development", "gothic_arming_sword")) {
+    foreach ($forbidden in @("/source/", "/high/", "runtime-development", "gothic_arming_sword", ".windows.ktx2")) {
         if (@($entries | Where-Object { $_ -like "*$forbidden*" }).Count -ne 0) {
             throw "Android validation APK contains forbidden development static asset content: $forbidden"
         }

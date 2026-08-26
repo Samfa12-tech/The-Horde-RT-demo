@@ -1,6 +1,8 @@
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
 
 #include "gameplay/items/HeldItemKinematics.h"
+#include "gameplay/items/HeldLightState.h"
+#include "vulkan/raytracing/HeldItemRenderSlot.h"
 
 #include <algorithm>
 #include <array>
@@ -283,9 +285,13 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     characterSlot_ = std::move(other.characterSlot_);
     other.characterSlot_ = {};
     developmentStaticAsset_ = std::move(other.developmentStaticAsset_);
+    productionTorchAsset_ = std::move(other.productionTorchAsset_);
     developmentStaticAssetDirectory_ = std::move(other.developmentStaticAssetDirectory_);
+    staticTextureDirectory_ = std::move(other.staticTextureDirectory_);
     staticMeshSlot_ = std::move(other.staticMeshSlot_);
     genericStaticAssetEnabled_ = std::exchange(other.genericStaticAssetEnabled_, false);
+    productionHeldItemAssetsEnabled_ =
+        std::exchange(other.productionHeldItemAssetsEnabled_, false);
     staticMeshBlasBytes_ = std::exchange(other.staticMeshBlasBytes_, 0u);
     staticTextureBytes_ = std::exchange(other.staticTextureBytes_, 0u);
     staticMeshBlasBuildMilliseconds_ = std::exchange(other.staticMeshBlasBuildMilliseconds_, 0.0);
@@ -327,7 +333,8 @@ bool PresentableTinyRtScene::Initialise(VkInstance instance,
                                         const std::string& materialAssetDirectory,
                                         const std::string& lichTextureDirectory,
                                         std::string& diagnostic,
-                                        const std::string& developmentStaticAssetDirectory)
+                                        const std::string& developmentStaticAssetDirectory,
+                                        const std::string& productionAssetRoot)
 {
     Destroy();
 
@@ -363,7 +370,8 @@ bool PresentableTinyRtScene::Initialise(VkInstance instance,
         return false;
     }
     gpuResources_.Bind(physicalDevice_, device_, vkDestroyAccelerationStructureKHR_, vkGetBufferDeviceAddressKHR_);
-    if (!LoadDevelopmentStaticAsset(developmentStaticAssetDirectory, diagnostic) ||
+    if (!LoadStaticHeldItemAssets(
+            developmentStaticAssetDirectory, productionAssetRoot, diagnostic) ||
         !CreateStorageImage(diagnostic) ||
         !CreateMaterialTextures(materialAssetDirectory, diagnostic) ||
         !CreateLichTextures(lichTextureDirectory, diagnostic) ||
@@ -451,9 +459,12 @@ void PresentableTinyRtScene::Destroy()
     DestroyTextureArray(staticBaseColor_);
     materialEncoding_.clear();
     developmentStaticAsset_ = {};
+    productionTorchAsset_ = {};
     developmentStaticAssetDirectory_.clear();
+    staticTextureDirectory_.clear();
     staticMeshSlot_ = {};
     genericStaticAssetEnabled_ = false;
+    productionHeldItemAssetsEnabled_ = false;
     staticMeshBlasBytes_ = 0u;
     staticTextureBytes_ = 0u;
     staticMeshBlasBuildMilliseconds_ = 0.0;
@@ -1010,39 +1021,52 @@ bool PresentableTinyRtScene::CreateLichTextures(const std::string& directory, st
     return true;
 }
 
-bool PresentableTinyRtScene::LoadDevelopmentStaticAsset(const std::string& directory,
-                                                        std::string& diagnostic)
+bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
+    const std::string& developmentDirectory,
+    const std::string& productionAssetRoot,
+    std::string& diagnostic)
 {
-    genericStaticAssetEnabled_ = !directory.empty();
-    developmentStaticAssetDirectory_ = directory;
+    (void)developmentDirectory;
+    genericStaticAssetEnabled_ = !productionAssetRoot.empty();
+    productionHeldItemAssetsEnabled_ = !productionAssetRoot.empty();
+    developmentStaticAssetDirectory_.clear();
+    staticTextureDirectory_.clear();
     developmentStaticAsset_ = {};
-    if (!genericStaticAssetEnabled_)
+    productionTorchAsset_ = {};
+    if (!productionHeldItemAssetsEnabled_)
     {
-        return staticMeshSlot_.Initialize({}, diagnostic);
-    }
-
-    const std::filesystem::path assetDirectory(directory);
-    horde::scene::assets::AssetManifest manifest;
-    if (!horde::scene::assets::AssetManifest::Load(
-            assetDirectory / "asset.manifest.json", manifest, diagnostic) ||
-        !horde::scene::assets::StaticMeshAsset::Load(
-            assetDirectory / "gothic_arming_sword_rh_lod1.runtime.glb",
-            manifest,
-            developmentStaticAsset_,
-            diagnostic))
-    {
+        diagnostic = "Production held-item asset root is required; procedural sword/torch bodies are retired.";
         return false;
     }
-    constexpr StaticRtAssetRegistration registration{
-        3u,
-        0x53574f52u,
-        static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
-        0u,
-        nullptr};
-    StaticRtAssetRegistration resolved = registration;
-    resolved.asset = &developmentStaticAsset_;
-    return staticMeshSlot_.Initialize(std::span<const StaticRtAssetRegistration>(&resolved, 1u),
-                                      diagnostic);
+
+    const std::filesystem::path root(productionAssetRoot);
+    const auto swordDirectory = root / "models/weapons/runtime";
+    const auto torchDirectory = root / "models/props/runtime";
+    horde::scene::assets::AssetManifest swordManifest;
+    horde::scene::assets::AssetManifest torchManifest;
+    if (!horde::scene::assets::AssetManifest::Load(
+            swordDirectory / "asset.manifest.json", swordManifest, diagnostic) ||
+        !horde::scene::assets::StaticMeshAsset::Load(
+            swordDirectory / "gothic-arming-sword-rh-lod0.runtime.glb",
+            swordManifest,
+            developmentStaticAsset_,
+            diagnostic) ||
+        !horde::scene::assets::AssetManifest::Load(
+            torchDirectory / "asset.manifest.json", torchManifest, diagnostic) ||
+        !horde::scene::assets::StaticMeshAsset::Load(
+            torchDirectory / "gothic-hand-torch-lod0.runtime.glb",
+            torchManifest,
+            productionTorchAsset_,
+            diagnostic))
+        return false;
+    staticTextureDirectory_ = (root / "textures/held-items/runtime").string();
+    std::array<StaticRtAssetRegistration, 2u> registrations{{
+        {3u, 0x53574f52u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
+         0u, &developmentStaticAsset_},
+        {1u, 0x544f5243u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
+         1u, &productionTorchAsset_},
+    }};
+    return staticMeshSlot_.Initialize(registrations, diagnostic);
 }
 
 bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
@@ -1098,26 +1122,46 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
         std::max(textureCounts.normal, 1u),
         std::max(textureCounts.orm, 1u),
         std::max(textureCounts.emissive, 1u)}};
-    for (std::uint32_t dimension = 512u; dimension > 0u; dimension >>= 1u)
+    const std::uint32_t textureDimension = productionHeldItemAssetsEnabled_ ? 1024u : 512u;
+    for (std::uint32_t dimension = textureDimension; dimension > 0u; dimension >>= 1u)
         staticTextureBytes_ += static_cast<VkDeviceSize>(dimension) * dimension * 4u *
             (actualTextureLayers[0] + actualTextureLayers[1] +
              actualTextureLayers[2] + actualTextureLayers[3]);
-    const std::filesystem::path assetDirectory(developmentStaticAssetDirectory_);
+    const std::filesystem::path assetDirectory(staticTextureDirectory_);
     const auto path = [&assetDirectory](const char* name) {
         return (assetDirectory / name).string();
     };
 #if defined(__ANDROID__)
-    diagnostic = "Development static assets cannot be enabled in an Android package.";
-    return false;
+    if (!productionHeldItemAssetsEnabled_)
+    {
+        diagnostic = "Development static assets cannot be enabled in an Android package.";
+        return false;
+    }
+    if (!SupportsTextureArrayFormat(VK_FORMAT_ASTC_6x6_SRGB_BLOCK) ||
+        !SupportsTextureArrayFormat(VK_FORMAT_ASTC_4x4_UNORM_BLOCK) ||
+        !SupportsTextureArrayFormat(VK_FORMAT_ASTC_6x6_UNORM_BLOCK))
+    {
+        diagnostic = "Production held-item PBR requires sampled ASTC 4x4/6x6 support; no uncompressed Android fallback is allowed.";
+        return false;
+    }
+    if (!CreateTexture(path("base-color.android.ktx2"), VK_FORMAT_ASTC_6x6_SRGB_BLOCK,
+                       textureDimension, textureDimension, actualTextureLayers[0], staticBaseColor_, diagnostic) ||
+        !CreateTexture(path("normal.android.ktx2"), VK_FORMAT_ASTC_4x4_UNORM_BLOCK,
+                       textureDimension, textureDimension, actualTextureLayers[1], staticNormal_, diagnostic) ||
+        !CreateTexture(path("orm.android.ktx2"), VK_FORMAT_ASTC_6x6_UNORM_BLOCK,
+                       textureDimension, textureDimension, actualTextureLayers[2], staticOrm_, diagnostic) ||
+        !CreateTexture(path("emissive.android.ktx2"), VK_FORMAT_ASTC_6x6_SRGB_BLOCK,
+                       textureDimension, textureDimension, actualTextureLayers[3], staticEmissive_, diagnostic))
+        return false;
 #else
     if (!CreateTexture(path("base-color.windows.ktx2"), VK_FORMAT_R8G8B8A8_SRGB,
-                       512u, 512u, actualTextureLayers[0], staticBaseColor_, diagnostic) ||
+                       textureDimension, textureDimension, actualTextureLayers[0], staticBaseColor_, diagnostic) ||
         !CreateTexture(path("normal.windows.ktx2"), VK_FORMAT_R8G8B8A8_UNORM,
-                       512u, 512u, actualTextureLayers[1], staticNormal_, diagnostic) ||
+                       textureDimension, textureDimension, actualTextureLayers[1], staticNormal_, diagnostic) ||
         !CreateTexture(path("orm.windows.ktx2"), VK_FORMAT_R8G8B8A8_UNORM,
-                       512u, 512u, actualTextureLayers[2], staticOrm_, diagnostic) ||
+                       textureDimension, textureDimension, actualTextureLayers[2], staticOrm_, diagnostic) ||
         !CreateTexture(path("emissive.windows.ktx2"), VK_FORMAT_R8G8B8A8_SRGB,
-                       512u, 512u, actualTextureLayers[3], staticEmissive_, diagnostic))
+                       textureDimension, textureDimension, actualTextureLayers[3], staticEmissive_, diagnostic))
     {
         return false;
     }
@@ -1659,18 +1703,8 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     addBox(-34.90f, 1.30f, -16.60f, -32.50f, 1.42f, -13.80f);
     const std::uint32_t finaleRoofIndexCount = static_cast<std::uint32_t>(indices.size());
 
-    // The camera-held props share upload buffers but use separate BLAS instances
-    // so the sword can swing without moving the torch or its light estimate.
-    // Keep this torch deliberately compact for phone RT: a solid wooden shaft,
-    // iron collar/cage and two nested faceted flames replace the old four-triangle
-    // proof while the generated Meshy LOD waits for the measured static-GLB path.
-    addBox(-0.034f, -0.44f, -0.034f, 0.034f, 0.12f, 0.034f);     // wood shaft: 12 triangles
-    addBox(-0.11f, 0.09f, -0.11f, 0.11f, 0.15f, 0.11f);         // iron lower collar
-    addBox(-0.105f, 0.14f, -0.105f, -0.075f, 0.35f, -0.075f);   // cage bars
-    addBox(0.075f, 0.14f, -0.105f, 0.105f, 0.35f, -0.075f);
-    addBox(-0.105f, 0.14f, 0.075f, -0.075f, 0.35f, 0.105f);
-    addBox(0.075f, 0.14f, 0.075f, 0.105f, 0.35f, 0.105f);
-    addBox(-0.115f, 0.33f, -0.115f, 0.115f, 0.38f, 0.115f);     // iron upper collar
+    // The production torch body comes through the generic static GLB/PBR slot.
+    // Retain only the temporary engine-owned faceted flame core for Task 4.
     const auto addFacetedFlame = [&addTriangle](float radius, float bottom, float waist, float top) {
         const Vertex lower{{0.0f, bottom, 0.0f}};
         const Vertex upper{{0.0f, top, 0.0f}};
@@ -1685,22 +1719,26 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
             addTriangle(upper, current, next);
         }
     };
-    addFacetedFlame(0.095f, 0.16f, 0.31f, 0.58f);               // orange outer flame: 8 triangles
-    addFacetedFlame(0.050f, 0.19f, 0.30f, 0.47f);               // bright inner flame: 8 triangles
+    float engineFlameOffset = 0.0f;
+    if (productionHeldItemAssetsEnabled_)
+    {
+        const auto* flameSocket = horde::gameplay::items::FindHeldItemSocket(
+            productionTorchAsset_.sockets, "Flame");
+        if (flameSocket == nullptr)
+        {
+            diagnostic = "Production torch is missing the exact Flame socket.";
+            return false;
+        }
+        engineFlameOffset = flameSocket->world[13] - 0.31f;
+    }
+    addFacetedFlame(0.095f, 0.16f + engineFlameOffset, 0.31f + engineFlameOffset,
+                    0.58f + engineFlameOffset);                 // orange outer flame: 8 triangles
+    addFacetedFlame(0.050f, 0.19f + engineFlameOffset, 0.30f + engineFlameOffset,
+                    0.47f + engineFlameOffset);                 // bright inner flame: 8 triangles
     const std::uint32_t torchIndexCount = static_cast<std::uint32_t>(indices.size());
 
-    // Low-poly player sword proof, angled inward from the right hand. The
-    // textured 12k LOD replaces this when static GLB/PBR upload is available.
-    constexpr float swordZ = 0.025f;
-    addQuad({{1.43f, -0.66f, swordZ}}, {{1.51f, -0.66f, swordZ}}, {{1.51f, -0.31f, swordZ}}, {{1.43f, -0.31f, swordZ}});
-    addQuad({{1.18f, -0.34f, swordZ}}, {{1.72f, -0.34f, swordZ}}, {{1.70f, -0.25f, swordZ}}, {{1.20f, -0.25f, swordZ}});
-    addQuad({{1.37f, -0.26f, swordZ}}, {{1.51f, -0.26f, swordZ}}, {{1.14f, 1.12f, swordZ}}, {{1.04f, 1.09f, swordZ}});
-    addTriangle({{1.04f, 1.09f, swordZ}}, {{1.14f, 1.12f, swordZ}}, {{1.00f, 1.34f, swordZ}});
-    addQuad({{1.51f, -0.66f, -swordZ}}, {{1.43f, -0.66f, -swordZ}}, {{1.43f, -0.31f, -swordZ}}, {{1.51f, -0.31f, -swordZ}});
-    addQuad({{1.72f, -0.34f, -swordZ}}, {{1.18f, -0.34f, -swordZ}}, {{1.20f, -0.25f, -swordZ}}, {{1.70f, -0.25f, -swordZ}});
-    addQuad({{1.51f, -0.26f, -swordZ}}, {{1.37f, -0.26f, -swordZ}}, {{1.04f, 1.09f, -swordZ}}, {{1.14f, 1.12f, -swordZ}});
-    addTriangle({{1.14f, 1.12f, -swordZ}}, {{1.04f, 1.09f, -swordZ}}, {{1.00f, 1.34f, -swordZ}});
-
+    // The procedural sword proof is retired; instance 3 always uses the
+    // production static GLB/PBR registration.
     const std::uint32_t swordIndexCount = static_cast<std::uint32_t>(indices.size());
 
     // A layered low-poly travelling coat replaces the original two-box torso
@@ -2004,19 +2042,94 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     finaleRoofAddressInfo.accelerationStructure = finaleRoofBlas_.handle;
     finaleRoofBlas_.address = vkGetAccelerationStructureDeviceAddressKHR_(device_, &finaleRoofAddressInfo);
 
-    VkAccelerationStructureBuildRangeInfoKHR torchRange{};
-    torchRange.primitiveCount = torchPrimitiveCount;
-    torchRange.primitiveOffset = finaleRoofIndexCount * sizeof(std::uint32_t);
-    // addQuad writes absolute indices into the shared vertex buffer, so no vertex offset belongs here.
-    torchRange.firstVertex = 0u;
+    const auto appendStaticGeometries = [this, &diagnostic](
+        const std::uint32_t instanceCustomIndex,
+        std::vector<VkAccelerationStructureGeometryKHR>& geometries,
+        std::vector<VkAccelerationStructureBuildRangeInfoKHR>& ranges,
+        std::vector<std::uint32_t>& primitiveCounts) {
+        const RtInstanceMetadata instance =
+            staticMeshSlot_.InstanceMetadata()[instanceCustomIndex];
+        const auto& primitiveMetadata = staticMeshSlot_.PrimitiveMetadata();
+        const auto& staticVertices = staticMeshSlot_.Vertices();
+        for (std::uint32_t localIndex = 0u; localIndex < instance.primitiveCount; ++localIndex)
+        {
+            const std::uint32_t geometryIndex = instance.primitiveBase + localIndex;
+            const RtPrimitiveMetadata& primitive = primitiveMetadata[geometryIndex];
+            const std::uint32_t nextVertexOffset = geometryIndex + 1u < primitiveMetadata.size()
+                ? primitiveMetadata[geometryIndex + 1u].vertexOffset
+                : static_cast<std::uint32_t>(staticVertices.size());
+            if (nextVertexOffset <= primitive.vertexOffset || primitive.indexCount == 0u)
+            {
+                diagnostic = "Static RT BLAS primitive has an empty geometry range.";
+                return false;
+            }
+            VkAccelerationStructureGeometryKHR geometry{
+                VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
+            geometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
+            geometry.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
+            geometry.geometry.triangles.sType =
+                VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
+            geometry.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
+            geometry.geometry.triangles.vertexData.deviceAddress =
+                staticVertexBuffer_.address +
+                static_cast<VkDeviceSize>(primitive.vertexOffset) *
+                    sizeof(horde::scene::assets::StaticRtVertex);
+            geometry.geometry.triangles.vertexStride =
+                sizeof(horde::scene::assets::StaticRtVertex);
+            geometry.geometry.triangles.maxVertex =
+                nextVertexOffset - primitive.vertexOffset - 1u;
+            geometry.geometry.triangles.indexType = VK_INDEX_TYPE_UINT32;
+            geometry.geometry.triangles.indexData.deviceAddress =
+                staticIndexBuffer_.address +
+                static_cast<VkDeviceSize>(primitive.indexOffset) * sizeof(std::uint32_t);
+            geometry.geometry.triangles.transformData.deviceAddress =
+                staticGeometryTransformBuffer_.address +
+                static_cast<VkDeviceSize>(geometryIndex) * sizeof(VkTransformMatrixKHR);
+            geometries.push_back(geometry);
+            VkAccelerationStructureBuildRangeInfoKHR range{};
+            range.primitiveCount = primitive.indexCount / 3u;
+            ranges.push_back(range);
+            primitiveCounts.push_back(range.primitiveCount);
+        }
+        return true;
+    };
+
+    std::vector<VkAccelerationStructureGeometryKHR> torchGeometries;
+    std::vector<VkAccelerationStructureBuildRangeInfoKHR> torchRanges;
+    std::vector<std::uint32_t> torchPrimitiveCounts;
+    if (productionHeldItemAssetsEnabled_)
+    {
+        if (!appendStaticGeometries(1u, torchGeometries, torchRanges, torchPrimitiveCounts))
+            return false;
+        // Task 4 owns final fire. Retain only the existing 16-triangle engine
+        // flame core as a separate geometry after the authored PBR body.
+        constexpr std::uint32_t engineFlamePrimitiveCount = 16u;
+        torchGeometries.push_back(blasGeometry);
+        VkAccelerationStructureBuildRangeInfoKHR flameRange{};
+        flameRange.primitiveCount = engineFlamePrimitiveCount;
+        flameRange.primitiveOffset =
+            (torchIndexCount - engineFlamePrimitiveCount * 3u) * sizeof(std::uint32_t);
+        torchRanges.push_back(flameRange);
+        torchPrimitiveCounts.push_back(engineFlamePrimitiveCount);
+    }
+    else
+    {
+        torchGeometries.push_back(blasGeometry);
+        VkAccelerationStructureBuildRangeInfoKHR torchRange{};
+        torchRange.primitiveCount = torchPrimitiveCount;
+        torchRange.primitiveOffset = finaleRoofIndexCount * sizeof(std::uint32_t);
+        torchRanges.push_back(torchRange);
+        torchPrimitiveCounts.push_back(torchPrimitiveCount);
+    }
 
     VkAccelerationStructureBuildGeometryInfoKHR torchBlasBuildInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR};
     torchBlasBuildInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
     torchBlasBuildInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
-    torchBlasBuildInfo.geometryCount = 1u;
-    torchBlasBuildInfo.pGeometries = &blasGeometry;
+    torchBlasBuildInfo.geometryCount = static_cast<std::uint32_t>(torchGeometries.size());
+    torchBlasBuildInfo.pGeometries = torchGeometries.data();
     VkAccelerationStructureBuildSizesInfoKHR torchBlasSizes{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR};
-    vkGetAccelerationStructureBuildSizesKHR_(device_, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &torchBlasBuildInfo, &torchPrimitiveCount, &torchBlasSizes);
+    vkGetAccelerationStructureBuildSizesKHR_(device_, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR,
+                                             &torchBlasBuildInfo, torchPrimitiveCounts.data(), &torchBlasSizes);
     if (!CreateBuffer(torchBlasSizes.accelerationStructureSize,
                       VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR,
                       VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
@@ -2049,8 +2162,11 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     }
     torchBlasBuildInfo.dstAccelerationStructure = torchBlas_.handle;
     torchBlasBuildInfo.scratchData.deviceAddress = torchBlasScratch.address;
-    const VkAccelerationStructureBuildRangeInfoKHR* torchBlasRanges[] = {&torchRange};
-    BlasBuildData torchBlasBuildData{this, &torchBlasBuildInfo, torchBlasRanges};
+    std::vector<const VkAccelerationStructureBuildRangeInfoKHR*> torchBlasRangePointers;
+    torchBlasRangePointers.reserve(torchRanges.size());
+    for (const auto& range : torchRanges) torchBlasRangePointers.push_back(&range);
+    BlasBuildData torchBlasBuildData{
+        this, &torchBlasBuildInfo, torchBlasRangePointers.data()};
     if (!RunOneTimeCommands(buildBlas, &torchBlasBuildData, diagnostic))
     {
         DestroyBuffer(torchBlasScratch);
@@ -2067,49 +2183,9 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     std::vector<std::uint32_t> swordPrimitiveCounts;
     if (genericStaticAssetEnabled_)
     {
-        const auto& primitiveMetadata = staticMeshSlot_.PrimitiveMetadata();
-        const auto& staticVertices = staticMeshSlot_.Vertices();
-        swordGeometries.reserve(primitiveMetadata.size());
-        swordRanges.reserve(primitiveMetadata.size());
-        swordPrimitiveCounts.reserve(primitiveMetadata.size());
-        for (std::size_t geometryIndex = 0u; geometryIndex < primitiveMetadata.size(); ++geometryIndex)
-        {
-            const RtPrimitiveMetadata& primitive = primitiveMetadata[geometryIndex];
-            const std::uint32_t nextVertexOffset = geometryIndex + 1u < primitiveMetadata.size()
-                ? primitiveMetadata[geometryIndex + 1u].vertexOffset
-                : static_cast<std::uint32_t>(staticVertices.size());
-            if (nextVertexOffset <= primitive.vertexOffset || primitive.indexCount == 0u)
-            {
-                diagnostic = "Static RT BLAS primitive has an empty geometry range.";
-                return false;
-            }
-            VkAccelerationStructureGeometryKHR geometry{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
-            geometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
-            geometry.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
-            geometry.geometry.triangles.sType =
-                VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
-            geometry.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
-            geometry.geometry.triangles.vertexData.deviceAddress =
-                staticVertexBuffer_.address +
-                static_cast<VkDeviceSize>(primitive.vertexOffset) *
-                    sizeof(horde::scene::assets::StaticRtVertex);
-            geometry.geometry.triangles.vertexStride =
-                sizeof(horde::scene::assets::StaticRtVertex);
-            geometry.geometry.triangles.maxVertex =
-                nextVertexOffset - primitive.vertexOffset - 1u;
-            geometry.geometry.triangles.indexType = VK_INDEX_TYPE_UINT32;
-            geometry.geometry.triangles.indexData.deviceAddress =
-                staticIndexBuffer_.address +
-                static_cast<VkDeviceSize>(primitive.indexOffset) * sizeof(std::uint32_t);
-            geometry.geometry.triangles.transformData.deviceAddress =
-                staticGeometryTransformBuffer_.address +
-                static_cast<VkDeviceSize>(geometryIndex) * sizeof(VkTransformMatrixKHR);
-            swordGeometries.push_back(geometry);
-            VkAccelerationStructureBuildRangeInfoKHR range{};
-            range.primitiveCount = primitive.indexCount / 3u;
-            swordRanges.push_back(range);
-            swordPrimitiveCounts.push_back(range.primitiveCount);
-        }
+        if (!appendStaticGeometries(
+                3u, swordGeometries, swordRanges, swordPrimitiveCounts))
+            return false;
     }
     else
     {
@@ -3143,9 +3219,9 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const float swordPoseRadians = heldKinematics.swordRadians;
     const float swordCos = std::cos(swordPoseRadians);
     const float swordSin = std::sin(swordPoseRadians);
-    const Vec3 swordColumnX = scaled(add(scaled(viewRight, swordCos), scaled(viewUp, swordSin)), torchScale);
-    const Vec3 swordColumnY = scaled(add(scaled(viewRight, -swordSin), scaled(viewUp, swordCos)), torchScale);
-    const Vec3 swordColumnZ = scaled(viewForward, torchScale);
+    Vec3 swordColumnX = scaled(add(scaled(viewRight, swordCos), scaled(viewUp, swordSin)), torchScale);
+    Vec3 swordColumnY = scaled(add(scaled(viewRight, -swordSin), scaled(viewUp, swordCos)), torchScale);
+    Vec3 swordColumnZ = scaled(viewForward, torchScale);
     Vec3 swordGrip{{1.47f, -0.485f, 0.0f}};
     if (genericStaticAssetEnabled_ && !developmentStaticAsset_.sockets.empty())
     {
@@ -3154,10 +3230,148 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     }
     // Place either held mesh by its authored grip socket without changing the
     // physical sword TLAS slot or the simulation-owned hand pose.
-    const Vec3 swordTranslation = add(
+    Vec3 swordTranslation = add(
         add(add(rightHand, scaled(swordColumnX, -swordGrip[0])),
             scaled(swordColumnY, -swordGrip[1])),
         scaled(swordColumnZ, -swordGrip[2]));
+
+    if (productionHeldItemAssetsEnabled_)
+    {
+        using horde::gameplay::items::HeldItemTransform;
+        const auto worldFromAxes = [](const Vec3& x,
+                                      const Vec3& y,
+                                      const Vec3& z,
+                                      const Vec3& translation) {
+            return HeldItemTransform{{
+                x[0], x[1], x[2], 0.0f,
+                y[0], y[1], y[2], 0.0f,
+                z[0], z[1], z[2], 0.0f,
+                translation[0], translation[1], translation[2], 1.0f}};
+        };
+        const auto extractAxes = [](const HeldItemTransform& transform,
+                                    Vec3& x,
+                                    Vec3& y,
+                                    Vec3& z,
+                                    Vec3& translation) {
+            x = {{transform[0], transform[1], transform[2]}};
+            y = {{transform[4], transform[5], transform[6]}};
+            z = {{transform[8], transform[9], transform[10]}};
+            translation = {{transform[12], transform[13], transform[14]}};
+        };
+        const auto* torchGrip = horde::gameplay::items::FindHeldItemSocket(
+            productionTorchAsset_.sockets, "Grip");
+        const auto* flameSocket = horde::gameplay::items::FindHeldItemSocket(
+            productionTorchAsset_.sockets, "Flame");
+        const auto* lightSocket = horde::gameplay::items::FindHeldItemSocket(
+            productionTorchAsset_.sockets, "Light");
+        const auto* productionSwordGrip = horde::gameplay::items::FindHeldItemSocket(
+            developmentStaticAsset_.sockets, "Grip");
+        if (torchGrip == nullptr || flameSocket == nullptr || lightSocket == nullptr ||
+            productionSwordGrip == nullptr)
+        {
+            diagnostic = "Production held items are missing exact Grip/Flame/Light sockets.";
+            return false;
+        }
+
+        HeldItemTransform worldFromTorch{};
+        if (frame.heldItems[0].parentMode ==
+            horde::gameplay::items::HeldItemParentMode::HandSocket)
+        {
+            const HeldItemTransform worldFromLeftHand =
+                worldFromAxes(viewRight, viewUp, scaled(viewForward, -1.0f), leftHand);
+            if (!horde::gameplay::items::ComposeWorldFromItem(
+                    worldFromLeftHand, torchGrip->world, worldFromTorch, diagnostic))
+                return false;
+        }
+        else
+        {
+            const float releaseYawCos = std::cos(torchFailure.droppedYawRadians);
+            const float releaseYawSin = std::sin(torchFailure.droppedYawRadians);
+            const Vec3 releaseBodyForward{releaseYawSin, 0.0f, -releaseYawCos};
+            const Vec3 releaseBodyRight{releaseYawCos, 0.0f, releaseYawSin};
+            const Vec3 releaseViewForward = normalize(Vec3{
+                releaseYawSin,
+                -0.05f + std::clamp(torchFailure.droppedViewPitchRadians, -0.32f, 0.28f),
+                -releaseYawCos});
+            const Vec3 releaseViewRight = normalize(cross(releaseViewForward, worldUp));
+            const Vec3 releaseViewUp = normalize(cross(releaseViewRight, releaseViewForward));
+            const float releaseDepth = horde::gameplay::ComputeShowcaseHeldPropDepth(
+                torchFailure.droppedX, torchFailure.droppedZ,
+                releaseBodyForward[0], releaseBodyForward[2]);
+            const Vec3 releaseEye{torchFailure.droppedX, 0.58f, torchFailure.droppedZ};
+            const Vec3 releaseLeftHand = add(
+                add(add(releaseEye, scaled(releaseViewRight, -0.34f)),
+                    scaled(releaseViewUp, -0.40f)),
+                scaled(releaseViewForward, releaseDepth));
+            HeldItemTransform releaseWorldFromTorch{};
+            if (!horde::gameplay::items::ComposeWorldFromItem(
+                    worldFromAxes(releaseViewRight, releaseViewUp,
+                                  scaled(releaseViewForward, -1.0f),
+                                  releaseLeftHand),
+                    torchGrip->world,
+                    releaseWorldFromTorch,
+                    diagnostic))
+                return false;
+
+            const float progress = std::clamp(torchFailure.fallProgress, 0.0f, 1.0f);
+            const float pitchCos = std::cos(torchFailure.droppedPitchRadians);
+            const float pitchSin = std::sin(torchFailure.droppedPitchRadians);
+            const Vec3 restingX = releaseBodyRight;
+            const Vec3 restingY = normalize(add(
+                scaled(worldUp, pitchCos), scaled(releaseBodyForward, pitchSin)));
+            const Vec3 restingZ = normalize(add(
+                scaled(releaseBodyForward, pitchCos), scaled(worldUp, -pitchSin)));
+            const Vec3 fallingX = normalize(lerp(releaseViewRight, restingX, progress));
+            const Vec3 fallingY = normalize(lerp(releaseViewUp, restingY, progress));
+            const Vec3 fallingZ = normalize(lerp(
+                scaled(releaseViewForward, -1.0f), scaled(restingZ, -1.0f), progress));
+            Vec3 settledPosition = add(
+                add(Vec3{torchFailure.droppedX, torchFailure.droppedY, torchFailure.droppedZ},
+                    scaled(worldUp, 0.13f)),
+                add(scaled(releaseBodyRight, -0.34f),
+                    scaled(releaseBodyForward, 0.78f)));
+            settledPosition[0] = std::clamp(settledPosition[0], -2.28f, 4.58f);
+            settledPosition[2] = std::clamp(settledPosition[2], -16.18f, -14.22f);
+            const Vec3 releaseTranslation{{releaseWorldFromTorch[12],
+                                           releaseWorldFromTorch[13],
+                                           releaseWorldFromTorch[14]}};
+            worldFromTorch = worldFromAxes(
+                fallingX, fallingY, fallingZ,
+                lerp(releaseTranslation, settledPosition, progress));
+        }
+        extractAxes(worldFromTorch,
+                    finalTorchColumnX,
+                    finalTorchColumnY,
+                    finalTorchColumnZ,
+                    torchTranslation);
+
+        horde::gameplay::items::HeldLightState heldLight{};
+        if (!horde::gameplay::items::ComposeHeldLightState(
+                worldFromTorch,
+                flameSocket->world,
+                lightSocket->world,
+                torchFailure.flameStrength,
+                heldLight,
+                diagnostic))
+            return false;
+
+        const Vec3 swordAxisX = normalize(
+            add(scaled(viewRight, swordCos), scaled(viewUp, swordSin)));
+        const Vec3 swordAxisY = normalize(
+            add(scaled(viewRight, -swordSin), scaled(viewUp, swordCos)));
+        HeldItemTransform worldFromSword{};
+        if (!horde::gameplay::items::ComposeWorldFromItem(
+                worldFromAxes(swordAxisX, swordAxisY, scaled(viewForward, -1.0f), rightHand),
+                productionSwordGrip->world,
+                worldFromSword,
+                diagnostic))
+            return false;
+        extractAxes(worldFromSword,
+                    swordColumnX,
+                    swordColumnY,
+                    swordColumnZ,
+                    swordTranslation);
+    }
 
     if (!characterSlot_.PrepareFrame(frame.skeletonEnemies,
                                      frame.skeletonEnemyCount,
@@ -3179,6 +3393,23 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const auto& lichBlasUpdateScratch_ = lichGpu.updateScratch;
     const auto& lichSkinnedVertices_ = characterSlot_.LichVertices();
 
+    const auto heldItemInstanceTransform = [](const Vec3& x,
+                                              const Vec3& y,
+                                              const Vec3& z,
+                                              const Vec3& translation) {
+        horde::gameplay::items::HeldItemState state{};
+        state.worldFromItem = {{
+            x[0], x[1], x[2], 0.0f,
+            y[0], y[1], y[2], 0.0f,
+            z[0], z[1], z[2], 0.0f,
+            translation[0], translation[1], translation[2], 1.0f}};
+        const auto renderTransform = HeldItemRenderSlot::BuildInstanceTransform(state);
+        return VkTransformMatrixKHR{{
+            renderTransform[0], renderTransform[1], renderTransform[2], renderTransform[3],
+            renderTransform[4], renderTransform[5], renderTransform[6], renderTransform[7],
+            renderTransform[8], renderTransform[9], renderTransform[10], renderTransform[11]}};
+    };
+
     std::array<VkAccelerationStructureInstanceKHR, PresentableTinyRtScene::kTlasInstanceCount> instances{};
     instances[0].transform = {{
         1.0f, 0.0f, 0.0f, 0.0f,
@@ -3189,10 +3420,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     instances[0].flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
     instances[0].accelerationStructureReference = blas_.address;
     instances[1] = instances[0];
-    instances[1].transform = {{
-        finalTorchColumnX[0], finalTorchColumnY[0], finalTorchColumnZ[0], torchTranslation[0],
-        finalTorchColumnX[1], finalTorchColumnY[1], finalTorchColumnZ[1], torchTranslation[1],
-        finalTorchColumnX[2], finalTorchColumnY[2], finalTorchColumnZ[2], torchTranslation[2]}};
+    instances[1].transform = heldItemInstanceTransform(
+        finalTorchColumnX, finalTorchColumnY, finalTorchColumnZ, torchTranslation);
     instances[1].instanceCustomIndex = 1u;
     instances[1].mask = 0x02u;
     instances[1].accelerationStructureReference = torchBlas_.address;
@@ -3202,10 +3431,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     instances[3].instanceCustomIndex = 3u;
     instances[3].mask = 0x02u;
     instances[3].accelerationStructureReference = swordBlas_.address;
-    instances[3].transform = {{
-        swordColumnX[0], swordColumnY[0], swordColumnZ[0], swordTranslation[0],
-        swordColumnX[1], swordColumnY[1], swordColumnZ[1], swordTranslation[1],
-        swordColumnX[2], swordColumnY[2], swordColumnZ[2], swordTranslation[2]}};
+    instances[3].transform = heldItemInstanceTransform(
+        swordColumnX, swordColumnY, swordColumnZ, swordTranslation);
     instances[4] = instances[0];
     instances[4].instanceCustomIndex = 4u;
     // The complete coat remains visible in mirror/reflection rays. Keeping its

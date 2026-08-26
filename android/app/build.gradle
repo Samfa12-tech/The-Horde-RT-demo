@@ -18,6 +18,12 @@ tasks.register('prepareRuntimeAssets', Sync) {
         include 'textures/polyhaven/mobile_1k/arm-array-512-astc6x6.ktx2'
         include 'textures/meshy/lich_placeholder_v01/base-color-2048-astc6x6.ktx2'
         include 'textures/meshy/lich_placeholder_v01/emissive-2048-astc6x6.ktx2'
+        include 'models/weapons/runtime/asset.manifest.json'
+        include 'models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb'
+        include 'models/props/runtime/asset.manifest.json'
+        include 'models/props/runtime/gothic-hand-torch-lod0.runtime.glb'
+        include 'textures/held-items/runtime/*.android.ktx2'
+        include 'textures/held-items/runtime/asset.manifest.json'
         include 'audio/filmcow/*.wav'
         include 'audio/pixabay/waterfall_loop.wav'
     }

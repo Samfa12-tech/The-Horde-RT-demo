@@ -10,4 +10,3 @@
 - Processing: reviewed Blender collapse remesh, metre normalization, +Y up/+Z forward, tangents, exact `Grip`, `Flame`, and `Light`; 4,999 runtime triangles. Runtime GLB SHA-256 `b1a2078c78d54dae548b89e20168c9922c7dfe33851d47f3d98e7ff1e7c14b8d`.
 - Evidence: `.superpowers/sdd/2026-08-26-fire-pbr-reward-lantern-player-upgrade/evidence/task-3/torch-candidate-1-neutral/`, `torch-source-pbr/`, and `torch-runtime-pbr/`.
 - Licence: the current account plan could not be independently proved. Distributed conservatively under Meshy Free-plan CC BY 4.0 with attribution in `ASSET_LICENSES.md`.
-

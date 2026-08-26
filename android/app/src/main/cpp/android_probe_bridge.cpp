@@ -1411,7 +1411,9 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
                                     context.reportDirectory + "/../lich_placeholder_merged_animations_v01.glb",
                                     context.reportDirectory + "/..",
                                     context.reportDirectory + "/..",
-                                    diagnostic))
+                                    diagnostic,
+                                    {},
+                                    context.reportDirectory + "/.."))
     {
         __android_log_print(ANDROID_LOG_ERROR, kTag, "Failed to initialise presentable RT scene: %s", diagnostic.c_str());
         return false;

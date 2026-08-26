@@ -149,7 +149,16 @@ $assetCopies = @(
     @{ Source = "assets\textures\meshy\lich_placeholder_v01\emissive-2048-rgba8.ktx2"; Destination = "assets\textures\meshy\lich_placeholder_v01" },
     @{ Source = "assets\textures\polyhaven\mobile_1k\diff-array-512.rgba"; Destination = "assets\textures\polyhaven\mobile_1k" },
     @{ Source = "assets\textures\polyhaven\mobile_1k\normal-array-512.rgba"; Destination = "assets\textures\polyhaven\mobile_1k" },
-    @{ Source = "assets\textures\polyhaven\mobile_1k\arm-array-512.rgba"; Destination = "assets\textures\polyhaven\mobile_1k" }
+    @{ Source = "assets\textures\polyhaven\mobile_1k\arm-array-512.rgba"; Destination = "assets\textures\polyhaven\mobile_1k" },
+    @{ Source = "assets\models\weapons\runtime\asset.manifest.json"; Destination = "assets\models\weapons\runtime" },
+    @{ Source = "assets\models\weapons\runtime\gothic-arming-sword-rh-lod0.runtime.glb"; Destination = "assets\models\weapons\runtime" },
+    @{ Source = "assets\models\props\runtime\asset.manifest.json"; Destination = "assets\models\props\runtime" },
+    @{ Source = "assets\models\props\runtime\gothic-hand-torch-lod0.runtime.glb"; Destination = "assets\models\props\runtime" },
+    @{ Source = "assets\textures\held-items\runtime\asset.manifest.json"; Destination = "assets\textures\held-items\runtime" },
+    @{ Source = "assets\textures\held-items\runtime\base-color.windows.ktx2"; Destination = "assets\textures\held-items\runtime" },
+    @{ Source = "assets\textures\held-items\runtime\normal.windows.ktx2"; Destination = "assets\textures\held-items\runtime" },
+    @{ Source = "assets\textures\held-items\runtime\orm.windows.ktx2"; Destination = "assets\textures\held-items\runtime" },
+    @{ Source = "assets\textures\held-items\runtime\emissive.windows.ktx2"; Destination = "assets\textures\held-items\runtime" }
 )
 foreach ($copy in $assetCopies) {
     $destination = Join-Path $windowsStage $copy.Destination
@@ -237,6 +246,25 @@ try {
     if ($apkEntryNames -notcontains 'assets/audio/pixabay/waterfall_loop.wav') {
         throw "Android candidate is missing the licensed waterfall loop."
     }
+    foreach ($requiredHeldItem in @(
+        'assets/models/weapons/runtime/asset.manifest.json',
+        'assets/models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb',
+        'assets/models/props/runtime/asset.manifest.json',
+        'assets/models/props/runtime/gothic-hand-torch-lod0.runtime.glb',
+        'assets/textures/held-items/runtime/asset.manifest.json',
+        'assets/textures/held-items/runtime/base-color.android.ktx2',
+        'assets/textures/held-items/runtime/normal.android.ktx2',
+        'assets/textures/held-items/runtime/orm.android.ktx2',
+        'assets/textures/held-items/runtime/emissive.android.ktx2')) {
+        if ($apkEntryNames -notcontains $requiredHeldItem) {
+            throw "Android candidate is missing production held-item runtime entry: $requiredHeldItem"
+        }
+    }
+    if (@($apkEntryNames | Where-Object {
+        $_ -match 'assets/.+/(source|high)/' -or $_ -match 'assets/textures/held-items/runtime/.+\.windows\.ktx2$'
+    }).Count -ne 0) {
+        throw "Android candidate contains source/high or Windows-only held-item content."
+    }
     $nativeEntries = @($apkArchive.Entries | Where-Object { $_.FullName -match '^lib/.+\.so$' } | ForEach-Object FullName)
     if ($nativeEntries.Count -lt 1) {
         throw "Android candidate does not contain a native runtime library."
@@ -279,12 +307,21 @@ try {
         "assets/textures/meshy/lich_placeholder_v01/base-color-2048-rgba8.ktx2",
         "assets/textures/meshy/lich_placeholder_v01/emissive-2048-rgba8.ktx2",
         "assets/textures/polyhaven/mobile_1k/diff-array-512.rgba",
+        "assets/models/weapons/runtime/asset.manifest.json",
+        "assets/models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb",
+        "assets/models/props/runtime/asset.manifest.json",
+        "assets/models/props/runtime/gothic-hand-torch-lod0.runtime.glb",
+        "assets/textures/held-items/runtime/asset.manifest.json",
+        "assets/textures/held-items/runtime/base-color.windows.ktx2",
+        "assets/textures/held-items/runtime/normal.windows.ktx2",
+        "assets/textures/held-items/runtime/orm.windows.ktx2",
+        "assets/textures/held-items/runtime/emissive.windows.ktx2",
         "assets/audio/filmcow/sword_swing_1.wav",
         "assets/audio/pixabay/waterfall_loop.wav"
     )) {
         if ($entryNames -notcontains $required) { throw "Windows zip is missing required entry: $required" }
     }
-    foreach ($forbidden in @("assets/models/weapons/", "runtime-development", "gothic_arming_sword")) {
+    foreach ($forbidden in @("/source/", "/high/", "runtime-development", "gothic_arming_sword", ".android.ktx2")) {
         if (@($entryNames | Where-Object { $_ -like "*$forbidden*" }).Count -ne 0) {
             throw "Windows zip contains forbidden development static asset content: $forbidden"
         }

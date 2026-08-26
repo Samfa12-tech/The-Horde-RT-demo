@@ -312,6 +312,16 @@ public class MainActivity extends Activity {
                     && stageAsset("textures/polyhaven/mobile_1k/arm-array-512-astc6x6.ktx2", "arm-array-512-astc6x6.ktx2")
                     && stageAsset("textures/meshy/lich_placeholder_v01/base-color-2048-astc6x6.ktx2", "base-color-2048-astc6x6.ktx2")
                     && stageAsset("textures/meshy/lich_placeholder_v01/emissive-2048-astc6x6.ktx2", "emissive-2048-astc6x6.ktx2");
+            final boolean heldItemsStaged =
+                    stageAsset("models/weapons/runtime/asset.manifest.json", "models/weapons/runtime/asset.manifest.json")
+                    && stageAsset("models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb", "models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb")
+                    && stageAsset("models/props/runtime/asset.manifest.json", "models/props/runtime/asset.manifest.json")
+                    && stageAsset("models/props/runtime/gothic-hand-torch-lod0.runtime.glb", "models/props/runtime/gothic-hand-torch-lod0.runtime.glb")
+                    && stageAsset("textures/held-items/runtime/asset.manifest.json", "textures/held-items/runtime/asset.manifest.json")
+                    && stageAsset("textures/held-items/runtime/base-color.android.ktx2", "textures/held-items/runtime/base-color.android.ktx2")
+                    && stageAsset("textures/held-items/runtime/normal.android.ktx2", "textures/held-items/runtime/normal.android.ktx2")
+                    && stageAsset("textures/held-items/runtime/orm.android.ktx2", "textures/held-items/runtime/orm.android.ktx2")
+                    && stageAsset("textures/held-items/runtime/emissive.android.ktx2", "textures/held-items/runtime/emissive.android.ktx2");
             final boolean written = ProbeBridge.writeReports(filesRoot);
             final StringBuilder output = new StringBuilder(textReport).append('\n');
             if (textReport.contains("RT mode: Unsupported")) {
@@ -321,6 +331,7 @@ public class MainActivity extends Activity {
             output.append("Animated skeleton staged: ").append(skeletonStaged ? "yes" : "no").append('\n');
             output.append("Animated lich placeholder staged: ").append(lichStaged ? "yes" : "no").append('\n');
             output.append("ASTC PBR material arrays staged: ").append(materialsStaged ? "yes" : "no").append('\n');
+            output.append("Production PBR held items staged: ").append(heldItemsStaged ? "yes" : "no").append('\n');
             output.append("Report directory: ").append(filesRoot).append('/').append(REPORT_DIRECTORY).append('\n');
             output.append("Report files: ").append(TEXT_REPORT_FILE).append(", ").append(JSON_REPORT_FILE).append('\n');
             output.append("JSON sample:\n").append(jsonReport);
@@ -1737,6 +1748,8 @@ public class MainActivity extends Activity {
 
     private boolean stageAsset(final String assetPath, final String fileName) {
         final File destination = new File(getFilesDir(), fileName);
+        final File parent = destination.getParentFile();
+        if (parent != null && !parent.exists() && !parent.mkdirs()) return false;
         try (InputStream source = getAssets().open(assetPath);
              FileOutputStream output = new FileOutputStream(destination, false)) {
             final byte[] buffer = new byte[64 * 1024];

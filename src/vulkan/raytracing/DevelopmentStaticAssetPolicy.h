@@ -17,7 +17,7 @@ inline std::filesystem::path ResolveDevelopmentStaticAssetDirectory(
 
 inline bool UseGenericStaticAssetForCheckpoint(std::string_view checkpointName)
 {
-    return checkpointName == "pbr-sword-closeup";
+    return checkpointName == "pbr-sword-closeup" || checkpointName == "pbr-torch-fire";
 }
 
 } // namespace horde::vulkan::raytracing
