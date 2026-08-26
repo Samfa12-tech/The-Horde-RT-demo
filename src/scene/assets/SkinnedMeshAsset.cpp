@@ -1,4 +1,4 @@
-#include "scene/SkeletonBipedModel.h"
+#include "scene/assets/SkinnedMeshAsset.h"
 
 #include <algorithm>
 #include <array>
@@ -347,7 +347,7 @@ Vec3 Normalise(Vec3 value)
 
 } // namespace
 
-struct SkeletonBipedModel::SourceVertex
+struct SkinnedMeshAsset::SourceVertex
 {
     Vec3 position;
     Vec3 normal;
@@ -356,7 +356,7 @@ struct SkeletonBipedModel::SourceVertex
     std::array<float, 4u> weights{};
 };
 
-struct SkeletonBipedModel::Node
+struct SkinnedMeshAsset::Node
 {
     int parent = -1;
     Vec3 translation{};
@@ -364,7 +364,7 @@ struct SkeletonBipedModel::Node
     Vec3 scale{1.0f, 1.0f, 1.0f};
 };
 
-struct SkeletonBipedModel::Channel
+struct SkinnedMeshAsset::Channel
 {
     enum class Path { Translation, Rotation, Scale } path = Path::Translation;
     std::uint32_t node = 0u;
@@ -372,7 +372,7 @@ struct SkeletonBipedModel::Channel
     std::vector<std::array<float, 4u>> values;
 };
 
-struct SkeletonBipedModel::Clip
+struct SkinnedMeshAsset::Clip
 {
     std::vector<Channel> channels;
     float duration = 0.0f;
@@ -404,17 +404,17 @@ const SkinnedClipSet& LichPlaceholderClipSet()
     return clips;
 }
 
-SkeletonBipedModel::SkeletonBipedModel() = default;
-SkeletonBipedModel::~SkeletonBipedModel() = default;
-SkeletonBipedModel::SkeletonBipedModel(SkeletonBipedModel&&) noexcept = default;
-SkeletonBipedModel& SkeletonBipedModel::operator=(SkeletonBipedModel&&) noexcept = default;
+SkinnedMeshAsset::SkinnedMeshAsset() = default;
+SkinnedMeshAsset::~SkinnedMeshAsset() = default;
+SkinnedMeshAsset::SkinnedMeshAsset(SkinnedMeshAsset&&) noexcept = default;
+SkinnedMeshAsset& SkinnedMeshAsset::operator=(SkinnedMeshAsset&&) noexcept = default;
 
-bool SkeletonBipedModel::LoadCombatClips(const std::string& glbPath, std::string& diagnostic)
+bool SkinnedMeshAsset::LoadCombatClips(const std::string& glbPath, std::string& diagnostic)
 {
     return LoadClips(glbPath, SkeletonCombatClipSet(), diagnostic);
 }
 
-bool SkeletonBipedModel::LoadClips(const std::string& glbPath, const SkinnedClipSet& clipSet, std::string& diagnostic)
+bool SkinnedMeshAsset::LoadClips(const std::string& glbPath, const SkinnedClipSet& clipSet, std::string& diagnostic)
 {
     loaded_ = false;
     hasTexcoords_ = false;
@@ -630,13 +630,13 @@ bool SkeletonBipedModel::LoadClips(const std::string& glbPath, const SkinnedClip
     return true;
 }
 
-float SkeletonBipedModel::ClipDuration(SkinnedClip clip) const
+float SkinnedMeshAsset::ClipDuration(SkinnedClip clip) const
 {
     const std::size_t index = static_cast<std::size_t>(clip);
     return index < clips_.size() ? clips_[index].duration : 0.0f;
 }
 
-bool SkeletonBipedModel::Skin(SkinnedClip clipId, float timeSeconds, std::vector<SkinnedRtVertex>& output, std::string& diagnostic) const
+bool SkinnedMeshAsset::Skin(SkinnedClip clipId, float timeSeconds, std::vector<SkinnedRtVertex>& output, std::string& diagnostic) const
 {
     if (!loaded_) { diagnostic = "Skeleton model was not loaded."; return false; }
     const std::size_t clipIndex = static_cast<std::size_t>(clipId);
@@ -716,7 +716,7 @@ bool SkeletonBipedModel::Skin(SkinnedClip clipId, float timeSeconds, std::vector
     return true;
 }
 
-bool SkeletonBipedModel::SkinTextured(SkinnedClip clipId,
+bool SkinnedMeshAsset::SkinTextured(SkinnedClip clipId,
                                       float timeSeconds,
                                       std::vector<TexturedSkinnedRtVertex>& output,
                                       std::string& diagnostic) const
