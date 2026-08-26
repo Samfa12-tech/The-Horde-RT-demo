@@ -3,8 +3,11 @@
 #include "gameplay/items/HeldItemState.h"
 #include "gameplay/simulation/GameSimulation.h"
 #include "vulkan/raytracing/HeldItemRenderSlot.h"
+#include "vulkan/raytracing/HeldItemBlasMeasurements.h"
+#include "vulkan/raytracing/RtSceneAbi.generated.h"
 #include "vulkan/raytracing/RtStaticMeshSlot.h"
 
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <cstdint>
@@ -45,6 +48,98 @@ HeldItemTransform Translation(const float x, const float y, const float z)
     result[13] = y;
     result[14] = z;
     return result;
+}
+
+std::array<float, 3u> Add(const std::array<float, 3u>& left,
+                          const std::array<float, 3u>& right)
+{
+    return {{left[0] + right[0], left[1] + right[1], left[2] + right[2]}};
+}
+
+std::array<float, 3u> Scale(const std::array<float, 3u>& value, const float scale)
+{
+    return {{value[0] * scale, value[1] * scale, value[2] * scale}};
+}
+
+std::array<float, 3u> Cross(const std::array<float, 3u>& left,
+                            const std::array<float, 3u>& right)
+{
+    return {{left[1] * right[2] - left[2] * right[1],
+             left[2] * right[0] - left[0] * right[2],
+             left[0] * right[1] - left[1] * right[0]}};
+}
+
+std::array<float, 3u> Normalize(const std::array<float, 3u>& value)
+{
+    const float length = std::sqrt(value[0] * value[0] + value[1] * value[1] +
+                                   value[2] * value[2]);
+    return Scale(value, 1.0f / length);
+}
+
+bool TransformNear(const HeldItemTransform& actual,
+                   const HeldItemTransform& expected,
+                   const float tolerance = 0.00001f)
+{
+    for (std::size_t i = 0u; i < actual.size(); ++i)
+    {
+        if (!Near(actual[i], expected[i], tolerance)) return false;
+    }
+    return true;
+}
+
+HeldItemTransform ExpectedHeldTorchFromFixedSnapshot(
+    const horde::gameplay::simulation::SimulationSnapshot& snapshot,
+    const HeldItemTransform& itemFromGrip)
+{
+    const std::array<float, 3u> worldUp{{0.0f, 1.0f, 0.0f}};
+    const auto forward = Normalize(std::array<float, 3u>{{
+        std::sin(snapshot.playerYawRadians),
+        -0.05f + std::clamp(snapshot.playerPitchRadians, -0.32f, 0.28f),
+        -std::cos(snapshot.playerYawRadians)}});
+    const auto right = Normalize(Cross(forward, worldUp));
+    const auto up = Normalize(Cross(right, forward));
+    const float movement = std::max(std::clamp(snapshot.walkAmount, 0.0f, 1.0f), 0.2f);
+    const float gait = snapshot.walkTime * 6.2f;
+    const float sway = std::sin(gait) * 0.035f * movement;
+    const float bob = std::abs(std::sin(gait)) * 0.025f * movement;
+    const float heldDepth = horde::gameplay::ComputeShowcaseHeldPropDepth(
+        snapshot.playerX, snapshot.playerZ,
+        std::sin(snapshot.playerYawRadians), -std::cos(snapshot.playerYawRadians));
+    const std::array<float, 3u> localHand{{-0.34f - sway, -0.40f + bob, heldDepth}};
+    const std::array<float, 3u> eye{{snapshot.playerX, 0.58f, snapshot.playerZ}};
+    const auto hand = Add(Add(Add(eye, Scale(right, localHand[0])),
+                              Scale(up, localHand[1])),
+                          Scale(forward, localHand[2]));
+    const auto itemZ = Scale(forward, -1.0f);
+    const auto translation = Add(
+        Add(Add(hand, Scale(right, -itemFromGrip[12])),
+            Scale(up, -itemFromGrip[13])),
+        Scale(itemZ, -itemFromGrip[14]));
+    return {{right[0], right[1], right[2], 0.0f,
+             up[0], up[1], up[2], 0.0f,
+             itemZ[0], itemZ[1], itemZ[2], 0.0f,
+             translation[0], translation[1], translation[2], 1.0f}};
+}
+
+bool LoadProductionHeldAssets(horde::scene::assets::StaticMeshAsset& sword,
+                              horde::scene::assets::StaticMeshAsset& torch,
+                              std::string& diagnostic)
+{
+    const std::filesystem::path root = HORDE_RT_SOURCE_DIR;
+    horde::scene::assets::AssetManifest swordManifest;
+    horde::scene::assets::AssetManifest torchManifest;
+    const auto swordDirectory = root / "assets/models/weapons/runtime";
+    const auto torchDirectory = root / "assets/models/props/runtime";
+    return horde::scene::assets::AssetManifest::Load(
+               swordDirectory / "asset.manifest.json", swordManifest, diagnostic) &&
+           horde::scene::assets::StaticMeshAsset::Load(
+               swordDirectory / "gothic-arming-sword-rh-lod0.runtime.glb",
+               swordManifest, sword, diagnostic) &&
+           horde::scene::assets::AssetManifest::Load(
+               torchDirectory / "asset.manifest.json", torchManifest, diagnostic) &&
+           horde::scene::assets::StaticMeshAsset::Load(
+               torchDirectory / "gothic-hand-torch-lod0.runtime.glb",
+               torchManifest, torch, diagnostic);
 }
 
 void TestSocketLookupIsNamedAndOrderIndependent()
@@ -121,26 +216,145 @@ void TestWallRetractionMovesHandAndAttachedItemTogether()
           "wall retraction must move the shared hand target, preserving Grip attachment");
 }
 
-void TestTorchDetachesOnceWithTransformContinuity()
+void TestRealFixedTickTorchDetachIsIndependentlyTransformContinuous()
 {
-    HeldItemState torch = horde::gameplay::items::MakeHeldItemState(
-        HeldItemId::OriginalTorch, HeldHand::LeftHand);
-    const HeldItemTransform release = Translation(-1.8f, -0.22f, -15.2f);
-    horde::gameplay::items::UpdateHeldItemParent(
-        torch, HeldItemParentMode::HandSocket, 41u, release);
-    const HeldItemTransform before = torch.worldFromItem;
-    horde::gameplay::items::UpdateHeldItemParent(
-        torch, HeldItemParentMode::AuthoredWorldTrajectory, 42u, release);
-    const std::uint64_t detachTick = torch.detachTick;
-    horde::gameplay::items::UpdateHeldItemParent(
-        torch, HeldItemParentMode::AuthoredWorldTrajectory, 43u,
-        Translation(-1.8f, -0.5f, -15.2f));
+    horde::scene::assets::StaticMeshAsset sword;
+    horde::scene::assets::StaticMeshAsset torchAsset;
+    std::string diagnostic;
+    Check(LoadProductionHeldAssets(sword, torchAsset, diagnostic),
+          "production held assets must load for the fixed-tick detach contract");
+    const auto* grip = horde::gameplay::items::FindHeldItemSocket(torchAsset.sockets, "Grip");
+    Check(grip != nullptr, "production torch Grip must exist for detach continuity");
+    if (grip == nullptr) return;
 
-    Check(torch.detached && detachTick == 42u && torch.detachTick == detachTick,
-          "original torch must detach exactly once at the first authored trajectory tick");
-    Check(Near(before[12], release[12]) && Near(before[13], release[13]) &&
-              Near(before[14], release[14]),
-          "the detach boundary must preserve the last hand-authored world transform");
+    horde::gameplay::simulation::GameSimulation simulation;
+    horde::gameplay::simulation::InputSnapshot input;
+    input.hasAuthoritativePlayerPose = true;
+    input.authoritativePlayerX = -2.16f;
+    input.authoritativePlayerZ = -15.14f;
+    input.yawRadians = 0.43f;
+    input.pitchRadians = 0.17f;
+
+    horde::gameplay::simulation::SimulationSnapshot beforeRelease{};
+    horde::gameplay::simulation::SimulationSnapshot released{};
+    for (std::size_t step = 0u; step < 80u; ++step)
+    {
+        const auto before = simulation.Snapshot();
+        simulation.StepFixed(input);
+        const auto after = simulation.Snapshot();
+        if (after.heldItems[0].detached)
+        {
+            beforeRelease = before;
+            released = after;
+            break;
+        }
+    }
+
+    Check(released.heldItems[0].detached &&
+              released.heldItems[0].parentMode == HeldItemParentMode::AuthoredWorldTrajectory &&
+              released.heldItems[0].detachTick == released.tickIndex,
+          "the real torch failure sequence must detach once on its shared fixed tick");
+    const HeldItemTransform expectedHeld = ExpectedHeldTorchFromFixedSnapshot(
+        beforeRelease, grip->world);
+    Check(std::abs(expectedHeld[12] - (-2.16f - 0.34f)) > 0.001f &&
+              std::abs(expectedHeld[13] - (0.58f - 0.40f)) > 0.001f,
+          "the independent pre-release fixture must contain real pitch plus sway/bob");
+    Check(TransformNear(beforeRelease.heldItems[0].worldFromItem, expectedHeld),
+          "shared fixed-step state must own the independently derived held torch matrix");
+    Check(TransformNear(released.heldItems[0].worldFromItem,
+                        beforeRelease.heldItems[0].worldFromItem, 0.000001f) &&
+              TransformNear(released.heldItems[0].worldFromDetach,
+                            beforeRelease.heldItems[0].worldFromItem, 0.000001f),
+          "the first independently resolved released matrix must exactly equal the last held matrix");
+
+    const std::uint64_t detachTick = released.heldItems[0].detachTick;
+    simulation.StepFixed(input);
+    Check(simulation.Snapshot().heldItems[0].detachTick == detachTick,
+          "subsequent authored trajectory ticks must not detach the torch again");
+}
+
+void TestSharedFixedStepOwnsItemsKinematicsAndSocketLight()
+{
+    horde::scene::assets::StaticMeshAsset swordAsset;
+    horde::scene::assets::StaticMeshAsset torchAsset;
+    std::string diagnostic;
+    Check(LoadProductionHeldAssets(swordAsset, torchAsset, diagnostic),
+          "production held assets must load for shared ownership checks");
+    const auto* flame = horde::gameplay::items::FindHeldItemSocket(torchAsset.sockets, "Flame");
+    const auto* light = horde::gameplay::items::FindHeldItemSocket(torchAsset.sockets, "Light");
+    Check(flame != nullptr && light != nullptr,
+          "production torch Flame and Light sockets must exist for shared ownership checks");
+    if (flame == nullptr || light == nullptr) return;
+
+    horde::gameplay::simulation::GameSimulation simulation;
+    horde::gameplay::simulation::InputSnapshot input;
+    input.yawRadians = -0.37f;
+    input.pitchRadians = 0.11f;
+    input.moveForward = 0.72f;
+    for (std::size_t tick = 0u; tick < 9u; ++tick) simulation.StepFixed(input);
+    const auto& snapshot = simulation.Snapshot();
+    Check(!TransformNear(snapshot.heldItems[0].worldFromItem,
+                         horde::gameplay::items::IdentityHeldItemTransform()) &&
+              !TransformNear(snapshot.heldItems[1].worldFromItem,
+                             horde::gameplay::items::IdentityHeldItemTransform()),
+          "shared fixed-step snapshots must carry resolved sword and torch world matrices");
+    Check(Near(snapshot.heldItemKinematics.leftHandLocal[2],
+               snapshot.heldItemKinematics.heldPropDepth),
+          "shared snapshots must carry the same wall-aware hand target used for item resolution");
+    const HeldItemTransform expectedFlame = horde::gameplay::items::MultiplyHeldItemTransforms(
+        snapshot.heldItems[0].worldFromItem, flame->world);
+    const HeldItemTransform expectedLight = horde::gameplay::items::MultiplyHeldItemTransforms(
+        snapshot.heldItems[0].worldFromItem, light->world);
+    Check(TransformNear(snapshot.heldLight.worldFromFlame, expectedFlame) &&
+              TransformNear(snapshot.heldLight.worldFromLight, expectedLight) &&
+              Near(snapshot.heldLight.flameStrength, snapshot.torchFailure.flameStrength),
+          "exact full Flame and Light socket transforms must be immutable shared simulation output");
+}
+
+void TestHeldItemSnapshotsAreRenderDeliveryInvariant()
+{
+    const auto run = [](const std::uint32_t renderRate) {
+        horde::gameplay::simulation::GameSimulation simulation;
+        horde::gameplay::simulation::InputSnapshot input;
+        input.hasAuthoritativePlayerPose = true;
+        input.authoritativePlayerX = -2.16f;
+        input.authoritativePlayerZ = -15.14f;
+        input.yawRadians = 0.43f;
+        input.pitchRadians = 0.17f;
+        const std::uint32_t frameCount = renderRate * 2u;
+        for (std::uint32_t frame = 0u; frame < frameCount; ++frame)
+            simulation.AdvanceFrame(input, 1.0 / static_cast<double>(renderRate), frame + 1u);
+        return simulation.Snapshot();
+    };
+    const auto at30 = run(30u);
+    const auto at60 = run(60u);
+    const auto at120 = run(120u);
+    Check(at30.tickIndex == at60.tickIndex && at60.tickIndex == at120.tickIndex &&
+              TransformNear(at30.heldItems[0].worldFromItem, at60.heldItems[0].worldFromItem) &&
+              TransformNear(at60.heldItems[0].worldFromItem, at120.heldItems[0].worldFromItem) &&
+              TransformNear(at30.heldItems[1].worldFromItem, at120.heldItems[1].worldFromItem) &&
+              TransformNear(at30.heldLight.worldFromLight, at120.heldLight.worldFromLight),
+          "30/60/120 Hz renderer delivery must expose identical fixed-step item and light state");
+}
+
+void TestHeldItemBlasMeasurementsIncludeBothProductionAssets()
+{
+    horde::vulkan::raytracing::HeldItemBlasMeasurements measurements;
+    measurements.RecordTorch(4096u, 1.25);
+    measurements.RecordSword(8192u, 2.50);
+    Check(measurements.torchBytes == 4096u && measurements.swordBytes == 8192u &&
+              measurements.TotalBytes() == 12288u &&
+              std::abs(measurements.TotalBuildMilliseconds() - 3.75) < 0.000001,
+          "production held-item BLAS evidence must sum torch and sword bytes and timings");
+}
+
+void TestHeldLightGpuAbiAppendsWithoutChangingReleasedBindings()
+{
+    Check(horde::vulkan::raytracing::kRtBindingInstanceMetadata == 11u &&
+              horde::vulkan::raytracing::kRtBindingEmissiveTextures == 19u &&
+              horde::vulkan::raytracing::kRtBindingHeldLight == 20u &&
+              sizeof(horde::vulkan::raytracing::RtHeldLightGpu) == 16u,
+          "held light GPU state must append at binding 20 without changing bindings 0-19");
 }
 
 void TestResetAndCheckpointImportRestoreParentContracts()
@@ -342,6 +556,29 @@ void TestProductionAssetsShareOneGenericStaticSlot()
           "generic material routing must match the audited shared texture array layers");
 }
 
+void TestProductionSocketsMatchSharedFixedStepContracts()
+{
+    horde::scene::assets::StaticMeshAsset sword;
+    horde::scene::assets::StaticMeshAsset torch;
+    std::string diagnostic;
+    Check(LoadProductionHeldAssets(sword, torch, diagnostic),
+          "production GLBs must load before comparing shared socket contracts");
+    const auto* swordGrip = horde::gameplay::items::FindHeldItemSocket(sword.sockets, "Grip");
+    const auto* torchGrip = horde::gameplay::items::FindHeldItemSocket(torch.sockets, "Grip");
+    const auto* flame = horde::gameplay::items::FindHeldItemSocket(torch.sockets, "Flame");
+    const auto* light = horde::gameplay::items::FindHeldItemSocket(torch.sockets, "Light");
+    Check(swordGrip != nullptr && torchGrip != nullptr && flame != nullptr && light != nullptr &&
+              TransformNear(swordGrip->world,
+                            horde::gameplay::items::SwordGripSocketTransform()) &&
+              TransformNear(torchGrip->world,
+                            horde::gameplay::items::OriginalTorchGripSocketTransform()) &&
+              TransformNear(flame->world,
+                            horde::gameplay::items::OriginalTorchFlameSocketTransform()) &&
+              TransformNear(light->world,
+                            horde::gameplay::items::OriginalTorchLightSocketTransform()),
+          "actual GLB Grip/Flame/Light transforms must exactly match shared fixed-step contracts");
+}
+
 } // namespace
 
 int main()
@@ -351,7 +588,11 @@ int main()
     TestScaledGripSocketIsRejected();
     TestLeftAndRightHandsCannotBeSwapped();
     TestWallRetractionMovesHandAndAttachedItemTogether();
-    TestTorchDetachesOnceWithTransformContinuity();
+    TestRealFixedTickTorchDetachIsIndependentlyTransformContinuous();
+    TestSharedFixedStepOwnsItemsKinematicsAndSocketLight();
+    TestHeldItemSnapshotsAreRenderDeliveryInvariant();
+    TestHeldItemBlasMeasurementsIncludeBothProductionAssets();
+    TestHeldLightGpuAbiAppendsWithoutChangingReleasedBindings();
     TestResetAndCheckpointImportRestoreParentContracts();
     TestRenderSlotConvertsGenericTransformWithoutItemBranches();
     TestFlameAndLightSocketsFollowTheComposedItem();
@@ -360,6 +601,7 @@ int main()
     TestProductionSwordAssetMeetsGenericSocketAndPbrBudget();
     TestProductionTorchAssetMeetsGenericSocketAndPbrBudget();
     TestProductionAssetsShareOneGenericStaticSlot();
+    TestProductionSocketsMatchSharedFixedStepContracts();
     if (failures == 0)
     {
         std::cout << "Held-item socket contracts passed.\n";
