@@ -12,6 +12,10 @@ try {
         $generatedGlsl -notmatch 'binding = 22\) restrict buffer RtDielectricDiagnosticsBuffer') {
         throw "Dielectric diagnostics must append a writable binding without aliasing read-only instance metadata."
     }
+    if ($generatedGlsl -notmatch 'uint primaryUnclosedVolumeCount;' -or
+        $generatedGlsl -notmatch 'uint shadowUnclosedVolumeCount;') {
+        throw "Dielectric diagnostics must append independent primary and shadow unclosed-volume counters."
+    }
 
     $definition = Get-Content -LiteralPath (Join-Path $repoRoot "src\vulkan\raytracing\RtSceneAbi.def") -Raw | ConvertFrom-Json
     $definition | Add-Member -Force -NotePropertyName records -NotePropertyValue @(

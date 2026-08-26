@@ -525,6 +525,8 @@ int main()
             ReadTextFile(raygenDirectory / "include/rt_hit_decode.glsl");
         const std::string fireSource =
             ReadTextFile(raygenDirectory / "include/rt_fire.glsl");
+        const std::string dielectricTransportSource =
+            ReadTextFile(raygenDirectory / "include/rt_dielectric_transport.glsl");
         std::string lightingSource =
             ReadTextFile(raygenDirectory / "include/rt_lighting.glsl");
         const std::string hitDecodeInclude = "#include \"rt_hit_decode.glsl\"";
@@ -539,7 +541,7 @@ int main()
             lightingSource +
             fireSource +
             ReadTextFile(raygenDirectory / "include/rt_dielectric_common.glsl") +
-            ReadTextFile(raygenDirectory / "include/rt_dielectric_transport.glsl") +
+            dielectricTransportSource +
             ReadTextFile(raygenDirectory / "include/rt_atmosphere.glsl");
         const std::string sceneSource =
             ReadTextFile(root / "src/vulkan/raytracing/PresentableTinyRtScene.cpp");
@@ -749,6 +751,8 @@ int main()
                       raygenSource.find("atomicAdd(rtDielectricDiagnostics.value.transportOverflowCount, 1u);") != std::string::npos &&
                       raygenSource.find("atomicAdd(rtDielectricDiagnostics.value.secondaryDielectricRejectCount, 1u);") != std::string::npos &&
                       raygenSource.find("atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);") != std::string::npos &&
+                      dielectricTransportSource.find("atomicAdd(rtDielectricDiagnostics.value.primaryUnclosedVolumeCount, 1u);") != std::string::npos &&
+                      dielectricTransportSource.find("shadowUnclosedVolumeCount") == std::string::npos &&
                       raygenSource.find("dielectricEffectiveFresnel(") != std::string::npos &&
                       raygenSource.find("dielectricRayEpsilon(") != std::string::npos &&
                       raygenSource.find("float minimumDistance") != std::string::npos &&
@@ -766,6 +770,8 @@ int main()
                       raygenSource.find("material.metallicRoughnessOcclusionTransmission.x") != std::string::npos &&
                       raygenSource.find("dielectricBeerLambert(") != std::string::npos &&
                       raygenSource.find("atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);") != std::string::npos &&
+                      lightingSource.find("atomicAdd(rtDielectricDiagnostics.value.shadowUnclosedVolumeCount, 1u);") != std::string::npos &&
+                      lightingSource.find("primaryUnclosedVolumeCount") == std::string::npos &&
                       raygenSource.find("if (interfaceCount >= interfaceBudget)") != std::string::npos &&
                       raygenSource.find("lightTransmittance = shadowTransmittanceMask(") != std::string::npos,
                       "nearest committed shadow traversal must retain RGB through local, sky, and fire lighting while keeping metallic blockers and mobile/high ceilings");
@@ -778,11 +784,17 @@ int main()
                       "fixture-hidden lighting must retain released scalar arithmetic from the shared ordered query while active generic transmission uses RGB traversal");
         ok &= Require(sceneSource.find("secondaryDielectricRejectCount") != std::string::npos &&
                       sceneSource.find("unclosedVolumeCount") != std::string::npos &&
+                      sceneSource.find("primaryUnclosedVolumeCount") != std::string::npos &&
+                      sceneSource.find("shadowUnclosedVolumeCount") != std::string::npos &&
                       windowsSource.find("secondaryDielectricRejectCount") != std::string::npos &&
                       windowsSource.find("unclosedVolumeCount") != std::string::npos &&
+                      windowsSource.find("primaryUnclosedVolumeCount") != std::string::npos &&
+                      windowsSource.find("shadowUnclosedVolumeCount") != std::string::npos &&
                       androidBridgeSource.find("dielectricSecondaryRejectCount") != std::string::npos &&
-                      androidBridgeSource.find("dielectricUnclosedVolumeCount") != std::string::npos,
-                      "CPU and platform diagnostics must expose secondary dielectric rejection separately from overflow and unclosed-volume fallback");
+                      androidBridgeSource.find("dielectricUnclosedVolumeCount") != std::string::npos &&
+                      androidBridgeSource.find("dielectricPrimaryUnclosedVolumeCount") != std::string::npos &&
+                      androidBridgeSource.find("dielectricShadowUnclosedVolumeCount") != std::string::npos,
+                      "CPU and platform diagnostics must retain the total while exposing primary and shadow unclosed-volume routes separately");
         ok &= Require(waterPrimary.find("transmittedHit.t += h.t + waterPathLength;") !=
                           std::string::npos &&
                       waterPrimary.find("float reflectedLocalDistance = reflectedHit.hit ? reflectedHit.t : 12.0;") !=

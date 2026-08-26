@@ -26,6 +26,30 @@ void Check(bool condition, std::string_view message)
     }
 }
 
+template <typename T>
+void CheckSplitDielectricDiagnosticLayout()
+{
+    if constexpr (requires(T value) {
+                      value.primaryUnclosedVolumeCount;
+                      value.shadowUnclosedVolumeCount;
+                  })
+    {
+        Check(sizeof(T) == 32u && alignof(T) == 16u &&
+                  offsetof(T, transportOverflowCount) == 0u &&
+                  offsetof(T, shadowOverflowCount) == 4u &&
+                  offsetof(T, secondaryDielectricRejectCount) == 8u &&
+                  offsetof(T, unclosedVolumeCount) == 12u &&
+                  offsetof(T, primaryUnclosedVolumeCount) == 16u &&
+                  offsetof(T, shadowUnclosedVolumeCount) == 20u,
+              "dielectric diagnostics append route-split unclosed counts without moving the released four counters");
+    }
+    else
+    {
+        Check(false,
+              "dielectric diagnostics must append independent primary and shadow unclosed-volume counts");
+    }
+}
+
 horde::scene::assets::StaticMeshAsset MakeAsset(std::size_t primitiveCount,
                                                  std::size_t materialCount)
 {
@@ -81,12 +105,7 @@ void TestAbiLayout()
               offsetof(RtPrimitiveMetadata, indexCount) == 8u &&
               offsetof(RtPrimitiveMetadata, materialIndex) == 12u,
           "RtPrimitiveMetadata CPU offsets match one GLSL uvec4 field");
-    Check(sizeof(RtDielectricDiagnostics) == 16u &&
-              offsetof(RtDielectricDiagnostics, transportOverflowCount) == 0u &&
-              offsetof(RtDielectricDiagnostics, shadowOverflowCount) == 4u &&
-              offsetof(RtDielectricDiagnostics, secondaryDielectricRejectCount) == 8u &&
-              offsetof(RtDielectricDiagnostics, unclosedVolumeCount) == 12u,
-          "dielectric diagnostics distinguish bounded overflow, secondary rejection, and unclosed volume without changing the fixed uvec4");
+    CheckSplitDielectricDiagnosticLayout<RtDielectricDiagnostics>();
 
     Check(sizeof(RtMaterialGpu) == 112u && alignof(RtMaterialGpu) == 16u,
           "RtMaterialGpu is seven aligned vec4/uvec4 fields");
