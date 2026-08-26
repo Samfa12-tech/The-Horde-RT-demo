@@ -144,3 +144,145 @@ Automated image inspection can confirm capture structure and deterministic outpu
 Task 5's two-cut combo owner audio/haptic replay remains independently open; Task 6 did not touch that route.
 
 Audio/haptic manual revalidation required: NO — this milestone changes material transport and shader visibility only; audio/haptic state, event timing, playback, spatialisation, and feedback semantics are unchanged.
+
+## Fix Round 1 — deterministic ordering, energy, thin defaults, winding, and exact identity
+
+Date: 2026-08-27 (Australia/Sydney)
+
+This section supersedes any contrary identity, shader, ABI, counter, or final-gate statement earlier in this report. In particular, the first-round image comparator allowed a maximum one-channel difference of one and therefore did **not** prove bit-exact output. A strict SHA-256 audit exposed sparse rounding changes in two fixture-hidden images. Fix Round 1 restores literal byte identity with a separately compiled legacy-inactive shader variant and proves all 13 images by exact hash.
+
+Final implementation head before this report update is `c5527a9d5ec90fcc97248472636bb5cb6dc545fd`; the worktree was clean before and after the full validation run.
+
+### Fix commits
+
+- `13db9b9` — `test: define ordered dielectric energy reference`
+- `422df8c` — `fix: honor gltf thin transmission defaults`
+- `11a2028` — `fix: validate dielectric winding after transforms`
+- `8b44980` — `fix: order and conserve bounded glass transport`
+- `59f5cae` — `test: add tinted and millimetre glass proofs`
+- `2df21a9` — `fix: preserve exact fixture-hidden transport`
+- `c5527a9` — `test: prove grazing and millimetre glass bounds`
+
+### Six Important findings — RED/GREEN resolution
+
+1. **Transparent-shadow candidate order.** The host reference test permutes all 120 orders of five nested/thin interfaces and requires identical RGB output, nesting state, interface count, and overflow state. Runtime shadow transport now repeats a nearest committed `rayQueryEXT` from an advanced origin, with actual accumulated distances and stable progress rules. It never pairs implementation-defined candidate order. Mobile remains four interfaces; High remains eight.
+2. **RGB generic shadow transmittance.** Transmittance stays `vec3` through ordinary local, skylight, and selected-fire lighting. Tinted glass therefore filters fire instead of falling back to binary visibility. Behavioral host tests prove channel-separated Beer-Lambert output and prove both an opaque blocker and a high-metallic transmissive material terminate to zero. The shader keeps exactly one/two local-plus-sky samples and the established fire sample counts, while Task 4 reflection-energy ownership remains unchanged.
+3. **Energy conservation.** Host and GLSL share one effective Fresnel, including the bounded roughness treatment, then partition reflection and transmission from that value. The exhaustive host sweep covers 499,849 IOR/cosine/roughness combinations and requires finite normalized Fresnel and reflection plus transmission no greater than one. Dedicated IOR 1.5 / roughness 1 and NaN/infinite/negative clamping cases pass.
+4. **Thin closed glass and unclosed fallback.** The fixed 4 mm advance / 2 mm `tMin` was replaced by a finite world-scale, hit-distance-aware, normal-aware epsilon. In the authored corridor it is 0.02–0.10 mm, keeps two advances below 1 mm, and remains capped at 0.25 mm for very large finite coordinates. A real 1 mm closed fixture passes direct through-view with zero unclosed-volume diagnostics. If an ordinary terminal is reached with a nonempty closed-volume stack, the path no longer shades through it: it selects the deterministic bounded fallback and increments the dedicated unclosed counter. The exact-zero Snell discriminant is accepted as tangent transmission (`discriminant < 0`, not `<= 0`) and has a boundary test.
+5. **glTF defaults.** `KHR_materials_transmission` without `KHR_materials_volume`, and `KHR_materials_volume` with zero thickness, deterministically map to audited `ThinWall`. A contradictory `thinWall=false` override cannot turn zero-thickness glTF material into a thick volume. An explicit positive thickness override selects real closed-volume intent and invokes topology validation. Runtime and offline fixture tests cover extension-only, zero-thickness, override, and positive-thickness cases.
+6. **Topology and winding.** Runtime and offline validators require exactly two uses of each shared edge, one in each direction, plus outward signed-volume orientation after baked positive-determinant transforms. Both routes accept the closed fixture and a valid transformed fixture, and reject open, non-manifold, inward-wound, single-face-flipped, and negative-determinant node-transform fixtures with repair instructions. Negative scale is deliberately rejected; the diagnostic requires baking the reflection and reversing triangle winding/normals before import.
+
+The diagnostic ABI remains one fixed 16-byte `RtDielectricDiagnostics` `uvec4` at append-only binding 22, now with distinct offsets for transport overflow, shadow overflow, secondary-dielectric rejection, and terminal-with-open-volume rejection. No existing binding, material stride, descriptor capacity, TLAS capacity, or sample budget changed.
+
+### Inactive-material identity and push ABI
+
+The sparse one-channel differences were caused by compiling the new RGB path behind a dynamic activity branch: even when false at runtime, the compiler changed legacy floating-point instruction formation. Restoring the literal legacy operations inside that dynamic shader was insufficient. The retained solution compiles two raygen pipelines from the same source:
+
+- generic variant: full bounded RGB dielectric transport;
+- legacy-inactive variant: `genericTransmissionActive` is a compile-time false constant, preserving the reviewed Task 5 arithmetic.
+
+The CPU derives activity by scanning active `Transmissive` instance metadata and imported transmission material flags/factor/metallic state. It does not branch on the fixture, lantern, or water object. Fixture-hidden authored routes select the legacy pipeline/SBT; any active generic dielectric selects the generic pipeline/SBT. Water retains its established special geometry/flow identity and does not spuriously activate the generic route.
+
+The push ABI appends `genericTransmissionActive` at offset 120 and is now 124 bytes. Compile-time assertions require `sizeof(ScenePushConstants) == 124` and `<= 128`; runtime initialization queries `VkPhysicalDeviceProperties::limits.maxPushConstantsSize` and rejects a device below 124 with an actionable diagnostic. Vulkan's guaranteed minimum/project ceiling remains 128 bytes. The exact Windows RTX device reports 256 bytes. The phone property could not be queried because ADB had no device; that remains part of the exact-device gate rather than being inferred.
+
+Both pipelines use the same three shader groups. On the RTX device the 32-byte handle, 32-byte handle alignment, and 64-byte base alignment produce a 192-byte SBT per pipeline, so the second SBT adds 192 bytes. The extra persistent embedded legacy SPIR-V is 774,584 bytes. Driver-managed pipeline memory is not exposed numerically; there is one additional `VkPipeline`, while shader modules are destroyed after creation. No descriptor or fixed scene-buffer capacity increased.
+
+### Final shader metrics and cliff investigation
+
+| Variant/boundary | Bytes | Instructions | Branch ops | Loops | Selections | Functions/calls | Static query sites |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| reviewed Task 6 before Fix Round 1 | 653,828 | 36,485 | 5,226 | 68 | 2,114 | 1 / 0 | 29 |
+| Fix Round 1 before identity split | 771,848 | 42,506 | 6,092 | 89 | 2,499 | 1 / 0 | 29 |
+| final generic | 785,676 | 43,378 | 6,263 | 89 | 2,556 | 1 / 0 | 29 |
+| final legacy-inactive | 774,584 | 42,711 | 6,155 | 89 | 2,520 | 1 / 0 | 29 |
+
+The Fix Round 1 increase is attributed to deterministic nearest-interface RGB traversal being fully inlined into 21 lighting call sites, plus terminal-open-volume handling and the activity route. Resolved sources contain no duplicate include and there is no accidental loop unrolling; final binaries still contain 29 static ray-query sites. Three optimizer hypotheses were tested without lowering interface budgets or sample/visual quality:
+
+- whole-function-preserving optimization: 188,844 bytes / 11,112 instructions / 568 branches / 10 loops / 241 selections / two static query sites;
+- `DontInline` limited to shadow traversal: 628,812 bytes / 35,004 instructions / 4,986 branches / 45 loops / 2,046 selections / nine static query sites;
+- the established fully inlined route above.
+
+Both call-preserving variants caused the NVIDIA capture process to hang without presenting for at least five minutes. They were rejected. The final fully inlined binaries complete real RTX `vkCmdTraceRaysKHR` captures. This is a driver-safety choice, not a physical-budget reduction.
+
+Final generic identity: source dependency SHA-256 `8a151c061b31d906568aa79e6f6ba07a16b397a4d70d0406cc673f642efdff4b`; embedded include SHA-256 `3ddaa87b59df1543309d1158645ba553e78778b4cd352ff371e56947865786f8`; SPIR-V SHA-256 `f358351e815f7e0394691f6893e27c2ba37f0a4b1a85f7b60d68a373dd467df1`.
+
+Final legacy identity: source dependency SHA-256 `5f10cd78513710a701a320df0d8a3e201bc7c0de5ec9d80b297498634572c09b`; embedded include SHA-256 `4c9864d665a0fcace4beb58f4823a67395a5f3ba79a468e822e8351be4ebd61e`; SPIR-V SHA-256 `d4ad85bed4bf04a0963d718386d17b7ac86e0bbbbccc1450c8511eaab976ce58`.
+
+Numerical register pressure remains unavailable because NVIDIA Nsight is not installed; shader size/structure and real capture timings are reported without claiming phone occupancy.
+
+### Strict fixture-hidden capture identity
+
+The independent check compares each PNG's literal SHA-256, not a pixel tolerance. Final run `run-20260827-013127` matches reviewed Task 5 run `run-20260826-213806` exactly, 13/13, and all four dielectric counters are zero:
+
+| Capture | Exact SHA-256 |
+| --- | --- |
+| `00-opening.png` | `fab96a76afa942cc96561cf6dc774e2167706835ac28e0f5b32f460f4585d82b` |
+| `01-skeleton.png` | `27646f0f4d4277128637132f9bdf6c80b95c502d84c26423872e40313a9e4ee6` |
+| `02-worst-bend.png` | `acd376b717f97d0e4922369aca7b32e20bda5abfb1155f9e8a9151a68e759f1b` |
+| `03-lantern-drop.png` | `126a05dc801aae00df61d69c8991b47d73b1601b245f401384d7ff2429ac1c79` |
+| `04-skylight.png` | `11fb28bf6de4c858d68fd6df4eb34b2ea1b382789db9c11623e0262926b4d3db` |
+| `05-yellow.png` | `b874493f452ebe26acb78575106d439bfbb6108112fc15317dbf7c9b0749b044` |
+| `06-blue.png` | `540669c427c34574b6a92624550f166041b1fa138e558c25c687e008ae600558` |
+| `07-red.png` | `b17c2bb2dc878b5b74a2898932262d195c170cff33034062c40b95d1d03eec82` |
+| `08-green.png` | `51813792e984f1ca627c5002fda3e285427ba49bd8d3a3ab10a7c4de469b41e0` |
+| `09-mirror.png` | `0384fbb5fdad251631a96f5c98923ed65f9e154be8aee893bc27b30bf864983e` |
+| `10-lich.png` | `6337ef821d787c1299d1c096c13a466d00af09d90682c3558695124400fc666f` |
+| `11-finale-roof.png` | `feb8ec4e715c1fe40bde71f90a6b38ad0e97a8be920fc828b7720a78a09ef210` |
+| `12-two-enemy-combat.png` | `cac5a343933cddb035f2037d15d0412774347e8948583164c35f634fdd118577` |
+
+Final hidden-run aggregate timing is median 6.053300 ms with GPU RT-command-buffer average 1.023149 ms over 156/155 samples respectively. These RTX timings do not substitute for the missing phone gate.
+
+### Generic glass captures and exact diagnostics
+
+All captures are 960x540, render scale 1.0, honestly presented RT frames on `NVIDIA GeForce RTX 5050 Laptop GPU`, with 12 timing samples and normalized `outputRedBlueSwap`.
+
+| Checkpoint | PNG SHA-256 | Median ms | GPU RT avg ms | Transport overflow | Shadow overflow | Secondary reject | Unclosed volume |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| no-fire / skylight `glass-transport` | `89f3d9956711ab33291b42b453ba50ae8ba3bb03107f8d797bbce97ac6f12401` | 6.060200 | 0.991031 | 106 | 0 | 11 | 36 |
+| fire-on `glass-fire-transport` | `3594ad3ab7e091e87771e66e8e4fd81e5d456748fe328427c4980560838abbc2` | 6.062900 | 1.250065 | 94 | 0 | 10 | 53 |
+| tinted/fire `glass-tinted-transport` | `722f76f445c17013e15be9688840213a886d8462375d13324c1ac0ff4407b0e8` | 6.050850 | 1.249484 | 94 | 0 | 10 | 53 |
+| 1 mm closed `glass-millimetre-closed` | `89371829197fed0b73c26757d4e20cb2b9e25d047b7cc5ef7788b3b0618e1a79` | 6.056450 | 0.973440 | 0 | 0 | 32 | 0 |
+| grazing `glass-edge-fresnel` | `3d44dc40efa662009473265ba7567da77c651a60bbf455c73371a3b496df4526` | 6.067700 | 0.875683 | 0 | 0 | 0 | 500 |
+
+Every nonzero counter has a distinct meaning:
+
+- **Transport overflow** means TIR/roughness/internal-edge continuation consumed the fixed 4/8 interface budget and selected the deterministic bounded fallback. It is 106 for the settled standard view and 94 for the fire/tinted views; it is zero for the 1 mm direct-view and edge checkpoints.
+- **Shadow overflow** is zero in every checkpoint, proving sampled local/skylight/fire shadow paths stayed within their fixed 4/8 interface ceilings.
+- **Secondary rejection** means the single allowed terminal reflection query hit the same generic dielectric and was rejected instead of recursively evaluating it. Counts are 11 standard, 10 fire/tinted, 32 for the 1 mm view, and zero edge.
+- **Unclosed volume** means a refracted path reached an ordinary terminal with its closed-volume stack still nonempty and was deterministically rejected. Temporary instrumentation first proved all 38 probed events were ordinary-terminal-with-open-stack, not no-hit. A second probe recorded first-interface incidence: maximum cosine 0.185004 and summed cosine 0.900348 over 38 events, mean 0.023693. Thus these are recorded silhouette/grazing paths, not an unexplained central miss. The final standard count is 36; camera/fire sampling changes make fire and tinted 53; the deliberately grazing edge checkpoint is 500. The same closed fixture scaled to exactly 1 mm has zero unclosed events in direct through-view. Temporary probe encoding was removed; the table contains the restored split counters.
+
+Reducing the normal bias to one eighth increased the standard probe from 36 to 38 unclosed events, so that hypothesis was rejected and the full bounded normal-aware bias retained. The corrected edge checkpoint yaw is -0.65 radians; its fixture is actually in view and intentionally exercises silhouette/Fresnel behavior rather than looking away.
+
+Automated capture inspection verifies route, structure, hashes, counters, and timing only. Hands-on perceived glass quality—edge readability, refraction/roughness feel, and direct through-view—is still an owner boundary.
+
+### Final focused and full validation
+
+Focused final-head CTests from the fresh build tree passed:
+
+- Debug: 8/8 in 18.91 s;
+- Release: 8/8 in 18.71 s;
+- coverage: dielectric math, development fixture/checkpoints, scene ABI, static GLB runtime validation, ABI generator, compiler strategy, offline topology tool, and character/render-slot integration.
+
+Fresh full run `reports/foundation-runs/run-20260827-013127` passed at exact commit `c5527a9d5ec90fcc97248472636bb5cb6dc545fd`:
+
+- shader freshness for generic and legacy variants: pass;
+- shader/ABI/topology negative safety gates: pass;
+- fresh Windows Debug: 27/27, 104.43 s;
+- fresh Windows Release: 27/27, 56.59 s;
+- deterministic Windows captures: 13/13 honestly presented; independent strict hash proof above;
+- Android: clean Debug, unsigned Release, and Release lint; `BUILD SUCCESSFUL in 2m 53s`, 100 actionable tasks (98 executed, two up-to-date);
+- Windows/Android package and licence gate: pass;
+- evidence hashing: pass;
+- status before and after the run: clean.
+
+The generated Android validation APK is deliberately unsigned and unpublishable:
+
+- `reports/foundation-runs/run-20260827-013127/artifacts/Horde-Lantern-RT-validation-20260827-013127-Android-UNSIGNED-DO-NOT-PUBLISH.apk`
+- 74,388,092 bytes
+- SHA-256 `4bf28a35f68b01198c326011ac95888db51bf22f0d5276b8d6a40c2d2eb4ed99`
+
+Final `adb devices -l` again returned an empty device list. No exact artifact was installed and no phone parity, matched Mobile/High 75%, separate 100%, warmed timing/thermal/GPU-power/resources, or Home/resume evidence is claimed. Exact `SM-S948B` Task 6 device acceptance remains a hard Task 9 gate.
+
+Task 5's two-cut combo owner audio/haptic replay remains separately open and was not changed by this fix round.
+
+Audio/haptic manual revalidation required: NO — this milestone changes material transport and shader visibility only; audio/haptic state, event timing, playback, spatialisation, and feedback semantics are unchanged.
