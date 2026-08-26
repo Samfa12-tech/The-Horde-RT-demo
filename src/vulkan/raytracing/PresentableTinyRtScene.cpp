@@ -297,6 +297,10 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     skinnedPlayerUpload_ = std::move(other.skinnedPlayerUpload_);
     playerStaticVertexBase_ = std::exchange(other.playerStaticVertexBase_, 0u);
     playerCpuSkinCadence_ = std::exchange(other.playerCpuSkinCadence_, PlayerCpuSkinCadence::Hz60);
+    measuredPlayerRoute_ = std::exchange(other.measuredPlayerRoute_, PlayerRenderRoute::Procedural);
+    playerSkinUpdateCount_ = std::exchange(other.playerSkinUpdateCount_, 0u);
+    playerSkinTotalMilliseconds_ = std::exchange(other.playerSkinTotalMilliseconds_, 0.0);
+    playerMaxSocketErrorMetres_ = std::exchange(other.playerMaxSocketErrorMetres_, 0.0f);
     developmentStaticAssetDirectory_ = std::move(other.developmentStaticAssetDirectory_);
     staticTextureDirectory_ = std::move(other.staticTextureDirectory_);
     staticMeshSlot_ = std::move(other.staticMeshSlot_);
@@ -3203,6 +3207,13 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                                                      const RtSceneFrameInputs& frame,
                                                      std::string& diagnostic)
 {
+    if (frame.playerRenderRoute != measuredPlayerRoute_)
+    {
+        measuredPlayerRoute_ = frame.playerRenderRoute;
+        playerSkinUpdateCount_ = 0u;
+        playerSkinTotalMilliseconds_ = 0.0;
+        playerMaxSocketErrorMetres_ = 0.0f;
+    }
     const float cameraYaw = frame.cameraYaw;
     const float cameraPitch = frame.cameraPitch;
     const float walkTime = frame.walkTime;
@@ -3319,6 +3330,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         animatedBodyOrigin[2]};
     if (frame.playerRenderRoute == PlayerRenderRoute::Skinned)
     {
+        const auto playerSkinBegin = std::chrono::steady_clock::now();
         std::array<float, 3u> rigShoulderCenter{};
         if (!playerRenderSlot_.ShoulderCenter(frame.playerAnimation,
                                               rigShoulderCenter, diagnostic))
@@ -3358,6 +3370,17 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                                            playerCpuSkinCadence_, updateSkinnedPlayer,
                                            diagnostic))
             return false;
+        if (updateSkinnedPlayer)
+        {
+            const auto playerSkinEnd = std::chrono::steady_clock::now();
+            playerSkinTotalMilliseconds_ +=
+                std::chrono::duration<double, std::milli>(playerSkinEnd - playerSkinBegin).count();
+            ++playerSkinUpdateCount_;
+            playerMaxSocketErrorMetres_ = std::max(
+                playerMaxSocketErrorMetres_,
+                std::max(playerRenderSlot_.LeftSocketErrorMetres(),
+                         playerRenderSlot_.RightSocketErrorMetres()));
+        }
         if (updateSkinnedPlayer)
         {
             const auto& skinned = playerRenderSlot_.UniqueVertices();

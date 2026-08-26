@@ -122,6 +122,14 @@ public:
     std::uint32_t TlasCount() const { return ready_ ? kTlasCount : 0u; }
     std::uint32_t TlasInstanceCount() const { return ready_ ? kTlasInstanceCount : 0u; }
     std::size_t SkeletonPoseBucketCount() const { return characterSlot_.SkeletonPoseBucketCount(); }
+    std::uint32_t PlayerSkinCadenceHz() const { return 60u; }
+    std::uint64_t PlayerSkinUpdateCount() const { return playerSkinUpdateCount_; }
+    double PlayerSkinAverageMilliseconds() const
+    {
+        return playerSkinUpdateCount_ == 0u
+            ? 0.0 : playerSkinTotalMilliseconds_ / static_cast<double>(playerSkinUpdateCount_);
+    }
+    float PlayerMaxSocketErrorMetres() const { return playerMaxSocketErrorMetres_; }
     bool GenericStaticAssetEnabled() const { return genericStaticAssetEnabled_; }
     const RtStaticMeshMeasurements& StaticMeshMeasurements() const { return staticMeshSlot_.Measurements(); }
     VkDeviceSize StaticMeshBlasBytes() const { return staticMeshBlasBytes_; }
@@ -262,6 +270,10 @@ private:
     std::vector<horde::scene::assets::StaticRtVertex> skinnedPlayerUpload_;
     std::uint32_t playerStaticVertexBase_ = 0u;
     PlayerCpuSkinCadence playerCpuSkinCadence_ = PlayerCpuSkinCadence::Hz60;
+    PlayerRenderRoute measuredPlayerRoute_ = PlayerRenderRoute::Procedural;
+    std::uint64_t playerSkinUpdateCount_ = 0u;
+    double playerSkinTotalMilliseconds_ = 0.0;
+    float playerMaxSocketErrorMetres_ = 0.0f;
     std::string developmentStaticAssetDirectory_;
     std::string staticTextureDirectory_;
     RtStaticMeshSlot staticMeshSlot_;

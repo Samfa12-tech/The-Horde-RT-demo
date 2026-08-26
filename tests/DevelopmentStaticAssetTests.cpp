@@ -36,8 +36,8 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 5u,
-          "three isolated render-development checkpoints are exposed");
+    Check(kDevelopmentCheckpoints.size() == 6u,
+          "six isolated render-development checkpoints are exposed");
     const DevelopmentCheckpoint* checkpoint = FindDevelopmentCheckpoint("pbr-sword-closeup");
     Check(checkpoint != nullptr && checkpoint->id == 100 && checkpoint->baseShowcaseCheckpointId == 0 &&
               checkpoint->name == std::string_view("pbr-sword-closeup") &&
@@ -52,6 +52,12 @@ int main()
               player->cameraX == 0.0f && player->cameraZ == 1.85f &&
               player->pitch < -0.28f,
           "player body/grips proof has a stable downward-view identity");
+    const DevelopmentCheckpoint* fallback = FindDevelopmentCheckpoint("player-fallback-grips");
+    Check(fallback != nullptr && fallback->baseShowcaseCheckpointId == 0 &&
+              fallback->pitch == player->pitch,
+          "procedural player A/B checkpoint uses the exact skinned grip view");
+    Check(FindDevelopmentCheckpoint(102) == player && FindDevelopmentCheckpoint(105) == fallback,
+          "Android debug automation resolves bounded development checkpoints by ID");
     Check(FindDevelopmentCheckpoint("opening") == nullptr,
           "release checkpoint names cannot resolve through the development lookup");
 

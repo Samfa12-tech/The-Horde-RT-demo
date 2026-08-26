@@ -1325,6 +1325,8 @@ public class MainActivity extends Activity {
             case "lich": return 10;
             case "finale-roof": return 11;
             case "two-enemy-combat": return 12;
+            case "player-body-grips": return 102;
+            case "player-fallback-grips": return 105;
             default: return -1;
         }
     }

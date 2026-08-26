@@ -8,6 +8,7 @@ param(
     [string]$GpuTiming = "Enabled",
     [switch]$Include100,
     [switch]$Capture,
+    [string[]]$CaptureSelection = @(),
     [switch]$RtLabWorkloadComparison,
     [switch]$SkipBuild,
     [switch]$SkipInstall,
@@ -49,9 +50,12 @@ $checkpointZones = @{
     "lich" = "finale"
     "finale-roof" = "finale"
     "two-enemy-combat" = "skeleton-room"
+    "player-body-grips" = "opening"
+    "player-fallback-grips" = "opening"
 }
 $baselineCheckpoints = @("opening", "two-enemy-combat", "worst-bend", "skylight", "green", "lich")
 $captureCheckpoints = @("opening", "skeleton", "worst-bend", "lantern-drop", "skylight", "yellow", "blue", "red", "green", "mirror", "lich", "finale-roof", "two-enemy-combat")
+if ($CaptureSelection.Count -gt 0) { $captureCheckpoints = @($CaptureSelection) }
 $rtLabComparisonCheckpoints = @('lantern-drop', 'skylight', 'finale-roof')
 $rtLabExpectedWaterQuality = 1
 $timingRows = [System.Collections.Generic.List[object]]::new()
@@ -215,6 +219,19 @@ function Invoke-CaptureCheckpoint {
     if (-not $state.presented) { $failures.Add("$Checkpoint capture did not retain honest RT presentation.") }
     if ([int]$state.captureStableFrames -lt 12) { $failures.Add("$Checkpoint capture had only $($state.captureStableFrames) stable presented frames.") }
     if ([double]$state.animationTime -ne 0.0) { $failures.Add("$Checkpoint capture animation time was not fixed at zero.") }
+    if ($Checkpoint -eq "player-body-grips") {
+        if ($state.playerRenderRoute -ne "skinned") { $failures.Add("Skinned player capture reported route '$($state.playerRenderRoute)'.") }
+        if ([int]$state.playerSkinCadenceHz -ne 60 -or [int64]$state.playerSkinUpdates -lt 1) {
+            $failures.Add("Skinned player capture did not prove the selected 60 Hz CPU update route.")
+        }
+        if ([double]$state.playerMaxSocketErrorM -gt 0.015) { $failures.Add("Skinned player capture exceeded the 15 mm socket tolerance.") }
+    }
+    if ($Checkpoint -eq "player-fallback-grips" -and $state.playerRenderRoute -ne "procedural") {
+        $failures.Add("Procedural player capture reported route '$($state.playerRenderRoute)'.")
+    }
+    if ($Checkpoint.StartsWith("player-") -and [int]$state.tlasInstanceCount -ne 20) {
+        $failures.Add("$Checkpoint reported $($state.tlasInstanceCount) TLAS instances instead of 20.")
+    }
     $image = Save-Screenshot ("capture-{0:d2}-{1}-{2}" -f $Index, $Checkpoint, $RequestedScale)
     $captureRecords.Add([PSCustomObject]@{
         index = $Index
@@ -233,6 +250,12 @@ function Invoke-CaptureCheckpoint {
         animationTime = $state.animationTime
         stablePresentedFrames = $state.captureStableFrames
         presented = [bool]$state.presented
+        playerRenderRoute = $state.playerRenderRoute
+        playerSkinCadenceHz = $state.playerSkinCadenceHz
+        playerSkinUpdates = $state.playerSkinUpdates
+        playerSkinCpuAverageMs = $state.playerSkinCpuAverageMs
+        playerMaxSocketErrorM = $state.playerMaxSocketErrorM
+        tlasInstanceCount = $state.tlasInstanceCount
         sceneOnly = $true
         overlaysHidden = @("menu", "touch-actions", "HUD", "diagnostics", "developer-overlay")
         png = $image
@@ -348,6 +371,18 @@ function Invoke-CheckpointBenchmark {
     if ($state.zone -ne $checkpointZones[$Checkpoint]) { $failures.Add("$Checkpoint native state reported zone '$($state.zone)'.") }
     if (-not $state.presented) { $failures.Add("$Checkpoint native state did not retain honest RT presentation.") }
     if ($state.gpuTimingMode -ne $gpuTimingLabel) { $failures.Add("$Checkpoint native state reported GPU timing '$($state.gpuTimingMode)' instead of '$gpuTimingLabel'.") }
+    if ($Checkpoint -eq "player-body-grips") {
+        if ($state.playerRenderRoute -ne "skinned" -or [int]$state.playerSkinCadenceHz -ne 60 -or
+            [int64]$state.playerSkinUpdates -lt 1 -or [double]$state.playerMaxSocketErrorM -gt 0.015) {
+            $failures.Add("Skinned player benchmark did not retain its 60 Hz route and socket contract.")
+        }
+    }
+    if ($Checkpoint -eq "player-fallback-grips" -and $state.playerRenderRoute -ne "procedural") {
+        $failures.Add("Procedural player benchmark reported route '$($state.playerRenderRoute)'.")
+    }
+    if ($Checkpoint.StartsWith("player-") -and [int]$state.tlasInstanceCount -ne 20) {
+        $failures.Add("$Checkpoint benchmark reported $($state.tlasInstanceCount) TLAS instances instead of 20.")
+    }
     if ($RtWorkload -ge 0 -and [int]$state.rtLab.workloadPreset -ne $RtWorkload) {
         $failures.Add("$Checkpoint $RtLabProfile state reported workload $($state.rtLab.workloadPreset) instead of $RtWorkload.")
     }
