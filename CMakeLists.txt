@@ -124,6 +124,8 @@ endif()
 if(BUILD_TESTING)
     add_executable(horde_rt_player_animation_tests
         tests/PlayerAnimationTests.cpp
+        src/scene/assets/SkinnedMeshAsset.cpp
+        src/vulkan/raytracing/PlayerRenderSlot.cpp
     )
     target_include_directories(horde_rt_player_animation_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_link_libraries(horde_rt_player_animation_tests PRIVATE horde_gameplay_simulation)
@@ -280,6 +282,10 @@ if(BUILD_TESTING)
         target_include_directories(horde_rt_character_render_slot_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
         target_link_libraries(horde_rt_character_render_slot_smoke PRIVATE horde_rt_probe_core)
         add_test(NAME horde_rt_character_render_slot_smoke COMMAND horde_rt_character_render_slot_smoke)
+
+        add_executable(horde_rt_player_skinning_benchmark tests/PlayerSkinningBenchmark.cpp)
+        target_include_directories(horde_rt_player_skinning_benchmark PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+        target_link_libraries(horde_rt_player_skinning_benchmark PRIVATE horde_rt_probe_core)
 
         add_executable(horde_rt_developer_overlay_smoke
             tests/DeveloperOverlaySmoke.cpp

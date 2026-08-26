@@ -252,6 +252,9 @@ function Write-ValidationPackage {
         @{ Source = "assets\models\weapons\runtime\gothic-arming-sword-rh-lod0.runtime.glb"; Destination = "assets\models\weapons\runtime" },
         @{ Source = "assets\models\props\runtime\asset.manifest.json"; Destination = "assets\models\props\runtime" },
         @{ Source = "assets\models\props\runtime\gothic-hand-torch-lod0.runtime.glb"; Destination = "assets\models\props\runtime" },
+        @{ Source = "assets\models\player\runtime\asset.manifest.json"; Destination = "assets\models\player\runtime" },
+        @{ Source = "assets\models\player\runtime\clip-manifest.json"; Destination = "assets\models\player\runtime" },
+        @{ Source = "assets\models\player\runtime\gothic-traveller-lod0.runtime.glb"; Destination = "assets\models\player\runtime" },
         @{ Source = "assets\textures\held-items\runtime\asset.manifest.json"; Destination = "assets\textures\held-items\runtime" },
         @{ Source = "assets\textures\held-items\runtime\base-color.windows.ktx2"; Destination = "assets\textures\held-items\runtime" },
         @{ Source = "assets\textures\held-items\runtime\normal.windows.ktx2"; Destination = "assets\textures\held-items\runtime" },
@@ -303,6 +306,9 @@ function Test-ValidationPackages {
         "assets/models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb",
         "assets/models/props/runtime/asset.manifest.json",
         "assets/models/props/runtime/gothic-hand-torch-lod0.runtime.glb",
+        "assets/models/player/runtime/asset.manifest.json",
+        "assets/models/player/runtime/clip-manifest.json",
+        "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb",
         "assets/textures/held-items/runtime/asset.manifest.json",
         "assets/textures/held-items/runtime/base-color.windows.ktx2",
         "assets/audio/filmcow/sword_swing_1.wav",
@@ -322,6 +328,9 @@ function Test-ValidationPackages {
         "assets/models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb",
         "assets/models/props/runtime/asset.manifest.json",
         "assets/models/props/runtime/gothic-hand-torch-lod0.runtime.glb",
+        "assets/models/player/runtime/asset.manifest.json",
+        "assets/models/player/runtime/clip-manifest.json",
+        "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb",
         "assets/textures/held-items/runtime/asset.manifest.json",
         "assets/textures/held-items/runtime/base-color.android.ktx2",
         "assets/textures/held-items/runtime/normal.android.ktx2",
@@ -357,6 +366,7 @@ function Test-ValidationPackages {
         "string/credits_body", "Hotstrike Studio", "FilmCow", "Meshy", "DRAGON-STUDIO", "Pixabay",
         "Production Gothic arming sword created with Meshy; runtime processing by Samfa12/Codex",
         "Production medieval hand torch created with Meshy; runtime processing by Samfa12/Codex"
+        "Historical-Gothic traveller/fighter created with Meshy; runtime processing and animation integration by Samfa12/Codex"
     )) {
         if ($resources -notmatch [regex]::Escape($marker)) { throw "Android validation APK lacks credit marker: $marker" }
     }
@@ -555,6 +565,7 @@ try {
                 "credits and licences", "Hotstrike Studio", "FilmCow", "Meshy", "DRAGON-STUDIO", "Pixabay",
                 "Production Gothic arming sword created with Meshy; runtime processing by Samfa12/Codex",
                 "Production medieval hand torch created with Meshy; runtime processing by Samfa12/Codex"
+                "Historical-Gothic traveller/fighter created with Meshy; runtime processing and animation integration by Samfa12/Codex"
             )) {
                 if ($windowsBinaryText -notmatch [regex]::Escape($marker)) { throw "Windows executable lacks credit marker: $marker" }
             }

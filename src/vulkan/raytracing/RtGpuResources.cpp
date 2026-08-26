@@ -110,14 +110,25 @@ bool RtGpuResources::WriteBuffer(const RtGpuBuffer& buffer,
                                  const char* label,
                                  std::string& diagnostic) const
 {
-    if (buffer.memory == VK_NULL_HANDLE || data == nullptr || size == 0u || size > buffer.size)
+    return WriteBufferRange(buffer, 0u, data, size, label, diagnostic);
+}
+
+bool RtGpuResources::WriteBufferRange(const RtGpuBuffer& buffer,
+                                      const VkDeviceSize offset,
+                                      const void* data,
+                                      const VkDeviceSize size,
+                                      const char* label,
+                                      std::string& diagnostic) const
+{
+    if (buffer.memory == VK_NULL_HANDLE || data == nullptr || size == 0u ||
+        offset > buffer.size || size > buffer.size - offset)
     {
         diagnostic = std::string("Invalid ") + label + " upload.";
         return false;
     }
 
     void* mapped = nullptr;
-    if (vkMapMemory(device_, buffer.memory, 0u, size, 0u, &mapped) != VK_SUCCESS || mapped == nullptr)
+    if (vkMapMemory(device_, buffer.memory, offset, size, 0u, &mapped) != VK_SUCCESS || mapped == nullptr)
     {
         diagnostic = std::string("Failed to map ") + label + " memory.";
         return false;

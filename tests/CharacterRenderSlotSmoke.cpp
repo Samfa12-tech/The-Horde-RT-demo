@@ -173,9 +173,9 @@ int main()
                       !ShouldPersistRtLabUnlock({true, false, false, false, true}),
                   "Android RT Lab unlock was not restricted to genuine live finale completion");
 
-    ok &= Require(PresentableTinyRtScene::kBlasCount == 10u &&
+    ok &= Require(PresentableTinyRtScene::kBlasCount == 11u &&
                       PresentableTinyRtScene::kTlasInstanceCount == 20u,
-                  "RT lab waterfall must report its dedicated tenth BLAS and twentieth TLAS instance");
+                  "skinned player must add one updateable BLAS while TLAS remains capped at twenty instances");
     const RtSceneTuning authoredTuning;
     ok &= Require(Near(authoredTuning.waterfallWidthScale, 1.0f) &&
                       !authoredTuning.finaleRoofOpenOverride.has_value() &&
@@ -280,6 +280,8 @@ int main()
     simulationSnapshot.lich.finaleSkylightOpenProgress = 0.35f;
     simulationSnapshot.lich.finaleDawnRevealProgress = 0.65f;
     const RtSceneFrameInputs adaptedFrame = BuildRtSceneFrameInputs(simulationSnapshot, 0.75f);
+    ok &= Require(adaptedFrame.playerAnimation == simulationSnapshot.playerAnimation,
+                  "simulation adapter must copy authoritative player animation without platform logic");
     ok &= Require(adaptedFrame.skeletonEnemyCount == 2u &&
                   adaptedFrame.skeletonEnemies[0].id == simulation::EntityId::SkeletonA &&
                   adaptedFrame.skeletonEnemies[1].id == simulation::EntityId::SkeletonB,
@@ -615,7 +617,7 @@ int main()
                       raygenSource.find("gl_LaunchIDEXT.y * 100u") == std::string::npos,
                       "direct RT visibility must include player/world shadow casters independent of screen position");
         ok &= Require(raygenSource.find(
-                          "uint rayFlags = ignoreWater ? gl_RayFlagsNoOpaqueEXT : gl_RayFlagsOpaqueEXT;") !=
+                          "uint rayFlags = (ignoreWater || ignorePlayerNearFace)") !=
                           std::string::npos &&
                       raygenSource.find(
                           "rayQueryInitializeEXT(query, topLevelAS, gl_RayFlagsNoOpaqueEXT, mask") !=

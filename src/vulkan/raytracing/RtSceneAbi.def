@@ -34,7 +34,9 @@
     "baseColorTexture": 8,
     "normalTexture": 16,
     "ormTexture": 32,
-    "emissiveTexture": 64
+    "emissiveTexture": 64,
+    "headPrimaryMasked": 128,
+    "nearFacePrimaryMasked": 256
   },
   "records": [
     {

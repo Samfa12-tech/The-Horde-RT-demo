@@ -117,6 +117,8 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
         vertices_.insert(vertices_.end(), asset.vertices.begin(), asset.vertices.end());
         indices_.insert(indices_.end(), asset.indices.begin(), asset.indices.end());
         std::array<std::unordered_map<std::int32_t, std::uint32_t>, 4u> textureRoutes;
+        std::array<std::uint32_t, 4u> playerSharedLayers{};
+        bool playerSharedLayersInitialised = false;
         const auto routeTexture = [&textureRoutes, &nextTextureLayers, &diagnostic](
             std::size_t category,
             std::int32_t sourceTexture,
@@ -145,11 +147,30 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
         for (const auto& sourceMaterial : asset.materials)
         {
             std::array<std::uint32_t, 4u> layers{};
-            if (!routeTexture(0u, sourceMaterial.baseColorTexture, "baseColor", layers[0]) ||
-                !routeTexture(1u, sourceMaterial.normalTexture, "normal", layers[1]) ||
-                !routeTexture(2u, sourceMaterial.ormTexture, "ORM", layers[2]) ||
-                !routeTexture(3u, sourceMaterial.emissiveTexture, "emissive", layers[3]))
-                return false;
+            const bool playerVisibilityMaterial =
+                sourceMaterial.name == "BodyPrimaryVisible" ||
+                sourceMaterial.name == "HeadPrimaryMasked" ||
+                sourceMaterial.name == "NearFacePrimaryMasked";
+            if (playerVisibilityMaterial && playerSharedLayersInitialised)
+            {
+                // The audited runtime player duplicates material records only
+                // to carry primary-ray visibility semantics; all three records
+                // intentionally reference the same PBR image payloads.
+                layers = playerSharedLayers;
+            }
+            else
+            {
+                if (!routeTexture(0u, sourceMaterial.baseColorTexture, "baseColor", layers[0]) ||
+                    !routeTexture(1u, sourceMaterial.normalTexture, "normal", layers[1]) ||
+                    !routeTexture(2u, sourceMaterial.ormTexture, "ORM", layers[2]) ||
+                    !routeTexture(3u, sourceMaterial.emissiveTexture, "emissive", layers[3]))
+                    return false;
+                if (playerVisibilityMaterial)
+                {
+                    playerSharedLayers = layers;
+                    playerSharedLayersInitialised = true;
+                }
+            }
             materials_.push_back(ConvertMaterial(sourceMaterial, layers));
         }
         for (const auto& primitive : asset.primitives)

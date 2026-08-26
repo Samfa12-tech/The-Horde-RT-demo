@@ -27,6 +27,7 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     const RtSceneTuning& tuning)
 {
     RtSceneFrameInputs frame;
+    frame.tickIndex = simulation.tickIndex;
     frame.cameraYaw = simulation.playerYawRadians;
     frame.cameraPitch = simulation.playerPitchRadians;
     frame.torchLightStrength = simulation.torchLightStrength * simulation.torchFailure.flameStrength;
@@ -45,6 +46,7 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     frame.torchFailure = simulation.torchFailure;
     frame.heldItems = simulation.heldItems;
     frame.heldItemKinematics = simulation.heldItemKinematics;
+    frame.playerAnimation = simulation.playerAnimation;
     frame.heldLight = simulation.heldLight;
     frame.roster = simulation.enemyRoster;
     frame.lich = simulation.lich;

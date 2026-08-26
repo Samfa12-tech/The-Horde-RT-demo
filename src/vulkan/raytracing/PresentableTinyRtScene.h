@@ -15,6 +15,7 @@
 #include "vulkan/raytracing/CharacterRenderSlot.h"
 #include "vulkan/raytracing/FireEmitterBuffer.h"
 #include "vulkan/raytracing/HeldItemBlasMeasurements.h"
+#include "vulkan/raytracing/PlayerRenderSlot.h"
 #include "vulkan/raytracing/RtGpuResources.h"
 #include "vulkan/raytracing/RtSceneTuning.h"
 #include "vulkan/raytracing/RtStaticMeshSlot.h"
@@ -44,6 +45,7 @@ PlayerWeaponRenderPose EvaluatePlayerWeaponRenderPose(
 
 struct RtSceneFrameInputs
 {
+    std::uint64_t tickIndex = 0u;
     float cameraYaw = 0.0f;
     float cameraPitch = 0.0f;
     float torchLightStrength = 1.0f;
@@ -62,6 +64,8 @@ struct RtSceneFrameInputs
     horde::gameplay::TorchFailureSnapshot torchFailure{};
     horde::gameplay::items::HeldItemStates heldItems{};
     horde::gameplay::items::HeldItemKinematicsState heldItemKinematics{};
+    horde::gameplay::animation::PlayerAnimationSnapshot playerAnimation{};
+    PlayerRenderRoute playerRenderRoute = PlayerRenderRoute::Procedural;
     horde::gameplay::items::HeldLightState heldLight{};
     horde::gameplay::EnemyRosterSnapshot roster{};
     horde::gameplay::LichSnapshot lich{};
@@ -82,7 +86,7 @@ public:
         std::vector<std::uint8_t> rgba;
     };
 
-    static constexpr std::uint32_t kBlasCount = 10u;
+    static constexpr std::uint32_t kBlasCount = 11u;
     static constexpr std::uint32_t kTlasCount = 1u;
     static constexpr std::uint32_t kTlasInstanceCount = 20u;
 
@@ -245,12 +249,19 @@ private:
     AccelerationStructure swordBlas_;
     AccelerationStructure playerBodyBlas_;
     AccelerationStructure playerLimbBlas_;
+    AccelerationStructure skinnedPlayerBlas_;
+    Buffer skinnedPlayerBlasUpdateScratch_;
     AccelerationStructure tlas_;
     Buffer tlasUpdateScratch_;
     RtGpuResources gpuResources_;
     CharacterRenderSlot characterSlot_;
+    PlayerRenderSlot playerRenderSlot_;
     horde::scene::assets::StaticMeshAsset developmentStaticAsset_;
     horde::scene::assets::StaticMeshAsset productionTorchAsset_;
+    horde::scene::assets::StaticMeshAsset productionPlayerAsset_;
+    std::vector<horde::scene::assets::StaticRtVertex> skinnedPlayerUpload_;
+    std::uint32_t playerStaticVertexBase_ = 0u;
+    PlayerCpuSkinCadence playerCpuSkinCadence_ = PlayerCpuSkinCadence::Hz60;
     std::string developmentStaticAssetDirectory_;
     std::string staticTextureDirectory_;
     RtStaticMeshSlot staticMeshSlot_;

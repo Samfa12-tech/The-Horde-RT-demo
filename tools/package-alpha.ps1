@@ -114,6 +114,7 @@ foreach ($creditMarker in @(
     "credits and licences", "Hotstrike Studio", "FilmCow", "Meshy", "DRAGON-STUDIO", "Pixabay",
     "Production Gothic arming sword created with Meshy; runtime processing by Samfa12/Codex",
     "Production medieval hand torch created with Meshy; runtime processing by Samfa12/Codex"
+    "Historical-Gothic traveller/fighter created with Meshy; runtime processing and animation integration by Samfa12/Codex"
 )) {
     if ($windowsBinaryText -notmatch [regex]::Escape($creditMarker)) {
         throw "Windows executable is missing in-app credit marker: $creditMarker"
@@ -158,6 +159,9 @@ $assetCopies = @(
     @{ Source = "assets\models\weapons\runtime\gothic-arming-sword-rh-lod0.runtime.glb"; Destination = "assets\models\weapons\runtime" },
     @{ Source = "assets\models\props\runtime\asset.manifest.json"; Destination = "assets\models\props\runtime" },
     @{ Source = "assets\models\props\runtime\gothic-hand-torch-lod0.runtime.glb"; Destination = "assets\models\props\runtime" },
+    @{ Source = "assets\models\player\runtime\asset.manifest.json"; Destination = "assets\models\player\runtime" },
+    @{ Source = "assets\models\player\runtime\clip-manifest.json"; Destination = "assets\models\player\runtime" },
+    @{ Source = "assets\models\player\runtime\gothic-traveller-lod0.runtime.glb"; Destination = "assets\models\player\runtime" },
     @{ Source = "assets\textures\held-items\runtime\asset.manifest.json"; Destination = "assets\textures\held-items\runtime" },
     @{ Source = "assets\textures\held-items\runtime\base-color.windows.ktx2"; Destination = "assets\textures\held-items\runtime" },
     @{ Source = "assets\textures\held-items\runtime\normal.windows.ktx2"; Destination = "assets\textures\held-items\runtime" },
@@ -224,6 +228,7 @@ foreach ($creditMarker in @(
     "string/credits_body", "Hotstrike Studio", "FilmCow", "Meshy", "DRAGON-STUDIO", "Pixabay",
     "Production Gothic arming sword created with Meshy; runtime processing by Samfa12/Codex",
     "Production medieval hand torch created with Meshy; runtime processing by Samfa12/Codex"
+    "Historical-Gothic traveller/fighter created with Meshy; runtime processing and animation integration by Samfa12/Codex"
 )) {
     if ($androidResources -notmatch [regex]::Escape($creditMarker)) {
         throw "Android candidate is missing in-app credit marker: $creditMarker"
@@ -263,6 +268,9 @@ try {
         'assets/models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb',
         'assets/models/props/runtime/asset.manifest.json',
         'assets/models/props/runtime/gothic-hand-torch-lod0.runtime.glb',
+        'assets/models/player/runtime/asset.manifest.json',
+        'assets/models/player/runtime/clip-manifest.json',
+        'assets/models/player/runtime/gothic-traveller-lod0.runtime.glb',
         'assets/textures/held-items/runtime/asset.manifest.json',
         'assets/textures/held-items/runtime/base-color.android.ktx2',
         'assets/textures/held-items/runtime/normal.android.ktx2',
@@ -323,6 +331,9 @@ try {
         "assets/models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb",
         "assets/models/props/runtime/asset.manifest.json",
         "assets/models/props/runtime/gothic-hand-torch-lod0.runtime.glb",
+        "assets/models/player/runtime/asset.manifest.json",
+        "assets/models/player/runtime/clip-manifest.json",
+        "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb",
         "assets/textures/held-items/runtime/asset.manifest.json",
         "assets/textures/held-items/runtime/base-color.windows.ktx2",
         "assets/textures/held-items/runtime/normal.windows.ktx2",

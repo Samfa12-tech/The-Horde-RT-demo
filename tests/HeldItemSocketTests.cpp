@@ -517,11 +517,14 @@ void TestProductionAssetsShareOneGenericStaticSlot()
     const std::filesystem::path root = HORDE_RT_SOURCE_DIR;
     horde::scene::assets::AssetManifest swordManifest;
     horde::scene::assets::AssetManifest torchManifest;
+    horde::scene::assets::AssetManifest playerManifest;
     horde::scene::assets::StaticMeshAsset sword;
     horde::scene::assets::StaticMeshAsset torch;
+    horde::scene::assets::StaticMeshAsset player;
     std::string diagnostic;
     const auto swordDirectory = root / "assets/models/weapons/runtime";
     const auto torchDirectory = root / "assets/models/props/runtime";
+    const auto playerDirectory = root / "assets/models/player/runtime";
     Check(horde::scene::assets::AssetManifest::Load(
               swordDirectory / "asset.manifest.json", swordManifest, diagnostic) &&
               horde::scene::assets::StaticMeshAsset::Load(
@@ -531,15 +534,23 @@ void TestProductionAssetsShareOneGenericStaticSlot()
                   torchDirectory / "asset.manifest.json", torchManifest, diagnostic) &&
               horde::scene::assets::StaticMeshAsset::Load(
                   torchDirectory / "gothic-hand-torch-lod0.runtime.glb",
-                  torchManifest, torch, diagnostic),
-          "both production assets must load before generic slot registration");
-    std::array<horde::vulkan::raytracing::StaticRtAssetRegistration, 2u> registrations{{
+                  torchManifest, torch, diagnostic) &&
+              horde::scene::assets::AssetManifest::Load(
+                  playerDirectory / "asset.manifest.json", playerManifest, diagnostic) &&
+              horde::scene::assets::StaticMeshAsset::Load(
+                  playerDirectory / "gothic-traveller-lod0.runtime.glb",
+                  playerManifest, player, diagnostic),
+          "all three production PBR assets must load before generic slot registration");
+    std::array<horde::vulkan::raytracing::StaticRtAssetRegistration, 3u> registrations{{
         {3u, 0x53574f52u,
          static_cast<std::uint32_t>(horde::vulkan::raytracing::RtInstanceFlag::StaticPbr),
          0u, &sword},
         {1u, 0x544f5243u,
          static_cast<std::uint32_t>(horde::vulkan::raytracing::RtInstanceFlag::StaticPbr),
          1u, &torch},
+        {4u, 0x504c4159u,
+         static_cast<std::uint32_t>(horde::vulkan::raytracing::RtInstanceFlag::StaticPbr),
+         0u, &player},
     }};
     horde::vulkan::raytracing::RtStaticMeshSlot slot;
     Check(slot.Initialize(registrations, diagnostic),
@@ -547,13 +558,14 @@ void TestProductionAssetsShareOneGenericStaticSlot()
     const auto& metadata = slot.InstanceMetadata();
     Check(metadata[3].primitiveCount == sword.primitives.size() &&
               metadata[1].primitiveCount == torch.primitives.size() &&
+              metadata[4].primitiveCount == 3u &&
               metadata[1].emitterIndex == 1u &&
               metadata[3].emitterIndex == 0u,
           "generic registrations must retain stable TLAS routes and engine-emitter ownership");
     const auto counts = slot.TextureArrayCounts();
-    Check(counts.baseColor == 2u && counts.normal == 2u && counts.orm == 2u &&
+    Check(counts.baseColor == 3u && counts.normal == 3u && counts.orm == 3u &&
               counts.emissive == 0u,
-          "generic material routing must match the audited shared texture array layers");
+          "generic material routing must include the player in audited shared texture array layers");
 }
 
 void TestProductionSocketsMatchSharedFixedStepContracts()

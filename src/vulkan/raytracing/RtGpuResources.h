@@ -54,6 +54,12 @@ public:
                      VkDeviceSize size,
                      const char* label,
                      std::string& diagnostic) const;
+    bool WriteBufferRange(const RtGpuBuffer& buffer,
+                          VkDeviceSize offset,
+                          const void* data,
+                          VkDeviceSize size,
+                          const char* label,
+                          std::string& diagnostic) const;
     void DestroyBuffer(RtGpuBuffer& buffer) const;
     void DestroyAccelerationStructure(RtAccelerationStructure& accelerationStructure) const;
     VkDeviceAddress BufferAddress(VkBuffer buffer) const;

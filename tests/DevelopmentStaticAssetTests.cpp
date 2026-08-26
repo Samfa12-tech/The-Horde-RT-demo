@@ -34,8 +34,10 @@ int main()
           "development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("pbr-torch-fire") == nullptr,
           "torch development proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 2u,
-          "two isolated PBR held-item development checkpoints are exposed");
+    Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
+          "player-body proof does not enter the release checkpoint lookup");
+    Check(kDevelopmentCheckpoints.size() == 5u,
+          "three isolated render-development checkpoints are exposed");
     const DevelopmentCheckpoint* checkpoint = FindDevelopmentCheckpoint("pbr-sword-closeup");
     Check(checkpoint != nullptr && checkpoint->id == 100 && checkpoint->baseShowcaseCheckpointId == 0 &&
               checkpoint->name == std::string_view("pbr-sword-closeup") &&
@@ -45,6 +47,11 @@ int main()
     Check(torch != nullptr && torch->id == 101 && torch->baseShowcaseCheckpointId == 0 &&
               torch->cameraX == 0.0f && torch->cameraZ == 1.85f,
           "production torch/fire close-up has a stable isolated identity");
+    const DevelopmentCheckpoint* player = FindDevelopmentCheckpoint("player-body-grips");
+    Check(player != nullptr && player->id == 102 && player->baseShowcaseCheckpointId == 0 &&
+              player->cameraX == 0.0f && player->cameraZ == 1.85f &&
+              player->pitch < -0.28f,
+          "player body/grips proof has a stable downward-view identity");
     Check(FindDevelopmentCheckpoint("opening") == nullptr,
           "release checkpoint names cannot resolve through the development lookup");
 

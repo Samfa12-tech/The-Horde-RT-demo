@@ -323,6 +323,9 @@ public class MainActivity extends Activity {
                     && stageAsset("models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb", "models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb")
                     && stageAsset("models/props/runtime/asset.manifest.json", "models/props/runtime/asset.manifest.json")
                     && stageAsset("models/props/runtime/gothic-hand-torch-lod0.runtime.glb", "models/props/runtime/gothic-hand-torch-lod0.runtime.glb")
+                    && stageAsset("models/player/runtime/asset.manifest.json", "models/player/runtime/asset.manifest.json")
+                    && stageAsset("models/player/runtime/clip-manifest.json", "models/player/runtime/clip-manifest.json")
+                    && stageAsset("models/player/runtime/gothic-traveller-lod0.runtime.glb", "models/player/runtime/gothic-traveller-lod0.runtime.glb")
                     && stageAsset("textures/held-items/runtime/asset.manifest.json", "textures/held-items/runtime/asset.manifest.json")
                     && stageAsset("textures/held-items/runtime/base-color.android.ktx2", "textures/held-items/runtime/base-color.android.ktx2")
                     && stageAsset("textures/held-items/runtime/normal.android.ktx2", "textures/held-items/runtime/normal.android.ktx2")
@@ -337,7 +340,7 @@ public class MainActivity extends Activity {
             output.append("Animated skeleton staged: ").append(skeletonStaged ? "yes" : "no").append('\n');
             output.append("Animated lich placeholder staged: ").append(lichStaged ? "yes" : "no").append('\n');
             output.append("ASTC PBR material arrays staged: ").append(materialsStaged ? "yes" : "no").append('\n');
-            output.append("Production PBR held items staged: ").append(heldItemsStaged ? "yes" : "no").append('\n');
+            output.append("Production PBR held items/player staged: ").append(heldItemsStaged ? "yes" : "no").append('\n');
             output.append("Report directory: ").append(filesRoot).append('/').append(REPORT_DIRECTORY).append('\n');
             output.append("Report files: ").append(TEXT_REPORT_FILE).append(", ").append(JSON_REPORT_FILE).append('\n');
             output.append("JSON sample:\n").append(jsonReport);

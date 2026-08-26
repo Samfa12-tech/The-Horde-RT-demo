@@ -71,7 +71,7 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
     if (transmissionAvailable)
     {
         HitInfo transmittedHit = traceScene(exitPoint + transmissionDirection * 0.004,
-                                             transmissionDirection, 12.0, 0x23u, true);
+                                             transmissionDirection, 12.0, 0x23u, true, false);
         transmittedHit.t += h.t + waterPathLength;
         transmitted = shadeOpaqueSecondary(transmittedHit, transmissionDirection);
         transmitted *= exp(-vec3(0.060, 0.018, 0.008) * waterPathLength);
@@ -87,7 +87,7 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
     if (controls.waterQuality >= 1.5)
     {
         HitInfo reflectedHit = traceScene(h.position + geometricNormal * 0.006,
-                                          reflectionDirection, 12.0, 0x37u, false);
+                                          reflectionDirection, 12.0, 0x37u, false, false);
         float reflectedLocalDistance = reflectedHit.hit ? reflectedHit.t : 12.0;
         reflectedHit.t += h.t;
         reflected = shadeOpaqueSecondary(reflectedHit, reflectionDirection);
@@ -211,7 +211,7 @@ vec3 shadeOpaquePrimary(HitInfo h, vec3 rayDirection)
             : normalize(h.normal + vec3(0.18, 0.58, -0.34));
         uint bounceMask = wantsPlayerReflection ? 0x37u : 0x23u;
         HitInfo bounceHit = traceScene(offsetRayOrigin(h, bounceDirection), bounceDirection,
-                                       12.0, bounceMask, false);
+                                       12.0, bounceMask, false, false);
         bounce = bounceSample(bounceHit, bounceDirection, wantsPlayerReflection);
         if (wantsPlayerReflection)
         {
@@ -261,7 +261,7 @@ vec3 shadePrimary(HitInfo h, vec3 rayDirection)
         // genuinely behind the glass. Schlick Fresnel adds a readable reflection
         // without pretending this single surface is a thick dielectric volume.
         HitInfo transmittedHit = traceScene(h.position + rayDirection * 0.012,
-                                            rayDirection, 10000.0, 0x23u, false);
+                                            rayDirection, 10000.0, 0x23u, false, false);
         vec3 transmitted = transmittedHit.hit
             ? bounceSample(transmittedHit, rayDirection, false) : skyColor(rayDirection);
         vec3 tint = vec3(0.82, 0.94, 1.0);

@@ -11,10 +11,15 @@ Add-Type -AssemblyName System.IO.Compression
 $requiredAttributionMarkers = @(
     "Production Gothic arming sword created with Meshy; runtime processing by Samfa12/Codex.",
     "Production medieval hand torch created with Meshy; runtime processing by Samfa12/Codex.",
+    "Historical-Gothic traveller/fighter created with Meshy; runtime processing and animation integration by Samfa12/Codex.",
     "01a03b99-8999-7adc-8590-536691aacb87",
     "01a03b9c-d300-78bb-adc2-8fc93a65306f",
     "01a03b9d-02b1-7b7b-86ee-5e8c1f47af51",
     "01a03ba0-23a8-7bd4-92bf-3f0493705c61",
+    "01a03c8c-1b40-733b-8a8b-0255f1384c22",
+    "01a03c91-1472-765e-9a2f-d15370325975",
+    "01a03c9d-5296-7994-8fe4-e68ecc77c7ac",
+    "01a03ca2-a736-7808-b554-4f4193ec49f4",
     "CC BY 4.0"
 )
 
@@ -34,6 +39,9 @@ function Test-HeldItemPackage {
             "$AssetPrefix/models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb",
             "$AssetPrefix/models/props/runtime/asset.manifest.json",
             "$AssetPrefix/models/props/runtime/gothic-hand-torch-lod0.runtime.glb",
+            "$AssetPrefix/models/player/runtime/asset.manifest.json",
+            "$AssetPrefix/models/player/runtime/clip-manifest.json",
+            "$AssetPrefix/models/player/runtime/gothic-traveller-lod0.runtime.glb",
             "$AssetPrefix/textures/held-items/runtime/asset.manifest.json",
             $LicenceEntry
         )
@@ -72,4 +80,4 @@ if (-not [string]::IsNullOrWhiteSpace($WindowsZipPath)) {
     Test-HeldItemPackage -PackagePath $WindowsZipPath -LicenceEntry "ASSET_LICENSES.md" -AssetPrefix "assets"
 }
 
-Write-Output "Held-item runtime package entries and exact sword/torch CC BY 4.0 attribution passed."
+Write-Output "Held-item/player runtime package entries and exact Meshy CC BY 4.0 attribution passed."

@@ -3,23 +3,23 @@
   "asset": "production-held-item-pbr-arrays",
   "resolution": 1024,
   "mipmapped": true,
-  "layerOrder": ["gothic-arming-sword-rh-lod0", "gothic-hand-torch-lod0"],
+  "layerOrder": ["gothic-arming-sword-rh-lod0", "gothic-hand-torch-lod0", "gothic-traveller-lod0"],
   "layerCounts": {
-    "baseColor": 2,
-    "normal": 2,
-    "orm": 2,
+    "baseColor": 3,
+    "normal": 3,
+    "orm": 3,
     "emissive": 1
   },
   "android": {
-    "baseColor": { "format": "ASTC_6x6_SRGB_BLOCK", "sha256": "59092b17f6922da28e4dbf07a3e6cace209ccd4e629b21c5a55b055107a87735" },
-    "normal": { "format": "ASTC_4x4_UNORM_BLOCK", "sha256": "9143bc87c71f50fb7bbf8fcce0c7bd8d2a59da712c05f7c7519510dc25ebf5fb" },
-    "orm": { "format": "ASTC_6x6_UNORM_BLOCK", "sha256": "eaeff63be5824619cb2fca28f52118d493e19d3f73ed905975bcb681054895b8" },
+    "baseColor": { "format": "ASTC_6x6_SRGB_BLOCK", "sha256": "d89ad223ffd5d6625d2002850c6f8334d6a3bce583039a7ef5d3882e0aa8fb5b" },
+    "normal": { "format": "ASTC_4x4_UNORM_BLOCK", "sha256": "7c2c3c9b263f2962567246dc2b0205014e6948fa196e555486ae41f0be5d8653" },
+    "orm": { "format": "ASTC_6x6_UNORM_BLOCK", "sha256": "984c28ec6bdc6bc25e46bafd22e6bb854d29b177d9fa618fceb2fd429b54536b" },
     "emissive": { "format": "ASTC_6x6_SRGB_BLOCK", "sha256": "da5ee0baa4e6b84280a1b9ae077954c4658a4e7fff1da03212d220d282f9542a" }
   },
   "windows": {
-    "baseColor": { "format": "R8G8B8A8_SRGB", "sha256": "ce288b6d56a57edf959787f7306e962e5b2318c3f9ac06e96e2d759802908272" },
-    "normal": { "format": "R8G8B8A8_UNORM", "sha256": "36d503168cf7fe37a24815453ff270498b370dc03d2e69cefad23b462728e6cb" },
-    "orm": { "format": "R8G8B8A8_UNORM", "sha256": "64d850b405c125456cbeda037f1416d4b35d85059fa24993ebd64f2ba7a7061f" },
+    "baseColor": { "format": "R8G8B8A8_SRGB", "sha256": "ff2be853cf378a8130d7b64208950213bfe42a55450f38830fdd0b80c5da41a5" },
+    "normal": { "format": "R8G8B8A8_UNORM", "sha256": "3e3ad527803d45d6ad4b535e692ac82a29bf71ae747b82a9c6fff1b449b5e47e" },
+    "orm": { "format": "R8G8B8A8_UNORM", "sha256": "48cf70e2d0f280f8048090569815e2c3bc0a3407266c5df2a5abbe18ed5fa8dd" },
     "emissive": { "format": "R8G8B8A8_SRGB", "sha256": "c642d3972a14bf477d88f2ecb34ffc177ad4dc6308dfe8f507af6033c292dd56" }
   },
   "licenceStatus": "Meshy outputs distributed conservatively under CC BY 4.0; attribution in ASSET_LICENSES.md"

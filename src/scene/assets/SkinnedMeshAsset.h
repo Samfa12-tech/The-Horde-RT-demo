@@ -10,6 +10,8 @@
 namespace horde::scene
 {
 
+using SkinnedNodeTransform = std::array<float, 16u>;
+
 // std430-compatible layout for both the RT build input and the raygen SSBO.
 struct SkinnedRtVertex
 {
@@ -53,8 +55,28 @@ struct SkinnedClipSet
     std::array<SkinnedClipBinding, 4u> clips{};
 };
 
+struct SkinnedPrimitiveRange
+{
+    std::size_t firstExpandedVertex = 0u;
+    std::size_t expandedVertexCount = 0u;
+    std::string materialName;
+};
+
+struct SkinnedArmIkTarget
+{
+    std::array<float, 3u> target{};
+    std::array<float, 3u> pole{};
+};
+
+struct SkinnedPlayerSockets
+{
+    SkinnedNodeTransform leftHand{};
+    SkinnedNodeTransform rightHand{};
+};
+
 const SkinnedClipSet& SkeletonCombatClipSet();
 const SkinnedClipSet& LichPlaceholderClipSet();
+const SkinnedClipSet& PlayerLocomotionClipSet();
 
 // Deliberately narrow glTF 2.0 reader for the audited Meshy bipeds. It imports
 // one skinned primitive into four semantic clip slots selected by the caller.
@@ -73,9 +95,28 @@ public:
     bool IsLoaded() const { return loaded_; }
     bool HasTexcoords() const { return hasTexcoords_; }
     std::size_t ExpandedVertexCount() const { return expandedIndices_.size(); }
+    std::size_t UniqueVertexCount() const;
+    const std::vector<SkinnedPrimitiveRange>& PrimitiveRanges() const { return primitiveRanges_; }
     float ClipDuration(SkinnedClip clip) const;
+    bool HasNode(std::string_view name) const;
+    bool NodeTransform(SkinnedClip clip,
+                       float timeSeconds,
+                       std::string_view nodeName,
+                       SkinnedNodeTransform& output,
+                       std::string& diagnostic) const;
     bool Skin(SkinnedClip clip, float timeSeconds, std::vector<SkinnedRtVertex>& output, std::string& diagnostic) const;
     bool SkinTextured(SkinnedClip clip, float timeSeconds, std::vector<TexturedSkinnedRtVertex>& output, std::string& diagnostic) const;
+    bool SkinUniqueTextured(SkinnedClip clip,
+                            float timeSeconds,
+                            std::vector<TexturedSkinnedRtVertex>& output,
+                            std::string& diagnostic) const;
+    bool SkinPlayerUniqueTextured(SkinnedClip clip,
+                                  float timeSeconds,
+                                  const SkinnedArmIkTarget& leftArm,
+                                  const SkinnedArmIkTarget& rightArm,
+                                  std::vector<TexturedSkinnedRtVertex>& output,
+                                  SkinnedPlayerSockets& sockets,
+                                  std::string& diagnostic) const;
 
 private:
     struct SourceVertex;
@@ -85,6 +126,7 @@ private:
 
     std::vector<SourceVertex> vertices_;
     std::vector<std::uint32_t> expandedIndices_;
+    std::vector<SkinnedPrimitiveRange> primitiveRanges_;
     std::vector<Node> nodes_;
     std::vector<std::uint32_t> joints_;
     std::vector<float> inverseBindMatrices_;

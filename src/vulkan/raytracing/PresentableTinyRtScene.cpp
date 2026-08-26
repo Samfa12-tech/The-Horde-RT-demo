@@ -282,12 +282,21 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     swordBlas_ = std::exchange(other.swordBlas_, AccelerationStructure{});
     playerBodyBlas_ = std::exchange(other.playerBodyBlas_, AccelerationStructure{});
     playerLimbBlas_ = std::exchange(other.playerLimbBlas_, AccelerationStructure{});
+    skinnedPlayerBlas_ = std::exchange(other.skinnedPlayerBlas_, AccelerationStructure{});
+    skinnedPlayerBlasUpdateScratch_ =
+        std::exchange(other.skinnedPlayerBlasUpdateScratch_, Buffer{});
     tlas_ = std::exchange(other.tlas_, AccelerationStructure{});
     tlasUpdateScratch_ = std::exchange(other.tlasUpdateScratch_, Buffer{});
     characterSlot_ = std::move(other.characterSlot_);
     other.characterSlot_ = {};
+    playerRenderSlot_ = std::move(other.playerRenderSlot_);
+    other.playerRenderSlot_ = {};
     developmentStaticAsset_ = std::move(other.developmentStaticAsset_);
     productionTorchAsset_ = std::move(other.productionTorchAsset_);
+    productionPlayerAsset_ = std::move(other.productionPlayerAsset_);
+    skinnedPlayerUpload_ = std::move(other.skinnedPlayerUpload_);
+    playerStaticVertexBase_ = std::exchange(other.playerStaticVertexBase_, 0u);
+    playerCpuSkinCadence_ = std::exchange(other.playerCpuSkinCadence_, PlayerCpuSkinCadence::Hz60);
     developmentStaticAssetDirectory_ = std::move(other.developmentStaticAssetDirectory_);
     staticTextureDirectory_ = std::move(other.staticTextureDirectory_);
     staticMeshSlot_ = std::move(other.staticMeshSlot_);
@@ -428,6 +437,8 @@ void PresentableTinyRtScene::Destroy()
     DestroyAccelerationStructure(tlas_);
     DestroyBuffer(tlasUpdateScratch_);
     characterSlot_.DestroyGpuResources(gpuResources_);
+    DestroyBuffer(skinnedPlayerBlasUpdateScratch_);
+    DestroyAccelerationStructure(skinnedPlayerBlas_);
     DestroyAccelerationStructure(playerLimbBlas_);
     DestroyAccelerationStructure(playerBodyBlas_);
     DestroyAccelerationStructure(swordBlas_);
@@ -466,6 +477,11 @@ void PresentableTinyRtScene::Destroy()
     materialEncoding_.clear();
     developmentStaticAsset_ = {};
     productionTorchAsset_ = {};
+    productionPlayerAsset_ = {};
+    productionPlayerAsset_ = {};
+    playerRenderSlot_ = {};
+    skinnedPlayerUpload_.clear();
+    playerStaticVertexBase_ = 0u;
     developmentStaticAssetDirectory_.clear();
     staticTextureDirectory_.clear();
     staticMeshSlot_ = {};
@@ -1049,8 +1065,10 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     const std::filesystem::path root(productionAssetRoot);
     const auto swordDirectory = root / "models/weapons/runtime";
     const auto torchDirectory = root / "models/props/runtime";
+    const auto playerDirectory = root / "models/player/runtime";
     horde::scene::assets::AssetManifest swordManifest;
     horde::scene::assets::AssetManifest torchManifest;
+    horde::scene::assets::AssetManifest playerManifest;
     if (!horde::scene::assets::AssetManifest::Load(
             swordDirectory / "asset.manifest.json", swordManifest, diagnostic) ||
         !horde::scene::assets::StaticMeshAsset::Load(
@@ -1064,16 +1082,40 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             torchDirectory / "gothic-hand-torch-lod0.runtime.glb",
             torchManifest,
             productionTorchAsset_,
-            diagnostic))
+            diagnostic) ||
+        !horde::scene::assets::AssetManifest::Load(
+            playerDirectory / "asset.manifest.json", playerManifest, diagnostic) ||
+        !horde::scene::assets::StaticMeshAsset::Load(
+            playerDirectory / "gothic-traveller-lod0.runtime.glb",
+            playerManifest, productionPlayerAsset_, diagnostic) ||
+        !playerRenderSlot_.LoadAsset(
+            (playerDirectory / "gothic-traveller-lod0.runtime.glb").string(), diagnostic))
         return false;
     staticTextureDirectory_ = (root / "textures/held-items/runtime").string();
-    std::array<StaticRtAssetRegistration, 2u> registrations{{
+    std::array<StaticRtAssetRegistration, 3u> registrations{{
         {3u, 0x53574f52u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
          0u, &developmentStaticAsset_},
         {1u, 0x544f5243u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
          1u, &productionTorchAsset_},
+        {4u, 0x504c4159u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
+         0u, &productionPlayerAsset_},
     }};
-    return staticMeshSlot_.Initialize(registrations, diagnostic);
+    if (!staticMeshSlot_.Initialize(registrations, diagnostic)) return false;
+    const RtInstanceMetadata playerMetadata = staticMeshSlot_.InstanceMetadata()[4u];
+    if (playerMetadata.primitiveCount != 3u ||
+        playerMetadata.primitiveBase >= staticMeshSlot_.PrimitiveMetadata().size())
+    {
+        diagnostic = "Runtime player static-PBR primitive metadata is incomplete.";
+        return false;
+    }
+    playerStaticVertexBase_ =
+        staticMeshSlot_.PrimitiveMetadata()[playerMetadata.primitiveBase].vertexOffset;
+    if (playerRenderSlot_.UniqueVertices().size() > productionPlayerAsset_.vertices.size())
+    {
+        diagnostic = "Runtime player skinned/static vertex streams do not share ordering.";
+        return false;
+    }
+    return true;
 }
 
 bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
@@ -2414,6 +2456,65 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     playerLimbBlasAddressInfo.accelerationStructure = playerLimbBlas_.handle;
     playerLimbBlas_.address = vkGetAccelerationStructureDeviceAddressKHR_(device_, &playerLimbBlasAddressInfo);
 
+    std::vector<VkAccelerationStructureGeometryKHR> skinnedPlayerGeometries;
+    std::vector<VkAccelerationStructureBuildRangeInfoKHR> skinnedPlayerRanges;
+    std::vector<std::uint32_t> skinnedPlayerPrimitiveCounts;
+    if (!appendStaticGeometries(
+            4u, skinnedPlayerGeometries, skinnedPlayerRanges,
+            skinnedPlayerPrimitiveCounts))
+        return false;
+    VkAccelerationStructureBuildGeometryInfoKHR skinnedPlayerBuildInfo{
+        VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR};
+    skinnedPlayerBuildInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+    skinnedPlayerBuildInfo.flags =
+        VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR |
+        VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_KHR;
+    skinnedPlayerBuildInfo.geometryCount =
+        static_cast<std::uint32_t>(skinnedPlayerGeometries.size());
+    skinnedPlayerBuildInfo.pGeometries = skinnedPlayerGeometries.data();
+    VkAccelerationStructureBuildSizesInfoKHR skinnedPlayerSizes{
+        VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR};
+    vkGetAccelerationStructureBuildSizesKHR_(
+        device_, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR,
+        &skinnedPlayerBuildInfo, skinnedPlayerPrimitiveCounts.data(),
+        &skinnedPlayerSizes);
+    if (!CreateBuffer(skinnedPlayerSizes.accelerationStructureSize,
+                      VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR,
+                      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, true,
+                      skinnedPlayerBlas_.backing, diagnostic))
+        return false;
+    VkAccelerationStructureCreateInfoKHR skinnedPlayerCreateInfo{
+        VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR};
+    skinnedPlayerCreateInfo.buffer = skinnedPlayerBlas_.backing.buffer;
+    skinnedPlayerCreateInfo.size = skinnedPlayerSizes.accelerationStructureSize;
+    skinnedPlayerCreateInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+    if (vkCreateAccelerationStructureKHR_(device_, &skinnedPlayerCreateInfo,
+                                          nullptr, &skinnedPlayerBlas_.handle) != VK_SUCCESS)
+    {
+        diagnostic = "Failed to create skinned player BLAS.";
+        return false;
+    }
+    if (!CreateBuffer(std::max(skinnedPlayerSizes.buildScratchSize,
+                               skinnedPlayerSizes.updateScratchSize),
+                      VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, true,
+                      skinnedPlayerBlasUpdateScratch_, diagnostic))
+        return false;
+    skinnedPlayerBuildInfo.dstAccelerationStructure = skinnedPlayerBlas_.handle;
+    skinnedPlayerBuildInfo.scratchData.deviceAddress = skinnedPlayerBlasUpdateScratch_.address;
+    std::vector<const VkAccelerationStructureBuildRangeInfoKHR*> skinnedPlayerRangePointers;
+    skinnedPlayerRangePointers.reserve(skinnedPlayerRanges.size());
+    for (const auto& range : skinnedPlayerRanges)
+        skinnedPlayerRangePointers.push_back(&range);
+    BlasBuildData skinnedPlayerBuildData{
+        this, &skinnedPlayerBuildInfo, skinnedPlayerRangePointers.data()};
+    if (!RunOneTimeCommands(buildBlas, &skinnedPlayerBuildData, diagnostic)) return false;
+    VkAccelerationStructureDeviceAddressInfoKHR skinnedPlayerAddressInfo{
+        VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR};
+    skinnedPlayerAddressInfo.accelerationStructure = skinnedPlayerBlas_.handle;
+    skinnedPlayerBlas_.address = vkGetAccelerationStructureDeviceAddressKHR_(
+        device_, &skinnedPlayerAddressInfo);
+
     if (!characterSlot_.PrepareInitialGeometry(diagnostic))
     {
         return false;
@@ -3127,6 +3228,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         finaleRoofBlas_.handle == VK_NULL_HANDLE || waterfallBlas_.handle == VK_NULL_HANDLE ||
         swordBlas_.handle == VK_NULL_HANDLE ||
         playerBodyBlas_.handle == VK_NULL_HANDLE || playerLimbBlas_.handle == VK_NULL_HANDLE ||
+        skinnedPlayerBlas_.handle == VK_NULL_HANDLE ||
+        skinnedPlayerBlasUpdateScratch_.address == 0u ||
         tlas_.handle == VK_NULL_HANDLE || skeletonGpu.updateScratch.address == 0u ||
         secondSkeletonGpu.updateScratch.address == 0u ||
         lichGpu.updateScratch.address == 0u || tlasUpdateScratch_.address == 0u)
@@ -3196,12 +3299,10 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             xAxis[2] * radius, yAxis[2] * radius, zAxis[2] * length, start[2]}};
     };
 
-    const horde::gameplay::items::HeldItemKinematicsState& heldKinematics =
-        frame.heldItemKinematics;
-    const Vec3 leftShoulderLocal = heldKinematics.leftShoulderLocal;
-    const Vec3 leftHandLocal = heldKinematics.leftHandLocal;
-    const Vec3 rightShoulderLocal = heldKinematics.rightShoulderLocal;
-    const Vec3 rightHandLocal = heldKinematics.rightHandLocal;
+    const Vec3 leftShoulderLocal = frame.playerAnimation.leftIk.shoulder;
+    const Vec3 leftHandLocal = frame.playerAnimation.leftIk.target;
+    const Vec3 rightShoulderLocal = frame.playerAnimation.rightIk.shoulder;
+    const Vec3 rightHandLocal = frame.playerAnimation.rightIk.target;
     const Vec3 leftElbowLocal = solveElbow(leftShoulderLocal, leftHandLocal, 0.53f, 0.53f, Vec3{-1.0f, -0.15f, 0.08f});
     const Vec3 rightElbowLocal = solveElbow(rightShoulderLocal, rightHandLocal, 0.53f, 0.53f, Vec3{1.0f, -0.20f, 0.10f});
     const Vec3 leftShoulder = toWorld(leftShoulderLocal);
@@ -3210,6 +3311,118 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const Vec3 rightShoulder = toWorld(rightShoulderLocal);
     const Vec3 rightElbow = toWorld(rightElbowLocal);
     const Vec3 rightHand = toWorld(rightHandLocal);
+
+    bool updateSkinnedPlayer = false;
+    horde::gameplay::items::HeldItemStates renderHeldItems = frame.heldItems;
+    Vec3 skinnedPlayerRootWorld{
+        animatedBodyOrigin[0], animatedBodyOrigin[1] - 1.8f,
+        animatedBodyOrigin[2]};
+    if (frame.playerRenderRoute == PlayerRenderRoute::Skinned)
+    {
+        std::array<float, 3u> rigShoulderCenter{};
+        if (!playerRenderSlot_.ShoulderCenter(frame.playerAnimation,
+                                              rigShoulderCenter, diagnostic))
+            return false;
+        const Vec3 intendedShoulderCenter =
+            scaled(add(leftShoulder, rightShoulder), 0.5f);
+        skinnedPlayerRootWorld = subtract(
+            intendedShoulderCenter,
+            add(add(scaled(animatedBodyRight, rigShoulderCenter[0]),
+                    Vec3{0.0f, rigShoulderCenter[1], 0.0f}),
+                scaled(animatedBodyForward, rigShoulderCenter[2])));
+        const auto worldPointToPlayer = [&subtract, &dot, &animatedBodyRight,
+                                         &animatedBodyForward, &skinnedPlayerRootWorld](
+                                            const Vec3& worldPoint) {
+            const Vec3 delta = subtract(worldPoint, skinnedPlayerRootWorld);
+            return Vec3{dot(delta, animatedBodyRight), delta[1],
+                        dot(delta, animatedBodyForward)};
+        };
+        const auto viewVectorToPlayer = [&add, &scaled, &dot, &viewRight, &viewUp,
+                                         &viewForward, &animatedBodyRight,
+                                         &animatedBodyForward](const Vec3& viewVector) {
+            const Vec3 worldVector = add(add(scaled(viewRight, viewVector[0]),
+                                             scaled(viewUp, viewVector[1])),
+                                         scaled(viewForward, viewVector[2]));
+            return Vec3{dot(worldVector, animatedBodyRight), worldVector[1],
+                        dot(worldVector, animatedBodyForward)};
+        };
+        horde::gameplay::animation::PlayerAnimationSnapshot rigAnimation =
+            frame.playerAnimation;
+        rigAnimation.leftIk.shoulder = worldPointToPlayer(leftShoulder);
+        rigAnimation.leftIk.target = worldPointToPlayer(leftHand);
+        rigAnimation.leftIk.pole = viewVectorToPlayer(frame.playerAnimation.leftIk.pole);
+        rigAnimation.rightIk.shoulder = worldPointToPlayer(rightShoulder);
+        rigAnimation.rightIk.target = worldPointToPlayer(rightHand);
+        rigAnimation.rightIk.pole = viewVectorToPlayer(frame.playerAnimation.rightIk.pole);
+        if (!playerRenderSlot_.PreparePose(rigAnimation, frame.tickIndex,
+                                           playerCpuSkinCadence_, updateSkinnedPlayer,
+                                           diagnostic))
+            return false;
+        if (updateSkinnedPlayer)
+        {
+            const auto& skinned = playerRenderSlot_.UniqueVertices();
+            if (skinned.size() != productionPlayerAsset_.vertices.size())
+            {
+                diagnostic = "Skinned player pose does not match its static-PBR vertex stream.";
+                return false;
+            }
+            skinnedPlayerUpload_ = productionPlayerAsset_.vertices;
+            for (std::size_t vertex = 0u; vertex < skinned.size(); ++vertex)
+            {
+                std::copy_n(skinned[vertex].position, 4u,
+                            skinnedPlayerUpload_[vertex].position.begin());
+                std::copy_n(skinned[vertex].normal, 4u,
+                            skinnedPlayerUpload_[vertex].normal.begin());
+            }
+            const VkDeviceSize playerOffset =
+                static_cast<VkDeviceSize>(playerStaticVertexBase_) *
+                sizeof(horde::scene::assets::StaticRtVertex);
+            if (!gpuResources_.WriteBufferRange(
+                    staticVertexBuffer_, playerOffset, skinnedPlayerUpload_.data(),
+                    skinnedPlayerUpload_.size() *
+                        sizeof(horde::scene::assets::StaticRtVertex),
+                    "skinned player static-PBR vertices", diagnostic))
+                return false;
+        }
+
+        const auto rigidWorldFromBone = [&animatedBodyRight, &animatedBodyForward,
+                                         &skinnedPlayerRootWorld, &add, &scaled,
+                                         &dot, &cross, &normalize](
+                                            const horde::scene::SkinnedNodeTransform& bone) {
+            const auto vectorToWorld = [&animatedBodyRight, &animatedBodyForward,
+                                        &add, &scaled](const Vec3& local) {
+                return add(add(scaled(animatedBodyRight, local[0]),
+                               Vec3{0.0f, local[1], 0.0f}),
+                           scaled(animatedBodyForward, local[2]));
+            };
+            Vec3 x = normalize(vectorToWorld({bone[0], bone[1], bone[2]}));
+            const Vec3 rawY = vectorToWorld({bone[4], bone[5], bone[6]});
+            Vec3 y = normalize(add(rawY, scaled(x, -dot(rawY, x))));
+            Vec3 z = normalize(cross(x, y));
+            const Vec3 rawZ = vectorToWorld({bone[8], bone[9], bone[10]});
+            if (dot(z, rawZ) < 0.0f)
+            {
+                y = scaled(y, -1.0f);
+                z = scaled(z, -1.0f);
+            }
+            const Vec3 position = add(skinnedPlayerRootWorld,
+                                      vectorToWorld({bone[12], bone[13], bone[14]}));
+            horde::gameplay::items::HeldItemTransform result =
+                horde::gameplay::items::IdentityHeldItemTransform();
+            result[0] = x[0]; result[1] = x[1]; result[2] = x[2];
+            result[4] = y[0]; result[5] = y[1]; result[6] = y[2];
+            result[8] = z[0]; result[9] = z[1]; result[10] = z[2];
+            result[12] = position[0]; result[13] = position[1]; result[14] = position[2];
+            return result;
+        };
+        const auto& boneSockets = playerRenderSlot_.BoneSockets();
+        if (!playerRenderSlot_.ResolveHeldItemVisuals(
+                frame.heldItems,
+                rigidWorldFromBone(boneSockets.leftHand),
+                rigidWorldFromBone(boneSockets.rightHand),
+                renderHeldItems, diagnostic))
+            return false;
+    }
 
     if (!characterSlot_.PrepareFrame(frame.skeletonEnemies,
                                      frame.skeletonEnemyCount,
@@ -3250,7 +3463,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     instances[0].flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
     instances[0].accelerationStructureReference = blas_.address;
     instances[1] = instances[0];
-    instances[1].transform = heldItemInstanceTransform(frame.heldItems[0]);
+    instances[1].transform = heldItemInstanceTransform(renderHeldItems[0]);
     instances[1].instanceCustomIndex = 1u;
     instances[1].mask = 0x02u;
     instances[1].accelerationStructureReference = torchBlas_.address;
@@ -3260,23 +3473,28 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     instances[3].instanceCustomIndex = 3u;
     instances[3].mask = 0x02u;
     instances[3].accelerationStructureReference = swordBlas_.address;
-    instances[3].transform = heldItemInstanceTransform(frame.heldItems[1]);
+    instances[3].transform = heldItemInstanceTransform(renderHeldItems[1]);
     instances[4] = instances[0];
     instances[4].instanceCustomIndex = 4u;
-    // The complete coat remains visible in mirror/reflection rays. Keeping its
-    // chest out of first-person primary rays avoids a near-camera slab while
-    // articulated arms, pelvis, legs and boots stay visible on mask 0x04.
-    instances[4].mask = 0x10u;
-    instances[4].accelerationStructureReference = playerBodyBlas_.address;
-    instances[4].transform = {{
-        animatedBodyRight[0], 0.0f, animatedBodyForward[0], animatedBodyOrigin[0],
-        animatedBodyRight[1], 1.0f, animatedBodyForward[1], animatedBodyOrigin[1],
-        animatedBodyRight[2], 0.0f, animatedBodyForward[2], animatedBodyOrigin[2]}};
+    const PlayerRouteMasks playerRouteMasks = BuildPlayerRouteMasks(frame.playerRenderRoute);
+    instances[4].mask = playerRouteMasks.instanceMasks[4];
+    instances[4].accelerationStructureReference =
+        frame.playerRenderRoute == PlayerRenderRoute::Skinned
+        ? skinnedPlayerBlas_.address : playerBodyBlas_.address;
+    instances[4].transform = frame.playerRenderRoute == PlayerRenderRoute::Skinned
+        ? VkTransformMatrixKHR{{
+            animatedBodyRight[0], 0.0f, animatedBodyForward[0], skinnedPlayerRootWorld[0],
+            animatedBodyRight[1], 1.0f, animatedBodyForward[1], skinnedPlayerRootWorld[1],
+            animatedBodyRight[2], 0.0f, animatedBodyForward[2], skinnedPlayerRootWorld[2]}}
+        : VkTransformMatrixKHR{{
+            animatedBodyRight[0], 0.0f, animatedBodyForward[0], animatedBodyOrigin[0],
+            animatedBodyRight[1], 1.0f, animatedBodyForward[1], animatedBodyOrigin[1],
+            animatedBodyRight[2], 0.0f, animatedBodyForward[2], animatedBodyOrigin[2]}};
     for (std::size_t i = 5u; i <= 16u; ++i)
     {
         instances[i] = instances[4];
         instances[i].instanceCustomIndex = static_cast<std::uint32_t>(i);
-        instances[i].mask = 0x04u;
+        instances[i].mask = playerRouteMasks.instanceMasks[i];
         instances[i].accelerationStructureReference = playerLimbBlas_.address;
     }
     instances[5].transform = segmentTransform(leftShoulder, leftElbow, 0.065f);
@@ -3321,7 +3539,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const Vec3 headBase = add(add(animatedBodyOrigin, Vec3{0.0f, -0.16f, 0.0f}), scaled(animatedBodyForward, 0.20f));
     const Vec3 headTop = add(add(animatedBodyOrigin, Vec3{0.0f, 0.15f, 0.0f}), scaled(animatedBodyForward, 0.20f));
     instances[16].transform = segmentTransform(headBase, headTop, 0.145f);
-    instances[16].mask = 0x10u; // Hero-mirror reflection only; never first-person primary.
+    instances[16].mask = playerRouteMasks.instanceMasks[16];
     instances[17] = instances[0];
     instances[17].instanceCustomIndex = 17u;
     instances[17].mask = 0x20u;
@@ -3365,12 +3583,17 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     {
         return false;
     }
+    auto frameInstanceMetadata = staticMeshSlot_.InstanceMetadata();
+    if (frame.playerRenderRoute == PlayerRenderRoute::Procedural)
+        frameInstanceMetadata[4u].flags = 0u;
     if (!WriteBuffer(heldLightBuffer_, &heldLightGpu, sizeof(heldLightGpu),
                      "held light", diagnostic) ||
         !WriteBuffer(fireEmitterBuffer_, fireEmitterUpload.emitters.data(),
                      sizeof(fireEmitterUpload.emitters), "fire emitters", diagnostic) ||
         !WriteBuffer(instanceBuffer_, instances.data(), sizeof(instances),
-                     "animated TLAS instance", diagnostic))
+                     "animated TLAS instance", diagnostic) ||
+        !WriteBuffer(instanceMetadataBuffer_, frameInstanceMetadata.data(),
+                     sizeof(frameInstanceMetadata), "player route metadata", diagnostic))
     {
         return false;
     }
@@ -3389,6 +3612,70 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                          nullptr,
                          0u,
                          nullptr);
+
+    if (updateSkinnedPlayer)
+    {
+        const RtInstanceMetadata playerMetadata =
+            staticMeshSlot_.InstanceMetadata()[4u];
+        const auto& primitiveMetadata = staticMeshSlot_.PrimitiveMetadata();
+        const auto& staticVertices = staticMeshSlot_.Vertices();
+        std::vector<VkAccelerationStructureGeometryKHR> playerGeometries;
+        std::vector<VkAccelerationStructureBuildRangeInfoKHR> playerRanges;
+        std::vector<const VkAccelerationStructureBuildRangeInfoKHR*> playerRangePointers;
+        playerGeometries.reserve(playerMetadata.primitiveCount);
+        playerRanges.reserve(playerMetadata.primitiveCount);
+        for (std::uint32_t localIndex = 0u;
+             localIndex < playerMetadata.primitiveCount; ++localIndex)
+        {
+            const std::uint32_t geometryIndex = playerMetadata.primitiveBase + localIndex;
+            const RtPrimitiveMetadata& primitive = primitiveMetadata[geometryIndex];
+            const std::uint32_t nextVertexOffset = geometryIndex + 1u < primitiveMetadata.size()
+                ? primitiveMetadata[geometryIndex + 1u].vertexOffset
+                : static_cast<std::uint32_t>(staticVertices.size());
+            VkAccelerationStructureGeometryKHR geometry{
+                VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
+            geometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
+            geometry.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
+            geometry.geometry.triangles.sType =
+                VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
+            geometry.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
+            geometry.geometry.triangles.vertexData.deviceAddress =
+                staticVertexBuffer_.address +
+                static_cast<VkDeviceSize>(primitive.vertexOffset) *
+                    sizeof(horde::scene::assets::StaticRtVertex);
+            geometry.geometry.triangles.vertexStride =
+                sizeof(horde::scene::assets::StaticRtVertex);
+            geometry.geometry.triangles.maxVertex =
+                nextVertexOffset - primitive.vertexOffset - 1u;
+            geometry.geometry.triangles.indexType = VK_INDEX_TYPE_UINT32;
+            geometry.geometry.triangles.indexData.deviceAddress =
+                staticIndexBuffer_.address +
+                static_cast<VkDeviceSize>(primitive.indexOffset) * sizeof(std::uint32_t);
+            geometry.geometry.triangles.transformData.deviceAddress =
+                staticGeometryTransformBuffer_.address +
+                static_cast<VkDeviceSize>(geometryIndex) * sizeof(VkTransformMatrixKHR);
+            playerGeometries.push_back(geometry);
+            VkAccelerationStructureBuildRangeInfoKHR range{};
+            range.primitiveCount = primitive.indexCount / 3u;
+            playerRanges.push_back(range);
+        }
+        for (const auto& range : playerRanges) playerRangePointers.push_back(&range);
+        VkAccelerationStructureBuildGeometryInfoKHR playerUpdateInfo{
+            VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR};
+        playerUpdateInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+        playerUpdateInfo.flags =
+            VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR |
+            VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_KHR;
+        playerUpdateInfo.mode = VK_BUILD_ACCELERATION_STRUCTURE_MODE_UPDATE_KHR;
+        playerUpdateInfo.srcAccelerationStructure = skinnedPlayerBlas_.handle;
+        playerUpdateInfo.dstAccelerationStructure = skinnedPlayerBlas_.handle;
+        playerUpdateInfo.geometryCount =
+            static_cast<std::uint32_t>(playerGeometries.size());
+        playerUpdateInfo.pGeometries = playerGeometries.data();
+        playerUpdateInfo.scratchData.deviceAddress = skinnedPlayerBlasUpdateScratch_.address;
+        vkCmdBuildAccelerationStructuresKHR_(commandBuffer, 1u, &playerUpdateInfo,
+                                             playerRangePointers.data());
+    }
 
     for (std::size_t bucket = 0u; bucket < CharacterRenderSlot::kMaximumSkeletonPoseBuckets; ++bucket)
     {

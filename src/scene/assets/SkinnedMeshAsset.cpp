@@ -358,6 +358,7 @@ struct SkinnedMeshAsset::SourceVertex
 
 struct SkinnedMeshAsset::Node
 {
+    std::string name;
     int parent = -1;
     Vec3 translation{};
     Quat rotation{};
@@ -404,6 +405,105 @@ const SkinnedClipSet& LichPlaceholderClipSet()
     return clips;
 }
 
+float Dot(const Vec3& left, const Vec3& right)
+{
+    return left.x * right.x + left.y * right.y + left.z * right.z;
+}
+
+Vec3 Cross(const Vec3& left, const Vec3& right)
+{
+    return {left.y * right.z - left.z * right.y,
+            left.z * right.x - left.x * right.z,
+            left.x * right.y - left.y * right.x};
+}
+
+Vec3 Subtract(const Vec3& left, const Vec3& right)
+{
+    return {left.x - right.x, left.y - right.y, left.z - right.z};
+}
+
+Vec3 Add(const Vec3& left, const Vec3& right)
+{
+    return {left.x + right.x, left.y + right.y, left.z + right.z};
+}
+
+Vec3 Scale(const Vec3& value, const float scale)
+{
+    return {value.x * scale, value.y * scale, value.z * scale};
+}
+
+float Length(const Vec3& value)
+{
+    return std::sqrt(std::max(Dot(value, value), 0.0f));
+}
+
+Quat FromToRotation(Vec3 from, Vec3 to)
+{
+    from = Normalise(from);
+    to = Normalise(to);
+    const float cosine = std::clamp(Dot(from, to), -1.0f, 1.0f);
+    if (cosine > 0.99999f) return {};
+    if (cosine < -0.99999f)
+    {
+        Vec3 axis = Cross(from, std::abs(from.x) < 0.8f ? Vec3{1.0f, 0.0f, 0.0f}
+                                                           : Vec3{0.0f, 1.0f, 0.0f});
+        axis = Normalise(axis);
+        return {axis.x, axis.y, axis.z, 0.0f};
+    }
+    const Vec3 axis = Cross(from, to);
+    return Normalise({axis.x, axis.y, axis.z, 1.0f + cosine});
+}
+
+Matrix RotationScaleAroundPoint(const Quat& rotation, const float scale,
+                                const Vec3& pivot)
+{
+    Matrix translateToOrigin = LocalMatrix({-pivot.x, -pivot.y, -pivot.z}, {}, {1.0f, 1.0f, 1.0f});
+    Matrix rotate = LocalMatrix({}, rotation, {scale, scale, scale});
+    Matrix translateBack = LocalMatrix(pivot, {}, {1.0f, 1.0f, 1.0f});
+    return Multiply(translateBack, Multiply(rotate, translateToOrigin));
+}
+
+Matrix RotationAroundPoint(const Quat& rotation, const Vec3& pivot)
+{
+    return RotationScaleAroundPoint(rotation, 1.0f, pivot);
+}
+
+Matrix ScaleAlongAxisAroundPoint(Vec3 axis, const float scale, const Vec3& pivot)
+{
+    axis = Normalise(axis);
+    const float extra = scale - 1.0f;
+    Matrix result{};
+    result.m = {{1.0f + extra * axis.x * axis.x,
+                 extra * axis.y * axis.x,
+                 extra * axis.z * axis.x, 0.0f,
+                 extra * axis.x * axis.y,
+                 1.0f + extra * axis.y * axis.y,
+                 extra * axis.z * axis.y, 0.0f,
+                 extra * axis.x * axis.z,
+                 extra * axis.y * axis.z,
+                 1.0f + extra * axis.z * axis.z, 0.0f,
+                 0.0f, 0.0f, 0.0f, 1.0f}};
+    const Vec3 scaledPivot = TransformVector(result, pivot);
+    result.m[12] = pivot.x - scaledPivot.x;
+    result.m[13] = pivot.y - scaledPivot.y;
+    result.m[14] = pivot.z - scaledPivot.z;
+    return result;
+}
+
+const SkinnedClipSet& PlayerLocomotionClipSet()
+{
+    // Combat actions are authoritative procedural/IK layers. The reusable
+    // biped carries only bounded locomotion clips and must never supply damage
+    // timing through an imported attack animation.
+    static const SkinnedClipSet clips{{{
+        {"Idle", true, true},
+        {"Walking", true, true},
+        {"", false, false},
+        {"", false, false},
+    }}};
+    return clips;
+}
+
 SkinnedMeshAsset::SkinnedMeshAsset() = default;
 SkinnedMeshAsset::~SkinnedMeshAsset() = default;
 SkinnedMeshAsset::SkinnedMeshAsset(SkinnedMeshAsset&&) noexcept = default;
@@ -418,7 +518,7 @@ bool SkinnedMeshAsset::LoadClips(const std::string& glbPath, const SkinnedClipSe
 {
     loaded_ = false;
     hasTexcoords_ = false;
-    vertices_.clear(); expandedIndices_.clear(); nodes_.clear(); joints_.clear(); inverseBindMatrices_.clear(); clips_.clear(); skinnedUniqueVertices_.clear(); texturedSkinScratch_.clear();
+    vertices_.clear(); expandedIndices_.clear(); primitiveRanges_.clear(); nodes_.clear(); joints_.clear(); inverseBindMatrices_.clear(); clips_.clear(); skinnedUniqueVertices_.clear(); texturedSkinScratch_.clear();
     std::ifstream stream(glbPath, std::ios::binary);
     if (!stream)
     {
@@ -467,69 +567,114 @@ bool SkinnedMeshAsset::LoadClips(const std::string& glbPath, const SkinnedClipSe
         meshes->empty() || skins->empty()) return false;
 
     const JsonValue* primitives = (*meshes)[0].Find("primitives");
-    const JsonValue* attributes = primitives != nullptr && !primitives->array.empty() ? primitives->array[0].Find("attributes") : nullptr;
-    const JsonValue* indexAccessor = primitives != nullptr && !primitives->array.empty() ? primitives->array[0].Find("indices") : nullptr;
-    if (attributes == nullptr || indexAccessor == nullptr)
+    if (primitives == nullptr || primitives->type != JsonType::Array || primitives->array.empty())
     {
-        diagnostic = "Skeleton GLB does not contain its expected mesh primitive.";
+        diagnostic = "Skeleton GLB does not contain its expected mesh primitives.";
         return false;
     }
-    const JsonValue* position = attributes->Find("POSITION");
-    const JsonValue* normal = attributes->Find("NORMAL");
-    const JsonValue* texcoord = attributes->Find("TEXCOORD_0");
-    const JsonValue* joint = attributes->Find("JOINTS_0");
-    const JsonValue* weight = attributes->Find("WEIGHTS_0");
-    Accessor positions, normals, texcoords, joints, weights, indices;
-    if (position == nullptr || normal == nullptr || joint == nullptr || weight == nullptr ||
-        !ReadAccessor(*accessors, *views, position->Uint(), positions, diagnostic) || !ReadAccessor(*accessors, *views, normal->Uint(), normals, diagnostic) ||
-        !ReadAccessor(*accessors, *views, joint->Uint(), joints, diagnostic) || !ReadAccessor(*accessors, *views, weight->Uint(), weights, diagnostic) ||
-        !ReadAccessor(*accessors, *views, indexAccessor->Uint(), indices, diagnostic) || positions.count != normals.count || positions.count != joints.count || positions.count != weights.count ||
-        positions.componentType != 5126u || normals.componentType != 5126u || weights.componentType != 5126u || joints.componentType != 5121u)
+    const JsonValue* materialValues = root.Find("materials");
+    bool allPrimitivesHaveTexcoords = true;
+    for (const JsonValue& primitive : primitives->array)
     {
-        diagnostic = "Skeleton GLB mesh layout is not the audited derivative layout.";
-        return false;
-    }
-    if (texcoord != nullptr)
-    {
-        if (!ReadAccessor(*accessors, *views, texcoord->Uint(), texcoords, diagnostic) ||
-            texcoords.count != positions.count || texcoords.componentType != 5126u || texcoords.components != 2u)
+        const JsonValue* attributes = primitive.Find("attributes");
+        const JsonValue* indexAccessor = primitive.Find("indices");
+        if (attributes == nullptr || indexAccessor == nullptr)
+        {
+            diagnostic = "Skeleton GLB contains an incomplete mesh primitive.";
+            return false;
+        }
+        const JsonValue* position = attributes->Find("POSITION");
+        const JsonValue* normal = attributes->Find("NORMAL");
+        const JsonValue* texcoord = attributes->Find("TEXCOORD_0");
+        const JsonValue* joint = attributes->Find("JOINTS_0");
+        const JsonValue* weight = attributes->Find("WEIGHTS_0");
+        Accessor positions, normals, texcoords, joints, weights, indices;
+        if (position == nullptr || normal == nullptr || joint == nullptr || weight == nullptr ||
+            !ReadAccessor(*accessors, *views, position->Uint(), positions, diagnostic) ||
+            !ReadAccessor(*accessors, *views, normal->Uint(), normals, diagnostic) ||
+            !ReadAccessor(*accessors, *views, joint->Uint(), joints, diagnostic) ||
+            !ReadAccessor(*accessors, *views, weight->Uint(), weights, diagnostic) ||
+            !ReadAccessor(*accessors, *views, indexAccessor->Uint(), indices, diagnostic) ||
+            positions.count != normals.count || positions.count != joints.count ||
+            positions.count != weights.count || positions.componentType != 5126u ||
+            normals.componentType != 5126u || weights.componentType != 5126u ||
+            joints.componentType != 5121u || indices.componentType != 5123u ||
+            indices.count % 3u != 0u)
+        {
+            diagnostic = "Skeleton GLB mesh primitive layout is not the audited derivative layout.";
+            return false;
+        }
+        const bool primitiveHasTexcoords = texcoord != nullptr;
+        allPrimitivesHaveTexcoords = allPrimitivesHaveTexcoords && primitiveHasTexcoords;
+        if (primitiveHasTexcoords &&
+            (!ReadAccessor(*accessors, *views, texcoord->Uint(), texcoords, diagnostic) ||
+             texcoords.count != positions.count || texcoords.componentType != 5126u ||
+             texcoords.components != 2u))
         {
             diagnostic = "Skinned GLB TEXCOORD_0 layout is unsupported.";
             return false;
         }
-        hasTexcoords_ = true;
-    }
-    vertices_.resize(positions.count);
-    for (std::size_t i = 0u; i < vertices_.size(); ++i)
-    {
-        vertices_[i].position = {ReadFloat(binary, positions, i, 0u), ReadFloat(binary, positions, i, 1u), ReadFloat(binary, positions, i, 2u)};
-        vertices_[i].normal = {ReadFloat(binary, normals, i, 0u), ReadFloat(binary, normals, i, 1u), ReadFloat(binary, normals, i, 2u)};
-        if (hasTexcoords_)
+
+        const std::size_t vertexBase = vertices_.size();
+        vertices_.resize(vertexBase + positions.count);
+        for (std::size_t i = 0u; i < positions.count; ++i)
         {
-            vertices_[i].texcoord = {ReadFloat(binary, texcoords, i, 0u), ReadFloat(binary, texcoords, i, 1u)};
+            SourceVertex& vertex = vertices_[vertexBase + i];
+            vertex.position = {ReadFloat(binary, positions, i, 0u),
+                               ReadFloat(binary, positions, i, 1u),
+                               ReadFloat(binary, positions, i, 2u)};
+            vertex.normal = {ReadFloat(binary, normals, i, 0u),
+                             ReadFloat(binary, normals, i, 1u),
+                             ReadFloat(binary, normals, i, 2u)};
+            if (primitiveHasTexcoords)
+            {
+                vertex.texcoord = {ReadFloat(binary, texcoords, i, 0u),
+                                   ReadFloat(binary, texcoords, i, 1u)};
+            }
+            for (std::size_t component = 0u; component < 4u; ++component)
+            {
+                vertex.joints[component] = static_cast<std::uint8_t>(
+                    ReadUnsigned(binary, joints, i, component));
+                vertex.weights[component] = ReadFloat(binary, weights, i, component);
+            }
         }
-        for (std::size_t component = 0u; component < 4u; ++component)
+
+        SkinnedPrimitiveRange range;
+        range.firstExpandedVertex = expandedIndices_.size();
+        range.expandedVertexCount = indices.count;
+        if (const JsonValue* materialIndex = primitive.Find("material");
+            materialIndex != nullptr && materialValues != nullptr &&
+            materialValues->type == JsonType::Array &&
+            materialIndex->Uint() < materialValues->array.size())
         {
-            vertices_[i].joints[component] = static_cast<std::uint8_t>(ReadUnsigned(binary, joints, i, component));
-            vertices_[i].weights[component] = ReadFloat(binary, weights, i, component);
+            if (const JsonValue* name = materialValues->array[materialIndex->Uint()].Find("name");
+                name != nullptr && name->type == JsonType::String)
+            {
+                range.materialName = name->string;
+            }
         }
+        for (std::size_t i = 0u; i < indices.count; ++i)
+        {
+            const std::uint32_t localIndex = ReadUnsigned(binary, indices, i, 0u);
+            if (localIndex >= positions.count)
+            {
+                diagnostic = "Skeleton GLB primitive index is out of range.";
+                return false;
+            }
+            expandedIndices_.push_back(static_cast<std::uint32_t>(vertexBase) + localIndex);
+        }
+        primitiveRanges_.push_back(std::move(range));
     }
-    if (indices.componentType != 5123u || indices.count % 3u != 0u)
-    {
-        diagnostic = "Skeleton GLB index layout is unsupported.";
-        return false;
-    }
-    expandedIndices_.resize(indices.count);
-    for (std::size_t i = 0u; i < indices.count; ++i)
-    {
-        expandedIndices_[i] = ReadUnsigned(binary, indices, i, 0u);
-        if (expandedIndices_[i] >= vertices_.size()) { diagnostic = "Skeleton GLB index is out of range."; return false; }
-    }
+    hasTexcoords_ = allPrimitivesHaveTexcoords;
 
     nodes_.resize(nodes->size());
     for (std::size_t nodeIndex = 0u; nodeIndex < nodes_.size(); ++nodeIndex)
     {
         const JsonValue& node = (*nodes)[nodeIndex];
+        if (const JsonValue* name = node.Find("name"); name != nullptr && name->type == JsonType::String)
+        {
+            nodes_[nodeIndex].name = name->string;
+        }
         const auto readVec = [&node](std::string_view name, float* destination, std::size_t count) {
             const JsonValue* value = node.Find(name);
             if (value != nullptr && value->type == JsonType::Array && value->array.size() == count)
@@ -636,6 +781,96 @@ float SkinnedMeshAsset::ClipDuration(SkinnedClip clip) const
     return index < clips_.size() ? clips_[index].duration : 0.0f;
 }
 
+std::size_t SkinnedMeshAsset::UniqueVertexCount() const
+{
+    return vertices_.size();
+}
+
+bool SkinnedMeshAsset::HasNode(const std::string_view name) const
+{
+    return std::any_of(nodes_.begin(), nodes_.end(), [name](const Node& node) {
+        return node.name == name;
+    });
+}
+
+bool SkinnedMeshAsset::NodeTransform(const SkinnedClip clipId,
+                                     float timeSeconds,
+                                     const std::string_view nodeName,
+                                     SkinnedNodeTransform& output,
+                                     std::string& diagnostic) const
+{
+    if (!loaded_)
+    {
+        diagnostic = "Skinned model was not loaded.";
+        return false;
+    }
+    const std::size_t clipIndex = static_cast<std::size_t>(clipId);
+    if (clipIndex >= clips_.size() || clips_[clipIndex].channels.empty() ||
+        clips_[clipIndex].duration <= 0.0f)
+    {
+        diagnostic = "Requested skinned clip is not mapped.";
+        return false;
+    }
+    const auto nodeIt = std::find_if(nodes_.begin(), nodes_.end(), [nodeName](const Node& node) {
+        return node.name == nodeName;
+    });
+    if (nodeIt == nodes_.end())
+    {
+        diagnostic = "Skinned asset is missing node: " + std::string(nodeName);
+        return false;
+    }
+    const std::size_t requestedNode = static_cast<std::size_t>(nodeIt - nodes_.begin());
+    const Clip& clip = clips_[clipIndex];
+    std::vector<Node> pose = nodes_;
+    const float time = clip.loops
+        ? std::fmod(std::max(timeSeconds, 0.0f), clip.duration)
+        : std::clamp(timeSeconds, 0.0f, clip.duration);
+    for (const Channel& channel : clip.channels)
+    {
+        if (channel.node >= pose.size() || channel.times.empty()) continue;
+        const auto upper = std::upper_bound(channel.times.begin(), channel.times.end(), time);
+        const std::size_t next = upper == channel.times.end()
+            ? (clip.loops ? 0u : channel.times.size() - 1u)
+            : static_cast<std::size_t>(upper - channel.times.begin());
+        const std::size_t previous = next == 0u ? channel.times.size() - 1u : next - 1u;
+        const float previousTime = channel.times[previous];
+        const float nextTime = next == 0u ? clip.duration : channel.times[next];
+        const float sampledTime = next == 0u && time < previousTime ? time + clip.duration : time;
+        const float fraction = nextTime > previousTime
+            ? std::clamp((sampledTime - previousTime) / (nextTime - previousTime), 0.0f, 1.0f)
+            : 0.0f;
+        const auto& a = channel.values[previous];
+        const auto& b = channel.values[next];
+        if (channel.path == Channel::Path::Rotation)
+        {
+            pose[channel.node].rotation = Nlerp(
+                {a[0], a[1], a[2], a[3]}, {b[0], b[1], b[2], b[3]}, fraction);
+        }
+        else
+        {
+            const Vec3 value{a[0] + (b[0] - a[0]) * fraction,
+                             a[1] + (b[1] - a[1]) * fraction,
+                             a[2] + (b[2] - a[2]) * fraction};
+            if (channel.path == Channel::Path::Translation) pose[channel.node].translation = value;
+            else pose[channel.node].scale = value;
+        }
+    }
+    std::vector<Matrix> globals(pose.size());
+    std::vector<bool> computed(pose.size(), false);
+    const auto resolveGlobal = [&pose, &globals, &computed](auto&& self, const std::size_t node) -> Matrix {
+        if (computed[node]) return globals[node];
+        const Matrix local = LocalMatrix(pose[node].translation, pose[node].rotation, pose[node].scale);
+        globals[node] = pose[node].parent < 0
+            ? local
+            : Multiply(self(self, static_cast<std::size_t>(pose[node].parent)), local);
+        computed[node] = true;
+        return globals[node];
+    };
+    output = resolveGlobal(resolveGlobal, requestedNode).m;
+    diagnostic.clear();
+    return true;
+}
+
 bool SkinnedMeshAsset::Skin(SkinnedClip clipId, float timeSeconds, std::vector<SkinnedRtVertex>& output, std::string& diagnostic) const
 {
     if (!loaded_) { diagnostic = "Skeleton model was not loaded."; return false; }
@@ -737,6 +972,251 @@ bool SkinnedMeshAsset::SkinTextured(SkinnedClip clipId,
         const auto& uv = vertices_[expandedIndices_[outputIndex]].texcoord;
         destination.texcoord[0] = uv[0];
         destination.texcoord[1] = uv[1];
+        destination.texcoord[2] = 0.0f;
+        destination.texcoord[3] = 0.0f;
+    }
+    diagnostic.clear();
+    return true;
+}
+
+bool SkinnedMeshAsset::SkinUniqueTextured(const SkinnedClip clipId,
+                                          const float timeSeconds,
+                                          std::vector<TexturedSkinnedRtVertex>& output,
+                                          std::string& diagnostic) const
+{
+    if (!hasTexcoords_)
+    {
+        diagnostic = "Skinned model has no TEXCOORD_0 stream.";
+        return false;
+    }
+    if (!Skin(clipId, timeSeconds, texturedSkinScratch_, diagnostic)) return false;
+    output.resize(skinnedUniqueVertices_.size());
+    for (std::size_t sourceIndex = 0u; sourceIndex < output.size(); ++sourceIndex)
+    {
+        const SkinnedRtVertex& source = skinnedUniqueVertices_[sourceIndex];
+        TexturedSkinnedRtVertex& destination = output[sourceIndex];
+        std::copy(std::begin(source.position), std::end(source.position),
+                  std::begin(destination.position));
+        std::copy(std::begin(source.normal), std::end(source.normal),
+                  std::begin(destination.normal));
+        destination.texcoord[0] = vertices_[sourceIndex].texcoord[0];
+        destination.texcoord[1] = vertices_[sourceIndex].texcoord[1];
+        destination.texcoord[2] = 0.0f;
+        destination.texcoord[3] = 0.0f;
+    }
+    diagnostic.clear();
+    return true;
+}
+
+bool SkinnedMeshAsset::SkinPlayerUniqueTextured(
+    const SkinnedClip clipId,
+    const float timeSeconds,
+    const SkinnedArmIkTarget& leftArm,
+    const SkinnedArmIkTarget& rightArm,
+    std::vector<TexturedSkinnedRtVertex>& output,
+    SkinnedPlayerSockets& sockets,
+    std::string& diagnostic) const
+{
+    if (!loaded_ || !hasTexcoords_)
+    {
+        diagnostic = "Textured player model was not loaded.";
+        return false;
+    }
+    const std::size_t clipIndex = static_cast<std::size_t>(clipId);
+    if (clipIndex >= clips_.size() || clips_[clipIndex].channels.empty() ||
+        clips_[clipIndex].duration <= 0.0f)
+    {
+        diagnostic = "Requested player locomotion clip is not mapped.";
+        return false;
+    }
+
+    const Clip& clip = clips_[clipIndex];
+    std::vector<Node> pose = nodes_;
+    const float time = clip.loops
+        ? std::fmod(std::max(timeSeconds, 0.0f), clip.duration)
+        : std::clamp(timeSeconds, 0.0f, clip.duration);
+    for (const Channel& channel : clip.channels)
+    {
+        if (channel.node >= pose.size() || channel.times.empty()) continue;
+        const auto upper = std::upper_bound(channel.times.begin(), channel.times.end(), time);
+        const std::size_t next = upper == channel.times.end()
+            ? (clip.loops ? 0u : channel.times.size() - 1u)
+            : static_cast<std::size_t>(upper - channel.times.begin());
+        const std::size_t previous = next == 0u ? channel.times.size() - 1u : next - 1u;
+        const float previousTime = channel.times[previous];
+        const float nextTime = next == 0u ? clip.duration : channel.times[next];
+        const float sampledTime = next == 0u && time < previousTime ? time + clip.duration : time;
+        const float fraction = nextTime > previousTime
+            ? std::clamp((sampledTime - previousTime) / (nextTime - previousTime), 0.0f, 1.0f)
+            : 0.0f;
+        const auto& a = channel.values[previous];
+        const auto& b = channel.values[next];
+        if (channel.path == Channel::Path::Rotation)
+        {
+            pose[channel.node].rotation = Nlerp(
+                {a[0], a[1], a[2], a[3]}, {b[0], b[1], b[2], b[3]}, fraction);
+        }
+        else
+        {
+            const Vec3 value{a[0] + (b[0] - a[0]) * fraction,
+                             a[1] + (b[1] - a[1]) * fraction,
+                             a[2] + (b[2] - a[2]) * fraction};
+            if (channel.path == Channel::Path::Translation) pose[channel.node].translation = value;
+            else pose[channel.node].scale = value;
+        }
+    }
+
+    std::vector<Matrix> globals(pose.size());
+    std::vector<bool> computed(pose.size(), false);
+    const auto resolveGlobal = [&pose, &globals, &computed](auto&& self,
+                                                            const std::size_t node) -> Matrix {
+        if (computed[node]) return globals[node];
+        const Matrix local = LocalMatrix(pose[node].translation, pose[node].rotation,
+                                         pose[node].scale);
+        globals[node] = pose[node].parent < 0
+            ? local
+            : Multiply(self(self, static_cast<std::size_t>(pose[node].parent)), local);
+        computed[node] = true;
+        return globals[node];
+    };
+    for (std::size_t node = 0u; node < pose.size(); ++node)
+        resolveGlobal(resolveGlobal, node);
+
+    const auto findNode = [this](const std::string_view name) -> std::size_t {
+        const auto found = std::find_if(nodes_.begin(), nodes_.end(), [name](const Node& node) {
+            return node.name == name;
+        });
+        return found == nodes_.end() ? nodes_.size()
+                                     : static_cast<std::size_t>(found - nodes_.begin());
+    };
+    const auto isDescendant = [&pose](std::size_t node, const std::size_t ancestor) {
+        while (node < pose.size())
+        {
+            if (node == ancestor) return true;
+            const int parent = pose[node].parent;
+            if (parent < 0) break;
+            node = static_cast<std::size_t>(parent);
+        }
+        return false;
+    };
+    const auto solveArm = [&globals, &findNode, &isDescendant, this, &diagnostic](
+        const char* upperName,
+        const char* lowerName,
+        const char* handName,
+        const SkinnedArmIkTarget& arm,
+        SkinnedNodeTransform& socket) {
+        const std::size_t upperNode = findNode(upperName);
+        const std::size_t lowerNode = findNode(lowerName);
+        const std::size_t handNode = findNode(handName);
+        if (upperNode >= nodes_.size() || lowerNode >= nodes_.size() || handNode >= nodes_.size())
+        {
+            diagnostic = std::string("Player rig is missing required arm bones: ") +
+                         upperName + "/" + lowerName + "/" + handName;
+            return false;
+        }
+        const Vec3 shoulder{globals[upperNode].m[12], globals[upperNode].m[13], globals[upperNode].m[14]};
+        const Vec3 originalElbow{globals[lowerNode].m[12], globals[lowerNode].m[13], globals[lowerNode].m[14]};
+        const Vec3 originalHand{globals[handNode].m[12], globals[handNode].m[13], globals[handNode].m[14]};
+        const float bindUpperLength = std::max(Length(Subtract(originalElbow, shoulder)), 0.0001f);
+        const float bindLowerLength = std::max(Length(Subtract(originalHand, originalElbow)), 0.0001f);
+        const Vec3 requestedTarget{arm.target[0], arm.target[1], arm.target[2]};
+        const Vec3 request = Subtract(requestedTarget, shoulder);
+        const float requestedDistance = Length(request);
+        const Vec3 direction = Normalise(request);
+        // The authored Meshy arm is slightly shorter than the established
+        // first-person grip envelope. Bounded uniform chain stretch retains
+        // the two-bone solve and reaches gameplay-owned sockets without moving
+        // sword/lantern authority into the renderer.
+        const float chainStretch = std::clamp(
+            requestedDistance / (bindUpperLength + bindLowerLength), 1.0f, 1.75f);
+        const float upperLength = bindUpperLength * chainStretch;
+        const float lowerLength = bindLowerLength * chainStretch;
+        const float solvedDistance = std::clamp(requestedDistance,
+                                                std::abs(upperLength - lowerLength) + 0.00001f,
+                                                upperLength + lowerLength - 0.00001f);
+        const Vec3 solvedHand = Add(shoulder, Scale(direction, solvedDistance));
+        Vec3 pole{arm.pole[0], arm.pole[1], arm.pole[2]};
+        pole = Subtract(pole, Scale(direction, Dot(pole, direction)));
+        if (Length(pole) < 0.00001f) pole = Cross(direction, {0.0f, 1.0f, 0.0f});
+        pole = Normalise(pole);
+        const float adjacent = std::clamp(
+            (upperLength * upperLength + solvedDistance * solvedDistance -
+             lowerLength * lowerLength) / (2.0f * solvedDistance),
+            0.0f, upperLength);
+        const float height = std::sqrt(std::max(
+            upperLength * upperLength - adjacent * adjacent, 0.0f));
+        const Vec3 solvedElbow = Add(Add(shoulder, Scale(direction, adjacent)),
+                                     Scale(pole, height));
+
+        const Vec3 originalUpperDirection = Subtract(originalElbow, shoulder);
+        const Matrix upperDelta = Multiply(
+            RotationAroundPoint(
+                FromToRotation(originalUpperDirection,
+                               Subtract(solvedElbow, shoulder)), shoulder),
+            ScaleAlongAxisAroundPoint(originalUpperDirection, chainStretch, shoulder));
+        for (std::size_t node = 0u; node < globals.size(); ++node)
+            if (isDescendant(node, upperNode)) globals[node] = Multiply(upperDelta, globals[node]);
+
+        const Vec3 rotatedElbow{globals[lowerNode].m[12], globals[lowerNode].m[13], globals[lowerNode].m[14]};
+        const Vec3 rotatedHand{globals[handNode].m[12], globals[handNode].m[13], globals[handNode].m[14]};
+        const Vec3 rotatedLowerDirection = Subtract(rotatedHand, rotatedElbow);
+        const float lowerStretch = lowerLength /
+            std::max(Length(rotatedLowerDirection), 0.0001f);
+        const Matrix lowerDelta = Multiply(
+            RotationAroundPoint(
+                FromToRotation(rotatedLowerDirection,
+                               Subtract(solvedHand, rotatedElbow)), rotatedElbow),
+            ScaleAlongAxisAroundPoint(rotatedLowerDirection, lowerStretch, rotatedElbow));
+        for (std::size_t node = 0u; node < globals.size(); ++node)
+            if (isDescendant(node, lowerNode)) globals[node] = Multiply(lowerDelta, globals[node]);
+        socket = globals[handNode].m;
+        return true;
+    };
+
+    if (!solveArm("LeftArm", "LeftForeArm", "LeftHand", leftArm, sockets.leftHand) ||
+        !solveArm("RightArm", "RightForeArm", "RightHand", rightArm, sockets.rightHand))
+        return false;
+
+    std::vector<Matrix> skinMatrices(joints_.size());
+    for (std::size_t joint = 0u; joint < joints_.size(); ++joint)
+    {
+        if (joints_[joint] >= globals.size())
+        {
+            diagnostic = "Player rig joint node is invalid.";
+            return false;
+        }
+        Matrix inverse{};
+        std::memcpy(inverse.m.data(), inverseBindMatrices_.data() + joint * 16u,
+                    sizeof(float) * 16u);
+        skinMatrices[joint] = Multiply(globals[joints_[joint]], inverse);
+    }
+    skinnedUniqueVertices_.resize(vertices_.size());
+    output.resize(vertices_.size());
+    for (std::size_t sourceIndex = 0u; sourceIndex < vertices_.size(); ++sourceIndex)
+    {
+        const SourceVertex& source = vertices_[sourceIndex];
+        Vec3 position{};
+        Vec3 normal{};
+        for (std::size_t influence = 0u; influence < 4u; ++influence)
+        {
+            const float weight = source.weights[influence];
+            const std::size_t joint = source.joints[influence];
+            if (weight <= 0.00001f || joint >= skinMatrices.size()) continue;
+            position = Add(position, Scale(TransformPoint(skinMatrices[joint], source.position), weight));
+            normal = Add(normal, Scale(TransformVector(skinMatrices[joint], source.normal), weight));
+        }
+        normal = Normalise(normal);
+        TexturedSkinnedRtVertex& destination = output[sourceIndex];
+        destination.position[0] = position.x;
+        destination.position[1] = position.y;
+        destination.position[2] = position.z;
+        destination.position[3] = 1.0f;
+        destination.normal[0] = normal.x;
+        destination.normal[1] = normal.y;
+        destination.normal[2] = normal.z;
+        destination.normal[3] = 0.0f;
+        destination.texcoord[0] = source.texcoord[0];
+        destination.texcoord[1] = source.texcoord[1];
         destination.texcoord[2] = 0.0f;
         destination.texcoord[3] = 0.0f;
     }

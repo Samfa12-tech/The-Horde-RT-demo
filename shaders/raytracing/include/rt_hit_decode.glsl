@@ -349,7 +349,7 @@ void materialForPrimitive(int primitive,
 }
 
 HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
-                   bool ignoreWater)
+                   bool ignoreWater, bool ignorePlayerNearFace)
 {
     HitInfo h;
     h.hit = false;
@@ -366,11 +366,12 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
     h.emissive = 0.0;
 
     rayQueryEXT query;
-    uint rayFlags = ignoreWater ? gl_RayFlagsNoOpaqueEXT : gl_RayFlagsOpaqueEXT;
+    uint rayFlags = (ignoreWater || ignorePlayerNearFace)
+        ? gl_RayFlagsNoOpaqueEXT : gl_RayFlagsOpaqueEXT;
     rayQueryInitializeEXT(query, topLevelAS, rayFlags, mask, origin, 0.002, direction, maxDistance);
     while (rayQueryProceedEXT(query))
     {
-        if (!ignoreWater ||
+        if ((!ignoreWater && !ignorePlayerNearFace) ||
             rayQueryGetIntersectionTypeEXT(query, false) != gl_RayQueryCandidateIntersectionTriangleEXT)
         {
             continue;
@@ -380,7 +381,23 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
         bool candidateIsWater = candidateInstance == kWaterfallInstance ||
             (candidateInstance == 0 &&
              int(worldSurfaces.codes[candidatePrimitive] & 0xffu) == kMaterialWater);
-        if (!candidateIsWater)
+        bool candidateIsPlayerNearFace = false;
+        if (ignorePlayerNearFace && candidateInstance == 4)
+        {
+            RtInstanceMetadata playerMetadata = rtInstances.values[4];
+            uint geometryIndex = rayQueryGetIntersectionGeometryIndexEXT(query, false);
+            if (geometryIndex < playerMetadata.primitiveCount)
+            {
+                RtPrimitiveMetadata playerPrimitive =
+                    rtPrimitives.values[playerMetadata.primitiveBase + geometryIndex];
+                uint playerFlags = rtMaterials.values[playerPrimitive.materialIndex].materialFlags.x;
+                candidateIsPlayerNearFace =
+                    (playerFlags & (kRtMaterialFlagHeadPrimaryMasked |
+                                    kRtMaterialFlagNearFacePrimaryMasked)) != 0u;
+            }
+        }
+        if ((!ignoreWater || !candidateIsWater) &&
+            (!ignorePlayerNearFace || !candidateIsPlayerNearFace))
         {
             rayQueryConfirmIntersectionEXT(query);
         }

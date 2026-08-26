@@ -3481,6 +3481,13 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         horde::vulkan::raytracing::RtSceneFrameInputs frameInputs =
             horde::vulkan::raytracing::BuildRtSceneFrameInputs(
                 simulation, ctx.outputExposure, ctx.waterQuality, ctx.rtSceneTuning);
+        // Developer A/B: the deterministic player-body-grips checkpoint opts
+        // into the authored skinned route. Every other route retains the
+        // established procedural phone-safe fallback until exact-device review.
+        frameInputs.playerRenderRoute =
+            ctx.developmentCheckpoint.starts_with("player-body-")
+            ? horde::vulkan::raytracing::PlayerRenderRoute::Skinned
+            : horde::vulkan::raytracing::PlayerRenderRoute::Procedural;
         if (ctx.debugEnemyOverride != horde::gameplay::EnemyKind::None)
         {
             // Debug-only renderer inspection remains non-authoritative gameplay.
@@ -4574,6 +4581,7 @@ void ShowCredits(HWND window)
                 "Placeholder lich character created and animated with Meshy (CC0).\n"
                 "Production Gothic arming sword created with Meshy; runtime processing by Samfa12/Codex (CC BY 4.0).\n"
                 "Production medieval hand torch created with Meshy; runtime processing by Samfa12/Codex (CC BY 4.0).\n"
+                "Historical-Gothic traveller/fighter created with Meshy; runtime processing and animation integration by Samfa12/Codex (CC BY 4.0).\n"
                 "Application icon created for this project with OpenAI image generation.\n\n"
                 "See ASSET_LICENSES.md beside the demo for source links and full licence details.",
                 "Horde Lantern RT - credits and licences",

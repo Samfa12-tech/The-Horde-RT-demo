@@ -1,6 +1,7 @@
 #include "gameplay/animation/PlayerAnimationState.h"
 #include "gameplay/animation/PlayerIkTargets.h"
 #include "gameplay/simulation/GameSimulation.h"
+#include "vulkan/raytracing/PlayerRenderSlot.h"
 
 #include <algorithm>
 #include <array>
@@ -155,6 +156,91 @@ int main()
                      PlayerUpperBodyAction::None &&
                  Near(simulation.Snapshot().playerAnimation.locomotionBlend, 0.0f),
                  "route reset must reset authoritative player animation state")) return 1;
+
+    using namespace horde::vulkan::raytracing;
+    const PlayerRouteMasks proceduralMasks = BuildPlayerRouteMasks(PlayerRenderRoute::Procedural);
+    const PlayerRouteMasks skinnedMasks = BuildPlayerRouteMasks(PlayerRenderRoute::Skinned);
+    if (!Require(proceduralMasks.instanceMasks[4] == 0x10u &&
+                 proceduralMasks.instanceMasks[5] == 0x04u &&
+                 proceduralMasks.instanceMasks[16] == 0x10u &&
+                 skinnedMasks.instanceMasks[4] == 0x14u,
+                 "developer A/B routes must preserve intended primary/reflection masks")) return 1;
+    for (std::size_t slot = 5u; slot <= 16u; ++slot)
+    {
+        if (!Require(skinnedMasks.instanceMasks[slot] == 0u,
+                     "skinned route must mask every procedural player slot")) return 1;
+    }
+
+    const auto primitiveVisibility = BuildPlayerPrimitiveVisibility({
+        PlayerPrimitiveSemantic::Body,
+        PlayerPrimitiveSemantic::Head,
+        PlayerPrimitiveSemantic::NearFace,
+    });
+    if (!Require(primitiveVisibility[0].primaryVisible &&
+                 !primitiveVisibility[1].primaryVisible &&
+                 !primitiveVisibility[2].primaryVisible &&
+                 primitiveVisibility[1].shadowVisible &&
+                 primitiveVisibility[2].reflectionVisible,
+                 "material/primitive metadata must hide only head/near-face primary hits")) return 1;
+
+    const PlayerSocketPlan sockets = EvaluatePlayerSocketPlan(authoritative.playerAnimation);
+    if (!Require(sockets.leftErrorMetres <= kPlayerGripSocketToleranceMetres &&
+                 sockets.rightErrorMetres <= kPlayerGripSocketToleranceMetres,
+                 "final left/right socket transforms must remain inside grip tolerance")) return 1;
+
+    using namespace horde::gameplay::items;
+    HeldItemStates authoritativeItems = MakeDefaultHeldItemStates();
+    authoritativeItems[0].worldFromItem = IdentityHeldItemTransform();
+    authoritativeItems[1].worldFromItem = IdentityHeldItemTransform();
+    HeldItemTransform leftBone = IdentityHeldItemTransform();
+    HeldItemTransform rightBone = IdentityHeldItemTransform();
+    leftBone[12] = -0.41f;
+    leftBone[13] = 0.22f;
+    leftBone[14] = 0.76f;
+    rightBone[12] = 0.38f;
+    rightBone[13] = 0.18f;
+    rightBone[14] = 0.81f;
+    HeldItemStates renderItems{};
+    std::string socketDiagnostic;
+    if (!Require(ResolvePlayerHeldItemVisuals(authoritativeItems, leftBone, rightBone,
+                                               renderItems, socketDiagnostic) &&
+                 Near(renderItems[0].worldFromItem[12], leftBone[12]) &&
+                 Near(renderItems[0].worldFromItem[13], leftBone[13] - 0.24f) &&
+                 Near(renderItems[1].worldFromItem[12], rightBone[12]) &&
+                 Near(renderItems[1].worldFromItem[13], rightBone[13] - 0.135f),
+                 "attached held-item visuals must compose from final LeftHand/RightHand bone sockets"))
+        return 1;
+    authoritativeItems[0].parentMode = HeldItemParentMode::AuthoredWorldTrajectory;
+    authoritativeItems[0].worldFromItem[12] = 4.0f;
+    if (!Require(ResolvePlayerHeldItemVisuals(authoritativeItems, leftBone, rightBone,
+                                               renderItems, socketDiagnostic) &&
+                 Near(renderItems[0].worldFromItem[12], 4.0f),
+                 "detached torch visuals must retain the authoritative world trajectory"))
+        return 1;
+
+    authoritativeItems = MakeDefaultHeldItemStates();
+    PlayerRenderSlot calibratedSlot;
+    if (!Require(calibratedSlot.ResolveHeldItemVisuals(
+                     authoritativeItems, leftBone, rightBone,
+                     renderItems, socketDiagnostic) &&
+                 Near(renderItems[0].worldFromItem[12], 0.0f) &&
+                 Near(renderItems[1].worldFromItem[12], 0.0f),
+                 "bone-local grip correction must preserve the established visual basis at calibration"))
+        return 1;
+    leftBone[12] += 0.06f;
+    rightBone[12] -= 0.04f;
+    if (!Require(calibratedSlot.ResolveHeldItemVisuals(
+                     authoritativeItems, leftBone, rightBone,
+                     renderItems, socketDiagnostic) &&
+                 Near(renderItems[0].worldFromItem[12], 0.06f) &&
+                 Near(renderItems[1].worldFromItem[12], -0.04f),
+                 "calibrated held-item visuals must follow subsequent final bone motion"))
+        return 1;
+    if (!Require(ChoosePlayerCpuCadence({0.18, 0.31, 0.018f, 0.004f}) ==
+                     PlayerCpuSkinCadence::Hz60 &&
+                 ChoosePlayerCpuCadence({0.18, 0.31, 0.004f, 0.003f}) ==
+                     PlayerCpuSkinCadence::Hz30,
+                 "CPU cadence selection must keep 30 Hz only when measured motion passes")) return 1;
 
     std::cout << "Player animation, IK, socket, reset/import, visibility, and delivery contracts passed\n";
     return 0;

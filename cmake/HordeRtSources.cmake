@@ -27,6 +27,7 @@ set(HORDE_RT_CORE_RELATIVE_SOURCES
     vulkan/raytracing/RtStaticMeshSlot.cpp
     vulkan/raytracing/RtTextureArrays.cpp
     vulkan/raytracing/CharacterRenderSlot.cpp
+    vulkan/raytracing/PlayerRenderSlot.cpp
     vulkan/raytracing/PresentableTinyRtScene.cpp
     vulkan/raytracing/SimulationFrameAdapter.cpp
     scene/assets/SkinnedMeshAsset.cpp

@@ -1,4 +1,8 @@
 #include "scene/SkeletonBipedModel.h"
+#include "scene/assets/AssetManifest.h"
+#include "scene/assets/StaticMeshAsset.h"
+#include "gameplay/simulation/GameSimulation.h"
+#include "vulkan/raytracing/PlayerRenderSlot.h"
 
 #include <cmath>
 #include <cstddef>
@@ -65,6 +69,17 @@ int main()
     if (!Require(skeleton.LoadCombatClips(skeletonPath.string(), diagnostic), diagnostic.c_str())) return 1;
     if (!Require(skeleton.HasTexcoords(), "skeleton TEXCOORD_0 was not imported")) return 1;
     if (!Require(skeleton.ExpandedVertexCount() == 28206u, "skeleton expanded vertex count changed")) return 1;
+    if (!Require(skeleton.HasNode("LeftHand") && skeleton.HasNode("RightHand"),
+                 "general skinned asset must expose actual left/right hand bones")) return 1;
+    SkinnedNodeTransform leftHandSocket{};
+    SkinnedNodeTransform rightHandSocket{};
+    if (!Require(skeleton.NodeTransform(SkinnedClip::Walking, 0.25f, "LeftHand", leftHandSocket, diagnostic),
+                 diagnostic.c_str()) ||
+        !Require(skeleton.NodeTransform(SkinnedClip::Walking, 0.25f, "RightHand", rightHandSocket, diagnostic),
+                 diagnostic.c_str())) return 1;
+    if (!Require(std::isfinite(leftHandSocket[12]) && std::isfinite(rightHandSocket[12]) &&
+                 std::abs(leftHandSocket[12] - rightHandSocket[12]) > 0.2f,
+                 "actual hand bone socket transforms must be finite and side-stable")) return 1;
 
     std::vector<SkinnedRtVertex> skeletonPlain;
     std::vector<TexturedSkinnedRtVertex> skeletonTextured;
@@ -72,6 +87,112 @@ int main()
     if (!Require(skeleton.SkinTextured(SkinnedClip::Idle, 0.25f, skeletonTextured, diagnostic), diagnostic.c_str())) return 1;
     if (!Require(skeletonPlain.size() == skeletonTextured.size(), "textured skinning changed skeleton vertex count")) return 1;
     if (!Require(FiniteTexturedVertices(skeletonTextured), "skeleton textured vertices are invalid")) return 1;
+
+    SkinnedCharacterModel player;
+    const auto playerPath = root / "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb";
+    if (!Require(player.LoadClips(playerPath.string(), PlayerLocomotionClipSet(), diagnostic),
+                 diagnostic.c_str())) return 1;
+    if (!Require(player.HasTexcoords() && player.ExpandedVertexCount() == 46785u,
+                 "player three-primitive textured skin layout changed")) return 1;
+    const auto& playerPrimitives = player.PrimitiveRanges();
+    if (!Require(playerPrimitives.size() == 3u &&
+                 playerPrimitives[0].materialName == "BodyPrimaryVisible" &&
+                 playerPrimitives[1].materialName == "HeadPrimaryMasked" &&
+                 playerPrimitives[2].materialName == "NearFacePrimaryMasked" &&
+                 playerPrimitives[0].expandedVertexCount == 40602u &&
+                 playerPrimitives[1].expandedVertexCount == 5439u &&
+                 playerPrimitives[2].expandedVertexCount == 744u,
+                 "player primitive semantics or triangle ranges changed")) return 1;
+    if (!Require(player.HasNode("LeftHand") && player.HasNode("RightHand") &&
+                 player.ClipDuration(SkinnedClip::Idle) > 0.9f &&
+                 player.ClipDuration(SkinnedClip::Walking) > 0.75f &&
+                 player.ClipDuration(SkinnedClip::Attack) == 0.0f &&
+                 player.ClipDuration(SkinnedClip::Dead) == 0.0f,
+                 "player joint or idle/walk-only clip contract changed")) return 1;
+    std::vector<TexturedSkinnedRtVertex> playerIdle;
+    std::vector<TexturedSkinnedRtVertex> playerWalking;
+    if (!Require(player.SkinTextured(SkinnedClip::Idle, 0.25f, playerIdle, diagnostic),
+                 diagnostic.c_str()) ||
+        !Require(player.SkinTextured(SkinnedClip::Walking, 0.25f, playerWalking, diagnostic),
+                 diagnostic.c_str()) ||
+        !Require(FiniteTexturedVertices(playerIdle) && FiniteTexturedVertices(playerWalking) &&
+                 playerIdle.size() == playerWalking.size(),
+                 "player idle/walk skinning output is invalid")) return 1;
+
+    horde::scene::assets::AssetManifest playerManifest;
+    horde::scene::assets::StaticMeshAsset playerStatic;
+    if (!Require(horde::scene::assets::AssetManifest::Load(
+                     root / "assets/models/player/runtime/asset.manifest.json",
+                     playerManifest, diagnostic), diagnostic.c_str()) ||
+        !Require(horde::scene::assets::StaticMeshAsset::Load(
+                     playerPath, playerManifest, playerStatic, diagnostic), diagnostic.c_str()) ||
+        !Require(player.UniqueVertexCount() == playerStatic.vertices.size(),
+                 "static-PBR and skinned player vertex streams must have identical unique ordering")) return 1;
+
+    SkinnedNodeTransform leftArmBase{};
+    SkinnedNodeTransform rightArmBase{};
+    if (!Require(player.NodeTransform(SkinnedClip::Idle, 0.25f, "LeftArm", leftArmBase, diagnostic),
+                 diagnostic.c_str()) ||
+        !Require(player.NodeTransform(SkinnedClip::Idle, 0.25f, "RightArm", rightArmBase, diagnostic),
+                 diagnostic.c_str())) return 1;
+    const SkinnedArmIkTarget leftTarget{{{leftArmBase[12] - 0.12f, leftArmBase[13] - 0.20f,
+                                           leftArmBase[14] + 0.28f}},
+                                         {{-1.0f, -0.2f, 0.2f}}};
+    const SkinnedArmIkTarget rightTarget{{{rightArmBase[12] + 0.12f, rightArmBase[13] - 0.20f,
+                                            rightArmBase[14] + 0.28f}},
+                                          {{1.0f, -0.2f, 0.2f}}};
+    std::vector<TexturedSkinnedRtVertex> playerSolved;
+    SkinnedPlayerSockets playerSockets;
+    if (!Require(player.SkinPlayerUniqueTextured(SkinnedClip::Idle, 0.25f,
+                                                  leftTarget, rightTarget,
+                                                  playerSolved, playerSockets,
+                                                  diagnostic), diagnostic.c_str()) ||
+        !Require(playerSolved.size() == playerStatic.vertices.size() &&
+                 FiniteTexturedVertices(playerSolved),
+                 "player IK skin output must remain finite and static-PBR-addressable")) return 1;
+    const auto socketDistance = [](const SkinnedNodeTransform& socket,
+                                   const SkinnedArmIkTarget& target) {
+        return std::hypot(std::hypot(socket[12] - target.target[0],
+                                    socket[13] - target.target[1]),
+                          socket[14] - target.target[2]);
+    };
+    if (!Require(socketDistance(playerSockets.leftHand, leftTarget) <= 0.015f &&
+                 socketDistance(playerSockets.rightHand, rightTarget) <= 0.015f,
+                 "actual LeftHand/RightHand bone sockets must solve within 15 mm")) return 1;
+
+    horde::gameplay::simulation::GameSimulation simulation;
+    horde::gameplay::simulation::InputSnapshot walkingInput{};
+    walkingInput.moveForward = 1.0f;
+    simulation.StepFixed(walkingInput);
+    horde::vulkan::raytracing::PlayerRenderSlot playerSlot;
+    bool poseUpdated = false;
+    auto rigSnapshot = simulation.Snapshot().playerAnimation;
+    for (std::size_t component = 0u; component < 3u; ++component)
+    {
+        rigSnapshot.leftIk.target[component] = leftArmBase[12u + component] +
+            rigSnapshot.leftIk.target[component] - rigSnapshot.leftIk.shoulder[component];
+        rigSnapshot.rightIk.target[component] = rightArmBase[12u + component] +
+            rigSnapshot.rightIk.target[component] - rigSnapshot.rightIk.shoulder[component];
+    }
+    if (!playerSlot.LoadAsset(playerPath.string(), diagnostic))
+    {
+        std::cerr << "FAIL: " << diagnostic << '\n';
+        return 1;
+    }
+    if (!playerSlot.PreparePose(
+            rigSnapshot,
+            simulation.Snapshot().tickIndex,
+            horde::vulkan::raytracing::PlayerCpuSkinCadence::Hz60,
+            poseUpdated, diagnostic))
+    {
+        std::cerr << "FAIL: " << diagnostic << '\n';
+        return 1;
+    }
+    if (
+        !Require(poseUpdated &&
+                 playerSlot.LeftSocketErrorMetres() <= 0.015f &&
+                 playerSlot.RightSocketErrorMetres() <= 0.015f,
+                 "authoritative held-item targets must drive the final rig bone sockets")) return 1;
 
     SkinnedCharacterModel lich;
     const auto lichPath = root / "assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb";
@@ -156,6 +277,7 @@ int main()
     if (!Require(!lich.Skin(SkinnedClip::Attack, 0.5f, unavailableAttack, diagnostic), "unmapped lich attack unexpectedly skinned")) return 1;
 
     std::cout << "Skinned character model smoke passed: skeleton=" << skeleton.ExpandedVertexCount()
+              << " player=" << player.ExpandedVertexCount()
               << " lich=" << lich.ExpandedVertexCount() << " textured std430 stride=" << sizeof(TexturedSkinnedRtVertex)
               << " emissiveVertices=" << emissiveVertexCount << " emissiveX=" << emissiveMinX << ".." << emissiveMaxX
               << " outer=" << outerEmissiveVertexCount << " avg="
