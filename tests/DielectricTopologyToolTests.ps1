@@ -6,6 +6,7 @@ $repoRoot = Split-Path -Parent $PSScriptRoot
 $validator = Join-Path $repoRoot "tools\validate-dielectric-topology.py"
 $fixtureRoot = Join-Path $PSScriptRoot "fixtures\dielectric-topology"
 $manifest = Join-Path $fixtureRoot "asset.manifest.json"
+$numericTest = Join-Path $PSScriptRoot "DielectricTopologyNumericTests.py"
 
 function Invoke-ExpectedValidation(
         [string]$name,
@@ -25,6 +26,11 @@ function Invoke-ExpectedValidation(
     if ($output -notmatch [regex]::Escape($expectedText)) {
         throw "Topology validation for '$name' did not report '$expectedText'. Output: $output"
     }
+}
+
+& py -3 $numericTest
+if ($LASTEXITCODE -ne 0) {
+    throw "Dielectric topology numeric reference tests failed with exit code $LASTEXITCODE."
 }
 
 Invoke-ExpectedValidation "closed-dielectric-lod0.runtime.glb" 0 "closed/manifold"
@@ -48,8 +54,20 @@ Invoke-ExpectedValidation "non-unit-min-diagonal-dielectric-lod0.runtime.glb" 2 
 Invoke-ExpectedValidation "non-unit-max-disconnected-dielectric-lod0.runtime.glb" 0 "2 closed/manifold thick component(s)" "ten-metre-units.manifest.json"
 Invoke-ExpectedValidation "non-unit-max-scale-seam-dielectric-lod0.runtime.glb" 2 "component 2" "ten-metre-units.manifest.json"
 Invoke-ExpectedValidation "mixed-orientation-shells-reordered-dielectric-lod0.runtime.glb" 2 "component 2"
+Invoke-ExpectedValidation "large-trs-matrix-seam-dielectric-lod0.runtime.glb" 0 "1 closed/manifold thick component(s)"
+Invoke-ExpectedValidation "position-nan-dielectric-lod0.runtime.glb" 2 "finite deterministic dielectric weld domain"
+Invoke-ExpectedValidation "position-positive-infinity-dielectric-lod0.runtime.glb" 2 "finite deterministic dielectric weld domain"
+Invoke-ExpectedValidation "position-negative-infinity-dielectric-lod0.runtime.glb" 2 "finite deterministic dielectric weld domain"
+Invoke-ExpectedValidation "weld-domain-upper-inside-dielectric-lod0.runtime.glb" 0 "1 closed/manifold thick component(s)"
+Invoke-ExpectedValidation "weld-domain-upper-at-dielectric-lod0.runtime.glb" 2 "finite deterministic dielectric weld domain"
+Invoke-ExpectedValidation "weld-domain-upper-outside-dielectric-lod0.runtime.glb" 2 "finite deterministic dielectric weld domain"
+Invoke-ExpectedValidation "weld-domain-lower-inside-dielectric-lod0.runtime.glb" 0 "1 closed/manifold thick component(s)"
+Invoke-ExpectedValidation "weld-domain-lower-at-dielectric-lod0.runtime.glb" 2 "finite deterministic dielectric weld domain"
+Invoke-ExpectedValidation "weld-domain-lower-outside-dielectric-lod0.runtime.glb" 2 "finite deterministic dielectric weld domain"
 Invoke-ExpectedValidation "closed-dielectric-lod0.runtime.glb" 2 "metresPerUnit must be finite and greater than zero" "zero-units.manifest.json"
+Invoke-ExpectedValidation "closed-dielectric-lod0.runtime.glb" 2 "metresPerUnit must be finite and greater than zero" "underflow-float-units.manifest.json"
 Invoke-ExpectedValidation "closed-dielectric-lod0.runtime.glb" 2 "metresPerUnit must be finite and greater than zero" "nonfinite-float-units.manifest.json"
+Invoke-ExpectedValidation "closed-dielectric-lod0.runtime.glb" 2 "metresPerUnit must be finite and greater than zero" "nan-units.manifest.json"
 
 $preparationSource = Get-Content -LiteralPath (Join-Path $repoRoot "tools\prepare-static-rt-asset.ps1") -Raw
 if ($preparationSource -notmatch "validate-dielectric-topology\.py") {

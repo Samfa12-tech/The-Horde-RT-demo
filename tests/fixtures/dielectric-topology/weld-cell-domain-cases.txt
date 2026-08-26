@@ -1,0 +1,7 @@
+# name scaled-coordinate accepted
+upper-inside 0x1.fffffffffffffp+62 true
+upper-at 0x1.0000000000000p+63 false
+upper-outside 0x1.0000000000001p+63 false
+lower-inside -0x1.fffffffffffffp+62 true
+lower-at -0x1.0000000000000p+63 false
+lower-outside -0x1.0000000000001p+63 false

@@ -31,10 +31,64 @@ uvs = [
     (0.0, 0.0), (1.0, 0.0), (1.0, 1.0), (0.0, 1.0),
 ]
 
+def float32(value):
+    return struct.unpack("<f", struct.pack("<f", value))[0]
+
+
+def float32_add(left, right):
+    return float32(float32(left) + float32(right))
+
+
+def float32_subtract(left, right):
+    return float32(float32(left) - float32(right))
+
+
+def float32_multiply(left, right):
+    return float32(float32(left) * float32(right))
+
+
+def cgltf_local_trs_matrix(translation, rotation, scale):
+    """Reference cgltf_node_transform_local expression order in float32."""
+    tx, ty, tz = map(float32, translation)
+    qx, qy, qz, qw = map(float32, rotation)
+    sx, sy, sz = map(float32, scale)
+    two = float32(2.0)
+    one = float32(1.0)
+
+    def twice_product(left, right):
+        return float32_multiply(float32_multiply(two, left), right)
+
+    return [
+        float32_multiply(float32_subtract(
+            float32_subtract(one, twice_product(qy, qy)),
+            twice_product(qz, qz)), sx),
+        float32_multiply(float32_add(
+            twice_product(qx, qy), twice_product(qz, qw)), sx),
+        float32_multiply(float32_subtract(
+            twice_product(qx, qz), twice_product(qy, qw)), sx), 0.0,
+        float32_multiply(float32_subtract(
+            twice_product(qx, qy), twice_product(qz, qw)), sy),
+        float32_multiply(float32_subtract(
+            float32_subtract(one, twice_product(qx, qx)),
+            twice_product(qz, qz)), sy),
+        float32_multiply(float32_add(
+            twice_product(qy, qz), twice_product(qx, qw)), sy), 0.0,
+        float32_multiply(float32_add(
+            twice_product(qx, qz), twice_product(qy, qw)), sz),
+        float32_multiply(float32_subtract(
+            twice_product(qy, qz), twice_product(qx, qw)), sz),
+        float32_multiply(float32_subtract(
+            float32_subtract(one, twice_product(qx, qx)),
+            twice_product(qy, qy)), sz), 0.0,
+        tx, ty, tz, 1.0,
+    ]
+
+
 def write_glb(output, mesh_indices, node_fields=None, include_volume=True,
-              thickness_factor=1.0):
+              thickness_factor=1.0, fixture_positions=None):
+    selected_positions = positions if fixture_positions is None else fixture_positions
     binary = bytearray()
-    for values in positions:
+    for values in selected_positions:
         binary.extend(struct.pack("<3f", *values))
     normal_offset = len(binary)
     for values in normals:
@@ -138,6 +192,7 @@ def write_component_fixture(output, parts):
     ]
     meshes = []
     nodes = []
+    scene_nodes = []
     for part_index, part in enumerate(parts):
         while len(binary) % 4:
             binary.append(0)
@@ -160,7 +215,16 @@ def write_component_fixture(output, parts):
         }]})
         node = {"name": part["name"], "mesh": part_index}
         node.update(part.get("node", {}))
-        nodes.append(node)
+        if "parent" in part:
+            parent_index = len(nodes)
+            child_index = parent_index + 1
+            parent = {"name": part["name"] + "Parent", "children": [child_index]}
+            parent.update(part["parent"])
+            nodes.extend((parent, node))
+            scene_nodes.append(parent_index)
+        else:
+            scene_nodes.append(len(nodes))
+            nodes.append(node)
     while len(binary) % 4:
         binary.append(0)
 
@@ -190,7 +254,7 @@ def write_component_fixture(output, parts):
         }],
         "meshes": meshes,
         "nodes": nodes,
-        "scenes": [{"nodes": list(range(len(nodes)))}],
+        "scenes": [{"nodes": scene_nodes}],
         "scene": 0,
     }
     json_bytes = json.dumps(document, separators=(",", ":")).encode("utf-8")
@@ -342,6 +406,66 @@ write_component_fixture(
         {"name": "LargeOutwardShell", "indices": indices,
          "node": {"scale": [2, 2, 2]}},
     ])
+
+# The two halves below have bit-identical local transforms in cgltf's float32
+# arithmetic. One route uses TRS, the other supplies the resulting matrix. A
+# similarly paired parent transform exercises cgltf's complete world-composition
+# loop while the large legal scale makes even a one-ULP regrouping visible at
+# the documented 10 um weld ceiling.
+large_trs = {
+    "translation": [-17.0, 9.0, 31.0],
+    "rotation": [
+        0.034700105941401764, 0.08930405965449124,
+        -0.8398654691199716, 0.534272104228522,
+    ],
+    "scale": [1772.607412245919, 80123.46646814236, 304.36350542842496],
+}
+large_parent_trs = {
+    "translation": [2048.0, -1024.0, 512.0],
+    "rotation": [0.18257418583505536, -0.3651483716701107,
+                 0.5477225575051661, 0.7302967433402214],
+    "scale": [1.25, 0.75, 2.0],
+}
+write_component_fixture(
+    TEST_OUTPUT / "large-trs-matrix-seam-dielectric-lod0.runtime.glb", [
+        {"name": "LargeTrsSeamA", "indices": indices[:18],
+         "node": large_trs, "parent": large_parent_trs},
+        {"name": "LargeMatrixSeamB", "indices": indices[18:],
+         "node": {"matrix": cgltf_local_trs_matrix(
+             large_trs["translation"], large_trs["rotation"], large_trs["scale"])},
+         "parent": {"matrix": cgltf_local_trs_matrix(
+             large_parent_trs["translation"], large_parent_trs["rotation"],
+             large_parent_trs["scale"])}},
+    ])
+
+for label, invalid_value in (
+        ("nan", math.nan), ("positive-infinity", math.inf),
+        ("negative-infinity", -math.inf)):
+    invalid_positions = list(positions)
+    invalid_positions[0] = (invalid_value, positions[0][1], positions[0][2])
+    write_glb(TEST_OUTPUT / f"position-{label}-dielectric-lod0.runtime.glb",
+              indices, fixture_positions=invalid_positions)
+
+# Float POSITION data cannot represent the mathematical boundary itself at this
+# magnitude. These GLBs therefore use the nearest float32 immediately inside,
+# the first float32 crossing, and a clearly outside value on both signs. The
+# companion exact-double case file below covers nextafter/at/nextafter itself.
+weld_safe_limit = (2**63) * 1.0e-7
+first_crossing = float32(weld_safe_limit)
+crossing_bits = struct.unpack("<I", struct.pack("<f", first_crossing))[0]
+cell_boundary_centres = {
+    "upper-inside": struct.unpack("<f", struct.pack("<I", crossing_bits - 3))[0],
+    "upper-at": first_crossing,
+    "upper-outside": struct.unpack("<f", struct.pack("<I", crossing_bits + 3))[0],
+    "lower-inside": -struct.unpack("<f", struct.pack("<I", crossing_bits - 3))[0],
+    "lower-at": -first_crossing,
+    "lower-outside": -struct.unpack("<f", struct.pack("<I", crossing_bits + 3))[0],
+}
+for label, centre in cell_boundary_centres.items():
+    write_glb(TEST_OUTPUT / f"weld-domain-{label}-dielectric-lod0.runtime.glb",
+              indices, {"scale": [131072.0, 131072.0, 131072.0],
+                        "translation": [centre, 0.0, 0.0]})
+
 TEST_OUTPUT.mkdir(parents=True, exist_ok=True)
 (TEST_OUTPUT / "asset.manifest.json").write_text(
     json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
@@ -349,8 +473,20 @@ for manifest_name, metres_per_unit in (
         ("centimetre-units.manifest.json", 0.01),
         ("ten-metre-units.manifest.json", 10.0),
         ("zero-units.manifest.json", 0.0),
-        ("nonfinite-float-units.manifest.json", 3.5e38)):
+        ("underflow-float-units.manifest.json", 1.0e-50),
+        ("nonfinite-float-units.manifest.json", 3.5e38),
+        ("nan-units.manifest.json", math.nan)):
     non_unit_manifest = dict(manifest)
     non_unit_manifest["metresPerUnit"] = metres_per_unit
     (TEST_OUTPUT / manifest_name).write_text(
         json.dumps(non_unit_manifest, indent=2) + "\n", encoding="utf-8")
+
+(TEST_OUTPUT / "weld-cell-domain-cases.txt").write_text(
+    "# name scaled-coordinate accepted\n"
+    "upper-inside 0x1.fffffffffffffp+62 true\n"
+    "upper-at 0x1.0000000000000p+63 false\n"
+    "upper-outside 0x1.0000000000001p+63 false\n"
+    "lower-inside -0x1.fffffffffffffp+62 true\n"
+    "lower-at -0x1.0000000000000p+63 false\n"
+    "lower-outside -0x1.0000000000001p+63 false\n",
+    encoding="utf-8")

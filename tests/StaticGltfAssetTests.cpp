@@ -822,6 +822,9 @@ void TestRuntimeOfflineDielectricComponentParity()
     expectPass("non-unit-min-seam-reordered-dielectric-lod0.runtime.glb", centimetreManifest);
     expectPass("non-unit-min-scale-seam-dielectric-lod0.runtime.glb", centimetreManifest);
     expectPass("non-unit-max-disconnected-dielectric-lod0.runtime.glb", tenMetreManifest);
+    expectDefaultPass("large-trs-matrix-seam-dielectric-lod0.runtime.glb");
+    expectDefaultPass("weld-domain-upper-inside-dielectric-lod0.runtime.glb");
+    expectDefaultPass("weld-domain-lower-inside-dielectric-lod0.runtime.glb");
 
     ExpectAssetFailureContains(
         fixtureRoot / "open-dielectric-lod0.runtime.glb", manifest,
@@ -861,6 +864,20 @@ void TestRuntimeOfflineDielectricComponentParity()
         manifest,
         {"material 'GenericClosedGlass' component 2", "SmallInwardShell",
          "inward-wound"});
+    for (const std::string_view name : {
+             "position-nan-dielectric-lod0.runtime.glb",
+             "position-positive-infinity-dielectric-lod0.runtime.glb",
+             "position-negative-infinity-dielectric-lod0.runtime.glb",
+             "weld-domain-upper-at-dielectric-lod0.runtime.glb",
+             "weld-domain-upper-outside-dielectric-lod0.runtime.glb",
+             "weld-domain-lower-at-dielectric-lod0.runtime.glb",
+             "weld-domain-lower-outside-dielectric-lod0.runtime.glb"})
+    {
+        ExpectAssetFailureContains(
+            fixtureRoot / name, manifest,
+            {"material 'GenericClosedGlass'", "node 'GenericDielectricFixture'",
+             "primitive 0", "finite deterministic dielectric weld domain"});
+    }
     ExpectAssetFailure(
         fixtureRoot / "negative-scale-dielectric-lod0.runtime.glb", manifest,
         "Static GLB node 'GenericDielectricFixture' has a negative-determinant transform; bake the reflection and reverse triangle winding/normals before runtime import.");
@@ -876,6 +893,16 @@ void TestRuntimeOfflineDielectricComponentParity()
                                rejectedManifest, diagnostic) &&
               diagnostic == "Asset manifest metresPerUnit must be finite and greater than zero.",
           "runtime rejects metresPerUnit outside the finite float range before dielectric topology validation");
+    diagnostic.clear();
+    Check(!AssetManifest::Load(fixtureRoot / "underflow-float-units.manifest.json",
+                               rejectedManifest, diagnostic) &&
+              diagnostic == "Asset manifest metresPerUnit must be finite and greater than zero.",
+          "runtime rejects positive metresPerUnit that underflows to float32 zero");
+    diagnostic.clear();
+    Check(!AssetManifest::Load(fixtureRoot / "nan-units.manifest.json",
+                               rejectedManifest, diagnostic) &&
+              diagnostic == "Asset manifest metresPerUnit must be finite and greater than zero.",
+          "runtime rejects NaN metresPerUnit after runtime-float conversion");
 }
 
 } // namespace
