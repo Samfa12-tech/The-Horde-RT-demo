@@ -15,10 +15,30 @@ JSON_CHUNK = 0x4E4F534A
 BIN_CHUNK = 0x004E4942
 COMPONENTS = {5121: ("B", 1), 5123: ("H", 2), 5125: ("I", 4), 5126: ("f", 4)}
 TYPE_WIDTHS = {"SCALAR": 1, "VEC3": 3}
+FLOAT32_MAX = 3.4028234663852886e38
 
 
 class ValidationError(RuntimeError):
     pass
+
+
+def runtime_float(value: float) -> float:
+    converted = float(value)
+    if not math.isfinite(converted) or abs(converted) > FLOAT32_MAX:
+        return math.copysign(math.inf, converted)
+    return struct.unpack("<f", struct.pack("<f", converted))[0]
+
+
+def manifest_metres_per_unit(manifest: dict) -> float:
+    try:
+        value = float(manifest["metresPerUnit"])
+    except (KeyError, TypeError, ValueError, OverflowError) as error:
+        raise ValidationError(
+            "Asset manifest metresPerUnit must be finite and greater than zero") from error
+    if not math.isfinite(value) or value <= 0.0 or value > FLOAT32_MAX:
+        raise ValidationError(
+            "Asset manifest metresPerUnit must be finite and greater than zero")
+    return runtime_float(value)
 
 
 def read_glb(path: pathlib.Path) -> tuple[dict, bytes]:
@@ -94,20 +114,27 @@ def material_properties(material: dict, overrides: dict[str, dict]) -> tuple[flo
 
 
 def multiply_matrices(left: list[float], right: list[float]) -> list[float]:
-    return [sum(left[k * 4 + row] * right[column * 4 + k] for k in range(4))
-            for column in range(4) for row in range(4)]
+    result = []
+    for column in range(4):
+        for row in range(4):
+            total = 0.0
+            for k in range(4):
+                product = runtime_float(left[k * 4 + row] * right[column * 4 + k])
+                total = runtime_float(total + product)
+            result.append(total)
+    return result
 
 
 def local_matrix(node: dict) -> list[float]:
     if "matrix" in node:
-        matrix = [float(value) for value in node["matrix"]]
+        matrix = [runtime_float(value) for value in node["matrix"]]
         if len(matrix) != 16:
             raise ValidationError("node matrix must contain 16 finite values")
         return matrix
-    tx, ty, tz = (float(value) for value in node.get("translation", [0, 0, 0]))
-    x, y, z, w = (float(value) for value in node.get("rotation", [0, 0, 0, 1]))
-    sx, sy, sz = (float(value) for value in node.get("scale", [1, 1, 1]))
-    return [
+    tx, ty, tz = (runtime_float(value) for value in node.get("translation", [0, 0, 0]))
+    x, y, z, w = (runtime_float(value) for value in node.get("rotation", [0, 0, 0, 1]))
+    sx, sy, sz = (runtime_float(value) for value in node.get("scale", [1, 1, 1]))
+    return [runtime_float(value) for value in [
         (1 - 2 * (y * y + z * z)) * sx,
         (2 * (x * y + z * w)) * sx,
         (2 * (x * z - y * w)) * sx, 0,
@@ -118,7 +145,7 @@ def local_matrix(node: dict) -> list[float]:
         (2 * (y * z - x * w)) * sz,
         (1 - 2 * (x * x + y * y)) * sz, 0,
         tx, ty, tz, 1,
-    ]
+    ]]
 
 
 def determinant(matrix: list[float]) -> float:
@@ -127,11 +154,18 @@ def determinant(matrix: list[float]) -> float:
             + matrix[8] * (matrix[1] * matrix[6] - matrix[5] * matrix[2]))
 
 
-def transform_point(matrix: list[float], point: tuple) -> tuple[float, float, float]:
-    x, y, z = (float(value) for value in point)
-    return (matrix[0] * x + matrix[4] * y + matrix[8] * z + matrix[12],
-            matrix[1] * x + matrix[5] * y + matrix[9] * z + matrix[13],
-            matrix[2] * x + matrix[6] * y + matrix[10] * z + matrix[14])
+def transform_point_metres(matrix: list[float], point: tuple,
+                           metres_per_unit: float) -> tuple[float, float, float]:
+    x, y, z = (runtime_float(value) for value in point)
+    result = []
+    for row in range(3):
+        first = runtime_float(runtime_float(matrix[row] * x) * metres_per_unit)
+        second = runtime_float(runtime_float(matrix[4 + row] * y) * metres_per_unit)
+        third = runtime_float(runtime_float(matrix[8 + row] * z) * metres_per_unit)
+        translation = runtime_float(matrix[12 + row] * metres_per_unit)
+        result.append(runtime_float(
+            runtime_float(runtime_float(first + second) + third) + translation))
+    return tuple(result)
 
 
 def node_world_matrices(document: dict) -> list[list[float]]:
@@ -178,14 +212,61 @@ def dielectric_weld_tolerance(triangles: list[dict]) -> tuple[float, tuple[float
     return max(1.0e-7, min(1.0e-5, extent * 1.0e-6)), minimum
 
 
-def quantize_position(position: tuple[float, float, float],
-                      origin: tuple[float, float, float],
-                      tolerance: float) -> tuple[int, int, int]:
-    def half_away_from_zero(value: float) -> int:
-        return (math.floor(value + 0.5) if value >= 0.0
-                else math.ceil(value - 0.5))
-    return tuple(half_away_from_zero((position[axis] - origin[axis]) / tolerance)
-                 for axis in range(3))
+def weld_cell(position: tuple[float, float, float],
+              origin: tuple[float, float, float],
+              tolerance: float) -> tuple[int, int, int]:
+    coordinates = []
+    for axis in range(3):
+        scaled = (position[axis] - origin[axis]) / tolerance
+        if not math.isfinite(scaled) or scaled < 0.0 or scaled > (2**63 - 2):
+            raise ValidationError(
+                "thick dielectric position exceeds the deterministic weld coordinate range")
+        coordinates.append(math.floor(scaled))
+    return tuple(coordinates)
+
+
+def squared_distance(left: tuple[float, float, float],
+                     right: tuple[float, float, float]) -> float:
+    return sum((left[axis] - right[axis]) ** 2 for axis in range(3))
+
+
+def build_dielectric_welds(triangles: list[dict],
+                           origin: tuple[float, float, float],
+                           tolerance: float) -> list[tuple[float, float, float]]:
+    occurrences = sorted(
+        (triangle["positions"][corner], triangle_index, corner)
+        for triangle_index, triangle in enumerate(triangles)
+        for corner in range(3))
+    representatives: list[tuple[float, float, float]] = []
+    buckets: collections.defaultdict[tuple[int, int, int], list[int]] = (
+        collections.defaultdict(list))
+    tolerance_squared = tolerance * tolerance
+    for position, triangle_index, corner in occurrences:
+        cell = weld_cell(position, origin, tolerance)
+        best = None
+        best_distance_squared = math.inf
+        for x in range(-1, 2):
+            for y in range(-1, 2):
+                for z in range(-1, 2):
+                    neighbor = (cell[0] + x, cell[1] + y, cell[2] + z)
+                    if any(value < 0 or value > (2**63 - 1) for value in neighbor):
+                        continue
+                    for candidate in buckets.get(neighbor, []):
+                        distance_squared = squared_distance(
+                            position, representatives[candidate])
+                        if distance_squared > tolerance_squared:
+                            continue
+                        if (distance_squared < best_distance_squared or
+                                (distance_squared == best_distance_squared and
+                                 (best is None or candidate < best))):
+                            best = candidate
+                            best_distance_squared = distance_squared
+        if best is None:
+            best = len(representatives)
+            representatives.append(position)
+            buckets[cell].append(best)
+        triangles[triangle_index].setdefault("welded", [None, None, None])[corner] = best
+    return representatives
 
 
 def component_sources(triangles: list[dict], component: list[int]) -> str:
@@ -199,13 +280,12 @@ def validate_material_components(path: pathlib.Path, material_name: str,
                                  triangles: list[dict]) -> int:
     if not triangles:
         return 0
-    tolerance, quantization_origin = dielectric_weld_tolerance(triangles)
+    tolerance, weld_origin = dielectric_weld_tolerance(triangles)
+    representatives = build_dielectric_welds(
+        triangles, weld_origin, tolerance)
     all_edges: collections.defaultdict[tuple, list[tuple[int, bool]]] = (
         collections.defaultdict(list))
     for triangle_index, triangle in enumerate(triangles):
-        triangle["welded"] = [
-            quantize_position(position, quantization_origin, tolerance)
-            for position in triangle["positions"]]
         for corner in range(3):
             a = triangle["welded"][corner]
             b = triangle["welded"][(corner + 1) % 3]
@@ -230,7 +310,7 @@ def validate_material_components(path: pathlib.Path, material_name: str,
                 adjacency[a].add(b)
                 adjacency[b].add(a)
 
-    components: list[list[int]] = []
+    components: list[tuple[list[int], list[int]]] = []
     visited = [False] * len(triangles)
     for first_triangle in range(len(triangles)):
         if visited[first_triangle]:
@@ -246,9 +326,16 @@ def validate_material_components(path: pathlib.Path, material_name: str,
                     continue
                 visited[neighbor] = True
                 pending.append(neighbor)
-        components.append(sorted(component))
+        vertex_key = sorted({vertex for triangle_index in component
+                             for vertex in triangles[triangle_index]["welded"]})
+        component.sort(key=lambda triangle_index: (
+            tuple(triangles[triangle_index]["welded"]),
+            tuple(triangles[triangle_index]["positions"]),
+            triangles[triangle_index]["source"]))
+        components.append((vertex_key, component))
+    components.sort(key=lambda item: item[0])
 
-    for component_number, component in enumerate(components, start=1):
+    for component_number, (vertex_key, component) in enumerate(components, start=1):
         edges: collections.defaultdict[tuple, list[int]] = (
             collections.defaultdict(lambda: [0, 0]))
         for triangle_index in component:
@@ -278,7 +365,7 @@ def validate_material_components(path: pathlib.Path, material_name: str,
             raise ValidationError(
                 f"{prefix} has inconsistent winding; each shared edge must be used once in each direction")
 
-        origin = triangles[component[0]]["positions"][0]
+        origin = representatives[vertex_key[0]]
         signed_six_times_volume = 0.0
         for triangle_index in component:
             relative = [tuple(position[axis] - origin[axis] for axis in range(3))
@@ -298,6 +385,7 @@ def validate_material_components(path: pathlib.Path, material_name: str,
 def validate(path: pathlib.Path, manifest_path: pathlib.Path) -> None:
     document, binary = read_glb(path)
     manifest = json.loads(manifest_path.read_text(encoding="utf-8-sig"))
+    metres_per_unit = manifest_metres_per_unit(manifest)
     overrides = {
         entry.get("material", ""): entry for entry in manifest.get("materialOverrides", [])
     }
@@ -328,7 +416,8 @@ def validate(path: pathlib.Path, manifest_path: pathlib.Path) -> None:
             if position_accessor is None:
                 raise ValidationError(
                     f"mesh {mesh_index} primitive {primitive_index}: thick dielectric geometry has no POSITION accessor")
-            positions = [transform_point(world_matrices[node_index], value)
+            positions = [transform_point_metres(
+                             world_matrices[node_index], value, metres_per_unit)
                          for value in read_accessor(document, binary, position_accessor)]
             if document["accessors"][position_accessor]["componentType"] != 5126:
                 raise ValidationError(

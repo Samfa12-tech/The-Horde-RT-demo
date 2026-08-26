@@ -261,8 +261,9 @@ bool IsFiniteMaterial(const StaticMaterial& material)
             material.attenuationDistance == std::numeric_limits<float>::max());
 }
 
-using QuantizedPosition = std::array<std::int64_t, 3u>;
-using UndirectedEdge = std::pair<QuantizedPosition, QuantizedPosition>;
+using WeldCell = std::array<std::int64_t, 3u>;
+using WeldVertexId = std::size_t;
+using UndirectedEdge = std::pair<WeldVertexId, WeldVertexId>;
 
 struct EdgeOrientationCount
 {
@@ -273,7 +274,7 @@ struct EdgeOrientationCount
 struct DielectricTriangle
 {
     std::array<std::array<double, 3u>, 3u> positions{};
-    std::array<QuantizedPosition, 3u> welded{};
+    std::array<WeldVertexId, 3u> welded{};
     std::size_t primitiveIndex = 0u;
     std::string nodeName;
 };
@@ -296,14 +297,136 @@ double DielectricWeldTolerance(const std::array<double, 3u>& minimum,
     return std::clamp(extent * 1.0e-6, 1.0e-7, 1.0e-5);
 }
 
-QuantizedPosition QuantizePosition(const std::array<double, 3u>& position,
-                                   const std::array<double, 3u>& origin,
-                                   double tolerance)
+bool WeldCellForPosition(const std::array<double, 3u>& position,
+                         const std::array<double, 3u>& origin,
+                         double tolerance,
+                         WeldCell& cell)
 {
-    return {{
-        static_cast<std::int64_t>(std::llround((position[0] - origin[0]) / tolerance)),
-        static_cast<std::int64_t>(std::llround((position[1] - origin[1]) / tolerance)),
-        static_cast<std::int64_t>(std::llround((position[2] - origin[2]) / tolerance))}};
+    constexpr double maximumCell =
+        static_cast<double>(std::numeric_limits<std::int64_t>::max() - 1);
+    for (std::size_t axis = 0u; axis < cell.size(); ++axis)
+    {
+        const double scaled = (position[axis] - origin[axis]) / tolerance;
+        if (!std::isfinite(scaled) || scaled < 0.0 || scaled > maximumCell) return false;
+        cell[axis] = static_cast<std::int64_t>(std::floor(scaled));
+    }
+    return true;
+}
+
+double SquaredDistance(const std::array<double, 3u>& left,
+                       const std::array<double, 3u>& right)
+{
+    double result = 0.0;
+    for (std::size_t axis = 0u; axis < left.size(); ++axis)
+    {
+        const double delta = left[axis] - right[axis];
+        result += delta * delta;
+    }
+    return result;
+}
+
+bool BuildDielectricWelds(std::vector<DielectricTriangle>& triangles,
+                          const std::array<double, 3u>& origin,
+                          double tolerance,
+                          std::vector<std::array<double, 3u>>& representatives,
+                          std::string_view materialName,
+                          std::string& diagnostic)
+{
+    struct Occurrence
+    {
+        std::array<double, 3u> position{};
+        std::size_t triangleIndex = 0u;
+        std::size_t corner = 0u;
+    };
+
+    std::vector<Occurrence> occurrences;
+    occurrences.reserve(triangles.size() * 3u);
+    for (std::size_t triangleIndex = 0u;
+         triangleIndex < triangles.size(); ++triangleIndex)
+    {
+        for (std::size_t corner = 0u; corner < 3u; ++corner)
+            occurrences.push_back(
+                Occurrence{triangles[triangleIndex].positions[corner],
+                           triangleIndex, corner});
+    }
+    std::sort(occurrences.begin(), occurrences.end(),
+              [](const Occurrence& left, const Occurrence& right) {
+                  if (left.position != right.position)
+                      return left.position < right.position;
+                  if (left.triangleIndex != right.triangleIndex)
+                      return left.triangleIndex < right.triangleIndex;
+                  return left.corner < right.corner;
+              });
+
+    // Only canonical representatives enter the spatial buckets. Processing
+    // positions lexicographically and choosing the nearest representative
+    // (lowest stable id on an exact tie) makes the result independent of
+    // primitive traversal and prevents transitive proximity chains.
+    std::map<WeldCell, std::vector<WeldVertexId>> buckets;
+    const double toleranceSquared = tolerance * tolerance;
+    for (const Occurrence& occurrence : occurrences)
+    {
+        WeldCell cell{};
+        if (!WeldCellForPosition(occurrence.position, origin, tolerance, cell))
+        {
+            const DielectricTriangle& triangle = triangles[occurrence.triangleIndex];
+            diagnostic = "Static GLB thick transmissive material '" +
+                std::string(materialName) + "' (node '" + triangle.nodeName +
+                "' primitive " + std::to_string(triangle.primitiveIndex) +
+                ") exceeds the deterministic dielectric weld coordinate range.";
+            return false;
+        }
+
+        WeldVertexId best = std::numeric_limits<WeldVertexId>::max();
+        double bestDistanceSquared = std::numeric_limits<double>::max();
+        for (std::int64_t x = -1; x <= 1; ++x)
+        {
+            for (std::int64_t y = -1; y <= 1; ++y)
+            {
+                for (std::int64_t z = -1; z <= 1; ++z)
+                {
+                    const std::array<std::int64_t, 3u> offset{{x, y, z}};
+                    WeldCell neighbor{};
+                    bool validNeighbor = true;
+                    for (std::size_t axis = 0u; axis < neighbor.size(); ++axis)
+                    {
+                        if ((offset[axis] < 0 && cell[axis] == 0) ||
+                            (offset[axis] > 0 &&
+                             cell[axis] == std::numeric_limits<std::int64_t>::max()))
+                        {
+                            validNeighbor = false;
+                            break;
+                        }
+                        neighbor[axis] = cell[axis] + offset[axis];
+                    }
+                    if (!validNeighbor) continue;
+                    const auto bucket = buckets.find(neighbor);
+                    if (bucket == buckets.end()) continue;
+                    for (const WeldVertexId candidate : bucket->second)
+                    {
+                        const double distanceSquared =
+                            SquaredDistance(occurrence.position,
+                                            representatives[candidate]);
+                        if (distanceSquared > toleranceSquared) continue;
+                        if (distanceSquared < bestDistanceSquared ||
+                            (distanceSquared == bestDistanceSquared && candidate < best))
+                        {
+                            best = candidate;
+                            bestDistanceSquared = distanceSquared;
+                        }
+                    }
+                }
+            }
+        }
+        if (best == std::numeric_limits<WeldVertexId>::max())
+        {
+            best = representatives.size();
+            representatives.push_back(occurrence.position);
+            buckets[cell].push_back(best);
+        }
+        triangles[occurrence.triangleIndex].welded[occurrence.corner] = best;
+    }
+    return true;
 }
 
 std::string DielectricComponentSources(
@@ -381,19 +504,20 @@ bool ValidateThickDielectricTopology(const StaticMeshAsset& asset,
         if (triangles.empty()) continue;
 
         const double weldTolerance = DielectricWeldTolerance(minimum, maximum);
+        std::vector<std::array<double, 3u>> weldRepresentatives;
+        if (!BuildDielectricWelds(triangles, minimum, weldTolerance,
+                                  weldRepresentatives, material.name,
+                                  diagnostic))
+            return false;
         std::map<UndirectedEdge, std::vector<EdgeReference>> allEdgeReferences;
         for (std::size_t triangleIndex = 0u;
              triangleIndex < triangles.size(); ++triangleIndex)
         {
             DielectricTriangle& triangle = triangles[triangleIndex];
-            for (std::size_t corner = 0u; corner < triangle.welded.size(); ++corner)
-                triangle.welded[corner] =
-                    QuantizePosition(triangle.positions[corner], minimum,
-                                     weldTolerance);
             for (std::size_t edge = 0u; edge < triangle.welded.size(); ++edge)
             {
-                QuantizedPosition a = triangle.welded[edge];
-                QuantizedPosition b = triangle.welded[(edge + 1u) % triangle.welded.size()];
+                WeldVertexId a = triangle.welded[edge];
+                WeldVertexId b = triangle.welded[(edge + 1u) % triangle.welded.size()];
                 if (a == b)
                 {
                     diagnostic = "Static GLB thick transmissive material '" +
@@ -427,21 +551,25 @@ bool ValidateThickDielectricTopology(const StaticMeshAsset& asset,
             }
         }
 
+        struct DielectricComponent
+        {
+            std::vector<std::size_t> triangles;
+            std::vector<WeldVertexId> vertexKey;
+        };
         std::vector<bool> visited(triangles.size(), false);
-        std::size_t componentNumber = 0u;
+        std::vector<DielectricComponent> components;
         for (std::size_t firstTriangle = 0u;
              firstTriangle < triangles.size(); ++firstTriangle)
         {
             if (visited[firstTriangle]) continue;
-            ++componentNumber;
-            std::vector<std::size_t> component;
+            DielectricComponent component;
             std::vector<std::size_t> pending{firstTriangle};
             visited[firstTriangle] = true;
             while (!pending.empty())
             {
                 const std::size_t triangleIndex = pending.back();
                 pending.pop_back();
-                component.push_back(triangleIndex);
+                component.triangles.push_back(triangleIndex);
                 for (const std::size_t neighbor : adjacency[triangleIndex])
                 {
                     if (visited[neighbor]) continue;
@@ -449,16 +577,47 @@ bool ValidateThickDielectricTopology(const StaticMeshAsset& asset,
                     pending.push_back(neighbor);
                 }
             }
+            for (const std::size_t triangleIndex : component.triangles)
+                component.vertexKey.insert(component.vertexKey.end(),
+                                           triangles[triangleIndex].welded.begin(),
+                                           triangles[triangleIndex].welded.end());
+            std::sort(component.vertexKey.begin(), component.vertexKey.end());
+            component.vertexKey.erase(
+                std::unique(component.vertexKey.begin(), component.vertexKey.end()),
+                component.vertexKey.end());
+            std::sort(component.triangles.begin(), component.triangles.end(),
+                      [&triangles](std::size_t left, std::size_t right) {
+                          if (triangles[left].welded != triangles[right].welded)
+                              return triangles[left].welded < triangles[right].welded;
+                          if (triangles[left].positions != triangles[right].positions)
+                              return triangles[left].positions < triangles[right].positions;
+                          if (triangles[left].nodeName != triangles[right].nodeName)
+                              return triangles[left].nodeName < triangles[right].nodeName;
+                          return triangles[left].primitiveIndex <
+                                 triangles[right].primitiveIndex;
+                      });
+            components.push_back(std::move(component));
+        }
+        std::sort(components.begin(), components.end(),
+                  [](const DielectricComponent& left,
+                     const DielectricComponent& right) {
+                      return left.vertexKey < right.vertexKey;
+                  });
 
-            std::sort(component.begin(), component.end());
+        for (std::size_t componentIndex = 0u;
+             componentIndex < components.size(); ++componentIndex)
+        {
+            const std::size_t componentNumber = componentIndex + 1u;
+            const std::vector<std::size_t>& component =
+                components[componentIndex].triangles;
             std::map<UndirectedEdge, EdgeOrientationCount> componentEdges;
             for (const std::size_t triangleIndex : component)
             {
                 const DielectricTriangle& triangle = triangles[triangleIndex];
                 for (std::size_t edge = 0u; edge < triangle.welded.size(); ++edge)
                 {
-                    QuantizedPosition a = triangle.welded[edge];
-                    QuantizedPosition b =
+                    WeldVertexId a = triangle.welded[edge];
+                    WeldVertexId b =
                         triangle.welded[(edge + 1u) % triangle.welded.size()];
                     const bool ascending = a < b;
                     if (!ascending) std::swap(a, b);
@@ -496,8 +655,8 @@ bool ValidateThickDielectricTopology(const StaticMeshAsset& asset,
                 }
             }
 
-            const std::array<double, 3u> origin =
-                triangles[component.front()].positions[0];
+            const std::array<double, 3u>& origin =
+                weldRepresentatives[components[componentIndex].vertexKey.front()];
             double signedSixTimesVolume = 0.0;
             for (const std::size_t triangleIndex : component)
             {
