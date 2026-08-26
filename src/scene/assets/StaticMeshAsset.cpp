@@ -11,8 +11,11 @@
 #include <limits>
 #include <map>
 #include <optional>
+#include <set>
+#include <sstream>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 namespace horde::scene::assets
 {
@@ -267,13 +270,62 @@ struct EdgeOrientationCount
     std::uint32_t descending = 0u;
 };
 
-QuantizedPosition QuantizePosition(const StaticRtVertex& vertex)
+struct DielectricTriangle
 {
-    constexpr double precision = 100000.0;
+    std::array<std::array<double, 3u>, 3u> positions{};
+    std::array<QuantizedPosition, 3u> welded{};
+    std::size_t primitiveIndex = 0u;
+    std::string nodeName;
+};
+
+struct EdgeReference
+{
+    std::size_t triangleIndex = 0u;
+    bool ascending = false;
+};
+
+double DielectricWeldTolerance(const std::array<double, 3u>& minimum,
+                               const std::array<double, 3u>& maximum)
+{
+    double extent = 0.0;
+    for (std::size_t axis = 0u; axis < 3u; ++axis)
+        extent = std::max(extent, maximum[axis] - minimum[axis]);
+    // Baked positions are metres. One millionth of material extent, clamped
+    // to 0.1-10 micrometres, welds transform-rounding equivalents while keeping
+    // authored shells separated by more than the documented 10 um ceiling.
+    return std::clamp(extent * 1.0e-6, 1.0e-7, 1.0e-5);
+}
+
+QuantizedPosition QuantizePosition(const std::array<double, 3u>& position,
+                                   const std::array<double, 3u>& origin,
+                                   double tolerance)
+{
     return {{
-        static_cast<std::int64_t>(std::llround(vertex.position[0] * precision)),
-        static_cast<std::int64_t>(std::llround(vertex.position[1] * precision)),
-        static_cast<std::int64_t>(std::llround(vertex.position[2] * precision))}};
+        static_cast<std::int64_t>(std::llround((position[0] - origin[0]) / tolerance)),
+        static_cast<std::int64_t>(std::llround((position[1] - origin[1]) / tolerance)),
+        static_cast<std::int64_t>(std::llround((position[2] - origin[2]) / tolerance))}};
+}
+
+std::string DielectricComponentSources(
+    const std::vector<DielectricTriangle>& triangles,
+    const std::vector<std::size_t>& component)
+{
+    std::set<std::pair<std::size_t, std::string>> uniqueSources;
+    for (const std::size_t triangleIndex : component)
+    {
+        const DielectricTriangle& triangle = triangles[triangleIndex];
+        uniqueSources.emplace(triangle.primitiveIndex, triangle.nodeName);
+    }
+    std::ostringstream stream;
+    bool first = true;
+    for (const auto& [primitiveIndex, nodeName] : uniqueSources)
+    {
+        if (!first) stream << ", ";
+        first = false;
+        stream << "node '" << (nodeName.empty() ? "<unnamed>" : nodeName)
+               << "' primitive " << primitiveIndex;
+    }
+    return stream.str();
 }
 
 bool ValidateThickDielectricTopology(const StaticMeshAsset& asset,
@@ -286,80 +338,189 @@ bool ValidateThickDielectricTopology(const StaticMeshAsset& asset,
         if (material.transmissionFactor <= 0.0f || material.thicknessFactor <= 0.0f ||
             (material.flags & thinWallFlag) != 0u)
             continue;
-        std::map<UndirectedEdge, EdgeOrientationCount> edgeReferences;
-        double signedSixTimesVolume = 0.0;
-        std::optional<std::array<float, 3u>> volumeOrigin;
-        for (const StaticPrimitiveRecord& primitive : asset.primitives)
+        std::vector<DielectricTriangle> triangles;
+        std::array<double, 3u> minimum{{
+            std::numeric_limits<double>::max(),
+            std::numeric_limits<double>::max(),
+            std::numeric_limits<double>::max()}};
+        std::array<double, 3u> maximum{{
+            std::numeric_limits<double>::lowest(),
+            std::numeric_limits<double>::lowest(),
+            std::numeric_limits<double>::lowest()}};
+        for (std::size_t primitiveIndex = 0u;
+             primitiveIndex < asset.primitives.size(); ++primitiveIndex)
         {
+            const StaticPrimitiveRecord& primitive = asset.primitives[primitiveIndex];
             if (primitive.materialIndex != materialIndex) continue;
             for (std::uint32_t index = 0u; index < primitive.indexCount; index += 3u)
             {
-                std::array<QuantizedPosition, 3u> triangle{};
-                std::array<std::array<float, 3u>, 3u> positions{};
-                for (std::size_t corner = 0u; corner < triangle.size(); ++corner)
+                DielectricTriangle triangle;
+                triangle.primitiveIndex = primitiveIndex;
+                triangle.nodeName =
+                    primitive.nodeTransformIndex < asset.nodeTransforms.size()
+                    ? asset.nodeTransforms[primitive.nodeTransformIndex].name
+                    : std::string("<unknown>");
+                for (std::size_t corner = 0u; corner < triangle.positions.size(); ++corner)
                 {
                     const std::uint32_t localVertex =
                         asset.indices[primitive.indexOffset + index + corner];
                     const StaticRtVertex& vertex =
                         asset.vertices[primitive.vertexOffset + localVertex];
-                    triangle[corner] = QuantizePosition(vertex);
-                    positions[corner] = {{
-                        vertex.position[0], vertex.position[1], vertex.position[2]}};
-                }
-                if (!volumeOrigin.has_value()) volumeOrigin = positions[0];
-                std::array<std::array<float, 3u>, 3u> relative = positions;
-                for (auto& position : relative)
                     for (std::size_t axis = 0u; axis < 3u; ++axis)
-                        position[axis] -= (*volumeOrigin)[axis];
-                signedSixTimesVolume += static_cast<double>(Dot(
-                    relative[0], Cross(relative[1], relative[2])));
-                for (std::size_t edge = 0u; edge < triangle.size(); ++edge)
-                {
-                    QuantizedPosition a = triangle[edge];
-                    QuantizedPosition b = triangle[(edge + 1u) % triangle.size()];
-                    if (a == b)
                     {
-                        diagnostic = "Static GLB thick transmissive material '" +
-                            material.name + "' contains a degenerate triangle edge.";
-                        return false;
+                        triangle.positions[corner][axis] = vertex.position[axis];
+                        minimum[axis] = std::min(minimum[axis],
+                                                 triangle.positions[corner][axis]);
+                        maximum[axis] = std::max(maximum[axis],
+                                                 triangle.positions[corner][axis]);
                     }
-                    const bool ascending = a < b;
-                    if (!ascending) std::swap(a, b);
-                    EdgeOrientationCount& count = edgeReferences[{a, b}];
-                    if (ascending) ++count.ascending;
-                    else ++count.descending;
                 }
+                triangles.push_back(std::move(triangle));
             }
         }
-        for (const auto& [edge, orientation] : edgeReferences)
+        if (triangles.empty()) continue;
+
+        const double weldTolerance = DielectricWeldTolerance(minimum, maximum);
+        std::map<UndirectedEdge, std::vector<EdgeReference>> allEdgeReferences;
+        for (std::size_t triangleIndex = 0u;
+             triangleIndex < triangles.size(); ++triangleIndex)
+        {
+            DielectricTriangle& triangle = triangles[triangleIndex];
+            for (std::size_t corner = 0u; corner < triangle.welded.size(); ++corner)
+                triangle.welded[corner] =
+                    QuantizePosition(triangle.positions[corner], minimum,
+                                     weldTolerance);
+            for (std::size_t edge = 0u; edge < triangle.welded.size(); ++edge)
+            {
+                QuantizedPosition a = triangle.welded[edge];
+                QuantizedPosition b = triangle.welded[(edge + 1u) % triangle.welded.size()];
+                if (a == b)
+                {
+                    diagnostic = "Static GLB thick transmissive material '" +
+                        material.name + "' (node '" + triangle.nodeName +
+                        "' primitive " + std::to_string(triangle.primitiveIndex) +
+                        ") contains a degenerate triangle edge after the documented " +
+                        std::to_string(weldTolerance) + " metre weld tolerance.";
+                    return false;
+                }
+                const bool ascending = a < b;
+                if (!ascending) std::swap(a, b);
+                allEdgeReferences[{a, b}].push_back(
+                    EdgeReference{triangleIndex, ascending});
+            }
+        }
+
+        std::vector<std::vector<std::size_t>> adjacency(triangles.size());
+        for (const auto& [edge, references] : allEdgeReferences)
         {
             (void)edge;
-            const std::uint32_t references =
-                orientation.ascending + orientation.descending;
-            if (references == 1u)
+            for (std::size_t left = 0u; left < references.size(); ++left)
             {
-                diagnostic = "Static GLB thick transmissive material '" + material.name +
-                    "' is open: boundary edge is referenced once. Use closed manifold geometry or set thinWall in the audited material override.";
-                return false;
-            }
-            if (references > 2u)
-            {
-                diagnostic = "Static GLB thick transmissive material '" + material.name +
-                    "' is non-manifold: an edge is referenced more than twice.";
-                return false;
-            }
-            if (orientation.ascending != 1u || orientation.descending != 1u)
-            {
-                diagnostic = "Static GLB thick transmissive material '" + material.name +
-                    "' has inconsistent winding: each shared edge must be used once in each direction.";
-                return false;
+                for (std::size_t right = left + 1u; right < references.size(); ++right)
+                {
+                    const std::size_t a = references[left].triangleIndex;
+                    const std::size_t b = references[right].triangleIndex;
+                    if (a == b) continue;
+                    adjacency[a].push_back(b);
+                    adjacency[b].push_back(a);
+                }
             }
         }
-        if (!std::isfinite(signedSixTimesVolume) || signedSixTimesVolume <= 1.0e-18)
+
+        std::vector<bool> visited(triangles.size(), false);
+        std::size_t componentNumber = 0u;
+        for (std::size_t firstTriangle = 0u;
+             firstTriangle < triangles.size(); ++firstTriangle)
         {
-            diagnostic = "Static GLB thick transmissive material '" + material.name +
-                "' is inward-wound after baked node transforms; reverse every triangle winding so normals face outward.";
-            return false;
+            if (visited[firstTriangle]) continue;
+            ++componentNumber;
+            std::vector<std::size_t> component;
+            std::vector<std::size_t> pending{firstTriangle};
+            visited[firstTriangle] = true;
+            while (!pending.empty())
+            {
+                const std::size_t triangleIndex = pending.back();
+                pending.pop_back();
+                component.push_back(triangleIndex);
+                for (const std::size_t neighbor : adjacency[triangleIndex])
+                {
+                    if (visited[neighbor]) continue;
+                    visited[neighbor] = true;
+                    pending.push_back(neighbor);
+                }
+            }
+
+            std::sort(component.begin(), component.end());
+            std::map<UndirectedEdge, EdgeOrientationCount> componentEdges;
+            for (const std::size_t triangleIndex : component)
+            {
+                const DielectricTriangle& triangle = triangles[triangleIndex];
+                for (std::size_t edge = 0u; edge < triangle.welded.size(); ++edge)
+                {
+                    QuantizedPosition a = triangle.welded[edge];
+                    QuantizedPosition b =
+                        triangle.welded[(edge + 1u) % triangle.welded.size()];
+                    const bool ascending = a < b;
+                    if (!ascending) std::swap(a, b);
+                    EdgeOrientationCount& orientation = componentEdges[{a, b}];
+                    if (ascending) ++orientation.ascending;
+                    else ++orientation.descending;
+                }
+            }
+
+            const std::string prefix = "Static GLB thick transmissive material '" +
+                material.name + "' component " + std::to_string(componentNumber) +
+                " (" + DielectricComponentSources(triangles, component) + ") ";
+            for (const auto& [edge, orientation] : componentEdges)
+            {
+                (void)edge;
+                const std::uint32_t referenceCount =
+                    orientation.ascending + orientation.descending;
+                if (referenceCount == 1u)
+                {
+                    diagnostic = prefix +
+                        "is open: a boundary edge is referenced once. Use closed manifold geometry or set thinWall in the audited material override.";
+                    return false;
+                }
+                if (referenceCount > 2u)
+                {
+                    diagnostic = prefix +
+                        "is non-manifold: an edge is referenced more than twice. Repair the component topology before import.";
+                    return false;
+                }
+                if (orientation.ascending != 1u || orientation.descending != 1u)
+                {
+                    diagnostic = prefix +
+                        "has inconsistent winding: each shared edge must be used once in each direction.";
+                    return false;
+                }
+            }
+
+            const std::array<double, 3u> origin =
+                triangles[component.front()].positions[0];
+            double signedSixTimesVolume = 0.0;
+            for (const std::size_t triangleIndex : component)
+            {
+                std::array<std::array<double, 3u>, 3u> relative =
+                    triangles[triangleIndex].positions;
+                for (auto& position : relative)
+                    for (std::size_t axis = 0u; axis < 3u; ++axis)
+                        position[axis] -= origin[axis];
+                signedSixTimesVolume +=
+                    relative[0][0] * (relative[1][1] * relative[2][2] -
+                                      relative[1][2] * relative[2][1]) +
+                    relative[0][1] * (relative[1][2] * relative[2][0] -
+                                      relative[1][0] * relative[2][2]) +
+                    relative[0][2] * (relative[1][0] * relative[2][1] -
+                                      relative[1][1] * relative[2][0]);
+            }
+            if (!std::isfinite(signedSixTimesVolume) ||
+                signedSixTimesVolume <= 1.0e-18)
+            {
+                diagnostic = prefix +
+                    "is inward-wound after baked node transforms; reverse every triangle winding so normals face outward.";
+                return false;
+            }
         }
     }
     return true;

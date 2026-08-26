@@ -793,8 +793,9 @@ void TestRuntimeOfflineDielectricComponentParity()
 
     const auto expectPass = [&](std::string_view name) {
         diagnostic.clear();
-        Check(horde::scene::assets::StaticMeshAsset::Load(
-                  fixtureRoot / name, manifest, asset, diagnostic),
+        const bool loaded = horde::scene::assets::StaticMeshAsset::Load(
+            fixtureRoot / name, manifest, asset, diagnostic);
+        Check(loaded,
               std::string("runtime/offline parity fixture must pass: ") +
                   std::string(name) + ": " + diagnostic);
     };

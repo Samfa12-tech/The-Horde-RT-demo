@@ -1,4 +1,4 @@
-"""Reject open or non-manifold thick dielectric primitives in a runtime GLB."""
+"""Validate edge-connected closed components for each thick dielectric material."""
 
 from __future__ import annotations
 
@@ -164,6 +164,137 @@ def node_world_matrices(document: dict) -> list[list[float]]:
     return [resolve(index, set()) for index in range(len(nodes))]
 
 
+def dielectric_weld_tolerance(triangles: list[dict]) -> tuple[float, tuple[float, float, float]]:
+    minimum = tuple(min(triangle["positions"][corner][axis]
+                        for triangle in triangles for corner in range(3))
+                    for axis in range(3))
+    maximum = tuple(max(triangle["positions"][corner][axis]
+                        for triangle in triangles for corner in range(3))
+                    for axis in range(3))
+    extent = max(maximum[axis] - minimum[axis] for axis in range(3))
+    # Baked positions are metres. One millionth of material extent, clamped
+    # to 0.1-10 micrometres, welds transform-rounding equivalents while keeping
+    # authored shells separated by more than the documented 10 um ceiling.
+    return max(1.0e-7, min(1.0e-5, extent * 1.0e-6)), minimum
+
+
+def quantize_position(position: tuple[float, float, float],
+                      origin: tuple[float, float, float],
+                      tolerance: float) -> tuple[int, int, int]:
+    def half_away_from_zero(value: float) -> int:
+        return (math.floor(value + 0.5) if value >= 0.0
+                else math.ceil(value - 0.5))
+    return tuple(half_away_from_zero((position[axis] - origin[axis]) / tolerance)
+                 for axis in range(3))
+
+
+def component_sources(triangles: list[dict], component: list[int]) -> str:
+    sources = sorted({triangles[index]["source"] for index in component})
+    return ", ".join(
+        f"node '{node_name}' mesh {mesh_index} primitive {primitive_index}"
+        for _, node_name, mesh_index, primitive_index in sources)
+
+
+def validate_material_components(path: pathlib.Path, material_name: str,
+                                 triangles: list[dict]) -> int:
+    if not triangles:
+        return 0
+    tolerance, quantization_origin = dielectric_weld_tolerance(triangles)
+    all_edges: collections.defaultdict[tuple, list[tuple[int, bool]]] = (
+        collections.defaultdict(list))
+    for triangle_index, triangle in enumerate(triangles):
+        triangle["welded"] = [
+            quantize_position(position, quantization_origin, tolerance)
+            for position in triangle["positions"]]
+        for corner in range(3):
+            a = triangle["welded"][corner]
+            b = triangle["welded"][(corner + 1) % 3]
+            if a == b:
+                _, node_name, mesh_index, primitive_index = triangle["source"]
+                raise ValidationError(
+                    f"{path}: thick dielectric material '{material_name}' "
+                    f"(node '{node_name}' mesh {mesh_index} primitive {primitive_index}) "
+                    f"has a degenerate edge after the documented {tolerance:.9g} metre weld tolerance")
+            ascending = a < b
+            key = (a, b) if ascending else (b, a)
+            all_edges[key].append((triangle_index, ascending))
+
+    adjacency = [set() for _ in triangles]
+    for references in all_edges.values():
+        for left in range(len(references)):
+            for right in range(left + 1, len(references)):
+                a = references[left][0]
+                b = references[right][0]
+                if a == b:
+                    continue
+                adjacency[a].add(b)
+                adjacency[b].add(a)
+
+    components: list[list[int]] = []
+    visited = [False] * len(triangles)
+    for first_triangle in range(len(triangles)):
+        if visited[first_triangle]:
+            continue
+        visited[first_triangle] = True
+        pending = [first_triangle]
+        component = []
+        while pending:
+            triangle_index = pending.pop()
+            component.append(triangle_index)
+            for neighbor in sorted(adjacency[triangle_index], reverse=True):
+                if visited[neighbor]:
+                    continue
+                visited[neighbor] = True
+                pending.append(neighbor)
+        components.append(sorted(component))
+
+    for component_number, component in enumerate(components, start=1):
+        edges: collections.defaultdict[tuple, list[int]] = (
+            collections.defaultdict(lambda: [0, 0]))
+        for triangle_index in component:
+            triangle = triangles[triangle_index]
+            for corner in range(3):
+                a = triangle["welded"][corner]
+                b = triangle["welded"][(corner + 1) % 3]
+                ascending = a < b
+                key = (a, b) if ascending else (b, a)
+                edges[key][0 if ascending else 1] += 1
+        prefix = (f"{path}: thick dielectric material '{material_name}' "
+                  f"component {component_number} "
+                  f"({component_sources(triangles, component)})")
+        boundary_count = sum(sum(references) == 1 for references in edges.values())
+        non_manifold_count = sum(sum(references) > 2 for references in edges.values())
+        inconsistent_count = sum(references != [1, 1] for references in edges.values()
+                                 if sum(references) == 2)
+        if boundary_count:
+            raise ValidationError(
+                f"{prefix} is an open thick dielectric volume with {boundary_count} boundary edge(s); "
+                "close/weld the component or set thinWall=true in the audited manifest override")
+        if non_manifold_count:
+            raise ValidationError(
+                f"{prefix} is non-manifold with {non_manifold_count} edge(s) referenced more than twice; "
+                "repair the component topology or set thinWall=true only for an intentional pane")
+        if inconsistent_count:
+            raise ValidationError(
+                f"{prefix} has inconsistent winding; each shared edge must be used once in each direction")
+
+        origin = triangles[component[0]]["positions"][0]
+        signed_six_times_volume = 0.0
+        for triangle_index in component:
+            relative = [tuple(position[axis] - origin[axis] for axis in range(3))
+                        for position in triangles[triangle_index]["positions"]]
+            a, b, c = relative
+            signed_six_times_volume += (
+                a[0] * (b[1] * c[2] - b[2] * c[1])
+                + a[1] * (b[2] * c[0] - b[0] * c[2])
+                + a[2] * (b[0] * c[1] - b[1] * c[0]))
+        if not math.isfinite(signed_six_times_volume) or signed_six_times_volume <= 1.0e-18:
+            raise ValidationError(
+                f"{prefix} is inward-wound after baked node transforms; "
+                "reverse every triangle winding so normals face outward")
+    return len(components)
+
+
 def validate(path: pathlib.Path, manifest_path: pathlib.Path) -> None:
     document, binary = read_glb(path)
     manifest = json.loads(manifest_path.read_text(encoding="utf-8-sig"))
@@ -179,7 +310,8 @@ def validate(path: pathlib.Path, manifest_path: pathlib.Path) -> None:
 
     nodes = document.get("nodes", [])
     world_matrices = node_world_matrices(document)
-    checked_primitives = 0
+    triangles_by_material: collections.defaultdict[int, list[dict]] = (
+        collections.defaultdict(list))
     for node_index, node in enumerate(nodes):
         if "mesh" not in node:
             continue
@@ -209,58 +341,30 @@ def validate(path: pathlib.Path, manifest_path: pathlib.Path) -> None:
             if len(indices) == 0 or len(indices) % 3:
                 raise ValidationError(
                     f"mesh {mesh_index} primitive {primitive_index}: thick dielectric triangle index count is invalid")
-            edges: collections.defaultdict[
-                tuple[tuple[int, int, int], tuple[int, int, int]], list[int]
-            ] = collections.defaultdict(lambda: [0, 0])
-            signed_six_times_volume = 0.0
-            volume_origin = None
             for triangle_offset in range(0, len(indices), 3):
                 try:
                     triangle_positions = [positions[index]
                                           for index in indices[triangle_offset : triangle_offset + 3]]
-                    triangle = [tuple(round(float(value) * 100000.0) for value in position)
-                                for position in triangle_positions]
                 except IndexError as error:
                     raise ValidationError(
                         f"mesh {mesh_index} primitive {primitive_index}: triangle index exceeds POSITION count") from error
-                for corner in range(3):
-                    a, b = triangle[corner], triangle[(corner + 1) % 3]
-                    if a == b:
-                        raise ValidationError(
-                            f"mesh {mesh_index} primitive {primitive_index}: thick dielectric has a degenerate edge")
-                    ascending = a < b
-                    key = (a, b) if ascending else (b, a)
-                    edges[key][0 if ascending else 1] += 1
-                a, b, c = triangle_positions
-                if volume_origin is None:
-                    volume_origin = a
-                a = tuple(a[axis] - volume_origin[axis] for axis in range(3))
-                b = tuple(b[axis] - volume_origin[axis] for axis in range(3))
-                c = tuple(c[axis] - volume_origin[axis] for axis in range(3))
-                signed_six_times_volume += (
-                    a[0] * (b[1] * c[2] - b[2] * c[1])
-                    + a[1] * (b[2] * c[0] - b[0] * c[2])
-                    + a[2] * (b[0] * c[1] - b[1] * c[0]))
-            boundary_count = sum(sum(references) == 1 for references in edges.values())
-            non_manifold_count = sum(sum(references) > 2 for references in edges.values())
-            inconsistent_count = sum(references != [1, 1] for references in edges.values()
-                                     if sum(references) == 2)
-            material_name = materials[material_index].get("name", f"material {material_index}")
-            if boundary_count:
-                raise ValidationError(
-                    f"{path}: open thick dielectric volume '{material_name}' has {boundary_count} boundary edge(s); close/weld the volume or set thinWall=true in the audited manifest override")
-            if non_manifold_count:
-                raise ValidationError(
-                    f"{path}: non-manifold thick dielectric volume '{material_name}' has {non_manifold_count} edge(s) referenced more than twice; repair the topology or set thinWall=true only for an intentional pane")
-            if inconsistent_count:
-                raise ValidationError(
-                    f"{path}: thick dielectric volume '{material_name}' has inconsistent winding; each shared edge must be used once in each direction")
-            if not math.isfinite(signed_six_times_volume) or signed_six_times_volume <= 1.0e-18:
-                raise ValidationError(
-                    f"{path}: thick dielectric volume '{material_name}' is inward-wound after baked node transforms; reverse every triangle winding so normals face outward")
-            checked_primitives += 1
+                if any(not math.isfinite(value) for position in triangle_positions
+                       for value in position):
+                    raise ValidationError(
+                        f"mesh {mesh_index} primitive {primitive_index}: thick dielectric POSITION must use finite FLOAT data")
+                node_name = node.get("name", "<unnamed>")
+                triangles_by_material[material_index].append({
+                    "positions": triangle_positions,
+                    "source": (node_index, node_name, mesh_index, primitive_index),
+                })
 
-    print(f"Dielectric topology validation passed: {checked_primitives} closed/manifold thick primitive(s) in {path}")
+    checked_components = 0
+    for material_index in sorted(thick_materials):
+        material_name = materials[material_index].get("name", f"material {material_index}")
+        checked_components += validate_material_components(
+            path, material_name, triangles_by_material[material_index])
+    print(f"Dielectric topology validation passed: {checked_components} "
+          f"closed/manifold thick component(s) in {path}")
 
 
 def main() -> int:
