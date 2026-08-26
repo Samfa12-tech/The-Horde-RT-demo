@@ -1,3 +1,5 @@
+#include "rt_fire.glsl"
+
 vec2 lightTuning(int group)
 {
     if (group == kLightTorch)
@@ -150,14 +152,21 @@ vec3 bounceSample(HitInfo h, vec3 incoming, bool lightAwareMirror)
 
 vec3 currentTorchLightPosition()
 {
-    return rtHeldLight.value.positionStrength.xyz;
+    RtFireEmitterGpu torch;
+    return findFireEmitter(1u, torch)
+        ? torch.lightPositionStrength.xyz
+        : vec3(0.0);
 }
 
 void activeLocalLight(out vec3 position, out vec3 color, out float strength)
 {
     position = currentTorchLightPosition();
-    color = tunedLightColor(vec3(1.0, 0.28, 0.055), kLightTorch);
-    strength = rtHeldLight.value.positionStrength.w;
+    RtFireEmitterGpu torch;
+    bool torchActive = findFireEmitter(1u, torch);
+    color = torchActive
+        ? tunedLightColor(torch.colourIntensity.rgb, kLightTorch)
+        : vec3(0.0);
+    strength = torchActive ? torch.lightPositionStrength.w : 0.0;
     if (controls.cameraX <= -8.5 && controls.cameraX >= -28.5 &&
         controls.cameraZ >= -16.8 && controls.cameraZ <= -13.6)
     {
@@ -264,7 +273,6 @@ vec3 shadeOpaqueDirect(HitInfo h, vec3 rayDirection, bool dualVisibility,
                                       -rayDirection), 0.0),
                               mix(34.0, 5.0, reflective));
     float localAttenuation = 1.0 / (1.0 + localDistance * localDistance * 0.58);
-    float flamePulse = 0.84 + 0.16 * sin(controls.time * 15.0);
     skyDiffuse = max(dot(h.normal, skyDirection), 0.0);
     vec3 skyHalf = normalize(skyDirection - rayDirection);
     float skySpecular = pow(max(dot(h.normal, skyHalf), 0.0),
@@ -274,7 +282,7 @@ vec3 shadeOpaqueDirect(HitInfo h, vec3 rayDirection, bool dualVisibility,
 
     vec3 color = h.base * vec3(0.025, 0.028, 0.032);
     color += h.base * localColor * localDiffuse * localAttenuation * localVisibility
-        * localStrength * flamePulse * 2.65;
+        * localStrength * 2.65;
     color += localColor * localSpecular * localAttenuation * localVisibility
         * localStrength * (0.12 + reflective * 1.04);
     color += h.base * cold * skyDiffuse * skyVisibility * 0.10;

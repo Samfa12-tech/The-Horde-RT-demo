@@ -82,6 +82,9 @@ public class MainActivity extends Activity {
     private static final String EXTRA_DEBUG_RT_LIGHT_GROUP = "horde.debug.rt_light_group";
     private static final String EXTRA_DEBUG_RT_LIGHT_HUE = "horde.debug.rt_light_hue";
     private static final String EXTRA_DEBUG_RT_LIGHT_INTENSITY = "horde.debug.rt_light_intensity";
+    private static final String EXTRA_DEBUG_RT_FIRE_STRENGTH = "horde.debug.rt_fire_strength";
+    private static final String EXTRA_DEBUG_RT_FIRE_TURBULENCE = "horde.debug.rt_fire_turbulence";
+    private static final String EXTRA_DEBUG_RT_FIRE_SMOKE = "horde.debug.rt_fire_smoke";
     private static final String EXTRA_DEBUG_RT_WORKLOAD = "horde.debug.rt_workload";
     private static final String DEBUG_RETRY_ACTION =
             "com.samfa12.hordelanternrt.DEBUG_RETRY_ENCOUNTER";
@@ -172,6 +175,9 @@ public class MainActivity extends Activity {
     private boolean rtDawnOverrideEnabled;
     private int rtDawnRevealPercent;
     private int rtFogDensityPercent = 100;
+    private int rtFireStrengthPercent = 100;
+    private int rtFireTurbulencePercent = 100;
+    private int rtFireSmokePercent = 100;
     private int rtLightGroup;
     private final int[] rtLightHueDegrees = {0, 0, 0, 0};
     private final int[] rtLightIntensityPercent = {100, 100, 100, 100};
@@ -856,6 +862,21 @@ public class MainActivity extends Activity {
                     rtFogDensityPercent = value;
                     publishRtSceneTuning();
                 });
+        addRtLabSlider(panel, getString(R.string.rt_lab_fire_strength),
+                rtFireStrengthPercent, 0, 200, "%", value -> {
+                    rtFireStrengthPercent = value;
+                    publishRtFireTuning();
+                });
+        addRtLabSlider(panel, getString(R.string.rt_lab_fire_turbulence),
+                rtFireTurbulencePercent, 0, 200, "%", value -> {
+                    rtFireTurbulencePercent = value;
+                    publishRtFireTuning();
+                });
+        addRtLabSlider(panel, getString(R.string.rt_lab_fire_smoke),
+                rtFireSmokePercent, 0, 200, "%", value -> {
+                    rtFireSmokePercent = value;
+                    publishRtFireTuning();
+                });
 
         addMenuButton(panel, getString(R.string.rt_lab_light_group, rtLightGroupName()), () -> {
             rtLightGroup = (rtLightGroup + 1) % rtLightHueDegrees.length;
@@ -978,6 +999,13 @@ public class MainActivity extends Activity {
                 rtLightIntensityPercent[rtLightGroup] / 100.0f);
     }
 
+    private void publishRtFireTuning() {
+        ProbeBridge.setRtFireTuning(
+                rtFireStrengthPercent / 100.0f,
+                rtFireTurbulencePercent / 100.0f,
+                rtFireSmokePercent / 100.0f);
+    }
+
     private void restoreAuthoredRtLabTuning() {
         rtWaterfallWidthPercent = 100;
         rtRoofOverrideEnabled = false;
@@ -985,6 +1013,9 @@ public class MainActivity extends Activity {
         rtDawnOverrideEnabled = false;
         rtDawnRevealPercent = 0;
         rtFogDensityPercent = 100;
+        rtFireStrengthPercent = 100;
+        rtFireTurbulencePercent = 100;
+        rtFireSmokePercent = 100;
         rtLightGroup = 0;
         for (int index = 0; index < rtLightHueDegrees.length; ++index) {
             rtLightHueDegrees[index] = 0;
@@ -1319,7 +1350,10 @@ public class MainActivity extends Activity {
                 intent.hasExtra(EXTRA_DEBUG_RT_WATERFALL) || intent.hasExtra(EXTRA_DEBUG_RT_ROOF) ||
                 intent.hasExtra(EXTRA_DEBUG_RT_DAWN) || intent.hasExtra(EXTRA_DEBUG_RT_FOG) ||
                 intent.hasExtra(EXTRA_DEBUG_RT_LIGHT_GROUP) || intent.hasExtra(EXTRA_DEBUG_RT_LIGHT_HUE) ||
-                intent.hasExtra(EXTRA_DEBUG_RT_LIGHT_INTENSITY) || intent.hasExtra(EXTRA_DEBUG_RT_WORKLOAD);
+                intent.hasExtra(EXTRA_DEBUG_RT_LIGHT_INTENSITY) ||
+                intent.hasExtra(EXTRA_DEBUG_RT_FIRE_STRENGTH) ||
+                intent.hasExtra(EXTRA_DEBUG_RT_FIRE_TURBULENCE) ||
+                intent.hasExtra(EXTRA_DEBUG_RT_FIRE_SMOKE) || intent.hasExtra(EXTRA_DEBUG_RT_WORKLOAD);
         if (hasRtLabIntent) {
             debugRtLabAccess = true;
             rtWaterfallWidthPercent = Math.max(25, Math.min(200,
@@ -1340,10 +1374,17 @@ public class MainActivity extends Activity {
                     intent.getIntExtra(EXTRA_DEBUG_RT_LIGHT_HUE, rtLightHueDegrees[rtLightGroup])));
             rtLightIntensityPercent[rtLightGroup] = Math.max(0, Math.min(200,
                     intent.getIntExtra(EXTRA_DEBUG_RT_LIGHT_INTENSITY, rtLightIntensityPercent[rtLightGroup])));
+            rtFireStrengthPercent = Math.max(0, Math.min(200,
+                    intent.getIntExtra(EXTRA_DEBUG_RT_FIRE_STRENGTH, rtFireStrengthPercent)));
+            rtFireTurbulencePercent = Math.max(0, Math.min(200,
+                    intent.getIntExtra(EXTRA_DEBUG_RT_FIRE_TURBULENCE, rtFireTurbulencePercent)));
+            rtFireSmokePercent = Math.max(0, Math.min(200,
+                    intent.getIntExtra(EXTRA_DEBUG_RT_FIRE_SMOKE, rtFireSmokePercent)));
             rtWorkloadPreset = Math.max(0, Math.min(2,
                     intent.getIntExtra(EXTRA_DEBUG_RT_WORKLOAD, rtWorkloadPreset)));
             publishRtSceneTuning();
             publishRtLightTuning();
+            publishRtFireTuning();
             ProbeBridge.setRtWorkloadPreset(rtWorkloadPreset);
         }
         if (requestedCheckpoint >= 0 || requestedReplay || hasRtLabIntent) {

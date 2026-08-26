@@ -92,6 +92,9 @@ int main()
     androidUnclamped.finaleRoofOpenOverride = -1.0f;
     androidUnclamped.finaleDawnRevealOverride = 2.0f;
     androidUnclamped.fogDensityScale = -1.0f;
+    androidUnclamped.fireStrengthScale = 3.0f;
+    androidUnclamped.fireTurbulenceScale = -1.0f;
+    androidUnclamped.fireSmokeScale = 3.0f;
     androidUnclamped.lights[static_cast<std::size_t>(RtLightGroup::Staff)] = {999.0f, 3.0f};
     androidUnclamped.workloadPreset = RtWorkloadPreset::Max;
     androidTuning.Replace(androidUnclamped);
@@ -101,16 +104,28 @@ int main()
                       Near(*androidClamped.finaleRoofOpenOverride, 0.0f) &&
                       Near(*androidClamped.finaleDawnRevealOverride, 1.0f) &&
                       Near(androidClamped.fogDensityScale, 0.0f) &&
+                      Near(androidClamped.fireStrengthScale, 2.0f) &&
+                      Near(androidClamped.fireTurbulenceScale, 0.0f) &&
+                      Near(androidClamped.fireSmokeScale, 2.0f) &&
                       Near(androidClamped.lights[static_cast<std::size_t>(RtLightGroup::Staff)].hueDegrees, 180.0f) &&
                       Near(androidClamped.lights[static_cast<std::size_t>(RtLightGroup::Staff)].intensityScale, 2.0f) &&
                       androidClamped.workloadPreset == RtWorkloadPreset::Max,
                   "Android RT Lab publication did not atomically clamp a complete tuning snapshot");
+    androidTuning.SetFire(-1.0f, 0.75f, 3.0f);
+    const RtSceneTuning androidFire = androidTuning.Snapshot();
+    ok &= Require(Near(androidFire.fireStrengthScale, 0.0f) &&
+                      Near(androidFire.fireTurbulenceScale, 0.75f) &&
+                      Near(androidFire.fireSmokeScale, 2.0f),
+                  "Android RT Lab fire controls did not publish one clamped tuning snapshot");
     androidTuning.Reset();
     const RtSceneTuning androidReset = androidTuning.Snapshot();
     ok &= Require(Near(androidReset.waterfallWidthScale, 1.0f) &&
                       !androidReset.finaleRoofOpenOverride.has_value() &&
                       !androidReset.finaleDawnRevealOverride.has_value() &&
                       Near(androidReset.fogDensityScale, 1.0f) &&
+                      Near(androidReset.fireStrengthScale, 1.0f) &&
+                      Near(androidReset.fireTurbulenceScale, 1.0f) &&
+                      Near(androidReset.fireSmokeScale, 1.0f) &&
                       androidReset.workloadPreset == RtWorkloadPreset::Authored,
                   "Android RT Lab route reset did not restore authored tuning");
 
@@ -448,6 +463,8 @@ int main()
         const std::filesystem::path raygenDirectory = root / "shaders/raytracing";
         const std::string hitDecodeSource =
             ReadTextFile(raygenDirectory / "include/rt_hit_decode.glsl");
+        const std::string fireSource =
+            ReadTextFile(raygenDirectory / "include/rt_fire.glsl");
         std::string lightingSource =
             ReadTextFile(raygenDirectory / "include/rt_lighting.glsl");
         const std::string hitDecodeInclude = "#include \"rt_hit_decode.glsl\"";
@@ -460,6 +477,7 @@ int main()
             ReadTextFile(raygenDirectory / "minimal.rgen") +
             ReadTextFile(raygenDirectory / "include/rt_scene_abi.glsl") +
             lightingSource +
+            fireSource +
             ReadTextFile(raygenDirectory / "include/rt_dielectric_common.glsl") +
             ReadTextFile(raygenDirectory / "include/rt_atmosphere.glsl");
         const std::string sceneSource =
@@ -696,6 +714,32 @@ int main()
                       raygenSource.find("color = color * lichMist.a + lichMist.rgb") != std::string::npos &&
                       raygenSource.find("vec3(-36.65, -0.95, -18.15)") != std::string::npos,
                       "lich mist must retain bounded fixed-step front-to-back integration");
+        ok &= Require(raygenSource.find("vec4 integrateFireEmitters(") != std::string::npos &&
+                      raygenSource.find("primary.hit ? primary.t : 10000.0, false") !=
+                          std::string::npos &&
+                      raygenSource.find("kRtActiveFireEmitterCapacity") != std::string::npos &&
+                      raygenSource.find("for (int stepIndex = 0; stepIndex < 10; ++stepIndex)") !=
+                          std::string::npos &&
+                      raygenSource.find("emberDistance < maximumDistance") != std::string::npos,
+                      "fire must be a bounded world-space volume and depth-clip analytic embers at the physical hit");
+        ok &= Require(raygenSource.find("findFireEmitter(1u, torch)") != std::string::npos &&
+                      raygenSource.find("torch.lightPositionStrength.xyz") != std::string::npos &&
+                      raygenSource.find("torch.colourIntensity.rgb") != std::string::npos &&
+                      raygenSource.find("sin(controls.time * 15.0)") == std::string::npos &&
+                      raygenSource.find("sin(controls.time * 17.0") == std::string::npos,
+                      "the exact Light socket, visible core, and direct light must share deterministic emitter flicker");
+        ok &= Require(raygenSource.find("bool reflectionPath") != std::string::npos &&
+                      raygenSource.find("reflected = reflected * reflectedFire.a + reflectedFire.rgb") !=
+                          std::string::npos &&
+                      raygenSource.find("bounce = bounce * reflectedFire.a + reflectedFire.rgb") !=
+                          std::string::npos,
+                      "approved water and general RT bounce routes must see the same bounded fire volume");
+        ok &= Require(sceneSource.find("constexpr std::uint32_t engineFlamePrimitiveCount = 8u;") !=
+                          std::string::npos &&
+                      sceneSource.find("addFacetedFlame(0.030f, -0.025f, 0.010f, 0.095f)") !=
+                          std::string::npos &&
+                      sceneSource.find("outputRedBlueSwap") != std::string::npos,
+                      "the static core must stay tiny and BGRA presentation compensation must remain live");
         ok &= Require(windowsSource.find("WaterQuality::High") != std::string::npos &&
                       windowsSource.find("context.waterQuality = horde::vulkan::raytracing::WaterQuality::High") !=
                           std::string::npos &&
@@ -713,6 +757,20 @@ int main()
                       androidBridgeSource.find("rtLabTuning);") != std::string::npos &&
                       androidBridgeSource.find("gRtLabState.Reset();") != std::string::npos,
                       "Android renderer must consume exactly one mutex-protected RT tuning snapshot and reset it with the route");
+        ok &= Require(androidBridgeSource.find("gRtLabState.SetFire(") != std::string::npos &&
+                      androidJavaBridgeSource.find("setRtFireTuning") != std::string::npos &&
+                      androidSource.find("publishRtFireTuning()") != std::string::npos &&
+                      androidSource.find("rtFireStrengthPercent") != std::string::npos &&
+                      androidSource.find("rtFireTurbulencePercent") != std::string::npos &&
+                      androidSource.find("rtFireSmokePercent") != std::string::npos,
+                      "Android RT Lab must expose authored-default strength, turbulence, and smoke controls");
+        ok &= Require(windowsSource.find("kRtLabFireStrengthSliderId") != std::string::npos &&
+                      windowsSource.find("kRtLabFireTurbulenceSliderId") != std::string::npos &&
+                      windowsSource.find("kRtLabFireSmokeSliderId") != std::string::npos &&
+                      windowsSource.find("tuning.fireStrengthScale") != std::string::npos &&
+                      windowsSource.find("tuning.fireTurbulenceScale") != std::string::npos &&
+                      windowsSource.find("tuning.fireSmokeScale") != std::string::npos,
+                      "Windows RT Lab must expose authored-default strength, turbulence, and smoke controls");
         ok &= Require(androidSource.find("PREF_RT_LAB_UNLOCKED = \"rt_lab_unlocked\"") != std::string::npos &&
                       androidSource.find(".putBoolean(PREF_RT_LAB_UNLOCKED, rtLabUnlocked)") != std::string::npos &&
                       androidSource.find("ProbeBridge.isRtLabUnlockEligible()") != std::string::npos &&

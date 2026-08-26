@@ -1754,8 +1754,10 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     }
     if (productionHeldItemAssetsEnabled_)
     {
-        addFacetedFlame(0.095f, -0.15f, 0.0f, 0.27f); // orange outer: 8 triangles
-        addFacetedFlame(0.050f, -0.12f, -0.01f, 0.16f); // bright inner: 8 triangles
+        // One tiny static emissive core stays inside the generic torch BLAS.
+        // The reusable tapered volume, smoke, and analytic embers are shader
+        // records, so extinguishing never rebuilds/refits this geometry.
+        addFacetedFlame(0.030f, -0.025f, 0.010f, 0.095f);
     }
     else
     {
@@ -2141,7 +2143,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
             return false;
         // Task 4 owns final fire. Retain only the existing 16-triangle engine
         // flame core as a separate geometry after the authored PBR body.
-        constexpr std::uint32_t engineFlamePrimitiveCount = 16u;
+        constexpr std::uint32_t engineFlamePrimitiveCount = 8u;
         torchGeometries.push_back(blasGeometry);
         VkAccelerationStructureBuildRangeInfoKHR flameRange{};
         flameRange.primitiveCount = engineFlamePrimitiveCount;

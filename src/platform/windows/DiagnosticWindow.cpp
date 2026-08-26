@@ -134,6 +134,12 @@ constexpr int kRtLabIntensitySliderId = 143;
 constexpr int kRtLabWorkloadButtonId = 144;
 constexpr int kRtLabRestoreButtonId = 145;
 constexpr int kRtLabBackButtonId = 146;
+constexpr int kRtLabFireStrengthLabelId = 147;
+constexpr int kRtLabFireStrengthSliderId = 148;
+constexpr int kRtLabFireTurbulenceLabelId = 149;
+constexpr int kRtLabFireTurbulenceSliderId = 150;
+constexpr int kRtLabFireSmokeLabelId = 151;
+constexpr int kRtLabFireSmokeSliderId = 152;
 constexpr int kMenuPauseId = 2001;
 constexpr int kMenuRestartId = 2002;
 constexpr int kMenuExitId = 2003;
@@ -1376,6 +1382,15 @@ void UpdateRtLabLabels(VulkanSurfaceContext& context)
     const int fog = static_cast<int>(std::lround(tuning.fogDensityScale * 100.0f));
     setText(kRtLabFogLabelId, "FOG DENSITY: " + std::to_string(fog) + "%");
     setSlider(kRtLabFogSliderId, fog);
+    const int fireStrength = static_cast<int>(std::lround(tuning.fireStrengthScale * 100.0f));
+    setText(kRtLabFireStrengthLabelId, "FLAME STRENGTH: " + std::to_string(fireStrength) + "%");
+    setSlider(kRtLabFireStrengthSliderId, fireStrength);
+    const int fireTurbulence = static_cast<int>(std::lround(tuning.fireTurbulenceScale * 100.0f));
+    setText(kRtLabFireTurbulenceLabelId, "FLAME TURBULENCE: " + std::to_string(fireTurbulence) + "%");
+    setSlider(kRtLabFireTurbulenceSliderId, fireTurbulence);
+    const int fireSmoke = static_cast<int>(std::lround(tuning.fireSmokeScale * 100.0f));
+    setText(kRtLabFireSmokeLabelId, "FLAME SMOKE: " + std::to_string(fireSmoke) + "%");
+    setSlider(kRtLabFireSmokeSliderId, fireSmoke);
 
     const auto& light = tuning.lights[static_cast<std::size_t>(context.rtLabLightGroup)];
     setText(kRtLabLightGroupButtonId, std::string("LIGHT GROUP: ") + RtLightGroupName(context.rtLabLightGroup));
@@ -1465,6 +1480,9 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
                          kRtLabRoofLabelId, kRtLabRoofSliderId,
                          kRtLabDawnLabelId, kRtLabDawnSliderId,
                          kRtLabFogLabelId, kRtLabFogSliderId,
+                         kRtLabFireStrengthLabelId, kRtLabFireStrengthSliderId,
+                         kRtLabFireTurbulenceLabelId, kRtLabFireTurbulenceSliderId,
+                         kRtLabFireSmokeLabelId, kRtLabFireSmokeSliderId,
                          kRtLabLightGroupButtonId, kRtLabHueLabelId, kRtLabHueSliderId,
                          kRtLabIntensityLabelId, kRtLabIntensitySliderId,
                          kRtLabWorkloadButtonId, kRtLabRestoreButtonId, kRtLabBackButtonId})
@@ -2215,14 +2233,15 @@ void ClearDesktopInput(VulkanSurfaceContext& context)
 
 std::vector<HWND> VisibleControllerMenuControls(const VulkanSurfaceContext& context)
 {
-    constexpr std::array<int, 28u> controlIds{{
+    constexpr std::array<int, 31u> controlIds{{
         kResumeButtonId, kRestartButtonId, kControlsButtonId, kSettingsButtonId,
         kRtLabButtonId, kDiagnosticsButtonId, kRunBenchmarkButtonId, kMoreBySamfa12ButtonId,
         kExitButtonId, kSfxButtonId, kSensitivityButtonId, kWaterQualityButtonId,
         kRenderScaleSliderId, kFullscreenButtonId, kSettingsBackButtonId,
         kBenchmarkCopyButtonId, kBenchmarkSaveButtonId, kBenchmarkBackButtonId,
         kRtLabWaterfallSliderId, kRtLabRoofSliderId, kRtLabDawnSliderId,
-        kRtLabFogSliderId, kRtLabLightGroupButtonId, kRtLabHueSliderId,
+        kRtLabFogSliderId, kRtLabFireStrengthSliderId, kRtLabFireTurbulenceSliderId,
+        kRtLabFireSmokeSliderId, kRtLabLightGroupButtonId, kRtLabHueSliderId,
         kRtLabIntensitySliderId, kRtLabWorkloadButtonId, kRtLabRestoreButtonId,
         kRtLabBackButtonId,
     }};
@@ -2233,6 +2252,8 @@ std::vector<HWND> VisibleControllerMenuControls(const VulkanSurfaceContext& cont
         HWND control = GetDlgItem(context.windowHandle, id);
         const bool labControl = id == kRtLabWaterfallSliderId || id == kRtLabRoofSliderId ||
             id == kRtLabDawnSliderId || id == kRtLabFogSliderId ||
+            id == kRtLabFireStrengthSliderId || id == kRtLabFireTurbulenceSliderId ||
+            id == kRtLabFireSmokeSliderId ||
             id == kRtLabLightGroupButtonId || id == kRtLabHueSliderId ||
             id == kRtLabIntensitySliderId || id == kRtLabWorkloadButtonId ||
             id == kRtLabRestoreButtonId || id == kRtLabBackButtonId;
@@ -2342,6 +2363,9 @@ bool AdjustFocusedControllerSlider(VulkanSurfaceContext& context, const bool inc
     case kRtLabRoofSliderId:
     case kRtLabDawnSliderId: range = horde::platform::windows::RtLabControlRange::UnitPercent; break;
     case kRtLabFogSliderId:
+    case kRtLabFireStrengthSliderId:
+    case kRtLabFireTurbulenceSliderId:
+    case kRtLabFireSmokeSliderId:
     case kRtLabIntensitySliderId: range = horde::platform::windows::RtLabControlRange::DoublePercent; break;
     case kRtLabHueSliderId: range = horde::platform::windows::RtLabControlRange::HueDegrees; break;
     default: rtLabSlider = false; break;
@@ -4254,6 +4278,9 @@ void ApplyDpiScaledFonts(HWND window)
                          kRtLabTitleId, kRtLabTelemetryId, kRtLabWaterfallLabelId, kRtLabWaterfallSliderId,
                          kRtLabRoofLabelId, kRtLabRoofSliderId, kRtLabDawnLabelId, kRtLabDawnSliderId,
                          kRtLabFogLabelId, kRtLabFogSliderId, kRtLabLightGroupButtonId,
+                         kRtLabFireStrengthLabelId, kRtLabFireStrengthSliderId,
+                         kRtLabFireTurbulenceLabelId, kRtLabFireTurbulenceSliderId,
+                         kRtLabFireSmokeLabelId, kRtLabFireSmokeSliderId,
                          kRtLabHueLabelId, kRtLabHueSliderId, kRtLabIntensityLabelId,
                          kRtLabIntensitySliderId, kRtLabWorkloadButtonId,
                          kRtLabRestoreButtonId, kRtLabBackButtonId})
@@ -4440,7 +4467,7 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
             MoveWindow(panel, panelX, panelY, panelWidth, panelHeight, TRUE);
             SetWindowPos(panel, HWND_BOTTOM, panelX, panelY, panelWidth, panelHeight, SWP_NOACTIVATE);
         }
-        const int contentHeight = ScaleForDpi(window, 840);
+        const int contentHeight = ScaleForDpi(window, 1056);
         const int maxScroll = std::max(0, contentHeight - panelHeight + ScaleForDpi(window, 28));
         mutableContext->rtLabScrollOffset = std::clamp(mutableContext->rtLabScrollOffset, 0, maxScroll);
         SCROLLINFO scroll{sizeof(SCROLLINFO), SIF_RANGE | SIF_PAGE | SIF_POS};
@@ -4476,11 +4503,14 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
         place(kRtLabTitleId, 0, titleHeight);
         place(kRtLabTelemetryId, 50, labelHeight);
         int labY = 84;
-        for (const auto [labelId, sliderId] : std::array<std::pair<int, int>, 4>{{
+        for (const auto [labelId, sliderId] : std::array<std::pair<int, int>, 7>{{
                  {kRtLabWaterfallLabelId, kRtLabWaterfallSliderId},
                  {kRtLabRoofLabelId, kRtLabRoofSliderId},
                  {kRtLabDawnLabelId, kRtLabDawnSliderId},
-                 {kRtLabFogLabelId, kRtLabFogSliderId}}})
+                 {kRtLabFogLabelId, kRtLabFogSliderId},
+                 {kRtLabFireStrengthLabelId, kRtLabFireStrengthSliderId},
+                 {kRtLabFireTurbulenceLabelId, kRtLabFireTurbulenceSliderId},
+                 {kRtLabFireSmokeLabelId, kRtLabFireSmokeSliderId}}})
         {
             place(labelId, labY, labelHeight);
             labY += 26;
@@ -4716,6 +4746,9 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             case kRtLabRoofSliderId: tuning.finaleRoofOpenOverride = static_cast<float>(value) / 100.0f; break;
             case kRtLabDawnSliderId: tuning.finaleDawnRevealOverride = static_cast<float>(value) / 100.0f; break;
             case kRtLabFogSliderId: tuning.fogDensityScale = static_cast<float>(value) / 100.0f; break;
+            case kRtLabFireStrengthSliderId: tuning.fireStrengthScale = static_cast<float>(value) / 100.0f; break;
+            case kRtLabFireTurbulenceSliderId: tuning.fireTurbulenceScale = static_cast<float>(value) / 100.0f; break;
+            case kRtLabFireSmokeSliderId: tuning.fireSmokeScale = static_cast<float>(value) / 100.0f; break;
             case kRtLabHueSliderId:
                 tuning.lights[static_cast<std::size_t>(sceneContext->rtLabLightGroup)].hueDegrees =
                     static_cast<float>(value);
@@ -5547,6 +5580,9 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     createStatic(kRtLabRoofLabelId, "FINALE ROOF: AUTHORED (ADJUST TO OVERRIDE)", SS_LEFT | SS_CENTERIMAGE);
     createStatic(kRtLabDawnLabelId, "FINALE DAWN: AUTHORED (ADJUST TO OVERRIDE)", SS_LEFT | SS_CENTERIMAGE);
     createStatic(kRtLabFogLabelId, "FOG DENSITY: 100%", SS_LEFT | SS_CENTERIMAGE);
+    createStatic(kRtLabFireStrengthLabelId, "FLAME STRENGTH: 100%", SS_LEFT | SS_CENTERIMAGE);
+    createStatic(kRtLabFireTurbulenceLabelId, "FLAME TURBULENCE: 100%", SS_LEFT | SS_CENTERIMAGE);
+    createStatic(kRtLabFireSmokeLabelId, "FLAME SMOKE: 100%", SS_LEFT | SS_CENTERIMAGE);
     createButton(kRtLabLightGroupButtonId, "LIGHT GROUP: TORCH");
     createStatic(kRtLabHueLabelId, "LIGHT HUE SHIFT: 0 DEG", SS_LEFT | SS_CENTERIMAGE);
     createStatic(kRtLabIntensityLabelId, "LIGHT INTENSITY: 100%", SS_LEFT | SS_CENTERIMAGE);
@@ -5569,6 +5605,9 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     createRtLabSlider(kRtLabRoofSliderId, 0, 100, 100);
     createRtLabSlider(kRtLabDawnSliderId, 0, 100, 100);
     createRtLabSlider(kRtLabFogSliderId, 0, 200, 100);
+    createRtLabSlider(kRtLabFireStrengthSliderId, 0, 200, 100);
+    createRtLabSlider(kRtLabFireTurbulenceSliderId, 0, 200, 100);
+    createRtLabSlider(kRtLabFireSmokeSliderId, 0, 200, 100);
     createRtLabSlider(kRtLabHueSliderId, -180, 180, 0);
     createRtLabSlider(kRtLabIntensitySliderId, 0, 200, 100);
     for (const int id : {kRtLabPanelId, kRtLabTitleId, kRtLabTelemetryId,
@@ -5576,6 +5615,9 @@ int CreateAndShowWindow(const std::string& diagnosticText,
                          kRtLabRoofLabelId, kRtLabRoofSliderId,
                          kRtLabDawnLabelId, kRtLabDawnSliderId,
                          kRtLabFogLabelId, kRtLabFogSliderId,
+                         kRtLabFireStrengthLabelId, kRtLabFireStrengthSliderId,
+                         kRtLabFireTurbulenceLabelId, kRtLabFireTurbulenceSliderId,
+                         kRtLabFireSmokeLabelId, kRtLabFireSmokeSliderId,
                          kRtLabLightGroupButtonId, kRtLabHueLabelId, kRtLabHueSliderId,
                          kRtLabIntensityLabelId, kRtLabIntensitySliderId,
                          kRtLabWorkloadButtonId, kRtLabRestoreButtonId, kRtLabBackButtonId})

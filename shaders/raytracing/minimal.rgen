@@ -33,6 +33,9 @@ void main()
     HitInfo primary = traceScene(origin, rayDirection, 10000.0, primaryMask,
                                  controls.waterQuality < 0.5);
     vec3 color = shadePrimary(primary, rayDirection);
+    vec4 fireVolume = integrateFireEmitters(
+        origin, rayDirection, primary.hit ? primary.t : 10000.0, false);
+    color = color * fireVolume.a + fireVolume.rgb;
     vec4 lichMist = lichGroundMist(origin, rayDirection, primary.t);
     color = color * lichMist.a + lichMist.rgb;
     color += staffElectricity(origin, rayDirection, primary.t);

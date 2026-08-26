@@ -69,6 +69,17 @@ public:
         tuning_ = vulkan::raytracing::ClampRtSceneTuning(tuning_);
     }
 
+    void SetFire(const float strengthScale,
+                 const float turbulenceScale,
+                 const float smokeScale)
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        tuning_.fireStrengthScale = strengthScale;
+        tuning_.fireTurbulenceScale = turbulenceScale;
+        tuning_.fireSmokeScale = smokeScale;
+        tuning_ = vulkan::raytracing::ClampRtSceneTuning(tuning_);
+    }
+
     void SetWorkload(const std::int32_t preset)
     {
         std::lock_guard<std::mutex> lock(mutex_);

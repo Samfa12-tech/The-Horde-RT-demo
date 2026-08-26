@@ -33,6 +33,9 @@
     <string name="rt_lab_roof_open">Finale roof override · touch to enable</string>
     <string name="rt_lab_dawn_reveal">Dawn reveal override · touch to enable</string>
     <string name="rt_lab_fog_density">Fog density</string>
+    <string name="rt_lab_fire_strength">Flame strength</string>
+    <string name="rt_lab_fire_turbulence">Flame turbulence</string>
+    <string name="rt_lab_fire_smoke">Flame smoke</string>
     <string name="rt_lab_light_group">LIGHT GROUP · %1$s</string>
     <string name="rt_lab_light_hue">Light hue shift</string>
     <string name="rt_lab_light_intensity">Light intensity</string>

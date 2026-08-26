@@ -89,6 +89,12 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
                                           reflectionDirection, 12.0, 0x37u, false);
         reflectedHit.t += h.t;
         reflected = shadeOpaqueSecondary(reflectedHit, reflectionDirection);
+        vec4 reflectedFire = integrateFireEmitters(
+            h.position + geometricNormal * 0.006,
+            reflectionDirection,
+            min(reflectedHit.hit ? reflectedHit.t : 12.0, 12.0),
+            true);
+        reflected = reflected * reflectedFire.a + reflectedFire.rgb;
     }
 
     float viewCosine = clamp(dot(surfaceNormal, -rayDirection), 0.0, 1.0);
@@ -202,6 +208,13 @@ vec3 shadeOpaquePrimary(HitInfo h, vec3 rayDirection)
         HitInfo bounceHit = traceScene(offsetRayOrigin(h, bounceDirection), bounceDirection,
                                        12.0, bounceMask, false);
         bounce = bounceSample(bounceHit, bounceDirection, wantsPlayerReflection);
+        if (wantsPlayerReflection)
+        {
+            vec4 reflectedFire = integrateFireEmitters(
+                offsetRayOrigin(h, bounceDirection), bounceDirection,
+                min(bounceHit.hit ? bounceHit.t : 12.0, 12.0), true);
+            bounce = bounce * reflectedFire.a + reflectedFire.rgb;
+        }
     }
 
     color += h.base * bounce * (0.10 + reflective * 0.16);

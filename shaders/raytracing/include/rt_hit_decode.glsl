@@ -467,19 +467,15 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
                 if (h.emissive > 0.0001) h.base = emission / h.emissive;
             }
             else if (instanceMetadata.emitterIndex != 0u &&
-                     geometryIndex == instanceMetadata.emitterIndex)
+                     geometryIndex >= instanceMetadata.primitiveCount)
             {
-                // Engine-owned held emitters remain separate from authored PBR
-                // bodies. Task 4 can replace this temporary faceted core without
-                // introducing a torch/sword instance branch in material decode.
-                bool innerCore = h.primitive >= 8;
-                float flicker = sin(controls.time * 17.0 + float(h.primitive) * 1.7);
-                h.base = tunedLightColor(
-                    innerCore ? vec3(1.0, 0.56, 0.055) : vec3(1.0, 0.105, 0.008),
-                    kLightTorch);
-                h.emissive = controls.torchLight *
-                    ((innerCore ? 3.6 : 2.75) + 0.35 * flicker);
-                if (controls.torchLight <= 0.001)
+                RtFireEmitterGpu emitter;
+                bool emitterActive = findFireEmitter(instanceMetadata.emitterIndex, emitter);
+                h.base = emitterActive
+                    ? tunedLightColor(emitter.colourIntensity.rgb, kLightTorch)
+                    : vec3(0.045, 0.025, 0.018);
+                h.emissive = emitterActive ? emitter.colourIntensity.w * 4.6 : 0.0;
+                if (!emitterActive || emitter.colourIntensity.w <= 0.001)
                     h.base = vec3(0.045, 0.025, 0.018);
                 h.normal = normalize(-direction);
                 h.geometricNormal = h.normal;

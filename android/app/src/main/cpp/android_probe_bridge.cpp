@@ -596,6 +596,9 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
          << ", \"dawnOverrideEnabled\": " << (rtLab.finaleDawnRevealOverride.has_value() ? "true" : "false")
          << ", \"dawnReveal\": " << rtLab.finaleDawnRevealOverride.value_or(-1.0f)
          << ", \"fogDensityScale\": " << rtLab.fogDensityScale
+         << ", \"fireStrengthScale\": " << rtLab.fireStrengthScale
+         << ", \"fireTurbulenceScale\": " << rtLab.fireTurbulenceScale
+         << ", \"fireSmokeScale\": " << rtLab.fireSmokeScale
          << ", \"workloadPreset\": " << static_cast<std::int32_t>(rtLab.workloadPreset) << "},\n"
          << "  \"internalExtent\": {\"width\": " << context.capabilities.performance.internalRenderWidth
          << ", \"height\": " << context.capabilities.performance.internalRenderHeight << "},\n"
@@ -2467,6 +2470,16 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_setRtLightTuning(
         static_cast<std::uint32_t>(group),
         static_cast<float>(hueDegrees),
         static_cast<float>(intensityScale));
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_setRtFireTuning(
+    JNIEnv*, jclass, jfloat strengthScale, jfloat turbulenceScale, jfloat smokeScale)
+{
+    gRtLabState.SetFire(
+        static_cast<float>(strengthScale),
+        static_cast<float>(turbulenceScale),
+        static_cast<float>(smokeScale));
 }
 
 extern "C" JNIEXPORT void JNICALL
