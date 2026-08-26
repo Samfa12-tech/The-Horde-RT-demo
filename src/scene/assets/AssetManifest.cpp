@@ -207,9 +207,15 @@ bool AssetManifest::Load(const std::filesystem::path& path,
     std::string_view requiredSockets;
     std::string_view textureProfile;
     std::string_view materialOverrides;
+    const bool hasMetresPerUnit = ExtractNumber(text, "metresPerUnit", metresPerUnit);
+    if (!hasMetresPerUnit && HasKey(text, "metresPerUnit"))
+    {
+        diagnostic = "Asset manifest metresPerUnit must be finite and greater than zero.";
+        return false;
+    }
     if (!ExtractUnsigned(text, "schema", manifest.schema) ||
         !ExtractString(text, "asset", manifest.assetName) ||
-        !ExtractNumber(text, "metresPerUnit", metresPerUnit) ||
+        !hasMetresPerUnit ||
         !FindDelimited(text, "coordinateSystem", '{', '}', coordinateSystem) ||
         !FindDelimited(text, "budgets", '{', '}', budgets) ||
         !FindDelimited(text, "lods", '[', ']', lods) ||

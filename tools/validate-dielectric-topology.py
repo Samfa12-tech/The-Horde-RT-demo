@@ -16,6 +16,9 @@ BIN_CHUNK = 0x004E4942
 COMPONENTS = {5121: ("B", 1), 5123: ("H", 2), 5125: ("I", 4), 5126: ("f", 4)}
 TYPE_WIDTHS = {"SCALAR": 1, "VEC3": 3}
 FLOAT32_MAX = 3.4028234663852886e38
+MINIMUM_WELD_TOLERANCE_METRES = 1.0e-7
+MAXIMUM_WELD_TOLERANCE_METRES = 1.0e-5
+EXCLUSIVE_WELD_CELL_COORDINATE_LIMIT = float.fromhex("0x1p63")
 
 
 class ValidationError(RuntimeError):
@@ -29,16 +32,29 @@ def runtime_float(value: float) -> float:
     return struct.unpack("<f", struct.pack("<f", converted))[0]
 
 
+def runtime_add(left: float, right: float) -> float:
+    return runtime_float(runtime_float(left) + runtime_float(right))
+
+
+def runtime_subtract(left: float, right: float) -> float:
+    return runtime_float(runtime_float(left) - runtime_float(right))
+
+
+def runtime_multiply(left: float, right: float) -> float:
+    return runtime_float(runtime_float(left) * runtime_float(right))
+
+
 def manifest_metres_per_unit(manifest: dict) -> float:
     try:
         value = float(manifest["metresPerUnit"])
     except (KeyError, TypeError, ValueError, OverflowError) as error:
         raise ValidationError(
             "Asset manifest metresPerUnit must be finite and greater than zero") from error
-    if not math.isfinite(value) or value <= 0.0 or value > FLOAT32_MAX:
+    value = runtime_float(value)
+    if not math.isfinite(value) or value <= 0.0:
         raise ValidationError(
             "Asset manifest metresPerUnit must be finite and greater than zero")
-    return runtime_float(value)
+    return value
 
 
 def read_glb(path: pathlib.Path) -> tuple[dict, bytes]:
@@ -113,18 +129,6 @@ def material_properties(material: dict, overrides: dict[str, dict]) -> tuple[flo
     return transmission, thickness, thin_wall
 
 
-def multiply_matrices(left: list[float], right: list[float]) -> list[float]:
-    result = []
-    for column in range(4):
-        for row in range(4):
-            total = 0.0
-            for k in range(4):
-                product = runtime_float(left[k * 4 + row] * right[column * 4 + k])
-                total = runtime_float(total + product)
-            result.append(total)
-    return result
-
-
 def local_matrix(node: dict) -> list[float]:
     if "matrix" in node:
         matrix = [runtime_float(value) for value in node["matrix"]]
@@ -134,18 +138,39 @@ def local_matrix(node: dict) -> list[float]:
     tx, ty, tz = (runtime_float(value) for value in node.get("translation", [0, 0, 0]))
     x, y, z, w = (runtime_float(value) for value in node.get("rotation", [0, 0, 0, 1]))
     sx, sy, sz = (runtime_float(value) for value in node.get("scale", [1, 1, 1]))
-    return [runtime_float(value) for value in [
-        (1 - 2 * (y * y + z * z)) * sx,
-        (2 * (x * y + z * w)) * sx,
-        (2 * (x * z - y * w)) * sx, 0,
-        (2 * (x * y - z * w)) * sy,
-        (1 - 2 * (x * x + z * z)) * sy,
-        (2 * (y * z + x * w)) * sy, 0,
-        (2 * (x * z + y * w)) * sz,
-        (2 * (y * z - x * w)) * sz,
-        (1 - 2 * (x * x + y * y)) * sz, 0,
-        tx, ty, tz, 1,
-    ]]
+    two = runtime_float(2.0)
+    one = runtime_float(1.0)
+
+    def twice_product(left: float, right: float) -> float:
+        return runtime_multiply(runtime_multiply(two, left), right)
+
+    # Match cgltf_node_transform_local expression-for-expression. Every
+    # cgltf_float product and add/subtract rounds to float32 before the next
+    # operation; Python double regrouping would move seams at micrometre scale.
+    return [
+        runtime_multiply(runtime_subtract(
+            runtime_subtract(one, twice_product(y, y)),
+            twice_product(z, z)), sx),
+        runtime_multiply(runtime_add(
+            twice_product(x, y), twice_product(z, w)), sx),
+        runtime_multiply(runtime_subtract(
+            twice_product(x, z), twice_product(y, w)), sx), runtime_float(0.0),
+        runtime_multiply(runtime_subtract(
+            twice_product(x, y), twice_product(z, w)), sy),
+        runtime_multiply(runtime_subtract(
+            runtime_subtract(one, twice_product(x, x)),
+            twice_product(z, z)), sy),
+        runtime_multiply(runtime_add(
+            twice_product(y, z), twice_product(x, w)), sy), runtime_float(0.0),
+        runtime_multiply(runtime_add(
+            twice_product(x, z), twice_product(y, w)), sz),
+        runtime_multiply(runtime_subtract(
+            twice_product(y, z), twice_product(x, w)), sz),
+        runtime_multiply(runtime_subtract(
+            runtime_subtract(one, twice_product(x, x)),
+            twice_product(y, y)), sz), runtime_float(0.0),
+        tx, ty, tz, runtime_float(1.0),
+    ]
 
 
 def determinant(matrix: list[float]) -> float:
@@ -159,12 +184,12 @@ def transform_point_metres(matrix: list[float], point: tuple,
     x, y, z = (runtime_float(value) for value in point)
     result = []
     for row in range(3):
-        first = runtime_float(runtime_float(matrix[row] * x) * metres_per_unit)
-        second = runtime_float(runtime_float(matrix[4 + row] * y) * metres_per_unit)
-        third = runtime_float(runtime_float(matrix[8 + row] * z) * metres_per_unit)
-        translation = runtime_float(matrix[12 + row] * metres_per_unit)
-        result.append(runtime_float(
-            runtime_float(runtime_float(first + second) + third) + translation))
+        first = runtime_multiply(runtime_multiply(matrix[row], x), metres_per_unit)
+        second = runtime_multiply(runtime_multiply(matrix[4 + row], y), metres_per_unit)
+        third = runtime_multiply(runtime_multiply(matrix[8 + row], z), metres_per_unit)
+        translation = runtime_multiply(matrix[12 + row], metres_per_unit)
+        result.append(runtime_add(
+            runtime_add(runtime_add(first, second), third), translation))
     return tuple(result)
 
 
@@ -176,16 +201,43 @@ def node_world_matrices(document: dict) -> list[list[float]]:
             parents[int(child_index)] = parent_index
     cache: dict[int, list[float]] = {}
 
-    def resolve(index: int, active: set[int]) -> list[float]:
+    def resolve(index: int) -> list[float]:
         if index in cache:
             return cache[index]
-        if index in active:
-            raise ValidationError("node hierarchy contains a cycle")
-        active.add(index)
-        local = local_matrix(nodes[index])
-        world = (multiply_matrices(resolve(parents[index], active), local)
-                 if index in parents else local)
-        active.remove(index)
+        world = list(local_matrix(nodes[index]))
+        parent_index = parents.get(index)
+        visited = {index}
+        while parent_index is not None:
+            if parent_index in visited:
+                raise ValidationError("node hierarchy contains a cycle")
+            visited.add(parent_index)
+            parent = local_matrix(nodes[parent_index])
+            # Match cgltf_node_transform_world exactly: transform each existing
+            # column by the parent's 3x3 linear part, then add parent translation.
+            for column in range(4):
+                offset = column * 4
+                left0 = world[offset]
+                left1 = world[offset + 1]
+                left2 = world[offset + 2]
+                result0 = runtime_add(runtime_add(
+                    runtime_multiply(left0, parent[0]),
+                    runtime_multiply(left1, parent[4])),
+                    runtime_multiply(left2, parent[8]))
+                result1 = runtime_add(runtime_add(
+                    runtime_multiply(left0, parent[1]),
+                    runtime_multiply(left1, parent[5])),
+                    runtime_multiply(left2, parent[9]))
+                result2 = runtime_add(runtime_add(
+                    runtime_multiply(left0, parent[2]),
+                    runtime_multiply(left1, parent[6])),
+                    runtime_multiply(left2, parent[10]))
+                world[offset] = result0
+                world[offset + 1] = result1
+                world[offset + 2] = result2
+            world[12] = runtime_add(world[12], parent[12])
+            world[13] = runtime_add(world[13], parent[13])
+            world[14] = runtime_add(world[14], parent[14])
+            parent_index = parents.get(parent_index)
         if any(not math.isfinite(value) for value in world):
             raise ValidationError(f"node {index} contains a non-finite transform")
         if determinant(world) < 0.0:
@@ -195,10 +247,10 @@ def node_world_matrices(document: dict) -> list[list[float]]:
         cache[index] = world
         return world
 
-    return [resolve(index, set()) for index in range(len(nodes))]
+    return [resolve(index) for index in range(len(nodes))]
 
 
-def dielectric_weld_tolerance(triangles: list[dict]) -> tuple[float, tuple[float, float, float]]:
+def dielectric_weld_tolerance(triangles: list[dict]) -> float:
     minimum = tuple(min(triangle["positions"][corner][axis]
                         for triangle in triangles for corner in range(3))
                     for axis in range(3))
@@ -209,7 +261,26 @@ def dielectric_weld_tolerance(triangles: list[dict]) -> tuple[float, tuple[float
     # Baked positions are metres. One millionth of material extent, clamped
     # to 0.1-10 micrometres, welds transform-rounding equivalents while keeping
     # authored shells separated by more than the documented 10 um ceiling.
-    return max(1.0e-7, min(1.0e-5, extent * 1.0e-6)), minimum
+    return max(MINIMUM_WELD_TOLERANCE_METRES,
+               min(MAXIMUM_WELD_TOLERANCE_METRES, extent * 1.0e-6))
+
+
+def weld_cell_coordinate(scaled: float) -> int:
+    if (not math.isfinite(scaled) or
+            not (-EXCLUSIVE_WELD_CELL_COORDINATE_LIMIT < scaled <
+                 EXCLUSIVE_WELD_CELL_COORDINATE_LIMIT)):
+        raise ValidationError(
+            "thick dielectric position exceeds the deterministic weld coordinate range")
+    return math.floor(scaled)
+
+
+def baked_position_in_weld_domain(position: tuple[float, float, float]) -> bool:
+    return all(
+        math.isfinite(coordinate) and
+        -EXCLUSIVE_WELD_CELL_COORDINATE_LIMIT <
+        coordinate / MINIMUM_WELD_TOLERANCE_METRES <
+        EXCLUSIVE_WELD_CELL_COORDINATE_LIMIT
+        for coordinate in position)
 
 
 def weld_cell(position: tuple[float, float, float],
@@ -218,10 +289,7 @@ def weld_cell(position: tuple[float, float, float],
     coordinates = []
     for axis in range(3):
         scaled = (position[axis] - origin[axis]) / tolerance
-        if not math.isfinite(scaled) or scaled < 0.0 or scaled > (2**63 - 2):
-            raise ValidationError(
-                "thick dielectric position exceeds the deterministic weld coordinate range")
-        coordinates.append(math.floor(scaled))
+        coordinates.append(weld_cell_coordinate(scaled))
     return tuple(coordinates)
 
 
@@ -249,7 +317,8 @@ def build_dielectric_welds(triangles: list[dict],
             for y in range(-1, 2):
                 for z in range(-1, 2):
                     neighbor = (cell[0] + x, cell[1] + y, cell[2] + z)
-                    if any(value < 0 or value > (2**63 - 1) for value in neighbor):
+                    if any(value < -(2**63) or value > (2**63 - 1)
+                           for value in neighbor):
                         continue
                     for candidate in buckets.get(neighbor, []):
                         distance_squared = squared_distance(
@@ -280,9 +349,12 @@ def validate_material_components(path: pathlib.Path, material_name: str,
                                  triangles: list[dict]) -> int:
     if not triangles:
         return 0
-    tolerance, weld_origin = dielectric_weld_tolerance(triangles)
+    tolerance = dielectric_weld_tolerance(triangles)
+    # Keep the bucket grid fixed in metre space in both validators. Signed
+    # buckets plus adjacent-cell search and the explicit Euclidean predicate
+    # preserve geometric welds while exposing both safe coordinate boundaries.
     representatives = build_dielectric_welds(
-        triangles, weld_origin, tolerance)
+        triangles, (0.0, 0.0, 0.0), tolerance)
     all_edges: collections.defaultdict[tuple, list[tuple[int, bool]]] = (
         collections.defaultdict(list))
     for triangle_index, triangle in enumerate(triangles):
@@ -422,6 +494,19 @@ def validate(path: pathlib.Path, manifest_path: pathlib.Path) -> None:
             if document["accessors"][position_accessor]["componentType"] != 5126:
                 raise ValidationError(
                     f"mesh {mesh_index} primitive {primitive_index}: thick dielectric POSITION must use finite FLOAT data")
+            invalid_position = next(
+                (position for position in positions
+                 if not baked_position_in_weld_domain(position)), None)
+            if invalid_position is not None:
+                material_name = materials[material_index].get(
+                    "name", f"material {material_index}")
+                node_name = node.get("name", "<unnamed>")
+                raise ValidationError(
+                    f"Static GLB material '{material_name}' "
+                    f"(node '{node_name}' mesh {mesh_index} primitive {primitive_index}) "
+                    "contains a POSITION outside the finite deterministic dielectric "
+                    "weld domain; keep every baked metre-space coordinate strictly "
+                    "inside +/-2^63 minimum-tolerance cells")
             if "indices" in primitive:
                 raw_indices = read_accessor(document, binary, primitive["indices"])
                 indices = [int(value[0]) for value in raw_indices]

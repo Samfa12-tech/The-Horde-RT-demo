@@ -1,4 +1,5 @@
 #include "scene/assets/AssetManifest.h"
+#include "scene/assets/DielectricTopologyMath.h"
 #include "scene/assets/StaticMeshAsset.h"
 
 #include <array>
@@ -8,6 +9,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -823,6 +825,9 @@ void TestRuntimeOfflineDielectricComponentParity()
     expectPass("non-unit-min-scale-seam-dielectric-lod0.runtime.glb", centimetreManifest);
     expectPass("non-unit-max-disconnected-dielectric-lod0.runtime.glb", tenMetreManifest);
     expectDefaultPass("large-trs-matrix-seam-dielectric-lod0.runtime.glb");
+    Check(asset.nodeTransforms.size() == 4u &&
+              asset.nodeTransforms[1].world == asset.nodeTransforms[3].world,
+          "cgltf-equivalent parent/child TRS and matrix paths produce bit-identical runtime worlds");
     expectDefaultPass("weld-domain-upper-inside-dielectric-lod0.runtime.glb");
     expectDefaultPass("weld-domain-lower-inside-dielectric-lod0.runtime.glb");
 
@@ -905,6 +910,40 @@ void TestRuntimeOfflineDielectricComponentParity()
           "runtime rejects NaN metresPerUnit after runtime-float conversion");
 }
 
+void TestExactDielectricWeldCellDomain()
+{
+    const std::filesystem::path fixture =
+        kFixtureRoot.parent_path() / "dielectric-topology" /
+        "weld-cell-domain-cases.txt";
+    std::ifstream input(fixture);
+    Check(static_cast<bool>(input), "exact weld-cell domain case file opens");
+    std::string line;
+    while (std::getline(input, line))
+    {
+        if (line.empty() || line[0] == '#') continue;
+        std::istringstream fields(line);
+        std::string name;
+        std::string hexadecimal;
+        std::string expectedText;
+        fields >> name >> hexadecimal >> expectedText;
+        std::size_t parsed = 0u;
+        const double scaled = std::stod(hexadecimal, &parsed);
+        Check(parsed == hexadecimal.size(), name + ": exact hexadecimal value parses");
+        std::int64_t coordinate = 0;
+        const bool accepted =
+            horde::scene::assets::detail::DielectricWeldCellCoordinate(
+                scaled, coordinate);
+        const bool expected = expectedText == "true";
+        Check(accepted == expected,
+              name + ": exact exclusive +/-2^63 weld-cell acceptance matches");
+        if (accepted)
+        {
+            Check(coordinate == static_cast<std::int64_t>(std::floor(scaled)),
+                  name + ": accepted coordinate retains floor semantics");
+        }
+    }
+}
+
 } // namespace
 
 int main()
@@ -915,6 +954,7 @@ int main()
     std::filesystem::create_directories(temporaryRoot);
 
     TestManifestContract(temporaryRoot);
+    TestExactDielectricWeldCellDomain();
     TestProductionDielectricFixture();
     TestRuntimeOfflineDielectricComponentParity();
 

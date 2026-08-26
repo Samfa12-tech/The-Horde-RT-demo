@@ -1,6 +1,7 @@
 #include "scene/assets/StaticMeshAsset.h"
 
 #include "scene/assets/AssetValidation.h"
+#include "scene/assets/DielectricTopologyMath.h"
 #include "scene/assets/GltfDocument.h"
 #include "third_party/cgltf/cgltf.h"
 
@@ -294,7 +295,9 @@ double DielectricWeldTolerance(const std::array<double, 3u>& minimum,
     // Baked positions are metres. One millionth of material extent, clamped
     // to 0.1-10 micrometres, welds transform-rounding equivalents while keeping
     // authored shells separated by more than the documented 10 um ceiling.
-    return std::clamp(extent * 1.0e-6, 1.0e-7, 1.0e-5);
+    return std::clamp(extent * 1.0e-6,
+                      detail::kDielectricMinimumWeldToleranceMetres,
+                      detail::kDielectricMaximumWeldToleranceMetres);
 }
 
 bool WeldCellForPosition(const std::array<double, 3u>& position,
@@ -302,13 +305,10 @@ bool WeldCellForPosition(const std::array<double, 3u>& position,
                          double tolerance,
                          WeldCell& cell)
 {
-    constexpr double maximumCell =
-        static_cast<double>(std::numeric_limits<std::int64_t>::max() - 1);
     for (std::size_t axis = 0u; axis < cell.size(); ++axis)
     {
         const double scaled = (position[axis] - origin[axis]) / tolerance;
-        if (!std::isfinite(scaled) || scaled < 0.0 || scaled > maximumCell) return false;
-        cell[axis] = static_cast<std::int64_t>(std::floor(scaled));
+        if (!detail::DielectricWeldCellCoordinate(scaled, cell[axis])) return false;
     }
     return true;
 }
@@ -390,7 +390,8 @@ bool BuildDielectricWelds(std::vector<DielectricTriangle>& triangles,
                     bool validNeighbor = true;
                     for (std::size_t axis = 0u; axis < neighbor.size(); ++axis)
                     {
-                        if ((offset[axis] < 0 && cell[axis] == 0) ||
+                        if ((offset[axis] < 0 &&
+                             cell[axis] == std::numeric_limits<std::int64_t>::min()) ||
                             (offset[axis] > 0 &&
                              cell[axis] == std::numeric_limits<std::int64_t>::max()))
                         {
@@ -492,6 +493,17 @@ bool ValidateThickDielectricTopology(const StaticMeshAsset& asset,
                     for (std::size_t axis = 0u; axis < 3u; ++axis)
                     {
                         triangle.positions[corner][axis] = vertex.position[axis];
+                        if (!detail::BakedCoordinateInDielectricWeldDomain(
+                                vertex.position[axis]))
+                        {
+                            diagnostic = "Static GLB thick transmissive material '" +
+                                material.name + "' (node '" + triangle.nodeName +
+                                "' primitive " + std::to_string(primitiveIndex) +
+                                ") contains a POSITION outside the finite deterministic "
+                                "dielectric weld domain; keep every baked metre-space "
+                                "coordinate strictly inside +/-2^63 minimum-tolerance cells.";
+                            return false;
+                        }
                         minimum[axis] = std::min(minimum[axis],
                                                  triangle.positions[corner][axis]);
                         maximum[axis] = std::max(maximum[axis],
@@ -505,7 +517,12 @@ bool ValidateThickDielectricTopology(const StaticMeshAsset& asset,
 
         const double weldTolerance = DielectricWeldTolerance(minimum, maximum);
         std::vector<std::array<double, 3u>> weldRepresentatives;
-        if (!BuildDielectricWelds(triangles, minimum, weldTolerance,
+        // A fixed metre-space origin keeps bucket identity independent of
+        // material traversal and deliberately exercises the signed cell domain.
+        // Adjacent-cell search plus the explicit Euclidean predicate preserves
+        // the established geometric weld result when the bucket grid shifts.
+        constexpr std::array<double, 3u> weldOrigin{{0.0, 0.0, 0.0}};
+        if (!BuildDielectricWelds(triangles, weldOrigin, weldTolerance,
                                   weldRepresentatives, material.name,
                                   diagnostic))
             return false;
@@ -1001,6 +1018,25 @@ bool StaticMeshAsset::Load(const std::filesystem::path& runtimeGlb,
                 const auto transformedPosition = TransformPoint(
                     nodeWorld, unpackedPositions.data() + vertexIndex * 3u,
                     manifest.metresPerUnit);
+                if (!std::all_of(
+                        transformedPosition.begin(), transformedPosition.end(),
+                        [](float value) {
+                            return detail::BakedCoordinateInDielectricWeldDomain(value);
+                        }))
+                {
+                    const std::string& materialName =
+                        asset.materials[record.materialIndex].name;
+                    diagnostic = "Static GLB material '" + materialName +
+                        "' (node '" +
+                        (asset.nodeTransforms[nodeIndex].name.empty()
+                            ? std::string("<unnamed>")
+                            : asset.nodeTransforms[nodeIndex].name) +
+                        "' primitive " + std::to_string(primitiveIndex) +
+                        ") contains a POSITION outside the finite deterministic "
+                        "dielectric weld domain; keep every baked metre-space "
+                        "coordinate strictly inside +/-2^63 minimum-tolerance cells.";
+                    return false;
+                }
                 std::array<float, 3u> transformedNormal{};
                 if (!TransformNormal(nodeWorld,
                                      unpackedNormals.data() + vertexIndex * 3u,
