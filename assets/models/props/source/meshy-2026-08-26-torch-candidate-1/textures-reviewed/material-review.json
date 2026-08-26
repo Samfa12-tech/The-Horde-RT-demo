@@ -1,0 +1,9 @@
+{
+  "source": "textures-2k",
+  "kind": "torch",
+  "operation": "region-preserving neutral PBR grade",
+  "metal": "blackened forged iron, authored metallic mask preserved",
+  "dielectric": "dark worn hardwood and char, no baked lighting",
+  "roughnessFloor": "0.48 metal to 0.64 dielectric",
+  "emissive": "black 1x1"
+}

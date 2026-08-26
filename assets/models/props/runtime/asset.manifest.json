@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "asset": "gothic-hand-torch-lod0",
+  "metresPerUnit": 1.0,
+  "coordinateSystem": { "up": "+Y", "forward": "+Z" },
+  "budgets": {
+    "maxVertices": 6500,
+    "maxIndices": 18000,
+    "maxPrimitives": 2,
+    "maxMaterials": 2,
+    "maxTextureLayersPerKind": 2
+  },
+  "lods": [{ "name": "lod0", "maxTriangles": 6000 }],
+  "requiredSockets": ["Grip", "Flame", "Light"],
+  "runtimeTextureProfile": {
+    "android": "astc",
+    "windows": "rgba8",
+    "mipmapped": true,
+    "resolution": 1024
+  },
+  "materialOverrides": [],
+  "distribution": "runtime",
+  "licenceStatus": "Meshy output distributed conservatively under CC BY 4.0; attribution in ASSET_LICENSES.md"
+}

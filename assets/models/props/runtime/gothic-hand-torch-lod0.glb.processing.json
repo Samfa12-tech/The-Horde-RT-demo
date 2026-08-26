@@ -1,0 +1,33 @@
+{
+  "kind": "torch",
+  "source": "meshy-refined.glb",
+  "runtime": "gothic-hand-torch-lod0.glb",
+  "sourceTriangles": 2653384,
+  "runtimeTriangles": 4999,
+  "runtimeVertices": 5409,
+  "dimensionsMetres": [
+    0.1358507201075554,
+    0.13522138446569443,
+    0.8502341837011045
+  ],
+  "upAxis": "+Y",
+  "forwardAxis": "+Z",
+  "sockets": {
+    "Grip": [
+      0.0,
+      0.0,
+      0.24
+    ],
+    "Flame": [
+      0.0,
+      0.0,
+      0.765
+    ],
+    "Light": [
+      0.0,
+      -0.025,
+      0.735
+    ]
+  },
+  "processing": "PCA axis normalization, metre-scale normalization, reviewed Blender collapse remesh, preserved UV/material regions, generated tangents"
+}

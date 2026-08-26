@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "asset": "production-held-item-pbr-arrays",
+  "resolution": 1024,
+  "mipmapped": true,
+  "layerOrder": ["gothic-arming-sword-rh-lod0", "gothic-hand-torch-lod0"],
+  "layerCounts": {
+    "baseColor": 2,
+    "normal": 2,
+    "orm": 2,
+    "emissive": 1
+  },
+  "android": {
+    "baseColor": { "format": "ASTC_6x6_SRGB_BLOCK", "sha256": "59092b17f6922da28e4dbf07a3e6cace209ccd4e629b21c5a55b055107a87735" },
+    "normal": { "format": "ASTC_4x4_UNORM_BLOCK", "sha256": "9143bc87c71f50fb7bbf8fcce0c7bd8d2a59da712c05f7c7519510dc25ebf5fb" },
+    "orm": { "format": "ASTC_6x6_UNORM_BLOCK", "sha256": "eaeff63be5824619cb2fca28f52118d493e19d3f73ed905975bcb681054895b8" },
+    "emissive": { "format": "ASTC_6x6_SRGB_BLOCK", "sha256": "da5ee0baa4e6b84280a1b9ae077954c4658a4e7fff1da03212d220d282f9542a" }
+  },
+  "windows": {
+    "baseColor": { "format": "R8G8B8A8_SRGB", "sha256": "ce288b6d56a57edf959787f7306e962e5b2318c3f9ac06e96e2d759802908272" },
+    "normal": { "format": "R8G8B8A8_UNORM", "sha256": "36d503168cf7fe37a24815453ff270498b370dc03d2e69cefad23b462728e6cb" },
+    "orm": { "format": "R8G8B8A8_UNORM", "sha256": "64d850b405c125456cbeda037f1416d4b35d85059fa24993ebd64f2ba7a7061f" },
+    "emissive": { "format": "R8G8B8A8_SRGB", "sha256": "c642d3972a14bf477d88f2ecb34ffc177ad4dc6308dfe8f507af6033c292dd56" }
+  },
+  "licenceStatus": "Meshy outputs distributed conservatively under CC BY 4.0; attribution in ASSET_LICENSES.md"
+}
