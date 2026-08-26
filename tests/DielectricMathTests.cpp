@@ -4,17 +4,24 @@
 #include <cmath>
 #include <iostream>
 #include <limits>
+#include <span>
 #include <string_view>
+#include <vector>
 
 namespace
 {
 
 using horde::vulkan::raytracing::BeerLambert;
 using horde::vulkan::raytracing::DielectricStack;
+using horde::vulkan::raytracing::DielectricEnergyPartition;
+using horde::vulkan::raytracing::DielectricRayEpsilon;
+using horde::vulkan::raytracing::EffectiveDielectricFresnel;
+using horde::vulkan::raytracing::EvaluateBoundedShadow;
 using horde::vulkan::raytracing::InterfaceTransition;
 using horde::vulkan::raytracing::OrientInterface;
 using horde::vulkan::raytracing::RefractDirection;
 using horde::vulkan::raytracing::SchlickFresnel;
+using horde::vulkan::raytracing::ShadowInterfaceSample;
 using horde::vulkan::raytracing::ThinWallTransition;
 using horde::vulkan::raytracing::Vec3;
 
@@ -102,6 +109,132 @@ void TestTotalInternalReflection()
           "TIR returns a deterministic finite zero transmission direction");
 }
 
+void TestCriticalAngleIsTransmissionBoundary()
+{
+    Vec3 transmitted{};
+    Check(RefractDirection(Vec3{0.5f, -0.8660254038f, 0.0f},
+                           Vec3{0.0f, 1.0f, 0.0f}, 2.0f, 1.0f, transmitted),
+          "an exact zero Snell discriminant is the critical transmission boundary, not TIR");
+    Check(Finite(transmitted) && NearlyEqual(transmitted, Vec3{1.0f, 0.0f, 0.0f}, 0.0001f),
+          "critical-angle transmission is finite and tangent to the interface");
+}
+
+void TestEffectiveFresnelPartitionsAllValidEnergy()
+{
+    for (int incidentIndex = 0; incidentIndex <= 6; ++incidentIndex)
+    {
+        const float incidentIor = 1.0f + static_cast<float>(incidentIndex) * 0.5f;
+        for (int transmittedIndex = 0; transmittedIndex <= 6; ++transmittedIndex)
+        {
+            const float transmittedIor = 1.0f + static_cast<float>(transmittedIndex) * 0.5f;
+            for (int cosineIndex = 0; cosineIndex <= 100; ++cosineIndex)
+            {
+                const float cosine = static_cast<float>(cosineIndex) / 100.0f;
+                for (int roughnessIndex = 0; roughnessIndex <= 100; ++roughnessIndex)
+                {
+                    const float roughness = static_cast<float>(roughnessIndex) / 100.0f;
+                    const float fresnel = EffectiveDielectricFresnel(
+                        cosine, incidentIor, transmittedIor, roughness);
+                    const DielectricEnergyPartition energy =
+                        horde::vulkan::raytracing::PartitionDielectricEnergy(
+                            fresnel, 1.0f);
+                    Check(std::isfinite(fresnel) && fresnel >= 0.0f && fresnel <= 1.0f,
+                          "effective Fresnel stays finite and normalized over valid inputs");
+                    Check(energy.reflection >= 0.0f && energy.transmission >= 0.0f &&
+                              energy.reflection + energy.transmission <= 1.000001f,
+                          "rough dielectric reflection and transmission never create energy");
+                }
+            }
+        }
+    }
+    const float roughGlass = EffectiveDielectricFresnel(1.0f, 1.0f, 1.5f, 1.0f);
+    const auto roughGlassEnergy =
+        horde::vulkan::raytracing::PartitionDielectricEnergy(roughGlass, 1.0f);
+    Check(NearlyEqual(roughGlassEnergy.reflection + roughGlassEnergy.transmission, 1.0f),
+          "IOR 1.5 roughness 1 retains one bounded energy budget");
+
+    const float degenerate = EffectiveDielectricFresnel(
+        std::numeric_limits<float>::quiet_NaN(), -4.0f,
+        std::numeric_limits<float>::infinity(),
+        std::numeric_limits<float>::quiet_NaN());
+    const auto clamped = horde::vulkan::raytracing::PartitionDielectricEnergy(
+        degenerate, std::numeric_limits<float>::infinity());
+    Check(std::isfinite(degenerate) && Finite(Vec3{clamped.reflection, clamped.transmission, 0.0f}) &&
+              clamped.reflection + clamped.transmission <= 1.000001f,
+          "degenerate Fresnel and transmission inputs clamp to a finite energy partition");
+}
+
+void TestNearestShadowTraversalIsCandidateOrderIndependent()
+{
+    const std::array<ShadowInterfaceSample, 5u> ordered{{
+        {1.0f, 10u, 101u, true, false, 0.90f, 0.0f,
+         Vec3{0.25f, 1.0f, 1.0f}, 2.0f},
+        {1.5f, 20u, 202u, true, false, 0.80f, 0.0f,
+         Vec3{1.0f, 1.0f, 0.25f}, 1.0f},
+        {2.5f, 21u, 202u, false, false, 0.80f, 0.0f,
+         Vec3{1.0f, 1.0f, 0.25f}, 1.0f},
+        {3.0f, 11u, 101u, false, false, 0.90f, 0.0f,
+         Vec3{0.25f, 1.0f, 1.0f}, 2.0f},
+        {4.0f, 30u, 303u, true, true, 0.75f, 0.0f,
+         Vec3{0.5f, 1.0f, 0.25f}, 0.0f},
+    }};
+    const Vec3 expected{0.1269f, 0.5400f, 0.12285f};
+    std::array<int, ordered.size()> permutation{{0, 1, 2, 3, 4}};
+    do
+    {
+        std::array<ShadowInterfaceSample, ordered.size()> shuffled{};
+        for (std::size_t index = 0u; index < shuffled.size(); ++index)
+            shuffled[index] = ordered[static_cast<std::size_t>(permutation[index])];
+        const auto result = EvaluateBoundedShadow<8u, 4u>(
+            std::span<const ShadowInterfaceSample>(shuffled), 5.0f);
+        Check(!result.blocked && !result.overflow && !result.unclosedVolume &&
+                  result.interfaceCount == 5u && NearlyEqual(result.transmittance, expected, 0.0001f),
+              "nearest shadow traversal gives identical nested RGB attenuation for every candidate order");
+    }
+    while (std::next_permutation(permutation.begin(), permutation.end()));
+}
+
+void TestShadowBlockersAndUnclosedVolumesFailDeterministically()
+{
+    const std::array<ShadowInterfaceSample, 2u> opaqueBehindTint{{
+        {1.0f, 1u, 11u, true, true, 0.8f, 0.0f,
+         Vec3{0.25f, 0.5f, 1.0f}, 0.0f},
+        {2.0f, 2u, 12u, true, false, 0.0f, 0.0f,
+         Vec3{1.0f, 1.0f, 1.0f}, 0.0f},
+    }};
+    const auto opaque = EvaluateBoundedShadow<4u, 2u>(opaqueBehindTint, 3.0f);
+    Check(opaque.blocked && NearlyEqual(opaque.transmittance, Vec3{}),
+          "an opaque blocker terminates tinted shadow transmission");
+
+    auto metallicSamples = opaqueBehindTint;
+    metallicSamples[1].transmission = 0.9f;
+    metallicSamples[1].metallic = 0.8f;
+    const auto metallic = EvaluateBoundedShadow<4u, 2u>(metallicSamples, 3.0f);
+    Check(metallic.blocked && NearlyEqual(metallic.transmittance, Vec3{}),
+          "a transmissive metal remains a shadow blocker");
+
+    const std::array<ShadowInterfaceSample, 1u> missingExit{{
+        {1.0f, 4u, 44u, true, false, 0.9f, 0.0f,
+         Vec3{0.5f, 0.8f, 1.0f}, 2.0f},
+    }};
+    const auto unclosed = EvaluateBoundedShadow<4u, 2u>(missingExit, 3.0f);
+    Check(unclosed.unclosedVolume && !unclosed.blocked &&
+              NearlyEqual(unclosed.transmittance, Vec3{0.072f, 0.072f, 0.072f}),
+          "a terminal reached inside a closed medium uses the bounded unclosed fallback");
+}
+
+void TestMillimetreScaleRayAdvance()
+{
+    const float epsilon = DielectricRayEpsilon(Vec3{-9.1f, -0.3f, -15.2f}, 0.001f);
+    Check(epsilon >= 0.00002f && epsilon <= 0.00010f,
+          "world-scale dielectric epsilon stays below one tenth millimetre in the authored corridor");
+    Check(2.0f * epsilon < 0.001f,
+          "entry advance and next-query minimum cannot skip a one millimetre closed volume");
+    const float farEpsilon = DielectricRayEpsilon(Vec3{10000.0f, 0.0f, 0.0f}, 5000.0f);
+    Check(std::isfinite(farEpsilon) && farEpsilon <= 0.00025f,
+          "large finite coordinates retain a bounded sub-millimetre dielectric epsilon");
+}
+
 void TestBeerLambertAttenuation()
 {
     Check(NearlyEqual(BeerLambert(Vec3{0.25f, 0.5f, 1.0f}, 2.0f, 2.0f),
@@ -169,6 +302,11 @@ int main()
     TestNormalOrientationAndSnellDirection();
     TestAirGlassAirStack();
     TestTotalInternalReflection();
+    TestCriticalAngleIsTransmissionBoundary();
+    TestEffectiveFresnelPartitionsAllValidEnergy();
+    TestNearestShadowTraversalIsCandidateOrderIndependent();
+    TestShadowBlockersAndUnclosedVolumesFailDeterministically();
+    TestMillimetreScaleRayAdvance();
     TestBeerLambertAttenuation();
     TestThinWallDoesNotMutateStack();
     TestBoundedOverflowAndMismatchedExit();
