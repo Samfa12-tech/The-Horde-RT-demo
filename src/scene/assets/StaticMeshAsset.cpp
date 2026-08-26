@@ -47,6 +47,28 @@ std::int32_t TextureIndex(const cgltf_data& data, const cgltf_texture_view& view
 using TextureKey = std::pair<std::int32_t, std::int32_t>;
 using TextureLayerRoutes = std::array<std::map<TextureKey, std::int32_t>, 4u>;
 
+std::string AssetIdentityStem(const std::filesystem::path& path)
+{
+    std::string stem = path.stem().string();
+    constexpr std::string_view runtimeSuffix = ".runtime";
+    if (stem.ends_with(runtimeSuffix)) stem.resize(stem.size() - runtimeSuffix.size());
+    return stem;
+}
+
+bool HasExactLodIdentitySuffix(std::string_view assetIdentity,
+                               std::string_view lodName)
+{
+    if (lodName.empty()) return false;
+    if (assetIdentity == lodName) return true;
+    if (assetIdentity.size() <= lodName.size() ||
+        !assetIdentity.ends_with(lodName))
+    {
+        return false;
+    }
+    const char delimiter = assetIdentity[assetIdentity.size() - lodName.size() - 1u];
+    return delimiter == '.' || delimiter == '-' || delimiter == '_';
+}
+
 std::int32_t CategoryTextureLayer(std::map<TextureKey, std::int32_t>& routes,
                                   TextureKey key)
 {
@@ -318,17 +340,21 @@ bool StaticMeshAsset::Load(const std::filesystem::path& runtimeGlb,
     }
     else
     {
-        const std::string filename = runtimeGlb.filename().string();
-        const auto match = std::find_if(
-            manifest.lods.begin(), manifest.lods.end(),
-            [&filename](const AssetLodBudget& lod) {
-                return !lod.name.empty() && filename.find(lod.name) != std::string::npos;
-            });
-        if (match != manifest.lods.end()) selectedLod = &*match;
+        const std::string assetIdentity = AssetIdentityStem(runtimeGlb.filename());
+        for (const AssetLodBudget& lod : manifest.lods)
+        {
+            if (!HasExactLodIdentitySuffix(assetIdentity, lod.name)) continue;
+            if (selectedLod != nullptr)
+            {
+                diagnostic = "Static RT asset filename must select exactly one manifest LOD identity.";
+                return false;
+            }
+            selectedLod = &lod;
+        }
     }
     if (selectedLod == nullptr)
     {
-        diagnostic = "Static GLB filename does not select a manifest LOD budget.";
+        diagnostic = "Static RT asset filename must select exactly one manifest LOD identity.";
         return false;
     }
 

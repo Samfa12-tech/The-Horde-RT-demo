@@ -327,6 +327,26 @@ void TestBakedNodeTransformAndUnitScale(const std::filesystem::path& temporaryRo
     }
 }
 
+void TestExactLodSuffixSelection(const std::filesystem::path& temporaryRoot)
+{
+    const auto manifestPath = RewriteManifest(
+        temporaryRoot, "colliding-lods.manifest.json",
+        "\"name\": \"lod0\", \"maxTriangles\": 8",
+        "\"name\": \"lod1\", \"maxTriangles\": 3 }, { \"name\": \"lod10\", \"maxTriangles\": 8");
+    horde::scene::assets::AssetManifest manifest;
+    std::string diagnostic;
+    Check(horde::scene::assets::AssetManifest::Load(manifestPath, manifest, diagnostic),
+          std::string("colliding LOD manifest loads: ") + diagnostic);
+
+    const auto runtimeGlb = temporaryRoot / "fixture_lod10.runtime.glb";
+    WriteBytes(runtimeGlb, ReadBytes(kFixtureRoot / "valid-multi.glb"));
+    horde::scene::assets::StaticMeshAsset asset;
+    const bool loaded = horde::scene::assets::StaticMeshAsset::Load(
+        runtimeGlb, manifest, asset, diagnostic);
+    Check(loaded,
+          std::string("exact LOD suffix selects lod10 rather than substring lod1: ") + diagnostic);
+}
+
 void TestMalformedAndUnsupportedGlbs(const std::filesystem::path& temporaryRoot,
                                      const horde::scene::assets::AssetManifest& manifest)
 {
@@ -507,6 +527,7 @@ int main()
     {
         TestAcceptedStaticGlbContract(manifest);
         TestBakedNodeTransformAndUnitScale(temporaryRoot);
+        TestExactLodSuffixSelection(temporaryRoot);
         TestMalformedAndUnsupportedGlbs(temporaryRoot, manifest);
         TestBudgetFailures(temporaryRoot, manifest);
     }

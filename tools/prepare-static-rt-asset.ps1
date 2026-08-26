@@ -27,14 +27,26 @@ foreach ($lod in @($manifestData.lods)) {
         throw "Asset manifest LOD '$($lod.name)' maxTriangles must be greater than zero."
     }
 }
+function Test-ExactLodIdentitySuffix([string]$assetIdentity, [string]$lodName) {
+    if ([string]::IsNullOrWhiteSpace($lodName)) { return $false }
+    if ($assetIdentity.EndsWith(".runtime", [StringComparison]::Ordinal)) {
+        $assetIdentity = $assetIdentity.Substring(0, $assetIdentity.Length - ".runtime".Length)
+    }
+    if ($assetIdentity.Equals($lodName, [StringComparison]::Ordinal)) { return $true }
+    foreach ($delimiter in @(".", "-", "_")) {
+        if ($assetIdentity.EndsWith("$delimiter$lodName", [StringComparison]::Ordinal)) { return $true }
+    }
+    return $false
+}
+
 $sourceStem = [IO.Path]::GetFileNameWithoutExtension($sourcePath)
 $selectedLods = @($manifestData.lods | Where-Object {
-    -not [string]::IsNullOrWhiteSpace($_.name) -and $sourceStem.Contains([string]$_.name)
+    Test-ExactLodIdentitySuffix $sourceStem ([string]$_.name)
 })
 if ($selectedLods.Count -eq 0 -and @($manifestData.lods).Count -eq 1) {
     $selectedLods = @($manifestData.lods[0])
 }
-if ($selectedLods.Count -ne 1) { throw "Static RT source filename must select exactly one manifest LOD budget." }
+if ($selectedLods.Count -ne 1) { throw "Static RT asset filename must select exactly one manifest LOD identity." }
 $selectedLod = $selectedLods[0]
 New-Item -ItemType Directory -Force -Path $outputRoot | Out-Null
 

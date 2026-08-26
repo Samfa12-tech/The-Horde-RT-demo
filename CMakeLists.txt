@@ -158,11 +158,15 @@ if(BUILD_TESTING)
         add_test(NAME horde_rt_static_preparation_skip_policy_tests
             COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
                 ${CMAKE_CURRENT_SOURCE_DIR}/tests/StaticAssetPreparationPolicyTests.ps1 -Mode UnsafeSkip)
+        add_test(NAME horde_rt_static_preparation_colliding_lod_policy_tests
+            COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
+                ${CMAKE_CURRENT_SOURCE_DIR}/tests/StaticAssetPreparationPolicyTests.ps1 -Mode CollidingLod)
         set_tests_properties(
             horde_rt_scene_abi_generator_tests
             horde_rt_static_texture_array_tool_tests
             horde_rt_static_preparation_lod_policy_tests
             horde_rt_static_preparation_skip_policy_tests
+            horde_rt_static_preparation_colliding_lod_policy_tests
             PROPERTIES TIMEOUT 120)
     endif()
 
