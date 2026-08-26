@@ -388,3 +388,91 @@ Final `adb devices -l` returned an empty device list. No exact artifact was inst
 Automated capture inspection verifies route, structure, hashes, counters, and timing only. Hands-on perceived glass quality remains an owner boundary. Task 5's two-cut combo owner audio/haptic replay remains separately open and was not changed by this fix round.
 
 Audio/haptic manual revalidation required: NO — this milestone changes material transport and shader visibility only; audio/haptic state, event timing, playback, spatialisation, and feedback semantics are unchanged.
+
+## Fix Round 3 — metre-space spatial-weld parity
+
+Date: 2026-08-27 (Australia/Sydney)
+
+This narrowly scoped round changes only runtime/offline thick-dielectric topology preparation and its tracked fixtures. Shader source, generated ABI, material ABI, descriptor bindings, dual-pipeline selection, physics budgets, captures, and glass diagnostics are unchanged. Implementation head before this report update is `0dd96cca9d67eab4899cad1fc729e1038cdf2ac0`.
+
+### Commits and RED evidence
+
+- `c424b08` — `test: define metre-space dielectric weld parity`
+- `0dd96cc` — `fix: weld dielectric topology in metre space`
+
+The shared tracked RED fixtures exposed every reviewed defect against the old validators:
+
+- runtime rejected the sub-tolerance seam whose equivalent vertices lie on opposite rounded-cell sides;
+- runtime accepted same-cell diagonal vertices whose Euclidean separation exceeds tolerance;
+- reordering the two mixed-orientation nodes changed the inward shell diagnostic from component 2 to component 1;
+- offline accepted both zero `metresPerUnit` and `3.5e38`, which overflows the runtime float representation;
+- a centimetre-unit node-translation seam passed runtime but failed offline because offline transformed positions and translations remained in source units.
+
+These were behavioral failures from real GLBs and both validators, not source-string assertions.
+
+### Matched metre and weld algorithm
+
+Offline validation now converts and validates `metresPerUnit` with the runtime float domain: it must be finite, representable as a finite float, and greater than zero. Node matrices use runtime-float semantics; the complete transformed point follows `StaticMeshAsset` ordering, multiplying all three linear point terms and the world translation into metres before topology validation. Material bounds, weld tolerance, distance predicates, and signed volumes therefore all operate in metres in both implementations.
+
+Rounded-cell equality is removed from C++ and Python. The matched algorithm is:
+
+1. Sort every triangle-corner occurrence lexicographically by baked metre-space position.
+2. Use floor-based spatial buckets whose cell width is the documented scale-aware tolerance `clamp(material extent * 1e-6, 0.1 um, 10 um)`.
+3. Search the current cell and all 26 adjacent cells.
+4. Accept a weld only when explicit Euclidean squared distance is no greater than tolerance squared.
+5. Choose the nearest canonical representative, breaking an exact tie by its stable lexicographic representative id.
+6. Put representatives—not subsequently joined members—into buckets. A proximity chain therefore cannot bridge two points that are farther apart than tolerance.
+7. Sort edge-connected components by their canonical welded-vertex keys, and sort their triangles canonically before signed-volume accumulation. Component identity no longer depends on node or primitive traversal order.
+
+The coordinate range is checked before conversion to fixed bucket coordinates. Existing actionable material/component/node/primitive diagnostics remain, including open, non-manifold, inconsistent-winding, inward-wound, negative-determinant, and now out-of-range weld-coordinate failures.
+
+### Runtime/offline parity fixtures
+
+The same committed GLBs and manifests drive the C++ runtime loader and Python offline gate:
+
+| Fixture/scale | Expected matched outcome |
+| --- | --- |
+| centimetre units, about 11 mm material extent, seam across opposite half-cell boundaries | pass, 2 closed components |
+| same fixture with nodes/primitives reordered | pass, 2 closed components |
+| centimetre units, 40 nm translated seam below the 0.1 um minimum clamp | pass, 2 closed components |
+| centimetre units, same rounded cell but diagonal distance greater than 0.1 um | fail, open component 2 |
+| ten-metre units, two outward shells with a 50 um separation at the 10 um maximum clamp | pass, 2 closed components; panes remain distinct |
+| ten-metre units, translated seam whose metre-space separation exceeds the 10 um clamp | fail, open component 2 |
+| reordered large outward plus smaller inward shells | fail, inward component 2 in both routes |
+| zero or runtime-float-overflow `metresPerUnit` | reject before topology validation |
+
+The prior split-shell, multiple-shell, open, non-manifold, flipped-face, inward, millimetre, valid-transform, negative-determinant, and thin-wall fixtures remain in the same parity gate.
+
+### Verification and unchanged invariants
+
+Focused final implementation-head tests passed:
+
+- Debug runtime/offline CTests: 2/2 in 3.46 s;
+- Release runtime/offline CTests: 2/2 in 3.39 s;
+- direct offline fixture suite: pass;
+- standalone Debug and Release runtime static-GLB contracts: pass.
+
+Fresh normal Host run `reports/foundation-runs/run-20260827-030354` passed at exact implementation commit `0dd96cca9d67eab4899cad1fc729e1038cdf2ac0`:
+
+- shader freshness and all negative safety gates: pass;
+- Windows Debug: 27/27 in 112.52 s;
+- Windows Release: 27/27 in 67.07 s;
+- Windows captures: 13 honestly presented RT frames;
+- independent literal SHA-256 comparison with reviewed Task 5 `run-20260826-213806`: exact 13/13;
+- all six hidden-route dielectric counters: zero;
+- hidden aggregate timing: 6.053500 ms median, GPU RT-command-buffer average 0.866746 ms over 156/155 samples;
+- Android clean Debug, unsigned Release, and Release lint: `BUILD SUCCESSFUL in 3m 18s`, 100 actionable tasks (98 executed, two up-to-date);
+- Windows/Android package and licence gate: pass;
+- evidence hashing: pass; worktree status before and after the run: clean.
+
+Both raygen artifacts are byte-identical to Fix Round 2. Generic remains 789,228 bytes / 43,514 instructions / SHA-256 `f29f2f537883d9e5deb5d56ad74a1cf35b3e88ed16f773e26e8c5092c704f594`; legacy-inactive remains 778,136 bytes / 42,847 instructions / SHA-256 `ac99c30e6f857593df534567a4b5c9efadddc6d8ff92c47b7e033d836edc6ed4`. Generated ABI and the 124-byte push block did not change.
+
+The exact unsigned, unpublishable Android validation artifact is:
+
+- `reports/foundation-runs/run-20260827-030354/artifacts/Horde-Lantern-RT-validation-20260827-030354-Android-UNSIGNED-DO-NOT-PUBLISH.apk`
+- 74,591,164 bytes
+- SHA-256 `e7b09f25c07cc008f112df02fa3bea8354d3810002f479fb5c966b58b3764642`
+
+Final `adb devices -l` returned an empty device list. No installation or phone-runtime evidence is claimed; exact `SM-S948B` acceptance remains the existing hard Task 9 gate. Hands-on perceived glass quality remains an owner boundary. Task 5's two-cut combo owner audio/haptic replay remains separately open and unchanged.
+
+Audio/haptic manual revalidation required: NO — this milestone changes material transport and shader visibility only; audio/haptic state, event timing, playback, spatialisation, and feedback semantics are unchanged.
