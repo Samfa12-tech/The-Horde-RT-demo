@@ -2,6 +2,7 @@
 
 #include "scene/assets/StaticMeshAsset.h"
 #include "vulkan/raytracing/RtSceneAbi.generated.h"
+#include "vulkan/raytracing/RtTextureArrays.h"
 
 #include <array>
 #include <cstdint>
@@ -49,6 +50,7 @@ public:
     {
         return geometryTransforms_;
     }
+    const RtTextureArrayCounts& TextureArrayCounts() const { return textureArrayCounts_; }
     const RtStaticMeshMeasurements& Measurements() const { return measurements_; }
 
 private:
@@ -58,6 +60,7 @@ private:
     std::vector<horde::scene::assets::StaticRtVertex> vertices_;
     std::vector<std::uint32_t> indices_;
     std::vector<std::array<float, 12u>> geometryTransforms_;
+    RtTextureArrayCounts textureArrayCounts_{};
     RtStaticMeshMeasurements measurements_{};
 };
 

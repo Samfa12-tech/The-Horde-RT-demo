@@ -144,6 +144,28 @@ if(BUILD_TESTING)
     )
     add_test(NAME horde_rt_static_gltf_asset_tests COMMAND horde_rt_static_gltf_asset_tests)
 
+    if(WIN32)
+        find_program(HORDE_RT_POWERSHELL_EXECUTABLE NAMES pwsh powershell REQUIRED)
+        add_test(NAME horde_rt_scene_abi_generator_tests
+            COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
+                ${CMAKE_CURRENT_SOURCE_DIR}/tests/RtSceneAbiGeneratorTests.ps1)
+        add_test(NAME horde_rt_static_texture_array_tool_tests
+            COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
+                ${CMAKE_CURRENT_SOURCE_DIR}/tests/StaticTextureArrayToolTests.ps1)
+        add_test(NAME horde_rt_static_preparation_lod_policy_tests
+            COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
+                ${CMAKE_CURRENT_SOURCE_DIR}/tests/StaticAssetPreparationPolicyTests.ps1 -Mode LodBudget)
+        add_test(NAME horde_rt_static_preparation_skip_policy_tests
+            COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
+                ${CMAKE_CURRENT_SOURCE_DIR}/tests/StaticAssetPreparationPolicyTests.ps1 -Mode UnsafeSkip)
+        set_tests_properties(
+            horde_rt_scene_abi_generator_tests
+            horde_rt_static_texture_array_tool_tests
+            horde_rt_static_preparation_lod_policy_tests
+            horde_rt_static_preparation_skip_policy_tests
+            PROPERTIES TIMEOUT 120)
+    endif()
+
     add_executable(horde_rt_simulation_timing_tests tests/SimulationTimingTests.cpp)
     target_include_directories(horde_rt_simulation_timing_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_link_libraries(horde_rt_simulation_timing_tests PRIVATE horde_gameplay_simulation)

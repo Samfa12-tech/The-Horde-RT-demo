@@ -3,14 +3,13 @@ param(
     [Parameter(Mandatory = $true)][string]$SourceGlb,
     [Parameter(Mandatory = $true)][string]$Manifest,
     [Parameter(Mandatory = $true)][string]$OutputDirectory,
-    [string]$BaseColorImage = "",
-    [string]$NormalImage = "",
-    [string]$RoughnessImage = "",
-    [string]$MetallicImage = "",
-    [string]$EmissiveImage = "",
+    [string[]]$BaseColorImage = @(),
+    [string[]]$NormalImage = @(),
+    [string[]]$RoughnessImage = @(),
+    [string[]]$MetallicImage = @(),
+    [string[]]$EmissiveImage = @(),
     [string[]]$ReviewedValidatorIssueCodes = @(),
-    [int]$TextureResolution = 512,
-    [switch]$SkipTextureCompilation
+    [int]$TextureResolution = 512
 )
 
 $ErrorActionPreference = "Stop"
@@ -21,6 +20,22 @@ $outputRoot = [IO.Path]::GetFullPath((Join-Path $repoRoot $OutputDirectory))
 if (-not (Test-Path -LiteralPath $sourcePath)) { throw "Static RT source GLB is missing: $sourcePath" }
 if (-not (Test-Path -LiteralPath $manifestPath)) { throw "Static RT asset manifest is missing: $manifestPath" }
 if ($TextureResolution -lt 1) { throw "TextureResolution must be greater than zero." }
+$manifestData = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
+if (@($manifestData.lods).Count -lt 1) { throw "Asset manifest must define at least one LOD budget." }
+foreach ($lod in @($manifestData.lods)) {
+    if ([int64]$lod.maxTriangles -le 0) {
+        throw "Asset manifest LOD '$($lod.name)' maxTriangles must be greater than zero."
+    }
+}
+$sourceStem = [IO.Path]::GetFileNameWithoutExtension($sourcePath)
+$selectedLods = @($manifestData.lods | Where-Object {
+    -not [string]::IsNullOrWhiteSpace($_.name) -and $sourceStem.Contains([string]$_.name)
+})
+if ($selectedLods.Count -eq 0 -and @($manifestData.lods).Count -eq 1) {
+    $selectedLods = @($manifestData.lods[0])
+}
+if ($selectedLods.Count -ne 1) { throw "Static RT source filename must select exactly one manifest LOD budget." }
+$selectedLod = $selectedLods[0]
 New-Item -ItemType Directory -Force -Path $outputRoot | Out-Null
 
 $nodeToolRoot = Join-Path $repoRoot "build\tools\static-rt-asset-node"
@@ -48,27 +63,79 @@ function Invoke-Validator([string]$assetPath, [string]$reportPath, [string[]]$re
     return $report
 }
 
+function Read-GlbJson([string]$path) {
+    $bytes = [IO.File]::ReadAllBytes($path)
+    if ($bytes.Length -lt 20 -or [BitConverter]::ToUInt32($bytes, 0) -ne 0x46546c67 -or
+        [BitConverter]::ToUInt32($bytes, 4) -ne 2 -or [BitConverter]::ToUInt32($bytes, 16) -ne 0x4e4f534a) {
+        throw "Runtime GLB header is malformed while deriving texture layers."
+    }
+    $jsonLength = [BitConverter]::ToUInt32($bytes, 12)
+    if (20 + $jsonLength -gt $bytes.Length) { throw "Runtime GLB JSON chunk is truncated while deriving texture layers." }
+    return [Text.Encoding]::UTF8.GetString($bytes, 20, $jsonLength).TrimEnd([char]0, ' ') | ConvertFrom-Json
+}
+
+function Get-TextureIndex($view) {
+    if ($null -eq $view -or $null -eq $view.index) { return -1 }
+    return [int]$view.index
+}
+
+function Get-RequiredTextureLayerCounts([string]$runtimeGlb) {
+    $document = Read-GlbJson $runtimeGlb
+    $baseColor = [Collections.Generic.HashSet[string]]::new()
+    $normal = [Collections.Generic.HashSet[string]]::new()
+    $orm = [Collections.Generic.HashSet[string]]::new()
+    $emissive = [Collections.Generic.HashSet[string]]::new()
+    foreach ($material in @($document.materials)) {
+        $baseIndex = Get-TextureIndex $material.pbrMetallicRoughness.baseColorTexture
+        $normalIndex = Get-TextureIndex $material.normalTexture
+        $metallicRoughnessIndex = Get-TextureIndex $material.pbrMetallicRoughness.metallicRoughnessTexture
+        $occlusionIndex = Get-TextureIndex $material.occlusionTexture
+        $emissiveIndex = Get-TextureIndex $material.emissiveTexture
+        if ($baseIndex -ge 0) { $null = $baseColor.Add([string]$baseIndex) }
+        if ($normalIndex -ge 0) { $null = $normal.Add([string]$normalIndex) }
+        if ($metallicRoughnessIndex -ge 0 -or $occlusionIndex -ge 0) {
+            $null = $orm.Add("$metallicRoughnessIndex/$occlusionIndex")
+        }
+        if ($emissiveIndex -ge 0) { $null = $emissive.Add([string]$emissiveIndex) }
+    }
+    return [ordered]@{
+        BaseColor = [Math]::Max($baseColor.Count, 1)
+        Normal = [Math]::Max($normal.Count, 1)
+        Orm = [Math]::Max($orm.Count, 1)
+        Emissive = [Math]::Max($emissive.Count, 1)
+    }
+}
+
+function Resolve-TextureInputs([string[]]$values, [int]$requiredCount, [string]$category) {
+    $provided = @($values | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+    if ($provided.Count -ne $requiredCount) {
+        throw "Static RT $category texture input count $($provided.Count) does not match required array layer count $requiredCount."
+    }
+    $resolved = @($provided | ForEach-Object { [IO.Path]::GetFullPath((Join-Path $repoRoot $_)) })
+    foreach ($path in $resolved) {
+        if (-not (Test-Path -LiteralPath $path)) { throw "Static RT texture source is missing: $path" }
+    }
+    return $resolved
+}
+
 $sourceReportPath = Join-Path $outputRoot "validator-source.json"
 $sourceReport = Invoke-Validator $sourcePath $sourceReportPath $ReviewedValidatorIssueCodes
 
 $runtimeName = ([IO.Path]::GetFileNameWithoutExtension($sourcePath)) + ".runtime.glb"
 $runtimePath = Join-Path $outputRoot $runtimeName
-if ($SkipTextureCompilation) {
-    Copy-Item -LiteralPath $sourcePath -Destination $runtimePath -Force
-} else {
-    $blender = "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe"
-    if (-not (Test-Path -LiteralPath $blender)) { throw "Blender 5.2 is required for audited tangent/socket conversion." }
-    $socketGlb = Join-Path $outputRoot "conversion-with-socket.glb"
-    # Blender Z-up -0.78 exports as glTF +Y-up -0.78, matching the hilt.
-    & $blender --background --python (Join-Path $PSScriptRoot "add-gltf-socket.py") -- `
-        $sourcePath $socketGlb grip 0 0 -0.78
-    if ($LASTEXITCODE -ne 0) { throw "Blender tangent/socket conversion failed." }
-    Copy-Item -LiteralPath $socketGlb -Destination $runtimePath -Force
-}
+$blender = "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe"
+if (-not (Test-Path -LiteralPath $blender)) { throw "Blender 5.2 is required for audited tangent/socket conversion." }
+$temporaryPaths = [Collections.Generic.List[string]]::new()
+$socketGlb = Join-Path $outputRoot "conversion-with-socket.glb"
+$temporaryPaths.Add($socketGlb)
+# Blender Z-up -0.78 exports as glTF +Y-up -0.78, matching the hilt.
+& $blender --background --python (Join-Path $PSScriptRoot "add-gltf-socket.py") -- `
+    $sourcePath $socketGlb grip 0 0 -0.78
+if ($LASTEXITCODE -ne 0) { throw "Blender tangent/socket conversion failed." }
+Copy-Item -LiteralPath $socketGlb -Destination $runtimePath -Force
 
 $runtimeReportPath = Join-Path $outputRoot "validator-runtime.json"
 $runtimeReport = Invoke-Validator $runtimePath $runtimeReportPath $ReviewedValidatorIssueCodes
-$manifestData = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
 if ($runtimeReport.info.totalVertexCount -gt $manifestData.budgets.maxVertices) {
     throw "Runtime GLB exceeds manifest maxVertices capacity."
 }
@@ -82,61 +149,58 @@ if ($runtimeReport.info.drawCallCount -gt $manifestData.budgets.maxPrimitives) {
 if ($runtimeReport.info.materialCount -gt $manifestData.budgets.maxMaterials) {
     throw "Runtime GLB exceeds manifest maxMaterials capacity."
 }
+if ([int64]$runtimeReport.info.totalTriangleCount -gt [int64]$selectedLod.maxTriangles) {
+    throw "Runtime GLB exceeds selected LOD '$($selectedLod.name)' maxTriangles capacity."
+}
 $sourceResolutionImages = @($runtimeReport.info.resources | Where-Object {
     $_.image -and ($_.image.width -gt 4 -or $_.image.height -gt 4)
 })
-if (-not $SkipTextureCompilation -and $sourceResolutionImages.Count -ne 0) {
+if ($sourceResolutionImages.Count -ne 0) {
     throw "Runtime GLB still contains source-resolution image payloads."
 }
 
-$textureRecords = @()
-if (-not $SkipTextureCompilation) {
-    $textureInputs = @($BaseColorImage, $NormalImage, $RoughnessImage, $MetallicImage, $EmissiveImage)
-    if (@($textureInputs | Where-Object { [string]::IsNullOrWhiteSpace($_) }).Count -ne 0) {
-        throw "BaseColorImage, NormalImage, RoughnessImage, MetallicImage, and EmissiveImage are required."
-    }
-    $resolvedInputs = @($textureInputs | ForEach-Object { [IO.Path]::GetFullPath((Join-Path $repoRoot $_)) })
-    foreach ($path in $resolvedInputs) {
-        if (-not (Test-Path -LiteralPath $path)) { throw "Static RT texture source is missing: $path" }
-    }
-    $ormPng = Join-Path $outputRoot "conversion-orm.png"
+$requiredTextureLayers = Get-RequiredTextureLayerCounts $runtimePath
+$baseColorInputs = @(Resolve-TextureInputs $BaseColorImage $requiredTextureLayers.BaseColor "baseColor")
+$normalInputs = @(Resolve-TextureInputs $NormalImage $requiredTextureLayers.Normal "normal")
+$roughnessInputs = @(Resolve-TextureInputs $RoughnessImage $requiredTextureLayers.Orm "roughness/ORM")
+$metallicInputs = @(Resolve-TextureInputs $MetallicImage $requiredTextureLayers.Orm "metallic/ORM")
+$emissiveInputs = @(Resolve-TextureInputs $EmissiveImage $requiredTextureLayers.Emissive "emissive")
+$ormInputs = @()
+for ($layer = 0; $layer -lt $requiredTextureLayers.Orm; ++$layer) {
+    $ormPng = Join-Path $outputRoot "conversion-orm-$layer.png"
+    $temporaryPaths.Add($ormPng)
     & $blender --background --python (Join-Path $PSScriptRoot "compile-orm-texture.py") -- `
-        $resolvedInputs[2] $resolvedInputs[3] $ormPng
-    if ($LASTEXITCODE -ne 0) { throw "Blender failed to compile the ORM source image." }
+        $roughnessInputs[$layer] $metallicInputs[$layer] $ormPng
+    if ($LASTEXITCODE -ne 0) { throw "Blender failed to compile ORM source layer $layer." }
+    $ormInputs += $ormPng
+}
 
-    $ktx = (Get-Command ktx -ErrorAction SilentlyContinue).Source
-    if ([string]::IsNullOrWhiteSpace($ktx)) {
-        $ktx = "C:\Users\sam_s\Documents\Codex\shared-tools\KTX-Software-4.4.2-src\build-local\Release\ktx.exe"
-    }
-    if (-not (Test-Path -LiteralPath $ktx)) { throw "KTX-Software 4.4.2 is required for runtime texture compilation." }
-    $categories = @(
-        @{ Name = "base-color"; Input = $resolvedInputs[0]; Transfer = "srgb"; Windows = "R8G8B8A8_SRGB"; Android = "ASTC_6x6_SRGB_BLOCK" },
-        @{ Name = "normal"; Input = $resolvedInputs[1]; Transfer = "linear"; Windows = "R8G8B8A8_UNORM"; Android = "ASTC_4x4_UNORM_BLOCK" },
-        @{ Name = "orm"; Input = $ormPng; Transfer = "linear"; Windows = "R8G8B8A8_UNORM"; Android = "ASTC_6x6_UNORM_BLOCK" },
-        @{ Name = "emissive"; Input = $resolvedInputs[4]; Transfer = "srgb"; Windows = "R8G8B8A8_SRGB"; Android = "ASTC_6x6_SRGB_BLOCK" }
-    )
-    foreach ($category in $categories) {
-        foreach ($platform in @("windows", "android")) {
-            $format = if ($platform -eq "windows") { $category.Windows } else { $category.Android }
-            $path = Join-Path $outputRoot "$($category.Name).$platform.ktx2"
-            & $ktx create --testrun --format $format --layers 1 --width $TextureResolution --height $TextureResolution `
-                --generate-mipmap --assign-tf $category.Transfer $category.Input $path
-            if ($LASTEXITCODE -ne 0) { throw "KTX2 compilation failed for $($category.Name) $platform." }
-            & $ktx validate $path
-            if ($LASTEXITCODE -ne 0) { throw "KTX2 validation failed for $path" }
-            $file = Get-Item -LiteralPath $path
-            $textureRecords += [ordered]@{
-                category = $category.Name
-                platform = $platform
-                format = $format
-                layers = 1
-                width = $TextureResolution
-                height = $TextureResolution
-                mipmapped = $true
-                bytes = $file.Length
-                sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $path).Hash.ToLowerInvariant()
-                file = $file.Name
-            }
+$textureRecords = @()
+$categories = @(
+    @{ Name = "base-color"; Inputs = $baseColorInputs; Transfer = "srgb"; Windows = "R8G8B8A8_SRGB"; Android = "ASTC_6x6_SRGB_BLOCK" },
+    @{ Name = "normal"; Inputs = $normalInputs; Transfer = "linear"; Windows = "R8G8B8A8_UNORM"; Android = "ASTC_4x4_UNORM_BLOCK" },
+    @{ Name = "orm"; Inputs = $ormInputs; Transfer = "linear"; Windows = "R8G8B8A8_UNORM"; Android = "ASTC_6x6_UNORM_BLOCK" },
+    @{ Name = "emissive"; Inputs = $emissiveInputs; Transfer = "srgb"; Windows = "R8G8B8A8_SRGB"; Android = "ASTC_6x6_SRGB_BLOCK" }
+)
+foreach ($category in $categories) {
+    foreach ($platform in @("windows", "android")) {
+        $format = if ($platform -eq "windows") { $category.Windows } else { $category.Android }
+        $path = Join-Path $outputRoot "$($category.Name).$platform.ktx2"
+        & (Join-Path $PSScriptRoot "compile-static-texture-array.ps1") `
+            -InputPaths $category.Inputs -OutputPath $path -Format $format `
+            -Transfer $category.Transfer -Width $TextureResolution -Height $TextureResolution
+        $file = Get-Item -LiteralPath $path
+        $textureRecords += [ordered]@{
+            category = $category.Name
+            platform = $platform
+            format = $format
+            layers = @($category.Inputs).Count
+            width = $TextureResolution
+            height = $TextureResolution
+            mipmapped = $true
+            bytes = $file.Length
+            sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $path).Hash.ToLowerInvariant()
+            file = $file.Name
         }
     }
 }
@@ -170,9 +234,11 @@ $budgetReport = [ordered]@{
 }
 $budgetPath = Join-Path $outputRoot "runtime-budget.json"
 $budgetReport | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $budgetPath -Encoding utf8
-Copy-Item -LiteralPath $manifestPath -Destination (Join-Path $outputRoot "asset.manifest.json") -Force
-foreach ($temporaryName in @("conversion-with-socket.glb", "conversion-orm.png")) {
-    $temporaryPath = Join-Path $outputRoot $temporaryName
+$manifestDestination = Join-Path $outputRoot "asset.manifest.json"
+if ([IO.Path]::GetFullPath($manifestPath) -ne [IO.Path]::GetFullPath($manifestDestination)) {
+    Copy-Item -LiteralPath $manifestPath -Destination $manifestDestination -Force
+}
+foreach ($temporaryPath in $temporaryPaths) {
     if (Test-Path -LiteralPath $temporaryPath) { Remove-Item -LiteralPath $temporaryPath -Force }
 }
 Write-Output "Prepared development-only static RT asset: $runtimePath"

@@ -50,6 +50,7 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
     vertices_.clear();
     indices_.clear();
     geometryTransforms_.clear();
+    textureArrayCounts_ = {};
     measurements_ = {};
 
     std::array<bool, kRtInstanceMetadataCapacity> occupied{};
@@ -168,11 +169,10 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
                 diagnostic = "RtStaticMeshSlot primitive references an out-of-range node transform.";
                 return false;
             }
-            const auto& matrix = asset.nodeTransforms[primitive.nodeTransformIndex].world;
             geometryTransforms_.push_back({{
-                matrix[0], matrix[4], matrix[8], matrix[12],
-                matrix[1], matrix[5], matrix[9], matrix[13],
-                matrix[2], matrix[6], matrix[10], matrix[14]}});
+                1.0f, 0.0f, 0.0f, 0.0f,
+                0.0f, 1.0f, 0.0f, 0.0f,
+                0.0f, 0.0f, 1.0f, 0.0f}});
         }
         routes.emplace(&asset, AssetRoute{
             static_cast<std::uint32_t>(assetIndex), primitiveBase,
@@ -187,6 +187,9 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
             registration.stableObjectId, registration.flags,
             registration.emitterIndex, route.assetIndex, 0u, 0u};
     }
+    textureArrayCounts_ = {
+        nextTextureLayers[0], nextTextureLayers[1],
+        nextTextureLayers[2], nextTextureLayers[3]};
     measurements_.vertexBytes = vertices_.size() * sizeof(horde::scene::assets::StaticRtVertex);
     measurements_.indexBytes = indices_.size() * sizeof(std::uint32_t);
     measurements_.materialBytes = materials_.size() * sizeof(RtMaterialGpu);

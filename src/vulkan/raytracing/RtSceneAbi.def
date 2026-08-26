@@ -31,5 +31,50 @@
     "normalTexture": 16,
     "ormTexture": 32,
     "emissiveTexture": 64
-  }
+  },
+  "records": [
+    {
+      "name": "StaticRtVertex", "alignment": 16, "size": 64,
+      "fields": [
+        { "name": "position", "type": "float4", "offset": 0 },
+        { "name": "normal", "type": "float4", "offset": 16 },
+        { "name": "tangent", "type": "float4", "offset": 32 },
+        { "name": "uv0", "type": "float4", "offset": 48 }
+      ]
+    },
+    {
+      "name": "RtInstanceMetadata", "alignment": 16, "size": 32,
+      "fields": [
+        { "name": "primitiveBase", "type": "uint", "offset": 0 },
+        { "name": "primitiveCount", "type": "uint", "offset": 4 },
+        { "name": "stableObjectId", "type": "uint", "offset": 8 },
+        { "name": "flags", "type": "uint", "offset": 12 },
+        { "name": "emitterIndex", "type": "uint", "offset": 16 },
+        { "name": "assetIndex", "type": "uint", "offset": 20 },
+        { "name": "reserved0", "type": "uint", "offset": 24 },
+        { "name": "reserved1", "type": "uint", "offset": 28 }
+      ]
+    },
+    {
+      "name": "RtPrimitiveMetadata", "alignment": 16, "size": 16,
+      "fields": [
+        { "name": "vertexOffset", "type": "uint", "offset": 0 },
+        { "name": "indexOffset", "type": "uint", "offset": 4 },
+        { "name": "indexCount", "type": "uint", "offset": 8 },
+        { "name": "materialIndex", "type": "uint", "offset": 12 }
+      ]
+    },
+    {
+      "name": "RtMaterialGpu", "alignment": 16, "size": 112,
+      "fields": [
+        { "name": "baseColorFactor", "type": "float4", "offset": 0 },
+        { "name": "emissiveFactorStrength", "type": "float4", "offset": 16 },
+        { "name": "metallicRoughnessOcclusionTransmission", "type": "float4", "offset": 32 },
+        { "name": "iorThicknessAttenuationDistance", "type": "float4", "offset": 48 },
+        { "name": "attenuationColor", "type": "float4", "offset": 64 },
+        { "name": "textureLayers", "type": "uint4", "offset": 80 },
+        { "name": "materialFlags", "type": "uint4", "offset": 96 }
+      ]
+    }
+  ]
 }

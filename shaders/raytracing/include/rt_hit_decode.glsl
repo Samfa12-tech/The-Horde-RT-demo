@@ -453,17 +453,17 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
         h.position = origin + direction * h.t;
         materialForPrimitive(h.primitive, h.instance, h.position, h.material, h.normal, h.geometricNormal, h.base, h.metallic, h.reflectivity, h.emissive);
         RtInstanceMetadata instanceMetadata = rtInstances.values[h.instance];
-        if ((instanceMetadata.geometry.w & kRtInstanceFlagStaticPbr) != 0u)
+        if ((instanceMetadata.flags & kRtInstanceFlagStaticPbr) != 0u)
         {
             uint geometryIndex = rayQueryGetIntersectionGeometryIndexEXT(query, true);
-            if (geometryIndex < instanceMetadata.geometry.y)
+            if (geometryIndex < instanceMetadata.primitiveCount)
             {
                 RtPrimitiveMetadata primitiveMetadata =
-                    rtPrimitives.values[instanceMetadata.geometry.x + geometryIndex];
-                uint triangleIndex = primitiveMetadata.geometry.y + uint(h.primitive) * 3u;
-                uint i0 = primitiveMetadata.geometry.x + rtStaticIndices.values[triangleIndex];
-                uint i1 = primitiveMetadata.geometry.x + rtStaticIndices.values[triangleIndex + 1u];
-                uint i2 = primitiveMetadata.geometry.x + rtStaticIndices.values[triangleIndex + 2u];
+                    rtPrimitives.values[instanceMetadata.primitiveBase + geometryIndex];
+                uint triangleIndex = primitiveMetadata.indexOffset + uint(h.primitive) * 3u;
+                uint i0 = primitiveMetadata.vertexOffset + rtStaticIndices.values[triangleIndex];
+                uint i1 = primitiveMetadata.vertexOffset + rtStaticIndices.values[triangleIndex + 1u];
+                uint i2 = primitiveMetadata.vertexOffset + rtStaticIndices.values[triangleIndex + 2u];
                 vec2 bary = rayQueryGetIntersectionBarycentricsEXT(query, true);
                 vec3 weights = vec3(1.0 - bary.x - bary.y, bary.x, bary.y);
                 StaticRtVertex v0 = rtStaticVertices.values[i0];
@@ -484,7 +484,7 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
                 vec3 worldBitangent = normalize(cross(worldNormal, worldTangent)) *
                                       (localTangent.w < 0.0 ? -1.0 : 1.0);
                 RtMaterialGpu staticMaterial =
-                    rtMaterials.values[primitiveMetadata.geometry.w];
+                    rtMaterials.values[primitiveMetadata.materialIndex];
                 vec3 sampledNormal = (staticMaterial.materialFlags.x &
                     kRtMaterialFlagNormalTexture) != 0u
                     ? texture(rtNormalTextures,
@@ -512,7 +512,7 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
                     ? texture(rtEmissiveTextures,
                         vec3(uv, float(staticMaterial.textureLayers.w))).rgb
                     : vec3(1.0);
-                h.material = 100 + int(primitiveMetadata.geometry.w);
+                h.material = 100 + int(primitiveMetadata.materialIndex);
                 h.base = baseSample.rgb * staticMaterial.baseColorFactor.rgb *
                          mix(1.0, orm.r, staticMaterial.metallicRoughnessOcclusionTransmission.z);
                 h.metallic = clamp(orm.b *

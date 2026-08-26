@@ -4,6 +4,7 @@
 #include <array>
 #include <cmath>
 #include <cstdint>
+#include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -46,6 +47,17 @@ void AppendU32(std::vector<std::uint8_t>& bytes, std::uint32_t value)
     bytes.push_back(static_cast<std::uint8_t>((value >> 8u) & 0xffu));
     bytes.push_back(static_cast<std::uint8_t>((value >> 16u) & 0xffu));
     bytes.push_back(static_cast<std::uint8_t>((value >> 24u) & 0xffu));
+}
+
+void WriteFloat(std::vector<std::uint8_t>& bytes, std::size_t offset, float value)
+{
+    static_assert(sizeof(float) == 4u);
+    std::memcpy(bytes.data() + offset, &value, sizeof(value));
+}
+
+bool NearlyEqual(float actual, float expected, float epsilon = 0.00001f)
+{
+    return std::abs(actual - expected) <= epsilon;
 }
 
 void WriteBytes(const std::filesystem::path& path, const std::vector<std::uint8_t>& bytes)
@@ -193,6 +205,9 @@ void TestManifestContract(const std::filesystem::path& temporaryRoot)
         RewriteManifest(temporaryRoot, "bad-budget.manifest.json", "\"maxVertices\": 16", "\"maxVertices\": 0"),
         "Asset manifest budgets must all be greater than zero.");
     ExpectManifestFailure(
+        RewriteManifest(temporaryRoot, "zero-lod.manifest.json", "\"maxTriangles\": 8", "\"maxTriangles\": 0"),
+        "Asset manifest LOD 'lod0' maxTriangles must be greater than zero.");
+    ExpectManifestFailure(
         RewriteManifest(temporaryRoot, "bad-profile.manifest.json", "\"android\": \"astc\"", "\"android\": \"rgba8\""),
         "Asset manifest runtimeTextureProfile must be Android ASTC, Windows RGBA8, and mipmapped.");
 }
@@ -222,9 +237,12 @@ void TestAcceptedStaticGlbContract(const horde::scene::assets::AssetManifest& ma
               asset.nodeTransforms[2].world[12] == 4.0f && asset.nodeTransforms[2].world[13] == 5.0f &&
               asset.nodeTransforms[2].world[14] == 6.0f,
           "node TRS and matrix transforms use the glTF column-major contract");
-    Check(asset.bounds.minimum[0] == 0.0f && asset.bounds.minimum[1] == 0.0f &&
-              asset.bounds.maximum[0] == 1.0f && asset.bounds.maximum[1] == 1.0f,
-          "asset bounds are computed from real positions");
+    Check(asset.vertices[0].position == std::array<float, 4u>{{1.0f, 2.0f, 3.0f, 1.0f}} &&
+              asset.vertices[4].position == std::array<float, 4u>{{4.0f, 5.0f, 6.0f, 1.0f}},
+          "node transforms are baked exactly once into runtime positions");
+    Check(asset.bounds.minimum == std::array<float, 3u>{{1.0f, 2.0f, 3.0f}} &&
+              asset.bounds.maximum == std::array<float, 3u>{{5.0f, 6.0f, 6.0f}},
+          "asset bounds are computed from baked positions");
     Check(asset.materials.size() == 1u, "one PBR material is retained");
     if (!asset.materials.empty())
     {
@@ -242,6 +260,70 @@ void TestAcceptedStaticGlbContract(const horde::scene::assets::AssetManifest& ma
         Check(material.baseColorTexture == 0 && material.normalTexture == 0 &&
                   material.ormTexture == 0 && material.emissiveTexture == 0,
               "four runtime texture categories receive deterministic layers");
+    }
+}
+
+void TestBakedNodeTransformAndUnitScale(const std::filesystem::path& temporaryRoot)
+{
+    constexpr float kInvSqrtTwo = 0.70710678118f;
+    auto parts = ReadGlbParts();
+    for (std::size_t vertexIndex = 0u; vertexIndex < 4u; ++vertexIndex)
+    {
+        const std::size_t normalOffset = 48u + vertexIndex * 12u;
+        WriteFloat(parts.binary, normalOffset, kInvSqrtTwo);
+        WriteFloat(parts.binary, normalOffset + 4u, 0.0f);
+        WriteFloat(parts.binary, normalOffset + 8u, kInvSqrtTwo);
+        const std::size_t tangentOffset = 96u + vertexIndex * 16u;
+        WriteFloat(parts.binary, tangentOffset, kInvSqrtTwo);
+        WriteFloat(parts.binary, tangentOffset + 4u, 0.0f);
+        WriteFloat(parts.binary, tangentOffset + 8u, -kInvSqrtTwo);
+        WriteFloat(parts.binary, tangentOffset + 12u, 1.0f);
+    }
+    const std::string_view sourceMatrix =
+        "\"matrix\":[1,0,0,0,0,1,0,0,0,0,1,0,4,5,6,1]";
+    const std::string_view transformedMatrix =
+        "\"matrix\":[2,0,0,0,0,0,3,0,0,-4,0,0,4,5,6,1]";
+    const auto matrixOffset = parts.json.find(sourceMatrix);
+    Check(matrixOffset != std::string::npos, "node transform mutation source exists");
+    if (matrixOffset != std::string::npos)
+        parts.json.replace(matrixOffset, sourceMatrix.size(), transformedMatrix);
+    const auto transformedGlb = temporaryRoot / "rotated-nonuniform.glb";
+    WriteGlb(transformedGlb, std::move(parts.json), std::move(parts.binary));
+
+    const auto scaledManifestPath = RewriteManifest(
+        temporaryRoot, "two-metres.manifest.json", "\"metresPerUnit\": 1.0", "\"metresPerUnit\": 2.0");
+    horde::scene::assets::AssetManifest manifest;
+    std::string diagnostic;
+    Check(horde::scene::assets::AssetManifest::Load(scaledManifestPath, manifest, diagnostic),
+          std::string("two-metre manifest loads: ") + diagnostic);
+    horde::scene::assets::StaticMeshAsset asset;
+    Check(horde::scene::assets::StaticMeshAsset::Load(
+              transformedGlb, manifest, asset, diagnostic),
+          std::string("rotated non-uniform GLB loads: ") + diagnostic);
+    if (asset.vertices.size() >= 6u && asset.nodeTransforms.size() >= 3u && !asset.sockets.empty())
+    {
+        Check(asset.nodeTransforms[0].world[12] == 2.0f &&
+                  asset.nodeTransforms[0].world[13] == 4.0f &&
+                  asset.nodeTransforms[0].world[14] == 6.0f &&
+                  asset.nodeTransforms[2].world[12] == 8.0f &&
+                  asset.nodeTransforms[2].world[13] == 10.0f &&
+                  asset.nodeTransforms[2].world[14] == 12.0f,
+              "metresPerUnit scales every node world translation");
+        Check(asset.sockets[0].world[12] == 2.0f &&
+                  asset.sockets[0].world[13] == 4.0f &&
+                  asset.sockets[0].world[14] == 6.0f,
+              "metresPerUnit scales socket world translation");
+        Check(asset.vertices[4].position == std::array<float, 4u>{{8.0f, 10.0f, 12.0f, 1.0f}} &&
+                  asset.vertices[5].position == std::array<float, 4u>{{12.0f, 10.0f, 12.0f, 1.0f}},
+              "rotation, non-uniform scale, translation, and unit scale bake into positions once");
+        Check(NearlyEqual(asset.vertices[4].normal[0], 0.89442719f) &&
+                  NearlyEqual(asset.vertices[4].normal[1], -0.44721359f) &&
+                  NearlyEqual(asset.vertices[4].normal[2], 0.0f),
+              "inverse-transpose produces the hand-checked non-uniform rotated normal");
+        Check(NearlyEqual(asset.vertices[4].tangent[0], 0.44721359f) &&
+                  NearlyEqual(asset.vertices[4].tangent[1], 0.89442719f) &&
+                  NearlyEqual(asset.vertices[4].tangent[2], 0.0f),
+              "node linear transform produces the hand-checked tangent");
     }
 }
 
@@ -348,16 +430,36 @@ void TestBudgetFailures(const std::filesystem::path& temporaryRoot,
     textureParts.json.replace(adjustedBaseColorOffset,
                               std::string_view("\"baseColorTexture\":{\"index\":0}").size(),
                               "\"baseColorTexture\":{\"index\":1}");
-    const auto textureOverflow = temporaryRoot / "texture-overflow.glb";
-    WriteGlb(textureOverflow, std::move(textureParts.json), std::move(textureParts.binary));
+    const auto categoryLocalTexture = temporaryRoot / "category-local-texture.glb";
+    WriteGlb(categoryLocalTexture, textureParts.json, textureParts.binary);
     const auto textureManifest = RewriteManifest(
         temporaryRoot, "texture-budget.manifest.json", "\"maxTextureLayersPerKind\": 4", "\"maxTextureLayersPerKind\": 1");
     Check(AssetManifest::Load(textureManifest, manifest, diagnostic), "texture budget manifest loads");
-    // A single material references one layer, so the valid fixture is the exact boundary.
     horde::scene::assets::StaticMeshAsset boundaryAsset;
     Check(horde::scene::assets::StaticMeshAsset::Load(
-              kFixtureRoot / "valid-multi.glb", manifest, boundaryAsset, diagnostic),
-          "one texture layer meets a capacity of one");
+              categoryLocalTexture, manifest, boundaryAsset, diagnostic),
+          std::string("one category-local layer meets a capacity of one even at global texture index 1: ") + diagnostic);
+    Check(!boundaryAsset.materials.empty() && boundaryAsset.materials[0].baseColorTexture == 0,
+          "global glTF texture index 1 is remapped to category-local baseColor layer 0");
+
+    const auto materialsOffset = textureParts.json.find("}],\"meshes\"");
+    Check(materialsOffset != std::string::npos, "texture material overflow mutation source exists");
+    if (materialsOffset != std::string::npos)
+    {
+        textureParts.json.replace(
+            materialsOffset, std::string_view("}],\"meshes\"").size(),
+            "},{\"name\":\"SecondBaseColor\",\"pbrMetallicRoughness\":{\"baseColorTexture\":{\"index\":0}}}],\"meshes\"");
+    }
+    const auto secondPrimitiveOffset = textureParts.json.find("\"indices\":5,\"material\":0");
+    Check(secondPrimitiveOffset != std::string::npos, "second primitive material mutation source exists");
+    if (secondPrimitiveOffset != std::string::npos)
+    {
+        textureParts.json.replace(secondPrimitiveOffset,
+                                  std::string_view("\"indices\":5,\"material\":0").size(),
+                                  "\"indices\":5,\"material\":1");
+    }
+    const auto textureOverflow = temporaryRoot / "texture-overflow.glb";
+    WriteGlb(textureOverflow, std::move(textureParts.json), std::move(textureParts.binary));
     ExpectAssetFailure(textureOverflow, manifest,
                        "Static GLB exceeds manifest maxTextureLayersPerKind capacity for baseColor.");
 
@@ -366,6 +468,12 @@ void TestBudgetFailures(const std::filesystem::path& temporaryRoot,
     Check(AssetManifest::Load(indexManifest, manifest, diagnostic), "index budget manifest loads");
     ExpectAssetFailure(kFixtureRoot / "valid-multi.glb", manifest,
                        "Static GLB exceeds manifest maxIndices capacity.");
+
+    const auto lodManifest = RewriteManifest(
+        temporaryRoot, "lod-budget.manifest.json", "\"maxTriangles\": 8", "\"maxTriangles\": 3");
+    Check(AssetManifest::Load(lodManifest, manifest, diagnostic), "LOD budget manifest loads");
+    ExpectAssetFailure(kFixtureRoot / "valid-multi.glb", manifest,
+                       "Static GLB exceeds selected LOD 'lod0' maxTriangles capacity.");
 
     const auto socketManifestPath = RewriteManifest(
         temporaryRoot, "socket.manifest.json", "[\"grip\"]", "[\"blade_grip\"]");
@@ -398,6 +506,7 @@ int main()
     else
     {
         TestAcceptedStaticGlbContract(manifest);
+        TestBakedNodeTransformAndUnitScale(temporaryRoot);
         TestMalformedAndUnsupportedGlbs(temporaryRoot, manifest);
         TestBudgetFailures(temporaryRoot, manifest);
     }

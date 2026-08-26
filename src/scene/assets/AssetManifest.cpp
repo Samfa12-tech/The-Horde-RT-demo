@@ -253,6 +253,15 @@ bool AssetManifest::Load(const std::filesystem::path& path,
         diagnostic = "Asset manifest must define at least one LOD budget.";
         return false;
     }
+    for (const AssetLodBudget& lod : manifest.lods)
+    {
+        if (lod.maxTriangles == 0u)
+        {
+            diagnostic = "Asset manifest LOD '" + lod.name +
+                         "' maxTriangles must be greater than zero.";
+            return false;
+        }
+    }
     if (manifest.textureProfile.androidEncoding != "astc" ||
         manifest.textureProfile.windowsEncoding != "rgba8" ||
         !manifest.textureProfile.mipmapped)

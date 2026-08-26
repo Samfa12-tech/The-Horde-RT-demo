@@ -9,6 +9,7 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <vector>
 
 namespace
@@ -31,10 +32,10 @@ horde::scene::assets::StaticMeshAsset MakeAsset(std::size_t primitiveCount,
     horde::scene::assets::StaticMeshAsset asset;
     horde::scene::assets::StaticNodeTransform root;
     root.name = "Root";
-    root.world = {{1.0f, 0.0f, 0.0f, 0.0f,
-                   0.0f, 1.0f, 0.0f, 0.0f,
-                   0.0f, 0.0f, 1.0f, 0.0f,
-                   0.0f, 0.0f, 0.0f, 1.0f}};
+    root.world = {{2.0f, 0.0f, 0.0f, 0.0f,
+                   0.0f, 3.0f, 0.0f, 0.0f,
+                   0.0f, 0.0f, 4.0f, 0.0f,
+                   5.0f, 6.0f, 7.0f, 1.0f}};
     asset.nodeTransforms.push_back(root);
     asset.vertices.resize(primitiveCount * 3u);
     asset.indices.resize(primitiveCount * 3u);
@@ -57,6 +58,14 @@ horde::scene::assets::StaticMeshAsset MakeAsset(std::size_t primitiveCount,
 void TestAbiLayout()
 {
     using namespace horde::vulkan::raytracing;
+    Check((std::is_same_v<horde::scene::assets::StaticRtVertex, StaticRtVertex>),
+          "StaticMeshAsset uses the generated StaticRtVertex ABI type");
+    Check(sizeof(StaticRtVertex) == 64u &&
+              offsetof(StaticRtVertex, position) == 0u &&
+              offsetof(StaticRtVertex, normal) == 16u &&
+              offsetof(StaticRtVertex, tangent) == 32u &&
+              offsetof(StaticRtVertex, uv0) == 48u,
+          "generated StaticRtVertex matches four hand-checked vec4 fields");
     Check(sizeof(RtInstanceMetadata) == 32u, "RtInstanceMetadata size is 32 bytes");
     Check(offsetof(RtInstanceMetadata, primitiveBase) == 0u &&
               offsetof(RtInstanceMetadata, primitiveCount) == 4u &&
@@ -147,12 +156,17 @@ void TestGenericRegistrationAndMeasurements()
                   1.0f, 0.0f, 0.0f, 0.0f,
                   0.0f, 1.0f, 0.0f, 0.0f,
                   0.0f, 0.0f, 1.0f, 0.0f}},
-          "multi-geometry BLAS transforms retain each primitive node matrix");
+          "baked geometry uses identity BLAS transforms so node transforms are not applied twice");
     Check(slot.Materials()[0].textureLayers == std::array<std::uint32_t, 4u>{{0u, 0u, 0u, 0u}} &&
               slot.Materials()[1].textureLayers == std::array<std::uint32_t, 4u>{{0u, 1u, 0u, 0u}} &&
               slot.Materials()[0].materialFlags[0] == (8u | 16u | 32u | 64u) &&
               slot.Materials()[1].materialFlags[0] == (8u | 16u),
           "texture layers are dense per PBR category and presence is explicit");
+    Check(slot.TextureArrayCounts().baseColor == 1u &&
+              slot.TextureArrayCounts().normal == 2u &&
+              slot.TextureArrayCounts().orm == 1u &&
+              slot.TextureArrayCounts().emissive == 1u,
+          "Vulkan array layer counts exactly cover every metadata layer");
     Check(slot.Measurements().vertexBytes == 6u * 64u &&
               slot.Measurements().indexBytes == 6u * 4u &&
               slot.Measurements().materialBytes == 2u * 112u &&
@@ -198,6 +212,14 @@ void TestNamedCapacityFailures()
     Check(!slot.Initialize(std::span<const StaticRtAssetRegistration>(&materialRequest, 1u), diagnostic) &&
               diagnostic == "RtStaticMeshSlot capacity overflow: materials exceed 32.",
           "material overflow fails initialization by name");
+
+    auto textureOverflow = MakeAsset(1u, 17u);
+    for (std::size_t materialIndex = 0u; materialIndex < textureOverflow.materials.size(); ++materialIndex)
+        textureOverflow.materials[materialIndex].baseColorTexture = static_cast<std::int32_t>(materialIndex);
+    StaticRtAssetRegistration textureRequest{3u, 1u, 1u, 0u, &textureOverflow};
+    Check(!slot.Initialize(std::span<const StaticRtAssetRegistration>(&textureRequest, 1u), diagnostic) &&
+              diagnostic == "RtStaticMeshSlot capacity overflow: baseColor texture layers exceed 16.",
+          "metadata cannot assign a texture layer outside the fixed Vulkan array");
 }
 
 void TestTextureArrayCapacities()

@@ -9,7 +9,9 @@
 #include <cmath>
 #include <cstddef>
 #include <limits>
+#include <map>
 #include <string_view>
+#include <utility>
 
 namespace horde::scene::assets
 {
@@ -35,11 +37,23 @@ std::size_t AccessorIndex(const cgltf_data& data, const cgltf_accessor* accessor
                                : static_cast<std::size_t>(accessor - data.accessors);
 }
 
-std::int32_t TextureLayer(const cgltf_data& data, const cgltf_texture_view& view)
+std::int32_t TextureIndex(const cgltf_data& data, const cgltf_texture_view& view)
 {
     return view.texture == nullptr
         ? -1
         : static_cast<std::int32_t>(view.texture - data.textures);
+}
+
+using TextureKey = std::pair<std::int32_t, std::int32_t>;
+using TextureLayerRoutes = std::array<std::map<TextureKey, std::int32_t>, 4u>;
+
+std::int32_t CategoryTextureLayer(std::map<TextureKey, std::int32_t>& routes,
+                                  TextureKey key)
+{
+    if (key.first < 0 && key.second < 0) return -1;
+    const auto [entry, inserted] = routes.try_emplace(
+        key, static_cast<std::int32_t>(routes.size()));
+    return entry->second;
 }
 
 bool ValidateAttribute(const cgltf_data& data,
@@ -72,6 +86,81 @@ bool UnpackFloats(const cgltf_accessor& accessor,
     return true;
 }
 
+std::array<float, 3u> TransformPoint(const std::array<float, 16u>& matrix,
+                                    const float* point,
+                                    float metresPerUnit)
+{
+    return {{
+        matrix[0] * point[0] * metresPerUnit +
+            matrix[4] * point[1] * metresPerUnit +
+            matrix[8] * point[2] * metresPerUnit + matrix[12],
+        matrix[1] * point[0] * metresPerUnit +
+            matrix[5] * point[1] * metresPerUnit +
+            matrix[9] * point[2] * metresPerUnit + matrix[13],
+        matrix[2] * point[0] * metresPerUnit +
+            matrix[6] * point[1] * metresPerUnit +
+            matrix[10] * point[2] * metresPerUnit + matrix[14]}};
+}
+
+std::array<float, 3u> Cross(const std::array<float, 3u>& left,
+                           const std::array<float, 3u>& right)
+{
+    return {{left[1] * right[2] - left[2] * right[1],
+             left[2] * right[0] - left[0] * right[2],
+             left[0] * right[1] - left[1] * right[0]}};
+}
+
+float Dot(const std::array<float, 3u>& left, const std::array<float, 3u>& right)
+{
+    return left[0] * right[0] + left[1] * right[1] + left[2] * right[2];
+}
+
+bool Normalize(std::array<float, 3u>& vector)
+{
+    const float lengthSquared = Dot(vector, vector);
+    if (!std::isfinite(lengthSquared) || lengthSquared <= 1.0e-20f) return false;
+    const float inverseLength = 1.0f / std::sqrt(lengthSquared);
+    for (float& component : vector) component *= inverseLength;
+    return true;
+}
+
+bool TransformNormal(const std::array<float, 16u>& matrix,
+                     const float* normal,
+                     std::array<float, 3u>& transformed)
+{
+    const std::array<float, 3u> column0{{matrix[0], matrix[1], matrix[2]}};
+    const std::array<float, 3u> column1{{matrix[4], matrix[5], matrix[6]}};
+    const std::array<float, 3u> column2{{matrix[8], matrix[9], matrix[10]}};
+    const auto cofactor0 = Cross(column1, column2);
+    const auto cofactor1 = Cross(column2, column0);
+    const auto cofactor2 = Cross(column0, column1);
+    const float determinant = Dot(column0, cofactor0);
+    if (!std::isfinite(determinant) || std::abs(determinant) <= 1.0e-20f) return false;
+    const float inverseDeterminant = 1.0f / determinant;
+    for (std::size_t axis = 0u; axis < 3u; ++axis)
+    {
+        transformed[axis] = (cofactor0[axis] * normal[0] +
+                             cofactor1[axis] * normal[1] +
+                             cofactor2[axis] * normal[2]) * inverseDeterminant;
+    }
+    return Normalize(transformed);
+}
+
+bool TransformTangent(const std::array<float, 16u>& matrix,
+                      const float* tangent,
+                      const std::array<float, 3u>& transformedNormal,
+                      std::array<float, 3u>& transformed)
+{
+    transformed = {{
+        matrix[0] * tangent[0] + matrix[4] * tangent[1] + matrix[8] * tangent[2],
+        matrix[1] * tangent[0] + matrix[5] * tangent[1] + matrix[9] * tangent[2],
+        matrix[2] * tangent[0] + matrix[6] * tangent[1] + matrix[10] * tangent[2]}};
+    const float normalProjection = Dot(transformed, transformedNormal);
+    for (std::size_t axis = 0u; axis < 3u; ++axis)
+        transformed[axis] -= transformedNormal[axis] * normalProjection;
+    return Normalize(transformed);
+}
+
 bool CheckTextureCapacity(std::int32_t layer,
                           std::uint32_t capacity,
                           std::string_view category,
@@ -86,7 +175,9 @@ bool CheckTextureCapacity(std::int32_t layer,
     return true;
 }
 
-StaticMaterial ConvertMaterial(const cgltf_data& data, const cgltf_material& source)
+StaticMaterial ConvertMaterial(const cgltf_data& data,
+                               const cgltf_material& source,
+                               TextureLayerRoutes& textureRoutes)
 {
     StaticMaterial result;
     if (source.name != nullptr) result.name = source.name;
@@ -96,15 +187,22 @@ StaticMaterial ConvertMaterial(const cgltf_data& data, const cgltf_material& sou
                     result.baseColorFactor.begin());
         result.metallicFactor = source.pbr_metallic_roughness.metallic_factor;
         result.roughnessFactor = source.pbr_metallic_roughness.roughness_factor;
-        result.baseColorTexture = TextureLayer(data, source.pbr_metallic_roughness.base_color_texture);
-        result.ormTexture = TextureLayer(data, source.pbr_metallic_roughness.metallic_roughness_texture);
+        result.baseColorTexture = CategoryTextureLayer(
+            textureRoutes[0], {TextureIndex(data, source.pbr_metallic_roughness.base_color_texture), -1});
     }
     std::copy_n(source.emissive_factor, 3u, result.emissiveFactor.begin());
-    result.normalTexture = TextureLayer(data, source.normal_texture);
-    result.emissiveTexture = TextureLayer(data, source.emissive_texture);
+    result.normalTexture = CategoryTextureLayer(
+        textureRoutes[1], {TextureIndex(data, source.normal_texture), -1});
+    result.ormTexture = CategoryTextureLayer(
+        textureRoutes[2],
+        {source.has_pbr_metallic_roughness
+             ? TextureIndex(data, source.pbr_metallic_roughness.metallic_roughness_texture)
+             : -1,
+         TextureIndex(data, source.occlusion_texture)});
+    result.emissiveTexture = CategoryTextureLayer(
+        textureRoutes[3], {TextureIndex(data, source.emissive_texture), -1});
     result.occlusionStrength = source.occlusion_texture.texture != nullptr
         ? source.occlusion_texture.scale : 1.0f;
-    if (result.ormTexture < 0) result.ormTexture = TextureLayer(data, source.occlusion_texture);
     if (source.has_transmission) result.transmissionFactor = source.transmission.transmission_factor;
     if (source.has_ior) result.ior = source.ior.ior;
     if (source.has_volume)
@@ -213,11 +311,32 @@ bool StaticMeshAsset::Load(const std::filesystem::path& runtimeGlb,
         diagnostic = "Static GLB exceeds manifest maxMaterials capacity.";
         return false;
     }
+    const AssetLodBudget* selectedLod = nullptr;
+    if (manifest.lods.size() == 1u)
+    {
+        selectedLod = &manifest.lods.front();
+    }
+    else
+    {
+        const std::string filename = runtimeGlb.filename().string();
+        const auto match = std::find_if(
+            manifest.lods.begin(), manifest.lods.end(),
+            [&filename](const AssetLodBudget& lod) {
+                return !lod.name.empty() && filename.find(lod.name) != std::string::npos;
+            });
+        if (match != manifest.lods.end()) selectedLod = &*match;
+    }
+    if (selectedLod == nullptr)
+    {
+        diagnostic = "Static GLB filename does not select a manifest LOD budget.";
+        return false;
+    }
 
     asset.materials.reserve(data.materials_count);
+    TextureLayerRoutes textureRoutes;
     for (std::size_t materialIndex = 0u; materialIndex < data.materials_count; ++materialIndex)
     {
-        StaticMaterial material = ConvertMaterial(data, data.materials[materialIndex]);
+        StaticMaterial material = ConvertMaterial(data, data.materials[materialIndex], textureRoutes);
         for (const MaterialOverride& materialOverride : manifest.materialOverrides)
         {
             if (materialOverride.material == material.name)
@@ -253,6 +372,9 @@ bool StaticMeshAsset::Load(const std::filesystem::path& runtimeGlb,
         StaticNodeTransform transform;
         if (data.nodes[nodeIndex].name != nullptr) transform.name = data.nodes[nodeIndex].name;
         cgltf_node_transform_world(&data.nodes[nodeIndex], transform.world.data());
+        transform.world[12] *= manifest.metresPerUnit;
+        transform.world[13] *= manifest.metresPerUnit;
+        transform.world[14] *= manifest.metresPerUnit;
         if (!std::all_of(transform.world.begin(), transform.world.end(),
                          [](float value) { return std::isfinite(value); }))
         {
@@ -283,6 +405,7 @@ bool StaticMeshAsset::Load(const std::filesystem::path& runtimeGlb,
     asset.bounds.minimum.fill(std::numeric_limits<float>::max());
     asset.bounds.maximum.fill(std::numeric_limits<float>::lowest());
     std::size_t primitiveIndex = 0u;
+    std::uint64_t triangleCount = 0u;
     for (std::size_t nodeIndex = 0u; nodeIndex < data.nodes_count; ++nodeIndex)
     {
         const cgltf_node& node = data.nodes[nodeIndex];
@@ -382,23 +505,48 @@ bool StaticMeshAsset::Load(const std::filesystem::path& runtimeGlb,
             record.indexCount = static_cast<std::uint32_t>(primitive.indices->count);
             record.materialIndex = static_cast<std::uint32_t>(primitive.material - data.materials);
             record.nodeTransformIndex = static_cast<std::uint32_t>(nodeIndex);
+            const auto& nodeWorld = asset.nodeTransforms[nodeIndex].world;
             for (std::size_t vertexIndex = 0u; vertexIndex < positions->count; ++vertexIndex)
             {
                 StaticRtVertex vertex;
+                const auto transformedPosition = TransformPoint(
+                    nodeWorld, unpackedPositions.data() + vertexIndex * 3u,
+                    manifest.metresPerUnit);
+                std::array<float, 3u> transformedNormal{};
+                if (!TransformNormal(nodeWorld,
+                                     unpackedNormals.data() + vertexIndex * 3u,
+                                     transformedNormal))
+                {
+                    diagnostic = "Static GLB node '" +
+                        (asset.nodeTransforms[nodeIndex].name.empty()
+                            ? std::string("<unnamed>")
+                            : asset.nodeTransforms[nodeIndex].name) +
+                        "' has a non-invertible normal transform.";
+                    return false;
+                }
+                const std::array<float, 4u> defaultTangent{{1.0f, 0.0f, 0.0f, 1.0f}};
+                const float* sourceTangent = tangents != nullptr
+                    ? unpackedTangents.data() + vertexIndex * 4u
+                    : defaultTangent.data();
+                std::array<float, 3u> transformedTangent{};
+                if (!TransformTangent(nodeWorld, sourceTangent,
+                                      transformedNormal, transformedTangent))
+                {
+                    diagnostic = "Static GLB primitive " + std::to_string(primitiveIndex) +
+                                 " has a degenerate tangent after node transform.";
+                    return false;
+                }
                 for (std::size_t axis = 0u; axis < 3u; ++axis)
                 {
-                    vertex.position[axis] = unpackedPositions[vertexIndex * 3u + axis] *
-                                            manifest.metresPerUnit;
-                    vertex.normal[axis] = unpackedNormals[vertexIndex * 3u + axis];
+                    vertex.position[axis] = transformedPosition[axis];
+                    vertex.normal[axis] = transformedNormal[axis];
+                    vertex.tangent[axis] = transformedTangent[axis];
                     asset.bounds.minimum[axis] = std::min(asset.bounds.minimum[axis], vertex.position[axis]);
                     asset.bounds.maximum[axis] = std::max(asset.bounds.maximum[axis], vertex.position[axis]);
                 }
                 vertex.position[3] = 1.0f;
                 vertex.normal[3] = 0.0f;
-                if (tangents != nullptr)
-                    std::copy_n(unpackedTangents.data() + vertexIndex * 4u, 4u, vertex.tangent.begin());
-                else
-                    vertex.tangent = {{1.0f, 0.0f, 0.0f, 1.0f}};
+                vertex.tangent[3] = sourceTangent[3];
                 vertex.uv0 = {{unpackedUv[vertexIndex * 2u],
                                unpackedUv[vertexIndex * 2u + 1u], 0.0f, 0.0f}};
                 asset.vertices.push_back(vertex);
@@ -415,6 +563,7 @@ bool StaticMeshAsset::Load(const std::filesystem::path& runtimeGlb,
                 asset.indices.push_back(static_cast<std::uint32_t>(sourceIndex));
             }
             asset.primitives.push_back(record);
+            triangleCount += primitive.indices->count / 3u;
 
             if (asset.vertices.size() > manifest.budgets.maxVertices)
             {
@@ -429,6 +578,12 @@ bool StaticMeshAsset::Load(const std::filesystem::path& runtimeGlb,
             if (asset.primitives.size() > manifest.budgets.maxPrimitives)
             {
                 diagnostic = "Static GLB exceeds manifest maxPrimitives capacity.";
+                return false;
+            }
+            if (triangleCount > selectedLod->maxTriangles)
+            {
+                diagnostic = "Static GLB exceeds selected LOD '" + selectedLod->name +
+                             "' maxTriangles capacity.";
                 return false;
             }
         }

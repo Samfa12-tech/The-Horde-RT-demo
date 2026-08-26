@@ -1,6 +1,7 @@
 #pragma once
 
 #include "scene/assets/AssetManifest.h"
+#include "vulkan/raytracing/RtSceneAbi.generated.h"
 
 #include <array>
 #include <cstdint>
@@ -11,14 +12,7 @@
 namespace horde::scene::assets
 {
 
-struct alignas(16) StaticRtVertex
-{
-    std::array<float, 4u> position{};
-    std::array<float, 4u> normal{};
-    std::array<float, 4u> tangent{};
-    std::array<float, 4u> uv0{};
-};
-static_assert(sizeof(StaticRtVertex) == 64u);
+using StaticRtVertex = horde::vulkan::raytracing::StaticRtVertex;
 
 struct StaticPrimitiveRecord
 {

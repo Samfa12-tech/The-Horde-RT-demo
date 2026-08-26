@@ -1124,8 +1124,16 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
     }
 
     if (!genericStaticAssetEnabled_) return true;
+    const RtTextureArrayCounts textureCounts = staticMeshSlot_.TextureArrayCounts();
+    const std::array<std::uint32_t, 4u> actualTextureLayers{{
+        std::max(textureCounts.baseColor, 1u),
+        std::max(textureCounts.normal, 1u),
+        std::max(textureCounts.orm, 1u),
+        std::max(textureCounts.emissive, 1u)}};
     for (std::uint32_t dimension = 512u; dimension > 0u; dimension >>= 1u)
-        staticTextureBytes_ += static_cast<VkDeviceSize>(dimension) * dimension * 4u * 4u;
+        staticTextureBytes_ += static_cast<VkDeviceSize>(dimension) * dimension * 4u *
+            (actualTextureLayers[0] + actualTextureLayers[1] +
+             actualTextureLayers[2] + actualTextureLayers[3]);
     const std::filesystem::path assetDirectory(developmentStaticAssetDirectory_);
     const auto path = [&assetDirectory](const char* name) {
         return (assetDirectory / name).string();
@@ -1135,13 +1143,13 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
     return false;
 #else
     if (!CreateTexture(path("base-color.windows.ktx2"), VK_FORMAT_R8G8B8A8_SRGB,
-                       512u, 512u, 1u, staticBaseColor_, diagnostic) ||
+                       512u, 512u, actualTextureLayers[0], staticBaseColor_, diagnostic) ||
         !CreateTexture(path("normal.windows.ktx2"), VK_FORMAT_R8G8B8A8_UNORM,
-                       512u, 512u, 1u, staticNormal_, diagnostic) ||
+                       512u, 512u, actualTextureLayers[1], staticNormal_, diagnostic) ||
         !CreateTexture(path("orm.windows.ktx2"), VK_FORMAT_R8G8B8A8_UNORM,
-                       512u, 512u, 1u, staticOrm_, diagnostic) ||
+                       512u, 512u, actualTextureLayers[2], staticOrm_, diagnostic) ||
         !CreateTexture(path("emissive.windows.ktx2"), VK_FORMAT_R8G8B8A8_SRGB,
-                       512u, 512u, 1u, staticEmissive_, diagnostic))
+                       512u, 512u, actualTextureLayers[3], staticEmissive_, diagnostic))
     {
         return false;
     }
