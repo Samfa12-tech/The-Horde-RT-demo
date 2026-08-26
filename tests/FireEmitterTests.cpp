@@ -201,6 +201,18 @@ bool TestTorchExtinguishZerosStrengthWithoutChangingTransforms()
                    "extinguish must not perturb Flame/Light socket transforms or require geometry motion");
 }
 
+bool TestAuthoredTorchUsesPlausibleWarmBlackBodyColour()
+{
+    const FireEmitterState emitter = MakeOpeningTorchFireEmitter();
+    const auto gpu = horde::vulkan::raytracing::PackFireEmitterGpu(
+        emitter, {}, horde::vulkan::raytracing::ResolveFireEmitterQualityBudget(
+                         FireEmitterQuality::High));
+    return Require(Approx(gpu.colourIntensity[0], 1.0f) &&
+                       gpu.colourIntensity[1] >= 0.45f && gpu.colourIntensity[1] <= 0.52f &&
+                       gpu.colourIntensity[2] >= 0.09f && gpu.colourIntensity[2] <= 0.15f,
+                   "the 1850 K authored torch must retain plausible warm black-body RGB instead of monochrome orange");
+}
+
 bool TestActualPivotAccelerationDrivesBoundedMotionResponse()
 {
     FireEmitterState stationary = MakeOpeningTorchFireEmitter();
@@ -307,6 +319,7 @@ int main()
     ok &= TestStableCameraAndZoneSelection();
     ok &= TestDistanceTieBreaksByStableEmitterId();
     ok &= TestTorchExtinguishZerosStrengthWithoutChangingTransforms();
+    ok &= TestAuthoredTorchUsesPlausibleWarmBlackBodyColour();
     ok &= TestActualPivotAccelerationDrivesBoundedMotionResponse();
     ok &= TestRenderDeliveryEquivalenceAt30_60_120Hz();
     ok &= TestQualityChangesOnlyBoundedRayBudgets();

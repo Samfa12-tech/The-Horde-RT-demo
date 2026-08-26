@@ -22,8 +22,8 @@ std::array<float, 3u> FireColour(const horde::gameplay::effects::FireEmitterStat
     const float warm = std::clamp((temperature - 1000.0f) / 3000.0f, 0.0f, 1.0f);
     const std::array<float, 3u> blackBody{{
         1.0f,
-        0.16f + 0.50f * warm,
-        0.012f + 0.24f * warm * warm}};
+        0.28f + 0.72f * warm,
+        0.02f + 0.58f * std::pow(warm, 1.4f)}};
     return {{
         blackBody[0] * FiniteClamped(emitter.artTint[0], 0.0f, 2.0f, 1.0f),
         blackBody[1] * FiniteClamped(emitter.artTint[1], 0.0f, 2.0f, 1.0f),
