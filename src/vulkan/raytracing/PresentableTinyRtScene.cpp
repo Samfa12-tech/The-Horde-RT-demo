@@ -13,6 +13,7 @@
 #include <cstring>
 #include <filesystem>
 #include <fstream>
+#include <span>
 #include <utility>
 #include <vector>
 
@@ -59,19 +60,61 @@ struct ScenePushConstants
     float staffHueDegrees = 0.0f;
     float staffIntensityScale = 1.0f;
     float workloadPreset = 1.0f;
+    float genericTransmissionActive = 0.0f;
 };
 
-static_assert(sizeof(ScenePushConstants) == 120u,
-              "CPU and raygen push-constant ABI must remain 30 packed floats");
+static_assert(sizeof(ScenePushConstants) == 124u,
+              "CPU and raygen push-constant ABI must remain 31 packed floats");
+static_assert(sizeof(ScenePushConstants) <= 128u,
+              "push constants must fit Vulkan's required minimum device limit");
 static_assert(offsetof(ScenePushConstants, waterQuality) == 72u,
               "water quality must stay appended after every released push field");
 static_assert(offsetof(ScenePushConstants, waterfallWidthScale) == 76u,
               "RT lab tuning must append after the released water-quality field");
+static_assert(offsetof(ScenePushConstants, genericTransmissionActive) == 120u,
+              "generic transmission activity must remain append-only");
+
+bool HasActiveGenericTransmission(
+    std::span<const RtInstanceMetadata> instances,
+    std::span<const RtPrimitiveMetadata> primitives,
+    std::span<const RtMaterialGpu> materials)
+{
+    constexpr std::uint32_t kTransmissiveInstance =
+        static_cast<std::uint32_t>(RtInstanceFlag::Transmissive);
+    constexpr std::uint32_t kTransmissionMaterial =
+        static_cast<std::uint32_t>(RtMaterialFlag::Transmission);
+    for (const RtInstanceMetadata& instance : instances)
+    {
+        if ((instance.flags & kTransmissiveInstance) == 0u)
+            continue;
+        const std::size_t primitiveBegin = instance.primitiveBase;
+        const std::size_t primitiveEnd = primitiveBegin + instance.primitiveCount;
+        if (primitiveEnd > primitives.size())
+            continue;
+        for (std::size_t primitiveIndex = primitiveBegin;
+             primitiveIndex < primitiveEnd; ++primitiveIndex)
+        {
+            const std::uint32_t materialIndex = primitives[primitiveIndex].materialIndex;
+            if (materialIndex >= materials.size())
+                continue;
+            const RtMaterialGpu& material = materials[materialIndex];
+            if ((material.materialFlags[0] & kTransmissionMaterial) != 0u &&
+                material.metallicRoughnessOcclusionTransmission[3] > 0.001f &&
+                material.metallicRoughnessOcclusionTransmission[0] <= 0.5f)
+                return true;
+        }
+    }
+    return false;
+}
 
 // Generated from shaders/raytracing/minimal.rgen with glslangValidator -V -Os.
 // Keep this embedded so the Android RT scene remains a self-contained native build.
 constexpr std::uint32_t kMinimalRayGenShader[] = {
 #include "vulkan/raytracing/MinimalRayGenShader.inc"
+};
+
+constexpr std::uint32_t kMinimalLegacyRayGenShader[] = {
+#include "vulkan/raytracing/MinimalLegacyRayGenShader.inc"
 };
 
 constexpr std::uint32_t kMinimalMissShader[] = {
@@ -322,6 +365,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     staticTextureDirectory_ = std::move(other.staticTextureDirectory_);
     staticMeshSlot_ = std::move(other.staticMeshSlot_);
     genericStaticAssetEnabled_ = std::exchange(other.genericStaticAssetEnabled_, false);
+    genericTransmissionActive_ = std::exchange(other.genericTransmissionActive_, false);
     productionHeldItemAssetsEnabled_ =
         std::exchange(other.productionHeldItemAssetsEnabled_, false);
     staticMeshBlasBytes_ = std::exchange(other.staticMeshBlasBytes_, 0u);
@@ -334,11 +378,21 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     descriptorSet_ = std::exchange(other.descriptorSet_, VK_NULL_HANDLE);
     pipelineLayout_ = std::exchange(other.pipelineLayout_, VK_NULL_HANDLE);
     pipeline_ = std::exchange(other.pipeline_, VK_NULL_HANDLE);
+    legacyPipeline_ = std::exchange(other.legacyPipeline_, VK_NULL_HANDLE);
     shaderBindingTable_ = std::exchange(other.shaderBindingTable_, Buffer{});
+    legacyShaderBindingTable_ = std::exchange(other.legacyShaderBindingTable_, Buffer{});
     raygenRegion_ = std::exchange(other.raygenRegion_, VkStridedDeviceAddressRegionKHR{});
     missRegion_ = std::exchange(other.missRegion_, VkStridedDeviceAddressRegionKHR{});
     hitRegion_ = std::exchange(other.hitRegion_, VkStridedDeviceAddressRegionKHR{});
     callableRegion_ = std::exchange(other.callableRegion_, VkStridedDeviceAddressRegionKHR{});
+    legacyRaygenRegion_ = std::exchange(
+        other.legacyRaygenRegion_, VkStridedDeviceAddressRegionKHR{});
+    legacyMissRegion_ = std::exchange(
+        other.legacyMissRegion_, VkStridedDeviceAddressRegionKHR{});
+    legacyHitRegion_ = std::exchange(
+        other.legacyHitRegion_, VkStridedDeviceAddressRegionKHR{});
+    legacyCallableRegion_ = std::exchange(
+        other.legacyCallableRegion_, VkStridedDeviceAddressRegionKHR{});
     vkCreateAccelerationStructureKHR_ = other.vkCreateAccelerationStructureKHR_;
     vkDestroyAccelerationStructureKHR_ = other.vkDestroyAccelerationStructureKHR_;
     vkGetAccelerationStructureBuildSizesKHR_ = other.vkGetAccelerationStructureBuildSizesKHR_;
@@ -437,6 +491,11 @@ void PresentableTinyRtScene::Destroy()
         vkDestroyPipeline(device_, pipeline_, nullptr);
         pipeline_ = VK_NULL_HANDLE;
     }
+    if (legacyPipeline_ != VK_NULL_HANDLE)
+    {
+        vkDestroyPipeline(device_, legacyPipeline_, nullptr);
+        legacyPipeline_ = VK_NULL_HANDLE;
+    }
     if (pipelineLayout_ != VK_NULL_HANDLE)
     {
         vkDestroyPipelineLayout(device_, pipelineLayout_, nullptr);
@@ -455,6 +514,7 @@ void PresentableTinyRtScene::Destroy()
     }
 
     DestroyBuffer(shaderBindingTable_);
+    DestroyBuffer(legacyShaderBindingTable_);
     DestroyAccelerationStructure(tlas_);
     DestroyBuffer(tlasUpdateScratch_);
     characterSlot_.DestroyGpuResources(gpuResources_);
@@ -514,6 +574,7 @@ void PresentableTinyRtScene::Destroy()
     staticTextureDirectory_.clear();
     staticMeshSlot_ = {};
     genericStaticAssetEnabled_ = false;
+    genericTransmissionActive_ = false;
     productionHeldItemAssetsEnabled_ = false;
     staticMeshBlasBytes_ = 0u;
     staticTextureBytes_ = 0u;
@@ -542,6 +603,10 @@ void PresentableTinyRtScene::Destroy()
     missRegion_ = {};
     hitRegion_ = {};
     callableRegion_ = {};
+    legacyRaygenRegion_ = {};
+    legacyMissRegion_ = {};
+    legacyHitRegion_ = {};
+    legacyCallableRegion_ = {};
     scaledBlitSupported_ = false;
     ready_ = false;
     gpuResources_.Reset();
@@ -3207,20 +3272,25 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
 bool PresentableTinyRtScene::CreatePipeline(std::string& diagnostic)
 {
     VkShaderModule raygenModule = VK_NULL_HANDLE;
+    VkShaderModule legacyRaygenModule = VK_NULL_HANDLE;
     VkShaderModule missModule = VK_NULL_HANDLE;
     VkShaderModule hitModule = VK_NULL_HANDLE;
     if (!CreateShaderModule(device_, kMinimalRayGenShader, sizeof(kMinimalRayGenShader), raygenModule) ||
+        !CreateShaderModule(device_, kMinimalLegacyRayGenShader,
+                            sizeof(kMinimalLegacyRayGenShader), legacyRaygenModule) ||
         !CreateShaderModule(device_, kMinimalMissShader, sizeof(kMinimalMissShader), missModule) ||
         !CreateShaderModule(device_, kMinimalClosestHitShader, sizeof(kMinimalClosestHitShader), hitModule))
     {
         if (raygenModule != VK_NULL_HANDLE) vkDestroyShaderModule(device_, raygenModule, nullptr);
+        if (legacyRaygenModule != VK_NULL_HANDLE)
+            vkDestroyShaderModule(device_, legacyRaygenModule, nullptr);
         if (missModule != VK_NULL_HANDLE) vkDestroyShaderModule(device_, missModule, nullptr);
         if (hitModule != VK_NULL_HANDLE) vkDestroyShaderModule(device_, hitModule, nullptr);
         diagnostic = "Failed to create RT shader modules.";
         return false;
     }
 
-    const std::array<VkPipelineShaderStageCreateInfo, 3u> stages{{
+    std::array<VkPipelineShaderStageCreateInfo, 3u> stages{{
         {VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO, nullptr, 0u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, raygenModule, "main", nullptr},
         {VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO, nullptr, 0u, VK_SHADER_STAGE_MISS_BIT_KHR, missModule, "main", nullptr},
         {VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO, nullptr, 0u, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, hitModule, "main", nullptr},
@@ -3246,6 +3316,18 @@ bool PresentableTinyRtScene::CreatePipeline(std::string& diagnostic)
     groups[2].anyHitShader = VK_SHADER_UNUSED_KHR;
     groups[2].intersectionShader = VK_SHADER_UNUSED_KHR;
 
+    VkPhysicalDeviceProperties properties{};
+    vkGetPhysicalDeviceProperties(physicalDevice_, &properties);
+    if (properties.limits.maxPushConstantsSize < sizeof(ScenePushConstants))
+    {
+        vkDestroyShaderModule(device_, raygenModule, nullptr);
+        vkDestroyShaderModule(device_, legacyRaygenModule, nullptr);
+        vkDestroyShaderModule(device_, missModule, nullptr);
+        vkDestroyShaderModule(device_, hitModule, nullptr);
+        diagnostic = "Device maxPushConstantsSize is below the required 124-byte RT scene ABI.";
+        return false;
+    }
+
     const VkPushConstantRange pushConstantRange{
         VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR,
         0u,
@@ -3261,6 +3343,7 @@ bool PresentableTinyRtScene::CreatePipeline(std::string& diagnostic)
     if (vkCreatePipelineLayout(device_, &pipelineLayoutInfo, nullptr, &pipelineLayout_) != VK_SUCCESS)
     {
         vkDestroyShaderModule(device_, raygenModule, nullptr);
+        vkDestroyShaderModule(device_, legacyRaygenModule, nullptr);
         vkDestroyShaderModule(device_, missModule, nullptr);
         vkDestroyShaderModule(device_, hitModule, nullptr);
         diagnostic = "Failed to create RT pipeline layout.";
@@ -3274,15 +3357,27 @@ bool PresentableTinyRtScene::CreatePipeline(std::string& diagnostic)
     pipelineInfo.pGroups = groups.data();
     pipelineInfo.maxPipelineRayRecursionDepth = 1u;
     pipelineInfo.layout = pipelineLayout_;
-    const VkResult result = vkCreateRayTracingPipelinesKHR_(device_, VK_NULL_HANDLE, VK_NULL_HANDLE, 1u, &pipelineInfo, nullptr, &pipeline_);
+    const VkResult result = vkCreateRayTracingPipelinesKHR_(
+        device_, VK_NULL_HANDLE, VK_NULL_HANDLE, 1u, &pipelineInfo, nullptr, &pipeline_);
+    stages[0].module = legacyRaygenModule;
+    const VkResult legacyResult = result == VK_SUCCESS
+        ? vkCreateRayTracingPipelinesKHR_(device_, VK_NULL_HANDLE, VK_NULL_HANDLE,
+                                          1u, &pipelineInfo, nullptr, &legacyPipeline_)
+        : result;
 
     vkDestroyShaderModule(device_, raygenModule, nullptr);
+    vkDestroyShaderModule(device_, legacyRaygenModule, nullptr);
     vkDestroyShaderModule(device_, missModule, nullptr);
     vkDestroyShaderModule(device_, hitModule, nullptr);
 
-    if (result != VK_SUCCESS)
+    if (result != VK_SUCCESS || legacyResult != VK_SUCCESS)
     {
-        diagnostic = "Failed to create RT pipeline.";
+        if (pipeline_ != VK_NULL_HANDLE)
+        {
+            vkDestroyPipeline(device_, pipeline_, nullptr);
+            pipeline_ = VK_NULL_HANDLE;
+        }
+        diagnostic = "Failed to create generic/legacy RT raygen pipelines.";
         return false;
     }
 
@@ -3317,43 +3412,60 @@ bool PresentableTinyRtScene::CreateShaderBindingTable(std::string& diagnostic)
     const std::uint32_t regionSize = AlignUp(groupStride, baseAlignment);
     const std::uint32_t sbtSize = regionSize * groupCount;
 
-    std::vector<std::uint8_t> handles(handleSize * groupCount);
-    if (vkGetRayTracingShaderGroupHandlesKHR_(device_, pipeline_, 0u, groupCount, handles.size(), handles.data()) != VK_SUCCESS)
+    const auto createTable = [&](VkPipeline sourcePipeline,
+                                 const char* label,
+                                 Buffer& table,
+                                 VkStridedDeviceAddressRegionKHR& raygen,
+                                 VkStridedDeviceAddressRegionKHR& miss,
+                                 VkStridedDeviceAddressRegionKHR& hit,
+                                 VkStridedDeviceAddressRegionKHR& callable) -> bool
     {
-        diagnostic = "Failed to fetch RT shader group handles.";
-        return false;
-    }
+        std::vector<std::uint8_t> handles(handleSize * groupCount);
+        if (vkGetRayTracingShaderGroupHandlesKHR_(
+                device_, sourcePipeline, 0u, groupCount,
+                handles.size(), handles.data()) != VK_SUCCESS)
+        {
+            diagnostic = std::string("Failed to fetch ") + label +
+                " RT shader group handles.";
+            return false;
+        }
+        if (!CreateBuffer(sbtSize,
+                          VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR,
+                          VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                              VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                          true, table, diagnostic))
+            return false;
 
-    if (!CreateBuffer(sbtSize,
-                      VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR,
-                      VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                      true,
-                      shaderBindingTable_,
-                      diagnostic))
-    {
-        return false;
-    }
+        std::vector<std::uint8_t> sbtData(sbtSize, 0u);
+        for (std::uint32_t group = 0u; group < groupCount; ++group)
+        {
+            std::memcpy(sbtData.data() + (regionSize * group),
+                        handles.data() + (handleSize * group), handleSize);
+        }
+        const std::string tableLabel = std::string(label) + " RT shader binding table";
+        if (!WriteBuffer(table, sbtData.data(), sbtSize,
+                         tableLabel.c_str(), diagnostic))
+            return false;
 
-    std::vector<std::uint8_t> sbtData(sbtSize, 0u);
-    for (std::uint32_t group = 0u; group < groupCount; ++group)
-    {
-        std::memcpy(sbtData.data() + (regionSize * group), handles.data() + (handleSize * group), handleSize);
-    }
-    if (!WriteBuffer(shaderBindingTable_, sbtData.data(), sbtSize, "RT shader binding table", diagnostic))
-    {
-        return false;
-    }
+        raygen.deviceAddress = table.address;
+        raygen.stride = groupStride;
+        raygen.size = groupStride;
+        miss.deviceAddress = table.address + regionSize;
+        miss.stride = groupStride;
+        miss.size = groupStride;
+        hit.deviceAddress = table.address + (regionSize * 2u);
+        hit.stride = groupStride;
+        hit.size = groupStride;
+        callable = {};
+        return true;
+    };
 
-    raygenRegion_.deviceAddress = shaderBindingTable_.address;
-    raygenRegion_.stride = groupStride;
-    raygenRegion_.size = groupStride;
-    missRegion_.deviceAddress = shaderBindingTable_.address + regionSize;
-    missRegion_.stride = groupStride;
-    missRegion_.size = groupStride;
-    hitRegion_.deviceAddress = shaderBindingTable_.address + (regionSize * 2u);
-    hitRegion_.stride = groupStride;
-    hitRegion_.size = groupStride;
-    callableRegion_ = {};
+    if (!createTable(pipeline_, "generic", shaderBindingTable_,
+                     raygenRegion_, missRegion_, hitRegion_, callableRegion_) ||
+        !createTable(legacyPipeline_, "legacy", legacyShaderBindingTable_,
+                     legacyRaygenRegion_, legacyMissRegion_, legacyHitRegion_,
+                     legacyCallableRegion_))
+        return false;
 
     diagnostic.clear();
     return true;
@@ -3801,6 +3913,13 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         frameInstanceMetadata[4u].flags = 0u;
         frameInstanceMetadata[5u].flags = 0u;
     }
+    else if (!clampedTuning.glassFixtureVisible)
+    {
+        // Custom index 5 is only bound to the dielectric BLAS while the
+        // development fixture is active. Keep inactive metadata honest so the
+        // generic material scan below follows the actual TLAS route.
+        frameInstanceMetadata[5u].flags = 0u;
+    }
     auto frameMaterials = staticMeshSlot_.Materials();
     if (dielectricFixtureMaterialIndex_ >= frameMaterials.size())
     {
@@ -3818,6 +3937,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     fixtureMaterial.attenuationColor[0] = clampedTuning.glassAttenuationColor[0];
     fixtureMaterial.attenuationColor[1] = clampedTuning.glassAttenuationColor[1];
     fixtureMaterial.attenuationColor[2] = clampedTuning.glassAttenuationColor[2];
+    genericTransmissionActive_ = HasActiveGenericTransmission(frameInstanceMetadata,
+        staticMeshSlot_.PrimitiveMetadata(), frameMaterials);
     if (!WriteBuffer(heldLightBuffer_, &heldLightGpu, sizeof(heldLightGpu),
                      "held light", diagnostic) ||
         !WriteBuffer(fireEmitterBuffer_, fireEmitterUpload.emitters.data(),
@@ -4074,7 +4195,17 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
         storageImageLayout_ = VK_IMAGE_LAYOUT_GENERAL;
     }
 
-    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, pipeline_);
+    const VkPipeline activePipeline = genericTransmissionActive_ ? pipeline_ : legacyPipeline_;
+    const VkStridedDeviceAddressRegionKHR& activeRaygenRegion =
+        genericTransmissionActive_ ? raygenRegion_ : legacyRaygenRegion_;
+    const VkStridedDeviceAddressRegionKHR& activeMissRegion =
+        genericTransmissionActive_ ? missRegion_ : legacyMissRegion_;
+    const VkStridedDeviceAddressRegionKHR& activeHitRegion =
+        genericTransmissionActive_ ? hitRegion_ : legacyHitRegion_;
+    const VkStridedDeviceAddressRegionKHR& activeCallableRegion =
+        genericTransmissionActive_ ? callableRegion_ : legacyCallableRegion_;
+    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR,
+                      activePipeline);
     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, pipelineLayout_, 0u, 1u, &descriptorSet_, 0u, nullptr);
     const std::array<float, 3u> staffWorldPosition = characterSlot_.LichStaffWorldPosition(frame.lich);
     const float heldPropDepth = frame.heldItemKinematics.heldPropDepth;
@@ -4112,7 +4243,8 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                                              passageTuning.intensityScale,
                                              staffTuning.hueDegrees,
                                              staffTuning.intensityScale,
-                                             static_cast<float>(tuning.workloadPreset)};
+                                             static_cast<float>(tuning.workloadPreset),
+                                             genericTransmissionActive_ ? 1.0f : 0.0f};
     lastOutputRedBlueSwapApplied_ = pushConstants.outputRedBlueSwap > 0.5f;
     vkCmdPushConstants(commandBuffer,
                        pipelineLayout_,
@@ -4121,10 +4253,10 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                        sizeof(pushConstants),
                        &pushConstants);
     vkCmdTraceRaysKHR_(commandBuffer,
-                       &raygenRegion_,
-                       &missRegion_,
-                       &hitRegion_,
-                       &callableRegion_,
+                       &activeRaygenRegion,
+                       &activeMissRegion,
+                       &activeHitRegion,
+                       &activeCallableRegion,
                        dispatchExtent_.width,
                        dispatchExtent_.height,
                        1u);

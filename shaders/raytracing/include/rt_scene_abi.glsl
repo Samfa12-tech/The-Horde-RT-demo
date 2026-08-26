@@ -69,6 +69,7 @@ layout(push_constant) uniform SceneControls
     float staffHueDegrees;
     float staffIntensityScale;
     float workloadPreset;
+    float genericTransmissionActive;
 } controls;
 
 struct HitInfo

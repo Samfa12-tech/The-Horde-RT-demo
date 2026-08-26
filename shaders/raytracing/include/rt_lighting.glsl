@@ -196,8 +196,9 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
             return clamp(transmittance, vec3(0.0), vec3(1.0));
         }
         float epsilon = dielectricRayEpsilon(currentOrigin, travelledDistance);
+        float minimumDistance = interfaceCount == 0 ? 0.0015 : epsilon * 0.5;
         ShadowHit nearest = traceNearestShadowHit(
-            currentOrigin, direction, remainingDistance, mask, epsilon * 0.5);
+            currentOrigin, direction, remainingDistance, mask, minimumDistance);
         if (!nearest.hit)
         {
             if (volumeDepth > 0)
@@ -373,14 +374,26 @@ vec3 bounceSample(HitInfo h, vec3 incoming, bool lightAwareMirror)
     vec3 toLight = localLightPosition - h.position;
     float lightDistance = length(toLight);
     vec3 lightDirection = toLight / max(lightDistance, 0.001);
+    bool genericTransmissionActive = controls.genericTransmissionActive > 0.5;
     vec3 lightTransmittance = shadowTransmittanceMask(
         offsetRayOrigin(h, lightDirection), lightDirection,
         lightDistance - 0.02, 0x35u);
+    float lightVisibility = lightTransmittance.x;
     float diffuse = max(dot(h.normal, lightDirection), 0.0);
     float attenuation = 1.0 / (1.0 + lightDistance * lightDistance * 0.58);
-    vec3 authoredDirect = h.base *
-        (0.008 + localLightColor * lightTransmittance * diffuse * attenuation *
-         localLightStrength * 2.25);
+    vec3 authoredDirect;
+    if (!genericTransmissionActive)
+    {
+        authoredDirect = h.base *
+            (0.008 + localLightColor * diffuse * attenuation * lightVisibility *
+             localLightStrength * 2.25);
+    }
+    else
+    {
+        authoredDirect = h.base *
+            (0.008 + localLightColor * lightTransmittance * diffuse * attenuation *
+             localLightStrength * 2.25);
+    }
     return authoredDirect + fireEmitterDirectLighting(h, incoming, false, false);
 }
 
@@ -418,6 +431,7 @@ vec3 fireEmitterDirectLighting(HitInfo h, vec3 rayDirection, bool dualVisibility
                                         vec3(0.070, 0.10, 0.060));
     int sampleIndex = int((gl_LaunchIDEXT.x + gl_LaunchIDEXT.y) & 1u);
     float reflective = max(h.metallic, h.reflectivity);
+    bool genericTransmissionActive = controls.genericTransmissionActive > 0.5;
     vec3 result = vec3(0.0);
     for (uint emitterIndex = 0u; emitterIndex < kRtActiveFireEmitterCapacity;
          ++emitterIndex)
@@ -447,17 +461,34 @@ vec3 fireEmitterDirectLighting(HitInfo h, vec3 rayDirection, bool dualVisibility
                     offsetRayOrigin(h, otherDirection), otherDirection,
                     otherDistance - 0.02, 0x35u));
         }
+        float lightVisibility = lightTransmittance.x;
         float attenuation = 1.0 / (1.0 + lightDistance * lightDistance * 0.58);
         float diffuse = max(dot(h.normal, lightDirection), 0.0);
-        result += h.base * lightColor * lightTransmittance * diffuse * attenuation *
-                  strength * 2.65;
+        if (!genericTransmissionActive)
+        {
+            result += h.base * lightColor * diffuse * attenuation * lightVisibility *
+                      strength * 2.65;
+        }
+        else
+        {
+            result += h.base * lightColor * lightTransmittance * diffuse * attenuation *
+                      strength * 2.65;
+        }
         if (allowAnalyticSpecular)
         {
             float specular = pow(max(dot(reflect(-lightDirection, h.normal),
                                          -rayDirection), 0.0),
                                  mix(34.0, 5.0, reflective));
-            result += lightColor * lightTransmittance * specular * attenuation *
-                      strength * (0.12 + reflective * 1.04);
+            if (!genericTransmissionActive)
+            {
+                result += lightColor * specular * attenuation * lightVisibility *
+                          strength * (0.12 + reflective * 1.04);
+            }
+            else
+            {
+                result += lightColor * lightTransmittance * specular * attenuation *
+                          strength * (0.12 + reflective * 1.04);
+            }
         }
     }
     return result;
@@ -508,6 +539,13 @@ vec3 shadeOpaqueDirect(HitInfo h, vec3 rayDirection, bool dualVisibility,
     vec3 sampleVector = localPosition + areaOffsets[sampleIndex] - h.position;
     float sampleDistance = length(sampleVector);
     vec3 sampleDirection = sampleVector / max(sampleDistance, 0.001);
+    bool genericTransmissionActive = controls.genericTransmissionActive > 0.5;
+    vec3 localTransmittance = vec3(0.0);
+    vec3 skyTransmittance = vec3(0.0);
+    vec3 skyDirection;
+    float skyDistance;
+    vec3 skyRadiance;
+    float skyGain;
     vec3 otherDirection = sampleDirection;
     float otherDistance = sampleDistance;
     if (dualVisibility && localStrength > 0.001)
@@ -516,11 +554,8 @@ vec3 shadeOpaqueDirect(HitInfo h, vec3 rayDirection, bool dualVisibility,
         otherDistance = length(otherVector);
         otherDirection = otherVector / max(otherDistance, 0.001);
     }
-    vec3 skyDirection;
-    float skyDistance;
-    vec3 skyRadiance;
-    float skyGain;
-    activeSkyLight(h.position, sampleIndex, skyDirection, skyDistance, skyRadiance, skyGain);
+    activeSkyLight(h.position, sampleIndex, skyDirection, skyDistance,
+                   skyRadiance, skyGain);
     vec3 otherSkyDirection = skyDirection;
     float otherSkyDistance = skyDistance;
     float otherSkyGain = skyGain;
@@ -543,15 +578,19 @@ vec3 shadeOpaqueDirect(HitInfo h, vec3 rayDirection, bool dualVisibility,
         visibilityOrigins, visibilityDirections, visibilityDistances,
         bvec4(localStrength > 0.001,
               dualVisibility && localStrength > 0.001, true, dualVisibility));
-    vec3 localTransmittance = dualVisibility
+    localTransmittance = dualVisibility
         ? 0.5 * (transmittanceSamples[0].xyz + transmittanceSamples[1].xyz)
         : transmittanceSamples[0].xyz;
-    vec3 skyTransmittance = dualVisibility
+    skyTransmittance = dualVisibility
         ? 0.5 * (transmittanceSamples[2].xyz * skyGain +
                  transmittanceSamples[3].xyz * otherSkyGain)
         : transmittanceSamples[2].xyz * skyGain;
-    localVisibility = dot(localTransmittance, vec3(0.2126, 0.7152, 0.0722));
-    skyVisibility = dot(skyTransmittance, vec3(0.2126, 0.7152, 0.0722));
+    localVisibility = !genericTransmissionActive
+        ? localTransmittance.x
+        : dot(localTransmittance, vec3(0.2126, 0.7152, 0.0722));
+    skyVisibility = !genericTransmissionActive
+        ? skyTransmittance.x
+        : dot(skyTransmittance, vec3(0.2126, 0.7152, 0.0722));
 
     float reflective = max(h.metallic, h.reflectivity);
     float localDiffuse = max(dot(h.normal, localDirection), 0.0);
@@ -569,14 +608,28 @@ vec3 shadeOpaqueDirect(HitInfo h, vec3 rayDirection, bool dualVisibility,
     vec3 color = h.base * vec3(0.025, 0.028, 0.032);
     color += fireEmitterDirectLighting(
         h, rayDirection, dualVisibility, allowAnalyticFireSpecular);
-    color += h.base * localColor * localTransmittance * localDiffuse * localAttenuation
-        * localStrength * 2.65;
-    color += localColor * localTransmittance * localSpecular * localAttenuation
-        * localStrength * (0.12 + reflective * 1.04);
-    color += h.base * cold * skyTransmittance * skyDiffuse * 0.10;
-    color += h.base * skyRadiance * skyTransmittance * skyDiffuse * 0.86;
-    color += skyRadiance * skyTransmittance * skySpecular
-        * mix(0.025, 0.44, reflective) * (0.45 + 0.55 * skyFresnel);
+    if (!genericTransmissionActive)
+    {
+        color += h.base * localColor * localDiffuse * localAttenuation * localVisibility
+            * localStrength * 2.65;
+        color += localColor * localSpecular * localAttenuation * localVisibility
+            * localStrength * (0.12 + reflective * 1.04);
+        color += h.base * cold * skyDiffuse * skyVisibility * 0.10;
+        color += h.base * skyRadiance * skyDiffuse * skyVisibility * 0.86;
+        color += skyRadiance * skySpecular * skyVisibility
+            * mix(0.025, 0.44, reflective) * (0.45 + 0.55 * skyFresnel);
+    }
+    else
+    {
+        color += h.base * localColor * localTransmittance * localDiffuse * localAttenuation
+            * localStrength * 2.65;
+        color += localColor * localTransmittance * localSpecular * localAttenuation
+            * localStrength * (0.12 + reflective * 1.04);
+        color += h.base * cold * skyTransmittance * skyDiffuse * 0.10;
+        color += h.base * skyRadiance * skyTransmittance * skyDiffuse * 0.86;
+        color += skyRadiance * skyTransmittance * skySpecular
+            * mix(0.025, 0.44, reflective) * (0.45 + 0.55 * skyFresnel);
+    }
     return color;
 }
 

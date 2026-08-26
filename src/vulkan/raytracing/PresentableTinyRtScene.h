@@ -308,6 +308,7 @@ private:
     std::string staticTextureDirectory_;
     RtStaticMeshSlot staticMeshSlot_;
     bool genericStaticAssetEnabled_ = false;
+    bool genericTransmissionActive_ = false;
     bool productionHeldItemAssetsEnabled_ = false;
     VkDeviceSize staticMeshBlasBytes_ = 0u;
     VkDeviceSize staticTextureBytes_ = 0u;
@@ -319,11 +320,17 @@ private:
     VkDescriptorSet descriptorSet_ = VK_NULL_HANDLE;
     VkPipelineLayout pipelineLayout_ = VK_NULL_HANDLE;
     VkPipeline pipeline_ = VK_NULL_HANDLE;
+    VkPipeline legacyPipeline_ = VK_NULL_HANDLE;
     Buffer shaderBindingTable_;
+    Buffer legacyShaderBindingTable_;
     VkStridedDeviceAddressRegionKHR raygenRegion_{};
     VkStridedDeviceAddressRegionKHR missRegion_{};
     VkStridedDeviceAddressRegionKHR hitRegion_{};
     VkStridedDeviceAddressRegionKHR callableRegion_{};
+    VkStridedDeviceAddressRegionKHR legacyRaygenRegion_{};
+    VkStridedDeviceAddressRegionKHR legacyMissRegion_{};
+    VkStridedDeviceAddressRegionKHR legacyHitRegion_{};
+    VkStridedDeviceAddressRegionKHR legacyCallableRegion_{};
 
     PFN_vkCreateAccelerationStructureKHR vkCreateAccelerationStructureKHR_ = nullptr;
     PFN_vkDestroyAccelerationStructureKHR vkDestroyAccelerationStructureKHR_ = nullptr;

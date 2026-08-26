@@ -179,6 +179,7 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
     // every ordinary direct-light sample.
     float runoffLocalHighlight = runoff
         ? pow(max(dot(surfaceNormal, localHalf), 0.0), 14.0) : 0.0;
+    bool genericTransmissionActive = controls.genericTransmissionActive > 0.5;
     vec3 localInterfaceTransmittance = localStrength > 0.001
         ? shadowTransmittanceMask(offsetRayOrigin(h, localDirection),
                                   localDirection, localDistance - 0.02, 0x35u)
@@ -193,15 +194,22 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
     vec3 skyInterfaceTransmittance = shadowTransmittanceMask(
         offsetRayOrigin(h, skyDirection), skyDirection,
         skyDistance - 0.02, 0x35u) * skyGain;
+    float localInterfaceVisibility = localInterfaceTransmittance.x;
+    float skyInterfaceVisibility = skyInterfaceTransmittance.x;
     float skyHighlight = pow(max(dot(surfaceNormal,
         normalize(skyDirection - rayDirection)), 0.0), 96.0);
-    vec3 interfaceLight = localColor * localInterfaceTransmittance
-        * (localHighlight * 3.2 + runoffLocalHighlight * 1.15)
-        * localStrength
-        / (1.0 + localDistanceSquared * 0.58);
+    vec3 interfaceLight = !genericTransmissionActive
+        ? localColor * (localHighlight * 3.2 + runoffLocalHighlight * 1.15)
+            * localStrength * localInterfaceVisibility
+            / (1.0 + localDistanceSquared * 0.58)
+        : localColor * localInterfaceTransmittance
+            * (localHighlight * 3.2 + runoffLocalHighlight * 1.15)
+            * localStrength / (1.0 + localDistanceSquared * 0.58);
     interfaceLight += fireEmitterDirectLighting(
         h, rayDirection, false, !fireRayReflectionOwned);
-    interfaceLight += skyRadiance * skyInterfaceTransmittance * skyHighlight * 0.10;
+    interfaceLight += !genericTransmissionActive
+        ? skyRadiance * skyHighlight * skyInterfaceVisibility * 0.10
+        : skyRadiance * skyInterfaceTransmittance * skyHighlight * 0.10;
     if (runoff && h.position.x > -2.88)
     {
         float impactDistance = length(h.position.xz - vec2(-2.32, -15.26));
@@ -209,8 +217,11 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
             impactDistance * 31.0 - controls.time * 6.2), 8.0)
             * (1.0 - smoothstep(0.07, 0.68, impactDistance));
         float impactCore = 1.0 - smoothstep(0.04, 0.22, impactDistance);
-        vec3 impactLight = skyRadiance * skyInterfaceTransmittance * 0.44
-            + localColor * localInterfaceTransmittance * localStrength * 0.24;
+        vec3 impactLight = !genericTransmissionActive
+            ? skyRadiance * skyInterfaceVisibility * 0.44
+                + localColor * localStrength * localInterfaceVisibility * 0.24
+            : skyRadiance * skyInterfaceTransmittance * 0.44
+                + localColor * localInterfaceTransmittance * localStrength * 0.24;
         interfaceLight += impactLight * (impactCrest * 0.12 + impactCore * 0.045);
     }
     float surfaceTurbulence = clamp(length(surfaceNormal - exitSurfaceNormal) * 5.0, 0.0, 1.0);
@@ -224,8 +235,11 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
               - controls.time * 8.4) * 0.17, 0.0, 1.0);
     float entrainedAir = runoff ? 0.004
         : 0.010 + pow(breakup, 3.0) * 0.028 + surfaceTurbulence * 0.010;
-    vec3 scatteringRadiance = skyRadiance * skyInterfaceTransmittance * 0.38
-        + localColor * localInterfaceTransmittance * localStrength * 0.18;
+    vec3 scatteringRadiance = !genericTransmissionActive
+        ? skyRadiance * skyInterfaceVisibility * 0.38
+            + localColor * localStrength * localInterfaceVisibility * 0.18
+        : skyRadiance * skyInterfaceTransmittance * 0.38
+            + localColor * localInterfaceTransmittance * localStrength * 0.18;
     return mix(surfaceRadiance, scatteringRadiance, entrainedAir);
 }
 

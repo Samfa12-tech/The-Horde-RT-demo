@@ -606,13 +606,34 @@ int main()
                       raygenSource.find("material == kMaterialWater") != std::string::npos &&
                       raygenSource.find("vec4 lichGroundMist") != std::string::npos,
                       "raygen must retain the RT water ABI, transparent visibility route, and bounded lich mist path");
-        ok &= Require(sceneSource.find("sizeof(ScenePushConstants) == 120u") != std::string::npos &&
+        ok &= Require(sceneSource.find("sizeof(ScenePushConstants) == 124u") != std::string::npos &&
+                      sceneSource.find("sizeof(ScenePushConstants) <= 128u") != std::string::npos &&
                       sceneSource.find("offsetof(ScenePushConstants, waterQuality) == 72u") != std::string::npos &&
                       sceneSource.find("offsetof(ScenePushConstants, waterfallWidthScale) == 76u") != std::string::npos &&
+                      sceneSource.find("offsetof(ScenePushConstants, genericTransmissionActive) == 120u") != std::string::npos &&
                       raygenSource.find("float waterQuality;") != std::string::npos &&
                       raygenSource.find("float waterfallWidthScale;") != std::string::npos &&
-                      raygenSource.find("float workloadPreset;") != std::string::npos,
-                      "RT lab tuning did not append its eleven floats after the released water-quality ABI");
+                      raygenSource.find("float workloadPreset;") != std::string::npos &&
+                      raygenSource.find("float genericTransmissionActive;") != std::string::npos,
+                      "RT lab tuning and generic transmission activity must append after the released water-quality ABI");
+        ok &= Require(sceneSource.find("properties.limits.maxPushConstantsSize") !=
+                          std::string::npos &&
+                      sceneSource.find("kMinimalLegacyRayGenShader") != std::string::npos &&
+                      sceneSource.find("genericTransmissionActive_ ? pipeline_ : legacyPipeline_") !=
+                          std::string::npos &&
+                      sceneSource.find("genericTransmissionActive_ ? raygenRegion_ : legacyRaygenRegion_") !=
+                          std::string::npos,
+                      "124-byte push ABI must be runtime-checked and fixture-hidden frames must bind a separately compiled legacy raygen pipeline/SBT");
+        ok &= Require(sceneSource.find("HasActiveGenericTransmission(frameInstanceMetadata") !=
+                          std::string::npos &&
+                      sceneSource.find("RtInstanceFlag::Transmissive") != std::string::npos &&
+                      sceneSource.find("RtMaterialFlag::Transmission") != std::string::npos &&
+                      sceneSource.find("clampedTuning.glassFixtureVisible ? 1.0f : 0.0f") ==
+                          std::string::npos &&
+                      raygenSource.find(
+                          "bool genericTransmissionActive = controls.genericTransmissionActive > 0.5;") !=
+                          std::string::npos,
+                      "no-glass preservation must be selected from active generic instance/material ABI data, not a fixture-name branch");
         ok &= Require(sceneSource.find("waterfallBlas_") != std::string::npos &&
                       sceneSource.find("instances[19].instanceCustomIndex = 19u;") != std::string::npos &&
                       sceneSource.find("instances[19].accelerationStructureReference = waterfallBlas_.address;") != std::string::npos &&
@@ -748,6 +769,13 @@ int main()
                       raygenSource.find("if (interfaceCount >= interfaceBudget)") != std::string::npos &&
                       raygenSource.find("lightTransmittance = shadowTransmittanceMask(") != std::string::npos,
                       "nearest committed shadow traversal must retain RGB through local, sky, and fire lighting while keeping metallic blockers and mobile/high ceilings");
+        ok &= Require(raygenSource.find("if (!genericTransmissionActive)") !=
+                          std::string::npos &&
+                      raygenSource.find("float lightVisibility = lightTransmittance.x;") !=
+                          std::string::npos &&
+                      raygenSource.find("vec3 lightTransmittance = shadowTransmittanceMask(") !=
+                          std::string::npos,
+                      "fixture-hidden lighting must retain released scalar arithmetic from the shared ordered query while active generic transmission uses RGB traversal");
         ok &= Require(sceneSource.find("secondaryDielectricRejectCount") != std::string::npos &&
                       sceneSource.find("unclosedVolumeCount") != std::string::npos &&
                       windowsSource.find("secondaryDielectricRejectCount") != std::string::npos &&

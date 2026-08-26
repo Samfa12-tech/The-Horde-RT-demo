@@ -2,7 +2,8 @@ param(
     [string]$VulkanSdk = $env:VULKAN_SDK,
     [switch]$Check,
     [string]$OutputDirectory,
-    [string]$EmbeddedIncludePath
+    [string]$EmbeddedIncludePath,
+    [switch]$Legacy
 )
 
 $ErrorActionPreference = 'Stop'
@@ -23,19 +24,11 @@ if (-not (Test-Path -LiteralPath $disassembler))
 {
     throw "spirv-dis was not found at $disassembler"
 }
-$spirvOptimizer = Join-Path $VulkanSdk 'Bin\spirv-opt.exe'
-if (-not (Test-Path -LiteralPath $spirvOptimizer))
-{
-    throw "spirv-opt was not found at $spirvOptimizer"
-}
-$spirvValidator = Join-Path $VulkanSdk 'Bin\spirv-val.exe'
-if (-not (Test-Path -LiteralPath $spirvValidator))
-{
-    throw "spirv-val was not found at $spirvValidator"
-}
-
 $source = Join-Path $repoRoot 'shaders\raytracing\minimal.rgen'
-$include = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalRayGenShader.inc'
+$includeName = if ($Legacy) { 'MinimalLegacyRayGenShader.inc' } else { 'MinimalRayGenShader.inc' }
+$include = Join-Path $repoRoot (Join-Path 'src\vulkan\raytracing' $includeName)
+$variantName = if ($Legacy) { 'legacy' } else { 'generic' }
+$outputStem = if ($Legacy) { 'minimal.legacy.rgen' } else { 'minimal.rgen' }
 
 function Resolve-RaygenIncludes
 {
@@ -100,8 +93,8 @@ if ($Check)
     }
     $outputFull = [IO.Path]::GetFullPath($OutputDirectory)
     New-Item -ItemType Directory -Force -Path $outputFull | Out-Null
-    $spirv = Join-Path $outputFull 'minimal.rgen.spv'
-    $disassembly = Join-Path $outputFull 'minimal.rgen.spvasm'
+    $spirv = Join-Path $outputFull "$outputStem.spv"
+    $disassembly = Join-Path $outputFull "$outputStem.spvasm"
 }
 else
 {
@@ -109,16 +102,31 @@ else
     {
         throw '-OutputDirectory is only supported with -Check.'
     }
-    $spirv = Join-Path $repoRoot 'shaders\raytracing\minimal.rgen.spv'
+    $spirv = Join-Path $repoRoot ("shaders\raytracing\$outputStem.spv")
     $disassembly = Join-Path ([IO.Path]::GetTempPath()) ("horde-raygen-{0}.spvasm" -f [guid]::NewGuid().ToString('N'))
 }
-$resolvedSourcePath = Join-Path (Split-Path -Parent $spirv) 'minimal.rgen.resolved'
+$resolvedSourcePath = Join-Path (Split-Path -Parent $spirv) "$outputStem.resolved"
 $activePaths = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
 $dependencies = [System.Collections.Generic.List[string]]::new()
 [IO.File]::WriteAllText(
     $resolvedSourcePath,
     (Resolve-RaygenIncludes -Path $source -ActivePaths $activePaths -Dependencies $dependencies),
     [Text.UTF8Encoding]::new($false))
+if ($Legacy)
+{
+    $resolvedLegacySource = [IO.File]::ReadAllText($resolvedSourcePath)
+    $activityExpression = 'bool genericTransmissionActive = controls.genericTransmissionActive > 0.5;'
+    $replacementCount = ([regex]::Matches(
+        $resolvedLegacySource, [regex]::Escape($activityExpression))).Count
+    if ($replacementCount -ne 4)
+    {
+        throw "Legacy raygen expected four generic transmission activity sites, found $replacementCount."
+    }
+    $resolvedLegacySource = $resolvedLegacySource.Replace(
+        $activityExpression, 'bool genericTransmissionActive = false;')
+    [IO.File]::WriteAllText(
+        $resolvedSourcePath, $resolvedLegacySource, [Text.UTF8Encoding]::new($false))
+}
 $dependencyHashes = foreach ($dependency in $dependencies)
 {
     [ordered]@{
@@ -127,35 +135,13 @@ $dependencyHashes = foreach ($dependency in $dependencies)
     }
 }
 $dependencyManifest = $dependencyHashes | ConvertTo-Json -Compress
-$dependencyHash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($dependencyManifest))).ToLowerInvariant()
+$dependencyIdentity = "$variantName|$dependencyManifest"
+$dependencyHash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($dependencyIdentity))).ToLowerInvariant()
 
-$unoptimizedSpirv = Join-Path ([IO.Path]::GetTempPath()) `
-    ("horde-raygen-unoptimized-{0}.spv" -f [guid]::NewGuid().ToString('N'))
-& $validator -V --target-env vulkan1.2 -S rgen -o $unoptimizedSpirv $resolvedSourcePath
+& $validator -V --target-env vulkan1.2 -Os -S rgen -o $spirv $resolvedSourcePath
 if ($LASTEXITCODE -ne 0)
 {
     throw "Raygen compilation failed with exit code $LASTEXITCODE"
-}
-& $spirvOptimizer `
-    --eliminate-dead-functions `
-    --eliminate-dead-code-aggressive `
-    --ccp `
-    --simplify-instructions `
-    --redundancy-elimination `
-    --eliminate-local-single-block `
-    --eliminate-local-single-store `
-    --eliminate-dead-inserts `
-    --compact-ids `
-    $unoptimizedSpirv -o $spirv
-if ($LASTEXITCODE -ne 0)
-{
-    throw "Raygen function-preserving optimization failed with exit code $LASTEXITCODE"
-}
-Remove-Item -LiteralPath $unoptimizedSpirv -Force
-& $spirvValidator --target-env vulkan1.2 $spirv
-if ($LASTEXITCODE -ne 0)
-{
-    throw "Raygen SPIR-V validation failed with exit code $LASTEXITCODE"
 }
 
 $bytes = [System.IO.File]::ReadAllBytes($spirv)
@@ -188,15 +174,18 @@ $functionCallCount = @($assemblyLines | Where-Object { $_ -match '\bOpFunctionCa
 $rayQueryInitializationCount = @($assemblyLines | Where-Object {
     $_ -match '\bOpRayQueryInitializeKHR\b'
 }).Count
-$optimizerPreservedFunctions = $functionCallCount -gt 0 -and $rayQueryInitializationCount -le 4
-if (-not $optimizerPreservedFunctions)
+$driverSafeFullyInlined = $functionCount -eq 1 -and
+    $functionCallCount -eq 0 -and $rayQueryInitializationCount -le 29
+if (-not $driverSafeFullyInlined)
 {
     throw ("Raygen optimizer cloned bounded traversal: functions={0}, calls={1}, ray-query sites={2}." -f `
         $functionCount, $functionCallCount, $rayQueryInitializationCount)
 }
 $spirvHash = (Get-FileHash -LiteralPath $spirv -Algorithm SHA256).Hash.ToLowerInvariant()
 $sourceHash = $dependencyHash
-$includeHash = (Get-FileHash -LiteralPath $include -Algorithm SHA256).Hash.ToLowerInvariant()
+$includeHash = if (Test-Path -LiteralPath $include) {
+    (Get-FileHash -LiteralPath $include -Algorithm SHA256).Hash.ToLowerInvariant()
+} else { '' }
 
 if ($Check)
 {
@@ -233,6 +222,7 @@ if ($Check)
 
     $stats = [ordered]@{
         source = $source
+        variant = $variantName
         sourceSha256 = $sourceHash
         dependencies = $dependencyHashes
         dependencySha256 = $dependencyHash
@@ -249,7 +239,7 @@ if ($Check)
         functions = $functionCount
         functionCalls = $functionCallCount
         rayQueryInitializations = $rayQueryInitializationCount
-        optimizerPreservedFunctions = $optimizerPreservedFunctions
+        driverSafeFullyInlined = $driverSafeFullyInlined
         matchesEmbeddedWords = $matchesEmbedded
     }
     $statsPath = Join-Path $outputFull 'raygen-stats.json'
@@ -260,13 +250,22 @@ if ($Check)
     Write-Output ("Raygen check artifacts: {0}" -f $outputFull)
     Write-Output ("Source dependency SHA-256: {0}; embedded include SHA-256: {1}" -f $sourceHash, $includeHash)
     Write-Output ("SPIR-V bytes: {0}; words: {1}; instructions: {2}; branch operations: {3}; loops: {4}; selection merges: {5}; SHA-256: {6}" -f $bytes.Length, $wordValues.Count, $instructionCount, $branchOperationCount, $loopCount, $selectionMergeCount, $spirvHash)
-    Write-Output ("Function-preserving optimizer: functions={0}; calls={1}; ray-query sites={2}" -f `
+    Write-Output ("Driver-safe inlined optimizer: functions={0}; calls={1}; ray-query sites={2}" -f `
         $functionCount, $functionCallCount, $rayQueryInitializationCount)
     if (-not $matchesEmbedded)
     {
         throw 'Embedded raygen SPIR-V is stale. Run tools\compile-raygen.ps1 and rebuild.'
     }
     Write-Output 'Embedded raygen SPIR-V words match the compiled shader.'
+    if (-not $Legacy)
+    {
+        $legacyOutput = Join-Path $outputFull 'legacy'
+        & $PSCommandPath -VulkanSdk $VulkanSdk -Check -OutputDirectory $legacyOutput -Legacy
+        if ($LASTEXITCODE -ne 0)
+        {
+            throw "Legacy raygen check failed with exit code $LASTEXITCODE."
+        }
+    }
     if ($temporaryOutput)
     {
         Remove-Item -LiteralPath $outputFull -Recurse -Force
@@ -296,5 +295,13 @@ if (Test-Path -LiteralPath $resolvedSourcePath)
 Write-Output "Generated $include"
 Write-Output ("Source dependency SHA-256: {0}; embedded include SHA-256 before generation: {1}" -f $sourceHash, $includeHash)
 Write-Output ("SPIR-V bytes: {0}; words: {1}; instructions: {2}; branch operations: {3}; loops: {4}; selection merges: {5}; SHA-256: {6}" -f $bytes.Length, $wordValues.Count, $instructionCount, $branchOperationCount, $loopCount, $selectionMergeCount, $spirvHash)
-Write-Output ("Function-preserving optimizer: functions={0}; calls={1}; ray-query sites={2}" -f `
+Write-Output ("Driver-safe inlined optimizer: functions={0}; calls={1}; ray-query sites={2}" -f `
     $functionCount, $functionCallCount, $rayQueryInitializationCount)
+if (-not $Legacy)
+{
+    & $PSCommandPath -VulkanSdk $VulkanSdk -Legacy
+    if ($LASTEXITCODE -ne 0)
+    {
+        throw "Legacy raygen generation failed with exit code $LASTEXITCODE."
+    }
+}
