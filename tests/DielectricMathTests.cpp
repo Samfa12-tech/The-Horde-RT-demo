@@ -233,6 +233,13 @@ void TestMillimetreScaleRayAdvance()
     const float farEpsilon = DielectricRayEpsilon(Vec3{10000.0f, 0.0f, 0.0f}, 5000.0f);
     Check(std::isfinite(farEpsilon) && farEpsilon <= 0.00025f,
           "large finite coordinates retain a bounded sub-millimetre dielectric epsilon");
+    const Vec3 grazingDirection{0.020f, 0.0f, 0.9998f};
+    const Vec3 advanced = AdvanceDielectricRayOrigin(
+        Vec3{0.0f, 0.0f, 0.0f}, Vec3{-1.0f, 0.0f, 0.0f},
+        grazingDirection, epsilon);
+    Check(advanced.x > epsilon && advanced.x < epsilon * 1.10f &&
+              advanced.z > epsilon * 0.99f,
+          "grazing entry uses the bounded normal-aware bias and remains far below a one-millimetre wall");
 }
 
 void TestBeerLambertAttenuation()

@@ -102,7 +102,7 @@ int main()
         FindDevelopmentCheckpoint("glass-edge-fresnel");
     Check(edgeGlass != nullptr && edgeGlass->id == 113 &&
               edgeGlass->baseShowcaseCheckpointId == 4 && edgeGlass->usesGlassFixture &&
-              edgeGlass->yaw < -2.0f,
+              edgeGlass->yaw < -0.50f && edgeGlass->yaw > -0.80f,
           "edge Fresnel proof retains a stable glancing camera and imported fixture route");
     horde::gameplay::simulation::GameSimulation stagedDownward;
     horde::gameplay::simulation::GameSimulation stagedUpward;

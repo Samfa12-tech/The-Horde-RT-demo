@@ -178,6 +178,25 @@ inline float DielectricRayEpsilon(const Vec3& position, float interfaceDistance)
         2.0e-5f, 2.5e-4f);
 }
 
+inline Vec3 AdvanceDielectricRayOrigin(const Vec3& position,
+                                       const Vec3& geometricNormal,
+                                       const Vec3& direction,
+                                       float epsilon)
+{
+    const Vec3 rayDirection = dielectric_detail::Normalize(
+        direction, Vec3{0.0f, 0.0f, 1.0f});
+    const Vec3 outward = dielectric_detail::Normalize(
+        geometricNormal, Vec3{0.0f, 1.0f, 0.0f});
+    epsilon = std::clamp(
+        dielectric_detail::FiniteOr(epsilon, 2.0e-5f), 2.0e-5f, 2.5e-4f);
+    const float side = dielectric_detail::Dot(outward, rayDirection) >= 0.0f
+        ? 1.0f : -1.0f;
+    return dielectric_detail::Add(position,
+        dielectric_detail::Add(
+            dielectric_detail::Scale(outward, side * epsilon),
+            dielectric_detail::Scale(rayDirection, epsilon)));
+}
+
 struct ShadowInterfaceSample
 {
     float distance = 0.0f;

@@ -50,7 +50,7 @@ inline constexpr std::array<DevelopmentCheckpoint, 14u> kDevelopmentCheckpoints{
      DevelopmentCombatPose::Rest, true, 1.0f, {{0.12f, 0.82f, 0.28f}}, 0.30f},
     {112, "glass-millimetre-closed", 4, -7.60f, -15.20f, -1.57079632679f, -0.05f,
      DevelopmentCombatPose::Rest, true, 0.005f},
-    {113, "glass-edge-fresnel", 4, -7.60f, -13.25f, -2.28f, -0.05f,
+    {113, "glass-edge-fresnel", 4, -7.60f, -13.25f, -0.65f, -0.05f,
      DevelopmentCombatPose::Rest, true},
 }};
 
