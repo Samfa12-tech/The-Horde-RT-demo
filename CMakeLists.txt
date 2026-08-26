@@ -119,6 +119,15 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AN
 endif()
 
 if(BUILD_TESTING)
+    add_executable(horde_rt_fire_emitter_tests
+        tests/FireEmitterTests.cpp
+        src/gameplay/effects/FireEmitterState.cpp
+        src/vulkan/raytracing/FireEmitterBuffer.cpp
+    )
+    target_include_directories(horde_rt_fire_emitter_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(horde_rt_fire_emitter_tests PRIVATE horde_gameplay_simulation)
+    add_test(NAME horde_rt_fire_emitter_tests COMMAND horde_rt_fire_emitter_tests)
+
     add_executable(horde_rt_held_item_socket_tests tests/HeldItemSocketTests.cpp)
     target_include_directories(horde_rt_held_item_socket_tests PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
