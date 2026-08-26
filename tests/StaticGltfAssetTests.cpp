@@ -163,7 +163,9 @@ std::filesystem::path RewriteManifest(const std::filesystem::path& root,
 std::filesystem::path WriteClosedDielectricGlb(const std::filesystem::path& root,
                                                std::string_view name,
                                                bool omitFrontFace,
-                                               bool duplicateBottomTriangle)
+                                               bool duplicateBottomTriangle,
+                                               bool includeVolume = true,
+                                               float thicknessFactor = 1.0f)
 {
     constexpr std::array<std::array<float, 3u>, 8u> positions{{
         {{-0.5f, -0.5f, -0.5f}}, {{0.5f, -0.5f, -0.5f}},
@@ -201,10 +203,18 @@ std::filesystem::path WriteClosedDielectricGlb(const std::filesystem::path& root
     const std::size_t indexOffset = binary.size();
     for (std::uint16_t index : indices) AppendU16(binary, index);
 
+    const std::string extensionNames = includeVolume
+        ? "[\"KHR_materials_transmission\",\"KHR_materials_volume\",\"KHR_materials_ior\"]"
+        : "[\"KHR_materials_transmission\",\"KHR_materials_ior\"]";
+    const std::string volumeExtension = includeVolume
+        ? ",\"KHR_materials_volume\":{\"thicknessFactor\":" +
+              std::to_string(thicknessFactor) +
+              ",\"attenuationDistance\":2,\"attenuationColor\":[0.75,0.9,1]}"
+        : "";
     const std::string json =
         "{\"asset\":{\"version\":\"2.0\"},"
-        "\"extensionsUsed\":[\"KHR_materials_transmission\",\"KHR_materials_volume\",\"KHR_materials_ior\"],"
-        "\"extensionsRequired\":[\"KHR_materials_transmission\",\"KHR_materials_volume\",\"KHR_materials_ior\"],"
+        "\"extensionsUsed\":" + extensionNames + ","
+        "\"extensionsRequired\":" + extensionNames + ","
         "\"buffers\":[{\"byteLength\":" + std::to_string(binary.size()) + "}],"
         "\"bufferViews\":["
         "{\"buffer\":0,\"byteOffset\":0,\"byteLength\":96,\"target\":34962},"
@@ -224,14 +234,60 @@ std::filesystem::path WriteClosedDielectricGlb(const std::filesystem::path& root
         "\"materials\":[{\"name\":\"ClosedGlass\",\"doubleSided\":true,"
         "\"pbrMetallicRoughness\":{\"baseColorFactor\":[0.92,0.97,1,1],\"metallicFactor\":0,\"roughnessFactor\":0.12},"
         "\"extensions\":{\"KHR_materials_transmission\":{\"transmissionFactor\":0.94},"
-        "\"KHR_materials_volume\":{\"thicknessFactor\":1,\"attenuationDistance\":2,\"attenuationColor\":[0.75,0.9,1]},"
-        "\"KHR_materials_ior\":{\"ior\":1.52}}}],"
+        "\"KHR_materials_ior\":{\"ior\":1.52}" + volumeExtension + "}}],"
         "\"meshes\":[{\"primitives\":[{\"attributes\":{\"POSITION\":0,\"NORMAL\":1,\"TEXCOORD_0\":2},"
         "\"indices\":3,\"material\":0,\"mode\":4}]}],"
         "\"nodes\":[{\"name\":\"Root\",\"mesh\":0},{\"name\":\"grip\"}],\"scenes\":[{\"nodes\":[0,1]}],\"scene\":0}";
     const auto path = root / name;
     WriteGlb(path, json, std::move(binary));
     return path;
+}
+
+void TestTransmissionDefaultThinWallSemantics(
+    const std::filesystem::path& temporaryRoot,
+    const horde::scene::assets::AssetManifest& sourceManifest)
+{
+    auto manifest = sourceManifest;
+    manifest.materialOverrides.clear();
+    manifest.budgets.maxIndices = 48u;
+    manifest.lods[0].maxTriangles = 16u;
+    horde::scene::assets::StaticMeshAsset asset;
+    std::string diagnostic;
+
+    const auto extensionOnly = WriteClosedDielectricGlb(
+        temporaryRoot, "transmission-only-lod0.runtime.glb", false, false, false);
+    Check(horde::scene::assets::StaticMeshAsset::Load(
+              extensionOnly, manifest, asset, diagnostic) &&
+              (asset.materials[0].flags & 512u) != 0u,
+          std::string("transmission without KHR_volume maps to ThinWall: ") + diagnostic);
+
+    const auto zeroThickness = WriteClosedDielectricGlb(
+        temporaryRoot, "zero-thickness-lod0.runtime.glb", false, false, true, 0.0f);
+    Check(horde::scene::assets::StaticMeshAsset::Load(
+              zeroThickness, manifest, asset, diagnostic) &&
+              (asset.materials[0].flags & 512u) != 0u,
+          std::string("KHR_volume zero thickness maps to ThinWall: ") + diagnostic);
+
+    horde::scene::assets::MaterialOverride explicitFalse;
+    explicitFalse.material = "ClosedGlass";
+    explicitFalse.hasThinWall = true;
+    explicitFalse.thinWall = false;
+    manifest.materialOverrides = {explicitFalse};
+    Check(horde::scene::assets::StaticMeshAsset::Load(
+              zeroThickness, manifest, asset, diagnostic) &&
+              (asset.materials[0].flags & 512u) != 0u,
+          "zero-thickness glTF semantics remain ThinWall despite a contradictory false override");
+
+    horde::scene::assets::MaterialOverride thickOverride;
+    thickOverride.material = "ClosedGlass";
+    thickOverride.hasThicknessFactor = true;
+    thickOverride.thicknessFactor = 0.004f;
+    manifest.materialOverrides = {thickOverride};
+    Check(horde::scene::assets::StaticMeshAsset::Load(
+              extensionOnly, manifest, asset, diagnostic) &&
+              (asset.materials[0].flags & 512u) == 0u &&
+              NearlyEqual(asset.materials[0].thicknessFactor, 0.004f),
+          std::string("audited positive thickness override selects real closed-volume intent: ") + diagnostic);
 }
 
 void ExpectManifestFailure(const std::filesystem::path& path, std::string_view expected)
@@ -673,6 +729,7 @@ int main()
     else
     {
         TestAcceptedStaticGlbContract(manifest);
+        TestTransmissionDefaultThinWallSemantics(temporaryRoot, manifest);
         TestThickDielectricTopology(temporaryRoot, manifest);
         TestBakedNodeTransformAndUnitScale(temporaryRoot);
         TestExactLodSuffixSelection(temporaryRoot);

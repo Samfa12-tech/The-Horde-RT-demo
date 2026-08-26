@@ -460,8 +460,20 @@ bool StaticMeshAsset::Load(const std::filesystem::path& runtimeGlb,
                 }
             }
         }
-        if (material.transmissionFactor > 0.0f) material.flags |= 4u;
-        else material.flags &= ~4u;
+        if (material.transmissionFactor > 0.0f)
+        {
+            material.flags |= 4u;
+            // KHR_materials_volume defines zero thickness (including an absent
+            // extension) as a surface-only transmission material. Keep that
+            // glTF semantic deterministic even if a sidecar incorrectly asks
+            // to treat a zero-thickness surface as a closed volume.
+            if (material.thicknessFactor <= 0.0f) material.flags |= 512u;
+        }
+        else
+        {
+            material.flags &= ~4u;
+            material.flags &= ~512u;
+        }
         if (!IsFiniteMaterial(material))
         {
             diagnostic = "Static GLB material " + std::to_string(materialIndex) +
