@@ -447,6 +447,13 @@ try {
     if ($startupLog -notmatch "HORDE_GPU_TIMING mode=$gpuTimingLabel rt_rendering=unchanged") {
         throw "Renderer did not report the requested GPU timing mode '$gpuTimingLabel'."
     }
+    $runtimePid = (Invoke-AdbText @("shell", "pidof", $packageName) -AllowFailure).Trim()
+    Invoke-AdbText @("shell", "dumpsys", "meminfo", $packageName) -AllowFailure |
+        Set-Content -LiteralPath (Join-Path $outputDirectory "runtime-resources-before.txt") -Encoding utf8
+    if (-not [string]::IsNullOrWhiteSpace($runtimePid)) {
+        Invoke-AdbText @("shell", "ps", "-T", "-p", $runtimePid) -AllowFailure |
+            Set-Content -LiteralPath (Join-Path $outputDirectory "runtime-threads-before.txt") -Encoding utf8
+    }
     if ($startupLog -notmatch [regex]::Escape("PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich")) {
         throw "Strict ASTC environment/lich selection was not reported."
     }
@@ -529,6 +536,14 @@ try {
     $finalLog | Set-Content -LiteralPath (Join-Path $outputDirectory "logcat.txt") -Encoding utf8
     $crashPattern = "FATAL EXCEPTION|Fatal signal|renderer initialisation failed|Diagnostic surface render loop ended unexpectedly|Failed to apply requested RT render scale"
     if ($finalLog -match $crashPattern) { $failures.Add("Current logcat contains a fatal/runtime renderer failure marker.") }
+
+    $runtimePid = (Invoke-AdbText @("shell", "pidof", $packageName) -AllowFailure).Trim()
+    Invoke-AdbText @("shell", "dumpsys", "meminfo", $packageName) -AllowFailure |
+        Set-Content -LiteralPath (Join-Path $outputDirectory "runtime-resources-after.txt") -Encoding utf8
+    if (-not [string]::IsNullOrWhiteSpace($runtimePid)) {
+        Invoke-AdbText @("shell", "ps", "-T", "-p", $runtimePid) -AllowFailure |
+            Set-Content -LiteralPath (Join-Path $outputDirectory "runtime-threads-after.txt") -Encoding utf8
+    }
 
     Save-PrivateFile -RemotePath "files/reports/vulkan_capability_report.txt" -Destination (Join-Path $outputDirectory "vulkan_capability_report.txt")
     $capabilityPath = Join-Path $outputDirectory "vulkan_capability_report.json"
