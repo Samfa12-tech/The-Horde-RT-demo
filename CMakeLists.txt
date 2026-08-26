@@ -32,10 +32,12 @@ set(HORDE_RT_SOURCE_FILES)
 foreach(source IN LISTS HORDE_RT_CORE_RELATIVE_SOURCES)
     list(APPEND HORDE_RT_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/${source}")
 endforeach()
-list(FILTER HORDE_RT_SOURCE_FILES EXCLUDE REGEX "/gameplay/(simulation/GameSimulation|effects/FireEmitterState|items/(HeldItemState|HeldItemKinematics|HeldLightState))\\.cpp$")
+list(FILTER HORDE_RT_SOURCE_FILES EXCLUDE REGEX "/gameplay/(simulation/GameSimulation|animation/(PlayerAnimationState|PlayerIkTargets)|effects/FireEmitterState|items/(HeldItemState|HeldItemKinematics|HeldLightState))\\.cpp$")
 
 add_library(horde_gameplay_simulation STATIC
     src/gameplay/simulation/GameSimulation.cpp
+    src/gameplay/animation/PlayerAnimationState.cpp
+    src/gameplay/animation/PlayerIkTargets.cpp
     src/gameplay/effects/FireEmitterState.cpp
     src/gameplay/items/HeldItemState.cpp
     src/gameplay/items/HeldItemKinematics.cpp
@@ -120,6 +122,13 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AN
 endif()
 
 if(BUILD_TESTING)
+    add_executable(horde_rt_player_animation_tests
+        tests/PlayerAnimationTests.cpp
+    )
+    target_include_directories(horde_rt_player_animation_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(horde_rt_player_animation_tests PRIVATE horde_gameplay_simulation)
+    add_test(NAME horde_rt_player_animation_tests COMMAND horde_rt_player_animation_tests)
+
     add_executable(horde_rt_fire_emitter_tests
         tests/FireEmitterTests.cpp
         src/vulkan/raytracing/FireEmitterBuffer.cpp

@@ -7,6 +7,7 @@
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/SwordCombat.h"
 #include "gameplay/effects/FireEmitterState.h"
+#include "gameplay/animation/PlayerAnimationState.h"
 #include "gameplay/items/HeldItemState.h"
 #include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/simulation/GameplayEvent.h"
@@ -74,6 +75,7 @@ struct SimulationSnapshot
     horde::gameplay::items::HeldItemStates heldItems =
         horde::gameplay::items::MakeDefaultHeldItemStates();
     horde::gameplay::items::HeldItemKinematicsState heldItemKinematics{};
+    horde::gameplay::animation::PlayerAnimationSnapshot playerAnimation{};
     horde::gameplay::items::HeldLightState heldLight{};
     EnemyRosterSnapshot enemyRoster{};
     CombatSnapshot swordCombat{};

@@ -53,6 +53,7 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
     combatSnapshot_ = swordCombat_.Snapshot();
     torchFailureSnapshot_ = torchFailure_.Snapshot();
     ResolveHeldItems();
+    ResolvePlayerAnimation(0.0f);
     ResolveFireEmitters(0.0f);
     RefreshSnapshot(lastInput_);
 }
@@ -145,6 +146,7 @@ void GameSimulation::StepFixed(const InputSnapshot& input,
                                            playerPitchRadians_);
         UpdateEncounters(input, fixedDeltaSeconds);
         ResolveHeldItems();
+        ResolvePlayerAnimation(fixedDeltaSeconds);
         ResolveFireEmitters(fixedDeltaSeconds);
     }
     else
@@ -193,7 +195,9 @@ void GameSimulation::ResetRoute()
                                            playerX_,
                                            playerZ_,
                                            playerYawRadians_);
+    playerAnimationState_.Reset();
     ResolveHeldItems();
+    ResolvePlayerAnimation(0.0f);
     horde::gameplay::effects::ResetFireEmitter(fireEmitters_[0]);
     ResolveFireEmitters(0.0f);
     RefreshSnapshot(lastInput_);
@@ -332,7 +336,9 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
         ++retryGeneration_;
     }
     fixedStepRunner_.ResetAccumulator();
+    playerAnimationState_.Reset();
     ResolveHeldItems();
+    ResolvePlayerAnimation(0.0f);
     horde::gameplay::effects::ResetFireEmitter(fireEmitters_[0]);
     ResolveFireEmitters(0.0f);
     RefreshSnapshot(lastInput_);
@@ -358,6 +364,17 @@ void GameSimulation::ResolveHeldItems()
     // state rather than publishing a renderer-authored fallback.
     horde::gameplay::items::ResolveHeldItemsFixedStep(
         heldItems_, input, tickIndex_, heldItemFixedStepState_, diagnostic);
+}
+
+void GameSimulation::ResolvePlayerAnimation(const float fixedDeltaSeconds)
+{
+    playerAnimationState_.StepFixed(
+        {walkVisualAmount_,
+         walkTime_,
+         combatSnapshot_.player,
+         heldItemFixedStepState_.kinematics,
+         1.0f - std::clamp(torchFailureSnapshot_.leftArmLowerBlend, 0.0f, 1.0f)},
+        fixedDeltaSeconds);
 }
 
 void GameSimulation::ResolveFireEmitters(const float fixedDeltaSeconds)
@@ -768,6 +785,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.torchFailure = torchFailureSnapshot_;
     snapshot_.heldItems = heldItems_;
     snapshot_.heldItemKinematics = heldItemFixedStepState_.kinematics;
+    snapshot_.playerAnimation = playerAnimationState_.Snapshot();
     snapshot_.heldLight = heldItemFixedStepState_.light;
     snapshot_.enemyRoster = enemyDirector_.Snapshot();
     snapshot_.swordCombat = combatSnapshot_;

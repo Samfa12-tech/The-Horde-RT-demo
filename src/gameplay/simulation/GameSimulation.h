@@ -7,6 +7,7 @@
 #include "gameplay/SpatialAudio.h"
 #include "gameplay/SwordCombat.h"
 #include "gameplay/effects/FireEmitterState.h"
+#include "gameplay/animation/PlayerAnimationState.h"
 #include "gameplay/items/HeldItemState.h"
 #include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/simulation/FixedStepRunner.h"
@@ -56,6 +57,7 @@ private:
     void UpdateMovement(const InputSnapshot& input, float deltaSeconds);
     void UpdateEncounters(const InputSnapshot& input, float deltaSeconds);
     void ResolveHeldItems();
+    void ResolvePlayerAnimation(float fixedDeltaSeconds);
     void ResolveFireEmitters(float fixedDeltaSeconds);
     void Emit(GameplayEventType type,
               EntityId source,
@@ -84,6 +86,7 @@ private:
     horde::gameplay::items::HeldItemStates heldItems_ =
         horde::gameplay::items::MakeDefaultHeldItemStates();
     horde::gameplay::items::HeldItemFixedStepState heldItemFixedStepState_{};
+    horde::gameplay::animation::PlayerAnimationState playerAnimationState_{};
     std::array<horde::gameplay::effects::FireEmitterState,
                horde::gameplay::effects::kFireEmitterCapacity> fireEmitters_{{
         horde::gameplay::effects::MakeOpeningTorchFireEmitter()}};

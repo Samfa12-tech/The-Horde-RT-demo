@@ -5,6 +5,8 @@ set(HORDE_RT_PACKAGE_VERSION "1.5.2")
 
 set(HORDE_RT_CORE_RELATIVE_SOURCES
     gameplay/simulation/GameSimulation.cpp
+    gameplay/animation/PlayerAnimationState.cpp
+    gameplay/animation/PlayerIkTargets.cpp
     gameplay/effects/FireEmitterState.cpp
     gameplay/items/HeldItemState.cpp
     gameplay/items/HeldLightState.cpp
