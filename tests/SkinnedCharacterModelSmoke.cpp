@@ -166,13 +166,41 @@ int main()
     simulation.StepFixed(walkingInput);
     horde::vulkan::raytracing::PlayerRenderSlot playerSlot;
     bool poseUpdated = false;
-    auto rigSnapshot = simulation.Snapshot().playerAnimation;
+    const auto authoritativeRigSnapshot = simulation.Snapshot().playerAnimation;
+    auto rigSnapshot = authoritativeRigSnapshot;
     for (std::size_t component = 0u; component < 3u; ++component)
     {
-        rigSnapshot.leftIk.target[component] = leftArmBase[12u + component] +
-            rigSnapshot.leftIk.target[component] - rigSnapshot.leftIk.shoulder[component];
-        rigSnapshot.rightIk.target[component] = rightArmBase[12u + component] +
-            rigSnapshot.rightIk.target[component] - rigSnapshot.rightIk.shoulder[component];
+        rigSnapshot.leftIk.shoulder[component] = leftArmBase[12u + component];
+        rigSnapshot.leftIk.target[component] = rigSnapshot.leftIk.shoulder[component] +
+            authoritativeRigSnapshot.leftIk.target[component] -
+            authoritativeRigSnapshot.leftIk.shoulder[component];
+        rigSnapshot.rightIk.shoulder[component] = rightArmBase[12u + component];
+        rigSnapshot.rightIk.target[component] = rigSnapshot.rightIk.shoulder[component] +
+            authoritativeRigSnapshot.rightIk.target[component] -
+            authoritativeRigSnapshot.rightIk.shoulder[component];
+    }
+    const auto sameArmDelta = [](const auto& modelArm, const auto& authoritativeArm) {
+        for (std::size_t component = 0u; component < 3u; ++component)
+        {
+            const float modelDelta = modelArm.target[component] - modelArm.shoulder[component];
+            const float authoritativeDelta = authoritativeArm.target[component] -
+                                             authoritativeArm.shoulder[component];
+            if (std::abs(modelDelta - authoritativeDelta) > 0.0001f) return false;
+        }
+        return true;
+    };
+    if (!sameArmDelta(rigSnapshot.leftIk, authoritativeRigSnapshot.leftIk) ||
+        !sameArmDelta(rigSnapshot.rightIk, authoritativeRigSnapshot.rightIk))
+    {
+        std::cerr << "FAIL: isolated player fixture mixed view/model spaces: leftBase="
+                  << leftArmBase[12] << ',' << leftArmBase[13] << ',' << leftArmBase[14]
+                  << " viewShoulder=" << authoritativeRigSnapshot.leftIk.shoulder[0] << ','
+                  << authoritativeRigSnapshot.leftIk.shoulder[1] << ','
+                  << authoritativeRigSnapshot.leftIk.shoulder[2]
+                  << " modelTarget=" << rigSnapshot.leftIk.target[0] << ','
+                  << rigSnapshot.leftIk.target[1] << ',' << rigSnapshot.leftIk.target[2]
+                  << '\n';
+        return 1;
     }
     if (!playerSlot.LoadAsset(playerPath.string(), diagnostic))
     {
