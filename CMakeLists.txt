@@ -122,6 +122,10 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AN
 endif()
 
 if(BUILD_TESTING)
+    add_executable(horde_rt_dielectric_math_tests tests/DielectricMathTests.cpp)
+    target_include_directories(horde_rt_dielectric_math_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_dielectric_math_tests COMMAND horde_rt_dielectric_math_tests)
+
     add_executable(horde_rt_player_animation_tests
         tests/PlayerAnimationTests.cpp
         src/scene/assets/SkinnedMeshAsset.cpp
