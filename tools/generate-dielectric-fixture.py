@@ -31,7 +31,8 @@ uvs = [
     (0.0, 0.0), (1.0, 0.0), (1.0, 1.0), (0.0, 1.0),
 ]
 
-def write_glb(output, mesh_indices):
+def write_glb(output, mesh_indices, node_fields=None, include_volume=True,
+              thickness_factor=1.0):
     binary = bytearray()
     for values in positions:
         binary.extend(struct.pack("<3f", *values))
@@ -47,14 +48,25 @@ def write_glb(output, mesh_indices):
     while len(binary) % 4:
         binary.append(0)
 
+    material_extensions = {
+        "KHR_materials_transmission": {"transmissionFactor": 0.94},
+    }
+    extension_names = ["KHR_materials_transmission", "KHR_materials_ior"]
+    if include_volume:
+        extension_names.insert(1, "KHR_materials_volume")
+        material_extensions["KHR_materials_volume"] = {
+            "thicknessFactor": thickness_factor,
+            "attenuationDistance": 2.4,
+            "attenuationColor": [0.72, 0.90, 1.0],
+        }
+    material_extensions["KHR_materials_ior"] = {"ior": 1.52}
+    node = {"name": "GenericDielectricFixture", "mesh": 0}
+    if node_fields:
+        node.update(node_fields)
     document = {
         "asset": {"version": "2.0", "generator": "Horde RT deterministic dielectric fixture"},
-        "extensionsUsed": [
-            "KHR_materials_transmission", "KHR_materials_volume", "KHR_materials_ior"
-        ],
-        "extensionsRequired": [
-            "KHR_materials_transmission", "KHR_materials_volume", "KHR_materials_ior"
-        ],
+        "extensionsUsed": extension_names,
+        "extensionsRequired": extension_names,
         "buffers": [{"byteLength": len(binary)}],
         "bufferViews": [
             {"buffer": 0, "byteOffset": 0, "byteLength": 96, "target": 34962},
@@ -77,21 +89,13 @@ def write_glb(output, mesh_indices):
                 "metallicFactor": 0.0,
                 "roughnessFactor": 0.12,
             },
-            "extensions": {
-                "KHR_materials_transmission": {"transmissionFactor": 0.94},
-                "KHR_materials_volume": {
-                    "thicknessFactor": 1.0,
-                    "attenuationDistance": 2.4,
-                    "attenuationColor": [0.72, 0.90, 1.0],
-                },
-                "KHR_materials_ior": {"ior": 1.52},
-            },
+            "extensions": material_extensions,
         }],
         "meshes": [{"name": "GenericDielectricFixture", "primitives": [{
             "attributes": {"POSITION": 0, "NORMAL": 1, "TEXCOORD_0": 2},
             "indices": 3, "material": 0, "mode": 4,
         }]}],
-        "nodes": [{"name": "GenericDielectricFixture", "mesh": 0}],
+        "nodes": [node],
         "scenes": [{"nodes": [0]}],
         "scene": 0,
     }
@@ -128,6 +132,27 @@ write_glb(OUTPUT, indices)
 write_glb(TEST_OUTPUT / "closed-dielectric-lod0.runtime.glb", indices)
 write_glb(TEST_OUTPUT / "open-dielectric-lod0.runtime.glb", indices[3:])
 write_glb(TEST_OUTPUT / "non-manifold-dielectric-lod0.runtime.glb", indices + indices[:3])
+inward_indices = []
+for triangle_offset in range(0, len(indices), 3):
+    inward_indices.extend((indices[triangle_offset], indices[triangle_offset + 2],
+                           indices[triangle_offset + 1]))
+single_face_flipped = list(indices)
+single_face_flipped[1], single_face_flipped[2] = (
+    single_face_flipped[2], single_face_flipped[1])
+write_glb(TEST_OUTPUT / "inward-dielectric-lod0.runtime.glb", inward_indices)
+write_glb(TEST_OUTPUT / "single-face-flipped-dielectric-lod0.runtime.glb",
+          single_face_flipped)
+write_glb(TEST_OUTPUT / "valid-transformed-dielectric-lod0.runtime.glb", indices,
+          {"matrix": [2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 4, 0, 1, 2, 3, 1]})
+write_glb(TEST_OUTPUT / "negative-scale-dielectric-lod0.runtime.glb", indices,
+          {"scale": [-1, 1, 1]})
+write_glb(TEST_OUTPUT / "millimetre-dielectric-lod0.runtime.glb", indices,
+          {"matrix": [0.001, 0, 0, 0, 0, 0.006, 0, 0,
+                      0, 0, 0.004, 0, -9.1, -0.3, -15.2, 1]})
+write_glb(TEST_OUTPUT / "transmission-only-lod0.runtime.glb", indices,
+          include_volume=False)
+write_glb(TEST_OUTPUT / "zero-thickness-lod0.runtime.glb", indices,
+          thickness_factor=0.0)
 TEST_OUTPUT.mkdir(parents=True, exist_ok=True)
 (TEST_OUTPUT / "asset.manifest.json").write_text(
     json.dumps(manifest, indent=2) + "\n", encoding="utf-8")

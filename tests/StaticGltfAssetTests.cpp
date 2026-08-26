@@ -165,7 +165,9 @@ std::filesystem::path WriteClosedDielectricGlb(const std::filesystem::path& root
                                                bool omitFrontFace,
                                                bool duplicateBottomTriangle,
                                                bool includeVolume = true,
-                                               float thicknessFactor = 1.0f)
+                                               float thicknessFactor = 1.0f,
+                                               int windingMutation = 0,
+                                               std::string_view nodeTransform = {})
 {
     constexpr std::array<std::array<float, 3u>, 8u> positions{{
         {{-0.5f, -0.5f, -0.5f}}, {{0.5f, -0.5f, -0.5f}},
@@ -182,6 +184,15 @@ std::filesystem::path WriteClosedDielectricGlb(const std::filesystem::path& root
     std::vector<std::uint16_t> indices(closedIndices.begin(), closedIndices.end());
     if (omitFrontFace) indices.erase(indices.begin() + 6, indices.begin() + 12);
     if (duplicateBottomTriangle) indices.insert(indices.end(), {0u, 1u, 5u});
+    if (windingMutation == 1)
+    {
+        for (std::size_t triangle = 0u; triangle + 2u < indices.size(); triangle += 3u)
+            std::swap(indices[triangle + 1u], indices[triangle + 2u]);
+    }
+    else if (windingMutation == 2 && indices.size() >= 3u)
+    {
+        std::swap(indices[1], indices[2]);
+    }
 
     std::vector<std::uint8_t> binary;
     for (const auto& p : positions)
@@ -237,7 +248,9 @@ std::filesystem::path WriteClosedDielectricGlb(const std::filesystem::path& root
         "\"KHR_materials_ior\":{\"ior\":1.52}" + volumeExtension + "}}],"
         "\"meshes\":[{\"primitives\":[{\"attributes\":{\"POSITION\":0,\"NORMAL\":1,\"TEXCOORD_0\":2},"
         "\"indices\":3,\"material\":0,\"mode\":4}]}],"
-        "\"nodes\":[{\"name\":\"Root\",\"mesh\":0},{\"name\":\"grip\"}],\"scenes\":[{\"nodes\":[0,1]}],\"scene\":0}";
+        "\"nodes\":[{\"name\":\"Root\",\"mesh\":0" +
+            std::string(nodeTransform) +
+            "},{\"name\":\"grip\"}],\"scenes\":[{\"nodes\":[0,1]}],\"scene\":0}";
     const auto path = root / name;
     WriteGlb(path, json, std::move(binary));
     return path;
@@ -445,6 +458,45 @@ void TestThickDielectricTopology(const std::filesystem::path& temporaryRoot,
     ExpectAssetFailure(
         nonManifold, manifest,
         "Static GLB thick transmissive material 'ClosedGlass' is non-manifold: an edge is referenced more than twice.");
+
+    const auto inward = WriteClosedDielectricGlb(
+        temporaryRoot, "inward-dielectric-lod0.runtime.glb", false, false,
+        true, 1.0f, 1);
+    ExpectAssetFailure(
+        inward, manifest,
+        "Static GLB thick transmissive material 'ClosedGlass' is inward-wound after baked node transforms; reverse every triangle winding so normals face outward.");
+
+    const auto flipped = WriteClosedDielectricGlb(
+        temporaryRoot, "single-face-flipped-dielectric-lod0.runtime.glb", false,
+        false, true, 1.0f, 2);
+    ExpectAssetFailure(
+        flipped, manifest,
+        "Static GLB thick transmissive material 'ClosedGlass' has inconsistent winding: each shared edge must be used once in each direction.");
+
+    const auto transformed = WriteClosedDielectricGlb(
+        temporaryRoot, "valid-transformed-dielectric-lod0.runtime.glb", false,
+        false, true, 1.0f, 0,
+        ",\"matrix\":[2,0,0,0,0,3,0,0,0,0,4,0,1,2,3,1]");
+    const bool transformedLoaded = horde::scene::assets::StaticMeshAsset::Load(
+        transformed, manifest, asset, diagnostic);
+    Check(transformedLoaded,
+          std::string("outward thick dielectric remains valid after positive baked transform: ") + diagnostic);
+
+    const auto millimetre = WriteClosedDielectricGlb(
+        temporaryRoot, "millimetre-dielectric-lod0.runtime.glb", false, false,
+        true, 1.0f, 0,
+        ",\"matrix\":[0.001,0,0,0,0,0.006,0,0,0,0,0.004,0,-9.1,-0.3,-15.2,1]");
+    const bool millimetreLoaded = horde::scene::assets::StaticMeshAsset::Load(
+        millimetre, manifest, asset, diagnostic);
+    Check(millimetreLoaded,
+          std::string("one-to-six millimetre closed dielectric remains valid after baking: ") + diagnostic);
+
+    const auto negativeScale = WriteClosedDielectricGlb(
+        temporaryRoot, "negative-scale-dielectric-lod0.runtime.glb", false,
+        false, true, 1.0f, 0, ",\"scale\":[-1,1,1]");
+    ExpectAssetFailure(
+        negativeScale, manifest,
+        "Static GLB node 'Root' has a negative-determinant transform; bake the reflection and reverse triangle winding/normals before runtime import.");
 }
 
 void TestBakedNodeTransformAndUnitScale(const std::filesystem::path& temporaryRoot)
@@ -568,7 +620,7 @@ void TestMalformedAndUnsupportedGlbs(const std::filesystem::path& temporaryRoot,
         "Static GLB node 'Root' contains a non-finite transform.");
     ExpectAssetFailure(
         RewriteGlb(temporaryRoot, "negative-scale.glb", "\"translation\":[1,2,3]", "\"translation\":[1,2,3],\"scale\":[-1,1,1]"), manifest,
-        "Static GLB node 'Root' contains a negative scale.");
+        "Static GLB node 'Root' has a negative-determinant transform; bake the reflection and reverse triangle winding/normals before runtime import.");
     ExpectAssetFailure(
         RewriteGlb(temporaryRoot, "missing-socket.glb", "\"name\":\"grip\"", "\"name\":\"not-grip\""), manifest,
         "Static GLB is missing required socket 'grip'.");

@@ -25,6 +25,13 @@ function Invoke-ExpectedValidation([string]$name, [int]$expectedExitCode, [strin
 Invoke-ExpectedValidation "closed-dielectric-lod0.runtime.glb" 0 "closed/manifold"
 Invoke-ExpectedValidation "open-dielectric-lod0.runtime.glb" 2 "open thick dielectric volume"
 Invoke-ExpectedValidation "non-manifold-dielectric-lod0.runtime.glb" 2 "referenced more than twice"
+Invoke-ExpectedValidation "inward-dielectric-lod0.runtime.glb" 2 "inward-wound after baked node transforms"
+Invoke-ExpectedValidation "single-face-flipped-dielectric-lod0.runtime.glb" 2 "used once in each direction"
+Invoke-ExpectedValidation "negative-scale-dielectric-lod0.runtime.glb" 2 "negative-determinant transform"
+Invoke-ExpectedValidation "valid-transformed-dielectric-lod0.runtime.glb" 0 "closed/manifold"
+Invoke-ExpectedValidation "millimetre-dielectric-lod0.runtime.glb" 0 "closed/manifold"
+Invoke-ExpectedValidation "transmission-only-lod0.runtime.glb" 0 "0 closed/manifold"
+Invoke-ExpectedValidation "zero-thickness-lod0.runtime.glb" 0 "0 closed/manifold"
 
 $preparationSource = Get-Content -LiteralPath (Join-Path $repoRoot "tools\prepare-static-rt-asset.ps1") -Raw
 if ($preparationSource -notmatch "validate-dielectric-topology\.py") {

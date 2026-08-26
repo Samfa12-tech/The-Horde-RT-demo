@@ -10,6 +10,7 @@
 #include <cstddef>
 #include <limits>
 #include <map>
+#include <optional>
 #include <string_view>
 #include <utility>
 
@@ -260,6 +261,12 @@ bool IsFiniteMaterial(const StaticMaterial& material)
 using QuantizedPosition = std::array<std::int64_t, 3u>;
 using UndirectedEdge = std::pair<QuantizedPosition, QuantizedPosition>;
 
+struct EdgeOrientationCount
+{
+    std::uint32_t ascending = 0u;
+    std::uint32_t descending = 0u;
+};
+
 QuantizedPosition QuantizePosition(const StaticRtVertex& vertex)
 {
     constexpr double precision = 100000.0;
@@ -279,38 +286,56 @@ bool ValidateThickDielectricTopology(const StaticMeshAsset& asset,
         if (material.transmissionFactor <= 0.0f || material.thicknessFactor <= 0.0f ||
             (material.flags & thinWallFlag) != 0u)
             continue;
-        std::map<UndirectedEdge, std::uint32_t> edgeReferences;
+        std::map<UndirectedEdge, EdgeOrientationCount> edgeReferences;
+        double signedSixTimesVolume = 0.0;
+        std::optional<std::array<float, 3u>> volumeOrigin;
         for (const StaticPrimitiveRecord& primitive : asset.primitives)
         {
             if (primitive.materialIndex != materialIndex) continue;
             for (std::uint32_t index = 0u; index < primitive.indexCount; index += 3u)
             {
                 std::array<QuantizedPosition, 3u> triangle{};
+                std::array<std::array<float, 3u>, 3u> positions{};
                 for (std::size_t corner = 0u; corner < triangle.size(); ++corner)
                 {
                     const std::uint32_t localVertex =
                         asset.indices[primitive.indexOffset + index + corner];
-                    triangle[corner] = QuantizePosition(
-                        asset.vertices[primitive.vertexOffset + localVertex]);
+                    const StaticRtVertex& vertex =
+                        asset.vertices[primitive.vertexOffset + localVertex];
+                    triangle[corner] = QuantizePosition(vertex);
+                    positions[corner] = {{
+                        vertex.position[0], vertex.position[1], vertex.position[2]}};
                 }
+                if (!volumeOrigin.has_value()) volumeOrigin = positions[0];
+                std::array<std::array<float, 3u>, 3u> relative = positions;
+                for (auto& position : relative)
+                    for (std::size_t axis = 0u; axis < 3u; ++axis)
+                        position[axis] -= (*volumeOrigin)[axis];
+                signedSixTimesVolume += static_cast<double>(Dot(
+                    relative[0], Cross(relative[1], relative[2])));
                 for (std::size_t edge = 0u; edge < triangle.size(); ++edge)
                 {
                     QuantizedPosition a = triangle[edge];
                     QuantizedPosition b = triangle[(edge + 1u) % triangle.size()];
-                    if (b < a) std::swap(a, b);
                     if (a == b)
                     {
                         diagnostic = "Static GLB thick transmissive material '" +
                             material.name + "' contains a degenerate triangle edge.";
                         return false;
                     }
-                    ++edgeReferences[{a, b}];
+                    const bool ascending = a < b;
+                    if (!ascending) std::swap(a, b);
+                    EdgeOrientationCount& count = edgeReferences[{a, b}];
+                    if (ascending) ++count.ascending;
+                    else ++count.descending;
                 }
             }
         }
-        for (const auto& [edge, references] : edgeReferences)
+        for (const auto& [edge, orientation] : edgeReferences)
         {
             (void)edge;
+            const std::uint32_t references =
+                orientation.ascending + orientation.descending;
             if (references == 1u)
             {
                 diagnostic = "Static GLB thick transmissive material '" + material.name +
@@ -323,6 +348,18 @@ bool ValidateThickDielectricTopology(const StaticMeshAsset& asset,
                     "' is non-manifold: an edge is referenced more than twice.";
                 return false;
             }
+            if (orientation.ascending != 1u || orientation.descending != 1u)
+            {
+                diagnostic = "Static GLB thick transmissive material '" + material.name +
+                    "' has inconsistent winding: each shared edge must be used once in each direction.";
+                return false;
+            }
+        }
+        if (!std::isfinite(signedSixTimesVolume) || signedSixTimesVolume <= 1.0e-18)
+        {
+            diagnostic = "Static GLB thick transmissive material '" + material.name +
+                "' is inward-wound after baked node transforms; reverse every triangle winding so normals face outward.";
+            return false;
         }
     }
     return true;

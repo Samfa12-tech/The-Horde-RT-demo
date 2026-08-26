@@ -86,22 +86,17 @@ bool ValidateNodeTransform(const cgltf_node& node, std::string& diagnostic)
         diagnostic = "Static GLB node '" + NodeName(node) + "' contains a non-finite transform.";
         return false;
     }
-    if (node.has_scale && (node.scale[0] < 0.0f || node.scale[1] < 0.0f || node.scale[2] < 0.0f))
+    float local[16]{};
+    cgltf_node_transform_local(&node, local);
+    const float determinant =
+        local[0] * (local[5] * local[10] - local[9] * local[6]) -
+        local[4] * (local[1] * local[10] - local[9] * local[2]) +
+        local[8] * (local[1] * local[6] - local[5] * local[2]);
+    if (determinant < 0.0f)
     {
-        diagnostic = "Static GLB node '" + NodeName(node) + "' contains a negative scale.";
+        diagnostic = "Static GLB node '" + NodeName(node) +
+            "' has a negative-determinant transform; bake the reflection and reverse triangle winding/normals before runtime import.";
         return false;
-    }
-    if (node.has_matrix)
-    {
-        const float determinant =
-            node.matrix[0] * (node.matrix[5] * node.matrix[10] - node.matrix[9] * node.matrix[6]) -
-            node.matrix[4] * (node.matrix[1] * node.matrix[10] - node.matrix[9] * node.matrix[2]) +
-            node.matrix[8] * (node.matrix[1] * node.matrix[6] - node.matrix[5] * node.matrix[2]);
-        if (determinant < 0.0f)
-        {
-            diagnostic = "Static GLB node '" + NodeName(node) + "' contains a negative scale.";
-            return false;
-        }
     }
     return true;
 }
