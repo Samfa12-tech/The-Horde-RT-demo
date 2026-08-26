@@ -139,7 +139,7 @@ bool BuildFireEmitterUpload(
     }
     std::sort(candidates.begin(), candidates.end(), [](const Candidate& left,
                                                         const Candidate& right) {
-        if (std::abs(left.distanceSquared - right.distanceSquared) > 0.000001f)
+        if (left.distanceSquared != right.distanceSquared)
             return left.distanceSquared < right.distanceSquared;
         return left.emitter->stableId < right.emitter->stableId;
     });
