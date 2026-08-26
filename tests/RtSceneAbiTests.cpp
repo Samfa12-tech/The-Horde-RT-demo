@@ -92,6 +92,9 @@ void TestAbiLayout()
               offsetof(RtMaterialGpu, textureLayers) == 80u &&
               offsetof(RtMaterialGpu, materialFlags) == 96u,
           "RtMaterialGpu CPU offsets match generated GLSL declaration");
+    Check(sizeof(RtHeldLightGpu) == 16u && alignof(RtHeldLightGpu) == 16u &&
+              offsetof(RtHeldLightGpu, positionStrength) == 0u,
+          "RtHeldLightGpu appends one exact world-position/strength vec4");
 }
 
 void TestGeneratedConstants()
@@ -106,8 +109,8 @@ void TestGeneratedConstants()
               kRtBindingMaterials == 13u && kRtBindingStaticVertices == 14u &&
               kRtBindingStaticIndices == 15u && kRtBindingBaseColorTextures == 16u &&
               kRtBindingNormalTextures == 17u && kRtBindingOrmTextures == 18u &&
-              kRtBindingEmissiveTextures == 19u,
-          "new descriptor bindings append contiguously after immutable binding 10");
+              kRtBindingEmissiveTextures == 19u && kRtBindingHeldLight == 20u,
+          "descriptor bindings append contiguously through held light without changing 0-19");
     Check(static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr) == 1u &&
               static_cast<std::uint32_t>(RtInstanceFlag::Emissive) == 2u &&
               static_cast<std::uint32_t>(RtInstanceFlag::Transmissive) == 4u,

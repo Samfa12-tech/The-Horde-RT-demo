@@ -114,6 +114,7 @@ inline constexpr std::uint32_t kRtBindingBaseColorTextures = $($b.baseColorTextu
 inline constexpr std::uint32_t kRtBindingNormalTextures = $($b.normalTextures)u;
 inline constexpr std::uint32_t kRtBindingOrmTextures = $($b.ormTextures)u;
 inline constexpr std::uint32_t kRtBindingEmissiveTextures = $($b.emissiveTextures)u;
+inline constexpr std::uint32_t kRtBindingHeldLight = $($b.heldLight)u;
 
 enum class RtInstanceFlag : std::uint32_t
 {
@@ -182,6 +183,10 @@ layout(set = 0, binding = $($b.baseColorTextures)) uniform sampler2DArray rtBase
 layout(set = 0, binding = $($b.normalTextures)) uniform sampler2DArray rtNormalTextures;
 layout(set = 0, binding = $($b.ormTextures)) uniform sampler2DArray rtOrmTextures;
 layout(set = 0, binding = $($b.emissiveTextures)) uniform sampler2DArray rtEmissiveTextures;
+layout(std430, set = 0, binding = $($b.heldLight)) readonly buffer RtHeldLightBuffer
+{
+    RtHeldLightGpu value;
+} rtHeldLight;
 "@
 
 function Normalize-Newlines([string]$text) { return $text.Replace("`r`n", "`n").TrimEnd("`r", "`n") + "`n" }

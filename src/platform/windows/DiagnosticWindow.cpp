@@ -3287,6 +3287,10 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx)
                   << ", textureBytes=" << ctx.rtScene.StaticTextureBytes()
                   << ", blasBytes=" << ctx.rtScene.StaticMeshBlasBytes()
                   << ", blasBuildMs=" << ctx.rtScene.StaticMeshBlasBuildMilliseconds()
+                  << ", swordBlasBytes=" << ctx.rtScene.StaticMeshSwordBlasBytes()
+                  << ", swordBlasBuildMs=" << ctx.rtScene.StaticMeshSwordBlasBuildMilliseconds()
+                  << ", torchBlasBytes=" << ctx.rtScene.StaticMeshTorchBlasBytes()
+                  << ", torchBlasBuildMs=" << ctx.rtScene.StaticMeshTorchBlasBuildMilliseconds()
                   << '\n' << std::flush;
     }
 
@@ -3688,6 +3692,12 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
              << ", \"descriptorCount\": " << context.rtScene.StaticMeshMeasurements().descriptorCount
              << ", \"blasBytes\": " << context.rtScene.StaticMeshBlasBytes()
              << ", \"blasBuildMilliseconds\": " << context.rtScene.StaticMeshBlasBuildMilliseconds()
+             << ", \"swordBlasBytes\": " << context.rtScene.StaticMeshSwordBlasBytes()
+             << ", \"swordBlasBuildMilliseconds\": "
+             << context.rtScene.StaticMeshSwordBlasBuildMilliseconds()
+             << ", \"torchBlasBytes\": " << context.rtScene.StaticMeshTorchBlasBytes()
+             << ", \"torchBlasBuildMilliseconds\": "
+             << context.rtScene.StaticMeshTorchBlasBuildMilliseconds()
              << "},\n"
              << "  \"error\": " << (error.empty() ? "null" : "\"" + JsonEscape(error) + "\"") << ",\n"
              << "  \"captures\": [\n";
@@ -4532,6 +4542,8 @@ void ShowCredits(HWND window)
                 "Water Dripping by DRAGON-STUDIO via Pixabay (Pixabay Content License).\n"
                 "Skeleton derivative: original by Hotstrike Studio; texture, rig, and animation processing created with Meshy (CC BY 4.0).\n"
                 "Placeholder lich character created and animated with Meshy (CC0).\n"
+                "Production Gothic arming sword created with Meshy; runtime processing by Samfa12/Codex (CC BY 4.0).\n"
+                "Production medieval hand torch created with Meshy; runtime processing by Samfa12/Codex (CC BY 4.0).\n"
                 "Application icon created for this project with OpenAI image generation.\n\n"
                 "See ASSET_LICENSES.md beside the demo for source links and full licence details.",
                 "Horde Lantern RT - credits and licences",

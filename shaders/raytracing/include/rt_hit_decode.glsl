@@ -193,64 +193,6 @@ void materialForPrimitive(int primitive,
         emissive = 0.0;
         return;
     }
-    if (instance == 1)
-    {
-        vec3 cameraForward = normalize(vec3(sin(controls.yaw), -0.05 + controls.pitch, -cos(controls.yaw)));
-        vec3 cameraRight = normalize(cross(cameraForward, vec3(0.0, 1.0, 0.0)));
-        vec3 cameraUp = normalize(cross(cameraRight, cameraForward));
-        int boxFace = (primitive % 12) / 2;
-        normal = boxFace == 0 ? -cameraForward :
-                 (boxFace == 1 ? cameraForward :
-                 (boxFace == 2 ? -cameraRight :
-                 (boxFace == 3 ? cameraRight :
-                 (boxFace == 4 ? cameraUp : -cameraUp))));
-        geometricNormal = normal;
-        metallic = 0.0;
-        reflectivity = primitive < 12 ? 0.14 : 0.48;
-        if (primitive < 12)
-        {
-            base = vec3(0.18, 0.075, 0.025);
-            emissive = 0.0;
-        }
-        else if (primitive < 84)
-        {
-            base = vec3(0.12, 0.095, 0.07);
-            metallic = 0.82;
-            emissive = 0.0;
-        }
-        else
-        {
-            bool innerFlame = primitive >= 92;
-            float flicker = sin(controls.time * 17.0 + float(primitive) * 1.7);
-            base = tunedLightColor(
-                innerFlame ? vec3(1.0, 0.56, 0.055) : vec3(1.0, 0.105, 0.008),
-                kLightTorch);
-            emissive = controls.torchLight * ((innerFlame ? 3.6 : 2.75) + 0.35 * flicker);
-            if (controls.torchLight <= 0.001)
-            {
-                base = vec3(0.045, 0.025, 0.018);
-            }
-            normal = cameraForward;
-            geometricNormal = normal;
-            metallic = 0.0;
-            reflectivity = 0.0;
-        }
-        return;
-    }
-
-    if (instance == 3)
-    {
-        vec3 cameraForward = normalize(vec3(sin(controls.yaw), -0.05 + controls.pitch, -cos(controls.yaw)));
-        normal = cameraForward;
-        geometricNormal = normal;
-        bool leather = primitive < 2 || (primitive >= 7 && primitive < 9);
-        base = leather ? vec3(0.16, 0.075, 0.028) : vec3(0.48, 0.52, 0.56);
-        metallic = leather ? 0.12 : 0.92;
-        reflectivity = leather ? 0.22 : 0.86;
-        emissive = 0.0;
-        return;
-    }
-
     if (instance >= 4 && instance <= 16)
     {
         normal = normalize(vec3(controls.cameraX, 0.75, controls.cameraZ) - p);
@@ -451,7 +393,6 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
         h.primitive = rayQueryGetIntersectionPrimitiveIndexEXT(query, true);
         h.instance = int(rayQueryGetIntersectionInstanceCustomIndexEXT(query, true));
         h.position = origin + direction * h.t;
-        materialForPrimitive(h.primitive, h.instance, h.position, h.material, h.normal, h.geometricNormal, h.base, h.metallic, h.reflectivity, h.emissive);
         RtInstanceMetadata instanceMetadata = rtInstances.values[h.instance];
         uint geometryIndex = rayQueryGetIntersectionGeometryIndexEXT(query, true);
         if ((instanceMetadata.flags & kRtInstanceFlagStaticPbr) != 0u)
@@ -525,7 +466,8 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
                 h.emissive = max(emission.r, max(emission.g, emission.b));
                 if (h.emissive > 0.0001) h.base = emission / h.emissive;
             }
-            else if (instanceMetadata.emitterIndex != 0u)
+            else if (instanceMetadata.emitterIndex != 0u &&
+                     geometryIndex == instanceMetadata.emitterIndex)
             {
                 // Engine-owned held emitters remain separate from authored PBR
                 // bodies. Task 4 can replace this temporary faceted core without
@@ -544,6 +486,12 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
                 h.metallic = 0.0;
                 h.reflectivity = 0.0;
             }
+        }
+        else
+        {
+            materialForPrimitive(h.primitive, h.instance, h.position, h.material,
+                                 h.normal, h.geometricNormal, h.base, h.metallic,
+                                 h.reflectivity, h.emissive);
         }
         if (h.instance == 2 || h.instance == 18)
         {

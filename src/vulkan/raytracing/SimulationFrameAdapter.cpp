@@ -44,6 +44,8 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     frame.skeletonEnemyCount = simulation.skeletonEnemyCount;
     frame.torchFailure = simulation.torchFailure;
     frame.heldItems = simulation.heldItems;
+    frame.heldItemKinematics = simulation.heldItemKinematics;
+    frame.heldLight = simulation.heldLight;
     frame.roster = simulation.enemyRoster;
     frame.lich = simulation.lich;
     frame.lich.finaleSkylightOpenProgress = ResolveRtFinaleRoofOpen(

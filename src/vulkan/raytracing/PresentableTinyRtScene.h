@@ -9,8 +9,11 @@
 
 #include "gameplay/SwordCombat.h"
 #include "gameplay/ShowcaseGameplay.h"
+#include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/items/HeldItemState.h"
+#include "gameplay/items/HeldLightState.h"
 #include "vulkan/raytracing/CharacterRenderSlot.h"
+#include "vulkan/raytracing/HeldItemBlasMeasurements.h"
 #include "vulkan/raytracing/RtGpuResources.h"
 #include "vulkan/raytracing/RtSceneTuning.h"
 #include "vulkan/raytracing/RtStaticMeshSlot.h"
@@ -57,6 +60,8 @@ struct RtSceneFrameInputs
     std::size_t skeletonEnemyCount = 0u;
     horde::gameplay::TorchFailureSnapshot torchFailure{};
     horde::gameplay::items::HeldItemStates heldItems{};
+    horde::gameplay::items::HeldItemKinematicsState heldItemKinematics{};
+    horde::gameplay::items::HeldLightState heldLight{};
     horde::gameplay::EnemyRosterSnapshot roster{};
     horde::gameplay::LichSnapshot lich{};
 };
@@ -111,8 +116,18 @@ public:
     bool GenericStaticAssetEnabled() const { return genericStaticAssetEnabled_; }
     const RtStaticMeshMeasurements& StaticMeshMeasurements() const { return staticMeshSlot_.Measurements(); }
     VkDeviceSize StaticMeshBlasBytes() const { return staticMeshBlasBytes_; }
+    VkDeviceSize StaticMeshSwordBlasBytes() const { return heldItemBlasMeasurements_.swordBytes; }
+    VkDeviceSize StaticMeshTorchBlasBytes() const { return heldItemBlasMeasurements_.torchBytes; }
     VkDeviceSize StaticTextureBytes() const { return staticTextureBytes_; }
     double StaticMeshBlasBuildMilliseconds() const { return staticMeshBlasBuildMilliseconds_; }
+    double StaticMeshSwordBlasBuildMilliseconds() const
+    {
+        return heldItemBlasMeasurements_.swordBuildMilliseconds;
+    }
+    double StaticMeshTorchBlasBuildMilliseconds() const
+    {
+        return heldItemBlasMeasurements_.torchBuildMilliseconds;
+    }
 
     bool RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                             VkImage swapchainImage,
@@ -209,6 +224,7 @@ private:
     Buffer indexBuffer_;
     Buffer transformBuffer_;
     Buffer instanceBuffer_;
+    Buffer heldLightBuffer_;
     Buffer worldSurfaceBuffer_;
     Buffer staticVertexBuffer_;
     Buffer staticIndexBuffer_;
@@ -237,6 +253,7 @@ private:
     VkDeviceSize staticMeshBlasBytes_ = 0u;
     VkDeviceSize staticTextureBytes_ = 0u;
     double staticMeshBlasBuildMilliseconds_ = 0.0;
+    HeldItemBlasMeasurements heldItemBlasMeasurements_{};
 
     VkDescriptorSetLayout descriptorSetLayout_ = VK_NULL_HANDLE;
     VkDescriptorPool descriptorPool_ = VK_NULL_HANDLE;

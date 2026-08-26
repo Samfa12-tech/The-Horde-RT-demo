@@ -16,7 +16,8 @@
     "baseColorTextures": 16,
     "normalTextures": 17,
     "ormTextures": 18,
-    "emissiveTextures": 19
+    "emissiveTextures": 19,
+    "heldLight": 20
   },
   "instanceFlags": {
     "staticPbr": 1,
@@ -74,6 +75,12 @@
         { "name": "attenuationColor", "type": "float4", "offset": 64 },
         { "name": "textureLayers", "type": "uint4", "offset": 80 },
         { "name": "materialFlags", "type": "uint4", "offset": 96 }
+      ]
+    },
+    {
+      "name": "RtHeldLightGpu", "alignment": 16, "size": 16,
+      "fields": [
+        { "name": "positionStrength", "type": "float4", "offset": 0 }
       ]
     }
   ]

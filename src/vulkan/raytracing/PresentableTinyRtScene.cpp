@@ -266,6 +266,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     indexBuffer_ = std::exchange(other.indexBuffer_, Buffer{});
     transformBuffer_ = std::exchange(other.transformBuffer_, Buffer{});
     instanceBuffer_ = std::exchange(other.instanceBuffer_, Buffer{});
+    heldLightBuffer_ = std::exchange(other.heldLightBuffer_, Buffer{});
     worldSurfaceBuffer_ = std::exchange(other.worldSurfaceBuffer_, Buffer{});
     staticVertexBuffer_ = std::exchange(other.staticVertexBuffer_, Buffer{});
     staticIndexBuffer_ = std::exchange(other.staticIndexBuffer_, Buffer{});
@@ -295,6 +296,8 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     staticMeshBlasBytes_ = std::exchange(other.staticMeshBlasBytes_, 0u);
     staticTextureBytes_ = std::exchange(other.staticTextureBytes_, 0u);
     staticMeshBlasBuildMilliseconds_ = std::exchange(other.staticMeshBlasBuildMilliseconds_, 0.0);
+    heldItemBlasMeasurements_ = std::exchange(
+        other.heldItemBlasMeasurements_, HeldItemBlasMeasurements{});
     descriptorSetLayout_ = std::exchange(other.descriptorSetLayout_, VK_NULL_HANDLE);
     descriptorPool_ = std::exchange(other.descriptorPool_, VK_NULL_HANDLE);
     descriptorSet_ = std::exchange(other.descriptorSet_, VK_NULL_HANDLE);
@@ -438,6 +441,7 @@ void PresentableTinyRtScene::Destroy()
     DestroyBuffer(staticIndexBuffer_);
     DestroyBuffer(staticGeometryTransformBuffer_);
     DestroyBuffer(staticVertexBuffer_);
+    DestroyBuffer(heldLightBuffer_);
     DestroyBuffer(instanceBuffer_);
     DestroyBuffer(transformBuffer_);
     DestroyBuffer(indexBuffer_);
@@ -468,6 +472,7 @@ void PresentableTinyRtScene::Destroy()
     staticMeshBlasBytes_ = 0u;
     staticTextureBytes_ = 0u;
     staticMeshBlasBuildMilliseconds_ = 0.0;
+    heldItemBlasMeasurements_ = {};
 
     if (storageImageView_ != VK_NULL_HANDLE)
     {
@@ -1705,12 +1710,27 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
 
     // The production torch body comes through the generic static GLB/PBR slot.
     // Retain only the temporary engine-owned faceted flame core for Task 4.
-    const auto addFacetedFlame = [&addTriangle](float radius, float bottom, float waist, float top) {
-        const Vertex lower{{0.0f, bottom, 0.0f}};
-        const Vertex upper{{0.0f, top, 0.0f}};
+    horde::gameplay::items::HeldItemTransform itemFromEngineFlame =
+        horde::gameplay::items::IdentityHeldItemTransform();
+    const auto transformFlameVertex = [&itemFromEngineFlame](const Vertex& vertex) {
+        const auto& p = vertex.position;
+        return Vertex{{
+            itemFromEngineFlame[0] * p[0] + itemFromEngineFlame[4] * p[1] +
+                itemFromEngineFlame[8] * p[2] + itemFromEngineFlame[12],
+            itemFromEngineFlame[1] * p[0] + itemFromEngineFlame[5] * p[1] +
+                itemFromEngineFlame[9] * p[2] + itemFromEngineFlame[13],
+            itemFromEngineFlame[2] * p[0] + itemFromEngineFlame[6] * p[1] +
+                itemFromEngineFlame[10] * p[2] + itemFromEngineFlame[14]}};
+    };
+    const auto addFacetedFlame = [&addTriangle, &transformFlameVertex](
+        float radius, float bottom, float waist, float top) {
+        const Vertex lower = transformFlameVertex(Vertex{{0.0f, bottom, 0.0f}});
+        const Vertex upper = transformFlameVertex(Vertex{{0.0f, top, 0.0f}});
         const std::array<Vertex, 4u> ring{{
-            Vertex{{radius, waist, 0.0f}}, Vertex{{0.0f, waist, radius}},
-            Vertex{{-radius, waist, 0.0f}}, Vertex{{0.0f, waist, -radius}}}};
+            transformFlameVertex(Vertex{{radius, waist, 0.0f}}),
+            transformFlameVertex(Vertex{{0.0f, waist, radius}}),
+            transformFlameVertex(Vertex{{-radius, waist, 0.0f}}),
+            transformFlameVertex(Vertex{{0.0f, waist, -radius}})}};
         for (std::size_t i = 0u; i < ring.size(); ++i)
         {
             const Vertex& current = ring[i];
@@ -1719,7 +1739,6 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
             addTriangle(upper, current, next);
         }
     };
-    float engineFlameOffset = 0.0f;
     if (productionHeldItemAssetsEnabled_)
     {
         const auto* flameSocket = horde::gameplay::items::FindHeldItemSocket(
@@ -1729,12 +1748,18 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
             diagnostic = "Production torch is missing the exact Flame socket.";
             return false;
         }
-        engineFlameOffset = flameSocket->world[13] - 0.31f;
+        itemFromEngineFlame = flameSocket->world;
     }
-    addFacetedFlame(0.095f, 0.16f + engineFlameOffset, 0.31f + engineFlameOffset,
-                    0.58f + engineFlameOffset);                 // orange outer flame: 8 triangles
-    addFacetedFlame(0.050f, 0.19f + engineFlameOffset, 0.30f + engineFlameOffset,
-                    0.47f + engineFlameOffset);                 // bright inner flame: 8 triangles
+    if (productionHeldItemAssetsEnabled_)
+    {
+        addFacetedFlame(0.095f, -0.15f, 0.0f, 0.27f); // orange outer: 8 triangles
+        addFacetedFlame(0.050f, -0.12f, -0.01f, 0.16f); // bright inner: 8 triangles
+    }
+    else
+    {
+        addFacetedFlame(0.095f, 0.16f, 0.31f, 0.58f);
+        addFacetedFlame(0.050f, 0.19f, 0.30f, 0.47f);
+    }
     const std::uint32_t torchIndexCount = static_cast<std::uint32_t>(indices.size());
 
     // The procedural sword proof is retired; instance 3 always uses the
@@ -1834,14 +1859,19 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     if (!CreateBuffer(vertexBufferSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, vertexBuffer_, diagnostic) ||
         !CreateBuffer(indexBufferSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, indexBuffer_, diagnostic) ||
         !CreateBuffer(sizeof(transform), VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, transformBuffer_, diagnostic) ||
+        !CreateBuffer(sizeof(RtHeldLightGpu), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                      uploadMemory, false, heldLightBuffer_, diagnostic) ||
         !CreateBuffer(worldSurfaceBufferSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, uploadMemory, false, worldSurfaceBuffer_, diagnostic))
     {
         return false;
     }
 
+    const RtHeldLightGpu initialHeldLight{};
     if (!WriteBuffer(vertexBuffer_, vertices.data(), vertexBufferSize, "world vertex", diagnostic) ||
         !WriteBuffer(indexBuffer_, indices.data(), indexBufferSize, "world index", diagnostic) ||
         !WriteBuffer(transformBuffer_, &transform, sizeof(transform), "world transform", diagnostic) ||
+        !WriteBuffer(heldLightBuffer_, &initialHeldLight, sizeof(initialHeldLight),
+                     "held light", diagnostic) ||
         !WriteBuffer(worldSurfaceBuffer_, worldSurfaceCodes.data(), worldSurfaceBufferSize,
                      "world surface metadata", diagnostic))
     {
@@ -2167,10 +2197,18 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     for (const auto& range : torchRanges) torchBlasRangePointers.push_back(&range);
     BlasBuildData torchBlasBuildData{
         this, &torchBlasBuildInfo, torchBlasRangePointers.data()};
+    const auto torchBlasBuildStart = std::chrono::steady_clock::now();
     if (!RunOneTimeCommands(buildBlas, &torchBlasBuildData, diagnostic))
     {
         DestroyBuffer(torchBlasScratch);
         return false;
+    }
+    if (productionHeldItemAssetsEnabled_)
+    {
+        heldItemBlasMeasurements_.RecordTorch(
+            torchBlasSizes.accelerationStructureSize,
+            std::chrono::duration<double, std::milli>(
+                std::chrono::steady_clock::now() - torchBlasBuildStart).count());
     }
     DestroyBuffer(torchBlasScratch);
 
@@ -2205,7 +2243,6 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     vkGetAccelerationStructureBuildSizesKHR_(device_, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR,
                                              &swordBlasBuildInfo, swordPrimitiveCounts.data(),
                                              &swordBlasSizes);
-    if (genericStaticAssetEnabled_) staticMeshBlasBytes_ = swordBlasSizes.accelerationStructureSize;
     if (!CreateBuffer(swordBlasSizes.accelerationStructureSize,
                       VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR,
                       VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
@@ -2248,9 +2285,13 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     }
     if (genericStaticAssetEnabled_)
     {
-        staticMeshBlasBuildMilliseconds_ =
+        heldItemBlasMeasurements_.RecordSword(
+            swordBlasSizes.accelerationStructureSize,
             std::chrono::duration<double, std::milli>(
-                std::chrono::steady_clock::now() - staticBlasBuildStart).count();
+                std::chrono::steady_clock::now() - staticBlasBuildStart).count());
+        staticMeshBlasBytes_ = heldItemBlasMeasurements_.TotalBytes();
+        staticMeshBlasBuildMilliseconds_ =
+            heldItemBlasMeasurements_.TotalBuildMilliseconds();
     }
     DestroyBuffer(swordBlasScratch);
     VkAccelerationStructureDeviceAddressInfoKHR swordBlasAddressInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR};
@@ -2688,7 +2729,7 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
     const auto& skeletonVertexBuffer_ = characterSlot_.SkeletonGpu(0u).vertices;
     const auto& secondSkeletonVertexBuffer = characterSlot_.SkeletonGpu(1u).vertices;
     const auto& lichVertexBuffer_ = characterSlot_.LichGpu().vertices;
-    const std::array<VkDescriptorSetLayoutBinding, 20u> bindings{{
+    const std::array<VkDescriptorSetLayoutBinding, 21u> bindings{{
         {0u, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, nullptr},
         {1u, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
         {2u, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
@@ -2709,6 +2750,7 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
         {kRtBindingNormalTextures, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
         {kRtBindingOrmTextures, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
         {kRtBindingEmissiveTextures, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
+        {kRtBindingHeldLight, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
     }};
     const VkDescriptorSetLayoutCreateInfo layoutInfo{
         VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
@@ -2725,7 +2767,7 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
     const std::array<VkDescriptorPoolSize, 4u> poolSizes{{
         {VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1u},
         {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1u},
-        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 9u},
+        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 10u},
         {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 9u},
     }};
     const VkDescriptorPoolCreateInfo poolInfo{
@@ -2815,6 +2857,8 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
         staticVertexBuffer_.buffer, 0u, staticVertexBuffer_.size};
     const VkDescriptorBufferInfo staticIndexInfo{
         staticIndexBuffer_.buffer, 0u, staticIndexBuffer_.size};
+    const VkDescriptorBufferInfo heldLightInfo{
+        heldLightBuffer_.buffer, 0u, heldLightBuffer_.size};
 
     VkDescriptorBufferInfo lichBufferInfo{};
     lichBufferInfo.buffer = lichVertexBuffer_.buffer;
@@ -2864,7 +2908,7 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
         write.pImageInfo = info;
         return write;
     };
-    const std::array<VkWriteDescriptorSet, 20u> writes{{accelerationStructureWrite, imageWrite, skeletonWrite,
+    const std::array<VkWriteDescriptorSet, 21u> writes{{accelerationStructureWrite, imageWrite, skeletonWrite,
                                                        sampledWrite(3u, &diffuseInfo), sampledWrite(4u, &normalInfo), sampledWrite(5u, &armInfo),
                                                        worldSurfaceWrite, lichBufferWrite,
                                                        sampledWrite(8u, &lichBaseInfo), sampledWrite(9u, &lichEmissiveInfo),
@@ -2877,7 +2921,8 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
                                                        sampledWrite(kRtBindingBaseColorTextures, &staticBaseInfo),
                                                        sampledWrite(kRtBindingNormalTextures, &staticNormalInfo),
                                                        sampledWrite(kRtBindingOrmTextures, &staticOrmInfo),
-                                                       sampledWrite(kRtBindingEmissiveTextures, &staticEmissiveInfo)}};
+                                                       sampledWrite(kRtBindingEmissiveTextures, &staticEmissiveInfo),
+                                                       bufferWrite(kRtBindingHeldLight, &heldLightInfo)}};
     vkUpdateDescriptorSets(device_, static_cast<std::uint32_t>(writes.size()), writes.data(), 0u, nullptr);
 
     diagnostic.clear();
@@ -3058,7 +3103,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const auto& skeletonGpu = characterSlot_.SkeletonGpu(0u);
     const auto& secondSkeletonGpu = characterSlot_.SkeletonGpu(1u);
     const auto& lichGpu = characterSlot_.LichGpu();
-    if (instanceBuffer_.memory == VK_NULL_HANDLE || skeletonGpu.vertices.memory == VK_NULL_HANDLE ||
+    if (instanceBuffer_.memory == VK_NULL_HANDLE || heldLightBuffer_.memory == VK_NULL_HANDLE ||
+        skeletonGpu.vertices.memory == VK_NULL_HANDLE ||
         secondSkeletonGpu.vertices.memory == VK_NULL_HANDLE ||
         skeletonGpu.accelerationStructure.handle == VK_NULL_HANDLE ||
         secondSkeletonGpu.accelerationStructure.handle == VK_NULL_HANDLE ||
@@ -3088,12 +3134,6 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         const float length = std::sqrt(std::max(dot(v, v), 0.0000001f));
         return Vec3{v[0] / length, v[1] / length, v[2] / length};
     };
-    const auto lerp = [](const Vec3& a, const Vec3& b, float amount) {
-        return Vec3{a[0] + (b[0] - a[0]) * amount,
-                    a[1] + (b[1] - a[1]) * amount,
-                    a[2] + (b[2] - a[2]) * amount};
-    };
-
     const Vec3 worldUp{0.0f, 1.0f, 0.0f};
     const Vec3 eye{cameraX, 0.58f, cameraZ};
     const Vec3 bodyForward{std::sin(cameraYaw), 0.0f, -std::cos(cameraYaw)};
@@ -3141,17 +3181,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             xAxis[2] * radius, yAxis[2] * radius, zAxis[2] * length, start[2]}};
     };
 
-    constexpr float torchScale = 0.56f;
-    const horde::gameplay::items::HeldItemKinematicsState heldKinematics =
-        horde::gameplay::items::EvaluateHeldItemKinematics({
-            cameraX,
-            cameraZ,
-            cameraYaw,
-            walkTime,
-            walkAmount,
-            torchFailure,
-            playerCombat,
-            combat.swordSwingRadians});
+    const horde::gameplay::items::HeldItemKinematicsState& heldKinematics =
+        frame.heldItemKinematics;
     const Vec3 leftShoulderLocal = heldKinematics.leftShoulderLocal;
     const Vec3 leftHandLocal = heldKinematics.leftHandLocal;
     const Vec3 rightShoulderLocal = heldKinematics.rightShoulderLocal;
@@ -3164,214 +3195,6 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const Vec3 rightShoulder = toWorld(rightShoulderLocal);
     const Vec3 rightElbow = toWorld(rightElbowLocal);
     const Vec3 rightHand = toWorld(rightHandLocal);
-
-    const Vec3 torchColumnX = scaled(viewRight, torchScale);
-    const Vec3 torchColumnY = scaled(viewUp, torchScale);
-    const Vec3 torchColumnZ = scaled(viewForward, torchScale);
-    // Local torch grip is (0, -0.22, 0), so T = hand - M * grip.
-    Vec3 torchTranslation = add(leftHand, scaled(torchColumnY, 0.22f));
-    Vec3 finalTorchColumnX = torchColumnX;
-    Vec3 finalTorchColumnY = torchColumnY;
-    Vec3 finalTorchColumnZ = torchColumnZ;
-    if (!torchFailure.heldByPlayer)
-    {
-        const float releaseYawCos = std::cos(torchFailure.droppedYawRadians);
-        const float releaseYawSin = std::sin(torchFailure.droppedYawRadians);
-        const Vec3 releaseBodyForward{releaseYawSin, 0.0f, -releaseYawCos};
-        const Vec3 releaseBodyRight{releaseYawCos, 0.0f, releaseYawSin};
-        const Vec3 releaseViewForward = normalize(Vec3{
-            releaseYawSin,
-            -0.05f + std::clamp(torchFailure.droppedViewPitchRadians, -0.32f, 0.28f),
-            -releaseYawCos});
-        const Vec3 releaseViewRight = normalize(cross(releaseViewForward, worldUp));
-        const Vec3 releaseViewUp = normalize(cross(releaseViewRight, releaseViewForward));
-        const float releaseDepth = horde::gameplay::ComputeShowcaseHeldPropDepth(
-            torchFailure.droppedX, torchFailure.droppedZ, releaseBodyForward[0], releaseBodyForward[2]);
-        const Vec3 releaseEye{torchFailure.droppedX, 0.58f, torchFailure.droppedZ};
-        const Vec3 releaseLeftHand = add(
-            add(add(releaseEye, scaled(releaseViewRight, -0.34f)), scaled(releaseViewUp, -0.40f)),
-            scaled(releaseViewForward, releaseDepth));
-        const Vec3 releaseTorchColumnY = scaled(releaseViewUp, torchScale);
-        const Vec3 releaseTorchTranslation = add(releaseLeftHand, scaled(releaseTorchColumnY, 0.22f));
-        const float pitchCos = std::cos(torchFailure.droppedPitchRadians);
-        const float pitchSin = std::sin(torchFailure.droppedPitchRadians);
-        finalTorchColumnX = scaled(releaseBodyRight, torchScale);
-        finalTorchColumnY = scaled(add(scaled(worldUp, pitchCos), scaled(releaseBodyForward, pitchSin)), torchScale);
-        finalTorchColumnZ = scaled(add(scaled(releaseBodyForward, pitchCos), scaled(worldUp, -pitchSin)), torchScale);
-        // The authored horizontal rest pose needs its centre slightly above the
-        // floor: the local shaft/flame geometry straddles the grip origin after
-        // the 1.36 rad pitch, so placing that origin exactly at floor height
-        // buries the readable cage and shaft.
-        Vec3 settledPosition = add(
-            add(Vec3{torchFailure.droppedX, torchFailure.droppedY, torchFailure.droppedZ}, scaled(worldUp, 0.13f)),
-            add(scaled(releaseBodyRight, -0.34f), scaled(releaseBodyForward, 0.78f)));
-        // The trigger occupies the western route edge and the player may face
-        // any direction when it fires. Keep the settled prop inside a compact
-        // inset of that leg instead of allowing the authored offset to bury it
-        // in a wall return.
-        settledPosition[0] = std::clamp(settledPosition[0], -2.28f, 4.58f);
-        settledPosition[2] = std::clamp(settledPosition[2], -16.18f, -14.22f);
-        torchTranslation = lerp(releaseTorchTranslation,
-                                settledPosition,
-                                std::clamp(torchFailure.fallProgress, 0.0f, 1.0f));
-    }
-
-    const float swordPoseRadians = heldKinematics.swordRadians;
-    const float swordCos = std::cos(swordPoseRadians);
-    const float swordSin = std::sin(swordPoseRadians);
-    Vec3 swordColumnX = scaled(add(scaled(viewRight, swordCos), scaled(viewUp, swordSin)), torchScale);
-    Vec3 swordColumnY = scaled(add(scaled(viewRight, -swordSin), scaled(viewUp, swordCos)), torchScale);
-    Vec3 swordColumnZ = scaled(viewForward, torchScale);
-    Vec3 swordGrip{{1.47f, -0.485f, 0.0f}};
-    if (genericStaticAssetEnabled_ && !developmentStaticAsset_.sockets.empty())
-    {
-        const auto& socket = developmentStaticAsset_.sockets.front().world;
-        swordGrip = {{socket[12], socket[13], socket[14]}};
-    }
-    // Place either held mesh by its authored grip socket without changing the
-    // physical sword TLAS slot or the simulation-owned hand pose.
-    Vec3 swordTranslation = add(
-        add(add(rightHand, scaled(swordColumnX, -swordGrip[0])),
-            scaled(swordColumnY, -swordGrip[1])),
-        scaled(swordColumnZ, -swordGrip[2]));
-
-    if (productionHeldItemAssetsEnabled_)
-    {
-        using horde::gameplay::items::HeldItemTransform;
-        const auto worldFromAxes = [](const Vec3& x,
-                                      const Vec3& y,
-                                      const Vec3& z,
-                                      const Vec3& translation) {
-            return HeldItemTransform{{
-                x[0], x[1], x[2], 0.0f,
-                y[0], y[1], y[2], 0.0f,
-                z[0], z[1], z[2], 0.0f,
-                translation[0], translation[1], translation[2], 1.0f}};
-        };
-        const auto extractAxes = [](const HeldItemTransform& transform,
-                                    Vec3& x,
-                                    Vec3& y,
-                                    Vec3& z,
-                                    Vec3& translation) {
-            x = {{transform[0], transform[1], transform[2]}};
-            y = {{transform[4], transform[5], transform[6]}};
-            z = {{transform[8], transform[9], transform[10]}};
-            translation = {{transform[12], transform[13], transform[14]}};
-        };
-        const auto* torchGrip = horde::gameplay::items::FindHeldItemSocket(
-            productionTorchAsset_.sockets, "Grip");
-        const auto* flameSocket = horde::gameplay::items::FindHeldItemSocket(
-            productionTorchAsset_.sockets, "Flame");
-        const auto* lightSocket = horde::gameplay::items::FindHeldItemSocket(
-            productionTorchAsset_.sockets, "Light");
-        const auto* productionSwordGrip = horde::gameplay::items::FindHeldItemSocket(
-            developmentStaticAsset_.sockets, "Grip");
-        if (torchGrip == nullptr || flameSocket == nullptr || lightSocket == nullptr ||
-            productionSwordGrip == nullptr)
-        {
-            diagnostic = "Production held items are missing exact Grip/Flame/Light sockets.";
-            return false;
-        }
-
-        HeldItemTransform worldFromTorch{};
-        if (frame.heldItems[0].parentMode ==
-            horde::gameplay::items::HeldItemParentMode::HandSocket)
-        {
-            const HeldItemTransform worldFromLeftHand =
-                worldFromAxes(viewRight, viewUp, scaled(viewForward, -1.0f), leftHand);
-            if (!horde::gameplay::items::ComposeWorldFromItem(
-                    worldFromLeftHand, torchGrip->world, worldFromTorch, diagnostic))
-                return false;
-        }
-        else
-        {
-            const float releaseYawCos = std::cos(torchFailure.droppedYawRadians);
-            const float releaseYawSin = std::sin(torchFailure.droppedYawRadians);
-            const Vec3 releaseBodyForward{releaseYawSin, 0.0f, -releaseYawCos};
-            const Vec3 releaseBodyRight{releaseYawCos, 0.0f, releaseYawSin};
-            const Vec3 releaseViewForward = normalize(Vec3{
-                releaseYawSin,
-                -0.05f + std::clamp(torchFailure.droppedViewPitchRadians, -0.32f, 0.28f),
-                -releaseYawCos});
-            const Vec3 releaseViewRight = normalize(cross(releaseViewForward, worldUp));
-            const Vec3 releaseViewUp = normalize(cross(releaseViewRight, releaseViewForward));
-            const float releaseDepth = horde::gameplay::ComputeShowcaseHeldPropDepth(
-                torchFailure.droppedX, torchFailure.droppedZ,
-                releaseBodyForward[0], releaseBodyForward[2]);
-            const Vec3 releaseEye{torchFailure.droppedX, 0.58f, torchFailure.droppedZ};
-            const Vec3 releaseLeftHand = add(
-                add(add(releaseEye, scaled(releaseViewRight, -0.34f)),
-                    scaled(releaseViewUp, -0.40f)),
-                scaled(releaseViewForward, releaseDepth));
-            HeldItemTransform releaseWorldFromTorch{};
-            if (!horde::gameplay::items::ComposeWorldFromItem(
-                    worldFromAxes(releaseViewRight, releaseViewUp,
-                                  scaled(releaseViewForward, -1.0f),
-                                  releaseLeftHand),
-                    torchGrip->world,
-                    releaseWorldFromTorch,
-                    diagnostic))
-                return false;
-
-            const float progress = std::clamp(torchFailure.fallProgress, 0.0f, 1.0f);
-            const float pitchCos = std::cos(torchFailure.droppedPitchRadians);
-            const float pitchSin = std::sin(torchFailure.droppedPitchRadians);
-            const Vec3 restingX = releaseBodyRight;
-            const Vec3 restingY = normalize(add(
-                scaled(worldUp, pitchCos), scaled(releaseBodyForward, pitchSin)));
-            const Vec3 restingZ = normalize(add(
-                scaled(releaseBodyForward, pitchCos), scaled(worldUp, -pitchSin)));
-            const Vec3 fallingX = normalize(lerp(releaseViewRight, restingX, progress));
-            const Vec3 fallingY = normalize(lerp(releaseViewUp, restingY, progress));
-            const Vec3 fallingZ = normalize(lerp(
-                scaled(releaseViewForward, -1.0f), scaled(restingZ, -1.0f), progress));
-            Vec3 settledPosition = add(
-                add(Vec3{torchFailure.droppedX, torchFailure.droppedY, torchFailure.droppedZ},
-                    scaled(worldUp, 0.13f)),
-                add(scaled(releaseBodyRight, -0.34f),
-                    scaled(releaseBodyForward, 0.78f)));
-            settledPosition[0] = std::clamp(settledPosition[0], -2.28f, 4.58f);
-            settledPosition[2] = std::clamp(settledPosition[2], -16.18f, -14.22f);
-            const Vec3 releaseTranslation{{releaseWorldFromTorch[12],
-                                           releaseWorldFromTorch[13],
-                                           releaseWorldFromTorch[14]}};
-            worldFromTorch = worldFromAxes(
-                fallingX, fallingY, fallingZ,
-                lerp(releaseTranslation, settledPosition, progress));
-        }
-        extractAxes(worldFromTorch,
-                    finalTorchColumnX,
-                    finalTorchColumnY,
-                    finalTorchColumnZ,
-                    torchTranslation);
-
-        horde::gameplay::items::HeldLightState heldLight{};
-        if (!horde::gameplay::items::ComposeHeldLightState(
-                worldFromTorch,
-                flameSocket->world,
-                lightSocket->world,
-                torchFailure.flameStrength,
-                heldLight,
-                diagnostic))
-            return false;
-
-        const Vec3 swordAxisX = normalize(
-            add(scaled(viewRight, swordCos), scaled(viewUp, swordSin)));
-        const Vec3 swordAxisY = normalize(
-            add(scaled(viewRight, -swordSin), scaled(viewUp, swordCos)));
-        HeldItemTransform worldFromSword{};
-        if (!horde::gameplay::items::ComposeWorldFromItem(
-                worldFromAxes(swordAxisX, swordAxisY, scaled(viewForward, -1.0f), rightHand),
-                productionSwordGrip->world,
-                worldFromSword,
-                diagnostic))
-            return false;
-        extractAxes(worldFromSword,
-                    swordColumnX,
-                    swordColumnY,
-                    swordColumnZ,
-                    swordTranslation);
-    }
 
     if (!characterSlot_.PrepareFrame(frame.skeletonEnemies,
                                      frame.skeletonEnemyCount,
@@ -3393,16 +3216,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const auto& lichBlasUpdateScratch_ = lichGpu.updateScratch;
     const auto& lichSkinnedVertices_ = characterSlot_.LichVertices();
 
-    const auto heldItemInstanceTransform = [](const Vec3& x,
-                                              const Vec3& y,
-                                              const Vec3& z,
-                                              const Vec3& translation) {
-        horde::gameplay::items::HeldItemState state{};
-        state.worldFromItem = {{
-            x[0], x[1], x[2], 0.0f,
-            y[0], y[1], y[2], 0.0f,
-            z[0], z[1], z[2], 0.0f,
-            translation[0], translation[1], translation[2], 1.0f}};
+    const auto heldItemInstanceTransform = [](
+        const horde::gameplay::items::HeldItemState& state) {
         const auto renderTransform = HeldItemRenderSlot::BuildInstanceTransform(state);
         return VkTransformMatrixKHR{{
             renderTransform[0], renderTransform[1], renderTransform[2], renderTransform[3],
@@ -3420,8 +3235,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     instances[0].flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
     instances[0].accelerationStructureReference = blas_.address;
     instances[1] = instances[0];
-    instances[1].transform = heldItemInstanceTransform(
-        finalTorchColumnX, finalTorchColumnY, finalTorchColumnZ, torchTranslation);
+    instances[1].transform = heldItemInstanceTransform(frame.heldItems[0]);
     instances[1].instanceCustomIndex = 1u;
     instances[1].mask = 0x02u;
     instances[1].accelerationStructureReference = torchBlas_.address;
@@ -3431,8 +3245,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     instances[3].instanceCustomIndex = 3u;
     instances[3].mask = 0x02u;
     instances[3].accelerationStructureReference = swordBlas_.address;
-    instances[3].transform = heldItemInstanceTransform(
-        swordColumnX, swordColumnY, swordColumnZ, swordTranslation);
+    instances[3].transform = heldItemInstanceTransform(frame.heldItems[1]);
     instances[4] = instances[0];
     instances[4].instanceCustomIndex = 4u;
     // The complete coat remains visible in mirror/reflection rays. Keeping its
@@ -3511,7 +3324,15 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         waterfallScale.depth, 0.0f, 0.0f, -2.32f,
         0.0f, waterfallScale.vertical, 0.0f, 0.0f,
         0.0f, 0.0f, waterfallScale.crossLane, -15.26f}};
-    if (!WriteBuffer(instanceBuffer_, instances.data(), sizeof(instances), "animated TLAS instance", diagnostic))
+    const RtHeldLightGpu heldLightGpu{{
+        frame.heldLight.worldFromLight[12],
+        frame.heldLight.worldFromLight[13],
+        frame.heldLight.worldFromLight[14],
+        frame.heldLight.active ? frame.torchLightStrength : 0.0f}};
+    if (!WriteBuffer(heldLightBuffer_, &heldLightGpu, sizeof(heldLightGpu),
+                     "held light", diagnostic) ||
+        !WriteBuffer(instanceBuffer_, instances.data(), sizeof(instances),
+                     "animated TLAS instance", diagnostic))
     {
         return false;
     }
@@ -3703,8 +3524,7 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, pipeline_);
     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, pipelineLayout_, 0u, 1u, &descriptorSet_, 0u, nullptr);
     const std::array<float, 3u> staffWorldPosition = characterSlot_.LichStaffWorldPosition(frame.lich);
-    const float heldPropDepth = horde::gameplay::ComputeShowcaseHeldPropDepth(
-        frame.cameraX, frame.cameraZ, std::sin(frame.cameraYaw), -std::cos(frame.cameraYaw));
+    const float heldPropDepth = frame.heldItemKinematics.heldPropDepth;
     const RtSceneTuning tuning = ClampRtSceneTuning(frame.tuning);
     const RtLightTuning& torchTuning = tuning.lights[static_cast<std::size_t>(RtLightGroup::Torch)];
     const RtLightTuning& skylightTuning = tuning.lights[static_cast<std::size_t>(RtLightGroup::Skylight)];

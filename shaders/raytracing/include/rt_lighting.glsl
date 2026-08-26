@@ -150,23 +150,14 @@ vec3 bounceSample(HitInfo h, vec3 incoming, bool lightAwareMirror)
 
 vec3 currentTorchLightPosition()
 {
-    vec3 forward = normalize(vec3(sin(controls.yaw), -0.05 + controls.pitch,
-                                  -cos(controls.yaw)));
-    vec3 right = normalize(cross(forward, vec3(0.0, 1.0, 0.0)));
-    vec3 up = normalize(cross(right, forward));
-    float movement = max(controls.walkAmount, 0.2);
-    float sway = sin(controls.time * 6.2) * 0.035 * movement;
-    float bob = abs(sin(controls.time * 6.2)) * 0.025 * movement;
-    return vec3(controls.cameraX, 0.58, controls.cameraZ)
-         + right * (-0.34 - sway) + up * (-0.12 + bob)
-         + forward * controls.heldPropDepth;
+    return rtHeldLight.value.positionStrength.xyz;
 }
 
 void activeLocalLight(out vec3 position, out vec3 color, out float strength)
 {
     position = currentTorchLightPosition();
     color = tunedLightColor(vec3(1.0, 0.28, 0.055), kLightTorch);
-    strength = controls.torchLight;
+    strength = rtHeldLight.value.positionStrength.w;
     if (controls.cameraX <= -8.5 && controls.cameraX >= -28.5 &&
         controls.cameraZ >= -16.8 && controls.cameraZ <= -13.6)
     {
