@@ -88,6 +88,8 @@ Thirty hertz is rejected because its measured motion delta is visually material 
 
 The standard pre-A/B exact-debug route passed in `reports/android-showcase-runs/run-20260826-173051`: six 75% timing views, 13-waypoint replay, 13 deterministic captures, strict ASTC, honest RT presentation, and Home/resume. That run used pre-toggle APK SHA-256 `290d0da14a19ca2b7faaf54ba026f2d7a3ee7adbea9fb8d8ffa1c146809a3955` at clean `6ec7ab5`.
 
+The same final installed owner-feedback APK then passed the complete standard route in `reports/android-showcase-runs/run-20260826-181248` from clean documentation HEAD `8b43754`: exact local/installed SHA-256 remained `15ee8396b77fc1f6b90a15522ae486800a44201b7b5de2e054753885b220b6be`; the six ordered 75% medians were 33.851 / 33.654 / 26.477 / 31.152 / 29.454 / 44.052 ms for opening / two-enemy / worst-bend / skylight / green / lich; replay reached 13/13, all 13 captures completed, and Home/resume honestly presented again. Thermal status progressed 0/0/1/1/1/2 and Samsung GPU power was 0/0/1/1/1/0. These are descriptive sustained bands, not a weakened pass criterion.
+
 The final owner-feedback A/B run is `reports/android-showcase-runs/run-20260826-180616`:
 
 - exact device: serial `R5GL219SZGK`, model `SM-S948B`, Android 16/API 36, Adreno 840;
@@ -118,4 +120,3 @@ Deterministic captures cover the downward body/grip view and owner-feedback comp
 - No publish, upload, signing, version bump, or deployment occurred.
 
 Audio/haptic manual revalidation required: NO — player rendering, animation, IK, and sockets change while combat event timing, listener pose/yaw, source coordinates, playback, transport, and haptic feedback remain unchanged.
-
