@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "asset": "generic-dielectric-topology-fixtures",
+  "metresPerUnit": 0.01,
+  "coordinateSystem": {
+    "up": "+Y",
+    "forward": "+Z"
+  },
+  "budgets": {
+    "maxVertices": 32,
+    "maxIndices": 96,
+    "maxPrimitives": 4,
+    "maxMaterials": 1,
+    "maxTextureLayersPerKind": 1
+  },
+  "lods": [
+    {
+      "name": "lod0",
+      "maxTriangles": 32
+    }
+  ],
+  "requiredSockets": [],
+  "runtimeTextureProfile": {
+    "android": "astc",
+    "windows": "rgba8",
+    "mipmapped": true
+  },
+  "materialOverrides": []
+}

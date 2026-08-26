@@ -781,7 +781,10 @@ void TestProductionDielectricFixture()
 
 void TestRuntimeOfflineDielectricComponentParity()
 {
-    horde::scene::assets::AssetManifest manifest;
+    using horde::scene::assets::AssetManifest;
+    AssetManifest manifest;
+    AssetManifest centimetreManifest;
+    AssetManifest tenMetreManifest;
     horde::scene::assets::StaticMeshAsset asset;
     std::string diagnostic;
     const std::filesystem::path fixtureRoot =
@@ -790,20 +793,35 @@ void TestRuntimeOfflineDielectricComponentParity()
               fixtureRoot / "asset.manifest.json",
               manifest, diagnostic),
           std::string("dielectric topology parity manifest loads: ") + diagnostic);
+    diagnostic.clear();
+    Check(AssetManifest::Load(fixtureRoot / "centimetre-units.manifest.json",
+                              centimetreManifest, diagnostic),
+          std::string("centimetre topology parity manifest loads: ") + diagnostic);
+    diagnostic.clear();
+    Check(AssetManifest::Load(fixtureRoot / "ten-metre-units.manifest.json",
+                              tenMetreManifest, diagnostic),
+          std::string("ten-metre topology parity manifest loads: ") + diagnostic);
 
-    const auto expectPass = [&](std::string_view name) {
+    const auto expectPass = [&](std::string_view name, const AssetManifest& selectedManifest) {
         diagnostic.clear();
         const bool loaded = horde::scene::assets::StaticMeshAsset::Load(
-            fixtureRoot / name, manifest, asset, diagnostic);
+            fixtureRoot / name, selectedManifest, asset, diagnostic);
         Check(loaded,
               std::string("runtime/offline parity fixture must pass: ") +
                   std::string(name) + ": " + diagnostic);
     };
-    expectPass("closed-dielectric-lod0.runtime.glb");
-    expectPass("split-shell-dielectric-lod0.runtime.glb");
-    expectPass("disconnected-shells-dielectric-lod0.runtime.glb");
-    expectPass("valid-transformed-dielectric-lod0.runtime.glb");
-    expectPass("millimetre-dielectric-lod0.runtime.glb");
+    const auto expectDefaultPass = [&](std::string_view name) {
+        expectPass(name, manifest);
+    };
+    expectDefaultPass("closed-dielectric-lod0.runtime.glb");
+    expectDefaultPass("split-shell-dielectric-lod0.runtime.glb");
+    expectDefaultPass("disconnected-shells-dielectric-lod0.runtime.glb");
+    expectDefaultPass("valid-transformed-dielectric-lod0.runtime.glb");
+    expectDefaultPass("millimetre-dielectric-lod0.runtime.glb");
+    expectPass("non-unit-min-seam-dielectric-lod0.runtime.glb", centimetreManifest);
+    expectPass("non-unit-min-seam-reordered-dielectric-lod0.runtime.glb", centimetreManifest);
+    expectPass("non-unit-min-scale-seam-dielectric-lod0.runtime.glb", centimetreManifest);
+    expectPass("non-unit-max-disconnected-dielectric-lod0.runtime.glb", tenMetreManifest);
 
     ExpectAssetFailureContains(
         fixtureRoot / "open-dielectric-lod0.runtime.glb", manifest,
@@ -830,9 +848,34 @@ void TestRuntimeOfflineDielectricComponentParity()
         {"material 'GenericClosedGlass' component 1",
          "node 'SplitFlippedA' primitive 0", "node 'SplitFlippedB' primitive 1",
          "used once in each direction"});
+    ExpectAssetFailureContains(
+        fixtureRoot / "non-unit-min-diagonal-dielectric-lod0.runtime.glb",
+        centimetreManifest,
+        {"material 'GenericClosedGlass' component 2", "boundary edge"});
+    ExpectAssetFailureContains(
+        fixtureRoot / "non-unit-max-scale-seam-dielectric-lod0.runtime.glb",
+        tenMetreManifest,
+        {"material 'GenericClosedGlass' component 2", "boundary edge"});
+    ExpectAssetFailureContains(
+        fixtureRoot / "mixed-orientation-shells-reordered-dielectric-lod0.runtime.glb",
+        manifest,
+        {"material 'GenericClosedGlass' component 2", "SmallInwardShell",
+         "inward-wound"});
     ExpectAssetFailure(
         fixtureRoot / "negative-scale-dielectric-lod0.runtime.glb", manifest,
         "Static GLB node 'GenericDielectricFixture' has a negative-determinant transform; bake the reflection and reverse triangle winding/normals before runtime import.");
+
+    AssetManifest rejectedManifest;
+    diagnostic.clear();
+    Check(!AssetManifest::Load(fixtureRoot / "zero-units.manifest.json",
+                               rejectedManifest, diagnostic) &&
+              diagnostic == "Asset manifest metresPerUnit must be finite and greater than zero.",
+          "runtime rejects zero metresPerUnit before dielectric topology validation");
+    diagnostic.clear();
+    Check(!AssetManifest::Load(fixtureRoot / "nonfinite-float-units.manifest.json",
+                               rejectedManifest, diagnostic) &&
+              diagnostic == "Asset manifest metresPerUnit must be finite and greater than zero.",
+          "runtime rejects metresPerUnit outside the finite float range before dielectric topology validation");
 }
 
 } // namespace

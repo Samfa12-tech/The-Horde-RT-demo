@@ -275,6 +275,82 @@ write_component_fixture(
         {"name": "SplitFlippedA", "indices": split_flipped[:18]},
         {"name": "SplitFlippedB", "indices": split_flipped[18:]},
     ])
+min_clamp_reference = {
+    "name": "MinClampReference", "indices": indices,
+    "node": {"scale": [0.1, 0.1, 0.1], "translation": [-1, -1, -1]},
+}
+min_clamp_seam_a = {
+    "name": "MinClampSeamA", "indices": indices[:18],
+    "node": {"scale": [0.1, 0.1, 0.1],
+             "translation": [0.0000049, 0.0000049, 0.0000049]},
+}
+min_clamp_seam_b = {
+    "name": "MinClampSeamB", "indices": indices[18:],
+    "node": {"scale": [0.1, 0.1, 0.1],
+             "translation": [0.0000051, 0.0000051, 0.0000051]},
+}
+write_component_fixture(
+    TEST_OUTPUT / "non-unit-min-seam-dielectric-lod0.runtime.glb", [
+        min_clamp_reference, min_clamp_seam_a, min_clamp_seam_b,
+    ])
+write_component_fixture(
+    TEST_OUTPUT / "non-unit-min-seam-reordered-dielectric-lod0.runtime.glb", [
+        min_clamp_seam_b, min_clamp_reference, min_clamp_seam_a,
+    ])
+write_component_fixture(
+    TEST_OUTPUT / "non-unit-min-scale-seam-dielectric-lod0.runtime.glb", [
+        min_clamp_reference,
+        {"name": "MinScaleSeamA", "indices": indices[:18],
+         "node": {"scale": [0.1, 0.1, 0.1]}},
+        {"name": "MinScaleSeamB", "indices": indices[18:],
+         "node": {"scale": [0.1, 0.1, 0.1],
+                  "translation": [0.000004, 0, 0]}},
+    ])
+write_component_fixture(
+    TEST_OUTPUT / "non-unit-min-diagonal-dielectric-lod0.runtime.glb", [
+        min_clamp_reference,
+        {
+            "name": "MinClampDiagonalA", "indices": indices[:18],
+            "node": {"scale": [0.1, 0.1, 0.1],
+                     "translation": [-0.0000049, -0.0000049, -0.0000049]},
+        },
+        {
+            "name": "MinClampDiagonalB", "indices": indices[18:],
+            "node": {"scale": [0.1, 0.1, 0.1],
+                     "translation": [0.0000049, 0.0000049, 0.0000049]},
+        },
+    ])
+write_component_fixture(
+    TEST_OUTPUT / "non-unit-max-disconnected-dielectric-lod0.runtime.glb", [
+        {"name": "MaxClampPaneA", "indices": indices},
+        {"name": "MaxClampPaneB", "indices": indices,
+         "node": {"translation": [1.000005, 0, 0]}},
+    ])
+write_component_fixture(
+    TEST_OUTPUT / "non-unit-max-scale-seam-dielectric-lod0.runtime.glb", [
+        {"name": "MaxScaleReference", "indices": indices,
+         "node": {"translation": [-1, 0, 0]}},
+        {"name": "MaxScaleSeamA", "indices": indices[:18],
+         "node": {"translation": [1, 0, 0]}},
+        {"name": "MaxScaleSeamB", "indices": indices[18:],
+         "node": {"translation": [1.0000015, 0, 0]}},
+    ])
+write_component_fixture(
+    TEST_OUTPUT / "mixed-orientation-shells-reordered-dielectric-lod0.runtime.glb", [
+        {"name": "SmallInwardShell", "indices": inward_indices,
+         "node": {"scale": [0.5, 0.5, 0.5], "translation": [4, 0, 0]}},
+        {"name": "LargeOutwardShell", "indices": indices,
+         "node": {"scale": [2, 2, 2]}},
+    ])
 TEST_OUTPUT.mkdir(parents=True, exist_ok=True)
 (TEST_OUTPUT / "asset.manifest.json").write_text(
     json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+for manifest_name, metres_per_unit in (
+        ("centimetre-units.manifest.json", 0.01),
+        ("ten-metre-units.manifest.json", 10.0),
+        ("zero-units.manifest.json", 0.0),
+        ("nonfinite-float-units.manifest.json", 3.5e38)):
+    non_unit_manifest = dict(manifest)
+    non_unit_manifest["metresPerUnit"] = metres_per_unit
+    (TEST_OUTPUT / manifest_name).write_text(
+        json.dumps(non_unit_manifest, indent=2) + "\n", encoding="utf-8")

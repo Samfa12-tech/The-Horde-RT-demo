@@ -7,11 +7,16 @@ $validator = Join-Path $repoRoot "tools\validate-dielectric-topology.py"
 $fixtureRoot = Join-Path $PSScriptRoot "fixtures\dielectric-topology"
 $manifest = Join-Path $fixtureRoot "asset.manifest.json"
 
-function Invoke-ExpectedValidation([string]$name, [int]$expectedExitCode, [string]$expectedText) {
+function Invoke-ExpectedValidation(
+        [string]$name,
+        [int]$expectedExitCode,
+        [string]$expectedText,
+        [string]$manifestName = "asset.manifest.json") {
     $asset = Join-Path $fixtureRoot $name
+    $fixtureManifest = Join-Path $fixtureRoot $manifestName
     $savedErrorActionPreference = $ErrorActionPreference
     $ErrorActionPreference = "Continue"
-    $output = & py -3 $validator $asset $manifest 2>&1 | Out-String
+    $output = & py -3 $validator $asset $fixtureManifest 2>&1 | Out-String
     $actualExitCode = $LASTEXITCODE
     $ErrorActionPreference = $savedErrorActionPreference
     if ($actualExitCode -ne $expectedExitCode) {
@@ -36,6 +41,15 @@ Invoke-ExpectedValidation "split-shell-dielectric-lod0.runtime.glb" 0 "1 closed/
 Invoke-ExpectedValidation "disconnected-shells-dielectric-lod0.runtime.glb" 0 "2 closed/manifold thick component(s)"
 Invoke-ExpectedValidation "mixed-orientation-shells-dielectric-lod0.runtime.glb" 2 "component 2"
 Invoke-ExpectedValidation "split-flipped-face-dielectric-lod0.runtime.glb" 2 "component 1"
+Invoke-ExpectedValidation "non-unit-min-seam-dielectric-lod0.runtime.glb" 0 "2 closed/manifold thick component(s)" "centimetre-units.manifest.json"
+Invoke-ExpectedValidation "non-unit-min-seam-reordered-dielectric-lod0.runtime.glb" 0 "2 closed/manifold thick component(s)" "centimetre-units.manifest.json"
+Invoke-ExpectedValidation "non-unit-min-scale-seam-dielectric-lod0.runtime.glb" 0 "2 closed/manifold thick component(s)" "centimetre-units.manifest.json"
+Invoke-ExpectedValidation "non-unit-min-diagonal-dielectric-lod0.runtime.glb" 2 "component 2" "centimetre-units.manifest.json"
+Invoke-ExpectedValidation "non-unit-max-disconnected-dielectric-lod0.runtime.glb" 0 "2 closed/manifold thick component(s)" "ten-metre-units.manifest.json"
+Invoke-ExpectedValidation "non-unit-max-scale-seam-dielectric-lod0.runtime.glb" 2 "component 2" "ten-metre-units.manifest.json"
+Invoke-ExpectedValidation "mixed-orientation-shells-reordered-dielectric-lod0.runtime.glb" 2 "component 2"
+Invoke-ExpectedValidation "closed-dielectric-lod0.runtime.glb" 2 "metresPerUnit must be finite and greater than zero" "zero-units.manifest.json"
+Invoke-ExpectedValidation "closed-dielectric-lod0.runtime.glb" 2 "metresPerUnit must be finite and greater than zero" "nonfinite-float-units.manifest.json"
 
 $preparationSource = Get-Content -LiteralPath (Join-Path $repoRoot "tools\prepare-static-rt-asset.ps1") -Raw
 if ($preparationSource -notmatch "validate-dielectric-topology\.py") {
