@@ -449,7 +449,8 @@ private:
         else
         {
             snapshot_.swordSwingRadians = swingElapsed > 0.0f
-                ? -1.12f * std::sin((swingElapsed / kSwordDuration) * 3.14159265f)
+                ? -kDownwardSwingAmplitude *
+                    std::sin((swingElapsed / kSwordDuration) * 3.14159265f)
                 : 0.0f;
         }
     }
@@ -811,11 +812,16 @@ public:
     static constexpr float kSwingActiveDuration = 0.16f;
     static constexpr float kSwingRecoveryDuration = 0.22f;
     static constexpr float kSwordDuration = kSwingWindupDuration + kSwingActiveDuration + kSwingRecoveryDuration;
+    // The cut arcs are authoritative gameplay-animation inputs. They are
+    // bounded so the audited sword remains in the 75% portrait safe frame;
+    // held-item rendering and hand IK both consume these same values.
+    static constexpr float kDownwardSwingAmplitude = 0.58f;
     static constexpr float kUpwardSliceAcceptOpen = 0.0f;
     static constexpr float kUpwardSliceAcceptClose = kSwingActiveDuration;
     static constexpr float kUpwardSliceWindupDuration = 0.10f;
     static constexpr float kUpwardSliceActiveDuration = 0.18f;
     static constexpr float kUpwardSliceRecoveryDuration = 0.24f;
+    static constexpr float kUpwardSliceEndRadians = 0.18f;
     static constexpr float kPlayerHitRange = 1.72f;
     static constexpr float kPlayerHitConeDot = 0.52f;
     static constexpr float kParryStartupDuration = 0.04f;
@@ -827,9 +833,8 @@ public:
     static constexpr float kEnemyStaggerDuration = 0.80f;
 
 private:
-    static constexpr float kUpwardSliceTransitionRadians = -1.057f;
-    static constexpr float kUpwardSliceStartRadians = -1.12f;
-    static constexpr float kUpwardSliceEndRadians = 0.78f;
+    static constexpr float kUpwardSliceTransitionRadians = -0.547f;
+    static constexpr float kUpwardSliceStartRadians = -kDownwardSwingAmplitude;
     static constexpr float kEnemyWalkSpeed = 0.62f;
     static constexpr float kEnemyAttackRange = 1.28f;
     static constexpr float kEnemyAttackEnterRange = 1.34f;

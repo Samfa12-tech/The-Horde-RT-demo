@@ -121,7 +121,8 @@ HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
     const float successJolt = playerCombat.reaction == CombatReaction::Parried
         ? std::clamp(playerCombat.reactionTime / 0.12f, 0.0f, 1.0f)
         : 0.0f;
-    const float swingAmount = std::clamp(-swordSwingRadians / 1.12f, 0.0f, 1.0f);
+    const float swingAmount = std::clamp(
+        -swordSwingRadians / SwordCombat::kDownwardSwingAmplitude, 0.0f, 1.0f);
     const float smoothSwing = swingAmount * swingAmount * (3.0f - 2.0f * swingAmount);
     const std::array<float, 3u> swingHand{{
         0.25f + (-0.08f - 0.25f) * smoothSwing,

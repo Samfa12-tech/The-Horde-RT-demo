@@ -1197,12 +1197,17 @@ public class MainActivity extends Activity {
                     final long stereoGains = platformEvents[eventIndex + 1];
                     final int eventType = (int) (metadata & 0xffL);
                     final int targetEntity = (int) ((metadata >>> 16) & 0xffL);
+                    final long eventSequence = (metadata >>> 32) & 0xffffffffL;
                     switch (eventType) {
                         case PLATFORM_EVENT_PLAYER_FOOTSTEP:
                             playSpatialSound((playerStepVariant++ & 1) == 0 ?
                                     "player_step_1" : "player_step_2", 0.62f, stereoGains);
                             break;
                         case PLATFORM_EVENT_PLAYER_SWING:
+                            if (isDebuggableApp()) {
+                                Log.i(TAG, "HORDE_PLAYER_SWING_FEEDBACK sequence=" + eventSequence +
+                                        " sound=1 haptic=1");
+                            }
                             playSpatialSound((swingVariant++ & 1) == 0 ?
                                     "sword_swing_1" : "sword_swing_2", 0.28f, stereoGains);
                             performHaptic(HAPTIC_SWING);

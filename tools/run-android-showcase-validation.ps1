@@ -59,6 +59,14 @@ $checkpointZones = @{
 $baselineCheckpoints = @("opening", "two-enemy-combat", "worst-bend", "skylight", "green", "lich")
 $captureCheckpoints = @("opening", "skeleton", "worst-bend", "lantern-drop", "skylight", "yellow", "blue", "red", "green", "mirror", "lich", "finale-roof", "two-enemy-combat")
 if ($CaptureSelection.Count -gt 0) { $captureCheckpoints = @($CaptureSelection) }
+$combatCaptureExpectations = @{
+    "player-body-downward-cut" = @{
+        action = "swing-active"; animationTime = 0.2500; consumedAttackSequence = 1
+    }
+    "player-body-upward-slice" = @{
+        action = "upward-active"; animationTime = 0.5167; consumedAttackSequence = 2
+    }
+}
 $rtLabComparisonCheckpoints = @('lantern-drop', 'skylight', 'finale-roof')
 $rtLabExpectedWaterQuality = 1
 $timingRows = [System.Collections.Generic.List[object]]::new()
@@ -221,7 +229,22 @@ function Invoke-CaptureCheckpoint {
     if ($state.zone -ne $checkpointZones[$Checkpoint]) { $failures.Add("$Checkpoint capture state reported zone '$($state.zone)'.") }
     if (-not $state.presented) { $failures.Add("$Checkpoint capture did not retain honest RT presentation.") }
     if ([int]$state.captureStableFrames -lt 12) { $failures.Add("$Checkpoint capture had only $($state.captureStableFrames) stable presented frames.") }
-    if ([double]$state.animationTime -ne 0.0) { $failures.Add("$Checkpoint capture animation time was not fixed at zero.") }
+    if ($combatCaptureExpectations.ContainsKey($Checkpoint)) {
+        $expectedCombat = $combatCaptureExpectations[$Checkpoint]
+        if ([math]::Abs([double]$state.animationTime - [double]$expectedCombat.animationTime) -gt 0.001) {
+            $failures.Add("$Checkpoint capture animation time $($state.animationTime) did not retain its authoritative staged time $($expectedCombat.animationTime).")
+        }
+        if ($state.playerCombat.action -ne $expectedCombat.action -or
+            [double]$state.playerCombat.actionTime -lt 0.06 -or
+            [double]$state.playerCombat.actionTime -gt 0.10) {
+            $failures.Add("$Checkpoint capture combat phase '$($state.playerCombat.action)' at $($state.playerCombat.actionTime) s did not match the staged active phase.")
+        }
+        if ([int64]$state.playerCombat.lastConsumedAttackSequence -ne [int64]$expectedCombat.consumedAttackSequence) {
+            $failures.Add("$Checkpoint capture consumed attack sequence $($state.playerCombat.lastConsumedAttackSequence) instead of $($expectedCombat.consumedAttackSequence).")
+        }
+    } elseif ([double]$state.animationTime -ne 0.0) {
+        $failures.Add("$Checkpoint capture animation time was not fixed at zero.")
+    }
     if ($Checkpoint -in @("player-body-grips", "player-body-owner-feedback", "player-body-downward-cut", "player-body-upward-slice")) {
         if ($state.playerRenderRoute -ne "skinned") { $failures.Add("Skinned player capture reported route '$($state.playerRenderRoute)'.") }
         if ([int]$state.playerSkinCadenceHz -ne 60 -or [int64]$state.playerSkinUpdates -lt 1) {
@@ -251,6 +274,7 @@ function Invoke-CaptureCheckpoint {
         shaderIdentity = $state.shaderIdentity
         outputRedBlueSwap = [bool]$state.outputRedBlueSwap
         animationTime = $state.animationTime
+        playerCombat = $state.playerCombat
         stablePresentedFrames = $state.captureStableFrames
         presented = [bool]$state.presented
         playerRenderRoute = $state.playerRenderRoute

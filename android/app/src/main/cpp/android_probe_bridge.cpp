@@ -62,6 +62,26 @@ constexpr const char* kJsonReportFilename = "vulkan_capability_report.json";
 constexpr const char* kShowcaseDebugStateFilename = "showcase_debug_state.json";
 // One frame in flight keeps the dynamically refit held-torch TLAS safely synchronized with its host-written instance buffer.
 constexpr uint32_t kMaxFramesInFlight = 1u;
+
+const char* DebugPlayerCombatActionName(const horde::gameplay::PlayerCombatAction action)
+{
+    using horde::gameplay::PlayerCombatAction;
+    switch (action)
+    {
+    case PlayerCombatAction::SwingWindup: return "swing-windup";
+    case PlayerCombatAction::SwingActive: return "swing-active";
+    case PlayerCombatAction::SwingRecovery: return "swing-recovery";
+    case PlayerCombatAction::UpwardSliceWindup: return "upward-windup";
+    case PlayerCombatAction::UpwardSliceActive: return "upward-active";
+    case PlayerCombatAction::UpwardSliceRecovery: return "upward-recovery";
+    case PlayerCombatAction::ParryStartup: return "parry-startup";
+    case PlayerCombatAction::ParryActive: return "parry-active";
+    case PlayerCombatAction::ParryRecovery: return "parry-recovery";
+    case PlayerCombatAction::Idle: return "idle";
+    }
+    return "unknown";
+}
+
 struct SwapchainContext
 {
     ANativeWindow* window = nullptr;
@@ -215,7 +235,18 @@ void EnqueuePlatformGameplayEvent(const horde::gameplay::simulation::GameplayEve
         ((event.sequence & 0xffffffffu) << 32u);
 
     std::lock_guard<std::mutex> lock(gPlatformGameplayEventMutex);
-    gPlatformGameplayEvents.Push({metadata, PackStereoGains(gains.left, gains.right)});
+    const bool enqueued = gPlatformGameplayEvents.Push(
+        {metadata, PackStereoGains(gains.left, gains.right)});
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS)
+    if (event.type == horde::gameplay::simulation::GameplayEventType::PlayerSwing)
+    {
+        __android_log_print(
+            ANDROID_LOG_INFO, kTag,
+            "HORDE_PLAYER_SWING_TRANSPORT phase=enqueued sequence=%llu cut=%d accepted=%d",
+            static_cast<unsigned long long>(event.sequence), event.payload,
+            enqueued ? 1 : 0);
+    }
+#endif
 }
 
 void DrainSimulationEventsToPlatform()
@@ -600,8 +631,20 @@ void ApplyDebugCheckpointSimulation(const DebugCheckpointSelection& selection)
 {
     if (selection.development != nullptr)
     {
-        (void)horde::gameplay::StageDevelopmentCheckpointSimulation(
-            gGameSimulation, *selection.development);
+        horde::gameplay::DevelopmentCheckpointStageEvidence evidence{};
+        const bool staged = horde::gameplay::StageDevelopmentCheckpointSimulation(
+            gGameSimulation, *selection.development, &evidence);
+        if (selection.development->combatPose != horde::gameplay::DevelopmentCombatPose::Rest)
+        {
+            __android_log_print(
+                ANDROID_LOG_INFO, kTag,
+                "HORDE_COMBO_STAGE checkpoint=%s staged=%d consumed_attack_edges=%u "
+                "player_swing_events=%u enemy_hit_events=%u action=%s action_time=%.4f events_cleared=1",
+                selection.development->name.data(), staged ? 1 : 0,
+                evidence.consumedAttackEdges, evidence.playerSwingEvents,
+                evidence.enemyHitEvents, DebugPlayerCombatActionName(evidence.action),
+                evidence.actionTime);
+        }
         return;
     }
     gGameSimulation.ApplyShowcaseCheckpoint(selection.simulationCheckpointId);
@@ -648,6 +691,13 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
          << ", \"maxVitality\": " << playerVitals.maxVitality
          << ", \"lifePhase\": \"" << horde::gameplay::PlayerLifePhaseName(playerVitals.phase) << "\""
          << ", \"damageEnabled\": " << (playerDamageEnabled ? "true" : "false") << "},\n"
+         << "  \"playerCombat\": {\"action\": \""
+         << DebugPlayerCombatActionName(simulation.playerCombat.action)
+         << "\", \"actionTime\": " << simulation.playerCombat.actionTime
+         << ", \"comboQueued\": " << (simulation.playerCombat.comboQueued ? "true" : "false")
+         << ", \"swordRadians\": " << simulation.swordCombat.swordSwingRadians
+         << ", \"lastConsumedAttackSequence\": " << simulation.lastConsumedAttackSequence
+         << "},\n"
          << "  \"zone\": \"" << horde::gameplay::ShowcaseZoneName(zone) << "\",\n"
          << "  \"renderScale\": " << context.renderScale << ",\n"
          << "  \"waterQuality\": " << gRequestedWaterQuality.load(std::memory_order_acquire) << ",\n"
@@ -2731,6 +2781,16 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_drainPlatformEvents(JNIEnv* env, jcl
         {
             packed.push_back(static_cast<jlong>(event.metadata));
             packed.push_back(static_cast<jlong>(event.stereoGains));
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS)
+            if ((event.metadata & 0xffu) == static_cast<std::uint64_t>(
+                    horde::gameplay::simulation::GameplayEventType::PlayerSwing))
+            {
+                __android_log_print(
+                    ANDROID_LOG_INFO, kTag,
+                    "HORDE_PLAYER_SWING_TRANSPORT phase=drained sequence=%llu",
+                    static_cast<unsigned long long>((event.metadata >> 32u) & 0xffffffffu));
+            }
+#endif
         }
         gPlatformGameplayEvents.Clear();
     }

@@ -6,16 +6,50 @@
 namespace horde::gameplay
 {
 
+struct DevelopmentCheckpointStageEvidence
+{
+    std::uint32_t consumedAttackEdges = 0u;
+    std::uint32_t playerSwingEvents = 0u;
+    std::uint32_t enemyHitEvents = 0u;
+    PlayerCombatAction action = PlayerCombatAction::Idle;
+    float actionTime = 0.0f;
+};
+
 // Stages a debug-only visual checkpoint by advancing the same fixed-step
 // command/combat/animation authority used by live play. Platforms only select
 // the requested checkpoint; no renderer or platform-owned animation state is
 // introduced.
 inline bool StageDevelopmentCheckpointSimulation(
     simulation::GameSimulation& gameSimulation,
-    const DevelopmentCheckpoint& checkpoint)
+    const DevelopmentCheckpoint& checkpoint,
+    DevelopmentCheckpointStageEvidence* evidence = nullptr)
 {
     if (!gameSimulation.ApplyShowcaseCheckpoint(checkpoint.baseShowcaseCheckpointId))
         return false;
+
+    const std::uint64_t initialConsumedAttackSequence =
+        gameSimulation.Snapshot().lastConsumedAttackSequence;
+    const auto finalize = [&](const bool staged)
+    {
+        if (evidence != nullptr)
+        {
+            *evidence = {};
+            evidence->consumedAttackEdges = static_cast<std::uint32_t>(
+                gameSimulation.Snapshot().lastConsumedAttackSequence -
+                initialConsumedAttackSequence);
+            evidence->action = gameSimulation.Snapshot().playerCombat.action;
+            evidence->actionTime = gameSimulation.Snapshot().playerCombat.actionTime;
+            for (const simulation::GameplayEvent& event : gameSimulation.Events().Events())
+            {
+                if (event.type == simulation::GameplayEventType::PlayerSwing)
+                    ++evidence->playerSwingEvents;
+                if (event.type == simulation::GameplayEventType::EnemyHit)
+                    ++evidence->enemyHitEvents;
+            }
+        }
+        gameSimulation.ClearEvents();
+        return staged;
+    };
 
     simulation::InputSnapshot input;
     input.damageEnabled = false;
@@ -28,10 +62,7 @@ inline bool StageDevelopmentCheckpointSimulation(
     gameSimulation.StepFixed(input, 0.0f,
                              gameSimulation.Snapshot().inputPublicationSequence + 1u);
     if (checkpoint.combatPose == DevelopmentCombatPose::Rest)
-    {
-        gameSimulation.ClearEvents();
-        return true;
-    }
+        return finalize(true);
 
     input.commands.attack = gameSimulation.Snapshot().lastConsumedAttackSequence + 1u;
     bool upwardEdgePublished = false;
@@ -57,13 +88,9 @@ inline bool StageDevelopmentCheckpointSimulation(
             checkpoint.combatPose == DevelopmentCombatPose::UpwardSliceActive &&
             after.action == PlayerCombatAction::UpwardSliceActive && after.actionTime >= 0.07f;
         if (reachedDownward || reachedUpward)
-        {
-            gameSimulation.ClearEvents();
-            return true;
-        }
+            return finalize(true);
     }
-    gameSimulation.ClearEvents();
-    return false;
+    return finalize(false);
 }
 
 } // namespace horde::gameplay

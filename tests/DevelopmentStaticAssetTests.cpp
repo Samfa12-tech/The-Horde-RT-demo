@@ -75,16 +75,24 @@ int main()
           "authoritative downward/upward owner regression poses have stable debug identities");
     horde::gameplay::simulation::GameSimulation stagedDownward;
     horde::gameplay::simulation::GameSimulation stagedUpward;
+    DevelopmentCheckpointStageEvidence downwardEvidence{};
+    DevelopmentCheckpointStageEvidence upwardEvidence{};
     Check(downward != nullptr &&
-              StageDevelopmentCheckpointSimulation(stagedDownward, *downward) &&
+              StageDevelopmentCheckpointSimulation(stagedDownward, *downward,
+                                                   &downwardEvidence) &&
               stagedDownward.Snapshot().playerCombat.action ==
-                  PlayerCombatAction::SwingActive && stagedDownward.Events().Empty(),
-          "downward capture must stage and freeze shared fixed-step combat without stale feedback");
+                  PlayerCombatAction::SwingActive &&
+              downwardEvidence.consumedAttackEdges == 1u &&
+              downwardEvidence.playerSwingEvents == 1u && stagedDownward.Events().Empty(),
+          "downward capture must stage one exact shared swing before freezing feedback");
     Check(upward != nullptr &&
-              StageDevelopmentCheckpointSimulation(stagedUpward, *upward) &&
+              StageDevelopmentCheckpointSimulation(stagedUpward, *upward,
+                                                   &upwardEvidence) &&
               stagedUpward.Snapshot().playerCombat.action ==
-                  PlayerCombatAction::UpwardSliceActive && stagedUpward.Events().Empty(),
-          "upward capture must stage and freeze shared fixed-step combat without stale feedback");
+                  PlayerCombatAction::UpwardSliceActive &&
+              upwardEvidence.consumedAttackEdges == 2u &&
+              upwardEvidence.playerSwingEvents == 2u && stagedUpward.Events().Empty(),
+          "upward capture must stage two exact shared swings before freezing feedback");
     Check(FindDevelopmentCheckpoint("opening") == nullptr,
           "release checkpoint names cannot resolve through the development lookup");
 

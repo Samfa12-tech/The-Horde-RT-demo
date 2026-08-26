@@ -124,17 +124,35 @@ int main()
                  "authored Grip basis must roll the sharp edge, not the blade flat, forward")) return 1;
     for (const float pitch : {-0.32f, -0.05f, 0.28f})
     {
-        for (const float depth : {0.72f, 1.05f})
-        {
-            const auto stableBasis = horde::gameplay::items::EvaluateSwordGripBasisInView(
-                ownerFeedbackPose.swordRadians - 0.35f * pitch,
-                ownerFeedbackPose.swordForwardRadians,
-                horde::gameplay::items::kSwordGripRollRadians);
-            if (!Require(stableBasis.edgeDirection[2] >= 0.90f && depth > 0.0f,
-                         "sword edge-forward basis must remain stable across pitch and wall retraction"))
-                return 1;
-        }
+        // Match the renderer's pitched view basis and measure the authored
+        // edge against its resulting world-space forward direction.
+        const float viewForwardY = -0.05f + pitch;
+        const float inverseViewLength = 1.0f / std::hypot(viewForwardY, 1.0f);
+        const std::array<float, 3u> viewForward{{
+            0.0f, viewForwardY * inverseViewLength, -inverseViewLength}};
+        const std::array<float, 3u> viewUp{{
+            0.0f, -viewForward[2], viewForward[1]}};
+        const std::array<float, 3u> worldEdge{{
+            swordGripBasis.edgeDirection[0],
+            viewUp[1] * swordGripBasis.edgeDirection[1] +
+                viewForward[1] * swordGripBasis.edgeDirection[2],
+            viewUp[2] * swordGripBasis.edgeDirection[1] +
+                viewForward[2] * swordGripBasis.edgeDirection[2]}};
+        const float edgeForwardProjection = worldEdge[1] * viewForward[1] +
+                                            worldEdge[2] * viewForward[2];
+        if (!Require(edgeForwardProjection >= 0.90f,
+                     "sword edge-forward basis must remain stable across camera pitch"))
+            return 1;
     }
+    horde::gameplay::items::HeldItemKinematicsInput wallInput{};
+    wallInput.cameraZ = -9.70f;
+    const auto wallPose = horde::gameplay::items::EvaluateHeldItemKinematics(wallInput);
+    const auto wallBasis = horde::gameplay::items::EvaluateSwordGripBasisInView(
+        wallPose.swordRadians, wallPose.swordForwardRadians,
+        horde::gameplay::items::kSwordGripRollRadians);
+    if (!Require(wallPose.heldPropDepth <= 0.38f &&
+                 wallBasis.edgeDirection[2] >= 0.90f,
+                 "wall retraction must preserve the RightHand edge-forward Grip basis")) return 1;
     const auto portraitFrame = horde::gameplay::items::EvaluateOwnerFeedbackPortraitSafeFrame(
         ownerFeedbackPose, 1440.0f / 3120.0f);
     std::cout << "Owner portrait safe-frame NDC x=[" << portraitFrame.minimumNdcX
@@ -146,6 +164,52 @@ int main()
                  portraitFrame.includesBladeBounds,
                  "75% portrait contract must keep torch markers, both grips, and blade bounds inside the safe frame"))
         return 1;
+
+    horde::gameplay::items::HeldItemKinematicsInput downwardInput{};
+    downwardInput.playerCombat.action = PlayerCombatAction::SwingActive;
+    downwardInput.swordSwingRadians = -SwordCombat::kDownwardSwingAmplitude;
+    const auto downwardPose = horde::gameplay::items::EvaluateHeldItemKinematics(downwardInput);
+    const auto downwardFrame = horde::gameplay::items::EvaluateOwnerFeedbackPortraitSafeFrame(
+        downwardPose, 1440.0f / 3120.0f);
+    std::cout << "Downward portrait safe-frame NDC x=[" << downwardFrame.minimumNdcX
+              << ", " << downwardFrame.maximumNdcX << "]\n";
+    if (!Require(downwardFrame.minimumNdcX >= -0.94f &&
+                 downwardFrame.maximumNdcX <= 0.94f,
+                 "downward-cut blade bounds must remain inside the 75% portrait safe frame"))
+        return 1;
+
+    horde::gameplay::items::HeldItemKinematicsInput upwardInput{};
+    upwardInput.playerCombat.action = PlayerCombatAction::UpwardSliceActive;
+    upwardInput.swordSwingRadians = SwordCombat::kUpwardSliceEndRadians;
+    const auto upwardPose = horde::gameplay::items::EvaluateHeldItemKinematics(upwardInput);
+    const auto upwardFrame = horde::gameplay::items::EvaluateOwnerFeedbackPortraitSafeFrame(
+        upwardPose, 1440.0f / 3120.0f);
+    std::cout << "Upward portrait safe-frame NDC x=[" << upwardFrame.minimumNdcX
+              << ", " << upwardFrame.maximumNdcX << "]\n";
+    if (!Require(upwardFrame.minimumNdcX >= -0.94f &&
+                 upwardFrame.maximumNdcX <= 0.94f,
+                 "upward-slice blade bounds must remain inside the 75% portrait safe frame"))
+        return 1;
+    for (int sample = 0; sample <= 24; ++sample)
+    {
+        const float amount = static_cast<float>(sample) / 24.0f;
+        horde::gameplay::items::HeldItemKinematicsInput arcInput{};
+        arcInput.playerCombat.action = amount < 0.5f
+            ? PlayerCombatAction::SwingActive : PlayerCombatAction::UpwardSliceActive;
+        arcInput.swordSwingRadians = -SwordCombat::kDownwardSwingAmplitude +
+            (SwordCombat::kUpwardSliceEndRadians + SwordCombat::kDownwardSwingAmplitude) * amount;
+        const auto arcPose = horde::gameplay::items::EvaluateHeldItemKinematics(arcInput);
+        const auto arcFrame = horde::gameplay::items::EvaluateOwnerFeedbackPortraitSafeFrame(
+            arcPose, 1440.0f / 3120.0f);
+        const auto arcBasis = horde::gameplay::items::EvaluateSwordGripBasisInView(
+            arcPose.swordRadians, arcPose.swordForwardRadians,
+            horde::gameplay::items::kSwordGripRollRadians);
+        if (!Require(arcFrame.minimumNdcX >= -0.94f &&
+                     arcFrame.maximumNdcX <= 0.94f &&
+                     arcBasis.edgeDirection[2] >= 0.90f,
+                     "the full down/up attack arc must stay portrait-safe and edge-forward"))
+            return 1;
+    }
 
     const float previousPose = layered.lanternPoseBlend;
     input.lanternPoseTarget = 0.0f;
