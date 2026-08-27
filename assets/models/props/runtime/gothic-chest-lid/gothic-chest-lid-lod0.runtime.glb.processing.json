@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "component": "gothic-chest-lid",
+  "source": "gothic-chest-lid-cleaned-source.glb",
+  "runtime": "gothic-chest-lid-lod0.runtime.glb",
+  "triangles": 1704,
+  "vertices": 898,
+  "materials": [
+    "BlackIron",
+    "ChestWood"
+  ],
+  "nodes": [
+    "ChestLid",
+    "ChestLidIron"
+  ],
+  "axes": {
+    "up": "+Y",
+    "forward": "+Z"
+  },
+  "processing": "Meshy-silhouette-guided deterministic rigid reauthor; applied transforms; triangulated; smart UV; reviewed tangents; 4x4 runtime texture identities",
+  "pivot": "local origin is the rear hinge; lid extends toward +Z after glTF axis conversion"
+}

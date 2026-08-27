@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "component": "reward-lantern-body",
+  "source": "reward-lantern-body-cleaned-source.glb",
+  "runtime": "reward-lantern-body-lod0.runtime.glb",
+  "triangles": 5340,
+  "vertices": 2866,
+  "materials": [
+    "BlackIron",
+    "FlameCore",
+    "LanternGlass"
+  ],
+  "nodes": [
+    "Flame",
+    "FlameCore",
+    "LanternBody",
+    "LanternGlass",
+    "Light"
+  ],
+  "axes": {
+    "up": "+Y",
+    "forward": "+Z"
+  },
+  "processing": "Meshy-silhouette-guided deterministic rigid reauthor; applied transforms; triangulated; smart UV; reviewed tangents; 4x4 runtime texture identities",
+  "pivot": "local origin is Hinge; body extends down -Y",
+  "glass": "six separate closed 7 mm outward-wound panes; KHR transmission/volume/IOR/attenuation",
+  "removed": "Meshy interior bulb/flame-like geometry and all source pane fill were removed"
+}

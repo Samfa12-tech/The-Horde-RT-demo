@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "asset": "reward-lantern-ring-lod0",
+  "metresPerUnit": 1.0,
+  "coordinateSystem": { "up": "+Y", "forward": "+Z" },
+  "budgets": {
+    "maxVertices": 1600,
+    "maxIndices": 2400,
+    "maxPrimitives": 2,
+    "maxMaterials": 1,
+    "maxTextureLayersPerKind": 1
+  },
+  "lods": [{ "name": "lod0", "maxTriangles": 800 }],
+  "requiredSockets": ["GripRing", "Hinge"],
+  "runtimeTextureProfile": {
+    "android": "astc",
+    "windows": "rgba8",
+    "mipmapped": true,
+    "resolution": 1024
+  },
+  "materialOverrides": [],
+  "distribution": "runtime",
+  "licenceStatus": "Meshy-derived silhouette distributed conservatively under CC BY 4.0; attribution in ASSET_LICENSES.md"
+}

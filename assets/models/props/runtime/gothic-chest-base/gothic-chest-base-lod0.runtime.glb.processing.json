@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "component": "gothic-chest-base",
+  "source": "gothic-chest-base-cleaned-source.glb",
+  "runtime": "gothic-chest-base-lod0.runtime.glb",
+  "triangles": 2384,
+  "vertices": 1256,
+  "materials": [
+    "BlackIron",
+    "ChestWood"
+  ],
+  "nodes": [
+    "ChestBase",
+    "ChestBaseIron",
+    "LanternSocket",
+    "Latch"
+  ],
+  "axes": {
+    "up": "+Y",
+    "forward": "+Z"
+  },
+  "processing": "Meshy-silhouette-guided deterministic rigid reauthor; applied transforms; triangulated; smart UV; reviewed tangents; 4x4 runtime texture identities",
+  "sourceLineage": "Meshy accepted chest candidate 01a03f69-2b15-7c6b-b17f-de4741cdafba"
+}

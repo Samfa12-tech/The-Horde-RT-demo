@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "component": "reward-lantern-ring",
+  "source": "reward-lantern-ring-cleaned-source.glb",
+  "runtime": "reward-lantern-ring-lod0.runtime.glb",
+  "triangles": 708,
+  "vertices": 360,
+  "materials": [
+    "BlackIron"
+  ],
+  "nodes": [
+    "GripRing",
+    "Hinge"
+  ],
+  "axes": {
+    "up": "+Y",
+    "forward": "+Z"
+  },
+  "processing": "Meshy-silhouette-guided deterministic rigid reauthor; applied transforms; triangulated; smart UV; reviewed tangents; 4x4 runtime texture identities",
+  "sourceLineage": "Meshy accepted lantern candidate 01a03f6b-e99a-7ee2-9738-d6d236f89c2b"
+}
