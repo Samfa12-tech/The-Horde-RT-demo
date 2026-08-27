@@ -3,8 +3,10 @@
 ## Art authority and generation lineage
 
 - The owner-package icon reference is not present in this repository and is
-  not claimed as a distributable file. Its former SHA-256 is retained only as
-  an unverified owner-package locator in the tracked Task 7 review record.
+  not claimed as a distributable file. Historical owner-package locator
+  SHA-256 `bc4b237247982a0a1953c403459dc42f8ec579f7b093ec150e78d42ae07639dc`
+  is explicitly **unverified**: the bytes are absent, so this value was not
+  independently recalculated and is not a repository-artifact hash.
   The surrounding architectural arch was explicitly excluded from the prop.
 - Rejected preview candidate 1: `01a03f69-327a-7c6d-ac8d-ccdbb9fe13d7`,
   Meshy 7 Ultra, 25 credits.
@@ -46,12 +48,14 @@ light/highlights and orange/glowing textures.
 
 ## Hashes
 
+- Unverified historical owner-package icon locator (bytes absent):
+  `bc4b237247982a0a1953c403459dc42f8ec579f7b093ec150e78d42ae07639dc`
 - Candidate 1 preview: `6e5c584a03e449052f3214ecfd918a55d5646fe5aa3aab900cbc16b39afc61be`
 - Candidate 2 preview: `e612a8468125600eb37f2ed3485018beb989d5ac9f40e306a128aec9b917e59c`
 - Refined PBR: `18f2395d39e13b682abf9350dce7cae2848c24d955d1f87af5ba53747b515443`
 - 9K remesh: `4e5ed5bac69be626d6fc20e94597395819cf1b63e9aaf0caca145669a6218871`
-- Clean ring/body source: `22cb880aee981d1e99147bf7e9e66b39d933ed96cb3acf39254a5a3638fdb113` / `3db6dfacf6cc871a404856c314e9d0616645c675f0b6f39e9a058caca15d5dd3`.
-- Runtime ring/body: `d9b476a791739fc8951490e61682597d9e736b2f5c80595207aeb10bcae99359` / `ddc611bd90fc52cd2a68d944beb3ea8d17cb4e881b1c10f45395445622805f37`.
+- Clean ring/body source: `22cb880aee981d1e99147bf7e9e66b39d933ed96cb3acf39254a5a3638fdb113` / `97a21829d0a34bb21ffb79dcc0e9202a7f96d9bd11ba26db710e8a5945efc521`.
+- Runtime ring/body: `d9b476a791739fc8951490e61682597d9e736b2f5c80595207aeb10bcae99359` / `34a2522f2027d3fb04b77480cc929d36c5a19c6e0f33bf3fa0f0ae0959c99ec4`.
 
 ## Glass and emission
 

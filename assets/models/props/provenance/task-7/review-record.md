@@ -12,4 +12,4 @@ This tracked record is the sanitized durable counterpart to the transient local 
 
 The deterministic Blender reauthor is the runtime authority. Its structural review is enforced by the production asset tests: named nodes/sockets, exact component bounds, 6 closed 7 mm panes, material route, and no prohibited scene nodes.
 
-Reference correction: `references/lantern_icon_reference.png` is **not** present in this repository and is not claimed as a distributable file. The former SHA-256 is retained only as an owner-package locator, not as a verified repository artifact. The accepted candidate-2 source GLB hash is `e612a8468125600eb37f2ed3485018beb989d5ac9f40e306a128aec9b917e59c`.
+Reference correction: `references/lantern_icon_reference.png` is **not** present in this repository and is not claimed as a distributable file. Historical owner-package locator SHA-256 `bc4b237247982a0a1953c403459dc42f8ec579f7b093ec150e78d42ae07639dc` is explicitly unverified: the bytes are absent, so it was not independently recalculated and is not a repository-artifact hash. The accepted candidate-2 source GLB hash is `e612a8468125600eb37f2ed3485018beb989d5ac9f40e306a128aec9b917e59c`.

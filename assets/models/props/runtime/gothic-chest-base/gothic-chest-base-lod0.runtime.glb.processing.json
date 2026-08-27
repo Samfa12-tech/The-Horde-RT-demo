@@ -12,6 +12,7 @@
   "nodes": [
     "ChestBase",
     "ChestBaseIron",
+    "ChestLidHinge",
     "LanternSocket",
     "Latch"
   ],

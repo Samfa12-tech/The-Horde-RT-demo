@@ -37,9 +37,9 @@ illumination or emission.
 - `chest-meshy7-ultra-preview.glb`: `9ae9a0591b31b269dd75d1cbcaf1615d9b26c9001f0d4d6454ffa5772b82e5f9`
 - `chest-meshy7-ultra-refined-pbr.glb`: `50a78e025c4e9828394a3dd4966ec66601f9b49ce1e808cf90af71216636c700`
 - `chest-meshy-remesh-7k.glb`: `eb70e139f5f776dc7204b9fff498bf9cdc7c75f275d65053d73a597b6908c5ab`
-- `gothic-chest-base-cleaned-source.glb`: `a312352d5f68b60ce41d45504d4ac06a919dc422c1c77f6cb631e60874e5ae2a`
-- `gothic-chest-lid-cleaned-source.glb`: `1c2d0a57608bfe30003777a0307516086a8b0bb056440b6da67020f51c0ab917`
-- Runtime base/lid: `32417bc40fdb8e9467c32d9f29f811efdd6b35a1c717e3f6eb1b628112488f89` / `24d771eab7d598192cf520d0a382e03486c15153b52e45ee6421a32ead3b1b25`.
+- `gothic-chest-base-cleaned-source.glb`: `54b02e118471ff04537b4939a08d72af08d900b2aefa78326cefd40a2c20affb`
+- `gothic-chest-lid-cleaned-source.glb`: `214d5f7ddd29ffa47dad3206a0def1ff46aca3b620339669c4620d37c727bc96`
+- Runtime base/lid: `d6eaa2e116d670821feff6db3679e6e278ed3de976b394a2d060c69313b4b8db` / `cd0db348fad0939197f36a02e14f87abd15e7284c6701b1db1e679c8f7af03e2`.
 
 ## Licence and attribution
 

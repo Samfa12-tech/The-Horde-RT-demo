@@ -405,7 +405,16 @@ def build_chest_base():
     socket.empty_display_type = "PLAIN_AXES"
     socket.location = (0.0, 0.0, 0.18)
     bpy.context.scene.collection.objects.link(socket)
-    return [chest_base, chest_iron, latch, socket]
+    # This is an authored chest-base anchor, not a renderer staging offset.
+    # The lid source's local origin is the rear hinge, so the runtime only
+    # supplies an open angle after composing this socket.
+    lid_hinge = bpy.data.objects.new("ChestLidHinge", None)
+    lid_hinge.empty_display_type = "PLAIN_AXES"
+    # Blender +Z becomes glTF +Y and Blender +Y becomes glTF -Z.
+    # This exports the released rear pivot as (0, +0.34, -0.286) metres.
+    lid_hinge.location = (0.0, 0.286, 0.34)
+    bpy.context.scene.collection.objects.link(lid_hinge)
+    return [chest_base, chest_iron, latch, socket, lid_hinge]
 
 
 def build_chest_lid():
@@ -542,7 +551,12 @@ def build_lantern_body():
     body = join(iron_parts, "LanternBody", iron)
 
     glass_parts = []
-    apothem = 0.194
+    # Keep the closed glass volume wholly behind the front-mounted iron
+    # tracery. The old 0.194 m centre put the 7 mm slab's outer face at
+    # 0.1975 m while the 8.5 mm tracery reached inward to 0.1965 m, embedding
+    # opaque triangles inside the medium. A 0.190 m centre retains the pane's
+    # physical thickness with 3 mm radial clearance to the cage.
+    apothem = 0.190
     for face in range(6):
         angle = 2.0 * math.pi * face / 6.0 + math.pi / 3.0
         bpy.ops.mesh.primitive_cube_add(location=(math.cos(angle) * apothem,
