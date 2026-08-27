@@ -326,6 +326,14 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     finaleRoofBlas_ = std::exchange(other.finaleRoofBlas_, AccelerationStructure{});
     torchBlas_ = std::exchange(other.torchBlas_, AccelerationStructure{});
     swordBlas_ = std::exchange(other.swordBlas_, AccelerationStructure{});
+    gothicChestBaseBlas_ =
+        std::exchange(other.gothicChestBaseBlas_, AccelerationStructure{});
+    gothicChestLidBlas_ =
+        std::exchange(other.gothicChestLidBlas_, AccelerationStructure{});
+    rewardLanternRingBlas_ =
+        std::exchange(other.rewardLanternRingBlas_, AccelerationStructure{});
+    rewardLanternBodyBlas_ =
+        std::exchange(other.rewardLanternBodyBlas_, AccelerationStructure{});
     dielectricFixtureBlas_ =
         std::exchange(other.dielectricFixtureBlas_, AccelerationStructure{});
     playerBodyBlas_ = std::exchange(other.playerBodyBlas_, AccelerationStructure{});
@@ -342,6 +350,10 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     developmentStaticAsset_ = std::move(other.developmentStaticAsset_);
     productionTorchAsset_ = std::move(other.productionTorchAsset_);
     productionPlayerAsset_ = std::move(other.productionPlayerAsset_);
+    gothicChestBaseAsset_ = std::move(other.gothicChestBaseAsset_);
+    gothicChestLidAsset_ = std::move(other.gothicChestLidAsset_);
+    rewardLanternRingAsset_ = std::move(other.rewardLanternRingAsset_);
+    rewardLanternBodyAsset_ = std::move(other.rewardLanternBodyAsset_);
     productionDielectricFixtureAsset_ =
         std::move(other.productionDielectricFixtureAsset_);
     skinnedPlayerUpload_ = std::move(other.skinnedPlayerUpload_);
@@ -375,6 +387,9 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     staticMeshBlasBytes_ = std::exchange(other.staticMeshBlasBytes_, 0u);
     staticTextureBytes_ = std::exchange(other.staticTextureBytes_, 0u);
     staticMeshBlasBuildMilliseconds_ = std::exchange(other.staticMeshBlasBuildMilliseconds_, 0.0);
+    productionPropBlasBytes_ = std::exchange(other.productionPropBlasBytes_, 0u);
+    productionPropBlasBuildMilliseconds_ =
+        std::exchange(other.productionPropBlasBuildMilliseconds_, 0.0);
     heldItemBlasMeasurements_ = std::exchange(
         other.heldItemBlasMeasurements_, HeldItemBlasMeasurements{});
     descriptorSetLayout_ = std::exchange(other.descriptorSetLayout_, VK_NULL_HANDLE);
@@ -527,6 +542,10 @@ void PresentableTinyRtScene::Destroy()
     DestroyAccelerationStructure(playerLimbBlas_);
     DestroyAccelerationStructure(playerBodyBlas_);
     DestroyAccelerationStructure(dielectricFixtureBlas_);
+    DestroyAccelerationStructure(rewardLanternBodyBlas_);
+    DestroyAccelerationStructure(rewardLanternRingBlas_);
+    DestroyAccelerationStructure(gothicChestLidBlas_);
+    DestroyAccelerationStructure(gothicChestBaseBlas_);
     DestroyAccelerationStructure(swordBlas_);
     DestroyAccelerationStructure(torchBlas_);
     DestroyAccelerationStructure(finaleRoofBlas_);
@@ -565,6 +584,10 @@ void PresentableTinyRtScene::Destroy()
     developmentStaticAsset_ = {};
     productionTorchAsset_ = {};
     productionPlayerAsset_ = {};
+    gothicChestBaseAsset_ = {};
+    gothicChestLidAsset_ = {};
+    rewardLanternRingAsset_ = {};
+    rewardLanternBodyAsset_ = {};
     productionDielectricFixtureAsset_ = {};
     playerRenderSlot_ = {};
     skinnedPlayerUpload_.clear();
@@ -585,6 +608,8 @@ void PresentableTinyRtScene::Destroy()
     staticMeshBlasBytes_ = 0u;
     staticTextureBytes_ = 0u;
     staticMeshBlasBuildMilliseconds_ = 0.0;
+    productionPropBlasBytes_ = 0u;
+    productionPropBlasBuildMilliseconds_ = 0.0;
     heldItemBlasMeasurements_ = {};
 
     if (storageImageView_ != VK_NULL_HANDLE)
@@ -1181,6 +1206,12 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     staticTextureDirectory_.clear();
     developmentStaticAsset_ = {};
     productionTorchAsset_ = {};
+    productionPlayerAsset_ = {};
+    gothicChestBaseAsset_ = {};
+    gothicChestLidAsset_ = {};
+    rewardLanternRingAsset_ = {};
+    rewardLanternBodyAsset_ = {};
+    productionDielectricFixtureAsset_ = {};
     if (!productionHeldItemAssetsEnabled_)
     {
         diagnostic = "Production held-item asset root is required; procedural sword/torch bodies are retired.";
@@ -1193,10 +1224,22 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     const auto playerDirectory = root / "models/player/runtime";
     const auto dielectricDirectory =
         root / "models/props/runtime/dielectric-fixture";
+    const auto chestBaseDirectory =
+        root / "models/props/runtime/gothic-chest-base";
+    const auto chestLidDirectory =
+        root / "models/props/runtime/gothic-chest-lid";
+    const auto lanternRingDirectory =
+        root / "models/props/runtime/reward-lantern-ring";
+    const auto lanternBodyDirectory =
+        root / "models/props/runtime/reward-lantern-body";
     horde::scene::assets::AssetManifest swordManifest;
     horde::scene::assets::AssetManifest torchManifest;
     horde::scene::assets::AssetManifest playerManifest;
     horde::scene::assets::AssetManifest dielectricManifest;
+    horde::scene::assets::AssetManifest chestBaseManifest;
+    horde::scene::assets::AssetManifest chestLidManifest;
+    horde::scene::assets::AssetManifest lanternRingManifest;
+    horde::scene::assets::AssetManifest lanternBodyManifest;
     if (!horde::scene::assets::AssetManifest::Load(
             swordDirectory / "asset.manifest.json", swordManifest, diagnostic) ||
         !horde::scene::assets::StaticMeshAsset::Load(
@@ -1223,20 +1266,50 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             dielectricManifest, diagnostic) ||
         !horde::scene::assets::StaticMeshAsset::Load(
             dielectricDirectory / "closed-glass-lod0.runtime.glb",
-            dielectricManifest, productionDielectricFixtureAsset_, diagnostic))
+            dielectricManifest, productionDielectricFixtureAsset_, diagnostic) ||
+        !horde::scene::assets::AssetManifest::Load(
+            chestBaseDirectory / "asset.manifest.json", chestBaseManifest, diagnostic) ||
+        !horde::scene::assets::StaticMeshAsset::Load(
+            chestBaseDirectory / "gothic-chest-base-lod0.runtime.glb",
+            chestBaseManifest, gothicChestBaseAsset_, diagnostic) ||
+        !horde::scene::assets::AssetManifest::Load(
+            chestLidDirectory / "asset.manifest.json", chestLidManifest, diagnostic) ||
+        !horde::scene::assets::StaticMeshAsset::Load(
+            chestLidDirectory / "gothic-chest-lid-lod0.runtime.glb",
+            chestLidManifest, gothicChestLidAsset_, diagnostic) ||
+        !horde::scene::assets::AssetManifest::Load(
+            lanternRingDirectory / "asset.manifest.json", lanternRingManifest, diagnostic) ||
+        !horde::scene::assets::StaticMeshAsset::Load(
+            lanternRingDirectory / "reward-lantern-ring-lod0.runtime.glb",
+            lanternRingManifest, rewardLanternRingAsset_, diagnostic) ||
+        !horde::scene::assets::AssetManifest::Load(
+            lanternBodyDirectory / "asset.manifest.json", lanternBodyManifest, diagnostic) ||
+        !horde::scene::assets::StaticMeshAsset::Load(
+            lanternBodyDirectory / "reward-lantern-body-lod0.runtime.glb",
+            lanternBodyManifest, rewardLanternBodyAsset_, diagnostic))
         return false;
-    staticTextureDirectory_ = (root / "textures/held-items/runtime").string();
-    std::array<StaticRtAssetRegistration, 4u> registrations{{
+    staticTextureDirectory_ = (root / "textures/props/runtime").string();
+    std::array<StaticRtAssetRegistration, 8u> registrations{{
         {3u, 0x53574f52u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
          0u, &developmentStaticAsset_},
         {1u, 0x544f5243u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
          1u, &productionTorchAsset_},
         {4u, 0x504c4159u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
          0u, &productionPlayerAsset_},
-        {5u, 0x474c4153u,
+        {9u, 0x474c4153u,
          static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr) |
              static_cast<std::uint32_t>(RtInstanceFlag::Transmissive),
          0u, &productionDielectricFixtureAsset_},
+        {5u, 0x43484241u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
+         0u, &gothicChestBaseAsset_},
+        {6u, 0x43484c44u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
+         0u, &gothicChestLidAsset_},
+        {7u, 0x4c4e5247u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
+         0u, &rewardLanternRingAsset_},
+        {8u, 0x4c4e4244u,
+         static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr) |
+             static_cast<std::uint32_t>(RtInstanceFlag::Transmissive),
+         0u, &rewardLanternBodyAsset_},
     }};
     if (!staticMeshSlot_.Initialize(registrations, diagnostic)) return false;
     const RtInstanceMetadata playerMetadata = staticMeshSlot_.InstanceMetadata()[4u];
@@ -1249,7 +1322,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     playerStaticVertexBase_ =
         staticMeshSlot_.PrimitiveMetadata()[playerMetadata.primitiveBase].vertexOffset;
     const RtInstanceMetadata dielectricMetadata =
-        staticMeshSlot_.InstanceMetadata()[5u];
+        staticMeshSlot_.InstanceMetadata()[9u];
     if (dielectricMetadata.primitiveCount != 1u ||
         dielectricMetadata.primitiveBase >= staticMeshSlot_.PrimitiveMetadata().size())
     {
@@ -2284,6 +2357,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         const RtInstanceMetadata instance =
             staticMeshSlot_.InstanceMetadata()[instanceCustomIndex];
         const auto& primitiveMetadata = staticMeshSlot_.PrimitiveMetadata();
+        const auto& materialMetadata = staticMeshSlot_.Materials();
         const auto& staticVertices = staticMeshSlot_.Vertices();
         for (std::uint32_t localIndex = 0u; localIndex < instance.primitiveCount; ++localIndex)
         {
@@ -2300,7 +2374,17 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
             VkAccelerationStructureGeometryKHR geometry{
                 VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
             geometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
-            geometry.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
+            if (primitive.materialIndex >= materialMetadata.size())
+            {
+                diagnostic = "Static RT BLAS primitive has an out-of-range material.";
+                return false;
+            }
+            const bool transmissive =
+                (materialMetadata[primitive.materialIndex].materialFlags[0] &
+                 static_cast<std::uint32_t>(RtMaterialFlag::Transmission)) != 0u;
+            // Let rayQuery NoOpaque filtering see physical dielectric
+            // interfaces while retaining the fast opaque path for metal/wood.
+            geometry.flags = transmissive ? 0u : VK_GEOMETRY_OPAQUE_BIT_KHR;
             geometry.geometry.triangles.sType =
                 VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
             geometry.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
@@ -2331,7 +2415,8 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     const auto buildRegisteredStaticBlas = [this, &appendStaticGeometries, &buildBlas, &diagnostic](
         const std::uint32_t instanceCustomIndex,
         const char* label,
-        AccelerationStructure& accelerationStructure) {
+        AccelerationStructure& accelerationStructure,
+        const bool productionProp = false) {
         std::vector<VkAccelerationStructureGeometryKHR> geometries;
         std::vector<VkAccelerationStructureBuildRangeInfoKHR> ranges;
         std::vector<std::uint32_t> primitiveCounts;
@@ -2377,6 +2462,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         rangePointers.reserve(ranges.size());
         for (const auto& range : ranges) rangePointers.push_back(&range);
         BlasBuildData buildData{this, &buildInfo, rangePointers.data()};
+        const auto buildStart = std::chrono::steady_clock::now();
         if (!RunOneTimeCommands(buildBlas, &buildData, diagnostic))
         {
             DestroyBuffer(scratch);
@@ -2388,6 +2474,13 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         addressInfo.accelerationStructure = accelerationStructure.handle;
         accelerationStructure.address = vkGetAccelerationStructureDeviceAddressKHR_(
             device_, &addressInfo);
+        if (productionProp)
+        {
+            productionPropBlasBytes_ += sizes.accelerationStructureSize;
+            productionPropBlasBuildMilliseconds_ +=
+                std::chrono::duration<double, std::milli>(
+                    std::chrono::steady_clock::now() - buildStart).count();
+        }
         return accelerationStructure.address != 0u;
     };
 
@@ -2565,8 +2658,18 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     swordBlasAddressInfo.accelerationStructure = swordBlas_.handle;
     swordBlas_.address = vkGetAccelerationStructureDeviceAddressKHR_(device_, &swordBlasAddressInfo);
 
+    productionPropBlasBytes_ = 0u;
+    productionPropBlasBuildMilliseconds_ = 0.0;
     if (!buildRegisteredStaticBlas(
-            5u, "generic dielectric fixture", dielectricFixtureBlas_))
+            5u, "production Gothic chest base", gothicChestBaseBlas_, true) ||
+        !buildRegisteredStaticBlas(
+            6u, "production Gothic chest lid", gothicChestLidBlas_, true) ||
+        !buildRegisteredStaticBlas(
+            7u, "production reward lantern ring", rewardLanternRingBlas_, true) ||
+        !buildRegisteredStaticBlas(
+            8u, "production reward lantern body", rewardLanternBodyBlas_, true) ||
+        !buildRegisteredStaticBlas(
+            9u, "generic dielectric fixture", dielectricFixtureBlas_))
         return false;
 
     VkAccelerationStructureBuildRangeInfoKHR playerBodyRange{};
@@ -2965,7 +3068,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
             0.0f, 0.0f, 0.40f, 0.0f}};
     }
     instances[5] = instances[0];
-    instances[5].instanceCustomIndex = 5u;
+    instances[5].instanceCustomIndex = 9u;
     instances[5].mask = 0u;
     instances[5].accelerationStructureReference = dielectricFixtureBlas_.address;
     instances[5].transform = {{
@@ -3482,8 +3585,11 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                                                      std::string& diagnostic)
 {
     const RtSceneTuning clampedTuning = ClampRtSceneTuning(frame.tuning);
+    const bool productionPropsVisible = clampedTuning.productionRewardPropsVisible;
+    const bool glassFixtureVisible =
+        clampedTuning.glassFixtureVisible && !productionPropsVisible;
     const PlayerRenderRoute effectivePlayerRenderRoute =
-        clampedTuning.glassFixtureVisible
+        (glassFixtureVisible || productionPropsVisible)
         ? PlayerRenderRoute::Skinned : frame.playerRenderRoute;
     if (effectivePlayerRenderRoute != measuredPlayerRoute_)
     {
@@ -3517,6 +3623,10 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         lichGpu.accelerationStructure.handle == VK_NULL_HANDLE ||
         finaleRoofBlas_.handle == VK_NULL_HANDLE || waterfallBlas_.handle == VK_NULL_HANDLE ||
         swordBlas_.handle == VK_NULL_HANDLE ||
+        gothicChestBaseBlas_.handle == VK_NULL_HANDLE ||
+        gothicChestLidBlas_.handle == VK_NULL_HANDLE ||
+        rewardLanternRingBlas_.handle == VK_NULL_HANDLE ||
+        rewardLanternBodyBlas_.handle == VK_NULL_HANDLE ||
         dielectricFixtureBlas_.handle == VK_NULL_HANDLE ||
         playerBodyBlas_.handle == VK_NULL_HANDLE || playerLimbBlas_.handle == VK_NULL_HANDLE ||
         skinnedPlayerBlas_.handle == VK_NULL_HANDLE ||
@@ -3774,19 +3884,20 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     instances[1] = instances[0];
     instances[1].transform = heldItemInstanceTransform(renderHeldItems[0]);
     instances[1].instanceCustomIndex = 1u;
-    instances[1].mask = 0x02u;
+    instances[1].mask = productionPropsVisible ? 0u : 0x02u;
     instances[1].accelerationStructureReference = torchBlas_.address;
     const auto characterInstances = characterSlot_.BuildActiveInstances();
     instances[CharacterRenderSlot::kTlasInstanceIndex] = characterInstances[0];
     instances[3] = instances[1];
     instances[3].instanceCustomIndex = 3u;
-    instances[3].mask = 0x02u;
+    instances[3].mask = productionPropsVisible ? 0u : 0x02u;
     instances[3].accelerationStructureReference = swordBlas_.address;
     instances[3].transform = heldItemInstanceTransform(renderHeldItems[1]);
     instances[4] = instances[0];
     instances[4].instanceCustomIndex = 4u;
     const PlayerRouteMasks playerRouteMasks = BuildPlayerRouteMasks(effectivePlayerRenderRoute);
     instances[4].mask = playerRouteMasks.instanceMasks[4];
+    if (productionPropsVisible) instances[4].mask = 0u;
     instances[4].accelerationStructureReference =
         effectivePlayerRenderRoute == PlayerRenderRoute::Skinned
         ? skinnedPlayerBlas_.address : playerBodyBlas_.address;
@@ -3849,10 +3960,48 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const Vec3 headTop = add(add(animatedBodyOrigin, Vec3{0.0f, 0.15f, 0.0f}), scaled(animatedBodyForward, 0.20f));
     instances[16].transform = segmentTransform(headBase, headTop, 0.145f);
     instances[16].mask = playerRouteMasks.instanceMasks[16];
-    if (clampedTuning.glassFixtureVisible)
+    if (productionPropsVisible)
     {
+        const bool glassOnly = clampedTuning.productionLanternGlassOnly;
+        const float lanternScale = glassOnly ? 1.05f : 0.90f;
+        const float lanternX = -12.50f;
+        const float lanternY = glassOnly ? 0.55f : 0.46f;
+        const float lanternZ = glassOnly ? -15.20f : -14.72f;
         instances[5] = instances[0];
         instances[5].instanceCustomIndex = 5u;
+        instances[5].mask = glassOnly ? 0u : 0x01u;
+        instances[5].accelerationStructureReference = gothicChestBaseBlas_.address;
+        instances[5].transform = {{
+            0.50f, 0.0f, 0.8660254f, -12.50f,
+            0.0f, 1.0f, 0.0f, -0.95f,
+            -0.8660254f, 0.0f, 0.50f, -15.42f}};
+        instances[6] = instances[0];
+        instances[6].instanceCustomIndex = 6u;
+        instances[6].mask = glassOnly ? 0u : 0x01u;
+        instances[6].accelerationStructureReference = gothicChestLidBlas_.address;
+        // The lid is a rigid node rooted on its rear hinge. This matrix is a
+        // -70 degree local hinge rotation composed with the chest's +90
+        // degree world-Y orientation; no skinning or vertex deformation.
+        instances[6].transform = {{
+            0.50f, -0.8137977f, 0.2961981f, -12.748f,
+            0.0f, 0.3420201f, 0.9396926f, -0.61f,
+            -0.8660254f, -0.4698463f, 0.1710101f, -15.563f}};
+        instances[7] = instances[0];
+        instances[7].instanceCustomIndex = 7u;
+        instances[7].mask = 0x01u;
+        instances[7].accelerationStructureReference = rewardLanternRingBlas_.address;
+        instances[7].transform = {{
+            0.0f, 0.0f, lanternScale, lanternX,
+            0.0f, lanternScale, 0.0f, lanternY,
+            -lanternScale, 0.0f, 0.0f, lanternZ}};
+        instances[8] = instances[7];
+        instances[8].instanceCustomIndex = 8u;
+        instances[8].accelerationStructureReference = rewardLanternBodyBlas_.address;
+    }
+    else if (glassFixtureVisible)
+    {
+        instances[5] = instances[0];
+        instances[5].instanceCustomIndex = 9u;
         instances[5].mask = 0x01u;
         instances[5].accelerationStructureReference = dielectricFixtureBlas_.address;
         instances[5].transform = {{
@@ -3877,11 +4026,21 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         waterfallScale.depth, 0.0f, 0.0f, -2.32f,
         0.0f, waterfallScale.vertical, 0.0f, 0.0f,
         0.0f, 0.0f, waterfallScale.crossLane, -15.26f}};
-    const RtHeldLightGpu heldLightGpu{{
+    RtHeldLightGpu heldLightGpu{{
         frame.heldLight.worldFromLight[12],
         frame.heldLight.worldFromLight[13],
         frame.heldLight.worldFromLight[14],
         frame.heldLight.active ? frame.torchLightStrength : 0.0f}};
+    if (productionPropsVisible)
+    {
+        const float lanternScale = clampedTuning.productionLanternGlassOnly ? 1.05f : 0.90f;
+        heldLightGpu.positionStrength = {{
+            -12.50f,
+            (clampedTuning.productionLanternGlassOnly ? 0.55f : 0.46f) -
+                0.515f * lanternScale,
+            clampedTuning.productionLanternGlassOnly ? -15.20f : -14.72f,
+            1.8f}};
+    }
     FireEmitterUpload fireEmitterUpload;
     const FireEmitterTuning fireTuning{
         frame.torchLightStrength * clampedTuning.fireStrengthScale,
@@ -3902,6 +4061,39 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     {
         return false;
     }
+    if (productionPropsVisible)
+    {
+        horde::gameplay::effects::FireEmitterState lanternEmitter{};
+        lanternEmitter.stableId = 0x4c414e54u;
+        lanternEmitter.seed = 0x474f5448u;
+        lanternEmitter.strength = 0.78f;
+        lanternEmitter.colourTemperatureKelvin = 1725.0f;
+        lanternEmitter.radius = 0.045f;
+        lanternEmitter.height = 0.12f;
+        lanternEmitter.coreRadius = 0.021f;
+        lanternEmitter.smokeDensity = 0.035f;
+        lanternEmitter.emberRate = 0.025f;
+        lanternEmitter.parentObject =
+            horde::gameplay::effects::FireEmitterParentObject::RewardLantern;
+        lanternEmitter.zone = frame.zone;
+        const float lanternScale = clampedTuning.productionLanternGlassOnly ? 1.05f : 0.90f;
+        const float lanternX = -12.50f;
+        const float lanternY = clampedTuning.productionLanternGlassOnly ? 0.55f : 0.46f;
+        const float lanternZ = clampedTuning.productionLanternGlassOnly ? -15.20f : -14.72f;
+        lanternEmitter.worldFromFlame[12] = lanternX;
+        lanternEmitter.worldFromFlame[13] = lanternY - 0.545f * lanternScale;
+        lanternEmitter.worldFromFlame[14] = lanternZ;
+        lanternEmitter.worldFromLight = lanternEmitter.worldFromFlame;
+        lanternEmitter.worldFromLight[13] = lanternY - 0.515f * lanternScale;
+        const std::size_t lanternEmitterIndex = std::min<std::size_t>(
+            fireEmitterUpload.activeCount, kRtActiveFireEmitterCapacity - 1u);
+        fireEmitterUpload.emitters[lanternEmitterIndex] = PackFireEmitterGpu(
+            lanternEmitter, fireTuning, ResolveFireEmitterQualityBudget(fireQuality));
+        fireEmitterUpload.selectedStableIds[lanternEmitterIndex] = lanternEmitter.stableId;
+        fireEmitterUpload.activeCount = static_cast<std::uint32_t>(
+            std::max<std::size_t>(fireEmitterUpload.activeCount,
+                                  lanternEmitterIndex + 1u));
+    }
     RtDielectricDiagnostics previousDielectricDiagnostics{};
     if (!ReadBuffer(dielectricDiagnosticsBuffer_, 0u,
                     &previousDielectricDiagnostics, sizeof(previousDielectricDiagnostics),
@@ -3921,14 +4113,18 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     if (effectivePlayerRenderRoute == PlayerRenderRoute::Procedural)
     {
         frameInstanceMetadata[4u].flags = 0u;
-        frameInstanceMetadata[5u].flags = 0u;
+        for (std::size_t i = 5u; i <= 9u; ++i)
+            frameInstanceMetadata[i].flags = 0u;
     }
-    else if (!clampedTuning.glassFixtureVisible)
+    else
     {
-        // Custom index 5 is only bound to the dielectric BLAS while the
-        // development fixture is active. Keep inactive metadata honest so the
-        // generic material scan below follows the actual TLAS route.
-        frameInstanceMetadata[5u].flags = 0u;
+        if (!productionPropsVisible)
+        {
+            for (std::size_t i = 5u; i <= 8u; ++i)
+                frameInstanceMetadata[i].flags = 0u;
+        }
+        if (!glassFixtureVisible)
+            frameInstanceMetadata[9u].flags = 0u;
     }
     auto frameMaterials = staticMeshSlot_.Materials();
     if (dielectricFixtureMaterialIndex_ >= frameMaterials.size())

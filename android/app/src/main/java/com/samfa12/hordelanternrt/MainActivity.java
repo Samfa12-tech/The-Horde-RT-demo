@@ -329,14 +329,22 @@ public class MainActivity extends Activity {
                     && stageAsset("models/props/runtime/gothic-hand-torch-lod0.runtime.glb", "models/props/runtime/gothic-hand-torch-lod0.runtime.glb")
                     && stageAsset("models/props/runtime/dielectric-fixture/asset.manifest.json", "models/props/runtime/dielectric-fixture/asset.manifest.json")
                     && stageAsset("models/props/runtime/dielectric-fixture/closed-glass-lod0.runtime.glb", "models/props/runtime/dielectric-fixture/closed-glass-lod0.runtime.glb")
+                    && stageAsset("models/props/runtime/gothic-chest-base/asset.manifest.json", "models/props/runtime/gothic-chest-base/asset.manifest.json")
+                    && stageAsset("models/props/runtime/gothic-chest-base/gothic-chest-base-lod0.runtime.glb", "models/props/runtime/gothic-chest-base/gothic-chest-base-lod0.runtime.glb")
+                    && stageAsset("models/props/runtime/gothic-chest-lid/asset.manifest.json", "models/props/runtime/gothic-chest-lid/asset.manifest.json")
+                    && stageAsset("models/props/runtime/gothic-chest-lid/gothic-chest-lid-lod0.runtime.glb", "models/props/runtime/gothic-chest-lid/gothic-chest-lid-lod0.runtime.glb")
+                    && stageAsset("models/props/runtime/reward-lantern-ring/asset.manifest.json", "models/props/runtime/reward-lantern-ring/asset.manifest.json")
+                    && stageAsset("models/props/runtime/reward-lantern-ring/reward-lantern-ring-lod0.runtime.glb", "models/props/runtime/reward-lantern-ring/reward-lantern-ring-lod0.runtime.glb")
+                    && stageAsset("models/props/runtime/reward-lantern-body/asset.manifest.json", "models/props/runtime/reward-lantern-body/asset.manifest.json")
+                    && stageAsset("models/props/runtime/reward-lantern-body/reward-lantern-body-lod0.runtime.glb", "models/props/runtime/reward-lantern-body/reward-lantern-body-lod0.runtime.glb")
                     && stageAsset("models/player/runtime/asset.manifest.json", "models/player/runtime/asset.manifest.json")
                     && stageAsset("models/player/runtime/clip-manifest.json", "models/player/runtime/clip-manifest.json")
                     && stageAsset("models/player/runtime/gothic-traveller-lod0.runtime.glb", "models/player/runtime/gothic-traveller-lod0.runtime.glb")
-                    && stageAsset("textures/held-items/runtime/asset.manifest.json", "textures/held-items/runtime/asset.manifest.json")
-                    && stageAsset("textures/held-items/runtime/base-color.android.ktx2", "textures/held-items/runtime/base-color.android.ktx2")
-                    && stageAsset("textures/held-items/runtime/normal.android.ktx2", "textures/held-items/runtime/normal.android.ktx2")
-                    && stageAsset("textures/held-items/runtime/orm.android.ktx2", "textures/held-items/runtime/orm.android.ktx2")
-                    && stageAsset("textures/held-items/runtime/emissive.android.ktx2", "textures/held-items/runtime/emissive.android.ktx2");
+                    && stageAsset("textures/props/runtime/asset.manifest.json", "textures/props/runtime/asset.manifest.json")
+                    && stageAsset("textures/props/runtime/base-color.android.ktx2", "textures/props/runtime/base-color.android.ktx2")
+                    && stageAsset("textures/props/runtime/normal.android.ktx2", "textures/props/runtime/normal.android.ktx2")
+                    && stageAsset("textures/props/runtime/orm.android.ktx2", "textures/props/runtime/orm.android.ktx2")
+                    && stageAsset("textures/props/runtime/emissive.android.ktx2", "textures/props/runtime/emissive.android.ktx2");
             final boolean written = ProbeBridge.writeReports(filesRoot);
             final StringBuilder output = new StringBuilder(textReport).append('\n');
             if (textReport.contains("RT mode: Unsupported")) {

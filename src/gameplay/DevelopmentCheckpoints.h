@@ -28,9 +28,11 @@ struct DevelopmentCheckpoint
     float glassDepthScale = 1.0f;
     std::array<float, 3u> glassAttenuationColor{{0.72f, 0.90f, 1.0f}};
     float glassAttenuationDistance = 2.4f;
+    bool usesProductionRewardProps = false;
+    bool productionLanternGlassOnly = false;
 };
 
-inline constexpr std::array<DevelopmentCheckpoint, 14u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 16u> kDevelopmentCheckpoints{{
     {100, "pbr-sword-closeup", 0, 0.0f, 1.85f, 0.0f, -0.18f},
     {101, "pbr-torch-fire", 0, 0.0f, 1.85f, 0.0f, -0.14f},
     {102, "player-body-grips", 0, 0.0f, 1.85f, 0.0f, -0.32f},
@@ -52,6 +54,12 @@ inline constexpr std::array<DevelopmentCheckpoint, 14u> kDevelopmentCheckpoints{
      DevelopmentCombatPose::Rest, true, 0.005f},
     {113, "glass-edge-fresnel", 4, -7.60f, -13.25f, -0.65f, -0.05f,
      DevelopmentCombatPose::Rest, true},
+    {114, "lantern-chest-unlock", 5, -10.65f, -15.20f, -1.57079632679f, -0.22f,
+     DevelopmentCombatPose::Rest, false, 1.0f, {{0.72f, 0.90f, 1.0f}}, 2.4f,
+     true, false},
+    {115, "lantern-glass-production", 5, -10.95f, -15.20f, -1.57079632679f, -0.16f,
+     DevelopmentCombatPose::Rest, false, 1.0f, {{0.72f, 0.90f, 1.0f}}, 2.4f,
+     true, true},
 }};
 
 constexpr const DevelopmentCheckpoint* FindDevelopmentCheckpoint(std::string_view name)

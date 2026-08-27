@@ -127,6 +127,8 @@ struct SwapchainContext
     horde::vulkan::raytracing::PlayerRenderRoute playerRenderRoute =
         horde::vulkan::raytracing::PlayerRenderRoute::Procedural;
     bool glassFixtureRequested = false;
+    bool productionRewardPropsRequested = false;
+    bool productionLanternGlassOnly = false;
     float glassDepthScale = 1.0f;
     std::array<float, 3u> glassAttenuationColor{{0.72f, 0.90f, 1.0f}};
     float glassAttenuationDistance = 2.4f;
@@ -626,7 +628,7 @@ bool ResolveDebugCheckpoint(const std::int32_t id, DebugCheckpointSelection& sel
     selection.simulationCheckpointId = base->id;
     selection.playerRoute =
         (development->name.starts_with("player-body-") ||
-         development->usesGlassFixture)
+         development->usesGlassFixture || development->usesProductionRewardProps)
         ? horde::vulkan::raytracing::PlayerRenderRoute::Skinned
         : horde::vulkan::raytracing::PlayerRenderRoute::Procedural;
     selection.development = development;
@@ -717,6 +719,10 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
          << ", \"fireTurbulenceScale\": " << rtLab.fireTurbulenceScale
          << ", \"fireSmokeScale\": " << rtLab.fireSmokeScale
          << ", \"glassVisible\": " << (rtLab.glassFixtureVisible ? "true" : "false")
+         << ", \"productionRewardPropsVisible\": "
+         << (context.productionRewardPropsRequested ? "true" : "false")
+         << ", \"productionLanternGlassOnly\": "
+         << (context.productionLanternGlassOnly ? "true" : "false")
          << ", \"glassTransmission\": " << rtLab.glassTransmission
          << ", \"glassIor\": " << rtLab.glassIor
          << ", \"glassRoughness\": " << rtLab.glassRoughness
@@ -793,6 +799,10 @@ void ApplyBenchmarkCheckpoint(SwapchainContext& context, const DebugCheckpointSe
     context.playerRenderRoute = selection.playerRoute;
     context.glassFixtureRequested =
         selection.development != nullptr && selection.development->usesGlassFixture;
+    context.productionRewardPropsRequested = selection.development != nullptr &&
+        selection.development->usesProductionRewardProps;
+    context.productionLanternGlassOnly = context.productionRewardPropsRequested &&
+        selection.development->productionLanternGlassOnly;
     if (context.glassFixtureRequested)
     {
         context.glassDepthScale = selection.development->glassDepthScale;
@@ -827,6 +837,10 @@ void ApplyCaptureCheckpoint(SwapchainContext& context, const DebugCheckpointSele
     context.playerRenderRoute = selection.playerRoute;
     context.glassFixtureRequested =
         selection.development != nullptr && selection.development->usesGlassFixture;
+    context.productionRewardPropsRequested = selection.development != nullptr &&
+        selection.development->usesProductionRewardProps;
+    context.productionLanternGlassOnly = context.productionRewardPropsRequested &&
+        selection.development->productionLanternGlassOnly;
     if (context.glassFixtureRequested)
     {
         context.glassDepthScale = selection.development->glassDepthScale;
@@ -856,6 +870,8 @@ void ApplyRouteReplay(SwapchainContext& context)
     context.activeBenchmarkName.clear();
     context.playerRenderRoute = horde::vulkan::raytracing::PlayerRenderRoute::Procedural;
     context.glassFixtureRequested = false;
+    context.productionRewardPropsRequested = false;
+    context.productionLanternGlassOnly = false;
     context.glassDepthScale = 1.0f;
     context.glassAttenuationColor = {{0.72f, 0.90f, 1.0f}};
     context.glassAttenuationDistance = 2.4f;
@@ -1970,6 +1986,10 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             frameInputs.tuning.glassAttenuationColor = context.glassAttenuationColor;
             frameInputs.tuning.glassAttenuationDistance = context.glassAttenuationDistance;
         }
+        frameInputs.tuning.productionRewardPropsVisible =
+            context.productionRewardPropsRequested;
+        frameInputs.tuning.productionLanternGlassOnly =
+            context.productionLanternGlassOnly;
         std::string diagnostic;
         gpuTimingRecording = context.gpuFrameTimingEnabled &&
             context.gpuFrameTimer.RecordBegin(context.commandBuffers[imageIndex], context.currentFrame);

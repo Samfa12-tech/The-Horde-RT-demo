@@ -50,6 +50,8 @@ struct RtSceneTuning
     std::array<float, 3u> glassAttenuationColor{{0.72f, 0.90f, 1.0f}};
     float glassAttenuationDistance = 2.4f;
     float glassDepthScale = 1.0f;
+    bool productionRewardPropsVisible = false;
+    bool productionLanternGlassOnly = false;
 };
 
 inline RtSceneTuning ClampRtSceneTuning(RtSceneTuning tuning)

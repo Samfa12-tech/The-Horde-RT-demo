@@ -3355,6 +3355,8 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx)
                   << ", swordBlasBuildMs=" << ctx.rtScene.StaticMeshSwordBlasBuildMilliseconds()
                   << ", torchBlasBytes=" << ctx.rtScene.StaticMeshTorchBlasBytes()
                   << ", torchBlasBuildMs=" << ctx.rtScene.StaticMeshTorchBlasBuildMilliseconds()
+                  << ", productionPropBlasBytes=" << ctx.rtScene.ProductionPropBlasBytes()
+                  << ", productionPropBlasBuildMs=" << ctx.rtScene.ProductionPropBlasBuildMilliseconds()
                   << '\n' << std::flush;
     }
 
@@ -3528,8 +3530,11 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             horde::gameplay::FindDevelopmentCheckpoint(ctx.developmentCheckpoint);
         const bool usesGlassFixture =
             development != nullptr && development->usesGlassFixture;
+        const bool usesProductionRewardProps =
+            development != nullptr && development->usesProductionRewardProps;
         frameInputs.playerRenderRoute =
-            (ctx.developmentCheckpoint.starts_with("player-body-") || usesGlassFixture)
+            (ctx.developmentCheckpoint.starts_with("player-body-") || usesGlassFixture ||
+             usesProductionRewardProps)
             ? horde::vulkan::raytracing::PlayerRenderRoute::Skinned
             : horde::vulkan::raytracing::PlayerRenderRoute::Procedural;
         if (usesGlassFixture)
@@ -3540,6 +3545,12 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
                 development->glassAttenuationColor;
             frameInputs.tuning.glassAttenuationDistance =
                 development->glassAttenuationDistance;
+        }
+        if (usesProductionRewardProps)
+        {
+            frameInputs.tuning.productionRewardPropsVisible = true;
+            frameInputs.tuning.productionLanternGlassOnly =
+                development->productionLanternGlassOnly;
         }
         if (ctx.debugEnemyOverride != horde::gameplay::EnemyKind::None)
         {
@@ -3782,6 +3793,10 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
              << ", \"torchBlasBytes\": " << context.rtScene.StaticMeshTorchBlasBytes()
              << ", \"torchBlasBuildMilliseconds\": "
              << context.rtScene.StaticMeshTorchBlasBuildMilliseconds()
+             << ", \"productionPropBlasBytes\": "
+             << context.rtScene.ProductionPropBlasBytes()
+             << ", \"productionPropBlasBuildMilliseconds\": "
+             << context.rtScene.ProductionPropBlasBuildMilliseconds()
              << "},\n"
              << "  \"dielectricDiagnostics\": {\"transportOverflowCount\": "
              << context.rtScene.DielectricTransportOverflowCount()
@@ -4665,6 +4680,8 @@ void ShowCredits(HWND window)
                 "Production Gothic arming sword created with Meshy; runtime processing by Samfa12/Codex (CC BY 4.0).\n"
                 "Production medieval hand torch created with Meshy; runtime processing by Samfa12/Codex (CC BY 4.0).\n"
                 "Historical-Gothic traveller/fighter created with Meshy; runtime processing and animation integration by Samfa12/Codex (CC BY 4.0).\n"
+                "Production Gothic reward chest created with Meshy; runtime processing by Samfa12/Codex (CC BY 4.0).\n"
+                "Production Gothic reward lantern created with Meshy; runtime processing by Samfa12/Codex (CC BY 4.0).\n"
                 "Application icon created for this project with OpenAI image generation.\n\n"
                 "See ASSET_LICENSES.md beside the demo for source links and full licence details.",
                 "Horde Lantern RT - credits and licences",

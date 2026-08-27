@@ -86,7 +86,7 @@ public:
         std::vector<std::uint8_t> rgba;
     };
 
-    static constexpr std::uint32_t kBlasCount = 12u;
+    static constexpr std::uint32_t kBlasCount = 16u;
     static constexpr std::uint32_t kTlasCount = 1u;
     static constexpr std::uint32_t kTlasInstanceCount = 20u;
 
@@ -168,6 +168,11 @@ public:
     double StaticMeshTorchBlasBuildMilliseconds() const
     {
         return heldItemBlasMeasurements_.torchBuildMilliseconds;
+    }
+    VkDeviceSize ProductionPropBlasBytes() const { return productionPropBlasBytes_; }
+    double ProductionPropBlasBuildMilliseconds() const
+    {
+        return productionPropBlasBuildMilliseconds_;
     }
 
     bool RecordTraceAndCopy(VkCommandBuffer commandBuffer,
@@ -286,6 +291,10 @@ private:
     AccelerationStructure finaleRoofBlas_;
     AccelerationStructure torchBlas_;
     AccelerationStructure swordBlas_;
+    AccelerationStructure gothicChestBaseBlas_;
+    AccelerationStructure gothicChestLidBlas_;
+    AccelerationStructure rewardLanternRingBlas_;
+    AccelerationStructure rewardLanternBodyBlas_;
     AccelerationStructure dielectricFixtureBlas_;
     AccelerationStructure playerBodyBlas_;
     AccelerationStructure playerLimbBlas_;
@@ -299,6 +308,10 @@ private:
     horde::scene::assets::StaticMeshAsset developmentStaticAsset_;
     horde::scene::assets::StaticMeshAsset productionTorchAsset_;
     horde::scene::assets::StaticMeshAsset productionPlayerAsset_;
+    horde::scene::assets::StaticMeshAsset gothicChestBaseAsset_;
+    horde::scene::assets::StaticMeshAsset gothicChestLidAsset_;
+    horde::scene::assets::StaticMeshAsset rewardLanternRingAsset_;
+    horde::scene::assets::StaticMeshAsset rewardLanternBodyAsset_;
     horde::scene::assets::StaticMeshAsset productionDielectricFixtureAsset_;
     std::vector<horde::scene::assets::StaticRtVertex> skinnedPlayerUpload_;
     std::uint32_t playerStaticVertexBase_ = 0u;
@@ -323,6 +336,8 @@ private:
     VkDeviceSize staticMeshBlasBytes_ = 0u;
     VkDeviceSize staticTextureBytes_ = 0u;
     double staticMeshBlasBuildMilliseconds_ = 0.0;
+    VkDeviceSize productionPropBlasBytes_ = 0u;
+    double productionPropBlasBuildMilliseconds_ = 0.0;
     HeldItemBlasMeasurements heldItemBlasMeasurements_{};
 
     VkDescriptorSetLayout descriptorSetLayout_ = VK_NULL_HANDLE;
