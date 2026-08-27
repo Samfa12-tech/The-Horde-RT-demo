@@ -199,9 +199,9 @@ int main()
                       !ShouldPersistRtLabUnlock({true, false, false, false, true}),
                   "Android RT Lab unlock was not restricted to genuine live finale completion");
 
-    ok &= Require(PresentableTinyRtScene::kBlasCount == 12u &&
+    ok &= Require(PresentableTinyRtScene::kBlasCount == 16u &&
                       PresentableTinyRtScene::kTlasInstanceCount == 20u,
-                  "skinned player and generic dielectric fixture must add bounded BLAS resources while TLAS remains capped at twenty instances");
+                  "production props and generic dielectric fixture must add bounded BLAS resources while TLAS remains capped at twenty instances");
     const DynamicBlasToTlasDependency noDynamicBlasDependency =
         BuildDynamicBlasToTlasDependency({});
     const DynamicBlasToTlasDependency playerOnlyDependency =
@@ -910,9 +910,18 @@ int main()
         ok &= Require(sceneSource.find("closed-glass-lod0.runtime.glb") != std::string::npos &&
                       sceneSource.find("dielectricFixtureBlas_") != std::string::npos &&
                       sceneSource.find("instances[5].accelerationStructureReference = dielectricFixtureBlas_.address;") != std::string::npos &&
-                      sceneSource.find("frameInstanceMetadata[5u].flags = 0u;") != std::string::npos &&
-                      sceneSource.find("clampedTuning.glassFixtureVisible") != std::string::npos,
+                      sceneSource.find("instances[5].instanceCustomIndex = 9u;") != std::string::npos &&
+                      sceneSource.find("frameInstanceMetadata[9u].flags = 0u;") != std::string::npos &&
+                      sceneSource.find("glassFixtureVisible") != std::string::npos,
                       "closed dielectric fixture must use the imported static-PBR/BLAS route and stay absent from authored captures");
+        ok &= Require(sceneSource.find("gothic-chest-base-lod0.runtime.glb") != std::string::npos &&
+                      sceneSource.find("reward-lantern-body-lod0.runtime.glb") != std::string::npos &&
+                      sceneSource.find("gothicChestBaseBlas_") != std::string::npos &&
+                      sceneSource.find("rewardLanternBodyBlas_") != std::string::npos &&
+                      sceneSource.find("productionPropsVisible") != std::string::npos &&
+                      sceneSource.find("instances[6].instanceCustomIndex = 6u;") != std::string::npos &&
+                      sceneSource.find("instances[8].instanceCustomIndex = 8u;") != std::string::npos,
+                      "production chest and lantern must use the generic static-PBR BLAS route in bounded slots 5-8");
         ok &= Require(windowsSource.find("FindDevelopmentCheckpoint(ctx.developmentCheckpoint)") !=
                           std::string::npos &&
                       windowsSource.find("development->usesGlassFixture") != std::string::npos,

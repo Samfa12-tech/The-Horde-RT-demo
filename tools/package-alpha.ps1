@@ -115,6 +115,8 @@ foreach ($creditMarker in @(
     "Production Gothic arming sword created with Meshy; runtime processing by Samfa12/Codex",
     "Production medieval hand torch created with Meshy; runtime processing by Samfa12/Codex"
     "Historical-Gothic traveller/fighter created with Meshy; runtime processing and animation integration by Samfa12/Codex"
+    "Production Gothic reward chest created with Meshy; runtime processing by Samfa12/Codex"
+    "Production Gothic reward lantern created with Meshy; runtime processing by Samfa12/Codex"
 )) {
     if ($windowsBinaryText -notmatch [regex]::Escape($creditMarker)) {
         throw "Windows executable is missing in-app credit marker: $creditMarker"
@@ -161,14 +163,22 @@ $assetCopies = @(
     @{ Source = "assets\models\props\runtime\gothic-hand-torch-lod0.runtime.glb"; Destination = "assets\models\props\runtime" },
     @{ Source = "assets\models\props\runtime\dielectric-fixture\asset.manifest.json"; Destination = "assets\models\props\runtime\dielectric-fixture" },
     @{ Source = "assets\models\props\runtime\dielectric-fixture\closed-glass-lod0.runtime.glb"; Destination = "assets\models\props\runtime\dielectric-fixture" },
+    @{ Source = "assets\models\props\runtime\gothic-chest-base\asset.manifest.json"; Destination = "assets\models\props\runtime\gothic-chest-base" },
+    @{ Source = "assets\models\props\runtime\gothic-chest-base\gothic-chest-base-lod0.runtime.glb"; Destination = "assets\models\props\runtime\gothic-chest-base" },
+    @{ Source = "assets\models\props\runtime\gothic-chest-lid\asset.manifest.json"; Destination = "assets\models\props\runtime\gothic-chest-lid" },
+    @{ Source = "assets\models\props\runtime\gothic-chest-lid\gothic-chest-lid-lod0.runtime.glb"; Destination = "assets\models\props\runtime\gothic-chest-lid" },
+    @{ Source = "assets\models\props\runtime\reward-lantern-ring\asset.manifest.json"; Destination = "assets\models\props\runtime\reward-lantern-ring" },
+    @{ Source = "assets\models\props\runtime\reward-lantern-ring\reward-lantern-ring-lod0.runtime.glb"; Destination = "assets\models\props\runtime\reward-lantern-ring" },
+    @{ Source = "assets\models\props\runtime\reward-lantern-body\asset.manifest.json"; Destination = "assets\models\props\runtime\reward-lantern-body" },
+    @{ Source = "assets\models\props\runtime\reward-lantern-body\reward-lantern-body-lod0.runtime.glb"; Destination = "assets\models\props\runtime\reward-lantern-body" },
     @{ Source = "assets\models\player\runtime\asset.manifest.json"; Destination = "assets\models\player\runtime" },
     @{ Source = "assets\models\player\runtime\clip-manifest.json"; Destination = "assets\models\player\runtime" },
     @{ Source = "assets\models\player\runtime\gothic-traveller-lod0.runtime.glb"; Destination = "assets\models\player\runtime" },
-    @{ Source = "assets\textures\held-items\runtime\asset.manifest.json"; Destination = "assets\textures\held-items\runtime" },
-    @{ Source = "assets\textures\held-items\runtime\base-color.windows.ktx2"; Destination = "assets\textures\held-items\runtime" },
-    @{ Source = "assets\textures\held-items\runtime\normal.windows.ktx2"; Destination = "assets\textures\held-items\runtime" },
-    @{ Source = "assets\textures\held-items\runtime\orm.windows.ktx2"; Destination = "assets\textures\held-items\runtime" },
-    @{ Source = "assets\textures\held-items\runtime\emissive.windows.ktx2"; Destination = "assets\textures\held-items\runtime" }
+    @{ Source = "assets\textures\props\runtime\asset.manifest.json"; Destination = "assets\textures\props\runtime" },
+    @{ Source = "assets\textures\props\runtime\base-color.windows.ktx2"; Destination = "assets\textures\props\runtime" },
+    @{ Source = "assets\textures\props\runtime\normal.windows.ktx2"; Destination = "assets\textures\props\runtime" },
+    @{ Source = "assets\textures\props\runtime\orm.windows.ktx2"; Destination = "assets\textures\props\runtime" },
+    @{ Source = "assets\textures\props\runtime\emissive.windows.ktx2"; Destination = "assets\textures\props\runtime" }
 )
 foreach ($copy in $assetCopies) {
     $destination = Join-Path $windowsStage $copy.Destination
@@ -231,6 +241,8 @@ foreach ($creditMarker in @(
     "Production Gothic arming sword created with Meshy; runtime processing by Samfa12/Codex",
     "Production medieval hand torch created with Meshy; runtime processing by Samfa12/Codex"
     "Historical-Gothic traveller/fighter created with Meshy; runtime processing and animation integration by Samfa12/Codex"
+    "Production Gothic reward chest created with Meshy; runtime processing by Samfa12/Codex"
+    "Production Gothic reward lantern created with Meshy; runtime processing by Samfa12/Codex"
 )) {
     if ($androidResources -notmatch [regex]::Escape($creditMarker)) {
         throw "Android candidate is missing in-app credit marker: $creditMarker"
@@ -272,20 +284,31 @@ try {
         'assets/models/props/runtime/gothic-hand-torch-lod0.runtime.glb',
         'assets/models/props/runtime/dielectric-fixture/asset.manifest.json',
         'assets/models/props/runtime/dielectric-fixture/closed-glass-lod0.runtime.glb',
+        'assets/models/props/runtime/gothic-chest-base/asset.manifest.json',
+        'assets/models/props/runtime/gothic-chest-base/gothic-chest-base-lod0.runtime.glb',
+        'assets/models/props/runtime/gothic-chest-lid/asset.manifest.json',
+        'assets/models/props/runtime/gothic-chest-lid/gothic-chest-lid-lod0.runtime.glb',
+        'assets/models/props/runtime/reward-lantern-ring/asset.manifest.json',
+        'assets/models/props/runtime/reward-lantern-ring/reward-lantern-ring-lod0.runtime.glb',
+        'assets/models/props/runtime/reward-lantern-body/asset.manifest.json',
+        'assets/models/props/runtime/reward-lantern-body/reward-lantern-body-lod0.runtime.glb',
         'assets/models/player/runtime/asset.manifest.json',
         'assets/models/player/runtime/clip-manifest.json',
         'assets/models/player/runtime/gothic-traveller-lod0.runtime.glb',
-        'assets/textures/held-items/runtime/asset.manifest.json',
-        'assets/textures/held-items/runtime/base-color.android.ktx2',
-        'assets/textures/held-items/runtime/normal.android.ktx2',
-        'assets/textures/held-items/runtime/orm.android.ktx2',
-        'assets/textures/held-items/runtime/emissive.android.ktx2')) {
+        'assets/textures/props/runtime/asset.manifest.json',
+        'assets/textures/props/runtime/base-color.android.ktx2',
+        'assets/textures/props/runtime/normal.android.ktx2',
+        'assets/textures/props/runtime/orm.android.ktx2',
+        'assets/textures/props/runtime/emissive.android.ktx2')) {
         if ($apkEntryNames -notcontains $requiredHeldItem) {
             throw "Android candidate is missing production held-item runtime entry: $requiredHeldItem"
         }
     }
     if (@($apkEntryNames | Where-Object {
-        $_ -match 'assets/.+/(source|high)/' -or $_ -match 'assets/textures/held-items/runtime/.+\.windows\.ktx2$'
+        $_ -match 'assets/.+/(source|high)/' -or
+        $_ -match 'assets/models/props/meshy/production-' -or
+        $_ -match '\.processing\.json$' -or
+        $_ -match 'assets/textures/props/runtime/.+\.windows\.ktx2$'
     }).Count -ne 0) {
         throw "Android candidate contains source/high or Windows-only held-item content."
     }
@@ -337,20 +360,28 @@ try {
         "assets/models/props/runtime/gothic-hand-torch-lod0.runtime.glb",
         "assets/models/props/runtime/dielectric-fixture/asset.manifest.json",
         "assets/models/props/runtime/dielectric-fixture/closed-glass-lod0.runtime.glb",
+        "assets/models/props/runtime/gothic-chest-base/asset.manifest.json",
+        "assets/models/props/runtime/gothic-chest-base/gothic-chest-base-lod0.runtime.glb",
+        "assets/models/props/runtime/gothic-chest-lid/asset.manifest.json",
+        "assets/models/props/runtime/gothic-chest-lid/gothic-chest-lid-lod0.runtime.glb",
+        "assets/models/props/runtime/reward-lantern-ring/asset.manifest.json",
+        "assets/models/props/runtime/reward-lantern-ring/reward-lantern-ring-lod0.runtime.glb",
+        "assets/models/props/runtime/reward-lantern-body/asset.manifest.json",
+        "assets/models/props/runtime/reward-lantern-body/reward-lantern-body-lod0.runtime.glb",
         "assets/models/player/runtime/asset.manifest.json",
         "assets/models/player/runtime/clip-manifest.json",
         "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb",
-        "assets/textures/held-items/runtime/asset.manifest.json",
-        "assets/textures/held-items/runtime/base-color.windows.ktx2",
-        "assets/textures/held-items/runtime/normal.windows.ktx2",
-        "assets/textures/held-items/runtime/orm.windows.ktx2",
-        "assets/textures/held-items/runtime/emissive.windows.ktx2",
+        "assets/textures/props/runtime/asset.manifest.json",
+        "assets/textures/props/runtime/base-color.windows.ktx2",
+        "assets/textures/props/runtime/normal.windows.ktx2",
+        "assets/textures/props/runtime/orm.windows.ktx2",
+        "assets/textures/props/runtime/emissive.windows.ktx2",
         "assets/audio/filmcow/sword_swing_1.wav",
         "assets/audio/pixabay/waterfall_loop.wav"
     )) {
         if ($entryNames -notcontains $required) { throw "Windows zip is missing required entry: $required" }
     }
-    foreach ($forbidden in @("/source/", "/high/", "runtime-development", "gothic_arming_sword", ".android.ktx2")) {
+    foreach ($forbidden in @("/source/", "/high/", "runtime-development", "gothic_arming_sword", "models/props/meshy/production-", ".processing.json", ".android.ktx2")) {
         if (@($entryNames | Where-Object { $_ -like "*$forbidden*" }).Count -ne 0) {
             throw "Windows zip contains forbidden development static asset content: $forbidden"
         }

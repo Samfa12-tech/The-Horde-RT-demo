@@ -194,6 +194,22 @@ if(BUILD_TESTING)
     )
     add_test(NAME horde_rt_static_gltf_asset_tests COMMAND horde_rt_static_gltf_asset_tests)
 
+    add_executable(horde_rt_production_prop_asset_tests tests/ProductionPropAssetTests.cpp)
+    target_include_directories(horde_rt_production_prop_asset_tests PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_SOURCE_DIR}
+    )
+    target_sources(horde_rt_production_prop_asset_tests PRIVATE
+        src/scene/assets/AssetManifest.cpp
+        src/scene/assets/AssetValidation.cpp
+        src/scene/assets/GltfDocument.cpp
+        src/scene/assets/StaticMeshAsset.cpp
+    )
+    target_compile_definitions(horde_rt_production_prop_asset_tests PRIVATE
+        HORDE_RT_PRODUCTION_PROP_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/assets/models/props/runtime"
+    )
+    add_test(NAME horde_rt_production_prop_asset_tests COMMAND horde_rt_production_prop_asset_tests)
+
     if(WIN32)
         find_program(HORDE_RT_POWERSHELL_EXECUTABLE NAMES pwsh powershell REQUIRED)
         add_test(NAME horde_rt_scene_abi_generator_tests

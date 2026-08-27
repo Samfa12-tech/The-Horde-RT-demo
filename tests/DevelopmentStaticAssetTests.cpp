@@ -37,8 +37,8 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 14u,
-          "fourteen isolated render-development checkpoints are exposed");
+    Check(kDevelopmentCheckpoints.size() == 16u,
+          "sixteen isolated render-development checkpoints are exposed");
     const DevelopmentCheckpoint* checkpoint = FindDevelopmentCheckpoint("pbr-sword-closeup");
     Check(checkpoint != nullptr && checkpoint->id == 100 && checkpoint->baseShowcaseCheckpointId == 0 &&
               checkpoint->name == std::string_view("pbr-sword-closeup") &&
@@ -104,6 +104,18 @@ int main()
               edgeGlass->baseShowcaseCheckpointId == 4 && edgeGlass->usesGlassFixture &&
               edgeGlass->yaw < -0.50f && edgeGlass->yaw > -0.80f,
           "edge Fresnel proof retains a stable glancing camera and imported fixture route");
+    const DevelopmentCheckpoint* chestUnlock =
+        FindDevelopmentCheckpoint("lantern-chest-unlock");
+    const DevelopmentCheckpoint* productionGlass =
+        FindDevelopmentCheckpoint("lantern-glass-production");
+    Check(chestUnlock != nullptr && chestUnlock->id == 114 &&
+              chestUnlock->usesProductionRewardProps &&
+              !chestUnlock->productionLanternGlassOnly,
+          "production chest unlock has a stable mutually exclusive reward-prop route");
+    Check(productionGlass != nullptr && productionGlass->id == 115 &&
+              productionGlass->usesProductionRewardProps &&
+              productionGlass->productionLanternGlassOnly,
+          "production lantern glass has a stable close inspection route");
     horde::gameplay::simulation::GameSimulation stagedDownward;
     horde::gameplay::simulation::GameSimulation stagedUpward;
     DevelopmentCheckpointStageEvidence downwardEvidence{};
