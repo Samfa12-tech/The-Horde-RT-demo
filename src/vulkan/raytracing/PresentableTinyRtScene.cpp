@@ -379,8 +379,48 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
         std::exchange(other.dielectricShadowUnclosedVolumeCount_, 0u);
     productionPaneStackFailureCount_ =
         std::exchange(other.productionPaneStackFailureCount_, 0u);
-    productionPaneSecondaryRejectCount_ =
-        std::exchange(other.productionPaneSecondaryRejectCount_, 0u);
+    productionPaneSecondaryOriginCount_ =
+        std::exchange(other.productionPaneSecondaryOriginCount_, 0u);
+    productionPaneSecondaryTerminalCount_ =
+        std::exchange(other.productionPaneSecondaryTerminalCount_, 0u);
+    productionPaneSecondarySameMediumCount_ =
+        std::exchange(other.productionPaneSecondarySameMediumCount_, 0u);
+    productionPaneSecondaryDifferentMediumCount_ =
+        std::exchange(other.productionPaneSecondaryDifferentMediumCount_, 0u);
+    secondaryNearSelfHitCount_ = std::exchange(other.secondaryNearSelfHitCount_, 0u);
+    primaryOpenMissCount_ = std::exchange(other.primaryOpenMissCount_, 0u);
+    primaryOpenOpaqueCount_ = std::exchange(other.primaryOpenOpaqueCount_, 0u);
+    primaryMismatchedExitCount_ = std::exchange(other.primaryMismatchedExitCount_, 0u);
+    primaryInterfaceBudgetCount_ = std::exchange(other.primaryInterfaceBudgetCount_, 0u);
+    primaryVolumeBudgetCount_ = std::exchange(other.primaryVolumeBudgetCount_, 0u);
+    shadowOpenMissCount_ = std::exchange(other.shadowOpenMissCount_, 0u);
+    shadowMismatchedExitCount_ = std::exchange(other.shadowMismatchedExitCount_, 0u);
+    primaryTirCount_ = std::exchange(other.primaryTirCount_, 0u);
+    primaryInterfaceBudgetOpenVolumeCount_ =
+        std::exchange(other.primaryInterfaceBudgetOpenVolumeCount_, 0u);
+    primaryInterfaceBudgetClosedVolumeCount_ =
+        std::exchange(other.primaryInterfaceBudgetClosedVolumeCount_, 0u);
+    shadowMismatchEmptyCount_ = std::exchange(other.shadowMismatchEmptyCount_, 0u);
+    shadowImplicitOriginExitCount_ =
+        std::exchange(other.shadowImplicitOriginExitCount_, 0u);
+    secondaryDielectricTerminalCount_ =
+        std::exchange(other.secondaryDielectricTerminalCount_, 0u);
+    primaryTirTerminationCount_ =
+        std::exchange(other.primaryTirTerminationCount_, 0u);
+    shadowFiniteEndpointVolumeCount_ =
+        std::exchange(other.shadowFiniteEndpointVolumeCount_, 0u);
+    primaryOpenOpaqueSameInstanceDifferentMaterialCount_ =
+        std::exchange(other.primaryOpenOpaqueSameInstanceDifferentMaterialCount_, 0u);
+    primaryOpenOpaqueAfterTirCount_ =
+        std::exchange(other.primaryOpenOpaqueAfterTirCount_, 0u);
+    primaryOpenOpaqueTerminalInstanceMask_ =
+        std::exchange(other.primaryOpenOpaqueTerminalInstanceMask_, 0u);
+    primaryOpenOpaqueVolumeInstanceMask_ =
+        std::exchange(other.primaryOpenOpaqueVolumeInstanceMask_, 0u);
+    primaryOpenOpaqueTerminalMaterialMask_ =
+        std::exchange(other.primaryOpenOpaqueTerminalMaterialMask_, 0u);
+    primaryClosedVolumeAbsorptionCount_ =
+        std::exchange(other.primaryClosedVolumeAbsorptionCount_, 0u);
     developmentStaticAssetDirectory_ = std::move(other.developmentStaticAssetDirectory_);
     staticTextureDirectory_ = std::move(other.staticTextureDirectory_);
     staticMeshSlot_ = std::move(other.staticMeshSlot_);
@@ -604,7 +644,32 @@ void PresentableTinyRtScene::Destroy()
     dielectricPrimaryUnclosedVolumeCount_ = 0u;
     dielectricShadowUnclosedVolumeCount_ = 0u;
     productionPaneStackFailureCount_ = 0u;
-    productionPaneSecondaryRejectCount_ = 0u;
+    productionPaneSecondaryOriginCount_ = 0u;
+    productionPaneSecondaryTerminalCount_ = 0u;
+    productionPaneSecondarySameMediumCount_ = 0u;
+    productionPaneSecondaryDifferentMediumCount_ = 0u;
+    secondaryNearSelfHitCount_ = 0u;
+    primaryOpenMissCount_ = 0u;
+    primaryOpenOpaqueCount_ = 0u;
+    primaryMismatchedExitCount_ = 0u;
+    primaryInterfaceBudgetCount_ = 0u;
+    primaryVolumeBudgetCount_ = 0u;
+    shadowOpenMissCount_ = 0u;
+    shadowMismatchedExitCount_ = 0u;
+    primaryTirCount_ = 0u;
+    primaryInterfaceBudgetOpenVolumeCount_ = 0u;
+    primaryInterfaceBudgetClosedVolumeCount_ = 0u;
+    shadowMismatchEmptyCount_ = 0u;
+    shadowImplicitOriginExitCount_ = 0u;
+    secondaryDielectricTerminalCount_ = 0u;
+    primaryTirTerminationCount_ = 0u;
+    shadowFiniteEndpointVolumeCount_ = 0u;
+    primaryOpenOpaqueSameInstanceDifferentMaterialCount_ = 0u;
+    primaryOpenOpaqueAfterTirCount_ = 0u;
+    primaryOpenOpaqueTerminalInstanceMask_ = 0u;
+    primaryOpenOpaqueVolumeInstanceMask_ = 0u;
+    primaryOpenOpaqueTerminalMaterialMask_ = 0u;
+    primaryClosedVolumeAbsorptionCount_ = 0u;
     developmentStaticAssetDirectory_.clear();
     staticTextureDirectory_.clear();
     staticMeshSlot_ = {};
@@ -3995,7 +4060,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             0.50f, 0.0f, -0.8660254f, 0.0f,
             0.0f, 1.0f, 0.0f, 0.0f,
             0.8660254f, 0.0f, 0.50f, 0.0f,
-            -12.50f, -0.95f, -15.42f, 1.0f}};
+            -12.50f, 0.37f, -15.42f, 1.0f}};
         const auto* lanternSocket = horde::gameplay::items::FindHeldItemSocket(
             gothicChestBaseAsset_.sockets, "LanternSocket");
         const auto* ringHinge = horde::gameplay::items::FindHeldItemSocket(
@@ -4004,10 +4069,15 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             rewardLanternBodyAsset_.sockets, "Flame");
         const auto* lightSocket = horde::gameplay::items::FindHeldItemSocket(
             rewardLanternBodyAsset_.sockets, "Light");
-        const auto* chestLid = horde::gameplay::items::FindHeldItemSocket(
-            gothicChestLidAsset_.sockets, "ChestLid");
+        const auto chestLid = std::find_if(gothicChestLidAsset_.nodeTransforms.begin(),
+            gothicChestLidAsset_.nodeTransforms.end(), [](const auto& node) {
+                return node.name == "ChestLid";
+            });
+        const auto* chestLidHinge = horde::gameplay::items::FindHeldItemSocket(
+            gothicChestBaseAsset_.sockets, "ChestLidHinge");
         if (lanternSocket == nullptr || ringHinge == nullptr || flameSocket == nullptr ||
-            lightSocket == nullptr || chestLid == nullptr)
+            lightSocket == nullptr || chestLid == gothicChestLidAsset_.nodeTransforms.end() ||
+            chestLidHinge == nullptr)
         {
             diagnostic = "Production reward prop is missing a validated authored pivot/socket.";
             return false;
@@ -4038,16 +4108,18 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         instances[6].instanceCustomIndex = 6u;
         instances[6].mask = glassOnly ? 0u : 0x01u;
         instances[6].accelerationStructureReference = gothicChestLidBlas_.address;
-        // The authored ChestLid root is its rear hinge. This is the staged
-        // -70 degree local open pose, composed once from that pivot.
+        // The chest-base GLB supplies the rear hinge translation; checkpoint
+        // staging supplies only this -70 degree local open angle.
         const horde::gameplay::items::HeldItemTransform rearHingeOpen{{
             1.0f, 0.0f, 0.0f, 0.0f,
             0.0f, 0.3420201f, -0.9396926f, 0.0f,
             0.0f, 0.9396926f, 0.3420201f, 0.0f,
-            0.0f, 0.34f, -0.286f, 1.0f}};
+            0.0f, 0.0f, 0.0f, 1.0f}};
         const auto worldFromChestLid = horde::gameplay::items::MultiplyHeldItemTransforms(
             horde::gameplay::items::MultiplyHeldItemTransforms(
-                stageWorldFromChestBase, rearHingeOpen), chestLid->world);
+                horde::gameplay::items::MultiplyHeldItemTransforms(
+                    stageWorldFromChestBase, chestLidHinge->world), rearHingeOpen),
+            chestLid->world);
         instances[6].transform = heldTransformToInstanceTransform(worldFromChestLid);
         instances[7] = instances[0];
         instances[7].instanceCustomIndex = 7u;
@@ -4162,8 +4234,48 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         previousDielectricDiagnostics.shadowUnclosedVolumeCount;
     productionPaneStackFailureCount_ =
         previousDielectricDiagnostics.productionPaneStackFailureCount;
-    productionPaneSecondaryRejectCount_ =
-        previousDielectricDiagnostics.productionPaneSecondaryRejectCount;
+    productionPaneSecondaryOriginCount_ =
+        previousDielectricDiagnostics.productionPaneSecondaryOriginCount;
+    productionPaneSecondaryTerminalCount_ =
+        previousDielectricDiagnostics.productionPaneSecondaryTerminalCount;
+    productionPaneSecondarySameMediumCount_ =
+        previousDielectricDiagnostics.productionPaneSecondarySameMediumCount;
+    productionPaneSecondaryDifferentMediumCount_ =
+        previousDielectricDiagnostics.productionPaneSecondaryDifferentMediumCount;
+    secondaryNearSelfHitCount_ = previousDielectricDiagnostics.secondaryNearSelfHitCount;
+    primaryOpenMissCount_ = previousDielectricDiagnostics.primaryOpenMissCount;
+    primaryOpenOpaqueCount_ = previousDielectricDiagnostics.primaryOpenOpaqueCount;
+    primaryMismatchedExitCount_ = previousDielectricDiagnostics.primaryMismatchedExitCount;
+    primaryInterfaceBudgetCount_ = previousDielectricDiagnostics.primaryInterfaceBudgetCount;
+    primaryVolumeBudgetCount_ = previousDielectricDiagnostics.primaryVolumeBudgetCount;
+    shadowOpenMissCount_ = previousDielectricDiagnostics.shadowOpenMissCount;
+    shadowMismatchedExitCount_ = previousDielectricDiagnostics.shadowMismatchedExitCount;
+    primaryTirCount_ = previousDielectricDiagnostics.primaryTirCount;
+    primaryInterfaceBudgetOpenVolumeCount_ =
+        previousDielectricDiagnostics.primaryInterfaceBudgetOpenVolumeCount;
+    primaryInterfaceBudgetClosedVolumeCount_ =
+        previousDielectricDiagnostics.primaryInterfaceBudgetClosedVolumeCount;
+    shadowMismatchEmptyCount_ = previousDielectricDiagnostics.shadowMismatchEmptyCount;
+    shadowImplicitOriginExitCount_ =
+        previousDielectricDiagnostics.shadowImplicitOriginExitCount;
+    secondaryDielectricTerminalCount_ =
+        previousDielectricDiagnostics.secondaryDielectricTerminalCount;
+    primaryTirTerminationCount_ =
+        previousDielectricDiagnostics.primaryTirTerminationCount;
+    shadowFiniteEndpointVolumeCount_ =
+        previousDielectricDiagnostics.shadowFiniteEndpointVolumeCount;
+    primaryOpenOpaqueSameInstanceDifferentMaterialCount_ =
+        previousDielectricDiagnostics.primaryOpenOpaqueSameInstanceDifferentMaterialCount;
+    primaryOpenOpaqueAfterTirCount_ =
+        previousDielectricDiagnostics.primaryOpenOpaqueAfterTirCount;
+    primaryOpenOpaqueTerminalInstanceMask_ =
+        previousDielectricDiagnostics.primaryOpenOpaqueTerminalInstanceMask;
+    primaryOpenOpaqueVolumeInstanceMask_ =
+        previousDielectricDiagnostics.primaryOpenOpaqueVolumeInstanceMask;
+    primaryOpenOpaqueTerminalMaterialMask_ =
+        previousDielectricDiagnostics.primaryOpenOpaqueTerminalMaterialMask;
+    primaryClosedVolumeAbsorptionCount_ =
+        previousDielectricDiagnostics.primaryClosedVolumeAbsorptionCount;
     const RtDielectricDiagnostics clearedDielectricDiagnostics{};
     auto frameInstanceMetadata = staticMeshSlot_.InstanceMetadata();
     if (effectivePlayerRenderRoute == PlayerRenderRoute::Procedural)

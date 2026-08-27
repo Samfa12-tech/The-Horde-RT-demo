@@ -749,9 +749,10 @@ int main()
                       raygenSource.find("const int kHighDielectricVolumes = 4;") != std::string::npos &&
                       raygenSource.find("segmentLength = currentHit.t;") != std::string::npos &&
                       raygenSource.find("atomicAdd(rtDielectricDiagnostics.value.transportOverflowCount, 1u);") != std::string::npos &&
-                      raygenSource.find("atomicAdd(rtDielectricDiagnostics.value.secondaryDielectricRejectCount, 1u);") != std::string::npos &&
+                      raygenSource.find("atomicAdd(rtDielectricDiagnostics.value.secondaryDielectricTerminalCount, 1u);") != std::string::npos &&
                       raygenSource.find("atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);") != std::string::npos &&
-                      dielectricTransportSource.find("atomicAdd(rtDielectricDiagnostics.value.primaryUnclosedVolumeCount, 1u);") != std::string::npos &&
+                      dielectricTransportSource.find("primaryClosedVolumeAbsorptionCount") != std::string::npos &&
+                      dielectricTransportSource.find("primaryUnclosedVolumeCount") == std::string::npos &&
                       dielectricTransportSource.find("shadowUnclosedVolumeCount") == std::string::npos &&
                       raygenSource.find("dielectricEffectiveFresnel(") != std::string::npos &&
                       raygenSource.find("dielectricRayEpsilon(") != std::string::npos &&
@@ -760,9 +761,12 @@ int main()
                       raygenSource.find("kRtMaterialFlagThinWall") != std::string::npos &&
                       raygenSource.find("shadeBoundedDielectric(nextHit") == std::string::npos,
                       "generic dielectric transport must use actual hit distance, explicit phone/high budgets, thin-wall ABI intent, and one terminal non-recursive evaluator");
-        ok &= Require(dielectricTransportSource.find("transmissionDirection = normalize(idealTransmission);") != std::string::npos &&
-                      dielectricTransportSource.find("Mobile's four-interface medium stack open") != std::string::npos,
-                      "closed production panes retain paired-interface transmission instead of stochastic stack escapes");
+        ok &= Require(dielectricTransportSource.find("(!thinWall && entering)") != std::string::npos &&
+                      dielectricTransportSource.find("paired exit geometrically") != std::string::npos &&
+                      dielectricTransportSource.find("productionPaneSecondaryOriginCount") != std::string::npos &&
+                      dielectricTransportSource.find("productionPaneSecondaryTerminalCount") != std::string::npos &&
+                      dielectricTransportSource.find("if (isGenericDielectric(reflectedHit) ||") != std::string::npos,
+                      "thin sheets retain rough transmission; thick panes defer rough scattering to the paired exit and secondary dielectric endpoints remain attributed");
         ok &= Require(raygenSource.find("vec3 shadowTransmittanceMask(") != std::string::npos &&
                       raygenSource.find("struct ShadowHit") != std::string::npos &&
                       raygenSource.find("ShadowHit traceNearestShadowHit(") != std::string::npos &&
@@ -790,16 +794,67 @@ int main()
                       sceneSource.find("primaryUnclosedVolumeCount") != std::string::npos &&
                       sceneSource.find("shadowUnclosedVolumeCount") != std::string::npos &&
                       sceneSource.find("productionPaneStackFailureCount") != std::string::npos &&
-                      sceneSource.find("productionPaneSecondaryRejectCount") != std::string::npos &&
+                      sceneSource.find("productionPaneSecondaryOriginCount") != std::string::npos &&
+                      sceneSource.find("productionPaneSecondaryTerminalCount") != std::string::npos &&
+                      sceneSource.find("productionPaneSecondarySameMediumCount") != std::string::npos &&
+                      sceneSource.find("productionPaneSecondaryDifferentMediumCount") != std::string::npos &&
                       windowsSource.find("secondaryDielectricRejectCount") != std::string::npos &&
                       windowsSource.find("unclosedVolumeCount") != std::string::npos &&
                       windowsSource.find("primaryUnclosedVolumeCount") != std::string::npos &&
                       windowsSource.find("shadowUnclosedVolumeCount") != std::string::npos &&
                       windowsSource.find("productionPaneStackFailureCount") != std::string::npos &&
+                      windowsSource.find("productionPaneSecondaryOriginCount") != std::string::npos &&
+                      windowsSource.find("productionPaneSecondaryTerminalCount") != std::string::npos &&
+                      windowsSource.find("secondaryNearSelfHitCount") != std::string::npos &&
+                      windowsSource.find("primaryOpenMissCount") != std::string::npos &&
+                      windowsSource.find("primaryOpenOpaqueCount") != std::string::npos &&
+                      windowsSource.find("primaryMismatchedExitCount") != std::string::npos &&
+                      windowsSource.find("primaryInterfaceBudgetCount") != std::string::npos &&
+                      windowsSource.find("primaryVolumeBudgetCount") != std::string::npos &&
+                      windowsSource.find("shadowOpenMissCount") != std::string::npos &&
+                      windowsSource.find("shadowMismatchedExitCount") != std::string::npos &&
+                      windowsSource.find("primaryTirCount") != std::string::npos &&
+                      windowsSource.find("primaryInterfaceBudgetOpenVolumeCount") != std::string::npos &&
+                      windowsSource.find("primaryInterfaceBudgetClosedVolumeCount") != std::string::npos &&
+                      windowsSource.find("shadowMismatchEmptyCount") != std::string::npos &&
+                      windowsSource.find("shadowImplicitOriginExitCount") != std::string::npos &&
+                      windowsSource.find("secondaryDielectricTerminalCount") != std::string::npos &&
+                      windowsSource.find("primaryTirTerminationCount") != std::string::npos &&
+                      windowsSource.find("shadowFiniteEndpointVolumeCount") != std::string::npos &&
+                      windowsSource.find("primaryOpenOpaqueSameInstanceDifferentMaterialCount") != std::string::npos &&
+                      windowsSource.find("primaryOpenOpaqueAfterTirCount") != std::string::npos &&
+                      windowsSource.find("primaryOpenOpaqueTerminalInstanceMask") != std::string::npos &&
+                      windowsSource.find("primaryOpenOpaqueVolumeInstanceMask") != std::string::npos &&
+                      windowsSource.find("primaryOpenOpaqueTerminalMaterialMask") != std::string::npos &&
+                      windowsSource.find("primaryClosedVolumeAbsorptionCount") != std::string::npos &&
                       androidBridgeSource.find("dielectricSecondaryRejectCount") != std::string::npos &&
                       androidBridgeSource.find("dielectricUnclosedVolumeCount") != std::string::npos &&
                       androidBridgeSource.find("dielectricPrimaryUnclosedVolumeCount") != std::string::npos &&
-                      androidBridgeSource.find("dielectricShadowUnclosedVolumeCount") != std::string::npos,
+                      androidBridgeSource.find("dielectricShadowUnclosedVolumeCount") != std::string::npos &&
+                      androidBridgeSource.find("productionPaneSecondaryOriginCount") != std::string::npos &&
+                      androidBridgeSource.find("productionPaneSecondaryTerminalCount") != std::string::npos &&
+                      androidBridgeSource.find("secondaryNearSelfHitCount") != std::string::npos &&
+                      androidBridgeSource.find("primaryOpenMissCount") != std::string::npos &&
+                      androidBridgeSource.find("primaryOpenOpaqueCount") != std::string::npos &&
+                      androidBridgeSource.find("primaryMismatchedExitCount") != std::string::npos &&
+                      androidBridgeSource.find("primaryInterfaceBudgetCount") != std::string::npos &&
+                      androidBridgeSource.find("primaryVolumeBudgetCount") != std::string::npos &&
+                      androidBridgeSource.find("shadowOpenMissCount") != std::string::npos &&
+                      androidBridgeSource.find("shadowMismatchedExitCount") != std::string::npos &&
+                      androidBridgeSource.find("primaryTirCount") != std::string::npos &&
+                      androidBridgeSource.find("primaryInterfaceBudgetOpenVolumeCount") != std::string::npos &&
+                      androidBridgeSource.find("primaryInterfaceBudgetClosedVolumeCount") != std::string::npos &&
+                      androidBridgeSource.find("shadowMismatchEmptyCount") != std::string::npos &&
+                      androidBridgeSource.find("shadowImplicitOriginExitCount") != std::string::npos &&
+                      androidBridgeSource.find("secondaryDielectricTerminalCount") != std::string::npos &&
+                      androidBridgeSource.find("primaryTirTerminationCount") != std::string::npos &&
+                      androidBridgeSource.find("shadowFiniteEndpointVolumeCount") != std::string::npos &&
+                      androidBridgeSource.find("primaryOpenOpaqueSameInstanceDifferentMaterialCount") != std::string::npos &&
+                      androidBridgeSource.find("primaryOpenOpaqueAfterTirCount") != std::string::npos &&
+                      androidBridgeSource.find("primaryOpenOpaqueTerminalInstanceMask") != std::string::npos &&
+                      androidBridgeSource.find("primaryOpenOpaqueVolumeInstanceMask") != std::string::npos &&
+                      androidBridgeSource.find("primaryOpenOpaqueTerminalMaterialMask") != std::string::npos &&
+                      androidBridgeSource.find("primaryClosedVolumeAbsorptionCount") != std::string::npos,
                       "CPU and platform diagnostics must retain route and production-pane failure attribution");
         ok &= Require(waterPrimary.find("transmittedHit.t += h.t + waterPathLength;") !=
                           std::string::npos &&

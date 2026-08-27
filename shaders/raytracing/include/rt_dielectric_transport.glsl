@@ -12,16 +12,28 @@ bool isGenericDielectric(HitInfo hit)
 vec3 roughDielectricDirection(vec3 idealDirection, vec3 surfaceNormal,
                               vec3 surfacePosition, float roughness)
 {
-    vec3 tangent = abs(surfaceNormal.y) < 0.92
-        ? normalize(cross(surfaceNormal, vec3(0.0, 1.0, 0.0)))
-        : normalize(cross(surfaceNormal, vec3(1.0, 0.0, 0.0)));
-    vec3 bitangent = normalize(cross(surfaceNormal, tangent));
+    vec3 ideal = normalize(idealDirection);
+    vec3 interfaceNormal = normalize(surfaceNormal);
+    vec3 tangent = abs(interfaceNormal.y) < 0.92
+        ? normalize(cross(interfaceNormal, vec3(0.0, 1.0, 0.0)))
+        : normalize(cross(interfaceNormal, vec3(1.0, 0.0, 0.0)));
+    vec3 bitangent = normalize(cross(interfaceNormal, tangent));
     float phase = fract(sin(dot(surfacePosition,
         vec3(12.9898, 78.233, 37.719))) * 43758.5453) * 6.2831853;
     float spread = clamp(roughness, 0.0, 1.0);
-    vec3 perturbed = normalize(idealDirection +
+    vec3 perturbed = normalize(ideal +
         (tangent * cos(phase) + bitangent * sin(phase)) * spread * spread * 0.24);
-    return normalize(mix(idealDirection, perturbed, spread));
+    vec3 result = normalize(mix(ideal, perturbed, spread));
+    // A microfacet lobe may approach the geometric tangent, but reflection,
+    // TIR, and exit transmission cannot cross to the opposite side of the
+    // ideal interface. Constrain only the tiny normal component; retain the
+    // authored rough tangential spread and its energy partition.
+    float idealSide = dot(ideal, interfaceNormal) >= 0.0 ? 1.0 : -1.0;
+    float signedAlignment = dot(result, interfaceNormal) * idealSide;
+    if (signedAlignment < 0.0001)
+        result = normalize(result + interfaceNormal * idealSide *
+                           (0.0001 - signedAlignment));
+    return result;
 }
 
 vec3 dielectricOverflowFallback(vec3 direction, vec3 throughput)
@@ -55,16 +67,30 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
                                    reflectionDirection, reflectionEpsilon),
         reflectionDirection, 12.0, 0x37u, reflectionEpsilon * 0.5,
         false, false);
+    float reflectedLocalDistance = reflectedHit.t;
     reflectedHit.t += firstHit.t;
     vec3 reflected;
-    if ((isGenericDielectric(reflectedHit) &&
-         (reflectedHit.instance != firstHit.instance ||
-          reflectedHit.material != firstHit.material)) ||
+    if (isGenericDielectric(reflectedHit) ||
         (reflectedHit.hit && reflectedHit.material == kMaterialWater))
     {
-        atomicAdd(rtDielectricDiagnostics.value.secondaryDielectricRejectCount, 1u);
+        atomicAdd(rtDielectricDiagnostics.value.secondaryDielectricTerminalCount, 1u);
+        // This is the reusable one-reflection terminal approximation, never
+        // an opaque reclassification or a rejected dielectric hit. Attribute
+        // both endpoints so captures distinguish a pane-origin reflection
+        // from the dielectric surface it subsequently encountered.
+        if (firstHit.instance == 8u)
+            atomicAdd(rtDielectricDiagnostics.value.productionPaneSecondaryOriginCount, 1u);
         if (reflectedHit.instance == 8u)
-            atomicAdd(rtDielectricDiagnostics.value.productionPaneSecondaryRejectCount, 1u);
+            atomicAdd(rtDielectricDiagnostics.value.productionPaneSecondaryTerminalCount, 1u);
+        if (isGenericDielectric(reflectedHit) && firstHit.instance == reflectedHit.instance &&
+            firstHit.material == reflectedHit.material)
+        {
+            atomicAdd(rtDielectricDiagnostics.value.productionPaneSecondarySameMediumCount, 1u);
+            if (reflectedLocalDistance <= reflectionEpsilon * 8.0)
+                atomicAdd(rtDielectricDiagnostics.value.secondaryNearSelfHitCount, 1u);
+        }
+        else if (firstHit.instance == 8u || reflectedHit.instance == 8u)
+            atomicAdd(rtDielectricDiagnostics.value.productionPaneSecondaryDifferentMediumCount, 1u);
         reflected = skyColor(reflectionDirection) * 0.18 +
             (reflectedHit.hit ? reflectedHit.base * 0.12 : vec3(0.0));
     }
@@ -72,7 +98,7 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     {
         reflected = shadeTerminalOpaqueEmissive(reflectedHit, reflectionDirection);
     }
-    float reflectedLocalDistance = reflectedHit.hit
+    reflectedLocalDistance = reflectedHit.hit
         ? max(reflectedHit.t - firstHit.t, 0.0) : 12.0;
     vec4 reflectedFire = integrateFireEmitters(
         firstHit.position + reflectionDirection * 0.004,
@@ -92,6 +118,7 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     bool terminalResolved = false;
     bool overflowed = false;
     bool touchedProductionPane = false;
+    int tirSinceLastTransition = 0;
 
     for (int interfaceIndex = 0; interfaceIndex <= kHighDielectricInterfaces;
          ++interfaceIndex)
@@ -107,12 +134,35 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
         {
             if (volumeDepth > 0)
             {
-                atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);
-                atomicAdd(rtDielectricDiagnostics.value.primaryUnclosedVolumeCount, 1u);
-                if (touchedProductionPane)
-                    atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
-                transmitted = dielectricOverflowFallback(
-                    transmissionDirection, throughput);
+                // Every pushed thick volume comes from a validated outward-
+                // wound closed mesh. Reaching an ordinary terminal before its
+                // paired exit is therefore a finite-precision shared-edge
+                // closure case, not permission to leak energy through an open
+                // stack or shade the terminal as if the dielectric vanished.
+                // Conservatively absorb the unresolved interior energy and
+                // retain exact reason/instance/material attribution below.
+                atomicAdd(rtDielectricDiagnostics.value.primaryClosedVolumeAbsorptionCount,
+                          1u);
+                if (currentHit.hit)
+                {
+                    atomicAdd(rtDielectricDiagnostics.value.primaryOpenOpaqueCount, 1u);
+                    if (tirSinceLastTransition > 0)
+                        atomicAdd(rtDielectricDiagnostics.value.primaryOpenOpaqueAfterTirCount,
+                                  1u);
+                    atomicOr(rtDielectricDiagnostics.value.primaryOpenOpaqueTerminalInstanceMask,
+                             1u << min(uint(currentHit.instance), 31u));
+                    atomicOr(rtDielectricDiagnostics.value.primaryOpenOpaqueVolumeInstanceMask,
+                             1u << min(volumeInstances[volumeDepth - 1], 31u));
+                    atomicOr(rtDielectricDiagnostics.value.primaryOpenOpaqueTerminalMaterialMask,
+                             1u << (uint(currentHit.material) & 31u));
+                    if (currentHit.instance == int(volumeInstances[volumeDepth - 1]) &&
+                        uint(currentHit.material) != volumeMaterials[volumeDepth - 1])
+                        atomicAdd(rtDielectricDiagnostics.value.primaryOpenOpaqueSameInstanceDifferentMaterialCount,
+                                  1u);
+                }
+                else
+                    atomicAdd(rtDielectricDiagnostics.value.primaryOpenMissCount, 1u);
+                transmitted = vec3(0.0);
             }
             else
             {
@@ -125,7 +175,25 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
         }
         if (interfaceIndex >= interfaceBudget)
         {
-            overflowed = true;
+            if (volumeDepth > 0 && tirSinceLastTransition > 0)
+            {
+                // Repeated TIR leaves the remaining transmission energy
+                // physically trapped in the closed volume. At the fixed
+                // Mobile/High interface bound, conservatively absorb it; the
+                // path has not overflowed or escaped an open stack.
+                atomicAdd(rtDielectricDiagnostics.value.primaryTirTerminationCount, 1u);
+                transmitted = vec3(0.0);
+                terminalResolved = true;
+            }
+            else
+            {
+                atomicAdd(rtDielectricDiagnostics.value.primaryInterfaceBudgetCount, 1u);
+                if (volumeDepth > 0)
+                    atomicAdd(rtDielectricDiagnostics.value.primaryInterfaceBudgetOpenVolumeCount, 1u);
+                else
+                    atomicAdd(rtDielectricDiagnostics.value.primaryInterfaceBudgetClosedVolumeCount, 1u);
+                overflowed = true;
+            }
             break;
         }
 
@@ -148,6 +216,8 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
         if (!thinWall && dot(idealTransmission, idealTransmission) < 0.25)
         {
             // TIR consumes one interface but does not mutate the medium stack.
+            atomicAdd(rtDielectricDiagnostics.value.primaryTirCount, 1u);
+            ++tirSinceLastTransition;
             transmissionDirection = roughDielectricDirection(
                 reflect(transmissionDirection, orientedNormal), orientedNormal,
                 currentHit.position, currentHit.roughness);
@@ -156,10 +226,12 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
         {
             if (!thinWall)
             {
+                tirSinceLastTransition = 0;
                 if (entering)
                 {
                     if (volumeDepth >= volumeBudget)
                     {
+                        atomicAdd(rtDielectricDiagnostics.value.primaryVolumeBudgetCount, 1u);
                         overflowed = true;
                         break;
                     }
@@ -177,25 +249,31 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
                         volumeMaterials[volumeDepth - 1] != uint(currentHit.material) ||
                         volumeInstances[volumeDepth - 1] != currentHit.instance)
                     {
+                        atomicAdd(rtDielectricDiagnostics.value.primaryMismatchedExitCount, 1u);
                         overflowed = true;
                         break;
                     }
                     --volumeDepth;
                 }
             }
-            // A closed volume must leave through its paired interface. A
-            // stochastic rough refraction direction on a seven-millimetre
-            // pane can jump to its metal cage or a neighbouring pane before
-            // the exit, leaving Mobile's four-interface medium stack open.
-            // Keep thick-volume transport geometric; roughness remains in
-            // the reflected lobe above.
-            transmissionDirection = normalize(idealTransmission);
+            // Thin sheets scatter at their sole interface. A thick closed
+            // volume must first traverse to the paired exit geometrically:
+            // scattering on entry can jump a 7 mm pane into its cage before
+            // Mobile has enough interfaces to close the stack. Apply the
+            // same deterministic microfacet perturbation at the physical
+            // exit instead, after the paired instance/material pop. This
+            // bounded two-interface approximation retains rough directional
+            // transmission while it cannot escape a volume before its exit.
+            vec3 roughTransmission = roughDielectricDirection(
+                idealTransmission, orientedNormal,
+                currentHit.position, currentHit.roughness);
+            transmissionDirection = (!thinWall && entering)
+                ? normalize(idealTransmission) : roughTransmission;
             throughput *= clamp(currentHit.transmission, 0.0, 1.0) *
                 (1.0 - fresnel);
         }
 
-        float epsilon = dielectricRayEpsilon(
-            currentHit.position, totalDistance);
+        float epsilon = dielectricRayEpsilon(currentHit.position, totalDistance);
         vec3 nextOrigin = advanceDielectricRayOrigin(
             currentHit.position, outwardNormal, transmissionDirection, epsilon);
         float advancedDistance = max(

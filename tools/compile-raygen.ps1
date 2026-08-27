@@ -118,9 +118,9 @@ if ($Legacy)
     $activityExpression = 'bool genericTransmissionActive = controls.genericTransmissionActive > 0.5;'
     $replacementCount = ([regex]::Matches(
         $resolvedLegacySource, [regex]::Escape($activityExpression))).Count
-    if ($replacementCount -ne 4)
+    if ($replacementCount -ne 5)
     {
-        throw "Legacy raygen expected four generic transmission activity sites, found $replacementCount."
+        throw "Legacy raygen expected five generic transmission activity sites, found $replacementCount."
     }
     $resolvedLegacySource = $resolvedLegacySource.Replace(
         $activityExpression, 'bool genericTransmissionActive = false;')

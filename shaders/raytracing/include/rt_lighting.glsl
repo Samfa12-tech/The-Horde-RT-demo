@@ -66,6 +66,8 @@ float puddleMask(vec3 p)
 vec3 dielectricBeerLambert(vec3 attenuationColor, float pathLength,
                            float attenuationDistance);
 float dielectricRayEpsilon(vec3 position, float interfaceDistance);
+vec3 advanceDielectricRayOrigin(vec3 position, vec3 geometricNormal,
+                                vec3 direction, float epsilon);
 
 const int kMobileShadowInterfaces = 4;
 const int kHighShadowInterfaces = 8;
@@ -180,6 +182,7 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
     float volumeEntryDistances[kHighShadowVolumes];
     vec4 volumeAttenuation[kHighShadowVolumes];
     int volumeDepth = 0;
+    bool observedClosedVolumeEntry = false;
     vec3 transmittance = vec3(1.0);
     vec3 currentOrigin = origin;
     float travelledDistance = 0.0;
@@ -189,12 +192,15 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
         if (remainingDistance <= 0.0)
         {
             if (volumeDepth > 0)
+                atomicAdd(rtDielectricDiagnostics.value.shadowFiniteEndpointVolumeCount,
+                          uint(volumeDepth));
+            for (int volumeIndex = 0; volumeIndex < volumeDepth; ++volumeIndex)
             {
-                atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);
-                atomicAdd(rtDielectricDiagnostics.value.shadowUnclosedVolumeCount, 1u);
-                if (volumeInstances[volumeDepth - 1] == 8u)
-                    atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
-                transmittance *= vec3(0.08);
+                vec4 attenuation = volumeAttenuation[volumeIndex];
+                transmittance *= dielectricBeerLambert(
+                    attenuation.rgb,
+                    max(maxDistance - volumeEntryDistances[volumeIndex], 0.0),
+                    attenuation.a);
             }
             return clamp(transmittance, vec3(0.0), vec3(1.0));
         }
@@ -204,13 +210,20 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
             currentOrigin, direction, remainingDistance, mask, minimumDistance);
         if (!nearest.hit)
         {
+            // A shadow query is a finite segment to a sampled light. Open
+            // media here mean that the light endpoint is inside each medium,
+            // so retain their partial path attenuation without inventing an
+            // exit surface beyond the endpoint.
             if (volumeDepth > 0)
+                atomicAdd(rtDielectricDiagnostics.value.shadowFiniteEndpointVolumeCount,
+                          uint(volumeDepth));
+            for (int volumeIndex = 0; volumeIndex < volumeDepth; ++volumeIndex)
             {
-                atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);
-                atomicAdd(rtDielectricDiagnostics.value.shadowUnclosedVolumeCount, 1u);
-                if (volumeInstances[volumeDepth - 1] == 8u)
-                    atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
-                transmittance *= vec3(0.08);
+                vec4 attenuation = volumeAttenuation[volumeIndex];
+                transmittance *= dielectricBeerLambert(
+                    attenuation.rgb,
+                    max(maxDistance - volumeEntryDistances[volumeIndex], 0.0),
+                    attenuation.a);
             }
             return clamp(transmittance, vec3(0.0), vec3(1.0));
         }
@@ -240,6 +253,7 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
                     atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
                 return clamp(transmittance * vec3(0.08), vec3(0.0), vec3(1.0));
             }
+            observedClosedVolumeEntry = true;
             volumeInstances[volumeDepth] = nearest.instance;
             volumeMaterials[volumeDepth] = nearest.material;
             volumeEntryDistances[volumeDepth] = absoluteDistance;
@@ -250,7 +264,19 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
         }
         else
         {
-            if (volumeDepth <= 0 ||
+            if (volumeDepth <= 0 && !observedClosedVolumeEntry)
+            {
+                // Surface and emissive samples can physically begin inside a
+                // closed dielectric. Consecutive leading exits represent
+                // nested origin-containing media. Account for each complete
+                // origin-to-boundary path without fabricating a stack entry.
+                transmittance *= nearest.transmission * dielectricBeerLambert(
+                    nearest.attenuationColor, absoluteDistance,
+                    nearest.attenuationDistance);
+                atomicAdd(
+                    rtDielectricDiagnostics.value.shadowImplicitOriginExitCount, 1u);
+            }
+            else if (volumeDepth <= 0 ||
                 volumeInstances[volumeDepth - 1] != nearest.instance ||
                 volumeMaterials[volumeDepth - 1] != nearest.material)
             {
@@ -259,14 +285,20 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
                 if (nearest.instance == 8u ||
                     (volumeDepth > 0 && volumeInstances[volumeDepth - 1] == 8u))
                     atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
+                atomicAdd(rtDielectricDiagnostics.value.shadowMismatchedExitCount, 1u);
+                if (volumeDepth <= 0)
+                    atomicAdd(rtDielectricDiagnostics.value.shadowMismatchEmptyCount, 1u);
                 return clamp(transmittance * vec3(0.08), vec3(0.0), vec3(1.0));
             }
-            --volumeDepth;
-            vec4 attenuation = volumeAttenuation[volumeDepth];
-            transmittance *= dielectricBeerLambert(
-                attenuation.rgb,
-                max(absoluteDistance - volumeEntryDistances[volumeDepth], 0.0),
-                attenuation.a);
+            else
+            {
+                --volumeDepth;
+                vec4 attenuation = volumeAttenuation[volumeDepth];
+                transmittance *= dielectricBeerLambert(
+                    attenuation.rgb,
+                    max(absoluteDistance - volumeEntryDistances[volumeDepth], 0.0),
+                    attenuation.a);
+            }
         }
 
         vec3 hitPosition = currentOrigin + direction * nearest.t;
@@ -308,6 +340,13 @@ float visibilityMask(vec3 origin, vec3 direction, float maxDistance, uint mask)
 
 vec3 offsetRayOrigin(HitInfo h, vec3 direction)
 {
+    bool genericTransmissionActive = controls.genericTransmissionActive > 0.5;
+    if (genericTransmissionActive)
+    {
+        return advanceDielectricRayOrigin(
+            h.position, h.geometricNormal, direction,
+            dielectricRayEpsilon(h.position, h.t));
+    }
     float side = dot(h.geometricNormal, direction) >= 0.0 ? 1.0 : -1.0;
     return h.position + h.geometricNormal * side * 0.004;
 }

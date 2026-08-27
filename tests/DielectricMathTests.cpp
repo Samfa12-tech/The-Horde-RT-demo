@@ -12,14 +12,24 @@ namespace
 {
 
 using horde::vulkan::raytracing::BeerLambert;
+using horde::vulkan::raytracing::ClassifyDielectricTerminal;
+using horde::vulkan::raytracing::ConstrainClosedVolumeTransmission;
+using horde::vulkan::raytracing::ConstrainDirectionToIdealHemisphere;
+using horde::vulkan::raytracing::DielectricBudgetResolution;
 using horde::vulkan::raytracing::DielectricStack;
+using horde::vulkan::raytracing::DielectricTerminalKind;
+using horde::vulkan::raytracing::DielectricTerminalResolution;
 using horde::vulkan::raytracing::DielectricEnergyPartition;
 using horde::vulkan::raytracing::DielectricRayEpsilon;
 using horde::vulkan::raytracing::EffectiveDielectricFresnel;
 using horde::vulkan::raytracing::EvaluateBoundedShadow;
 using horde::vulkan::raytracing::InterfaceTransition;
+using horde::vulkan::raytracing::IsDielectricNearSelfHit;
 using horde::vulkan::raytracing::OrientInterface;
+using horde::vulkan::raytracing::OffsetShadowRayOrigin;
 using horde::vulkan::raytracing::RefractDirection;
+using horde::vulkan::raytracing::ResolveDielectricInterfaceBudget;
+using horde::vulkan::raytracing::ResolveDielectricTerminal;
 using horde::vulkan::raytracing::SchlickFresnel;
 using horde::vulkan::raytracing::ShadowInterfaceSample;
 using horde::vulkan::raytracing::ThinWallTransition;
@@ -96,6 +106,25 @@ void TestAirGlassAirStack()
     Check(exit.accepted && !exit.overflow && NearlyEqual(exit.incidentIor, 1.5f) &&
               NearlyEqual(exit.transmittedIor, 1.0f) && stack.Depth() == 0u,
           "closed-volume exit pops glass and restores air");
+}
+
+void TestStackPairsExactInstanceAndMaterial()
+{
+    DielectricStack<4u> stack;
+    Check(stack.Enter(7u, 17u, 1.5f).accepted,
+          "closed-volume entry records an exact instance/material pair");
+    Check(!stack.Exit(8u, 17u).accepted && stack.Depth() == 1u,
+          "same material on a different instance cannot pop a closed volume");
+    Check(!stack.Exit(7u, 18u).accepted && stack.Depth() == 1u,
+          "different material on the same instance cannot pop a closed volume");
+    Check(stack.Exit(7u, 17u).accepted && stack.Depth() == 0u,
+          "the exact paired exit restores the outside medium");
+
+    Check(stack.Enter(3u, 41u, 1.33f).accepted &&
+              stack.Enter(4u, 41u, 1.52f).accepted &&
+              stack.Exit(4u, 41u).accepted &&
+              stack.Exit(3u, 41u).accepted && stack.Depth() == 0u,
+          "nested instances may share a material while retaining LIFO instance identity");
 }
 
 void TestTotalInternalReflection()
@@ -213,14 +242,94 @@ void TestShadowBlockersAndUnclosedVolumesFailDeterministically()
     Check(metallic.blocked && NearlyEqual(metallic.transmittance, Vec3{}),
           "a transmissive metal remains a shadow blocker");
 
-    const std::array<ShadowInterfaceSample, 1u> missingExit{{
+    const std::array<ShadowInterfaceSample, 1u> finiteEndpointInsideVolume{{
         {1.0f, 4u, 44u, true, false, 0.9f, 0.0f,
+         Vec3{0.25f, 0.81f, 1.0f}, 2.0f},
+    }};
+    const auto finiteEndpoint = EvaluateBoundedShadow<4u, 2u>(
+        finiteEndpointInsideVolume, 3.0f);
+    Check(!finiteEndpoint.unclosedVolume && !finiteEndpoint.blocked &&
+              NearlyEqual(finiteEndpoint.transmittance, Vec3{0.225f, 0.729f, 0.9f}),
+          "a finite shadow endpoint inside a closed medium uses partial Beer-Lambert attenuation");
+
+    const std::array<ShadowInterfaceSample, 2u> mismatchedInstance{{
+        {0.5f, 4u, 44u, true, false, 0.9f, 0.0f,
+         Vec3{0.5f, 0.8f, 1.0f}, 2.0f, 4u},
+        {1.0f, 5u, 44u, false, false, 0.9f, 0.0f,
+         Vec3{0.5f, 0.8f, 1.0f}, 2.0f, 5u},
+    }};
+    const auto mismatched = EvaluateBoundedShadow<4u, 2u>(mismatchedInstance, 3.0f);
+    Check(mismatched.unclosedVolume && !mismatched.blocked &&
+              NearlyEqual(mismatched.transmittance, Vec3{0.072f, 0.072f, 0.072f}),
+          "an exit from a different instance still uses the bounded stack-failure fallback");
+}
+
+void TestShadowOriginInsideClosedVolumes()
+{
+    const std::array<ShadowInterfaceSample, 1u> singleExit{{
+        {0.6f, 4u, 44u, false, false, 0.9f, 0.0f,
+         Vec3{0.25f, 0.81f, 1.0f}, 1.2f},
+    }};
+    const auto single = EvaluateBoundedShadow<4u, 2u>(singleExit, 3.0f);
+    Check(!single.unclosedVolume && !single.blocked && !single.overflow &&
+              single.interfaceCount == 1u &&
+              NearlyEqual(single.transmittance, Vec3{0.45f, 0.81f, 0.9f}),
+          "a shadow born inside one closed volume attenuates from its origin through the first exit");
+
+    const std::array<ShadowInterfaceSample, 2u> nestedExits{{
+        {0.5f, 20u, 202u, false, false, 0.8f, 0.0f,
+         Vec3{0.25f, 1.0f, 1.0f}, 1.0f},
+        {1.0f, 10u, 101u, false, false, 0.9f, 0.0f,
+         Vec3{1.0f, 0.25f, 1.0f}, 2.0f},
+    }};
+    const auto nested = EvaluateBoundedShadow<4u, 2u>(nestedExits, 3.0f);
+    Check(!nested.unclosedVolume && !nested.blocked && !nested.overflow &&
+              nested.interfaceCount == 2u &&
+              NearlyEqual(nested.transmittance, Vec3{0.36f, 0.36f, 0.72f}),
+          "nested closed volumes containing the shadow origin attenuate independently through ordered exits");
+
+    const std::array<ShadowInterfaceSample, 3u> laterUnmatchedExit{{
+        {0.5f, 4u, 44u, true, false, 0.9f, 0.0f,
+         Vec3{0.5f, 0.8f, 1.0f}, 2.0f},
+        {1.0f, 4u, 44u, false, false, 0.9f, 0.0f,
+         Vec3{0.5f, 0.8f, 1.0f}, 2.0f},
+        {1.5f, 5u, 55u, false, false, 0.9f, 0.0f,
          Vec3{0.5f, 0.8f, 1.0f}, 2.0f},
     }};
-    const auto unclosed = EvaluateBoundedShadow<4u, 2u>(missingExit, 3.0f);
-    Check(unclosed.unclosedVolume && !unclosed.blocked &&
-              NearlyEqual(unclosed.transmittance, Vec3{0.072f, 0.072f, 0.072f}),
-          "a terminal reached inside a closed medium uses the bounded unclosed fallback");
+    const auto unmatched = EvaluateBoundedShadow<4u, 2u>(laterUnmatchedExit, 3.0f);
+    Check(unmatched.unclosedVolume,
+          "an unmatched exit after a complete entry-exit pair is not reclassified as an inside-origin segment");
+}
+
+void TestMobileAndHighShadowBounds()
+{
+    const std::array<ShadowInterfaceSample, 5u> thinInterfaces{{
+        {0.2f, 1u, 10u, true, true, 0.9f},
+        {0.4f, 2u, 11u, true, true, 0.9f},
+        {0.6f, 3u, 12u, true, true, 0.9f},
+        {0.8f, 4u, 13u, true, true, 0.9f},
+        {1.0f, 5u, 14u, true, true, 0.9f},
+    }};
+    const auto mobileInterfaces = EvaluateBoundedShadow<4u, 2u>(thinInterfaces, 2.0f);
+    const auto highInterfaces = EvaluateBoundedShadow<8u, 4u>(thinInterfaces, 2.0f);
+    Check(mobileInterfaces.overflow && mobileInterfaces.interfaceCount == 4u &&
+              !highInterfaces.overflow && highInterfaces.interfaceCount == 5u,
+          "Mobile enforces four shadow interfaces while High accepts the same five-interface path");
+
+    const std::array<ShadowInterfaceSample, 6u> threeNestedVolumes{{
+        {0.2f, 1u, 21u, true, false, 0.95f, 0.0f, {1.0f, 1.0f, 1.0f}, 1.0f, 101u},
+        {0.4f, 2u, 22u, true, false, 0.95f, 0.0f, {1.0f, 1.0f, 1.0f}, 1.0f, 102u},
+        {0.6f, 3u, 23u, true, false, 0.95f, 0.0f, {1.0f, 1.0f, 1.0f}, 1.0f, 103u},
+        {0.8f, 4u, 23u, false, false, 0.95f, 0.0f, {1.0f, 1.0f, 1.0f}, 1.0f, 103u},
+        {1.0f, 5u, 22u, false, false, 0.95f, 0.0f, {1.0f, 1.0f, 1.0f}, 1.0f, 102u},
+        {1.2f, 6u, 21u, false, false, 0.95f, 0.0f, {1.0f, 1.0f, 1.0f}, 1.0f, 101u},
+    }};
+    const auto mobileVolumes = EvaluateBoundedShadow<8u, 2u>(threeNestedVolumes, 2.0f);
+    const auto highVolumes = EvaluateBoundedShadow<8u, 4u>(threeNestedVolumes, 2.0f);
+    Check(mobileVolumes.overflow && mobileVolumes.interfaceCount == 3u &&
+              !highVolumes.overflow && !highVolumes.unclosedVolume &&
+              highVolumes.interfaceCount == 6u,
+          "Mobile enforces two nested shadow volumes while High closes the same three-volume path");
 }
 
 void TestMillimetreScaleRayAdvance()
@@ -240,6 +349,108 @@ void TestMillimetreScaleRayAdvance()
     Check(advanced.x > epsilon && advanced.x < epsilon * 1.10f &&
               advanced.z > epsilon * 0.99f,
           "grazing entry uses the bounded normal-aware bias and remains far below a one-millimetre wall");
+}
+
+void TestGenericShadowOriginKeepsMillimetreClearance()
+{
+    const Vec3 position{-12.31f, -0.48f, -15.20f};
+    const Vec3 normal{-1.0f, 0.0f, 0.0f};
+    const Vec3 direction{-0.85f, 0.20f, 0.48f};
+    const Vec3 generic = OffsetShadowRayOrigin(
+        position, normal, direction, 1.6f, true);
+    const Vec3 legacy = OffsetShadowRayOrigin(
+        position, normal, direction, 1.6f, false);
+    const float genericDistance = std::sqrt(
+        (generic.x - position.x) * (generic.x - position.x) +
+        (generic.y - position.y) * (generic.y - position.y) +
+        (generic.z - position.z) * (generic.z - position.z));
+    Check(genericDistance < 0.0015f,
+          "generic shadow origin cannot jump a 1.5 mm cage-to-glass clearance");
+    Check(NearlyEqual(legacy, Vec3{position.x - 0.004f, position.y, position.z}),
+          "legacy-inactive shadow origin retains the reviewed four-millimetre normal offset");
+}
+
+void TestRoughClosedVolumeTransmissionReachesPairedBoundary()
+{
+    const Vec3 ideal = horde::vulkan::raytracing::dielectric_detail::Normalize(
+        Vec3{0.20f, -0.95f, 0.24f}, Vec3{0.0f, -1.0f, 0.0f});
+    const Vec3 rough = horde::vulkan::raytracing::dielectric_detail::Normalize(
+        Vec3{0.34f, -0.88f, 0.33f}, Vec3{0.0f, -1.0f, 0.0f});
+    Check(NearlyEqual(
+              ConstrainClosedVolumeTransmission(ideal, rough, false, true), ideal),
+          "rough thick-volume entry remains on the geometric Snell path to its paired boundary");
+    Check(NearlyEqual(
+              ConstrainClosedVolumeTransmission(ideal, rough, false, false), rough) &&
+              NearlyEqual(
+                  ConstrainClosedVolumeTransmission(ideal, rough, true, true), rough),
+          "roughness remains directional at thick exits and thin-wall interfaces");
+    Check(NearlyEqual(
+              ConstrainClosedVolumeTransmission(ideal, ideal, false, true), ideal) &&
+              NearlyEqual(
+                  ConstrainClosedVolumeTransmission(ideal, ideal, false, false), ideal),
+          "smooth thick entry and exit preserve the ideal Snell direction");
+
+    const Vec3 grazingIdeal = horde::vulkan::raytracing::dielectric_detail::Normalize(
+        Vec3{1.0f, 0.00002f, 0.0f}, Vec3{1.0f, 0.0f, 0.0f});
+    const Vec3 crossedRough = horde::vulkan::raytracing::dielectric_detail::Normalize(
+        Vec3{1.0f, -0.004f, 0.0f}, Vec3{1.0f, 0.0f, 0.0f});
+    const Vec3 constrained = ConstrainDirectionToIdealHemisphere(
+        grazingIdeal, crossedRough, Vec3{0.0f, 1.0f, 0.0f});
+    Check(constrained.y > 0.0f && NearlyEqual(
+              std::sqrt(constrained.x * constrained.x + constrained.y * constrained.y +
+                        constrained.z * constrained.z), 1.0f),
+          "rough reflection and exit lobes cannot cross the physical ideal interface hemisphere at grazing angles");
+}
+
+void TestBoundedTirAndWaterTerminationContracts()
+{
+    Check(ResolveDielectricInterfaceBudget(1u, 8u) ==
+              DielectricBudgetResolution::AbsorbTrappedTir &&
+              ResolveDielectricInterfaceBudget(4u, 1u) ==
+              DielectricBudgetResolution::AbsorbTrappedTir,
+          "Mobile and High interface limits absorb energy still trapped by TIR inside bounded media");
+    Check(ResolveDielectricInterfaceBudget(0u, 8u) ==
+              DielectricBudgetResolution::Overflow &&
+              ResolveDielectricInterfaceBudget(1u, 0u) ==
+              DielectricBudgetResolution::Overflow,
+          "closed-stack and non-TIR budget exhaustion remain explicit transport overflows");
+    Check(ClassifyDielectricTerminal(true, false, true) ==
+              DielectricTerminalKind::Water &&
+              ClassifyDielectricTerminal(true, true, false) ==
+              DielectricTerminalKind::ContinueGeneric &&
+              ClassifyDielectricTerminal(true, false, false) ==
+              DielectricTerminalKind::Opaque &&
+              ClassifyDielectricTerminal(false, false, false) ==
+              DielectricTerminalKind::Miss,
+          "water terminates the bounded generic path without being reclassified as opaque or recursively continued");
+    Check(ResolveDielectricTerminal(0u, DielectricTerminalKind::Water) ==
+              DielectricTerminalResolution::ShadeTerminal &&
+              ResolveDielectricTerminal(0u, DielectricTerminalKind::Opaque) ==
+              DielectricTerminalResolution::ShadeTerminal &&
+              ResolveDielectricTerminal(0u, DielectricTerminalKind::Miss) ==
+              DielectricTerminalResolution::ShadeTerminal,
+          "water, opaque, and miss terminals use their ordinary terminal path after a paired stack exit");
+    Check(ResolveDielectricTerminal(1u, DielectricTerminalKind::Water) ==
+              DielectricTerminalResolution::AbsorbUnresolvedClosedVolume &&
+              ResolveDielectricTerminal(2u, DielectricTerminalKind::Opaque) ==
+              DielectricTerminalResolution::AbsorbUnresolvedClosedVolume &&
+              ResolveDielectricTerminal(4u, DielectricTerminalKind::Miss) ==
+              DielectricTerminalResolution::AbsorbUnresolvedClosedVolume,
+          "an ordinary terminal reached before a validated closed-volume exit is conservatively absorbed at Mobile and High depths");
+    Check(ResolveDielectricTerminal(4u, DielectricTerminalKind::ContinueGeneric) ==
+              DielectricTerminalResolution::ContinueGeneric,
+          "a generic dielectric terminal always continues to exact instance/material stack validation");
+}
+
+void TestSelfHitClassificationUsesBoundedEpsilon()
+{
+    const float epsilon = DielectricRayEpsilon(
+        Vec3{-12.5f, 0.12f, -15.42f}, 1.55f);
+    Check(IsDielectricNearSelfHit(epsilon * 7.99f, epsilon) &&
+              !IsDielectricNearSelfHit(epsilon * 8.01f, epsilon),
+          "secondary dielectric self-hit attribution has an exact eight-epsilon boundary");
+    Check(!IsDielectricNearSelfHit(0.0015f, epsilon),
+          "a distinct millimetre-clearance boundary is never attributed as an epsilon self-hit");
 }
 
 void TestBeerLambertAttenuation()
@@ -308,12 +519,19 @@ int main()
     TestSchlickEndpoints();
     TestNormalOrientationAndSnellDirection();
     TestAirGlassAirStack();
+    TestStackPairsExactInstanceAndMaterial();
     TestTotalInternalReflection();
     TestCriticalAngleIsTransmissionBoundary();
     TestEffectiveFresnelPartitionsAllValidEnergy();
     TestNearestShadowTraversalIsCandidateOrderIndependent();
     TestShadowBlockersAndUnclosedVolumesFailDeterministically();
+    TestShadowOriginInsideClosedVolumes();
+    TestMobileAndHighShadowBounds();
     TestMillimetreScaleRayAdvance();
+    TestGenericShadowOriginKeepsMillimetreClearance();
+    TestRoughClosedVolumeTransmissionReachesPairedBoundary();
+    TestBoundedTirAndWaterTerminationContracts();
+    TestSelfHitClassificationUsesBoundedEpsilon();
     TestBeerLambertAttenuation();
     TestThinWallDoesNotMutateStack();
     TestBoundedOverflowAndMismatchedExit();

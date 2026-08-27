@@ -73,7 +73,7 @@
       ]
     },
     {
-      "name": "RtDielectricDiagnostics", "alignment": 16, "size": 32,
+      "name": "RtDielectricDiagnostics", "alignment": 16, "size": 144,
       "fields": [
         { "name": "transportOverflowCount", "type": "uint", "offset": 0 },
         { "name": "shadowOverflowCount", "type": "uint", "offset": 4 },
@@ -82,7 +82,32 @@
         { "name": "primaryUnclosedVolumeCount", "type": "uint", "offset": 16 },
         { "name": "shadowUnclosedVolumeCount", "type": "uint", "offset": 20 },
         { "name": "productionPaneStackFailureCount", "type": "uint", "offset": 24 },
-        { "name": "productionPaneSecondaryRejectCount", "type": "uint", "offset": 28 }
+        { "name": "productionPaneSecondaryOriginCount", "type": "uint", "offset": 28 },
+        { "name": "productionPaneSecondaryTerminalCount", "type": "uint", "offset": 32 },
+        { "name": "productionPaneSecondarySameMediumCount", "type": "uint", "offset": 36 },
+        { "name": "productionPaneSecondaryDifferentMediumCount", "type": "uint", "offset": 40 },
+        { "name": "secondaryNearSelfHitCount", "type": "uint", "offset": 44 },
+        { "name": "primaryOpenMissCount", "type": "uint", "offset": 48 },
+        { "name": "primaryOpenOpaqueCount", "type": "uint", "offset": 52 },
+        { "name": "primaryMismatchedExitCount", "type": "uint", "offset": 56 },
+        { "name": "primaryInterfaceBudgetCount", "type": "uint", "offset": 60 },
+        { "name": "primaryVolumeBudgetCount", "type": "uint", "offset": 64 },
+        { "name": "shadowOpenMissCount", "type": "uint", "offset": 68 },
+        { "name": "shadowMismatchedExitCount", "type": "uint", "offset": 72 },
+        { "name": "primaryTirCount", "type": "uint", "offset": 76 },
+        { "name": "primaryInterfaceBudgetOpenVolumeCount", "type": "uint", "offset": 80 },
+        { "name": "primaryInterfaceBudgetClosedVolumeCount", "type": "uint", "offset": 84 },
+        { "name": "shadowMismatchEmptyCount", "type": "uint", "offset": 88 },
+        { "name": "shadowImplicitOriginExitCount", "type": "uint", "offset": 92 },
+        { "name": "secondaryDielectricTerminalCount", "type": "uint", "offset": 96 },
+        { "name": "primaryTirTerminationCount", "type": "uint", "offset": 100 },
+        { "name": "shadowFiniteEndpointVolumeCount", "type": "uint", "offset": 104 },
+        { "name": "primaryOpenOpaqueSameInstanceDifferentMaterialCount", "type": "uint", "offset": 108 },
+        { "name": "primaryOpenOpaqueAfterTirCount", "type": "uint", "offset": 112 },
+        { "name": "primaryOpenOpaqueTerminalInstanceMask", "type": "uint", "offset": 116 },
+        { "name": "primaryOpenOpaqueVolumeInstanceMask", "type": "uint", "offset": 120 },
+        { "name": "primaryOpenOpaqueTerminalMaterialMask", "type": "uint", "offset": 124 },
+        { "name": "primaryClosedVolumeAbsorptionCount", "type": "uint", "offset": 128 }
       ]
     },
     {

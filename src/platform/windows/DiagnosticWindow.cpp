@@ -3812,8 +3812,50 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
              << context.rtScene.DielectricShadowUnclosedVolumeCount()
              << ", \"productionPaneStackFailureCount\": "
              << context.rtScene.ProductionPaneStackFailureCount()
-             << ", \"productionPaneSecondaryRejectCount\": "
-             << context.rtScene.ProductionPaneSecondaryRejectCount() << "},\n"
+             << ", \"productionPaneSecondaryOriginCount\": "
+             << context.rtScene.ProductionPaneSecondaryOriginCount()
+             << ", \"productionPaneSecondaryTerminalCount\": "
+             << context.rtScene.ProductionPaneSecondaryTerminalCount()
+             << ", \"productionPaneSecondarySameMediumCount\": "
+             << context.rtScene.ProductionPaneSecondarySameMediumCount()
+             << ", \"productionPaneSecondaryDifferentMediumCount\": "
+             << context.rtScene.ProductionPaneSecondaryDifferentMediumCount() << "},\n"
+             << "  \"dielectricReasonDiagnostics\": {\"secondaryNearSelfHitCount\": "
+             << context.rtScene.SecondaryNearSelfHitCount()
+             << ", \"primaryOpenMissCount\": " << context.rtScene.PrimaryOpenMissCount()
+             << ", \"primaryOpenOpaqueCount\": " << context.rtScene.PrimaryOpenOpaqueCount()
+             << ", \"primaryMismatchedExitCount\": " << context.rtScene.PrimaryMismatchedExitCount()
+             << ", \"primaryInterfaceBudgetCount\": " << context.rtScene.PrimaryInterfaceBudgetCount()
+             << ", \"primaryVolumeBudgetCount\": " << context.rtScene.PrimaryVolumeBudgetCount()
+             << ", \"shadowOpenMissCount\": " << context.rtScene.ShadowOpenMissCount()
+             << ", \"shadowMismatchedExitCount\": " << context.rtScene.ShadowMismatchedExitCount()
+             << ", \"primaryTirCount\": " << context.rtScene.PrimaryTirCount()
+             << ", \"primaryInterfaceBudgetOpenVolumeCount\": "
+             << context.rtScene.PrimaryInterfaceBudgetOpenVolumeCount()
+             << ", \"primaryInterfaceBudgetClosedVolumeCount\": "
+             << context.rtScene.PrimaryInterfaceBudgetClosedVolumeCount()
+             << ", \"shadowMismatchEmptyCount\": " << context.rtScene.ShadowMismatchEmptyCount()
+             << ", \"shadowImplicitOriginExitCount\": "
+             << context.rtScene.ShadowImplicitOriginExitCount()
+             << ", \"secondaryDielectricTerminalCount\": "
+             << context.rtScene.SecondaryDielectricTerminalCount()
+             << ", \"primaryTirTerminationCount\": "
+             << context.rtScene.PrimaryTirTerminationCount()
+             << ", \"shadowFiniteEndpointVolumeCount\": "
+             << context.rtScene.ShadowFiniteEndpointVolumeCount()
+             << ", \"primaryOpenOpaqueSameInstanceDifferentMaterialCount\": "
+             << context.rtScene.PrimaryOpenOpaqueSameInstanceDifferentMaterialCount()
+             << ", \"primaryOpenOpaqueAfterTirCount\": "
+             << context.rtScene.PrimaryOpenOpaqueAfterTirCount()
+             << ", \"primaryOpenOpaqueTerminalInstanceMask\": "
+             << context.rtScene.PrimaryOpenOpaqueTerminalInstanceMask()
+             << ", \"primaryOpenOpaqueVolumeInstanceMask\": "
+             << context.rtScene.PrimaryOpenOpaqueVolumeInstanceMask()
+             << ", \"primaryOpenOpaqueTerminalMaterialMask\": "
+             << context.rtScene.PrimaryOpenOpaqueTerminalMaterialMask()
+             << ", \"primaryClosedVolumeAbsorptionCount\": "
+             << context.rtScene.PrimaryClosedVolumeAbsorptionCount()
+             << "},\n"
              << "  \"error\": " << (error.empty() ? "null" : "\"" + JsonEscape(error) + "\"") << ",\n"
              << "  \"captures\": [\n";
     for (std::size_t index = 0; index < captures.size(); ++index)

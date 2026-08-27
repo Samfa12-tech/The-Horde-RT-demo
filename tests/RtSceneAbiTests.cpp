@@ -33,10 +33,35 @@ void CheckSplitDielectricDiagnosticLayout()
                       value.primaryUnclosedVolumeCount;
                       value.shadowUnclosedVolumeCount;
                       value.productionPaneStackFailureCount;
-                      value.productionPaneSecondaryRejectCount;
+                      value.productionPaneSecondaryOriginCount;
+                      value.productionPaneSecondaryTerminalCount;
+                      value.productionPaneSecondarySameMediumCount;
+                      value.productionPaneSecondaryDifferentMediumCount;
+                      value.secondaryNearSelfHitCount;
+                      value.primaryOpenMissCount;
+                      value.primaryOpenOpaqueCount;
+                      value.primaryMismatchedExitCount;
+                      value.primaryInterfaceBudgetCount;
+                      value.primaryVolumeBudgetCount;
+                      value.shadowOpenMissCount;
+                      value.shadowMismatchedExitCount;
+                      value.primaryTirCount;
+                      value.primaryInterfaceBudgetOpenVolumeCount;
+                      value.primaryInterfaceBudgetClosedVolumeCount;
+                      value.shadowMismatchEmptyCount;
+                      value.shadowImplicitOriginExitCount;
+                      value.secondaryDielectricTerminalCount;
+                      value.primaryTirTerminationCount;
+                      value.shadowFiniteEndpointVolumeCount;
+                      value.primaryOpenOpaqueSameInstanceDifferentMaterialCount;
+                      value.primaryOpenOpaqueAfterTirCount;
+                      value.primaryOpenOpaqueTerminalInstanceMask;
+                      value.primaryOpenOpaqueVolumeInstanceMask;
+                      value.primaryOpenOpaqueTerminalMaterialMask;
+                      value.primaryClosedVolumeAbsorptionCount;
                   })
     {
-        Check(sizeof(T) == 32u && alignof(T) == 16u &&
+        Check(sizeof(T) == 144u && alignof(T) == 16u &&
                   offsetof(T, transportOverflowCount) == 0u &&
                   offsetof(T, shadowOverflowCount) == 4u &&
                   offsetof(T, secondaryDielectricRejectCount) == 8u &&
@@ -44,8 +69,33 @@ void CheckSplitDielectricDiagnosticLayout()
                   offsetof(T, primaryUnclosedVolumeCount) == 16u &&
                   offsetof(T, shadowUnclosedVolumeCount) == 20u &&
                   offsetof(T, productionPaneStackFailureCount) == 24u &&
-                  offsetof(T, productionPaneSecondaryRejectCount) == 28u,
-              "dielectric diagnostics retain released layout while attributing production pane stack/reject routes");
+                  offsetof(T, productionPaneSecondaryOriginCount) == 28u &&
+                  offsetof(T, productionPaneSecondaryTerminalCount) == 32u &&
+                  offsetof(T, productionPaneSecondarySameMediumCount) == 36u &&
+                  offsetof(T, productionPaneSecondaryDifferentMediumCount) == 40u &&
+                  offsetof(T, secondaryNearSelfHitCount) == 44u &&
+                  offsetof(T, primaryOpenMissCount) == 48u &&
+                  offsetof(T, primaryOpenOpaqueCount) == 52u &&
+                  offsetof(T, primaryMismatchedExitCount) == 56u &&
+                  offsetof(T, primaryInterfaceBudgetCount) == 60u &&
+                  offsetof(T, primaryVolumeBudgetCount) == 64u &&
+                  offsetof(T, shadowOpenMissCount) == 68u &&
+                  offsetof(T, shadowMismatchedExitCount) == 72u &&
+                  offsetof(T, primaryTirCount) == 76u &&
+                  offsetof(T, primaryInterfaceBudgetOpenVolumeCount) == 80u &&
+                  offsetof(T, primaryInterfaceBudgetClosedVolumeCount) == 84u &&
+                  offsetof(T, shadowMismatchEmptyCount) == 88u &&
+                  offsetof(T, shadowImplicitOriginExitCount) == 92u &&
+                  offsetof(T, secondaryDielectricTerminalCount) == 96u &&
+                  offsetof(T, primaryTirTerminationCount) == 100u &&
+                  offsetof(T, shadowFiniteEndpointVolumeCount) == 104u &&
+                  offsetof(T, primaryOpenOpaqueSameInstanceDifferentMaterialCount) == 108u &&
+                  offsetof(T, primaryOpenOpaqueAfterTirCount) == 112u &&
+                  offsetof(T, primaryOpenOpaqueTerminalInstanceMask) == 116u &&
+                  offsetof(T, primaryOpenOpaqueVolumeInstanceMask) == 120u &&
+                  offsetof(T, primaryOpenOpaqueTerminalMaterialMask) == 124u &&
+                  offsetof(T, primaryClosedVolumeAbsorptionCount) == 128u,
+              "dielectric diagnostics attribute secondary self hits and primary/shadow open-stack reasons");
     }
     else
     {

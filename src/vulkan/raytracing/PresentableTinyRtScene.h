@@ -158,9 +158,79 @@ public:
     {
         return productionPaneStackFailureCount_;
     }
-    std::uint32_t ProductionPaneSecondaryRejectCount() const
+    std::uint32_t ProductionPaneSecondaryOriginCount() const
     {
-        return productionPaneSecondaryRejectCount_;
+        return productionPaneSecondaryOriginCount_;
+    }
+    std::uint32_t ProductionPaneSecondaryTerminalCount() const
+    {
+        return productionPaneSecondaryTerminalCount_;
+    }
+    std::uint32_t ProductionPaneSecondarySameMediumCount() const
+    {
+        return productionPaneSecondarySameMediumCount_;
+    }
+    std::uint32_t ProductionPaneSecondaryDifferentMediumCount() const
+    {
+        return productionPaneSecondaryDifferentMediumCount_;
+    }
+    std::uint32_t SecondaryNearSelfHitCount() const { return secondaryNearSelfHitCount_; }
+    std::uint32_t PrimaryOpenMissCount() const { return primaryOpenMissCount_; }
+    std::uint32_t PrimaryOpenOpaqueCount() const { return primaryOpenOpaqueCount_; }
+    std::uint32_t PrimaryMismatchedExitCount() const { return primaryMismatchedExitCount_; }
+    std::uint32_t PrimaryInterfaceBudgetCount() const { return primaryInterfaceBudgetCount_; }
+    std::uint32_t PrimaryVolumeBudgetCount() const { return primaryVolumeBudgetCount_; }
+    std::uint32_t ShadowOpenMissCount() const { return shadowOpenMissCount_; }
+    std::uint32_t ShadowMismatchedExitCount() const { return shadowMismatchedExitCount_; }
+    std::uint32_t PrimaryTirCount() const { return primaryTirCount_; }
+    std::uint32_t PrimaryInterfaceBudgetOpenVolumeCount() const
+    {
+        return primaryInterfaceBudgetOpenVolumeCount_;
+    }
+    std::uint32_t PrimaryInterfaceBudgetClosedVolumeCount() const
+    {
+        return primaryInterfaceBudgetClosedVolumeCount_;
+    }
+    std::uint32_t ShadowMismatchEmptyCount() const { return shadowMismatchEmptyCount_; }
+    std::uint32_t ShadowImplicitOriginExitCount() const
+    {
+        return shadowImplicitOriginExitCount_;
+    }
+    std::uint32_t SecondaryDielectricTerminalCount() const
+    {
+        return secondaryDielectricTerminalCount_;
+    }
+    std::uint32_t PrimaryTirTerminationCount() const
+    {
+        return primaryTirTerminationCount_;
+    }
+    std::uint32_t ShadowFiniteEndpointVolumeCount() const
+    {
+        return shadowFiniteEndpointVolumeCount_;
+    }
+    std::uint32_t PrimaryOpenOpaqueSameInstanceDifferentMaterialCount() const
+    {
+        return primaryOpenOpaqueSameInstanceDifferentMaterialCount_;
+    }
+    std::uint32_t PrimaryOpenOpaqueAfterTirCount() const
+    {
+        return primaryOpenOpaqueAfterTirCount_;
+    }
+    std::uint32_t PrimaryOpenOpaqueTerminalInstanceMask() const
+    {
+        return primaryOpenOpaqueTerminalInstanceMask_;
+    }
+    std::uint32_t PrimaryOpenOpaqueVolumeInstanceMask() const
+    {
+        return primaryOpenOpaqueVolumeInstanceMask_;
+    }
+    std::uint32_t PrimaryOpenOpaqueTerminalMaterialMask() const
+    {
+        return primaryOpenOpaqueTerminalMaterialMask_;
+    }
+    std::uint32_t PrimaryClosedVolumeAbsorptionCount() const
+    {
+        return primaryClosedVolumeAbsorptionCount_;
     }
     bool GenericStaticAssetEnabled() const { return genericStaticAssetEnabled_; }
     const RtStaticMeshMeasurements& StaticMeshMeasurements() const { return staticMeshSlot_.Measurements(); }
@@ -336,7 +406,32 @@ private:
     std::uint32_t dielectricPrimaryUnclosedVolumeCount_ = 0u;
     std::uint32_t dielectricShadowUnclosedVolumeCount_ = 0u;
     std::uint32_t productionPaneStackFailureCount_ = 0u;
-    std::uint32_t productionPaneSecondaryRejectCount_ = 0u;
+    std::uint32_t productionPaneSecondaryOriginCount_ = 0u;
+    std::uint32_t productionPaneSecondaryTerminalCount_ = 0u;
+    std::uint32_t productionPaneSecondarySameMediumCount_ = 0u;
+    std::uint32_t productionPaneSecondaryDifferentMediumCount_ = 0u;
+    std::uint32_t secondaryNearSelfHitCount_ = 0u;
+    std::uint32_t primaryOpenMissCount_ = 0u;
+    std::uint32_t primaryOpenOpaqueCount_ = 0u;
+    std::uint32_t primaryMismatchedExitCount_ = 0u;
+    std::uint32_t primaryInterfaceBudgetCount_ = 0u;
+    std::uint32_t primaryVolumeBudgetCount_ = 0u;
+    std::uint32_t shadowOpenMissCount_ = 0u;
+    std::uint32_t shadowMismatchedExitCount_ = 0u;
+    std::uint32_t primaryTirCount_ = 0u;
+    std::uint32_t primaryInterfaceBudgetOpenVolumeCount_ = 0u;
+    std::uint32_t primaryInterfaceBudgetClosedVolumeCount_ = 0u;
+    std::uint32_t shadowMismatchEmptyCount_ = 0u;
+    std::uint32_t shadowImplicitOriginExitCount_ = 0u;
+    std::uint32_t secondaryDielectricTerminalCount_ = 0u;
+    std::uint32_t primaryTirTerminationCount_ = 0u;
+    std::uint32_t shadowFiniteEndpointVolumeCount_ = 0u;
+    std::uint32_t primaryOpenOpaqueSameInstanceDifferentMaterialCount_ = 0u;
+    std::uint32_t primaryOpenOpaqueAfterTirCount_ = 0u;
+    std::uint32_t primaryOpenOpaqueTerminalInstanceMask_ = 0u;
+    std::uint32_t primaryOpenOpaqueVolumeInstanceMask_ = 0u;
+    std::uint32_t primaryOpenOpaqueTerminalMaterialMask_ = 0u;
+    std::uint32_t primaryClosedVolumeAbsorptionCount_ = 0u;
     std::string developmentStaticAssetDirectory_;
     std::string staticTextureDirectory_;
     RtStaticMeshSlot staticMeshSlot_;
