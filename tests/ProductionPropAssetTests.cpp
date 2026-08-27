@@ -262,6 +262,12 @@ struct PaneTopology
 
 using Matrix = std::array<float, 16u>;
 
+struct TransformedBounds
+{
+    std::array<float, 3u> minimum{{INFINITY, INFINITY, INFINITY}};
+    std::array<float, 3u> maximum{{-INFINITY, -INFINITY, -INFINITY}};
+};
+
 Matrix Translation(float x, float y, float z)
 {
     return {{1.0f, 0.0f, 0.0f, 0.0f,
@@ -293,6 +299,43 @@ std::array<float, 3u> Origin(const Matrix& matrix)
     return {{matrix[12], matrix[13], matrix[14]}};
 }
 
+TransformedBounds TransformBounds(const StaticMeshAsset& asset, const Matrix& matrix)
+{
+    TransformedBounds result;
+    for (std::uint32_t corner = 0u; corner < 8u; ++corner)
+    {
+        const float x = (corner & 1u) != 0u
+            ? asset.bounds.maximum[0] : asset.bounds.minimum[0];
+        const float y = (corner & 2u) != 0u
+            ? asset.bounds.maximum[1] : asset.bounds.minimum[1];
+        const float z = (corner & 4u) != 0u
+            ? asset.bounds.maximum[2] : asset.bounds.minimum[2];
+        const std::array<float, 3u> point{{
+            matrix[0] * x + matrix[4] * y + matrix[8] * z + matrix[12],
+            matrix[1] * x + matrix[5] * y + matrix[9] * z + matrix[13],
+            matrix[2] * x + matrix[6] * y + matrix[10] * z + matrix[14]}};
+        for (std::size_t axis = 0u; axis < 3u; ++axis)
+        {
+            result.minimum[axis] = std::min(result.minimum[axis], point[axis]);
+            result.maximum[axis] = std::max(result.maximum[axis], point[axis]);
+        }
+    }
+    return result;
+}
+
+bool BoundsSeparatedBy(const TransformedBounds& left,
+                       const TransformedBounds& right,
+                       float clearance)
+{
+    for (std::size_t axis = 0u; axis < 3u; ++axis)
+    {
+        if (left.maximum[axis] + clearance <= right.minimum[axis] ||
+            right.maximum[axis] + clearance <= left.minimum[axis])
+            return true;
+    }
+    return false;
+}
+
 bool InLanternInspectionFrustum(const Matrix& matrix, float cameraX,
                                 float cameraZ, float yaw, float pitch)
 {
@@ -322,6 +365,29 @@ bool InLanternInspectionFrustum(const Matrix& matrix, float cameraX,
     const float projectedY = 1.22f * dot(up) / depth;
     return std::abs(projectedX) <= 16.0f / 9.0f &&
            std::abs(projectedY) <= 0.74f;
+}
+
+bool BoundsInLanternInspectionFrustum(const StaticMeshAsset& asset,
+                                      const Matrix& matrix,
+                                      float cameraX, float cameraZ,
+                                      float yaw, float pitch)
+{
+    for (std::uint32_t corner = 0u; corner < 8u; ++corner)
+    {
+        Matrix point = matrix;
+        const float x = (corner & 1u) != 0u
+            ? asset.bounds.maximum[0] : asset.bounds.minimum[0];
+        const float y = (corner & 2u) != 0u
+            ? asset.bounds.maximum[1] : asset.bounds.minimum[1];
+        const float z = (corner & 4u) != 0u
+            ? asset.bounds.maximum[2] : asset.bounds.minimum[2];
+        point[12] = matrix[0] * x + matrix[4] * y + matrix[8] * z + matrix[12];
+        point[13] = matrix[1] * x + matrix[5] * y + matrix[9] * z + matrix[13];
+        point[14] = matrix[2] * x + matrix[6] * y + matrix[10] * z + matrix[14];
+        if (!InLanternInspectionFrustum(point, cameraX, cameraZ, yaw, pitch))
+            return false;
+    }
+    return true;
 }
 
 bool BoundsNear(const StaticMeshAsset& asset,
@@ -498,8 +564,10 @@ int main()
     const LoadedAsset lanternBody = Load("reward-lantern-body", "reward-lantern-body-lod0.runtime.glb");
 
     Check(HasNode(chestBase.asset, "ChestBase") && HasNode(chestBase.asset, "Latch") &&
-              HasNode(chestBase.asset, "LanternSocket") && HasNode(chestBase.asset, "ChestLidHinge"),
-          "chest base exposes exact rigid nodes, lantern socket, and rear lid hinge anchor");
+              HasNode(chestBase.asset, "RewardLanternHingeSocket") &&
+              !HasNode(chestBase.asset, "LanternSocket") &&
+              HasNode(chestBase.asset, "ChestLidHinge"),
+          "chest base exposes an unambiguous reward hinge target and rear lid hinge anchor");
     Check(HasNode(chestLid.asset, "ChestLid"),
           "chest lid exposes its exact rigid node");
     Check(HasNode(lanternRing.asset, "GripRing") && HasNode(lanternRing.asset, "Hinge"),
@@ -509,7 +577,7 @@ int main()
               HasNode(lanternBody.asset, "Flame") && HasNode(lanternBody.asset, "Light") &&
               HasNode(lanternBody.asset, "FlameCore"),
           "lantern body exposes exact metal, closed glass, emitter sockets and local core");
-    const auto* chestSocket = Socket(chestBase.asset, "LanternSocket");
+    const auto* chestSocket = Socket(chestBase.asset, "RewardLanternHingeSocket");
     const auto* chestLidHinge = Socket(chestBase.asset, "ChestLidHinge");
     const auto* ringHinge = Socket(lanternRing.asset, "Hinge");
     const auto* flameSocket = Socket(lanternBody.asset, "Flame");
@@ -517,7 +585,7 @@ int main()
     const auto* lidNode = Node(chestLid.asset, "ChestLid");
     Check(chestSocket != nullptr && chestLidHinge != nullptr && ringHinge != nullptr && flameSocket != nullptr &&
               lightSocket != nullptr && lidNode != nullptr &&
-              MatrixNear(chestSocket->world, Translation(0.0f, 0.18f, 0.0f)) &&
+              MatrixNear(chestSocket->world, Translation(0.0f, 1.28f, 0.30f)) &&
               MatrixNear(chestLidHinge->world, Translation(0.0f, 0.34f, -0.286f)) &&
               MatrixNear(ringHinge->world, Translation(0.0f, -0.012f, 0.0f)) &&
               MatrixNear(flameSocket->world, Translation(0.0f, -0.545f, 0.0f)) &&
@@ -530,7 +598,7 @@ int main()
         const Matrix stage{{0.50f, 0.0f, -0.8660254f, 0.0f,
                             0.0f, 1.0f, 0.0f, 0.0f,
                             0.8660254f, 0.0f, 0.50f, 0.0f,
-                            -12.50f, 0.37f, -15.42f, 1.0f}};
+                            -12.50f, 0.0f, -15.42f, 1.0f}};
         const Matrix openAngle{{1.0f, 0.0f, 0.0f, 0.0f,
                                 0.0f, 0.3420201f, -0.9396926f, 0.0f,
                                 0.0f, 0.9396926f, 0.3420201f, 0.0f,
@@ -544,14 +612,18 @@ int main()
         inverseRingHinge[12] = -inverseRingHinge[12];
         inverseRingHinge[13] = -inverseRingHinge[13];
         inverseRingHinge[14] = -inverseRingHinge[14];
-        Check(Near(Origin(hinge)[1], 0.55f) && Near(Origin(lid)[1], 0.71f) &&
-                  InLanternInspectionFrustum(
-                      lid, -10.65f, -15.20f, -1.57079632679f, -0.22f),
-              "authored rear hinge and -70 degree local angle place the lid in checkpoint 114's exact raygen frustum");
-        constexpr std::array<float, 2u> scales{{0.90f, 1.05f}};
+        const Matrix chestLocalLid = Multiply(
+            Multiply(chestLidHinge->world, openAngle), lidNode->world);
+        const TransformedBounds chestWorldBounds = TransformBounds(chestBase.asset, stage);
+        const TransformedBounds lidLocalBounds = TransformBounds(chestLid.asset, chestLocalLid);
+        Check(Near(chestWorldBounds.minimum[1], 0.0f) &&
+                  Near(chestWorldBounds.maximum[1], 0.38f) &&
+                  Near(Origin(hinge)[1], 1.28f) && Near(Origin(lid)[1], 0.34f),
+              "checkpoint 114 places the complete chest on the floor and composes both authored hinges exactly");
+        constexpr std::array<float, 2u> scales{{0.90f, 0.90f}};
         constexpr std::array<std::array<float, 4u>, 2u> cameras{{
-            {{-10.65f, -15.20f, -1.57079632679f, -0.22f}},
-            {{-10.95f, -15.20f, -1.57079632679f, -0.16f}}}};
+            {{-10.65f, -15.20f, -1.57079632679f, 0.05f}},
+            {{-10.65f, -15.20f, -1.57079632679f, 0.05f}}}};
         for (std::size_t checkpoint = 0u; checkpoint < scales.size(); ++checkpoint)
         {
             const float value = scales[checkpoint];
@@ -564,25 +636,55 @@ int main()
             const Matrix glass = Multiply(body, Translation(0.0f, -0.25f, 0.0f));
             const Matrix flame = Multiply(body, flameSocket->world);
             const Matrix light = Multiply(body, lightSocket->world);
+            const Matrix bodyLocal = Multiply(chestSocket->world, scale);
+            const Matrix ringLocal = Multiply(
+                Multiply(chestSocket->world, inverseRingHinge), scale);
+            const TransformedBounds bodyLocalBounds =
+                TransformBounds(lanternBody.asset, bodyLocal);
+            const TransformedBounds ringLocalBounds =
+                TransformBounds(lanternRing.asset, ringLocal);
+            const TransformedBounds chestLocalBounds =
+                TransformBounds(chestBase.asset, Translation(0.0f, 0.0f, 0.0f));
             const auto& camera = cameras[checkpoint];
             const auto flameOrigin = Origin(flame);
             const auto lightOrigin = Origin(light);
-            Check(InLanternInspectionFrustum(ring, camera[0], camera[1], camera[2], camera[3]) &&
-                      InLanternInspectionFrustum(body, camera[0], camera[1], camera[2], camera[3]) &&
+            std::cout << "checkpoint " << (114u + checkpoint)
+                      << " flame origin=" << flameOrigin[0] << ',' << flameOrigin[1]
+                      << ',' << flameOrigin[2] << " light origin=" << lightOrigin[0]
+                      << ',' << lightOrigin[1] << ',' << lightOrigin[2] << '\n';
+            Check(BoundsInLanternInspectionFrustum(
+                      lanternRing.asset, ring, camera[0], camera[1], camera[2], camera[3]) &&
+                      BoundsInLanternInspectionFrustum(
+                          lanternBody.asset, body, camera[0], camera[1], camera[2], camera[3]) &&
                       InLanternInspectionFrustum(glass, camera[0], camera[1], camera[2], camera[3]) &&
                       InLanternInspectionFrustum(flame, camera[0], camera[1], camera[2], camera[3]) &&
-                      InLanternInspectionFrustum(light, camera[0], camera[1], camera[2], camera[3]),
+                      InLanternInspectionFrustum(light, camera[0], camera[1], camera[2], camera[3]) &&
+                      (checkpoint != 0u ||
+                       (BoundsInLanternInspectionFrustum(
+                            chestBase.asset, stage, camera[0], camera[1], camera[2], camera[3]) &&
+                        BoundsInLanternInspectionFrustum(
+                            chestLid.asset, lid, camera[0], camera[1], camera[2], camera[3]))),
                   checkpoint == 0u
-                      ? "ring, body, glass, flame, and light origins lie inside checkpoint 114's exact raygen frustum"
-                      : "ring, body, glass, flame, and light origins lie inside checkpoint 115's exact raygen frustum");
-            Check(Near(flameOrigin[0], -12.50f) && Near(flameOrigin[2], -15.42f) &&
-                      Near(lightOrigin[0], -12.50f) && Near(lightOrigin[2], -15.42f) &&
-                      Near(flameOrigin[1], 0.55f - 0.545f * value) &&
-                      Near(lightOrigin[1], 0.55f - 0.515f * value) &&
+                      ? "full chest, lid, ring, and body bounds fit checkpoint 114's exact raygen frustum"
+                      : "full ring and body bounds fit checkpoint 115's exact raygen frustum");
+            Check(Near(flameOrigin[0], -12.2401924f) && Near(flameOrigin[2], -15.27f) &&
+                      Near(lightOrigin[0], -12.2401924f) && Near(lightOrigin[2], -15.27f) &&
+                      Near(flameOrigin[1], 1.28f - 0.545f * value) &&
+                      Near(lightOrigin[1], 1.28f - 0.515f * value) &&
                       Near(lightOrigin[1] - flameOrigin[1], 0.030f * value),
                   checkpoint == 0u
                       ? "checkpoint 114 flame and light origins exactly compose at 0.90 scale"
                       : "checkpoint 115 flame and light origins exactly compose at 1.05 scale");
+            Check(BoundsSeparatedBy(bodyLocalBounds, chestLocalBounds, 0.002f) &&
+                      BoundsSeparatedBy(ringLocalBounds, chestLocalBounds, 0.002f) &&
+                      BoundsSeparatedBy(bodyLocalBounds, lidLocalBounds, 0.025f) &&
+                      BoundsSeparatedBy(ringLocalBounds, lidLocalBounds, 0.025f) &&
+                      bodyLocalBounds.minimum[1] >= chestLocalBounds.maximum[1] + 0.002f &&
+                      bodyLocalBounds.minimum[1] <= chestLocalBounds.maximum[1] + 0.035f &&
+                      bodyLocalBounds.minimum[2] >= lidLocalBounds.maximum[2] + 0.15f,
+                  checkpoint == 0u
+                      ? "checkpoint 114 full transformed bounds reveal the lantern immediately above the floor-contact chest with open-lid clearance"
+                      : "checkpoint 115 reuses the exact nonintersecting Task 8 reward reveal transform");
         }
     }
 

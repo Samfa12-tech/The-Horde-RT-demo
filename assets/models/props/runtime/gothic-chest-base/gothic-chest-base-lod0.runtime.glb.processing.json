@@ -13,8 +13,8 @@
     "ChestBase",
     "ChestBaseIron",
     "ChestLidHinge",
-    "LanternSocket",
-    "Latch"
+    "Latch",
+    "RewardLanternHingeSocket"
   ],
   "axes": {
     "up": "+Y",

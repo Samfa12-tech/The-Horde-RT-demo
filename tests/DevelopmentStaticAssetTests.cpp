@@ -110,12 +110,15 @@ int main()
         FindDevelopmentCheckpoint("lantern-glass-production");
     Check(chestUnlock != nullptr && chestUnlock->id == 114 &&
               chestUnlock->usesProductionRewardProps &&
-              !chestUnlock->productionLanternGlassOnly,
-          "production chest unlock has a stable mutually exclusive reward-prop route");
+              !chestUnlock->productionLanternGlassOnly &&
+              chestUnlock->pitch == 0.05f,
+          "production chest unlock has a stable mutually exclusive floor-valid reveal framing");
     Check(productionGlass != nullptr && productionGlass->id == 115 &&
               productionGlass->usesProductionRewardProps &&
-              productionGlass->productionLanternGlassOnly,
-          "production lantern glass has a stable close inspection route");
+              productionGlass->productionLanternGlassOnly &&
+              productionGlass->cameraX == -10.65f &&
+              productionGlass->pitch == 0.05f,
+          "production lantern glass has a stable full-bounds close inspection route");
     horde::gameplay::simulation::GameSimulation stagedDownward;
     horde::gameplay::simulation::GameSimulation stagedUpward;
     DevelopmentCheckpointStageEvidence downwardEvidence{};

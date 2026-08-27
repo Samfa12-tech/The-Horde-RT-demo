@@ -4052,7 +4052,9 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     if (productionPropsVisible)
     {
         const bool glassOnly = clampedTuning.productionLanternGlassOnly;
-        const float lanternScale = glassOnly ? 1.05f : 0.90f;
+        // Inspection and reveal share the exact Task 8 authored composition;
+        // glass-only mode changes visibility, never the rigid prop transform.
+        const float lanternScale = 0.90f;
         // Checkpoint staging is deliberately separate from the asset contract:
         // this rigid world matrix chooses the inspection location, while every
         // prop pivot/socket below is read from the loaded GLBs.
@@ -4060,9 +4062,9 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             0.50f, 0.0f, -0.8660254f, 0.0f,
             0.0f, 1.0f, 0.0f, 0.0f,
             0.8660254f, 0.0f, 0.50f, 0.0f,
-            -12.50f, 0.37f, -15.42f, 1.0f}};
+            -12.50f, 0.0f, -15.42f, 1.0f}};
         const auto* lanternSocket = horde::gameplay::items::FindHeldItemSocket(
-            gothicChestBaseAsset_.sockets, "LanternSocket");
+            gothicChestBaseAsset_.sockets, "RewardLanternHingeSocket");
         const auto* ringHinge = horde::gameplay::items::FindHeldItemSocket(
             rewardLanternRingAsset_.sockets, "Hinge");
         const auto* flameSocket = horde::gameplay::items::FindHeldItemSocket(

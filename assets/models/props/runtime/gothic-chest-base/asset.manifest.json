@@ -11,7 +11,7 @@
     "maxTextureLayersPerKind": 2
   },
   "lods": [{ "name": "lod0", "maxTriangles": 2500 }],
-  "requiredSockets": ["ChestBase", "Latch", "LanternSocket", "ChestLidHinge"],
+  "requiredSockets": ["ChestBase", "Latch", "RewardLanternHingeSocket", "ChestLidHinge"],
   "runtimeTextureProfile": {
     "android": "astc",
     "windows": "rgba8",

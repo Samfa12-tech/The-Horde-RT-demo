@@ -401,9 +401,14 @@ def build_chest_base():
               major_segments=20, minor_segments=6, rotation=(math.pi / 2.0, 0.0, 0.0)),
     ]
     latch = join(latch_parts, "Latch", iron)
-    socket = bpy.data.objects.new("LanternSocket", None)
+    # The reward body is authored downward from its hinge. This target belongs
+    # above and slightly forward of the open chest, not inside the chest base.
+    # Task 8 reuses the same semantically named hinge target for reveal/claim.
+    socket = bpy.data.objects.new("RewardLanternHingeSocket", None)
     socket.empty_display_type = "PLAIN_AXES"
-    socket.location = (0.0, 0.0, 0.18)
+    # Blender +Z becomes glTF +Y and Blender +Y becomes glTF -Z.
+    # Exported glTF translation: (0.0, +1.28, +0.30) metres.
+    socket.location = (0.0, -0.30, 1.28)
     bpy.context.scene.collection.objects.link(socket)
     # This is an authored chest-base anchor, not a renderer staging offset.
     # The lid source's local origin is the rear hinge, so the runtime only
