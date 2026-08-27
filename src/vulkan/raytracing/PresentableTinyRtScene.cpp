@@ -377,6 +377,10 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
         std::exchange(other.dielectricPrimaryUnclosedVolumeCount_, 0u);
     dielectricShadowUnclosedVolumeCount_ =
         std::exchange(other.dielectricShadowUnclosedVolumeCount_, 0u);
+    productionPaneStackFailureCount_ =
+        std::exchange(other.productionPaneStackFailureCount_, 0u);
+    productionPaneSecondaryRejectCount_ =
+        std::exchange(other.productionPaneSecondaryRejectCount_, 0u);
     developmentStaticAssetDirectory_ = std::move(other.developmentStaticAssetDirectory_);
     staticTextureDirectory_ = std::move(other.staticTextureDirectory_);
     staticMeshSlot_ = std::move(other.staticMeshSlot_);
@@ -599,6 +603,8 @@ void PresentableTinyRtScene::Destroy()
     dielectricUnclosedVolumeCount_ = 0u;
     dielectricPrimaryUnclosedVolumeCount_ = 0u;
     dielectricShadowUnclosedVolumeCount_ = 0u;
+    productionPaneStackFailureCount_ = 0u;
+    productionPaneSecondaryRejectCount_ = 0u;
     developmentStaticAssetDirectory_.clear();
     staticTextureDirectory_.clear();
     staticMeshSlot_ = {};
@@ -3871,6 +3877,20 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             renderTransform[4], renderTransform[5], renderTransform[6], renderTransform[7],
             renderTransform[8], renderTransform[9], renderTransform[10], renderTransform[11]}};
     };
+    const auto heldTransformToInstanceTransform = [](
+        const horde::gameplay::items::HeldItemTransform& transform) {
+        return VkTransformMatrixKHR{{
+            transform[0], transform[4], transform[8], transform[12],
+            transform[1], transform[5], transform[9], transform[13],
+            transform[2], transform[6], transform[10], transform[14]}};
+    };
+    const auto uniformScale = [](float scale) {
+        auto result = horde::gameplay::items::IdentityHeldItemTransform();
+        result[0] = scale;
+        result[5] = scale;
+        result[10] = scale;
+        return result;
+    };
 
     std::array<VkAccelerationStructureInstanceKHR, PresentableTinyRtScene::kTlasInstanceCount> instances{};
     instances[0].transform = {{
@@ -3960,43 +3980,84 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const Vec3 headTop = add(add(animatedBodyOrigin, Vec3{0.0f, 0.15f, 0.0f}), scaled(animatedBodyForward, 0.20f));
     instances[16].transform = segmentTransform(headBase, headTop, 0.145f);
     instances[16].mask = playerRouteMasks.instanceMasks[16];
+    horde::gameplay::items::HeldItemTransform productionLanternWorldFromFlame =
+        horde::gameplay::items::IdentityHeldItemTransform();
+    horde::gameplay::items::HeldItemTransform productionLanternWorldFromLight =
+        horde::gameplay::items::IdentityHeldItemTransform();
     if (productionPropsVisible)
     {
         const bool glassOnly = clampedTuning.productionLanternGlassOnly;
         const float lanternScale = glassOnly ? 1.05f : 0.90f;
-        const float lanternX = -12.50f;
-        const float lanternY = glassOnly ? 0.55f : 0.46f;
-        const float lanternZ = glassOnly ? -15.20f : -14.72f;
+        // Checkpoint staging is deliberately separate from the asset contract:
+        // this rigid world matrix chooses the inspection location, while every
+        // prop pivot/socket below is read from the loaded GLBs.
+        const horde::gameplay::items::HeldItemTransform stageWorldFromChestBase{{
+            0.50f, 0.0f, -0.8660254f, 0.0f,
+            0.0f, 1.0f, 0.0f, 0.0f,
+            0.8660254f, 0.0f, 0.50f, 0.0f,
+            -12.50f, -0.95f, -15.42f, 1.0f}};
+        const auto* lanternSocket = horde::gameplay::items::FindHeldItemSocket(
+            gothicChestBaseAsset_.sockets, "LanternSocket");
+        const auto* ringHinge = horde::gameplay::items::FindHeldItemSocket(
+            rewardLanternRingAsset_.sockets, "Hinge");
+        const auto* flameSocket = horde::gameplay::items::FindHeldItemSocket(
+            rewardLanternBodyAsset_.sockets, "Flame");
+        const auto* lightSocket = horde::gameplay::items::FindHeldItemSocket(
+            rewardLanternBodyAsset_.sockets, "Light");
+        const auto* chestLid = horde::gameplay::items::FindHeldItemSocket(
+            gothicChestLidAsset_.sockets, "ChestLid");
+        if (lanternSocket == nullptr || ringHinge == nullptr || flameSocket == nullptr ||
+            lightSocket == nullptr || chestLid == nullptr)
+        {
+            diagnostic = "Production reward prop is missing a validated authored pivot/socket.";
+            return false;
+        }
+        const auto worldFromLanternHinge = horde::gameplay::items::MultiplyHeldItemTransforms(
+            stageWorldFromChestBase, lanternSocket->world);
+        horde::gameplay::items::HeldItemTransform worldFromRing{};
+        if (!horde::gameplay::items::ComposeWorldFromItem(
+                worldFromLanternHinge, ringHinge->world, worldFromRing, diagnostic))
+            return false;
+        worldFromRing = horde::gameplay::items::MultiplyHeldItemTransforms(
+            worldFromRing, uniformScale(lanternScale));
+        const auto worldFromLanternBody = horde::gameplay::items::MultiplyHeldItemTransforms(
+            worldFromLanternHinge, uniformScale(lanternScale));
+        productionLanternWorldFromFlame =
+            horde::gameplay::items::MultiplyHeldItemTransforms(worldFromLanternBody,
+                                                                flameSocket->world);
+        productionLanternWorldFromLight =
+            horde::gameplay::items::MultiplyHeldItemTransforms(worldFromLanternBody,
+                                                                lightSocket->world);
+
         instances[5] = instances[0];
         instances[5].instanceCustomIndex = 5u;
         instances[5].mask = glassOnly ? 0u : 0x01u;
         instances[5].accelerationStructureReference = gothicChestBaseBlas_.address;
-        instances[5].transform = {{
-            0.50f, 0.0f, 0.8660254f, -12.50f,
-            0.0f, 1.0f, 0.0f, -0.95f,
-            -0.8660254f, 0.0f, 0.50f, -15.42f}};
+        instances[5].transform = heldTransformToInstanceTransform(stageWorldFromChestBase);
         instances[6] = instances[0];
         instances[6].instanceCustomIndex = 6u;
         instances[6].mask = glassOnly ? 0u : 0x01u;
         instances[6].accelerationStructureReference = gothicChestLidBlas_.address;
-        // The lid is a rigid node rooted on its rear hinge. This matrix is a
-        // -70 degree local hinge rotation composed with the chest's +90
-        // degree world-Y orientation; no skinning or vertex deformation.
-        instances[6].transform = {{
-            0.50f, -0.8137977f, 0.2961981f, -12.748f,
-            0.0f, 0.3420201f, 0.9396926f, -0.61f,
-            -0.8660254f, -0.4698463f, 0.1710101f, -15.563f}};
+        // The authored ChestLid root is its rear hinge. This is the staged
+        // -70 degree local open pose, composed once from that pivot.
+        const horde::gameplay::items::HeldItemTransform rearHingeOpen{{
+            1.0f, 0.0f, 0.0f, 0.0f,
+            0.0f, 0.3420201f, -0.9396926f, 0.0f,
+            0.0f, 0.9396926f, 0.3420201f, 0.0f,
+            0.0f, 0.34f, -0.286f, 1.0f}};
+        const auto worldFromChestLid = horde::gameplay::items::MultiplyHeldItemTransforms(
+            horde::gameplay::items::MultiplyHeldItemTransforms(
+                stageWorldFromChestBase, rearHingeOpen), chestLid->world);
+        instances[6].transform = heldTransformToInstanceTransform(worldFromChestLid);
         instances[7] = instances[0];
         instances[7].instanceCustomIndex = 7u;
         instances[7].mask = 0x01u;
         instances[7].accelerationStructureReference = rewardLanternRingBlas_.address;
-        instances[7].transform = {{
-            0.0f, 0.0f, lanternScale, lanternX,
-            0.0f, lanternScale, 0.0f, lanternY,
-            -lanternScale, 0.0f, 0.0f, lanternZ}};
+        instances[7].transform = heldTransformToInstanceTransform(worldFromRing);
         instances[8] = instances[7];
         instances[8].instanceCustomIndex = 8u;
         instances[8].accelerationStructureReference = rewardLanternBodyBlas_.address;
+        instances[8].transform = heldTransformToInstanceTransform(worldFromLanternBody);
     }
     else if (glassFixtureVisible)
     {
@@ -4033,12 +4094,10 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         frame.heldLight.active ? frame.torchLightStrength : 0.0f}};
     if (productionPropsVisible)
     {
-        const float lanternScale = clampedTuning.productionLanternGlassOnly ? 1.05f : 0.90f;
         heldLightGpu.positionStrength = {{
-            -12.50f,
-            (clampedTuning.productionLanternGlassOnly ? 0.55f : 0.46f) -
-                0.515f * lanternScale,
-            clampedTuning.productionLanternGlassOnly ? -15.20f : -14.72f,
+            productionLanternWorldFromLight[12],
+            productionLanternWorldFromLight[13],
+            productionLanternWorldFromLight[14],
             1.8f}};
     }
     FireEmitterUpload fireEmitterUpload;
@@ -4076,15 +4135,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         lanternEmitter.parentObject =
             horde::gameplay::effects::FireEmitterParentObject::RewardLantern;
         lanternEmitter.zone = frame.zone;
-        const float lanternScale = clampedTuning.productionLanternGlassOnly ? 1.05f : 0.90f;
-        const float lanternX = -12.50f;
-        const float lanternY = clampedTuning.productionLanternGlassOnly ? 0.55f : 0.46f;
-        const float lanternZ = clampedTuning.productionLanternGlassOnly ? -15.20f : -14.72f;
-        lanternEmitter.worldFromFlame[12] = lanternX;
-        lanternEmitter.worldFromFlame[13] = lanternY - 0.545f * lanternScale;
-        lanternEmitter.worldFromFlame[14] = lanternZ;
-        lanternEmitter.worldFromLight = lanternEmitter.worldFromFlame;
-        lanternEmitter.worldFromLight[13] = lanternY - 0.515f * lanternScale;
+        lanternEmitter.worldFromFlame = productionLanternWorldFromFlame;
+        lanternEmitter.worldFromLight = productionLanternWorldFromLight;
         const std::size_t lanternEmitterIndex = std::min<std::size_t>(
             fireEmitterUpload.activeCount, kRtActiveFireEmitterCapacity - 1u);
         fireEmitterUpload.emitters[lanternEmitterIndex] = PackFireEmitterGpu(
@@ -4108,6 +4160,10 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         previousDielectricDiagnostics.primaryUnclosedVolumeCount;
     dielectricShadowUnclosedVolumeCount_ =
         previousDielectricDiagnostics.shadowUnclosedVolumeCount;
+    productionPaneStackFailureCount_ =
+        previousDielectricDiagnostics.productionPaneStackFailureCount;
+    productionPaneSecondaryRejectCount_ =
+        previousDielectricDiagnostics.productionPaneSecondaryRejectCount;
     const RtDielectricDiagnostics clearedDielectricDiagnostics{};
     auto frameInstanceMetadata = staticMeshSlot_.InstanceMetadata();
     if (effectivePlayerRenderRoute == PlayerRenderRoute::Procedural)

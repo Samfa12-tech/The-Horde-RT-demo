@@ -32,6 +32,8 @@ void CheckSplitDielectricDiagnosticLayout()
     if constexpr (requires(T value) {
                       value.primaryUnclosedVolumeCount;
                       value.shadowUnclosedVolumeCount;
+                      value.productionPaneStackFailureCount;
+                      value.productionPaneSecondaryRejectCount;
                   })
     {
         Check(sizeof(T) == 32u && alignof(T) == 16u &&
@@ -40,8 +42,10 @@ void CheckSplitDielectricDiagnosticLayout()
                   offsetof(T, secondaryDielectricRejectCount) == 8u &&
                   offsetof(T, unclosedVolumeCount) == 12u &&
                   offsetof(T, primaryUnclosedVolumeCount) == 16u &&
-                  offsetof(T, shadowUnclosedVolumeCount) == 20u,
-              "dielectric diagnostics append route-split unclosed counts without moving the released four counters");
+                  offsetof(T, shadowUnclosedVolumeCount) == 20u &&
+                  offsetof(T, productionPaneStackFailureCount) == 24u &&
+                  offsetof(T, productionPaneSecondaryRejectCount) == 28u,
+              "dielectric diagnostics retain released layout while attributing production pane stack/reject routes");
     }
     else
     {

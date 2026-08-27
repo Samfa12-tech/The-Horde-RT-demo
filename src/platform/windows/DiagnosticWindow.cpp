@@ -3809,7 +3809,11 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
              << ", \"primaryUnclosedVolumeCount\": "
              << context.rtScene.DielectricPrimaryUnclosedVolumeCount()
              << ", \"shadowUnclosedVolumeCount\": "
-             << context.rtScene.DielectricShadowUnclosedVolumeCount() << "},\n"
+             << context.rtScene.DielectricShadowUnclosedVolumeCount()
+             << ", \"productionPaneStackFailureCount\": "
+             << context.rtScene.ProductionPaneStackFailureCount()
+             << ", \"productionPaneSecondaryRejectCount\": "
+             << context.rtScene.ProductionPaneSecondaryRejectCount() << "},\n"
              << "  \"error\": " << (error.empty() ? "null" : "\"" + JsonEscape(error) + "\"") << ",\n"
              << "  \"captures\": [\n";
     for (std::size_t index = 0; index < captures.size(); ++index)

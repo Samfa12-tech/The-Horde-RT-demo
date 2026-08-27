@@ -192,6 +192,8 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
             {
                 atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);
                 atomicAdd(rtDielectricDiagnostics.value.shadowUnclosedVolumeCount, 1u);
+                if (volumeInstances[volumeDepth - 1] == 8u)
+                    atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
                 transmittance *= vec3(0.08);
             }
             return clamp(transmittance, vec3(0.0), vec3(1.0));
@@ -206,6 +208,8 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
             {
                 atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);
                 atomicAdd(rtDielectricDiagnostics.value.shadowUnclosedVolumeCount, 1u);
+                if (volumeInstances[volumeDepth - 1] == 8u)
+                    atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
                 transmittance *= vec3(0.08);
             }
             return clamp(transmittance, vec3(0.0), vec3(1.0));
@@ -215,6 +219,9 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
         if (interfaceCount >= interfaceBudget)
         {
             atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);
+            if (nearest.instance == 8u ||
+                (volumeDepth > 0 && volumeInstances[volumeDepth - 1] == 8u))
+                atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
             return clamp(transmittance * vec3(0.08), vec3(0.0), vec3(1.0));
         }
         ++interfaceCount;
@@ -229,6 +236,8 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
             if (volumeDepth >= volumeBudget)
             {
                 atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);
+                if (nearest.instance == 8u)
+                    atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
                 return clamp(transmittance * vec3(0.08), vec3(0.0), vec3(1.0));
             }
             volumeInstances[volumeDepth] = nearest.instance;
@@ -247,6 +256,9 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
             {
                 atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);
                 atomicAdd(rtDielectricDiagnostics.value.shadowUnclosedVolumeCount, 1u);
+                if (nearest.instance == 8u ||
+                    (volumeDepth > 0 && volumeInstances[volumeDepth - 1] == 8u))
+                    atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
                 return clamp(transmittance * vec3(0.08), vec3(0.0), vec3(1.0));
             }
             --volumeDepth;
@@ -264,6 +276,8 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
         remainingDistance = max(maxDistance - travelledDistance, 0.0);
     }
     atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);
+    if (volumeDepth > 0 && volumeInstances[volumeDepth - 1] == 8u)
+        atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
     return clamp(transmittance * vec3(0.08), vec3(0.0), vec3(1.0));
 }
 

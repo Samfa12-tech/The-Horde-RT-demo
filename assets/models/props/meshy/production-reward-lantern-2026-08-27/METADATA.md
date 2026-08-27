@@ -2,9 +2,9 @@
 
 ## Art authority and generation lineage
 
-- Binding reference: `references/lantern_icon_reference.png` from the approved
-  owner package, SHA-256
-  `bc4b237247982a0a1953c403459dc42f8ec579f7b093ec150e78d42ae07639dc`.
+- The owner-package icon reference is not present in this repository and is
+  not claimed as a distributable file. Its former SHA-256 is retained only as
+  an unverified owner-package locator in the tracked Task 7 review record.
   The surrounding architectural arch was explicitly excluded from the prop.
 - Rejected preview candidate 1: `01a03f69-327a-7c6d-ac8d-ccdbb9fe13d7`,
   Meshy 7 Ultra, 25 credits.
@@ -16,8 +16,8 @@
   target 9,000 triangles, bottom origin, 5 credits.
 - Generation date: 2026-08-27 (Australia/Sydney).
 
-Exact prompts/settings are retained as JSON in
-`.superpowers/sdd/2026-08-26-fire-pbr-reward-lantern-player-upgrade/evidence/task-7/meshy/`.
+Sanitized exact settings/task IDs and the accepted/rejected review record are
+tracked in `assets/models/props/provenance/task-7/`.
 They require an isolated compact blackened six-sided Gothic cage with a small
 free ring, obvious hinge, steep pointed canopy, pointed lower finial, empty
 pointed ogee/quatrefoil windows, and no modern camping form, pane fill, outer

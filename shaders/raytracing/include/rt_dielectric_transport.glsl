@@ -57,10 +57,14 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
         false, false);
     reflectedHit.t += firstHit.t;
     vec3 reflected;
-    if (isGenericDielectric(reflectedHit) ||
+    if ((isGenericDielectric(reflectedHit) &&
+         (reflectedHit.instance != firstHit.instance ||
+          reflectedHit.material != firstHit.material)) ||
         (reflectedHit.hit && reflectedHit.material == kMaterialWater))
     {
         atomicAdd(rtDielectricDiagnostics.value.secondaryDielectricRejectCount, 1u);
+        if (reflectedHit.instance == 8u)
+            atomicAdd(rtDielectricDiagnostics.value.productionPaneSecondaryRejectCount, 1u);
         reflected = skyColor(reflectionDirection) * 0.18 +
             (reflectedHit.hit ? reflectedHit.base * 0.12 : vec3(0.0));
     }
@@ -76,6 +80,7 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     reflected = reflected * reflectedFire.a + reflectedFire.rgb;
 
     uint volumeMaterials[kHighDielectricVolumes];
+    uint volumeInstances[kHighDielectricVolumes];
     float volumeIors[kHighDielectricVolumes];
     vec4 volumeAttenuation[kHighDielectricVolumes];
     int volumeDepth = 0;
@@ -86,6 +91,7 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     vec3 transmitted = vec3(0.0);
     bool terminalResolved = false;
     bool overflowed = false;
+    bool touchedProductionPane = false;
 
     for (int interfaceIndex = 0; interfaceIndex <= kHighDielectricInterfaces;
          ++interfaceIndex)
@@ -103,6 +109,8 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
             {
                 atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);
                 atomicAdd(rtDielectricDiagnostics.value.primaryUnclosedVolumeCount, 1u);
+                if (touchedProductionPane)
+                    atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
                 transmitted = dielectricOverflowFallback(
                     transmissionDirection, throughput);
             }
@@ -122,6 +130,7 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
         }
 
         bool thinWall = (currentHit.materialFlags & kRtMaterialFlagThinWall) != 0u;
+        touchedProductionPane = touchedProductionPane || currentHit.instance == 8u;
         vec3 outwardNormal = normalize(currentHit.geometricNormal);
         bool entering = dot(transmissionDirection, outwardNormal) < 0.0;
         vec3 orientedNormal = entering ? outwardNormal : -outwardNormal;
@@ -155,6 +164,7 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
                         break;
                     }
                     volumeMaterials[volumeDepth] = uint(currentHit.material);
+                    volumeInstances[volumeDepth] = currentHit.instance;
                     volumeIors[volumeDepth] = currentHit.ior;
                     volumeAttenuation[volumeDepth] = vec4(
                         currentHit.attenuationColor,
@@ -164,7 +174,8 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
                 else
                 {
                     if (volumeDepth <= 0 ||
-                        volumeMaterials[volumeDepth - 1] != uint(currentHit.material))
+                        volumeMaterials[volumeDepth - 1] != uint(currentHit.material) ||
+                        volumeInstances[volumeDepth - 1] != currentHit.instance)
                     {
                         overflowed = true;
                         break;
@@ -172,9 +183,13 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
                     --volumeDepth;
                 }
             }
-            transmissionDirection = roughDielectricDirection(
-                idealTransmission, -orientedNormal,
-                currentHit.position, currentHit.roughness);
+            // A closed volume must leave through its paired interface. A
+            // stochastic rough refraction direction on a seven-millimetre
+            // pane can jump to its metal cage or a neighbouring pane before
+            // the exit, leaving Mobile's four-interface medium stack open.
+            // Keep thick-volume transport geometric; roughness remains in
+            // the reflected lobe above.
+            transmissionDirection = normalize(idealTransmission);
             throughput *= clamp(currentHit.transmission, 0.0, 1.0) *
                 (1.0 - fresnel);
         }
@@ -197,6 +212,8 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     {
         overflowed = true;
         atomicAdd(rtDielectricDiagnostics.value.transportOverflowCount, 1u);
+        if (touchedProductionPane)
+            atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
         transmitted = dielectricOverflowFallback(transmissionDirection, throughput);
     }
     // Roughness changes the same bounded reflection/transmission response; it

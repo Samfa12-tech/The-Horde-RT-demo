@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "sanitized": true,
+  "date": "2026-08-27",
+  "credentialOrSignedUrlIncluded": false,
+  "chest": {
+    "previewTask": "01a03f69-2b15-7c6b-b17f-de4741cdafba",
+    "preview": {"model": "meshy-7-ultra", "topology": "triangle", "remesh": false, "format": "glb", "credits": 25},
+    "refineTask": "01a03f6c-ba91-7f43-a42a-10d2f09f9f09",
+    "refine": {"model": "meshy-7-pbr", "resolution": "2k", "removeLighting": true, "credits": 10},
+    "remeshTask": "01a03f74-72ac-7e62-8b58-cd906ddc758a",
+    "remesh": {"topology": "triangle", "targetTriangles": 7000, "bottomOrigin": true, "credits": 5},
+    "previewPrompt": "Isolated medieval Gothic reward chest for a dark stone crypt, sized to hold one ornate hand lantern. Heavy dark oak body, blackened iron bands, pointed-arch and quatrefoil motifs, believable rear hinges, clearly separate lid and base, separate latch, clean compact rectangular footprint, empty interior and clear central lantern socket space. Object only. No lantern, floor, coins, weapons, chains, flame, glow, magical particles, text, logo or background. Rigid game prop, closed geometry, restrained crisp detail.",
+    "refineTexturePrompt": "Neutral PBR medieval chest: dark aged oak with visible grain and worn edges, blackened forged iron straps and hinges with realistic metallic and roughness variation, slight dust and damp age. No baked torchlight, no directional shadow, no emissive markings, no bright gold, no blood, no text or logo."
+  },
+  "lantern": {
+    "rejectedPreviewTask": "01a03f69-327a-7c6d-ac8d-ccdbb9fe13d7",
+    "acceptedPreviewTask": "01a03f6b-e99a-7ee2-9738-d6d236f89c2b",
+    "preview": {"model": "meshy-7-ultra", "topology": "triangle", "remesh": false, "format": "glb", "creditsEach": 25},
+    "refineTask": "01a03f70-0499-7047-976b-daef45aa7684",
+    "refine": {"model": "meshy-7-pbr", "resolution": "2k", "removeLighting": true, "credits": 10},
+    "remeshTask": "01a03f74-7501-7164-8113-53ba917fc66d",
+    "remesh": {"topology": "triangle", "targetTriangles": 9000, "bottomOrigin": true, "credits": 5},
+    "previewPrompt": "Isolated compact six-sided Gothic hanging lantern metal cage, icon-faithful cathedral silhouette. Small free circular grip ring, obvious narrow hinge under it, steep pointed canopy, six tall EMPTY open window apertures framed by crisp pointed ogee arches and bold quatrefoil tracery, narrow forged ribs, pointed inverted lower canopy and long central finial. Black metal frame geometry only. No solid wall panels, no opaque panes, no glass fill, no scrollwork, no modern camping form, no outer architectural arch, bracket, chain, hand, stand, floor, flame, glow, beams, background, text or logo. Clean separated ring, hinge and lantern body, symmetrical closed metal geometry, readable from several metres.",
+    "refineTexturePrompt": "Physically based aged Gothic lantern under neutral lighting: blackened forged iron with subtle cool steel edges, restrained scratches, soot near vents, tiny warm bronze wear only at hinge edges and varied roughness. No glass fill, opaque orange, flame, magical runes, light beams, glow texture, painted highlights, baked directional shadows, words or logos."
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "source": "rt-storage-image",
+  "device": "NVIDIA GeForce RTX 5050 Laptop GPU",
+  "raygenSha256": "015d43605af450728c3d16e24feabfc04ad0cbba83cca0122f0d5fc680694d14",
+  "productionPaneDiagnostics": {
+    "transportOverflowCount": 0,
+    "shadowOverflowCount": 0,
+    "secondaryDielectricRejectCount": 0,
+    "unclosedVolumeCount": 0,
+    "primaryUnclosedVolumeCount": 0,
+    "shadowUnclosedVolumeCount": 0,
+    "productionPaneStackFailureCount": 0,
+    "productionPaneSecondaryRejectCount": 0
+  },
+  "captures": [
+    {"checkpoint": "lantern-chest-unlock", "id": 114, "presented": true, "pngSha256": "5d5cab0651b8f57fec88a738a9e8771aed5b384be009099926c4d3179a911151", "manifest": "reports/task-7-fix-round-1/windows-lantern-chest-unlock/capture-manifest.json"},
+    {"checkpoint": "lantern-glass-production", "id": 115, "presented": true, "pngSha256": "c5511bb0b31e4c412490057488da14cd5fcc74b79f8dcbe58b8cc0f153354a08", "manifest": "reports/task-7-fix-round-1/windows-lantern-glass-production/capture-manifest.json"}
+  ]
+}

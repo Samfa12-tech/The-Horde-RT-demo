@@ -81,8 +81,8 @@
         { "name": "unclosedVolumeCount", "type": "uint", "offset": 12 },
         { "name": "primaryUnclosedVolumeCount", "type": "uint", "offset": 16 },
         { "name": "shadowUnclosedVolumeCount", "type": "uint", "offset": 20 },
-        { "name": "reserved0", "type": "uint", "offset": 24 },
-        { "name": "reserved1", "type": "uint", "offset": 28 }
+        { "name": "productionPaneStackFailureCount", "type": "uint", "offset": 24 },
+        { "name": "productionPaneSecondaryRejectCount", "type": "uint", "offset": 28 }
       ]
     },
     {

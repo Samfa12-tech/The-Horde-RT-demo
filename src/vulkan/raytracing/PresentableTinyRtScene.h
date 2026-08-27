@@ -154,6 +154,14 @@ public:
     {
         return dielectricShadowUnclosedVolumeCount_;
     }
+    std::uint32_t ProductionPaneStackFailureCount() const
+    {
+        return productionPaneStackFailureCount_;
+    }
+    std::uint32_t ProductionPaneSecondaryRejectCount() const
+    {
+        return productionPaneSecondaryRejectCount_;
+    }
     bool GenericStaticAssetEnabled() const { return genericStaticAssetEnabled_; }
     const RtStaticMeshMeasurements& StaticMeshMeasurements() const { return staticMeshSlot_.Measurements(); }
     VkDeviceSize StaticMeshBlasBytes() const { return staticMeshBlasBytes_; }
@@ -327,6 +335,8 @@ private:
     std::uint32_t dielectricUnclosedVolumeCount_ = 0u;
     std::uint32_t dielectricPrimaryUnclosedVolumeCount_ = 0u;
     std::uint32_t dielectricShadowUnclosedVolumeCount_ = 0u;
+    std::uint32_t productionPaneStackFailureCount_ = 0u;
+    std::uint32_t productionPaneSecondaryRejectCount_ = 0u;
     std::string developmentStaticAssetDirectory_;
     std::string staticTextureDirectory_;
     RtStaticMeshSlot staticMeshSlot_;

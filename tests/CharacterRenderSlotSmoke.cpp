@@ -760,6 +760,9 @@ int main()
                       raygenSource.find("kRtMaterialFlagThinWall") != std::string::npos &&
                       raygenSource.find("shadeBoundedDielectric(nextHit") == std::string::npos,
                       "generic dielectric transport must use actual hit distance, explicit phone/high budgets, thin-wall ABI intent, and one terminal non-recursive evaluator");
+        ok &= Require(dielectricTransportSource.find("transmissionDirection = normalize(idealTransmission);") != std::string::npos &&
+                      dielectricTransportSource.find("Mobile's four-interface medium stack open") != std::string::npos,
+                      "closed production panes retain paired-interface transmission instead of stochastic stack escapes");
         ok &= Require(raygenSource.find("vec3 shadowTransmittanceMask(") != std::string::npos &&
                       raygenSource.find("struct ShadowHit") != std::string::npos &&
                       raygenSource.find("ShadowHit traceNearestShadowHit(") != std::string::npos &&
@@ -786,15 +789,18 @@ int main()
                       sceneSource.find("unclosedVolumeCount") != std::string::npos &&
                       sceneSource.find("primaryUnclosedVolumeCount") != std::string::npos &&
                       sceneSource.find("shadowUnclosedVolumeCount") != std::string::npos &&
+                      sceneSource.find("productionPaneStackFailureCount") != std::string::npos &&
+                      sceneSource.find("productionPaneSecondaryRejectCount") != std::string::npos &&
                       windowsSource.find("secondaryDielectricRejectCount") != std::string::npos &&
                       windowsSource.find("unclosedVolumeCount") != std::string::npos &&
                       windowsSource.find("primaryUnclosedVolumeCount") != std::string::npos &&
                       windowsSource.find("shadowUnclosedVolumeCount") != std::string::npos &&
+                      windowsSource.find("productionPaneStackFailureCount") != std::string::npos &&
                       androidBridgeSource.find("dielectricSecondaryRejectCount") != std::string::npos &&
                       androidBridgeSource.find("dielectricUnclosedVolumeCount") != std::string::npos &&
                       androidBridgeSource.find("dielectricPrimaryUnclosedVolumeCount") != std::string::npos &&
                       androidBridgeSource.find("dielectricShadowUnclosedVolumeCount") != std::string::npos,
-                      "CPU and platform diagnostics must retain the total while exposing primary and shadow unclosed-volume routes separately");
+                      "CPU and platform diagnostics must retain route and production-pane failure attribution");
         ok &= Require(waterPrimary.find("transmittedHit.t += h.t + waterPathLength;") !=
                           std::string::npos &&
                       waterPrimary.find("float reflectedLocalDistance = reflectedHit.hit ? reflectedHit.t : 12.0;") !=
@@ -920,8 +926,15 @@ int main()
                       sceneSource.find("rewardLanternBodyBlas_") != std::string::npos &&
                       sceneSource.find("productionPropsVisible") != std::string::npos &&
                       sceneSource.find("instances[6].instanceCustomIndex = 6u;") != std::string::npos &&
-                      sceneSource.find("instances[8].instanceCustomIndex = 8u;") != std::string::npos,
-                      "production chest and lantern must use the generic static-PBR BLAS route in bounded slots 5-8");
+                      sceneSource.find("instances[8].instanceCustomIndex = 8u;") != std::string::npos &&
+                      sceneSource.find("gothicChestBaseAsset_.sockets, \"LanternSocket\"") != std::string::npos &&
+                      sceneSource.find("rewardLanternRingAsset_.sockets, \"Hinge\"") != std::string::npos &&
+                      sceneSource.find("rewardLanternBodyAsset_.sockets, \"Flame\"") != std::string::npos &&
+                      sceneSource.find("rewardLanternBodyAsset_.sockets, \"Light\"") != std::string::npos &&
+                      sceneSource.find("ComposeWorldFromItem(") != std::string::npos &&
+                      sceneSource.find("rearHingeOpen") != std::string::npos &&
+                      sceneSource.find("productionLanternWorldFromFlame") != std::string::npos,
+                      "production chest and lantern must use bounded generic slots plus loaded authored pivots for lid, ring, body, flame, and light");
         ok &= Require(windowsSource.find("FindDevelopmentCheckpoint(ctx.developmentCheckpoint)") !=
                           std::string::npos &&
                       windowsSource.find("development->usesGlassFixture") != std::string::npos,
