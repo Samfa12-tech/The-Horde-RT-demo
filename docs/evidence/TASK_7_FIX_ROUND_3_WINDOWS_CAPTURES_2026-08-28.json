@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-08-28",
+  "scope": "Task 7 Fix Round 3 floor-valid reward composition and strict open-stack Windows RT captures",
+  "rendererSourceHead": "92b3b97",
+  "raygenEmbeddedSha256": "a148ef9dc3f7137a459d21e480c12ad13c61e14c2ef376ebe37f3caf6d85b3eb",
+  "raygenSpirvSha256": "46128e287c8bf86363cddb529906955fa25fabca29c294122a77cce54716a400",
+  "captures": [
+    {
+      "id": 114,
+      "checkpoint": "lantern-chest-unlock",
+      "manifest": "reports/task-7-fix-round-3c-final-114/capture-manifest.json",
+      "png": "reports/task-7-fix-round-3c-final-114/114-lantern-chest-unlock.png",
+      "pngSha256": "9d88984ae26db1446343fd887dd60674f2d81681d3c02719fef1b75b43fdcf09",
+      "honestlyPresentedRtFrame": true,
+      "visuallyInspected": true,
+      "visible": [
+        "floor-contact Gothic chest",
+        "opened lid",
+        "reward lantern revealed above and forward of the chest",
+        "transparent panes",
+        "engine flame"
+      ],
+      "failureCounters": {
+        "transportOverflowCount": 0,
+        "shadowOverflowCount": 0,
+        "secondaryDielectricRejectCount": 0,
+        "unclosedVolumeCount": 0,
+        "primaryUnclosedVolumeCount": 0,
+        "shadowUnclosedVolumeCount": 0,
+        "productionPaneStackFailureCount": 0,
+        "primaryOpenMissCount": 0,
+        "primaryOpenOpaqueCount": 0,
+        "primaryMismatchedExitCount": 0,
+        "primaryInterfaceBudgetCount": 0,
+        "primaryVolumeBudgetCount": 0,
+        "shadowOpenMissCount": 0,
+        "shadowMismatchedExitCount": 0,
+        "primaryClosedVolumeAbsorptionCount": 0
+      },
+      "intentionalCounters": {
+        "productionPaneSecondaryOriginCount": 221,
+        "productionPaneSecondaryTerminalCount": 211,
+        "productionPaneSecondarySameMediumCount": 211,
+        "productionPaneSecondaryDifferentMediumCount": 10,
+        "primaryTirCount": 168,
+        "primaryTirTerminationCount": 15,
+        "shadowImplicitOriginExitCount": 565,
+        "secondaryDielectricTerminalCount": 221
+      }
+    },
+    {
+      "id": 115,
+      "checkpoint": "lantern-glass-production",
+      "manifest": "reports/task-7-fix-round-3c-final-115/capture-manifest.json",
+      "png": "reports/task-7-fix-round-3c-final-115/115-lantern-glass-production.png",
+      "pngSha256": "52b6530d18f83f8b351dad4fd7e4eb8298ee72516a1fca08606639c38df405f4",
+      "honestlyPresentedRtFrame": true,
+      "visuallyInspected": true,
+      "visible": [
+        "isolated complete reward lantern",
+        "Gothic cage and finial",
+        "transparent panes",
+        "engine flame"
+      ],
+      "failureCounters": {
+        "transportOverflowCount": 0,
+        "shadowOverflowCount": 0,
+        "secondaryDielectricRejectCount": 0,
+        "unclosedVolumeCount": 0,
+        "primaryUnclosedVolumeCount": 0,
+        "shadowUnclosedVolumeCount": 0,
+        "productionPaneStackFailureCount": 0,
+        "primaryOpenMissCount": 0,
+        "primaryOpenOpaqueCount": 0,
+        "primaryMismatchedExitCount": 0,
+        "primaryInterfaceBudgetCount": 0,
+        "primaryVolumeBudgetCount": 0,
+        "shadowOpenMissCount": 0,
+        "shadowMismatchedExitCount": 0,
+        "primaryClosedVolumeAbsorptionCount": 0
+      },
+      "intentionalCounters": {
+        "productionPaneSecondaryOriginCount": 221,
+        "productionPaneSecondaryTerminalCount": 211,
+        "productionPaneSecondarySameMediumCount": 211,
+        "productionPaneSecondaryDifferentMediumCount": 10,
+        "primaryTirCount": 168,
+        "primaryTirTerminationCount": 15,
+        "shadowImplicitOriginExitCount": 429,
+        "secondaryDielectricTerminalCount": 221
+      }
+    }
+  ],
+  "boundary": "Windows RTX capture evidence only. adb devices -l exposed no device; no Android presentation, visual, performance, lifecycle, thermal, or owner verdict is claimed."
+}

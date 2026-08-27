@@ -138,3 +138,96 @@ prop processing, bounded dielectric RT math/diagnostics, visual checkpoints,
 tests, and documentation. It does not change event identity/timing/transport,
 listener or source routing, spatialisation, playback, cue assets, haptics, or
 damage/death feedback.
+
+## Fix Round 3
+
+Round 3 supersedes the Round 2 conclusion that any ordinary terminal reached
+with an open validated volume could be treated as a shared-edge miss. The old
+three-count absorption evidence remains above as historical review evidence,
+but that blanket policy is rejected and is no longer present in the shader.
+
+### Floor-valid reward composition
+
+- The former checkpoint stage translated the complete chest by `+0.37 m`, so
+  its authored Y bounds became `+0.37..+0.75 m`. At the same time the ambiguous
+  `LanternSocket` target was only `+0.18 m` above the chest origin while the
+  lantern body extends downward from its hinge. This inverted the composition:
+  the chest visibly floated over and penetrated the lantern.
+- Checkpoint staging now leaves the chest at authored floor contact
+  (`Y 0.000..0.380 m`). The reusable chest asset exposes the semantic
+  `RewardLanternHingeSocket` at exact local translation
+  `(0.000, +1.280, +0.300) m`, intended for the Task 8 reveal/claim contract.
+- At the exact shared `0.90` reveal/inspection scale, the body AABB in chest
+  space is `X -0.2016..+0.2016`, `Y +0.4025..+1.2665`,
+  `Z +0.0696..+0.5304 m`. It clears the chest top by `22.5 mm`. The opened lid
+  ends at `Z -0.107700456 m`, leaving more than `177 mm` of AABB separation.
+  Ring/body also retain at least the tested base/lid clearance.
+- Tests transform every corner of the chest, opened lid, ring, and body AABBs,
+  prove floor contact and nonintersection, and prove the full bounds—not only
+  socket origins—fit the exact 960x540 raygen frustum. Both checkpoints use the
+  same Task 8 transform and camera framing; glass-only mode changes visibility,
+  not scale or composition.
+
+### Strict open-stack behavior
+
+- An opaque, miss, or water terminal while any thick dielectric volume remains
+  open is again an explicit global/primary unclosed-volume failure. The shader
+  retains terminal/volume/material attribution and shows the conspicuous
+  bounded fallback; it neither shades through the terminal nor absorbs it.
+- Behavioral negatives cover an opaque intersection, a non-edge missing exit,
+  and ordinary/water terminals inside nested media. Generic dielectric hits
+  still proceed to exact instance/material stack validation. Existing rough
+  thick/thin, nested media, inside-origin shadow, finite-endpoint Beer-Lambert,
+  water, TIR, epsilon, and Mobile/High contracts remain green.
+- The capture correction removed every former open-stack event, so no
+  primitive/component/barycentric absorption exception was necessary. The
+  retained `primaryClosedVolumeAbsorptionCount` ABI field is zero in both
+  captures and has no shader increment site.
+- `productionPaneSecondarySameMediumCount` now increments only when both the
+  reflection origin and terminal are production-pane instance 8 with the same
+  material. Generic same-instance/material reflection terminals no longer
+  contaminate this production-specific counter.
+
+### Exact final evidence and gates
+
+Both final PNGs were inspected directly and both manifests report an honestly
+presented RT swapchain frame. The tracked machine-readable record is
+`docs/evidence/TASK_7_FIX_ROUND_3_WINDOWS_CAPTURES_2026-08-28.json`.
+
+- Checkpoint 114 visibly reads as an opened floor-contact Gothic chest revealing
+  the complete lantern above and forward of the lid/base. PNG SHA-256:
+  `9d88984ae26db1446343fd887dd60674f2d81681d3c02719fef1b75b43fdcf09`.
+- Checkpoint 115 visibly shows the isolated complete cage, finial, transparent
+  panes, and engine flame. PNG SHA-256:
+  `52b6530d18f83f8b351dad4fd7e4eb8298ee72516a1fca08606639c38df405f4`.
+- Both captures have zero transport/shadow overflow, reject, global/primary/
+  shadow unclosed volume, pane-stack failure, open miss/opaque, mismatch,
+  interface/volume budget failure, and closed-volume absorption. Both report
+  production-pane origin `221`, terminal `211`, guarded same-medium `211`,
+  different-medium `10`, primary TIR `168`, bounded TIR termination `15`, and
+  secondary dielectric terminal `221`. Intentional inside-origin shadow exits
+  are `565` for checkpoint 114 and `429` for checkpoint 115.
+- Generic embedded raygen SHA-256 is
+  `a148ef9dc3f7137a459d21e480c12ad13c61e14c2ef376ebe37f3caf6d85b3eb`;
+  SPIR-V SHA-256 is
+  `46128e287c8bf86363cddb529906955fa25fabca29c294122a77cce54716a400`
+  (`896640` bytes, `224160` words, `49884` instructions, `7524` branch
+  operations, `131` loops, `3080` selection merges, one function, zero calls,
+  `29` ray-query sites). Legacy compile/freshness and ABI SHA-256
+  `821418c6c28f1827e5064f8a1551e3aa04c393d9e9df2ff37bdcaf0f6e3dfe54`
+  also pass.
+- Fresh Windows Debug and Release builds each pass 28/28 CTests. Android
+  `assembleDebug`, unsigned `assembleRelease`, and `lintRelease` pass in one
+  97-task build; the held-item/player package and exact CC BY 4.0 attribution
+  contract passes. Debug APK SHA-256 is
+  `f8efc8500461b153f25f9c6643fc7b22722b80b90ca54c7efe3199b5f43e2b52`;
+  unsigned Release APK SHA-256 is
+  `50cb0c6e699296c5860ba15ef189ce4790c7f1ff84a12702549820aec354c6dd`.
+- `adb devices -l` exposed no device. No Android installation, presentation,
+  capture, performance, lifecycle, thermal, or owner verdict is claimed.
+
+Audio/haptic manual revalidation required: NO — Round 3 changes only static
+reward composition, dielectric failure classification/diagnostics, visual
+checkpoint framing, tests, assets, and documentation. Gameplay event identity,
+timing and transport, listener/source routing, spatialisation, playback, cue
+assets, haptics, and damage/death feedback are unchanged.

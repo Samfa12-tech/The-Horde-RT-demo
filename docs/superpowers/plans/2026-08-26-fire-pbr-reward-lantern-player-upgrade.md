@@ -354,7 +354,7 @@
 
 **Asset organization:**
 
-- Chest: `ChestBase`, `ChestLid` with rear hinge pivot, `Latch`, and `LanternSocket`.
+- Chest: `ChestBase`, `ChestLid` with rear hinge pivot, `Latch`, and the semantically explicit `RewardLanternHingeSocket` reused by the Task 8 reveal/claim composition.
 - Lantern: `GripRing`, `Hinge`, `LanternBody`, separate closed/manifold `LanternGlass`, `Flame`, `Light`, and optional simple emissive `FlameCore`.
 - Initial target budgets: chest 4k-8k triangles; lantern metal+glass 6k-10k with hard review above 12k; 2-3 materials each; 1K mobile texture profile.
 
