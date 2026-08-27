@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-08-28",
+  "scope": "Task 7 dielectric Fix Round 2 final Windows RT-presented captures",
+  "raygenEmbeddedSha256": "24ef76391936a8189acaf4bd35cf6e7d040fb4693b241cb7b931bc4a381f6b0e",
+  "raygenSpirvSha256": "25acc660bdc5c7cdcf23064a6e9a2d8c35cbfe435b717f433841b24eeb5d621d",
+  "captures": [
+    {
+      "id": 114,
+      "checkpoint": "lantern-chest-unlock",
+      "manifest": "reports/task-7-fix-round-2s-closed-volume-absorption-114/capture-manifest.json",
+      "png": "reports/task-7-fix-round-2s-closed-volume-absorption-114/114-lantern-chest-unlock.png",
+      "pngSha256": "3dce6ec6d42be04b946a876980ad437c62c0f0b40b4c499ac146b4efeca8f564",
+      "honestlyPresentedRtFrame": true,
+      "visuallyInspected": true,
+      "visible": ["gothic chest", "lantern cage", "transparent panes", "engine flame"],
+      "failureCounters": {
+        "transportOverflowCount": 0,
+        "shadowOverflowCount": 0,
+        "secondaryDielectricRejectCount": 0,
+        "unclosedVolumeCount": 0,
+        "primaryUnclosedVolumeCount": 0,
+        "shadowUnclosedVolumeCount": 0,
+        "productionPaneStackFailureCount": 0,
+        "primaryMismatchedExitCount": 0,
+        "primaryInterfaceBudgetCount": 0,
+        "primaryVolumeBudgetCount": 0,
+        "shadowMismatchedExitCount": 0
+      },
+      "intentionalCounters": {
+        "primaryOpenOpaqueCount": 3,
+        "primaryClosedVolumeAbsorptionCount": 3,
+        "primaryOpenOpaqueTerminalInstanceMask": 1,
+        "primaryOpenOpaqueVolumeInstanceMask": 256,
+        "primaryOpenOpaqueTerminalMaterialMask": 4,
+        "primaryTirCount": 409,
+        "primaryTirTerminationCount": 58,
+        "shadowImplicitOriginExitCount": 287,
+        "secondaryDielectricTerminalCount": 380
+      }
+    },
+    {
+      "id": 115,
+      "checkpoint": "lantern-glass-production",
+      "manifest": "reports/task-7-fix-round-2s-closed-volume-absorption-115/capture-manifest.json",
+      "png": "reports/task-7-fix-round-2s-closed-volume-absorption-115/115-lantern-glass-production.png",
+      "pngSha256": "58cc8edc76b6349f722200ac477123f5e1299ebd5b75d9d6d2b818a065aa1971",
+      "honestlyPresentedRtFrame": true,
+      "visuallyInspected": true,
+      "visible": ["lantern ring", "lantern body", "transparent panes", "engine flame"],
+      "failureCounters": {
+        "transportOverflowCount": 0,
+        "shadowOverflowCount": 0,
+        "secondaryDielectricRejectCount": 0,
+        "unclosedVolumeCount": 0,
+        "primaryUnclosedVolumeCount": 0,
+        "shadowUnclosedVolumeCount": 0,
+        "productionPaneStackFailureCount": 0,
+        "primaryMismatchedExitCount": 0,
+        "primaryInterfaceBudgetCount": 0,
+        "primaryVolumeBudgetCount": 0,
+        "shadowMismatchedExitCount": 0
+      },
+      "intentionalCounters": {
+        "primaryOpenOpaqueCount": 0,
+        "primaryClosedVolumeAbsorptionCount": 0,
+        "primaryTirCount": 1044,
+        "primaryTirTerminationCount": 129,
+        "shadowImplicitOriginExitCount": 513,
+        "secondaryDielectricTerminalCount": 539
+      }
+    }
+  ],
+  "boundary": "Windows RTX capture evidence only; no Android device was attached and no phone visual, performance, lifecycle, thermal, or owner verdict is claimed."
+}

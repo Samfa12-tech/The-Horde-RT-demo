@@ -360,12 +360,12 @@
 
 **Tests and steps:**
 
-- [ ] Generate geometry-first Meshy 7/Smart Topology candidates from the approved briefs and reject modern camping silhouettes, arch contamination, fused opaque panes, mushy tracery, and unusable hinge/ring topology.
-- [ ] Use headless Blender processing to split/clean rigid parts, establish metre scale/+Y up/+Z forward, set hinge/origin, add or repair simple manifold glass panes, create sockets, validate normals/tangents/UVs, and remove hidden/interior waste.
-- [ ] Texture metal/wood under neutral light. Because Meshy 7 does not emit an emission map and ignores `remove_lighting`, inspect base colour directly for baked light and author engine-controlled emissive/core data locally.
-- [ ] Require black-silhouette and lit-turntable reviews against the icon: pointed canopy/finial, ring/hinge, and deliberate Gothic tracery must read at game FOV.
-- [ ] Render chest base/lid and lantern ring/body as generic scene objects. Reuse freed procedural-player TLAS slots 5-8; retain roof 17, second skeleton 18, and waterfall 19.
-- [ ] Add `lantern-chest-unlock` and a development glass/transmission inspection using the production lantern asset.
+- [x] Generate geometry-first Meshy 7/Smart Topology candidates from the approved briefs and reject modern camping silhouettes, arch contamination, fused opaque panes, mushy tracery, and unusable hinge/ring topology.
+- [x] Use headless Blender processing to split/clean rigid parts, establish metre scale/+Y up/+Z forward, set hinge/origin, add or repair simple manifold glass panes, create sockets, validate normals/tangents/UVs, and remove hidden/interior waste.
+- [x] Texture metal/wood under neutral light. Because Meshy 7 does not emit an emission map and ignores `remove_lighting`, inspect base colour directly for baked light and author engine-controlled emissive/core data locally.
+- [x] Require black-silhouette and lit-turntable reviews against the icon: pointed canopy/finial, ring/hinge, and deliberate Gothic tracery must read at game FOV.
+- [x] Render chest base/lid and lantern ring/body as generic scene objects. Reuse freed procedural-player TLAS slots 5-8; retain roof 17, second skeleton 18, and waterfall 19.
+- [x] Add `lantern-chest-unlock` and a development glass/transmission inspection using the production lantern asset.
 
 **Commits:**
 
