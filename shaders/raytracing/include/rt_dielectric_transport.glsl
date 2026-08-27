@@ -82,7 +82,9 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
             atomicAdd(rtDielectricDiagnostics.value.productionPaneSecondaryOriginCount, 1u);
         if (reflectedHit.instance == 8u)
             atomicAdd(rtDielectricDiagnostics.value.productionPaneSecondaryTerminalCount, 1u);
-        if (isGenericDielectric(reflectedHit) && firstHit.instance == reflectedHit.instance &&
+        if (isGenericDielectric(reflectedHit) &&
+            firstHit.instance == 8u && reflectedHit.instance == 8u &&
+            firstHit.instance == reflectedHit.instance &&
             firstHit.material == reflectedHit.material)
         {
             atomicAdd(rtDielectricDiagnostics.value.productionPaneSecondarySameMediumCount, 1u);
@@ -134,15 +136,12 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
         {
             if (volumeDepth > 0)
             {
-                // Every pushed thick volume comes from a validated outward-
-                // wound closed mesh. Reaching an ordinary terminal before its
-                // paired exit is therefore a finite-precision shared-edge
-                // closure case, not permission to leak energy through an open
-                // stack or shade the terminal as if the dielectric vanished.
-                // Conservatively absorb the unresolved interior energy and
-                // retain exact reason/instance/material attribution below.
-                atomicAdd(rtDielectricDiagnostics.value.primaryClosedVolumeAbsorptionCount,
-                          1u);
+                // Closed topology does not prove that an ordinary terminal is
+                // a shared-edge traversal miss. Without retained entry
+                // primitive/component and barycentric-edge evidence, never
+                // absorb or shade through it: report the open stack exactly.
+                atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);
+                atomicAdd(rtDielectricDiagnostics.value.primaryUnclosedVolumeCount, 1u);
                 if (currentHit.hit)
                 {
                     atomicAdd(rtDielectricDiagnostics.value.primaryOpenOpaqueCount, 1u);
@@ -162,7 +161,7 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
                 }
                 else
                     atomicAdd(rtDielectricDiagnostics.value.primaryOpenMissCount, 1u);
-                transmitted = vec3(0.0);
+                overflowed = true;
             }
             else
             {
@@ -170,7 +169,7 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
                 transmitted = throughput *
                     shadeTerminalOpaqueEmissive(currentHit, transmissionDirection);
             }
-            terminalResolved = true;
+            terminalResolved = volumeDepth == 0;
             break;
         }
         if (interfaceIndex >= interfaceBudget)

@@ -295,7 +295,7 @@ enum class DielectricTerminalResolution
 {
     ContinueGeneric,
     ShadeTerminal,
-    AbsorbUnresolvedClosedVolume
+    FailUnclosedVolume
 };
 
 inline DielectricTerminalKind ClassifyDielectricTerminal(
@@ -312,17 +312,12 @@ inline DielectricTerminalResolution ResolveDielectricTerminal(
 {
     if (terminal == DielectricTerminalKind::ContinueGeneric)
         return DielectricTerminalResolution::ContinueGeneric;
-    // A pushed thick-volume entry is a contract that the validated, outward-
-    // wound source has a paired exit. If finite-precision triangle traversal
-    // reaches an ordinary terminal first (typically at a shared slab edge),
-    // leaking the still-interior energy or shading that terminal through an
-    // open medium is non-physical. Conservatively absorb it and count the
-    // bounded closure termination. This applies equally to miss, opaque, and
-    // water terminals; with a closed stack they are all beyond the unresolved
-    // paired boundary. Exact instance/material mismatches remain failures in
-    // the normal generic-interface path.
+    // Topology validation alone cannot prove at runtime that an ordinary hit
+    // behind an open medium is a harmless shared-edge traversal miss. Without
+    // retained primitive/component and barycentric-edge evidence, every miss,
+    // opaque hit, or water hit is an explicit unclosed-volume failure.
     return closedVolumeDepth > 0u
-        ? DielectricTerminalResolution::AbsorbUnresolvedClosedVolume
+        ? DielectricTerminalResolution::FailUnclosedVolume
         : DielectricTerminalResolution::ShadeTerminal;
 }
 

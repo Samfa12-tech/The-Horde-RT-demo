@@ -751,8 +751,10 @@ int main()
                       raygenSource.find("atomicAdd(rtDielectricDiagnostics.value.transportOverflowCount, 1u);") != std::string::npos &&
                       raygenSource.find("atomicAdd(rtDielectricDiagnostics.value.secondaryDielectricTerminalCount, 1u);") != std::string::npos &&
                       raygenSource.find("atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);") != std::string::npos &&
-                      dielectricTransportSource.find("primaryClosedVolumeAbsorptionCount") != std::string::npos &&
-                      dielectricTransportSource.find("primaryUnclosedVolumeCount") == std::string::npos &&
+                      dielectricTransportSource.find(
+                          "atomicAdd(rtDielectricDiagnostics.value.primaryClosedVolumeAbsorptionCount") ==
+                          std::string::npos &&
+                      dielectricTransportSource.find("primaryUnclosedVolumeCount") != std::string::npos &&
                       dielectricTransportSource.find("shadowUnclosedVolumeCount") == std::string::npos &&
                       raygenSource.find("dielectricEffectiveFresnel(") != std::string::npos &&
                       raygenSource.find("dielectricRayEpsilon(") != std::string::npos &&
@@ -765,8 +767,11 @@ int main()
                       dielectricTransportSource.find("paired exit geometrically") != std::string::npos &&
                       dielectricTransportSource.find("productionPaneSecondaryOriginCount") != std::string::npos &&
                       dielectricTransportSource.find("productionPaneSecondaryTerminalCount") != std::string::npos &&
+                      dielectricTransportSource.find(
+                          "firstHit.instance == 8u && reflectedHit.instance == 8u") !=
+                          std::string::npos &&
                       dielectricTransportSource.find("if (isGenericDielectric(reflectedHit) ||") != std::string::npos,
-                      "thin sheets retain rough transmission; thick panes defer rough scattering to the paired exit and secondary dielectric endpoints remain attributed");
+                      "thin/thick rough transmission remains physical and the production-pane same-medium counter is instance-8 scoped");
         ok &= Require(raygenSource.find("vec3 shadowTransmittanceMask(") != std::string::npos &&
                       raygenSource.find("struct ShadowHit") != std::string::npos &&
                       raygenSource.find("ShadowHit traceNearestShadowHit(") != std::string::npos &&
@@ -982,7 +987,10 @@ int main()
                       sceneSource.find("productionPropsVisible") != std::string::npos &&
                       sceneSource.find("instances[6].instanceCustomIndex = 6u;") != std::string::npos &&
                       sceneSource.find("instances[8].instanceCustomIndex = 8u;") != std::string::npos &&
-                      sceneSource.find("gothicChestBaseAsset_.sockets, \"LanternSocket\"") != std::string::npos &&
+                      sceneSource.find("const float lanternScale = 0.90f;") != std::string::npos &&
+                      sceneSource.find(
+                          "gothicChestBaseAsset_.sockets, \"RewardLanternHingeSocket\"") !=
+                          std::string::npos &&
                       sceneSource.find("rewardLanternRingAsset_.sockets, \"Hinge\"") != std::string::npos &&
                       sceneSource.find("rewardLanternBodyAsset_.sockets, \"Flame\"") != std::string::npos &&
                       sceneSource.find("rewardLanternBodyAsset_.sockets, \"Light\"") != std::string::npos &&

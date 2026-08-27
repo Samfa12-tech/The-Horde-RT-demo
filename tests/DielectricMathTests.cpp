@@ -430,13 +430,17 @@ void TestBoundedTirAndWaterTerminationContracts()
               ResolveDielectricTerminal(0u, DielectricTerminalKind::Miss) ==
               DielectricTerminalResolution::ShadeTerminal,
           "water, opaque, and miss terminals use their ordinary terminal path after a paired stack exit");
-    Check(ResolveDielectricTerminal(1u, DielectricTerminalKind::Water) ==
-              DielectricTerminalResolution::AbsorbUnresolvedClosedVolume &&
-              ResolveDielectricTerminal(2u, DielectricTerminalKind::Opaque) ==
-              DielectricTerminalResolution::AbsorbUnresolvedClosedVolume &&
-              ResolveDielectricTerminal(4u, DielectricTerminalKind::Miss) ==
-              DielectricTerminalResolution::AbsorbUnresolvedClosedVolume,
-          "an ordinary terminal reached before a validated closed-volume exit is conservatively absorbed at Mobile and High depths");
+    Check(ResolveDielectricTerminal(1u, DielectricTerminalKind::Opaque) ==
+              DielectricTerminalResolution::FailUnclosedVolume,
+          "an opaque intersection cannot be hidden while a dielectric volume remains open");
+    Check(ResolveDielectricTerminal(1u, DielectricTerminalKind::Miss) ==
+              DielectricTerminalResolution::FailUnclosedVolume,
+          "a non-edge missing exit remains an explicit unclosed-volume failure");
+    Check(ResolveDielectricTerminal(2u, DielectricTerminalKind::Opaque) ==
+              DielectricTerminalResolution::FailUnclosedVolume &&
+              ResolveDielectricTerminal(4u, DielectricTerminalKind::Water) ==
+              DielectricTerminalResolution::FailUnclosedVolume,
+          "nested-media ordinary and water terminals cannot use a blanket absorption policy");
     Check(ResolveDielectricTerminal(4u, DielectricTerminalKind::ContinueGeneric) ==
               DielectricTerminalResolution::ContinueGeneric,
           "a generic dielectric terminal always continues to exact instance/material stack validation");
