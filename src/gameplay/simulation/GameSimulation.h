@@ -10,6 +10,9 @@
 #include "gameplay/animation/PlayerAnimationState.h"
 #include "gameplay/items/HeldItemState.h"
 #include "gameplay/items/HeldItemKinematics.h"
+#include "gameplay/interactions/ChestRewardSequence.h"
+#include "gameplay/interactions/FinaleSequence.h"
+#include "gameplay/interactions/InteractionState.h"
 #include "gameplay/simulation/FixedStepRunner.h"
 #include "gameplay/simulation/GameplayEvent.h"
 #include "gameplay/simulation/InputSnapshot.h"
@@ -42,6 +45,10 @@ public:
     void ResetRoute();
     void RetryEncounter();
     bool ApplyShowcaseCheckpoint(std::int32_t checkpointId, bool countAsRetry = false);
+    void ImportRewardCheckpoint(
+        const horde::gameplay::interactions::ChestRewardSnapshot& chestReward,
+        const horde::gameplay::interactions::InteractionState& interaction,
+        const horde::gameplay::interactions::FinaleSequenceSnapshot& finale);
     void ResetTiming();
     void ClearEvents();
 
@@ -56,6 +63,7 @@ private:
     bool ApplyCheckpoint(std::int32_t checkpointId, bool isRetry);
     void UpdateMovement(const InputSnapshot& input, float deltaSeconds);
     void UpdateEncounters(const InputSnapshot& input, float deltaSeconds);
+    void UpdateRewardSequence(float deltaSeconds, bool commandsAvailable);
     void ResolveHeldItems();
     void ResolvePlayerAnimation(float fixedDeltaSeconds);
     void ResolveFireEmitters(float fixedDeltaSeconds);
@@ -78,6 +86,9 @@ private:
     EnemyDirector enemyDirector_{};
     SwordCombat swordCombat_{};
     LichEncounter lichEncounter_{};
+    horde::gameplay::interactions::ChestRewardSequence chestRewardSequence_{};
+    horde::gameplay::interactions::FinaleSequence finaleSequence_{};
+    horde::gameplay::interactions::InteractionState interactionState_{};
     PlayerVitals playerVitals_{};
     TravelFootstepCadence playerFootsteps_{};
     std::array<PlayerFootstepCadence, kSkeletonEnemyCapacity> enemyFootsteps_{};
@@ -108,16 +119,22 @@ private:
     std::uint64_t latestDodgeSequence_ = 0u;
     std::uint64_t latestRouteResetSequence_ = 0u;
     std::uint64_t latestRetrySequence_ = 0u;
+    std::uint64_t latestInteractSequence_ = 0u;
+    std::uint64_t latestToggleHeldLightPoseSequence_ = 0u;
     std::uint64_t lastConsumedAttackSequence_ = 0u;
     std::uint64_t lastConsumedParrySequence_ = 0u;
     std::uint64_t lastConsumedDodgeSequence_ = 0u;
     std::uint64_t lastConsumedRouteResetSequence_ = 0u;
     std::uint64_t lastConsumedRetrySequence_ = 0u;
+    std::uint64_t lastConsumedInteractSequence_ = 0u;
+    std::uint64_t lastConsumedToggleHeldLightPoseSequence_ = 0u;
     std::uint64_t pendingAttackCommands_ = 0u;
     std::uint64_t pendingParryCommands_ = 0u;
     std::uint64_t pendingDodgeCommands_ = 0u;
     std::uint64_t pendingRouteResetCommands_ = 0u;
     std::uint64_t pendingRetryCommands_ = 0u;
+    std::uint64_t pendingInteractCommands_ = 0u;
+    std::uint64_t pendingToggleHeldLightPoseCommands_ = 0u;
     float pendingDodgeForward_ = 0.0f;
     float pendingDodgeStrafe_ = 0.0f;
     float dodgeDirectionX_ = 0.0f;

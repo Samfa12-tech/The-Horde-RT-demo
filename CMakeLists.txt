@@ -34,13 +34,16 @@ set(HORDE_RT_SOURCE_FILES)
 foreach(source IN LISTS HORDE_RT_CORE_RELATIVE_SOURCES)
     list(APPEND HORDE_RT_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/${source}")
 endforeach()
-list(FILTER HORDE_RT_SOURCE_FILES EXCLUDE REGEX "/gameplay/(simulation/GameSimulation|animation/(PlayerAnimationState|PlayerIkTargets)|effects/FireEmitterState|items/(HeldItemState|HeldItemKinematics|HeldLightState))\\.cpp$")
+list(FILTER HORDE_RT_SOURCE_FILES EXCLUDE REGEX "/gameplay/(simulation/GameSimulation|animation/(PlayerAnimationState|PlayerIkTargets)|effects/FireEmitterState|interactions/(InteractionState|ChestRewardSequence|FinaleSequence)|items/(HeldItemState|HeldItemKinematics|HeldLightState))\\.cpp$")
 
 add_library(horde_gameplay_simulation STATIC
     src/gameplay/simulation/GameSimulation.cpp
     src/gameplay/animation/PlayerAnimationState.cpp
     src/gameplay/animation/PlayerIkTargets.cpp
     src/gameplay/effects/FireEmitterState.cpp
+    src/gameplay/interactions/InteractionState.cpp
+    src/gameplay/interactions/ChestRewardSequence.cpp
+    src/gameplay/interactions/FinaleSequence.cpp
     src/gameplay/items/HeldItemState.cpp
     src/gameplay/items/HeldItemKinematics.cpp
     src/gameplay/items/HeldLightState.cpp
@@ -281,6 +284,7 @@ if(BUILD_TESTING)
 
     add_executable(horde_rt_showcase_gameplay_smoke tests/ShowcaseGameplaySmoke.cpp)
     target_include_directories(horde_rt_showcase_gameplay_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(horde_rt_showcase_gameplay_smoke PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_showcase_gameplay_smoke COMMAND horde_rt_showcase_gameplay_smoke)
 
     # This must use CMake's configured compiler and generator: the shared host

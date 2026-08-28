@@ -10,6 +10,9 @@
 #include "gameplay/animation/PlayerAnimationState.h"
 #include "gameplay/items/HeldItemState.h"
 #include "gameplay/items/HeldItemKinematics.h"
+#include "gameplay/interactions/ChestRewardSequence.h"
+#include "gameplay/interactions/FinaleSequence.h"
+#include "gameplay/interactions/InteractionState.h"
 #include "gameplay/simulation/GameplayEvent.h"
 
 namespace horde::gameplay::simulation
@@ -45,6 +48,8 @@ struct SimulationSnapshot
     std::uint64_t lastConsumedDodgeSequence = 0;
     std::uint64_t lastConsumedRouteResetSequence = 0;
     std::uint64_t lastConsumedRetrySequence = 0;
+    std::uint64_t lastConsumedInteractSequence = 0;
+    std::uint64_t lastConsumedToggleHeldLightPoseSequence = 0;
 
     float playerX = 0.0f;
     float playerZ = 1.85f;
@@ -70,6 +75,10 @@ struct SimulationSnapshot
     bool paused = false;
     bool playerAlive = true;
     bool finaleComplete = false;
+
+    horde::gameplay::interactions::InteractionState interaction{};
+    horde::gameplay::interactions::ChestRewardSnapshot chestReward{};
+    horde::gameplay::interactions::FinaleSequenceSnapshot finale{};
 
     TorchFailureSnapshot torchFailure{};
     horde::gameplay::items::HeldItemStates heldItems =

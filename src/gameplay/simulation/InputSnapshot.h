@@ -13,6 +13,8 @@ struct SimulationCommandSequences
     std::uint64_t dodge = 0;
     std::uint64_t routeReset = 0;
     std::uint64_t retry = 0;
+    std::uint64_t interact = 0;
+    std::uint64_t toggleHeldLightPose = 0;
 };
 
 // One coherent publication of continuous controls and monotonic edge commands.

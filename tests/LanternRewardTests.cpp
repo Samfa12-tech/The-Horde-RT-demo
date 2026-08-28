@@ -6,6 +6,7 @@
 #include "gameplay/interactions/ChestRewardSequence.h"
 #include "gameplay/interactions/FinaleSequence.h"
 #include "gameplay/interactions/InteractionState.h"
+#include "gameplay/simulation/GameSimulation.h"
 #include "gameplay/simulation/InputMailbox.h"
 
 namespace
@@ -14,6 +15,8 @@ namespace
 using namespace horde::gameplay::interactions;
 using horde::gameplay::simulation::InputMailbox;
 using horde::gameplay::simulation::InputSnapshot;
+using horde::gameplay::simulation::GameSimulation;
+using horde::gameplay::simulation::GameplayEventType;
 
 bool passed = true;
 
@@ -37,6 +40,17 @@ InteractionQuery ValidChestQuery()
         kRewardChestInteractionPosition.x + 1.30f,
         kRewardChestInteractionPosition.z,
         -1.57079632679f};
+}
+
+std::size_t CountEvents(const GameSimulation& simulation,
+                        const GameplayEventType type)
+{
+    std::size_t count = 0u;
+    for (const auto& event : simulation.Events().Events())
+    {
+        if (event.type == type) ++count;
+    }
+    return count;
 }
 
 } // namespace
@@ -145,6 +159,82 @@ int main()
     finale.Update(10.0f);
     Check(finale.Snapshot() == complete,
           "repeated ending polls after completion must not change shared finale state");
+
+    ChestRewardSnapshot unlockedChest;
+    unlockedChest.phase = ChestRewardPhase::ClosedUnlocked;
+    InteractionState noTorch;
+    ResetInteractionState(noTorch, HeldLightKind::None);
+    FinaleSequenceSnapshot defeatedFinale;
+    defeatedFinale.phase = FinaleSequencePhase::LichFalling;
+    defeatedFinale.endingPhase = FinaleEndingPhase::LichFalling;
+    defeatedFinale.lichDefeated = true;
+
+    GameSimulation directSimulation;
+    GameSimulation mailboxSimulation;
+    directSimulation.ImportRewardCheckpoint(unlockedChest, noTorch, defeatedFinale);
+    mailboxSimulation.ImportRewardCheckpoint(unlockedChest, noTorch, defeatedFinale);
+    InputSnapshot interactionInput;
+    interactionInput.damageEnabled = false;
+    interactionInput.hasAuthoritativePlayerPose = true;
+    const InteractionQuery valid = ValidChestQuery();
+    interactionInput.authoritativePlayerX = valid.playerX;
+    interactionInput.authoritativePlayerZ = valid.playerZ;
+    interactionInput.yawRadians = valid.playerYawRadians;
+    interactionInput.commands.interact = 1u;
+    directSimulation.StepFixed(interactionInput);
+    InputMailbox simulationMailbox;
+    const std::uint64_t directParityPublication = simulationMailbox.Publish(interactionInput);
+    const auto mailboxInput = simulationMailbox.ConsumeLatest();
+    mailboxSimulation.StepFixed(
+        mailboxInput.snapshot,
+        static_cast<float>(horde::gameplay::simulation::FixedStepRunner::kFixedDeltaSeconds),
+        mailboxInput.publicationSequence);
+    Check(directSimulation.Snapshot().lastConsumedInteractSequence == 1u &&
+              directSimulation.Snapshot().chestReward.phase == ChestRewardPhase::Opening &&
+              CountEvents(directSimulation, GameplayEventType::ChestOpened) == 1u &&
+              mailboxSimulation.Snapshot().lastConsumedInteractSequence == 1u &&
+              mailboxSimulation.Snapshot().chestReward == directSimulation.Snapshot().chestReward &&
+              mailboxSimulation.Snapshot().inputPublicationSequence == directParityPublication &&
+              CountEvents(mailboxSimulation, GameplayEventType::ChestOpened) == 1u,
+          "direct and coherent-mailbox delivery must consume one open edge with identical state/events");
+
+    directSimulation.ClearEvents();
+    interactionInput.commands.interact = 4u;
+    interactionInput.commands.toggleHeldLightPose = 3u;
+    directSimulation.StepFixed(interactionInput);
+    Check(directSimulation.Snapshot().lastConsumedInteractSequence == 4u,
+          "unavailable interact deltas must still advance the consumed diagnostic");
+    Check(directSimulation.Snapshot().lastConsumedToggleHeldLightPoseSequence == 3u,
+          "unavailable pose deltas must still advance the consumed diagnostic");
+    Check(directSimulation.Snapshot().chestReward.phase == ChestRewardPhase::Opening,
+          "interact deltas during opening must not buffer a later claim");
+    Check(directSimulation.Snapshot().interaction.heldLightKind == HeldLightKind::None &&
+              CountEvents(directSimulation, GameplayEventType::LanternClaimed) == 0u,
+          "unavailable reward commands must not equip or emit claim semantics");
+
+    GameSimulation pausedSimulation;
+    pausedSimulation.ImportRewardCheckpoint(unlockedChest, noTorch, defeatedFinale);
+    InputSnapshot pausedInput = interactionInput;
+    pausedInput.commands.interact = 1u;
+    pausedInput.commands.toggleHeldLightPose = 1u;
+    pausedInput.paused = true;
+    pausedSimulation.StepFixed(pausedInput);
+    pausedInput.paused = false;
+    pausedSimulation.StepFixed(pausedInput);
+    Check(pausedSimulation.Snapshot().lastConsumedInteractSequence == 1u &&
+              pausedSimulation.Snapshot().lastConsumedToggleHeldLightPoseSequence == 1u &&
+              pausedSimulation.Snapshot().chestReward.phase == ChestRewardPhase::ClosedUnlocked &&
+              CountEvents(pausedSimulation, GameplayEventType::ChestOpened) == 0u,
+          "pause/Home-resume must consume reward edges without replaying them after resume");
+
+    GameSimulation importReset;
+    importReset.ImportRewardCheckpoint(unlockedChest, noTorch, defeatedFinale);
+    importReset.ResetRoute();
+    Check(importReset.Snapshot().chestReward.phase == ChestRewardPhase::Locked &&
+              importReset.Snapshot().finale.phase == FinaleSequencePhase::Inactive &&
+              importReset.Snapshot().interaction.heldLightKind == HeldLightKind::Torch &&
+              importReset.Events().Empty(),
+          "route reset must clear imported reward/finale state and stale semantic events");
 
     chest.Reset();
     finale.Reset();

@@ -7,6 +7,7 @@
 #include <cstdint>
 
 #include "gameplay/ShowcaseRoute.h"
+#include "gameplay/interactions/FinaleSequence.h"
 
 namespace horde::gameplay
 {
@@ -472,14 +473,7 @@ enum class LichPhase
     Dead,
 };
 
-enum class FinaleEndingPhase
-{
-    Inactive,
-    LichFalling,
-    SkylightOpening,
-    DawnRevealed,
-    Complete,
-};
+using FinaleEndingPhase = horde::gameplay::interactions::FinaleEndingPhase;
 
 struct LichSnapshot
 {
@@ -523,40 +517,12 @@ public:
         // authored Dead clip has reached its clamped final pose.
         if (snapshot_.phase == LichPhase::Dead)
         {
-            float remainingDelta = deltaSeconds;
             const float deathTimeRemaining = std::max(0.0f, kDeathAnimationDuration - snapshot_.phaseTime);
-            const float deathDelta = std::min(remainingDelta, deathTimeRemaining);
+            const float deathDelta = std::min(deltaSeconds, deathTimeRemaining);
             snapshot_.phaseTime = std::min(kDeathAnimationDuration, snapshot_.phaseTime + deathDelta);
             snapshot_.animationTime = snapshot_.phaseTime;
-            remainingDelta -= deathDelta;
             snapshot_.deathAnimationComplete =
                 snapshot_.phaseTime + 0.00001f >= kDeathAnimationDuration;
-            if (snapshot_.deathAnimationComplete)
-            {
-                snapshot_.finaleEndingPhase = FinaleEndingPhase::SkylightOpening;
-                const float skylightTimeRemaining =
-                    std::max(0.0f, kFinaleSkylightOpenDuration - finaleSkylightOpenTime_);
-                const float skylightDelta = std::min(remainingDelta, skylightTimeRemaining);
-                finaleSkylightOpenTime_ = std::min(
-                    kFinaleSkylightOpenDuration,
-                    finaleSkylightOpenTime_ + skylightDelta);
-                remainingDelta -= skylightDelta;
-                snapshot_.finaleSkylightOpenProgress =
-                    finaleSkylightOpenTime_ / kFinaleSkylightOpenDuration;
-                if (snapshot_.finaleSkylightOpenProgress + 0.00001f >= 1.0f)
-                {
-                    snapshot_.finaleEndingPhase = FinaleEndingPhase::DawnRevealed;
-                    finaleDawnRevealTime_ = std::min(
-                        kFinaleDawnRevealDuration,
-                        finaleDawnRevealTime_ + remainingDelta);
-                    snapshot_.finaleDawnRevealProgress =
-                        finaleDawnRevealTime_ / kFinaleDawnRevealDuration;
-                    if (snapshot_.finaleDawnRevealProgress + 0.00001f >= 1.0f)
-                    {
-                        snapshot_.finaleEndingPhase = FinaleEndingPhase::Complete;
-                    }
-                }
-            }
             snapshot_.staffLightStrength = 0.0f;
             return snapshot_;
         }
@@ -661,8 +627,6 @@ public:
         snapshot_ = {};
         hitPulseTime_ = 0.0f;
         hitRecoilTime_ = 0.0f;
-        finaleSkylightOpenTime_ = 0.0f;
-        finaleDawnRevealTime_ = 0.0f;
     }
 
     const LichSnapshot& Snapshot() const { return snapshot_; }
@@ -670,8 +634,10 @@ public:
     static constexpr float kChargeDuration = 1.20f;
     static constexpr float kRecoveryDuration = 1.80f;
     static constexpr float kDeathAnimationDuration = 2.967f;
-    static constexpr float kFinaleSkylightOpenDuration = 4.50f;
-    static constexpr float kFinaleDawnRevealDuration = 1.75f;
+    static constexpr float kFinaleSkylightOpenDuration =
+        horde::gameplay::interactions::kFinaleSkylightOpenSeconds;
+    static constexpr float kFinaleDawnRevealDuration =
+        horde::gameplay::interactions::kFinaleDawnRevealSeconds;
     static constexpr float kMinimumRepositionDuration = 0.65f;
     static constexpr float kAttackRange = 7.0f;
     static constexpr float kPreferredMinRange = 3.0f;
@@ -694,8 +660,6 @@ private:
         snapshot_.finaleSkylightOpenProgress = 0.0f;
         snapshot_.finaleDawnRevealProgress = 0.0f;
         snapshot_.finaleEndingPhase = FinaleEndingPhase::LichFalling;
-        finaleSkylightOpenTime_ = 0.0f;
-        finaleDawnRevealTime_ = 0.0f;
     }
     static constexpr float MovementScaleForPhase(LichPhase phase)
     {
@@ -744,8 +708,6 @@ private:
     LichSnapshot snapshot_{};
     float hitPulseTime_ = 0.0f;
     float hitRecoilTime_ = 0.0f;
-    float finaleSkylightOpenTime_ = 0.0f;
-    float finaleDawnRevealTime_ = 0.0f;
 };
 
 } // namespace horde::gameplay

@@ -162,9 +162,9 @@ int main()
         {
             check(state.lichEncounter.Snapshot().phase == LichPhase::Dead &&
                   state.lichEncounter.Snapshot().deathAnimationComplete &&
-                  NearlyEqual(state.lichEncounter.Snapshot().finaleSkylightOpenProgress, 1.0f, 0.003f) &&
-                  state.lichEncounter.Snapshot().finaleEndingPhase == FinaleEndingPhase::DawnRevealed &&
-                  state.lichEncounter.Snapshot().finaleDawnRevealProgress < 0.1f,
+                  NearlyEqual(state.finaleSequence.Snapshot().skylightOpenProgress, 1.0f, 0.003f) &&
+                  state.finaleSequence.Snapshot().endingPhase == FinaleEndingPhase::DawnRevealed &&
+                  state.finaleSequence.Snapshot().dawnRevealProgress < 0.1f,
                   "finale-roof checkpoint must retain the dead lich, open the roof, and stay before the ending overlay");
         }
     }
@@ -374,36 +374,23 @@ int main()
           "roster must retain the lich throughout the visible death animation");
     dyingLich.Update(0.007f, closeHitX, closeHitZ, true, true);
     check(dyingLich.Snapshot().deathAnimationComplete &&
-          NearlyEqual(dyingLich.Snapshot().animationTime, LichEncounter::kDeathAnimationDuration, 0.002f) &&
-          NearlyEqual(dyingLich.Snapshot().finaleSkylightOpenProgress, 0.0f, 0.002f) &&
-          dyingLich.Snapshot().finaleEndingPhase == FinaleEndingPhase::SkylightOpening,
-          "death animation must reach and hold its authored final frame");
+           NearlyEqual(dyingLich.Snapshot().animationTime, LichEncounter::kDeathAnimationDuration, 0.002f) &&
+           NearlyEqual(dyingLich.Snapshot().finaleSkylightOpenProgress, 0.0f, 0.002f) &&
+           dyingLich.Snapshot().finaleEndingPhase == FinaleEndingPhase::LichFalling,
+          "death animation must reach and hold its authored final frame without owning finale clocks");
     director.MarkSelectedDead();
     check(director.Snapshot().encounters[1].status == EncounterStatus::Dead,
           "roster death notification must occur only after animation completion");
-    for (int i = 0; i < 225; ++i)
+    for (int i = 0; i < 700; ++i)
     {
         dyingLich.Update(0.01f, closeHitX, closeHitZ, true, true);
     }
-    check(NearlyEqual(dyingLich.Snapshot().finaleSkylightOpenProgress, 0.5f, 0.003f) &&
-          NearlyEqual(dyingLich.Snapshot().animationTime, LichEncounter::kDeathAnimationDuration, 0.002f),
-          "finale skylight must open halfway over the first 2.25 post-death seconds while pose stays clamped");
-    for (int i = 0; i < 225; ++i)
-    {
-        dyingLich.Update(0.01f, closeHitX, closeHitZ, true, true);
-    }
-    check(NearlyEqual(dyingLich.Snapshot().finaleSkylightOpenProgress, 1.0f, 0.003f),
-          "finale skylight must finish opening after 4.5 post-death seconds");
-    check(dyingLich.Snapshot().finaleEndingPhase == FinaleEndingPhase::DawnRevealed &&
-              NearlyEqual(dyingLich.Snapshot().finaleDawnRevealProgress, 0.0f, 0.03f),
-          "the fully open roof must begin a short visible dawn reveal before completing the demo");
-    for (int i = 0; i < 175; ++i)
-    {
-        dyingLich.Update(0.01f, closeHitX, closeHitZ, true, true);
-    }
-    check(dyingLich.Snapshot().finaleEndingPhase == FinaleEndingPhase::Complete &&
-              NearlyEqual(dyingLich.Snapshot().finaleDawnRevealProgress, 1.0f, 0.003f),
-          "the ending must complete deterministically after the dawn reveal hold");
+    check(NearlyEqual(dyingLich.Snapshot().finaleSkylightOpenProgress, 0.0f) &&
+              NearlyEqual(dyingLich.Snapshot().finaleDawnRevealProgress, 0.0f) &&
+              dyingLich.Snapshot().finaleEndingPhase == FinaleEndingPhase::LichFalling &&
+              NearlyEqual(dyingLich.Snapshot().animationTime,
+                          LichEncounter::kDeathAnimationDuration, 0.002f),
+          "encounter-only updates must never advance extracted roof/dawn clocks");
     check(!dyingLich.TryAcceptPlayerHit(closeHitX, closeHitZ),
           "dead lich must reject all further player hits");
     dyingLich.Reset();

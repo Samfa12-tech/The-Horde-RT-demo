@@ -5,6 +5,8 @@
 #include <cstdint>
 
 #include "gameplay/ShowcaseGameplay.h"
+#include "gameplay/interactions/ChestRewardSequence.h"
+#include "gameplay/interactions/InteractionState.h"
 
 namespace horde::gameplay
 {
@@ -89,6 +91,9 @@ struct ShowcaseCheckpointState
     TorchFailureSnapshot torchFailureSnapshot;
     EnemyDirector enemyDirector;
     LichEncounter lichEncounter;
+    horde::gameplay::interactions::ChestRewardSequence chestRewardSequence;
+    horde::gameplay::interactions::FinaleSequence finaleSequence;
+    horde::gameplay::interactions::InteractionState interactionState;
     EnemyKind activeEnemyKind = EnemyKind::Skeleton;
 };
 
@@ -127,8 +132,7 @@ inline void AdvanceLichToOpenRoof(ShowcaseCheckpointState& state, const Showcase
             }
         }
     }
-    const float completionSeconds = LichEncounter::kDeathAnimationDuration +
-                                    LichEncounter::kFinaleSkylightOpenDuration + 0.05f;
+    const float completionSeconds = LichEncounter::kDeathAnimationDuration + 0.05f;
     const int completionFrames = static_cast<int>(completionSeconds / 0.05f) + 1;
     for (int frame = 0; frame < completionFrames; ++frame)
     {
@@ -138,6 +142,23 @@ inline void AdvanceLichToOpenRoof(ShowcaseCheckpointState& state, const Showcase
     {
         state.enemyDirector.MarkSelectedDead();
     }
+    using namespace horde::gameplay::interactions;
+    state.finaleSequence.NotifyLichDefeated();
+    state.chestRewardSequence.Unlock();
+    const InteractionQuery atChest{
+        kRewardChestInteractionPosition.x,
+        kRewardChestInteractionPosition.z,
+        0.0f};
+    state.chestRewardSequence.TryInteract(atChest);
+    state.chestRewardSequence.Update(ChestRewardSequence::kOpeningDurationSeconds);
+    state.chestRewardSequence.TryInteract(atChest);
+    EquipRewardLantern(state.interactionState);
+    state.interactionState.heldLightPose = HeldLightPose::High;
+    state.interactionState.heldLightPoseProgress = 1.0f;
+    state.finaleSequence.NotifyLanternClaimed();
+    state.finaleSequence.Update(kFinaleLanternRaiseSeconds +
+                                kFinaleLanternRevealSeconds +
+                                kFinaleSkylightOpenSeconds + 0.05f);
 }
 
 inline ShowcaseCheckpointState BuildShowcaseCheckpointState(const ShowcaseCheckpoint& checkpoint)
@@ -146,6 +167,11 @@ inline ShowcaseCheckpointState BuildShowcaseCheckpointState(const ShowcaseCheckp
     state.enemyDirector.Reset();
     state.torchFailure.Reset();
     state.lichEncounter.Reset();
+    state.chestRewardSequence.Reset();
+    state.finaleSequence.Reset();
+    horde::gameplay::interactions::ResetInteractionState(
+        state.interactionState,
+        horde::gameplay::interactions::HeldLightKind::Torch);
 
     if (checkpoint.preset == ShowcaseCheckpointPreset::TorchFailureTrigger)
     {

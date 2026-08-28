@@ -133,6 +133,10 @@ void GameSimulation::StepFixed(const InputSnapshot& input,
         pendingParryCommands_ = 0u;
         lastConsumedDodgeSequence_ += pendingDodgeCommands_;
         pendingDodgeCommands_ = 0u;
+        lastConsumedInteractSequence_ += pendingInteractCommands_;
+        pendingInteractCommands_ = 0u;
+        lastConsumedToggleHeldLightPoseSequence_ += pendingToggleHeldLightPoseCommands_;
+        pendingToggleHeldLightPoseCommands_ = 0u;
         dodgeRemainingSeconds_ = 0.0f;
     }
     if (!input.paused && playerAlive)
@@ -145,6 +149,7 @@ void GameSimulation::StepFixed(const InputSnapshot& input,
                                            playerYawRadians_,
                                            playerPitchRadians_);
         UpdateEncounters(input, fixedDeltaSeconds);
+        UpdateRewardSequence(fixedDeltaSeconds, true);
         ResolveHeldItems();
         ResolvePlayerAnimation(fixedDeltaSeconds);
         ResolveFireEmitters(fixedDeltaSeconds);
@@ -165,6 +170,8 @@ void GameSimulation::StepFixed(const InputSnapshot& input,
         pendingAttackCommands_ = 0u;
         pendingParryCommands_ = 0u;
         pendingDodgeCommands_ = 0u;
+        pendingInteractCommands_ = 0u;
+        pendingToggleHeldLightPoseCommands_ = 0u;
         dodgeRemainingSeconds_ = 0.0f;
     }
 
@@ -213,6 +220,26 @@ bool GameSimulation::ApplyShowcaseCheckpoint(std::int32_t checkpointId, bool cou
     return ApplyCheckpoint(checkpointId, countAsRetry);
 }
 
+void GameSimulation::ImportRewardCheckpoint(
+    const horde::gameplay::interactions::ChestRewardSnapshot& chestReward,
+    const horde::gameplay::interactions::InteractionState& interaction,
+    const horde::gameplay::interactions::FinaleSequenceSnapshot& finale)
+{
+    events_.Clear();
+    chestRewardSequence_.Import(chestReward);
+    interactionState_ = interaction;
+    finaleSequence_.Import(finale);
+    pendingInteractCommands_ = 0u;
+    pendingToggleHeldLightPoseCommands_ = 0u;
+    finaleCompletionEmitted_ =
+        finaleSequence_.Snapshot().endingPhase ==
+        horde::gameplay::interactions::FinaleEndingPhase::Complete;
+    ResolveHeldItems();
+    ResolvePlayerAnimation(0.0f);
+    ResolveFireEmitters(0.0f);
+    RefreshSnapshot(lastInput_);
+}
+
 void GameSimulation::ResetTiming()
 {
     fixedStepRunner_.ResetAccumulator();
@@ -252,11 +279,17 @@ void GameSimulation::IngestCommands(const InputSnapshot& input)
     }
     pendingRouteResetCommands_ += SequenceDelta(input.commands.routeReset, latestRouteResetSequence_);
     pendingRetryCommands_ += SequenceDelta(input.commands.retry, latestRetrySequence_);
+    pendingInteractCommands_ += SequenceDelta(input.commands.interact, latestInteractSequence_);
+    pendingToggleHeldLightPoseCommands_ += SequenceDelta(
+        input.commands.toggleHeldLightPose, latestToggleHeldLightPoseSequence_);
     latestAttackSequence_ = std::max(latestAttackSequence_, input.commands.attack);
     latestParrySequence_ = std::max(latestParrySequence_, input.commands.parry);
     latestDodgeSequence_ = std::max(latestDodgeSequence_, input.commands.dodge);
     latestRouteResetSequence_ = std::max(latestRouteResetSequence_, input.commands.routeReset);
     latestRetrySequence_ = std::max(latestRetrySequence_, input.commands.retry);
+    latestInteractSequence_ = std::max(latestInteractSequence_, input.commands.interact);
+    latestToggleHeldLightPoseSequence_ = std::max(
+        latestToggleHeldLightPoseSequence_, input.commands.toggleHeldLightPose);
 }
 
 bool GameSimulation::ConsumeWorldCommand()
@@ -301,6 +334,16 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
     enemyDirector_ = state.enemyDirector;
     activeEnemyKind_ = state.activeEnemyKind;
     lichEncounter_ = state.lichEncounter;
+    chestRewardSequence_ = state.chestRewardSequence;
+    finaleSequence_ = state.finaleSequence;
+    interactionState_ = state.interactionState;
+    if (!torchFailureSnapshot_.heldByPlayer &&
+        interactionState_.heldLightKind ==
+            horde::gameplay::interactions::HeldLightKind::Torch)
+    {
+        interactionState_.heldLightKind =
+            horde::gameplay::interactions::HeldLightKind::None;
+    }
     const bool pairCheckpoint = checkpoint->preset == ShowcaseCheckpointPreset::TwoSkeletonCombat;
     swordCombat_.Reset((isRetry || pairCheckpoint) ? kSkeletonEnemyCapacity : 1u);
     combatSnapshot_ = swordCombat_.Update(0.0f,
@@ -331,9 +374,13 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
     lastConsumedAttackSequence_ += pendingAttackCommands_;
     lastConsumedParrySequence_ += pendingParryCommands_;
     lastConsumedDodgeSequence_ += pendingDodgeCommands_;
+    lastConsumedInteractSequence_ += pendingInteractCommands_;
+    lastConsumedToggleHeldLightPoseSequence_ += pendingToggleHeldLightPoseCommands_;
     pendingAttackCommands_ = 0u;
     pendingParryCommands_ = 0u;
     pendingDodgeCommands_ = 0u;
+    pendingInteractCommands_ = 0u;
+    pendingToggleHeldLightPoseCommands_ = 0u;
     dodgeRemainingSeconds_ = 0.0f;
     dodgeCooldownRemainingSeconds_ = 0.0f;
     retryCheckpoint_ = activeEnemyKind_ == EnemyKind::Lich ? 9 : 0;
@@ -371,6 +418,73 @@ void GameSimulation::ResolveHeldItems()
     // state rather than publishing a renderer-authored fallback.
     horde::gameplay::items::ResolveHeldItemsFixedStep(
         heldItems_, input, tickIndex_, heldItemFixedStepState_, diagnostic);
+}
+
+void GameSimulation::UpdateRewardSequence(const float deltaSeconds,
+                                          const bool commandsAvailable)
+{
+    using namespace horde::gameplay::interactions;
+
+    if (interactionState_.heldLightKind == HeldLightKind::Torch &&
+        !torchFailureSnapshot_.heldByPlayer)
+    {
+        interactionState_.heldLightKind = HeldLightKind::None;
+    }
+
+    const InteractionQuery query{playerX_, playerZ_, playerYawRadians_};
+    while (pendingInteractCommands_ > 0u)
+    {
+        --pendingInteractCommands_;
+        ++lastConsumedInteractSequence_;
+        if (!commandsAvailable)
+        {
+            continue;
+        }
+        const ChestRewardAction action = chestRewardSequence_.TryInteract(query);
+        if (action == ChestRewardAction::OpeningStarted)
+        {
+            Emit(GameplayEventType::ChestOpened,
+                 EntityId::Player,
+                 EntityId::RewardChest,
+                 kRewardChestInteractionPosition.x,
+                 kRewardChestInteractionPosition.z);
+        }
+        else if (action == ChestRewardAction::LanternClaimed)
+        {
+            EquipRewardLantern(interactionState_);
+            finaleSequence_.NotifyLanternClaimed();
+            Emit(GameplayEventType::LanternClaimed,
+                 EntityId::Player,
+                 EntityId::RewardLantern,
+                 kRewardChestInteractionPosition.x,
+                 kRewardChestInteractionPosition.z);
+        }
+    }
+    while (pendingToggleHeldLightPoseCommands_ > 0u)
+    {
+        --pendingToggleHeldLightPoseCommands_;
+        ++lastConsumedToggleHeldLightPoseSequence_;
+        if (commandsAvailable)
+        {
+            RequestHeldLightPoseToggle(interactionState_);
+        }
+    }
+
+    chestRewardSequence_.Update(deltaSeconds);
+    AdvanceHeldLightPose(interactionState_, deltaSeconds);
+    finaleSequence_.Update(deltaSeconds);
+
+    if (finaleSequence_.Snapshot().endingPhase ==
+            horde::gameplay::interactions::FinaleEndingPhase::Complete &&
+        !finaleCompletionEmitted_)
+    {
+        finaleCompletionEmitted_ = true;
+        Emit(GameplayEventType::FinaleCompleted,
+             EntityId::Player,
+             EntityId::Lich,
+             playerX_,
+             playerZ_);
+    }
 }
 
 void GameSimulation::ResolvePlayerAnimation(const float fixedDeltaSeconds)
@@ -642,6 +756,14 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
                  EntityId::Lich,
                  lich.x,
                  lich.z);
+            if (finaleSequence_.NotifyLichDefeated() && chestRewardSequence_.Unlock())
+            {
+                Emit(GameplayEventType::ChestUnlocked,
+                     EntityId::Lich,
+                     EntityId::RewardChest,
+                     horde::gameplay::interactions::kRewardChestInteractionPosition.x,
+                     horde::gameplay::interactions::kRewardChestInteractionPosition.z);
+            }
         }
     }
     if (activeEnemyKind_ == EnemyKind::Lich &&
@@ -698,16 +820,6 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
     {
         enemyDirector_.MarkSelectedDead();
     }
-    if (lichEncounter_.Snapshot().finaleEndingPhase == FinaleEndingPhase::Complete &&
-        !finaleCompletionEmitted_)
-    {
-        finaleCompletionEmitted_ = true;
-        Emit(GameplayEventType::FinaleCompleted,
-             EntityId::Player,
-             EntityId::Lich,
-             playerX_,
-             playerZ_);
-    }
 }
 
 void GameSimulation::Emit(GameplayEventType type,
@@ -741,6 +853,9 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.lastConsumedDodgeSequence = lastConsumedDodgeSequence_;
     snapshot_.lastConsumedRouteResetSequence = lastConsumedRouteResetSequence_;
     snapshot_.lastConsumedRetrySequence = lastConsumedRetrySequence_;
+    snapshot_.lastConsumedInteractSequence = lastConsumedInteractSequence_;
+    snapshot_.lastConsumedToggleHeldLightPoseSequence =
+        lastConsumedToggleHeldLightPoseSequence_;
     snapshot_.playerX = playerX_;
     snapshot_.playerZ = playerZ_;
     snapshot_.playerYawRadians = playerYawRadians_;
@@ -794,7 +909,11 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.retryGeneration = retryGeneration_;
     snapshot_.paused = input.paused;
     snapshot_.playerAlive = playerVitals_.Snapshot().phase == PlayerLifePhase::Alive;
-    snapshot_.finaleComplete = lichEncounter_.Snapshot().finaleEndingPhase == FinaleEndingPhase::Complete;
+    snapshot_.finaleComplete = finaleSequence_.Snapshot().endingPhase ==
+        horde::gameplay::interactions::FinaleEndingPhase::Complete;
+    snapshot_.interaction = interactionState_;
+    snapshot_.chestReward = chestRewardSequence_.Snapshot();
+    snapshot_.finale = finaleSequence_.Snapshot();
     snapshot_.torchFailure = torchFailureSnapshot_;
     snapshot_.heldItems = heldItems_;
     snapshot_.heldItemKinematics = heldItemFixedStepState_.kinematics;
@@ -804,6 +923,10 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.swordCombat = combatSnapshot_;
     snapshot_.playerCombat = combatSnapshot_.player;
     snapshot_.lich = lichEncounter_.Snapshot();
+    snapshot_.lich.finaleSkylightOpenProgress = snapshot_.finale.skylightOpenProgress;
+    snapshot_.lich.finaleDawnRevealProgress = snapshot_.finale.dawnRevealProgress;
+    snapshot_.lich.finaleEndingPhase = static_cast<FinaleEndingPhase>(
+        snapshot_.finale.endingPhase);
     snapshot_.playerVitals = playerVitals_.Snapshot();
     snapshot_.fireEmitters = fireEmitters_;
     snapshot_.fireEmitterCount = fireEmitterCount_;

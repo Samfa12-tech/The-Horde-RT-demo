@@ -8,6 +8,9 @@ set(HORDE_RT_CORE_RELATIVE_SOURCES
     gameplay/animation/PlayerAnimationState.cpp
     gameplay/animation/PlayerIkTargets.cpp
     gameplay/effects/FireEmitterState.cpp
+    gameplay/interactions/InteractionState.cpp
+    gameplay/interactions/ChestRewardSequence.cpp
+    gameplay/interactions/FinaleSequence.cpp
     gameplay/items/HeldItemState.cpp
     gameplay/items/HeldLightState.cpp
     gameplay/items/HeldItemKinematics.cpp

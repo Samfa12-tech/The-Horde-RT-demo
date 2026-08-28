@@ -16,6 +16,8 @@ enum class EntityId : std::uint32_t
     Skeleton = SkeletonA,
     Lich = 3,
     SkeletonB = 4,
+    RewardChest = 5,
+    RewardLantern = 6,
 };
 
 enum class GameplayEventType : std::uint8_t
@@ -33,6 +35,9 @@ enum class GameplayEventType : std::uint8_t
     LichDefeated,
     FinaleCompleted,
     PlayerParrySucceeded,
+    ChestUnlocked,
+    ChestOpened,
+    LanternClaimed,
 };
 
 struct GameplayEvent
