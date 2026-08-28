@@ -13,7 +13,7 @@
 #include "gameplay/interactions/ChestRewardSequence.h"
 #include "gameplay/interactions/FinaleSequence.h"
 #include "gameplay/interactions/InteractionState.h"
-#include "gameplay/interactions/LanternPendulum.h"
+#include "gameplay/items/LanternPendulum.h"
 #include "gameplay/simulation/FixedStepRunner.h"
 #include "gameplay/simulation/GameplayEvent.h"
 #include "gameplay/simulation/InputSnapshot.h"
@@ -145,6 +145,7 @@ private:
     float dodgeRemainingSeconds_ = 0.0f;
     float dodgeCooldownRemainingSeconds_ = 0.0f;
     bool finaleCompletionEmitted_ = false;
+    bool lanternPendulumResetPending_ = true;
 };
 
 } // namespace horde::gameplay::simulation

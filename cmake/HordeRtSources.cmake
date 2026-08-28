@@ -11,7 +11,7 @@ set(HORDE_RT_CORE_RELATIVE_SOURCES
     gameplay/interactions/InteractionState.cpp
     gameplay/interactions/ChestRewardSequence.cpp
     gameplay/interactions/FinaleSequence.cpp
-    gameplay/interactions/LanternPendulum.cpp
+    gameplay/items/LanternPendulum.cpp
     gameplay/items/HeldItemState.cpp
     gameplay/items/HeldLightState.cpp
     gameplay/items/HeldItemKinematics.cpp

@@ -1,4 +1,4 @@
-#include "gameplay/interactions/LanternPendulum.h"
+#include "gameplay/items/LanternPendulum.h"
 
 #include <algorithm>
 #include <cmath>
@@ -12,7 +12,7 @@ using horde::gameplay::items::HeldItemTransform;
 using Vec3 = std::array<float, 3u>;
 
 constexpr float kGravity = 9.81f;
-constexpr float kCentreOfMassLength = 0.54f;
+constexpr float kDefaultCentreOfMassLength = 0.54f;
 constexpr float kAngularDamping = 2.45f;
 constexpr float kSoftLimitSpring = 52.0f;
 constexpr float kTeleportDistanceMetres = 0.70f;
@@ -142,6 +142,10 @@ void LanternPendulum::Reset(const HeldItemTransform& worldFromHinge)
 void LanternPendulum::Import(const LanternPendulumSnapshot& snapshot)
 {
     snapshot_ = snapshot;
+    snapshot_.centreOfMassLengthMetres =
+        std::isfinite(snapshot_.centreOfMassLengthMetres)
+        ? std::clamp(snapshot_.centreOfMassLengthMetres, 0.12f, 1.20f)
+        : kDefaultCentreOfMassLength;
     ClampMotion(snapshot_);
     for (float& value : snapshot_.previousPivotPosition)
     {
@@ -197,13 +201,14 @@ const LanternPendulumSnapshot& LanternPendulum::StepFixed(
     }
     const float forwardAcceleration = Dot(acceleration, Column(worldFromHinge, 2u));
     const float strafeAcceleration = Dot(acceleration, Column(worldFromHinge, 0u));
+    const float centreOfMassLength = snapshot_.centreOfMassLengthMetres;
     float forwardAngularAcceleration =
-        -(kGravity / kCentreOfMassLength) * std::sin(snapshot_.forwardAngleRadians) +
-        forwardAcceleration / kCentreOfMassLength -
+        -(kGravity / centreOfMassLength) * std::sin(snapshot_.forwardAngleRadians) +
+        forwardAcceleration / centreOfMassLength -
         kAngularDamping * snapshot_.forwardAngularVelocity;
     float strafeAngularAcceleration =
-        -(kGravity / kCentreOfMassLength) * std::sin(snapshot_.strafeAngleRadians) -
-        strafeAcceleration / kCentreOfMassLength -
+        -(kGravity / centreOfMassLength) * std::sin(snapshot_.strafeAngleRadians) -
+        strafeAcceleration / centreOfMassLength -
         kAngularDamping * snapshot_.strafeAngularVelocity;
 
     const float angleMagnitude = std::hypot(snapshot_.forwardAngleRadians,

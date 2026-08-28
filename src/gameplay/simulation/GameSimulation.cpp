@@ -98,6 +98,7 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& input,
             cadence.Reset();
         }
         lanternPendulum_.Reset(heldItemFixedStepState_.worldFromLeftHand);
+        lanternPendulumResetPending_ = true;
     }
     const std::uint32_t ticks = fixedStepRunner_.Advance(
         frameDeltaSeconds,
@@ -167,12 +168,21 @@ void GameSimulation::StepFixed(const InputSnapshot& input,
         if (interactionState_.heldLightKind ==
             horde::gameplay::interactions::HeldLightKind::RewardLantern)
         {
-            lanternPendulum_.StepFixed(
-                heldItemFixedStepState_.worldFromLeftHand, fixedDeltaSeconds);
+            if (lanternPendulumResetPending_)
+            {
+                lanternPendulum_.Reset(heldItemFixedStepState_.worldFromLeftHand);
+                lanternPendulumResetPending_ = false;
+            }
+            else
+            {
+                lanternPendulum_.StepFixed(
+                    heldItemFixedStepState_.worldFromLeftHand, fixedDeltaSeconds);
+            }
         }
         else
         {
             lanternPendulum_.Reset(heldItemFixedStepState_.worldFromLeftHand);
+            lanternPendulumResetPending_ = true;
         }
         ResolvePlayerAnimation(fixedDeltaSeconds);
         ResolveFireEmitters(fixedDeltaSeconds);
@@ -187,6 +197,7 @@ void GameSimulation::StepFixed(const InputSnapshot& input,
             cadence.Reset();
         }
         lanternPendulum_.Reset(heldItemFixedStepState_.worldFromLeftHand);
+        lanternPendulumResetPending_ = true;
     }
 
     if (wasAlive && playerVitals_.Snapshot().phase != PlayerLifePhase::Alive)
@@ -229,6 +240,7 @@ void GameSimulation::ResetRoute()
     playerAnimationState_.Reset();
     ResolveHeldItems();
     lanternPendulum_.Reset(heldItemFixedStepState_.worldFromLeftHand);
+    lanternPendulumResetPending_ = true;
     ResolvePlayerAnimation(0.0f);
     horde::gameplay::effects::ResetFireEmitter(fireEmitters_[0]);
     ResolveFireEmitters(0.0f);
@@ -265,6 +277,11 @@ void GameSimulation::ImportRewardCheckpoint(
     if (pendulum != nullptr)
     {
         lanternPendulum_.Import(*pendulum);
+        lanternPendulumResetPending_ = false;
+    }
+    else
+    {
+        lanternPendulumResetPending_ = true;
     }
     ResolvePlayerAnimation(0.0f);
     ResolveFireEmitters(0.0f);
@@ -424,6 +441,7 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
     playerAnimationState_.Reset();
     ResolveHeldItems();
     lanternPendulum_.Reset(heldItemFixedStepState_.worldFromLeftHand);
+    lanternPendulumResetPending_ = true;
     ResolvePlayerAnimation(0.0f);
     horde::gameplay::effects::ResetFireEmitter(fireEmitters_[0]);
     ResolveFireEmitters(0.0f);

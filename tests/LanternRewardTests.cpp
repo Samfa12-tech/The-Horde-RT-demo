@@ -236,6 +236,47 @@ int main()
               importReset.Events().Empty(),
           "route reset must clear imported reward/finale state and stale semantic events");
 
+    GameSimulation retryReset;
+    retryReset.ImportRewardCheckpoint(unlockedChest, noTorch, defeatedFinale);
+    retryReset.RetryEncounter();
+    Check(retryReset.Snapshot().chestReward.phase == ChestRewardPhase::Locked &&
+              retryReset.Snapshot().finale.phase == FinaleSequencePhase::Inactive &&
+              retryReset.Snapshot().interaction.heldLightKind == HeldLightKind::Torch &&
+              retryReset.Events().Empty(),
+          "retry must restore route-local reward authority without replaying semantic events");
+
+    GameSimulation endingPolls;
+    ChestRewardSnapshot claimedChest;
+    claimedChest.phase = ChestRewardPhase::LanternClaimed;
+    claimedChest.lidOpenProgress = 1.0f;
+    InteractionState claimedInteraction;
+    claimedInteraction.heldLightKind = HeldLightKind::RewardLantern;
+    claimedInteraction.heldLightPose = HeldLightPose::High;
+    FinaleSequenceSnapshot almostComplete;
+    almostComplete.phase = FinaleSequencePhase::DawnRevealed;
+    almostComplete.endingPhase = FinaleEndingPhase::DawnRevealed;
+    almostComplete.phaseTime = kFinaleDawnRevealSeconds - 0.01f;
+    almostComplete.skylightOpenProgress = 1.0f;
+    almostComplete.dawnRevealProgress = 0.99f;
+    almostComplete.lichDefeated = true;
+    almostComplete.lanternClaimed = true;
+    endingPolls.ImportRewardCheckpoint(claimedChest, claimedInteraction, almostComplete);
+    InputSnapshot endingInput;
+    endingInput.damageEnabled = false;
+    endingPolls.StepFixed(endingInput);
+    std::size_t finaleCompletedCount =
+        CountEvents(endingPolls, GameplayEventType::FinaleCompleted);
+    endingPolls.ClearEvents();
+    for (int poll = 0; poll < 120; ++poll)
+    {
+        endingPolls.AdvanceFrame(endingInput, 1.0 / 60.0);
+        finaleCompletedCount += CountEvents(endingPolls, GameplayEventType::FinaleCompleted);
+        endingPolls.ClearEvents();
+    }
+    Check(endingPolls.Snapshot().finale.endingPhase == FinaleEndingPhase::Complete &&
+              finaleCompletedCount == 1u,
+          "repeated platform ending polls must observe one delayed FinaleCompleted event");
+
     chest.Reset();
     finale.Reset();
     ResetInteractionState(interaction, HeldLightKind::Torch);

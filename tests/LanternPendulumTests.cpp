@@ -1,4 +1,4 @@
-#include "gameplay/interactions/LanternPendulum.h"
+#include "gameplay/items/LanternPendulum.h"
 #include "gameplay/simulation/GameSimulation.h"
 
 #include <cmath>
@@ -148,10 +148,12 @@ int main()
     authored.strafeAngleRadians = -0.18f;
     authored.forwardAngularVelocity = 0.70f;
     authored.strafeAngularVelocity = -0.45f;
+    authored.centreOfMassLengthMetres = 0.61f;
     frozen.Import(authored);
     Check(frozen.Snapshot().forwardAngleRadians == authored.forwardAngleRadians &&
-              frozen.Snapshot().strafeAngularVelocity == authored.strafeAngularVelocity,
-          "checkpoint import must preserve exact finite pendulum angles and velocities");
+              frozen.Snapshot().strafeAngularVelocity == authored.strafeAngularVelocity &&
+              frozen.Snapshot().centreOfMassLengthMetres == authored.centreOfMassLengthMetres,
+          "checkpoint import must preserve exact finite pendulum angles, velocities, and COM length");
 
     LanternPendulum cadence30;
     LanternPendulum cadence60;
@@ -202,6 +204,33 @@ int main()
               std::abs(shared60.forwardAngleRadians - shared120.forwardAngleRadians) < 0.00001f &&
               std::abs(shared30.strafeAngleRadians - shared120.strafeAngleRadians) < 0.00001f,
           "GameSimulation must own identical pendulum state under 30/60/120 Hz frame delivery");
+
+    horde::gameplay::simulation::GameSimulation lifecycle;
+    lifecycle.ImportRewardCheckpoint(claimedChest, heldReward, inactiveFinale);
+    LanternPendulumSnapshot movingCheckpoint = lifecycle.Snapshot().lanternPendulum;
+    movingCheckpoint.forwardAngleRadians = 0.48f;
+    movingCheckpoint.strafeAngleRadians = -0.27f;
+    movingCheckpoint.forwardAngularVelocity = 2.1f;
+    movingCheckpoint.strafeAngularVelocity = -1.3f;
+    movingCheckpoint.worldFromBody = ComposeLanternPendulumBodyTransform(
+        lifecycle.Snapshot().rewardLanternWorldFromHinge,
+        movingCheckpoint.forwardAngleRadians,
+        movingCheckpoint.strafeAngleRadians);
+    lifecycle.ImportRewardCheckpoint(
+        claimedChest, heldReward, inactiveFinale, &movingCheckpoint);
+    horde::gameplay::simulation::InputSnapshot homePause;
+    homePause.paused = true;
+    lifecycle.AdvanceFrame(homePause, 1.0 / 30.0);
+    Check(std::abs(lifecycle.Snapshot().lanternPendulum.forwardAngleRadians) < 0.00001f &&
+              std::abs(lifecycle.Snapshot().lanternPendulum.strafeAngleRadians) < 0.00001f &&
+              std::abs(lifecycle.Snapshot().lanternPendulum.forwardAngularVelocity) < 0.00001f &&
+              std::abs(lifecycle.Snapshot().lanternPendulum.strafeAngularVelocity) < 0.00001f,
+          "pause/Home must reset pendulum motion instead of retaining hidden velocity");
+    homePause.paused = false;
+    lifecycle.AdvanceFrame(homePause, 1.0 / 60.0);
+    Check(std::abs(lifecycle.Snapshot().lanternPendulum.forwardAngleRadians) < 0.00001f &&
+              std::abs(lifecycle.Snapshot().lanternPendulum.strafeAngleRadians) < 0.00001f,
+          "resume after Home must not inject pendulum velocity");
 
     if (!passed) return EXIT_FAILURE;
     std::cout << "Lantern pendulum deterministic physics tests passed\n";

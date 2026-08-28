@@ -13,7 +13,7 @@
 #include "gameplay/interactions/ChestRewardSequence.h"
 #include "gameplay/interactions/FinaleSequence.h"
 #include "gameplay/interactions/InteractionState.h"
-#include "gameplay/interactions/LanternPendulum.h"
+#include "gameplay/items/LanternPendulum.h"
 #include "gameplay/simulation/GameplayEvent.h"
 
 namespace horde::gameplay::simulation

@@ -23,6 +23,7 @@ struct LanternPendulumSnapshot
     float strafeAngularVelocity = 0.0f;
     std::array<float, 3u> previousPivotPosition{};
     std::array<float, 3u> previousPivotVelocity{};
+    float centreOfMassLengthMetres = 0.54f;
     horde::gameplay::items::HeldItemTransform worldFromBody{};
     bool initialized = false;
 
