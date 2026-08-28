@@ -484,12 +484,41 @@ void TestRewardLanternHighLowUsesSharedLeftArmTarget()
     wallInput.cameraZ = -9.70f;
     wallInput.cameraYawRadians = 0.0f;
     const auto wall = horde::gameplay::items::EvaluateHeldItemKinematics(wallInput);
+    std::cout << "reward carry open held/high/low x="
+              << high.heldPropDepth << '/' << high.leftHandLocal[2] << '/'
+              << low.leftHandLocal[2] << '/' << high.leftHandLocal[0]
+              << " wall held/hand/x=" << wall.heldPropDepth << '/'
+              << wall.leftHandLocal[2] << '/' << wall.leftHandLocal[0] << '\n';
     Check(Near(high.heldPropDepth, low.heldPropDepth) &&
-              Near(high.leftHandLocal[2], high.heldPropDepth + 0.40f) &&
-              Near(low.leftHandLocal[2], low.heldPropDepth + 0.40f) &&
-              Near(wall.leftHandLocal[2], wall.heldPropDepth + 0.40f) &&
-              wall.leftHandLocal[2] < low.leftHandLocal[2] - 0.40f,
-          "high/low carry must share a readable depth offset while retaining wall retraction");
+              high.leftHandLocal[2] >= high.heldPropDepth + 1.10f &&
+              high.leftHandLocal[2] <= high.heldPropDepth + 1.25f &&
+              std::abs(high.leftHandLocal[2] - low.leftHandLocal[2]) <= 0.002f &&
+              wall.leftHandLocal[2] >= -0.03f &&
+              wall.leftHandLocal[2] <= 0.01f &&
+              wall.leftHandLocal[0] <= -0.30f &&
+              wall.leftHandLocal[2] < low.leftHandLocal[2] - 1.50f,
+          "high/low carry must share the portrait-readable open advance and collapse to the wall-safe depth/lateral target");
+
+    float previousDepth = high.leftHandLocal[2];
+    float previousLateral = high.leftHandLocal[0];
+    for (int step = 1; step <= 16; ++step)
+    {
+        auto approachInput = input;
+        approachInput.interaction.heldLightPose = HeldLightPose::High;
+        approachInput.interaction.heldLightPoseProgress = 1.0f;
+        approachInput.cameraX = 0.0f;
+        approachInput.cameraZ = -8.50f - static_cast<float>(step) * 0.075f;
+        approachInput.cameraYawRadians = 0.0f;
+        const auto approach =
+            horde::gameplay::items::EvaluateHeldItemKinematics(approachInput);
+        Check(approach.leftHandLocal[2] <= previousDepth + 0.0002f &&
+                  previousDepth - approach.leftHandLocal[2] <= 0.30f &&
+                  approach.leftHandLocal[0] <= previousLateral + 0.0002f &&
+                  previousLateral - approach.leftHandLocal[0] <= 0.10f,
+              "collision-derived reward advance and lateral offset must collapse monotonically without a carry pop");
+        previousDepth = approach.leftHandLocal[2];
+        previousLateral = approach.leftHandLocal[0];
+    }
 }
 
 void TestProductionSwordAssetMeetsGenericSocketAndPbrBudget()

@@ -257,9 +257,9 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
     const float rewardClearanceBlend = rewardClearance * rewardClearance *
         (3.0f - 2.0f * rewardClearance);
     const float rewardWallInset = 0.320f * (1.0f - rewardClearanceBlend);
-    const float rewardOpenAdvance = 1.05f * rewardClearanceBlend;
+    const float rewardOpenAdvance = 1.20f * rewardClearanceBlend;
     const float rewardDepth = heldPropDepth - rewardWallInset + rewardOpenAdvance;
-    const float rewardLateral = -0.35f + 0.365f * rewardClearanceBlend;
+    const float rewardLateral = -0.35f + 0.30f * rewardClearanceBlend;
     const float rewardLowWallDepthBoost =
         0.025f * (1.0f - rewardClearanceBlend);
     const std::array<float, 3u> rewardHighLeftHand{{
@@ -307,7 +307,7 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
     result.leftShoulderLocal = rewardLantern
         ? std::array<float, 3u>{{
               -0.34f,
-              -0.10f + lowerBodyPose.pelvisBob * 0.35f,
+              0.08f + lowerBodyPose.pelvisBob * 0.35f,
               rewardShoulderDepth - lowerBodyPose.leftStride * 0.018f}}
         : std::array<float, 3u>{{
               -0.36f,
