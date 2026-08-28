@@ -165,19 +165,33 @@ HeldItemTransform ComposeLanternPendulumBodyTransform(
     const HeldItemTransform& worldFromHinge,
     const float forwardAngleRadians,
     const float strafeAngleRadians,
-    const float torsionAngleRadians)
+    const float torsionAngleRadians,
+    const float presentationYawRadians)
 {
     if (!FiniteTransform(worldFromHinge) || !std::isfinite(forwardAngleRadians) ||
-        !std::isfinite(strafeAngleRadians) || !std::isfinite(torsionAngleRadians))
+        !std::isfinite(strafeAngleRadians) || !std::isfinite(torsionAngleRadians) ||
+        !std::isfinite(presentationYawRadians))
     {
         return horde::gameplay::items::IdentityHeldItemTransform();
     }
-    return Multiply(worldFromHinge,
-                    Rotation(forwardAngleRadians, strafeAngleRadians,
-                             torsionAngleRadians));
+    // Close collision clearance turns the long cage sideways and smoothly
+    // bounds the visible body swing while preserving the authoritative
+    // pendulum angles/velocities. This keeps the wall response physical in
+    // open space and prevents the authored cage from entering route walls or
+    // the near-camera exclusion volume when the hand retracts.
+    const float wallPresentation = std::clamp(
+        std::sin(std::abs(presentationYawRadians)), 0.0f, 1.0f);
+    const float presentationSwingScale = 1.0f - 0.98f * wallPresentation;
+    return Multiply(
+        Multiply(worldFromHinge,
+                 Rotation(forwardAngleRadians * presentationSwingScale,
+                          strafeAngleRadians * presentationSwingScale,
+                          torsionAngleRadians * presentationSwingScale)),
+        Rotation(0.0f, 0.0f, presentationYawRadians));
 }
 
-void LanternPendulum::Reset(const HeldItemTransform& worldFromHinge)
+void LanternPendulum::Reset(const HeldItemTransform& worldFromHinge,
+                            const float presentationYawRadians)
 {
     if (!FiniteTransform(worldFromHinge))
     {
@@ -189,7 +203,8 @@ void LanternPendulum::Reset(const HeldItemTransform& worldFromHinge)
     snapshot_.previousPivotPosition = {{worldFromHinge[12], worldFromHinge[13],
                                         worldFromHinge[14]}};
     snapshot_.previousHandForward = HorizontalForward(worldFromHinge);
-    snapshot_.worldFromBody = worldFromHinge;
+    snapshot_.worldFromBody = ComposeLanternPendulumBodyTransform(
+        worldFromHinge, 0.0f, 0.0f, 0.0f, presentationYawRadians);
     snapshot_.initialized = true;
 }
 
@@ -228,7 +243,8 @@ void LanternPendulum::Import(const LanternPendulumSnapshot& snapshot)
 
 const LanternPendulumSnapshot& LanternPendulum::StepFixed(
     const HeldItemTransform& worldFromHinge,
-    const float fixedDeltaSeconds)
+    const float fixedDeltaSeconds,
+    const float presentationYawRadians)
 {
     if (!FiniteTransform(worldFromHinge) || !std::isfinite(fixedDeltaSeconds) ||
         fixedDeltaSeconds <= 0.0f || fixedDeltaSeconds > 0.05f)
@@ -238,7 +254,7 @@ const LanternPendulumSnapshot& LanternPendulum::StepFixed(
     const Vec3 pivot{{worldFromHinge[12], worldFromHinge[13], worldFromHinge[14]}};
     if (!snapshot_.initialized)
     {
-        Reset(worldFromHinge);
+        Reset(worldFromHinge, presentationYawRadians);
         return snapshot_;
     }
     const Vec3 displacement{{pivot[0] - snapshot_.previousPivotPosition[0],
@@ -246,7 +262,7 @@ const LanternPendulumSnapshot& LanternPendulum::StepFixed(
                              pivot[2] - snapshot_.previousPivotPosition[2]}};
     if (std::sqrt(Dot(displacement, displacement)) > kTeleportDistanceMetres)
     {
-        Reset(worldFromHinge);
+        Reset(worldFromHinge, presentationYawRadians);
         return snapshot_;
     }
     const Vec3 handForward = HorizontalForward(worldFromHinge);
@@ -255,7 +271,7 @@ const LanternPendulumSnapshot& LanternPendulum::StepFixed(
     if (!std::isfinite(handYawDelta) ||
         std::abs(handYawDelta) > kHandBasisTeleportRadians)
     {
-        Reset(worldFromHinge);
+        Reset(worldFromHinge, presentationYawRadians);
         return snapshot_;
     }
 
@@ -318,7 +334,7 @@ const LanternPendulumSnapshot& LanternPendulum::StepFixed(
     ClampMotion(snapshot_);
     snapshot_.worldFromBody = ComposeLanternPendulumBodyTransform(
         worldFromHinge, snapshot_.forwardAngleRadians, snapshot_.strafeAngleRadians,
-        snapshot_.torsionAngleRadians);
+        snapshot_.torsionAngleRadians, presentationYawRadians);
     return snapshot_;
 }
 

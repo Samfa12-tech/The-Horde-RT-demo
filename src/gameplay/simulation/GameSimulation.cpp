@@ -53,7 +53,9 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
     combatSnapshot_ = swordCombat_.Snapshot();
     torchFailureSnapshot_ = torchFailure_.Snapshot();
     ResolveHeldItems();
-    lanternPendulum_.Reset(heldItemFixedStepState_.worldFromLeftHand);
+    lanternPendulum_.Reset(
+        heldItemFixedStepState_.worldFromLeftHand,
+        heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
     ResolvePlayerAnimation(0.0f);
     ResolveFireEmitters(0.0f);
     RefreshSnapshot(lastInput_);
@@ -97,7 +99,9 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& input,
         {
             cadence.Reset();
         }
-        lanternPendulum_.Reset(heldItemFixedStepState_.worldFromLeftHand);
+        lanternPendulum_.Reset(
+            heldItemFixedStepState_.worldFromLeftHand,
+            heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
         lanternPendulumResetPending_ = true;
     }
     const std::uint32_t ticks = fixedStepRunner_.Advance(
@@ -170,18 +174,23 @@ void GameSimulation::StepFixed(const InputSnapshot& input,
         {
             if (lanternPendulumResetPending_)
             {
-                lanternPendulum_.Reset(heldItemFixedStepState_.worldFromLeftHand);
+                lanternPendulum_.Reset(
+                    heldItemFixedStepState_.worldFromLeftHand,
+                    heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
                 lanternPendulumResetPending_ = false;
             }
             else
             {
                 lanternPendulum_.StepFixed(
-                    heldItemFixedStepState_.worldFromLeftHand, fixedDeltaSeconds);
+                    heldItemFixedStepState_.worldFromLeftHand, fixedDeltaSeconds,
+                    heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
             }
         }
         else
         {
-            lanternPendulum_.Reset(heldItemFixedStepState_.worldFromLeftHand);
+            lanternPendulum_.Reset(
+                heldItemFixedStepState_.worldFromLeftHand,
+                heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
             lanternPendulumResetPending_ = true;
         }
         ResolvePlayerAnimation(fixedDeltaSeconds);
@@ -196,7 +205,9 @@ void GameSimulation::StepFixed(const InputSnapshot& input,
         {
             cadence.Reset();
         }
-        lanternPendulum_.Reset(heldItemFixedStepState_.worldFromLeftHand);
+        lanternPendulum_.Reset(
+            heldItemFixedStepState_.worldFromLeftHand,
+            heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
         lanternPendulumResetPending_ = true;
     }
 
@@ -259,7 +270,9 @@ void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
     for (PlayerFootstepCadence& cadence : enemyFootsteps_)
         cadence.Reset();
     fixedStepRunner_.ResetAccumulator();
-    lanternPendulum_.Reset(heldItemFixedStepState_.worldFromLeftHand);
+    lanternPendulum_.Reset(
+        heldItemFixedStepState_.worldFromLeftHand,
+        heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
     lanternPendulumResetPending_ = true;
     events_.Clear();
 
@@ -296,7 +309,9 @@ void GameSimulation::ResetRoute()
                                            playerYawRadians_);
     playerAnimationState_.Reset();
     ResolveHeldItems();
-    lanternPendulum_.Reset(heldItemFixedStepState_.worldFromLeftHand);
+    lanternPendulum_.Reset(
+        heldItemFixedStepState_.worldFromLeftHand,
+        heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
     lanternPendulumResetPending_ = true;
     ResolvePlayerAnimation(0.0f);
     horde::gameplay::effects::ResetFireEmitter(fireEmitters_[0]);
@@ -330,7 +345,9 @@ void GameSimulation::ImportRewardCheckpoint(
         finaleSequence_.Snapshot().endingPhase ==
         horde::gameplay::interactions::FinaleEndingPhase::Complete;
     ResolveHeldItems();
-    lanternPendulum_.Reset(heldItemFixedStepState_.worldFromLeftHand);
+    lanternPendulum_.Reset(
+        heldItemFixedStepState_.worldFromLeftHand,
+        heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
     if (pendulum != nullptr)
     {
         lanternPendulum_.Import(*pendulum);
@@ -497,7 +514,9 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
     fixedStepRunner_.ResetAccumulator();
     playerAnimationState_.Reset();
     ResolveHeldItems();
-    lanternPendulum_.Reset(heldItemFixedStepState_.worldFromLeftHand);
+    lanternPendulum_.Reset(
+        heldItemFixedStepState_.worldFromLeftHand,
+        heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
     lanternPendulumResetPending_ = true;
     ResolvePlayerAnimation(0.0f);
     horde::gameplay::effects::ResetFireEmitter(fireEmitters_[0]);

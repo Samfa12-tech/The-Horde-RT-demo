@@ -217,9 +217,17 @@ int main()
               stagedWallHigh.Snapshot().playerZ == -9.70f &&
               stagedWallHigh.Snapshot().interaction.heldLightPose ==
                   interactions::HeldLightPose::High &&
-              stagedWallHigh.Snapshot().rewardLanternWorldFromHinge[14] > -9.75f &&
-              stagedWallHigh.Snapshot().rewardLanternWorldFromHinge[14] < -9.70f,
-          "near-wall high checkpoint freezes the shared wall-retracted hinge camera-side of the fixture");
+              stagedWallHigh.Snapshot().heldItemKinematics.
+                  rewardLanternPresentationYawRadians > 1.50f &&
+              stagedWallHigh.Snapshot().rewardLanternWorldFromHinge[14] > -9.90f &&
+              stagedWallHigh.Snapshot().rewardLanternWorldFromHinge[14] < -9.715f &&
+              stagedWallHigh.Snapshot().lanternPendulum.worldFromBody ==
+                  interactions::ComposeLanternPendulumBodyTransform(
+                      stagedWallHigh.Snapshot().rewardLanternWorldFromHinge,
+                      0.0f, 0.0f, 0.0f,
+                      stagedWallHigh.Snapshot().heldItemKinematics.
+                          rewardLanternPresentationYawRadians),
+          "near-wall high checkpoint freezes the shared wall-retracted hinge and authoritative sideways body camera-side of the fixture");
     Check(wallLow != nullptr &&
               StageDevelopmentCheckpointSimulation(stagedWallLow, *wallLow) &&
               stagedWallLow.Snapshot().playerX == 0.0f &&
@@ -229,8 +237,16 @@ int main()
               stagedWallLow.Snapshot().lanternPendulum.strafeAngleRadians ==
                   wallLow->rewardStrafeAngleRadians &&
               stagedWallLow.Snapshot().lanternPendulum.torsionAngleRadians ==
-                  wallLow->rewardTorsionAngleRadians,
-          "near-wall low checkpoint freezes the exact representative wall swing and torsion");
+                  wallLow->rewardTorsionAngleRadians &&
+              stagedWallLow.Snapshot().lanternPendulum.worldFromBody ==
+                  interactions::ComposeLanternPendulumBodyTransform(
+                      stagedWallLow.Snapshot().rewardLanternWorldFromHinge,
+                      wallLow->rewardForwardAngleRadians,
+                      wallLow->rewardStrafeAngleRadians,
+                      wallLow->rewardTorsionAngleRadians,
+                      stagedWallLow.Snapshot().heldItemKinematics.
+                          rewardLanternPresentationYawRadians),
+          "near-wall low checkpoint freezes raw pendulum continuity plus the exact authoritative collision-bounded body transform");
     std::size_t lanternSweepCount = 0u;
     bool sweepHasHigh = false;
     bool sweepHasLow = false;

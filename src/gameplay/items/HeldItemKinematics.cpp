@@ -259,20 +259,24 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
     // Leave enough camera-side travel for the full authored body at the real
     // wall fixture even when downward look pitches the skinned grip forward.
     const float rewardWallInset =
-        0.320f * (1.0f - rewardClearanceBlend) + 0.010f;
+        0.250f * (1.0f - rewardClearanceBlend) + 0.010f;
     const float rewardOpenAdvance = 1.20f * rewardClearanceBlend;
     const float rewardDepth = heldPropDepth - rewardWallInset + rewardOpenAdvance;
-    const float rewardLateral = -0.35f + 0.30f * rewardClearanceBlend;
-    const float rewardLowWallDepthBoost =
+    const float rewardLateral = -0.12f + 0.07f * rewardClearanceBlend;
+    const float rewardHighVerticalWallOffset =
+        -0.40f * (1.0f - rewardClearanceBlend);
+    const float rewardLowVerticalWallOffset =
+        -0.17f * (1.0f - rewardClearanceBlend);
+    const float rewardWallDepthBoost =
         0.025f * (1.0f - rewardClearanceBlend);
     const std::array<float, 3u> rewardHighLeftHand{{
         rewardLateral - torchSway * 0.35f,
-        0.50f + torchBob * 0.25f,
-        rewardDepth}};
+        0.50f + rewardHighVerticalWallOffset + torchBob * 0.25f,
+        rewardDepth + rewardWallDepthBoost}};
     const std::array<float, 3u> rewardLowLeftHand{{
         rewardLateral - torchSway * 0.35f,
-        0.26f + torchBob * 0.25f,
-        rewardDepth + rewardLowWallDepthBoost}};
+        0.26f + rewardLowVerticalWallOffset + torchBob * 0.25f,
+        rewardDepth + rewardWallDepthBoost}};
     constexpr std::array<float, 3u> loweredLeftHand{{-0.36f, -0.92f, 0.27f}};
     float lowerBlend = std::clamp(input.torchFailure.leftArmLowerBlend, 0.0f, 1.0f);
     if (input.interaction.heldLightKind ==
@@ -329,6 +333,9 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
     }
     result.rightHandLocal = sword.rightHandLocal;
     result.heldPropDepth = heldPropDepth;
+    result.rewardLanternPresentationYawRadians = rewardLantern
+        ? 1.57079632679f * (1.0f - rewardClearanceBlend)
+        : 0.0f;
     result.swordRadians = sword.swordRadians;
     result.swordForwardRadians = sword.swordForwardRadians;
     result.parryBlend = sword.parryBlend;

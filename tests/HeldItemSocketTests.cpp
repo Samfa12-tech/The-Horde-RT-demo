@@ -484,6 +484,12 @@ void TestRewardLanternHighLowUsesSharedLeftArmTarget()
     wallInput.cameraZ = -9.70f;
     wallInput.cameraYawRadians = 0.0f;
     const auto wall = horde::gameplay::items::EvaluateHeldItemKinematics(wallInput);
+    wallInput.interaction.heldLightPose = HeldLightPose::High;
+    const auto wallHigh =
+        horde::gameplay::items::EvaluateHeldItemKinematics(wallInput);
+    wallInput.interaction.heldLightPose = HeldLightPose::Low;
+    const auto wallLow =
+        horde::gameplay::items::EvaluateHeldItemKinematics(wallInput);
     std::cout << "reward carry open held/high/low x="
               << high.heldPropDepth << '/' << high.leftHandLocal[2] << '/'
               << low.leftHandLocal[2] << '/' << high.leftHandLocal[0]
@@ -493,14 +499,21 @@ void TestRewardLanternHighLowUsesSharedLeftArmTarget()
               high.leftHandLocal[2] >= high.heldPropDepth + 1.10f &&
               high.leftHandLocal[2] <= high.heldPropDepth + 1.25f &&
               std::abs(high.leftHandLocal[2] - low.leftHandLocal[2]) <= 0.002f &&
-              wall.leftHandLocal[2] >= -0.03f &&
-              wall.leftHandLocal[2] <= 0.01f &&
-              wall.leftHandLocal[0] <= -0.30f &&
+              wall.leftHandLocal[2] >= 0.05f &&
+              wall.leftHandLocal[2] <= 0.08f &&
+              wall.leftHandLocal[0] <= -0.10f &&
+              wall.leftHandLocal[0] >= -0.14f &&
+              std::abs(high.rewardLanternPresentationYawRadians) <= 0.05f &&
+              wall.rewardLanternPresentationYawRadians >= 1.50f &&
+              wall.rewardLanternPresentationYawRadians <= 1.58f &&
+              wallHigh.leftHandLocal[1] >= wallLow.leftHandLocal[1] + 0.009f &&
+              wallHigh.leftHandLocal[2] == wallLow.leftHandLocal[2] &&
               wall.leftHandLocal[2] < low.leftHandLocal[2] - 1.50f,
-          "high/low carry must share the portrait-readable open advance and collapse to the wall-safe depth/lateral target");
+          "high/low carry must share the portrait-readable open advance and collapse to distinct wall-safe rotated targets");
 
     float previousDepth = high.leftHandLocal[2];
     float previousLateral = high.leftHandLocal[0];
+    float previousPresentationYaw = high.rewardLanternPresentationYawRadians;
     for (int step = 1; step <= 16; ++step)
     {
         auto approachInput = input;
@@ -514,10 +527,15 @@ void TestRewardLanternHighLowUsesSharedLeftArmTarget()
         Check(approach.leftHandLocal[2] <= previousDepth + 0.0002f &&
                   previousDepth - approach.leftHandLocal[2] <= 0.30f &&
                   approach.leftHandLocal[0] <= previousLateral + 0.0002f &&
-                  previousLateral - approach.leftHandLocal[0] <= 0.10f,
-              "collision-derived reward advance and lateral offset must collapse monotonically without a carry pop");
+                  previousLateral - approach.leftHandLocal[0] <= 0.10f &&
+                  approach.rewardLanternPresentationYawRadians >=
+                      previousPresentationYaw - 0.0002f &&
+                  approach.rewardLanternPresentationYawRadians -
+                      previousPresentationYaw <= 0.40f,
+              "collision-derived reward advance, lateral offset, and wall presentation must collapse monotonically without a carry pop");
         previousDepth = approach.leftHandLocal[2];
         previousLateral = approach.leftHandLocal[0];
+        previousPresentationYaw = approach.rewardLanternPresentationYawRadians;
     }
 }
 

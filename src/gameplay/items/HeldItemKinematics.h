@@ -45,6 +45,7 @@ struct HeldItemKinematicsState
     std::array<float, 3u> leftHandLocal{};
     std::array<float, 3u> rightHandLocal{};
     float heldPropDepth = 1.05f;
+    float rewardLanternPresentationYawRadians = 0.0f;
     float swordRadians = 0.0f;
     float swordForwardRadians = 0.0f;
     float parryBlend = 0.0f;

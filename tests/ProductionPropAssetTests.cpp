@@ -883,7 +883,9 @@ int main()
                         horde::gameplay::interactions::
                             ComposeLanternPendulumBodyTransform(
                                 hinge, motion.forward, motion.strafe,
-                                motion.torsion);
+                                motion.torsion,
+                                state.kinematics.
+                                    rewardLanternPresentationYawRadians);
                     const Matrix body = Multiply(bodyRotation, lanternScale);
                     const ProjectedSafeFrame projectedBody =
                         ProjectAuthoredBoundsToSafeFrame(
@@ -1004,7 +1006,9 @@ int main()
                     horde::gameplay::interactions::
                         ComposeLanternPendulumBodyTransform(
                             hinge, motion.forward, motion.strafe,
-                            motion.torsion);
+                            motion.torsion,
+                            state.kinematics.
+                                rewardLanternPresentationYawRadians);
                 const Matrix body = Multiply(bodyRotation, lanternScale);
                 const TransformedBounds bodyBounds = TransformBounds(
                     lanternBody.asset, body);
@@ -1019,6 +1023,8 @@ int main()
                           << ','
                           << std::max(ringBounds.maximum[2], bodyBounds.maximum[2])
                           << "] hinge=" << hinge[14]
+                          << " presentationYaw="
+                          << state.kinematics.rewardLanternPresentationYawRadians
                           << " body x=[" << bodyBounds.minimum[0] << ','
                           << bodyBounds.maximum[0] << "]"
                           << " camera clearance body/glass/ring="

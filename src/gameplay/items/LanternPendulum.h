@@ -17,7 +17,8 @@ horde::gameplay::items::HeldItemTransform ComposeLanternPendulumBodyTransform(
     const horde::gameplay::items::HeldItemTransform& worldFromHinge,
     float forwardAngleRadians,
     float strafeAngleRadians,
-    float torsionAngleRadians = 0.0f);
+    float torsionAngleRadians = 0.0f,
+    float presentationYawRadians = 0.0f);
 
 struct LanternPendulumSnapshot
 {
@@ -40,11 +41,13 @@ struct LanternPendulumSnapshot
 class LanternPendulum
 {
 public:
-    void Reset(const horde::gameplay::items::HeldItemTransform& worldFromHinge);
+    void Reset(const horde::gameplay::items::HeldItemTransform& worldFromHinge,
+               float presentationYawRadians = 0.0f);
     void Import(const LanternPendulumSnapshot& snapshot);
     const LanternPendulumSnapshot& StepFixed(
         const horde::gameplay::items::HeldItemTransform& worldFromHinge,
-        float fixedDeltaSeconds);
+        float fixedDeltaSeconds,
+        float presentationYawRadians = 0.0f);
     const LanternPendulumSnapshot& Snapshot() const { return snapshot_; }
 
 private:

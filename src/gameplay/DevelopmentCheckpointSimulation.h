@@ -97,7 +97,9 @@ inline bool StageDevelopmentCheckpointSimulation(
         pendulum.previousHandForward = {{hinge[8], hinge[9], hinge[10]}};
         pendulum.worldFromBody = ComposeLanternPendulumBodyTransform(
             hinge, pendulum.forwardAngleRadians, pendulum.strafeAngleRadians,
-            pendulum.torsionAngleRadians);
+            pendulum.torsionAngleRadians,
+            gameSimulation.Snapshot().heldItemKinematics.
+                rewardLanternPresentationYawRadians);
         gameSimulation.ImportRewardCheckpoint(chest, interaction, finale, &pendulum);
     }
     if (checkpoint.combatPose == DevelopmentCombatPose::Rest)
