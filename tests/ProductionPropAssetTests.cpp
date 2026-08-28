@@ -1,6 +1,8 @@
 #include "scene/assets/AssetManifest.h"
 #include "scene/assets/StaticMeshAsset.h"
 #include "gameplay/ShowcaseRoute.h"
+#include "gameplay/items/HeldItemKinematics.h"
+#include "gameplay/items/LanternPendulum.h"
 #include "vulkan/raytracing/RtSceneRouteConstants.h"
 
 #include <algorithm>
@@ -392,6 +394,91 @@ bool BoundsInLanternInspectionFrustum(const StaticMeshAsset& asset,
     return true;
 }
 
+struct ProjectedSafeFrame
+{
+    float minimumX = INFINITY;
+    float maximumX = -INFINITY;
+    float minimumY = INFINITY;
+    float maximumY = -INFINITY;
+    float horizontalCoverage = 0.0f;
+    float verticalCoverage = 0.0f;
+    bool finite = true;
+};
+
+ProjectedSafeFrame ProjectAuthoredBoundsToSafeFrame(
+    const StaticMeshAsset& asset,
+    const Matrix& worldFromAsset,
+    const float aspect,
+    const float cameraX = 0.0f,
+    const float cameraZ = 0.0f,
+    const float yaw = 0.0f,
+    const float pitch = -0.05f)
+{
+    ProjectedSafeFrame result;
+    const std::array<float, 3u> eye{{cameraX, 0.58f, cameraZ}};
+    std::array<float, 3u> forward{{std::sin(yaw), -0.05f + pitch,
+                                   -std::cos(yaw)}};
+    const float forwardLength = std::sqrt(
+        forward[0] * forward[0] + forward[1] * forward[1] +
+        forward[2] * forward[2]);
+    for (float& value : forward) value /= forwardLength;
+    std::array<float, 3u> right{{-forward[2], 0.0f, forward[0]}};
+    const float rightLength = std::hypot(right[0], right[2]);
+    for (float& value : right) value /= rightLength;
+    const std::array<float, 3u> up{{
+        right[1] * forward[2] - right[2] * forward[1],
+        right[2] * forward[0] - right[0] * forward[2],
+        right[0] * forward[1] - right[1] * forward[0]}};
+    const auto dot = [](const std::array<float, 3u>& left,
+                        const std::array<float, 3u>& axis) {
+        return left[0] * axis[0] + left[1] * axis[1] + left[2] * axis[2];
+    };
+    for (std::uint32_t corner = 0u; corner < 8u; ++corner)
+    {
+        const float x = (corner & 1u) != 0u
+            ? asset.bounds.maximum[0] : asset.bounds.minimum[0];
+        const float y = (corner & 2u) != 0u
+            ? asset.bounds.maximum[1] : asset.bounds.minimum[1];
+        const float z = (corner & 4u) != 0u
+            ? asset.bounds.maximum[2] : asset.bounds.minimum[2];
+        const std::array<float, 3u> world{{
+            worldFromAsset[0] * x + worldFromAsset[4] * y +
+                worldFromAsset[8] * z + worldFromAsset[12],
+            worldFromAsset[1] * x + worldFromAsset[5] * y +
+                worldFromAsset[9] * z + worldFromAsset[13],
+            worldFromAsset[2] * x + worldFromAsset[6] * y +
+                worldFromAsset[10] * z + worldFromAsset[14]}};
+        const std::array<float, 3u> delta{{world[0] - eye[0],
+                                           world[1] - eye[1],
+                                           world[2] - eye[2]}};
+        const float depth = dot(delta, forward);
+        if (!std::isfinite(depth) || depth <= 0.02f)
+        {
+            result.finite = false;
+            continue;
+        }
+        const float ndcX = 1.22f * dot(delta, right) / (depth * aspect);
+        const float ndcY = 1.22f * dot(delta, up) / (depth * 0.74f);
+        result.minimumX = std::min(result.minimumX, ndcX);
+        result.maximumX = std::max(result.maximumX, ndcX);
+        result.minimumY = std::min(result.minimumY, ndcY);
+        result.maximumY = std::max(result.maximumY, ndcY);
+    }
+    constexpr float safeMinimum = -0.90f;
+    constexpr float safeMaximum = 0.90f;
+    const auto coverage = [](const float minimum, const float maximum) {
+        const float span = maximum - minimum;
+        if (!std::isfinite(span) || span <= 0.000001f) return 0.0f;
+        const float visible = std::max(
+            0.0f, std::min(maximum, safeMaximum) -
+                      std::max(minimum, safeMinimum));
+        return std::clamp(visible / span, 0.0f, 1.0f);
+    };
+    result.horizontalCoverage = coverage(result.minimumX, result.maximumX);
+    result.verticalCoverage = coverage(result.minimumY, result.maximumY);
+    return result;
+}
+
 bool BoundsNear(const StaticMeshAsset& asset,
                 const std::array<float, 3u>& minimum,
                 const std::array<float, 3u>& maximum,
@@ -597,6 +684,144 @@ int main()
               MatrixNear(lightSocket->world, Translation(0.0f, -0.515f, 0.0f)) &&
               MatrixNear(lidNode->world, Translation(0.0f, 0.0f, 0.0f)),
           "all sixteen authored matrix elements retain identity-basis GripRing, chest/lantern hinges, flame, light, and lid contracts");
+
+    if (ringGrip != nullptr && ringHinge != nullptr)
+    {
+        using horde::gameplay::interactions::HeldLightKind;
+        using horde::gameplay::interactions::HeldLightPose;
+        using horde::gameplay::interactions::kLanternPendulumHardLimitRadians;
+        using horde::gameplay::interactions::kLanternPendulumSoftLimitRadians;
+        using horde::gameplay::interactions::kLanternPendulumTorsionHardLimitRadians;
+        using horde::gameplay::items::HeldItemFixedStepInput;
+        using horde::gameplay::items::HeldItemFixedStepState;
+
+        struct Motion
+        {
+            const char* name;
+            float forward;
+            float strafe;
+            float torsion;
+        };
+        constexpr float diagonalHard = 0.678773f;
+        const std::array<Motion, 9u> motions{{
+            {"rest", 0.0f, 0.0f, 0.0f},
+            {"soft-forward", kLanternPendulumSoftLimitRadians, 0.0f,
+             kLanternPendulumTorsionHardLimitRadians},
+            {"soft-backward", -kLanternPendulumSoftLimitRadians, 0.0f,
+             -kLanternPendulumTorsionHardLimitRadians},
+            {"soft-left", 0.0f, kLanternPendulumSoftLimitRadians,
+             -kLanternPendulumTorsionHardLimitRadians},
+            {"soft-right", 0.0f, -kLanternPendulumSoftLimitRadians,
+             kLanternPendulumTorsionHardLimitRadians},
+            {"hard-forward", kLanternPendulumHardLimitRadians, 0.0f,
+             -kLanternPendulumTorsionHardLimitRadians},
+            {"hard-backward", -kLanternPendulumHardLimitRadians, 0.0f,
+             kLanternPendulumTorsionHardLimitRadians},
+            {"hard-diagonal", diagonalHard, diagonalHard,
+             kLanternPendulumTorsionHardLimitRadians},
+            {"hard-opposite", -diagonalHard, -diagonalHard,
+             -kLanternPendulumTorsionHardLimitRadians}}};
+        constexpr std::array<float, 3u> aspects{{
+            16.0f / 9.0f, 9.0f / 16.0f, 1440.0f / 3120.0f}};
+        constexpr Matrix lanternScale{{
+            0.90f, 0.0f, 0.0f, 0.0f,
+            0.0f, 0.90f, 0.0f, 0.0f,
+            0.0f, 0.0f, 0.90f, 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f}};
+        Matrix inverseRingGrip = ringGrip->world;
+        inverseRingGrip[12] = -inverseRingGrip[12];
+        inverseRingGrip[13] = -inverseRingGrip[13];
+        inverseRingGrip[14] = -inverseRingGrip[14];
+
+        std::array<float, 2u> handHeight{};
+        for (std::size_t poseIndex = 0u; poseIndex < 2u; ++poseIndex)
+        {
+            HeldItemFixedStepInput input;
+            input.playerX = 0.0f;
+            input.playerZ = 0.0f;
+            input.playerPitchRadians = -0.05f;
+            input.interaction.heldLightKind = HeldLightKind::RewardLantern;
+            input.interaction.heldLightPose = poseIndex == 0u
+                ? HeldLightPose::High : HeldLightPose::Low;
+            input.interaction.heldLightPoseProgress = 1.0f;
+            auto items = horde::gameplay::items::MakeDefaultHeldItemStates();
+            HeldItemFixedStepState state;
+            std::string diagnostic;
+            Check(horde::gameplay::items::ResolveHeldItemsFixedStep(
+                      items, input, 1u, state, diagnostic),
+                  std::string("reward safe-frame shared hand target resolves: ") +
+                      diagnostic);
+            handHeight[poseIndex] = state.kinematics.leftHandLocal[1];
+            const Matrix ring = Multiply(
+                Multiply(state.worldFromLeftHand, lanternScale),
+                inverseRingGrip);
+            const Matrix hinge = Multiply(ring, ringHinge->world);
+            float worstHorizontalCoverage = 1.0f;
+            float worstVerticalCoverage = 1.0f;
+            float largestRingAbsX = 0.0f;
+            float largestRingAbsY = 0.0f;
+            for (const float aspect : aspects)
+            {
+                const ProjectedSafeFrame projectedRing =
+                    ProjectAuthoredBoundsToSafeFrame(
+                        lanternRing.asset, ring, aspect);
+                largestRingAbsX = std::max(
+                    largestRingAbsX,
+                    std::max(std::abs(projectedRing.minimumX),
+                             std::abs(projectedRing.maximumX)));
+                largestRingAbsY = std::max(
+                    largestRingAbsY,
+                    std::max(std::abs(projectedRing.minimumY),
+                             std::abs(projectedRing.maximumY)));
+                for (const Motion& motion : motions)
+                {
+                    const Matrix bodyRotation =
+                        horde::gameplay::interactions::
+                            ComposeLanternPendulumBodyTransform(
+                                hinge, motion.forward, motion.strafe,
+                                motion.torsion);
+                    const Matrix body = Multiply(bodyRotation, lanternScale);
+                    const ProjectedSafeFrame projectedBody =
+                        ProjectAuthoredBoundsToSafeFrame(
+                            lanternBody.asset, body, aspect);
+                    worstHorizontalCoverage = std::min(
+                        worstHorizontalCoverage,
+                        projectedBody.horizontalCoverage);
+                    worstVerticalCoverage = std::min(
+                        worstVerticalCoverage,
+                        projectedBody.verticalCoverage);
+                    Check(projectedBody.finite,
+                          std::string(poseIndex == 0u ? "high " : "low ") +
+                              motion.name +
+                              " authored body AABB remains in front of the camera");
+                    if (motion.forward == 0.0f && motion.strafe == 0.0f)
+                    {
+                        Check(projectedBody.minimumX >= -0.90f &&
+                                  projectedBody.maximumX <= 0.90f &&
+                                  projectedBody.minimumY >= -0.90f &&
+                                  projectedBody.maximumY <= 0.90f,
+                              std::string(poseIndex == 0u ? "high" : "low") +
+                                  " rest full authored lantern body AABB fits the safe frame");
+                    }
+                }
+            }
+            std::cout << (poseIndex == 0u ? "high" : "low")
+                      << " reward safe-frame worst coverage x/y="
+                      << worstHorizontalCoverage << '/' << worstVerticalCoverage
+                      << " ring abs x/y=" << largestRingAbsX << '/'
+                      << largestRingAbsY << '\n';
+            Check(largestRingAbsX <= 0.86f && largestRingAbsY <= 0.86f,
+                  std::string(poseIndex == 0u ? "high" : "low") +
+                      " complete authored GripRing AABB retains a 14% safe-frame margin");
+            Check(worstHorizontalCoverage >= 0.50f &&
+                      worstVerticalCoverage >= 0.90f,
+                  std::string(poseIndex == 0u ? "high" : "low") +
+                      " full authored body AABB keeps a projected majority horizontally and at least 90% vertically through 45/55-degree swing and torsion extremes on landscape and portrait");
+        }
+        Check(handHeight[0] - handHeight[1] >= 0.22f,
+              "shared high and low hand targets remain visibly distinct after safe-frame composition");
+    }
+
     if (chestSocket != nullptr && ringHinge != nullptr && flameSocket != nullptr &&
         lightSocket != nullptr && chestLidHinge != nullptr && lidNode != nullptr)
     {

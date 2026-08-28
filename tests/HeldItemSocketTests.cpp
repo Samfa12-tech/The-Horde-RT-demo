@@ -466,12 +466,12 @@ void TestRewardLanternHighLowUsesSharedLeftArmTarget()
     input.interaction.heldLightPoseProgress = 0.5f;
     const auto midpoint = horde::gameplay::items::EvaluateHeldItemKinematics(input);
 
-    Check(high.leftHandLocal[0] < -0.15f && high.leftHandLocal[0] > -0.45f &&
-              low.leftHandLocal[0] < -0.15f && low.leftHandLocal[0] > -0.45f,
+    Check(high.leftHandLocal[0] < -0.04f && high.leftHandLocal[0] > -0.18f &&
+              low.leftHandLocal[0] < -0.04f && low.leftHandLocal[0] > -0.18f,
           "reward high/low targets must preserve the accepted inward phone-arm placement");
-    Check(high.leftHandLocal[1] > -0.15f &&
-              low.leftHandLocal[1] < high.leftHandLocal[1] - 0.30f &&
-              low.leftHandLocal[1] > -0.82f,
+    Check(high.leftHandLocal[1] > 0.45f &&
+              low.leftHandLocal[1] <= high.leftHandLocal[1] - 0.22f &&
+              low.leftHandLocal[1] > 0.20f,
           "reward high/low carry must visibly raise and lower the real left arm without using the failed-torch pose");
     for (std::size_t axis = 0u; axis < midpoint.leftHandLocal.size(); ++axis)
     {
@@ -479,9 +479,17 @@ void TestRewardLanternHighLowUsesSharedLeftArmTarget()
                    0.5f * (high.leftHandLocal[axis] + low.leftHandLocal[axis]), 0.0002f),
               "the 0.65 second high/low transition must remain continuous in shared kinematics");
     }
+    horde::gameplay::items::HeldItemKinematicsInput wallInput = input;
+    wallInput.cameraX = 0.0f;
+    wallInput.cameraZ = -9.70f;
+    wallInput.cameraYawRadians = 0.0f;
+    const auto wall = horde::gameplay::items::EvaluateHeldItemKinematics(wallInput);
     Check(Near(high.heldPropDepth, low.heldPropDepth) &&
-              Near(low.leftHandLocal[2], low.heldPropDepth),
-          "high/low carry must share the existing wall-retracted depth contract");
+              Near(high.leftHandLocal[2], high.heldPropDepth + 0.40f) &&
+              Near(low.leftHandLocal[2], low.heldPropDepth + 0.40f) &&
+              Near(wall.leftHandLocal[2], wall.heldPropDepth + 0.40f) &&
+              wall.leftHandLocal[2] < low.leftHandLocal[2] - 0.40f,
+          "high/low carry must share a readable depth offset while retaining wall retraction");
 }
 
 void TestProductionSwordAssetMeetsGenericSocketAndPbrBudget()

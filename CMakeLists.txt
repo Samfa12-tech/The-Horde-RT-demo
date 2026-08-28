@@ -212,6 +212,9 @@ if(BUILD_TESTING)
     target_compile_definitions(horde_rt_production_prop_asset_tests PRIVATE
         HORDE_RT_PRODUCTION_PROP_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/assets/models/props/runtime"
     )
+    target_link_libraries(horde_rt_production_prop_asset_tests PRIVATE
+        horde_gameplay_simulation
+    )
     add_test(NAME horde_rt_production_prop_asset_tests COMMAND horde_rt_production_prop_asset_tests)
 
     if(WIN32)

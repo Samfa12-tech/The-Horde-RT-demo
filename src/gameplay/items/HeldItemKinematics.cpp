@@ -246,14 +246,20 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
     const float torchBob = std::abs(std::sin(input.walkTime * 6.2f)) * 0.025f * movement;
     const std::array<float, 3u> heldLeftHand{{
         -0.24f - torchSway, -0.40f + torchBob, heldPropDepth}};
+    // The authored lantern is almost one metre tall. Its claimed carry is
+    // centred and held farther forward than the compact torch so the full
+    // ring/body remains readable at rest and retains a projected majority at
+    // the 55-degree swing limit on narrow portrait phones. The offset still
+    // follows heldPropDepth, so corridor wall retraction remains shared.
+    const float rewardDepth = heldPropDepth + 0.40f;
     const std::array<float, 3u> rewardHighLeftHand{{
-        -0.27f - torchSway * 0.35f,
-        torchBob * 0.25f,
-        heldPropDepth}};
+        -0.06f - torchSway * 0.35f,
+        0.50f + torchBob * 0.25f,
+        rewardDepth}};
     const std::array<float, 3u> rewardLowLeftHand{{
-        -0.30f - torchSway * 0.35f,
-        -0.31f + torchBob * 0.25f,
-        heldPropDepth}};
+        -0.06f - torchSway * 0.35f,
+        0.26f + torchBob * 0.25f,
+        rewardDepth}};
     constexpr std::array<float, 3u> loweredLeftHand{{-0.36f, -0.92f, 0.27f}};
     float lowerBlend = std::clamp(input.torchFailure.leftArmLowerBlend, 0.0f, 1.0f);
     if (input.interaction.heldLightKind ==
@@ -281,18 +287,26 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
         input.playerCombat, input.swordSwingRadians, heldPropDepth);
 
     HeldItemKinematicsState result;
-    result.leftShoulderLocal = {{
-        -0.36f,
-        -0.44f + lowerBodyPose.pelvisBob * 0.35f,
-        0.39f - lowerBodyPose.leftStride * 0.018f}};
+    const bool rewardLantern = input.interaction.heldLightKind ==
+        horde::gameplay::interactions::HeldLightKind::RewardLantern;
+    // Raise/advance only the reward-carry clavicle target so the real skinned
+    // arm reaches the safe-frame grip without stretching. Torch and sword
+    // anatomy keep the owner-approved Task 5 targets unchanged.
+    result.leftShoulderLocal = rewardLantern
+        ? std::array<float, 3u>{{
+              -0.34f,
+              -0.10f + lowerBodyPose.pelvisBob * 0.35f,
+              0.84f - lowerBodyPose.leftStride * 0.018f}}
+        : std::array<float, 3u>{{
+              -0.36f,
+              -0.44f + lowerBodyPose.pelvisBob * 0.35f,
+              0.39f - lowerBodyPose.leftStride * 0.018f}};
     result.rightShoulderLocal = {{
         0.36f,
         -0.44f + lowerBodyPose.pelvisBob * 0.35f,
         0.39f + lowerBodyPose.leftStride * 0.018f}};
     for (std::size_t axis = 0u; axis < result.leftHandLocal.size(); ++axis)
     {
-        const bool rewardLantern = input.interaction.heldLightKind ==
-            horde::gameplay::interactions::HeldLightKind::RewardLantern;
         const auto& highTarget = rewardLantern ? rewardHighLeftHand : heldLeftHand;
         const auto& lowTarget = rewardLantern ? rewardLowLeftHand : loweredLeftHand;
         result.leftHandLocal[axis] = highTarget[axis] +

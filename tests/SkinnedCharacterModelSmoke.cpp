@@ -425,18 +425,27 @@ int main()
     const auto* restCheckpoint = horde::gameplay::FindDevelopmentCheckpoint(106);
     const auto* downCheckpoint = horde::gameplay::FindDevelopmentCheckpoint(107);
     const auto* upCheckpoint = horde::gameplay::FindDevelopmentCheckpoint(108);
+    const auto* rewardHighCheckpoint = horde::gameplay::FindDevelopmentCheckpoint(116);
+    const auto* rewardLowCheckpoint = horde::gameplay::FindDevelopmentCheckpoint(117);
     horde::gameplay::simulation::GameSimulation restSimulation;
     horde::gameplay::simulation::GameSimulation downSimulation;
     horde::gameplay::simulation::GameSimulation upSimulation;
+    horde::gameplay::simulation::GameSimulation rewardHighSimulation;
+    horde::gameplay::simulation::GameSimulation rewardLowSimulation;
     if (!Require(restCheckpoint != nullptr && downCheckpoint != nullptr &&
-                 upCheckpoint != nullptr &&
+                 upCheckpoint != nullptr && rewardHighCheckpoint != nullptr &&
+                 rewardLowCheckpoint != nullptr &&
                  horde::gameplay::StageDevelopmentCheckpointSimulation(
                      restSimulation, *restCheckpoint) &&
                  horde::gameplay::StageDevelopmentCheckpointSimulation(
                      downSimulation, *downCheckpoint) &&
                  horde::gameplay::StageDevelopmentCheckpointSimulation(
-                     upSimulation, *upCheckpoint),
-                 "rest/down/up direct checkpoints must import and freeze deterministically"))
+                     upSimulation, *upCheckpoint) &&
+                 horde::gameplay::StageDevelopmentCheckpointSimulation(
+                     rewardHighSimulation, *rewardHighCheckpoint) &&
+                 horde::gameplay::StageDevelopmentCheckpointSimulation(
+                     rewardLowSimulation, *rewardLowCheckpoint),
+                 "rest/down/up and reward high/low direct checkpoints must import and freeze deterministically"))
         return 1;
 
     struct ResolvedPlayerPose
@@ -485,15 +494,64 @@ int main()
     horde::vulkan::raytracing::PlayerRenderSlot upFirstSlot;
     horde::vulkan::raytracing::PlayerRenderSlot resetSlot;
     horde::vulkan::raytracing::PlayerRenderSlot frozenSlot;
+    horde::vulkan::raytracing::PlayerRenderSlot sameTickSlot;
     if (!restFirstSlot.LoadAsset(playerPath.string(), diagnostic) ||
         !downFirstSlot.LoadAsset(playerPath.string(), diagnostic) ||
         !upFirstSlot.LoadAsset(playerPath.string(), diagnostic) ||
         !resetSlot.LoadAsset(playerPath.string(), diagnostic) ||
-        !frozenSlot.LoadAsset(playerPath.string(), diagnostic))
+        !frozenSlot.LoadAsset(playerPath.string(), diagnostic) ||
+        !sameTickSlot.LoadAsset(playerPath.string(), diagnostic))
     {
         std::cerr << "FAIL: stable rest basis load: " << diagnostic << '\n';
         return 1;
     }
+
+    const TestRigFrame highRig = BuildRigFrame(
+        rewardHighSimulation.Snapshot(), leftArmBase, rightArmBase);
+    const TestRigFrame lowRig = BuildRigFrame(
+        rewardLowSimulation.Snapshot(), leftArmBase, rightArmBase);
+    bool sameTickUpdated = false;
+    horde::gameplay::items::HeldItemStates sameTickRendered{};
+    if (!sameTickSlot.PreparePose(
+            highRig.animation, 77u,
+            horde::vulkan::raytracing::PlayerCpuSkinCadence::Hz60,
+            sameTickUpdated, diagnostic) || !sameTickUpdated ||
+        !sameTickSlot.ResolveHeldItemVisuals(
+            rewardHighSimulation.Snapshot().heldItems,
+            RigidWorldBoneTransform(sameTickSlot.BoneSockets().leftHand, highRig),
+            RigidWorldBoneTransform(sameTickSlot.BoneSockets().rightHand, highRig),
+            sameTickRendered, diagnostic))
+    {
+        std::cerr << "FAIL: initial same-tick high pose: " << diagnostic << '\n';
+        return 1;
+    }
+    const HeldItemTransform highFinalGrip = sameTickSlot.FinalWorldFromLeftGrip();
+    sameTickUpdated = false;
+    if (!sameTickSlot.PreparePose(
+            lowRig.animation, 77u,
+            horde::vulkan::raytracing::PlayerCpuSkinCadence::Hz60,
+            sameTickUpdated, diagnostic) || !sameTickUpdated ||
+        !sameTickSlot.ResolveHeldItemVisuals(
+            rewardLowSimulation.Snapshot().heldItems,
+            RigidWorldBoneTransform(sameTickSlot.BoneSockets().leftHand, lowRig),
+            RigidWorldBoneTransform(sameTickSlot.BoneSockets().rightHand, lowRig),
+            sameTickRendered, diagnostic))
+    {
+        std::cerr << "FAIL: changed same-tick low pose: " << diagnostic << '\n';
+        return 1;
+    }
+    const HeldItemTransform lowFinalGrip = sameTickSlot.FinalWorldFromLeftGrip();
+    sameTickUpdated = true;
+    if (!Require(PositionError(highFinalGrip, lowFinalGrip) >= 0.20f,
+                 "same-tick changed animation must refresh skinning and publish the changed final left Grip") ||
+        !Require(sameTickSlot.PreparePose(
+                     lowRig.animation, 77u,
+                     horde::vulkan::raytracing::PlayerCpuSkinCadence::Hz60,
+                     sameTickUpdated, diagnostic) && !sameTickUpdated &&
+                     PositionError(lowFinalGrip,
+                                   sameTickSlot.FinalWorldFromLeftGrip()) <= 0.000001f,
+                 "same-tick unchanged animation must reuse the cached skin and final Grip"))
+        return 1;
 
     ResolvedPlayerPose restInitial;
     ResolvedPlayerPose downInitial;
