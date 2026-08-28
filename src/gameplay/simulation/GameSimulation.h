@@ -42,6 +42,11 @@ public:
     void StepFixed(const InputSnapshot& input,
                    float fixedDeltaSeconds = static_cast<float>(FixedStepRunner::kFixedDeltaSeconds),
                    std::uint64_t inputPublicationSequence = 0u);
+    // Owner-thread lifecycle barrier: acknowledges the most recent coherent
+    // paused publication without running gameplay or buffering any edge for
+    // the first resumed fixed tick.
+    void SynchronizePausedInput(const InputSnapshot& input,
+                                std::uint64_t inputPublicationSequence = 0u);
 
     void ResetRoute();
     void RetryEncounter();

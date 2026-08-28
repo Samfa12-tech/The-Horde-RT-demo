@@ -236,6 +236,73 @@ int main()
               CountEvents(pausedSimulation, GameplayEventType::ChestOpened) == 0u,
           "pause/Home-resume must consume reward edges without replaying them after resume");
 
+    // Android may stop the render owner immediately after publishing pause.  Model
+    // that exact interleaving: no AdvanceFrame consumes the paused publication,
+    // then the new owner synchronizes the coherent mailbox snapshot before it is
+    // allowed to publish/resume unpaused input.
+    GameSimulation directLifecycle;
+    GameSimulation mailboxLifecycle;
+    directLifecycle.ImportRewardCheckpoint(unlockedChest, noTorch, defeatedFinale);
+    mailboxLifecycle.ImportRewardCheckpoint(unlockedChest, noTorch, defeatedFinale);
+    InputSnapshot stoppedBeforeConsume = interactionInput;
+    stoppedBeforeConsume.commands.attack = 3u;
+    stoppedBeforeConsume.commands.parry = 2u;
+    stoppedBeforeConsume.commands.dodge = 4u;
+    stoppedBeforeConsume.commands.routeReset = 1u;
+    stoppedBeforeConsume.commands.retry = 2u;
+    stoppedBeforeConsume.commands.interact = 5u;
+    stoppedBeforeConsume.commands.toggleHeldLightPose = 6u;
+    stoppedBeforeConsume.paused = true;
+    directLifecycle.SynchronizePausedInput(stoppedBeforeConsume, 91u);
+    InputMailbox lifecycleMailbox;
+    const std::uint64_t pausePublication = lifecycleMailbox.Publish(stoppedBeforeConsume);
+    const auto ownerAcknowledgement = lifecycleMailbox.ConsumeLatest();
+    mailboxLifecycle.SynchronizePausedInput(ownerAcknowledgement.snapshot,
+                                            ownerAcknowledgement.publicationSequence);
+    InputSnapshot resumedAfterAcknowledgement = stoppedBeforeConsume;
+    resumedAfterAcknowledgement.paused = false;
+    resumedAfterAcknowledgement.hasAuthoritativePlayerPose = false;
+    directLifecycle.StepFixed(resumedAfterAcknowledgement,
+                              static_cast<float>(horde::gameplay::simulation::FixedStepRunner::kFixedDeltaSeconds),
+                              92u);
+    const std::uint64_t resumePublication =
+        lifecycleMailbox.Publish(resumedAfterAcknowledgement);
+    const auto resumedMailboxInput = lifecycleMailbox.ConsumeLatest();
+    mailboxLifecycle.StepFixed(resumedMailboxInput.snapshot,
+                               static_cast<float>(horde::gameplay::simulation::FixedStepRunner::kFixedDeltaSeconds),
+                               resumedMailboxInput.publicationSequence);
+    const auto& directLifecycleSnapshot = directLifecycle.Snapshot();
+    const auto& mailboxLifecycleSnapshot = mailboxLifecycle.Snapshot();
+    Check(directLifecycleSnapshot.lastConsumedAttackSequence == 3u &&
+              directLifecycleSnapshot.lastConsumedParrySequence == 2u &&
+              directLifecycleSnapshot.lastConsumedDodgeSequence == 4u &&
+              directLifecycleSnapshot.lastConsumedRouteResetSequence == 1u &&
+              directLifecycleSnapshot.lastConsumedRetrySequence == 2u &&
+              directLifecycleSnapshot.lastConsumedInteractSequence == 5u &&
+              directLifecycleSnapshot.lastConsumedToggleHeldLightPoseSequence == 6u &&
+              directLifecycleSnapshot.chestReward.phase == ChestRewardPhase::ClosedUnlocked &&
+              directLifecycle.Events().Empty(),
+          "stop-before-consume synchronization must discard every paused edge without world actions or events");
+    Check(mailboxLifecycleSnapshot.lastConsumedAttackSequence ==
+                  directLifecycleSnapshot.lastConsumedAttackSequence &&
+              mailboxLifecycleSnapshot.lastConsumedParrySequence ==
+                  directLifecycleSnapshot.lastConsumedParrySequence &&
+              mailboxLifecycleSnapshot.lastConsumedDodgeSequence ==
+                  directLifecycleSnapshot.lastConsumedDodgeSequence &&
+              mailboxLifecycleSnapshot.lastConsumedRouteResetSequence ==
+                  directLifecycleSnapshot.lastConsumedRouteResetSequence &&
+              mailboxLifecycleSnapshot.lastConsumedRetrySequence ==
+                  directLifecycleSnapshot.lastConsumedRetrySequence &&
+              mailboxLifecycleSnapshot.lastConsumedInteractSequence ==
+                  directLifecycleSnapshot.lastConsumedInteractSequence &&
+              mailboxLifecycleSnapshot.lastConsumedToggleHeldLightPoseSequence ==
+                  directLifecycleSnapshot.lastConsumedToggleHeldLightPoseSequence &&
+              mailboxLifecycleSnapshot.chestReward == directLifecycleSnapshot.chestReward &&
+              mailboxLifecycle.Events().Empty() &&
+              pausePublication == 1u && resumePublication == 2u &&
+              mailboxLifecycleSnapshot.inputPublicationSequence == resumePublication,
+          "owner acknowledgement and direct delivery must resume with identical consumed sequences and no replay");
+
     GameSimulation importReset;
     importReset.ImportRewardCheckpoint(unlockedChest, noTorch, defeatedFinale);
     importReset.ResetRoute();

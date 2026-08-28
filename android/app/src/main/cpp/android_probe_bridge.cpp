@@ -171,6 +171,15 @@ horde::gameplay::simulation::InputSnapshot gInputPublisherState = []
     input.paused = true;
     return input;
 }();
+// JNI publishes pause requests, but only the render/gameplay owner may
+// acknowledge their command counters. An unpause remains deferred until the
+// latest coherent paused publication has been synchronized by that owner.
+horde::gameplay::simulation::InputSnapshot gLifecyclePausedInput =
+    gInputPublisherState;
+std::uint64_t gLifecyclePausedPublicationSequence = 0u;
+std::uint64_t gLifecyclePauseGeneration = 0u;
+std::uint64_t gLifecyclePauseAcknowledgedGeneration = 0u;
+bool gLifecycleUnpausePending = false;
 std::atomic<int> gRuntimeState{0}; // 0 starting/stopped, 1 honestly presented RT, 2 unsupported, 3 render error.
 std::atomic<float> gRequestedRenderScale{1.0f};
 std::atomic<int> gRequestedWaterQuality{1};
@@ -218,6 +227,45 @@ uint64_t PackStereoGains(float left, float right)
 std::uint64_t PublishInputLocked()
 {
     return gInputMailbox.Publish(gInputPublisherState);
+}
+
+void RequestLifecyclePauseSynchronizationLocked(const bool resumeAfterAcknowledgement)
+{
+    gInputPublisherState.paused = true;
+    gLifecyclePausedPublicationSequence = PublishInputLocked();
+    gLifecyclePausedInput = gInputPublisherState;
+    ++gLifecyclePauseGeneration;
+    gLifecycleUnpausePending = resumeAfterAcknowledgement;
+}
+
+void SynchronizeLifecyclePauseOnOwnerThread()
+{
+    horde::gameplay::simulation::InputSnapshot pausedInput;
+    std::uint64_t publicationSequence = 0u;
+    std::uint64_t generation = 0u;
+    {
+        std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+        if (gLifecyclePauseAcknowledgedGeneration >= gLifecyclePauseGeneration)
+            return;
+        pausedInput = gLifecyclePausedInput;
+        publicationSequence = gLifecyclePausedPublicationSequence;
+        generation = gLifecyclePauseGeneration;
+    }
+
+    // GameSimulation is owned by this render thread. No JNI callback mutates
+    // it directly, including during lifecycle teardown/recreation.
+    gGameSimulation.SynchronizePausedInput(pausedInput, publicationSequence);
+
+    std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+    gLifecyclePauseAcknowledgedGeneration = std::max(
+        gLifecyclePauseAcknowledgedGeneration, generation);
+    if (gLifecycleUnpausePending &&
+        gLifecyclePauseAcknowledgedGeneration >= gLifecyclePauseGeneration)
+    {
+        gInputPublisherState.paused = false;
+        PublishInputLocked();
+        gLifecycleUnpausePending = false;
+    }
 }
 
 void ClearPlatformGameplayEvents()
@@ -2265,6 +2313,7 @@ void SwapchainRenderLoop()
 #endif
     while (gSwapchainRunning.load(std::memory_order_acquire))
     {
+        SynchronizeLifecyclePauseOnOwnerThread();
         const float requestedRenderScale = std::clamp(gRequestedRenderScale.load(std::memory_order_acquire), 0.50f, 1.0f);
         if (gSwapchainContext.useRtPath && std::abs(requestedRenderScale - gSwapchainContext.renderScale) > 0.001f)
         {
@@ -2725,8 +2774,7 @@ extern "C" JNIEXPORT void JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_setSimulationPaused(JNIEnv*, jclass, jboolean paused)
 {
     std::lock_guard<std::mutex> lock(gInputPublisherMutex);
-    gInputPublisherState.paused = paused == JNI_TRUE;
-    PublishInputLocked();
+    RequestLifecyclePauseSynchronizationLocked(paused != JNI_TRUE);
 }
 
 extern "C" JNIEXPORT void JNICALL

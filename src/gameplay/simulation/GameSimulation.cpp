@@ -214,6 +214,63 @@ void GameSimulation::StepFixed(const InputSnapshot& input,
     snapshot_.eventsEmittedThisTick = events_.Size() - eventsBefore;
 }
 
+void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
+                                            const std::uint64_t inputPublicationSequence)
+{
+    lastInput_ = input;
+    lastInput_.paused = true;
+    inputPublicationSequence_ = std::max(inputPublicationSequence_,
+                                         inputPublicationSequence);
+
+    const auto synchronize = [](const std::uint64_t incoming,
+                                std::uint64_t& latest,
+                                std::uint64_t& consumed) {
+        latest = std::max(latest, incoming);
+        consumed = std::max(consumed, latest);
+    };
+    synchronize(input.commands.attack, latestAttackSequence_,
+                lastConsumedAttackSequence_);
+    synchronize(input.commands.parry, latestParrySequence_,
+                lastConsumedParrySequence_);
+    synchronize(input.commands.dodge, latestDodgeSequence_,
+                lastConsumedDodgeSequence_);
+    synchronize(input.commands.routeReset, latestRouteResetSequence_,
+                lastConsumedRouteResetSequence_);
+    synchronize(input.commands.retry, latestRetrySequence_,
+                lastConsumedRetrySequence_);
+    synchronize(input.commands.interact, latestInteractSequence_,
+                lastConsumedInteractSequence_);
+    synchronize(input.commands.toggleHeldLightPose,
+                latestToggleHeldLightPoseSequence_,
+                lastConsumedToggleHeldLightPoseSequence_);
+
+    pendingAttackCommands_ = 0u;
+    pendingParryCommands_ = 0u;
+    pendingDodgeCommands_ = 0u;
+    pendingRouteResetCommands_ = 0u;
+    pendingRetryCommands_ = 0u;
+    pendingInteractCommands_ = 0u;
+    pendingToggleHeldLightPoseCommands_ = 0u;
+    pendingDodgeForward_ = 0.0f;
+    pendingDodgeStrafe_ = 0.0f;
+    dodgeRemainingSeconds_ = 0.0f;
+    walkVisualAmount_ = 0.0f;
+    playerFootsteps_.Reset();
+    for (PlayerFootstepCadence& cadence : enemyFootsteps_)
+        cadence.Reset();
+    fixedStepRunner_.ResetAccumulator();
+    lanternPendulum_.Reset(heldItemFixedStepState_.worldFromLeftHand);
+    lanternPendulumResetPending_ = true;
+    events_.Clear();
+
+    RefreshSnapshot(lastInput_);
+    snapshot_.simulationTicksThisFrame = 0u;
+    snapshot_.fixedStepAccumulatorSeconds = fixedStepRunner_.AccumulatorSeconds();
+    snapshot_.catchUpOverrunCount = fixedStepRunner_.OverrunCount();
+    snapshot_.eventsEmittedThisTick = 0u;
+    snapshot_.eventsEmittedThisFrame = 0u;
+}
+
 void GameSimulation::ResetRoute()
 {
     if (!ApplyShowcaseCheckpoint(0, false))
