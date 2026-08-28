@@ -17,6 +17,7 @@ using horde::gameplay::simulation::InputMailbox;
 using horde::gameplay::simulation::InputSnapshot;
 using horde::gameplay::simulation::GameSimulation;
 using horde::gameplay::simulation::GameplayEventType;
+using horde::gameplay::simulation::EntityId;
 
 bool passed = true;
 
@@ -57,6 +58,14 @@ std::size_t CountEvents(const GameSimulation& simulation,
 
 int main()
 {
+    Check(static_cast<std::uint32_t>(EntityId::RewardChest) == 5u &&
+              static_cast<std::uint32_t>(EntityId::RewardLantern) == 6u &&
+              static_cast<std::uint8_t>(GameplayEventType::PlayerParrySucceeded) == 12u &&
+              static_cast<std::uint8_t>(GameplayEventType::ChestUnlocked) == 13u &&
+              static_cast<std::uint8_t>(GameplayEventType::ChestOpened) == 14u &&
+              static_cast<std::uint8_t>(GameplayEventType::LanternClaimed) == 15u,
+          "reward entity/event values must append without renumbering stable transport IDs");
+
     InputSnapshot publication;
     publication.commands.attack = 7u;
     publication.commands.interact = 11u;
