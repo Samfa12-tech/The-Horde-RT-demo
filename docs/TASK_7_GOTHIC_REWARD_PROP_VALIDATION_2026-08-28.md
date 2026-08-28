@@ -143,7 +143,8 @@ damage/death feedback.
 
 Round 3 capture evidence is retained as historical only. It corrected the
 chest/lantern relative composition but incorrectly treated asset-local `Y=0`
-as the corridor floor; Fix Round 4 supplies the final world-space evidence.
+as the corridor floor. Fix Round 4 corrected the world-space placement; Fix
+Round 5 supplies the final cross-system floor-authority evidence.
 
 Round 3 supersedes the Round 2 conclusion that any ordinary terminal reached
 with an open validated volume could be treated as a shared-edge miss. The old
@@ -236,12 +237,13 @@ checkpoint framing, tests, assets, and documentation. Gameplay event identity,
 timing and transport, listener/source routing, spatialisation, playback, cue
 assets, haptics, and damage/death feedback are unchanged.
 
-## Fix Round 4 — final coordinate authority and evidence
+## Fix Round 4 — historical coordinate correction
 
-Round 4 supersedes every earlier 114/115 capture as the Task 7 final visual
-evidence. The glass/transport conclusions and strict failure behavior from
-Round 3 remain current; only the route-floor authority, prop world Y, and
-camera pitch changed.
+Round 4 corrected the visible world-space placement and superseded every
+earlier 114/115 capture at that time. Round 5 now supplies the final Task 7
+evidence because it removes the remaining gameplay/renderer floor-authority
+duplication. The glass/transport conclusions and strict failure behavior from
+Round 3 remain current.
 
 ### One route-floor and reward-stage authority
 
@@ -262,7 +264,7 @@ camera pitch changed.
   projection. Checkpoint 115 remains the exact same transform at `0.90` scale;
   glass-only mode changes visibility only.
 
-### Final visible evidence
+### Round 4 visible evidence
 
 Both PNGs were inspected directly and both manifests report complete, honest
 RT swapchain presentation. The tracked machine-readable record is
@@ -286,7 +288,7 @@ RT swapchain presentation. The tracked machine-readable record is
   `225`. Intentional implicit-origin shadow exits are `323` for checkpoint 114
   and `291` for checkpoint 115.
 
-### Final gates and evidence boundary
+### Round 4 gates and evidence boundary
 
 - Focused Debug and Release tests pass 4/4. Fresh full Windows Debug and Release
   builds each pass 28/28 CTests.
@@ -311,3 +313,77 @@ world-space prop placement, deterministic visual framing, tests, and evidence.
 Gameplay event identity/timing/transport, listener/source routing,
 spatialisation, playback, cue assets, haptics, and damage/death feedback are
 unchanged.
+
+## Fix Round 5 — neutral shared floor authority
+
+Round 5 supersedes Round 4 as the final Task 7 validation record. It changes
+only which C++ route contract owns the existing `Y=-0.95 m` value; reward
+geometry, shader transport, and camera composition are unchanged.
+
+### Authority repair and behavioral proof
+
+- `horde::gameplay::kRouteFloorWorldY` now lives in neutral
+  `src/gameplay/ShowcaseRoute.h`, alongside the route rectangles and zone
+  contract already shared by gameplay and the renderer. No gameplay code
+  depends on a Vulkan renderer header.
+- `TorchFailureSnapshot` initialization and fall/settle evaluation, active
+  skeleton placement and recoil, initial/extended corridor geometry, and
+  `kProductionRewardChestStageWorldFromBase` all consume that one authority.
+- A cross-system behavioral test triggers and fully settles the real torch
+  sequence, evaluates a real active resting skeleton, and compares both world
+  Y results with the production reward-stage transform and shared route floor.
+  It was first observed RED because the gameplay-visible authority did not
+  exist, then passed in Debug and Release after the relocation.
+- The repository exact-literal audit leaves only semantically unrelated
+  `-0.95` values in live source/tests: the finale atmosphere-mist coordinate
+  and its shader fixture, a normalized dielectric direction fixture, and the
+  player-animation left IK pole's X component. Numeric documentation/evidence
+  retains `-0.95` because it records the resolved floor value.
+
+### Fresh visible evidence and counters
+
+The fresh, directly inspected, honestly RT-presented manifests are
+`reports/task-7-fix-round-5-final-114/capture-manifest.json` and
+`reports/task-7-fix-round-5-final-115/capture-manifest.json`. The renderer
+pixels are byte-identical to Round 4, which is expected for an authority-only
+relocation. Checkpoint 114 still shows the floor-contact chest, opened lid,
+complete revealed lantern, transparent panes, and flame; checkpoint 115 still
+shows the isolated complete lantern, cage, ring, panes, and flame.
+
+- Checkpoint 114 PNG SHA-256:
+  `4fb924c25e35052116a46d7e1102c907acb19f8e863ecf0d657fbc17e168890b`.
+- Checkpoint 115 PNG SHA-256:
+  `05e8ecdbf03d2c0573db3f939c27a931d3e5eef2b3db38c9e0521e26c2c19477`.
+- Both captures retain zero transport/shadow overflow, secondary reject,
+  near-self-hit, global/primary/shadow unclosed volume, production-pane stack,
+  open miss/opaque, mismatch, interface/volume budget, terminal/volume/material
+  mask, and closed-volume absorption failures.
+- Both retain intentional pane origin/terminal/guarded same-medium
+  `225/225/225`, different-medium `0`, primary TIR `869`, bounded TIR
+  termination `134`, finite-endpoint shadow volume `1`, and secondary terminal
+  `225`. Intentional implicit-origin exits are `323` for 114 and `291` for 115.
+
+### Exact gates and evidence boundary
+
+- Focused Debug and Release character/gameplay/production-prop tests pass.
+  Fresh full Windows Debug and Release builds each pass 28/28 CTests.
+- Generic/legacy shader compile and embedded freshness pass. Generic embedded
+  SHA-256 remains
+  `a148ef9dc3f7137a459d21e480c12ad13c61e14c2ef376ebe37f3caf6d85b3eb`;
+  generic SPIR-V remains
+  `46128e287c8bf86363cddb529906955fa25fabca29c294122a77cce54716a400`.
+  ABI freshness remains
+  `821418c6c28f1827e5064f8a1551e3aa04c393d9e9df2ff37bdcaf0f6e3dfe54`.
+- Android `assembleDebug`, unsigned `assembleRelease`, and `lintRelease` pass
+  in one 97-task build; package/runtime asset and exact CC BY 4.0 attribution
+  checks pass. Debug APK SHA-256 is
+  `329f8714fc90411a57baa02df16204c4765a66592169f74c61c084a699f4738c`;
+  unsigned Release APK SHA-256 is
+  `5c3788e12a262349ade16146643ddcd183fa99739ef6f74baaa1fd10aef63253`.
+- `adb devices -l` exposed no device. No Android installation, presentation,
+  visual, performance, lifecycle, thermal, or owner verdict is claimed.
+
+Audio/haptic manual revalidation required: NO — Round 5 relocates a static
+coordinate authority and updates tests/evidence only. It changes no gameplay
+event identity/timing/transport, listener/source routing, spatialisation,
+playback, cue asset, haptic, or player-damage feedback behavior.
