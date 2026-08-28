@@ -366,6 +366,7 @@
 - [x] Require black-silhouette and lit-turntable reviews against the icon: pointed canopy/finial, ring/hinge, and deliberate Gothic tracery must read at game FOV.
 - [x] Render chest base/lid and lantern ring/body as generic scene objects. Reuse freed procedural-player TLAS slots 5-8; retain roof 17, second skeleton 18, and waterfall 19.
 - [x] Add `lantern-chest-unlock` and a development glass/transmission inspection using the production lantern asset.
+- [x] Bind corridor geometry and the reusable Task 8 reward transform to one `kRouteFloorWorldY=-0.95` authority; prove full transformed AABBs, floor contact, base/lid clearance, exact `RewardLanternHingeSocket` composition, and both final checkpoint frusta.
 
 **Commits:**
 

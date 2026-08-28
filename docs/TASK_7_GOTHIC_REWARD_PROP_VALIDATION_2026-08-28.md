@@ -20,7 +20,7 @@ Date: 2026-08-28
 ## Fix Round 1
 
 - The previous live pane failures were not an asset-topology defect: metre-space validation now asserts six disconnected, outward-wound, two-use-edge closed components and a 7 mm nearest paired-face thickness. The existing static-GLB negative fixtures continue to reject open, non-manifold, inward, and malformed thick-volume inputs; the production gate adds the non-generic wrong-thickness guard. The generic transport bug was stochastic rough refraction inside a thick 7 mm volume, which could reach cage/neighbor geometry before its paired exit. Thick transmission now preserves its geometric refracted direction; roughness remains on reflection. Primary stack identity includes instance plus material, so an exit from a different pane cannot close the wrong volume.
-- `LanternSocket`, `Hinge`, `Flame`, and `Light` are now resolved from loaded GLB sockets. Checkpoint staging supplies only the chest world placement; ring/body transforms and emitter/light positions are composed from one authoritative lantern hinge transform. The chest lid is composed from the loaded `ChestLid` rear-hinge root and a named staged -70 degree open pose.
+- `RewardLanternHingeSocket`, `Hinge`, `Flame`, and `Light` are now resolved from loaded GLB sockets. Checkpoint staging supplies only the chest world placement; ring/body transforms and emitter/light positions are composed from one authoritative lantern hinge transform. The chest lid is composed from the loaded `ChestLid` rear-hinge root and a named staged -70 degree open pose.
 - Fresh RT-presented Windows captures for 114/115 have zero transport overflow, shadow overflow, secondary reject, open-volume, and production-pane-attributed counters. Exact capture hashes and manifest paths are tracked in [TASK_7_FIX_ROUND_1_WINDOWS_CAPTURES_2026-08-28.json](evidence/TASK_7_FIX_ROUND_1_WINDOWS_CAPTURES_2026-08-28.json). These are capture evidence, not a matched performance acceptance.
 - Sanitized exact Meshy settings/task IDs and accepted/rejected decisions are tracked in `assets/models/props/provenance/task-7/`. The prior `references/lantern_icon_reference.png` statement is corrected: no such repository/distributable file exists.
 - `SM-S948B` remains unavailable through ADB. The exact APK mobile 4-interface visual/performance/lifecycle confirmation remains a Task 9 gate; it is not inferred from this Host repair.
@@ -141,20 +141,24 @@ damage/death feedback.
 
 ## Fix Round 3
 
+Round 3 capture evidence is retained as historical only. It corrected the
+chest/lantern relative composition but incorrectly treated asset-local `Y=0`
+as the corridor floor; Fix Round 4 supplies the final world-space evidence.
+
 Round 3 supersedes the Round 2 conclusion that any ordinary terminal reached
 with an open validated volume could be treated as a shared-edge miss. The old
 three-count absorption evidence remains above as historical review evidence,
 but that blanket policy is rejected and is no longer present in the shader.
 
-### Floor-valid reward composition
+### Historical asset-local reward composition
 
 - The former checkpoint stage translated the complete chest by `+0.37 m`, so
   its authored Y bounds became `+0.37..+0.75 m`. At the same time the ambiguous
   `LanternSocket` target was only `+0.18 m` above the chest origin while the
   lantern body extends downward from its hinge. This inverted the composition:
   the chest visibly floated over and penetrated the lantern.
-- Checkpoint staging now leaves the chest at authored floor contact
-  (`Y 0.000..0.380 m`). The reusable chest asset exposes the semantic
+- Checkpoint staging in this historical round left the chest on its asset-local
+  base plane (`Y 0.000..0.380 m`), not the route floor. The reusable chest asset exposes the semantic
   `RewardLanternHingeSocket` at exact local translation
   `(0.000, +1.280, +0.300) m`, intended for the Task 8 reveal/claim contract.
 - At the exact shared `0.90` reveal/inspection scale, the body AABB in chest
@@ -188,7 +192,7 @@ but that blanket policy is rejected and is no longer present in the shader.
   material. Generic same-instance/material reflection terminals no longer
   contaminate this production-specific counter.
 
-### Exact final evidence and gates
+### Historical Round 3 evidence and gates
 
 Both final PNGs were inspected directly and both manifests report an honestly
 presented RT swapchain frame. The tracked machine-readable record is
@@ -231,3 +235,79 @@ reward composition, dielectric failure classification/diagnostics, visual
 checkpoint framing, tests, assets, and documentation. Gameplay event identity,
 timing and transport, listener/source routing, spatialisation, playback, cue
 assets, haptics, and damage/death feedback are unchanged.
+
+## Fix Round 4 — final coordinate authority and evidence
+
+Round 4 supersedes every earlier 114/115 capture as the Task 7 final visual
+evidence. The glass/transport conclusions and strict failure behavior from
+Round 3 remain current; only the route-floor authority, prop world Y, and
+camera pitch changed.
+
+### One route-floor and reward-stage authority
+
+- `kRouteFloorWorldY` is the single C++ authority for the authored corridor
+  floor at world `Y=-0.95 m`. Initial corridor floor/wall geometry, extended
+  route floors/walls, floor-bound corridor props, and the deterministic reward
+  stage consume it rather than duplicating `-0.95` literals.
+- `kProductionRewardChestStageWorldFromBase` is derived from that floor
+  constant and is consumed by both the renderer and production-prop behavior
+  test. The chest full world AABB is exactly `Y -0.95..-0.57 m`; the authored
+  reward hinge is `Y +0.33 m` and the opened lid origin is `Y -0.61 m`.
+- At the unchanged `0.90` lantern scale, flame and light origins are exactly
+  `(-12.2401924, -0.1605, -15.27)` and
+  `(-12.2401924, -0.1335, -15.27)`. The full transformed body remains
+  `22.5 mm` above the chest, and its chest-local full AABB remains
+  `177.899 mm` clear of the opened lid. The shared checkpoint pitch is now
+  `-0.35`, which contains every chest/lid/ring/body bound in the exact 960x540
+  projection. Checkpoint 115 remains the exact same transform at `0.90` scale;
+  glass-only mode changes visibility only.
+
+### Final visible evidence
+
+Both PNGs were inspected directly and both manifests report complete, honest
+RT swapchain presentation. The tracked machine-readable record is
+`docs/evidence/TASK_7_FIX_ROUND_4_WINDOWS_CAPTURES_2026-08-28.json`.
+
+- Checkpoint 114 visibly shows the chest contacting the cobble floor, its lid
+  open, and the complete reward lantern revealed above/forward with transparent
+  panes and the engine flame. PNG SHA-256:
+  `4fb924c25e35052116a46d7e1102c907acb19f8e863ecf0d657fbc17e168890b`.
+- Checkpoint 115 visibly shows the isolated complete Gothic cage, ring, finial,
+  transparent panes, and engine flame at the grounded reveal transform. PNG
+  SHA-256:
+  `05e8ecdbf03d2c0573db3f939c27a931d3e5eef2b3db38c9e0521e26c2c19477`.
+- Both captures have zero transport/shadow overflow, secondary reject,
+  near-self-hit, global/primary/shadow unclosed volume, production-pane stack
+  failure, open miss/opaque, mismatch, interface/volume budget failure,
+  terminal/volume/material mask, and closed-volume absorption counters.
+- Both report production-pane origin/terminal/guarded same-medium `225/225/225`,
+  different-medium `0`, primary TIR `869`, bounded TIR termination `134`, one
+  intentional finite-endpoint shadow volume, and secondary dielectric terminal
+  `225`. Intentional implicit-origin shadow exits are `323` for checkpoint 114
+  and `291` for checkpoint 115.
+
+### Final gates and evidence boundary
+
+- Focused Debug and Release tests pass 4/4. Fresh full Windows Debug and Release
+  builds each pass 28/28 CTests.
+- Generic and legacy shader compile/freshness pass unchanged. Generic embedded
+  SHA-256 is
+  `a148ef9dc3f7137a459d21e480c12ad13c61e14c2ef376ebe37f3caf6d85b3eb`;
+  generic SPIR-V SHA-256 is
+  `46128e287c8bf86363cddb529906955fa25fabca29c294122a77cce54716a400`.
+  ABI freshness passes at
+  `821418c6c28f1827e5064f8a1551e3aa04c393d9e9df2ff37bdcaf0f6e3dfe54`.
+- Android `assembleDebug`, unsigned `assembleRelease`, and `lintRelease` pass in
+  one 97-task build; the held-item/player runtime-package and exact CC BY 4.0
+  attribution contract passes. Debug APK SHA-256 is
+  `094ef6c34c68ffebd44c818926a58e13e6138d947adaeb5b16eb81f6db9072a8`;
+  unsigned Release APK SHA-256 is
+  `7b7ee35f7326af5b9feda6e725ae9c99b52b3f83656b002e64014c73967c1cde`.
+- `adb devices -l` exposed no device. No Android installation, presentation,
+  capture, performance, lifecycle, thermal, or owner verdict is claimed.
+
+Audio/haptic manual revalidation required: NO — Round 4 changes only static
+world-space prop placement, deterministic visual framing, tests, and evidence.
+Gameplay event identity/timing/transport, listener/source routing,
+spatialisation, playback, cue assets, haptics, and damage/death feedback are
+unchanged.
