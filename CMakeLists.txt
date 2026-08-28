@@ -254,6 +254,11 @@ if(BUILD_TESTING)
     target_link_libraries(horde_rt_simulation_gameplay_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_simulation_gameplay_tests COMMAND horde_rt_simulation_gameplay_tests)
 
+    add_executable(horde_rt_lantern_reward_tests tests/LanternRewardTests.cpp)
+    target_include_directories(horde_rt_lantern_reward_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(horde_rt_lantern_reward_tests PRIVATE horde_gameplay_simulation)
+    add_test(NAME horde_rt_lantern_reward_tests COMMAND horde_rt_lantern_reward_tests)
+
     add_executable(horde_rt_input_mailbox_stress tests/InputMailboxStress.cpp)
     target_include_directories(horde_rt_input_mailbox_stress PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_input_mailbox_stress COMMAND horde_rt_input_mailbox_stress)
