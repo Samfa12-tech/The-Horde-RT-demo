@@ -79,6 +79,10 @@ inline bool StageDevelopmentCheckpointSimulation(
         finale.lichDefeated = true;
         finale.lanternClaimed = true;
 
+        // Resolve the exact high/low shared hand target before authoring the
+        // frozen body state beneath it. The final import then preserves those
+        // finite angles/velocities without advancing a simulation tick.
+        gameSimulation.ImportRewardCheckpoint(chest, interaction, finale);
         LanternPendulumSnapshot pendulum;
         const auto& hinge = gameSimulation.Snapshot().rewardLanternWorldFromHinge;
         pendulum.initialized = true;

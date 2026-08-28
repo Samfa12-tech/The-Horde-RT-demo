@@ -1032,6 +1032,7 @@ int main()
                       "production chest and lantern must use bounded generic slots plus loaded authored pivots for lid, ring, body, flame, and light");
         ok &= Require(sceneSource.find("frame.rewardLanternWorldFromHinge") != std::string::npos &&
                       sceneSource.find("frame.lanternPendulum.worldFromBody") != std::string::npos &&
+                      sceneSource.find("glassFixtureVisible || productionInspection || rewardLanternClaimed") != std::string::npos &&
                       sceneSource.find("productionLanternVisible ? 0x01u : 0u") != std::string::npos &&
                       sceneSource.find("lanternEmitter.worldFromFlame = productionLanternWorldFromFlame") != std::string::npos &&
                       sceneSource.find("lanternEmitter.worldFromLight = productionLanternWorldFromLight") != std::string::npos,
@@ -1040,6 +1041,9 @@ int main()
                           std::string::npos &&
                       windowsSource.find("development->usesGlassFixture") != std::string::npos,
                       "all bounded glass development checkpoints must enable the same imported fixture route");
+        ok &= Require(windowsSource.find("frozenDevelopmentCheckpoint") != std::string::npos &&
+                      windowsSource.find("!ctx.developmentCheckpoint.empty()") != std::string::npos,
+                      "Windows capture polling must preserve exact imported/frozen reward motion state");
         ok &= Require(windowsSource.find("WaterQuality::High") != std::string::npos &&
                       windowsSource.find("context.waterQuality = horde::vulkan::raytracing::WaterQuality::High") !=
                           std::string::npos &&

@@ -3662,8 +3662,16 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         clampedTuning.glassFixtureVisible &&
         !clampedTuning.productionRewardPropsVisible;
     const bool productionPropsVisible = !glassFixtureVisible;
+    const bool productionInspection = clampedTuning.productionRewardPropsVisible &&
+        frame.chestReward.phase ==
+            horde::gameplay::interactions::ChestRewardPhase::Locked;
+    const bool rewardLanternClaimed =
+        frame.chestReward.phase ==
+            horde::gameplay::interactions::ChestRewardPhase::LanternClaimed &&
+        frame.interaction.heldLightKind ==
+            horde::gameplay::interactions::HeldLightKind::RewardLantern;
     const PlayerRenderRoute effectivePlayerRenderRoute =
-        (glassFixtureVisible || productionPropsVisible)
+        (glassFixtureVisible || productionInspection || rewardLanternClaimed)
         ? PlayerRenderRoute::Skinned : frame.playerRenderRoute;
     if (effectivePlayerRenderRoute != measuredPlayerRoute_)
     {
@@ -4057,13 +4065,10 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     {
         using horde::gameplay::interactions::ChestRewardPhase;
         using horde::gameplay::interactions::HeldLightKind;
-        const bool inspectionOverride = clampedTuning.productionRewardPropsVisible &&
-            frame.chestReward.phase == ChestRewardPhase::Locked;
+        const bool inspectionOverride = productionInspection;
         const bool glassOnly = inspectionOverride &&
             clampedTuning.productionLanternGlassOnly;
-        const bool lanternClaimed =
-            frame.chestReward.phase == ChestRewardPhase::LanternClaimed &&
-            frame.interaction.heldLightKind == HeldLightKind::RewardLantern;
+        const bool lanternClaimed = rewardLanternClaimed;
         productionLanternVisible = inspectionOverride ||
             frame.chestReward.phase == ChestRewardPhase::LanternAvailable ||
             lanternClaimed;

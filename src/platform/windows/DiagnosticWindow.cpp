@@ -3516,7 +3516,13 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
     {
         SpatialAudioEngine().Update();
         PollDesktopController(ctx);
-        UpdateDesktopSceneControls(ctx);
+        const bool frozenDevelopmentCheckpoint =
+            ctx.simulationPaused && ctx.frameDeltaSeconds == 0.0f &&
+            !ctx.developmentCheckpoint.empty();
+        if (!frozenDevelopmentCheckpoint)
+        {
+            UpdateDesktopSceneControls(ctx);
+        }
         UpdateWaterfallAmbience(ctx);
         const horde::gameplay::simulation::SimulationSnapshot& simulation =
             ctx.simulation.Snapshot();

@@ -469,9 +469,10 @@ void TestRewardLanternHighLowUsesSharedLeftArmTarget()
     Check(high.leftHandLocal[0] < -0.15f && high.leftHandLocal[0] > -0.45f &&
               low.leftHandLocal[0] < -0.15f && low.leftHandLocal[0] > -0.45f,
           "reward high/low targets must preserve the accepted inward phone-arm placement");
-    Check(low.leftHandLocal[1] < high.leftHandLocal[1] - 0.22f &&
+    Check(high.leftHandLocal[1] > -0.15f &&
+              low.leftHandLocal[1] < high.leftHandLocal[1] - 0.30f &&
               low.leftHandLocal[1] > -0.82f,
-          "reward low carry must visibly lower the real left arm without using the failed-torch pose");
+          "reward high/low carry must visibly raise and lower the real left arm without using the failed-torch pose");
     for (std::size_t axis = 0u; axis < midpoint.leftHandLocal.size(); ++axis)
     {
         Check(Near(midpoint.leftHandLocal[axis],

@@ -246,9 +246,13 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
     const float torchBob = std::abs(std::sin(input.walkTime * 6.2f)) * 0.025f * movement;
     const std::array<float, 3u> heldLeftHand{{
         -0.24f - torchSway, -0.40f + torchBob, heldPropDepth}};
+    const std::array<float, 3u> rewardHighLeftHand{{
+        -0.27f - torchSway * 0.35f,
+        torchBob * 0.25f,
+        heldPropDepth}};
     const std::array<float, 3u> rewardLowLeftHand{{
         -0.30f - torchSway * 0.35f,
-        -0.70f + torchBob * 0.25f,
+        -0.31f + torchBob * 0.25f,
         heldPropDepth}};
     constexpr std::array<float, 3u> loweredLeftHand{{-0.36f, -0.92f, 0.27f}};
     float lowerBlend = std::clamp(input.torchFailure.leftArmLowerBlend, 0.0f, 1.0f);
@@ -287,12 +291,12 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
         0.39f + lowerBodyPose.leftStride * 0.018f}};
     for (std::size_t axis = 0u; axis < result.leftHandLocal.size(); ++axis)
     {
-        const auto& lowTarget = input.interaction.heldLightKind ==
-            horde::gameplay::interactions::HeldLightKind::RewardLantern
-            ? rewardLowLeftHand
-            : loweredLeftHand;
-        result.leftHandLocal[axis] = heldLeftHand[axis] +
-            (lowTarget[axis] - heldLeftHand[axis]) * lowerBlend;
+        const bool rewardLantern = input.interaction.heldLightKind ==
+            horde::gameplay::interactions::HeldLightKind::RewardLantern;
+        const auto& highTarget = rewardLantern ? rewardHighLeftHand : heldLeftHand;
+        const auto& lowTarget = rewardLantern ? rewardLowLeftHand : loweredLeftHand;
+        result.leftHandLocal[axis] = highTarget[axis] +
+            (lowTarget[axis] - highTarget[axis]) * lowerBlend;
     }
     result.rightHandLocal = sword.rightHandLocal;
     result.heldPropDepth = heldPropDepth;
