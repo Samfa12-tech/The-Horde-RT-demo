@@ -212,6 +212,11 @@ struct ShowcaseCaptureRecord
     std::uint32_t primaryRewardBodyPixels = 0u;
     float rewardGripPositionErrorMetres = 0.0f;
     float rewardGripOrientationErrorRadians = 0.0f;
+    float rewardAuthorityPositionErrorMetres = 0.0f;
+    float rewardAuthorityOrientationErrorRadians = 0.0f;
+    std::array<float, 3u> rewardFinalGripPosition{};
+    std::array<float, 3u> rewardRingGripPosition{};
+    std::array<float, 3u> rewardBodyPosition{};
     std::vector<double> frameTimesMs;
 };
 
@@ -3933,7 +3938,23 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                  << capture.primaryRewardBodyPixels << "}, \"rewardGrip\": {\"positionErrorMetres\": "
                  << capture.rewardGripPositionErrorMetres
                  << ", \"orientationErrorRadians\": "
-                 << capture.rewardGripOrientationErrorRadians << "}},\n"
+                 << capture.rewardGripOrientationErrorRadians
+                 << ", \"authorityPositionErrorMetres\": "
+                 << capture.rewardAuthorityPositionErrorMetres
+                 << ", \"authorityOrientationErrorRadians\": "
+                 << capture.rewardAuthorityOrientationErrorRadians
+                 << ", \"finalGripPosition\": ["
+                 << capture.rewardFinalGripPosition[0] << ", "
+                 << capture.rewardFinalGripPosition[1] << ", "
+                 << capture.rewardFinalGripPosition[2]
+                 << "], \"ringGripPosition\": ["
+                 << capture.rewardRingGripPosition[0] << ", "
+                 << capture.rewardRingGripPosition[1] << ", "
+                 << capture.rewardRingGripPosition[2]
+                 << "], \"bodyPosition\": ["
+                 << capture.rewardBodyPosition[0] << ", "
+                 << capture.rewardBodyPosition[1] << ", "
+                 << capture.rewardBodyPosition[2] << "]}},\n"
                  << "      \"timing\": {\"sampleCount\": " << capture.frameTimesMs.size()
                  << ", \"medianMs\": " << CaptureMedianMs(capture.frameTimesMs)
                  << ", \"meanMs\": " << CaptureMeanMs(capture.frameTimesMs) << "},\n"
@@ -4087,6 +4108,13 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             context.rtScene.RewardLanternGripAgreement().positionErrorMetres;
         record.rewardGripOrientationErrorRadians =
             context.rtScene.RewardLanternGripAgreement().orientationErrorRadians;
+        record.rewardAuthorityPositionErrorMetres =
+            context.rtScene.RewardLanternAuthorityAgreement().positionErrorMetres;
+        record.rewardAuthorityOrientationErrorRadians =
+            context.rtScene.RewardLanternAuthorityAgreement().orientationErrorRadians;
+        record.rewardFinalGripPosition = context.rtScene.RewardLanternFinalGripPosition();
+        record.rewardRingGripPosition = context.rtScene.RewardLanternRingGripPosition();
+        record.rewardBodyPosition = context.rtScene.RewardLanternBodyPosition();
         record.frameTimesMs = std::move(frameTimesMs);
         const auto* development = horde::gameplay::FindDevelopmentCheckpoint(
             context.developmentCheckpoint);
@@ -4114,10 +4142,28 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
              record.rewardGripPositionErrorMetres >
                  horde::vulkan::raytracing::kPlayerGripSocketToleranceMetres ||
              record.rewardGripOrientationErrorRadians >
+                 horde::vulkan::raytracing::kPlayerGripOrientationToleranceRadians ||
+             record.rewardAuthorityPositionErrorMetres >
+                 horde::vulkan::raytracing::kPlayerGripSocketToleranceMetres ||
+             record.rewardAuthorityOrientationErrorRadians >
                  horde::vulkan::raytracing::kPlayerGripOrientationToleranceRadians))
         {
-            return fail(std::string("Checkpoint '") + checkpoint.name +
-                        "' failed claimed reward player/lantern primary visibility or final GripRing contact.");
+            std::ostringstream reason;
+            reason << "Checkpoint '" << checkpoint.name
+                   << "' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels="
+                   << record.primaryPlayerPixels << "/" << record.primaryRewardRingPixels
+                   << "/" << record.primaryRewardBodyPixels << " grip="
+                   << record.rewardGripPositionErrorMetres << "/"
+                   << record.rewardGripOrientationErrorRadians << " authority="
+                   << record.rewardAuthorityPositionErrorMetres << "/"
+                   << record.rewardAuthorityOrientationErrorRadians << " finalGrip="
+                   << record.rewardFinalGripPosition[0] << ","
+                   << record.rewardFinalGripPosition[1] << ","
+                   << record.rewardFinalGripPosition[2] << " body="
+                   << record.rewardBodyPosition[0] << ","
+                   << record.rewardBodyPosition[1] << ","
+                   << record.rewardBodyPosition[2] << ".";
+            return fail(reason.str());
         }
         if (!Sha256File(pngPath, record.pngSha256, diagnostic))
         {

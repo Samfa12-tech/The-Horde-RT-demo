@@ -148,6 +148,22 @@ public:
     {
         return rewardLanternGripAgreement_;
     }
+    const PlayerGripAgreement& RewardLanternAuthorityAgreement() const
+    {
+        return rewardLanternAuthorityAgreement_;
+    }
+    const std::array<float, 3u>& RewardLanternFinalGripPosition() const
+    {
+        return rewardLanternFinalGripPosition_;
+    }
+    const std::array<float, 3u>& RewardLanternRingGripPosition() const
+    {
+        return rewardLanternRingGripPosition_;
+    }
+    const std::array<float, 3u>& RewardLanternBodyPosition() const
+    {
+        return rewardLanternBodyPosition_;
+    }
     std::uint32_t DielectricTransportOverflowCount() const
     {
         return dielectricTransportOverflowCount_;
@@ -443,6 +459,10 @@ private:
     std::array<std::uint8_t, kTlasInstanceCount> lastInstanceMasks_{};
     bool lastPlayerPrimaryVisible_ = false;
     PlayerGripAgreement rewardLanternGripAgreement_{};
+    PlayerGripAgreement rewardLanternAuthorityAgreement_{};
+    std::array<float, 3u> rewardLanternFinalGripPosition_{};
+    std::array<float, 3u> rewardLanternRingGripPosition_{};
+    std::array<float, 3u> rewardLanternBodyPosition_{};
     std::uint32_t dielectricTransportOverflowCount_ = 0u;
     std::uint32_t dielectricShadowOverflowCount_ = 0u;
     std::uint32_t dielectricSecondaryRejectCount_ = 0u;

@@ -464,9 +464,16 @@ def build_chest_lid():
 def build_lantern_ring():
     reset_scene()
     iron = textured_material("BlackIron", "lantern-iron", 0.94, 0.67)
+    grip_torus = torus("GripRingTorus", (0.0, 0.0, 0.085), 0.060, 0.012, iron,
+                       major_segments=32, minor_segments=8)
+    # The node doubles as the authored GripRing socket. Bake the torus's
+    # modelling rotation into its vertices so the exported socket basis stays
+    # identity: GripRing Y +0.085 to Hinge Y -0.012 is then a true 97 mm
+    # downward hand-to-body offset in every carried pose.
+    bpy.context.view_layer.objects.active = grip_torus
+    bpy.ops.object.transform_apply(location=False, rotation=True, scale=False)
     ring_parts = [
-        torus("GripRingTorus", (0.0, 0.0, 0.085), 0.060, 0.012, iron,
-              major_segments=32, minor_segments=8),
+        grip_torus,
         cylinder_between("RingStem", (0.0, 0.0, 0.022), (0.0, 0.0, 0.050), 0.012, iron, 12),
     ]
     grip = join(ring_parts, "GripRing", iron)

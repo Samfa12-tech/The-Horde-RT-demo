@@ -581,19 +581,22 @@ int main()
           "lantern body exposes exact metal, closed glass, emitter sockets and local core");
     const auto* chestSocket = Socket(chestBase.asset, "RewardLanternHingeSocket");
     const auto* chestLidHinge = Socket(chestBase.asset, "ChestLidHinge");
+    const auto* ringGrip = Socket(lanternRing.asset, "GripRing");
     const auto* ringHinge = Socket(lanternRing.asset, "Hinge");
     const auto* flameSocket = Socket(lanternBody.asset, "Flame");
     const auto* lightSocket = Socket(lanternBody.asset, "Light");
     const auto* lidNode = Node(chestLid.asset, "ChestLid");
-    Check(chestSocket != nullptr && chestLidHinge != nullptr && ringHinge != nullptr && flameSocket != nullptr &&
+    Check(chestSocket != nullptr && chestLidHinge != nullptr && ringGrip != nullptr &&
+              ringHinge != nullptr && flameSocket != nullptr &&
               lightSocket != nullptr && lidNode != nullptr &&
               MatrixNear(chestSocket->world, Translation(0.0f, 1.28f, 0.30f)) &&
               MatrixNear(chestLidHinge->world, Translation(0.0f, 0.34f, -0.286f)) &&
+              MatrixNear(ringGrip->world, Translation(0.0f, 0.085f, 0.0f)) &&
               MatrixNear(ringHinge->world, Translation(0.0f, -0.012f, 0.0f)) &&
               MatrixNear(flameSocket->world, Translation(0.0f, -0.545f, 0.0f)) &&
               MatrixNear(lightSocket->world, Translation(0.0f, -0.515f, 0.0f)) &&
               MatrixNear(lidNode->world, Translation(0.0f, 0.0f, 0.0f)),
-          "all sixteen authored matrix elements retain the exact chest hinge, lantern hinge, flame, light, and lid contracts");
+          "all sixteen authored matrix elements retain identity-basis GripRing, chest/lantern hinges, flame, light, and lid contracts");
     if (chestSocket != nullptr && ringHinge != nullptr && flameSocket != nullptr &&
         lightSocket != nullptr && chestLidHinge != nullptr && lidNode != nullptr)
     {

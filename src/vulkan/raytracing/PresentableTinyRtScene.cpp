@@ -371,6 +371,10 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     lastInstanceMasks_ = std::exchange(other.lastInstanceMasks_, {});
     lastPlayerPrimaryVisible_ = std::exchange(other.lastPlayerPrimaryVisible_, false);
     rewardLanternGripAgreement_ = std::exchange(other.rewardLanternGripAgreement_, {});
+    rewardLanternAuthorityAgreement_ = std::exchange(other.rewardLanternAuthorityAgreement_, {});
+    rewardLanternFinalGripPosition_ = std::exchange(other.rewardLanternFinalGripPosition_, {});
+    rewardLanternRingGripPosition_ = std::exchange(other.rewardLanternRingGripPosition_, {});
+    rewardLanternBodyPosition_ = std::exchange(other.rewardLanternBodyPosition_, {});
     dielectricTransportOverflowCount_ =
         std::exchange(other.dielectricTransportOverflowCount_, 0u);
     dielectricShadowOverflowCount_ =
@@ -4097,6 +4101,10 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         horde::gameplay::items::IdentityHeldItemTransform();
     bool productionLanternVisible = false;
     rewardLanternGripAgreement_ = {};
+    rewardLanternAuthorityAgreement_ = {};
+    rewardLanternFinalGripPosition_ = {};
+    rewardLanternRingGripPosition_ = {};
+    rewardLanternBodyPosition_ = {};
     if (productionRewardWorldVisible)
     {
         using horde::gameplay::interactions::ChestRewardPhase;
@@ -4166,6 +4174,19 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             worldFromLanternBody = horde::gameplay::items::MultiplyHeldItemTransforms(
                 rewardVisuals.worldFromBody, uniformScale(lanternScale));
             rewardLanternGripAgreement_ = rewardVisuals.gripAgreement;
+            rewardLanternAuthorityAgreement_ = MeasureTransformAgreement(
+                frame.rewardLanternWorldFromHinge, finalSkinnedLeftGrip);
+            const auto finalRingGrip = horde::gameplay::items::MultiplyHeldItemTransforms(
+                rewardVisuals.worldFromRing, ringGrip->world);
+            rewardLanternFinalGripPosition_ = {{finalSkinnedLeftGrip[12],
+                                                finalSkinnedLeftGrip[13],
+                                                finalSkinnedLeftGrip[14]}};
+            rewardLanternRingGripPosition_ = {{finalRingGrip[12],
+                                               finalRingGrip[13],
+                                               finalRingGrip[14]}};
+            rewardLanternBodyPosition_ = {{worldFromLanternBody[12],
+                                           worldFromLanternBody[13],
+                                           worldFromLanternBody[14]}};
         }
         else
         {
