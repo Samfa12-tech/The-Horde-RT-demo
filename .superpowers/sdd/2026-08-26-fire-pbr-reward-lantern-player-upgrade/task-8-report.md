@@ -5,60 +5,58 @@ Date: 2026-08-28
 ## Delivered scope
 
 - Added platform-free `InteractionState`, `ChestRewardSequence`, `FinaleSequence`, and `LanternPendulum` authorities. Rendering consumes immutable snapshots and does not advance reward, finale, or motion state.
-- Appended stable `RewardChest`/`RewardLantern` entity identities and `ChestUnlocked`/`ChestOpened`/`LanternClaimed` semantic events. The existing event values remain unchanged.
-- Added monotonic interact and held-light-pose command sequences through direct simulation input, the coherent two-slot mailbox, JNI, Android controls, Windows keyboard, and controller input. Every new edge is consumed once, including edges issued while interaction or pose changes are unavailable; commands are never buffered for later eligibility.
-- Added the route-local chest progression `Locked -> ClosedUnlocked -> Opening -> LanternAvailable -> LanternClaimed`. A valid interaction requires at most 1.35 m distance and at most a 55-degree facing error. Opening lasts 1.20 s. The first valid interaction opens the chest and a second post-open interaction claims the lantern.
-- Moved the post-reward clocks into `FinaleSequence`: a 0.65 s pickup raise and 1.25 s reveal precede the retained 4.50 s roof and 1.75 s dawn stages. `LichEncounter` owns defeat only. Automated contracts pin one `LichDefeated`, one `ChestUnlocked`, one `ChestOpened`, one `LanternClaimed`, and one delayed `FinaleCompleted` per completed route.
-- Added shared `HeldLightKind` and `HeldLightPose` state, renderer adapter outputs, pause/reset/retry/import/Home-resume preservation, repeated ending-poll/RT-Lab ownership coverage, and deterministic checkpoints 116-119 for held-high, held-low, glass transmission, and motion extreme.
+- Appended stable `RewardChest`/`RewardLantern` entity identities and `ChestUnlocked`/`ChestOpened`/`LanternClaimed` semantic events without renumbering existing values. Monotonic interact and held-light-pose sequences travel through direct simulation, the coherent two-slot mailbox, JNI, Android, Windows keyboard, and controller input. Unavailable edges are consumed once and are never buffered.
+- Added route-local `Locked -> ClosedUnlocked -> Opening -> LanternAvailable -> LanternClaimed` progression. Valid interaction is at most 1.35 m and 55 degrees; opening lasts 1.20 s; the next post-open interaction claims the lantern. One completed route emits exactly one each of `LichDefeated`, `ChestUnlocked`, `ChestOpened`, `LanternClaimed`, and delayed `FinaleCompleted`.
+- Extracted finale clocks into `FinaleSequence`: 0.65 s pickup raise, 1.25 s reveal, existing 4.50 s roof and 1.75 s dawn. Reset, retry, checkpoint import, pause/Home-resume, ending polls, and RT Lab ownership are deterministic and do not duplicate events or inject motion.
+- Added shared `HeldLightKind`/`HeldLightPose` state and deterministic checkpoints 116-131 for high, low, glass, motion extreme, and the reachable carry volume.
 
-## Physical carry and character integration
+## Fix Round 1 corrections
 
-- `LanternPendulum` advances only at the shared 60 Hz gameplay tick. Its state contains two hand-local angular components and velocities, prior authoritative pivot position/velocity, COM length, and explicit initialization/reset/import data.
-- Semi-implicit Euler integration applies gravity/restoring torque, damping, actual hinge acceleration, and bounded movement/turn/strafe/dodge forcing. A soft 45-degree cone and hard 55-degree safety clamp bound all motion. Teleport, pause, lifecycle, retry, reset, and import seams clear inferred velocity; finite guards prevent NaN propagation.
-- Behavioral tests cover rest convergence, forward-start lag, stop overshoot, strafe/turn response, bounded dodge, damping, both clamps, teleport reset, pause/Home-resume, finite output, and identical fixed-tick results under 30/60/120 Hz render delivery.
-- The grip ring remains rigid to the authored hand socket. The lantern body, frame, six glass panes, flame mesh, true coloured light, reflection, and shadow all consume one pendulum body transform below the Task 7 `RewardLanternHingeSocket`/`Hinge` contract. The two ordered physical angular components provide bounded coupled front-face alignment; there is no camera attachment or sinusoidal render fake.
-- The real skinned left arm follows high/low/transitioning IK targets and shared held-item wall retraction. Existing phone inward placement, sword edge-forward orientation, downcut/up-slice combo, right-hand grip, and route-floor authority remain covered by the expanded character and held-item tests.
+- Separated production world/reward-asset existence from the developer inspection override. Standard production captures retain torch/sword masks `0x02`, the skinned-player route mask `0x14`, and primary player/arm pixels. Claimed-lantern frames keep the player, grip ring, and lantern body primary-visible instead of producing floating props.
+- `PlayerRenderSlot` now exports the final skinned left-grip transform and refreshes it for same-tick checkpoint imports when animation state changes. The claimed ring is composed through the authored `GripRing`; `Hinge`, body, frame, glass, flame, light, reflection, and shadow derive below it. The source asset processor now bakes the ring's modelling rotation into vertices so `GripRing` and `Hinge` both have identity bases and their authored Y offset is the intended 97 mm. Runtime ring-to-final-grip error is 0 m and at most 0.000345 rad across checkpoints 116-131; ring-to-authoritative-grip error is at most 0.000005 m and 0 rad.
+- Added owner-thread paused-input synchronization. Android resumes only after the owning thread acknowledges and consumes current attack/parry/reset/retry/interact/toggle sequences while paused. Deterministic stop-before-consume/resume interleavings pass for direct and mailbox delivery with no replay.
+- Extended `LanternPendulum` with explicit torsion angle and angular velocity about the hanging axis. Torsion uses fixed-60-Hz restoring/damping and hand-basis/turn forcing, is bounded to a soft 15-degree and hard 20-degree limit with a 6 rad/s velocity cap, and participates in snapshots, checkpoint import, reset, teleport, pause/lifecycle, finite guards, and 30/60/120 delivery-invariance tests. It is composed with the two swing components; it is not inferred from those components or faked in rendering.
+- Added a Robolectric SDK-34 rendered maximum-font-scale check at font scale 2.0 and a 320x568 viewport. It inflates and draws the real contextual controls, asserts bounds/no clipping/no overlap/no ellipsizing and non-empty rendered pixels. `includeFontPadding=false` and zero vertical text padding keep the compact buttons inside their authored bounds.
+- Existing Task 5 inward phone-arm placement, 80-degree edge-forward sword, downcut/up-slice combo, wall retraction, and grip contracts remain green.
 
-## Renderer, controls, and budgets
+## Dielectric and reachable-volume contract
 
-- The generic production assets provide a hinged chest lid plus closed/open/reveal/claimed and held-high/held-low states. The retained budgets are 16 BLAS, at most 20 TLAS instances, 14 compact materials, 256 primitives, 3,938,688 vertex bytes, 506,892 index bytes, 1,568 material bytes, 640 metadata bytes, 156,587,312 texture bytes, and 1,032,704 combined static BLAS bytes.
-- Android exposes contextual `INTERACT` and `RAISE`/`LOWER` controls with the enlarged-font compact-layout contract. Windows exposes `E`/`F`; controller gameplay uses A/Y while A retains menu selection semantics. Attack, parry, dodge, and pause/menu commands are not overloaded.
-- Task 7 dielectric, generic-asset, floor, provenance, socket, texture-array, and licence contracts remain intact.
+- Loader-issued material flag `1024` remains restricted to thick components that pass finite weld-domain, closed-manifold, consistent-winding, and outward signed-volume validation. Uncertified/open/thin/inward/nonmanifold components cannot use recovery.
+- A certified closed stack that reaches an attributable ordinary/grazing terminal, interface/volume bound, or mismatched exit conservatively absorbs; it does not shade or transmit through the opaque cage. The ABI now records strict counters, intentional primary/shadow certified recovery, reason masks, primary visibility pixels, and final grip metrics in 176 bytes.
+- All standard 13 views and reward/stress checkpoints 114-131 have zero strict failure/open-stack/mismatch/overflow counters. Intentional certified recovery is separately attributed: primary 0-8 pixels, shadow 0-2296 pixels, reason masks in `{0,1,32,33,289,417}`. The worst intentional shadow recovery is 2296/518400 pixels (0.443%), bounded to certified glass terminals. Re-enabling skinned hands/player geometry did not create a strict transport failure.
 
-## Moving dielectric stress repair
+## Exact Host, shader, and visual evidence
 
-- The production lantern exposed finite-precision terminal cases at reachable high/low and pendulum angles. Camera-only composition changes were rejected because the dynamic prop is visible from arbitrary player views.
-- Runtime loading now issues append-only material flag `1024` only when every thick-material component passes finite weld-domain, closed-manifold, consistent-winding, and outward signed-volume checks. Open, inward, nonmanifold, thin-wall, or otherwise uncertified geometry cannot enter the recovery path.
-- A certified closed stack that reaches an ordinary/grazing terminal, interface/volume bound, or mismatched exit conservatively absorbs instead of shading or transmitting through its opaque cage. The strict open-stack/failure counters remain zero. Separate primary/shadow recovery counters and a reason mask distinguish intentional certified recovery from a strict transport failure; ABI size remains 144 bytes.
-- Checkpoints 120-131 deterministically sweep the reachable high/low forward, backward, left, right, hard-diagonal, and alternate-camera volume. All 12 sweep views have zero strict failure/open/mismatch/overflow counters. Intentional certified recovery ranges from 0-9 primary and 0-21 shadow samples per view, with reason masks limited to `0`, `32`, `33`, and `289`. The fix therefore covers the live reachable volume rather than one camera angle.
-
-## Exact Host and Windows evidence
-
-- Final implementation head `e29e16adf4350ccb418e095417172db74b77128e` and tree `41e29a392f56c68c71ae9f497d7d3d763dafdf1c` passed a fresh `build/task-8-final-e29e16a`: Debug 30/30 in 137.84 s and Release 30/30 in 72.51 s.
-- Generic and legacy shader freshness, embedded-SPIR-V equality, and generated ABI freshness passed. The ABI definition SHA-256 is `4b15639690968cc21fd1b20dbf8deaca2f67cc9467019c83c9f258a1a1849067`; generic/legacy SPIR-V hashes are `f8eb622d9dd6add57158b346e9ff358feb1eb6d4f28995506260cb651f718326` and `18399de853a49861a156dc97e8108fe3c6d01e36686aa4a994389c04f42eee1c`.
-- The RTX 5050 Laptop GPU honestly presented and was visually inspected at 960x540, render scale 1.0. The fresh standard 13-view route is complete with every strict and certified-recovery counter zero; its aggregate 12-sample median is 11.3547 ms and mean is 26.25054 ms.
-- The 18 reward/stress views, including Task 7 regressions 114/115, required Task 8 views 116-119, and reachable-volume sweep 120-131, honestly presented and were visually inspected. Every strict failure/open-stack/mismatch/overflow counter is zero. Required-view medians are 12.3552 ms high, 12.6980 ms low, 12.13105 ms glass transmission, and 11.7491 ms motion extreme. The 12-view sweep medians span 11.6864-12.98305 ms.
-- Exact PNG hashes, shader metrics, resource totals, every recovery count/reason mask, and the standard route hashes are tracked in `docs/evidence/TASK_8_REWARD_LANTERN_WINDOWS_CAPTURES_2026-08-28.json`. These short deterministic samples establish workload identity and bounded Host behavior; they are not a sustained-phone performance claim.
+- Qualified implementation head: `3f383e8a8c0eb9a021e15954bd07988a49a51cf5`; tree: `dff41c6eaa4f4c26c0918ef0568b2c4b4d96b3d9`.
+- Fresh independent `build/task-8-fix-round1-3f383e8/debug` and `/release` trees passed Debug 30/30 in 126.57 s and Release 30/30 in 65.75 s.
+- Generated ABI freshness, generic/legacy shader freshness, and embedded-SPIR-V equality passed. ABI definition SHA-256: `9295d677a88c47b52321b1d749207b2024edf617dd2486074f1bad7903100332`. Generic SPIR-V: `6714d10905d3e20f9b546a86a202861672146d32e964f9bfd6c112f09bc815f9`; legacy SPIR-V: `6e60d08555173dfe24fddb670b67074040446bf95b082a966c10e499c1411cfb`.
+- The NVIDIA GeForce RTX 5050 Laptop GPU honestly presented fresh 960x540, render-scale-1.0 evidence in `reports/task-8-fix-round1-3f383e8`. Standard 13-view aggregate median was 12.52555 ms and mean 28.008789 ms; RT-command-buffer average was 1.568330 ms across 155 samples. Reward/stress medians were 11.94505-13.77105 ms.
+- Every exact final PNG was visually inspected. Standard opening showed real skinned arms with torch and sword, not floating props. Checkpoints 114/115 showed the chest/reward asset and glass inspection; 116-119 showed distinct high/low/glass/extreme poses with the hand contacting the ring and the body below it; 120-131 showed distinct swing, torsion, and alternate-camera views while the ring stayed hand-rigid.
+- Exact hashes, masks, pixel counts, grip metrics, timings, transport counters/reasons, shader metrics, asset hashes, and resource totals are recorded in `docs/evidence/TASK_8_REWARD_LANTERN_WINDOWS_CAPTURES_2026-08-28.json`. These deterministic Host samples establish workload identity and bounded behavior, not sustained-phone performance.
 
 ## Android build and package evidence
 
-- A clean `assembleDebug assembleRelease lintDebug` passed in 1 min 35 s, and a separate `lintRelease` passed in 2 s. The package contains all four Android ABIs.
-- Debug APK: 85,905,461 bytes, SHA-256 `2c2d41a54f1fb24a21e015a940ce5c12f936d2a370fa0d47de8346ce5635e66f`.
-- Unsigned Release APK: 84,009,452 bytes, SHA-256 `65e342c9723cf6c847f898d119fb77d3f391bc455df612e0278996905655ae7f`.
-- The held-item runtime asset/licence package contract, chest/lantern credit strings, ZIP alignment, and all twelve ELF `LOAD` segments at 16 KiB alignment passed.
-- `adb devices -l` exposed no device. No install, APK pullback, runtime ASTC selection, honest phone RT presentation, touch/controller feel, Home/resume, performance, thermal, or phone visual evidence is claimed. No new Android-device evidence exists, so the compatibility record was not changed. Exact `SM-S948B` validation remains a hard Task 9 gate.
+- Clean `testDebugUnitTest assembleDebug assembleRelease lintDebug lintRelease` passed in 1 min 57 s (116 tasks; 114 executed). The rendered max-font test passed 1/1 in 4.873 s.
+- Debug APK: 85,967,277 bytes; SHA-256 `9275d1594253891a5c9094dc15b3ebe49312cd730e563fa862d3550851a475da`.
+- Unsigned Release APK: 84,071,540 bytes; SHA-256 `50004667087ec48a014581e8efa27c5ca94aac52f9ab6b66188171fad61538e3`.
+- Runtime asset/licence package checks, four-ABI presence, ZIP alignment, and all twelve ELF `LOAD` segments at 16 KiB alignment passed.
+- `adb devices -l` exposed zero devices. No install, pullback, strict-ASTC runtime selection, honest phone RT presentation, touch/controller feel, Home-resume, performance, thermal, or phone visual evidence is claimed. There is no new device evidence, so the compatibility record is unchanged. Exact `SM-S948B` validation remains the Task 9 hard gate.
 
-## Commits and remaining owner gates
+## Commits and owner gates
 
-1. `4849fb2` — `test: add reward interaction and command sequence contracts`
-2. `381c060` — `feat: add reward interaction and finale authorities`
-3. `3e714a2` — `feat: add deterministic reward lantern motion`
-4. `95f49d0` — `fix: reset lantern motion across lifecycle seams`
-5. `8f0c6b9` — `feat: render and control the claimed reward lantern`
-6. `e1fde27` — `fix: preserve frozen lantern capture state`
-7. `6dca5e4` — `test: pin reward transport identifiers`
-8. `e29e16a` — `fix: harden certified lantern glass traversal`
+Original Task 8 commits: `4849fb2`, `381c060`, `3e714a2`, `95f49d0`, `8f0c6b9`, `e1fde27`, `6dca5e4`, and `e29e16a`.
 
-No signing, version change, publication, upload, deployment, or Meshy generation occurred. Automated and deterministic Windows visual evidence does not replace owner interaction, carry-motion, art, audio/haptic, or exact-phone review.
+Fix Round 1 commits:
+
+1. `f9d8c71` — `fix: preserve reward player visibility and grip`
+2. `0ededb7` — `fix: acknowledge paused input before Android resume`
+3. `2f64ef5` — `feat: add deterministic lantern torsion`
+4. `1d04525` — `test: render contextual controls at maximum font`
+5. `964efc4` — `test: guard reward fix integration seams`
+6. `c2834e5` — `fix: keep claimed lantern below final grip`
+7. `64cf333` — `fix: keep skinned arms in production reward world`
+8. `3f383e8` — `test: enforce player and grip visibility through lantern sweep`
+
+No signing, version change, publication, upload, deployment, Meshy use, or replacement asset generation occurred. Automated and deterministic Windows evidence does not replace owner interaction, carry-motion, art, audio/haptic, or exact-phone review.
 
 Audio/haptic manual revalidation required: YES — delaying FinaleCompleted and appending chest/claim semantic events changes gameplay-event timing/traffic even though no new cue or haptic is planned; the exact candidate therefore needs an owner feedback pass.
