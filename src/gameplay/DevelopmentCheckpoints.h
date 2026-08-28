@@ -49,7 +49,7 @@ struct DevelopmentCheckpoint
     float rewardTorsionAngularVelocity = 0.0f;
 };
 
-inline constexpr std::array<DevelopmentCheckpoint, 32u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 34u> kDevelopmentCheckpoints{{
     {100, "pbr-sword-closeup", 0, 0.0f, 1.85f, 0.0f, -0.18f},
     {101, "pbr-torch-fire", 0, 0.0f, 1.85f, 0.0f, -0.14f},
     {102, "player-body-grips", 0, 0.0f, 1.85f, 0.0f, -0.32f},
@@ -131,6 +131,13 @@ inline constexpr std::array<DevelopmentCheckpoint, 32u> kDevelopmentCheckpoints{
      DevelopmentCombatPose::Rest, false, 1.0f, {{0.72f, 0.90f, 1.0f}}, 2.4f,
      true, false, DevelopmentRewardPose::HeldLow, -0.45f, 0.45f,
      0.0f, 0.0f, {{0.0f, 0.0f, 0.0f}}, -0.20f, -0.60f},
+    {132, "lantern-wall-high", 2, 0.0f, -9.70f, 0.0f, -0.08f,
+     DevelopmentCombatPose::Rest, false, 1.0f, {{0.72f, 0.90f, 1.0f}}, 2.4f,
+     true, false, DevelopmentRewardPose::HeldHigh},
+    {133, "lantern-wall-low", 2, 0.0f, -9.70f, 0.0f, -0.08f,
+     DevelopmentCombatPose::Rest, false, 1.0f, {{0.72f, 0.90f, 1.0f}}, 2.4f,
+     true, false, DevelopmentRewardPose::HeldLow, 0.0f, 0.52359877560f,
+     0.0f, 0.0f, {{0.0f, 0.0f, 0.0f}}, 0.34906585040f, 0.0f},
 }};
 
 constexpr const DevelopmentCheckpoint* FindDevelopmentCheckpoint(std::string_view name)

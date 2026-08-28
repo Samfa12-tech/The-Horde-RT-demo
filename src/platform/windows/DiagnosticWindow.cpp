@@ -4119,7 +4119,7 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         const auto* development = horde::gameplay::FindDevelopmentCheckpoint(
             context.developmentCheckpoint);
         const bool claimedRewardCapture = development != nullptr &&
-            development->id >= 116 && development->id <= 131;
+            development->rewardPose != horde::gameplay::DevelopmentRewardPose::None;
         if (context.developmentCheckpoint.empty() &&
             (record.instanceMasks[1] != 0x02u ||
              record.instanceMasks[3] != 0x02u ||

@@ -256,7 +256,10 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
         (heldPropDepth - 0.30f) / (1.05f - 0.30f), 0.0f, 1.0f);
     const float rewardClearanceBlend = rewardClearance * rewardClearance *
         (3.0f - 2.0f * rewardClearance);
-    const float rewardWallInset = 0.320f * (1.0f - rewardClearanceBlend);
+    // Leave enough camera-side travel for the full authored body at the real
+    // wall fixture even when downward look pitches the skinned grip forward.
+    const float rewardWallInset =
+        0.320f * (1.0f - rewardClearanceBlend) + 0.010f;
     const float rewardOpenAdvance = 1.20f * rewardClearanceBlend;
     const float rewardDepth = heldPropDepth - rewardWallInset + rewardOpenAdvance;
     const float rewardLateral = -0.35f + 0.30f * rewardClearanceBlend;

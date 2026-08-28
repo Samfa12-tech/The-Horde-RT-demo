@@ -1,5 +1,6 @@
 #include "scene/assets/AssetManifest.h"
 #include "scene/assets/StaticMeshAsset.h"
+#include "gameplay/DevelopmentCheckpoints.h"
 #include "gameplay/ShowcaseRoute.h"
 #include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/items/LanternPendulum.h"
@@ -945,12 +946,31 @@ int main()
             {"wall-rest", 0.0f, 0.0f, 0.0f},
             {"wall-swing", 0.0f, 0.5235988f,
              kLanternPendulumTorsionHardLimitRadians}}};
+        const std::array<const horde::gameplay::DevelopmentCheckpoint*, 2u>
+            wallCheckpoints{{
+                horde::gameplay::FindDevelopmentCheckpoint("lantern-wall-high"),
+                horde::gameplay::FindDevelopmentCheckpoint("lantern-wall-low")}};
         for (std::size_t poseIndex = 0u; poseIndex < 2u; ++poseIndex)
         {
+            const horde::gameplay::DevelopmentCheckpoint* wallCheckpoint =
+                wallCheckpoints[poseIndex];
+            Check(wallCheckpoint != nullptr &&
+                      wallCheckpoint->cameraX == wallCameraOrigin[0] &&
+                      wallCheckpoint->cameraZ == wallCameraZ &&
+                      wallCheckpoint->rewardForwardAngleRadians ==
+                          wallMotions[poseIndex].forward &&
+                      wallCheckpoint->rewardStrafeAngleRadians ==
+                          wallMotions[poseIndex].strafe &&
+                      wallCheckpoint->rewardTorsionAngleRadians ==
+                          wallMotions[poseIndex].torsion,
+                  std::string(poseIndex == 0u ? "high" : "low") +
+                      " rendered wall checkpoint shares the exact authored-AABB fixture origin and motion");
             HeldItemFixedStepInput input;
-            input.playerX = 0.0f;
-            input.playerZ = wallCameraZ;
-            input.playerPitchRadians = -0.05f;
+            input.playerX = wallCheckpoint == nullptr ? 0.0f : wallCheckpoint->cameraX;
+            input.playerZ = wallCheckpoint == nullptr ? wallCameraZ : wallCheckpoint->cameraZ;
+            input.playerYawRadians = wallCheckpoint == nullptr ? 0.0f : wallCheckpoint->yaw;
+            input.playerPitchRadians = wallCheckpoint == nullptr
+                ? -0.05f : wallCheckpoint->pitch;
             input.interaction.heldLightKind = HeldLightKind::RewardLantern;
             input.interaction.heldLightPose = poseIndex == 0u
                 ? HeldLightPose::High : HeldLightPose::Low;

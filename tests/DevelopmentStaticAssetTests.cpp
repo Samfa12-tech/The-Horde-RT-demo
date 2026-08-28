@@ -38,8 +38,8 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 32u,
-          "thirty-two isolated render-development and lantern stress checkpoints are exposed");
+    Check(kDevelopmentCheckpoints.size() == 34u,
+          "thirty-four isolated render-development, lantern stress, and wall checkpoints are exposed");
     const DevelopmentCheckpoint* checkpoint = FindDevelopmentCheckpoint("pbr-sword-closeup");
     Check(checkpoint != nullptr && checkpoint->id == 100 && checkpoint->baseShowcaseCheckpointId == 0 &&
               checkpoint->name == std::string_view("pbr-sword-closeup") &&
@@ -187,6 +187,50 @@ int main()
               stagedMotionExtreme.Snapshot().lanternPendulum.torsionAngularVelocity == -0.90f &&
               stagedMotionExtreme.Snapshot().lanternPendulum.previousPivotVelocity[0] == 3.8f,
           "motion-extreme checkpoint preserves exact imported swing/torsion and hinge history");
+    const DevelopmentCheckpoint* wallHigh =
+        FindDevelopmentCheckpoint("lantern-wall-high");
+    const DevelopmentCheckpoint* wallLow =
+        FindDevelopmentCheckpoint("lantern-wall-low");
+    Check(wallHigh != nullptr && wallHigh->id == 132 &&
+              wallHigh->baseShowcaseCheckpointId == 2 &&
+              wallHigh->cameraX == 0.0f && wallHigh->cameraZ == -9.70f &&
+              wallHigh->yaw == 0.0f &&
+              wallHigh->rewardPose == DevelopmentRewardPose::HeldHigh &&
+              wallHigh->rewardForwardAngleRadians == 0.0f &&
+              wallHigh->rewardStrafeAngleRadians == 0.0f &&
+              wallHigh->rewardTorsionAngleRadians == 0.0f,
+          "near-wall high checkpoint appends stable ID 132 at the real z=-10 fixture");
+    Check(wallLow != nullptr && wallLow->id == 133 &&
+              wallLow->baseShowcaseCheckpointId == 2 &&
+              wallLow->cameraX == 0.0f && wallLow->cameraZ == -9.70f &&
+              wallLow->yaw == 0.0f &&
+              wallLow->rewardPose == DevelopmentRewardPose::HeldLow &&
+              wallLow->rewardForwardAngleRadians == 0.0f &&
+              wallLow->rewardStrafeAngleRadians == 0.52359877560f &&
+              wallLow->rewardTorsionAngleRadians == 0.34906585040f,
+          "near-wall low checkpoint appends stable ID 133 with representative swing and torsion");
+    horde::gameplay::simulation::GameSimulation stagedWallHigh;
+    horde::gameplay::simulation::GameSimulation stagedWallLow;
+    Check(wallHigh != nullptr &&
+              StageDevelopmentCheckpointSimulation(stagedWallHigh, *wallHigh) &&
+              stagedWallHigh.Snapshot().playerX == 0.0f &&
+              stagedWallHigh.Snapshot().playerZ == -9.70f &&
+              stagedWallHigh.Snapshot().interaction.heldLightPose ==
+                  interactions::HeldLightPose::High &&
+              stagedWallHigh.Snapshot().rewardLanternWorldFromHinge[14] > -9.75f &&
+              stagedWallHigh.Snapshot().rewardLanternWorldFromHinge[14] < -9.70f,
+          "near-wall high checkpoint freezes the shared wall-retracted hinge camera-side of the fixture");
+    Check(wallLow != nullptr &&
+              StageDevelopmentCheckpointSimulation(stagedWallLow, *wallLow) &&
+              stagedWallLow.Snapshot().playerX == 0.0f &&
+              stagedWallLow.Snapshot().playerZ == -9.70f &&
+              stagedWallLow.Snapshot().interaction.heldLightPose ==
+                  interactions::HeldLightPose::Low &&
+              stagedWallLow.Snapshot().lanternPendulum.strafeAngleRadians ==
+                  wallLow->rewardStrafeAngleRadians &&
+              stagedWallLow.Snapshot().lanternPendulum.torsionAngleRadians ==
+                  wallLow->rewardTorsionAngleRadians,
+          "near-wall low checkpoint freezes the exact representative wall swing and torsion");
     std::size_t lanternSweepCount = 0u;
     bool sweepHasHigh = false;
     bool sweepHasLow = false;
