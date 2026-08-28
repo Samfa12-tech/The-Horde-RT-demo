@@ -28,7 +28,7 @@ struct TorchFailureSnapshot
     float fallProgress = 0.0f;
     float leftArmLowerBlend = 0.0f;
     float droppedX = 0.0f;
-    float droppedY = -0.95f;
+    float droppedY = kRouteFloorWorldY;
     float droppedZ = 0.0f;
     float droppedYawRadians = 0.0f;
     float droppedViewPitchRadians = 0.0f;
@@ -282,7 +282,7 @@ public:
 
         snapshot_.leftArmLowerBlend = SmoothStep(
             (snapshot_.sequenceTime - kArmLowerStart) / (kArmLowerEnd - kArmLowerStart));
-        snapshot_.droppedY = -0.95f + 0.72f * (1.0f - snapshot_.fallProgress);
+        snapshot_.droppedY = kRouteFloorWorldY + 0.72f * (1.0f - snapshot_.fallProgress);
         snapshot_.droppedPitchRadians = 1.36f * snapshot_.fallProgress;
         return snapshot_;
     }

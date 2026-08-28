@@ -1,5 +1,6 @@
 #include "vulkan/raytracing/CharacterRenderSlot.h"
 #include "vulkan/raytracing/DynamicBlasSynchronization.h"
+#include "vulkan/raytracing/RtSceneRouteConstants.h"
 #include "vulkan/raytracing/RtSceneTuning.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
 #include "platform/android/AndroidRtLabState.h"
@@ -394,6 +395,21 @@ int main()
                   Near(sharedPlan.skeletons[1].transform.matrix[0][3], 0.75f),
                   "two-skeleton transforms were not independent");
 
+    TorchFailureSequence sharedFloorTorch;
+    sharedFloorTorch.Update(0.05f, -1.80f, -15.20f);
+    for (int frame = 0; frame < 24; ++frame)
+    {
+        sharedFloorTorch.Update(0.05f, -1.80f, -15.20f);
+    }
+    ok &= Require(
+        sharedFloorTorch.Snapshot().phase == TorchFailurePhase::Settled &&
+            Near(sharedFloorTorch.Snapshot().droppedY, horde::gameplay::kRouteFloorWorldY) &&
+            Near(sharedPlan.skeletons[0].transform.matrix[1][3],
+                 horde::gameplay::kRouteFloorWorldY) &&
+            Near(horde::vulkan::raytracing::kProductionRewardChestStageWorldFromBase[13],
+                 horde::gameplay::kRouteFloorWorldY),
+        "settled torch, active character, and production reward stage must share the route-floor authority");
+
     skeletons[1].action = EnemyCombatAction::AttackActive;
     skeletons[1].actionTime = 0.08f;
     const CharacterFramePlan splitPlan = EvaluateCharacterFramePlan(skeletons, skeletons.size(), roster, lich, 2.967f);
@@ -414,9 +430,11 @@ int main()
                   Near(staggerRecoveryPlan.skeletons[1].time, 2.80f),
                   "stagger did not traverse the bounded authored Attack recovery from contact to rest");
     ok &= Require(!Near(staggerImpactPlan.skeletons[1].transform.matrix[1][1], 1.0f) &&
-                  !Near(staggerImpactPlan.skeletons[1].transform.matrix[1][3], -0.95f) &&
+                  !Near(staggerImpactPlan.skeletons[1].transform.matrix[1][3],
+                        horde::gameplay::kRouteFloorWorldY) &&
                   Near(staggerRecoveryPlan.skeletons[1].transform.matrix[1][1], 1.0f) &&
-                  Near(staggerRecoveryPlan.skeletons[1].transform.matrix[1][3], -0.95f),
+                  Near(staggerRecoveryPlan.skeletons[1].transform.matrix[1][3],
+                       horde::gameplay::kRouteFloorWorldY),
                   "stagger did not produce a bounded recoil and settle over its 800 ms action");
     skeletons[0] = skeletons[1];
     skeletons[0].id = simulation::EntityId::SkeletonA;

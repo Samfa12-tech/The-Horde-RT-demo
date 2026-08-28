@@ -1,5 +1,6 @@
 #include "scene/assets/AssetManifest.h"
 #include "scene/assets/StaticMeshAsset.h"
+#include "gameplay/ShowcaseRoute.h"
 #include "vulkan/raytracing/RtSceneRouteConstants.h"
 
 #include <algorithm>
@@ -615,9 +616,10 @@ int main()
             Multiply(chestLidHinge->world, openAngle), lidNode->world);
         const TransformedBounds chestWorldBounds = TransformBounds(chestBase.asset, stage);
         const TransformedBounds lidLocalBounds = TransformBounds(chestLid.asset, chestLocalLid);
-        Check(Near(chestWorldBounds.minimum[1], -0.95f) &&
-                  Near(chestWorldBounds.maximum[1], -0.57f) &&
-                  Near(Origin(hinge)[1], 0.33f) && Near(Origin(lid)[1], -0.61f),
+        Check(Near(chestWorldBounds.minimum[1], horde::gameplay::kRouteFloorWorldY) &&
+                  Near(chestWorldBounds.maximum[1], horde::gameplay::kRouteFloorWorldY + 0.38f) &&
+                  Near(Origin(hinge)[1], horde::gameplay::kRouteFloorWorldY + 1.28f) &&
+                  Near(Origin(lid)[1], horde::gameplay::kRouteFloorWorldY + 0.34f),
               "checkpoint 114 places the complete chest on the authoritative corridor floor and composes both authored hinges exactly");
         constexpr std::array<float, 2u> scales{{0.90f, 0.90f}};
         constexpr std::array<std::array<float, 4u>, 2u> cameras{{
@@ -672,8 +674,8 @@ int main()
                       : "full ring and body bounds fit checkpoint 115's exact raygen frustum");
             Check(Near(flameOrigin[0], -12.2401924f) && Near(flameOrigin[2], -15.27f) &&
                       Near(lightOrigin[0], -12.2401924f) && Near(lightOrigin[2], -15.27f) &&
-                      Near(flameOrigin[1], horde::vulkan::raytracing::kRouteFloorWorldY + 1.28f - 0.545f * value) &&
-                      Near(lightOrigin[1], horde::vulkan::raytracing::kRouteFloorWorldY + 1.28f - 0.515f * value) &&
+                      Near(flameOrigin[1], horde::gameplay::kRouteFloorWorldY + 1.28f - 0.545f * value) &&
+                      Near(lightOrigin[1], horde::gameplay::kRouteFloorWorldY + 1.28f - 0.515f * value) &&
                       Near(lightOrigin[1] - flameOrigin[1], 0.030f * value),
                   checkpoint == 0u
                       ? "checkpoint 114 flame and light origins exactly compose at 0.90 scale"

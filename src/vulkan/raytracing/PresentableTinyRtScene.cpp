@@ -24,6 +24,8 @@
 namespace horde::vulkan::raytracing
 {
 
+using horde::gameplay::kRouteFloorWorldY;
+
 namespace
 {
 

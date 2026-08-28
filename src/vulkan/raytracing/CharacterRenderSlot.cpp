@@ -1,5 +1,7 @@
 #include "vulkan/raytracing/CharacterRenderSlot.h"
 
+#include "gameplay/ShowcaseRoute.h"
+
 #include <algorithm>
 #include <cmath>
 
@@ -118,7 +120,7 @@ VkTransformMatrixKHR SkeletonInstanceTransform(
     const float leanSin = std::sin(lean);
     return {{
         enemyCos, enemySin * leanSin, enemySin * leanCos, x,
-        0.0f, leanCos, -leanSin, -0.95f + recoil * 0.055f,
+        0.0f, leanCos, -leanSin, horde::gameplay::kRouteFloorWorldY + recoil * 0.055f,
         -enemySin, enemyCos * leanSin, enemyCos * leanCos, z}};
 }
 

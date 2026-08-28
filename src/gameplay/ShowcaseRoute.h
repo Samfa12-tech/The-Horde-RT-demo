@@ -6,6 +6,10 @@
 namespace horde::gameplay
 {
 
+// World-space vertical authority for the authored showcase route. Gameplay
+// placement and renderer geometry both consume this neutral route contract.
+inline constexpr float kRouteFloorWorldY = -0.95f;
+
 struct RoutePosition
 {
     float x;
