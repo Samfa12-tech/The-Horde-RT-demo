@@ -64,6 +64,8 @@ The staged Meshy sword LOD and torch study are not used by the runtime or includ
 - Right-side drag: 360-degree look
 - `SWING`: sword attack
 - `PARRY`: timed skeleton-strike parry
+- Contextual `INTERACT`: open the unlocked reward chest, then claim its lantern after the lid finishes opening
+- Contextual `RAISE` / `LOWER`: change the carried reward-lantern pose
 - Android Back: pause/resume
 
 ### Windows
@@ -72,13 +74,15 @@ The staged Meshy sword LOD and torch study are not used by the runtime or includ
 - Left mouse drag: look
 - Right mouse or `Space`: sword attack
 - `Q`: timed skeleton-strike parry
+- `E`: interact with the unlocked reward chest / available lantern
+- `F`: raise or lower the claimed reward lantern
 - `Esc`: pause/resume
 - `R`: restart route
 - `F1`: controls
 - `F2`: RT diagnostics
 - `F3`: live non-pausing developer overlay (Debug builds only)
 - `Alt+Enter`: fullscreen/windowed
-- Backbone/controller: left stick move, right stick look, RT attack, LT parry, B/Circle directional dodge, D-pad menus, A select, Menu/Start pause
+- Backbone/controller: left stick move, right stick look, RT attack, LT parry, B/Circle directional dodge, gameplay A interact, gameplay Y raise/lower, D-pad menus, A menu select, Menu/Start pause
 
 At zero vitality, `RETRY ENCOUNTER` restores the current encounter, `RESTART ROUTE` returns to the opening, and Back/`Esc` cannot resume a dead player.
 
