@@ -575,6 +575,10 @@ int main()
             ReadTextFile(raygenDirectory / "include/rt_atmosphere.glsl");
         const std::string sceneSource =
             ReadTextFile(root / "src/vulkan/raytracing/PresentableTinyRtScene.cpp");
+        const std::string simulationSource =
+            ReadTextFile(root / "src/gameplay/simulation/GameSimulation.cpp");
+        const std::string pendulumSource =
+            ReadTextFile(root / "src/gameplay/items/LanternPendulum.cpp");
         const std::string windowsSource =
             ReadTextFile(root / "src/platform/windows/DiagnosticWindow.cpp");
         const std::string androidSource = ReadTextFile(
@@ -585,6 +589,8 @@ int main()
             root / "android/app/src/main/java/com/samfa12/hordelanternrt/ProbeBridge.java");
         const std::string androidLayoutSource = ReadTextFile(
             root / "android/app/src/main/res/layout/activity_main.xml");
+        const std::string androidLayoutTestSource = ReadTextFile(
+            root / "android/app/src/test/java/com/samfa12/hordelanternrt/ContextualControlsLayoutTest.java");
         const std::string androidValidationSource =
             ReadTextFile(root / "tools/run-android-showcase-validation.ps1");
         ok &= Require(raygenSource.find(
@@ -1033,7 +1039,10 @@ int main()
                       sceneSource.find("reward-lantern-body-lod0.runtime.glb") != std::string::npos &&
                       sceneSource.find("gothicChestBaseBlas_") != std::string::npos &&
                       sceneSource.find("rewardLanternBodyBlas_") != std::string::npos &&
-                      sceneSource.find("productionPropsVisible") != std::string::npos &&
+                      sceneSource.find("productionRewardWorldVisible") != std::string::npos &&
+                      sceneSource.find("productionVisibility.torchMask") != std::string::npos &&
+                      sceneSource.find("productionVisibility.swordMask") != std::string::npos &&
+                      sceneSource.find("productionVisibility.playerMask") != std::string::npos &&
                       sceneSource.find("instances[6].instanceCustomIndex = 6u;") != std::string::npos &&
                       sceneSource.find("instances[8].instanceCustomIndex = 8u;") != std::string::npos &&
                       sceneSource.find("const float lanternScale = 0.90f;") != std::string::npos &&
@@ -1041,6 +1050,7 @@ int main()
                           "gothicChestBaseAsset_.sockets, \"RewardLanternHingeSocket\"") !=
                           std::string::npos &&
                       sceneSource.find("rewardLanternRingAsset_.sockets, \"Hinge\"") != std::string::npos &&
+                      sceneSource.find("rewardLanternRingAsset_.sockets, \"GripRing\"") != std::string::npos &&
                       sceneSource.find("rewardLanternBodyAsset_.sockets, \"Flame\"") != std::string::npos &&
                       sceneSource.find("rewardLanternBodyAsset_.sockets, \"Light\"") != std::string::npos &&
                       sceneSource.find("ComposeWorldFromItem(") != std::string::npos &&
@@ -1049,11 +1059,31 @@ int main()
                       "production chest and lantern must use bounded generic slots plus loaded authored pivots for lid, ring, body, flame, and light");
         ok &= Require(sceneSource.find("frame.rewardLanternWorldFromHinge") != std::string::npos &&
                       sceneSource.find("frame.lanternPendulum.worldFromBody") != std::string::npos &&
-                      sceneSource.find("glassFixtureVisible || productionInspection || rewardLanternClaimed") != std::string::npos &&
+                      sceneSource.find("BuildProductionSceneVisibility") != std::string::npos &&
+                      sceneSource.find("ComposeClaimedRewardLanternVisuals") != std::string::npos &&
+                      sceneSource.find("FinalWorldFromLeftGrip") != std::string::npos &&
                       sceneSource.find("productionLanternVisible ? 0x01u : 0u") != std::string::npos &&
                       sceneSource.find("lanternEmitter.worldFromFlame = productionLanternWorldFromFlame") != std::string::npos &&
                       sceneSource.find("lanternEmitter.worldFromLight = productionLanternWorldFromLight") != std::string::npos,
                       "claimed ring must be hand-rigid while lantern body, glass, flame, and light consume the shared pendulum transform");
+        ok &= Require(raygenSource.find("primaryTorchPixelCount") != std::string::npos &&
+                      raygenSource.find("primaryPlayerPixelCount") != std::string::npos &&
+                      raygenSource.find("primaryRewardRingPixelCount") != std::string::npos &&
+                      windowsSource.find("instanceMasks[4] != 0x14u") != std::string::npos &&
+                      windowsSource.find("record.primaryPlayerPixels == 0u") != std::string::npos &&
+                      windowsSource.find("rewardGripPositionErrorMetres") != std::string::npos,
+                      "capture evidence must assert actual primary pixels, stable instance masks, and final reward GripRing contact");
+        ok &= Require(simulationSource.find("SynchronizePausedInput") != std::string::npos &&
+                      simulationSource.find("pendingToggleHeldLightPoseCommands_ = 0u") != std::string::npos &&
+                      androidBridgeSource.find("RequestLifecyclePauseSynchronizationLocked") != std::string::npos &&
+                      androidBridgeSource.find("SynchronizeLifecyclePauseOnOwnerThread") != std::string::npos &&
+                      androidBridgeSource.find("gLifecycleUnpausePending") != std::string::npos,
+                      "Android resume must defer unpause until the owner synchronizes all paused command sequences");
+        ok &= Require(pendulumSource.find("torsionAngularAcceleration") != std::string::npos &&
+                      pendulumSource.find("SignedYawDelta") != std::string::npos &&
+                      pendulumSource.find("kHandBasisTeleportRadians") != std::string::npos &&
+                      pendulumSource.find("snapshot_.torsionAngleRadians") != std::string::npos,
+                      "shared fixed-step lantern physics must include bounded hand-basis-driven torsion");
         ok &= Require(windowsSource.find("FindDevelopmentCheckpoint(ctx.developmentCheckpoint)") !=
                           std::string::npos &&
                       windowsSource.find("development->usesGlassFixture") != std::string::npos,
@@ -1147,6 +1177,11 @@ int main()
                       androidLayoutSource.find("android:layout_width=\"128dp\"") != std::string::npos &&
                       androidLayoutSource.find("android:maxLines=\"1\"") != std::string::npos,
                       "contextual Android controls must retain compact enlarged-font-safe sizing");
+        ok &= Require(androidLayoutTestSource.find("maximumFont.fontScale = 2.0f") != std::string::npos &&
+                      androidLayoutTestSource.find("@GraphicsMode(GraphicsMode.Mode.NATIVE)") != std::string::npos &&
+                      androidLayoutTestSource.find("root.draw(new Canvas(rendered))") != std::string::npos &&
+                      androidLayoutTestSource.find("Rect.intersects") != std::string::npos,
+                      "maximum-font contextual controls require a native-graphics rendered layout assertion, not source inspection alone");
         const std::size_t androidOpenRtLabBegin = androidSource.find("private void openRtLab(");
         const std::size_t androidOpenRtLabEnd = androidSource.find("private void showRtLab(", androidOpenRtLabBegin);
         const std::size_t androidCloseRtLabBegin = androidSource.find("private void closeRtLab(");
