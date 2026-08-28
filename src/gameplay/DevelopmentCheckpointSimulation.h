@@ -91,9 +91,13 @@ inline bool StageDevelopmentCheckpointSimulation(
         pendulum.strafeAngleRadians = checkpoint.rewardStrafeAngleRadians;
         pendulum.forwardAngularVelocity = checkpoint.rewardForwardAngularVelocity;
         pendulum.strafeAngularVelocity = checkpoint.rewardStrafeAngularVelocity;
+        pendulum.torsionAngleRadians = checkpoint.rewardTorsionAngleRadians;
+        pendulum.torsionAngularVelocity = checkpoint.rewardTorsionAngularVelocity;
         pendulum.previousPivotVelocity = checkpoint.rewardPreviousPivotVelocity;
+        pendulum.previousHandForward = {{hinge[8], hinge[9], hinge[10]}};
         pendulum.worldFromBody = ComposeLanternPendulumBodyTransform(
-            hinge, pendulum.forwardAngleRadians, pendulum.strafeAngleRadians);
+            hinge, pendulum.forwardAngleRadians, pendulum.strafeAngleRadians,
+            pendulum.torsionAngleRadians);
         gameSimulation.ImportRewardCheckpoint(chest, interaction, finale, &pendulum);
     }
     if (checkpoint.combatPose == DevelopmentCombatPose::Rest)

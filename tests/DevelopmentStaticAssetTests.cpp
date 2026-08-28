@@ -162,25 +162,31 @@ int main()
     Check(heldHigh != nullptr && StageDevelopmentCheckpointSimulation(stagedHigh, *heldHigh) &&
               stagedHigh.Snapshot().interaction.heldLightPose ==
                   interactions::HeldLightPose::High &&
-              stagedHigh.Snapshot().lanternPendulum.forwardAngleRadians == 0.0f,
+              stagedHigh.Snapshot().lanternPendulum.forwardAngleRadians == 0.0f &&
+              stagedHigh.Snapshot().lanternPendulum.torsionAngleRadians == 0.0f,
           "held-high checkpoint imports a frozen rest pendulum and real high carry state");
     Check(heldLow != nullptr && StageDevelopmentCheckpointSimulation(stagedLow, *heldLow) &&
               stagedLow.Snapshot().interaction.heldLightPose ==
                   interactions::HeldLightPose::Low &&
-              stagedLow.Snapshot().lanternPendulum.strafeAngularVelocity == 0.0f,
+              stagedLow.Snapshot().lanternPendulum.strafeAngularVelocity == 0.0f &&
+              stagedLow.Snapshot().lanternPendulum.torsionAngularVelocity == 0.0f,
           "held-low checkpoint imports a frozen rest pendulum and real low carry state");
     Check(glassTransmission != nullptr &&
               StageDevelopmentCheckpointSimulation(stagedGlassTransmission,
                                                    *glassTransmission) &&
               stagedGlassTransmission.Snapshot().lanternPendulum.forwardAngleRadians == 0.30f &&
-              stagedGlassTransmission.Snapshot().lanternPendulum.strafeAngleRadians == -0.16f,
-          "glass-transmission checkpoint freezes an exact angled shared body transform");
+              stagedGlassTransmission.Snapshot().lanternPendulum.strafeAngleRadians == -0.16f &&
+              stagedGlassTransmission.Snapshot().lanternPendulum.torsionAngleRadians == 0.12f &&
+              stagedGlassTransmission.Snapshot().lanternPendulum.torsionAngularVelocity == -0.40f,
+          "glass-transmission checkpoint freezes exact swing/torsion shared body state");
     Check(motionExtreme != nullptr &&
               StageDevelopmentCheckpointSimulation(stagedMotionExtreme, *motionExtreme) &&
               stagedMotionExtreme.Snapshot().lanternPendulum.forwardAngleRadians == 0.82f &&
               stagedMotionExtreme.Snapshot().lanternPendulum.strafeAngularVelocity == -1.60f &&
+              stagedMotionExtreme.Snapshot().lanternPendulum.torsionAngleRadians == 0.28f &&
+              stagedMotionExtreme.Snapshot().lanternPendulum.torsionAngularVelocity == -0.90f &&
               stagedMotionExtreme.Snapshot().lanternPendulum.previousPivotVelocity[0] == 3.8f,
-          "motion-extreme checkpoint preserves exact imported angles, velocities, and hinge history");
+          "motion-extreme checkpoint preserves exact imported swing/torsion and hinge history");
     std::size_t lanternSweepCount = 0u;
     bool sweepHasHigh = false;
     bool sweepHasLow = false;
@@ -205,7 +211,11 @@ int main()
                   stagedSweep.Snapshot().lanternPendulum.forwardAngleRadians ==
                       candidate.rewardForwardAngleRadians &&
                   stagedSweep.Snapshot().lanternPendulum.strafeAngleRadians ==
-                      candidate.rewardStrafeAngleRadians,
+                      candidate.rewardStrafeAngleRadians &&
+                  stagedSweep.Snapshot().lanternPendulum.torsionAngleRadians ==
+                      candidate.rewardTorsionAngleRadians &&
+                  stagedSweep.Snapshot().lanternPendulum.torsionAngularVelocity ==
+                      candidate.rewardTorsionAngularVelocity,
               "each GPU lantern stress checkpoint imports and freezes its exact authoritative pendulum");
     }
     Check(lanternSweepCount == 12u && sweepHasHigh && sweepHasLow &&

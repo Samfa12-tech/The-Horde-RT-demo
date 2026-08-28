@@ -15,7 +15,12 @@ constexpr float kGravity = 9.81f;
 constexpr float kDefaultCentreOfMassLength = 0.54f;
 constexpr float kAngularDamping = 2.45f;
 constexpr float kSoftLimitSpring = 52.0f;
+constexpr float kTorsionRestoring = 16.0f;
+constexpr float kTorsionDamping = 4.2f;
+constexpr float kTorsionTurnResponse = 1.3f;
+constexpr float kTorsionSoftLimitSpring = 44.0f;
 constexpr float kTeleportDistanceMetres = 0.70f;
+constexpr float kHandBasisTeleportRadians = 0.75f;
 constexpr float kMaximumHingeAcceleration = 70.0f;
 constexpr float kMaximumAngularVelocity = 9.0f;
 
@@ -57,12 +62,34 @@ HeldItemTransform Multiply(const HeldItemTransform& left,
     return result;
 }
 
-HeldItemTransform Rotation(const float forward, const float strafe)
+Vec3 HorizontalForward(const HeldItemTransform& transform)
+{
+    Vec3 forward = Column(transform, 2u);
+    forward[1] = 0.0f;
+    const float lengthSquared = Dot(forward, forward);
+    if (!std::isfinite(lengthSquared) || lengthSquared <= 0.000001f)
+        return {{0.0f, 0.0f, 1.0f}};
+    const float inverseLength = 1.0f / std::sqrt(lengthSquared);
+    return {{forward[0] * inverseLength, 0.0f, forward[2] * inverseLength}};
+}
+
+float SignedYawDelta(const Vec3& previous, const Vec3& current)
+{
+    const float crossY = previous[2] * current[0] - previous[0] * current[2];
+    const float cosine = previous[0] * current[0] + previous[2] * current[2];
+    return std::atan2(crossY, cosine);
+}
+
+HeldItemTransform Rotation(const float forward,
+                           const float strafe,
+                           const float torsion)
 {
     const float cx = std::cos(forward);
     const float sx = std::sin(forward);
     const float cz = std::cos(strafe);
     const float sz = std::sin(strafe);
+    const float cy = std::cos(torsion);
+    const float sy = std::sin(torsion);
     const HeldItemTransform rotateX{{
         1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, cx, sx, 0.0f,
@@ -73,19 +100,42 @@ HeldItemTransform Rotation(const float forward, const float strafe)
         -sz, cz, 0.0f, 0.0f,
         0.0f, 0.0f, 1.0f, 0.0f,
         0.0f, 0.0f, 0.0f, 1.0f}};
-    return Multiply(rotateZ, rotateX);
+    const HeldItemTransform rotateY{{
+        cy, 0.0f, -sy, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        sy, 0.0f, cy, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f}};
+    // Swing establishes the hanging axis; torsion then rotates the body about
+    // its local Y axis without altering the ring/hand rigid attachment.
+    return Multiply(Multiply(rotateZ, rotateX), rotateY);
 }
 
 void ClampMotion(LanternPendulumSnapshot& snapshot)
 {
     if (!std::isfinite(snapshot.forwardAngleRadians)) snapshot.forwardAngleRadians = 0.0f;
     if (!std::isfinite(snapshot.strafeAngleRadians)) snapshot.strafeAngleRadians = 0.0f;
+    if (!std::isfinite(snapshot.torsionAngleRadians)) snapshot.torsionAngleRadians = 0.0f;
     if (!std::isfinite(snapshot.forwardAngularVelocity)) snapshot.forwardAngularVelocity = 0.0f;
     if (!std::isfinite(snapshot.strafeAngularVelocity)) snapshot.strafeAngularVelocity = 0.0f;
+    if (!std::isfinite(snapshot.torsionAngularVelocity)) snapshot.torsionAngularVelocity = 0.0f;
     snapshot.forwardAngularVelocity = std::clamp(
         snapshot.forwardAngularVelocity, -kMaximumAngularVelocity, kMaximumAngularVelocity);
     snapshot.strafeAngularVelocity = std::clamp(
         snapshot.strafeAngularVelocity, -kMaximumAngularVelocity, kMaximumAngularVelocity);
+    snapshot.torsionAngularVelocity = std::clamp(
+        snapshot.torsionAngularVelocity,
+        -kLanternPendulumMaximumTorsionVelocity,
+        kLanternPendulumMaximumTorsionVelocity);
+    snapshot.torsionAngleRadians = std::clamp(
+        snapshot.torsionAngleRadians,
+        -kLanternPendulumTorsionHardLimitRadians,
+        kLanternPendulumTorsionHardLimitRadians);
+    if (std::abs(snapshot.torsionAngleRadians) >=
+            kLanternPendulumTorsionHardLimitRadians &&
+        snapshot.torsionAngularVelocity * snapshot.torsionAngleRadians > 0.0f)
+    {
+        snapshot.torsionAngularVelocity = 0.0f;
+    }
     const float magnitude = std::hypot(snapshot.forwardAngleRadians,
                                        snapshot.strafeAngleRadians);
     if (magnitude <= kLanternPendulumHardLimitRadians || magnitude <= 0.000001f)
@@ -114,14 +164,17 @@ void ClampMotion(LanternPendulumSnapshot& snapshot)
 HeldItemTransform ComposeLanternPendulumBodyTransform(
     const HeldItemTransform& worldFromHinge,
     const float forwardAngleRadians,
-    const float strafeAngleRadians)
+    const float strafeAngleRadians,
+    const float torsionAngleRadians)
 {
     if (!FiniteTransform(worldFromHinge) || !std::isfinite(forwardAngleRadians) ||
-        !std::isfinite(strafeAngleRadians))
+        !std::isfinite(strafeAngleRadians) || !std::isfinite(torsionAngleRadians))
     {
         return horde::gameplay::items::IdentityHeldItemTransform();
     }
-    return Multiply(worldFromHinge, Rotation(forwardAngleRadians, strafeAngleRadians));
+    return Multiply(worldFromHinge,
+                    Rotation(forwardAngleRadians, strafeAngleRadians,
+                             torsionAngleRadians));
 }
 
 void LanternPendulum::Reset(const HeldItemTransform& worldFromHinge)
@@ -135,6 +188,7 @@ void LanternPendulum::Reset(const HeldItemTransform& worldFromHinge)
     snapshot_ = {};
     snapshot_.previousPivotPosition = {{worldFromHinge[12], worldFromHinge[13],
                                         worldFromHinge[14]}};
+    snapshot_.previousHandForward = HorizontalForward(worldFromHinge);
     snapshot_.worldFromBody = worldFromHinge;
     snapshot_.initialized = true;
 }
@@ -154,6 +208,16 @@ void LanternPendulum::Import(const LanternPendulumSnapshot& snapshot)
     for (float& value : snapshot_.previousPivotVelocity)
     {
         if (!std::isfinite(value)) value = 0.0f;
+    }
+    bool finiteHandForward = true;
+    for (const float value : snapshot_.previousHandForward)
+        finiteHandForward = finiteHandForward && std::isfinite(value);
+    const float handForwardLengthSquared = Dot(snapshot_.previousHandForward,
+                                               snapshot_.previousHandForward);
+    if (!finiteHandForward || handForwardLengthSquared < 0.81f ||
+        handForwardLengthSquared > 1.21f)
+    {
+        snapshot_.previousHandForward = {{0.0f, 0.0f, 1.0f}};
     }
     if (!FiniteTransform(snapshot_.worldFromBody))
     {
@@ -185,6 +249,15 @@ const LanternPendulumSnapshot& LanternPendulum::StepFixed(
         Reset(worldFromHinge);
         return snapshot_;
     }
+    const Vec3 handForward = HorizontalForward(worldFromHinge);
+    const float handYawDelta = SignedYawDelta(snapshot_.previousHandForward,
+                                              handForward);
+    if (!std::isfinite(handYawDelta) ||
+        std::abs(handYawDelta) > kHandBasisTeleportRadians)
+    {
+        Reset(worldFromHinge);
+        return snapshot_;
+    }
 
     const Vec3 velocity{{displacement[0] / fixedDeltaSeconds,
                          displacement[1] / fixedDeltaSeconds,
@@ -210,6 +283,10 @@ const LanternPendulumSnapshot& LanternPendulum::StepFixed(
         -(kGravity / centreOfMassLength) * std::sin(snapshot_.strafeAngleRadians) -
         strafeAcceleration / centreOfMassLength -
         kAngularDamping * snapshot_.strafeAngularVelocity;
+    float torsionAngularAcceleration =
+        -kTorsionRestoring * std::sin(snapshot_.torsionAngleRadians) -
+        kTorsionDamping * snapshot_.torsionAngularVelocity -
+        kTorsionTurnResponse * (handYawDelta / fixedDeltaSeconds);
 
     const float angleMagnitude = std::hypot(snapshot_.forwardAngleRadians,
                                             snapshot_.strafeAngleRadians);
@@ -220,16 +297,28 @@ const LanternPendulumSnapshot& LanternPendulum::StepFixed(
         forwardAngularAcceleration += scale * snapshot_.forwardAngleRadians;
         strafeAngularAcceleration += scale * snapshot_.strafeAngleRadians;
     }
+    if (std::abs(snapshot_.torsionAngleRadians) >
+        kLanternPendulumTorsionSoftLimitRadians)
+    {
+        const float excess = std::abs(snapshot_.torsionAngleRadians) -
+            kLanternPendulumTorsionSoftLimitRadians;
+        torsionAngularAcceleration -= kTorsionSoftLimitSpring * excess *
+            std::copysign(1.0f, snapshot_.torsionAngleRadians);
+    }
 
     snapshot_.forwardAngularVelocity += forwardAngularAcceleration * fixedDeltaSeconds;
     snapshot_.strafeAngularVelocity += strafeAngularAcceleration * fixedDeltaSeconds;
+    snapshot_.torsionAngularVelocity += torsionAngularAcceleration * fixedDeltaSeconds;
     snapshot_.forwardAngleRadians += snapshot_.forwardAngularVelocity * fixedDeltaSeconds;
     snapshot_.strafeAngleRadians += snapshot_.strafeAngularVelocity * fixedDeltaSeconds;
+    snapshot_.torsionAngleRadians += snapshot_.torsionAngularVelocity * fixedDeltaSeconds;
     snapshot_.previousPivotPosition = pivot;
     snapshot_.previousPivotVelocity = velocity;
+    snapshot_.previousHandForward = handForward;
     ClampMotion(snapshot_);
     snapshot_.worldFromBody = ComposeLanternPendulumBodyTransform(
-        worldFromHinge, snapshot_.forwardAngleRadians, snapshot_.strafeAngleRadians);
+        worldFromHinge, snapshot_.forwardAngleRadians, snapshot_.strafeAngleRadians,
+        snapshot_.torsionAngleRadians);
     return snapshot_;
 }
 

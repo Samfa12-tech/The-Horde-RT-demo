@@ -39,8 +39,14 @@ bool Finite(const LanternPendulumSnapshot& snapshot)
 {
     if (!std::isfinite(snapshot.forwardAngleRadians) ||
         !std::isfinite(snapshot.strafeAngleRadians) ||
+        !std::isfinite(snapshot.torsionAngleRadians) ||
         !std::isfinite(snapshot.forwardAngularVelocity) ||
-        !std::isfinite(snapshot.strafeAngularVelocity)) return false;
+        !std::isfinite(snapshot.strafeAngularVelocity) ||
+        !std::isfinite(snapshot.torsionAngularVelocity)) return false;
+    for (const float value : snapshot.previousHandForward)
+    {
+        if (!std::isfinite(value)) return false;
+    }
     for (const float value : snapshot.worldFromBody)
     {
         if (!std::isfinite(value)) return false;
@@ -81,14 +87,16 @@ int main()
     LanternPendulumSnapshot displaced = rest.Snapshot();
     displaced.forwardAngleRadians = 0.40f;
     displaced.strafeAngleRadians = -0.30f;
+    displaced.torsionAngleRadians = 0.24f;
     rest.Import(displaced);
     for (int tick = 0; tick < 360; ++tick)
     {
         rest.StepFixed(Hinge(0.0f, 1.0f, 0.0f), dt);
     }
     Check(std::abs(rest.Snapshot().forwardAngleRadians) < 0.01f &&
-              std::abs(rest.Snapshot().strafeAngleRadians) < 0.01f,
-          "gravity and damping must converge a displaced lantern to rest");
+              std::abs(rest.Snapshot().strafeAngleRadians) < 0.01f &&
+              std::abs(rest.Snapshot().torsionAngleRadians) < 0.01f,
+          "gravity/restoring forces and damping must converge swing and torsion to rest");
 
     Check(Finite(RunStartAndStop()), "forward start/stop must remain finite");
 
@@ -101,6 +109,9 @@ int main()
     Check(std::abs(lateral.Snapshot().forwardAngularVelocity) > 0.001f ||
               std::abs(lateral.Snapshot().strafeAngularVelocity) > 0.001f,
           "turning the authoritative hinge must retain dynamic angular response");
+    Check(std::abs(lateral.Snapshot().torsionAngleRadians) > 0.001f &&
+              std::abs(lateral.Snapshot().torsionAngularVelocity) > 0.01f,
+          "turning the final hand basis must excite explicit bounded torsion about the hanging axis");
 
     for (int tick = 0; tick < 18; ++tick)
     {
@@ -119,20 +130,35 @@ int main()
     extreme.strafeAngleRadians = -3.0f;
     extreme.forwardAngularVelocity = 80.0f;
     extreme.strafeAngularVelocity = -60.0f;
+    extreme.torsionAngleRadians = 3.0f;
+    extreme.torsionAngularVelocity = 70.0f;
     clamp.Import(extreme);
     clamp.StepFixed(Hinge(0.0f, 1.0f, 0.0f), dt);
     Check(std::hypot(clamp.Snapshot().forwardAngleRadians,
                      clamp.Snapshot().strafeAngleRadians) <=
               kLanternPendulumHardLimitRadians + 0.0001f,
           "import and integration must enforce soft 45/hard 55 degree limits");
+    Check(std::abs(clamp.Snapshot().torsionAngleRadians) <=
+                  kLanternPendulumTorsionHardLimitRadians + 0.0001f &&
+              std::abs(clamp.Snapshot().torsionAngularVelocity) <=
+                  kLanternPendulumMaximumTorsionVelocity + 0.0001f,
+          "torsion import and integration must enforce its independent hard angle/velocity stops");
 
     clamp.StepFixed(Hinge(20.0f, 4.0f, -18.0f), dt);
     Check(std::abs(clamp.Snapshot().forwardAngleRadians) < 0.0001f &&
               std::abs(clamp.Snapshot().strafeAngleRadians) < 0.0001f &&
+              std::abs(clamp.Snapshot().torsionAngleRadians) < 0.0001f &&
               clamp.Snapshot().worldFromBody[12] == 20.0f &&
               clamp.Snapshot().worldFromBody[13] == 4.0f &&
               clamp.Snapshot().worldFromBody[14] == -18.0f,
           "teleports must reset motion at the exact new hinge without velocity injection");
+
+    LanternPendulum angularTeleport;
+    angularTeleport.Reset(Hinge(0.0f, 1.0f, 0.0f));
+    angularTeleport.StepFixed(Hinge(0.0f, 1.0f, 0.0f, 1.20f), dt);
+    Check(std::abs(angularTeleport.Snapshot().torsionAngleRadians) < 0.0001f &&
+              std::abs(angularTeleport.Snapshot().torsionAngularVelocity) < 0.0001f,
+          "discontinuous hand-basis teleports must reset torsion rather than injecting turn velocity");
 
     LanternPendulum nanGuard;
     nanGuard.Reset(Hinge(0.0f, 1.0f, 0.0f));
@@ -140,6 +166,12 @@ int main()
     invalid[12] = std::numeric_limits<float>::quiet_NaN();
     nanGuard.StepFixed(invalid, dt);
     Check(Finite(nanGuard.Snapshot()), "invalid hinge input must never publish NaNs");
+    LanternPendulumSnapshot invalidImport = nanGuard.Snapshot();
+    invalidImport.torsionAngleRadians = std::numeric_limits<float>::quiet_NaN();
+    invalidImport.torsionAngularVelocity = std::numeric_limits<float>::infinity();
+    invalidImport.previousHandForward[0] = std::numeric_limits<float>::quiet_NaN();
+    nanGuard.Import(invalidImport);
+    Check(Finite(nanGuard.Snapshot()), "invalid torsion import/history must be sanitized without NaNs");
 
     LanternPendulum frozen;
     frozen.Reset(Hinge(-3.0f, 2.0f, 7.0f));
@@ -148,12 +180,26 @@ int main()
     authored.strafeAngleRadians = -0.18f;
     authored.forwardAngularVelocity = 0.70f;
     authored.strafeAngularVelocity = -0.45f;
+    authored.torsionAngleRadians = 0.18f;
+    authored.torsionAngularVelocity = -0.32f;
+    authored.previousHandForward = {{0.3f, 0.0f, 0.9539392f}};
     authored.centreOfMassLengthMetres = 0.61f;
     frozen.Import(authored);
     Check(frozen.Snapshot().forwardAngleRadians == authored.forwardAngleRadians &&
               frozen.Snapshot().strafeAngularVelocity == authored.strafeAngularVelocity &&
+              frozen.Snapshot().torsionAngleRadians == authored.torsionAngleRadians &&
+              frozen.Snapshot().torsionAngularVelocity == authored.torsionAngularVelocity &&
+              frozen.Snapshot().previousHandForward == authored.previousHandForward &&
               frozen.Snapshot().centreOfMassLengthMetres == authored.centreOfMassLengthMetres,
-          "checkpoint import must preserve exact finite pendulum angles, velocities, and COM length");
+          "checkpoint import must preserve exact finite swing/torsion angles, velocities, basis history, and COM length");
+
+    const HeldItemTransform swingOnly = ComposeLanternPendulumBodyTransform(
+        Hinge(0.0f, 1.0f, 0.0f), 0.22f, -0.18f, 0.0f);
+    const HeldItemTransform withTorsion = ComposeLanternPendulumBodyTransform(
+        Hinge(0.0f, 1.0f, 0.0f), 0.22f, -0.18f, 0.20f);
+    Check(std::abs(swingOnly[0] - withTorsion[0]) > 0.01f ||
+              std::abs(swingOnly[8] - withTorsion[8]) > 0.01f,
+          "body composition must include torsion as a third rotation about its hanging axis");
 
     LanternPendulum cadence30;
     LanternPendulum cadence60;
@@ -202,7 +248,9 @@ int main()
               simulation60.Snapshot().tickIndex == simulation120.Snapshot().tickIndex &&
               std::abs(shared30.forwardAngleRadians - shared60.forwardAngleRadians) < 0.00001f &&
               std::abs(shared60.forwardAngleRadians - shared120.forwardAngleRadians) < 0.00001f &&
-              std::abs(shared30.strafeAngleRadians - shared120.strafeAngleRadians) < 0.00001f,
+              std::abs(shared30.strafeAngleRadians - shared120.strafeAngleRadians) < 0.00001f &&
+              std::abs(shared30.torsionAngleRadians - shared120.torsionAngleRadians) < 0.00001f &&
+              std::abs(shared30.torsionAngularVelocity - shared120.torsionAngularVelocity) < 0.00001f,
           "GameSimulation must own identical pendulum state under 30/60/120 Hz frame delivery");
 
     horde::gameplay::simulation::GameSimulation turning;
@@ -215,8 +263,9 @@ int main()
         turning.AdvanceFrame(turnInput, 1.0 / 60.0);
     }
     Check(std::hypot(turning.Snapshot().lanternPendulum.forwardAngleRadians,
-                     turning.Snapshot().lanternPendulum.strafeAngleRadians) > 0.005f,
-          "authoritative hand motion during a turn must excite shared lantern motion");
+                     turning.Snapshot().lanternPendulum.strafeAngleRadians) > 0.005f &&
+              std::abs(turning.Snapshot().lanternPendulum.torsionAngleRadians) > 0.005f,
+          "authoritative hand motion/basis during a turn must excite shared swing and torsion");
 
     horde::gameplay::simulation::GameSimulation lifecycle;
     lifecycle.ImportRewardCheckpoint(claimedChest, heldReward, inactiveFinale);
@@ -225,10 +274,13 @@ int main()
     movingCheckpoint.strafeAngleRadians = -0.27f;
     movingCheckpoint.forwardAngularVelocity = 2.1f;
     movingCheckpoint.strafeAngularVelocity = -1.3f;
+    movingCheckpoint.torsionAngleRadians = 0.19f;
+    movingCheckpoint.torsionAngularVelocity = -0.8f;
     movingCheckpoint.worldFromBody = ComposeLanternPendulumBodyTransform(
         lifecycle.Snapshot().rewardLanternWorldFromHinge,
         movingCheckpoint.forwardAngleRadians,
-        movingCheckpoint.strafeAngleRadians);
+        movingCheckpoint.strafeAngleRadians,
+        movingCheckpoint.torsionAngleRadians);
     lifecycle.ImportRewardCheckpoint(
         claimedChest, heldReward, inactiveFinale, &movingCheckpoint);
     horde::gameplay::simulation::InputSnapshot homePause;
@@ -237,7 +289,9 @@ int main()
     Check(std::abs(lifecycle.Snapshot().lanternPendulum.forwardAngleRadians) < 0.00001f &&
               std::abs(lifecycle.Snapshot().lanternPendulum.strafeAngleRadians) < 0.00001f &&
               std::abs(lifecycle.Snapshot().lanternPendulum.forwardAngularVelocity) < 0.00001f &&
-              std::abs(lifecycle.Snapshot().lanternPendulum.strafeAngularVelocity) < 0.00001f,
+              std::abs(lifecycle.Snapshot().lanternPendulum.strafeAngularVelocity) < 0.00001f &&
+              std::abs(lifecycle.Snapshot().lanternPendulum.torsionAngleRadians) < 0.00001f &&
+              std::abs(lifecycle.Snapshot().lanternPendulum.torsionAngularVelocity) < 0.00001f,
           "pause/Home must reset pendulum motion instead of retaining hidden velocity");
     homePause.paused = false;
     lifecycle.AdvanceFrame(homePause, 1.0 / 60.0);

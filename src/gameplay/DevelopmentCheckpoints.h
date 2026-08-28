@@ -45,6 +45,8 @@ struct DevelopmentCheckpoint
     float rewardForwardAngularVelocity = 0.0f;
     float rewardStrafeAngularVelocity = 0.0f;
     std::array<float, 3u> rewardPreviousPivotVelocity{{0.0f, 0.0f, 0.0f}};
+    float rewardTorsionAngleRadians = 0.0f;
+    float rewardTorsionAngularVelocity = 0.0f;
 };
 
 inline constexpr std::array<DevelopmentCheckpoint, 32u> kDevelopmentCheckpoints{{
@@ -83,11 +85,12 @@ inline constexpr std::array<DevelopmentCheckpoint, 32u> kDevelopmentCheckpoints{
      true, false, DevelopmentRewardPose::HeldLow},
     {118, "lantern-glass-transmission", 5, -10.65f, -15.20f, -1.57079632679f, -0.30f,
      DevelopmentCombatPose::Rest, false, 1.0f, {{0.72f, 0.90f, 1.0f}}, 2.4f,
-     true, false, DevelopmentRewardPose::GlassTransmission, 0.30f, -0.16f},
+     true, false, DevelopmentRewardPose::GlassTransmission, 0.30f, -0.16f,
+     0.0f, 0.0f, {{0.0f, 0.0f, 0.0f}}, 0.12f, -0.40f},
     {119, "lantern-motion-extreme", 5, -10.65f, -15.20f, -1.57079632679f, -0.30f,
      DevelopmentCombatPose::Rest, false, 1.0f, {{0.72f, 0.90f, 1.0f}}, 2.4f,
      true, false, DevelopmentRewardPose::MotionExtreme, 0.82f, -0.42f,
-     2.40f, -1.60f, {{3.8f, 0.25f, -2.2f}}},
+     2.40f, -1.60f, {{3.8f, 0.25f, -2.2f}}, 0.28f, -0.90f},
     {120, "lantern-sweep-high-forward", 5, -10.65f, -15.20f, -1.57079632679f, -0.30f,
      DevelopmentCombatPose::Rest, false, 1.0f, {{0.72f, 0.90f, 1.0f}}, 2.4f,
      true, false, DevelopmentRewardPose::HeldHigh, 0.78539816339f, 0.0f},
@@ -102,10 +105,12 @@ inline constexpr std::array<DevelopmentCheckpoint, 32u> kDevelopmentCheckpoints{
      true, false, DevelopmentRewardPose::HeldHigh, 0.0f, -0.78539816339f},
     {124, "lantern-sweep-high-diagonal", 5, -10.65f, -15.20f, -1.57079632679f, -0.30f,
      DevelopmentCombatPose::Rest, false, 1.0f, {{0.72f, 0.90f, 1.0f}}, 2.4f,
-     true, false, DevelopmentRewardPose::HeldHigh, 0.678f, 0.678f},
+     true, false, DevelopmentRewardPose::HeldHigh, 0.678f, 0.678f,
+     0.0f, 0.0f, {{0.0f, 0.0f, 0.0f}}, 0.34906585040f, 0.0f},
     {125, "lantern-sweep-high-opposite", 5, -10.65f, -15.20f, -1.57079632679f, -0.30f,
      DevelopmentCombatPose::Rest, false, 1.0f, {{0.72f, 0.90f, 1.0f}}, 2.4f,
-     true, false, DevelopmentRewardPose::HeldHigh, -0.678f, -0.678f},
+     true, false, DevelopmentRewardPose::HeldHigh, -0.678f, -0.678f,
+     0.0f, 0.0f, {{0.0f, 0.0f, 0.0f}}, -0.34906585040f, 0.0f},
     {126, "lantern-sweep-low-forward", 5, -10.65f, -15.20f, -1.57079632679f, -0.30f,
      DevelopmentCombatPose::Rest, false, 1.0f, {{0.72f, 0.90f, 1.0f}}, 2.4f,
      true, false, DevelopmentRewardPose::HeldLow, 0.78539816339f, 0.0f},
@@ -120,10 +125,12 @@ inline constexpr std::array<DevelopmentCheckpoint, 32u> kDevelopmentCheckpoints{
      true, false, DevelopmentRewardPose::HeldLow, 0.0f, -0.78539816339f},
     {130, "lantern-sweep-high-alt-camera", 5, -10.90f, -15.55f, -1.10f, -0.42f,
      DevelopmentCombatPose::Rest, false, 1.0f, {{0.72f, 0.90f, 1.0f}}, 2.4f,
-     true, false, DevelopmentRewardPose::HeldHigh, 0.45f, -0.45f},
+     true, false, DevelopmentRewardPose::HeldHigh, 0.45f, -0.45f,
+     0.0f, 0.0f, {{0.0f, 0.0f, 0.0f}}, 0.20f, 0.60f},
     {131, "lantern-sweep-low-alt-camera", 5, -10.30f, -15.00f, -2.05f, -0.14f,
      DevelopmentCombatPose::Rest, false, 1.0f, {{0.72f, 0.90f, 1.0f}}, 2.4f,
-     true, false, DevelopmentRewardPose::HeldLow, -0.45f, 0.45f},
+     true, false, DevelopmentRewardPose::HeldLow, -0.45f, 0.45f,
+     0.0f, 0.0f, {{0.0f, 0.0f, 0.0f}}, -0.20f, -0.60f},
 }};
 
 constexpr const DevelopmentCheckpoint* FindDevelopmentCheckpoint(std::string_view name)
