@@ -4119,7 +4119,7 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         const auto* development = horde::gameplay::FindDevelopmentCheckpoint(
             context.developmentCheckpoint);
         const bool claimedRewardCapture = development != nullptr &&
-            development->id >= 116 && development->id <= 119;
+            development->id >= 116 && development->id <= 131;
         if (context.developmentCheckpoint.empty() &&
             (record.instanceMasks[1] != 0x02u ||
              record.instanceMasks[3] != 0x02u ||
@@ -4130,9 +4130,12 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             return fail(std::string("Checkpoint '") + checkpoint.name +
                         "' masked the ordinary torch/sword/skinned-player production instances.");
         }
-        if (checkpoint.name == "opening" && record.primaryTorchPixels == 0u)
+        if (checkpoint.name == "opening" &&
+            (record.primaryTorchPixels == 0u ||
+             record.primarySwordPixels == 0u ||
+             record.primaryPlayerPixels == 0u))
         {
-            return fail("Opening capture has no primary-visible torch pixels (floating-flame regression).");
+            return fail("Opening capture lacks primary-visible skinned arms, torch, or sword (floating-prop regression).");
         }
         if (claimedRewardCapture &&
             (record.instanceMasks[4] != 0x14u ||
