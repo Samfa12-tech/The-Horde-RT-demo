@@ -246,20 +246,30 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
     const float torchBob = std::abs(std::sin(input.walkTime * 6.2f)) * 0.025f * movement;
     const std::array<float, 3u> heldLeftHand{{
         -0.24f - torchSway, -0.40f + torchBob, heldPropDepth}};
-    // The authored lantern is almost one metre tall. Its claimed carry is
-    // centred and held farther forward than the compact torch so the full
-    // ring/body remains readable at rest and retains a projected majority at
-    // the 55-degree swing limit on narrow portrait phones. The offset still
-    // follows heldPropDepth, so corridor wall retraction remains shared.
-    const float rewardDepth = heldPropDepth + 0.40f;
+    // The authored lantern is almost one metre tall. In open space it needs
+    // more perspective distance than the compact torch so its full swing cone
+    // remains readable on narrow portrait phones. Near route collision, the
+    // same sampled clearance smoothly removes that advance and adds the body
+    // radius inset needed to keep the complete authored cage camera-side of
+    // the wall. This remains one shared carry contract on every platform.
+    const float rewardClearance = std::clamp(
+        (heldPropDepth - 0.30f) / (1.05f - 0.30f), 0.0f, 1.0f);
+    const float rewardClearanceBlend = rewardClearance * rewardClearance *
+        (3.0f - 2.0f * rewardClearance);
+    const float rewardWallInset = 0.320f * (1.0f - rewardClearanceBlend);
+    const float rewardOpenAdvance = 1.05f * rewardClearanceBlend;
+    const float rewardDepth = heldPropDepth - rewardWallInset + rewardOpenAdvance;
+    const float rewardLateral = -0.35f + 0.365f * rewardClearanceBlend;
+    const float rewardLowWallDepthBoost =
+        0.025f * (1.0f - rewardClearanceBlend);
     const std::array<float, 3u> rewardHighLeftHand{{
-        -0.06f - torchSway * 0.35f,
+        rewardLateral - torchSway * 0.35f,
         0.50f + torchBob * 0.25f,
         rewardDepth}};
     const std::array<float, 3u> rewardLowLeftHand{{
-        -0.06f - torchSway * 0.35f,
+        rewardLateral - torchSway * 0.35f,
         0.26f + torchBob * 0.25f,
-        rewardDepth}};
+        rewardDepth + rewardLowWallDepthBoost}};
     constexpr std::array<float, 3u> loweredLeftHand{{-0.36f, -0.92f, 0.27f}};
     float lowerBlend = std::clamp(input.torchFailure.leftArmLowerBlend, 0.0f, 1.0f);
     if (input.interaction.heldLightKind ==
@@ -292,11 +302,13 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
     // Raise/advance only the reward-carry clavicle target so the real skinned
     // arm reaches the safe-frame grip without stretching. Torch and sword
     // anatomy keep the owner-approved Task 5 targets unchanged.
+    const float rewardShoulderDepth = 0.20f +
+        ((rewardDepth - 0.61f) - 0.20f) * rewardClearanceBlend;
     result.leftShoulderLocal = rewardLantern
         ? std::array<float, 3u>{{
               -0.34f,
               -0.10f + lowerBodyPose.pelvisBob * 0.35f,
-              0.84f - lowerBodyPose.leftStride * 0.018f}}
+              rewardShoulderDepth - lowerBodyPose.leftStride * 0.018f}}
         : std::array<float, 3u>{{
               -0.36f,
               -0.44f + lowerBodyPose.pelvisBob * 0.35f,

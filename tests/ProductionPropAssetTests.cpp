@@ -327,6 +327,109 @@ TransformedBounds TransformBounds(const StaticMeshAsset& asset, const Matrix& ma
     return result;
 }
 
+std::array<float, 3u> TransformPosition(
+    const Matrix& matrix, const std::array<float, 4u>& position)
+{
+    return {{
+        matrix[0] * position[0] + matrix[4] * position[1] +
+            matrix[8] * position[2] + matrix[12],
+        matrix[1] * position[0] + matrix[5] * position[1] +
+            matrix[9] * position[2] + matrix[13],
+        matrix[2] * position[0] + matrix[6] * position[1] +
+            matrix[10] * position[2] + matrix[14]}};
+}
+
+float PointTriangleDistance(
+    const std::array<float, 3u>& point,
+    const std::array<float, 3u>& a,
+    const std::array<float, 3u>& b,
+    const std::array<float, 3u>& c)
+{
+    const auto subtract = [](const auto& left, const auto& right) {
+        return std::array<float, 3u>{{left[0] - right[0],
+                                      left[1] - right[1],
+                                      left[2] - right[2]}};
+    };
+    const auto addScaled = [](const auto& origin, const auto& direction,
+                              const float scale) {
+        return std::array<float, 3u>{{origin[0] + direction[0] * scale,
+                                      origin[1] + direction[1] * scale,
+                                      origin[2] + direction[2] * scale}};
+    };
+    const auto dot = [](const auto& left, const auto& right) {
+        return left[0] * right[0] + left[1] * right[1] +
+            left[2] * right[2];
+    };
+    const auto distance = [&](const auto& candidate) {
+        const auto delta = subtract(point, candidate);
+        return std::sqrt(dot(delta, delta));
+    };
+    const auto ab = subtract(b, a);
+    const auto ac = subtract(c, a);
+    const auto ap = subtract(point, a);
+    const float d1 = dot(ab, ap);
+    const float d2 = dot(ac, ap);
+    if (d1 <= 0.0f && d2 <= 0.0f) return distance(a);
+    const auto bp = subtract(point, b);
+    const float d3 = dot(ab, bp);
+    const float d4 = dot(ac, bp);
+    if (d3 >= 0.0f && d4 <= d3) return distance(b);
+    const float vc = d1 * d4 - d3 * d2;
+    if (vc <= 0.0f && d1 >= 0.0f && d3 <= 0.0f)
+        return distance(addScaled(a, ab, d1 / (d1 - d3)));
+    const auto cp = subtract(point, c);
+    const float d5 = dot(ab, cp);
+    const float d6 = dot(ac, cp);
+    if (d6 >= 0.0f && d5 <= d6) return distance(c);
+    const float vb = d5 * d2 - d1 * d6;
+    if (vb <= 0.0f && d2 >= 0.0f && d6 <= 0.0f)
+        return distance(addScaled(a, ac, d2 / (d2 - d6)));
+    const float va = d3 * d6 - d5 * d4;
+    if (va <= 0.0f && d4 - d3 >= 0.0f && d5 - d6 >= 0.0f)
+    {
+        const auto bc = subtract(c, b);
+        return distance(addScaled(b, bc, (d4 - d3) /
+            ((d4 - d3) + (d5 - d6))));
+    }
+    const float denominator = 1.0f / (va + vb + vc);
+    const float v = vb * denominator;
+    const float w = vc * denominator;
+    return distance(addScaled(addScaled(a, ab, v), ac, w));
+}
+
+float MinimumTriangleDistance(
+    const StaticMeshAsset& asset, const Matrix& matrix,
+    const std::array<float, 3u>& point,
+    const std::string_view materialName = {})
+{
+    float result = INFINITY;
+    for (const auto& primitive : asset.primitives)
+    {
+        if (!materialName.empty() &&
+            (primitive.materialIndex >= asset.materials.size() ||
+             asset.materials[primitive.materialIndex].name != materialName))
+        {
+            continue;
+        }
+        for (std::uint32_t offset = 0u;
+             offset + 2u < primitive.indexCount; offset += 3u)
+        {
+            std::array<std::array<float, 3u>, 3u> triangle{};
+            for (std::uint32_t corner = 0u; corner < 3u; ++corner)
+            {
+                const std::uint32_t vertexIndex =
+                    asset.indices[primitive.indexOffset + offset + corner] +
+                    primitive.vertexOffset;
+                triangle[corner] = TransformPosition(
+                    matrix, asset.vertices[vertexIndex].position);
+            }
+            result = std::min(result, PointTriangleDistance(
+                point, triangle[0], triangle[1], triangle[2]));
+        }
+    }
+    return result;
+}
+
 bool BoundsSeparatedBy(const TransformedBounds& left,
                        const TransformedBounds& right,
                        float clearance)
@@ -784,6 +887,18 @@ int main()
                     const ProjectedSafeFrame projectedBody =
                         ProjectAuthoredBoundsToSafeFrame(
                             lanternBody.asset, body, aspect);
+                    if (projectedBody.horizontalCoverage < 0.90f ||
+                        projectedBody.verticalCoverage < 0.90f)
+                    {
+                        std::cout << (poseIndex == 0u ? "high " : "low ")
+                                  << motion.name << " aspect=" << aspect
+                                  << " frame x=[" << projectedBody.minimumX
+                                  << ',' << projectedBody.maximumX << "] y=["
+                                  << projectedBody.minimumY << ','
+                                  << projectedBody.maximumY << "] coverage="
+                                  << projectedBody.horizontalCoverage << '/'
+                                  << projectedBody.verticalCoverage << '\n';
+                    }
                     worstHorizontalCoverage = std::min(
                         worstHorizontalCoverage,
                         projectedBody.horizontalCoverage);
@@ -813,13 +928,102 @@ int main()
             Check(largestRingAbsX <= 0.86f && largestRingAbsY <= 0.86f,
                   std::string(poseIndex == 0u ? "high" : "low") +
                       " complete authored GripRing AABB retains a 14% safe-frame margin");
-            Check(worstHorizontalCoverage >= 0.50f &&
+            Check(worstHorizontalCoverage >= 0.90f &&
                       worstVerticalCoverage >= 0.90f,
                   std::string(poseIndex == 0u ? "high" : "low") +
-                      " full authored body AABB keeps a projected majority horizontally and at least 90% vertically through 45/55-degree swing and torsion extremes on landscape and portrait");
+                      " full authored body AABB keeps at least 90% horizontal and vertical coverage through 45/55-degree swing and torsion extremes on 16:9, 9:16, and 1440:3120");
         }
         Check(handHeight[0] - handHeight[1] >= 0.22f,
               "shared high and low hand targets remain visibly distinct after safe-frame composition");
+
+        constexpr float wallCameraZ = -9.70f;
+        constexpr float wallPlaneZ = -10.0f;
+        constexpr float wallSafetyMargin = 0.015f;
+        constexpr std::array<float, 3u> wallCameraOrigin{{
+            0.0f, 0.58f, wallCameraZ}};
+        constexpr std::array<Motion, 2u> wallMotions{{
+            {"wall-rest", 0.0f, 0.0f, 0.0f},
+            {"wall-swing", 0.0f, 0.5235988f,
+             kLanternPendulumTorsionHardLimitRadians}}};
+        for (std::size_t poseIndex = 0u; poseIndex < 2u; ++poseIndex)
+        {
+            HeldItemFixedStepInput input;
+            input.playerX = 0.0f;
+            input.playerZ = wallCameraZ;
+            input.playerPitchRadians = -0.05f;
+            input.interaction.heldLightKind = HeldLightKind::RewardLantern;
+            input.interaction.heldLightPose = poseIndex == 0u
+                ? HeldLightPose::High : HeldLightPose::Low;
+            input.interaction.heldLightPoseProgress = 1.0f;
+            auto items = horde::gameplay::items::MakeDefaultHeldItemStates();
+            HeldItemFixedStepState state;
+            std::string diagnostic;
+            Check(horde::gameplay::items::ResolveHeldItemsFixedStep(
+                      items, input, 1u, state, diagnostic),
+                  std::string("wall reward shared hand target resolves: ") + diagnostic);
+            const Matrix ring = Multiply(
+                Multiply(state.worldFromLeftHand, lanternScale),
+                inverseRingGrip);
+            const Matrix hinge = Multiply(ring, ringHinge->world);
+            const TransformedBounds ringBounds = TransformBounds(
+                lanternRing.asset, ring);
+            const float ringCameraClearance = MinimumTriangleDistance(
+                lanternRing.asset, ring, wallCameraOrigin);
+            Check(ringBounds.minimum[2] >= wallPlaneZ + wallSafetyMargin,
+                  std::string(poseIndex == 0u ? "high" : "low") +
+                      " wall-retracted authored GripRing stays camera-side of the wall plane");
+            Check(hinge[14] <= wallCameraZ - wallSafetyMargin,
+                  std::string(poseIndex == 0u ? "high" : "low") +
+                      " wall-retracted GripRing keeps its shared hinge in front of the camera without inversion");
+            Check(ringCameraClearance >= wallSafetyMargin,
+                  std::string(poseIndex == 0u ? "high" : "low") +
+                      " wall-retracted GripRing keeps the camera origin and 15 mm near sphere outside authored triangles");
+            for (const Motion& motion : wallMotions)
+            {
+                const Matrix bodyRotation =
+                    horde::gameplay::interactions::
+                        ComposeLanternPendulumBodyTransform(
+                            hinge, motion.forward, motion.strafe,
+                            motion.torsion);
+                const Matrix body = Multiply(bodyRotation, lanternScale);
+                const TransformedBounds bodyBounds = TransformBounds(
+                    lanternBody.asset, body);
+                const float bodyCameraClearance = MinimumTriangleDistance(
+                    lanternBody.asset, body, wallCameraOrigin);
+                const float glassCameraClearance = MinimumTriangleDistance(
+                    lanternBody.asset, body, wallCameraOrigin,
+                    "LanternGlass");
+                std::cout << (poseIndex == 0u ? "high " : "low ")
+                          << motion.name << " wall z=["
+                          << std::min(ringBounds.minimum[2], bodyBounds.minimum[2])
+                          << ','
+                          << std::max(ringBounds.maximum[2], bodyBounds.maximum[2])
+                          << "] hinge=" << hinge[14]
+                          << " body x=[" << bodyBounds.minimum[0] << ','
+                          << bodyBounds.maximum[0] << "]"
+                          << " camera clearance body/glass/ring="
+                          << bodyCameraClearance << '/'
+                          << glassCameraClearance << '/'
+                          << ringCameraClearance
+                          << '\n';
+                Check(bodyBounds.minimum[2] >=
+                          wallPlaneZ + wallSafetyMargin,
+                      std::string(poseIndex == 0u ? "high " : "low ") +
+                          motion.name +
+                          " full transformed body AABB stays camera-side of the actual wall plane");
+                Check(hinge[14] <= wallCameraZ - wallSafetyMargin &&
+                          bodyBounds.minimum[2] <=
+                              wallCameraZ - wallSafetyMargin,
+                      std::string(poseIndex == 0u ? "high " : "low ") +
+                          motion.name +
+                          " wall-retracted body keeps geometry in front of its non-inverted shared hinge");
+                Check(bodyCameraClearance >= wallSafetyMargin &&
+                          glassCameraClearance >= wallSafetyMargin,
+                      std::string(poseIndex == 0u ? "high " : "low ") +
+                          motion.name +
+                          " camera origin and 15 mm near sphere stay outside body triangles and every closed LanternGlass pane");
+            }
+        }
     }
 
     if (chestSocket != nullptr && ringHinge != nullptr && flameSocket != nullptr &&
