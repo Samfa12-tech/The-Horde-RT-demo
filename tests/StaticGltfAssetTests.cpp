@@ -14,6 +14,12 @@
 #include <string_view>
 #include <vector>
 
+#if defined(_WIN32)
+#include <process.h>
+#else
+#include <unistd.h>
+#endif
+
 namespace
 {
 
@@ -29,6 +35,74 @@ void Check(bool condition, std::string_view message)
         ++failures;
     }
 }
+
+std::uint64_t CurrentProcessId()
+{
+#if defined(_WIN32)
+    return static_cast<std::uint64_t>(_getpid());
+#else
+    return static_cast<std::uint64_t>(getpid());
+#endif
+}
+
+class ScopedStaticGltfTestDirectory
+{
+public:
+    ScopedStaticGltfTestDirectory()
+    {
+        base_ = std::filesystem::absolute(
+            std::filesystem::temp_directory_path()).lexically_normal();
+        if (!base_.has_filename()) base_ = base_.parent_path();
+#if defined(NDEBUG)
+        constexpr std::string_view configuration = "release";
+#else
+        constexpr std::string_view configuration = "debug";
+#endif
+        root_ = (base_ / (std::string("horde-rt-static-gltf-tests-") +
+                          std::string(configuration) + "-pid-" +
+                          std::to_string(CurrentProcessId()))).lexically_normal();
+        safe_ = root_.parent_path() == base_ &&
+            root_.filename().string().starts_with(
+                "horde-rt-static-gltf-tests-");
+        if (!safe_)
+        {
+            std::cerr << "Unsafe temporary root rejected: base='" << base_.string()
+                      << "' root='" << root_.string() << "'\n";
+            return;
+        }
+        std::error_code error;
+        std::filesystem::remove_all(root_, error);
+        error.clear();
+        std::filesystem::create_directories(root_, error);
+        ready_ = !error && std::filesystem::is_directory(root_);
+        if (!ready_)
+        {
+            std::cerr << "Temporary root setup failed: base='" << base_.string()
+                      << "' root='" << root_.string() << "' safe=" << safe_
+                      << " error='" << error.message() << "'\n";
+        }
+    }
+
+    ~ScopedStaticGltfTestDirectory()
+    {
+        if (!safe_) return;
+        std::error_code error;
+        std::filesystem::remove_all(root_, error);
+    }
+
+    ScopedStaticGltfTestDirectory(const ScopedStaticGltfTestDirectory&) = delete;
+    ScopedStaticGltfTestDirectory& operator=(
+        const ScopedStaticGltfTestDirectory&) = delete;
+
+    [[nodiscard]] bool Ready() const { return ready_; }
+    [[nodiscard]] const std::filesystem::path& Path() const { return root_; }
+
+private:
+    std::filesystem::path base_;
+    std::filesystem::path root_;
+    bool safe_ = false;
+    bool ready_ = false;
+};
 
 std::vector<std::uint8_t> ReadBytes(const std::filesystem::path& path)
 {
@@ -951,10 +1025,13 @@ void TestExactDielectricWeldCellDomain()
 
 int main()
 {
-    const auto temporaryRoot = std::filesystem::temp_directory_path() / "horde-rt-static-gltf-tests";
-    std::error_code removeError;
-    std::filesystem::remove_all(temporaryRoot, removeError);
-    std::filesystem::create_directories(temporaryRoot);
+    const ScopedStaticGltfTestDirectory scopedTemporaryRoot;
+    Check(scopedTemporaryRoot.Ready(),
+          "process/config-unique static GLB temporary directory is safely created");
+    if (!scopedTemporaryRoot.Ready()) return 1;
+    const auto& temporaryRoot = scopedTemporaryRoot.Path();
+    std::cout << "Static GLB temporary root="
+              << temporaryRoot.filename().string() << '\n';
 
     TestManifestContract(temporaryRoot);
     TestExactDielectricWeldCellDomain();
@@ -980,7 +1057,6 @@ int main()
         TestBudgetFailures(temporaryRoot, manifest);
     }
 
-    std::filesystem::remove_all(temporaryRoot, removeError);
     if (failures != 0)
     {
         std::cerr << failures << " static glTF asset assertion(s) failed\n";
