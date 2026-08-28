@@ -176,8 +176,12 @@ ProductionSceneVisibility BuildProductionSceneVisibility(
     ProductionSceneVisibility result;
     result.rewardWorldVisible = !input.glassFixtureVisible;
     result.inspectionOverride = input.productionInspection;
-    result.playerRoute = (input.glassFixtureVisible || input.productionInspection ||
-                          input.rewardLanternClaimed)
+    // The production reward world owns TLAS slots 5-8 (chest, lid, ring,
+    // body), which are the legacy procedural arm slots. Keep the single
+    // skinned player in slot 4 whenever either production world is present;
+    // otherwise normal opening frames silently lose both arms even though the
+    // torch and sword remain visible.
+    result.playerRoute = (result.rewardWorldVisible || input.glassFixtureVisible)
         ? PlayerRenderRoute::Skinned
         : input.requestedPlayerRoute;
     const PlayerRouteMasks playerMasks = BuildPlayerRouteMasks(result.playerRoute);
@@ -396,6 +400,8 @@ bool PlayerRenderSlot::LoadAsset(const std::string& runtimeGlbPath,
     uniqueVertices_.clear();
     sockets_ = {};
     lastSkinnedTick_ = std::numeric_limits<std::uint64_t>::max();
+    lastPreparedAnimation_ = {};
+    hasLastPreparedAnimation_ = false;
     leftSocketErrorMetres_ = 0.0f;
     rightSocketErrorMetres_ = 0.0f;
     leftGripAgreement_ = {};
@@ -612,7 +618,10 @@ bool PlayerRenderSlot::PreparePose(
         diagnostic = "Skinned player render slot has no loaded asset.";
         return false;
     }
-    if (!PlayerPoseNeedsRefresh(tickIndex, lastSkinnedTick_, cadence))
+    const bool importedPoseAtSameTick = hasLastPreparedAnimation_ &&
+        tickIndex == lastSkinnedTick_ && animation != lastPreparedAnimation_;
+    if (!PlayerPoseNeedsRefresh(tickIndex, lastSkinnedTick_, cadence) &&
+        !importedPoseAtSameTick)
     {
         diagnostic.clear();
         return true;
@@ -685,6 +694,8 @@ bool PlayerRenderSlot::PreparePose(
         return false;
     }
     lastSkinnedTick_ = tickIndex;
+    lastPreparedAnimation_ = animation;
+    hasLastPreparedAnimation_ = true;
     poseUpdated = true;
     diagnostic.clear();
     return true;

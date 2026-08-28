@@ -310,12 +310,13 @@ int main()
     }
 
     const ProductionSceneVisibility normalRewardWorld =
-        BuildProductionSceneVisibility({PlayerRenderRoute::Skinned,
+        BuildProductionSceneVisibility({PlayerRenderRoute::Procedural,
                                         false,
                                         false,
                                         false});
     if (!Require(normalRewardWorld.rewardWorldVisible &&
                  !normalRewardWorld.inspectionOverride &&
+                 normalRewardWorld.playerRoute == PlayerRenderRoute::Skinned &&
                  normalRewardWorld.torchMask == 0x02u &&
                  normalRewardWorld.swordMask == 0x02u &&
                  normalRewardWorld.playerMask == 0x14u &&

@@ -4122,10 +4122,13 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             development->id >= 116 && development->id <= 119;
         if (context.developmentCheckpoint.empty() &&
             (record.instanceMasks[1] != 0x02u ||
-             record.instanceMasks[3] != 0x02u))
+             record.instanceMasks[3] != 0x02u ||
+             record.instanceMasks[4] != 0x14u ||
+             !record.playerPrimaryVisible ||
+             record.primaryPlayerPixels == 0u))
         {
             return fail(std::string("Checkpoint '") + checkpoint.name +
-                        "' masked the ordinary torch/sword production instances.");
+                        "' masked the ordinary torch/sword/skinned-player production instances.");
         }
         if (checkpoint.name == "opening" && record.primaryTorchPixels == 0u)
         {

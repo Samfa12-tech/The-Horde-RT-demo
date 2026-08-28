@@ -189,6 +189,8 @@ private:
     std::vector<horde::scene::TexturedSkinnedRtVertex> uniqueVertices_;
     horde::scene::SkinnedPlayerSockets sockets_{};
     std::uint64_t lastSkinnedTick_ = std::numeric_limits<std::uint64_t>::max();
+    horde::gameplay::animation::PlayerAnimationSnapshot lastPreparedAnimation_{};
+    bool hasLastPreparedAnimation_ = false;
     float leftSocketErrorMetres_ = 0.0f;
     float rightSocketErrorMetres_ = 0.0f;
     horde::gameplay::items::HeldItemTransform leftBoneFromGripSocket_ =
