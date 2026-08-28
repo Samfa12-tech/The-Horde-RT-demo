@@ -63,8 +63,8 @@ LanternPendulumSnapshot RunStartAndStop()
     {
         pendulum.StepFixed(Hinge(0.0f, 1.0f, z), 1.0f / 60.0f);
     }
-    Check(std::abs(movingAngle) > 0.015f,
-          "forward acceleration must create visible body lag");
+    Check(movingAngle < -0.015f,
+          "forward acceleration must create visible backward body lag");
     Check(pendulum.Snapshot().forwardAngleRadians * movingAngle < 0.0f ||
               std::abs(pendulum.Snapshot().forwardAngularVelocity) > 0.03f,
           "stopping must create a physical overshoot response");
@@ -204,6 +204,19 @@ int main()
               std::abs(shared60.forwardAngleRadians - shared120.forwardAngleRadians) < 0.00001f &&
               std::abs(shared30.strafeAngleRadians - shared120.strafeAngleRadians) < 0.00001f,
           "GameSimulation must own identical pendulum state under 30/60/120 Hz frame delivery");
+
+    horde::gameplay::simulation::GameSimulation turning;
+    turning.ImportRewardCheckpoint(claimedChest, heldReward, inactiveFinale);
+    horde::gameplay::simulation::InputSnapshot turnInput;
+    turnInput.damageEnabled = false;
+    for (int tick = 0; tick < 30; ++tick)
+    {
+        turnInput.yawRadians = 0.65f * static_cast<float>(tick + 1) / 30.0f;
+        turning.AdvanceFrame(turnInput, 1.0 / 60.0);
+    }
+    Check(std::hypot(turning.Snapshot().lanternPendulum.forwardAngleRadians,
+                     turning.Snapshot().lanternPendulum.strafeAngleRadians) > 0.005f,
+          "authoritative hand motion during a turn must excite shared lantern motion");
 
     horde::gameplay::simulation::GameSimulation lifecycle;
     lifecycle.ImportRewardCheckpoint(claimedChest, heldReward, inactiveFinale);

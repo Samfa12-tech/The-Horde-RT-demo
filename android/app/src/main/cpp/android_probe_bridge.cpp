@@ -193,6 +193,9 @@ std::atomic<int> gPlayerVitality{horde::gameplay::PlayerVitals::kMaxVitality};
 std::atomic<int> gPlayerLifePhase{static_cast<int>(horde::gameplay::PlayerLifePhase::Alive)};
 std::atomic<std::int32_t> gPlayerRetryCheckpoint{0};
 std::atomic<int> gFinaleEndingPhase{static_cast<int>(horde::gameplay::FinaleEndingPhase::Inactive)};
+// Bit 0: INTERACT, bit 1: RAISE, bit 2: LOWER. The render thread owns
+// gameplay and publishes this compact contextual UI view to the Java thread.
+std::atomic<int> gContextualControlState{0};
 std::atomic<std::uint64_t> gWaterfallStereoGains{0u};
 
 struct PlatformGameplayEvent
@@ -273,8 +276,35 @@ void PublishSimulationUiState()
     gPlayerLifePhase.store(static_cast<int>(vitals.phase), std::memory_order_release);
     gPlayerRetryCheckpoint.store(simulation.retryCheckpoint, std::memory_order_release);
     gFinaleEndingPhase.store(
-        static_cast<int>(simulation.lich.finaleEndingPhase),
+        static_cast<int>(simulation.finale.endingPhase),
         std::memory_order_release);
+    int contextualControls = 0;
+    using horde::gameplay::interactions::ChestRewardPhase;
+    using horde::gameplay::interactions::HeldLightKind;
+    using horde::gameplay::interactions::HeldLightPose;
+    const bool chestCanBeUsed =
+        simulation.chestReward.phase == ChestRewardPhase::ClosedUnlocked ||
+        simulation.chestReward.phase == ChestRewardPhase::LanternAvailable;
+    const horde::gameplay::interactions::InteractionQuery interactionQuery{
+        simulation.playerX, simulation.playerZ, simulation.playerYawRadians};
+    if (chestCanBeUsed && horde::gameplay::interactions::IsInteractionAvailable(
+            interactionQuery,
+            horde::gameplay::interactions::kRewardChestInteractionPosition))
+    {
+        contextualControls |= 1;
+    }
+    if (simulation.interaction.heldLightKind == HeldLightKind::RewardLantern)
+    {
+        if (simulation.interaction.heldLightPose == HeldLightPose::Low)
+        {
+            contextualControls |= 2;
+        }
+        else if (simulation.interaction.heldLightPose == HeldLightPose::High)
+        {
+            contextualControls |= 4;
+        }
+    }
+    gContextualControlState.store(contextualControls, std::memory_order_release);
     const horde::gameplay::SpatialAudioGains waterfallGains =
         horde::gameplay::CalculateSpatialAudio(
             {-2.32f, -15.26f, 0.52f, 0.65f, 10.0f},
@@ -1891,9 +1921,9 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             context.capturePresentedFrames = 0u;
         }
 
-        // World commands must remain responsive while menus/death pause fixed
-        // time. StepFixed consumes reset/retry before its paused branch, while
-        // attack edges remain queued until live gameplay resumes.
+        // World commands remain responsive while menus/death pause fixed time.
+        // Reset/retry wins this zero-delta loop; the shared paused AdvanceFrame
+        // path consumes every unavailable action edge without buffering it.
         for (std::size_t command = 0u; command < 128u; ++command)
         {
             const horde::gameplay::simulation::SimulationSnapshot& snapshot = gGameSimulation.Snapshot();
@@ -2602,6 +2632,28 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestParry(JNIEnv*, jclass)
 }
 
 extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_requestInteract(JNIEnv*, jclass)
+{
+    std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+    if (gInputPublisherState.commands.interact != UINT64_MAX)
+    {
+        ++gInputPublisherState.commands.interact;
+    }
+    PublishInputLocked();
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_requestToggleHeldLightPose(JNIEnv*, jclass)
+{
+    std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+    if (gInputPublisherState.commands.toggleHeldLightPose != UINT64_MAX)
+    {
+        ++gInputPublisherState.commands.toggleHeldLightPose;
+    }
+    PublishInputLocked();
+}
+
+extern "C" JNIEXPORT void JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_requestRouteReset(JNIEnv*, jclass)
 {
     gRtLabState.Reset();
@@ -2631,6 +2683,12 @@ extern "C" JNIEXPORT jint JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_getFinaleEndingPhase(JNIEnv*, jclass)
 {
     return static_cast<jint>(gFinaleEndingPhase.load(std::memory_order_acquire));
+}
+
+extern "C" JNIEXPORT jint JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getContextualControlState(JNIEnv*, jclass)
+{
+    return static_cast<jint>(gContextualControlState.load(std::memory_order_acquire));
 }
 extern "C" JNIEXPORT jint JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_retryEncounter(JNIEnv*, jclass)

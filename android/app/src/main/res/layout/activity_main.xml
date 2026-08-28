@@ -140,6 +140,40 @@
         android:textSize="17sp"
         android:textStyle="bold" />
 
+    <Button
+        android:id="@+id/toggle_held_light_pose_button"
+        android:autoSizeMaxTextSize="17sp"
+        android:autoSizeMinTextSize="9sp"
+        android:autoSizeStepGranularity="1sp"
+        android:autoSizeTextType="uniform"
+        android:layout_width="128dp"
+        android:layout_height="60dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="164dp"
+        android:layout_marginBottom="116dp"
+        android:maxLines="1"
+        android:text="@string/lower_lantern"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/interact_button"
+        android:autoSizeMaxTextSize="17sp"
+        android:autoSizeMinTextSize="9sp"
+        android:autoSizeStepGranularity="1sp"
+        android:autoSizeTextType="uniform"
+        android:layout_width="128dp"
+        android:layout_height="60dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="116dp"
+        android:maxLines="1"
+        android:text="@string/interact"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
     <FrameLayout
         android:id="@+id/menu_scrim"
         android:layout_width="match_parent"

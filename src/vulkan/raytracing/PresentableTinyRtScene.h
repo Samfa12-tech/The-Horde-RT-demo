@@ -12,6 +12,10 @@
 #include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/items/HeldItemState.h"
 #include "gameplay/items/HeldLightState.h"
+#include "gameplay/interactions/ChestRewardSequence.h"
+#include "gameplay/interactions/FinaleSequence.h"
+#include "gameplay/interactions/InteractionState.h"
+#include "gameplay/items/LanternPendulum.h"
 #include "vulkan/raytracing/CharacterRenderSlot.h"
 #include "vulkan/raytracing/FireEmitterBuffer.h"
 #include "vulkan/raytracing/HeldItemBlasMeasurements.h"
@@ -67,6 +71,11 @@ struct RtSceneFrameInputs
     horde::gameplay::animation::PlayerAnimationSnapshot playerAnimation{};
     PlayerRenderRoute playerRenderRoute = PlayerRenderRoute::Procedural;
     horde::gameplay::items::HeldLightState heldLight{};
+    horde::gameplay::interactions::InteractionState interaction{};
+    horde::gameplay::interactions::ChestRewardSnapshot chestReward{};
+    horde::gameplay::interactions::FinaleSequenceSnapshot finale{};
+    horde::gameplay::interactions::LanternPendulumSnapshot lanternPendulum{};
+    horde::gameplay::items::HeldItemTransform rewardLanternWorldFromHinge{};
     horde::gameplay::EnemyRosterSnapshot roster{};
     horde::gameplay::LichSnapshot lich{};
     horde::gameplay::ShowcaseZone zone = horde::gameplay::ShowcaseZone::Opening;

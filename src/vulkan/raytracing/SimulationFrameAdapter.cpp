@@ -48,6 +48,11 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     frame.heldItemKinematics = simulation.heldItemKinematics;
     frame.playerAnimation = simulation.playerAnimation;
     frame.heldLight = simulation.heldLight;
+    frame.interaction = simulation.interaction;
+    frame.chestReward = simulation.chestReward;
+    frame.finale = simulation.finale;
+    frame.lanternPendulum = simulation.lanternPendulum;
+    frame.rewardLanternWorldFromHinge = simulation.rewardLanternWorldFromHinge;
     frame.roster = simulation.enemyRoster;
     frame.lich = simulation.lich;
     frame.zone = simulation.zone;

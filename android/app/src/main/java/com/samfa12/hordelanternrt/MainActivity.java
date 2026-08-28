@@ -114,6 +114,9 @@ public class MainActivity extends Activity {
     private static final int HAPTIC_FATAL = 2;
     private static final int HAPTIC_PARRY = 3;
     private static final long ENEMY_IMPACT_FALL_DELAY_MILLISECONDS = 140L;
+    private static final int CONTEXTUAL_INTERACT = 1;
+    private static final int CONTEXTUAL_RAISE = 2;
+    private static final int CONTEXTUAL_LOWER = 4;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final float[] viewControls = {0.0f, 0.0f, 1.8f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
@@ -133,6 +136,8 @@ public class MainActivity extends Activity {
     private TextView vitalityStatus;
     private Button attackButton;
     private Button parryButton;
+    private Button interactButton;
+    private Button toggleHeldLightPoseButton;
     private boolean parryRequestedOnTouchDown;
     private SoundPool soundPool;
     private MediaPlayer waterfallPlayer;
@@ -234,16 +239,22 @@ public class MainActivity extends Activity {
         menuButton = findViewById(R.id.menu_button);
         attackButton = findViewById(R.id.attack_button);
         parryButton = findViewById(R.id.parry_button);
+        interactButton = findViewById(R.id.interact_button);
+        toggleHeldLightPoseButton = findViewById(R.id.toggle_held_light_pose_button);
         vitalityStatus = findViewById(R.id.vitality_status);
         final Button diagnosticsBack = findViewById(R.id.diagnostics_back);
 
         styleActionButton(menuButton, 0xCC1A1713, 0xFFFFD28A);
         styleActionButton(attackButton, 0xDD5B210D, 0xFFFFE0A3);
         styleActionButton(parryButton, 0xDD263B42, 0xFFE5F7FF);
+        styleActionButton(interactButton, 0xDD5C4216, 0xFFFFE5A8);
+        styleActionButton(toggleHeldLightPoseButton, 0xDD173E34, 0xFFE2FFF0);
         styleActionButton(diagnosticsBack, 0xCC211B15, 0xFFFFD28A);
         menuButton.setContentDescription(getString(R.string.menu));
         attackButton.setContentDescription(getString(R.string.swing));
         parryButton.setContentDescription(getString(R.string.parry));
+        interactButton.setContentDescription(getString(R.string.interact));
+        toggleHeldLightPoseButton.setContentDescription(getString(R.string.lower_lantern));
         updateVitalityHud(3);
         if (isDebuggableApp()) {
             rtStatus.setOnLongClickListener(view -> {
@@ -262,6 +273,16 @@ public class MainActivity extends Activity {
         attackButton.setOnClickListener(view -> {
             if (menuVisible || diagnosticsVisible || deathOverlayVisible || ProbeBridge.getRuntimeState() != 1) return;
             ProbeBridge.requestAttack();
+        });
+        interactButton.setOnClickListener(view -> {
+            if (menuVisible || diagnosticsVisible || deathOverlayVisible ||
+                    endingOverlayVisible || ProbeBridge.getRuntimeState() != 1) return;
+            ProbeBridge.requestInteract();
+        });
+        toggleHeldLightPoseButton.setOnClickListener(view -> {
+            if (menuVisible || diagnosticsVisible || deathOverlayVisible ||
+                    endingOverlayVisible || ProbeBridge.getRuntimeState() != 1) return;
+            ProbeBridge.requestToggleHeldLightPose();
         });
         parryButton.setOnClickListener(view -> {
             if (parryRequestedOnTouchDown) {
@@ -1147,6 +1168,9 @@ public class MainActivity extends Activity {
                         attackButton.setVisibility(View.VISIBLE);
                         parryButton.setVisibility(View.VISIBLE);
                     }
+                    updateContextualControls(!debugCaptureUiSuppressed && !menuVisible &&
+                            !diagnosticsVisible && !benchmarkRunning && !endingOverlayVisible &&
+                            showHud && lifePhase == PLAYER_ALIVE);
                     if (!debugCaptureUiSuppressed && !menuVisible && !benchmarkRunning && showHud &&
                             lifePhase != PLAYER_DEAD) {
                         vitalityStatus.setVisibility(View.VISIBLE);
@@ -1191,6 +1215,7 @@ public class MainActivity extends Activity {
                         debugAutomationAutostart = false;
                     }
                 } else if (state == 2) {
+                    updateContextualControls(false);
                     rtStatus.setText(R.string.rt_unsupported);
                     rtStatus.setTextColor(0xFFFF8A7A);
                     if (!autoDiagnosticsShown) {
@@ -1198,6 +1223,7 @@ public class MainActivity extends Activity {
                         showDiagnostics(false);
                     }
                 } else if (state == 3) {
+                    updateContextualControls(false);
                     rtStatus.setText(R.string.rt_error);
                     rtStatus.setTextColor(0xFFFF8A7A);
                     if (!autoDiagnosticsShown) {
@@ -1205,6 +1231,7 @@ public class MainActivity extends Activity {
                         showDiagnostics(true);
                     }
                 } else {
+                    updateContextualControls(false);
                     rtStatus.setText(R.string.rt_starting);
                 }
 
@@ -1217,6 +1244,7 @@ public class MainActivity extends Activity {
                         menuButton.setVisibility(View.GONE);
                         attackButton.setVisibility(View.GONE);
                         parryButton.setVisibility(View.GONE);
+                        updateContextualControls(false);
                         vitalityStatus.setVisibility(View.GONE);
                     } else if (benchmarkStatus == 2 || benchmarkStatus == 3) {
                         latestBenchmarkReport = ProbeBridge.getBenchmarkReport();
@@ -1844,6 +1872,28 @@ public class MainActivity extends Activity {
         viewControls[7] = 0.0f;
         viewControls[8] = 0.0f;
         pushViewControls();
+        updateContextualControls(false);
+    }
+
+    private void updateContextualControls(final boolean controlsAllowed) {
+        if (!controlsAllowed) {
+            interactButton.setVisibility(View.GONE);
+            toggleHeldLightPoseButton.setVisibility(View.GONE);
+            return;
+        }
+        final int contextualState = ProbeBridge.getContextualControlState();
+        interactButton.setVisibility((contextualState & CONTEXTUAL_INTERACT) != 0 ?
+                View.VISIBLE : View.GONE);
+        final boolean showRaise = (contextualState & CONTEXTUAL_RAISE) != 0;
+        final boolean showLower = (contextualState & CONTEXTUAL_LOWER) != 0;
+        if (!showRaise && !showLower) {
+            toggleHeldLightPoseButton.setVisibility(View.GONE);
+            return;
+        }
+        final int label = showRaise ? R.string.raise_lantern : R.string.lower_lantern;
+        toggleHeldLightPoseButton.setText(label);
+        toggleHeldLightPoseButton.setContentDescription(getString(label));
+        toggleHeldLightPoseButton.setVisibility(View.VISIBLE);
     }
 
     private boolean stageAsset(final String assetPath, final String fileName) {

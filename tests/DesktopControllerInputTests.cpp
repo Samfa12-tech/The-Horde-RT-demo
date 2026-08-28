@@ -186,8 +186,27 @@ int main()
     const ControllerActionEdges dodge = MapLegacyControllerEdges(0x002u, 0x000u, capturedBackbone);
     Require(!dodge.attackPressed && !dodge.parryPressed && dodge.dodgePressed,
             "captured Backbone B/Circle must emit a dodge edge");
+    const ControllerActionEdges interact =
+        MapLegacyControllerEdges(0x001u, 0x000u, capturedBackbone);
+    Require(interact.interactPressed && !interact.attackPressed &&
+                !interact.toggleHeldLightPosePressed,
+            "captured Backbone A must interact during unpaused gameplay");
+    const ControllerActionEdges toggle =
+        MapLegacyControllerEdges(0x008u, 0x000u, capturedBackbone);
+    Require(toggle.toggleHeldLightPosePressed && !toggle.interactPressed,
+            "captured Backbone Y must raise/lower the claimed lantern");
     Require(!MapLegacyControllerEdges(0x302u, 0x302u, capturedBackbone).Any(),
             "held Backbone actions must not retrigger");
+
+    const LegacyControllerIdentity genericController{};
+    const ControllerActionEdges genericInteract =
+        MapLegacyControllerEdges(0x001u, 0x000u, genericController);
+    Require(genericInteract.interactPressed && !genericInteract.attackPressed,
+            "generic controller A must interact without overloading attack");
+    const ControllerActionEdges genericAttack =
+        MapLegacyControllerEdges(0x004u, 0x000u, genericController);
+    Require(genericAttack.attackPressed && !genericAttack.interactPressed,
+            "generic controller X must retain an independent attack edge");
 
     // Current owner capture: Z/R reach the full 0..65535 range and rest at
     // 32767. Applying the sampled right-stick frame must change the persistent

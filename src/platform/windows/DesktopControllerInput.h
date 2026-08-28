@@ -48,8 +48,14 @@ struct ControllerActionEdges
     bool attackPressed = false;
     bool parryPressed = false;
     bool dodgePressed = false;
+    bool interactPressed = false;
+    bool toggleHeldLightPosePressed = false;
 
-    bool Any() const { return attackPressed || parryPressed || dodgePressed; }
+    bool Any() const
+    {
+        return attackPressed || parryPressed || dodgePressed || interactPressed ||
+               toggleHeldLightPosePressed;
+    }
 };
 
 struct ControllerTriggerLatch
@@ -213,12 +219,18 @@ inline ControllerActionEdges MapLegacyControllerEdges(
             .attackPressed = (pressed & 0x200u) != 0u,
             .parryPressed = (pressed & 0x100u) != 0u,
             .dodgePressed = (pressed & 0x002u) != 0u,
+            .interactPressed = (pressed & 0x001u) != 0u,
+            .toggleHeldLightPosePressed = (pressed & 0x008u) != 0u,
         };
     }
     return {
-        .attackPressed = (pressed & 0x001u) != 0u,
+        // Generic WinMM follows the XInput face layout: A interacts, X attacks,
+        // B dodges and Y raises/lowers the claimed lantern.
+        .attackPressed = (pressed & 0x004u) != 0u,
         .parryPressed = false,
         .dodgePressed = (pressed & 0x002u) != 0u,
+        .interactPressed = (pressed & 0x001u) != 0u,
+        .toggleHeldLightPosePressed = (pressed & 0x008u) != 0u,
     };
 }
 
@@ -294,6 +306,8 @@ inline ControllerActionEdges UpdateXInputTriggerEdges(
         .attackPressed = rightNow && !latch.rightHeld,
         .parryPressed = leftNow && !latch.leftHeld,
         .dodgePressed = false,
+        .interactPressed = false,
+        .toggleHeldLightPosePressed = false,
     };
     latch.leftHeld = leftNow;
     latch.rightHeld = rightNow;

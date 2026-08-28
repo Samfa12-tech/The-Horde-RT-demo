@@ -311,6 +311,8 @@ struct VulkanSurfaceContext
     std::uint64_t dodgeSequence = 0u;
     std::uint64_t routeResetSequence = 0u;
     std::uint64_t retrySequence = 0u;
+    std::uint64_t interactSequence = 0u;
+    std::uint64_t toggleHeldLightPoseSequence = 0u;
     int playerSwingVariant = 0;
     horde::gameplay::DelayedGameplayFeedbackQueue delayedFeedback;
     // Legacy mirrors retained only for Win32 overlays, capture manifests, and
@@ -2623,6 +2625,8 @@ void PollDesktopController(VulkanSurfaceContext& context)
             if (edges.attackPressed) ++context.attackSequence;
             if (edges.parryPressed) ++context.parrySequence;
             if (edges.dodgePressed) ++context.dodgeSequence;
+            if (edges.interactPressed) ++context.interactSequence;
+            if (edges.toggleHeldLightPosePressed) ++context.toggleHeldLightPoseSequence;
         }
         const horde::platform::windows::ControllerMenuEdges menuEdges =
             horde::platform::windows::MapLegacyControllerMenuEdges(
@@ -2666,6 +2670,8 @@ void PollDesktopController(VulkanSurfaceContext& context)
         if (triggerEdges.attackPressed) ++context.attackSequence;
         if (triggerEdges.parryPressed) ++context.parrySequence;
         if ((pressed & XINPUT_GAMEPAD_B) != 0u) ++context.dodgeSequence;
+        if ((pressed & XINPUT_GAMEPAD_A) != 0u) ++context.interactSequence;
+        if ((pressed & XINPUT_GAMEPAD_Y) != 0u) ++context.toggleHeldLightPoseSequence;
     }
     const WORD uiPressed = state.Gamepad.wButtons & ~context.previousXInputUiButtons;
     const horde::platform::windows::ControllerMenuEdges menuEdges{
@@ -2720,6 +2726,8 @@ void UpdateDesktopSceneControls(VulkanSurfaceContext& context)
     input.commands.dodge = context.dodgeSequence;
     input.commands.routeReset = context.routeResetSequence;
     input.commands.retry = context.retrySequence;
+    input.commands.interact = context.interactSequence;
+    input.commands.toggleHeldLightPose = context.toggleHeldLightPoseSequence;
     input.hasAuthoritativePlayerPose = false;
     input.moveForward = (context.forwardHeld ? 1.0f : 0.0f) -
                         (context.backwardHeld ? 1.0f : 0.0f) + context.controllerForward;
@@ -2749,6 +2757,8 @@ void UpdateDesktopSceneControls(VulkanSurfaceContext& context)
         input.commands.dodge = context.dodgeSequence;
         input.commands.routeReset = context.routeResetSequence;
         input.commands.retry = context.retrySequence;
+        input.commands.interact = context.interactSequence;
+        input.commands.toggleHeldLightPose = context.toggleHeldLightPoseSequence;
         if (advance.replay.waypointReached || advance.lapStarted || advance.finished)
         {
             UpdateBenchmarkHud(context);
@@ -4698,9 +4708,11 @@ void ShowControlsHelp(HWND window)
                 "Left mouse drag  360 camera look\n"
                 "Right mouse or Space  Swing sword\n"
                 "Q  Parry skeleton strike\n"
+                "E  Interact    F  Raise / lower claimed lantern\n"
                 "Controller left stick  Move and strafe\n"
                 "Controller right stick  Camera look\n"
                 "RT  Attack    LT  Parry    B / Circle  Dodge\n"
+                "A  Interact    Y  Raise / lower claimed lantern\n"
                 "D-pad  Navigate menus    A  Select    B / Circle  Back\n"
                 "Menu / Start  Pause / resume\n"
                 "Esc  Pause / resume\n"
@@ -5319,6 +5331,18 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             if (!sceneContext->simulationPaused && wParam == 'Q' && (lParam & (1ll << 30)) == 0)
             {
                 ++sceneContext->parrySequence;
+                return 0;
+            }
+            if (!sceneContext->simulationPaused && wParam == 'E' &&
+                (lParam & (1ll << 30)) == 0)
+            {
+                ++sceneContext->interactSequence;
+                return 0;
+            }
+            if (!sceneContext->simulationPaused && wParam == 'F' &&
+                (lParam & (1ll << 30)) == 0)
+            {
+                ++sceneContext->toggleHeldLightPoseSequence;
                 return 0;
             }
             if (!sceneContext->simulationPaused && SetDesktopMovementKey(*sceneContext, wParam, true))

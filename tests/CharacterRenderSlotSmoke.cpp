@@ -338,9 +338,21 @@ int main()
     simulationSnapshot.skeletonEnemyCount = skeletons.size();
     simulationSnapshot.lich.finaleSkylightOpenProgress = 0.35f;
     simulationSnapshot.lich.finaleDawnRevealProgress = 0.65f;
+    simulationSnapshot.interaction.heldLightKind =
+        interactions::HeldLightKind::RewardLantern;
+    simulationSnapshot.chestReward.phase =
+        interactions::ChestRewardPhase::LanternClaimed;
+    simulationSnapshot.lanternPendulum.forwardAngleRadians = 0.37f;
+    simulationSnapshot.rewardLanternWorldFromHinge[12] = -12.5f;
     const RtSceneFrameInputs adaptedFrame = BuildRtSceneFrameInputs(simulationSnapshot, 0.75f);
     ok &= Require(adaptedFrame.playerAnimation == simulationSnapshot.playerAnimation,
                   "simulation adapter must copy authoritative player animation without platform logic");
+    ok &= Require(adaptedFrame.interaction == simulationSnapshot.interaction &&
+                      adaptedFrame.chestReward == simulationSnapshot.chestReward &&
+                      adaptedFrame.lanternPendulum == simulationSnapshot.lanternPendulum &&
+                      adaptedFrame.rewardLanternWorldFromHinge ==
+                          simulationSnapshot.rewardLanternWorldFromHinge,
+                  "simulation adapter must copy reward and pendulum authority without renderer mutation");
     ok &= Require(adaptedFrame.skeletonEnemyCount == 2u &&
                   adaptedFrame.skeletonEnemies[0].id == simulation::EntityId::SkeletonA &&
                   adaptedFrame.skeletonEnemies[1].id == simulation::EntityId::SkeletonB,
@@ -571,6 +583,8 @@ int main()
             ReadTextFile(root / "android/app/src/main/cpp/android_probe_bridge.cpp");
         const std::string androidJavaBridgeSource = ReadTextFile(
             root / "android/app/src/main/java/com/samfa12/hordelanternrt/ProbeBridge.java");
+        const std::string androidLayoutSource = ReadTextFile(
+            root / "android/app/src/main/res/layout/activity_main.xml");
         const std::string androidValidationSource =
             ReadTextFile(root / "tools/run-android-showcase-validation.ps1");
         ok &= Require(raygenSource.find(
@@ -1016,6 +1030,12 @@ int main()
                       sceneSource.find("rearHingeOpen") != std::string::npos &&
                       sceneSource.find("productionLanternWorldFromFlame") != std::string::npos,
                       "production chest and lantern must use bounded generic slots plus loaded authored pivots for lid, ring, body, flame, and light");
+        ok &= Require(sceneSource.find("frame.rewardLanternWorldFromHinge") != std::string::npos &&
+                      sceneSource.find("frame.lanternPendulum.worldFromBody") != std::string::npos &&
+                      sceneSource.find("productionLanternVisible ? 0x01u : 0u") != std::string::npos &&
+                      sceneSource.find("lanternEmitter.worldFromFlame = productionLanternWorldFromFlame") != std::string::npos &&
+                      sceneSource.find("lanternEmitter.worldFromLight = productionLanternWorldFromLight") != std::string::npos,
+                      "claimed ring must be hand-rigid while lantern body, glass, flame, and light consume the shared pendulum transform");
         ok &= Require(windowsSource.find("FindDevelopmentCheckpoint(ctx.developmentCheckpoint)") !=
                           std::string::npos &&
                       windowsSource.find("development->usesGlassFixture") != std::string::npos,
@@ -1093,6 +1113,19 @@ int main()
         ok &= Require(!androidShowEnding.empty() &&
                       androidShowEnding.find("rtLabVisible") != std::string::npos,
                       "Android finale polling must not replace an open RT Lab with the ending overlay");
+        ok &= Require(androidJavaBridgeSource.find("requestInteract") != std::string::npos &&
+                      androidJavaBridgeSource.find("requestToggleHeldLightPose") != std::string::npos &&
+                      androidBridgeSource.find("commands.interact") != std::string::npos &&
+                      androidBridgeSource.find("commands.toggleHeldLightPose") != std::string::npos &&
+                      androidSource.find("ProbeBridge.requestInteract()") != std::string::npos &&
+                      androidSource.find("ProbeBridge.requestToggleHeldLightPose()") != std::string::npos,
+                      "Android interaction controls must publish independent monotonic JNI commands");
+        ok &= Require(androidLayoutSource.find("@+id/interact_button") != std::string::npos &&
+                      androidLayoutSource.find("@+id/toggle_held_light_pose_button") != std::string::npos &&
+                      androidLayoutSource.find("android:autoSizeMinTextSize=\"9sp\"") != std::string::npos &&
+                      androidLayoutSource.find("android:layout_width=\"128dp\"") != std::string::npos &&
+                      androidLayoutSource.find("android:maxLines=\"1\"") != std::string::npos,
+                      "contextual Android controls must retain compact enlarged-font-safe sizing");
         const std::size_t androidOpenRtLabBegin = androidSource.find("private void openRtLab(");
         const std::size_t androidOpenRtLabEnd = androidSource.find("private void showRtLab(", androidOpenRtLabBegin);
         const std::size_t androidCloseRtLabBegin = androidSource.find("private void closeRtLab(");
