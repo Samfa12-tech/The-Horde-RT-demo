@@ -139,6 +139,15 @@ public:
             ? 0.0 : playerSkinTotalMilliseconds_ / static_cast<double>(playerSkinUpdateCount_);
     }
     float PlayerMaxSocketErrorMetres() const { return playerMaxSocketErrorMetres_; }
+    const std::array<std::uint8_t, kTlasInstanceCount>& LastInstanceMasks() const
+    {
+        return lastInstanceMasks_;
+    }
+    bool LastPlayerPrimaryVisible() const { return lastPlayerPrimaryVisible_; }
+    const PlayerGripAgreement& RewardLanternGripAgreement() const
+    {
+        return rewardLanternGripAgreement_;
+    }
     std::uint32_t DielectricTransportOverflowCount() const
     {
         return dielectricTransportOverflowCount_;
@@ -252,6 +261,17 @@ public:
     std::uint32_t CertifiedClosedVolumeRecoveryReasonMask() const
     {
         return certifiedClosedVolumeRecoveryReasonMask_;
+    }
+    std::uint32_t PrimaryTorchPixelCount() const { return primaryTorchPixelCount_; }
+    std::uint32_t PrimarySwordPixelCount() const { return primarySwordPixelCount_; }
+    std::uint32_t PrimaryPlayerPixelCount() const { return primaryPlayerPixelCount_; }
+    std::uint32_t PrimaryRewardRingPixelCount() const
+    {
+        return primaryRewardRingPixelCount_;
+    }
+    std::uint32_t PrimaryRewardBodyPixelCount() const
+    {
+        return primaryRewardBodyPixelCount_;
     }
     bool GenericStaticAssetEnabled() const { return genericStaticAssetEnabled_; }
     const RtStaticMeshMeasurements& StaticMeshMeasurements() const { return staticMeshSlot_.Measurements(); }
@@ -420,6 +440,9 @@ private:
     std::uint64_t playerSkinUpdateCount_ = 0u;
     double playerSkinTotalMilliseconds_ = 0.0;
     float playerMaxSocketErrorMetres_ = 0.0f;
+    std::array<std::uint8_t, kTlasInstanceCount> lastInstanceMasks_{};
+    bool lastPlayerPrimaryVisible_ = false;
+    PlayerGripAgreement rewardLanternGripAgreement_{};
     std::uint32_t dielectricTransportOverflowCount_ = 0u;
     std::uint32_t dielectricShadowOverflowCount_ = 0u;
     std::uint32_t dielectricSecondaryRejectCount_ = 0u;
@@ -456,6 +479,11 @@ private:
     std::uint32_t primaryCertifiedClosedVolumeRecoveryCount_ = 0u;
     std::uint32_t shadowCertifiedClosedVolumeRecoveryCount_ = 0u;
     std::uint32_t certifiedClosedVolumeRecoveryReasonMask_ = 0u;
+    std::uint32_t primaryTorchPixelCount_ = 0u;
+    std::uint32_t primarySwordPixelCount_ = 0u;
+    std::uint32_t primaryPlayerPixelCount_ = 0u;
+    std::uint32_t primaryRewardRingPixelCount_ = 0u;
+    std::uint32_t primaryRewardBodyPixelCount_ = 0u;
     std::string developmentStaticAssetDirectory_;
     std::string staticTextureDirectory_;
     RtStaticMeshSlot staticMeshSlot_;

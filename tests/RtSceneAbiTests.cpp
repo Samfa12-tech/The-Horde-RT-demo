@@ -62,9 +62,14 @@ void CheckSplitDielectricDiagnosticLayout()
                       value.primaryCertifiedClosedVolumeRecoveryCount;
                       value.shadowCertifiedClosedVolumeRecoveryCount;
                       value.certifiedClosedVolumeRecoveryReasonMask;
+                      value.primaryTorchPixelCount;
+                      value.primarySwordPixelCount;
+                      value.primaryPlayerPixelCount;
+                      value.primaryRewardRingPixelCount;
+                      value.primaryRewardBodyPixelCount;
                   })
     {
-        Check(sizeof(T) == 144u && alignof(T) == 16u &&
+        Check(sizeof(T) == 176u && alignof(T) == 16u &&
                   offsetof(T, transportOverflowCount) == 0u &&
                   offsetof(T, shadowOverflowCount) == 4u &&
                   offsetof(T, secondaryDielectricRejectCount) == 8u &&
@@ -100,8 +105,13 @@ void CheckSplitDielectricDiagnosticLayout()
                   offsetof(T, primaryClosedVolumeAbsorptionCount) == 128u &&
                   offsetof(T, primaryCertifiedClosedVolumeRecoveryCount) == 132u &&
                   offsetof(T, shadowCertifiedClosedVolumeRecoveryCount) == 136u &&
-                  offsetof(T, certifiedClosedVolumeRecoveryReasonMask) == 140u,
-              "dielectric diagnostics attribute secondary self hits and primary/shadow open-stack reasons");
+                  offsetof(T, certifiedClosedVolumeRecoveryReasonMask) == 140u &&
+                  offsetof(T, primaryTorchPixelCount) == 144u &&
+                  offsetof(T, primarySwordPixelCount) == 148u &&
+                  offsetof(T, primaryPlayerPixelCount) == 152u &&
+                  offsetof(T, primaryRewardRingPixelCount) == 156u &&
+                  offsetof(T, primaryRewardBodyPixelCount) == 160u,
+              "diagnostics attribute transport reasons and primary-visible prop/player pixels without reordering stable fields");
     }
     else
     {

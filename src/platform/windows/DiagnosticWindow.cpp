@@ -201,6 +201,17 @@ struct ShowcaseCaptureRecord
     std::uint32_t width = 0u;
     std::uint32_t height = 0u;
     bool redBlueSwapNormalised = false;
+    std::array<std::uint8_t,
+               horde::vulkan::raytracing::PresentableTinyRtScene::kTlasInstanceCount>
+        instanceMasks{};
+    bool playerPrimaryVisible = false;
+    std::uint32_t primaryTorchPixels = 0u;
+    std::uint32_t primarySwordPixels = 0u;
+    std::uint32_t primaryPlayerPixels = 0u;
+    std::uint32_t primaryRewardRingPixels = 0u;
+    std::uint32_t primaryRewardBodyPixels = 0u;
+    float rewardGripPositionErrorMetres = 0.0f;
+    float rewardGripOrientationErrorRadians = 0.0f;
     std::vector<double> frameTimesMs;
 };
 
@@ -3877,6 +3888,16 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
              << context.rtScene.ShadowCertifiedClosedVolumeRecoveryCount()
              << ", \"certifiedClosedVolumeRecoveryReasonMask\": "
              << context.rtScene.CertifiedClosedVolumeRecoveryReasonMask()
+             << ", \"primaryTorchPixelCount\": "
+             << context.rtScene.PrimaryTorchPixelCount()
+             << ", \"primarySwordPixelCount\": "
+             << context.rtScene.PrimarySwordPixelCount()
+             << ", \"primaryPlayerPixelCount\": "
+             << context.rtScene.PrimaryPlayerPixelCount()
+             << ", \"primaryRewardRingPixelCount\": "
+             << context.rtScene.PrimaryRewardRingPixelCount()
+             << ", \"primaryRewardBodyPixelCount\": "
+             << context.rtScene.PrimaryRewardBodyPixelCount()
              << "},\n"
              << "  \"error\": " << (error.empty() ? "null" : "\"" + JsonEscape(error) + "\"") << ",\n"
              << "  \"captures\": [\n";
@@ -3898,6 +3919,21 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                  << "      \"width\": " << capture.width << ",\n"
                  << "      \"height\": " << capture.height << ",\n"
                  << "      \"honestlyPresentedRtFrame\": true,\n"
+                 << "      \"visibility\": {\"playerPrimaryVisible\": "
+                 << (capture.playerPrimaryVisible ? "true" : "false")
+                 << ", \"instanceMasks\": [";
+        for (std::size_t mask = 0u; mask < capture.instanceMasks.size(); ++mask)
+            manifest << (mask == 0u ? "" : ", ")
+                     << static_cast<std::uint32_t>(capture.instanceMasks[mask]);
+        manifest << "], \"primaryPixels\": {\"torch\": "
+                 << capture.primaryTorchPixels << ", \"sword\": "
+                 << capture.primarySwordPixels << ", \"player\": "
+                 << capture.primaryPlayerPixels << ", \"rewardRing\": "
+                 << capture.primaryRewardRingPixels << ", \"rewardBody\": "
+                 << capture.primaryRewardBodyPixels << "}, \"rewardGrip\": {\"positionErrorMetres\": "
+                 << capture.rewardGripPositionErrorMetres
+                 << ", \"orientationErrorRadians\": "
+                 << capture.rewardGripOrientationErrorRadians << "}},\n"
                  << "      \"timing\": {\"sampleCount\": " << capture.frameTimesMs.size()
                  << ", \"medianMs\": " << CaptureMedianMs(capture.frameTimesMs)
                  << ", \"meanMs\": " << CaptureMeanMs(capture.frameTimesMs) << "},\n"
@@ -4040,7 +4076,49 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         record.width = image.width;
         record.height = image.height;
         record.redBlueSwapNormalised = image.redBlueSwapNormalised;
+        record.instanceMasks = context.rtScene.LastInstanceMasks();
+        record.playerPrimaryVisible = context.rtScene.LastPlayerPrimaryVisible();
+        record.primaryTorchPixels = context.rtScene.PrimaryTorchPixelCount();
+        record.primarySwordPixels = context.rtScene.PrimarySwordPixelCount();
+        record.primaryPlayerPixels = context.rtScene.PrimaryPlayerPixelCount();
+        record.primaryRewardRingPixels = context.rtScene.PrimaryRewardRingPixelCount();
+        record.primaryRewardBodyPixels = context.rtScene.PrimaryRewardBodyPixelCount();
+        record.rewardGripPositionErrorMetres =
+            context.rtScene.RewardLanternGripAgreement().positionErrorMetres;
+        record.rewardGripOrientationErrorRadians =
+            context.rtScene.RewardLanternGripAgreement().orientationErrorRadians;
         record.frameTimesMs = std::move(frameTimesMs);
+        const auto* development = horde::gameplay::FindDevelopmentCheckpoint(
+            context.developmentCheckpoint);
+        const bool claimedRewardCapture = development != nullptr &&
+            development->id >= 116 && development->id <= 119;
+        if (context.developmentCheckpoint.empty() &&
+            (record.instanceMasks[1] != 0x02u ||
+             record.instanceMasks[3] != 0x02u))
+        {
+            return fail(std::string("Checkpoint '") + checkpoint.name +
+                        "' masked the ordinary torch/sword production instances.");
+        }
+        if (checkpoint.name == "opening" && record.primaryTorchPixels == 0u)
+        {
+            return fail("Opening capture has no primary-visible torch pixels (floating-flame regression).");
+        }
+        if (claimedRewardCapture &&
+            (record.instanceMasks[4] != 0x14u ||
+             !record.playerPrimaryVisible ||
+             record.instanceMasks[7] != 0x01u ||
+             record.instanceMasks[8] != 0x01u ||
+             record.primaryPlayerPixels == 0u ||
+             record.primaryRewardRingPixels == 0u ||
+             record.primaryRewardBodyPixels == 0u ||
+             record.rewardGripPositionErrorMetres >
+                 horde::vulkan::raytracing::kPlayerGripSocketToleranceMetres ||
+             record.rewardGripOrientationErrorRadians >
+                 horde::vulkan::raytracing::kPlayerGripOrientationToleranceRadians))
+        {
+            return fail(std::string("Checkpoint '") + checkpoint.name +
+                        "' failed claimed reward player/lantern primary visibility or final GripRing contact.");
+        }
         if (!Sha256File(pngPath, record.pngSha256, diagnostic))
         {
             return fail(std::string("Checkpoint '") + checkpoint.name + "' hash failed: " + diagnostic);

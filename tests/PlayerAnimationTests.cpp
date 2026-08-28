@@ -1,6 +1,7 @@
 #include "gameplay/animation/PlayerAnimationState.h"
 #include "gameplay/animation/PlayerIkTargets.h"
 #include "gameplay/simulation/GameSimulation.h"
+#include "gameplay/items/LanternPendulum.h"
 #include "vulkan/raytracing/PlayerRenderSlot.h"
 
 #include <algorithm>
@@ -308,6 +309,47 @@ int main()
                      "skinned route must mask every procedural player slot")) return 1;
     }
 
+    const ProductionSceneVisibility normalRewardWorld =
+        BuildProductionSceneVisibility({PlayerRenderRoute::Skinned,
+                                        false,
+                                        false,
+                                        false});
+    if (!Require(normalRewardWorld.rewardWorldVisible &&
+                 !normalRewardWorld.inspectionOverride &&
+                 normalRewardWorld.torchMask == 0x02u &&
+                 normalRewardWorld.swordMask == 0x02u &&
+                 normalRewardWorld.playerMask == 0x14u &&
+                 normalRewardWorld.playerPrimaryVisible &&
+                 normalRewardWorld.playerReflectionVisible,
+                 "ordinary reward-world existence must not mask the torch, sword, or skinned player"))
+        return 1;
+    const ProductionSceneVisibility claimedReward =
+        BuildProductionSceneVisibility({PlayerRenderRoute::Procedural,
+                                        false,
+                                        false,
+                                        true});
+    if (!Require(claimedReward.rewardWorldVisible &&
+                 claimedReward.playerRoute == PlayerRenderRoute::Skinned &&
+                 claimedReward.torchMask == 0x02u &&
+                 claimedReward.swordMask == 0x02u &&
+                 claimedReward.playerMask == 0x14u &&
+                 claimedReward.playerPrimaryVisible &&
+                 claimedReward.playerReflectionVisible,
+                 "claimed reward frames must retain primary/reflection-visible skinned hands and body"))
+        return 1;
+    const ProductionSceneVisibility inspectionReward =
+        BuildProductionSceneVisibility({PlayerRenderRoute::Skinned,
+                                        false,
+                                        true,
+                                        false});
+    if (!Require(inspectionReward.rewardWorldVisible &&
+                 inspectionReward.inspectionOverride &&
+                 inspectionReward.torchMask == 0u &&
+                 inspectionReward.swordMask == 0u &&
+                 inspectionReward.playerMask == 0u,
+                 "the isolated Task 7 inspection override must not leak into ordinary reward-world visibility"))
+        return 1;
+
     const auto primitiveVisibility = BuildPlayerPrimitiveVisibility({
         PlayerPrimitiveSemantic::Body,
         PlayerPrimitiveSemantic::Head,
@@ -370,6 +412,55 @@ int main()
                  leftGripAgreement.orientationErrorRadians <= 0.0005f &&
                  rightGripAgreement.orientationErrorRadians <= 0.0005f,
                  "post-composition Grip metric must include final position and orientation"))
+        return 1;
+
+    HeldItemTransform finalSkinnedLeftGrip = IdentityHeldItemTransform();
+    finalSkinnedLeftGrip[12] = -0.42f;
+    finalSkinnedLeftGrip[13] = 0.31f;
+    finalSkinnedLeftGrip[14] = 0.74f;
+    HeldItemTransform authoredGripRing = IdentityHeldItemTransform();
+    authoredGripRing[13] = 0.085f;
+    HeldItemTransform authoredHinge = IdentityHeldItemTransform();
+    authoredHinge[13] = -0.012f;
+    HeldItemTransform authoritativeHinge = IdentityHeldItemTransform();
+    authoritativeHinge[12] = -0.42f;
+    authoritativeHinge[13] = 0.31f;
+    authoritativeHinge[14] = 0.74f;
+    const HeldItemTransform authoritativeBody =
+        horde::gameplay::interactions::ComposeLanternPendulumBodyTransform(
+        authoritativeHinge, 0.22f, -0.18f);
+    RewardLanternVisualTransforms rewardVisuals;
+    if (!Require(ComposeClaimedRewardLanternVisuals(
+                     finalSkinnedLeftGrip,
+                     authoredGripRing,
+                     authoredHinge,
+                     authoritativeHinge,
+                     authoritativeBody,
+                     0.90f,
+                     rewardVisuals,
+                     socketDiagnostic),
+                 socketDiagnostic.c_str()))
+        return 1;
+    const HeldItemTransform composedGripRing = MultiplyHeldItemTransforms(
+        rewardVisuals.worldFromRing, authoredGripRing);
+    const PlayerGripAgreement rewardGripAgreement = MeasureTransformAgreement(
+        finalSkinnedLeftGrip, composedGripRing);
+    if (!Require(rewardGripAgreement.positionErrorMetres <=
+                     kPlayerGripSocketToleranceMetres &&
+                 rewardGripAgreement.orientationErrorRadians <=
+                     kPlayerGripOrientationToleranceRadians &&
+                 Near(rewardVisuals.worldFromHinge[13],
+                      finalSkinnedLeftGrip[13] - 0.90f * 0.097f),
+                 "claimed reward ring must attach through authored GripRing and derive Hinge below the final skinned hand"))
+        return 1;
+    const HeldItemTransform rewardBodyLocal = MultiplyHeldItemTransforms(
+        InverseRigidHeldItemTransform(rewardVisuals.worldFromHinge),
+        rewardVisuals.worldFromBody);
+    const HeldItemTransform authoritativeBodyLocal = MultiplyHeldItemTransforms(
+        InverseRigidHeldItemTransform(authoritativeHinge), authoritativeBody);
+    if (!Require(MeasureTransformAgreement(authoritativeBodyLocal, rewardBodyLocal)
+                         .orientationErrorRadians <= 0.0005f,
+                 "final skinned Grip alignment must preserve the authoritative swing/torsion body rotation"))
         return 1;
     authoritativeItems[0].parentMode = HeldItemParentMode::AuthoredWorldTrajectory;
     authoritativeItems[0].worldFromItem[12] = 4.0f;

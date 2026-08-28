@@ -46,6 +46,12 @@ Vec3 Normalise(const Vec3& value)
     return Scale(value, 1.0f / length);
 }
 
+Vec3 Column(const HeldItemTransform& transform, const std::size_t column)
+{
+    const std::size_t offset = column * 4u;
+    return {{transform[offset], transform[offset + 1u], transform[offset + 2u]}};
+}
+
 horde::gameplay::items::HeldItemTransform InverseRigid(
     const horde::gameplay::items::HeldItemTransform& transform)
 {
@@ -132,10 +138,10 @@ float GripOrientationError(const HeldItemTransform& left,
     for (std::size_t column = 0u; column < 3u; ++column)
     {
         const std::size_t offset = column * 4u;
+        const Vec3 leftAxis{{left[offset], left[offset + 1u], left[offset + 2u]}};
+        const Vec3 rightAxis{{right[offset], right[offset + 1u], right[offset + 2u]}};
         const float cosine = std::clamp(
-            left[offset] * right[offset] +
-                left[offset + 1u] * right[offset + 1u] +
-                left[offset + 2u] * right[offset + 2u],
+            Dot(Normalise(leftAxis), Normalise(rightAxis)),
             -1.0f, 1.0f);
         maximum = std::max(maximum, std::acos(cosine));
     }
@@ -161,6 +167,28 @@ PlayerRouteMasks BuildPlayerRouteMasks(const PlayerRenderRoute route)
         result.instanceMasks[slot] = 0x04u;
     }
     result.instanceMasks[16] = 0x10u;
+    return result;
+}
+
+ProductionSceneVisibility BuildProductionSceneVisibility(
+    const ProductionSceneVisibilityInput& input)
+{
+    ProductionSceneVisibility result;
+    result.rewardWorldVisible = !input.glassFixtureVisible;
+    result.inspectionOverride = input.productionInspection;
+    result.playerRoute = (input.glassFixtureVisible || input.productionInspection ||
+                          input.rewardLanternClaimed)
+        ? PlayerRenderRoute::Skinned
+        : input.requestedPlayerRoute;
+    const PlayerRouteMasks playerMasks = BuildPlayerRouteMasks(result.playerRoute);
+    result.torchMask = input.productionInspection ? 0u : 0x02u;
+    result.swordMask = input.productionInspection ? 0u : 0x02u;
+    result.playerMask = input.productionInspection
+        ? 0u : playerMasks.instanceMasks[4];
+    result.playerPrimaryVisible = result.playerRoute == PlayerRenderRoute::Procedural
+        ? !input.productionInspection
+        : (result.playerMask & 0x04u) != 0u;
+    result.playerReflectionVisible = (result.playerMask & 0x10u) != 0u;
     return result;
 }
 
@@ -247,13 +275,79 @@ PlayerGripAgreement MeasurePlayerGripAgreement(
         authoritativeItem.worldFromItem, itemFromGrip);
     const HeldItemTransform finalGrip = MultiplyHeldItemTransforms(
         renderedItem.worldFromItem, itemFromGrip);
+    return MeasureTransformAgreement(intendedGrip, finalGrip);
+}
+
+PlayerGripAgreement MeasureTransformAgreement(
+    const HeldItemTransform& intended,
+    const HeldItemTransform& rendered)
+{
     PlayerGripAgreement result;
     result.positionErrorMetres = std::hypot(
-        std::hypot(intendedGrip[12] - finalGrip[12],
-                   intendedGrip[13] - finalGrip[13]),
-        intendedGrip[14] - finalGrip[14]);
-    result.orientationErrorRadians = GripOrientationError(intendedGrip, finalGrip);
+        std::hypot(intended[12] - rendered[12], intended[13] - rendered[13]),
+        intended[14] - rendered[14]);
+    result.orientationErrorRadians = GripOrientationError(intended, rendered);
     return result;
+}
+
+HeldItemTransform InverseRigidHeldItemTransform(const HeldItemTransform& transform)
+{
+    return InverseRigid(transform);
+}
+
+bool ComposeClaimedRewardLanternVisuals(
+    const HeldItemTransform& worldFromFinalLeftGrip,
+    const HeldItemTransform& ringFromGripRing,
+    const HeldItemTransform& ringFromHinge,
+    const HeldItemTransform& authoritativeWorldFromHinge,
+    const HeldItemTransform& authoritativeWorldFromBody,
+    const float uniformScale,
+    RewardLanternVisualTransforms& output,
+    std::string& diagnostic)
+{
+    using namespace horde::gameplay::items;
+    if (!ValidateHeldItemSocketTransform(worldFromFinalLeftGrip, diagnostic) ||
+        !ValidateHeldItemSocketTransform(ringFromGripRing, diagnostic) ||
+        !ValidateHeldItemSocketTransform(ringFromHinge, diagnostic) ||
+        !ValidateHeldItemSocketTransform(authoritativeWorldFromHinge, diagnostic) ||
+        !ValidateHeldItemSocketTransform(authoritativeWorldFromBody, diagnostic) ||
+        !std::isfinite(uniformScale) || uniformScale <= 0.0f)
+    {
+        diagnostic = "Claimed reward lantern requires finite rigid Grip/Hinge/body transforms and positive scale.";
+        return false;
+    }
+    HeldItemTransform scale = IdentityHeldItemTransform();
+    scale[0] = uniformScale;
+    scale[5] = uniformScale;
+    scale[10] = uniformScale;
+    output.worldFromRing = MultiplyHeldItemTransforms(
+        MultiplyHeldItemTransforms(worldFromFinalLeftGrip, scale),
+        InverseRigid(ringFromGripRing));
+    const HeldItemTransform scaledWorldFromHinge = MultiplyHeldItemTransforms(
+        output.worldFromRing, ringFromHinge);
+    output.worldFromHinge = TransformFromAxes(
+        Normalise(Column(scaledWorldFromHinge, 0u)),
+        Normalise(Column(scaledWorldFromHinge, 1u)),
+        Normalise(Column(scaledWorldFromHinge, 2u)),
+        {{scaledWorldFromHinge[12], scaledWorldFromHinge[13],
+          scaledWorldFromHinge[14]}});
+    const HeldItemTransform bodyFromAuthoritativeHinge = MultiplyHeldItemTransforms(
+        InverseRigid(authoritativeWorldFromHinge), authoritativeWorldFromBody);
+    output.worldFromBody = MultiplyHeldItemTransforms(
+        output.worldFromHinge, bodyFromAuthoritativeHinge);
+    const HeldItemTransform composedGrip = MultiplyHeldItemTransforms(
+        output.worldFromRing, ringFromGripRing);
+    output.gripAgreement = MeasureTransformAgreement(
+        worldFromFinalLeftGrip, composedGrip);
+    if (output.gripAgreement.positionErrorMetres > kPlayerGripSocketToleranceMetres ||
+        output.gripAgreement.orientationErrorRadians >
+            kPlayerGripOrientationToleranceRadians)
+    {
+        diagnostic = "Final composed reward GripRing exceeded position/orientation tolerance.";
+        return false;
+    }
+    diagnostic.clear();
+    return true;
 }
 
 PlayerCpuSkinCadence ChoosePlayerCpuCadence(
@@ -306,6 +400,7 @@ bool PlayerRenderSlot::LoadAsset(const std::string& runtimeGlbPath,
     rightSocketErrorMetres_ = 0.0f;
     leftGripAgreement_ = {};
     rightGripAgreement_ = {};
+    finalWorldFromLeftGrip_ = horde::gameplay::items::IdentityHeldItemTransform();
     leftBoneFromGripSocket_ = horde::gameplay::items::IdentityHeldItemTransform();
     rightBoneFromGripSocket_ = horde::gameplay::items::IdentityHeldItemTransform();
     leftRestHandOrientation_ = horde::gameplay::items::IdentityHeldItemTransform();
@@ -479,6 +574,7 @@ bool PlayerRenderSlot::ResolveHeldItemVisuals(
         worldFromLeftHandBone, leftBoneFromGripSocket_);
     const HeldItemTransform worldFromRightGrip = MultiplyHeldItemTransforms(
         worldFromRightHandBone, rightBoneFromGripSocket_);
+    finalWorldFromLeftGrip_ = worldFromLeftGrip;
     if (!ResolvePlayerHeldItemVisuals(
         authoritativeItems, worldFromLeftGrip, worldFromRightGrip,
         renderItems, diagnostic))

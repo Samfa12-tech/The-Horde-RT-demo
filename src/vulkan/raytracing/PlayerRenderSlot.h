@@ -29,6 +29,29 @@ struct PlayerRouteMasks
 
 PlayerRouteMasks BuildPlayerRouteMasks(PlayerRenderRoute route);
 
+struct ProductionSceneVisibilityInput
+{
+    PlayerRenderRoute requestedPlayerRoute = PlayerRenderRoute::Procedural;
+    bool glassFixtureVisible = false;
+    bool productionInspection = false;
+    bool rewardLanternClaimed = false;
+};
+
+struct ProductionSceneVisibility
+{
+    bool rewardWorldVisible = false;
+    bool inspectionOverride = false;
+    PlayerRenderRoute playerRoute = PlayerRenderRoute::Procedural;
+    std::uint8_t torchMask = 0u;
+    std::uint8_t swordMask = 0u;
+    std::uint8_t playerMask = 0u;
+    bool playerPrimaryVisible = false;
+    bool playerReflectionVisible = false;
+};
+
+ProductionSceneVisibility BuildProductionSceneVisibility(
+    const ProductionSceneVisibilityInput& input);
+
 enum class PlayerPrimitiveSemantic : std::uint8_t
 {
     Body,
@@ -75,6 +98,31 @@ struct PlayerGripAgreement
 PlayerGripAgreement MeasurePlayerGripAgreement(
     const horde::gameplay::items::HeldItemState& authoritativeItem,
     const horde::gameplay::items::HeldItemState& renderedItem);
+
+PlayerGripAgreement MeasureTransformAgreement(
+    const horde::gameplay::items::HeldItemTransform& intended,
+    const horde::gameplay::items::HeldItemTransform& rendered);
+
+horde::gameplay::items::HeldItemTransform InverseRigidHeldItemTransform(
+    const horde::gameplay::items::HeldItemTransform& transform);
+
+struct RewardLanternVisualTransforms
+{
+    horde::gameplay::items::HeldItemTransform worldFromRing{};
+    horde::gameplay::items::HeldItemTransform worldFromHinge{};
+    horde::gameplay::items::HeldItemTransform worldFromBody{};
+    PlayerGripAgreement gripAgreement{};
+};
+
+bool ComposeClaimedRewardLanternVisuals(
+    const horde::gameplay::items::HeldItemTransform& worldFromFinalLeftGrip,
+    const horde::gameplay::items::HeldItemTransform& ringFromGripRing,
+    const horde::gameplay::items::HeldItemTransform& ringFromHinge,
+    const horde::gameplay::items::HeldItemTransform& authoritativeWorldFromHinge,
+    const horde::gameplay::items::HeldItemTransform& authoritativeWorldFromBody,
+    float uniformScale,
+    RewardLanternVisualTransforms& output,
+    std::string& diagnostic);
 
 enum class PlayerCpuSkinCadence : std::uint8_t
 {
@@ -129,6 +177,10 @@ public:
     float RightSocketErrorMetres() const { return rightSocketErrorMetres_; }
     const PlayerGripAgreement& LeftGripAgreement() const { return leftGripAgreement_; }
     const PlayerGripAgreement& RightGripAgreement() const { return rightGripAgreement_; }
+    const horde::gameplay::items::HeldItemTransform& FinalWorldFromLeftGrip() const
+    {
+        return finalWorldFromLeftGrip_;
+    }
 
 private:
     bool DeriveStableRestGripBases(std::string& diagnostic);
@@ -153,6 +205,8 @@ private:
         horde::gameplay::items::IdentityHeldItemTransform();
     PlayerGripAgreement leftGripAgreement_{};
     PlayerGripAgreement rightGripAgreement_{};
+    horde::gameplay::items::HeldItemTransform finalWorldFromLeftGrip_ =
+        horde::gameplay::items::IdentityHeldItemTransform();
     bool stableGripBasesReady_ = false;
 };
 

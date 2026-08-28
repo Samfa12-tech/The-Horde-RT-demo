@@ -74,7 +74,7 @@
       ]
     },
     {
-      "name": "RtDielectricDiagnostics", "alignment": 16, "size": 144,
+      "name": "RtDielectricDiagnostics", "alignment": 16, "size": 176,
       "fields": [
         { "name": "transportOverflowCount", "type": "uint", "offset": 0 },
         { "name": "shadowOverflowCount", "type": "uint", "offset": 4 },
@@ -111,7 +111,12 @@
         { "name": "primaryClosedVolumeAbsorptionCount", "type": "uint", "offset": 128 },
         { "name": "primaryCertifiedClosedVolumeRecoveryCount", "type": "uint", "offset": 132 },
         { "name": "shadowCertifiedClosedVolumeRecoveryCount", "type": "uint", "offset": 136 },
-        { "name": "certifiedClosedVolumeRecoveryReasonMask", "type": "uint", "offset": 140 }
+        { "name": "certifiedClosedVolumeRecoveryReasonMask", "type": "uint", "offset": 140 },
+        { "name": "primaryTorchPixelCount", "type": "uint", "offset": 144 },
+        { "name": "primarySwordPixelCount", "type": "uint", "offset": 148 },
+        { "name": "primaryPlayerPixelCount", "type": "uint", "offset": 152 },
+        { "name": "primaryRewardRingPixelCount", "type": "uint", "offset": 156 },
+        { "name": "primaryRewardBodyPixelCount", "type": "uint", "offset": 160 }
       ]
     },
     {

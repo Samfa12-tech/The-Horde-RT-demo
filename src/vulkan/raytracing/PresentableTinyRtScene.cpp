@@ -368,6 +368,9 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     playerSkinUpdateCount_ = std::exchange(other.playerSkinUpdateCount_, 0u);
     playerSkinTotalMilliseconds_ = std::exchange(other.playerSkinTotalMilliseconds_, 0.0);
     playerMaxSocketErrorMetres_ = std::exchange(other.playerMaxSocketErrorMetres_, 0.0f);
+    lastInstanceMasks_ = std::exchange(other.lastInstanceMasks_, {});
+    lastPlayerPrimaryVisible_ = std::exchange(other.lastPlayerPrimaryVisible_, false);
+    rewardLanternGripAgreement_ = std::exchange(other.rewardLanternGripAgreement_, {});
     dielectricTransportOverflowCount_ =
         std::exchange(other.dielectricTransportOverflowCount_, 0u);
     dielectricShadowOverflowCount_ =
@@ -430,6 +433,13 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
         std::exchange(other.shadowCertifiedClosedVolumeRecoveryCount_, 0u);
     certifiedClosedVolumeRecoveryReasonMask_ =
         std::exchange(other.certifiedClosedVolumeRecoveryReasonMask_, 0u);
+    primaryTorchPixelCount_ = std::exchange(other.primaryTorchPixelCount_, 0u);
+    primarySwordPixelCount_ = std::exchange(other.primarySwordPixelCount_, 0u);
+    primaryPlayerPixelCount_ = std::exchange(other.primaryPlayerPixelCount_, 0u);
+    primaryRewardRingPixelCount_ =
+        std::exchange(other.primaryRewardRingPixelCount_, 0u);
+    primaryRewardBodyPixelCount_ =
+        std::exchange(other.primaryRewardBodyPixelCount_, 0u);
     developmentStaticAssetDirectory_ = std::move(other.developmentStaticAssetDirectory_);
     staticTextureDirectory_ = std::move(other.staticTextureDirectory_);
     staticMeshSlot_ = std::move(other.staticMeshSlot_);
@@ -682,6 +692,11 @@ void PresentableTinyRtScene::Destroy()
     primaryCertifiedClosedVolumeRecoveryCount_ = 0u;
     shadowCertifiedClosedVolumeRecoveryCount_ = 0u;
     certifiedClosedVolumeRecoveryReasonMask_ = 0u;
+    primaryTorchPixelCount_ = 0u;
+    primarySwordPixelCount_ = 0u;
+    primaryPlayerPixelCount_ = 0u;
+    primaryRewardRingPixelCount_ = 0u;
+    primaryRewardBodyPixelCount_ = 0u;
     developmentStaticAssetDirectory_.clear();
     staticTextureDirectory_.clear();
     staticMeshSlot_ = {};
@@ -3670,7 +3685,6 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const bool glassFixtureVisible =
         clampedTuning.glassFixtureVisible &&
         !clampedTuning.productionRewardPropsVisible;
-    const bool productionPropsVisible = !glassFixtureVisible;
     const bool productionInspection = clampedTuning.productionRewardPropsVisible &&
         frame.chestReward.phase ==
             horde::gameplay::interactions::ChestRewardPhase::Locked;
@@ -3679,9 +3693,15 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             horde::gameplay::interactions::ChestRewardPhase::LanternClaimed &&
         frame.interaction.heldLightKind ==
             horde::gameplay::interactions::HeldLightKind::RewardLantern;
+    const ProductionSceneVisibility productionVisibility =
+        BuildProductionSceneVisibility({frame.playerRenderRoute,
+                                        glassFixtureVisible,
+                                        productionInspection,
+                                        rewardLanternClaimed});
+    const bool productionRewardWorldVisible =
+        productionVisibility.rewardWorldVisible;
     const PlayerRenderRoute effectivePlayerRenderRoute =
-        (glassFixtureVisible || productionInspection || rewardLanternClaimed)
-        ? PlayerRenderRoute::Skinned : frame.playerRenderRoute;
+        productionVisibility.playerRoute;
     if (effectivePlayerRenderRoute != measuredPlayerRoute_)
     {
         measuredPlayerRoute_ = effectivePlayerRenderRoute;
@@ -3806,6 +3826,9 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
 
     bool updateSkinnedPlayer = false;
     horde::gameplay::items::HeldItemStates renderHeldItems = frame.heldItems;
+    horde::gameplay::items::HeldItemTransform finalSkinnedLeftGrip =
+        horde::gameplay::items::IdentityHeldItemTransform();
+    bool hasFinalSkinnedLeftGrip = false;
     Vec3 skinnedPlayerRootWorld{
         animatedBodyOrigin[0], animatedBodyOrigin[1] - 1.8f,
         animatedBodyOrigin[2]};
@@ -3932,6 +3955,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                 rigidWorldFromBone(boneSockets.rightHand),
                 renderHeldItems, diagnostic))
             return false;
+        finalSkinnedLeftGrip = playerRenderSlot_.FinalWorldFromLeftGrip();
+        hasFinalSkinnedLeftGrip = true;
     }
 
     if (!characterSlot_.PrepareFrame(frame.skeletonEnemies,
@@ -3989,20 +4014,19 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     instances[1] = instances[0];
     instances[1].transform = heldItemInstanceTransform(renderHeldItems[0]);
     instances[1].instanceCustomIndex = 1u;
-    instances[1].mask = productionPropsVisible ? 0u : 0x02u;
+    instances[1].mask = productionVisibility.torchMask;
     instances[1].accelerationStructureReference = torchBlas_.address;
     const auto characterInstances = characterSlot_.BuildActiveInstances();
     instances[CharacterRenderSlot::kTlasInstanceIndex] = characterInstances[0];
     instances[3] = instances[1];
     instances[3].instanceCustomIndex = 3u;
-    instances[3].mask = productionPropsVisible ? 0u : 0x02u;
+    instances[3].mask = productionVisibility.swordMask;
     instances[3].accelerationStructureReference = swordBlas_.address;
     instances[3].transform = heldItemInstanceTransform(renderHeldItems[1]);
     instances[4] = instances[0];
     instances[4].instanceCustomIndex = 4u;
     const PlayerRouteMasks playerRouteMasks = BuildPlayerRouteMasks(effectivePlayerRenderRoute);
-    instances[4].mask = playerRouteMasks.instanceMasks[4];
-    if (productionPropsVisible) instances[4].mask = 0u;
+    instances[4].mask = productionVisibility.playerMask;
     instances[4].accelerationStructureReference =
         effectivePlayerRenderRoute == PlayerRenderRoute::Skinned
         ? skinnedPlayerBlas_.address : playerBodyBlas_.address;
@@ -4019,7 +4043,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     {
         instances[i] = instances[4];
         instances[i].instanceCustomIndex = static_cast<std::uint32_t>(i);
-        instances[i].mask = playerRouteMasks.instanceMasks[i];
+        instances[i].mask = productionVisibility.inspectionOverride
+            ? 0u : playerRouteMasks.instanceMasks[i];
         instances[i].accelerationStructureReference = playerLimbBlas_.address;
     }
     instances[5].transform = segmentTransform(leftShoulder, leftElbow, 0.065f);
@@ -4064,13 +4089,15 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const Vec3 headBase = add(add(animatedBodyOrigin, Vec3{0.0f, -0.16f, 0.0f}), scaled(animatedBodyForward, 0.20f));
     const Vec3 headTop = add(add(animatedBodyOrigin, Vec3{0.0f, 0.15f, 0.0f}), scaled(animatedBodyForward, 0.20f));
     instances[16].transform = segmentTransform(headBase, headTop, 0.145f);
-    instances[16].mask = playerRouteMasks.instanceMasks[16];
+    instances[16].mask = productionVisibility.inspectionOverride
+        ? 0u : playerRouteMasks.instanceMasks[16];
     horde::gameplay::items::HeldItemTransform productionLanternWorldFromFlame =
         horde::gameplay::items::IdentityHeldItemTransform();
     horde::gameplay::items::HeldItemTransform productionLanternWorldFromLight =
         horde::gameplay::items::IdentityHeldItemTransform();
     bool productionLanternVisible = false;
-    if (productionPropsVisible)
+    rewardLanternGripAgreement_ = {};
+    if (productionRewardWorldVisible)
     {
         using horde::gameplay::interactions::ChestRewardPhase;
         using horde::gameplay::interactions::HeldLightKind;
@@ -4092,6 +4119,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             gothicChestBaseAsset_.sockets, "RewardLanternHingeSocket");
         const auto* ringHinge = horde::gameplay::items::FindHeldItemSocket(
             rewardLanternRingAsset_.sockets, "Hinge");
+        const auto* ringGrip = horde::gameplay::items::FindHeldItemSocket(
+            rewardLanternRingAsset_.sockets, "GripRing");
         const auto* flameSocket = horde::gameplay::items::FindHeldItemSocket(
             rewardLanternBodyAsset_.sockets, "Flame");
         const auto* lightSocket = horde::gameplay::items::FindHeldItemSocket(
@@ -4102,7 +4131,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             });
         const auto* chestLidHinge = horde::gameplay::items::FindHeldItemSocket(
             gothicChestBaseAsset_.sockets, "ChestLidHinge");
-        if (lanternSocket == nullptr || ringHinge == nullptr || flameSocket == nullptr ||
+        if (lanternSocket == nullptr || ringHinge == nullptr || ringGrip == nullptr ||
+            flameSocket == nullptr ||
             lightSocket == nullptr || chestLid == gothicChestLidAsset_.nodeTransforms.end() ||
             chestLidHinge == nullptr)
         {
@@ -4112,21 +4142,42 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         const auto stageWorldFromLanternHinge =
             horde::gameplay::items::MultiplyHeldItemTransforms(
                 stageWorldFromChestBase, lanternSocket->world);
-        const auto& worldFromLanternHinge = lanternClaimed
-            ? frame.rewardLanternWorldFromHinge
-            : stageWorldFromLanternHinge;
         horde::gameplay::items::HeldItemTransform worldFromRing{};
-        if (!horde::gameplay::items::ComposeWorldFromItem(
-                worldFromLanternHinge, ringHinge->world, worldFromRing, diagnostic))
-            return false;
-        worldFromRing = horde::gameplay::items::MultiplyHeldItemTransforms(
-            worldFromRing, uniformScale(lanternScale));
-        const auto& pendulumBody = lanternClaimed
-            ? frame.lanternPendulum.worldFromBody
-            : worldFromLanternHinge;
-        const auto worldFromLanternBody =
-            horde::gameplay::items::MultiplyHeldItemTransforms(
-                pendulumBody, uniformScale(lanternScale));
+        horde::gameplay::items::HeldItemTransform worldFromLanternBody{};
+        if (lanternClaimed)
+        {
+            if (!hasFinalSkinnedLeftGrip)
+            {
+                diagnostic = "Claimed reward lantern requires the final skinned left Grip transform.";
+                return false;
+            }
+            RewardLanternVisualTransforms rewardVisuals;
+            if (!ComposeClaimedRewardLanternVisuals(
+                    finalSkinnedLeftGrip,
+                    ringGrip->world,
+                    ringHinge->world,
+                    frame.rewardLanternWorldFromHinge,
+                    frame.lanternPendulum.worldFromBody,
+                    lanternScale,
+                    rewardVisuals,
+                    diagnostic))
+                return false;
+            worldFromRing = rewardVisuals.worldFromRing;
+            worldFromLanternBody = horde::gameplay::items::MultiplyHeldItemTransforms(
+                rewardVisuals.worldFromBody, uniformScale(lanternScale));
+            rewardLanternGripAgreement_ = rewardVisuals.gripAgreement;
+        }
+        else
+        {
+            if (!horde::gameplay::items::ComposeWorldFromItem(
+                    stageWorldFromLanternHinge, ringHinge->world,
+                    worldFromRing, diagnostic))
+                return false;
+            worldFromRing = horde::gameplay::items::MultiplyHeldItemTransforms(
+                worldFromRing, uniformScale(lanternScale));
+            worldFromLanternBody = horde::gameplay::items::MultiplyHeldItemTransforms(
+                stageWorldFromLanternHinge, uniformScale(lanternScale));
+        }
         productionLanternWorldFromFlame =
             horde::gameplay::items::MultiplyHeldItemTransforms(worldFromLanternBody,
                                                                 flameSocket->world);
@@ -4200,6 +4251,9 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         waterfallScale.depth, 0.0f, 0.0f, -2.32f,
         0.0f, waterfallScale.vertical, 0.0f, 0.0f,
         0.0f, 0.0f, waterfallScale.crossLane, -15.26f}};
+    for (std::size_t instance = 0u; instance < instances.size(); ++instance)
+        lastInstanceMasks_[instance] = instances[instance].mask;
+    lastPlayerPrimaryVisible_ = productionVisibility.playerPrimaryVisible;
     RtHeldLightGpu heldLightGpu{{
         frame.heldLight.worldFromLight[12],
         frame.heldLight.worldFromLight[13],
@@ -4328,6 +4382,13 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         previousDielectricDiagnostics.shadowCertifiedClosedVolumeRecoveryCount;
     certifiedClosedVolumeRecoveryReasonMask_ =
         previousDielectricDiagnostics.certifiedClosedVolumeRecoveryReasonMask;
+    primaryTorchPixelCount_ = previousDielectricDiagnostics.primaryTorchPixelCount;
+    primarySwordPixelCount_ = previousDielectricDiagnostics.primarySwordPixelCount;
+    primaryPlayerPixelCount_ = previousDielectricDiagnostics.primaryPlayerPixelCount;
+    primaryRewardRingPixelCount_ =
+        previousDielectricDiagnostics.primaryRewardRingPixelCount;
+    primaryRewardBodyPixelCount_ =
+        previousDielectricDiagnostics.primaryRewardBodyPixelCount;
     const RtDielectricDiagnostics clearedDielectricDiagnostics{};
     auto frameInstanceMetadata = staticMeshSlot_.InstanceMetadata();
     if (effectivePlayerRenderRoute == PlayerRenderRoute::Procedural)
@@ -4338,7 +4399,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     }
     else
     {
-        if (!productionPropsVisible)
+        if (!productionRewardWorldVisible)
         {
             for (std::size_t i = 5u; i <= 8u; ++i)
                 frameInstanceMetadata[i].flags = 0u;

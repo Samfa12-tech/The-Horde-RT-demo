@@ -33,6 +33,19 @@ void main()
     uint primaryMask = uv.y > playerPrimaryStart ? 0x27u : 0x23u;
     HitInfo primary = traceScene(origin, rayDirection, 10000.0, primaryMask,
                                  0.002, controls.waterQuality < 0.5, true);
+    if (primary.hit)
+    {
+        if (primary.instance == 1)
+            atomicAdd(rtDielectricDiagnostics.value.primaryTorchPixelCount, 1u);
+        else if (primary.instance == 3)
+            atomicAdd(rtDielectricDiagnostics.value.primarySwordPixelCount, 1u);
+        else if (primary.instance == 4)
+            atomicAdd(rtDielectricDiagnostics.value.primaryPlayerPixelCount, 1u);
+        else if (primary.instance == 7)
+            atomicAdd(rtDielectricDiagnostics.value.primaryRewardRingPixelCount, 1u);
+        else if (primary.instance == 8)
+            atomicAdd(rtDielectricDiagnostics.value.primaryRewardBodyPixelCount, 1u);
+    }
     vec3 color = shadePrimary(primary, rayDirection);
     vec4 fireVolume = integrateFireEmitters(
         origin, rayDirection, primary.hit ? primary.t : 10000.0, false);
