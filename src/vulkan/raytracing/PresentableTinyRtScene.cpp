@@ -4,6 +4,7 @@
 #include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/items/HeldLightState.h"
 #include "vulkan/raytracing/HeldItemRenderSlot.h"
+#include "vulkan/raytracing/RtSceneRouteConstants.h"
 
 #include <algorithm>
 #include <array>
@@ -1635,21 +1636,21 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         addQuad({{minX, minY, maxZ}}, {{minX, minY, minZ}}, {{maxX, minY, minZ}}, {{maxX, minY, maxZ}});
     };
 
-    addWorldQuad({{-1.85f, -0.95f, 3.4f}}, {{1.85f, -0.95f, 3.4f}}, {{1.85f, -0.95f, -6.4f}}, {{-1.85f, -0.95f, -6.4f}}, SurfaceWetCobble, SurfaceUp);
+    addWorldQuad({{-1.85f, kRouteFloorWorldY, 3.4f}}, {{1.85f, kRouteFloorWorldY, 3.4f}}, {{1.85f, kRouteFloorWorldY, -6.4f}}, {{-1.85f, kRouteFloorWorldY, -6.4f}}, SurfaceWetCobble, SurfaceUp);
     addWorldQuad({{-1.85f, 1.35f, 3.4f}}, {{-1.85f, 1.35f, -0.2f}}, {{1.85f, 1.35f, -0.2f}}, {{1.85f, 1.35f, 3.4f}}, SurfaceDryStone, SurfaceDown);
-    addWorldQuad({{-1.85f, -0.95f, 3.4f}}, {{-1.85f, -0.95f, -6.4f}}, {{-1.85f, 1.35f, -6.4f}}, {{-1.85f, 1.35f, 3.4f}}, SurfaceMossyStone, SurfaceRight);
-    addWorldQuad({{1.85f, -0.95f, -6.4f}}, {{1.85f, -0.95f, 3.4f}}, {{1.85f, 1.35f, 3.4f}}, {{1.85f, 1.35f, -6.4f}}, SurfaceMossyStone, SurfaceLeft);
+    addWorldQuad({{-1.85f, kRouteFloorWorldY, 3.4f}}, {{-1.85f, kRouteFloorWorldY, -6.4f}}, {{-1.85f, 1.35f, -6.4f}}, {{-1.85f, 1.35f, 3.4f}}, SurfaceMossyStone, SurfaceRight);
+    addWorldQuad({{1.85f, kRouteFloorWorldY, -6.4f}}, {{1.85f, kRouteFloorWorldY, 3.4f}}, {{1.85f, 1.35f, 3.4f}}, {{1.85f, 1.35f, -6.4f}}, SurfaceMossyStone, SurfaceLeft);
     // Close the starting chamber behind the player. This is real RT geometry,
     // preventing a 180-degree turn at spawn from exposing the exterior sky.
-    addWorldQuad({{-1.85f, -0.95f, 3.4f}}, {{-1.85f, 1.35f, 3.4f}}, {{1.85f, 1.35f, 3.4f}}, {{1.85f, -0.95f, 3.4f}}, SurfaceMossyStone, SurfaceBack);
+    addWorldQuad({{-1.85f, kRouteFloorWorldY, 3.4f}}, {{-1.85f, 1.35f, 3.4f}}, {{1.85f, 1.35f, 3.4f}}, {{1.85f, kRouteFloorWorldY, 3.4f}}, SurfaceMossyStone, SurfaceBack);
     // The former sealed far wall is split around a 1.8 m doorway into the
     // extended showcase route. The matching hidden shell is split below too.
-    addWorldQuad({{-1.85f, -0.95f, -6.4f}}, {{-0.90f, -0.95f, -6.4f}}, {{-0.90f, 1.35f, -6.4f}}, {{-1.85f, 1.35f, -6.4f}}, SurfaceMossyStone, SurfaceForward);
-    addWorldQuad({{0.90f, -0.95f, -6.4f}}, {{1.85f, -0.95f, -6.4f}}, {{1.85f, 1.35f, -6.4f}}, {{0.90f, 1.35f, -6.4f}}, SurfaceMossyStone, SurfaceForward);
+    addWorldQuad({{-1.85f, kRouteFloorWorldY, -6.4f}}, {{-0.90f, kRouteFloorWorldY, -6.4f}}, {{-0.90f, 1.35f, -6.4f}}, {{-1.85f, 1.35f, -6.4f}}, SurfaceMossyStone, SurfaceForward);
+    addWorldQuad({{0.90f, kRouteFloorWorldY, -6.4f}}, {{1.85f, kRouteFloorWorldY, -6.4f}}, {{1.85f, 1.35f, -6.4f}}, {{0.90f, 1.35f, -6.4f}}, SurfaceMossyStone, SurfaceForward);
     addWorldQuad({{-0.90f, 0.85f, -6.4f}}, {{0.90f, 0.85f, -6.4f}}, {{0.90f, 1.35f, -6.4f}}, {{-0.90f, 1.35f, -6.4f}}, SurfaceMossyStone, SurfaceForward);
     // Give the room-two portal real RT depth instead of three paper-thin cards.
-    addWorldBox(-1.20f, -0.95f, -3.55f, -0.78f, 0.95f, -3.25f, SurfaceMossyStone);
-    addWorldBox(0.78f, -0.95f, -3.55f, 1.20f, 0.95f, -3.25f, SurfaceMossyStone);
+    addWorldBox(-1.20f, kRouteFloorWorldY, -3.55f, -0.78f, 0.95f, -3.25f, SurfaceMossyStone);
+    addWorldBox(0.78f, kRouteFloorWorldY, -3.55f, 1.20f, 0.95f, -3.25f, SurfaceMossyStone);
     addWorldBox(-1.20f, 0.78f, -3.55f, 1.20f, 1.18f, -3.25f, SurfaceMossyStone);
     addWorldQuad({{-1.86f, -0.28f, 1.12f}}, {{-1.86f, 0.46f, 1.12f}}, {{-1.86f, 0.46f, 0.62f}}, {{-1.86f, -0.28f, 0.62f}}, SurfaceFlame, SurfaceRight);
     addWorldQuad({{1.86f, -0.35f, -1.98f}}, {{1.86f, -0.35f, -1.48f}}, {{1.86f, 0.38f, -1.48f}}, {{1.86f, 0.38f, -1.98f}}, SurfaceFlame, SurfaceLeft);
@@ -1672,14 +1673,14 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         const float x = -1.05f + static_cast<float>(i % 4u) * 0.7f + (i >= 4u ? 0.18f : 0.0f);
         const float z = -2.55f - static_cast<float>(i / 4u) * 1.1f - static_cast<float>(i % 2u) * 0.24f;
         const float h = 0.58f + static_cast<float>(i % 3u) * 0.12f;
-        addWorldQuad({{x - 0.18f, -0.95f, z}}, {{x + 0.18f, -0.95f, z}}, {{x + 0.14f, -0.95f + h, z}}, {{x - 0.14f, -0.95f + h, z}}, SurfaceDarkFigure, SurfaceForward);
+        addWorldQuad({{x - 0.18f, kRouteFloorWorldY, z}}, {{x + 0.18f, kRouteFloorWorldY, z}}, {{x + 0.14f, kRouteFloorWorldY + h, z}}, {{x - 0.14f, kRouteFloorWorldY + h, z}}, SurfaceDarkFigure, SurfaceForward);
     }
 
     // A shallow gallery table runs along the left wall, leaving the central
     // lane open. Five canted swatches reuse the existing ASTC material layers.
     constexpr float galleryMinX = -1.55f;
     constexpr float galleryMaxX = -0.72f;
-    constexpr float galleryMinY = -0.95f;
+    constexpr float galleryMinY = kRouteFloorWorldY;
     constexpr float galleryMaxY = -0.58f;
     constexpr float galleryMinZ = 0.05f;
     constexpr float galleryMaxZ = 2.35f;
@@ -1712,11 +1713,10 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     // deliberately adds no new flame, glass or mirror surface: the brackets
     // are unlit, the transmission frame is empty and the final mirror frame
     // has only its dry-stone wall behind it.
-    constexpr float routeFloor = -0.95f;
     constexpr float routeCeiling = 1.35f;
     const auto addRouteFloor = [&addWorldQuad](float minX, float minZ, float maxX, float maxZ, SurfaceMaterial material) {
-        addWorldQuad({{minX, routeFloor, maxZ}}, {{maxX, routeFloor, maxZ}},
-                     {{maxX, routeFloor, minZ}}, {{minX, routeFloor, minZ}}, material, SurfaceUp);
+        addWorldQuad({{minX, kRouteFloorWorldY, maxZ}}, {{maxX, kRouteFloorWorldY, maxZ}},
+                     {{maxX, kRouteFloorWorldY, minZ}}, {{minX, kRouteFloorWorldY, minZ}}, material, SurfaceUp);
     };
     const auto addRouteCeiling = [&addWorldQuad](float minX, float minZ, float maxX, float maxZ) {
         addWorldQuad({{minX, routeCeiling, maxZ}}, {{minX, routeCeiling, minZ}},
@@ -1725,32 +1725,32 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     const auto addRouteWallX = [&addWorldQuad](float x, float minZ, float maxZ, SurfaceNormal normal) {
         if (normal == SurfaceRight)
         {
-            addWorldQuad({{x, routeFloor, maxZ}}, {{x, routeFloor, minZ}},
+            addWorldQuad({{x, kRouteFloorWorldY, maxZ}}, {{x, kRouteFloorWorldY, minZ}},
                          {{x, routeCeiling, minZ}}, {{x, routeCeiling, maxZ}}, SurfaceMossyStone, normal);
         }
         else
         {
-            addWorldQuad({{x, routeFloor, minZ}}, {{x, routeFloor, maxZ}},
+            addWorldQuad({{x, kRouteFloorWorldY, minZ}}, {{x, kRouteFloorWorldY, maxZ}},
                          {{x, routeCeiling, maxZ}}, {{x, routeCeiling, minZ}}, SurfaceMossyStone, normal);
         }
     };
     const auto addRouteWallZ = [&addWorldQuad](float z, float minX, float maxX, SurfaceNormal normal) {
         if (normal == SurfaceForward)
         {
-            addWorldQuad({{minX, routeFloor, z}}, {{maxX, routeFloor, z}},
+            addWorldQuad({{minX, kRouteFloorWorldY, z}}, {{maxX, kRouteFloorWorldY, z}},
                          {{maxX, routeCeiling, z}}, {{minX, routeCeiling, z}}, SurfaceMossyStone, normal);
         }
         else
         {
-            addWorldQuad({{minX, routeFloor, z}}, {{minX, routeCeiling, z}},
-                         {{maxX, routeCeiling, z}}, {{maxX, routeFloor, z}}, SurfaceMossyStone, normal);
+            addWorldQuad({{minX, kRouteFloorWorldY, z}}, {{minX, routeCeiling, z}},
+                         {{maxX, routeCeiling, z}}, {{maxX, kRouteFloorWorldY, z}}, SurfaceMossyStone, normal);
         }
     };
 
     // A shallow stone surround gives the new 1.8 m opening real RT depth. Its
     // clear width stays exactly x=-0.9..0.9 throughout the player's height.
-    addWorldBox(-1.08f, -0.95f, -6.52f, -0.90f, 0.82f, -6.28f, SurfaceMossyStone);
-    addWorldBox(0.90f, -0.95f, -6.52f, 1.08f, 0.82f, -6.28f, SurfaceMossyStone);
+    addWorldBox(-1.08f, kRouteFloorWorldY, -6.52f, -0.90f, 0.82f, -6.28f, SurfaceMossyStone);
+    addWorldBox(0.90f, kRouteFloorWorldY, -6.52f, 1.08f, 0.82f, -6.28f, SurfaceMossyStone);
     addWorldBox(-1.08f, 0.82f, -6.52f, -0.48f, 1.12f, -6.28f, SurfaceMossyStone);
     addWorldBox(0.48f, 0.82f, -6.52f, 1.08f, 1.12f, -6.28f, SurfaceMossyStone);
     addWorldBox(-0.48f, 0.96f, -6.52f, 0.48f, 1.20f, -6.28f, SurfaceMossyStone);
@@ -1997,8 +1997,8 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     // The authored threshold remains open. Its narrow jambs sit inside the
     // collision wall inset and the high lintel leaves the full central walking
     // lane unobstructed.
-    addWorldBox(-29.62f, -0.95f, -16.80f, -29.38f, 0.88f, -16.62f, SurfaceMossyStone);
-    addWorldBox(-29.62f, -0.95f, -13.78f, -29.38f, 0.88f, -13.60f, SurfaceMossyStone);
+    addWorldBox(-29.62f, kRouteFloorWorldY, -16.80f, -29.38f, 0.88f, -16.62f, SurfaceMossyStone);
+    addWorldBox(-29.62f, kRouteFloorWorldY, -13.78f, -29.38f, 0.88f, -13.60f, SurfaceMossyStone);
     addWorldBox(-29.62f, 0.88f, -16.80f, -29.38f, 1.20f, -13.60f, SurfaceMossyStone);
 
     // Dry final reveal room. The far-wall metal surround is an empty hero
@@ -3110,7 +3110,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     instances[2].accelerationStructureReference = characterSlot_.SkeletonGpu(0u).accelerationStructure.address;
     instances[2].transform = {{
         1.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 1.0f, 0.0f, -0.95f,
+        0.0f, 1.0f, 0.0f, kRouteFloorWorldY,
         0.0f, 0.0f, 1.0f, -4.65f}};
     instances[3] = instances[1];
     instances[3].instanceCustomIndex = 3u;
@@ -4058,11 +4058,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         // Checkpoint staging is deliberately separate from the asset contract:
         // this rigid world matrix chooses the inspection location, while every
         // prop pivot/socket below is read from the loaded GLBs.
-        const horde::gameplay::items::HeldItemTransform stageWorldFromChestBase{{
-            0.50f, 0.0f, -0.8660254f, 0.0f,
-            0.0f, 1.0f, 0.0f, 0.0f,
-            0.8660254f, 0.0f, 0.50f, 0.0f,
-            -12.50f, 0.0f, -15.42f, 1.0f}};
+        const auto& stageWorldFromChestBase = kProductionRewardChestStageWorldFromBase;
         const auto* lanternSocket = horde::gameplay::items::FindHeldItemSocket(
             gothicChestBaseAsset_.sockets, "RewardLanternHingeSocket");
         const auto* ringHinge = horde::gameplay::items::FindHeldItemSocket(

@@ -54,10 +54,10 @@ inline constexpr std::array<DevelopmentCheckpoint, 16u> kDevelopmentCheckpoints{
      DevelopmentCombatPose::Rest, true, 0.005f},
     {113, "glass-edge-fresnel", 4, -7.60f, -13.25f, -0.65f, -0.05f,
      DevelopmentCombatPose::Rest, true},
-    {114, "lantern-chest-unlock", 5, -10.65f, -15.20f, -1.57079632679f, 0.05f,
+    {114, "lantern-chest-unlock", 5, -10.65f, -15.20f, -1.57079632679f, -0.35f,
      DevelopmentCombatPose::Rest, false, 1.0f, {{0.72f, 0.90f, 1.0f}}, 2.4f,
      true, false},
-    {115, "lantern-glass-production", 5, -10.65f, -15.20f, -1.57079632679f, 0.05f,
+    {115, "lantern-glass-production", 5, -10.65f, -15.20f, -1.57079632679f, -0.35f,
      DevelopmentCombatPose::Rest, false, 1.0f, {{0.72f, 0.90f, 1.0f}}, 2.4f,
      true, true},
 }};

@@ -1,5 +1,6 @@
 #include "scene/assets/AssetManifest.h"
 #include "scene/assets/StaticMeshAsset.h"
+#include "vulkan/raytracing/RtSceneRouteConstants.h"
 
 #include <algorithm>
 #include <cctype>
@@ -595,10 +596,8 @@ int main()
     if (chestSocket != nullptr && ringHinge != nullptr && flameSocket != nullptr &&
         lightSocket != nullptr && chestLidHinge != nullptr && lidNode != nullptr)
     {
-        const Matrix stage{{0.50f, 0.0f, -0.8660254f, 0.0f,
-                            0.0f, 1.0f, 0.0f, 0.0f,
-                            0.8660254f, 0.0f, 0.50f, 0.0f,
-                            -12.50f, 0.0f, -15.42f, 1.0f}};
+        const Matrix stage =
+            horde::vulkan::raytracing::kProductionRewardChestStageWorldFromBase;
         const Matrix openAngle{{1.0f, 0.0f, 0.0f, 0.0f,
                                 0.0f, 0.3420201f, -0.9396926f, 0.0f,
                                 0.0f, 0.9396926f, 0.3420201f, 0.0f,
@@ -616,14 +615,14 @@ int main()
             Multiply(chestLidHinge->world, openAngle), lidNode->world);
         const TransformedBounds chestWorldBounds = TransformBounds(chestBase.asset, stage);
         const TransformedBounds lidLocalBounds = TransformBounds(chestLid.asset, chestLocalLid);
-        Check(Near(chestWorldBounds.minimum[1], 0.0f) &&
-                  Near(chestWorldBounds.maximum[1], 0.38f) &&
-                  Near(Origin(hinge)[1], 1.28f) && Near(Origin(lid)[1], 0.34f),
-              "checkpoint 114 places the complete chest on the floor and composes both authored hinges exactly");
+        Check(Near(chestWorldBounds.minimum[1], -0.95f) &&
+                  Near(chestWorldBounds.maximum[1], -0.57f) &&
+                  Near(Origin(hinge)[1], 0.33f) && Near(Origin(lid)[1], -0.61f),
+              "checkpoint 114 places the complete chest on the authoritative corridor floor and composes both authored hinges exactly");
         constexpr std::array<float, 2u> scales{{0.90f, 0.90f}};
         constexpr std::array<std::array<float, 4u>, 2u> cameras{{
-            {{-10.65f, -15.20f, -1.57079632679f, 0.05f}},
-            {{-10.65f, -15.20f, -1.57079632679f, 0.05f}}}};
+            {{-10.65f, -15.20f, -1.57079632679f, -0.35f}},
+            {{-10.65f, -15.20f, -1.57079632679f, -0.35f}}}};
         for (std::size_t checkpoint = 0u; checkpoint < scales.size(); ++checkpoint)
         {
             const float value = scales[checkpoint];
@@ -643,6 +642,10 @@ int main()
                 TransformBounds(lanternBody.asset, bodyLocal);
             const TransformedBounds ringLocalBounds =
                 TransformBounds(lanternRing.asset, ringLocal);
+            const TransformedBounds bodyWorldBounds =
+                TransformBounds(lanternBody.asset, body);
+            const TransformedBounds ringWorldBounds =
+                TransformBounds(lanternRing.asset, ring);
             const TransformedBounds chestLocalBounds =
                 TransformBounds(chestBase.asset, Translation(0.0f, 0.0f, 0.0f));
             const auto& camera = cameras[checkpoint];
@@ -669,19 +672,22 @@ int main()
                       : "full ring and body bounds fit checkpoint 115's exact raygen frustum");
             Check(Near(flameOrigin[0], -12.2401924f) && Near(flameOrigin[2], -15.27f) &&
                       Near(lightOrigin[0], -12.2401924f) && Near(lightOrigin[2], -15.27f) &&
-                      Near(flameOrigin[1], 1.28f - 0.545f * value) &&
-                      Near(lightOrigin[1], 1.28f - 0.515f * value) &&
+                      Near(flameOrigin[1], horde::vulkan::raytracing::kRouteFloorWorldY + 1.28f - 0.545f * value) &&
+                      Near(lightOrigin[1], horde::vulkan::raytracing::kRouteFloorWorldY + 1.28f - 0.515f * value) &&
                       Near(lightOrigin[1] - flameOrigin[1], 0.030f * value),
                   checkpoint == 0u
                       ? "checkpoint 114 flame and light origins exactly compose at 0.90 scale"
-                      : "checkpoint 115 flame and light origins exactly compose at 1.05 scale");
+                      : "checkpoint 115 flame and light origins exactly compose at 0.90 scale");
             Check(BoundsSeparatedBy(bodyLocalBounds, chestLocalBounds, 0.002f) &&
                       BoundsSeparatedBy(ringLocalBounds, chestLocalBounds, 0.002f) &&
                       BoundsSeparatedBy(bodyLocalBounds, lidLocalBounds, 0.025f) &&
                       BoundsSeparatedBy(ringLocalBounds, lidLocalBounds, 0.025f) &&
+                      BoundsSeparatedBy(bodyWorldBounds, chestWorldBounds, 0.002f) &&
+                      BoundsSeparatedBy(ringWorldBounds, chestWorldBounds, 0.002f) &&
+                      Near(bodyWorldBounds.minimum[1] - chestWorldBounds.maximum[1], 0.0225f) &&
                       bodyLocalBounds.minimum[1] >= chestLocalBounds.maximum[1] + 0.002f &&
                       bodyLocalBounds.minimum[1] <= chestLocalBounds.maximum[1] + 0.035f &&
-                      bodyLocalBounds.minimum[2] >= lidLocalBounds.maximum[2] + 0.15f,
+                      bodyLocalBounds.minimum[2] - lidLocalBounds.maximum[2] > 0.177f,
                   checkpoint == 0u
                       ? "checkpoint 114 full transformed bounds reveal the lantern immediately above the floor-contact chest with open-lid clearance"
                       : "checkpoint 115 reuses the exact nonintersecting Task 8 reward reveal transform");
