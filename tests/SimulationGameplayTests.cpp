@@ -547,6 +547,7 @@ int main()
     std::uint64_t lichAttackCommand = 0u;
     std::size_t lichHitEventCount = 0u;
     std::size_t lichDefeatedEventCount = 0u;
+    std::size_t chestUnlockedEventCount = 0u;
     bool lichDefeatIdentityAndOrderValid = true;
     for (int frame = 0; frame < 1200 && lichDefeatFeedback.Snapshot().lich.health > 0; ++frame)
     {
@@ -578,14 +579,34 @@ int main()
                     hasPrevious && previousType == GameplayEventType::EnemyHit &&
                     event.source == EntityId::Player && event.target == EntityId::Lich;
             }
+            if (event.type == GameplayEventType::ChestUnlocked)
+            {
+                ++chestUnlockedEventCount;
+                lichDefeatIdentityAndOrderValid = lichDefeatIdentityAndOrderValid &&
+                    hasPrevious && previousType == GameplayEventType::LichDefeated &&
+                    event.source == EntityId::Lich && event.target == EntityId::RewardChest;
+            }
             previousType = event.type;
             hasPrevious = true;
         }
         lichDefeatFeedback.ClearEvents();
     }
+    for (int frame = 0; frame < 60; ++frame)
+    {
+        lichDefeatFeedback.AdvanceFrame(lichDefeatInput, 1.0 / 60.0);
+        for (const GameplayEvent& event : lichDefeatFeedback.Events().Events())
+        {
+            if (event.type == GameplayEventType::LichDefeated) ++lichDefeatedEventCount;
+            if (event.type == GameplayEventType::ChestUnlocked) ++chestUnlockedEventCount;
+        }
+        lichDefeatFeedback.ClearEvents();
+    }
     check(lichDefeatFeedback.Snapshot().lich.health == 0 && lichHitEventCount == 3u &&
-          lichDefeatedEventCount == 1u && lichDefeatIdentityAndOrderValid,
-          "three accepted active-window hits must emit one ordered entity-aware lich defeat");
+          lichDefeatedEventCount == 1u && chestUnlockedEventCount == 1u &&
+          lichDefeatFeedback.Snapshot().chestReward.phase ==
+              horde::gameplay::interactions::ChestRewardPhase::ClosedUnlocked &&
+          lichDefeatIdentityAndOrderValid,
+          "three accepted active-window hits must emit one ordered lich defeat and chest unlock");
 
     GameSimulation retry;
     InputSnapshot finaleInput;

@@ -1,6 +1,7 @@
 #include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/items/HeldLightState.h"
 #include "gameplay/items/HeldItemState.h"
+#include "gameplay/interactions/InteractionState.h"
 #include "gameplay/simulation/GameSimulation.h"
 #include "vulkan/raytracing/HeldItemRenderSlot.h"
 #include "vulkan/raytracing/HeldItemBlasMeasurements.h"
@@ -445,6 +446,43 @@ void TestSharedKinematicsOwnsWallDepthHandsAndSwordPose()
           "torch lowering and sword parry must share the authored hand-target evaluator");
 }
 
+void TestRewardLanternHighLowUsesSharedLeftArmTarget()
+{
+    using namespace horde::gameplay::interactions;
+    horde::gameplay::items::HeldItemKinematicsInput input{};
+    input.cameraX = -11.0f;
+    input.cameraZ = -15.2f;
+    input.cameraYawRadians = -1.57079632679f;
+    input.torchFailure.heldByPlayer = false;
+    input.torchFailure.leftArmLowerBlend = 1.0f;
+    input.interaction.heldLightKind = HeldLightKind::RewardLantern;
+    input.interaction.heldLightPose = HeldLightPose::High;
+    input.interaction.heldLightPoseProgress = 1.0f;
+    const auto high = horde::gameplay::items::EvaluateHeldItemKinematics(input);
+
+    input.interaction.heldLightPose = HeldLightPose::Low;
+    const auto low = horde::gameplay::items::EvaluateHeldItemKinematics(input);
+    input.interaction.heldLightPose = HeldLightPose::TransitioningToLow;
+    input.interaction.heldLightPoseProgress = 0.5f;
+    const auto midpoint = horde::gameplay::items::EvaluateHeldItemKinematics(input);
+
+    Check(high.leftHandLocal[0] < -0.15f && high.leftHandLocal[0] > -0.45f &&
+              low.leftHandLocal[0] < -0.15f && low.leftHandLocal[0] > -0.45f,
+          "reward high/low targets must preserve the accepted inward phone-arm placement");
+    Check(low.leftHandLocal[1] < high.leftHandLocal[1] - 0.22f &&
+              low.leftHandLocal[1] > -0.82f,
+          "reward low carry must visibly lower the real left arm without using the failed-torch pose");
+    for (std::size_t axis = 0u; axis < midpoint.leftHandLocal.size(); ++axis)
+    {
+        Check(Near(midpoint.leftHandLocal[axis],
+                   0.5f * (high.leftHandLocal[axis] + low.leftHandLocal[axis]), 0.0002f),
+              "the 0.65 second high/low transition must remain continuous in shared kinematics");
+    }
+    Check(Near(high.heldPropDepth, low.heldPropDepth) &&
+              Near(low.leftHandLocal[2], low.heldPropDepth),
+          "high/low carry must share the existing wall-retracted depth contract");
+}
+
 void TestProductionSwordAssetMeetsGenericSocketAndPbrBudget()
 {
     const std::filesystem::path root = HORDE_RT_SOURCE_DIR;
@@ -610,6 +648,7 @@ int main()
     TestFlameAndLightSocketsFollowTheComposedItem();
     TestSimulationOwnsResetAndCheckpointParentState();
     TestSharedKinematicsOwnsWallDepthHandsAndSwordPose();
+    TestRewardLanternHighLowUsesSharedLeftArmTarget();
     TestProductionSwordAssetMeetsGenericSocketAndPbrBudget();
     TestProductionTorchAssetMeetsGenericSocketAndPbrBudget();
     TestProductionAssetsShareOneGenericStaticSlot();

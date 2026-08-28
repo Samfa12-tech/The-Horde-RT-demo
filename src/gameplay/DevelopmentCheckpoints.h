@@ -14,6 +14,15 @@ enum class DevelopmentCombatPose : std::uint8_t
     UpwardSliceActive,
 };
 
+enum class DevelopmentRewardPose : std::uint8_t
+{
+    None,
+    HeldHigh,
+    HeldLow,
+    GlassTransmission,
+    MotionExtreme,
+};
+
 struct DevelopmentCheckpoint
 {
     std::int32_t id;
@@ -30,9 +39,10 @@ struct DevelopmentCheckpoint
     float glassAttenuationDistance = 2.4f;
     bool usesProductionRewardProps = false;
     bool productionLanternGlassOnly = false;
+    DevelopmentRewardPose rewardPose = DevelopmentRewardPose::None;
 };
 
-inline constexpr std::array<DevelopmentCheckpoint, 16u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 20u> kDevelopmentCheckpoints{{
     {100, "pbr-sword-closeup", 0, 0.0f, 1.85f, 0.0f, -0.18f},
     {101, "pbr-torch-fire", 0, 0.0f, 1.85f, 0.0f, -0.14f},
     {102, "player-body-grips", 0, 0.0f, 1.85f, 0.0f, -0.32f},
@@ -60,6 +70,18 @@ inline constexpr std::array<DevelopmentCheckpoint, 16u> kDevelopmentCheckpoints{
     {115, "lantern-glass-production", 5, -10.65f, -15.20f, -1.57079632679f, -0.35f,
      DevelopmentCombatPose::Rest, false, 1.0f, {{0.72f, 0.90f, 1.0f}}, 2.4f,
      true, true},
+    {116, "lantern-held-high", 5, -10.65f, -15.20f, -1.57079632679f, -0.30f,
+     DevelopmentCombatPose::Rest, false, 1.0f, {{0.72f, 0.90f, 1.0f}}, 2.4f,
+     true, false, DevelopmentRewardPose::HeldHigh},
+    {117, "lantern-held-low", 5, -10.65f, -15.20f, -1.57079632679f, -0.30f,
+     DevelopmentCombatPose::Rest, false, 1.0f, {{0.72f, 0.90f, 1.0f}}, 2.4f,
+     true, false, DevelopmentRewardPose::HeldLow},
+    {118, "lantern-glass-transmission", 5, -10.65f, -15.20f, -1.57079632679f, -0.30f,
+     DevelopmentCombatPose::Rest, false, 1.0f, {{0.72f, 0.90f, 1.0f}}, 2.4f,
+     true, false, DevelopmentRewardPose::GlassTransmission},
+    {119, "lantern-motion-extreme", 5, -10.65f, -15.20f, -1.57079632679f, -0.30f,
+     DevelopmentCombatPose::Rest, false, 1.0f, {{0.72f, 0.90f, 1.0f}}, 2.4f,
+     true, false, DevelopmentRewardPose::MotionExtreme},
 }};
 
 constexpr const DevelopmentCheckpoint* FindDevelopmentCheckpoint(std::string_view name)

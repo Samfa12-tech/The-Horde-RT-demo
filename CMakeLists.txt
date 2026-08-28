@@ -34,7 +34,7 @@ set(HORDE_RT_SOURCE_FILES)
 foreach(source IN LISTS HORDE_RT_CORE_RELATIVE_SOURCES)
     list(APPEND HORDE_RT_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/${source}")
 endforeach()
-list(FILTER HORDE_RT_SOURCE_FILES EXCLUDE REGEX "/gameplay/(simulation/GameSimulation|animation/(PlayerAnimationState|PlayerIkTargets)|effects/FireEmitterState|interactions/(InteractionState|ChestRewardSequence|FinaleSequence)|items/(HeldItemState|HeldItemKinematics|HeldLightState))\\.cpp$")
+list(FILTER HORDE_RT_SOURCE_FILES EXCLUDE REGEX "/gameplay/(simulation/GameSimulation|animation/(PlayerAnimationState|PlayerIkTargets)|effects/FireEmitterState|interactions/(InteractionState|ChestRewardSequence|FinaleSequence|LanternPendulum)|items/(HeldItemState|HeldItemKinematics|HeldLightState))\\.cpp$")
 
 add_library(horde_gameplay_simulation STATIC
     src/gameplay/simulation/GameSimulation.cpp
@@ -44,6 +44,7 @@ add_library(horde_gameplay_simulation STATIC
     src/gameplay/interactions/InteractionState.cpp
     src/gameplay/interactions/ChestRewardSequence.cpp
     src/gameplay/interactions/FinaleSequence.cpp
+    src/gameplay/interactions/LanternPendulum.cpp
     src/gameplay/items/HeldItemState.cpp
     src/gameplay/items/HeldItemKinematics.cpp
     src/gameplay/items/HeldLightState.cpp
@@ -261,6 +262,11 @@ if(BUILD_TESTING)
     target_include_directories(horde_rt_lantern_reward_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_link_libraries(horde_rt_lantern_reward_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_lantern_reward_tests COMMAND horde_rt_lantern_reward_tests)
+
+    add_executable(horde_rt_lantern_pendulum_tests tests/LanternPendulumTests.cpp)
+    target_include_directories(horde_rt_lantern_pendulum_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(horde_rt_lantern_pendulum_tests PRIVATE horde_gameplay_simulation)
+    add_test(NAME horde_rt_lantern_pendulum_tests COMMAND horde_rt_lantern_pendulum_tests)
 
     add_executable(horde_rt_input_mailbox_stress tests/InputMailboxStress.cpp)
     target_include_directories(horde_rt_input_mailbox_stress PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)

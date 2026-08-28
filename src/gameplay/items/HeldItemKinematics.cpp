@@ -246,8 +246,33 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
     const float torchBob = std::abs(std::sin(input.walkTime * 6.2f)) * 0.025f * movement;
     const std::array<float, 3u> heldLeftHand{{
         -0.24f - torchSway, -0.40f + torchBob, heldPropDepth}};
+    const std::array<float, 3u> rewardLowLeftHand{{
+        -0.30f - torchSway * 0.35f,
+        -0.70f + torchBob * 0.25f,
+        heldPropDepth}};
     constexpr std::array<float, 3u> loweredLeftHand{{-0.36f, -0.92f, 0.27f}};
-    const float lowerBlend = std::clamp(input.torchFailure.leftArmLowerBlend, 0.0f, 1.0f);
+    float lowerBlend = std::clamp(input.torchFailure.leftArmLowerBlend, 0.0f, 1.0f);
+    if (input.interaction.heldLightKind ==
+        horde::gameplay::interactions::HeldLightKind::RewardLantern)
+    {
+        using horde::gameplay::interactions::HeldLightPose;
+        switch (input.interaction.heldLightPose)
+        {
+        case HeldLightPose::Low:
+            lowerBlend = 1.0f;
+            break;
+        case HeldLightPose::TransitioningToLow:
+            lowerBlend = std::clamp(input.interaction.heldLightPoseProgress, 0.0f, 1.0f);
+            break;
+        case HeldLightPose::TransitioningToHigh:
+            lowerBlend = 1.0f - std::clamp(
+                input.interaction.heldLightPoseProgress, 0.0f, 1.0f);
+            break;
+        default:
+            lowerBlend = 0.0f;
+            break;
+        }
+    }
     const HeldSwordPose sword = EvaluateHeldSwordPose(
         input.playerCombat, input.swordSwingRadians, heldPropDepth);
 
@@ -262,8 +287,12 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
         0.39f + lowerBodyPose.leftStride * 0.018f}};
     for (std::size_t axis = 0u; axis < result.leftHandLocal.size(); ++axis)
     {
+        const auto& lowTarget = input.interaction.heldLightKind ==
+            horde::gameplay::interactions::HeldLightKind::RewardLantern
+            ? rewardLowLeftHand
+            : loweredLeftHand;
         result.leftHandLocal[axis] = heldLeftHand[axis] +
-            (loweredLeftHand[axis] - heldLeftHand[axis]) * lowerBlend;
+            (lowTarget[axis] - heldLeftHand[axis]) * lowerBlend;
     }
     result.rightHandLocal = sword.rightHandLocal;
     result.heldPropDepth = heldPropDepth;
@@ -367,7 +396,8 @@ bool ResolveHeldItemsFixedStep(HeldItemStates& items,
         input.walkAmount,
         input.torchFailure,
         input.playerCombat,
-        input.swordSwingRadians});
+        input.swordSwingRadians,
+        input.interaction});
 
     constexpr Vec3 worldUp{{0.0f, 1.0f, 0.0f}};
     const float pitch = std::clamp(input.playerPitchRadians, -0.32f, 0.28f);
@@ -387,6 +417,7 @@ bool ResolveHeldItemsFixedStep(HeldItemStates& items,
     const Vec3 rightHand = toWorld(state.kinematics.rightHandLocal);
     const HeldItemTransform worldFromLeftHand = WorldFromAxes(
         viewRight, viewUp, Scale(viewForward, -1.0f), leftHand);
+    state.worldFromLeftHand = worldFromLeftHand;
     HeldItemTransform heldWorldFromTorch{};
     if (!ComposeWorldFromItem(worldFromLeftHand,
                               OriginalTorchGripSocketTransform(),

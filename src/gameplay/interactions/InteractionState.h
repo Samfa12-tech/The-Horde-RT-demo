@@ -2,6 +2,8 @@
 
 #include <cstdint>
 
+#include "gameplay/ShowcaseRoute.h"
+
 namespace horde::gameplay::interactions
 {
 
@@ -42,7 +44,9 @@ struct InteractionState
     bool operator==(const InteractionState&) const = default;
 };
 
-inline constexpr InteractionPosition kRewardChestInteractionPosition{-12.0f, -15.20f};
+inline constexpr InteractionPosition kRewardChestInteractionPosition{
+    horde::gameplay::kRewardChestRoutePosition.x,
+    horde::gameplay::kRewardChestRoutePosition.z};
 inline constexpr float kInteractionMaximumRangeMetres = 1.35f;
 inline constexpr float kInteractionFacingMaximumDegrees = 55.0f;
 inline constexpr float kHeldLightPoseTransitionSeconds = 0.65f;

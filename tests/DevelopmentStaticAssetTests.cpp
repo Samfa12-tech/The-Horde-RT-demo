@@ -37,8 +37,8 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 16u,
-          "sixteen isolated render-development checkpoints are exposed");
+    Check(kDevelopmentCheckpoints.size() == 20u,
+          "twenty isolated render-development checkpoints are exposed");
     const DevelopmentCheckpoint* checkpoint = FindDevelopmentCheckpoint("pbr-sword-closeup");
     Check(checkpoint != nullptr && checkpoint->id == 100 && checkpoint->baseShowcaseCheckpointId == 0 &&
               checkpoint->name == std::string_view("pbr-sword-closeup") &&
@@ -119,6 +119,21 @@ int main()
               productionGlass->cameraX == -10.65f &&
               productionGlass->pitch == -0.35f,
           "production lantern glass has a stable full-bounds close inspection route");
+    const DevelopmentCheckpoint* heldHigh = FindDevelopmentCheckpoint("lantern-held-high");
+    const DevelopmentCheckpoint* heldLow = FindDevelopmentCheckpoint("lantern-held-low");
+    const DevelopmentCheckpoint* glassTransmission =
+        FindDevelopmentCheckpoint("lantern-glass-transmission");
+    const DevelopmentCheckpoint* motionExtreme =
+        FindDevelopmentCheckpoint("lantern-motion-extreme");
+    Check(heldHigh != nullptr && heldHigh->id == 116 &&
+              heldHigh->rewardPose == DevelopmentRewardPose::HeldHigh &&
+              heldLow != nullptr && heldLow->id == 117 &&
+              heldLow->rewardPose == DevelopmentRewardPose::HeldLow &&
+              glassTransmission != nullptr && glassTransmission->id == 118 &&
+              glassTransmission->rewardPose == DevelopmentRewardPose::GlassTransmission &&
+              motionExtreme != nullptr && motionExtreme->id == 119 &&
+              motionExtreme->rewardPose == DevelopmentRewardPose::MotionExtreme,
+          "Task 8 held/glass/extreme checkpoints append stable IDs 116 through 119");
     horde::gameplay::simulation::GameSimulation stagedDownward;
     horde::gameplay::simulation::GameSimulation stagedUpward;
     DevelopmentCheckpointStageEvidence downwardEvidence{};
@@ -139,6 +154,32 @@ int main()
               upwardEvidence.consumedAttackEdges == 2u &&
               upwardEvidence.playerSwingEvents == 2u && stagedUpward.Events().Empty(),
           "upward capture must stage two exact shared swings before freezing feedback");
+    horde::gameplay::simulation::GameSimulation stagedHigh;
+    horde::gameplay::simulation::GameSimulation stagedLow;
+    horde::gameplay::simulation::GameSimulation stagedGlassTransmission;
+    horde::gameplay::simulation::GameSimulation stagedMotionExtreme;
+    Check(heldHigh != nullptr && StageDevelopmentCheckpointSimulation(stagedHigh, *heldHigh) &&
+              stagedHigh.Snapshot().interaction.heldLightPose ==
+                  interactions::HeldLightPose::High &&
+              stagedHigh.Snapshot().lanternPendulum.forwardAngleRadians == 0.0f,
+          "held-high checkpoint imports a frozen rest pendulum and real high carry state");
+    Check(heldLow != nullptr && StageDevelopmentCheckpointSimulation(stagedLow, *heldLow) &&
+              stagedLow.Snapshot().interaction.heldLightPose ==
+                  interactions::HeldLightPose::Low &&
+              stagedLow.Snapshot().lanternPendulum.strafeAngularVelocity == 0.0f,
+          "held-low checkpoint imports a frozen rest pendulum and real low carry state");
+    Check(glassTransmission != nullptr &&
+              StageDevelopmentCheckpointSimulation(stagedGlassTransmission,
+                                                   *glassTransmission) &&
+              stagedGlassTransmission.Snapshot().lanternPendulum.forwardAngleRadians == 0.30f &&
+              stagedGlassTransmission.Snapshot().lanternPendulum.strafeAngleRadians == -0.16f,
+          "glass-transmission checkpoint freezes an exact angled shared body transform");
+    Check(motionExtreme != nullptr &&
+              StageDevelopmentCheckpointSimulation(stagedMotionExtreme, *motionExtreme) &&
+              stagedMotionExtreme.Snapshot().lanternPendulum.forwardAngleRadians == 0.82f &&
+              stagedMotionExtreme.Snapshot().lanternPendulum.strafeAngularVelocity == -1.60f &&
+              stagedMotionExtreme.Snapshot().lanternPendulum.previousPivotVelocity[0] == 3.8f,
+          "motion-extreme checkpoint preserves exact imported angles, velocities, and hinge history");
     Check(FindDevelopmentCheckpoint("opening") == nullptr,
           "release checkpoint names cannot resolve through the development lookup");
 

@@ -53,6 +53,7 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
     combatSnapshot_ = swordCombat_.Snapshot();
     torchFailureSnapshot_ = torchFailure_.Snapshot();
     ResolveHeldItems();
+    lanternPendulum_.Reset(heldItemFixedStepState_.worldFromLeftHand);
     ResolvePlayerAnimation(0.0f);
     ResolveFireEmitters(0.0f);
     RefreshSnapshot(lastInput_);
@@ -78,6 +79,17 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& input,
     }
     if (input.paused)
     {
+        lastConsumedAttackSequence_ += pendingAttackCommands_;
+        pendingAttackCommands_ = 0u;
+        lastConsumedParrySequence_ += pendingParryCommands_;
+        pendingParryCommands_ = 0u;
+        lastConsumedDodgeSequence_ += pendingDodgeCommands_;
+        pendingDodgeCommands_ = 0u;
+        lastConsumedInteractSequence_ += pendingInteractCommands_;
+        pendingInteractCommands_ = 0u;
+        lastConsumedToggleHeldLightPoseSequence_ += pendingToggleHeldLightPoseCommands_;
+        pendingToggleHeldLightPoseCommands_ = 0u;
+        dodgeRemainingSeconds_ = 0.0f;
         walkVisualAmount_ = 0.0f;
         snapshot_.playerTravelledThisTick = 0.0f;
         playerFootsteps_.Reset();
@@ -85,6 +97,7 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& input,
         {
             cadence.Reset();
         }
+        lanternPendulum_.Reset(heldItemFixedStepState_.worldFromLeftHand);
     }
     const std::uint32_t ticks = fixedStepRunner_.Advance(
         frameDeltaSeconds,
@@ -151,6 +164,16 @@ void GameSimulation::StepFixed(const InputSnapshot& input,
         UpdateEncounters(input, fixedDeltaSeconds);
         UpdateRewardSequence(fixedDeltaSeconds, true);
         ResolveHeldItems();
+        if (interactionState_.heldLightKind ==
+            horde::gameplay::interactions::HeldLightKind::RewardLantern)
+        {
+            lanternPendulum_.StepFixed(
+                heldItemFixedStepState_.worldFromLeftHand, fixedDeltaSeconds);
+        }
+        else
+        {
+            lanternPendulum_.Reset(heldItemFixedStepState_.worldFromLeftHand);
+        }
         ResolvePlayerAnimation(fixedDeltaSeconds);
         ResolveFireEmitters(fixedDeltaSeconds);
     }
@@ -163,6 +186,7 @@ void GameSimulation::StepFixed(const InputSnapshot& input,
         {
             cadence.Reset();
         }
+        lanternPendulum_.Reset(heldItemFixedStepState_.worldFromLeftHand);
     }
 
     if (wasAlive && playerVitals_.Snapshot().phase != PlayerLifePhase::Alive)
@@ -204,6 +228,7 @@ void GameSimulation::ResetRoute()
                                            playerYawRadians_);
     playerAnimationState_.Reset();
     ResolveHeldItems();
+    lanternPendulum_.Reset(heldItemFixedStepState_.worldFromLeftHand);
     ResolvePlayerAnimation(0.0f);
     horde::gameplay::effects::ResetFireEmitter(fireEmitters_[0]);
     ResolveFireEmitters(0.0f);
@@ -223,7 +248,8 @@ bool GameSimulation::ApplyShowcaseCheckpoint(std::int32_t checkpointId, bool cou
 void GameSimulation::ImportRewardCheckpoint(
     const horde::gameplay::interactions::ChestRewardSnapshot& chestReward,
     const horde::gameplay::interactions::InteractionState& interaction,
-    const horde::gameplay::interactions::FinaleSequenceSnapshot& finale)
+    const horde::gameplay::interactions::FinaleSequenceSnapshot& finale,
+    const horde::gameplay::interactions::LanternPendulumSnapshot* pendulum)
 {
     events_.Clear();
     chestRewardSequence_.Import(chestReward);
@@ -235,6 +261,11 @@ void GameSimulation::ImportRewardCheckpoint(
         finaleSequence_.Snapshot().endingPhase ==
         horde::gameplay::interactions::FinaleEndingPhase::Complete;
     ResolveHeldItems();
+    lanternPendulum_.Reset(heldItemFixedStepState_.worldFromLeftHand);
+    if (pendulum != nullptr)
+    {
+        lanternPendulum_.Import(*pendulum);
+    }
     ResolvePlayerAnimation(0.0f);
     ResolveFireEmitters(0.0f);
     RefreshSnapshot(lastInput_);
@@ -392,6 +423,7 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
     fixedStepRunner_.ResetAccumulator();
     playerAnimationState_.Reset();
     ResolveHeldItems();
+    lanternPendulum_.Reset(heldItemFixedStepState_.worldFromLeftHand);
     ResolvePlayerAnimation(0.0f);
     horde::gameplay::effects::ResetFireEmitter(fireEmitters_[0]);
     ResolveFireEmitters(0.0f);
@@ -412,7 +444,8 @@ void GameSimulation::ResolveHeldItems()
         walkVisualAmount_,
         torchFailureSnapshot_,
         combatSnapshot_.player,
-        combatSnapshot_.swordSwingRadians};
+        combatSnapshot_.swordSwingRadians,
+        interactionState_};
     // Every socket contract is a checked rigid transform. A failure would
     // indicate a source-code contract violation; preserve the last immutable
     // state rather than publishing a renderer-authored fallback.
@@ -489,12 +522,16 @@ void GameSimulation::UpdateRewardSequence(const float deltaSeconds,
 
 void GameSimulation::ResolvePlayerAnimation(const float fixedDeltaSeconds)
 {
+    const float leftArmWeight = interactionState_.heldLightKind ==
+        horde::gameplay::interactions::HeldLightKind::RewardLantern
+        ? 1.0f
+        : 1.0f - std::clamp(torchFailureSnapshot_.leftArmLowerBlend, 0.0f, 1.0f);
     playerAnimationState_.StepFixed(
         {walkVisualAmount_,
          walkTime_,
          combatSnapshot_.player,
          heldItemFixedStepState_.kinematics,
-         1.0f - std::clamp(torchFailureSnapshot_.leftArmLowerBlend, 0.0f, 1.0f)},
+         leftArmWeight},
         fixedDeltaSeconds);
 }
 
@@ -914,6 +951,8 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.interaction = interactionState_;
     snapshot_.chestReward = chestRewardSequence_.Snapshot();
     snapshot_.finale = finaleSequence_.Snapshot();
+    snapshot_.lanternPendulum = lanternPendulum_.Snapshot();
+    snapshot_.rewardLanternWorldFromHinge = heldItemFixedStepState_.worldFromLeftHand;
     snapshot_.torchFailure = torchFailureSnapshot_;
     snapshot_.heldItems = heldItems_;
     snapshot_.heldItemKinematics = heldItemFixedStepState_.kinematics;

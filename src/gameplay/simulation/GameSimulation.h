@@ -13,6 +13,7 @@
 #include "gameplay/interactions/ChestRewardSequence.h"
 #include "gameplay/interactions/FinaleSequence.h"
 #include "gameplay/interactions/InteractionState.h"
+#include "gameplay/interactions/LanternPendulum.h"
 #include "gameplay/simulation/FixedStepRunner.h"
 #include "gameplay/simulation/GameplayEvent.h"
 #include "gameplay/simulation/InputSnapshot.h"
@@ -48,7 +49,8 @@ public:
     void ImportRewardCheckpoint(
         const horde::gameplay::interactions::ChestRewardSnapshot& chestReward,
         const horde::gameplay::interactions::InteractionState& interaction,
-        const horde::gameplay::interactions::FinaleSequenceSnapshot& finale);
+        const horde::gameplay::interactions::FinaleSequenceSnapshot& finale,
+        const horde::gameplay::interactions::LanternPendulumSnapshot* pendulum = nullptr);
     void ResetTiming();
     void ClearEvents();
 
@@ -89,6 +91,7 @@ private:
     horde::gameplay::interactions::ChestRewardSequence chestRewardSequence_{};
     horde::gameplay::interactions::FinaleSequence finaleSequence_{};
     horde::gameplay::interactions::InteractionState interactionState_{};
+    horde::gameplay::interactions::LanternPendulum lanternPendulum_{};
     PlayerVitals playerVitals_{};
     TravelFootstepCadence playerFootsteps_{};
     std::array<PlayerFootstepCadence, kSkeletonEnemyCapacity> enemyFootsteps_{};

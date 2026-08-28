@@ -51,6 +51,7 @@ inline constexpr std::array<RoutePosition, 4> kTorchBayCenters{{
 }};
 inline constexpr RoutePosition kTransmissionThresholdCenter{-29.5f, -15.2f};
 inline constexpr RoutePosition kFinaleCenter{-33.7f, -15.2f};
+inline constexpr RoutePosition kRewardChestRoutePosition{-12.50f, -15.42f};
 
 // Geometry-space bounds. Collision applies the player radius to their union,
 // including radius-safe portals where two rectangles meet edge-to-edge.

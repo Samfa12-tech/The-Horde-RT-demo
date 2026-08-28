@@ -218,7 +218,7 @@ int main()
     pausedInput.commands.interact = 1u;
     pausedInput.commands.toggleHeldLightPose = 1u;
     pausedInput.paused = true;
-    pausedSimulation.StepFixed(pausedInput);
+    pausedSimulation.AdvanceFrame(pausedInput, 1.0 / 60.0);
     pausedInput.paused = false;
     pausedSimulation.StepFixed(pausedInput);
     Check(pausedSimulation.Snapshot().lastConsumedInteractSequence == 1u &&

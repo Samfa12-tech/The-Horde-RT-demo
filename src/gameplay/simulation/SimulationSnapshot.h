@@ -13,6 +13,7 @@
 #include "gameplay/interactions/ChestRewardSequence.h"
 #include "gameplay/interactions/FinaleSequence.h"
 #include "gameplay/interactions/InteractionState.h"
+#include "gameplay/interactions/LanternPendulum.h"
 #include "gameplay/simulation/GameplayEvent.h"
 
 namespace horde::gameplay::simulation
@@ -79,6 +80,8 @@ struct SimulationSnapshot
     horde::gameplay::interactions::InteractionState interaction{};
     horde::gameplay::interactions::ChestRewardSnapshot chestReward{};
     horde::gameplay::interactions::FinaleSequenceSnapshot finale{};
+    horde::gameplay::interactions::LanternPendulumSnapshot lanternPendulum{};
+    horde::gameplay::items::HeldItemTransform rewardLanternWorldFromHinge{};
 
     TorchFailureSnapshot torchFailure{};
     horde::gameplay::items::HeldItemStates heldItems =

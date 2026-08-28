@@ -4,6 +4,7 @@
 #include "gameplay/items/HeldItemState.h"
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/SwordCombat.h"
+#include "gameplay/interactions/InteractionState.h"
 #include "scene/assets/StaticMeshAsset.h"
 
 #include <span>
@@ -25,6 +26,7 @@ struct HeldItemKinematicsInput
     TorchFailureSnapshot torchFailure{};
     PlayerCombatSnapshot playerCombat{};
     float swordSwingRadians = 0.0f;
+    horde::gameplay::interactions::InteractionState interaction{};
 };
 
 struct HeldSwordPose
@@ -60,12 +62,14 @@ struct HeldItemFixedStepInput
     TorchFailureSnapshot torchFailure{};
     PlayerCombatSnapshot playerCombat{};
     float swordSwingRadians = 0.0f;
+    horde::gameplay::interactions::InteractionState interaction{};
 };
 
 struct HeldItemFixedStepState
 {
     HeldItemKinematicsState kinematics{};
     HeldLightState light{};
+    HeldItemTransform worldFromLeftHand{};
 };
 
 struct SwordGripBasisInView

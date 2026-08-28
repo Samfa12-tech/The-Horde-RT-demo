@@ -61,6 +61,45 @@ inline bool StageDevelopmentCheckpointSimulation(
     input.torchLightStrength = 1.8f;
     gameSimulation.StepFixed(input, 0.0f,
                              gameSimulation.Snapshot().inputPublicationSequence + 1u);
+    if (checkpoint.rewardPose != DevelopmentRewardPose::None)
+    {
+        using namespace horde::gameplay::interactions;
+        ChestRewardSnapshot chest;
+        chest.phase = ChestRewardPhase::LanternClaimed;
+        chest.lidOpenProgress = 1.0f;
+        InteractionState interaction;
+        interaction.heldLightKind = HeldLightKind::RewardLantern;
+        interaction.heldLightPose = checkpoint.rewardPose == DevelopmentRewardPose::HeldLow
+            ? HeldLightPose::Low
+            : HeldLightPose::High;
+        interaction.heldLightPoseProgress = 1.0f;
+        FinaleSequenceSnapshot finale;
+        finale.phase = FinaleSequencePhase::RevealingLantern;
+        finale.endingPhase = FinaleEndingPhase::LichFalling;
+        finale.lichDefeated = true;
+        finale.lanternClaimed = true;
+
+        LanternPendulumSnapshot pendulum;
+        const auto& hinge = gameSimulation.Snapshot().rewardLanternWorldFromHinge;
+        pendulum.initialized = true;
+        pendulum.previousPivotPosition = {{hinge[12], hinge[13], hinge[14]}};
+        if (checkpoint.rewardPose == DevelopmentRewardPose::GlassTransmission)
+        {
+            pendulum.forwardAngleRadians = 0.30f;
+            pendulum.strafeAngleRadians = -0.16f;
+        }
+        else if (checkpoint.rewardPose == DevelopmentRewardPose::MotionExtreme)
+        {
+            pendulum.forwardAngleRadians = 0.82f;
+            pendulum.strafeAngleRadians = -0.42f;
+            pendulum.forwardAngularVelocity = 2.40f;
+            pendulum.strafeAngularVelocity = -1.60f;
+            pendulum.previousPivotVelocity = {{3.8f, 0.25f, -2.2f}};
+        }
+        pendulum.worldFromBody = ComposeLanternPendulumBodyTransform(
+            hinge, pendulum.forwardAngleRadians, pendulum.strafeAngleRadians);
+        gameSimulation.ImportRewardCheckpoint(chest, interaction, finale, &pendulum);
+    }
     if (checkpoint.combatPose == DevelopmentCombatPose::Rest)
         return finalize(true);
 
