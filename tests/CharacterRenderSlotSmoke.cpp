@@ -786,6 +786,11 @@ int main()
                       dielectricTransportSource.find(
                           "atomicAdd(rtDielectricDiagnostics.value.primaryClosedVolumeAbsorptionCount") ==
                           std::string::npos &&
+                      dielectricTransportSource.find(
+                          "atomicAdd(rtDielectricDiagnostics.value.primaryCertifiedClosedVolumeRecoveryCount") !=
+                          std::string::npos &&
+                      dielectricTransportSource.find("kRtMaterialFlagCertifiedClosedVolume") !=
+                          std::string::npos &&
                       dielectricTransportSource.find("primaryUnclosedVolumeCount") != std::string::npos &&
                       dielectricTransportSource.find("shadowUnclosedVolumeCount") == std::string::npos &&
                       raygenSource.find("dielectricEffectiveFresnel(") != std::string::npos &&
@@ -815,6 +820,9 @@ int main()
                       raygenSource.find("dielectricBeerLambert(") != std::string::npos &&
                       raygenSource.find("atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);") != std::string::npos &&
                       lightingSource.find("atomicAdd(rtDielectricDiagnostics.value.shadowUnclosedVolumeCount, 1u);") != std::string::npos &&
+                      lightingSource.find(
+                          "atomicAdd(rtDielectricDiagnostics.value.shadowCertifiedClosedVolumeRecoveryCount") !=
+                          std::string::npos &&
                       lightingSource.find("primaryUnclosedVolumeCount") == std::string::npos &&
                       raygenSource.find("if (interfaceCount >= interfaceBudget)") != std::string::npos &&
                       raygenSource.find("lightTransmittance = shadowTransmittanceMask(") != std::string::npos,
@@ -835,6 +843,9 @@ int main()
                       sceneSource.find("productionPaneSecondaryTerminalCount") != std::string::npos &&
                       sceneSource.find("productionPaneSecondarySameMediumCount") != std::string::npos &&
                       sceneSource.find("productionPaneSecondaryDifferentMediumCount") != std::string::npos &&
+                      sceneSource.find("primaryCertifiedClosedVolumeRecoveryCount") != std::string::npos &&
+                      sceneSource.find("shadowCertifiedClosedVolumeRecoveryCount") != std::string::npos &&
+                      sceneSource.find("certifiedClosedVolumeRecoveryReasonMask") != std::string::npos &&
                       windowsSource.find("secondaryDielectricRejectCount") != std::string::npos &&
                       windowsSource.find("unclosedVolumeCount") != std::string::npos &&
                       windowsSource.find("primaryUnclosedVolumeCount") != std::string::npos &&
@@ -864,6 +875,9 @@ int main()
                       windowsSource.find("primaryOpenOpaqueVolumeInstanceMask") != std::string::npos &&
                       windowsSource.find("primaryOpenOpaqueTerminalMaterialMask") != std::string::npos &&
                       windowsSource.find("primaryClosedVolumeAbsorptionCount") != std::string::npos &&
+                      windowsSource.find("primaryCertifiedClosedVolumeRecoveryCount") != std::string::npos &&
+                      windowsSource.find("shadowCertifiedClosedVolumeRecoveryCount") != std::string::npos &&
+                      windowsSource.find("certifiedClosedVolumeRecoveryReasonMask") != std::string::npos &&
                       androidBridgeSource.find("dielectricSecondaryRejectCount") != std::string::npos &&
                       androidBridgeSource.find("dielectricUnclosedVolumeCount") != std::string::npos &&
                       androidBridgeSource.find("dielectricPrimaryUnclosedVolumeCount") != std::string::npos &&
@@ -891,7 +905,10 @@ int main()
                       androidBridgeSource.find("primaryOpenOpaqueTerminalInstanceMask") != std::string::npos &&
                       androidBridgeSource.find("primaryOpenOpaqueVolumeInstanceMask") != std::string::npos &&
                       androidBridgeSource.find("primaryOpenOpaqueTerminalMaterialMask") != std::string::npos &&
-                      androidBridgeSource.find("primaryClosedVolumeAbsorptionCount") != std::string::npos,
+                      androidBridgeSource.find("primaryClosedVolumeAbsorptionCount") != std::string::npos &&
+                      androidBridgeSource.find("primaryCertifiedClosedVolumeRecoveryCount") != std::string::npos &&
+                      androidBridgeSource.find("shadowCertifiedClosedVolumeRecoveryCount") != std::string::npos &&
+                      androidBridgeSource.find("certifiedClosedVolumeRecoveryReasonMask") != std::string::npos,
                       "CPU and platform diagnostics must retain route and production-pane failure attribution");
         ok &= Require(waterPrimary.find("transmittedHit.t += h.t + waterPathLength;") !=
                           std::string::npos &&

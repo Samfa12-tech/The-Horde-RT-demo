@@ -3,6 +3,7 @@
 #include "gameplay/ShowcaseCheckpoints.h"
 #include "vulkan/raytracing/DevelopmentStaticAssetPolicy.h"
 
+#include <cmath>
 #include <filesystem>
 #include <iostream>
 #include <string>
@@ -37,8 +38,8 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 20u,
-          "twenty isolated render-development checkpoints are exposed");
+    Check(kDevelopmentCheckpoints.size() == 32u,
+          "thirty-two isolated render-development and lantern stress checkpoints are exposed");
     const DevelopmentCheckpoint* checkpoint = FindDevelopmentCheckpoint("pbr-sword-closeup");
     Check(checkpoint != nullptr && checkpoint->id == 100 && checkpoint->baseShowcaseCheckpointId == 0 &&
               checkpoint->name == std::string_view("pbr-sword-closeup") &&
@@ -180,6 +181,36 @@ int main()
               stagedMotionExtreme.Snapshot().lanternPendulum.strafeAngularVelocity == -1.60f &&
               stagedMotionExtreme.Snapshot().lanternPendulum.previousPivotVelocity[0] == 3.8f,
           "motion-extreme checkpoint preserves exact imported angles, velocities, and hinge history");
+    std::size_t lanternSweepCount = 0u;
+    bool sweepHasHigh = false;
+    bool sweepHasLow = false;
+    bool sweepHasAlternateCamera = false;
+    for (const DevelopmentCheckpoint& candidate : kDevelopmentCheckpoints)
+    {
+        if (!candidate.name.starts_with("lantern-sweep-")) continue;
+        ++lanternSweepCount;
+        sweepHasHigh = sweepHasHigh ||
+            candidate.rewardPose == DevelopmentRewardPose::HeldHigh;
+        sweepHasLow = sweepHasLow ||
+            candidate.rewardPose == DevelopmentRewardPose::HeldLow;
+        sweepHasAlternateCamera = sweepHasAlternateCamera ||
+            candidate.name.ends_with("alt-camera");
+        const float cone = std::sqrt(
+            candidate.rewardForwardAngleRadians * candidate.rewardForwardAngleRadians +
+            candidate.rewardStrafeAngleRadians * candidate.rewardStrafeAngleRadians);
+        Check(cone <= 0.95994f,
+              "every GPU lantern stress import remains inside the 55-degree hard cone");
+        horde::gameplay::simulation::GameSimulation stagedSweep;
+        Check(StageDevelopmentCheckpointSimulation(stagedSweep, candidate) &&
+                  stagedSweep.Snapshot().lanternPendulum.forwardAngleRadians ==
+                      candidate.rewardForwardAngleRadians &&
+                  stagedSweep.Snapshot().lanternPendulum.strafeAngleRadians ==
+                      candidate.rewardStrafeAngleRadians,
+              "each GPU lantern stress checkpoint imports and freezes its exact authoritative pendulum");
+    }
+    Check(lanternSweepCount == 12u && sweepHasHigh && sweepHasLow &&
+              sweepHasAlternateCamera,
+          "reachable-angle GPU stress covers cone cardinals, hard diagonals, both poses, and alternate cameras");
     Check(FindDevelopmentCheckpoint("opening") == nullptr,
           "release checkpoint names cannot resolve through the development lookup");
 

@@ -79,6 +79,7 @@ struct ShadowHit
     bool hit;
     bool transparent;
     bool thinWall;
+    bool certifiedClosedVolume;
     bool entering;
     float t;
     uint instance;
@@ -97,6 +98,7 @@ ShadowHit traceNearestShadowHit(vec3 origin, vec3 direction,
     result.hit = false;
     result.transparent = false;
     result.thinWall = false;
+    result.certifiedClosedVolume = false;
     result.entering = true;
     result.t = maxDistance;
     result.instance = 0u;
@@ -159,6 +161,8 @@ ShadowHit traceNearestShadowHit(vec3 origin, vec3 direction,
     result.transparent = true;
     result.thinWall =
         (material.materialFlags.x & kRtMaterialFlagThinWall) != 0u;
+    result.certifiedClosedVolume =
+        (material.materialFlags.x & kRtMaterialFlagCertifiedClosedVolume) != 0u;
     result.material = primitiveMetadata.materialIndex;
     result.transmission = transmission;
     result.tint = clamp(material.baseColorFactor.rgb, vec3(0.0), vec3(1.0));
@@ -179,6 +183,7 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
     int interfaceCount = 0;
     uint volumeInstances[kHighShadowVolumes];
     uint volumeMaterials[kHighShadowVolumes];
+    uint volumeMaterialFlags[kHighShadowVolumes];
     float volumeEntryDistances[kHighShadowVolumes];
     vec4 volumeAttenuation[kHighShadowVolumes];
     int volumeDepth = 0;
@@ -228,9 +233,44 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
             return clamp(transmittance, vec3(0.0), vec3(1.0));
         }
         if (!nearest.transparent)
+        {
+            bool everyOpenVolumeCertified = volumeDepth > 0;
+            for (int volumeIndex = 0; volumeIndex < kHighShadowVolumes;
+                 ++volumeIndex)
+            {
+                if (volumeIndex < volumeDepth)
+                    everyOpenVolumeCertified = everyOpenVolumeCertified &&
+                        (volumeMaterialFlags[volumeIndex] &
+                         kRtMaterialFlagCertifiedClosedVolume) != 0u;
+            }
+            if (everyOpenVolumeCertified)
+            {
+                atomicAdd(rtDielectricDiagnostics.value.shadowCertifiedClosedVolumeRecoveryCount,
+                          1u);
+                atomicOr(rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask,
+                         32u);
+            }
             return vec3(0.0);
+        }
         if (interfaceCount >= interfaceBudget)
         {
+            bool everyOpenVolumeCertified = nearest.certifiedClosedVolume;
+            for (int volumeIndex = 0; volumeIndex < kHighShadowVolumes;
+                 ++volumeIndex)
+            {
+                if (volumeIndex < volumeDepth)
+                    everyOpenVolumeCertified = everyOpenVolumeCertified &&
+                        (volumeMaterialFlags[volumeIndex] &
+                         kRtMaterialFlagCertifiedClosedVolume) != 0u;
+            }
+            if (everyOpenVolumeCertified)
+            {
+                atomicAdd(rtDielectricDiagnostics.value.shadowCertifiedClosedVolumeRecoveryCount,
+                          1u);
+                atomicOr(rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask,
+                         64u);
+                return vec3(0.0);
+            }
             atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);
             if (nearest.instance == 8u ||
                 (volumeDepth > 0 && volumeInstances[volumeDepth - 1] == 8u))
@@ -248,6 +288,23 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
         {
             if (volumeDepth >= volumeBudget)
             {
+                bool everyOpenVolumeCertified = nearest.certifiedClosedVolume;
+                for (int volumeIndex = 0; volumeIndex < kHighShadowVolumes;
+                     ++volumeIndex)
+                {
+                    if (volumeIndex < volumeDepth)
+                        everyOpenVolumeCertified = everyOpenVolumeCertified &&
+                            (volumeMaterialFlags[volumeIndex] &
+                             kRtMaterialFlagCertifiedClosedVolume) != 0u;
+                }
+                if (everyOpenVolumeCertified)
+                {
+                    atomicAdd(rtDielectricDiagnostics.value.shadowCertifiedClosedVolumeRecoveryCount,
+                              1u);
+                    atomicOr(rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask,
+                             128u);
+                    return vec3(0.0);
+                }
                 atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);
                 if (nearest.instance == 8u)
                     atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
@@ -256,6 +313,8 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
             observedClosedVolumeEntry = true;
             volumeInstances[volumeDepth] = nearest.instance;
             volumeMaterials[volumeDepth] = nearest.material;
+            volumeMaterialFlags[volumeDepth] = nearest.certifiedClosedVolume
+                ? kRtMaterialFlagCertifiedClosedVolume : 0u;
             volumeEntryDistances[volumeDepth] = absoluteDistance;
             volumeAttenuation[volumeDepth] = vec4(
                 nearest.attenuationColor, nearest.attenuationDistance);
@@ -280,6 +339,26 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
                 volumeInstances[volumeDepth - 1] != nearest.instance ||
                 volumeMaterials[volumeDepth - 1] != nearest.material)
             {
+                bool everyOpenVolumeCertified = nearest.certifiedClosedVolume;
+                for (int volumeIndex = 0; volumeIndex < kHighShadowVolumes;
+                     ++volumeIndex)
+                {
+                    if (volumeIndex < volumeDepth)
+                        everyOpenVolumeCertified = everyOpenVolumeCertified &&
+                            (volumeMaterialFlags[volumeIndex] &
+                             kRtMaterialFlagCertifiedClosedVolume) != 0u;
+                }
+                if (everyOpenVolumeCertified)
+                {
+                    // The certified manifold cannot leak energy through a
+                    // mismatched grazing edge. Block the sample and count the
+                    // finite-precision recovery without hiding invalid assets.
+                    atomicAdd(rtDielectricDiagnostics.value.shadowCertifiedClosedVolumeRecoveryCount,
+                              1u);
+                    atomicOr(rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask,
+                             256u);
+                    return vec3(0.0);
+                }
                 atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);
                 atomicAdd(rtDielectricDiagnostics.value.shadowUnclosedVolumeCount, 1u);
                 if (nearest.instance == 8u ||
@@ -306,6 +385,22 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
         currentOrigin = hitPosition + direction * epsilon;
         travelledDistance = absoluteDistance + epsilon;
         remainingDistance = max(maxDistance - travelledDistance, 0.0);
+    }
+    bool everyOpenVolumeCertified = volumeDepth > 0;
+    for (int volumeIndex = 0; volumeIndex < kHighShadowVolumes; ++volumeIndex)
+    {
+        if (volumeIndex < volumeDepth)
+            everyOpenVolumeCertified = everyOpenVolumeCertified &&
+                (volumeMaterialFlags[volumeIndex] &
+                 kRtMaterialFlagCertifiedClosedVolume) != 0u;
+    }
+    if (everyOpenVolumeCertified)
+    {
+        atomicAdd(rtDielectricDiagnostics.value.shadowCertifiedClosedVolumeRecoveryCount,
+                  1u);
+        atomicOr(rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask,
+                 512u);
+        return vec3(0.0);
     }
     atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);
     if (volumeDepth > 0 && volumeInstances[volumeDepth - 1] == 8u)

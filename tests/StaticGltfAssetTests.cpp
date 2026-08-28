@@ -465,6 +465,9 @@ void TestThickDielectricTopology(const std::filesystem::path& temporaryRoot,
         temporaryRoot, "closed-dielectric-lod0.runtime.glb", false, false);
     Check(horde::scene::assets::StaticMeshAsset::Load(closed, manifest, asset, diagnostic),
           std::string("closed manifold thick dielectric loads: ") + diagnostic);
+    Check(asset.materials.size() == 1u &&
+              (asset.materials[0].flags & 1024u) != 0u,
+          "validated outward closed thick dielectric receives the runtime certification flag");
 
     const auto open = WriteClosedDielectricGlb(
         temporaryRoot, "open-dielectric-lod0.runtime.glb", true, false);

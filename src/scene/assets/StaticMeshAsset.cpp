@@ -452,13 +452,14 @@ std::string DielectricComponentSources(
     return stream.str();
 }
 
-bool ValidateThickDielectricTopology(const StaticMeshAsset& asset,
+bool ValidateThickDielectricTopology(StaticMeshAsset& asset,
                                      std::string& diagnostic)
 {
     constexpr std::uint32_t thinWallFlag = 512u;
+    constexpr std::uint32_t certifiedClosedVolumeFlag = 1024u;
     for (std::size_t materialIndex = 0u; materialIndex < asset.materials.size(); ++materialIndex)
     {
-        const StaticMaterial& material = asset.materials[materialIndex];
+        StaticMaterial& material = asset.materials[materialIndex];
         if (material.transmissionFactor <= 0.0f || material.thicknessFactor <= 0.0f ||
             (material.flags & thinWallFlag) != 0u)
             continue;
@@ -698,6 +699,10 @@ bool ValidateThickDielectricTopology(const StaticMeshAsset& asset,
                 return false;
             }
         }
+        // Certification is loader-owned and can only be appended after every
+        // component using this thick material passed closed-manifold, winding,
+        // and finite weld-domain validation above.
+        material.flags |= certifiedClosedVolumeFlag;
     }
     return true;
 }

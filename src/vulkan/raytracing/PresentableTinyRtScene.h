@@ -241,6 +241,18 @@ public:
     {
         return primaryClosedVolumeAbsorptionCount_;
     }
+    std::uint32_t PrimaryCertifiedClosedVolumeRecoveryCount() const
+    {
+        return primaryCertifiedClosedVolumeRecoveryCount_;
+    }
+    std::uint32_t ShadowCertifiedClosedVolumeRecoveryCount() const
+    {
+        return shadowCertifiedClosedVolumeRecoveryCount_;
+    }
+    std::uint32_t CertifiedClosedVolumeRecoveryReasonMask() const
+    {
+        return certifiedClosedVolumeRecoveryReasonMask_;
+    }
     bool GenericStaticAssetEnabled() const { return genericStaticAssetEnabled_; }
     const RtStaticMeshMeasurements& StaticMeshMeasurements() const { return staticMeshSlot_.Measurements(); }
     VkDeviceSize StaticMeshBlasBytes() const { return staticMeshBlasBytes_; }
@@ -441,6 +453,9 @@ private:
     std::uint32_t primaryOpenOpaqueVolumeInstanceMask_ = 0u;
     std::uint32_t primaryOpenOpaqueTerminalMaterialMask_ = 0u;
     std::uint32_t primaryClosedVolumeAbsorptionCount_ = 0u;
+    std::uint32_t primaryCertifiedClosedVolumeRecoveryCount_ = 0u;
+    std::uint32_t shadowCertifiedClosedVolumeRecoveryCount_ = 0u;
+    std::uint32_t certifiedClosedVolumeRecoveryReasonMask_ = 0u;
     std::string developmentStaticAssetDirectory_;
     std::string staticTextureDirectory_;
     RtStaticMeshSlot staticMeshSlot_;

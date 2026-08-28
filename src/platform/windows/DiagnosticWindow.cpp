@@ -3871,6 +3871,12 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
              << context.rtScene.PrimaryOpenOpaqueTerminalMaterialMask()
              << ", \"primaryClosedVolumeAbsorptionCount\": "
              << context.rtScene.PrimaryClosedVolumeAbsorptionCount()
+             << ", \"primaryCertifiedClosedVolumeRecoveryCount\": "
+             << context.rtScene.PrimaryCertifiedClosedVolumeRecoveryCount()
+             << ", \"shadowCertifiedClosedVolumeRecoveryCount\": "
+             << context.rtScene.ShadowCertifiedClosedVolumeRecoveryCount()
+             << ", \"certifiedClosedVolumeRecoveryReasonMask\": "
+             << context.rtScene.CertifiedClosedVolumeRecoveryReasonMask()
              << "},\n"
              << "  \"error\": " << (error.empty() ? "null" : "\"" + JsonEscape(error) + "\"") << ",\n"
              << "  \"captures\": [\n";

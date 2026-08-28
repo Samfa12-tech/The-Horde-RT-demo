@@ -87,19 +87,11 @@ inline bool StageDevelopmentCheckpointSimulation(
         const auto& hinge = gameSimulation.Snapshot().rewardLanternWorldFromHinge;
         pendulum.initialized = true;
         pendulum.previousPivotPosition = {{hinge[12], hinge[13], hinge[14]}};
-        if (checkpoint.rewardPose == DevelopmentRewardPose::GlassTransmission)
-        {
-            pendulum.forwardAngleRadians = 0.30f;
-            pendulum.strafeAngleRadians = -0.16f;
-        }
-        else if (checkpoint.rewardPose == DevelopmentRewardPose::MotionExtreme)
-        {
-            pendulum.forwardAngleRadians = 0.82f;
-            pendulum.strafeAngleRadians = -0.42f;
-            pendulum.forwardAngularVelocity = 2.40f;
-            pendulum.strafeAngularVelocity = -1.60f;
-            pendulum.previousPivotVelocity = {{3.8f, 0.25f, -2.2f}};
-        }
+        pendulum.forwardAngleRadians = checkpoint.rewardForwardAngleRadians;
+        pendulum.strafeAngleRadians = checkpoint.rewardStrafeAngleRadians;
+        pendulum.forwardAngularVelocity = checkpoint.rewardForwardAngularVelocity;
+        pendulum.strafeAngularVelocity = checkpoint.rewardStrafeAngularVelocity;
+        pendulum.previousPivotVelocity = checkpoint.rewardPreviousPivotVelocity;
         pendulum.worldFromBody = ComposeLanternPendulumBodyTransform(
             hinge, pendulum.forwardAngleRadians, pendulum.strafeAngleRadians);
         gameSimulation.ImportRewardCheckpoint(chest, interaction, finale, &pendulum);

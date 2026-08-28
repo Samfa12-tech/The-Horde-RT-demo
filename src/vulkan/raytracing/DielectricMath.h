@@ -295,6 +295,7 @@ enum class DielectricTerminalResolution
 {
     ContinueGeneric,
     ShadeTerminal,
+    ConservativeCertifiedAbsorption,
     FailUnclosedVolume
 };
 
@@ -308,14 +309,18 @@ inline DielectricTerminalKind ClassifyDielectricTerminal(
 }
 
 inline DielectricTerminalResolution ResolveDielectricTerminal(
-    std::size_t closedVolumeDepth, DielectricTerminalKind terminal)
+    std::size_t closedVolumeDepth, DielectricTerminalKind terminal,
+    bool everyOpenVolumeCertified = false)
 {
     if (terminal == DielectricTerminalKind::ContinueGeneric)
         return DielectricTerminalResolution::ContinueGeneric;
-    // Topology validation alone cannot prove at runtime that an ordinary hit
-    // behind an open medium is a harmless shared-edge traversal miss. Without
-    // retained primitive/component and barycentric-edge evidence, every miss,
-    // opaque hit, or water hit is an explicit unclosed-volume failure.
+    // A loader-issued certificate proves every thick component is an outward,
+    // closed manifold. If a finite-precision grazing ray nevertheless reaches
+    // an ordinary terminal with only certified media open, absorb the remaining
+    // energy. This never shades through the cage and is unavailable to open,
+    // inward, thin-wall, or otherwise uncertified geometry.
+    if (closedVolumeDepth > 0u && everyOpenVolumeCertified)
+        return DielectricTerminalResolution::ConservativeCertifiedAbsorption;
     return closedVolumeDepth > 0u
         ? DielectricTerminalResolution::FailUnclosedVolume
         : DielectricTerminalResolution::ShadeTerminal;

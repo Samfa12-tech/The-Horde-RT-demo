@@ -13,7 +13,11 @@ try {
         throw "Dielectric diagnostics must append a writable binding without aliasing read-only instance metadata."
     }
     if ($generatedGlsl -notmatch 'uint primaryUnclosedVolumeCount;' -or
-        $generatedGlsl -notmatch 'uint shadowUnclosedVolumeCount;') {
+        $generatedGlsl -notmatch 'uint shadowUnclosedVolumeCount;' -or
+        $generatedGlsl -notmatch 'uint primaryCertifiedClosedVolumeRecoveryCount;' -or
+        $generatedGlsl -notmatch 'uint shadowCertifiedClosedVolumeRecoveryCount;' -or
+        $generatedGlsl -notmatch 'uint certifiedClosedVolumeRecoveryReasonMask;' -or
+        $generatedGlsl -notmatch 'kRtMaterialFlagCertifiedClosedVolume = 1024u;') {
         throw "Dielectric diagnostics must append independent primary and shadow unclosed-volume counters."
     }
 

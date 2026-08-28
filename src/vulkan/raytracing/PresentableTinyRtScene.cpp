@@ -424,6 +424,12 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
         std::exchange(other.primaryOpenOpaqueTerminalMaterialMask_, 0u);
     primaryClosedVolumeAbsorptionCount_ =
         std::exchange(other.primaryClosedVolumeAbsorptionCount_, 0u);
+    primaryCertifiedClosedVolumeRecoveryCount_ =
+        std::exchange(other.primaryCertifiedClosedVolumeRecoveryCount_, 0u);
+    shadowCertifiedClosedVolumeRecoveryCount_ =
+        std::exchange(other.shadowCertifiedClosedVolumeRecoveryCount_, 0u);
+    certifiedClosedVolumeRecoveryReasonMask_ =
+        std::exchange(other.certifiedClosedVolumeRecoveryReasonMask_, 0u);
     developmentStaticAssetDirectory_ = std::move(other.developmentStaticAssetDirectory_);
     staticTextureDirectory_ = std::move(other.staticTextureDirectory_);
     staticMeshSlot_ = std::move(other.staticMeshSlot_);
@@ -673,6 +679,9 @@ void PresentableTinyRtScene::Destroy()
     primaryOpenOpaqueVolumeInstanceMask_ = 0u;
     primaryOpenOpaqueTerminalMaterialMask_ = 0u;
     primaryClosedVolumeAbsorptionCount_ = 0u;
+    primaryCertifiedClosedVolumeRecoveryCount_ = 0u;
+    shadowCertifiedClosedVolumeRecoveryCount_ = 0u;
+    certifiedClosedVolumeRecoveryReasonMask_ = 0u;
     developmentStaticAssetDirectory_.clear();
     staticTextureDirectory_.clear();
     staticMeshSlot_ = {};
@@ -4313,6 +4322,12 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         previousDielectricDiagnostics.primaryOpenOpaqueTerminalMaterialMask;
     primaryClosedVolumeAbsorptionCount_ =
         previousDielectricDiagnostics.primaryClosedVolumeAbsorptionCount;
+    primaryCertifiedClosedVolumeRecoveryCount_ =
+        previousDielectricDiagnostics.primaryCertifiedClosedVolumeRecoveryCount;
+    shadowCertifiedClosedVolumeRecoveryCount_ =
+        previousDielectricDiagnostics.shadowCertifiedClosedVolumeRecoveryCount;
+    certifiedClosedVolumeRecoveryReasonMask_ =
+        previousDielectricDiagnostics.certifiedClosedVolumeRecoveryReasonMask;
     const RtDielectricDiagnostics clearedDielectricDiagnostics{};
     auto frameInstanceMetadata = staticMeshSlot_.InstanceMetadata();
     if (effectivePlayerRenderRoute == PlayerRenderRoute::Procedural)

@@ -38,7 +38,8 @@
     "emissiveTexture": 64,
     "headPrimaryMasked": 128,
     "nearFacePrimaryMasked": 256,
-    "thinWall": 512
+    "thinWall": 512,
+    "certifiedClosedVolume": 1024
   },
   "records": [
     {
@@ -107,7 +108,10 @@
         { "name": "primaryOpenOpaqueTerminalInstanceMask", "type": "uint", "offset": 116 },
         { "name": "primaryOpenOpaqueVolumeInstanceMask", "type": "uint", "offset": 120 },
         { "name": "primaryOpenOpaqueTerminalMaterialMask", "type": "uint", "offset": 124 },
-        { "name": "primaryClosedVolumeAbsorptionCount", "type": "uint", "offset": 128 }
+        { "name": "primaryClosedVolumeAbsorptionCount", "type": "uint", "offset": 128 },
+        { "name": "primaryCertifiedClosedVolumeRecoveryCount", "type": "uint", "offset": 132 },
+        { "name": "shadowCertifiedClosedVolumeRecoveryCount", "type": "uint", "offset": 136 },
+        { "name": "certifiedClosedVolumeRecoveryReasonMask", "type": "uint", "offset": 140 }
       ]
     },
     {

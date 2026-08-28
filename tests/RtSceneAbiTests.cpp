@@ -59,6 +59,9 @@ void CheckSplitDielectricDiagnosticLayout()
                       value.primaryOpenOpaqueVolumeInstanceMask;
                       value.primaryOpenOpaqueTerminalMaterialMask;
                       value.primaryClosedVolumeAbsorptionCount;
+                      value.primaryCertifiedClosedVolumeRecoveryCount;
+                      value.shadowCertifiedClosedVolumeRecoveryCount;
+                      value.certifiedClosedVolumeRecoveryReasonMask;
                   })
     {
         Check(sizeof(T) == 144u && alignof(T) == 16u &&
@@ -94,7 +97,10 @@ void CheckSplitDielectricDiagnosticLayout()
                   offsetof(T, primaryOpenOpaqueTerminalInstanceMask) == 116u &&
                   offsetof(T, primaryOpenOpaqueVolumeInstanceMask) == 120u &&
                   offsetof(T, primaryOpenOpaqueTerminalMaterialMask) == 124u &&
-                  offsetof(T, primaryClosedVolumeAbsorptionCount) == 128u,
+                  offsetof(T, primaryClosedVolumeAbsorptionCount) == 128u &&
+                  offsetof(T, primaryCertifiedClosedVolumeRecoveryCount) == 132u &&
+                  offsetof(T, shadowCertifiedClosedVolumeRecoveryCount) == 136u &&
+                  offsetof(T, certifiedClosedVolumeRecoveryReasonMask) == 140u,
               "dielectric diagnostics attribute secondary self hits and primary/shadow open-stack reasons");
     }
     else
@@ -179,6 +185,8 @@ void TestAbiLayout()
 void TestGeneratedConstants()
 {
     using namespace horde::vulkan::raytracing;
+    Check(static_cast<std::uint32_t>(RtMaterialFlag::CertifiedClosedVolume) == 1024u,
+          "topology-certified closed volume is an append-only material ABI flag");
     Check(kRtInstanceMetadataCapacity == 20u, "instance metadata capacity retains all TLAS custom indices");
     Check(kRtStaticAssetCapacity == 8u, "static asset capacity is 8");
     Check(kRtPrimitiveMetadataCapacity == 32u, "primitive capacity is 32");

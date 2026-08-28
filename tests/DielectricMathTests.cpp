@@ -444,6 +444,14 @@ void TestBoundedTirAndWaterTerminationContracts()
     Check(ResolveDielectricTerminal(4u, DielectricTerminalKind::ContinueGeneric) ==
               DielectricTerminalResolution::ContinueGeneric,
           "a generic dielectric terminal always continues to exact instance/material stack validation");
+    Check(ResolveDielectricTerminal(1u, DielectricTerminalKind::Opaque, true) ==
+              DielectricTerminalResolution::ConservativeCertifiedAbsorption &&
+              ResolveDielectricTerminal(1u, DielectricTerminalKind::Miss, true) ==
+              DielectricTerminalResolution::ConservativeCertifiedAbsorption,
+          "a topology-certified open stack conservatively absorbs a grazing terminal instead of shading through it");
+    Check(ResolveDielectricTerminal(1u, DielectricTerminalKind::Opaque, false) ==
+              DielectricTerminalResolution::FailUnclosedVolume,
+          "uncertified open geometry cannot use the conservative grazing recovery");
 }
 
 void TestSelfHitClassificationUsesBoundedEpsilon()
