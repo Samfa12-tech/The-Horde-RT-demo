@@ -294,7 +294,7 @@ bool TestQualityChangesOnlyBoundedRayBudgets()
     const auto highIdentity = high.identity;
     mobile.identity[2] = high.identity[2];
     mobile.identity[3] = high.identity[3];
-    return Require(mobileBudget.volumeSteps == 6u && mobileBudget.reflectionSamples == 1u &&
+    return Require(mobileBudget.volumeSteps == 4u && mobileBudget.reflectionSamples == 1u &&
                        highBudget.volumeSteps == 10u && highBudget.reflectionSamples == 2u,
                    "Mobile/High must use the authored bounded integration/reflection budgets") &&
            Require(mobile.worldFromLocal0 == high.worldFromLocal0 &&

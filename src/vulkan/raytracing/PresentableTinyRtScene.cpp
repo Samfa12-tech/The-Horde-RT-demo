@@ -4011,7 +4011,6 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         result[10] = scale;
         return result;
     };
-
     std::array<VkAccelerationStructureInstanceKHR, PresentableTinyRtScene::kTlasInstanceCount> instances{};
     instances[0].transform = {{
         1.0f, 0.0f, 0.0f, 0.0f,
@@ -4442,6 +4441,14 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         {
             for (std::size_t i = 5u; i <= 8u; ++i)
                 frameInstanceMetadata[i].flags = 0u;
+        }
+        else if (!productionLanternVisible)
+        {
+            // The locked chest remains in the lich room, but its hidden reward
+            // must not select the dielectric pipeline before the lantern is
+            // actually revealed.
+            frameInstanceMetadata[7u].flags = 0u;
+            frameInstanceMetadata[8u].flags = 0u;
         }
         if (!glassFixtureVisible)
             frameInstanceMetadata[9u].flags = 0u;

@@ -24,6 +24,11 @@ if (-not (Test-Path -LiteralPath $disassembler))
 {
     throw "spirv-dis was not found at $disassembler"
 }
+$optimizer = Join-Path $VulkanSdk 'Bin\spirv-opt.exe'
+if (-not (Test-Path -LiteralPath $optimizer))
+{
+    throw "spirv-opt was not found at $optimizer"
+}
 $source = Join-Path $repoRoot 'shaders\raytracing\minimal.rgen'
 $includeName = if ($Legacy) { 'MinimalLegacyRayGenShader.inc' } else { 'MinimalRayGenShader.inc' }
 $include = Join-Path $repoRoot (Join-Path 'src\vulkan\raytracing' $includeName)
@@ -115,15 +120,15 @@ $dependencies = [System.Collections.Generic.List[string]]::new()
 if ($Legacy)
 {
     $resolvedLegacySource = [IO.File]::ReadAllText($resolvedSourcePath)
-    $activityExpression = 'bool genericTransmissionActive = controls.genericTransmissionActive > 0.5;'
+    $activityExpression = '#define HORDE_GENERIC_TRANSMISSION_VARIANT 1'
     $replacementCount = ([regex]::Matches(
         $resolvedLegacySource, [regex]::Escape($activityExpression))).Count
-    if ($replacementCount -ne 5)
+    if ($replacementCount -ne 1)
     {
-        throw "Legacy raygen expected five generic transmission activity sites, found $replacementCount."
+        throw "Legacy raygen expected one generic transmission variant definition, found $replacementCount."
     }
     $resolvedLegacySource = $resolvedLegacySource.Replace(
-        $activityExpression, 'bool genericTransmissionActive = false;')
+        $activityExpression, '#define HORDE_GENERIC_TRANSMISSION_VARIANT 0')
     [IO.File]::WriteAllText(
         $resolvedSourcePath, $resolvedLegacySource, [Text.UTF8Encoding]::new($false))
 }
@@ -138,11 +143,42 @@ $dependencyManifest = $dependencyHashes | ConvertTo-Json -Compress
 $dependencyIdentity = "$variantName|$dependencyManifest"
 $dependencyHash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($dependencyIdentity))).ToLowerInvariant()
 
-& $validator -V --target-env vulkan1.2 -Os -S rgen -o $spirv $resolvedSourcePath
+$validatorArguments = @('-V', '--target-env', 'vulkan1.2')
+if ($Legacy)
+{
+    $validatorArguments += '-Os'
+}
+$validatorArguments += @('-S', 'rgen', '-o', $spirv, $resolvedSourcePath)
+& $validator @validatorArguments
 if ($LASTEXITCODE -ne 0)
 {
     throw "Raygen compilation failed with exit code $LASTEXITCODE"
 }
+
+# The generic dielectric path deliberately retains GLSL helper boundaries.
+# Exact SM-S948B validation showed glslang's fully inlined generic module
+# duplicated bounded ray-query control flow and cost substantially more than
+# this function-retaining form. The legacy no-glass shader keeps its previously
+# validated fully inlined shape.
+$optimizedSpirv = "$spirv.optimized"
+if (-not $Legacy)
+{
+    & $optimizer --eliminate-dead-functions `
+        --eliminate-dead-code-aggressive `
+        --simplify-instructions `
+        --eliminate-dead-branches `
+        --cfg-cleanup $spirv -o $optimizedSpirv
+}
+else
+{
+    & $optimizer -O $spirv -o $optimizedSpirv
+}
+if ($LASTEXITCODE -ne 0)
+{
+    throw "Raygen SPIR-V optimization failed with exit code $LASTEXITCODE"
+}
+[IO.File]::Copy($optimizedSpirv, $spirv, $true)
+Remove-Item -LiteralPath $optimizedSpirv -Force
 
 $bytes = [System.IO.File]::ReadAllBytes($spirv)
 if (($bytes.Length % 4) -ne 0)
@@ -176,9 +212,16 @@ $rayQueryInitializationCount = @($assemblyLines | Where-Object {
 }).Count
 $driverSafeFullyInlined = $functionCount -eq 1 -and
     $functionCallCount -eq 0 -and $rayQueryInitializationCount -le 29
-if (-not $driverSafeFullyInlined)
+$boundedGenericFunctionsRetained = $functionCount -gt 1 -and
+    $functionCallCount -gt 0 -and $rayQueryInitializationCount -le 3
+if ($Legacy -and -not $driverSafeFullyInlined)
 {
     throw ("Raygen optimizer cloned bounded traversal: functions={0}, calls={1}, ray-query sites={2}." -f `
+        $functionCount, $functionCallCount, $rayQueryInitializationCount)
+}
+if (-not $Legacy -and -not $boundedGenericFunctionsRetained)
+{
+    throw ("Generic raygen lost its measured bounded function strategy: functions={0}, calls={1}, ray-query sites={2}." -f `
         $functionCount, $functionCallCount, $rayQueryInitializationCount)
 }
 $spirvHash = (Get-FileHash -LiteralPath $spirv -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -240,6 +283,7 @@ if ($Check)
         functionCalls = $functionCallCount
         rayQueryInitializations = $rayQueryInitializationCount
         driverSafeFullyInlined = $driverSafeFullyInlined
+        boundedGenericFunctionsRetained = $boundedGenericFunctionsRetained
         matchesEmbeddedWords = $matchesEmbedded
     }
     $statsPath = Join-Path $outputFull 'raygen-stats.json'
@@ -250,7 +294,7 @@ if ($Check)
     Write-Output ("Raygen check artifacts: {0}" -f $outputFull)
     Write-Output ("Source dependency SHA-256: {0}; embedded include SHA-256: {1}" -f $sourceHash, $includeHash)
     Write-Output ("SPIR-V bytes: {0}; words: {1}; instructions: {2}; branch operations: {3}; loops: {4}; selection merges: {5}; SHA-256: {6}" -f $bytes.Length, $wordValues.Count, $instructionCount, $branchOperationCount, $loopCount, $selectionMergeCount, $spirvHash)
-    Write-Output ("Driver-safe inlined optimizer: functions={0}; calls={1}; ray-query sites={2}" -f `
+    Write-Output ("Raygen optimizer shape: functions={0}; calls={1}; ray-query sites={2}" -f `
         $functionCount, $functionCallCount, $rayQueryInitializationCount)
     if (-not $matchesEmbedded)
     {
@@ -295,7 +339,7 @@ if (Test-Path -LiteralPath $resolvedSourcePath)
 Write-Output "Generated $include"
 Write-Output ("Source dependency SHA-256: {0}; embedded include SHA-256 before generation: {1}" -f $sourceHash, $includeHash)
 Write-Output ("SPIR-V bytes: {0}; words: {1}; instructions: {2}; branch operations: {3}; loops: {4}; selection merges: {5}; SHA-256: {6}" -f $bytes.Length, $wordValues.Count, $instructionCount, $branchOperationCount, $loopCount, $selectionMergeCount, $spirvHash)
-Write-Output ("Driver-safe inlined optimizer: functions={0}; calls={1}; ray-query sites={2}" -f `
+Write-Output ("Raygen optimizer shape: functions={0}; calls={1}; ray-query sites={2}" -f `
     $functionCount, $functionCallCount, $rayQueryInitializationCount)
 if (-not $Legacy)
 {

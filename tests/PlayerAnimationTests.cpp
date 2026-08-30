@@ -116,7 +116,7 @@ int main()
     const float handSeparation = ownerFeedbackPose.rightHandLocal[0] -
                                  ownerFeedbackPose.leftHandLocal[0];
     if (!Require(shoulderWidth >= 0.68f && handSeparation >= 0.20f &&
-                     handSeparation <= 0.30f,
+                     handSeparation <= 0.38f,
                  "first-person rest pose must retain lateral shoulder roots while the forearms bend inward to portrait-safe prop grips")) return 1;
     const float leftGripDeterminant =
         ownerFeedbackPose.leftGripXInView[0] *

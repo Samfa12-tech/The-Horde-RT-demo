@@ -750,11 +750,16 @@ bool ResolveDebugCheckpoint(const std::int32_t id, DebugCheckpointSelection& sel
                             development->yaw, development->pitch,
                             base->expectedZone, base->preset};
     selection.simulationCheckpointId = base->id;
-    selection.playerRoute =
-        (development->name.starts_with("player-body-") ||
-         development->usesGlassFixture || development->usesProductionRewardProps)
+    // Only the explicit player-body A/B is allowed to expose the unfinished
+    // authored gauntlets. Every gameplay/reward/glass checkpoint uses the same
+    // block-primary route as the live phone game until the hands are accepted
+    // across sword, torch and reward-lantern poses.
+    selection.playerRoute = development->name.starts_with("player-body-")
         ? horde::vulkan::raytracing::PlayerRenderRoute::Skinned
-        : horde::vulkan::raytracing::PlayerRenderRoute::Procedural;
+        : ((development->usesGlassFixture ||
+            development->usesProductionRewardProps)
+            ? horde::vulkan::raytracing::PlayerRenderRoute::HybridBlockPrimary
+            : horde::vulkan::raytracing::PlayerRenderRoute::Procedural);
     selection.development = development;
     return true;
 }
@@ -856,7 +861,10 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
          << "  \"presented\": " << (context.capabilities.rtScene.presented ? "true" : "false") << ",\n"
          << "  \"playerRenderRoute\": \""
          << (context.playerRenderRoute == horde::vulkan::raytracing::PlayerRenderRoute::Skinned
-                 ? "skinned" : "procedural") << "\",\n"
+                 ? "skinned"
+                 : (context.playerRenderRoute ==
+                        horde::vulkan::raytracing::PlayerRenderRoute::HybridBlockPrimary
+                        ? "hybrid-block-primary" : "procedural")) << "\",\n"
          << "  \"playerSkinCadenceHz\": " << context.rtScene.PlayerSkinCadenceHz() << ",\n"
          << "  \"playerSkinUpdates\": " << context.rtScene.PlayerSkinUpdateCount() << ",\n"
          << "  \"playerSkinCpuAverageMs\": " << context.rtScene.PlayerSkinAverageMilliseconds() << ",\n"

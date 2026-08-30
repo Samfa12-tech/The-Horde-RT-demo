@@ -27,9 +27,11 @@ void main()
 
     // The first-person body only occupies the lower view. Skip its BLAS for
     // upper-screen primary rays, but retain it in lower-screen primary rays,
-    // reflective bounces and lower-view direct-light visibility queries. Move
-    // the cull boundary upward when looking down so the body never shears off.
-    float playerPrimaryStart = clamp(0.68 + controls.pitch, 0.34, 0.82);
+    // reflective bounces and lower-view direct-light visibility queries.
+    // View-relative held arms stay in roughly the same screen region at either
+    // pitch extreme, so move the boundary upward for both upward and downward
+    // look. Raising it with positive pitch used to cull the lantern forearm.
+    float playerPrimaryStart = clamp(0.68 - abs(controls.pitch), 0.34, 0.68);
     uint primaryMask = uv.y > playerPrimaryStart ? 0x27u : 0x23u;
     HitInfo primary = traceScene(origin, rayDirection, 10000.0, primaryMask,
                                  0.002, controls.waterQuality < 0.5, true);

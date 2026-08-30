@@ -383,7 +383,7 @@ int main()
     PlayerCombatSnapshot playerCombat;
     const PlayerWeaponRenderPose idleWeapon = EvaluatePlayerWeaponRenderPose(playerCombat, 0.0f, 1.05f);
     ok &= Require(Near(idleWeapon.parryBlend, 0.0f) && Near(idleWeapon.swordRadians, 0.20f) &&
-                  Near(idleWeapon.rightHandLocal[0], 0.12f) &&
+                  Near(idleWeapon.rightHandLocal[0], 0.18f) &&
                   Near(idleWeapon.rightHandLocal[1], -0.44f) &&
                   Near(idleWeapon.rightHandLocal[2], 1.00f),
                   "idle weapon pose must retain the owner-reviewed safe-frame/canted composition");
@@ -648,6 +648,13 @@ int main()
                       raygenSource.find("material == kMaterialWater") != std::string::npos &&
                       raygenSource.find("vec4 lichGroundMist") != std::string::npos,
                       "raygen must retain the RT water ABI, transparent visibility route, and bounded lich mist path");
+        ok &= Require(raygenSource.find(
+                          "clamp(0.68 - abs(controls.pitch), 0.34, 0.68)") !=
+                          std::string::npos &&
+                      raygenSource.find(
+                          "clamp(0.68 + controls.pitch, 0.34, 0.82)") ==
+                          std::string::npos,
+                      "first-person arm traversal must not cull the lantern forearm while looking up");
         ok &= Require(sceneSource.find("sizeof(ScenePushConstants) == 124u") != std::string::npos &&
                       sceneSource.find("sizeof(ScenePushConstants) <= 128u") != std::string::npos &&
                       sceneSource.find("offsetof(ScenePushConstants, waterQuality) == 72u") != std::string::npos &&
@@ -656,7 +663,9 @@ int main()
                       raygenSource.find("float waterQuality;") != std::string::npos &&
                       raygenSource.find("float waterfallWidthScale;") != std::string::npos &&
                       raygenSource.find("float workloadPreset;") != std::string::npos &&
-                      raygenSource.find("float genericTransmissionActive;") != std::string::npos,
+                      raygenSource.find("float genericTransmissionActive;") != std::string::npos &&
+                      raygenSource.find("HORDE_GENERIC_TRANSMISSION_VARIANT") != std::string::npos &&
+                      raygenSource.find("genericTransmissionEnabled()") != std::string::npos,
                       "RT lab tuning and generic transmission activity must append after the released water-quality ABI");
         ok &= Require(sceneSource.find("properties.limits.maxPushConstantsSize") !=
                           std::string::npos &&
@@ -673,7 +682,7 @@ int main()
                       sceneSource.find("clampedTuning.glassFixtureVisible ? 1.0f : 0.0f") ==
                           std::string::npos &&
                       raygenSource.find(
-                          "bool genericTransmissionActive = controls.genericTransmissionActive > 0.5;") !=
+                          "bool genericTransmissionActive = genericTransmissionEnabled();") !=
                           std::string::npos,
                       "no-glass preservation must be selected from active generic instance/material ABI data, not a fixture-name branch");
         ok &= Require(sceneSource.find("waterfallBlas_") != std::string::npos &&
@@ -773,7 +782,7 @@ int main()
                           std::string::npos &&
                       waterPrimary.find("vec3 localInterfaceTransmittance = localStrength > 0.001") !=
                           std::string::npos &&
-                      waterPrimary.find("vec3 skyInterfaceTransmittance = shadowTransmittanceMask(") != std::string::npos &&
+                      waterPrimary.find("vec3 skyInterfaceTransmittance = sceneShadowTransmittanceMask(") != std::string::npos &&
                       waterPrimary.find("vec3(-5.50, 2.62, -15.20)") == std::string::npos &&
                       waterPrimary.find("tunedLightColor(vec3(1.0, 0.28, 0.055), kLightTorch)") ==
                           std::string::npos,
@@ -833,13 +842,13 @@ int main()
                           std::string::npos &&
                       lightingSource.find("primaryUnclosedVolumeCount") == std::string::npos &&
                       raygenSource.find("if (interfaceCount >= interfaceBudget)") != std::string::npos &&
-                      raygenSource.find("lightTransmittance = shadowTransmittanceMask(") != std::string::npos,
+                      raygenSource.find("lightTransmittance = sceneShadowTransmittanceMask(") != std::string::npos,
                       "nearest committed shadow traversal must retain RGB through local, sky, and fire lighting while keeping metallic blockers and mobile/high ceilings");
         ok &= Require(raygenSource.find("if (!genericTransmissionActive)") !=
                           std::string::npos &&
                       raygenSource.find("float lightVisibility = lightTransmittance.x;") !=
                           std::string::npos &&
-                      raygenSource.find("vec3 lightTransmittance = shadowTransmittanceMask(") !=
+                      raygenSource.find("vec3 lightTransmittance = sceneShadowTransmittanceMask(") !=
                           std::string::npos,
                       "fixture-hidden lighting must retain released scalar arithmetic from the shared ordered query while active generic transmission uses RGB traversal");
         ok &= Require(sceneSource.find("secondaryDielectricRejectCount") != std::string::npos &&
@@ -964,7 +973,9 @@ int main()
                 ? raygenSource.substr(opaqueDirectBegin, opaqueDirectEnd - opaqueDirectBegin)
                 : std::string{};
         ok &= Require(!opaqueDirect.empty() &&
-                      opaqueDirect.find("bvec4(localStrength > 0.001") !=
+                      opaqueDirect.find("bool localContributes = localStrength > 0.001") !=
+                          std::string::npos &&
+                      opaqueDirect.find("bvec4(localContributes") !=
                           std::string::npos &&
                       opaqueDirect.find("mat4 transmittanceSamples = transparentTransmittanceBatch(") != std::string::npos &&
                       !opaquePrimary.empty() &&
@@ -1002,7 +1013,7 @@ int main()
                       fireDirect.find("rtFireEmitters.values[emitterIndex]") != std::string::npos &&
                       fireDirect.find("emitter.lightPositionStrength.xyz") != std::string::npos &&
                       fireDirect.find("emitter.colourIntensity.rgb") != std::string::npos &&
-                      fireDirect.find("shadowTransmittanceMask(") != std::string::npos &&
+                      fireDirect.find("sceneShadowTransmittanceMask(") != std::string::npos &&
                       raygenSource.find("findFireEmitter(1u") == std::string::npos &&
                       raygenSource.find("currentTorchLightPosition") == std::string::npos &&
                       raygenSource.find("sin(controls.time * 15.0)") == std::string::npos &&
@@ -1034,6 +1045,7 @@ int main()
                       sceneSource.find("dielectricFixtureBlas_") != std::string::npos &&
                       sceneSource.find("instances[5].accelerationStructureReference = dielectricFixtureBlas_.address;") != std::string::npos &&
                       sceneSource.find("instances[5].instanceCustomIndex = 9u;") != std::string::npos &&
+                      sceneSource.find("frameInstanceMetadata[8u].flags = 0u;") != std::string::npos &&
                       sceneSource.find("frameInstanceMetadata[9u].flags = 0u;") != std::string::npos &&
                       sceneSource.find("glassFixtureVisible") != std::string::npos,
                       "closed dielectric fixture must use the imported static-PBR/BLAS route and stay absent from authored captures");
@@ -1107,6 +1119,15 @@ int main()
                       androidBridgeSource.find("context.routeReplayActive && !simulationPaused") ==
                           std::string::npos,
                       "authoritative Android route replay must not freeze behind menu/death pause state");
+        ok &= Require(androidBridgeSource.find(
+                          "development->name.starts_with(\"player-body-\")") !=
+                          std::string::npos &&
+                      androidBridgeSource.find(
+                          "PlayerRenderRoute::HybridBlockPrimary") !=
+                          std::string::npos &&
+                      androidBridgeSource.find("\"hybrid-block-primary\"") !=
+                          std::string::npos,
+                      "Android reward/glass checkpoints must use and report the same block-primary arm route as live gameplay");
         ok &= Require(androidBridgeSource.find("AndroidRtLabState gRtLabState;") != std::string::npos &&
                       androidBridgeSource.find("const horde::vulkan::raytracing::RtSceneTuning rtLabTuning = gRtLabState.Snapshot();") != std::string::npos &&
                       androidBridgeSource.find("rtLabTuning);") != std::string::npos &&

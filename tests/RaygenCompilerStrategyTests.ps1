@@ -11,14 +11,11 @@ try {
         -Check -OutputDirectory $temporaryRoot
     $stats = Get-Content -LiteralPath `
         (Join-Path $temporaryRoot "raygen-stats.json") -Raw | ConvertFrom-Json
-    if ($stats.functionCalls -ne 0 -or $stats.functions -ne 1) {
-        throw "Raygen compiler retained helper calls that are unsafe around driver ray-query traversal."
-    }
-    if ($stats.rayQueryInitializations -gt 29) {
-        throw "Raygen compiler cloned $($stats.rayQueryInitializations) static ray-query sites; expected at most the audited 29-site fully inlined shape."
-    }
-    if (-not $stats.driverSafeFullyInlined) {
-        throw "Raygen compiler did not report the driver-safe fully inlined strategy."
+    if ($stats.variant -ne "generic" -or $stats.functions -le 1 -or
+        $stats.functionCalls -le 0 -or $stats.rayQueryInitializations -gt 3 -or
+        -not $stats.boundedGenericFunctionsRetained -or
+        $stats.driverSafeFullyInlined) {
+        throw "Generic raygen no longer matches the exact-phone-validated bounded function strategy."
     }
     $legacyStatsPath = Join-Path $temporaryRoot "legacy\raygen-stats.json"
     if (-not (Test-Path -LiteralPath $legacyStatsPath)) {
@@ -30,7 +27,7 @@ try {
         $legacyStats.functions -ne 1 -or $legacyStats.rayQueryInitializations -gt 29) {
         throw "Legacy raygen is stale or no longer matches the audited driver-safe shape."
     }
-    Write-Output "Raygen compiler retained the audited driver-safe inlined traversal ($($stats.bytes) bytes, $($stats.instructions) instructions, $($stats.rayQueryInitializations) ray-query sites)."
+    Write-Output "Raygen compiler retained the measured generic function strategy ($($stats.bytes) bytes, $($stats.instructions) instructions, $($stats.rayQueryInitializations) ray-query sites) and the audited fully inlined legacy path."
 }
 finally {
     if (Test-Path -LiteralPath $temporaryRoot) {

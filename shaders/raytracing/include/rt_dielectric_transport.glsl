@@ -370,7 +370,7 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
         currentHit = nextHit;
     }
 
-    if (!terminalResolved)
+    if (!terminalResolved && !overflowed)
     {
         bool everyOpenVolumeCertified = volumeDepth > 0;
         for (int volumeIndex = 0; volumeIndex < kHighDielectricVolumes;
@@ -400,5 +400,304 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     }
     // Roughness changes the same bounded reflection/transmission response; it
     // never switches to a screen sample or adds a recursive glossy path.
+    return reflected * firstFresnel + transmitted;
+}
+
+// Production compact transport. Runtime closed-volume assets are validated as
+// disjoint outward-wound components, so a ray may traverse multiple panes in
+// sequence but must never be inside two closed media simultaneously. Keeping
+// one explicit open-volume state preserves geometric entry/exit, refraction,
+// TIR, measured path attenuation and the Mobile/High interface ceilings while
+// avoiding a dynamically indexed nested stack in every phone invocation.
+vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
+{
+    int interfaceBudget = controls.waterQuality >= 1.5
+        ? kHighDielectricInterfaces : kMobileDielectricInterfaces;
+
+    vec3 firstOutward = normalize(firstHit.geometricNormal);
+    vec3 firstNormal = dot(rayDirection, firstOutward) < 0.0
+        ? firstOutward : -firstOutward;
+    float firstCosine = clamp(dot(firstNormal, -rayDirection), 0.0, 1.0);
+    float firstFresnel = dielectricEffectiveFresnel(
+        firstCosine, 1.0, firstHit.ior, firstHit.roughness);
+
+    vec3 reflectionDirection = roughDielectricDirection(
+        reflect(rayDirection, firstNormal), firstNormal,
+        firstHit.position, firstHit.roughness);
+    float reflectionEpsilon = dielectricRayEpsilon(firstHit.position, firstHit.t);
+    HitInfo reflectedHit = traceScene(
+        advanceDielectricRayOrigin(firstHit.position, firstOutward,
+                                   reflectionDirection, reflectionEpsilon),
+        reflectionDirection, 12.0, 0x37u, reflectionEpsilon * 0.5,
+        false, false);
+    float reflectedLocalDistance = reflectedHit.hit ? reflectedHit.t : 12.0;
+    reflectedHit.t += firstHit.t;
+    vec3 reflected;
+    if (isGenericDielectric(reflectedHit) ||
+        (reflectedHit.hit && reflectedHit.material == kMaterialWater))
+    {
+        atomicAdd(rtDielectricDiagnostics.value.secondaryDielectricTerminalCount,
+                  1u);
+        if (firstHit.instance == 8u)
+            atomicAdd(
+                rtDielectricDiagnostics.value.productionPaneSecondaryOriginCount,
+                1u);
+        if (reflectedHit.instance == 8u)
+            atomicAdd(
+                rtDielectricDiagnostics.value.productionPaneSecondaryTerminalCount,
+                1u);
+        if (isGenericDielectric(reflectedHit) && firstHit.instance == 8u &&
+            reflectedHit.instance == 8u &&
+            firstHit.material == reflectedHit.material)
+        {
+            atomicAdd(
+                rtDielectricDiagnostics.value.productionPaneSecondarySameMediumCount,
+                1u);
+            if (reflectedLocalDistance <= reflectionEpsilon * 8.0)
+                atomicAdd(
+                    rtDielectricDiagnostics.value.secondaryNearSelfHitCount, 1u);
+        }
+        else if (firstHit.instance == 8u || reflectedHit.instance == 8u)
+        {
+            atomicAdd(
+                rtDielectricDiagnostics.value.productionPaneSecondaryDifferentMediumCount,
+                1u);
+        }
+        reflected = skyColor(reflectionDirection) * 0.18 +
+            (reflectedHit.hit ? reflectedHit.base * 0.12 : vec3(0.0));
+    }
+    else
+    {
+        reflected = shadeTerminalOpaqueEmissive(
+            reflectedHit, reflectionDirection);
+    }
+    vec4 reflectedFire = integrateFireEmitters(
+        firstHit.position + reflectionDirection * 0.004,
+        reflectionDirection, min(reflectedLocalDistance, 12.0), true);
+    reflected = reflected * reflectedFire.a + reflectedFire.rgb;
+
+    bool volumeOpen = false;
+    bool volumeCertified = false;
+    uint volumeInstance = 0u;
+    uint volumeMaterial = 0u;
+    float volumeIor = 1.0;
+    vec3 volumeAttenuationColor = vec3(1.0);
+    float volumeAttenuationDistance = 0.0;
+    int tirSinceTransition = 0;
+    bool touchedProductionPane = false;
+    bool terminalResolved = false;
+    bool overflowed = false;
+    vec3 throughput = vec3(1.0);
+    vec3 transmissionDirection = rayDirection;
+    HitInfo currentHit = firstHit;
+    float totalDistance = firstHit.t;
+    vec3 transmitted = vec3(0.0);
+
+    for (int interfaceIndex = 0; interfaceIndex <= kHighDielectricInterfaces;
+         ++interfaceIndex)
+    {
+        if (interfaceIndex > 0 && volumeOpen)
+        {
+            throughput *= dielectricBeerLambert(
+                volumeAttenuationColor, currentHit.t,
+                volumeAttenuationDistance);
+        }
+
+        if (!isGenericDielectric(currentHit))
+        {
+            if (volumeOpen)
+            {
+                if (volumeCertified)
+                {
+                    atomicAdd(
+                        rtDielectricDiagnostics.value.primaryCertifiedClosedVolumeRecoveryCount,
+                        1u);
+                    atomicOr(
+                        rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask,
+                        1u);
+                    transmitted = vec3(0.0);
+                    terminalResolved = true;
+                }
+                else
+                {
+                    atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount,
+                              1u);
+                    atomicAdd(
+                        rtDielectricDiagnostics.value.primaryUnclosedVolumeCount,
+                        1u);
+                    if (currentHit.hit)
+                        atomicAdd(
+                            rtDielectricDiagnostics.value.primaryOpenOpaqueCount,
+                            1u);
+                    else
+                        atomicAdd(
+                            rtDielectricDiagnostics.value.primaryOpenMissCount,
+                            1u);
+                    overflowed = true;
+                }
+            }
+            else
+            {
+                currentHit.t = totalDistance;
+                transmitted = throughput * shadeTerminalOpaqueEmissive(
+                    currentHit, transmissionDirection);
+                terminalResolved = true;
+            }
+            break;
+        }
+
+        if (interfaceIndex >= interfaceBudget)
+        {
+            if (volumeOpen && tirSinceTransition > 0)
+            {
+                atomicAdd(
+                    rtDielectricDiagnostics.value.primaryTirTerminationCount,
+                    1u);
+                transmitted = vec3(0.0);
+                terminalResolved = true;
+            }
+            else if (volumeOpen && volumeCertified)
+            {
+                atomicAdd(
+                    rtDielectricDiagnostics.value.primaryCertifiedClosedVolumeRecoveryCount,
+                    1u);
+                atomicOr(
+                    rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask,
+                    2u);
+                transmitted = vec3(0.0);
+                terminalResolved = true;
+            }
+            else
+            {
+                atomicAdd(
+                    rtDielectricDiagnostics.value.primaryInterfaceBudgetCount,
+                    1u);
+                if (volumeOpen)
+                    atomicAdd(
+                        rtDielectricDiagnostics.value.primaryInterfaceBudgetOpenVolumeCount,
+                        1u);
+                else
+                    atomicAdd(
+                        rtDielectricDiagnostics.value.primaryInterfaceBudgetClosedVolumeCount,
+                        1u);
+                overflowed = true;
+            }
+            break;
+        }
+
+        bool thinWall =
+            (currentHit.materialFlags & kRtMaterialFlagThinWall) != 0u;
+        touchedProductionPane =
+            touchedProductionPane || currentHit.instance == 8u;
+        vec3 outwardNormal = normalize(currentHit.geometricNormal);
+        bool entering = dot(transmissionDirection, outwardNormal) < 0.0;
+        vec3 orientedNormal = entering ? outwardNormal : -outwardNormal;
+        float incidentIor = volumeOpen ? volumeIor : 1.0;
+        float transmittedIor = entering ? currentHit.ior : 1.0;
+        float cosine = clamp(
+            dot(orientedNormal, -transmissionDirection), 0.0, 1.0);
+        float fresnel = dielectricEffectiveFresnel(
+            cosine, incidentIor, transmittedIor, currentHit.roughness);
+        vec3 idealTransmission = thinWall
+            ? transmissionDirection
+            : refract(transmissionDirection, orientedNormal,
+                      incidentIor / max(transmittedIor, 1.0));
+
+        if (!thinWall && dot(idealTransmission, idealTransmission) < 0.25)
+        {
+            atomicAdd(rtDielectricDiagnostics.value.primaryTirCount, 1u);
+            ++tirSinceTransition;
+            transmissionDirection = roughDielectricDirection(
+                reflect(transmissionDirection, orientedNormal), orientedNormal,
+                currentHit.position, currentHit.roughness);
+        }
+        else
+        {
+            tirSinceTransition = 0;
+            if (!thinWall && entering)
+            {
+                // Overlapping closed volumes violate the runtime asset
+                // contract. Reject them explicitly instead of allocating a
+                // nested stack on every phone ray.
+                if (volumeOpen)
+                {
+                    atomicAdd(
+                        rtDielectricDiagnostics.value.primaryVolumeBudgetCount,
+                        1u);
+                    overflowed = true;
+                    break;
+                }
+                volumeOpen = true;
+                volumeCertified =
+                    (currentHit.materialFlags &
+                     kRtMaterialFlagCertifiedClosedVolume) != 0u;
+                volumeInstance = currentHit.instance;
+                volumeMaterial = uint(currentHit.material);
+                volumeIor = currentHit.ior;
+                volumeAttenuationColor = currentHit.attenuationColor;
+                volumeAttenuationDistance = currentHit.attenuationDistance;
+            }
+            else if (!thinWall)
+            {
+                if (!volumeOpen || volumeInstance != currentHit.instance ||
+                    volumeMaterial != uint(currentHit.material))
+                {
+                    atomicAdd(
+                        rtDielectricDiagnostics.value.primaryMismatchedExitCount,
+                        1u);
+                    overflowed = true;
+                    break;
+                }
+                volumeOpen = false;
+                volumeCertified = false;
+            }
+
+            vec3 roughTransmission = roughDielectricDirection(
+                idealTransmission, orientedNormal,
+                currentHit.position, currentHit.roughness);
+            transmissionDirection = (!thinWall && entering)
+                ? normalize(idealTransmission) : roughTransmission;
+            throughput *= clamp(currentHit.transmission, 0.0, 1.0) *
+                (1.0 - fresnel);
+        }
+
+        float epsilon = dielectricRayEpsilon(currentHit.position, totalDistance);
+        vec3 nextOrigin = advanceDielectricRayOrigin(
+            currentHit.position, outwardNormal, transmissionDirection, epsilon);
+        float advancedDistance = max(
+            dot(nextOrigin - currentHit.position, transmissionDirection), 0.0);
+        HitInfo nextHit = traceScene(
+            nextOrigin, transmissionDirection, 10000.0, 0x23u,
+            epsilon * 0.5, false, false);
+        nextHit.t += advancedDistance;
+        totalDistance += nextHit.t;
+        currentHit = nextHit;
+    }
+
+    if (!terminalResolved)
+    {
+        if (volumeOpen && volumeCertified)
+        {
+            atomicAdd(
+                rtDielectricDiagnostics.value.primaryCertifiedClosedVolumeRecoveryCount,
+                1u);
+            atomicOr(
+                rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask,
+                16u);
+            transmitted = vec3(0.0);
+        }
+        else
+            overflowed = true;
+    }
+    if (overflowed)
+    {
+        atomicAdd(rtDielectricDiagnostics.value.transportOverflowCount, 1u);
+        if (touchedProductionPane)
+            atomicAdd(
+                rtDielectricDiagnostics.value.productionPaneStackFailureCount,
+                1u);
+        transmitted = dielectricOverflowFallback(
+            transmissionDirection, throughput);
+    }
     return reflected * firstFresnel + transmitted;
 }

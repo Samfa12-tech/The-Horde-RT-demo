@@ -23,7 +23,7 @@
       "material": "LanternGlass",
       "transmissionFactor": 0.94,
       "ior": 1.52,
-      "thicknessFactor": 1.0,
+      "thicknessFactor": 0.007,
       "attenuationDistance": 1.8,
       "attenuationColor": [0.94, 0.90, 0.78],
       "roughnessFactor": 0.12,

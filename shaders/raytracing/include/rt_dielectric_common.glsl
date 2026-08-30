@@ -1,4 +1,5 @@
 vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection);
+vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection);
 
 float dielectricSchlickFromR0(float incidentCosine, float r0)
 {
@@ -179,9 +180,9 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
     // every ordinary direct-light sample.
     float runoffLocalHighlight = runoff
         ? pow(max(dot(surfaceNormal, localHalf), 0.0), 14.0) : 0.0;
-    bool genericTransmissionActive = controls.genericTransmissionActive > 0.5;
+    bool genericTransmissionActive = genericTransmissionEnabled();
     vec3 localInterfaceTransmittance = localStrength > 0.001
-        ? shadowTransmittanceMask(offsetRayOrigin(h, localDirection),
+        ? sceneShadowTransmittanceMask(offsetRayOrigin(h, localDirection),
                                   localDirection, localDistance - 0.02, 0x35u)
         : vec3(0.0);
     int skySample = int((gl_LaunchIDEXT.x + gl_LaunchIDEXT.y) & 1u);
@@ -191,7 +192,7 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
     float skyGain;
     activeSkyLight(h.position, skySample, skyDirection, skyDistance,
                    skyRadiance, skyGain);
-    vec3 skyInterfaceTransmittance = shadowTransmittanceMask(
+    vec3 skyInterfaceTransmittance = sceneShadowTransmittanceMask(
         offsetRayOrigin(h, skyDirection), skyDirection,
         skyDistance - 0.02, 0x35u) * skyGain;
     float localInterfaceVisibility = localInterfaceTransmittance.x;
@@ -327,10 +328,10 @@ vec3 shadePrimary(HitInfo h, vec3 rayDirection)
         return shadeOpaquePrimary(h, rayDirection);
     }
 
-    if (h.transmission > 0.001 &&
+    if (genericTransmissionEnabled() && h.transmission > 0.001 &&
         (h.materialFlags & kRtMaterialFlagTransmission) != 0u)
     {
-        return shadeBoundedDielectric(h, rayDirection);
+        return shadeProductionBoundedDielectric(h, rayDirection);
     }
 
     bool isThinGlass = h.instance == 0 && h.material == kMaterialClearGlass;

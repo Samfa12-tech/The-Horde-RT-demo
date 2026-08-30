@@ -72,6 +72,18 @@ layout(push_constant) uniform SceneControls
     float genericTransmissionActive;
 } controls;
 
+// The CPU binds this shader variant only when a visible TLAS instance owns a
+// transmitting material. Keeping the choice compile-time lets phone drivers
+// discard the bounded dielectric traversal from ordinary corridor frames.
+#ifndef HORDE_GENERIC_TRANSMISSION_VARIANT
+#define HORDE_GENERIC_TRANSMISSION_VARIANT 1
+#endif
+
+bool genericTransmissionEnabled()
+{
+    return HORDE_GENERIC_TRANSMISSION_VARIANT != 0;
+}
+
 struct HitInfo
 {
     bool hit;

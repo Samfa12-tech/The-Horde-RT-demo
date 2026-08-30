@@ -113,7 +113,7 @@ HeldItemTransform ExpectedHeldTorchFromFixedSnapshot(
         (forwardClearance - 0.30f) / (2.70f - 0.30f), 0.0f, 1.0f);
     const float heldDepth = 0.30f + (0.68f - 0.30f) * clearanceBlend;
     const std::array<float, 3u> localHand{{
-        -0.12f - sway, -0.41f + bob, heldDepth}};
+        -0.16f - sway, -0.41f + bob, heldDepth}};
     const std::array<float, 3u> eye{{
         snapshot.playerX, horde::gameplay::kShowcaseEyeWorldY,
         snapshot.playerZ}};
@@ -444,9 +444,9 @@ void TestSharedKinematicsOwnsWallDepthHandsAndSwordPose()
     input.walkAmount = 0.0f;
     const auto idle = horde::gameplay::items::EvaluateHeldItemKinematics(input);
     Check(Near(idle.heldPropDepth, 0.68f) &&
-              Near(idle.leftHandLocal[0], -0.12f) && Near(idle.leftHandLocal[1], -0.41f) &&
+              Near(idle.leftHandLocal[0], -0.16f) && Near(idle.leftHandLocal[1], -0.41f) &&
               Near(idle.leftHandLocal[2], idle.heldPropDepth) &&
-              Near(idle.rightHandLocal[0], 0.12f) && Near(idle.rightHandLocal[1], -0.44f) &&
+              Near(idle.rightHandLocal[0], 0.18f) && Near(idle.rightHandLocal[1], -0.44f) &&
               Near(idle.rightHandLocal[2], 0.77f),
           "shared kinematics must own the safe-frame wall-aware idle hand targets");
 

@@ -18,7 +18,7 @@ enum class FireEmitterQuality : std::uint32_t
 
 struct FireEmitterQualityBudget
 {
-    std::uint32_t volumeSteps = 6u;
+    std::uint32_t volumeSteps = 4u;
     std::uint32_t reflectionSamples = 1u;
 };
 

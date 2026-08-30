@@ -45,7 +45,7 @@ FireEmitterQualityBudget ResolveFireEmitterQualityBudget(const FireEmitterQualit
 {
     return quality == FireEmitterQuality::High
         ? FireEmitterQualityBudget{10u, 2u}
-        : FireEmitterQualityBudget{6u, 1u};
+        : FireEmitterQualityBudget{4u, 1u};
 }
 
 RtFireEmitterGpu PackFireEmitterGpu(

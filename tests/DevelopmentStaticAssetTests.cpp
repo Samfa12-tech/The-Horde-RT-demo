@@ -38,8 +38,8 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 34u,
-          "thirty-four isolated render-development, lantern stress, and wall checkpoints are exposed");
+    Check(kDevelopmentCheckpoints.size() == 35u,
+          "thirty-five isolated render-development, lantern stress, wall, and pitch checkpoints are exposed");
     const DevelopmentCheckpoint* checkpoint = FindDevelopmentCheckpoint("pbr-sword-closeup");
     Check(checkpoint != nullptr && checkpoint->id == 100 && checkpoint->baseShowcaseCheckpointId == 0 &&
               checkpoint->name == std::string_view("pbr-sword-closeup") &&
@@ -218,8 +218,21 @@ int main()
               wallLow->rewardStrafeAngleRadians == 0.52359877560f &&
               wallLow->rewardTorsionAngleRadians == 0.34906585040f,
           "near-wall low checkpoint appends stable ID 133 with representative swing and torsion");
+    const DevelopmentCheckpoint* lookUp =
+        FindDevelopmentCheckpoint("lantern-held-look-up");
+    Check(lookUp != nullptr && lookUp->id == 134 &&
+              lookUp->rewardPose == DevelopmentRewardPose::HeldHigh &&
+              lookUp->pitch == 0.28f,
+          "maximum-upward-look lantern checkpoint protects the block forearm cull regression");
     horde::gameplay::simulation::GameSimulation stagedWallHigh;
     horde::gameplay::simulation::GameSimulation stagedWallLow;
+    horde::gameplay::simulation::GameSimulation stagedLookUp;
+    Check(lookUp != nullptr &&
+              StageDevelopmentCheckpointSimulation(stagedLookUp, *lookUp) &&
+              stagedLookUp.Snapshot().playerPitchRadians == 0.28f &&
+              stagedLookUp.Snapshot().interaction.heldLightPose ==
+                  interactions::HeldLightPose::High,
+          "maximum-upward-look checkpoint freezes the exact claimed-lantern pitch and pose");
     Check(wallHigh != nullptr &&
               StageDevelopmentCheckpointSimulation(stagedWallHigh, *wallHigh) &&
               stagedWallHigh.Snapshot().playerX == 0.0f &&

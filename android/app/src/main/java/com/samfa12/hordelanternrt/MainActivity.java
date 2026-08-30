@@ -1640,6 +1640,7 @@ public class MainActivity extends Activity {
             case "lantern-sweep-low-alt-camera": return 131;
             case "lantern-wall-high": return 132;
             case "lantern-wall-low": return 133;
+            case "lantern-held-look-up": return 134;
             default: return -1;
         }
     }

@@ -194,7 +194,7 @@ HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
         return Lerp(from, to, amount);
     };
     const float swordGripDepth = heldPropDepth - 0.05f;
-    const Vec3 restHand{{0.12f, -0.44f, swordGripDepth}};
+    const Vec3 restHand{{0.18f, -0.44f, swordGripDepth}};
     const Vec3 downwardWindupHand{{0.08f, -0.17f,
                                    std::max(0.56f, swordGripDepth - 0.01f)}};
     const Vec3 downwardImpactHand{{0.02f, -0.70f,
@@ -418,7 +418,7 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
     const float torchSway = std::sin(input.walkTime * 6.2f) * 0.035f * movement;
     const float torchBob = std::abs(std::sin(input.walkTime * 6.2f)) * 0.025f * movement;
     const std::array<float, 3u> heldLeftHand{{
-        -0.12f - torchSway, -0.41f + torchBob, carriedPropDepth}};
+        -0.16f - torchSway, -0.41f + torchBob, carriedPropDepth}};
     const bool rewardLantern = input.interaction.heldLightKind ==
         horde::gameplay::interactions::HeldLightKind::RewardLantern;
     // The authored lantern is almost one metre tall. In open space it needs

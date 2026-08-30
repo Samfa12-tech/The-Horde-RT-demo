@@ -408,6 +408,321 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
     return clamp(transmittance * vec3(0.08), vec3(0.0), vec3(1.0));
 }
 
+// Phone-safe ordered shadow transport for the production path. A shadow ray
+// may cross several closed panes sequentially, but only one volume may be open
+// at a time. That matches the asset contract for the lantern and fixture while
+// making nested glass-on-glass terminate conservatively instead of carrying a
+// dynamically indexed volume stack in every raygen invocation. Mobile and
+// High retain the same entry/exit, thickness and Beer-Lambert model; High only
+// raises the ordered interface ceiling.
+vec3 compactShadowTransmittanceMask(vec3 origin, vec3 direction,
+                                    float maxDistance, uint mask)
+{
+    int interfaceBudget = controls.waterQuality >= 1.5
+        ? kHighShadowInterfaces : kMobileShadowInterfaces;
+    int interfaceCount = 0;
+    bool volumeOpen = false;
+    bool observedClosedVolumeEntry = false;
+    bool volumeCertified = false;
+    uint volumeInstance = 0u;
+    uint volumeMaterial = 0u;
+    float volumeEntryDistance = 0.0;
+    vec3 volumeAttenuationColor = vec3(1.0);
+    float volumeAttenuationDistance = 0.0;
+    vec3 transmittance = vec3(1.0);
+    vec3 currentOrigin = origin;
+    float travelledDistance = 0.0;
+    float remainingDistance = max(maxDistance, 0.0);
+
+    for (int traversal = 0; traversal <= kHighShadowInterfaces; ++traversal)
+    {
+        if (remainingDistance <= 0.0)
+        {
+            if (volumeOpen)
+            {
+                transmittance *= dielectricBeerLambert(
+                    volumeAttenuationColor,
+                    max(maxDistance - volumeEntryDistance, 0.0),
+                    volumeAttenuationDistance);
+                atomicAdd(rtDielectricDiagnostics.value.shadowFiniteEndpointVolumeCount,
+                          1u);
+            }
+            return clamp(transmittance, vec3(0.0), vec3(1.0));
+        }
+
+        float epsilon = dielectricRayEpsilon(currentOrigin, travelledDistance);
+        float minimumDistance = interfaceCount == 0 ? 0.0015 : epsilon * 0.5;
+        ShadowHit nearest = traceNearestShadowHit(
+            currentOrigin, direction, remainingDistance, mask, minimumDistance);
+        if (!nearest.hit)
+        {
+            if (volumeOpen)
+            {
+                transmittance *= dielectricBeerLambert(
+                    volumeAttenuationColor,
+                    max(maxDistance - volumeEntryDistance, 0.0),
+                    volumeAttenuationDistance);
+                atomicAdd(rtDielectricDiagnostics.value.shadowFiniteEndpointVolumeCount,
+                          1u);
+            }
+            return clamp(transmittance, vec3(0.0), vec3(1.0));
+        }
+        if (!nearest.transparent)
+        {
+            if (volumeOpen && volumeCertified)
+            {
+                atomicAdd(
+                    rtDielectricDiagnostics.value.shadowCertifiedClosedVolumeRecoveryCount,
+                    1u);
+                atomicOr(
+                    rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask,
+                    32u);
+            }
+            return vec3(0.0);
+        }
+        if (interfaceCount >= interfaceBudget)
+        {
+            atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);
+            if (nearest.instance == 8u || (volumeOpen && volumeInstance == 8u))
+                atomicAdd(
+                    rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
+            return clamp(transmittance * vec3(0.08), vec3(0.0), vec3(1.0));
+        }
+        ++interfaceCount;
+
+        float absoluteDistance = travelledDistance + nearest.t;
+        if (nearest.thinWall)
+        {
+            transmittance *= nearest.transmission *
+                mix(vec3(1.0), nearest.tint, 0.12);
+        }
+        else if (nearest.entering)
+        {
+            // The runtime asset contract forbids overlapping closed panes.
+            // Treat a nested entry as a bounded invalid-stack recovery.
+            if (volumeOpen)
+            {
+                atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);
+                if (nearest.instance == 8u || volumeInstance == 8u)
+                    atomicAdd(
+                        rtDielectricDiagnostics.value.productionPaneStackFailureCount,
+                        1u);
+                return vec3(0.0);
+            }
+            observedClosedVolumeEntry = true;
+            volumeOpen = true;
+            volumeCertified = nearest.certifiedClosedVolume;
+            volumeInstance = nearest.instance;
+            volumeMaterial = nearest.material;
+            volumeEntryDistance = absoluteDistance;
+            volumeAttenuationColor = nearest.attenuationColor;
+            volumeAttenuationDistance = nearest.attenuationDistance;
+            transmittance *= nearest.transmission;
+        }
+        else if (!volumeOpen && !observedClosedVolumeEntry)
+        {
+            // The sampled light segment begins inside this closed medium.
+            transmittance *= nearest.transmission * dielectricBeerLambert(
+                nearest.attenuationColor, absoluteDistance,
+                nearest.attenuationDistance);
+            atomicAdd(rtDielectricDiagnostics.value.shadowImplicitOriginExitCount,
+                      1u);
+        }
+        else if (!volumeOpen || volumeInstance != nearest.instance ||
+                 volumeMaterial != nearest.material)
+        {
+            if (volumeCertified && nearest.certifiedClosedVolume)
+            {
+                atomicAdd(
+                    rtDielectricDiagnostics.value.shadowCertifiedClosedVolumeRecoveryCount,
+                    1u);
+                atomicOr(
+                    rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask,
+                    256u);
+                return vec3(0.0);
+            }
+            atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);
+            atomicAdd(rtDielectricDiagnostics.value.shadowUnclosedVolumeCount, 1u);
+            atomicAdd(rtDielectricDiagnostics.value.shadowMismatchedExitCount, 1u);
+            if (!volumeOpen)
+                atomicAdd(rtDielectricDiagnostics.value.shadowMismatchEmptyCount, 1u);
+            if (nearest.instance == 8u || (volumeOpen && volumeInstance == 8u))
+                atomicAdd(
+                    rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
+            return clamp(transmittance * vec3(0.08), vec3(0.0), vec3(1.0));
+        }
+        else
+        {
+            transmittance *= dielectricBeerLambert(
+                volumeAttenuationColor,
+                max(absoluteDistance - volumeEntryDistance, 0.0),
+                volumeAttenuationDistance);
+            volumeOpen = false;
+            volumeCertified = false;
+        }
+
+        if (max(transmittance.r, max(transmittance.g, transmittance.b)) <= 0.001)
+            return vec3(0.0);
+
+        vec3 hitPosition = currentOrigin + direction * nearest.t;
+        epsilon = dielectricRayEpsilon(hitPosition, absoluteDistance);
+        currentOrigin = hitPosition + direction * epsilon;
+        travelledDistance = absoluteDistance + epsilon;
+        remainingDistance = max(maxDistance - travelledDistance, 0.0);
+    }
+
+    atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);
+    if (volumeOpen && volumeInstance == 8u)
+        atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
+    return clamp(transmittance * vec3(0.08), vec3(0.0), vec3(1.0));
+}
+
+bool shadowSegmentIntersectsBounds(vec3 origin, vec3 direction,
+                                   float maxDistance,
+                                   vec3 boundsMin, vec3 boundsMax)
+{
+    vec3 safeDirection = sign(direction + vec3(0.0000001)) *
+        max(abs(direction), vec3(0.0001));
+    vec3 first = (boundsMin - origin) / safeDirection;
+    vec3 second = (boundsMax - origin) / safeDirection;
+    vec3 nearPlane = min(first, second);
+    vec3 farPlane = max(first, second);
+    float intervalStart = max(max(nearPlane.x, nearPlane.y), nearPlane.z);
+    float intervalEnd = min(min(farPlane.x, farPlane.y), farPlane.z);
+    return intervalEnd > max(intervalStart, 0.0) &&
+           intervalStart < maxDistance;
+}
+
+bool shadowSegmentCrossesTransparentWorld(vec3 origin, vec3 direction,
+                                          float maxDistance)
+{
+    // Procedural world geometry currently shares one BLAS geometry and is
+    // therefore marked opaque at build time. These conservative world-space
+    // bounds cover every clear roof pane, catchment/runoff sheet, and the full
+    // tunable waterfall envelope. Only segments that can touch those surfaces
+    // need NoOpaque candidate filtering; elsewhere Vulkan can commit opaque
+    // stone/metal in hardware and expose only imported dielectric geometry.
+    return shadowSegmentIntersectsBounds(
+               origin, direction, maxDistance,
+               vec3(-0.80, 1.27, -5.30), vec3(0.70, 1.40, -3.30)) ||
+           shadowSegmentIntersectsBounds(
+               origin, direction, maxDistance,
+               vec3(-5.45, -1.02, -16.90), vec3(-1.75, 2.60, -13.50));
+}
+
+// One ray query can visit every candidate interface on a finite light segment.
+// Opaque candidates are committed normally; transmissive candidates instead
+// contribute bounded per-interface Fresnel-independent transmission, tint and
+// half of the material's validated closed-volume thickness. A closed pane's
+// entry and exit therefore accumulate its complete Beer-Lambert path without
+// relaunching a query or keeping a per-ray dynamic stack. Primary camera
+// transport still measures exact geometric entry/exit distance and refraction.
+vec3 boundedShadowTransmittanceMask(vec3 origin, vec3 direction,
+                                    float maxDistance, uint mask)
+{
+    int interfaceBudget = controls.waterQuality >= 1.5
+        ? kHighShadowInterfaces : kMobileShadowInterfaces;
+    int interfaceCount = 0;
+    bool overflow = false;
+    bool productionPaneOverflow = false;
+    vec3 transmittance = vec3(1.0);
+
+    rayQueryEXT query;
+    uint shadowFlags = shadowSegmentCrossesTransparentWorld(
+        origin, direction, maxDistance) ? gl_RayFlagsNoOpaqueEXT : 0u;
+    rayQueryInitializeEXT(query, topLevelAS, shadowFlags, mask,
+                          origin, 0.0015, direction,
+                          max(maxDistance, 0.004));
+    while (rayQueryProceedEXT(query))
+    {
+        if (rayQueryGetIntersectionTypeEXT(query, false) !=
+            gl_RayQueryCandidateIntersectionTriangleEXT)
+            continue;
+
+        uint instance = uint(
+            rayQueryGetIntersectionInstanceCustomIndexEXT(query, false));
+        int primitive = rayQueryGetIntersectionPrimitiveIndexEXT(query, false);
+        bool transparentWorldPane = int(instance) == kWaterfallInstance;
+        if (instance == 0u)
+        {
+            int material = int(worldSurfaces.codes[primitive] & 0xffu);
+            transparentWorldPane = material == kMaterialClearGlass ||
+                                   material == kMaterialWater;
+        }
+        if (transparentWorldPane)
+            continue;
+
+        bool materialTransmits = false;
+        RtMaterialGpu material;
+        RtInstanceMetadata instanceMetadata = rtInstances.values[instance];
+        if ((instanceMetadata.flags & kRtInstanceFlagStaticPbr) != 0u)
+        {
+            uint geometryIndex =
+                rayQueryGetIntersectionGeometryIndexEXT(query, false);
+            if (geometryIndex < instanceMetadata.primitiveCount)
+            {
+                RtPrimitiveMetadata primitiveMetadata = rtPrimitives.values[
+                    instanceMetadata.primitiveBase + geometryIndex];
+                material = rtMaterials.values[primitiveMetadata.materialIndex];
+                float transmission = clamp(
+                    material.metallicRoughnessOcclusionTransmission.w,
+                    0.0, 1.0);
+                float metallic = clamp(
+                    material.metallicRoughnessOcclusionTransmission.x,
+                    0.0, 1.0);
+                materialTransmits =
+                    (material.materialFlags.x &
+                     kRtMaterialFlagTransmission) != 0u &&
+                    transmission > 0.001 && metallic <= 0.5;
+            }
+        }
+
+        if (!materialTransmits)
+        {
+            rayQueryConfirmIntersectionEXT(query);
+            continue;
+        }
+
+        if (interfaceCount >= interfaceBudget)
+        {
+            overflow = true;
+            productionPaneOverflow = productionPaneOverflow || instance == 8u;
+            continue;
+        }
+        ++interfaceCount;
+
+        float transmission = clamp(
+            material.metallicRoughnessOcclusionTransmission.w, 0.0, 1.0);
+        vec3 tint = clamp(material.baseColorFactor.rgb,
+                          vec3(0.0), vec3(1.0));
+        transmittance *= transmission * mix(vec3(1.0), tint, 0.12);
+        if ((material.materialFlags.x & kRtMaterialFlagThinWall) == 0u)
+        {
+            float closedThickness = max(
+                material.iorThicknessAttenuationDistance.y, 0.0);
+            transmittance *= dielectricBeerLambert(
+                clamp(material.attenuationColor.rgb,
+                      vec3(0.0), vec3(1.0)),
+                closedThickness * 0.5,
+                material.iorThicknessAttenuationDistance.z);
+        }
+    }
+
+    if (rayQueryGetIntersectionTypeEXT(query, true) !=
+        gl_RayQueryCommittedIntersectionNoneEXT)
+        return vec3(0.0);
+    if (overflow)
+    {
+        atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);
+        if (productionPaneOverflow)
+            atomicAdd(
+                rtDielectricDiagnostics.value.productionPaneStackFailureCount,
+                1u);
+        transmittance *= vec3(0.08);
+    }
+    return clamp(transmittance, vec3(0.0), vec3(1.0));
+}
+
 float visibilityMask(vec3 origin, vec3 direction, float maxDistance, uint mask)
 {
     rayQueryEXT query;
@@ -433,9 +748,20 @@ float visibilityMask(vec3 origin, vec3 direction, float maxDistance, uint mask)
         gl_RayQueryCommittedIntersectionNoneEXT ? 1.0 : 0.0;
 }
 
+vec3 sceneShadowTransmittanceMask(vec3 origin, vec3 direction,
+                                  float maxDistance, uint mask)
+{
+    if (!genericTransmissionEnabled())
+    {
+        return vec3(visibilityMask(origin, direction, maxDistance, mask));
+    }
+    return boundedShadowTransmittanceMask(
+        origin, direction, maxDistance, mask);
+}
+
 vec3 offsetRayOrigin(HitInfo h, vec3 direction)
 {
-    bool genericTransmissionActive = controls.genericTransmissionActive > 0.5;
+    bool genericTransmissionActive = genericTransmissionEnabled();
     if (genericTransmissionActive)
     {
         return advanceDielectricRayOrigin(
@@ -460,7 +786,7 @@ float visibility(vec3 origin, vec3 direction, float maxDistance)
 
 float transparentVisibility(vec3 origin, vec3 direction, float maxDistance)
 {
-    vec3 transmittance = shadowTransmittanceMask(
+    vec3 transmittance = sceneShadowTransmittanceMask(
         origin, direction, maxDistance, 0x35u);
     return dot(transmittance, vec3(0.2126, 0.7152, 0.0722));
 }
@@ -479,7 +805,7 @@ mat4 transparentTransmittanceBatch(vec3 origins[kShadowSampleCapacity],
     for (int shadowSample = 0; shadowSample < kShadowSampleCapacity; ++shadowSample)
     {
         if (!enabled[shadowSample]) continue;
-        result[shadowSample] = vec4(shadowTransmittanceMask(
+        result[shadowSample] = vec4(sceneShadowTransmittanceMask(
             origins[shadowSample], directions[shadowSample],
             distances[shadowSample], 0x35u), 1.0);
     }
@@ -525,10 +851,16 @@ vec3 bounceSample(HitInfo h, vec3 incoming, bool lightAwareMirror)
     vec3 toLight = localLightPosition - h.position;
     float lightDistance = length(toLight);
     vec3 lightDirection = toLight / max(lightDistance, 0.001);
-    bool genericTransmissionActive = controls.genericTransmissionActive > 0.5;
-    vec3 lightTransmittance = shadowTransmittanceMask(
-        offsetRayOrigin(h, lightDirection), lightDirection,
-        lightDistance - 0.02, 0x35u);
+    bool genericTransmissionActive = genericTransmissionEnabled();
+    // Passage/staff lights may be absent while the held fire emitter remains
+    // active. Do not launch a second shadow ray toward the zero placeholder;
+    // the emitter query below still supplies the physically coherent coloured
+    // light for the reflected hit.
+    vec3 lightTransmittance = localLightStrength > 0.001
+        ? sceneShadowTransmittanceMask(
+            offsetRayOrigin(h, lightDirection), lightDirection,
+            lightDistance - 0.02, 0x35u)
+        : vec3(0.0);
     float lightVisibility = lightTransmittance.x;
     float diffuse = max(dot(h.normal, lightDirection), 0.0);
     float attenuation = 1.0 / (1.0 + lightDistance * lightDistance * 0.58);
@@ -582,7 +914,7 @@ vec3 fireEmitterDirectLighting(HitInfo h, vec3 rayDirection, bool dualVisibility
                                         vec3(0.070, 0.10, 0.060));
     int sampleIndex = int((gl_LaunchIDEXT.x + gl_LaunchIDEXT.y) & 1u);
     float reflective = max(h.metallic, h.reflectivity);
-    bool genericTransmissionActive = controls.genericTransmissionActive > 0.5;
+    bool genericTransmissionActive = genericTransmissionEnabled();
     vec3 result = vec3(0.0);
     for (uint emitterIndex = 0u; emitterIndex < kRtActiveFireEmitterCapacity;
          ++emitterIndex)
@@ -599,7 +931,19 @@ vec3 fireEmitterDirectLighting(HitInfo h, vec3 rayDirection, bool dualVisibility
         vec3 sampleVector = lightPosition + areaOffsets[sampleIndex] - h.position;
         float sampleDistance = length(sampleVector);
         vec3 sampleDirection = sampleVector / max(sampleDistance, 0.001);
-        vec3 lightTransmittance = shadowTransmittanceMask(
+        float attenuation = 1.0 / (1.0 + lightDistance * lightDistance * 0.58);
+        float diffuse = max(dot(h.normal, lightDirection), 0.0);
+        float specular = allowAnalyticSpecular
+            ? pow(max(dot(reflect(-lightDirection, h.normal),
+                          -rayDirection), 0.0),
+                  mix(34.0, 5.0, reflective))
+            : 0.0;
+        // A shadow ray cannot affect a mathematically zero lighting term.
+        // Rejecting that work before traversal is exact (not a visibility
+        // approximation) and matters for the three orthogonal corridor faces.
+        if (diffuse <= 0.0 && specular <= 0.0)
+            continue;
+        vec3 lightTransmittance = sceneShadowTransmittanceMask(
             offsetRayOrigin(h, sampleDirection), sampleDirection,
             sampleDistance - 0.02, 0x35u);
         if (dualVisibility)
@@ -608,13 +952,11 @@ vec3 fireEmitterDirectLighting(HitInfo h, vec3 rayDirection, bool dualVisibility
             float otherDistance = length(otherVector);
             vec3 otherDirection = otherVector / max(otherDistance, 0.001);
             lightTransmittance = 0.5 * (lightTransmittance +
-                shadowTransmittanceMask(
+                sceneShadowTransmittanceMask(
                     offsetRayOrigin(h, otherDirection), otherDirection,
                     otherDistance - 0.02, 0x35u));
         }
         float lightVisibility = lightTransmittance.x;
-        float attenuation = 1.0 / (1.0 + lightDistance * lightDistance * 0.58);
-        float diffuse = max(dot(h.normal, lightDirection), 0.0);
         if (!genericTransmissionActive)
         {
             result += h.base * lightColor * diffuse * attenuation * lightVisibility *
@@ -627,9 +969,6 @@ vec3 fireEmitterDirectLighting(HitInfo h, vec3 rayDirection, bool dualVisibility
         }
         if (allowAnalyticSpecular)
         {
-            float specular = pow(max(dot(reflect(-lightDirection, h.normal),
-                                         -rayDirection), 0.0),
-                                 mix(34.0, 5.0, reflective));
             if (!genericTransmissionActive)
             {
                 result += lightColor * specular * attenuation * lightVisibility *
@@ -690,7 +1029,7 @@ vec3 shadeOpaqueDirect(HitInfo h, vec3 rayDirection, bool dualVisibility,
     vec3 sampleVector = localPosition + areaOffsets[sampleIndex] - h.position;
     float sampleDistance = length(sampleVector);
     vec3 sampleDirection = sampleVector / max(sampleDistance, 0.001);
-    bool genericTransmissionActive = controls.genericTransmissionActive > 0.5;
+    bool genericTransmissionActive = genericTransmissionEnabled();
     vec3 localTransmittance = vec3(0.0);
     vec3 skyTransmittance = vec3(0.0);
     vec3 skyDirection;
@@ -717,6 +1056,20 @@ vec3 shadeOpaqueDirect(HitInfo h, vec3 rayDirection, bool dualVisibility,
                        otherSkyDistance, otherSkyRadiance, otherSkyGain);
         skyRadiance = 0.5 * (skyRadiance + otherSkyRadiance);
     }
+    float reflective = max(h.metallic, h.reflectivity);
+    float localDiffuse = max(dot(h.normal, localDirection), 0.0);
+    float localSpecular = pow(max(dot(reflect(-localDirection, h.normal),
+                                      -rayDirection), 0.0),
+                              mix(34.0, 5.0, reflective));
+    float localAttenuation = 1.0 / (1.0 + localDistance * localDistance * 0.58);
+    skyDiffuse = max(dot(h.normal, skyDirection), 0.0);
+    vec3 skyHalf = normalize(skyDirection - rayDirection);
+    float skySpecular = pow(max(dot(h.normal, skyHalf), 0.0),
+                            mix(12.0, 96.0, reflective));
+    bool localContributes = localStrength > 0.001 &&
+        (localDiffuse > 0.0 || localSpecular > 0.0);
+    bool skyContributes = (skyGain > 0.0 || otherSkyGain > 0.0) &&
+        (skyDiffuse > 0.0 || skySpecular > 0.0);
     vec3 visibilityOrigins[kShadowSampleCapacity] = vec3[kShadowSampleCapacity](
         offsetRayOrigin(h, sampleDirection), offsetRayOrigin(h, otherDirection),
         offsetRayOrigin(h, skyDirection), offsetRayOrigin(h, otherSkyDirection));
@@ -727,8 +1080,9 @@ vec3 shadeOpaqueDirect(HitInfo h, vec3 rayDirection, bool dualVisibility,
         skyDistance - 0.02, otherSkyDistance - 0.02);
     mat4 transmittanceSamples = transparentTransmittanceBatch(
         visibilityOrigins, visibilityDirections, visibilityDistances,
-        bvec4(localStrength > 0.001,
-              dualVisibility && localStrength > 0.001, true, dualVisibility));
+        bvec4(localContributes,
+              dualVisibility && localContributes,
+              skyContributes, dualVisibility && skyContributes));
     localTransmittance = dualVisibility
         ? 0.5 * (transmittanceSamples[0].xyz + transmittanceSamples[1].xyz)
         : transmittanceSamples[0].xyz;
@@ -743,16 +1097,6 @@ vec3 shadeOpaqueDirect(HitInfo h, vec3 rayDirection, bool dualVisibility,
         ? skyTransmittance.x
         : dot(skyTransmittance, vec3(0.2126, 0.7152, 0.0722));
 
-    float reflective = max(h.metallic, h.reflectivity);
-    float localDiffuse = max(dot(h.normal, localDirection), 0.0);
-    float localSpecular = pow(max(dot(reflect(-localDirection, h.normal),
-                                      -rayDirection), 0.0),
-                              mix(34.0, 5.0, reflective));
-    float localAttenuation = 1.0 / (1.0 + localDistance * localDistance * 0.58);
-    skyDiffuse = max(dot(h.normal, skyDirection), 0.0);
-    vec3 skyHalf = normalize(skyDirection - rayDirection);
-    float skySpecular = pow(max(dot(h.normal, skyHalf), 0.0),
-                            mix(12.0, 96.0, reflective));
     float skyFresnel = pow(1.0 - max(dot(h.normal, -rayDirection), 0.0), 5.0);
     vec3 cold = tunedLightColor(vec3(0.15, 0.20, 0.28), kLightSkylight);
 
