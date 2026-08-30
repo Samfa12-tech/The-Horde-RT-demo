@@ -362,9 +362,16 @@ bool IsTrustedReleasePage(std::string_view page, std::string_view tag)
 std::string BoundedNotes(std::string notes)
 {
     if (notes.size() <= kMaximumReleaseNotesBytes) return notes;
-    notes.resize(kMaximumReleaseNotesBytes);
-    while (!notes.empty() && (static_cast<unsigned char>(notes.back()) & 0xc0u) == 0x80u) notes.pop_back();
-    notes += "\n\n[Release notes truncated. Open the GitHub release page for the full notes.]";
+    constexpr std::string_view suffix =
+        "\n\n[Release notes truncated. Open the GitHub release page for the full notes.]";
+    std::size_t prefixBytes = kMaximumReleaseNotesBytes - suffix.size();
+    while (prefixBytes < notes.size() && prefixBytes != 0u &&
+           (static_cast<unsigned char>(notes[prefixBytes]) & 0xc0u) == 0x80u)
+    {
+        --prefixBytes;
+    }
+    notes.resize(prefixBytes);
+    notes.append(suffix);
     return notes;
 }
 

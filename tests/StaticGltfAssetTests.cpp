@@ -1,14 +1,18 @@
 #include "scene/assets/AssetManifest.h"
+#include "scene/assets/AssetValidation.h"
 #include "scene/assets/DielectricTopologyMath.h"
 #include "scene/assets/StaticMeshAsset.h"
+#include "third_party/cgltf/cgltf.h"
 
 #include <array>
 #include <cmath>
+#include <cstdlib>
 #include <cstdint>
 #include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -24,6 +28,7 @@ namespace
 {
 
 int failures = 0;
+std::filesystem::path executablePath;
 const std::filesystem::path kFixtureRoot{HORDE_RT_STATIC_GLTF_FIXTURE_DIR};
 const std::filesystem::path kDielectricFixtureRoot{HORDE_RT_DIELECTRIC_FIXTURE_DIR};
 
@@ -469,6 +474,91 @@ void TestManifestContract(const std::filesystem::path& temporaryRoot)
     ExpectManifestFailure(
         RewriteManifest(temporaryRoot, "bad-profile.manifest.json", "\"android\": \"astc\"", "\"android\": \"rgba8\""),
         "Asset manifest runtimeTextureProfile must be Android ASTC, Windows RGBA8, and mipmapped.");
+
+    ExpectManifestFailure(
+        RewriteManifest(temporaryRoot, "duplicate-root-key.manifest.json",
+                        "\"schema\": 1,", "\"schema\": 1, \"schema\": 1,"),
+        "Asset manifest JSON contains duplicate key 'schema'.");
+
+    const auto trailingGarbage = temporaryRoot / "trailing-garbage.manifest.json";
+    WriteText(trailingGarbage, ReadText(kFixtureRoot / "valid.manifest.json") + " trailing");
+    ExpectManifestFailure(trailingGarbage,
+                          "Asset manifest JSON has trailing content.");
+
+    ExpectManifestFailure(
+        RewriteManifest(temporaryRoot, "wrong-nesting.manifest.json",
+                        "\"schema\": 1,", "\"metadata\": {\"schema\": 1},"),
+        "Asset manifest contains unsupported root field 'metadata'.");
+
+    const auto oversizedManifest = temporaryRoot / "oversized.manifest.json";
+    {
+        std::ofstream output(oversizedManifest, std::ios::binary | std::ios::trunc);
+        output.seekp(static_cast<std::streamoff>(1024u * 1024u));
+        output.put('x');
+    }
+    ExpectManifestFailure(oversizedManifest,
+                          "Asset manifest exceeds the bounded JSON size limit.");
+}
+
+void TestAccessorRangeRejectsOverflow()
+{
+    std::uint8_t byte = 0u;
+    cgltf_buffer buffer{};
+    buffer.data = &byte;
+    buffer.size = std::numeric_limits<std::size_t>::max();
+    cgltf_buffer_view view{};
+    view.buffer = &buffer;
+    view.size = std::numeric_limits<std::size_t>::max();
+    cgltf_accessor accessor{};
+    accessor.buffer_view = &view;
+    accessor.type = cgltf_type_scalar;
+    accessor.component_type = cgltf_component_type_r_32f;
+    accessor.count = 4u;
+    accessor.stride = std::numeric_limits<std::size_t>::max() / 2u;
+
+    std::string diagnostic;
+    Check(!horde::scene::assets::ValidateAccessorRange(accessor, 0u, diagnostic),
+          "accessor range validation rejects overflowing count/stride arithmetic");
+    Check(diagnostic == "Static GLB accessor data is out of range.",
+          "overflowing accessor range uses the bounded range diagnostic");
+}
+
+void TestUnsupportedAlphaMaterialIsRejected(
+    const std::filesystem::path& temporaryRoot,
+    const horde::scene::assets::AssetManifest& manifest)
+{
+    const auto alpha = RewriteGlb(
+        temporaryRoot, "alpha-mask.glb", "{\"name\":\"FixtureMaterial\"",
+        "{\"alphaMode\":\"MASK\",\"name\":\"FixtureMaterial\"");
+    ExpectAssetFailure(alpha, manifest,
+                       "Static GLB material 0 uses unsupported alphaMode; only OPAQUE is supported.");
+}
+
+void TestCyclicNodeGraphIsRejectedBeforeTraversal(
+    const std::filesystem::path& temporaryRoot)
+{
+    const auto cyclic = RewriteGlb(
+        temporaryRoot, "cyclic-node.glb", "{\"name\":\"grip\",\"rotation\"",
+        "{\"name\":\"grip\",\"children\":[0],\"rotation\"");
+    const auto manifest = kFixtureRoot / "valid.manifest.json";
+#if defined(_WIN32)
+    const std::string executable = executablePath.string();
+    const std::string cyclicArgument = cyclic.string();
+    const std::string manifestArgument = manifest.string();
+    _putenv_s("HORDE_TEST_CYCLIC_PATH", cyclicArgument.c_str());
+    _putenv_s("HORDE_TEST_CYCLIC_MANIFEST", manifestArgument.c_str());
+    const char* arguments[]{executable.c_str(), nullptr};
+    const int result = static_cast<int>(_spawnv(_P_WAIT, executable.c_str(), arguments));
+    _putenv_s("HORDE_TEST_CYCLIC_PATH", "");
+    _putenv_s("HORDE_TEST_CYCLIC_MANIFEST", "");
+#else
+    const std::string command = "\"" + executablePath.string() +
+        "\" --probe-cyclic \"" + cyclic.string() + "\" \"" + manifest.string() + "\"";
+    const int result = std::system(command.c_str());
+#endif
+    Check(result == 0,
+          std::string("cyclic node graph is rejected cleanly before recursive world-transform traversal; child result=") +
+              std::to_string(result));
 }
 
 void TestAcceptedStaticGlbContract(const horde::scene::assets::AssetManifest& manifest)
@@ -701,7 +791,7 @@ void TestMalformedAndUnsupportedGlbs(const std::filesystem::path& temporaryRoot,
     parts.binary[192u] = 9u;
     const auto badIndex = temporaryRoot / "bad-index.glb";
     WriteGlb(badIndex, std::move(parts.json), std::move(parts.binary));
-    ExpectAssetFailure(badIndex, manifest, "Static GLB index is out of range for primitive 0.");
+    ExpectAssetFailure(badIndex, manifest, "Static GLB failed cgltf structural validation.");
 
     ExpectAssetFailure(
         RewriteGlb(temporaryRoot, "bad-mode.glb", "\"material\":0,\"mode\":4", "\"material\":0,\"mode\":1"), manifest,
@@ -756,8 +846,15 @@ void TestBudgetFailures(const std::filesystem::path& temporaryRoot,
     const auto vertexManifest = RewriteManifest(
         temporaryRoot, "vertex-budget.manifest.json", "\"maxVertices\": 16", "\"maxVertices\": 7");
     Check(AssetManifest::Load(vertexManifest, manifest, diagnostic), "vertex budget manifest loads");
-    ExpectAssetFailure(kFixtureRoot / "valid-multi.glb", manifest,
-                       "Static GLB exceeds manifest maxVertices capacity.");
+    horde::scene::assets::StaticMeshAsset rejectedVertexAsset;
+    Check(!horde::scene::assets::StaticMeshAsset::Load(
+              kFixtureRoot / "valid-multi.glb", manifest, rejectedVertexAsset, diagnostic) &&
+              diagnostic == "Static GLB exceeds manifest maxVertices capacity.",
+          "vertex budget overflow is rejected with the capacity diagnostic");
+    Check(rejectedVertexAsset.vertices.empty() && rejectedVertexAsset.indices.empty() &&
+              rejectedVertexAsset.primitives.empty() && rejectedVertexAsset.materials.empty() &&
+              rejectedVertexAsset.nodeTransforms.empty(),
+          "geometry budgets are preflighted before material, transform, vertex, or index decoding");
 
     const auto primitiveManifest = RewriteManifest(
         temporaryRoot, "primitive-budget.manifest.json", "\"maxPrimitives\": 4", "\"maxPrimitives\": 1");
@@ -983,8 +1080,8 @@ void TestRuntimeOfflineDielectricComponentParity()
     diagnostic.clear();
     Check(!AssetManifest::Load(fixtureRoot / "nan-units.manifest.json",
                                rejectedManifest, diagnostic) &&
-              diagnostic == "Asset manifest metresPerUnit must be finite and greater than zero.",
-          "runtime rejects NaN metresPerUnit after runtime-float conversion");
+              diagnostic == "Asset manifest JSON is invalid.",
+          "runtime rejects non-JSON NaN metresPerUnit before schema conversion");
 }
 
 void TestExactDielectricWeldCellDomain()
@@ -1023,8 +1120,39 @@ void TestExactDielectricWeldCellDomain()
 
 } // namespace
 
-int main()
+int main(int argc, char** argv)
 {
+    executablePath = std::filesystem::absolute(argv[0]);
+#if defined(_WIN32)
+    const char* cyclicEnvironment = std::getenv("HORDE_TEST_CYCLIC_PATH");
+    const char* manifestEnvironment = std::getenv("HORDE_TEST_CYCLIC_MANIFEST");
+    if (cyclicEnvironment != nullptr && cyclicEnvironment[0] != '\0' &&
+        manifestEnvironment != nullptr && manifestEnvironment[0] != '\0')
+    {
+        horde::scene::assets::AssetManifest manifest;
+        horde::scene::assets::StaticMeshAsset asset;
+        std::string diagnostic;
+        if (!horde::scene::assets::AssetManifest::Load(
+                manifestEnvironment, manifest, diagnostic)) return 3;
+        const bool loaded = horde::scene::assets::StaticMeshAsset::Load(
+            cyclicEnvironment, manifest, asset, diagnostic);
+        const bool safeDiagnostic =
+            diagnostic == "Static GLB failed cgltf structural validation." ||
+            diagnostic == "Static GLB contains an out-of-range accessor or index reference.";
+        return !loaded && safeDiagnostic ? 0 : 2;
+    }
+#endif
+    if (argc == 4 && std::string_view(argv[1]) == "--probe-cyclic")
+    {
+        horde::scene::assets::AssetManifest manifest;
+        horde::scene::assets::StaticMeshAsset asset;
+        std::string diagnostic;
+        if (!horde::scene::assets::AssetManifest::Load(argv[3], manifest, diagnostic)) return 3;
+        const bool loaded = horde::scene::assets::StaticMeshAsset::Load(
+            argv[2], manifest, asset, diagnostic);
+        return !loaded && diagnostic == "Static GLB failed cgltf structural validation." ? 0 : 2;
+    }
+
     const ScopedStaticGltfTestDirectory scopedTemporaryRoot;
     Check(scopedTemporaryRoot.Ready(),
           "process/config-unique static GLB temporary directory is safely created");
@@ -1034,6 +1162,8 @@ int main()
               << temporaryRoot.filename().string() << '\n';
 
     TestManifestContract(temporaryRoot);
+    TestAccessorRangeRejectsOverflow();
+    TestCyclicNodeGraphIsRejectedBeforeTraversal(temporaryRoot);
     TestExactDielectricWeldCellDomain();
     TestProductionDielectricFixture();
     TestRuntimeOfflineDielectricComponentParity();
@@ -1049,6 +1179,7 @@ int main()
     else
     {
         TestAcceptedStaticGlbContract(manifest);
+        TestUnsupportedAlphaMaterialIsRejected(temporaryRoot, manifest);
         TestTransmissionDefaultThinWallSemantics(temporaryRoot, manifest);
         TestThickDielectricTopology(temporaryRoot, manifest);
         TestBakedNodeTransformAndUnitScale(temporaryRoot);

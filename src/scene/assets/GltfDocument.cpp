@@ -125,6 +125,12 @@ bool GltfDocument::Load(const std::filesystem::path& path,
         diagnostic = "Static GLB buffer payload could not be loaded.";
         return false;
     }
+    if (cgltf_validate(data) != cgltf_result_success)
+    {
+        cgltf_free(data);
+        diagnostic = "Static GLB failed cgltf structural validation.";
+        return false;
+    }
 
     document = GltfDocument{};
     document.data_ = data;

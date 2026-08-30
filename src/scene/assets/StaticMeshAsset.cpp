@@ -763,6 +763,65 @@ bool ValidateUnsupportedFeatures(const cgltf_data& data, std::string& diagnostic
     return true;
 }
 
+bool PreflightGeometryBudgets(const cgltf_data& data,
+                              const AssetManifest& manifest,
+                              const AssetLodBudget& selectedLod,
+                              std::string& diagnostic)
+{
+    std::uint64_t vertexCount = 0u;
+    std::uint64_t indexCount = 0u;
+    std::uint64_t primitiveCount = 0u;
+    std::uint64_t triangleCount = 0u;
+    for (std::size_t nodeIndex = 0u; nodeIndex < data.nodes_count; ++nodeIndex)
+    {
+        const cgltf_node& node = data.nodes[nodeIndex];
+        if (node.mesh == nullptr) continue;
+        for (std::size_t localPrimitive = 0u;
+             localPrimitive < node.mesh->primitives_count; ++localPrimitive)
+        {
+            const cgltf_primitive& primitive = node.mesh->primitives[localPrimitive];
+            if (primitiveCount >= manifest.budgets.maxPrimitives)
+            {
+                diagnostic = "Static GLB exceeds manifest maxPrimitives capacity.";
+                return false;
+            }
+            ++primitiveCount;
+
+            const cgltf_accessor* positions = FindAttribute(
+                primitive, cgltf_attribute_type_position);
+            if (positions != nullptr)
+            {
+                if (positions->count > manifest.budgets.maxVertices - vertexCount ||
+                    positions->count > std::numeric_limits<std::uint32_t>::max())
+                {
+                    diagnostic = "Static GLB exceeds manifest maxVertices capacity.";
+                    return false;
+                }
+                vertexCount += static_cast<std::uint64_t>(positions->count);
+            }
+            if (primitive.indices != nullptr)
+            {
+                if (primitive.indices->count > manifest.budgets.maxIndices - indexCount ||
+                    primitive.indices->count > std::numeric_limits<std::uint32_t>::max())
+                {
+                    diagnostic = "Static GLB exceeds manifest maxIndices capacity.";
+                    return false;
+                }
+                indexCount += static_cast<std::uint64_t>(primitive.indices->count);
+                const std::uint64_t primitiveTriangles = primitive.indices->count / 3u;
+                if (primitiveTriangles > selectedLod.maxTriangles - triangleCount)
+                {
+                    diagnostic = "Static GLB exceeds selected LOD '" + selectedLod.name +
+                                 "' maxTriangles capacity.";
+                    return false;
+                }
+                triangleCount += primitiveTriangles;
+            }
+        }
+    }
+    return true;
+}
+
 } // namespace
 
 bool StaticMeshAsset::Load(const std::filesystem::path& runtimeGlb,
@@ -809,11 +868,18 @@ bool StaticMeshAsset::Load(const std::filesystem::path& runtimeGlb,
         diagnostic = "Static RT asset filename must select exactly one manifest LOD identity.";
         return false;
     }
+    if (!PreflightGeometryBudgets(data, manifest, *selectedLod, diagnostic)) return false;
 
     asset.materials.reserve(data.materials_count);
     TextureLayerRoutes textureRoutes;
     for (std::size_t materialIndex = 0u; materialIndex < data.materials_count; ++materialIndex)
     {
+        if (data.materials[materialIndex].alpha_mode != cgltf_alpha_mode_opaque)
+        {
+            diagnostic = "Static GLB material " + std::to_string(materialIndex) +
+                         " uses unsupported alphaMode; only OPAQUE is supported.";
+            return false;
+        }
         StaticMaterial material = ConvertMaterial(data, data.materials[materialIndex], textureRoutes);
         for (const MaterialOverride& materialOverride : manifest.materialOverrides)
         {
@@ -1121,11 +1187,6 @@ bool StaticMeshAsset::Load(const std::filesystem::path& runtimeGlb,
     if (asset.primitives.empty())
     {
         diagnostic = "Static GLB contains no presentable triangle primitives.";
-        return false;
-    }
-    if (cgltf_validate(const_cast<cgltf_data*>(&data)) != cgltf_result_success)
-    {
-        diagnostic = "Static GLB failed cgltf structural validation.";
         return false;
     }
     if (!ValidateThickDielectricTopology(asset, diagnostic)) return false;

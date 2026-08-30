@@ -216,6 +216,29 @@ void CheckBoundedFailureModes()
     Check(invalidInstalled.status == UpdateCheckStatus::InvalidInstalledVersion,
           "an invalid installed identity must not trigger a network request or update");
 }
+
+void CheckReleaseNotesTruncateAtUtf8Boundary()
+{
+    constexpr std::string_view suffix =
+        "\n\n[Release notes truncated. Open the GitHub release page for the full notes.]";
+    std::string body(4094u, 'a');
+    body += "\xf0\x9f\x94\xa5tail";
+    const std::string response =
+        "[{\"tag_name\":\"v1.6.0\","
+        "\"html_url\":\"https://github.com/Samfa12-tech/The-Horde-RT-demo/releases/tag/v1.6.0\","
+        "\"name\":\"Bounded notes\",\"body\":\"" + body +
+        "\",\"draft\":false,\"prerelease\":false,"
+        "\"published_at\":\"2026-08-30T01:00:00Z\"}]";
+    const auto result = CheckForGitHubReleaseUpdate(
+        "1.5.2", ReleaseChannel::IncludePrerelease,
+        [&](const GitHubHttpRequest&) { return Ok(response); });
+    Check(result.status == UpdateCheckStatus::UpdateAvailable && result.update.has_value(),
+          "a release with bounded UTF-8 notes must remain available");
+    std::string expected(4096u - suffix.size(), 'a');
+    expected += suffix;
+    Check(result.update->notes == expected,
+          "release notes must reserve the byte limit for the suffix and truncate before a split UTF-8 code point");
+}
 }
 
 int main()
@@ -225,6 +248,7 @@ int main()
     CheckPrereleaseChannelAndCurrentVersion();
     CheckUntrustedAndDraftReleasesAreIgnored();
     CheckBoundedFailureModes();
+    CheckReleaseNotesTruncateAtUtf8Boundary();
     std::cout << "GitHub release updater tests passed.\n";
     return 0;
 }

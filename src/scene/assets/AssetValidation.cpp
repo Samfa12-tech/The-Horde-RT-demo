@@ -5,6 +5,7 @@
 #include <array>
 #include <cmath>
 #include <cstring>
+#include <limits>
 #include <string_view>
 
 namespace horde::scene::assets
@@ -62,9 +63,25 @@ bool ValidateAccessorRange(const cgltf_accessor& accessor,
         diagnostic = "Static GLB accessor data is out of range.";
         return false;
     }
-    const std::size_t lastByte = accessor.count == 0u
-        ? accessor.offset
-        : accessor.offset + (accessor.count - 1u) * stride + elementSize;
+    std::size_t lastByte = accessor.offset;
+    if (accessor.count != 0u)
+    {
+        const std::size_t intervals = accessor.count - 1u;
+        if (intervals > std::numeric_limits<std::size_t>::max() / stride)
+        {
+            diagnostic = "Static GLB accessor data is out of range.";
+            return false;
+        }
+        const std::size_t span = intervals * stride;
+        if (accessor.offset > std::numeric_limits<std::size_t>::max() - span ||
+            accessor.offset + span >
+                std::numeric_limits<std::size_t>::max() - elementSize)
+        {
+            diagnostic = "Static GLB accessor data is out of range.";
+            return false;
+        }
+        lastByte = accessor.offset + span + elementSize;
+    }
     if (accessor.offset > accessor.buffer_view->size || lastByte > accessor.buffer_view->size ||
         accessor.buffer_view->offset > accessor.buffer_view->buffer->size ||
         accessor.buffer_view->size > accessor.buffer_view->buffer->size - accessor.buffer_view->offset)
