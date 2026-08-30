@@ -6,9 +6,10 @@ Date: 2026-08-30
 
 - Authoritative base: `origin/main` commit `b45a1b71aa9b74178df72c8060f44b46b04a46b4`.
 - Development branch: `codex/fire-pbr-lantern-player-upgrade`.
-- Final runtime commit validated by the recorded artifacts: `a04dcb9` (`fix: reveal reward chest and preserve lantern carry`). The full Host and device runs were made immediately before this commit while the worktree contained the same runtime bytes; the commit changed no file contents.
+- Final runtime commit: `a04dcb9` (`fix: reveal reward chest and preserve lantern carry`). Final provenance corrections are commit `41e9c6c` (`docs: reconcile final asset provenance`); they change metadata and documentation only, not runtime code or packaged runtime bytes.
 - Public release identity remains Showcase Alpha 1.5.2 / Android `versionCode 7`. This work did not sign, publish, upload to itch, rewrite history, or change application identity.
 - The only Android device used was serial `R5GL219SZGK`, raw model code `SM-S948B`.
+- The two external package references were re-opened and visually inspected during the final audit. `lantern_icon_reference.png` hashes to `bc4b237247982a0a1953c403459dc42f8ec579f7b093ec150e78d42ae07639dc`; `current_android_player_reference.jpg` hashes to `3624d805b33878a665aafd5046c26637a3ceade67cf7587c2dc492f6bfe849b9`. They remain non-distributable inputs rather than repository assets.
 
 ## Delivered engine and gameplay capabilities
 
@@ -35,9 +36,11 @@ Date: 2026-08-30
 
 ## Fresh Host gate
 
-Run: `reports/chest-guidance-foundation-final-20260830/run-20260830-192950`
+Final clean run: `reports/programme-completion-host-20260830/run-20260830-203317`
 
 Result: PASS.
+
+Source commit was `41e9c6c1d2f277af26f3aa842d9b9b8bdefaa565`; both pre-run and post-run Git status were empty.
 
 - Raygen compilation, embedded-SPIR-V freshness, negative staleness fixtures, and compiler-strategy contracts passed.
 - Fresh Windows Debug: 31/31 Vulkan-enabled CTests passed.
@@ -46,6 +49,7 @@ Result: PASS.
 - Android Debug, unsigned Release, and lint completed for the configured ABIs.
 - GLB/PBR assets, runtime budgets, licences, shader ABI, strict transform arithmetic, and package contents passed.
 - Generated validation artifacts are explicitly unpublishable/unsigned.
+- The staged Windows executable was also launched from its isolated package directory. It remained live through the smoke interval, wrote a capability report with `rtScene.presented=true`, and was then closed cleanly. This is packaged-launch evidence, not owner play acceptance.
 
 The production shader strategy retains functions for the generic route and keeps a fully inlined legacy comparison variant:
 
@@ -76,6 +80,41 @@ Result: PASS after correcting one harness-only expected-zone label. The installe
 These values describe a sustained Debug validation workload with capture and telemetry instrumentation; they are not claimed as Release frame rates.
 
 ## Exact `SM-S948B` feature route and owner-fix follow-up
+
+Final clean 75% run: `reports/programme-completion-device-75-20260830/run-20260830-200903`
+
+Final clean 100% run: `reports/programme-completion-device-100-20260830/run-20260830-201938`
+
+Both runs passed with no warnings or failures from clean source `41e9c6c1d2f277af26f3aa842d9b9b8bdefaa565`. Local and installed Debug APK bytes matched SHA-256 `0b5a59b6e41d2c4d717eff885aaa310b7f5f1512002f6a89cb77e5989ab7edd3`; strict ASTC, `RayTracingPipeline`, raygen SHA-256 `d9bc8eff596cfaee67067329206aa02a2133c2f02e2250317c56def00a0c2bf2`, and honest RT presentation remained active.
+
+| Checkpoint | 75% median / mean | 100% median / mean |
+|---|---:|---:|
+| `pbr-sword-closeup` | 58.364 / 61.338 ms | 99.447 / 100.828 ms |
+| `pbr-torch-fire` | 60.283 / 63.948 ms | 98.515 / 99.025 ms |
+| `player-body-grips` | 75.683 / 79.919 ms | 128.615 / 128.187 ms |
+| `lantern-chest-unlock` | 53.481 / 56.879 ms | 83.954 / 84.171 ms |
+| `lantern-held-high` | 90.342 / 91.906 ms | 147.773 / 147.888 ms |
+| `lantern-held-low` | 81.011 / 85.387 ms | 140.519 / 139.712 ms |
+| `lantern-glass-transmission` | 89.890 / 92.803 ms | 154.484 / 153.472 ms |
+| `lantern-motion-extreme` | 91.176 / 95.421 ms | 153.942 / 154.364 ms |
+
+The 75% run completed eleven exact-device captures and Home/resume. It ran at Android thermal status 3 and 42.1-43.2 C. Total PSS changed 578,768 -> 576,514 KB, RSS 698,300 -> 691,312 KB, native-heap private memory 255,172 -> 254,576 KB, EGL mtrack 121,100 -> 103,800 KB, GL mtrack 157,032 -> 156,868 KB, and scoped thread-list lines 32 -> 33. No growing graphics/native allocation signature was observed. These are instrumented Debug results and are candidly below the 30 FPS reference line for every measured feature checkpoint; the separate 100% run is roughly 6.5-11.9 FPS and is image/full-extent evidence, not a recommended play tier.
+
+Final Windows feature captures are under `reports/programme-completion-windows-features-20260830`. All eleven honestly presented RT at 960x540 / 100% on the RTX 5050, with 12.055-16.884 ms medians. Agent inspection confirmed the lit closed chest, retained look-up arm, sword/torch composition, held high/low lantern, glass, and motion states. The skinned development checkpoint remains visually distinct from the accepted block-arm gameplay checkpoint.
+
+| Windows checkpoint | PNG SHA-256 | Median |
+|---|---|---:|
+| `pbr-sword-closeup` | `5529530e3522da8cf143d69123cc0aa1bc2929bdfc98e5161bdd9b94991da426` | 13.619 ms |
+| `pbr-torch-fire` | `4621db04d4b041067c1c69d16fb4bb0e27eaa7d2376244d0f3df16a463d13ed1` | 14.628 ms |
+| `player-body-grips` | `4e086f856185bf1513c6214bfb3bd564c0abbc93eb6a456c2a2c2c6ca6bffe50` | 14.498 ms |
+| `player-fallback-grips` | `a3d999626dfe9142b276f369295a08538eecba41986c8274daff61948489d217` | 13.152 ms |
+| `lantern-chest-unlock` | `528aa37be3906d61385dd77f0f50c5c10b1fb81ff8d97dd5bae3edb1687d8cf1` | 16.884 ms |
+| `lantern-held-high` | `f05c711feccfb4ece547fd842d809df2a7d3a96db10294cc6414bec1955fa222` | 13.956 ms |
+| `lantern-held-low` | `d9947dfb4d673b775586a796bcd4ca894af59e6bbca6779dc7b1bf32d0d2912b` | 15.185 ms |
+| `lantern-glass-transmission` | `5858f8d0fba48ac0dd4084d6929faf959cf1e8b90387fbbffa21a3892f5ebdf4` | 13.146 ms |
+| `lantern-motion-extreme` | `ca620b83a232943ecf46c85bbe7fd4e36bf3f8660858ff67a5bc683a0d8cc7d0` | 12.055 ms |
+| `lantern-held-look-up` | `d0512e52fd1af81dfee0ed057e13a4fd7838fc73c4c6c12c0625e844f0b41901` | 12.584 ms |
+| `lantern-chest-held-high` | `9cd7ec2d6f925f9c48d3e6b8f1792d79fc0040f7deb017e142dd648061506b88` | 13.418 ms |
 
 Run: `reports/final-owner-feature-device-20260830/run-20260830-182904`
 
@@ -115,8 +154,8 @@ The retained implementation skips transparent-shadow traversal only when the fin
 
 | Artifact | SHA-256 | Status |
 |---|---|---|
-| `Horde-Lantern-RT-validation-20260830-192950-Windows-x64-UNPUBLISHABLE.zip` | `a345417a35eddd062e25cdbea2fbc360856005c4c8ee8548986d1e20428b713c` | Local owner review only |
-| `Horde-Lantern-RT-validation-20260830-192950-Android-UNSIGNED-DO-NOT-PUBLISH.apk` | `bc1e4550723f06bdad6b6330b79bbc5974f73a73f320fc5c8523f367a96b450d` | Unsigned owner review only |
+| `Horde-Lantern-RT-validation-20260830-203317-Windows-x64-UNPUBLISHABLE.zip` | `a6b3f82d03544ad81ed5ed92a539ba6e5b548e9793265a046643b70cbeca0cf6` | Local owner review only |
+| `Horde-Lantern-RT-validation-20260830-203317-Android-UNSIGNED-DO-NOT-PUBLISH.apk` | `a7315f7b5058ca5f8320c60d74f4430f65bc5551fa902758ed2579472929ac26` | Unsigned all-ABI build evidence; not the installed Debug APK |
 
 No artifact in this record is a signed or published release candidate.
 
@@ -124,7 +163,7 @@ No artifact in this record is a signed or published release candidate.
 
 - First-person skinned gauntlets/hands are not player-facing. Their anatomy, left-hand quality, sleeve closure, and all-scenario grip quality need a later asset/animation pass before replacing block arms.
 - Arm/body appearance in shadows and reflections is explicitly deferred by owner direction to the next update.
-- At max upward/grazing glass angles, the bounded production diagnostics may record a finite pane-stack/primary-volume budget terminal; shadow overflow and unclosed-volume diagnostics remain absent. This is bounded termination, not recursion or a crash, but it remains a tuning/test target.
+- The Mobile glass route records finite pane-stack/primary-volume budget terminations at ordinary held-lantern pitch as well as upward/grazing angles. For example, `lantern-chest-held-high` recorded six transport/pane-stack/primary-volume-budget terminals at pitch `-0.05`, with no shadow overflow, unclosed volume, mismatched exit, or open terminal. This is bounded recovery rather than recursion or a crash, but it can affect pixels and remains a correctness/performance target.
 - The sustained warm glass route is expensive. Its physical model and 75% scale were preserved rather than manufacturing a pass.
 - The GitHub release updater requires a future real release newer than the current identity for an end-to-end public notification test.
 - Signing, version bump, publication, Butler upload, and itch verification remain owner-gated and were not performed.
@@ -136,7 +175,7 @@ No artifact in this record is a signed or published release candidate.
 - [x] Downward/upward sword combo accepted by owner.
 - [ ] Owner confirms the new two-second post-lich unlock sound timing on the final installed APK; other audio and haptics were accepted on the immediately preceding candidate.
 - [x] Max-upward lantern arm remains visible in deterministic exact-device evidence.
-- [ ] Owner completes a natural full-route chest unlock/open/claim replay on the final unsigned review package if desired before release preparation.
+- [ ] Owner completes a natural full-route chest unlock/open/claim replay on the final installed Debug candidate before release preparation.
 - [ ] Owner explicitly approves a future version, signing, and itch upload.
 
 Audio/haptic manual revalidation required: YES — the chest unlock event now intentionally fires two seconds after lich death, so the final installed APK needs one owner-listening check even though the cue asset, playback backend, routing, haptics, and previously accepted feedback are otherwise unchanged.

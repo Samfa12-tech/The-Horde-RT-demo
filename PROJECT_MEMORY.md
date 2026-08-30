@@ -18,7 +18,7 @@ Last updated: 2026-08-30
 - Signing certificate SHA-256: `8245277a11bca5576f116724507f799d6f4c178ce5fbb7e3981415c9e6b3c245`.
 - The release JKS and a local-only password note live together outside Git with restricted ACLs. An independent owner backup is still required.
 - Release proof: `docs/SHOWCASE_ALPHA_1_5_2_RELEASE_VALIDATION_2026-08-25.md`.
-- Current unsigned development candidate: Fire/PBR/reward-lantern runtime commit `a04dcb9`, validated on Windows and exact `SM-S948B` Debug APK SHA-256 `0b5a59b6e41d2c4d717eff885aaa310b7f5f1512002f6a89cb77e5989ab7edd3`. It has not changed release identity, been signed, or been published. Evidence: `docs/FIRE_PBR_REWARD_LANTERN_PLAYER_UPGRADE_VALIDATION_2026-08-30.md`.
+- Current unsigned development candidate: Fire/PBR/reward-lantern runtime commit `a04dcb9`, with clean final validation/provenance commit `41e9c6c`, validated on Windows and exact `SM-S948B` Debug APK SHA-256 `0b5a59b6e41d2c4d717eff885aaa310b7f5f1512002f6a89cb77e5989ab7edd3`. Final clean Host and 75%/100% exact-device runs pass, but instrumented feature medians are slow and Mobile dielectric budget terminals remain an explicit risk. It has not changed release identity, been signed, or been published. Evidence: `docs/FIRE_PBR_REWARD_LANTERN_PLAYER_UPGRADE_VALIDATION_2026-08-30.md` and `docs/TASK_9_OWNER_CANDIDATE_VALIDATION_2026-08-30.md`.
 
 ## Locked creative direction
 
