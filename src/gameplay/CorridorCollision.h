@@ -91,6 +91,26 @@ constexpr bool IsPlayerPositionWalkable(float x, float z)
     return true;
 }
 
+constexpr bool IsHeldPropPositionWalkable(float x, float z)
+{
+    if (!InsideWalkableUnion(x, z))
+    {
+        return false;
+    }
+    for (const RouteRect& obstacle : kShowcaseSolidObstacles)
+    {
+        if (InsideInsetRect(obstacle, x, z))
+        {
+            return false;
+        }
+    }
+    // The reward chest is a floor-height player obstacle. Treating its 2D
+    // footprint as full-height masonry retracts elevated hand props into the
+    // near camera even though they pass above it. Player movement continues
+    // to use IsPlayerPositionWalkable and therefore remains chest-blocked.
+    return true;
+}
+
 inline bool IsWalkableSweep(RoutePosition previous, RoutePosition proposed)
 {
     const float dx = proposed.x - previous.x;
@@ -115,13 +135,18 @@ inline bool IsShowcasePlayerPositionWalkable(float x, float z)
     return detail::IsPlayerPositionWalkable(x, z);
 }
 
+inline bool IsShowcaseHeldPropPositionWalkable(float x, float z)
+{
+    return detail::IsHeldPropPositionWalkable(x, z);
+}
+
 inline float ComputeShowcaseHeldPropDepth(float cameraX, float cameraZ, float forwardX, float forwardZ)
 {
     float depth = 0.30f;
     for (float distance = 0.30f; distance <= 1.0501f; distance += 0.075f)
     {
-        if (!IsShowcasePlayerPositionWalkable(cameraX + forwardX * distance,
-                                              cameraZ + forwardZ * distance))
+        if (!IsShowcaseHeldPropPositionWalkable(cameraX + forwardX * distance,
+                                                cameraZ + forwardZ * distance))
         {
             break;
         }

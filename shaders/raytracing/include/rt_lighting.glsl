@@ -885,6 +885,13 @@ void activeLocalLight(out vec3 position, out vec3 color, out float strength)
     position = vec3(0.0);
     color = vec3(0.0);
     strength = 0.0;
+    if (controls.guidanceLightStrength > 0.001)
+    {
+        position = vec3(controls.staffX, controls.staffY, controls.staffZ);
+        color = tunedLightColor(vec3(1.0, 0.48, 0.12), kLightPassage);
+        strength = controls.guidanceLightStrength;
+        return;
+    }
     if (controls.cameraX <= -8.5 && controls.cameraX >= -28.5 &&
         controls.cameraZ >= -16.8 && controls.cameraZ <= -13.6)
     {

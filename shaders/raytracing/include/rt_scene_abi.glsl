@@ -70,6 +70,7 @@ layout(push_constant) uniform SceneControls
     float staffIntensityScale;
     float workloadPreset;
     float genericTransmissionActive;
+    float guidanceLightStrength;
 } controls;
 
 // The CPU binds this shader variant only when a visible TLAS instance owns a

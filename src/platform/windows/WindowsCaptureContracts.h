@@ -45,6 +45,19 @@ constexpr ClaimedRewardCapturePixelPolicy ClaimedRewardCapturePolicy(
             .permitsCompleteWallRetraction = true,
         };
     }
+    if (checkpointName == "lantern-chest-held-high")
+    {
+        // Exact live post-claim stand-off: the chest collision footprint must
+        // retract the carry safely without hiding the anatomical-left arm,
+        // top ring, hanging body, or right-hand sword on a phone viewport.
+        return {
+            .requirePlayerPixels = true,
+            .requireRewardRingPixels = true,
+            .requireRewardBodyPixels = true,
+            .requireSwordPixels = true,
+            .permitsCompleteWallRetraction = false,
+        };
+    }
     return {};
 }
 

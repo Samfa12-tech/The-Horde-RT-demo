@@ -488,6 +488,36 @@ void TestRewardLanternHighLowUsesSharedLeftArmTarget()
               low.leftHandLocal[1] <= high.leftHandLocal[1] - 0.18f &&
               low.leftHandLocal[1] > -0.26f,
           "reward high/low carry must visibly raise and lower the real left arm without using the failed-torch pose");
+
+    // This is the exact post-claim stand-off: the player faces west into the
+    // low Gothic chest while holding the reward high. The chest remains a
+    // solid player collider, but emergency held-prop retraction must keep the
+    // grip inside the narrow 1440:3120 phone frustum instead of moving the
+    // entire left arm and lantern off-screen while their light remains live.
+    auto chestInput = input;
+    chestInput.cameraX = horde::gameplay::kRewardChestRoutePosition.x + 1.30f;
+    chestInput.cameraZ = horde::gameplay::kRewardChestRoutePosition.z;
+    chestInput.cameraYawRadians = -1.57079632679f;
+    chestInput.interaction.heldLightPose = HeldLightPose::High;
+    const auto chestHigh =
+        horde::gameplay::items::EvaluateHeldItemKinematics(chestInput);
+    constexpr float portraitAspect = 1440.0f / 3120.0f;
+    const float chestGripNdcX = 1.22f * chestHigh.leftHandLocal[0] /
+        (portraitAspect * chestHigh.leftHandLocal[2]);
+    const float chestGripNdcY = 1.22f * chestHigh.leftHandLocal[1] /
+        chestHigh.leftHandLocal[2];
+    std::cout << "post-claim chest held depth/x/y/clearance="
+              << chestHigh.leftHandLocal[2] << '/'
+              << chestHigh.leftHandLocal[0] << '/'
+              << chestHigh.leftHandLocal[1] << '/'
+              << horde::gameplay::items::ComputeRewardLanternForwardClearance(
+                     chestInput.cameraX, chestInput.cameraZ, -1.0f, 0.0f)
+              << '\n';
+    Check(chestHigh.leftHandLocal[2] >= 1.02f &&
+              chestHigh.leftHandLocal[2] <= 1.05f &&
+              chestGripNdcX >= -0.90f && chestGripNdcX <= -0.05f &&
+              chestGripNdcY >= -0.75f && chestGripNdcY <= 0.50f,
+          "the low post-claim chest must not replace the accepted elevated lantern carry with a near-camera wall pose");
     for (std::size_t axis = 0u; axis < midpoint.leftHandLocal.size(); ++axis)
     {
         Check(Near(midpoint.leftHandLocal[axis],

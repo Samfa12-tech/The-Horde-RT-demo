@@ -119,9 +119,10 @@ FirstPersonSafeFrame EvaluateOwnerFeedbackPortraitSafeFrame(
     const HeldItemKinematicsState& kinematics,
     float portraitAspect);
 
-// Resolves the first shared route collision surface continuously along the
-// camera-centre ray. The walkability predicate already owns the player radius;
-// reward composition separately reserves the authored cage's forward extent.
+// Resolves the first full-height route collision surface continuously along
+// the camera-centre ray. Low floor props such as the chest remain player-solid
+// without masquerading as walls for elevated held items. The predicate owns
+// the player-radius inset; reward composition separately reserves cage extent.
 float ComputeRewardLanternForwardClearance(float cameraX,
                                            float cameraZ,
                                            float forwardX,

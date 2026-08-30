@@ -137,6 +137,7 @@ public class MainActivity extends Activity {
     private static final int CHEST_PROMPT_OPEN = 2;
     private static final int CHEST_PROMPT_OPENING = 3;
     private static final int CHEST_PROMPT_CLAIM = 4;
+    private static final int CHEST_PROMPT_UNLOCKING = 5;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final ExecutorService updateExecutor = Executors.newSingleThreadExecutor();
@@ -1641,6 +1642,7 @@ public class MainActivity extends Activity {
             case "lantern-wall-high": return 132;
             case "lantern-wall-low": return 133;
             case "lantern-held-look-up": return 134;
+            case "lantern-chest-held-high": return 135;
             default: return -1;
         }
     }
@@ -2132,6 +2134,9 @@ public class MainActivity extends Activity {
                 break;
             case CHEST_PROMPT_CLAIM:
                 interactLabel = R.string.take_lantern;
+                break;
+            case CHEST_PROMPT_UNLOCKING:
+                interactLabel = R.string.chest_unlocking;
                 break;
             case CHEST_PROMPT_NONE:
             default:

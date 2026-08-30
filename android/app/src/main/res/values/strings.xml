@@ -29,6 +29,7 @@
     <string name="open_chest">OPEN CHEST</string>
     <string name="chest_opening">OPENING…</string>
     <string name="take_lantern">TAKE LANTERN</string>
+    <string name="chest_unlocking">SEAL BREAKING…</string>
     <string name="raise_lantern">RAISE</string>
     <string name="lower_lantern">LOWER</string>
     <string name="vitality_full">VITALITY  3 / 3</string>

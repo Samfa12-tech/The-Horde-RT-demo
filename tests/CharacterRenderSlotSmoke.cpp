@@ -655,18 +655,20 @@ int main()
                           "clamp(0.68 + controls.pitch, 0.34, 0.82)") ==
                           std::string::npos,
                       "first-person arm traversal must not cull the lantern forearm while looking up");
-        ok &= Require(sceneSource.find("sizeof(ScenePushConstants) == 124u") != std::string::npos &&
+        ok &= Require(sceneSource.find("sizeof(ScenePushConstants) == 128u") != std::string::npos &&
                       sceneSource.find("sizeof(ScenePushConstants) <= 128u") != std::string::npos &&
                       sceneSource.find("offsetof(ScenePushConstants, waterQuality) == 72u") != std::string::npos &&
                       sceneSource.find("offsetof(ScenePushConstants, waterfallWidthScale) == 76u") != std::string::npos &&
                       sceneSource.find("offsetof(ScenePushConstants, genericTransmissionActive) == 120u") != std::string::npos &&
+                      sceneSource.find("offsetof(ScenePushConstants, guidanceLightStrength) == 124u") != std::string::npos &&
                       raygenSource.find("float waterQuality;") != std::string::npos &&
                       raygenSource.find("float waterfallWidthScale;") != std::string::npos &&
                       raygenSource.find("float workloadPreset;") != std::string::npos &&
                       raygenSource.find("float genericTransmissionActive;") != std::string::npos &&
+                      raygenSource.find("float guidanceLightStrength;") != std::string::npos &&
                       raygenSource.find("HORDE_GENERIC_TRANSMISSION_VARIANT") != std::string::npos &&
                       raygenSource.find("genericTransmissionEnabled()") != std::string::npos,
-                      "RT lab tuning and generic transmission activity must append after the released water-quality ABI");
+                      "RT lab tuning, generic transmission, and chest guidance must append within the 128-byte phone-safe ABI");
         ok &= Require(sceneSource.find("properties.limits.maxPushConstantsSize") !=
                           std::string::npos &&
                       sceneSource.find("kMinimalLegacyRayGenShader") != std::string::npos &&
@@ -674,7 +676,7 @@ int main()
                           std::string::npos &&
                       sceneSource.find("genericTransmissionActive_ ? raygenRegion_ : legacyRaygenRegion_") !=
                           std::string::npos,
-                      "124-byte push ABI must be runtime-checked and fixture-hidden frames must bind a separately compiled legacy raygen pipeline/SBT");
+                      "128-byte push ABI must be runtime-checked and fixture-hidden frames must bind a separately compiled legacy raygen pipeline/SBT");
         ok &= Require(sceneSource.find("HasActiveGenericTransmission(frameInstanceMetadata") !=
                           std::string::npos &&
                       sceneSource.find("RtInstanceFlag::Transmissive") != std::string::npos &&
@@ -735,6 +737,8 @@ int main()
                       raygenSource.find("0.002, false, false") != std::string::npos,
                       "water quality must retain real ellipse refraction and bounded High/Mobile/Off query routes");
         ok &= Require(raygenSource.find("void activeLocalLight(") != std::string::npos &&
+                      raygenSource.find("controls.guidanceLightStrength > 0.001") != std::string::npos &&
+                      raygenSource.find("vec3(1.0, 0.48, 0.12)") != std::string::npos &&
                       raygenSource.find("void activeSkyLight(") != std::string::npos &&
                       raygenSource.find("vec3 shadeOpaqueDirect(") != std::string::npos &&
                       raygenSource.find("vec3 shadeOpaqueSecondary(") != std::string::npos,

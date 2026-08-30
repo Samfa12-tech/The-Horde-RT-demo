@@ -1,5 +1,6 @@
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
 #include "vulkan/raytracing/DynamicBlasSynchronization.h"
+#include "vulkan/raytracing/ChestGuidanceLight.h"
 
 #include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/items/HeldLightState.h"
@@ -65,10 +66,11 @@ struct ScenePushConstants
     float staffIntensityScale = 1.0f;
     float workloadPreset = 1.0f;
     float genericTransmissionActive = 0.0f;
+    float guidanceLightStrength = 0.0f;
 };
 
-static_assert(sizeof(ScenePushConstants) == 124u,
-              "CPU and raygen push-constant ABI must remain 31 packed floats");
+static_assert(sizeof(ScenePushConstants) == 128u,
+              "CPU and raygen push-constant ABI must remain 32 packed floats");
 static_assert(sizeof(ScenePushConstants) <= 128u,
               "push constants must fit Vulkan's required minimum device limit");
 static_assert(offsetof(ScenePushConstants, waterQuality) == 72u,
@@ -77,6 +79,8 @@ static_assert(offsetof(ScenePushConstants, waterfallWidthScale) == 76u,
               "RT lab tuning must append after the released water-quality field");
 static_assert(offsetof(ScenePushConstants, genericTransmissionActive) == 120u,
               "generic transmission activity must remain append-only");
+static_assert(offsetof(ScenePushConstants, guidanceLightStrength) == 124u,
+              "chest guidance light strength must remain append-only");
 
 bool HasActiveGenericTransmission(
     std::span<const RtInstanceMetadata> instances,
@@ -2047,6 +2051,17 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     addWorldBox(-32.50f, finaleShaftBase, -16.75f, -32.35f, 1.72f, -13.65f, SurfaceMossyStone);
     addWorldBox(-34.90f, finaleShaftBase, -16.75f, -32.50f, 1.72f, -16.60f, SurfaceMossyStone);
     addWorldBox(-34.90f, finaleShaftBase, -13.80f, -32.50f, 1.72f, -13.65f, SurfaceMossyStone);
+    // A physical aged-metal ceiling fixture establishes the source of the
+    // post-lich guidance light. It remains unlit while the seal breaks; the
+    // shared chest phase activates the matching ray-query-shadowed light.
+    constexpr float chestLampX = horde::gameplay::kRewardChestRoutePosition.x;
+    constexpr float chestLampZ = horde::gameplay::kRewardChestRoutePosition.z;
+    addWorldBox(chestLampX - 0.018f, 1.18f, chestLampZ - 0.018f,
+                chestLampX + 0.018f, 1.34f, chestLampZ + 0.018f,
+                SurfaceAgedMetal);
+    addWorldBox(chestLampX - 0.14f, 1.08f, chestLampZ - 0.14f,
+                chestLampX + 0.14f, 1.18f, chestLampZ + 0.14f,
+                SurfaceAgedMetal);
     addRouteWallZ(-12.0f, -36.90f, -30.50f, SurfaceBack);
     addRouteWallZ(-18.4f, -36.90f, -30.50f, SurfaceForward);
     addRouteWallX(-30.50f, -18.4f, -16.8f, SurfaceLeft);
@@ -4741,6 +4756,8 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                       activePipeline);
     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, pipelineLayout_, 0u, 1u, &descriptorSet_, 0u, nullptr);
     const std::array<float, 3u> staffWorldPosition = characterSlot_.LichStaffWorldPosition(frame.lich);
+    const RtGuidanceLight guidanceLight = ResolveChestGuidanceLight(frame.chestReward);
+    const bool guidanceLightActive = guidanceLight.strength > 0.0f;
     const float heldPropDepth = frame.heldItemKinematics.heldPropDepth;
     const RtSceneTuning tuning = ClampRtSceneTuning(frame.tuning);
     const RtLightTuning& torchTuning = tuning.lights[static_cast<std::size_t>(RtLightGroup::Torch)];
@@ -4758,10 +4775,12 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                                             std::clamp(frame.outputExposure, 0.2f, 1.4f),
                                             std::clamp(frame.combat.damageFlash, 0.0f, 1.0f),
                                             frame.roster.selectedEnemy == horde::gameplay::EnemyKind::Lich ? 1.0f : 0.0f,
-                                            std::clamp(frame.lich.staffLightStrength, 0.0f, 2.2f),
-                                            staffWorldPosition[0],
-                                            staffWorldPosition[1],
-                                            staffWorldPosition[2],
+                                            guidanceLightActive
+                                                ? 0.0f
+                                                : std::clamp(frame.lich.staffLightStrength, 0.0f, 2.2f),
+                                            guidanceLightActive ? guidanceLight.position[0] : staffWorldPosition[0],
+                                            guidanceLightActive ? guidanceLight.position[1] : staffWorldPosition[1],
+                                            guidanceLightActive ? guidanceLight.position[2] : staffWorldPosition[2],
                                              std::clamp(frame.lich.finaleSkylightOpenProgress, 0.0f, 1.0f),
                                              std::clamp(frame.lich.finaleDawnRevealProgress, 0.0f, 1.0f),
                                              heldPropDepth,
@@ -4777,7 +4796,8 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                                              staffTuning.hueDegrees,
                                              staffTuning.intensityScale,
                                              static_cast<float>(tuning.workloadPreset),
-                                             genericTransmissionActive_ ? 1.0f : 0.0f};
+                                             genericTransmissionActive_ ? 1.0f : 0.0f,
+                                             guidanceLight.strength};
     lastOutputRedBlueSwapApplied_ = pushConstants.outputRedBlueSwap > 0.5f;
     vkCmdPushConstants(commandBuffer,
                        pipelineLayout_,

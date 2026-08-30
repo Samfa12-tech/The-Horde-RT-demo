@@ -592,6 +592,8 @@ int main()
     std::size_t lichHitEventCount = 0u;
     std::size_t lichDefeatedEventCount = 0u;
     std::size_t chestUnlockedEventCount = 0u;
+    std::uint64_t lichDefeatedSequence = 0u;
+    std::uint64_t chestUnlockedSequence = 0u;
     bool lichDefeatIdentityAndOrderValid = true;
     for (int frame = 0; frame < 1200 && lichDefeatFeedback.Snapshot().lich.health > 0; ++frame)
     {
@@ -619,6 +621,7 @@ int main()
             if (event.type == GameplayEventType::LichDefeated)
             {
                 ++lichDefeatedEventCount;
+                lichDefeatedSequence = event.sequence;
                 lichDefeatIdentityAndOrderValid = lichDefeatIdentityAndOrderValid &&
                     hasPrevious && previousType == GameplayEventType::EnemyHit &&
                     event.source == EntityId::Player && event.target == EntityId::Lich;
@@ -626,8 +629,8 @@ int main()
             if (event.type == GameplayEventType::ChestUnlocked)
             {
                 ++chestUnlockedEventCount;
+                chestUnlockedSequence = event.sequence;
                 lichDefeatIdentityAndOrderValid = lichDefeatIdentityAndOrderValid &&
-                    hasPrevious && previousType == GameplayEventType::LichDefeated &&
                     event.source == EntityId::Lich && event.target == EntityId::RewardChest;
             }
             previousType = event.type;
@@ -635,7 +638,12 @@ int main()
         }
         lichDefeatFeedback.ClearEvents();
     }
-    for (int frame = 0; frame < 60; ++frame)
+    check(lichDefeatFeedback.Snapshot().chestReward.phase ==
+              horde::gameplay::interactions::ChestRewardPhase::Locked &&
+          lichDefeatFeedback.Snapshot().chestReward.unlockPending &&
+          chestUnlockedEventCount == 0u,
+          "the lethal tick must arm, but not emit, the two-second chest unlock");
+    for (int frame = 0; frame < 118; ++frame)
     {
         lichDefeatFeedback.AdvanceFrame(lichDefeatInput, 1.0 / 60.0);
         for (const GameplayEvent& event : lichDefeatFeedback.Events().Events())
@@ -645,12 +653,42 @@ int main()
         }
         lichDefeatFeedback.ClearEvents();
     }
+    check(lichDefeatFeedback.Snapshot().chestReward.phase ==
+              horde::gameplay::interactions::ChestRewardPhase::Locked &&
+          lichDefeatFeedback.Snapshot().chestReward.unlockPending &&
+          chestUnlockedEventCount == 0u,
+          "the chest must remain locked through 1.983 fixed seconds after the lethal tick begins");
+    lichDefeatFeedback.AdvanceFrame(lichDefeatInput, 1.0 / 60.0);
+    for (const GameplayEvent& event : lichDefeatFeedback.Events().Events())
+    {
+        if (event.type == GameplayEventType::LichDefeated) ++lichDefeatedEventCount;
+        if (event.type == GameplayEventType::ChestUnlocked)
+        {
+            ++chestUnlockedEventCount;
+            chestUnlockedSequence = event.sequence;
+            lichDefeatIdentityAndOrderValid = lichDefeatIdentityAndOrderValid &&
+                event.source == EntityId::Lich &&
+                event.target == EntityId::RewardChest;
+        }
+    }
+    lichDefeatFeedback.ClearEvents();
+    std::cout << "lich/chest delayed finale events hits/defeat/unlock="
+              << lichHitEventCount << '/' << lichDefeatedEventCount << '/'
+              << chestUnlockedEventCount << " phase="
+              << static_cast<int>(lichDefeatFeedback.Snapshot().chestReward.phase)
+              << " pending="
+              << lichDefeatFeedback.Snapshot().chestReward.unlockPending
+              << " time="
+              << lichDefeatFeedback.Snapshot().chestReward.phaseTime
+              << " sequence=" << lichDefeatedSequence << '/'
+              << chestUnlockedSequence << '\n';
     check(lichDefeatFeedback.Snapshot().lich.health == 0 && lichHitEventCount == 3u &&
           lichDefeatedEventCount == 1u && chestUnlockedEventCount == 1u &&
           lichDefeatFeedback.Snapshot().chestReward.phase ==
               horde::gameplay::interactions::ChestRewardPhase::ClosedUnlocked &&
-          lichDefeatIdentityAndOrderValid,
-          "three accepted active-window hits must emit one ordered lich defeat and chest unlock");
+          lichDefeatIdentityAndOrderValid &&
+          chestUnlockedSequence > lichDefeatedSequence,
+          "three accepted hits must emit one lich defeat followed exactly two fixed seconds later by one chest unlock");
 
     GameSimulation retry;
     InputSnapshot finaleInput;

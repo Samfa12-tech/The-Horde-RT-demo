@@ -35,6 +35,8 @@ constexpr std::string_view WindowsChestPromptText(
         return "OPENING...";
     case ChestRewardPrompt::ClaimLantern:
         return "PRESS E / A TO TAKE LANTERN";
+    case ChestRewardPrompt::Unlocking:
+        return "THE LICH'S SEAL IS BREAKING...";
     default:
         return {};
     }

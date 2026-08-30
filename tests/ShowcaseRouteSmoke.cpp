@@ -145,8 +145,10 @@ int main()
         kRewardChestRoutePosition.z,
         -1.0f,
         0.0f);
-    check(chestHeldDepth >= 0.29f && chestHeldDepth <= 0.38f,
-          "held props must retract before entering the reward chest footprint");
+    check(IsShowcaseHeldPropPositionWalkable(
+              kRewardChestRoutePosition.x, kRewardChestRoutePosition.z) &&
+              chestHeldDepth > 0.90f,
+          "the floor chest must block player movement without masquerading as a full-height held-prop wall");
 
     // Camera-held props keep their authored reach in open route space, but tuck
     // behind the camera collision boundary when looking directly into masonry.

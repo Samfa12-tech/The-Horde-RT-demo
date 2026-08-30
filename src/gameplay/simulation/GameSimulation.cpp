@@ -606,7 +606,19 @@ void GameSimulation::UpdateRewardSequence(const float deltaSeconds,
         }
     }
 
+    const ChestRewardPhase chestPhaseBeforeUpdate =
+        chestRewardSequence_.Snapshot().phase;
     chestRewardSequence_.Update(deltaSeconds);
+    if (chestPhaseBeforeUpdate == ChestRewardPhase::Locked &&
+        chestRewardSequence_.Snapshot().phase ==
+            ChestRewardPhase::ClosedUnlocked)
+    {
+        Emit(GameplayEventType::ChestUnlocked,
+             EntityId::Lich,
+             EntityId::RewardChest,
+             kRewardChestInteractionPosition.x,
+             kRewardChestInteractionPosition.z);
+    }
     AdvanceHeldLightPose(interactionState_, deltaSeconds);
     finaleSequence_.Update(deltaSeconds);
 
@@ -899,13 +911,9 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
                  EntityId::Lich,
                  lich.x,
                  lich.z);
-            if (finaleSequence_.NotifyLichDefeated() && chestRewardSequence_.Unlock())
+            if (finaleSequence_.NotifyLichDefeated())
             {
-                Emit(GameplayEventType::ChestUnlocked,
-                     EntityId::Lich,
-                     EntityId::RewardChest,
-                     horde::gameplay::interactions::kRewardChestInteractionPosition.x,
-                     horde::gameplay::interactions::kRewardChestInteractionPosition.z);
+                chestRewardSequence_.BeginUnlockCountdown();
             }
         }
     }

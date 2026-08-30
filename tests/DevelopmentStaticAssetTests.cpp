@@ -38,8 +38,8 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 35u,
-          "thirty-five isolated render-development, lantern stress, wall, and pitch checkpoints are exposed");
+    Check(kDevelopmentCheckpoints.size() == 36u,
+          "thirty-six isolated render-development, lantern stress, wall, pitch, and chest-clearance checkpoints are exposed");
     const DevelopmentCheckpoint* checkpoint = FindDevelopmentCheckpoint("pbr-sword-closeup");
     Check(checkpoint != nullptr && checkpoint->id == 100 && checkpoint->baseShowcaseCheckpointId == 0 &&
               checkpoint->name == std::string_view("pbr-sword-closeup") &&
@@ -111,6 +111,7 @@ int main()
         FindDevelopmentCheckpoint("lantern-glass-production");
     Check(chestUnlock != nullptr && chestUnlock->id == 114 &&
               chestUnlock->usesProductionRewardProps &&
+              chestUnlock->stagesUnlockedChest &&
               !chestUnlock->productionLanternGlassOnly &&
               chestUnlock->cameraX == kRewardChestRoutePosition.x + 1.85f &&
               chestUnlock->cameraZ == kRewardChestRoutePosition.z &&
@@ -118,6 +119,16 @@ int main()
                   ShowcaseZone::Finale &&
               chestUnlock->pitch == -0.35f,
           "production chest unlock has a stable finale-room interaction framing");
+    horde::gameplay::simulation::GameSimulation stagedChestGuidance;
+    Check(chestUnlock != nullptr &&
+              StageDevelopmentCheckpointSimulation(stagedChestGuidance,
+                                                   *chestUnlock) &&
+              stagedChestGuidance.Snapshot().chestReward.phase ==
+                  interactions::ChestRewardPhase::ClosedUnlocked &&
+              !stagedChestGuidance.Snapshot().chestReward.unlockPending &&
+              stagedChestGuidance.Snapshot().finale.lichDefeated &&
+              !stagedChestGuidance.Snapshot().finale.lanternClaimed,
+          "chest-unlock checkpoint must freeze the exact post-delay light-on state before opening or claiming");
     Check(productionGlass != nullptr && productionGlass->id == 115 &&
               productionGlass->usesProductionRewardProps &&
               productionGlass->productionLanternGlassOnly &&
@@ -224,15 +235,53 @@ int main()
               lookUp->rewardPose == DevelopmentRewardPose::HeldHigh &&
               lookUp->pitch == 0.28f,
           "maximum-upward-look lantern checkpoint protects the block forearm cull regression");
+    const DevelopmentCheckpoint* chestHeldHigh =
+        FindDevelopmentCheckpoint("lantern-chest-held-high");
+    Check(chestHeldHigh != nullptr && chestHeldHigh->id == 135 &&
+              chestHeldHigh->baseShowcaseCheckpointId == 10 &&
+              chestHeldHigh->cameraX == kRewardChestRoutePosition.x + 1.30f &&
+              chestHeldHigh->cameraZ == kRewardChestRoutePosition.z &&
+              chestHeldHigh->yaw == -1.57079632679f &&
+              chestHeldHigh->rewardPose == DevelopmentRewardPose::HeldHigh &&
+              QueryShowcaseZone(chestHeldHigh->cameraX, chestHeldHigh->cameraZ) ==
+                  ShowcaseZone::Finale,
+          "post-claim chest checkpoint freezes the exact finale-room carry pose above the low chest footprint");
     horde::gameplay::simulation::GameSimulation stagedWallHigh;
     horde::gameplay::simulation::GameSimulation stagedWallLow;
     horde::gameplay::simulation::GameSimulation stagedLookUp;
+    horde::gameplay::simulation::GameSimulation stagedChestHeldHigh;
     Check(lookUp != nullptr &&
               StageDevelopmentCheckpointSimulation(stagedLookUp, *lookUp) &&
               stagedLookUp.Snapshot().playerPitchRadians == 0.28f &&
               stagedLookUp.Snapshot().interaction.heldLightPose ==
                   interactions::HeldLightPose::High,
           "maximum-upward-look checkpoint freezes the exact claimed-lantern pitch and pose");
+    Check(chestHeldHigh != nullptr &&
+              StageDevelopmentCheckpointSimulation(stagedChestHeldHigh,
+                                                   *chestHeldHigh) &&
+              stagedChestHeldHigh.Snapshot().playerX ==
+                  kRewardChestRoutePosition.x + 1.30f &&
+              stagedChestHeldHigh.Snapshot().playerZ ==
+                  kRewardChestRoutePosition.z &&
+              stagedChestHeldHigh.Snapshot().interaction.heldLightPose ==
+                  interactions::HeldLightPose::High &&
+              stagedChestHeldHigh.Snapshot().heldItemKinematics.
+                  leftHandLocal[2] >= 1.02f &&
+              stagedChestHeldHigh.Snapshot().heldItemKinematics.
+                  leftHandLocal[2] <= 1.05f &&
+              items::ComputeRewardLanternForwardClearance(
+                  stagedChestHeldHigh.Snapshot().playerX,
+                  stagedChestHeldHigh.Snapshot().playerZ,
+                  std::sin(stagedChestHeldHigh.Snapshot().playerYawRadians),
+                  -std::cos(stagedChestHeldHigh.Snapshot().playerYawRadians)) >
+                  2.65f &&
+              items::ComputeRewardLanternForwardClearance(
+                  stagedChestHeldHigh.Snapshot().playerX,
+                  stagedChestHeldHigh.Snapshot().playerZ,
+                  std::sin(stagedChestHeldHigh.Snapshot().playerYawRadians),
+                  -std::cos(stagedChestHeldHigh.Snapshot().playerYawRadians)) <
+                  2.67f,
+          "post-claim chest checkpoint preserves open held-prop clearance while player movement remains blocked by the floor chest");
     Check(wallHigh != nullptr &&
               StageDevelopmentCheckpointSimulation(stagedWallHigh, *wallHigh) &&
               stagedWallHigh.Snapshot().playerX == 0.0f &&

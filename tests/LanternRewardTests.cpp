@@ -8,6 +8,7 @@
 #include "gameplay/interactions/InteractionState.h"
 #include "gameplay/simulation/GameSimulation.h"
 #include "gameplay/simulation/InputMailbox.h"
+#include "vulkan/raytracing/ChestGuidanceLight.h"
 
 namespace
 {
@@ -58,6 +59,8 @@ std::size_t CountEvents(const GameSimulation& simulation,
 
 int main()
 {
+    using horde::vulkan::raytracing::ResolveChestGuidanceLight;
+
     Check(static_cast<std::uint32_t>(EntityId::RewardChest) == 5u &&
               static_cast<std::uint32_t>(EntityId::RewardLantern) == 6u &&
               static_cast<std::uint8_t>(GameplayEventType::PlayerParrySucceeded) == 12u &&
@@ -70,8 +73,30 @@ int main()
               static_cast<std::uint8_t>(ChestRewardPrompt::Locked) == 1u &&
               static_cast<std::uint8_t>(ChestRewardPrompt::OpenChest) == 2u &&
               static_cast<std::uint8_t>(ChestRewardPrompt::Opening) == 3u &&
-              static_cast<std::uint8_t>(ChestRewardPrompt::ClaimLantern) == 4u,
+              static_cast<std::uint8_t>(ChestRewardPrompt::ClaimLantern) == 4u &&
+              static_cast<std::uint8_t>(ChestRewardPrompt::Unlocking) == 5u,
           "shared chest prompt values must retain the compact Android UI ABI");
+
+    ChestRewardSnapshot guidanceLocked;
+    const auto lockedGuidance = ResolveChestGuidanceLight(guidanceLocked);
+    guidanceLocked.unlockPending = true;
+    guidanceLocked.phaseTime = ChestRewardSequence::kUnlockDelaySeconds - 0.01f;
+    const auto pendingGuidance = ResolveChestGuidanceLight(guidanceLocked);
+    ChestRewardSnapshot guidanceUnlocked;
+    guidanceUnlocked.phase = ChestRewardPhase::ClosedUnlocked;
+    const auto unlockedGuidance = ResolveChestGuidanceLight(guidanceUnlocked);
+    ChestRewardSnapshot guidanceClaimed;
+    guidanceClaimed.phase = ChestRewardPhase::LanternClaimed;
+    const auto claimedGuidance = ResolveChestGuidanceLight(guidanceClaimed);
+    Check(lockedGuidance.strength == 0.0f && pendingGuidance.strength == 0.0f,
+          "the chest guidance light must remain dark throughout the two-second sealed pause");
+    Check(unlockedGuidance.strength > 0.0f &&
+              claimedGuidance.strength == unlockedGuidance.strength &&
+              NearlyEqual(unlockedGuidance.position[0], kRewardChestInteractionPosition.x) &&
+              NearlyEqual(unlockedGuidance.position[2], kRewardChestInteractionPosition.z) &&
+              unlockedGuidance.position[1] > 0.80f &&
+              unlockedGuidance.position[1] < 1.35f,
+          "unlock must activate one stable overhead world-space light above the physical chest");
 
     InputSnapshot publication;
     publication.commands.attack = 7u;
@@ -99,9 +124,21 @@ int main()
           "the chest prompt must hide outside the shared interaction range");
     Check(chest.TryInteract(ValidChestQuery()) == ChestRewardAction::None,
           "an interact edge before unlock must be rejected without changing phase");
-    Check(chest.Unlock() && !chest.Unlock() &&
+    Check(chest.BeginUnlockCountdown() && !chest.BeginUnlockCountdown() &&
+              chest.Snapshot().phase == ChestRewardPhase::Locked &&
+              chest.Snapshot().unlockPending &&
+              chest.QueryPrompt(ValidChestQuery()) == ChestRewardPrompt::Unlocking,
+          "lich defeat must arm one shared two-second seal-breaking countdown");
+    chest.Update(ChestRewardSequence::kUnlockDelaySeconds - 0.01f);
+    Check(chest.Snapshot().phase == ChestRewardPhase::Locked &&
+              chest.Snapshot().unlockPending &&
+              chest.Snapshot().phaseTime > 1.98f &&
+              chest.QueryPrompt(ValidChestQuery()) == ChestRewardPrompt::Unlocking,
+          "the chest must remain sealed before the exact two-second boundary");
+    chest.Update(0.01f);
+    Check(!chest.Snapshot().unlockPending &&
               chest.Snapshot().phase == ChestRewardPhase::ClosedUnlocked,
-          "lich defeat must unlock the chest exactly once");
+          "the chest must unlock exactly at the two-second boundary");
     Check(chest.QueryPrompt(ValidChestQuery()) == ChestRewardPrompt::OpenChest,
           "an unlocked nearby chest must publish the open prompt");
 

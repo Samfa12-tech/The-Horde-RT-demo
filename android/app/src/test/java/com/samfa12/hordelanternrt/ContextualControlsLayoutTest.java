@@ -52,9 +52,9 @@ public final class ContextualControlsLayoutTest {
                 "pbr-sword-closeup", "pbr-torch-fire", "player-body-grips",
                 "lantern-chest-unlock", "lantern-held-high", "lantern-held-low",
                 "lantern-glass-transmission", "lantern-motion-extreme",
-                "lantern-held-look-up"
+                "lantern-held-look-up", "lantern-chest-held-high"
         };
-        final int[] ids = {100, 101, 102, 114, 116, 117, 118, 119, 134};
+        final int[] ids = {100, 101, 102, 114, 116, 117, 118, 119, 134, 135};
         for (int index = 0; index < names.length; ++index) {
             assertEquals("debug capture name must reach its native checkpoint",
                          ids[index], MainActivity.checkpointId(names[index]));

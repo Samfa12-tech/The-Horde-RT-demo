@@ -89,6 +89,7 @@ $checkpointZones = @{
     "lantern-wall-high" = "shadow-corridor"
     "lantern-wall-low" = "shadow-corridor"
     "lantern-held-look-up" = "yellow-torch-bay"
+    "lantern-chest-held-high" = "finale"
 }
 $baselineCheckpoints = @("opening", "two-enemy-combat", "worst-bend", "skylight", "green", "lich")
 $captureCheckpoints = @("opening", "skeleton", "worst-bend", "lantern-drop", "skylight", "yellow", "blue", "red", "green", "mirror", "lich", "finale-roof", "two-enemy-combat")

@@ -83,6 +83,8 @@ int main()
         ClaimedRewardCapturePolicy("lantern-held-high");
     constexpr auto maximumWallCapture =
         ClaimedRewardCapturePolicy("lantern-wall-high");
+    constexpr auto chestClearanceCapture =
+        ClaimedRewardCapturePolicy("lantern-chest-held-high");
     constexpr auto finaleRewardCapture =
         ClaimedRewardCapturePolicy("finale-roof");
     static_assert(ordinaryLanternCapture.requirePlayerPixels &&
@@ -97,6 +99,11 @@ int main()
                   maximumWallCapture.permitsCompleteWallRetraction);
     static_assert(ClaimedRewardCapturePolicy("lantern-wall-low")
                       .permitsCompleteWallRetraction);
+    static_assert(chestClearanceCapture.requirePlayerPixels &&
+                  chestClearanceCapture.requireRewardBodyPixels &&
+                  chestClearanceCapture.requireRewardRingPixels &&
+                  chestClearanceCapture.requireSwordPixels &&
+                  !chestClearanceCapture.permitsCompleteWallRetraction);
     static_assert(finaleRewardCapture.requirePlayerPixels &&
                   finaleRewardCapture.requireRewardBodyPixels &&
                   finaleRewardCapture.requireRewardRingPixels &&
@@ -111,6 +118,8 @@ int main()
             WindowsChestPromptText(ChestRewardPrompt::Opening) == "OPENING..." &&
             WindowsChestPromptText(ChestRewardPrompt::ClaimLantern) ==
                 "PRESS E / A TO TAKE LANTERN" &&
+            WindowsChestPromptText(ChestRewardPrompt::Unlocking) ==
+                "THE LICH'S SEAL IS BREAKING..." &&
             WindowsChestPromptText(ChestRewardPrompt::None).empty(),
             "Windows labels must map every shared chest prompt without owning gameplay state");
     Require(CanPersistRtLabUnlock({.finaleComplete = true}),

@@ -123,7 +123,7 @@ float ComputeRewardLanternForwardClearance(const float cameraX,
         return 0.0f;
     const float forwardLength = std::hypot(forwardX, forwardZ);
     if (forwardLength <= 0.000001f ||
-        !IsShowcasePlayerPositionWalkable(cameraX, cameraZ))
+        !IsShowcaseHeldPropPositionWalkable(cameraX, cameraZ))
         return 0.0f;
     const float unitForwardX = forwardX / forwardLength;
     const float unitForwardZ = forwardZ / forwardLength;
@@ -134,7 +134,7 @@ float ComputeRewardLanternForwardClearance(const float cameraX,
          static_cast<int>(kMaximumClearance / kSearchStride); ++step)
     {
         const float distance = static_cast<float>(step) * kSearchStride;
-        if (IsShowcasePlayerPositionWalkable(
+        if (IsShowcaseHeldPropPositionWalkable(
                 cameraX + unitForwardX * distance,
                 cameraZ + unitForwardZ * distance))
         {
@@ -150,7 +150,7 @@ float ComputeRewardLanternForwardClearance(const float cameraX,
         for (int refinement = 0; refinement < 14; ++refinement)
         {
             const float midpoint = 0.5f * (lastWalkable + blocked);
-            if (IsShowcasePlayerPositionWalkable(
+            if (IsShowcaseHeldPropPositionWalkable(
                     cameraX + unitForwardX * midpoint,
                     cameraZ + unitForwardZ * midpoint))
                 lastWalkable = midpoint;
@@ -459,12 +459,9 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
         std::min(preferredRewardDepth,
                  std::max(0.20f, rewardForwardClearance - 0.30f)));
     // At the tight wall fixture there is not enough forward clearance for the
-    // long cage to hang toward the wall. Centre the ring in the shallow view
-    // cone; the authoritative collision presentation turns the cage sideways
-    // below it. Open-space carry keeps the established shoulder-side target.
-    // Keep the claimed prop on the anatomical left side. Centralising the
-    // open-space ring at -5 cm made the correctly paired left hand cross the
-    // torso even though the arm-chain mapping itself was fixed.
+    // long cage to hang toward the wall. Keep the ring on its anatomical left
+    // side and turn the cage sideways below it. The low reward chest is not a
+    // full-height held-prop obstruction, so it retains the open-space target.
     const float rewardLateral =
         -0.45f + 0.32f * rewardClearanceBlend * rewardClearanceBlend;
     const float rewardHighVerticalWallOffset =

@@ -6,6 +6,18 @@
 namespace horde::gameplay::interactions
 {
 
+bool ChestRewardSequence::BeginUnlockCountdown()
+{
+    if (snapshot_.phase != ChestRewardPhase::Locked || snapshot_.unlockPending)
+    {
+        return false;
+    }
+    snapshot_.unlockPending = true;
+    snapshot_.phaseTime = 0.0f;
+    snapshot_.lidOpenProgress = 0.0f;
+    return true;
+}
+
 bool ChestRewardSequence::Unlock()
 {
     if (snapshot_.phase != ChestRewardPhase::Locked)
@@ -15,6 +27,7 @@ bool ChestRewardSequence::Unlock()
     snapshot_.phase = ChestRewardPhase::ClosedUnlocked;
     snapshot_.phaseTime = 0.0f;
     snapshot_.lidOpenProgress = 0.0f;
+    snapshot_.unlockPending = false;
     return true;
 }
 
@@ -51,7 +64,9 @@ ChestRewardPrompt ChestRewardSequence::QueryPrompt(
     switch (snapshot_.phase)
     {
     case ChestRewardPhase::Locked:
-        return ChestRewardPrompt::Locked;
+        return snapshot_.unlockPending
+            ? ChestRewardPrompt::Unlocking
+            : ChestRewardPrompt::Locked;
     case ChestRewardPhase::ClosedUnlocked:
         return ChestRewardPrompt::OpenChest;
     case ChestRewardPhase::Opening:
@@ -65,8 +80,26 @@ ChestRewardPrompt ChestRewardSequence::QueryPrompt(
 
 const ChestRewardSnapshot& ChestRewardSequence::Update(float fixedDeltaSeconds)
 {
-    if (snapshot_.phase != ChestRewardPhase::Opening ||
-        !std::isfinite(fixedDeltaSeconds) || fixedDeltaSeconds <= 0.0f)
+    if (!std::isfinite(fixedDeltaSeconds) || fixedDeltaSeconds <= 0.0f)
+    {
+        return snapshot_;
+    }
+    if (snapshot_.phase == ChestRewardPhase::Locked && snapshot_.unlockPending)
+    {
+        snapshot_.phaseTime = std::min(
+            kUnlockDelaySeconds, snapshot_.phaseTime + fixedDeltaSeconds);
+        // Fixed 1/60 accumulation lands a few float ulps below exactly 2.0.
+        // Use a sub-tick tolerance so the authored boundary remains 120 ticks,
+        // rather than slipping audibly to tick 121 on one compiler.
+        if (snapshot_.phaseTime + 0.0001f >= kUnlockDelaySeconds)
+        {
+            snapshot_.phase = ChestRewardPhase::ClosedUnlocked;
+            snapshot_.phaseTime = 0.0f;
+            snapshot_.unlockPending = false;
+        }
+        return snapshot_;
+    }
+    if (snapshot_.phase != ChestRewardPhase::Opening)
     {
         return snapshot_;
     }
@@ -94,6 +127,18 @@ void ChestRewardSequence::Import(const ChestRewardSnapshot& snapshot)
     if (!std::isfinite(snapshot_.lidOpenProgress)) snapshot_.lidOpenProgress = 0.0f;
     snapshot_.phaseTime = std::max(0.0f, snapshot_.phaseTime);
     snapshot_.lidOpenProgress = std::clamp(snapshot_.lidOpenProgress, 0.0f, 1.0f);
+    if (snapshot_.phase != ChestRewardPhase::Locked)
+    {
+        snapshot_.unlockPending = false;
+    }
+    else if (!snapshot_.unlockPending)
+    {
+        snapshot_.phaseTime = 0.0f;
+    }
+    else
+    {
+        snapshot_.phaseTime = std::min(snapshot_.phaseTime, kUnlockDelaySeconds);
+    }
 }
 
 } // namespace horde::gameplay::interactions

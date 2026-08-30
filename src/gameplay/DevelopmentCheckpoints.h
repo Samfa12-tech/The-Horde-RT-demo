@@ -49,9 +49,10 @@ struct DevelopmentCheckpoint
     std::array<float, 3u> rewardPreviousPivotVelocity{{0.0f, 0.0f, 0.0f}};
     float rewardTorsionAngleRadians = 0.0f;
     float rewardTorsionAngularVelocity = 0.0f;
+    bool stagesUnlockedChest = false;
 };
 
-inline constexpr std::array<DevelopmentCheckpoint, 35u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 36u> kDevelopmentCheckpoints{{
     {100, "pbr-sword-closeup", 0, 0.0f, 1.85f, 0.0f, -0.18f},
     {101, "pbr-torch-fire", 0, 0.0f, 1.85f, 0.0f, -0.14f},
     {102, "player-body-grips", 0, 0.0f, 1.85f, 0.0f, -0.32f},
@@ -73,11 +74,15 @@ inline constexpr std::array<DevelopmentCheckpoint, 35u> kDevelopmentCheckpoints{
      DevelopmentCombatPose::Rest, true, 0.005f},
     {113, "glass-edge-fresnel", 4, -7.60f, -13.25f, -0.65f, -0.05f,
      DevelopmentCombatPose::Rest, true},
-    {114, "lantern-chest-unlock", 5,
-     kRewardChestRoutePosition.x + 1.85f, kRewardChestRoutePosition.z,
-     -1.57079632679f, -0.35f,
-     DevelopmentCombatPose::Rest, false, 1.0f, {{0.72f, 0.90f, 1.0f}}, 2.4f,
-     true, false},
+    {.id = 114,
+     .name = "lantern-chest-unlock",
+     .baseShowcaseCheckpointId = 5,
+     .cameraX = kRewardChestRoutePosition.x + 1.85f,
+     .cameraZ = kRewardChestRoutePosition.z,
+     .yaw = -1.57079632679f,
+     .pitch = -0.35f,
+     .usesProductionRewardProps = true,
+     .stagesUnlockedChest = true},
     {115, "lantern-glass-production", 5,
      kRewardChestRoutePosition.x + 1.85f, kRewardChestRoutePosition.z,
      -1.57079632679f, -0.35f,
@@ -146,6 +151,11 @@ inline constexpr std::array<DevelopmentCheckpoint, 35u> kDevelopmentCheckpoints{
      0.0f, 0.0f, {{0.0f, 0.0f, 0.0f}}, 0.34906585040f, 0.0f},
     {134, "lantern-held-look-up", 5, -10.65f, -15.20f,
      -1.57079632679f, 0.28f,
+     DevelopmentCombatPose::Rest, false, 1.0f, {{0.72f, 0.90f, 1.0f}}, 2.4f,
+     true, false, DevelopmentRewardPose::HeldHigh},
+    {135, "lantern-chest-held-high", 10,
+     kRewardChestRoutePosition.x + 1.30f, kRewardChestRoutePosition.z,
+     -1.57079632679f, -0.05f,
      DevelopmentCombatPose::Rest, false, 1.0f, {{0.72f, 0.90f, 1.0f}}, 2.4f,
      true, false, DevelopmentRewardPose::HeldHigh},
 }};

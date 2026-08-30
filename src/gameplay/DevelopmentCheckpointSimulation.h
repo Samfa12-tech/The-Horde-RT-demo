@@ -61,6 +61,18 @@ inline bool StageDevelopmentCheckpointSimulation(
     input.torchLightStrength = 1.8f;
     gameSimulation.StepFixed(input, 0.0f,
                              gameSimulation.Snapshot().inputPublicationSequence + 1u);
+    if (checkpoint.stagesUnlockedChest)
+    {
+        using namespace horde::gameplay::interactions;
+        ChestRewardSnapshot chest;
+        chest.phase = ChestRewardPhase::ClosedUnlocked;
+        InteractionState interaction = gameSimulation.Snapshot().interaction;
+        FinaleSequenceSnapshot finale;
+        finale.phase = FinaleSequencePhase::LichFalling;
+        finale.endingPhase = FinaleEndingPhase::LichFalling;
+        finale.lichDefeated = true;
+        gameSimulation.ImportRewardCheckpoint(chest, interaction, finale);
+    }
     if (checkpoint.rewardPose != DevelopmentRewardPose::None)
     {
         using namespace horde::gameplay::interactions;
