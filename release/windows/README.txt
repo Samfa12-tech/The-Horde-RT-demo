@@ -1,4 +1,4 @@
-HORDE LANTERN RT - SHOWCASE ALPHA 1.5.2
+HORDE LANTERN RT - SHOWCASE ALPHA 1.6.0
 =======================================
 
 This is a native Vulkan hardware-ray-tracing technology demo from Samfa12.
@@ -17,8 +17,11 @@ CONTROLS
 - Left mouse drag: 360 camera look
 - Right mouse or Space: swing sword
 - Q: parry skeleton melee attacks
+- E: interact with the reward chest or lantern
+- F: raise or lower the claimed reward lantern
 - Backbone / compatible controller: left stick move, right stick look,
-  RT attack, LT parry, B / Circle dodge, D-pad menus, A select,
+  RT attack, LT parry, B / Circle dodge, A interact, Y raise/lower,
+  D-pad menus, A select,
   Menu / Start pause
 - Esc: pause / resume
 - R: restart route
@@ -42,7 +45,9 @@ and does not silently start a fallback renderer.
 SHOWCASE CONTENT
 - Two-skeleton opening encounter followed by a three-turn shadow corridor
 - Animation-owned sword contact, timed parry, attacker stagger, and riposte window
-- Rebuilt low-poly coat/body with articulated first-person walking
+- Textured PBR sword and hand torch with shared held-item sockets
+- World-space volumetric torch fire with movement-reactive coloured RT light
+- Stable block-arm first-person presentation while the reusable skinned-player path remains in development
 - Three-point vitality, encounter retry, and route restart flow
 - Blue skylight chamber and four bay-selected coloured torch environments
 - Open framed threshold, wet stone, and a single-bounce hero mirror
@@ -50,17 +55,24 @@ SHOWCASE CONTENT
 - Low, depth-clipped ritual ground mist in the lich room
 - Positional looping waterfall ambience
 - Floating staff-lit lich finale with violet charge electricity, three-hit combat,
-  hit recoil/cry, death animation, opening roof, returning dawn, and epilogue
+  hit recoil/cry, death animation, and an illuminated Gothic reward chest
+- Locked/open/claim interaction prompts, authored chest opening, and a physical
+  reward lantern with bounded ray-traced glass and acceleration-driven swing
+- Two-second post-lich latch cue and chest guidance light before interaction
+- Automatic GitHub Release availability checks with an optional update action
 - Native Vulkan BLAS/TLAS, RT pipeline/SBT and vkCmdTraceRaysKHR presentation
 - Phone-safe ray-query shading work inside raygen
-- Seventeen FilmCow UI, combat, movement, skeleton, and lich sound cues,
-  plus the credited DRAGON-STUDIO/Pixabay waterfall loop
+- FilmCow UI, combat, movement, skeleton, and lich sound cues, plus credited
+  Pixabay waterfall, torch-extinguish, chest-unlock, and chest-open effects
 - Help > Credits & licences carries the main attribution inside the executable
 
 KNOWN ALPHA LIMITS
 - The opening encounter is capped at two skeletons and one attacker at a time.
 - The lich is a CC0 Meshy placeholder with visible source-rig limitations.
-- Larger hordes, broader fire/fluid simulation, and the staged textured sword remain deferred.
+- Larger hordes remain deferred.
+- First-person skinned gauntlets and arm/body shadow/reflection polish remain deferred;
+  normal gameplay deliberately uses the stable block-arm viewmodel.
+- The bounded Mobile lantern-glass path is expensive and 75% RT resolution is recommended.
 - Only tested RT-capable hardware paths are supported.
 - See ASSET_LICENSES.md and ALPHA_RELEASE_NOTES.md.
 

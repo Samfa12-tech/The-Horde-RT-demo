@@ -5,7 +5,7 @@ if(POLICY CMP0091)
 endif()
 
 project(HordeLanternRT
-    VERSION 1.5.2
+    VERSION 1.6.0
     DESCRIPTION "Native Vulkan hardware ray tracing technology demo"
     LANGUAGES CXX
 )

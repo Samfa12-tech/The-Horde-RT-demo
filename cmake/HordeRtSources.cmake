@@ -1,7 +1,7 @@
 # Shared native renderer sources. Keep platform entry points and UI shells in
 # their platform-specific targets; this list is consumed by Windows and Android.
-set(HORDE_RT_DISPLAY_VERSION "1.5.2")
-set(HORDE_RT_PACKAGE_VERSION "1.5.2")
+set(HORDE_RT_DISPLAY_VERSION "1.6.0")
+set(HORDE_RT_PACKAGE_VERSION "1.6.0")
 
 set(HORDE_RT_CORE_RELATIVE_SOURCES
     gameplay/simulation/GameSimulation.cpp
