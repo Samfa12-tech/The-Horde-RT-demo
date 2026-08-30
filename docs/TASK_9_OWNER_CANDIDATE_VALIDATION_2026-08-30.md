@@ -24,7 +24,7 @@ Date: 2026-08-30
 | Physical reward-lantern carry | Complete | Fixed-step acceleration response, damping, clamps, high/low transitions, checkpoint import/freeze, wall/chest regression coverage |
 | Player/animation foundation | Foundation complete; presentation deferred | Reusable skinned loader, layers, IK, sockets, CPU skin/refit, and two-cut combo remain; owner selected block arms for normal gameplay until all-scenario hands/gauntlets are ready |
 | Cross-platform updater | Complete | Public GitHub Releases check, explicit user action, lifecycle/process ownership, no silent install |
-| Audio/haptics | One owner timing check open | Cue assets/event transport pass; prior sound/haptics accepted, but the unlock event deliberately moved to two seconds after lich death |
+| Audio/haptics | Complete | Cue assets/event transport pass; owner accepted the exact final candidate's two-second unlock timing, audio, and haptics |
 
 ## Exact clean evidence
 
@@ -38,7 +38,7 @@ Date: 2026-08-30
 - Player-facing block arms are an explicit owner-directed exception to the original all-scenario skinned-character presentation. The reusable character path is retained rather than represented as finished visual quality.
 - Arm/body shadows and reflections are owner-deferred to the next update.
 - Mobile dielectric termination diagnostics and glass cost are open optimisation/correctness work. No render scale, RT feature, transmission, or shadow model was reduced to hide them.
-- The owner must play the natural lich -> two-second latch -> chest open -> lantern claim route and confirm the audible delay before release preparation.
+- The owner completed and accepted the natural lich -> two-second latch -> lit chest -> chest open -> lantern claim route on the exact installed Debug candidate.
 - Signing, versioning, and itch upload require a later explicit approval of exact artifacts.
 
-Audio/haptic manual revalidation required: YES — event timing changed from immediate post-lich unlock to an exact two-second delay; haptic routing, playback backend, cue asset, and all other accepted feedback are unchanged.
+Audio/haptic manual revalidation required: YES — completed and accepted by the owner on the exact installed `SM-S948B` Debug candidate; haptic routing, playback backend, and cue assets remain unchanged.

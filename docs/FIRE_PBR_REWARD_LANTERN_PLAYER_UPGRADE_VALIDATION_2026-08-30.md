@@ -32,7 +32,7 @@ Date: 2026-08-30
 - The sword presents its cutting edge forward, sits farther right on phone, and supports a downward cut followed by a second-press upward slice.
 - Phone sword and torch composition borders the viewport rather than crowding the centre.
 - The final max-upward-pitch checkpoint proves the left block forearm remains visible and attached to the held lantern.
-- The owner reported that the preceding installed phone candidate feels good, and separately confirmed: “sound and haptics are good.” The new two-second unlock timing is a deliberate audio timing change and therefore still needs one owner-listening check on the final installed APK.
+- With the exact final Debug APK still installed and foreground on `SM-S948B`, the owner completed the natural lich-to-chest review and reported “its all good. audio and haptics is good, too.” This accepts the two-second latch timing, chest guidance light/readability, chest opening, lantern claim, audio, and haptics for the owner-review candidate.
 
 ## Fresh Host gate
 
@@ -173,9 +173,9 @@ No artifact in this record is a signed or published release candidate.
 - [x] Fire appearance accepted by owner.
 - [x] Phone control/held-item feel accepted by owner.
 - [x] Downward/upward sword combo accepted by owner.
-- [ ] Owner confirms the new two-second post-lich unlock sound timing on the final installed APK; other audio and haptics were accepted on the immediately preceding candidate.
+- [x] Owner confirms the new two-second post-lich unlock sound timing on the final installed APK; audio and haptics accepted.
 - [x] Max-upward lantern arm remains visible in deterministic exact-device evidence.
-- [ ] Owner completes a natural full-route chest unlock/open/claim replay on the final installed Debug candidate before release preparation.
+- [x] Owner completes a natural full-route chest unlock/open/claim replay on the final installed Debug candidate.
 - [ ] Owner explicitly approves a future version, signing, and itch upload.
 
-Audio/haptic manual revalidation required: YES — the chest unlock event now intentionally fires two seconds after lich death, so the final installed APK needs one owner-listening check even though the cue asset, playback backend, routing, haptics, and previously accepted feedback are otherwise unchanged.
+Audio/haptic manual revalidation required: YES — completed and accepted by the owner on the exact installed `SM-S948B` Debug candidate after the chest unlock event was moved to two seconds after lich death.
