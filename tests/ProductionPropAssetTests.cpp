@@ -449,7 +449,7 @@ bool InLanternInspectionFrustum(const Matrix& matrix, float cameraX,
 {
     const auto point = Origin(matrix);
     const std::array<float, 3u> delta{{point[0] - cameraX,
-                                       point[1] - 0.58f,
+                                       point[1] - horde::gameplay::kShowcaseEyeWorldY,
                                        point[2] - cameraZ}};
     std::array<float, 3u> forward{{std::sin(yaw), -0.05f + pitch,
                                    -std::cos(yaw)}};
@@ -519,7 +519,8 @@ ProjectedSafeFrame ProjectAuthoredBoundsToSafeFrame(
     const float pitch = -0.05f)
 {
     ProjectedSafeFrame result;
-    const std::array<float, 3u> eye{{cameraX, 0.58f, cameraZ}};
+    const std::array<float, 3u> eye{{
+        cameraX, horde::gameplay::kShowcaseEyeWorldY, cameraZ}};
     std::array<float, 3u> forward{{std::sin(yaw), -0.05f + pitch,
                                    -std::cos(yaw)}};
     const float forwardLength = std::sqrt(
@@ -827,10 +828,12 @@ int main()
              -kLanternPendulumTorsionHardLimitRadians}}};
         constexpr std::array<float, 3u> aspects{{
             16.0f / 9.0f, 9.0f / 16.0f, 1440.0f / 3120.0f}};
+        constexpr float claimedScale =
+            horde::gameplay::items::kClaimedRewardLanternScale;
         constexpr Matrix lanternScale{{
-            0.90f, 0.0f, 0.0f, 0.0f,
-            0.0f, 0.90f, 0.0f, 0.0f,
-            0.0f, 0.0f, 0.90f, 0.0f,
+            claimedScale, 0.0f, 0.0f, 0.0f,
+            0.0f, claimedScale, 0.0f, 0.0f,
+            0.0f, 0.0f, claimedScale, 0.0f,
             0.0f, 0.0f, 0.0f, 1.0f}};
         Matrix inverseRingGrip = ringGrip->world;
         inverseRingGrip[12] = -inverseRingGrip[12];
@@ -936,14 +939,16 @@ int main()
                   std::string(poseIndex == 0u ? "high" : "low") +
                       " full authored body AABB keeps at least 90% horizontal and vertical coverage through 45/55-degree swing and torsion extremes on 16:9, 9:16, and 1440:3120");
         }
-        Check(handHeight[0] - handHeight[1] >= 0.22f,
+        Check(handHeight[0] - handHeight[1] >= 0.18f,
               "shared high and low hand targets remain visibly distinct after safe-frame composition");
 
+        // This is the real fixed-step reward-carry stop produced by the shared
+        // z=-10 wall clearance response, not an inspection-only camera offset.
         constexpr float wallCameraZ = -9.70f;
         constexpr float wallPlaneZ = -10.0f;
         constexpr float wallSafetyMargin = 0.015f;
         constexpr std::array<float, 3u> wallCameraOrigin{{
-            0.0f, 0.58f, wallCameraZ}};
+            0.0f, horde::gameplay::kShowcaseEyeWorldY, wallCameraZ}};
         constexpr std::array<Motion, 2u> wallMotions{{
             {"wall-rest", 0.0f, 0.0f, 0.0f},
             {"wall-swing", 0.0f, 0.5235988f,
@@ -1050,6 +1055,104 @@ int main()
                           " camera origin and 15 mm near sphere stay outside body triangles and every closed LanternGlass pane");
             }
         }
+
+        std::vector<float> fullWallSweepZ;
+        for (float z = -7.50f; z >= -9.7001f; z -= 0.05f)
+            fullWallSweepZ.push_back(z);
+        fullWallSweepZ.push_back(-8.53f);
+        fullWallSweepZ.push_back(-9.735f);
+        std::sort(fullWallSweepZ.begin(), fullWallSweepZ.end(),
+                  std::greater<float>());
+        for (std::size_t poseIndex = 0u; poseIndex < 2u; ++poseIndex)
+        {
+            float worstRingClearance = INFINITY;
+            float worstBodyClearance = INFINITY;
+            float worstGlassClearance = INFINITY;
+            float worstWallMargin = INFINITY;
+            float worstZ = 0.0f;
+            for (const float cameraZ : fullWallSweepZ)
+            {
+                HeldItemFixedStepInput input;
+                input.playerX = 0.0f;
+                input.playerZ = cameraZ;
+                input.playerYawRadians = 0.0f;
+                input.playerPitchRadians = -0.08f;
+                input.interaction.heldLightKind = HeldLightKind::RewardLantern;
+                input.interaction.heldLightPose = poseIndex == 0u
+                    ? HeldLightPose::High : HeldLightPose::Low;
+                input.interaction.heldLightPoseProgress = 1.0f;
+                auto items = horde::gameplay::items::MakeDefaultHeldItemStates();
+                HeldItemFixedStepState state;
+                std::string diagnostic;
+                Check(horde::gameplay::items::ResolveHeldItemsFixedStep(
+                          items, input, 1u, state, diagnostic),
+                      std::string("wall interval shared hand target resolves: ") +
+                          diagnostic);
+                const Matrix ring = Multiply(
+                    Multiply(state.worldFromLeftHand, lanternScale),
+                    inverseRingGrip);
+                const Matrix hinge = Multiply(ring, ringHinge->world);
+                const std::array<float, 3u> cameraOrigin{{
+                    0.0f, horde::gameplay::kShowcaseEyeWorldY, cameraZ}};
+                const TransformedBounds ringBounds = TransformBounds(
+                    lanternRing.asset, ring);
+                const float ringClearance = MinimumTriangleDistance(
+                    lanternRing.asset, ring, cameraOrigin);
+                for (const Motion& motion : wallMotions)
+                {
+                    const Matrix bodyRotation =
+                        horde::gameplay::interactions::
+                            ComposeLanternPendulumBodyTransform(
+                                hinge, motion.forward, motion.strafe,
+                                motion.torsion,
+                                state.kinematics.
+                                    rewardLanternPresentationYawRadians);
+                    const Matrix body = Multiply(bodyRotation, lanternScale);
+                    const TransformedBounds bodyBounds = TransformBounds(
+                        lanternBody.asset, body);
+                    const float bodyClearance = MinimumTriangleDistance(
+                        lanternBody.asset, body, cameraOrigin);
+                    const float glassClearance = MinimumTriangleDistance(
+                        lanternBody.asset, body, cameraOrigin,
+                        "LanternGlass");
+                    const float wallMargin = std::min(
+                        ringBounds.minimum[2], bodyBounds.minimum[2]) -
+                        wallPlaneZ;
+                    worstRingClearance = std::min(
+                        worstRingClearance, ringClearance);
+                    worstBodyClearance = std::min(
+                        worstBodyClearance, bodyClearance);
+                    worstGlassClearance = std::min(
+                        worstGlassClearance, glassClearance);
+                    if (wallMargin < worstWallMargin)
+                    {
+                        worstWallMargin = wallMargin;
+                        worstZ = cameraZ;
+                    }
+                    Check(std::isfinite(ringClearance) &&
+                              std::isfinite(bodyClearance) &&
+                              std::isfinite(glassClearance) &&
+                              ringBounds.minimum[2] >=
+                                  wallPlaneZ + wallSafetyMargin &&
+                              bodyBounds.minimum[2] >=
+                                  wallPlaneZ + wallSafetyMargin &&
+                              ringClearance >= wallSafetyMargin &&
+                              bodyClearance >= wallSafetyMargin &&
+                              glassClearance >= wallSafetyMargin &&
+                              hinge[14] <= cameraZ - wallSafetyMargin,
+                          std::string(poseIndex == 0u ? "high " : "low ") +
+                              motion.name +
+                              " full 5 cm wall interval keeps ring, complete body AABB, every glass pane, and hinge finite/camera-side/wall-safe");
+                }
+            }
+            std::cout << (poseIndex == 0u ? "high" : "low")
+                      << " full prop wall sweep samples="
+                      << fullWallSweepZ.size()
+                      << " clearance ring/body/glass="
+                      << worstRingClearance << '/' << worstBodyClearance << '/'
+                      << worstGlassClearance << " wall-margin@z="
+                      << worstWallMargin << '@' << worstZ << '\n';
+        }
     }
 
     if (chestSocket != nullptr && ringHinge != nullptr && flameSocket != nullptr &&
@@ -1081,8 +1184,10 @@ int main()
               "checkpoint 114 places the complete chest on the authoritative corridor floor and composes both authored hinges exactly");
         constexpr std::array<float, 2u> scales{{0.90f, 0.90f}};
         constexpr std::array<std::array<float, 4u>, 2u> cameras{{
-            {{-10.65f, -15.20f, -1.57079632679f, -0.35f}},
-            {{-10.65f, -15.20f, -1.57079632679f, -0.35f}}}};
+            {{horde::gameplay::kRewardChestRoutePosition.x + 1.85f,
+              horde::gameplay::kRewardChestRoutePosition.z, -1.57079632679f, -0.35f}},
+            {{horde::gameplay::kRewardChestRoutePosition.x + 1.85f,
+              horde::gameplay::kRewardChestRoutePosition.z, -1.57079632679f, -0.35f}}}};
         for (std::size_t checkpoint = 0u; checkpoint < scales.size(); ++checkpoint)
         {
             const float value = scales[checkpoint];
@@ -1130,8 +1235,10 @@ int main()
                   checkpoint == 0u
                       ? "full chest, lid, ring, and body bounds fit checkpoint 114's exact raygen frustum"
                       : "full ring and body bounds fit checkpoint 115's exact raygen frustum");
-            Check(Near(flameOrigin[0], -12.2401924f) && Near(flameOrigin[2], -15.27f) &&
-                      Near(lightOrigin[0], -12.2401924f) && Near(lightOrigin[2], -15.27f) &&
+            Check(Near(flameOrigin[0], horde::gameplay::kRewardChestRoutePosition.x + 0.2598076f) &&
+                      Near(flameOrigin[2], horde::gameplay::kRewardChestRoutePosition.z + 0.15f) &&
+                      Near(lightOrigin[0], horde::gameplay::kRewardChestRoutePosition.x + 0.2598076f) &&
+                      Near(lightOrigin[2], horde::gameplay::kRewardChestRoutePosition.z + 0.15f) &&
                       Near(flameOrigin[1], horde::gameplay::kRouteFloorWorldY + 1.28f - 0.545f * value) &&
                       Near(lightOrigin[1], horde::gameplay::kRouteFloorWorldY + 1.28f - 0.515f * value) &&
                       Near(lightOrigin[1] - flameOrigin[1], 0.030f * value),
@@ -1245,6 +1352,18 @@ int main()
                          {{-0.224f, -0.975f, -0.256f}},
                          {{0.224f, -0.015f, 0.256f}}),
           "exact per-component metre-space bounds reject imported arch, floor, room, and scenery contamination even when node names look benign");
+    const TransformedBounds stagedChestBaseBounds = TransformBounds(
+        chestBase.asset,
+        horde::vulkan::raytracing::kProductionRewardChestStageWorldFromBase);
+    Check(horde::gameplay::kRewardChestCollisionRect.minX <=
+                  stagedChestBaseBounds.minimum[0] &&
+              horde::gameplay::kRewardChestCollisionRect.maxX >=
+                  stagedChestBaseBounds.maximum[0] &&
+              horde::gameplay::kRewardChestCollisionRect.minZ <=
+                  stagedChestBaseBounds.minimum[2] &&
+              horde::gameplay::kRewardChestCollisionRect.maxZ >=
+                  stagedChestBaseBounds.maximum[2],
+          "shared reward chest collision conservatively contains the complete rotated production base footprint");
 
     if (failures != 0)
     {

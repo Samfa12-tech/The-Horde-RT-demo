@@ -446,8 +446,22 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
                 vec4 localTangent = v0.tangent * weights.x +
                                     v1.tangent * weights.y +
                                     v2.tangent * weights.z;
+                vec3 p0 = objectToWorld * v0.position.xyz;
+                vec3 p1 = objectToWorld * v1.position.xyz;
+                vec3 p2 = objectToWorld * v2.position.xyz;
+                h.geometricNormal = normalize(cross(p1 - p0, p2 - p0));
                 vec3 worldNormal = normalize(normalToWorld * localNormal);
-                vec3 worldTangent = normalize(objectToWorld * localTangent.xyz);
+                if (dot(worldNormal, h.geometricNormal) < 0.0)
+                    worldNormal = -worldNormal;
+                vec3 worldTangent = objectToWorld * localTangent.xyz;
+                worldTangent -= worldNormal * dot(worldNormal, worldTangent);
+                if (dot(worldTangent, worldTangent) <= 0.00000001)
+                    worldTangent = normalize(cross(
+                        abs(worldNormal.y) < 0.9 ? vec3(0.0, 1.0, 0.0)
+                                                 : vec3(1.0, 0.0, 0.0),
+                        worldNormal));
+                else
+                    worldTangent = normalize(worldTangent);
                 vec3 worldBitangent = normalize(cross(worldNormal, worldTangent)) *
                                       (localTangent.w < 0.0 ? -1.0 : 1.0);
                 RtMaterialGpu staticMaterial =
@@ -460,10 +474,8 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
                 h.normal = normalize(worldTangent * sampledNormal.x +
                                      worldBitangent * sampledNormal.y +
                                      worldNormal * sampledNormal.z);
-                vec3 p0 = objectToWorld * v0.position.xyz;
-                vec3 p1 = objectToWorld * v1.position.xyz;
-                vec3 p2 = objectToWorld * v2.position.xyz;
-                h.geometricNormal = normalize(cross(p1 - p0, p2 - p0));
+                if (dot(h.normal, h.geometricNormal) < 0.0)
+                    h.normal = -h.normal;
                 vec4 baseSample = (staticMaterial.materialFlags.x &
                     kRtMaterialFlagBaseColorTexture) != 0u
                     ? texture(rtBaseColorTextures,

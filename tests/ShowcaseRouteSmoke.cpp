@@ -121,6 +121,33 @@ int main()
               NearlyEqual(waterCrossing.x, -2.80f),
           "continuous east-to-west waterfall traversal must remain unobstructed");
 
+    // The reward belongs to the lich encounter, and its authored chest must
+    // participate in the same shared collision authority as route masonry.
+    check(QueryShowcaseZone(kRewardChestRoutePosition.x,
+                            kRewardChestRoutePosition.z) == ShowcaseZone::Finale,
+          "the reward chest must be staged inside the lich/finale room");
+    check(!IsShowcasePlayerPositionWalkable(kRewardChestRoutePosition.x,
+                                             kRewardChestRoutePosition.z),
+          "the reward chest footprint must be solid to the player");
+    check(IsShowcasePlayerPositionWalkable(kRewardChestRoutePosition.x + 1.30f,
+                                            kRewardChestRoutePosition.z),
+          "the reward chest interaction stand-off must remain walkable");
+    player = {kRewardChestRoutePosition.x + 1.30f,
+              kRewardChestRoutePosition.z};
+    proposedX = kRewardChestRoutePosition.x;
+    proposedZ = kRewardChestRoutePosition.z;
+    ResolveCorridorPlayerCollision(player.x, player.z, proposedX, proposedZ);
+    check(!NearlyEqual(proposedX, kRewardChestRoutePosition.x) ||
+              !NearlyEqual(proposedZ, kRewardChestRoutePosition.z),
+          "a swept player move must not enter the reward chest footprint");
+    const float chestHeldDepth = ComputeShowcaseHeldPropDepth(
+        kRewardChestRoutePosition.x + 1.30f,
+        kRewardChestRoutePosition.z,
+        -1.0f,
+        0.0f);
+    check(chestHeldDepth >= 0.29f && chestHeldDepth <= 0.38f,
+          "held props must retract before entering the reward chest footprint");
+
     // Camera-held props keep their authored reach in open route space, but tuck
     // behind the camera collision boundary when looking directly into masonry.
     check(ComputeShowcaseHeldPropDepth(-20.0f, -15.2f, -1.0f, 0.0f) > 0.90f,

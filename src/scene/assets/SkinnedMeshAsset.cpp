@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
+#include <limits>
 #include <map>
 #include <string_view>
 #include <utility>
@@ -310,6 +311,39 @@ Vec3 TransformVector(const Matrix& matrix, Vec3 vector)
             matrix.m[2] * vector.x + matrix.m[6] * vector.y + matrix.m[10] * vector.z};
 }
 
+bool TransformNormal(const Matrix& matrix, const Vec3 normal, Vec3& transformed)
+{
+    const Vec3 column0{matrix.m[0], matrix.m[1], matrix.m[2]};
+    const Vec3 column1{matrix.m[4], matrix.m[5], matrix.m[6]};
+    const Vec3 column2{matrix.m[8], matrix.m[9], matrix.m[10]};
+    const Vec3 cofactor0{
+        column1.y * column2.z - column1.z * column2.y,
+        column1.z * column2.x - column1.x * column2.z,
+        column1.x * column2.y - column1.y * column2.x};
+    const Vec3 cofactor1{
+        column2.y * column0.z - column2.z * column0.y,
+        column2.z * column0.x - column2.x * column0.z,
+        column2.x * column0.y - column2.y * column0.x};
+    const Vec3 cofactor2{
+        column0.y * column1.z - column0.z * column1.y,
+        column0.z * column1.x - column0.x * column1.z,
+        column0.x * column1.y - column0.y * column1.x};
+    const float determinant = column0.x * cofactor0.x +
+        column0.y * cofactor0.y + column0.z * cofactor0.z;
+    if (!std::isfinite(determinant) || std::abs(determinant) <= 1.0e-20f)
+        return false;
+    const float inverseDeterminant = 1.0f / determinant;
+    transformed = {
+        (cofactor0.x * normal.x + cofactor1.x * normal.y +
+         cofactor2.x * normal.z) * inverseDeterminant,
+        (cofactor0.y * normal.x + cofactor1.y * normal.y +
+         cofactor2.y * normal.z) * inverseDeterminant,
+        (cofactor0.z * normal.x + cofactor1.z * normal.y +
+         cofactor2.z * normal.z) * inverseDeterminant};
+    return std::isfinite(transformed.x) && std::isfinite(transformed.y) &&
+        std::isfinite(transformed.z);
+}
+
 Matrix LocalMatrix(Vec3 translation, Quat rotation, Vec3 scale)
 {
     const float x2 = rotation.x + rotation.x;
@@ -351,6 +385,8 @@ struct SkinnedMeshAsset::SourceVertex
 {
     Vec3 position;
     Vec3 normal;
+    Vec3 tangent{1.0f, 0.0f, 0.0f};
+    float tangentSign = 1.0f;
     std::array<float, 2u> texcoord{};
     std::array<std::uint8_t, 4u> joints{};
     std::array<float, 4u> weights{};
@@ -520,19 +556,6 @@ Matrix RotationTranspose(const Matrix& rotation)
     return result;
 }
 
-Matrix RotationDeltaAroundPoint(const Matrix& current,
-                                const Matrix& desired,
-                                const Vec3& pivot)
-{
-    Matrix delta = Multiply(RigidRotation(desired),
-                            RotationTranspose(RigidRotation(current)));
-    const Vec3 rotatedPivot = TransformVector(delta, pivot);
-    delta.m[12] = pivot.x - rotatedPivot.x;
-    delta.m[13] = pivot.y - rotatedPivot.y;
-    delta.m[14] = pivot.z - rotatedPivot.z;
-    return delta;
-}
-
 const SkinnedClipSet& PlayerLocomotionClipSet()
 {
     // Combat actions are authoritative procedural/IK layers. The reusable
@@ -561,7 +584,8 @@ bool SkinnedMeshAsset::LoadClips(const std::string& glbPath, const SkinnedClipSe
 {
     loaded_ = false;
     hasTexcoords_ = false;
-    vertices_.clear(); expandedIndices_.clear(); primitiveRanges_.clear(); nodes_.clear(); joints_.clear(); inverseBindMatrices_.clear(); clips_.clear(); skinnedUniqueVertices_.clear(); texturedSkinScratch_.clear();
+    hasTangents_ = false;
+    vertices_.clear(); expandedIndices_.clear(); primitiveRanges_.clear(); nodes_.clear(); joints_.clear(); inverseBindMatrices_.clear(); clips_.clear(); idleBootMinimumY_.clear(); walkingBootMinimumY_.clear(); bootGroundingVertexIndices_.clear(); skinnedUniqueVertices_.clear(); texturedSkinScratch_.clear();
     std::ifstream stream(glbPath, std::ios::binary);
     if (!stream)
     {
@@ -617,6 +641,7 @@ bool SkinnedMeshAsset::LoadClips(const std::string& glbPath, const SkinnedClipSe
     }
     const JsonValue* materialValues = root.Find("materials");
     bool allPrimitivesHaveTexcoords = true;
+    bool allPrimitivesHaveTangents = true;
     for (const JsonValue& primitive : primitives->array)
     {
         const JsonValue* attributes = primitive.Find("attributes");
@@ -628,10 +653,11 @@ bool SkinnedMeshAsset::LoadClips(const std::string& glbPath, const SkinnedClipSe
         }
         const JsonValue* position = attributes->Find("POSITION");
         const JsonValue* normal = attributes->Find("NORMAL");
+        const JsonValue* tangent = attributes->Find("TANGENT");
         const JsonValue* texcoord = attributes->Find("TEXCOORD_0");
         const JsonValue* joint = attributes->Find("JOINTS_0");
         const JsonValue* weight = attributes->Find("WEIGHTS_0");
-        Accessor positions, normals, texcoords, joints, weights, indices;
+        Accessor positions, normals, tangents, texcoords, joints, weights, indices;
         if (position == nullptr || normal == nullptr || joint == nullptr || weight == nullptr ||
             !ReadAccessor(*accessors, *views, position->Uint(), positions, diagnostic) ||
             !ReadAccessor(*accessors, *views, normal->Uint(), normals, diagnostic) ||
@@ -648,13 +674,23 @@ bool SkinnedMeshAsset::LoadClips(const std::string& glbPath, const SkinnedClipSe
             return false;
         }
         const bool primitiveHasTexcoords = texcoord != nullptr;
+        const bool primitiveHasTangents = tangent != nullptr;
         allPrimitivesHaveTexcoords = allPrimitivesHaveTexcoords && primitiveHasTexcoords;
+        allPrimitivesHaveTangents = allPrimitivesHaveTangents && primitiveHasTangents;
         if (primitiveHasTexcoords &&
             (!ReadAccessor(*accessors, *views, texcoord->Uint(), texcoords, diagnostic) ||
              texcoords.count != positions.count || texcoords.componentType != 5126u ||
              texcoords.components != 2u))
         {
             diagnostic = "Skinned GLB TEXCOORD_0 layout is unsupported.";
+            return false;
+        }
+        if (primitiveHasTangents &&
+            (!ReadAccessor(*accessors, *views, tangent->Uint(), tangents, diagnostic) ||
+             tangents.count != positions.count || tangents.componentType != 5126u ||
+             tangents.components != 4u))
+        {
+            diagnostic = "Skinned GLB TANGENT layout is unsupported.";
             return false;
         }
 
@@ -669,6 +705,14 @@ bool SkinnedMeshAsset::LoadClips(const std::string& glbPath, const SkinnedClipSe
             vertex.normal = {ReadFloat(binary, normals, i, 0u),
                              ReadFloat(binary, normals, i, 1u),
                              ReadFloat(binary, normals, i, 2u)};
+            if (primitiveHasTangents)
+            {
+                vertex.tangent = {ReadFloat(binary, tangents, i, 0u),
+                                  ReadFloat(binary, tangents, i, 1u),
+                                  ReadFloat(binary, tangents, i, 2u)};
+                vertex.tangentSign = ReadFloat(binary, tangents, i, 3u) < 0.0f
+                    ? -1.0f : 1.0f;
+            }
             if (primitiveHasTexcoords)
             {
                 vertex.texcoord = {ReadFloat(binary, texcoords, i, 0u),
@@ -709,6 +753,17 @@ bool SkinnedMeshAsset::LoadClips(const std::string& glbPath, const SkinnedClipSe
         primitiveRanges_.push_back(std::move(range));
     }
     hasTexcoords_ = allPrimitivesHaveTexcoords;
+    hasTangents_ = allPrimitivesHaveTangents;
+    for (std::size_t vertex = 0u; vertex < vertices_.size(); ++vertex)
+    {
+        // The authored player is 1.8 m and ground-centred. Only bind vertices
+        // below 0.45 m can become the boot sole under the bounded walk clip;
+        // evaluating this subset makes exact per-pose grounding cheap without
+        // another full CPU skin/refit pass.
+        if (vertices_[vertex].position.y <= 0.45f)
+            bootGroundingVertexIndices_.push_back(
+                static_cast<std::uint32_t>(vertex));
+    }
 
     nodes_.resize(nodes->size());
     for (std::size_t nodeIndex = 0u; nodeIndex < nodes_.size(); ++nodeIndex)
@@ -726,6 +781,47 @@ bool SkinnedMeshAsset::LoadClips(const std::string& glbPath, const SkinnedClipSe
         readVec("translation", &nodes_[nodeIndex].translation.x, 3u);
         readVec("rotation", &nodes_[nodeIndex].rotation.x, 4u);
         readVec("scale", &nodes_[nodeIndex].scale.x, 3u);
+        if (const JsonValue* extras = node.Find("extras");
+            extras != nullptr && extras->type == JsonType::Object)
+        {
+            const JsonValue* schema = extras->Find("hordeBootGroundingSchema");
+            if (schema != nullptr)
+            {
+                const JsonValue* idle = extras->Find("hordeIdleBootMinimumY");
+                const JsonValue* walking = extras->Find("hordeWalkingBootMinimumY");
+                if (schema->type != JsonType::Number || schema->Uint() != 1u ||
+                    idle == nullptr || walking == nullptr ||
+                    idle->type != JsonType::Array ||
+                    walking->type != JsonType::Array ||
+                    idle->array.size() < 16u || idle->array.size() > 256u ||
+                    idle->array.size() != walking->array.size() ||
+                    !idleBootMinimumY_.empty() || !walkingBootMinimumY_.empty())
+                {
+                    diagnostic = "Skinned GLB has an invalid or duplicate boot-grounding profile.";
+                    return false;
+                }
+                const auto readProfile = [&diagnostic](
+                    const JsonValue& source, std::vector<float>& destination) {
+                    destination.reserve(source.array.size());
+                    for (const JsonValue& sample : source.array)
+                    {
+                        const float minimumY = sample.Float();
+                        if (sample.type != JsonType::Number ||
+                            !std::isfinite(minimumY) ||
+                            std::abs(minimumY) > 0.075f)
+                        {
+                            diagnostic = "Skinned GLB boot-grounding sample exceeded the audited +/-75 mm envelope.";
+                            return false;
+                        }
+                        destination.push_back(minimumY);
+                    }
+                    return true;
+                };
+                if (!readProfile(*idle, idleBootMinimumY_) ||
+                    !readProfile(*walking, walkingBootMinimumY_))
+                    return false;
+            }
+        }
         if (const JsonValue* children = node.Find("children"); children != nullptr)
             for (const JsonValue& child : children->array)
                 if (child.Uint() < nodes_.size()) nodes_[child.Uint()].parent = static_cast<int>(nodeIndex);
@@ -822,6 +918,122 @@ float SkinnedMeshAsset::ClipDuration(SkinnedClip clip) const
 {
     const std::size_t index = static_cast<std::size_t>(clip);
     return index < clips_.size() ? clips_[index].duration : 0.0f;
+}
+
+bool SkinnedMeshAsset::BootGroundingMinimumY(
+    const SkinnedClip clip,
+    const float timeSeconds,
+    float& minimumY,
+    std::string& diagnostic) const
+{
+    const std::vector<float>* authoredProfile = nullptr;
+    if (clip == SkinnedClip::Idle) authoredProfile = &idleBootMinimumY_;
+    if (clip == SkinnedClip::Walking) authoredProfile = &walkingBootMinimumY_;
+    const std::size_t clipIndex = static_cast<std::size_t>(clip);
+    if (!loaded_ || authoredProfile == nullptr || authoredProfile->empty() ||
+        clipIndex >= clips_.size() || bootGroundingVertexIndices_.empty())
+    {
+        diagnostic = "Skinned player asset has no compatible boot-grounding profile.";
+        return false;
+    }
+    const Clip& sourceClip = clips_[clipIndex];
+    if (sourceClip.channels.empty() || sourceClip.duration <= 0.0f)
+    {
+        diagnostic = "Skinned player boot grounding requested an unmapped clip.";
+        return false;
+    }
+    std::vector<Node> pose = nodes_;
+    const float time = sourceClip.loops
+        ? std::fmod(std::max(timeSeconds, 0.0f), sourceClip.duration)
+        : std::clamp(timeSeconds, 0.0f, sourceClip.duration);
+    for (const Channel& channel : sourceClip.channels)
+    {
+        if (channel.node >= pose.size() || channel.times.empty()) continue;
+        const auto upper = std::upper_bound(
+            channel.times.begin(), channel.times.end(), time);
+        const std::size_t next = upper == channel.times.end()
+            ? (sourceClip.loops ? 0u : channel.times.size() - 1u)
+            : static_cast<std::size_t>(upper - channel.times.begin());
+        const std::size_t previous = next == 0u
+            ? channel.times.size() - 1u : next - 1u;
+        const float previousTime = channel.times[previous];
+        const float nextTime = next == 0u
+            ? sourceClip.duration : channel.times[next];
+        const float sampledTime = next == 0u && time < previousTime
+            ? time + sourceClip.duration : time;
+        const float fraction = nextTime > previousTime
+            ? std::clamp((sampledTime - previousTime) /
+                         (nextTime - previousTime), 0.0f, 1.0f)
+            : 0.0f;
+        const auto& a = channel.values[previous];
+        const auto& b = channel.values[next];
+        if (channel.path == Channel::Path::Rotation)
+            pose[channel.node].rotation = Nlerp(
+                {a[0], a[1], a[2], a[3]},
+                {b[0], b[1], b[2], b[3]}, fraction);
+        else
+        {
+            const Vec3 value{
+                a[0] + (b[0] - a[0]) * fraction,
+                a[1] + (b[1] - a[1]) * fraction,
+                a[2] + (b[2] - a[2]) * fraction};
+            if (channel.path == Channel::Path::Translation)
+                pose[channel.node].translation = value;
+            else
+                pose[channel.node].scale = value;
+        }
+    }
+    std::vector<Matrix> globals(pose.size());
+    std::vector<bool> computed(pose.size(), false);
+    const auto resolveGlobal = [&pose, &globals, &computed](
+        auto&& self, const std::size_t node) -> Matrix {
+        if (computed[node]) return globals[node];
+        const Matrix local = LocalMatrix(
+            pose[node].translation, pose[node].rotation, pose[node].scale);
+        globals[node] = pose[node].parent < 0
+            ? local
+            : Multiply(self(self, static_cast<std::size_t>(pose[node].parent)),
+                       local);
+        computed[node] = true;
+        return globals[node];
+    };
+    std::vector<Matrix> skinMatrices(joints_.size());
+    for (std::size_t joint = 0u; joint < joints_.size(); ++joint)
+    {
+        if (joints_[joint] >= pose.size())
+        {
+            diagnostic = "Player boot grounding joint node is invalid.";
+            return false;
+        }
+        Matrix inverse{};
+        std::memcpy(inverse.m.data(),
+                    inverseBindMatrices_.data() + joint * 16u,
+                    sizeof(float) * 16u);
+        skinMatrices[joint] = Multiply(
+            resolveGlobal(resolveGlobal, joints_[joint]), inverse);
+    }
+    minimumY = std::numeric_limits<float>::infinity();
+    for (const std::uint32_t vertexIndex : bootGroundingVertexIndices_)
+    {
+        const SourceVertex& source = vertices_[vertexIndex];
+        float skinnedY = 0.0f;
+        for (std::size_t influence = 0u; influence < 4u; ++influence)
+        {
+            const float weight = source.weights[influence];
+            const std::size_t joint = source.joints[influence];
+            if (weight <= 0.00001f || joint >= skinMatrices.size()) continue;
+            skinnedY += TransformPoint(
+                skinMatrices[joint], source.position).y * weight;
+        }
+        minimumY = std::min(minimumY, skinnedY);
+    }
+    if (!std::isfinite(minimumY) || minimumY < -0.075f || minimumY > 0.075f)
+    {
+        diagnostic = "Exact player boot grounding exceeded the audited +/-75 mm envelope.";
+        return false;
+    }
+    diagnostic.clear();
+    return true;
 }
 
 std::size_t SkinnedMeshAsset::UniqueVertexCount() const
@@ -979,7 +1191,13 @@ bool SkinnedMeshAsset::Skin(SkinnedClip clipId, float timeSeconds, std::vector<S
             const std::size_t joint = source.joints[influence];
             if (weight <= 0.00001f || joint >= skinMatrices.size()) continue;
             const Vec3 transformedPosition = TransformPoint(skinMatrices[joint], source.position);
-            const Vec3 transformedNormal = TransformVector(skinMatrices[joint], source.normal);
+            Vec3 transformedNormal{};
+            if (!TransformNormal(skinMatrices[joint], source.normal,
+                                 transformedNormal))
+            {
+                diagnostic = "Skinned model produced a non-invertible normal transform.";
+                return false;
+            }
             position.x += transformedPosition.x * weight; position.y += transformedPosition.y * weight; position.z += transformedPosition.z * weight;
             normal.x += transformedNormal.x * weight; normal.y += transformedNormal.y * weight; normal.z += transformedNormal.z * weight;
         }
@@ -1057,12 +1275,13 @@ bool SkinnedMeshAsset::SkinPlayerUniqueTextured(
     const SkinnedArmIkTarget& leftArm,
     const SkinnedArmIkTarget& rightArm,
     std::vector<TexturedSkinnedRtVertex>& output,
+    std::vector<SkinnedPbrTangent>& outputTangents,
     SkinnedPlayerSockets& sockets,
     std::string& diagnostic) const
 {
-    if (!loaded_ || !hasTexcoords_)
+    if (!loaded_ || !hasTexcoords_ || !hasTangents_)
     {
-        diagnostic = "Textured player model was not loaded.";
+        diagnostic = "Textured PBR player model was not loaded.";
         return false;
     }
     const std::size_t clipIndex = static_cast<std::size_t>(clipId);
@@ -1146,15 +1365,21 @@ bool SkinnedMeshAsset::SkinPlayerUniqueTextured(
         const char* upperName,
         const char* lowerName,
         const char* handName,
+        const char* gripName,
         const SkinnedArmIkTarget& arm,
-        SkinnedNodeTransform& socket) {
+        SkinnedNodeTransform& handSocket,
+        SkinnedNodeTransform& gripSocket) {
         const std::size_t upperNode = findNode(upperName);
         const std::size_t lowerNode = findNode(lowerName);
         const std::size_t handNode = findNode(handName);
-        if (upperNode >= nodes_.size() || lowerNode >= nodes_.size() || handNode >= nodes_.size())
+        const std::size_t gripNode = findNode(gripName);
+        if (upperNode >= nodes_.size() || lowerNode >= nodes_.size() ||
+            handNode >= nodes_.size() || gripNode >= nodes_.size() ||
+            !isDescendant(gripNode, handNode))
         {
             diagnostic = std::string("Player rig is missing required arm bones: ") +
-                         upperName + "/" + lowerName + "/" + handName;
+                         upperName + "/" + lowerName + "/" + handName +
+                         "/" + gripName;
             return false;
         }
         Vec3 shoulder{globals[upperNode].m[12], globals[upperNode].m[13], globals[upperNode].m[14]};
@@ -1171,6 +1396,7 @@ bool SkinnedMeshAsset::SkinPlayerUniqueTextured(
         }
         const Vec3 originalElbow{globals[lowerNode].m[12], globals[lowerNode].m[13], globals[lowerNode].m[14]};
         const Vec3 originalHand{globals[handNode].m[12], globals[handNode].m[13], globals[handNode].m[14]};
+        const Matrix originalHandGlobal = globals[handNode];
         const float bindUpperLength = std::max(Length(Subtract(originalElbow, shoulder)), 0.0001f);
         const float bindLowerLength = std::max(Length(Subtract(originalHand, originalElbow)), 0.0001f);
         const Vec3 requestedTarget{arm.target[0], arm.target[1], arm.target[2]};
@@ -1189,10 +1415,22 @@ bool SkinnedMeshAsset::SkinPlayerUniqueTextured(
                                                 std::abs(upperLength - lowerLength) + 0.00001f,
                                                 upperLength + lowerLength - 0.00001f);
         const Vec3 solvedHand = Add(shoulder, Scale(direction, solvedDistance));
-        Vec3 pole{arm.pole[0], arm.pole[1], arm.pole[2]};
-        pole = Subtract(pole, Scale(direction, Dot(pole, direction)));
-        if (Length(pole) < 0.00001f) pole = Cross(direction, {0.0f, 1.0f, 0.0f});
-        pole = Normalise(pole);
+        const Vec3 authoredPole{arm.pole[0], arm.pole[1], arm.pole[2]};
+        Vec3 projectedPole = Subtract(
+            authoredPole, Scale(direction, Dot(authoredPole, direction)));
+        // The gameplay pole is a stable down-and-out direction, not a moving
+        // world point. Projecting that constant direction into the arm plane
+        // makes the forearm enter from the lower corner like a conventional
+        // first-person viewmodel. Retain a deterministic outside fallback for
+        // the mathematically degenerate parallel case.
+        if (Length(projectedPole) < 0.08f)
+        {
+            const Vec3 outsideDown{
+                shoulder.x < 0.0f ? -1.0f : 1.0f, -1.0f, 0.0f};
+            projectedPole = Subtract(
+                outsideDown, Scale(direction, Dot(outsideDown, direction)));
+        }
+        const Vec3 pole = Normalise(projectedPole);
         const float adjacent = std::clamp(
             (upperLength * upperLength + solvedDistance * solvedDistance -
              lowerLength * lowerLength) / (2.0f * solvedDistance),
@@ -1209,36 +1447,91 @@ bool SkinnedMeshAsset::SkinPlayerUniqueTextured(
                                Subtract(solvedElbow, shoulder)), shoulder),
             ScaleAlongAxisAroundPoint(originalUpperDirection, chainStretch, shoulder));
         for (std::size_t node = 0u; node < globals.size(); ++node)
-            if (isDescendant(node, upperNode)) globals[node] = Multiply(upperDelta, globals[node]);
-
-        const Vec3 rotatedElbow{globals[lowerNode].m[12], globals[lowerNode].m[13], globals[lowerNode].m[14]};
-        const Vec3 rotatedHand{globals[handNode].m[12], globals[handNode].m[13], globals[handNode].m[14]};
-        const Vec3 rotatedLowerDirection = Subtract(rotatedHand, rotatedElbow);
-        const float lowerStretch = lowerLength /
-            std::max(Length(rotatedLowerDirection), 0.0001f);
-        const Matrix lowerDelta = Multiply(
-            RotationAroundPoint(
-                FromToRotation(rotatedLowerDirection,
-                               Subtract(solvedHand, rotatedElbow)), rotatedElbow),
-            ScaleAlongAxisAroundPoint(rotatedLowerDirection, lowerStretch, rotatedElbow));
-        for (std::size_t node = 0u; node < globals.size(); ++node)
-            if (isDescendant(node, lowerNode)) globals[node] = Multiply(lowerDelta, globals[node]);
-        if (arm.handOrientationTargetEnabled)
         {
-            Matrix desired{};
-            desired.m = arm.handOrientation;
-            const Matrix wristDelta = RotationDeltaAroundPoint(
-                globals[handNode], desired, solvedHand);
-            for (std::size_t node = 0u; node < globals.size(); ++node)
-                if (isDescendant(node, handNode))
-                    globals[node] = Multiply(wristDelta, globals[node]);
+            if (isDescendant(node, upperNode) &&
+                !isDescendant(node, lowerNode))
+                globals[node] = Multiply(upperDelta, globals[node]);
         }
-        socket = globals[handNode].m;
+
+        // Resolve the forearm directly from the shoulder-translated bind pose
+        // instead of inheriting the upper arm's axial scale and then applying
+        // a second non-uniform scale. The old compounded map sheared both
+        // forearm/hand subtrees through the near plane when wall retraction
+        // folded the elbow back toward the player.
+        const Vec3 originalLowerDirection = Subtract(originalHand, originalElbow);
+        const float lowerStretch = lowerLength /
+            std::max(Length(originalLowerDirection), 0.0001f);
+        const Matrix lowerRotateScale = Multiply(
+            RotationAroundPoint(
+                FromToRotation(originalLowerDirection,
+                               Subtract(solvedHand, solvedElbow)), originalElbow),
+            ScaleAlongAxisAroundPoint(
+                originalLowerDirection, lowerStretch, originalElbow));
+        const Matrix lowerTranslation = LocalMatrix(
+            Subtract(solvedElbow, originalElbow), Quat{},
+            Vec3{1.0f, 1.0f, 1.0f});
+        const Matrix lowerDelta = Multiply(lowerTranslation, lowerRotateScale);
+        for (std::size_t node = 0u; node < globals.size(); ++node)
+        {
+            if (isDescendant(node, lowerNode) &&
+                !isDescendant(node, handNode))
+                globals[node] = Multiply(lowerDelta, globals[node]);
+        }
+
+        Matrix desiredHand = arm.handOrientationTargetEnabled
+            ? Matrix{arm.handOrientation}
+            : Multiply(RigidRotation(lowerDelta),
+                       RigidRotation(originalHandGlobal));
+        desiredHand = RigidRotation(desiredHand);
+        desiredHand.m[12] = solvedHand.x;
+        desiredHand.m[13] = solvedHand.y;
+        desiredHand.m[14] = solvedHand.z;
+        Matrix originalRigidHand = RigidRotation(originalHandGlobal);
+        originalRigidHand.m[12] = originalHand.x;
+        originalRigidHand.m[13] = originalHand.y;
+        originalRigidHand.m[14] = originalHand.z;
+        Matrix inverseOriginalHand = RotationTranspose(originalRigidHand);
+        inverseOriginalHand.m[12] = -(
+            inverseOriginalHand.m[0] * originalHand.x +
+            inverseOriginalHand.m[4] * originalHand.y +
+            inverseOriginalHand.m[8] * originalHand.z);
+        inverseOriginalHand.m[13] = -(
+            inverseOriginalHand.m[1] * originalHand.x +
+            inverseOriginalHand.m[5] * originalHand.y +
+            inverseOriginalHand.m[9] * originalHand.z);
+        inverseOriginalHand.m[14] = -(
+            inverseOriginalHand.m[2] * originalHand.x +
+            inverseOriginalHand.m[6] * originalHand.y +
+            inverseOriginalHand.m[10] * originalHand.z);
+        const Matrix handDelta = Multiply(desiredHand, inverseOriginalHand);
+        for (std::size_t node = 0u; node < globals.size(); ++node)
+        {
+            if (isDescendant(node, handNode))
+                globals[node] = Multiply(handDelta, globals[node]);
+        }
+        handSocket = globals[handNode].m;
+        gripSocket = globals[gripNode].m;
         return true;
     };
 
-    if (!solveArm("LeftArm", "LeftForeArm", "LeftHand", leftArm, sockets.leftHand) ||
-        !solveArm("RightArm", "RightForeArm", "RightHand", rightArm, sockets.rightHand))
+    // Preserve the audited anatomical chain names. The renderer maps this
+    // +Z-forward model into the game with a proper 180-degree Y rotation, so
+    // anatomical Left (+X in model space) arrives on gameplay left without
+    // swapping hands or reflecting glove chirality.
+    const std::size_t namedLeftUpper = findNode("LeftArm");
+    const std::size_t namedRightUpper = findNode("RightArm");
+    if (namedLeftUpper >= nodes_.size() || namedRightUpper >= nodes_.size())
+    {
+        diagnostic = "Player rig is missing required LeftArm/RightArm roots.";
+        return false;
+    }
+    const bool leftSolved = solveArm(
+        "LeftArm", "LeftForeArm", "LeftHand", "LeftGrip",
+        leftArm, sockets.leftHand, sockets.leftGrip);
+    const bool rightSolved = solveArm(
+        "RightArm", "RightForeArm", "RightHand", "RightGrip",
+        rightArm, sockets.rightHand, sockets.rightGrip);
+    if (!leftSolved || !rightSolved)
         return false;
 
     std::vector<Matrix> skinMatrices(joints_.size());
@@ -1256,20 +1549,40 @@ bool SkinnedMeshAsset::SkinPlayerUniqueTextured(
     }
     skinnedUniqueVertices_.resize(vertices_.size());
     output.resize(vertices_.size());
+    outputTangents.resize(vertices_.size());
     for (std::size_t sourceIndex = 0u; sourceIndex < vertices_.size(); ++sourceIndex)
     {
         const SourceVertex& source = vertices_[sourceIndex];
         Vec3 position{};
         Vec3 normal{};
+        Vec3 tangent{};
         for (std::size_t influence = 0u; influence < 4u; ++influence)
         {
             const float weight = source.weights[influence];
             const std::size_t joint = source.joints[influence];
             if (weight <= 0.00001f || joint >= skinMatrices.size()) continue;
             position = Add(position, Scale(TransformPoint(skinMatrices[joint], source.position), weight));
-            normal = Add(normal, Scale(TransformVector(skinMatrices[joint], source.normal), weight));
+            Vec3 transformedNormal{};
+            if (!TransformNormal(skinMatrices[joint], source.normal,
+                                 transformedNormal))
+            {
+                diagnostic = "Player IK produced a non-invertible normal transform.";
+                return false;
+            }
+            normal = Add(normal, Scale(transformedNormal, weight));
+            tangent = Add(tangent, Scale(
+                TransformVector(skinMatrices[joint], source.tangent), weight));
         }
         normal = Normalise(normal);
+        tangent = Subtract(tangent, Scale(normal, Dot(normal, tangent)));
+        if (Length(tangent) <= 0.00001f)
+        {
+            tangent = Cross(
+                std::abs(normal.y) < 0.9f ? Vec3{0.0f, 1.0f, 0.0f}
+                                          : Vec3{1.0f, 0.0f, 0.0f},
+                normal);
+        }
+        tangent = Normalise(tangent);
         TexturedSkinnedRtVertex& destination = output[sourceIndex];
         destination.position[0] = position.x;
         destination.position[1] = position.y;
@@ -1283,7 +1596,13 @@ bool SkinnedMeshAsset::SkinPlayerUniqueTextured(
         destination.texcoord[1] = source.texcoord[1];
         destination.texcoord[2] = 0.0f;
         destination.texcoord[3] = 0.0f;
+        SkinnedPbrTangent& destinationTangent = outputTangents[sourceIndex];
+        destinationTangent.tangent[0] = tangent.x;
+        destinationTangent.tangent[1] = tangent.y;
+        destinationTangent.tangent[2] = tangent.z;
+        destinationTangent.tangent[3] = source.tangentSign;
     }
+
     diagnostic.clear();
     return true;
 }

@@ -182,10 +182,12 @@ HeldItemTransform ComposeLanternPendulumBodyTransform(
     const float wallPresentation = std::clamp(
         std::sin(std::abs(presentationYawRadians)), 0.0f, 1.0f);
     const float presentationSwingScale = 1.0f - 0.98f * wallPresentation;
+    const float wallOutwardLeanRadians = -0.85f * wallPresentation;
     return Multiply(
         Multiply(worldFromHinge,
                  Rotation(forwardAngleRadians * presentationSwingScale,
-                          strafeAngleRadians * presentationSwingScale,
+                          strafeAngleRadians * presentationSwingScale +
+                              wallOutwardLeanRadians,
                           torsionAngleRadians * presentationSwingScale)),
         Rotation(0.0f, 0.0f, presentationYawRadians));
 }

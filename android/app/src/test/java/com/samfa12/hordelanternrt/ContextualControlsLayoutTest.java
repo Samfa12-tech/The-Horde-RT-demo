@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -46,6 +47,36 @@ public final class ContextualControlsLayoutTest {
     }
 
     @Test
+    public void debugCheckpointMappingIncludesEveryNewOwnerReviewCapture() {
+        final String[] names = {
+                "pbr-sword-closeup", "pbr-torch-fire", "player-body-grips",
+                "lantern-chest-unlock", "lantern-held-high", "lantern-held-low",
+                "lantern-glass-transmission", "lantern-motion-extreme"
+        };
+        final int[] ids = {100, 101, 102, 114, 116, 117, 118, 119};
+        for (int index = 0; index < names.length; ++index) {
+            assertEquals("debug capture name must reach its native checkpoint",
+                         ids[index], MainActivity.checkpointId(names[index]));
+        }
+        assertEquals("unknown automation names must remain rejected", -1,
+                     MainActivity.checkpointId("not-a-checkpoint"));
+    }
+
+    @Test
+    public void updaterComparesDebugCandidatesUsingThePublishedBaseVersion() {
+        assertEquals("1.5.2", MainActivity.installedUpdateVersion("1.5.2-debug"));
+        assertEquals("1.5.2-alpha.1", MainActivity.installedUpdateVersion("1.5.2-alpha.1"));
+        assertEquals("", MainActivity.installedUpdateVersion(null));
+        assertEquals("CHECK FOR UPDATES",
+                     RuntimeEnvironment.getApplication().getString(R.string.check_for_updates));
+        assertEquals("the release check requires only ordinary network access",
+                     PackageManager.PERMISSION_GRANTED,
+                     RuntimeEnvironment.getApplication().getPackageManager().checkPermission(
+                             android.Manifest.permission.INTERNET,
+                             RuntimeEnvironment.getApplication().getPackageName()));
+    }
+
+    @Test
     public void maximumFontScaleContextualControlsRenderWithoutClippingOrOverlap() {
         final Configuration maximumFont = new Configuration(
                 RuntimeEnvironment.getApplication().getResources().getConfiguration());
@@ -64,6 +95,7 @@ public final class ContextualControlsLayoutTest {
         final Button attack = root.findViewById(R.id.attack_button);
         final Button parry = root.findViewById(R.id.parry_button);
         interact.setVisibility(View.VISIBLE);
+        interact.setText(R.string.chest_locked_until_lich_defeated);
         toggle.setVisibility(View.VISIBLE);
         attack.setVisibility(View.VISIBLE);
         parry.setVisibility(View.VISIBLE);
@@ -78,10 +110,13 @@ public final class ContextualControlsLayoutTest {
         final Button[] buttons = {interact, toggle, attack, parry};
         for (final Button button : buttons) {
             assertNotNull("real text layout must be produced", button.getLayout());
-            assertEquals("action text must stay on one line", 1,
+            final int expectedLines = button == interact ? 2 : 1;
+            assertEquals("action text must use only its authored line count", expectedLines,
                          button.getLayout().getLineCount());
-            assertEquals("action text must not be ellipsized", 0,
-                         button.getLayout().getEllipsisCount(0));
+            for (int line = 0; line < button.getLayout().getLineCount(); ++line) {
+                assertEquals("action text must not be ellipsized", 0,
+                             button.getLayout().getEllipsisCount(line));
+            }
             assertTrue("text must fit the rendered vertical content box",
                        button.getLayout().getHeight() <=
                                button.getHeight() - button.getPaddingTop() -

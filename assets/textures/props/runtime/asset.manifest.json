@@ -7,6 +7,7 @@
     "gothic-arming-sword-rh-lod0",
     "gothic-hand-torch-lod0",
     "gothic-traveller-lod0",
+    "gothic-traveller-lod0.GauntletPrimaryVisible",
     "gothic-chest-base.ChestWood",
     "gothic-chest-base.BlackIron",
     "gothic-chest-lid.ChestWood",
@@ -15,23 +16,23 @@
     "reward-lantern-body.BlackIron"
   ],
   "layerCounts": {
-    "baseColor": 9,
-    "normal": 9,
-    "orm": 9,
+    "baseColor": 10,
+    "normal": 10,
+    "orm": 10,
     "emissive": 1
   },
   "android": {
     "baseColor": {
       "format": "ASTC_6x6_SRGB_BLOCK",
-      "sha256": "085cee7e94bebe34cb4ddd68ee806cc83ff4149deb97b4ee427a026451221503"
+      "sha256": "e6934fca4a3452d5d5c239f2fc8d0047d5364c044543867ff002c9421edd5335"
     },
     "normal": {
       "format": "ASTC_4x4_UNORM_BLOCK",
-      "sha256": "de447fe328902fc6b5202ff6ee3faf91bc3b2bf0926d03c8128e2477c63b9474"
+      "sha256": "049c73a52c8c69a02dbbbc01c3bfdba18ab3782efd0e06b1afc20e3d5e6b3776"
     },
     "orm": {
       "format": "ASTC_6x6_UNORM_BLOCK",
-      "sha256": "c78d02c8d31f237869ca0c34a1a61de73c1ca89dc92b6c2a32a12d1b1f6e203b"
+      "sha256": "8f431b7e03d63f2bcda36518daa29d68280b6af9fa188a787a86a77594e33c01"
     },
     "emissive": {
       "format": "ASTC_6x6_SRGB_BLOCK",
@@ -41,15 +42,15 @@
   "windows": {
     "baseColor": {
       "format": "R8G8B8A8_SRGB",
-      "sha256": "6ac6798dd014955ea22d5debab5c418e13d5863af8e1d471df93c13ea439bd72"
+      "sha256": "459aee2320b09248c975463f0540015ff3c9cd1341e598687c883a7547e69df3"
     },
     "normal": {
       "format": "R8G8B8A8_UNORM",
-      "sha256": "5f46b385bb1c35a074650dd5d3ce422a82f3002099fe3cdd1bc2f7faf4a23103"
+      "sha256": "22876139676970909c2284223031850bf6852482e9e41885c58ada408cbf97f0"
     },
     "orm": {
       "format": "R8G8B8A8_UNORM",
-      "sha256": "2b8c51e35951deb4863c665140623d8b25753917509773e1b9f3962f00bb16dd"
+      "sha256": "85eea39067c5c9382727b885618379f9c43e49ae9b1a390756ad001f14b7a132"
     },
     "emissive": {
       "format": "R8G8B8A8_SRGB",

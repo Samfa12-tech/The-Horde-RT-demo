@@ -110,13 +110,18 @@ void PlayerAnimationState::StepFixed(const PlayerAnimationInput& input,
         fixedDeltaSeconds * kLanternPoseBlendRatePerSecond);
     snapshot_.leftIk.shoulder = input.heldItemKinematics.leftShoulderLocal;
     snapshot_.leftIk.target = input.heldItemKinematics.leftHandLocal;
-    snapshot_.leftIk.pole = {{-0.95f, -0.1f, 0.42f}};
-    snapshot_.leftIk.gripX = {{1.0f, 0.0f, 0.0f}};
-    snapshot_.leftIk.gripY = {{0.0f, 1.0f, 0.0f}};
-    snapshot_.leftIk.gripZ = {{0.0f, 0.0f, -1.0f}};
+    // A conventional first-person carry drops each upper arm beside the
+    // torso, then bends the forearm inward and upward to the grip.  Keep the
+    // pole predominantly down with only a small same-side bias; the old
+    // equally down-and-out pole flared elbows beyond the shoulders and made
+    // the complete sleeve read as one straight shoulder-to-hand bar.
+    snapshot_.leftIk.pole = {{-0.12f, -1.0f, 0.0f}};
+    snapshot_.leftIk.gripX = input.heldItemKinematics.leftGripXInView;
+    snapshot_.leftIk.gripY = input.heldItemKinematics.leftGripYInView;
+    snapshot_.leftIk.gripZ = input.heldItemKinematics.leftGripZInView;
     snapshot_.rightIk.shoulder = input.heldItemKinematics.rightShoulderLocal;
     snapshot_.rightIk.target = input.heldItemKinematics.rightHandLocal;
-    snapshot_.rightIk.pole = {{0.95f, -0.1f, 0.42f}};
+    snapshot_.rightIk.pole = {{0.12f, -1.0f, 0.0f}};
     const auto swordGrip = horde::gameplay::items::EvaluateSwordGripBasisInView(
         input.heldItemKinematics.swordRadians,
         input.heldItemKinematics.swordForwardRadians,

@@ -4,6 +4,8 @@
 #include <cstdint>
 #include <string_view>
 
+#include "gameplay/ShowcaseRoute.h"
+
 namespace horde::gameplay
 {
 
@@ -71,10 +73,14 @@ inline constexpr std::array<DevelopmentCheckpoint, 34u> kDevelopmentCheckpoints{
      DevelopmentCombatPose::Rest, true, 0.005f},
     {113, "glass-edge-fresnel", 4, -7.60f, -13.25f, -0.65f, -0.05f,
      DevelopmentCombatPose::Rest, true},
-    {114, "lantern-chest-unlock", 5, -10.65f, -15.20f, -1.57079632679f, -0.35f,
+    {114, "lantern-chest-unlock", 5,
+     kRewardChestRoutePosition.x + 1.85f, kRewardChestRoutePosition.z,
+     -1.57079632679f, -0.35f,
      DevelopmentCombatPose::Rest, false, 1.0f, {{0.72f, 0.90f, 1.0f}}, 2.4f,
      true, false},
-    {115, "lantern-glass-production", 5, -10.65f, -15.20f, -1.57079632679f, -0.35f,
+    {115, "lantern-glass-production", 5,
+     kRewardChestRoutePosition.x + 1.85f, kRewardChestRoutePosition.z,
+     -1.57079632679f, -0.35f,
      DevelopmentCombatPose::Rest, false, 1.0f, {{0.72f, 0.90f, 1.0f}}, 2.4f,
      true, true},
     {116, "lantern-held-high", 5, -10.65f, -15.20f, -1.57079632679f, -0.30f,

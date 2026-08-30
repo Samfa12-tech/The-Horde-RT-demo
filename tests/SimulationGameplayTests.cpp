@@ -151,8 +151,17 @@ int main()
         attacks.AdvanceFrame(attackInput, 1.0 / 60.0, 2u);
     }
     check(attacks.Snapshot().lastConsumedAttackSequence == 2u &&
-          CountEvents(attacks.Events(), GameplayEventType::PlayerSwing) == 1u,
-          "an unavailable attack command must be consumed once without delayed buffering");
+          CountEvents(attacks.Events(), GameplayEventType::PlayerSwing) == 2u,
+          "a natural second press during downward wind-up must buffer one upward slice");
+
+    attackInput.commands.attack = 3u;
+    for (int frame = 0; frame < 5; ++frame)
+    {
+        attacks.AdvanceFrame(attackInput, 1.0 / 60.0, 3u);
+    }
+    check(attacks.Snapshot().lastConsumedAttackSequence == 3u &&
+          CountEvents(attacks.Events(), GameplayEventType::PlayerSwing) == 2u,
+          "a third edge during the committed upward action must be consumed without replay");
 
     const auto swingEvents = attacks.Events().Events();
     std::uint64_t firstSwingSequence = 0u;
@@ -172,8 +181,8 @@ int main()
             }
         }
     }
-    check(firstSwingSequence != 0u && secondSwingSequence == 0u,
-          "rejected unavailable swings must not emit a false semantic event");
+    check(firstSwingSequence != 0u && secondSwingSequence > firstSwingSequence,
+          "buffered downward/upward swings must publish two ordered semantic events");
     check(std::all_of(swingEvents.begin(), swingEvents.end(), [](const GameplayEvent& event)
           {
               return event.type != GameplayEventType::PlayerSwing || event.target == EntityId::Invalid;
@@ -215,6 +224,42 @@ int main()
           chainedAttack.Snapshot().openingEncounterComplete,
           "downward then upward cut must consume two edges and publish one identified swing/hit per cut");
 
+    GameSimulation ownerTimedChainedAttack;
+    InputSnapshot ownerTimedChainedInput;
+    ownerTimedChainedInput.damageEnabled = false;
+    ownerTimedChainedInput.commands.attack = 1u;
+    // Reproduce the real input trace: the owner's second click arrives about
+    // 400 ms after the first, after the 160 ms downstroke has visibly landed.
+    for (int tick = 0; tick < 24; ++tick)
+    {
+        ownerTimedChainedAttack.StepFixed(ownerTimedChainedInput);
+    }
+    ownerTimedChainedInput.commands.attack = 2u;
+    ownerTimedChainedAttack.StepFixed(ownerTimedChainedInput);
+    for (int tick = 0; tick < 70; ++tick)
+    {
+        ownerTimedChainedAttack.StepFixed(ownerTimedChainedInput);
+    }
+    check(ownerTimedChainedAttack.Snapshot().lastConsumedAttackSequence == 2u &&
+          CountEvents(ownerTimedChainedAttack.Events(), GameplayEventType::PlayerSwing) == 2u,
+          "a natural 400 ms second press after the downstroke lands must produce the upward slice");
+
+    GameSimulation coalescedAttack;
+    InputSnapshot coalescedInput;
+    coalescedInput.hasAuthoritativePlayerPose = true;
+    coalescedInput.authoritativePlayerX = 0.0f;
+    coalescedInput.authoritativePlayerZ = -3.20f;
+    coalescedInput.damageEnabled = false;
+    coalescedInput.commands.attack = 2u;
+    for (int tick = 0; tick < 70; ++tick)
+    {
+        coalescedAttack.StepFixed(coalescedInput);
+    }
+    check(coalescedAttack.Snapshot().lastConsumedAttackSequence == 2u &&
+          CountEvents(coalescedAttack.Events(), GameplayEventType::PlayerSwing) == 2u &&
+          CountEvents(coalescedAttack.Events(), GameplayEventType::EnemyHit) == 2u,
+          "a coalesced 0-to-2 publication must preserve both downward and upward edges");
+
     GameSimulation pausedChain;
     InputSnapshot pausedChainInput;
     pausedChainInput.damageEnabled = false;
@@ -245,8 +290,7 @@ int main()
         bool secondEdgePublished = false;
         for (int frame = 0; frame < renderRate * 2; ++frame)
         {
-            if (!secondEdgePublished &&
-                delivered.Snapshot().playerCombat.action == PlayerCombatAction::SwingActive)
+            if (!secondEdgePublished && frame == renderRate * 2 / 5)
             {
                 input.commands.attack = 2u;
                 secondEdgePublished = true;
@@ -267,7 +311,7 @@ int main()
           chainedAt60[0] == 120u && chainedAt60[1] == 2u &&
           chainedAt60[2] == static_cast<std::uint64_t>(PlayerCombatAction::Idle) &&
           chainedAt60[3] == 2u && chainedAt60[4] == 2u,
-          "30/60/120 render delivery must produce the same fixed-step two-cut commands, hits, and final phase");
+          "30/60/120 render delivery must preserve the same owner-timed 400 ms two-cut commands, hits, and final phase");
 
     GameSimulation skeletonPair;
     InputSnapshot pairInput;
@@ -791,6 +835,47 @@ int main()
           NearlyEqual(pausedRejectsDodge.Snapshot().playerX, kPlayerSpawn.x) &&
           NearlyEqual(pausedRejectsDodge.Snapshot().playerZ, kPlayerSpawn.z),
           "paused dodge input must be consumed without buffering movement after resume");
+
+    GameSimulation torchDrenchFeedback;
+    InputSnapshot drenchedTorchInput;
+    drenchedTorchInput.hasAuthoritativePlayerPose = true;
+    drenchedTorchInput.authoritativePlayerX = -2.10f;
+    drenchedTorchInput.authoritativePlayerZ = -15.20f;
+    drenchedTorchInput.damageEnabled = false;
+    torchDrenchFeedback.StepFixed(drenchedTorchInput);
+    check(CountEvents(torchDrenchFeedback.Events(),
+                      GameplayEventType::TorchExtinguished) == 1u &&
+              torchDrenchFeedback.Snapshot().torchFailure.triggered,
+          "entering roof water must emit one shared positional torch-extinguish cue");
+    bool extinguishUsesTriggerPosition = false;
+    for (const GameplayEvent& event : torchDrenchFeedback.Events().Events())
+    {
+        if (event.type == GameplayEventType::TorchExtinguished)
+        {
+            extinguishUsesTriggerPosition =
+                NearlyEqual(event.worldX, -2.10f) &&
+                NearlyEqual(event.worldZ, -15.20f) &&
+                NearlyEqual(event.listenerX, -2.10f) &&
+                NearlyEqual(event.listenerZ, -15.20f);
+        }
+    }
+    check(extinguishUsesTriggerPosition,
+          "torch-extinguish audio must retain exact event-time source/listener state");
+    torchDrenchFeedback.ClearEvents();
+    for (int tick = 0; tick < 120; ++tick)
+    {
+        torchDrenchFeedback.StepFixed(drenchedTorchInput);
+    }
+    check(CountEvents(torchDrenchFeedback.Events(),
+                      GameplayEventType::TorchExtinguished) == 0u,
+          "guttering, drop, settle, and repeated polling must not duplicate the extinguish cue");
+    drenchedTorchInput.paused = true;
+    torchDrenchFeedback.StepFixed(drenchedTorchInput);
+    drenchedTorchInput.paused = false;
+    torchDrenchFeedback.StepFixed(drenchedTorchInput);
+    check(CountEvents(torchDrenchFeedback.Events(),
+                      GameplayEventType::TorchExtinguished) == 0u,
+          "pause/resume must not replay the already-consumed extinguish cue");
 
     GameSimulation resetParity;
     check(resetParity.ApplyShowcaseCheckpoint(0) &&

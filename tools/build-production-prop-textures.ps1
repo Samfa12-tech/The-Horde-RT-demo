@@ -13,17 +13,20 @@ $props = Join-Path $repoRoot "assets/textures/props/source"
 $runtime = Join-Path $repoRoot "assets/textures/props/runtime"
 $base = @(
     "$shared/sword-base-color.png", "$shared/torch-base-color.png",
-    "$shared/player-base-color.png", "$props/chest-wood-base-color.png",
+    "$shared/player-base-color.png", "$shared/player-gauntlet-base-color.png",
+    "$props/chest-wood-base-color.png",
     "$props/chest-iron-base-color.png", "$props/chest-wood-base-color.png",
     "$props/chest-iron-base-color.png", "$props/lantern-iron-base-color.png",
     "$props/lantern-iron-base-color.png")
 $normal = @(
     "$shared/sword-normal.png", "$shared/torch-normal.png", "$shared/player-normal.png",
+    "$shared/player-gauntlet-normal.png",
     "$props/chest-wood-normal.png", "$props/chest-iron-normal.png",
     "$props/chest-wood-normal.png", "$props/chest-iron-normal.png",
     "$props/lantern-iron-normal.png", "$props/lantern-iron-normal.png")
 $orm = @(
     "$shared/sword-orm.png", "$shared/torch-orm.png", "$shared/player-orm.png",
+    "$shared/player-gauntlet-orm.png",
     "$props/chest-wood-orm.png", "$props/chest-iron-orm.png",
     "$props/chest-wood-orm.png", "$props/chest-iron-orm.png",
     "$props/lantern-iron-orm.png", "$props/lantern-iron-orm.png")
@@ -58,11 +61,12 @@ $manifest = [ordered]@{
     mipmapped = $true
     layerOrder = @(
         "gothic-arming-sword-rh-lod0", "gothic-hand-torch-lod0",
-        "gothic-traveller-lod0", "gothic-chest-base.ChestWood",
+        "gothic-traveller-lod0", "gothic-traveller-lod0.GauntletPrimaryVisible",
+        "gothic-chest-base.ChestWood",
         "gothic-chest-base.BlackIron", "gothic-chest-lid.ChestWood",
         "gothic-chest-lid.BlackIron", "reward-lantern-ring.BlackIron",
         "reward-lantern-body.BlackIron")
-    layerCounts = [ordered]@{ baseColor = 9; normal = 9; orm = 9; emissive = 1 }
+    layerCounts = [ordered]@{ baseColor = 10; normal = 10; orm = 10; emissive = 1 }
     android = [ordered]@{
         baseColor = [ordered]@{ format = "ASTC_6x6_SRGB_BLOCK"; sha256 = Get-Sha "base-color.android.ktx2" }
         normal = [ordered]@{ format = "ASTC_4x4_UNORM_BLOCK"; sha256 = Get-Sha "normal.android.ktx2" }

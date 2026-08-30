@@ -96,6 +96,7 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AN
     add_executable(horde_rt_diagnostic_window WIN32
         src/platform/windows/DiagnosticWindowMain.cpp
         src/platform/windows/DiagnosticWindow.cpp
+        src/platform/windows/WindowsGitHubReleaseUpdate.cpp
         src/platform/windows/HordeLanternRT.manifest
         src/platform/windows/HordeLanternRT.rc
         src/ui/DiagnosticOverlay.cpp
@@ -113,6 +114,7 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AN
         ole32
         windowscodecs
         shell32
+        winhttp
         winmm
     )
     target_compile_definitions(horde_rt_diagnostic_window PRIVATE
@@ -128,6 +130,13 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AN
 endif()
 
 if(BUILD_TESTING)
+    add_executable(horde_rt_github_release_updater_tests
+        tests/GitHubReleaseUpdaterTests.cpp
+        src/update/GitHubReleaseUpdater.cpp
+    )
+    target_include_directories(horde_rt_github_release_updater_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_github_release_updater_tests COMMAND horde_rt_github_release_updater_tests)
+
     add_executable(horde_rt_dielectric_math_tests tests/DielectricMathTests.cpp)
     target_include_directories(horde_rt_dielectric_math_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_dielectric_math_tests COMMAND horde_rt_dielectric_math_tests)

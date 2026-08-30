@@ -691,14 +691,25 @@ private:
         const float orbitSpeed = 0.34f + 0.10f * std::sin(snapshot_.animationTime * 0.91f + 0.65f);
         const float velocityX = (towardX * radialSpeed - towardZ * orbitSpeed) * movementScale;
         const float velocityZ = (towardZ * radialSpeed + towardX * orbitSpeed) * movementScale;
-        snapshot_.x = std::clamp(snapshot_.x + velocityX * deltaSeconds, kMinX, kMaxX);
-        snapshot_.z = std::clamp(snapshot_.z + velocityZ * deltaSeconds, kMinZ, kMaxZ);
+        const float previousX = snapshot_.x;
+        const float previousZ = snapshot_.z;
+        float proposedX = std::clamp(previousX + velocityX * deltaSeconds, kMinX, kMaxX);
+        float proposedZ = std::clamp(previousZ + velocityZ * deltaSeconds, kMinZ, kMaxZ);
+        ResolveMovementAgainstRect(kRewardChestCollisionRect,
+                                   kCollisionRadius,
+                                   previousX,
+                                   previousZ,
+                                   proposedX,
+                                   proposedZ);
+        snapshot_.x = proposedX;
+        snapshot_.z = proposedZ;
     }
 
     static constexpr float kBaseY = -0.77f;
     static constexpr float kHoverAmplitude = 0.06f;
     static constexpr float kHoverRadiansPerSecond = 1.65f;
     static constexpr float kMoveSpeed = 0.55f;
+    static constexpr float kCollisionRadius = 0.34f;
     static constexpr float kHitPulseDuration = 0.14f;
     static constexpr float kMinX = -36.40f;
     static constexpr float kMaxX = -30.90f;

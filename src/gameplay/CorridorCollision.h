@@ -84,6 +84,10 @@ constexpr bool IsPlayerPositionWalkable(float x, float z)
             return false;
         }
     }
+    if (InsideInsetRect(kRewardChestCollisionRect, x, z))
+    {
+        return false;
+    }
     return true;
 }
 

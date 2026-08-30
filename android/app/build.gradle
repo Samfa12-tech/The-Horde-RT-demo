@@ -39,6 +39,9 @@ tasks.register('prepareRuntimeAssets', Sync) {
         include 'textures/props/runtime/asset.manifest.json'
         include 'audio/filmcow/*.wav'
         include 'audio/pixabay/waterfall_loop.wav'
+        include 'audio/pixabay/chest_unlock.wav'
+        include 'audio/pixabay/chest_open.wav'
+        include 'audio/pixabay/torch_extinguish.wav'
     }
     from('../..') {
         include 'ASSET_LICENSES.md'

@@ -12,6 +12,10 @@ param(
     [switch]$RtLabWorkloadComparison,
     [switch]$SkipBuild,
     [switch]$SkipInstall,
+    [ValidateNotNullOrEmpty()]
+    [string]$DeviceSerial = "R5GL219SZGK",
+    [ValidateNotNullOrEmpty()]
+    [string]$ExpectedDeviceModel = "SM-S948B",
     [ValidateRange(30, 300)]
     [int]$TimeoutSeconds = 120,
     [string]$OutputRoot = (Join-Path $PSScriptRoot "..\reports\android-showcase-runs")
@@ -60,6 +64,30 @@ $checkpointZones = @{
     "glass-tinted-transport" = "opening"
     "glass-millimetre-closed" = "skylight-chamber"
     "glass-edge-fresnel" = "skylight-chamber"
+    "pbr-sword-closeup" = "opening"
+    "pbr-torch-fire" = "opening"
+    "player-body-forward" = "opening"
+    "player-fallback-forward" = "opening"
+    "lantern-chest-unlock" = "finale"
+    "lantern-glass-production" = "finale"
+    "lantern-held-high" = "finale"
+    "lantern-held-low" = "finale"
+    "lantern-glass-transmission" = "finale"
+    "lantern-motion-extreme" = "finale"
+    "lantern-sweep-high-forward" = "finale"
+    "lantern-sweep-high-backward" = "finale"
+    "lantern-sweep-high-left" = "finale"
+    "lantern-sweep-high-right" = "finale"
+    "lantern-sweep-high-diagonal" = "finale"
+    "lantern-sweep-high-opposite" = "finale"
+    "lantern-sweep-low-forward" = "finale"
+    "lantern-sweep-low-backward" = "finale"
+    "lantern-sweep-low-left" = "finale"
+    "lantern-sweep-low-right" = "finale"
+    "lantern-sweep-high-alt-camera" = "finale"
+    "lantern-sweep-low-alt-camera" = "finale"
+    "lantern-wall-high" = "shadow-corridor"
+    "lantern-wall-low" = "shadow-corridor"
 }
 $baselineCheckpoints = @("opening", "two-enemy-combat", "worst-bend", "skylight", "green", "lich")
 $captureCheckpoints = @("opening", "skeleton", "worst-bend", "lantern-drop", "skylight", "yellow", "blue", "red", "green", "mirror", "lich", "finale-roof", "two-enemy-combat")
@@ -90,10 +118,11 @@ $lifecycleEvidence = [ordered]@{
 
 function Invoke-AdbText {
     param([string[]]$Arguments, [switch]$AllowFailure)
-    $output = (& $adb @Arguments 2>&1 | Out-String).TrimEnd()
+    $scopedArguments = @("-s", $DeviceSerial) + $Arguments
+    $output = (& $adb @scopedArguments 2>&1 | Out-String).TrimEnd()
     $exitCode = $LASTEXITCODE
     if (-not $AllowFailure -and $exitCode -ne 0) {
-        throw "adb $($Arguments -join ' ') failed with exit code $exitCode`n$output"
+        throw "adb -s $DeviceSerial $($Arguments -join ' ') failed with exit code $exitCode`n$output"
     }
     return $output
 }
@@ -444,11 +473,19 @@ if (-not (Test-Path -LiteralPath $adb)) { throw "adb not found: $adb" }
 New-Item -ItemType Directory -Force -Path $outputDirectory | Out-Null
 
 try {
-    $devices = @((Invoke-AdbText @("devices")) -split "`r?`n" | Where-Object { $_ -match "\tdevice$" })
-    if ($devices.Count -ne 1) { throw "Exactly one authorised Android device is required; found $($devices.Count)." }
-    $serial = ($devices[0] -split "\t")[0]
+    $deviceOutput = (& $adb devices 2>&1 | Out-String).TrimEnd()
+    if ($LASTEXITCODE -ne 0) { throw "adb devices failed.`n$deviceOutput" }
+    $devices = @($deviceOutput -split "`r?`n" | Where-Object { $_ -match "\tdevice$" })
+    $target = @($devices | Where-Object { ($_ -split "\t")[0] -eq $DeviceSerial })
+    if ($target.Count -ne 1) {
+        throw "Approved Android device $DeviceSerial is not the one authorised target in adb devices."
+    }
+    $serial = $DeviceSerial
     $initialWakefulness = Invoke-AdbText @("shell", "dumpsys", "power") -AllowFailure
     $deviceModel = Invoke-AdbText @("shell", "getprop", "ro.product.model")
+    if ($deviceModel.Trim() -ne $ExpectedDeviceModel) {
+        throw "Approved serial $DeviceSerial reported model '$($deviceModel.Trim())'; expected $ExpectedDeviceModel."
+    }
     $androidVersion = Invoke-AdbText @("shell", "getprop", "ro.build.version.release")
     $apiLevel = Invoke-AdbText @("shell", "getprop", "ro.build.version.sdk")
     $osBuildFingerprint = Invoke-AdbText @("shell", "getprop", "ro.build.fingerprint")

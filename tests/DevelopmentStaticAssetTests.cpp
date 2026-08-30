@@ -112,12 +112,17 @@ int main()
     Check(chestUnlock != nullptr && chestUnlock->id == 114 &&
               chestUnlock->usesProductionRewardProps &&
               !chestUnlock->productionLanternGlassOnly &&
+              chestUnlock->cameraX == kRewardChestRoutePosition.x + 1.85f &&
+              chestUnlock->cameraZ == kRewardChestRoutePosition.z &&
+              QueryShowcaseZone(chestUnlock->cameraX, chestUnlock->cameraZ) ==
+                  ShowcaseZone::Finale &&
               chestUnlock->pitch == -0.35f,
-          "production chest unlock has a stable mutually exclusive floor-valid reveal framing");
+          "production chest unlock has a stable finale-room interaction framing");
     Check(productionGlass != nullptr && productionGlass->id == 115 &&
               productionGlass->usesProductionRewardProps &&
               productionGlass->productionLanternGlassOnly &&
-              productionGlass->cameraX == -10.65f &&
+              productionGlass->cameraX == kRewardChestRoutePosition.x + 1.85f &&
+              productionGlass->cameraZ == kRewardChestRoutePosition.z &&
               productionGlass->pitch == -0.35f,
           "production lantern glass has a stable full-bounds close inspection route");
     const DevelopmentCheckpoint* heldHigh = FindDevelopmentCheckpoint("lantern-held-high");
@@ -144,6 +149,8 @@ int main()
                                                    &downwardEvidence) &&
               stagedDownward.Snapshot().playerCombat.action ==
                   PlayerCombatAction::SwingActive &&
+              downwardEvidence.actionTime >=
+                  SwordCombat::kSwingActiveDuration - 0.025f &&
               downwardEvidence.consumedAttackEdges == 1u &&
               downwardEvidence.playerSwingEvents == 1u && stagedDownward.Events().Empty(),
           "downward capture must stage one exact shared swing before freezing feedback");
@@ -152,6 +159,8 @@ int main()
                                                    &upwardEvidence) &&
               stagedUpward.Snapshot().playerCombat.action ==
                   PlayerCombatAction::UpwardSliceActive &&
+              upwardEvidence.actionTime >=
+                  SwordCombat::kUpwardSliceActiveDuration - 0.025f &&
               upwardEvidence.consumedAttackEdges == 2u &&
               upwardEvidence.playerSwingEvents == 2u && stagedUpward.Events().Empty(),
           "upward capture must stage two exact shared swings before freezing feedback");

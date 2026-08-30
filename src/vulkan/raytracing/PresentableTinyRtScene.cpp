@@ -25,6 +25,7 @@ namespace horde::vulkan::raytracing
 {
 
 using horde::gameplay::kRouteFloorWorldY;
+using horde::gameplay::kShowcaseEyeWorldY;
 
 namespace
 {
@@ -1415,7 +1416,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     }};
     if (!staticMeshSlot_.Initialize(registrations, diagnostic)) return false;
     const RtInstanceMetadata playerMetadata = staticMeshSlot_.InstanceMetadata()[4u];
-    if (playerMetadata.primitiveCount != 3u ||
+    if (playerMetadata.primitiveCount != 4u ||
         playerMetadata.primitiveBase >= staticMeshSlot_.PrimitiveMetadata().size())
     {
         diagnostic = "Runtime player static-PBR primitive metadata is incomplete.";
@@ -3155,7 +3156,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     instances[4].accelerationStructureReference = playerBodyBlas_.address;
     instances[4].transform = {{
         1.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 1.0f, 0.0f, 0.58f,
+        0.0f, 1.0f, 0.0f, kShowcaseEyeWorldY,
         0.0f, 0.0f, 1.0f, 0.0f}};
     for (std::size_t i = 5u; i <= 16u; ++i)
     {
@@ -3769,7 +3770,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         return Vec3{v[0] / length, v[1] / length, v[2] / length};
     };
     const Vec3 worldUp{0.0f, 1.0f, 0.0f};
-    const Vec3 eye{cameraX, 0.58f, cameraZ};
+    const Vec3 eye{cameraX, kShowcaseEyeWorldY, cameraZ};
     const Vec3 bodyForward{std::sin(cameraYaw), 0.0f, -std::cos(cameraYaw)};
     const Vec3 bodyRight{std::cos(cameraYaw), 0.0f, std::sin(cameraYaw)};
     const horde::gameplay::LowerBodyPoseState lowerBodyPose =
@@ -3778,6 +3779,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const float torsoSin = std::sin(lowerBodyPose.torsoTwistRadians);
     const Vec3 animatedBodyForward = normalize(add(scaled(bodyForward, torsoCos), scaled(bodyRight, torsoSin)));
     const Vec3 animatedBodyRight = normalize(subtract(scaled(bodyRight, torsoCos), scaled(bodyForward, torsoSin)));
+    const PlayerModelWorldBasis playerModelBasis =
+        BuildPlayerModelWorldBasis(animatedBodyRight, animatedBodyForward);
     const Vec3 animatedBodyOrigin = add(add(eye, scaled(bodyRight, lowerBodyPose.pelvisSway)),
                                         Vec3{0.0f, lowerBodyPose.pelvisBob * 0.65f, 0.0f});
     const float viewPitch = std::clamp(cameraPitch, -0.32f, 0.28f);
@@ -3836,35 +3839,37 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     Vec3 skinnedPlayerRootWorld{
         animatedBodyOrigin[0], animatedBodyOrigin[1] - 1.8f,
         animatedBodyOrigin[2]};
-    if (effectivePlayerRenderRoute == PlayerRenderRoute::Skinned)
+    const bool usesSkinnedPlayer =
+        effectivePlayerRenderRoute != PlayerRenderRoute::Procedural;
+    if (usesSkinnedPlayer)
     {
         const auto playerSkinBegin = std::chrono::steady_clock::now();
         std::array<float, 3u> rigShoulderCenter{};
         if (!playerRenderSlot_.ShoulderCenter(frame.playerAnimation,
                                               rigShoulderCenter, diagnostic))
             return false;
-        const Vec3 intendedShoulderCenter =
-            scaled(add(leftShoulder, rightShoulder), 0.5f);
-        skinnedPlayerRootWorld = subtract(
+        const Vec3 intendedShoulderCenter = toWorld(
+            EvaluatePlayerTorsoAnchorLocal(frame.playerAnimation));
+        const Vec3 shoulderAnchoredRootWorld = subtract(
             intendedShoulderCenter,
-            add(add(scaled(animatedBodyRight, rigShoulderCenter[0]),
-                    Vec3{0.0f, rigShoulderCenter[1], 0.0f}),
-                scaled(animatedBodyForward, rigShoulderCenter[2])));
-        const auto worldPointToPlayer = [&subtract, &dot, &animatedBodyRight,
-                                         &animatedBodyForward, &skinnedPlayerRootWorld](
+            PlayerModelVectorToWorld(playerModelBasis, rigShoulderCenter));
+        skinnedPlayerRootWorld = GroundPlayerRootOnRouteFloor(
+            shoulderAnchoredRootWorld, kRouteFloorWorldY,
+            playerRenderSlot_.BootGroundingOffsetMetres(
+                frame.playerAnimation));
+        const auto worldPointToPlayer = [&subtract, &playerModelBasis,
+                                         &skinnedPlayerRootWorld](
                                             const Vec3& worldPoint) {
             const Vec3 delta = subtract(worldPoint, skinnedPlayerRootWorld);
-            return Vec3{dot(delta, animatedBodyRight), delta[1],
-                        dot(delta, animatedBodyForward)};
+            return WorldVectorToPlayerModel(playerModelBasis, delta);
         };
-        const auto viewVectorToPlayer = [&add, &scaled, &dot, &viewRight, &viewUp,
-                                         &viewForward, &animatedBodyRight,
-                                         &animatedBodyForward](const Vec3& viewVector) {
+        const auto viewVectorToPlayer = [&add, &scaled, &viewRight, &viewUp,
+                                         &viewForward,
+                                         &playerModelBasis](const Vec3& viewVector) {
             const Vec3 worldVector = add(add(scaled(viewRight, viewVector[0]),
                                              scaled(viewUp, viewVector[1])),
                                          scaled(viewForward, viewVector[2]));
-            return Vec3{dot(worldVector, animatedBodyRight), worldVector[1],
-                        dot(worldVector, animatedBodyForward)};
+            return WorldVectorToPlayerModel(playerModelBasis, worldVector);
         };
         horde::gameplay::animation::PlayerAnimationSnapshot rigAnimation =
             frame.playerAnimation;
@@ -3898,9 +3903,11 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         if (updateSkinnedPlayer)
         {
             const auto& skinned = playerRenderSlot_.UniqueVertices();
-            if (skinned.size() != productionPlayerAsset_.vertices.size())
+            const auto& skinnedTangents = playerRenderSlot_.UniqueTangents();
+            if (skinned.size() != productionPlayerAsset_.vertices.size() ||
+                skinnedTangents.size() != skinned.size())
             {
-                diagnostic = "Skinned player pose does not match its static-PBR vertex stream.";
+                diagnostic = "Skinned player pose/tangent frame does not match its static-PBR vertex stream.";
                 return false;
             }
             skinnedPlayerUpload_ = productionPlayerAsset_.vertices;
@@ -3910,6 +3917,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                             skinnedPlayerUpload_[vertex].position.begin());
                 std::copy_n(skinned[vertex].normal, 4u,
                             skinnedPlayerUpload_[vertex].normal.begin());
+                std::copy_n(skinnedTangents[vertex].tangent, 4u,
+                            skinnedPlayerUpload_[vertex].tangent.begin());
             }
             const VkDeviceSize playerOffset =
                 static_cast<VkDeviceSize>(playerStaticVertexBase_) *
@@ -3922,15 +3931,12 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                 return false;
         }
 
-        const auto rigidWorldFromBone = [&animatedBodyRight, &animatedBodyForward,
+        const auto rigidWorldFromBone = [&playerModelBasis,
                                          &skinnedPlayerRootWorld, &add, &scaled,
                                          &dot, &cross, &normalize](
                                             const horde::scene::SkinnedNodeTransform& bone) {
-            const auto vectorToWorld = [&animatedBodyRight, &animatedBodyForward,
-                                        &add, &scaled](const Vec3& local) {
-                return add(add(scaled(animatedBodyRight, local[0]),
-                               Vec3{0.0f, local[1], 0.0f}),
-                           scaled(animatedBodyForward, local[2]));
+            const auto vectorToWorld = [&playerModelBasis](const Vec3& local) {
+                return PlayerModelVectorToWorld(playerModelBasis, local);
             };
             Vec3 x = normalize(vectorToWorld({bone[0], bone[1], bone[2]}));
             const Vec3 rawY = vectorToWorld({bone[4], bone[5], bone[6]});
@@ -3955,8 +3961,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         const auto& boneSockets = playerRenderSlot_.BoneSockets();
         if (!playerRenderSlot_.ResolveHeldItemVisuals(
                 frame.heldItems,
-                rigidWorldFromBone(boneSockets.leftHand),
-                rigidWorldFromBone(boneSockets.rightHand),
+                rigidWorldFromBone(boneSockets.leftGrip),
+                rigidWorldFromBone(boneSockets.rightGrip),
                 renderHeldItems, diagnostic))
             return false;
         finalSkinnedLeftGrip = playerRenderSlot_.FinalWorldFromLeftGrip();
@@ -4032,13 +4038,13 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const PlayerRouteMasks playerRouteMasks = BuildPlayerRouteMasks(effectivePlayerRenderRoute);
     instances[4].mask = productionVisibility.playerMask;
     instances[4].accelerationStructureReference =
-        effectivePlayerRenderRoute == PlayerRenderRoute::Skinned
+        usesSkinnedPlayer
         ? skinnedPlayerBlas_.address : playerBodyBlas_.address;
-    instances[4].transform = effectivePlayerRenderRoute == PlayerRenderRoute::Skinned
+    instances[4].transform = usesSkinnedPlayer
         ? VkTransformMatrixKHR{{
-            animatedBodyRight[0], 0.0f, animatedBodyForward[0], skinnedPlayerRootWorld[0],
-            animatedBodyRight[1], 1.0f, animatedBodyForward[1], skinnedPlayerRootWorld[1],
-            animatedBodyRight[2], 0.0f, animatedBodyForward[2], skinnedPlayerRootWorld[2]}}
+            playerModelBasis.modelXInWorld[0], playerModelBasis.modelYInWorld[0], playerModelBasis.modelZInWorld[0], skinnedPlayerRootWorld[0],
+            playerModelBasis.modelXInWorld[1], playerModelBasis.modelYInWorld[1], playerModelBasis.modelZInWorld[1], skinnedPlayerRootWorld[1],
+            playerModelBasis.modelXInWorld[2], playerModelBasis.modelYInWorld[2], playerModelBasis.modelZInWorld[2], skinnedPlayerRootWorld[2]}}
         : VkTransformMatrixKHR{{
             animatedBodyRight[0], 0.0f, animatedBodyForward[0], animatedBodyOrigin[0],
             animatedBodyRight[1], 1.0f, animatedBodyForward[1], animatedBodyOrigin[1],
@@ -4090,6 +4096,16 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     instances[13].transform = segmentTransform(rightKnee, rightAnkle, 0.09f);
     instances[14].transform = segmentTransform(leftAnkle, leftToe, 0.11f);
     instances[15].transform = segmentTransform(rightAnkle, rightToe, 0.11f);
+    if (effectivePlayerRenderRoute == PlayerRenderRoute::HybridBlockPrimary)
+    {
+        // Chest/lantern instances replace legacy arm slots 5-8. Reuse four
+        // otherwise hidden procedural limb slots for the owner-approved block
+        // fallback without increasing TLAS or metadata capacity.
+        instances[10].transform = segmentTransform(leftShoulder, leftElbow, 0.050f);
+        instances[11].transform = segmentTransform(leftElbow, leftHand, 0.045f);
+        instances[12].transform = segmentTransform(rightShoulder, rightElbow, 0.050f);
+        instances[13].transform = segmentTransform(rightElbow, rightHand, 0.045f);
+    }
     const Vec3 headBase = add(add(animatedBodyOrigin, Vec3{0.0f, -0.16f, 0.0f}), scaled(animatedBodyForward, 0.20f));
     const Vec3 headTop = add(add(animatedBodyOrigin, Vec3{0.0f, 0.15f, 0.0f}), scaled(animatedBodyForward, 0.20f));
     instances[16].transform = segmentTransform(headBase, headTop, 0.145f);
@@ -4118,7 +4134,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             lanternClaimed;
         // Inspection and reveal share the exact Task 8 authored composition;
         // glass-only mode changes visibility, never the rigid prop transform.
-        const float lanternScale = 0.90f;
+        const float lanternScale =
+            horde::gameplay::items::kClaimedRewardLanternScale;
         // Checkpoint staging is deliberately separate from the asset contract:
         // this rigid world matrix chooses the inspection location, while every
         // prop pivot/socket below is read from the loaded GLBs.
@@ -4300,7 +4317,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             std::span<const horde::gameplay::effects::FireEmitterState>(
                 frame.fireEmitters.data(),
                 std::min(frame.fireEmitterCount, frame.fireEmitters.size())),
-            {{frame.cameraX, 0.58f, frame.cameraZ}, frame.zone, 24.0f},
+            {{frame.cameraX, kShowcaseEyeWorldY, frame.cameraZ},
+             frame.zone, 24.0f},
             fireTuning,
             fireQuality,
             fireEmitterUpload,

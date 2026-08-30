@@ -23,6 +23,15 @@ enum class ChestRewardAction : std::uint8_t
     LanternClaimed,
 };
 
+enum class ChestRewardPrompt : std::uint8_t
+{
+    None,
+    Locked,
+    OpenChest,
+    Opening,
+    ClaimLantern,
+};
+
 struct ChestRewardSnapshot
 {
     ChestRewardPhase phase = ChestRewardPhase::Locked;
@@ -39,6 +48,7 @@ public:
 
     bool Unlock();
     ChestRewardAction TryInteract(const InteractionQuery& query);
+    ChestRewardPrompt QueryPrompt(const InteractionQuery& query) const;
     const ChestRewardSnapshot& Update(float fixedDeltaSeconds);
     void Reset();
     void Import(const ChestRewardSnapshot& snapshot);

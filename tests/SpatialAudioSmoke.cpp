@@ -8,6 +8,7 @@
 
 #include "gameplay/FeedbackTiming.h"
 #include "gameplay/SpatialAudio.h"
+#include "gameplay/simulation/BoundedTransportQueue.h"
 #include "gameplay/simulation/GameplayEvent.h"
 
 namespace
@@ -128,6 +129,14 @@ int main()
     check(!IsRouteAudioObstructed(0.0f, -7.0f, 0.0f, -9.4f) &&
           IsRouteAudioObstructed(0.0f, -4.8f, 4.2f, -9.4f),
           "route walls must pass same-leg sound and attenuate sound cutting across a bend");
+    const SpatialAudioGains chestUnlockAtInteraction = CalculateSpatialAudio(
+        {kRewardChestRoutePosition.x, kRewardChestRoutePosition.z,
+         0.70f, 1.0f, 14.0f},
+        {kRewardChestRoutePosition.x + 1.30f,
+         kRewardChestRoutePosition.z, -1.57079632679f});
+    check(!chestUnlockAtInteraction.obstructed &&
+              StereoPower(chestUnlockAtInteraction) > 0.0f,
+          "the physical chest collider must not self-occlude its positional unlock cue at the interaction stand-off");
 
     DelayedGameplayFeedbackQueue delayedFeedback;
     horde::gameplay::simulation::GameplayEvent fallA;
@@ -194,6 +203,17 @@ int main()
           cancelledFeedback.Size() == 0u,
           "route reset and retry must be able to cancel stale delayed feedback");
 
+    horde::gameplay::simulation::BoundedTransportQueue<
+        horde::gameplay::simulation::GameplayEvent, 4u> lifecycleFeedback;
+    horde::gameplay::simulation::GameplayEvent pendingUnlock;
+    pendingUnlock.type = horde::gameplay::simulation::GameplayEventType::ChestUnlocked;
+    pendingUnlock.sequence = 73u;
+    check(lifecycleFeedback.Push(pendingUnlock),
+          "lifecycle fixture must queue a pending chest unlock cue");
+    lifecycleFeedback.Clear();
+    check(lifecycleFeedback.Size() == 0u && lifecycleFeedback.Values().empty(),
+          "Home teardown must discard a pending chest unlock cue rather than replay it after resume");
+
     const std::filesystem::path root = FindRepoRoot();
     check(!root.empty(), "platform feedback sources were not found");
     if (!root.empty())
@@ -217,6 +237,51 @@ int main()
               androidBridgeSource.find("gPlatformGameplayEvents.Push(") != std::string::npos &&
               androidBridgeSource.find("PlatformGameplayEventOverflowCount()") != std::string::npos,
               "Android must retain bounded ordered event transport with visible overflow");
+        const std::size_t androidStopBegin =
+            androidBridgeSource.find("void StopSurfaceInternal()");
+        const std::size_t androidStopEnd =
+            androidBridgeSource.find("} // namespace", androidStopBegin);
+        check(androidStopBegin != std::string::npos && androidStopEnd != std::string::npos &&
+                  androidBridgeSource.substr(androidStopBegin,
+                                             androidStopEnd - androidStopBegin)
+                          .find("ClearPlatformGameplayEvents();") != std::string::npos &&
+                  androidSource.find("if (resumed && surfaceStarted && state == 1)") !=
+                      std::string::npos,
+              "Android Home teardown must clear queued immediate cues and runtime polling must dispatch only for the resumed active surface");
+        check(windowsSource.find("case GameplayEventType::ChestUnlocked:") != std::string::npos &&
+              windowsSource.find("PlayPositionalSoundEffect(context, \"chest_unlock.wav\"") != std::string::npos &&
+              windowsSource.find("case GameplayEventType::ChestOpened:") != std::string::npos &&
+              windowsSource.find("PlayPositionalSoundEffect(context, \"chest_open.wav\"") != std::string::npos &&
+              windowsSource.find("case GameplayEventType::TorchExtinguished:") != std::string::npos &&
+              windowsSource.find("PlayPositionalSoundEffect(context, \"torch_extinguish.wav\"") != std::string::npos,
+              "Windows must map the shared chest and torch transitions to the licensed positional Pixabay cues");
+        check(androidSource.find("PLATFORM_EVENT_CHEST_UNLOCKED = 13") != std::string::npos &&
+              androidSource.find("case PLATFORM_EVENT_CHEST_UNLOCKED:") != std::string::npos &&
+              androidSource.find("playSpatialSound(\"chest_unlock\"") != std::string::npos &&
+              androidSource.find("PLATFORM_EVENT_CHEST_OPENED = 14") != std::string::npos &&
+              androidSource.find("playSpatialSound(\"chest_open\"") != std::string::npos &&
+              androidSource.find("PLATFORM_EVENT_TORCH_EXTINGUISHED = 16") != std::string::npos &&
+              androidSource.find("playSpatialSound(\"torch_extinguish\"") != std::string::npos,
+              "Android must map the same shared chest and torch transitions to licensed positional cues");
+        const auto cueCaseHasNoHaptic = [&](const char* caseLabel) {
+            const std::size_t cueCase = androidSource.find(caseLabel);
+            const std::size_t cueCaseEnd = androidSource.find("break;", cueCase);
+            return cueCase != std::string::npos &&
+                   cueCaseEnd != std::string::npos &&
+                   androidSource.substr(cueCase, cueCaseEnd - cueCase)
+                           .find("performHaptic") == std::string::npos;
+        };
+        check(cueCaseHasNoHaptic("case PLATFORM_EVENT_CHEST_UNLOCKED:") &&
+                  cueCaseHasNoHaptic("case PLATFORM_EVENT_CHEST_OPENED:") &&
+                  cueCaseHasNoHaptic("case PLATFORM_EVENT_TORCH_EXTINGUISHED:"),
+              "chest and torch transition cues must not silently append Android haptics");
+        check(std::filesystem::exists(root / "assets/audio/pixabay/chest_unlock.wav") &&
+                  std::filesystem::file_size(root / "assets/audio/pixabay/chest_unlock.wav") == 36908u &&
+                  std::filesystem::exists(root / "assets/audio/pixabay/chest_open.wav") &&
+                  std::filesystem::file_size(root / "assets/audio/pixabay/chest_open.wav") == 479276u &&
+                  std::filesystem::exists(root / "assets/audio/pixabay/torch_extinguish.wav") &&
+                  std::filesystem::file_size(root / "assets/audio/pixabay/torch_extinguish.wav") == 100268u,
+              "exact deterministic Pixabay runtime WAV derivatives must be present");
         check(windowsSource.find("waterfall_loop.wav") != std::string::npos &&
               windowsSource.find("StartOrUpdateLoop") != std::string::npos &&
               windowsSource.find("StopLoop") != std::string::npos,

@@ -161,11 +161,20 @@ void GameSimulation::StepFixed(const InputSnapshot& input,
     {
         walkTime_ += fixedDeltaSeconds;
         UpdateMovement(input, fixedDeltaSeconds);
+        const bool torchWasTriggered = torchFailureSnapshot_.triggered;
         torchFailureSnapshot_ = torchFailure_.Update(fixedDeltaSeconds,
                                            playerX_,
                                            playerZ_,
                                            playerYawRadians_,
                                            playerPitchRadians_);
+        if (!torchWasTriggered && torchFailureSnapshot_.triggered)
+        {
+            Emit(GameplayEventType::TorchExtinguished,
+                 EntityId::Player,
+                 EntityId::Invalid,
+                 torchFailureSnapshot_.droppedX,
+                 torchFailureSnapshot_.droppedZ);
+        }
         UpdateEncounters(input, fixedDeltaSeconds);
         UpdateRewardSequence(fixedDeltaSeconds, true);
         ResolveHeldItems();
@@ -759,14 +768,17 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
         }
     }
 
-    const bool attackAvailable = swordCombat_.CanAcceptAttack();
     const bool parryAvailable = swordCombat_.CanAcceptParry();
     bool playerActionAccepted = false;
     if (pendingAttackCommands_ > 0u)
     {
-        lastConsumedAttackSequence_ += pendingAttackCommands_;
-        pendingAttackCommands_ = 0u;
-        if (attackAvailable)
+        // Consume one monotonic edge per fixed tick. A coherent publication
+        // may legitimately jump 0 -> 2 when both clicks arrive between ticks;
+        // collapsing the whole delta into one RequestAttack silently erased
+        // the upward continuation.
+        --pendingAttackCommands_;
+        ++lastConsumedAttackSequence_;
+        if (swordCombat_.CanAcceptAttack())
         {
             const PlayerAttackCut acceptedCut = swordCombat_.RequestAttack();
             if (acceptedCut != PlayerAttackCut::None)
@@ -1044,6 +1056,8 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
         horde::gameplay::interactions::FinaleEndingPhase::Complete;
     snapshot_.interaction = interactionState_;
     snapshot_.chestReward = chestRewardSequence_.Snapshot();
+    snapshot_.chestPrompt = chestRewardSequence_.QueryPrompt({
+        playerX_, playerZ_, playerYawRadians_});
     snapshot_.finale = finaleSequence_.Snapshot();
     snapshot_.lanternPendulum = lanternPendulum_.Snapshot();
     snapshot_.rewardLanternWorldFromHinge = heldItemFixedStepState_.worldFromLeftHand;

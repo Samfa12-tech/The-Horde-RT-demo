@@ -419,6 +419,24 @@ int main()
     check(sawVisibleDamage, "visible player inside seven metres must receive peak charge pulse");
     check(maxY - minY > 0.05f, "active lich must visibly hover");
 
+    LichEncounter chestCollisionLich;
+    bool lichEnteredChest = false;
+    constexpr float lichCollisionRadius = 0.34f;
+    const RouteRect chestWithLichClearance{
+        kRewardChestCollisionRect.minX - lichCollisionRadius,
+        kRewardChestCollisionRect.maxX + lichCollisionRadius,
+        kRewardChestCollisionRect.minZ - lichCollisionRadius,
+        kRewardChestCollisionRect.maxZ + lichCollisionRadius};
+    for (int i = 0; i < 3600; ++i)
+    {
+        const auto& snapshot = chestCollisionLich.Update(
+            1.0f / 60.0f, -36.40f, -15.15f, true, true);
+        lichEnteredChest = lichEnteredChest ||
+            Contains(chestWithLichClearance, snapshot.x, snapshot.z);
+    }
+    check(!lichEnteredChest,
+          "the moving lich must respect the reward chest's physical footprint");
+
     lich.Reset();
     bool sawOccludedDamage = false;
     for (int i = 0; i < 400; ++i)

@@ -12,10 +12,12 @@
 #include <cstring>
 #include <ctime>
 #include <fstream>
+#include <limits>
 #include <mutex>
 #include <optional>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <vector>
 #include <sys/stat.h>
@@ -39,6 +41,7 @@
 #include "gameplay/simulation/BoundedTransportQueue.h"
 #include "gameplay/simulation/InputMailbox.h"
 #include "platform/android/AndroidRtLabState.h"
+#include "update/GitHubReleaseUpdater.h"
 #include "vulkan/GpuFrameTimer.h"
 #include "vulkan/RtCapabilityReport.h"
 #include "vulkan/VulkanContext.h"
@@ -62,6 +65,53 @@ constexpr const char* kJsonReportFilename = "vulkan_capability_report.json";
 constexpr const char* kShowcaseDebugStateFilename = "showcase_debug_state.json";
 // One frame in flight keeps the dynamically refit held-torch TLAS safely synchronized with its host-written instance buffer.
 constexpr uint32_t kMaxFramesInFlight = 1u;
+
+std::string JsonUtf8String(const std::string_view value)
+{
+    static constexpr char kHex[] = "0123456789abcdef";
+    std::string escaped;
+    escaped.reserve(value.size() + 2u);
+    escaped.push_back('"');
+    for (const unsigned char byte : value)
+    {
+        switch (byte)
+        {
+        case '"': escaped += "\\\""; break;
+        case '\\': escaped += "\\\\"; break;
+        case '\b': escaped += "\\b"; break;
+        case '\f': escaped += "\\f"; break;
+        case '\n': escaped += "\\n"; break;
+        case '\r': escaped += "\\r"; break;
+        case '\t': escaped += "\\t"; break;
+        default:
+            if (byte < 0x20u)
+            {
+                escaped += "\\u00";
+                escaped.push_back(kHex[(byte >> 4u) & 0x0fu]);
+                escaped.push_back(kHex[byte & 0x0fu]);
+            }
+            else
+            {
+                escaped.push_back(static_cast<char>(byte));
+            }
+            break;
+        }
+    }
+    escaped.push_back('"');
+    return escaped;
+}
+
+jbyteArray NewUtf8ByteArray(JNIEnv* env, const std::string& value)
+{
+    if (value.size() > static_cast<std::size_t>(std::numeric_limits<jsize>::max())) return nullptr;
+    jbyteArray bytes = env->NewByteArray(static_cast<jsize>(value.size()));
+    if (bytes != nullptr && !value.empty())
+    {
+        env->SetByteArrayRegion(bytes, 0, static_cast<jsize>(value.size()),
+                                reinterpret_cast<const jbyte*>(value.data()));
+    }
+    return bytes;
+}
 
 const char* DebugPlayerCombatActionName(const horde::gameplay::PlayerCombatAction action)
 {
@@ -202,8 +252,9 @@ std::atomic<int> gPlayerVitality{horde::gameplay::PlayerVitals::kMaxVitality};
 std::atomic<int> gPlayerLifePhase{static_cast<int>(horde::gameplay::PlayerLifePhase::Alive)};
 std::atomic<std::int32_t> gPlayerRetryCheckpoint{0};
 std::atomic<int> gFinaleEndingPhase{static_cast<int>(horde::gameplay::FinaleEndingPhase::Inactive)};
-// Bit 0: INTERACT, bit 1: RAISE, bit 2: LOWER. The render thread owns
-// gameplay and publishes this compact contextual UI view to the Java thread.
+// Bit 0: INTERACT, bit 1: RAISE, bit 2: LOWER. Bits 3..5 carry the shared
+// ChestRewardPrompt value. The render thread owns gameplay and publishes this
+// compact contextual UI view to the Java thread; Java only chooses labels.
 std::atomic<int> gContextualControlState{0};
 std::atomic<std::uint64_t> gWaterfallStereoGains{0u};
 
@@ -327,17 +378,12 @@ void PublishSimulationUiState()
         static_cast<int>(simulation.finale.endingPhase),
         std::memory_order_release);
     int contextualControls = 0;
-    using horde::gameplay::interactions::ChestRewardPhase;
+    using horde::gameplay::interactions::ChestRewardPrompt;
     using horde::gameplay::interactions::HeldLightKind;
     using horde::gameplay::interactions::HeldLightPose;
-    const bool chestCanBeUsed =
-        simulation.chestReward.phase == ChestRewardPhase::ClosedUnlocked ||
-        simulation.chestReward.phase == ChestRewardPhase::LanternAvailable;
-    const horde::gameplay::interactions::InteractionQuery interactionQuery{
-        simulation.playerX, simulation.playerZ, simulation.playerYawRadians};
-    if (chestCanBeUsed && horde::gameplay::interactions::IsInteractionAvailable(
-            interactionQuery,
-            horde::gameplay::interactions::kRewardChestInteractionPosition))
+    contextualControls |= static_cast<int>(simulation.chestPrompt) << 3;
+    if (simulation.chestPrompt == ChestRewardPrompt::OpenChest ||
+        simulation.chestPrompt == ChestRewardPrompt::ClaimLantern)
     {
         contextualControls |= 1;
     }
@@ -2502,10 +2548,101 @@ void StopSurfaceInternal()
     {
         gSwapchainThread.join();
     }
+    // Home/surface teardown is an ownership boundary. Never replay an immediate
+    // gameplay cue (including ChestUnlocked) into the next Activity surface.
+    ClearPlatformGameplayEvents();
     PublishSimulationUiState();
 }
 
 } // namespace
+
+extern "C" JNIEXPORT jbyteArray JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getGitHubReleaseRequestContract(
+    JNIEnv* env,
+    jclass)
+{
+    const horde::update::GitHubHttpRequest request = horde::update::BuildHordeGitHubReleaseRequest();
+    std::ostringstream json;
+    json << "{\"url\":" << JsonUtf8String(request.url)
+         << ",\"accept\":" << JsonUtf8String(request.accept)
+         << ",\"apiVersion\":" << JsonUtf8String(request.apiVersion)
+         << ",\"userAgent\":" << JsonUtf8String(request.userAgent)
+         << ",\"maximumResponseBytes\":" << request.maximumResponseBytes << '}';
+    return NewUtf8ByteArray(env, json.str());
+}
+
+extern "C" JNIEXPORT jbyteArray JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_evaluateGitHubReleaseUpdate(
+    JNIEnv* env,
+    jclass,
+    jstring installedVersion,
+    jint httpStatus,
+    jbyteArray responseBodyUtf8)
+{
+    if (installedVersion == nullptr || responseBodyUtf8 == nullptr)
+    {
+        return NewUtf8ByteArray(
+            env, "{\"status\":\"error\",\"diagnostic\":\"Missing update-check input.\"}");
+    }
+    const char* installedUtf = env->GetStringUTFChars(installedVersion, nullptr);
+    if (installedUtf == nullptr) return nullptr;
+    const horde::update::GitHubHttpRequest request = horde::update::BuildHordeGitHubReleaseRequest();
+    const jsize responseSize = env->GetArrayLength(responseBodyUtf8);
+    std::string body;
+    if (responseSize < 0)
+    {
+        env->ReleaseStringUTFChars(installedVersion, installedUtf);
+        return nullptr;
+    }
+    const std::size_t boundedSize = std::min<std::size_t>(
+        static_cast<std::size_t>(responseSize), request.maximumResponseBytes + 1u);
+    body.resize(boundedSize);
+    if (boundedSize != 0u)
+    {
+        env->GetByteArrayRegion(responseBodyUtf8, 0, static_cast<jsize>(boundedSize),
+                                reinterpret_cast<jbyte*>(body.data()));
+        if (env->ExceptionCheck())
+        {
+            env->ReleaseStringUTFChars(installedVersion, installedUtf);
+            return nullptr;
+        }
+    }
+    const std::string installed(installedUtf);
+    env->ReleaseStringUTFChars(installedVersion, installedUtf);
+
+    const horde::update::UpdateCheckResult result = horde::update::CheckForGitHubReleaseUpdate(
+        installed,
+        horde::update::ReleaseChannel::IncludePrerelease,
+        [httpStatus, &body](const horde::update::GitHubHttpRequest&) {
+            return horde::update::GitHubHttpResponse{static_cast<int>(httpStatus), body};
+        });
+
+    using horde::update::UpdateCheckStatus;
+    const char* status = "error";
+    if (result.status == UpdateCheckStatus::UpdateAvailable) status = "update-available";
+    else if (result.status == UpdateCheckStatus::UpToDate ||
+             result.status == UpdateCheckStatus::NoPublishedRelease)
+    {
+        status = "up-to-date";
+    }
+
+    std::ostringstream json;
+    json << "{\"status\":" << JsonUtf8String(status)
+         << ",\"installedVersion\":" << JsonUtf8String(result.installedVersion)
+         << ",\"diagnostic\":" << JsonUtf8String(result.diagnostic);
+    if (result.update)
+    {
+        const auto& update = *result.update;
+        json << ",\"update\":{\"version\":" << JsonUtf8String(update.version)
+             << ",\"tag\":" << JsonUtf8String(update.tag)
+             << ",\"title\":" << JsonUtf8String(update.title)
+             << ",\"notes\":" << JsonUtf8String(update.notes)
+             << ",\"releasePageUrl\":" << JsonUtf8String(update.releasePageUrl)
+             << ",\"prerelease\":" << (update.prerelease ? "true" : "false") << '}';
+    }
+    json << '}';
+    return NewUtf8ByteArray(env, json.str());
+}
 
 extern "C" JNIEXPORT jstring JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_getTextReport(JNIEnv* env, jclass)

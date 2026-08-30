@@ -1,0 +1,26 @@
+{
+  "source": "right-gauntlet-hilt-5k.glb",
+  "runtimeSource": "right-gauntlet-5k-stripped.glb",
+  "baseColourImage": "",
+  "removedCyanFaces": 768,
+  "removedCyanTriangles": 768,
+  "removedDebrisVertices": 9,
+  "gripOrigin": [
+    -0.4031010781400442,
+    -0.13307665203943106,
+    0.017481967283695322
+  ],
+  "gripAxis": [
+    0.08846598071612699,
+    0.09239557754780603,
+    0.9917846679121136
+  ],
+  "gripAxisPrincipalVariance": 0.36480916757061277,
+  "remainingTriangles": 4419,
+  "remainingVertices": 2317,
+  "componentVertexCounts": [
+    2317
+  ],
+  "boundaryEdges": 384,
+  "processing": "UV-sampled bright-cyan training-hilt removal; coincident source vertices welded; <=8-vertex detached debris islands removed; rigid glove PBR and authored grip silhouette retained"
+}

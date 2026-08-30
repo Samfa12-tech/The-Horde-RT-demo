@@ -124,10 +124,12 @@ inline bool StageDevelopmentCheckpointSimulation(
         const PlayerCombatSnapshot& after = gameSimulation.Snapshot().playerCombat;
         const bool reachedDownward =
             checkpoint.combatPose == DevelopmentCombatPose::DownwardCutActive &&
-            after.action == PlayerCombatAction::SwingActive && after.actionTime >= 0.07f;
+            after.action == PlayerCombatAction::SwingActive &&
+            after.actionTime >= SwordCombat::kSwingActiveDuration - 0.025f;
         const bool reachedUpward =
             checkpoint.combatPose == DevelopmentCombatPose::UpwardSliceActive &&
-            after.action == PlayerCombatAction::UpwardSliceActive && after.actionTime >= 0.07f;
+            after.action == PlayerCombatAction::UpwardSliceActive &&
+            after.actionTime >= SwordCombat::kUpwardSliceActiveDuration - 0.025f;
         if (reachedDownward || reachedUpward)
             return finalize(true);
     }

@@ -11,7 +11,7 @@ Add-Type -AssemblyName System.IO.Compression
 $requiredAttributionMarkers = @(
     "Production Gothic arming sword created with Meshy; runtime processing by Samfa12/Codex.",
     "Production medieval hand torch created with Meshy; runtime processing by Samfa12/Codex.",
-    "Historical-Gothic traveller/fighter created with Meshy; runtime processing and animation integration by Samfa12/Codex.",
+    "Historical-Gothic traveller/fighter and viewmodel gauntlets created with Meshy; runtime processing and animation integration by Samfa12/Codex.",
     "Production Gothic reward chest created with Meshy; runtime processing by Samfa12/Codex.",
     "Production Gothic reward lantern created with Meshy; runtime processing by Samfa12/Codex.",
     "01a03b99-8999-7adc-8590-536691aacb87",

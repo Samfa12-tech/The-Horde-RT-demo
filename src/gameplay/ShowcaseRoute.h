@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <cmath>
 #include <cstddef>
 
 namespace horde::gameplay
@@ -9,6 +10,10 @@ namespace horde::gameplay
 // World-space vertical authority for the authored showcase route. Gameplay
 // placement and renderer geometry both consume this neutral route contract.
 inline constexpr float kRouteFloorWorldY = -0.95f;
+// The 1.8 m runtime player is boot-grounded on the route floor. Keep the
+// camera at an anatomical 1.65 m eye height instead of the former 1.53 m
+// shoulder-height placement that put the primary camera inside the torso.
+inline constexpr float kShowcaseEyeWorldY = 0.70f;
 
 struct RoutePosition
 {
@@ -51,7 +56,17 @@ inline constexpr std::array<RoutePosition, 4> kTorchBayCenters{{
 }};
 inline constexpr RoutePosition kTransmissionThresholdCenter{-29.5f, -15.2f};
 inline constexpr RoutePosition kFinaleCenter{-33.7f, -15.2f};
-inline constexpr RoutePosition kRewardChestRoutePosition{-12.50f, -15.42f};
+// The reward is staged against the rear wall of the lich/finale room, clear of
+// the combat centre and with a walkable 1.30 m interaction stand-off to its
+// east. The production chest's audited 1.02 x 0.654 m base is rotated by
+// the shared renderer stage transform, so this conservative world AABB covers
+// the complete base rather than only its origin.
+inline constexpr RoutePosition kRewardChestRoutePosition{-35.30f, -17.55f};
+inline constexpr RouteRect kRewardChestCollisionRect{
+    kRewardChestRoutePosition.x - 0.53f,
+    kRewardChestRoutePosition.x + 0.58f,
+    kRewardChestRoutePosition.z - 0.61f,
+    kRewardChestRoutePosition.z + 0.64f};
 
 // Geometry-space bounds. Collision applies the player radius to their union,
 // including radius-safe portals where two rectangles meet edge-to-edge.
@@ -69,6 +84,9 @@ inline constexpr std::array<RouteRect, 9> kShowcaseWalkableRects{{
 
 // The gallery and arch posts are retained from the original chamber. The two
 // far-wall returns enforce the framed 1.8 m doorway at z=-6.4.
+// Static masonry/acoustic obstacles. The reward chest remains a separate
+// physical collider because positional sound emitted from its centre must not
+// be classified as crossing a wall.
 inline constexpr std::array<RouteRect, 5> kShowcaseSolidObstacles{{
     {-10.0f, -0.72f, 0.05f, 2.35f},
     {-1.20f, -0.78f, -3.55f, -3.25f},
@@ -80,6 +98,48 @@ inline constexpr std::array<RouteRect, 5> kShowcaseSolidObstacles{{
 constexpr bool Contains(const RouteRect& rect, float x, float z)
 {
     return x >= rect.minX && x <= rect.maxX && z >= rect.minZ && z <= rect.maxZ;
+}
+
+constexpr bool ContainsWithClearance(const RouteRect& rect,
+                                     float x,
+                                     float z,
+                                     float clearance)
+{
+    return x >= rect.minX - clearance && x <= rect.maxX + clearance &&
+           z >= rect.minZ - clearance && z <= rect.maxZ + clearance;
+}
+
+inline void ResolveMovementAgainstRect(const RouteRect& rect,
+                                       float clearance,
+                                       float previousX,
+                                       float previousZ,
+                                       float& proposedX,
+                                       float& proposedZ)
+{
+    if (!ContainsWithClearance(rect, proposedX, proposedZ, clearance))
+    {
+        return;
+    }
+
+    const bool xOnlyFree =
+        !ContainsWithClearance(rect, proposedX, previousZ, clearance);
+    const bool zOnlyFree =
+        !ContainsWithClearance(rect, previousX, proposedZ, clearance);
+    if (xOnlyFree && (!zOnlyFree ||
+                      std::abs(proposedX - previousX) >=
+                          std::abs(proposedZ - previousZ)))
+    {
+        proposedZ = previousZ;
+    }
+    else if (zOnlyFree)
+    {
+        proposedX = previousX;
+    }
+    else
+    {
+        proposedX = previousX;
+        proposedZ = previousZ;
+    }
 }
 
 constexpr ShowcaseZone QueryShowcaseZone(float x, float z)

@@ -56,6 +56,9 @@
 #include "gameplay/SwordCombat.h"
 #include "gameplay/simulation/GameSimulation.h"
 #include "platform/windows/DesktopControllerInput.h"
+#include "platform/windows/WindowsCaptureContracts.h"
+#include "platform/windows/WindowsInteractionPrompt.h"
+#include "platform/windows/WindowsGitHubReleaseUpdate.h"
 #include "platform/windows/WindowsRtLabState.h"
 #include "vulkan/GpuFrameTimer.h"
 #include "vulkan/RtCapabilityReport.h"
@@ -149,6 +152,7 @@ constexpr int kRtLabGlassIorLabelId = 157;
 constexpr int kRtLabGlassIorSliderId = 158;
 constexpr int kRtLabGlassRoughnessLabelId = 159;
 constexpr int kRtLabGlassRoughnessSliderId = 160;
+constexpr int kChestPromptControlId = 161;
 constexpr int kMenuPauseId = 2001;
 constexpr int kMenuRestartId = 2002;
 constexpr int kMenuExitId = 2003;
@@ -162,6 +166,7 @@ constexpr int kMenuDiagnosticsId = 2021;
 constexpr int kMenuAboutId = 2022;
 constexpr int kMenuCreditsId = 2023;
 constexpr int kMenuDeveloperOverlayId = 2024;
+constexpr int kMenuCheckUpdatesId = 2025;
 constexpr int kAppIconId = 1;
 constexpr UINT kDefaultDpi = 96u;
 constexpr char kUiFontProperty[] = "HordeLanternRtUiFont";
@@ -352,6 +357,7 @@ struct VulkanSurfaceContext
 bool WriteReportFile(const std::filesystem::path& path, const std::string& data);
 void ClearDesktopInput(VulkanSurfaceContext& context);
 void UpdateVitalityHud(VulkanSurfaceContext& context);
+void UpdateChestPrompt(VulkanSurfaceContext& context);
 int ScaleForDpi(HWND window, int logicalPixels);
 void LayoutOverlayControls(HWND window, int width, int height);
 std::string WindowSafeText(const std::string& value);
@@ -1173,7 +1179,8 @@ void UpdateWaterfallAmbience(const VulkanSurfaceContext& context)
 void PlayPositionalSoundEffect(const VulkanSurfaceContext& context,
                                const char* filename,
                                float mixGain,
-                               const horde::gameplay::simulation::GameplayEvent& event)
+                               const horde::gameplay::simulation::GameplayEvent& event,
+                               const char* collection = "filmcow")
 {
     if (!context.sfxEnabled)
     {
@@ -1186,7 +1193,7 @@ void PlayPositionalSoundEffect(const VulkanSurfaceContext& context,
     {
         return;
     }
-    const std::filesystem::path path = ResolveAssetRoot() / "audio/filmcow" / filename;
+    const std::filesystem::path path = ResolveAssetRoot() / "audio" / collection / filename;
     if (std::filesystem::exists(path))
     {
         if (!PlayXAudioFile(path, gains.left, gains.right))
@@ -1266,6 +1273,18 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
             break;
         case GameplayEventType::LichDefeated:
             PlayPositionalSoundEffect(context, "lich_fall.wav", 0.36f, event);
+            break;
+        case GameplayEventType::ChestUnlocked:
+            PlayPositionalSoundEffect(context, "chest_unlock.wav", 0.82f, event,
+                                      "pixabay");
+            break;
+        case GameplayEventType::ChestOpened:
+            PlayPositionalSoundEffect(context, "chest_open.wav", 1.0f, event,
+                                      "pixabay");
+            break;
+        case GameplayEventType::TorchExtinguished:
+            PlayPositionalSoundEffect(context, "torch_extinguish.wav", 0.78f,
+                                      event, "pixabay");
             break;
         case GameplayEventType::PlayerDamaged:
             UpdateVitalityHud(context);
@@ -1460,6 +1479,35 @@ void UpdateVitalityHud(VulkanSurfaceContext& context)
     }
 }
 
+void UpdateChestPrompt(VulkanSurfaceContext& context)
+{
+    HWND promptControl = GetDlgItem(context.windowHandle, kChestPromptControlId);
+    if (promptControl == nullptr)
+    {
+        return;
+    }
+    const std::string_view text = horde::platform::windows::WindowsChestPromptText(
+        context.simulation.Snapshot().chestPrompt);
+    const bool visible = horde::platform::windows::ShouldShowWindowsChestPrompt(
+        context.simulation.Snapshot().chestPrompt,
+        {.simulationPaused = context.simulationPaused,
+         .pauseMenuVisible = context.pauseMenuVisible,
+         .settingsVisible = context.settingsVisible,
+         .diagnosticsVisible = context.diagnosticsVisible,
+         .benchmarkReportVisible = context.benchmarkReportVisible,
+         .rtLabVisible = context.rtLabVisible,
+         .deathOverlayVisible = context.deathOverlayVisible,
+         .endingOverlayVisible = context.endingOverlayVisible,
+         .benchmarkRunning = context.benchmark.IsRunning(),
+         .captureMode = GetPropA(context.windowHandle, kCaptureModeProperty) != nullptr});
+    if (visible)
+    {
+        SetWindowTextA(promptControl, std::string(text).c_str());
+        InvalidateRect(promptControl, nullptr, TRUE);
+    }
+    ShowWindow(promptControl, visible ? SW_SHOWNA : SW_HIDE);
+}
+
 bool IsPlayerDamageEnabled(const VulkanSurfaceContext& context)
 {
     return !context.simulationPaused &&
@@ -1561,6 +1609,10 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
     {
         ClearDesktopInput(context);
     }
+    // Overlay transitions are synchronous. Re-evaluate here so a chest prompt
+    // cannot survive for one rendered frame beneath pause, death, finale, lab,
+    // diagnostics, benchmark, settings, or capture UI.
+    UpdateChestPrompt(context);
     if (HMENU menu = GetMenu(context.windowHandle))
     {
         ModifyMenuA(menu, kMenuPauseId, MF_BYCOMMAND | MF_STRING, kMenuPauseId,
@@ -3542,6 +3594,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         UpdateWaterfallAmbience(ctx);
         const horde::gameplay::simulation::SimulationSnapshot& simulation =
             ctx.simulation.Snapshot();
+        UpdateChestPrompt(ctx);
         if (simulation.playerVitals.phase == horde::gameplay::PlayerLifePhase::Dead)
         {
             ShowDeathMenu(ctx);
@@ -3555,9 +3608,9 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         horde::vulkan::raytracing::RtSceneFrameInputs frameInputs =
             horde::vulkan::raytracing::BuildRtSceneFrameInputs(
                 simulation, ctx.outputExposure, ctx.waterQuality, ctx.rtSceneTuning);
-        // Development-only player/glass proofs share the skinned route because
-        // the generic fixture owns procedural slot 5. Authored captures retain
-        // the established procedural phone-safe fallback.
+        // Player-body checkpoints remain a deliberate skinned-route A/B proof.
+        // Ordinary gameplay, reward/glass proofs, and player-fallback captures
+        // use the production hybrid block-primary route selected below.
         const horde::gameplay::DevelopmentCheckpoint* development =
             horde::gameplay::FindDevelopmentCheckpoint(ctx.developmentCheckpoint);
         const bool usesGlassFixture =
@@ -3565,10 +3618,11 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         const bool usesProductionRewardProps =
             development != nullptr && development->usesProductionRewardProps;
         frameInputs.playerRenderRoute =
-            (ctx.developmentCheckpoint.starts_with("player-body-") || usesGlassFixture ||
-             usesProductionRewardProps)
+            ctx.developmentCheckpoint.starts_with("player-body-")
             ? horde::vulkan::raytracing::PlayerRenderRoute::Skinned
-            : horde::vulkan::raytracing::PlayerRenderRoute::Procedural;
+            : ((usesGlassFixture || usesProductionRewardProps)
+                ? horde::vulkan::raytracing::PlayerRenderRoute::HybridBlockPrimary
+                : horde::vulkan::raytracing::PlayerRenderRoute::Procedural);
         if (usesGlassFixture)
         {
             frameInputs.tuning.glassFixtureVisible = true;
@@ -4118,33 +4172,55 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         record.frameTimesMs = std::move(frameTimesMs);
         const auto* development = horde::gameplay::FindDevelopmentCheckpoint(
             context.developmentCheckpoint);
-        const bool claimedRewardCapture = development != nullptr &&
-            development->rewardPose != horde::gameplay::DevelopmentRewardPose::None;
+        const bool simulationRewardClaimed =
+            simulation.interaction.heldLightKind ==
+                horde::gameplay::interactions::HeldLightKind::RewardLantern;
+        const bool claimedRewardCapture = simulationRewardClaimed ||
+            (development != nullptr &&
+             development->rewardPose !=
+                 horde::gameplay::DevelopmentRewardPose::None);
+        const auto claimedRewardPixelPolicy =
+            horde::platform::windows::ClaimedRewardCapturePolicy(checkpoint.name);
         if (context.developmentCheckpoint.empty() &&
+            !simulationRewardClaimed &&
             (record.instanceMasks[1] != 0x02u ||
              record.instanceMasks[3] != 0x02u ||
-             record.instanceMasks[4] != 0x14u ||
+             record.instanceMasks[4] != 0x10u ||
+             record.instanceMasks[10] != 0x04u ||
+             record.instanceMasks[11] != 0x04u ||
+             record.instanceMasks[12] != 0x04u ||
+             record.instanceMasks[13] != 0x04u ||
              !record.playerPrimaryVisible ||
              record.primaryPlayerPixels == 0u))
         {
             return fail(std::string("Checkpoint '") + checkpoint.name +
-                        "' masked the ordinary torch/sword/skinned-player production instances.");
+                        "' masked the ordinary torch/sword or hybrid block-primary player instances.");
         }
         if (checkpoint.name == "opening" &&
             (record.primaryTorchPixels == 0u ||
              record.primarySwordPixels == 0u ||
              record.primaryPlayerPixels == 0u))
         {
-            return fail("Opening capture lacks primary-visible skinned arms, torch, or sword (floating-prop regression).");
+            return fail("Opening capture lacks primary-visible block arms, torch, or sword (floating-prop regression).");
         }
         if (claimedRewardCapture &&
-            (record.instanceMasks[4] != 0x14u ||
+            (record.instanceMasks[4] != 0x10u ||
+             record.instanceMasks[10] != 0x04u ||
+             record.instanceMasks[11] != 0x04u ||
+             record.instanceMasks[12] != 0x04u ||
+             record.instanceMasks[13] != 0x04u ||
              !record.playerPrimaryVisible ||
              record.instanceMasks[7] != 0x01u ||
              record.instanceMasks[8] != 0x01u ||
-             record.primaryPlayerPixels == 0u ||
-             record.primaryRewardRingPixels == 0u ||
-             record.primaryRewardBodyPixels == 0u ||
+             record.primaryTorchPixels != 0u ||
+             (claimedRewardPixelPolicy.requirePlayerPixels &&
+              record.primaryPlayerPixels == 0u) ||
+             (claimedRewardPixelPolicy.requireRewardRingPixels &&
+              record.primaryRewardRingPixels == 0u) ||
+             (claimedRewardPixelPolicy.requireRewardBodyPixels &&
+              record.primaryRewardBodyPixels == 0u) ||
+             (claimedRewardPixelPolicy.requireSwordPixels &&
+              record.primarySwordPixels == 0u) ||
              record.rewardGripPositionErrorMetres >
                  horde::vulkan::raytracing::kPlayerGripSocketToleranceMetres ||
              record.rewardGripOrientationErrorRadians >
@@ -4158,7 +4234,11 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             reason << "Checkpoint '" << checkpoint.name
                    << "' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels="
                    << record.primaryPlayerPixels << "/" << record.primaryRewardRingPixels
-                   << "/" << record.primaryRewardBodyPixels << " grip="
+                   << "/" << record.primaryRewardBodyPixels << " sword/torch="
+                   << record.primarySwordPixels << "/"
+                   << record.primaryTorchPixels << " wall-retraction="
+                   << claimedRewardPixelPolicy.permitsCompleteWallRetraction
+                   << " grip="
                    << record.rewardGripPositionErrorMetres << "/"
                    << record.rewardGripOrientationErrorRadians << " authority="
                    << record.rewardAuthorityPositionErrorMetres << "/"
@@ -4308,6 +4388,8 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         if (captureDirectory == nullptr)
         {
             ApplyOverlayState(context);
+            horde::platform::windows::BeginGitHubReleaseUpdateCheck(
+                hWnd, HORDE_RT_DISPLAY_VERSION, false);
 #if defined(_DEBUG)
             if (context.rtLabDebugInjection) OpenRtLab(context);
             else
@@ -4564,7 +4646,7 @@ void ApplyDpiScaledFonts(HWND window)
         SendMessageA(developerOverlay, WM_SETFONT, reinterpret_cast<WPARAM>(developerFont), TRUE);
     }
 #endif
-    for (const int id : {kHudControlId, kVitalityHudControlId, kPauseTitleId, kEndingBodyId, kResumeButtonId, kRestartButtonId,
+    for (const int id : {kHudControlId, kVitalityHudControlId, kChestPromptControlId, kPauseTitleId, kEndingBodyId, kResumeButtonId, kRestartButtonId,
                          kControlsButtonId, kSettingsButtonId, kDiagnosticsButtonId, kRunBenchmarkButtonId,
                          kMoreBySamfa12ButtonId, kExitButtonId, kBenchmarkTitleId,
                          kBenchmarkCopyButtonId, kBenchmarkSaveButtonId, kBenchmarkBackButtonId,
@@ -4672,6 +4754,18 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
         const int vitalityWidth = ScaleForDpi(window, 190);
         MoveWindow(vitality, (width - vitalityWidth) / 2, ScaleForDpi(window, 52),
                    vitalityWidth, ScaleForDpi(window, 28), TRUE);
+    }
+    if (HWND prompt = GetDlgItem(window, kChestPromptControlId))
+    {
+        const int promptWidth = std::min(ScaleForDpi(window, 390),
+                                         std::max(ScaleForDpi(window, 250),
+                                                  width - ScaleForDpi(window, 48)));
+        MoveWindow(prompt,
+                   (width - promptWidth) / 2,
+                   height - ScaleForDpi(window, 94),
+                   promptWidth,
+                   ScaleForDpi(window, 34),
+                   TRUE);
     }
 #if defined(_DEBUG)
     if (HWND developerOverlay = GetDlgItem(window, kDeveloperOverlayId))
@@ -4879,7 +4973,7 @@ void ShowCredits(HWND window)
                 "Placeholder lich character created and animated with Meshy (CC0).\n"
                 "Production Gothic arming sword created with Meshy; runtime processing by Samfa12/Codex (CC BY 4.0).\n"
                 "Production medieval hand torch created with Meshy; runtime processing by Samfa12/Codex (CC BY 4.0).\n"
-                "Historical-Gothic traveller/fighter created with Meshy; runtime processing and animation integration by Samfa12/Codex (CC BY 4.0).\n"
+                "Historical-Gothic traveller/fighter and viewmodel gauntlets created with Meshy; runtime processing and animation integration by Samfa12/Codex (CC BY 4.0).\n"
                 "Production Gothic reward chest created with Meshy; runtime processing by Samfa12/Codex (CC BY 4.0).\n"
                 "Production Gothic reward lantern created with Meshy; runtime processing by Samfa12/Codex (CC BY 4.0).\n"
                 "Application icon created for this project with OpenAI image generation.\n\n"
@@ -4969,6 +5063,10 @@ void OpenSettings(VulkanSurfaceContext& context)
 LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     auto* sceneContext = reinterpret_cast<VulkanSurfaceContext*>(GetWindowLongPtrA(hWnd, GWLP_USERDATA));
+    if (horde::platform::windows::HandleGitHubReleaseUpdateMessage(hWnd, message, wParam))
+    {
+        return 0;
+    }
     switch (message)
     {
     case WM_MOUSEWHEEL:
@@ -5237,6 +5335,10 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 return 0;
             case kMenuCreditsId:
                 ShowCredits(hWnd);
+                return 0;
+            case kMenuCheckUpdatesId:
+                horde::platform::windows::BeginGitHubReleaseUpdateCheck(
+                    hWnd, HORDE_RT_DISPLAY_VERSION, true);
                 return 0;
             case kMoreBySamfa12ButtonId:
                 PlaySoundEffect(*sceneContext, "ui_select.wav");
@@ -5628,6 +5730,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         return reinterpret_cast<LRESULT>(brush);
     }
     case WM_DESTROY:
+        horde::platform::windows::CancelGitHubReleaseUpdateCheck(hWnd);
         if (sceneContext && sceneContext->controlsEnabled)
         {
             ClearDesktopInput(*sceneContext);
@@ -5669,6 +5772,8 @@ HMENU CreateApplicationMenu()
 #if defined(_DEBUG)
     AppendMenuA(help, MF_STRING, kMenuDeveloperOverlayId, "Live developer &overlay\tF3");
 #endif
+    AppendMenuA(help, MF_SEPARATOR, 0, nullptr);
+    AppendMenuA(help, MF_STRING, kMenuCheckUpdatesId, "Check for &updates...");
     AppendMenuA(help, MF_SEPARATOR, 0, nullptr);
     AppendMenuA(help, MF_STRING, kMenuCreditsId, "&Credits && licences");
     AppendMenuA(help, MF_STRING, kMenuAboutId, "&About");
@@ -5852,6 +5957,10 @@ int CreateAndShowWindow(const std::string& diagnosticText,
 
     createStatic(kHudControlId, kHudStartingText, SS_LEFT | SS_CENTERIMAGE);
     createStatic(kVitalityHudControlId, "VITALITY  3 / 3", SS_CENTER | SS_CENTERIMAGE);
+    if (HWND prompt = createStatic(kChestPromptControlId, "", SS_CENTER | SS_CENTERIMAGE))
+    {
+        ShowWindow(prompt, SW_HIDE);
+    }
 #if defined(_DEBUG)
     if (HWND developerOverlay = createStatic(kDeveloperOverlayId, "DEV OVERLAY STARTING...", SS_LEFT | SS_NOPREFIX))
     {

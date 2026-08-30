@@ -1,4 +1,5 @@
 #include "gameplay/items/HeldItemKinematics.h"
+#include "gameplay/ShowcaseRoute.h"
 #include "gameplay/items/HeldLightState.h"
 #include "gameplay/items/HeldItemState.h"
 #include "gameplay/interactions/InteractionState.h"
@@ -103,21 +104,34 @@ HeldItemTransform ExpectedHeldTorchFromFixedSnapshot(
     const float gait = snapshot.walkTime * 6.2f;
     const float sway = std::sin(gait) * 0.035f * movement;
     const float bob = std::abs(std::sin(gait)) * 0.025f * movement;
-    const float heldDepth = horde::gameplay::ComputeShowcaseHeldPropDepth(
-        snapshot.playerX, snapshot.playerZ,
-        std::sin(snapshot.playerYawRadians), -std::cos(snapshot.playerYawRadians));
-    const std::array<float, 3u> localHand{{-0.24f - sway, -0.40f + bob, heldDepth}};
-    const std::array<float, 3u> eye{{snapshot.playerX, 0.58f, snapshot.playerZ}};
+    const float forwardClearance =
+        horde::gameplay::items::ComputeRewardLanternForwardClearance(
+            snapshot.playerX, snapshot.playerZ,
+            std::sin(snapshot.playerYawRadians),
+            -std::cos(snapshot.playerYawRadians));
+    const float clearanceBlend = std::clamp(
+        (forwardClearance - 0.30f) / (2.70f - 0.30f), 0.0f, 1.0f);
+    const float heldDepth = 0.30f + (0.68f - 0.30f) * clearanceBlend;
+    const std::array<float, 3u> localHand{{
+        -0.12f - sway, -0.41f + bob, heldDepth}};
+    const std::array<float, 3u> eye{{
+        snapshot.playerX, horde::gameplay::kShowcaseEyeWorldY,
+        snapshot.playerZ}};
     const auto hand = Add(Add(Add(eye, Scale(right, localHand[0])),
                               Scale(up, localHand[1])),
                           Scale(forward, localHand[2]));
-    const auto itemZ = Scale(forward, -1.0f);
+    constexpr float roll = 0.0f;
+    const auto itemX = Add(Scale(right, std::cos(roll)),
+                           Scale(forward, std::sin(roll)));
+    const auto itemY = up;
+    const auto itemZ = Add(Scale(right, std::sin(roll)),
+                           Scale(forward, -std::cos(roll)));
     const auto translation = Add(
-        Add(Add(hand, Scale(right, -itemFromGrip[12])),
-            Scale(up, -itemFromGrip[13])),
+        Add(Add(hand, Scale(itemX, -itemFromGrip[12])),
+            Scale(itemY, -itemFromGrip[13])),
         Scale(itemZ, -itemFromGrip[14]));
-    return {{right[0], right[1], right[2], 0.0f,
-             up[0], up[1], up[2], 0.0f,
+    return {{itemX[0], itemX[1], itemX[2], 0.0f,
+             itemY[0], itemY[1], itemY[2], 0.0f,
              itemZ[0], itemZ[1], itemZ[2], 0.0f,
              translation[0], translation[1], translation[2], 1.0f}};
 }
@@ -258,7 +272,8 @@ void TestRealFixedTickTorchDetachIsIndependentlyTransformContinuous()
     const HeldItemTransform expectedHeld = ExpectedHeldTorchFromFixedSnapshot(
         beforeRelease, grip->world);
     Check(std::abs(expectedHeld[12] - (-2.16f - 0.24f)) > 0.001f &&
-              std::abs(expectedHeld[13] - (0.58f - 0.40f)) > 0.001f,
+              std::abs(expectedHeld[13] -
+                       (horde::gameplay::kShowcaseEyeWorldY - 0.34f)) > 0.001f,
           "the independent pre-release fixture must contain real pitch plus sway/bob");
     Check(TransformNear(beforeRelease.heldItems[0].worldFromItem, expectedHeld),
           "shared fixed-step state must own the independently derived held torch matrix");
@@ -428,11 +443,11 @@ void TestSharedKinematicsOwnsWallDepthHandsAndSwordPose()
     input.walkTime = 0.0f;
     input.walkAmount = 0.0f;
     const auto idle = horde::gameplay::items::EvaluateHeldItemKinematics(input);
-    Check(Near(idle.heldPropDepth, 0.975f) &&
-              Near(idle.leftHandLocal[0], -0.24f) && Near(idle.leftHandLocal[1], -0.40f) &&
+    Check(Near(idle.heldPropDepth, 0.68f) &&
+              Near(idle.leftHandLocal[0], -0.12f) && Near(idle.leftHandLocal[1], -0.41f) &&
               Near(idle.leftHandLocal[2], idle.heldPropDepth) &&
-              Near(idle.rightHandLocal[0], 0.25f) && Near(idle.rightHandLocal[1], -0.41f) &&
-              Near(idle.rightHandLocal[2], idle.heldPropDepth),
+              Near(idle.rightHandLocal[0], 0.12f) && Near(idle.rightHandLocal[1], -0.44f) &&
+              Near(idle.rightHandLocal[2], 0.77f),
           "shared kinematics must own the safe-frame wall-aware idle hand targets");
 
     input.torchFailure.leftArmLowerBlend = 1.0f;
@@ -466,12 +481,12 @@ void TestRewardLanternHighLowUsesSharedLeftArmTarget()
     input.interaction.heldLightPoseProgress = 0.5f;
     const auto midpoint = horde::gameplay::items::EvaluateHeldItemKinematics(input);
 
-    Check(high.leftHandLocal[0] < -0.04f && high.leftHandLocal[0] > -0.18f &&
-              low.leftHandLocal[0] < -0.04f && low.leftHandLocal[0] > -0.18f,
-          "reward high/low targets must preserve the accepted inward phone-arm placement");
-    Check(high.leftHandLocal[1] > 0.45f &&
-              low.leftHandLocal[1] <= high.leftHandLocal[1] - 0.22f &&
-              low.leftHandLocal[1] > 0.20f,
+    Check(high.leftHandLocal[0] < -0.12f && high.leftHandLocal[0] > -0.14f &&
+              low.leftHandLocal[0] < -0.12f && low.leftHandLocal[0] > -0.14f,
+          "reward high/low targets must stay inward while retaining the anatomical left side");
+    Check(high.leftHandLocal[1] > -0.08f &&
+              low.leftHandLocal[1] <= high.leftHandLocal[1] - 0.18f &&
+              low.leftHandLocal[1] > -0.26f,
           "reward high/low carry must visibly raise and lower the real left arm without using the failed-torch pose");
     for (std::size_t axis = 0u; axis < midpoint.leftHandLocal.size(); ++axis)
     {
@@ -479,64 +494,117 @@ void TestRewardLanternHighLowUsesSharedLeftArmTarget()
                    0.5f * (high.leftHandLocal[axis] + low.leftHandLocal[axis]), 0.0002f),
               "the 0.65 second high/low transition must remain continuous in shared kinematics");
     }
-    horde::gameplay::items::HeldItemKinematicsInput wallInput = input;
-    wallInput.cameraX = 0.0f;
+    horde::gameplay::items::HeldItemKinematicsInput guardedInput = input;
+    guardedInput.cameraX = 0.0f;
+    guardedInput.cameraZ = -9.70f;
+    guardedInput.cameraYawRadians = 0.0f;
+    guardedInput.interaction.heldLightPose = HeldLightPose::High;
+    const auto guardedHigh =
+        horde::gameplay::items::EvaluateHeldItemKinematics(guardedInput);
+    guardedInput.interaction.heldLightPose = HeldLightPose::Low;
+    const auto guardedLow =
+        horde::gameplay::items::EvaluateHeldItemKinematics(guardedInput);
+    horde::gameplay::items::HeldItemKinematicsInput wallInput = guardedInput;
     wallInput.cameraZ = -9.70f;
-    wallInput.cameraYawRadians = 0.0f;
-    const auto wall = horde::gameplay::items::EvaluateHeldItemKinematics(wallInput);
+    const auto wallLow =
+        horde::gameplay::items::EvaluateHeldItemKinematics(wallInput);
     wallInput.interaction.heldLightPose = HeldLightPose::High;
     const auto wallHigh =
-        horde::gameplay::items::EvaluateHeldItemKinematics(wallInput);
-    wallInput.interaction.heldLightPose = HeldLightPose::Low;
-    const auto wallLow =
         horde::gameplay::items::EvaluateHeldItemKinematics(wallInput);
     std::cout << "reward carry open held/high/low x="
               << high.heldPropDepth << '/' << high.leftHandLocal[2] << '/'
               << low.leftHandLocal[2] << '/' << high.leftHandLocal[0]
-              << " wall held/hand/x=" << wall.heldPropDepth << '/'
-              << wall.leftHandLocal[2] << '/' << wall.leftHandLocal[0] << '\n';
+              << " guard clearance/hand="
+              << horde::gameplay::items::ComputeRewardLanternForwardClearance(
+                     guardedInput.cameraX, guardedInput.cameraZ, 0.0f, -1.0f)
+              << '/' << guardedHigh.leftHandLocal[2]
+              << " emergency wall held/hand/x=" << wallHigh.heldPropDepth << '/'
+              << wallHigh.leftHandLocal[2] << '/' << wallHigh.leftHandLocal[0]
+              << '\n';
     Check(Near(high.heldPropDepth, low.heldPropDepth) &&
-              high.leftHandLocal[2] >= high.heldPropDepth + 1.10f &&
-              high.leftHandLocal[2] <= high.heldPropDepth + 1.25f &&
+              high.leftHandLocal[2] >= 1.03f &&
+              high.leftHandLocal[2] <= 1.05f &&
               std::abs(high.leftHandLocal[2] - low.leftHandLocal[2]) <= 0.002f &&
-              wall.leftHandLocal[2] >= 0.05f &&
-              wall.leftHandLocal[2] <= 0.08f &&
-              wall.leftHandLocal[0] <= -0.10f &&
-              wall.leftHandLocal[0] >= -0.14f &&
+              guardedHigh.leftHandLocal[2] >= 0.19f &&
+              guardedHigh.leftHandLocal[2] <= 0.21f &&
+              guardedHigh.leftHandLocal[2] == guardedLow.leftHandLocal[2] &&
+              guardedHigh.leftHandLocal[1] >= guardedLow.leftHandLocal[1] + 0.03f &&
+              wallHigh.leftHandLocal[2] >= 0.19f &&
+              wallHigh.leftHandLocal[2] <= 0.21f &&
+              wallHigh.leftHandLocal[0] <= -0.44f &&
+              wallHigh.leftHandLocal[0] >= -0.46f &&
               std::abs(high.rewardLanternPresentationYawRadians) <= 0.05f &&
-              wall.rewardLanternPresentationYawRadians >= 1.50f &&
-              wall.rewardLanternPresentationYawRadians <= 1.58f &&
-              wallHigh.leftHandLocal[1] >= wallLow.leftHandLocal[1] + 0.009f &&
+              guardedHigh.rewardLanternPresentationYawRadians >= 1.50f &&
+              guardedHigh.rewardLanternPresentationYawRadians <= 1.58f &&
+              wallHigh.rewardLanternPresentationYawRadians >= 1.50f &&
+              wallHigh.rewardLanternPresentationYawRadians <= 1.58f &&
+              wallHigh.leftHandLocal[1] >= wallLow.leftHandLocal[1] + 0.03f &&
               wallHigh.leftHandLocal[2] == wallLow.leftHandLocal[2] &&
-              wall.leftHandLocal[2] < low.leftHandLocal[2] - 1.50f,
-          "high/low carry must share the portrait-readable open advance and collapse to distinct wall-safe rotated targets");
+              wallHigh.leftShoulderLocal[2] >= 0.38f &&
+              wallHigh.leftShoulderLocal[2] <= 0.65f &&
+              high.leftShoulderLocal[2] <= 0.65f &&
+              wallHigh.rightShoulderLocal[2] <= 0.42f &&
+              high.rightShoulderLocal[2] <= 0.42f &&
+              wallHigh.leftHandLocal[2] < low.leftHandLocal[2] - 0.70f,
+          "reward carry must solve reach through only the left arm while both shoulders remain close to the ordinary anchored torso depth");
 
-    float previousDepth = high.leftHandLocal[2];
-    float previousLateral = high.leftHandLocal[0];
-    float previousPresentationYaw = high.rewardLanternPresentationYawRadians;
-    for (int step = 1; step <= 16; ++step)
+    auto approachInput = input;
+    approachInput.interaction.heldLightPose = HeldLightPose::High;
+    approachInput.interaction.heldLightPoseProgress = 1.0f;
+    approachInput.cameraX = 0.0f;
+    approachInput.cameraZ = -7.90f;
+    approachInput.cameraYawRadians = 0.0f;
+    const auto approachStart =
+        horde::gameplay::items::EvaluateHeldItemKinematics(approachInput);
+    float previousDepth = approachStart.leftHandLocal[2];
+    float previousLateral = approachStart.leftHandLocal[0];
+    float previousPresentationYaw =
+        approachStart.rewardLanternPresentationYawRadians;
+    float maximumClearanceDelta = 0.0f;
+    float maximumDepthDelta = 0.0f;
+    float maximumLateralDelta = 0.0f;
+    float maximumYawDelta = 0.0f;
+    float previousClearance =
+        horde::gameplay::items::ComputeRewardLanternForwardClearance(
+            approachInput.cameraX, approachInput.cameraZ, 0.0f, -1.0f);
+    for (int step = 1; step <= 1840; ++step)
     {
-        auto approachInput = input;
-        approachInput.interaction.heldLightPose = HeldLightPose::High;
-        approachInput.interaction.heldLightPoseProgress = 1.0f;
-        approachInput.cameraX = 0.0f;
-        approachInput.cameraZ = -8.50f - static_cast<float>(step) * 0.075f;
-        approachInput.cameraYawRadians = 0.0f;
+        approachInput.cameraZ = -7.90f - static_cast<float>(step) * 0.001f;
         const auto approach =
             horde::gameplay::items::EvaluateHeldItemKinematics(approachInput);
+        const float clearance =
+            horde::gameplay::items::ComputeRewardLanternForwardClearance(
+                approachInput.cameraX, approachInput.cameraZ, 0.0f, -1.0f);
+        maximumClearanceDelta = std::max(
+            maximumClearanceDelta, std::abs(clearance - previousClearance));
+        maximumDepthDelta = std::max(
+            maximumDepthDelta, std::abs(approach.leftHandLocal[2] - previousDepth));
+        maximumLateralDelta = std::max(
+            maximumLateralDelta, std::abs(approach.leftHandLocal[0] - previousLateral));
+        maximumYawDelta = std::max(
+            maximumYawDelta,
+            std::abs(approach.rewardLanternPresentationYawRadians -
+                     previousPresentationYaw));
         Check(approach.leftHandLocal[2] <= previousDepth + 0.0002f &&
-                  previousDepth - approach.leftHandLocal[2] <= 0.30f &&
+                  previousDepth - approach.leftHandLocal[2] <= 0.020f &&
                   approach.leftHandLocal[0] <= previousLateral + 0.0002f &&
-                  previousLateral - approach.leftHandLocal[0] <= 0.10f &&
+                  previousLateral - approach.leftHandLocal[0] <= 0.003f &&
                   approach.rewardLanternPresentationYawRadians >=
                       previousPresentationYaw - 0.0002f &&
                   approach.rewardLanternPresentationYawRadians -
-                      previousPresentationYaw <= 0.40f,
-              "collision-derived reward advance, lateral offset, and wall presentation must collapse monotonically without a carry pop");
+                      previousPresentationYaw <= 0.040f,
+              "one-millimetre wall approach phases must retract the reward pose continuously without a fixed-grid carry pop");
+        previousClearance = clearance;
         previousDepth = approach.leftHandLocal[2];
         previousLateral = approach.leftHandLocal[0];
         previousPresentationYaw = approach.rewardLanternPresentationYawRadians;
     }
+    std::cout << "reward one-millimetre wall sweep max clearance/depth/lateral/yaw delta="
+              << maximumClearanceDelta << '/' << maximumDepthDelta << '/'
+              << maximumLateralDelta << '/' << maximumYawDelta << '\n';
+    Check(maximumClearanceDelta <= 0.002f && maximumDepthDelta <= 0.020f &&
+              maximumLateralDelta <= 0.003f && maximumYawDelta <= 0.040f,
+          "reward collision distance and authored carry response must be continuous across every 1 mm wall phase");
 }
 
 void TestProductionSwordAssetMeetsGenericSocketAndPbrBudget()
@@ -652,12 +720,12 @@ void TestProductionAssetsShareOneGenericStaticSlot()
     const auto& metadata = slot.InstanceMetadata();
     Check(metadata[3].primitiveCount == sword.primitives.size() &&
               metadata[1].primitiveCount == torch.primitives.size() &&
-              metadata[4].primitiveCount == 3u &&
+              metadata[4].primitiveCount == 4u &&
               metadata[1].emitterIndex == 1u &&
               metadata[3].emitterIndex == 0u,
           "generic registrations must retain stable TLAS routes and engine-emitter ownership");
     const auto counts = slot.TextureArrayCounts();
-    Check(counts.baseColor == 3u && counts.normal == 3u && counts.orm == 3u &&
+    Check(counts.baseColor == 4u && counts.normal == 4u && counts.orm == 4u &&
               counts.emissive == 0u,
           "generic material routing must include the player in audited shared texture array layers");
 }

@@ -1,4 +1,6 @@
 #include "platform/windows/DesktopControllerInput.h"
+#include "platform/windows/WindowsCaptureContracts.h"
+#include "platform/windows/WindowsInteractionPrompt.h"
 #include "platform/windows/WindowsRtLabState.h"
 
 #include <cstdlib>
@@ -32,6 +34,8 @@ using horde::platform::windows::StepRtLabScroll;
 using horde::platform::windows::RtLabScrollAction;
 using horde::platform::windows::WrapRtLabFocus;
 using horde::platform::windows::ShouldPlayControllerMenuSound;
+using horde::platform::windows::WindowsChestPromptText;
+using horde::platform::windows::ClaimedRewardCapturePolicy;
 
 void Require(const bool condition, const std::string_view message)
 {
@@ -75,6 +79,40 @@ std::string ReadWindowsSource()
 
 int main()
 {
+    constexpr auto ordinaryLanternCapture =
+        ClaimedRewardCapturePolicy("lantern-held-high");
+    constexpr auto maximumWallCapture =
+        ClaimedRewardCapturePolicy("lantern-wall-high");
+    constexpr auto finaleRewardCapture =
+        ClaimedRewardCapturePolicy("finale-roof");
+    static_assert(ordinaryLanternCapture.requirePlayerPixels &&
+                  ordinaryLanternCapture.requireRewardBodyPixels &&
+                  !ordinaryLanternCapture.requireRewardRingPixels &&
+                  !ordinaryLanternCapture.requireSwordPixels &&
+                  !ordinaryLanternCapture.permitsCompleteWallRetraction);
+    static_assert(!maximumWallCapture.requirePlayerPixels &&
+                  !maximumWallCapture.requireRewardBodyPixels &&
+                  !maximumWallCapture.requireRewardRingPixels &&
+                  maximumWallCapture.requireSwordPixels &&
+                  maximumWallCapture.permitsCompleteWallRetraction);
+    static_assert(ClaimedRewardCapturePolicy("lantern-wall-low")
+                      .permitsCompleteWallRetraction);
+    static_assert(finaleRewardCapture.requirePlayerPixels &&
+                  finaleRewardCapture.requireRewardBodyPixels &&
+                  finaleRewardCapture.requireRewardRingPixels &&
+                  finaleRewardCapture.requireSwordPixels &&
+                  !finaleRewardCapture.permitsCompleteWallRetraction);
+
+    using horde::gameplay::interactions::ChestRewardPrompt;
+    Require(WindowsChestPromptText(ChestRewardPrompt::Locked) ==
+                "LOCKED | DEFEAT THE LICH" &&
+            WindowsChestPromptText(ChestRewardPrompt::OpenChest) ==
+                "PRESS E / A TO OPEN CHEST" &&
+            WindowsChestPromptText(ChestRewardPrompt::Opening) == "OPENING..." &&
+            WindowsChestPromptText(ChestRewardPrompt::ClaimLantern) ==
+                "PRESS E / A TO TAKE LANTERN" &&
+            WindowsChestPromptText(ChestRewardPrompt::None).empty(),
+            "Windows labels must map every shared chest prompt without owning gameplay state");
     Require(CanPersistRtLabUnlock({.finaleComplete = true}),
             "a genuine live finale completion must persist the RT Lab unlock");
     Require(!CanPersistRtLabUnlock({.finaleComplete = false}) &&
@@ -296,6 +334,34 @@ int main()
             labFunctionsBegin != std::string::npos && labFunctionsEnd != std::string::npos &&
             windowsSource.substr(labFunctionsBegin, labFunctionsEnd - labFunctionsBegin).find("PlaySoundEffect") == std::string::npos,
             "opening, adjusting, restoring, and closing the RT Lab must not add audio behavior");
+
+    using horde::gameplay::interactions::ChestRewardPrompt;
+    using horde::platform::windows::ShouldShowWindowsChestPrompt;
+    using horde::platform::windows::WindowsChestPromptVisibility;
+    Require(ShouldShowWindowsChestPrompt(ChestRewardPrompt::Locked, {}) &&
+                !ShouldShowWindowsChestPrompt(ChestRewardPrompt::None, {}),
+            "Windows chest prompt visibility requires a shared non-empty gameplay prompt");
+    for (const WindowsChestPromptVisibility suppressed : {
+             WindowsChestPromptVisibility{.simulationPaused = true},
+             WindowsChestPromptVisibility{.pauseMenuVisible = true},
+             WindowsChestPromptVisibility{.settingsVisible = true},
+             WindowsChestPromptVisibility{.diagnosticsVisible = true},
+             WindowsChestPromptVisibility{.benchmarkReportVisible = true},
+             WindowsChestPromptVisibility{.rtLabVisible = true},
+             WindowsChestPromptVisibility{.deathOverlayVisible = true},
+             WindowsChestPromptVisibility{.endingOverlayVisible = true},
+             WindowsChestPromptVisibility{.benchmarkRunning = true},
+             WindowsChestPromptVisibility{.captureMode = true}})
+    {
+        Require(!ShouldShowWindowsChestPrompt(ChestRewardPrompt::OpenChest, suppressed),
+                "pause, death, finale, lab, diagnostics, benchmark, settings, and capture UI must suppress the Windows chest prompt");
+    }
+    const std::size_t overlayStateBegin = windowsSource.find("void ApplyOverlayState(");
+    const std::size_t overlayStateEnd = windowsSource.find("void ShowPauseMenu(", overlayStateBegin);
+    Require(overlayStateBegin != std::string::npos && overlayStateEnd != std::string::npos &&
+                windowsSource.substr(overlayStateBegin, overlayStateEnd - overlayStateBegin)
+                        .find("UpdateChestPrompt(context);") != std::string::npos,
+            "synchronous Windows overlay transitions must hide the chest prompt without waiting for another rendered frame");
 
     ControllerTriggerLatch triggerLatch{};
     const ControllerActionEdges firstTriggers = UpdateXInputTriggerEdges(0u, 255u, triggerLatch);

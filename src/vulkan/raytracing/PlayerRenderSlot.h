@@ -15,11 +15,17 @@ namespace horde::vulkan::raytracing
 
 inline constexpr float kPlayerGripSocketToleranceMetres = 0.015f;
 inline constexpr float kPlayerGripOrientationToleranceRadians = 0.02f;
+inline constexpr float kPlayerBootGroundingSafetyMetres = 0.00025f;
 
 enum class PlayerRenderRoute : std::uint8_t
 {
     Procedural,
     Skinned,
+    // Stable first-person fallback: the skinned character remains available to
+    // reflection/shadow rays, while four procedural arm segments own the
+    // primary-camera view. This keeps the authored rig/socket authority without
+    // presenting the deferred hand mesh in the player's view.
+    HybridBlockPrimary,
 };
 
 struct PlayerRouteMasks
@@ -28,6 +34,30 @@ struct PlayerRouteMasks
 };
 
 PlayerRouteMasks BuildPlayerRouteMasks(PlayerRenderRoute route);
+
+// The imported player is authored +Z forward with anatomical Left on +X.
+// Facing the gameplay -Z direction therefore requires a 180-degree Y rotation:
+// model +X maps to gameplay left, not a reflection through the Z plane.
+struct PlayerModelWorldBasis
+{
+    std::array<float, 3u> modelXInWorld{};
+    std::array<float, 3u> modelYInWorld{{0.0f, 1.0f, 0.0f}};
+    std::array<float, 3u> modelZInWorld{};
+};
+
+PlayerModelWorldBasis BuildPlayerModelWorldBasis(
+    const std::array<float, 3u>& gameplayRightInWorld,
+    const std::array<float, 3u>& gameplayForwardInWorld);
+
+std::array<float, 3u> PlayerModelVectorToWorld(
+    const PlayerModelWorldBasis& basis,
+    const std::array<float, 3u>& modelVector);
+
+std::array<float, 3u> WorldVectorToPlayerModel(
+    const PlayerModelWorldBasis& basis,
+    const std::array<float, 3u>& worldVector);
+
+float PlayerModelWorldBasisDeterminant(const PlayerModelWorldBasis& basis);
 
 struct ProductionSceneVisibilityInput
 {
@@ -51,6 +81,17 @@ struct ProductionSceneVisibility
 
 ProductionSceneVisibility BuildProductionSceneVisibility(
     const ProductionSceneVisibilityInput& input);
+
+// The torso is a stable player-space frame, not the midpoint of two IK
+// effectors. A raised or retracted one-handed prop may move one clavicle, but
+// must never drag the complete skinned body toward the camera.
+std::array<float, 3u> EvaluatePlayerTorsoAnchorLocal(
+    const horde::gameplay::animation::PlayerAnimationSnapshot& animation);
+
+std::array<float, 3u> GroundPlayerRootOnRouteFloor(
+    const std::array<float, 3u>& shoulderAnchoredRootWorld,
+    float routeFloorWorldY,
+    float assetGroundingOffsetMetres);
 
 enum class PlayerPrimitiveSemantic : std::uint8_t
 {
@@ -162,15 +203,21 @@ public:
                         std::string& diagnostic) const;
     bool ResolveHeldItemVisuals(
         const horde::gameplay::items::HeldItemStates& authoritativeItems,
-        const horde::gameplay::items::HeldItemTransform& worldFromLeftHandBone,
-        const horde::gameplay::items::HeldItemTransform& worldFromRightHandBone,
+        const horde::gameplay::items::HeldItemTransform& worldFromLeftGrip,
+        const horde::gameplay::items::HeldItemTransform& worldFromRightGrip,
         horde::gameplay::items::HeldItemStates& renderItems,
         std::string& diagnostic);
+    float BootGroundingOffsetMetres(
+        const horde::gameplay::animation::PlayerAnimationSnapshot& animation) const;
 
     bool IsLoaded() const { return asset_.IsLoaded(); }
     const std::vector<horde::scene::TexturedSkinnedRtVertex>& UniqueVertices() const
     {
         return uniqueVertices_;
+    }
+    const std::vector<horde::scene::SkinnedPbrTangent>& UniqueTangents() const
+    {
+        return uniqueTangents_;
     }
     const horde::scene::SkinnedPlayerSockets& BoneSockets() const { return sockets_; }
     float LeftSocketErrorMetres() const { return leftSocketErrorMetres_; }
@@ -183,33 +230,28 @@ public:
     }
 
 private:
-    bool DeriveStableRestGripBases(std::string& diagnostic);
+    bool DeriveAssetGripSockets(std::string& diagnostic);
+    bool BuildBootGroundingProfiles(std::string& diagnostic);
 
     horde::scene::SkinnedMeshAsset asset_;
     std::vector<horde::scene::TexturedSkinnedRtVertex> uniqueVertices_;
+    std::vector<horde::scene::SkinnedPbrTangent> uniqueTangents_;
     horde::scene::SkinnedPlayerSockets sockets_{};
     std::uint64_t lastSkinnedTick_ = std::numeric_limits<std::uint64_t>::max();
     horde::gameplay::animation::PlayerAnimationSnapshot lastPreparedAnimation_{};
     bool hasLastPreparedAnimation_ = false;
     float leftSocketErrorMetres_ = 0.0f;
     float rightSocketErrorMetres_ = 0.0f;
-    horde::gameplay::items::HeldItemTransform leftBoneFromGripSocket_ =
+    horde::gameplay::items::HeldItemTransform leftHandFromGripSocket_ =
         horde::gameplay::items::IdentityHeldItemTransform();
-    horde::gameplay::items::HeldItemTransform rightBoneFromGripSocket_ =
-        horde::gameplay::items::IdentityHeldItemTransform();
-    horde::gameplay::items::HeldItemTransform leftRestHandOrientation_ =
-        horde::gameplay::items::IdentityHeldItemTransform();
-    horde::gameplay::items::HeldItemTransform rightRestHandOrientation_ =
-        horde::gameplay::items::IdentityHeldItemTransform();
-    horde::gameplay::items::HeldItemTransform leftRestGripBasisInPlayer_ =
-        horde::gameplay::items::IdentityHeldItemTransform();
-    horde::gameplay::items::HeldItemTransform rightRestGripBasisInPlayer_ =
+    horde::gameplay::items::HeldItemTransform rightHandFromGripSocket_ =
         horde::gameplay::items::IdentityHeldItemTransform();
     PlayerGripAgreement leftGripAgreement_{};
     PlayerGripAgreement rightGripAgreement_{};
     horde::gameplay::items::HeldItemTransform finalWorldFromLeftGrip_ =
         horde::gameplay::items::IdentityHeldItemTransform();
     bool stableGripBasesReady_ = false;
+    bool bootGroundingProfilesReady_ = false;
 };
 
 } // namespace horde::vulkan::raytracing

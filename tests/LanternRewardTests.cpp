@@ -63,8 +63,15 @@ int main()
               static_cast<std::uint8_t>(GameplayEventType::PlayerParrySucceeded) == 12u &&
               static_cast<std::uint8_t>(GameplayEventType::ChestUnlocked) == 13u &&
               static_cast<std::uint8_t>(GameplayEventType::ChestOpened) == 14u &&
-              static_cast<std::uint8_t>(GameplayEventType::LanternClaimed) == 15u,
+              static_cast<std::uint8_t>(GameplayEventType::LanternClaimed) == 15u &&
+              static_cast<std::uint8_t>(GameplayEventType::TorchExtinguished) == 16u,
           "reward entity/event values must append without renumbering stable transport IDs");
+    Check(static_cast<std::uint8_t>(ChestRewardPrompt::None) == 0u &&
+              static_cast<std::uint8_t>(ChestRewardPrompt::Locked) == 1u &&
+              static_cast<std::uint8_t>(ChestRewardPrompt::OpenChest) == 2u &&
+              static_cast<std::uint8_t>(ChestRewardPrompt::Opening) == 3u &&
+              static_cast<std::uint8_t>(ChestRewardPrompt::ClaimLantern) == 4u,
+          "shared chest prompt values must retain the compact Android UI ABI");
 
     InputSnapshot publication;
     publication.commands.attack = 7u;
@@ -84,11 +91,19 @@ int main()
     ChestRewardSequence chest;
     Check(chest.Snapshot().phase == ChestRewardPhase::Locked,
           "the route-local chest must begin locked");
+    Check(chest.QueryPrompt(ValidChestQuery()) == ChestRewardPrompt::Locked,
+          "a nearby locked chest must publish a defeat-the-lich prompt");
+    InteractionQuery promptTooFar = ValidChestQuery();
+    promptTooFar.playerX += 0.051f;
+    Check(chest.QueryPrompt(promptTooFar) == ChestRewardPrompt::None,
+          "the chest prompt must hide outside the shared interaction range");
     Check(chest.TryInteract(ValidChestQuery()) == ChestRewardAction::None,
           "an interact edge before unlock must be rejected without changing phase");
     Check(chest.Unlock() && !chest.Unlock() &&
               chest.Snapshot().phase == ChestRewardPhase::ClosedUnlocked,
           "lich defeat must unlock the chest exactly once");
+    Check(chest.QueryPrompt(ValidChestQuery()) == ChestRewardPrompt::OpenChest,
+          "an unlocked nearby chest must publish the open prompt");
 
     InteractionQuery tooFar = ValidChestQuery();
     tooFar.playerX += 0.051f;
@@ -96,12 +111,16 @@ int main()
           "interaction beyond 1.35 metres must be rejected");
     InteractionQuery facingAway = ValidChestQuery();
     facingAway.playerYawRadians = 1.57079632679f;
+    Check(chest.QueryPrompt(facingAway) == ChestRewardPrompt::None,
+          "the chest prompt must hide outside the shared facing cone");
     Check(chest.TryInteract(facingAway) == ChestRewardAction::None,
           "interaction outside the 55 degree facing cone must be rejected");
 
     Check(chest.TryInteract(ValidChestQuery()) == ChestRewardAction::OpeningStarted &&
               chest.Snapshot().phase == ChestRewardPhase::Opening,
           "the first valid post-unlock edge must begin the one opening transition");
+    Check(chest.QueryPrompt(ValidChestQuery()) == ChestRewardPrompt::Opening,
+          "the opening chest must replace the button prompt with progress feedback");
     Check(chest.TryInteract(ValidChestQuery()) == ChestRewardAction::None,
           "an interact edge during opening must be consumed without buffering a claim");
     chest.Update(1.19f);
@@ -113,10 +132,14 @@ int main()
     Check(chest.Snapshot().phase == ChestRewardPhase::LanternAvailable &&
               NearlyEqual(chest.Snapshot().lidOpenProgress, 1.0f),
           "the reward must become available exactly when the lid reaches its target");
+    Check(chest.QueryPrompt(ValidChestQuery()) == ChestRewardPrompt::ClaimLantern,
+          "an exposed reward must publish the claim-lantern prompt");
     Check(chest.TryInteract(ValidChestQuery()) == ChestRewardAction::LanternClaimed &&
               chest.Snapshot().phase == ChestRewardPhase::LanternClaimed &&
               chest.TryInteract(ValidChestQuery()) == ChestRewardAction::None,
           "the second post-open edge must claim the reward exactly once");
+    Check(chest.QueryPrompt(ValidChestQuery()) == ChestRewardPrompt::None,
+          "the chest prompt must hide after the lantern is claimed");
 
     InteractionState interaction;
     EquipRewardLantern(interaction);
@@ -177,6 +200,33 @@ int main()
     defeatedFinale.phase = FinaleSequencePhase::LichFalling;
     defeatedFinale.endingPhase = FinaleEndingPhase::LichFalling;
     defeatedFinale.lichDefeated = true;
+
+    const InteractionQuery promptQuery = ValidChestQuery();
+    horde::gameplay::simulation::GameSimulationConfig promptConfig;
+    promptConfig.playerStartX = promptQuery.playerX;
+    promptConfig.playerStartZ = promptQuery.playerZ;
+    promptConfig.playerStartYawRadians = promptQuery.playerYawRadians;
+    GameSimulation promptSimulation(promptConfig);
+    Check(promptSimulation.Snapshot().chestPrompt == ChestRewardPrompt::Locked,
+          "the immutable simulation snapshot must publish the nearby locked prompt");
+    promptSimulation.ImportRewardCheckpoint(unlockedChest, noTorch, defeatedFinale);
+    Check(promptSimulation.Snapshot().chestPrompt == ChestRewardPrompt::OpenChest,
+          "the immutable simulation snapshot must publish the unlocked action prompt");
+
+    GameSimulation lockedEdgeSimulation(promptConfig);
+    InputSnapshot lockedEdgeInput;
+    lockedEdgeInput.damageEnabled = false;
+    lockedEdgeInput.commands.interact = 1u;
+    lockedEdgeSimulation.StepFixed(lockedEdgeInput);
+    Check(lockedEdgeSimulation.Snapshot().lastConsumedInteractSequence == 1u &&
+              lockedEdgeSimulation.Snapshot().chestReward.phase == ChestRewardPhase::Locked &&
+              CountEvents(lockedEdgeSimulation, GameplayEventType::ChestOpened) == 0u,
+          "a locked interact edge must be consumed without opening or buffering");
+    lockedEdgeSimulation.ImportRewardCheckpoint(unlockedChest, noTorch, defeatedFinale);
+    lockedEdgeSimulation.StepFixed(lockedEdgeInput);
+    Check(lockedEdgeSimulation.Snapshot().chestReward.phase == ChestRewardPhase::ClosedUnlocked &&
+              CountEvents(lockedEdgeSimulation, GameplayEventType::ChestOpened) == 0u,
+          "unlocking later must not replay the interact edge consumed while locked");
 
     GameSimulation directSimulation;
     GameSimulation mailboxSimulation;

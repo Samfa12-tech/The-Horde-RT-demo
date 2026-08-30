@@ -178,7 +178,7 @@
         android:layout_marginEnd="24dp"
         android:layout_marginBottom="116dp"
         android:includeFontPadding="false"
-        android:maxLines="1"
+        android:maxLines="2"
         android:paddingTop="0dp"
         android:paddingBottom="0dp"
         android:text="@string/interact"

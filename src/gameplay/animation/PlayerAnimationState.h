@@ -9,15 +9,18 @@
 namespace horde::gameplay::animation
 {
 
-inline constexpr float kPlayerSwingWindupSeconds = 0.18f;
-inline constexpr float kPlayerSwingActiveSeconds = 0.16f;
-inline constexpr float kPlayerSwingRecoverySeconds = 0.22f;
-inline constexpr float kPlayerUpwardSliceWindupSeconds = 0.10f;
-inline constexpr float kPlayerUpwardSliceActiveSeconds = 0.18f;
-inline constexpr float kPlayerUpwardSliceRecoverySeconds = 0.24f;
-inline constexpr float kPlayerParryStartupSeconds = 0.04f;
-inline constexpr float kPlayerParryActiveSeconds = 0.22f;
-inline constexpr float kPlayerParryRecoverySeconds = 0.24f;
+inline constexpr float kPlayerSwingWindupSeconds = SwordCombat::kSwingWindupDuration;
+inline constexpr float kPlayerSwingActiveSeconds = SwordCombat::kSwingActiveDuration;
+inline constexpr float kPlayerSwingRecoverySeconds = SwordCombat::kSwingRecoveryDuration;
+inline constexpr float kPlayerUpwardSliceWindupSeconds =
+    SwordCombat::kUpwardSliceWindupDuration;
+inline constexpr float kPlayerUpwardSliceActiveSeconds =
+    SwordCombat::kUpwardSliceActiveDuration;
+inline constexpr float kPlayerUpwardSliceRecoverySeconds =
+    SwordCombat::kUpwardSliceRecoveryDuration;
+inline constexpr float kPlayerParryStartupSeconds = SwordCombat::kParryStartupDuration;
+inline constexpr float kPlayerParryActiveSeconds = SwordCombat::kParryActiveDuration;
+inline constexpr float kPlayerParryRecoverySeconds = SwordCombat::kParryRecoveryDuration;
 inline constexpr float kLanternPoseBlendRatePerSecond = 1.0f / 0.65f;
 
 enum class PlayerLocomotionClip : std::uint8_t

@@ -383,7 +383,9 @@ int main()
     PlayerCombatSnapshot playerCombat;
     const PlayerWeaponRenderPose idleWeapon = EvaluatePlayerWeaponRenderPose(playerCombat, 0.0f, 1.05f);
     ok &= Require(Near(idleWeapon.parryBlend, 0.0f) && Near(idleWeapon.swordRadians, 0.20f) &&
-                  Near(idleWeapon.rightHandLocal[0], 0.25f),
+                  Near(idleWeapon.rightHandLocal[0], 0.12f) &&
+                  Near(idleWeapon.rightHandLocal[1], -0.44f) &&
+                  Near(idleWeapon.rightHandLocal[2], 1.00f),
                   "idle weapon pose must retain the owner-reviewed safe-frame/canted composition");
     playerCombat.action = PlayerCombatAction::ParryActive;
     const PlayerWeaponRenderPose activeParry = EvaluatePlayerWeaponRenderPose(playerCombat, 0.0f, 1.05f);
@@ -1045,7 +1047,7 @@ int main()
                       sceneSource.find("productionVisibility.playerMask") != std::string::npos &&
                       sceneSource.find("instances[6].instanceCustomIndex = 6u;") != std::string::npos &&
                       sceneSource.find("instances[8].instanceCustomIndex = 8u;") != std::string::npos &&
-                      sceneSource.find("const float lanternScale = 0.90f;") != std::string::npos &&
+                      sceneSource.find("horde::gameplay::items::kClaimedRewardLanternScale") != std::string::npos &&
                       sceneSource.find(
                           "gothicChestBaseAsset_.sockets, \"RewardLanternHingeSocket\"") !=
                           std::string::npos &&
@@ -1069,10 +1071,12 @@ int main()
         ok &= Require(raygenSource.find("primaryTorchPixelCount") != std::string::npos &&
                       raygenSource.find("primaryPlayerPixelCount") != std::string::npos &&
                       raygenSource.find("primaryRewardRingPixelCount") != std::string::npos &&
-                      windowsSource.find("instanceMasks[4] != 0x14u") != std::string::npos &&
-                      windowsSource.find("record.primaryPlayerPixels == 0u") != std::string::npos &&
+                      windowsSource.find("ClaimedRewardCapturePolicy(checkpoint.name)") != std::string::npos &&
+                      windowsSource.find("instanceMasks[4] != 0x10u") != std::string::npos &&
+                      windowsSource.find("instanceMasks[10] != 0x04u") != std::string::npos &&
+                      windowsSource.find("record.primaryTorchPixels != 0u") != std::string::npos &&
                       windowsSource.find("rewardGripPositionErrorMetres") != std::string::npos,
-                      "capture evidence must assert actual primary pixels, stable instance masks, and final reward GripRing contact");
+                      "capture evidence must assert checkpoint-specific primary pixels, zero replaced-torch pixels, stable instance masks, and final reward GripRing contact");
         ok &= Require(simulationSource.find("SynchronizePausedInput") != std::string::npos &&
                       simulationSource.find("pendingToggleHeldLightPoseCommands_ = 0u") != std::string::npos &&
                       androidBridgeSource.find("RequestLifecyclePauseSynchronizationLocked") != std::string::npos &&

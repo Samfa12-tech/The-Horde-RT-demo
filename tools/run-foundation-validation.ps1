@@ -4,6 +4,7 @@ param(
     [ValidateRange(30, 300)]
     [int]$TimeoutSeconds = 180,
     [string]$ExpectedDeviceModel = "SM-S948B",
+    [string]$DeviceSerial = "R5GL219SZGK",
     [string]$BaselineWindowsCaptureDirectory,
     [string]$BaselineAndroidTimingCsv,
     [string]$OutputRoot = (Join-Path $PSScriptRoot "..\reports\foundation-runs")
@@ -279,9 +280,9 @@ function Write-ValidationPackage {
     $audioDestination = Join-Path $windowsStage "assets\audio\filmcow"
     New-Item -ItemType Directory -Force -Path $audioDestination | Out-Null
     Copy-Item -Path (Join-Path $repoRoot "assets\audio\filmcow\*.wav") -Destination $audioDestination
-    $waterAudioDestination = Join-Path $windowsStage "assets\audio\pixabay"
-    New-Item -ItemType Directory -Force -Path $waterAudioDestination | Out-Null
-    Copy-Item -LiteralPath (Join-Path $repoRoot "assets\audio\pixabay\waterfall_loop.wav") -Destination $waterAudioDestination
+    $pixabayAudioDestination = Join-Path $windowsStage "assets\audio\pixabay"
+    New-Item -ItemType Directory -Force -Path $pixabayAudioDestination | Out-Null
+    Copy-Item -Path (Join-Path $repoRoot "assets\audio\pixabay\*.wav") -Destination $pixabayAudioDestination
     Compress-Archive -Path (Join-Path $windowsStage "*") -DestinationPath $windowsZip -CompressionLevel Optimal
     Copy-Item -LiteralPath $AndroidApk -Destination $androidValidationApk
     @(
@@ -332,7 +333,10 @@ function Test-ValidationPackages {
         "assets/textures/props/runtime/asset.manifest.json",
         "assets/textures/props/runtime/base-color.windows.ktx2",
         "assets/audio/filmcow/sword_swing_1.wav",
-        "assets/audio/pixabay/waterfall_loop.wav"))
+        "assets/audio/pixabay/waterfall_loop.wav",
+        "assets/audio/pixabay/chest_unlock.wav",
+        "assets/audio/pixabay/chest_open.wav",
+        "assets/audio/pixabay/torch_extinguish.wav"))
     foreach ($forbidden in @("/source/", "/high/", "runtime-development", "gothic_arming_sword", "models/props/meshy/production-", ".processing.json", ".android.ktx2")) {
         if (@($entries | Where-Object { $_ -like "*$forbidden*" }).Count -ne 0) {
             throw "Windows validation zip contains forbidden development static asset content: $forbidden"
@@ -369,7 +373,10 @@ function Test-ValidationPackages {
         "assets/ASSET_LICENSES.md",
         "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb",
         "assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb",
-        "assets/audio/pixabay/waterfall_loop.wav"))
+        "assets/audio/pixabay/waterfall_loop.wav",
+        "assets/audio/pixabay/chest_unlock.wav",
+        "assets/audio/pixabay/chest_open.wav",
+        "assets/audio/pixabay/torch_extinguish.wav"))
     foreach ($forbidden in @("/source/", "/high/", "runtime-development", "gothic_arming_sword", "models/props/meshy/production-", ".processing.json", ".windows.ktx2")) {
         if (@($entries | Where-Object { $_ -like "*$forbidden*" }).Count -ne 0) {
             throw "Android validation APK contains forbidden development static asset content: $forbidden"
@@ -396,7 +403,7 @@ function Test-ValidationPackages {
         "string/credits_body", "Hotstrike Studio", "FilmCow", "Meshy", "DRAGON-STUDIO", "Pixabay",
         "Production Gothic arming sword created with Meshy; runtime processing by Samfa12/Codex",
         "Production medieval hand torch created with Meshy; runtime processing by Samfa12/Codex"
-        "Historical-Gothic traveller/fighter created with Meshy; runtime processing and animation integration by Samfa12/Codex"
+        "Historical-Gothic traveller/fighter and viewmodel gauntlets created with Meshy; runtime processing and animation integration by Samfa12/Codex"
         "Production Gothic reward chest created with Meshy; runtime processing by Samfa12/Codex"
         "Production Gothic reward lantern created with Meshy; runtime processing by Samfa12/Codex"
     )) {
@@ -607,7 +614,7 @@ try {
                 "credits and licences", "Hotstrike Studio", "FilmCow", "Meshy", "DRAGON-STUDIO", "Pixabay",
                 "Production Gothic arming sword created with Meshy; runtime processing by Samfa12/Codex",
                 "Production medieval hand torch created with Meshy; runtime processing by Samfa12/Codex"
-                "Historical-Gothic traveller/fighter created with Meshy; runtime processing and animation integration by Samfa12/Codex"
+                "Historical-Gothic traveller/fighter and viewmodel gauntlets created with Meshy; runtime processing and animation integration by Samfa12/Codex"
                 "Production Gothic reward chest created with Meshy; runtime processing by Samfa12/Codex"
                 "Production Gothic reward lantern created with Meshy; runtime processing by Samfa12/Codex"
             )) {
@@ -619,7 +626,8 @@ try {
             Invoke-Stage "android-device-validation-and-captures" {
                 & (Join-Path $PSScriptRoot "run-android-showcase-validation.ps1") `
                     -Mode Both -Scale 75 -Include100 -Capture -SkipBuild `
-                    -TimeoutSeconds $TimeoutSeconds -OutputRoot $androidDeviceRoot
+                    -TimeoutSeconds $TimeoutSeconds -OutputRoot $androidDeviceRoot `
+                    -DeviceSerial $DeviceSerial -ExpectedDeviceModel $ExpectedDeviceModel
                 if ($LASTEXITCODE -ne 0) { throw "Android device validation failed." }
                 $manifests = @(Get-ChildItem -LiteralPath $androidDeviceRoot -Recurse -Filter "capture-manifest.json" -File)
                 if ($manifests.Count -ne 1) { throw "Expected one Android capture manifest; found $($manifests.Count)." }

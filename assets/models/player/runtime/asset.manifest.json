@@ -4,14 +4,14 @@
   "metresPerUnit": 1.0,
   "coordinateSystem": { "up": "+Y", "forward": "+Z" },
   "budgets": {
-    "maxVertices": 22000,
-    "maxIndices": 48000,
-    "maxPrimitives": 3,
-    "maxMaterials": 3,
-    "maxTextureLayersPerKind": 3
+    "maxVertices": 42000,
+    "maxIndices": 84000,
+    "maxPrimitives": 4,
+    "maxMaterials": 4,
+    "maxTextureLayersPerKind": 4
   },
-  "lods": [{ "name": "lod0", "maxTriangles": 16000 }],
-  "requiredSockets": ["LeftHand", "RightHand"],
+  "lods": [{ "name": "lod0", "maxTriangles": 28000 }],
+  "requiredSockets": ["LeftHand", "RightHand", "LeftGrip", "RightGrip"],
   "runtimeTextureProfile": {
     "android": "astc",
     "windows": "rgba8",

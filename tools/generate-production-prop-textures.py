@@ -96,12 +96,57 @@ def resize_shared_array_inputs() -> None:
         "player-base-color.png": ROOT / "assets/textures/player/source/base-color.png",
         "player-normal.png": ROOT / "assets/textures/player/source/normal.png",
         "player-orm.png": ROOT / "assets/textures/held-items/source/player-orm-2k.png",
+        "player-gauntlet-base-color.png": ROOT / "assets/models/player/source/meshy-2026-08-30-viewmodel-gauntlet/right-gauntlet-hilt-5k_textures/base_color.png",
+        "player-gauntlet-normal.png": ROOT / "assets/models/player/source/meshy-2026-08-30-viewmodel-gauntlet/right-gauntlet-hilt-5k_textures/normal.png",
     }
     ARRAY_INPUT.mkdir(parents=True, exist_ok=True)
     for name, source in sources.items():
         with Image.open(source) as image:
             image.convert("RGBA").resize((SIZE, SIZE), Image.Resampling.LANCZOS).save(
                 ARRAY_INPUT / name)
+
+    gauntlet_texture_directory = (
+        ROOT / "assets/models/player/source/meshy-2026-08-30-viewmodel-gauntlet" /
+        "right-gauntlet-hilt-5k_textures")
+    with Image.open(gauntlet_texture_directory / "roughness.png") as image:
+        gauntlet_roughness = image.convert("L").resize(
+            (SIZE, SIZE), Image.Resampling.LANCZOS)
+    with Image.open(gauntlet_texture_directory / "metallic.png") as image:
+        gauntlet_metallic = image.convert("L").resize(
+            (SIZE, SIZE), Image.Resampling.LANCZOS)
+    opaque = Image.new("L", (SIZE, SIZE), 255)
+    Image.merge("RGBA", (opaque, gauntlet_roughness, gauntlet_metallic, opaque)).save(
+        ARRAY_INPUT / "player-gauntlet-orm.png")
+
+    # Meshy's disposable training hilt left cyan/zero texels in otherwise
+    # unused atlas space, with a handful landing inside retained glove islands.
+    # Replace only those unmistakable invalid texels with a conservative dark
+    # leather/iron fill and a neutral tangent frame. This also gives mipmaps a
+    # stable padded colour instead of bleeding a removed prop into the hand.
+    gauntlet_base_path = ARRAY_INPUT / "player-gauntlet-base-color.png"
+    gauntlet_normal_path = ARRAY_INPUT / "player-gauntlet-normal.png"
+    gauntlet_orm_path = ARRAY_INPUT / "player-gauntlet-orm.png"
+    gauntlet_base = np.asarray(
+        Image.open(gauntlet_base_path).convert("RGBA"), dtype=np.uint8).copy()
+    black = np.max(gauntlet_base[:, :, :3], axis=2) <= 1
+    cyan = ((gauntlet_base[:, :, 1] >= 77) &
+            (gauntlet_base[:, :, 2] >= 87) &
+            (np.minimum(gauntlet_base[:, :, 1], gauntlet_base[:, :, 2]) -
+             gauntlet_base[:, :, 0].astype(np.int16) >= 46))
+    invalid = black | cyan
+    gauntlet_base[black, :3] = np.array([14, 12, 10], dtype=np.uint8)
+    gauntlet_base[cyan, :3] = np.array([42, 31, 23], dtype=np.uint8)
+    gauntlet_base[:, :, 3] = 255
+    Image.fromarray(gauntlet_base, "RGBA").save(gauntlet_base_path)
+
+    gauntlet_normal = np.asarray(
+        Image.open(gauntlet_normal_path).convert("RGBA"), dtype=np.uint8).copy()
+    gauntlet_normal[invalid] = np.array([128, 128, 255, 255], dtype=np.uint8)
+    Image.fromarray(gauntlet_normal, "RGBA").save(gauntlet_normal_path)
+    gauntlet_orm = np.asarray(
+        Image.open(gauntlet_orm_path).convert("RGBA"), dtype=np.uint8).copy()
+    gauntlet_orm[invalid] = np.array([255, 190, 64, 255], dtype=np.uint8)
+    Image.fromarray(gauntlet_orm, "RGBA").save(gauntlet_orm_path)
 
 
 OUTPUT.mkdir(parents=True, exist_ok=True)

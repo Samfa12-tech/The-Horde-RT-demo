@@ -38,6 +38,7 @@ enum class GameplayEventType : std::uint8_t
     ChestUnlocked,
     ChestOpened,
     LanternClaimed,
+    TorchExtinguished,
 };
 
 struct GameplayEvent

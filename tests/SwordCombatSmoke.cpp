@@ -151,7 +151,10 @@ int main()
     const bool swingEnteredActive = actionTimeline.Snapshot().player.action ==
         horde::gameplay::PlayerCombatAction::SwingActive &&
         actionTimeline.Snapshot().playerAttackPulse;
-    for (int tick = 0; tick < 16; ++tick)
+    // The accepted combo window holds the completed downward impact through
+    // 420 ms so a human second press can chain the upward slice. With no second
+    // press, the legacy single-cut path enters recovery at that exact boundary.
+    for (int tick = 0; tick < 43; ++tick)
     {
         actionTimeline.Update(0.01f, 0.0f, 1.85f, 0.0f);
     }

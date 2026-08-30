@@ -347,18 +347,21 @@ private:
             }
             break;
         case PlayerCombatAction::SwingActive:
-            if (player_.actionTime >= kSwingActiveDuration)
+            if (player_.comboQueued &&
+                player_.actionTime >= kDownwardCutTravelDuration)
+            {
+                // Once the blade reaches the bottom, an early buffered edge
+                // or a later human edge starts from the same exact contact
+                // pose. Do not carry time spent in the input hold into the
+                // upward wind-up or the continuation would visibly skip.
+                player_.comboQueued = false;
+                player_.action = PlayerCombatAction::UpwardSliceWindup;
+                player_.actionTime = 0.0f;
+            }
+            else if (player_.actionTime >= kSwingActiveDuration)
             {
                 player_.actionTime -= kSwingActiveDuration;
-                if (player_.comboQueued)
-                {
-                    player_.comboQueued = false;
-                    player_.action = PlayerCombatAction::UpwardSliceWindup;
-                }
-                else
-                {
-                    player_.action = PlayerCombatAction::SwingRecovery;
-                }
+                player_.action = PlayerCombatAction::SwingRecovery;
             }
             break;
         case PlayerCombatAction::SwingRecovery:
@@ -457,10 +460,15 @@ private:
 
     bool CanAcceptUpwardSlice() const
     {
-        return player_.action == PlayerCombatAction::SwingActive &&
-               player_.actionTime >= kUpwardSliceAcceptOpen &&
-               player_.actionTime <= kUpwardSliceAcceptClose &&
-               !player_.comboQueued;
+        // The second press is a buffered continuation of the visible
+        // downward action, not a 160 ms active-frame quick-time event. Keep
+        // the actual upward transition at the bottom of the cut, then retain
+        // a bounded contact hold so an ordinary 400 ms human click/tap is not
+        // acknowledged and silently discarded.
+        const bool downwardAction =
+            player_.action == PlayerCombatAction::SwingWindup ||
+            player_.action == PlayerCombatAction::SwingActive;
+        return downwardAction && !player_.comboQueued;
     }
 
     static float SmoothStep(const float value)
@@ -809,15 +817,14 @@ private:
 
 public:
     static constexpr float kSwingWindupDuration = 0.18f;
-    static constexpr float kSwingActiveDuration = 0.16f;
+    static constexpr float kDownwardCutTravelDuration = 0.16f;
+    static constexpr float kSwingActiveDuration = 0.42f;
     static constexpr float kSwingRecoveryDuration = 0.22f;
     static constexpr float kSwordDuration = kSwingWindupDuration + kSwingActiveDuration + kSwingRecoveryDuration;
     // The cut arcs are authoritative gameplay-animation inputs. They are
     // bounded so the audited sword remains in the 75% portrait safe frame;
     // held-item rendering and hand IK both consume these same values.
     static constexpr float kDownwardSwingAmplitude = 0.58f;
-    static constexpr float kUpwardSliceAcceptOpen = 0.0f;
-    static constexpr float kUpwardSliceAcceptClose = kSwingActiveDuration;
     static constexpr float kUpwardSliceWindupDuration = 0.10f;
     static constexpr float kUpwardSliceActiveDuration = 0.18f;
     static constexpr float kUpwardSliceRecoveryDuration = 0.24f;

@@ -14,6 +14,8 @@
 namespace horde::gameplay::items
 {
 
+inline constexpr float kClaimedRewardLanternScale = 0.50f;
+
 inline constexpr float kSwordGripRollRadians = 1.3962634f;
 
 struct HeldItemKinematicsInput
@@ -44,6 +46,14 @@ struct HeldItemKinematicsState
     std::array<float, 3u> rightShoulderLocal{};
     std::array<float, 3u> leftHandLocal{};
     std::array<float, 3u> rightHandLocal{};
+    // The left grip is deliberately rolled around its vertical handle axis so
+    // first-person primary rays see the knuckles/back of the anatomical left
+    // hand rather than looking end-on into a palm capsule. These axes remain
+    // shared fixed-step state: rig IK and rigid held-item composition consume
+    // the same frame.
+    std::array<float, 3u> leftGripXInView{{1.0f, 0.0f, 0.0f}};
+    std::array<float, 3u> leftGripYInView{{0.0f, 1.0f, 0.0f}};
+    std::array<float, 3u> leftGripZInView{{0.0f, 0.0f, -1.0f}};
     float heldPropDepth = 1.05f;
     float rewardLanternPresentationYawRadians = 0.0f;
     float swordRadians = 0.0f;
@@ -108,6 +118,14 @@ SwordGripBasisInView EvaluateSwordGripBasisInView(float inwardRadians,
 FirstPersonSafeFrame EvaluateOwnerFeedbackPortraitSafeFrame(
     const HeldItemKinematicsState& kinematics,
     float portraitAspect);
+
+// Resolves the first shared route collision surface continuously along the
+// camera-centre ray. The walkability predicate already owns the player radius;
+// reward composition separately reserves the authored cage's forward extent.
+float ComputeRewardLanternForwardClearance(float cameraX,
+                                           float cameraZ,
+                                           float forwardX,
+                                           float forwardZ);
 
 HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput& input);
 

@@ -10,6 +10,10 @@ public final class ProbeBridge {
     public static native String getTextReport();
     public static native String getJsonReport();
     public static native String getDeveloperOverlayText();
+    public static native byte[] getGitHubReleaseRequestContract();
+    public static native byte[] evaluateGitHubReleaseUpdate(String installedVersion,
+                                                             int httpStatus,
+                                                             byte[] responseBodyUtf8);
     public static native boolean writeReports(String baseDirectory);
 
     public static native boolean startDiagnosticSurface(android.view.Surface surface, String baseDirectory);

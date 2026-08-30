@@ -1,11 +1,82 @@
 #include "vulkan/raytracing/PlayerRenderSlot.h"
 
+#include "gameplay/ShowcaseRoute.h"
+
 #include <algorithm>
 #include <cmath>
 #include <limits>
 
 namespace horde::vulkan::raytracing
 {
+
+std::array<float, 3u> EvaluatePlayerTorsoAnchorLocal(
+    const horde::gameplay::animation::PlayerAnimationSnapshot& animation)
+{
+    // Both ordinary shoulders are authored around z=0.39. Keep the torso ten
+    // millimetres forward of that nominal socket plane so closed-glove arm
+    // poses retain a measured primary-camera clearance margin while the hands
+    // continue to resolve to their exact gameplay-owned Grip targets.
+    return {{0.0f, animation.rightIk.shoulder[1], 0.40f}};
+}
+
+std::array<float, 3u> GroundPlayerRootOnRouteFloor(
+    const std::array<float, 3u>& shoulderAnchoredRootWorld,
+    const float routeFloorWorldY,
+    const float assetGroundingOffsetMetres)
+{
+    return {{shoulderAnchoredRootWorld[0],
+             routeFloorWorldY + assetGroundingOffsetMetres,
+             shoulderAnchoredRootWorld[2]}};
+}
+
+PlayerModelWorldBasis BuildPlayerModelWorldBasis(
+    const std::array<float, 3u>& gameplayRightInWorld,
+    const std::array<float, 3u>& gameplayForwardInWorld)
+{
+    PlayerModelWorldBasis result;
+    result.modelXInWorld = {{-gameplayRightInWorld[0],
+                             -gameplayRightInWorld[1],
+                             -gameplayRightInWorld[2]}};
+    result.modelZInWorld = gameplayForwardInWorld;
+    return result;
+}
+
+std::array<float, 3u> PlayerModelVectorToWorld(
+    const PlayerModelWorldBasis& basis,
+    const std::array<float, 3u>& modelVector)
+{
+    return {{basis.modelXInWorld[0] * modelVector[0] +
+                 basis.modelYInWorld[0] * modelVector[1] +
+                 basis.modelZInWorld[0] * modelVector[2],
+             basis.modelXInWorld[1] * modelVector[0] +
+                 basis.modelYInWorld[1] * modelVector[1] +
+                 basis.modelZInWorld[1] * modelVector[2],
+             basis.modelXInWorld[2] * modelVector[0] +
+                 basis.modelYInWorld[2] * modelVector[1] +
+                 basis.modelZInWorld[2] * modelVector[2]}};
+}
+
+std::array<float, 3u> WorldVectorToPlayerModel(
+    const PlayerModelWorldBasis& basis,
+    const std::array<float, 3u>& worldVector)
+{
+    const auto dot = [&worldVector](const std::array<float, 3u>& axis) {
+        return worldVector[0] * axis[0] + worldVector[1] * axis[1] +
+               worldVector[2] * axis[2];
+    };
+    return {{dot(basis.modelXInWorld), dot(basis.modelYInWorld),
+             dot(basis.modelZInWorld)}};
+}
+
+float PlayerModelWorldBasisDeterminant(const PlayerModelWorldBasis& basis)
+{
+    const auto& x = basis.modelXInWorld;
+    const auto& y = basis.modelYInWorld;
+    const auto& z = basis.modelZInWorld;
+    return x[0] * (y[1] * z[2] - y[2] * z[1]) -
+           y[0] * (x[1] * z[2] - x[2] * z[1]) +
+           z[0] * (x[1] * y[2] - x[2] * y[1]);
+}
 
 namespace
 {
@@ -66,36 +137,6 @@ horde::gameplay::items::HeldItemTransform InverseRigid(
                               result[4u + row] * transform[13] +
                               result[8u + row] * transform[14]);
     }
-    return result;
-}
-
-HeldItemTransform RigidPlayerBoneToWorld(
-    const horde::scene::SkinnedNodeTransform& bone,
-    const Vec3& bodyRight,
-    const Vec3& bodyForward,
-    const Vec3& playerRootWorld)
-{
-    const auto vectorToWorld = [&bodyRight, &bodyForward](const Vec3& local) {
-        return Add(Add(Scale(bodyRight, local[0]), {{0.0f, local[1], 0.0f}}),
-                   Scale(bodyForward, local[2]));
-    };
-    Vec3 x = Normalise(vectorToWorld({{bone[0], bone[1], bone[2]}}));
-    const Vec3 rawY = vectorToWorld({{bone[4], bone[5], bone[6]}});
-    Vec3 y = Normalise(Subtract(rawY, Scale(x, Dot(rawY, x))));
-    Vec3 z = Normalise(Cross(x, y));
-    const Vec3 rawZ = vectorToWorld({{bone[8], bone[9], bone[10]}});
-    if (Dot(z, rawZ) < 0.0f)
-    {
-        y = Scale(y, -1.0f);
-        z = Scale(z, -1.0f);
-    }
-    const Vec3 position = Add(
-        playerRootWorld, vectorToWorld({{bone[12], bone[13], bone[14]}}));
-    HeldItemTransform result = horde::gameplay::items::IdentityHeldItemTransform();
-    result[0] = x[0]; result[1] = x[1]; result[2] = x[2];
-    result[4] = y[0]; result[5] = y[1]; result[6] = y[2];
-    result[8] = z[0]; result[9] = z[1]; result[10] = z[2];
-    result[12] = position[0]; result[13] = position[1]; result[14] = position[2];
     return result;
 }
 
@@ -161,6 +202,17 @@ PlayerRouteMasks BuildPlayerRouteMasks(const PlayerRenderRoute route)
         result.instanceMasks[4] = 0x14u;
         return result;
     }
+    if (route == PlayerRenderRoute::HybridBlockPrimary)
+    {
+        // Slot 4 retains the complete skinned character for reflection/shadow
+        // rays. Reward props own TLAS slots 5-8 and the dielectric fixture owns
+        // metadata index 9, so the bounded fallback arms use the otherwise
+        // available procedural slots/custom indices 10-13.
+        result.instanceMasks[4] = 0x10u;
+        for (std::size_t slot = 10u; slot <= 13u; ++slot)
+            result.instanceMasks[slot] = 0x04u;
+        return result;
+    }
     result.instanceMasks[4] = 0x10u;
     for (std::size_t slot = 5u; slot <= 15u; ++slot)
     {
@@ -177,21 +229,29 @@ ProductionSceneVisibility BuildProductionSceneVisibility(
     result.rewardWorldVisible = !input.glassFixtureVisible;
     result.inspectionOverride = input.productionInspection;
     // The production reward world owns TLAS slots 5-8 (chest, lid, ring,
-    // body), which are the legacy procedural arm slots. Keep the single
-    // skinned player in slot 4 whenever either production world is present;
-    // otherwise normal opening frames silently lose both arms even though the
-    // torch and sword remain visible.
-    result.playerRoute = (result.rewardWorldVisible || input.glassFixtureVisible)
+    // body), which are the legacy procedural arm slots. The owner-deferred
+    // skinned first-person hands therefore use the bounded hybrid route:
+    // skinned body in reflections/shadows, stable block arms in free slots
+    // 10-13. This is intentionally one route switch, not a second animation or
+    // socket authority.
+    result.playerRoute = input.requestedPlayerRoute == PlayerRenderRoute::Skinned
         ? PlayerRenderRoute::Skinned
-        : input.requestedPlayerRoute;
+        : ((result.rewardWorldVisible || input.glassFixtureVisible)
+            ? PlayerRenderRoute::HybridBlockPrimary
+            : input.requestedPlayerRoute);
     const PlayerRouteMasks playerMasks = BuildPlayerRouteMasks(result.playerRoute);
-    result.torchMask = input.productionInspection ? 0u : 0x02u;
+    // The claimed reward is the active left-hand light and replaces the
+    // ordinary torch. Keep the normal-route torch before the claim, but never
+    // render both rigid props through the same final skinned grip.
+    result.torchMask = (input.productionInspection || input.rewardLanternClaimed)
+        ? 0u : 0x02u;
     result.swordMask = input.productionInspection ? 0u : 0x02u;
     result.playerMask = input.productionInspection
         ? 0u : playerMasks.instanceMasks[4];
-    result.playerPrimaryVisible = result.playerRoute == PlayerRenderRoute::Procedural
-        ? !input.productionInspection
-        : (result.playerMask & 0x04u) != 0u;
+    result.playerPrimaryVisible = !input.productionInspection &&
+        std::any_of(playerMasks.instanceMasks.begin(),
+                    playerMasks.instanceMasks.end(),
+                    [](const std::uint8_t mask) { return (mask & 0x04u) != 0u; });
     result.playerReflectionVisible = (result.playerMask & 0x10u) != 0u;
     return result;
 }
@@ -407,152 +467,88 @@ bool PlayerRenderSlot::LoadAsset(const std::string& runtimeGlbPath,
     leftGripAgreement_ = {};
     rightGripAgreement_ = {};
     finalWorldFromLeftGrip_ = horde::gameplay::items::IdentityHeldItemTransform();
-    leftBoneFromGripSocket_ = horde::gameplay::items::IdentityHeldItemTransform();
-    rightBoneFromGripSocket_ = horde::gameplay::items::IdentityHeldItemTransform();
-    leftRestHandOrientation_ = horde::gameplay::items::IdentityHeldItemTransform();
-    rightRestHandOrientation_ = horde::gameplay::items::IdentityHeldItemTransform();
-    leftRestGripBasisInPlayer_ = horde::gameplay::items::IdentityHeldItemTransform();
-    rightRestGripBasisInPlayer_ = horde::gameplay::items::IdentityHeldItemTransform();
+    leftHandFromGripSocket_ = horde::gameplay::items::IdentityHeldItemTransform();
+    rightHandFromGripSocket_ = horde::gameplay::items::IdentityHeldItemTransform();
     stableGripBasesReady_ = false;
+    bootGroundingProfilesReady_ = false;
     if (!asset_.LoadClips(runtimeGlbPath, horde::scene::PlayerLocomotionClipSet(), diagnostic))
         return false;
-    return DeriveStableRestGripBases(diagnostic);
+    return DeriveAssetGripSockets(diagnostic) &&
+           BuildBootGroundingProfiles(diagnostic);
 }
 
-bool PlayerRenderSlot::DeriveStableRestGripBases(std::string& diagnostic)
+bool PlayerRenderSlot::BuildBootGroundingProfiles(std::string& diagnostic)
 {
-    using namespace horde::gameplay::animation;
+    float idle = 0.0f;
+    float walking = 0.0f;
+    if (!asset_.BootGroundingMinimumY(
+            horde::scene::SkinnedClip::Idle, 0.0f, idle, diagnostic) ||
+        !asset_.BootGroundingMinimumY(
+            horde::scene::SkinnedClip::Walking, 0.0f, walking, diagnostic))
+        return false;
+    bootGroundingProfilesReady_ = true;
+    diagnostic.clear();
+    return true;
+}
+
+float PlayerRenderSlot::BootGroundingOffsetMetres(
+    const horde::gameplay::animation::PlayerAnimationSnapshot& animation) const
+{
+    if (!bootGroundingProfilesReady_)
+        return kPlayerBootGroundingSafetyMetres;
+    const horde::scene::SkinnedClip clip = animation.locomotionClip ==
+            horde::gameplay::animation::PlayerLocomotionClip::Walk
+        ? horde::scene::SkinnedClip::Walking
+        : horde::scene::SkinnedClip::Idle;
+    float minimumY = 0.0f;
+    std::string ignoredDiagnostic;
+    if (!asset_.BootGroundingMinimumY(
+            clip, animation.locomotionTime, minimumY, ignoredDiagnostic))
+        return kPlayerBootGroundingSafetyMetres;
+    return -minimumY + kPlayerBootGroundingSafetyMetres;
+}
+
+bool PlayerRenderSlot::DeriveAssetGripSockets(std::string& diagnostic)
+{
     using namespace horde::gameplay::items;
-
-    // The asset-owned bone-to-Grip basis is derived once from the approved
-    // owner-feedback rest checkpoint composition. It never depends on the
-    // first live/capture pose delivered to the renderer.
-    HeldItemFixedStepInput restInput;
-    restInput.playerX = 0.0f;
-    restInput.playerZ = 1.85f;
-    restInput.playerYawRadians = 0.0f;
-    restInput.playerPitchRadians = -0.28f;
-    HeldItemStates restItems = MakeDefaultHeldItemStates();
-    HeldItemFixedStepState restHeldState;
-    if (!ResolveHeldItemsFixedStep(restItems, restInput, 0u, restHeldState, diagnostic))
-        return false;
-
-    PlayerAnimationState restAnimationState;
-    restAnimationState.StepFixed(
-        {0.0f, 0.0f, restInput.playerCombat, restHeldState.kinematics, 1.0f}, 0.0f);
-    PlayerAnimationSnapshot rigAnimation = restAnimationState.Snapshot();
-
-    horde::scene::SkinnedNodeTransform leftArm{};
-    horde::scene::SkinnedNodeTransform rightArm{};
+    horde::scene::SkinnedNodeTransform namedLeftHand{};
+    horde::scene::SkinnedNodeTransform namedLeftGrip{};
+    horde::scene::SkinnedNodeTransform namedRightHand{};
+    horde::scene::SkinnedNodeTransform namedRightGrip{};
     if (!asset_.NodeTransform(horde::scene::SkinnedClip::Idle, 0.0f,
-                              "LeftArm", leftArm, diagnostic) ||
+                              "LeftHand", namedLeftHand, diagnostic) ||
         !asset_.NodeTransform(horde::scene::SkinnedClip::Idle, 0.0f,
-                              "RightArm", rightArm, diagnostic))
-        return false;
-    const Vec3 rigShoulderCenter{{
-        (leftArm[12] + rightArm[12]) * 0.5f,
-        (leftArm[13] + rightArm[13]) * 0.5f,
-        (leftArm[14] + rightArm[14]) * 0.5f}};
-
-    constexpr Vec3 bodyRight{{1.0f, 0.0f, 0.0f}};
-    constexpr Vec3 bodyForward{{0.0f, 0.0f, -1.0f}};
-    constexpr Vec3 worldUp{{0.0f, 1.0f, 0.0f}};
-    const Vec3 viewForward = Normalise(
-        {{0.0f, -0.05f + restInput.playerPitchRadians, -1.0f}});
-    const Vec3 viewRight = Normalise(Cross(viewForward, worldUp));
-    const Vec3 viewUp = Normalise(Cross(viewRight, viewForward));
-    const Vec3 eye{{restInput.playerX, 0.58f, restInput.playerZ}};
-    const auto toWorld = [&eye, &viewRight, &viewUp, &viewForward](const Vec3& local) {
-        return Add(Add(Add(eye, Scale(viewRight, local[0])),
-                       Scale(viewUp, local[1])),
-                   Scale(viewForward, local[2]));
-    };
-    const Vec3 leftShoulder = toWorld(rigAnimation.leftIk.shoulder);
-    const Vec3 rightShoulder = toWorld(rigAnimation.rightIk.shoulder);
-    const Vec3 leftHand = toWorld(rigAnimation.leftIk.target);
-    const Vec3 rightHand = toWorld(rigAnimation.rightIk.target);
-    const Vec3 intendedShoulderCenter = Scale(Add(leftShoulder, rightShoulder), 0.5f);
-    const Vec3 playerRootWorld = Subtract(
-        intendedShoulderCenter,
-        Add(Add(Scale(bodyRight, rigShoulderCenter[0]),
-                {{0.0f, rigShoulderCenter[1], 0.0f}}),
-            Scale(bodyForward, rigShoulderCenter[2])));
-    const auto worldPointToPlayer = [&playerRootWorld, &bodyRight, &bodyForward](
-                                        const Vec3& worldPoint) {
-        const Vec3 delta = Subtract(worldPoint, playerRootWorld);
-        return Vec3{{Dot(delta, bodyRight), delta[1], Dot(delta, bodyForward)}};
-    };
-    const auto viewVectorToPlayer = [&viewRight, &viewUp, &viewForward,
-                                     &bodyRight, &bodyForward](const Vec3& viewVector) {
-        const Vec3 worldVector = Add(Add(Scale(viewRight, viewVector[0]),
-                                        Scale(viewUp, viewVector[1])),
-                                     Scale(viewForward, viewVector[2]));
-        return Vec3{{Dot(worldVector, bodyRight), worldVector[1],
-                     Dot(worldVector, bodyForward)}};
-    };
-    rigAnimation.leftIk.shoulder = worldPointToPlayer(leftShoulder);
-    rigAnimation.leftIk.target = worldPointToPlayer(leftHand);
-    rigAnimation.leftIk.pole = viewVectorToPlayer(rigAnimation.leftIk.pole);
-    rigAnimation.leftIk.gripX = viewVectorToPlayer(rigAnimation.leftIk.gripX);
-    rigAnimation.leftIk.gripY = viewVectorToPlayer(rigAnimation.leftIk.gripY);
-    rigAnimation.leftIk.gripZ = viewVectorToPlayer(rigAnimation.leftIk.gripZ);
-    rigAnimation.rightIk.shoulder = worldPointToPlayer(rightShoulder);
-    rigAnimation.rightIk.target = worldPointToPlayer(rightHand);
-    rigAnimation.rightIk.pole = viewVectorToPlayer(rigAnimation.rightIk.pole);
-    rigAnimation.rightIk.gripX = viewVectorToPlayer(rigAnimation.rightIk.gripX);
-    rigAnimation.rightIk.gripY = viewVectorToPlayer(rigAnimation.rightIk.gripY);
-    rigAnimation.rightIk.gripZ = viewVectorToPlayer(rigAnimation.rightIk.gripZ);
-
-    const auto armTarget = [](const PlayerArmIkTarget& source) {
-        horde::scene::SkinnedArmIkTarget result;
-        result.target = source.target;
-        result.pole = source.pole;
-        result.shoulder = source.shoulder;
-        result.shoulderTargetEnabled = true;
-        return result;
-    };
-    std::vector<horde::scene::TexturedSkinnedRtVertex> restVertices;
-    horde::scene::SkinnedPlayerSockets restSockets;
-    if (!asset_.SkinPlayerUniqueTextured(
-            horde::scene::SkinnedClip::Idle, 0.0f,
-            armTarget(rigAnimation.leftIk), armTarget(rigAnimation.rightIk),
-            restVertices, restSockets, diagnostic))
+                              "LeftGrip", namedLeftGrip, diagnostic) ||
+        !asset_.NodeTransform(horde::scene::SkinnedClip::Idle, 0.0f,
+                              "RightHand", namedRightHand, diagnostic) ||
+        !asset_.NodeTransform(horde::scene::SkinnedClip::Idle, 0.0f,
+                              "RightGrip", namedRightGrip, diagnostic))
         return false;
 
-    leftRestHandOrientation_ = RigidPlayerBoneInModel(restSockets.leftHand);
-    rightRestHandOrientation_ = RigidPlayerBoneInModel(restSockets.rightHand);
-    leftRestGripBasisInPlayer_ = TransformFromAxes(
-        rigAnimation.leftIk.gripX, rigAnimation.leftIk.gripY,
-        rigAnimation.leftIk.gripZ);
-    rightRestGripBasisInPlayer_ = TransformFromAxes(
-        rigAnimation.rightIk.gripX, rigAnimation.rightIk.gripY,
-        rigAnimation.rightIk.gripZ);
-
-    const HeldItemTransform worldFromLeftBone = RigidPlayerBoneToWorld(
-        restSockets.leftHand, bodyRight, bodyForward, playerRootWorld);
-    const HeldItemTransform worldFromRightBone = RigidPlayerBoneToWorld(
-        restSockets.rightHand, bodyRight, bodyForward, playerRootWorld);
-    const HeldItemTransform intendedWorldFromLeftGrip = MultiplyHeldItemTransforms(
-        restItems[0].worldFromItem, OriginalTorchGripSocketTransform());
-    const HeldItemTransform intendedWorldFromRightGrip = MultiplyHeldItemTransforms(
-        restItems[1].worldFromItem, SwordGripSocketTransform());
-    leftBoneFromGripSocket_ = MultiplyHeldItemTransforms(
-        InverseRigid(worldFromLeftBone), intendedWorldFromLeftGrip);
-    rightBoneFromGripSocket_ = MultiplyHeldItemTransforms(
-        InverseRigid(worldFromRightBone), intendedWorldFromRightGrip);
-    if (!ValidateHeldItemSocketTransform(leftBoneFromGripSocket_, diagnostic) ||
-        !ValidateHeldItemSocketTransform(rightBoneFromGripSocket_, diagnostic))
+    // Preserve anatomical identity end to end. The renderer's proper
+    // model-to-world rotation maps model +X (anatomical Left) to gameplay
+    // left, so no opposite-hand socket substitution is valid here.
+    leftHandFromGripSocket_ = MultiplyHeldItemTransforms(
+        InverseRigid(RigidPlayerBoneInModel(namedLeftHand)),
+        RigidPlayerBoneInModel(namedLeftGrip));
+    rightHandFromGripSocket_ = MultiplyHeldItemTransforms(
+        InverseRigid(RigidPlayerBoneInModel(namedRightHand)),
+        RigidPlayerBoneInModel(namedRightGrip));
+    if (!ValidateHeldItemSocketTransform(leftHandFromGripSocket_, diagnostic) ||
+        !ValidateHeldItemSocketTransform(rightHandFromGripSocket_, diagnostic))
         return false;
     const float leftPivotOffset = std::hypot(
-        std::hypot(leftBoneFromGripSocket_[12], leftBoneFromGripSocket_[13]),
-        leftBoneFromGripSocket_[14]);
+        std::hypot(leftHandFromGripSocket_[12], leftHandFromGripSocket_[13]),
+        leftHandFromGripSocket_[14]);
     const float rightPivotOffset = std::hypot(
-        std::hypot(rightBoneFromGripSocket_[12], rightBoneFromGripSocket_[13]),
-        rightBoneFromGripSocket_[14]);
-    if (leftPivotOffset > kPlayerGripSocketToleranceMetres ||
-        rightPivotOffset > kPlayerGripSocketToleranceMetres)
+        std::hypot(rightHandFromGripSocket_[12], rightHandFromGripSocket_[13]),
+        rightHandFromGripSocket_[14]);
+    if (leftPivotOffset < 0.035f || leftPivotOffset > 0.090f ||
+        rightPivotOffset < 0.035f || rightPivotOffset > 0.090f)
     {
-        diagnostic = "Deterministic rest bone-to-Grip basis exceeded the 15 mm pivot tolerance.";
+        diagnostic = "Asset-owned palm Grip must be 35-90 mm from its wrist joint: left=" +
+                     std::to_string(leftPivotOffset) + " right=" +
+                     std::to_string(rightPivotOffset) + ".";
         return false;
     }
     stableGripBasesReady_ = true;
@@ -562,24 +558,20 @@ bool PlayerRenderSlot::DeriveStableRestGripBases(std::string& diagnostic)
 
 bool PlayerRenderSlot::ResolveHeldItemVisuals(
     const horde::gameplay::items::HeldItemStates& authoritativeItems,
-    const horde::gameplay::items::HeldItemTransform& worldFromLeftHandBone,
-    const horde::gameplay::items::HeldItemTransform& worldFromRightHandBone,
+    const horde::gameplay::items::HeldItemTransform& worldFromLeftGrip,
+    const horde::gameplay::items::HeldItemTransform& worldFromRightGrip,
     horde::gameplay::items::HeldItemStates& renderItems,
     std::string& diagnostic)
 {
     using namespace horde::gameplay::items;
     if (!stableGripBasesReady_)
     {
-        diagnostic = "Skinned player render slot has no validated rest bone-to-Grip basis.";
+        diagnostic = "Skinned player render slot has no validated asset-owned palm Grip sockets.";
         return false;
     }
-    if (!ValidateHeldItemSocketTransform(worldFromLeftHandBone, diagnostic) ||
-        !ValidateHeldItemSocketTransform(worldFromRightHandBone, diagnostic))
+    if (!ValidateHeldItemSocketTransform(worldFromLeftGrip, diagnostic) ||
+        !ValidateHeldItemSocketTransform(worldFromRightGrip, diagnostic))
         return false;
-    const HeldItemTransform worldFromLeftGrip = MultiplyHeldItemTransforms(
-        worldFromLeftHandBone, leftBoneFromGripSocket_);
-    const HeldItemTransform worldFromRightGrip = MultiplyHeldItemTransforms(
-        worldFromRightHandBone, rightBoneFromGripSocket_);
     finalWorldFromLeftGrip_ = worldFromLeftGrip;
     if (!ResolvePlayerHeldItemVisuals(
         authoritativeItems, worldFromLeftGrip, worldFromRightGrip,
@@ -640,57 +632,86 @@ bool PlayerRenderSlot::PreparePose(
     // into the player's +Z-forward model space. The rig solves to those exact
     // points; imported clips never dictate item or damage timing.
     const auto target = [](const horde::gameplay::animation::PlayerArmIkTarget& source,
-                           const HeldItemTransform& restGripBasis,
-                           const HeldItemTransform& restHandOrientation) {
+                           const HeldItemTransform& handFromGripSocket) {
         horde::scene::SkinnedArmIkTarget result;
-        result.target = source.target;
         result.pole = source.pole;
         result.shoulder = source.shoulder;
-        result.shoulderTargetEnabled = true;
-        const HeldItemTransform currentGripBasis = TransformFromAxes(
-            source.gripX, source.gripY, source.gripZ);
-        const HeldItemTransform gripDelta = horde::gameplay::items::MultiplyHeldItemTransforms(
-            currentGripBasis, InverseRigid(restGripBasis));
-        result.handOrientation = horde::gameplay::items::MultiplyHeldItemTransforms(
-            gripDelta, restHandOrientation);
+        result.shoulderTargetEnabled = false;
+        // PresentableTinyRtScene converts the gameplay view frame through the
+        // proper 180-degree player-model rotation. The resulting Grip frame is
+        // already right-handed and must not be reflected a second time.
+        const HeldItemTransform desiredGrip = TransformFromAxes(
+            source.gripX, source.gripY, source.gripZ, source.target);
+        const HeldItemTransform desiredHand =
+            horde::gameplay::items::MultiplyHeldItemTransforms(
+                desiredGrip, InverseRigid(handFromGripSocket));
+        result.target = {{desiredHand[12], desiredHand[13], desiredHand[14]}};
+        result.handOrientation = desiredHand;
         result.handOrientationTargetEnabled = true;
         return result;
     };
     const horde::scene::SkinnedArmIkTarget left = target(
-        animation.leftIk, leftRestGripBasisInPlayer_, leftRestHandOrientation_);
+        animation.leftIk, leftHandFromGripSocket_);
     const horde::scene::SkinnedArmIkTarget right = target(
-        animation.rightIk, rightRestGripBasisInPlayer_, rightRestHandOrientation_);
+        animation.rightIk, rightHandFromGripSocket_);
     if (!horde::gameplay::items::ValidateHeldItemSocketTransform(
             left.handOrientation, diagnostic) ||
         !horde::gameplay::items::ValidateHeldItemSocketTransform(
             right.handOrientation, diagnostic))
     {
-        diagnostic = "Gameplay-authored player Grip basis produced a non-rigid hand target.";
+        const auto determinant = [](const HeldItemTransform& transform) {
+            return transform[0] *
+                       (transform[5] * transform[10] -
+                        transform[9] * transform[6]) -
+                   transform[4] *
+                       (transform[1] * transform[10] -
+                        transform[9] * transform[2]) +
+                   transform[8] *
+                       (transform[1] * transform[6] -
+                        transform[5] * transform[2]);
+        };
+        diagnostic = "Gameplay-authored player Grip basis produced a non-rigid hand target: " +
+                     diagnostic + " determinants=" +
+                     std::to_string(determinant(left.handOrientation)) + "/" +
+                     std::to_string(determinant(right.handOrientation)) + ".";
         return false;
     }
-    if (!asset_.SkinPlayerUniqueTextured(clip, animation.locomotionTime,
-                                          left, right, uniqueVertices_, sockets_,
-                                          diagnostic))
+    if (!asset_.SkinPlayerUniqueTextured(
+            clip, animation.locomotionTime, left, right, uniqueVertices_,
+            uniqueTangents_, sockets_, diagnostic))
         return false;
     const auto socketError = [](const horde::scene::SkinnedNodeTransform& socket,
-                                const horde::scene::SkinnedArmIkTarget& intended) {
+                                const horde::gameplay::animation::PlayerArmIkTarget& intended) {
         return std::hypot(std::hypot(socket[12] - intended.target[0],
                                     socket[13] - intended.target[1]),
                           socket[14] - intended.target[2]);
     };
-    leftSocketErrorMetres_ = socketError(sockets_.leftHand, left);
-    rightSocketErrorMetres_ = socketError(sockets_.rightHand, right);
+    leftSocketErrorMetres_ = socketError(sockets_.leftGrip, animation.leftIk);
+    rightSocketErrorMetres_ = socketError(sockets_.rightGrip, animation.rightIk);
     if (leftSocketErrorMetres_ > kPlayerGripSocketToleranceMetres ||
         rightSocketErrorMetres_ > kPlayerGripSocketToleranceMetres)
     {
-        diagnostic = "Skinned player hand bone socket exceeded the 15 mm grip tolerance: left=" +
+        diagnostic = "Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=" +
                      std::to_string(leftSocketErrorMetres_) + " right=" +
                      std::to_string(rightSocketErrorMetres_) +
-                     " leftTarget=" + std::to_string(left.target[0]) + "," +
-                     std::to_string(left.target[1]) + "," + std::to_string(left.target[2]) +
-                     " leftSocket=" + std::to_string(sockets_.leftHand[12]) + "," +
+                     " leftTarget=" + std::to_string(animation.leftIk.target[0]) + "," +
+                     std::to_string(animation.leftIk.target[1]) + "," +
+                     std::to_string(animation.leftIk.target[2]) +
+                     " leftSocket=" + std::to_string(sockets_.leftGrip[12]) + "," +
+                     std::to_string(sockets_.leftGrip[13]) + "," +
+                     std::to_string(sockets_.leftGrip[14]) +
+                     " leftHandTarget=" + std::to_string(left.target[0]) + "," +
+                     std::to_string(left.target[1]) + "," +
+                     std::to_string(left.target[2]) +
+                     " leftHandSocket=" + std::to_string(sockets_.leftHand[12]) + "," +
                      std::to_string(sockets_.leftHand[13]) + "," +
-                     std::to_string(sockets_.leftHand[14]) + ".";
+                     std::to_string(sockets_.leftHand[14]) +
+                     " rightHandTarget=" + std::to_string(right.target[0]) + "," +
+                     std::to_string(right.target[1]) + "," +
+                     std::to_string(right.target[2]) +
+                     " rightHandSocket=" + std::to_string(sockets_.rightHand[12]) + "," +
+                     std::to_string(sockets_.rightHand[13]) + "," +
+                     std::to_string(sockets_.rightHand[14]) + ".";
         return false;
     }
     lastSkinnedTick_ = tickIndex;

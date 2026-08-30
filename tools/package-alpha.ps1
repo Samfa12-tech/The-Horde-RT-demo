@@ -114,7 +114,7 @@ foreach ($creditMarker in @(
     "credits and licences", "Hotstrike Studio", "FilmCow", "Meshy", "DRAGON-STUDIO", "Pixabay",
     "Production Gothic arming sword created with Meshy; runtime processing by Samfa12/Codex",
     "Production medieval hand torch created with Meshy; runtime processing by Samfa12/Codex"
-    "Historical-Gothic traveller/fighter created with Meshy; runtime processing and animation integration by Samfa12/Codex"
+    "Historical-Gothic traveller/fighter and viewmodel gauntlets created with Meshy; runtime processing and animation integration by Samfa12/Codex"
     "Production Gothic reward chest created with Meshy; runtime processing by Samfa12/Codex"
     "Production Gothic reward lantern created with Meshy; runtime processing by Samfa12/Codex"
 )) {
@@ -188,9 +188,9 @@ foreach ($copy in $assetCopies) {
 $audioDestination = Join-Path $windowsStage "assets\audio\filmcow"
 New-Item -ItemType Directory -Force -Path $audioDestination | Out-Null
 Copy-Item -Path (Join-Path $repoRoot "assets\audio\filmcow\*.wav") -Destination $audioDestination
-$waterAudioDestination = Join-Path $windowsStage "assets\audio\pixabay"
-New-Item -ItemType Directory -Force -Path $waterAudioDestination | Out-Null
-Copy-Item -LiteralPath (Join-Path $repoRoot "assets\audio\pixabay\waterfall_loop.wav") -Destination $waterAudioDestination
+$pixabayAudioDestination = Join-Path $windowsStage "assets\audio\pixabay"
+New-Item -ItemType Directory -Force -Path $pixabayAudioDestination | Out-Null
+Copy-Item -Path (Join-Path $repoRoot "assets\audio\pixabay\*.wav") -Destination $pixabayAudioDestination
 
 $windowsZip = Join-Path $outputFull "$baseName-Windows-x64.zip"
 if (Test-Path -LiteralPath $windowsZip) { Remove-Item -LiteralPath $windowsZip -Force }
@@ -240,7 +240,7 @@ foreach ($creditMarker in @(
     "string/credits_body", "Hotstrike Studio", "FilmCow", "Meshy", "DRAGON-STUDIO", "Pixabay",
     "Production Gothic arming sword created with Meshy; runtime processing by Samfa12/Codex",
     "Production medieval hand torch created with Meshy; runtime processing by Samfa12/Codex"
-    "Historical-Gothic traveller/fighter created with Meshy; runtime processing and animation integration by Samfa12/Codex"
+    "Historical-Gothic traveller/fighter and viewmodel gauntlets created with Meshy; runtime processing and animation integration by Samfa12/Codex"
     "Production Gothic reward chest created with Meshy; runtime processing by Samfa12/Codex"
     "Production Gothic reward lantern created with Meshy; runtime processing by Samfa12/Codex"
 )) {
@@ -274,8 +274,14 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 $apkArchive = [IO.Compression.ZipFile]::OpenRead($androidCandidate)
 try {
     $apkEntryNames = @($apkArchive.Entries | ForEach-Object FullName)
-    if ($apkEntryNames -notcontains 'assets/audio/pixabay/waterfall_loop.wav') {
-        throw "Android candidate is missing the licensed waterfall loop."
+    foreach ($requiredAudio in @(
+        'assets/audio/pixabay/waterfall_loop.wav',
+        'assets/audio/pixabay/chest_unlock.wav',
+        'assets/audio/pixabay/chest_open.wav',
+        'assets/audio/pixabay/torch_extinguish.wav')) {
+        if ($apkEntryNames -notcontains $requiredAudio) {
+            throw "Android candidate is missing licensed runtime audio: $requiredAudio"
+        }
     }
     foreach ($requiredHeldItem in @(
         'assets/models/weapons/runtime/asset.manifest.json',
@@ -377,7 +383,10 @@ try {
         "assets/textures/props/runtime/orm.windows.ktx2",
         "assets/textures/props/runtime/emissive.windows.ktx2",
         "assets/audio/filmcow/sword_swing_1.wav",
-        "assets/audio/pixabay/waterfall_loop.wav"
+        "assets/audio/pixabay/waterfall_loop.wav",
+        "assets/audio/pixabay/chest_unlock.wav",
+        "assets/audio/pixabay/chest_open.wav",
+        "assets/audio/pixabay/torch_extinguish.wav"
     )) {
         if ($entryNames -notcontains $required) { throw "Windows zip is missing required entry: $required" }
     }

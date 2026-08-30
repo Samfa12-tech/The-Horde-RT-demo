@@ -79,6 +79,8 @@ struct SimulationSnapshot
 
     horde::gameplay::interactions::InteractionState interaction{};
     horde::gameplay::interactions::ChestRewardSnapshot chestReward{};
+    horde::gameplay::interactions::ChestRewardPrompt chestPrompt =
+        horde::gameplay::interactions::ChestRewardPrompt::None;
     horde::gameplay::interactions::FinaleSequenceSnapshot finale{};
     horde::gameplay::interactions::LanternPendulumSnapshot lanternPendulum{};
     horde::gameplay::items::HeldItemTransform rewardLanternWorldFromHinge{};

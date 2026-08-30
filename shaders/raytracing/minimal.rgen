@@ -14,7 +14,7 @@ void main()
     float aspect = float(gl_LaunchSizeEXT.x) / max(float(gl_LaunchSizeEXT.y), 1.0);
     float step = controls.time * 6.2;
     vec3 origin = vec3(controls.cameraX + sin(step * 0.5) * 0.035 * controls.walkAmount,
-                       0.58 + abs(sin(step)) * 0.035 * controls.walkAmount,
+                       0.70 + abs(sin(step)) * 0.035 * controls.walkAmount,
                        controls.cameraZ);
     float pitch = clamp(controls.pitch + sin(step) * 0.012 * controls.walkAmount, -0.32, 0.28);
     vec3 forward = normalize(vec3(sin(controls.yaw), -0.05 + pitch, -cos(controls.yaw)));
@@ -39,7 +39,8 @@ void main()
             atomicAdd(rtDielectricDiagnostics.value.primaryTorchPixelCount, 1u);
         else if (primary.instance == 3)
             atomicAdd(rtDielectricDiagnostics.value.primarySwordPixelCount, 1u);
-        else if (primary.instance == 4)
+        else if (primary.instance == 4 ||
+                 (primary.instance >= 10 && primary.instance <= 13))
             atomicAdd(rtDielectricDiagnostics.value.primaryPlayerPixelCount, 1u);
         else if (primary.instance == 7)
             atomicAdd(rtDielectricDiagnostics.value.primaryRewardRingPixelCount, 1u);

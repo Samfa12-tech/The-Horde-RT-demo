@@ -1,0 +1,28 @@
+{
+  "source": "right-gauntlet-hilt-meshy7.glb",
+  "runtimeSource": "right-gauntlet-stripped.glb",
+  "baseColourImage": "",
+  "removedCyanFaces": 816,
+  "removedCyanTriangles": 816,
+  "gripOrigin": [
+    -0.39494882903250134,
+    -0.13389729786677576,
+    0.06847316120239104
+  ],
+  "gripAxis": [
+    0.13791056851002462,
+    0.09585578918504958,
+    0.9857952844140375
+  ],
+  "gripAxisPrincipalVariance": 0.3981491862802323,
+  "remainingTriangles": 4800,
+  "remainingVertices": 2184,
+  "pointSurfaceRadius": 0.04,
+  "pointSurfaceVoxelSize": 0.012,
+  "trianglesBeforeBoundedDecimate": 216708,
+  "componentVertexCounts": [
+    2184
+  ],
+  "boundaryEdgesBeforeRuntimeWeld": 0,
+  "processing": "UV-sampled bright-cyan training-hilt removal; glove PBR and authored grip silhouette retained"
+}

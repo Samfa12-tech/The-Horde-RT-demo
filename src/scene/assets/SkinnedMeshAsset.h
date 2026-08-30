@@ -34,6 +34,15 @@ static_assert(sizeof(TexturedSkinnedRtVertex) == 48u);
 static_assert(offsetof(TexturedSkinnedRtVertex, normal) == 16u);
 static_assert(offsetof(TexturedSkinnedRtVertex, texcoord) == 32u);
 
+// Kept separate from TexturedSkinnedRtVertex so the established mobile lich
+// SSBO/BLAS stride remains 48 bytes. The static-PBR player path consumes this
+// alongside its unique skinned vertices and writes it into StaticRtVertex.
+struct SkinnedPbrTangent
+{
+    float tangent[4]{};
+};
+static_assert(sizeof(SkinnedPbrTangent) == 16u);
+
 enum class SkinnedClip
 {
     Idle,
@@ -76,6 +85,8 @@ struct SkinnedPlayerSockets
 {
     SkinnedNodeTransform leftHand{};
     SkinnedNodeTransform rightHand{};
+    SkinnedNodeTransform leftGrip{};
+    SkinnedNodeTransform rightGrip{};
 };
 
 const SkinnedClipSet& SkeletonCombatClipSet();
@@ -98,10 +109,19 @@ public:
     bool LoadCombatClips(const std::string& glbPath, std::string& diagnostic);
     bool IsLoaded() const { return loaded_; }
     bool HasTexcoords() const { return hasTexcoords_; }
+    bool HasTangents() const { return hasTangents_; }
     std::size_t ExpandedVertexCount() const { return expandedIndices_.size(); }
     std::size_t UniqueVertexCount() const;
+    std::size_t BootGroundingCandidateVertexCount() const
+    {
+        return bootGroundingVertexIndices_.size();
+    }
     const std::vector<SkinnedPrimitiveRange>& PrimitiveRanges() const { return primitiveRanges_; }
     float ClipDuration(SkinnedClip clip) const;
+    bool BootGroundingMinimumY(SkinnedClip clip,
+                               float timeSeconds,
+                               float& minimumY,
+                               std::string& diagnostic) const;
     bool HasNode(std::string_view name) const;
     bool NodeTransform(SkinnedClip clip,
                        float timeSeconds,
@@ -119,6 +139,7 @@ public:
                                   const SkinnedArmIkTarget& leftArm,
                                   const SkinnedArmIkTarget& rightArm,
                                   std::vector<TexturedSkinnedRtVertex>& output,
+                                  std::vector<SkinnedPbrTangent>& outputTangents,
                                   SkinnedPlayerSockets& sockets,
                                   std::string& diagnostic) const;
 
@@ -135,9 +156,13 @@ private:
     std::vector<std::uint32_t> joints_;
     std::vector<float> inverseBindMatrices_;
     std::vector<Clip> clips_;
+    std::vector<float> idleBootMinimumY_;
+    std::vector<float> walkingBootMinimumY_;
+    std::vector<std::uint32_t> bootGroundingVertexIndices_;
     mutable std::vector<SkinnedRtVertex> skinnedUniqueVertices_;
     mutable std::vector<SkinnedRtVertex> texturedSkinScratch_;
     bool hasTexcoords_ = false;
+    bool hasTangents_ = false;
     bool loaded_ = false;
 };
 

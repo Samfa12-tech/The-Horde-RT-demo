@@ -2,6 +2,7 @@ package com.samfa12.hordelanternrt;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.BroadcastReceiver;
 import android.content.ClipboardManager;
@@ -47,14 +48,21 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
+import javax.net.ssl.HttpsURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import org.json.JSONObject;
 
 public class MainActivity extends Activity {
     private static final String TAG = "HordeLanternAudio";
@@ -63,6 +71,8 @@ public class MainActivity extends Activity {
     private static final String REPORT_DIRECTORY = "reports";
     private static final String TEXT_REPORT_FILE = "vulkan_capability_report.txt";
     private static final String JSON_REPORT_FILE = "vulkan_capability_report.json";
+    private static final String GITHUB_RELEASE_PAGE_PREFIX =
+            "https://github.com/Samfa12-tech/The-Horde-RT-demo/releases/tag/";
     private static final String SKELETON_ASSET = "models/enemies/meshy/skeleton_biped_merged_animations_v01.glb";
     private static final String SKELETON_FILE = "skeleton_biped_merged_animations_v01.glb";
     private static final String LICH_ASSET = "models/enemies/meshy/lich_placeholder_merged_animations_v01.glb";
@@ -101,6 +111,9 @@ public class MainActivity extends Activity {
     private static final int PLATFORM_EVENT_LICH_IMPACT = 9;
     private static final int PLATFORM_EVENT_LICH_DEFEATED = 10;
     private static final int PLATFORM_EVENT_PLAYER_PARRY_SUCCEEDED = 12;
+    private static final int PLATFORM_EVENT_CHEST_UNLOCKED = 13;
+    private static final int PLATFORM_EVENT_CHEST_OPENED = 14;
+    private static final int PLATFORM_EVENT_TORCH_EXTINGUISHED = 16;
     private static final int ENTITY_LICH = 3;
     private static final int PLAYER_ALIVE = 0;
     private static final int PLAYER_DYING = 1;
@@ -117,8 +130,16 @@ public class MainActivity extends Activity {
     private static final int CONTEXTUAL_INTERACT = 1;
     private static final int CONTEXTUAL_RAISE = 2;
     private static final int CONTEXTUAL_LOWER = 4;
+    private static final int CHEST_PROMPT_SHIFT = 3;
+    private static final int CHEST_PROMPT_MASK = 7 << CHEST_PROMPT_SHIFT;
+    private static final int CHEST_PROMPT_NONE = 0;
+    private static final int CHEST_PROMPT_LOCKED = 1;
+    private static final int CHEST_PROMPT_OPEN = 2;
+    private static final int CHEST_PROMPT_OPENING = 3;
+    private static final int CHEST_PROMPT_CLAIM = 4;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
+    private final ExecutorService updateExecutor = Executors.newSingleThreadExecutor();
     private final float[] viewControls = {0.0f, 0.0f, 1.8f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
     private final int[] activePointers = {-1, -1};
     private final Map<String, Integer> sounds = new HashMap<>();
@@ -192,11 +213,23 @@ public class MainActivity extends Activity {
     private final int[] rtLightIntensityPercent = {100, 100, 100, 100};
     private int rtWorkloadPreset = 1;
     private boolean retryPending;
+    private boolean updateCheckInFlight;
+    private boolean updatePromptShown;
+    private boolean startupUpdateCheckScheduled;
+    private boolean startupUpdateCheckCompleted;
+    private String pendingUpdateDecision;
+    private boolean pendingUpdateManualRequest;
     private int lastPlayerLifePhase = PLAYER_ALIVE;
     private int lastPlayerVitality = 3;
     private long delayedGameplayFeedbackGeneration;
     private final Runnable applyPendingRenderScale = () ->
             ProbeBridge.setRenderScale(preferences.getInt("render_scale", 100) / 100.0f);
+    private final Runnable runStartupUpdateCheck = () -> {
+        startupUpdateCheckScheduled = false;
+        if (!resumed || startupUpdateCheckCompleted) return;
+        startupUpdateCheckCompleted = true;
+        checkForUpdates(false);
+    };
     private final Runnable refreshRtLabTelemetry = new Runnable() {
         @Override public void run() {
             if (!rtLabVisible || rtLabTelemetry == null) return;
@@ -325,6 +358,7 @@ public class MainActivity extends Activity {
         collectInitialDiagnostics();
         showMainMenu(true);
         handler.post(runtimePoll);
+        scheduleStartupUpdateCheck();
     }
 
     private void collectInitialDiagnostics() {
@@ -529,7 +563,9 @@ public class MainActivity extends Activity {
             addMenuButton(panel, getString(R.string.rt_lab), () -> openRtLab(false));
         }
         addMenuButton(panel, getString(R.string.run_benchmark), this::startBenchmark);
-        addMenuButton(panel, getString(R.string.more_by_samfa12), this::openSamfa12Website);
+        addMenuButtonRow(panel,
+                getString(R.string.more_by_samfa12), this::openSamfa12Website,
+                getString(R.string.check_for_updates), () -> checkForUpdates(true));
         addMenuButtonRow(panel,
                 getString(R.string.credits), this::showCredits,
                 getString(R.string.quit), this::finishAndRemoveTask);
@@ -1057,6 +1093,157 @@ public class MainActivity extends Activity {
                 rtLightIntensityPercent[rtLightGroup] / 100.0f);
     }
 
+    static String installedUpdateVersion(final String packageVersion) {
+        if (packageVersion == null) return "";
+        return packageVersion.endsWith("-debug")
+                ? packageVersion.substring(0, packageVersion.length() - "-debug".length())
+                : packageVersion;
+    }
+
+    private String installedUpdateVersion() {
+        try {
+            return installedUpdateVersion(
+                    getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
+        } catch (final Exception error) {
+            Log.w(TAG, "Installed package version was unavailable for the update check.", error);
+            return "";
+        }
+    }
+
+    private void checkForUpdates(final boolean manualRequest) {
+        if (manualRequest) {
+            handler.removeCallbacks(runStartupUpdateCheck);
+            startupUpdateCheckScheduled = false;
+            startupUpdateCheckCompleted = true;
+        }
+        if (updateCheckInFlight) {
+            if (manualRequest) {
+                Toast.makeText(this, R.string.update_check_in_progress, Toast.LENGTH_SHORT).show();
+            }
+            return;
+        }
+        updateCheckInFlight = true;
+        final String installedVersion = installedUpdateVersion();
+        updateExecutor.execute(() -> {
+            int statusCode = 0;
+            byte[] body = new byte[0];
+            HttpsURLConnection connection = null;
+            try {
+                final JSONObject request = new JSONObject(new String(
+                        ProbeBridge.getGitHubReleaseRequestContract(), StandardCharsets.UTF_8));
+                final URL endpoint = new URL(request.getString("url"));
+                if (!"https".equalsIgnoreCase(endpoint.getProtocol())) {
+                    throw new IllegalStateException("Native update request was not HTTPS.");
+                }
+                connection = (HttpsURLConnection) endpoint.openConnection();
+                connection.setInstanceFollowRedirects(false);
+                connection.setConnectTimeout(3500);
+                connection.setReadTimeout(5000);
+                connection.setRequestMethod("GET");
+                connection.setRequestProperty("Accept", request.getString("accept"));
+                connection.setRequestProperty("X-GitHub-Api-Version", request.getString("apiVersion"));
+                connection.setRequestProperty("User-Agent", request.getString("userAgent"));
+                statusCode = connection.getResponseCode();
+                final InputStream response = statusCode >= 200 && statusCode < 300
+                        ? connection.getInputStream() : connection.getErrorStream();
+                body = readBoundedUpdateResponse(
+                        response, request.getInt("maximumResponseBytes"));
+            } catch (final Exception error) {
+                Log.w(TAG, "GitHub Releases update check failed.", error);
+            } finally {
+                if (connection != null) connection.disconnect();
+            }
+
+            final String decision = new String(ProbeBridge.evaluateGitHubReleaseUpdate(
+                    installedVersion, statusCode, body), StandardCharsets.UTF_8);
+            runOnUiThread(() -> presentUpdateDecision(decision, manualRequest));
+        });
+    }
+
+    private static byte[] readBoundedUpdateResponse(final InputStream response,
+                                                     final int maximumBytes) throws Exception {
+        if (response == null) return new byte[0];
+        if (maximumBytes <= 0 || maximumBytes > 1024 * 1024) {
+            throw new IllegalArgumentException("Native update response limit is invalid.");
+        }
+        try (InputStream input = response;
+             ByteArrayOutputStream output = new ByteArrayOutputStream(8192)) {
+            final byte[] buffer = new byte[8192];
+            int total = 0;
+            while (true) {
+                final int read = input.read(buffer);
+                if (read < 0) break;
+                final int accepted = Math.min(read, maximumBytes + 1 - total);
+                if (accepted > 0) output.write(buffer, 0, accepted);
+                total += accepted;
+                if (total > maximumBytes) break;
+            }
+            return output.toByteArray();
+        }
+    }
+
+    private void presentUpdateDecision(final String decisionJson, final boolean manualRequest) {
+        updateCheckInFlight = false;
+        if (isFinishing() || (Build.VERSION.SDK_INT >= 17 && isDestroyed())) return;
+        if (!resumed) {
+            pendingUpdateDecision = decisionJson;
+            pendingUpdateManualRequest = manualRequest;
+            return;
+        }
+        pendingUpdateDecision = null;
+        try {
+            final JSONObject decision = new JSONObject(decisionJson);
+            final String status = decision.optString("status", "error");
+            if ("update-available".equals(status)) {
+                final JSONObject update = decision.optJSONObject("update");
+                if (update == null || updatePromptShown) return;
+                final String releaseUrl = update.optString("releasePageUrl", "");
+                if (!releaseUrl.startsWith(GITHUB_RELEASE_PAGE_PREFIX)) return;
+                updatePromptShown = true;
+                final String version = update.optString("version", "new");
+                final String title = update.optString("title", "");
+                final String notes = update.optString("notes", "");
+                final StringBuilder message = new StringBuilder(
+                        getString(R.string.update_available_body, version));
+                if (!title.isEmpty()) message.append("\n\n").append(title);
+                if (!notes.isEmpty()) message.append("\n\n").append(notes);
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.update_available_title)
+                        .setMessage(message.toString())
+                        .setPositiveButton(R.string.update_now, (dialog, which) ->
+                                openVerifiedReleasePage(releaseUrl))
+                        .setNegativeButton(R.string.later, null)
+                        .show();
+            } else if (manualRequest && "up-to-date".equals(status)) {
+                Toast.makeText(this, R.string.up_to_date, Toast.LENGTH_LONG).show();
+            } else if (manualRequest) {
+                Toast.makeText(this, R.string.update_check_failed, Toast.LENGTH_LONG).show();
+            }
+        } catch (final Exception error) {
+            Log.w(TAG, "Native update decision was invalid.", error);
+            if (manualRequest) {
+                Toast.makeText(this, R.string.update_check_failed, Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    private void scheduleStartupUpdateCheck() {
+        if (debugCaptureUiSuppressed || debugAutomationAutostart ||
+                startupUpdateCheckCompleted || startupUpdateCheckScheduled) return;
+        startupUpdateCheckScheduled = true;
+        handler.postDelayed(runStartupUpdateCheck, 1500L);
+    }
+
+    private void openVerifiedReleasePage(final String releaseUrl) {
+        if (!releaseUrl.startsWith(GITHUB_RELEASE_PAGE_PREFIX)) return;
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(releaseUrl)));
+        } catch (final RuntimeException error) {
+            Log.e(TAG, "Failed to open the verified GitHub release page.", error);
+            Toast.makeText(this, R.string.update_open_failed, Toast.LENGTH_LONG).show();
+        }
+    }
+
     private void publishRtFireTuning() {
         ProbeBridge.setRtFireTuning(
                 rtFireStrengthPercent / 100.0f,
@@ -1265,8 +1452,13 @@ public class MainActivity extends Activity {
                     developerOverlay.setVisibility(View.GONE);
                 }
 
-                final long[] platformEvents = ProbeBridge.drainPlatformEvents();
-                for (int eventIndex = 0; eventIndex + 1 < platformEvents.length; eventIndex += 2) {
+                // Platform feedback is meaningful only while this exact RT surface is
+                // active. Native teardown discards its pending transport queue, so a
+                // pre-Home event can neither play in the background nor replay after
+                // the new surface resumes.
+                if (resumed && surfaceStarted && state == 1) {
+                    final long[] platformEvents = ProbeBridge.drainPlatformEvents();
+                    for (int eventIndex = 0; eventIndex + 1 < platformEvents.length; eventIndex += 2) {
                     final long metadata = platformEvents[eventIndex];
                     final long stereoGains = platformEvents[eventIndex + 1];
                     final int eventType = (int) (metadata & 0xffL);
@@ -1330,12 +1522,22 @@ public class MainActivity extends Activity {
                         case PLATFORM_EVENT_LICH_DEFEATED:
                             playSpatialSound("lich_fall", 0.28f, stereoGains);
                             break;
+                        case PLATFORM_EVENT_CHEST_UNLOCKED:
+                            playSpatialSound("chest_unlock", 0.82f, stereoGains);
+                            break;
+                        case PLATFORM_EVENT_CHEST_OPENED:
+                            playSpatialSound("chest_open", 1.0f, stereoGains);
+                            break;
+                        case PLATFORM_EVENT_TORCH_EXTINGUISHED:
+                            playSpatialSound("torch_extinguish", 0.78f, stereoGains);
+                            break;
                         case PLATFORM_EVENT_PLAYER_PARRY_SUCCEEDED:
                             playSpatialSound("sword_hit_2", 0.46f, stereoGains);
                             performHaptic(HAPTIC_PARRY);
                             break;
                         default:
                             break;
+                    }
                     }
                 }
                 updateWaterfallLoop();
@@ -1388,7 +1590,7 @@ public class MainActivity extends Activity {
                 HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
     }
 
-    private static int checkpointId(final String name) {
+    static int checkpointId(final String name) {
         if (name == null) return -1;
         switch (name) {
             case "opening": return 0;
@@ -1404,11 +1606,40 @@ public class MainActivity extends Activity {
             case "lich": return 10;
             case "finale-roof": return 11;
             case "two-enemy-combat": return 12;
+            case "pbr-sword-closeup": return 100;
+            case "pbr-torch-fire": return 101;
             case "player-body-grips": return 102;
+            case "player-body-forward": return 103;
+            case "player-fallback-forward": return 104;
             case "player-fallback-grips": return 105;
             case "player-body-owner-feedback": return 106;
             case "player-body-downward-cut": return 107;
             case "player-body-upward-slice": return 108;
+            case "glass-transport": return 109;
+            case "glass-fire-transport": return 110;
+            case "glass-tinted-transport": return 111;
+            case "glass-millimetre-closed": return 112;
+            case "glass-edge-fresnel": return 113;
+            case "lantern-chest-unlock": return 114;
+            case "lantern-glass-production": return 115;
+            case "lantern-held-high": return 116;
+            case "lantern-held-low": return 117;
+            case "lantern-glass-transmission": return 118;
+            case "lantern-motion-extreme": return 119;
+            case "lantern-sweep-high-forward": return 120;
+            case "lantern-sweep-high-backward": return 121;
+            case "lantern-sweep-high-left": return 122;
+            case "lantern-sweep-high-right": return 123;
+            case "lantern-sweep-high-diagonal": return 124;
+            case "lantern-sweep-high-opposite": return 125;
+            case "lantern-sweep-low-forward": return 126;
+            case "lantern-sweep-low-backward": return 127;
+            case "lantern-sweep-low-left": return 128;
+            case "lantern-sweep-low-right": return 129;
+            case "lantern-sweep-high-alt-camera": return 130;
+            case "lantern-sweep-low-alt-camera": return 131;
+            case "lantern-wall-high": return 132;
+            case "lantern-wall-low": return 133;
             default: return -1;
         }
     }
@@ -1592,6 +1823,9 @@ public class MainActivity extends Activity {
         loadSound("lich_impact", "audio/filmcow/lich_impact.wav");
         loadSound("lich_fall", "audio/filmcow/lich_fall.wav");
         loadSound("lich_hurt", "audio/filmcow/lich_hurt.wav");
+        loadSound("chest_unlock", "audio/pixabay/chest_unlock.wav");
+        loadSound("chest_open", "audio/pixabay/chest_open.wav");
+        loadSound("torch_extinguish", "audio/pixabay/torch_extinguish.wav");
         initialiseWaterfallLoop(attributes);
     }
 
@@ -1882,8 +2116,35 @@ public class MainActivity extends Activity {
             return;
         }
         final int contextualState = ProbeBridge.getContextualControlState();
-        interactButton.setVisibility((contextualState & CONTEXTUAL_INTERACT) != 0 ?
-                View.VISIBLE : View.GONE);
+        final int chestPrompt = (contextualState & CHEST_PROMPT_MASK) >> CHEST_PROMPT_SHIFT;
+        final boolean interactEnabled = (contextualState & CONTEXTUAL_INTERACT) != 0;
+        final int interactLabel;
+        switch (chestPrompt) {
+            case CHEST_PROMPT_LOCKED:
+                interactLabel = R.string.chest_locked_until_lich_defeated;
+                break;
+            case CHEST_PROMPT_OPEN:
+                interactLabel = R.string.open_chest;
+                break;
+            case CHEST_PROMPT_OPENING:
+                interactLabel = R.string.chest_opening;
+                break;
+            case CHEST_PROMPT_CLAIM:
+                interactLabel = R.string.take_lantern;
+                break;
+            case CHEST_PROMPT_NONE:
+            default:
+                interactLabel = 0;
+                break;
+        }
+        if (interactLabel == 0) {
+            interactButton.setVisibility(View.GONE);
+        } else {
+            interactButton.setText(interactLabel);
+            interactButton.setContentDescription(getString(interactLabel));
+            interactButton.setEnabled(interactEnabled);
+            interactButton.setVisibility(View.VISIBLE);
+        }
         final boolean showRaise = (contextualState & CONTEXTUAL_RAISE) != 0;
         final boolean showLower = (contextualState & CONTEXTUAL_LOWER) != 0;
         if (!showRaise && !showLower) {
@@ -1992,6 +2253,13 @@ public class MainActivity extends Activity {
         enterImmersiveMode();
         startSurfaceIfReady();
         if (rtLabVisible) handler.post(refreshRtLabTelemetry);
+        scheduleStartupUpdateCheck();
+        if (pendingUpdateDecision != null) {
+            final String decision = pendingUpdateDecision;
+            final boolean manualRequest = pendingUpdateManualRequest;
+            pendingUpdateDecision = null;
+            handler.post(() -> presentUpdateDecision(decision, manualRequest));
+        }
     }
 
     @Override
@@ -2007,6 +2275,8 @@ public class MainActivity extends Activity {
     @Override
     protected void onPause() {
         resumed = false;
+        handler.removeCallbacks(runStartupUpdateCheck);
+        startupUpdateCheckScheduled = false;
         handler.removeCallbacks(refreshRtLabTelemetry);
         if (waterfallPlayer != null) {
             waterfallPlayer.setVolume(0.0f, 0.0f);
@@ -2036,6 +2306,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         handler.removeCallbacksAndMessages(null);
+        updateExecutor.shutdownNow();
         if (vibrator != null) vibrator.cancel();
         if (debugRetryReceiver != null) {
             unregisterReceiver(debugRetryReceiver);

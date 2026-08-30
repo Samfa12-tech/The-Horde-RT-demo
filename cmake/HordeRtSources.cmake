@@ -20,6 +20,7 @@ set(HORDE_RT_CORE_RELATIVE_SOURCES
     scene/assets/AssetValidation.cpp
     scene/assets/GltfDocument.cpp
     scene/assets/StaticMeshAsset.cpp
+    update/GitHubReleaseUpdater.cpp
     vulkan/DeviceCapabilities.cpp
     vulkan/RtCapabilityReport.cpp
     vulkan/GpuFrameTimer.cpp

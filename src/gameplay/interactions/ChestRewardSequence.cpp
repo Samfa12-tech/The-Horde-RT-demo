@@ -41,6 +41,28 @@ ChestRewardAction ChestRewardSequence::TryInteract(const InteractionQuery& query
     return ChestRewardAction::None;
 }
 
+ChestRewardPrompt ChestRewardSequence::QueryPrompt(
+    const InteractionQuery& query) const
+{
+    if (!IsInteractionAvailable(query, kRewardChestInteractionPosition))
+    {
+        return ChestRewardPrompt::None;
+    }
+    switch (snapshot_.phase)
+    {
+    case ChestRewardPhase::Locked:
+        return ChestRewardPrompt::Locked;
+    case ChestRewardPhase::ClosedUnlocked:
+        return ChestRewardPrompt::OpenChest;
+    case ChestRewardPhase::Opening:
+        return ChestRewardPrompt::Opening;
+    case ChestRewardPhase::LanternAvailable:
+        return ChestRewardPrompt::ClaimLantern;
+    default:
+        return ChestRewardPrompt::None;
+    }
+}
+
 const ChestRewardSnapshot& ChestRewardSequence::Update(float fixedDeltaSeconds)
 {
     if (snapshot_.phase != ChestRewardPhase::Opening ||

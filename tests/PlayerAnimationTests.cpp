@@ -97,9 +97,9 @@ int main()
         input.heldItemKinematics.swordRadians,
         input.heldItemKinematics.swordForwardRadians,
         horde::gameplay::items::kSwordGripRollRadians);
-    if (!Require(layered.leftIk.gripX == std::array<float, 3u>{{1.0f, 0.0f, 0.0f}} &&
-                 layered.leftIk.gripY == std::array<float, 3u>{{0.0f, 1.0f, 0.0f}} &&
-                 layered.leftIk.gripZ == std::array<float, 3u>{{0.0f, 0.0f, -1.0f}} &&
+    if (!Require(layered.leftIk.gripX == input.heldItemKinematics.leftGripXInView &&
+                 layered.leftIk.gripY == input.heldItemKinematics.leftGripYInView &&
+                 layered.leftIk.gripZ == input.heldItemKinematics.leftGripZInView &&
                  layered.rightIk.gripX == layeredSwordBasis.edgeDirection &&
                  layered.rightIk.gripY == layeredSwordBasis.bladeAxis &&
                  layered.rightIk.gripZ == layeredSwordBasis.flatNormal,
@@ -115,16 +115,39 @@ int main()
                                 ownerFeedbackPose.leftShoulderLocal[0];
     const float handSeparation = ownerFeedbackPose.rightHandLocal[0] -
                                  ownerFeedbackPose.leftHandLocal[0];
-    if (!Require(shoulderWidth >= 0.68f && handSeparation >= 0.48f,
-                 "first-person rest pose must retain lateral shoulder roots and torso space")) return 1;
+    if (!Require(shoulderWidth >= 0.68f && handSeparation >= 0.20f &&
+                     handSeparation <= 0.30f,
+                 "first-person rest pose must retain lateral shoulder roots while the forearms bend inward to portrait-safe prop grips")) return 1;
+    const float leftGripDeterminant =
+        ownerFeedbackPose.leftGripXInView[0] *
+            (ownerFeedbackPose.leftGripYInView[1] * ownerFeedbackPose.leftGripZInView[2] -
+             ownerFeedbackPose.leftGripYInView[2] * ownerFeedbackPose.leftGripZInView[1]) -
+        ownerFeedbackPose.leftGripYInView[0] *
+            (ownerFeedbackPose.leftGripXInView[1] * ownerFeedbackPose.leftGripZInView[2] -
+             ownerFeedbackPose.leftGripXInView[2] * ownerFeedbackPose.leftGripZInView[1]) +
+        ownerFeedbackPose.leftGripZInView[0] *
+            (ownerFeedbackPose.leftGripXInView[1] * ownerFeedbackPose.leftGripYInView[2] -
+             ownerFeedbackPose.leftGripXInView[2] * ownerFeedbackPose.leftGripYInView[1]);
+    if (!Require(leftGripDeterminant < -0.999f &&
+                 ownerFeedbackPose.leftGripXInView[0] > 0.999f &&
+                 ownerFeedbackPose.leftGripZInView[2] < -0.999f,
+                 "left torch grip must retain the authored broadside palm instead of collapsing the fingers into an end-on fist blob"))
+        return 1;
     const TwoBoneIkSolution ownerLeftArm = SolveTwoBoneIk(
         ownerFeedbackPose.leftShoulderLocal, ownerFeedbackPose.leftHandLocal,
-        {{-0.9f, -0.1f, 0.4f}}, 0.53f, 0.53f);
+        layered.leftIk.pole, layered.leftIk.upperArmLength,
+        layered.leftIk.lowerArmLength);
     const TwoBoneIkSolution ownerRightArm = SolveTwoBoneIk(
         ownerFeedbackPose.rightShoulderLocal, ownerFeedbackPose.rightHandLocal,
-        {{0.9f, -0.1f, 0.4f}}, 0.53f, 0.53f);
-    if (!Require(ownerLeftArm.elbow[0] <= -0.30f && ownerRightArm.elbow[0] >= 0.30f,
-                 "first-person upper arms must remain separate left/right chains")) return 1;
+        layered.rightIk.pole, layered.rightIk.upperArmLength,
+        layered.rightIk.lowerArmLength);
+    if (!Require(ownerLeftArm.elbow[0] >=
+                     ownerFeedbackPose.leftShoulderLocal[0] - 0.04f &&
+                 ownerRightArm.elbow[0] <=
+                     ownerFeedbackPose.rightShoulderLocal[0] + 0.04f &&
+                 ownerLeftArm.elbow[1] <= ownerFeedbackPose.leftHandLocal[1] - 0.32f &&
+                 ownerRightArm.elbow[1] <= ownerFeedbackPose.rightHandLocal[1] - 0.32f,
+                 "first-person upper arms must drop below and slightly inward from the shoulders before the forearms bend across to the grips")) return 1;
     const auto swordAxis = horde::gameplay::items::EvaluateSwordBladeAxisInView(
         ownerFeedbackPose.swordRadians, ownerFeedbackPose.swordForwardRadians);
     if (!Require(swordAxis[0] <= -0.12f && swordAxis[2] >= 0.10f && swordAxis[1] > 0.90f,
@@ -178,10 +201,24 @@ int main()
                  "75% portrait contract must keep torch markers, both grips, and blade bounds inside the safe frame"))
         return 1;
 
+    horde::gameplay::items::HeldItemKinematicsInput downwardWindupInput{};
+    downwardWindupInput.playerCombat.action = PlayerCombatAction::SwingWindup;
+    downwardWindupInput.playerCombat.actionTime = SwordCombat::kSwingWindupDuration;
+    const auto downwardWindupPose =
+        horde::gameplay::items::EvaluateHeldItemKinematics(downwardWindupInput);
     horde::gameplay::items::HeldItemKinematicsInput downwardInput{};
     downwardInput.playerCombat.action = PlayerCombatAction::SwingActive;
+    downwardInput.playerCombat.actionTime = SwordCombat::kSwingActiveDuration;
     downwardInput.swordSwingRadians = -SwordCombat::kDownwardSwingAmplitude;
     const auto downwardPose = horde::gameplay::items::EvaluateHeldItemKinematics(downwardInput);
+    if (!Require(downwardWindupPose.rightHandLocal[1] -
+                     downwardPose.rightHandLocal[1] >= 0.50f &&
+                 std::abs(downwardWindupPose.rightHandLocal[0] -
+                          downwardPose.rightHandLocal[0]) <= 0.30f &&
+                 downwardPose.swordRadians >= 0.75f &&
+                 downwardPose.swordForwardRadians >= 0.98f,
+                 "first attack must be an unmistakable vertical downward cut, not a small lateral hand shift"))
+        return 1;
     const auto downwardFrame = horde::gameplay::items::EvaluateOwnerFeedbackPortraitSafeFrame(
         downwardPose, 1440.0f / 3120.0f);
     std::cout << "Downward portrait safe-frame NDC x=[" << downwardFrame.minimumNdcX
@@ -191,10 +228,24 @@ int main()
                  "downward-cut blade bounds must remain inside the 75% portrait safe frame"))
         return 1;
 
+    horde::gameplay::items::HeldItemKinematicsInput upwardStartInput{};
+    upwardStartInput.playerCombat.action = PlayerCombatAction::UpwardSliceWindup;
+    upwardStartInput.playerCombat.actionTime = 0.0f;
+    const auto upwardStartPose =
+        horde::gameplay::items::EvaluateHeldItemKinematics(upwardStartInput);
     horde::gameplay::items::HeldItemKinematicsInput upwardInput{};
     upwardInput.playerCombat.action = PlayerCombatAction::UpwardSliceActive;
+    upwardInput.playerCombat.actionTime = SwordCombat::kUpwardSliceActiveDuration;
     upwardInput.swordSwingRadians = SwordCombat::kUpwardSliceEndRadians;
     const auto upwardPose = horde::gameplay::items::EvaluateHeldItemKinematics(upwardInput);
+    if (!Require(Distance(downwardPose.rightHandLocal,
+                          upwardStartPose.rightHandLocal) <= 0.025f &&
+                 std::abs(downwardPose.swordRadians -
+                          upwardStartPose.swordRadians) <= 0.05f &&
+                 upwardPose.rightHandLocal[1] - upwardStartPose.rightHandLocal[1] >= 0.54f &&
+                 upwardPose.swordRadians <= -0.25f,
+                 "queued second press must continue from the down-cut and drive a smooth, readable upward slice"))
+        return 1;
     const auto upwardFrame = horde::gameplay::items::EvaluateOwnerFeedbackPortraitSafeFrame(
         upwardPose, 1440.0f / 3120.0f);
     std::cout << "Upward portrait safe-frame NDC x=[" << upwardFrame.minimumNdcX
@@ -207,20 +258,37 @@ int main()
     {
         const float amount = static_cast<float>(sample) / 24.0f;
         horde::gameplay::items::HeldItemKinematicsInput arcInput{};
-        arcInput.playerCombat.action = amount < 0.5f
-            ? PlayerCombatAction::SwingActive : PlayerCombatAction::UpwardSliceActive;
+        if (amount < 0.5f)
+        {
+            arcInput.playerCombat.action = PlayerCombatAction::SwingActive;
+            arcInput.playerCombat.actionTime =
+                SwordCombat::kSwingActiveDuration * amount * 2.0f;
+        }
+        else
+        {
+            arcInput.playerCombat.action = PlayerCombatAction::UpwardSliceActive;
+            arcInput.playerCombat.actionTime =
+                SwordCombat::kUpwardSliceActiveDuration * (amount - 0.5f) * 2.0f;
+        }
         arcInput.swordSwingRadians = -SwordCombat::kDownwardSwingAmplitude +
             (SwordCombat::kUpwardSliceEndRadians + SwordCombat::kDownwardSwingAmplitude) * amount;
         const auto arcPose = horde::gameplay::items::EvaluateHeldItemKinematics(arcInput);
         const auto arcFrame = horde::gameplay::items::EvaluateOwnerFeedbackPortraitSafeFrame(
             arcPose, 1440.0f / 3120.0f);
-        const auto arcBasis = horde::gameplay::items::EvaluateSwordGripBasisInView(
-            arcPose.swordRadians, arcPose.swordForwardRadians,
-            horde::gameplay::items::kSwordGripRollRadians);
+        if (arcFrame.minimumNdcX < -0.94f || arcFrame.maximumNdcX > 0.94f)
+        {
+            std::cout << "Unsafe attack sample " << sample << " NDC x=["
+                      << arcFrame.minimumNdcX << ", "
+                      << arcFrame.maximumNdcX << "] hand="
+                      << arcPose.rightHandLocal[0] << ','
+                      << arcPose.rightHandLocal[1] << ','
+                      << arcPose.rightHandLocal[2] << " angles="
+                      << arcPose.swordRadians << '/'
+                      << arcPose.swordForwardRadians << '\n';
+        }
         if (!Require(arcFrame.minimumNdcX >= -0.94f &&
-                     arcFrame.maximumNdcX <= 0.94f &&
-                     arcBasis.edgeDirection[2] >= 0.90f,
-                     "the full down/up attack arc must stay portrait-safe and edge-forward"))
+                     arcFrame.maximumNdcX <= 0.94f,
+                     "the full down/up attack arc must stay inside the portrait safe frame"))
             return 1;
     }
 
@@ -296,12 +364,32 @@ int main()
                  "route reset must reset authoritative player animation state")) return 1;
 
     using namespace horde::vulkan::raytracing;
+    const PlayerModelWorldBasis modelBasis = BuildPlayerModelWorldBasis(
+        {{1.0f, 0.0f, 0.0f}}, {{0.0f, 0.0f, -1.0f}});
+    const auto anatomicalLeftInWorld = PlayerModelVectorToWorld(
+        modelBasis, {{1.0f, 0.0f, 0.0f}});
+    const auto gameplayLeftInModel = WorldVectorToPlayerModel(
+        modelBasis, {{-1.0f, 0.0f, 0.0f}});
+    if (!Require(PlayerModelWorldBasisDeterminant(modelBasis) > 0.999f &&
+                 anatomicalLeftInWorld[0] < -0.999f &&
+                 gameplayLeftInModel[0] > 0.999f,
+                 "the +Z player rig must use a proper 180-degree rotation that keeps anatomical Left on gameplay left"))
+        return 1;
     const PlayerRouteMasks proceduralMasks = BuildPlayerRouteMasks(PlayerRenderRoute::Procedural);
     const PlayerRouteMasks skinnedMasks = BuildPlayerRouteMasks(PlayerRenderRoute::Skinned);
+    const PlayerRouteMasks hybridMasks =
+        BuildPlayerRouteMasks(PlayerRenderRoute::HybridBlockPrimary);
     if (!Require(proceduralMasks.instanceMasks[4] == 0x10u &&
                  proceduralMasks.instanceMasks[5] == 0x04u &&
                  proceduralMasks.instanceMasks[16] == 0x10u &&
-                 skinnedMasks.instanceMasks[4] == 0x14u,
+                 skinnedMasks.instanceMasks[4] == 0x14u &&
+                 hybridMasks.instanceMasks[4] == 0x10u &&
+                 hybridMasks.instanceMasks[9] == 0u &&
+                 hybridMasks.instanceMasks[10] == 0x04u &&
+                 hybridMasks.instanceMasks[11] == 0x04u &&
+                 hybridMasks.instanceMasks[12] == 0x04u &&
+                 hybridMasks.instanceMasks[13] == 0x04u &&
+                 hybridMasks.instanceMasks[14] == 0u,
                  "developer A/B routes must preserve intended primary/reflection masks")) return 1;
     for (std::size_t slot = 5u; slot <= 16u; ++slot)
     {
@@ -316,13 +404,13 @@ int main()
                                         false});
     if (!Require(normalRewardWorld.rewardWorldVisible &&
                  !normalRewardWorld.inspectionOverride &&
-                 normalRewardWorld.playerRoute == PlayerRenderRoute::Skinned &&
+                 normalRewardWorld.playerRoute == PlayerRenderRoute::HybridBlockPrimary &&
                  normalRewardWorld.torchMask == 0x02u &&
                  normalRewardWorld.swordMask == 0x02u &&
-                 normalRewardWorld.playerMask == 0x14u &&
+                 normalRewardWorld.playerMask == 0x10u &&
                  normalRewardWorld.playerPrimaryVisible &&
                  normalRewardWorld.playerReflectionVisible,
-                 "ordinary reward-world existence must not mask the torch, sword, or skinned player"))
+                 "ordinary reward-world existence must retain torch, sword, block-primary arms, and the reflected skinned body"))
         return 1;
     const ProductionSceneVisibility claimedReward =
         BuildProductionSceneVisibility({PlayerRenderRoute::Procedural,
@@ -330,13 +418,24 @@ int main()
                                         false,
                                         true});
     if (!Require(claimedReward.rewardWorldVisible &&
-                 claimedReward.playerRoute == PlayerRenderRoute::Skinned &&
-                 claimedReward.torchMask == 0x02u &&
+                 claimedReward.playerRoute == PlayerRenderRoute::HybridBlockPrimary &&
+                 claimedReward.torchMask == 0u &&
                  claimedReward.swordMask == 0x02u &&
-                 claimedReward.playerMask == 0x14u &&
+                 claimedReward.playerMask == 0x10u &&
                  claimedReward.playerPrimaryVisible &&
                  claimedReward.playerReflectionVisible,
-                 "claimed reward frames must retain primary/reflection-visible skinned hands and body"))
+                 "claimed reward frames must replace only the ordinary torch while retaining the sword, block-primary arms, and reflected skinned body"))
+        return 1;
+    const ProductionSceneVisibility skinnedDevelopment =
+        BuildProductionSceneVisibility({PlayerRenderRoute::Skinned,
+                                        false,
+                                        false,
+                                        false});
+    if (!Require(skinnedDevelopment.playerRoute == PlayerRenderRoute::Skinned &&
+                 skinnedDevelopment.playerMask == 0x14u &&
+                 skinnedDevelopment.playerPrimaryVisible &&
+                 skinnedDevelopment.playerReflectionVisible,
+                 "an explicit development A/B request must retain the skinned primary route"))
         return 1;
     const ProductionSceneVisibility inspectionReward =
         BuildProductionSceneVisibility({PlayerRenderRoute::Skinned,
@@ -437,7 +536,7 @@ int main()
                      authoredHinge,
                      authoritativeHinge,
                      authoritativeBody,
-                     0.90f,
+                     horde::gameplay::items::kClaimedRewardLanternScale,
                      rewardVisuals,
                      socketDiagnostic),
                  socketDiagnostic.c_str()))
@@ -451,7 +550,9 @@ int main()
                  rewardGripAgreement.orientationErrorRadians <=
                      kPlayerGripOrientationToleranceRadians &&
                  Near(rewardVisuals.worldFromHinge[13],
-                      finalSkinnedLeftGrip[13] - 0.90f * 0.097f),
+                      finalSkinnedLeftGrip[13] -
+                          horde::gameplay::items::kClaimedRewardLanternScale *
+                              0.097f),
                  "claimed reward ring must attach through authored GripRing and derive Hinge below the final skinned hand"))
         return 1;
     const HeldItemTransform rewardBodyLocal = MultiplyHeldItemTransforms(

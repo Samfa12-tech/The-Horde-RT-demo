@@ -10,12 +10,25 @@
     <string name="technical_info">RT DIAGNOSTICS</string>
     <string name="run_benchmark">RUN BENCHMARK</string>
     <string name="more_by_samfa12">MORE BY SAMFA12</string>
+    <string name="check_for_updates">CHECK FOR UPDATES</string>
+    <string name="update_check_in_progress">Update check already in progress.</string>
+    <string name="update_available_title">UPDATE AVAILABLE</string>
+    <string name="update_available_body">Horde Lantern RT %1$s is available.</string>
+    <string name="update_now">UPDATE NOW</string>
+    <string name="later">LATER</string>
+    <string name="up_to_date">You already have the newest published version.</string>
+    <string name="update_check_failed">Could not check GitHub Releases. Check your connection and try again.</string>
+    <string name="update_open_failed">The GitHub release page could not be opened.</string>
     <string name="credits">CREDITS &amp; LICENCES</string>
     <string name="quit">QUIT DEMO</string>
     <string name="back">BACK</string>
     <string name="swing">SWING</string>
     <string name="parry">PARRY</string>
     <string name="interact">INTERACT</string>
+    <string name="chest_locked_until_lich_defeated">LOCKED\nSLAY LICH</string>
+    <string name="open_chest">OPEN CHEST</string>
+    <string name="chest_opening">OPENING…</string>
+    <string name="take_lantern">TAKE LANTERN</string>
     <string name="raise_lantern">RAISE</string>
     <string name="lower_lantern">LOWER</string>
     <string name="vitality_full">VITALITY  3 / 3</string>
@@ -82,7 +95,7 @@
     <string name="report_copy_failed">The benchmark report could not be copied.</string>
     <string name="report_saved">Benchmark report saved.</string>
     <string name="report_save_failed">The benchmark report could not be saved.</string>
-    <string name="controls_help">LEFT HALF\nDrag to walk and strafe\n\nRIGHT HALF\nDrag for 360° camera look\n\nSWING\nTap the amber button to attack\n\nPARRY\nTap beside Swing to deflect a skeleton strike\n\nINTERACT\nAppears when the reward chest can be used\n\nRAISE / LOWER\nAppears while carrying the reward lantern\n\nMENU / BACK\nPause, restart, settings and diagnostics</string>
+    <string name="controls_help">LEFT HALF\nDrag to walk and strafe\n\nRIGHT HALF\nDrag for 360° camera look\n\nSWING\nTap the amber button to attack\n\nPARRY\nTap beside Swing to deflect a skeleton strike\n\nINTERACT\nShows the chest state nearby; tap when enabled\n\nRAISE / LOWER\nAppears while carrying the reward lantern\n\nMENU / BACK\nPause, restart, settings and diagnostics</string>
     <string name="sfx_enabled">Sound effects</string>
     <string name="haptics_enabled">Vibration / haptics</string>
     <string name="sfx_volume">SFX volume</string>
@@ -94,5 +107,5 @@
     <string name="water_quality_high">High</string>
     <string name="show_hud">Show compact HUD</string>
     <string name="reset_defaults">RESET DEFAULTS</string>
-    <string name="credits_body">Environment materials: Poly Haven — CC0.\nhttps://polyhaven.com/\n\nSound effects: FilmCow Royalty Free Sound Effects Library — FilmCow custom royalty-free licence.\nhttps://filmcow.itch.io/filmcow-sfx\n\nWater Dripping by DRAGON-STUDIO via Pixabay — Pixabay Content License.\nhttps://pixabay.com/sound-effects/nature-water-dripping-364450/\n\nSkeleton derivative: original Free Stylized Dark Fantasy Skeleton by Hotstrike Studio; texture, rig, and animation processing created with Meshy — CC BY 4.0.\nhttps://hotstrikestudio.itch.io/free-stylized-skeleton\n\nPlaceholder lich character created and animated with Meshy — CC0.\nhttps://www.meshy.ai/\n\nProduction Gothic arming sword created with Meshy; runtime processing by Samfa12/Codex — CC BY 4.0.\n\nProduction medieval hand torch created with Meshy; runtime processing by Samfa12/Codex — CC BY 4.0.\n\nHistorical-Gothic traveller/fighter created with Meshy; runtime processing and animation integration by Samfa12/Codex — CC BY 4.0.\n\nProduction Gothic reward chest created with Meshy; runtime processing by Samfa12/Codex — CC BY 4.0.\n\nProduction Gothic reward lantern created with Meshy; runtime processing by Samfa12/Codex — CC BY 4.0.\n\nApplication icon created for this project with OpenAI image generation.\n\nFull provenance and licence details are bundled as ASSET_LICENSES.md and published at:\nhttps://github.com/Samfa12-tech/The-Horde-RT-demo/blob/main/ASSET_LICENSES.md</string>
+    <string name="credits_body">Environment materials: Poly Haven — CC0.\nhttps://polyhaven.com/\n\nSound effects: FilmCow Royalty Free Sound Effects Library — FilmCow custom royalty-free licence.\nhttps://filmcow.itch.io/filmcow-sfx\n\nWater Dripping by DRAGON-STUDIO via Pixabay — Pixabay Content License.\nhttps://pixabay.com/sound-effects/nature-water-dripping-364450/\n\nWooden Trunk Latch 1 by floraphonic via Pixabay — Pixabay Content License.\nhttps://pixabay.com/sound-effects/film-special-effects-wooden-trunk-latch-1-183944/\n\nChest Opening by spookymodem (Freesound), via Pixabay — Pixabay Content License.\nhttps://pixabay.com/sound-effects/household-chest-opening-87569/\n\nFire extinguishing by MUSICHOLDER via Pixabay — Pixabay Content License.\nhttps://pixabay.com/sound-effects/film-special-effects-fire-extinguishing-212651/\n\nSkeleton derivative: original Free Stylized Dark Fantasy Skeleton by Hotstrike Studio; texture, rig, and animation processing created with Meshy — CC BY 4.0.\nhttps://hotstrikestudio.itch.io/free-stylized-skeleton\n\nPlaceholder lich character created and animated with Meshy — CC0.\nhttps://www.meshy.ai/\n\nProduction Gothic arming sword created with Meshy; runtime processing by Samfa12/Codex — CC BY 4.0.\n\nProduction medieval hand torch created with Meshy; runtime processing by Samfa12/Codex — CC BY 4.0.\n\nHistorical-Gothic traveller/fighter and viewmodel gauntlets created with Meshy; runtime processing and animation integration by Samfa12/Codex — CC BY 4.0.\n\nProduction Gothic reward chest created with Meshy; runtime processing by Samfa12/Codex — CC BY 4.0.\n\nProduction Gothic reward lantern created with Meshy; runtime processing by Samfa12/Codex — CC BY 4.0.\n\nApplication icon created for this project with OpenAI image generation.\n\nFull provenance and licence details are bundled as ASSET_LICENSES.md and published at:\nhttps://github.com/Samfa12-tech/The-Horde-RT-demo/blob/main/ASSET_LICENSES.md</string>
 </resources>
