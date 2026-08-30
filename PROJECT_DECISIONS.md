@@ -113,6 +113,20 @@ Publish the reviewed RT Lab and general water-light correction as literal packag
 
 The Windows package passed a fresh isolated launch with `RayTracingPipeline`, honest swapchain presentation, and exit code 0. The Android package passed the established certificate and static/package compatibility guards, but ADB exposed no device at publication; do not infer an exact signed-device, pullback, lifecycle, performance, or owner-feel pass. The 0.1.1 through 0.1.5 and 1.5.2 lines are immutable, and the next Android update requires `versionCode > 7`.
 
+## Fire/PBR/reward-lantern development decision - 2026-08-30
+
+New production props use the fixed-capacity static GLB/PBR asset, instance-metadata, material-metadata, socket, and immutable-BLAS routes. Fire is bounded emitter data plus RT-visible emissive geometry and a deterministic world-space raygen volume; its visible flame, coloured direct light, reflection energy, and flicker share one emitter transform and state. Glass uses the generic bounded dielectric path with exact entry/exit interfaces, Fresnel, IOR, roughness, Beer-Lambert attenuation, transparent shadow transmittance, and finite Mobile/High `rayQueryEXT` budgets. Do not reintroduce primitive-range object branches, alpha-only lantern glass, a screen-space flame, or independent light motion.
+
+Chest, reward, interaction, held-light pose, sword combo, and lantern secondary motion remain authoritative in the shared fixed-step simulation. Platform layers publish monotonic commands and consume ordered events. The physical lantern solver responds to actual pivot acceleration, gravity, damping, torsion, and bounded stops; renderer interpolation must not invent authority. Windows/Android updater UI may query public GitHub Releases and open a release page, but may not mutate gameplay state or install a package silently.
+
+Normal gameplay uses the stable block-arm presentation for sword, torch, and reward lantern until a later skinned-hand/gauntlet asset and animation pass is accepted in every scenario. `player-body-*` checkpoints retain the reusable skinned player/IK/socket foundation for development only. Arm/body appearance in shadows and reflections is owner-deferred to the next update. This is an explicit quality decision, not permission to remove the reusable character foundation.
+
+The retained generic raygen strategy uses functions and three source ray-query sites; the legacy comparison remains fully inlined. The physical world-bounds transparent-shadow fast path is retained because it improves the measured glass route without changing transport. Nonphysical scalar shadowing and unsuccessful compact-ABI/sphere experiments were reverted. The exact `SM-S948B` sustained warm `lantern-held-high` Debug sample remains 99.145 ms at 75%; do not hide this by lowering scale or disabling glass/fire. The owner reported that phone play feels good and accepted the preceding candidate's sound/haptics. The final candidate deliberately delays the unlock event by two seconds and therefore requires one new owner-listening check. See `docs/FIRE_PBR_REWARD_LANTERN_PLAYER_UPGRADE_VALIDATION_2026-08-30.md`.
+
+Lich death now begins an exact two-second shared-simulation seal-breaking phase. At its boundary, one ordered `ChestUnlocked` event plays the latch cue and a real warm world-space RT guidance light above the collision-bearing chest turns on. The later skylight/dawn reveal remains pickup-gated. Held-prop clearance excludes the low chest footprint while player collision retains it; real masonry continues to use the previously validated wall-retraction pose.
+
+This programme is an unsigned development candidate. It does not alter Showcase Alpha 1.5.2 identity, sign a package, publish a GitHub/itch release, or authorize Butler upload.
+
 ## Target devices
 
 - Primary target: Samsung Galaxy S26 Ultra.

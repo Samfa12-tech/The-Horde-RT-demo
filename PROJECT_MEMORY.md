@@ -1,6 +1,6 @@
 # Horde Lantern RT - Project Memory
 
-Last updated: 2026-08-25
+Last updated: 2026-08-30
 
 ## Identity and release state
 
@@ -18,6 +18,7 @@ Last updated: 2026-08-25
 - Signing certificate SHA-256: `8245277a11bca5576f116724507f799d6f4c178ce5fbb7e3981415c9e6b3c245`.
 - The release JKS and a local-only password note live together outside Git with restricted ACLs. An independent owner backup is still required.
 - Release proof: `docs/SHOWCASE_ALPHA_1_5_2_RELEASE_VALIDATION_2026-08-25.md`.
+- Current unsigned development candidate: Fire/PBR/reward-lantern runtime commit `a04dcb9`, validated on Windows and exact `SM-S948B` Debug APK SHA-256 `0b5a59b6e41d2c4d717eff885aaa310b7f5f1512002f6a89cb77e5989ab7edd3`. It has not changed release identity, been signed, or been published. Evidence: `docs/FIRE_PBR_REWARD_LANTERN_PLAYER_UPGRADE_VALIDATION_2026-08-30.md`.
 
 ## Locked creative direction
 
@@ -37,6 +38,9 @@ Last updated: 2026-08-25
 - `RtGpuResources` owns checked buffer operations, acceleration-structure lifetime helpers, and updatable-BLAS state without taking ownership of the platform device; BLAS sizing/build/refit recording remains in the scene. `CharacterRenderSlot` owns two bounded skeleton pose/BLAS routes plus the singular lich route.
 - Supported graphics queues expose a separately labelled Vulkan GPU RT command-buffer interval from top-of-pipe to bottom-of-pipe around acceleration-structure, trace, barrier, and copy/blit recording. It does not replace CPU frame time or include presentation/display latency; unsupported timestamp queues report `N/A` without affecting rendering.
 - Android uses strict ASTC KTX2 arrays: ASTC 6x6 diffuse/ARM and ASTC 4x4 normals. Windows uses executable-relative raw RGBA8 arrays.
+- New production props use a validated static GLB/PBR importer, manifests, immutable mesh/BLAS ownership, fixed-capacity generated instance/material metadata, and per-primitive material assignment. Sword, torch, chest, reward lantern, and player study share the asset-contract and package/licence gates.
+- Fire is a deterministic bounded emitter with RT-visible emissive geometry, world-space depth-clipped volume, coherent coloured local light, and reflection energy driven by the same transform/state. Glass uses generic bounded entry/exit dielectric transport and transparent shadow transmittance through `rayQueryEXT`; it is not alpha-only lantern shading.
+- The generic production raygen retains functions and three source ray-query sites; the legacy comparison stays fully inlined. A physical transparent-world-bounds fast path is retained. Nonphysical scalar shadowing and abandoned compact-ABI/sphere experiments are absent.
 - `SurfaceWater = 10` is appended without renumbering the material ABI. Refracted and High reflected opaque hits share terminal ordinary material/direct/shadow/fog shading, while the water interface owns the sole bounded reflection; interface highlights share selected lights and visibility. Transparent filtering uses `gl_RayFlagsNoOpaqueEXT`, accumulated distance includes the primary segment, and the directional moon traverses physical roof/player geometry. Water-on-water secondary hits remain non-recursive. Fresh Host/deterministic Windows and exact `SM-S948B` Debug evidence pass; the owner accepted the moving Windows result. The repeated 75% Mobile medians are approximately 27.8 ms waterfall, 19.0 ms skylight, and 30.8 ms lich. The investigated real-light cost is retained rather than hidden by reducing RT quality or resolution. Lich mist is a six-step depth-clipped final-room volume.
 - The unreachable stained-glass material route has been removed from the CPU material table and raygen. The retained open threshold and live clear-glass route are unchanged. Current generated-shader identity and phone/Windows measurements belong in the dated renderer validation notes rather than this rolling memory.
 
@@ -44,14 +48,15 @@ Last updated: 2026-08-25
 
 - The complete route is two-skeleton encounter -> three-turn moving-shadow corridor -> roof-water drench/original torch failure at historical `lantern-drop` -> rounded catchment and drain runoff -> blue skylight -> yellow/blue/red/green bays -> open framed threshold -> light-aware hero mirror -> misted staff-lit lich -> opening roof -> returning dawn -> epilogue.
 - The rejected stained pane is not present. The water slice is a narrow architectural feature with no fluid simulation, collision, or movement slowdown.
-- The held and dropped torch are RT geometry. Visible flame and direct-light contribution both reach zero after the authored fall; the old fullscreen overlay must not return.
-- The rebuilt low-poly player uses a layered travelling coat, shaped shoulders/belt/collar/tails, articulated capsule arms and legs, pelvis/boots, foot lift and toe roll, torso counter-rotation, a head shadow/reflection instance, and wall-aware held-prop retraction.
+- The held and dropped torch are imported PBR RT geometry. Visible flame, coloured direct light, and reflection contribution share one emitter and all reach zero after the authored fall; the old fullscreen overlay must not return.
+- A reusable skinned-player loader/render slot, animation layers, bone sockets, IK targets, and CPU skin/refit backend are retained for development. Owner review keeps block arms player-facing for sword, torch, and reward lantern until the hands/gauntlets are accepted in every scenario. Shadow/reflection arm appearance is deferred to the next update.
 - Player vitality is three points with a one-second damage lockout, short fatal hold, encounter retry, route restart, and platform-native death overlays.
-- The procedural sword swings independently of the torch and the lich requires three accepted hits with a two-second lockout. Its death now opens the roof, reveals warm dawn, and ends in a contextual Continue/Begin Again/Quit epilogue.
+- The imported PBR sword uses an edge-forward rest pose and authoritative downward/upward two-press combo. The lich still requires three accepted hits with a two-second lockout. Its death begins a separate exact two-second chest-unlock countdown; at the boundary one latch event and a warm overhead RT guidance light identify the collision-bearing Gothic chest. Shared interaction opens it, exposes the reward lantern, and claims it before the roof/dawn epilogue continues.
+- The reward lantern has raise/lower state, a hand/grip socket, closed glass geometry, warm internal light, and deterministic acceleration-driven pendulum/torsion motion. Sword, torch, and lantern share held-item composition and wall retraction.
 - The skeleton uses Hotstrike Studio's base asset processed with Meshy. The CC0 Meshy lich uses restrained `Idle_02`/`Dead` skinning plus whole-instance hover/orbit; its visibly distorted walking clip is deliberately not presented.
 - Showcase Alpha 1.5.2 retains the two-skeleton system first published in 0.1.4: at most two opening-encounter skeletons, two pose buckets, and a singular later lich route. The scene now owns ten BLAS and twenty physical TLAS slots because the waterfall is independently transformable.
-- Android: left drag movement/strafe, right drag 360 look, Swing and press-down Parry buttons, Android Back pause/resume.
-- Windows: WASD/mouse plus Backbone/XInput/WinMM controller support. The verified Backbone path uses left stick move, right stick look, RT attack, LT parry, B/Circle directional dodge, D-pad menus, A select, Menu/Start pause, and D-pad render-scale adjustment.
+- Android: left drag movement/strafe, right drag 360 look, Swing and press-down Parry, contextual Interact and Raise/Lower, Android Back pause/resume.
+- Windows: WASD/mouse plus Backbone/XInput/WinMM controller support. `E` interacts and `F` raises/lowers the reward lantern; controller gameplay A/Y provide the same commands.
 
 ## UI, settings, diagnostics, and audio
 
@@ -66,11 +71,14 @@ Last updated: 2026-08-25
 - Android diagnostics report internal resolution, FPS, frame time, dispatch resolution, and honest RT presentation.
 - The shared Debug developer overlay reports build/shader identity, GPU/API, RT mode/presentation, render scale/extents/timing, route/lantern/enemy state, BLAS/TLAS/instance counts, active skinned count, and material route. Windows F3 and Android long-press are live-validated; Android passed 1.7-font layout, Home/resume state, and a 75% overlay-active opening measurement.
 - Seventeen FilmCow WAVs cover UI, sword, normalized alternating player/skeleton footsteps, skeleton attack, and lich charge/impact/fall/hurt reactions. A mono DRAGON-STUDIO/Pixabay waterfall loop is the eighteenth shipped audio asset.
+- Approved Pixabay chest-unlock, chest-opening, and torch-extinguish cues are routed from ordered shared gameplay events. The owner accepted sound and haptics on the immediately preceding development APK; the final two-second unlock timing still needs one owner listening check.
+- Windows and Android can check the public GitHub Releases feed and offer an explicit release-page/update action. They do not silently install or alter gameplay authority.
 - Android uses SoundPool per-cue gain plus lifecycle-paused MediaPlayer for the waterfall. Windows uses XAudio2 per-voice matrices with WinMM fallback. Both consume native world-space waterfall gain/pan.
 
 ## Validated Android release state
 
 - Device: Samsung `SM-S948B`, Adreno 840, Vulkan 1.4.295, Android 16.
+- Exact unsigned development candidate `0b5a59b6e41d2c4d717eff885aaa310b7f5f1512002f6a89cb77e5989ab7edd3` passed strict ASTC, `RayTracingPipeline`, honest presentation, replay, focused lit-chest/post-claim captures, and Home/resume on `R5GL219SZGK` / `SM-S948B`. Matched 75% medians remain in the same sustained Debug band as the preceding candidate. The owner reported that phone play feels good and accepted the preceding candidate's sound/haptics; the new two-second unlock timing still needs one listening check. This is not signed or published evidence.
 - Showcase Alpha `1.5.2` / `versionCode 7` is published as Android itch build `#1913192`, SHA-256 `19593f9d8902052cb54f9b989f9646ec8cad97063db5d882e1487dd56a671182`. The exact APK passed the established certificate, version, layout, static-runtime, 16 KiB APK/ELF, credit, waterfall-asset, and native-library guards. No ADB device was connected at publication, so it has no exact signed-device, pullback, lifecycle, performance, or owner-feel claim.
 - Showcase Alpha `0.1.5-alpha.1` / `versionCode 6` is published as Android itch build `#1908331`, SHA-256 `1e81238a6e1b0e934c50eb15e80fc8efd39c06f16ca8960c428b22e5f5d5a7f2`. The exact public APK passed established-certificate, version, strict layout, static-runtime, 16 KiB APK/ELF, credit, waterfall-asset, and native-library checks. It was installed on `SM-S948B`, pulled back byte-for-byte, and passed strict ASTC plus honest presentation before and after Home/resume. With that exact release still installed, the owner approved waterfall audio and confirmed good haptics and working pause/resume, closing the change-triggered feedback gate.
 - The exact stable-key-signed 0.1.3 APK is published as build `#1845896`, `versionCode 4` / `versionName 0.1.3-alpha.1`. On 2026-08-01 the old stable 0.1.2 and Debug packages were removed, and the exact published APK was clean-installed on `SM-S948B`; the installed `base.apk` SHA-256 matched `a4eb996104c03734a7fa8a16be1f8f701d5b19c861c066af002f96f9a199eee9` byte-for-byte.
