@@ -7,6 +7,48 @@ $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) `
     ("horde-rt-raygen-strategy-" + [guid]::NewGuid().ToString("N"))
 
 try {
+    $lfRoot = Join-Path $temporaryRoot "lf-checkout"
+    $crlfRoot = Join-Path $temporaryRoot "crlf-checkout"
+    foreach ($checkoutRoot in @($lfRoot, $crlfRoot)) {
+        New-Item -ItemType Directory -Force -Path `
+            (Join-Path $checkoutRoot "tools"), `
+            (Join-Path $checkoutRoot "shaders\raytracing"), `
+            (Join-Path $checkoutRoot "src\vulkan\raytracing") | Out-Null
+        Copy-Item -LiteralPath (Join-Path $repoRoot "tools\compile-raygen.ps1") `
+            -Destination (Join-Path $checkoutRoot "tools\compile-raygen.ps1")
+        Copy-Item -Path (Join-Path $repoRoot "shaders\raytracing\*") `
+            -Destination (Join-Path $checkoutRoot "shaders\raytracing") -Recurse
+        Copy-Item -LiteralPath `
+            (Join-Path $repoRoot "src\vulkan\raytracing\MinimalRayGenShader.inc") `
+            -Destination (Join-Path $checkoutRoot "src\vulkan\raytracing\MinimalRayGenShader.inc")
+        Copy-Item -LiteralPath `
+            (Join-Path $repoRoot "src\vulkan\raytracing\MinimalLegacyRayGenShader.inc") `
+            -Destination (Join-Path $checkoutRoot "src\vulkan\raytracing\MinimalLegacyRayGenShader.inc")
+    }
+
+    foreach ($shaderPath in Get-ChildItem -LiteralPath `
+        (Join-Path $lfRoot "shaders\raytracing") -File -Recurse |
+        Where-Object Extension -in ".rgen", ".glsl") {
+        $text = [IO.File]::ReadAllText($shaderPath.FullName).Replace("`r`n", "`n")
+        [IO.File]::WriteAllText($shaderPath.FullName, $text, [Text.UTF8Encoding]::new($false))
+    }
+    foreach ($shaderPath in Get-ChildItem -LiteralPath `
+        (Join-Path $crlfRoot "shaders\raytracing") -File -Recurse |
+        Where-Object Extension -in ".rgen", ".glsl") {
+        $text = [IO.File]::ReadAllText($shaderPath.FullName).Replace("`r`n", "`n").Replace("`n", "`r`n")
+        [IO.File]::WriteAllText($shaderPath.FullName, $text, [Text.UTF8Encoding]::new($false))
+    }
+
+    & (Join-Path $lfRoot "tools\compile-raygen.ps1")
+    Copy-Item -LiteralPath `
+        (Join-Path $lfRoot "src\vulkan\raytracing\MinimalRayGenShader.inc") `
+        -Destination (Join-Path $crlfRoot "src\vulkan\raytracing\MinimalRayGenShader.inc") -Force
+    Copy-Item -LiteralPath `
+        (Join-Path $lfRoot "src\vulkan\raytracing\MinimalLegacyRayGenShader.inc") `
+        -Destination (Join-Path $crlfRoot "src\vulkan\raytracing\MinimalLegacyRayGenShader.inc") -Force
+    & (Join-Path $crlfRoot "tools\compile-raygen.ps1") -Check `
+        -OutputDirectory (Join-Path $temporaryRoot "crlf-output")
+
     & (Join-Path $repoRoot "tools\compile-raygen.ps1") `
         -Check -OutputDirectory $temporaryRoot
     $stats = Get-Content -LiteralPath `

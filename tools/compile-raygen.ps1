@@ -75,6 +75,27 @@ function Resolve-RaygenIncludes
     [void]$ActivePaths.Remove($fullPath)
     return $output.ToString()
 }
+
+function Get-RaygenDependencyHash
+{
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path
+    )
+
+    # Resolve-RaygenIncludes compiles logical text lines, so checkout-specific
+    # CRLF/LF bytes must not make an otherwise identical embedded shader stale.
+    $lines = [IO.File]::ReadAllLines($Path)
+    $canonicalText = if ($lines.Count -eq 0) {
+        ''
+    } else {
+        [string]::Join("`n", $lines) + "`n"
+    }
+    return [Convert]::ToHexString(
+        [Security.Cryptography.SHA256]::HashData(
+            [Text.Encoding]::UTF8.GetBytes($canonicalText))).ToLowerInvariant()
+}
+
 $hasIncludeOverride = -not [string]::IsNullOrWhiteSpace($EmbeddedIncludePath)
 if ($hasIncludeOverride -and -not $Check)
 {
@@ -136,7 +157,7 @@ $dependencyHashes = foreach ($dependency in $dependencies)
 {
     [ordered]@{
         path = [IO.Path]::GetRelativePath($repoRoot, $dependency).Replace('\', '/')
-        sha256 = (Get-FileHash -LiteralPath $dependency -Algorithm SHA256).Hash.ToLowerInvariant()
+        sha256 = Get-RaygenDependencyHash -Path $dependency
     }
 }
 $dependencyManifest = $dependencyHashes | ConvertTo-Json -Compress
