@@ -6,6 +6,27 @@ $repoRoot = Split-Path -Parent $PSScriptRoot
 $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) ("horde-rt-abi-generator-" + [guid]::NewGuid().ToString("N"))
 New-Item -ItemType Directory -Path $temporaryRoot | Out-Null
 try {
+    $lfDefinitionPath = Join-Path $temporaryRoot "lf.def"
+    $crlfDefinitionPath = Join-Path $temporaryRoot "crlf.def"
+    $portableCpuPath = Join-Path $temporaryRoot "portable.generated.h"
+    $portableGlslPath = Join-Path $temporaryRoot "portable.generated.glsl"
+    $definitionText = [IO.File]::ReadAllText(
+        (Join-Path $repoRoot "src\vulkan\raytracing\RtSceneAbi.def")).Replace("`r`n", "`n")
+    [IO.File]::WriteAllText(
+        $lfDefinitionPath, $definitionText, [Text.UTF8Encoding]::new($false))
+    [IO.File]::WriteAllText(
+        $crlfDefinitionPath, $definitionText.Replace("`n", "`r`n"),
+        [Text.UTF8Encoding]::new($false))
+    & (Join-Path $repoRoot "tools\generate-rt-scene-abi.ps1") `
+        -DefinitionPath $lfDefinitionPath `
+        -CpuOutputPath $portableCpuPath `
+        -GlslOutputPath $portableGlslPath
+    & (Join-Path $repoRoot "tools\generate-rt-scene-abi.ps1") `
+        -DefinitionPath $crlfDefinitionPath `
+        -CpuOutputPath $portableCpuPath `
+        -GlslOutputPath $portableGlslPath `
+        -Check
+
     & (Join-Path $repoRoot "tools\generate-rt-scene-abi.ps1") -Check
     $generatedGlsl = Get-Content -LiteralPath (Join-Path $repoRoot "shaders\raytracing\include\rt_scene_abi.generated.glsl") -Raw
     if ($generatedGlsl -notmatch 'binding = 11\) readonly buffer RtInstanceMetadataBuffer' -or

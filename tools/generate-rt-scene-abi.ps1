@@ -12,9 +12,14 @@ if ([string]::IsNullOrWhiteSpace($DefinitionPath)) { $DefinitionPath = Join-Path
 if ([string]::IsNullOrWhiteSpace($CpuOutputPath)) { $CpuOutputPath = Join-Path $repoRoot "src\vulkan\raytracing\RtSceneAbi.generated.h" }
 if ([string]::IsNullOrWhiteSpace($GlslOutputPath)) { $GlslOutputPath = Join-Path $repoRoot "shaders\raytracing\include\rt_scene_abi.generated.glsl" }
 
+function Normalize-Newlines([string]$text) { return $text.Replace("`r`n", "`n").TrimEnd("`r", "`n") + "`n" }
+
 $definition = Get-Content -LiteralPath $DefinitionPath -Raw | ConvertFrom-Json
 if ($definition.schema -ne 1) { throw "RT scene ABI definition schema must be 1." }
-$hash = (Get-FileHash -Algorithm SHA256 -LiteralPath $DefinitionPath).Hash.ToLowerInvariant()
+$normalizedDefinition = Normalize-Newlines ([IO.File]::ReadAllText($DefinitionPath))
+$hash = [Convert]::ToHexString(
+    [Security.Cryptography.SHA256]::HashData(
+        [Text.Encoding]::UTF8.GetBytes($normalizedDefinition))).ToLowerInvariant()
 $c = $definition.capacities
 $b = $definition.bindings
 $i = $definition.instanceFlags
@@ -211,7 +216,6 @@ layout(std430, set = 0, binding = $($b.dielectricDiagnostics)) restrict buffer R
 } rtDielectricDiagnostics;
 "@
 
-function Normalize-Newlines([string]$text) { return $text.Replace("`r`n", "`n").TrimEnd("`r", "`n") + "`n" }
 function Publish-OrCheck([string]$path, [string]$content) {
     $normalized = Normalize-Newlines $content
     if ($Check) {

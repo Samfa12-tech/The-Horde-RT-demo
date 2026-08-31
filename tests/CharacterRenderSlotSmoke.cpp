@@ -64,7 +64,14 @@ std::string ReadTextFile(const std::filesystem::path& path)
     std::ifstream input(path, std::ios::binary);
     std::ostringstream text;
     text << input.rdbuf();
-    return text.str();
+    std::string normalized = text.str();
+    std::size_t position = 0u;
+    while ((position = normalized.find("\r\n", position)) != std::string::npos)
+    {
+        normalized.replace(position, 2u, "\n");
+        ++position;
+    }
+    return normalized;
 }
 
 } // namespace
