@@ -125,7 +125,15 @@ The retained generic raygen strategy uses functions and three source ray-query s
 
 Lich death now begins an exact two-second shared-simulation seal-breaking phase. At its boundary, one ordered `ChestUnlocked` event plays the latch cue and a real warm world-space RT guidance light above the collision-bearing chest turns on. The later skylight/dawn reveal remains pickup-gated. Held-prop clearance excludes the low chest footprint while player collision retains it; real masonry continues to use the previously validated wall-retraction pose.
 
-This programme is an unsigned development candidate. It does not alter Showcase Alpha 1.5.2 identity, sign a package, publish a GitHub/itch release, or authorize Butler upload.
+At this programme-completion milestone the work remained an unsigned development candidate. Publication authority and exact package evidence were added separately by the following decision.
+
+## Showcase Alpha 1.6.0 publication decision - 2026-08-31
+
+Publish the accepted Fire/PBR/reward-lantern programme as literal package version `1.6.0`, Android `versionCode 8`, on the existing itch channels. Release source `57c81b6` passed clean Host run `run-20260831-131431`; Windows build `#1931949` and Android build `#1931951` are active. Exact hashes, sizes, package identity, certificate, Windows RT smoke, and public-channel verification are recorded in `docs/SHOWCASE_ALPHA_1_6_0_RELEASE_VALIDATION_2026-08-30.md`.
+
+The Windows ZIP passed an isolated packaged-file launch with `RayTracingPipeline`, honest swapchain presentation, and clean exit code 0. The Android APK passed established-certificate and static/package guards, but ADB exposed no device at publication. Do not infer exact signed-APK install, pullback, strict ASTC runtime, honest phone presentation, lifecycle, performance, or owner-feel evidence from the accepted Debug runtime.
+
+Normal gameplay retains block arms; skinned gauntlets and arm/body shadow/reflection presentation remain deferred. The finite Mobile glass budget and measured performance remain accepted alpha boundaries and must not be hidden by silently lowering quality or render scale. The 1.6.0 release line and `versionCode 8` are immutable; the next Android release requires a new version and `versionCode > 8`. No Git tag or GitHub Release was created, so updater announcement remains a separate owner-authorised publication action.
 
 ## Target devices
 

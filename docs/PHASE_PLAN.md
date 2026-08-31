@@ -1,6 +1,6 @@
 # Phase Plan
 
-> This file records the implementation sequence. Earlier “next” and “deferred” statements are preserved as dated history; the rebuilt player, vitality/retry loop, complete dawn ending, two-skeleton/parry slice, bounded waterfall/mist/controller slice, corrected general water lighting, and cross-platform RT Lab are published through Showcase Alpha 1.5.2. Current authority and open evidence boundaries are indexed by `DOCUMENTATION_CHECKPOINT_2026-07-17.md`.
+> This file records the implementation sequence. Earlier “next” and “deferred” statements are preserved as dated history; the rebuilt player, vitality/retry loop, complete dawn ending, two-skeleton/parry slice, bounded waterfall/mist/controller slice, corrected general water lighting, cross-platform RT Lab, and Fire/PBR/reward-lantern programme are published through Showcase Alpha 1.6.0. Current authority and open evidence boundaries are indexed by `DOCUMENTATION_CHECKPOINT_2026-07-17.md`.
 
 ## Phase 0 - Vulkan RT capability proof: complete
 
@@ -122,10 +122,19 @@ The runtime-only Android asset task is complete and reduced the debug APK from 9
 - Published Windows itch build `#1913191` and Android build `#1913192`. Exact Host, package, public-channel, and Windows RT evidence is in `SHOWCASE_ALPHA_1_5_2_RELEASE_VALIDATION_2026-08-25.md`.
 - The exact signed 1.5.2 Android package passed static/certificate guards but was not installed because no ADB device was connected. The later RT Lab ownership/width fixes therefore retain a clearly documented exact-fixed-APK phone acceptance gate.
 
+## Showcase Alpha 1.6.0 - complete and published 2026-08-31
+
+- Published the reusable static GLB/PBR asset and fixed-capacity RT material/instance metadata routes with measured sword, torch, chest, reward lantern, and player assets.
+- Published coherent deterministic world-space fire and true coloured light, bounded reusable dielectric glass, shared held-item sockets, fixed-step physical lantern swing, post-lich chest interaction/reward progression, and the downward/upward sword combo.
+- Retained the reusable skinned-character/IK/socket foundation while using the owner-accepted block-arm viewmodel until gauntlets and reflected/shadow arms are ready in every held-item scenario.
+- Published Windows itch build `#1931949` and Android build `#1931951`. Exact source, hashes, Host gate, package, public-channel, Windows RT, and Android evidence boundaries are in `SHOWCASE_ALPHA_1_6_0_RELEASE_VALIDATION_2026-08-30.md`.
+- The exact signed 1.6.0 Android package passed static/certificate guards but was not installed because no ADB device was connected. The accepted exact Debug runtime on `SM-S948B` is supporting feature evidence, not signed-package proof.
+
 ## Current follow-up gates
 
-1. Install the exact signed 1.5.2 APK on the authorised `SM-S948B`, pull it back byte-for-byte, and verify strict ASTC, honest RT presentation, genuine-finale RT Lab retention/Back behavior, waterfall width, and Home/resume without treating earlier Debug evidence as signed-package proof.
+1. Install the exact signed 1.6.0 APK on the authorised `SM-S948B`, pull it back byte-for-byte, and verify strict ASTC, honest RT presentation, reward progression, RT Lab retention/Back behavior, waterfall width, and Home/resume without treating earlier Debug evidence as signed-package proof.
 2. Preserve the completed integrated clean-build, test, shader-staleness, asset/licence, package, deterministic capture, developer-overlay, and player-benchmark foundations.
 3. Resolve the separate Hotstrike raw-source redistribution permission/history question and maintain an independent owner backup of the Android release key.
 4. Fixed video/presentation capture and a presentation/orbit camera remain optional tooling work.
 5. Any broader gameplay or multi-enemy slice requires a separately scoped renderer/simulation design and fresh phone measurement.
+6. Creating a GitHub Release to activate 1.6.0 updater discovery remains a separately authorised publication action.

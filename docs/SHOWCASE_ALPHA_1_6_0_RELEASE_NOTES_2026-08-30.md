@@ -32,7 +32,7 @@ Android version code: `8`
 ## Evidence boundary
 
 - The owner accepted the final phone composition, downward/upward sword combo, fire, chest guidance, natural lich-to-chest progression, reward-lantern carry, audio, and haptics on the exact final Debug runtime.
-- Fresh source, signed package, Windows RT, Android package/device, and publication evidence is recorded in `SHOWCASE_ALPHA_1_6_0_RELEASE_VALIDATION_2026-08-30.md`.
+- Fresh source, signed package, Windows RT, Android package, prior exact-Debug device, and publication evidence is recorded with their separate boundaries in `SHOWCASE_ALPHA_1_6_0_RELEASE_VALIDATION_2026-08-30.md`.
 - `Audio/haptic manual revalidation required: NO` - the owner already accepted the final runtime and cues; the remaining release delta is version identity, signing, packaging, and publication only.
 
 See `FIRE_PBR_REWARD_LANTERN_PLAYER_UPGRADE_VALIDATION_2026-08-30.md`, `GITHUB_RELEASE_UPDATE_FOUNDATION_2026-08-30.md`, and `ASSET_LICENSES.md` for detailed implementation, validation, and licence records.

@@ -1,6 +1,6 @@
 # Horde Lantern RT - Project Memory
 
-Last updated: 2026-08-30
+Last updated: 2026-08-31
 
 ## Identity and release state
 
@@ -8,17 +8,17 @@ Last updated: 2026-08-30
 - Purpose: native Vulkan hardware-ray-tracing game/technology demo.
 - Principle: **RT or nothing**; unsupported devices receive honest diagnostics, never a fake fallback.
 - Primary target: Android phone. Equal validation target: Windows RTX.
-- Current release: **Showcase Alpha 1.5.2**, package version `1.5.2`, Android `versionCode 7`.
+- Current release: **Showcase Alpha 1.6.0**, package version `1.6.0`, Android `versionCode 8`.
 - Canonical downloads: https://samfa12.itch.io/the-horde. Samfa12.com links to itch rather than hosting a second copy; the live `/games/` card, itch link, GitHub link, thumbnail, and released status were rendered and verified on 2026-07-15.
 - Source: https://github.com/Samfa12-tech/The-Horde-RT-demo.
-- Windows itch channel: upload `#18339908`, build `#1913191`, `windows-x64`.
-- Android itch channel: upload `#18341739`, build `#1913192`, `android`.
-- Signed Android APK SHA-256: `19593f9d8902052cb54f9b989f9646ec8cad97063db5d882e1487dd56a671182`.
-- Windows ZIP SHA-256: `fd929f1972c4587c6720013eb0586934ab72924c5f8f9c50ec8576a23a57690d`.
+- Windows itch channel: upload `#18339908`, build `#1931949`, `windows-x64`.
+- Android itch channel: upload `#18341739`, build `#1931951`, `android`.
+- Signed Android APK SHA-256: `52a64255ad5dec82cc866fb2ea3545be498ca06c73a789019be851c77e5d6c48`.
+- Windows ZIP SHA-256: `7b0dcf24b4a47771a9c3a27cbc52e3899c87781109afcef20f7a9a8472411d77`.
 - Signing certificate SHA-256: `8245277a11bca5576f116724507f799d6f4c178ce5fbb7e3981415c9e6b3c245`.
 - The release JKS and a local-only password note live together outside Git with restricted ACLs. An independent owner backup is still required.
-- Release proof: `docs/SHOWCASE_ALPHA_1_5_2_RELEASE_VALIDATION_2026-08-25.md`.
-- Current unsigned development candidate: Fire/PBR/reward-lantern runtime commit `a04dcb9`, with clean final validation/provenance commit `41e9c6c`, validated on Windows and exact `SM-S948B` Debug APK SHA-256 `0b5a59b6e41d2c4d717eff885aaa310b7f5f1512002f6a89cb77e5989ab7edd3`. Final clean Host and 75%/100% exact-device runs pass, but instrumented feature medians are slow and Mobile dielectric budget terminals remain an explicit risk. It has not changed release identity, been signed, or been published. Evidence: `docs/FIRE_PBR_REWARD_LANTERN_PLAYER_UPGRADE_VALIDATION_2026-08-30.md` and `docs/TASK_9_OWNER_CANDIDATE_VALIDATION_2026-08-30.md`.
+- Release proof: `docs/SHOWCASE_ALPHA_1_6_0_RELEASE_VALIDATION_2026-08-30.md`.
+- Published Fire/PBR/reward-lantern runtime lineage: feature runtime commit `a04dcb9`, final validation/provenance commit `41e9c6c`, and release source commit `57c81b6`. The exact accepted `SM-S948B` Debug APK is SHA-256 `0b5a59b6e41d2c4d717eff885aaa310b7f5f1512002f6a89cb77e5989ab7edd3`. Final clean Host and 75%/100% exact-device runs pass, but instrumented feature medians are slow and Mobile dielectric budget terminals remain an explicit risk. The signed public APK has package/publication evidence only because no device was connected at publication. Evidence: `docs/FIRE_PBR_REWARD_LANTERN_PLAYER_UPGRADE_VALIDATION_2026-08-30.md`, `docs/TASK_9_OWNER_CANDIDATE_VALIDATION_2026-08-30.md`, and `docs/SHOWCASE_ALPHA_1_6_0_RELEASE_VALIDATION_2026-08-30.md`.
 
 ## Locked creative direction
 
@@ -78,6 +78,7 @@ Last updated: 2026-08-30
 ## Validated Android release state
 
 - Device: Samsung `SM-S948B`, Adreno 840, Vulkan 1.4.295, Android 16.
+- Showcase Alpha `1.6.0` / `versionCode 8` is published as Android itch build `#1931951`, SHA-256 `52a64255ad5dec82cc866fb2ea3545be498ca06c73a789019be851c77e5d6c48`. The APK passed the established certificate, identity, signed-package, ABI, strict runtime-asset/licence, and lint guards. ADB exposed no device at publication, so the exact signed APK has no install, pullback, strict-ASTC runtime, honest-presentation, Home/resume, performance, or owner-feel claim. The same feature runtime was accepted on exact final Debug APK `0b5a59b6e41d2c4d717eff885aaa310b7f5f1512002f6a89cb77e5989ab7edd3` before the release-only version/signing/package delta.
 - Exact unsigned development candidate `0b5a59b6e41d2c4d717eff885aaa310b7f5f1512002f6a89cb77e5989ab7edd3` passed strict ASTC, `RayTracingPipeline`, honest presentation, replay, focused lit-chest/post-claim captures, and Home/resume on `R5GL219SZGK` / `SM-S948B`. Matched 75% medians remain in the same sustained Debug band as the preceding candidate. The owner accepted phone feel, chest visibility/opening/claim, the two-second unlock cue, audio, and haptics on this exact installed candidate. This is not signed or published evidence.
 - Showcase Alpha `1.5.2` / `versionCode 7` is published as Android itch build `#1913192`, SHA-256 `19593f9d8902052cb54f9b989f9646ec8cad97063db5d882e1487dd56a671182`. The exact APK passed the established certificate, version, layout, static-runtime, 16 KiB APK/ELF, credit, waterfall-asset, and native-library guards. No ADB device was connected at publication, so it has no exact signed-device, pullback, lifecycle, performance, or owner-feel claim.
 - Showcase Alpha `0.1.5-alpha.1` / `versionCode 6` is published as Android itch build `#1908331`, SHA-256 `1e81238a6e1b0e934c50eb15e80fc8efd39c06f16ca8960c428b22e5f5d5a7f2`. The exact public APK passed established-certificate, version, strict layout, static-runtime, 16 KiB APK/ELF, credit, waterfall-asset, and native-library checks. It was installed on `SM-S948B`, pulled back byte-for-byte, and passed strict ASTC plus honest presentation before and after Home/resume. With that exact release still installed, the owner approved waterfall audio and confirmed good haptics and working pause/resume, closing the change-triggered feedback gate.
@@ -96,6 +97,8 @@ Last updated: 2026-08-30
 
 - GPU: NVIDIA GeForce RTX 5050 Laptop GPU.
 - Release builds as `HordeLanternRT.exe` with GUI subsystem, icon/version resource, static MSVC runtime, and executable-relative assets.
+- The exact published 1.6.0 ZIP SHA-256 `7b0dcf24b4a47771a9c3a27cbc52e3899c87781109afcef20f7a9a8472411d77` was extracted to `reports/release-smoke/windows-1.6.0-20260831-133408/`, launched using only packaged files, reported file/product version `1.6.0`, selected `RayTracingPipeline` on the RTX 5050, honestly presented the RT scene, and exited cleanly with code 0 after direct `WM_CLOSE`. Itch build `#1931949` is active.
+- Exact 1.6.0 source Host run `run-20260831-131431` passed shader freshness/negative fixtures, fresh Debug and Release 31/31 CTests, 13 deterministic Windows captures, Android Debug/unsigned Release/lint, strict ARM64 asset math, package/licence checks, and evidence hashing from clean source commit `57c81b6`.
 - The exact published 1.5.2 ZIP SHA-256 `fd929f1972c4587c6720013eb0586934ab72924c5f8f9c50ec8576a23a57690d` was extracted to `reports/release-smoke/windows-1.5.2-20260825-074305/`, launched using only packaged files, reported file/product version `1.5.2`, selected `RayTracingPipeline`, dispatched `1232x803`, honestly presented the RT scene, and exited cleanly with code 0. Itch build `#1913191` is active.
 - Exact 1.5.2 source Host runs `run-20260825-073343` and final post-publication `run-20260825-074907` each passed shader freshness/negative fixtures, fresh Debug and Release 13/13 CTests, 13 deterministic Windows captures, Android Debug/unsigned Release/lint, package/licence checks, and evidence hashing.
 - The exact final 0.1.3 candidate extraction launched without the source tree, selected `RayTracingPipeline`, dispatched `1232x803`, and honestly presented the RT scene.

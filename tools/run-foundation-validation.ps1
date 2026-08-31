@@ -500,10 +500,13 @@ try {
                 & (Join-Path $PSScriptRoot "package-alpha.ps1") -Version "1.5.2" -VersionCode 8
             } 'immutable'
             Assert-ExpectedFailure {
-                & (Join-Path $PSScriptRoot "package-alpha.ps1") -Version "1.5.3" -VersionCode 7
+                & (Join-Path $PSScriptRoot "package-alpha.ps1") -Version "1.6.0" -VersionCode 9
+            } 'immutable'
+            Assert-ExpectedFailure {
+                & (Join-Path $PSScriptRoot "package-alpha.ps1") -Version "1.6.1" -VersionCode 8
             } 'greater than'
             Assert-ExpectedFailure {
-                & (Join-Path $PSScriptRoot "push-alpha-to-itch.ps1") -Version "1.5.2" `
+                & (Join-Path $PSScriptRoot "push-alpha-to-itch.ps1") -Version "1.6.0" `
                     -ButlerPath (Join-Path $runDirectory "missing-butler.exe")
             } 'immutable'
 
