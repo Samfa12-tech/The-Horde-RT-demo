@@ -36,11 +36,15 @@ The signed APK passed the established-certificate, package identity, version, si
 
 The exact ZIP above was extracted to `reports/release-smoke/windows-1.6.0-20260831-133408` and launched using only packaged files. It reported file/product version `1.6.0`, selected `RayTracingPipeline` on the NVIDIA GeForce RTX 5050 Laptop GPU, presented an RT-produced image through the swapchain, received direct `WM_CLOSE`, and exited with code 0. No game process remained.
 
-## Android evidence boundary
+## Android exact signed-package smoke
 
-ADB exposed no device at publication. Therefore the exact signed 1.6.0 APK has no install, pullback, strict-ASTC runtime, honest-phone-presentation, Home/resume, performance, or owner-feel claim.
+At publication time ADB was unavailable, so the first publication record correctly made no signed-device claim. On 2026-08-31, the sole authorised target `SM-S948B` / serial `R5GL219SZGK` became available. The exact published APK was installed without modification and its installed `base.apk` was pulled back byte-for-byte: local and installed SHA-256 are both `52a64255ad5dec82cc866fb2ea3545be498ca06c73a789019be851c77e5d6c48`. Package manager reported `com.samfa12.hordelanternrt`, `versionName 1.6.0`, and `versionCode 8`.
 
-The same feature runtime had already been installed and byte-matched on the sole authorised `SM-S948B` as final Debug APK SHA-256 `0b5a59b6e41d2c4d717eff885aaa310b7f5f1512002f6a89cb77e5989ab7edd3`. That candidate passed strict ASTC, `RayTracingPipeline`, honest RT presentation, deterministic replay/captures, Home/resume, 75% and 100% feature evidence, and owner review of phone composition, fire, chest/reward progression, sword combo, audio, and haptics. This is supporting runtime evidence, not proof that the signed public APK ran on the phone.
+The signed release process launched and remained alive through a short route smoke. Logcat reported strict ASTC material selection, `RayTracingPipeline`, and `RT frame reached Android swapchain presentation`; no fatal exception, native crash, or Vulkan-startup failure marker was present. A Home/resume cycle produced a new honest RT presentation, and the release opening/route screenshot was captured at `reports/release-device-smoke/android-1.6.0-20260831/opening.png` and `route.png`. A post-smoke snapshot reported Android thermal status 0, battery temperature 33.3 C, and Samsung GPU thermal power level 0.
+
+The same feature runtime had already been installed and byte-matched on the sole authorised `SM-S948B` as final Debug APK SHA-256 `0b5a59b6e41d2c4d717eff885aaa310b7f5f1512002f6a89cb77e5989ab7edd3`. That candidate passed strict ASTC, `RayTracingPipeline`, honest RT presentation, deterministic replay/captures, Home/resume, 75% and 100% feature evidence, and owner review of phone composition, fire, chest/reward progression, sword combo, audio, and haptics. This remains the feature-timing/artistic evidence; it is kept distinct from the signed release smoke above.
+
+The signed release smoke is functional/presentation evidence, not a deterministic checkpoint/replay or sustained performance run. The existing Debug feature measurements and owner acceptance remain the performance/artistic evidence for the runtime; no Release FPS or signed-release owner-feel claim is inferred from this short smoke.
 
 ## Publication verification
 

@@ -128,7 +128,7 @@ The runtime-only Android asset task is complete and reduced the debug APK from 9
 - Published coherent deterministic world-space fire and true coloured light, bounded reusable dielectric glass, shared held-item sockets, fixed-step physical lantern swing, post-lich chest interaction/reward progression, and the downward/upward sword combo.
 - Retained the reusable skinned-character/IK/socket foundation while using the owner-accepted block-arm viewmodel until gauntlets and reflected/shadow arms are ready in every held-item scenario.
 - Published Windows itch build `#1931949` and Android build `#1931951`. Exact source, hashes, Host gate, package, public-channel, Windows RT, and Android evidence boundaries are in `SHOWCASE_ALPHA_1_6_0_RELEASE_VALIDATION_2026-08-30.md`.
-- The exact signed 1.6.0 Android package passed static/certificate guards but was not installed because no ADB device was connected. The accepted exact Debug runtime on `SM-S948B` is supporting feature evidence, not signed-package proof.
+- At publication the exact signed 1.6.0 Android package had only static/certificate evidence because no ADB device was connected. On 2026-08-31 it was subsequently installed and pulled back byte-for-byte on `SM-S948B`; strict ASTC, `RayTracingPipeline`, honest RT presentation, Home/resume, and a short route smoke passed. The accepted exact Debug runtime remains the feature-timing/artistic evidence, while the signed smoke is functional/presentation evidence.
 
 ## Current follow-up gates
 
