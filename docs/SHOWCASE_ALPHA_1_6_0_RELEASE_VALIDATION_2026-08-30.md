@@ -21,6 +21,8 @@ Published and closed: 2026-08-31
 - strict ARM64 runtime-asset sizing and package/licence contracts;
 - evidence hashing with clean before/after Git state.
 
+After publication records and the immutable 1.6.0/code-8 policy were committed, clean closeout run `reports/foundation-runs/run-20260831-135300` repeated all seven stages on commit `8d69ed0`: Debug 31/31, Release 31/31, 13 captures, Android builds/lint, strict ARM64 asset math, package/licence checks, and evidence hashing all passed. Its negative gates explicitly rejected the 1.6.0 release line, `versionCode 8`, and another 1.6.0 upload.
+
 ## Exact public artifacts
 
 | Platform | Candidate | Bytes | SHA-256 | Itch result |

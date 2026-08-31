@@ -73,4 +73,5 @@ The following dated families are intentionally preserved rather than rewritten: 
 - Preserved dated evidence, corrected living package commands/counts/feature descriptions, promoted the reviewed automation digest, and separated cool automation from warm certification.
 - Verified current source/package version surfaces agree on 1.6.0 / Android code 8. Release source `57c81b6` produced the exact published artifacts recorded in the 1.6.0 release validation.
 - Exact 1.6.0 source Host run `run-20260831-131431` rebuilt Android Debug/unsigned Release, passed Release lint, and passed fresh Windows Debug/Release 31/31 CTests plus all 13 standard deterministic captures and package/licence/evidence checks.
+- Clean post-publication closeout run `run-20260831-135300` repeated all seven Host stages and proved the updated immutable 1.6.0/code-8 package and upload negatives.
 - The 2026-08-31 itch channel update preserves the existing public page while publishing both 1.6.0 downloads. Anonymous verification returned HTTP 200 and exposed both current artifacts. The repository page copy is prepared but no authenticated description or devlog edit was requested or performed.
