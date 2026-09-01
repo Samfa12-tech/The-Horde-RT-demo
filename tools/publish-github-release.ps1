@@ -26,7 +26,7 @@ $windowsZip = Join-Path $candidateRoot "$baseName-Windows-x64.zip"
 $androidApk = Join-Path $candidateRoot "$baseName-Android.apk"
 $hashFile = Join-Path $candidateRoot 'SHA256SUMS.txt'
 $preflightScript = Join-Path $PSScriptRoot 'preflight-github-release.ps1'
-$preflightHost = if ($PSVersionTable.PSEdition -eq 'Core') { Join-Path $PSHOME 'pwsh.exe' } else { Join-Path $PSHOME 'powershell.exe' }
+. (Join-Path $PSScriptRoot 'github-release-preflight-invoker.ps1')
 
 function Require-File([string]$Path, [string]$Description) {
     if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
@@ -62,9 +62,8 @@ foreach ($command in @('git', 'gh')) {
 }
 
 Require-File $preflightScript 'Exact release-provenance preflight'
-& $preflightHost -NoProfile -File $preflightScript -Version $Version -ArtifactDirectory $candidateRoot -ExpectedTargetCommit $TargetCommit
-$preflightExitCode = $LASTEXITCODE
-if ($preflightExitCode -ne 0) {
+$preflightResult = Invoke-HordeGitHubReleasePreflight -PreflightScript $preflightScript -Version $Version -ArtifactDirectory $candidateRoot -ExpectedTargetCommit $TargetCommit
+if ($preflightResult.ExitCode -ne 0) {
     throw "Exact release-provenance preflight did not pass for $Version."
 }
 

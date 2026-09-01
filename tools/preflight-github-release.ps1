@@ -14,6 +14,7 @@ param(
 
     [string]$FixturePublicationStatePath,
     [string]$FixtureSourceSurfacePath,
+    [string]$FixtureSourceStatePath,
 
     # Fixture-only escape hatch. Production invocations must query origin and GitHub.
     [switch]$SkipRemote,
@@ -26,15 +27,17 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
-if ([string]::IsNullOrWhiteSpace($RecordPath)) {
-    $RecordPath = Join-Path $repoRoot "release-provenance\horde-lantern-rt-alpha-$Version.json"
-}
+$defaultRecordPath = Join-Path $repoRoot "release-provenance\horde-lantern-rt-alpha-$Version.json"
+if ([string]::IsNullOrWhiteSpace($RecordPath)) { $RecordPath = $defaultRecordPath }
 if ([string]::IsNullOrWhiteSpace($ReportDirectory)) {
     $ReportDirectory = Join-Path $repoRoot 'reports\github-release-preflight'
 }
 $RecordPath = [IO.Path]::GetFullPath($RecordPath)
 $ArtifactDirectory = [IO.Path]::GetFullPath($ArtifactDirectory)
 $ReportDirectory = [IO.Path]::GetFullPath($ReportDirectory)
+if ($RecordPath -ne [IO.Path]::GetFullPath($defaultRecordPath) -and -not $FixtureMode) {
+    throw 'RecordPath overrides are fixture-only; production must use the checked canonical provenance record.'
+}
 if ($SkipRemote -and -not $FixtureMode) {
     throw 'SkipRemote is fixture-only and cannot be used for a publication decision.'
 }
@@ -43,6 +46,9 @@ if (-not [string]::IsNullOrWhiteSpace($FixturePublicationStatePath) -and -not $F
 }
 if (-not [string]::IsNullOrWhiteSpace($FixtureSourceSurfacePath) -and -not $FixtureMode) {
     throw 'FixtureSourceSurfacePath is fixture-only.'
+}
+if (-not [string]::IsNullOrWhiteSpace($FixtureSourceStatePath) -and -not $FixtureMode) {
+    throw 'FixtureSourceStatePath is fixture-only.'
 }
 
 $checks = [Collections.Generic.List[object]]::new()
@@ -240,10 +246,23 @@ function Read-FixtureSourceSurfaces {
     return $surfaces
 }
 
+function Read-FixtureSourceState {
+    param([string]$Path)
+    if ([string]::IsNullOrWhiteSpace($Path)) { return $null }
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { throw "Fixture source state not found: $Path" }
+    try { $state = Get-Content -LiteralPath $Path -Raw -Encoding utf8 | ConvertFrom-Json } catch { throw 'Fixture source state must be valid JSON.' }
+    Assert-ExactObjectKeys -Object $state -Expected @('commitExists', 'objectType', 'reachable') -Context 'fixture source state'
+    if ($state.commitExists -isnot [bool] -or $state.objectType -isnot [string] -or $state.reachable -isnot [bool]) {
+        throw 'Fixture source state has invalid value types.'
+    }
+    return $state
+}
+
 $record = $null
 $fatalError = $null
 $fixturePublicationState = $null
 $fixtureSourceSurfaces = $null
+$fixtureSourceState = $null
 try {
     $record = Read-Record -Path $RecordPath
     if ($record.Version -ne $Version -or $record.Tag -ne "v$Version") {
@@ -279,6 +298,7 @@ try {
     if ($FixtureMode) {
         $fixturePublicationState = Read-FixturePublicationState -Path $FixturePublicationStatePath
         $fixtureSourceSurfaces = Read-FixtureSourceSurfaces -Path $FixtureSourceSurfacePath
+        $fixtureSourceState = Read-FixtureSourceState -Path $FixtureSourceStatePath
     }
 } catch {
     $fatalError = $_.Exception.Message
@@ -288,9 +308,15 @@ try {
 if ($null -ne $record) {
     Push-Location $repoRoot
     try {
-        $commitType = Invoke-GitText -Arguments @('cat-file', '-t', $record.SourceCommit)
+        if ($null -ne $fixtureSourceState) {
+            $commitType = [PSCustomObject]@{ exitCode = $(if ($fixtureSourceState.commitExists) { 0 } else { 1 }); output = $fixtureSourceState.objectType }
+            $reachable = [PSCustomObject]@{ exitCode = $(if ($fixtureSourceState.reachable) { 0 } else { 1 }) }
+        } else {
+            $commitType = Invoke-GitText -Arguments @('cat-file', '-t', $record.SourceCommit)
+            $reachable = $null
+        }
         if ($commitType.exitCode -eq 0 -and $commitType.output -eq 'commit') {
-            $reachable = Invoke-GitText -Arguments @('merge-base', '--is-ancestor', $record.SourceCommit, 'HEAD')
+            if ($null -eq $reachable) { $reachable = Invoke-GitText -Arguments @('merge-base', '--is-ancestor', $record.SourceCommit, 'HEAD') }
             if ($reachable.exitCode -eq 0) { Add-Check 'source.commit' 'pass' 'exact commit exists, is a commit, and is reachable from HEAD' }
             else { Add-Check 'source.commit' 'fail' 'exact source commit is not reachable from HEAD' }
         } else { Add-Check 'source.commit' 'fail' 'exact source commit is missing or is not a commit object' }
