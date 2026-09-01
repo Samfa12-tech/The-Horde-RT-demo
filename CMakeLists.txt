@@ -263,6 +263,9 @@ if(BUILD_TESTING)
         add_test(NAME horde_rt_raygen_compiler_strategy_tests
             COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
                 ${CMAKE_CURRENT_SOURCE_DIR}/tests/RaygenCompilerStrategyTests.ps1)
+        add_test(NAME horde_rt_raygen_variant_manifest_tests
+            COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
+                ${CMAKE_CURRENT_SOURCE_DIR}/tests/RaygenVariantManifestTests.ps1)
         add_test(NAME horde_rt_static_texture_array_tool_tests
             COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
                 ${CMAKE_CURRENT_SOURCE_DIR}/tests/StaticTextureArrayToolTests.ps1)
@@ -296,6 +299,7 @@ if(BUILD_TESTING)
         set_tests_properties(
             horde_rt_scene_abi_generator_tests
             horde_rt_raygen_compiler_strategy_tests
+            horde_rt_raygen_variant_manifest_tests
             horde_rt_static_texture_array_tool_tests
             horde_rt_static_preparation_lod_policy_tests
             horde_rt_static_preparation_skip_policy_tests

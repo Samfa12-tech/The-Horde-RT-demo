@@ -73,26 +73,26 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     if (isGenericDielectric(reflectedHit) ||
         (reflectedHit.hit && reflectedHit.material == kMaterialWater))
     {
-        atomicAdd(rtDielectricDiagnostics.value.secondaryDielectricTerminalCount, 1u);
+        RT_DIAG_ADD(secondaryDielectricTerminalCount, 1u);
         // This is the reusable one-reflection terminal approximation, never
         // an opaque reclassification or a rejected dielectric hit. Attribute
         // both endpoints so captures distinguish a pane-origin reflection
         // from the dielectric surface it subsequently encountered.
         if (firstHit.instance == 8u)
-            atomicAdd(rtDielectricDiagnostics.value.productionPaneSecondaryOriginCount, 1u);
+            RT_DIAG_ADD(productionPaneSecondaryOriginCount, 1u);
         if (reflectedHit.instance == 8u)
-            atomicAdd(rtDielectricDiagnostics.value.productionPaneSecondaryTerminalCount, 1u);
+            RT_DIAG_ADD(productionPaneSecondaryTerminalCount, 1u);
         if (isGenericDielectric(reflectedHit) &&
             firstHit.instance == 8u && reflectedHit.instance == 8u &&
             firstHit.instance == reflectedHit.instance &&
             firstHit.material == reflectedHit.material)
         {
-            atomicAdd(rtDielectricDiagnostics.value.productionPaneSecondarySameMediumCount, 1u);
+            RT_DIAG_ADD(productionPaneSecondarySameMediumCount, 1u);
             if (reflectedLocalDistance <= reflectionEpsilon * 8.0)
-                atomicAdd(rtDielectricDiagnostics.value.secondaryNearSelfHitCount, 1u);
+                RT_DIAG_ADD(secondaryNearSelfHitCount, 1u);
         }
         else if (firstHit.instance == 8u || reflectedHit.instance == 8u)
-            atomicAdd(rtDielectricDiagnostics.value.productionPaneSecondaryDifferentMediumCount, 1u);
+            RT_DIAG_ADD(productionPaneSecondaryDifferentMediumCount, 1u);
         reflected = skyColor(reflectionDirection) * 0.18 +
             (reflectedHit.hit ? reflectedHit.base * 0.12 : vec3(0.0));
     }
@@ -152,35 +152,35 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
                     // closed manifold. A grazing numerical terminal may not
                     // shade through its cage: conservatively absorb remaining
                     // energy and attribute the bounded recovery separately.
-                    atomicAdd(rtDielectricDiagnostics.value.primaryCertifiedClosedVolumeRecoveryCount,
+                    RT_DIAG_ADD(primaryCertifiedClosedVolumeRecoveryCount,
                               1u);
-                    atomicOr(rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask,
+                    RT_DIAG_OR(certifiedClosedVolumeRecoveryReasonMask,
                              1u);
                     transmitted = vec3(0.0);
                     terminalResolved = true;
                     break;
                 }
-                atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);
-                atomicAdd(rtDielectricDiagnostics.value.primaryUnclosedVolumeCount, 1u);
+                RT_DIAG_ADD(unclosedVolumeCount, 1u);
+                RT_DIAG_ADD(primaryUnclosedVolumeCount, 1u);
                 if (currentHit.hit)
                 {
-                    atomicAdd(rtDielectricDiagnostics.value.primaryOpenOpaqueCount, 1u);
+                    RT_DIAG_ADD(primaryOpenOpaqueCount, 1u);
                     if (tirSinceLastTransition > 0)
-                        atomicAdd(rtDielectricDiagnostics.value.primaryOpenOpaqueAfterTirCount,
+                        RT_DIAG_ADD(primaryOpenOpaqueAfterTirCount,
                                   1u);
-                    atomicOr(rtDielectricDiagnostics.value.primaryOpenOpaqueTerminalInstanceMask,
+                    RT_DIAG_OR(primaryOpenOpaqueTerminalInstanceMask,
                              1u << min(uint(currentHit.instance), 31u));
-                    atomicOr(rtDielectricDiagnostics.value.primaryOpenOpaqueVolumeInstanceMask,
+                    RT_DIAG_OR(primaryOpenOpaqueVolumeInstanceMask,
                              1u << min(volumeInstances[volumeDepth - 1], 31u));
-                    atomicOr(rtDielectricDiagnostics.value.primaryOpenOpaqueTerminalMaterialMask,
+                    RT_DIAG_OR(primaryOpenOpaqueTerminalMaterialMask,
                              1u << (uint(currentHit.material) & 31u));
                     if (currentHit.instance == int(volumeInstances[volumeDepth - 1]) &&
                         uint(currentHit.material) != volumeMaterials[volumeDepth - 1])
-                        atomicAdd(rtDielectricDiagnostics.value.primaryOpenOpaqueSameInstanceDifferentMaterialCount,
+                        RT_DIAG_ADD(primaryOpenOpaqueSameInstanceDifferentMaterialCount,
                                   1u);
                 }
                 else
-                    atomicAdd(rtDielectricDiagnostics.value.primaryOpenMissCount, 1u);
+                    RT_DIAG_ADD(primaryOpenMissCount, 1u);
                 overflowed = true;
             }
             else
@@ -200,7 +200,7 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
                 // physically trapped in the closed volume. At the fixed
                 // Mobile/High interface bound, conservatively absorb it; the
                 // path has not overflowed or escaped an open stack.
-                atomicAdd(rtDielectricDiagnostics.value.primaryTirTerminationCount, 1u);
+                RT_DIAG_ADD(primaryTirTerminationCount, 1u);
                 transmitted = vec3(0.0);
                 terminalResolved = true;
             }
@@ -217,22 +217,22 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
                 }
                 if (everyOpenVolumeCertified)
                 {
-                    atomicAdd(rtDielectricDiagnostics.value.primaryCertifiedClosedVolumeRecoveryCount,
+                    RT_DIAG_ADD(primaryCertifiedClosedVolumeRecoveryCount,
                               1u);
-                    atomicOr(rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask,
+                    RT_DIAG_OR(certifiedClosedVolumeRecoveryReasonMask,
                              2u);
                     transmitted = vec3(0.0);
                     terminalResolved = true;
                     break;
                 }
-                atomicAdd(rtDielectricDiagnostics.value.primaryInterfaceBudgetCount, 1u);
-                atomicAdd(rtDielectricDiagnostics.value.primaryInterfaceBudgetOpenVolumeCount, 1u);
+                RT_DIAG_ADD(primaryInterfaceBudgetCount, 1u);
+                RT_DIAG_ADD(primaryInterfaceBudgetOpenVolumeCount, 1u);
                 overflowed = true;
             }
             else
             {
-                atomicAdd(rtDielectricDiagnostics.value.primaryInterfaceBudgetCount, 1u);
-                atomicAdd(rtDielectricDiagnostics.value.primaryInterfaceBudgetClosedVolumeCount, 1u);
+                RT_DIAG_ADD(primaryInterfaceBudgetCount, 1u);
+                RT_DIAG_ADD(primaryInterfaceBudgetClosedVolumeCount, 1u);
                 overflowed = true;
             }
             break;
@@ -257,7 +257,7 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
         if (!thinWall && dot(idealTransmission, idealTransmission) < 0.25)
         {
             // TIR consumes one interface but does not mutate the medium stack.
-            atomicAdd(rtDielectricDiagnostics.value.primaryTirCount, 1u);
+            RT_DIAG_ADD(primaryTirCount, 1u);
             ++tirSinceLastTransition;
             transmissionDirection = roughDielectricDirection(
                 reflect(transmissionDirection, orientedNormal), orientedNormal,
@@ -285,15 +285,15 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
                         }
                         if (everyOpenVolumeCertified)
                         {
-                            atomicAdd(rtDielectricDiagnostics.value.primaryCertifiedClosedVolumeRecoveryCount,
+                            RT_DIAG_ADD(primaryCertifiedClosedVolumeRecoveryCount,
                                       1u);
-                            atomicOr(rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask,
+                            RT_DIAG_OR(certifiedClosedVolumeRecoveryReasonMask,
                                      4u);
                             transmitted = vec3(0.0);
                             terminalResolved = true;
                             break;
                         }
-                        atomicAdd(rtDielectricDiagnostics.value.primaryVolumeBudgetCount, 1u);
+                        RT_DIAG_ADD(primaryVolumeBudgetCount, 1u);
                         overflowed = true;
                         break;
                     }
@@ -325,15 +325,15 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
                         }
                         if (everyOpenVolumeCertified)
                         {
-                            atomicAdd(rtDielectricDiagnostics.value.primaryCertifiedClosedVolumeRecoveryCount,
+                            RT_DIAG_ADD(primaryCertifiedClosedVolumeRecoveryCount,
                                       1u);
-                            atomicOr(rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask,
+                            RT_DIAG_OR(certifiedClosedVolumeRecoveryReasonMask,
                                      8u);
                             transmitted = vec3(0.0);
                             terminalResolved = true;
                             break;
                         }
-                        atomicAdd(rtDielectricDiagnostics.value.primaryMismatchedExitCount, 1u);
+                        RT_DIAG_ADD(primaryMismatchedExitCount, 1u);
                         overflowed = true;
                         break;
                     }
@@ -383,18 +383,18 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
         }
         if (everyOpenVolumeCertified)
         {
-            atomicAdd(rtDielectricDiagnostics.value.primaryCertifiedClosedVolumeRecoveryCount,
+            RT_DIAG_ADD(primaryCertifiedClosedVolumeRecoveryCount,
                       1u);
-            atomicOr(rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask,
+            RT_DIAG_OR(certifiedClosedVolumeRecoveryReasonMask,
                      16u);
             transmitted = vec3(0.0);
         }
         else
         {
             overflowed = true;
-            atomicAdd(rtDielectricDiagnostics.value.transportOverflowCount, 1u);
+            RT_DIAG_ADD(transportOverflowCount, 1u);
             if (touchedProductionPane)
-                atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
+                RT_DIAG_ADD(productionPaneStackFailureCount, 1u);
             transmitted = dielectricOverflowFallback(transmissionDirection, throughput);
         }
     }
@@ -436,31 +436,26 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     if (isGenericDielectric(reflectedHit) ||
         (reflectedHit.hit && reflectedHit.material == kMaterialWater))
     {
-        atomicAdd(rtDielectricDiagnostics.value.secondaryDielectricTerminalCount,
+        RT_DIAG_ADD(secondaryDielectricTerminalCount,
                   1u);
         if (firstHit.instance == 8u)
-            atomicAdd(
-                rtDielectricDiagnostics.value.productionPaneSecondaryOriginCount,
+            RT_DIAG_ADD(productionPaneSecondaryOriginCount,
                 1u);
         if (reflectedHit.instance == 8u)
-            atomicAdd(
-                rtDielectricDiagnostics.value.productionPaneSecondaryTerminalCount,
+            RT_DIAG_ADD(productionPaneSecondaryTerminalCount,
                 1u);
         if (isGenericDielectric(reflectedHit) && firstHit.instance == 8u &&
             reflectedHit.instance == 8u &&
             firstHit.material == reflectedHit.material)
         {
-            atomicAdd(
-                rtDielectricDiagnostics.value.productionPaneSecondarySameMediumCount,
+            RT_DIAG_ADD(productionPaneSecondarySameMediumCount,
                 1u);
             if (reflectedLocalDistance <= reflectionEpsilon * 8.0)
-                atomicAdd(
-                    rtDielectricDiagnostics.value.secondaryNearSelfHitCount, 1u);
+                RT_DIAG_ADD(secondaryNearSelfHitCount, 1u);
         }
         else if (firstHit.instance == 8u || reflectedHit.instance == 8u)
         {
-            atomicAdd(
-                rtDielectricDiagnostics.value.productionPaneSecondaryDifferentMediumCount,
+            RT_DIAG_ADD(productionPaneSecondaryDifferentMediumCount,
                 1u);
         }
         reflected = skyColor(reflectionDirection) * 0.18 +
@@ -509,29 +504,24 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
             {
                 if (volumeCertified)
                 {
-                    atomicAdd(
-                        rtDielectricDiagnostics.value.primaryCertifiedClosedVolumeRecoveryCount,
+                    RT_DIAG_ADD(primaryCertifiedClosedVolumeRecoveryCount,
                         1u);
-                    atomicOr(
-                        rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask,
+                    RT_DIAG_OR(certifiedClosedVolumeRecoveryReasonMask,
                         1u);
                     transmitted = vec3(0.0);
                     terminalResolved = true;
                 }
                 else
                 {
-                    atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount,
+                    RT_DIAG_ADD(unclosedVolumeCount,
                               1u);
-                    atomicAdd(
-                        rtDielectricDiagnostics.value.primaryUnclosedVolumeCount,
+                    RT_DIAG_ADD(primaryUnclosedVolumeCount,
                         1u);
                     if (currentHit.hit)
-                        atomicAdd(
-                            rtDielectricDiagnostics.value.primaryOpenOpaqueCount,
+                        RT_DIAG_ADD(primaryOpenOpaqueCount,
                             1u);
                     else
-                        atomicAdd(
-                            rtDielectricDiagnostics.value.primaryOpenMissCount,
+                        RT_DIAG_ADD(primaryOpenMissCount,
                             1u);
                     overflowed = true;
                 }
@@ -550,35 +540,29 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
         {
             if (volumeOpen && tirSinceTransition > 0)
             {
-                atomicAdd(
-                    rtDielectricDiagnostics.value.primaryTirTerminationCount,
+                RT_DIAG_ADD(primaryTirTerminationCount,
                     1u);
                 transmitted = vec3(0.0);
                 terminalResolved = true;
             }
             else if (volumeOpen && volumeCertified)
             {
-                atomicAdd(
-                    rtDielectricDiagnostics.value.primaryCertifiedClosedVolumeRecoveryCount,
+                RT_DIAG_ADD(primaryCertifiedClosedVolumeRecoveryCount,
                     1u);
-                atomicOr(
-                    rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask,
+                RT_DIAG_OR(certifiedClosedVolumeRecoveryReasonMask,
                     2u);
                 transmitted = vec3(0.0);
                 terminalResolved = true;
             }
             else
             {
-                atomicAdd(
-                    rtDielectricDiagnostics.value.primaryInterfaceBudgetCount,
+                RT_DIAG_ADD(primaryInterfaceBudgetCount,
                     1u);
                 if (volumeOpen)
-                    atomicAdd(
-                        rtDielectricDiagnostics.value.primaryInterfaceBudgetOpenVolumeCount,
+                    RT_DIAG_ADD(primaryInterfaceBudgetOpenVolumeCount,
                         1u);
                 else
-                    atomicAdd(
-                        rtDielectricDiagnostics.value.primaryInterfaceBudgetClosedVolumeCount,
+                    RT_DIAG_ADD(primaryInterfaceBudgetClosedVolumeCount,
                         1u);
                 overflowed = true;
             }
@@ -605,7 +589,7 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
 
         if (!thinWall && dot(idealTransmission, idealTransmission) < 0.25)
         {
-            atomicAdd(rtDielectricDiagnostics.value.primaryTirCount, 1u);
+            RT_DIAG_ADD(primaryTirCount, 1u);
             ++tirSinceTransition;
             transmissionDirection = roughDielectricDirection(
                 reflect(transmissionDirection, orientedNormal), orientedNormal,
@@ -621,8 +605,7 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
                 // nested stack on every phone ray.
                 if (volumeOpen)
                 {
-                    atomicAdd(
-                        rtDielectricDiagnostics.value.primaryVolumeBudgetCount,
+                    RT_DIAG_ADD(primaryVolumeBudgetCount,
                         1u);
                     overflowed = true;
                     break;
@@ -642,8 +625,7 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
                 if (!volumeOpen || volumeInstance != currentHit.instance ||
                     volumeMaterial != uint(currentHit.material))
                 {
-                    atomicAdd(
-                        rtDielectricDiagnostics.value.primaryMismatchedExitCount,
+                    RT_DIAG_ADD(primaryMismatchedExitCount,
                         1u);
                     overflowed = true;
                     break;
@@ -678,11 +660,9 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     {
         if (volumeOpen && volumeCertified)
         {
-            atomicAdd(
-                rtDielectricDiagnostics.value.primaryCertifiedClosedVolumeRecoveryCount,
+            RT_DIAG_ADD(primaryCertifiedClosedVolumeRecoveryCount,
                 1u);
-            atomicOr(
-                rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask,
+            RT_DIAG_OR(certifiedClosedVolumeRecoveryReasonMask,
                 16u);
             transmitted = vec3(0.0);
         }
@@ -691,10 +671,9 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     }
     if (overflowed)
     {
-        atomicAdd(rtDielectricDiagnostics.value.transportOverflowCount, 1u);
+        RT_DIAG_ADD(transportOverflowCount, 1u);
         if (touchedProductionPane)
-            atomicAdd(
-                rtDielectricDiagnostics.value.productionPaneStackFailureCount,
+            RT_DIAG_ADD(productionPaneStackFailureCount,
                 1u);
         transmitted = dielectricOverflowFallback(
             transmissionDirection, throughput);

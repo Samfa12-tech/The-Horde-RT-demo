@@ -197,7 +197,7 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
         if (remainingDistance <= 0.0)
         {
             if (volumeDepth > 0)
-                atomicAdd(rtDielectricDiagnostics.value.shadowFiniteEndpointVolumeCount,
+                RT_DIAG_ADD(shadowFiniteEndpointVolumeCount,
                           uint(volumeDepth));
             for (int volumeIndex = 0; volumeIndex < volumeDepth; ++volumeIndex)
             {
@@ -220,7 +220,7 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
             // so retain their partial path attenuation without inventing an
             // exit surface beyond the endpoint.
             if (volumeDepth > 0)
-                atomicAdd(rtDielectricDiagnostics.value.shadowFiniteEndpointVolumeCount,
+                RT_DIAG_ADD(shadowFiniteEndpointVolumeCount,
                           uint(volumeDepth));
             for (int volumeIndex = 0; volumeIndex < volumeDepth; ++volumeIndex)
             {
@@ -245,9 +245,9 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
             }
             if (everyOpenVolumeCertified)
             {
-                atomicAdd(rtDielectricDiagnostics.value.shadowCertifiedClosedVolumeRecoveryCount,
+                RT_DIAG_ADD(shadowCertifiedClosedVolumeRecoveryCount,
                           1u);
-                atomicOr(rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask,
+                RT_DIAG_OR(certifiedClosedVolumeRecoveryReasonMask,
                          32u);
             }
             return vec3(0.0);
@@ -265,16 +265,16 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
             }
             if (everyOpenVolumeCertified)
             {
-                atomicAdd(rtDielectricDiagnostics.value.shadowCertifiedClosedVolumeRecoveryCount,
+                RT_DIAG_ADD(shadowCertifiedClosedVolumeRecoveryCount,
                           1u);
-                atomicOr(rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask,
+                RT_DIAG_OR(certifiedClosedVolumeRecoveryReasonMask,
                          64u);
                 return vec3(0.0);
             }
-            atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);
+            RT_DIAG_ADD(shadowOverflowCount, 1u);
             if (nearest.instance == 8u ||
                 (volumeDepth > 0 && volumeInstances[volumeDepth - 1] == 8u))
-                atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
+                RT_DIAG_ADD(productionPaneStackFailureCount, 1u);
             return clamp(transmittance * vec3(0.08), vec3(0.0), vec3(1.0));
         }
         ++interfaceCount;
@@ -299,15 +299,15 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
                 }
                 if (everyOpenVolumeCertified)
                 {
-                    atomicAdd(rtDielectricDiagnostics.value.shadowCertifiedClosedVolumeRecoveryCount,
+                    RT_DIAG_ADD(shadowCertifiedClosedVolumeRecoveryCount,
                               1u);
-                    atomicOr(rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask,
+                    RT_DIAG_OR(certifiedClosedVolumeRecoveryReasonMask,
                              128u);
                     return vec3(0.0);
                 }
-                atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);
+                RT_DIAG_ADD(shadowOverflowCount, 1u);
                 if (nearest.instance == 8u)
-                    atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
+                    RT_DIAG_ADD(productionPaneStackFailureCount, 1u);
                 return clamp(transmittance * vec3(0.08), vec3(0.0), vec3(1.0));
             }
             observedClosedVolumeEntry = true;
@@ -332,8 +332,7 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
                 transmittance *= nearest.transmission * dielectricBeerLambert(
                     nearest.attenuationColor, absoluteDistance,
                     nearest.attenuationDistance);
-                atomicAdd(
-                    rtDielectricDiagnostics.value.shadowImplicitOriginExitCount, 1u);
+                RT_DIAG_ADD(shadowImplicitOriginExitCount, 1u);
             }
             else if (volumeDepth <= 0 ||
                 volumeInstances[volumeDepth - 1] != nearest.instance ||
@@ -353,20 +352,20 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
                     // The certified manifold cannot leak energy through a
                     // mismatched grazing edge. Block the sample and count the
                     // finite-precision recovery without hiding invalid assets.
-                    atomicAdd(rtDielectricDiagnostics.value.shadowCertifiedClosedVolumeRecoveryCount,
+                    RT_DIAG_ADD(shadowCertifiedClosedVolumeRecoveryCount,
                               1u);
-                    atomicOr(rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask,
+                    RT_DIAG_OR(certifiedClosedVolumeRecoveryReasonMask,
                              256u);
                     return vec3(0.0);
                 }
-                atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);
-                atomicAdd(rtDielectricDiagnostics.value.shadowUnclosedVolumeCount, 1u);
+                RT_DIAG_ADD(unclosedVolumeCount, 1u);
+                RT_DIAG_ADD(shadowUnclosedVolumeCount, 1u);
                 if (nearest.instance == 8u ||
                     (volumeDepth > 0 && volumeInstances[volumeDepth - 1] == 8u))
-                    atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
-                atomicAdd(rtDielectricDiagnostics.value.shadowMismatchedExitCount, 1u);
+                    RT_DIAG_ADD(productionPaneStackFailureCount, 1u);
+                RT_DIAG_ADD(shadowMismatchedExitCount, 1u);
                 if (volumeDepth <= 0)
-                    atomicAdd(rtDielectricDiagnostics.value.shadowMismatchEmptyCount, 1u);
+                    RT_DIAG_ADD(shadowMismatchEmptyCount, 1u);
                 return clamp(transmittance * vec3(0.08), vec3(0.0), vec3(1.0));
             }
             else
@@ -396,15 +395,15 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
     }
     if (everyOpenVolumeCertified)
     {
-        atomicAdd(rtDielectricDiagnostics.value.shadowCertifiedClosedVolumeRecoveryCount,
+        RT_DIAG_ADD(shadowCertifiedClosedVolumeRecoveryCount,
                   1u);
-        atomicOr(rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask,
+        RT_DIAG_OR(certifiedClosedVolumeRecoveryReasonMask,
                  512u);
         return vec3(0.0);
     }
-    atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);
+    RT_DIAG_ADD(shadowOverflowCount, 1u);
     if (volumeDepth > 0 && volumeInstances[volumeDepth - 1] == 8u)
-        atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
+        RT_DIAG_ADD(productionPaneStackFailureCount, 1u);
     return clamp(transmittance * vec3(0.08), vec3(0.0), vec3(1.0));
 }
 
@@ -444,7 +443,7 @@ vec3 compactShadowTransmittanceMask(vec3 origin, vec3 direction,
                     volumeAttenuationColor,
                     max(maxDistance - volumeEntryDistance, 0.0),
                     volumeAttenuationDistance);
-                atomicAdd(rtDielectricDiagnostics.value.shadowFiniteEndpointVolumeCount,
+                RT_DIAG_ADD(shadowFiniteEndpointVolumeCount,
                           1u);
             }
             return clamp(transmittance, vec3(0.0), vec3(1.0));
@@ -462,7 +461,7 @@ vec3 compactShadowTransmittanceMask(vec3 origin, vec3 direction,
                     volumeAttenuationColor,
                     max(maxDistance - volumeEntryDistance, 0.0),
                     volumeAttenuationDistance);
-                atomicAdd(rtDielectricDiagnostics.value.shadowFiniteEndpointVolumeCount,
+                RT_DIAG_ADD(shadowFiniteEndpointVolumeCount,
                           1u);
             }
             return clamp(transmittance, vec3(0.0), vec3(1.0));
@@ -471,21 +470,18 @@ vec3 compactShadowTransmittanceMask(vec3 origin, vec3 direction,
         {
             if (volumeOpen && volumeCertified)
             {
-                atomicAdd(
-                    rtDielectricDiagnostics.value.shadowCertifiedClosedVolumeRecoveryCount,
+                RT_DIAG_ADD(shadowCertifiedClosedVolumeRecoveryCount,
                     1u);
-                atomicOr(
-                    rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask,
+                RT_DIAG_OR(certifiedClosedVolumeRecoveryReasonMask,
                     32u);
             }
             return vec3(0.0);
         }
         if (interfaceCount >= interfaceBudget)
         {
-            atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);
+            RT_DIAG_ADD(shadowOverflowCount, 1u);
             if (nearest.instance == 8u || (volumeOpen && volumeInstance == 8u))
-                atomicAdd(
-                    rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
+                RT_DIAG_ADD(productionPaneStackFailureCount, 1u);
             return clamp(transmittance * vec3(0.08), vec3(0.0), vec3(1.0));
         }
         ++interfaceCount;
@@ -502,10 +498,9 @@ vec3 compactShadowTransmittanceMask(vec3 origin, vec3 direction,
             // Treat a nested entry as a bounded invalid-stack recovery.
             if (volumeOpen)
             {
-                atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);
+                RT_DIAG_ADD(shadowOverflowCount, 1u);
                 if (nearest.instance == 8u || volumeInstance == 8u)
-                    atomicAdd(
-                        rtDielectricDiagnostics.value.productionPaneStackFailureCount,
+                    RT_DIAG_ADD(productionPaneStackFailureCount,
                         1u);
                 return vec3(0.0);
             }
@@ -525,7 +520,7 @@ vec3 compactShadowTransmittanceMask(vec3 origin, vec3 direction,
             transmittance *= nearest.transmission * dielectricBeerLambert(
                 nearest.attenuationColor, absoluteDistance,
                 nearest.attenuationDistance);
-            atomicAdd(rtDielectricDiagnostics.value.shadowImplicitOriginExitCount,
+            RT_DIAG_ADD(shadowImplicitOriginExitCount,
                       1u);
         }
         else if (!volumeOpen || volumeInstance != nearest.instance ||
@@ -533,22 +528,19 @@ vec3 compactShadowTransmittanceMask(vec3 origin, vec3 direction,
         {
             if (volumeCertified && nearest.certifiedClosedVolume)
             {
-                atomicAdd(
-                    rtDielectricDiagnostics.value.shadowCertifiedClosedVolumeRecoveryCount,
+                RT_DIAG_ADD(shadowCertifiedClosedVolumeRecoveryCount,
                     1u);
-                atomicOr(
-                    rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask,
+                RT_DIAG_OR(certifiedClosedVolumeRecoveryReasonMask,
                     256u);
                 return vec3(0.0);
             }
-            atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);
-            atomicAdd(rtDielectricDiagnostics.value.shadowUnclosedVolumeCount, 1u);
-            atomicAdd(rtDielectricDiagnostics.value.shadowMismatchedExitCount, 1u);
+            RT_DIAG_ADD(unclosedVolumeCount, 1u);
+            RT_DIAG_ADD(shadowUnclosedVolumeCount, 1u);
+            RT_DIAG_ADD(shadowMismatchedExitCount, 1u);
             if (!volumeOpen)
-                atomicAdd(rtDielectricDiagnostics.value.shadowMismatchEmptyCount, 1u);
+                RT_DIAG_ADD(shadowMismatchEmptyCount, 1u);
             if (nearest.instance == 8u || (volumeOpen && volumeInstance == 8u))
-                atomicAdd(
-                    rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
+                RT_DIAG_ADD(productionPaneStackFailureCount, 1u);
             return clamp(transmittance * vec3(0.08), vec3(0.0), vec3(1.0));
         }
         else
@@ -571,9 +563,9 @@ vec3 compactShadowTransmittanceMask(vec3 origin, vec3 direction,
         remainingDistance = max(maxDistance - travelledDistance, 0.0);
     }
 
-    atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);
+    RT_DIAG_ADD(shadowOverflowCount, 1u);
     if (volumeOpen && volumeInstance == 8u)
-        atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
+        RT_DIAG_ADD(productionPaneStackFailureCount, 1u);
     return clamp(transmittance * vec3(0.08), vec3(0.0), vec3(1.0));
 }
 
@@ -713,10 +705,9 @@ vec3 boundedShadowTransmittanceMask(vec3 origin, vec3 direction,
         return vec3(0.0);
     if (overflow)
     {
-        atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);
+        RT_DIAG_ADD(shadowOverflowCount, 1u);
         if (productionPaneOverflow)
-            atomicAdd(
-                rtDielectricDiagnostics.value.productionPaneStackFailureCount,
+            RT_DIAG_ADD(productionPaneStackFailureCount,
                 1u);
         transmittance *= vec3(0.08);
     }

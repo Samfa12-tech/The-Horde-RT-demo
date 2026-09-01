@@ -7,6 +7,13 @@ $compiler = Join-Path $repoRoot 'tools\compile-raygen.ps1'
 $manifestPath = Join-Path $repoRoot 'tools\raygen-variants.json'
 $budgetsPath = Join-Path $repoRoot 'tools\raygen-variant-budgets.json'
 $configPath = Join-Path $repoRoot 'shaders\raytracing\include\rt_variant_config.glsl'
+$diagnosticsPath = Join-Path $repoRoot 'shaders\raytracing\include\rt_diagnostics.glsl'
+$raygenPath = Join-Path $repoRoot 'shaders\raytracing\minimal.rgen'
+$diagnosticConsumerPaths = @(
+    $raygenPath
+    Join-Path $repoRoot 'shaders\raytracing\include\rt_lighting.glsl'
+    Join-Path $repoRoot 'shaders\raytracing\include\rt_dielectric_transport.glsl'
+)
 $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) ('horde-raygen-variants-' + [guid]::NewGuid().ToString('N'))
 $worktreeStatusBefore = (& git -C $repoRoot status --porcelain) -join "`n"
 
@@ -60,9 +67,34 @@ function Invoke-InvalidVariantConfigCompile {
 }
 
 try {
-    foreach ($path in @($manifestPath, $budgetsPath, $configPath)) {
+    foreach ($path in @($manifestPath, $budgetsPath, $configPath, $diagnosticsPath)) {
         Assert-True (Test-Path -LiteralPath $path -PathType Leaf) "Missing required variant foundation file: $path"
     }
+
+    $diagnosticsSource = Get-Content -LiteralPath $diagnosticsPath -Raw
+    Assert-True (([regex]::Matches($diagnosticsSource, '\batomic(?:Add|Or)\s*\(').Count -eq 2)) `
+        'The diagnostics helper must own exactly the two raw atomic operations.'
+    Assert-True ($diagnosticsSource -match '#define\s+RT_DIAG_ADD\s*\(\s*fieldName\s*,\s*deltaValue\s*\)\s+atomicAdd\s*\(\s*rtDielectricDiagnostics\.value\.fieldName\s*,\s*deltaValue\s*\)') `
+        'RT_DIAG_ADD must route a field name and delta through the diagnostics SSBO.'
+    Assert-True ($diagnosticsSource -match '#define\s+RT_DIAG_OR\s*\(\s*fieldName\s*,\s*maskValue\s*\)\s+atomicOr\s*\(\s*rtDielectricDiagnostics\.value\.fieldName\s*,\s*maskValue\s*\)') `
+        'RT_DIAG_OR must route a field name and mask through the diagnostics SSBO.'
+    Assert-True ($diagnosticsSource -notmatch '#define\s+RT_DIAG_(?:ADD|OR)\s*\([^\)]*\bvalue\b') `
+        'Diagnostics macro parameter names must not collide with rtDielectricDiagnostics.value.'
+    foreach ($consumerPath in $diagnosticConsumerPaths) {
+        $consumerSource = Get-Content -LiteralPath $consumerPath -Raw
+        Assert-True (([regex]::Matches($consumerSource, '\batomic(?:Add|Or)\s*\(').Count -eq 0)) `
+            "Direct diagnostics atomics remain in $consumerPath."
+    }
+    $raygenSource = Get-Content -LiteralPath $raygenPath -Raw
+    $abiInclude = '#include "include/rt_scene_abi.glsl"'
+    $diagnosticsInclude = '#include "include/rt_diagnostics.glsl"'
+    $lightingInclude = '#include "include/rt_lighting.glsl"'
+    $transportInclude = '#include "include/rt_dielectric_transport.glsl"'
+    Assert-True (($raygenSource.IndexOf($abiInclude) -ge 0) -and
+        ($raygenSource.IndexOf($diagnosticsInclude) -gt $raygenSource.IndexOf($abiInclude)) -and
+        ($raygenSource.IndexOf($lightingInclude) -gt $raygenSource.IndexOf($diagnosticsInclude)) -and
+        ($raygenSource.IndexOf($transportInclude) -gt $raygenSource.IndexOf($diagnosticsInclude))) `
+        'The diagnostics helper must follow the ABI declaration and precede lighting and transport.'
 
     $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
     Assert-True ($manifest.schema -eq 1) 'Variant manifest schema must be 1.'
@@ -98,8 +130,8 @@ try {
 
     $genericHashBefore = Get-CanonicalFileHash (Join-Path $repoRoot 'src\vulkan\raytracing\MinimalRayGenShader.inc')
     $legacyHashBefore = Get-CanonicalFileHash (Join-Path $repoRoot 'src\vulkan\raytracing\MinimalLegacyRayGenShader.inc')
-    Assert-True ($genericHashBefore -eq 'd0c8cccea28d6c4deb02256dd4be0e828416a1f4087d64dc505bcacb0485fa56') 'Generic include hash changed before matrix compilation.'
-    Assert-True ($legacyHashBefore -eq '100109525677b2d6b3327cecd1128ecd999bf556d46c30f9c1c925d0349e8300') 'Legacy include hash changed before matrix compilation.'
+    Assert-True ($genericHashBefore -eq '2b39f13a9648ad6e14feb1b24309e2bb3d28b0d257954fe23103430438f139c5') 'Generic include hash changed before matrix compilation.'
+    Assert-True ($legacyHashBefore -eq '68455959f0770b0dfd03550934193c0e657b808620ef732eae7f565988c06f27') 'Legacy include hash changed before matrix compilation.'
 
     $matrixOutputRoot = Join-Path $temporaryRoot 'matrix'
     $matrixCompilerOutput = @(& $compiler -Matrix -OutputDirectory $matrixOutputRoot)
@@ -124,9 +156,21 @@ try {
             -not [string]::IsNullOrWhiteSpace($stats.compiledSpirvSha256)) "Stats hashes missing for $($variant.name)."
         $dependencyHashes += $stats.dependencySha256
         if ($variant.strategy -eq 'GenericRetained') {
-            Assert-True ($stats.functions -gt 1 -and $stats.functionCalls -gt 0 -and $stats.rayQueryInitializations -le 3) "Generic strategy shape regressed for $($variant.name)."
+            $expectedStats = @{ bytes = 224764; instructions = 13244; branchOperations = 683; loops = 10; selectionMerges = 285; functions = 59; functionCalls = 192; rayQueryInitializations = 3; atomicInstructions = 32 }
+            $expectedSpirvSha256 = 'e9d4fca05e8c642b6e09251a7c57253124fa6475ab5f81e34d1acb548764c23a'
         } else {
-            Assert-True ($stats.functions -eq 1 -and $stats.functionCalls -eq 0 -and $stats.rayQueryInitializations -le 29) "Opaque-fast strategy shape regressed for $($variant.name)."
+            $expectedStats = @{ bytes = 493244; instructions = 27152; branchOperations = 3677; loops = 49; selectionMerges = 1506; functions = 1; functionCalls = 0; rayQueryInitializations = 23; atomicInstructions = 5 }
+            $expectedSpirvSha256 = '870e4ea0c0b24fdcac516fec15343c1531906600d8ec28c9eaebf826a7bd75a0'
+        }
+        foreach ($property in $expectedStats.Keys) {
+            Assert-True ($stats.PSObject.Properties.Name -contains $property) "Missing $property stat for $($variant.name)."
+            Assert-True ([int64]$stats.$property -eq [int64]$expectedStats[$property]) "Unexpected $property for $($variant.name)."
+        }
+        Assert-True ($stats.compiledSpirvSha256 -eq $expectedSpirvSha256) "Compiled SPIR-V hash changed for $($variant.name)."
+        Assert-True ([bool]$stats.hasDiagnosticsBinding) "Diagnostics binding 22 is missing for $($variant.name)."
+        if ($variant.instrumentation -eq 'Shipping') {
+            Assert-True ($stats.atomicInstructions -eq $expectedStats.atomicInstructions -and [bool]$stats.hasDiagnosticsBinding) `
+                "Shipping-named baseline artifact changed diagnostics semantics for $($variant.name)."
         }
     }
     Assert-True ((@($dependencyHashes | Sort-Object -Unique).Count -eq 8)) `

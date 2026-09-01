@@ -564,6 +564,8 @@ int main()
             ReadTextFile(raygenDirectory / "include/rt_hit_decode.glsl");
         const std::string fireSource =
             ReadTextFile(raygenDirectory / "include/rt_fire.glsl");
+        const std::string diagnosticsSource =
+            ReadTextFile(raygenDirectory / "include/rt_diagnostics.glsl");
         const std::string dielectricTransportSource =
             ReadTextFile(raygenDirectory / "include/rt_dielectric_transport.glsl");
         std::string lightingSource =
@@ -577,6 +579,7 @@ int main()
         const std::string raygenSource =
             ReadTextFile(raygenDirectory / "minimal.rgen") +
             ReadTextFile(raygenDirectory / "include/rt_scene_abi.glsl") +
+            diagnosticsSource +
             lightingSource +
             fireSource +
             ReadTextFile(raygenDirectory / "include/rt_dielectric_common.glsl") +
@@ -808,14 +811,14 @@ int main()
                       raygenSource.find("const int kMobileDielectricVolumes = 2;") != std::string::npos &&
                       raygenSource.find("const int kHighDielectricVolumes = 4;") != std::string::npos &&
                       raygenSource.find("segmentLength = currentHit.t;") != std::string::npos &&
-                      raygenSource.find("atomicAdd(rtDielectricDiagnostics.value.transportOverflowCount, 1u);") != std::string::npos &&
-                      raygenSource.find("atomicAdd(rtDielectricDiagnostics.value.secondaryDielectricTerminalCount, 1u);") != std::string::npos &&
-                      raygenSource.find("atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);") != std::string::npos &&
+                      raygenSource.find("RT_DIAG_ADD(transportOverflowCount, 1u);") != std::string::npos &&
+                      raygenSource.find("RT_DIAG_ADD(secondaryDielectricTerminalCount, 1u);") != std::string::npos &&
+                      raygenSource.find("RT_DIAG_ADD(unclosedVolumeCount, 1u);") != std::string::npos &&
                       dielectricTransportSource.find(
                           "atomicAdd(rtDielectricDiagnostics.value.primaryClosedVolumeAbsorptionCount") ==
                           std::string::npos &&
                       dielectricTransportSource.find(
-                          "atomicAdd(rtDielectricDiagnostics.value.primaryCertifiedClosedVolumeRecoveryCount") !=
+                          "RT_DIAG_ADD(primaryCertifiedClosedVolumeRecoveryCount") !=
                           std::string::npos &&
                       dielectricTransportSource.find("kRtMaterialFlagCertifiedClosedVolume") !=
                           std::string::npos &&
@@ -846,10 +849,10 @@ int main()
                       raygenSource.find("const int kHighShadowInterfaces = 8;") != std::string::npos &&
                       raygenSource.find("material.metallicRoughnessOcclusionTransmission.x") != std::string::npos &&
                       raygenSource.find("dielectricBeerLambert(") != std::string::npos &&
-                      raygenSource.find("atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);") != std::string::npos &&
-                      lightingSource.find("atomicAdd(rtDielectricDiagnostics.value.shadowUnclosedVolumeCount, 1u);") != std::string::npos &&
+                      raygenSource.find("RT_DIAG_ADD(shadowOverflowCount, 1u);") != std::string::npos &&
+                      lightingSource.find("RT_DIAG_ADD(shadowUnclosedVolumeCount, 1u);") != std::string::npos &&
                       lightingSource.find(
-                          "atomicAdd(rtDielectricDiagnostics.value.shadowCertifiedClosedVolumeRecoveryCount") !=
+                          "RT_DIAG_ADD(shadowCertifiedClosedVolumeRecoveryCount") !=
                           std::string::npos &&
                       lightingSource.find("primaryUnclosedVolumeCount") == std::string::npos &&
                       raygenSource.find("if (interfaceCount >= interfaceBudget)") != std::string::npos &&
