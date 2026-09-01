@@ -7,3 +7,7 @@
 
 # Preserve the audited upstream cgltf bytes, including its one trailing tab.
 third_party/cgltf/cgltf.h whitespace=-trailing-space
+
+# The release identity contract is one UTF-8 line. Keep its checkout bytes
+# stable even when core.autocrlf is enabled on Windows.
+VERSION text eol=lf

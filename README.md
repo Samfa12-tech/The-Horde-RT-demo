@@ -4,14 +4,16 @@ Horde Lantern RT is a native Vulkan hardware-ray-tracing technology demo for And
 
 - Public alpha: https://samfa12.itch.io/the-horde
 - Source repository: https://github.com/Samfa12-tech/The-Horde-RT-demo
-- Current package version: `1.6.0`
-- Current itch builds: Windows `#1931949`; Android `#1931951`
+- Current development candidate: `1.6.1` / Android `versionCode 9` (not published)
+- Latest published itch release: `1.6.0` / Android `versionCode 8`; Windows `#1931949`; Android `#1931951`
 - Published SHA-256: Windows `7b0dcf24b4a47771a9c3a27cbc52e3899c87781109afcef20f7a9a8472411d77`; Android `52a64255ad5dec82cc866fb2ea3545be498ca06c73a789019be851c77e5d6c48`
 - Primary validated phone: Samsung `SM-S948B` / Adreno 840
 - Exact Android device baseline: the published stable-key-signed `1.6.0` APK is now installed and pulled back byte-for-byte on `SM-S948B`, with strict ASTC, honest RT presentation, and Home/resume smoke passing. The exact signed release smoke is functional/presentation evidence only; deterministic feature timing and owner feel remain tied to the accepted final Debug runtime.
 - Validated Windows GPU: NVIDIA GeForce RTX 5050 Laptop GPU
 
 Showcase Alpha 1.6.0 publishes the Fire/PBR/reward-lantern programme: imported PBR sword, torch, chest, lantern, and player assets; deterministic world-space fire with coherent coloured light and reflections; reusable bounded dielectric glass; shared held-item sockets; the post-lich chest/reward interaction; fixed-step physical lantern swing; the downward/upward sword combo; the skinned-player/IK foundation; and explicit GitHub Release update alerts. Owner review keeps block arms in normal gameplay until the skinned hands/gauntlets are ready in every scenario, and arm/body shadow/reflection polish remains deferred.
+
+The active source identity is the unpublished `1.6.1` / Android `versionCode 9` development candidate. It has no published artifact, device-performance, or owner-feel claim. The latest published itch release remains the exact `1.6.0` / `versionCode 8` package recorded below.
 
 The 1.5.2 water path removes the waterfall-only lighting approximation and hidden second glossy bounce on submerged cobble. Refracted and reflected opaque hits use terminal shared active-light/material/shadow logic, transparent candidates are explicitly filtered, path distance is accumulated, interface highlights use the same visible lights, and the directional moon traverses physical roof/player geometry. The ray budget remains finite and water-on-water paths do not recurse. Deterministic Windows, fresh Host, and exact `SM-S948B` Debug evidence pass; the owner accepted the moving Windows result. Repeated phone medians are approximately 27.8 ms at `lantern-drop`, 19.0 ms at `skylight`, and 30.8 ms at `lich`, with the bounded real-light cost retained rather than hidden through a quality or resolution reduction. See `docs/WATER_TRANSMISSION_SHADOW_VALIDATION_2026-08-24.md` and `docs/SHOWCASE_ALPHA_1_5_2_RELEASE_VALIDATION_2026-08-25.md`.
 
@@ -233,12 +235,12 @@ For a signed rebuild:
 
 ```powershell
 .\tools\package-signed-alpha.ps1 -KeyStorePath '<outside-repo path>' -Version '<next-version>' -VersionCode <next-version-code>
-.\tools\push-alpha-to-itch.ps1 -Version '<next-version>' -Channels Both
+.\tools\push-alpha-to-itch.ps1 -Version '<next-version>' -VersionCode <next-version-code> -Channels Both
 ```
 
 The packaging and push scripts securely prompt for signing secrets, reject debug/unsigned Android candidates, verify hashes, and keep Windows and Android on separate itch channels. Add `-ConfirmPush` only after the preflight passes.
 
-There are no packaging version defaults: candidate scripts require explicit `Version` and `VersionCode`, reject the immutable published `0.1.1` through `0.1.5`, `1.5.2`, and `1.6.0` lines, and require Android `versionCode > 8`. One shared policy helper owns these rules for packaging, signing, and itch upload. A future public build must first bump CMake/Windows/Android/package metadata, provide matching release notes, and update the guarded candidate hashes.
+There are no packaging version defaults: candidate scripts require explicit `Version` and `VersionCode`, then require both to match the root `VERSION` and Android version-code map. They reject the immutable published `0.1.1` through `0.1.5`, `1.5.2`, and `1.6.0` lines. One shared policy helper owns these rules for packaging, signing, and itch upload. A future public build must first provide matching release notes and update the guarded candidate hashes.
 
 Android native code is linked for 16 KiB page compatibility. The release uses a static C++ runtime, 16 KiB ELF `LOAD` alignment, and AGP 8.7.2 APK alignment; `package-alpha.ps1` rejects candidates that fail either APK or ELF verification or reintroduce `libc++_shared.so` from the r26 NDK.
 

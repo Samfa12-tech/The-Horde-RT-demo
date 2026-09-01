@@ -3,7 +3,7 @@
 #include "scene/assets/AssetValidation.h"
 #include "scene/assets/DielectricTopologyMath.h"
 #include "scene/assets/GltfDocument.h"
-#include "third_party/cgltf/cgltf.h"
+#include "cgltf/cgltf.h"
 
 #include <algorithm>
 #include <array>

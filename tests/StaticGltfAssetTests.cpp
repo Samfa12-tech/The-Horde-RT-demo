@@ -2,7 +2,7 @@
 #include "scene/assets/AssetValidation.h"
 #include "scene/assets/DielectricTopologyMath.h"
 #include "scene/assets/StaticMeshAsset.h"
-#include "third_party/cgltf/cgltf.h"
+#include "cgltf/cgltf.h"
 
 #include <array>
 #include <cmath>

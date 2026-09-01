@@ -33,11 +33,11 @@ void CheckSemanticVersionOrdering()
     const auto stable = ParseSemanticVersion("v1.5.3");
     const auto beta2 = ParseSemanticVersion("1.6.0-beta.2");
     const auto beta11 = ParseSemanticVersion("1.6.0-beta.11");
-    const auto release = ParseSemanticVersion("1.6.0");
+    const auto release = ParseSemanticVersion("1.6.1");
 
     Check(stable.has_value(), "v-prefixed stable SemVer must parse");
     Check(beta2.has_value() && beta11.has_value(), "numeric prerelease identifiers must parse");
-    Check(release.has_value(), "stable SemVer must parse");
+    Check(release.has_value(), "the installed 1.6.1 semantic version must parse");
     Check(CompareSemanticVersions(*stable, *beta2) < 0, "a later minor prerelease must outrank an older stable release");
     Check(CompareSemanticVersions(*beta2, *beta11) < 0, "numeric prerelease identifiers must compare numerically");
     Check(CompareSemanticVersions(*beta11, *release) < 0, "a stable release must outrank its prerelease");
@@ -134,9 +134,9 @@ void CheckPrereleaseChannelAndCurrentVersion()
           "Unicode release notes must survive shared JSON parsing as UTF-8");
 
     const auto current = CheckForGitHubReleaseUpdate(
-        "1.6.0-beta.2", ReleaseChannel::IncludePrerelease,
+        "1.6.1", ReleaseChannel::IncludePrerelease,
         [&](const GitHubHttpRequest&) { return Ok(response); });
-    Check(current.status == UpdateCheckStatus::UpToDate, "the same published version must not notify again");
+    Check(current.status == UpdateCheckStatus::UpToDate, "an installed 1.6.1 must remain up to date when no newer tag exists");
     Check(!current.update.has_value(), "up-to-date results must not expose an update action");
 }
 
@@ -239,6 +239,26 @@ void CheckReleaseNotesTruncateAtUtf8Boundary()
     Check(result.update->notes == expected,
           "release notes must reserve the byte limit for the suffix and truncate before a split UTF-8 code point");
 }
+
+void CheckCurrentReleaseTagIsRepresentable()
+{
+    const auto result = CheckForGitHubReleaseUpdate(
+        "1.6.1", ReleaseChannel::StableOnly,
+        [](const GitHubHttpRequest&) {
+            return Ok(R"json([{
+                "tag_name":"v1.6.1",
+                "html_url":"https://github.com/Samfa12-tech/The-Horde-RT-demo/releases/tag/v1.6.1",
+                "name":"Horde Lantern RT 1.6.1",
+                "body":"Current candidate tag",
+                "draft":false,
+                "prerelease":false,
+                "published_at":"2026-09-01T00:00:00Z"
+            }])json");
+        });
+    Check(result.status == UpdateCheckStatus::UpToDate,
+          "installed 1.6.1 and tag v1.6.1 must compare as the same current release");
+    Check(!result.update.has_value(), "matching v1.6.1 must not expose an update action");
+}
 }
 
 int main()
@@ -249,6 +269,7 @@ int main()
     CheckUntrustedAndDraftReleasesAreIgnored();
     CheckBoundedFailureModes();
     CheckReleaseNotesTruncateAtUtf8Boundary();
+    CheckCurrentReleaseTagIsRepresentable();
     std::cout << "GitHub release updater tests passed.\n";
     return 0;
 }

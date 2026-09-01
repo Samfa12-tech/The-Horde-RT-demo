@@ -12,6 +12,8 @@ param(
 
 $ErrorActionPreference = "Stop"
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
+. (Join-Path $PSScriptRoot "version-contract.ps1")
+$sourceIdentity = Get-HordeSourceIdentity -RepoRoot $repoRoot
 $outputRootFull = [IO.Path]::GetFullPath($OutputRoot)
 $allowedOutputRoot = [IO.Path]::GetFullPath((Join-Path $repoRoot "reports"))
 $allowedOutputPrefix = $allowedOutputRoot.TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
@@ -40,8 +42,8 @@ $gitCommit = "unknown"
 $gitStatusBefore = ""
 $gitStatusAfter = ""
 $shaderRetention = "not-evaluated"
-$sourcePackageVersion = ""
-$sourceVersionCode = 0
+$sourcePackageVersion = $sourceIdentity.Version
+$sourceVersionCode = $sourceIdentity.VersionCode
 
 foreach ($directory in @($runDirectory, $logDirectory, $artifactDirectory, $captureDirectory,
                           $windowsCaptureDirectory, $shaderDirectory)) {
@@ -506,7 +508,13 @@ try {
                 & (Join-Path $PSScriptRoot "package-alpha.ps1") -Version "1.6.1" -VersionCode 8
             } 'greater than'
             Assert-ExpectedFailure {
+                & (Join-Path $PSScriptRoot "package-alpha.ps1") -Version "1.6.1" -VersionCode 10
+            } 'active root contract'
+            . (Join-Path $PSScriptRoot "release-version-policy.ps1")
+            Assert-HordeReleaseVersionIsMutable -Version $script:sourcePackageVersion -VersionCode $script:sourceVersionCode
+            Assert-ExpectedFailure {
                 & (Join-Path $PSScriptRoot "push-alpha-to-itch.ps1") -Version "1.6.0" `
+                    -VersionCode 9 `
                     -ButlerPath (Join-Path $runDirectory "missing-butler.exe")
             } 'immutable'
 
@@ -587,19 +595,6 @@ try {
         $windowsReleaseExe = Join-Path $windowsBuild "Release\HordeLanternRT.exe"
         $androidUnsignedApk = Join-Path $repoRoot "android\app\build\outputs\apk\release\app-release-unsigned.apk"
         Invoke-Stage "validation-package-and-licence-gate" {
-            $cmakeVersionSource = Get-Content -LiteralPath (Join-Path $repoRoot "cmake\HordeRtSources.cmake") -Raw
-            $gradleVersionSource = Get-Content -LiteralPath (Join-Path $repoRoot "android\app\build.gradle") -Raw
-            $cmakeVersionMatch = [regex]::Match($cmakeVersionSource, 'HORDE_RT_PACKAGE_VERSION\s+"([^"]+)"')
-            $gradleNameMatch = [regex]::Match($gradleVersionSource, "versionName\s+'([^']+)'")
-            $gradleCodeMatch = [regex]::Match($gradleVersionSource, 'versionCode\s+(\d+)(?:\s|$)')
-            if (-not $cmakeVersionMatch.Success -or -not $gradleNameMatch.Success -or -not $gradleCodeMatch.Success) {
-                throw "Could not parse the current CMake/Android release identity."
-            }
-            if ($cmakeVersionMatch.Groups[1].Value -ne $gradleNameMatch.Groups[1].Value) {
-                throw "CMake and Android package versions disagree."
-            }
-            $script:sourcePackageVersion = $cmakeVersionMatch.Groups[1].Value
-            $script:sourceVersionCode = [int]$gradleCodeMatch.Groups[1].Value
             foreach ($required in @(
                 $windowsReleaseExe, $androidUnsignedApk, (Join-Path $repoRoot "ASSET_LICENSES.md"),
                 (Join-Path $repoRoot "assets\models\enemies\meshy\lich_placeholder_source_licence.png"))) {
@@ -611,6 +606,24 @@ try {
             if ($windowsVersion.FileVersion -ne $script:sourcePackageVersion -or
                 $windowsVersion.ProductVersion -ne $script:sourcePackageVersion) {
                 throw "Windows validation binary version surfaces do not agree on $($script:sourcePackageVersion)."
+            }
+            $windowsSdkBin = Join-Path ${env:ProgramFiles(x86)} "Windows Kits\10\bin"
+            $mt = Find-LatestVersionedTool -Root $windowsSdkBin -RelativeToolPath "x64\mt.exe"
+            $embeddedManifest = Join-Path $artifactDirectory "HordeLanternRT.embedded.manifest"
+            try {
+                & $mt -nologo "-inputresource:$windowsReleaseExe;#1" "-out:$embeddedManifest"
+                if ($LASTEXITCODE -ne 0) { throw "Could not extract the Windows embedded manifest." }
+                $embeddedManifestText = Get-Content -LiteralPath $embeddedManifest -Raw
+                $expectedAssemblyVersion = "$($script:sourcePackageVersion).0"
+                if ($embeddedManifestText -notmatch [regex]::Escape(('version="{0}"' -f $expectedAssemblyVersion))) {
+                    throw "Windows embedded manifest does not contain expected assembly identity $expectedAssemblyVersion."
+                }
+                if ($embeddedManifestText -notmatch 'PerMonitorV2' -or $embeddedManifestText -notmatch 'longPathAware' -or
+                    $embeddedManifestText -notmatch 'Microsoft.Windows.Common-Controls') {
+                    throw "Windows embedded manifest lost a required compatibility declaration."
+                }
+            } finally {
+                if (Test-Path -LiteralPath $embeddedManifest) { Remove-Item -LiteralPath $embeddedManifest -Force }
             }
             $windowsBinaryText = [Text.Encoding]::ASCII.GetString([IO.File]::ReadAllBytes($windowsReleaseExe))
             foreach ($marker in @(
@@ -732,6 +745,8 @@ try {
             $sourceAndArtifactTargets = @(
                 (Join-Path $repoRoot "shaders\raytracing\minimal.rgen"),
                 (Join-Path $repoRoot "src\vulkan\raytracing\MinimalRayGenShader.inc"),
+                (Join-Path $repoRoot "VERSION"),
+                (Join-Path $repoRoot "version-code-map.json"),
                 (Join-Path $repoRoot "ASSET_LICENSES.md"),
                 $windowsReleaseExe,
                 $androidUnsignedApk,
@@ -787,6 +802,12 @@ try {
         shaderRegisterPressureMeasured = $false
         shaderRegisterPressureNote = "NVIDIA Nsight is not installed; SPIR-V structure and device timing are the available evidence."
         shaderRetention = $shaderRetention
+        sourceIdentity = [ordered]@{
+            version = $sourcePackageVersion
+            androidVersionCode = $sourceVersionCode
+            versionSource = [IO.Path]::GetRelativePath($repoRoot, $sourceIdentity.VersionPath)
+            versionCodeMap = [IO.Path]::GetRelativePath($repoRoot, $sourceIdentity.VersionCodeMapPath)
+        }
         validationArtifactsPublishable = $false
         captureCount = $pngCount
         stages = @($stageResults)
@@ -798,6 +819,7 @@ try {
         "- Mode: $Mode",
         "- Result: $($summary.result.ToUpperInvariant())",
         "- Git commit: ``$gitCommit``",
+        "- Source identity: ``$sourcePackageVersion`` / Android versionCode ``$sourceVersionCode``",
         "- Captures: $pngCount",
         "- Validation artifacts: UNPUBLISHABLE",
         "- Register pressure: not numerically measured; NVIDIA Nsight is not installed.",

@@ -4,8 +4,10 @@ if(POLICY CMP0091)
     cmake_policy(SET CMP0091 NEW)
 endif()
 
+include(cmake/HordeRtVersion.cmake)
+
 project(HordeLanternRT
-    VERSION 1.6.0
+    VERSION ${HORDE_RT_PACKAGE_VERSION}
     DESCRIPTION "Native Vulkan hardware ray tracing technology demo"
     LANGUAGES CXX
 )
@@ -67,7 +69,7 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS)
         PUBLIC
             ${CMAKE_CURRENT_SOURCE_DIR}/src
         PRIVATE
-            ${CMAKE_CURRENT_SOURCE_DIR}
+            ${CMAKE_CURRENT_SOURCE_DIR}/third_party
     )
     target_compile_features(horde_rt_probe_core PUBLIC cxx_std_20)
     target_link_libraries(horde_rt_probe_core PUBLIC Vulkan::Vulkan horde_gameplay_simulation)
@@ -93,12 +95,19 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_CAPABILITY_PROBE_EXECUTABLE)
 endif()
 
 if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AND WIN32)
+    set(HORDE_RT_WINDOWS_RESOURCE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/generated/windows")
+    file(MAKE_DIRECTORY "${HORDE_RT_WINDOWS_RESOURCE_DIRECTORY}")
+    configure_file(src/platform/windows/HordeLanternRT.rc.in
+        "${HORDE_RT_WINDOWS_RESOURCE_DIRECTORY}/HordeLanternRT.rc" @ONLY)
+    configure_file(src/platform/windows/HordeLanternRT.manifest.in
+        "${HORDE_RT_WINDOWS_RESOURCE_DIRECTORY}/HordeLanternRT.manifest" @ONLY)
+
     add_executable(horde_rt_diagnostic_window WIN32
         src/platform/windows/DiagnosticWindowMain.cpp
         src/platform/windows/DiagnosticWindow.cpp
         src/platform/windows/WindowsGitHubReleaseUpdate.cpp
-        src/platform/windows/HordeLanternRT.manifest
-        src/platform/windows/HordeLanternRT.rc
+        "${HORDE_RT_WINDOWS_RESOURCE_DIRECTORY}/HordeLanternRT.manifest"
+        "${HORDE_RT_WINDOWS_RESOURCE_DIRECTORY}/HordeLanternRT.rc"
         src/ui/DiagnosticOverlay.cpp
     )
 
@@ -119,7 +128,8 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AN
     )
     target_compile_definitions(horde_rt_diagnostic_window PRIVATE
         HORDE_RT_DISPLAY_VERSION="${HORDE_RT_DISPLAY_VERSION}"
-        HORDE_RT_BUILD_ID="${HORDE_RT_PACKAGE_VERSION}"
+        HORDE_RT_PACKAGE_VERSION="${HORDE_RT_PACKAGE_VERSION}"
+        HORDE_RT_BUILD_ID="${HORDE_RT_BUILD_ID}"
         HORDE_RT_RAYGEN_SHA256="${HORDE_RT_RAYGEN_SHA256}"
         $<$<CONFIG:Debug>:HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}">
     )
@@ -136,6 +146,14 @@ if(BUILD_TESTING)
     )
     target_include_directories(horde_rt_github_release_updater_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_github_release_updater_tests COMMAND horde_rt_github_release_updater_tests)
+
+    add_executable(horde_rt_version_contract_tests tests/VersionContractTests.cpp)
+    target_compile_definitions(horde_rt_version_contract_tests PRIVATE
+        HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
+        HORDE_RT_EXPECTED_VERSION="${HORDE_RT_PACKAGE_VERSION}"
+        HORDE_RT_EXPECTED_ANDROID_VERSION_CODE=${HORDE_RT_ANDROID_VERSION_CODE}
+    )
+    add_test(NAME horde_rt_version_contract_tests COMMAND horde_rt_version_contract_tests)
 
     add_executable(horde_rt_dielectric_math_tests tests/DielectricMathTests.cpp)
     target_include_directories(horde_rt_dielectric_math_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
@@ -161,7 +179,7 @@ if(BUILD_TESTING)
     add_executable(horde_rt_held_item_socket_tests tests/HeldItemSocketTests.cpp)
     target_include_directories(horde_rt_held_item_socket_tests PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
-        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party
     )
     target_sources(horde_rt_held_item_socket_tests PRIVATE
         src/scene/assets/AssetManifest.cpp
@@ -193,7 +211,7 @@ if(BUILD_TESTING)
     add_executable(horde_rt_static_gltf_asset_tests tests/StaticGltfAssetTests.cpp)
     target_include_directories(horde_rt_static_gltf_asset_tests PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
-        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party
     )
     target_sources(horde_rt_static_gltf_asset_tests PRIVATE
         src/scene/assets/AssetManifest.cpp
@@ -210,7 +228,7 @@ if(BUILD_TESTING)
     add_executable(horde_rt_production_prop_asset_tests tests/ProductionPropAssetTests.cpp)
     target_include_directories(horde_rt_production_prop_asset_tests PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
-        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party
     )
     target_sources(horde_rt_production_prop_asset_tests PRIVATE
         src/scene/assets/AssetManifest.cpp

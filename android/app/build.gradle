@@ -2,6 +2,22 @@ plugins {
     id 'com.android.application'
 }
 
+import groovy.json.JsonSlurper
+
+def hordeVersionFile = rootProject.file('../VERSION')
+def hordeVersionCodeMapFile = rootProject.file('../version-code-map.json')
+def hordeVersionRaw = hordeVersionFile.getText('UTF-8')
+if (!(hordeVersionRaw ==~ /^[0-9]+\.[0-9]+\.[0-9]+\r?\n?$/)) {
+    throw new GradleException("VERSION must contain exactly one MAJOR.MINOR.PATCH line without whitespace.")
+}
+def hordeVersionName = hordeVersionRaw.trim()
+def hordeVersionCodeMap = new JsonSlurper().parse(hordeVersionCodeMapFile)
+def hordeVersionCode = hordeVersionCodeMap?.androidVersionCodes?[(hordeVersionName)]
+def hordeVersionCodeText = hordeVersionCode?.toString()
+if (!(hordeVersionCode instanceof Number) || !(hordeVersionCodeText ==~ /^[1-9][0-9]*$/)) {
+    throw new GradleException("Android version-code map has no positive integer for ${hordeVersionName}.")
+}
+
 def runtimeAssetsDir = layout.buildDirectory.dir('generated/runtimeAssets')
 def validationUnsigned = System.getenv('HORDE_VALIDATION_UNSIGNED') == '1'
 def releaseStoreFile = validationUnsigned ? null : System.getenv('HORDE_RELEASE_STORE_FILE')
@@ -57,8 +73,9 @@ android {
         applicationId 'com.samfa12.hordelanternrt'
         minSdk 24
         targetSdk 34
-        versionCode 8
-        versionName '1.6.0'
+        versionCode hordeVersionCode.intValue()
+        versionName hordeVersionName
+        resValue 'string', 'alpha_version', "SHOWCASE · ALPHA ${hordeVersionName}"
 
         externalNativeBuild {
             cmake {
