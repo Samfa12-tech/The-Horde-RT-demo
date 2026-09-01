@@ -33,6 +33,32 @@ function Get-CanonicalFileHash {
     }
 }
 
+function Invoke-InvalidVariantConfigCompile {
+    param([string]$MacroName, [string]$Value)
+
+    $vulkanSdk = if ([string]::IsNullOrWhiteSpace($env:VULKAN_SDK)) { 'C:\VulkanSDK\1.4.350.0' } else { $env:VULKAN_SDK }
+    $validator = Join-Path $vulkanSdk 'Bin\glslangValidator.exe'
+    Assert-True (Test-Path -LiteralPath $validator -PathType Leaf) "glslangValidator was not found at $validator"
+    $invalidSource = Join-Path $temporaryRoot ("invalid-{0}.rgen" -f $MacroName.ToLowerInvariant())
+    $invalidSpirv = "$invalidSource.spv"
+    $macroDefinitions = @(
+        '#version 460',
+        '#extension GL_EXT_ray_tracing : require',
+        '#define HORDE_RT_VARIANT_INSTRUMENTATION 0',
+        '#define HORDE_RT_VARIANT_QUALITY 0',
+        '#define HORDE_RT_VARIANT_MATERIAL 0',
+        ("#undef {0}" -f $MacroName),
+        ("#define {0} {1}" -f $MacroName, $Value),
+        (Get-Content -LiteralPath $configPath -Raw).TrimEnd("`r", "`n"),
+        'void main() {}'
+    )
+    [IO.File]::WriteAllText($invalidSource, ([string]::Join("`n", $macroDefinitions) + "`n"), [Text.UTF8Encoding]::new($false))
+    $validatorOutput = @(& $validator -V --target-env vulkan1.2 -S rgen -o $invalidSpirv $invalidSource 2>&1)
+    if ($LASTEXITCODE -eq 0) {
+        throw "Invalid GLSL $MacroName=$Value compiled successfully: $($validatorOutput -join ' ')"
+    }
+}
+
 try {
     foreach ($path in @($manifestPath, $budgetsPath, $configPath)) {
         Assert-True (Test-Path -LiteralPath $path -PathType Leaf) "Missing required variant foundation file: $path"
@@ -65,13 +91,18 @@ try {
         'Variant budget record must remain schema-1 and explicitly unfrozen.'
     Assert-True ($null -eq $budgets.budgets -or @($budgets.budgets).Count -eq 0) `
         'Unfrozen variant budget record must not invent numeric limits.'
+    New-Item -ItemType Directory -Force -Path $temporaryRoot | Out-Null
+    Invoke-InvalidVariantConfigCompile -MacroName 'HORDE_RT_VARIANT_INSTRUMENTATION' -Value '2'
+    Invoke-InvalidVariantConfigCompile -MacroName 'HORDE_RT_VARIANT_QUALITY' -Value '-1'
+    Invoke-InvalidVariantConfigCompile -MacroName 'HORDE_RT_VARIANT_MATERIAL' -Value '7'
 
     $genericHashBefore = Get-CanonicalFileHash (Join-Path $repoRoot 'src\vulkan\raytracing\MinimalRayGenShader.inc')
     $legacyHashBefore = Get-CanonicalFileHash (Join-Path $repoRoot 'src\vulkan\raytracing\MinimalLegacyRayGenShader.inc')
     Assert-True ($genericHashBefore -eq 'd0c8cccea28d6c4deb02256dd4be0e828416a1f4087d64dc505bcacb0485fa56') 'Generic include hash changed before matrix compilation.'
     Assert-True ($legacyHashBefore -eq '100109525677b2d6b3327cecd1128ecd999bf556d46c30f9c1c925d0349e8300') 'Legacy include hash changed before matrix compilation.'
 
-    $matrixCompilerOutput = @(& $compiler -Matrix -OutputDirectory $temporaryRoot)
+    $matrixOutputRoot = Join-Path $temporaryRoot 'matrix'
+    $matrixCompilerOutput = @(& $compiler -Matrix -OutputDirectory $matrixOutputRoot)
     if ($LASTEXITCODE -ne 0) { throw "Matrix compiler failed with exit code $LASTEXITCODE." }
     $reportedOrder = @($matrixCompilerOutput | ForEach-Object {
         if ($_ -match '^Raygen variant ([a-z_]+):') { $Matches[1] }
@@ -80,7 +111,7 @@ try {
         'Matrix compiler output order must be deterministic and sorted by stable key.'
     $dependencyHashes = @()
     foreach ($variant in $manifest.variants) {
-        $variantRoot = Join-Path $temporaryRoot $variant.name
+        $variantRoot = Join-Path $matrixOutputRoot $variant.name
         foreach ($name in @('minimal.rgen.resolved', 'minimal.rgen.spv', 'minimal.rgen.spvasm', 'raygen-stats.json')) {
             Assert-True (Test-Path -LiteralPath (Join-Path $variantRoot $name) -PathType Leaf) "Missing matrix artifact $name for $($variant.name)."
         }
@@ -103,7 +134,7 @@ try {
     $singleOutputRoot = Join-Path $temporaryRoot 'single-variant'
     $singleCompilerOutput = @(& $compiler -Variant 'shipping_mobile_generic_dielectric' -OutputDirectory $singleOutputRoot)
     if ($LASTEXITCODE -ne 0) { throw "Single variant compiler failed with exit code $LASTEXITCODE." }
-    $matrixStatsText = Get-Content -LiteralPath (Join-Path $temporaryRoot 'shipping_mobile_generic_dielectric\raygen-stats.json') -Raw
+    $matrixStatsText = Get-Content -LiteralPath (Join-Path $matrixOutputRoot 'shipping_mobile_generic_dielectric\raygen-stats.json') -Raw
     $singleStatsText = Get-Content -LiteralPath (Join-Path $singleOutputRoot 'shipping_mobile_generic_dielectric\raygen-stats.json') -Raw
     Assert-True ($singleStatsText -eq $matrixStatsText) 'Single-key compilation did not reproduce deterministic stats output.'
     Assert-True ((Get-CanonicalFileHash (Join-Path $repoRoot 'src\vulkan\raytracing\MinimalRayGenShader.inc')) -eq $genericHashBefore) 'Matrix compilation modified the generic include.'
@@ -140,6 +171,47 @@ try {
     Invoke-ExpectFailure {
         & $compiler -Matrix -ManifestPath $unknownEnumManifestPath -OutputDirectory (Join-Path $temporaryRoot 'unknown-enum-output')
     } 'Unknown variant enum did not fail closed.'
+    $wrongCaseNameManifestPath = Join-Path $temporaryRoot 'wrong-case-name-variants.json'
+    $wrongCaseNameManifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
+    $wrongCaseNameManifest.variants[0].name = 'Shipping_Mobile_Opaque_Fast'
+    [IO.File]::WriteAllText($wrongCaseNameManifestPath, ($wrongCaseNameManifest | ConvertTo-Json -Depth 4), [Text.UTF8Encoding]::new($false))
+    Invoke-ExpectFailure {
+        & $compiler -Matrix -ManifestPath $wrongCaseNameManifestPath -OutputDirectory (Join-Path $temporaryRoot 'wrong-case-name-output')
+    } 'Wrong-case stable key did not fail closed.'
+    $wrongCaseEnumManifestPath = Join-Path $temporaryRoot 'wrong-case-enum-variants.json'
+    $wrongCaseEnumManifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
+    $wrongCaseEnumManifest.variants[0].instrumentation = 'shipping'
+    [IO.File]::WriteAllText($wrongCaseEnumManifestPath, ($wrongCaseEnumManifest | ConvertTo-Json -Depth 4), [Text.UTF8Encoding]::new($false))
+    Invoke-ExpectFailure {
+        & $compiler -Matrix -ManifestPath $wrongCaseEnumManifestPath -OutputDirectory (Join-Path $temporaryRoot 'wrong-case-enum-output')
+    } 'Wrong-case manifest enum did not fail closed.'
+    $wrongCaseStrategyManifestPath = Join-Path $temporaryRoot 'wrong-case-strategy-variants.json'
+    $wrongCaseStrategyManifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
+    $wrongCaseStrategyManifest.variants[1].strategy = 'genericretained'
+    [IO.File]::WriteAllText($wrongCaseStrategyManifestPath, ($wrongCaseStrategyManifest | ConvertTo-Json -Depth 4), [Text.UTF8Encoding]::new($false))
+    Invoke-ExpectFailure {
+        & $compiler -Matrix -ManifestPath $wrongCaseStrategyManifestPath -OutputDirectory (Join-Path $temporaryRoot 'wrong-case-strategy-output')
+    } 'Wrong-case manifest strategy did not fail closed.'
+    $wrongShippingRelationshipManifestPath = Join-Path $temporaryRoot 'wrong-shipping-relationship-variants.json'
+    $wrongShippingRelationshipManifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
+    $wrongShippingRelationshipManifest.variants[4].shippingAllowed = $true
+    [IO.File]::WriteAllText($wrongShippingRelationshipManifestPath, ($wrongShippingRelationshipManifest | ConvertTo-Json -Depth 4), [Text.UTF8Encoding]::new($false))
+    Invoke-ExpectFailure {
+        & $compiler -Matrix -ManifestPath $wrongShippingRelationshipManifestPath -OutputDirectory (Join-Path $temporaryRoot 'wrong-shipping-relationship-output')
+    } 'Invalid Shipping relationship did not fail closed.'
+    $wrongCasePropertyManifestPath = Join-Path $temporaryRoot 'wrong-case-property-variants.json'
+    [IO.File]::WriteAllText($wrongCasePropertyManifestPath,
+        ((Get-Content -LiteralPath $manifestPath -Raw).Replace('"name"', '"Name"')),
+        [Text.UTF8Encoding]::new($false))
+    Invoke-ExpectFailure {
+        & $compiler -Matrix -ManifestPath $wrongCasePropertyManifestPath -OutputDirectory (Join-Path $temporaryRoot 'wrong-case-property-output')
+    } 'Wrong-case manifest property did not fail closed.'
+    Invoke-ExpectFailure {
+        & $compiler -Variant 'SHIPPING_MOBILE_OPAQUE_FAST' -OutputDirectory (Join-Path $temporaryRoot 'wrong-case-key-output')
+    } 'Wrong-case requested key did not fail closed.'
+    Invoke-ExpectFailure {
+        & $compiler -Variant 'shipping_mobile_opaque_fast' -Strategy 'legacyinlined' -OutputDirectory (Join-Path $temporaryRoot 'wrong-case-requested-strategy-output')
+    } 'Wrong-case requested strategy did not fail closed.'
     $duplicateCombinationManifestPath = Join-Path $temporaryRoot 'duplicate-combination-variants.json'
     $duplicateCombinationManifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
     $duplicateCombinationManifest.variants[7].name = 'diagnostic_high_generic_dielectric_duplicate'

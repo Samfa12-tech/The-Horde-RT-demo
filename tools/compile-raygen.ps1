@@ -6,7 +6,6 @@ param(
     [switch]$Legacy,
     [string]$Variant,
     [switch]$Matrix,
-    [ValidateSet('GenericRetained', 'LegacyInlined')]
     [string]$Strategy,
     [string]$ManifestPath
 )
@@ -146,6 +145,28 @@ function Get-RaygenFileSha256
     }
 }
 
+function Test-RaygenExactString
+{
+    param([string]$Left, [string]$Right)
+
+    return $null -ne $Left -and $null -ne $Right -and
+        [string]::Equals($Left, $Right, [StringComparison]::Ordinal)
+}
+
+function Test-RaygenExactOneOf
+{
+    param([string]$Value, [string[]]$ExpectedValues)
+
+    foreach ($expectedValue in $ExpectedValues)
+    {
+        if (Test-RaygenExactString -Left $Value -Right $expectedValue)
+        {
+            return $true
+        }
+    }
+    return $false
+}
+
 function Get-RaygenVariantManifest
 {
     param([string]$Path)
@@ -164,7 +185,7 @@ function Get-RaygenVariantManifest
     {
         throw 'Raygen variant manifest must use schema 1 and contain variants.'
     }
-    if (@($manifest.PSObject.Properties.Name | Sort-Object) -join ',' -ne 'schema,variants')
+    if (-not (Test-RaygenExactString -Left (@($manifest.PSObject.Properties.Name | Sort-Object) -join ',') -Right 'schema,variants'))
     {
         throw 'Raygen variant manifest has unsupported top-level fields.'
     }
@@ -182,7 +203,7 @@ function Get-RaygenVariantManifest
                     quality = $quality
                     material = $material
                     strategy = if ($material -eq 'OpaqueFast') { 'LegacyInlined' } else { 'GenericRetained' }
-                    shippingAllowed = $instrumentation -eq 'Shipping'
+                    shippingAllowed = Test-RaygenExactString -Left $instrumentation -Right 'Shipping'
                 }
             }
         }
@@ -196,15 +217,15 @@ function Get-RaygenVariantManifest
     $seenCombinations = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
     foreach ($variantDefinition in $variants)
     {
-        if ((@($variantDefinition.PSObject.Properties.Name | Sort-Object) -join ',') -ne
-            'instrumentation,material,name,quality,shippingAllowed,strategy')
+        $entryPropertyNames = @($variantDefinition.PSObject.Properties.Name | Sort-Object) -join ','
+        if (-not (Test-RaygenExactString -Left $entryPropertyNames -Right 'instrumentation,material,name,quality,shippingAllowed,strategy'))
         {
             throw 'Raygen variant manifest entry has unsupported or missing fields.'
         }
-        if ($variantDefinition.instrumentation -notin @('Shipping', 'Diagnostic') -or
-            $variantDefinition.quality -notin @('Mobile', 'High') -or
-            $variantDefinition.material -notin @('OpaqueFast', 'GenericDielectric') -or
-            $variantDefinition.strategy -notin @('GenericRetained', 'LegacyInlined') -or
+        if (-not (Test-RaygenExactOneOf -Value $variantDefinition.instrumentation -ExpectedValues @('Shipping', 'Diagnostic')) -or
+            -not (Test-RaygenExactOneOf -Value $variantDefinition.quality -ExpectedValues @('Mobile', 'High')) -or
+            -not (Test-RaygenExactOneOf -Value $variantDefinition.material -ExpectedValues @('OpaqueFast', 'GenericDielectric')) -or
+            -not (Test-RaygenExactOneOf -Value $variantDefinition.strategy -ExpectedValues @('GenericRetained', 'LegacyInlined')) -or
             $variantDefinition.shippingAllowed -isnot [bool])
         {
             throw "Raygen variant manifest entry is invalid: $($variantDefinition.name)"
@@ -219,11 +240,11 @@ function Get-RaygenVariantManifest
             throw "Raygen variant manifest has duplicate combination: $combination"
         }
         $matchingExpected = @($expected | Where-Object {
-            $_.name -eq $variantDefinition.name -and
-            $_.instrumentation -eq $variantDefinition.instrumentation -and
-            $_.quality -eq $variantDefinition.quality -and
-            $_.material -eq $variantDefinition.material -and
-            $_.strategy -eq $variantDefinition.strategy -and
+            (Test-RaygenExactString -Left $_.name -Right $variantDefinition.name) -and
+            (Test-RaygenExactString -Left $_.instrumentation -Right $variantDefinition.instrumentation) -and
+            (Test-RaygenExactString -Left $_.quality -Right $variantDefinition.quality) -and
+            (Test-RaygenExactString -Left $_.material -Right $variantDefinition.material) -and
+            (Test-RaygenExactString -Left $_.strategy -Right $variantDefinition.strategy) -and
             $_.shippingAllowed -eq $variantDefinition.shippingAllowed
         })
         if ($matchingExpected.Count -ne 1)
@@ -338,7 +359,7 @@ function Invoke-RaygenVariantCompilation
         throw "Raygen variant config was not found: $configPath"
     }
     Write-RaygenVariantSource -ResolvedSourcePath $resolvedSourcePath -VariantDefinition $VariantDefinition -ConfigPath $configPath
-    $legacyStrategy = $VariantDefinition.strategy -eq 'LegacyInlined'
+    $legacyStrategy = Test-RaygenExactString -Left $VariantDefinition.strategy -Right 'LegacyInlined'
     if ($legacyStrategy)
     {
         $resolvedLegacySource = [IO.File]::ReadAllText($resolvedSourcePath)
@@ -441,9 +462,15 @@ if ($variantMode)
     $matrixManifest = Get-RaygenVariantManifest -Path $ManifestPath
     $matrixOutput = Get-RaygenVariantOutputRoot -Path $OutputDirectory
     $selectedVariants = if ($Matrix) { $matrixManifest.Variants } else {
-        $match = @($matrixManifest.Variants | Where-Object { $_.name -eq $Variant })
+        $match = @($matrixManifest.Variants | Where-Object { Test-RaygenExactString -Left $_.name -Right $Variant })
         if ($match.Count -ne 1) { throw "Unknown raygen variant key: $Variant" }
-        if (-not [string]::IsNullOrWhiteSpace($Strategy) -and $Strategy -ne $match[0].strategy)
+        if (-not [string]::IsNullOrWhiteSpace($Strategy) -and
+            -not (Test-RaygenExactOneOf -Value $Strategy -ExpectedValues @('GenericRetained', 'LegacyInlined')))
+        {
+            throw "Unknown compiler strategy: $Strategy"
+        }
+        if (-not [string]::IsNullOrWhiteSpace($Strategy) -and
+            -not (Test-RaygenExactString -Left $Strategy -Right $match[0].strategy))
         {
             throw "Requested strategy $Strategy contradicts manifest strategy $($match[0].strategy) for $Variant."
         }
