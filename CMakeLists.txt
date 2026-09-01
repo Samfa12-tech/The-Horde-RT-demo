@@ -155,6 +155,15 @@ if(BUILD_TESTING)
     )
     add_test(NAME horde_rt_version_contract_tests COMMAND horde_rt_version_contract_tests)
 
+    add_executable(horde_rt_version_contract_incremental_configure_tests
+        tests/VersionContractIncrementalConfigureTests.cpp)
+    target_compile_definitions(horde_rt_version_contract_incremental_configure_tests PRIVATE
+        HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
+    )
+    add_test(NAME horde_rt_version_contract_incremental_configure_tests
+        COMMAND horde_rt_version_contract_incremental_configure_tests "${CMAKE_COMMAND}")
+    set_tests_properties(horde_rt_version_contract_incremental_configure_tests PROPERTIES TIMEOUT 120)
+
     add_executable(horde_rt_dielectric_math_tests tests/DielectricMathTests.cpp)
     target_include_directories(horde_rt_dielectric_math_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_dielectric_math_tests COMMAND horde_rt_dielectric_math_tests)
@@ -267,6 +276,9 @@ if(BUILD_TESTING)
         add_test(NAME horde_rt_dielectric_topology_tool_tests
             COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
                 ${CMAKE_CURRENT_SOURCE_DIR}/tests/DielectricTopologyToolTests.ps1)
+        add_test(NAME horde_rt_version_contract_powershell_tests
+            COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
+                ${CMAKE_CURRENT_SOURCE_DIR}/tests/VersionContractPowerShellTests.ps1)
         set_tests_properties(
             horde_rt_scene_abi_generator_tests
             horde_rt_raygen_compiler_strategy_tests
@@ -275,6 +287,7 @@ if(BUILD_TESTING)
             horde_rt_static_preparation_skip_policy_tests
             horde_rt_static_preparation_colliding_lod_policy_tests
             horde_rt_dielectric_topology_tool_tests
+            horde_rt_version_contract_powershell_tests
             PROPERTIES TIMEOUT 120)
     endif()
 

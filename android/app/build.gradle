@@ -3,18 +3,52 @@ plugins {
 }
 
 import groovy.json.JsonSlurper
+import java.nio.ByteBuffer
+import java.nio.charset.CharacterCodingException
+import java.nio.charset.CodingErrorAction
+import java.nio.charset.StandardCharsets
 
 def hordeVersionFile = rootProject.file('../VERSION')
 def hordeVersionCodeMapFile = rootProject.file('../version-code-map.json')
-def hordeVersionRaw = hordeVersionFile.getText('UTF-8')
-if (!(hordeVersionRaw ==~ /^[0-9]+\.[0-9]+\.[0-9]+\r?\n?$/)) {
+def readHordeUtf8Authority = { File authorityFile, String authorityName ->
+    def bytes = authorityFile.bytes
+    if (bytes.length >= 3 && (bytes[0] & 0xff) == 0xef && (bytes[1] & 0xff) == 0xbb && (bytes[2] & 0xff) == 0xbf) {
+        throw new GradleException("${authorityName} must be valid UTF-8 without a byte-order mark.")
+    }
+    try {
+        return StandardCharsets.UTF_8.newDecoder()
+            .onMalformedInput(CodingErrorAction.REPORT)
+            .onUnmappableCharacter(CodingErrorAction.REPORT)
+            .decode(ByteBuffer.wrap(bytes))
+            .toString()
+    } catch (CharacterCodingException exception) {
+        throw new GradleException("${authorityName} must be valid UTF-8 without a byte-order mark.", exception)
+    }
+}
+
+def hordeVersionRaw = readHordeUtf8Authority(hordeVersionFile, 'VERSION')
+def hordeVersionMatcher = hordeVersionRaw =~ /^((?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*))(?:\r?\n)?$/
+if (!hordeVersionMatcher.matches()) {
     throw new GradleException("VERSION must contain exactly one MAJOR.MINOR.PATCH line without whitespace.")
 }
-def hordeVersionName = hordeVersionRaw.trim()
-def hordeVersionCodeMap = new JsonSlurper().parse(hordeVersionCodeMapFile)
+def hordeVersionName = hordeVersionMatcher.group(1)
+def hordeVersionCodeMapRaw = readHordeUtf8Authority(hordeVersionCodeMapFile, 'Android version-code map')
+def hordeVersionCodeMap = new JsonSlurper().parseText(hordeVersionCodeMapRaw)
+if (!(hordeVersionCodeMap instanceof Map) || !(hordeVersionCodeMap.androidVersionCodes instanceof Map)) {
+    throw new GradleException('Android version-code map androidVersionCodes must be an object.')
+}
+def hordeActiveAssignmentMatcher = java.util.regex.Pattern
+    .compile('"' + java.util.regex.Pattern.quote(hordeVersionName) + '"\\s*:')
+    .matcher(hordeVersionCodeMapRaw)
+int hordeActiveAssignmentCount = 0
+while (hordeActiveAssignmentMatcher.find()) {
+    ++hordeActiveAssignmentCount
+}
+if (hordeActiveAssignmentCount != 1) {
+    throw new GradleException("Android version-code map must contain exactly one active assignment for ${hordeVersionName}.")
+}
 def hordeVersionCode = hordeVersionCodeMap?.androidVersionCodes?[(hordeVersionName)]
-def hordeVersionCodeText = hordeVersionCode?.toString()
-if (!(hordeVersionCode instanceof Number) || !(hordeVersionCodeText ==~ /^[1-9][0-9]*$/)) {
+if (!(hordeVersionCode instanceof Integer) || hordeVersionCode < 1) {
     throw new GradleException("Android version-code map has no positive integer for ${hordeVersionName}.")
 }
 

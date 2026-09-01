@@ -16,30 +16,52 @@ function Get-HordeSourceIdentity {
 
     $utf8 = [Text.UTF8Encoding]::new($false, $true)
     try {
-        $versionRaw = [IO.File]::ReadAllText($versionPath, $utf8)
+        $versionBytes = [IO.File]::ReadAllBytes($versionPath)
+        if ($versionBytes.Length -ge 3 -and $versionBytes[0] -eq 0xEF -and
+            $versionBytes[1] -eq 0xBB -and $versionBytes[2] -eq 0xBF) {
+            throw "VERSION has a byte-order mark."
+        }
+        $versionRaw = $utf8.GetString($versionBytes)
     } catch {
         throw "VERSION must be valid UTF-8 without a byte-order mark: $versionPath"
     }
-    if ($versionRaw -notmatch '\A([0-9]+\.[0-9]+\.[0-9]+)(?:\r?\n)?\z' -or
+    if ($versionRaw -notmatch '\A((?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*))(?:\r?\n)?\z' -or
         $versionRaw -match '[ \t]') {
         throw "VERSION must contain exactly one MAJOR.MINOR.PATCH line without whitespace."
     }
     $version = $matches[1]
 
     try {
-        $versionCodeMap = Get-Content -LiteralPath $versionCodeMapPath -Raw -Encoding utf8 | ConvertFrom-Json
+        $versionCodeMapBytes = [IO.File]::ReadAllBytes($versionCodeMapPath)
+        if ($versionCodeMapBytes.Length -ge 3 -and $versionCodeMapBytes[0] -eq 0xEF -and
+            $versionCodeMapBytes[1] -eq 0xBB -and $versionCodeMapBytes[2] -eq 0xBF) {
+            throw "Android version-code map has a byte-order mark."
+        }
+        $versionCodeMapRaw = $utf8.GetString($versionCodeMapBytes)
+        $versionCodeMap = $versionCodeMapRaw | ConvertFrom-Json
     } catch {
-        throw "Android version-code map is not valid JSON: $versionCodeMapPath"
+        throw "Android version-code map must be valid UTF-8 JSON without a byte-order mark: $versionCodeMapPath"
+    }
+    if ($versionCodeMap -isnot [PSCustomObject]) {
+        throw "Android version-code map must be a JSON object."
     }
     if ($null -eq $versionCodeMap.androidVersionCodes) {
         throw "Android version-code map has no androidVersionCodes object."
     }
+    if ($versionCodeMap.androidVersionCodes -isnot [PSCustomObject]) {
+        throw "Android version-code map androidVersionCodes must be an object."
+    }
+    $activeAssignmentPattern = '"' + [regex]::Escape($version) + '"\s*:'
+    $activeAssignmentCount = [regex]::Matches($versionCodeMapRaw, $activeAssignmentPattern).Count
+    if ($activeAssignmentCount -ne 1) {
+        throw "Android version-code map must contain exactly one active assignment for $version."
+    }
     $entry = $versionCodeMap.androidVersionCodes.PSObject.Properties[$version]
-    $versionCodeText = if ($null -eq $entry) { "" } else { [string]$entry.Value }
-    if ($null -eq $entry -or $entry.Value -isnot [ValueType] -or $versionCodeText -notmatch '^[1-9][0-9]*$') {
+    if ($null -eq $entry -or $entry.Value -isnot [long] -or
+        $entry.Value -lt 1 -or $entry.Value -gt [int]::MaxValue) {
         throw "Android version-code map has no positive integer for $version."
     }
-    $versionCode = [int]$versionCodeText
+    $versionCode = [int]$entry.Value
 
     return [PSCustomObject]@{
         Version = $version
