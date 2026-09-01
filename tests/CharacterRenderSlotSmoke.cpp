@@ -566,6 +566,8 @@ int main()
             ReadTextFile(raygenDirectory / "include/rt_fire.glsl");
         const std::string diagnosticsSource =
             ReadTextFile(raygenDirectory / "include/rt_diagnostics.glsl");
+        const std::string variantConfigSource =
+            ReadTextFile(raygenDirectory / "include/rt_variant_config.glsl");
         const std::string dielectricTransportSource =
             ReadTextFile(raygenDirectory / "include/rt_dielectric_transport.glsl");
         std::string lightingSource =
@@ -578,6 +580,7 @@ int main()
         }
         const std::string raygenSource =
             ReadTextFile(raygenDirectory / "minimal.rgen") +
+            variantConfigSource +
             ReadTextFile(raygenDirectory / "include/rt_scene_abi.glsl") +
             diagnosticsSource +
             lightingSource +
@@ -810,6 +813,12 @@ int main()
                       raygenSource.find("const int kHighDielectricInterfaces = 8;") != std::string::npos &&
                       raygenSource.find("const int kMobileDielectricVolumes = 2;") != std::string::npos &&
                       raygenSource.find("const int kHighDielectricVolumes = 4;") != std::string::npos &&
+                      raygenSource.find("kRtVariantDielectricInterfaceBudget") != std::string::npos &&
+                      raygenSource.find("kRtVariantDielectricVolumeBudget") != std::string::npos &&
+                      dielectricTransportSource.find("HORDE_RT_DIELECTRIC_INTERFACE_CEILING") !=
+                          std::string::npos &&
+                      dielectricTransportSource.find("HORDE_RT_DIELECTRIC_VOLUME_CAPACITY") !=
+                          std::string::npos &&
                       raygenSource.find("segmentLength = currentHit.t;") != std::string::npos &&
                       raygenSource.find("RT_DIAG_ADD(transportOverflowCount, 1u);") != std::string::npos &&
                       raygenSource.find("RT_DIAG_ADD(secondaryDielectricTerminalCount, 1u);") != std::string::npos &&
@@ -847,6 +856,10 @@ int main()
                       raygenSource.find("const int kShadowSampleCapacity = 4;") != std::string::npos &&
                       raygenSource.find("const int kMobileShadowInterfaces = 4;") != std::string::npos &&
                       raygenSource.find("const int kHighShadowInterfaces = 8;") != std::string::npos &&
+                      raygenSource.find("kRtVariantShadowInterfaceBudget") != std::string::npos &&
+                      raygenSource.find("kRtVariantShadowVolumeBudget") != std::string::npos &&
+                      lightingSource.find("HORDE_RT_SHADOW_INTERFACE_CEILING") != std::string::npos &&
+                      lightingSource.find("HORDE_RT_SHADOW_VOLUME_CAPACITY") != std::string::npos &&
                       raygenSource.find("material.metallicRoughnessOcclusionTransmission.x") != std::string::npos &&
                       raygenSource.find("dielectricBeerLambert(") != std::string::npos &&
                       raygenSource.find("RT_DIAG_ADD(shadowOverflowCount, 1u);") != std::string::npos &&

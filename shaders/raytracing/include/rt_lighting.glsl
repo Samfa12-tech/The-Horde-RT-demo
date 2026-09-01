@@ -74,6 +74,14 @@ const int kHighShadowInterfaces = 8;
 const int kMobileShadowVolumes = 2;
 const int kHighShadowVolumes = 4;
 
+#if defined(HORDE_RT_VARIANT_QUALITY)
+#define HORDE_RT_SHADOW_INTERFACE_CEILING kRtVariantShadowInterfaceBudget
+#define HORDE_RT_SHADOW_VOLUME_CAPACITY kRtVariantShadowVolumeBudget
+#else
+#define HORDE_RT_SHADOW_INTERFACE_CEILING kHighShadowInterfaces
+#define HORDE_RT_SHADOW_VOLUME_CAPACITY kHighShadowVolumes
+#endif
+
 struct ShadowHit
 {
     bool hit;
@@ -176,23 +184,28 @@ ShadowHit traceNearestShadowHit(vec3 origin, vec3 direction,
 vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
                              float maxDistance, uint mask)
 {
+#if defined(HORDE_RT_VARIANT_QUALITY)
+    const int interfaceBudget = kRtVariantShadowInterfaceBudget;
+    const int volumeBudget = kRtVariantShadowVolumeBudget;
+#else
     int interfaceBudget = controls.waterQuality >= 1.5
         ? kHighShadowInterfaces : kMobileShadowInterfaces;
     int volumeBudget = controls.waterQuality >= 1.5
         ? kHighShadowVolumes : kMobileShadowVolumes;
+#endif
     int interfaceCount = 0;
-    uint volumeInstances[kHighShadowVolumes];
-    uint volumeMaterials[kHighShadowVolumes];
-    uint volumeMaterialFlags[kHighShadowVolumes];
-    float volumeEntryDistances[kHighShadowVolumes];
-    vec4 volumeAttenuation[kHighShadowVolumes];
+    uint volumeInstances[HORDE_RT_SHADOW_VOLUME_CAPACITY];
+    uint volumeMaterials[HORDE_RT_SHADOW_VOLUME_CAPACITY];
+    uint volumeMaterialFlags[HORDE_RT_SHADOW_VOLUME_CAPACITY];
+    float volumeEntryDistances[HORDE_RT_SHADOW_VOLUME_CAPACITY];
+    vec4 volumeAttenuation[HORDE_RT_SHADOW_VOLUME_CAPACITY];
     int volumeDepth = 0;
     bool observedClosedVolumeEntry = false;
     vec3 transmittance = vec3(1.0);
     vec3 currentOrigin = origin;
     float travelledDistance = 0.0;
     float remainingDistance = max(maxDistance, 0.0);
-    for (int traversal = 0; traversal <= kHighShadowInterfaces; ++traversal)
+    for (int traversal = 0; traversal <= HORDE_RT_SHADOW_INTERFACE_CEILING; ++traversal)
     {
         if (remainingDistance <= 0.0)
         {
@@ -235,7 +248,7 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
         if (!nearest.transparent)
         {
             bool everyOpenVolumeCertified = volumeDepth > 0;
-            for (int volumeIndex = 0; volumeIndex < kHighShadowVolumes;
+            for (int volumeIndex = 0; volumeIndex < HORDE_RT_SHADOW_VOLUME_CAPACITY;
                  ++volumeIndex)
             {
                 if (volumeIndex < volumeDepth)
@@ -255,7 +268,7 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
         if (interfaceCount >= interfaceBudget)
         {
             bool everyOpenVolumeCertified = nearest.certifiedClosedVolume;
-            for (int volumeIndex = 0; volumeIndex < kHighShadowVolumes;
+            for (int volumeIndex = 0; volumeIndex < HORDE_RT_SHADOW_VOLUME_CAPACITY;
                  ++volumeIndex)
             {
                 if (volumeIndex < volumeDepth)
@@ -289,7 +302,7 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
             if (volumeDepth >= volumeBudget)
             {
                 bool everyOpenVolumeCertified = nearest.certifiedClosedVolume;
-                for (int volumeIndex = 0; volumeIndex < kHighShadowVolumes;
+                for (int volumeIndex = 0; volumeIndex < HORDE_RT_SHADOW_VOLUME_CAPACITY;
                      ++volumeIndex)
                 {
                     if (volumeIndex < volumeDepth)
@@ -339,7 +352,7 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
                 volumeMaterials[volumeDepth - 1] != nearest.material)
             {
                 bool everyOpenVolumeCertified = nearest.certifiedClosedVolume;
-                for (int volumeIndex = 0; volumeIndex < kHighShadowVolumes;
+                for (int volumeIndex = 0; volumeIndex < HORDE_RT_SHADOW_VOLUME_CAPACITY;
                      ++volumeIndex)
                 {
                     if (volumeIndex < volumeDepth)
@@ -386,7 +399,7 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
         remainingDistance = max(maxDistance - travelledDistance, 0.0);
     }
     bool everyOpenVolumeCertified = volumeDepth > 0;
-    for (int volumeIndex = 0; volumeIndex < kHighShadowVolumes; ++volumeIndex)
+    for (int volumeIndex = 0; volumeIndex < HORDE_RT_SHADOW_VOLUME_CAPACITY; ++volumeIndex)
     {
         if (volumeIndex < volumeDepth)
             everyOpenVolumeCertified = everyOpenVolumeCertified &&
@@ -417,8 +430,12 @@ vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
 vec3 compactShadowTransmittanceMask(vec3 origin, vec3 direction,
                                     float maxDistance, uint mask)
 {
+#if defined(HORDE_RT_VARIANT_QUALITY)
+    const int interfaceBudget = kRtVariantShadowInterfaceBudget;
+#else
     int interfaceBudget = controls.waterQuality >= 1.5
         ? kHighShadowInterfaces : kMobileShadowInterfaces;
+#endif
     int interfaceCount = 0;
     bool volumeOpen = false;
     bool observedClosedVolumeEntry = false;
@@ -433,7 +450,7 @@ vec3 compactShadowTransmittanceMask(vec3 origin, vec3 direction,
     float travelledDistance = 0.0;
     float remainingDistance = max(maxDistance, 0.0);
 
-    for (int traversal = 0; traversal <= kHighShadowInterfaces; ++traversal)
+    for (int traversal = 0; traversal <= HORDE_RT_SHADOW_INTERFACE_CEILING; ++traversal)
     {
         if (remainingDistance <= 0.0)
         {
@@ -612,8 +629,12 @@ bool shadowSegmentCrossesTransparentWorld(vec3 origin, vec3 direction,
 vec3 boundedShadowTransmittanceMask(vec3 origin, vec3 direction,
                                     float maxDistance, uint mask)
 {
+#if defined(HORDE_RT_VARIANT_QUALITY)
+    const int interfaceBudget = kRtVariantShadowInterfaceBudget;
+#else
     int interfaceBudget = controls.waterQuality >= 1.5
         ? kHighShadowInterfaces : kMobileShadowInterfaces;
+#endif
     int interfaceCount = 0;
     bool overflow = false;
     bool productionPaneOverflow = false;

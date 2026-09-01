@@ -3,6 +3,14 @@ const int kHighDielectricInterfaces = 8;
 const int kMobileDielectricVolumes = 2;
 const int kHighDielectricVolumes = 4;
 
+#if defined(HORDE_RT_VARIANT_QUALITY)
+#define HORDE_RT_DIELECTRIC_INTERFACE_CEILING kRtVariantDielectricInterfaceBudget
+#define HORDE_RT_DIELECTRIC_VOLUME_CAPACITY kRtVariantDielectricVolumeBudget
+#else
+#define HORDE_RT_DIELECTRIC_INTERFACE_CEILING kHighDielectricInterfaces
+#define HORDE_RT_DIELECTRIC_VOLUME_CAPACITY kHighDielectricVolumes
+#endif
+
 bool isGenericDielectric(HitInfo hit)
 {
     return hit.hit && hit.transmission > 0.001 &&
@@ -44,11 +52,16 @@ vec3 dielectricOverflowFallback(vec3 direction, vec3 throughput)
 
 vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
 {
+#if defined(HORDE_RT_VARIANT_QUALITY)
+    const int interfaceBudget = kRtVariantDielectricInterfaceBudget;
+    const int volumeBudget = kRtVariantDielectricVolumeBudget;
+#else
     bool highQuality = controls.waterQuality >= 1.5;
     int interfaceBudget = highQuality
         ? kHighDielectricInterfaces : kMobileDielectricInterfaces;
     int volumeBudget = highQuality
         ? kHighDielectricVolumes : kMobileDielectricVolumes;
+#endif
 
     vec3 firstOutward = normalize(firstHit.geometricNormal);
     vec3 firstNormal = dot(rayDirection, firstOutward) < 0.0
@@ -107,11 +120,11 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
         reflectionDirection, min(reflectedLocalDistance, 12.0), true);
     reflected = reflected * reflectedFire.a + reflectedFire.rgb;
 
-    uint volumeMaterials[kHighDielectricVolumes];
-    uint volumeInstances[kHighDielectricVolumes];
-    uint volumeMaterialFlags[kHighDielectricVolumes];
-    float volumeIors[kHighDielectricVolumes];
-    vec4 volumeAttenuation[kHighDielectricVolumes];
+    uint volumeMaterials[HORDE_RT_DIELECTRIC_VOLUME_CAPACITY];
+    uint volumeInstances[HORDE_RT_DIELECTRIC_VOLUME_CAPACITY];
+    uint volumeMaterialFlags[HORDE_RT_DIELECTRIC_VOLUME_CAPACITY];
+    float volumeIors[HORDE_RT_DIELECTRIC_VOLUME_CAPACITY];
+    vec4 volumeAttenuation[HORDE_RT_DIELECTRIC_VOLUME_CAPACITY];
     int volumeDepth = 0;
     vec3 throughput = vec3(1.0);
     vec3 transmissionDirection = rayDirection;
@@ -123,7 +136,7 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     bool touchedProductionPane = false;
     int tirSinceLastTransition = 0;
 
-    for (int interfaceIndex = 0; interfaceIndex <= kHighDielectricInterfaces;
+    for (int interfaceIndex = 0; interfaceIndex <= HORDE_RT_DIELECTRIC_INTERFACE_CEILING;
          ++interfaceIndex)
     {
         float segmentLength = currentHit.t;
@@ -138,7 +151,7 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
             if (volumeDepth > 0)
             {
                 bool everyOpenVolumeCertified = true;
-                for (int volumeIndex = 0; volumeIndex < kHighDielectricVolumes;
+                for (int volumeIndex = 0; volumeIndex < HORDE_RT_DIELECTRIC_VOLUME_CAPACITY;
                      ++volumeIndex)
                 {
                     if (volumeIndex < volumeDepth)
@@ -207,7 +220,7 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
             else if (volumeDepth > 0)
             {
                 bool everyOpenVolumeCertified = true;
-                for (int volumeIndex = 0; volumeIndex < kHighDielectricVolumes;
+                for (int volumeIndex = 0; volumeIndex < HORDE_RT_DIELECTRIC_VOLUME_CAPACITY;
                      ++volumeIndex)
                 {
                     if (volumeIndex < volumeDepth)
@@ -276,7 +289,7 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
                             (currentHit.materialFlags &
                              kRtMaterialFlagCertifiedClosedVolume) != 0u;
                         for (int volumeIndex = 0;
-                             volumeIndex < kHighDielectricVolumes; ++volumeIndex)
+                             volumeIndex < HORDE_RT_DIELECTRIC_VOLUME_CAPACITY; ++volumeIndex)
                         {
                             if (volumeIndex < volumeDepth)
                                 everyOpenVolumeCertified = everyOpenVolumeCertified &&
@@ -316,7 +329,7 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
                             (currentHit.materialFlags &
                              kRtMaterialFlagCertifiedClosedVolume) != 0u;
                         for (int volumeIndex = 0;
-                             volumeIndex < kHighDielectricVolumes; ++volumeIndex)
+                             volumeIndex < HORDE_RT_DIELECTRIC_VOLUME_CAPACITY; ++volumeIndex)
                         {
                             if (volumeIndex < volumeDepth)
                                 everyOpenVolumeCertified = everyOpenVolumeCertified &&
@@ -373,7 +386,7 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     if (!terminalResolved && !overflowed)
     {
         bool everyOpenVolumeCertified = volumeDepth > 0;
-        for (int volumeIndex = 0; volumeIndex < kHighDielectricVolumes;
+        for (int volumeIndex = 0; volumeIndex < HORDE_RT_DIELECTRIC_VOLUME_CAPACITY;
              ++volumeIndex)
         {
             if (volumeIndex < volumeDepth)
@@ -411,8 +424,12 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
 // avoiding a dynamically indexed nested stack in every phone invocation.
 vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
 {
+#if defined(HORDE_RT_VARIANT_QUALITY)
+    const int interfaceBudget = kRtVariantDielectricInterfaceBudget;
+#else
     int interfaceBudget = controls.waterQuality >= 1.5
         ? kHighDielectricInterfaces : kMobileDielectricInterfaces;
+#endif
 
     vec3 firstOutward = normalize(firstHit.geometricNormal);
     vec3 firstNormal = dot(rayDirection, firstOutward) < 0.0
@@ -488,7 +505,7 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     float totalDistance = firstHit.t;
     vec3 transmitted = vec3(0.0);
 
-    for (int interfaceIndex = 0; interfaceIndex <= kHighDielectricInterfaces;
+    for (int interfaceIndex = 0; interfaceIndex <= HORDE_RT_DIELECTRIC_INTERFACE_CEILING;
          ++interfaceIndex)
     {
         if (interfaceIndex > 0 && volumeOpen)

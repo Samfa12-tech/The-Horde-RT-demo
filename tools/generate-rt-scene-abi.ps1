@@ -210,10 +210,12 @@ layout(std430, set = 0, binding = $($b.fireEmitters)) readonly buffer RtFireEmit
 {
     RtFireEmitterGpu values[$($c.fireEmitters)];
 } rtFireEmitters;
+#if !defined(HORDE_RT_VARIANT_INSTRUMENTATION) || HORDE_RT_VARIANT_INSTRUMENTATION == 1
 layout(std430, set = 0, binding = $($b.dielectricDiagnostics)) restrict buffer RtDielectricDiagnosticsBuffer
 {
     RtDielectricDiagnostics value;
 } rtDielectricDiagnostics;
+#endif
 "@
 
 function Publish-OrCheck([string]$path, [string]$content) {

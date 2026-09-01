@@ -32,3 +32,18 @@
     HORDE_RT_VARIANT_MATERIAL != HORDE_RT_MATERIAL_GENERIC_DIELECTRIC
 #error "raygen variant material selection is invalid"
 #endif
+
+// Matrix shaders compile these bounded transport ceilings directly into the
+// module. The compatibility shader remains macro-absent and retains its
+// runtime WaterQuality policy below the variant boundary.
+#if HORDE_RT_VARIANT_QUALITY == HORDE_RT_QUALITY_MOBILE
+const int kRtVariantDielectricInterfaceBudget = 4;
+const int kRtVariantDielectricVolumeBudget = 2;
+const int kRtVariantShadowInterfaceBudget = 4;
+const int kRtVariantShadowVolumeBudget = 2;
+#else
+const int kRtVariantDielectricInterfaceBudget = 8;
+const int kRtVariantDielectricVolumeBudget = 4;
+const int kRtVariantShadowInterfaceBudget = 8;
+const int kRtVariantShadowVolumeBudget = 4;
+#endif

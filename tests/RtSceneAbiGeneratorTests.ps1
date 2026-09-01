@@ -30,8 +30,10 @@ try {
     & (Join-Path $repoRoot "tools\generate-rt-scene-abi.ps1") -Check
     $generatedGlsl = Get-Content -LiteralPath (Join-Path $repoRoot "shaders\raytracing\include\rt_scene_abi.generated.glsl") -Raw
     if ($generatedGlsl -notmatch 'binding = 11\) readonly buffer RtInstanceMetadataBuffer' -or
-        $generatedGlsl -notmatch 'binding = 22\) restrict buffer RtDielectricDiagnosticsBuffer') {
-        throw "Dielectric diagnostics must append a writable binding without aliasing read-only instance metadata."
+        $generatedGlsl -notmatch '#if !defined\(HORDE_RT_VARIANT_INSTRUMENTATION\) \|\| HORDE_RT_VARIANT_INSTRUMENTATION == 1' -or
+        $generatedGlsl -notmatch 'binding = 22\) restrict buffer RtDielectricDiagnosticsBuffer' -or
+        $generatedGlsl -notmatch '\} rtDielectricDiagnostics;\s*#endif') {
+        throw "Dielectric diagnostics must retain binding 22 for compatibility/Diagnostic shaders and omit it in Shipping variants."
     }
     if ($generatedGlsl -notmatch 'uint primaryUnclosedVolumeCount;' -or
         $generatedGlsl -notmatch 'uint shadowUnclosedVolumeCount;' -or
@@ -43,6 +45,14 @@ try {
     }
 
     $definition = Get-Content -LiteralPath (Join-Path $repoRoot "src\vulkan\raytracing\RtSceneAbi.def") -Raw | ConvertFrom-Json
+    if ($definition.schema -ne 1 -or $definition.bindings.dielectricDiagnostics -ne 22) {
+        throw "RT scene ABI schema/binding-22 contract changed."
+    }
+    $diagnosticRecord = @($definition.records | Where-Object name -eq 'RtDielectricDiagnostics')
+    if ($diagnosticRecord.Count -ne 1 -or $diagnosticRecord[0].size -ne 176 -or
+        @($diagnosticRecord[0].fields).Count -ne 41) {
+        throw "RtDielectricDiagnostics must remain a 176-byte record with 41 uint fields."
+    }
     $definition | Add-Member -Force -NotePropertyName records -NotePropertyValue @(
         [ordered]@{
             name = "StaticRtVertex"; alignment = 16; size = 65

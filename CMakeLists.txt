@@ -266,6 +266,9 @@ if(BUILD_TESTING)
         add_test(NAME horde_rt_raygen_variant_manifest_tests
             COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
                 ${CMAKE_CURRENT_SOURCE_DIR}/tests/RaygenVariantManifestTests.ps1)
+        add_test(NAME horde_rt_raygen_variant_artifact_tests
+            COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
+                ${CMAKE_CURRENT_SOURCE_DIR}/tests/RaygenVariantArtifactTests.ps1)
         add_test(NAME horde_rt_static_texture_array_tool_tests
             COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
                 ${CMAKE_CURRENT_SOURCE_DIR}/tests/StaticTextureArrayToolTests.ps1)

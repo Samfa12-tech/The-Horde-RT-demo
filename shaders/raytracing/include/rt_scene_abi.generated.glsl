@@ -151,7 +151,9 @@ layout(std430, set = 0, binding = 21) readonly buffer RtFireEmitterBuffer
 {
     RtFireEmitterGpu values[4];
 } rtFireEmitters;
+#if !defined(HORDE_RT_VARIANT_INSTRUMENTATION) || HORDE_RT_VARIANT_INSTRUMENTATION == 1
 layout(std430, set = 0, binding = 22) restrict buffer RtDielectricDiagnosticsBuffer
 {
     RtDielectricDiagnostics value;
 } rtDielectricDiagnostics;
+#endif
