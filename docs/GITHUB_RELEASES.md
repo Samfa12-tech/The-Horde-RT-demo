@@ -9,7 +9,7 @@ GitHub Packages is intended for package registries such as container images, npm
 Run this from the repository root on the Windows machine that contains the validated files in `releases/candidates/`:
 
 ```powershell
-.\tools\publish-github-release.ps1 -Version '<version>'
+.\tools\publish-github-release.ps1 -Version '<version>' -TargetCommit '<full-40-character-commit>'
 ```
 
 The publisher expects:
@@ -26,22 +26,24 @@ Before publication it:
 - rejects Android filenames containing `debug`, `unsigned`, or `do-not-publish`;
 - verifies both release files against `SHA256SUMS.txt`;
 - refuses to overwrite an existing tag/release;
+- requires a passing exact provenance preflight and full immutable target commit (never moving `main`);
 - creates a prerelease by default;
 - uploads the Windows ZIP, signed Android APK, and checksum manifest;
-- includes the itch page in the release notes.
+- attaches the release notes named by the checked provenance record.
 
-Use a reviewed release-notes file when available:
+The publisher accepts only the release-notes path named by its exact provenance record:
 
 ```powershell
 .\tools\publish-github-release.ps1 `
   -Version '<version>' `
+  -TargetCommit '<full-40-character-commit>' `
   -NotesFile '.\docs\<release-notes-file>.md'
 ```
 
 Create a draft instead of immediately publishing:
 
 ```powershell
-.\tools\publish-github-release.ps1 -Version '<version>' -Draft
+.\tools\publish-github-release.ps1 -Version '<version>' -TargetCommit '<full-40-character-commit>' -Draft
 ```
 
 ## Authentication
