@@ -9,13 +9,16 @@ param(
 
     [string]$ReleaseName,
     [string]$NotesFile,
+    [string]$ArtifactDirectory,
     [switch]$Draft,
-    [switch]$Prerelease = $true
+    [switch]$Prerelease = $true,
+    [switch]$PreflightOnly
 )
 
 $ErrorActionPreference = 'Stop'
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
-$candidateRoot = Join-Path $repoRoot 'releases\candidates'
+if ([string]::IsNullOrWhiteSpace($ArtifactDirectory)) { $candidateRoot = Join-Path $repoRoot 'releases\candidates' }
+else { $candidateRoot = [IO.Path]::GetFullPath($ArtifactDirectory) }
 $safeVersion = $Version -replace '[^0-9A-Za-z.-]', '-'
 $tag = "v$Version"
 $baseName = "Horde-Lantern-RT-Alpha-$safeVersion"
@@ -23,6 +26,7 @@ $windowsZip = Join-Path $candidateRoot "$baseName-Windows-x64.zip"
 $androidApk = Join-Path $candidateRoot "$baseName-Android.apk"
 $hashFile = Join-Path $candidateRoot 'SHA256SUMS.txt'
 $preflightScript = Join-Path $PSScriptRoot 'preflight-github-release.ps1'
+$preflightHost = if ($PSVersionTable.PSEdition -eq 'Core') { Join-Path $PSHOME 'pwsh.exe' } else { Join-Path $PSHOME 'powershell.exe' }
 
 function Require-File([string]$Path, [string]$Description) {
     if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
@@ -58,8 +62,9 @@ foreach ($command in @('git', 'gh')) {
 }
 
 Require-File $preflightScript 'Exact release-provenance preflight'
-& $preflightScript -Version $Version -ArtifactDirectory $candidateRoot -ExpectedTargetCommit $TargetCommit
-if ($LASTEXITCODE -ne 0) {
+& $preflightHost -NoProfile -File $preflightScript -Version $Version -ArtifactDirectory $candidateRoot -ExpectedTargetCommit $TargetCommit
+$preflightExitCode = $LASTEXITCODE
+if ($preflightExitCode -ne 0) {
     throw "Exact release-provenance preflight did not pass for $Version."
 }
 
@@ -74,6 +79,11 @@ if ($androidApk -match '(?i)(debug|unsigned|do-not-publish)') {
 $expectedHashes = Read-ExpectedHashes $hashFile
 Assert-Hash $windowsZip $expectedHashes
 Assert-Hash $androidApk $expectedHashes
+
+if ($PreflightOnly) {
+    Write-Host "Exact release-provenance preflight passed for $Version / $TargetCommit."
+    return
+}
 
 & gh auth status
 if ($LASTEXITCODE -ne 0) {

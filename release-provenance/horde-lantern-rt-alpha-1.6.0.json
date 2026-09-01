@@ -12,7 +12,11 @@
     "versionCode": 8
   },
   "artifacts": {
-    "checksumManifest": "SHA256SUMS.txt",
+    "checksumManifest": {
+      "fileName": "SHA256SUMS.txt",
+      "bytes": 349,
+      "sha256": "b86650261d7b8cdf000aeaf33f5a0a526b118c55ba59ea2ec2993d4a1bb47a30"
+    },
     "windows": {
       "fileName": "Horde-Lantern-RT-Alpha-1.6.0-Windows-x64.zip",
       "bytes": 105508271,
