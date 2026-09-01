@@ -41,6 +41,12 @@ void Check(bool condition, std::string_view message)
     }
 }
 
+bool IsSafeCyclicRejectionDiagnostic(std::string_view diagnostic)
+{
+    return diagnostic == "Static GLB failed cgltf structural validation." ||
+           diagnostic == "Static GLB contains an out-of-range accessor or index reference.";
+}
+
 std::uint64_t CurrentProcessId()
 {
 #if defined(_WIN32)
@@ -1136,10 +1142,7 @@ int main(int argc, char** argv)
                 manifestEnvironment, manifest, diagnostic)) return 3;
         const bool loaded = horde::scene::assets::StaticMeshAsset::Load(
             cyclicEnvironment, manifest, asset, diagnostic);
-        const bool safeDiagnostic =
-            diagnostic == "Static GLB failed cgltf structural validation." ||
-            diagnostic == "Static GLB contains an out-of-range accessor or index reference.";
-        return !loaded && safeDiagnostic ? 0 : 2;
+        return !loaded && IsSafeCyclicRejectionDiagnostic(diagnostic) ? 0 : 2;
     }
 #endif
     if (argc == 4 && std::string_view(argv[1]) == "--probe-cyclic")
@@ -1150,7 +1153,7 @@ int main(int argc, char** argv)
         if (!horde::scene::assets::AssetManifest::Load(argv[3], manifest, diagnostic)) return 3;
         const bool loaded = horde::scene::assets::StaticMeshAsset::Load(
             argv[2], manifest, asset, diagnostic);
-        return !loaded && diagnostic == "Static GLB failed cgltf structural validation." ? 0 : 2;
+        return !loaded && IsSafeCyclicRejectionDiagnostic(diagnostic) ? 0 : 2;
     }
 
     const ScopedStaticGltfTestDirectory scopedTemporaryRoot;
