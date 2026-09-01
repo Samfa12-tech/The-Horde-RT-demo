@@ -57,7 +57,7 @@ function Get-HordeSourceIdentity {
         throw "Android version-code map must contain exactly one active assignment for $version."
     }
     $entry = $versionCodeMap.androidVersionCodes.PSObject.Properties[$version]
-    if ($null -eq $entry -or $entry.Value -isnot [long] -or
+    if ($null -eq $entry -or ($entry.Value -isnot [int] -and $entry.Value -isnot [long]) -or
         $entry.Value -lt 1 -or $entry.Value -gt [int]::MaxValue) {
         throw "Android version-code map has no positive integer for $version."
     }

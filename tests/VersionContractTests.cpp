@@ -170,7 +170,7 @@ int main()
     passed &= Require(Contains(cmakeVersion, "_horde_rt_active_map_assignment_count EQUAL 1"),
         "CMake reader must reject duplicate active map assignments");
     passed &= Require(Contains(cmakeVersion, "GREATER 2147483647"),
-        "CMake reader must enforce Android-safe version-code range");
+        "CMake reader must enforce the signed-Int32/APK version-code range");
 
     std::string cmakeLists;
     std::string cmakeSources;
@@ -217,8 +217,13 @@ int main()
     std::string powerShell;
     passed &= ReadFile(sourceRoot / "tools" / "version-contract.ps1", powerShell);
     passed &= Require(Contains(powerShell, "ReadAllBytes") && Contains(powerShell, "byte-order mark") &&
-                      Contains(powerShell, "activeAssignmentCount -ne 1") && Contains(powerShell, "-isnot [long]"),
-        "PowerShell must enforce raw UTF-8, unique active assignment, and integral code type");
+                      Contains(powerShell, "activeAssignmentCount -ne 1") && Contains(powerShell, "-isnot [int]") &&
+                      Contains(powerShell, "-isnot [long]"),
+        "PowerShell must accept both native integral JSON types while rejecting non-integral code values");
+    passed &= Require(Contains(cmakeLists, "HORDE_RT_PWSH_EXECUTABLE") &&
+                      Contains(cmakeLists, "HORDE_RT_WINDOWS_POWERSHELL_EXECUTABLE") &&
+                      Contains(cmakeLists, "horde_rt_version_contract_windows_powershell_tests"),
+        "Windows CTest registration must cover both pwsh and built-in PowerShell when both are available");
 
     passed &= Require(CountMatches(nestedAndroidCmake,
                           std::regex("include\\(\\\"?\\$\\{HORDE_RT_REPO_ROOT\\}/cmake/HordeRtVersion\\.cmake\\\"?\\)")) == 1,

@@ -255,6 +255,8 @@ if(BUILD_TESTING)
 
     if(WIN32)
         find_program(HORDE_RT_POWERSHELL_EXECUTABLE NAMES pwsh powershell REQUIRED)
+        find_program(HORDE_RT_PWSH_EXECUTABLE NAMES pwsh)
+        find_program(HORDE_RT_WINDOWS_POWERSHELL_EXECUTABLE NAMES powershell.exe powershell)
         add_test(NAME horde_rt_scene_abi_generator_tests
             COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
                 ${CMAKE_CURRENT_SOURCE_DIR}/tests/RtSceneAbiGeneratorTests.ps1)
@@ -276,9 +278,18 @@ if(BUILD_TESTING)
         add_test(NAME horde_rt_dielectric_topology_tool_tests
             COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
                 ${CMAKE_CURRENT_SOURCE_DIR}/tests/DielectricTopologyToolTests.ps1)
+        set(HORDE_RT_VERSION_CONTRACT_POWERSHELL_EXECUTABLE "${HORDE_RT_POWERSHELL_EXECUTABLE}")
+        if(HORDE_RT_PWSH_EXECUTABLE)
+            set(HORDE_RT_VERSION_CONTRACT_POWERSHELL_EXECUTABLE "${HORDE_RT_PWSH_EXECUTABLE}")
+        endif()
         add_test(NAME horde_rt_version_contract_powershell_tests
-            COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
+            COMMAND ${HORDE_RT_VERSION_CONTRACT_POWERSHELL_EXECUTABLE} -NoProfile -File
                 ${CMAKE_CURRENT_SOURCE_DIR}/tests/VersionContractPowerShellTests.ps1)
+        if(HORDE_RT_PWSH_EXECUTABLE AND HORDE_RT_WINDOWS_POWERSHELL_EXECUTABLE)
+            add_test(NAME horde_rt_version_contract_windows_powershell_tests
+                COMMAND ${HORDE_RT_WINDOWS_POWERSHELL_EXECUTABLE} -NoProfile -File
+                    ${CMAKE_CURRENT_SOURCE_DIR}/tests/VersionContractPowerShellTests.ps1)
+        endif()
         set_tests_properties(
             horde_rt_scene_abi_generator_tests
             horde_rt_raygen_compiler_strategy_tests
@@ -289,6 +300,9 @@ if(BUILD_TESTING)
             horde_rt_dielectric_topology_tool_tests
             horde_rt_version_contract_powershell_tests
             PROPERTIES TIMEOUT 120)
+        if(HORDE_RT_PWSH_EXECUTABLE AND HORDE_RT_WINDOWS_POWERSHELL_EXECUTABLE)
+            set_tests_properties(horde_rt_version_contract_windows_powershell_tests PROPERTIES TIMEOUT 120)
+        endif()
     endif()
 
     add_executable(horde_rt_simulation_timing_tests tests/SimulationTimingTests.cpp)
