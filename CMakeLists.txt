@@ -178,23 +178,24 @@ if(BUILD_TESTING)
     add_test(NAME horde_rt_pipeline_bundle_contracts_tests COMMAND horde_rt_pipeline_bundle_contracts_tests)
 
     function(horde_rt_add_pipeline_variant_fixture target_name instrumentation quality opaque_hash generic_hash required_key)
-        add_library(${target_name}_provider_object OBJECT src/vulkan/raytracing/RtPipelineVariantProvider.cpp)
-        target_include_directories(${target_name}_provider_object PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-        target_compile_definitions(${target_name}_provider_object PRIVATE
+        set(provider_target "horde_rtpv_${instrumentation}_${quality}_obj")
+        add_library(${provider_target} OBJECT src/vulkan/raytracing/RtPipelineVariantProvider.cpp)
+        target_include_directories(${provider_target} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+        target_compile_definitions(${provider_target} PRIVATE
             HORDE_RT_SELECTED_INSTRUMENTATION=${instrumentation}
             HORDE_RT_SELECTED_DIELECTRIC_QUALITY=${quality})
-        horde_rt_attach_raygen_artifacts(${target_name}_provider_object)
+        horde_rt_attach_raygen_artifacts(${provider_target})
         add_executable(${target_name}
             tests/RtPipelineVariantFixture.cpp
             src/vulkan/raytracing/RtPipelineBundleContracts.cpp
             src/vulkan/raytracing/RtPipelineVariants.cpp
-            $<TARGET_OBJECTS:${target_name}_provider_object>)
+            $<TARGET_OBJECTS:${provider_target}>)
         target_include_directories(${target_name} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
         add_test(NAME ${target_name} COMMAND ${target_name})
         add_test(NAME ${target_name}_evidence
             COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
                 ${CMAKE_CURRENT_SOURCE_DIR}/tests/RtPipelineVariantFixtureEvidence.ps1
-                -Fixture $<TARGET_FILE:${target_name}> -ProviderObject $<TARGET_OBJECTS:${target_name}_provider_object>
+                -Fixture $<TARGET_FILE:${target_name}> -ProviderObject $<TARGET_OBJECTS:${provider_target}>
                 -OpaqueSha256 ${opaque_hash} -GenericSha256 ${generic_hash}
                 -RequiredKey ${required_key})
     endfunction()
