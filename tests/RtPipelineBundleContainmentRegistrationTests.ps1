@@ -35,28 +35,57 @@ function Assert-Registration(
     }
 }
 
-Assert-Registration $ConfiguredCtestFile $Configuration $Instrumentation $Quality
-
-$temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) (
-    'horde-rt-containment-registration-' + [guid]::NewGuid().ToString('N'))
-try {
+function Assert-MobileLifetimePolicy(
+    [string]$instrumentation,
+    [string]$temporaryRoot,
+    [string]$ctestExecutable)
+{
     $arguments = @(
         '-S', $repoRoot, '-B', $temporaryRoot, '-G', $Generator,
-        '-DHORDE_RT_INSTRUMENTATION_OVERRIDE=Shipping',
+        "-DHORDE_RT_INSTRUMENTATION_OVERRIDE=$instrumentation",
         '-DHORDE_RT_DIELECTRIC_QUALITY_OVERRIDE=Mobile')
     if (-not [string]::IsNullOrWhiteSpace($GeneratorPlatform)) {
         $arguments += @('-A', $GeneratorPlatform)
     }
     & $CmakeExecutable @arguments
-    Assert-True ($LASTEXITCODE -eq 0) 'Paired containment-override tree failed to configure.'
+    Assert-True ($LASTEXITCODE -eq 0) "$instrumentation/Mobile tree failed to configure."
+
     $overrideCtest = Join-Path $temporaryRoot 'CTestTestfile.cmake'
-    Assert-Registration $overrideCtest 'Debug' 'Shipping' 'Mobile'
-    Assert-Registration $overrideCtest 'Release' 'Shipping' 'Mobile'
+    Assert-Registration $overrideCtest 'Debug' $instrumentation 'Mobile'
+    Assert-Registration $overrideCtest 'Release' $instrumentation 'Mobile'
+
+    & $CmakeExecutable --build $temporaryRoot --config Debug `
+        --target horde_rt_pipeline_bundle_lifetime_tests --parallel
+    Assert-True ($LASTEXITCODE -eq 0) `
+        "$instrumentation/Mobile lifetime target failed to build."
+    & $ctestExecutable --test-dir $temporaryRoot -C Debug --output-on-failure `
+        -R '^horde_rt_pipeline_bundle_lifetime_tests$'
+    Assert-True ($LASTEXITCODE -eq 0) `
+        "$instrumentation/Mobile lifetime target failed to execute."
 }
-finally {
-    if (Test-Path -LiteralPath $temporaryRoot) {
-        Remove-Item -LiteralPath $temporaryRoot -Recurse -Force
+
+Assert-Registration $ConfiguredCtestFile $Configuration $Instrumentation $Quality
+
+$cmakeItem = Get-Item -LiteralPath $CmakeExecutable
+$ctestFileName = if ($cmakeItem.Extension -eq '.exe') { 'ctest.exe' } else { 'ctest' }
+$ctestExecutable = Join-Path $cmakeItem.DirectoryName $ctestFileName
+Assert-True (Test-Path -LiteralPath $ctestExecutable -PathType Leaf) `
+    'CTest must be installed beside the configured CMake executable.'
+
+$temporaryParent = Join-Path $repoRoot 'build'
+New-Item -ItemType Directory -Path $temporaryParent -Force | Out-Null
+foreach ($mobileInstrumentation in @('Shipping', 'Diagnostic')) {
+    $temporaryRoot = Join-Path $temporaryParent (
+        'rtm-' + $mobileInstrumentation.Substring(0, 1).ToLowerInvariant() + '-' +
+        [guid]::NewGuid().ToString('N').Substring(0, 12))
+    try {
+        Assert-MobileLifetimePolicy $mobileInstrumentation $temporaryRoot $ctestExecutable
+    }
+    finally {
+        if (Test-Path -LiteralPath $temporaryRoot) {
+            Remove-Item -LiteralPath $temporaryRoot -Recurse -Force
+        }
     }
 }
 
-Write-Output 'Effective final-target containment registrations passed.'
+Write-Output 'Effective final-target containment registrations and Mobile lifetime policies passed.'
