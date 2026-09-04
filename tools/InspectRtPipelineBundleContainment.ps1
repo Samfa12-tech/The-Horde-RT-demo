@@ -1,6 +1,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory = $true)][string]$TargetPath,
+    [Parameter(Mandatory = $true)][ValidateSet('Windows','Android')][string]$TargetPlatform,
     [Parameter(Mandatory = $true)][ValidateSet('Shipping','Diagnostic')][string]$Instrumentation,
     [Parameter(Mandatory = $true)][ValidateSet('Mobile','High')][string]$Quality,
     [string]$CatalogPath,
@@ -17,6 +18,9 @@ function Assert-True([bool]$condition, [string]$message) {
 }
 function Get-U32([byte[]]$bytes, [int]$offset) {
     return [BitConverter]::ToUInt32($bytes, $offset)
+}
+function Get-U16([byte[]]$bytes, [int]$offset) {
+    return [BitConverter]::ToUInt16($bytes, $offset)
 }
 function Get-Sha256Hex([byte[]]$bytes) {
     $sha = [Security.Cryptography.SHA256]::Create()
@@ -109,8 +113,47 @@ function Resolve-SpirvTool([string]$name) {
         $candidate = Join-Path $env:VULKAN_SDK "Bin\$name.exe"
         if (Test-Path -LiteralPath $candidate -PathType Leaf) { return $candidate }
     }
+    $installedSdkRoot = 'C:\VulkanSDK'
+    if (Test-Path -LiteralPath $installedSdkRoot -PathType Container) {
+        $candidate = Get-ChildItem -LiteralPath $installedSdkRoot -Directory |
+            ForEach-Object {
+                $version = $null
+                if ([Version]::TryParse($_.Name, [ref]$version)) {
+                    $tool = Join-Path $_.FullName "Bin\$name.exe"
+                    if (Test-Path -LiteralPath $tool -PathType Leaf) {
+                        [pscustomobject]@{ Version = $version; Path = $tool }
+                    }
+                }
+            } | Sort-Object Version -Descending | Select-Object -First 1
+        if ($null -ne $candidate) { return $candidate.Path }
+    }
     $command = Get-Command "$name.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
     return if ($null -eq $command) { $null } else { $command.Source }
+}
+function Assert-FinalTargetIdentity([byte[]]$bytes, [string]$platform) {
+    if ($platform -ceq 'Windows') {
+        Assert-True ($bytes.Length -ge 64 -and $bytes[0] -eq 0x4d -and
+                     $bytes[1] -eq 0x5a) 'Final Windows target is not a PE image.'
+        $peOffset = [int64](Get-U32 $bytes 0x3c)
+        Assert-True ($peOffset -ge 0 -and $peOffset + 26 -le $bytes.Length -and
+                     $bytes[[int]$peOffset] -eq 0x50 -and
+                     $bytes[[int]$peOffset + 1] -eq 0x45 -and
+                     $bytes[[int]$peOffset + 2] -eq 0x00 -and
+                     $bytes[[int]$peOffset + 3] -eq 0x00) `
+            'Final Windows target is not a PE image.'
+        Assert-True ((Get-U16 $bytes ([int]$peOffset + 4)) -eq 0x8664) `
+            'Final Windows target machine is not AMD64.'
+        Assert-True ((Get-U16 $bytes ([int]$peOffset + 24)) -eq 0x020b) `
+            'Final Windows target is not PE32+.'
+        return
+    }
+    Assert-True ($bytes.Length -ge 64 -and $bytes[0] -eq 0x7f -and
+                 $bytes[1] -eq 0x45 -and $bytes[2] -eq 0x4c -and
+                 $bytes[3] -eq 0x46) 'Final Android target is not an ELF image.'
+    Assert-True ($bytes[4] -eq 2 -and $bytes[5] -eq 1) `
+        'Final Android target is not ELF64 little-endian.'
+    Assert-True ((Get-U16 $bytes 18) -eq 0x00b7) `
+        'Final Android target machine is not AArch64.'
 }
 
 $resolvedTarget = (Resolve-Path -LiteralPath $TargetPath -ErrorAction Stop).Path
@@ -127,6 +170,8 @@ foreach ($material in @('OpaqueFast','GenericDielectric')) {
 }
 
 $rowModules = @{}
+$knownModuleHashes = [Collections.Generic.List[string]]::new()
+$knownWordCounts = [Collections.Generic.List[int]]::new()
 foreach ($row in $rows) {
     $includePath = Join-Path $repoRoot ([string]$row.artifactPath)
     $raw = Get-IncludeBytes $includePath
@@ -135,12 +180,27 @@ foreach ($row in $rows) {
                  $raw.Length / 4 -eq [int64]$row.words -and
                  $rawHash -ceq [string]$row.spirvSha256) "Frozen catalog module is stale: $($row.key)"
     $rowModules[[string]$row.key] = $raw
+    $knownModuleHashes.Add($rawHash)
+    $knownWordCounts.Add([int]$row.words)
+}
+$compatibilityModules = @()
+foreach ($compatibilityInclude in @('src\vulkan\raytracing\MinimalRayGenShader.inc',
+                                     'src\vulkan\raytracing\MinimalLegacyRayGenShader.inc')) {
+    $compatibilityBytes = Get-IncludeBytes (Join-Path $repoRoot $compatibilityInclude)
+    $compatibilityModules += [pscustomobject]@{
+        Include = $compatibilityInclude
+        Sha256 = Get-Sha256Hex $compatibilityBytes
+        Words = [int]($compatibilityBytes.Length / 4)
+    }
+    $knownModuleHashes.Add($compatibilityModules[-1].Sha256)
+    $knownWordCounts.Add($compatibilityModules[-1].Words)
 }
 
 $targetBytes = [IO.File]::ReadAllBytes($resolvedTarget)
+Assert-FinalTargetIdentity $targetBytes $TargetPlatform
 Assert-True ($targetBytes.Length -ge 20) 'Final target is too small to contain SPIR-V.'
 $observed = @()
-$wordCounts = @($rows | ForEach-Object { [int]$_.words } | Sort-Object -Unique)
+$wordCounts = @($knownWordCounts | Sort-Object -Unique)
 for ($offset = 0; $offset -le $targetBytes.Length - 20; $offset += 4) {
     if ($targetBytes[$offset] -ne 0x03 -or
         $targetBytes[$offset + 1] -ne 0x02 -or
@@ -151,7 +211,7 @@ for ($offset = 0; $offset -le $targetBytes.Length - 20; $offset += 4) {
     foreach ($words in $wordCounts) {
         $shape = Get-ExactModuleShape $targetBytes $offset $words
         if ($null -ne $shape -and
-            @($rows | Where-Object spirvSha256 -CEQ $shape.Sha256).Count -gt 0) {
+            $shape.Sha256 -cin $knownModuleHashes) {
             $matches += $shape
         }
     }
@@ -192,11 +252,11 @@ if ($Instrumentation -ceq 'Shipping') {
     }
 }
 
-foreach ($compatibilityInclude in @('src\vulkan\raytracing\MinimalRayGenShader.inc',
-                                     'src\vulkan\raytracing\MinimalLegacyRayGenShader.inc')) {
-    $compatibilityHash = Get-Sha256Hex (Get-IncludeBytes (Join-Path $repoRoot $compatibilityInclude))
-    if ($compatibilityHash -cnotin $selectedHashes) {
-        Assert-True (@($observed | Where-Object { $_.Shape.Sha256 -ceq $compatibilityHash }).Count -eq 0) "Compatibility raygen module leaked into final target: $compatibilityInclude"
+foreach ($compatibilityModule in $compatibilityModules) {
+    if ($compatibilityModule.Sha256 -cnotin $selectedHashes) {
+        Assert-True (@($observed | Where-Object {
+            $_.Shape.Sha256 -ceq $compatibilityModule.Sha256
+        }).Count -eq 0) "Compatibility raygen module leaked into final target: $($compatibilityModule.Include)"
     }
 }
 
@@ -233,6 +293,7 @@ if (-not $SkipExternalValidation) {
 
 $summary = [pscustomobject]@{
     target = $resolvedTarget
+    targetPlatform = $TargetPlatform
     instrumentation = $Instrumentation
     quality = $Quality
     targetSha256 = (Get-FileHash -LiteralPath $resolvedTarget -Algorithm SHA256).Hash.ToLowerInvariant()

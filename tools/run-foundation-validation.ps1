@@ -573,7 +573,9 @@ try {
             $validationUnsignedPrevious = $(if ($validationUnsignedExisted) { $env:HORDE_VALIDATION_UNSIGNED } else { $null })
             try {
                 $env:HORDE_VALIDATION_UNSIGNED = "1"
-                .\gradlew.bat clean assembleDebug assembleRelease lintRelease --console=plain
+                .\gradlew.bat clean assembleDebug assembleRelease lintRelease --console=plain `
+                    -PhordeRtInstrumentationOverride= `
+                    -PhordeRtDielectricQualityOverride=
                 if ($LASTEXITCODE -ne 0) { throw "Android build or lint failed." }
             } finally {
                 if ($validationUnsignedExisted) { $env:HORDE_VALIDATION_UNSIGNED = $validationUnsignedPrevious }
@@ -589,6 +591,45 @@ try {
                     "-SkipAndroidBuild",
                     "-OutputDirectory", (Join-Path $runDirectory "asset-math-compiler-contract\$($assetMathConfiguration.ToLowerInvariant())")
                 )
+            }
+            $powerShell = (Get-Command pwsh -ErrorAction Stop).Source
+            $androidContainmentScanner = Join-Path $repoRoot "tools\InspectRtPipelineBundleContainment.ps1"
+            $androidPackageScanner = Join-Path $repoRoot "tools\InspectAndroidRtPipelineBundlePackage.ps1"
+            $androidContainmentControls = Join-Path $repoRoot "tests\RtPipelineBundleContainmentTests.ps1"
+            foreach ($containmentCase in @(
+                [pscustomobject]@{
+                    BuildType = "debug"
+                    StripTask = "stripDebugDebugSymbols"
+                    Apk = "app-debug.apk"
+                    Instrumentation = "Diagnostic"
+                },
+                [pscustomobject]@{
+                    BuildType = "release"
+                    StripTask = "stripReleaseDebugSymbols"
+                    Apk = "app-release-unsigned.apk"
+                    Instrumentation = "Shipping"
+                })) {
+                $strippedLibrary = Join-Path $repoRoot (
+                    "android\app\build\intermediates\stripped_native_libs\{0}\{1}\out\lib\arm64-v8a\libhorde_rt_probe_android.so" -f
+                        $containmentCase.BuildType, $containmentCase.StripTask)
+                $apkPath = Join-Path $repoRoot (
+                    "android\app\build\outputs\apk\{0}\{1}" -f
+                        $containmentCase.BuildType, $containmentCase.Apk)
+                Invoke-CheckedNative $powerShell @(
+                    "-NoProfile", "-File", $androidPackageScanner,
+                    "-Scanner", $androidContainmentScanner,
+                    "-StrippedLibraryPath", $strippedLibrary,
+                    "-ApkPath", $apkPath,
+                    "-Instrumentation", $containmentCase.Instrumentation,
+                    "-Quality", "Mobile")
+                Invoke-CheckedNative $powerShell @(
+                    "-NoProfile", "-File", $androidContainmentControls,
+                    "-Scanner", $androidContainmentScanner,
+                    "-TargetPath", $strippedLibrary,
+                    "-TargetPlatform", "Android",
+                    "-Instrumentation", $containmentCase.Instrumentation,
+                    "-Quality", "Mobile",
+                    "-PowerShellExecutable", $powerShell)
             }
         }
 

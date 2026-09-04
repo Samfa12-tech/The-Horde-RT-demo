@@ -2,6 +2,7 @@
 param(
     [Parameter(Mandatory = $true)][string]$Scanner,
     [Parameter(Mandatory = $true)][string]$TargetPath,
+    [Parameter(Mandatory = $true)][ValidateSet('Windows','Android')][string]$TargetPlatform,
     [Parameter(Mandatory = $true)][ValidateSet('Shipping','Diagnostic')][string]$Instrumentation,
     [Parameter(Mandatory = $true)][ValidateSet('Mobile','High')][string]$Quality,
     [Parameter(Mandatory = $true)][string]$PowerShellExecutable
@@ -31,9 +32,28 @@ function Add-AlignedBytes([byte[]]$prefix, [byte[]]$suffix) {
     [Array]::Copy($suffix, 0, $combined, $prefix.Length + $padding, $suffix.Length)
     return $combined
 }
+function Find-AlignedByteSequenceOffsets([byte[]]$haystack, [byte[]]$needle) {
+    $offsets = [Collections.Generic.List[int]]::new()
+    for ($offset = 0; $offset -le $haystack.Length - $needle.Length; $offset += 4) {
+        if ($haystack[$offset] -ne $needle[0] -or
+            $haystack[$offset + 1] -ne $needle[1] -or
+            $haystack[$offset + 2] -ne $needle[2] -or
+            $haystack[$offset + 3] -ne $needle[3]) { continue }
+        $equal = $true
+        for ($index = 4; $index -lt $needle.Length; ++$index) {
+            if ($haystack[$offset + $index] -ne $needle[$index]) {
+                $equal = $false
+                break
+            }
+        }
+        if ($equal) { $offsets.Add($offset) }
+    }
+    return $offsets.ToArray()
+}
 function Invoke-ScannerExpectFailure([string]$path, [string]$expectedText) {
     $output = (& $PowerShellExecutable -NoProfile -File $Scanner -TargetPath $path `
-        -Instrumentation $Instrumentation -Quality $Quality -SkipExternalValidation 2>&1 |
+        -TargetPlatform $TargetPlatform -Instrumentation $Instrumentation `
+        -Quality $Quality -SkipExternalValidation 2>&1 |
         Out-String)
     $exitCode = $LASTEXITCODE
     Assert-True ($exitCode -ne 0) "Containment scanner unexpectedly accepted fixture: $path"
@@ -55,21 +75,63 @@ $targetBytes = [IO.File]::ReadAllBytes((Resolve-Path -LiteralPath $TargetPath))
 $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) ('horde-rt-containment-controls-' + [guid]::NewGuid().ToString('N'))
 try {
     New-Item -ItemType Directory -Path $temporaryRoot | Out-Null
+
+    $wrongContainerPath = Join-Path $temporaryRoot 'wrong-container.bin'
+    $wrongContainer = [byte[]]$targetBytes.Clone()
+    $wrongContainer[0] = $wrongContainer[0] -bxor 0xff
+    [IO.File]::WriteAllBytes($wrongContainerPath, $wrongContainer)
+    Invoke-ScannerExpectFailure $wrongContainerPath $(if ($TargetPlatform -ceq 'Windows') {
+        'Final Windows target is not a PE image.'
+    } else {
+        'Final Android target is not an ELF image.'
+    })
+
+    $wrongMachinePath = Join-Path $temporaryRoot 'wrong-machine.bin'
+    $wrongMachine = [byte[]]$targetBytes.Clone()
+    if ($TargetPlatform -ceq 'Windows') {
+        $peOffset = [BitConverter]::ToUInt32($wrongMachine, 0x3c)
+        $wrongMachine[[int]$peOffset + 4] = 0x4c
+        $wrongMachine[[int]$peOffset + 5] = 0x01
+    } else {
+        $wrongMachine[18] = 0x3e
+        $wrongMachine[19] = 0x00
+    }
+    [IO.File]::WriteAllBytes($wrongMachinePath, $wrongMachine)
+    Invoke-ScannerExpectFailure $wrongMachinePath $(if ($TargetPlatform -ceq 'Windows') {
+        'Final Windows target machine is not AMD64.'
+    } else {
+        'Final Android target machine is not AArch64.'
+    })
+
+    $selectedPayloads = [Collections.Generic.List[byte[]]]::new()
+    foreach ($row in $selected) {
+        $selectedPayloads.Add(
+            (Get-IncludeBytes (Join-Path $repoRoot ([string]$row.artifactPath))))
+    }
+    $selectedOffsets = @()
+    foreach ($payload in $selectedPayloads) {
+        $matches = @(Find-AlignedByteSequenceOffsets $targetBytes $payload)
+        Assert-True ($matches.Count -eq 1) 'Control fixture requires one exact selected module in the valid target.'
+        $selectedOffsets += $matches[0]
+    }
+
     $zeroPath = Join-Path $temporaryRoot 'zero-modules.bin'
-    [IO.File]::WriteAllBytes($zeroPath, (New-Object byte[] 64))
+    $zeroModules = [byte[]]$targetBytes.Clone()
+    for ($index = 0; $index -lt $selectedPayloads.Count; ++$index) {
+        [Array]::Clear($zeroModules, [int]$selectedOffsets[$index], $selectedPayloads[$index].Length)
+    }
+    [IO.File]::WriteAllBytes($zeroPath, $zeroModules)
     Invoke-ScannerExpectFailure $zeroPath 'observed 0'
 
     $missingPath = Join-Path $temporaryRoot 'unreadable.bin'
     Invoke-ScannerExpectFailure $missingPath 'Cannot find path'
 
     $malformedPath = Join-Path $temporaryRoot 'malformed-raygen.bin'
-    $malformedWords = [uint32[]]@(0x07230203,0x00010500,0,2,0,
-                                  ((3 -shl 16) -bor 15),5313,1,0)
-    $malformed = New-Object byte[] ($malformedWords.Count * 4)
-    for ($index = 0; $index -lt $malformedWords.Count; ++$index) {
-        [Array]::Copy([BitConverter]::GetBytes($malformedWords[$index]), 0,
-                      $malformed, $index * 4, 4)
-    }
+    $malformed = [byte[]]$targetBytes.Clone()
+    [Array]::Clear(
+        $malformed,
+        [int]$selectedOffsets[0] + $selectedPayloads[0].Length - 4,
+        4)
     [IO.File]::WriteAllBytes($malformedPath, $malformed)
     Invoke-ScannerExpectFailure $malformedPath 'malformed, unknown, or ambiguous'
 
@@ -89,6 +151,13 @@ try {
     [IO.File]::WriteAllBytes($metadataPath,
         (Add-AlignedBytes $targetBytes $metadataBytes))
     Invoke-ScannerExpectFailure $metadataPath 'Non-selected semantic key leaked'
+
+    $compatibilityPath = Join-Path $temporaryRoot 'compatibility-stream.bin'
+    $compatibilityBytes = Get-IncludeBytes (
+        Join-Path $repoRoot 'src\vulkan\raytracing\MinimalLegacyRayGenShader.inc')
+    [IO.File]::WriteAllBytes($compatibilityPath,
+        (Add-AlignedBytes $targetBytes $compatibilityBytes))
+    Invoke-ScannerExpectFailure $compatibilityPath 'observed 3'
 }
 finally {
     if (Test-Path -LiteralPath $temporaryRoot) {

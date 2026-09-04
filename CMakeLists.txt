@@ -506,23 +506,46 @@ if(BUILD_TESTING)
             COMMAND horde_rt_scene_initialise_preflight_tests)
 
         if(TARGET horde_rt_diagnostic_window)
+            if("${HORDE_RT_INSTRUMENTATION_OVERRIDE}" STREQUAL "")
+                set(HORDE_RT_WINDOWS_CONTAINMENT_INSTRUMENTATION
+                    $<IF:$<CONFIG:Debug>,Diagnostic,Shipping>)
+                set(HORDE_RT_WINDOWS_CONTAINMENT_QUALITY High)
+            else()
+                set(HORDE_RT_WINDOWS_CONTAINMENT_INSTRUMENTATION
+                    ${HORDE_RT_INSTRUMENTATION_OVERRIDE})
+                set(HORDE_RT_WINDOWS_CONTAINMENT_QUALITY
+                    ${HORDE_RT_DIELECTRIC_QUALITY_OVERRIDE})
+            endif()
             add_test(NAME horde_rt_final_windows_bundle_containment
                 COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
                     ${CMAKE_CURRENT_SOURCE_DIR}/tools/InspectRtPipelineBundleContainment.ps1
                     -TargetPath $<TARGET_FILE:horde_rt_diagnostic_window>
-                    -Instrumentation $<IF:$<CONFIG:Debug>,Diagnostic,Shipping>
-                    -Quality High)
+                    -TargetPlatform Windows
+                    -Instrumentation ${HORDE_RT_WINDOWS_CONTAINMENT_INSTRUMENTATION}
+                    -Quality ${HORDE_RT_WINDOWS_CONTAINMENT_QUALITY})
             add_test(NAME horde_rt_final_windows_bundle_containment_controls
                 COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
                     ${CMAKE_CURRENT_SOURCE_DIR}/tests/RtPipelineBundleContainmentTests.ps1
                     -Scanner ${CMAKE_CURRENT_SOURCE_DIR}/tools/InspectRtPipelineBundleContainment.ps1
                     -TargetPath $<TARGET_FILE:horde_rt_diagnostic_window>
-                    -Instrumentation $<IF:$<CONFIG:Debug>,Diagnostic,Shipping>
-                    -Quality High
+                    -TargetPlatform Windows
+                    -Instrumentation ${HORDE_RT_WINDOWS_CONTAINMENT_INSTRUMENTATION}
+                    -Quality ${HORDE_RT_WINDOWS_CONTAINMENT_QUALITY}
                     -PowerShellExecutable ${HORDE_RT_POWERSHELL_EXECUTABLE})
+            add_test(NAME horde_rt_final_windows_bundle_containment_registration
+                COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
+                    ${CMAKE_CURRENT_SOURCE_DIR}/tests/RtPipelineBundleContainmentRegistrationTests.ps1
+                    -CmakeExecutable ${CMAKE_COMMAND}
+                    -ConfiguredCtestFile ${CMAKE_BINARY_DIR}/CTestTestfile.cmake
+                    -Configuration $<CONFIG>
+                    -Instrumentation ${HORDE_RT_WINDOWS_CONTAINMENT_INSTRUMENTATION}
+                    -Quality ${HORDE_RT_WINDOWS_CONTAINMENT_QUALITY}
+                    -Generator ${CMAKE_GENERATOR}
+                    -GeneratorPlatform ${CMAKE_GENERATOR_PLATFORM})
             set_tests_properties(
                 horde_rt_final_windows_bundle_containment
                 horde_rt_final_windows_bundle_containment_controls
+                horde_rt_final_windows_bundle_containment_registration
                 PROPERTIES TIMEOUT 300)
         endif()
 
