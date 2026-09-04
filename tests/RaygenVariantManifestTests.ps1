@@ -119,10 +119,13 @@ try {
     }
 
     $budgets = Get-Content -LiteralPath $budgetsPath -Raw | ConvertFrom-Json
-    Assert-True ($budgets.schema -eq 1 -and $budgets.status -eq 'unfrozen') `
-        'Variant budget record must remain schema-1 and explicitly unfrozen.'
-    Assert-True ($null -eq $budgets.budgets -or @($budgets.budgets).Count -eq 0) `
-        'Unfrozen variant budget record must not invent numeric limits.'
+    Assert-True ($budgets.schema -eq 1 -and $budgets.status -eq 'frozen') `
+        'Task 3d requires the schema-1 variant budget record to be explicitly frozen.'
+    Assert-True (@($budgets.budgets).Count -eq 8) `
+        'Task 3d requires exactly one frozen budget record for each approved variant key.'
+    Assert-True ((@($budgets.metrics) -join ',') -eq
+        'bytes,instructions,branchOperations,loops,selectionMerges,functions,functionCalls,rayQueryInitializations,atomicInstructions,bindingDecorations') `
+        'Frozen variant budgets must retain the reviewed metric schema and order.'
     New-Item -ItemType Directory -Force -Path $temporaryRoot | Out-Null
     Invoke-InvalidVariantConfigCompile -MacroName 'HORDE_RT_VARIANT_INSTRUMENTATION' -Value '2'
     Invoke-InvalidVariantConfigCompile -MacroName 'HORDE_RT_VARIANT_QUALITY' -Value '-1'
