@@ -30,6 +30,27 @@ function Assert-Throws {
     Assert-True $threw $Message
 }
 
+function Assert-FrozenCatalogShape {
+    param([pscustomobject]$Catalog)
+
+    $rootFields = 'authorities,generator,schema,status,target,toolchain,variants'
+    Assert-True ((@($Catalog.PSObject.Properties.Name | Sort-Object) -join ',') -eq $rootFields) `
+        'Catalog root has a missing, reordered, or unknown field.'
+    Assert-True ($Catalog.schema -eq 1 -and $Catalog.status -eq 'frozen' -and @($Catalog.variants).Count -eq 8) `
+        'Catalog must remain a frozen schema-1 eight-key record.'
+    $rowFields = 'artifactPath,atomicInstructions,boundedGenericFunctionsRetained,branchOperations,bytes,compiler,dependencies,dependencySha256,driverSafeFullyInlined,functionCalls,functions,hasDiagnosticsBinding,includeSha256,instrumentation,instructions,key,loops,material,quality,rayQueryInitializations,selectionMerges,shippingAllowed,spirvSha256,strategy,words'
+    $compilerFields = 'glslangCompileArguments,spirvDisArguments,spirvOptArguments,spirvValArguments'
+    foreach ($row in @($Catalog.variants)) {
+        Assert-True ((@($row.PSObject.Properties.Name | Sort-Object) -join ',') -eq $rowFields) `
+            "Catalog row is malformed or has an extra field: $($row.key)"
+        Assert-True ((@($row.compiler.PSObject.Properties.Name | Sort-Object) -join ',') -eq $compilerFields) `
+            "Catalog compiler invocation is incomplete or malformed: $($row.key)"
+        Assert-True ($row.artifactPath -match '^src/vulkan/raytracing/variants/[a-z_]+\.inc$' -and
+            -not $row.artifactPath.Contains('..') -and -not $row.artifactPath.Contains('\')) `
+            "Catalog artifact path escaped the dedicated artifact directory: $($row.key)"
+    }
+}
+
 function Get-CanonicalTextHash {
     param([string]$Path)
 
@@ -255,6 +276,46 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
         'diagnostic_high_opaque_fast', 'diagnostic_high_generic_dielectric')
     Assert-True ((Compare-Object ($expectedKeys | Sort-Object) (@($manifest.variants | ForEach-Object name | Sort-Object))).Count -eq 0) `
         'Matrix manifest no longer contains the exact eight approved keys.'
+
+    $catalog = Get-Content -LiteralPath $catalogPath -Raw | ConvertFrom-Json
+    Assert-FrozenCatalogShape -Catalog $catalog
+    Assert-True ((@($catalog.variants | ForEach-Object key | Sort-Object) -join ',') -eq ((@($expectedKeys | Sort-Object)) -join ',')) `
+        'Catalog keys must remain the exact approved set without duplicates or reordering.'
+    Assert-True ((@($catalog.variants | Where-Object { $_.material -eq 'OpaqueFast' } | Group-Object spirvSha256 | Where-Object Count -eq 2).Count -eq 2)) `
+        'Distinct OpaqueFast artifact paths must permit their reviewed equal raw SPIR-V pairs.'
+    Assert-Throws {
+        $unknownFieldCatalog = Get-Content -LiteralPath $catalogPath -Raw | ConvertFrom-Json
+        $unknownFieldCatalog.variants[0] | Add-Member -NotePropertyName unexpected -NotePropertyValue 'reject'
+        Assert-FrozenCatalogShape -Catalog $unknownFieldCatalog
+    } 'Catalog schema must reject unknown row fields.'
+    Assert-Throws {
+        $escapeCatalog = Get-Content -LiteralPath $catalogPath -Raw | ConvertFrom-Json
+        $escapeCatalog.variants[0].artifactPath = '../escape.inc'
+        Assert-FrozenCatalogShape -Catalog $escapeCatalog
+    } 'Catalog schema must reject artifact path escape.'
+    Assert-Throws {
+        $malformedCatalog = Get-Content -LiteralPath $catalogPath -Raw | ConvertFrom-Json
+        $malformedCatalog.variants[0].compiler.PSObject.Properties.Remove('spirvValArguments')
+        Assert-FrozenCatalogShape -Catalog $malformedCatalog
+    } 'Catalog schema must reject missing compiler arguments.'
+    Assert-Throws {
+        & $compiler -CheckCatalog -ArtifactDirectory $temporaryRoot -CatalogPath $catalogPath -BudgetPath $budgetPath
+        if ($LASTEXITCODE -ne 0) { throw 'expected path containment failure' }
+    } 'Catalog checker must reject a shared or escaping artifact directory.'
+    Assert-Throws {
+        & $compiler -CheckCatalog -ArtifactDirectory $artifactDirectory -CatalogPath (Join-Path $temporaryRoot 'catalog.json') -BudgetPath $budgetPath
+        if ($LASTEXITCODE -ne 0) { throw 'expected path containment failure' }
+    } 'Catalog checker must reject a substituted catalog path.'
+    $includeFixture = Join-Path $temporaryRoot 'one-byte-spirv-mutation.inc'
+    Copy-Item -LiteralPath (Join-Path $artifactDirectory "$($catalog.variants[0].key).inc") -Destination $includeFixture
+    $includeText = Get-Content -LiteralPath $includeFixture -Raw
+    $firstWord = [regex]::Match($includeText, '0x([0-9a-fA-F])')
+    Assert-True $firstWord.Success 'Frozen include must contain a mutable raw SPIR-V word.'
+    $replacementNibble = if ($firstWord.Groups[1].Value -eq '0') { '1' } else { '0' }
+    $mutatedIncludeText = $includeText.Remove($firstWord.Index + 2, 1).Insert($firstWord.Index + 2, $replacementNibble)
+    [IO.File]::WriteAllText($includeFixture, $mutatedIncludeText, [Text.UTF8Encoding]::new($false))
+    Assert-True ((Get-RawFileHash $includeFixture) -ne (Get-RawFileHash (Join-Path $artifactDirectory "$($catalog.variants[0].key).inc"))) `
+        'A one-byte SPIR-V-word mutation must not retain the frozen include identity.'
 
     # CheckCatalog is the sole matrix compilation in this test. It replays all
     # eight compile/preprocess/validate/disassemble paths into temporary storage

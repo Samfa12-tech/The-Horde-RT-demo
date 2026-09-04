@@ -321,9 +321,10 @@ function New-RaygenVariantCatalog
             atomicInstructions = $stats.atomicInstructions; hasDiagnosticsBinding = $stats.hasDiagnosticsBinding
             driverSafeFullyInlined = $stats.driverSafeFullyInlined; boundedGenericFunctionsRetained = $stats.boundedGenericFunctionsRetained
             compiler = [ordered]@{
-                validatorArguments = if ($definition.strategy -eq 'LegacyInlined') { @('-V', '--target-env', 'vulkan1.2', '-Os', '-S', 'rgen') } else { @('-V', '--target-env', 'vulkan1.2', '-S', 'rgen') }
-                optimizerArguments = $optimizerArguments
-                validatorArgumentsAfterOutput = @('-S', 'rgen')
+                glslangCompileArguments = if ($definition.strategy -eq 'LegacyInlined') { @('-V', '--target-env', 'vulkan1.2', '-Os', '-S', 'rgen', '-o', '<output>', '<source>') } else { @('-V', '--target-env', 'vulkan1.2', '-S', 'rgen', '-o', '<output>', '<source>') }
+                spirvOptArguments = @($optimizerArguments) + @('<input>', '-o', '<output>')
+                spirvValArguments = @('--target-env', 'vulkan1.2', '<input>')
+                spirvDisArguments = @('<input>', '-o', '<output>')
             }
         }
     }
@@ -331,9 +332,9 @@ function New-RaygenVariantCatalog
         schema = 1; status = 'frozen'; target = [ordered]@{ environment = 'vulkan1.2'; stage = 'rgen' }
         generator = [ordered]@{ path = 'tools/compile-raygen.ps1'; interface = 'freeze-v1'; sha256 = Get-RaygenDependencyHash -Path $PSCommandPath }
         toolchain = [ordered]@{
-            glslangValidator = [ordered]@{ version = Get-RaygenToolVersion -Tool $validator; arguments = @('-V', '--target-env', 'vulkan1.2', '-S', 'rgen') }
+            glslangValidator = [ordered]@{ version = Get-RaygenToolVersion -Tool $validator; preprocessArguments = @('-E', '-S', 'rgen', '<source>') }
             spirvOpt = [ordered]@{ version = Get-RaygenToolVersion -Tool $optimizer }
-            spirvVal = [ordered]@{ version = Get-RaygenToolVersion -Tool (Join-Path $VulkanSdk 'Bin\spirv-val.exe'); arguments = @('--target-env', 'vulkan1.2') }
+            spirvVal = [ordered]@{ version = Get-RaygenToolVersion -Tool (Join-Path $VulkanSdk 'Bin\spirv-val.exe') }
             spirvDis = [ordered]@{ version = Get-RaygenToolVersion -Tool $disassembler }
         }
         authorities = [ordered]@{

@@ -8,28 +8,23 @@
   "generator": {
     "path": "tools/compile-raygen.ps1",
     "interface": "freeze-v1",
-    "sha256": "5e0e9d3aa6f0ade8606844633c6cbbfbd33e890b7c9a53a944bffc6a4017735b"
+    "sha256": "05cf310cc9962829ed11f293358506c581cbd87acd3af7035ed2cc197ef7c28a"
   },
   "toolchain": {
     "glslangValidator": {
       "version": "Glslang Version: 11:16.2.0 ESSL Version: OpenGL ES GLSL 3.20 glslang Khronos. 16.2.0 GLSL Version: 4.60 glslang Khronos. 16.2.0 SPIR-V Version 0x00010600, Revision 1 GLSL.std.450 Version 100, Revision 1 Khronos Tool ID 8 SPIR-V Generator Version 11 GL_KHR_vulkan_glsl version 100 ARB_GL_gl_spirv version 100",
-      "arguments": [
-        "-V",
-        "--target-env",
-        "vulkan1.2",
+      "preprocessArguments": [
+        "-E",
         "-S",
-        "rgen"
+        "rgen",
+        "<source>"
       ]
     },
     "spirvOpt": {
       "version": "SPIRV-Tools v2026.2 v2026.2.rc2-1-g2ec8457a"
     },
     "spirvVal": {
-      "version": "SPIRV-Tools v2026.2 v2026.2.rc2-1-g2ec8457a Targets: SPIR-V 1.0 SPIR-V 1.1 SPIR-V 1.2 SPIR-V 1.3 SPIR-V 1.4 SPIR-V 1.5 SPIR-V 1.6 SPIR-V 1.2 (under OpenCL 2.2 Full Profile semantics) SPIR-V 1.0 (under Vulkan 1.0 semantics) SPIR-V 1.3 (under Vulkan 1.1 semantics) SPIR-V 1.4 (under Vulkan 1.1 semantics) SPIR-V 1.5 (under Vulkan 1.2 semantics) SPIR-V 1.6 (under Vulkan 1.3 semantics) SPIR-V 1.6 (under Vulkan 1.4 semantics)",
-      "arguments": [
-        "--target-env",
-        "vulkan1.2"
-      ]
+      "version": "SPIRV-Tools v2026.2 v2026.2.rc2-1-g2ec8457a Targets: SPIR-V 1.0 SPIR-V 1.1 SPIR-V 1.2 SPIR-V 1.3 SPIR-V 1.4 SPIR-V 1.5 SPIR-V 1.6 SPIR-V 1.2 (under OpenCL 2.2 Full Profile semantics) SPIR-V 1.0 (under Vulkan 1.0 semantics) SPIR-V 1.3 (under Vulkan 1.1 semantics) SPIR-V 1.4 (under Vulkan 1.1 semantics) SPIR-V 1.5 (under Vulkan 1.2 semantics) SPIR-V 1.6 (under Vulkan 1.3 semantics) SPIR-V 1.6 (under Vulkan 1.4 semantics)"
     },
     "spirvDis": {
       "version": "SPIRV-Tools v2026.2 v2026.2.rc2-1-g2ec8457a Target: SPIR-V 1.5"
@@ -121,23 +116,35 @@
       "driverSafeFullyInlined": false,
       "boundedGenericFunctionsRetained": true,
       "compiler": {
-        "validatorArguments": [
+        "glslangCompileArguments": [
           "-V",
           "--target-env",
           "vulkan1.2",
           "-S",
-          "rgen"
+          "rgen",
+          "-o",
+          "<output>",
+          "<source>"
         ],
-        "optimizerArguments": [
+        "spirvOptArguments": [
           "--eliminate-dead-functions",
           "--eliminate-dead-code-aggressive",
           "--simplify-instructions",
           "--eliminate-dead-branches",
-          "--cfg-cleanup"
+          "--cfg-cleanup",
+          "<input>",
+          "-o",
+          "<output>"
         ],
-        "validatorArgumentsAfterOutput": [
-          "-S",
-          "rgen"
+        "spirvValArguments": [
+          "--target-env",
+          "vulkan1.2",
+          "<input>"
+        ],
+        "spirvDisArguments": [
+          "<input>",
+          "-o",
+          "<output>"
         ]
       }
     },
@@ -212,20 +219,32 @@
       "driverSafeFullyInlined": true,
       "boundedGenericFunctionsRetained": false,
       "compiler": {
-        "validatorArguments": [
+        "glslangCompileArguments": [
           "-V",
           "--target-env",
           "vulkan1.2",
           "-Os",
           "-S",
-          "rgen"
+          "rgen",
+          "-o",
+          "<output>",
+          "<source>"
         ],
-        "optimizerArguments": [
-          "-O"
+        "spirvOptArguments": [
+          "-O",
+          "<input>",
+          "-o",
+          "<output>"
         ],
-        "validatorArgumentsAfterOutput": [
-          "-S",
-          "rgen"
+        "spirvValArguments": [
+          "--target-env",
+          "vulkan1.2",
+          "<input>"
+        ],
+        "spirvDisArguments": [
+          "<input>",
+          "-o",
+          "<output>"
         ]
       }
     },
@@ -300,23 +319,35 @@
       "driverSafeFullyInlined": false,
       "boundedGenericFunctionsRetained": true,
       "compiler": {
-        "validatorArguments": [
+        "glslangCompileArguments": [
           "-V",
           "--target-env",
           "vulkan1.2",
           "-S",
-          "rgen"
+          "rgen",
+          "-o",
+          "<output>",
+          "<source>"
         ],
-        "optimizerArguments": [
+        "spirvOptArguments": [
           "--eliminate-dead-functions",
           "--eliminate-dead-code-aggressive",
           "--simplify-instructions",
           "--eliminate-dead-branches",
-          "--cfg-cleanup"
+          "--cfg-cleanup",
+          "<input>",
+          "-o",
+          "<output>"
         ],
-        "validatorArgumentsAfterOutput": [
-          "-S",
-          "rgen"
+        "spirvValArguments": [
+          "--target-env",
+          "vulkan1.2",
+          "<input>"
+        ],
+        "spirvDisArguments": [
+          "<input>",
+          "-o",
+          "<output>"
         ]
       }
     },
@@ -391,20 +422,32 @@
       "driverSafeFullyInlined": true,
       "boundedGenericFunctionsRetained": false,
       "compiler": {
-        "validatorArguments": [
+        "glslangCompileArguments": [
           "-V",
           "--target-env",
           "vulkan1.2",
           "-Os",
           "-S",
-          "rgen"
+          "rgen",
+          "-o",
+          "<output>",
+          "<source>"
         ],
-        "optimizerArguments": [
-          "-O"
+        "spirvOptArguments": [
+          "-O",
+          "<input>",
+          "-o",
+          "<output>"
         ],
-        "validatorArgumentsAfterOutput": [
-          "-S",
-          "rgen"
+        "spirvValArguments": [
+          "--target-env",
+          "vulkan1.2",
+          "<input>"
+        ],
+        "spirvDisArguments": [
+          "<input>",
+          "-o",
+          "<output>"
         ]
       }
     },
@@ -479,23 +522,35 @@
       "driverSafeFullyInlined": false,
       "boundedGenericFunctionsRetained": true,
       "compiler": {
-        "validatorArguments": [
+        "glslangCompileArguments": [
           "-V",
           "--target-env",
           "vulkan1.2",
           "-S",
-          "rgen"
+          "rgen",
+          "-o",
+          "<output>",
+          "<source>"
         ],
-        "optimizerArguments": [
+        "spirvOptArguments": [
           "--eliminate-dead-functions",
           "--eliminate-dead-code-aggressive",
           "--simplify-instructions",
           "--eliminate-dead-branches",
-          "--cfg-cleanup"
+          "--cfg-cleanup",
+          "<input>",
+          "-o",
+          "<output>"
         ],
-        "validatorArgumentsAfterOutput": [
-          "-S",
-          "rgen"
+        "spirvValArguments": [
+          "--target-env",
+          "vulkan1.2",
+          "<input>"
+        ],
+        "spirvDisArguments": [
+          "<input>",
+          "-o",
+          "<output>"
         ]
       }
     },
@@ -570,20 +625,32 @@
       "driverSafeFullyInlined": true,
       "boundedGenericFunctionsRetained": false,
       "compiler": {
-        "validatorArguments": [
+        "glslangCompileArguments": [
           "-V",
           "--target-env",
           "vulkan1.2",
           "-Os",
           "-S",
-          "rgen"
+          "rgen",
+          "-o",
+          "<output>",
+          "<source>"
         ],
-        "optimizerArguments": [
-          "-O"
+        "spirvOptArguments": [
+          "-O",
+          "<input>",
+          "-o",
+          "<output>"
         ],
-        "validatorArgumentsAfterOutput": [
-          "-S",
-          "rgen"
+        "spirvValArguments": [
+          "--target-env",
+          "vulkan1.2",
+          "<input>"
+        ],
+        "spirvDisArguments": [
+          "<input>",
+          "-o",
+          "<output>"
         ]
       }
     },
@@ -658,23 +725,35 @@
       "driverSafeFullyInlined": false,
       "boundedGenericFunctionsRetained": true,
       "compiler": {
-        "validatorArguments": [
+        "glslangCompileArguments": [
           "-V",
           "--target-env",
           "vulkan1.2",
           "-S",
-          "rgen"
+          "rgen",
+          "-o",
+          "<output>",
+          "<source>"
         ],
-        "optimizerArguments": [
+        "spirvOptArguments": [
           "--eliminate-dead-functions",
           "--eliminate-dead-code-aggressive",
           "--simplify-instructions",
           "--eliminate-dead-branches",
-          "--cfg-cleanup"
+          "--cfg-cleanup",
+          "<input>",
+          "-o",
+          "<output>"
         ],
-        "validatorArgumentsAfterOutput": [
-          "-S",
-          "rgen"
+        "spirvValArguments": [
+          "--target-env",
+          "vulkan1.2",
+          "<input>"
+        ],
+        "spirvDisArguments": [
+          "<input>",
+          "-o",
+          "<output>"
         ]
       }
     },
@@ -749,20 +828,32 @@
       "driverSafeFullyInlined": true,
       "boundedGenericFunctionsRetained": false,
       "compiler": {
-        "validatorArguments": [
+        "glslangCompileArguments": [
           "-V",
           "--target-env",
           "vulkan1.2",
           "-Os",
           "-S",
-          "rgen"
+          "rgen",
+          "-o",
+          "<output>",
+          "<source>"
         ],
-        "optimizerArguments": [
-          "-O"
+        "spirvOptArguments": [
+          "-O",
+          "<input>",
+          "-o",
+          "<output>"
         ],
-        "validatorArgumentsAfterOutput": [
-          "-S",
-          "rgen"
+        "spirvValArguments": [
+          "--target-env",
+          "vulkan1.2",
+          "<input>"
+        ],
+        "spirvDisArguments": [
+          "<input>",
+          "-o",
+          "<output>"
         ]
       }
     }

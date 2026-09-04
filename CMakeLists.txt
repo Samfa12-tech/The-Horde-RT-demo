@@ -155,7 +155,6 @@ if(BUILD_TESTING)
         HORDE_RT_EXPECTED_VERSION="${HORDE_RT_PACKAGE_VERSION}"
         HORDE_RT_EXPECTED_ANDROID_VERSION_CODE=${HORDE_RT_ANDROID_VERSION_CODE}
     )
-    horde_rt_attach_raygen_artifacts(horde_rt_diagnostic_window)
     add_test(NAME horde_rt_version_contract_tests COMMAND horde_rt_version_contract_tests)
 
     add_executable(horde_rt_version_contract_incremental_configure_tests
