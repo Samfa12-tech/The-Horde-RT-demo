@@ -6,6 +6,8 @@ endif()
 
 include(cmake/HordeRtVersion.cmake)
 include(cmake/HordeRtRaygenArtifacts.cmake)
+include(cmake/HordeRtRaygenPolicy.cmake)
+horde_rt_validate_raygen_policy()
 
 project(HordeLanternRT
     VERSION ${HORDE_RT_PACKAGE_VERSION}
@@ -75,6 +77,7 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS)
     target_compile_features(horde_rt_probe_core PUBLIC cxx_std_20)
     target_link_libraries(horde_rt_probe_core PUBLIC Vulkan::Vulkan horde_gameplay_simulation)
     horde_rt_attach_raygen_artifacts(horde_rt_probe_core)
+    horde_rt_apply_raygen_policy(horde_rt_probe_core Windows)
 endif()
 
 if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_CAPABILITY_PROBE_EXECUTABLE)
@@ -143,6 +146,62 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AN
 endif()
 
 if(BUILD_TESTING)
+    add_executable(horde_rt_pipeline_variants_tests
+        tests/RtPipelineVariantsTests.cpp
+        src/vulkan/raytracing/RtPipelineVariants.cpp)
+    target_include_directories(horde_rt_pipeline_variants_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_compile_definitions(horde_rt_pipeline_variants_tests PRIVATE
+        HORDE_RT_SELECTED_INSTRUMENTATION=0 HORDE_RT_SELECTED_DIELECTRIC_QUALITY=0)
+    add_test(NAME horde_rt_pipeline_variants_tests COMMAND horde_rt_pipeline_variants_tests)
+
+    add_executable(horde_rt_pipeline_variant_provider_tests
+        tests/RtPipelineVariantProviderTests.cpp
+        src/vulkan/raytracing/RtPipelineVariants.cpp
+        src/vulkan/raytracing/RtPipelineVariantProvider.cpp)
+    target_include_directories(horde_rt_pipeline_variant_provider_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_compile_definitions(horde_rt_pipeline_variant_provider_tests PRIVATE
+        HORDE_RT_SELECTED_INSTRUMENTATION=0 HORDE_RT_SELECTED_DIELECTRIC_QUALITY=0)
+    horde_rt_attach_raygen_artifacts(horde_rt_pipeline_variant_provider_tests)
+    add_test(NAME horde_rt_pipeline_variant_provider_tests COMMAND horde_rt_pipeline_variant_provider_tests)
+
+    function(horde_rt_add_pipeline_variant_fixture target_name instrumentation quality opaque_hash generic_hash required_key forbidden_key)
+        add_library(${target_name}_provider_object OBJECT src/vulkan/raytracing/RtPipelineVariantProvider.cpp)
+        target_include_directories(${target_name}_provider_object PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+        target_compile_definitions(${target_name}_provider_object PRIVATE
+            HORDE_RT_SELECTED_INSTRUMENTATION=${instrumentation}
+            HORDE_RT_SELECTED_DIELECTRIC_QUALITY=${quality})
+        horde_rt_attach_raygen_artifacts(${target_name}_provider_object)
+        add_executable(${target_name}
+            tests/RtPipelineVariantFixture.cpp
+            src/vulkan/raytracing/RtPipelineVariants.cpp
+            $<TARGET_OBJECTS:${target_name}_provider_object>)
+        target_include_directories(${target_name} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+        add_test(NAME ${target_name} COMMAND ${target_name})
+        add_test(NAME ${target_name}_evidence
+            COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
+                ${CMAKE_CURRENT_SOURCE_DIR}/tests/RtPipelineVariantFixtureEvidence.ps1
+                -Fixture $<TARGET_FILE:${target_name}> -ProviderObject $<TARGET_OBJECTS:${target_name}_provider_object>
+                -OpaqueSha256 ${opaque_hash} -GenericSha256 ${generic_hash}
+                -RequiredKey ${required_key} -ForbiddenKey ${forbidden_key}
+                -ForbiddenGenericKey ${forbidden_key})
+    endfunction()
+    horde_rt_add_pipeline_variant_fixture(horde_rt_provider_shipping_mobile_fixture 0 0
+        7ebdb794794a854b6cb5c44c75dd9a9decd42f4999c44a9cfa78f13b12a13f21
+        c52a143c5e0e96f7bf187a9278937a5d17534690cbc0e8e7d70f2d95ae104a01
+        shipping_mobile_opaque_fast diagnostic_mobile_generic_dielectric)
+    horde_rt_add_pipeline_variant_fixture(horde_rt_provider_shipping_high_fixture 0 1
+        7ebdb794794a854b6cb5c44c75dd9a9decd42f4999c44a9cfa78f13b12a13f21
+        1be2b430ba190ae82250693ae079adf3f0712b361914b1355f386fb1f57fc5aa
+        shipping_high_opaque_fast diagnostic_high_generic_dielectric)
+    horde_rt_add_pipeline_variant_fixture(horde_rt_provider_diagnostic_mobile_fixture 1 0
+        d7b0722e572e63bd96e62bae85cc6a5b968ae71bf157526b513b50b56e515c3b
+        d8f4c915955836f6693c5c5a073c23155944a8a3048dbfdcee6c3a0c4d8f57f7
+        diagnostic_mobile_opaque_fast shipping_mobile_generic_dielectric)
+    horde_rt_add_pipeline_variant_fixture(horde_rt_provider_diagnostic_high_fixture 1 1
+        d7b0722e572e63bd96e62bae85cc6a5b968ae71bf157526b513b50b56e515c3b
+        2b61176f676227adfd13a880cd415478536e1403b46317ea3321dc463bebecd0
+        diagnostic_high_opaque_fast shipping_high_generic_dielectric)
+
     add_executable(horde_rt_github_release_updater_tests
         tests/GitHubReleaseUpdaterTests.cpp
         src/update/GitHubReleaseUpdater.cpp
@@ -272,6 +331,9 @@ if(BUILD_TESTING)
         add_test(NAME horde_rt_raygen_variant_artifact_tests
             COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
                 ${CMAKE_CURRENT_SOURCE_DIR}/tests/RaygenVariantArtifactTests.ps1)
+        add_test(NAME horde_rt_pipeline_policy_fence_tests
+            COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
+                ${CMAKE_CURRENT_SOURCE_DIR}/tests/RtPipelinePolicyFenceTests.ps1)
         add_test(NAME horde_rt_static_texture_array_tool_tests
             COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
                 ${CMAKE_CURRENT_SOURCE_DIR}/tests/StaticTextureArrayToolTests.ps1)

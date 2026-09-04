@@ -58,6 +58,26 @@ def releaseStoreFile = validationUnsigned ? null : System.getenv('HORDE_RELEASE_
 def releaseStorePassword = validationUnsigned ? null : System.getenv('HORDE_RELEASE_STORE_PASSWORD')
 def releaseKeyAlias = validationUnsigned ? null : System.getenv('HORDE_RELEASE_KEY_ALIAS')
 def releaseKeyPassword = validationUnsigned ? null : System.getenv('HORDE_RELEASE_KEY_PASSWORD')
+def hordeRtInstrumentationOverride = providers.gradleProperty('hordeRtInstrumentationOverride').orNull
+def hordeRtDielectricQualityOverride = providers.gradleProperty('hordeRtDielectricQualityOverride').orNull
+def hordeRtOverridePresent = { String value -> value != null && !value.isEmpty() }
+if (hordeRtOverridePresent(hordeRtInstrumentationOverride) != hordeRtOverridePresent(hordeRtDielectricQualityOverride)) {
+    throw new GradleException('hordeRtInstrumentationOverride and hordeRtDielectricQualityOverride must be supplied together.')
+}
+if (hordeRtOverridePresent(hordeRtInstrumentationOverride) &&
+    !(hordeRtInstrumentationOverride == 'Shipping' || hordeRtInstrumentationOverride == 'Diagnostic')) {
+    throw new GradleException('hordeRtInstrumentationOverride must be exactly Shipping or Diagnostic.')
+}
+if (hordeRtOverridePresent(hordeRtDielectricQualityOverride) &&
+    !(hordeRtDielectricQualityOverride == 'Mobile' || hordeRtDielectricQualityOverride == 'High')) {
+    throw new GradleException('hordeRtDielectricQualityOverride must be exactly Mobile or High.')
+}
+def hordeRtNativePolicyArguments = { String defaultInstrumentation ->
+    def instrumentation = hordeRtOverridePresent(hordeRtInstrumentationOverride) ? hordeRtInstrumentationOverride : defaultInstrumentation
+    def quality = hordeRtOverridePresent(hordeRtDielectricQualityOverride) ? hordeRtDielectricQualityOverride : 'Mobile'
+    return ["-DHORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION=${instrumentation}",
+            "-DHORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY=${quality}"]
+}
 
 tasks.register('prepareRuntimeAssets', Sync) {
     from('../../assets') {
@@ -146,7 +166,7 @@ android {
             minifyEnabled false
             externalNativeBuild {
                 cmake {
-                    arguments '-DHORDE_RT_DEBUG_CHECKPOINTS=ON'
+                    arguments '-DHORDE_RT_DEBUG_CHECKPOINTS=ON', *hordeRtNativePolicyArguments('Diagnostic')
                 }
             }
         }
@@ -154,7 +174,7 @@ android {
             minifyEnabled false
             externalNativeBuild {
                 cmake {
-                    arguments '-DHORDE_RT_DEBUG_CHECKPOINTS=OFF'
+                    arguments '-DHORDE_RT_DEBUG_CHECKPOINTS=OFF', *hordeRtNativePolicyArguments('Shipping')
                 }
             }
             if (signingConfigs.findByName('release') != null) {

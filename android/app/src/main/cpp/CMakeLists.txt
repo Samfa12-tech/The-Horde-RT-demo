@@ -7,6 +7,7 @@ option(HORDE_RT_DEBUG_CHECKPOINTS "Enable debug-only showcase checkpoint and rep
 get_filename_component(HORDE_RT_REPO_ROOT "${CMAKE_CURRENT_LIST_DIR}/../../../../.." ABSOLUTE)
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtVersion.cmake")
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtRaygenArtifacts.cmake")
+include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtRaygenPolicy.cmake")
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtSources.cmake")
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtStrictAssetMath.cmake")
 horde_rt_enable_strict_asset_math("${HORDE_RT_REPO_ROOT}")
@@ -30,6 +31,7 @@ target_include_directories(horde_rt_probe_android PRIVATE
     "${HORDE_RT_REPO_ROOT}/third_party"
 )
 horde_rt_attach_raygen_artifacts(horde_rt_probe_android)
+horde_rt_apply_raygen_policy(horde_rt_probe_android Android)
 
 target_compile_features(horde_rt_probe_android PRIVATE cxx_std_20)
 target_compile_definitions(horde_rt_probe_android PRIVATE
