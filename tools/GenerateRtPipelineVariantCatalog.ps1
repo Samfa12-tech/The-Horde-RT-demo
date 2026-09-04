@@ -11,6 +11,11 @@ function Assert-Names([object]$value, [string[]]$expected, [string]$message) {
     $actual = @($value.PSObject.Properties.Name | Sort-Object)
     Assert-True (($actual -join "`n") -eq (($expected | Sort-Object) -join "`n")) $message
 }
+function Read-Utf8NoBom([string]$path, [string]$label) {
+    $bytes = [IO.File]::ReadAllBytes($path)
+    Assert-True (-not ($bytes.Length -ge 3 -and $bytes[0] -eq 0xef -and $bytes[1] -eq 0xbb -and $bytes[2] -eq 0xbf)) "$label must not contain a UTF-8 BOM."
+    try { return [Text.UTF8Encoding]::new($false, $true).GetString($bytes) } catch { throw "$label must be valid UTF-8." }
+}
 function Get-Sha256Hex([byte[]]$bytes) {
     $sha256 = [Security.Cryptography.SHA256]::Create()
     try { return ([BitConverter]::ToString($sha256.ComputeHash($bytes))).Replace('-', '').ToLowerInvariant() }
@@ -31,7 +36,7 @@ function Get-IncludeWords([string]$path) {
 }
 
 $expectedKeys = @('diagnostic_high_generic_dielectric', 'diagnostic_high_opaque_fast', 'diagnostic_mobile_generic_dielectric', 'diagnostic_mobile_opaque_fast', 'shipping_high_generic_dielectric', 'shipping_high_opaque_fast', 'shipping_mobile_generic_dielectric', 'shipping_mobile_opaque_fast')
-$catalog = Get-Content -LiteralPath $CatalogPath -Raw | ConvertFrom-Json
+$catalog = (Read-Utf8NoBom $CatalogPath 'Frozen raygen catalog') | ConvertFrom-Json
 Assert-True ($catalog.schema -is [int] -or $catalog.schema -is [long]) 'Frozen raygen catalog schema must be an integer.'
 Assert-True ($catalog.schema -eq 1 -and $catalog.status -eq 'frozen') 'Frozen raygen catalog schema/status is invalid.'
 Assert-Names $catalog @('authorities', 'generator', 'schema', 'status', 'target', 'toolchain', 'variants') 'Frozen raygen catalog root schema is invalid.'
@@ -46,7 +51,7 @@ foreach ($row in $rows) {
     Assert-True ($row.key -cmatch '^[a-z_]+$' -and $row.artifactPath -ceq "src/vulkan/raytracing/variants/$($row.key).inc") "Frozen catalog artifact path/key mapping is invalid: $($row.key)"
     Assert-True ($row.spirvSha256 -cmatch '^[0-9a-f]{64}$' -and $row.includeSha256 -cmatch '^[0-9a-f]{64}$') "Frozen catalog hash lexeme is invalid: $($row.key)"
     Assert-True (@('Shipping','Diagnostic') -ccontains $row.instrumentation -and @('Mobile','High') -ccontains $row.quality -and @('OpaqueFast','GenericDielectric') -ccontains $row.material) "Frozen catalog enum is invalid: $($row.key)"
-    $includePath = Join-Path $repoRoot $row.artifactPath.Replace('/', '\')
+    $includePath = Join-Path $repoRoot ([string]::Join([IO.Path]::DirectorySeparatorChar, [string[]]$row.artifactPath.Split('/')))
     Assert-True (Test-Path -LiteralPath $includePath -PathType Leaf) "Frozen catalog include is missing: $($row.key)"
     $words = Get-IncludeWords $includePath
     Assert-True ($words.Count -eq $row.words -and (Get-Sha256Hex $words.Bytes) -ceq $row.spirvSha256 -and (Get-CanonicalTextHash $includePath) -ceq $row.includeSha256) "Frozen catalog include is stale: $($row.key)"
@@ -67,6 +72,7 @@ for ($index = 0; $index -lt $pairs.Count; ++$index) {
 }
 $lines += @('#else', '#error "Unsupported exact RT raygen bundle policy."', '#endif', '', '} // namespace horde::vulkan::raytracing::detail', '')
 $rendered = $lines -join "`n"
-if ($Write) { [IO.File]::WriteAllText($OutputPath, $rendered, [Text.UTF8Encoding]::new($false)); exit 0 }
-if (-not (Test-Path -LiteralPath $OutputPath) -or [IO.File]::ReadAllText($OutputPath) -cne $rendered) { throw 'Generated RT catalog adapter is stale, malformed, or hand-edited.' }
+$renderedBytes = [Text.UTF8Encoding]::new($false, $true).GetBytes($rendered)
+if ($Write) { [IO.File]::WriteAllBytes($OutputPath, $renderedBytes); exit 0 }
+if (-not (Test-Path -LiteralPath $OutputPath) -or -not [Linq.Enumerable]::SequenceEqual([byte[]][IO.File]::ReadAllBytes($OutputPath), [byte[]]$renderedBytes)) { throw 'Generated RT catalog adapter is stale, malformed, or hand-edited.' }
 Write-Output 'Generated RT catalog adapter is current.'

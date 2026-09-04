@@ -1,5 +1,5 @@
 [CmdletBinding()]
-param()
+param([string]$CmakeExecutable)
 
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
@@ -18,6 +18,35 @@ try {
     $rejectedHandEdit = $false
     try { & (Join-Path $repoRoot 'tools\GenerateRtPipelineVariantCatalog.ps1') -Check -CatalogPath $catalogFixture -OutputPath $adapterFixture } catch { $rejectedHandEdit = $true }
     Assert-True $rejectedHandEdit 'A hand-edited generated adapter must fail closed.'
+    Copy-Item -LiteralPath (Join-Path $repoRoot 'src\vulkan\raytracing\RtPipelineVariantCatalog.generated.h') -Destination $adapterFixture -Force
+    $adapterBytes = [IO.File]::ReadAllBytes($adapterFixture)
+    [IO.File]::WriteAllBytes($adapterFixture, [byte[]](0xef,0xbb,0xbf) + $adapterBytes)
+    $rejectedAdapterBom = $false
+    try { & (Join-Path $repoRoot 'tools\GenerateRtPipelineVariantCatalog.ps1') -Check -CatalogPath $catalogFixture -OutputPath $adapterFixture } catch { $rejectedAdapterBom = $true }
+    Assert-True $rejectedAdapterBom 'A BOM-prefixed generated adapter must fail closed.'
+    Copy-Item -LiteralPath (Join-Path $repoRoot 'tools\raygen-variant-catalog.json') -Destination $catalogFixture -Force
+    $catalogBytes = [IO.File]::ReadAllBytes($catalogFixture)
+    [IO.File]::WriteAllBytes($catalogFixture, [byte[]](0xef,0xbb,0xbf) + $catalogBytes)
+    $rejectedCatalogBom = $false
+    try { & (Join-Path $repoRoot 'tools\GenerateRtPipelineVariantCatalog.ps1') -Check -CatalogPath $catalogFixture -OutputPath (Join-Path $repoRoot 'src\vulkan\raytracing\RtPipelineVariantCatalog.generated.h') } catch { $rejectedCatalogBom = $true }
+    Assert-True $rejectedCatalogBom 'A BOM-prefixed frozen catalog must fail closed.'
+    Copy-Item -LiteralPath (Join-Path $repoRoot 'tools\raygen-variant-catalog.json') -Destination $catalogFixture -Force
+    $catalog = Get-Content -LiteralPath $catalogFixture -Raw | ConvertFrom-Json
+    $firstVariant = $catalog.variants[0]
+    $catalog.variants[0] = $catalog.variants[1]
+    $catalog.variants[1] = $firstVariant
+    [IO.File]::WriteAllText($catalogFixture, ($catalog | ConvertTo-Json -Depth 100), [Text.UTF8Encoding]::new($false))
+    $rejectedReorderedCatalog = $false
+    try { & (Join-Path $repoRoot 'tools\GenerateRtPipelineVariantCatalog.ps1') -Check -CatalogPath $catalogFixture -OutputPath (Join-Path $repoRoot 'src\vulkan\raytracing\RtPipelineVariantCatalog.generated.h') } catch { $rejectedReorderedCatalog = $true }
+    Assert-True $rejectedReorderedCatalog 'A reordered frozen catalog must fail closed.'
+    Copy-Item -LiteralPath (Join-Path $repoRoot 'tools\raygen-variant-catalog.json') -Destination $catalogFixture -Force
+    $catalog = Get-Content -LiteralPath $catalogFixture -Raw | ConvertFrom-Json
+    $catalog | Add-Member -NotePropertyName unexpectedAuthority -NotePropertyValue 'reject'
+    [IO.File]::WriteAllText($catalogFixture, ($catalog | ConvertTo-Json -Depth 100), [Text.UTF8Encoding]::new($false))
+    $rejectedExtraCatalogField = $false
+    try { & (Join-Path $repoRoot 'tools\GenerateRtPipelineVariantCatalog.ps1') -Check -CatalogPath $catalogFixture -OutputPath (Join-Path $repoRoot 'src\vulkan\raytracing\RtPipelineVariantCatalog.generated.h') } catch { $rejectedExtraCatalogField = $true }
+    Assert-True $rejectedExtraCatalogField 'An extra frozen catalog field must fail closed.'
+    Copy-Item -LiteralPath (Join-Path $repoRoot 'tools\raygen-variant-catalog.json') -Destination $catalogFixture -Force
     $catalogText = Get-Content -LiteralPath $catalogFixture -Raw
     [IO.File]::WriteAllText($catalogFixture, $catalogText.Replace('diagnostic_high_generic_dielectric', 'shipping_mobile_opaque_fast'), [Text.UTF8Encoding]::new($false))
     $rejectedCatalog = $false
@@ -31,6 +60,20 @@ try {
     Assert-True $rejectedInclude 'A stale frozen include hash must fail before provider compilation.'
 }
 finally { if (Test-Path -LiteralPath $temporaryRoot) { Remove-Item -LiteralPath $temporaryRoot -Recurse -Force } }
+
+if (-not [string]::IsNullOrWhiteSpace($CmakeExecutable)) {
+    $freshConfigureRoot = Join-Path ([IO.Path]::GetTempPath()) ('horde-rt-fresh-configure-' + [guid]::NewGuid().ToString('N'))
+    try {
+        & $CmakeExecutable -S $repoRoot -B $freshConfigureRoot -DHORDE_RT_BUILD_VULKAN_TARGETS=OFF
+        Assert-True ($LASTEXITCODE -eq 0) 'Fresh policy fixture configure failed.'
+        $ctestFile = Get-Content -LiteralPath (Join-Path $freshConfigureRoot 'CTestTestfile.cmake') -Raw
+        $runner = (Get-Command pwsh,powershell -ErrorAction Stop | Select-Object -First 1 -ExpandProperty Source).Replace('\','/')
+        foreach ($name in @('shipping_mobile','shipping_high','diagnostic_mobile','diagnostic_high')) {
+            Assert-True ($ctestFile -match ('horde_rt_provider_' + $name + '_fixture_evidence.*"' + [regex]::Escape($runner))) "Fresh fixture command does not begin with resolved PowerShell: $name"
+        }
+    }
+    finally { if (Test-Path -LiteralPath $freshConfigureRoot) { Remove-Item -LiteralPath $freshConfigureRoot -Recurse -Force } }
+}
 
 $policy = Get-Content -LiteralPath (Join-Path $repoRoot 'cmake\HordeRtRaygenPolicy.cmake') -Raw
 foreach ($required in @('HORDE_RT_INSTRUMENTATION_OVERRIDE', 'HORDE_RT_DIELECTRIC_QUALITY_OVERRIDE',

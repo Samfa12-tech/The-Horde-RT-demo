@@ -31,6 +31,11 @@ option(HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW "Build the Win32 diagnostic shel
 option(HORDE_RT_BUILD_VULKAN_TARGETS "Build targets that require a Vulkan SDK" ON)
 
 include(CTest)
+if(BUILD_TESTING)
+    # Resolve the runner before registering any PowerShell-backed fixture.  CTest
+    # records this exact executable in its generated command line.
+    find_program(HORDE_RT_POWERSHELL_EXECUTABLE NAMES pwsh powershell REQUIRED)
+endif()
 
 include(cmake/HordeRtSources.cmake)
 include(cmake/HordeRtStrictAssetMath.cmake)
@@ -164,7 +169,7 @@ if(BUILD_TESTING)
     horde_rt_attach_raygen_artifacts(horde_rt_pipeline_variant_provider_tests)
     add_test(NAME horde_rt_pipeline_variant_provider_tests COMMAND horde_rt_pipeline_variant_provider_tests)
 
-    function(horde_rt_add_pipeline_variant_fixture target_name instrumentation quality opaque_hash generic_hash required_key forbidden_key)
+    function(horde_rt_add_pipeline_variant_fixture target_name instrumentation quality opaque_hash generic_hash required_key)
         add_library(${target_name}_provider_object OBJECT src/vulkan/raytracing/RtPipelineVariantProvider.cpp)
         target_include_directories(${target_name}_provider_object PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
         target_compile_definitions(${target_name}_provider_object PRIVATE
@@ -182,25 +187,24 @@ if(BUILD_TESTING)
                 ${CMAKE_CURRENT_SOURCE_DIR}/tests/RtPipelineVariantFixtureEvidence.ps1
                 -Fixture $<TARGET_FILE:${target_name}> -ProviderObject $<TARGET_OBJECTS:${target_name}_provider_object>
                 -OpaqueSha256 ${opaque_hash} -GenericSha256 ${generic_hash}
-                -RequiredKey ${required_key} -ForbiddenKey ${forbidden_key}
-                -ForbiddenGenericKey ${forbidden_key})
+                -RequiredKey ${required_key})
     endfunction()
     horde_rt_add_pipeline_variant_fixture(horde_rt_provider_shipping_mobile_fixture 0 0
         7ebdb794794a854b6cb5c44c75dd9a9decd42f4999c44a9cfa78f13b12a13f21
         c52a143c5e0e96f7bf187a9278937a5d17534690cbc0e8e7d70f2d95ae104a01
-        shipping_mobile_opaque_fast diagnostic_mobile_generic_dielectric)
+        shipping_mobile_opaque_fast)
     horde_rt_add_pipeline_variant_fixture(horde_rt_provider_shipping_high_fixture 0 1
         7ebdb794794a854b6cb5c44c75dd9a9decd42f4999c44a9cfa78f13b12a13f21
         1be2b430ba190ae82250693ae079adf3f0712b361914b1355f386fb1f57fc5aa
-        shipping_high_opaque_fast diagnostic_high_generic_dielectric)
+        shipping_high_opaque_fast)
     horde_rt_add_pipeline_variant_fixture(horde_rt_provider_diagnostic_mobile_fixture 1 0
         d7b0722e572e63bd96e62bae85cc6a5b968ae71bf157526b513b50b56e515c3b
         d8f4c915955836f6693c5c5a073c23155944a8a3048dbfdcee6c3a0c4d8f57f7
-        diagnostic_mobile_opaque_fast shipping_mobile_generic_dielectric)
+        diagnostic_mobile_opaque_fast)
     horde_rt_add_pipeline_variant_fixture(horde_rt_provider_diagnostic_high_fixture 1 1
         d7b0722e572e63bd96e62bae85cc6a5b968ae71bf157526b513b50b56e515c3b
         2b61176f676227adfd13a880cd415478536e1403b46317ea3321dc463bebecd0
-        diagnostic_high_opaque_fast shipping_high_generic_dielectric)
+        diagnostic_high_opaque_fast)
 
     add_executable(horde_rt_github_release_updater_tests
         tests/GitHubReleaseUpdaterTests.cpp
@@ -316,7 +320,6 @@ if(BUILD_TESTING)
     add_test(NAME horde_rt_production_prop_asset_tests COMMAND horde_rt_production_prop_asset_tests)
 
     if(WIN32)
-        find_program(HORDE_RT_POWERSHELL_EXECUTABLE NAMES pwsh powershell REQUIRED)
         find_program(HORDE_RT_PWSH_EXECUTABLE NAMES pwsh)
         find_program(HORDE_RT_WINDOWS_POWERSHELL_EXECUTABLE NAMES powershell.exe powershell)
         add_test(NAME horde_rt_scene_abi_generator_tests
@@ -333,7 +336,13 @@ if(BUILD_TESTING)
                 ${CMAKE_CURRENT_SOURCE_DIR}/tests/RaygenVariantArtifactTests.ps1)
         add_test(NAME horde_rt_pipeline_policy_fence_tests
             COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
-                ${CMAKE_CURRENT_SOURCE_DIR}/tests/RtPipelinePolicyFenceTests.ps1)
+                ${CMAKE_CURRENT_SOURCE_DIR}/tests/RtPipelinePolicyFenceTests.ps1
+                -CmakeExecutable ${CMAKE_COMMAND})
+        add_test(NAME horde_rt_pipeline_policy_execution_tests
+            COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
+                ${CMAKE_CURRENT_SOURCE_DIR}/tests/RtPipelinePolicyExecutionTests.ps1
+                -CmakeExecutable ${CMAKE_COMMAND}
+                -GradleExecutable ${CMAKE_CURRENT_SOURCE_DIR}/android/gradlew.bat)
         add_test(NAME horde_rt_static_texture_array_tool_tests
             COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
                 ${CMAKE_CURRENT_SOURCE_DIR}/tests/StaticTextureArrayToolTests.ps1)

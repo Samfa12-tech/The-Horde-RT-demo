@@ -205,3 +205,12 @@ dependencies {
 tasks.named('preBuild').configure {
     dependsOn tasks.named('prepareRuntimeAssets')
 }
+
+// Hermetic policy evidence invokes this narrow task with explicit -P inputs.
+// It intentionally reports the CMake arguments without configuring native code.
+tasks.register('printHordeRtPolicyForTest') {
+    doLast {
+        println("debug=" + hordeRtNativePolicyArguments('Diagnostic').join('|'))
+        println("release=" + hordeRtNativePolicyArguments('Shipping').join('|'))
+    }
+}

@@ -4,9 +4,7 @@ param(
     [Parameter(Mandatory = $true)][string]$ProviderObject,
     [Parameter(Mandatory = $true)][string]$OpaqueSha256,
     [Parameter(Mandatory = $true)][string]$GenericSha256,
-    [Parameter(Mandatory = $true)][string]$RequiredKey,
-    [Parameter(Mandatory = $true)][string]$ForbiddenKey,
-    [Parameter(Mandatory = $true)][string]$ForbiddenGenericKey)
+    [Parameter(Mandatory = $true)][string]$RequiredKey)
 
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
@@ -38,20 +36,33 @@ function Get-ByteSequenceCount([byte[]]$bytes, [byte[]]$needle) {
     return $count
 }
 function Get-IncludeBytes([string]$key) {
-    $path = Join-Path $repoRoot ("src\vulkan\raytracing\variants\$key.inc")
+    $path = Join-Path $repoRoot ([string]::Join([IO.Path]::DirectorySeparatorChar, @('src','vulkan','raytracing','variants', "$key.inc")))
     $words = [regex]::Matches((Get-Content -LiteralPath $path -Raw), '0x([0-9a-fA-F]{8})u') | ForEach-Object { [Convert]::ToUInt32($_.Groups[1].Value, 16) }
     $bytes = New-Object byte[] ($words.Count * 4)
     for ($index = 0; $index -lt $words.Count; ++$index) { [Array]::Copy([BitConverter]::GetBytes([uint32]$words[$index]), 0, $bytes, $index * 4, 4) }
     return $bytes
 }
+function Test-ByteEqual([byte[]]$left, [byte[]]$right) {
+    if ($left.Length -ne $right.Length) { return $false }
+    for ($index = 0; $index -lt $left.Length; ++$index) { if ($left[$index] -ne $right[$index]) { return $false } }
+    return $true
+}
 function Assert-ProviderContainment([byte[]]$providerBytes, [byte[]]$selectedOpaque, [byte[]]$selectedGeneric,
-    [byte[]]$forbiddenGeneric, [string]$requiredKey, [string]$forbiddenKey) {
+    [string]$requiredKey) {
+    $allKeys = @('shipping_mobile_opaque_fast','shipping_mobile_generic_dielectric','shipping_high_opaque_fast','shipping_high_generic_dielectric','diagnostic_mobile_opaque_fast','diagnostic_mobile_generic_dielectric','diagnostic_high_opaque_fast','diagnostic_high_generic_dielectric')
+    $selectedKeys = @($requiredKey, ($requiredKey -replace 'opaque_fast$', 'generic_dielectric'))
     $opaqueOccurrences = Get-ByteSequenceCount $providerBytes $selectedOpaque
     $genericOccurrences = Get-ByteSequenceCount $providerBytes $selectedGeneric
     Assert-True ($opaqueOccurrences -eq 1 -and $genericOccurrences -eq 1) 'Provider object did not retain exactly one copy of each selected SPIR-V stream.'
-    Assert-True (Test-ContainsAscii $providerBytes $requiredKey) 'Selected semantic metadata is missing from provider object.'
-    Assert-True (-not (Test-ContainsAscii $providerBytes $forbiddenKey)) 'Non-selected semantic metadata leaked into provider object.'
-    Assert-True (-not (Test-ContainsBytes $providerBytes $forbiddenGeneric)) 'Non-selected distinct generic word stream leaked into provider object.'
+    foreach ($key in $selectedKeys) { Assert-True (Test-ContainsAscii $providerBytes $key) "Selected semantic metadata is missing: $key" }
+    $forbiddenStreams = @()
+    foreach ($key in $allKeys | Where-Object { $_ -notin $selectedKeys }) {
+        Assert-True (-not (Test-ContainsAscii $providerBytes $key)) "Non-selected semantic metadata leaked: $key"
+        $stream = Get-IncludeBytes $key
+        if (-not (Test-ByteEqual $stream $selectedOpaque) -and -not (Test-ByteEqual $stream $selectedGeneric) -and -not (@($forbiddenStreams | Where-Object { Test-ByteEqual $_ $stream }).Count -gt 0)) { $forbiddenStreams += ,$stream }
+    }
+    foreach ($stream in $forbiddenStreams) { Assert-True (-not (Test-ContainsBytes $providerBytes $stream)) 'Non-selected distinct word stream leaked into provider object.' }
+    return $forbiddenStreams
 }
 
 $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) ('horde-rt-provider-fixture-' + [guid]::NewGuid().ToString('N'))
@@ -64,14 +75,26 @@ try {
     $providerBytes = [IO.File]::ReadAllBytes($ProviderObject)
     $selectedOpaque = Get-IncludeBytes -key $RequiredKey
     $selectedGeneric = Get-IncludeBytes -key ($RequiredKey -replace 'opaque_fast$', 'generic_dielectric')
-    $forbiddenGeneric = Get-IncludeBytes -key $ForbiddenGenericKey
-    Assert-ProviderContainment $providerBytes $selectedOpaque $selectedGeneric $forbiddenGeneric $RequiredKey $ForbiddenKey
-    # Scanner control: contaminate an inspected-object copy with a real forbidden stream.
-    $contaminated = New-Object byte[] ($providerBytes.Length + $forbiddenGeneric.Length)
+    $forbiddenStreams = @(Assert-ProviderContainment $providerBytes $selectedOpaque $selectedGeneric $RequiredKey)
+    Assert-True ($forbiddenStreams.Count -gt 0) 'Containment fixture must have distinguishable forbidden streams.'
+    # Scanner controls use the exact same predicate.  Metadata and word-stream
+    # violations are independent so either detection branch has adversarial proof.
+    $forbiddenMetadata = @('shipping_mobile_opaque_fast','shipping_mobile_generic_dielectric','shipping_high_opaque_fast','shipping_high_generic_dielectric','diagnostic_mobile_opaque_fast','diagnostic_mobile_generic_dielectric','diagnostic_high_opaque_fast','diagnostic_high_generic_dielectric' | Where-Object { $_ -notin @($RequiredKey, ($RequiredKey -replace 'opaque_fast$', 'generic_dielectric')) })
+    $metadataBytes = [Text.Encoding]::ASCII.GetBytes(($forbiddenMetadata -join '|'))
+    $metadataContaminated = New-Object byte[] ($providerBytes.Length + $metadataBytes.Length)
+    [Array]::Copy($providerBytes, $metadataContaminated, $providerBytes.Length)
+    [Array]::Copy($metadataBytes, 0, $metadataContaminated, $providerBytes.Length, $metadataBytes.Length)
+    $rejectedMetadataContamination = $false
+    try { Assert-ProviderContainment $metadataContaminated $selectedOpaque $selectedGeneric $RequiredKey | Out-Null } catch { $rejectedMetadataContamination = $true }
+    Assert-True $rejectedMetadataContamination 'Forbidden-semantic-metadata scanner control did not reject contamination.'
+    # Scanner control: contaminate an inspected-object copy with every distinguishable forbidden stream.
+    $forbiddenBytes = @($forbiddenStreams | ForEach-Object { $_ }).Count
+    $contaminated = New-Object byte[] ($providerBytes.Length + $forbiddenBytes)
     [Array]::Copy($providerBytes, $contaminated, $providerBytes.Length)
-    [Array]::Copy($forbiddenGeneric, 0, $contaminated, $providerBytes.Length, $forbiddenGeneric.Length)
+    $cursor = $providerBytes.Length
+    foreach ($stream in $forbiddenStreams) { [Array]::Copy($stream, 0, $contaminated, $cursor, $stream.Length); $cursor += $stream.Length }
     $rejectedContamination = $false
-    try { Assert-ProviderContainment $contaminated $selectedOpaque $selectedGeneric $forbiddenGeneric $RequiredKey $ForbiddenKey } catch { $rejectedContamination = $true }
+    try { Assert-ProviderContainment $contaminated $selectedOpaque $selectedGeneric $RequiredKey | Out-Null } catch { $rejectedContamination = $true }
     Assert-True $rejectedContamination 'Forbidden-stream scanner control did not reject contamination.'
 }
 finally { if (Test-Path -LiteralPath $temporaryRoot) { Remove-Item -LiteralPath $temporaryRoot -Recurse -Force } }
