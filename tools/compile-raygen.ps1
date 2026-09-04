@@ -170,7 +170,11 @@ function Get-RaygenToolVersion
 {
     param([string]$Tool)
 
-    $versionLines = @(& $Tool --version 2>&1 | ForEach-Object { ([string]$_).Trim() } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+    # SPIRV-Tools writes its version to stderr on Windows. Run it through cmd
+    # so PowerShell 5.1 receives a normal combined stdout stream rather than a
+    # NativeCommandError under this script's fail-fast preference.
+    $commandLine = '"' + $Tool + '" --version 2>&1'
+    $versionLines = @(& $env:ComSpec /d /c $commandLine | ForEach-Object { ([string]$_).Trim() } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
     if ($LASTEXITCODE -ne 0 -or $versionLines.Count -eq 0)
     {
         throw "Unable to determine tool version: $Tool"

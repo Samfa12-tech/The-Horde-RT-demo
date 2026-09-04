@@ -8,7 +8,7 @@
   "generator": {
     "path": "tools/compile-raygen.ps1",
     "interface": "freeze-v1",
-    "sha256": "48dd4d192596bfbe3e6e63357c47e418f53e42f8490808f80e0c5b425822a390"
+    "sha256": "976deeecee7f74ad8a5077b140f0814eff1a1f081096d4fd481443a36593f45e"
   },
   "toolchain": {
     "glslangValidator": {
