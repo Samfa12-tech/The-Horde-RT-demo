@@ -255,7 +255,7 @@ bool ValidateRtPipelineBundlePreflight(
     for (std::size_t strategyIndex = 0u; strategyIndex < strategies.size(); ++strategyIndex) {
         const RtPipelineVariantKey expected{request.instrumentation, request.quality,
                                             strategies[strategyIndex]};
-        const std::string_view expectedKey = FormatRtPipelineVariantKey(expected);
+        const std::string expectedKey = FormatRtPipelineVariantKey(expected);
         std::size_t matches = 0u;
         for (const auto& candidate : candidateRecords) {
             if (candidate.key == expected) {

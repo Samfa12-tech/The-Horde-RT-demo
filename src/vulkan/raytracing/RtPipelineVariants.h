@@ -1,7 +1,7 @@
 #pragma once
 
 #include <optional>
-#include <string_view>
+#include <string>
 
 namespace horde::vulkan::raytracing {
 
@@ -24,10 +24,10 @@ struct RtPipelineBundleRequest {
     constexpr bool operator==(const RtPipelineBundleRequest&) const = default;
 };
 
-[[nodiscard]] std::optional<std::string_view> TryFormatRtPipelineVariantKey(
-    RtPipelineVariantKey key) noexcept;
-[[nodiscard]] std::string_view FormatRtPipelineVariantKey(RtPipelineVariantKey key);
+[[nodiscard]] std::optional<std::string> TryFormatRtPipelineVariantKey(
+    RtPipelineVariantKey key);
+[[nodiscard]] std::string FormatRtPipelineVariantKey(RtPipelineVariantKey key);
 [[nodiscard]] std::optional<RtPipelineBundleRequest> TryMakeRtPipelineBundleRequest(
-    RtInstrumentation instrumentation, DielectricQuality quality) noexcept;
+    RtInstrumentation instrumentation, DielectricQuality quality);
 
 } // namespace horde::vulkan::raytracing

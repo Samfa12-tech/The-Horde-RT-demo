@@ -495,6 +495,27 @@ if(BUILD_TESTING)
         horde_rt_attach_raygen_artifacts(horde_rt_pipeline_bundle_lifetime_tests)
         add_test(NAME horde_rt_pipeline_bundle_lifetime_tests COMMAND horde_rt_pipeline_bundle_lifetime_tests)
 
+        if(TARGET horde_rt_diagnostic_window)
+            add_test(NAME horde_rt_final_windows_bundle_containment
+                COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
+                    ${CMAKE_CURRENT_SOURCE_DIR}/tools/InspectRtPipelineBundleContainment.ps1
+                    -TargetPath $<TARGET_FILE:horde_rt_diagnostic_window>
+                    -Instrumentation $<IF:$<CONFIG:Debug>,Diagnostic,Shipping>
+                    -Quality High)
+            add_test(NAME horde_rt_final_windows_bundle_containment_controls
+                COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
+                    ${CMAKE_CURRENT_SOURCE_DIR}/tests/RtPipelineBundleContainmentTests.ps1
+                    -Scanner ${CMAKE_CURRENT_SOURCE_DIR}/tools/InspectRtPipelineBundleContainment.ps1
+                    -TargetPath $<TARGET_FILE:horde_rt_diagnostic_window>
+                    -Instrumentation $<IF:$<CONFIG:Debug>,Diagnostic,Shipping>
+                    -Quality High
+                    -PowerShellExecutable ${HORDE_RT_POWERSHELL_EXECUTABLE})
+            set_tests_properties(
+                horde_rt_final_windows_bundle_containment
+                horde_rt_final_windows_bundle_containment_controls
+                PROPERTIES TIMEOUT 300)
+        endif()
+
         add_executable(horde_rt_skinned_character_smoke tests/SkinnedCharacterModelSmoke.cpp)
         target_include_directories(horde_rt_skinned_character_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
         target_link_libraries(horde_rt_skinned_character_smoke PRIVATE horde_rt_probe_core)
