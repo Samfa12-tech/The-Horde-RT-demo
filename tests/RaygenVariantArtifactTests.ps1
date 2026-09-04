@@ -38,7 +38,7 @@ function Assert-FrozenCatalogShape {
         'Catalog root has a missing, reordered, or unknown field.'
     Assert-True ($Catalog.schema -eq 1 -and $Catalog.status -eq 'frozen' -and @($Catalog.variants).Count -eq 8) `
         'Catalog must remain a frozen schema-1 eight-key record.'
-    $rowFields = 'artifactPath,atomicInstructions,boundedGenericFunctionsRetained,branchOperations,bytes,compiler,dependencies,dependencySha256,driverSafeFullyInlined,functionCalls,functions,hasDiagnosticsBinding,includeSha256,instrumentation,instructions,key,loops,material,quality,rayQueryInitializations,selectionMerges,shippingAllowed,spirvSha256,strategy,words'
+    $rowFields = 'artifactPath,atomicInstructions,boundedGenericFunctionsRetained,branchOperations,bytes,compiler,dependencies,dependencySha256,driverSafeFullyInlined,functionCalls,functions,hasDiagnosticsBinding,includeSha256,instructions,instrumentation,key,loops,material,quality,rayQueryInitializations,selectionMerges,shippingAllowed,spirvSha256,strategy,words'
     $compilerFields = 'glslangCompileArguments,spirvDisArguments,spirvOptArguments,spirvValArguments'
     foreach ($row in @($Catalog.variants)) {
         Assert-True ((@($row.PSObject.Properties.Name | Sort-Object) -join ',') -eq $rowFields) `
@@ -49,6 +49,24 @@ function Assert-FrozenCatalogShape {
             -not $row.artifactPath.Contains('..') -and -not $row.artifactPath.Contains('\')) `
             "Catalog artifact path escaped the dedicated artifact directory: $($row.key)"
     }
+}
+
+function New-CatalogFixture {
+    param([string]$FixtureRoot, [string]$Name, [string]$ExpectedDiagnostic, [scriptblock]$Mutate)
+
+    $fixture = Join-Path $FixtureRoot $Name
+    $fixtureVariants = Join-Path $fixture 'variants'
+    New-Item -ItemType Directory -Force -Path $fixtureVariants | Out-Null
+    Copy-Item -LiteralPath $catalogPath -Destination (Join-Path $fixture 'raygen-variant-catalog.json')
+    Copy-Item -LiteralPath $budgetPath -Destination (Join-Path $fixture 'raygen-variant-budgets.json')
+    Get-ChildItem -LiteralPath $artifactDirectory -Filter '*.inc' -File | Copy-Item -Destination $fixtureVariants
+    [IO.File]::WriteAllText((Join-Path $fixture 'expected-diagnostic.txt'), $ExpectedDiagnostic, [Text.UTF8Encoding]::new($false))
+    & $Mutate $fixture $fixtureVariants
+}
+
+function Write-FixtureJson {
+    param([string]$Path, [object]$Value)
+    [IO.File]::WriteAllText($Path, (($Value | ConvertTo-Json -Depth 24).Replace("`r`n", "`n") + "`n"), [Text.UTF8Encoding]::new($false))
 }
 
 function Get-CanonicalTextHash {
@@ -317,10 +335,76 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     Assert-True ((Get-RawFileHash $includeFixture) -ne (Get-RawFileHash (Join-Path $artifactDirectory "$($catalog.variants[0].key).inc"))) `
         'A one-byte SPIR-V-word mutation must not retain the frozen include identity.'
 
+    $fixtureRoot = Join-Path $temporaryRoot 'checker-fixtures'
+    New-CatalogFixture -FixtureRoot $fixtureRoot -Name 'pass-reviewed-equal-opaque-hashes' -ExpectedDiagnostic '' -Mutate { param($fixture, $variants) }
+    New-CatalogFixture -FixtureRoot $fixtureRoot -Name 'reject-reordered-keys' -ExpectedDiagnostic 'stale or malformed' -Mutate {
+        param($fixture, $variants)
+        $value = Get-Content (Join-Path $fixture 'raygen-variant-catalog.json') -Raw | ConvertFrom-Json
+        [array]::Reverse($value.variants); Write-FixtureJson (Join-Path $fixture 'raygen-variant-catalog.json') $value
+    }
+    New-CatalogFixture -FixtureRoot $fixtureRoot -Name 'reject-shared-artifact-path' -ExpectedDiagnostic 'stale or malformed' -Mutate {
+        param($fixture, $variants)
+        $value = Get-Content (Join-Path $fixture 'raygen-variant-catalog.json') -Raw | ConvertFrom-Json
+        $value.variants[1].artifactPath = $value.variants[0].artifactPath; Write-FixtureJson (Join-Path $fixture 'raygen-variant-catalog.json') $value
+    }
+    New-CatalogFixture -FixtureRoot $fixtureRoot -Name 'reject-stale-generator-hash' -ExpectedDiagnostic 'stale or malformed' -Mutate {
+        param($fixture, $variants)
+        $value = Get-Content (Join-Path $fixture 'raygen-variant-catalog.json') -Raw | ConvertFrom-Json
+        $value.generator.sha256 = '0' * 64
+        Write-FixtureJson (Join-Path $fixture 'raygen-variant-catalog.json') $value
+    }
+    New-CatalogFixture -FixtureRoot $fixtureRoot -Name 'reject-stale-source-dependency-toolchain' -ExpectedDiagnostic 'stale or malformed' -Mutate {
+        param($fixture, $variants)
+        $value = Get-Content (Join-Path $fixture 'raygen-variant-catalog.json') -Raw | ConvertFrom-Json
+        $value.authorities.source.sha256 = '1' * 64; $value.variants[0].dependencies[0].sha256 = '2' * 64; $value.toolchain.glslangValidator.version = 'stale'
+        Write-FixtureJson (Join-Path $fixture 'raygen-variant-catalog.json') $value
+    }
+    New-CatalogFixture -FixtureRoot $fixtureRoot -Name 'reject-missing-stats' -ExpectedDiagnostic 'stale or malformed' -Mutate {
+        param($fixture, $variants)
+        $value = Get-Content (Join-Path $fixture 'raygen-variant-catalog.json') -Raw | ConvertFrom-Json
+        $value.variants[0].PSObject.Properties.Remove('instructions')
+        Write-FixtureJson (Join-Path $fixture 'raygen-variant-catalog.json') $value
+    }
+    New-CatalogFixture -FixtureRoot $fixtureRoot -Name 'reject-diagnostic-counter-drift' -ExpectedDiagnostic 'stale or malformed' -Mutate {
+        param($fixture, $variants)
+        $value = Get-Content (Join-Path $fixture 'raygen-variant-catalog.json') -Raw | ConvertFrom-Json
+        $value.variants[0].hasDiagnosticsBinding = $false; Write-FixtureJson (Join-Path $fixture 'raygen-variant-catalog.json') $value
+    }
+    New-CatalogFixture -FixtureRoot $fixtureRoot -Name 'reject-shipping-atomic-drift' -ExpectedDiagnostic 'stale or malformed' -Mutate {
+        param($fixture, $variants)
+        $value = Get-Content (Join-Path $fixture 'raygen-variant-catalog.json') -Raw | ConvertFrom-Json
+        $shipping = @($value.variants | Where-Object instrumentation -eq 'Shipping')[0]
+        $shipping.atomicInstructions = 1
+        Write-FixtureJson (Join-Path $fixture 'raygen-variant-catalog.json') $value
+    }
+    New-CatalogFixture -FixtureRoot $fixtureRoot -Name 'reject-strategy-drift' -ExpectedDiagnostic 'stale or malformed' -Mutate {
+        param($fixture, $variants)
+        $value = Get-Content (Join-Path $fixture 'raygen-variant-catalog.json') -Raw | ConvertFrom-Json
+        $value.variants[0].strategy = 'LegacyInlined'; Write-FixtureJson (Join-Path $fixture 'raygen-variant-catalog.json') $value
+    }
+    New-CatalogFixture -FixtureRoot $fixtureRoot -Name 'reject-over-budget' -ExpectedDiagnostic 'exceeds frozen budget' -Mutate {
+        param($fixture, $variants)
+        $budget = Get-Content (Join-Path $fixture 'raygen-variant-budgets.json') -Raw | ConvertFrom-Json
+        $budget.budgets[0].max.bytes = 1
+        Write-FixtureJson (Join-Path $fixture 'raygen-variant-budgets.json') $budget
+    }
+    New-CatalogFixture -FixtureRoot $fixtureRoot -Name 'reject-widened-metric-set' -ExpectedDiagnostic 'unsupported schema or metric set' -Mutate {
+        param($fixture, $variants)
+        $budget = Get-Content (Join-Path $fixture 'raygen-variant-budgets.json') -Raw | ConvertFrom-Json
+        $budget.metrics += 'bindingDecorations'; Write-FixtureJson (Join-Path $fixture 'raygen-variant-budgets.json') $budget
+    }
+    New-CatalogFixture -FixtureRoot $fixtureRoot -Name 'reject-mutated-include-words' -ExpectedDiagnostic 'include is stale' -Mutate {
+        param($fixture, $variants)
+        $path = Get-ChildItem -LiteralPath $variants -Filter '*.inc' -File | Select-Object -First 1 -ExpandProperty FullName
+        $text = Get-Content $path -Raw; $word = [regex]::Match($text, '0x([0-9a-fA-F])')
+        $replacement = if ($word.Groups[1].Value -eq '0') { '1' } else { '0' }
+        [IO.File]::WriteAllText($path, $text.Remove($word.Index + 2, 1).Insert($word.Index + 2, $replacement), [Text.UTF8Encoding]::new($false))
+    }
+
     # CheckCatalog is the sole matrix compilation in this test. It replays all
     # eight compile/preprocess/validate/disassemble paths into temporary storage
     # and compares catalog, include words, raw SPIR-V, budgets, and toolchain.
-    & $compiler -CheckCatalog -ArtifactDirectory $artifactDirectory -CatalogPath $catalogPath -BudgetPath $budgetPath
+    & $compiler -CheckCatalog -ArtifactDirectory $artifactDirectory -CatalogPath $catalogPath -BudgetPath $budgetPath -CheckCatalogFixtureRoot $fixtureRoot
     if ($LASTEXITCODE -ne 0) { throw "Frozen catalog check failed with exit code $LASTEXITCODE." }
 
     $compatibilityGenericOutput = Join-Path $temporaryRoot 'compatibility-generic'

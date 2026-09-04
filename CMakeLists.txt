@@ -135,6 +135,7 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AN
         HORDE_RT_RAYGEN_SHA256="${HORDE_RT_RAYGEN_SHA256}"
         $<$<CONFIG:Debug>:HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}">
     )
+    horde_rt_attach_raygen_artifacts(horde_rt_diagnostic_window)
 
     set_target_properties(horde_rt_diagnostic_window PROPERTIES
         OUTPUT_NAME "HordeLanternRT"

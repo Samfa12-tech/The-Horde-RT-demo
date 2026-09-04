@@ -10,6 +10,7 @@ param(
     [string]$ManifestPath,
     [switch]$Freeze,
     [switch]$CheckCatalog,
+    [string]$CheckCatalogFixtureRoot,
     [string]$ArtifactDirectory,
     [string]$CatalogPath,
     [string]$BudgetPath
@@ -751,6 +752,51 @@ function Invoke-RaygenVariantCompilation
         $VariantDefinition.name, $bytes.Length, $functionCount, $functionCallCount, $rayQueryInitializationCount, $dependencyHash)
 }
 
+function Test-RaygenFrozenCatalogBundle
+{
+    param(
+        [string]$ArtifactRoot,
+        [string]$CatalogFile,
+        [string]$BudgetFile,
+        [string]$ExpectedCatalogPath,
+        [object]$ExpectedCatalog,
+        [string]$CompilationRoot
+    )
+
+    if (-not (Test-Path -LiteralPath $ArtifactRoot -PathType Container) -or -not (Test-Path -LiteralPath $CatalogFile -PathType Leaf) -or -not (Test-Path -LiteralPath $BudgetFile -PathType Leaf))
+    { throw 'Frozen raygen fixture is missing an artifact directory, catalog, or budget file.' }
+    $fixtureBudgets = Get-Content -LiteralPath $BudgetFile -Raw | ConvertFrom-Json
+    Assert-RaygenFrozenBudgets -Budgets $fixtureBudgets -Variants @($ExpectedCatalog.variants)
+    $catalogBytes = [IO.File]::ReadAllBytes($CatalogFile)
+    if ($catalogBytes.Length -ge 3 -and $catalogBytes[0] -eq 0xef -and $catalogBytes[1] -eq 0xbb -and $catalogBytes[2] -eq 0xbf)
+    { throw 'Frozen raygen variant catalog must not contain a UTF-8 BOM.' }
+    $catalogText = Get-RaygenCanonicalText -Path $CatalogFile
+    if ($catalogText -match "`r") { throw 'Frozen raygen variant catalog must use LF line endings.' }
+    $actualCatalog = $catalogText | ConvertFrom-Json
+    if (-not (Test-RaygenExactString -Left (@($actualCatalog.PSObject.Properties.Name | Sort-Object) -join ',') -Right 'authorities,generator,schema,status,target,toolchain,variants') -or
+        $actualCatalog.schema -ne 1 -or -not (Test-RaygenExactString -Left $actualCatalog.status -Right 'frozen'))
+    { throw 'Frozen raygen variant catalog has an invalid schema.' }
+    $expectedCatalogComparable = (Get-RaygenCanonicalText -Path $ExpectedCatalogPath | ConvertFrom-Json)
+    if (-not (Test-RaygenCatalogValueEqual -Left $actualCatalog -Right $expectedCatalogComparable))
+    { throw 'Frozen raygen variant catalog is stale or malformed.' }
+    foreach ($expectedVariant in $ExpectedCatalog.variants)
+    {
+        $includePath = Join-Path $ArtifactRoot "$($expectedVariant.key).inc"
+        $include = Read-RaygenInclude -Path $includePath -ExpectedKey $expectedVariant.key -ExpectedDependencySha256 $expectedVariant.dependencySha256
+        $compiled = Get-RaygenSpirvWords -Path (Join-Path (Join-Path $CompilationRoot $expectedVariant.key) 'minimal.rgen.spv')
+        if ($include.Words.Count -ne $compiled.Words.Count -or (Get-RaygenDependencyHash -Path $includePath) -ne $expectedVariant.includeSha256)
+        { throw "Frozen raygen variant include is stale: $($expectedVariant.key)" }
+        for ($index = 0; $index -lt $compiled.Words.Count; ++$index)
+        {
+            if ($include.Words[$index] -ne $compiled.Words[$index]) { throw "Frozen raygen variant include words are stale: $($expectedVariant.key)" }
+        }
+        $rawHash = Get-RaygenFileSha256 -Path (Join-Path (Join-Path $CompilationRoot $expectedVariant.key) 'minimal.rgen.spv')
+        $includeRawHash = ([BitConverter]::ToString(([Security.Cryptography.SHA256]::Create().ComputeHash($include.Bytes)))).Replace('-', '').ToLowerInvariant()
+        if ($rawHash -ne $includeRawHash -or $rawHash -ne $expectedVariant.spirvSha256)
+        { throw "Frozen raygen variant raw SPIR-V hash mismatch: $($expectedVariant.key)" }
+    }
+}
+
 function Invoke-RaygenFrozenCatalogMode
 {
     param([switch]$Publish)
@@ -802,39 +848,31 @@ function Invoke-RaygenFrozenCatalogMode
             return
         }
 
-        if (-not (Test-Path -LiteralPath $artifactRoot -PathType Container) -or -not (Test-Path -LiteralPath $catalogFile -PathType Leaf))
+        Test-RaygenFrozenCatalogBundle -ArtifactRoot $artifactRoot -CatalogFile $catalogFile -BudgetFile $budgetFile `
+            -ExpectedCatalogPath $expectedCatalogPath -ExpectedCatalog $expectedCatalogObject -CompilationRoot $temporaryRoot
+        if (-not [string]::IsNullOrWhiteSpace($CheckCatalogFixtureRoot))
         {
-            throw 'Frozen raygen variant artifacts or catalog are missing.'
-        }
-        $catalogBytes = [IO.File]::ReadAllBytes($catalogFile)
-        if ($catalogBytes.Length -ge 3 -and $catalogBytes[0] -eq 0xef -and $catalogBytes[1] -eq 0xbb -and $catalogBytes[2] -eq 0xbf)
-        { throw 'Frozen raygen variant catalog must not contain a UTF-8 BOM.' }
-        $catalogText = Get-RaygenCanonicalText -Path $catalogFile
-        if ($catalogText -match "`r") { throw 'Frozen raygen variant catalog must use LF line endings.' }
-        $actualCatalog = $catalogText | ConvertFrom-Json
-        if (-not (Test-RaygenExactString -Left (@($actualCatalog.PSObject.Properties.Name | Sort-Object) -join ',') -Right 'authorities,generator,schema,status,target,toolchain,variants') -or
-            $actualCatalog.schema -ne 1 -or -not (Test-RaygenExactString -Left $actualCatalog.status -Right 'frozen'))
-        { throw 'Frozen raygen variant catalog has an invalid schema.' }
-        $expectedCatalogComparable = (Get-RaygenCanonicalText -Path $expectedCatalogPath | ConvertFrom-Json)
-        if (-not (Test-RaygenCatalogValueEqual -Left $actualCatalog -Right $expectedCatalogComparable))
-        { throw 'Frozen raygen variant catalog is stale or malformed.' }
-        foreach ($expectedVariant in $expectedCatalogObject.variants)
-        {
-            $includePath = Join-Path $repoRoot $expectedVariant.artifactPath.Replace('/', '\')
-            if (-not $includePath.StartsWith($artifactRoot.TrimEnd('\') + '\', [StringComparison]::OrdinalIgnoreCase))
-            { throw "Catalog artifact path escapes the variant directory: $($expectedVariant.artifactPath)" }
-            $include = Read-RaygenInclude -Path $includePath -ExpectedKey $expectedVariant.key -ExpectedDependencySha256 $expectedVariant.dependencySha256
-            $compiled = Get-RaygenSpirvWords -Path (Join-Path (Join-Path $temporaryRoot $expectedVariant.key) 'minimal.rgen.spv')
-            if ($include.Words.Count -ne $compiled.Words.Count -or (Get-RaygenDependencyHash -Path $includePath) -ne $expectedVariant.includeSha256)
-            { throw "Frozen raygen variant include is stale: $($expectedVariant.key)" }
-            for ($index = 0; $index -lt $compiled.Words.Count; ++$index)
+            $fixtureRoot = [IO.Path]::GetFullPath($CheckCatalogFixtureRoot)
+            if (-not (Test-Path -LiteralPath $fixtureRoot -PathType Container)) { throw 'Catalog fixture root does not exist.' }
+            foreach ($fixture in @(Get-ChildItem -LiteralPath $fixtureRoot -Directory | Sort-Object Name))
             {
-                if ($include.Words[$index] -ne $compiled.Words[$index]) { throw "Frozen raygen variant include words are stale: $($expectedVariant.key)" }
+                $mustReject = $fixture.Name.StartsWith('reject-', [StringComparison]::Ordinal)
+                $rejected = $false
+                $diagnostic = ''
+                try
+                {
+                    Test-RaygenFrozenCatalogBundle -ArtifactRoot (Join-Path $fixture.FullName 'variants') `
+                        -CatalogFile (Join-Path $fixture.FullName 'raygen-variant-catalog.json') `
+                        -BudgetFile (Join-Path $fixture.FullName 'raygen-variant-budgets.json') `
+                        -ExpectedCatalogPath $expectedCatalogPath -ExpectedCatalog $expectedCatalogObject -CompilationRoot $temporaryRoot
+                }
+                catch { $rejected = $true; $diagnostic = $_.Exception.Message }
+                $expectedDiagnosticPath = Join-Path $fixture.FullName 'expected-diagnostic.txt'
+                $expectedDiagnostic = if (Test-Path -LiteralPath $expectedDiagnosticPath -PathType Leaf) { [IO.File]::ReadAllText($expectedDiagnosticPath) } else { '' }
+                if ($mustReject -and ([string]::IsNullOrWhiteSpace($expectedDiagnostic) -or -not $diagnostic.Contains($expectedDiagnostic)))
+                { throw "Catalog fixture rejected for an unexpected reason: $($fixture.Name)" }
+                if ($mustReject -ne $rejected) { throw "Catalog fixture expectation failed: $($fixture.Name)" }
             }
-            $rawHash = Get-RaygenFileSha256 -Path (Join-Path (Join-Path $temporaryRoot $expectedVariant.key) 'minimal.rgen.spv')
-            $includeRawHash = ([BitConverter]::ToString(([Security.Cryptography.SHA256]::Create().ComputeHash($include.Bytes)))).Replace('-', '').ToLowerInvariant()
-            if ($rawHash -ne $includeRawHash -or $rawHash -ne $expectedVariant.spirvSha256)
-            { throw "Frozen raygen variant raw SPIR-V hash mismatch: $($expectedVariant.key)" }
         }
         if ((& git -C $repoRoot status --porcelain) -join "`n" -ne $statusBefore)
         { throw 'Read-only raygen catalog check modified the worktree.' }
@@ -849,9 +887,11 @@ function Invoke-RaygenFrozenCatalogMode
 if ($Freeze -or $CheckCatalog)
 {
     if ($Freeze -and $CheckCatalog) { throw '-Freeze and -CheckCatalog are mutually exclusive.' }
+    if ($Freeze -and -not [string]::IsNullOrWhiteSpace($CheckCatalogFixtureRoot)) { throw 'Catalog fixtures are read-only check-only.' }
     Invoke-RaygenFrozenCatalogMode -Publish:$Freeze
     return
 }
+if (-not [string]::IsNullOrWhiteSpace($CheckCatalogFixtureRoot)) { throw 'Catalog fixtures require -CheckCatalog.' }
 
 $variantMode = $Matrix -or -not [string]::IsNullOrWhiteSpace($Variant)
 if ($variantMode)

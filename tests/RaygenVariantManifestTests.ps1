@@ -124,7 +124,7 @@ try {
     Assert-True (@($budgets.budgets).Count -eq 8) `
         'Task 3d requires exactly one frozen budget record for each approved variant key.'
     Assert-True ((@($budgets.metrics) -join ',') -eq
-        'bytes,instructions,branchOperations,loops,selectionMerges,functions,functionCalls,rayQueryInitializations,atomicInstructions,bindingDecorations') `
+        'bytes,words,instructions,branchOperations,loops,selectionMerges,functions,functionCalls,rayQueryInitializations,atomicInstructions') `
         'Frozen variant budgets must retain the reviewed metric schema and order.'
     New-Item -ItemType Directory -Force -Path $temporaryRoot | Out-Null
     Invoke-InvalidVariantConfigCompile -MacroName 'HORDE_RT_VARIANT_INSTRUMENTATION' -Value '2'
