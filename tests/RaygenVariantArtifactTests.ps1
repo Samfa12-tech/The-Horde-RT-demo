@@ -20,6 +20,14 @@ function Assert-True {
     if (-not $Condition) { throw $Message }
 }
 
+function Assert-Throws {
+    param([scriptblock]$Action, [string]$Message)
+
+    $threw = $false
+    try { & $Action } catch { $threw = $true }
+    Assert-True $threw $Message
+}
+
 function Get-CanonicalTextHash {
     param([string]$Path)
 
@@ -114,6 +122,8 @@ function Assert-MatrixRouteBudget {
         [string]$PreprocessedSource,
         [string]$FunctionName,
         [string]$InterfaceConstant,
+        [string]$GuardVariable,
+        [switch]$RequireStaticCeiling,
         [string]$VolumeConstant = ''
     )
 
@@ -122,9 +132,13 @@ function Assert-MatrixRouteBudget {
     Assert-True ($body -match ("\bconst\s+int\s+interfaceBudget\s*=\s*{0}\s*;" -f [regex]::Escape($InterfaceConstant))) `
         "$FunctionName did not receive $InterfaceConstant as its matrix interface budget."
     $hasStaticCeiling = $body -match ("\bfor\s*\([^;]*;\s*\w+\s*<=\s*{0}\s*;" -f [regex]::Escape($InterfaceConstant))
-    $hasCounterGuard = $body -match '\binterfaceCount\s*>=\s*interfaceBudget\b'
-    Assert-True ($hasStaticCeiling -or $hasCounterGuard) `
-        "$FunctionName did not retain its bounded interface traversal through $InterfaceConstant."
+    $hasCounterGuard = $body -match ("\b{0}\s*>=\s*interfaceBudget\b" -f [regex]::Escape($GuardVariable))
+    if ($RequireStaticCeiling) {
+        Assert-True $hasStaticCeiling `
+            "$FunctionName did not retain its required static interface ceiling through $InterfaceConstant."
+    }
+    Assert-True $hasCounterGuard `
+        "$FunctionName did not retain its $GuardVariable budget guard."
     if (-not [string]::IsNullOrWhiteSpace($VolumeConstant)) {
         Assert-True ($body -match ("\bconst\s+int\s+volumeBudget\s*=\s*{0}\s*;" -f [regex]::Escape($VolumeConstant))) `
             "$FunctionName did not receive $VolumeConstant as its matrix volume budget."
@@ -214,6 +228,19 @@ try {
     Assert-True ((Get-RawFileHash $lfFixture) -ne (Get-RawFileHash $crlfFixture)) `
         'The LF/CRLF fixture must prove canonical text hashing is not raw-byte hashing.'
 
+    $staleCeilingFixture = @'
+vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
+{
+    const int interfaceBudget = kRtVariantDielectricInterfaceBudget;
+    if (interfaceIndex >= interfaceBudget) return vec3(0.0);
+    return vec3(1.0);
+}
+'@
+    Assert-Throws {
+        Assert-MatrixRouteBudget -PreprocessedSource $staleCeilingFixture -FunctionName 'shadeBoundedDielectric' `
+            -InterfaceConstant 'kRtVariantDielectricInterfaceBudget' -GuardVariable 'interfaceIndex' -RequireStaticCeiling
+    } 'A dielectric route with only a stale/missing static ceiling must fail the route contract.'
+
     $matrixOutput = Join-Path $temporaryRoot 'matrix'
     & $compiler -Matrix -OutputDirectory $matrixOutput
     if ($LASTEXITCODE -ne 0) { throw "Matrix compiler failed with exit code $LASTEXITCODE." }
@@ -270,15 +297,17 @@ try {
             Assert-PreprocessedBudgetConstants -PreprocessedSource $preprocessed `
                 -ExpectedInterfaceBudget $expectedBound -ExpectedVolumeBudget $expectedVolume
             Assert-MatrixRouteBudget -PreprocessedSource $preprocessed -FunctionName 'shadeBoundedDielectric' `
-                -InterfaceConstant 'kRtVariantDielectricInterfaceBudget' -VolumeConstant 'kRtVariantDielectricVolumeBudget'
+                -InterfaceConstant 'kRtVariantDielectricInterfaceBudget' -GuardVariable 'interfaceIndex' `
+                -RequireStaticCeiling -VolumeConstant 'kRtVariantDielectricVolumeBudget'
             Assert-MatrixRouteBudget -PreprocessedSource $preprocessed -FunctionName 'shadeProductionBoundedDielectric' `
-                -InterfaceConstant 'kRtVariantDielectricInterfaceBudget'
+                -InterfaceConstant 'kRtVariantDielectricInterfaceBudget' -GuardVariable 'interfaceIndex' -RequireStaticCeiling
             Assert-MatrixRouteBudget -PreprocessedSource $preprocessed -FunctionName 'shadowTransmittanceMask' `
-                -InterfaceConstant 'kRtVariantShadowInterfaceBudget' -VolumeConstant 'kRtVariantShadowVolumeBudget'
+                -InterfaceConstant 'kRtVariantShadowInterfaceBudget' -GuardVariable 'interfaceCount' `
+                -RequireStaticCeiling -VolumeConstant 'kRtVariantShadowVolumeBudget'
             Assert-MatrixRouteBudget -PreprocessedSource $preprocessed -FunctionName 'compactShadowTransmittanceMask' `
-                -InterfaceConstant 'kRtVariantShadowInterfaceBudget'
+                -InterfaceConstant 'kRtVariantShadowInterfaceBudget' -GuardVariable 'interfaceCount' -RequireStaticCeiling
             Assert-MatrixRouteBudget -PreprocessedSource $preprocessed -FunctionName 'boundedShadowTransmittanceMask' `
-                -InterfaceConstant 'kRtVariantShadowInterfaceBudget'
+                -InterfaceConstant 'kRtVariantShadowInterfaceBudget' -GuardVariable 'interfaceCount'
             Assert-True ($assembly -match ("\bOp(?:SLessThanEqual|SGreaterThanEqual)\s+%bool\s+%\S+\s+%int_{0}\b" -f $expectedBound)) `
                 "Generic artifact did not compile the expected interface ceiling ${expectedBound}: $($variant.name)."
         }
