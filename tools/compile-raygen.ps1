@@ -11,6 +11,7 @@ param(
     [switch]$Freeze,
     [switch]$CheckCatalog,
     [string]$CheckCatalogFixtureRoot,
+    [int]$TestPublicationFaultAfter = 0,
     [string]$ArtifactDirectory,
     [string]$CatalogPath,
     [string]$BudgetPath
@@ -209,6 +210,9 @@ function Read-RaygenInclude
 {
     param([string]$Path, [string]$ExpectedKey, [string]$ExpectedDependencySha256)
 
+    $rawBytes = [IO.File]::ReadAllBytes($Path)
+    if ($rawBytes.Length -ge 3 -and $rawBytes[0] -eq 0xef -and $rawBytes[1] -eq 0xbb -and $rawBytes[2] -eq 0xbf)
+    { throw "Raygen variant include must not contain a UTF-8 BOM: $Path" }
     $text = Get-RaygenCanonicalText -Path $Path
     $key = [regex]::Match($text, '^// Raygen variant key: ([a-z_]+)$', [Text.RegularExpressions.RegexOptions]::Multiline).Groups[1].Value
     $dependency = [regex]::Match($text, '^// Raygen dependency SHA-256: ([0-9a-f]{64})$', [Text.RegularExpressions.RegexOptions]::Multiline).Groups[1].Value
@@ -245,17 +249,55 @@ function Test-RaygenAllowedPath
     return $fullPath
 }
 
+function Test-RaygenByteEqual
+{
+    param([byte[]]$Left, [byte[]]$Right)
+
+    if ($Left.Length -ne $Right.Length) { return $false }
+    for ($index = 0; $index -lt $Left.Length; ++$index)
+    { if ($Left[$index] -ne $Right[$index]) { return $false } }
+    return $true
+}
+
+function Test-RaygenOrderedStringEqual
+{
+    param(
+        [object]$Left,
+        [object]$Right
+    )
+
+    if ($Left -isnot [Array] -or $Right -isnot [Array]) { return $false }
+    if ($Left.Count -ne $Right.Count) { return $false }
+    for ($index = 0; $index -lt $Left.Count; ++$index)
+    {
+        if ($Left[$index] -isnot [string] -or $Right[$index] -isnot [string]) { return $false }
+        if (-not [string]::Equals($Left[$index], $Right[$index], [StringComparison]::Ordinal)) { return $false }
+    }
+    return $true
+}
+
+function Test-RaygenJsonInteger
+{
+    param([object]$Value)
+
+    return $Value -is [int] -or $Value -is [long]
+}
+
 function Assert-RaygenFrozenBudgets
 {
-    param([pscustomobject]$Budgets, [object[]]$Variants)
+    param([object]$Budgets, [object[]]$Variants)
 
-    if ($Budgets.schema -ne 1 -or -not (Test-RaygenExactString -Left $Budgets.status -Right 'frozen'))
+    if ($Budgets -isnot [pscustomobject] -or -not (Test-RaygenJsonInteger $Budgets.schema) -or $Budgets.schema -ne 1 -or -not (Test-RaygenExactString -Left $Budgets.status -Right 'frozen'))
     {
         throw 'Raygen variant budgets must use frozen schema 1.'
     }
     $metrics = @('bytes', 'words', 'instructions', 'branchOperations', 'loops', 'selectionMerges', 'functions', 'functionCalls', 'rayQueryInitializations', 'atomicInstructions')
-    if (-not (Test-RaygenExactString -Left (@($Budgets.PSObject.Properties.Name | Sort-Object) -join ',') -Right 'budgets,metrics,schema,status') -or
-        -not (Test-RaygenExactString -Left (@($Budgets.metrics) -join ',') -Right ($metrics -join ',')))
+    $budgetRootFields = @('budgets', 'metrics', 'schema', 'status')
+    $budgetExactFields = @('atomicInstructions', 'boundedGenericFunctionsRetained', 'driverSafeFullyInlined', 'hasDiagnosticsBinding', 'instrumentation', 'material', 'quality', 'shippingAllowed', 'strategy')
+    $budgetMaxFields = @($metrics | Sort-Object)
+    if (-not (Test-RaygenOrderedStringEqual -Left @($Budgets.PSObject.Properties.Name | Sort-Object) -Right $budgetRootFields) -or
+        -not (Test-RaygenOrderedStringEqual -Left $Budgets.metrics -Right $metrics) -or
+        $Budgets.budgets -isnot [Array])
     {
         throw 'Raygen variant budgets have an unsupported schema or metric set.'
     }
@@ -265,22 +307,31 @@ function Assert-RaygenFrozenBudgets
     {
         $row = $rows[$index]
         $variant = $Variants[$index]
-        if (-not (Test-RaygenExactString -Left (@($row.PSObject.Properties.Name | Sort-Object) -join ',') -Right 'exact,key,max') -or
+        if ($row -isnot [pscustomobject] -or $row.max -isnot [pscustomobject] -or $row.exact -isnot [pscustomobject] -or
+            -not (Test-RaygenOrderedStringEqual -Left @($row.PSObject.Properties.Name | Sort-Object) -Right @('exact', 'key', 'max')) -or
             -not (Test-RaygenExactString -Left $row.key -Right $variant.key) -or
-            -not (Test-RaygenExactString -Left (@($row.max.PSObject.Properties.Name | Sort-Object) -join ',') -Right (($metrics | Sort-Object) -join ',')) -or
-            -not (Test-RaygenExactString -Left (@($row.exact.PSObject.Properties.Name | Sort-Object) -join ',') -Right 'atomicInstructions,boundedGenericFunctionsRetained,driverSafeFullyInlined,hasDiagnosticsBinding,instrumentation,material,quality,shippingAllowed,strategy'))
+            -not (Test-RaygenOrderedStringEqual -Left @($row.max.PSObject.Properties.Name | Sort-Object) -Right $budgetMaxFields) -or
+            -not (Test-RaygenOrderedStringEqual -Left @($row.exact.PSObject.Properties.Name | Sort-Object) -Right $budgetExactFields))
         {
             throw "Raygen variant budget row is malformed: $($variant.key)"
         }
         foreach ($metric in $metrics)
         {
-            if ($row.max.$metric -isnot [long] -and $row.max.$metric -isnot [int]) { throw "Raygen variant budget metric is invalid: $($variant.key)/$metric" }
+            if (-not (Test-RaygenJsonInteger $row.max.$metric)) { throw "Raygen variant budget metric is invalid: $($variant.key)/$metric" }
             if ([long]$variant.$metric -gt [long]$row.max.$metric) { throw "Raygen variant exceeds frozen budget: $($variant.key)/$metric" }
         }
-        foreach ($property in @('instrumentation', 'quality', 'material', 'strategy', 'shippingAllowed', 'atomicInstructions', 'hasDiagnosticsBinding', 'driverSafeFullyInlined', 'boundedGenericFunctionsRetained'))
+        foreach ($property in @('instrumentation', 'quality', 'material', 'strategy'))
         {
-            if ($row.exact.$property -ne $variant.$property) { throw "Raygen variant exact budget invariant changed: $($variant.key)/$property" }
+            if (-not (Test-RaygenExactString -Left $row.exact.$property -Right $variant.$property)) { throw "Raygen variant exact budget invariant changed: $($variant.key)/$property" }
         }
+        foreach ($property in @('shippingAllowed', 'hasDiagnosticsBinding', 'driverSafeFullyInlined', 'boundedGenericFunctionsRetained'))
+        {
+            if ($row.exact.$property -isnot [bool] -or $variant.$property -isnot [bool] -or $row.exact.$property -ne $variant.$property)
+            { throw "Raygen variant exact budget invariant changed: $($variant.key)/$property" }
+        }
+        if (-not (Test-RaygenJsonInteger $row.exact.atomicInstructions) -or -not (Test-RaygenJsonInteger $variant.atomicInstructions) -or
+            $row.exact.atomicInstructions -ne $variant.atomicInstructions)
+        { throw "Raygen variant exact budget invariant changed: $($variant.key)/atomicInstructions" }
         if ($variant.instrumentation -eq 'Shipping' -and ($variant.atomicInstructions -ne 0 -or $variant.hasDiagnosticsBinding))
         { throw "Shipping variant violates diagnostic budget invariants: $($variant.key)" }
         $expectedDiagnosticAtomics = if ($variant.material -eq 'GenericDielectric') { 32 } else { 5 }
@@ -371,24 +422,26 @@ function Test-RaygenCatalogValueEqual
     {
         if ($Left -isnot [pscustomobject] -or $Right -isnot [pscustomobject]) { return $false }
         $leftNames = @($Left.PSObject.Properties.Name); $rightNames = @($Right.PSObject.Properties.Name)
-        if (($leftNames -join ',') -ne ($rightNames -join ',')) { return $false }
+        if (-not (Test-RaygenOrderedStringEqual -Left $leftNames -Right $rightNames)) { return $false }
         foreach ($name in $leftNames) { if (-not (Test-RaygenCatalogValueEqual $Left.$name $Right.$name)) { return $false } }
         return $true
     }
-    return [string]$Left -ceq [string]$Right
+    if ($Left.GetType() -ne $Right.GetType()) { return $false }
+    if ($Left -is [string]) { return [string]::Equals($Left, $Right, [StringComparison]::Ordinal) }
+    return $Left -eq $Right
 }
 
 function Test-RaygenExactString
 {
-    param([string]$Left, [string]$Right)
+    param([object]$Left, [object]$Right)
 
-    return $null -ne $Left -and $null -ne $Right -and
+    return $Left -is [string] -and $Right -is [string] -and
         [string]::Equals($Left, $Right, [StringComparison]::Ordinal)
 }
 
 function Test-RaygenExactOneOf
 {
-    param([string]$Value, [string[]]$ExpectedValues)
+    param([object]$Value, [string[]]$ExpectedValues)
 
     foreach ($expectedValue in $ExpectedValues)
     {
@@ -765,6 +818,10 @@ function Test-RaygenFrozenCatalogBundle
 
     if (-not (Test-Path -LiteralPath $ArtifactRoot -PathType Container) -or -not (Test-Path -LiteralPath $CatalogFile -PathType Leaf) -or -not (Test-Path -LiteralPath $BudgetFile -PathType Leaf))
     { throw 'Frozen raygen fixture is missing an artifact directory, catalog, or budget file.' }
+    $expectedArtifactNames = @($ExpectedCatalog.variants | ForEach-Object { "$($_.key).inc" } | Sort-Object)
+    $actualArtifactNames = @(Get-ChildItem -LiteralPath $ArtifactRoot -File -ErrorAction Stop | ForEach-Object Name | Sort-Object)
+    if (-not (Test-RaygenOrderedStringEqual -Left $expectedArtifactNames -Right $actualArtifactNames))
+    { throw 'Frozen raygen artifact directory has unexpected or missing files.' }
     $fixtureBudgets = Get-Content -LiteralPath $BudgetFile -Raw | ConvertFrom-Json
     Assert-RaygenFrozenBudgets -Budgets $fixtureBudgets -Variants @($ExpectedCatalog.variants)
     $catalogBytes = [IO.File]::ReadAllBytes($CatalogFile)
@@ -773,8 +830,9 @@ function Test-RaygenFrozenCatalogBundle
     $catalogText = Get-RaygenCanonicalText -Path $CatalogFile
     if ($catalogText -match "`r") { throw 'Frozen raygen variant catalog must use LF line endings.' }
     $actualCatalog = $catalogText | ConvertFrom-Json
-    if (-not (Test-RaygenExactString -Left (@($actualCatalog.PSObject.Properties.Name | Sort-Object) -join ',') -Right 'authorities,generator,schema,status,target,toolchain,variants') -or
-        $actualCatalog.schema -ne 1 -or -not (Test-RaygenExactString -Left $actualCatalog.status -Right 'frozen'))
+    $catalogRootFields = @('authorities', 'generator', 'schema', 'status', 'target', 'toolchain', 'variants')
+    if ($actualCatalog -isnot [pscustomobject] -or -not (Test-RaygenOrderedStringEqual -Left @($actualCatalog.PSObject.Properties.Name | Sort-Object) -Right $catalogRootFields) -or
+        -not (Test-RaygenJsonInteger $actualCatalog.schema) -or $actualCatalog.schema -ne 1 -or -not (Test-RaygenExactString -Left $actualCatalog.status -Right 'frozen'))
     { throw 'Frozen raygen variant catalog has an invalid schema.' }
     $expectedCatalogComparable = (Get-RaygenCanonicalText -Path $ExpectedCatalogPath | ConvertFrom-Json)
     if (-not (Test-RaygenCatalogValueEqual -Left $actualCatalog -Right $expectedCatalogComparable))
@@ -794,6 +852,88 @@ function Test-RaygenFrozenCatalogBundle
         $includeRawHash = ([BitConverter]::ToString(([Security.Cryptography.SHA256]::Create().ComputeHash($include.Bytes)))).Replace('-', '').ToLowerInvariant()
         if ($rawHash -ne $includeRawHash -or $rawHash -ne $expectedVariant.spirvSha256)
         { throw "Frozen raygen variant raw SPIR-V hash mismatch: $($expectedVariant.key)" }
+    }
+}
+
+function Publish-RaygenFrozenCatalogBundle
+{
+    param(
+        [string]$StagingRoot,
+        [object]$Manifest,
+        [string]$ExpectedCatalogPath,
+        [string]$ArtifactRoot,
+        [string]$CatalogFile,
+        [int]$FaultAfterWrite = 0
+    )
+
+    $expectedNames = @($Manifest.Variants | ForEach-Object { "$($_.name).inc" } | Sort-Object)
+    $actualNames = if (Test-Path -LiteralPath $ArtifactRoot -PathType Container) {
+        @(Get-ChildItem -LiteralPath $ArtifactRoot -File -ErrorAction Stop | ForEach-Object Name | Sort-Object)
+    } else { @() }
+    if ($actualNames.Count -ne 0 -and -not (Test-RaygenOrderedStringEqual -Left $actualNames -Right $expectedNames))
+    { throw 'Artifact directory contains an unexpected file; refusing to publish a partial catalog.' }
+    $publicationStepCount = $expectedNames.Count + 1
+    if ($FaultAfterWrite -gt $publicationStepCount)
+    { throw "Publication fault injection index exceeds the $publicationStepCount-step bundle publication." }
+
+    $recoveryRoot = Join-Path ([IO.Path]::GetTempPath()) ('horde-raygen-publication-' + [guid]::NewGuid().ToString('N'))
+    $records = @()
+    $removeRecoveryRoot = $false
+    try
+    {
+        New-Item -ItemType Directory -Path $recoveryRoot | Out-Null
+        if (-not (Test-Path -LiteralPath $ArtifactRoot)) { New-Item -ItemType Directory -Path $ArtifactRoot | Out-Null }
+        foreach ($name in $expectedNames)
+        {
+            $destination = Join-Path $ArtifactRoot $name
+            $backup = Join-Path $recoveryRoot $name
+            $exists = Test-Path -LiteralPath $destination -PathType Leaf
+            if ($exists) { Copy-Item -LiteralPath $destination -Destination $backup -ErrorAction Stop }
+            $records += [pscustomobject]@{ Destination = $destination; Backup = $backup; Exists = $exists }
+        }
+        $catalogBackup = Join-Path $recoveryRoot 'raygen-variant-catalog.json'
+        $catalogExists = Test-Path -LiteralPath $CatalogFile -PathType Leaf
+        if ($catalogExists) { Copy-Item -LiteralPath $CatalogFile -Destination $catalogBackup -ErrorAction Stop }
+        $records += [pscustomobject]@{ Destination = $CatalogFile; Backup = $catalogBackup; Exists = $catalogExists }
+
+        $writeCount = 0
+        foreach ($name in $expectedNames)
+        {
+            $source = Join-Path (Join-Path $StagingRoot ([IO.Path]::GetFileNameWithoutExtension($name))) $name
+            Copy-Item -LiteralPath $source -Destination (Join-Path $ArtifactRoot $name) -Force -ErrorAction Stop
+            ++$writeCount
+            if ($FaultAfterWrite -gt 0 -and $writeCount -eq $FaultAfterWrite) { throw 'Injected raygen publication failure.' }
+        }
+        Copy-Item -LiteralPath $ExpectedCatalogPath -Destination $CatalogFile -Force -ErrorAction Stop
+        ++$writeCount
+        if ($FaultAfterWrite -gt 0 -and $writeCount -eq $FaultAfterWrite) { throw 'Injected raygen publication failure.' }
+        $removeRecoveryRoot = $true
+    }
+    catch
+    {
+        $publicationError = $_
+        $rollbackErrors = @()
+        for ($index = $records.Count - 1; $index -ge 0; --$index)
+        {
+            $record = $records[$index]
+            try
+            {
+                if ($record.Exists) { Copy-Item -LiteralPath $record.Backup -Destination $record.Destination -Force -ErrorAction Stop }
+                elseif (Test-Path -LiteralPath $record.Destination -PathType Leaf) { Remove-Item -LiteralPath $record.Destination -Force -ErrorAction Stop }
+            }
+            catch { $rollbackErrors += $_.Exception.Message }
+        }
+        if ($rollbackErrors.Count -ne 0)
+        {
+            throw ("Raygen publication failed and rollback failed; recovery data retained at '{0}'. Original error: {1}; rollback errors: {2}" -f `
+                $recoveryRoot, $publicationError.Exception.Message, ($rollbackErrors -join ' | '))
+        }
+        $removeRecoveryRoot = $true
+        throw $publicationError
+    }
+    finally
+    {
+        if ($removeRecoveryRoot -and (Test-Path -LiteralPath $recoveryRoot)) { Remove-Item -LiteralPath $recoveryRoot -Recurse -Force }
     }
 }
 
@@ -834,22 +974,62 @@ function Invoke-RaygenFrozenCatalogMode
         {
             # No tracked output is touched until all eight compiles, SPIR-V
             # validations, catalog construction, and frozen-budget checks pass.
-            if (-not (Test-Path -LiteralPath $artifactRoot)) { New-Item -ItemType Directory -Path $artifactRoot | Out-Null }
-            $expectedNames = @($manifest.Variants | ForEach-Object { "$($_.name).inc" })
-            $unexpected = @(Get-ChildItem -LiteralPath $artifactRoot -File -ErrorAction Stop | Where-Object { $_.Name -notin $expectedNames })
-            if ($unexpected.Count -ne 0) { throw 'Artifact directory contains an unexpected file; refusing to publish a partial catalog.' }
-            foreach ($definition in $manifest.Variants)
-            {
-                Copy-Item -LiteralPath (Join-Path (Join-Path $temporaryRoot $definition.name) "$($definition.name).inc") `
-                    -Destination (Join-Path $artifactRoot "$($definition.name).inc") -Force
-            }
-            Copy-Item -LiteralPath $expectedCatalogPath -Destination $catalogFile -Force
+            Publish-RaygenFrozenCatalogBundle -StagingRoot $temporaryRoot -Manifest $manifest `
+                -ExpectedCatalogPath $expectedCatalogPath -ArtifactRoot $artifactRoot -CatalogFile $catalogFile `
+                -FaultAfterWrite $TestPublicationFaultAfter
             Write-Output "Frozen eight raygen variant artifacts and catalog."
             return
         }
 
         Test-RaygenFrozenCatalogBundle -ArtifactRoot $artifactRoot -CatalogFile $catalogFile -BudgetFile $budgetFile `
             -ExpectedCatalogPath $expectedCatalogPath -ExpectedCatalog $expectedCatalogObject -CompilationRoot $temporaryRoot
+        if ($TestPublicationFaultAfter -gt 0)
+        {
+            $publicationFixture = Join-Path $temporaryRoot 'publication-rollback-fixture'
+            $publicationArtifacts = Join-Path $publicationFixture 'variants'
+            New-Item -ItemType Directory -Path $publicationArtifacts | Out-Null
+            foreach ($name in @($manifest.Variants | ForEach-Object { "$($_.name).inc" }))
+            { Copy-Item -LiteralPath (Join-Path $artifactRoot $name) -Destination (Join-Path $publicationArtifacts $name) }
+            $publicationCatalog = Join-Path $publicationFixture 'raygen-variant-catalog.json'
+            Copy-Item -LiteralPath $catalogFile -Destination $publicationCatalog
+            $publicationFiles = @(
+                @(Get-ChildItem -LiteralPath $publicationArtifacts -File | Sort-Object Name | ForEach-Object {
+                    [pscustomobject]@{ Name = $_.Name; Path = $_.FullName }
+                }) + @([pscustomobject]@{ Name = 'raygen-variant-catalog.json'; Path = $publicationCatalog })
+            )
+            foreach ($publicationFile in $publicationFiles)
+            {
+                [IO.File]::WriteAllBytes($publicationFile.Path, [Text.UTF8Encoding]::new($false).GetBytes("rollback-sentinel::$($publicationFile.Name)`n"))
+            }
+            $before = @()
+            foreach ($publicationFile in $publicationFiles)
+            {
+                $bytes = [IO.File]::ReadAllBytes($publicationFile.Path)
+                $before += [pscustomobject]@{
+                    Name = $publicationFile.Name
+                    Bytes = $bytes
+                    Sha256 = (Get-FileHash -LiteralPath $publicationFile.Path -Algorithm SHA256).Hash
+                }
+            }
+            $faulted = $false
+            try
+            {
+                Publish-RaygenFrozenCatalogBundle -StagingRoot $temporaryRoot -Manifest $manifest `
+                    -ExpectedCatalogPath $expectedCatalogPath -ArtifactRoot $publicationArtifacts -CatalogFile $publicationCatalog `
+                    -FaultAfterWrite $TestPublicationFaultAfter
+            }
+            catch { if ($_.Exception.Message -eq 'Injected raygen publication failure.') { $faulted = $true } else { throw } }
+            if (-not $faulted) { throw 'Publication fault injection did not fail.' }
+            foreach ($record in $before)
+            {
+                $matches = @($publicationFiles | Where-Object Name -ceq $record.Name)
+                if ($matches.Count -ne 1) { throw "Publication rollback fixture cannot resolve '$($record.Name)'." }
+                $after = [IO.File]::ReadAllBytes($matches[0].Path)
+                $afterHash = (Get-FileHash -LiteralPath $matches[0].Path -Algorithm SHA256).Hash
+                if ($afterHash -ne $record.Sha256 -or -not (Test-RaygenByteEqual -Left $record.Bytes -Right $after))
+                { throw "Publication rollback did not restore exact pre-existing bytes for '$($record.Name)'." }
+            }
+        }
         if (-not [string]::IsNullOrWhiteSpace($CheckCatalogFixtureRoot))
         {
             $fixtureRoot = [IO.Path]::GetFullPath($CheckCatalogFixtureRoot)
@@ -883,6 +1063,10 @@ function Invoke-RaygenFrozenCatalogMode
         if (Test-Path -LiteralPath $temporaryRoot) { Remove-Item -LiteralPath $temporaryRoot -Recurse -Force }
     }
 }
+
+if ($TestPublicationFaultAfter -lt 0) { throw 'Publication fault injection must be non-negative.' }
+if ($TestPublicationFaultAfter -gt 0 -and -not $CheckCatalog) { throw 'Publication fault injection requires -CheckCatalog.' }
+if ($TestPublicationFaultAfter -gt 9) { throw 'Publication fault injection index must be in the range 1 through 9.' }
 
 if ($Freeze -or $CheckCatalog)
 {

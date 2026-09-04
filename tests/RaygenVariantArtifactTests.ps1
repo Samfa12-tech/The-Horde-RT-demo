@@ -353,6 +353,54 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
         $value.generator.sha256 = '0' * 64
         Write-FixtureJson (Join-Path $fixture 'raygen-variant-catalog.json') $value
     }
+    New-CatalogFixture -FixtureRoot $fixtureRoot -Name 'reject-numeric-type-drift' -ExpectedDiagnostic 'stale or malformed' -Mutate {
+        param($fixture, $variants)
+        $value = Get-Content (Join-Path $fixture 'raygen-variant-catalog.json') -Raw | ConvertFrom-Json
+        $value.variants[0].bytes = [string]$value.variants[0].bytes
+        Write-FixtureJson (Join-Path $fixture 'raygen-variant-catalog.json') $value
+    }
+    New-CatalogFixture -FixtureRoot $fixtureRoot -Name 'reject-boolean-type-drift' -ExpectedDiagnostic 'stale or malformed' -Mutate {
+        param($fixture, $variants)
+        $value = Get-Content (Join-Path $fixture 'raygen-variant-catalog.json') -Raw | ConvertFrom-Json
+        $value.variants[0].shippingAllowed = [string]$value.variants[0].shippingAllowed
+        Write-FixtureJson (Join-Path $fixture 'raygen-variant-catalog.json') $value
+    }
+    New-CatalogFixture -FixtureRoot $fixtureRoot -Name 'reject-comma-bearing-extra-field' -ExpectedDiagnostic 'invalid schema' -Mutate {
+        param($fixture, $variants)
+        $value = Get-Content (Join-Path $fixture 'raygen-variant-catalog.json') -Raw | ConvertFrom-Json
+        $value | Add-Member -NotePropertyName 'extra,field' -NotePropertyValue 'must not collide with ordered fields'
+        Write-FixtureJson (Join-Path $fixture 'raygen-variant-catalog.json') $value
+    }
+    New-CatalogFixture -FixtureRoot $fixtureRoot -Name 'reject-budget-schema-type-drift' -ExpectedDiagnostic 'budgets must use frozen schema 1' -Mutate {
+        param($fixture, $variants)
+        $budget = Get-Content (Join-Path $fixture 'raygen-variant-budgets.json') -Raw | ConvertFrom-Json
+        $budget.schema = [string]$budget.schema
+        Write-FixtureJson (Join-Path $fixture 'raygen-variant-budgets.json') $budget
+    }
+    New-CatalogFixture -FixtureRoot $fixtureRoot -Name 'reject-budget-metrics-container-drift' -ExpectedDiagnostic 'unsupported schema or metric set' -Mutate {
+        param($fixture, $variants)
+        $budget = Get-Content (Join-Path $fixture 'raygen-variant-budgets.json') -Raw | ConvertFrom-Json
+        $budget.metrics = @($budget.metrics) -join ','
+        Write-FixtureJson (Join-Path $fixture 'raygen-variant-budgets.json') $budget
+    }
+    New-CatalogFixture -FixtureRoot $fixtureRoot -Name 'reject-budget-case-drift' -ExpectedDiagnostic 'exact budget invariant changed' -Mutate {
+        param($fixture, $variants)
+        $budget = Get-Content (Join-Path $fixture 'raygen-variant-budgets.json') -Raw | ConvertFrom-Json
+        $budget.budgets[0].exact.instrumentation = 'diagnostic'
+        Write-FixtureJson (Join-Path $fixture 'raygen-variant-budgets.json') $budget
+    }
+    New-CatalogFixture -FixtureRoot $fixtureRoot -Name 'reject-budget-boolean-type-drift' -ExpectedDiagnostic 'exact budget invariant changed' -Mutate {
+        param($fixture, $variants)
+        $budget = Get-Content (Join-Path $fixture 'raygen-variant-budgets.json') -Raw | ConvertFrom-Json
+        $budget.budgets[0].exact.shippingAllowed = [string]$budget.budgets[0].exact.shippingAllowed
+        Write-FixtureJson (Join-Path $fixture 'raygen-variant-budgets.json') $budget
+    }
+    New-CatalogFixture -FixtureRoot $fixtureRoot -Name 'reject-budget-integer-type-drift' -ExpectedDiagnostic 'exact budget invariant changed' -Mutate {
+        param($fixture, $variants)
+        $budget = Get-Content (Join-Path $fixture 'raygen-variant-budgets.json') -Raw | ConvertFrom-Json
+        $budget.budgets[0].exact.atomicInstructions = [string]$budget.budgets[0].exact.atomicInstructions
+        Write-FixtureJson (Join-Path $fixture 'raygen-variant-budgets.json') $budget
+    }
     New-CatalogFixture -FixtureRoot $fixtureRoot -Name 'reject-stale-source-dependency-toolchain' -ExpectedDiagnostic 'stale or malformed' -Mutate {
         param($fixture, $variants)
         $value = Get-Content (Join-Path $fixture 'raygen-variant-catalog.json') -Raw | ConvertFrom-Json
@@ -400,11 +448,25 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
         $replacement = if ($word.Groups[1].Value -eq '0') { '1' } else { '0' }
         [IO.File]::WriteAllText($path, $text.Remove($word.Index + 2, 1).Insert($word.Index + 2, $replacement), [Text.UTF8Encoding]::new($false))
     }
+    New-CatalogFixture -FixtureRoot $fixtureRoot -Name 'reject-extra-include' -ExpectedDiagnostic 'unexpected or missing files' -Mutate {
+        param($fixture, $variants)
+        [IO.File]::WriteAllText((Join-Path $variants 'stale.inc'), '// stale artifact' + "`n", [Text.UTF8Encoding]::new($false))
+    }
+    New-CatalogFixture -FixtureRoot $fixtureRoot -Name 'reject-bom-prefixed-include' -ExpectedDiagnostic 'must not contain a UTF-8 BOM' -Mutate {
+        param($fixture, $variants)
+        $path = Get-ChildItem -LiteralPath $variants -Filter '*.inc' -File | Select-Object -First 1 -ExpandProperty FullName
+        $bytes = [IO.File]::ReadAllBytes($path)
+        $bomBytes = New-Object byte[] ($bytes.Length + 3)
+        $bomBytes[0] = 0xef; $bomBytes[1] = 0xbb; $bomBytes[2] = 0xbf
+        [Array]::Copy($bytes, 0, $bomBytes, 3, $bytes.Length)
+        [IO.File]::WriteAllBytes($path, $bomBytes)
+    }
 
     # CheckCatalog is the sole matrix compilation in this test. It replays all
     # eight compile/preprocess/validate/disassemble paths into temporary storage
     # and compares catalog, include words, raw SPIR-V, budgets, and toolchain.
-    & $compiler -CheckCatalog -ArtifactDirectory $artifactDirectory -CatalogPath $catalogPath -BudgetPath $budgetPath -CheckCatalogFixtureRoot $fixtureRoot
+    & $compiler -CheckCatalog -ArtifactDirectory $artifactDirectory -CatalogPath $catalogPath -BudgetPath $budgetPath `
+        -CheckCatalogFixtureRoot $fixtureRoot -TestPublicationFaultAfter 5
     if ($LASTEXITCODE -ne 0) { throw "Frozen catalog check failed with exit code $LASTEXITCODE." }
 
     $compatibilityGenericOutput = Join-Path $temporaryRoot 'compatibility-generic'
