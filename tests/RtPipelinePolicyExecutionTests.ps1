@@ -11,7 +11,16 @@ function Write-Utf8NoBom([string]$path, [string]$contents) {
 }
 function Invoke-Native([string]$file, [string[]]$arguments, [string]$workingDirectory) {
     Push-Location $workingDirectory
-    try { $output = & $file @arguments 2>&1; return ,@($LASTEXITCODE, ($output -join "`n")) }
+    try {
+        # Windows PowerShell turns a native stderr warning into a terminating
+        # NativeCommandError under the script-wide Stop policy.  Keep captured
+        # stderr diagnostic-only and make the native exit code authoritative.
+        $previousErrorActionPreference = $ErrorActionPreference
+        $ErrorActionPreference = 'Continue'
+        try { $output = & $file @arguments 2>&1; $exitCode = $LASTEXITCODE }
+        finally { $ErrorActionPreference = $previousErrorActionPreference }
+        return ,@($exitCode, ($output -join "`n"))
+    }
     finally { Pop-Location }
 }
 
@@ -70,6 +79,27 @@ file(GENERATE OUTPUT "`$`{CMAKE_BINARY_DIR}/treewide-definitions-`$<CONFIG>.txt"
             Assert-True ($build[0] -eq 0) "Policy case $name failed to build: $($build[1])"
         }
     }
+    function Invoke-WindowsOverrideTreewideCase {
+        $name = 'windows-override-treewide'
+        $buildDirectory = Join-Path $temporaryRoot $name
+        $arguments = @('-S', $temporaryRoot, '-B', $buildDirectory) + $generatorArguments + @(
+            '-DHORDE_RT_POLICY_PLATFORM=Windows',
+            '-DHORDE_RT_INSTRUMENTATION_OVERRIDE=Diagnostic',
+            '-DHORDE_RT_DIELECTRIC_QUALITY_OVERRIDE=Mobile')
+        $result = Invoke-Native $CmakeExecutable $arguments $temporaryRoot
+        Assert-True ($result[0] -eq 0) "Policy case $name failed to configure: $($result[1])"
+        foreach ($configuration in @('Debug', 'Release')) {
+            $definitions = @(
+                (Get-Content -LiteralPath (Join-Path $buildDirectory "definitions-$configuration.txt") -Raw),
+                (Get-Content -LiteralPath (Join-Path $buildDirectory "treewide-definitions-$configuration.txt") -Raw))
+            foreach ($targetDefinitions in $definitions) {
+                Assert-True ($targetDefinitions.Contains('HORDE_RT_SELECTED_INSTRUMENTATION=1')) "Policy case $name missed Debug/Release tree-wide Diagnostic override."
+                Assert-True ($targetDefinitions.Contains('HORDE_RT_SELECTED_DIELECTRIC_QUALITY=0')) "Policy case $name missed Debug/Release tree-wide Mobile override."
+            }
+            $build = Invoke-Native $CmakeExecutable @('--build', $buildDirectory, '--config', $configuration) $temporaryRoot
+            Assert-True ($build[0] -eq 0) "Policy case $name failed to build ${configuration}: $($build[1])"
+        }
+    }
 
     Invoke-PolicyCase 'windows-debug' 'Windows' 'Debug' @() @('HORDE_RT_SELECTED_INSTRUMENTATION=1', 'HORDE_RT_SELECTED_DIELECTRIC_QUALITY=1')
     Invoke-PolicyCase 'windows-release' 'Windows' 'Release' @() @('HORDE_RT_SELECTED_INSTRUMENTATION=0', 'HORDE_RT_SELECTED_DIELECTRIC_QUALITY=1')
@@ -77,7 +107,7 @@ file(GENERATE OUTPUT "`$`{CMAKE_BINARY_DIR}/treewide-definitions-`$<CONFIG>.txt"
     Invoke-PolicyCase 'android-debug-default' 'Android' 'Debug' @('-DHORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION=Diagnostic', '-DHORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY=Mobile') @('HORDE_RT_SELECTED_INSTRUMENTATION=1', 'HORDE_RT_SELECTED_DIELECTRIC_QUALITY=0')
     Invoke-PolicyCase 'android-release-default' 'Android' 'Release' @('-DHORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION=Shipping', '-DHORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY=Mobile') @('HORDE_RT_SELECTED_INSTRUMENTATION=0', 'HORDE_RT_SELECTED_DIELECTRIC_QUALITY=0')
     Invoke-PolicyCase 'android-override-precedence' 'Android' 'Release' @('-DHORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION=Shipping', '-DHORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY=Mobile', '-DHORDE_RT_INSTRUMENTATION_OVERRIDE=Diagnostic', '-DHORDE_RT_DIELECTRIC_QUALITY_OVERRIDE=High') @('HORDE_RT_SELECTED_INSTRUMENTATION=1', 'HORDE_RT_SELECTED_DIELECTRIC_QUALITY=1')
-    Invoke-PolicyCase 'windows-override-treewide' 'Windows' 'Release' @('-DHORDE_RT_INSTRUMENTATION_OVERRIDE=Diagnostic', '-DHORDE_RT_DIELECTRIC_QUALITY_OVERRIDE=Mobile') @('HORDE_RT_SELECTED_INSTRUMENTATION=1', 'HORDE_RT_SELECTED_DIELECTRIC_QUALITY=0')
+    Invoke-WindowsOverrideTreewideCase
     Invoke-PolicyCase 'partial-override' 'Windows' 'Debug' @('-DHORDE_RT_INSTRUMENTATION_OVERRIDE=Shipping') @() $true
     Invoke-PolicyCase 'invalid-override-case' 'Windows' 'Debug' @('-DHORDE_RT_INSTRUMENTATION_OVERRIDE=shipping', '-DHORDE_RT_DIELECTRIC_QUALITY_OVERRIDE=Mobile') @() $true
     Invoke-PolicyCase 'invalid-quality' 'Windows' 'Debug' @('-DHORDE_RT_INSTRUMENTATION_OVERRIDE=Shipping', '-DHORDE_RT_DIELECTRIC_QUALITY_OVERRIDE=mobile') @() $true

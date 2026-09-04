@@ -4,6 +4,21 @@ param([string]$CmakeExecutable)
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
 function Assert-True([bool]$condition, [string]$message) { if (-not $condition) { throw $message } }
+function Get-CtestFirstCommandToken([string]$ctestContents, [string]$testName) {
+    $record = [regex]::Match($ctestContents, ('(?s)add_test\(\[=\[' + [regex]::Escape($testName) + '\]=\]\s+"([^"]+)"'))
+    Assert-True $record.Success "Generated CTest record is missing: $testName"
+    return $record.Groups[1].Value
+}
+function Assert-CtestFirstCommandToken([string]$ctestContents, [string]$testName, [string]$expectedRunner) {
+    $actualRunner = Get-CtestFirstCommandToken $ctestContents $testName
+    Assert-True ($actualRunner -ceq $expectedRunner) "Generated CTest record does not begin with resolved PowerShell: $testName ($actualRunner)"
+}
+function Assert-CtestTimeout([string]$ctestContents, [string]$testName, [int]$expectedSeconds) {
+    $record = [regex]::Match($ctestContents, ('(?s)set_tests_properties\(\[=\[' + [regex]::Escape($testName) + '\]=\]\s+PROPERTIES\s+(.*?)\)'))
+    Assert-True $record.Success "Generated CTest timeout metadata is missing: $testName"
+    $timeout = [regex]::Match($record.Groups[1].Value, 'TIMEOUT\s+"?([0-9]+)"?')
+    Assert-True ($timeout.Success -and [int]$timeout.Groups[1].Value -eq $expectedSeconds) "Generated CTest timeout is wrong: $testName"
+}
 
 & (Join-Path $repoRoot 'tools\GenerateRtPipelineVariantCatalog.ps1') -Check
 $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) ('horde-rt-provider-fence-' + [guid]::NewGuid().ToString('N'))
@@ -69,7 +84,14 @@ if (-not [string]::IsNullOrWhiteSpace($CmakeExecutable)) {
         $ctestFile = Get-Content -LiteralPath (Join-Path $freshConfigureRoot 'CTestTestfile.cmake') -Raw
         $runner = (Get-Command pwsh,powershell -ErrorAction Stop | Select-Object -First 1 -ExpandProperty Source).Replace('\','/')
         foreach ($name in @('shipping_mobile','shipping_high','diagnostic_mobile','diagnostic_high')) {
-            Assert-True ($ctestFile -match ('horde_rt_provider_' + $name + '_fixture_evidence.*"' + [regex]::Escape($runner))) "Fresh fixture command does not begin with resolved PowerShell: $name"
+            Assert-CtestFirstCommandToken $ctestFile ("horde_rt_provider_${name}_fixture_evidence") $runner
+        }
+        $syntheticWrongFirst = 'add_test([=[horde_rt_provider_synthetic_fixture_evidence]=] "C:/wrong.exe" "C:/Program Files/PowerShell/7/pwsh.exe")'
+        $rejectedWrongFirst = $false
+        try { Assert-CtestFirstCommandToken $syntheticWrongFirst 'horde_rt_provider_synthetic_fixture_evidence' 'C:/Program Files/PowerShell/7/pwsh.exe' } catch { $rejectedWrongFirst = $true }
+        Assert-True $rejectedWrongFirst 'Fresh-command parser must reject a correct runner that appears after a wrong first executable.'
+        foreach ($name in @('horde_rt_pipeline_policy_fence_tests', 'horde_rt_pipeline_policy_execution_tests')) {
+            Assert-CtestTimeout $ctestFile $name 300
         }
     }
     finally { if (Test-Path -LiteralPath $freshConfigureRoot) { Remove-Item -LiteralPath $freshConfigureRoot -Recurse -Force } }

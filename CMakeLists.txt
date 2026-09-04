@@ -343,6 +343,10 @@ if(BUILD_TESTING)
                 ${CMAKE_CURRENT_SOURCE_DIR}/tests/RtPipelinePolicyExecutionTests.ps1
                 -CmakeExecutable ${CMAKE_COMMAND}
                 -GradleExecutable ${CMAKE_CURRENT_SOURCE_DIR}/android/gradlew.bat)
+        set_tests_properties(
+            horde_rt_pipeline_policy_fence_tests
+            horde_rt_pipeline_policy_execution_tests
+            PROPERTIES TIMEOUT 300)
         add_test(NAME horde_rt_static_texture_array_tool_tests
             COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
                 ${CMAKE_CURRENT_SOURCE_DIR}/tests/StaticTextureArrayToolTests.ps1)
