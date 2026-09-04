@@ -1856,8 +1856,7 @@ horde::gameplay::ShowcaseBenchmarkMetadata BuildBenchmarkMetadata(
     horde::gameplay::ShowcaseBenchmarkMetadata metadata;
     metadata.timestampUtc = UtcTimestamp("%Y-%m-%dT%H:%M:%SZ");
     metadata.buildIdentity = HORDE_RT_BUILD_ID;
-    metadata.shaderIdentity = std::string(
-        context.rtScene.SelectedGenericDielectricSha256()).substr(0u, 12u);
+    metadata.shaderIdentity = context.rtScene.SelectedPipelineBundleIdentity();
     metadata.gpuName = capabilities.identity.gpuName;
     metadata.vulkanApi = std::to_string(VK_API_VERSION_MAJOR(capabilities.identity.vulkanApiVersion)) + "." +
                          std::to_string(VK_API_VERSION_MINOR(capabilities.identity.vulkanApiVersion)) + "." +
@@ -2036,8 +2035,7 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(
     const horde::gameplay::EnemyEncounterSnapshot* encounter = SelectedEncounter(roster);
     horde::ui::DeveloperOverlaySnapshot snapshot;
     snapshot.buildIdentity = std::string(HORDE_RT_BUILD_ID) + " DEBUG";
-    snapshot.shaderIdentity = std::string(
-        context.rtScene.SelectedGenericDielectricSha256()).substr(0u, 12u);
+    snapshot.shaderIdentity = context.rtScene.SelectedPipelineBundleDisplayIdentity();
     snapshot.gpuName = capabilities.identity.gpuName;
     snapshot.vulkanApi = PackedVulkanVersion(capabilities.identity.vulkanApiVersion);
     snapshot.rtMode = horde::vulkan::ToString(capabilities.rtMode);

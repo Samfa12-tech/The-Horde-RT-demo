@@ -160,6 +160,25 @@ function Get-PngMetadata {
     }
 }
 
+function Assert-SelectedRtPipelineBundle {
+    param([Parameter(Mandatory = $true)]$Bundle,
+          [Parameter(Mandatory = $true)][string]$Context)
+    foreach ($strategy in @("opaqueFast", "genericDielectric")) {
+        $entry = $Bundle.$strategy
+        if ($null -eq $entry -or [string]::IsNullOrWhiteSpace([string]$entry.key) -or
+            [string]$entry.sha256 -cnotmatch '^[0-9a-f]{64}$') {
+            throw "$Context selected RT pipeline bundle is missing exact $strategy key/hash identity."
+        }
+    }
+    $opaquePolicy = ([string]$Bundle.opaqueFast.key) -replace '_opaque_fast$', ''
+    $genericPolicy = ([string]$Bundle.genericDielectric.key) -replace '_generic_dielectric$', ''
+    if ($opaquePolicy -ceq [string]$Bundle.opaqueFast.key -or
+        $genericPolicy -ceq [string]$Bundle.genericDielectric.key -or
+        $opaquePolicy -cne $genericPolicy) {
+        throw "$Context selected RT pipeline bundle does not identify one coherent policy pair."
+    }
+}
+
 function Test-CaptureManifest {
     param([Parameter(Mandatory = $true)][string]$ManifestPath,
           [Parameter(Mandatory = $true)][ValidateSet("Windows", "Android")][string]$Platform,
@@ -169,12 +188,13 @@ function Test-CaptureManifest {
     $records = @($(if ($Platform -eq "Windows") { $manifest.captures } else { $manifest.checkpoints }))
     $expected = @("opening", "skeleton", "worst-bend", "lantern-drop", "skylight", "yellow", "blue", "red", "green", "mirror", "lich", "finale-roof", "two-enemy-combat")
     if ($records.Count -ne $expected.Count) { throw "$Platform manifest contains $($records.Count) captures; expected $($expected.Count)." }
+    Assert-SelectedRtPipelineBundle -Bundle $manifest.selectedRtPipelineBundle -Context "$Platform manifest"
     if ($Platform -eq "Windows") {
         if (-not $manifest.complete -or -not $manifest.sceneOnly -or $manifest.overlaysIncluded) {
             throw "Windows capture manifest is not a complete scene-only capture set."
         }
         if ([double]$manifest.fixedAnimationTimeSeconds -ne 0.0) { throw "Windows capture animation time is not fixed at zero." }
-        if ([string]::IsNullOrWhiteSpace($manifest.buildId) -or [string]::IsNullOrWhiteSpace($manifest.raygenSha256) -or
+        if ([string]::IsNullOrWhiteSpace($manifest.buildId) -or
             [string]::IsNullOrWhiteSpace($manifest.device.gpuName)) { throw "Windows capture identity metadata is incomplete." }
         if ([int]$manifest.presentation.dispatchWidth -le 0 -or [int]$manifest.presentation.dispatchHeight -le 0 -or
             [int]$manifest.presentation.swapchainWidth -le 0 -or [int]$manifest.presentation.swapchainHeight -le 0) {
@@ -210,6 +230,7 @@ function Test-CaptureManifest {
                 throw "Windows capture lacks honest-presentation or colour-route metadata: $file"
             }
         } else {
+            Assert-SelectedRtPipelineBundle -Bundle $record.selectedRtPipelineBundle -Context "Android capture $($record.checkpoint)"
             if (-not $record.presented -or -not $record.sceneOnly -or [double]$record.animationTime -ne 0.0 -or
                 [string]::IsNullOrWhiteSpace($record.gpu) -or [string]::IsNullOrWhiteSpace($record.buildIdentity) -or
                 [string]::IsNullOrWhiteSpace($record.shaderIdentity) -or

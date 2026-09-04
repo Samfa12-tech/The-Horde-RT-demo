@@ -310,6 +310,14 @@ public:
     {
         return pipelineBundle_.GenericDielectricSha256();
     }
+    std::string SelectedPipelineBundleIdentity() const
+    {
+        return pipelineBundle_.FullPairIdentity();
+    }
+    std::string SelectedPipelineBundleDisplayIdentity() const
+    {
+        return pipelineBundle_.ShortPairIdentity();
+    }
     bool GenericStaticAssetEnabled() const { return genericStaticAssetEnabled_; }
     const RtStaticMeshMeasurements& StaticMeshMeasurements() const { return staticMeshSlot_.Measurements(); }
     VkDeviceSize StaticMeshBlasBytes() const { return staticMeshBlasBytes_; }

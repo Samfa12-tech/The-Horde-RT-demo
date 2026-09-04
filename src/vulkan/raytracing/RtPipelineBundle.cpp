@@ -208,6 +208,39 @@ std::string_view RtPipelineBundle::GenericDielectricSha256() const noexcept
     return selected_ ? strategies_[1].artifact.spirvSha256 : std::string_view{};
 }
 
+std::string RtPipelineBundle::FullPairIdentity() const
+{
+    if (!selected_) {
+        return {};
+    }
+    std::string identity;
+    identity.reserve(OpaqueFastKey().size() + OpaqueFastSha256().size() +
+                     GenericDielectricKey().size() + GenericDielectricSha256().size() + 35u);
+    identity.append("opaqueFast:");
+    identity.append(OpaqueFastKey());
+    identity.push_back('@');
+    identity.append(OpaqueFastSha256());
+    identity.append("|genericDielectric:");
+    identity.append(GenericDielectricKey());
+    identity.push_back('@');
+    identity.append(GenericDielectricSha256());
+    return identity;
+}
+
+std::string RtPipelineBundle::ShortPairIdentity() const
+{
+    if (!selected_) {
+        return {};
+    }
+    constexpr std::size_t kShortHashLength = 8u;
+    std::string identity;
+    identity.reserve(kShortHashLength * 2u + 1u);
+    identity.append(OpaqueFastSha256().substr(0u, kShortHashLength));
+    identity.push_back('+');
+    identity.append(GenericDielectricSha256().substr(0u, kShortHashLength));
+    return identity;
+}
+
 RtStrategyPipelineResources& RtPipelineBundle::Strategy(
     RtMaterialStrategy strategy) noexcept
 {

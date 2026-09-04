@@ -15,6 +15,20 @@ namespace {
 
 using namespace horde::vulkan::raytracing;
 
+#if HORDE_RT_SELECTED_INSTRUMENTATION == 1 && HORDE_RT_SELECTED_DIELECTRIC_QUALITY == 1
+constexpr std::string_view kExpectedFullPairIdentity =
+    "opaqueFast:diagnostic_high_opaque_fast@d7b0722e572e63bd96e62bae85cc6a5b968ae71bf157526b513b50b56e515c3b|"
+    "genericDielectric:diagnostic_high_generic_dielectric@2b61176f676227adfd13a880cd415478536e1403b46317ea3321dc463bebecd0";
+constexpr std::string_view kExpectedShortPairIdentity = "d7b0722e+2b61176f";
+#elif HORDE_RT_SELECTED_INSTRUMENTATION == 0 && HORDE_RT_SELECTED_DIELECTRIC_QUALITY == 1
+constexpr std::string_view kExpectedFullPairIdentity =
+    "opaqueFast:shipping_high_opaque_fast@7ebdb794794a854b6cb5c44c75dd9a9decd42f4999c44a9cfa78f13b12a13f21|"
+    "genericDielectric:shipping_high_generic_dielectric@1be2b430ba190ae82250693ae079adf3f0712b361914b1355f386fb1f57fc5aa";
+constexpr std::string_view kExpectedShortPairIdentity = "7ebdb794+1be2b430";
+#else
+#error "Lifetime pair-identity fixture expects the Windows High policy."
+#endif
+
 bool Require(bool condition, std::string_view message)
 {
     if (!condition) { std::cerr << message << '\n'; }
@@ -324,6 +338,10 @@ int main()
                       bundle.Strategy(RtMaterialStrategy::OpaqueFast).pipeline != VK_NULL_HANDLE &&
                       bundle.Strategy(RtMaterialStrategy::GenericDielectric).pipeline != VK_NULL_HANDLE,
                   "the complete bundle must own both material strategy records");
+    ok &= Require(bundle.FullPairIdentity() == kExpectedFullPairIdentity,
+                  "the full selected-pair identity must contain both canonical keys and hashes");
+    ok &= Require(bundle.ShortPairIdentity() == kExpectedShortPairIdentity,
+                  "the display identity must be derived from both selected module hashes");
     RtPipelineBundle moved(std::move(bundle));
     ok &= Require(!bundle.HasSelection() && moved.HasSelection(),
                   "move construction must transfer ownership and clear the source");

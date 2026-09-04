@@ -123,6 +123,9 @@ $scene = Get-Content -LiteralPath (Join-Path $repoRoot 'src\vulkan\raytracing\Pr
 $sceneHeader = Get-Content -LiteralPath (Join-Path $repoRoot 'src\vulkan\raytracing\PresentableTinyRtScene.h') -Raw
 $windowsHost = Get-Content -LiteralPath (Join-Path $repoRoot 'src\platform\windows\DiagnosticWindow.cpp') -Raw
 $androidHost = Get-Content -LiteralPath (Join-Path $repoRoot 'android\app\src\main\cpp\android_probe_bridge.cpp') -Raw
+$foundationRunner = Get-Content -LiteralPath (Join-Path $repoRoot 'tools\run-foundation-validation.ps1') -Raw
+$androidRunner = Get-Content -LiteralPath (Join-Path $repoRoot 'tools\run-android-showcase-validation.ps1') -Raw
+$androidComparison = Get-Content -LiteralPath (Join-Path $repoRoot 'tools\compare-android-gpu-timing-ab.ps1') -Raw
 foreach ($retired in @('MinimalRayGenShader.inc', 'MinimalLegacyRayGenShader.inc',
                         'kMinimalRayGenShader', 'kMinimalLegacyRayGenShader',
                         'legacyPipeline_', 'legacyShaderBindingTable_')) {
@@ -164,6 +167,13 @@ foreach ($hostSource in @($windowsHost, $androidHost)) {
     Assert-True $hostSource.Contains('SelectedOpaqueFastKey()') 'A platform host must serialize the selected OpaqueFast key.'
     Assert-True $hostSource.Contains('SelectedGenericDielectricKey()') 'A platform host must serialize the selected GenericDielectric key.'
     Assert-True $hostSource.Contains('DiagnosticsAvailability()') 'A platform host must publish diagnostic availability beside legacy scalars.'
+    Assert-True $hostSource.Contains('SelectedPipelineBundleIdentity()') 'A platform host must persist the full selected pair identity.'
+    Assert-True $hostSource.Contains('SelectedPipelineBundleDisplayIdentity()') 'A platform host must display the short selected pair identity.'
+    Assert-True (-not $hostSource.Contains('SelectedGenericDielectricSha256()).substr')) 'A platform host must not collapse pair identity to the generic-dielectric hash.'
+}
+foreach ($toolSource in @($foundationRunner, $androidRunner, $androidComparison)) {
+    Assert-True $toolSource.Contains('selectedRtPipelineBundle') 'Live validation tooling must preserve selected RT pipeline-pair provenance.'
+    Assert-True (-not $toolSource.Contains('raygenSha256')) 'Live validation tooling must not accept the compatibility raygen hash as runtime provenance.'
 }
 
 $rejectedControl = $false

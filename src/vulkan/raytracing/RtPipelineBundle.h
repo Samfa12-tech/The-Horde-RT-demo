@@ -109,6 +109,8 @@ public:
     [[nodiscard]] std::string_view GenericDielectricKey() const noexcept;
     [[nodiscard]] std::string_view OpaqueFastSha256() const noexcept;
     [[nodiscard]] std::string_view GenericDielectricSha256() const noexcept;
+    [[nodiscard]] std::string FullPairIdentity() const;
+    [[nodiscard]] std::string ShortPairIdentity() const;
 
     [[nodiscard]] RtStrategyPipelineResources& Strategy(RtMaterialStrategy strategy) noexcept;
     [[nodiscard]] const RtStrategyPipelineResources& Strategy(

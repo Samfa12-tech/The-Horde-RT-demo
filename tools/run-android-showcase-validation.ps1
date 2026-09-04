@@ -39,7 +39,6 @@ $reference30FpsMs = 1000.0 / 30.0
 $sourceCommit = (& git -C $repoRoot rev-parse HEAD 2>&1 | Out-String).Trim()
 if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($sourceCommit)) { throw "Could not resolve the source Git commit." }
 $sourceDirty = -not [string]::IsNullOrWhiteSpace((& git -C $repoRoot status --porcelain 2>&1 | Out-String).Trim())
-$raygenSha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $repoRoot "src\vulkan\raytracing\MinimalRayGenShader.inc")).Hash.ToLowerInvariant()
 $checkpointZones = @{
     "opening" = "opening"
     "skeleton" = "skeleton-room"
@@ -110,6 +109,8 @@ $timingRows = [System.Collections.Generic.List[object]]::new()
 $captureRecords = [System.Collections.Generic.List[object]]::new()
 $failures = [System.Collections.Generic.List[string]]::new()
 $warnings = [System.Collections.Generic.List[string]]::new()
+$selectedRtPipelineBundle = $null
+$selectedRtPipelineBundleSerialized = $null
 $initialWakefulness = ""
 $lifecycleEvidence = [ordered]@{
     requested = [bool]$Capture
@@ -199,9 +200,37 @@ function Get-ShowcaseState {
     param([string]$Destination)
     Save-PrivateFile -RemotePath "files/reports/showcase_debug_state.json" -Destination $Destination
     try {
-        return Get-Content -LiteralPath $Destination -Raw | ConvertFrom-Json
+        $state = Get-Content -LiteralPath $Destination -Raw | ConvertFrom-Json
     } catch {
         throw "Native showcase state is not valid JSON: $Destination`n$($_.Exception.Message)"
+    }
+    Register-SelectedRtPipelineBundle -Bundle $state.selectedRtPipelineBundle -Context $Destination
+    return $state
+}
+
+function Register-SelectedRtPipelineBundle {
+    param([Parameter(Mandatory = $true)]$Bundle,
+          [Parameter(Mandatory = $true)][string]$Context)
+    foreach ($strategy in @("opaqueFast", "genericDielectric")) {
+        $entry = $Bundle.$strategy
+        if ($null -eq $entry -or [string]::IsNullOrWhiteSpace([string]$entry.key) -or
+            [string]$entry.sha256 -cnotmatch '^[0-9a-f]{64}$') {
+            throw "$Context is missing exact selected $strategy key/hash identity."
+        }
+    }
+    $opaquePolicy = ([string]$Bundle.opaqueFast.key) -replace '_opaque_fast$', ''
+    $genericPolicy = ([string]$Bundle.genericDielectric.key) -replace '_generic_dielectric$', ''
+    if ($opaquePolicy -ceq [string]$Bundle.opaqueFast.key -or
+        $genericPolicy -ceq [string]$Bundle.genericDielectric.key -or
+        $opaquePolicy -cne $genericPolicy) {
+        throw "$Context does not identify one coherent selected RT pipeline policy pair."
+    }
+    $serialized = $Bundle | ConvertTo-Json -Depth 4 -Compress
+    if ($null -eq $script:selectedRtPipelineBundle) {
+        $script:selectedRtPipelineBundle = $Bundle
+        $script:selectedRtPipelineBundleSerialized = $serialized
+    } elseif ($serialized -cne $script:selectedRtPipelineBundleSerialized) {
+        throw "$Context selected RT pipeline bundle changed during one evidence run."
     }
 }
 
@@ -314,6 +343,7 @@ function Invoke-CaptureCheckpoint {
         gpu = $state.gpu
         buildIdentity = $state.buildIdentity
         shaderIdentity = $state.shaderIdentity
+        selectedRtPipelineBundle = $state.selectedRtPipelineBundle
         outputRedBlueSwap = [bool]$state.outputRedBlueSwap
         animationTime = $state.animationTime
         playerCombat = $state.playerCombat
@@ -567,7 +597,7 @@ try {
         }
         Invoke-HomeResumeLifecycleCheck
         $captureManifest = [ordered]@{
-            schema = 1
+            schema = 2
             runId = $runId
             captureMode = "debug-only deterministic checkpoint intent plus ADB screencap"
             scale = $Scale
@@ -584,7 +614,7 @@ try {
             installedApkSha256 = $installedApkHash
             sourceCommit = $sourceCommit
             sourceDirty = $sourceDirty
-            raygenSha256 = $raygenSha256
+            selectedRtPipelineBundle = $script:selectedRtPipelineBundle
             checkpointCount = $captureRecords.Count
             checkpoints = @($captureRecords)
             lifecycle = $lifecycleEvidence
@@ -631,7 +661,7 @@ try {
     Invoke-AdbText @("shell", "dumpsys", "battery") -AllowFailure | Set-Content -LiteralPath (Join-Path $outputDirectory "battery-after.txt") -Encoding utf8
     $timingRows | Export-Csv -LiteralPath (Join-Path $outputDirectory "timing.csv") -NoTypeInformation
     $metadata = [ordered]@{
-        schema = 7
+        schema = 8
         runId = $runId
         mode = $Mode
         scale = $Scale
@@ -657,7 +687,7 @@ try {
         installedApkSha256 = $installedApkHash
         sourceCommit = $sourceCommit
         sourceDirty = $sourceDirty
-        raygenSha256 = $raygenSha256
+        selectedRtPipelineBundle = $script:selectedRtPipelineBundle
         captureRequested = [bool]$Capture
         captureCheckpointCount = $captureRecords.Count
         captureManifest = $(if ($Capture) { "capture-manifest.json" } else { $null })
@@ -685,7 +715,7 @@ try {
         "- Debug APK SHA-256: ``$apkHash``"
         "- Installed base APK SHA-256: ``$installedApkHash`` (exact match)"
         "- Source: ``$sourceCommit``$(if ($sourceDirty) { ' with a dirty worktree recorded' } else { ' from a clean worktree' })"
-        "- Embedded raygen SHA-256: ``$raygenSha256``"
+        "- Selected RT pipeline pair: ``$($script:selectedRtPipelineBundle.opaqueFast.key)@$($script:selectedRtPipelineBundle.opaqueFast.sha256) | $($script:selectedRtPipelineBundle.genericDielectric.key)@$($script:selectedRtPipelineBundle.genericDielectric.sha256)``"
         "- Scale: $Scale%$(if ($Include100) { ' plus report-only 100% opening' } else { '' })"
         "- GPU timestamp instrumentation: $gpuTimingLabel (RT rendering unchanged)"
         "- Evidence type: automated deterministic checkpoint/replay evidence; visual quality and perceived spatial audio remain hands-on checks."

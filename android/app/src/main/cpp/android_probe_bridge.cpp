@@ -452,8 +452,7 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(const Swapchai
     const horde::gameplay::EnemyEncounterSnapshot* encounter = SelectedEncounter(roster);
     horde::ui::DeveloperOverlaySnapshot snapshot;
     snapshot.buildIdentity = std::string(HORDE_RT_BUILD_ID) + " DEBUG";
-    snapshot.shaderIdentity = std::string(
-        context.rtScene.SelectedGenericDielectricSha256()).substr(0u, 12u);
+    snapshot.shaderIdentity = context.rtScene.SelectedPipelineBundleDisplayIdentity();
     const horde::gameplay::PlayerVitalsSnapshot& playerVitals = simulation.playerVitals;
     snapshot.playerLifePhase = horde::gameplay::PlayerLifePhaseName(playerVitals.phase);
     snapshot.playerVitality = playerVitals.vitality;
@@ -632,8 +631,7 @@ horde::gameplay::ShowcaseBenchmarkMetadata BuildBenchmarkMetadata(const Swapchai
     horde::gameplay::ShowcaseBenchmarkMetadata metadata;
     metadata.timestampUtc = UtcTimestamp();
     metadata.buildIdentity = HORDE_RT_BUILD_ID;
-    metadata.shaderIdentity = std::string(
-        context.rtScene.SelectedGenericDielectricSha256()).substr(0u, 12u);
+    metadata.shaderIdentity = context.rtScene.SelectedPipelineBundleIdentity();
     metadata.gpuName = context.capabilities.identity.gpuName;
     metadata.vulkanApi = std::to_string(VK_API_VERSION_MAJOR(context.capabilities.identity.vulkanApiVersion)) + "." +
                          std::to_string(VK_API_VERSION_MINOR(context.capabilities.identity.vulkanApiVersion)) + "." +
@@ -945,7 +943,7 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
          << "  \"tlasInstanceCount\": " << context.rtScene.TlasInstanceCount() << ",\n"
          << "  \"buildIdentity\": \"" << HORDE_RT_BUILD_ID << " DEBUG\",\n"
          << "  \"shaderIdentity\": \""
-         << std::string(context.rtScene.SelectedGenericDielectricSha256()).substr(0u, 12u)
+         << context.rtScene.SelectedPipelineBundleDisplayIdentity()
          << "\",\n"
          << "  \"gpu\": \"" << context.capabilities.identity.gpuName << "\",\n"
          << "  \"swapchainExtent\": {\"width\": " << context.swapchainExtent.width
