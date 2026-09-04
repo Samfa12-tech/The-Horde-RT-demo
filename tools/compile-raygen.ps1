@@ -7,7 +7,12 @@ param(
     [string]$Variant,
     [switch]$Matrix,
     [string]$Strategy,
-    [string]$ManifestPath
+    [string]$ManifestPath,
+    [switch]$Freeze,
+    [switch]$CheckCatalog,
+    [string]$ArtifactDirectory,
+    [string]$CatalogPath,
+    [string]$BudgetPath
 )
 
 $ErrorActionPreference = 'Stop'
@@ -143,6 +148,204 @@ function Get-RaygenFileSha256
     {
         $sha256.Dispose()
     }
+}
+
+function Get-RaygenCanonicalText
+{
+    param([string]$Path)
+
+    $lines = [IO.File]::ReadAllLines($Path)
+    if ($lines.Count -eq 0) { return '' }
+    return [string]::Join("`n", $lines) + "`n"
+}
+
+function Write-RaygenCanonicalText
+{
+    param([string]$Path, [string]$Text)
+
+    [IO.File]::WriteAllText($Path, $Text.Replace("`r`n", "`n").Replace("`r", "`n"), [Text.UTF8Encoding]::new($false))
+}
+
+function Get-RaygenToolVersion
+{
+    param([string]$Tool)
+
+    $versionLines = @(& $Tool --version 2>&1 | ForEach-Object { ([string]$_).Trim() } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+    if ($LASTEXITCODE -ne 0 -or $versionLines.Count -eq 0)
+    {
+        throw "Unable to determine tool version: $Tool"
+    }
+    return (($versionLines -join ' ') -replace '\s+', ' ').Trim()
+}
+
+function Get-RaygenSpirvWords
+{
+    param([string]$Path)
+
+    $bytes = [IO.File]::ReadAllBytes($Path)
+    if (($bytes.Length % 4) -ne 0) { throw "SPIR-V is not word aligned: $Path" }
+    $words = for ($offset = 0; $offset -lt $bytes.Length; $offset += 4) { [BitConverter]::ToUInt32($bytes, $offset) }
+    return [pscustomobject]@{ Bytes = $bytes; Words = @($words) }
+}
+
+function Get-RaygenIncludeText
+{
+    param([string]$Key, [string]$DependencySha256, [uint32[]]$Words)
+
+    $lines = for ($index = 0; $index -lt $Words.Count; $index += 8)
+    {
+        $last = [Math]::Min($index + 7, $Words.Count - 1)
+        '    ' + ((@($Words[$index..$last] | ForEach-Object { '0x{0:x8}u' -f $_ }) -join ', ') + ',')
+    }
+    return "// Raygen variant key: $Key`n// Raygen dependency SHA-256: $DependencySha256`n" + ($lines -join "`n") + "`n"
+}
+
+function Read-RaygenInclude
+{
+    param([string]$Path, [string]$ExpectedKey, [string]$ExpectedDependencySha256)
+
+    $text = Get-RaygenCanonicalText -Path $Path
+    $key = [regex]::Match($text, '^// Raygen variant key: ([a-z_]+)$', [Text.RegularExpressions.RegexOptions]::Multiline).Groups[1].Value
+    $dependency = [regex]::Match($text, '^// Raygen dependency SHA-256: ([0-9a-f]{64})$', [Text.RegularExpressions.RegexOptions]::Multiline).Groups[1].Value
+    if (-not (Test-RaygenExactString -Left $key -Right $ExpectedKey) -or
+        -not (Test-RaygenExactString -Left $dependency -Right $ExpectedDependencySha256))
+    {
+        throw "Raygen variant include header mismatch: $Path"
+    }
+    $matches = [regex]::Matches($text, '0x([0-9a-fA-F]{8})u')
+    if ($matches.Count -eq 0) { throw "Raygen variant include contains no words: $Path" }
+    $words = foreach ($match in $matches) { [Convert]::ToUInt32($match.Groups[1].Value, 16) }
+    $bytes = New-Object byte[] ($words.Count * 4)
+    for ($index = 0; $index -lt $words.Count; ++$index)
+    {
+        [Array]::Copy([BitConverter]::GetBytes([uint32]$words[$index]), 0, $bytes, $index * 4, 4)
+    }
+    return [pscustomobject]@{ Text = $text; Words = @($words); Bytes = $bytes }
+}
+
+function Test-RaygenAllowedPath
+{
+    param([string]$Path, [string]$ExpectedPath, [string]$Label)
+
+    if ([string]::IsNullOrWhiteSpace($Path) -or -not [IO.Path]::IsPathRooted($Path))
+    {
+        throw "$Label requires an absolute path."
+    }
+    $fullPath = [IO.Path]::GetFullPath($Path)
+    $expectedFullPath = [IO.Path]::GetFullPath($ExpectedPath)
+    if (-not $fullPath.Equals($expectedFullPath, [StringComparison]::OrdinalIgnoreCase))
+    {
+        throw "$Label must be exactly $expectedFullPath."
+    }
+    return $fullPath
+}
+
+function Assert-RaygenFrozenBudgets
+{
+    param([pscustomobject]$Budgets, [object[]]$Variants)
+
+    if ($Budgets.schema -ne 1 -or -not (Test-RaygenExactString -Left $Budgets.status -Right 'frozen'))
+    {
+        throw 'Raygen variant budgets must use frozen schema 1.'
+    }
+    $metrics = @('bytes', 'words', 'instructions', 'branchOperations', 'loops', 'selectionMerges', 'functions', 'functionCalls', 'rayQueryInitializations', 'atomicInstructions')
+    if (-not (Test-RaygenExactString -Left (@($Budgets.PSObject.Properties.Name | Sort-Object) -join ',') -Right 'budgets,metrics,schema,status') -or
+        -not (Test-RaygenExactString -Left (@($Budgets.metrics) -join ',') -Right ($metrics -join ',')))
+    {
+        throw 'Raygen variant budgets have an unsupported schema or metric set.'
+    }
+    $rows = @($Budgets.budgets)
+    if ($rows.Count -ne $Variants.Count) { throw 'Raygen variant budgets must contain exactly eight rows.' }
+    for ($index = 0; $index -lt $Variants.Count; ++$index)
+    {
+        $row = $rows[$index]
+        $variant = $Variants[$index]
+        if (-not (Test-RaygenExactString -Left (@($row.PSObject.Properties.Name | Sort-Object) -join ',') -Right 'exact,key,max') -or
+            -not (Test-RaygenExactString -Left $row.key -Right $variant.key) -or
+            -not (Test-RaygenExactString -Left (@($row.max.PSObject.Properties.Name | Sort-Object) -join ',') -Right (($metrics | Sort-Object) -join ',')) -or
+            -not (Test-RaygenExactString -Left (@($row.exact.PSObject.Properties.Name | Sort-Object) -join ',') -Right 'atomicInstructions,boundedGenericFunctionsRetained,driverSafeFullyInlined,hasDiagnosticsBinding,instrumentation,material,quality,shippingAllowed,strategy'))
+        {
+            throw "Raygen variant budget row is malformed: $($variant.key)"
+        }
+        foreach ($metric in $metrics)
+        {
+            if ($row.max.$metric -isnot [long] -and $row.max.$metric -isnot [int]) { throw "Raygen variant budget metric is invalid: $($variant.key)/$metric" }
+            if ([long]$variant.$metric -gt [long]$row.max.$metric) { throw "Raygen variant exceeds frozen budget: $($variant.key)/$metric" }
+        }
+        foreach ($property in @('instrumentation', 'quality', 'material', 'strategy', 'shippingAllowed', 'atomicInstructions', 'hasDiagnosticsBinding', 'driverSafeFullyInlined', 'boundedGenericFunctionsRetained'))
+        {
+            if ($row.exact.$property -ne $variant.$property) { throw "Raygen variant exact budget invariant changed: $($variant.key)/$property" }
+        }
+        if ($variant.instrumentation -eq 'Shipping' -and ($variant.atomicInstructions -ne 0 -or $variant.hasDiagnosticsBinding))
+        { throw "Shipping variant violates diagnostic budget invariants: $($variant.key)" }
+        $expectedDiagnosticAtomics = if ($variant.material -eq 'GenericDielectric') { 32 } else { 5 }
+        if ($variant.instrumentation -eq 'Diagnostic' -and (-not $variant.hasDiagnosticsBinding -or $variant.atomicInstructions -ne $expectedDiagnosticAtomics))
+        { throw "Diagnostic variant violates reviewed counter shape: $($variant.key)" }
+    }
+}
+
+function New-RaygenVariantCatalog
+{
+    param([pscustomobject]$Manifest, [string]$OutputRoot)
+
+    $variantRows = @()
+    foreach ($definition in $Manifest.Variants)
+    {
+        $variantRoot = Join-Path $OutputRoot $definition.name
+        $stats = Get-Content -LiteralPath (Join-Path $variantRoot 'raygen-stats.json') -Raw | ConvertFrom-Json
+        $spirvPath = Join-Path $variantRoot 'minimal.rgen.spv'
+        $spirv = Get-RaygenSpirvWords -Path $spirvPath
+        $artifactPath = "src/vulkan/raytracing/variants/$($definition.name).inc"
+        $includeText = Get-RaygenIncludeText -Key $definition.name -DependencySha256 $stats.dependencySha256 -Words $spirv.Words
+        $stageInclude = Join-Path $variantRoot "$($definition.name).inc"
+        Write-RaygenCanonicalText -Path $stageInclude -Text $includeText
+        $optimizerArguments = [Collections.ArrayList]::new()
+        if ($definition.strategy -eq 'LegacyInlined') { [void]$optimizerArguments.Add('-O') }
+        else
+        {
+            foreach ($pass in @('--eliminate-dead-functions', '--eliminate-dead-code-aggressive', '--simplify-instructions', '--eliminate-dead-branches', '--cfg-cleanup'))
+            { [void]$optimizerArguments.Add($pass) }
+        }
+        $variantRows += [ordered]@{
+            key = $definition.name; instrumentation = $definition.instrumentation; quality = $definition.quality
+            material = $definition.material; strategy = $definition.strategy; shippingAllowed = $definition.shippingAllowed
+            artifactPath = $artifactPath; dependencySha256 = $stats.dependencySha256; dependencies = @($stats.dependencies)
+            includeSha256 = Get-RaygenDependencyHash -Path $stageInclude; spirvSha256 = Get-RaygenFileSha256 -Path $spirvPath
+            bytes = $stats.bytes; words = $stats.words; instructions = $stats.instructions; branchOperations = $stats.branchOperations
+            loops = $stats.loops; selectionMerges = $stats.selectionMerges; functions = $stats.functions
+            functionCalls = $stats.functionCalls; rayQueryInitializations = $stats.rayQueryInitializations
+            atomicInstructions = $stats.atomicInstructions; hasDiagnosticsBinding = $stats.hasDiagnosticsBinding
+            driverSafeFullyInlined = $stats.driverSafeFullyInlined; boundedGenericFunctionsRetained = $stats.boundedGenericFunctionsRetained
+            compiler = [ordered]@{
+                validatorArguments = if ($definition.strategy -eq 'LegacyInlined') { @('-V', '--target-env', 'vulkan1.2', '-Os', '-S', 'rgen') } else { @('-V', '--target-env', 'vulkan1.2', '-S', 'rgen') }
+                optimizerArguments = $optimizerArguments
+                validatorArgumentsAfterOutput = @('-S', 'rgen')
+            }
+        }
+    }
+    return [ordered]@{
+        schema = 1; status = 'frozen'; target = [ordered]@{ environment = 'vulkan1.2'; stage = 'rgen' }
+        generator = [ordered]@{ path = 'tools/compile-raygen.ps1'; interface = 'freeze-v1'; sha256 = Get-RaygenDependencyHash -Path $PSCommandPath }
+        toolchain = [ordered]@{
+            glslangValidator = [ordered]@{ version = Get-RaygenToolVersion -Tool $validator; arguments = @('-V', '--target-env', 'vulkan1.2', '-S', 'rgen') }
+            spirvOpt = [ordered]@{ version = Get-RaygenToolVersion -Tool $optimizer }
+            spirvVal = [ordered]@{ version = Get-RaygenToolVersion -Tool (Join-Path $VulkanSdk 'Bin\spirv-val.exe'); arguments = @('--target-env', 'vulkan1.2') }
+            spirvDis = [ordered]@{ version = Get-RaygenToolVersion -Tool $disassembler }
+        }
+        authorities = [ordered]@{
+            manifest = [ordered]@{ path = 'tools/raygen-variants.json'; sha256 = $Manifest.Sha256 }
+            source = [ordered]@{ path = 'shaders/raytracing/minimal.rgen'; sha256 = Get-RaygenDependencyHash -Path $source }
+            variantConfig = [ordered]@{ path = 'shaders/raytracing/include/rt_variant_config.glsl'; sha256 = Get-RaygenDependencyHash -Path (Join-Path $repoRoot 'shaders\raytracing\include\rt_variant_config.glsl') }
+        }
+        variants = @($variantRows)
+    }
+}
+
+function Write-RaygenCatalogJson
+{
+    param([string]$Path, [object]$Catalog)
+    $json = ($Catalog | ConvertTo-Json -Depth 16).Replace("`r`n", "`n") + "`n"
+    Write-RaygenCanonicalText -Path $Path -Text $json
 }
 
 function Test-RaygenExactString
@@ -334,6 +537,67 @@ function Write-RaygenVariantSource
         [Text.UTF8Encoding]::new($false))
 }
 
+function Get-RaygenBracedFunctionBody
+{
+    param([string]$Source, [string]$Name)
+
+    $match = [regex]::Match($Source, ('(?ms)^\s*(?:[A-Za-z_]\w*\s+)+{0}\s*\([^{{;]*\)\s*\{{' -f [regex]::Escape($Name)))
+    if (-not $match.Success) { throw "Missing preprocessed function definition: $Name" }
+    $depth = 0
+    for ($index = $match.Index + $match.Length - 1; $index -lt $Source.Length; ++$index)
+    {
+        if ($Source[$index] -eq '{') { ++$depth }
+        elseif ($Source[$index] -eq '}')
+        {
+            --$depth
+            if ($depth -eq 0) { return $Source.Substring($match.Index, $index - $match.Index + 1) }
+        }
+    }
+    throw "Unterminated preprocessed function definition: $Name"
+}
+
+function Assert-RaygenMatrixRoute
+{
+    param([string]$Source, [string]$Name, [string]$InterfaceConstant, [string]$Guard, [switch]$StaticCeiling, [string]$VolumeConstant = '')
+
+    $body = Get-RaygenBracedFunctionBody -Source $Source -Name $Name
+    if ($body -match 'controls\.waterQuality' -or $body -notmatch ("\bconst\s+int\s+interfaceBudget\s*=\s*{0}\s*;" -f [regex]::Escape($InterfaceConstant)) -or
+        $body -notmatch ("\b{0}\s*>=\s*interfaceBudget\b" -f [regex]::Escape($Guard)))
+    { throw "Matrix route budget contract failed: $Name" }
+    if ($StaticCeiling -and $body -notmatch ("\bfor\s*\([^;]*;\s*\w+\s*<=\s*{0}\s*;" -f [regex]::Escape($InterfaceConstant)))
+    { throw "Matrix route lost its static interface ceiling: $Name" }
+    if (-not [string]::IsNullOrWhiteSpace($VolumeConstant) -and
+        ($body -notmatch ("\bconst\s+int\s+volumeBudget\s*=\s*{0}\s*;" -f [regex]::Escape($VolumeConstant)) -or
+         $body -notmatch ("\[\s*{0}\s*\]" -f [regex]::Escape($VolumeConstant)) -or
+         $body -notmatch ("\bfor\s*\([^;]*;\s*\w+\s*<\s*{0}\s*;" -f [regex]::Escape($VolumeConstant))))
+    { throw "Matrix route volume budget contract failed: $Name" }
+}
+
+function Assert-RaygenSpecializedRoutes
+{
+    param([string]$Path, [pscustomobject]$VariantDefinition)
+
+    if ($VariantDefinition.material -ne 'GenericDielectric') { return }
+    $sourceText = Get-RaygenCanonicalText -Path $Path
+    $interface = if ($VariantDefinition.quality -eq 'Mobile') { 4 } else { 8 }
+    $volume = if ($VariantDefinition.quality -eq 'Mobile') { 2 } else { 4 }
+    foreach ($constant in @('kRtVariantDielectricInterfaceBudget', 'kRtVariantShadowInterfaceBudget'))
+    {
+        if (@([regex]::Matches($sourceText, ("\bconst\s+int\s+{0}\s*=\s*{1}\s*;" -f $constant, $interface))).Count -ne 1)
+        { throw "Matrix preprocessed source lost literal interface budget $constant=$interface." }
+    }
+    foreach ($constant in @('kRtVariantDielectricVolumeBudget', 'kRtVariantShadowVolumeBudget'))
+    {
+        if (@([regex]::Matches($sourceText, ("\bconst\s+int\s+{0}\s*=\s*{1}\s*;" -f $constant, $volume))).Count -ne 1)
+        { throw "Matrix preprocessed source lost literal volume budget $constant=$volume." }
+    }
+    Assert-RaygenMatrixRoute -Source $sourceText -Name 'shadeBoundedDielectric' -InterfaceConstant 'kRtVariantDielectricInterfaceBudget' -Guard 'interfaceIndex' -StaticCeiling -VolumeConstant 'kRtVariantDielectricVolumeBudget'
+    Assert-RaygenMatrixRoute -Source $sourceText -Name 'shadeProductionBoundedDielectric' -InterfaceConstant 'kRtVariantDielectricInterfaceBudget' -Guard 'interfaceIndex' -StaticCeiling
+    Assert-RaygenMatrixRoute -Source $sourceText -Name 'shadowTransmittanceMask' -InterfaceConstant 'kRtVariantShadowInterfaceBudget' -Guard 'interfaceCount' -StaticCeiling -VolumeConstant 'kRtVariantShadowVolumeBudget'
+    Assert-RaygenMatrixRoute -Source $sourceText -Name 'compactShadowTransmittanceMask' -InterfaceConstant 'kRtVariantShadowInterfaceBudget' -Guard 'interfaceCount' -StaticCeiling
+    Assert-RaygenMatrixRoute -Source $sourceText -Name 'boundedShadowTransmittanceMask' -InterfaceConstant 'kRtVariantShadowInterfaceBudget' -Guard 'interfaceCount'
+}
+
 function Invoke-RaygenVariantCompilation
 {
     param(
@@ -382,6 +646,7 @@ function Invoke-RaygenVariantCompilation
     # literal budget before dead-code elimination.
     & $validator -E -S rgen $resolvedSourcePath | Set-Content -LiteralPath $preprocessedSourcePath -Encoding utf8
     if ($LASTEXITCODE -ne 0) { throw "Raygen variant preprocessing failed with exit code $LASTEXITCODE." }
+    Assert-RaygenSpecializedRoutes -Path $preprocessedSourcePath -VariantDefinition $VariantDefinition
 
     $dependencyHashes = @($dependencies | ForEach-Object {
         [ordered]@{ path = Get-RaygenRelativePath -Path $_; sha256 = Get-RaygenDependencyHash -Path $_ }
@@ -455,6 +720,108 @@ function Invoke-RaygenVariantCompilation
         ($stats | ConvertTo-Json -Depth 4), [Text.UTF8Encoding]::new($false))
     Write-Output ("Raygen variant {0}: {1} bytes; functions={2}; calls={3}; ray-query sites={4}; dependency SHA-256={5}" -f
         $VariantDefinition.name, $bytes.Length, $functionCount, $functionCallCount, $rayQueryInitializationCount, $dependencyHash)
+}
+
+function Invoke-RaygenFrozenCatalogMode
+{
+    param([switch]$Publish)
+
+    if ($Check -or $Legacy -or $Matrix -or -not [string]::IsNullOrWhiteSpace($Variant) -or
+        -not [string]::IsNullOrWhiteSpace($Strategy) -or -not [string]::IsNullOrWhiteSpace($OutputDirectory) -or
+        -not [string]::IsNullOrWhiteSpace($EmbeddedIncludePath))
+    {
+        throw 'Freeze and catalog-check modes are mutually exclusive with compatibility and temporary matrix modes.'
+    }
+    $expectedArtifacts = Join-Path $repoRoot 'src\vulkan\raytracing\variants'
+    $expectedCatalog = Join-Path $repoRoot 'tools\raygen-variant-catalog.json'
+    $expectedBudgets = Join-Path $repoRoot 'tools\raygen-variant-budgets.json'
+    $artifactRoot = Test-RaygenAllowedPath -Path $ArtifactDirectory -ExpectedPath $expectedArtifacts -Label 'ArtifactDirectory'
+    $catalogFile = Test-RaygenAllowedPath -Path $CatalogPath -ExpectedPath $expectedCatalog -Label 'CatalogPath'
+    $budgetFile = Test-RaygenAllowedPath -Path $BudgetPath -ExpectedPath $expectedBudgets -Label 'BudgetPath'
+    if (-not (Test-Path -LiteralPath $budgetFile -PathType Leaf)) { throw "Frozen raygen budgets were not found: $budgetFile" }
+    $budgets = Get-Content -LiteralPath $budgetFile -Raw | ConvertFrom-Json
+    $manifest = Get-RaygenVariantManifest -Path $ManifestPath
+    $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) ('horde-raygen-freeze-' + [guid]::NewGuid().ToString('N'))
+    $statusBefore = (& git -C $repoRoot status --porcelain) -join "`n"
+    try
+    {
+        New-Item -ItemType Directory -Path $temporaryRoot | Out-Null
+        foreach ($definition in $manifest.Variants)
+        {
+            Invoke-RaygenVariantCompilation -VariantDefinition $definition -OutputRoot $temporaryRoot -Manifest $manifest
+        }
+        $expectedCatalogObject = New-RaygenVariantCatalog -Manifest $manifest -OutputRoot $temporaryRoot
+        Assert-RaygenFrozenBudgets -Budgets $budgets -Variants @($expectedCatalogObject.variants)
+        $expectedCatalogPath = Join-Path $temporaryRoot 'raygen-variant-catalog.json'
+        Write-RaygenCatalogJson -Path $expectedCatalogPath -Catalog $expectedCatalogObject
+
+        if ($Publish)
+        {
+            # No tracked output is touched until all eight compiles, SPIR-V
+            # validations, catalog construction, and frozen-budget checks pass.
+            if (-not (Test-Path -LiteralPath $artifactRoot)) { New-Item -ItemType Directory -Path $artifactRoot | Out-Null }
+            $expectedNames = @($manifest.Variants | ForEach-Object { "$($_.name).inc" })
+            $unexpected = @(Get-ChildItem -LiteralPath $artifactRoot -File -ErrorAction Stop | Where-Object { $_.Name -notin $expectedNames })
+            if ($unexpected.Count -ne 0) { throw 'Artifact directory contains an unexpected file; refusing to publish a partial catalog.' }
+            foreach ($definition in $manifest.Variants)
+            {
+                Copy-Item -LiteralPath (Join-Path (Join-Path $temporaryRoot $definition.name) "$($definition.name).inc") `
+                    -Destination (Join-Path $artifactRoot "$($definition.name).inc") -Force
+            }
+            Copy-Item -LiteralPath $expectedCatalogPath -Destination $catalogFile -Force
+            Write-Output "Frozen eight raygen variant artifacts and catalog."
+            return
+        }
+
+        if (-not (Test-Path -LiteralPath $artifactRoot -PathType Container) -or -not (Test-Path -LiteralPath $catalogFile -PathType Leaf))
+        {
+            throw 'Frozen raygen variant artifacts or catalog are missing.'
+        }
+        $catalogBytes = [IO.File]::ReadAllBytes($catalogFile)
+        if ($catalogBytes.Length -ge 3 -and $catalogBytes[0] -eq 0xef -and $catalogBytes[1] -eq 0xbb -and $catalogBytes[2] -eq 0xbf)
+        { throw 'Frozen raygen variant catalog must not contain a UTF-8 BOM.' }
+        $catalogText = Get-RaygenCanonicalText -Path $catalogFile
+        if ($catalogText -match "`r") { throw 'Frozen raygen variant catalog must use LF line endings.' }
+        $actualCatalog = $catalogText | ConvertFrom-Json
+        if (-not (Test-RaygenExactString -Left (@($actualCatalog.PSObject.Properties.Name | Sort-Object) -join ',') -Right 'authorities,generator,schema,status,target,toolchain,variants') -or
+            $actualCatalog.schema -ne 1 -or -not (Test-RaygenExactString -Left $actualCatalog.status -Right 'frozen'))
+        { throw 'Frozen raygen variant catalog has an invalid schema.' }
+        $expectedCatalogText = Get-RaygenCanonicalText -Path $expectedCatalogPath
+        if (-not (Test-RaygenExactString -Left $catalogText -Right $expectedCatalogText))
+        { throw 'Frozen raygen variant catalog is stale or malformed.' }
+        foreach ($expectedVariant in $expectedCatalogObject.variants)
+        {
+            $includePath = Join-Path $repoRoot $expectedVariant.artifactPath.Replace('/', '\')
+            if (-not $includePath.StartsWith($artifactRoot.TrimEnd('\') + '\', [StringComparison]::OrdinalIgnoreCase))
+            { throw "Catalog artifact path escapes the variant directory: $($expectedVariant.artifactPath)" }
+            $include = Read-RaygenInclude -Path $includePath -ExpectedKey $expectedVariant.key -ExpectedDependencySha256 $expectedVariant.dependencySha256
+            $compiled = Get-RaygenSpirvWords -Path (Join-Path (Join-Path $temporaryRoot $expectedVariant.key) 'minimal.rgen.spv')
+            if ($include.Words.Count -ne $compiled.Words.Count -or (Get-RaygenDependencyHash -Path $includePath) -ne $expectedVariant.includeSha256)
+            { throw "Frozen raygen variant include is stale: $($expectedVariant.key)" }
+            for ($index = 0; $index -lt $compiled.Words.Count; ++$index)
+            {
+                if ($include.Words[$index] -ne $compiled.Words[$index]) { throw "Frozen raygen variant include words are stale: $($expectedVariant.key)" }
+            }
+            $rawHash = Get-RaygenFileSha256 -Path (Join-Path (Join-Path $temporaryRoot $expectedVariant.key) 'minimal.rgen.spv')
+            $includeRawHash = ([BitConverter]::ToString(([Security.Cryptography.SHA256]::Create().ComputeHash($include.Bytes)))).Replace('-', '').ToLowerInvariant()
+            if ($rawHash -ne $includeRawHash -or $rawHash -ne $expectedVariant.spirvSha256)
+            { throw "Frozen raygen variant raw SPIR-V hash mismatch: $($expectedVariant.key)" }
+        }
+        if ((& git -C $repoRoot status --porcelain) -join "`n" -ne $statusBefore)
+        { throw 'Read-only raygen catalog check modified the worktree.' }
+        Write-Output 'Frozen raygen variant catalog matches a fresh eight-key compilation.'
+    }
+    finally
+    {
+        if (Test-Path -LiteralPath $temporaryRoot) { Remove-Item -LiteralPath $temporaryRoot -Recurse -Force }
+    }
+}
+
+if ($Freeze -or $CheckCatalog)
+{
+    if ($Freeze -and $CheckCatalog) { throw '-Freeze and -CheckCatalog are mutually exclusive.' }
+    Invoke-RaygenFrozenCatalogMode -Publish:$Freeze
+    return
 }
 
 $variantMode = $Matrix -or -not [string]::IsNullOrWhiteSpace($Variant)

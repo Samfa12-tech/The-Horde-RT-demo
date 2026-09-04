@@ -5,6 +5,7 @@ if(POLICY CMP0091)
 endif()
 
 include(cmake/HordeRtVersion.cmake)
+include(cmake/HordeRtRaygenArtifacts.cmake)
 
 project(HordeLanternRT
     VERSION ${HORDE_RT_PACKAGE_VERSION}
@@ -13,7 +14,7 @@ project(HordeLanternRT
 )
 
 set(HORDE_RT_EMBEDDED_RAYGEN "${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan/raytracing/MinimalRayGenShader.inc")
-set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${HORDE_RT_EMBEDDED_RAYGEN}")
+horde_rt_configure_raygen_artifacts("${CMAKE_CURRENT_SOURCE_DIR}")
 file(SHA256 "${HORDE_RT_EMBEDDED_RAYGEN}" HORDE_RT_RAYGEN_SHA256)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -73,6 +74,7 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS)
     )
     target_compile_features(horde_rt_probe_core PUBLIC cxx_std_20)
     target_link_libraries(horde_rt_probe_core PUBLIC Vulkan::Vulkan horde_gameplay_simulation)
+    horde_rt_attach_raygen_artifacts(horde_rt_probe_core)
 endif()
 
 if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_CAPABILITY_PROBE_EXECUTABLE)
@@ -153,6 +155,7 @@ if(BUILD_TESTING)
         HORDE_RT_EXPECTED_VERSION="${HORDE_RT_PACKAGE_VERSION}"
         HORDE_RT_EXPECTED_ANDROID_VERSION_CODE=${HORDE_RT_ANDROID_VERSION_CODE}
     )
+    horde_rt_attach_raygen_artifacts(horde_rt_diagnostic_window)
     add_test(NAME horde_rt_version_contract_tests COMMAND horde_rt_version_contract_tests)
 
     add_executable(horde_rt_version_contract_incremental_configure_tests

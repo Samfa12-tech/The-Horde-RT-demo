@@ -6,6 +6,8 @@ $repoRoot = Split-Path -Parent $PSScriptRoot
 $compiler = Join-Path $repoRoot 'tools\compile-raygen.ps1'
 $manifestPath = Join-Path $repoRoot 'tools\raygen-variants.json'
 $budgetPath = Join-Path $repoRoot 'tools\raygen-variant-budgets.json'
+$catalogPath = Join-Path $repoRoot 'tools\raygen-variant-catalog.json'
+$artifactDirectory = Join-Path $repoRoot 'src\vulkan\raytracing\variants'
 $abiDefinitionPath = Join-Path $repoRoot 'src\vulkan\raytracing\RtSceneAbi.def'
 $generatedAbiPath = Join-Path $repoRoot 'shaders\raytracing\include\rt_scene_abi.generated.glsl'
 $diagnosticsPath = Join-Path $repoRoot 'shaders\raytracing\include\rt_diagnostics.glsl'
@@ -167,6 +169,10 @@ function Assert-PreprocessedBudgetConstants {
 }
 
 try {
+    Assert-True (Test-Path -LiteralPath $catalogPath -PathType Leaf) `
+        'Frozen raygen variant catalog is missing.'
+    Assert-True (Test-Path -LiteralPath $artifactDirectory -PathType Container) `
+        'Frozen raygen variant artifact directory is missing.'
     $abi = Get-Content -LiteralPath $abiDefinitionPath -Raw | ConvertFrom-Json
     Assert-True ($abi.schema -eq 1 -and $abi.bindings.dielectricDiagnostics -eq 22) `
         'RT scene ABI must retain schema 1 and diagnostics binding 22.'
@@ -207,9 +213,9 @@ try {
         'Matrix budgets must specialise all bounded dielectric/shadow routes while macro-absent compatibility retains runtime WaterQuality selection.'
 
     $budgets = Get-Content -LiteralPath $budgetPath -Raw | ConvertFrom-Json
-    Assert-True ($budgets.schema -eq 1 -and $budgets.status -eq 'unfrozen' -and
-        ($null -eq $budgets.budgets -or @($budgets.budgets).Count -eq 0)) `
-        'Task 3c must not freeze temporary matrix budgets.'
+    Assert-True ($budgets.schema -eq 1 -and $budgets.status -eq 'frozen' -and
+        @($budgets.budgets).Count -eq 8 -and @($budgets.metrics).Count -eq 10) `
+        'Task 3d must retain the reviewed frozen eight-key budget set.'
 
     New-Item -ItemType Directory -Path $temporaryRoot | Out-Null
     $genericInclude = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalRayGenShader.inc'
@@ -241,10 +247,6 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
             -InterfaceConstant 'kRtVariantDielectricInterfaceBudget' -GuardVariable 'interfaceIndex' -RequireStaticCeiling
     } 'A dielectric route with only a stale/missing static ceiling must fail the route contract.'
 
-    $matrixOutput = Join-Path $temporaryRoot 'matrix'
-    & $compiler -Matrix -OutputDirectory $matrixOutput
-    if ($LASTEXITCODE -ne 0) { throw "Matrix compiler failed with exit code $LASTEXITCODE." }
-
     $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
     $expectedKeys = @(
         'shipping_mobile_opaque_fast', 'shipping_mobile_generic_dielectric',
@@ -254,64 +256,11 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     Assert-True ((Compare-Object ($expectedKeys | Sort-Object) (@($manifest.variants | ForEach-Object name | Sort-Object))).Count -eq 0) `
         'Matrix manifest no longer contains the exact eight approved keys.'
 
-    foreach ($variant in $manifest.variants) {
-        $variantRoot = Join-Path $matrixOutput $variant.name
-        $statsPath = Join-Path $variantRoot 'raygen-stats.json'
-        $assemblyPath = Join-Path $variantRoot 'minimal.rgen.spvasm'
-        $resolvedPath = Join-Path $variantRoot 'minimal.rgen.resolved'
-        $preprocessedPath = Join-Path $variantRoot 'minimal.rgen.preprocessed'
-        Assert-True ((Test-Path -LiteralPath $statsPath) -and (Test-Path -LiteralPath $assemblyPath) -and
-            (Test-Path -LiteralPath $resolvedPath) -and (Test-Path -LiteralPath $preprocessedPath)) "Missing compiled artifact for $($variant.name)."
-        $stats = Get-Content -LiteralPath $statsPath -Raw | ConvertFrom-Json
-        $assembly = Get-Content -LiteralPath $assemblyPath -Raw
-        Assert-True ($stats.schema -eq 1 -and $stats.key -eq $variant.name -and
-            $stats.instrumentation -eq $variant.instrumentation -and $stats.quality -eq $variant.quality -and
-            $stats.material -eq $variant.material -and $stats.strategy -eq $variant.strategy -and
-            -not [string]::IsNullOrWhiteSpace($stats.dependencySha256) -and
-            -not [string]::IsNullOrWhiteSpace($stats.compiledSpirvSha256)) "Artifact identity mismatch for $($variant.name)."
-        if ($variant.strategy -eq 'GenericRetained') {
-            Assert-True ($stats.boundedGenericFunctionsRetained -and $stats.functions -gt 1 -and
-                $stats.functionCalls -gt 0 -and $stats.rayQueryInitializations -le 3) "Generic strategy shape changed for $($variant.name)."
-        } else {
-            Assert-True ($stats.driverSafeFullyInlined -and $stats.functions -eq 1 -and
-                $stats.functionCalls -eq 0 -and $stats.rayQueryInitializations -le 29) "Legacy strategy shape changed for $($variant.name)."
-        }
-        $hasBinding22 = $assembly -match '\bOpDecorate\s+%\S+\s+Binding\s+22\b'
-        if ($variant.instrumentation -eq 'Shipping') {
-            Assert-True ($stats.atomicInstructions -eq 0 -and -not $stats.hasDiagnosticsBinding -and -not $hasBinding22 -and
-                $assembly -notmatch '\bOpAtomic\w+\b') "Shipping artifact retained diagnostic SSBO work: $($variant.name)."
-        } else {
-            $expectedAtomics = if ($variant.material -eq 'GenericDielectric') { 32 } else { 5 }
-            Assert-True ($stats.atomicInstructions -eq $expectedAtomics -and $stats.hasDiagnosticsBinding -and $hasBinding22 -and
-                ([regex]::Matches($assembly, '\bOpAtomic\w+\b').Count -eq $expectedAtomics)) `
-                "Diagnostic artifact lost its expected atomic/binding shape: $($variant.name)."
-        }
-        if ($variant.material -eq 'GenericDielectric') {
-            $expectedBound = if ($variant.quality -eq 'Mobile') { 4 } else { 8 }
-            $expectedVolume = if ($variant.quality -eq 'Mobile') { 2 } else { 4 }
-            $preprocessed = Get-Content -LiteralPath $preprocessedPath -Raw
-            # GenericDielectric owns all six specialized routes. The legacy
-            # strategy may validly DCE them, so prove each route before DCE in
-            # exact compiler-preprocessed source and retain the live SPIR-V
-            # comparator assertion below for the surviving generic route.
-            Assert-PreprocessedBudgetConstants -PreprocessedSource $preprocessed `
-                -ExpectedInterfaceBudget $expectedBound -ExpectedVolumeBudget $expectedVolume
-            Assert-MatrixRouteBudget -PreprocessedSource $preprocessed -FunctionName 'shadeBoundedDielectric' `
-                -InterfaceConstant 'kRtVariantDielectricInterfaceBudget' -GuardVariable 'interfaceIndex' `
-                -RequireStaticCeiling -VolumeConstant 'kRtVariantDielectricVolumeBudget'
-            Assert-MatrixRouteBudget -PreprocessedSource $preprocessed -FunctionName 'shadeProductionBoundedDielectric' `
-                -InterfaceConstant 'kRtVariantDielectricInterfaceBudget' -GuardVariable 'interfaceIndex' -RequireStaticCeiling
-            Assert-MatrixRouteBudget -PreprocessedSource $preprocessed -FunctionName 'shadowTransmittanceMask' `
-                -InterfaceConstant 'kRtVariantShadowInterfaceBudget' -GuardVariable 'interfaceCount' `
-                -RequireStaticCeiling -VolumeConstant 'kRtVariantShadowVolumeBudget'
-            Assert-MatrixRouteBudget -PreprocessedSource $preprocessed -FunctionName 'compactShadowTransmittanceMask' `
-                -InterfaceConstant 'kRtVariantShadowInterfaceBudget' -GuardVariable 'interfaceCount' -RequireStaticCeiling
-            Assert-MatrixRouteBudget -PreprocessedSource $preprocessed -FunctionName 'boundedShadowTransmittanceMask' `
-                -InterfaceConstant 'kRtVariantShadowInterfaceBudget' -GuardVariable 'interfaceCount'
-            Assert-True ($assembly -match ("\bOp(?:SLessThanEqual|SGreaterThanEqual)\s+%bool\s+%\S+\s+%int_{0}\b" -f $expectedBound)) `
-                "Generic artifact did not compile the expected interface ceiling ${expectedBound}: $($variant.name)."
-        }
-    }
+    # CheckCatalog is the sole matrix compilation in this test. It replays all
+    # eight compile/preprocess/validate/disassemble paths into temporary storage
+    # and compares catalog, include words, raw SPIR-V, budgets, and toolchain.
+    & $compiler -CheckCatalog -ArtifactDirectory $artifactDirectory -CatalogPath $catalogPath -BudgetPath $budgetPath
+    if ($LASTEXITCODE -ne 0) { throw "Frozen catalog check failed with exit code $LASTEXITCODE." }
 
     $compatibilityGenericOutput = Join-Path $temporaryRoot 'compatibility-generic'
     & $compiler -Check -OutputDirectory $compatibilityGenericOutput
