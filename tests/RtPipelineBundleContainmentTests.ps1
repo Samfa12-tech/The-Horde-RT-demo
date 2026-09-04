@@ -103,6 +103,16 @@ try {
         'Final Android target machine is not AArch64.'
     })
 
+    if ($TargetPlatform -ceq 'Android') {
+        $wrongElfTypePath = Join-Path $temporaryRoot 'wrong-elf-type.bin'
+        $wrongElfType = [byte[]]$targetBytes.Clone()
+        $wrongElfType[16] = 0x02
+        $wrongElfType[17] = 0x00
+        [IO.File]::WriteAllBytes($wrongElfTypePath, $wrongElfType)
+        Invoke-ScannerExpectFailure $wrongElfTypePath `
+            'Final Android target is not an ELF shared object.'
+    }
+
     $selectedPayloads = [Collections.Generic.List[byte[]]]::new()
     foreach ($row in $selected) {
         $selectedPayloads.Add(

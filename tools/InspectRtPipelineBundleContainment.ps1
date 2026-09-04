@@ -152,6 +152,8 @@ function Assert-FinalTargetIdentity([byte[]]$bytes, [string]$platform) {
                  $bytes[3] -eq 0x46) 'Final Android target is not an ELF image.'
     Assert-True ($bytes[4] -eq 2 -and $bytes[5] -eq 1) `
         'Final Android target is not ELF64 little-endian.'
+    Assert-True ((Get-U16 $bytes 16) -eq 0x0003) `
+        'Final Android target is not an ELF shared object.'
     Assert-True ((Get-U16 $bytes 18) -eq 0x00b7) `
         'Final Android target machine is not AArch64.'
 }
