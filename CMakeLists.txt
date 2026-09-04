@@ -312,15 +312,16 @@ if(BUILD_TESTING)
             horde_rt_version_contract_powershell_tests
             horde_rt_github_release_preflight_tests
             PROPERTIES TIMEOUT 120)
-        # The raygen compiler/manifest/artifact gates preprocess and compile
-        # compatibility and matrix modules. Their measured focused runs can
-        # exceed the shared lightweight PowerShell-test bound, so keep this
-        # deliberate CI ceiling confined to shader gates.
+        # The compiler and manifest checks preprocess/compile raygen modules,
+        # so keep their deliberate CI ceiling confined to shader gates.
         set_tests_properties(
             horde_rt_raygen_compiler_strategy_tests
             horde_rt_raygen_variant_manifest_tests
-            horde_rt_raygen_variant_artifact_tests
             PROPERTIES TIMEOUT 600)
+        # The artifact gate additionally validates the eight matrix outputs,
+        # isolated fixture bundles, and two compatibility modules. Retain a
+        # finite ceiling above that complete bounded workload only.
+        set_tests_properties(horde_rt_raygen_variant_artifact_tests PROPERTIES TIMEOUT 1200)
         if(HORDE_RT_PWSH_EXECUTABLE AND HORDE_RT_WINDOWS_POWERSHELL_EXECUTABLE)
             set_tests_properties(horde_rt_version_contract_windows_powershell_tests PROPERTIES TIMEOUT 120)
         endif()
