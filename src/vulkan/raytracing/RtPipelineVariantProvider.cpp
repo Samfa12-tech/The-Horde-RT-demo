@@ -78,7 +78,9 @@ std::optional<RtPipelineVariantArtifact> RtPipelineVariantProvider::ResolveExact
             if (error) { *error = std::string(*requestedKey); }
             return std::nullopt;
         }
-        return RtPipelineVariantArtifact{record.key, kOpaqueWords, record.canonicalKey, record.spirvSha256, record.includeSha256};
+        return RtPipelineVariantArtifact{record.key, kOpaqueWords, record.canonicalKey,
+            record.artifactPath, record.spirvSha256, record.includeSha256, record.words,
+            record.atomicInstructions, record.hasDiagnosticsBinding};
     }
     if (requested.material == RtMaterialStrategy::GenericDielectric) {
         const auto& record = detail::kSelectedRtPipelineCatalog[1];
@@ -86,7 +88,9 @@ std::optional<RtPipelineVariantArtifact> RtPipelineVariantProvider::ResolveExact
             if (error) { *error = std::string(*requestedKey); }
             return std::nullopt;
         }
-        return RtPipelineVariantArtifact{record.key, kGenericWords, record.canonicalKey, record.spirvSha256, record.includeSha256};
+        return RtPipelineVariantArtifact{record.key, kGenericWords, record.canonicalKey,
+            record.artifactPath, record.spirvSha256, record.includeSha256, record.words,
+            record.atomicInstructions, record.hasDiagnosticsBinding};
     }
     if (error) { *error = std::string(*requestedKey); }
     return std::nullopt;

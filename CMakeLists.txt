@@ -169,6 +169,17 @@ if(BUILD_TESTING)
     horde_rt_attach_raygen_artifacts(horde_rt_pipeline_variant_provider_tests)
     add_test(NAME horde_rt_pipeline_variant_provider_tests COMMAND horde_rt_pipeline_variant_provider_tests)
 
+    add_executable(horde_rt_pipeline_bundle_contracts_tests
+        tests/RtPipelineBundleContractsTests.cpp
+        src/vulkan/raytracing/RtPipelineBundleContracts.cpp
+        src/vulkan/raytracing/RtPipelineVariants.cpp
+        src/vulkan/raytracing/RtPipelineVariantProvider.cpp)
+    target_include_directories(horde_rt_pipeline_bundle_contracts_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_compile_definitions(horde_rt_pipeline_bundle_contracts_tests PRIVATE
+        HORDE_RT_SELECTED_INSTRUMENTATION=0 HORDE_RT_SELECTED_DIELECTRIC_QUALITY=0)
+    horde_rt_attach_raygen_artifacts(horde_rt_pipeline_bundle_contracts_tests)
+    add_test(NAME horde_rt_pipeline_bundle_contracts_tests COMMAND horde_rt_pipeline_bundle_contracts_tests)
+
     function(horde_rt_add_pipeline_variant_fixture target_name instrumentation quality opaque_hash generic_hash required_key)
         add_library(${target_name}_provider_object OBJECT src/vulkan/raytracing/RtPipelineVariantProvider.cpp)
         target_include_directories(${target_name}_provider_object PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
@@ -178,6 +189,7 @@ if(BUILD_TESTING)
         horde_rt_attach_raygen_artifacts(${target_name}_provider_object)
         add_executable(${target_name}
             tests/RtPipelineVariantFixture.cpp
+            src/vulkan/raytracing/RtPipelineBundleContracts.cpp
             src/vulkan/raytracing/RtPipelineVariants.cpp
             $<TARGET_OBJECTS:${target_name}_provider_object>)
         target_include_directories(${target_name} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)

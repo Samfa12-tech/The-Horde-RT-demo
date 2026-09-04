@@ -1,14 +1,22 @@
+#include "vulkan/raytracing/RtPipelineBundleContracts.h"
 #include "vulkan/raytracing/RtPipelineVariantProvider.h"
 
 #include <cstdint>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <string>
 
 int main(int argc, char** argv)
 {
     using namespace horde::vulkan::raytracing;
     const auto& provider = RtPipelineVariantProvider::Compiled();
+    RtPipelineBundlePreflight preflight{};
+    std::string failureKey;
+    if (!ResolveCompiledRtPipelineBundlePreflight(preflight, failureKey)) {
+        std::cerr << "selected provider fixture preflight failed: " << failureKey << '\n';
+        return 1;
+    }
     std::uint64_t checksum = 0;
     std::size_t artifactIndex = 0;
     for (const auto material : {RtMaterialStrategy::OpaqueFast, RtMaterialStrategy::GenericDielectric}) {

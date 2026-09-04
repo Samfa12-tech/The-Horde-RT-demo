@@ -14,8 +14,12 @@ struct RtPipelineVariantArtifact {
     RtPipelineVariantKey key;
     std::span<const std::uint32_t> words;
     std::string_view canonicalKey;
+    std::string_view artifactPath;
     std::string_view spirvSha256;
     std::string_view includeSha256;
+    std::size_t expectedWordCount;
+    std::size_t atomicInstructions;
+    bool hasDiagnosticsBinding;
 };
 
 class RtPipelineVariantProvider final {
