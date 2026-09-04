@@ -23,6 +23,12 @@ try {
     $rejectedCatalog = $false
     try { & (Join-Path $repoRoot 'tools\GenerateRtPipelineVariantCatalog.ps1') -Check -CatalogPath $catalogFixture -OutputPath (Join-Path $repoRoot 'src\vulkan\raytracing\RtPipelineVariantCatalog.generated.h') } catch { $rejectedCatalog = $true }
     Assert-True $rejectedCatalog 'A duplicate/missing frozen catalog key must fail closed.'
+    Copy-Item -LiteralPath (Join-Path $repoRoot 'tools\raygen-variant-catalog.json') -Destination $catalogFixture -Force
+    $catalogText = Get-Content -LiteralPath $catalogFixture -Raw
+    [IO.File]::WriteAllText($catalogFixture, $catalogText.Replace('7ebdb794794a854b6cb5c44c75dd9a9decd42f4999c44a9cfa78f13b12a13f21', ('0' * 64)), [Text.UTF8Encoding]::new($false))
+    $rejectedInclude = $false
+    try { & (Join-Path $repoRoot 'tools\GenerateRtPipelineVariantCatalog.ps1') -Check -CatalogPath $catalogFixture -OutputPath (Join-Path $repoRoot 'src\vulkan\raytracing\RtPipelineVariantCatalog.generated.h') } catch { $rejectedInclude = $true }
+    Assert-True $rejectedInclude 'A stale frozen include hash must fail before provider compilation.'
 }
 finally { if (Test-Path -LiteralPath $temporaryRoot) { Remove-Item -LiteralPath $temporaryRoot -Recurse -Force } }
 
