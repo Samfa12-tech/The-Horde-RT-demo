@@ -496,6 +496,15 @@ if(BUILD_TESTING)
         horde_rt_attach_raygen_artifacts(horde_rt_pipeline_bundle_lifetime_tests)
         add_test(NAME horde_rt_pipeline_bundle_lifetime_tests COMMAND horde_rt_pipeline_bundle_lifetime_tests)
 
+        add_executable(horde_rt_scene_initialise_preflight_tests
+            tests/RtSceneInitialisePreflightTests.cpp)
+        target_include_directories(horde_rt_scene_initialise_preflight_tests PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/src)
+        target_link_libraries(horde_rt_scene_initialise_preflight_tests PRIVATE
+            horde_rt_probe_core)
+        add_test(NAME horde_rt_scene_initialise_preflight_tests
+            COMMAND horde_rt_scene_initialise_preflight_tests)
+
         if(TARGET horde_rt_diagnostic_window)
             add_test(NAME horde_rt_final_windows_bundle_containment
                 COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File

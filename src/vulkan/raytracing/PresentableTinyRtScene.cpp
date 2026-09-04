@@ -486,6 +486,45 @@ bool PresentableTinyRtScene::Initialise(VkInstance instance,
                                         const std::string& developmentStaticAssetDirectory,
                                         const std::string& productionAssetRoot)
 {
+    InitialiseOrchestrationApi api{};
+    api.resolvePreflight = [](void*, RtPipelineBundlePreflight& preflight,
+                              std::string& failureKey) {
+        return ResolveCompiledRtPipelineBundlePreflight(preflight, failureKey);
+    };
+    api.continueAfterPreflight = [](
+        void*, PresentableTinyRtScene& scene, VkFormat format,
+        const std::string& skeletonPath, const std::string& lichPath,
+        const std::string& materialDirectory, const std::string& lichDirectory,
+        const std::string& developmentDirectory, const std::string& productionRoot,
+        std::string& error) {
+        return scene.ContinueInitialiseAfterPreflight(
+            format, skeletonPath, lichPath, materialDirectory, lichDirectory,
+            developmentDirectory, productionRoot, error);
+    };
+    return InitialiseWithOrchestration(
+        instance, physicalDevice, device, queue, commandPool, dispatchExtent,
+        presentationFormat, skeletonAssetPath, lichAssetPath,
+        materialAssetDirectory, lichTextureDirectory, diagnostic,
+        developmentStaticAssetDirectory, productionAssetRoot, api);
+}
+
+bool PresentableTinyRtScene::InitialiseWithOrchestration(
+    VkInstance instance,
+    VkPhysicalDevice physicalDevice,
+    VkDevice device,
+    VkQueue queue,
+    VkCommandPool commandPool,
+    VkExtent2D dispatchExtent,
+    VkFormat presentationFormat,
+    const std::string& skeletonAssetPath,
+    const std::string& lichAssetPath,
+    const std::string& materialAssetDirectory,
+    const std::string& lichTextureDirectory,
+    std::string& diagnostic,
+    const std::string& developmentStaticAssetDirectory,
+    const std::string& productionAssetRoot,
+    const InitialiseOrchestrationApi& api)
+{
     Destroy();
 
     instance_ = instance;
@@ -505,8 +544,14 @@ bool PresentableTinyRtScene::Initialise(VkInstance instance,
         diagnostic = "RT dispatch extent is zero.";
         return false;
     }
+    if (api.resolvePreflight == nullptr || api.continueAfterPreflight == nullptr)
+    {
+        diagnostic = "Invalid RT scene initialisation orchestration.";
+        Destroy();
+        return false;
+    }
     RtPipelineBundlePreflight selectedPreflight{};
-    if (!ResolveCompiledRtPipelineBundlePreflight(selectedPreflight, diagnostic))
+    if (!api.resolvePreflight(api.user, selectedPreflight, diagnostic))
     {
         Destroy();
         return false;
@@ -551,6 +596,22 @@ bool PresentableTinyRtScene::Initialise(VkInstance instance,
         Destroy();
         return false;
     }
+    return api.continueAfterPreflight(
+        api.user, *this, presentationFormat, skeletonAssetPath, lichAssetPath,
+        materialAssetDirectory, lichTextureDirectory,
+        developmentStaticAssetDirectory, productionAssetRoot, diagnostic);
+}
+
+bool PresentableTinyRtScene::ContinueInitialiseAfterPreflight(
+    VkFormat presentationFormat,
+    const std::string& skeletonAssetPath,
+    const std::string& lichAssetPath,
+    const std::string& materialAssetDirectory,
+    const std::string& lichTextureDirectory,
+    const std::string& developmentStaticAssetDirectory,
+    const std::string& productionAssetRoot,
+    std::string& diagnostic)
+{
     VkFormatProperties storageFormatProperties{};
     VkFormatProperties presentationFormatProperties{};
     vkGetPhysicalDeviceFormatProperties(physicalDevice_, kStorageImageFormat, &storageFormatProperties);

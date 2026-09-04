@@ -195,24 +195,12 @@ RtPipelineBundleBuildApi MakeBuildApi(Ledger& ledger)
     return api;
 }
 
-RtPipelineBundlePreflight MakePreflight(RtInstrumentation instrumentation)
+RtPipelineBundlePreflight MakePreflight()
 {
     RtPipelineBundlePreflight preflight{};
     std::string error;
     if (!ResolveCompiledRtPipelineBundlePreflight(preflight, error)) {
         throw std::runtime_error(error);
-    }
-    preflight.request.instrumentation = instrumentation;
-    preflight.descriptorIo = *TryMakeRtDescriptorIoContract(instrumentation);
-    for (auto& strategy : preflight.strategies) {
-        strategy.key.instrumentation = instrumentation;
-        strategy.canonicalKey = strategy.key.material == RtMaterialStrategy::OpaqueFast
-            ? (instrumentation == RtInstrumentation::Shipping
-                   ? "shipping_mobile_opaque_fast"
-                   : "diagnostic_mobile_opaque_fast")
-            : (instrumentation == RtInstrumentation::Shipping
-                   ? "shipping_mobile_generic_dielectric"
-                   : "diagnostic_mobile_generic_dielectric");
     }
     return preflight;
 }
@@ -241,22 +229,15 @@ bool UsesContractTeardownOrder(const std::vector<std::string>& destroyed)
     return true;
 }
 
-bool RejectedPreflightMakesZeroBuildCalls(
-    RtPipelineBundleRequest request,
-    std::span<const RtPipelineVariantArtifact> candidates,
-    std::string& failureKey)
+bool RejectsForgedAdoption(RtPipelineBundlePreflight preflight)
 {
     Ledger ledger{};
-    RtPipelineBundlePreflight preflight{};
-    const bool valid = ValidateRtPipelineBundlePreflight(
-        request, candidates, preflight, failureKey);
-    if (valid) {
-        RtPipelineBundle bundle;
-        std::string error;
-        if (bundle.AdoptPreflight(std::move(preflight), MakeDestroyApi(ledger), error))
-            (void)BuildRtPipelineBundleResources(bundle, MakeBuildApi(ledger), error);
-    }
-    return !valid && ledger.created.empty() && ledger.destroyed.empty();
+    RtPipelineBundle bundle;
+    std::string error;
+    return !bundle.AdoptPreflight(std::move(preflight), MakeDestroyApi(ledger), error) &&
+           error == "Invalid selected RT pipeline bundle preflight." &&
+           !bundle.HasSelection() && !bundle.HasLiveResources() &&
+           ledger.created.empty() && ledger.destroyed.empty();
 }
 
 } // namespace
@@ -267,60 +248,27 @@ int main()
     std::string error;
 
     const auto& provider = RtPipelineVariantProvider::Compiled();
-    const auto opaque = provider.ResolveExact(
-        {provider.request().instrumentation, provider.request().quality,
-         RtMaterialStrategy::OpaqueFast});
-    const auto generic = provider.ResolveExact(
-        {provider.request().instrumentation, provider.request().quality,
-         RtMaterialStrategy::GenericDielectric});
-    ok &= Require(opaque.has_value() && generic.has_value(),
-                  "zero-call preflight fixtures require the compiled pair");
-    if (opaque && generic) {
-        const std::array pair{*opaque, *generic};
-        const std::string opaqueKey(opaque->canonicalKey);
-        const std::string genericKey(generic->canonicalKey);
-        std::string failureKey;
-        const std::array<RtPipelineVariantArtifact, 1u> missing{pair[0]};
-        ok &= Require(RejectedPreflightMakesZeroBuildCalls(
-                          provider.request(), missing, failureKey) &&
-                          failureKey == genericKey,
-                      "missing strategy preflight must make zero Vulkan/build-seam calls");
-        const std::array<RtPipelineVariantArtifact, 2u> duplicate{pair[0], pair[0]};
-        ok &= Require(RejectedPreflightMakesZeroBuildCalls(
-                          provider.request(), duplicate, failureKey) &&
-                          failureKey == opaqueKey,
-                      "duplicate strategy preflight must make zero Vulkan/build-seam calls");
-        auto wrong = pair;
-        wrong[0].canonicalKey = generic->canonicalKey;
-        ok &= Require(RejectedPreflightMakesZeroBuildCalls(
-                          provider.request(), wrong, failureKey) &&
-                          failureKey == opaqueKey,
-                      "wrong-key preflight must make zero Vulkan/build-seam calls");
-        auto stale = pair;
-        stale[0].spirvSha256 =
-            "0000000000000000000000000000000000000000000000000000000000000000";
-        ok &= Require(RejectedPreflightMakesZeroBuildCalls(
-                          provider.request(), stale, failureKey) &&
-                          failureKey == opaqueKey,
-                      "stale-metadata preflight must make zero Vulkan/build-seam calls");
-        auto empty = pair;
-        empty[0].words = {};
-        ok &= Require(RejectedPreflightMakesZeroBuildCalls(
-                          provider.request(), empty, failureKey) &&
-                          failureKey == opaqueKey,
-                      "empty-module preflight must make zero Vulkan/build-seam calls");
-        std::vector<std::byte> storage(pair[0].words.size_bytes() + 1u);
-        auto unaligned = pair;
-        unaligned[0].words = std::span<const std::uint32_t>(
-            reinterpret_cast<const std::uint32_t*>(storage.data() + 1u),
-            pair[0].words.size());
-        ok &= Require(RejectedPreflightMakesZeroBuildCalls(
-                          provider.request(), unaligned, failureKey) &&
-                          failureKey == opaqueKey,
-                      "unaligned-module preflight must make zero Vulkan/build-seam calls");
-    }
+    const bool diagnosticPolicy =
+        provider.request().instrumentation == RtInstrumentation::Diagnostic;
+    auto forgedDescriptor = MakePreflight();
+    ++forgedDescriptor.descriptorIo.descriptorWriteCount;
+    ok &= Require(RejectsForgedAdoption(std::move(forgedDescriptor)),
+                  "adoption must reject a forged descriptor/IO plan before ownership");
+    auto forgedPath = MakePreflight();
+    forgedPath.strategies[0].artifactPath = "forged-selected-module.inc";
+    ok &= Require(RejectsForgedAdoption(std::move(forgedPath)),
+                  "adoption must reject forged selected-record catalog metadata");
+    auto forgedHash = MakePreflight();
+    forgedHash.strategies[1].spirvSha256 =
+        "0000000000000000000000000000000000000000000000000000000000000000";
+    ok &= Require(RejectsForgedAdoption(std::move(forgedHash)),
+                  "adoption must reject forged selected-module hashes");
+    auto forgedWords = MakePreflight();
+    forgedWords.strategies[0].words = forgedWords.strategies[1].words;
+    ok &= Require(RejectsForgedAdoption(std::move(forgedWords)),
+                  "adoption must reject a non-authoritative selected module payload");
 
-    const std::array<RtPipelineBundleBuildStep, 12u> shippingFaults{
+    std::vector<RtPipelineBundleBuildStep> constructionFaults{
         RtPipelineBundleBuildStep::DescriptorSetLayout,
         RtPipelineBundleBuildStep::DescriptorPool,
         RtPipelineBundleBuildStep::DescriptorSet,
@@ -334,45 +282,45 @@ int main()
         RtPipelineBundleBuildStep::OpaqueFastSbt,
         RtPipelineBundleBuildStep::GenericDielectricSbt,
     };
-    for (const auto failure : shippingFaults) {
+    if (diagnosticPolicy) {
+        constructionFaults.insert(constructionFaults.begin() + 3,
+                                  RtPipelineBundleBuildStep::DiagnosticBuffer);
+    }
+    for (const auto failure : constructionFaults) {
         Ledger ledger{failure};
         RtPipelineBundle bundle;
-        ok &= Require(bundle.AdoptPreflight(MakePreflight(RtInstrumentation::Shipping),
+        ok &= Require(bundle.AdoptPreflight(MakePreflight(),
                                             MakeDestroyApi(ledger), error),
-                      "Shipping preflight adoption failed");
+                      "compiled-policy preflight adoption failed");
         ok &= Require(!BuildRtPipelineBundleResources(bundle, MakeBuildApi(ledger), error),
-                      "every injected Shipping construction fault must fail");
+                      "every injected compiled-policy construction fault must fail");
         ok &= Require(!bundle.HasSelection() && bundle.DiagnosticAvailability() ==
                           RtDiagnosticAvailability::Unavailable,
-                      "partial Shipping failure must leave no selected/live bundle");
+                      "partial construction failure must leave no selected/live bundle");
         ok &= Require(UsesContractTeardownOrder(ledger.destroyed),
                       "every partial Shipping failure must use contract teardown order");
+        if (!diagnosticPolicy) {
+            ok &= Require(std::find(ledger.created.begin(), ledger.created.end(),
+                                    "diagnostics-buffer") == ledger.created.end() &&
+                              std::find(ledger.destroyed.begin(), ledger.destroyed.end(),
+                                    "diagnostics-buffer") == ledger.destroyed.end(),
+                          "Shipping must never call or own the diagnostic-buffer seam");
+        }
         const std::size_t destroyed = ledger.destroyed.size();
         bundle.Reset();
         ok &= Require(ledger.destroyed.size() == destroyed,
                       "failure cleanup and explicit reset must be idempotent");
     }
 
-    {
-        Ledger ledger{RtPipelineBundleBuildStep::DiagnosticBuffer};
-        RtPipelineBundle bundle;
-        ok &= Require(bundle.AdoptPreflight(MakePreflight(RtInstrumentation::Diagnostic),
-                                            MakeDestroyApi(ledger), error),
-                      "Diagnostic preflight adoption failed");
-        ok &= Require(!BuildRtPipelineBundleResources(bundle, MakeBuildApi(ledger), error) &&
-                          !bundle.HasSelection(),
-                      "optional Diagnostic buffer fault must unwind the complete partial bundle");
-        ok &= Require(UsesContractTeardownOrder(ledger.destroyed),
-                      "partial Diagnostic failure must use contract teardown order");
-    }
-
     Ledger ledger{};
     RtPipelineBundle bundle;
-    ok &= Require(bundle.AdoptPreflight(MakePreflight(RtInstrumentation::Diagnostic),
+    ok &= Require(bundle.AdoptPreflight(MakePreflight(),
                                         MakeDestroyApi(ledger), error) &&
                       BuildRtPipelineBundleResources(bundle, MakeBuildApi(ledger), error),
-                  "complete Diagnostic bundle construction must succeed");
-    ok &= Require(bundle.DiagnosticAvailability() == RtDiagnosticAvailability::Available &&
+                  "complete compiled-policy bundle construction must succeed");
+    ok &= Require(bundle.DiagnosticAvailability() ==
+                          (diagnosticPolicy ? RtDiagnosticAvailability::Available
+                                            : RtDiagnosticAvailability::CompiledOut) &&
                       bundle.Strategy(RtMaterialStrategy::OpaqueFast).pipeline != VK_NULL_HANDLE &&
                       bundle.Strategy(RtMaterialStrategy::GenericDielectric).pipeline != VK_NULL_HANDLE,
                   "the complete bundle must own both material strategy records");
@@ -380,9 +328,10 @@ int main()
     ok &= Require(!bundle.HasSelection() && moved.HasSelection(),
                   "move construction must transfer ownership and clear the source");
     moved.Reset();
-    const std::array<std::string, 8u> expectedTail{
+    std::vector<std::string> expectedTail{
         "generic-sbt", "generic-pipeline", "opaque-sbt", "opaque-pipeline",
-        "pipeline-layout", "descriptor-pool", "descriptor-layout", "diagnostics-buffer"};
+        "pipeline-layout", "descriptor-pool", "descriptor-layout"};
+    if (diagnosticPolicy) expectedTail.emplace_back("diagnostics-buffer");
     ok &= Require(ledger.destroyed.size() >= expectedTail.size() &&
                       std::equal(expectedTail.begin(), expectedTail.end(),
                                  ledger.destroyed.end() - expectedTail.size()),
@@ -401,16 +350,18 @@ int main()
     Ledger assignmentLedger{};
     RtPipelineBundle destination;
     RtPipelineBundle source;
-    ok &= Require(destination.AdoptPreflight(MakePreflight(RtInstrumentation::Shipping),
+    ok &= Require(destination.AdoptPreflight(MakePreflight(),
                                              MakeDestroyApi(assignmentLedger), error) &&
                       BuildRtPipelineBundleResources(destination, MakeBuildApi(assignmentLedger), error) &&
-                      source.AdoptPreflight(MakePreflight(RtInstrumentation::Diagnostic),
+                      source.AdoptPreflight(MakePreflight(),
                                             MakeDestroyApi(assignmentLedger), error) &&
                       BuildRtPipelineBundleResources(source, MakeBuildApi(assignmentLedger), error),
                   "move-assignment fixtures must construct");
     destination = std::move(source);
     ok &= Require(destination.HasSelection() && !source.HasSelection() &&
-                      destination.DiagnosticAvailability() == RtDiagnosticAvailability::Available,
+                      destination.DiagnosticAvailability() ==
+                          (diagnosticPolicy ? RtDiagnosticAvailability::Available
+                                            : RtDiagnosticAvailability::CompiledOut),
                   "move assignment must reset the destination then transfer one live bundle");
     destination.Reset();
 
@@ -418,7 +369,7 @@ int main()
     Ledger movedToOwner{};
     RtPipelineBundle ownerBoundSource;
     ok &= Require(ownerBoundSource.AdoptPreflight(
-                      MakePreflight(RtInstrumentation::Shipping),
+                      MakePreflight(),
                       MakeDestroyApi(movedFromOwner), error) &&
                       BuildRtPipelineBundleResources(ownerBoundSource,
                                                      MakeBuildApi(movedFromOwner), error),

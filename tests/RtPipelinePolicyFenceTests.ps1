@@ -131,15 +131,17 @@ foreach ($retired in @('MinimalRayGenShader.inc', 'MinimalLegacyRayGenShader.inc
 Assert-True $sceneHeader.Contains('RtPipelineBundle pipelineBundle_') 'Scene must own exactly one selected RT pipeline bundle.'
 Assert-True $scene.Contains('BuildRtPipelineBundleResources(pipelineBundle_') 'Live scene must use the production-tested bundle builder.'
 
-$initialiseStart = $scene.IndexOf('bool PresentableTinyRtScene::Initialise(')
-$initialiseEnd = $scene.IndexOf('void PresentableTinyRtScene::Destroy()', $initialiseStart)
+$initialiseStart = $scene.IndexOf('bool PresentableTinyRtScene::InitialiseWithOrchestration(')
+$initialiseEnd = $scene.IndexOf('bool PresentableTinyRtScene::ContinueInitialiseAfterPreflight(', $initialiseStart)
 Assert-True ($initialiseStart -ge 0 -and $initialiseEnd -gt $initialiseStart) 'Unable to isolate scene Initialise ownership path.'
 $initialise = $scene.Substring($initialiseStart, $initialiseEnd - $initialiseStart)
-$preflightAt = $initialise.IndexOf('ResolveCompiledRtPipelineBundlePreflight')
+$preflightAt = $initialise.IndexOf('api.resolvePreflight(')
 Assert-True ($preflightAt -gt $initialise.IndexOf('RT dispatch extent is zero.')) 'Selected provider preflight must follow non-owning argument checks.'
+$ownershipContinuationAt = $initialise.IndexOf('api.continueAfterPreflight(')
+Assert-True ($ownershipContinuationAt -gt $preflightAt) 'Scene ownership continuation must follow selected-provider preflight.'
 foreach ($later in @('vkGetPhysicalDeviceFormatProperties', 'characterSlot_.LoadAssets',
                       'LoadStaticHeldItemAssets', 'CreateStorageImage')) {
-    Assert-True ($preflightAt -lt $initialise.IndexOf($later)) "Selected provider preflight must precede ownership/work: $later"
+    Assert-True (-not $initialise.Contains($later)) "Scene orchestration contains ownership/work before its guarded continuation: $later"
 }
 
 $recordStart = $scene.IndexOf('bool PresentableTinyRtScene::RecordTraceAndCopy(')

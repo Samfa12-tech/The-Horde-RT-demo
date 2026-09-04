@@ -29,6 +29,8 @@
 namespace horde::vulkan::raytracing
 {
 
+struct PresentableTinyRtScenePreflightTestAccess;
+
 enum class WaterQuality : std::uint32_t
 {
     Off = 0u,
@@ -342,8 +344,20 @@ public:
     bool CaptureStorageImage(StorageImageCapture& capture, std::string& diagnostic);
 
 private:
+    friend struct PresentableTinyRtScenePreflightTestAccess;
+
     using Buffer = RtGpuBuffer;
     using AccelerationStructure = RtAccelerationStructure;
+
+    struct InitialiseOrchestrationApi
+    {
+        void* user = nullptr;
+        bool (*resolvePreflight)(void*, RtPipelineBundlePreflight&, std::string&) = nullptr;
+        bool (*continueAfterPreflight)(
+            void*, PresentableTinyRtScene&, VkFormat, const std::string&,
+            const std::string&, const std::string&, const std::string&,
+            const std::string&, const std::string&, std::string&) = nullptr;
+    };
 
     struct TextureArray
     {
@@ -351,6 +365,32 @@ private:
         VkDeviceMemory memory = VK_NULL_HANDLE;
         VkImageView view = VK_NULL_HANDLE;
     };
+
+    bool InitialiseWithOrchestration(
+        VkInstance instance,
+        VkPhysicalDevice physicalDevice,
+        VkDevice device,
+        VkQueue queue,
+        VkCommandPool commandPool,
+        VkExtent2D dispatchExtent,
+        VkFormat presentationFormat,
+        const std::string& skeletonAssetPath,
+        const std::string& lichAssetPath,
+        const std::string& materialAssetDirectory,
+        const std::string& lichTextureDirectory,
+        std::string& diagnostic,
+        const std::string& developmentStaticAssetDirectory,
+        const std::string& productionAssetRoot,
+        const InitialiseOrchestrationApi& api);
+    bool ContinueInitialiseAfterPreflight(
+        VkFormat presentationFormat,
+        const std::string& skeletonAssetPath,
+        const std::string& lichAssetPath,
+        const std::string& materialAssetDirectory,
+        const std::string& lichTextureDirectory,
+        const std::string& developmentStaticAssetDirectory,
+        const std::string& productionAssetRoot,
+        std::string& diagnostic);
 
     bool LoadEntryPoints(std::string& diagnostic);
     bool CreateBuffer(VkDeviceSize size,

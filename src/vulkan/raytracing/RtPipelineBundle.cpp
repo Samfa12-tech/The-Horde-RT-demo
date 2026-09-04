@@ -17,6 +17,57 @@ RtPipelineOwnedBuffer OwnedSbtKind(RtMaterialStrategy strategy) noexcept
         : RtPipelineOwnedBuffer::OpaqueFastSbt;
 }
 
+bool SameDescriptorIoContract(const RtDescriptorIoContract& candidate,
+                              const RtDescriptorIoContract& authoritative) noexcept
+{
+    if (candidate.instrumentation != authoritative.instrumentation ||
+        candidate.bindingCount != authoritative.bindingCount ||
+        candidate.storageBufferDescriptorCount !=
+            authoritative.storageBufferDescriptorCount ||
+        candidate.descriptorWriteCount != authoritative.descriptorWriteCount ||
+        candidate.diagnosticAvailability != authoritative.diagnosticAvailability ||
+        candidate.diagnosticIo.allocateBuffer != authoritative.diagnosticIo.allocateBuffer ||
+        candidate.diagnosticIo.descriptorInfo != authoritative.diagnosticIo.descriptorInfo ||
+        candidate.diagnosticIo.descriptorWrite != authoritative.diagnosticIo.descriptorWrite ||
+        candidate.diagnosticIo.priorFrameRead != authoritative.diagnosticIo.priorFrameRead ||
+        candidate.diagnosticIo.zeroReset != authoritative.diagnosticIo.zeroReset ||
+        candidate.diagnosticIo.shaderWriteBarrier !=
+            authoritative.diagnosticIo.shaderWriteBarrier) {
+        return false;
+    }
+    for (std::size_t index = 0u; index < candidate.bindings.size(); ++index) {
+        if (candidate.bindings[index].binding != authoritative.bindings[index].binding ||
+            candidate.bindings[index].kind != authoritative.bindings[index].kind) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool SameAuthoritativeArtifact(const RtPipelineVariantArtifact& candidate,
+                               const RtPipelineVariantArtifact& authoritative) noexcept
+{
+    return candidate.key == authoritative.key &&
+           candidate.words.data() == authoritative.words.data() &&
+           candidate.words.size() == authoritative.words.size() &&
+           candidate.canonicalKey == authoritative.canonicalKey &&
+           candidate.artifactPath == authoritative.artifactPath &&
+           candidate.spirvSha256 == authoritative.spirvSha256 &&
+           candidate.includeSha256 == authoritative.includeSha256 &&
+           candidate.expectedWordCount == authoritative.expectedWordCount &&
+           candidate.atomicInstructions == authoritative.atomicInstructions &&
+           candidate.hasDiagnosticsBinding == authoritative.hasDiagnosticsBinding;
+}
+
+bool SameCompiledPreflight(const RtPipelineBundlePreflight& candidate,
+                           const RtPipelineBundlePreflight& authoritative) noexcept
+{
+    return candidate.request == authoritative.request &&
+           SameDescriptorIoContract(candidate.descriptorIo, authoritative.descriptorIo) &&
+           SameAuthoritativeArtifact(candidate.strategies[0], authoritative.strategies[0]) &&
+           SameAuthoritativeArtifact(candidate.strategies[1], authoritative.strategies[1]);
+}
+
 } // namespace
 
 bool RtPipelineBundleDestroyApi::Complete() const noexcept
@@ -56,14 +107,11 @@ bool RtPipelineBundle::AdoptPreflight(RtPipelineBundlePreflight preflight,
                                       RtPipelineBundleDestroyApi destroyApi,
                                       std::string& diagnostic)
 {
+    RtPipelineBundlePreflight authoritative{};
+    std::string authorityFailure;
     if (selected_ || HasLiveResources() || !destroyApi.Complete() ||
-        preflight.descriptorIo.instrumentation != preflight.request.instrumentation ||
-        preflight.strategies[0].key.instrumentation != preflight.request.instrumentation ||
-        preflight.strategies[1].key.instrumentation != preflight.request.instrumentation ||
-        preflight.strategies[0].key.quality != preflight.request.quality ||
-        preflight.strategies[1].key.quality != preflight.request.quality ||
-        preflight.strategies[0].key.material != RtMaterialStrategy::OpaqueFast ||
-        preflight.strategies[1].key.material != RtMaterialStrategy::GenericDielectric) {
+        !ResolveCompiledRtPipelineBundlePreflight(authoritative, authorityFailure) ||
+        !SameCompiledPreflight(preflight, authoritative)) {
         diagnostic = "Invalid selected RT pipeline bundle preflight.";
         return false;
     }
