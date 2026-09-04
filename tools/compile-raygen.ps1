@@ -352,6 +352,30 @@ function Write-RaygenCatalogJson
     Write-RaygenCanonicalText -Path $Path -Text $json
 }
 
+function Test-RaygenCatalogValueEqual
+{
+    param([object]$Left, [object]$Right)
+
+    if ($null -eq $Left -or $null -eq $Right) { return $null -eq $Left -and $null -eq $Right }
+    if ($Left -is [System.Collections.IEnumerable] -and $Left -isnot [string] -and $Left -isnot [pscustomobject])
+    {
+        $leftValues = @($Left); $rightValues = @($Right)
+        if ($leftValues.Count -ne $rightValues.Count) { return $false }
+        for ($index = 0; $index -lt $leftValues.Count; ++$index)
+        { if (-not (Test-RaygenCatalogValueEqual $leftValues[$index] $rightValues[$index])) { return $false } }
+        return $true
+    }
+    if ($Left -is [pscustomobject] -or $Right -is [pscustomobject])
+    {
+        if ($Left -isnot [pscustomobject] -or $Right -isnot [pscustomobject]) { return $false }
+        $leftNames = @($Left.PSObject.Properties.Name); $rightNames = @($Right.PSObject.Properties.Name)
+        if (($leftNames -join ',') -ne ($rightNames -join ',')) { return $false }
+        foreach ($name in $leftNames) { if (-not (Test-RaygenCatalogValueEqual $Left.$name $Right.$name)) { return $false } }
+        return $true
+    }
+    return [string]$Left -ceq [string]$Right
+}
+
 function Test-RaygenExactString
 {
     param([string]$Left, [string]$Right)
@@ -790,8 +814,8 @@ function Invoke-RaygenFrozenCatalogMode
         if (-not (Test-RaygenExactString -Left (@($actualCatalog.PSObject.Properties.Name | Sort-Object) -join ',') -Right 'authorities,generator,schema,status,target,toolchain,variants') -or
             $actualCatalog.schema -ne 1 -or -not (Test-RaygenExactString -Left $actualCatalog.status -Right 'frozen'))
         { throw 'Frozen raygen variant catalog has an invalid schema.' }
-        $expectedCatalogText = Get-RaygenCanonicalText -Path $expectedCatalogPath
-        if (-not (Test-RaygenExactString -Left $catalogText -Right $expectedCatalogText))
+        $expectedCatalogComparable = (Get-RaygenCanonicalText -Path $expectedCatalogPath | ConvertFrom-Json)
+        if (-not (Test-RaygenCatalogValueEqual -Left $actualCatalog -Right $expectedCatalogComparable))
         { throw 'Frozen raygen variant catalog is stale or malformed.' }
         foreach ($expectedVariant in $expectedCatalogObject.variants)
         {
