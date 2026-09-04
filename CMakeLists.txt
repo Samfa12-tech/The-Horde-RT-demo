@@ -311,6 +311,10 @@ if(BUILD_TESTING)
             horde_rt_version_contract_powershell_tests
             horde_rt_github_release_preflight_tests
             PROPERTIES TIMEOUT 120)
+        # The artifact gate compiles eight matrix modules and two compatibility
+        # modules. Its measured focused run exceeds the shared lightweight
+        # PowerShell-test bound, so retain a deliberate CI ceiling here.
+        set_tests_properties(horde_rt_raygen_variant_artifact_tests PROPERTIES TIMEOUT 600)
         if(HORDE_RT_PWSH_EXECUTABLE AND HORDE_RT_WINDOWS_POWERSHELL_EXECUTABLE)
             set_tests_properties(horde_rt_version_contract_windows_powershell_tests PROPERTIES TIMEOUT 120)
         endif()

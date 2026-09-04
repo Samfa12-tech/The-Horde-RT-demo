@@ -347,6 +347,7 @@ function Invoke-RaygenVariantCompilation
     $spirv = Join-Path $variantOutput 'minimal.rgen.spv'
     $disassembly = Join-Path $variantOutput 'minimal.rgen.spvasm'
     $resolvedSourcePath = Join-Path $variantOutput 'minimal.rgen.resolved'
+    $preprocessedSourcePath = Join-Path $variantOutput 'minimal.rgen.preprocessed'
     $activePaths = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
     $dependencies = [Collections.Generic.List[string]]::new()
     [IO.File]::WriteAllText($resolvedSourcePath,
@@ -373,6 +374,14 @@ function Invoke-RaygenVariantCompilation
             $resolvedLegacySource.Replace($activityExpression, '#define HORDE_GENERIC_TRANSMISSION_VARIANT 0'),
             [Text.UTF8Encoding]::new($false))
     }
+
+    # Keep the compiler's exact macro-expanded source beside the temporary
+    # matrix evidence. This is intentionally an ignored artifact: the
+    # disassembly can legitimately retire whole specialized routes, while the
+    # preprocessed source proves each owning route received its Mobile/High
+    # literal budget before dead-code elimination.
+    & $validator -E -S rgen $resolvedSourcePath | Set-Content -LiteralPath $preprocessedSourcePath -Encoding utf8
+    if ($LASTEXITCODE -ne 0) { throw "Raygen variant preprocessing failed with exit code $LASTEXITCODE." }
 
     $dependencyHashes = @($dependencies | ForEach-Object {
         [ordered]@{ path = Get-RaygenRelativePath -Path $_; sha256 = Get-RaygenDependencyHash -Path $_ }
@@ -640,7 +649,9 @@ if (-not $Legacy -and -not $boundedGenericFunctionsRetained)
 $spirvHash = Get-RaygenFileSha256 -Path $spirv
 $sourceHash = $dependencyHash
 $includeHash = if (Test-Path -LiteralPath $include) {
-    Get-RaygenFileSha256 -Path $include
+    # Generated text is logically line-oriented. Preserve this identity across
+    # CRLF/LF checkouts while compiled .spv payloads above stay raw-byte hashes.
+    Get-RaygenDependencyHash -Path $include
 } else { '' }
 
 if ($Check)

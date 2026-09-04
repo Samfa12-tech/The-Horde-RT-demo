@@ -20,7 +20,27 @@ function Assert-True {
     if (-not $Condition) { throw $Message }
 }
 
-function Get-CanonicalFileHash {
+function Get-CanonicalTextHash {
+    param([string]$Path)
+
+    # Match compile-raygen.ps1's logical-source identity: UTF-8 text without a
+    # BOM, normalized to LF with one trailing newline.
+    $lines = [IO.File]::ReadAllLines($Path)
+    $canonicalText = if ($lines.Count -eq 0) {
+        ''
+    } else {
+        [string]::Join("`n", $lines) + "`n"
+    }
+    $sha256 = [Security.Cryptography.SHA256]::Create()
+    try {
+        return ([BitConverter]::ToString($sha256.ComputeHash([Text.Encoding]::UTF8.GetBytes($canonicalText)))).Replace('-', '').ToLowerInvariant()
+    }
+    finally {
+        $sha256.Dispose()
+    }
+}
+
+function Get-RawFileHash {
     param([string]$Path)
 
     $sha256 = [Security.Cryptography.SHA256]::Create()
@@ -29,6 +49,106 @@ function Get-CanonicalFileHash {
     }
     finally {
         $sha256.Dispose()
+    }
+}
+
+function Get-BracedFunctionBody {
+    param([string]$Source, [string]$FunctionName)
+
+    $headers = [regex]::Matches($Source, ('(?m)^\s*(?:[A-Za-z_]\w*\s+)+{0}\s*\(' -f [regex]::Escape($FunctionName)))
+    foreach ($header in $headers) {
+        $parentheses = 0
+        $bodyStart = -1
+        $afterSignature = -1
+        for ($index = $header.Index; $index -lt $Source.Length; ++$index) {
+            $character = $Source[$index]
+            if ($character -eq '(') { ++$parentheses; continue }
+            if ($character -eq ')') {
+                --$parentheses
+                if ($parentheses -eq 0) { $afterSignature = $index + 1; break }
+            }
+        }
+        if ($afterSignature -lt 0) { continue }
+        while ($afterSignature -lt $Source.Length -and [char]::IsWhiteSpace($Source[$afterSignature])) { ++$afterSignature }
+        # The flattened source contains forward declarations before definitions.
+        # Only accept the exact signature followed by an opening brace.
+        if ($afterSignature -ge $Source.Length -or $Source[$afterSignature] -ne '{') { continue }
+        $bodyStart = $afterSignature
+
+        $depth = 0
+        $inLineComment = $false
+        $inBlockComment = $false
+        $inString = $false
+        for ($index = $bodyStart; $index -lt $Source.Length; ++$index) {
+            $character = $Source[$index]
+            $next = if ($index + 1 -lt $Source.Length) { $Source[$index + 1] } else { [char]0 }
+            if ($inLineComment) {
+                if ($character -eq "`n") { $inLineComment = $false }
+                continue
+            }
+            if ($inBlockComment) {
+                if ($character -eq '*' -and $next -eq '/') { $inBlockComment = $false; ++$index }
+                continue
+            }
+            if ($inString) {
+                if ($character -eq '\\') { ++$index; continue }
+                if ($character -eq '"') { $inString = $false }
+                continue
+            }
+            if ($character -eq '/' -and $next -eq '/') { $inLineComment = $true; ++$index; continue }
+            if ($character -eq '/' -and $next -eq '*') { $inBlockComment = $true; ++$index; continue }
+            if ($character -eq '"') { $inString = $true; continue }
+            if ($character -eq '{') { ++$depth; continue }
+            if ($character -eq '}') {
+                --$depth
+                if ($depth -eq 0) { return $Source.Substring($bodyStart, $index - $bodyStart + 1) }
+            }
+        }
+        throw "Unterminated preprocessed function body: $FunctionName"
+    }
+    throw "Missing preprocessed function definition: $FunctionName"
+}
+
+function Assert-MatrixRouteBudget {
+    param(
+        [string]$PreprocessedSource,
+        [string]$FunctionName,
+        [string]$InterfaceConstant,
+        [string]$VolumeConstant = ''
+    )
+
+    $body = Get-BracedFunctionBody -Source $PreprocessedSource -FunctionName $FunctionName
+    Assert-True ($body -notmatch 'controls\.waterQuality') "$FunctionName retained runtime WaterQuality selection in a matrix compile."
+    Assert-True ($body -match ("\bconst\s+int\s+interfaceBudget\s*=\s*{0}\s*;" -f [regex]::Escape($InterfaceConstant))) `
+        "$FunctionName did not receive $InterfaceConstant as its matrix interface budget."
+    $hasStaticCeiling = $body -match ("\bfor\s*\([^;]*;\s*\w+\s*<=\s*{0}\s*;" -f [regex]::Escape($InterfaceConstant))
+    $hasCounterGuard = $body -match '\binterfaceCount\s*>=\s*interfaceBudget\b'
+    Assert-True ($hasStaticCeiling -or $hasCounterGuard) `
+        "$FunctionName did not retain its bounded interface traversal through $InterfaceConstant."
+    if (-not [string]::IsNullOrWhiteSpace($VolumeConstant)) {
+        Assert-True ($body -match ("\bconst\s+int\s+volumeBudget\s*=\s*{0}\s*;" -f [regex]::Escape($VolumeConstant))) `
+            "$FunctionName did not receive $VolumeConstant as its matrix volume budget."
+        Assert-True ($body -match ("\[\s*{0}\s*\]" -f [regex]::Escape($VolumeConstant))) `
+            "$FunctionName did not compile fixed volume capacity $VolumeConstant."
+        Assert-True ($body -match ("\bfor\s*\([^;]*;\s*\w+\s*<\s*{0}\s*;" -f [regex]::Escape($VolumeConstant))) `
+            "$FunctionName did not retain a volume-capacity loop through $VolumeConstant."
+    }
+}
+
+function Assert-PreprocessedBudgetConstants {
+    param([string]$PreprocessedSource, [int]$ExpectedInterfaceBudget, [int]$ExpectedVolumeBudget)
+
+    foreach ($constant in @(
+        @{ name = 'kRtVariantDielectricInterfaceBudget'; value = $ExpectedInterfaceBudget },
+        @{ name = 'kRtVariantDielectricVolumeBudget'; value = $ExpectedVolumeBudget },
+        @{ name = 'kRtVariantShadowInterfaceBudget'; value = $ExpectedInterfaceBudget },
+        @{ name = 'kRtVariantShadowVolumeBudget'; value = $ExpectedVolumeBudget })) {
+        $declarations = @([regex]::Matches($PreprocessedSource,
+            ("\bconst\s+int\s+{0}\s*=\s*(\d+)\s*;" -f [regex]::Escape($constant.name))))
+        Assert-True ($declarations.Count -eq 1) `
+            "Preprocessed matrix source must contain exactly one literal declaration of $($constant.name)."
+        Assert-True ($declarations[0].Groups[1].Value -eq [string]$constant.value) `
+            "Preprocessed matrix source did not define $($constant.name) as literal $($constant.value)."
     }
 }
 
@@ -77,14 +197,23 @@ try {
         ($null -eq $budgets.budgets -or @($budgets.budgets).Count -eq 0)) `
         'Task 3c must not freeze temporary matrix budgets.'
 
+    New-Item -ItemType Directory -Path $temporaryRoot | Out-Null
     $genericInclude = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalRayGenShader.inc'
     $legacyInclude = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalLegacyRayGenShader.inc'
-    Assert-True ((Get-CanonicalFileHash $genericInclude) -eq 'fd534d390fc5d73aa65fb291fc847dde6d94a70da4d611eb274c4739d65c7087') `
+    Assert-True ((Get-CanonicalTextHash $genericInclude) -eq 'fd534d390fc5d73aa65fb291fc847dde6d94a70da4d611eb274c4739d65c7087') `
         'Compatibility generic include changed unexpectedly.'
-    Assert-True ((Get-CanonicalFileHash $legacyInclude) -eq 'b8ec454582c7b7e0a4f0734286b3475596b817b785b857ddc2c563e40a70bb82') `
+    Assert-True ((Get-CanonicalTextHash $legacyInclude) -eq 'b8ec454582c7b7e0a4f0734286b3475596b817b785b857ddc2c563e40a70bb82') `
         'Compatibility legacy include changed unexpectedly.'
 
-    New-Item -ItemType Directory -Path $temporaryRoot | Out-Null
+    $lfFixture = Join-Path $temporaryRoot 'canonical-lf-fixture.txt'
+    $crlfFixture = Join-Path $temporaryRoot 'canonical-crlf-fixture.txt'
+    [IO.File]::WriteAllText($lfFixture, "generated include`nline two`n", [Text.UTF8Encoding]::new($false))
+    [IO.File]::WriteAllText($crlfFixture, "generated include`r`nline two`r`n", [Text.UTF8Encoding]::new($false))
+    Assert-True ((Get-CanonicalTextHash $lfFixture) -eq (Get-CanonicalTextHash $crlfFixture)) `
+        'Canonical generated-text hashing must treat LF and CRLF forms identically.'
+    Assert-True ((Get-RawFileHash $lfFixture) -ne (Get-RawFileHash $crlfFixture)) `
+        'The LF/CRLF fixture must prove canonical text hashing is not raw-byte hashing.'
+
     $matrixOutput = Join-Path $temporaryRoot 'matrix'
     & $compiler -Matrix -OutputDirectory $matrixOutput
     if ($LASTEXITCODE -ne 0) { throw "Matrix compiler failed with exit code $LASTEXITCODE." }
@@ -103,8 +232,9 @@ try {
         $statsPath = Join-Path $variantRoot 'raygen-stats.json'
         $assemblyPath = Join-Path $variantRoot 'minimal.rgen.spvasm'
         $resolvedPath = Join-Path $variantRoot 'minimal.rgen.resolved'
+        $preprocessedPath = Join-Path $variantRoot 'minimal.rgen.preprocessed'
         Assert-True ((Test-Path -LiteralPath $statsPath) -and (Test-Path -LiteralPath $assemblyPath) -and
-            (Test-Path -LiteralPath $resolvedPath)) "Missing compiled artifact for $($variant.name)."
+            (Test-Path -LiteralPath $resolvedPath) -and (Test-Path -LiteralPath $preprocessedPath)) "Missing compiled artifact for $($variant.name)."
         $stats = Get-Content -LiteralPath $statsPath -Raw | ConvertFrom-Json
         $assembly = Get-Content -LiteralPath $assemblyPath -Raw
         Assert-True ($stats.schema -eq 1 -and $stats.key -eq $variant.name -and
@@ -131,6 +261,24 @@ try {
         }
         if ($variant.material -eq 'GenericDielectric') {
             $expectedBound = if ($variant.quality -eq 'Mobile') { 4 } else { 8 }
+            $expectedVolume = if ($variant.quality -eq 'Mobile') { 2 } else { 4 }
+            $preprocessed = Get-Content -LiteralPath $preprocessedPath -Raw
+            # GenericDielectric owns all six specialized routes. The legacy
+            # strategy may validly DCE them, so prove each route before DCE in
+            # exact compiler-preprocessed source and retain the live SPIR-V
+            # comparator assertion below for the surviving generic route.
+            Assert-PreprocessedBudgetConstants -PreprocessedSource $preprocessed `
+                -ExpectedInterfaceBudget $expectedBound -ExpectedVolumeBudget $expectedVolume
+            Assert-MatrixRouteBudget -PreprocessedSource $preprocessed -FunctionName 'shadeBoundedDielectric' `
+                -InterfaceConstant 'kRtVariantDielectricInterfaceBudget' -VolumeConstant 'kRtVariantDielectricVolumeBudget'
+            Assert-MatrixRouteBudget -PreprocessedSource $preprocessed -FunctionName 'shadeProductionBoundedDielectric' `
+                -InterfaceConstant 'kRtVariantDielectricInterfaceBudget'
+            Assert-MatrixRouteBudget -PreprocessedSource $preprocessed -FunctionName 'shadowTransmittanceMask' `
+                -InterfaceConstant 'kRtVariantShadowInterfaceBudget' -VolumeConstant 'kRtVariantShadowVolumeBudget'
+            Assert-MatrixRouteBudget -PreprocessedSource $preprocessed -FunctionName 'compactShadowTransmittanceMask' `
+                -InterfaceConstant 'kRtVariantShadowInterfaceBudget'
+            Assert-MatrixRouteBudget -PreprocessedSource $preprocessed -FunctionName 'boundedShadowTransmittanceMask' `
+                -InterfaceConstant 'kRtVariantShadowInterfaceBudget'
             Assert-True ($assembly -match ("\bOp(?:SLessThanEqual|SGreaterThanEqual)\s+%bool\s+%\S+\s+%int_{0}\b" -f $expectedBound)) `
                 "Generic artifact did not compile the expected interface ceiling ${expectedBound}: $($variant.name)."
         }
@@ -139,13 +287,13 @@ try {
     $compatibilityGenericOutput = Join-Path $temporaryRoot 'compatibility-generic'
     & $compiler -Check -OutputDirectory $compatibilityGenericOutput
     if ($LASTEXITCODE -ne 0) { throw "Generic compatibility freshness failed with exit code $LASTEXITCODE." }
-    Assert-True ((Get-CanonicalFileHash (Join-Path $compatibilityGenericOutput 'minimal.rgen.spv')) -eq
+    Assert-True ((Get-RawFileHash (Join-Path $compatibilityGenericOutput 'minimal.rgen.spv')) -eq
         'e9d4fca05e8c642b6e09251a7c57253124fa6475ab5f81e34d1acb548764c23a') `
         'Compatibility generic SPIR-V words changed.'
     $compatibilityLegacyOutput = Join-Path $temporaryRoot 'compatibility-legacy'
     & $compiler -Legacy -Check -OutputDirectory $compatibilityLegacyOutput
     if ($LASTEXITCODE -ne 0) { throw "Legacy compatibility freshness failed with exit code $LASTEXITCODE." }
-    Assert-True ((Get-CanonicalFileHash (Join-Path $compatibilityLegacyOutput 'minimal.legacy.rgen.spv')) -eq
+    Assert-True ((Get-RawFileHash (Join-Path $compatibilityLegacyOutput 'minimal.legacy.rgen.spv')) -eq
         '870e4ea0c0b24fdcac516fec15343c1531906600d8ec28c9eaebf826a7bd75a0') `
         'Compatibility legacy SPIR-V words changed.'
     Assert-True ((& git -C $repoRoot status --porcelain) -join "`n" -eq $worktreeStatusBefore) `

@@ -17,9 +17,14 @@ function Normalize-Newlines([string]$text) { return $text.Replace("`r`n", "`n").
 $definition = Get-Content -LiteralPath $DefinitionPath -Raw | ConvertFrom-Json
 if ($definition.schema -ne 1) { throw "RT scene ABI definition schema must be 1." }
 $normalizedDefinition = Normalize-Newlines ([IO.File]::ReadAllText($DefinitionPath))
-$hash = [Convert]::ToHexString(
-    [Security.Cryptography.SHA256]::HashData(
-        [Text.Encoding]::UTF8.GetBytes($normalizedDefinition))).ToLowerInvariant()
+$sha256 = [Security.Cryptography.SHA256]::Create()
+try {
+    $hash = ([BitConverter]::ToString(
+        $sha256.ComputeHash([Text.Encoding]::UTF8.GetBytes($normalizedDefinition)))).Replace('-', '').ToLowerInvariant()
+}
+finally {
+    $sha256.Dispose()
+}
 $c = $definition.capacities
 $b = $definition.bindings
 $i = $definition.instanceFlags
