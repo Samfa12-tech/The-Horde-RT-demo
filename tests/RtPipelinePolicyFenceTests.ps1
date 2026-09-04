@@ -111,28 +111,60 @@ foreach ($required in @('hordeRtInstrumentationOverride', 'hordeRtDielectricQual
 
 $isolatedSources = @('src\vulkan\raytracing\RtPipelineVariants.h', 'src\vulkan\raytracing\RtPipelineVariants.cpp',
     'src\vulkan\raytracing\RtPipelineVariantProvider.h', 'src\vulkan\raytracing\RtPipelineVariantProvider.cpp',
+    'src\vulkan\raytracing\RtPipelineBundleContracts.h', 'src\vulkan\raytracing\RtPipelineBundleContracts.cpp',
+    'src\vulkan\raytracing\RtPipelineBundle.h', 'src\vulkan\raytracing\RtPipelineBundle.cpp',
     'src\vulkan\raytracing\RtPipelineVariantCatalog.generated.h', 'tests\RtPipelineVariantsTests.cpp',
     'tests\RtPipelineVariantProviderTests.cpp', 'tests\RtPipelineVariantFixture.cpp')
 foreach ($relativePath in $isolatedSources) {
     $contents = Get-Content -LiteralPath (Join-Path $repoRoot $relativePath) -Raw
     Assert-True (-not $contents.Contains('WaterQuality')) "Provider boundary must not couple to WaterQuality: $relativePath"
 }
-$forbidden = [ordered]@{
-    'src/vulkan/raytracing/PresentableTinyRtScene.cpp' = '8d35e7c29ae210a9c7272ed1592778208653647e'
-    'src/vulkan/raytracing/PresentableTinyRtScene.h' = 'e52e4ca74c00c629625e4da44bec843633240364'
-    'src/platform/windows/DiagnosticWindow.cpp' = 'eacddf9cf069980893eb06f1d478b935835ed2e4'
-    'android/app/src/main/cpp/android_probe_bridge.cpp' = '325973cc8ef62373fe6a592befd9a910270bc143'
+$scene = Get-Content -LiteralPath (Join-Path $repoRoot 'src\vulkan\raytracing\PresentableTinyRtScene.cpp') -Raw
+$sceneHeader = Get-Content -LiteralPath (Join-Path $repoRoot 'src\vulkan\raytracing\PresentableTinyRtScene.h') -Raw
+$windowsHost = Get-Content -LiteralPath (Join-Path $repoRoot 'src\platform\windows\DiagnosticWindow.cpp') -Raw
+$androidHost = Get-Content -LiteralPath (Join-Path $repoRoot 'android\app\src\main\cpp\android_probe_bridge.cpp') -Raw
+foreach ($retired in @('MinimalRayGenShader.inc', 'MinimalLegacyRayGenShader.inc',
+                        'kMinimalRayGenShader', 'kMinimalLegacyRayGenShader',
+                        'legacyPipeline_', 'legacyShaderBindingTable_')) {
+    Assert-True (-not $scene.Contains($retired)) "Runtime source still retains compatibility ownership: $retired"
 }
-function Assert-OwnershipFence([hashtable]$expected) {
-    foreach ($entry in $expected.GetEnumerator()) {
-        $actual = ((& git -C $repoRoot hash-object $entry.Key) -join '').Trim()
-        Assert-True ($actual -eq $entry.Value) "Task 3e-a ownership fence changed: $($entry.Key)"
-    }
+Assert-True $sceneHeader.Contains('RtPipelineBundle pipelineBundle_') 'Scene must own exactly one selected RT pipeline bundle.'
+Assert-True $scene.Contains('BuildRtPipelineBundleResources(pipelineBundle_') 'Live scene must use the production-tested bundle builder.'
+
+$initialiseStart = $scene.IndexOf('bool PresentableTinyRtScene::Initialise(')
+$initialiseEnd = $scene.IndexOf('void PresentableTinyRtScene::Destroy()', $initialiseStart)
+Assert-True ($initialiseStart -ge 0 -and $initialiseEnd -gt $initialiseStart) 'Unable to isolate scene Initialise ownership path.'
+$initialise = $scene.Substring($initialiseStart, $initialiseEnd - $initialiseStart)
+$preflightAt = $initialise.IndexOf('ResolveCompiledRtPipelineBundlePreflight')
+Assert-True ($preflightAt -gt $initialise.IndexOf('RT dispatch extent is zero.')) 'Selected provider preflight must follow non-owning argument checks.'
+foreach ($later in @('vkGetPhysicalDeviceFormatProperties', 'characterSlot_.LoadAssets',
+                      'LoadStaticHeldItemAssets', 'CreateStorageImage')) {
+    Assert-True ($preflightAt -lt $initialise.IndexOf($later)) "Selected provider preflight must precede ownership/work: $later"
 }
-Assert-OwnershipFence $forbidden
-$ineffectiveControl = [ordered]@{} + $forbidden
-$ineffectiveControl['src/vulkan/raytracing/PresentableTinyRtScene.cpp'] = '0' * 40
+
+$recordStart = $scene.IndexOf('bool PresentableTinyRtScene::RecordTraceAndCopy(')
+$recordEnd = $scene.IndexOf('bool PresentableTinyRtScene::CaptureStorageImage(', $recordStart)
+Assert-True ($recordStart -ge 0 -and $recordEnd -gt $recordStart) 'Unable to isolate record-time selection path.'
+$record = $scene.Substring($recordStart, $recordEnd - $recordStart)
+foreach ($required in @('pipelineBundle_.Strategy(', 'genericTransmissionActive_',
+                         'activeStrategy.pipeline', 'activeStrategy.sbtRegions[0]',
+                         'pipelineBundle_.pipelineLayout', 'pipelineBundle_.descriptorSet')) {
+    Assert-True $record.Contains($required) "Record path is missing selected-record ownership: $required"
+}
+foreach ($forbiddenRecordDecision in @('ResolveCompiledRtPipelineBundlePreflight',
+        'RtPipelineVariantProvider', 'RtPipelineBundleRequest', 'CreateBuffer(',
+        'BuildRtPipelineBundleResources', 'Destroy(', 'WaterQuality', 'waterQuality =')) {
+    Assert-True (-not $record.Contains($forbiddenRecordDecision)) "Record path contains a forbidden policy/lifetime decision: $forbiddenRecordDecision"
+}
+foreach ($hostSource in @($windowsHost, $androidHost)) {
+    Assert-True (-not $hostSource.Contains('RtPipelineBundleRequest')) 'A platform host must not construct or pass a bundle request.'
+    Assert-True (-not $hostSource.Contains('RtPipelineVariantProvider')) 'A platform host must not resolve provider policy.'
+    Assert-True $hostSource.Contains('SelectedOpaqueFastKey()') 'A platform host must serialize the selected OpaqueFast key.'
+    Assert-True $hostSource.Contains('SelectedGenericDielectricKey()') 'A platform host must serialize the selected GenericDielectric key.'
+    Assert-True $hostSource.Contains('DiagnosticsAvailability()') 'A platform host must publish diagnostic availability beside legacy scalars.'
+}
+
 $rejectedControl = $false
-try { Assert-OwnershipFence $ineffectiveControl } catch { $rejectedControl = $true }
-Assert-True $rejectedControl 'Ownership fence control must fail when an expected source identity is wrong.'
-Write-Output 'RT provider policy and ownership fence contracts passed.'
+try { Assert-True $record.Replace('pipelineBundle_.Strategy(', 'removed(').Contains('pipelineBundle_.Strategy(') 'Synthetic record without atomic strategy selection must fail.' } catch { $rejectedControl = $true }
+Assert-True $rejectedControl 'Behavioral ownership-fence control did not prove it can reject a missing selection.'
+Write-Output 'RT provider policy and ownership behavior contracts passed.'

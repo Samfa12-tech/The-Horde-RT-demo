@@ -15,9 +15,7 @@ project(HordeLanternRT
     LANGUAGES CXX
 )
 
-set(HORDE_RT_EMBEDDED_RAYGEN "${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan/raytracing/MinimalRayGenShader.inc")
 horde_rt_configure_raygen_artifacts("${CMAKE_CURRENT_SOURCE_DIR}")
-file(SHA256 "${HORDE_RT_EMBEDDED_RAYGEN}" HORDE_RT_RAYGEN_SHA256)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -140,7 +138,6 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AN
         HORDE_RT_DISPLAY_VERSION="${HORDE_RT_DISPLAY_VERSION}"
         HORDE_RT_PACKAGE_VERSION="${HORDE_RT_PACKAGE_VERSION}"
         HORDE_RT_BUILD_ID="${HORDE_RT_BUILD_ID}"
-        HORDE_RT_RAYGEN_SHA256="${HORDE_RT_RAYGEN_SHA256}"
         $<$<CONFIG:Debug>:HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}">
     )
     horde_rt_attach_raygen_artifacts(horde_rt_diagnostic_window)
@@ -486,6 +483,18 @@ if(BUILD_TESTING)
     add_test(NAME horde_rt_spatial_audio_smoke COMMAND horde_rt_spatial_audio_smoke)
 
     if(HORDE_RT_BUILD_VULKAN_TARGETS)
+        add_executable(horde_rt_pipeline_bundle_lifetime_tests
+            tests/RtPipelineBundleLifetimeTests.cpp
+            src/vulkan/raytracing/RtPipelineBundle.cpp
+            src/vulkan/raytracing/RtPipelineBundleContracts.cpp
+            src/vulkan/raytracing/RtPipelineVariants.cpp
+            src/vulkan/raytracing/RtPipelineVariantProvider.cpp)
+        target_include_directories(horde_rt_pipeline_bundle_lifetime_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+        target_link_libraries(horde_rt_pipeline_bundle_lifetime_tests PRIVATE Vulkan::Vulkan)
+        horde_rt_apply_raygen_policy(horde_rt_pipeline_bundle_lifetime_tests Windows)
+        horde_rt_attach_raygen_artifacts(horde_rt_pipeline_bundle_lifetime_tests)
+        add_test(NAME horde_rt_pipeline_bundle_lifetime_tests COMMAND horde_rt_pipeline_bundle_lifetime_tests)
+
         add_executable(horde_rt_skinned_character_smoke tests/SkinnedCharacterModelSmoke.cpp)
         target_include_directories(horde_rt_skinned_character_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
         target_link_libraries(horde_rt_skinned_character_smoke PRIVATE horde_rt_probe_core)

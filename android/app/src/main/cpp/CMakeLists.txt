@@ -11,9 +11,7 @@ include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtRaygenPolicy.cmake")
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtSources.cmake")
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtStrictAssetMath.cmake")
 horde_rt_enable_strict_asset_math("${HORDE_RT_REPO_ROOT}")
-set(HORDE_RT_EMBEDDED_RAYGEN "${HORDE_RT_REPO_ROOT}/src/vulkan/raytracing/MinimalRayGenShader.inc")
 horde_rt_configure_raygen_artifacts("${HORDE_RT_REPO_ROOT}")
-file(SHA256 "${HORDE_RT_EMBEDDED_RAYGEN}" HORDE_RT_RAYGEN_SHA256)
 set(HORDE_RT_ANDROID_CORE_SOURCES)
 foreach(source IN LISTS HORDE_RT_CORE_RELATIVE_SOURCES)
     list(APPEND HORDE_RT_ANDROID_CORE_SOURCES "${HORDE_RT_REPO_ROOT}/src/${source}")
@@ -38,7 +36,6 @@ target_compile_definitions(horde_rt_probe_android PRIVATE
     HORDE_RT_DISPLAY_VERSION="${HORDE_RT_DISPLAY_VERSION}"
     HORDE_RT_PACKAGE_VERSION="${HORDE_RT_PACKAGE_VERSION}"
     HORDE_RT_BUILD_ID="${HORDE_RT_BUILD_ID}"
-    HORDE_RT_RAYGEN_SHA256="${HORDE_RT_RAYGEN_SHA256}"
 )
 if(HORDE_RT_DEBUG_CHECKPOINTS)
     target_compile_definitions(horde_rt_probe_android PRIVATE

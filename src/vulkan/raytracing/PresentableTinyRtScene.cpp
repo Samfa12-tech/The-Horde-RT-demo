@@ -15,6 +15,7 @@
 #include <cstring>
 #include <filesystem>
 #include <fstream>
+#include <optional>
 #include <span>
 #include <utility>
 #include <vector>
@@ -114,16 +115,6 @@ bool HasActiveGenericTransmission(
     }
     return false;
 }
-
-// Generated from shaders/raytracing/minimal.rgen with glslangValidator -V -Os.
-// Keep this embedded so the Android RT scene remains a self-contained native build.
-constexpr std::uint32_t kMinimalRayGenShader[] = {
-#include "vulkan/raytracing/MinimalRayGenShader.inc"
-};
-
-constexpr std::uint32_t kMinimalLegacyRayGenShader[] = {
-#include "vulkan/raytracing/MinimalLegacyRayGenShader.inc"
-};
 
 constexpr std::uint32_t kMinimalMissShader[] = {
     0x07230203u, 0x00010500u, 0x0008000bu, 0x00000069u, 0x00000000u, 0x00020011u, 0x0000117fu, 0x0006000au,
@@ -327,8 +318,6 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     instanceMetadataBuffer_ = std::exchange(other.instanceMetadataBuffer_, Buffer{});
     primitiveMetadataBuffer_ = std::exchange(other.primitiveMetadataBuffer_, Buffer{});
     materialMetadataBuffer_ = std::exchange(other.materialMetadataBuffer_, Buffer{});
-    dielectricDiagnosticsBuffer_ =
-        std::exchange(other.dielectricDiagnosticsBuffer_, Buffer{});
     blas_ = std::exchange(other.blas_, AccelerationStructure{});
     waterfallBlas_ = std::exchange(other.waterfallBlas_, AccelerationStructure{});
     finaleRoofBlas_ = std::exchange(other.finaleRoofBlas_, AccelerationStructure{});
@@ -464,26 +453,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
         std::exchange(other.productionPropBlasBuildMilliseconds_, 0.0);
     heldItemBlasMeasurements_ = std::exchange(
         other.heldItemBlasMeasurements_, HeldItemBlasMeasurements{});
-    descriptorSetLayout_ = std::exchange(other.descriptorSetLayout_, VK_NULL_HANDLE);
-    descriptorPool_ = std::exchange(other.descriptorPool_, VK_NULL_HANDLE);
-    descriptorSet_ = std::exchange(other.descriptorSet_, VK_NULL_HANDLE);
-    pipelineLayout_ = std::exchange(other.pipelineLayout_, VK_NULL_HANDLE);
-    pipeline_ = std::exchange(other.pipeline_, VK_NULL_HANDLE);
-    legacyPipeline_ = std::exchange(other.legacyPipeline_, VK_NULL_HANDLE);
-    shaderBindingTable_ = std::exchange(other.shaderBindingTable_, Buffer{});
-    legacyShaderBindingTable_ = std::exchange(other.legacyShaderBindingTable_, Buffer{});
-    raygenRegion_ = std::exchange(other.raygenRegion_, VkStridedDeviceAddressRegionKHR{});
-    missRegion_ = std::exchange(other.missRegion_, VkStridedDeviceAddressRegionKHR{});
-    hitRegion_ = std::exchange(other.hitRegion_, VkStridedDeviceAddressRegionKHR{});
-    callableRegion_ = std::exchange(other.callableRegion_, VkStridedDeviceAddressRegionKHR{});
-    legacyRaygenRegion_ = std::exchange(
-        other.legacyRaygenRegion_, VkStridedDeviceAddressRegionKHR{});
-    legacyMissRegion_ = std::exchange(
-        other.legacyMissRegion_, VkStridedDeviceAddressRegionKHR{});
-    legacyHitRegion_ = std::exchange(
-        other.legacyHitRegion_, VkStridedDeviceAddressRegionKHR{});
-    legacyCallableRegion_ = std::exchange(
-        other.legacyCallableRegion_, VkStridedDeviceAddressRegionKHR{});
+    pipelineBundle_ = std::move(other.pipelineBundle_);
     vkCreateAccelerationStructureKHR_ = other.vkCreateAccelerationStructureKHR_;
     vkDestroyAccelerationStructureKHR_ = other.vkDestroyAccelerationStructureKHR_;
     vkGetAccelerationStructureBuildSizesKHR_ = other.vkGetAccelerationStructureBuildSizesKHR_;
@@ -494,6 +464,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     vkCmdTraceRaysKHR_ = other.vkCmdTraceRaysKHR_;
     vkGetBufferDeviceAddressKHR_ = other.vkGetBufferDeviceAddressKHR_;
     gpuResources_.Bind(physicalDevice_, device_, vkDestroyAccelerationStructureKHR_, vkGetBufferDeviceAddressKHR_);
+    pipelineBundle_.RebindDestroyContext(this, &gpuResources_);
     other.gpuResources_.Reset();
     ready_ = std::exchange(other.ready_, false);
 
@@ -534,6 +505,52 @@ bool PresentableTinyRtScene::Initialise(VkInstance instance,
         diagnostic = "RT dispatch extent is zero.";
         return false;
     }
+    RtPipelineBundlePreflight selectedPreflight{};
+    if (!ResolveCompiledRtPipelineBundlePreflight(selectedPreflight, diagnostic))
+    {
+        Destroy();
+        return false;
+    }
+    RtPipelineBundleDestroyApi destroyApi{};
+    destroyApi.user = this;
+    destroyApi.gpuResources = &gpuResources_;
+    destroyApi.destroyBuffer = [](void*, RtGpuResources* resources, RtGpuBuffer& buffer,
+                                  RtPipelineOwnedBuffer) noexcept {
+        if (resources != nullptr) resources->DestroyBuffer(buffer);
+        else buffer = {};
+    };
+    destroyApi.destroyPipeline = [](void* user, VkPipeline& pipeline,
+                                    RtMaterialStrategy) noexcept {
+        auto& scene = *static_cast<PresentableTinyRtScene*>(user);
+        if (scene.device_ != VK_NULL_HANDLE && pipeline != VK_NULL_HANDLE)
+            vkDestroyPipeline(scene.device_, pipeline, nullptr);
+        pipeline = VK_NULL_HANDLE;
+    };
+    destroyApi.destroyPipelineLayout = [](void* user, VkPipelineLayout& layout) noexcept {
+        auto& scene = *static_cast<PresentableTinyRtScene*>(user);
+        if (scene.device_ != VK_NULL_HANDLE && layout != VK_NULL_HANDLE)
+            vkDestroyPipelineLayout(scene.device_, layout, nullptr);
+        layout = VK_NULL_HANDLE;
+    };
+    destroyApi.destroyDescriptorPool = [](void* user, VkDescriptorPool& pool) noexcept {
+        auto& scene = *static_cast<PresentableTinyRtScene*>(user);
+        if (scene.device_ != VK_NULL_HANDLE && pool != VK_NULL_HANDLE)
+            vkDestroyDescriptorPool(scene.device_, pool, nullptr);
+        pool = VK_NULL_HANDLE;
+    };
+    destroyApi.destroyDescriptorSetLayout = [](void* user,
+                                               VkDescriptorSetLayout& layout) noexcept {
+        auto& scene = *static_cast<PresentableTinyRtScene*>(user);
+        if (scene.device_ != VK_NULL_HANDLE && layout != VK_NULL_HANDLE)
+            vkDestroyDescriptorSetLayout(scene.device_, layout, nullptr);
+        layout = VK_NULL_HANDLE;
+    };
+    if (!pipelineBundle_.AdoptPreflight(
+            std::move(selectedPreflight), destroyApi, diagnostic))
+    {
+        Destroy();
+        return false;
+    }
     VkFormatProperties storageFormatProperties{};
     VkFormatProperties presentationFormatProperties{};
     vkGetPhysicalDeviceFormatProperties(physicalDevice_, kStorageImageFormat, &storageFormatProperties);
@@ -556,9 +573,7 @@ bool PresentableTinyRtScene::Initialise(VkInstance instance,
         !CreateLichTextures(lichTextureDirectory, diagnostic) ||
         !CreateStaticMeshResources(diagnostic) ||
         !BuildAccelerationStructures(diagnostic) ||
-        !CreateDescriptors(diagnostic) ||
-        !CreatePipeline(diagnostic) ||
-        !CreateShaderBindingTable(diagnostic))
+        !CreateSelectedPipelineBundle(diagnostic))
     {
         Destroy();
         return false;
@@ -577,35 +592,7 @@ void PresentableTinyRtScene::Destroy()
         return;
     }
 
-    if (pipeline_ != VK_NULL_HANDLE)
-    {
-        vkDestroyPipeline(device_, pipeline_, nullptr);
-        pipeline_ = VK_NULL_HANDLE;
-    }
-    if (legacyPipeline_ != VK_NULL_HANDLE)
-    {
-        vkDestroyPipeline(device_, legacyPipeline_, nullptr);
-        legacyPipeline_ = VK_NULL_HANDLE;
-    }
-    if (pipelineLayout_ != VK_NULL_HANDLE)
-    {
-        vkDestroyPipelineLayout(device_, pipelineLayout_, nullptr);
-        pipelineLayout_ = VK_NULL_HANDLE;
-    }
-    if (descriptorPool_ != VK_NULL_HANDLE)
-    {
-        vkDestroyDescriptorPool(device_, descriptorPool_, nullptr);
-        descriptorPool_ = VK_NULL_HANDLE;
-        descriptorSet_ = VK_NULL_HANDLE;
-    }
-    if (descriptorSetLayout_ != VK_NULL_HANDLE)
-    {
-        vkDestroyDescriptorSetLayout(device_, descriptorSetLayout_, nullptr);
-        descriptorSetLayout_ = VK_NULL_HANDLE;
-    }
-
-    DestroyBuffer(shaderBindingTable_);
-    DestroyBuffer(legacyShaderBindingTable_);
+    pipelineBundle_.Reset();
     DestroyAccelerationStructure(tlas_);
     DestroyBuffer(tlasUpdateScratch_);
     characterSlot_.DestroyGpuResources(gpuResources_);
@@ -625,7 +612,6 @@ void PresentableTinyRtScene::Destroy()
     DestroyAccelerationStructure(blas_);
     DestroyBuffer(worldSurfaceBuffer_);
     DestroyBuffer(materialMetadataBuffer_);
-    DestroyBuffer(dielectricDiagnosticsBuffer_);
     DestroyBuffer(primitiveMetadataBuffer_);
     DestroyBuffer(instanceMetadataBuffer_);
     DestroyBuffer(staticIndexBuffer_);
@@ -737,14 +723,6 @@ void PresentableTinyRtScene::Destroy()
     storageImageLayout_ = VK_IMAGE_LAYOUT_UNDEFINED;
     lastOutputRedBlueSwapApplied_ = false;
 
-    raygenRegion_ = {};
-    missRegion_ = {};
-    hitRegion_ = {};
-    callableRegion_ = {};
-    legacyRaygenRegion_ = {};
-    legacyMissRegion_ = {};
-    legacyHitRegion_ = {};
-    legacyCallableRegion_ = {};
     scaledBlitSupported_ = false;
     ready_ = false;
     gpuResources_.Reset();
@@ -1456,7 +1434,6 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
     const auto& vertices = staticMeshSlot_.Vertices();
     const auto& indices = staticMeshSlot_.Indices();
     const auto& geometryTransforms = staticMeshSlot_.GeometryTransforms();
-    const RtDielectricDiagnostics dielectricDiagnostics{};
     const auto createAndWrite = [this, uploadMemory, &diagnostic](
         const void* data,
         VkDeviceSize size,
@@ -1479,9 +1456,6 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
                         storage, false, "RT primitive metadata", primitiveMetadataBuffer_) ||
         !createAndWrite(materials.data(), materials.size() * sizeof(RtMaterialGpu),
                         storage, false, "RT material metadata", materialMetadataBuffer_) ||
-        !createAndWrite(&dielectricDiagnostics, sizeof(dielectricDiagnostics),
-                        storage, false, "dielectric diagnostics",
-                        dielectricDiagnosticsBuffer_) ||
         !createAndWrite(vertices.data(),
                         vertices.size() * sizeof(horde::scene::assets::StaticRtVertex),
                         geometry, true, "static RT vertices", staticVertexBuffer_) ||
@@ -3282,85 +3256,181 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     return true;
 }
 
-bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
+bool PresentableTinyRtScene::CreateSelectedPipelineBundle(std::string& diagnostic)
+{
+    RtPipelineBundleBuildApi api{};
+    api.user = this;
+    api.createDescriptorSetLayout = [](void* user, const RtDescriptorIoContract& contract,
+                                       VkDescriptorSetLayout& out, std::string& error) {
+        return static_cast<PresentableTinyRtScene*>(user)->CreateBundleDescriptorSetLayout(
+            contract, out, error);
+    };
+    api.createDescriptorPool = [](void* user, const RtDescriptorIoContract& contract,
+                                  VkDescriptorPool& out, std::string& error) {
+        return static_cast<PresentableTinyRtScene*>(user)->CreateBundleDescriptorPool(
+            contract, out, error);
+    };
+    api.allocateDescriptorSet = [](void* user, VkDescriptorPool pool,
+                                   VkDescriptorSetLayout layout, VkDescriptorSet& out,
+                                   std::string& error) {
+        return static_cast<PresentableTinyRtScene*>(user)->AllocateBundleDescriptorSet(
+            pool, layout, out, error);
+    };
+    api.createDiagnosticBuffer = [](void* user, RtGpuBuffer& out, std::string& error) {
+        return static_cast<PresentableTinyRtScene*>(user)->CreateBundleDiagnosticBuffer(
+            out, error);
+    };
+    api.writeDescriptors = [](void* user, RtPipelineBundle& bundle, std::string& error) {
+        return static_cast<PresentableTinyRtScene*>(user)->WriteBundleDescriptors(
+            bundle, error);
+    };
+    api.createPipelineLayout = [](void* user, VkDescriptorSetLayout layout,
+                                  VkPipelineLayout& out, std::string& error) {
+        return static_cast<PresentableTinyRtScene*>(user)->CreateBundlePipelineLayout(
+            layout, out, error);
+    };
+    api.createSharedShaderModules = [](void* user, VkShaderModule& miss,
+                                       VkShaderModule& hit, std::string& error) {
+        return static_cast<PresentableTinyRtScene*>(user)->CreateBundleSharedShaderModules(
+            miss, hit, error);
+    };
+    api.createRaygenShaderModule = [](void* user,
+                                      const RtPipelineVariantArtifact& artifact,
+                                      VkShaderModule& out, std::string& error) {
+        return static_cast<PresentableTinyRtScene*>(user)->CreateBundleRaygenShaderModule(
+            artifact, out, error);
+    };
+    api.createStrategyPipeline = [](void* user, RtMaterialStrategy strategy,
+                                    VkShaderModule raygen, VkShaderModule miss,
+                                    VkShaderModule hit, VkPipelineLayout layout,
+                                    VkPipeline& out, std::string& error) {
+        return static_cast<PresentableTinyRtScene*>(user)->CreateBundleStrategyPipeline(
+            strategy, raygen, miss, hit, layout, out, error);
+    };
+    api.destroyShaderModule = [](void* user, VkShaderModule& module) noexcept {
+        auto& scene = *static_cast<PresentableTinyRtScene*>(user);
+        if (scene.device_ != VK_NULL_HANDLE && module != VK_NULL_HANDLE)
+            vkDestroyShaderModule(scene.device_, module, nullptr);
+        module = VK_NULL_HANDLE;
+    };
+    api.createStrategySbt = [](void* user, RtMaterialStrategy strategy,
+                               VkPipeline pipeline, RtGpuBuffer& out,
+                               std::array<VkStridedDeviceAddressRegionKHR, 4u>& regions,
+                               std::string& error) {
+        return static_cast<PresentableTinyRtScene*>(user)->CreateBundleStrategySbt(
+            strategy, pipeline, out, regions, error);
+    };
+    return BuildRtPipelineBundleResources(pipelineBundle_, api, diagnostic);
+}
+
+bool PresentableTinyRtScene::CreateBundleDescriptorSetLayout(
+    const RtDescriptorIoContract& contract,
+    VkDescriptorSetLayout& out,
+    std::string& diagnostic)
+{
+    std::array<VkDescriptorSetLayoutBinding, 23u> bindings{};
+    for (std::uint32_t index = 0u; index < contract.bindingCount; ++index)
+    {
+        const RtDescriptorBindingContract& selected = contract.bindings[index];
+        VkDescriptorType type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+        switch (selected.kind)
+        {
+        case RtDescriptorResourceKind::AccelerationStructure:
+            type = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
+            break;
+        case RtDescriptorResourceKind::StorageImage:
+            type = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+            break;
+        case RtDescriptorResourceKind::CombinedImageSampler:
+            type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            break;
+        case RtDescriptorResourceKind::StorageBuffer:
+            break;
+        }
+        bindings[index] = {selected.binding, type, 1u,
+            static_cast<VkShaderStageFlags>(selected.binding == 0u
+                ? VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR
+                : VK_SHADER_STAGE_RAYGEN_BIT_KHR),
+            nullptr};
+    }
+    const VkDescriptorSetLayoutCreateInfo layoutInfo{
+        VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO, nullptr, 0u,
+        contract.bindingCount, bindings.data()};
+    if (vkCreateDescriptorSetLayout(device_, &layoutInfo, nullptr, &out) != VK_SUCCESS)
+    {
+        diagnostic = "Failed to create selected RT descriptor set layout.";
+        return false;
+    }
+    return true;
+}
+
+bool PresentableTinyRtScene::CreateBundleDescriptorPool(
+    const RtDescriptorIoContract& contract,
+    VkDescriptorPool& out,
+    std::string& diagnostic)
+{
+    const std::array<VkDescriptorPoolSize, 4u> poolSizes{{
+        {VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1u},
+        {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1u},
+        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, contract.storageBufferDescriptorCount},
+        {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 9u},
+    }};
+    const VkDescriptorPoolCreateInfo poolInfo{
+        VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO, nullptr, 0u, 1u,
+        static_cast<std::uint32_t>(poolSizes.size()), poolSizes.data()};
+    if (vkCreateDescriptorPool(device_, &poolInfo, nullptr, &out) != VK_SUCCESS)
+    {
+        diagnostic = "Failed to create selected RT descriptor pool.";
+        return false;
+    }
+    return true;
+}
+
+bool PresentableTinyRtScene::AllocateBundleDescriptorSet(
+    VkDescriptorPool pool,
+    VkDescriptorSetLayout layout,
+    VkDescriptorSet& out,
+    std::string& diagnostic)
+{
+    const VkDescriptorSetAllocateInfo allocateInfo{
+        VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO, nullptr, pool, 1u, &layout};
+    if (vkAllocateDescriptorSets(device_, &allocateInfo, &out) != VK_SUCCESS)
+    {
+        diagnostic = "Failed to allocate selected RT descriptor set.";
+        return false;
+    }
+    return true;
+}
+
+bool PresentableTinyRtScene::CreateBundleDiagnosticBuffer(
+    Buffer& out,
+    std::string& diagnostic)
+{
+    static_assert(sizeof(RtDielectricDiagnostics) == 176u);
+    static_assert(alignof(RtDielectricDiagnostics) == 16u);
+    const RtDielectricDiagnostics zeros{};
+    if (!CreateBuffer(sizeof(zeros), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                      VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                          VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                      false, out, diagnostic))
+        return false;
+    return WriteBuffer(out, &zeros, sizeof(zeros), "dielectric diagnostics", diagnostic);
+}
+
+bool PresentableTinyRtScene::WriteBundleDescriptors(RtPipelineBundle& bundle,
+                                                    std::string& diagnostic)
 {
     const auto& skeletonVertexBuffer_ = characterSlot_.SkeletonGpu(0u).vertices;
     const auto& secondSkeletonVertexBuffer = characterSlot_.SkeletonGpu(1u).vertices;
     const auto& lichVertexBuffer_ = characterSlot_.LichGpu().vertices;
-    const std::array<VkDescriptorSetLayoutBinding, 23u> bindings{{
-        {0u, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, nullptr},
-        {1u, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {2u, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {3u, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {4u, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {5u, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {6u, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {7u, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {8u, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {9u, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {10u, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {kRtBindingInstanceMetadata, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {kRtBindingPrimitiveMetadata, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {kRtBindingMaterials, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {kRtBindingStaticVertices, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {kRtBindingStaticIndices, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {kRtBindingBaseColorTextures, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {kRtBindingNormalTextures, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {kRtBindingOrmTextures, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {kRtBindingEmissiveTextures, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {kRtBindingHeldLight, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {kRtBindingFireEmitters, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {kRtBindingDielectricDiagnostics, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-    }};
-    const VkDescriptorSetLayoutCreateInfo layoutInfo{
-        VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-        nullptr,
-        0u,
-        static_cast<std::uint32_t>(bindings.size()),
-        bindings.data()};
-    if (vkCreateDescriptorSetLayout(device_, &layoutInfo, nullptr, &descriptorSetLayout_) != VK_SUCCESS)
-    {
-        diagnostic = "Failed to create RT descriptor set layout.";
-        return false;
-    }
-
-    const std::array<VkDescriptorPoolSize, 4u> poolSizes{{
-        {VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1u},
-        {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1u},
-        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 12u},
-        {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 9u},
-    }};
-    const VkDescriptorPoolCreateInfo poolInfo{
-        VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
-        nullptr,
-        0u,
-        1u,
-        static_cast<std::uint32_t>(poolSizes.size()),
-        poolSizes.data()};
-    if (vkCreateDescriptorPool(device_, &poolInfo, nullptr, &descriptorPool_) != VK_SUCCESS)
-    {
-        diagnostic = "Failed to create RT descriptor pool.";
-        return false;
-    }
-
-    const VkDescriptorSetAllocateInfo allocateInfo{
-        VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
-        nullptr,
-        descriptorPool_,
-        1u,
-        &descriptorSetLayout_};
-    if (vkAllocateDescriptorSets(device_, &allocateInfo, &descriptorSet_) != VK_SUCCESS)
-    {
-        diagnostic = "Failed to allocate RT descriptor set.";
-        return false;
-    }
+    const VkDescriptorSet descriptorSet = bundle.descriptorSet;
 
     VkWriteDescriptorSetAccelerationStructureKHR asWrite{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR};
     asWrite.accelerationStructureCount = 1u;
     asWrite.pAccelerationStructures = &tlas_.handle;
     VkWriteDescriptorSet accelerationStructureWrite{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
     accelerationStructureWrite.pNext = &asWrite;
-    accelerationStructureWrite.dstSet = descriptorSet_;
+    accelerationStructureWrite.dstSet = descriptorSet;
     accelerationStructureWrite.dstBinding = 0u;
     accelerationStructureWrite.descriptorCount = 1u;
     accelerationStructureWrite.descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
@@ -3369,7 +3439,7 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
     imageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
     imageInfo.imageView = storageImageView_;
     VkWriteDescriptorSet imageWrite{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
-    imageWrite.dstSet = descriptorSet_;
+    imageWrite.dstSet = descriptorSet;
     imageWrite.dstBinding = 1u;
     imageWrite.descriptorCount = 1u;
     imageWrite.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
@@ -3380,7 +3450,7 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
     skeletonBufferInfo.offset = 0u;
     skeletonBufferInfo.range = skeletonVertexBuffer_.size;
     VkWriteDescriptorSet skeletonWrite{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
-    skeletonWrite.dstSet = descriptorSet_;
+    skeletonWrite.dstSet = descriptorSet;
     skeletonWrite.dstBinding = 2u;
     skeletonWrite.descriptorCount = 1u;
     skeletonWrite.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
@@ -3391,16 +3461,16 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
     secondSkeletonBufferInfo.offset = 0u;
     secondSkeletonBufferInfo.range = secondSkeletonVertexBuffer.size;
     VkWriteDescriptorSet secondSkeletonWrite{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
-    secondSkeletonWrite.dstSet = descriptorSet_;
+    secondSkeletonWrite.dstSet = descriptorSet;
     secondSkeletonWrite.dstBinding = 10u;
     secondSkeletonWrite.descriptorCount = 1u;
     secondSkeletonWrite.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     secondSkeletonWrite.pBufferInfo = &secondSkeletonBufferInfo;
 
-    const auto bufferWrite = [this](std::uint32_t binding,
-                                    const VkDescriptorBufferInfo* info) {
+    const auto bufferWrite = [descriptorSet](std::uint32_t binding,
+                                             const VkDescriptorBufferInfo* info) {
         VkWriteDescriptorSet write{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
-        write.dstSet = descriptorSet_;
+        write.dstSet = descriptorSet;
         write.dstBinding = binding;
         write.descriptorCount = 1u;
         write.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
@@ -3421,15 +3491,17 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
         heldLightBuffer_.buffer, 0u, heldLightBuffer_.size};
     const VkDescriptorBufferInfo fireEmitterInfo{
         fireEmitterBuffer_.buffer, 0u, fireEmitterBuffer_.size};
-    const VkDescriptorBufferInfo dielectricDiagnosticsInfo{
-        dielectricDiagnosticsBuffer_.buffer, 0u, dielectricDiagnosticsBuffer_.size};
+    std::optional<VkDescriptorBufferInfo> dielectricDiagnosticsInfo;
+    if (bundle.DescriptorIo().diagnosticIo.descriptorInfo)
+        dielectricDiagnosticsInfo.emplace(VkDescriptorBufferInfo{
+            bundle.diagnosticBuffer.buffer, 0u, bundle.diagnosticBuffer.size});
 
     VkDescriptorBufferInfo lichBufferInfo{};
     lichBufferInfo.buffer = lichVertexBuffer_.buffer;
     lichBufferInfo.offset = 0u;
     lichBufferInfo.range = lichVertexBuffer_.size;
     VkWriteDescriptorSet lichBufferWrite{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
-    lichBufferWrite.dstSet = descriptorSet_;
+    lichBufferWrite.dstSet = descriptorSet;
     lichBufferWrite.dstBinding = 7u;
     lichBufferWrite.descriptorCount = 1u;
     lichBufferWrite.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
@@ -3440,7 +3512,7 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
     worldSurfaceBufferInfo.offset = 0u;
     worldSurfaceBufferInfo.range = worldSurfaceBuffer_.size;
     VkWriteDescriptorSet worldSurfaceWrite{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
-    worldSurfaceWrite.dstSet = descriptorSet_;
+    worldSurfaceWrite.dstSet = descriptorSet;
     worldSurfaceWrite.dstBinding = 6u;
     worldSurfaceWrite.descriptorCount = 1u;
     worldSurfaceWrite.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
@@ -3463,59 +3535,115 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
     const VkDescriptorImageInfo staticEmissiveInfo{
         materialSampler_, genericStaticAssetEnabled_ ? staticEmissive_.view : lichEmissive_.view,
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
-    const auto sampledWrite = [this](std::uint32_t binding, const VkDescriptorImageInfo* info) {
+    const auto sampledWrite = [descriptorSet](std::uint32_t binding,
+                                              const VkDescriptorImageInfo* info) {
         VkWriteDescriptorSet write{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
-        write.dstSet = descriptorSet_;
+        write.dstSet = descriptorSet;
         write.dstBinding = binding;
         write.descriptorCount = 1u;
         write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
         write.pImageInfo = info;
         return write;
     };
-    const std::array<VkWriteDescriptorSet, 23u> writes{{accelerationStructureWrite, imageWrite, skeletonWrite,
-                                                       sampledWrite(3u, &diffuseInfo), sampledWrite(4u, &normalInfo), sampledWrite(5u, &armInfo),
-                                                       worldSurfaceWrite, lichBufferWrite,
-                                                       sampledWrite(8u, &lichBaseInfo), sampledWrite(9u, &lichEmissiveInfo),
-                                                       secondSkeletonWrite,
-                                                       bufferWrite(kRtBindingInstanceMetadata, &instanceMetadataInfo),
-                                                       bufferWrite(kRtBindingPrimitiveMetadata, &primitiveMetadataInfo),
-                                                       bufferWrite(kRtBindingMaterials, &materialMetadataInfo),
-                                                       bufferWrite(kRtBindingStaticVertices, &staticVertexInfo),
-                                                       bufferWrite(kRtBindingStaticIndices, &staticIndexInfo),
-                                                       sampledWrite(kRtBindingBaseColorTextures, &staticBaseInfo),
-                                                       sampledWrite(kRtBindingNormalTextures, &staticNormalInfo),
-                                                       sampledWrite(kRtBindingOrmTextures, &staticOrmInfo),
-                                                       sampledWrite(kRtBindingEmissiveTextures, &staticEmissiveInfo),
-                                                       bufferWrite(kRtBindingHeldLight, &heldLightInfo),
-                                                       bufferWrite(kRtBindingFireEmitters, &fireEmitterInfo),
-                                                       bufferWrite(kRtBindingDielectricDiagnostics, &dielectricDiagnosticsInfo)}};
+    std::vector<VkWriteDescriptorSet> writes{
+        accelerationStructureWrite, imageWrite, skeletonWrite,
+        sampledWrite(3u, &diffuseInfo), sampledWrite(4u, &normalInfo),
+        sampledWrite(5u, &armInfo), worldSurfaceWrite, lichBufferWrite,
+        sampledWrite(8u, &lichBaseInfo), sampledWrite(9u, &lichEmissiveInfo),
+        secondSkeletonWrite,
+        bufferWrite(kRtBindingInstanceMetadata, &instanceMetadataInfo),
+        bufferWrite(kRtBindingPrimitiveMetadata, &primitiveMetadataInfo),
+        bufferWrite(kRtBindingMaterials, &materialMetadataInfo),
+        bufferWrite(kRtBindingStaticVertices, &staticVertexInfo),
+        bufferWrite(kRtBindingStaticIndices, &staticIndexInfo),
+        sampledWrite(kRtBindingBaseColorTextures, &staticBaseInfo),
+        sampledWrite(kRtBindingNormalTextures, &staticNormalInfo),
+        sampledWrite(kRtBindingOrmTextures, &staticOrmInfo),
+        sampledWrite(kRtBindingEmissiveTextures, &staticEmissiveInfo),
+        bufferWrite(kRtBindingHeldLight, &heldLightInfo),
+        bufferWrite(kRtBindingFireEmitters, &fireEmitterInfo)};
+    if (bundle.DescriptorIo().diagnosticIo.descriptorWrite &&
+        dielectricDiagnosticsInfo.has_value())
+        writes.push_back(bufferWrite(kRtBindingDielectricDiagnostics,
+                                     &*dielectricDiagnosticsInfo));
+    if (writes.size() != bundle.DescriptorIo().descriptorWriteCount)
+    {
+        diagnostic = "Selected RT descriptor write count disagrees with its contract.";
+        return false;
+    }
     vkUpdateDescriptorSets(device_, static_cast<std::uint32_t>(writes.size()), writes.data(), 0u, nullptr);
 
     diagnostic.clear();
     return true;
 }
 
-bool PresentableTinyRtScene::CreatePipeline(std::string& diagnostic)
+bool PresentableTinyRtScene::CreateBundlePipelineLayout(
+    VkDescriptorSetLayout descriptorSetLayout,
+    VkPipelineLayout& out,
+    std::string& diagnostic)
 {
-    VkShaderModule raygenModule = VK_NULL_HANDLE;
-    VkShaderModule legacyRaygenModule = VK_NULL_HANDLE;
-    VkShaderModule missModule = VK_NULL_HANDLE;
-    VkShaderModule hitModule = VK_NULL_HANDLE;
-    if (!CreateShaderModule(device_, kMinimalRayGenShader, sizeof(kMinimalRayGenShader), raygenModule) ||
-        !CreateShaderModule(device_, kMinimalLegacyRayGenShader,
-                            sizeof(kMinimalLegacyRayGenShader), legacyRaygenModule) ||
-        !CreateShaderModule(device_, kMinimalMissShader, sizeof(kMinimalMissShader), missModule) ||
-        !CreateShaderModule(device_, kMinimalClosestHitShader, sizeof(kMinimalClosestHitShader), hitModule))
+    VkPhysicalDeviceProperties properties{};
+    vkGetPhysicalDeviceProperties(physicalDevice_, &properties);
+    if (properties.limits.maxPushConstantsSize < sizeof(ScenePushConstants))
     {
-        if (raygenModule != VK_NULL_HANDLE) vkDestroyShaderModule(device_, raygenModule, nullptr);
-        if (legacyRaygenModule != VK_NULL_HANDLE)
-            vkDestroyShaderModule(device_, legacyRaygenModule, nullptr);
-        if (missModule != VK_NULL_HANDLE) vkDestroyShaderModule(device_, missModule, nullptr);
-        if (hitModule != VK_NULL_HANDLE) vkDestroyShaderModule(device_, hitModule, nullptr);
-        diagnostic = "Failed to create RT shader modules.";
+        diagnostic = "Device maxPushConstantsSize is below the required 128-byte RT scene ABI.";
         return false;
     }
+    const VkPushConstantRange pushConstantRange{
+        VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR,
+        0u, sizeof(ScenePushConstants)};
+    const VkPipelineLayoutCreateInfo pipelineLayoutInfo{
+        VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO, nullptr, 0u, 1u,
+        &descriptorSetLayout, 1u, &pushConstantRange};
+    if (vkCreatePipelineLayout(device_, &pipelineLayoutInfo, nullptr, &out) != VK_SUCCESS)
+    {
+        diagnostic = "Failed to create selected RT pipeline layout.";
+        return false;
+    }
+    return true;
+}
 
+bool PresentableTinyRtScene::CreateBundleSharedShaderModules(
+    VkShaderModule& miss,
+    VkShaderModule& hit,
+    std::string& diagnostic)
+{
+    if (!CreateShaderModule(device_, kMinimalMissShader,
+                            sizeof(kMinimalMissShader), miss) ||
+        !CreateShaderModule(device_, kMinimalClosestHitShader,
+                            sizeof(kMinimalClosestHitShader), hit))
+    {
+        diagnostic = "Failed to create shared RT shader modules.";
+        return false;
+    }
+    return true;
+}
+
+bool PresentableTinyRtScene::CreateBundleRaygenShaderModule(
+    const RtPipelineVariantArtifact& artifact,
+    VkShaderModule& out,
+    std::string& diagnostic)
+{
+    if (artifact.words.empty() ||
+        !CreateShaderModule(device_, artifact.words.data(),
+                            artifact.words.size_bytes(), out))
+    {
+        diagnostic = std::string("Failed to create selected raygen module: ") +
+            std::string(artifact.canonicalKey);
+        return false;
+    }
+    return true;
+}
+
+bool PresentableTinyRtScene::CreateBundleStrategyPipeline(
+    RtMaterialStrategy,
+    VkShaderModule raygenModule,
+    VkShaderModule missModule,
+    VkShaderModule hitModule,
+    VkPipelineLayout layout,
+    VkPipeline& out,
+    std::string& diagnostic)
+{
     std::array<VkPipelineShaderStageCreateInfo, 3u> stages{{
         {VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO, nullptr, 0u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, raygenModule, "main", nullptr},
         {VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO, nullptr, 0u, VK_SHADER_STAGE_MISS_BIT_KHR, missModule, "main", nullptr},
@@ -3542,68 +3670,18 @@ bool PresentableTinyRtScene::CreatePipeline(std::string& diagnostic)
     groups[2].anyHitShader = VK_SHADER_UNUSED_KHR;
     groups[2].intersectionShader = VK_SHADER_UNUSED_KHR;
 
-    VkPhysicalDeviceProperties properties{};
-    vkGetPhysicalDeviceProperties(physicalDevice_, &properties);
-    if (properties.limits.maxPushConstantsSize < sizeof(ScenePushConstants))
-    {
-        vkDestroyShaderModule(device_, raygenModule, nullptr);
-        vkDestroyShaderModule(device_, legacyRaygenModule, nullptr);
-        vkDestroyShaderModule(device_, missModule, nullptr);
-        vkDestroyShaderModule(device_, hitModule, nullptr);
-        diagnostic = "Device maxPushConstantsSize is below the required 124-byte RT scene ABI.";
-        return false;
-    }
-
-    const VkPushConstantRange pushConstantRange{
-        VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR,
-        0u,
-        sizeof(ScenePushConstants)};
-    const VkPipelineLayoutCreateInfo pipelineLayoutInfo{
-        VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-        nullptr,
-        0u,
-        1u,
-        &descriptorSetLayout_,
-        1u,
-        &pushConstantRange};
-    if (vkCreatePipelineLayout(device_, &pipelineLayoutInfo, nullptr, &pipelineLayout_) != VK_SUCCESS)
-    {
-        vkDestroyShaderModule(device_, raygenModule, nullptr);
-        vkDestroyShaderModule(device_, legacyRaygenModule, nullptr);
-        vkDestroyShaderModule(device_, missModule, nullptr);
-        vkDestroyShaderModule(device_, hitModule, nullptr);
-        diagnostic = "Failed to create RT pipeline layout.";
-        return false;
-    }
-
     VkRayTracingPipelineCreateInfoKHR pipelineInfo{VK_STRUCTURE_TYPE_RAY_TRACING_PIPELINE_CREATE_INFO_KHR};
     pipelineInfo.stageCount = static_cast<std::uint32_t>(stages.size());
     pipelineInfo.pStages = stages.data();
     pipelineInfo.groupCount = static_cast<std::uint32_t>(groups.size());
     pipelineInfo.pGroups = groups.data();
     pipelineInfo.maxPipelineRayRecursionDepth = 1u;
-    pipelineInfo.layout = pipelineLayout_;
+    pipelineInfo.layout = layout;
     const VkResult result = vkCreateRayTracingPipelinesKHR_(
-        device_, VK_NULL_HANDLE, VK_NULL_HANDLE, 1u, &pipelineInfo, nullptr, &pipeline_);
-    stages[0].module = legacyRaygenModule;
-    const VkResult legacyResult = result == VK_SUCCESS
-        ? vkCreateRayTracingPipelinesKHR_(device_, VK_NULL_HANDLE, VK_NULL_HANDLE,
-                                          1u, &pipelineInfo, nullptr, &legacyPipeline_)
-        : result;
-
-    vkDestroyShaderModule(device_, raygenModule, nullptr);
-    vkDestroyShaderModule(device_, legacyRaygenModule, nullptr);
-    vkDestroyShaderModule(device_, missModule, nullptr);
-    vkDestroyShaderModule(device_, hitModule, nullptr);
-
-    if (result != VK_SUCCESS || legacyResult != VK_SUCCESS)
+        device_, VK_NULL_HANDLE, VK_NULL_HANDLE, 1u, &pipelineInfo, nullptr, &out);
+    if (result != VK_SUCCESS)
     {
-        if (pipeline_ != VK_NULL_HANDLE)
-        {
-            vkDestroyPipeline(device_, pipeline_, nullptr);
-            pipeline_ = VK_NULL_HANDLE;
-        }
-        diagnostic = "Failed to create generic/legacy RT raygen pipelines.";
+        diagnostic = "Failed to create selected material-strategy RT pipeline.";
         return false;
     }
 
@@ -3611,7 +3689,12 @@ bool PresentableTinyRtScene::CreatePipeline(std::string& diagnostic)
     return true;
 }
 
-bool PresentableTinyRtScene::CreateShaderBindingTable(std::string& diagnostic)
+bool PresentableTinyRtScene::CreateBundleStrategySbt(
+    RtMaterialStrategy strategy,
+    VkPipeline pipeline,
+    Buffer& out,
+    std::array<VkStridedDeviceAddressRegionKHR, 4u>& regions,
+    std::string& diagnostic)
 {
     VkPhysicalDeviceRayTracingPipelinePropertiesKHR rtProperties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR};
     VkPhysicalDeviceProperties2 properties2{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2};
@@ -3638,13 +3721,10 @@ bool PresentableTinyRtScene::CreateShaderBindingTable(std::string& diagnostic)
     const std::uint32_t regionSize = AlignUp(groupStride, baseAlignment);
     const std::uint32_t sbtSize = regionSize * groupCount;
 
+    const char* label = strategy == RtMaterialStrategy::GenericDielectric
+        ? "generic dielectric" : "opaque fast";
     const auto createTable = [&](VkPipeline sourcePipeline,
-                                 const char* label,
-                                 Buffer& table,
-                                 VkStridedDeviceAddressRegionKHR& raygen,
-                                 VkStridedDeviceAddressRegionKHR& miss,
-                                 VkStridedDeviceAddressRegionKHR& hit,
-                                 VkStridedDeviceAddressRegionKHR& callable) -> bool
+                                 Buffer& table) -> bool
     {
         std::vector<std::uint8_t> handles(handleSize * groupCount);
         if (vkGetRayTracingShaderGroupHandlesKHR_(
@@ -3673,24 +3753,20 @@ bool PresentableTinyRtScene::CreateShaderBindingTable(std::string& diagnostic)
                          tableLabel.c_str(), diagnostic))
             return false;
 
-        raygen.deviceAddress = table.address;
-        raygen.stride = groupStride;
-        raygen.size = groupStride;
-        miss.deviceAddress = table.address + regionSize;
-        miss.stride = groupStride;
-        miss.size = groupStride;
-        hit.deviceAddress = table.address + (regionSize * 2u);
-        hit.stride = groupStride;
-        hit.size = groupStride;
-        callable = {};
+        regions[0].deviceAddress = table.address;
+        regions[0].stride = groupStride;
+        regions[0].size = groupStride;
+        regions[1].deviceAddress = table.address + regionSize;
+        regions[1].stride = groupStride;
+        regions[1].size = groupStride;
+        regions[2].deviceAddress = table.address + (regionSize * 2u);
+        regions[2].stride = groupStride;
+        regions[2].size = groupStride;
+        regions[3] = {};
         return true;
     };
 
-    if (!createTable(pipeline_, "generic", shaderBindingTable_,
-                     raygenRegion_, missRegion_, hitRegion_, callableRegion_) ||
-        !createTable(legacyPipeline_, "legacy", legacyShaderBindingTable_,
-                     legacyRaygenRegion_, legacyMissRegion_, legacyHitRegion_,
-                     legacyCallableRegion_))
+    if (!createTable(pipeline, out))
         return false;
 
     diagnostic.clear();
@@ -3746,7 +3822,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const auto& lichGpu = characterSlot_.LichGpu();
     if (instanceBuffer_.memory == VK_NULL_HANDLE || heldLightBuffer_.memory == VK_NULL_HANDLE ||
         fireEmitterBuffer_.memory == VK_NULL_HANDLE ||
-        dielectricDiagnosticsBuffer_.memory == VK_NULL_HANDLE ||
+        (pipelineBundle_.DescriptorIo().diagnosticIo.allocateBuffer &&
+         pipelineBundle_.diagnosticBuffer.memory == VK_NULL_HANDLE) ||
         skeletonGpu.vertices.memory == VK_NULL_HANDLE ||
         secondSkeletonGpu.vertices.memory == VK_NULL_HANDLE ||
         skeletonGpu.accelerationStructure.handle == VK_NULL_HANDLE ||
@@ -4371,8 +4448,12 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             std::max<std::size_t>(fireEmitterUpload.activeCount,
                                   lanternEmitterIndex + 1u));
     }
+    const bool diagnosticsAvailable =
+        pipelineBundle_.DiagnosticAvailability() == RtDiagnosticAvailability::Available;
+    if (diagnosticsAvailable)
+    {
     RtDielectricDiagnostics previousDielectricDiagnostics{};
-    if (!ReadBuffer(dielectricDiagnosticsBuffer_, 0u,
+    if (!ReadBuffer(pipelineBundle_.diagnosticBuffer, 0u,
                     &previousDielectricDiagnostics, sizeof(previousDielectricDiagnostics),
                     "dielectric diagnostics", diagnostic))
         return false;
@@ -4442,6 +4523,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         previousDielectricDiagnostics.primaryRewardRingPixelCount;
     primaryRewardBodyPixelCount_ =
         previousDielectricDiagnostics.primaryRewardBodyPixelCount;
+    }
     const RtDielectricDiagnostics clearedDielectricDiagnostics{};
     auto frameInstanceMetadata = staticMeshSlot_.InstanceMetadata();
     if (effectivePlayerRenderRoute == PlayerRenderRoute::Procedural)
@@ -4498,9 +4580,11 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         !WriteBuffer(materialMetadataBuffer_, frameMaterials.data(),
                      frameMaterials.size() * sizeof(RtMaterialGpu),
                      "RT Lab dielectric material", diagnostic) ||
-        !WriteBuffer(dielectricDiagnosticsBuffer_, &clearedDielectricDiagnostics,
-                     sizeof(clearedDielectricDiagnostics),
-                     "dielectric diagnostics reset", diagnostic))
+        (diagnosticsAvailable &&
+         !WriteBuffer(pipelineBundle_.diagnosticBuffer,
+                      &clearedDielectricDiagnostics,
+                      sizeof(clearedDielectricDiagnostics),
+                      "dielectric diagnostics reset", diagnostic)))
     {
         return false;
     }
@@ -4508,7 +4592,9 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     VkMemoryBarrier hostWriteBarrier{VK_STRUCTURE_TYPE_MEMORY_BARRIER};
     hostWriteBarrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;
     hostWriteBarrier.dstAccessMask = VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR |
-                                     VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT;
+                                     VK_ACCESS_SHADER_READ_BIT;
+    if (pipelineBundle_.DescriptorIo().diagnosticIo.shaderWriteBarrier)
+        hostWriteBarrier.dstAccessMask |= VK_ACCESS_SHADER_WRITE_BIT;
     vkCmdPipelineBarrier(commandBuffer,
                          VK_PIPELINE_STAGE_HOST_BIT,
                          VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR |
@@ -4743,18 +4829,14 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
         storageImageLayout_ = VK_IMAGE_LAYOUT_GENERAL;
     }
 
-    const VkPipeline activePipeline = genericTransmissionActive_ ? pipeline_ : legacyPipeline_;
-    const VkStridedDeviceAddressRegionKHR& activeRaygenRegion =
-        genericTransmissionActive_ ? raygenRegion_ : legacyRaygenRegion_;
-    const VkStridedDeviceAddressRegionKHR& activeMissRegion =
-        genericTransmissionActive_ ? missRegion_ : legacyMissRegion_;
-    const VkStridedDeviceAddressRegionKHR& activeHitRegion =
-        genericTransmissionActive_ ? hitRegion_ : legacyHitRegion_;
-    const VkStridedDeviceAddressRegionKHR& activeCallableRegion =
-        genericTransmissionActive_ ? callableRegion_ : legacyCallableRegion_;
+    const RtStrategyPipelineResources& activeStrategy = pipelineBundle_.Strategy(
+        genericTransmissionActive_ ? RtMaterialStrategy::GenericDielectric
+                                   : RtMaterialStrategy::OpaqueFast);
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR,
-                      activePipeline);
-    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, pipelineLayout_, 0u, 1u, &descriptorSet_, 0u, nullptr);
+                      activeStrategy.pipeline);
+    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR,
+                            pipelineBundle_.pipelineLayout, 0u, 1u,
+                            &pipelineBundle_.descriptorSet, 0u, nullptr);
     const std::array<float, 3u> staffWorldPosition = characterSlot_.LichStaffWorldPosition(frame.lich);
     const RtGuidanceLight guidanceLight = ResolveChestGuidanceLight(frame.chestReward);
     const bool guidanceLightActive = guidanceLight.strength > 0.0f;
@@ -4800,16 +4882,16 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                                              guidanceLight.strength};
     lastOutputRedBlueSwapApplied_ = pushConstants.outputRedBlueSwap > 0.5f;
     vkCmdPushConstants(commandBuffer,
-                       pipelineLayout_,
+                       pipelineBundle_.pipelineLayout,
                        VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR,
                        0u,
                        sizeof(pushConstants),
                        &pushConstants);
     vkCmdTraceRaysKHR_(commandBuffer,
-                       &activeRaygenRegion,
-                       &activeMissRegion,
-                       &activeHitRegion,
-                       &activeCallableRegion,
+                       &activeStrategy.sbtRegions[0],
+                       &activeStrategy.sbtRegions[1],
+                       &activeStrategy.sbtRegions[2],
+                       &activeStrategy.sbtRegions[3],
                        dispatchExtent_.width,
                        dispatchExtent_.height,
                        1u);

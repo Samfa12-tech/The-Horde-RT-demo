@@ -684,12 +684,14 @@ int main()
                       "RT lab tuning, generic transmission, and chest guidance must append within the 128-byte phone-safe ABI");
         ok &= Require(sceneSource.find("properties.limits.maxPushConstantsSize") !=
                           std::string::npos &&
-                      sceneSource.find("kMinimalLegacyRayGenShader") != std::string::npos &&
-                      sceneSource.find("genericTransmissionActive_ ? pipeline_ : legacyPipeline_") !=
+                      sceneSource.find("BuildRtPipelineBundleResources(pipelineBundle_") !=
                           std::string::npos &&
-                      sceneSource.find("genericTransmissionActive_ ? raygenRegion_ : legacyRaygenRegion_") !=
-                          std::string::npos,
-                      "128-byte push ABI must be runtime-checked and fixture-hidden frames must bind a separately compiled legacy raygen pipeline/SBT");
+                      sceneSource.find("pipelineBundle_.Strategy(") != std::string::npos &&
+                      sceneSource.find("activeStrategy.pipeline") != std::string::npos &&
+                      sceneSource.find("activeStrategy.sbtRegions[0]") != std::string::npos &&
+                      sceneSource.find("kMinimalLegacyRayGenShader") == std::string::npos &&
+                      sceneSource.find("kMinimalRayGenShader") == std::string::npos,
+                      "128-byte push ABI must be runtime-checked and frames must bind one complete selected material-strategy record without compatibility arrays");
         ok &= Require(sceneSource.find("HasActiveGenericTransmission(frameInstanceMetadata") !=
                           std::string::npos &&
                       sceneSource.find("RtInstanceFlag::Transmissive") != std::string::npos &&
@@ -1114,8 +1116,10 @@ int main()
                       windowsSource.find("instanceMasks[4] != 0x10u") != std::string::npos &&
                       windowsSource.find("instanceMasks[10] != 0x04u") != std::string::npos &&
                       windowsSource.find("record.primaryTorchPixels != 0u") != std::string::npos &&
+                      windowsSource.find("DiagnosticsAvailability()") != std::string::npos &&
+                      androidBridgeSource.find("diagnosticsAvailability") != std::string::npos &&
                       windowsSource.find("rewardGripPositionErrorMetres") != std::string::npos,
-                      "capture evidence must assert checkpoint-specific primary pixels, zero replaced-torch pixels, stable instance masks, and final reward GripRing contact");
+                      "capture evidence must qualify diagnostic pixels by availability while retaining masks and final reward GripRing contact");
         ok &= Require(simulationSource.find("SynchronizePausedInput") != std::string::npos &&
                       simulationSource.find("pendingToggleHeldLightPoseCommands_ = 0u") != std::string::npos &&
                       androidBridgeSource.find("RequestLifecyclePauseSynchronizationLocked") != std::string::npos &&
