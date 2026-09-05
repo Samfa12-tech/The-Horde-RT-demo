@@ -1,6 +1,7 @@
 #include "vulkan/raytracing/CharacterRenderSlot.h"
 #include "vulkan/raytracing/DynamicBlasSynchronization.h"
 #include "vulkan/raytracing/RtSceneRouteConstants.h"
+#include "vulkan/raytracing/RtSceneRecordObservation.h"
 #include "vulkan/raytracing/RtSceneTuning.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
 #include "platform/android/AndroidRtLabState.h"
@@ -42,6 +43,17 @@ bool HasInvertibleLinearTransform(const VkTransformMatrixKHR& transform)
             (transform.matrix[1][0] * transform.matrix[2][1] -
              transform.matrix[1][1] * transform.matrix[2][0]);
     return std::abs(determinant) > 0.00001f;
+}
+
+struct CharacterObservationClock
+{
+    std::size_t reads = 0u;
+};
+
+std::uint64_t ReadCharacterObservationClock(void* user) noexcept
+{
+    auto& clock = *static_cast<CharacterObservationClock*>(user);
+    return clock.reads++ == 0u ? 300u : 335u;
 }
 
 std::filesystem::path FindRepoRoot()
@@ -564,6 +576,10 @@ int main()
             ReadTextFile(raygenDirectory / "include/rt_hit_decode.glsl");
         const std::string fireSource =
             ReadTextFile(raygenDirectory / "include/rt_fire.glsl");
+        const std::string diagnosticsSource =
+            ReadTextFile(raygenDirectory / "include/rt_diagnostics.glsl");
+        const std::string variantConfigSource =
+            ReadTextFile(raygenDirectory / "include/rt_variant_config.glsl");
         const std::string dielectricTransportSource =
             ReadTextFile(raygenDirectory / "include/rt_dielectric_transport.glsl");
         std::string lightingSource =
@@ -576,7 +592,9 @@ int main()
         }
         const std::string raygenSource =
             ReadTextFile(raygenDirectory / "minimal.rgen") +
+            variantConfigSource +
             ReadTextFile(raygenDirectory / "include/rt_scene_abi.glsl") +
+            diagnosticsSource +
             lightingSource +
             fireSource +
             ReadTextFile(raygenDirectory / "include/rt_dielectric_common.glsl") +
@@ -678,12 +696,14 @@ int main()
                       "RT lab tuning, generic transmission, and chest guidance must append within the 128-byte phone-safe ABI");
         ok &= Require(sceneSource.find("properties.limits.maxPushConstantsSize") !=
                           std::string::npos &&
-                      sceneSource.find("kMinimalLegacyRayGenShader") != std::string::npos &&
-                      sceneSource.find("genericTransmissionActive_ ? pipeline_ : legacyPipeline_") !=
+                      sceneSource.find("BuildRtPipelineBundleResources(pipelineBundle_") !=
                           std::string::npos &&
-                      sceneSource.find("genericTransmissionActive_ ? raygenRegion_ : legacyRaygenRegion_") !=
-                          std::string::npos,
-                      "128-byte push ABI must be runtime-checked and fixture-hidden frames must bind a separately compiled legacy raygen pipeline/SBT");
+                      sceneSource.find("pipelineBundle_.Strategy(") != std::string::npos &&
+                      sceneSource.find("activeStrategy.pipeline") != std::string::npos &&
+                      sceneSource.find("activeStrategy.sbtRegions[0]") != std::string::npos &&
+                      sceneSource.find("kMinimalLegacyRayGenShader") == std::string::npos &&
+                      sceneSource.find("kMinimalRayGenShader") == std::string::npos,
+                      "128-byte push ABI must be runtime-checked and frames must bind one complete selected material-strategy record without compatibility arrays");
         ok &= Require(sceneSource.find("HasActiveGenericTransmission(frameInstanceMetadata") !=
                           std::string::npos &&
                       sceneSource.find("RtInstanceFlag::Transmissive") != std::string::npos &&
@@ -807,15 +827,21 @@ int main()
                       raygenSource.find("const int kHighDielectricInterfaces = 8;") != std::string::npos &&
                       raygenSource.find("const int kMobileDielectricVolumes = 2;") != std::string::npos &&
                       raygenSource.find("const int kHighDielectricVolumes = 4;") != std::string::npos &&
+                      raygenSource.find("kRtVariantDielectricInterfaceBudget") != std::string::npos &&
+                      raygenSource.find("kRtVariantDielectricVolumeBudget") != std::string::npos &&
+                      dielectricTransportSource.find("HORDE_RT_DIELECTRIC_INTERFACE_CEILING") !=
+                          std::string::npos &&
+                      dielectricTransportSource.find("HORDE_RT_DIELECTRIC_VOLUME_CAPACITY") !=
+                          std::string::npos &&
                       raygenSource.find("segmentLength = currentHit.t;") != std::string::npos &&
-                      raygenSource.find("atomicAdd(rtDielectricDiagnostics.value.transportOverflowCount, 1u);") != std::string::npos &&
-                      raygenSource.find("atomicAdd(rtDielectricDiagnostics.value.secondaryDielectricTerminalCount, 1u);") != std::string::npos &&
-                      raygenSource.find("atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);") != std::string::npos &&
+                      raygenSource.find("RT_DIAG_ADD(transportOverflowCount, 1u);") != std::string::npos &&
+                      raygenSource.find("RT_DIAG_ADD(secondaryDielectricTerminalCount, 1u);") != std::string::npos &&
+                      raygenSource.find("RT_DIAG_ADD(unclosedVolumeCount, 1u);") != std::string::npos &&
                       dielectricTransportSource.find(
                           "atomicAdd(rtDielectricDiagnostics.value.primaryClosedVolumeAbsorptionCount") ==
                           std::string::npos &&
                       dielectricTransportSource.find(
-                          "atomicAdd(rtDielectricDiagnostics.value.primaryCertifiedClosedVolumeRecoveryCount") !=
+                          "RT_DIAG_ADD(primaryCertifiedClosedVolumeRecoveryCount") !=
                           std::string::npos &&
                       dielectricTransportSource.find("kRtMaterialFlagCertifiedClosedVolume") !=
                           std::string::npos &&
@@ -844,12 +870,16 @@ int main()
                       raygenSource.find("const int kShadowSampleCapacity = 4;") != std::string::npos &&
                       raygenSource.find("const int kMobileShadowInterfaces = 4;") != std::string::npos &&
                       raygenSource.find("const int kHighShadowInterfaces = 8;") != std::string::npos &&
+                      raygenSource.find("kRtVariantShadowInterfaceBudget") != std::string::npos &&
+                      raygenSource.find("kRtVariantShadowVolumeBudget") != std::string::npos &&
+                      lightingSource.find("HORDE_RT_SHADOW_INTERFACE_CEILING") != std::string::npos &&
+                      lightingSource.find("HORDE_RT_SHADOW_VOLUME_CAPACITY") != std::string::npos &&
                       raygenSource.find("material.metallicRoughnessOcclusionTransmission.x") != std::string::npos &&
                       raygenSource.find("dielectricBeerLambert(") != std::string::npos &&
-                      raygenSource.find("atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);") != std::string::npos &&
-                      lightingSource.find("atomicAdd(rtDielectricDiagnostics.value.shadowUnclosedVolumeCount, 1u);") != std::string::npos &&
+                      raygenSource.find("RT_DIAG_ADD(shadowOverflowCount, 1u);") != std::string::npos &&
+                      lightingSource.find("RT_DIAG_ADD(shadowUnclosedVolumeCount, 1u);") != std::string::npos &&
                       lightingSource.find(
-                          "atomicAdd(rtDielectricDiagnostics.value.shadowCertifiedClosedVolumeRecoveryCount") !=
+                          "RT_DIAG_ADD(shadowCertifiedClosedVolumeRecoveryCount") !=
                           std::string::npos &&
                       lightingSource.find("primaryUnclosedVolumeCount") == std::string::npos &&
                       raygenSource.find("if (interfaceCount >= interfaceBudget)") != std::string::npos &&
@@ -1098,8 +1128,10 @@ int main()
                       windowsSource.find("instanceMasks[4] != 0x10u") != std::string::npos &&
                       windowsSource.find("instanceMasks[10] != 0x04u") != std::string::npos &&
                       windowsSource.find("record.primaryTorchPixels != 0u") != std::string::npos &&
+                      windowsSource.find("DiagnosticsAvailability()") != std::string::npos &&
+                      androidBridgeSource.find("diagnosticsAvailability") != std::string::npos &&
                       windowsSource.find("rewardGripPositionErrorMetres") != std::string::npos,
-                      "capture evidence must assert checkpoint-specific primary pixels, zero replaced-torch pixels, stable instance masks, and final reward GripRing contact");
+                      "capture evidence must qualify diagnostic pixels by availability while retaining masks and final reward GripRing contact");
         ok &= Require(simulationSource.find("SynchronizePausedInput") != std::string::npos &&
                       simulationSource.find("pendingToggleHeldLightPoseCommands_ = 0u") != std::string::npos &&
                       androidBridgeSource.find("RequestLifecyclePauseSynchronizationLocked") != std::string::npos &&
@@ -1303,6 +1335,27 @@ int main()
         diagnostic.clear();
         skeletons[1] = skeletons[0];
         skeletons[1].id = simulation::EntityId::SkeletonB;
+        horde::telemetry::RtStageAccumulator failedAttemptStages;
+        CharacterObservationClock observationClock;
+        RtSceneRecordObservation observation{
+            &failedAttemptStages, &observationClock,
+            ReadCharacterObservationClock};
+        ok &= Require(failedAttemptStages.Begin(),
+                      "failed character attempt did not begin");
+        ok &= Require(
+            !slot.PrepareFrame(skeletons, skeletons.size(), spareCapacityRoster,
+                               lich, unboundResources, diagnostic, &observation) &&
+                observationClock.reads == 2u,
+            "character skin must be observed at its inner call before upload failure");
+        ok &= Require(failedAttemptStages.Abort(),
+                      "failed character attempt did not abort");
+        ok &= Require(
+            failedAttemptStages.AggregatesByValue()
+                    .values[horde::telemetry::RtStageIndex(
+                        horde::telemetry::RtStage::CharacterSkin)]
+                    .sampleCount == 0u,
+            "failed character skin/upload attempt entered committed aggregates");
+        diagnostic.clear();
         ok &= Require(!slot.PrepareFrame(skeletons, skeletons.size(), spareCapacityRoster, lich,
                                          unboundResources, diagnostic) &&
                       diagnostic.find("Invalid animated skeleton pose 0 vertex upload") != std::string::npos,

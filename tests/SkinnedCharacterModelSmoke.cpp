@@ -5,6 +5,7 @@
 #include "gameplay/ShowcaseRoute.h"
 #include "gameplay/simulation/GameSimulation.h"
 #include "vulkan/raytracing/PlayerRenderSlot.h"
+#include "vulkan/raytracing/RtSceneRecordObservation.h"
 
 #include <algorithm>
 #include <array>
@@ -37,6 +38,18 @@ bool Require(bool condition, const char* message)
     if (condition) return true;
     std::cerr << "FAIL: " << message << '\n';
     return false;
+}
+
+struct ObservationClock
+{
+    std::array<std::uint64_t, 2u> values{{100u, 127u}};
+    std::size_t reads = 0u;
+};
+
+std::uint64_t ReadObservationClock(void* user) noexcept
+{
+    auto& clock = *static_cast<ObservationClock*>(user);
+    return clock.values.at(clock.reads++);
 }
 
 bool FiniteTexturedVertices(const std::vector<horde::scene::TexturedSkinnedRtVertex>& vertices)
@@ -776,6 +789,41 @@ int main()
                  playerSlot.LeftSocketErrorMetres() <= 0.015f &&
                  playerSlot.RightSocketErrorMetres() <= 0.015f,
                  "authoritative held-item targets must drive the final rig bone sockets")) return 1;
+
+    horde::vulkan::raytracing::PlayerRenderSlot observedPlayerSlot;
+    if (!observedPlayerSlot.LoadAsset(playerPath.string(), diagnostic))
+    {
+        std::cerr << "FAIL: observed player load: " << diagnostic << '\n';
+        return 1;
+    }
+    horde::telemetry::RtStageAccumulator playerStages;
+    ObservationClock observationClock;
+    horde::vulkan::raytracing::RtSceneRecordObservation playerObservation{
+        &playerStages, &observationClock, ReadObservationClock};
+    bool observedPoseUpdated = false;
+    horde::telemetry::RtStageFrameSample playerStageSample{};
+    if (!Require(playerStages.Begin(), "observed player stage attempt must begin") ||
+        !observedPlayerSlot.PreparePose(
+            rigSnapshot, simulation.Snapshot().tickIndex,
+            horde::vulkan::raytracing::PlayerCpuSkinCadence::Hz60,
+            observedPoseUpdated, diagnostic, &playerObservation) ||
+        !Require(observedPoseUpdated, "first observed player pose must skin") ||
+        !observedPlayerSlot.PreparePose(
+            rigSnapshot, simulation.Snapshot().tickIndex,
+            horde::vulkan::raytracing::PlayerCpuSkinCadence::Hz60,
+            observedPoseUpdated, diagnostic, &playerObservation) ||
+        !Require(!observedPoseUpdated,
+                 "same-tick unchanged player pose must be a cadence skip") ||
+        !Require(playerStages.Commit(playerStageSample),
+                 "observed player stage attempt must commit"))
+        return 1;
+    const auto& observedPlayerSkin = playerStageSample.values[
+        horde::telemetry::RtStageIndex(horde::telemetry::RtStage::PlayerSkin)];
+    if (!Require(observationClock.reads == 2u &&
+                     observedPlayerSkin.durationNanoseconds == 27u &&
+                     observedPlayerSkin.workInvocationCount == 1u,
+                 "player skin observation must time only actual skin and skip cached cadence work"))
+        return 1;
 
     const auto* restCheckpoint = horde::gameplay::FindDevelopmentCheckpoint(106);
     const auto* downCheckpoint = horde::gameplay::FindDevelopmentCheckpoint(107);

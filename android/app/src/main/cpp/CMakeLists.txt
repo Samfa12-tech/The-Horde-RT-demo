@@ -5,12 +5,13 @@ project(horde_rt_probe_android)
 option(HORDE_RT_DEBUG_CHECKPOINTS "Enable debug-only showcase checkpoint and replay commands" OFF)
 
 get_filename_component(HORDE_RT_REPO_ROOT "${CMAKE_CURRENT_LIST_DIR}/../../../../.." ABSOLUTE)
+include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtVersion.cmake")
+include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtRaygenArtifacts.cmake")
+include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtRaygenPolicy.cmake")
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtSources.cmake")
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtStrictAssetMath.cmake")
 horde_rt_enable_strict_asset_math("${HORDE_RT_REPO_ROOT}")
-set(HORDE_RT_EMBEDDED_RAYGEN "${HORDE_RT_REPO_ROOT}/src/vulkan/raytracing/MinimalRayGenShader.inc")
-set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${HORDE_RT_EMBEDDED_RAYGEN}")
-file(SHA256 "${HORDE_RT_EMBEDDED_RAYGEN}" HORDE_RT_RAYGEN_SHA256)
+horde_rt_configure_raygen_artifacts("${HORDE_RT_REPO_ROOT}")
 set(HORDE_RT_ANDROID_CORE_SOURCES)
 foreach(source IN LISTS HORDE_RT_CORE_RELATIVE_SOURCES)
     list(APPEND HORDE_RT_ANDROID_CORE_SOURCES "${HORDE_RT_REPO_ROOT}/src/${source}")
@@ -25,13 +26,16 @@ add_library(horde_rt_probe_android
 
 target_include_directories(horde_rt_probe_android PRIVATE
     "${HORDE_RT_REPO_ROOT}/src"
-    "${HORDE_RT_REPO_ROOT}"
+    "${HORDE_RT_REPO_ROOT}/third_party"
 )
+horde_rt_attach_raygen_artifacts(horde_rt_probe_android)
+horde_rt_apply_raygen_policy(horde_rt_probe_android Android)
 
 target_compile_features(horde_rt_probe_android PRIVATE cxx_std_20)
 target_compile_definitions(horde_rt_probe_android PRIVATE
-    HORDE_RT_BUILD_ID="${HORDE_RT_PACKAGE_VERSION}"
-    HORDE_RT_RAYGEN_SHA256="${HORDE_RT_RAYGEN_SHA256}"
+    HORDE_RT_DISPLAY_VERSION="${HORDE_RT_DISPLAY_VERSION}"
+    HORDE_RT_PACKAGE_VERSION="${HORDE_RT_PACKAGE_VERSION}"
+    HORDE_RT_BUILD_ID="${HORDE_RT_BUILD_ID}"
 )
 if(HORDE_RT_DEBUG_CHECKPOINTS)
     target_compile_definitions(horde_rt_probe_android PRIVATE

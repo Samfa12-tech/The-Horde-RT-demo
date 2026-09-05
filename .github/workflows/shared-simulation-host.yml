@@ -17,6 +17,17 @@ jobs:
       - name: Check out source
         uses: actions/checkout@v6
 
+      - name: Fetch portable-test GLB assets
+        run: >-
+          git -c lfs.fetchexclude= lfs fetch
+          --include="assets/models/player/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,tests/fixtures/*/*.glb"
+          && git lfs checkout
+          "assets/models/player/runtime/*.glb"
+          "assets/models/props/runtime/*.glb"
+          "assets/models/props/runtime/*/*.glb"
+          "assets/models/weapons/runtime/*.glb"
+          "tests/fixtures/*/*.glb"
+
       - name: Configure non-hardware host tests
         run: >-
           cmake -S . -B build/host-ci

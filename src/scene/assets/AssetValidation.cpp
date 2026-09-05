@@ -1,6 +1,6 @@
 #include "scene/assets/AssetValidation.h"
 
-#include "third_party/cgltf/cgltf.h"
+#include "cgltf/cgltf.h"
 
 #include <array>
 #include <cmath>
