@@ -264,6 +264,7 @@ if(BUILD_TESTING)
 
     add_executable(horde_rt_player_animation_tests
         tests/PlayerAnimationTests.cpp
+        src/telemetry/RtPerformanceEvidence.cpp
         src/scene/assets/SkinnedMeshAsset.cpp
         src/vulkan/raytracing/PlayerRenderSlot.cpp
     )
