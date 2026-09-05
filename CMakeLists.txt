@@ -158,6 +158,14 @@ if(BUILD_TESTING)
     add_test(NAME horde_rt_performance_evidence_tests
         COMMAND horde_rt_performance_evidence_tests)
 
+    add_executable(horde_rt_scene_record_observation_tests
+        tests/RtSceneRecordObservationTests.cpp
+        src/telemetry/RtPerformanceEvidence.cpp)
+    target_include_directories(horde_rt_scene_record_observation_tests PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_scene_record_observation_tests
+        COMMAND horde_rt_scene_record_observation_tests)
+
     add_executable(horde_rt_pipeline_variants_tests
         tests/RtPipelineVariantsTests.cpp
         src/vulkan/raytracing/RtPipelineVariants.cpp)
@@ -494,6 +502,16 @@ if(BUILD_TESTING)
     add_test(NAME horde_rt_spatial_audio_smoke COMMAND horde_rt_spatial_audio_smoke)
 
     if(HORDE_RT_BUILD_VULKAN_TARGETS)
+        add_executable(horde_rt_gpu_resources_observation_tests
+            tests/RtGpuResourcesObservationTests.cpp
+            src/telemetry/RtPerformanceEvidence.cpp
+            src/vulkan/raytracing/RtGpuResources.cpp)
+        target_include_directories(horde_rt_gpu_resources_observation_tests PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/src
+            ${Vulkan_INCLUDE_DIRS})
+        add_test(NAME horde_rt_gpu_resources_observation_tests
+            COMMAND horde_rt_gpu_resources_observation_tests)
+
         add_executable(horde_rt_pipeline_bundle_lifetime_tests
             tests/RtPipelineBundleLifetimeTests.cpp
             src/vulkan/raytracing/RtPipelineBundle.cpp
@@ -514,6 +532,17 @@ if(BUILD_TESTING)
             horde_rt_probe_core)
         add_test(NAME horde_rt_scene_initialise_preflight_tests
             COMMAND horde_rt_scene_initialise_preflight_tests)
+
+        add_executable(horde_rt_scene_resource_inventory_tests
+            tests/RtSceneResourceInventoryTests.cpp)
+        target_include_directories(horde_rt_scene_resource_inventory_tests PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/src)
+        target_compile_definitions(horde_rt_scene_resource_inventory_tests PRIVATE
+            HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+        target_link_libraries(horde_rt_scene_resource_inventory_tests PRIVATE
+            horde_rt_probe_core)
+        add_test(NAME horde_rt_scene_resource_inventory_tests
+            COMMAND horde_rt_scene_resource_inventory_tests)
 
         if(TARGET horde_rt_diagnostic_window)
             if("${HORDE_RT_INSTRUMENTATION_OVERRIDE}" STREQUAL "")

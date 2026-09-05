@@ -111,6 +111,8 @@ public:
     [[nodiscard]] std::string_view GenericDielectricSha256() const noexcept;
     [[nodiscard]] std::string FullPairIdentity() const;
     [[nodiscard]] std::string ShortPairIdentity() const;
+    void AccumulateResourceInventory(
+        horde::telemetry::RtResourceInventory& inventory) const noexcept;
 
     [[nodiscard]] RtStrategyPipelineResources& Strategy(RtMaterialStrategy strategy) noexcept;
     [[nodiscard]] const RtStrategyPipelineResources& Strategy(

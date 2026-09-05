@@ -30,6 +30,7 @@ namespace horde::vulkan::raytracing
 {
 
 struct PresentableTinyRtScenePreflightTestAccess;
+struct PresentableTinyRtSceneObservationTestAccess;
 
 enum class WaterQuality : std::uint32_t
 {
@@ -338,13 +339,15 @@ public:
     {
         return productionPropBlasBuildMilliseconds_;
     }
+    [[nodiscard]] horde::telemetry::RtResourceInventory ResourceInventory() const noexcept;
 
     bool RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                             VkImage swapchainImage,
                             VkImageLayout& swapchainImageLayout,
                             VkExtent2D swapchainExtent,
                             const RtSceneFrameInputs& frame,
-                            std::string& diagnostic);
+                            std::string& diagnostic,
+                            RtSceneRecordObservation* observation = nullptr);
 
     // Synchronously reads the last RT-produced storage image. The returned
     // bytes are canonical RGBA even when the presentation push constant had
@@ -353,6 +356,7 @@ public:
 
 private:
     friend struct PresentableTinyRtScenePreflightTestAccess;
+    friend struct PresentableTinyRtSceneObservationTestAccess;
 
     using Buffer = RtGpuBuffer;
     using AccelerationStructure = RtAccelerationStructure;
@@ -372,6 +376,8 @@ private:
         VkImage image = VK_NULL_HANDLE;
         VkDeviceMemory memory = VK_NULL_HANDLE;
         VkImageView view = VK_NULL_HANDLE;
+        VkDeviceSize allocationSize = 0u;
+        VkMemoryPropertyFlags memoryPropertyFlags = 0u;
     };
 
     bool InitialiseWithOrchestration(
@@ -411,7 +417,8 @@ private:
                      const void* data,
                      VkDeviceSize size,
                      const char* label,
-                     std::string& diagnostic) const;
+                     std::string& diagnostic,
+                     RtSceneRecordObservation* observation = nullptr) const;
     bool ReadBuffer(const Buffer& buffer,
                     VkDeviceSize offset,
                     void* data,
@@ -471,7 +478,8 @@ private:
                                  std::string& diagnostic);
     bool UpdateDynamicInstances(VkCommandBuffer commandBuffer,
                                 const RtSceneFrameInputs& frame,
-                                std::string& diagnostic);
+                                std::string& diagnostic,
+                                RtSceneRecordObservation* observation = nullptr);
     bool RunOneTimeCommands(void (*record)(VkCommandBuffer, void*), void* userData, std::string& diagnostic) const;
     void DestroyBuffer(Buffer& buffer) const;
     void DestroyAccelerationStructure(AccelerationStructure& accelerationStructure);
@@ -491,6 +499,8 @@ private:
     VkImage storageImage_ = VK_NULL_HANDLE;
     VkDeviceMemory storageImageMemory_ = VK_NULL_HANDLE;
     VkImageView storageImageView_ = VK_NULL_HANDLE;
+    VkDeviceSize storageImageAllocationSize_ = 0u;
+    VkMemoryPropertyFlags storageImageMemoryPropertyFlags_ = 0u;
     VkImageLayout storageImageLayout_ = VK_IMAGE_LAYOUT_UNDEFINED;
     bool lastOutputRedBlueSwapApplied_ = false;
     TextureArray materialDiffuse_;

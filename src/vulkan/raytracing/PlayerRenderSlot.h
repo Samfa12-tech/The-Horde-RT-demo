@@ -13,6 +13,8 @@
 namespace horde::vulkan::raytracing
 {
 
+struct RtSceneRecordObservation;
+
 inline constexpr float kPlayerGripSocketToleranceMetres = 0.015f;
 inline constexpr float kPlayerGripOrientationToleranceRadians = 0.02f;
 inline constexpr float kPlayerBootGroundingSafetyMetres = 0.00025f;
@@ -197,7 +199,8 @@ public:
                      std::uint64_t tickIndex,
                      PlayerCpuSkinCadence cadence,
                      bool& poseUpdated,
-                     std::string& diagnostic);
+                     std::string& diagnostic,
+                     RtSceneRecordObservation* observation = nullptr);
     bool ShoulderCenter(const horde::gameplay::animation::PlayerAnimationSnapshot& animation,
                         std::array<float, 3u>& center,
                         std::string& diagnostic) const;

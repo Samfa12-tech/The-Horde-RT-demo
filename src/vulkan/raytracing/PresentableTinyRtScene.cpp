@@ -5,6 +5,7 @@
 #include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/items/HeldLightState.h"
 #include "vulkan/raytracing/HeldItemRenderSlot.h"
+#include "vulkan/raytracing/RtSceneRecordObservation.h"
 #include "vulkan/raytracing/RtSceneRouteConstants.h"
 
 #include <algorithm>
@@ -292,6 +293,9 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     storageImage_ = std::exchange(other.storageImage_, VK_NULL_HANDLE);
     storageImageMemory_ = std::exchange(other.storageImageMemory_, VK_NULL_HANDLE);
     storageImageView_ = std::exchange(other.storageImageView_, VK_NULL_HANDLE);
+    storageImageAllocationSize_ = std::exchange(other.storageImageAllocationSize_, 0u);
+    storageImageMemoryPropertyFlags_ =
+        std::exchange(other.storageImageMemoryPropertyFlags_, 0u);
     storageImageLayout_ = std::exchange(other.storageImageLayout_, VK_IMAGE_LAYOUT_UNDEFINED);
     lastOutputRedBlueSwapApplied_ = std::exchange(other.lastOutputRedBlueSwapApplied_, false);
     materialDiffuse_ = std::exchange(other.materialDiffuse_, TextureArray{});
@@ -781,12 +785,64 @@ void PresentableTinyRtScene::Destroy()
         vkFreeMemory(device_, storageImageMemory_, nullptr);
         storageImageMemory_ = VK_NULL_HANDLE;
     }
+    storageImageAllocationSize_ = 0u;
+    storageImageMemoryPropertyFlags_ = 0u;
     storageImageLayout_ = VK_IMAGE_LAYOUT_UNDEFINED;
     lastOutputRedBlueSwapApplied_ = false;
 
     scaledBlitSupported_ = false;
     ready_ = false;
     gpuResources_.Reset();
+}
+
+horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory() const noexcept
+{
+    horde::telemetry::RtResourceInventory inventory{};
+    for (const Buffer* buffer : std::array<const Buffer*, 16u>{
+             &vertexBuffer_, &indexBuffer_, &transformBuffer_, &instanceBuffer_,
+             &heldLightBuffer_, &fireEmitterBuffer_, &worldSurfaceBuffer_,
+             &staticVertexBuffer_, &staticIndexBuffer_, &staticGeometryTransformBuffer_,
+             &instanceMetadataBuffer_, &primitiveMetadataBuffer_, &materialMetadataBuffer_,
+             &skinnedPlayerBlasUpdateScratch_, &tlas_.backing, &tlasUpdateScratch_})
+    {
+        AccumulateRtGpuBuffer(inventory, *buffer);
+    }
+    const auto accumulateBlas = [&inventory](const AccelerationStructure& blas) {
+        AccumulateRtGpuBuffer(inventory, blas.backing);
+        if (blas.handle != VK_NULL_HANDLE)
+        {
+            AccumulateRtResourceCount(inventory.bottomLevelAccelerationStructureCount);
+        }
+    };
+    for (const AccelerationStructure* blas : std::array<const AccelerationStructure*, 13u>{
+             &blas_, &waterfallBlas_, &finaleRoofBlas_, &torchBlas_, &swordBlas_,
+             &gothicChestBaseBlas_, &gothicChestLidBlas_, &rewardLanternRingBlas_,
+             &rewardLanternBodyBlas_, &dielectricFixtureBlas_, &playerBodyBlas_,
+             &playerLimbBlas_, &skinnedPlayerBlas_})
+    {
+        accumulateBlas(*blas);
+    }
+    if (tlas_.handle != VK_NULL_HANDLE)
+    {
+        AccumulateRtResourceCount(inventory.topLevelAccelerationStructureCount);
+        inventory.tlasInstanceCount = kTlasInstanceCount;
+    }
+    characterSlot_.AccumulateResourceInventory(inventory);
+    pipelineBundle_.AccumulateResourceInventory(inventory);
+
+    AccumulateRtMemoryAllocation(
+        inventory, storageImageMemory_, storageImageAllocationSize_,
+        storageImageMemoryPropertyFlags_);
+    for (const TextureArray* texture : std::array<const TextureArray*, 9u>{
+             &materialDiffuse_, &materialNormal_, &materialArm_, &lichBaseColor_,
+             &lichEmissive_, &staticBaseColor_, &staticNormal_, &staticOrm_,
+             &staticEmissive_})
+    {
+        AccumulateRtMemoryAllocation(
+            inventory, texture->memory, texture->allocationSize,
+            texture->memoryPropertyFlags);
+    }
+    return inventory;
 }
 
 bool PresentableTinyRtScene::LoadEntryPoints(std::string& diagnostic)
@@ -833,9 +889,11 @@ bool PresentableTinyRtScene::WriteBuffer(const Buffer& buffer,
                                          const void* data,
                                          const VkDeviceSize size,
                                          const char* label,
-                                         std::string& diagnostic) const
+                                         std::string& diagnostic,
+                                         RtSceneRecordObservation* observation) const
 {
-    return gpuResources_.WriteBuffer(buffer, data, size, label, diagnostic);
+    return gpuResources_.WriteBuffer(
+        buffer, data, size, label, diagnostic, observation);
 }
 
 bool PresentableTinyRtScene::ReadBuffer(const Buffer& buffer,
@@ -955,8 +1013,10 @@ bool PresentableTinyRtScene::CreateStorageImage(std::string& diagnostic)
 
     VkMemoryRequirements requirements{};
     vkGetImageMemoryRequirements(device_, storageImage_, &requirements);
+    VkMemoryPropertyFlags selectedMemoryFlags = 0u;
     const std::uint32_t memoryType = gpuResources_.FindMemoryType(
-        requirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+        requirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+        &selectedMemoryFlags);
     if (memoryType == UINT32_MAX)
     {
         diagnostic = "No compatible memory type for RT storage image.";
@@ -974,6 +1034,8 @@ bool PresentableTinyRtScene::CreateStorageImage(std::string& diagnostic)
         diagnostic = "Failed to allocate RT storage image memory.";
         return false;
     }
+    storageImageAllocationSize_ = requirements.size;
+    storageImageMemoryPropertyFlags_ = selectedMemoryFlags;
 
     const VkImageViewCreateInfo viewInfo{
         VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
@@ -1161,8 +1223,10 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
     }
     VkMemoryRequirements requirements{};
     vkGetImageMemoryRequirements(device_, texture.image, &requirements);
+    VkMemoryPropertyFlags selectedMemoryFlags = 0u;
     const std::uint32_t memoryType = gpuResources_.FindMemoryType(
-        requirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+        requirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+        &selectedMemoryFlags);
     VkMemoryAllocateInfo allocation{VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO};
     allocation.allocationSize = requirements.size;
     allocation.memoryTypeIndex = memoryType;
@@ -1173,6 +1237,8 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
         diagnostic = "Failed to allocate PBR texture array memory.";
         return false;
     }
+    texture.allocationSize = requirements.size;
+    texture.memoryPropertyFlags = selectedMemoryFlags;
     struct UploadData
     {
         PresentableTinyRtScene* scene;
@@ -3836,7 +3902,8 @@ bool PresentableTinyRtScene::CreateBundleStrategySbt(
 
 bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffer,
                                                      const RtSceneFrameInputs& frame,
-                                                     std::string& diagnostic)
+                                                     std::string& diagnostic,
+                                                     RtSceneRecordObservation* observation)
 {
     const RtSceneTuning clampedTuning = ClampRtSceneTuning(frame.tuning);
     const bool glassFixtureVisible =
@@ -4040,7 +4107,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         rigAnimation.rightIk.gripZ = viewVectorToPlayer(frame.playerAnimation.rightIk.gripZ);
         if (!playerRenderSlot_.PreparePose(rigAnimation, frame.tickIndex,
                                            playerCpuSkinCadence_, updateSkinnedPlayer,
-                                           diagnostic))
+                                           diagnostic, observation))
             return false;
         if (updateSkinnedPlayer)
         {
@@ -4080,7 +4147,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                     staticVertexBuffer_, playerOffset, skinnedPlayerUpload_.data(),
                     skinnedPlayerUpload_.size() *
                         sizeof(horde::scene::assets::StaticRtVertex),
-                    "skinned player static-PBR vertices", diagnostic))
+                    "skinned player static-PBR vertices", diagnostic,
+                    observation))
                 return false;
         }
 
@@ -4127,7 +4195,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                                      roster,
                                      lich,
                                      gpuResources_,
-                                     diagnostic))
+                                     diagnostic,
+                                     observation))
     {
         return false;
     }
@@ -4631,16 +4700,18 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     genericTransmissionActive_ = HasActiveGenericTransmission(frameInstanceMetadata,
         staticMeshSlot_.PrimitiveMetadata(), frameMaterials);
     if (!WriteBuffer(heldLightBuffer_, &heldLightGpu, sizeof(heldLightGpu),
-                     "held light", diagnostic) ||
+                     "held light", diagnostic, observation) ||
         !WriteBuffer(fireEmitterBuffer_, fireEmitterUpload.emitters.data(),
-                     sizeof(fireEmitterUpload.emitters), "fire emitters", diagnostic) ||
+                     sizeof(fireEmitterUpload.emitters), "fire emitters", diagnostic,
+                     observation) ||
         !WriteBuffer(instanceBuffer_, instances.data(), sizeof(instances),
-                     "animated TLAS instance", diagnostic) ||
+                     "animated TLAS instance", diagnostic, observation) ||
         !WriteBuffer(instanceMetadataBuffer_, frameInstanceMetadata.data(),
-                     sizeof(frameInstanceMetadata), "player route metadata", diagnostic) ||
+                     sizeof(frameInstanceMetadata), "player route metadata", diagnostic,
+                     observation) ||
         !WriteBuffer(materialMetadataBuffer_, frameMaterials.data(),
                      frameMaterials.size() * sizeof(RtMaterialGpu),
-                     "RT Lab dielectric material", diagnostic) ||
+                     "RT Lab dielectric material", diagnostic, observation) ||
         (diagnosticsAvailable &&
          !WriteBuffer(pipelineBundle_.diagnosticBuffer,
                       &clearedDielectricDiagnostics,
@@ -4667,6 +4738,15 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                          nullptr,
                          0u,
                          nullptr);
+
+    const std::uint64_t blasWorkInvocationCount =
+        static_cast<std::uint64_t>(updateSkinnedPlayer) +
+        static_cast<std::uint64_t>(updateSkeletonPose0) +
+        static_cast<std::uint64_t>(updateSkeletonPose1) +
+        static_cast<std::uint64_t>(updateLich);
+    RtSceneStageScope blasRefitScope(
+        blasWorkInvocationCount != 0u ? observation : nullptr,
+        horde::telemetry::RtStage::BlasRefitRecord);
 
     if (updateSkinnedPlayer)
     {
@@ -4812,7 +4892,10 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                              0u,
                              nullptr);
     }
+    blasRefitScope.Complete(blasWorkInvocationCount);
 
+    RtSceneStageScope tlasUpdateScope(
+        observation, horde::telemetry::RtStage::TlasUpdateRecord);
     VkAccelerationStructureGeometryKHR tlasGeometry{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
     tlasGeometry.geometryType = VK_GEOMETRY_TYPE_INSTANCES_KHR;
     tlasGeometry.geometry.instances.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_INSTANCES_DATA_KHR;
@@ -4847,6 +4930,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                          nullptr,
                          0u,
                          nullptr);
+    tlasUpdateScope.Complete(1u);
 
     diagnostic.clear();
     return true;
@@ -4857,7 +4941,8 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                                                 VkImageLayout& swapchainImageLayout,
                                                 VkExtent2D swapchainExtent,
                                                 const RtSceneFrameInputs& frame,
-                                                std::string& diagnostic)
+                                                std::string& diagnostic,
+                                                RtSceneRecordObservation* observation)
 {
     if (!ready_)
     {
@@ -4872,11 +4957,13 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
         return false;
     }
 
-    if (!UpdateDynamicInstances(commandBuffer, frame, diagnostic))
+    if (!UpdateDynamicInstances(commandBuffer, frame, diagnostic, observation))
     {
         return false;
     }
 
+    RtSceneStageScope traceCopyScope(
+        observation, horde::telemetry::RtStage::TraceCopyRecord);
     if (storageImageLayout_ != VK_IMAGE_LAYOUT_GENERAL)
     {
         SetImageBarrier(commandBuffer,
@@ -5032,6 +5119,7 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                     VK_ACCESS_SHADER_WRITE_BIT);
     storageImageLayout_ = VK_IMAGE_LAYOUT_GENERAL;
 
+    traceCopyScope.Complete(1u);
     diagnostic.clear();
     return true;
 }

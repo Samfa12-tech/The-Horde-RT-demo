@@ -241,6 +241,28 @@ std::string RtPipelineBundle::ShortPairIdentity() const
     return identity;
 }
 
+void RtPipelineBundle::AccumulateResourceInventory(
+    horde::telemetry::RtResourceInventory& inventory) const noexcept
+{
+    for (const auto& strategy : strategies_)
+    {
+        if (strategy.pipeline != VK_NULL_HANDLE)
+        {
+            AccumulateRtResourceCount(inventory.pipelineCount);
+        }
+        if (strategy.shaderBindingTable.buffer != VK_NULL_HANDLE)
+        {
+            AccumulateRtResourceCount(inventory.shaderBindingTableCount);
+        }
+        AccumulateRtGpuBuffer(inventory, strategy.shaderBindingTable);
+    }
+    AccumulateRtGpuBuffer(inventory, diagnosticBuffer);
+    if (descriptorSet != VK_NULL_HANDLE)
+    {
+        AccumulateRtResourceCount(inventory.descriptorSetCount);
+    }
+}
+
 RtStrategyPipelineResources& RtPipelineBundle::Strategy(
     RtMaterialStrategy strategy) noexcept
 {

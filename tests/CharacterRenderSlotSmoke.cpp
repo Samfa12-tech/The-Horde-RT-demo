@@ -1,6 +1,7 @@
 #include "vulkan/raytracing/CharacterRenderSlot.h"
 #include "vulkan/raytracing/DynamicBlasSynchronization.h"
 #include "vulkan/raytracing/RtSceneRouteConstants.h"
+#include "vulkan/raytracing/RtSceneRecordObservation.h"
 #include "vulkan/raytracing/RtSceneTuning.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
 #include "platform/android/AndroidRtLabState.h"
@@ -42,6 +43,17 @@ bool HasInvertibleLinearTransform(const VkTransformMatrixKHR& transform)
             (transform.matrix[1][0] * transform.matrix[2][1] -
              transform.matrix[1][1] * transform.matrix[2][0]);
     return std::abs(determinant) > 0.00001f;
+}
+
+struct CharacterObservationClock
+{
+    std::size_t reads = 0u;
+};
+
+std::uint64_t ReadCharacterObservationClock(void* user) noexcept
+{
+    auto& clock = *static_cast<CharacterObservationClock*>(user);
+    return clock.reads++ == 0u ? 300u : 335u;
 }
 
 std::filesystem::path FindRepoRoot()
@@ -1323,6 +1335,27 @@ int main()
         diagnostic.clear();
         skeletons[1] = skeletons[0];
         skeletons[1].id = simulation::EntityId::SkeletonB;
+        horde::telemetry::RtStageAccumulator failedAttemptStages;
+        CharacterObservationClock observationClock;
+        RtSceneRecordObservation observation{
+            &failedAttemptStages, &observationClock,
+            ReadCharacterObservationClock};
+        ok &= Require(failedAttemptStages.Begin(),
+                      "failed character attempt did not begin");
+        ok &= Require(
+            !slot.PrepareFrame(skeletons, skeletons.size(), spareCapacityRoster,
+                               lich, unboundResources, diagnostic, &observation) &&
+                observationClock.reads == 2u,
+            "character skin must be observed at its inner call before upload failure");
+        ok &= Require(failedAttemptStages.Abort(),
+                      "failed character attempt did not abort");
+        ok &= Require(
+            failedAttemptStages.AggregatesByValue()
+                    .values[horde::telemetry::RtStageIndex(
+                        horde::telemetry::RtStage::CharacterSkin)]
+                    .sampleCount == 0u,
+            "failed character skin/upload attempt entered committed aggregates");
+        diagnostic.clear();
         ok &= Require(!slot.PrepareFrame(skeletons, skeletons.size(), spareCapacityRoster, lich,
                                          unboundResources, diagnostic) &&
                       diagnostic.find("Invalid animated skeleton pose 0 vertex upload") != std::string::npos,
