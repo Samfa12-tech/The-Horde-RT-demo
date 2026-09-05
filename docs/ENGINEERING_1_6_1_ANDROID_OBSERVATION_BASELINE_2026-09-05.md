@@ -4,7 +4,7 @@
 
 The exact Engineering 1.6.1 Debug candidate passed the standard Android `Both` run on `SM-S948B`: build/install and installed-artifact parity, strict ASTC selection, honest `RayTracingPipeline` swapchain presentation, six ordered three-window measurements, the deterministic 13-waypoint replay, all 13 capture-manifest checks, and Home/resume. `summary.json` records zero warnings and zero failures, and the lead invocation returned exit code 0.
 
-This is exact-device automated Debug observation evidence. It is not signed/public-package validation, a Release performance claim, a matched A/B comparison, full art or motion acceptance, owner-feel evidence, or closure of the still-open host candidate review.
+This is exact-device automated Debug observation evidence. It is not signed/public-package validation, a Release performance claim, a matched A/B comparison, full art or motion acceptance, owner-feel evidence, or evidence that itself establishes host acceptance. Candidate review was open during the phone run and subsequently closed at `4c69928` after clean rereview and CI run `33948503458` passed 35/35.
 
 Audio/haptic manual revalidation required: **NO** - the observation/accounting work and subsequent standalone host-test linkage repair preserve feedback inputs, event routes, cues, timing, and haptic behavior.
 
@@ -31,7 +31,7 @@ The four pre-existing untracked tooling paths reflected by the dirty source mark
 
 The run targeted the Debug package only; it did not target the separate public package. The APK retained under the ignored report directory hashes byte-for-byte to the local and installed values above.
 
-The later `4c69928df0eef46789cd5903e33312368411a913` repair changes only `CMakeLists.txt`, adding `src/telemetry/RtPerformanceEvidence.cpp` to the standalone `horde_rt_player_animation_tests` host-test target. No Android source changed between tested source `3383246` and that repair. The device evidence remains attributed to `33832460184f342dea612fd0b1f2309e74bd6c77`; it must not be relabelled with the later HEAD. Candidate review remained open during the phone run, so the physical pass does not close host acceptance.
+The later `4c69928df0eef46789cd5903e33312368411a913` repair changes only `CMakeLists.txt`, adding `src/telemetry/RtPerformanceEvidence.cpp` to the standalone `horde_rt_player_animation_tests` host-test target. No Android source changed between tested source `3383246` and that repair. The device evidence remains attributed to `33832460184f342dea612fd0b1f2309e74bd6c77`; it must not be relabelled with the later HEAD. Candidate review was open during the phone run, so the physical pass itself did not establish host acceptance. Host acceptance subsequently closed at `4c69928` after clean rereview and CI run `33948503458` passed 35/35.
 
 ## Invocation and run configuration
 
@@ -43,7 +43,7 @@ The lead ran this from the isolated worktree:
 
 The resulting run is `run-20260905-153927`. `assembleDebug` completed successfully, streamed installation succeeded, and installed `base.apk` matched the retained candidate hash. The runtime selected strict ASTC materials and `RayTracingPipeline`; the capability report records `rtScene.presented=true` after a frame reached the swapchain.
 
-Internal rendering was `1080x2235` at 75%, the swapchain extent was `1440x2980`, and ADB physical captures were `1440x3120`. USB power was true throughout. Battery evidence moved from 32.3 C / 67% to 43.5 C / 64%; the final Android thermal status was 2.
+Internal rendering was `1080x2235` at 75%, the swapchain extent was `1440x2980`, and ADB physical captures were `1440x3120`. USB power was true at both recorded endpoints. Battery evidence moved from 32.3 C / 67% to 43.5 C / 64%; the final Android thermal status was 2.
 
 ## Exact RT pipeline identities
 
