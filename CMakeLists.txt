@@ -148,6 +148,16 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AN
 endif()
 
 if(BUILD_TESTING)
+    add_executable(horde_rt_performance_evidence_tests
+        tests/RtPerformanceEvidenceTests.cpp
+        src/telemetry/RtPerformanceEvidence.cpp)
+    target_include_directories(horde_rt_performance_evidence_tests PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_compile_definitions(horde_rt_performance_evidence_tests PRIVATE
+        HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+    add_test(NAME horde_rt_performance_evidence_tests
+        COMMAND horde_rt_performance_evidence_tests)
+
     add_executable(horde_rt_pipeline_variants_tests
         tests/RtPipelineVariantsTests.cpp
         src/vulkan/raytracing/RtPipelineVariants.cpp)
