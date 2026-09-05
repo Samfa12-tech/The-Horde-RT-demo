@@ -11,6 +11,7 @@
 #include <fstream>
 #include <iostream>
 #include <limits>
+#include <locale>
 #include <new>
 #include <sstream>
 #include <string>
@@ -157,6 +158,31 @@ namespace
 {
 
 using namespace horde::telemetry;
+
+class GroupedNumberPunct final : public std::numpunct<char>
+{
+protected:
+    [[nodiscard]] char do_thousands_sep() const override { return ','; }
+    [[nodiscard]] std::string do_grouping() const override { return "\3"; }
+};
+
+class ScopedGlobalLocale final
+{
+public:
+    explicit ScopedGlobalLocale(const std::locale& replacement)
+        : previous_(std::locale())
+    {
+        std::locale::global(replacement);
+    }
+
+    ~ScopedGlobalLocale() { std::locale::global(previous_); }
+
+    ScopedGlobalLocale(const ScopedGlobalLocale&) = delete;
+    ScopedGlobalLocale& operator=(const ScopedGlobalLocale&) = delete;
+
+private:
+    std::locale previous_;
+};
 
 static_assert(kRtEvidenceSampleCapacity == 128u);
 static_assert(kRtDielectricCounterCount == 41u);
@@ -467,6 +493,27 @@ void TestStageAccumulatorAndConversion(TestContext& context)
     context.Check(!CheckedMillisecondsToNanoseconds(
                       std::numeric_limits<double>::max(), nanoseconds),
                   "out-of-range injected durations must be rejected");
+
+    const double roundedExclusiveMilliseconds =
+        std::ldexp(1.0, std::numeric_limits<std::uint64_t>::digits) / 1'000'000.0;
+    const double adjacentAcceptedMilliseconds =
+        std::nextafter(roundedExclusiveMilliseconds, 0.0);
+    const double adjacentRejectedMilliseconds =
+        std::nextafter(roundedExclusiveMilliseconds,
+                       std::numeric_limits<double>::infinity());
+    nanoseconds = 0x1234u;
+#if defined(_MSC_VER)
+    context.Check(!CheckedMillisecondsToNanoseconds(roundedExclusiveMilliseconds, nanoseconds) &&
+                      nanoseconds == 0x1234u,
+                  "MSVC conversion rounded to the exact 2^64 boundary must reject transactionally");
+#endif
+    context.Check(CheckedMillisecondsToNanoseconds(adjacentAcceptedMilliseconds, nanoseconds) &&
+                      nanoseconds < std::numeric_limits<std::uint64_t>::max(),
+                  "the adjacent representable duration below the exclusive boundary must convert");
+    nanoseconds = 0x5678u;
+    context.Check(!CheckedMillisecondsToNanoseconds(adjacentRejectedMilliseconds, nanoseconds) &&
+                      nanoseconds == 0x5678u,
+                  "the adjacent representable duration above the exclusive boundary must reject transactionally");
 
     RtStageAccumulator accumulator;
     context.Check(accumulator.Begin(), "first stage attempt must begin");
@@ -1153,6 +1200,92 @@ void TestLifecycleResetTableAndExhaustion(TestContext& context)
                   "completion identity exhaustion must fail closed without wrapping");
 }
 
+void TestGpuToggleRetainedCompletionStatus(TestContext& context)
+{
+    RtEvidenceLifecycle lifecycle;
+    RtLifecycleSeeds seeds{};
+    seeds.sceneEpoch = 21u;
+    seeds.measurementGeneration = 30u;
+    RtLifecycleResetEffects effects{};
+    context.Check(lifecycle.Initialise(
+                      seeds, 1u, RtSampleStatus::CompiledOut, RtSampleStatus::Disabled, effects),
+                  "GPU-toggle retained-completion lifecycle must initialise");
+    const RtSceneFrameEvidence scene = MakeSceneEvidence(
+        context, RtInstrumentationMode::Shipping, RtMaterialStrategy::OpaqueFast, 'a', 100u);
+
+    const auto submitPresented = [&](const std::uint64_t tick,
+                                     RtSubmittedFrameIdentity& submitted) {
+        RtFrameToken attempt{};
+        RtFrameToken recorded{};
+        return lifecycle.BeginRecord(0u, tick, attempt) &&
+               lifecycle.FinishRecord(attempt, MakeRecordedScene(scene), recorded) &&
+               lifecycle.Submit(recorded, submitted) &&
+               lifecycle.AttachPresentation(submitted, RtPresentationOutcome::Presented);
+    };
+
+    RtSubmittedFrameIdentity disabledSubmission{};
+    context.Check(submitPresented(1u, disabledSubmission),
+                  "pre-enable Disabled frame must remain outstanding");
+    context.Check(lifecycle.ApplyEvent(RtLifecycleEvent::GpuTimingEnabled, effects) &&
+                      lifecycle.PublishedStateByValue().gpuStatus == RtSampleStatus::Pending,
+                  "GPU enable must publish Pending before old work completes");
+    RtPerformanceEvidenceSnapshot oldDisabled{};
+    context.Check(lifecycle.CompleteFence(
+                      disabledSubmission,
+                      MakeSubmittedStages(disabledSubmission, scene.stages),
+                      MakeDiagnostic(RtInstrumentationMode::Shipping,
+                                     RtSampleStatus::CompiledOut,
+                                     0u,
+                                     0u),
+                      MakeGpu(RtSampleStatus::Disabled, 0u, 0u),
+                      oldDisabled) &&
+                      oldDisabled.gpu.status == RtSampleStatus::Disabled &&
+                      lifecycle.CompletedEvidenceByValue().gpu.status == RtSampleStatus::Disabled &&
+                      lifecycle.PublishedStateByValue().gpuStatus == RtSampleStatus::Pending,
+                  "old Disabled evidence must publish without clobbering the enabled Pending state");
+
+    RtSubmittedFrameIdentity enabledSubmission{};
+    context.Check(submitPresented(2u, enabledSubmission),
+                  "current enabled frame must submit");
+    RtPerformanceEvidenceSnapshot currentValid{};
+    context.Check(lifecycle.CompleteFence(
+                      enabledSubmission,
+                      MakeSubmittedStages(enabledSubmission, scene.stages),
+                      MakeDiagnostic(RtInstrumentationMode::Shipping,
+                                     RtSampleStatus::CompiledOut,
+                                     0u,
+                                     0u),
+                      MakeGpu(RtSampleStatus::Valid,
+                              enabledSubmission.submissionSerial,
+                              7'000'000u),
+                      currentValid) &&
+                      lifecycle.PublishedStateByValue().gpuStatus == RtSampleStatus::Valid,
+                  "matching enabled-generation completion must publish its Valid GPU state");
+
+    RtSubmittedFrameIdentity validSubmission{};
+    context.Check(submitPresented(3u, validSubmission),
+                  "pre-disable Valid frame must remain outstanding");
+    context.Check(lifecycle.ApplyEvent(RtLifecycleEvent::GpuTimingDisabled, effects) &&
+                      lifecycle.PublishedStateByValue().gpuStatus == RtSampleStatus::Disabled,
+                  "GPU disable must publish Disabled before old enabled work completes");
+    RtPerformanceEvidenceSnapshot oldValid{};
+    context.Check(lifecycle.CompleteFence(
+                      validSubmission,
+                      MakeSubmittedStages(validSubmission, scene.stages),
+                      MakeDiagnostic(RtInstrumentationMode::Shipping,
+                                     RtSampleStatus::CompiledOut,
+                                     0u,
+                                     0u),
+                      MakeGpu(RtSampleStatus::Valid,
+                              validSubmission.submissionSerial,
+                              9'000'000u),
+                      oldValid) &&
+                      oldValid.gpu.status == RtSampleStatus::Valid &&
+                      lifecycle.CompletedEvidenceByValue().gpu.status == RtSampleStatus::Valid &&
+                      lifecycle.PublishedStateByValue().gpuStatus == RtSampleStatus::Disabled,
+                  "old Valid evidence must publish without clobbering the disabled current state");
+}
+
 void TestMeasurementEligibility(TestContext& context)
 {
     RtEvidenceLifecycle lifecycle;
@@ -1232,7 +1365,7 @@ void TestMeasurementEligibility(TestContext& context)
                   "a matching presented completion after resume must become eligible");
 }
 
-void TestDiagnosticPendingLifecycle(TestContext& context)
+void TestDiagnosticFirstSubmittedCompletion(TestContext& context)
 {
     RtEvidenceLifecycle lifecycle;
     RtLifecycleSeeds seeds{};
@@ -1242,6 +1375,9 @@ void TestDiagnosticPendingLifecycle(TestContext& context)
     context.Check(lifecycle.Initialise(
                       seeds, 1u, RtSampleStatus::Pending, RtSampleStatus::Disabled, effects),
                   "Diagnostic Pending lifecycle must initialise");
+    context.Check(lifecycle.PublishedStateByValue().diagnosticStatus == RtSampleStatus::Pending &&
+                      !lifecycle.PublishedStateByValue().hasCompletedEvidence,
+                  "initial signalled-fence state must be Pending without a completed token");
     const RtSceneFrameEvidence scene = MakeSceneEvidence(
         context, RtInstrumentationMode::Diagnostic, RtMaterialStrategy::OpaqueFast, 'a', 100u);
 
@@ -1255,43 +1391,141 @@ void TestDiagnosticPendingLifecycle(TestContext& context)
                       lifecycle.AttachPresentation(
                           firstSubmission, RtPresentationOutcome::Presented),
                   "first Diagnostic submission must reach matching presentation");
-    RtPerformanceEvidenceSnapshot pending{};
-    context.Check(lifecycle.CompleteFence(
+    const RtEvidenceLifecycle beforePendingCompletion = lifecycle;
+    RtPerformanceEvidenceSnapshot rejectedPending{};
+    context.Check(!lifecycle.CompleteFence(
                       firstSubmission,
                       MakeSubmittedStages(firstSubmission, scene.stages),
                       MakeDiagnostic(
                           RtInstrumentationMode::Diagnostic, RtSampleStatus::Pending, 0u, 0u),
                       MakeGpu(RtSampleStatus::Disabled, 0u, 0u),
-                      pending) &&
-                      pending.dielectric.status == RtSampleStatus::Pending &&
-                      !pending.dielectric.hasCounters && !pending.benchmarkEligible,
-                  "first completed Diagnostic submission must publish Pending, not false zero counters");
+                      rejectedPending) &&
+                      SameBytes(beforePendingCompletion, lifecycle),
+                  "a token-bearing Diagnostic fence completion must reject Pending transactionally");
 
-    RtFrameToken secondAttempt{};
-    RtFrameToken secondRecord{};
-    RtSubmittedFrameIdentity secondSubmission{};
-    context.Check(lifecycle.BeginRecord(0u, 2u, secondAttempt) &&
-                      lifecycle.FinishRecord(
-                          secondAttempt, MakeRecordedScene(scene), secondRecord) &&
-                      lifecycle.Submit(secondRecord, secondSubmission) &&
-                      lifecycle.AttachPresentation(
-                          secondSubmission, RtPresentationOutcome::Presented),
-                  "second Diagnostic submission must retain its exact identity");
     RtPerformanceEvidenceSnapshot valid{};
     context.Check(lifecycle.CompleteFence(
-                      secondSubmission,
-                      MakeSubmittedStages(secondSubmission, scene.stages),
+                      firstSubmission,
+                      MakeSubmittedStages(firstSubmission, scene.stages),
                       MakeDiagnostic(RtInstrumentationMode::Diagnostic,
                                      RtSampleStatus::Valid,
-                                     secondSubmission.submissionSerial,
+                                     firstSubmission.submissionSerial,
                                      9u),
                       MakeGpu(RtSampleStatus::Disabled, 0u, 0u),
                       valid) &&
                       valid.dielectric.status == RtSampleStatus::Valid &&
                       valid.dielectric.completedSubmissionSerial ==
-                          secondSubmission.submissionSerial &&
+                          firstSubmission.submissionSerial &&
                       valid.dielectric.counters[0] == 9u && valid.benchmarkEligible,
-                  "Diagnostic may become Valid only with counters joined to the completed submission");
+                  "the first real submitted completion must become Valid with matching counters");
+}
+
+void TestDiagnosticFaultLatchAcrossOutstandingSlots(TestContext& context)
+{
+    const RtSceneFrameEvidence scene = MakeSceneEvidence(
+        context, RtInstrumentationMode::Diagnostic, RtMaterialStrategy::OpaqueFast, 'a', 100u);
+    RtLifecycleSeeds seeds{};
+    seeds.sceneEpoch = 60u;
+    seeds.measurementGeneration = 70u;
+    RtLifecycleResetEffects effects{};
+
+    const auto initialise = [&](RtEvidenceLifecycle& lifecycle) {
+        return lifecycle.Initialise(
+            seeds, 2u, RtSampleStatus::Pending, RtSampleStatus::Disabled, effects);
+    };
+    const auto submitPresented = [&](RtEvidenceLifecycle& lifecycle,
+                                     const std::uint32_t slot,
+                                     const std::uint64_t tick,
+                                     RtSubmittedFrameIdentity& submitted) {
+        RtFrameToken attempt{};
+        RtFrameToken recorded{};
+        return lifecycle.BeginRecord(slot, tick, attempt) &&
+               lifecycle.FinishRecord(attempt, MakeRecordedScene(scene), recorded) &&
+               lifecycle.Submit(recorded, submitted) &&
+               lifecycle.AttachPresentation(submitted, RtPresentationOutcome::Presented);
+    };
+    const auto completeDiagnostic = [&](RtEvidenceLifecycle& lifecycle,
+                                        const RtSubmittedFrameIdentity& submitted,
+                                        const RtSampleStatus status,
+                                        RtPerformanceEvidenceSnapshot& completed) {
+        return lifecycle.CompleteFence(
+            submitted,
+            MakeSubmittedStages(submitted, scene.stages),
+            MakeDiagnostic(RtInstrumentationMode::Diagnostic,
+                           status,
+                           submitted.submissionSerial,
+                           5u),
+            MakeGpu(RtSampleStatus::Disabled, 0u, 0u),
+            completed);
+    };
+
+    RtEvidenceLifecycle errorFirst;
+    context.Check(initialise(errorFirst), "error-first Diagnostic lifecycle must initialise");
+    RtSubmittedFrameIdentity errorSubmission{};
+    RtSubmittedFrameIdentity validSubmission{};
+    context.Check(submitPresented(errorFirst, 0u, 1u, errorSubmission) &&
+                      submitPresented(errorFirst, 1u, 2u, validSubmission),
+                  "error-first fixture must retain two outstanding submissions");
+    RtPerformanceEvidenceSnapshot errorEvidence{};
+    context.Check(completeDiagnostic(
+                      errorFirst, errorSubmission, RtSampleStatus::Error, errorEvidence) &&
+                      errorFirst.PublishedStateByValue().diagnosticStatus == RtSampleStatus::Error,
+                  "matching Diagnostic read Error must latch the current resource fault");
+    RtPerformanceEvidenceSnapshot laterValidEvidence{};
+    context.Check(completeDiagnostic(
+                      errorFirst, validSubmission, RtSampleStatus::Valid, laterValidEvidence) &&
+                      laterValidEvidence.dielectric.status == RtSampleStatus::Valid &&
+                      !laterValidEvidence.benchmarkEligible &&
+                      errorFirst.PublishedStateByValue().diagnosticStatus == RtSampleStatus::Error,
+                  "a later Valid slot completion must preserve its evidence without clearing the fault latch");
+    RtFrameToken blocked{};
+    context.Check(!errorFirst.BeginRecord(0u, 3u, blocked),
+                  "latched read failure must keep BeginRecord blocked after another slot completes");
+
+    RtEvidenceLifecycle validFirst;
+    context.Check(initialise(validFirst), "valid-first Diagnostic lifecycle must initialise");
+    RtSubmittedFrameIdentity firstValidSubmission{};
+    RtSubmittedFrameIdentity laterErrorSubmission{};
+    context.Check(submitPresented(validFirst, 0u, 4u, firstValidSubmission) &&
+                      submitPresented(validFirst, 1u, 5u, laterErrorSubmission),
+                  "valid-first fixture must retain two outstanding submissions");
+    RtPerformanceEvidenceSnapshot firstValidEvidence{};
+    RtPerformanceEvidenceSnapshot laterErrorEvidence{};
+    context.Check(completeDiagnostic(
+                      validFirst, firstValidSubmission, RtSampleStatus::Valid, firstValidEvidence) &&
+                      validFirst.PublishedStateByValue().diagnosticStatus == RtSampleStatus::Valid &&
+                      completeDiagnostic(
+                          validFirst, laterErrorSubmission, RtSampleStatus::Error, laterErrorEvidence) &&
+                      validFirst.PublishedStateByValue().diagnosticStatus == RtSampleStatus::Error &&
+                      !validFirst.BeginRecord(0u, 6u, blocked),
+                  "Valid-then-Error completion order must end fail-closed");
+
+    RtEvidenceLifecycle resetFailure;
+    context.Check(initialise(resetFailure), "reset-failure Diagnostic lifecycle must initialise");
+    RtSubmittedFrameIdentity retainedSubmission{};
+    context.Check(submitPresented(resetFailure, 1u, 7u, retainedSubmission),
+                  "reset-failure fixture must retain another submitted slot");
+    RtFrameToken resetAttempt{};
+    context.Check(resetFailure.BeginRecord(0u, 8u, resetAttempt) &&
+                      resetFailure.FailDiagnosticReset(resetAttempt, effects),
+                  "Diagnostic reset failure must latch while another slot is outstanding");
+    RtPerformanceEvidenceSnapshot retainedValid{};
+    context.Check(completeDiagnostic(
+                      resetFailure, retainedSubmission, RtSampleStatus::Valid, retainedValid) &&
+                      retainedValid.dielectric.status == RtSampleStatus::Valid &&
+                      !retainedValid.benchmarkEligible &&
+                      resetFailure.PublishedStateByValue().diagnosticStatus == RtSampleStatus::Error &&
+                      !resetFailure.BeginRecord(0u, 9u, blocked),
+                  "outstanding Valid completion must not clear a reset-failure latch");
+    context.Check(resetFailure.Recreate(
+                      RtResourceResetReason::DiagnosticResourceReplacement,
+                      RtSampleStatus::Pending,
+                      RtSampleStatus::Disabled,
+                      effects) &&
+                      resetFailure.PublishedStateByValue().diagnosticStatus == RtSampleStatus::Pending &&
+                      resetFailure.BeginRecord(0u, 10u, blocked) &&
+                      resetFailure.AbortRecord(blocked),
+                  "Diagnostic resource recreation alone must clear the fault latch");
 }
 
 void TestDiagnosticResetFailure(TestContext& context)
@@ -1455,19 +1689,19 @@ void TestValidatorAndSerializers(TestContext& context)
                       diagnosticJson.find("\"wholeRtGpuMs\":0.000000") != std::string::npos,
                       "Diagnostic JSON must retain exact 41 counters and a genuinely measured zero");
 
-    RtPerformanceEvidenceSnapshot firstDiagnostic = diagnostic;
-    firstDiagnostic.dielectric = MakeDiagnostic(
+    RtPerformanceEvidenceSnapshot pendingCompletedDiagnostic = diagnostic;
+    pendingCompletedDiagnostic.dielectric = MakeDiagnostic(
         RtInstrumentationMode::Diagnostic, RtSampleStatus::Pending, 0u, 0u);
-    firstDiagnostic.benchmarkEligible = false;
-    std::string firstDiagnosticJson;
-    context.Check(ValidateRtPerformanceEvidence(firstDiagnostic, error) &&
-                      SerializeRtPerformanceEvidenceJson(
-                          firstDiagnostic, firstDiagnosticJson, error) &&
-                      firstDiagnosticJson.find(
-                          "\"dielectric\":{\"status\":\"pending\",\"available\":false,") !=
-                          std::string::npos &&
-                      firstDiagnosticJson.find("\"counters\":null") != std::string::npos,
-                  "first completed Diagnostic frame must remain Pending with null counters");
+    pendingCompletedDiagnostic.benchmarkEligible = false;
+    context.Check(!ValidateRtPerformanceEvidence(pendingCompletedDiagnostic, error) &&
+                      error == RtEvidenceValidationError::InvalidDiagnosticState,
+                  "token-bearing completed Diagnostic evidence must reject Pending status");
+    std::string pendingCompletedJson = "preexisting";
+    context.Check(!SerializeRtPerformanceEvidenceJson(
+                      pendingCompletedDiagnostic, pendingCompletedJson, error) &&
+                      pendingCompletedJson.empty() &&
+                      error == RtEvidenceValidationError::InvalidDiagnosticState,
+                  "rejected completed Pending diagnostics must emit no partial JSON");
 
     RtPerformanceEvidenceSnapshot invalidStages = shipping;
     invalidStages.scene.stages.status = RtSampleStatus::Error;
@@ -1612,6 +1846,31 @@ void TestValidatorAndSerializers(TestContext& context)
     context.Check(!ValidateRtPerformanceEvidence(invalid, error) &&
                       error == RtEvidenceValidationError::InvalidGpuState,
                   "enabled-but-Pending GPU evidence must not enter a complete benchmark sample");
+
+    RtPerformanceEvidenceSnapshot largeIdentity = shipping;
+    largeIdentity.identity.submitted.frame.simulationTick = 1'234'567u;
+    std::string localizedJson;
+    std::string localizedText;
+    bool localizedJsonSerialized = false;
+    bool localizedTextSerialized = false;
+    {
+        const ScopedGlobalLocale groupedLocale(
+            std::locale(std::locale::classic(), new GroupedNumberPunct));
+        localizedJsonSerialized =
+            SerializeRtPerformanceEvidenceJson(largeIdentity, localizedJson, error);
+        localizedTextSerialized =
+            SerializeRtPerformanceEvidenceText(largeIdentity, localizedText, error);
+    }
+    context.Check(localizedJsonSerialized &&
+                      localizedJson.find("\"simulationTick\":1234567,\"frameSlot\":0") !=
+                          std::string::npos &&
+                      localizedJson.find("\"hostVisibleBytes\":4096") != std::string::npos &&
+                      localizedJson.find("1,234,567") == std::string::npos,
+                  "canonical JSON numeric tokens must ignore process-global digit grouping");
+    context.Check(localizedTextSerialized &&
+                      localizedText.find("tick=1234567 slot=0") != std::string::npos &&
+                      localizedText.find("1,234,567") == std::string::npos,
+                  "canonical text numeric fields must ignore process-global digit grouping");
 }
 
 void TestAllocationHookCoverage(TestContext& context)
@@ -1811,8 +2070,10 @@ int main()
     TestBoundedCollector(context);
     TestLifecycleAssociationAndTransactions(context);
     TestLifecycleResetTableAndExhaustion(context);
+    TestGpuToggleRetainedCompletionStatus(context);
     TestMeasurementEligibility(context);
-    TestDiagnosticPendingLifecycle(context);
+    TestDiagnosticFirstSubmittedCompletion(context);
+    TestDiagnosticFaultLatchAcrossOutstandingSlots(context);
     TestDiagnosticResetFailure(context);
     TestValidatorAndSerializers(context);
     TestSourceDependencyFence(context);

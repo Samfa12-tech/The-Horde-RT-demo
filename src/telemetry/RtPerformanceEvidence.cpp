@@ -4,6 +4,7 @@
 #include <cmath>
 #include <iomanip>
 #include <limits>
+#include <locale>
 #include <sstream>
 
 namespace horde::telemetry
@@ -247,11 +248,6 @@ bool ValidDiagnostic(const RtDiagnosticEvidence& diagnostic,
     {
         error = RtEvidenceValidationError::NonValidNumericSample;
         return false;
-    }
-    if (diagnostic.status == RtSampleStatus::Pending &&
-        diagnostic.completedSubmissionSerial == 0u)
-    {
-        return true;
     }
     if (diagnostic.status == RtSampleStatus::Error &&
         diagnostic.completedSubmissionSerial == submissionSerial)
@@ -513,12 +509,14 @@ bool CheckedMillisecondsToNanoseconds(const double milliseconds,
         return false;
     }
     const long double converted = static_cast<long double>(milliseconds) * 1'000'000.0L;
-    if (converted > static_cast<long double>(std::numeric_limits<std::uint64_t>::max()))
+    const long double exclusiveUpperBound =
+        std::ldexp(1.0L, std::numeric_limits<std::uint64_t>::digits);
+    if (converted >= exclusiveUpperBound)
     {
         return false;
     }
     const long double rounded = std::round(converted);
-    if (rounded > static_cast<long double>(std::numeric_limits<std::uint64_t>::max()))
+    if (rounded >= exclusiveUpperBound)
     {
         return false;
     }
@@ -812,6 +810,7 @@ bool SerializeRtPerformanceEvidenceJson(const RtPerformanceEvidenceSnapshot& sna
     const RtFrameToken& frame = snapshot.identity.submitted.frame;
     const RtPipelineEvidenceIdentity& pipeline = snapshot.scene.pipeline;
     std::ostringstream json;
+    json.imbue(std::locale::classic());
     json << "{\"schema\":" << snapshot.schema
          << ",\"identity\":{\"sceneEpoch\":" << frame.sceneEpoch
          << ",\"measurementGeneration\":" << frame.measurementGeneration
@@ -964,6 +963,7 @@ bool SerializeRtPerformanceEvidenceText(const RtPerformanceEvidenceSnapshot& sna
     const RtFrameToken& frame = snapshot.identity.submitted.frame;
     const RtPipelineEvidenceIdentity& pipeline = snapshot.scene.pipeline;
     std::ostringstream text;
+    text.imbue(std::locale::classic());
     text << "RT PERFORMANCE EVIDENCE schema=" << snapshot.schema << '\n'
          << "Frame: epoch=" << frame.sceneEpoch
          << " generation=" << frame.measurementGeneration
@@ -1045,6 +1045,7 @@ bool RtEvidenceLifecycle::ResetResources(const RtResourceResetReason reason,
     ++seeds_.sceneEpoch;
     ClearSlots();
     lastSuccessfulPresentSubmissionSerial_ = 0u;
+    diagnosticFaultLatched_ = false;
     published_ = {};
     published_.sceneEpoch = seeds_.sceneEpoch;
     published_.measurementGeneration = seeds_.measurementGeneration;
@@ -1222,7 +1223,7 @@ bool RtEvidenceLifecycle::BeginRecord(const std::uint32_t frameSlot,
                                       RtFrameToken& attempt) noexcept
 {
     if (!initialised_ || !published_.running || published_.paused ||
-        published_.diagnosticStatus == RtSampleStatus::Error ||
+        diagnosticFaultLatched_ || published_.diagnosticStatus == RtSampleStatus::Error ||
         frameSlot >= activeSlotCount_ || slots_[frameSlot].phase != SlotPhase::Empty ||
         seeds_.recordAttemptSerial == std::numeric_limits<std::uint64_t>::max())
     {
@@ -1283,6 +1284,7 @@ bool RtEvidenceLifecycle::FailDiagnosticReset(const RtFrameToken& attempt,
         return false;
     }
     slots_[attempt.frameSlot] = {};
+    diagnosticFaultLatched_ = true;
     published_.diagnosticStatus = RtSampleStatus::Error;
     measurementSamplesEligible_ = false;
     effects = {};
@@ -1386,14 +1388,18 @@ bool RtEvidenceLifecycle::Complete(const RtSubmittedFrameIdentity& submitted,
     candidate.presentation.lastSuccessfulPresentSubmissionSerial =
         lastSuccessfulPresentSubmissionSerial_;
     candidate.presentation.finalIdleCompletion = finalIdle;
+    const bool currentMeasurementGeneration =
+        submitted.frame.measurementGeneration == seeds_.measurementGeneration;
+    const bool diagnosticFault =
+        diagnosticFaultLatched_ || diagnostic.status == RtSampleStatus::Error;
     const bool diagnosticUsable = diagnostic.status == RtSampleStatus::CompiledOut ||
                                   diagnostic.status == RtSampleStatus::Valid;
     const bool gpuUsable = gpu.status == RtSampleStatus::Valid ||
                            gpu.status == RtSampleStatus::Disabled ||
                            gpu.status == RtSampleStatus::Unsupported;
     candidate.benchmarkEligible =
-        measurementSamplesEligible_ && !published_.paused &&
-        submitted.frame.measurementGeneration == seeds_.measurementGeneration &&
+        measurementSamplesEligible_ && !published_.paused && !diagnosticFault &&
+        currentMeasurementGeneration &&
         outcome == RtPresentationOutcome::Presented &&
         candidate.scene.stages.status == RtSampleStatus::Valid &&
         diagnosticUsable && gpuUsable;
@@ -1411,8 +1417,14 @@ bool RtEvidenceLifecycle::Complete(const RtSubmittedFrameIdentity& submitted,
             std::max(lastSuccessfulPresentSubmissionSerial_, submitted.submissionSerial);
     }
     slots_[submitted.frame.frameSlot] = {};
-    published_.diagnosticStatus = diagnostic.status;
-    published_.gpuStatus = gpu.status;
+    diagnosticFaultLatched_ = diagnosticFault;
+    published_.diagnosticStatus = diagnosticFaultLatched_
+        ? RtSampleStatus::Error
+        : diagnostic.status;
+    if (currentMeasurementGeneration)
+    {
+        published_.gpuStatus = gpu.status;
+    }
     published_.presented = outcome == RtPresentationOutcome::Presented;
     published_.hasCompletedEvidence = true;
     published_.completedEvidence = candidate;

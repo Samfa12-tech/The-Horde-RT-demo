@@ -567,6 +567,7 @@ private:
     std::uint64_t lastSuccessfulPresentSubmissionSerial_ = 0u;
     RtLifecyclePublishedState published_{};
     bool measurementSamplesEligible_ = false;
+    bool diagnosticFaultLatched_ = false;
     bool initialised_ = false;
 };
 
