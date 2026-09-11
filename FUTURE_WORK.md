@@ -37,7 +37,7 @@ The exact supplied music pack and its integration notes may supersede implementa
 
 This is the next major renderer programme after music.
 
-The immediate motivation is a real Samsung Galaxy S25 Ultra test performed on 2026-09-11. The device reached the Horde Vulkan diagnostics but could not run the current scene because its tested driver exposes ray query but not the full Vulkan ray-tracing-pipeline extension.
+The immediate motivation is now confirmed across two Qualcomm flagship generations: real Samsung Galaxy S25 Ultra and Galaxy S24 Ultra tests performed on 2026-09-11 both reached Horde's Vulkan diagnostics and exposed acceleration structures plus `VK_KHR_ray_query`, but neither tested driver exposed `VK_KHR_ray_tracing_pipeline`. The current renderer therefore selected `RayQuery` capability mode but did not attempt or present the Horde RT scene.
 
 Tested S25 Ultra diagnostic result:
 
@@ -54,7 +54,24 @@ Tested S25 Ultra diagnostic result:
 - Selected capability mode: `RayQuery`
 - RT scene: not attempted / not presented
 
-The detailed compatibility evidence is recorded in `docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md`.
+Tested S24 Ultra diagnostic result:
+
+- GPU: `Adreno (TM) 750`
+- Vendor ID: `20803`
+- Device ID: `1124406273`
+- Driver: `512.762.41` (packed `2150604841`)
+- Vulkan API: `1.3.128`
+- `VK_KHR_acceleration_structure`: yes
+- `VK_KHR_ray_tracing_pipeline`: **no**
+- `VK_KHR_ray_query`: yes
+- `VK_KHR_buffer_device_address`: yes
+- `VK_KHR_deferred_host_operations`: yes
+- Selected capability mode: `RayQuery`
+- RT scene: not attempted / not presented
+
+The detailed S25 compatibility evidence is recorded in `docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md`. The S24 screenshot-derived evidence is preserved in `docs/validation/horde-galaxy-s24-ultra-rayquery-2026-09-11.md` and should be folded into the main compatibility record when that living record is next edited.
+
+The two-device result is important because this is no longer merely an S25/Adreno 830 edge case. It suggests the planned RayQuery backend could materially widen support across at least Snapdragon 8 Gen 3 / Adreno 750 and Snapdragon 8 Elite / Adreno 830 class devices whose shipped drivers expose hardware ray query but not the full Vulkan ray-tracing pipeline.
 
 ## Compatibility goal
 
@@ -139,7 +156,7 @@ Do not call the RayQuery backend a low-quality or fake fallback. It is an **alte
 
 Feature parity does **not** mean identical performance.
 
-The S25 Ultra may need a different internal render scale or workload setting than the S26 Ultra. That is acceptable provided:
+The S25 Ultra and S24 Ultra may need different internal render scales or workload settings than the S26 Ultra. That is acceptable provided:
 
 - the engine does not silently remove RT features to manufacture performance;
 - any automatic/default quality selection is explicit and evidence-driven;
@@ -186,9 +203,11 @@ Codex should inspect the current code before deciding exact implementation, but 
    - Update `AGENTS.md`, `PROJECT_DECISIONS.md`, `PROJECT_MEMORY.md`, `docs/PHASE_PLAN.md`, shader documentation and `docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md` as the architecture becomes real.
    - Preserve historical evidence rather than rewriting old results to imply support existed earlier.
 
-## Primary acceptance device
+## Acceptance devices
 
-The **Samsung Galaxy S25 Ultra / Adreno 830 / driver 512.800.64** is the first acceptance device for the new backend because it gives a clean capability boundary:
+### Primary acceptance: Galaxy S25 Ultra / Adreno 830 / driver 512.800.64
+
+This remains the first acceptance device because it provides the cleanest initial capability boundary:
 
 - hardware acceleration structures: yes;
 - ray query: yes;
@@ -207,11 +226,17 @@ Minimum acceptance criteria on that exact device:
 9. Sustained performance is measured with internal resolution, quality/workload state, temperature, Android thermal status and Samsung GPU power level where available.
 10. The compatibility record is updated with exact-device evidence.
 
+### Secondary acceptance: Galaxy S24 Ultra / Adreno 750 / driver 512.762.41
+
+After the S25 path is operational, repeat the same functional and evidence gates on the tested S24 Ultra. This second device is important because it proves the alternate backend is not narrowly special-cased for Adreno 830 and tests an older Snapdragon 8 Gen 3 / Adreno 750 hardware/driver generation with the same `RayQuery`-without-`RayTracingPipeline` pattern.
+
+Do not infer performance from the S24 diagnostic screen's `241.35 fps / 4.14 ms`; the actual RT scene was not dispatched. Measure the real RayQueryCompute scene after implementation.
+
 ## Cross-check device
 
 The Galaxy S26 Ultra / Adreno 840 remains the primary development reference.
 
-After the RayQuery backend works on the S25 Ultra:
+After the RayQuery backend works on the S25 Ultra and S24 Ultra:
 
 - confirm the existing `RayTracingPipeline` path still works unchanged on the S26 Ultra;
 - where practical, run both backends on a device that exposes both and compare output/performance to detect shader divergence;
@@ -245,7 +270,7 @@ Suggested slices:
 4. **Secondary transport parity** - reflections, wet materials, water and glass.
 5. **Dynamic scene parity** - player body, held props, animated enemies, dynamic BLAS/TLAS updates.
 6. **Full route/lifecycle pass** - gameplay, finale, RT Lab, Home/resume.
-7. **Performance/default selection** - sustained S25 measurement and honest device default.
+7. **Performance/default selection** - sustained S25 measurement, then S24 measurement, and honest per-device defaults if evidence supports them.
 8. **Regression closeout** - S26 pipeline + Windows RTX remain clean.
 
 Each slice should leave a runnable build and should end with files changed, build/run instructions, evidence gathered, limitations and the exact next task.
@@ -254,7 +279,7 @@ Each slice should leave a runnable build and should end with files changed, buil
 
 When 1.6.1 and the music milestone are complete, the owner can start this programme with a prompt as small as:
 
-> Read `AGENTS.md`, `PROJECT_DECISIONS.md`, `PROJECT_MEMORY.md`, `docs/PHASE_PLAN.md`, `docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md`, and `FUTURE_WORK.md`. The 1.6.1 and music milestones are complete. Begin the planned **RayQuery hardware-RT compatibility programme** in `FUTURE_WORK.md`. First audit current main and produce an implementation/validation plan grounded in the actual architecture; then execute the smallest safe vertical slice. Preserve the existing RayTracingPipeline backend and all RT-or-nothing rules. The Galaxy S25 Ultra / Adreno 830 / driver 512.800.64 is the first acceptance device. Do not fake RT or remove visual features to gain compatibility.
+> Read `AGENTS.md`, `PROJECT_DECISIONS.md`, `PROJECT_MEMORY.md`, `docs/PHASE_PLAN.md`, `docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md`, `docs/validation/horde-galaxy-s24-ultra-rayquery-2026-09-11.md`, and `FUTURE_WORK.md`. The 1.6.1 and music milestones are complete. Begin the planned **RayQuery hardware-RT compatibility programme** in `FUTURE_WORK.md`. First audit current main and produce an implementation/validation plan grounded in the actual architecture; then execute the smallest safe vertical slice. Preserve the existing RayTracingPipeline backend and all RT-or-nothing rules. The Galaxy S25 Ultra / Adreno 830 / driver 512.800.64 is the primary acceptance device and the Galaxy S24 Ultra / Adreno 750 / driver 512.762.41 is the secondary acceptance device. Do not fake RT or remove visual features to gain compatibility.
 
 For a larger autonomous Codex run, add:
 
