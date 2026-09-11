@@ -1,6 +1,6 @@
 # Android RT Device Compatibility Record
 
-Last updated: 2026-08-31
+Last updated: 2026-09-11
 
 This is a living compatibility record for the Horde Lantern RT Android build. It separates direct project evidence from reports and hardware-based predictions. A device is not marked as working solely because its GPU advertises Vulkan or hardware ray tracing.
 
@@ -68,6 +68,28 @@ The working gate is the project's presentable Vulkan RT path: acceleration struc
 - **Source:** [`ALPHA_ANDROID_REFRESH_VALIDATION_2026-07-16.md`](ALPHA_ANDROID_REFRESH_VALIDATION_2026-07-16.md), [`HORDE_SHOWCASE_ANDROID_VALIDATION_2026-07-17.md`](HORDE_SHOWCASE_ANDROID_VALIDATION_2026-07-17.md), [`FOUNDATION_VALIDATION_2026-07-22.md`](FOUNDATION_VALIDATION_2026-07-22.md), [`SHOWCASE_ALPHA_0_1_2_RELEASE_VALIDATION_2026-07-22.md`](SHOWCASE_ALPHA_0_1_2_RELEASE_VALIDATION_2026-07-22.md), [`PLAYER_VITALITY_RETRY_SLICE_2026-07-31.md`](PLAYER_VITALITY_RETRY_SLICE_2026-07-31.md), [`PLAYER_BODY_AND_FINALE_SLICE_2026-07-31.md`](PLAYER_BODY_AND_FINALE_SLICE_2026-07-31.md), [`SHOWCASE_ALPHA_0_1_3_RELEASE_VALIDATION_2026-07-31.md`](SHOWCASE_ALPHA_0_1_3_RELEASE_VALIDATION_2026-07-31.md), [`RENDERER_RESOURCE_SLOTS_ANDROID_VALIDATION_2026-08-11.md`](RENDERER_RESOURCE_SLOTS_ANDROID_VALIDATION_2026-08-11.md), [`TWO_SKELETON_COMBAT_ANDROID_VALIDATION_2026-08-12.md`](TWO_SKELETON_COMBAT_ANDROID_VALIDATION_2026-08-12.md), [`ANIMATION_COMBAT_PARRY_SLICE_2026-08-13.md`](ANIMATION_COMBAT_PARRY_SLICE_2026-08-13.md), [`CURRENT_DEVELOPMENT_BASELINE_VALIDATION_2026-08-21.md`](CURRENT_DEVELOPMENT_BASELINE_VALIDATION_2026-08-21.md), [`RT_LAB_VALIDATION_2026-08-24.md`](RT_LAB_VALIDATION_2026-08-24.md), [`WATER_TRANSMISSION_SHADOW_VALIDATION_2026-08-24.md`](WATER_TRANSMISSION_SHADOW_VALIDATION_2026-08-24.md), and [`SHOWCASE_ALPHA_1_5_2_RELEASE_VALIDATION_2026-08-25.md`](SHOWCASE_ALPHA_1_5_2_RELEASE_VALIDATION_2026-08-25.md).
 - **Qualification:** This is the main development platform and strongest current compatibility reference. It confirms this exact model/driver configuration, not every phone using a similar GPU.
 
+### Samsung Galaxy S25 Ultra - exact model code not captured
+
+- **Status:** Unsupported on the reported device/driver for the current Horde Lantern RT full-pipeline path.
+- **Evidence type:** User-reported + screenshot evidence; **not locally tested** by this project owner.
+- **Tester/source:** Project owner supplied a capability-screen screenshot after testing the app on a Samsung Galaxy S25 Ultra.
+- **Date:** 2026-09-11.
+- **Screenshot-reported hardware:** GPU `Adreno (TM) 830`; vendor ID `20803`; device ID `1141178369`; Vulkan API `1.3.284`; driver `512.800.64` (packed `2150760512`).
+- **Observed RT selection:** `RT mode: RayQuery`.
+- **Reported Vulkan RT support:**
+  - `VK_KHR_acceleration_structure`: yes
+  - `VK_KHR_ray_tracing_pipeline`: **no**
+  - `VK_KHR_ray_query`: yes
+  - `VK_KHR_buffer_device_address`: yes
+  - `VK_KHR_deferred_host_operations`: yes
+- **Observed result:** `RT scene status: Not attempted`; `RT scene dispatch resolution: N/A`; `RT scene presented: no`; GPU RT command-buffer timing was not initialised.
+- **Diagnostic-screen timing:** `465.18 fps / 2.15 ms`, with internal render resolution `N/A`. This is diagnostic/UI timing only and must **not** be interpreted as RT-scene performance because the RT scene was never dispatched.
+- **Scene geometry report:** The capability screen still reports `Complete Horde showcase route with sequential animated skeleton and staff-lit lich`, but the renderer did not attempt or present that scene on this driver path.
+- **Device-local report files:** `/data/user/0/com.samfa12.hordelanternrt/files/reports/vulkan_capability_report.txt` and `vulkan_capability_report.json` were reported by the app. These files were not supplied or checked into the repository with this result.
+- **Preserved evidence:** Screenshot supplied in the project conversation on 2026-09-11; the image itself is not currently checked into the repository.
+- **Interpretation:** The device exposes acceleration structures and ray query, so this is **not** evidence that Adreno 830 lacks hardware ray-tracing capability. It is evidence that this reported Galaxy S25 Ultra driver does not expose `VK_KHR_ray_tracing_pipeline`, which the current Android bridge requires before it will run and present the Horde RT scene. The current project therefore correctly refuses to substitute the RayQuery-only path for its required full ray-tracing-pipeline route.
+- **Qualification:** This result applies to the tested Galaxy S25 Ultra / Adreno 830 / driver `512.800.64` configuration. It must not be generalised to every S25-series firmware, every Adreno 830 device, or every Snapdragon 8 Elite device without a matching runtime probe.
+
 ### Google Pixel 8 - Marc's device
 
 - **Status:** Unsupported on the reported device.
@@ -84,7 +106,7 @@ The working gate is the project's presentable Vulkan RT path: acceleration struc
 
 ## Research candidates
 
-These entries are hardware/driver candidates, not confirmed project support. Every named model still needs the project's runtime probe, followed by a real scene/presentation and performance check.
+These entries are hardware/driver candidates, not confirmed project support. Every named model still needs the project's runtime probe, followed by a real scene/presentation and performance check unless a specific tested configuration is called out below.
 
 ### Qualcomm Adreno candidates
 
@@ -93,7 +115,7 @@ Qualcomm identifies hardware-accelerated ray tracing on Snapdragon 8 Gen 2 and h
 | SoC family | Representative Android devices | Evidence status |
 |---|---|---|
 | Snapdragon 8 Elite Gen 5 | Samsung Galaxy S26/S26+/S26 Ultra; OnePlus 15; other 2026 flagship models using this platform | Unverified candidate; highest-priority follow-up after `SM-S948B` |
-| Snapdragon 8 Elite | Samsung Galaxy S25 series and S25 Edge; Galaxy Z Fold7; OnePlus 13; Xiaomi 15/15 Ultra; ASUS ROG Phone 9; RedMagic 10; Honor Magic7 Pro; iQOO 13; Motorola Razr 60 Ultra | Unverified candidate; strong hardware inference |
+| Snapdragon 8 Elite | Samsung Galaxy S25 series and S25 Edge; Galaxy Z Fold7; OnePlus 13; Xiaomi 15/15 Ultra; ASUS ROG Phone 9; RedMagic 10; Honor Magic7 Pro; iQOO 13; Motorola Razr 60 Ultra | **Partial direct evidence:** one Galaxy S25 Ultra / Adreno 830 configuration on driver `512.800.64` exposes RayQuery but not `VK_KHR_ray_tracing_pipeline` and is unsupported by the current project path; other models/drivers remain unverified |
 | Snapdragon 8 Gen 5 | OnePlus 15R and equivalent premium devices | Unverified candidate; strong hardware inference, exact Android driver still required |
 | Snapdragon 8s Gen 4 | POCO F7 and other phones explicitly using Snapdragon 8s Gen 4 | Unverified candidate; strong hardware inference |
 | Snapdragon 8s Gen 3 | POCO F6; Xiaomi 14 Civi; OnePlus Ace 3V; Motorola Razr+ variants | Unverified candidate; hardware RT advertised, driver exposure still required |
