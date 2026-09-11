@@ -1,4 +1,5 @@
 #include "vulkan/raytracing/PlayerRenderSlot.h"
+#include "vulkan/raytracing/RtSceneRecordObservation.h"
 
 #include "gameplay/ShowcaseRoute.h"
 
@@ -602,7 +603,8 @@ bool PlayerRenderSlot::PreparePose(
     const std::uint64_t tickIndex,
     const PlayerCpuSkinCadence cadence,
     bool& poseUpdated,
-    std::string& diagnostic)
+    std::string& diagnostic,
+    RtSceneRecordObservation* observation)
 {
     poseUpdated = false;
     if (!asset_.IsLoaded())
@@ -676,10 +678,15 @@ bool PlayerRenderSlot::PreparePose(
                      std::to_string(determinant(right.handOrientation)) + ".";
         return false;
     }
+    RtSceneStageScope skinScope(observation, horde::telemetry::RtStage::PlayerSkin);
     if (!asset_.SkinPlayerUniqueTextured(
             clip, animation.locomotionTime, left, right, uniqueVertices_,
             uniqueTangents_, sockets_, diagnostic))
+    {
+        skinScope.Cancel();
         return false;
+    }
+    skinScope.Complete(1u);
     const auto socketError = [](const horde::scene::SkinnedNodeTransform& socket,
                                 const horde::gameplay::animation::PlayerArmIkTarget& intended) {
         return std::hypot(std::hypot(socket[12] - intended.target[0],

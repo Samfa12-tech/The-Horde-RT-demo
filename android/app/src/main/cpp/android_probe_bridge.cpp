@@ -51,10 +51,6 @@
 #ifndef HORDE_RT_BUILD_ID
 #define HORDE_RT_BUILD_ID "development"
 #endif
-#ifndef HORDE_RT_RAYGEN_SHA256
-#define HORDE_RT_RAYGEN_SHA256 "unknown"
-#endif
-
 namespace
 {
 
@@ -456,7 +452,7 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(const Swapchai
     const horde::gameplay::EnemyEncounterSnapshot* encounter = SelectedEncounter(roster);
     horde::ui::DeveloperOverlaySnapshot snapshot;
     snapshot.buildIdentity = std::string(HORDE_RT_BUILD_ID) + " DEBUG";
-    snapshot.shaderIdentity = std::string(HORDE_RT_RAYGEN_SHA256).substr(0u, 12u);
+    snapshot.shaderIdentity = context.rtScene.SelectedPipelineBundleDisplayIdentity();
     const horde::gameplay::PlayerVitalsSnapshot& playerVitals = simulation.playerVitals;
     snapshot.playerLifePhase = horde::gameplay::PlayerLifePhaseName(playerVitals.phase);
     snapshot.playerVitality = playerVitals.vitality;
@@ -635,7 +631,7 @@ horde::gameplay::ShowcaseBenchmarkMetadata BuildBenchmarkMetadata(const Swapchai
     horde::gameplay::ShowcaseBenchmarkMetadata metadata;
     metadata.timestampUtc = UtcTimestamp();
     metadata.buildIdentity = HORDE_RT_BUILD_ID;
-    metadata.shaderIdentity = std::string(HORDE_RT_RAYGEN_SHA256).substr(0u, 12u);
+    metadata.shaderIdentity = context.rtScene.SelectedPipelineBundleIdentity();
     metadata.gpuName = context.capabilities.identity.gpuName;
     metadata.vulkanApi = std::to_string(VK_API_VERSION_MAJOR(context.capabilities.identity.vulkanApiVersion)) + "." +
                          std::to_string(VK_API_VERSION_MINOR(context.capabilities.identity.vulkanApiVersion)) + "." +
@@ -869,6 +865,19 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
          << "  \"playerSkinUpdates\": " << context.rtScene.PlayerSkinUpdateCount() << ",\n"
          << "  \"playerSkinCpuAverageMs\": " << context.rtScene.PlayerSkinAverageMilliseconds() << ",\n"
          << "  \"playerMaxSocketErrorM\": " << context.rtScene.PlayerMaxSocketErrorMetres() << ",\n"
+         << "  \"selectedRtPipelineBundle\": {\"opaqueFast\": {\"key\": \""
+         << context.rtScene.SelectedOpaqueFastKey() << "\", \"sha256\": \""
+         << context.rtScene.SelectedOpaqueFastSha256()
+         << "\"}, \"genericDielectric\": {\"key\": \""
+         << context.rtScene.SelectedGenericDielectricKey() << "\", \"sha256\": \""
+         << context.rtScene.SelectedGenericDielectricSha256() << "\"}},\n"
+         << "  \"diagnosticsAvailability\": \""
+         << horde::vulkan::raytracing::ToString(
+                context.rtScene.DiagnosticsAvailability()) << "\",\n"
+         << "  \"diagnosticsAvailable\": "
+         << (context.rtScene.DiagnosticsAvailability() ==
+                     horde::vulkan::raytracing::RtDiagnosticAvailability::Available
+                 ? "true" : "false") << ",\n"
          << "  \"dielectricTransportOverflowCount\": "
          << context.rtScene.DielectricTransportOverflowCount() << ",\n"
          << "  \"dielectricShadowOverflowCount\": "
@@ -933,7 +942,9 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
          << context.rtScene.CertifiedClosedVolumeRecoveryReasonMask() << ",\n"
          << "  \"tlasInstanceCount\": " << context.rtScene.TlasInstanceCount() << ",\n"
          << "  \"buildIdentity\": \"" << HORDE_RT_BUILD_ID << " DEBUG\",\n"
-         << "  \"shaderIdentity\": \"" << std::string(HORDE_RT_RAYGEN_SHA256).substr(0u, 12u) << "\",\n"
+         << "  \"shaderIdentity\": \""
+         << context.rtScene.SelectedPipelineBundleDisplayIdentity()
+         << "\",\n"
          << "  \"gpu\": \"" << context.capabilities.identity.gpuName << "\",\n"
          << "  \"swapchainExtent\": {\"width\": " << context.swapchainExtent.width
          << ", \"height\": " << context.swapchainExtent.height << "},\n"

@@ -2,11 +2,11 @@
 
 #define IDI_HORDE_LANTERN_RT 1
 
-IDI_HORDE_LANTERN_RT ICON "../../../assets/branding/horde_lantern_rt.ico"
+IDI_HORDE_LANTERN_RT ICON "@HORDE_RT_REPO_ROOT@/assets/branding/horde_lantern_rt.ico"
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,6,0,0
- PRODUCTVERSION 1,6,0,0
+ FILEVERSION @HORDE_RT_WINDOWS_FILE_VERSION@
+ PRODUCTVERSION @HORDE_RT_WINDOWS_FILE_VERSION@
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS VS_FF_DEBUG
@@ -23,11 +23,11 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Samfa12\0"
             VALUE "FileDescription", "Horde Lantern RT - Showcase Alpha\0"
-            VALUE "FileVersion", "1.6.0\0"
+            VALUE "FileVersion", "@HORDE_RT_DISPLAY_VERSION@\0"
             VALUE "InternalName", "HordeLanternRT\0"
             VALUE "OriginalFilename", "HordeLanternRT.exe\0"
             VALUE "ProductName", "Horde Lantern RT\0"
-            VALUE "ProductVersion", "1.6.0\0"
+            VALUE "ProductVersion", "@HORDE_RT_DISPLAY_VERSION@\0"
         END
     END
     BLOCK "VarFileInfo"

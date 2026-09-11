@@ -73,10 +73,6 @@
 #ifndef HORDE_RT_DISPLAY_VERSION
 #define HORDE_RT_DISPLAY_VERSION "development"
 #endif
-#ifndef HORDE_RT_RAYGEN_SHA256
-#define HORDE_RT_RAYGEN_SHA256 "unknown"
-#endif
-
 namespace
 {
 
@@ -1860,7 +1856,7 @@ horde::gameplay::ShowcaseBenchmarkMetadata BuildBenchmarkMetadata(
     horde::gameplay::ShowcaseBenchmarkMetadata metadata;
     metadata.timestampUtc = UtcTimestamp("%Y-%m-%dT%H:%M:%SZ");
     metadata.buildIdentity = HORDE_RT_BUILD_ID;
-    metadata.shaderIdentity = std::string(HORDE_RT_RAYGEN_SHA256).substr(0u, 12u);
+    metadata.shaderIdentity = context.rtScene.SelectedPipelineBundleIdentity();
     metadata.gpuName = capabilities.identity.gpuName;
     metadata.vulkanApi = std::to_string(VK_API_VERSION_MAJOR(capabilities.identity.vulkanApiVersion)) + "." +
                          std::to_string(VK_API_VERSION_MINOR(capabilities.identity.vulkanApiVersion)) + "." +
@@ -2039,7 +2035,7 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(
     const horde::gameplay::EnemyEncounterSnapshot* encounter = SelectedEncounter(roster);
     horde::ui::DeveloperOverlaySnapshot snapshot;
     snapshot.buildIdentity = std::string(HORDE_RT_BUILD_ID) + " DEBUG";
-    snapshot.shaderIdentity = std::string(HORDE_RT_RAYGEN_SHA256).substr(0u, 12u);
+    snapshot.shaderIdentity = context.rtScene.SelectedPipelineBundleDisplayIdentity();
     snapshot.gpuName = capabilities.identity.gpuName;
     snapshot.vulkanApi = PackedVulkanVersion(capabilities.identity.vulkanApiVersion);
     snapshot.rtMode = horde::vulkan::ToString(capabilities.rtMode);
@@ -3835,7 +3831,15 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
              << "  \"settlingFrames\": " << kCaptureSettlingFrames << ",\n"
              << "  \"fixedAnimationTimeSeconds\": 0.000000,\n"
              << "  \"buildId\": \"" << JsonEscape(HORDE_RT_BUILD_ID) << "\",\n"
-             << "  \"raygenSha256\": \"" << JsonEscape(HORDE_RT_RAYGEN_SHA256) << "\",\n"
+             << "  \"selectedRtPipelineBundle\": {\"opaqueFast\": {\"key\": \""
+             << JsonEscape(std::string(context.rtScene.SelectedOpaqueFastKey()))
+             << "\", \"sha256\": \""
+             << JsonEscape(std::string(context.rtScene.SelectedOpaqueFastSha256()))
+             << "\"}, \"genericDielectric\": {\"key\": \""
+             << JsonEscape(std::string(context.rtScene.SelectedGenericDielectricKey()))
+             << "\", \"sha256\": \""
+             << JsonEscape(std::string(context.rtScene.SelectedGenericDielectricSha256()))
+             << "\"}},\n"
              << "  \"device\": {\n"
              << "    \"gpuName\": \"" << JsonEscape(capabilities.identity.gpuName) << "\",\n"
              << "    \"vendorId\": " << capabilities.identity.vendorId << ",\n"
@@ -3884,7 +3888,14 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
              << ", \"productionPropBlasBuildMilliseconds\": "
              << context.rtScene.ProductionPropBlasBuildMilliseconds()
              << "},\n"
-             << "  \"dielectricDiagnostics\": {\"transportOverflowCount\": "
+             << "  \"dielectricDiagnostics\": {\"availability\": \""
+             << horde::vulkan::raytracing::ToString(
+                    context.rtScene.DiagnosticsAvailability())
+             << "\", \"available\": "
+             << (context.rtScene.DiagnosticsAvailability() ==
+                         horde::vulkan::raytracing::RtDiagnosticAvailability::Available
+                     ? "true" : "false")
+             << ", \"transportOverflowCount\": "
              << context.rtScene.DielectricTransportOverflowCount()
              << ", \"shadowOverflowCount\": "
              << context.rtScene.DielectricShadowOverflowCount()
@@ -3906,7 +3917,14 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
              << context.rtScene.ProductionPaneSecondarySameMediumCount()
              << ", \"productionPaneSecondaryDifferentMediumCount\": "
              << context.rtScene.ProductionPaneSecondaryDifferentMediumCount() << "},\n"
-             << "  \"dielectricReasonDiagnostics\": {\"secondaryNearSelfHitCount\": "
+             << "  \"dielectricReasonDiagnostics\": {\"availability\": \""
+             << horde::vulkan::raytracing::ToString(
+                    context.rtScene.DiagnosticsAvailability())
+             << "\", \"available\": "
+             << (context.rtScene.DiagnosticsAvailability() ==
+                         horde::vulkan::raytracing::RtDiagnosticAvailability::Available
+                     ? "true" : "false")
+             << ", \"secondaryNearSelfHitCount\": "
              << context.rtScene.SecondaryNearSelfHitCount()
              << ", \"primaryOpenMissCount\": " << context.rtScene.PrimaryOpenMissCount()
              << ", \"primaryOpenOpaqueCount\": " << context.rtScene.PrimaryOpenOpaqueCount()
@@ -3984,7 +4002,14 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
         for (std::size_t mask = 0u; mask < capture.instanceMasks.size(); ++mask)
             manifest << (mask == 0u ? "" : ", ")
                      << static_cast<std::uint32_t>(capture.instanceMasks[mask]);
-        manifest << "], \"primaryPixels\": {\"torch\": "
+        manifest << "], \"diagnostics\": {\"availability\": \""
+                 << horde::vulkan::raytracing::ToString(
+                        context.rtScene.DiagnosticsAvailability())
+                 << "\", \"available\": "
+                 << (context.rtScene.DiagnosticsAvailability() ==
+                             horde::vulkan::raytracing::RtDiagnosticAvailability::Available
+                         ? "true" : "false")
+                 << "}, \"primaryPixels\": {\"torch\": "
                  << capture.primaryTorchPixels << ", \"sword\": "
                  << capture.primarySwordPixels << ", \"player\": "
                  << capture.primaryPlayerPixels << ", \"rewardRing\": "
@@ -4181,6 +4206,9 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
                  horde::gameplay::DevelopmentRewardPose::None);
         const auto claimedRewardPixelPolicy =
             horde::platform::windows::ClaimedRewardCapturePolicy(checkpoint.name);
+        const bool diagnosticPixelCountersAvailable =
+            context.rtScene.DiagnosticsAvailability() ==
+            horde::vulkan::raytracing::RtDiagnosticAvailability::Available;
         if (context.developmentCheckpoint.empty() &&
             !simulationRewardClaimed &&
             (record.instanceMasks[1] != 0x02u ||
@@ -4191,12 +4219,13 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
              record.instanceMasks[12] != 0x04u ||
              record.instanceMasks[13] != 0x04u ||
              !record.playerPrimaryVisible ||
-             record.primaryPlayerPixels == 0u))
+             (diagnosticPixelCountersAvailable &&
+              record.primaryPlayerPixels == 0u)))
         {
             return fail(std::string("Checkpoint '") + checkpoint.name +
                         "' masked the ordinary torch/sword or hybrid block-primary player instances.");
         }
-        if (checkpoint.name == "opening" &&
+        if (diagnosticPixelCountersAvailable && checkpoint.name == "opening" &&
             (record.primaryTorchPixels == 0u ||
              record.primarySwordPixels == 0u ||
              record.primaryPlayerPixels == 0u))
@@ -4212,15 +4241,16 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
              !record.playerPrimaryVisible ||
              record.instanceMasks[7] != 0x01u ||
              record.instanceMasks[8] != 0x01u ||
-             record.primaryTorchPixels != 0u ||
-             (claimedRewardPixelPolicy.requirePlayerPixels &&
-              record.primaryPlayerPixels == 0u) ||
-             (claimedRewardPixelPolicy.requireRewardRingPixels &&
-              record.primaryRewardRingPixels == 0u) ||
-             (claimedRewardPixelPolicy.requireRewardBodyPixels &&
-              record.primaryRewardBodyPixels == 0u) ||
-             (claimedRewardPixelPolicy.requireSwordPixels &&
-              record.primarySwordPixels == 0u) ||
+             (diagnosticPixelCountersAvailable &&
+              (record.primaryTorchPixels != 0u ||
+               (claimedRewardPixelPolicy.requirePlayerPixels &&
+                record.primaryPlayerPixels == 0u) ||
+               (claimedRewardPixelPolicy.requireRewardRingPixels &&
+                record.primaryRewardRingPixels == 0u) ||
+               (claimedRewardPixelPolicy.requireRewardBodyPixels &&
+                record.primaryRewardBodyPixels == 0u) ||
+               (claimedRewardPixelPolicy.requireSwordPixels &&
+                record.primarySwordPixels == 0u))) ||
              record.rewardGripPositionErrorMetres >
                  horde::vulkan::raytracing::kPlayerGripSocketToleranceMetres ||
              record.rewardGripOrientationErrorRadians >

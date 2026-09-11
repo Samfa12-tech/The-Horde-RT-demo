@@ -3,6 +3,7 @@
 #extension GL_EXT_ray_query : require
 
 #include "include/rt_scene_abi.glsl"
+#include "include/rt_diagnostics.glsl"
 #include "include/rt_lighting.glsl"
 #include "include/rt_dielectric_common.glsl"
 #include "include/rt_dielectric_transport.glsl"
@@ -38,16 +39,16 @@ void main()
     if (primary.hit)
     {
         if (primary.instance == 1)
-            atomicAdd(rtDielectricDiagnostics.value.primaryTorchPixelCount, 1u);
+            RT_DIAG_ADD(primaryTorchPixelCount, 1u);
         else if (primary.instance == 3)
-            atomicAdd(rtDielectricDiagnostics.value.primarySwordPixelCount, 1u);
+            RT_DIAG_ADD(primarySwordPixelCount, 1u);
         else if (primary.instance == 4 ||
                  (primary.instance >= 10 && primary.instance <= 13))
-            atomicAdd(rtDielectricDiagnostics.value.primaryPlayerPixelCount, 1u);
+            RT_DIAG_ADD(primaryPlayerPixelCount, 1u);
         else if (primary.instance == 7)
-            atomicAdd(rtDielectricDiagnostics.value.primaryRewardRingPixelCount, 1u);
+            RT_DIAG_ADD(primaryRewardRingPixelCount, 1u);
         else if (primary.instance == 8)
-            atomicAdd(rtDielectricDiagnostics.value.primaryRewardBodyPixelCount, 1u);
+            RT_DIAG_ADD(primaryRewardBodyPixelCount, 1u);
     }
     vec3 color = shadePrimary(primary, rayDirection);
     vec4 fireVolume = integrateFireEmitters(
