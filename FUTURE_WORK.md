@@ -69,7 +69,7 @@ Tested S24 Ultra diagnostic result:
 - Selected capability mode: `RayQuery`
 - RT scene: not attempted / not presented
 
-The detailed S25 compatibility evidence is recorded in `docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md`. The S24 screenshot-derived evidence is preserved in `docs/validation/horde-galaxy-s24-ultra-rayquery-2026-09-11.md` and should be folded into the main compatibility record when that living record is next edited.
+Both tested-device results are now recorded in `docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md`. The S24 screenshot-derived evidence also has a dedicated note at `docs/validation/horde-galaxy-s24-ultra-rayquery-2026-09-11.md`.
 
 The two-device result is important because this is no longer merely an S25/Adreno 830 edge case. It suggests the planned RayQuery backend could materially widen support across at least Snapdragon 8 Gen 3 / Adreno 750 and Snapdragon 8 Elite / Adreno 830 class devices whose shipped drivers expose hardware ray query but not the full Vulkan ray-tracing pipeline.
 
