@@ -132,6 +132,18 @@ The runtime-only Android asset task is complete and reduced the debug APK from 9
 
 ## Current follow-up gates
 
+The active 1.6.1 work order is now [the engineering programme](ENGINEERING_1_6_1_PLAN.md),
+updated by the owner on 2026-09-13: lean guidance, evidence/plan reconciliation,
+S24/S25 compatibility, remaining audit work plus adaptive music/player reporting,
+then comprehensive final-candidate validation. Targeted checks run during development;
+publication requires a separate explicit instruction.
+
+### Historical 1.6.0 follow-up list
+
+The following list is retained as historical context, not the current execution
+order. Exact signed 1.6.0 installation/RT smoke was subsequently recorded above;
+it does not certify the forthcoming 1.6.1 candidate.
+
 1. Install the exact signed 1.6.0 APK on the authorised `SM-S948B`, pull it back byte-for-byte, and verify strict ASTC, honest RT presentation, reward progression, RT Lab retention/Back behavior, waterfall width, and Home/resume without treating earlier Debug evidence as signed-package proof.
 2. Preserve the completed integrated clean-build, test, shader-staleness, asset/licence, package, deterministic capture, developer-overlay, and player-benchmark foundations.
 3. Resolve the separate Hotstrike raw-source redistribution permission/history question and maintain an independent owner backup of the Android release key.
