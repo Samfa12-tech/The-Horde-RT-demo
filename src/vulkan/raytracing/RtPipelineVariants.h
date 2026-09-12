@@ -1,5 +1,7 @@
 #pragma once
 
+#include "vulkan/RtExecutionBackend.h"
+
 #include <optional>
 #include <string>
 
@@ -13,6 +15,7 @@ struct RtPipelineVariantKey {
     RtInstrumentation instrumentation;
     DielectricQuality quality;
     RtMaterialStrategy material;
+    RtExecutionBackend executionBackend = RtExecutionBackend::RayTracingPipeline;
 
     constexpr bool operator==(const RtPipelineVariantKey&) const = default;
 };
@@ -21,6 +24,8 @@ struct RtPipelineBundleRequest {
     RtInstrumentation instrumentation;
     DielectricQuality quality;
 
+    RtExecutionBackend executionBackend = RtExecutionBackend::RayTracingPipeline;
+
     constexpr bool operator==(const RtPipelineBundleRequest&) const = default;
 };
 
@@ -28,6 +33,7 @@ struct RtPipelineBundleRequest {
     RtPipelineVariantKey key);
 [[nodiscard]] std::string FormatRtPipelineVariantKey(RtPipelineVariantKey key);
 [[nodiscard]] std::optional<RtPipelineBundleRequest> TryMakeRtPipelineBundleRequest(
-    RtInstrumentation instrumentation, DielectricQuality quality);
+    RtInstrumentation instrumentation, DielectricQuality quality,
+    RtExecutionBackend executionBackend = RtExecutionBackend::RayTracingPipeline);
 
 } // namespace horde::vulkan::raytracing

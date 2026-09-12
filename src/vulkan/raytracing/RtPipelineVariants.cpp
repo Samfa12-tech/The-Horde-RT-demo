@@ -24,7 +24,13 @@ std::optional<std::string> TryFormatRtPipelineVariantKey(RtPipelineVariantKey ke
     case RtMaterialStrategy::GenericDielectric: material = "generic_dielectric"; break;
     default: return std::nullopt;
     }
-    std::string formatted(instrumentation);
+    std::string formatted;
+    switch (key.executionBackend) {
+    case RtExecutionBackend::RayTracingPipeline: break;
+    case RtExecutionBackend::RayQueryCompute: formatted = "rayquery_compute_"; break;
+    default: return std::nullopt;
+    }
+    formatted += instrumentation;
     formatted += '_';
     formatted += quality;
     formatted += '_';
@@ -41,14 +47,15 @@ std::string FormatRtPipelineVariantKey(RtPipelineVariantKey key)
 }
 
 std::optional<RtPipelineBundleRequest> TryMakeRtPipelineBundleRequest(
-    RtInstrumentation instrumentation, DielectricQuality quality)
+    RtInstrumentation instrumentation, DielectricQuality quality,
+    RtExecutionBackend executionBackend)
 {
-    const RtPipelineVariantKey opaque{instrumentation, quality, RtMaterialStrategy::OpaqueFast};
-    const RtPipelineVariantKey generic{instrumentation, quality, RtMaterialStrategy::GenericDielectric};
+    const RtPipelineVariantKey opaque{instrumentation, quality, RtMaterialStrategy::OpaqueFast, executionBackend};
+    const RtPipelineVariantKey generic{instrumentation, quality, RtMaterialStrategy::GenericDielectric, executionBackend};
     if (!TryFormatRtPipelineVariantKey(opaque) || !TryFormatRtPipelineVariantKey(generic)) {
         return std::nullopt;
     }
-    return RtPipelineBundleRequest{instrumentation, quality};
+    return RtPipelineBundleRequest{instrumentation, quality, executionBackend};
 }
 
 } // namespace horde::vulkan::raytracing

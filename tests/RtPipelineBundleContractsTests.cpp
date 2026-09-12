@@ -130,6 +130,26 @@ int main()
                       failureKey.empty(),
                   "production preflight must independently resolve both compiled records");
 
+    auto computeRequest = provider.request();
+    computeRequest.executionBackend = horde::vulkan::RtExecutionBackend::RayQueryCompute;
+    ok &= Require(!ValidateRtPipelineBundlePreflight(computeRequest, pair, preflight, failureKey),
+                  "compute request must reject a raygen-only pair");
+    auto invalidBackendRequest = provider.request();
+    invalidBackendRequest.executionBackend = static_cast<horde::vulkan::RtExecutionBackend>(99);
+    ok &= Require(!ValidateRtPipelineBundlePreflight(invalidBackendRequest, pair, preflight, failureKey),
+                  "invalid backend request must fail closed");
+
+    auto disguisedRaygen = pair;
+    for (auto& record : disguisedRaygen) {
+        record.key.executionBackend = horde::vulkan::RtExecutionBackend::RayQueryCompute;
+    }
+    disguisedRaygen[0].canonicalKey = "rayquery_compute_shipping_mobile_opaque_fast";
+    disguisedRaygen[0].artifactPath = "src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_opaque_fast.inc";
+    disguisedRaygen[1].canonicalKey = "rayquery_compute_shipping_mobile_generic_dielectric";
+    disguisedRaygen[1].artifactPath = "src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_generic_dielectric.inc";
+    ok &= Require(!ValidateRtPipelineBundlePreflight(computeRequest, disguisedRaygen, preflight, failureKey),
+                  "compute metadata must not disguise raygen execution-model bytes");
+
     const std::array<RtPipelineVariantArtifact, 1u> missingGeneric{pair[0]};
     ok &= Require(!ValidateRtPipelineBundlePreflight(provider.request(), missingGeneric,
                                                      preflight, failureKey) &&

@@ -16,6 +16,7 @@ constexpr std::uint32_t kSpirvMagic = 0x07230203u;
 constexpr std::uint16_t kOpEntryPoint = 15u;
 constexpr std::uint16_t kOpDecorate = 71u;
 constexpr std::uint32_t kExecutionModelRayGenerationKhr = 5313u;
+constexpr std::uint32_t kExecutionModelGlCompute = 5u;
 constexpr std::uint32_t kDecorationBinding = 33u;
 
 constexpr std::array<RtDescriptorResourceKind, 23u> kDescriptorKinds{
@@ -130,7 +131,7 @@ bool IsLowerHexSha256(std::string_view value) noexcept
 }
 
 struct ReflectedModuleContract {
-    std::size_t raygenEntryPoints = 0u;
+    std::size_t matchingEntryPoints = 0u;
     std::size_t diagnosticsBindings = 0u;
     std::size_t atomicInstructions = 0u;
 };
@@ -141,6 +142,7 @@ bool IsAtomicOpcode(std::uint16_t opcode) noexcept
 }
 
 bool ReflectModule(std::span<const std::uint32_t> words,
+                   const RtExecutionBackend executionBackend,
                    ReflectedModuleContract& reflected) noexcept
 {
     reflected = {};
@@ -150,9 +152,11 @@ bool ReflectModule(std::span<const std::uint32_t> words,
         const std::uint16_t wordCount = static_cast<std::uint16_t>(instruction >> 16u);
         const std::uint16_t opcode = static_cast<std::uint16_t>(instruction & 0xffffu);
         if (wordCount == 0u || wordCount > words.size() - offset) { return false; }
-        if (opcode == kOpEntryPoint && wordCount >= 4u &&
-            words[offset + 1u] == kExecutionModelRayGenerationKhr) {
-            ++reflected.raygenEntryPoints;
+        if (opcode == kOpEntryPoint) {
+            const auto expectedModel = executionBackend == RtExecutionBackend::RayQueryCompute
+                ? kExecutionModelGlCompute : kExecutionModelRayGenerationKhr;
+            if (wordCount < 4u || words[offset + 1u] != expectedModel) { return false; }
+            ++reflected.matchingEntryPoints;
         }
         if (opcode == kOpDecorate && wordCount >= 4u &&
             words[offset + 2u] == kDecorationBinding &&
@@ -162,7 +166,7 @@ bool ReflectModule(std::span<const std::uint32_t> words,
         if (IsAtomicOpcode(opcode)) { ++reflected.atomicInstructions; }
         offset += wordCount;
     }
-    return reflected.raygenEntryPoints == 1u;
+    return reflected.matchingEntryPoints == 1u;
 }
 
 bool ValidateRecord(const RtPipelineVariantArtifact& record,
@@ -181,7 +185,7 @@ bool ValidateRecord(const RtPipelineVariantArtifact& record,
         return false;
     }
     ReflectedModuleContract reflected{};
-    if (!ReflectModule(record.words, reflected) ||
+    if (!ReflectModule(record.words, expected.executionBackend, reflected) ||
         reflected.atomicInstructions != record.atomicInstructions ||
         (reflected.diagnosticsBindings != 0u) != record.hasDiagnosticsBinding ||
         record.hasDiagnosticsBinding != descriptorIo.diagnosticIo.descriptorWrite ||
@@ -240,7 +244,8 @@ bool ValidateRtPipelineBundlePreflight(
 {
     preflight = {};
     failureKey.clear();
-    if (!TryMakeRtPipelineBundleRequest(request.instrumentation, request.quality)) {
+    if (!TryMakeRtPipelineBundleRequest(request.instrumentation, request.quality,
+                                        request.executionBackend)) {
         failureKey = "invalid_rt_pipeline_bundle_request";
         return false;
     }
@@ -254,7 +259,7 @@ bool ValidateRtPipelineBundlePreflight(
     std::array<RtPipelineVariantArtifact, 2u> selected{};
     for (std::size_t strategyIndex = 0u; strategyIndex < strategies.size(); ++strategyIndex) {
         const RtPipelineVariantKey expected{request.instrumentation, request.quality,
-                                            strategies[strategyIndex]};
+                                            strategies[strategyIndex], request.executionBackend};
         const std::string expectedKey = FormatRtPipelineVariantKey(expected);
         std::size_t matches = 0u;
         for (const auto& candidate : candidateRecords) {

@@ -10,6 +10,7 @@ using horde::vulkan::raytracing::DielectricQuality;
 using horde::vulkan::raytracing::RtInstrumentation;
 using horde::vulkan::raytracing::RtMaterialStrategy;
 using horde::vulkan::raytracing::RtPipelineVariantKey;
+using horde::vulkan::RtExecutionBackend;
 
 bool Require(bool condition, std::string_view message)
 {
@@ -31,6 +32,11 @@ int main()
         "diagnostic_high_opaque_fast", "diagnostic_high_generic_dielectric"};
     constexpr std::array<RtInstrumentation, 2> instrumentations{
         RtInstrumentation::Shipping, RtInstrumentation::Diagnostic};
+    constexpr std::array<std::string_view, 8> expectedComputeKeys{
+        "rayquery_compute_shipping_mobile_opaque_fast", "rayquery_compute_shipping_mobile_generic_dielectric",
+        "rayquery_compute_shipping_high_opaque_fast", "rayquery_compute_shipping_high_generic_dielectric",
+        "rayquery_compute_diagnostic_mobile_opaque_fast", "rayquery_compute_diagnostic_mobile_generic_dielectric",
+        "rayquery_compute_diagnostic_high_opaque_fast", "rayquery_compute_diagnostic_high_generic_dielectric"};
     constexpr std::array<DielectricQuality, 2> qualities{
         DielectricQuality::Mobile, DielectricQuality::High};
     constexpr std::array<RtMaterialStrategy, 2> materials{
@@ -43,9 +49,21 @@ int main()
                 const RtPipelineVariantKey key{instrumentation, quality, material};
                 ok &= Require(horde::vulkan::raytracing::FormatRtPipelineVariantKey(key) == expectedKeys[index],
                               "canonical variant key changed");
+                const RtPipelineVariantKey computeKey{instrumentation, quality, material,
+                                                       RtExecutionBackend::RayQueryCompute};
+                ok &= Require(horde::vulkan::raytracing::FormatRtPipelineVariantKey(computeKey) ==
+                                  expectedComputeKeys[index] && computeKey != key,
+                              "compute and pipeline stage identities must never alias");
                 ++index;
             }
         }
+    }
+
+    for (const auto backend : {RtExecutionBackend::Unsupported, static_cast<RtExecutionBackend>(99)}) {
+        ok &= Require(!horde::vulkan::raytracing::TryFormatRtPipelineVariantKey(
+                           {RtInstrumentation::Shipping, DielectricQuality::Mobile,
+                            RtMaterialStrategy::OpaqueFast, backend}).has_value(),
+                      "unsupported or invalid execution backend must not resolve a variant");
     }
 
     ok &= Require(!horde::vulkan::raytracing::TryFormatRtPipelineVariantKey(
