@@ -11,3 +11,8 @@ third_party/cgltf/cgltf.h whitespace=-trailing-space
 # The release identity contract is one UTF-8 line. Keep its checkout bytes
 # stable even when core.autocrlf is enabled on Windows.
 VERSION text eol=lf
+
+# Compute shader artifacts and their generated provenance are byte-checked.
+src/vulkan/raytracing/variants/rayquery_compute_*.inc text eol=lf
+src/vulkan/raytracing/RtRayQueryVariantCatalog.generated.h text eol=lf
+tools/rayquery-variant-catalog.json text eol=lf
