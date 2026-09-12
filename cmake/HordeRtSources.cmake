@@ -2,6 +2,7 @@
 # their platform-specific targets; this list is consumed by Windows and Android.
 set(HORDE_RT_CORE_RELATIVE_SOURCES
     telemetry/RtPerformanceEvidence.cpp
+    telemetry/RtEvidencePublication.cpp
     gameplay/simulation/GameSimulation.cpp
     gameplay/animation/PlayerAnimationState.cpp
     gameplay/animation/PlayerIkTargets.cpp
