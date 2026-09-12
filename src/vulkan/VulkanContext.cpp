@@ -254,13 +254,17 @@ DeviceCapabilities VulkanContext::ProbePhysicalDevice(const VkPhysicalDevice phy
     capabilities.features.rayQuery = rayQueryFeatures.rayQuery == VK_TRUE;
     capabilities.features.bufferDeviceAddress = bufferDeviceAddressFeatures.bufferDeviceAddress == VK_TRUE;
 
-    capabilities.rtMode = raytracing::EvaluateRtMode(capabilities.extensions, capabilities.features);
+    capabilities.rtMode = raytracing::EvaluateRtMode(
+        capabilities.extensions, capabilities.features, capabilities.identity.vulkanApiVersion);
 
     if (capabilities.rtMode == RtMode::Unsupported)
     {
         std::vector<std::string> missing;
-        AppendMissingRequirementsForRayTracingPipeline(capabilities.extensions, capabilities.features, missing);
-        AppendMissingRequirementsForRayQuery(capabilities.extensions, capabilities.features, missing);
+        ExtensionSupport effectiveRequirements = capabilities.extensions;
+        effectiveRequirements.bufferDeviceAddress = capabilities.extensions.bufferDeviceAddress ||
+            capabilities.identity.vulkanApiVersion >= VK_API_VERSION_1_2;
+        AppendMissingRequirementsForRayTracingPipeline(effectiveRequirements, capabilities.features, missing);
+        AppendMissingRequirementsForRayQuery(effectiveRequirements, capabilities.features, missing);
 
         if (missing.empty())
         {
@@ -272,7 +276,7 @@ DeviceCapabilities VulkanContext::ProbePhysicalDevice(const VkPhysicalDevice phy
         }
     }
 
-    capabilities.diagnostics.push_back("RT mode selected: " + ToString(capabilities.rtMode));
+    capabilities.diagnostics.push_back("RT capability mode: " + ToString(capabilities.rtMode));
     return capabilities;
 }
 
