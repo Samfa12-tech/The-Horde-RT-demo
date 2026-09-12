@@ -15,6 +15,15 @@ struct DevelopmentCheckpointStageEvidence
     float actionTime = 0.0f;
 };
 
+// Optional, non-owning boundary callbacks for the helper's exact shared
+// StepFixed invocations. The observer must not modify simulation inputs/state.
+struct DevelopmentCheckpointStepFixedObservation
+{
+    void* user = nullptr;
+    void (*beginStepFixed)(void*) noexcept = nullptr;
+    void (*completeStepFixed)(void*) noexcept = nullptr;
+};
+
 // Stages a debug-only visual checkpoint by advancing the same fixed-step
 // command/combat/animation authority used by live play. Platforms only select
 // the requested checkpoint; no renderer or platform-owned animation state is
@@ -22,10 +31,25 @@ struct DevelopmentCheckpointStageEvidence
 inline bool StageDevelopmentCheckpointSimulation(
     simulation::GameSimulation& gameSimulation,
     const DevelopmentCheckpoint& checkpoint,
-    DevelopmentCheckpointStageEvidence* evidence = nullptr)
+    DevelopmentCheckpointStageEvidence* evidence = nullptr,
+    const DevelopmentCheckpointStepFixedObservation* stepObservation = nullptr)
 {
     if (!gameSimulation.ApplyShowcaseCheckpoint(checkpoint.baseShowcaseCheckpointId))
         return false;
+
+    const auto stepFixed = [&](const simulation::InputSnapshot& input,
+                               const float fixedDeltaSeconds,
+                               const std::uint64_t inputPublicationSequence)
+    {
+        const bool observe = stepObservation != nullptr &&
+            stepObservation->beginStepFixed != nullptr &&
+            stepObservation->completeStepFixed != nullptr;
+        if (observe)
+            stepObservation->beginStepFixed(stepObservation->user);
+        gameSimulation.StepFixed(input, fixedDeltaSeconds, inputPublicationSequence);
+        if (observe)
+            stepObservation->completeStepFixed(stepObservation->user);
+    };
 
     const std::uint64_t initialConsumedAttackSequence =
         gameSimulation.Snapshot().lastConsumedAttackSequence;
@@ -59,8 +83,8 @@ inline bool StageDevelopmentCheckpointSimulation(
     input.yawRadians = checkpoint.yaw;
     input.pitchRadians = checkpoint.pitch;
     input.torchLightStrength = 1.8f;
-    gameSimulation.StepFixed(input, 0.0f,
-                             gameSimulation.Snapshot().inputPublicationSequence + 1u);
+    stepFixed(input, 0.0f,
+              gameSimulation.Snapshot().inputPublicationSequence + 1u);
     if (checkpoint.stagesUnlockedChest)
     {
         using namespace horde::gameplay::interactions;
@@ -131,8 +155,8 @@ inline bool StageDevelopmentCheckpointSimulation(
             ++input.commands.attack;
             upwardEdgePublished = true;
         }
-        gameSimulation.StepFixed(input, fixedDelta,
-                                 gameSimulation.Snapshot().inputPublicationSequence + 1u);
+        stepFixed(input, fixedDelta,
+                  gameSimulation.Snapshot().inputPublicationSequence + 1u);
         const PlayerCombatSnapshot& after = gameSimulation.Snapshot().playerCombat;
         const bool reachedDownward =
             checkpoint.combatPose == DevelopmentCombatPose::DownwardCutActive &&

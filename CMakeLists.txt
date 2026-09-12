@@ -516,6 +516,28 @@ if(BUILD_TESTING)
     add_test(NAME horde_rt_spatial_audio_smoke COMMAND horde_rt_spatial_audio_smoke)
 
     if(HORDE_RT_BUILD_VULKAN_TARGETS)
+        add_executable(horde_rt_gpu_frame_timer_collection_tests
+            tests/GpuFrameTimerCollectionTests.cpp
+            src/vulkan/GpuFrameTimer.cpp)
+        target_include_directories(horde_rt_gpu_frame_timer_collection_tests PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/src
+            ${Vulkan_INCLUDE_DIRS})
+        add_test(NAME horde_rt_gpu_frame_timer_collection_tests
+            COMMAND horde_rt_gpu_frame_timer_collection_tests)
+
+        add_executable(horde_rt_frame_evidence_coordinator_tests
+            tests/RtFrameEvidenceCoordinatorTests.cpp
+            src/vulkan/raytracing/RtFrameEvidenceCoordinator.cpp
+            src/vulkan/GpuFrameTimer.cpp
+            src/telemetry/RtPerformanceEvidence.cpp)
+        target_include_directories(horde_rt_frame_evidence_coordinator_tests PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/src
+            ${Vulkan_INCLUDE_DIRS})
+        target_link_libraries(horde_rt_frame_evidence_coordinator_tests PRIVATE
+            Vulkan::Vulkan)
+        add_test(NAME horde_rt_frame_evidence_coordinator_tests
+            COMMAND horde_rt_frame_evidence_coordinator_tests)
+
         add_executable(horde_rt_gpu_resources_observation_tests
             tests/RtGpuResourcesObservationTests.cpp
             src/telemetry/RtPerformanceEvidence.cpp

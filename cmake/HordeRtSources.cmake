@@ -35,6 +35,7 @@ set(HORDE_RT_CORE_RELATIVE_SOURCES
     vulkan/raytracing/RtPipelineVariantProvider.cpp
     vulkan/raytracing/RtPipelineBundleContracts.cpp
     vulkan/raytracing/RtPipelineBundle.cpp
+    vulkan/raytracing/RtFrameEvidenceCoordinator.cpp
     vulkan/raytracing/PresentableTinyRtScene.cpp
     vulkan/raytracing/SimulationFrameAdapter.cpp
     scene/assets/SkinnedMeshAsset.cpp

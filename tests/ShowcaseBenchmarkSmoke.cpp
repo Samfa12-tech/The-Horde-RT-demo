@@ -74,10 +74,26 @@ int main()
           "invalid presentation must be explicit in the text report");
 
     ShowcaseBenchmarkRun cancelled;
-    cancelled.Start();
+    cancelled.Start(1u);
+    cancelled.Advance();
+    cancelled.RecordFrame(10.0, true);
+    const auto samplesBeforeCancellation = cancelled.Frames().size();
     cancelled.Cancel();
+    cancelled.RecordFrame(999.0, true);
     check(cancelled.Status() == ShowcaseBenchmarkStatus::Cancelled && !cancelled.Passed(),
           "cancel must leave an invalid non-running session");
+    check(samplesBeforeCancellation == 1u &&
+              cancelled.Frames().size() == samplesBeforeCancellation,
+          "a cancelled interrupted measurement must reject even a successfully presented interval");
+
+    // Advance can mark the final lap Complete before its frame is presented.
+    // Recreate on that final present must still cancel admission of the interval.
+    const auto completedSamplesBeforeCancellation = benchmark.Frames().size();
+    benchmark.Cancel();
+    benchmark.RecordFrame(999.0, true);
+    check(benchmark.Status() == ShowcaseBenchmarkStatus::Cancelled && !benchmark.Passed() &&
+              benchmark.Frames().size() == completedSamplesBeforeCancellation,
+          "presentation interruption must reject the final interval even after replay completion");
 
     if (!passed)
     {

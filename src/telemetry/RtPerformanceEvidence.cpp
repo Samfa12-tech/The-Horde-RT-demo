@@ -114,6 +114,26 @@ bool ValidPipelineIdentity(const RtPipelineEvidenceIdentity& pipeline,
     return true;
 }
 
+bool ValidPlayerDiagnostics(const RtPlayerDiagnostics& player,
+                            RtEvidenceValidationError& error) noexcept
+{
+    if (!player.primaryPixelCountAvailable)
+    {
+        if (player.primaryPixelCount != 0u || player.primaryVisible)
+        {
+            error = RtEvidenceValidationError::NonValidNumericSample;
+            return false;
+        }
+        return true;
+    }
+    if (player.primaryVisible != (player.primaryPixelCount != 0u))
+    {
+        error = RtEvidenceValidationError::InconsistentIdentity;
+        return false;
+    }
+    return true;
+}
+
 bool ValidStageFrame(const RtStageFrameSample& stages,
                      RtEvidenceValidationError& error) noexcept
 {
@@ -128,12 +148,16 @@ bool ValidStageFrame(const RtStageFrameSample& stages,
         return false;
     }
     bool anyOverflow = false;
+    bool anyBackingValue = false;
     for (const RtStageValue& stage : stages.values)
     {
         anyOverflow = anyOverflow || stage.overflowed;
+        anyBackingValue = anyBackingValue || stage.durationNanoseconds != 0u ||
+                          stage.workInvocationCount != 0u || stage.byteCount != 0u ||
+                          stage.operationCount != 0u;
     }
     if ((stages.status == RtSampleStatus::Valid && anyOverflow) ||
-        (stages.status == RtSampleStatus::Error && !anyOverflow))
+        (stages.status == RtSampleStatus::Error && !anyOverflow && anyBackingValue))
     {
         error = RtEvidenceValidationError::InvalidStageSample;
         return false;
@@ -168,7 +192,8 @@ bool ValidStageFrame(const RtStageFrameSample& stages,
 bool ValidSceneFrame(const RtSceneFrameEvidence& scene,
                      RtEvidenceValidationError& error) noexcept
 {
-    if (!ValidPipelineIdentity(scene.pipeline, error))
+    if (!ValidPipelineIdentity(scene.pipeline, error) ||
+        !ValidPlayerDiagnostics(scene.player, error))
     {
         return false;
     }
@@ -184,11 +209,13 @@ bool ValidSceneFrame(const RtSceneFrameEvidence& scene,
 bool ValidRecordedScene(const RtRecordedSceneEvidence& scene,
                          RtEvidenceValidationError& error) noexcept
 {
-    if (!ValidPipelineIdentity(scene.pipeline, error))
+    if (!ValidPipelineIdentity(scene.pipeline, error) ||
+        !ValidPlayerDiagnostics(scene.player, error))
     {
         return false;
     }
-    if (!scene.dispatch.sceneReady || !scene.dispatch.rtDispatchRecorded ||
+    if (scene.player.primaryPixelCountAvailable ||
+        !scene.dispatch.sceneReady || !scene.dispatch.rtDispatchRecorded ||
         !scene.dispatch.swapchainCopyRecorded)
     {
         error = RtEvidenceValidationError::InvalidDispatchState;
@@ -345,7 +372,8 @@ bool ValidInitialDiagnosticStatus(const RtSampleStatus status) noexcept
 bool ValidInitialGpuStatus(const RtSampleStatus status) noexcept
 {
     return status == RtSampleStatus::NotReady || status == RtSampleStatus::Disabled ||
-           status == RtSampleStatus::Unsupported || status == RtSampleStatus::Pending;
+           status == RtSampleStatus::Unsupported || status == RtSampleStatus::Pending ||
+           status == RtSampleStatus::Error;
 }
 
 void WriteJsonEscaped(std::ostream& output, const std::string_view value)
@@ -431,6 +459,7 @@ const char* RtPresentationOutcomeName(const RtPresentationOutcome outcome) noexc
     switch (outcome)
     {
     case RtPresentationOutcome::Presented: return "presented";
+    case RtPresentationOutcome::PresentedNeedsRecreate: return "presented-needs-recreate";
     case RtPresentationOutcome::NotPresentedNeedsRecreate:
         return "not-presented-needs-recreate";
     case RtPresentationOutcome::Failed: return "failed";
@@ -620,6 +649,16 @@ bool RtStageAccumulator::ResetAggregates() noexcept
     return true;
 }
 
+bool RtStageAccumulator::ResetAggregatesPreservingActive() noexcept
+{
+    if (!active_)
+    {
+        return false;
+    }
+    aggregates_ = {};
+    return true;
+}
+
 bool RtStageSampleCollector::Start(const std::uint64_t sceneEpoch,
                                    const std::uint64_t measurementGeneration) noexcept
 {
@@ -754,6 +793,16 @@ bool ValidateRtPerformanceEvidence(const RtPerformanceEvidenceSnapshot& snapshot
     {
         return false;
     }
+    const bool primaryPixelsAvailable =
+        snapshot.dielectric.status == RtSampleStatus::Valid;
+    if (snapshot.scene.player.primaryPixelCountAvailable != primaryPixelsAvailable ||
+        (primaryPixelsAvailable &&
+         snapshot.scene.player.primaryPixelCount !=
+             snapshot.dielectric.counters[kRtPrimaryPlayerPixelCounterIndex]))
+    {
+        error = RtEvidenceValidationError::InconsistentIdentity;
+        return false;
+    }
     if (!KnownEnumName(RtPresentationOutcomeName, snapshot.presentation.outcome))
     {
         error = RtEvidenceValidationError::UnknownEnum;
@@ -765,7 +814,7 @@ bool ValidateRtPerformanceEvidence(const RtPerformanceEvidenceSnapshot& snapshot
         error = RtEvidenceValidationError::InvalidPresentationState;
         return false;
     }
-    const bool presented = snapshot.presentation.outcome == RtPresentationOutcome::Presented;
+    const bool presented = RtPresentationSucceeded(snapshot.presentation.outcome);
     if (presented && snapshot.presentation.lastSuccessfulPresentSubmissionSerial <
                          snapshot.identity.submitted.submissionSerial)
     {
@@ -789,7 +838,8 @@ bool ValidateRtPerformanceEvidence(const RtPerformanceEvidenceSnapshot& snapshot
         return false;
     }
     if (snapshot.benchmarkEligible &&
-        (!presented || snapshot.scene.stages.status != RtSampleStatus::Valid))
+        (snapshot.presentation.outcome != RtPresentationOutcome::Presented ||
+         snapshot.scene.stages.status != RtSampleStatus::Valid))
     {
         error = RtEvidenceValidationError::InvalidPresentationState;
         return false;
@@ -862,7 +912,18 @@ bool SerializeRtPerformanceEvidenceJson(const RtPerformanceEvidenceSnapshot& sna
          << ",\"skinUpdateCount\":" << player.skinUpdateCount
          << ",\"maximumSocketErrorMicrometres\":"
          << player.maximumSocketErrorMicrometres
-         << ",\"primaryPixelCount\":" << player.primaryPixelCount
+         << ",\"primaryPixelCountAvailable\":"
+         << (player.primaryPixelCountAvailable ? "true" : "false")
+         << ",\"primaryPixelCount\":";
+    if (player.primaryPixelCountAvailable)
+    {
+        json << player.primaryPixelCount;
+    }
+    else
+    {
+        json << "null";
+    }
+    json
          << ",\"primaryVisible\":" << (player.primaryVisible ? "true" : "false") << '}';
 
     const RtDiagnosticEvidence& diagnostic = snapshot.dielectric;
@@ -937,7 +998,7 @@ bool SerializeRtPerformanceEvidenceJson(const RtPerformanceEvidenceSnapshot& sna
     WriteJsonStageArray(json, snapshot.scene.stages, 2u);
     json << '}';
 
-    const bool presented = snapshot.presentation.outcome == RtPresentationOutcome::Presented;
+    const bool presented = RtPresentationSucceeded(snapshot.presentation.outcome);
     json << ",\"presentation\":{\"outcome\":\""
          << RtPresentationOutcomeName(snapshot.presentation.outcome)
          << "\",\"presented\":" << (presented ? "true" : "false")
@@ -982,7 +1043,16 @@ bool SerializeRtPerformanceEvidenceText(const RtPerformanceEvidenceSnapshot& sna
          << "Player: skin-cadence-hz=" << snapshot.scene.player.skinCadenceHz
          << " skin-updates=" << snapshot.scene.player.skinUpdateCount
          << " max-socket-error-um=" << snapshot.scene.player.maximumSocketErrorMicrometres
-         << " primary-pixels=" << snapshot.scene.player.primaryPixelCount
+         << " primary-pixels=";
+    if (snapshot.scene.player.primaryPixelCountAvailable)
+    {
+        text << snapshot.scene.player.primaryPixelCount;
+    }
+    else
+    {
+        text << "N/A";
+    }
+    text
          << " primary-visible=" << (snapshot.scene.player.primaryVisible ? "yes" : "no") << '\n'
          << "Presentation: " << RtPresentationOutcomeName(snapshot.presentation.outcome)
          << " last-successful-submission="
@@ -1222,7 +1292,7 @@ bool RtEvidenceLifecycle::BeginRecord(const std::uint32_t frameSlot,
                                       const std::uint64_t simulationTick,
                                       RtFrameToken& attempt) noexcept
 {
-    if (!initialised_ || !published_.running || published_.paused ||
+    if (!initialised_ || !published_.running ||
         diagnosticFaultLatched_ || published_.diagnosticStatus == RtSampleStatus::Error ||
         frameSlot >= activeSlotCount_ || slots_[frameSlot].phase != SlotPhase::Empty ||
         seeds_.recordAttemptSerial == std::numeric_limits<std::uint64_t>::max())
@@ -1337,7 +1407,7 @@ bool RtEvidenceLifecycle::AttachPresentation(const RtSubmittedFrameIdentity& sub
     }
     slot.presentationAttached = true;
     slot.presentation = outcome;
-    if (outcome == RtPresentationOutcome::Presented)
+    if (RtPresentationSucceeded(outcome))
     {
         lastSuccessfulPresentSubmissionSerial_ =
             std::max(lastSuccessfulPresentSubmissionSerial_, submitted.submissionSerial);
@@ -1380,6 +1450,14 @@ bool RtEvidenceLifecycle::Complete(const RtSubmittedFrameIdentity& submitted,
     candidate.scene.pipeline = slot.scene.pipeline;
     candidate.scene.resources = slot.scene.resources;
     candidate.scene.player = slot.scene.player;
+    if (diagnostic.status == RtSampleStatus::Valid)
+    {
+        candidate.scene.player.primaryPixelCountAvailable = true;
+        candidate.scene.player.primaryPixelCount =
+            diagnostic.counters[kRtPrimaryPlayerPixelCounterIndex];
+        candidate.scene.player.primaryVisible =
+            candidate.scene.player.primaryPixelCount != 0u;
+    }
     candidate.scene.dispatch = slot.scene.dispatch;
     candidate.scene.stages = stages.stages;
     candidate.dielectric = diagnostic;
@@ -1411,7 +1489,7 @@ bool RtEvidenceLifecycle::Complete(const RtSubmittedFrameIdentity& submitted,
     }
 
     ++seeds_.completionSerial;
-    if (outcome == RtPresentationOutcome::Presented)
+    if (RtPresentationSucceeded(outcome))
     {
         lastSuccessfulPresentSubmissionSerial_ =
             std::max(lastSuccessfulPresentSubmissionSerial_, submitted.submissionSerial);
@@ -1425,7 +1503,7 @@ bool RtEvidenceLifecycle::Complete(const RtSubmittedFrameIdentity& submitted,
     {
         published_.gpuStatus = gpu.status;
     }
-    published_.presented = outcome == RtPresentationOutcome::Presented;
+    published_.presented = RtPresentationSucceeded(outcome);
     published_.hasCompletedEvidence = true;
     published_.completedEvidence = candidate;
     completed = candidate;

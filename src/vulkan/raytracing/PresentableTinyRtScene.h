@@ -31,6 +31,13 @@ namespace horde::vulkan::raytracing
 
 struct PresentableTinyRtScenePreflightTestAccess;
 struct PresentableTinyRtSceneObservationTestAccess;
+struct RtDiagnosticCounterPayload;
+
+[[nodiscard]] bool TryMakeRtPipelineEvidenceIdentity(
+    const RtPipelineBundleRequest& request,
+    const RtPipelineVariantArtifact& opaqueFast,
+    const RtPipelineVariantArtifact& genericDielectric,
+    horde::telemetry::RtPipelineEvidenceIdentity& identity) noexcept;
 
 enum class WaterQuality : std::uint32_t
 {
@@ -340,6 +347,11 @@ public:
         return productionPropBlasBuildMilliseconds_;
     }
     [[nodiscard]] horde::telemetry::RtResourceInventory ResourceInventory() const noexcept;
+    [[nodiscard]] bool CollectCompletedDiagnostic(
+        RtDiagnosticCounterPayload& payload,
+        std::string& diagnostic);
+    void PublishCompletedDiagnostic(
+        const RtDiagnosticCounterPayload& payload) noexcept;
 
     bool RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                             VkImage swapchainImage,
@@ -443,6 +455,7 @@ private:
     bool CreateStaticMeshResources(std::string& diagnostic);
     bool BuildAccelerationStructures(std::string& diagnostic);
     bool CreateSelectedPipelineBundle(std::string& diagnostic);
+    [[nodiscard]] bool CapturePipelineEvidenceIdentity() noexcept;
     bool CreateBundleDescriptorSetLayout(const RtDescriptorIoContract& contract,
                                          VkDescriptorSetLayout& out,
                                          std::string& diagnostic);
@@ -625,6 +638,10 @@ private:
     HeldItemBlasMeasurements heldItemBlasMeasurements_{};
 
     RtPipelineBundle pipelineBundle_;
+    horde::telemetry::RtPipelineEvidenceIdentity pipelineEvidenceIdentity_{};
+    bool pipelineEvidenceIdentityValid_ = false;
+    horde::telemetry::RtPipelineEvidenceIdentity framePipelineEvidence_{};
+    bool framePipelineEvidenceValid_ = false;
 
     PFN_vkCreateAccelerationStructureKHR vkCreateAccelerationStructureKHR_ = nullptr;
     PFN_vkDestroyAccelerationStructureKHR vkDestroyAccelerationStructureKHR_ = nullptr;

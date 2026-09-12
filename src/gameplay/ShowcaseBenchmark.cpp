@@ -163,7 +163,9 @@ void ShowcaseBenchmarkRun::RecordFrame(const double frameTimeMs, const bool rtFr
 
 void ShowcaseBenchmarkRun::Cancel()
 {
-    if (IsRunning())
+    // The replay may complete in Advance before the final frame is presented.
+    // Its caller must still be able to cancel a recreation-interrupted result.
+    if (IsRunning() || status_ == ShowcaseBenchmarkStatus::Complete)
     {
         status_ = ShowcaseBenchmarkStatus::Cancelled;
     }

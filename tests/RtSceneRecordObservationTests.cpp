@@ -107,6 +107,25 @@ int main()
     ok &= Require(clock.readCount == 6u,
                   "only three active observed scopes should sample start and end clocks");
 
+    RtStageAccumulator entryAccumulator;
+    TestClock entryClock{{250u}, 1u, 0u};
+    RtSceneRecordObservation entryObservation{
+        &entryAccumulator, &entryClock, ReadTestClock};
+    ok &= Require(entryAccumulator.Begin(), "entry-timestamp attempt did not begin");
+    {
+        RtSceneStageScope wholeFrame(
+            &entryObservation, RtStage::WholeFrameCycle, 100u);
+        wholeFrame.Complete(1u, 0u, 1u);
+    }
+    RtStageFrameSample entryCommitted{};
+    ok &= Require(
+        entryAccumulator.Commit(entryCommitted) && entryClock.readCount == 1u &&
+            entryCommitted.values[RtStageIndex(RtStage::WholeFrameCycle)]
+                    .durationNanoseconds == 150u &&
+            entryCommitted.values[RtStageIndex(RtStage::WholeFrameCycle)]
+                    .workInvocationCount == 1u,
+        "an explicit function-entry timestamp must include setup before scope construction without a second start-clock read");
+
     RtStageAccumulator reversedAccumulator;
     TestClock reversedClock{{100u, 90u}, 2u, 0u};
     RtSceneRecordObservation reversedObservation{

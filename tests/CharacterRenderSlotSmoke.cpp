@@ -13,6 +13,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <thread>
 
 namespace
@@ -84,6 +85,18 @@ std::string ReadTextFile(const std::filesystem::path& path)
         ++position;
     }
     return normalized;
+}
+
+std::size_t CountOccurrences(const std::string& text, const std::string_view needle)
+{
+    std::size_t count = 0u;
+    std::size_t position = 0u;
+    while ((position = text.find(needle, position)) != std::string::npos)
+    {
+        ++count;
+        position += needle.size();
+    }
+    return count;
 }
 
 } // namespace
@@ -893,10 +906,10 @@ int main()
                       raygenSource.find("vec3 lightTransmittance = sceneShadowTransmittanceMask(") !=
                           std::string::npos,
                       "fixture-hidden lighting must retain released scalar arithmetic from the shared ordered query while active generic transmission uses RGB traversal");
-        ok &= Require(sceneSource.find("secondaryDielectricRejectCount") != std::string::npos &&
-                      sceneSource.find("unclosedVolumeCount") != std::string::npos &&
-                      sceneSource.find("primaryUnclosedVolumeCount") != std::string::npos &&
-                      sceneSource.find("shadowUnclosedVolumeCount") != std::string::npos &&
+        ok &= Require(sceneSource.find("dielectricSecondaryRejectCount_") != std::string::npos &&
+                      sceneSource.find("dielectricUnclosedVolumeCount_") != std::string::npos &&
+                      sceneSource.find("dielectricPrimaryUnclosedVolumeCount_") != std::string::npos &&
+                      sceneSource.find("dielectricShadowUnclosedVolumeCount_") != std::string::npos &&
                       sceneSource.find("productionPaneStackFailureCount") != std::string::npos &&
                       sceneSource.find("productionPaneSecondaryOriginCount") != std::string::npos &&
                       sceneSource.find("productionPaneSecondaryTerminalCount") != std::string::npos &&
@@ -1139,6 +1152,118 @@ int main()
                       androidBridgeSource.find("SynchronizeLifecyclePauseOnOwnerThread") != std::string::npos &&
                       androidBridgeSource.find("gLifecycleUnpausePending") != std::string::npos,
                       "Android resume must defer unpause until the owner synchronizes all paused command sequences");
+        const std::size_t windowsMeasurementPauseBegin =
+            windowsSource.find("bool MeasurementPausedByUi(");
+        const std::size_t windowsMeasurementPauseEnd =
+            windowsSource.find("void ApplyOverlayState(", windowsMeasurementPauseBegin);
+        const std::string windowsMeasurementPause =
+            windowsMeasurementPauseBegin != std::string::npos &&
+                    windowsMeasurementPauseEnd != std::string::npos
+                ? windowsSource.substr(
+                    windowsMeasurementPauseBegin,
+                    windowsMeasurementPauseEnd - windowsMeasurementPauseBegin)
+                : std::string{};
+        ok &= Require(!windowsMeasurementPause.empty() &&
+                      windowsMeasurementPause.find("pauseMenuVisible") != std::string::npos &&
+                      windowsMeasurementPause.find("settingsVisible") != std::string::npos &&
+                      windowsMeasurementPause.find("diagnosticsVisible") != std::string::npos &&
+                      windowsMeasurementPause.find("rtLabVisible") != std::string::npos &&
+                      windowsMeasurementPause.find("simulationInput.paused") == std::string::npos &&
+                      windowsMeasurementPause.find("developmentCheckpoint") == std::string::npos &&
+                      windowsSource.find(
+                          "rtFrameEvidence.SetPaused(context.simulationPaused)") !=
+                          std::string::npos,
+                      "Windows measurement pause must follow consolidated UI overlays, not authored capture freeze");
+        const std::size_t androidPauseSyncBegin =
+            androidBridgeSource.find("bool SynchronizeLifecyclePauseOnOwnerThread(");
+        const std::size_t androidPauseSyncEnd =
+            androidBridgeSource.find("void ClearPlatformGameplayEvents(", androidPauseSyncBegin);
+        const std::string androidPauseSync =
+            androidPauseSyncBegin != std::string::npos &&
+                    androidPauseSyncEnd != std::string::npos
+                ? androidBridgeSource.substr(
+                    androidPauseSyncBegin,
+                    androidPauseSyncEnd - androidPauseSyncBegin)
+                : std::string{};
+        const std::size_t androidCaptureBegin =
+            androidBridgeSource.find("void ApplyCaptureCheckpoint(");
+        const std::size_t androidCaptureEnd =
+            androidBridgeSource.find("void ApplyRouteReplay(", androidCaptureBegin);
+        const std::string androidCapture =
+            androidCaptureBegin != std::string::npos && androidCaptureEnd != std::string::npos
+                ? androidBridgeSource.substr(
+                    androidCaptureBegin, androidCaptureEnd - androidCaptureBegin)
+                : std::string{};
+        ok &= Require(!androidPauseSync.empty() &&
+                      androidPauseSync.find("gLifecycleMeasurementPaused") != std::string::npos &&
+                      androidBridgeSource.find(
+                          "rtFrameEvidence.SetPaused(measurementPaused)") !=
+                          std::string::npos &&
+                      androidBridgeSource.find(
+                          "seeds.sceneEpoch = 1u;") != std::string::npos &&
+                      androidBridgeSource.find(
+                          "seeds.measurementGeneration = 1u;") != std::string::npos &&
+                      androidBridgeSource.find(
+                          "PreserveRtEvidenceSeeds(context.rtFrameEvidence.SeedsByValue())") !=
+                          std::string::npos &&
+                      !androidCapture.empty() &&
+                      androidCapture.find("RtLifecycleEvent::CheckpointChange") !=
+                          std::string::npos &&
+                      androidCapture.find("SetPaused") == std::string::npos,
+                      "Android measurement pause must publish only after owner acknowledgement, exclude frozen captures, and preserve a valid monotonic evidence seed floor");
+        ok &= Require(
+                      CountOccurrences(
+                          androidBridgeSource,
+                          "horde::telemetry::RtStage::SimulationStep") == 7u &&
+                      CountOccurrences(
+                          windowsSource,
+                          "horde::telemetry::RtStage::SimulationStep") == 1u,
+                      "every in-frame StepFixed/AdvanceFrame path must have exactly one simulation-step scope");
+        const auto resourceResetOrdered = [](const std::string& source,
+                                             const std::string_view beginMarker,
+                                             const std::string_view endMarker) {
+            const std::size_t begin = source.find(beginMarker);
+            const std::size_t end = source.find(endMarker, begin);
+            if (begin == std::string::npos || end == std::string::npos)
+            {
+                return false;
+            }
+            const std::string_view body(source.data() + begin, end - begin);
+            const std::size_t complete = body.find(
+                "CompleteRtEvidenceAfterDeviceIdle");
+            const std::size_t recreate = body.find(
+                "rtFrameEvidence.Recreate", complete);
+            const std::size_t timerReset = body.find(
+                "gpuFrameTimer.ResetAfterDeviceIdle", recreate);
+            const std::size_t sceneDestroy = body.find(
+                "rtScene.Destroy", timerReset);
+            return complete != std::string_view::npos &&
+                   recreate != std::string_view::npos &&
+                   timerReset != std::string_view::npos &&
+                   sceneDestroy != std::string_view::npos &&
+                   complete < recreate && recreate < timerReset &&
+                   timerReset < sceneDestroy;
+        };
+        ok &= Require(
+                      resourceResetOrdered(
+                          windowsSource,
+                          "bool ReleaseSwapchainResources(",
+                          "VkExtent2D ScaledRenderExtent(") &&
+                      resourceResetOrdered(
+                          androidBridgeSource,
+                          "bool ReleaseSwapchainResources(",
+                          "void RefreshGpuTimingTelemetry("),
+                      "both swapchain integrations must complete owned work, invalidate the epoch, then reset timer/scene resources");
+        ok &= Require(
+                      resourceResetOrdered(
+                          windowsSource,
+                          "if (context.renderScaleDirty && context.useRtPath)",
+                          "const bool benchmarkFrame = context.benchmark.IsRunning();") &&
+                      resourceResetOrdered(
+                          androidBridgeSource,
+                          "if (gSwapchainContext.useRtPath && std::abs(requestedRenderScale",
+                          "const auto frameStart = std::chrono::steady_clock::now();"),
+                      "both render-scale paths must complete owned work, invalidate the epoch, then reset timer/scene resources");
         ok &= Require(pendulumSource.find("torsionAngularAcceleration") != std::string::npos &&
                       pendulumSource.find("SignedYawDelta") != std::string::npos &&
                       pendulumSource.find("kHandBasisTeleportRadians") != std::string::npos &&

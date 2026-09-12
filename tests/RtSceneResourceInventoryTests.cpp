@@ -1,4 +1,5 @@
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
+#include "vulkan/raytracing/RtFrameEvidenceCoordinator.h"
 #include "vulkan/raytracing/RtSceneRecordObservation.h"
 
 #include <algorithm>
@@ -43,6 +44,35 @@ bool Require(const bool condition, const std::string_view message)
 struct NoWorkClock
 {
     std::size_t reads = 0u;
+};
+
+enum class ExecutedRtCommand : std::uint8_t
+{
+    HostWriteBarrier,
+    PlayerBlas,
+    SkeletonBlas0,
+    SkeletonBlas1,
+    LichBlas,
+    BlasToTlasBarrier,
+    TlasUpdate,
+    TlasToTraceBarrier,
+    Trace,
+    CopyOrBlit,
+};
+
+struct RtCommandExecutionLog
+{
+    std::array<ExecutedRtCommand, 10u> commands{};
+    std::size_t count = 0u;
+    bool observationsFollowCommands = true;
+
+    void Push(const ExecutedRtCommand command)
+    {
+        if (count < commands.size())
+        {
+            commands[count++] = command;
+        }
+    }
 };
 
 std::uint64_t ReadNoWorkClock(void* user) noexcept
@@ -174,6 +204,145 @@ int main()
     using namespace horde::vulkan::raytracing;
 
     bool ok = true;
+    RtPipelineBundlePreflight selectedPreflight{};
+    std::string preflightFailure;
+    ok &= Require(ResolveCompiledRtPipelineBundlePreflight(
+                      selectedPreflight, preflightFailure),
+                  "compiled pair must resolve for immutable evidence identity fixture");
+    horde::telemetry::RtPipelineEvidenceIdentity fixedPairIdentity{};
+    ok &= Require(TryMakeRtPipelineEvidenceIdentity(
+                      selectedPreflight.request,
+                      selectedPreflight.strategies[0],
+                      selectedPreflight.strategies[1],
+                      fixedPairIdentity) &&
+                      !horde::telemetry::RtFixedTextView(
+                           fixedPairIdentity.bundleKey).empty() &&
+                      horde::telemetry::RtFixedTextView(
+                           fixedPairIdentity.opaqueFast.key) ==
+                          selectedPreflight.strategies[0].canonicalKey &&
+                      horde::telemetry::RtFixedTextView(
+                           fixedPairIdentity.genericDielectric.key) ==
+                          selectedPreflight.strategies[1].canonicalKey,
+                  "fixed pair identity must retain both exact selected artifacts without truncation");
+    const std::string oversizedKey(96u, 'x');
+    RtPipelineVariantArtifact oversizedArtifact = selectedPreflight.strategies[0];
+    oversizedArtifact.canonicalKey = oversizedKey;
+    horde::telemetry::RtPipelineEvidenceIdentity rejectedIdentity{};
+    ok &= Require(!TryMakeRtPipelineEvidenceIdentity(
+                      selectedPreflight.request,
+                      oversizedArtifact,
+                      selectedPreflight.strategies[1],
+                      rejectedIdentity) &&
+                      horde::telemetry::RtFixedTextView(
+                          rejectedIdentity.bundleKey).empty(),
+                  "identity construction must reject rather than truncate an oversized key");
+    const auto executeFixedCommands = [](
+        RtSceneRecordObservation& observation,
+        RtCommandExecutionLog& execution,
+        const std::array<bool, 4u>& dynamicBlasWork) {
+        ExecuteObservedRtSceneCommand(
+            &observation, RtSceneCommandEvent::HostWriteBarrier,
+            [&execution]() { execution.Push(ExecutedRtCommand::HostWriteBarrier); });
+        std::uint64_t completedBlasCommands = 0u;
+        const std::uint64_t blasCount = ExecuteObservedDynamicBlasCommands(
+            &observation, dynamicBlasWork,
+            [&observation, &execution, &completedBlasCommands](const std::size_t index) {
+                static constexpr std::array<ExecutedRtCommand, 4u> commands{{
+                    ExecutedRtCommand::PlayerBlas,
+                    ExecutedRtCommand::SkeletonBlas0,
+                    ExecutedRtCommand::SkeletonBlas1,
+                    ExecutedRtCommand::LichBlas,
+                }};
+                execution.observationsFollowCommands =
+                    execution.observationsFollowCommands &&
+                    observation.commands->BlasUpdateCount() == completedBlasCommands;
+                execution.Push(commands[index]);
+                ++completedBlasCommands;
+            },
+            [&execution]() {
+                execution.Push(ExecutedRtCommand::BlasToTlasBarrier);
+            });
+        ExecuteObservedTlasUpdateCommands(
+            &observation,
+            [&observation, &execution]() {
+                execution.observationsFollowCommands =
+                    execution.observationsFollowCommands &&
+                    observation.commands->TlasUpdateCount() == 0u;
+                execution.Push(ExecutedRtCommand::TlasUpdate);
+            },
+            [&observation, &execution]() {
+                execution.observationsFollowCommands =
+                    execution.observationsFollowCommands &&
+                    observation.commands->TlasUpdateCount() == 1u;
+                execution.Push(ExecutedRtCommand::TlasToTraceBarrier);
+            });
+        ExecuteObservedTraceCopyCommands(
+            &observation,
+            [&observation, &execution]() {
+                execution.observationsFollowCommands =
+                    execution.observationsFollowCommands &&
+                    observation.commands->TraceCount() == 0u;
+                execution.Push(ExecutedRtCommand::Trace);
+            },
+            [&observation, &execution]() {
+                execution.observationsFollowCommands =
+                    execution.observationsFollowCommands &&
+                    observation.commands->TraceCount() == 1u &&
+                    observation.commands->CopyCount() == 0u;
+                execution.Push(ExecutedRtCommand::CopyOrBlit);
+            });
+        return blasCount;
+    };
+
+    RtSceneCommandObservation zeroBlasCommands{};
+    RtSceneRecordObservation zeroBlasObservation{};
+    zeroBlasObservation.commands = &zeroBlasCommands;
+    RtCommandExecutionLog zeroBlasExecution{};
+    const std::uint64_t zeroBlasCount = executeFixedCommands(
+        zeroBlasObservation, zeroBlasExecution, {false, false, false, false});
+    constexpr std::array<ExecutedRtCommand, 5u> expectedZeroBlas{{
+        ExecutedRtCommand::HostWriteBarrier,
+        ExecutedRtCommand::TlasUpdate,
+        ExecutedRtCommand::TlasToTraceBarrier,
+        ExecutedRtCommand::Trace,
+        ExecutedRtCommand::CopyOrBlit,
+    }};
+    ok &= Require(zeroBlasObservation.healthy && zeroBlasCommands.ValidCompleted() &&
+                      zeroBlasCount == 0u && zeroBlasCommands.BlasUpdateCount() == 0u &&
+                      zeroBlasExecution.observationsFollowCommands &&
+                      zeroBlasExecution.count == expectedZeroBlas.size() &&
+                      std::equal(expectedZeroBlas.begin(), expectedZeroBlas.end(),
+                                 zeroBlasExecution.commands.begin()),
+                  "production command routing must execute no BLAS work/barrier for a zero-work frame");
+
+    RtSceneCommandObservation fourBlasCommands{};
+    RtSceneRecordObservation fourBlasObservation{};
+    fourBlasObservation.commands = &fourBlasCommands;
+    RtCommandExecutionLog fourBlasExecution{};
+    const std::uint64_t fourBlasCount = executeFixedCommands(
+        fourBlasObservation, fourBlasExecution, {true, true, true, true});
+    constexpr std::array<ExecutedRtCommand, 10u> expectedFourBlas{{
+        ExecutedRtCommand::HostWriteBarrier,
+        ExecutedRtCommand::PlayerBlas,
+        ExecutedRtCommand::SkeletonBlas0,
+        ExecutedRtCommand::SkeletonBlas1,
+        ExecutedRtCommand::LichBlas,
+        ExecutedRtCommand::BlasToTlasBarrier,
+        ExecutedRtCommand::TlasUpdate,
+        ExecutedRtCommand::TlasToTraceBarrier,
+        ExecutedRtCommand::Trace,
+        ExecutedRtCommand::CopyOrBlit,
+    }};
+    ok &= Require(fourBlasObservation.healthy && fourBlasCommands.ValidCompleted() &&
+                      fourBlasCount == 4u && fourBlasCommands.BlasUpdateCount() == 4u &&
+                      fourBlasCommands.TlasUpdateCount() == 1u &&
+                      fourBlasCommands.TraceCount() == 1u &&
+                      fourBlasCommands.CopyCount() == 1u &&
+                      fourBlasExecution.observationsFollowCommands &&
+                      fourBlasExecution.count == expectedFourBlas.size() &&
+                      fourBlasExecution.commands == expectedFourBlas,
+                  "production command routing must execute and observe each BLAS, one dependency barrier, TLAS, trace, and copy in order");
+
     const std::string sceneSource = ReadCompactSource(
         std::filesystem::path(HORDE_RT_SOURCE_DIR) /
         "src/vulkan/raytracing/PresentableTinyRtScene.cpp");
@@ -183,9 +352,19 @@ int main()
     ok &= Require(
         sceneSource.find(std::string(diagnosticResetPrefix) + ",observation") ==
             std::string::npos &&
-            sceneSource.find(std::string(diagnosticResetPrefix) + ")))") !=
+            sceneSource.find(std::string(diagnosticResetPrefix) + "))") !=
                 std::string::npos,
         "Diagnostic reset must not change the observed DynamicUpload set");
+    const std::size_t updateStart = sceneSource.find(
+        "boolPresentableTinyRtScene::UpdateDynamicInstances(");
+    const std::size_t recordStart = sceneSource.find(
+        "boolPresentableTinyRtScene::RecordTraceAndCopy(");
+    ok &= Require(updateStart != std::string::npos &&
+                      recordStart > updateStart &&
+                      sceneSource.substr(updateStart, recordStart - updateStart).find(
+                          "ReadBuffer(pipelineBundle_.diagnosticBuffer") ==
+                          std::string::npos,
+                  "dynamic recording must not read the prior Diagnostic submission");
 
     PresentableTinyRtScene notReadyScene;
     horde::telemetry::RtStageAccumulator notReadyStages;
@@ -207,6 +386,16 @@ int main()
 
     PresentableTinyRtScene scene;
     PresentableTinyRtSceneObservationTestAccess::Populate(scene);
+    RtDiagnosticCounterPayload completedDiagnostic{};
+    for (std::size_t index = 0u; index < completedDiagnostic.counters.size(); ++index)
+    {
+        completedDiagnostic.counters[index] = static_cast<std::uint32_t>(index + 1u);
+    }
+    scene.PublishCompletedDiagnostic(completedDiagnostic);
+    ok &= Require(scene.DielectricTransportOverflowCount() == 1u &&
+                      scene.PrimaryPlayerPixelCount() == 39u &&
+                      scene.PrimaryRewardBodyPixelCount() == 41u,
+                  "legacy getters must project one explicitly published completed record");
     const auto diagnostic = scene.ResourceInventory();
     ok &= Require(diagnostic.bufferCount == 41u &&
                       diagnostic.memoryAllocationCount == 51u &&

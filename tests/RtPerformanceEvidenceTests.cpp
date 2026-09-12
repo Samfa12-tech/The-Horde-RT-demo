@@ -318,8 +318,9 @@ RtSceneFrameEvidence MakeSceneEvidence(TestContext& context,
     evidence.player.skinCadenceHz = 60u;
     evidence.player.skinUpdateCount = durationSentinel;
     evidence.player.maximumSocketErrorMicrometres = durationSentinel + 10u;
+    evidence.player.primaryPixelCountAvailable = true;
     evidence.player.primaryPixelCount = static_cast<std::uint32_t>(sentinel);
-    evidence.player.primaryVisible = sentinel == 'c';
+    evidence.player.primaryVisible = evidence.player.primaryPixelCount != 0u;
     evidence.stages = MakeStageFrame(durationSentinel);
     evidence.dispatch.sceneReady = true;
     evidence.dispatch.rtDispatchRecorded = true;
@@ -333,6 +334,9 @@ RtRecordedSceneEvidence MakeRecordedScene(const RtSceneFrameEvidence& evidence)
     recorded.pipeline = evidence.pipeline;
     recorded.resources = evidence.resources;
     recorded.player = evidence.player;
+    recorded.player.primaryPixelCountAvailable = false;
+    recorded.player.primaryPixelCount = 0u;
+    recorded.player.primaryVisible = false;
     recorded.dispatch = evidence.dispatch;
     return recorded;
 }
@@ -419,6 +423,15 @@ RtPerformanceEvidenceSnapshot MakeSnapshot(TestContext& context,
     snapshot.dielectric = instrumentation == RtInstrumentationMode::Shipping
         ? MakeDiagnostic(instrumentation, RtSampleStatus::CompiledOut, 0u, 0u)
         : MakeDiagnostic(instrumentation, RtSampleStatus::Valid, 1u, 1u);
+    snapshot.scene.player.primaryPixelCountAvailable =
+        snapshot.dielectric.status == RtSampleStatus::Valid;
+    snapshot.scene.player.primaryPixelCount =
+        snapshot.scene.player.primaryPixelCountAvailable
+            ? snapshot.dielectric.counters[kRtPrimaryPlayerPixelCounterIndex]
+            : 0u;
+    snapshot.scene.player.primaryVisible =
+        snapshot.scene.player.primaryPixelCountAvailable &&
+        snapshot.scene.player.primaryPixelCount != 0u;
     snapshot.gpu = MakeGpu(gpuStatus,
                            gpuStatus == RtSampleStatus::Valid || gpuStatus == RtSampleStatus::Error
                                ? 1u
@@ -566,12 +579,49 @@ void TestStageAccumulatorAndConversion(TestContext& context)
                       aggregates.values[RtStageIndex(RtStage::SimulationStep)].maxNanoseconds == 300u,
                   "stage aggregate latest/sum/max must be exact");
 
+    context.Check(accumulator.Begin(),
+                  "mid-frame generation fixture must begin with historical aggregates");
+    context.Check(accumulator.Accumulate(RtStage::FrameFenceWait, 17u, 1u, 0u, 1u) &&
+                      accumulator.Accumulate(RtStage::ImageAcquire, 23u, 1u, 0u, 1u),
+                  "mid-frame generation fixture must retain already-observed host intervals");
+    context.Check(!accumulator.ResetAggregates(),
+                  "ordinary aggregate reset must keep rejecting active scratch");
+    context.Check(accumulator.ResetAggregatesPreservingActive(),
+                  "owned generation reset must clear history without discarding active scratch");
+    RtStageFrameSample firstNewGeneration{};
+    context.Check(accumulator.Commit(firstNewGeneration) &&
+                      firstNewGeneration.values[RtStageIndex(RtStage::FrameFenceWait)]
+                              .durationNanoseconds == 17u &&
+                      firstNewGeneration.values[RtStageIndex(RtStage::ImageAcquire)]
+                              .durationNanoseconds == 23u,
+                  "the first new-generation sample must retain pre-event fence/acquire intervals");
+    const RtStageAggregateSet newGenerationAggregates = accumulator.AggregatesByValue();
+    context.Check(newGenerationAggregates.values[RtStageIndex(RtStage::FrameFenceWait)]
+                              .sampleCount == 1u &&
+                      newGenerationAggregates.values[RtStageIndex(RtStage::FrameFenceWait)]
+                              .sumNanoseconds == 17u &&
+                      newGenerationAggregates.values[RtStageIndex(RtStage::ImageAcquire)]
+                              .sampleCount == 1u &&
+                      newGenerationAggregates.values[RtStageIndex(RtStage::ImageAcquire)]
+                              .sumNanoseconds == 23u,
+                  "owned active reset must remove old history and commit current scratch as sample one");
+    context.Check(accumulator.Begin() &&
+                      accumulator.Accumulate(RtStage::FrameFenceWait, 999u, 1u, 0u, 1u) &&
+                      accumulator.Abort(),
+                  "a subsequent unhealthy observer attempt must remain abortable");
+    const RtStageAggregateSet afterNewGenerationAbort = accumulator.AggregatesByValue();
+    context.Check(std::memcmp(&newGenerationAggregates,
+                              &afterNewGenerationAbort,
+                              sizeof(newGenerationAggregates)) == 0,
+                  "a subsequent aborted observer attempt must not commit invalid scratch");
+
     context.Check(accumulator.Begin(), "a new attempt must begin after commit");
     context.Check(accumulator.Accumulate(RtStage::TraceCopyRecord, 999u, 1u, 0u, 1u),
                   "aborted attempt may collect scratch");
     context.Check(accumulator.Abort(), "active attempt must abort");
     const RtStageAggregateSet afterAbort = accumulator.AggregatesByValue();
-    context.Check(std::memcmp(&aggregates, &afterAbort, sizeof(aggregates)) == 0,
+    context.Check(std::memcmp(&newGenerationAggregates, &afterAbort,
+                              sizeof(newGenerationAggregates)) == 0,
                   "abort must discard scratch without changing aggregates");
     context.Check(accumulator.ResetAggregates(),
                   "idle accumulator must reset its lifetime aggregates");
@@ -791,14 +841,16 @@ void TestLifecycleAssociationAndTransactions(TestContext& context)
                       completedA.scene.pipeline.activeStrategy == RtMaterialStrategy::OpaqueFast &&
                       completedA.scene.resources.bufferCount == static_cast<std::uint32_t>('a') &&
                       completedA.scene.player.skinUpdateCount == 1'000u &&
-                      !completedA.scene.player.primaryVisible &&
+                      completedA.scene.player.primaryPixelCountAvailable &&
+                      completedA.scene.player.primaryPixelCount == 39u &&
+                      completedA.scene.player.primaryVisible &&
                       completedA.scene.stages.values[0].durationNanoseconds == 1'000u &&
                       completedA.dielectric.counters[0] == 1u &&
                       completedA.gpu.durationNanoseconds == 11'000'000u,
                   "completed A must contain only A identity, scene, diagnostic and GPU sentinels");
     context.Check(completedA.scene.pipeline.activeStrategy != sceneB.pipeline.activeStrategy &&
                       completedA.scene.resources.bufferCount != sceneB.resources.bufferCount &&
-                      completedA.scene.player.primaryVisible != sceneB.player.primaryVisible &&
+                      completedA.scene.player.primaryPixelCount != sceneB.player.primaryPixelCount &&
                       completedA.scene.stages.values[0].durationNanoseconds !=
                           sceneB.stages.values[0].durationNanoseconds,
                   "record B sentinels must not leak into completed A");
@@ -961,9 +1013,31 @@ void TestLifecycleResetTableAndExhaustion(TestContext& context)
                       !effects.collectorCleared && !effects.nextSampleEligible &&
                       lifecycle.PublishedStateByValue().paused,
                   "pause must retain identities and suspend sample eligibility");
-    RtFrameToken rejectedWhilePaused{};
-    context.Check(!lifecycle.BeginRecord(0u, 2u, rejectedWhilePaused),
-                  "paused lifecycle must not begin a measured render attempt");
+    RtFrameToken pausedAttempt{};
+    RtFrameToken pausedRecord{};
+    RtSubmittedFrameIdentity pausedSubmit{};
+    RtPerformanceEvidenceSnapshot pausedEvidence{};
+    context.Check(lifecycle.BeginRecord(0u, 2u, pausedAttempt) &&
+                      lifecycle.FinishRecord(
+                          pausedAttempt, MakeRecordedScene(shippingScene), pausedRecord) &&
+                      lifecycle.Submit(pausedRecord, pausedSubmit) &&
+                      lifecycle.AttachPresentation(
+                          pausedSubmit, RtPresentationOutcome::Presented) &&
+                      lifecycle.CompleteFence(
+                          pausedSubmit,
+                          MakeSubmittedStages(pausedSubmit, shippingScene.stages),
+                          MakeDiagnostic(RtInstrumentationMode::Shipping,
+                                         RtSampleStatus::CompiledOut,
+                                         0u,
+                                         0u),
+                          MakeGpu(RtSampleStatus::Disabled, 0u, 0u),
+                          pausedEvidence),
+                  "paused RT rendering must retain submission/completion identity");
+    context.Check(!pausedEvidence.benchmarkEligible &&
+                      pausedEvidence.presentation.outcome == RtPresentationOutcome::Presented &&
+                      pausedEvidence.identity.submitted.frame.measurementGeneration ==
+                          expectedGeneration,
+                  "paused RT completion must remain presented but benchmark-ineligible");
     context.Check(lifecycle.ApplyEvent(RtLifecycleEvent::Resume, effects), "resume must succeed");
     ++expectedGeneration;
     context.Check(effects.measurementGenerationChanged && effects.collectorCleared &&
@@ -1088,6 +1162,19 @@ void TestLifecycleResetTableAndExhaustion(TestContext& context)
                                         effects) &&
                       SameBytes(beforeExhausted, exhausted),
                   "epoch exhaustion must fail closed without wrapping or mutation");
+
+    RtEvidenceLifecycle initialGpuError;
+    exhaustedSeeds = {};
+    exhaustedSeeds.sceneEpoch = 1u;
+    exhaustedSeeds.measurementGeneration = 1u;
+    context.Check(initialGpuError.Initialise(exhaustedSeeds,
+                                             1u,
+                                             RtSampleStatus::CompiledOut,
+                                             RtSampleStatus::Error,
+                                             effects) &&
+                      initialGpuError.PublishedStateByValue().gpuStatus ==
+                          RtSampleStatus::Error,
+                  "optional query-pool setup failure must initialise as honest GPU Error");
 
     RtEvidenceLifecycle attemptExhausted;
     exhaustedSeeds.sceneEpoch = 1u;
@@ -1628,7 +1715,8 @@ void TestValidatorAndSerializers(TestContext& context)
         "\"tlasInstanceCount\":20,\"pipelineCount\":2,\"shaderBindingTableCount\":2,"
         "\"descriptorSetCount\":1,\"hostVisibleBytes\":4096,\"deviceLocalBytes\":8192},"
         "\"player\":{\"skinCadenceHz\":60,\"skinUpdateCount\":0,"
-        "\"maximumSocketErrorMicrometres\":10,\"primaryPixelCount\":97,"
+        "\"maximumSocketErrorMicrometres\":10,\"primaryPixelCountAvailable\":false,"
+        "\"primaryPixelCount\":null,"
         "\"primaryVisible\":false},"
         "\"dielectric\":{\"status\":\"compiled-out\",\"available\":false,\"compiled\":false,"
         "\"completedSubmissionSerial\":0,\"readCount\":0,\"resetCount\":0,\"counters\":null,"
@@ -1663,7 +1751,7 @@ void TestValidatorAndSerializers(TestContext& context)
         "RT PERFORMANCE EVIDENCE schema=1\n"
         "Frame: epoch=11 generation=20 attempt=1 record=1 submission=1 completion=1 tick=101 slot=0\n"
         "Pipeline: shipping/high pair=shipping_high_pair active=opaque-fast opaque_fast@aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n"
-        "Player: skin-cadence-hz=60 skin-updates=0 max-socket-error-um=10 primary-pixels=97 primary-visible=no\n"
+        "Player: skin-cadence-hz=60 skin-updates=0 max-socket-error-um=10 primary-pixels=N/A primary-visible=no\n"
         "Presentation: presented last-successful-submission=1 final-idle=no benchmark-eligible=yes\n"
         "Dielectric diagnostics: compiled-out counters=N/A reads=0 resets=0\n"
         "Whole RT GPU: disabled value=N/A\n"
@@ -1682,6 +1770,9 @@ void TestValidatorAndSerializers(TestContext& context)
                   "valid Diagnostic evidence must serialize");
     context.Check(diagnosticJson.find("\"status\":\"valid\",\"available\":true,"
                                       "\"compiled\":true") != std::string::npos &&
+                      diagnosticJson.find("\"primaryPixelCountAvailable\":true,"
+                                          "\"primaryPixelCount\":39,"
+                                          "\"primaryVisible\":true") != std::string::npos &&
                       diagnosticJson.find("\"counters\":[1,2,3,4,5,6,7,8,9,10,11,12,13,"
                                           "14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,"
                                           "30,31,32,33,34,35,36,37,38,39,40,41]") !=
@@ -1716,6 +1807,17 @@ void TestValidatorAndSerializers(TestContext& context)
                           "\"workInvocationCounts\":[null,null,null,null,null") !=
                           std::string::npos,
                   "non-Valid stage durations and counts must serialize as numeric nulls");
+
+    RtPerformanceEvidenceSnapshot reversedClockStages = shipping;
+    reversedClockStages.scene.stages = {};
+    reversedClockStages.scene.stages.status = RtSampleStatus::Error;
+    reversedClockStages.benchmarkEligible = false;
+    std::string reversedClockJson;
+    context.Check(SerializeRtPerformanceEvidenceJson(
+                      reversedClockStages, reversedClockJson, error) &&
+                      reversedClockJson.find("\"traceCopyRecordCpuMs\":null") !=
+                          std::string::npos,
+                  "observer failure must permit zero-backed Error/null stages without false overflow");
 
     RtPerformanceEvidenceSnapshot invalidMeasured = diagnostic;
     invalidMeasured.dielectric.readCount = 0u;
@@ -1812,7 +1914,18 @@ void TestValidatorAndSerializers(TestContext& context)
     invalid = shipping;
     invalid.scene.dispatch.rtDispatchRecorded = false;
     context.Check(!ValidateRtPerformanceEvidence(invalid, error),
-                  "submitted evidence without the native RT dispatch must be rejected");
+                   "submitted evidence without the native RT dispatch must be rejected");
+    invalid = shipping;
+    invalid.scene.player.primaryPixelCount = 1u;
+    context.Check(!ValidateRtPerformanceEvidence(invalid, error) &&
+                      error == RtEvidenceValidationError::NonValidNumericSample,
+                  "unavailable Shipping player pixels must reject a numeric backing value");
+    invalid = MakeSnapshot(
+        context, RtInstrumentationMode::Diagnostic, RtSampleStatus::Disabled);
+    invalid.scene.player.primaryPixelCount = 40u;
+    context.Check(!ValidateRtPerformanceEvidence(invalid, error) &&
+                      error == RtEvidenceValidationError::InconsistentIdentity,
+                  "completed player pixels must exactly match their owning Diagnostic record");
     invalid = shipping;
     invalid.presentation.outcome = RtPresentationOutcome::NotAttempted;
     invalid.benchmarkEligible = false;
@@ -1826,6 +1939,9 @@ void TestValidatorAndSerializers(TestContext& context)
         RtSampleStatus::Error,
         diagnosticError.identity.submitted.submissionSerial,
         0u);
+    diagnosticError.scene.player.primaryPixelCountAvailable = false;
+    diagnosticError.scene.player.primaryPixelCount = 0u;
+    diagnosticError.scene.player.primaryVisible = false;
     diagnosticError.benchmarkEligible = false;
     std::string diagnosticErrorJson;
     context.Check(ValidateRtPerformanceEvidence(diagnosticError, error) &&

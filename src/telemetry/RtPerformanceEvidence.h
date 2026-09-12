@@ -11,6 +11,7 @@ namespace horde::telemetry
 
 inline constexpr std::uint32_t kRtPerformanceEvidenceSchema = 1u;
 inline constexpr std::size_t kRtDielectricCounterCount = 41u;
+inline constexpr std::size_t kRtPrimaryPlayerPixelCounterIndex = 38u;
 inline constexpr std::size_t kRtMaximumFrameSlots = 4u;
 inline constexpr std::size_t kRtEvidenceSampleCapacity = 128u;
 
@@ -73,7 +74,14 @@ enum class RtPresentationOutcome : std::uint8_t
     NotPresentedNeedsRecreate,
     Failed,
     NotAttempted,
+    PresentedNeedsRecreate,
 };
+
+[[nodiscard]] constexpr bool RtPresentationSucceeded(const RtPresentationOutcome outcome) noexcept
+{
+    return outcome == RtPresentationOutcome::Presented ||
+           outcome == RtPresentationOutcome::PresentedNeedsRecreate;
+}
 
 enum class RtInstrumentationMode : std::uint8_t
 {
@@ -171,6 +179,7 @@ struct RtPlayerDiagnostics
     std::uint32_t skinCadenceHz = 0u;
     std::uint64_t skinUpdateCount = 0u;
     std::uint64_t maximumSocketErrorMicrometres = 0u;
+    bool primaryPixelCountAvailable = false;
     std::uint32_t primaryPixelCount = 0u;
     bool primaryVisible = false;
 };
@@ -258,6 +267,10 @@ public:
     [[nodiscard]] bool Commit(RtStageFrameSample& output) noexcept;
     [[nodiscard]] bool Abort() noexcept;
     [[nodiscard]] bool ResetAggregates() noexcept;
+    // Retain active frame scratch while clearing lifetime aggregate history.
+    // The owning coordinator uses this at an immediate generation boundary,
+    // before committing the current frame as sample one of the new generation.
+    [[nodiscard]] bool ResetAggregatesPreservingActive() noexcept;
     [[nodiscard]] RtStageAggregateSet AggregatesByValue() const noexcept { return aggregates_; }
     [[nodiscard]] bool Active() const noexcept { return active_; }
 

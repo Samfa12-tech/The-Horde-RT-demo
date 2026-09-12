@@ -5,6 +5,7 @@
 #include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/items/HeldLightState.h"
 #include "vulkan/raytracing/HeldItemRenderSlot.h"
+#include "vulkan/raytracing/RtFrameEvidenceCoordinator.h"
 #include "vulkan/raytracing/RtSceneRecordObservation.h"
 #include "vulkan/raytracing/RtSceneRouteConstants.h"
 
@@ -16,6 +17,7 @@
 #include <cstring>
 #include <filesystem>
 #include <fstream>
+#include <limits>
 #include <optional>
 #include <span>
 #include <utility>
@@ -34,6 +36,45 @@ namespace
 {
 
 constexpr VkFormat kStorageImageFormat = VK_FORMAT_R8G8B8A8_UNORM;
+
+bool ValidEvidenceHash(const std::string_view hash) noexcept
+{
+    return hash.size() == 64u &&
+           std::all_of(hash.begin(), hash.end(), [](const char value) {
+               return (value >= '0' && value <= '9') ||
+                      (value >= 'a' && value <= 'f');
+           });
+}
+
+bool CheckedMetresToMicrometres(const float metres,
+                                std::uint64_t& micrometres) noexcept
+{
+    if (!std::isfinite(metres) || metres < 0.0f)
+    {
+        return false;
+    }
+    const long double converted = static_cast<long double>(metres) * 1'000'000.0L;
+    const long double upper = std::ldexp(
+        1.0L, std::numeric_limits<std::uint64_t>::digits);
+    if (converted >= upper)
+    {
+        return false;
+    }
+    micrometres = static_cast<std::uint64_t>(std::round(converted));
+    return true;
+}
+
+std::string_view EvidenceBundleKey(
+    const RtPipelineBundleRequest& request) noexcept
+{
+    if (request.instrumentation == RtInstrumentation::Shipping)
+    {
+        return request.quality == DielectricQuality::Mobile
+            ? "shipping_mobile_pair" : "shipping_high_pair";
+    }
+    return request.quality == DielectricQuality::Mobile
+        ? "diagnostic_mobile_pair" : "diagnostic_high_pair";
+}
 
 struct ScenePushConstants
 {
@@ -249,6 +290,58 @@ bool CreateShaderModule(VkDevice device, const std::uint32_t* code, std::size_t 
 
 } // namespace
 
+bool TryMakeRtPipelineEvidenceIdentity(
+    const RtPipelineBundleRequest& request,
+    const RtPipelineVariantArtifact& opaqueFast,
+    const RtPipelineVariantArtifact& genericDielectric,
+    horde::telemetry::RtPipelineEvidenceIdentity& identity) noexcept
+{
+    identity = {};
+    if ((request.instrumentation != RtInstrumentation::Shipping &&
+         request.instrumentation != RtInstrumentation::Diagnostic) ||
+        (request.quality != DielectricQuality::Mobile &&
+         request.quality != DielectricQuality::High) ||
+        opaqueFast.key.instrumentation != request.instrumentation ||
+        genericDielectric.key.instrumentation != request.instrumentation ||
+        opaqueFast.key.quality != request.quality ||
+        genericDielectric.key.quality != request.quality ||
+        opaqueFast.key.material != RtMaterialStrategy::OpaqueFast ||
+        genericDielectric.key.material != RtMaterialStrategy::GenericDielectric ||
+        opaqueFast.canonicalKey.empty() || genericDielectric.canonicalKey.empty() ||
+        !ValidEvidenceHash(opaqueFast.spirvSha256) ||
+        !ValidEvidenceHash(genericDielectric.spirvSha256))
+    {
+        return false;
+    }
+
+    horde::telemetry::RtPipelineEvidenceIdentity candidate{};
+    candidate.instrumentation = request.instrumentation == RtInstrumentation::Shipping
+        ? horde::telemetry::RtInstrumentationMode::Shipping
+        : horde::telemetry::RtInstrumentationMode::Diagnostic;
+    candidate.dielectricQuality = request.quality == DielectricQuality::Mobile
+        ? horde::telemetry::RtDielectricQuality::Mobile
+        : horde::telemetry::RtDielectricQuality::High;
+    candidate.activeStrategy = horde::telemetry::RtMaterialStrategy::OpaqueFast;
+    candidate.waterQuality = horde::telemetry::RtWaterQuality::Off;
+    if (!horde::telemetry::AssignRtFixedText(
+            candidate.bundleKey, EvidenceBundleKey(request)) ||
+        !horde::telemetry::AssignRtFixedText(
+            candidate.opaqueFast.key, opaqueFast.canonicalKey) ||
+        !horde::telemetry::AssignRtFixedText(
+            candidate.opaqueFast.sha256, opaqueFast.spirvSha256) ||
+        !horde::telemetry::AssignRtFixedText(
+            candidate.genericDielectric.key, genericDielectric.canonicalKey) ||
+        !horde::telemetry::AssignRtFixedText(
+            candidate.genericDielectric.sha256,
+            genericDielectric.spirvSha256))
+    {
+        return false;
+    }
+    candidate.active = candidate.opaqueFast;
+    identity = candidate;
+    return true;
+}
+
 PlayerWeaponRenderPose EvaluatePlayerWeaponRenderPose(
     const horde::gameplay::PlayerCombatSnapshot& playerCombat,
     const float swordSwingRadians,
@@ -458,6 +551,16 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     heldItemBlasMeasurements_ = std::exchange(
         other.heldItemBlasMeasurements_, HeldItemBlasMeasurements{});
     pipelineBundle_ = std::move(other.pipelineBundle_);
+    pipelineEvidenceIdentity_ = std::exchange(
+        other.pipelineEvidenceIdentity_,
+        horde::telemetry::RtPipelineEvidenceIdentity{});
+    pipelineEvidenceIdentityValid_ = std::exchange(
+        other.pipelineEvidenceIdentityValid_, false);
+    framePipelineEvidence_ = std::exchange(
+        other.framePipelineEvidence_,
+        horde::telemetry::RtPipelineEvidenceIdentity{});
+    framePipelineEvidenceValid_ = std::exchange(
+        other.framePipelineEvidenceValid_, false);
     vkCreateAccelerationStructureKHR_ = other.vkCreateAccelerationStructureKHR_;
     vkDestroyAccelerationStructureKHR_ = other.vkDestroyAccelerationStructureKHR_;
     vkGetAccelerationStructureBuildSizesKHR_ = other.vkGetAccelerationStructureBuildSizesKHR_;
@@ -644,6 +747,7 @@ bool PresentableTinyRtScene::ContinueInitialiseAfterPreflight(
         return false;
     }
 
+    pipelineEvidenceIdentityValid_ = CapturePipelineEvidenceIdentity();
     ready_ = true;
     diagnostic.clear();
     return true;
@@ -653,6 +757,10 @@ void PresentableTinyRtScene::Destroy()
 {
     if (device_ == VK_NULL_HANDLE)
     {
+        pipelineEvidenceIdentity_ = {};
+        pipelineEvidenceIdentityValid_ = false;
+        framePipelineEvidence_ = {};
+        framePipelineEvidenceValid_ = false;
         ready_ = false;
         return;
     }
@@ -769,6 +877,10 @@ void PresentableTinyRtScene::Destroy()
     productionPropBlasBytes_ = 0u;
     productionPropBlasBuildMilliseconds_ = 0.0;
     heldItemBlasMeasurements_ = {};
+    pipelineEvidenceIdentity_ = {};
+    pipelineEvidenceIdentityValid_ = false;
+    framePipelineEvidence_ = {};
+    framePipelineEvidenceValid_ = false;
 
     if (storageImageView_ != VK_NULL_HANDLE)
     {
@@ -843,6 +955,111 @@ horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory(
             texture->memoryPropertyFlags);
     }
     return inventory;
+}
+
+bool PresentableTinyRtScene::CollectCompletedDiagnostic(
+    RtDiagnosticCounterPayload& payload,
+    std::string& diagnostic)
+{
+    payload = {};
+    static_assert(kRtDielectricDiagnosticsSchema1FieldCount ==
+                  horde::telemetry::kRtDielectricCounterCount);
+    static_assert(offsetof(RtDielectricDiagnostics, primaryRewardBodyPixelCount) +
+                      sizeof(std::uint32_t) ==
+                  horde::telemetry::kRtDielectricCounterCount *
+                      sizeof(std::uint32_t));
+    static_assert(offsetof(RtDielectricDiagnostics, primaryPlayerPixelCount) /
+                      sizeof(std::uint32_t) ==
+                  horde::telemetry::kRtPrimaryPlayerPixelCounterIndex);
+    if (pipelineBundle_.DiagnosticAvailability() !=
+            RtDiagnosticAvailability::Available ||
+        pipelineBundle_.diagnosticBuffer.memory == VK_NULL_HANDLE)
+    {
+        diagnostic = "The completed RT Diagnostic buffer is unavailable.";
+        return false;
+    }
+    RtDielectricDiagnostics completed{};
+    if (!ReadBuffer(pipelineBundle_.diagnosticBuffer, 0u,
+                    &completed, sizeof(completed),
+                    "dielectric diagnostics", diagnostic))
+    {
+        return false;
+    }
+    std::memcpy(payload.counters.data(), &completed,
+                payload.counters.size() * sizeof(payload.counters[0]));
+    diagnostic.clear();
+    return true;
+}
+
+void PresentableTinyRtScene::PublishCompletedDiagnostic(
+    const RtDiagnosticCounterPayload& payload) noexcept
+{
+    using CounterMember = std::uint32_t PresentableTinyRtScene::*;
+    static constexpr std::array<CounterMember,
+                                horde::telemetry::kRtDielectricCounterCount>
+        members{{
+            &PresentableTinyRtScene::dielectricTransportOverflowCount_,
+            &PresentableTinyRtScene::dielectricShadowOverflowCount_,
+            &PresentableTinyRtScene::dielectricSecondaryRejectCount_,
+            &PresentableTinyRtScene::dielectricUnclosedVolumeCount_,
+            &PresentableTinyRtScene::dielectricPrimaryUnclosedVolumeCount_,
+            &PresentableTinyRtScene::dielectricShadowUnclosedVolumeCount_,
+            &PresentableTinyRtScene::productionPaneStackFailureCount_,
+            &PresentableTinyRtScene::productionPaneSecondaryOriginCount_,
+            &PresentableTinyRtScene::productionPaneSecondaryTerminalCount_,
+            &PresentableTinyRtScene::productionPaneSecondarySameMediumCount_,
+            &PresentableTinyRtScene::productionPaneSecondaryDifferentMediumCount_,
+            &PresentableTinyRtScene::secondaryNearSelfHitCount_,
+            &PresentableTinyRtScene::primaryOpenMissCount_,
+            &PresentableTinyRtScene::primaryOpenOpaqueCount_,
+            &PresentableTinyRtScene::primaryMismatchedExitCount_,
+            &PresentableTinyRtScene::primaryInterfaceBudgetCount_,
+            &PresentableTinyRtScene::primaryVolumeBudgetCount_,
+            &PresentableTinyRtScene::shadowOpenMissCount_,
+            &PresentableTinyRtScene::shadowMismatchedExitCount_,
+            &PresentableTinyRtScene::primaryTirCount_,
+            &PresentableTinyRtScene::primaryInterfaceBudgetOpenVolumeCount_,
+            &PresentableTinyRtScene::primaryInterfaceBudgetClosedVolumeCount_,
+            &PresentableTinyRtScene::shadowMismatchEmptyCount_,
+            &PresentableTinyRtScene::shadowImplicitOriginExitCount_,
+            &PresentableTinyRtScene::secondaryDielectricTerminalCount_,
+            &PresentableTinyRtScene::primaryTirTerminationCount_,
+            &PresentableTinyRtScene::shadowFiniteEndpointVolumeCount_,
+            &PresentableTinyRtScene::primaryOpenOpaqueSameInstanceDifferentMaterialCount_,
+            &PresentableTinyRtScene::primaryOpenOpaqueAfterTirCount_,
+            &PresentableTinyRtScene::primaryOpenOpaqueTerminalInstanceMask_,
+            &PresentableTinyRtScene::primaryOpenOpaqueVolumeInstanceMask_,
+            &PresentableTinyRtScene::primaryOpenOpaqueTerminalMaterialMask_,
+            &PresentableTinyRtScene::primaryClosedVolumeAbsorptionCount_,
+            &PresentableTinyRtScene::primaryCertifiedClosedVolumeRecoveryCount_,
+            &PresentableTinyRtScene::shadowCertifiedClosedVolumeRecoveryCount_,
+            &PresentableTinyRtScene::certifiedClosedVolumeRecoveryReasonMask_,
+            &PresentableTinyRtScene::primaryTorchPixelCount_,
+            &PresentableTinyRtScene::primarySwordPixelCount_,
+            &PresentableTinyRtScene::primaryPlayerPixelCount_,
+            &PresentableTinyRtScene::primaryRewardRingPixelCount_,
+            &PresentableTinyRtScene::primaryRewardBodyPixelCount_,
+        }};
+    for (std::size_t index = 0u; index < members.size(); ++index)
+    {
+        this->*members[index] = payload.counters[index];
+    }
+}
+
+RtDiagnosticFrameIo MakeRtDiagnosticFrameIo(
+    PresentableTinyRtScene& scene) noexcept
+{
+    return {
+        &scene,
+        [](void* user, RtDiagnosticCounterPayload& output,
+           std::string& diagnostic) {
+            return static_cast<PresentableTinyRtScene*>(user)
+                ->CollectCompletedDiagnostic(output, diagnostic);
+        },
+        [](void* user, const RtDiagnosticCounterPayload& value) noexcept {
+            static_cast<PresentableTinyRtScene*>(user)
+                ->PublishCompletedDiagnostic(value);
+        }};
 }
 
 bool PresentableTinyRtScene::LoadEntryPoints(std::string& diagnostic)
@@ -3450,6 +3667,23 @@ bool PresentableTinyRtScene::CreateSelectedPipelineBundle(std::string& diagnosti
     return BuildRtPipelineBundleResources(pipelineBundle_, api, diagnostic);
 }
 
+bool PresentableTinyRtScene::CapturePipelineEvidenceIdentity() noexcept
+{
+    horde::telemetry::RtPipelineEvidenceIdentity candidate{};
+    if (!pipelineBundle_.HasSelection() ||
+        !TryMakeRtPipelineEvidenceIdentity(
+            pipelineBundle_.Request(),
+            pipelineBundle_.Strategy(RtMaterialStrategy::OpaqueFast).artifact,
+            pipelineBundle_.Strategy(RtMaterialStrategy::GenericDielectric).artifact,
+            candidate))
+    {
+        pipelineEvidenceIdentity_ = {};
+        return false;
+    }
+    pipelineEvidenceIdentity_ = candidate;
+    return true;
+}
+
 bool PresentableTinyRtScene::CreateBundleDescriptorSetLayout(
     const RtDescriptorIoContract& contract,
     VkDescriptorSetLayout& out,
@@ -4580,80 +4814,6 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     }
     const bool diagnosticsAvailable =
         pipelineBundle_.DiagnosticAvailability() == RtDiagnosticAvailability::Available;
-    if (diagnosticsAvailable)
-    {
-    RtDielectricDiagnostics previousDielectricDiagnostics{};
-    if (!ReadBuffer(pipelineBundle_.diagnosticBuffer, 0u,
-                    &previousDielectricDiagnostics, sizeof(previousDielectricDiagnostics),
-                    "dielectric diagnostics", diagnostic))
-        return false;
-    dielectricTransportOverflowCount_ = previousDielectricDiagnostics.transportOverflowCount;
-    dielectricShadowOverflowCount_ = previousDielectricDiagnostics.shadowOverflowCount;
-    dielectricSecondaryRejectCount_ =
-        previousDielectricDiagnostics.secondaryDielectricRejectCount;
-    dielectricUnclosedVolumeCount_ = previousDielectricDiagnostics.unclosedVolumeCount;
-    dielectricPrimaryUnclosedVolumeCount_ =
-        previousDielectricDiagnostics.primaryUnclosedVolumeCount;
-    dielectricShadowUnclosedVolumeCount_ =
-        previousDielectricDiagnostics.shadowUnclosedVolumeCount;
-    productionPaneStackFailureCount_ =
-        previousDielectricDiagnostics.productionPaneStackFailureCount;
-    productionPaneSecondaryOriginCount_ =
-        previousDielectricDiagnostics.productionPaneSecondaryOriginCount;
-    productionPaneSecondaryTerminalCount_ =
-        previousDielectricDiagnostics.productionPaneSecondaryTerminalCount;
-    productionPaneSecondarySameMediumCount_ =
-        previousDielectricDiagnostics.productionPaneSecondarySameMediumCount;
-    productionPaneSecondaryDifferentMediumCount_ =
-        previousDielectricDiagnostics.productionPaneSecondaryDifferentMediumCount;
-    secondaryNearSelfHitCount_ = previousDielectricDiagnostics.secondaryNearSelfHitCount;
-    primaryOpenMissCount_ = previousDielectricDiagnostics.primaryOpenMissCount;
-    primaryOpenOpaqueCount_ = previousDielectricDiagnostics.primaryOpenOpaqueCount;
-    primaryMismatchedExitCount_ = previousDielectricDiagnostics.primaryMismatchedExitCount;
-    primaryInterfaceBudgetCount_ = previousDielectricDiagnostics.primaryInterfaceBudgetCount;
-    primaryVolumeBudgetCount_ = previousDielectricDiagnostics.primaryVolumeBudgetCount;
-    shadowOpenMissCount_ = previousDielectricDiagnostics.shadowOpenMissCount;
-    shadowMismatchedExitCount_ = previousDielectricDiagnostics.shadowMismatchedExitCount;
-    primaryTirCount_ = previousDielectricDiagnostics.primaryTirCount;
-    primaryInterfaceBudgetOpenVolumeCount_ =
-        previousDielectricDiagnostics.primaryInterfaceBudgetOpenVolumeCount;
-    primaryInterfaceBudgetClosedVolumeCount_ =
-        previousDielectricDiagnostics.primaryInterfaceBudgetClosedVolumeCount;
-    shadowMismatchEmptyCount_ = previousDielectricDiagnostics.shadowMismatchEmptyCount;
-    shadowImplicitOriginExitCount_ =
-        previousDielectricDiagnostics.shadowImplicitOriginExitCount;
-    secondaryDielectricTerminalCount_ =
-        previousDielectricDiagnostics.secondaryDielectricTerminalCount;
-    primaryTirTerminationCount_ =
-        previousDielectricDiagnostics.primaryTirTerminationCount;
-    shadowFiniteEndpointVolumeCount_ =
-        previousDielectricDiagnostics.shadowFiniteEndpointVolumeCount;
-    primaryOpenOpaqueSameInstanceDifferentMaterialCount_ =
-        previousDielectricDiagnostics.primaryOpenOpaqueSameInstanceDifferentMaterialCount;
-    primaryOpenOpaqueAfterTirCount_ =
-        previousDielectricDiagnostics.primaryOpenOpaqueAfterTirCount;
-    primaryOpenOpaqueTerminalInstanceMask_ =
-        previousDielectricDiagnostics.primaryOpenOpaqueTerminalInstanceMask;
-    primaryOpenOpaqueVolumeInstanceMask_ =
-        previousDielectricDiagnostics.primaryOpenOpaqueVolumeInstanceMask;
-    primaryOpenOpaqueTerminalMaterialMask_ =
-        previousDielectricDiagnostics.primaryOpenOpaqueTerminalMaterialMask;
-    primaryClosedVolumeAbsorptionCount_ =
-        previousDielectricDiagnostics.primaryClosedVolumeAbsorptionCount;
-    primaryCertifiedClosedVolumeRecoveryCount_ =
-        previousDielectricDiagnostics.primaryCertifiedClosedVolumeRecoveryCount;
-    shadowCertifiedClosedVolumeRecoveryCount_ =
-        previousDielectricDiagnostics.shadowCertifiedClosedVolumeRecoveryCount;
-    certifiedClosedVolumeRecoveryReasonMask_ =
-        previousDielectricDiagnostics.certifiedClosedVolumeRecoveryReasonMask;
-    primaryTorchPixelCount_ = previousDielectricDiagnostics.primaryTorchPixelCount;
-    primarySwordPixelCount_ = previousDielectricDiagnostics.primarySwordPixelCount;
-    primaryPlayerPixelCount_ = previousDielectricDiagnostics.primaryPlayerPixelCount;
-    primaryRewardRingPixelCount_ =
-        previousDielectricDiagnostics.primaryRewardRingPixelCount;
-    primaryRewardBodyPixelCount_ =
-        previousDielectricDiagnostics.primaryRewardBodyPixelCount;
-    }
     const RtDielectricDiagnostics clearedDielectricDiagnostics{};
     auto frameInstanceMetadata = staticMeshSlot_.InstanceMetadata();
     if (effectivePlayerRenderRoute == PlayerRenderRoute::Procedural)
@@ -4699,6 +4859,29 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     fixtureMaterial.attenuationColor[2] = clampedTuning.glassAttenuationColor[2];
     genericTransmissionActive_ = HasActiveGenericTransmission(frameInstanceMetadata,
         staticMeshSlot_.PrimitiveMetadata(), frameMaterials);
+    framePipelineEvidence_ = pipelineEvidenceIdentity_;
+    framePipelineEvidenceValid_ = pipelineEvidenceIdentityValid_;
+    framePipelineEvidence_.activeStrategy = genericTransmissionActive_
+        ? horde::telemetry::RtMaterialStrategy::GenericDielectric
+        : horde::telemetry::RtMaterialStrategy::OpaqueFast;
+    framePipelineEvidence_.active = genericTransmissionActive_
+        ? framePipelineEvidence_.genericDielectric
+        : framePipelineEvidence_.opaqueFast;
+    switch (frame.waterQuality)
+    {
+    case WaterQuality::Off:
+        framePipelineEvidence_.waterQuality = horde::telemetry::RtWaterQuality::Off;
+        break;
+    case WaterQuality::Mobile:
+        framePipelineEvidence_.waterQuality = horde::telemetry::RtWaterQuality::Mobile;
+        break;
+    case WaterQuality::High:
+        framePipelineEvidence_.waterQuality = horde::telemetry::RtWaterQuality::High;
+        break;
+    default:
+        framePipelineEvidenceValid_ = false;
+        break;
+    }
     if (!WriteBuffer(heldLightBuffer_, &heldLightGpu, sizeof(heldLightGpu),
                      "held light", diagnostic, observation) ||
         !WriteBuffer(fireEmitterBuffer_, fireEmitterUpload.emitters.data(),
@@ -4707,18 +4890,31 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         !WriteBuffer(instanceBuffer_, instances.data(), sizeof(instances),
                      "animated TLAS instance", diagnostic, observation) ||
         !WriteBuffer(instanceMetadataBuffer_, frameInstanceMetadata.data(),
-                     sizeof(frameInstanceMetadata), "player route metadata", diagnostic,
-                     observation) ||
+                      sizeof(frameInstanceMetadata), "player route metadata", diagnostic,
+                      observation) ||
         !WriteBuffer(materialMetadataBuffer_, frameMaterials.data(),
                      frameMaterials.size() * sizeof(RtMaterialGpu),
-                     "RT Lab dielectric material", diagnostic, observation) ||
-        (diagnosticsAvailable &&
-         !WriteBuffer(pipelineBundle_.diagnosticBuffer,
-                      &clearedDielectricDiagnostics,
-                      sizeof(clearedDielectricDiagnostics),
-                      "dielectric diagnostics reset", diagnostic)))
+                     "RT Lab dielectric material", diagnostic, observation))
     {
         return false;
+    }
+    if (diagnosticsAvailable)
+    {
+        if (!WriteBuffer(pipelineBundle_.diagnosticBuffer,
+                         &clearedDielectricDiagnostics,
+                         sizeof(clearedDielectricDiagnostics),
+                         "dielectric diagnostics reset", diagnostic))
+        {
+            if (observation != nullptr)
+            {
+                observation->failure = RtSceneRecordFailure::DiagnosticReset;
+            }
+            return false;
+        }
+        if (observation != nullptr)
+        {
+            observation->diagnosticResetCompleted = true;
+        }
     }
 
     VkMemoryBarrier hostWriteBarrier{VK_STRUCTURE_TYPE_MEMORY_BARRIER};
@@ -4727,28 +4923,30 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                                      VK_ACCESS_SHADER_READ_BIT;
     if (pipelineBundle_.DescriptorIo().diagnosticIo.shaderWriteBarrier)
         hostWriteBarrier.dstAccessMask |= VK_ACCESS_SHADER_WRITE_BIT;
-    vkCmdPipelineBarrier(commandBuffer,
-                         VK_PIPELINE_STAGE_HOST_BIT,
-                         VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR |
-                             VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
-                         0u,
-                         1u,
-                         &hostWriteBarrier,
-                         0u,
-                         nullptr,
-                         0u,
-                         nullptr);
+    ExecuteObservedRtSceneCommand(
+        observation, RtSceneCommandEvent::HostWriteBarrier, [&]() noexcept {
+            vkCmdPipelineBarrier(commandBuffer,
+                                 VK_PIPELINE_STAGE_HOST_BIT,
+                                 VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR |
+                                     VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
+                                 0u,
+                                 1u,
+                                 &hostWriteBarrier,
+                                 0u,
+                                 nullptr,
+                                 0u,
+                                 nullptr);
+        });
 
-    const std::uint64_t blasWorkInvocationCount =
-        static_cast<std::uint64_t>(updateSkinnedPlayer) +
-        static_cast<std::uint64_t>(updateSkeletonPose0) +
-        static_cast<std::uint64_t>(updateSkeletonPose1) +
-        static_cast<std::uint64_t>(updateLich);
+    const std::array<bool, 4u> requestedBlasWork{{
+        updateSkinnedPlayer, updateSkeletonPose0, updateSkeletonPose1, updateLich}};
+    const std::uint64_t blasWorkInvocationCount = static_cast<std::uint64_t>(
+        std::count(requestedBlasWork.begin(), requestedBlasWork.end(), true));
     RtSceneStageScope blasRefitScope(
         blasWorkInvocationCount != 0u ? observation : nullptr,
         horde::telemetry::RtStage::BlasRefitRecord);
 
-    if (updateSkinnedPlayer)
+    const auto recordPlayerBlas = [&]()
     {
         const RtInstanceMetadata playerMetadata =
             staticMeshSlot_.InstanceMetadata()[4u];
@@ -4810,15 +5008,10 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         playerUpdateInfo.scratchData.deviceAddress = skinnedPlayerBlasUpdateScratch_.address;
         vkCmdBuildAccelerationStructuresKHR_(commandBuffer, 1u, &playerUpdateInfo,
                                              playerRangePointers.data());
-    }
+    };
 
-    for (std::size_t bucket = 0u; bucket < CharacterRenderSlot::kMaximumSkeletonPoseBuckets; ++bucket)
+    const auto recordSkeletonBlas = [&](const std::size_t bucket) noexcept
     {
-        const bool updateBucket = bucket == 0u ? updateSkeletonPose0 : updateSkeletonPose1;
-        if (!updateBucket)
-        {
-            continue;
-        }
         const auto& skeletonBucketGpu = characterSlot_.SkeletonGpu(bucket);
         const auto& skeletonVertices = characterSlot_.SkeletonVertices(bucket);
         VkAccelerationStructureGeometryKHR skeletonGeometry{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
@@ -4843,10 +5036,9 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         skeletonRange.primitiveCount = static_cast<std::uint32_t>(skeletonVertices.size() / 3u);
         const VkAccelerationStructureBuildRangeInfoKHR* skeletonRanges[] = {&skeletonRange};
         vkCmdBuildAccelerationStructuresKHR_(commandBuffer, 1u, &skeletonUpdateInfo, skeletonRanges);
+    };
 
-    }
-
-    if (updateLich)
+    const auto recordLichBlas = [&]() noexcept
     {
         VkAccelerationStructureGeometryKHR lichGeometry{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
         lichGeometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
@@ -4870,13 +5062,13 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         lichRange.primitiveCount = static_cast<std::uint32_t>(lichSkinnedVertices_.size() / 3u);
         const VkAccelerationStructureBuildRangeInfoKHR* lichRanges[] = {&lichRange};
         vkCmdBuildAccelerationStructuresKHR_(commandBuffer, 1u, &lichUpdateInfo, lichRanges);
-
-    }
+    };
 
     const DynamicBlasToTlasDependency blasToTlasDependency =
         BuildDynamicBlasToTlasDependency({
-            updateSkinnedPlayer, updateSkeletonPose0, updateSkeletonPose1, updateLich});
-    if (blasToTlasDependency.required)
+            requestedBlasWork[0], requestedBlasWork[1],
+            requestedBlasWork[2], requestedBlasWork[3]});
+    const auto recordBlasToTlasBarrier = [&]() noexcept
     {
         VkMemoryBarrier dynamicBlasBuildBarrier{VK_STRUCTURE_TYPE_MEMORY_BARRIER};
         dynamicBlasBuildBarrier.srcAccessMask = blasToTlasDependency.sourceAccessMask;
@@ -4891,8 +5083,21 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                              nullptr,
                              0u,
                              nullptr);
-    }
-    blasRefitScope.Complete(blasWorkInvocationCount);
+    };
+    const std::uint64_t executedBlasWork = ExecuteObservedDynamicBlasCommands(
+        observation, requestedBlasWork,
+        [&](const std::size_t index) {
+            switch (index)
+            {
+            case 0u: recordPlayerBlas(); break;
+            case 1u: recordSkeletonBlas(0u); break;
+            case 2u: recordSkeletonBlas(1u); break;
+            case 3u: recordLichBlas(); break;
+            default: break;
+            }
+        },
+        recordBlasToTlasBarrier);
+    blasRefitScope.Complete(executedBlasWork);
 
     RtSceneStageScope tlasUpdateScope(
         observation, horde::telemetry::RtStage::TlasUpdateRecord);
@@ -4915,21 +5120,27 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     VkAccelerationStructureBuildRangeInfoKHR updateRange{};
     updateRange.primitiveCount = static_cast<std::uint32_t>(instances.size());
     const VkAccelerationStructureBuildRangeInfoKHR* updateRanges[] = {&updateRange};
-    vkCmdBuildAccelerationStructuresKHR_(commandBuffer, 1u, &updateInfo, updateRanges);
-
     VkMemoryBarrier traceBarrier{VK_STRUCTURE_TYPE_MEMORY_BARRIER};
     traceBarrier.srcAccessMask = VK_ACCESS_ACCELERATION_STRUCTURE_WRITE_BIT_KHR;
     traceBarrier.dstAccessMask = VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR | VK_ACCESS_SHADER_READ_BIT;
-    vkCmdPipelineBarrier(commandBuffer,
-                         VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR,
-                         VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
-                         0u,
-                         1u,
-                         &traceBarrier,
-                         0u,
-                         nullptr,
-                         0u,
-                         nullptr);
+    ExecuteObservedTlasUpdateCommands(
+        observation,
+        [&]() noexcept {
+            vkCmdBuildAccelerationStructuresKHR_(
+                commandBuffer, 1u, &updateInfo, updateRanges);
+        },
+        [&]() noexcept {
+            vkCmdPipelineBarrier(commandBuffer,
+                                 VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR,
+                                 VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
+                                 0u,
+                                 1u,
+                                 &traceBarrier,
+                                 0u,
+                                 nullptr,
+                                 0u,
+                                 nullptr);
+        });
     tlasUpdateScope.Complete(1u);
 
     diagnostic.clear();
@@ -4944,6 +5155,19 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                                                 std::string& diagnostic,
                                                 RtSceneRecordObservation* observation)
 {
+    if (observation != nullptr)
+    {
+        observation->failure = RtSceneRecordFailure::None;
+        observation->diagnosticResetCompleted = false;
+        if (observation->commands != nullptr)
+        {
+            *observation->commands = {};
+        }
+        if (observation->recordedScene != nullptr)
+        {
+            *observation->recordedScene = {};
+        }
+    }
     if (!ready_)
     {
         diagnostic = "RT scene is not ready.";
@@ -5035,69 +5259,77 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                        0u,
                        sizeof(pushConstants),
                        &pushConstants);
-    vkCmdTraceRaysKHR_(commandBuffer,
-                       &activeStrategy.sbtRegions[0],
-                       &activeStrategy.sbtRegions[1],
-                       &activeStrategy.sbtRegions[2],
-                       &activeStrategy.sbtRegions[3],
-                       dispatchExtent_.width,
-                       dispatchExtent_.height,
-                       1u);
+    ExecuteObservedTraceCopyCommands(
+        observation,
+        [&]() noexcept {
+            vkCmdTraceRaysKHR_(commandBuffer,
+                               &activeStrategy.sbtRegions[0],
+                               &activeStrategy.sbtRegions[1],
+                               &activeStrategy.sbtRegions[2],
+                               &activeStrategy.sbtRegions[3],
+                               dispatchExtent_.width,
+                               dispatchExtent_.height,
+                               1u);
+        },
+        [&]() noexcept {
+            SetImageBarrier(commandBuffer,
+                            storageImage_,
+                            VK_IMAGE_LAYOUT_GENERAL,
+                            VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                            VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
+                            VK_PIPELINE_STAGE_TRANSFER_BIT,
+                            VK_ACCESS_SHADER_WRITE_BIT,
+                            VK_ACCESS_TRANSFER_READ_BIT);
+            storageImageLayout_ = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
 
-    SetImageBarrier(commandBuffer,
-                    storageImage_,
-                    VK_IMAGE_LAYOUT_GENERAL,
-                    VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-                    VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
-                    VK_PIPELINE_STAGE_TRANSFER_BIT,
-                    VK_ACCESS_SHADER_WRITE_BIT,
-                    VK_ACCESS_TRANSFER_READ_BIT);
-    storageImageLayout_ = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+            const VkPipelineStageFlags swapSrcStage =
+                swapchainImageLayout == VK_IMAGE_LAYOUT_UNDEFINED
+                    ? VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT
+                    : VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+            SetImageBarrier(commandBuffer,
+                            swapchainImage,
+                            swapchainImageLayout,
+                            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                            swapSrcStage,
+                            VK_PIPELINE_STAGE_TRANSFER_BIT,
+                            0u,
+                            VK_ACCESS_TRANSFER_WRITE_BIT);
 
-    const VkPipelineStageFlags swapSrcStage = swapchainImageLayout == VK_IMAGE_LAYOUT_UNDEFINED
-        ? VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT
-        : VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    SetImageBarrier(commandBuffer,
-                    swapchainImage,
-                    swapchainImageLayout,
-                    VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                    swapSrcStage,
-                    VK_PIPELINE_STAGE_TRANSFER_BIT,
-                    0u,
-                    VK_ACCESS_TRANSFER_WRITE_BIT);
-
-    if (scaledPresentation)
-    {
-        VkImageBlit blitRegion{};
-        blitRegion.srcSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, 0u, 1u};
-        blitRegion.srcOffsets[1] = {static_cast<std::int32_t>(dispatchExtent_.width),
-                                    static_cast<std::int32_t>(dispatchExtent_.height), 1};
-        blitRegion.dstSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, 0u, 1u};
-        blitRegion.dstOffsets[1] = {static_cast<std::int32_t>(swapchainExtent.width),
-                                    static_cast<std::int32_t>(swapchainExtent.height), 1};
-        vkCmdBlitImage(commandBuffer,
-                       storageImage_,
-                       VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-                       swapchainImage,
-                       VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                       1u,
-                       &blitRegion,
-                       VK_FILTER_LINEAR);
-    }
-    else
-    {
-        VkImageCopy copyRegion{};
-        copyRegion.srcSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, 0u, 1u};
-        copyRegion.dstSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, 0u, 1u};
-        copyRegion.extent = {dispatchExtent_.width, dispatchExtent_.height, 1u};
-        vkCmdCopyImage(commandBuffer,
-                       storageImage_,
-                       VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-                       swapchainImage,
-                       VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                       1u,
-                       &copyRegion);
-    }
+            if (scaledPresentation)
+            {
+                VkImageBlit blitRegion{};
+                blitRegion.srcSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, 0u, 1u};
+                blitRegion.srcOffsets[1] = {
+                    static_cast<std::int32_t>(dispatchExtent_.width),
+                    static_cast<std::int32_t>(dispatchExtent_.height), 1};
+                blitRegion.dstSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, 0u, 1u};
+                blitRegion.dstOffsets[1] = {
+                    static_cast<std::int32_t>(swapchainExtent.width),
+                    static_cast<std::int32_t>(swapchainExtent.height), 1};
+                vkCmdBlitImage(commandBuffer,
+                               storageImage_,
+                               VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                               swapchainImage,
+                               VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                               1u,
+                               &blitRegion,
+                               VK_FILTER_LINEAR);
+            }
+            else
+            {
+                VkImageCopy copyRegion{};
+                copyRegion.srcSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, 0u, 1u};
+                copyRegion.dstSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, 0u, 1u};
+                copyRegion.extent = {dispatchExtent_.width, dispatchExtent_.height, 1u};
+                vkCmdCopyImage(commandBuffer,
+                               storageImage_,
+                               VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                               swapchainImage,
+                               VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                               1u,
+                               &copyRegion);
+            }
+        });
 
     SetImageBarrier(commandBuffer,
                     swapchainImage,
@@ -5120,6 +5352,47 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
     storageImageLayout_ = VK_IMAGE_LAYOUT_GENERAL;
 
     traceCopyScope.Complete(1u);
+    if (observation != nullptr && observation->recordedScene != nullptr)
+    {
+        horde::telemetry::RtRecordedSceneEvidence recorded{};
+        bool recordedFactsValid = framePipelineEvidenceValid_;
+        recorded.pipeline = framePipelineEvidence_;
+        recorded.resources = ResourceInventory();
+        switch (playerCpuSkinCadence_)
+        {
+        case PlayerCpuSkinCadence::Hz30:
+            recorded.player.skinCadenceHz = 30u;
+            break;
+        case PlayerCpuSkinCadence::Hz60:
+            recorded.player.skinCadenceHz = 60u;
+            break;
+        case PlayerCpuSkinCadence::RequiresReviewedBackend:
+            recorded.player.skinCadenceHz = 0u;
+            break;
+        }
+        recorded.player.skinUpdateCount = playerSkinUpdateCount_;
+        recordedFactsValid =
+            CheckedMetresToMicrometres(
+                playerMaxSocketErrorMetres_,
+                recorded.player.maximumSocketErrorMicrometres) &&
+            recordedFactsValid;
+        // Primary pixels are populated only from this submission's completed
+        // Diagnostic record at its owning fence.
+        recorded.player.primaryPixelCountAvailable = false;
+        recorded.player.primaryPixelCount = 0u;
+        recorded.player.primaryVisible = false;
+        recorded.dispatch.sceneReady = true;
+        recorded.dispatch.rtDispatchRecorded = true;
+        recorded.dispatch.swapchainCopyRecorded = true;
+        if (recordedFactsValid)
+        {
+            *observation->recordedScene = recorded;
+        }
+        else
+        {
+            observation->healthy = false;
+        }
+    }
     diagnostic.clear();
     return true;
 }

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstdint>
-#include <optional>
 #include <string>
 #include <vector>
 
@@ -28,6 +27,29 @@ struct GpuFrameTimingSample
     std::uint64_t elapsedTicks = 0u;
     std::uint64_t submissionSequence = 0u;
     std::uint32_t frameSlot = 0u;
+};
+
+enum class GpuFrameTimingCollectionStatus
+{
+    NoSubmittedWork,
+    Valid,
+    Unavailable,
+    Error,
+};
+
+// A fence-owned collection outcome. Even when a timestamp is unavailable or
+// query IO fails, the consumed slot and submission identity remain available
+// so callers cannot attach the outcome to a newer frame.
+struct GpuFrameTimingCollection
+{
+    GpuFrameTimingCollectionStatus status =
+        GpuFrameTimingCollectionStatus::NoSubmittedWork;
+    bool consumed = false;
+    bool hasSample = false;
+    std::uint32_t frameSlot = 0u;
+    std::uint64_t submissionSequence = 0u;
+    VkResult result = VK_SUCCESS;
+    GpuFrameTimingSample sample{};
 };
 
 struct GpuFrameTimerTelemetry
@@ -75,7 +97,7 @@ public:
     bool RecordEnd(VkCommandBuffer commandBuffer, std::uint32_t frameSlot);
     void CancelRecording(std::uint32_t frameSlot);
     bool MarkSubmitted(std::uint32_t frameSlot, std::uint64_t submissionSequence);
-    std::optional<GpuFrameTimingSample> CollectCompleted(std::uint32_t frameSlot);
+    GpuFrameTimingCollection CollectCompleted(std::uint32_t frameSlot);
 
     bool Supported() const { return queryPool_ != VK_NULL_HANDLE; }
     std::uint32_t FrameSlotCount() const { return static_cast<std::uint32_t>(slots_.size()); }
