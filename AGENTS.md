@@ -1,89 +1,34 @@
 # Horde Lantern RT - Agent Instructions
 
-This repo is a native Vulkan hardware ray tracing game/tech-demo project. Keep work aligned with the project memory and decisions before adding features.
+Native Vulkan hardware-ray-tracing game/tech demo with a historical-gothic visual direction. Android is the primary, first-class target; Windows RTX is an equal validation target.
 
-## Non-negotiables
+## Preserve the product and engine contracts
 
-- RT or nothing: do not replace the main path with raster-only rendering, baked lighting, screen-space effects, browser WebGPU, or fake RT.
-- Android phone is first-class and currently the primary target.
-- Windows RTX remains an equal validation target, but do not let desktop-only polish break the phone path.
-- Unsupported devices should show clear diagnostics instead of silently falling back.
-- Keep the repo clean. Do not paste in a giant engine or sample dump.
+- **RT or nothing.** Keep real `vkCmdTraceRaysKHR` dispatch and RT-produced swapchain presentation. Do not substitute raster-only rendering, baked lighting, screen-space effects, browser WebGPU, or fake RT. Unsupported hardware gets clear diagnostics, not a silent fallback; `rtScene.presented` is true only after successful presentation of an RT-produced frame.
+- Build reusable, measured engine capabilities rather than scene-specific tricks, per-object rendering branches, or an imported engine/sample dump. Do not silently reduce render scale or quality to hide a regression.
+- Shared 60 Hz `GameSimulation` owns gameplay on the existing application/render thread. Preserve immutable snapshots, coherent Android input publication, and ordered semantic feedback events rather than platform-specific gameplay or direct JNI mutation.
+- Preserve exact-build evidence and asset provenance. New Android device evidence belongs in `docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md`, with the exact model and evidence class; vendor/SoC claims do not certify a working device. Record imported-asset licences in `ASSET_LICENSES.md` before shipping.
 
-## Current implementation shape
+## Work to the requested outcome
 
-- Android app entrypoint: `android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java`.
-- Android native bridge: `android/app/src/main/cpp/android_probe_bridge.cpp`.
-- Windows diagnostic path: `src/platform/windows/DiagnosticWindow.cpp`.
-- Shared presentable RT scene: `src/vulkan/raytracing/PresentableTinyRtScene.cpp`.
-- Shared gameplay authority: `src/gameplay/simulation/GameSimulation.cpp` with immutable `SimulationSnapshot` output.
-- Shared renderer adapter: `src/vulkan/raytracing/SimulationFrameAdapter.cpp`.
-- Android continuous and edge input crosses JNI through `src/gameplay/simulation/InputMailbox.h`; do not restore direct JNI mutation of render-thread gameplay state.
-- RT shaders: `shaders/raytracing/minimal.rgen`, `minimal.rmiss`, `minimal.rchit`.
-- Regenerate the embedded raygen SPIR-V after shader edits with `tools/compile-raygen.ps1`.
-- Current phone-safe path tracing is implemented with `rayQueryEXT` in the raygen shader, not recursive closest-hit tracing.
+Read the affected code and the relevant references below, not the whole documentation set before every edit. Use `PROJECT_DECISIONS.md` when a change touches an established decision and `PROJECT_MEMORY.md` when historical context is needed; dated reports and old task plans describe their own snapshots, not current implementation or permission to start unrelated work.
 
-## Working rules
+For an implementation request, continue through the change, affected checks, inspection of the result, and fixes for regressions caused by the change. Do not stop at the first patch or a plan unless the user requested that stopping point. Use small runnable slices for substantial work; a typo does not need a new spec, milestone, or full validation programme. Report what changed, what was actually checked, and any remaining blocker. Missing hardware is a validation gap, not a pass or a reason to abandon safe host-side work.
 
-- Android device evidence maintenance: whenever new Android device evidence appears (local validation, capability report, logcat, screenshot, or user report), update `docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md` in the same task. Preserve the exact model code and classify the evidence type. Do not mark devices as working from SoC/vendor claims alone, and do not overwrite prior evidence.
+The lead agent, including Astra, may implement, inspect, test and fix safe local work directly. Local edits, standard local builds/tests, and rerunning affected checks are within an implementation task; do not ask for approval at each step. Preserve unrelated work and respect the execution environment's permissions. Ask only when needed to resolve a material product/architecture decision, destructive action, or external side effect outside the authorised task. Paid asset generation, device installation/data clearing, release signing/publication, credential changes, and production/account changes are not authorised merely by permission to edit code. Follow explicit authorisation when already given rather than requesting it repeatedly. Signing backup/recovery checks remain owner-only.
 
-- Preserve actual `vkCmdTraceRaysKHR` presentation through the swapchain.
-- Keep `selectedCapabilities_.rtScene.presented` / report `rtScene.presented` honest: only true after an RT-produced frame reaches successful swapchain presentation.
-- Prefer small, shippable vertical slices over large speculative rewrites.
-- When adding visual/gameplay features, keep a visible phone build runnable at each step.
-- Record asset licenses in `ASSET_LICENSES.md` before shipping any imported asset.
-- Keep one frame in flight while the held-torch TLAS uses a host-written instance buffer; changing this requires proper per-frame TLAS/instance-buffer ownership.
-- The RT storage image is RGBA but is raw-copied to common BGRA swapchains. Preserve the presentation-format-driven `outputRedBlueSwap` push constant or warm fire will render cyan.
-- Keep gameplay on the existing owning application/render thread. Movement, collision, encounters, combat, vitality, retry, finale, and semantic events belong to the shared 60 Hz `GameSimulation`, not platform loops.
-- Android input publications use a coherent two-slot mailbox with monotonic attack/parry/reset/retry counters. A bare atomic published index is insufficient because a writer may lap a reader and overwrite its slot.
-- Platform audio and haptics drain ordered `GameplayEvent` records. Android uses a fixed 128-entry transport that drops only the newest event on overflow; Windows retains delayed fall events in a fixed-capacity queue. Do not restore one-bit-per-sound polling that collapses repeated same-type events.
-- Preserve feedback semantics: nonfatal accepted hits emit `PlayerDamaged`, the lethal hit emits only `PlayerKilled`, and both platforms keep the 140 ms separation between positional skeleton impact and fall audio. Reset, retry, and Android lifecycle transitions cancel stale delayed fall cues.
-- Deterministic captures import exact authored checkpoint state and then freeze simulation. Preserve the zero-delta skeleton/lich snapshot finalization required by the 0.1.3 hashes.
-- Manual owner audio/haptic validation is change-triggered, not milestone-triggered. Every milestone must explicitly state `Audio/haptic manual revalidation required: YES/NO` and why; default **NO**. Require **YES** only for changes that can affect listener/source event-time data or identity, spatialisation/attenuation/pan/obstruction, playback backend/gain/cues/assets, event transport/timing, haptic routing/cues/patterns/intensity, or player damage/death feedback. Unrelated RT, visual, UI, asset, build, packaging, telemetry, documentation, unrelated AI, or unrelated animation changes do not trigger an owner check when automated contracts pass and semantic inputs are unchanged. Current reconciliation was **YES** because listener-at-event-time routing and platform feedback transport/timing changed; the exact-candidate owner check passed, so future work returns to the normal change-trigger rule. See `docs/OWNER_RELEASE_SAFETY_CHECKLIST.md` for separate owner-only signing recovery work.
+## Load references by task
 
-## Visual direction
+| Change | Reference |
+| --- | --- |
+| Renderer, shaders, materials, water/fire/glass, held props or player geometry | [Renderer and asset contracts](docs/AGENT_ENGINE_CONTRACTS.md#renderer-and-assets) |
+| Gameplay, input, combat, animation, feedback or capture state | [Simulation and feedback contracts](docs/AGENT_ENGINE_CONTRACTS.md#simulation-and-feedback) |
+| Android/Windows controls, HUD, lifecycle or RT Lab | [Platform interaction contracts](docs/AGENT_ENGINE_CONTRACTS.md#platform-interaction) |
+| Choosing checks, compiling shaders, device evidence or performance claims | [Validation guide](docs/AGENT_VALIDATION.md) - select the applicable section, not every gate |
+| Importing or shipping an asset | `docs/ASSET_PIPELINE.md` and `ASSET_LICENSES.md`; keep source/runtime separation and commercial-safe provenance |
+| Release work | [README](README.md) package summary, `tools/release-version-policy.ps1`, and [owner-only signing safeguards](docs/OWNER_RELEASE_SAFETY_CHECKLIST.md) |
+| Requested campaign/roadmap work | [Phase plan](docs/PHASE_PLAN.md) and the relevant accepted plan; a future version label is not a release instruction |
 
-- Historical gothic action demo.
-- Start in a dark torch-lit corridor or ruin.
-- Prioritize lantern/fire lighting, wet stone, fog, silhouettes, shadows, and obvious RT mood.
-- Gameplay comes after the visual RT proof feels like a scene, not a probe.
+## Skills and delegation
 
-## Current phone scene controls
-
-- Left-side drag walks/strafs.
-- Right-side drag gives 360 camera look.
-- Pitch stays clamped; yaw should remain unbounded for 360 look.
-- The held torch is a separate low-poly BLAS instance refit into the TLAS from the camera pose each frame. Its emissive flame mesh and direct-light estimate share the same hand-space placement; do not restore the old fullscreen torch overlay.
-- The player uses a yaw-relative torso, four IK arm segments, procedural pelvis/legs/boots, gait, head shadow/reflection geometry, and wall-aware held-prop retraction. Body geometry remains selectively masked and the camera origin must stay outside it. See the historical arm foundation in `docs/PLAYER_BODY_RT_SLICE_2026-07-14.md` and final route evidence in `docs/HORDE_SHOWCASE_WINDOWS_VALIDATION_2026-07-16.md`.
-- Branded entry/pause/settings surfaces keep diagnostics tucked away unless requested or startup fails, so the app first reads as a game scene.
-
-## Known renderer constraint
-
-- A recursive path-tracing experiment with pipeline recursion depth 2 failed on phone pipeline creation.
-- Prefer phone-safe ray-query path tracing inside raygen while keeping `vkCmdTraceRaysKHR` as the frame dispatch/presentation path.
-- If trying recursion again, prove capability and pipeline creation on the phone before making it the default.
-
-## Current validated baseline and guardrails
-
-- The combat/ASTC phone gate passed on `SM-S948B`: strict ASTC selection, honest RT swapchain presentation, and two 126-interval samples at 12.500 ms median / 16.667 ms p95. See `docs/COMBAT_ASTC_PHONE_VALIDATION_2026-07-14.md`.
-- The articulated grip/pitch revision is phone-verified: strict ASTC selection, honest RT presentation, live grip/swing composition, and sustained warm evidence around 50-52 FPS at thermal status 2. Preserve mask `0x04` culling and the compact material route. See `docs/PLAYER_BODY_RT_SLICE_2026-07-14.md`.
-- Showcase Alpha 1.5.2 publishes the accepted RT waterfall/catchment/drain, corrected shared-light water transport, cross-platform RT Lab, lich mist, positional water loop, shared directional dodge, and Windows controller path. Source `f4891c4` passed fresh 13/13 Debug and Release Host gates and 13 Windows captures. Windows itch build `#1913191` launched from exact ZIP SHA-256 `fd929f1972c4587c6720013eb0586934ab72924c5f8f9c50ec8576a23a57690d` and honestly presented RT before a clean exit. Android build `#1913192` uses the established certificate and exact APK SHA-256 `19593f9d8902052cb54f9b989f9646ec8cad97063db5d882e1487dd56a671182`; it passed static/package guards but was not installed because ADB exposed no device at publication. See `docs/SHOWCASE_ALPHA_1_5_2_RELEASE_VALIDATION_2026-08-25.md`.
-- Showcase Alpha 1.6.0 publishes the Fire/PBR/reward-lantern programme. Source `57c81b6` passed clean Host run `run-20260831-131431` with fresh Debug/Release 31/31 CTests and 13 captures. Windows itch build `#1931949` launched from exact ZIP SHA-256 `7b0dcf24b4a47771a9c3a27cbc52e3899c87781109afcef20f7a9a8472411d77`, honestly presented RT, and exited cleanly. Android build `#1931951` uses the established certificate and exact APK SHA-256 `52a64255ad5dec82cc866fb2ea3545be498ca06c73a789019be851c77e5d6c48`; it passed static/package guards and was subsequently installed/pulled back byte-for-byte on `SM-S948B`, with strict ASTC, honest RT presentation, Home/resume, and short route smoke passing. The signed smoke is functional/presentation evidence, not sustained Release performance or owner-feel proof. See `docs/SHOWCASE_ALPHA_1_6_0_RELEASE_VALIDATION_2026-08-30.md`.
-- Current development water uses the terminal ordinary opaque material/direct-light path for refracted and High-quality reflected hits, with shared active-light selection and real visibility for interface highlights. Transparent filtering uses `gl_RayFlagsNoOpaqueEXT`; secondary hit distance is accumulated from the camera; the ordinary moon traverses physical roof geometry; and no transmitted glossy bounce may double-count the water reflection. Fixed water-only transport floors and screen-position shadow masks are prohibited. Water-on-water secondary hits terminate without recursion. Current deterministic Windows and exact `SM-S948B` evidence are in `docs/WATER_TRANSMISSION_SHADOW_VALIDATION_2026-08-24.md`; preserve the documented bounded RT cost rather than lowering quality or resolution to hide it.
-- When the post-lich Android RT Lab is open, `showEndingOverlay()` must remain gated by `rtLabVisible`. The completed-finale poll runs repeatedly and otherwise replaces the lab immediately. Closing the lab deliberately clears that flag before restoring the ending card. On Windows, RT Lab trackbars must remain opaque native controls, repaint after scroll hide/show, and forward wheel input to the lab's vertical scroll owner. Waterfall width scales the world-Z cross-lane span of TLAS instance 19; world-X remains the thin transmission depth, and shader stream centres/radii must match that transform. Preserve the RED/GREEN contracts. Focused Host run `run-20260825-070928` and final post-publication Host run `run-20260825-074907` pass, and the owner accepted Windows scroll/repaint and width behavior; exact fixed-APK phone retest remains pending.
-- Keep the HUD compact or collapsible at large Android accessibility font scales; do not change the user's system font setting.
-- Android Debug now has thirteen named checkpoints, three-window measurement, a deterministic 13-waypoint replay, and an evidence runner whose standard 75% route includes `two-enemy-combat`. Use `tools/run-android-showcase-validation.ps1` after meaningful Android renderer or gameplay-route changes; automation does not replace hands-on touch, perceived audio, or lifecycle checks. See `docs/ANDROID_SHOWCASE_AUTOMATION_2026-07-17.md`.
-- Performance is evidence, not a single hard frame-time gate. Report median-derived bands at the 16.667 ms (60 FPS), 20.000 ms (50 FPS), and 33.333 ms (30 FPS) reference lines, plus checkpoint order, temperature, Android thermal status, and GPU thermal power level when available. Crossing 20 ms does not by itself fail a candidate. Investigate matched regressions above 15%, growing memory/resource use, or unexplained workload changes before accepting them; never weaken RT or silently lower resolution to manufacture a pass.
-- Sustained exact-APK diagnostics on `SM-S948B` held graphics allocation, native heap, PSS/RSS, and thread counts essentially flat while the GPU fell from 1300 MHz to 578-646 MHz at Samsung GPU thermal power level 7. Treat fresh-process speedups and cooled runs as useful context, but use sustained warm behavior as the primary player-facing report.
-- Two simultaneous skeletons are the current validated milestone ceiling, not a permanent game-design limit. Do not add a third/fourth enemy inside unrelated work; a future four/five-enemy slice requires an explicit measured renderer/simulation design and phone pass. Keep the lich singular until that work is authorized.
-- Current Vulkan-enabled host configurations have 31 CTests. Exact 1.6.0 source Host run `run-20260831-131431` and clean post-publication closeout run `run-20260831-135300` passed fresh Debug/Release 31/31 CTests, 13 Windows captures, Android Debug/unsigned Release/lint, strict ARM64 asset math, packaging/licence, shader freshness, and evidence hashing. The latter also proves the immutable 1.6.0/code-8 negative gates. The portable CI lane remains Vulkan-disabled and does not prove hardware RT.
-- New production props must use the measured static GLB/PBR asset, fixed-capacity instance/material metadata, socket, and immutable-BLAS routes; do not restore per-object geometry or material branches.
-
-## Build notes
-
-- Android debug build from `android/`: `.\gradlew.bat assembleDebug installDebug --console=plain`.
-- Standard Android checkpoint/replay gate from repo root: `.\tools\run-android-showcase-validation.ps1`.
-- Windows Vulkan SDK was installed at `C:\VulkanSDK\1.4.350.0` during development.
-- Shader generation from the repo root: `.\tools\compile-raygen.ps1`.
-- Additive Windows configure/build/test presets are in `CMakePresets.json`.
-- `.github/workflows/shared-simulation-host.yml` exercises non-hardware shared gameplay tests only; it does not prove Vulkan RT presentation or phone behavior.
+Keep guidance model-neutral: the caller chooses model and reasoning effort. Use skills only when their stated task matches. Delegate independent, bounded work when useful and available, with clear ownership and an integration check; no fixed agent roster or mandatory multi-agent ceremony. Add a repository skill only for a demonstrated recurring workflow, with a short, specific trigger and on-demand references rather than another copy of these instructions.
