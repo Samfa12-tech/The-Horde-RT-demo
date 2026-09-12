@@ -592,6 +592,7 @@ int main()
         }
         const std::string raygenSource =
             ReadTextFile(raygenDirectory / "minimal.rgen") +
+            ReadTextFile(raygenDirectory / "include/rt_frame.glsl") +
             variantConfigSource +
             ReadTextFile(raygenDirectory / "include/rt_scene_abi.glsl") +
             diagnosticsSource +

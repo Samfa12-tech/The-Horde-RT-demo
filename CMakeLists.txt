@@ -611,6 +611,8 @@ if(BUILD_TESTING)
         target_include_directories(horde_rt_character_render_slot_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
         target_link_libraries(horde_rt_character_render_slot_smoke PRIVATE horde_rt_probe_core)
         add_test(NAME horde_rt_character_render_slot_smoke COMMAND horde_rt_character_render_slot_smoke)
+        set_tests_properties(horde_rt_character_render_slot_smoke PROPERTIES
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
         add_executable(horde_rt_player_skinning_benchmark tests/PlayerSkinningBenchmark.cpp)
         target_include_directories(horde_rt_player_skinning_benchmark PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
