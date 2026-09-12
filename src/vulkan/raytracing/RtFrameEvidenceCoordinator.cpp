@@ -628,8 +628,13 @@ RtFrameEvidenceCompletionResult RtFrameEvidenceCoordinator::CompleteOwnedSlot(
     const std::uint32_t frameSlot,
     const bool finalIdle,
     const RtGpuFrameTimerIo& gpuIo,
-    const RtDiagnosticFrameIo& diagnosticIo) noexcept
+    const RtDiagnosticFrameIo& diagnosticIo,
+    RtPerformanceEvidenceSnapshot* const completedOutput) noexcept
 {
+    if (completedOutput != nullptr)
+    {
+        *completedOutput = {};
+    }
     RtFrameEvidenceCompletionResult result{};
     if (frameSlot >= activeSlotCount_ || frameSlot >= pending_.size())
     {
@@ -737,6 +742,10 @@ RtFrameEvidenceCompletionResult RtFrameEvidenceCoordinator::CompleteOwnedSlot(
         observerAvailable_ = false;
         return result;
     }
+    if (completedOutput != nullptr)
+    {
+        *completedOutput = completed;
+    }
     if (instrumentation_ == RtInstrumentationMode::Diagnostic &&
         !result.fatalDiagnosticIoFailure &&
         diagnosticIo.publishCompleted != nullptr)
@@ -750,17 +759,21 @@ RtFrameEvidenceCompletionResult RtFrameEvidenceCoordinator::CompleteOwnedSlot(
 RtFrameEvidenceCompletionResult RtFrameEvidenceCoordinator::CompleteFence(
     const std::uint32_t frameSlot,
     const RtGpuFrameTimerIo& gpuIo,
-    const RtDiagnosticFrameIo& diagnosticIo) noexcept
+    const RtDiagnosticFrameIo& diagnosticIo,
+    RtPerformanceEvidenceSnapshot* const completedOutput) noexcept
 {
-    return CompleteOwnedSlot(frameSlot, false, gpuIo, diagnosticIo);
+    return CompleteOwnedSlot(
+        frameSlot, false, gpuIo, diagnosticIo, completedOutput);
 }
 
 RtFrameEvidenceCompletionResult RtFrameEvidenceCoordinator::CompleteFinalIdle(
     const std::uint32_t frameSlot,
     const RtGpuFrameTimerIo& gpuIo,
-    const RtDiagnosticFrameIo& diagnosticIo) noexcept
+    const RtDiagnosticFrameIo& diagnosticIo,
+    RtPerformanceEvidenceSnapshot* const completedOutput) noexcept
 {
-    return CompleteOwnedSlot(frameSlot, true, gpuIo, diagnosticIo);
+    return CompleteOwnedSlot(
+        frameSlot, true, gpuIo, diagnosticIo, completedOutput);
 }
 
 void RtFrameEvidenceCoordinator::NoteFailedDeviceIdle() noexcept
@@ -797,6 +810,24 @@ bool RtFrameEvidenceCoordinator::HasSubmittedIdentity(
     const std::uint32_t frameSlot) const noexcept
 {
     return frameSlot < pending_.size() && pending_[frameSlot].hasIdentity;
+}
+
+bool RtFrameEvidenceCoordinator::TryGetCommittedIdentity(
+    const std::uint32_t frameSlot,
+    RtSubmittedFrameIdentity& output) const noexcept
+{
+    output = {};
+    if (frameSlot >= activeSlotCount_ || frameSlot >= pending_.size())
+    {
+        return false;
+    }
+    const PendingSlot& pending = pending_[frameSlot];
+    if (!pending.hasSuccessfulGraphicsSubmission || !pending.hasIdentity)
+    {
+        return false;
+    }
+    output = pending.identity;
+    return true;
 }
 
 void RtFrameEvidenceCoordinator::LoseCurrentIdentity() noexcept

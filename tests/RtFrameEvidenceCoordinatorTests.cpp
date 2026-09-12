@@ -116,6 +116,39 @@ RtLifecycleSeeds Seeds()
     return seeds;
 }
 
+bool SameSubmittedIdentity(const RtSubmittedFrameIdentity& left,
+                           const RtSubmittedFrameIdentity& right)
+{
+    return left.frame.sceneEpoch == right.frame.sceneEpoch &&
+           left.frame.measurementGeneration == right.frame.measurementGeneration &&
+           left.frame.recordAttemptSerial == right.frame.recordAttemptSerial &&
+           left.frame.recordSerial == right.frame.recordSerial &&
+           left.frame.simulationTick == right.frame.simulationTick &&
+           left.frame.frameSlot == right.frame.frameSlot &&
+           left.submissionSerial == right.submissionSerial;
+}
+
+bool ClearedSubmittedIdentity(const RtSubmittedFrameIdentity& identity)
+{
+    return SameSubmittedIdentity(identity, RtSubmittedFrameIdentity{});
+}
+
+bool ClearedCompletedEvidence(const RtPerformanceEvidenceSnapshot& evidence)
+{
+    return ClearedSubmittedIdentity(evidence.identity.submitted) &&
+           evidence.identity.completionSerial == 0u &&
+           RtFixedTextView(evidence.scene.pipeline.bundleKey).empty() &&
+           evidence.scene.resources.bufferCount == 0u &&
+           evidence.scene.stages.status == RtSampleStatus::NotReady &&
+           evidence.dielectric.status == RtSampleStatus::NotReady &&
+           evidence.gpu.status == RtSampleStatus::NotReady &&
+           evidence.presentation.outcome == RtPresentationOutcome::NotAttempted &&
+           evidence.presentation.lastSuccessfulPresentSubmissionSerial == 0u &&
+           !evidence.presentation.finalIdleCompletion &&
+           !evidence.cpuBenchmarkEligible &&
+           !evidence.benchmarkEligible;
+}
+
 void PopulateRecordedScene(RtSceneRecordObservation& observation,
                            const RtInstrumentationMode instrumentation,
                            const char hashCharacter)
@@ -206,6 +239,199 @@ void SubmitPresentedFrame(TestContext& test,
     test.Check(coordinator.AttachPresentation(RtPresentationOutcome::Presented),
                "presented outcome must attach independently");
     coordinator.FinalizeSubmittedFrame(observation);
+}
+
+void TestCommittedIdentityHandoff(TestContext& test)
+{
+    RtFrameEvidenceCoordinator coordinator;
+    FakeGpu gpu;
+    test.Check(coordinator.Initialise(Seeds(), 1u,
+                                      RtInstrumentationMode::Shipping,
+                                      RtSampleStatus::Disabled, false),
+               "committed-identity fixture must initialise");
+
+    RtSubmittedFrameIdentity handedOff{};
+    handedOff.submissionSerial = 999u;
+    test.Check(!coordinator.TryGetCommittedIdentity(0u, handedOff) &&
+                   ClearedSubmittedIdentity(handedOff),
+               "empty slot must not leak a caller's old submitted identity");
+    handedOff.submissionSerial = 999u;
+    test.Check(!coordinator.TryGetCommittedIdentity(1u, handedOff) &&
+                   ClearedSubmittedIdentity(handedOff),
+               "invalid slot must clear output and expose no identity");
+
+    RtSceneRecordObservation observation{};
+    test.Check(coordinator.BeginFrame(0u, observation),
+               "committed-identity frame must begin");
+    const RtEvidenceSubmitTransaction transaction = RecordAndPrevalidate(
+        test, coordinator, observation, RtInstrumentationMode::Shipping, 301u);
+    handedOff.submissionSerial = 999u;
+    test.Check(!coordinator.TryGetCommittedIdentity(0u, handedOff) &&
+                   ClearedSubmittedIdentity(handedOff),
+               "prevalidated identity must not be authoritative before actual commit");
+
+    coordinator.CommitGraphicsSubmit(
+        transaction, false, false, MakeFakeGpuIo(gpu));
+    test.Check(coordinator.TryGetCommittedIdentity(0u, handedOff) &&
+                   SameSubmittedIdentity(handedOff, transaction.identity) &&
+                   handedOff.frame.simulationTick == 301u,
+               "successful graphics commit must expose its exact accepted identity");
+
+    test.Check(coordinator.Recreate(RtResourceResetReason::SwapchainRecreate,
+                                    RtSampleStatus::Disabled),
+               "recreation must invalidate the pending committed identity");
+    handedOff = transaction.identity;
+    test.Check(!coordinator.TryGetCommittedIdentity(0u, handedOff) &&
+                   ClearedSubmittedIdentity(handedOff),
+               "recreation must clear output instead of leaking the retired identity");
+
+    RtSceneRecordObservation failedObservation{};
+    test.Check(coordinator.BeginFrame(0u, failedObservation),
+               "failed-submit identity frame must begin");
+    (void)RecordAndPrevalidate(test, coordinator, failedObservation,
+                              RtInstrumentationMode::Shipping, 302u);
+    coordinator.FailGraphicsSubmit(false, MakeFakeGpuIo(gpu));
+    handedOff.submissionSerial = 999u;
+    test.Check(!coordinator.TryGetCommittedIdentity(0u, handedOff) &&
+                   ClearedSubmittedIdentity(handedOff),
+               "failed graphics submit must expose no committed identity");
+
+    RtLifecycleSeeds exhausted = Seeds();
+    exhausted.submissionSerial = std::numeric_limits<std::uint64_t>::max();
+    RtFrameEvidenceCoordinator tokenless;
+    test.Check(tokenless.Initialise(exhausted, 1u,
+                                    RtInstrumentationMode::Shipping,
+                                    RtSampleStatus::Disabled, false),
+               "tokenless committed-identity fixture must initialise");
+    RtSceneRecordObservation tokenlessObservation{};
+    test.Check(tokenless.BeginFrame(0u, tokenlessObservation) &&
+                   tokenless.BeginRecord(303u),
+               "tokenless committed-identity frame must begin recording");
+    PopulateRecordedScene(tokenlessObservation,
+                          RtInstrumentationMode::Shipping, 'a');
+    test.Check(tokenless.FinishRecord(tokenlessObservation),
+               "tokenless committed-identity frame must finish recording");
+    const RtEvidenceSubmitTransaction rejected = tokenless.PrevalidateSubmit();
+    test.Check(!rejected.valid,
+               "serial exhaustion must prevent optional identity prevalidation");
+    tokenless.CommitGraphicsSubmit(
+        rejected, false, false, MakeFakeGpuIo(gpu));
+    handedOff.submissionSerial = 999u;
+    test.Check(tokenless.HasSuccessfulGraphicsSubmission(0u) &&
+                   !tokenless.TryGetCommittedIdentity(0u, handedOff) &&
+                   ClearedSubmittedIdentity(handedOff),
+               "tokenless successful graphics must retain ownership without inventing identity");
+}
+
+void TestCompletionOutputHandoff(TestContext& test)
+{
+    FakeGpu gpu;
+    FakeDiagnostic diagnostic;
+    RtFrameEvidenceCoordinator fenceCoordinator;
+    test.Check(fenceCoordinator.Initialise(Seeds(), 1u,
+                                           RtInstrumentationMode::Shipping,
+                                           RtSampleStatus::Disabled, false),
+               "fence completion-output fixture must initialise");
+    RtSceneRecordObservation fenceObservation{};
+    test.Check(fenceCoordinator.BeginFrame(0u, fenceObservation),
+               "fence completion-output frame must begin");
+    SubmitPresentedFrame(test, fenceCoordinator, fenceObservation,
+                         RtInstrumentationMode::Shipping, gpu,
+                         false, false, 401u);
+    RtSubmittedFrameIdentity fenceIdentity{};
+    test.Check(fenceCoordinator.TryGetCommittedIdentity(0u, fenceIdentity),
+               "fence fixture must expose its committed identity before completion");
+
+    RtPerformanceEvidenceSnapshot fenceOutput{};
+    fenceOutput.identity.completionSerial = 999u;
+    const RtFrameEvidenceCompletionResult fenceResult =
+        fenceCoordinator.CompleteFence(
+            0u, MakeFakeGpuIo(gpu), MakeFakeDiagnosticIo(diagnostic),
+            &fenceOutput);
+    test.Check(fenceResult.completedEvidence &&
+                   SameSubmittedIdentity(fenceOutput.identity.submitted,
+                                         fenceIdentity) &&
+                   fenceOutput.identity.completionSerial == 1u &&
+                   fenceOutput.identity.submitted.frame.simulationTick == 401u &&
+                   RtFixedTextView(fenceOutput.scene.pipeline.bundleKey) ==
+                       "shipping_high_pair" &&
+                   fenceOutput.dielectric.status == RtSampleStatus::CompiledOut &&
+                   fenceOutput.gpu.status == RtSampleStatus::Disabled &&
+                   fenceOutput.presentation.outcome ==
+                       RtPresentationOutcome::Presented &&
+                   !fenceOutput.presentation.finalIdleCompletion,
+               "owning fence must return the exact lifecycle-accepted completion");
+
+    RtPerformanceEvidenceSnapshot duplicateOutput = fenceOutput;
+    const RtFrameEvidenceCompletionResult duplicate =
+        fenceCoordinator.CompleteFence(
+            0u, MakeFakeGpuIo(gpu), MakeFakeDiagnosticIo(diagnostic),
+            &duplicateOutput);
+    test.Check(!duplicate.ownedGraphicsSubmission && !duplicate.completedEvidence &&
+                   ClearedCompletedEvidence(duplicateOutput),
+               "duplicate or empty fence completion must clear old output");
+
+    RtFrameEvidenceCoordinator idleCoordinator;
+    test.Check(idleCoordinator.Initialise(Seeds(), 1u,
+                                          RtInstrumentationMode::Shipping,
+                                          RtSampleStatus::Disabled, false),
+               "final-idle completion-output fixture must initialise");
+    RtSceneRecordObservation idleObservation{};
+    test.Check(idleCoordinator.BeginFrame(0u, idleObservation),
+               "final-idle completion-output frame must begin");
+    SubmitPresentedFrame(test, idleCoordinator, idleObservation,
+                         RtInstrumentationMode::Shipping, gpu,
+                         false, false, 402u);
+    RtSubmittedFrameIdentity idleIdentity{};
+    test.Check(idleCoordinator.TryGetCommittedIdentity(0u, idleIdentity),
+               "final-idle fixture must expose its committed identity");
+    RtPerformanceEvidenceSnapshot idleOutput{};
+    const RtFrameEvidenceCompletionResult idleResult =
+        idleCoordinator.CompleteFinalIdle(
+            0u, MakeFakeGpuIo(gpu), MakeFakeDiagnosticIo(diagnostic),
+            &idleOutput);
+    test.Check(idleResult.completedEvidence &&
+                   SameSubmittedIdentity(idleOutput.identity.submitted,
+                                         idleIdentity) &&
+                   idleOutput.identity.completionSerial == 1u &&
+                   idleOutput.identity.submitted.frame.simulationTick == 402u &&
+                   RtFixedTextView(idleOutput.scene.pipeline.bundleKey) ==
+                       "shipping_high_pair" &&
+                   idleOutput.presentation.outcome ==
+                       RtPresentationOutcome::Presented &&
+                   idleOutput.presentation.finalIdleCompletion,
+               "successful final idle must return its exact accepted completion");
+
+    RtLifecycleSeeds exhausted = Seeds();
+    exhausted.submissionSerial = std::numeric_limits<std::uint64_t>::max();
+    RtFrameEvidenceCoordinator tokenless;
+    test.Check(tokenless.Initialise(exhausted, 1u,
+                                    RtInstrumentationMode::Shipping,
+                                    RtSampleStatus::Disabled, false),
+               "tokenless completion-output fixture must initialise");
+    RtSceneRecordObservation tokenlessObservation{};
+    test.Check(tokenless.BeginFrame(0u, tokenlessObservation) &&
+                   tokenless.BeginRecord(403u),
+               "tokenless completion-output frame must begin recording");
+    PopulateRecordedScene(tokenlessObservation,
+                          RtInstrumentationMode::Shipping, 'a');
+    test.Check(tokenless.FinishRecord(tokenlessObservation),
+               "tokenless completion-output frame must finish recording");
+    const RtEvidenceSubmitTransaction rejected = tokenless.PrevalidateSubmit();
+    tokenless.CommitGraphicsSubmit(
+        rejected, false, false, MakeFakeGpuIo(gpu));
+    test.Check(tokenless.AttachPresentation(RtPresentationOutcome::Presented),
+               "tokenless completion-output frame must retain presentation ownership");
+    tokenless.FinalizeSubmittedFrame(tokenlessObservation);
+    RtPerformanceEvidenceSnapshot tokenlessOutput = fenceOutput;
+    const RtFrameEvidenceCompletionResult tokenlessResult =
+        tokenless.CompleteFence(
+            0u, MakeFakeGpuIo(gpu), MakeFakeDiagnosticIo(diagnostic),
+            &tokenlessOutput);
+    test.Check(tokenlessResult.ownedGraphicsSubmission &&
+                   !tokenlessResult.completedEvidence &&
+                   ClearedCompletedEvidence(tokenlessOutput),
+               "tokenless completion must clear output without leaking an older frame");
 }
 
 void TestSuboptimalPresentation(TestContext& test)
@@ -337,10 +563,14 @@ void TestTokenlessSubmissionAndFatalDiagnosticRead(TestContext& test)
     SubmitPresentedFrame(test, failing, failedObservation,
                          RtInstrumentationMode::Diagnostic, gpu,
                          false, false, 20u, true);
+    RtPerformanceEvidenceSnapshot readFailureOutput{};
     const RtFrameEvidenceCompletionResult readFailure = failing.CompleteFence(
-        0u, MakeFakeGpuIo(gpu), MakeFakeDiagnosticIo(failedRead));
+        0u, MakeFakeGpuIo(gpu), MakeFakeDiagnosticIo(failedRead),
+        &readFailureOutput);
     test.Check(readFailure.fatalDiagnosticIoFailure &&
-                   readFailure.completedEvidence && failedRead.publishCount == 0u,
+                   readFailure.completedEvidence && failedRead.publishCount == 0u &&
+                   readFailureOutput.identity.submitted.frame.simulationTick == 20u &&
+                   readFailureOutput.dielectric.status == RtSampleStatus::Error,
                "actual Diagnostic read IO failure must publish Error but no counter payload");
     const auto failedState = failing.PublishedStateByValue();
     test.Check(failedState.hasCompletedEvidence &&
@@ -1049,6 +1279,8 @@ void TestGpuUnavailableAndSetupErrorEvidence(TestContext& test)
 int main()
 {
     TestContext test;
+    TestCommittedIdentityHandoff(test);
+    TestCompletionOutputHandoff(test);
     TestSuboptimalPresentation(test);
     TestInitialFenceAndDiagnosticOwnership(test);
     TestTokenlessSubmissionAndFatalDiagnosticRead(test);

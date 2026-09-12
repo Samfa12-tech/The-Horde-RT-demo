@@ -109,14 +109,18 @@ public:
     void FinalizeSubmittedFrame(const RtSceneRecordObservation& observation) noexcept;
     void AbortFrame() noexcept;
 
+    // Optional output is cleared on entry and filled only by exact lifecycle acceptance.
+    // No pointer is retained; callers consume the copied snapshot before resetting an epoch.
     [[nodiscard]] RtFrameEvidenceCompletionResult CompleteFence(
         std::uint32_t frameSlot,
         const RtGpuFrameTimerIo& gpuIo,
-        const RtDiagnosticFrameIo& diagnosticIo) noexcept;
+        const RtDiagnosticFrameIo& diagnosticIo,
+        horde::telemetry::RtPerformanceEvidenceSnapshot* completedOutput = nullptr) noexcept;
     [[nodiscard]] RtFrameEvidenceCompletionResult CompleteFinalIdle(
         std::uint32_t frameSlot,
         const RtGpuFrameTimerIo& gpuIo,
-        const RtDiagnosticFrameIo& diagnosticIo) noexcept;
+        const RtDiagnosticFrameIo& diagnosticIo,
+        horde::telemetry::RtPerformanceEvidenceSnapshot* completedOutput = nullptr) noexcept;
     // Failed device idle owns no host reads. Pending facts are cleared only by
     // the following Recreate/Destroy epoch transition.
     void NoteFailedDeviceIdle() noexcept;
@@ -133,6 +137,10 @@ public:
     [[nodiscard]] bool ObserverAvailable() const noexcept { return observerAvailable_; }
     [[nodiscard]] bool HasSuccessfulGraphicsSubmission(std::uint32_t frameSlot) const noexcept;
     [[nodiscard]] bool HasSubmittedIdentity(std::uint32_t frameSlot) const noexcept;
+    // Prevalidation is not a commit. Failure clears the caller's prior identity.
+    [[nodiscard]] bool TryGetCommittedIdentity(
+        std::uint32_t frameSlot,
+        horde::telemetry::RtSubmittedFrameIdentity& output) const noexcept;
     [[nodiscard]] bool FrameActive() const noexcept { return frameActive_; }
 
 private:
@@ -158,7 +166,8 @@ private:
         std::uint32_t frameSlot,
         bool finalIdle,
         const RtGpuFrameTimerIo& gpuIo,
-        const RtDiagnosticFrameIo& diagnosticIo) noexcept;
+        const RtDiagnosticFrameIo& diagnosticIo,
+        horde::telemetry::RtPerformanceEvidenceSnapshot* completedOutput) noexcept;
     [[nodiscard]] horde::telemetry::RtGpuTimingEvidence BuildGpuEvidence(
         const PendingSlot& pending,
         const GpuFrameTimingCollection* collection,
