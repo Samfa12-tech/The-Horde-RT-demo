@@ -899,7 +899,7 @@ bool ValidateRtPerformanceEvidence(const RtPerformanceEvidenceSnapshot& snapshot
     const bool gpuBenchmarkValid = snapshot.gpu.status == RtSampleStatus::Valid ||
                                    snapshot.gpu.status == RtSampleStatus::Disabled ||
                                    snapshot.gpu.status == RtSampleStatus::Unsupported;
-    if (snapshot.benchmarkEligible && !diagnosticBenchmarkValid)
+    if ((snapshot.cpuBenchmarkEligible || snapshot.benchmarkEligible) && !diagnosticBenchmarkValid)
     {
         error = RtEvidenceValidationError::InvalidDiagnosticState;
         return false;
@@ -909,11 +909,16 @@ bool ValidateRtPerformanceEvidence(const RtPerformanceEvidenceSnapshot& snapshot
         error = RtEvidenceValidationError::InvalidGpuState;
         return false;
     }
-    if (snapshot.benchmarkEligible &&
+    if ((snapshot.cpuBenchmarkEligible || snapshot.benchmarkEligible) &&
         (snapshot.presentation.outcome != RtPresentationOutcome::Presented ||
          snapshot.scene.stages.status != RtSampleStatus::Valid))
     {
         error = RtEvidenceValidationError::InvalidPresentationState;
+        return false;
+    }
+    if (snapshot.benchmarkEligible && !snapshot.cpuBenchmarkEligible)
+    {
+        error = RtEvidenceValidationError::InconsistentIdentity;
         return false;
     }
     return true;
@@ -1080,6 +1085,7 @@ bool SerializeRtPerformanceEvidenceJson(const RtPerformanceEvidenceSnapshot& sna
          << snapshot.presentation.lastSuccessfulPresentSubmissionSerial
          << ",\"finalIdleCompletion\":"
          << (snapshot.presentation.finalIdleCompletion ? "true" : "false") << '}'
+         << ",\"cpuBenchmarkEligible\":" << (snapshot.cpuBenchmarkEligible ? "true" : "false")
          << ",\"benchmarkEligible\":" << (snapshot.benchmarkEligible ? "true" : "false")
          << "}\n";
     output = json.str();
@@ -1133,6 +1139,7 @@ bool SerializeRtPerformanceEvidenceText(const RtPerformanceEvidenceSnapshot& sna
          << " last-successful-submission="
          << snapshot.presentation.lastSuccessfulPresentSubmissionSerial
          << " final-idle=" << (snapshot.presentation.finalIdleCompletion ? "yes" : "no")
+         << " cpu-benchmark-eligible=" << (snapshot.cpuBenchmarkEligible ? "yes" : "no")
          << " benchmark-eligible=" << (snapshot.benchmarkEligible ? "yes" : "no") << '\n'
          << "Dielectric diagnostics: " << RtSampleStatusName(snapshot.dielectric.status)
          << " counters=" << (snapshot.dielectric.status == RtSampleStatus::Valid ? "available" : "N/A")
@@ -1550,12 +1557,13 @@ bool RtEvidenceLifecycle::Complete(const RtSubmittedFrameIdentity& submitted,
     const bool gpuUsable = gpu.status == RtSampleStatus::Valid ||
                            gpu.status == RtSampleStatus::Disabled ||
                            gpu.status == RtSampleStatus::Unsupported;
-    candidate.benchmarkEligible =
+    candidate.cpuBenchmarkEligible =
         measurementSamplesEligible_ && !published_.paused && !diagnosticFault &&
         currentMeasurementGeneration &&
         outcome == RtPresentationOutcome::Presented &&
         candidate.scene.stages.status == RtSampleStatus::Valid &&
-        diagnosticUsable && gpuUsable;
+        diagnosticUsable;
+    candidate.benchmarkEligible = candidate.cpuBenchmarkEligible && gpuUsable;
 
     RtEvidenceValidationError error = RtEvidenceValidationError::None;
     if (!ValidateRtPerformanceEvidence(candidate, error))

@@ -173,6 +173,7 @@ RtPerformanceEvidenceSnapshot MakeCompletedEvidence(
     snapshot.gpu = MakeGpu(instrumentation, 1u);
     snapshot.presentation.outcome = RtPresentationOutcome::Presented;
     snapshot.presentation.lastSuccessfulPresentSubmissionSerial = 1u;
+    snapshot.cpuBenchmarkEligible = true;
     snapshot.benchmarkEligible = true;
     return snapshot;
 }

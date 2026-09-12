@@ -354,6 +354,9 @@ struct RtPerformanceEvidenceSnapshot
     RtDiagnosticEvidence dielectric{};
     RtGpuTimingEvidence gpu{};
     RtPresentationEvidence presentation{};
+    // Lifecycle/presentation/CPU/Diagnostic admission, independent of optional GPU availability.
+    bool cpuBenchmarkEligible = false;
+    // Combined admission additionally requires GPU Valid, Disabled or Unsupported.
     bool benchmarkEligible = false;
 };
 

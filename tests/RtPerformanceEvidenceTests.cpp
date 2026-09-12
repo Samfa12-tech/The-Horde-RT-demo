@@ -444,6 +444,7 @@ RtPerformanceEvidenceSnapshot MakeSnapshot(TestContext& context,
                            0u);
     snapshot.presentation.outcome = RtPresentationOutcome::Presented;
     snapshot.presentation.lastSuccessfulPresentSubmissionSerial = 1u;
+    snapshot.cpuBenchmarkEligible = true;
     snapshot.benchmarkEligible = true;
     return snapshot;
 }
@@ -1211,7 +1212,7 @@ void TestLifecycleResetTableAndExhaustion(TestContext& context)
                       MakeGpu(RtSampleStatus::Disabled, 0u, 0u),
                       oldGenerationEvidence),
                   "old-generation submission remains valid for general evidence");
-    context.Check(!oldGenerationEvidence.benchmarkEligible,
+    context.Check(!oldGenerationEvidence.benchmarkEligible && !oldGenerationEvidence.cpuBenchmarkEligible,
                   "old-generation completion must be benchmark-ineligible");
 
     context.Check(lifecycle.ApplyEvent(RtLifecycleEvent::Pause, effects), "pause must succeed");
@@ -1593,7 +1594,8 @@ void TestMeasurementEligibility(TestContext& context)
         context, RtInstrumentationMode::Shipping, RtMaterialStrategy::OpaqueFast, 'a', 100u);
 
     const auto completePresentedFrame = [&](const std::uint64_t tick,
-                                            RtPerformanceEvidenceSnapshot& completed) {
+                                            RtPerformanceEvidenceSnapshot& completed,
+                                            const RtSampleStatus gpuStatus = RtSampleStatus::Disabled) {
         RtFrameToken attempt{};
         RtFrameToken recorded{};
         RtSubmittedFrameIdentity submitted{};
@@ -1608,7 +1610,9 @@ void TestMeasurementEligibility(TestContext& context)
                                   RtSampleStatus::CompiledOut,
                                   0u,
                                   0u),
-                   MakeGpu(RtSampleStatus::Disabled, 0u, 0u),
+                   MakeGpu(gpuStatus,
+                           gpuStatus == RtSampleStatus::Valid || gpuStatus == RtSampleStatus::Error
+                               ? submitted.submissionSerial : 0u, 0u),
                    completed);
     };
 
@@ -1616,14 +1620,16 @@ void TestMeasurementEligibility(TestContext& context)
                       !effects.nextSampleEligible,
                   "benchmark start must enter an explicit warm-up-ineligible generation");
     RtPerformanceEvidenceSnapshot warmup{};
-    context.Check(completePresentedFrame(1u, warmup) && !warmup.benchmarkEligible,
+    context.Check(completePresentedFrame(1u, warmup) && !warmup.benchmarkEligible &&
+                      !warmup.cpuBenchmarkEligible,
                   "a presented completion during benchmark warm-up must remain ineligible");
 
     context.Check(lifecycle.ApplyEvent(RtLifecycleEvent::WarmupToMeasure, effects) &&
                       effects.nextSampleEligible,
                   "warm-up transition must enable the new measurement generation");
     RtPerformanceEvidenceSnapshot measured{};
-    context.Check(completePresentedFrame(2u, measured) && measured.benchmarkEligible,
+    context.Check(completePresentedFrame(2u, measured) && measured.benchmarkEligible &&
+                      measured.cpuBenchmarkEligible,
                   "a matching presented completion after warm-up must become eligible");
 
     RtFrameToken prePauseAttempt{};
@@ -1647,7 +1653,7 @@ void TestMeasurementEligibility(TestContext& context)
                                      0u),
                       MakeGpu(RtSampleStatus::Disabled, 0u, 0u),
                       pausedCompletion) &&
-                      !pausedCompletion.benchmarkEligible,
+                      !pausedCompletion.benchmarkEligible && !pausedCompletion.cpuBenchmarkEligible,
                   "a retained submission completed while paused must not enter benchmark data");
 
     context.Check(lifecycle.ApplyEvent(RtLifecycleEvent::Resume, effects) &&
@@ -1656,6 +1662,18 @@ void TestMeasurementEligibility(TestContext& context)
     RtPerformanceEvidenceSnapshot resumed{};
     context.Check(completePresentedFrame(4u, resumed) && resumed.benchmarkEligible,
                   "a matching presented completion after resume must become eligible");
+    std::uint64_t gpuCaseTick = 5u;
+    for (const auto status : {RtSampleStatus::Valid, RtSampleStatus::Pending,
+                              RtSampleStatus::Error, RtSampleStatus::Disabled,
+                              RtSampleStatus::Unsupported})
+    {
+        RtPerformanceEvidenceSnapshot gpuCase{};
+        const bool gpuUsable = status == RtSampleStatus::Valid ||
+            status == RtSampleStatus::Disabled || status == RtSampleStatus::Unsupported;
+        context.Check(completePresentedFrame(gpuCaseTick++, gpuCase, status) &&
+                          gpuCase.cpuBenchmarkEligible && gpuCase.benchmarkEligible == gpuUsable,
+                      "GPU-only availability must not discard independently valid owning CPU timings");
+    }
 }
 
 void TestDiagnosticFirstSubmittedCompletion(TestContext& context)
@@ -1943,7 +1961,7 @@ void TestValidatorAndSerializers(TestContext& context)
         "\"operationCounts\":[0,0,0,0,2,0,0,0,0,0,0,0,0]},"
         "\"presentation\":{\"outcome\":\"presented\",\"presented\":true,"
         "\"lastSuccessfulPresentSubmissionSerial\":1,\"finalIdleCompletion\":false},"
-        "\"benchmarkEligible\":true}\n";
+        "\"cpuBenchmarkEligible\":true,\"benchmarkEligible\":true}\n";
     context.Check(shippingJson == expectedShippingJson,
                   "Shipping JSON must match the hand-derived canonical golden document");
     context.Check(shippingJson.find("\"counters\":null") != std::string::npos &&
@@ -1958,7 +1976,7 @@ void TestValidatorAndSerializers(TestContext& context)
         "Frame: epoch=11 generation=20 attempt=1 record=1 submission=1 completion=1 tick=101 slot=0\n"
         "Pipeline: RayTracingPipeline/shipping/high pair=shipping_high_pair active=opaque-fast opaque_fast@aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n"
         "Player: skin-cadence-hz=60 skin-updates=0 max-socket-error-um=10 primary-pixels=N/A primary-visible=no\n"
-        "Presentation: presented last-successful-submission=1 final-idle=no benchmark-eligible=yes\n"
+        "Presentation: presented last-successful-submission=1 final-idle=no cpu-benchmark-eligible=yes benchmark-eligible=yes\n"
         "Dielectric diagnostics: compiled-out counters=N/A reads=0 resets=0\n"
         "Whole RT GPU: disabled value=N/A\n"
         "Stages (CPU wall/record): simulationStepCpuMs=0.000000 skinCpuMs=0.000005 playerSkinCpuMs=0.000002 characterSkinCpuMs=0.000003 dynamicUploadCpuMs=0.000004 blasRefitRecordCpuMs=0.000005 tlasUpdateRecordCpuMs=0.000006 traceCopyRecordCpuMs=0.000007 frameFenceWaitCpuMs=0.000008 imageAcquireCpuMs=0.000009 queueSubmitCpuMs=0.000010 presentCallCpuMs=0.000011 wholeFrameCycleCpuMs=0.000012\n";
@@ -2004,6 +2022,7 @@ void TestValidatorAndSerializers(TestContext& context)
     invalidStages.scene.stages.status = RtSampleStatus::Error;
     invalidStages.scene.stages.values[RtStageIndex(RtStage::DynamicUpload)].overflowed = true;
     invalidStages.benchmarkEligible = false;
+    invalidStages.cpuBenchmarkEligible = false;
     std::string invalidStagesJson;
     context.Check(SerializeRtPerformanceEvidenceJson(
                       invalidStages, invalidStagesJson, error) &&
@@ -2018,6 +2037,7 @@ void TestValidatorAndSerializers(TestContext& context)
     reversedClockStages.scene.stages = {};
     reversedClockStages.scene.stages.status = RtSampleStatus::Error;
     reversedClockStages.benchmarkEligible = false;
+    reversedClockStages.cpuBenchmarkEligible = false;
     std::string reversedClockJson;
     context.Check(SerializeRtPerformanceEvidenceJson(
                       reversedClockStages, reversedClockJson, error) &&
@@ -2149,6 +2169,7 @@ void TestValidatorAndSerializers(TestContext& context)
     diagnosticError.scene.player.primaryPixelCount = 0u;
     diagnosticError.scene.player.primaryVisible = false;
     diagnosticError.benchmarkEligible = false;
+    diagnosticError.cpuBenchmarkEligible = false;
     std::string diagnosticErrorJson;
     context.Check(ValidateRtPerformanceEvidence(diagnosticError, error) &&
                       SerializeRtPerformanceEvidenceJson(
@@ -2161,6 +2182,23 @@ void TestValidatorAndSerializers(TestContext& context)
     context.Check(!ValidateRtPerformanceEvidence(diagnosticError, error) &&
                       error == RtEvidenceValidationError::InvalidDiagnosticState,
                   "Diagnostic Error must invalidate the benchmark sample");
+    diagnosticError.benchmarkEligible = false;
+    diagnosticError.cpuBenchmarkEligible = true;
+    context.Check(!ValidateRtPerformanceEvidence(diagnosticError, error) &&
+                      error == RtEvidenceValidationError::InvalidDiagnosticState,
+                  "CPU admission cannot bypass a Diagnostic ownership fault");
+
+    invalid = shipping;
+    invalid.cpuBenchmarkEligible = false;
+    context.Check(!ValidateRtPerformanceEvidence(invalid, error) &&
+                      error == RtEvidenceValidationError::InconsistentIdentity,
+                  "combined benchmark admission requires independent CPU admission");
+    invalid = shipping;
+    invalid.benchmarkEligible = false;
+    invalid.presentation.outcome = RtPresentationOutcome::PresentedNeedsRecreate;
+    context.Check(!ValidateRtPerformanceEvidence(invalid, error) &&
+                      error == RtEvidenceValidationError::InvalidPresentationState,
+                  "CPU-only admission cannot bypass recreation-interrupted presentation");
 
     invalid = shipping;
     invalid.gpu.status = RtSampleStatus::Pending;
