@@ -135,6 +135,28 @@ The Windows ZIP passed an isolated packaged-file launch with `RayTracingPipeline
 
 Normal gameplay retains block arms; skinned gauntlets and arm/body shadow/reflection presentation remain deferred. The finite Mobile glass budget and measured performance remain accepted alpha boundaries and must not be hidden by silently lowering quality or render scale. The 1.6.0 release line and `versionCode 8` are immutable; the next Android release requires a new version and `versionCode > 8`. No Git tag or GitHub Release was created, so updater announcement remains a separate owner-authorised publication action.
 
+## 1.6.1 hardware ray-query compatibility decision - 2026-09-13
+
+The owner moved the already planned S24/S25 compatibility programme from
+post-1.6.1 into the current release, ahead of the remaining engineering work.
+The reported S25 Ultra / Adreno 830 / driver 512.800.64 and S24 Ultra / Adreno 750 /
+driver 512.762.41 expose acceleration structures and ray query but not
+`VK_KHR_ray_tracing_pipeline`; the existing bridge therefore never attempted the
+scene. This is a missing execution backend, not evidence of a failed AS build or
+of absent hardware ray tracing. Exact Samsung model codes and tested APK hashes
+were not captured in those screenshot-derived records.
+
+Preserve the preferred `RayTracingPipeline` backend on S26/Windows RTX and add
+the previously planned `RayQueryCompute` backend: a compute launcher invokes the
+same shared per-pixel shading and real Vulkan hardware `rayQueryEXT` traversal
+over the same BLAS/TLAS/resources. This implements the Rendering path section's
+existing genuine-RayQuery allowance; it does not authorise generic compute/software
+path tracing, raster fallback, feature removal or dishonest presentation. Keep
+backend and quality/instrumentation policy separate and report the actual backend.
+See `FUTURE_WORK.md` and `docs/ENGINEERING_1_6_1_PLAN.md` for parity and final gates.
+
+At this decision the alternate backend is not implemented or device-accepted.
+
 ## Target devices
 
 - Primary target: Samsung Galaxy S26 Ultra.

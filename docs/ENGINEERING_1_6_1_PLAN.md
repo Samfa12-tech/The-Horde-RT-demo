@@ -39,10 +39,19 @@ set is complete. It does not authorise publication or relax any RT requirement.
 
 ## Galaxy S24/S25 compatibility
 
-Investigate before changing device policy. Existing compatibility records classify
-S24/S25 families as candidates, not locally confirmed support. The owner's new
-failure report must be reconciled with exact model/region, OS/driver, build and
-startup diagnostics; absence of a raw report is not proof of a particular cause.
+The current-main screenshot-derived records identify S25 Ultra / Adreno 830 /
+driver 512.800.64 and S24 Ultra / Adreno 750 / driver 512.762.41 as RayQuery-only:
+AS/RQ/BDA/deferred-host-operations are exposed, but ray-tracing-pipeline is not.
+The bridge's pipeline-only launch gate prevents any scene attempt. No downstream
+AS/shader/surface failure has been demonstrated. Exact model codes and APK hashes
+are absent, and neither configuration has locally confirmed working RT presentation.
+
+Bring the already planned alternate hardware `RayQueryCompute` backend in
+[FUTURE_WORK.md](../FUTURE_WORK.md) into 1.6.1. Share real BLAS/TLAS ray traversal,
+shading, resources and simulation with the preferred pipeline backend; only the
+launcher, required features and synchronization/stage bindings differ. Preserve
+the existing pipeline preference on S26/RTX. The main roadmap's former
+post-1.6.1/music/compatibility order is superseded by the owner's current request.
 
 Trace loader/capability enumeration, enabled features/extensions, queue/device
 selection, BLAS/TLAS creation, shader/RT pipeline setup, surface/swapchain creation,
