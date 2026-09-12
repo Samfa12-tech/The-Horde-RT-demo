@@ -13,10 +13,13 @@
 #include <limits>
 #include <locale>
 #include <new>
+#include <span>
 #include <sstream>
 #include <string>
 #include <string_view>
 #include <type_traits>
+#include <utility>
+#include <vector>
 
 #if defined(_MSC_VER)
 #include <malloc.h>
@@ -218,6 +221,8 @@ static_assert(std::is_trivially_copyable_v<RtSubmittedStageSample>);
 static_assert(std::is_standard_layout_v<RtSubmittedStageSample>);
 static_assert(std::is_trivially_copyable_v<RtStageAccumulator>);
 static_assert(std::is_standard_layout_v<RtStageAccumulator>);
+static_assert(std::is_trivially_copyable_v<RtStageSampleCollectionCore>);
+static_assert(std::is_standard_layout_v<RtStageSampleCollectionCore>);
 static_assert(std::is_trivially_copyable_v<RtStageSampleCollector>);
 static_assert(std::is_standard_layout_v<RtStageSampleCollector>);
 static_assert(std::is_trivially_copyable_v<RtEvidenceLifecycle>);
@@ -705,6 +710,190 @@ RtCompletedStageSample MakeCollectedSample(const std::uint64_t completionSerial,
     sample.stages = MakeStageFrame(durationNanoseconds);
     sample.benchmarkEligible = true;
     return sample;
+}
+
+bool SameStageStatistics(const RtStageStatistics& left,
+                         const RtStageStatistics& right)
+{
+    return left.valid == right.valid &&
+           left.sampleCount == right.sampleCount &&
+           left.meanMilliseconds == right.meanMilliseconds &&
+           left.medianMilliseconds == right.medianMilliseconds &&
+           left.p90Milliseconds == right.p90Milliseconds &&
+           left.p95Milliseconds == right.p95Milliseconds &&
+           left.slowestOnePercentMeanMilliseconds ==
+               right.slowestOnePercentMeanMilliseconds &&
+           left.onePercentLowFps == right.onePercentLowFps;
+}
+
+void TestSharedDurationStatistics(TestContext& context)
+{
+    std::array<std::uint64_t, 5u> oddDurations{{
+        9'000'000u, 1'000'000u, 5'000'000u, 3'000'000u, 7'000'000u}};
+    RtStageStatistics odd{};
+    context.Check(ComputeRtDurationStatistics(oddDurations, odd),
+                  "shared duration statistics must accept caller-owned writable scratch");
+    context.Check(odd.valid && odd.sampleCount == 5u &&
+                      std::abs(odd.meanMilliseconds - 5.0) < 1.0e-12 &&
+                      std::abs(odd.medianMilliseconds - 5.0) < 1.0e-12 &&
+                      std::abs(odd.p90Milliseconds - 9.0) < 1.0e-12 &&
+                      std::abs(odd.p95Milliseconds - 9.0) < 1.0e-12 &&
+                      std::abs(odd.slowestOnePercentMeanMilliseconds - 9.0) < 1.0e-12 &&
+                      std::abs(odd.onePercentLowFps - (1'000.0 / 9.0)) < 1.0e-12,
+                  "shared duration statistics must preserve odd median, nearest ranks and slow-tail FPS");
+
+    std::array<std::uint64_t, 200u> slowTail{};
+    slowTail.fill(10'000'000u);
+    slowTail[198u] = 20'000'000u;
+    slowTail[199u] = 100'000'000u;
+    RtStageStatistics slowTailStatistics{};
+    context.Check(ComputeRtDurationStatistics(slowTail, slowTailStatistics) &&
+                      std::abs(slowTailStatistics.meanMilliseconds - 10.5) < 1.0e-12 &&
+                      std::abs(slowTailStatistics.medianMilliseconds - 10.0) < 1.0e-12 &&
+                      std::abs(slowTailStatistics.p90Milliseconds - 10.0) < 1.0e-12 &&
+                      std::abs(slowTailStatistics.p95Milliseconds - 10.0) < 1.0e-12 &&
+                      std::abs(slowTailStatistics.slowestOnePercentMeanMilliseconds - 60.0) <
+                          1.0e-12 &&
+                      std::abs(slowTailStatistics.onePercentLowFps - (50.0 / 3.0)) < 1.0e-12 &&
+                      std::abs(slowTailStatistics.onePercentLowFps - 100.0) > 1.0,
+                  "one-percent low must use the mean of the slowest ceil one percent, not inverse P99");
+
+    RtStageStatistics empty{true, 7u, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
+    context.Check(!ComputeRtDurationStatistics({}, empty) && !empty.valid &&
+                      empty.sampleCount == 0u,
+                  "empty shared duration scratch must fail without stale statistics");
+}
+
+void TestExternalStageSampleCollectionCore(TestContext& context)
+{
+    constexpr std::size_t routeSampleCount = 1'838u;
+    std::vector<RtCompletedStageSample> routeStorage(routeSampleCount);
+    std::vector<std::uint64_t> routeScratch(routeSampleCount);
+    RtStageSampleCollectionCore route;
+
+    gAllocationCount = 0u;
+    gCountAllocations = true;
+    bool routeAccepted = route.Start(routeStorage, 31u, 41u);
+    for (std::uint64_t serial = 1u; serial <= routeSampleCount; ++serial)
+    {
+        routeAccepted = route.Append(
+            routeStorage,
+            MakeCollectedSample(serial,
+                                (8u + serial % 17u) * 1'000'000u,
+                                31u,
+                                41u)) && routeAccepted;
+    }
+    RtStageStatistics insufficient{true, 99u, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
+    const bool insufficientRejected = !route.Statistics(
+        routeStorage,
+        RtStage::SimulationStep,
+        std::span<std::uint64_t>{routeScratch}.first(routeSampleCount - 1u),
+        insufficient);
+    RtStageStatistics routeStatistics{};
+    const bool routeStatisticsAccepted = route.Statistics(
+        routeStorage, RtStage::SimulationStep, routeScratch, routeStatistics);
+    gCountAllocations = false;
+
+    context.Check(routeAccepted && route.Size() == routeSampleCount &&
+                      route.CompleteReportEligible(),
+                  "external core must retain the actual 1838-frame measured route without truncation");
+    context.Check(insufficientRejected && !insufficient.valid &&
+                      insufficient.sampleCount == 0u && route.CompleteReportEligible(),
+                  "external core must reject insufficient caller scratch without corrupting a valid run");
+    context.Check(routeStatisticsAccepted && routeStatistics.valid &&
+                      routeStatistics.sampleCount == routeSampleCount,
+                  "external core must calculate statistics over every retained route sample");
+    context.Check(gAllocationCount == 0u,
+                  "external core Start, Append and Statistics must allocate zero bytes");
+
+    std::array<RtCompletedStageSample, 20u> externalStorage{};
+    std::array<std::uint64_t, 20u> externalScratch{};
+    RtStageSampleCollectionCore external;
+    RtStageSampleCollector fixed;
+    bool matchingCollectors = external.Start(externalStorage, 51u, 61u) &&
+                              fixed.Start(51u, 61u);
+    for (std::uint64_t milliseconds = 1u; milliseconds <= 19u; ++milliseconds)
+    {
+        const RtCompletedStageSample sample = MakeCollectedSample(
+            milliseconds, milliseconds * 1'000'000u, 51u, 61u);
+        matchingCollectors = external.Append(externalStorage, sample) &&
+                             fixed.Append(sample) && matchingCollectors;
+    }
+    const RtCompletedStageSample outlier = MakeCollectedSample(
+        20u, 100'000'000u, 51u, 61u);
+    matchingCollectors = external.Append(externalStorage, outlier) &&
+                         fixed.Append(outlier) && matchingCollectors;
+    RtStageStatistics externalStatistics{};
+    RtStageStatistics fixedStatistics{};
+    matchingCollectors = external.Statistics(
+                             externalStorage,
+                             RtStage::SimulationStep,
+                             externalScratch,
+                             externalStatistics) &&
+                         fixed.Statistics(RtStage::SimulationStep, fixedStatistics) &&
+                         matchingCollectors;
+    context.Check(matchingCollectors &&
+                      SameStageStatistics(externalStatistics, fixedStatistics),
+                  "fixed and external collectors must share exact identity and statistics behavior");
+
+    constexpr std::size_t maximumLapSamples = 4'000u;
+    std::vector<RtCompletedStageSample> maximumStorage(maximumLapSamples);
+    std::vector<std::uint64_t> maximumScratch(maximumLapSamples);
+    RtStageSampleCollectionCore maximum;
+    bool maximumAccepted = maximum.Start(maximumStorage, 71u, 81u);
+    for (std::uint64_t serial = 1u; serial <= maximumLapSamples; ++serial)
+    {
+        maximumAccepted = maximum.Append(
+            maximumStorage,
+            MakeCollectedSample(serial, serial * 1'000u, 71u, 81u)) &&
+                          maximumAccepted;
+    }
+    RtStageStatistics maximumStatistics{};
+    maximumAccepted = maximum.Statistics(
+                          maximumStorage,
+                          RtStage::SimulationStep,
+                          maximumScratch,
+                          maximumStatistics) &&
+                      maximumAccepted;
+    context.Check(maximumAccepted && maximumStatistics.sampleCount == maximumLapSamples &&
+                      maximumStorage.back().identity.completionSerial == maximumLapSamples,
+                  "external core must retain and report every sample at exact 4000-frame capacity");
+    const RtCompletedStageSample overflow = MakeCollectedSample(
+        maximumLapSamples + 1u, 99'000u, 71u, 81u);
+    context.Check(!maximum.Append(maximumStorage, overflow) &&
+                      maximum.Size() == maximumLapSamples &&
+                      maximum.OverflowCount() == 1u && maximum.InvalidRun() &&
+                      maximumStorage.back().identity.completionSerial == maximumLapSamples,
+                  "sample after exact external capacity must be rejected and invalidate without truncation");
+
+    std::array<RtCompletedStageSample, 2u> identityStorage{};
+    RtStageSampleCollectionCore identity;
+    context.Check(identity.Start(identityStorage, 91u, 101u) &&
+                      identity.Append(
+                          identityStorage,
+                          MakeCollectedSample(1u, 1'000'000u, 91u, 101u)),
+                  "external identity fixture must accept its first exact sample");
+    context.Check(!identity.Append(
+                      identityStorage,
+                      MakeCollectedSample(2u, 2'000'000u, 92u, 101u)) &&
+                      identity.Size() == 1u && identity.IdentityRejectCount() == 1u &&
+                      identity.InvalidRun(),
+                  "external core must reject mismatched identity and preserve retained samples");
+
+    RtStageSampleCollector movable;
+    context.Check(movable.Start(111u, 121u) &&
+                      movable.Append(MakeCollectedSample(1u, 1'000'000u, 111u, 121u)) &&
+                      movable.Append(MakeCollectedSample(2u, 3'000'000u, 111u, 121u)),
+                  "movable fixed collector fixture must contain valid samples");
+    RtStageSampleCollector moved = std::move(movable);
+    context.Check(movable.Start(211u, 221u),
+                  "moved-from fixed collector must be independently restartable");
+    RtStageStatistics movedStatistics{};
+    context.Check(moved.Append(MakeCollectedSample(3u, 5'000'000u, 111u, 121u)) &&
+                      moved.Statistics(RtStage::SimulationStep, movedStatistics) &&
+                      movedStatistics.sampleCount == 3u &&
+                      std::abs(movedStatistics.medianMilliseconds - 3.0) < 1.0e-12,
+                  "moved fixed collector must address its own storage and remain valid");
 }
 
 void TestBoundedCollector(TestContext& context)
@@ -2201,6 +2390,8 @@ int main()
     TestExecutionModeEvidence(context);
     TestFixedTextAndEnums(context);
     TestStageAccumulatorAndConversion(context);
+    TestSharedDurationStatistics(context);
+    TestExternalStageSampleCollectionCore(context);
     TestBoundedCollector(context);
     TestLifecycleAssociationAndTransactions(context);
     TestLifecycleResetTableAndExhaustion(context);

@@ -670,26 +670,96 @@ bool RtStageAccumulator::ResetAggregatesPreservingActive() noexcept
     return true;
 }
 
-bool RtStageSampleCollector::Start(const std::uint64_t sceneEpoch,
-                                   const std::uint64_t measurementGeneration) noexcept
+bool ComputeRtDurationStatistics(
+    const std::span<std::uint64_t> durationScratchNanoseconds,
+    RtStageStatistics& output) noexcept
 {
-    if (sceneEpoch == 0u || measurementGeneration == 0u)
+    output = {};
+    if (durationScratchNanoseconds.empty())
     {
         return false;
     }
-    RtStageSampleCollector candidate{};
+
+    long double sumNanoseconds = 0.0L;
+    for (const std::uint64_t duration : durationScratchNanoseconds)
+    {
+        sumNanoseconds += static_cast<long double>(duration);
+    }
+    std::sort(durationScratchNanoseconds.begin(), durationScratchNanoseconds.end());
+
+    const std::size_t size = durationScratchNanoseconds.size();
+    RtStageStatistics candidate{};
+    candidate.valid = true;
+    candidate.sampleCount = static_cast<std::uint64_t>(size);
+    candidate.meanMilliseconds = static_cast<double>(sumNanoseconds /
+        static_cast<long double>(size) / 1'000'000.0L);
+    if ((size % 2u) == 0u)
+    {
+        const long double middle =
+            (static_cast<long double>(durationScratchNanoseconds[size / 2u - 1u]) +
+             static_cast<long double>(durationScratchNanoseconds[size / 2u])) /
+            2.0L;
+        candidate.medianMilliseconds = static_cast<double>(middle / 1'000'000.0L);
+    }
+    else
+    {
+        candidate.medianMilliseconds =
+            static_cast<double>(durationScratchNanoseconds[size / 2u]) / 1'000'000.0;
+    }
+    const auto nearestRankIndex = [size](const std::size_t percentile) noexcept {
+        // The shared helper is no longer limited to the fixed 128-frame wrapper.
+        return (size / 100u) * percentile +
+               ((size % 100u) * percentile + 99u) / 100u - 1u;
+    };
+    const std::size_t p90Index = nearestRankIndex(90u);
+    const std::size_t p95Index = nearestRankIndex(95u);
+    candidate.p90Milliseconds =
+        static_cast<double>(durationScratchNanoseconds[p90Index]) / 1'000'000.0;
+    candidate.p95Milliseconds =
+        static_cast<double>(durationScratchNanoseconds[p95Index]) / 1'000'000.0;
+
+    const std::size_t slowCount = size / 100u + (size % 100u != 0u ? 1u : 0u);
+    long double slowSum = 0.0L;
+    for (std::size_t index = size - slowCount; index < size; ++index)
+    {
+        slowSum += static_cast<long double>(durationScratchNanoseconds[index]);
+    }
+    const long double slowAverage = slowSum / static_cast<long double>(slowCount);
+    candidate.slowestOnePercentMeanMilliseconds =
+        static_cast<double>(slowAverage / 1'000'000.0L);
+    candidate.onePercentLowFps = slowAverage > 0.0L
+        ? static_cast<double>(1'000'000'000.0L / slowAverage)
+        : 0.0;
+    output = candidate;
+    return true;
+}
+
+bool RtStageSampleCollectionCore::Start(
+    const std::span<RtCompletedStageSample> storage,
+    const std::uint64_t sceneEpoch,
+    const std::uint64_t measurementGeneration) noexcept
+{
+    if (storage.empty() || sceneEpoch == 0u || measurementGeneration == 0u)
+    {
+        return false;
+    }
+    RtStageSampleCollectionCore candidate{};
     candidate.sceneEpoch_ = sceneEpoch;
     candidate.measurementGeneration_ = measurementGeneration;
+    candidate.storageCapacity_ = storage.size();
     candidate.configured_ = true;
     *this = candidate;
     return true;
 }
 
-bool RtStageSampleCollector::Append(const RtCompletedStageSample& sample) noexcept
+bool RtStageSampleCollectionCore::Append(
+    const std::span<RtCompletedStageSample> storage,
+    const RtCompletedStageSample& sample) noexcept
 {
     const RtFrameToken& frame = sample.identity.submitted.frame;
     RtEvidenceValidationError stageError = RtEvidenceValidationError::None;
-    const bool identityValid = configured_ && sample.benchmarkEligible &&
+    const bool identityValid = configured_ && storage.size() == storageCapacity_ &&
+        size_ <= storage.size() && sample.benchmarkEligible &&
         frame.sceneEpoch == sceneEpoch_ &&
         frame.measurementGeneration == measurementGeneration_ &&
         frame.recordAttemptSerial > lastRecordAttemptSerial_ &&
@@ -705,13 +775,13 @@ bool RtStageSampleCollector::Append(const RtCompletedStageSample& sample) noexce
         invalidRun_ = true;
         return false;
     }
-    if (size_ == samples_.size())
+    if (size_ == storage.size())
     {
         IncrementSaturatingCounter(overflowCount_);
         invalidRun_ = true;
         return false;
     }
-    samples_[size_] = sample;
+    storage[size_] = sample;
     ++size_;
     lastRecordAttemptSerial_ = frame.recordAttemptSerial;
     lastRecordSerial_ = frame.recordSerial;
@@ -720,60 +790,51 @@ bool RtStageSampleCollector::Append(const RtCompletedStageSample& sample) noexce
     return true;
 }
 
-bool RtStageSampleCollector::Statistics(const RtStage stage,
-                                        RtStageStatistics& output) const noexcept
+bool RtStageSampleCollectionCore::Statistics(
+    const std::span<const RtCompletedStageSample> storage,
+    const RtStage stage,
+    const std::span<std::uint64_t> durationScratchNanoseconds,
+    RtStageStatistics& output) const noexcept
 {
     const std::size_t stageIndex = RtStageIndex(stage);
-    if (!CompleteReportEligible() || stageIndex >= kRtStageCount)
+    if (!CompleteReportEligible() || stageIndex >= kRtStageCount ||
+        storage.size() != storageCapacity_ || size_ > storage.size() ||
+        durationScratchNanoseconds.size() < size_)
     {
         output = {};
         return false;
     }
-    std::array<std::uint64_t, kRtEvidenceSampleCapacity> sorted{};
-    long double sumNanoseconds = 0.0L;
+    const std::span<std::uint64_t> scratch =
+        durationScratchNanoseconds.first(size_);
     for (std::size_t index = 0u; index < size_; ++index)
     {
-        const std::uint64_t duration = samples_[index].stages.values[stageIndex].durationNanoseconds;
-        sorted[index] = duration;
-        sumNanoseconds += static_cast<long double>(duration);
+        scratch[index] = storage[index].stages.values[stageIndex].durationNanoseconds;
     }
-    std::sort(sorted.begin(), sorted.begin() + static_cast<std::ptrdiff_t>(size_));
+    return ComputeRtDurationStatistics(scratch, output);
+}
 
-    RtStageStatistics candidate{};
-    candidate.valid = true;
-    candidate.sampleCount = static_cast<std::uint64_t>(size_);
-    candidate.meanMilliseconds = static_cast<double>(sumNanoseconds /
-        static_cast<long double>(size_) / 1'000'000.0L);
-    if ((size_ % 2u) == 0u)
+bool RtStageSampleCollector::Start(const std::uint64_t sceneEpoch,
+                                   const std::uint64_t measurementGeneration) noexcept
+{
+    RtStageSampleCollector candidate{};
+    if (!candidate.core_.Start(candidate.samples_, sceneEpoch, measurementGeneration))
     {
-        const long double middle =
-            (static_cast<long double>(sorted[size_ / 2u - 1u]) +
-             static_cast<long double>(sorted[size_ / 2u])) /
-            2.0L;
-        candidate.medianMilliseconds = static_cast<double>(middle / 1'000'000.0L);
+        return false;
     }
-    else
-    {
-        candidate.medianMilliseconds =
-            static_cast<double>(sorted[size_ / 2u]) / 1'000'000.0;
-    }
-    const std::size_t p90Index = (90u * size_ + 99u) / 100u - 1u;
-    const std::size_t p95Index = (95u * size_ + 99u) / 100u - 1u;
-    candidate.p90Milliseconds = static_cast<double>(sorted[p90Index]) / 1'000'000.0;
-    candidate.p95Milliseconds = static_cast<double>(sorted[p95Index]) / 1'000'000.0;
-
-    const std::size_t slowCount = (size_ + 99u) / 100u;
-    long double slowSum = 0.0L;
-    for (std::size_t index = size_ - slowCount; index < size_; ++index)
-    {
-        slowSum += static_cast<long double>(sorted[index]);
-    }
-    const long double slowAverage = slowSum / static_cast<long double>(slowCount);
-    candidate.onePercentLowFps = slowAverage > 0.0L
-        ? static_cast<double>(1'000'000'000.0L / slowAverage)
-        : 0.0;
-    output = candidate;
+    *this = candidate;
     return true;
+}
+
+bool RtStageSampleCollector::Append(const RtCompletedStageSample& sample) noexcept
+{
+    return core_.Append(samples_, sample);
+}
+
+bool RtStageSampleCollector::Statistics(const RtStage stage,
+                                        RtStageStatistics& output) const noexcept
+{
+    std::array<std::uint64_t, kRtEvidenceSampleCapacity> scratch{};
+    return core_.Statistics(samples_, stage, scratch, output);
 }
 
 bool ValidateRtPerformanceEvidence(const RtPerformanceEvidenceSnapshot& snapshot,

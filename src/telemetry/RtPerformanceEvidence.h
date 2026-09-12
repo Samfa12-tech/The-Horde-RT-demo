@@ -3,6 +3,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <span>
 #include <string>
 #include <string_view>
 
@@ -371,16 +372,29 @@ struct RtStageStatistics
     double medianMilliseconds = 0.0;
     double p90Milliseconds = 0.0;
     double p95Milliseconds = 0.0;
+    double slowestOnePercentMeanMilliseconds = 0.0;
     double onePercentLowFps = 0.0;
 };
 
-class RtStageSampleCollector
+[[nodiscard]] bool ComputeRtDurationStatistics(
+    std::span<std::uint64_t> durationScratchNanoseconds,
+    RtStageStatistics& output) noexcept;
+
+class RtStageSampleCollectionCore
 {
 public:
-    [[nodiscard]] bool Start(std::uint64_t sceneEpoch,
+    // The owner keeps the accepted storage prefix with this scalar state.
+    // Moving storage is safe if its contents/capacity move with the core; a
+    // different equal-sized array is not a replacement for retained samples.
+    [[nodiscard]] bool Start(std::span<RtCompletedStageSample> storage,
+                             std::uint64_t sceneEpoch,
                              std::uint64_t measurementGeneration) noexcept;
-    [[nodiscard]] bool Append(const RtCompletedStageSample& sample) noexcept;
-    [[nodiscard]] bool Statistics(RtStage stage, RtStageStatistics& output) const noexcept;
+    [[nodiscard]] bool Append(std::span<RtCompletedStageSample> storage,
+                              const RtCompletedStageSample& sample) noexcept;
+    [[nodiscard]] bool Statistics(std::span<const RtCompletedStageSample> storage,
+                                  RtStage stage,
+                                  std::span<std::uint64_t> durationScratchNanoseconds,
+                                  RtStageStatistics& output) const noexcept;
     void Invalidate() noexcept { invalidRun_ = true; }
 
     [[nodiscard]] std::size_t Size() const noexcept { return size_; }
@@ -393,7 +407,6 @@ public:
     }
 
 private:
-    std::array<RtCompletedStageSample, kRtEvidenceSampleCapacity> samples_{};
     std::uint64_t sceneEpoch_ = 0u;
     std::uint64_t measurementGeneration_ = 0u;
     std::uint64_t lastRecordAttemptSerial_ = 0u;
@@ -402,9 +415,36 @@ private:
     std::uint64_t lastCompletionSerial_ = 0u;
     std::uint64_t overflowCount_ = 0u;
     std::uint64_t identityRejectCount_ = 0u;
+    std::size_t storageCapacity_ = 0u;
     std::size_t size_ = 0u;
     bool configured_ = false;
     bool invalidRun_ = false;
+};
+
+class RtStageSampleCollector
+{
+public:
+    [[nodiscard]] bool Start(std::uint64_t sceneEpoch,
+                             std::uint64_t measurementGeneration) noexcept;
+    [[nodiscard]] bool Append(const RtCompletedStageSample& sample) noexcept;
+    [[nodiscard]] bool Statistics(RtStage stage, RtStageStatistics& output) const noexcept;
+    void Invalidate() noexcept { core_.Invalidate(); }
+
+    [[nodiscard]] std::size_t Size() const noexcept { return core_.Size(); }
+    [[nodiscard]] std::uint64_t OverflowCount() const noexcept { return core_.OverflowCount(); }
+    [[nodiscard]] std::uint64_t IdentityRejectCount() const noexcept
+    {
+        return core_.IdentityRejectCount();
+    }
+    [[nodiscard]] bool InvalidRun() const noexcept { return core_.InvalidRun(); }
+    [[nodiscard]] bool CompleteReportEligible() const noexcept
+    {
+        return core_.CompleteReportEligible();
+    }
+
+private:
+    std::array<RtCompletedStageSample, kRtEvidenceSampleCapacity> samples_{};
+    RtStageSampleCollectionCore core_{};
 };
 
 enum class RtEvidenceValidationError : std::uint8_t
