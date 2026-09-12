@@ -18,9 +18,13 @@ set is complete. It does not authorise publication or relax any RT requirement.
   Shipping/Diagnostic and fixed Mobile/High shader policy, evidence contracts,
   renderer observation plumbing, and exact Debug phone evidence documentation.
   These are historical accepted gates, not a fresh pass for the current dirty tree.
-- Preserved unfinished work: frame-evidence coordinator, completion-owned counters,
-  GPU outcomes, Windows/Android wiring and related tests. It has no accepted final
-  integration commit or report. Reconcile and finish it without discarding changes.
+- Frame-evidence integration was recovered, reviewed and accepted at `f443904`;
+  [C2b evidence](ENGINEERING_1_6_1_FRAME_EVIDENCE_2026-09-13.md) preserves its exact
+  build boundaries. Shared report/benchmark migration remains next, not complete.
+- Hardware RayQuery native integration was accepted at `99b8565`, after shader,
+  provider and capability prerequisites. [Targeted backend evidence](ENGINEERING_1_6_1_RAYQUERY_BACKEND_2026-09-13.md)
+  records Windows and exact SM-S948B functional/lifecycle checks. Exact S24/S25
+  acceptance, cross-stage precision investigation and final-candidate matrix remain open.
 - Implementation ledger and detailed audit briefs are retained locally under
   `.superpowers/sdd/Horde_RT_Demo_1.6.0_Full_Repo_Code_Audit/`; this tracked index
   carries the release scope rather than making that scratch history always-loaded.
@@ -42,7 +46,7 @@ set is complete. It does not authorise publication or relax any RT requirement.
 The current-main screenshot-derived records identify S25 Ultra / Adreno 830 /
 driver 512.800.64 and S24 Ultra / Adreno 750 / driver 512.762.41 as RayQuery-only:
 AS/RQ/BDA/deferred-host-operations are exposed, but ray-tracing-pipeline is not.
-The bridge's pipeline-only launch gate prevents any scene attempt. No downstream
+The published bridge's pipeline-only launch gate prevents any scene attempt. No downstream
 AS/shader/surface failure has been demonstrated. Exact model codes and APK hashes
 are absent, and neither configuration has locally confirmed working RT presentation.
 
