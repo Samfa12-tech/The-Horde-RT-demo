@@ -47,5 +47,39 @@ int main()
         {RtInstrumentation::Shipping, DielectricQuality::Mobile, static_cast<RtMaterialStrategy>(99)}, &error);
     ok &= Require(!invalid && error == "invalid_rt_pipeline_variant_key",
                   "invalid material must not fall back to a selected strategy");
+    const auto& compute = RtPipelineVariantProvider::Compiled(
+        horde::vulkan::RtExecutionBackend::RayQueryCompute);
+    const RtPipelineVariantKey computeOpaqueKey{
+        RtInstrumentation::Shipping, DielectricQuality::Mobile, RtMaterialStrategy::OpaqueFast,
+        horde::vulkan::RtExecutionBackend::RayQueryCompute};
+    const RtPipelineVariantKey computeGenericKey{
+        RtInstrumentation::Shipping, DielectricQuality::Mobile, RtMaterialStrategy::GenericDielectric,
+        horde::vulkan::RtExecutionBackend::RayQueryCompute};
+    const auto computeOpaque = compute.ResolveExact(computeOpaqueKey, &error);
+    const auto computeGeneric = compute.ResolveExact(computeGenericKey, &error);
+    ok &= Require(compute.request().executionBackend ==
+                      horde::vulkan::RtExecutionBackend::RayQueryCompute &&
+                      computeOpaque && computeGeneric,
+                  "compiled compute provider must resolve its exact two hardware-query artifacts");
+    if (computeOpaque && computeGeneric && opaque && generic) {
+        ok &= Require(computeOpaque->canonicalKey == "rayquery_compute_shipping_mobile_opaque_fast" &&
+                          computeGeneric->canonicalKey == "rayquery_compute_shipping_mobile_generic_dielectric" &&
+                          computeOpaque->words.data() != opaque->words.data() &&
+                          computeGeneric->words.data() != generic->words.data() &&
+                          computeOpaque->atomicInstructions == 0u &&
+                          computeGeneric->atomicInstructions == 0u &&
+                          !computeOpaque->hasDiagnosticsBinding && !computeGeneric->hasDiagnosticsBinding,
+                      "compute provider must own distinct stage bytes with Shipping diagnostics absent");
+    }
+    ok &= Require(!provider.ResolveExact(computeOpaqueKey) &&
+                      !compute.ResolveExact({RtInstrumentation::Shipping, DielectricQuality::Mobile,
+                                             RtMaterialStrategy::OpaqueFast}),
+                  "a fixed stage provider must reject a cross-backend request");
+    const auto& unsupported = RtPipelineVariantProvider::Compiled(
+        horde::vulkan::RtExecutionBackend::Unsupported);
+    ok &= Require(!unsupported.ResolveExact(computeOpaqueKey) &&
+                      !unsupported.ResolveExact({RtInstrumentation::Shipping, DielectricQuality::Mobile,
+                                                 RtMaterialStrategy::OpaqueFast}),
+                  "unsupported execution provider must not silently return a pipeline artifact");
     return ok ? 0 : 1;
 }

@@ -24,7 +24,8 @@ struct RtPipelineVariantArtifact {
 
 class RtPipelineVariantProvider final {
 public:
-    [[nodiscard]] static const RtPipelineVariantProvider& Compiled() noexcept;
+    [[nodiscard]] static const RtPipelineVariantProvider& Compiled(
+        RtExecutionBackend executionBackend = RtExecutionBackend::RayTracingPipeline) noexcept;
     [[nodiscard]] const RtPipelineBundleRequest& request() const noexcept;
     [[nodiscard]] std::optional<RtPipelineVariantArtifact> ResolveExact(
         RtPipelineVariantKey requested, std::string* error = nullptr) const;
