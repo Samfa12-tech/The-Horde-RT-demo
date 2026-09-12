@@ -24,6 +24,7 @@ bool SupportsRayQuery(const ExtensionSupport& extensions, const FeatureSupport& 
     return extensions.accelerationStructure &&
            extensions.rayQuery &&
            extensions.bufferDeviceAddress &&
+           extensions.deferredHostOperations &&
            features.accelerationStructure &&
            features.rayQuery &&
            features.bufferDeviceAddress;

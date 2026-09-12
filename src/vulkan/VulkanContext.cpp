@@ -101,6 +101,11 @@ void AppendMissingRequirementsForRayQuery(const ExtensionSupport& extensions, co
     {
         AddMissing(diagnostics, "Missing required feature: VkPhysicalDeviceBufferDeviceAddressFeatures::bufferDeviceAddress");
     }
+
+    if (!extensions.deferredHostOperations)
+    {
+        AddMissing(diagnostics, "Missing required extension: VK_KHR_deferred_host_operations");
+    }
 }
 
 void AppendExtensionLine(std::vector<std::string>& diagnostics, const std::string& extension, const bool supported)

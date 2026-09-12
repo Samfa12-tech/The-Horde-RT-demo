@@ -148,6 +148,14 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AN
 endif()
 
 if(BUILD_TESTING)
+    add_executable(horde_rt_ray_tracing_requirements_tests
+        tests/RayTracingRequirementsTests.cpp
+        src/vulkan/raytracing/RayTracingRequirements.cpp)
+    target_include_directories(horde_rt_ray_tracing_requirements_tests PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_ray_tracing_requirements_tests
+        COMMAND horde_rt_ray_tracing_requirements_tests)
+
     add_executable(horde_rt_performance_evidence_tests
         tests/RtPerformanceEvidenceTests.cpp
         src/telemetry/RtPerformanceEvidence.cpp)
