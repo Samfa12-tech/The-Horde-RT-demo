@@ -47,12 +47,15 @@ void BuildAvailableObserverProjection(
     const std::string_view gpuStatus,
     const CompletedFrameProjection& completed,
     std::string& jsonOutput,
-    std::string& textOutput)
+    std::string& textOutput,
+    const RtEvidencePublicationSource source = RtEvidencePublicationSource::ActiveObserver)
 {
+    const bool observerAvailable = source == RtEvidencePublicationSource::ActiveObserver;
     std::ostringstream json;
     json.imbue(std::locale::classic());
     json << "{\"version\":" << kRtEvidencePublicationVersion
-         << ",\"observerAvailable\":true,\"sceneEpoch\":";
+         << ",\"observerAvailable\":" << (observerAvailable ? "true" : "false")
+         << ",\"sceneEpoch\":";
     WriteOptionalIdentity(json, publication.sceneEpoch);
     json << ",\"measurementGeneration\":";
     WriteOptionalIdentity(json, publication.measurementGeneration);
@@ -80,7 +83,9 @@ void BuildAvailableObserverProjection(
     std::ostringstream text;
     text.imbue(std::locale::classic());
     text << "RT EVIDENCE PUBLICATION version=" << kRtEvidencePublicationVersion << '\n'
-         << "Observer: available\n"
+         << (observerAvailable ? "Observer: available\n" :
+             source == RtEvidencePublicationSource::StoppedObserver ? "Observer: stopped (terminal publication)\n" :
+                 "Observer: unavailable (invalid publication)\n")
          << "Lifecycle: epoch=";
     if (publication.sceneEpoch == 0u)
     {
@@ -153,24 +158,27 @@ bool FailPublication(const RtLifecyclePublishedState& publication,
         "error",
         {"error", "invalid-publication", nullptr, nullptr},
         jsonOutput,
-        textOutput);
+        textOutput, RtEvidencePublicationSource::Unavailable);
     return false;
 }
 
 } // namespace
 
 bool SerializeRtEvidencePublication(RtLifecyclePublishedState publication,
-                                    const bool observerAvailable,
+                                    const RtEvidencePublicationSource source,
                                     std::string& jsonOutput,
                                     std::string& textOutput,
                                     std::string& validationReason)
 {
     validationReason.clear();
-    if (!observerAvailable)
+    if (source == RtEvidencePublicationSource::Unavailable)
     {
         BuildUnavailableObserverProjection(jsonOutput, textOutput);
         return true;
     }
+    if (source != RtEvidencePublicationSource::ActiveObserver &&
+        source != RtEvidencePublicationSource::StoppedObserver)
+        return FailPublication(publication, "unknown publication source", jsonOutput, textOutput, validationReason);
     if (publication.sceneEpoch == 0u)
     {
         return FailPublication(
@@ -209,6 +217,18 @@ bool SerializeRtEvidencePublication(RtLifecyclePublishedState publication,
             textOutput,
             validationReason);
     }
+    if (source == RtEvidencePublicationSource::StoppedObserver)
+    {
+        if (publication.running || publication.paused || publication.presented || publication.hasCompletedEvidence ||
+            publication.diagnosticStatus != RtSampleStatus::NotReady || publication.gpuStatus != RtSampleStatus::NotReady)
+            return FailPublication(publication, "terminal publication retains live state", jsonOutput, textOutput, validationReason);
+        BuildAvailableObserverProjection(publication, diagnosticStatus, gpuStatus,
+            {"unavailable", "lifecycle-stopped", nullptr, nullptr}, jsonOutput, textOutput,
+            RtEvidencePublicationSource::StoppedObserver);
+        return true;
+    }
+    if (!publication.running)
+        return FailPublication(publication, "active observer publication is not running", jsonOutput, textOutput, validationReason);
     if (!publication.hasCompletedEvidence)
     {
         BuildAvailableObserverProjection(
@@ -293,6 +313,17 @@ bool SerializeRtEvidencePublication(RtLifecyclePublishedState publication,
         jsonOutput,
         textOutput);
     return true;
+}
+
+bool SerializeRtEvidencePublication(RtLifecyclePublishedState publication,
+                                    const bool observerAvailable,
+                                    std::string& jsonOutput,
+                                    std::string& textOutput,
+                                    std::string& validationReason)
+{
+    return SerializeRtEvidencePublication(publication,
+        observerAvailable ? RtEvidencePublicationSource::ActiveObserver : RtEvidencePublicationSource::Unavailable,
+        jsonOutput, textOutput, validationReason);
 }
 
 } // namespace horde::telemetry

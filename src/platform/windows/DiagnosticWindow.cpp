@@ -2030,13 +2030,14 @@ void ToggleFullscreen(VulkanSurfaceContext& context)
     UpdateSettingsLabels(context);
 }
 
-std::string BuildDisplayText(const horde::vulkan::DeviceCapabilities& capabilities)
+std::string BuildDisplayText(const horde::vulkan::DeviceCapabilities& capabilities,
+    const horde::telemetry::RtLifecyclePublishedState* evidence = nullptr)
 {
     if (capabilities.rtMode == horde::vulkan::RtMode::Unsupported)
     {
         return horde::ui::BuildUnsupportedDeviceText(capabilities);
     }
-    return horde::ui::BuildDiagnosticOverlayText(capabilities);
+    return horde::vulkan::BuildCapabilityTextReport(capabilities, evidence);
 }
 
 #if defined(_DEBUG)
@@ -4728,10 +4729,13 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                 std::remove(presentationDiagnostics.begin(), presentationDiagnostics.end(),
                             "Internal render resolution: not measured yet."),
                 presentationDiagnostics.end());
+            const auto publication = context.rtFrameEvidence.PublishedStateByValue();
+            const auto* evidence = context.rtFrameEvidenceInitialised && context.rtFrameEvidence.ObserverAvailable()
+                ? &publication : nullptr;
             const bool textReportWritten = WriteReportFile(
-                textReportPath, horde::vulkan::BuildCapabilityTextReport(capabilities));
+                textReportPath, horde::vulkan::BuildCapabilityTextReport(capabilities, evidence));
             const bool jsonReportWritten = WriteReportFile(
-                jsonReportPath, horde::vulkan::BuildCapabilityJsonReport(capabilities));
+                jsonReportPath, horde::vulkan::BuildCapabilityJsonReport(capabilities, evidence));
             if (!textReportWritten || !jsonReportWritten)
             {
                 std::cerr << "Failed to refresh capability reports after successful showcase capture.\n";
@@ -4854,6 +4858,9 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         {
             timingSamples.push_back(frameTimeMs);
         }
+        const auto publication = context.rtFrameEvidence.PublishedStateByValue();
+        const auto* evidencePublication = context.rtFrameEvidenceInitialised && context.rtFrameEvidence.ObserverAvailable()
+            ? &publication : nullptr;
         if (timingSamples.size() >= 120u)
         {
             std::vector<double> sortedSamples = timingSamples;
@@ -4881,13 +4888,13 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             timingDiagnostics.erase(std::remove(timingDiagnostics.begin(), timingDiagnostics.end(),
                                                 "FPS / frame time: not measured yet."),
                                     timingDiagnostics.end());
-            WriteReportFile(textReportPath, horde::vulkan::BuildCapabilityTextReport(capabilities));
-            WriteReportFile(jsonReportPath, horde::vulkan::BuildCapabilityJsonReport(capabilities));
+            WriteReportFile(textReportPath, horde::vulkan::BuildCapabilityTextReport(capabilities, evidencePublication));
+            WriteReportFile(jsonReportPath, horde::vulkan::BuildCapabilityJsonReport(capabilities, evidencePublication));
             if (context.diagnosticsVisible)
             {
                 if (HWND edit = GetDlgItem(hWnd, kEditControlId))
                 {
-                    const std::string updatedText = WindowSafeText(BuildDisplayText(capabilities));
+                    const std::string updatedText = WindowSafeText(BuildDisplayText(capabilities, evidencePublication));
                     SetWindowTextA(edit, updatedText.c_str());
                 }
             }
@@ -4907,15 +4914,15 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             presentationDiagnostics.erase(std::remove(presentationDiagnostics.begin(), presentationDiagnostics.end(),
                                                        "Internal render resolution: not measured yet."),
                                           presentationDiagnostics.end());
-            WriteReportFile(textReportPath, horde::vulkan::BuildCapabilityTextReport(capabilities));
-            WriteReportFile(jsonReportPath, horde::vulkan::BuildCapabilityJsonReport(capabilities));
+            WriteReportFile(textReportPath, horde::vulkan::BuildCapabilityTextReport(capabilities, evidencePublication));
+            WriteReportFile(jsonReportPath, horde::vulkan::BuildCapabilityJsonReport(capabilities, evidencePublication));
             if (HWND hud = GetDlgItem(hWnd, kHudControlId))
             {
                 SetWindowTextA(hud, kHudActiveText);
             }
             if (HWND edit = GetDlgItem(hWnd, kEditControlId))
             {
-                const std::string updatedText = WindowSafeText(BuildDisplayText(capabilities));
+                const std::string updatedText = WindowSafeText(BuildDisplayText(capabilities, evidencePublication));
                 SetWindowTextA(edit, updatedText.c_str());
             }
         }

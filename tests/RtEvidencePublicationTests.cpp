@@ -250,6 +250,19 @@ void TestPendingAndRecreatedPublication()
               json.find("\"sceneEpoch\":12") != std::string::npos &&
               json.find("\"completedFrame\":null") != std::string::npos,
           "recreated publication must not expose evidence from the retired epoch");
+    Check(lifecycle.Destroy(effects), "real lifecycle must produce a stopped publication");
+    Check(SerializeRtEvidencePublication(
+              lifecycle.PublishedStateByValue(), RtEvidencePublicationSource::StoppedObserver, json, text, reason) &&
+              json.find("\"observerAvailable\":false") != std::string::npos &&
+              json.find("\"running\":false,\"paused\":false,\"presented\":false") != std::string::npos &&
+              json.find("\"completedFrameStatus\":\"unavailable\",\"completedFrameReason\":\"lifecycle-stopped\"") != std::string::npos &&
+              json.find("\"completedFrame\":null") != std::string::npos,
+          "accepted final teardown publication must explicitly stop and clear measurements");
+    auto inconsistentStopped = lifecycle.PublishedStateByValue();
+    inconsistentStopped.gpuStatus = RtSampleStatus::Valid;
+    Check(!SerializeRtEvidencePublication(inconsistentStopped,
+              RtEvidencePublicationSource::StoppedObserver, json, text, reason),
+          "terminal publication must not retain a live valid GPU status");
 }
 
 void TestObserverUnavailable()
@@ -404,6 +417,8 @@ void ExpectInvalid(RtLifecyclePublishedState state,
               std::string::npos &&
               json.find("\"completedFrameStatus\":\"error\"") != std::string::npos &&
               json.find("\"completedFrame\":null") != std::string::npos &&
+              text.find("Observer: unavailable (invalid publication)") != std::string::npos &&
+              text.find("terminal publication") == std::string::npos &&
               text.find("Completed frame: N/A (invalid-publication)") !=
                   std::string::npos,
           std::string(label) + " must emit Error/null without stale frame passthrough");

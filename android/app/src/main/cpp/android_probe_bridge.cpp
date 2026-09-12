@@ -48,6 +48,7 @@
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
 #include "vulkan/raytracing/RtFrameEvidenceCoordinator.h"
 #include "vulkan/raytracing/RtDeviceEnablePlan.h"
+#include "telemetry/RtEvidencePublication.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
 
 #ifndef HORDE_RT_BUILD_ID
@@ -443,13 +444,14 @@ void PublishSimulationUiState()
         std::memory_order_release);
 }
 
-std::string BuildDisplayText(const horde::vulkan::DeviceCapabilities& capabilities)
+std::string BuildDisplayText(const horde::vulkan::DeviceCapabilities& capabilities,
+    const horde::telemetry::RtLifecyclePublishedState* evidence = nullptr, bool observerAvailable = true)
 {
     if (capabilities.rtMode == horde::vulkan::RtMode::Unsupported)
     {
         return horde::ui::BuildUnsupportedDeviceText(capabilities);
     }
-    return horde::ui::BuildDiagnosticOverlayText(capabilities);
+    return horde::vulkan::BuildCapabilityTextReport(capabilities, evidence, observerAvailable);
 }
 
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS)
@@ -634,6 +636,25 @@ bool WriteTextFile(const std::string& path, const std::string& data)
 
     stream << data;
     return stream.good();
+}
+
+void PublishRuntimeReports(const SwapchainContext& context,
+    const horde::telemetry::RtLifecyclePublishedState* finalPublication = nullptr)
+{
+    const auto publication = finalPublication ? *finalPublication
+        : context.rtFrameEvidence.PublishedStateByValue();
+    const auto* evidence = finalPublication ||
+        (context.rtFrameEvidenceInitialised && context.rtFrameEvidence.ObserverAvailable())
+        ? &publication : nullptr;
+    const std::string text = BuildDisplayText(context.capabilities, evidence, finalPublication == nullptr);
+    const std::string json = horde::vulkan::BuildCapabilityJsonReport(context.capabilities, evidence, finalPublication == nullptr);
+    {
+        std::lock_guard<std::mutex> lock(gReportMutex);
+        gLatestTextReport = text;
+        gLatestJsonReport = json;
+    }
+    WriteTextFile(context.reportDirectory + '/' + kTextReportFilename, text);
+    WriteTextFile(context.reportDirectory + '/' + kJsonReportFilename, json);
 }
 
 void ResetShowcaseSimulation()
@@ -880,6 +901,13 @@ void ApplyDebugCheckpointSimulation(
 
 void WriteShowcaseDebugState(const SwapchainContext& context, const char* status)
 {
+    const auto publication = context.rtFrameEvidence.PublishedStateByValue();
+    std::string frameEvidenceJson;
+    std::string frameEvidenceText;
+    std::string frameEvidenceError;
+    (void)horde::telemetry::SerializeRtEvidencePublication(
+        publication, context.rtFrameEvidenceInitialised && context.rtFrameEvidence.ObserverAvailable(),
+        frameEvidenceJson, frameEvidenceText, frameEvidenceError);
     const horde::gameplay::simulation::SimulationSnapshot& simulation = gGameSimulation.Snapshot();
     const horde::gameplay::ShowcaseZone zone = simulation.zone;
     const horde::gameplay::LichSnapshot& lich = simulation.lich;
@@ -1059,7 +1087,8 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
          << "  \"benchmarkWindowsCompleted\": " << context.benchmarkWindow << ",\n"
          << "  \"replayWaypointsReached\": " << replay.reachedWaypoints << ",\n"
          << "  \"replayComplete\": " << (replay.complete ? "true" : "false") << ",\n"
-         << "  \"replayFailed\": " << (replay.failed ? "true" : "false") << "\n"
+         << "  \"replayFailed\": " << (replay.failed ? "true" : "false") << ",\n"
+         << "  \"rtFrameEvidence\": " << frameEvidenceJson
          << "}\n";
     WriteTextFile(context.reportDirectory + '/' + kShowcaseDebugStateFilename, json.str());
 }
@@ -1971,7 +2000,15 @@ void DestroyRtEvidenceOnOwnerThread(SwapchainContext& context)
     {
         return;
     }
-    (void)context.rtFrameEvidence.Destroy();
+    const bool destroyed = context.rtFrameEvidence.Destroy();
+    context.capabilities.rtScene.presented = false;
+    context.capabilities.rtScene.status = "RT surface stopped";
+    context.capabilities.rtScene.dispatchWidth = 0u;
+    context.capabilities.rtScene.dispatchHeight = 0u;
+    context.capabilities.performance = {};
+    const auto stoppedPublication = context.rtFrameEvidence.PublishedStateByValue();
+    // A successful Destroy yields one final accepted not-running publication.
+    PublishRuntimeReports(context, destroyed ? &stoppedPublication : nullptr);
     PreserveRtEvidenceSeeds(context.rtFrameEvidence.SeedsByValue());
     context.rtFrameEvidenceInitialised = false;
 }
@@ -2710,10 +2747,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
         timingDiagnostics.erase(std::remove(timingDiagnostics.begin(), timingDiagnostics.end(),
                                             "FPS / frame time: not measured yet."),
                                 timingDiagnostics.end());
-        PublishReportSnapshot(context.capabilities);
-        WriteTextFile(context.reportDirectory + '/' + kTextReportFilename, BuildDisplayText(context.capabilities));
-        WriteTextFile(context.reportDirectory + '/' + kJsonReportFilename,
-                      horde::vulkan::BuildCapabilityJsonReport(context.capabilities));
+        PublishRuntimeReports(context);
         __android_log_print(ANDROID_LOG_INFO,
                             kTag,
                             "RT frame timing avg ms: total=%.3f fence=%.3f record=%.3f submit+present=%.3f",
@@ -2862,9 +2896,7 @@ void SwapchainRenderLoop()
                                           presentationDiagnostics.end());
             gRuntimeState.store(1, std::memory_order_release);
 
-            PublishReportSnapshot(gSwapchainContext.capabilities);
-            WriteTextFile(gSwapchainContext.reportDirectory + '/' + kTextReportFilename, BuildDisplayText(gSwapchainContext.capabilities));
-            WriteTextFile(gSwapchainContext.reportDirectory + '/' + kJsonReportFilename, horde::vulkan::BuildCapabilityJsonReport(gSwapchainContext.capabilities));
+            PublishRuntimeReports(gSwapchainContext);
             __android_log_print(ANDROID_LOG_INFO, kTag, "RT frame reached Android swapchain presentation.");
         }
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS)
@@ -2951,10 +2983,7 @@ bool StartSurfaceInternal(ANativeWindow* window,
     context.executionBackend = horde::vulkan::raytracing::SelectRtExecutionBackend(
         capabilities, true, requireRayQueryCompute);
     horde::vulkan::BeginRtBackendSelection(context.capabilities.rtScene, context.executionBackend);
-    PublishReportSnapshot(context.capabilities);
-    WriteTextFile(context.reportDirectory + '/' + kTextReportFilename, BuildDisplayText(context.capabilities));
-    WriteTextFile(context.reportDirectory + '/' + kJsonReportFilename,
-                  horde::vulkan::BuildCapabilityJsonReport(context.capabilities));
+    PublishRuntimeReports(context);
     if (requireRayQueryCompute &&
         context.executionBackend != horde::vulkan::RtExecutionBackend::RayQueryCompute)
     {

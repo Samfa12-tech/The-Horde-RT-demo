@@ -1,4 +1,5 @@
 #include "vulkan/RtCapabilityReport.h"
+#include "telemetry/RtEvidencePublication.h"
 
 #include <iomanip>
 #include <locale>
@@ -85,7 +86,8 @@ std::string JsonLegacyFloat(const float value, const bool available)
 
 } // namespace
 
-std::string BuildCapabilityTextReport(const DeviceCapabilities& capabilities)
+std::string BuildCapabilityTextReport(const DeviceCapabilities& capabilities,
+    const horde::telemetry::RtLifecyclePublishedState* evidence, const bool observerAvailable)
 {
     std::ostringstream out;
     out << "Backend: " << capabilities.backend << '\n';
@@ -145,6 +147,16 @@ std::string BuildCapabilityTextReport(const DeviceCapabilities& capabilities)
         out << "RT scene dispatch resolution: N/A\n";
     }
     out << "RT scene presented: " << (capabilities.rtScene.presented ? "yes" : "no") << '\n';
+    std::string frameJson;
+    std::string frameText;
+    std::string frameError;
+    (void)horde::telemetry::SerializeRtEvidencePublication(
+        evidence ? *evidence : horde::telemetry::RtLifecyclePublishedState{},
+        evidence == nullptr ? horde::telemetry::RtEvidencePublicationSource::Unavailable :
+            observerAvailable ? horde::telemetry::RtEvidencePublicationSource::ActiveObserver :
+                horde::telemetry::RtEvidencePublicationSource::StoppedObserver,
+        frameJson, frameText, frameError);
+    out << frameText;
 
     if (!capabilities.diagnostics.empty())
     {
@@ -158,7 +170,8 @@ std::string BuildCapabilityTextReport(const DeviceCapabilities& capabilities)
     return out.str();
 }
 
-std::string BuildCapabilityJsonReport(const DeviceCapabilities& capabilities)
+std::string BuildCapabilityJsonReport(const DeviceCapabilities& capabilities,
+    const horde::telemetry::RtLifecyclePublishedState* evidence, const bool observerAvailable)
 {
     std::ostringstream out;
     out.imbue(std::locale::classic());
@@ -222,7 +235,17 @@ std::string BuildCapabilityJsonReport(const DeviceCapabilities& capabilities)
         out << "\"" << JsonEscape(capabilities.diagnostics[i]) << "\"";
     }
 
-    out << "]\n";
+    out << "],\n";
+    std::string frameJson;
+    std::string frameText;
+    std::string frameError;
+    (void)horde::telemetry::SerializeRtEvidencePublication(
+        evidence ? *evidence : horde::telemetry::RtLifecyclePublishedState{},
+        evidence == nullptr ? horde::telemetry::RtEvidencePublicationSource::Unavailable :
+            observerAvailable ? horde::telemetry::RtEvidencePublicationSource::ActiveObserver :
+                horde::telemetry::RtEvidencePublicationSource::StoppedObserver,
+        frameJson, frameText, frameError);
+    out << "  \"rtFrameEvidence\": " << frameJson;
     out << "}\n";
     return out.str();
 }

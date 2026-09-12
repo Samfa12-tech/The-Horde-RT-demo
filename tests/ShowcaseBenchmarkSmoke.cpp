@@ -4,6 +4,7 @@
 #include <string>
 
 #include "gameplay/ShowcaseBenchmark.h"
+#include "telemetry/RtPerformanceEvidence.h"
 #include "vulkan/RtCapabilityReport.h"
 
 namespace
@@ -160,6 +161,24 @@ int main()
               "legacy float fields must not inherit the C locale through std::to_string");
     }
     std::cout << "Comma C-locale coverage: " << (commaLocaleAvailable ? "executed" : "unavailable") << '\n';
+    horde::telemetry::RtLifecyclePublishedState pendingPublication{};
+    pendingPublication.sceneEpoch = 12u;
+    pendingPublication.measurementGeneration = 34u;
+    pendingPublication.running = true;
+    pendingPublication.gpuStatus = horde::telemetry::RtSampleStatus::Pending;
+    pendingPublication.diagnosticStatus = horde::telemetry::RtSampleStatus::CompiledOut;
+    const auto pendingCapabilityJson =
+        horde::vulkan::BuildCapabilityJsonReport(capabilities, &pendingPublication);
+    const auto pendingCapabilityText =
+        horde::vulkan::BuildCapabilityTextReport(capabilities, &pendingPublication);
+    check(pendingCapabilityJson.find("\"rtFrameEvidence\": {\"version\":1") != std::string::npos &&
+              pendingCapabilityJson.find("\"sceneEpoch\":12,\"measurementGeneration\":34") != std::string::npos &&
+              pendingCapabilityJson.find("\"completedFrame\":null") != std::string::npos &&
+              pendingCapabilityText.find("RT EVIDENCE PUBLICATION version=1") != std::string::npos,
+          "capability reports must embed the canonical publication rather than reconstruct frame counters");
+    check(horde::vulkan::BuildCapabilityJsonReport(capabilities).find(
+              "\"observerAvailable\":false") != std::string::npos,
+          "probe-only capability reporting must mark joined frame evidence unavailable");
 
     ShowcaseBenchmarkRun presentationFailure;
     presentationFailure.Start();
