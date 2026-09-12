@@ -65,6 +65,7 @@ class ShowcaseBenchmarkRun
 {
 public:
     static constexpr std::uint32_t kDefaultLaps = 2u;
+    static constexpr std::uint32_t kMaximumFramesPerLap = 4000u;
 
     void Start(std::uint32_t laps = kDefaultLaps);
     ShowcaseBenchmarkAdvance Advance();

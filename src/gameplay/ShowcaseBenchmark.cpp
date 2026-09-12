@@ -130,7 +130,7 @@ ShowcaseBenchmarkAdvance ShowcaseBenchmarkRun::Advance()
     }
 
     result.replay = replay_.Update();
-    if (++lapFrames_ > 4000u)
+    if (++lapFrames_ > kMaximumFramesPerLap)
     {
         status_ = ShowcaseBenchmarkStatus::Failed;
         result.finished = true;
