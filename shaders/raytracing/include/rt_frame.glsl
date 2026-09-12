@@ -1,0 +1,76 @@
+// One per-pixel implementation; launchers supply only stage and pixel builtins.
+#include "rt_scene_abi.glsl"
+#include "rt_diagnostics.glsl"
+#include "rt_lighting.glsl"
+#include "rt_dielectric_common.glsl"
+#include "rt_dielectric_transport.glsl"
+#include "rt_atmosphere.glsl"
+
+void main()
+{
+#ifdef HORDE_RT_COMPUTE_ENTRY
+    // Rounded-up groups must not trace or write beyond the RT storage image.
+    if (any(greaterThanEqual(HORDE_RT_PIXEL_ID.xy, uvec2(HORDE_RT_PIXEL_EXTENT.xy))))
+    {
+        return;
+    }
+#endif
+    vec2 uv = (vec2(HORDE_RT_PIXEL_ID.xy) + vec2(0.5)) / vec2(HORDE_RT_PIXEL_EXTENT.xy);
+    float aspect = float(HORDE_RT_PIXEL_EXTENT.x) / max(float(HORDE_RT_PIXEL_EXTENT.y), 1.0);
+    float step = controls.time * 6.2;
+    vec3 origin = vec3(controls.cameraX + sin(step * 0.5) * 0.035 * controls.walkAmount,
+                       0.70 + abs(sin(step)) * 0.035 * controls.walkAmount,
+                       controls.cameraZ);
+    float pitch = clamp(controls.pitch + sin(step) * 0.012 * controls.walkAmount, -0.32, 0.28);
+    vec3 forward = normalize(vec3(sin(controls.yaw), -0.05 + pitch, -cos(controls.yaw)));
+    vec3 right = normalize(cross(forward, vec3(0.0, 1.0, 0.0)));
+    vec3 up = normalize(cross(right, forward));
+    vec2 screen = uv * 2.0 - 1.0;
+    screen.x *= aspect;
+    screen.y *= -0.74;
+    vec3 rayDirection = normalize(forward * 1.22 + right * screen.x + up * screen.y);
+
+    // The first-person body only occupies the lower view. Skip its BLAS for
+    // upper-screen primary rays, but retain it in lower-screen primary rays,
+    // reflective bounces and lower-view direct-light visibility queries.
+    // View-relative held arms stay in roughly the same screen region at either
+    // pitch extreme, so move the boundary upward for both upward and downward
+    // look. Raising it with positive pitch used to cull the lantern forearm.
+    float playerPrimaryStart = clamp(0.68 - abs(controls.pitch), 0.34, 0.68);
+    uint primaryMask = uv.y > playerPrimaryStart ? 0x27u : 0x23u;
+    HitInfo primary = traceScene(origin, rayDirection, 10000.0, primaryMask,
+                                 0.002, controls.waterQuality < 0.5, true);
+    if (primary.hit)
+    {
+        if (primary.instance == 1)
+            RT_DIAG_ADD(primaryTorchPixelCount, 1u);
+        else if (primary.instance == 3)
+            RT_DIAG_ADD(primarySwordPixelCount, 1u);
+        else if (primary.instance == 4 ||
+                 (primary.instance >= 10 && primary.instance <= 13))
+            RT_DIAG_ADD(primaryPlayerPixelCount, 1u);
+        else if (primary.instance == 7)
+            RT_DIAG_ADD(primaryRewardRingPixelCount, 1u);
+        else if (primary.instance == 8)
+            RT_DIAG_ADD(primaryRewardBodyPixelCount, 1u);
+    }
+    vec3 color = shadePrimary(primary, rayDirection);
+    vec4 fireVolume = integrateFireEmitters(
+        origin, rayDirection, primary.hit ? primary.t : 10000.0, false);
+    color = color * fireVolume.a + fireVolume.rgb;
+    vec4 lichMist = lichGroundMist(origin, rayDirection, primary.t);
+    color = color * lichMist.a + lichMist.rgb;
+    color += staffElectricity(origin, rayDirection, primary.t);
+
+    vec2 centered = uv * 2.0 - 1.0;
+    float vignette = 1.0 - smoothstep(0.28, 1.22, length(centered * vec2(0.82, 1.08)));
+    color = color * (0.62 + 0.38 * vignette);
+    color += vec3(0.46, 0.012, 0.004) * controls.damageFlash * (0.28 + 0.72 * (1.0 - vignette));
+    color = linearToSrgb(toneMapAces(max(color, vec3(0.0)) * controls.outputExposure));
+    // The RT storage image is RGBA, while common Android/Windows swapchains are BGRA and receive a raw image copy.
+    if (controls.outputRedBlueSwap > 0.5)
+    {
+        color = color.bgr;
+    }
+    imageStore(outputImage, ivec2(HORDE_RT_PIXEL_ID.xy), vec4(clamp(color, 0.0, 1.0), 1.0));
+}

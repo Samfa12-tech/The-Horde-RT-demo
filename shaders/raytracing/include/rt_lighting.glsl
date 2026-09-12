@@ -931,7 +931,7 @@ vec3 fireEmitterDirectLighting(HitInfo h, vec3 rayDirection, bool dualVisibility
 {
     const vec3 areaOffsets[2] = vec3[2](vec3(-0.075, 0.03, -0.045),
                                         vec3(0.070, 0.10, 0.060));
-    int sampleIndex = int((gl_LaunchIDEXT.x + gl_LaunchIDEXT.y) & 1u);
+    int sampleIndex = int((HORDE_RT_PIXEL_ID.x + HORDE_RT_PIXEL_ID.y) & 1u);
     float reflective = max(h.metallic, h.reflectivity);
     bool genericTransmissionActive = genericTransmissionEnabled();
     vec3 result = vec3(0.0);
@@ -1044,7 +1044,7 @@ vec3 shadeOpaqueDirect(HitInfo h, vec3 rayDirection, bool dualVisibility,
     vec3 localDirection = localVector / max(localDistance, 0.001);
     const vec3 areaOffsets[2] = vec3[2](vec3(-0.075, 0.03, -0.045),
                                         vec3(0.070, 0.10, 0.060));
-    int sampleIndex = int((gl_LaunchIDEXT.x + gl_LaunchIDEXT.y) & 1u);
+    int sampleIndex = int((HORDE_RT_PIXEL_ID.x + HORDE_RT_PIXEL_ID.y) & 1u);
     vec3 sampleVector = localPosition + areaOffsets[sampleIndex] - h.position;
     float sampleDistance = length(sampleVector);
     vec3 sampleDirection = sampleVector / max(sampleDistance, 0.001);
