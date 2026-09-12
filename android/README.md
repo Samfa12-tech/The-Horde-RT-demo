@@ -11,6 +11,7 @@ The `android/` module is the supported phone path for Horde Lantern RT. It owns 
 - Coherent JNI input publication through the two-slot `InputMailbox`, with independent monotonic attack/parry/dodge/reset/retry counters
 - Ordered semantic gameplay events with per-event spatial gains drive SoundPool and haptics without collapsing repeated cues
 - Native Vulkan RT presentation through the Android swapchain
+- Development 1.6.1 selects the existing RT-pipeline backend when supported, or shared BLAS/TLAS-backed `RayQueryCompute` on verified RayQuery-only devices. Raw capability, selected backend and successful presentation are separate report fields; see [targeted backend evidence](../docs/ENGINEERING_1_6_1_RAYQUERY_BACKEND_2026-09-13.md) for exact device limitations.
 - Optional Vulkan timestamp queries report a separate GPU RT command-buffer interval without changing CPU benchmark pass/fail
 - One frame in flight while the held-prop TLAS uses a host-written instance buffer
 - Portrait-first branded entry/pause/settings/controls/diagnostics/credits UI; touch movement/look plus `SWING` and `PARRY`; a bounded two-skeleton opening encounter followed by a singular lich route; layered articulated body/head with a smoothed walk gait, roof-water drench and lantern drop, rounded catchment/drain runnel, coloured bays, mirror, low ritual mist, sliding-roof dawn reveal, and Continue/Begin Again/Quit ending; a persistent post-lich RT Lab with route-local tuning; strict ASTC assets; and phone-safe ray-query shading inside `vkCmdTraceRaysKHR`
@@ -28,6 +29,8 @@ adb shell am start -n com.samfa12.hordelanternrt.debug/com.samfa12.hordelanternr
 ```
 
 The debug build uses `com.samfa12.hordelanternrt.debug`, so it can be installed beside the stable-key-signed public alpha without uninstalling or changing the release app. Release builds retain `com.samfa12.hordelanternrt`.
+
+For a focused Debug validation of the alternate hardware backend, force-stop only the Debug package and append `--ez horde_require_rayquery_compute true` to its launch intent. Omit the flag on a fresh launch to restore normal backend preference. The native Release build ignores this private flag; RayQuery-only supported devices select compute automatically. Do not change system settings or clear app data for this check.
 
 Expected RT success log:
 

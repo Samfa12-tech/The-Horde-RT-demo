@@ -33,7 +33,9 @@ Device compatibility is tracked in [`docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD
 
 ## RT or nothing
 
-The demo uses Vulkan acceleration structures, an RT pipeline and shader binding table, `vkCmdTraceRaysKHR`, an RT storage image, and swapchain presentation. The phone-safe shading path uses `rayQueryEXT` inside raygen with pipeline recursion depth 1. Unsupported devices show explicit diagnostics; there is no browser, raster, baked, screen-space, or fake-RT fallback.
+The preferred backend uses Vulkan acceleration structures, an RT pipeline and shader binding table, `vkCmdTraceRaysKHR`, an RT storage image, and swapchain presentation. Its phone-safe shading uses `rayQueryEXT` inside raygen with pipeline recursion depth 1. The unpublished 1.6.1 branch also supports a hardware `RayQueryCompute` launcher for RayQuery-only drivers: compute dispatch executes the same shading over real BLAS/TLAS and presents through the same storage-image/swapchain path, without an SBT. Unsupported devices show explicit diagnostics; there is no browser, raster, baked, screen-space, software-traversal or fake-RT fallback.
+
+[Targeted 1.6.1 backend evidence](docs/ENGINEERING_1_6_1_RAYQUERY_BACKEND_2026-09-13.md) covers Windows and exact SM-S948B checks. Exact S24/S25 acceptance, cross-stage precision investigation and the complete final-candidate matrix remain open.
 
 `rtScene.presented` becomes true only after an RT-produced frame reaches successful swapchain presentation.
 
