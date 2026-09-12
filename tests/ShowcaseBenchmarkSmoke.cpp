@@ -1,8 +1,20 @@
 #include <iostream>
+#include <clocale>
+#include <locale>
 #include <string>
 
 #include "gameplay/ShowcaseBenchmark.h"
 #include "vulkan/RtCapabilityReport.h"
+
+namespace
+{
+class NonJsonNumberPunctuation final : public std::numpunct<char>
+{
+    char do_decimal_point() const override { return ','; }
+    char do_thousands_sep() const override { return '_'; }
+    std::string do_grouping() const override { return "\3"; }
+};
+}
 
 int main()
 {
@@ -108,6 +120,46 @@ int main()
     check(capabilities.rtScene.executionBackend == horde::vulkan::RtExecutionBackend::Unsupported &&
               !capabilities.rtScene.presented,
           "rejected backend selection must not retain a previously selected backend");
+
+    auto escapedMetadata = metadata;
+    escapedMetadata.buildIdentity = "quote\" slash\\ control";
+    escapedMetadata.buildIdentity.push_back('\x01');
+    escapedMetadata.internalWidth = 1234u;
+    capabilities.identity.gpuName = escapedMetadata.buildIdentity;
+    capabilities.identity.vendorId = 1234u;
+    capabilities.performance.gpuRt.timestampPeriodNanoseconds = 1250.5f;
+    const std::locale previousLocale;
+    std::locale::global(std::locale(previousLocale, new NonJsonNumberPunctuation));
+    const std::string localizedBenchmark = benchmark.BuildJsonReport(escapedMetadata);
+    const std::string localizedCapability = horde::vulkan::BuildCapabilityJsonReport(capabilities);
+    std::locale::global(previousLocale);
+    check(localizedBenchmark.find("quote\\\" slash\\\\ control\\u0001") != std::string::npos &&
+              localizedCapability.find("quote\\\" slash\\\\ control\\u0001") != std::string::npos,
+          "both JSON reports must escape quotes, slashes and all low control characters");
+    check(localizedBenchmark.find("1_234") == std::string::npos &&
+              localizedBenchmark.find("\"width\": 1234") != std::string::npos &&
+              localizedCapability.find("\"vendorId\": 1234") != std::string::npos &&
+              localizedCapability.find("\"timestampPeriodNanoseconds\": 1250.5") != std::string::npos,
+          "JSON numeric output must remain locale-independent rather than use grouped/comma decimals");
+    const std::string previousNumericLocale = std::setlocale(LC_NUMERIC, nullptr);
+    bool commaLocaleAvailable = std::setlocale(LC_NUMERIC, "French_France.1252") != nullptr;
+    if (!commaLocaleAvailable)
+        commaLocaleAvailable = std::setlocale(LC_NUMERIC, "fr_FR.UTF-8") != nullptr;
+    if (commaLocaleAvailable)
+    {
+        capabilities.performance.fps = 12.5f;
+        capabilities.performance.frameTimeMs = 80.0f;
+        capabilities.performance.gpuRt.valid = true;
+        capabilities.performance.gpuRt.latestMs = 75.5f;
+        capabilities.performance.gpuRt.averageMs = 76.5f;
+        const std::string cLocaleCapability = horde::vulkan::BuildCapabilityJsonReport(capabilities);
+        std::setlocale(LC_NUMERIC, previousNumericLocale.c_str());
+        check(cLocaleCapability.find("\"fps\": 12.500000") != std::string::npos &&
+                  cLocaleCapability.find("\"latestMs\": 75.500000") != std::string::npos &&
+                  cLocaleCapability.find("\"averageMs\": 76.500000") != std::string::npos,
+              "legacy float fields must not inherit the C locale through std::to_string");
+    }
+    std::cout << "Comma C-locale coverage: " << (commaLocaleAvailable ? "executed" : "unavailable") << '\n';
 
     ShowcaseBenchmarkRun presentationFailure;
     presentationFailure.Start();

@@ -4,6 +4,7 @@
 #include <array>
 #include <cmath>
 #include <iomanip>
+#include <locale>
 #include <numeric>
 #include <sstream>
 
@@ -38,7 +39,19 @@ std::string JsonEscape(const std::string& value)
         case '\n': escaped += "\\n"; break;
         case '\r': escaped += "\\r"; break;
         case '\t': escaped += "\\t"; break;
-        default: escaped += character; break;
+        default:
+            if (static_cast<unsigned char>(character) < 0x20u)
+            {
+                constexpr char hex[] = "0123456789abcdef";
+                escaped += "\\u00";
+                escaped += hex[static_cast<unsigned char>(character) >> 4u];
+                escaped += hex[static_cast<unsigned char>(character) & 0x0fu];
+            }
+            else
+            {
+                escaped += character;
+            }
+            break;
         }
     }
     return escaped;
@@ -284,6 +297,7 @@ std::string ShowcaseBenchmarkRun::BuildJsonReport(const ShowcaseBenchmarkMetadat
 {
     const ShowcaseBenchmarkStatistics overall = OverallStatistics();
     std::ostringstream out;
+    out.imbue(std::locale::classic());
     out << std::fixed << std::setprecision(4)
         << "{\n"
         << "  \"schema\": 1,\n"

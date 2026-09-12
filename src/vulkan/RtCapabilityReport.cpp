@@ -1,6 +1,7 @@
 #include "vulkan/RtCapabilityReport.h"
 
 #include <iomanip>
+#include <locale>
 #include <sstream>
 #include <string>
 
@@ -39,7 +40,16 @@ std::string JsonEscape(const std::string& value)
             escaped << "\\t";
             break;
         default:
-            escaped << c;
+            if (static_cast<unsigned char>(c) < 0x20u)
+            {
+                constexpr char hex[] = "0123456789abcdef";
+                escaped << "\\u00" << hex[static_cast<unsigned char>(c) >> 4u]
+                        << hex[static_cast<unsigned char>(c) & 0x0fu];
+            }
+            else
+            {
+                escaped << c;
+            }
             break;
         }
     }
@@ -62,6 +72,15 @@ bool IsMeasured(const float value)
 bool IsResolutionMeasured(const std::uint32_t width, const std::uint32_t height)
 {
     return width > 0 && height > 0;
+}
+
+std::string JsonLegacyFloat(const float value, const bool available)
+{
+    if (!available) return "\"N/A\"";
+    std::ostringstream number;
+    number.imbue(std::locale::classic());
+    number << std::fixed << std::setprecision(6) << value;
+    return number.str();
 }
 
 } // namespace
@@ -142,6 +161,7 @@ std::string BuildCapabilityTextReport(const DeviceCapabilities& capabilities)
 std::string BuildCapabilityJsonReport(const DeviceCapabilities& capabilities)
 {
     std::ostringstream out;
+    out.imbue(std::locale::classic());
     out << "{\n";
     out << "  \"backend\": \"" << JsonEscape(capabilities.backend) << "\",\n";
     out << "  \"rtMode\": \"" << ToString(capabilities.rtMode) << "\",\n";
@@ -170,14 +190,14 @@ std::string BuildCapabilityJsonReport(const DeviceCapabilities& capabilities)
     out << "    \"width\": " << capabilities.performance.internalRenderWidth << ",\n";
     out << "    \"height\": " << capabilities.performance.internalRenderHeight << "\n";
     out << "  },\n";
-    out << "  \"fps\": " << (IsMeasured(capabilities.performance.fps) ? std::to_string(capabilities.performance.fps) : "\"N/A\"") << ",\n";
-    out << "  \"frameTimeMs\": " << (capabilities.performance.frameTimeMs > 0.0f ? std::to_string(capabilities.performance.frameTimeMs) : "\"N/A\"") << ",\n";
+    out << "  \"fps\": " << JsonLegacyFloat(capabilities.performance.fps, IsMeasured(capabilities.performance.fps)) << ",\n";
+    out << "  \"frameTimeMs\": " << JsonLegacyFloat(capabilities.performance.frameTimeMs, capabilities.performance.frameTimeMs > 0.0f) << ",\n";
     out << "  \"gpuRtTiming\": {\n";
     out << "    \"status\": \"" << JsonEscape(capabilities.performance.gpuRt.status) << "\",\n";
     out << "    \"supported\": " << (capabilities.performance.gpuRt.supported ? "true" : "false") << ",\n";
     out << "    \"valid\": " << (capabilities.performance.gpuRt.valid ? "true" : "false") << ",\n";
-    out << "    \"latestMs\": " << (capabilities.performance.gpuRt.valid ? std::to_string(capabilities.performance.gpuRt.latestMs) : "\"N/A\"") << ",\n";
-    out << "    \"averageMs\": " << (capabilities.performance.gpuRt.valid ? std::to_string(capabilities.performance.gpuRt.averageMs) : "\"N/A\"") << ",\n";
+    out << "    \"latestMs\": " << JsonLegacyFloat(capabilities.performance.gpuRt.latestMs, capabilities.performance.gpuRt.valid) << ",\n";
+    out << "    \"averageMs\": " << JsonLegacyFloat(capabilities.performance.gpuRt.averageMs, capabilities.performance.gpuRt.valid) << ",\n";
     out << "    \"timestampPeriodNanoseconds\": " << capabilities.performance.gpuRt.timestampPeriodNanoseconds << ",\n";
     out << "    \"timestampValidBits\": " << capabilities.performance.gpuRt.timestampValidBits << ",\n";
     out << "    \"sampleCount\": " << capabilities.performance.gpuRt.sampleCount << ",\n";
