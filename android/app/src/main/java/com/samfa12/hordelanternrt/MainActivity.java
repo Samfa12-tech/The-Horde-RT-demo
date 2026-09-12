@@ -84,6 +84,7 @@ public class MainActivity extends Activity {
     private static final String EXTRA_DEBUG_AUTOSTART = "horde.debug.autostart";
     private static final String EXTRA_DEBUG_OVERLAY = "horde.debug.overlay";
     private static final String EXTRA_DEBUG_GPU_TIMING = "horde.debug.gpu_timing";
+    private static final String EXTRA_REQUIRE_RAYQUERY_COMPUTE = "horde_require_rayquery_compute";
     private static final String EXTRA_DEBUG_RT_LAB = "horde.debug.rt_lab";
     private static final String EXTRA_DEBUG_RT_WATERFALL = "horde.debug.rt_waterfall_width";
     private static final String EXTRA_DEBUG_RT_ROOF = "horde.debug.rt_roof_open";
@@ -1557,6 +1558,11 @@ public class MainActivity extends Activity {
         return (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
     }
 
+    static boolean shouldRequireRayQueryCompute(final boolean debugBuild, final Intent intent) {
+        return debugBuild && intent != null &&
+                intent.getBooleanExtra(EXTRA_REQUIRE_RAYQUERY_COMPUTE, false);
+    }
+
     @SuppressWarnings("deprecation")
     private void performHaptic(final int cue) {
         if (!resumed || !preferences.getBoolean("haptics_enabled", true)) return;
@@ -1648,6 +1654,9 @@ public class MainActivity extends Activity {
     }
 
     private void consumeDebugAutomationIntent(final Intent intent) {
+        final boolean requireRayQueryCompute =
+                shouldRequireRayQueryCompute(isDebuggableApp(), intent);
+        ProbeBridge.setRequiredRayQueryCompute(requireRayQueryCompute);
         if (intent == null) return;
         if (!isDebuggableApp()) {
             if (intent.getBooleanExtra(EXTRA_DEBUG_CAPTURE, false)) {
@@ -1726,6 +1735,7 @@ public class MainActivity extends Activity {
             Log.i(TAG, "Accepted debug automation intent: checkpoint=" + requestedCheckpoint +
                     " capture=" + requestedCapture + " replay=" + requestedReplay + " scale=" + requestedScale +
                     " gpuTiming=" + (gpuTimingEnabled ? "enabled" : "disabled") +
+                    " requireRayQueryCompute=" + requireRayQueryCompute +
                     " rtLab=" + hasRtLabIntent);
         }
     }

@@ -23,6 +23,7 @@
 #include "vulkan/raytracing/PlayerRenderSlot.h"
 #include "vulkan/raytracing/RtGpuResources.h"
 #include "vulkan/raytracing/RtPipelineBundle.h"
+#include "vulkan/raytracing/RtExecutionPolicy.h"
 #include "vulkan/raytracing/RtSceneTuning.h"
 #include "vulkan/raytracing/RtStaticMeshSlot.h"
 
@@ -132,11 +133,17 @@ public:
                     const std::string& lichTextureDirectory,
                     std::string& diagnostic,
                     const std::string& developmentStaticAssetDirectory = {},
-                    const std::string& productionAssetRoot = {});
+                    const std::string& productionAssetRoot = {},
+                    RtExecutionBackend executionBackend = RtExecutionBackend::RayTracingPipeline);
 
     void Destroy();
 
     bool IsReady() const { return ready_; }
+    RtExecutionBackend ExecutionBackend() const
+    {
+        return pipelineBundle_.HasSelection() ? pipelineBundle_.Request().executionBackend
+                                              : RtExecutionBackend::Unsupported;
+    }
     VkExtent2D DispatchExtent() const { return dispatchExtent_; }
     const std::string& MaterialEncoding() const { return materialEncoding_; }
     std::uint32_t BlasCount() const { return ready_ ? kBlasCount : 0u; }
@@ -474,7 +481,7 @@ private:
     bool CreateBundleSharedShaderModules(VkShaderModule& miss,
                                          VkShaderModule& hit,
                                          std::string& diagnostic);
-    bool CreateBundleRaygenShaderModule(const RtPipelineVariantArtifact& artifact,
+    bool CreateBundleEntryShaderModule(const RtPipelineVariantArtifact& artifact,
                                         VkShaderModule& out,
                                         std::string& diagnostic);
     bool CreateBundleStrategyPipeline(RtMaterialStrategy strategy,
@@ -638,6 +645,8 @@ private:
     HeldItemBlasMeasurements heldItemBlasMeasurements_{};
 
     RtPipelineBundle pipelineBundle_;
+    RtExecutionPolicy executionPolicy_{};
+    std::array<std::uint32_t, 3u> computeDispatchGroups_{};
     horde::telemetry::RtPipelineEvidenceIdentity pipelineEvidenceIdentity_{};
     bool pipelineEvidenceIdentityValid_ = false;
     horde::telemetry::RtPipelineEvidenceIdentity framePipelineEvidence_{};

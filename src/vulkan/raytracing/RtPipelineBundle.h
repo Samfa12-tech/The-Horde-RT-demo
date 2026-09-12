@@ -68,8 +68,8 @@ struct RtPipelineBundleBuildApi {
                                  VkPipelineLayout&, std::string&) = nullptr;
     bool (*createSharedShaderModules)(void*, VkShaderModule&, VkShaderModule&,
                                       std::string&) = nullptr;
-    bool (*createRaygenShaderModule)(void*, const RtPipelineVariantArtifact&,
-                                     VkShaderModule&, std::string&) = nullptr;
+    bool (*createEntryShaderModule)(void*, const RtPipelineVariantArtifact&,
+                                    VkShaderModule&, std::string&) = nullptr;
     bool (*createStrategyPipeline)(void*, RtMaterialStrategy, VkShaderModule,
                                    VkShaderModule, VkShaderModule, VkPipelineLayout,
                                    VkPipeline&, std::string&) = nullptr;
@@ -78,7 +78,9 @@ struct RtPipelineBundleBuildApi {
                               std::array<VkStridedDeviceAddressRegionKHR, 4u>&,
                               std::string&) = nullptr;
 
-    [[nodiscard]] bool Complete() const noexcept;
+    [[nodiscard]] bool Complete(
+        horde::vulkan::RtExecutionBackend executionBackend =
+            horde::vulkan::RtExecutionBackend::RayTracingPipeline) const noexcept;
 };
 
 class RtPipelineBundle final {

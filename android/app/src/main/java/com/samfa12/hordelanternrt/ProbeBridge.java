@@ -48,6 +48,7 @@ public final class ProbeBridge {
     public static native int getCurrentRenderScalePercent();
     public static native int getCurrentWaterQuality();
     public static native void setGpuTimingEnabled(boolean enabled);
+    public static native void setRequiredRayQueryCompute(boolean required);
     public static native boolean requestDebugCheckpoint(int checkpointId);
     public static native boolean requestDebugCaptureCheckpoint(int checkpointId);
     public static native boolean requestDebugRouteReplay();

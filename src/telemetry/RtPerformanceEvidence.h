@@ -89,6 +89,12 @@ enum class RtInstrumentationMode : std::uint8_t
     Diagnostic,
 };
 
+enum class RtExecutionMode : std::uint8_t
+{
+    RayTracingPipeline,
+    RayQueryCompute,
+};
+
 enum class RtDielectricQuality : std::uint8_t
 {
     Mobile,
@@ -111,6 +117,7 @@ enum class RtWaterQuality : std::uint8_t
 [[nodiscard]] const char* RtSampleStatusName(RtSampleStatus status) noexcept;
 [[nodiscard]] const char* RtPresentationOutcomeName(RtPresentationOutcome outcome) noexcept;
 [[nodiscard]] const char* RtInstrumentationModeName(RtInstrumentationMode mode) noexcept;
+[[nodiscard]] const char* RtExecutionModeName(RtExecutionMode mode) noexcept;
 [[nodiscard]] const char* RtDielectricQualityName(RtDielectricQuality quality) noexcept;
 [[nodiscard]] const char* RtMaterialStrategyName(RtMaterialStrategy strategy) noexcept;
 [[nodiscard]] const char* RtWaterQualityName(RtWaterQuality quality) noexcept;
@@ -149,6 +156,7 @@ struct RtShaderArtifactIdentity
 
 struct RtPipelineEvidenceIdentity
 {
+    RtExecutionMode executionMode = RtExecutionMode::RayTracingPipeline;
     RtInstrumentationMode instrumentation = RtInstrumentationMode::Shipping;
     RtDielectricQuality dielectricQuality = RtDielectricQuality::Mobile;
     RtMaterialStrategy activeStrategy = RtMaterialStrategy::OpaqueFast;

@@ -288,16 +288,19 @@ bool ValidateRtPipelineBundlePreflight(
 
 bool ResolveCompiledRtPipelineBundlePreflight(
     RtPipelineBundlePreflight& preflight,
-    std::string& failureKey)
+    std::string& failureKey,
+    const horde::vulkan::RtExecutionBackend executionBackend)
 {
     preflight = {};
     failureKey.clear();
-    const auto& provider = RtPipelineVariantProvider::Compiled();
+    const auto& provider = RtPipelineVariantProvider::Compiled(executionBackend);
     const RtPipelineBundleRequest request = provider.request();
     const RtPipelineVariantKey opaqueKey{
-        request.instrumentation, request.quality, RtMaterialStrategy::OpaqueFast};
+        request.instrumentation, request.quality, RtMaterialStrategy::OpaqueFast,
+        request.executionBackend};
     const RtPipelineVariantKey genericKey{
-        request.instrumentation, request.quality, RtMaterialStrategy::GenericDielectric};
+        request.instrumentation, request.quality, RtMaterialStrategy::GenericDielectric,
+        request.executionBackend};
     const auto opaque = provider.ResolveExact(opaqueKey, &failureKey);
     if (!opaque) { return false; }
     const auto generic = provider.ResolveExact(genericKey, &failureKey);

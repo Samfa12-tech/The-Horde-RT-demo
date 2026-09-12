@@ -245,6 +245,7 @@ std::string ShowcaseBenchmarkRun::BuildTextReport(const ShowcaseBenchmarkMetadat
         << "GPU: " << metadata.gpuName << '\n'
         << "Vulkan API: " << metadata.vulkanApi << '\n'
         << "RT mode: " << metadata.rtMode << '\n'
+        << "Execution backend: " << metadata.executionBackend << '\n'
         << "Swapchain present mode: " << metadata.presentMode << '\n'
         << "RT presented every measured frame: " << (presentedEveryFrame_ ? "yes" : "no") << '\n'
         << "Material route: " << metadata.materialEncoding << '\n'
@@ -294,6 +295,7 @@ std::string ShowcaseBenchmarkRun::BuildJsonReport(const ShowcaseBenchmarkMetadat
         << "  \"gpu\": \"" << JsonEscape(metadata.gpuName) << "\",\n"
         << "  \"vulkanApi\": \"" << JsonEscape(metadata.vulkanApi) << "\",\n"
         << "  \"rtMode\": \"" << JsonEscape(metadata.rtMode) << "\",\n"
+        << "  \"executionBackend\": \"" << JsonEscape(metadata.executionBackend) << "\",\n"
         << "  \"presentMode\": \"" << JsonEscape(metadata.presentMode) << "\",\n"
         << "  \"materialEncoding\": \"" << JsonEscape(metadata.materialEncoding) << "\",\n"
         << "  \"presentedEveryFrame\": " << (presentedEveryFrame_ ? "true" : "false") << ",\n"

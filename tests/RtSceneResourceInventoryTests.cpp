@@ -1,6 +1,7 @@
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
 #include "vulkan/raytracing/RtFrameEvidenceCoordinator.h"
 #include "vulkan/raytracing/RtSceneRecordObservation.h"
+#include "vulkan/raytracing/RtExecutionPolicy.h"
 
 #include <algorithm>
 #include <array>
@@ -204,6 +205,45 @@ int main()
     using namespace horde::vulkan::raytracing;
 
     bool ok = true;
+    const auto pipelinePolicy = TryMakeRtExecutionPolicy(
+        horde::vulkan::RtExecutionBackend::RayTracingPipeline);
+    const auto computePolicy = TryMakeRtExecutionPolicy(
+        horde::vulkan::RtExecutionBackend::RayQueryCompute);
+    ok &= Require(pipelinePolicy &&
+                      pipelinePolicy->shaderPipelineStage == VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR &&
+                      pipelinePolicy->shaderStage == VK_SHADER_STAGE_RAYGEN_BIT_KHR &&
+                      pipelinePolicy->pushConstantStages ==
+                          (VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR) &&
+                      pipelinePolicy->bindPoint == VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR &&
+                      pipelinePolicy->requiresShaderBindingTable,
+                  "pipeline execution must retain its exact stage/bind/push/SBT contract");
+    ok &= Require(computePolicy &&
+                      computePolicy->shaderPipelineStage == VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT &&
+                      computePolicy->shaderStage == VK_SHADER_STAGE_COMPUTE_BIT &&
+                      computePolicy->pushConstantStages == VK_SHADER_STAGE_COMPUTE_BIT &&
+                      computePolicy->bindPoint == VK_PIPELINE_BIND_POINT_COMPUTE &&
+                      !computePolicy->requiresShaderBindingTable &&
+                      !TryMakeRtExecutionPolicy(horde::vulkan::RtExecutionBackend::Unsupported) &&
+                      !TryMakeRtExecutionPolicy(static_cast<horde::vulkan::RtExecutionBackend>(99)),
+                  "compute must require only compute stages and unsupported must not become raster");
+    VkPhysicalDeviceLimits dispatchLimits{};
+    dispatchLimits.maxComputeWorkGroupInvocations = 64u;
+    dispatchLimits.maxComputeWorkGroupSize[0] = 8u;
+    dispatchLimits.maxComputeWorkGroupSize[1] = 8u;
+    dispatchLimits.maxComputeWorkGroupSize[2] = 1u;
+    dispatchLimits.maxComputeWorkGroupCount[0] = 65535u;
+    dispatchLimits.maxComputeWorkGroupCount[1] = 65535u;
+    dispatchLimits.maxComputeWorkGroupCount[2] = 1u;
+    const auto oddDispatch = TryMakeRtComputeDispatch({961u, 541u}, dispatchLimits);
+    const auto exactDispatch = TryMakeRtComputeDispatch({960u, 540u}, dispatchLimits);
+    ok &= Require(oddDispatch && (*oddDispatch == std::array<std::uint32_t, 3u>{121u, 68u, 1u}) &&
+                      exactDispatch && (*exactDispatch == std::array<std::uint32_t, 3u>{120u, 68u, 1u}) &&
+                      !TryMakeRtComputeDispatch({0u, 540u}, dispatchLimits) &&
+                      !TryMakeRtComputeDispatch({UINT32_MAX, 540u}, dispatchLimits),
+                  "compute dispatch must round up 8x8 safely and reject zero/unsupported group extents");
+    dispatchLimits.maxComputeWorkGroupInvocations = 63u;
+    ok &= Require(!TryMakeRtComputeDispatch({960u, 540u}, dispatchLimits),
+                  "compute dispatch must reject a device below the fixed workgroup requirement");
     RtPipelineBundlePreflight selectedPreflight{};
     std::string preflightFailure;
     ok &= Require(ResolveCompiledRtPipelineBundlePreflight(
@@ -225,6 +265,23 @@ int main()
                           selectedPreflight.strategies[1].canonicalKey,
                   "fixed pair identity must retain both exact selected artifacts without truncation");
     const std::string oversizedKey(96u, 'x');
+    RtPipelineBundlePreflight computePreflight{};
+    horde::telemetry::RtPipelineEvidenceIdentity computeIdentity{};
+    ok &= Require(ResolveCompiledRtPipelineBundlePreflight(
+                      computePreflight, preflightFailure,
+                      horde::vulkan::RtExecutionBackend::RayQueryCompute) &&
+                      TryMakeRtPipelineEvidenceIdentity(
+                          computePreflight.request, computePreflight.strategies[0],
+                          computePreflight.strategies[1], computeIdentity) &&
+                      computeIdentity.executionMode == horde::telemetry::RtExecutionMode::RayQueryCompute &&
+                      horde::telemetry::RtFixedTextView(computeIdentity.bundleKey).starts_with("rayquery_compute_") &&
+                      horde::telemetry::RtFixedTextView(computeIdentity.opaqueFast.key).starts_with("rayquery_compute_"),
+                  "scene evidence must identify the actual compute backend and exact selected pair");
+    horde::telemetry::RtPipelineEvidenceIdentity crossBackendIdentity{};
+    ok &= Require(!TryMakeRtPipelineEvidenceIdentity(
+                      computePreflight.request, selectedPreflight.strategies[0],
+                      selectedPreflight.strategies[1], crossBackendIdentity),
+                  "scene evidence must reject an artifact pair from the other backend");
     RtPipelineVariantArtifact oversizedArtifact = selectedPreflight.strategies[0];
     oversizedArtifact.canonicalKey = oversizedKey;
     horde::telemetry::RtPipelineEvidenceIdentity rejectedIdentity{};

@@ -67,6 +67,8 @@ struct RtPipelineBundlePreflight {
     std::string& failureKey);
 [[nodiscard]] bool ResolveCompiledRtPipelineBundlePreflight(
     RtPipelineBundlePreflight& preflight,
-    std::string& failureKey);
+    std::string& failureKey,
+    horde::vulkan::RtExecutionBackend executionBackend =
+        horde::vulkan::RtExecutionBackend::RayTracingPipeline);
 
 } // namespace horde::vulkan::raytracing

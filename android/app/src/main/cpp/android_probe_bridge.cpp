@@ -47,6 +47,7 @@
 #include "vulkan/VulkanContext.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
 #include "vulkan/raytracing/RtFrameEvidenceCoordinator.h"
+#include "vulkan/raytracing/RtDeviceEnablePlan.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
 
 #ifndef HORDE_RT_BUILD_ID
@@ -196,6 +197,7 @@ struct SwapchainContext
     horde::gameplay::ShowcaseBenchmarkRun inAppBenchmark;
     std::string reportDirectory;
     bool useRtPath = false;
+    horde::vulkan::RtExecutionBackend executionBackend = horde::vulkan::RtExecutionBackend::Unsupported;
     uint32_t currentFrame = 0u;
 };
 
@@ -240,6 +242,7 @@ std::atomic<int> gRuntimeState{0}; // 0 starting/stopped, 1 honestly presented R
 std::atomic<float> gRequestedRenderScale{1.0f};
 std::atomic<int> gRequestedWaterQuality{1};
 std::atomic<bool> gRequestedGpuFrameTimingEnabled{true};
+std::atomic<bool> gRequiredRayQueryCompute{false};
 // The sole Android-owned RT tuning state. The render thread takes one coherent
 // copy per frame while JNI setters publish complete, clamped updates.
 horde::platform::android::AndroidRtLabState gRtLabState;
@@ -501,7 +504,7 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(const Swapchai
 
     snapshot.gpuName = context.capabilities.identity.gpuName;
     snapshot.vulkanApi = PackedVulkanVersion(context.capabilities.identity.vulkanApiVersion);
-    snapshot.rtMode = horde::vulkan::ToString(context.capabilities.rtMode);
+    snapshot.rtMode = horde::vulkan::ToString(context.rtScene.ExecutionBackend());
     snapshot.routeZone = horde::gameplay::ShowcaseZoneName(
         simulation.zone);
     snapshot.materialEncoding = context.rtScene.MaterialEncoding();
@@ -673,6 +676,7 @@ horde::gameplay::ShowcaseBenchmarkMetadata BuildBenchmarkMetadata(const Swapchai
                          std::to_string(VK_API_VERSION_MINOR(context.capabilities.identity.vulkanApiVersion)) + "." +
                          std::to_string(VK_API_VERSION_PATCH(context.capabilities.identity.vulkanApiVersion));
     metadata.rtMode = horde::vulkan::ToString(context.capabilities.rtMode);
+    metadata.executionBackend = horde::vulkan::ToString(context.rtScene.ExecutionBackend());
     metadata.presentMode = PresentModeName(context.swapchainPresentMode);
     metadata.materialEncoding = context.rtScene.MaterialEncoding();
     metadata.renderScalePercent = static_cast<std::uint32_t>(std::lround(context.renderScale * 100.0f));
@@ -933,6 +937,8 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
          << "  \"internalExtent\": {\"width\": " << context.capabilities.performance.internalRenderWidth
          << ", \"height\": " << context.capabilities.performance.internalRenderHeight << "},\n"
          << "  \"presented\": " << (context.capabilities.rtScene.presented ? "true" : "false") << ",\n"
+         << "  \"executionBackend\": \""
+         << horde::vulkan::ToString(context.rtScene.ExecutionBackend()) << "\",\n"
          << "  \"playerRenderRoute\": \""
          << (context.playerRenderRoute == horde::vulkan::raytracing::PlayerRenderRoute::Skinned
                  ? "skinned"
@@ -1288,7 +1294,7 @@ bool CreateInstance(VkInstance& instance)
         VK_MAKE_VERSION(1, 0, 0),
         "horde_rt",
         VK_MAKE_VERSION(1, 0, 0),
-        VK_API_VERSION_1_1};
+        VK_API_VERSION_1_2};
 
     VkInstanceCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -1336,7 +1342,8 @@ bool FindGraphicsAndPresentQueueFamily(VkPhysicalDevice physicalDevice, VkSurfac
     vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, queueFamilies.data());
     for (uint32_t index = 0u; index < queueFamilyCount; ++index)
     {
-        if ((queueFamilies[index].queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0u)
+        constexpr VkQueueFlags requiredFlags = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT;
+        if ((queueFamilies[index].queueFlags & requiredFlags) != requiredFlags)
         {
             continue;
         }
@@ -1375,7 +1382,7 @@ bool HasDeviceExtension(VkPhysicalDevice physicalDevice, const char* extensionNa
 
 bool CreateLogicalDevice(VkPhysicalDevice physicalDevice,
                          uint32_t graphicsQueueFamilyIndex,
-                         const horde::vulkan::DeviceCapabilities& capabilities,
+                         horde::vulkan::RtExecutionBackend executionBackend,
                          VkDevice& device,
                          VkQueue& graphicsQueue)
 {
@@ -1388,22 +1395,17 @@ bool CreateLogicalDevice(VkPhysicalDevice physicalDevice,
         1u,
         &queuePriority};
     std::vector<const char*> extensions{VK_KHR_SWAPCHAIN_EXTENSION_NAME};
-    const bool enableRayTracing = capabilities.rtMode == horde::vulkan::RtMode::RayTracingPipeline;
+    const auto rtPlan = horde::vulkan::raytracing::MakeRtDeviceEnablePlan(executionBackend);
+    const bool enableRayTracing = rtPlan.has_value();
+    const horde::vulkan::FeatureSupport requestedFeatures = rtPlan ? rtPlan->features : horde::vulkan::FeatureSupport{};
     if (enableRayTracing)
     {
-        const char* rtExtensions[] = {
-            VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME,
-            VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME,
-            VK_KHR_RAY_QUERY_EXTENSION_NAME,
-            VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME,
-            VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME,
-            VK_KHR_SPIRV_1_4_EXTENSION_NAME,
-            VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME};
-        for (const char* extension : rtExtensions)
+        for (std::uint32_t index = 0u; index < rtPlan->extensionCount; ++index)
         {
+            const char* extension = rtPlan->extensions[index];
             if (!HasDeviceExtension(physicalDevice, extension))
             {
-                __android_log_print(ANDROID_LOG_ERROR, kTag, "Selected RayTracingPipeline device is missing required extension: %s", extension);
+                __android_log_print(ANDROID_LOG_ERROR, kTag, "Selected hardware RT backend is missing required extension: %s", extension);
                 return false;
             }
             extensions.push_back(extension);
@@ -1412,22 +1414,24 @@ bool CreateLogicalDevice(VkPhysicalDevice physicalDevice,
 
     VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures{
         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR};
-    accelerationStructureFeatures.accelerationStructure = enableRayTracing ? VK_TRUE : VK_FALSE;
+    accelerationStructureFeatures.accelerationStructure = requestedFeatures.accelerationStructure ? VK_TRUE : VK_FALSE;
     VkPhysicalDeviceRayTracingPipelineFeaturesKHR rayTracingPipelineFeatures{
         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR};
-    rayTracingPipelineFeatures.rayTracingPipeline = enableRayTracing ? VK_TRUE : VK_FALSE;
+    rayTracingPipelineFeatures.rayTracingPipeline = requestedFeatures.rayTracingPipeline ? VK_TRUE : VK_FALSE;
     VkPhysicalDeviceRayQueryFeaturesKHR rayQueryFeatures{
         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR};
-    rayQueryFeatures.rayQuery = enableRayTracing ? VK_TRUE : VK_FALSE;
+    rayQueryFeatures.rayQuery = requestedFeatures.rayQuery ? VK_TRUE : VK_FALSE;
     VkPhysicalDeviceBufferDeviceAddressFeaturesKHR bufferDeviceAddressFeatures{
         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES_KHR};
-    bufferDeviceAddressFeatures.bufferDeviceAddress = enableRayTracing ? VK_TRUE : VK_FALSE;
+    bufferDeviceAddressFeatures.bufferDeviceAddress = requestedFeatures.bufferDeviceAddress ? VK_TRUE : VK_FALSE;
     VkPhysicalDeviceFeatures2 features2{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2};
     VkPhysicalDeviceFeatures supportedCoreFeatures{};
     vkGetPhysicalDeviceFeatures(physicalDevice, &supportedCoreFeatures);
     features2.features.textureCompressionASTC_LDR = supportedCoreFeatures.textureCompressionASTC_LDR;
     features2.pNext = &accelerationStructureFeatures;
-    accelerationStructureFeatures.pNext = &rayTracingPipelineFeatures;
+    accelerationStructureFeatures.pNext = &rayQueryFeatures;
+    if (requestedFeatures.rayTracingPipeline)
+        accelerationStructureFeatures.pNext = &rayTracingPipelineFeatures;
     rayTracingPipelineFeatures.pNext = &rayQueryFeatures;
     rayQueryFeatures.pNext = &bufferDeviceAddressFeatures;
 
@@ -1728,24 +1732,16 @@ VkPhysicalDevice FindMatchingPhysicalDevice(
     {
         VkPhysicalDeviceProperties properties{};
         vkGetPhysicalDeviceProperties(candidate, &properties);
-        if (properties.vendorID == capabilities.identity.vendorId &&
-            properties.deviceID == capabilities.identity.deviceId &&
-            capabilities.identity.gpuName == properties.deviceName)
+        const horde::vulkan::DeviceIdentity candidateIdentity{
+            properties.deviceName, properties.vendorID, properties.deviceID,
+            properties.driverVersion, properties.apiVersion};
+        if (horde::vulkan::raytracing::SameRtDeviceIdentity(capabilities.identity, candidateIdentity))
         {
             uint32_t queueFamilyIndex = 0u;
             if (FindGraphicsAndPresentQueueFamily(candidate, surface, queueFamilyIndex))
             {
                 return candidate;
             }
-        }
-    }
-
-    for (const VkPhysicalDevice candidate : physicalDevices)
-    {
-        uint32_t queueFamilyIndex = 0u;
-        if (FindGraphicsAndPresentQueueFamily(candidate, surface, queueFamilyIndex))
-        {
-            return candidate;
         }
     }
 
@@ -2002,7 +1998,8 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
                                     context.reportDirectory + "/..",
                                     diagnostic,
                                     {},
-                                    context.reportDirectory + "/.."))
+                                    context.reportDirectory + "/..",
+                                    context.executionBackend))
     {
         __android_log_print(ANDROID_LOG_ERROR, kTag, "Failed to initialise presentable RT scene: %s", diagnostic.c_str());
         return false;
@@ -2851,6 +2848,8 @@ void SwapchainRenderLoop()
         if (rtFramePresented && !gSwapchainContext.capabilities.rtScene.presented)
         {
             gSwapchainContext.capabilities.rtScene.presented = true;
+            gSwapchainContext.capabilities.rtScene.executionBackend =
+                gSwapchainContext.rtScene.ExecutionBackend();
             gSwapchainContext.capabilities.rtScene.status = "Presented via swapchain";
             gSwapchainContext.capabilities.rtScene.geometry = "Complete Horde showcase route with sequential animated skeleton and staff-lit lich";
             gSwapchainContext.capabilities.rtScene.dispatchWidth = gSwapchainContext.rtScene.DispatchExtent().width;
@@ -2908,13 +2907,13 @@ bool StartSurfaceInternal(ANativeWindow* window,
     context.reportDirectory = reportDirectory;
     context.renderScale = std::clamp(gRequestedRenderScale.load(std::memory_order_acquire), 0.50f, 1.0f);
     context.gpuFrameTimingEnabled = gRequestedGpuFrameTimingEnabled.load(std::memory_order_acquire);
-    context.useRtPath = capabilities.rtMode == horde::vulkan::RtMode::RayTracingPipeline;
+    const bool requireRayQueryCompute = gRequiredRayQueryCompute.load(std::memory_order_acquire);
     context.clearColor = ClearColorForMode(capabilities.rtMode);
     __android_log_print(ANDROID_LOG_INFO,
                         kTag,
                         "HORDE_GPU_TIMING mode=%s rt_rendering=unchanged",
                         context.gpuFrameTimingEnabled ? "enabled" : "disabled");
-    gRuntimeState.store(context.useRtPath ? 0 : 2, std::memory_order_release);
+    gRuntimeState.store(0, std::memory_order_release);
     ClearPlatformGameplayEvents();
     {
         std::lock_guard<std::mutex> inputLock(gInputPublisherMutex);
@@ -2943,12 +2942,33 @@ bool StartSurfaceInternal(ANativeWindow* window,
 
     if (!FindGraphicsAndPresentQueueFamily(context.physicalDevice, context.surface, context.graphicsQueueFamilyIndex))
     {
-        __android_log_print(ANDROID_LOG_ERROR, kTag, "Could not find graphics+present queue family on Android.");
+        __android_log_print(ANDROID_LOG_ERROR, kTag, "Could not find graphics+compute+present queue family on Android.");
         DestroySwapchainContext(context);
         return false;
     }
 
-    if (!CreateLogicalDevice(context.physicalDevice, context.graphicsQueueFamilyIndex, capabilities, context.device, context.graphicsQueue))
+    // The selector's queue prerequisite is now proved for this exact device/surface.
+    context.executionBackend = horde::vulkan::raytracing::SelectRtExecutionBackend(
+        capabilities, true, requireRayQueryCompute);
+    horde::vulkan::BeginRtBackendSelection(context.capabilities.rtScene, context.executionBackend);
+    PublishReportSnapshot(context.capabilities);
+    WriteTextFile(context.reportDirectory + '/' + kTextReportFilename, BuildDisplayText(context.capabilities));
+    WriteTextFile(context.reportDirectory + '/' + kJsonReportFilename,
+                  horde::vulkan::BuildCapabilityJsonReport(context.capabilities));
+    if (requireRayQueryCompute &&
+        context.executionBackend != horde::vulkan::RtExecutionBackend::RayQueryCompute)
+    {
+        __android_log_print(
+            ANDROID_LOG_ERROR, kTag,
+            "Required hardware RayQuery compute backend is unavailable; no alternate backend will be selected.");
+        gRuntimeState.store(2, std::memory_order_release);
+        DestroySwapchainContext(context);
+        return false;
+    }
+    context.useRtPath = context.executionBackend != horde::vulkan::RtExecutionBackend::Unsupported;
+    gRuntimeState.store(context.useRtPath ? 0 : 2, std::memory_order_release);
+
+    if (!CreateLogicalDevice(context.physicalDevice, context.graphicsQueueFamilyIndex, context.executionBackend, context.device, context.graphicsQueue))
     {
         DestroySwapchainContext(context);
         return false;
@@ -3480,6 +3500,18 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_setGpuTimingEnabled(JNIEnv*, jclass,
 #else
     (void)enabled;
     gRequestedGpuFrameTimingEnabled.store(true, std::memory_order_release);
+#endif
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_setRequiredRayQueryCompute(
+    JNIEnv*, jclass, jboolean required)
+{
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS)
+    gRequiredRayQueryCompute.store(required == JNI_TRUE, std::memory_order_release);
+#else
+    (void)required;
+    gRequiredRayQueryCompute.store(false, std::memory_order_release);
 #endif
 }
 

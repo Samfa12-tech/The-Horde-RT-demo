@@ -66,6 +66,7 @@
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
 #include "vulkan/raytracing/DevelopmentStaticAssetPolicy.h"
 #include "vulkan/raytracing/RtFrameEvidenceCoordinator.h"
+#include "vulkan/raytracing/RtDeviceEnablePlan.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
 
 #ifndef HORDE_RT_BUILD_ID
@@ -176,6 +177,7 @@ constexpr UINT kMaxFramesInFlight = 1u;
 struct CaptureLaunchOptions
 {
     bool requested = false;
+    bool requireRayQueryCompute = false;
     std::filesystem::path outputDirectory;
     std::string developmentCheckpoint;
     std::string error;
@@ -258,6 +260,7 @@ struct VulkanSurfaceContext
     horde::telemetry::RtPresentationOutcome lastFramePresentation =
         horde::telemetry::RtPresentationOutcome::NotAttempted;
     bool useRtPath = false;
+    horde::vulkan::RtExecutionBackend executionBackend = horde::vulkan::RtExecutionBackend::Unsupported;
     std::string developmentCheckpoint;
     std::string lastRtFrameError;
     bool controlsEnabled = false;
@@ -380,6 +383,11 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     for (int index = 1; index < argumentCount; ++index)
     {
         const std::wstring_view argument(arguments[index]);
+        if (argument == L"--require-rayquery-compute")
+        {
+            options.requireRayQueryCompute = true;
+            continue;
+        }
         if (argument == L"--development-checkpoint")
         {
             if (!options.developmentCheckpoint.empty())
@@ -1893,6 +1901,7 @@ horde::gameplay::ShowcaseBenchmarkMetadata BuildBenchmarkMetadata(
                          std::to_string(VK_API_VERSION_MINOR(capabilities.identity.vulkanApiVersion)) + "." +
                          std::to_string(VK_API_VERSION_PATCH(capabilities.identity.vulkanApiVersion));
     metadata.rtMode = horde::vulkan::ToString(capabilities.rtMode);
+    metadata.executionBackend = horde::vulkan::ToString(context.rtScene.ExecutionBackend());
     metadata.presentMode = PresentModeName(context.swapchainPresentMode);
     metadata.materialEncoding = context.rtScene.MaterialEncoding();
     metadata.renderScalePercent = static_cast<std::uint32_t>(std::lround(context.renderScale * 100.0f));
@@ -2074,7 +2083,7 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(
     snapshot.shaderIdentity = context.rtScene.SelectedPipelineBundleDisplayIdentity();
     snapshot.gpuName = capabilities.identity.gpuName;
     snapshot.vulkanApi = PackedVulkanVersion(capabilities.identity.vulkanApiVersion);
-    snapshot.rtMode = horde::vulkan::ToString(capabilities.rtMode);
+    snapshot.rtMode = horde::vulkan::ToString(context.rtScene.ExecutionBackend());
     snapshot.routeZone = horde::gameplay::ShowcaseZoneName(
         horde::gameplay::QueryShowcaseZone(context.cameraX, context.cameraZ));
     snapshot.materialEncoding = context.rtScene.MaterialEncoding();
@@ -2240,7 +2249,7 @@ bool CreateInstance(VkInstance& instance)
         VK_MAKE_VERSION(1, 0, 0),
         "horde_rt",
         VK_MAKE_VERSION(1, 0, 0),
-        VK_API_VERSION_1_1};
+        VK_API_VERSION_1_2};
 
     const VkInstanceCreateInfo createInfo{
         VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
@@ -2296,7 +2305,8 @@ bool FindGraphicsAndPresentQueueFamily(VkPhysicalDevice physicalDevice, VkSurfac
 
     for (uint32_t index = 0u; index < queueFamilyCount; ++index)
     {
-        if ((queueFamilies[index].queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0u)
+        constexpr VkQueueFlags requiredFlags = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT;
+        if ((queueFamilies[index].queueFlags & requiredFlags) != requiredFlags)
         {
             continue;
         }
@@ -2941,7 +2951,7 @@ bool SetDesktopMovementKey(VulkanSurfaceContext& context, const WPARAM key, cons
 
 bool CreateLogicalDevice(VkPhysicalDevice physicalDevice,
                          uint32_t graphicsQueueFamilyIndex,
-                         const horde::vulkan::DeviceCapabilities& capabilities,
+                         horde::vulkan::RtExecutionBackend executionBackend,
                          VkDevice& device,
                          VkQueue& graphicsQueue)
 {
@@ -2954,22 +2964,17 @@ bool CreateLogicalDevice(VkPhysicalDevice physicalDevice,
         1u,
         &queuePriority};
     std::vector<const char*> extensions{VK_KHR_SWAPCHAIN_EXTENSION_NAME};
-    const bool enableRayTracing = capabilities.rtMode == horde::vulkan::RtMode::RayTracingPipeline;
+    const auto rtPlan = horde::vulkan::raytracing::MakeRtDeviceEnablePlan(executionBackend);
+    const bool enableRayTracing = rtPlan.has_value();
+    const horde::vulkan::FeatureSupport requestedFeatures = rtPlan ? rtPlan->features : horde::vulkan::FeatureSupport{};
     if (enableRayTracing)
     {
-        const char* rtExtensions[] = {
-            VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME,
-            VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME,
-            VK_KHR_RAY_QUERY_EXTENSION_NAME,
-            VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME,
-            VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME,
-            VK_KHR_SPIRV_1_4_EXTENSION_NAME,
-            VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME};
-        for (const char* extension : rtExtensions)
+        for (std::uint32_t index = 0u; index < rtPlan->extensionCount; ++index)
         {
+            const char* extension = rtPlan->extensions[index];
             if (!HasDeviceExtension(physicalDevice, extension))
             {
-                std::cerr << "Selected RayTracingPipeline device is missing required extension: " << extension << ".\n";
+                std::cerr << "Selected hardware RT backend is missing required extension: " << extension << ".\n";
                 return false;
             }
             extensions.push_back(extension);
@@ -2978,22 +2983,24 @@ bool CreateLogicalDevice(VkPhysicalDevice physicalDevice,
 
     VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures{
         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR};
-    accelerationStructureFeatures.accelerationStructure = enableRayTracing ? VK_TRUE : VK_FALSE;
+    accelerationStructureFeatures.accelerationStructure = requestedFeatures.accelerationStructure ? VK_TRUE : VK_FALSE;
     VkPhysicalDeviceRayTracingPipelineFeaturesKHR rayTracingPipelineFeatures{
         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR};
-    rayTracingPipelineFeatures.rayTracingPipeline = enableRayTracing ? VK_TRUE : VK_FALSE;
+    rayTracingPipelineFeatures.rayTracingPipeline = requestedFeatures.rayTracingPipeline ? VK_TRUE : VK_FALSE;
     VkPhysicalDeviceRayQueryFeaturesKHR rayQueryFeatures{
         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR};
-    rayQueryFeatures.rayQuery = enableRayTracing ? VK_TRUE : VK_FALSE;
+    rayQueryFeatures.rayQuery = requestedFeatures.rayQuery ? VK_TRUE : VK_FALSE;
     VkPhysicalDeviceBufferDeviceAddressFeaturesKHR bufferDeviceAddressFeatures{
         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES_KHR};
-    bufferDeviceAddressFeatures.bufferDeviceAddress = enableRayTracing ? VK_TRUE : VK_FALSE;
+    bufferDeviceAddressFeatures.bufferDeviceAddress = requestedFeatures.bufferDeviceAddress ? VK_TRUE : VK_FALSE;
     VkPhysicalDeviceFeatures2 features2{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2};
     VkPhysicalDeviceFeatures supportedCoreFeatures{};
     vkGetPhysicalDeviceFeatures(physicalDevice, &supportedCoreFeatures);
     features2.features.textureCompressionASTC_LDR = supportedCoreFeatures.textureCompressionASTC_LDR;
     features2.pNext = &accelerationStructureFeatures;
-    accelerationStructureFeatures.pNext = &rayTracingPipelineFeatures;
+    accelerationStructureFeatures.pNext = &rayQueryFeatures;
+    if (requestedFeatures.rayTracingPipeline)
+        accelerationStructureFeatures.pNext = &rayTracingPipelineFeatures;
     rayTracingPipelineFeatures.pNext = &rayQueryFeatures;
     rayQueryFeatures.pNext = &bufferDeviceAddressFeatures;
 
@@ -3495,7 +3502,8 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx)
                                 (assetRoot / "textures/meshy/lich_placeholder_v01").string(),
                                 diagnostic,
                                 developmentStaticAssetDirectory,
-                                assetRoot.string()))
+                                assetRoot.string(),
+                                ctx.executionBackend))
     {
         std::cerr << "Failed to initialise presentable RT scene: " << diagnostic << '\n';
         MessageBoxA(ctx.windowHandle,
@@ -4098,6 +4106,8 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
              << "  \"settlingFrames\": " << kCaptureSettlingFrames << ",\n"
              << "  \"fixedAnimationTimeSeconds\": 0.000000,\n"
              << "  \"buildId\": \"" << JsonEscape(HORDE_RT_BUILD_ID) << "\",\n"
+             << "  \"executionBackend\": \""
+             << JsonEscape(horde::vulkan::ToString(context.rtScene.ExecutionBackend())) << "\",\n"
              << "  \"selectedRtPipelineBundle\": {\"opaqueFast\": {\"key\": \""
              << JsonEscape(std::string(context.rtScene.SelectedOpaqueFastKey()))
              << "\", \"sha256\": \""
@@ -4415,6 +4425,7 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             frameTimesMs.push_back(std::chrono::duration<double, std::milli>(frameEnd - frameStart).count());
             capabilities.performance.gpuRt = context.gpuRtTiming;
             capabilities.rtScene.presented = true;
+            capabilities.rtScene.executionBackend = context.rtScene.ExecutionBackend();
         }
 
         horde::vulkan::raytracing::PresentableTinyRtScene::StorageImageCapture image;
@@ -4571,7 +4582,8 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                                  const std::filesystem::path& textReportPath,
                                  const std::filesystem::path& jsonReportPath,
                                  const std::filesystem::path* captureDirectory,
-                                 const std::string* developmentCheckpoint)
+                                 const std::string* developmentCheckpoint,
+                                 const bool requireRayQueryCompute)
 {
     VulkanSurfaceContext context;
     context.windowHandle = hWnd;
@@ -4607,10 +4619,6 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         return 1;
     }
 
-    const uint32_t desiredVendorId = capabilities.identity.vendorId;
-    const uint32_t desiredDeviceId = capabilities.identity.deviceId;
-    const std::string& desiredDeviceName = capabilities.identity.gpuName;
-
     uint32_t physicalDeviceCount = 0u;
     if (vkEnumeratePhysicalDevices(context.instance, &physicalDeviceCount, nullptr) != VK_SUCCESS || physicalDeviceCount == 0u)
     {
@@ -4626,9 +4634,10 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     {
         VkPhysicalDeviceProperties properties{};
         vkGetPhysicalDeviceProperties(candidate, &properties);
-        if (properties.vendorID == desiredVendorId &&
-            properties.deviceID == desiredDeviceId &&
-            desiredDeviceName == properties.deviceName)
+        const horde::vulkan::DeviceIdentity candidateIdentity{
+            properties.deviceName, properties.vendorID, properties.deviceID,
+            properties.driverVersion, properties.apiVersion};
+        if (horde::vulkan::raytracing::SameRtDeviceIdentity(capabilities.identity, candidateIdentity))
         {
             context.physicalDevice = candidate;
             break;
@@ -4637,19 +4646,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
 
     if (context.physicalDevice == VK_NULL_HANDLE)
     {
-        for (const VkPhysicalDevice candidate : physicalDevices)
-        {
-            uint32_t queueFamilyIndex = 0u;
-            if (FindGraphicsAndPresentQueueFamily(candidate, context.surface, queueFamilyIndex))
-            {
-                context.physicalDevice = candidate;
-                break;
-            }
-        }
-    }
-
-    if (context.physicalDevice == VK_NULL_HANDLE)
-    {
+        std::cerr << "No physical device matches the probed GPU, driver and API identity.\n";
         DestroyRenderContext(context);
         return 1;
     }
@@ -4660,8 +4657,25 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         return 1;
     }
 
-    context.useRtPath = capabilities.rtMode == horde::vulkan::RtMode::RayTracingPipeline;
-    if (!CreateLogicalDevice(context.physicalDevice, context.graphicsQueueFamilyIndex, capabilities, context.device, context.graphicsQueue))
+    context.executionBackend = horde::vulkan::raytracing::SelectRtExecutionBackend(
+        capabilities, true, requireRayQueryCompute);
+    horde::vulkan::BeginRtBackendSelection(capabilities.rtScene, context.executionBackend);
+    const bool selectedTextWritten = WriteReportFile(
+        textReportPath, horde::vulkan::BuildCapabilityTextReport(capabilities));
+    const bool selectedJsonWritten = WriteReportFile(
+        jsonReportPath, horde::vulkan::BuildCapabilityJsonReport(capabilities));
+    if (!selectedTextWritten || !selectedJsonWritten)
+    {
+        std::cerr << "Failed to persist selected RT backend diagnostics.\n";
+    }
+    if (requireRayQueryCompute && context.executionBackend != horde::vulkan::RtExecutionBackend::RayQueryCompute)
+    {
+        std::cerr << "The required hardware RayQuery compute backend is unavailable; no other backend will be selected.\n";
+        DestroyRenderContext(context);
+        return 2;
+    }
+    context.useRtPath = context.executionBackend != horde::vulkan::RtExecutionBackend::Unsupported;
+    if (!CreateLogicalDevice(context.physicalDevice, context.graphicsQueueFamilyIndex, context.executionBackend, context.device, context.graphicsQueue))
     {
         DestroyRenderContext(context);
         return 1;
@@ -4698,7 +4712,32 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
 #if defined(_DEBUG)
     if (captureDirectory != nullptr)
     {
-        const int captureResult = RunShowcaseCapture(context, capabilities, *captureDirectory);
+        int captureResult = RunShowcaseCapture(context, capabilities, *captureDirectory);
+        if (captureResult == 0 && capabilities.rtScene.presented)
+        {
+            capabilities.rtScene.executionBackend = context.rtScene.ExecutionBackend();
+            capabilities.rtScene.status = "Presented via swapchain";
+            capabilities.rtScene.geometry =
+                "Complete Horde showcase route with sequential animated skeleton and staff-lit lich";
+            capabilities.rtScene.dispatchWidth = context.rtScene.DispatchExtent().width;
+            capabilities.rtScene.dispatchHeight = context.rtScene.DispatchExtent().height;
+            capabilities.performance.internalRenderWidth = capabilities.rtScene.dispatchWidth;
+            capabilities.performance.internalRenderHeight = capabilities.rtScene.dispatchHeight;
+            auto& presentationDiagnostics = capabilities.diagnostics;
+            presentationDiagnostics.erase(
+                std::remove(presentationDiagnostics.begin(), presentationDiagnostics.end(),
+                            "Internal render resolution: not measured yet."),
+                presentationDiagnostics.end());
+            const bool textReportWritten = WriteReportFile(
+                textReportPath, horde::vulkan::BuildCapabilityTextReport(capabilities));
+            const bool jsonReportWritten = WriteReportFile(
+                jsonReportPath, horde::vulkan::BuildCapabilityJsonReport(capabilities));
+            if (!textReportWritten || !jsonReportWritten)
+            {
+                std::cerr << "Failed to refresh capability reports after successful showcase capture.\n";
+                captureResult = 1;
+            }
+        }
         if (IsWindow(hWnd))
         {
             SetWindowLongPtrA(hWnd, GWLP_USERDATA, 0);
@@ -4857,6 +4896,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         if (rtFramePresented && !capabilities.rtScene.presented)
         {
             capabilities.rtScene.presented = true;
+            capabilities.rtScene.executionBackend = context.rtScene.ExecutionBackend();
             capabilities.rtScene.status = "Presented via swapchain";
             capabilities.rtScene.geometry = "Complete Horde showcase route with sequential animated skeleton and staff-lit lich";
             capabilities.rtScene.dispatchWidth = context.rtScene.DispatchExtent().width;
@@ -6180,7 +6220,8 @@ int CreateAndShowWindow(const std::string& diagnosticText,
                         const std::filesystem::path& textReportPath,
                         const std::filesystem::path& jsonReportPath,
                         const std::filesystem::path* captureDirectory,
-                        const std::string* developmentCheckpoint)
+                        const std::string* developmentCheckpoint,
+                        const bool requireRayQueryCompute)
 {
     const HINSTANCE instance = GetModuleHandleA(nullptr);
     INITCOMMONCONTROLSEX commonControls{sizeof(INITCOMMONCONTROLSEX), ICC_BAR_CLASSES};
@@ -6397,7 +6438,8 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     ApplyDpiScaledFonts(hWnd);
 
     const std::string windowText = WindowSafeText(diagnosticText);
-    const bool sceneMode = capabilities.rtMode == horde::vulkan::RtMode::RayTracingPipeline;
+    const bool sceneMode = horde::vulkan::raytracing::SelectRtExecutionBackend(capabilities, true) !=
+        horde::vulkan::RtExecutionBackend::Unsupported;
     const std::string windowTitle = sceneMode
         ? kWindowTitle
         : MakeWindowTitle(diagnosticText);
@@ -6440,7 +6482,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
 
     const int result = RunDiagnosticSwapchainWindow(
         hWnd, capabilities, textReportPath, jsonReportPath, captureDirectory,
-        developmentCheckpoint);
+        developmentCheckpoint, requireRayQueryCompute);
     if (captureDirectory != nullptr && IsWindow(hWnd))
     {
         DestroyWindow(hWnd);
@@ -6518,7 +6560,7 @@ int RunDiagnosticWindow(const int showCommand)
         ? nullptr
         : &launchOptions.developmentCheckpoint;
     return CreateAndShowWindow(diagnosticText, capabilities, textReportPath, jsonReportPath,
-                               captureDirectory, developmentCheckpoint);
+                               captureDirectory, developmentCheckpoint, launchOptions.requireRayQueryCompute);
 }
 
 } // namespace horde::platform::windows

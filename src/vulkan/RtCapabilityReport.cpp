@@ -71,6 +71,7 @@ std::string BuildCapabilityTextReport(const DeviceCapabilities& capabilities)
     std::ostringstream out;
     out << "Backend: " << capabilities.backend << '\n';
     out << "RT mode: " << ToString(capabilities.rtMode) << '\n';
+    out << "Execution backend: " << ToString(capabilities.rtScene.executionBackend) << '\n';
     out << "GPU name: " << capabilities.identity.gpuName << '\n';
     out << "Vendor ID: " << capabilities.identity.vendorId << '\n';
     out << "Device ID: " << capabilities.identity.deviceId << '\n';
@@ -144,6 +145,7 @@ std::string BuildCapabilityJsonReport(const DeviceCapabilities& capabilities)
     out << "{\n";
     out << "  \"backend\": \"" << JsonEscape(capabilities.backend) << "\",\n";
     out << "  \"rtMode\": \"" << ToString(capabilities.rtMode) << "\",\n";
+    out << "  \"executionBackend\": \"" << ToString(capabilities.rtScene.executionBackend) << "\",\n";
     out << "  \"gpuName\": \"" << JsonEscape(capabilities.identity.gpuName) << "\",\n";
     out << "  \"vendorId\": " << capabilities.identity.vendorId << ",\n";
     out << "  \"deviceId\": " << capabilities.identity.deviceId << ",\n";

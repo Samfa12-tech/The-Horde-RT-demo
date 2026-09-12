@@ -443,6 +443,23 @@ RtPerformanceEvidenceSnapshot MakeSnapshot(TestContext& context,
     return snapshot;
 }
 
+void TestExecutionModeEvidence(TestContext& context)
+{
+    auto compute = MakeSnapshot(context, RtInstrumentationMode::Shipping);
+    compute.scene.pipeline.executionMode = RtExecutionMode::RayQueryCompute;
+    std::string json;
+    std::string text;
+    RtEvidenceValidationError error{};
+    context.Check(SerializeRtPerformanceEvidenceJson(compute, json, error) &&
+                      json.find("\"executionBackend\":\"RayQueryCompute\"") != std::string::npos &&
+                      SerializeRtPerformanceEvidenceText(compute, text, error) &&
+                      text.find("RayQueryCompute") != std::string::npos,
+                  "compute frame evidence must explicitly identify its real execution backend");
+    compute.scene.pipeline.executionMode = static_cast<RtExecutionMode>(99);
+    context.Check(!ValidateRtPerformanceEvidence(compute, error),
+                  "unknown execution backend must not become plausible frame evidence");
+}
+
 bool SameBytes(const RtEvidenceLifecycle& left, const RtEvidenceLifecycle& right)
 {
     return std::memcmp(&left, &right, sizeof(left)) == 0;
@@ -1700,7 +1717,7 @@ void TestValidatorAndSerializers(TestContext& context)
         "{\"schema\":1,\"identity\":{\"sceneEpoch\":11,\"measurementGeneration\":20,"
         "\"recordAttemptSerial\":1,\"recordSerial\":1,\"submissionSerial\":1,"
         "\"completionSerial\":1,\"simulationTick\":101,\"frameSlot\":0},"
-        "\"pipeline\":{\"instrumentation\":\"shipping\",\"dielectricQuality\":\"high\","
+        "\"pipeline\":{\"executionBackend\":\"RayTracingPipeline\",\"instrumentation\":\"shipping\",\"dielectricQuality\":\"high\","
         "\"bundleKey\":\"shipping_high_pair\",\"opaqueFast\":{\"key\":\"opaque_fast\","
         "\"sha256\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"},"
         "\"genericDielectric\":{\"key\":\"generic_dielectric\","
@@ -1750,7 +1767,7 @@ void TestValidatorAndSerializers(TestContext& context)
     const std::string expectedShippingText =
         "RT PERFORMANCE EVIDENCE schema=1\n"
         "Frame: epoch=11 generation=20 attempt=1 record=1 submission=1 completion=1 tick=101 slot=0\n"
-        "Pipeline: shipping/high pair=shipping_high_pair active=opaque-fast opaque_fast@aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n"
+        "Pipeline: RayTracingPipeline/shipping/high pair=shipping_high_pair active=opaque-fast opaque_fast@aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n"
         "Player: skin-cadence-hz=60 skin-updates=0 max-socket-error-um=10 primary-pixels=N/A primary-visible=no\n"
         "Presentation: presented last-successful-submission=1 final-idle=no benchmark-eligible=yes\n"
         "Dielectric diagnostics: compiled-out counters=N/A reads=0 resets=0\n"
@@ -2181,6 +2198,7 @@ void TestNoAllocationAndOneWayIsolation(TestContext& context)
 int main()
 {
     TestContext context;
+    TestExecutionModeEvidence(context);
     TestFixedTextAndEnums(context);
     TestStageAccumulatorAndConversion(context);
     TestBoundedCollector(context);

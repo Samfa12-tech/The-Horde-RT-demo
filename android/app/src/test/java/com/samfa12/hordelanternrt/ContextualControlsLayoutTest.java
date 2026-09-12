@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -44,6 +45,25 @@ public final class ContextualControlsLayoutTest {
         }
         assertTrue("button must produce rendered background/text pixels; colours=" +
                            colours.size(), colours.size() >= 4);
+    }
+
+    @Test
+    public void rayQueryComputeLaunchRequirementIsExplicitAndDebugOnly() {
+        final Intent required = new Intent()
+                .putExtra("horde_require_rayquery_compute", true);
+        final Intent explicitlyDisabled = new Intent()
+                .putExtra("horde_require_rayquery_compute", false);
+
+        assertTrue("an explicit Debug launch may require the compute backend",
+                   MainActivity.shouldRequireRayQueryCompute(true, required));
+        assertFalse("a Release launch must reject the same private validation flag",
+                    MainActivity.shouldRequireRayQueryCompute(false, required));
+        assertFalse("an explicitly disabled flag must preserve normal backend selection",
+                    MainActivity.shouldRequireRayQueryCompute(true, explicitlyDisabled));
+        assertFalse("an absent flag must preserve normal backend selection",
+                    MainActivity.shouldRequireRayQueryCompute(true, new Intent()));
+        assertFalse("a null launch intent must preserve normal backend selection",
+                    MainActivity.shouldRequireRayQueryCompute(true, null));
     }
 
     @Test

@@ -32,11 +32,21 @@ struct Ledger {
     std::uintptr_t nextHandle = 0x100u;
     std::vector<std::string> created;
     std::vector<std::string> destroyed;
+    horde::vulkan::RtExecutionBackend expectedBackend =
+        horde::vulkan::RtExecutionBackend::RayTracingPipeline;
+    std::size_t sbtDestroyCalls = 0u;
+    std::size_t liveTemporaryModules = 0u;
+    bool pipelineModuleContractHonored = true;
+    bool injectedFailureReached = false;
 
     bool Begin(RtPipelineBundleBuildStep step, std::string_view name)
     {
         created.emplace_back(name);
-        return failure != step;
+        if (failure == step) {
+            injectedFailureReached = true;
+            return false;
+        }
+        return true;
     }
 };
 
@@ -52,6 +62,10 @@ RtPipelineBundleDestroyApi MakeDestroyApi(Ledger& ledger)
     api.destroyBuffer = [](void* user, RtGpuResources*, RtGpuBuffer& buffer,
                            RtPipelineOwnedBuffer kind) noexcept {
         auto& state = *static_cast<Ledger*>(user);
+        if (kind == RtPipelineOwnedBuffer::OpaqueFastSbt ||
+            kind == RtPipelineOwnedBuffer::GenericDielectricSbt) {
+            ++state.sbtDestroyCalls;
+        }
         if (buffer.buffer == VK_NULL_HANDLE && buffer.memory == VK_NULL_HANDLE) { return; }
         switch (kind) {
         case RtPipelineOwnedBuffer::OpaqueFastSbt: state.destroyed.emplace_back("opaque-sbt"); break;
@@ -134,17 +148,20 @@ RtPipelineBundleBuildApi MakeBuildApi(Ledger& ledger)
         out = FakeHandle<VkPipelineLayout>(state.nextHandle++);
         return succeeds;
     };
-    api.createSharedShaderModules = [](void* user, VkShaderModule& miss,
-                                       VkShaderModule& hit, std::string&) {
-        auto& state = *static_cast<Ledger*>(user);
-        const bool succeeds = state.Begin(
-            RtPipelineBundleBuildStep::SharedShaderModules, "shared-modules");
-        miss = FakeHandle<VkShaderModule>(state.nextHandle++);
-        hit = FakeHandle<VkShaderModule>(state.nextHandle++);
-        return succeeds;
-    };
-    api.createRaygenShaderModule = [](void* user, const RtPipelineVariantArtifact& artifact,
-                                      VkShaderModule& out, std::string&) {
+    if (ledger.expectedBackend == horde::vulkan::RtExecutionBackend::RayTracingPipeline) {
+        api.createSharedShaderModules = [](void* user, VkShaderModule& miss,
+                                           VkShaderModule& hit, std::string&) {
+            auto& state = *static_cast<Ledger*>(user);
+            const bool succeeds = state.Begin(
+                RtPipelineBundleBuildStep::SharedShaderModules, "shared-modules");
+            miss = FakeHandle<VkShaderModule>(state.nextHandle++);
+            hit = FakeHandle<VkShaderModule>(state.nextHandle++);
+            state.liveTemporaryModules += 2u;
+            return succeeds;
+        };
+    }
+    api.createEntryShaderModule = [](void* user, const RtPipelineVariantArtifact& artifact,
+                                     VkShaderModule& out, std::string&) {
         auto& state = *static_cast<Ledger*>(user);
         const auto step = artifact.key.material == RtMaterialStrategy::OpaqueFast
             ? RtPipelineBundleBuildStep::OpaqueFastShaderModule
@@ -152,12 +169,21 @@ RtPipelineBundleBuildApi MakeBuildApi(Ledger& ledger)
         const bool succeeds = state.Begin(
             step, std::string(StrategyName(artifact.key.material)) + "-module");
         out = FakeHandle<VkShaderModule>(state.nextHandle++);
+        ++state.liveTemporaryModules;
         return succeeds;
     };
     api.createStrategyPipeline = [](void* user, RtMaterialStrategy strategy,
-                                    VkShaderModule, VkShaderModule, VkShaderModule,
+                                    VkShaderModule entry, VkShaderModule miss,
+                                    VkShaderModule hit,
                                     VkPipelineLayout, VkPipeline& out, std::string&) {
         auto& state = *static_cast<Ledger*>(user);
+        const bool compute = state.expectedBackend ==
+            horde::vulkan::RtExecutionBackend::RayQueryCompute;
+        state.pipelineModuleContractHonored =
+            state.pipelineModuleContractHonored && entry != VK_NULL_HANDLE &&
+            (compute
+                 ? miss == VK_NULL_HANDLE && hit == VK_NULL_HANDLE
+                 : miss != VK_NULL_HANDLE && hit != VK_NULL_HANDLE);
         const auto step = strategy == RtMaterialStrategy::OpaqueFast
             ? RtPipelineBundleBuildStep::OpaqueFastPipeline
             : RtPipelineBundleBuildStep::GenericDielectricPipeline;
@@ -168,38 +194,47 @@ RtPipelineBundleBuildApi MakeBuildApi(Ledger& ledger)
     };
     api.destroyShaderModule = [](void* user, VkShaderModule& module) noexcept {
         if (module == VK_NULL_HANDLE) { return; }
-        static_cast<Ledger*>(user)->destroyed.emplace_back("temporary-module");
+        auto& state = *static_cast<Ledger*>(user);
+        state.destroyed.emplace_back("temporary-module");
+        if (state.liveTemporaryModules != 0u) {
+            --state.liveTemporaryModules;
+        }
         module = VK_NULL_HANDLE;
     };
-    api.createStrategySbt = [](void* user, RtMaterialStrategy strategy, VkPipeline,
-                               RtGpuBuffer& out,
-                               std::array<VkStridedDeviceAddressRegionKHR, 4u>& regions,
-                               std::string&) {
-        auto& state = *static_cast<Ledger*>(user);
-        const auto step = strategy == RtMaterialStrategy::OpaqueFast
-            ? RtPipelineBundleBuildStep::OpaqueFastSbt
-            : RtPipelineBundleBuildStep::GenericDielectricSbt;
-        const bool succeeds = state.Begin(
-            step, std::string(StrategyName(strategy)) + "-sbt");
-        out.buffer = FakeHandle<VkBuffer>(state.nextHandle++);
-        out.memory = FakeHandle<VkDeviceMemory>(state.nextHandle++);
-        out.address = state.nextHandle++;
-        out.size = 192u;
-        for (std::size_t index = 0u; index < 3u; ++index) {
-            regions[index].deviceAddress = out.address + index * 64u;
-            regions[index].stride = 32u;
-            regions[index].size = 32u;
-        }
-        return succeeds;
-    };
+    if (ledger.expectedBackend == horde::vulkan::RtExecutionBackend::RayTracingPipeline) {
+        api.createStrategySbt = [](void* user, RtMaterialStrategy strategy, VkPipeline,
+                                   RtGpuBuffer& out,
+                                   std::array<VkStridedDeviceAddressRegionKHR, 4u>& regions,
+                                   std::string&) {
+            auto& state = *static_cast<Ledger*>(user);
+            const auto step = strategy == RtMaterialStrategy::OpaqueFast
+                ? RtPipelineBundleBuildStep::OpaqueFastSbt
+                : RtPipelineBundleBuildStep::GenericDielectricSbt;
+            const bool succeeds = state.Begin(
+                step, std::string(StrategyName(strategy)) + "-sbt");
+            out.buffer = FakeHandle<VkBuffer>(state.nextHandle++);
+            out.memory = FakeHandle<VkDeviceMemory>(state.nextHandle++);
+            out.address = state.nextHandle++;
+            out.size = 192u;
+            for (std::size_t index = 0u; index < 3u; ++index) {
+                regions[index].deviceAddress = out.address + index * 64u;
+                regions[index].stride = 32u;
+                regions[index].size = 32u;
+            }
+            return succeeds;
+        };
+    }
     return api;
 }
 
-RtPipelineBundlePreflight MakePreflight()
+RtPipelineBundlePreflight MakePreflight(
+    const horde::vulkan::RtExecutionBackend executionBackend =
+        horde::vulkan::RtExecutionBackend::RayTracingPipeline)
 {
     RtPipelineBundlePreflight preflight{};
     std::string error;
-    if (!ResolveCompiledRtPipelineBundlePreflight(preflight, error)) {
+    if (!ResolveCompiledRtPipelineBundlePreflight(
+            preflight, error, executionBackend)) {
         throw std::runtime_error(error);
     }
     return preflight;
@@ -340,8 +375,11 @@ int main()
         ok &= Require(!BuildRtPipelineBundleResources(bundle, MakeBuildApi(ledger), error),
                       "every injected compiled-policy construction fault must fail");
         ok &= Require(!bundle.HasSelection() && bundle.DiagnosticAvailability() ==
-                          RtDiagnosticAvailability::Unavailable,
+                          RtDiagnosticAvailability::Unavailable &&
+                          ledger.liveTemporaryModules == 0u,
                       "partial construction failure must leave no selected/live bundle");
+        ok &= Require(ledger.injectedFailureReached,
+                      "compiled-policy failure injection must reach its requested build step");
         ok &= Require(UsesContractTeardownOrder(ledger.destroyed),
                       "every partial Shipping failure must use contract teardown order");
         if (!diagnosticPolicy) {
@@ -368,7 +406,8 @@ int main()
                           (diagnosticPolicy ? RtDiagnosticAvailability::Available
                                             : RtDiagnosticAvailability::CompiledOut) &&
                       bundle.Strategy(RtMaterialStrategy::OpaqueFast).pipeline != VK_NULL_HANDLE &&
-                      bundle.Strategy(RtMaterialStrategy::GenericDielectric).pipeline != VK_NULL_HANDLE,
+                      bundle.Strategy(RtMaterialStrategy::GenericDielectric).pipeline != VK_NULL_HANDLE &&
+                      ledger.liveTemporaryModules == 0u,
                   "the complete bundle must own both material strategy records");
     ok &= Require(MatchesFullPairIdentity(bundle.FullPairIdentity(), selectedPreflight),
                   "the full selected-pair identity must preserve exact labels, order, keys, and hashes");
@@ -430,6 +469,131 @@ int main()
     ok &= Require(movedFromOwner.destroyed.size() == 4u &&
                       !movedToOwner.destroyed.empty(),
                   "scene-style move must rebind the enclosing owner before later Reset");
+
+    constexpr auto computeBackend = horde::vulkan::RtExecutionBackend::RayQueryCompute;
+    auto computePreflight = MakePreflight(computeBackend);
+    auto forgedComputeRequest = computePreflight;
+    forgedComputeRequest.request.executionBackend =
+        horde::vulkan::RtExecutionBackend::RayTracingPipeline;
+    ok &= Require(RejectsForgedAdoption(std::move(forgedComputeRequest)),
+                  "adoption must reject a compute artifact pair relabelled as RTP");
+
+    std::vector<RtPipelineBundleBuildStep> computeConstructionFaults{
+        RtPipelineBundleBuildStep::DescriptorSetLayout,
+        RtPipelineBundleBuildStep::DescriptorPool,
+        RtPipelineBundleBuildStep::DescriptorSet,
+        RtPipelineBundleBuildStep::DescriptorWrites,
+        RtPipelineBundleBuildStep::PipelineLayout,
+        RtPipelineBundleBuildStep::OpaqueFastShaderModule,
+        RtPipelineBundleBuildStep::OpaqueFastPipeline,
+        RtPipelineBundleBuildStep::GenericDielectricShaderModule,
+        RtPipelineBundleBuildStep::GenericDielectricPipeline,
+    };
+    if (diagnosticPolicy) {
+        computeConstructionFaults.insert(computeConstructionFaults.begin() + 3,
+                                         RtPipelineBundleBuildStep::DiagnosticBuffer);
+    }
+    for (const auto failure : computeConstructionFaults) {
+        Ledger computeFailureLedger{failure};
+        computeFailureLedger.expectedBackend = computeBackend;
+        RtPipelineBundle computeFailureBundle;
+        ok &= Require(computeFailureBundle.AdoptPreflight(
+                          MakePreflight(computeBackend),
+                          MakeDestroyApi(computeFailureLedger), error),
+                      "compute preflight adoption must use compute authority");
+        const auto computeFailureApi = MakeBuildApi(computeFailureLedger);
+        ok &= Require(computeFailureApi.Complete(computeBackend) &&
+                          !computeFailureApi.Complete(
+                              horde::vulkan::RtExecutionBackend::RayTracingPipeline),
+                      "compute build API must not require shared-module or SBT callbacks");
+        ok &= Require(!BuildRtPipelineBundleResources(
+                          computeFailureBundle, computeFailureApi, error),
+                      "every injected compute construction fault must fail");
+        ok &= Require(computeFailureLedger.injectedFailureReached &&
+                          !computeFailureBundle.HasSelection() &&
+                          !computeFailureBundle.HasLiveResources() &&
+                          computeFailureLedger.liveTemporaryModules == 0u,
+                      "compute partial failure must reach its fault and release every live handle");
+        ok &= Require(computeFailureLedger.pipelineModuleContractHonored,
+                      "compute pipeline creation must receive one entry module and null miss/hit modules");
+        ok &= Require(std::find(computeFailureLedger.created.begin(),
+                                computeFailureLedger.created.end(),
+                                "shared-modules") == computeFailureLedger.created.end() &&
+                          std::none_of(computeFailureLedger.created.begin(),
+                                       computeFailureLedger.created.end(),
+                                       [](const std::string& name) {
+                                           return name.ends_with("-sbt");
+                                       }) &&
+                          computeFailureLedger.sbtDestroyCalls == 0u,
+                      "compute partial failure must perform zero shared-module or SBT operations");
+        const std::size_t destroyed = computeFailureLedger.destroyed.size();
+        computeFailureBundle.Reset();
+        ok &= Require(computeFailureLedger.destroyed.size() == destroyed,
+                      "compute partial-failure cleanup must be idempotent");
+    }
+
+    Ledger computeLedger{};
+    computeLedger.expectedBackend = computeBackend;
+    RtPipelineBundle computeBundle;
+    const auto computeApi = MakeBuildApi(computeLedger);
+    ok &= Require(computeBundle.AdoptPreflight(
+                      computePreflight, MakeDestroyApi(computeLedger), error) &&
+                      BuildRtPipelineBundleResources(computeBundle, computeApi, error),
+                  "complete compute bundle construction must succeed without shared modules or SBTs");
+    ok &= Require(computeBundle.Request().executionBackend == computeBackend &&
+                      computeBundle.DiagnosticAvailability() ==
+                          (diagnosticPolicy ? RtDiagnosticAvailability::Available
+                                            : RtDiagnosticAvailability::CompiledOut) &&
+                      computeBundle.pipelineLayout != VK_NULL_HANDLE &&
+                      computeBundle.descriptorSet != VK_NULL_HANDLE &&
+                      computeBundle.Strategy(RtMaterialStrategy::OpaqueFast).pipeline !=
+                          VK_NULL_HANDLE &&
+                      computeBundle.Strategy(RtMaterialStrategy::GenericDielectric).pipeline !=
+                          VK_NULL_HANDLE &&
+                      computeLedger.liveTemporaryModules == 0u &&
+                      computeLedger.pipelineModuleContractHonored &&
+                      std::find(computeLedger.created.begin(), computeLedger.created.end(),
+                                "shared-modules") == computeLedger.created.end() &&
+                      std::none_of(computeLedger.created.begin(), computeLedger.created.end(),
+                                   [](const std::string& name) {
+                                       return name.ends_with("-sbt");
+                                   }),
+                  "compute bundle must own two strategy pipelines and no shared-module/SBT work");
+    horde::telemetry::RtResourceInventory computeInventory{};
+    computeBundle.AccumulateResourceInventory(computeInventory);
+    ok &= Require(computeInventory.pipelineCount == 2u &&
+                      computeInventory.shaderBindingTableCount == 0u &&
+                      computeInventory.descriptorSetCount == 1u,
+                  "compute inventory must count two pipelines, one descriptor set, and zero SBTs");
+    for (const auto strategy : {RtMaterialStrategy::OpaqueFast,
+                                RtMaterialStrategy::GenericDielectric}) {
+        const auto& resources = computeBundle.Strategy(strategy);
+        ok &= Require(resources.shaderBindingTable.buffer == VK_NULL_HANDLE &&
+                          resources.shaderBindingTable.memory == VK_NULL_HANDLE &&
+                          std::all_of(resources.sbtRegions.begin(), resources.sbtRegions.end(),
+                                      IsZero),
+                      "compute strategy resources must contain no SBT handles or regions");
+    }
+
+    RtPipelineBundle movedCompute(std::move(computeBundle));
+    ok &= Require(!computeBundle.HasSelection() && !computeBundle.HasLiveResources() &&
+                      movedCompute.HasSelection() &&
+                      movedCompute.Request().executionBackend == computeBackend,
+                  "compute move construction must transfer its exact backend ownership");
+    movedCompute.Reset();
+    std::vector<std::string> expectedComputeTail{
+        "generic-pipeline", "opaque-pipeline", "pipeline-layout",
+        "descriptor-pool", "descriptor-layout"};
+    if (diagnosticPolicy) expectedComputeTail.emplace_back("diagnostics-buffer");
+    ok &= Require(computeLedger.destroyed.size() >= expectedComputeTail.size() &&
+                      std::equal(expectedComputeTail.begin(), expectedComputeTail.end(),
+                                 computeLedger.destroyed.end() - expectedComputeTail.size()) &&
+                      computeLedger.sbtDestroyCalls == 0u,
+                  "compute reset must destroy its graph in reverse order without SBT operations");
+    const std::size_t computeDestroyed = computeLedger.destroyed.size();
+    movedCompute.Reset();
+    ok &= Require(computeLedger.destroyed.size() == computeDestroyed,
+                  "compute move/reset cleanup must remain idempotent");
 
     return ok ? 0 : 1;
 }

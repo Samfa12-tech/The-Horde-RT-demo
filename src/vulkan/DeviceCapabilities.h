@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include "vulkan/RtExecutionBackend.h"
+
 namespace horde::vulkan
 {
 
@@ -69,6 +71,7 @@ struct RtSceneSnapshot
     std::string geometry = "Complete Horde showcase route with sequential animated skeleton and staff-lit lich";
     std::uint32_t dispatchWidth = 0;
     std::uint32_t dispatchHeight = 0;
+    RtExecutionBackend executionBackend = RtExecutionBackend::Unsupported;
     bool presented = false;
 };
 
@@ -85,5 +88,8 @@ struct DeviceCapabilities
 };
 
 std::string ToString(RtMode mode);
+std::string ToString(RtExecutionBackend backend);
+// Selection is useful failure evidence, never proof of successful presentation.
+void BeginRtBackendSelection(RtSceneSnapshot& scene, RtExecutionBackend backend);
 
 } // namespace horde::vulkan

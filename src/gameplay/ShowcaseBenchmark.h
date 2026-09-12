@@ -51,6 +51,7 @@ struct ShowcaseBenchmarkMetadata
     std::string gpuName;
     std::string vulkanApi;
     std::string rtMode;
+    std::string executionBackend;
     std::string presentMode;
     std::string materialEncoding;
     std::uint32_t renderScalePercent = 100u;

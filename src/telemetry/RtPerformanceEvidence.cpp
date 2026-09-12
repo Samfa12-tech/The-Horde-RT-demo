@@ -72,6 +72,7 @@ bool ValidPipelineIdentity(const RtPipelineEvidenceIdentity& pipeline,
                            RtEvidenceValidationError& error) noexcept
 {
     if (!KnownEnumName(RtInstrumentationModeName, pipeline.instrumentation) ||
+        !KnownEnumName(RtExecutionModeName, pipeline.executionMode) ||
         !KnownEnumName(RtDielectricQualityName, pipeline.dielectricQuality) ||
         !KnownEnumName(RtMaterialStrategyName, pipeline.activeStrategy) ||
         !KnownEnumName(RtWaterQualityName, pipeline.waterQuality))
@@ -452,6 +453,16 @@ const char* RtSampleStatusName(const RtSampleStatus status) noexcept
     case RtSampleStatus::Error: return "error";
     default: return nullptr;
     }
+}
+
+const char* RtExecutionModeName(const RtExecutionMode mode) noexcept
+{
+    switch (mode)
+    {
+    case RtExecutionMode::RayTracingPipeline: return "RayTracingPipeline";
+    case RtExecutionMode::RayQueryCompute: return "RayQueryCompute";
+    }
+    return nullptr;
 }
 
 const char* RtPresentationOutcomeName(const RtPresentationOutcome outcome) noexcept
@@ -870,7 +881,9 @@ bool SerializeRtPerformanceEvidenceJson(const RtPerformanceEvidenceSnapshot& sna
          << ",\"completionSerial\":" << snapshot.identity.completionSerial
          << ",\"simulationTick\":" << frame.simulationTick
          << ",\"frameSlot\":" << frame.frameSlot << "}"
-         << ",\"pipeline\":{\"instrumentation\":\""
+         << ",\"pipeline\":{\"executionBackend\":\""
+         << RtExecutionModeName(pipeline.executionMode)
+         << "\",\"instrumentation\":\""
          << RtInstrumentationModeName(pipeline.instrumentation)
          << "\",\"dielectricQuality\":\"" << RtDielectricQualityName(pipeline.dielectricQuality)
          << "\",\"bundleKey\":\"";
@@ -1034,7 +1047,8 @@ bool SerializeRtPerformanceEvidenceText(const RtPerformanceEvidenceSnapshot& sna
          << " completion=" << snapshot.identity.completionSerial
          << " tick=" << frame.simulationTick
          << " slot=" << frame.frameSlot << '\n'
-         << "Pipeline: " << RtInstrumentationModeName(pipeline.instrumentation) << '/'
+         << "Pipeline: " << RtExecutionModeName(pipeline.executionMode) << '/'
+         << RtInstrumentationModeName(pipeline.instrumentation) << '/'
          << RtDielectricQualityName(pipeline.dielectricQuality)
          << " pair=" << RtFixedTextView(pipeline.bundleKey)
          << " active=" << RtMaterialStrategyName(pipeline.activeStrategy) << ' '

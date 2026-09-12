@@ -76,12 +76,24 @@ bool RtPipelineBundleDestroyApi::Complete() const noexcept
            destroyDescriptorPool && destroyDescriptorSetLayout;
 }
 
-bool RtPipelineBundleBuildApi::Complete() const noexcept
+bool RtPipelineBundleBuildApi::Complete(
+    const horde::vulkan::RtExecutionBackend executionBackend) const noexcept
 {
-    return createDescriptorSetLayout && createDescriptorPool && allocateDescriptorSet &&
-           createDiagnosticBuffer && writeDescriptors && createPipelineLayout &&
-           createSharedShaderModules && createRaygenShaderModule &&
-           createStrategyPipeline && destroyShaderModule && createStrategySbt;
+    const bool common = createDescriptorSetLayout && createDescriptorPool &&
+        allocateDescriptorSet && createDiagnosticBuffer && writeDescriptors &&
+        createPipelineLayout && createEntryShaderModule && createStrategyPipeline &&
+        destroyShaderModule;
+    if (!common) {
+        return false;
+    }
+    switch (executionBackend) {
+    case horde::vulkan::RtExecutionBackend::RayTracingPipeline:
+        return createSharedShaderModules && createStrategySbt;
+    case horde::vulkan::RtExecutionBackend::RayQueryCompute:
+        return true;
+    default:
+        return false;
+    }
 }
 
 RtPipelineBundle::~RtPipelineBundle()
@@ -110,7 +122,8 @@ bool RtPipelineBundle::AdoptPreflight(RtPipelineBundlePreflight preflight,
     RtPipelineBundlePreflight authoritative{};
     std::string authorityFailure;
     if (selected_ || HasLiveResources() || !destroyApi.Complete() ||
-        !ResolveCompiledRtPipelineBundlePreflight(authoritative, authorityFailure) ||
+        !ResolveCompiledRtPipelineBundlePreflight(
+            authoritative, authorityFailure, preflight.request.executionBackend) ||
         !SameCompiledPreflight(preflight, authoritative)) {
         diagnostic = "Invalid selected RT pipeline bundle preflight.";
         return false;
@@ -140,9 +153,14 @@ void RtPipelineBundle::Reset() noexcept
         for (std::size_t index = strategies_.size(); index-- > 0u;) {
             auto& strategy = strategies_[index];
             strategy.sbtRegions = {};
-            destroyApi_.destroyBuffer(destroyApi_.user, destroyApi_.gpuResources,
-                                      strategy.shaderBindingTable,
-                                      OwnedSbtKind(strategy.artifact.key.material));
+            if (strategy.shaderBindingTable.buffer != VK_NULL_HANDLE ||
+                strategy.shaderBindingTable.memory != VK_NULL_HANDLE) {
+                destroyApi_.destroyBuffer(destroyApi_.user, destroyApi_.gpuResources,
+                                          strategy.shaderBindingTable,
+                                          OwnedSbtKind(strategy.artifact.key.material));
+            } else {
+                strategy.shaderBindingTable = {};
+            }
             destroyApi_.destroyPipeline(destroyApi_.user, strategy.pipeline,
                                         strategy.artifact.key.material);
         }
@@ -294,17 +312,27 @@ bool BuildRtPipelineBundleResources(RtPipelineBundle& bundle,
                                     const RtPipelineBundleBuildApi& api,
                                     std::string& diagnostic)
 {
-    if (!bundle.selected_ || bundle.HasLiveResources() || !api.Complete()) {
+    const horde::vulkan::RtExecutionBackend executionBackend =
+        bundle.preflight_.request.executionBackend;
+    if (!bundle.selected_ || bundle.HasLiveResources() ||
+        !api.Complete(executionBackend)) {
         diagnostic = "Invalid RT pipeline bundle construction state.";
         return false;
     }
+    const bool rayTracingPipeline = executionBackend ==
+        horde::vulkan::RtExecutionBackend::RayTracingPipeline;
     VkShaderModule missModule = VK_NULL_HANDLE;
     VkShaderModule hitModule = VK_NULL_HANDLE;
-    VkShaderModule raygenModule = VK_NULL_HANDLE;
+    VkShaderModule entryModule = VK_NULL_HANDLE;
+    const auto destroyModule = [&](VkShaderModule& module) noexcept {
+        if (module != VK_NULL_HANDLE) {
+            api.destroyShaderModule(api.user, module);
+        }
+    };
     const auto fail = [&]() {
-        api.destroyShaderModule(api.user, raygenModule);
-        api.destroyShaderModule(api.user, hitModule);
-        api.destroyShaderModule(api.user, missModule);
+        destroyModule(entryModule);
+        destroyModule(hitModule);
+        destroyModule(missModule);
         bundle.Reset();
         if (diagnostic.empty()) { diagnostic = "Failed to create selected RT pipeline bundle."; }
         return false;
@@ -327,33 +355,39 @@ bool BuildRtPipelineBundleResources(RtPipelineBundle& bundle,
     }
     if (!api.writeDescriptors(api.user, bundle, diagnostic) ||
         !api.createPipelineLayout(api.user, bundle.descriptorSetLayout,
-                                  bundle.pipelineLayout, diagnostic) ||
-        !api.createSharedShaderModules(api.user, missModule, hitModule, diagnostic)) {
+                                  bundle.pipelineLayout, diagnostic)) {
+        return fail();
+    }
+    if (rayTracingPipeline &&
+        !api.createSharedShaderModules(
+            api.user, missModule, hitModule, diagnostic)) {
         return fail();
     }
 
     for (const RtMaterialStrategy material :
          {RtMaterialStrategy::OpaqueFast, RtMaterialStrategy::GenericDielectric}) {
         auto& strategy = bundle.Strategy(material);
-        if (!api.createRaygenShaderModule(api.user, strategy.artifact,
-                                          raygenModule, diagnostic) ||
-            !api.createStrategyPipeline(api.user, material, raygenModule,
+        if (!api.createEntryShaderModule(api.user, strategy.artifact,
+                                         entryModule, diagnostic) ||
+            !api.createStrategyPipeline(api.user, material, entryModule,
                                         missModule, hitModule, bundle.pipelineLayout,
                                         strategy.pipeline, diagnostic)) {
             return fail();
         }
-        api.destroyShaderModule(api.user, raygenModule);
+        destroyModule(entryModule);
     }
-    api.destroyShaderModule(api.user, hitModule);
-    api.destroyShaderModule(api.user, missModule);
+    destroyModule(hitModule);
+    destroyModule(missModule);
 
-    for (const RtMaterialStrategy material :
-         {RtMaterialStrategy::OpaqueFast, RtMaterialStrategy::GenericDielectric}) {
-        auto& strategy = bundle.Strategy(material);
-        if (!api.createStrategySbt(api.user, material, strategy.pipeline,
-                                   strategy.shaderBindingTable, strategy.sbtRegions,
-                                   diagnostic)) {
-            return fail();
+    if (rayTracingPipeline) {
+        for (const RtMaterialStrategy material :
+             {RtMaterialStrategy::OpaqueFast, RtMaterialStrategy::GenericDielectric}) {
+            auto& strategy = bundle.Strategy(material);
+            if (!api.createStrategySbt(api.user, material, strategy.pipeline,
+                                       strategy.shaderBindingTable, strategy.sbtRegions,
+                                       diagnostic)) {
+                return fail();
+            }
         }
     }
     diagnostic.clear();

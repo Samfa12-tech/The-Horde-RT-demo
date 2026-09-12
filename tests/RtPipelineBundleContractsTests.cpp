@@ -22,15 +22,17 @@ bool Require(bool condition, std::string_view message)
     return condition;
 }
 
-std::array<RtPipelineVariantArtifact, 2u> ResolveCompiledPair()
+std::array<RtPipelineVariantArtifact, 2u> ResolveCompiledPair(
+    const horde::vulkan::RtExecutionBackend executionBackend =
+        horde::vulkan::RtExecutionBackend::RayTracingPipeline)
 {
-    const auto& provider = RtPipelineVariantProvider::Compiled();
+    const auto& provider = RtPipelineVariantProvider::Compiled(executionBackend);
     const auto opaque = provider.ResolveExact(
         {provider.request().instrumentation, provider.request().quality,
-         RtMaterialStrategy::OpaqueFast});
+         RtMaterialStrategy::OpaqueFast, executionBackend});
     const auto generic = provider.ResolveExact(
         {provider.request().instrumentation, provider.request().quality,
-         RtMaterialStrategy::GenericDielectric});
+         RtMaterialStrategy::GenericDielectric, executionBackend});
     if (!opaque || !generic) { throw std::runtime_error("compiled fixture pair is incomplete"); }
     return {*opaque, *generic};
 }
@@ -127,13 +129,47 @@ int main()
 
     RtPipelineBundlePreflight compiledPreflight{};
     ok &= Require(ResolveCompiledRtPipelineBundlePreflight(compiledPreflight, failureKey) &&
-                      failureKey.empty(),
-                  "production preflight must independently resolve both compiled records");
+                      failureKey.empty() &&
+                      compiledPreflight.request.executionBackend ==
+                          horde::vulkan::RtExecutionBackend::RayTracingPipeline &&
+                      compiledPreflight.strategies[0].key.executionBackend ==
+                          horde::vulkan::RtExecutionBackend::RayTracingPipeline &&
+                      compiledPreflight.strategies[1].key.executionBackend ==
+                          horde::vulkan::RtExecutionBackend::RayTracingPipeline,
+                  "default production preflight must independently resolve the exact RTP pair");
 
-    auto computeRequest = provider.request();
-    computeRequest.executionBackend = horde::vulkan::RtExecutionBackend::RayQueryCompute;
+    const auto computePair = ResolveCompiledPair(
+        horde::vulkan::RtExecutionBackend::RayQueryCompute);
+    RtPipelineBundlePreflight computePreflight{};
+    ok &= Require(ResolveCompiledRtPipelineBundlePreflight(
+                      computePreflight, failureKey,
+                      horde::vulkan::RtExecutionBackend::RayQueryCompute) &&
+                      failureKey.empty() &&
+                      computePreflight.request.executionBackend ==
+                          horde::vulkan::RtExecutionBackend::RayQueryCompute &&
+                      computePreflight.strategies[0].key.executionBackend ==
+                          horde::vulkan::RtExecutionBackend::RayQueryCompute &&
+                      computePreflight.strategies[1].key.executionBackend ==
+                          horde::vulkan::RtExecutionBackend::RayQueryCompute &&
+                      computePreflight.descriptorIo.instrumentation ==
+                          compiledPreflight.descriptorIo.instrumentation &&
+                      computePreflight.descriptorIo.bindingCount ==
+                          compiledPreflight.descriptorIo.bindingCount &&
+                      computePreflight.descriptorIo.diagnosticAvailability ==
+                          compiledPreflight.descriptorIo.diagnosticAvailability &&
+                      computePreflight.strategies[0].canonicalKey ==
+                          "rayquery_compute_shipping_mobile_opaque_fast" &&
+                      computePreflight.strategies[1].canonicalKey ==
+                          "rayquery_compute_shipping_mobile_generic_dielectric",
+                  "compute production preflight must resolve its exact two-entry strategy pair");
+
+    const auto computeRequest = computePreflight.request;
     ok &= Require(!ValidateRtPipelineBundlePreflight(computeRequest, pair, preflight, failureKey),
                   "compute request must reject a raygen-only pair");
+    ok &= Require(!ValidateRtPipelineBundlePreflight(
+                      provider.request(), computePair, preflight, failureKey) &&
+                      failureKey == "shipping_mobile_opaque_fast",
+                  "RTP request must reject a compute-only pair without cross-stage fallback");
     auto invalidBackendRequest = provider.request();
     invalidBackendRequest.executionBackend = static_cast<horde::vulkan::RtExecutionBackend>(99);
     ok &= Require(!ValidateRtPipelineBundlePreflight(invalidBackendRequest, pair, preflight, failureKey),
@@ -149,6 +185,20 @@ int main()
     disguisedRaygen[1].artifactPath = "src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_generic_dielectric.inc";
     ok &= Require(!ValidateRtPipelineBundlePreflight(computeRequest, disguisedRaygen, preflight, failureKey),
                   "compute metadata must not disguise raygen execution-model bytes");
+
+    auto disguisedCompute = computePair;
+    for (auto& record : disguisedCompute) {
+        record.key.executionBackend = horde::vulkan::RtExecutionBackend::RayTracingPipeline;
+    }
+    disguisedCompute[0].canonicalKey = "shipping_mobile_opaque_fast";
+    disguisedCompute[0].artifactPath =
+        "src/vulkan/raytracing/variants/shipping_mobile_opaque_fast.inc";
+    disguisedCompute[1].canonicalKey = "shipping_mobile_generic_dielectric";
+    disguisedCompute[1].artifactPath =
+        "src/vulkan/raytracing/variants/shipping_mobile_generic_dielectric.inc";
+    ok &= Require(!ValidateRtPipelineBundlePreflight(
+                      provider.request(), disguisedCompute, preflight, failureKey),
+                  "RTP metadata must not disguise compute execution-model bytes");
 
     const std::array<RtPipelineVariantArtifact, 1u> missingGeneric{pair[0]};
     ok &= Require(!ValidateRtPipelineBundlePreflight(provider.request(), missingGeneric,
