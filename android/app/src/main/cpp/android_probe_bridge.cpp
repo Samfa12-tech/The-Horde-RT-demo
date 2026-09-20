@@ -48,6 +48,7 @@
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
 #include "vulkan/raytracing/RtFrameEvidenceCoordinator.h"
 #include "vulkan/raytracing/RtDeviceEnablePlan.h"
+#include "telemetry/RtBenchmarkEvidenceRun.h"
 #include "telemetry/RtEvidencePublication.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
 
@@ -196,6 +197,8 @@ struct SwapchainContext
     horde::gameplay::ShowcaseRouteReplay routeReplay;
     bool routeReplayActive = false;
     horde::gameplay::ShowcaseBenchmarkRun inAppBenchmark;
+    horde::telemetry::RtBenchmarkEvidenceRun benchmarkEvidence;
+    std::optional<std::size_t> benchmarkExpectedFrame;
     std::string reportDirectory;
     bool useRtPath = false;
     horde::vulkan::RtExecutionBackend executionBackend = horde::vulkan::RtExecutionBackend::Unsupported;
@@ -699,6 +702,7 @@ horde::gameplay::ShowcaseBenchmarkMetadata BuildBenchmarkMetadata(const Swapchai
     metadata.rtMode = horde::vulkan::ToString(context.capabilities.rtMode);
     metadata.executionBackend = horde::vulkan::ToString(context.rtScene.ExecutionBackend());
     metadata.presentMode = PresentModeName(context.swapchainPresentMode);
+    metadata.legacyFrameTimingScope = "android-render-entry-through-present";
     metadata.materialEncoding = context.rtScene.MaterialEncoding();
     metadata.renderScalePercent = static_cast<std::uint32_t>(std::lround(context.renderScale * 100.0f));
     metadata.internalWidth = context.rtScene.DispatchExtent().width;
@@ -706,6 +710,101 @@ horde::gameplay::ShowcaseBenchmarkMetadata BuildBenchmarkMetadata(const Swapchai
     metadata.presentationWidth = context.swapchainExtent.width;
     metadata.presentationHeight = context.swapchainExtent.height;
     return metadata;
+}
+
+void CancelActiveInAppBenchmark(SwapchainContext& context)
+{
+    bool cancelled = false;
+    if (context.inAppBenchmark.IsRunning())
+    {
+        context.inAppBenchmark.Cancel();
+        cancelled = true;
+    }
+    if (context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Allocated ||
+        context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring)
+    {
+        context.benchmarkEvidence.Cancel();
+        cancelled = true;
+    }
+    context.benchmarkExpectedFrame.reset();
+    if (cancelled)
+    {
+        gInAppBenchmarkStatus.store(3, std::memory_order_release);
+    }
+}
+
+void CancelBenchmarkEvidenceOnly(SwapchainContext& context)
+{
+    if (context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Allocated ||
+        context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring)
+    {
+        context.benchmarkEvidence.Cancel();
+    }
+    context.benchmarkExpectedFrame.reset();
+}
+
+void DeliverCompletedBenchmarkEvidence(
+    SwapchainContext& context,
+    const horde::vulkan::raytracing::RtFrameEvidenceCompletionResult& completion,
+    const horde::telemetry::RtPerformanceEvidenceSnapshot& snapshot)
+{
+    if (!completion.completedEvidence ||
+        context.benchmarkEvidence.Status() != horde::telemetry::RtBenchmarkRunStatus::Measuring)
+    {
+        return;
+    }
+    if (snapshot.identity.submitted.frame.sceneEpoch != context.benchmarkEvidence.SceneEpoch() ||
+        snapshot.identity.submitted.frame.measurementGeneration !=
+            context.benchmarkEvidence.MeasurementGeneration())
+    {
+        return;
+    }
+    if (!context.benchmarkEvidence.Complete(snapshot))
+    {
+        __android_log_print(ANDROID_LOG_ERROR, kTag,
+                            "Android benchmark rejected completed RT evidence.");
+    }
+}
+
+void RejectPendingBenchmarkExpectation(
+    SwapchainContext& context,
+    const horde::telemetry::RtBenchmarkFailureReason reason)
+{
+    if (!context.benchmarkExpectedFrame.has_value())
+    {
+        return;
+    }
+    if (context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring)
+    {
+        (void)context.benchmarkEvidence.RejectExpected(*context.benchmarkExpectedFrame, reason);
+    }
+    context.benchmarkExpectedFrame.reset();
+}
+
+void BindCommittedBenchmarkExpectation(SwapchainContext& context)
+{
+    if (!context.benchmarkExpectedFrame.has_value())
+    {
+        return;
+    }
+    horde::telemetry::RtSubmittedFrameIdentity committedIdentity{};
+    if (context.rtFrameEvidence.TryGetCommittedIdentity(
+            context.currentFrame, committedIdentity))
+    {
+        if (!context.benchmarkEvidence.BindSubmitted(
+                *context.benchmarkExpectedFrame, committedIdentity))
+        {
+            __android_log_print(ANDROID_LOG_ERROR, kTag,
+                                "Android benchmark failed to bind committed submission.");
+        }
+    }
+    else
+    {
+        (void)context.benchmarkEvidence.RejectExpected(
+            *context.benchmarkExpectedFrame,
+            horde::telemetry::RtBenchmarkFailureReason::TokenlessCompletion);
+    }
+    context.benchmarkExpectedFrame.reset();
 }
 
 void PublishBenchmarkProgress(const SwapchainContext& context)
@@ -732,6 +831,13 @@ void StartInAppBenchmark(SwapchainContext& context)
     context.routeReplayActive = false;
     context.captureActive = false;
     context.capturePresentedFrames = 0u;
+    context.benchmarkExpectedFrame.reset();
+    if (!context.benchmarkEvidence.Start(
+            horde::gameplay::ShowcaseBenchmarkRun::kMaximumFramesPerLap))
+    {
+        __android_log_print(ANDROID_LOG_ERROR, kTag,
+                            "Android benchmark evidence allocation failed; route will remain invalid.");
+    }
     context.inAppBenchmark.Start();
     {
         std::lock_guard<std::mutex> lock(gReportMutex);
@@ -744,8 +850,11 @@ void StartInAppBenchmark(SwapchainContext& context)
 void FinishInAppBenchmark(SwapchainContext& context)
 {
     const horde::gameplay::ShowcaseBenchmarkMetadata metadata = BuildBenchmarkMetadata(context);
-    std::string text = context.inAppBenchmark.BuildTextReport(metadata);
-    const std::string json = context.inAppBenchmark.BuildJsonReport(metadata);
+    const bool evidenceComplete = context.benchmarkEvidence.Status() ==
+        horde::telemetry::RtBenchmarkRunStatus::Complete &&
+        context.benchmarkEvidence.ExpectedCount() == context.inAppBenchmark.Frames().size();
+    std::string text = context.inAppBenchmark.BuildTextReport(metadata, &context.benchmarkEvidence);
+    const std::string json = context.inAppBenchmark.BuildJsonReport(metadata, &context.benchmarkEvidence);
     const std::string textPath = context.reportDirectory + "/HordeLanternRT-benchmark-latest.txt";
     const std::string jsonPath = context.reportDirectory + "/HordeLanternRT-benchmark-latest.json";
     const bool jsonSaved = WriteTextFile(jsonPath, json);
@@ -758,15 +867,18 @@ void FinishInAppBenchmark(SwapchainContext& context)
     {
         std::lock_guard<std::mutex> lock(gReportMutex);
         gLatestBenchmarkReport = text;
-        gLatestBenchmarkProgress = context.inAppBenchmark.Passed() ? "BENCHMARK COMPLETE" : "BENCHMARK INVALID";
+        gLatestBenchmarkProgress = context.inAppBenchmark.Passed() && evidenceComplete
+            ? "BENCHMARK COMPLETE" : "BENCHMARK INVALID";
     }
-    gInAppBenchmarkStatus.store(context.inAppBenchmark.Passed() ? 2 : 3, std::memory_order_release);
+    gInAppBenchmarkStatus.store(context.inAppBenchmark.Passed() && evidenceComplete ? 2 : 3,
+                                std::memory_order_release);
     {
         std::lock_guard<std::mutex> inputLock(gInputPublisherMutex);
         gInputPublisherState.paused = true;
         PublishInputLocked();
     }
     ResetShowcaseSimulation();
+    context.benchmarkExpectedFrame.reset();
     if (context.rtFrameEvidenceInitialised)
     {
         (void)context.rtFrameEvidence.ApplyEvent(
@@ -1793,6 +1905,7 @@ bool ReleaseSwapchainResources(SwapchainContext& context)
 
     const VkResult idleResult = vkDeviceWaitIdle(context.device);
     const bool evidenceCompleted = CompleteRtEvidenceAfterDeviceIdle(context, idleResult);
+    CancelActiveInAppBenchmark(context);
     const bool evidenceRecreated = !context.rtFrameEvidenceInitialised ||
         context.rtFrameEvidence.Recreate(
             horde::telemetry::RtResourceResetReason::SwapchainRecreate,
@@ -1939,12 +2052,15 @@ bool CompleteRtEvidenceAfterDeviceIdle(
     bool completed = true;
     for (std::uint32_t frameSlot = 0u; frameSlot < kMaxFramesInFlight; ++frameSlot)
     {
+        horde::telemetry::RtPerformanceEvidenceSnapshot completedSnapshot{};
         const horde::vulkan::raytracing::RtFrameEvidenceCompletionResult result =
-            context.rtFrameEvidence.CompleteFinalIdle(frameSlot, gpuIo, diagnosticIo);
+            context.rtFrameEvidence.CompleteFinalIdle(
+                frameSlot, gpuIo, diagnosticIo, &completedSnapshot);
         if (result.gpuCollectionAttempted)
         {
             RefreshGpuTimingTelemetry(context, &result.gpuCollection);
         }
+        DeliverCompletedBenchmarkEvidence(context, result, completedSnapshot);
         if (result.fatalDiagnosticIoFailure)
         {
             __android_log_print(
@@ -1954,6 +2070,42 @@ bool CompleteRtEvidenceAfterDeviceIdle(
         }
     }
     return completed;
+}
+
+bool FinalizeCompletedInAppBenchmark(SwapchainContext& context)
+{
+    const VkResult idleResult = vkDeviceWaitIdle(context.device);
+    const bool drained = CompleteRtEvidenceAfterDeviceIdle(context, idleResult);
+    if (context.benchmarkEvidence.Status() != horde::telemetry::RtBenchmarkRunStatus::Measuring)
+    {
+        return drained;
+    }
+    const bool drainRecorded = context.benchmarkEvidence.RecordOwnerDrainResult(
+        idleResult == VK_SUCCESS && drained);
+    const bool finalized = context.benchmarkEvidence.Finalize();
+    return drained && drainRecorded && finalized;
+}
+
+void FailInAppBenchmarkAfterRenderFailure(SwapchainContext& context)
+{
+    const bool active = context.inAppBenchmark.IsRunning() ||
+        context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Allocated ||
+        context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring;
+    if (!active)
+    {
+        return;
+    }
+
+    const VkResult idleResult = vkDeviceWaitIdle(context.device);
+    const bool drained = CompleteRtEvidenceAfterDeviceIdle(context, idleResult);
+    if (context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring)
+    {
+        (void)context.benchmarkEvidence.RecordOwnerDrainResult(
+            idleResult == VK_SUCCESS && drained);
+        (void)context.benchmarkEvidence.Finalize();
+    }
+    CancelActiveInAppBenchmark(context);
+    FinishInAppBenchmark(context);
 }
 
 horde::telemetry::RtSampleStatus CurrentInitialGpuEvidenceStatus(
@@ -2094,6 +2246,7 @@ void DestroySwapchainContext(SwapchainContext& context)
 
     const VkResult idleResult = vkDeviceWaitIdle(context.device);
     (void)CompleteRtEvidenceAfterDeviceIdle(context, idleResult);
+    CancelActiveInAppBenchmark(context);
     DestroyRtEvidenceOnOwnerThread(context);
     context.rtScene.Destroy();
     context.gpuFrameTimer.Destroy();
@@ -2206,15 +2359,18 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
 
     if (evidenceFrame)
     {
+        horde::telemetry::RtPerformanceEvidenceSnapshot completedSnapshot{};
         const horde::vulkan::raytracing::RtFrameEvidenceCompletionResult completion =
             context.rtFrameEvidence.CompleteFence(
                 context.currentFrame,
                 horde::vulkan::raytracing::MakeRtGpuFrameTimerIo(
                     context.gpuFrameTimer),
-                horde::vulkan::raytracing::MakeRtDiagnosticFrameIo(context.rtScene));
+                horde::vulkan::raytracing::MakeRtDiagnosticFrameIo(context.rtScene),
+                &completedSnapshot);
         RefreshGpuTimingTelemetry(
             context,
             completion.gpuCollectionAttempted ? &completion.gpuCollection : nullptr);
+        DeliverCompletedBenchmarkEvidence(context, completion, completedSnapshot);
         if (completion.fatalDiagnosticIoFailure)
         {
             __android_log_print(
@@ -2290,9 +2446,11 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             StartInAppBenchmark(context);
         }
         if (gInAppBenchmarkCancelRequested.exchange(false, std::memory_order_acq_rel) &&
-            context.inAppBenchmark.IsRunning())
+            (context.inAppBenchmark.IsRunning() ||
+             context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Allocated ||
+             context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring))
         {
-            context.inAppBenchmark.Cancel();
+            CancelActiveInAppBenchmark(context);
             ResetShowcaseSimulation();
             if (context.rtFrameEvidenceInitialised)
             {
@@ -2344,10 +2502,11 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             simulationInput.commands.retry > beforeCommands.lastConsumedRetrySequence;
         if (routeResetPending)
         {
-            if (context.inAppBenchmark.IsRunning())
+            if (context.inAppBenchmark.IsRunning() ||
+                context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Allocated ||
+                context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring)
             {
-                context.inAppBenchmark.Cancel();
-                gInAppBenchmarkStatus.store(3, std::memory_order_release);
+                CancelActiveInAppBenchmark(context);
             }
             context.activeBenchmarkCheckpoint = -1;
             context.benchmarkSampling = false;
@@ -2361,7 +2520,11 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
                 horde::telemetry::RtLifecycleEvent::RouteReset);
         }
         if (context.rtFrameEvidenceInitialised && retryPending &&
-            !context.inAppBenchmark.IsRunning())
+            context.inAppBenchmark.IsRunning())
+        {
+            CancelBenchmarkEvidenceOnly(context);
+        }
+        else if (context.rtFrameEvidenceInitialised && retryPending)
         {
             (void)context.rtFrameEvidence.ApplyEvent(
                 horde::telemetry::RtLifecycleEvent::Retry);
@@ -2402,14 +2565,42 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
                 ResetShowcaseSimulation();
                 if (context.rtFrameEvidenceInitialised)
                 {
-                    (void)context.rtFrameEvidence.ApplyEvent(
+                    const bool routeResetApplied = context.rtFrameEvidence.ApplyEvent(
                         horde::telemetry::RtLifecycleEvent::RouteReset);
-                    if (context.inAppBenchmark.CurrentLap() ==
-                        context.inAppBenchmark.TotalLaps())
+                    const bool finalLap = context.inAppBenchmark.CurrentLap() ==
+                        context.inAppBenchmark.TotalLaps();
+                    const bool warmupApplied = !finalLap || context.rtFrameEvidence.ApplyEvent(
+                        horde::telemetry::RtLifecycleEvent::WarmupToMeasure);
+                    if (finalLap && routeResetApplied && warmupApplied &&
+                        context.benchmarkEvidence.Status() ==
+                            horde::telemetry::RtBenchmarkRunStatus::Allocated)
                     {
-                        (void)context.rtFrameEvidence.ApplyEvent(
-                            horde::telemetry::RtLifecycleEvent::WarmupToMeasure);
+                        const horde::telemetry::RtLifecycleSeeds seeds =
+                            context.rtFrameEvidence.SeedsByValue();
+                        (void)context.benchmarkEvidence.ArmMeasurement(
+                            seeds.sceneEpoch, seeds.measurementGeneration);
                     }
+                }
+            }
+            if (context.rtFrameEvidenceInitialised &&
+                context.benchmarkEvidence.Status() ==
+                    horde::telemetry::RtBenchmarkRunStatus::Allocated &&
+                context.inAppBenchmark.TotalLaps() == 1u &&
+                !advance.lapStarted &&
+                context.inAppBenchmark.CurrentLap() == context.inAppBenchmark.TotalLaps())
+            {
+                const bool warmupApplied = context.rtFrameEvidence.ApplyEvent(
+                    horde::telemetry::RtLifecycleEvent::WarmupToMeasure);
+                if (warmupApplied)
+                {
+                    const horde::telemetry::RtLifecycleSeeds seeds =
+                        context.rtFrameEvidence.SeedsByValue();
+                    (void)context.benchmarkEvidence.ArmMeasurement(
+                        seeds.sceneEpoch, seeds.measurementGeneration);
+                }
+                else
+                {
+                    CancelBenchmarkEvidenceOnly(context);
                 }
             }
             simulationInput.paused = false;
@@ -2427,6 +2618,13 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
                 static_cast<float>(horde::gameplay::simulation::FixedStepRunner::kFixedDeltaSeconds),
                 publishedInput.publicationSequence);
             simulationScope.Complete(1u);
+            if (context.benchmarkEvidence.Status() ==
+                    horde::telemetry::RtBenchmarkRunStatus::Measuring)
+            {
+                context.benchmarkExpectedFrame = context.benchmarkEvidence.ExpectFrame({
+                    static_cast<std::uint32_t>(advance.replay.zone),
+                    context.inAppBenchmark.CurrentLap()});
+            }
             if (advance.replay.waypointReached || advance.lapStarted || advance.finished)
             {
                 PublishBenchmarkProgress(context);
@@ -2564,6 +2762,8 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             {
                 context.gpuFrameTimer.CancelRecording(context.currentFrame);
             }
+            RejectPendingBenchmarkExpectation(
+                context, horde::telemetry::RtBenchmarkFailureReason::SubmissionFailed);
             __android_log_print(ANDROID_LOG_ERROR, kTag, "Failed to record RT frame: %s", diagnostic.c_str());
             return false;
         }
@@ -2608,6 +2808,8 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
         {
             context.gpuFrameTimer.CancelRecording(context.currentFrame);
         }
+        RejectPendingBenchmarkExpectation(
+            context, horde::telemetry::RtBenchmarkFailureReason::SubmissionFailed);
         return false;
     }
     const auto recordDone = std::chrono::steady_clock::now();
@@ -2629,6 +2831,8 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
         {
             context.gpuFrameTimer.CancelRecording(context.currentFrame);
         }
+        RejectPendingBenchmarkExpectation(
+            context, horde::telemetry::RtBenchmarkFailureReason::SubmissionFailed);
         return false;
     }
 
@@ -2664,6 +2868,8 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
         {
             context.gpuFrameTimer.CancelRecording(context.currentFrame);
         }
+        RejectPendingBenchmarkExpectation(
+            context, horde::telemetry::RtBenchmarkFailureReason::SubmissionFailed);
         return false;
     }
     if (evidenceFrame)
@@ -2674,6 +2880,18 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             gpuTimingRecording,
             horde::vulkan::raytracing::MakeRtGpuFrameTimerIo(
                 context.gpuFrameTimer));
+    }
+    if (context.benchmarkExpectedFrame.has_value())
+    {
+        if (evidenceFrame)
+        {
+            BindCommittedBenchmarkExpectation(context);
+        }
+        else
+        {
+            RejectPendingBenchmarkExpectation(
+                context, horde::telemetry::RtBenchmarkFailureReason::TokenlessCompletion);
+        }
     }
 
     VkPresentInfoKHR presentInfo{};
@@ -2713,7 +2931,8 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             context.inAppBenchmark.RecordFrame(interruptedFrameMs, false);
             PublishBenchmarkProgress(context);
         }
-        return RecreateSwapchain(context);
+        const bool recreated = RecreateSwapchain(context);
+        return recreated;
     }
     if (presentResult != VK_SUCCESS)
     {
@@ -2780,6 +2999,19 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
         context.inAppBenchmark.RecordFrame(frameTotalMs, rtFramePresented);
         if (!context.inAppBenchmark.IsRunning())
         {
+            if (context.inAppBenchmark.Status() ==
+                    horde::gameplay::ShowcaseBenchmarkStatus::Complete)
+            {
+                if (!FinalizeCompletedInAppBenchmark(context))
+                {
+                    __android_log_print(ANDROID_LOG_ERROR, kTag,
+                                        "Android benchmark final evidence drain was incomplete.");
+                }
+            }
+            else
+            {
+                CancelActiveInAppBenchmark(context);
+            }
             FinishInAppBenchmark(context);
         }
     }
@@ -2823,12 +3055,21 @@ void SwapchainRenderLoop()
         {
             (void)gSwapchainContext.rtFrameEvidence.SetPaused(measurementPaused);
         }
+        if (measurementPaused &&
+            (gSwapchainContext.benchmarkEvidence.Status() ==
+                 horde::telemetry::RtBenchmarkRunStatus::Allocated ||
+             gSwapchainContext.benchmarkEvidence.Status() ==
+                 horde::telemetry::RtBenchmarkRunStatus::Measuring))
+        {
+            CancelActiveInAppBenchmark(gSwapchainContext);
+        }
         const float requestedRenderScale = std::clamp(gRequestedRenderScale.load(std::memory_order_acquire), 0.50f, 1.0f);
         if (gSwapchainContext.useRtPath && std::abs(requestedRenderScale - gSwapchainContext.renderScale) > 0.001f)
         {
             const VkResult idleResult = vkDeviceWaitIdle(gSwapchainContext.device);
             const bool evidenceCompleted = CompleteRtEvidenceAfterDeviceIdle(
                 gSwapchainContext, idleResult);
+            CancelActiveInAppBenchmark(gSwapchainContext);
             const bool evidenceRecreated =
                 !gSwapchainContext.rtFrameEvidenceInitialised ||
                 gSwapchainContext.rtFrameEvidence.Recreate(
@@ -2854,10 +3095,11 @@ void SwapchainRenderLoop()
             if (!evidenceCompleted || !evidenceRecreated ||
                 !InitialiseRtSceneForSwapchain(gSwapchainContext))
             {
-                if (gSwapchainContext.inAppBenchmark.IsRunning())
+                if (gSwapchainContext.inAppBenchmark.IsRunning() ||
+                    gSwapchainContext.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Allocated ||
+                    gSwapchainContext.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring)
                 {
-                    gSwapchainContext.inAppBenchmark.Cancel();
-                    gInAppBenchmarkStatus.store(3, std::memory_order_release);
+                    CancelActiveInAppBenchmark(gSwapchainContext);
                 }
                 gRuntimeState.store(3, std::memory_order_release);
                 __android_log_print(ANDROID_LOG_ERROR, kTag, "Failed to apply requested RT render scale.");
@@ -2870,11 +3112,7 @@ void SwapchainRenderLoop()
         bool rtFramePresented = false;
         if (!RenderFrame(gSwapchainContext, rtFramePresented))
         {
-            if (gSwapchainContext.inAppBenchmark.IsRunning())
-            {
-                gSwapchainContext.inAppBenchmark.Cancel();
-                gInAppBenchmarkStatus.store(3, std::memory_order_release);
-            }
+            FailInAppBenchmarkAfterRenderFailure(gSwapchainContext);
             gRuntimeState.store(3, std::memory_order_release);
             __android_log_print(ANDROID_LOG_ERROR, kTag, "Diagnostic surface render loop ended unexpectedly.");
             break;
