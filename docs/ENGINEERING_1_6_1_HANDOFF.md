@@ -13,9 +13,26 @@ models, redeem credits or shrink the goal. Before pausing, preserve a current
 handoff and safely commit/push task-owned work without credentials, unrelated
 files, force-push or release publication; verify the remote SHA. Keep GitHub
 current after subsequent coherent, reviewed slices rather than waiting for 5%.
-The final September 20 check reported **5% weekly remaining** (95% used), triggering
-the requested pause. No more engineering work starts until the owner resumes.
-The usage guard is also paused; resuming the project does not reduce its scope.
+The original September 20 checkpoint reported **5% weekly remaining** (95% used),
+triggering the requested usage pause. A later check reports **4% remaining**.
+The owner has removed the separate requirement to stay paused until an explicit
+resume. Do not restore that instruction from older handoffs. The approximately
+5% usage guard remains binding; the current pause is for that guard only.
+
+### Latest owner steering for continued work
+
+Restore current CI early: inspect/reconcile PR #15 conflicts non-destructively,
+preserve accepted implementation/guidance, add scoped branch-push validation,
+obtain fresh current-source/integration results, and update the PR description.
+Ensure actual skinned smoke/semantic fixtures are covered despite the portable
+workflow disabling Vulkan targets. Do not merge into main, force-push or rewrite
+history. Finish Phase 2 admission and affected RT images without restarting
+Phase 1 or endlessly chasing historical parallel-export ordering. Define a
+separate arms-only contract for the dedicated viewmodel. Keep Shipping/Diagnostic
+parity distinct from pipeline/compute parity; investigate backend pixel divergence
+without loosening tolerance. Include live motion, not just frozen extreme poses.
+Music, consent-based reporting, resource work and final gates remain in scope;
+licensing, signing recovery and publication remain owner-controlled.
 
 ### Quota checkpoint
 
