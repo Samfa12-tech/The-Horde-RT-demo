@@ -72,6 +72,8 @@ public class MainActivity extends Activity {
     private static final String REPORT_DIRECTORY = "reports";
     private static final String ACTION_BENCHMARK = "com.samfa12.hordelanternrt.action.BENCHMARK";
     private static final String EXTRA_BENCHMARK_RUN_ID = "horde.benchmark.run_id";
+    private static final String EXTRA_BENCHMARK_WORKLOAD = "horde.benchmark.workload";
+    private static final String DEFAULT_BENCHMARK_WORKLOAD = "showcase-route-v1";
     private static final long BENCHMARK_AUTOMATION_TIMEOUT_MS = 15L * 60L * 1000L;
     private static final String TEXT_REPORT_FILE = "vulkan_capability_report.txt";
     private static final String JSON_REPORT_FILE = "vulkan_capability_report.json";
@@ -192,6 +194,7 @@ public class MainActivity extends Activity {
     private boolean benchmarkReportVisible;
     private String latestBenchmarkReport = "";
     private String benchmarkAutomationId;
+    private String benchmarkAutomationWorkload = DEFAULT_BENCHMARK_WORKLOAD;
     private boolean benchmarkAutomationPending;
     private boolean benchmarkAutomationFinishing;
     private long benchmarkAutomationStartedAt;
@@ -596,7 +599,8 @@ public class MainActivity extends Activity {
         playSound("ui_select", 0.18f);
         if (ProbeBridge.getRuntimeState() != 1 || !(benchmarkAutomationId == null
                 ? ProbeBridge.requestBenchmark()
-                : ProbeBridge.requestBenchmarkWithId(benchmarkAutomationId))) {
+                : ProbeBridge.requestBenchmarkWithIdAndWorkload(
+                        benchmarkAutomationId, benchmarkAutomationWorkload))) {
             Toast.makeText(this, R.string.benchmark_unavailable, Toast.LENGTH_LONG).show();
             return;
         }
@@ -630,18 +634,46 @@ public class MainActivity extends Activity {
         return id;
     }
 
+    static String benchmarkAutomationWorkload(final Intent intent) {
+        if (intent == null || !ACTION_BENCHMARK.equals(intent.getAction())) return null;
+        benchmarkAutomationRequestId(intent);
+        if (!intent.hasExtra(EXTRA_BENCHMARK_WORKLOAD)) return DEFAULT_BENCHMARK_WORKLOAD;
+        final String workload;
+        try {
+            workload = intent.getStringExtra(EXTRA_BENCHMARK_WORKLOAD);
+        } catch (final ClassCastException error) {
+            throw new IllegalArgumentException("Benchmark workload must be a string.", error);
+        }
+        if (!isAllowedBenchmarkWorkload(workload)) {
+            throw new IllegalArgumentException("Benchmark workload is not allowlisted.");
+        }
+        return workload;
+    }
+
+    private static boolean isAllowedBenchmarkWorkload(final String workload) {
+        return DEFAULT_BENCHMARK_WORKLOAD.equals(workload) ||
+                "lantern-held-high-v1".equals(workload) ||
+                "lantern-held-low-v1".equals(workload) ||
+                "lantern-grazing-v1".equals(workload) ||
+                "lantern-motion-extreme-v1".equals(workload) ||
+                "lantern-reveal-sequence-v1".equals(workload);
+    }
+
     private boolean consumeBenchmarkAutomationIntent(final Intent intent, final boolean freshLaunch) {
         if (intent == null || !ACTION_BENCHMARK.equals(intent.getAction())) return false;
         try {
             final String id = benchmarkAutomationRequestId(intent);
+            final String workload = benchmarkAutomationWorkload(intent);
             // Consume even a duplicate request; recreation must not replay it.
             intent.setAction(Intent.ACTION_MAIN);
             intent.removeExtra(EXTRA_BENCHMARK_RUN_ID);
+            intent.removeExtra(EXTRA_BENCHMARK_WORKLOAD);
             if (benchmarkAutomationId != null || benchmarkRunning) {
                 Log.w(TAG, "Rejected benchmark automation while another run is active.");
                 return true;
             }
             benchmarkAutomationId = id;
+            benchmarkAutomationWorkload = workload;
             benchmarkAutomationPending = true;
             benchmarkAutomationStartedAt = SystemClock.elapsedRealtime();
             ProbeBridge.setRequiredRayQueryCompute(false);
@@ -661,12 +693,13 @@ public class MainActivity extends Activity {
         benchmarkRunning = false;
         if (nativeStatus != 2) ProbeBridge.cancelBenchmark();
         final String runId = benchmarkAutomationId;
+        final String workload = benchmarkAutomationWorkload;
         final File privateReports = new File(getFilesDir(), REPORT_DIRECTORY);
         final File externalFiles = getExternalFilesDir(null);
         new Thread(() -> {
             try {
                 final BenchmarkAutomationExport.Result result = BenchmarkAutomationExport.export(
-                        privateReports, externalFiles, runId, nativeStatus);
+                        privateReports, externalFiles, runId, workload, nativeStatus);
                 Log.i(TAG, "HORDE_BENCHMARK_EXPORT run_id=" + runId +
                         " status=" + (result.successful ? "complete" : "invalid") +
                         " directory=" + result.directory.getAbsolutePath() +
@@ -1455,7 +1488,8 @@ public class MainActivity extends Activity {
                         parryButton.setVisibility(View.GONE);
                     }
                     if (lifePhase == PLAYER_DEAD) showDeathOverlay();
-                    if (finaleEndingPhase == FINALE_ENDING_COMPLETE) {
+                    if (finaleEndingPhase == FINALE_ENDING_COMPLETE && !benchmarkRunning &&
+                            benchmarkAutomationId == null) {
                         final boolean unlockGranted = persistRtLabUnlockIfEligible();
                         if (unlockGranted && endingOverlayVisible) {
                             endingOverlayVisible = false;

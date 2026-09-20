@@ -32,6 +32,7 @@
 #include "gameplay/DevelopmentCheckpoints.h"
 #include "gameplay/DevelopmentCheckpointSimulation.h"
 #include "gameplay/ShowcaseBenchmark.h"
+#include "gameplay/LanternBenchmarkScenario.h"
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/ShowcaseCheckpoints.h"
 #include "gameplay/ShowcaseReplay.h"
@@ -218,6 +219,8 @@ std::string gLatestBenchmarkReport;
 std::string gLatestBenchmarkProgress;
 // Request identity shares the report mutex; it is not a frame/submission counter.
 std::string gRequestedBenchmarkRunId;
+horde::gameplay::BenchmarkWorkload gRequestedBenchmarkWorkload =
+    horde::gameplay::BenchmarkWorkload::ShowcaseRoute;
 horde::gameplay::simulation::GameSimulation gGameSimulation;
 horde::gameplay::simulation::InputMailbox gInputMailbox;
 std::mutex gInputPublisherMutex;
@@ -836,17 +839,24 @@ void StartInAppBenchmark(SwapchainContext& context)
     context.captureActive = false;
     context.capturePresentedFrames = 0u;
     context.benchmarkExpectedFrame.reset();
+    horde::gameplay::BenchmarkWorkload requestedWorkload =
+        horde::gameplay::BenchmarkWorkload::ShowcaseRoute;
+    {
+        std::lock_guard<std::mutex> lock(gReportMutex);
+        gLatestBenchmarkReport.clear();
+        context.benchmarkRunId = std::move(gRequestedBenchmarkRunId);
+        requestedWorkload = gRequestedBenchmarkWorkload;
+    }
     if (!context.benchmarkEvidence.Start(
             horde::gameplay::ShowcaseBenchmarkRun::kMaximumFramesPerLap))
     {
         __android_log_print(ANDROID_LOG_ERROR, kTag,
                             "Android benchmark evidence allocation failed; route will remain invalid.");
     }
-    context.inAppBenchmark.Start();
+    context.inAppBenchmark.Start(
+        horde::gameplay::ShowcaseBenchmarkRun::kDefaultLaps, requestedWorkload);
     {
         std::lock_guard<std::mutex> lock(gReportMutex);
-        gLatestBenchmarkReport.clear();
-        context.benchmarkRunId = std::move(gRequestedBenchmarkRunId);
         gLatestBenchmarkProgress = context.inAppBenchmark.ProgressText();
     }
     gInAppBenchmarkStatus.store(1, std::memory_order_release);
@@ -2608,20 +2618,45 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
                     CancelBenchmarkEvidenceOnly(context);
                 }
             }
+            const bool lanternBenchmark =
+                horde::gameplay::IsLanternBenchmark(context.inAppBenchmark.Workload());
+            if (lanternBenchmark && advance.frameInLap == 1u &&
+                !horde::gameplay::StageLanternBenchmark(
+                    gGameSimulation, context.inAppBenchmark.Workload()))
+            {
+                CancelActiveInAppBenchmark(context);
+            }
             simulationInput.paused = false;
             simulationInput.damageEnabled = false;
             simulationInput.hasAuthoritativePlayerPose = true;
             simulationInput.authoritativePlayerX = advance.replay.x;
             simulationInput.authoritativePlayerZ = advance.replay.z;
             simulationInput.yawRadians = advance.replay.yaw;
-            simulationInput.pitchRadians = -0.04f;
+            simulationInput.pitchRadians = lanternBenchmark
+                ? horde::gameplay::kLanternBenchmarkPitch : -0.04f;
             horde::vulkan::raytracing::RtSceneStageScope simulationScope(
                 evidenceFrame ? &observation : nullptr,
                 horde::telemetry::RtStage::SimulationStep);
-            gGameSimulation.StepFixed(
-                simulationInput,
-                static_cast<float>(horde::gameplay::simulation::FixedStepRunner::kFixedDeltaSeconds),
-                publishedInput.publicationSequence);
+            if (lanternBenchmark &&
+                horde::gameplay::IsFrozenBenchmark(context.inAppBenchmark.Workload()))
+            {
+                gGameSimulation.AdvanceFrame(
+                    simulationInput, 0.0, publishedInput.publicationSequence);
+            }
+            else if (lanternBenchmark)
+            {
+                gGameSimulation.AdvanceFrame(
+                    simulationInput,
+                    horde::gameplay::simulation::FixedStepRunner::kFixedDeltaSeconds,
+                    publishedInput.publicationSequence);
+            }
+            else
+            {
+                gGameSimulation.StepFixed(
+                    simulationInput,
+                    static_cast<float>(horde::gameplay::simulation::FixedStepRunner::kFixedDeltaSeconds),
+                    publishedInput.publicationSequence);
+            }
             simulationScope.Complete(1u);
             if (context.benchmarkEvidence.Status() ==
                     horde::telemetry::RtBenchmarkRunStatus::Measuring)
@@ -2714,7 +2749,9 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
         PublishSimulationUiState();
         const horde::gameplay::simulation::SimulationSnapshot& renderedSimulation =
             gGameSimulation.Snapshot();
-        const bool benchmarkActive = context.benchmarkSampling || context.inAppBenchmark.IsRunning();
+        const bool benchmarkActive = context.benchmarkSampling ||
+            context.inAppBenchmark.IsRunning() ||
+            gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1;
         gRtLabUnlockEligible.store(
             horde::platform::android::ShouldPersistRtLabUnlock({
                 renderedSimulation.finaleComplete,
@@ -3843,8 +3880,9 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestBenchmark(JNIEnv*, jclass)
     {
         return JNI_FALSE;
     }
-    gInAppBenchmarkCancelRequested.store(false, std::memory_order_release);
     gRequestedBenchmarkRunId.clear();
+    gRequestedBenchmarkWorkload = horde::gameplay::BenchmarkWorkload::ShowcaseRoute;
+    gInAppBenchmarkCancelRequested.store(false, std::memory_order_release);
     gRtLabBenchmarkRoute.store(true, std::memory_order_release);
     gInAppBenchmarkStatus.store(1, std::memory_order_release);
     gInAppBenchmarkRequested.store(true, std::memory_order_release);
@@ -3869,6 +3907,47 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestBenchmarkWithId(
     if (gRuntimeState.load(std::memory_order_acquire) != 1 ||
         gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1) return JNI_FALSE;
     gRequestedBenchmarkRunId = id;
+    gRequestedBenchmarkWorkload = horde::gameplay::BenchmarkWorkload::ShowcaseRoute;
+    gInAppBenchmarkCancelRequested.store(false, std::memory_order_release);
+    gRtLabBenchmarkRoute.store(true, std::memory_order_release);
+    gInAppBenchmarkStatus.store(1, std::memory_order_release);
+    gInAppBenchmarkRequested.store(true, std::memory_order_release);
+    return JNI_TRUE;
+}
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_requestBenchmarkWithIdAndWorkload(
+    JNIEnv* env, jclass, jstring runId, jstring workloadName)
+{
+    if (runId == nullptr || workloadName == nullptr ||
+        env->GetStringUTFLength(runId) < 1 || env->GetStringUTFLength(runId) > 64 ||
+        env->GetStringUTFLength(workloadName) < 1 || env->GetStringUTFLength(workloadName) > 64) {
+        return JNI_FALSE;
+    }
+    const char* runText = env->GetStringUTFChars(runId, nullptr);
+    const char* workloadText = env->GetStringUTFChars(workloadName, nullptr);
+    if (runText == nullptr || workloadText == nullptr) {
+        if (runText != nullptr) env->ReleaseStringUTFChars(runId, runText);
+        if (workloadText != nullptr) env->ReleaseStringUTFChars(workloadName, workloadText);
+        return JNI_FALSE;
+    }
+    const std::string id(runText);
+    const std::string workloadNameUtf8(workloadText);
+    env->ReleaseStringUTFChars(runId, runText);
+    env->ReleaseStringUTFChars(workloadName, workloadText);
+    if (!std::all_of(id.begin(), id.end(), [](const char c) {
+            return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
+                (c >= '0' && c <= '9') || c == '-' || c == '_';
+        })) return JNI_FALSE;
+    horde::gameplay::BenchmarkWorkload workload;
+    if (!horde::gameplay::ParseBenchmarkWorkload(workloadNameUtf8, workload)) {
+        return JNI_FALSE;
+    }
+    std::lock_guard<std::mutex> lock(gReportMutex);
+    if (gRuntimeState.load(std::memory_order_acquire) != 1 ||
+        gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1) return JNI_FALSE;
+    gRequestedBenchmarkRunId = id;
+    gRequestedBenchmarkWorkload = workload;
     gInAppBenchmarkCancelRequested.store(false, std::memory_order_release);
     gRtLabBenchmarkRoute.store(true, std::memory_order_release);
     gInAppBenchmarkStatus.store(1, std::memory_order_release);

@@ -34,4 +34,19 @@ public final class BenchmarkAutomationIntentTest {
         assertThrows(IllegalArgumentException.class, () -> MainActivity.benchmarkAutomationRequestId(
                 new Intent("com.samfa12.hordelanternrt.action.BENCHMARK")));
     }
+
+    @Test public void workloadExtraUsesTheStrictNativeAllowlistAndDefaultsToShowcase() {
+        assertEquals("showcase-route-v1", MainActivity.benchmarkAutomationWorkload(request("valid")));
+        for (String workload : new String[]{"lantern-held-high-v1", "lantern-held-low-v1",
+                "lantern-grazing-v1", "lantern-motion-extreme-v1", "lantern-reveal-sequence-v1"}) {
+            assertEquals(workload, MainActivity.benchmarkAutomationWorkload(
+                    request("valid").putExtra("horde.benchmark.workload", workload)));
+        }
+        for (String workload : new String[]{"", "lantern-held-high", "../escape", "unknown-v1"}) {
+            assertThrows(IllegalArgumentException.class, () -> MainActivity.benchmarkAutomationWorkload(
+                    request("valid").putExtra("horde.benchmark.workload", workload)));
+        }
+        assertThrows(IllegalArgumentException.class, () -> MainActivity.benchmarkAutomationWorkload(
+                request("valid").putExtra("horde.benchmark.workload", 7)));
+    }
 }

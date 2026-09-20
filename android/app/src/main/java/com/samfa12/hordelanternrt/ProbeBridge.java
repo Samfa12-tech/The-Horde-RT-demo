@@ -54,6 +54,7 @@ public final class ProbeBridge {
     public static native boolean requestDebugRouteReplay();
     public static native boolean requestBenchmark();
     public static native boolean requestBenchmarkWithId(String runId);
+    public static native boolean requestBenchmarkWithIdAndWorkload(String runId, String workload);
     public static native void cancelBenchmark();
     public static native int getBenchmarkStatus();
     public static native String getBenchmarkProgress();

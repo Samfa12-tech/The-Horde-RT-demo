@@ -146,6 +146,27 @@ public final class BenchmarkAutomationExportTest {
     }
 
     @Test
+    public void workloadMarkerMustMatchRequestedAllowlistedCase() throws Exception {
+        final File privateReports = temporaryFolder.newFolder("private");
+        final File externalRoot = temporaryFolder.newFolder("external");
+        write(privateReports, "HordeLanternRT-benchmark-latest.json", validJson(RUN_ID, 1, 1, 1, 1, 1));
+        write(privateReports, "HordeLanternRT-benchmark-latest.txt", validText(RUN_ID));
+
+        final BenchmarkAutomationExport.Result mismatch = BenchmarkAutomationExport.export(
+                privateReports, externalRoot, RUN_ID, "lantern-held-high-v1", 2);
+
+        assertFalse(mismatch.successful);
+        assertTrue(mismatch.detail.contains("workload"));
+        try {
+            BenchmarkAutomationExport.export(privateReports, externalRoot,
+                    "invalid-workload", "unknown-case", 2);
+            fail("unknown workload must be rejected before export");
+        } catch (IllegalArgumentException expected) {
+            // expected
+        }
+    }
+
+    @Test
     public void numericFieldsMustBeIntegralAndWithinIntRange() throws Exception {
         final File privateReports = temporaryFolder.newFolder("private");
         final File externalRoot = temporaryFolder.newFolder("external");
@@ -192,13 +213,15 @@ public final class BenchmarkAutomationExportTest {
                 .put("schema", 2)
                 .put("runId", runId)
                 .put("result", "complete")
+                .put("workload", "showcase-route-v1")
                 .put("measuredFrames", measuredFrames)
                 .put("completedFrameEvidence", evidence)
                 .toString();
     }
 
     private static String validText(final String runId) {
-        return "HORDE LANTERN RT - IN-APP BENCHMARK\nRun ID: " + runId + "\n";
+        return "HORDE LANTERN RT - IN-APP BENCHMARK\nRun ID: " + runId +
+                "\nPreset: showcase-route-v1\n";
     }
 
     private static void write(final File directory, final String name, final String value)

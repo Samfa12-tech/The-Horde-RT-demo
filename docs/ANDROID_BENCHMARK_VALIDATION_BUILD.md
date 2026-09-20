@@ -35,3 +35,12 @@ from the accepted source before using it for matched measurements.
 
 Audio/haptic manual revalidation required: **NO** for this packaging lane.
 It does not change runtime events, playback or haptic behavior.
+
+Automation may add the optional `horde.benchmark.workload` string extra to the
+benchmark Intent. It is strictly allowlisted: `showcase-route-v1` (the default),
+`lantern-held-high-v1`, `lantern-held-low-v1`, `lantern-grazing-v1`,
+`lantern-motion-extreme-v1`, or `lantern-reveal-sequence-v1`. The selected
+workload is carried through the native request and must match both exported
+report markers; a wrong or malformed case cannot certify a run.
+Lantern cases retain the same warm-up/measurement contract with 600 frames per
+lap; the default showcase route remains the existing 1,838-frame measured case.

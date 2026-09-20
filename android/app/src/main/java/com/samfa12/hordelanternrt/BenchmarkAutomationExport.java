@@ -42,7 +42,17 @@ public final class BenchmarkAutomationExport {
                                 final File externalFilesRoot,
                                 final String runId,
                                 final int nativeStatus) throws IOException {
+        return export(privateReports, externalFilesRoot, runId,
+                "showcase-route-v1", nativeStatus);
+    }
+
+    public static Result export(final File privateReports,
+                                final File externalFilesRoot,
+                                final String runId,
+                                final String expectedWorkload,
+                                final int nativeStatus) throws IOException {
         validateRunId(runId);
+        validateWorkload(expectedWorkload);
         if (privateReports == null || externalFilesRoot == null) {
             throw new IllegalArgumentException("report and external roots are required");
         }
@@ -65,7 +75,7 @@ public final class BenchmarkAutomationExport {
             final byte[] textBytes = readBounded(textFile, MAX_TEXT_BYTES);
             final String jsonText = decodeUtf8(jsonBytes, JSON_NAME);
             final String reportText = decodeUtf8(textBytes, TEXT_NAME);
-            validateReport(jsonText, reportText, runId, nativeStatus);
+            validateReport(jsonText, reportText, runId, expectedWorkload, nativeStatus);
 
             writeBytes(new File(destination, "benchmark.json"), jsonBytes);
             writeBytes(new File(destination, "benchmark.txt"), textBytes);
@@ -85,6 +95,21 @@ public final class BenchmarkAutomationExport {
         if (runId == null || !RUN_ID_PATTERN.matcher(runId).matches()) {
             throw new IllegalArgumentException("runId must match [A-Za-z0-9_-]{1,64}");
         }
+    }
+
+    private static void validateWorkload(final String workload) {
+        if (!isAllowedWorkload(workload)) {
+            throw new IllegalArgumentException("workload is not an allowlisted benchmark: " + workload);
+        }
+    }
+
+    private static boolean isAllowedWorkload(final String workload) {
+        return "showcase-route-v1".equals(workload) ||
+                "lantern-held-high-v1".equals(workload) ||
+                "lantern-held-low-v1".equals(workload) ||
+                "lantern-grazing-v1".equals(workload) ||
+                "lantern-motion-extreme-v1".equals(workload) ||
+                "lantern-reveal-sequence-v1".equals(workload);
     }
 
     private static void ensureDirectory(final File directory, final String label)
@@ -137,6 +162,7 @@ public final class BenchmarkAutomationExport {
     private static void validateReport(final String jsonText,
                                        final String reportText,
                                        final String runId,
+                                       final String expectedWorkload,
                                        final int nativeStatus)
             throws InvalidReportException, JSONException {
         if (nativeStatus != 2) {
@@ -152,12 +178,18 @@ public final class BenchmarkAutomationExport {
         if (!runId.equals(root.optString("runId", ""))) {
             throw new InvalidReportException("benchmark JSON runId does not match requested run");
         }
+        if (!expectedWorkload.equals(root.optString("workload", ""))) {
+            throw new InvalidReportException("benchmark JSON workload does not match requested workload");
+        }
         if (!"complete".equals(root.optString("result", ""))) {
             throw new InvalidReportException("benchmark JSON result is not complete");
         }
         final String marker = "Run ID: " + runId + "\n";
         if (!reportText.contains(marker)) {
             throw new InvalidReportException("benchmark text Run ID marker does not match requested run");
+        }
+        if (!reportText.contains("Preset: " + expectedWorkload + "\n")) {
+            throw new InvalidReportException("benchmark text workload marker does not match requested workload");
         }
 
         final JSONObject evidence = root.optJSONObject("completedFrameEvidence");
