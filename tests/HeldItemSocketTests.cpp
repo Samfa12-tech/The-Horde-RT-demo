@@ -8,6 +8,7 @@
 #include "vulkan/raytracing/HeldItemBlasMeasurements.h"
 #include "vulkan/raytracing/RtSceneAbi.generated.h"
 #include "vulkan/raytracing/RtStaticMeshSlot.h"
+#include "scene/assets/PlayerPrimitiveContract.h"
 
 #include <algorithm>
 #include <array>
@@ -758,6 +759,36 @@ void TestProductionAssetsShareOneGenericStaticSlot()
     Check(counts.baseColor == 4u && counts.normal == 4u && counts.orm == 4u &&
               counts.emissive == 0u,
           "generic material routing must include the player in audited shared texture array layers");
+    const auto originalMaterials = player.materials;
+    const auto originalPrimitives = player.primitives;
+    std::array<unsigned, 4u> order{{0, 1, 2, 3}};
+    do
+    {
+        std::array<unsigned, 4u> remap{};
+        for (unsigned i = 0; i < order.size(); ++i)
+        {
+            player.materials[i] = originalMaterials[order[i]];
+            remap[order[i]] = i;
+        }
+        player.primitives = originalPrimitives;
+        for (auto& primitive : player.primitives) primitive.materialIndex = remap[primitive.materialIndex];
+        const bool initialized = slot.Initialize(registrations, diagnostic);
+        Check(initialized, "all player material orders must register");
+        if (!initialized) continue;
+        const auto materialBase = sword.materials.size() + torch.materials.size();
+        for (std::size_t i = 0; i < player.materials.size(); ++i)
+        {
+            const auto* part = horde::scene::assets::FindPlayerPrimitiveContract(player.materials[i].name);
+            Check(part != nullptr, "loaded player material must have a named contract");
+            if (!part) continue;
+            const std::uint32_t expected = part->textureGroup == horde::scene::assets::PlayerTextureGroup::Body ? 2u : 3u;
+            Check(slot.Materials()[materialBase + i].textureLayers ==
+                      std::array<std::uint32_t, 4u>{{expected, expected, expected, 0u}},
+                  "actual player body and gauntlet map to generated atlas layers regardless of order");
+        }
+        Check(slot.TextureArrayCounts().baseColor == 4u && slot.TextureArrayCounts().normal == 4u &&
+                  slot.TextureArrayCounts().orm == 4u, "reordered player cannot grow texture allocations");
+    } while (std::next_permutation(order.begin(), order.end()));
 }
 
 void TestProductionSocketsMatchSharedFixedStepContracts()

@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <map>
 #include <unordered_map>
 
 namespace horde::vulkan::raytracing
@@ -117,8 +118,39 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
         vertices_.insert(vertices_.end(), asset.vertices.begin(), asset.vertices.end());
         indices_.insert(indices_.end(), asset.indices.begin(), asset.indices.end());
         std::array<std::unordered_map<std::int32_t, std::uint32_t>, 4u> textureRoutes;
-        std::array<std::uint32_t, 4u> playerSharedLayers{};
-        bool playerSharedLayersInitialised = false;
+        // Explicit asset-local groups are allocated canonically before the
+        // ordinary per-texture routes. Visibility-only material duplication
+        // cannot exchange body/gauntlet atlas layers by changing material order.
+        std::map<std::int32_t, std::array<bool, 4u>> groupPresence;
+        std::map<std::int32_t, std::array<std::uint32_t, 4u>> groupLayers;
+        for (const auto& material : asset.materials)
+        {
+            if (material.textureGroup < 0) continue;
+            const std::array<bool, 4u> present{{material.baseColorTexture >= 0,
+                material.normalTexture >= 0, material.ormTexture >= 0, material.emissiveTexture >= 0}};
+            const auto [entry, inserted] = groupPresence.try_emplace(material.textureGroup, present);
+            if (!inserted && entry->second != present)
+            {
+                diagnostic = "RtStaticMeshSlot texture group has conflicting texture presence.";
+                return false;
+            }
+        }
+        constexpr std::array<const char*, 4u> categoryNames{{"baseColor", "normal", "ORM", "emissive"}};
+        for (const auto& [group, present] : groupPresence)
+        {
+            auto& layers = groupLayers[group];
+            for (std::size_t category = 0; category < layers.size(); ++category)
+            {
+                if (!present[category]) continue;
+                if (nextTextureLayers[category] >= kRtTextureLayerCapacity)
+                {
+                    diagnostic = std::string("RtStaticMeshSlot capacity overflow: ") +
+                        categoryNames[category] + " texture layers exceed 16.";
+                    return false;
+                }
+                layers[category] = nextTextureLayers[category]++;
+            }
+        }
         const auto routeTexture = [&textureRoutes, &nextTextureLayers, &diagnostic](
             std::size_t category,
             std::int32_t sourceTexture,
@@ -147,16 +179,9 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
         for (const auto& sourceMaterial : asset.materials)
         {
             std::array<std::uint32_t, 4u> layers{};
-            const bool playerVisibilityMaterial =
-                sourceMaterial.name == "BodyPrimaryVisible" ||
-                sourceMaterial.name == "HeadPrimaryMasked" ||
-                sourceMaterial.name == "NearFacePrimaryMasked";
-            if (playerVisibilityMaterial && playerSharedLayersInitialised)
+            if (sourceMaterial.textureGroup >= 0)
             {
-                // The audited runtime player duplicates material records only
-                // to carry primary-ray visibility semantics; all three records
-                // intentionally reference the same PBR image payloads.
-                layers = playerSharedLayers;
+                layers = groupLayers.at(sourceMaterial.textureGroup);
             }
             else
             {
@@ -165,11 +190,6 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
                     !routeTexture(2u, sourceMaterial.ormTexture, "ORM", layers[2]) ||
                     !routeTexture(3u, sourceMaterial.emissiveTexture, "emissive", layers[3]))
                     return false;
-                if (playerVisibilityMaterial)
-                {
-                    playerSharedLayers = layers;
-                    playerSharedLayersInitialised = true;
-                }
             }
             materials_.push_back(ConvertMaterial(sourceMaterial, layers));
         }

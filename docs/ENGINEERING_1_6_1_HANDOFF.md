@@ -79,9 +79,10 @@ build, benchmark or worker remains active.
 1. **Continue Phase 2:** the [typed contract and loader enforcement](ENGINEERING_1_6_1_PLAYER_CONTRACT_2026-09-20.md)
    now cover Body/Head/NearFace/Gauntlet, synchronize both manifests, and pass 5/5
    targeted MSVC Release tests. Static/skinned loaders enforce actual named parts;
-   production player loading requires the declaration. Next replace implicit
-   first-seen texture allocation in `RtStaticMeshSlot.cpp`, add texture/skinned
-   malformed fixtures, regenerate cleanly and validate GCC/MSVC/Android.
+   production player loading requires the declaration. The next texture-group
+   slice passes 4/4 MSVC tests, including all 24 actual-player material orders and
+   generated Body/Gauntlet atlas mapping. Next add skinned malformed fixtures,
+   regenerate cleanly and validate GCC/MSVC/Android.
    Preserve primary masking of Head/NearFace. Phase 2 is not complete.
 2. Dedicated real-geometry RT viewmodel/world-body ownership remains unimplemented.
    Keep gameplay-owned IK/grip authority and independent small dynamic resources;

@@ -278,6 +278,39 @@ void TestGenericRegistrationAndMeasurements()
           "resource measurements use literal ABI sizes and descriptor count");
 }
 
+void TestExplicitTextureGroups()
+{
+    using namespace horde::vulkan::raytracing;
+    auto asset = MakeAsset(4u, 4u);
+    // Groups are generic asset metadata, not string branches or material indices.
+    for (std::size_t i = 0; i < asset.materials.size(); ++i)
+    {
+        auto& material = asset.materials[i];
+        material.textureGroup = i == 0 ? 1 : 0;
+        material.baseColorTexture = static_cast<std::int32_t>(i);
+        material.normalTexture = static_cast<std::int32_t>(i + 4);
+    }
+    const StaticRtAssetRegistration request{3u, 1u, 1u, 0u, &asset};
+    RtStaticMeshSlot slot;
+    std::string diagnostic;
+    Check(slot.Initialize(std::span(&request, 1), diagnostic), "explicit texture groups initialize");
+    Check(slot.Materials()[0].textureLayers == std::array<std::uint32_t, 4u>{{1u, 1u, 0u, 0u}} &&
+              slot.Materials()[3].textureLayers == std::array<std::uint32_t, 4u>{{0u, 0u, 0u, 0u}},
+          "canonical group order overrides first encountered material");
+    asset.materials[2].normalTexture = -1;
+    Check(!slot.Initialize(std::span(&request, 1), diagnostic) &&
+              diagnostic == "RtStaticMeshSlot texture group has conflicting texture presence.",
+          "grouped materials cannot silently disagree on texture presence");
+    asset.materials[2].normalTexture = 6;
+    auto preceding = MakeAsset(1u, 15u);
+    for (std::size_t i = 0; i < preceding.materials.size(); ++i)
+        preceding.materials[i].baseColorTexture = static_cast<std::int32_t>(i);
+    const std::array<StaticRtAssetRegistration, 2> registrations{{{1u, 2u, 1u, 0u, &preceding}, request}};
+    Check(!slot.Initialize(registrations, diagnostic) &&
+              diagnostic == "RtStaticMeshSlot capacity overflow: baseColor texture layers exceed 16.",
+          "canonical groups still enforce bounded texture capacity");
+}
+
 void TestNamedCapacityFailures()
 {
     using namespace horde::vulkan::raytracing;
@@ -351,6 +384,7 @@ int main()
     TestAbiLayout();
     TestGeneratedConstants();
     TestGenericRegistrationAndMeasurements();
+    TestExplicitTextureGroups();
     TestNamedCapacityFailures();
     TestTextureArrayCapacities();
     if (failures != 0)

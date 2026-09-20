@@ -246,6 +246,7 @@ StaticMaterial ConvertMaterial(const cgltf_data& data,
     if (result.transmissionFactor > 0.0f) result.flags |= 4u;
     if (const auto* playerPart = FindPlayerPrimitiveContract(result.name))
     {
+        result.textureGroup = static_cast<std::int32_t>(playerPart->textureGroup);
         // Preserve the existing CPU/GLSL bits; semantic lookup is name-based.
         if (playerPart->semantic == PlayerPrimitiveSemantic::Head) result.flags |= 128u;
         if (playerPart->semantic == PlayerPrimitiveSemantic::NearFace) result.flags |= 256u;

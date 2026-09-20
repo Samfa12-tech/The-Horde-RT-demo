@@ -27,4 +27,9 @@ foreach ($file in @('asset.manifest.json', 'clip-manifest.json')) {
         }
     }
 }
-Write-Output 'Player runtime/clip manifests agree with the four-way visibility contract.'
+$atlas = Get-Content -LiteralPath (Join-Path $repoRoot 'assets/textures/props/runtime/asset.manifest.json') -Raw | ConvertFrom-Json
+if ($atlas.layerOrder[2] -cne 'gothic-traveller-lod0' -or
+    $atlas.layerOrder[3] -cne 'gothic-traveller-lod0.GauntletPrimaryVisible') {
+    throw 'Generated production atlas must match tested Body/Gauntlet layers after sword/torch'
+}
+Write-Output 'Player runtime/clip manifests and generated atlas order agree with the four-way contract.'

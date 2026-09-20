@@ -60,6 +60,9 @@ struct StaticMaterial
     std::int32_t normalTexture = -1;
     std::int32_t ormTexture = -1;
     std::int32_t emissiveTexture = -1;
+    // Optional asset-local texture group. Groups allocate in ascending ID order,
+    // independent of GLB material order; -1 retains generic texture-index routing.
+    std::int32_t textureGroup = -1;
     std::uint32_t flags = 0u;
 };
 

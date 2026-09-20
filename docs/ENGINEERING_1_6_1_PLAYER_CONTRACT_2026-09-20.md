@@ -53,10 +53,31 @@ CTest working directory is now the source directory. Final targeted run passes
 skinned-character smoke. This is host validation, not new phone/visual evidence.
 No asset binary or shader was regenerated in this slice.
 
+## Third slice: explicit texture groups
+
+`StaticMaterial` now carries an optional asset-local texture group, assigned by
+the shared player contract. `RtStaticMeshSlot` allocates groups in canonical order
+before ordinary ungrouped texture routes; it no longer branches on player material
+names or adopts whichever visibility material was encountered first. Body/head/
+near-face share Body; gauntlets use Gauntlet. Inconsistent texture presence within
+a group and capacity overflow reject initialization. This is CPU load-time metadata,
+not a change to the GPU material ABI or frame loop.
+
+Fresh MSVC Release build and **4/4** targeted CTests pass (4.86 seconds): manifest
+agreement, held-item sockets, scene ABI and static glTF. The actual loaded player
+was tested in all 24 material orders with primitive references remapped: body
+remains atlas layer 2 and gauntlet layer 3 after sword/torch, with unchanged counts.
+The tracked generated atlas manifest is checked against that mapping. Generic
+ungrouped texture routing and existing capacity tests remain passing.
+
+This fixes player material-order dependence, not global asset-registration order:
+the production registration list still follows the generated shared atlas order.
+Atlas image contents and clean regeneration remain part of the open phase gate;
+no new shader, asset binary, phone performance or visual pass is claimed here.
+
 ## Remaining gate
 
-Replace first-seen texture allocation with explicit named groups; exercise real
-texture permutations and skinned malformed fixtures; regenerate into a clean
+Exercise skinned malformed fixtures; regenerate into a clean
 validation destination from existing licensed sources; verify generated agreement
 and GCC/MSVC. The current host checks do not establish generated-asset agreement
 or a fresh GCC/Android pass. Phase 2 remains open.
