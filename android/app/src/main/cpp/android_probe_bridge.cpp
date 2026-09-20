@@ -2114,6 +2114,15 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             {
                 gGameSimulation.AdvanceFrame(simulationInput, 0.0, publishedInput.publicationSequence);
             }
+            else if (lanternBenchmark)
+            {
+                // Match the candidate's live-reveal fixed-step runner bookkeeping
+                // as well as its gameplay state. The historical route stays below.
+                gGameSimulation.AdvanceFrame(
+                    simulationInput,
+                    horde::gameplay::simulation::FixedStepRunner::kFixedDeltaSeconds,
+                    publishedInput.publicationSequence);
+            }
             else
             {
                 gGameSimulation.StepFixed(

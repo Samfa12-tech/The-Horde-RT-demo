@@ -52,7 +52,7 @@ $env:HORDE_VALIDATION_UNSIGNED = '1'
 .\gradlew.bat -PhordeSourceBaseline=true :app:assembleBaseline `
   :app:testBaselineUnitTest --tests com.samfa12.hordelanternrt.BaselineBenchmarkIntentPolicyTest
 # After exact package proof and an authorised install, using the verified device:
-adb -s VERIFIED_SERIAL shell am start -W --user 0 `
+adb -s VERIFIED_SERIAL shell am start -S -W --user 0 `
   -n com.samfa12.hordelanternrt.baseline/com.samfa12.hordelanternrt.MainActivity `
   -a com.samfa12.hordelanternrt.action.BASELINE_BENCHMARK `
   --es horde.benchmark.workload lantern-held-high-v1
@@ -66,6 +66,19 @@ zero-delta/fixed-step advancement and cancellation cleanup remain on the owning
 render thread. The final measurement frame cannot grant the gameplay finale
 unlock. A completed/cancelled benchmark no longer owns the scene and therefore
 cannot reset later gameplay on Home.
+
+Use the explicit fresh-process `-S` launch for both sides of a matched comparison.
+Without it Android may merely bring an existing task forward without delivering
+the action again; a visible running process is not proof the new workload began.
+Confirm the workload HUD or its new completed report/timestamp. Never restart
+solely because `am start -W` timed out while the actual run is still alive.
+This launch stops only the isolated test package, never the stable game.
+
+The live reveal uses `AdvanceFrame(1/60)`, matching candidate runner bookkeeping
+as well as gameplay state; frozen cases use `AdvanceFrame(0)`. The old route's
+direct `StepFixed` path is unchanged. This alignment supersedes the first harness
+build's direct live-reveal `StepFixed`; its frozen held-high data remains bound
+to the earlier exact artifact, not transferred to a rebuilt APK.
 
 This deliberately reuses the original report UI and COPY/SAVE facility; there
 is no new baseline report exporter or modern completion telemetry. Capture the
@@ -86,9 +99,22 @@ validation/disassembly. The old generic module has 56,191 words/32 atomics/3
 ray-query initialization sites; legacy has 123,311 words/5 atomics/23 sites.
 Those diagnostic atomics are deliberately preserved for an honest 1.6.0 baseline.
 
-Real RT presentation, interrupted-scene cleanup and device measurement remain
-pending. Build/test existence is not a phone or performance pass. Publication
-and production signing are not authorised.
+Source `84104e3` APK
+`5f92533a75a9079ac6892b7c8f89781896bdcb9420c124023139036c29c4fee2`
+was installed and pulled back byte-identically on SM-S948B. Real held-high RT
+presentation, Home interruption and restoration to normal spawn/torch were
+observed. Two complete frozen held-high runs at 100%/1440x2980 measured
+134.387/134.578 ms medians. The candidate pair measured 130.6903/130.5626 ms;
+whole-run thermal context and the −2.87% descriptive mean-of-medians difference
+do not isolate a causal optimization. The engineering branch's
+`docs/ENGINEERING_1_6_1_LANTERN_ABBA_2026-09-20.md` carries the complete evidence.
+
+After that measurement, live-reveal runner alignment was rebuilt across four
+ABIs and the three policy tests passed afresh. Package proof also passed for
+APK `4cbd08c2d57314697b01284ccb31b8af1cba4d99e79915356c7104e0535a3461`.
+That later APK is **not installed or device-certified**; do not transfer the
+earlier APK's numbers to it. Actual live reveal and other baseline case timing
+remain open. Publication and production signing are not authorised.
 
 Audio/haptic manual revalidation required: **NO** for this shared measurement
 core. Normal gameplay feedback and assets are unchanged; platform wiring must
