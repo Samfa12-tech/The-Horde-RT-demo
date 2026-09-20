@@ -32,8 +32,8 @@ This is merge review, not compiler, hardware or release acceptance.
 
 | Finding | Status |
 | --- | --- |
-| PR conflicts hide current compiler checks | Documentation reconciliation prepared; remote mergeability and fresh jobs still to verify |
-| Portable lane excludes actual skinned smoke/fixtures | Focused CI coverage being added; not yet a passing job |
+| PR conflicts hide current compiler checks | Main reconciled in merge commit `d3a7225`; exact branch-push trigger added; remote mergeability and fresh jobs still to verify |
+| Portable lane excludes actual skinned smoke/fixtures | Vulkan-enabled Ubuntu GCC CPU-host lane added for eight focused tests, with required LFS assets and no-tests rejection; not yet a passing job |
 | Phase 2 generated-runtime admission | Open; repeatable single-thread artifact differs in vertex ordering/tangents and has not replaced the accepted runtime |
 | Phase 1 measurement foundation | Accepted; not being restarted |
 | Dedicated viewmodel, glass/backend parity, music/reporting and final matrix | Remain in scope and incomplete |

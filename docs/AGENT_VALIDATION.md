@@ -29,6 +29,14 @@ ctest --test-dir build/host-ci --build-config Release --output-on-failure
 
 This covers non-hardware shared tests, not Vulkan presentation or phone behaviour. Use CTest selection for an affected subset when appropriate; report the actual selection and result instead of hard-coding a test count.
 
+The same workflow also runs on pushes to `codex/horde-1.6.1-engineering-pass`, so
+PR merge conflicts cannot suppress all current-source compiler coverage. Its
+`player-vulkan-host` lane enables Vulkan targets with the Ubuntu development
+package and builds/runs the focused player contracts, actual skinned-player smoke
+and malformed/reordered GLB fixtures. The tests do not create a Vulkan device:
+SDK-enabled host compilation is **not** physical RT presentation, backend image
+parity or Android-device acceptance. Keep the portable lane as separate coverage.
+
 Windows configure/build/test presets are in `CMakePresets.json`:
 
 ```powershell
