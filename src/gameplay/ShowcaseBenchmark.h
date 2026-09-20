@@ -47,6 +47,7 @@ struct ShowcaseBenchmarkStatistics
 
 struct ShowcaseBenchmarkMetadata
 {
+    std::string runId;
     std::string timestampUtc;
     std::string buildIdentity;
     std::string shaderIdentity;

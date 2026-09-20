@@ -197,6 +197,7 @@ struct SwapchainContext
     horde::gameplay::ShowcaseRouteReplay routeReplay;
     bool routeReplayActive = false;
     horde::gameplay::ShowcaseBenchmarkRun inAppBenchmark;
+    std::string benchmarkRunId;
     horde::telemetry::RtBenchmarkEvidenceRun benchmarkEvidence;
     std::optional<std::size_t> benchmarkExpectedFrame;
     std::string reportDirectory;
@@ -215,6 +216,8 @@ std::string gLatestJsonReport;
 std::string gLatestDeveloperOverlayText;
 std::string gLatestBenchmarkReport;
 std::string gLatestBenchmarkProgress;
+// Request identity shares the report mutex; it is not a frame/submission counter.
+std::string gRequestedBenchmarkRunId;
 horde::gameplay::simulation::GameSimulation gGameSimulation;
 horde::gameplay::simulation::InputMailbox gInputMailbox;
 std::mutex gInputPublisherMutex;
@@ -692,6 +695,7 @@ std::string UtcTimestamp()
 horde::gameplay::ShowcaseBenchmarkMetadata BuildBenchmarkMetadata(const SwapchainContext& context)
 {
     horde::gameplay::ShowcaseBenchmarkMetadata metadata;
+    metadata.runId = context.benchmarkRunId;
     metadata.timestampUtc = UtcTimestamp();
     metadata.buildIdentity = HORDE_RT_BUILD_ID;
     metadata.shaderIdentity = context.rtScene.SelectedPipelineBundleIdentity();
@@ -842,6 +846,7 @@ void StartInAppBenchmark(SwapchainContext& context)
     {
         std::lock_guard<std::mutex> lock(gReportMutex);
         gLatestBenchmarkReport.clear();
+        context.benchmarkRunId = std::move(gRequestedBenchmarkRunId);
         gLatestBenchmarkProgress = context.inAppBenchmark.ProgressText();
     }
     gInAppBenchmarkStatus.store(1, std::memory_order_release);
@@ -3832,11 +3837,38 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestDebugRouteReplay(JNIEnv*, jcl
 extern "C" JNIEXPORT jboolean JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_requestBenchmark(JNIEnv*, jclass)
 {
+    std::lock_guard<std::mutex> lock(gReportMutex);
     if (gRuntimeState.load(std::memory_order_acquire) != 1 ||
         gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1)
     {
         return JNI_FALSE;
     }
+    gInAppBenchmarkCancelRequested.store(false, std::memory_order_release);
+    gRequestedBenchmarkRunId.clear();
+    gRtLabBenchmarkRoute.store(true, std::memory_order_release);
+    gInAppBenchmarkStatus.store(1, std::memory_order_release);
+    gInAppBenchmarkRequested.store(true, std::memory_order_release);
+    return JNI_TRUE;
+}
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_requestBenchmarkWithId(
+    JNIEnv* env, jclass, jstring runId)
+{
+    if (runId == nullptr || env->GetStringUTFLength(runId) < 1 ||
+        env->GetStringUTFLength(runId) > 64) return JNI_FALSE;
+    const char* text = env->GetStringUTFChars(runId, nullptr);
+    if (text == nullptr) return JNI_FALSE;
+    const std::string id(text);
+    env->ReleaseStringUTFChars(runId, text);
+    if (!std::all_of(id.begin(), id.end(), [](const char c) {
+            return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
+                (c >= '0' && c <= '9') || c == '-' || c == '_';
+        })) return JNI_FALSE;
+    std::lock_guard<std::mutex> lock(gReportMutex);
+    if (gRuntimeState.load(std::memory_order_acquire) != 1 ||
+        gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1) return JNI_FALSE;
+    gRequestedBenchmarkRunId = id;
     gInAppBenchmarkCancelRequested.store(false, std::memory_order_release);
     gRtLabBenchmarkRoute.store(true, std::memory_order_release);
     gInAppBenchmarkStatus.store(1, std::memory_order_release);

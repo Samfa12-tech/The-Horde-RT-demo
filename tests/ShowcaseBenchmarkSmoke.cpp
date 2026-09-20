@@ -59,6 +59,7 @@ int main()
     ShowcaseBenchmarkMetadata metadata;
     metadata.timestampUtc = "2026-07-17T00:00:00Z";
     metadata.buildIdentity = "smoke";
+    metadata.runId = "automation-abc";
     metadata.shaderIdentity = "shader";
     metadata.gpuName = "test gpu";
     metadata.vulkanApi = "1.4.0";
@@ -70,6 +71,9 @@ int main()
     check(text.find("Integrity: COMPLETE") != std::string::npos, "text report must expose integrity result");
     check(text.find("Laps completed: 2/2") != std::string::npos, "text report must expose lap count");
     check(json.find("\"result\": \"complete\"") != std::string::npos, "JSON report must expose integrity result");
+    check(text.find("Run ID: automation-abc\n") != std::string::npos &&
+              json.find("\"runId\": \"automation-abc\"") != std::string::npos,
+          "text and JSON must identify the exact automation request, not an older report");
     horde::telemetry::RtBenchmarkEvidenceRun unarmedEvidence;
     check(unarmedEvidence.Start(ShowcaseBenchmarkRun::kMaximumFramesPerLap),
           "report fixture must allocate an unarmed evidence run");

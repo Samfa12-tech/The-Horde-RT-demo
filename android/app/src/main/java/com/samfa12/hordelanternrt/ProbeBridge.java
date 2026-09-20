@@ -53,6 +53,7 @@ public final class ProbeBridge {
     public static native boolean requestDebugCaptureCheckpoint(int checkpointId);
     public static native boolean requestDebugRouteReplay();
     public static native boolean requestBenchmark();
+    public static native boolean requestBenchmarkWithId(String runId);
     public static native void cancelBenchmark();
     public static native int getBenchmarkStatus();
     public static native String getBenchmarkProgress();

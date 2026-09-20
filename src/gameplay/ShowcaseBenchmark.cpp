@@ -258,6 +258,7 @@ std::string ShowcaseBenchmarkRun::BuildTextReport(const ShowcaseBenchmarkMetadat
         << "====================================\n"
         << "Integrity: " << (complete ? "COMPLETE" : "INVALID") << '\n'
         << "Status: " << ShowcaseBenchmarkStatusName(status_) << '\n'
+        << "Run ID: " << metadata.runId << '\n'
         << "Timestamp (UTC): " << metadata.timestampUtc << '\n'
         << "Build: " << metadata.buildIdentity << '\n'
         << "Shader: " << metadata.shaderIdentity << '\n'
@@ -318,6 +319,7 @@ std::string ShowcaseBenchmarkRun::BuildJsonReport(const ShowcaseBenchmarkMetadat
         << "  \"routeTraversalComplete\": " << (Passed() ? "true" : "false") << ",\n"
         << "  \"legacyFrameTimingScope\": \"" << JsonEscape(metadata.legacyFrameTimingScope) << "\",\n"
         << "  \"status\": \"" << ShowcaseBenchmarkStatusName(status_) << "\",\n"
+        << "  \"runId\": \"" << JsonEscape(metadata.runId) << "\",\n"
         << "  \"timestampUtc\": \"" << JsonEscape(metadata.timestampUtc) << "\",\n"
         << "  \"build\": \"" << JsonEscape(metadata.buildIdentity) << "\",\n"
         << "  \"shader\": \"" << JsonEscape(metadata.shaderIdentity) << "\",\n"
