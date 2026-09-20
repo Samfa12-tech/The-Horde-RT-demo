@@ -98,6 +98,19 @@ No production signing, installation or device run occurred. Local log:
 `reports/phase2-android-native-build.log`. Later changes in this slice are host
 test-only, not a new Android renderer build or physical-phone certification.
 
+## Clean regeneration investigation
+
+The asset-production skill's source/provenance safeguards guided a new-output-only
+rebuild using existing licensed inputs; no paid generation or source replacement.
+Default parallel Blender export was not byte-repeatable. Four single-threaded
+exports across two pairs matched `e8737f10…450fd`; the new
+`tools/validate-player-regeneration.ps1` records input hashes and requires two
+matching outputs in a new directory. [Full evidence and remaining admission
+boundary](evidence/2026-09-20-player-regeneration/README.md).
+This is not byte identity with the older tracked GLB: unique vertex order and a few
+tangent components differ. Indexed position/normal/UV/joint/weight values agree;
+the generated slot loads, but no regenerated asset was promoted or visually accepted.
+
 ## Remaining gate
 
 Complete clean-regeneration reconciliation and generated-asset admission; obtain

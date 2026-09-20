@@ -13,7 +13,7 @@ models, redeem credits or shrink the goal. Before pausing, preserve a current
 handoff and safely commit/push task-owned work without credentials, unrelated
 files, force-push or release publication; verify the remote SHA. Keep GitHub
 current after subsequent coherent, reviewed slices rather than waiting for 5%.
-The latest September 20 check reported 7% weekly remaining, so it did not trigger a pause.
+The latest September 20 check reported 6% weekly remaining, so it did not trigger a pause.
 
 ## Accepted work and current boundaries
 
@@ -81,8 +81,12 @@ build, benchmark or worker remains active.
    targeted MSVC Release tests. Static/skinned loaders enforce actual named parts;
    production player loading requires the declaration. The next texture-group
    slice passes 4/4 MSVC tests, including all 24 actual-player material orders and
-   generated Body/Gauntlet atlas mapping. Next add skinned malformed fixtures,
-   regenerate cleanly and validate GCC/MSVC/Android.
+   generated Body/Gauntlet atlas mapping. Actual skinned malformed/reordered
+   fixtures now pass 2/2 with the full smoke; unsigned Shipping/Mobile Android
+   build at `ef8fdc0` passed all four ABIs, not installed. Single-threaded clean
+   regeneration is repeatable but differs in vertex order/tiny tangent rounding
+   from the tracked GLB. See the [reproducibility receipt](evidence/2026-09-20-player-regeneration/README.md).
+   Next validate generated-runtime admission, fresh GCC/CI and affected RT images.
    Preserve primary masking of Head/NearFace. Phase 2 is not complete.
 2. Dedicated real-geometry RT viewmodel/world-body ownership remains unimplemented.
    Keep gameplay-owned IK/grip authority and independent small dynamic resources;

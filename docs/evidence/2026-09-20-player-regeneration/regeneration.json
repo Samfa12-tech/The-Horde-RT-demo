@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "blender": [
+    "Blender 5.2.0 LTS",
+    "\tbuild date: 2026-07-14",
+    "\tbuild time: 01:35:40",
+    "\tbuild commit date: 2026-07-13",
+    "\tbuild commit time: 15:20",
+    "\tbuild hash: fbe6228777e7",
+    "\tbuild branch: blender-v5.2-release",
+    "\tbuild platform: Windows",
+    "\tbuild type: Release",
+    "\tbuild c flags:  /W3 -Werror=implicit-function-declaration -Werror=return-type -Wno-tautological-compare -Wno-unknown-pragmas -Wno-char-subscripts -Wstrict-prototypes -Wmissing-prototypes -Wunused-parameter -Wundef -Wundef-prefix -Werror=unguarded-availability-new /DWIN32 /D_WINDOWS /MP /nologo /J /Gy /Gd /showFilenames -Wno-unused-command-line-argument -Wno-microsoft-enum-forward-reference /clang:-funsigned-char /clang:-fno-strict-aliasing /clang:-ffp-contract=off -march=x86-64-v2 ",
+    "\tbuild c++ flags:  /W3 -Wno-tautological-compare -Wno-unknown-pragmas -Wno-char-subscripts -Wno-overloaded-virtual -Wno-sign-compare -Wno-invalid-offsetof -Wno-suggest-override -Wundef -Wundef-prefix -Wunused-parameter -Wmismatched-tags -Werror=unguarded-availability-new /DWIN32 /D_WINDOWS /EHsc  /Gy /MP /nologo /J /Gd /showFilenames /EHsc -Wno-unused-command-line-argument -Wno-microsoft-enum-forward-reference /clang:-funsigned-char /clang:-fno-strict-aliasing /clang:-ffp-contract=off -march=x86-64-v2 ",
+    "\tbuild link flags: /MACHINE:X64  /SUBSYSTEM:CONSOLE /STACK:2097152 /ignore:4049 /ignore:4217 /ignore:4221",
+    "\tbuild system: CMake"
+  ],
+  "threads": 1,
+  "inputs": [
+    {
+      "path": "tools/process-player-rig-runtime.py",
+      "sha256": "1ae0992c027d204bbb2f808d7a21ebd24643b8147f268424087ff617d8c36286"
+    },
+    {
+      "path": "assets/models/player/source/meshy-2026-08-26-gothic-traveller-candidate-2/player-rigged.glb",
+      "sha256": "083adf4f86716155fc25ee1bb2f2966b513ceac6b6f3178374218e85b2295e00"
+    },
+    {
+      "path": "assets/models/player/source/meshy-2026-08-26-gothic-traveller-candidate-2/player-walking.glb",
+      "sha256": "1a8faa6667300da04e7088ee8e5bcae5506280fe259de33b6796a87f85a19d67"
+    },
+    {
+      "path": "assets/models/player/source/meshy-2026-08-30-viewmodel-gauntlet/right-gauntlet-5k-stripped.glb",
+      "sha256": "228e364d82075d7a7ae6e275bb463bc9e73021be83fed4d088734e424f66d400"
+    },
+    {
+      "path": "assets/textures/player/source/base-color.png",
+      "sha256": "902fa74f126635cb2aa2b2d44bcfb009e859b6a48d301a6e5a7e7cf9614c18f9"
+    },
+    {
+      "path": "assets/textures/player/source/emissive.png",
+      "sha256": "4e4123eaae2d93bf6249da62db754233caa860e1f9bc55b09eb10b64023dc076"
+    },
+    {
+      "path": "assets/textures/player/source/metallic.png",
+      "sha256": "0d7a99502d7ec6a622e6d8581d9edb403b99a53208e6e122f99c1c6e1d420e54"
+    },
+    {
+      "path": "assets/textures/player/source/normal.png",
+      "sha256": "b8d579b41178a55a3a6980f167204aed8e5139e5aef1b1b64f3bb39a26aa28fe"
+    },
+    {
+      "path": "assets/textures/player/source/orm.png",
+      "sha256": "472735ab5aa251dc755ea03e2336b3fd3e307e55f7ec9c402dc8ad8c8f7efd33"
+    },
+    {
+      "path": "assets/textures/player/source/roughness.png",
+      "sha256": "bf5530a3ef56e682f6c018d6d4b2debbc949bcb8cabd2c190e81f4471afe6b53"
+    }
+  ],
+  "outputs": [
+    {
+      "file": "attempt-1.glb",
+      "bytes": 3058292,
+      "sha256": "e8737f10e7669b284e04109d9c3acdf537df284093a21511656bf191a70450fd"
+    },
+    {
+      "file": "attempt-2.glb",
+      "bytes": 3058292,
+      "sha256": "e8737f10e7669b284e04109d9c3acdf537df284093a21511656bf191a70450fd"
+    }
+  ],
+  "byteRepeatable": true,
+  "scope": "Offline regeneration only. Does not replace runtime assets or prove visual/device acceptance."
+}
