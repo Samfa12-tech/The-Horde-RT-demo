@@ -26,9 +26,10 @@ set is complete. It does not authorise publication or relax any RT requirement.
   staged Shipping/High Windows run retained all 1,838 CPU/GPU completions and
   exited0; [route evidence](ENGINEERING_1_6_1_ROUTE_EVIDENCE_2026-09-13.md) records
   its exact artifact and limitations. Android native route integration (`f46de7a`)
-  passed a targeted four-ABI Debug build; Android unattended Release export and
-  matched A/B remain open. This does not close the original observability phase
-  or final matrix.
+  passed a targeted four-ABI Debug build. Android unattended Release export
+  (`2961ad0`, `e856161`) now has [native build and unit-test evidence](ANDROID_RELEASE_BENCHMARK_AUTOMATION_2026-09-20.md),
+  but still needs exact-APK device acceptance. Clean matched A/B remains open;
+  this does not close the original observability phase or final matrix.
 - Hardware RayQuery native integration was accepted at `99b8565`, after shader,
   provider and capability prerequisites. [Targeted backend evidence](ENGINEERING_1_6_1_RAYQUERY_BACKEND_2026-09-13.md)
   records Windows and exact SM-S948B functional/lifecycle checks. Exact S24/S25
