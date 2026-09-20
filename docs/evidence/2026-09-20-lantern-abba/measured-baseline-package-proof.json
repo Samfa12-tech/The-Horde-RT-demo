@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "baseSource": "57c81b635a6c10e2772283639026936adac80f8b",
+  "apkSha256": "5f92533a75a9079ac6892b7c8f89781896bdcb9420c124023139036c29c4fee2",
+  "arm64Sha256": "c18d06f154ef31c53879b54771453981f61ff3ab4ada2565825226d93cd6ed8d",
+  "nativeMode": "RelWithDebInfo",
+  "checkpoints": "OFF",
+  "developmentSigned": true,
+  "debuggable": false,
+  "identicalPublishedAssetCount": 51,
+  "shaders": [
+    {
+      "name": "MinimalRayGenShader",
+      "words": 56191,
+      "sha256": "e9d4fca05e8c642b6e09251a7c57253124fa6475ab5f81e34d1acb548764c23a",
+      "headerSha256": "d0c8cccea28d6c4deb02256dd4be0e828416a1f4087d64dc505bcacb0485fa56",
+      "atomics": 32,
+      "rayQueryInitializations": 3,
+      "spirvVal": "passed",
+      "spirvDis": "passed"
+    },
+    {
+      "name": "MinimalLegacyRayGenShader",
+      "words": 123311,
+      "sha256": "870e4ea0c0b24fdcac516fec15343c1531906600d8ec28c9eaebf826a7bd75a0",
+      "headerSha256": "100109525677b2d6b3327cecd1128ecd999bf556d46c30f9c1c925d0349e8300",
+      "atomics": 5,
+      "rayQueryInitializations": 23,
+      "spirvVal": "passed",
+      "spirvDis": "passed"
+    }
+  ],
+  "qualification": "Rebuilt source-baseline harness, not the public APK or diagnostic-free Shipping policy."
+}

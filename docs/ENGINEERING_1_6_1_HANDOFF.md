@@ -50,35 +50,46 @@ completed; −0.37% mean-of-run-medians is not a demonstrated gain given thermal
 drift. The 15-file [recovery bundle](evidence/2026-09-20-android-route/README.md)
 is tracked. `.benchmark` now contains that clean candidate, restored to 100%;
 stable remains untouched at 76%, phone Home, no active sampler/benchmark.
-Quota check after measurement: 20% remaining, no pause threshold reached.
+Quota check after subsequent lantern measurement: 12% remaining; no pause threshold reached.
 
-The narrow source-baseline lantern harness core is reviewed, MSVC Release-built
-and 2/2 focused-test passed at **`513b5d3`**, pushed/verified on the separate
-`codex/horde-160-lantern-baseline` branch. Worktree:
-`C:\Dev\tmp\horde-160-lantern-baseline`; build:
-`C:\Dev\tmp\horde-160-harness-build`. It changes shared benchmark staging/tests
-only, not old renderer/shader/assets/gameplay implementation. Next wire its
-allowlisted workload into isolated Android measurement packaging and the existing
-native timing path. Do not merge the old source branch into the engineering
-branch or label its rebuilt artifact as the published 1.6.0 APK. No phase closure
-is inferred from the route-only A/B; actual matched held-lantern evidence remains.
+The narrow source-baseline harness is now implemented and pushed through
+**`186068a`** on `codex/horde-160-lantern-baseline`. Worktree:
+`C:\Dev\tmp\horde-160-lantern-baseline`; host build:
+`C:\Dev\tmp\horde-160-harness-build`. Core2/2 MSVC tests, four-ABI Android build,
+three Java policy tests and exact old shader/51-asset package proof passed.
+It does not change the old renderer, shader bytes, assets or gameplay implementation.
+Do not merge the old-source branch into engineering or publish its test package.
 
-1. Finish genuinely matched warmed 1.6.0/1.6.1 Release A/B, especially the phone
-   baseline. Published 1.6.0 cannot run the new lantern preset; a backported test
-   harness must be labelled as such, never as the unmodified public binary.
-   Do not add another telemetry framework or hide the cost by lowering quality.
-2. Then repair the four-way player semantic contract: processor/runtime GLB already
+[Held-high source-baseline A/B](ENGINEERING_1_6_1_LANTERN_ABBA_2026-09-20.md)
+completed at unchanged100%: A134.387/B130.6903/B130.5626/A134.578ms. The observed
+−2.867% mean-of-run-medians difference is small, not a material glass optimization.
+The checked scene-region pixels match exactly. Full report/hash/thermal limitations
+are retained; both originals needed to reproduce pixel comparison are Git-LFS-backed.
+This plus the preceding variant/counter/runtime/route evidence closes the Phase1
+measurement-foundation gate; its explicit decision is in the report. Broader
+glass correctness/performance, exact S24/S25 and final release gates remain open.
+
+Installed `.baseline` is **`84104e3` / APK `5f9253…c4fee2`**. New live-reveal
+runner alignment at `186068a` built as APK `4cbd08…5a3461`, but is **not installed**.
+No timings belong to the later artifact. All four accepted held-high runs used
+fresh-process `am start -S -W`; without `-S` one attempt only brought a task forward
+and was excluded. Baseline/candidate remain100%, stable76%; phone Home, no sampler,
+build, benchmark or worker remains active.
+
+1. **Start Phase 2:** repair the four-way player semantic contract: processor/runtime GLB already
    emit Body/Head/NearFace/Gauntlet; the clip manifest and C++ semantic routing still
    describe only three. Make manifest/loader/texture mapping order-independent,
    reject missing/unknown/duplicate/conflicting semantics, regenerate cleanly and
    validate GCC/MSVC. Preserve primary masking of Head/NearFace.
-3. Dedicated real-geometry RT viewmodel/world-body ownership remains unimplemented.
+2. Dedicated real-geometry RT viewmodel/world-body ownership remains unimplemented.
    Keep gameplay-owned IK/grip authority and independent small dynamic resources;
    no full-body primary-ray switch, overlays or permanent procedural block arms.
-4. Physical glass correctness/performance remains open. Diagnostic held-high still
+3. Physical glass correctness/performance remains open. Diagnostic held-high still
    records one overflow/pane-stack/primary-volume-budget event; secondary glass
    termination is also visible. Preserve these failures until actually fixed.
-5. Complete justified memory/pacing/CI/docs, supplied adaptive Pocket Chordsmith
+   Expand genuinely matched measurement to remaining views/live reveal before
+   accepting later optimizations; no more telemetry framework is needed.
+4. Complete justified memory/pacing/CI/docs, supplied adaptive Pocket Chordsmith
    music and separate volume, and Briarhold-derived reporting. Only then run the
    final comprehensive cross-platform/device/release matrix. No publication authorised.
 

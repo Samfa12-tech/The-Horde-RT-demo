@@ -275,6 +275,36 @@ Add one block per new result rather than changing a prediction into an implied f
 - Full exact-artifact report, comparison limitations and GitHub recovery data:
   [Android Release route A/B](ENGINEERING_1_6_1_ANDROID_RELEASE_ABBA_2026-09-20.md).
 
+## September 20, 2026 - Exact held-high source-baseline A/B on SM-S948B
+
+- Evidence type: local installed/pulled-back source-baseline APK, real held-lantern
+  screenshots, Home/resume cleanup check, four complete native reports and thermal
+  context. Exact model **SM-S948B**, Android 16, Adreno 840, Vulkan 1.4.295.
+- A is **not the public APK**: source `84104e3` backports only the measurement
+  harness onto runtime `57c81b6`; APK
+  `5f92533a75a9079ac6892b7c8f89781896bdcb9420c124023139036c29c4fee2`.
+  All 51 packaged assets and both old raygen modules match the original renderer;
+  old diagnostic atomics are deliberately retained. It is an isolated, non-debuggable,
+  development-signed `.baseline` package, with checkpoints OFF.
+- B is clean-source `167ce8b`, Shipping/Mobile `.benchmark` APK
+  `02112a48aea45431f52270ab9ee82d68091497aed0816dfcc359ba4068ee24bc`.
+  Both sides use 100%/1440x2980, Mobile water, ASTC, MAILBOX, RayTracingPipeline,
+  frozen `lantern-held-high-v1`, 600 warm-up and 600 measured frames per run.
+- A1/B1/B2/A2 medians: **134.387 / 130.6903 / 130.5626 / 134.578 ms**.
+  Descriptive mean-of-run-medians difference −2.867%; not a material gain or
+  causal attribution. Whole-run thermal status 0→2, battery33.0–37.7 C and GPU
+  thermal power level0–9; states are not identical. Candidate GPU medians are
+  about129 ms, so the heavy cost remains. All intended candidate rows are valid.
+- Presented frozen-scene pixels match exactly below the changing HUD band
+  (maximum RGB delta0). This is not whole-image/raw-RT-image parity or proof that
+  the outstanding physical dielectric budget/termination findings are fixed.
+- Home interruption restored the normal spawn/torch scene. A later live-step
+  alignment rebuild `4cbd08c2d57314697b01284ccb31b8af1cba4d99e79915356c7104e0535a3461`
+  passed build/package checks but was **not installed**; timings are not transferred.
+  Phone returned Home; sampler stopped. No stable data/settings were changed.
+- [Full source/artifact report and recovery bundle](ENGINEERING_1_6_1_LANTERN_ABBA_2026-09-20.md).
+  No S24/S25, subjective arms, full glass-performance matrix or final release pass.
+
 ## Research sources
 
 - [Android NDK stable APIs - Vulkan runtime capability guidance](https://developer.android.com/ndk/guides/stable_apis)

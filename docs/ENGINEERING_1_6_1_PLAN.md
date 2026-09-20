@@ -57,6 +57,14 @@ set is complete. It does not authorise publication or relax any RT requirement.
 
 ## Required work order
 
+Phase1 measurement-foundation gate is accepted after the
+[exact held-high source-baseline A/B](ENGINEERING_1_6_1_LANTERN_ABBA_2026-09-20.md),
+which records the gate-by-gate evidence and its public-APK/source-harness boundary.
+Next is Phase2 player semantic repair. This is not closure of physical glass
+correctness, all-view/causal performance, exact S24/S25 acceptance or final validation.
+Historical entries above retain their original evidence status; the new gate
+decision supersedes their then-open measurement-foundation status only.
+
 | Order | Work | Exit evidence |
 | --- | --- | --- |
 | 1 | Reconcile lean agent guidance | Scoped diff/link/contract review; no runtime gate solely for prose |
