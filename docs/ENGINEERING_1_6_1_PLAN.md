@@ -39,6 +39,14 @@ set is complete. It does not authorise publication or relax any RT requirement.
   baseline A/B remains open; this does not close the original observability phase
   or final matrix. Exact Android Home-cancel cleanup was fixed/device-checked at
   `6576950` without replacing stable/Debug packages.
+- Follow-on [exact Android Release route A/B](ENGINEERING_1_6_1_ANDROID_RELEASE_ABBA_2026-09-20.md)
+  compares the byte-matched published APK with clean source `167ce8b`, both at
+  76%/Mobile on SM-S948B. Four complete 1,838-frame reports and whole-run thermal
+  context are GitHub-backed. The descriptive −0.37% aggregate is not a gain claim:
+  thermal drift dominates. Source-baseline lantern harness core `513b5d3` is on
+  separate branch `codex/horde-160-lantern-baseline`, reviewed and 2/2 focused
+  MSVC-tested; its platform wiring, isolated packaging and matched held-lantern
+  measurements remain next. Do not merge that old-source branch into development.
 - Hardware RayQuery native integration was accepted at `99b8565`, after shader,
   provider and capability prerequisites. [Targeted backend evidence](ENGINEERING_1_6_1_RAYQUERY_BACKEND_2026-09-13.md)
   records Windows and exact SM-S948B functional/lifecycle checks. Exact S24/S25

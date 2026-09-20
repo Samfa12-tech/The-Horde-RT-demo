@@ -33,6 +33,12 @@ The tested APK was built with concurrent, uncommitted shared benchmark work and
 is therefore WIP, not a clean-source candidate or physical-device pass. Rebuild
 from the accepted source before using it for matched measurements.
 
+Follow-on: clean detached source `167ce8b` was rebuilt through this same full
+policy/package check, installed and pulled back byte-identically on SM-S948B.
+See [exact Android route A/B](ENGINEERING_1_6_1_ANDROID_RELEASE_ABBA_2026-09-20.md)
+for the new artifact and measured boundaries; this does not retrospectively
+turn the initial WIP artifact into a clean build or certify lantern performance.
+
 Audio/haptic manual revalidation required: **NO** for this packaging lane.
 It does not change runtime events, playback or haptic behavior.
 

@@ -1,0 +1,192 @@
+{
+  "schema": 1,
+  "status": "complete",
+  "generatedUtc": "2026-09-20T06:40:46.5989793+00:00",
+  "failures": [],
+  "baseline": [
+    {
+      "run": "baseline-a1",
+      "timestampUtc": "2026-09-20T06:27:28Z",
+      "rtMode": "RayTracingPipeline",
+      "gpu": "Adreno (TM) 840",
+      "vulkanApi": "1.4.295",
+      "presentMode": "MAILBOX",
+      "materialEncoding": "ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich",
+      "renderScalePercent": 76,
+      "internalWidth": 1094,
+      "internalHeight": 2265,
+      "presentationWidth": 1440,
+      "presentationHeight": 2980,
+      "lapsCompleted": 2,
+      "waypointsReached": 26,
+      "measuredFrames": 1838,
+      "medianMs": 52.329,
+      "p95Ms": 69.449,
+      "zoneFrames": {
+        "opening": 160,
+        "skeleton-room": 98,
+        "shadow-corridor": 599,
+        "skylight-chamber": 189,
+        "yellow-torch-bay": 157,
+        "blue-torch-bay": 157,
+        "red-torch-bay": 157,
+        "green-torch-bay": 157,
+        "transmission-threshold": 63,
+        "finale": 101
+      }
+    },
+    {
+      "run": "baseline-a2",
+      "timestampUtc": "2026-09-20T06:39:35Z",
+      "rtMode": "RayTracingPipeline",
+      "gpu": "Adreno (TM) 840",
+      "vulkanApi": "1.4.295",
+      "presentMode": "MAILBOX",
+      "materialEncoding": "ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich",
+      "renderScalePercent": 76,
+      "internalWidth": 1094,
+      "internalHeight": 2265,
+      "presentationWidth": 1440,
+      "presentationHeight": 2980,
+      "lapsCompleted": 2,
+      "waypointsReached": 26,
+      "measuredFrames": 1838,
+      "medianMs": 58.795,
+      "p95Ms": 78.986,
+      "zoneFrames": {
+        "opening": 160,
+        "skeleton-room": 98,
+        "shadow-corridor": 599,
+        "skylight-chamber": 189,
+        "yellow-torch-bay": 157,
+        "blue-torch-bay": 157,
+        "red-torch-bay": 157,
+        "green-torch-bay": 157,
+        "transmission-threshold": 63,
+        "finale": 101
+      }
+    }
+  ],
+  "candidates": [
+    {
+      "run": "route-b1-20260920",
+      "timestampUtc": "2026-09-20T06:31:27+00:00",
+      "gpu": "Adreno (TM) 840",
+      "vulkanApi": "1.4.295",
+      "rtMode": "RayTracingPipeline",
+      "presentMode": "MAILBOX",
+      "materialEncoding": "ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich",
+      "medianMs": 54.1482,
+      "p95Ms": 72.6266,
+      "lastCompletionSerial": 4502
+    },
+    {
+      "run": "route-b2-20260920",
+      "timestampUtc": "2026-09-20T06:35:17+00:00",
+      "gpu": "Adreno (TM) 840",
+      "vulkanApi": "1.4.295",
+      "rtMode": "RayTracingPipeline",
+      "presentMode": "MAILBOX",
+      "materialEncoding": "ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich",
+      "medianMs": 56.5649,
+      "p95Ms": 74.3675,
+      "lastCompletionSerial": 8186
+    }
+  ],
+  "performance": {
+    "runs": [
+      {
+        "run": "baseline-a1",
+        "medianMs": 52.329,
+        "p95Ms": 69.449
+      },
+      {
+        "run": "baseline-a2",
+        "medianMs": 58.795,
+        "p95Ms": 78.986
+      },
+      {
+        "run": "route-b1-20260920",
+        "medianMs": 54.148,
+        "p95Ms": 72.627
+      },
+      {
+        "run": "route-b2-20260920",
+        "medianMs": 56.565,
+        "p95Ms": 74.368
+      }
+    ],
+    "meanOfRunMediansBaselineMs": 55.562,
+    "meanOfRunMediansCandidateMs": 55.357,
+    "meanOfRunMediansChangePercent": -0.37,
+    "interpretation": "Descriptive mean-of-run-medians change only; not pooled and not causal."
+  },
+  "thermal": {
+    "assessment": "descriptive-only; temporal overlap is not a matched thermal-state claim",
+    "runs": [
+      {
+        "run": "baseline-a1",
+        "windowStartUtc": "2026-09-20T06:24:14.4205173+00:00",
+        "windowEndUtc": "2026-09-20T06:27:28.0000000+00:00",
+        "sampleCount": 36,
+        "thermalStatusMissingCount": 0,
+        "batteryTempMissingCount": 0,
+        "gpuThermalPowerLevelMissingCount": 0,
+        "thermalStatusMin": 2.0,
+        "thermalStatusMax": 2.0,
+        "batteryTempCMin": 39.5,
+        "batteryTempCMax": 41.9,
+        "gpuThermalPowerLevelMin": 0.0,
+        "gpuThermalPowerLevelMax": 2.0
+      },
+      {
+        "run": "baseline-a2",
+        "windowStartUtc": "2026-09-20T06:35:59.9444338+00:00",
+        "windowEndUtc": "2026-09-20T06:39:35.0000000+00:00",
+        "sampleCount": 41,
+        "thermalStatusMissingCount": 0,
+        "batteryTempMissingCount": 0,
+        "gpuThermalPowerLevelMissingCount": 0,
+        "thermalStatusMin": 3.0,
+        "thermalStatusMax": 3.0,
+        "batteryTempCMin": 44.0,
+        "batteryTempCMax": 44.1,
+        "gpuThermalPowerLevelMin": 1.0,
+        "gpuThermalPowerLevelMax": 2.0
+      },
+      {
+        "run": "route-b1-20260920",
+        "windowStartUtc": "2026-09-20T06:27:52.3719098+00:00",
+        "windowEndUtc": "2026-09-20T06:31:35.6013282+00:00",
+        "sampleCount": 42,
+        "thermalStatusMissingCount": 0,
+        "batteryTempMissingCount": 0,
+        "gpuThermalPowerLevelMissingCount": 0,
+        "thermalStatusMin": 2.0,
+        "thermalStatusMax": 3.0,
+        "batteryTempCMin": 42.4,
+        "batteryTempCMax": 43.5,
+        "gpuThermalPowerLevelMin": 0.0,
+        "gpuThermalPowerLevelMax": 6.0
+      },
+      {
+        "run": "route-b2-20260920",
+        "windowStartUtc": "2026-09-20T06:31:35.6566343+00:00",
+        "windowEndUtc": "2026-09-20T06:35:19.2800621+00:00",
+        "sampleCount": 42,
+        "thermalStatusMissingCount": 0,
+        "batteryTempMissingCount": 0,
+        "gpuThermalPowerLevelMissingCount": 0,
+        "thermalStatusMin": 3.0,
+        "thermalStatusMax": 3.0,
+        "batteryTempCMin": 43.5,
+        "batteryTempCMax": 44.1,
+        "gpuThermalPowerLevelMin": 1.0,
+        "gpuThermalPowerLevelMax": 5.0
+      }
+    ]
+  },
+  "limitations": [
+    "This report is observational and does not make a causal performance claim."
+  ]
+}

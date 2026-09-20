@@ -43,6 +43,26 @@ The September 20 check reported 26% weekly remaining, so it did not trigger a pa
 
 ## Next work
 
+September 20 follow-on: [fresh Android route A/B](ENGINEERING_1_6_1_ANDROID_RELEASE_ABBA_2026-09-20.md)
+is complete at matched 76% settings, with whole-run thermal context and a new
+clean-source candidate `167ce8b` / APK `02112a…e24bc`. All four 1,838-frame runs
+completed; −0.37% mean-of-run-medians is not a demonstrated gain given thermal
+drift. The 15-file [recovery bundle](evidence/2026-09-20-android-route/README.md)
+is tracked. `.benchmark` now contains that clean candidate, restored to 100%;
+stable remains untouched at 76%, phone Home, no active sampler/benchmark.
+Quota check after measurement: 20% remaining, no pause threshold reached.
+
+The narrow source-baseline lantern harness core is reviewed, MSVC Release-built
+and 2/2 focused-test passed at **`513b5d3`**, pushed/verified on the separate
+`codex/horde-160-lantern-baseline` branch. Worktree:
+`C:\Dev\tmp\horde-160-lantern-baseline`; build:
+`C:\Dev\tmp\horde-160-harness-build`. It changes shared benchmark staging/tests
+only, not old renderer/shader/assets/gameplay implementation. Next wire its
+allowlisted workload into isolated Android measurement packaging and the existing
+native timing path. Do not merge the old source branch into the engineering
+branch or label its rebuilt artifact as the published 1.6.0 APK. No phase closure
+is inferred from the route-only A/B; actual matched held-lantern evidence remains.
+
 1. Finish genuinely matched warmed 1.6.0/1.6.1 Release A/B, especially the phone
    baseline. Published 1.6.0 cannot run the new lantern preset; a backported test
    harness must be labelled as such, never as the unmodified public binary.
@@ -66,7 +86,8 @@ The September 20 check reported 26% weekly remaining, so it did not trigger a pa
 
 - Engineering checkout: `.worktrees/horde-1.6.1-engineering-pass` beneath the saved
   project. No active test run or worker remains from this checkpoint. The phone is
-  returned Home; `.benchmark` contains the cleanup artifact. Stable/Debug apps and
+  returned Home; `.benchmark` contains the clean `167ce8b` artifact described above.
+  Stable/Debug apps and
   their data were not replaced or cleared. Phone permission is already granted;
   do not repeat Briarhold coordination merely because context was compacted.
 - Curated report evidence is now tracked in [the recovery bundle](evidence/2026-09-20-lantern/README.md).

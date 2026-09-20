@@ -248,6 +248,33 @@ Add one block per new result rather than changing a prediction into an implied f
   opening torch scene. This targeted lifecycle pass does not recertify the
   earlier APK's timing figures for the cleanup artifact. Phone returned Home.
 
+## September 20, 2026 - Warmed published/candidate route A/B on SM-S948B
+
+- Evidence type: local exact installed-APK pullback, settings/UI observations,
+  four complete native benchmark reports, completion-owned candidate records,
+  thermal sampling and fresh system Vulkan JSON. Raw model **SM-S948B**, Android
+  16, Adreno 840, Vulkan 1.4.295, driver 2150932499 / 512.842.19.
+- Published stable APK `52a64255ad5dec82cc866fb2ea3545be498ca06c73a789019be851c77e5d6c48`
+  was not replaced or cleared. Clean candidate source `167ce8b`, APK
+  `02112a48aea45431f52270ab9ee82d68091497aed0816dfcc359ba4068ee24bc`,
+  was development-signed, non-debuggable Shipping/Mobile in `.benchmark`, and
+  installed/pulled back byte-identically. Four-ABI build/package and external
+  packaged ARM64 SPIR-V checks passed.
+- A1/B1/B2/A2 all completed 1,838 measured RT-presented frames, two laps and 26
+  waypoints at **76%**, internal 1094x2265 / presentation 1440x2980, Mobile water,
+  strict ASTC and RayTracingPipeline. Candidate rows have exact identity joins,
+  valid CPU/GPU samples and zero missing/rejected/cancelled/outstanding samples.
+- Medians in order: **52.329 / 54.1482 / 56.5649 / 58.795 ms**. Mean-of-run-medians
+  difference is −0.37%, not proof of improvement. Thermal status rose 2→3 and
+  battery temperature 39.5→44.1 C; ranges/power-level differences are retained.
+  This general route does not include the held reward lantern and cannot close
+  its glass gate. No S24/S25, viewmodel, owner-feel or final-candidate pass.
+- Candidate scale was explicitly matched to the stable app's existing 76%, then
+  restored to its original 100%. Stable settings were unchanged. Phone returned
+  Home; no benchmark/sampler remains running.
+- Full exact-artifact report, comparison limitations and GitHub recovery data:
+  [Android Release route A/B](ENGINEERING_1_6_1_ANDROID_RELEASE_ABBA_2026-09-20.md).
+
 ## Research sources
 
 - [Android NDK stable APIs - Vulkan runtime capability guidance](https://developer.android.com/ndk/guides/stable_apis)

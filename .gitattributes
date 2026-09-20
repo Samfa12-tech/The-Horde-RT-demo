@@ -22,3 +22,4 @@ tools/rayquery-variant-catalog.json text eol=lf
 
 # Retained validation reports are bound to their original byte hashes.
 docs/evidence/2026-09-20-lantern/** -text
+docs/evidence/2026-09-20-android-route/** -text
