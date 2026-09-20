@@ -54,10 +54,14 @@ if (!(hordeVersionCode instanceof Integer) || hordeVersionCode < 1) {
 
 def runtimeAssetsDir = layout.buildDirectory.dir('generated/runtimeAssets')
 def validationUnsigned = System.getenv('HORDE_VALIDATION_UNSIGNED') == '1'
-def releaseStoreFile = validationUnsigned ? null : System.getenv('HORDE_RELEASE_STORE_FILE')
-def releaseStorePassword = validationUnsigned ? null : System.getenv('HORDE_RELEASE_STORE_PASSWORD')
-def releaseKeyAlias = validationUnsigned ? null : System.getenv('HORDE_RELEASE_KEY_ALIAS')
-def releaseKeyPassword = validationUnsigned ? null : System.getenv('HORDE_RELEASE_KEY_PASSWORD')
+def hordeBenchmarkValidation = providers.gradleProperty('hordeBenchmarkValidation').orNull == 'true'
+// Benchmark validation is an isolated, development-signed app. Do not even
+// read production signing environment variables when that opt-in is present.
+def hordeValidationUnsigned = validationUnsigned || hordeBenchmarkValidation
+def releaseStoreFile = hordeValidationUnsigned ? null : System.getenv('HORDE_RELEASE_STORE_FILE')
+def releaseStorePassword = hordeValidationUnsigned ? null : System.getenv('HORDE_RELEASE_STORE_PASSWORD')
+def releaseKeyAlias = hordeValidationUnsigned ? null : System.getenv('HORDE_RELEASE_KEY_ALIAS')
+def releaseKeyPassword = hordeValidationUnsigned ? null : System.getenv('HORDE_RELEASE_KEY_PASSWORD')
 def hordeRtInstrumentationOverride = providers.gradleProperty('hordeRtInstrumentationOverride').orNull
 def hordeRtDielectricQualityOverride = providers.gradleProperty('hordeRtDielectricQualityOverride').orNull
 def hordeRtOverridePresent = { String value -> value != null && !value.isEmpty() }
@@ -71,6 +75,13 @@ if (hordeRtOverridePresent(hordeRtInstrumentationOverride) &&
 if (hordeRtOverridePresent(hordeRtDielectricQualityOverride) &&
     !(hordeRtDielectricQualityOverride == 'Mobile' || hordeRtDielectricQualityOverride == 'High')) {
     throw new GradleException('hordeRtDielectricQualityOverride must be exactly Mobile or High.')
+}
+if (hordeBenchmarkValidation &&
+    ((hordeRtOverridePresent(hordeRtInstrumentationOverride) &&
+      hordeRtInstrumentationOverride != 'Shipping') ||
+     (hordeRtOverridePresent(hordeRtDielectricQualityOverride) &&
+      hordeRtDielectricQualityOverride != 'Mobile'))) {
+    throw new GradleException('benchmark validation requires Shipping/Mobile native policy.')
 }
 def hordeRtNativePolicyArguments = { String defaultInstrumentation ->
     def instrumentation = hordeRtOverridePresent(hordeRtInstrumentationOverride) ? hordeRtInstrumentationOverride : defaultInstrumentation
@@ -149,7 +160,7 @@ android {
     }
 
     signingConfigs {
-        if (!validationUnsigned && releaseStoreFile && releaseStorePassword && releaseKeyAlias && releaseKeyPassword) {
+        if (!hordeValidationUnsigned && releaseStoreFile && releaseStorePassword && releaseKeyAlias && releaseKeyPassword) {
             release {
                 storeFile file(releaseStoreFile)
                 storePassword releaseStorePassword
@@ -179,6 +190,16 @@ android {
             }
             if (signingConfigs.findByName('release') != null) {
                 signingConfig signingConfigs.release
+            }
+        }
+        if (hordeBenchmarkValidation) {
+            benchmark {
+                initWith release
+                applicationIdSuffix '.benchmark'
+                versionNameSuffix '-benchmark'
+                debuggable false
+                jniDebuggable false
+                signingConfig signingConfigs.debug
             }
         }
     }

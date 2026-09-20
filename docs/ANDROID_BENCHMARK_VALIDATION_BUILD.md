@@ -1,0 +1,37 @@
+# Android benchmark validation build
+
+The benchmark validation APK is an isolated, locally installable comparison
+artifact. It is registered only when the Gradle property
+`hordeBenchmarkValidation=true` is explicitly supplied:
+
+```powershell
+$env:HORDE_VALIDATION_UNSIGNED = '1'
+.\gradlew.bat -PhordeBenchmarkValidation=true :app:assembleBenchmark --console=plain
+```
+
+The `benchmark` build type inherits the Release build, uses the fixed
+Shipping/Mobile native policy with checkpoints disabled, is non-debuggable,
+and receives the `.benchmark` application/package suffix. It is signed only by
+the development debug key so it cannot replace the stable or Debug app and is
+not a public release candidate. The benchmark opt-in also suppresses all
+production signing-environment reads.
+
+The resulting APK is under
+`android/app/build/outputs/apk/benchmark/`. Use
+`tests/AndroidBenchmarkValidationBuildTests.ps1` for the bounded manifest,
+development-certificate, native-CMake-policy, and ARM64 package checks. This
+build lane does not install an APK, inspect a physical device, or publish an
+artifact.
+
+Targeted September 20 validation passed: absent variant without opt-in; rejection
+of Diagnostic/High overrides; isolated non-debuggable manifest and Android Debug
+development certificate; exact benchmark build-model/cache checks for all four
+ABIs (`RelWithDebInfo`, Shipping/Mobile, checkpoints OFF); and external SPIR-V
+validation/disassembly plus byte-identical stripped/packaged ARM64 containment.
+Evidence is `reports/android-benchmark-containment-20260920-145936.json`.
+The tested APK was built with concurrent, uncommitted shared benchmark work and
+is therefore WIP, not a clean-source candidate or physical-device pass. Rebuild
+from the accepted source before using it for matched measurements.
+
+Audio/haptic manual revalidation required: **NO** for this packaging lane.
+It does not change runtime events, playback or haptic behavior.
