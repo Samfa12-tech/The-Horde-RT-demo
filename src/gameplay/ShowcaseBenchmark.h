@@ -7,6 +7,8 @@
 
 #include "gameplay/ShowcaseReplay.h"
 
+namespace horde::telemetry { class RtBenchmarkEvidenceRun; }
+
 namespace horde::gameplay
 {
 
@@ -53,6 +55,7 @@ struct ShowcaseBenchmarkMetadata
     std::string rtMode;
     std::string executionBackend;
     std::string presentMode;
+    std::string legacyFrameTimingScope = "unspecified-platform-interval";
     std::string materialEncoding;
     std::uint32_t renderScalePercent = 100u;
     std::uint32_t internalWidth = 0u;
@@ -87,8 +90,10 @@ public:
     ShowcaseBenchmarkStatistics OverallStatistics() const;
     ShowcaseBenchmarkStatistics ZoneStatistics(ShowcaseZone zone) const;
     std::string ProgressText() const;
-    std::string BuildTextReport(const ShowcaseBenchmarkMetadata& metadata) const;
-    std::string BuildJsonReport(const ShowcaseBenchmarkMetadata& metadata) const;
+    std::string BuildTextReport(const ShowcaseBenchmarkMetadata& metadata,
+        const horde::telemetry::RtBenchmarkEvidenceRun* evidence = nullptr) const;
+    std::string BuildJsonReport(const ShowcaseBenchmarkMetadata& metadata,
+        const horde::telemetry::RtBenchmarkEvidenceRun* evidence = nullptr) const;
 
 private:
     ShowcaseBenchmarkStatistics StatisticsFor(ShowcaseZone zone, bool filterZone) const;

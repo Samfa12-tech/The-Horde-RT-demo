@@ -5,6 +5,7 @@
 
 #include "gameplay/ShowcaseBenchmark.h"
 #include "telemetry/RtPerformanceEvidence.h"
+#include "telemetry/RtBenchmarkEvidenceRun.h"
 #include "vulkan/RtCapabilityReport.h"
 
 namespace
@@ -69,6 +70,20 @@ int main()
     check(text.find("Integrity: COMPLETE") != std::string::npos, "text report must expose integrity result");
     check(text.find("Laps completed: 2/2") != std::string::npos, "text report must expose lap count");
     check(json.find("\"result\": \"complete\"") != std::string::npos, "JSON report must expose integrity result");
+    horde::telemetry::RtBenchmarkEvidenceRun unarmedEvidence;
+    check(unarmedEvidence.Start(ShowcaseBenchmarkRun::kMaximumFramesPerLap),
+          "report fixture must allocate an unarmed evidence run");
+    metadata.legacyFrameTimingScope = "windows-render-plus-rtlab-telemetry";
+    const auto incompleteEvidenceText = benchmark.BuildTextReport(metadata, &unarmedEvidence);
+    const auto incompleteEvidenceJson = benchmark.BuildJsonReport(metadata, &unarmedEvidence);
+    check(incompleteEvidenceText.find("Integrity: INVALID") != std::string::npos &&
+              incompleteEvidenceJson.find("\"result\": \"invalid\"") != std::string::npos &&
+              incompleteEvidenceJson.find("\"routeTraversalComplete\": true") != std::string::npos,
+          "finished gameplay route must not certify unarmed or missing completed-frame evidence");
+    check(incompleteEvidenceJson.find("\"schema\": 2") != std::string::npos &&
+              incompleteEvidenceJson.find("\"completedFrameEvidence\": {") != std::string::npos &&
+              incompleteEvidenceJson.find("windows-render-plus-rtlab-telemetry") != std::string::npos,
+          "new evidence must be versioned separately and preserve the named legacy platform clock");
     check(text.find("RT mode: RayTracingPipeline") != std::string::npos &&
               text.find("Execution backend: RayQueryCompute") != std::string::npos,
           "benchmark text must separate raw RT capability mode from actual execution backend");

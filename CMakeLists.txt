@@ -148,9 +148,21 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AN
 endif()
 
 if(BUILD_TESTING)
+    add_executable(horde_rt_benchmark_evidence_report_tests
+        tests/RtBenchmarkEvidenceReportTests.cpp
+        src/gameplay/ShowcaseBenchmark.cpp
+        src/telemetry/RtBenchmarkEvidenceReport.cpp
+        src/telemetry/RtBenchmarkEvidenceRun.cpp
+        src/telemetry/RtPerformanceEvidence.cpp)
+    target_include_directories(horde_rt_benchmark_evidence_report_tests PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(horde_rt_benchmark_evidence_report_tests PRIVATE horde_gameplay_simulation)
+    add_test(NAME horde_rt_benchmark_evidence_report_tests COMMAND horde_rt_benchmark_evidence_report_tests)
+
     add_executable(horde_rt_benchmark_evidence_run_tests
         tests/RtBenchmarkEvidenceRunTests.cpp
         src/telemetry/RtBenchmarkEvidenceRun.cpp
+        src/telemetry/RtBenchmarkEvidenceReport.cpp
         src/telemetry/RtPerformanceEvidence.cpp
         src/gameplay/ShowcaseBenchmark.cpp)
     target_include_directories(horde_rt_benchmark_evidence_run_tests PRIVATE

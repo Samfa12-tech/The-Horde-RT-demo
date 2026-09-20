@@ -1,4 +1,5 @@
 #include "gameplay/ShowcaseBenchmark.h"
+#include "telemetry/RtBenchmarkEvidenceReport.h"
 
 #include <algorithm>
 #include <array>
@@ -244,13 +245,18 @@ std::string ShowcaseBenchmarkRun::ProgressText() const
     return out.str();
 }
 
-std::string ShowcaseBenchmarkRun::BuildTextReport(const ShowcaseBenchmarkMetadata& metadata) const
+std::string ShowcaseBenchmarkRun::BuildTextReport(const ShowcaseBenchmarkMetadata& metadata,
+    const horde::telemetry::RtBenchmarkEvidenceRun* evidence) const
 {
     const ShowcaseBenchmarkStatistics overall = OverallStatistics();
+    const bool complete = Passed() && (evidence == nullptr ||
+        (evidence->Status() == horde::telemetry::RtBenchmarkRunStatus::Complete &&
+         evidence->ExpectedCount() == frames_.size()));
     std::ostringstream out;
+    out.imbue(std::locale::classic());
     out << "HORDE LANTERN RT - IN-APP BENCHMARK\n"
         << "====================================\n"
-        << "Integrity: " << (Passed() ? "COMPLETE" : "INVALID") << '\n'
+        << "Integrity: " << (complete ? "COMPLETE" : "INVALID") << '\n'
         << "Status: " << ShowcaseBenchmarkStatusName(status_) << '\n'
         << "Timestamp (UTC): " << metadata.timestampUtc << '\n'
         << "Build: " << metadata.buildIdentity << '\n'
@@ -274,7 +280,8 @@ std::string ShowcaseBenchmarkRun::BuildTextReport(const ShowcaseBenchmarkMetadat
         << static_cast<std::size_t>(totalLaps_) * kShowcaseReplayPath.size() << '\n'
         << "Measured frames: " << overall.frames << "\n\n"
         << std::fixed << std::setprecision(3)
-        << "OVERALL FRAME TIME\n"
+        << "LEGACY PLATFORM FRAME TIME\n"
+        << "Clock: " << metadata.legacyFrameTimingScope << '\n'
         << "Average: " << overall.averageMs << " ms\n"
         << "Median: " << overall.medianMs << " ms ("
         << (overall.medianMs > 0.0 ? 1000.0 / overall.medianMs : 0.0) << " FPS)\n"
@@ -290,18 +297,26 @@ std::string ShowcaseBenchmarkRun::BuildTextReport(const ShowcaseBenchmarkMetadat
             << statistics.p95Ms << ',' << statistics.onePercentLowFps << '\n';
     }
     out << "\nThis deterministic in-app course is intended for comparing Horde Lantern RT settings and builds.\n";
+    if (evidence != nullptr)
+        out << '\n' << horde::telemetry::BuildRtBenchmarkEvidenceText(*evidence);
     return out.str();
 }
 
-std::string ShowcaseBenchmarkRun::BuildJsonReport(const ShowcaseBenchmarkMetadata& metadata) const
+std::string ShowcaseBenchmarkRun::BuildJsonReport(const ShowcaseBenchmarkMetadata& metadata,
+    const horde::telemetry::RtBenchmarkEvidenceRun* evidence) const
 {
     const ShowcaseBenchmarkStatistics overall = OverallStatistics();
+    const bool complete = Passed() && (evidence == nullptr ||
+        (evidence->Status() == horde::telemetry::RtBenchmarkRunStatus::Complete &&
+         evidence->ExpectedCount() == frames_.size()));
     std::ostringstream out;
     out.imbue(std::locale::classic());
     out << std::fixed << std::setprecision(4)
         << "{\n"
-        << "  \"schema\": 1,\n"
-        << "  \"result\": \"" << (Passed() ? "complete" : "invalid") << "\",\n"
+        << "  \"schema\": " << (evidence != nullptr ? 2 : 1) << ",\n"
+        << "  \"result\": \"" << (complete ? "complete" : "invalid") << "\",\n"
+        << "  \"routeTraversalComplete\": " << (Passed() ? "true" : "false") << ",\n"
+        << "  \"legacyFrameTimingScope\": \"" << JsonEscape(metadata.legacyFrameTimingScope) << "\",\n"
         << "  \"status\": \"" << ShowcaseBenchmarkStatusName(status_) << "\",\n"
         << "  \"timestampUtc\": \"" << JsonEscape(metadata.timestampUtc) << "\",\n"
         << "  \"build\": \"" << JsonEscape(metadata.buildIdentity) << "\",\n"
@@ -338,7 +353,10 @@ std::string ShowcaseBenchmarkRun::BuildJsonReport(const ShowcaseBenchmarkMetadat
             << ", \"onePercentLowFps\": " << statistics.onePercentLowFps << "}"
             << (index + 1u < kReportedZones.size() ? "," : "") << '\n';
     }
-    out << "  ]\n}\n";
+    out << "  ]";
+    if (evidence != nullptr)
+        out << ",\n  \"completedFrameEvidence\": " << horde::telemetry::BuildRtBenchmarkEvidenceJson(*evidence);
+    out << "\n}\n";
     return out.str();
 }
 
