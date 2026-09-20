@@ -1,4 +1,5 @@
 #include "scene/assets/SkinnedMeshAsset.h"
+#include "scene/assets/StaticMeshAsset.h"
 
 #include <algorithm>
 #include <array>
@@ -729,6 +730,8 @@ bool SkinnedMeshAsset::LoadClips(const std::string& glbPath, const SkinnedClipSe
         SkinnedPrimitiveRange range;
         range.firstExpandedVertex = expandedIndices_.size();
         range.expandedVertexCount = indices.count;
+        range.firstUniqueVertex = vertexBase;
+        range.uniqueVertexCount = positions.count;
         if (const JsonValue* materialIndex = primitive.Find("material");
             materialIndex != nullptr && materialValues != nullptr &&
             materialValues->type == JsonType::Array &&
@@ -1032,6 +1035,45 @@ bool SkinnedMeshAsset::BootGroundingMinimumY(
         diagnostic = "Exact player boot grounding exceeded the audited +/-75 mm envelope.";
         return false;
     }
+    diagnostic.clear();
+    return true;
+}
+
+bool SkinnedMeshAsset::ValidateStaticVertexLayout(const assets::StaticMeshAsset& asset,
+                                                 std::string& diagnostic) const
+{
+    const auto reject = [&diagnostic]() {
+        diagnostic = "Skinned/static vertex layout disagrees on primitive identity, indices or UV ordering.";
+        return false;
+    };
+    if (!loaded_ || !hasTexcoords_ || asset.vertices.size() != vertices_.size() ||
+        asset.indices.size() != expandedIndices_.size() ||
+        asset.primitives.size() != primitiveRanges_.size()) return reject();
+    for (std::size_t i = 0; i < primitiveRanges_.size(); ++i)
+    {
+        const auto& skin = primitiveRanges_[i];
+        const auto& fixed = asset.primitives[i];
+        if (fixed.materialIndex >= asset.materials.size() ||
+            asset.materials[fixed.materialIndex].name != skin.materialName ||
+            fixed.vertexOffset != skin.firstUniqueVertex ||
+            fixed.indexOffset != skin.firstExpandedVertex ||
+            fixed.indexCount != skin.expandedVertexCount ||
+            skin.firstUniqueVertex > vertices_.size() ||
+            skin.uniqueVertexCount > vertices_.size() - skin.firstUniqueVertex ||
+            skin.firstExpandedVertex > expandedIndices_.size() ||
+            skin.expandedVertexCount > expandedIndices_.size() - skin.firstExpandedVertex)
+            return reject();
+        for (std::size_t j = 0; j < skin.expandedVertexCount; ++j)
+        {
+            const auto local = asset.indices[skin.firstExpandedVertex + j];
+            if (local >= skin.uniqueVertexCount ||
+                skin.firstUniqueVertex + local != expandedIndices_[skin.firstExpandedVertex + j])
+                return reject();
+        }
+    }
+    for (std::size_t i = 0; i < vertices_.size(); ++i)
+        if (asset.vertices[i].uv0[0] != vertices_[i].texcoord[0] ||
+            asset.vertices[i].uv0[1] != vertices_[i].texcoord[1]) return reject();
     diagnostic.clear();
     return true;
 }

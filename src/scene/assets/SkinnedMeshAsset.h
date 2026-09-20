@@ -10,6 +10,8 @@
 namespace horde::scene
 {
 
+namespace assets { class StaticMeshAsset; }
+
 using SkinnedNodeTransform = std::array<float, 16u>;
 
 // std430-compatible layout for both the RT build input and the raygen SSBO.
@@ -69,6 +71,8 @@ struct SkinnedPrimitiveRange
     std::size_t firstExpandedVertex = 0u;
     std::size_t expandedVertexCount = 0u;
     std::string materialName;
+    std::size_t firstUniqueVertex = 0u;
+    std::size_t uniqueVertexCount = 0u;
 };
 
 struct SkinnedArmIkTarget
@@ -112,6 +116,10 @@ public:
     bool HasTangents() const { return hasTangents_; }
     std::size_t ExpandedVertexCount() const { return expandedIndices_.size(); }
     std::size_t UniqueVertexCount() const;
+    // Static indices/UVs remain resident while skinning replaces positions,
+    // normals and tangents. Validate their exact addressing before GPU upload.
+    bool ValidateStaticVertexLayout(const assets::StaticMeshAsset& asset,
+                                    std::string& diagnostic) const;
     std::size_t BootGroundingCandidateVertexCount() const
     {
         return bootGroundingVertexIndices_.size();

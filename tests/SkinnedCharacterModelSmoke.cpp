@@ -593,6 +593,18 @@ GripSurfaceMetrics MeasureGripSurface(
 int main(int argc, char** argv)
 {
     using namespace horde::scene;
+    if (argc == 4 && std::string(argv[1]) == "--validate-player-admission")
+    {
+        horde::scene::assets::AssetManifest manifest;
+        horde::scene::assets::StaticMeshAsset fixed;
+        horde::vulkan::raytracing::PlayerRenderSlot slot;
+        std::string diagnostic;
+        const bool valid = horde::scene::assets::AssetManifest::Load(argv[3], manifest, diagnostic) &&
+            manifest.ValidatePlayerSemantics(diagnostic) &&
+            horde::scene::assets::StaticMeshAsset::Load(argv[2], manifest, fixed, diagnostic) &&
+            slot.LoadAsset(argv[2], diagnostic) && slot.ValidateStaticVertexLayout(fixed, diagnostic);
+        return Require(valid, diagnostic.c_str()) ? 0 : 1;
+    }
     if (argc == 4 && std::string(argv[1]) == "--validate-player-asset")
     {
         horde::vulkan::raytracing::PlayerRenderSlot slot;
@@ -695,8 +707,22 @@ int main(int argc, char** argv)
     const bool playerStaticLoaded = horde::scene::assets::StaticMeshAsset::Load(
         playerPath, playerManifest, playerStatic, diagnostic);
     if (!Require(playerStaticLoaded, diagnostic.c_str()) ||
-        !Require(player.UniqueVertexCount() == playerStatic.vertices.size(),
-                 "static-PBR and skinned player vertex streams must have identical unique ordering")) return 1;
+        !Require(player.ValidateStaticVertexLayout(playerStatic, diagnostic), diagnostic.c_str())) return 1;
+    auto badStatic = playerStatic;
+    badStatic.primitives[0].vertexOffset += 1;
+    if (!Require(!player.ValidateStaticVertexLayout(badStatic, diagnostic), "changed unique offset must reject")) return 1;
+    badStatic = playerStatic;
+    badStatic.primitives[0].materialIndex = badStatic.primitives[1].materialIndex;
+    if (!Require(!player.ValidateStaticVertexLayout(badStatic, diagnostic), "changed material identity must reject")) return 1;
+    badStatic = playerStatic;
+    badStatic.indices[0] = (badStatic.indices[0] + 1u) % 4630u;
+    if (!Require(!player.ValidateStaticVertexLayout(badStatic, diagnostic), "changed expanded index must reject")) return 1;
+    badStatic = playerStatic;
+    badStatic.vertices[0].uv0[0] += 0.125f;
+    if (!Require(!player.ValidateStaticVertexLayout(badStatic, diagnostic), "changed static UV ordering must reject")) return 1;
+    badStatic = playerStatic;
+    badStatic.vertices.pop_back();
+    if (!Require(!player.ValidateStaticVertexLayout(badStatic, diagnostic), "changed unique vertex count must reject")) return 1;
     std::cout << "player static/skinned stream agreement passed\n";
     horde::scene::assets::AssetManifest rewardRingManifest;
     horde::scene::assets::StaticMeshAsset rewardRingStatic;

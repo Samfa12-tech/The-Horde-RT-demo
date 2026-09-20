@@ -41,6 +41,10 @@ try {
         $expectation = if ($case -in @('unchanged', 'reordered')) { 'accept' } else { 'reject-semantic' }
         & $TestExecutable --validate-player-asset $output $expectation
         if ($LASTEXITCODE -ne 0) { throw "$case failed its $expectation check" }
+        if ($expectation -eq 'accept') {
+            & $TestExecutable --validate-player-admission $output (Join-Path $repoRoot 'assets/models/player/runtime/asset.manifest.json')
+            if ($LASTEXITCODE -ne 0) { throw "$case failed static/skinned stream admission" }
+        }
     }
     Write-Output 'Actual skinned player: unchanged/reordered accepted; missing/duplicate/unknown rejected.'
 } finally {

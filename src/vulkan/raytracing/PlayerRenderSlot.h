@@ -210,6 +210,11 @@ public:
         const horde::gameplay::animation::PlayerAnimationSnapshot& animation) const;
 
     bool IsLoaded() const { return asset_.IsLoaded(); }
+    bool ValidateStaticVertexLayout(const horde::scene::assets::StaticMeshAsset& asset,
+                                    std::string& diagnostic) const
+    {
+        return asset_.ValidateStaticVertexLayout(asset, diagnostic);
+    }
     const std::vector<horde::scene::TexturedSkinnedRtVertex>& UniqueVertices() const
     {
         return uniqueVertices_;

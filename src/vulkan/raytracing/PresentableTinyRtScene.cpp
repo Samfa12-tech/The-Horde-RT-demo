@@ -1823,11 +1823,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     }
     dielectricFixtureMaterialIndex_ = staticMeshSlot_.PrimitiveMetadata()[
         dielectricMetadata.primitiveBase].materialIndex;
-    if (playerRenderSlot_.UniqueVertices().size() > productionPlayerAsset_.vertices.size())
-    {
-        diagnostic = "Runtime player skinned/static vertex streams do not share ordering.";
-        return false;
-    }
+    if (!playerRenderSlot_.ValidateStaticVertexLayout(productionPlayerAsset_, diagnostic)) return false;
     return true;
 }
 

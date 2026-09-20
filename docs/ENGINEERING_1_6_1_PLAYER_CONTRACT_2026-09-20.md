@@ -111,6 +111,23 @@ This is not byte identity with the older tracked GLB: unique vertex order and a 
 tangent components differ. Indexed position/normal/UV/joint/weight values agree;
 the generated slot loads, but no regenerated asset was promoted or visually accepted.
 
+## Static/skinned admission addressing
+
+Review for generated-runtime admission found that scene startup compared the
+initially empty `UniqueVertices()` output against static vertex count. That could
+not establish the ordering claimed by its diagnostic. The scene now validates the
+loaded source layout before GPU resource creation: exact unique/expanded counts,
+primitive identities and offsets, every expanded index and immutable UV ordering.
+Positions/normals/tangents remain skinning-owned; this adds no per-frame work and
+changes no GPU ABI, shader, gameplay or accepted asset bytes.
+
+Fresh MSVC Release tests pass 3/3 (animation, skinned smoke, semantic fixtures;
+7.89s), including rejection of changed offsets, identity, indices, UVs and counts.
+The generated `e8737f10…450fd` candidate passes the new static/skinned admission
+mode as well as grip/boot setup. Reordered real-GLB fixtures also pass both loaders'
+addressing agreement (fresh fixture rerun 1/1, 3.63s). This is host admission
+evidence, not replacement or native RT image acceptance.
+
 ## Remaining gate
 
 Complete clean-regeneration reconciliation and generated-asset admission; obtain
