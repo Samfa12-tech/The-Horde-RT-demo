@@ -33,7 +33,8 @@ verified fixes for completion-order bypass and lost failure metadata.
   collection was not introduced; it would require its own ownership design.
 - A duplicate arriving after slot reuse is rejected as a mismatch; the run is
   invalidated rather than accepted. Finer error naming is deferred.
-- Android route wiring and unattended Release export remain in progress.
+- Android unattended Release export remains in progress; native route wiring
+  has targeted build evidence below, not a new phone pass.
 - No new physical-device, matched-performance, remote-CI or final-candidate claim.
 - Audio/haptic manual revalidation required: **NO**. This slice does not change
   gameplay events, listener/source data, transport, playback or haptics.
@@ -114,3 +115,23 @@ and retained the real missing-skeleton diagnostic. Evidence directories:
 
 The September13 Debug legacy report exists, but its original process handle was
 missing on resumption; no exit-status claim is made from that report alone.
+
+## September 20: Android native integration
+
+Commit `f46de7a` makes the Android in-app route retain actual submitted/completed identities,
+arms only its measurement generation, drains the final submission before resetting
+the route, and passes the retained run to the shared report. Failed presentation
+and Diagnostic completion facts survive the failure path; optional telemetry
+failure does not change gameplay authority. Pause/recreation cancels measurement,
+with old completion delivered before resources are recreated. The existing
+three-window `HORDE_BENCH` markers retain their original meaning.
+
+Lead source review corrected tokenless handling, failure-delivery ordering,
+single-lap optional-error handling and lifecycle cancellation. The final targeted
+`:app:externalNativeBuildDebug` passed all four ABIs (arm64-v8a, armeabi-v7a,
+x86, x86_64), with the final incremental run taking 19 seconds. No device run or
+Release APK claim is made from this build. Unattended Release export, the clean
+matched-A/B harness and final device acceptance remain open.
+
+Audio/haptic manual revalidation required: **NO**. The implementation preserves
+existing gameplay/input/event consumption and changes benchmark evidence only.

@@ -20,13 +20,15 @@ set is complete. It does not authorise publication or relax any RT requirement.
   These are historical accepted gates, not a fresh pass for the current dirty tree.
 - Frame-evidence integration was recovered, reviewed and accepted at `f443904`;
   [C2b evidence](ENGINEERING_1_6_1_FRAME_EVIDENCE_2026-09-13.md) preserves its exact
-  build boundaries. Shared report/benchmark migration remains next, not complete.
+  build boundaries. Subsequent shared report/benchmark integration is listed below.
 - Full-route evidence storage (`7287d57`), versioned report projection (`badcd23`)
   and Windows Release benchmark export/exit (`762cd35`) are implemented. A fresh
   staged Shipping/High Windows run retained all 1,838 CPU/GPU completions and
   exited0; [route evidence](ENGINEERING_1_6_1_ROUTE_EVIDENCE_2026-09-13.md) records
-  its exact artifact and limitations. Android integration and matched A/B remain
-  open; this does not close the original observability phase or final matrix.
+  its exact artifact and limitations. Android native route integration (`f46de7a`)
+  passed a targeted four-ABI Debug build; Android unattended Release export and
+  matched A/B remain open. This does not close the original observability phase
+  or final matrix.
 - Hardware RayQuery native integration was accepted at `99b8565`, after shader,
   provider and capability prerequisites. [Targeted backend evidence](ENGINEERING_1_6_1_RAYQUERY_BACKEND_2026-09-13.md)
   records Windows and exact SM-S948B functional/lifecycle checks. Exact S24/S25
