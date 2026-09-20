@@ -22,6 +22,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.text.method.LinkMovementMethod;
@@ -69,6 +70,9 @@ public class MainActivity extends Activity {
     private static final String PREFS = "horde_lantern_alpha_settings";
     private static final String PREF_RT_LAB_UNLOCKED = "rt_lab_unlocked";
     private static final String REPORT_DIRECTORY = "reports";
+    private static final String ACTION_BENCHMARK = "com.samfa12.hordelanternrt.action.BENCHMARK";
+    private static final String EXTRA_BENCHMARK_RUN_ID = "horde.benchmark.run_id";
+    private static final long BENCHMARK_AUTOMATION_TIMEOUT_MS = 15L * 60L * 1000L;
     private static final String TEXT_REPORT_FILE = "vulkan_capability_report.txt";
     private static final String JSON_REPORT_FILE = "vulkan_capability_report.json";
     private static final String GITHUB_RELEASE_PAGE_PREFIX =
@@ -187,6 +191,10 @@ public class MainActivity extends Activity {
     private boolean benchmarkRunning;
     private boolean benchmarkReportVisible;
     private String latestBenchmarkReport = "";
+    private String benchmarkAutomationId;
+    private boolean benchmarkAutomationPending;
+    private boolean benchmarkAutomationFinishing;
+    private long benchmarkAutomationStartedAt;
     private BroadcastReceiver debugRetryReceiver;
     private boolean deathOverlayVisible;
     private boolean endingOverlayVisible;
@@ -262,7 +270,7 @@ public class MainActivity extends Activity {
         ProbeBridge.resetRtSceneTuning();
         ProbeBridge.setRenderScale(preferences.getInt("render_scale", 100) / 100.0f);
         ProbeBridge.setWaterQuality(preferences.getInt("water_quality", WATER_QUALITY_MOBILE));
-        consumeDebugAutomationIntent(getIntent());
+        if (!consumeBenchmarkAutomationIntent(getIntent(), true)) consumeDebugAutomationIntent(getIntent());
 
         surfaceView = findViewById(R.id.scene_surface);
         surfaceView.setHapticFeedbackEnabled(true);
@@ -586,11 +594,14 @@ public class MainActivity extends Activity {
 
     private void startBenchmark() {
         playSound("ui_select", 0.18f);
-        if (ProbeBridge.getRuntimeState() != 1 || !ProbeBridge.requestBenchmark()) {
+        if (ProbeBridge.getRuntimeState() != 1 || !(benchmarkAutomationId == null
+                ? ProbeBridge.requestBenchmark()
+                : ProbeBridge.requestBenchmarkWithId(benchmarkAutomationId))) {
             Toast.makeText(this, R.string.benchmark_unavailable, Toast.LENGTH_LONG).show();
             return;
         }
         benchmarkRunning = true;
+        benchmarkAutomationPending = false;
         latestBenchmarkReport = "";
         firstMenu = false;
         hideMenu();
@@ -600,6 +611,74 @@ public class MainActivity extends Activity {
         rtStatus.setVisibility(View.VISIBLE);
         vitalityStatus.setVisibility(View.GONE);
         rtStatus.setText(R.string.benchmark_starting);
+    }
+
+    // This Release-safe route does not grant any Debug checkpoint or quality control.
+    static String benchmarkAutomationRequestId(final Intent intent) {
+        if (intent == null || !ACTION_BENCHMARK.equals(intent.getAction())) return null;
+        final String id = intent.getStringExtra(EXTRA_BENCHMARK_RUN_ID);
+        if (id == null || !id.matches("[A-Za-z0-9_-]{1,64}")) {
+            throw new IllegalArgumentException("Benchmark requires a safe, unique run ID.");
+        }
+        if (intent.getExtras() != null) {
+            for (final String key : intent.getExtras().keySet()) {
+                if (key != null && (key.startsWith("horde.debug.") || EXTRA_REQUIRE_RAYQUERY_COMPUTE.equals(key))) {
+                    throw new IllegalArgumentException("Benchmark and Debug automation cannot be combined.");
+                }
+            }
+        }
+        return id;
+    }
+
+    private boolean consumeBenchmarkAutomationIntent(final Intent intent, final boolean freshLaunch) {
+        if (intent == null || !ACTION_BENCHMARK.equals(intent.getAction())) return false;
+        try {
+            final String id = benchmarkAutomationRequestId(intent);
+            // Consume even a duplicate request; recreation must not replay it.
+            intent.setAction(Intent.ACTION_MAIN);
+            intent.removeExtra(EXTRA_BENCHMARK_RUN_ID);
+            if (benchmarkAutomationId != null || benchmarkRunning) {
+                Log.w(TAG, "Rejected benchmark automation while another run is active.");
+                return true;
+            }
+            benchmarkAutomationId = id;
+            benchmarkAutomationPending = true;
+            benchmarkAutomationStartedAt = SystemClock.elapsedRealtime();
+            ProbeBridge.setRequiredRayQueryCompute(false);
+            handler.removeCallbacks(runStartupUpdateCheck);
+            startupUpdateCheckScheduled = false;
+        } catch (final IllegalArgumentException error) {
+            Log.e(TAG, "HORDE_BENCHMARK_EXPORT status=rejected " + error.getMessage());
+            if (freshLaunch) handler.post(this::finishAndRemoveTask);
+        }
+        return true;
+    }
+
+    private void finishBenchmarkAutomation(final int nativeStatus) {
+        if (benchmarkAutomationId == null || benchmarkAutomationFinishing) return;
+        benchmarkAutomationFinishing = true;
+        benchmarkAutomationPending = false;
+        benchmarkRunning = false;
+        if (nativeStatus != 2) ProbeBridge.cancelBenchmark();
+        final String runId = benchmarkAutomationId;
+        final File privateReports = new File(getFilesDir(), REPORT_DIRECTORY);
+        final File externalFiles = getExternalFilesDir(null);
+        new Thread(() -> {
+            try {
+                final BenchmarkAutomationExport.Result result = BenchmarkAutomationExport.export(
+                        privateReports, externalFiles, runId, nativeStatus);
+                Log.i(TAG, "HORDE_BENCHMARK_EXPORT run_id=" + runId +
+                        " status=" + (result.successful ? "complete" : "invalid") +
+                        " directory=" + result.directory.getAbsolutePath() +
+                        " detail=" + result.detail);
+            } catch (final Exception error) {
+                Log.e(TAG, "HORDE_BENCHMARK_EXPORT run_id=" + runId + " status=export-failed", error);
+            } finally {
+                handler.post(() -> {
+                    if (!isDestroyed() && !isFinishing()) finishAndRemoveTask();
+                });
+            }
+        }, "horde-benchmark-export").start();
     }
 
     private void showBenchmarkReport(final boolean completed) {
@@ -1186,6 +1265,7 @@ public class MainActivity extends Activity {
 
     private void presentUpdateDecision(final String decisionJson, final boolean manualRequest) {
         updateCheckInFlight = false;
+        if (benchmarkAutomationId != null) return;
         if (isFinishing() || (Build.VERSION.SDK_INT >= 17 && isDestroyed())) return;
         if (!resumed) {
             pendingUpdateDecision = decisionJson;
@@ -1230,7 +1310,7 @@ public class MainActivity extends Activity {
     }
 
     private void scheduleStartupUpdateCheck() {
-        if (debugCaptureUiSuppressed || debugAutomationAutostart ||
+        if (benchmarkAutomationId != null || debugCaptureUiSuppressed || debugAutomationAutostart ||
                 startupUpdateCheckCompleted || startupUpdateCheckScheduled) return;
         startupUpdateCheckScheduled = true;
         handler.postDelayed(runStartupUpdateCheck, 1500L);
@@ -1332,6 +1412,11 @@ public class MainActivity extends Activity {
         @Override
         public void run() {
             try {
+                if (benchmarkAutomationId != null && !benchmarkAutomationFinishing &&
+                        SystemClock.elapsedRealtime() - benchmarkAutomationStartedAt >=
+                            BENCHMARK_AUTOMATION_TIMEOUT_MS) {
+                    finishBenchmarkAutomation(3);
+                }
                 final int state = ProbeBridge.getRuntimeState();
                 if (state == 1) {
                     rtStatus.setText(R.string.rt_active);
@@ -1424,6 +1509,14 @@ public class MainActivity extends Activity {
                     rtStatus.setText(R.string.rt_starting);
                 }
 
+                if (benchmarkAutomationId != null && !benchmarkAutomationFinishing) {
+                    if (state == 2 || state == 3) {
+                        finishBenchmarkAutomation(3);
+                    } else if (benchmarkAutomationPending && !benchmarkRunning && resumed && state == 1) {
+                        startBenchmark();
+                        if (!benchmarkRunning) finishBenchmarkAutomation(3);
+                    }
+                }
                 if (benchmarkRunning) {
                     final int benchmarkStatus = ProbeBridge.getBenchmarkStatus();
                     if (benchmarkStatus == 1) {
@@ -1440,7 +1533,8 @@ public class MainActivity extends Activity {
                         if (latestBenchmarkReport.isEmpty()) {
                             latestBenchmarkReport = getString(R.string.benchmark_interrupted);
                         }
-                        showBenchmarkReport(benchmarkStatus == 2);
+                        if (benchmarkAutomationId != null) finishBenchmarkAutomation(benchmarkStatus);
+                        else showBenchmarkReport(benchmarkStatus == 2);
                     }
                 }
 
@@ -2237,6 +2331,10 @@ public class MainActivity extends Activity {
             return;
         }
 
+        if (benchmarkAutomationId != null && !benchmarkAutomationFinishing) {
+            finishBenchmarkAutomation(3);
+            return;
+        }
         if (benchmarkRunning) {
             ProbeBridge.cancelBenchmark();
             benchmarkRunning = false;
@@ -2282,7 +2380,7 @@ public class MainActivity extends Activity {
     protected void onNewIntent(final Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
-        consumeDebugAutomationIntent(intent);
+        if (!consumeBenchmarkAutomationIntent(intent, false)) consumeDebugAutomationIntent(intent);
         if (debugRtLabAccess && menuVisible && !deathOverlayVisible && !endingOverlayVisible) {
             showMainMenu(false);
         }
@@ -2291,6 +2389,9 @@ public class MainActivity extends Activity {
     @Override
     protected void onPause() {
         resumed = false;
+        if (benchmarkAutomationId != null && !benchmarkAutomationFinishing) {
+            finishBenchmarkAutomation(3);
+        }
         handler.removeCallbacks(runStartupUpdateCheck);
         startupUpdateCheckScheduled = false;
         handler.removeCallbacks(refreshRtLabTelemetry);
