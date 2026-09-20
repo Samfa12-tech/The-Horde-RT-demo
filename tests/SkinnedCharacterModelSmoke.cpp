@@ -16,6 +16,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <string_view>
+#include <utility>
 #include <vector>
 
 namespace
@@ -588,9 +590,22 @@ GripSurfaceMetrics MeasureGripSurface(
 
 } // namespace
 
-int main()
+int main(int argc, char** argv)
 {
     using namespace horde::scene;
+    if (argc == 4 && std::string(argv[1]) == "--validate-player-asset")
+    {
+        horde::vulkan::raytracing::PlayerRenderSlot slot;
+        std::string diagnostic;
+        const bool loaded = slot.LoadAsset(argv[2], diagnostic);
+        const std::string expectation(argv[3]);
+        if (expectation == "accept")
+            return Require(loaded && slot.IsLoaded(), diagnostic.c_str()) ? 0 : 1;
+        if (expectation == "reject-semantic")
+            return Require(!loaded && !slot.IsLoaded() && diagnostic.starts_with("Player primitive"),
+                           "malformed player must fail its semantic gate and retain no loaded asset") ? 0 : 1;
+        return 2;
+    }
     static_assert(sizeof(SkinnedRtVertex) == 32u);
     static_assert(sizeof(TexturedSkinnedRtVertex) == 48u);
 
@@ -636,16 +651,19 @@ int main()
                  "player exact-grounding subset must remain bounded to the authored lower body"))
         return 1;
     const auto& playerPrimitives = player.PrimitiveRanges();
-    if (!Require(playerPrimitives.size() == 4u &&
-                 playerPrimitives[0].materialName == "BodyPrimaryVisible" &&
-                 playerPrimitives[1].materialName == "GauntletPrimaryVisible" &&
-                 playerPrimitives[2].materialName == "HeadPrimaryMasked" &&
-                 playerPrimitives[3].materialName == "NearFacePrimaryMasked" &&
-                 playerPrimitives[0].expandedVertexCount == 16596u &&
-                 playerPrimitives[1].expandedVertexCount == 26514u &&
-                 playerPrimitives[2].expandedVertexCount == 5439u &&
-                 playerPrimitives[3].expandedVertexCount == 34776u,
-                 "player authored complete-arm and reflection-only body triangle ranges changed")) return 1;
+    std::vector<std::string_view> playerNames;
+    for (const auto& primitive : playerPrimitives) playerNames.push_back(primitive.materialName);
+    if (!Require(horde::scene::assets::ValidatePlayerPrimitiveNames(playerNames, diagnostic), diagnostic.c_str()))
+        return 1;
+    for (const auto& [name, count] : std::array<std::pair<std::string_view, std::size_t>, 4>{{
+             {"BodyPrimaryVisible", 16596u}, {"GauntletPrimaryVisible", 26514u},
+             {"HeadPrimaryMasked", 5439u}, {"NearFacePrimaryMasked", 34776u}}})
+    {
+        const auto part = std::find_if(playerPrimitives.begin(), playerPrimitives.end(),
+            [&](const auto& primitive) { return primitive.materialName == name; });
+        if (!Require(part != playerPrimitives.end() && part->expandedVertexCount == count,
+                     "named player primitive triangle count changed")) return 1;
+    }
     if (!Require(player.HasNode("LeftHand") && player.HasNode("RightHand") &&
                  player.HasNode("LeftGrip") && player.HasNode("RightGrip") &&
                  player.ClipDuration(SkinnedClip::Idle) > 0.9f &&

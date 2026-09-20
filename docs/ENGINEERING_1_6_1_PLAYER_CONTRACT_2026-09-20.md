@@ -75,12 +75,34 @@ the production registration list still follows the generated shared atlas order.
 Atlas image contents and clean regeneration remain part of the open phase gate;
 no new shader, asset binary, phone performance or visual pass is claimed here.
 
+## Fourth slice: actual skinned fixtures and Android build
+
+The smoke test checks authored counts by semantic name, not primitive slot. Its
+bounded fixture mode loads a real GLB through `PlayerRenderSlot`. Temporary copies
+of the actual player accept unchanged/reversed primitives and reject missing,
+duplicate and unknown semantics; rejected slots are not left loaded. The script
+never modifies the source asset and validates its dedicated temporary directory
+before cleanup. Fresh final MSVC Release smoke/fixture run passes **2/2** (7.07s).
+
+At native source `ef8fdc0`, unsigned Android `assembleRelease` passed in 35s for
+arm64-v8a, armeabi-v7a, x86 and x86_64 (native RelWithDebInfo, Shipping/Mobile).
+Command from `android/`, with `HORDE_VALIDATION_UNSIGNED=1`:
+
+```powershell
+.\gradlew.bat :app:assembleRelease --console=plain -PhordeRtInstrumentationOverride=Shipping -PhordeRtDielectricQualityOverride=Mobile
+```
+
+APK: 85,993,427 bytes, SHA-256
+`d390f39e2270d6290e7755d822697f8e2060c5dc389b5f47c3bc461f7d41b659`.
+No production signing, installation or device run occurred. Local log:
+`reports/phase2-android-native-build.log`. Later changes in this slice are host
+test-only, not a new Android renderer build or physical-phone certification.
+
 ## Remaining gate
 
-Exercise skinned malformed fixtures; regenerate into a clean
-validation destination from existing licensed sources; verify generated agreement
-and GCC/MSVC. The current host checks do not establish generated-asset agreement
-or a fresh GCC/Android pass. Phase 2 remains open.
+Complete clean-regeneration reconciliation and generated-asset admission; obtain
+fresh GCC/CI and affected renderer/phone evidence. The targeted MSVC and Android
+build checks are not visual acceptance. Phase 2 remains open.
 
 Dedicated viewmodel geometry/resource ownership and owner phone acceptance follow
 this gate. Preserve current primary masks and do not substitute the full world body.

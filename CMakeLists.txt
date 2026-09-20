@@ -682,6 +682,10 @@ if(BUILD_TESTING)
         add_test(NAME horde_rt_skinned_character_smoke COMMAND horde_rt_skinned_character_smoke)
         set_tests_properties(horde_rt_skinned_character_smoke PROPERTIES
             WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+        add_test(NAME horde_rt_player_skinned_semantic_fixtures
+            COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
+                ${CMAKE_CURRENT_SOURCE_DIR}/tests/PlayerSkinnedSemanticFixtures.ps1
+                -TestExecutable $<TARGET_FILE:horde_rt_skinned_character_smoke>)
 
         add_executable(horde_rt_character_render_slot_smoke tests/CharacterRenderSlotSmoke.cpp)
         target_include_directories(horde_rt_character_render_slot_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
