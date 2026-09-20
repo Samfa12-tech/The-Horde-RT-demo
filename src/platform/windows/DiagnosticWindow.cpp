@@ -50,6 +50,7 @@
 #include "gameplay/DevelopmentCheckpointSimulation.h"
 #include "gameplay/FeedbackTiming.h"
 #include "gameplay/ShowcaseBenchmark.h"
+#include "telemetry/RtBenchmarkEvidenceRun.h"
 #include "gameplay/ShowcaseCheckpoints.h"
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/SpatialAudio.h"
@@ -57,6 +58,7 @@
 #include "gameplay/simulation/GameSimulation.h"
 #include "platform/windows/DesktopControllerInput.h"
 #include "platform/windows/WindowsCaptureContracts.h"
+#include "platform/windows/WindowsBenchmarkLaunch.h"
 #include "platform/windows/WindowsInteractionPrompt.h"
 #include "platform/windows/WindowsGitHubReleaseUpdate.h"
 #include "platform/windows/WindowsRtLabState.h"
@@ -176,6 +178,7 @@ constexpr UINT kMaxFramesInFlight = 1u;
 
 struct CaptureLaunchOptions
 {
+    horde::platform::windows::WindowsBenchmarkLaunch benchmark;
     bool requested = false;
     bool requireRayQueryCompute = false;
     std::filesystem::path outputDirectory;
@@ -351,9 +354,13 @@ struct VulkanSurfaceContext
     horde::gameplay::EnemyKind debugEnemyOverride = horde::gameplay::EnemyKind::None;
     uint32_t debugValidationPoint = 0u;
     horde::gameplay::ShowcaseBenchmarkRun benchmark;
+    horde::telemetry::RtBenchmarkEvidenceRun benchmarkEvidence;
+    std::optional<std::size_t> expectedBenchmarkFrame;
     std::string benchmarkReport;
     std::string benchmarkJsonReport;
     bool benchmarkCompletionHandled = false;
+    bool benchmarkReportsSaved = false;
+    bool unattendedBenchmark = false;
     uint32_t currentFrame = 0u;
 };
 
@@ -369,6 +376,7 @@ void RefreshGpuTimingTelemetry(
     const horde::vulkan::GpuFrameTimingCollection* completed = nullptr);
 horde::telemetry::RtSampleStatus CurrentInitialGpuEvidenceStatus(
     VulkanSurfaceContext& context);
+bool CompleteRtEvidenceAfterDeviceIdle(VulkanSurfaceContext& ctx, VkResult idleResult);
 
 CaptureLaunchOptions ParseCaptureLaunchOptions()
 {
@@ -378,6 +386,15 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     if (arguments == nullptr)
     {
         options.error = "Failed to parse the process command line.";
+        return options;
+    }
+    std::vector<std::wstring_view> argumentViews;
+    for (int index = 1; index < argumentCount; ++index) argumentViews.emplace_back(arguments[index]);
+    options.benchmark = horde::platform::windows::ParseWindowsBenchmarkLaunch(argumentViews);
+    if (!options.benchmark.error.empty())
+    {
+        options.error = options.benchmark.error;
+        LocalFree(arguments);
         return options;
     }
     for (int index = 1; index < argumentCount; ++index)
@@ -1632,6 +1649,7 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
     }
     if (context.simulationPaused)
     {
+        context.benchmarkEvidence.Cancel();
         ClearDesktopInput(context);
     }
     // Overlay transitions are synchronous. Re-evaluate here so a chest prompt
@@ -1743,8 +1761,13 @@ void ShowPauseMenu(VulkanSurfaceContext& context, const bool visible)
     }
 }
 
-void ResetRoute(VulkanSurfaceContext& context)
+void ResetRoute(VulkanSurfaceContext& context, const bool preserveBenchmark = false)
 {
+    if (!preserveBenchmark)
+    {
+        context.benchmarkEvidence.Cancel();
+        if (context.benchmark.IsRunning()) context.benchmark.Cancel();
+    }
     context.torchLightStrength = 1.8f;
     context.deathOverlayVisible = false;
     context.endingOverlayVisible = false;
@@ -1847,6 +1870,7 @@ bool ApplyPlayerRetryCheckpoint(VulkanSurfaceContext& context, const std::int32_
     }
     context.delayedFeedback.Clear();
     context.simulation.RetryEncounter();
+    context.benchmarkEvidence.Cancel();
     if (context.rtFrameEvidenceInitialised)
     {
         (void)context.rtFrameEvidence.ApplyEvent(
@@ -1893,6 +1917,7 @@ horde::gameplay::ShowcaseBenchmarkMetadata BuildBenchmarkMetadata(
     const horde::vulkan::DeviceCapabilities& capabilities)
 {
     horde::gameplay::ShowcaseBenchmarkMetadata metadata;
+    metadata.legacyFrameTimingScope = "windows-render-plus-rtlab-telemetry";
     metadata.timestampUtc = UtcTimestamp("%Y-%m-%dT%H:%M:%SZ");
     metadata.buildIdentity = HORDE_RT_BUILD_ID;
     metadata.shaderIdentity = context.rtScene.SelectedPipelineBundleIdentity();
@@ -1925,6 +1950,9 @@ void StartBenchmark(VulkanSurfaceContext& context)
 {
     ResetRoute(context);
     context.benchmark.Start();
+    (void)context.benchmarkEvidence.Start(
+        horde::gameplay::ShowcaseBenchmarkRun::kMaximumFramesPerLap);
+    context.expectedBenchmarkFrame.reset();
     if (context.rtFrameEvidenceInitialised)
     {
         (void)context.rtFrameEvidence.ApplyEvent(
@@ -1932,6 +1960,7 @@ void StartBenchmark(VulkanSurfaceContext& context)
     }
     context.rtLabRouteTainted = true;
     context.benchmarkCompletionHandled = false;
+    context.benchmarkReportsSaved = false;
     context.benchmarkReport.clear();
     context.benchmarkJsonReport.clear();
     context.pauseMenuVisible = false;
@@ -1951,6 +1980,7 @@ void CancelBenchmark(VulkanSurfaceContext& context, const bool showMenu)
         return;
     }
     context.benchmark.Cancel();
+    context.benchmarkEvidence.Cancel();
     ResetRoute(context);
     if (HWND hud = GetDlgItem(context.windowHandle, kHudControlId))
     {
@@ -1971,10 +2001,20 @@ void CompleteBenchmark(VulkanSurfaceContext& context,
         return;
     }
     context.benchmarkCompletionHandled = true;
+    // The last measured present has no following frame fence. Drain its owning
+    // submission before report construction or the route reset below. The caller
+    // has already sampled the legacy outer-loop interval before this wait.
+    if (context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring)
+    {
+        const VkResult idleResult = vkDeviceWaitIdle(context.device);
+        const bool drained = CompleteRtEvidenceAfterDeviceIdle(context, idleResult);
+        (void)context.benchmarkEvidence.RecordOwnerDrainResult(drained);
+        (void)context.benchmarkEvidence.Finalize();
+    }
     const horde::gameplay::ShowcaseBenchmarkMetadata metadata =
         BuildBenchmarkMetadata(context, capabilities);
-    context.benchmarkReport = context.benchmark.BuildTextReport(metadata);
-    context.benchmarkJsonReport = context.benchmark.BuildJsonReport(metadata);
+    context.benchmarkReport = context.benchmark.BuildTextReport(metadata, &context.benchmarkEvidence);
+    context.benchmarkJsonReport = context.benchmark.BuildJsonReport(metadata, &context.benchmarkEvidence);
     const std::string stamp = UtcTimestamp("%Y%m%d-%H%M%S");
     const std::filesystem::path textPath = reportDirectory / ("HordeLanternRT-benchmark-" + stamp + ".txt");
     const std::filesystem::path jsonPath = reportDirectory / ("HordeLanternRT-benchmark-" + stamp + ".json");
@@ -1982,7 +2022,9 @@ void CompleteBenchmark(VulkanSurfaceContext& context,
     context.benchmarkReport += "\nSaved text report: " + textPath.string() +
         "\nSaved JSON report: " + (jsonSaved ? jsonPath.string() : std::string("FAILED")) +
         "\nUse the buttons below or Ctrl+A, Ctrl+C to copy.\n";
-    if (!WriteReportFile(textPath, context.benchmarkReport))
+    const bool textSaved = WriteReportFile(textPath, context.benchmarkReport);
+    context.benchmarkReportsSaved = textSaved && jsonSaved;
+    if (!textSaved)
     {
         context.benchmarkReport += "WARNING: automatic text report save failed; COPY REPORT and SAVE AS remain available.\n";
     }
@@ -2854,13 +2896,27 @@ void UpdateDesktopSceneControls(
         const horde::gameplay::ShowcaseBenchmarkAdvance advance = context.benchmark.Advance();
         if (advance.lapStarted)
         {
-            ResetRoute(context);
+            ResetRoute(context, true);
             if (context.benchmark.CurrentLap() == context.benchmark.TotalLaps() &&
                 context.rtFrameEvidenceInitialised)
             {
                 (void)context.rtFrameEvidence.ApplyEvent(
                     horde::telemetry::RtLifecycleEvent::WarmupToMeasure);
             }
+        }
+        if (context.benchmark.CurrentLap() == context.benchmark.TotalLaps())
+        {
+            if (context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Allocated)
+            {
+                // Single-lap mode has no lapStarted transition.
+                if (context.benchmark.TotalLaps() == 1u && context.rtFrameEvidenceInitialised)
+                    (void)context.rtFrameEvidence.ApplyEvent(horde::telemetry::RtLifecycleEvent::WarmupToMeasure);
+                const auto state = context.rtFrameEvidence.PublishedStateByValue();
+                (void)context.benchmarkEvidence.ArmMeasurement(state.sceneEpoch, state.measurementGeneration);
+            }
+            if (context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring)
+                context.expectedBenchmarkFrame = context.benchmarkEvidence.ExpectFrame(
+                    {static_cast<std::uint32_t>(advance.replay.zone), context.benchmark.CurrentLap()});
         }
         input = context.simulationInput;
         input.paused = false;
@@ -3295,6 +3351,20 @@ bool CreateSwapchain(VulkanSurfaceContext& ctx, HWND hwnd)
     return true;
 }
 
+void AcceptBenchmarkCompletion(
+    VulkanSurfaceContext& ctx,
+    const horde::vulkan::raytracing::RtFrameEvidenceCompletionResult& result,
+    const horde::telemetry::RtPerformanceEvidenceSnapshot& snapshot)
+{
+    if (result.completedEvidence &&
+        ctx.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring &&
+        snapshot.identity.submitted.frame.sceneEpoch == ctx.benchmarkEvidence.SceneEpoch() &&
+        snapshot.identity.submitted.frame.measurementGeneration == ctx.benchmarkEvidence.MeasurementGeneration())
+    {
+        (void)ctx.benchmarkEvidence.Complete(snapshot);
+    }
+}
+
 bool CompleteRtEvidenceAfterDeviceIdle(
     VulkanSurfaceContext& ctx,
     const VkResult idleResult)
@@ -3317,8 +3387,10 @@ bool CompleteRtEvidenceAfterDeviceIdle(
     bool completed = true;
     for (std::uint32_t frameSlot = 0u; frameSlot < kMaxFramesInFlight; ++frameSlot)
     {
+        horde::telemetry::RtPerformanceEvidenceSnapshot snapshot{};
         const horde::vulkan::raytracing::RtFrameEvidenceCompletionResult result =
-            ctx.rtFrameEvidence.CompleteFinalIdle(frameSlot, gpuIo, diagnosticIo);
+            ctx.rtFrameEvidence.CompleteFinalIdle(frameSlot, gpuIo, diagnosticIo, &snapshot);
+        AcceptBenchmarkCompletion(ctx, result, snapshot);
         if (result.gpuCollectionAttempted)
         {
             RefreshGpuTimingTelemetry(ctx, &result.gpuCollection);
@@ -3337,11 +3409,13 @@ bool ReleaseSwapchainResources(VulkanSurfaceContext& ctx)
 {
     if (ctx.device == VK_NULL_HANDLE)
     {
+        ctx.benchmarkEvidence.Cancel();
         return true;
     }
 
     const VkResult idleResult = vkDeviceWaitIdle(ctx.device);
     const bool evidenceCompleted = CompleteRtEvidenceAfterDeviceIdle(ctx, idleResult);
+    ctx.benchmarkEvidence.Cancel();
     const bool evidenceRecreated = !ctx.rtFrameEvidenceInitialised ||
         ctx.rtFrameEvidence.Recreate(
             horde::telemetry::RtResourceResetReason::SwapchainRecreate,
@@ -3507,7 +3581,7 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx)
                                 ctx.executionBackend))
     {
         std::cerr << "Failed to initialise presentable RT scene: " << diagnostic << '\n';
-        MessageBoxA(ctx.windowHandle,
+        if (!ctx.unattendedBenchmark) MessageBoxA(ctx.windowHandle,
                     ("The native RT scene could not start.\n\n" + diagnostic +
                      "\n\nKeep the packaged assets folder beside HordeLanternRT.exe. No fallback renderer will be used.").c_str(),
                     "Horde Lantern RT - startup error",
@@ -3680,6 +3754,14 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
     const std::uint64_t frameStartNanoseconds =
         horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr);
     ctx.lastFramePresentation = horde::telemetry::RtPresentationOutcome::NotAttempted;
+    if (ctx.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring)
+    {
+        const auto state = ctx.rtFrameEvidence.PublishedStateByValue();
+        if (!state.running || state.paused ||
+            state.sceneEpoch != ctx.benchmarkEvidence.SceneEpoch() ||
+            state.measurementGeneration != ctx.benchmarkEvidence.MeasurementGeneration())
+            ctx.benchmarkEvidence.Cancel();
+    }
     rtFramePresented = false;
     if (ctx.commandBuffers.empty())
     {
@@ -3712,11 +3794,13 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
 
     if (evidenceFrame)
     {
+        horde::telemetry::RtPerformanceEvidenceSnapshot snapshot{};
         const horde::vulkan::raytracing::RtFrameEvidenceCompletionResult completion =
             ctx.rtFrameEvidence.CompleteFence(
                 ctx.currentFrame,
                 horde::vulkan::raytracing::MakeRtGpuFrameTimerIo(ctx.gpuFrameTimer),
-                horde::vulkan::raytracing::MakeRtDiagnosticFrameIo(ctx.rtScene));
+                horde::vulkan::raytracing::MakeRtDiagnosticFrameIo(ctx.rtScene), &snapshot);
+        AcceptBenchmarkCompletion(ctx, completion, snapshot);
         RefreshGpuTimingTelemetry(
             ctx, completion.gpuCollectionAttempted ? &completion.gpuCollection : nullptr);
         if (completion.fatalDiagnosticIoFailure)
@@ -3979,6 +4063,16 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             gpuTimingRecording,
             horde::vulkan::raytracing::MakeRtGpuFrameTimerIo(ctx.gpuFrameTimer));
     }
+    if (ctx.expectedBenchmarkFrame &&
+        ctx.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring)
+    {
+        horde::telemetry::RtSubmittedFrameIdentity committed{};
+        if (ctx.rtFrameEvidence.TryGetCommittedIdentity(ctx.currentFrame, committed))
+            (void)ctx.benchmarkEvidence.BindSubmitted(*ctx.expectedBenchmarkFrame, committed);
+        else
+            (void)ctx.benchmarkEvidence.RejectExpected(*ctx.expectedBenchmarkFrame,
+                horde::telemetry::RtBenchmarkFailureReason::TokenlessCompletion);
+    }
 
     VkPresentInfoKHR presentInfo{
         VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
@@ -4042,6 +4136,7 @@ void ApplyCaptureCheckpoint(VulkanSurfaceContext& context,
                             const horde::gameplay::ShowcaseCheckpoint& checkpoint)
 {
     context.simulation.ApplyShowcaseCheckpoint(checkpoint.id);
+    context.benchmarkEvidence.Cancel();
     if (context.rtFrameEvidenceInitialised)
     {
         (void)context.rtFrameEvidence.ApplyEvent(
@@ -4584,10 +4679,12 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                                  const std::filesystem::path& jsonReportPath,
                                  const std::filesystem::path* captureDirectory,
                                  const std::string* developmentCheckpoint,
-                                 const bool requireRayQueryCompute)
+                                 const bool requireRayQueryCompute,
+                                 const bool unattendedBenchmark)
 {
     VulkanSurfaceContext context;
     context.windowHandle = hWnd;
+    context.unattendedBenchmark = unattendedBenchmark;
     if (developmentCheckpoint != nullptr) context.developmentCheckpoint = *developmentCheckpoint;
     LoadSettings(context);
 #if defined(_DEBUG)
@@ -4700,8 +4797,9 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         if (captureDirectory == nullptr)
         {
             ApplyOverlayState(context);
-            horde::platform::windows::BeginGitHubReleaseUpdateCheck(
-                hWnd, HORDE_RT_DISPLAY_VERSION, false);
+            if (!unattendedBenchmark)
+                horde::platform::windows::BeginGitHubReleaseUpdateCheck(
+                    hWnd, HORDE_RT_DISPLAY_VERSION, false);
 #if defined(_DEBUG)
             if (context.rtLabDebugInjection) OpenRtLab(context);
             else
@@ -4753,6 +4851,15 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     (void)captureDirectory;
 #endif
 
+    if (unattendedBenchmark)
+    {
+        if (!context.controlsEnabled)
+        {
+            DestroyRenderContext(context);
+            return 1;
+        }
+        StartBenchmark(context);
+    }
     const VkClearColorValue clearColor = ClearColorForMode(capabilities.rtMode);
     MSG message{};
     bool running = true;
@@ -4783,9 +4890,15 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         {
             break;
         }
+        if (unattendedBenchmark && !context.benchmark.IsRunning())
+        {
+            CompleteBenchmark(context, capabilities, textReportPath.parent_path());
+            break;
+        }
 
         if (context.renderScaleDirty && context.useRtPath)
         {
+            context.benchmarkEvidence.Cancel();
             context.renderScaleDirty = false;
             timingSamples.clear();
             const VkResult idleResult = vkDeviceWaitIdle(context.device);
@@ -4822,10 +4935,26 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         const bool benchmarkFrame = context.benchmark.IsRunning();
         const auto frameStart = std::chrono::steady_clock::now();
         bool rtFramePresented = false;
-        if (!RenderFrame(context, clearColor, rtFramePresented))
+        context.expectedBenchmarkFrame.reset();
+        const bool frameRendered = RenderFrame(context, clearColor, rtFramePresented);
+        if (context.expectedBenchmarkFrame &&
+            context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring)
         {
+            horde::telemetry::RtExpectedFrameRecord row{};
+            if (context.benchmarkEvidence.TryGetExpectedFrame(*context.expectedBenchmarkFrame, row) &&
+                row.disposition == horde::telemetry::RtExpectedFrameDisposition::AwaitingSubmission)
+                (void)context.benchmarkEvidence.RejectExpected(*context.expectedBenchmarkFrame,
+                    horde::telemetry::RtBenchmarkFailureReason::SubmissionFailed);
+        }
+        if (!frameRendered)
+        {
+            if (benchmarkFrame)
+            {
+                context.benchmark.Cancel();
+                CompleteBenchmark(context, capabilities, textReportPath.parent_path());
+            }
             renderFailed = true;
-            MessageBoxA(hWnd,
+            if (!unattendedBenchmark) MessageBoxA(hWnd,
                         "The native RT render loop stopped unexpectedly. Check the reports folder for diagnostics.",
                         "Horde Lantern RT - renderer stopped",
                         MB_OK | MB_ICONERROR);
@@ -4935,7 +5064,11 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     {
         SetWindowLongPtrA(hWnd, GWLP_USERDATA, 0);
     }
+    const bool benchmarkSucceeded = context.benchmark.Passed() && context.benchmarkReportsSaved &&
+        context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Complete &&
+        context.benchmarkEvidence.ExpectedCount() == context.benchmark.Frames().size();
     DestroyRenderContext(context);
+    if (unattendedBenchmark) return !renderFailed && benchmarkSucceeded ? 0 : 1;
     return renderFailed ? 1 : (running ? 0 : static_cast<int>(message.wParam));
 }
 
@@ -6228,7 +6361,8 @@ int CreateAndShowWindow(const std::string& diagnosticText,
                         const std::filesystem::path& jsonReportPath,
                         const std::filesystem::path* captureDirectory,
                         const std::string* developmentCheckpoint,
-                        const bool requireRayQueryCompute)
+                        const bool requireRayQueryCompute,
+                        const bool unattendedBenchmark)
 {
     const HINSTANCE instance = GetModuleHandleA(nullptr);
     INITCOMMONCONTROLSEX commonControls{sizeof(INITCOMMONCONTROLSEX), ICC_BAR_CLASSES};
@@ -6489,8 +6623,8 @@ int CreateAndShowWindow(const std::string& diagnosticText,
 
     const int result = RunDiagnosticSwapchainWindow(
         hWnd, capabilities, textReportPath, jsonReportPath, captureDirectory,
-        developmentCheckpoint, requireRayQueryCompute);
-    if (captureDirectory != nullptr && IsWindow(hWnd))
+        developmentCheckpoint, requireRayQueryCompute, unattendedBenchmark);
+    if ((captureDirectory != nullptr || unattendedBenchmark) && IsWindow(hWnd))
     {
         DestroyWindow(hWnd);
     }
@@ -6534,7 +6668,9 @@ int RunDiagnosticWindow(const int showCommand)
     std::cout << diagnosticText << "\n\n";
 
     std::error_code error;
-    const std::filesystem::path reportDirectory = ExecutableDirectory() / kReportDirectory;
+    const std::filesystem::path reportDirectory = launchOptions.benchmark.requested
+        ? std::filesystem::absolute(std::filesystem::path(launchOptions.benchmark.outputDirectory))
+        : ExecutableDirectory() / kReportDirectory;
     std::filesystem::create_directories(reportDirectory, error);
     if (error)
     {
@@ -6567,7 +6703,8 @@ int RunDiagnosticWindow(const int showCommand)
         ? nullptr
         : &launchOptions.developmentCheckpoint;
     return CreateAndShowWindow(diagnosticText, capabilities, textReportPath, jsonReportPath,
-                               captureDirectory, developmentCheckpoint, launchOptions.requireRayQueryCompute);
+                               captureDirectory, developmentCheckpoint, launchOptions.requireRayQueryCompute,
+                               launchOptions.benchmark.requested);
 }
 
 } // namespace horde::platform::windows

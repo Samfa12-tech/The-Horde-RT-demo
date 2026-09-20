@@ -159,6 +159,11 @@ if(BUILD_TESTING)
     target_link_libraries(horde_rt_benchmark_evidence_report_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_benchmark_evidence_report_tests COMMAND horde_rt_benchmark_evidence_report_tests)
 
+    add_executable(horde_rt_windows_benchmark_launch_tests tests/WindowsBenchmarkLaunchTests.cpp)
+    target_include_directories(horde_rt_windows_benchmark_launch_tests PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_windows_benchmark_launch_tests COMMAND horde_rt_windows_benchmark_launch_tests)
+
     add_executable(horde_rt_benchmark_evidence_run_tests
         tests/RtBenchmarkEvidenceRunTests.cpp
         src/telemetry/RtBenchmarkEvidenceRun.cpp
