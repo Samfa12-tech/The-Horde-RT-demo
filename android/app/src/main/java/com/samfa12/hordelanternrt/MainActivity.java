@@ -66,6 +66,9 @@ import org.json.JSONObject;
 
 public class MainActivity extends Activity {
     private static final String TAG = "HordeLanternAudio";
+    private static final String ACTION_BASELINE_BENCHMARK =
+            "com.samfa12.hordelanternrt.action.BASELINE_BENCHMARK";
+    private static final String EXTRA_BENCHMARK_WORKLOAD = "horde.benchmark.workload";
     private static final String PREFS = "horde_lantern_alpha_settings";
     private static final String PREF_RT_LAB_UNLOCKED = "rt_lab_unlocked";
     private static final String REPORT_DIRECTORY = "reports";
@@ -186,6 +189,9 @@ public class MainActivity extends Activity {
     private boolean benchmarkRunning;
     private boolean benchmarkReportVisible;
     private String latestBenchmarkReport = "";
+    private boolean baselineBenchmarkPending;
+    private boolean baselineBenchmarkRunning;
+    private String baselineBenchmarkWorkload;
     private BroadcastReceiver debugRetryReceiver;
     private boolean deathOverlayVisible;
     private boolean endingOverlayVisible;
@@ -261,7 +267,9 @@ public class MainActivity extends Activity {
         ProbeBridge.resetRtSceneTuning();
         ProbeBridge.setRenderScale(preferences.getInt("render_scale", 100) / 100.0f);
         ProbeBridge.setWaterQuality(preferences.getInt("water_quality", WATER_QUALITY_MOBILE));
-        consumeDebugAutomationIntent(getIntent());
+        if (!consumeBaselineBenchmarkIntent(getIntent(), true)) {
+            consumeDebugAutomationIntent(getIntent());
+        }
 
         surfaceView = findViewById(R.id.scene_surface);
         surfaceView.setHapticFeedbackEnabled(true);
@@ -560,7 +568,8 @@ public class MainActivity extends Activity {
         addMenuButtonRow(panel,
                 getString(R.string.settings), this::showSettings,
                 getString(R.string.technical_info), () -> showDiagnostics(false));
-        if (rtLabUnlocked || debugRtLabAccess) {
+        if ((rtLabUnlocked || debugRtLabAccess) &&
+                !baselineBenchmarkPending && !baselineBenchmarkRunning) {
             addMenuButton(panel, getString(R.string.rt_lab), () -> openRtLab(false));
         }
         addMenuButton(panel, getString(R.string.run_benchmark), this::startBenchmark);
@@ -584,12 +593,23 @@ public class MainActivity extends Activity {
     }
 
     private void startBenchmark() {
-        playSound("ui_select", 0.18f);
-        if (ProbeBridge.getRuntimeState() != 1 || !ProbeBridge.requestBenchmark()) {
+        startBenchmark(null);
+    }
+
+    private boolean startBenchmark(final String workload) {
+        if (workload == null) playSound("ui_select", 0.18f);
+        final boolean requested = ProbeBridge.getRuntimeState() == 1 &&
+                (workload == null ? ProbeBridge.requestBenchmark() :
+                        ProbeBridge.requestBenchmarkWorkload(workload));
+        if (!requested) {
             Toast.makeText(this, R.string.benchmark_unavailable, Toast.LENGTH_LONG).show();
-            return;
+            return false;
         }
         benchmarkRunning = true;
+        if (workload != null) {
+            baselineBenchmarkPending = false;
+            baselineBenchmarkRunning = true;
+        }
         latestBenchmarkReport = "";
         firstMenu = false;
         hideMenu();
@@ -599,10 +619,13 @@ public class MainActivity extends Activity {
         rtStatus.setVisibility(View.VISIBLE);
         vitalityStatus.setVisibility(View.GONE);
         rtStatus.setText(R.string.benchmark_starting);
+        return true;
     }
 
     private void showBenchmarkReport(final boolean completed) {
         benchmarkRunning = false;
+        baselineBenchmarkPending = false;
+        baselineBenchmarkRunning = false;
         benchmarkReportVisible = true;
         menuVisible = true;
         diagnosticsVisible = false;
@@ -1229,7 +1252,8 @@ public class MainActivity extends Activity {
     }
 
     private void scheduleStartupUpdateCheck() {
-        if (debugCaptureUiSuppressed || debugAutomationAutostart ||
+        if (baselineBenchmarkPending || baselineBenchmarkRunning ||
+                debugCaptureUiSuppressed || debugAutomationAutostart ||
                 startupUpdateCheckCompleted || startupUpdateCheckScheduled) return;
         startupUpdateCheckScheduled = true;
         handler.postDelayed(runStartupUpdateCheck, 1500L);
@@ -1369,7 +1393,9 @@ public class MainActivity extends Activity {
                         parryButton.setVisibility(View.GONE);
                     }
                     if (lifePhase == PLAYER_DEAD) showDeathOverlay();
-                    if (finaleEndingPhase == FINALE_ENDING_COMPLETE) {
+                    if (finaleEndingPhase == FINALE_ENDING_COMPLETE &&
+                            !benchmarkRunning && !baselineBenchmarkPending &&
+                            !baselineBenchmarkRunning && !benchmarkReportVisible) {
                         final boolean unlockGranted = persistRtLabUnlockIfEligible();
                         if (unlockGranted && endingOverlayVisible) {
                             endingOverlayVisible = false;
@@ -1423,6 +1449,12 @@ public class MainActivity extends Activity {
                     rtStatus.setText(R.string.rt_starting);
                 }
 
+                if (baselineBenchmarkPending && resumed && state == 1 && !benchmarkRunning) {
+                    if (!startBenchmark(baselineBenchmarkWorkload)) {
+                        baselineBenchmarkPending = false;
+                        baselineBenchmarkRunning = false;
+                    }
+                }
                 if (benchmarkRunning) {
                     final int benchmarkStatus = ProbeBridge.getBenchmarkStatus();
                     if (benchmarkStatus == 1) {
@@ -1645,6 +1677,64 @@ public class MainActivity extends Activity {
             case "lantern-chest-held-high": return 135;
             default: return -1;
         }
+    }
+
+    static boolean isAllowedBaselineWorkload(final String workload) {
+        return "showcase-route-v1".equals(workload) ||
+                "lantern-held-high-v1".equals(workload) ||
+                "lantern-held-low-v1".equals(workload) ||
+                "lantern-grazing-v1".equals(workload) ||
+                "lantern-motion-extreme-v1".equals(workload) ||
+                "lantern-reveal-sequence-v1".equals(workload);
+    }
+
+    static String baselineWorkloadFromIntent(final Intent intent, final boolean enabled) {
+        if (intent == null || !ACTION_BASELINE_BENCHMARK.equals(intent.getAction())) {
+            return null;
+        }
+        if (!enabled) {
+            throw new IllegalArgumentException("Source-baseline benchmark is unavailable in this build.");
+        }
+        final String workload;
+        try {
+            workload = intent.getStringExtra(EXTRA_BENCHMARK_WORKLOAD);
+        } catch (final ClassCastException error) {
+            throw new IllegalArgumentException("Baseline benchmark workload must be a string.", error);
+        }
+        if (!isAllowedBaselineWorkload(workload)) {
+            throw new IllegalArgumentException("Baseline benchmark requires an allowlisted workload.");
+        }
+        if (intent.getExtras() != null) {
+            for (final String key : intent.getExtras().keySet()) {
+                if (key.startsWith("horde.debug.")) {
+                    throw new IllegalArgumentException("Baseline benchmark and Debug automation cannot be combined.");
+                }
+            }
+        }
+        return workload;
+    }
+
+    private boolean consumeBaselineBenchmarkIntent(final Intent intent, final boolean freshLaunch) {
+        if (intent == null || !ACTION_BASELINE_BENCHMARK.equals(intent.getAction())) return false;
+        try {
+            final String workload = baselineWorkloadFromIntent(
+                    intent, BuildConfig.SOURCE_BASELINE_HARNESS);
+            intent.setAction(Intent.ACTION_MAIN);
+            intent.removeExtra(EXTRA_BENCHMARK_WORKLOAD);
+            if (baselineBenchmarkPending || baselineBenchmarkRunning || benchmarkRunning) {
+                Log.w(TAG, "Rejected source-baseline benchmark while another run is active.");
+                return true;
+            }
+            baselineBenchmarkWorkload = workload;
+            baselineBenchmarkPending = true;
+            baselineBenchmarkRunning = false;
+            handler.removeCallbacks(runStartupUpdateCheck);
+            startupUpdateCheckScheduled = false;
+        } catch (final IllegalArgumentException error) {
+            Log.e(TAG, "Rejected source-baseline benchmark: " + error.getMessage());
+            if (freshLaunch) handler.post(this::finishAndRemoveTask);
+        }
+        return true;
     }
 
     private void consumeDebugAutomationIntent(final Intent intent) {
@@ -2272,7 +2362,9 @@ public class MainActivity extends Activity {
     protected void onNewIntent(final Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
-        consumeDebugAutomationIntent(intent);
+        if (!consumeBaselineBenchmarkIntent(intent, false)) {
+            consumeDebugAutomationIntent(intent);
+        }
         if (debugRtLabAccess && menuVisible && !deathOverlayVisible && !endingOverlayVisible) {
             showMainMenu(false);
         }
@@ -2281,6 +2373,9 @@ public class MainActivity extends Activity {
     @Override
     protected void onPause() {
         resumed = false;
+        baselineBenchmarkPending = false;
+        baselineBenchmarkRunning = false;
+        baselineBenchmarkWorkload = null;
         handler.removeCallbacks(runStartupUpdateCheck);
         startupUpdateCheckScheduled = false;
         handler.removeCallbacks(refreshRtLabTelemetry);

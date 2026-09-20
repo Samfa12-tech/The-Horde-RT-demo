@@ -36,10 +36,59 @@ state sequences and all live reveal phases; the latter retains the old route's
 timing/report/presentation-failure checks. Build/test logs are local under
 `reports/harness-core-20260920/` and `C:\Dev\tmp\horde-160-harness-build/Testing/`.
 
-Platform selection,
-first-frame/lap staging, isolated development packaging, real RT presentation,
-and device measurement are still pending. Source/test existence is not a phone
-or performance pass. Publication and production signing are not authorised.
+## Isolated Android selector
+
+The opt-in `-PhordeSourceBaseline=true` registers `assembleBaseline` and
+`testBaselineUnitTest`, inheriting the old Release/RelWithDebInfo renderer with
+checkpoints OFF. It uses only the development certificate, is non-debuggable,
+has package `com.samfa12.hordelanternrt.baseline` and version suffix
+`-source-baseline`. The opt-in skips production signing environment reads.
+Without it the variant does not exist. Native benchmark reports explicitly say
+`source-baseline (57c81b6 + lantern harness)` rather than merely `1.6.0`.
+
+```powershell
+$env:HORDE_VALIDATION_UNSIGNED = '1'
+# From android/:
+.\gradlew.bat -PhordeSourceBaseline=true :app:assembleBaseline `
+  :app:testBaselineUnitTest --tests com.samfa12.hordelanternrt.BaselineBenchmarkIntentPolicyTest
+# After exact package proof and an authorised install, using the verified device:
+adb -s VERIFIED_SERIAL shell am start -W --user 0 `
+  -n com.samfa12.hordelanternrt.baseline/com.samfa12.hordelanternrt.MainActivity `
+  -a com.samfa12.hordelanternrt.action.BASELINE_BENCHMARK `
+  --es horde.benchmark.workload lantern-held-high-v1
+```
+
+The six workload names are allowlisted in Java and again in native code. Other
+builds reject the action/native selector. Debug-extra mixtures and concurrent
+requests are rejected. A pending request waits for actual RT readiness and is
+cleared on pause. No persisted rendering setting is changed. Native staging,
+zero-delta/fixed-step advancement and cancellation cleanup remain on the owning
+render thread. The final measurement frame cannot grant the gameplay finale
+unlock. A completed/cancelled benchmark no longer owns the scene and therefore
+cannot reset later gameplay on Home.
+
+This deliberately reuses the original report UI and COPY/SAVE facility; there
+is no new baseline report exporter or modern completion telemetry. Capture the
+visible text, verify workload, completion, timestamp, 600 measured frames, exact
+settings and real presentation. Keep the original schema-1 CPU timing boundary;
+never compare it directly with candidate GPU distributions. Pending/failed or
+interrupted runs are not results. Startup-update prompts are suppressed while
+the harness is pending/running, and the normal benchmark feedback suppression
+is retained.
+
+Fresh four-ABI Android build and all 3 focused baseline Intent-policy tests
+passed. Non-opt-in task inspection confirms the baseline variant is absent.
+`tools/check-source-baseline-package.ps1` checks identity/development signing,
+four exact native models, checkpoints OFF, unmodified baseline renderer/source,
+all 51 packaged asset entries byte-equal to the published APK, stripped/package
+ARM64 equality, and exact old raygen module containment with external SPIR-V
+validation/disassembly. The old generic module has 56,191 words/32 atomics/3
+ray-query initialization sites; legacy has 123,311 words/5 atomics/23 sites.
+Those diagnostic atomics are deliberately preserved for an honest 1.6.0 baseline.
+
+Real RT presentation, interrupted-scene cleanup and device measurement remain
+pending. Build/test existence is not a phone or performance pass. Publication
+and production signing are not authorised.
 
 Audio/haptic manual revalidation required: **NO** for this shared measurement
 core. Normal gameplay feedback and assets are unchanged; platform wiring must

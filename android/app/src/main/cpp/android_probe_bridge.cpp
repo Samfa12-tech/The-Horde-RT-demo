@@ -32,6 +32,7 @@
 #include "gameplay/DevelopmentCheckpoints.h"
 #include "gameplay/DevelopmentCheckpointSimulation.h"
 #include "gameplay/ShowcaseBenchmark.h"
+#include "gameplay/LanternBenchmarkScenario.h"
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/ShowcaseCheckpoints.h"
 #include "gameplay/ShowcaseReplay.h"
@@ -196,6 +197,7 @@ struct SwapchainContext
     horde::gameplay::ShowcaseRouteReplay routeReplay;
     bool routeReplayActive = false;
     horde::gameplay::ShowcaseBenchmarkRun inAppBenchmark;
+    bool lanternBenchmarkSceneStaged = false;
     std::string reportDirectory;
     bool useRtPath = false;
     uint32_t currentFrame = 0u;
@@ -246,6 +248,10 @@ std::atomic<std::int32_t> gBenchmarkCheckpointRequested{-1};
 std::atomic<std::int32_t> gCaptureCheckpointRequested{-1};
 std::atomic<bool> gRouteReplayRequested{false};
 std::atomic<bool> gInAppBenchmarkRequested{false};
+// Protected by gReportMutex; request/status publication remains separate from
+// gameplay, which is staged only on the existing owning render thread.
+horde::gameplay::BenchmarkWorkload gRequestedBenchmarkWorkload =
+    horde::gameplay::BenchmarkWorkload::ShowcaseRoute;
 std::atomic<bool> gInAppBenchmarkCancelRequested{false};
 std::atomic<int> gInAppBenchmarkStatus{0}; // 0 idle, 1 running, 2 complete, 3 failed/cancelled.
 std::atomic<int> gPlayerVitality{horde::gameplay::PlayerVitals::kMaxVitality};
@@ -657,20 +663,41 @@ void PublishBenchmarkProgress(const SwapchainContext& context)
     gLatestBenchmarkProgress = context.inAppBenchmark.ProgressText();
 }
 
+bool QueueInAppBenchmark(horde::gameplay::BenchmarkWorkload workload)
+{
+    std::lock_guard<std::mutex> lock(gReportMutex);
+    if (gRuntimeState.load(std::memory_order_acquire) != 1 ||
+        gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1)
+    {
+        return false;
+    }
+    gRequestedBenchmarkWorkload = workload;
+    gLatestBenchmarkReport.clear();
+    gLatestBenchmarkProgress = "BENCHMARK STARTING";
+    gInAppBenchmarkCancelRequested.store(false, std::memory_order_release);
+    gRtLabBenchmarkRoute.store(true, std::memory_order_release);
+    gInAppBenchmarkStatus.store(1, std::memory_order_release);
+    gInAppBenchmarkRequested.store(true, std::memory_order_release);
+    return true;
+}
+
 void StartInAppBenchmark(SwapchainContext& context)
 {
     gBenchmarkCheckpointRequested.store(-1, std::memory_order_release);
     gCaptureCheckpointRequested.store(-1, std::memory_order_release);
     gRouteReplayRequested.store(false, std::memory_order_release);
     ResetShowcaseSimulation();
+    context.lanternBenchmarkSceneStaged = false;
     context.activeBenchmarkCheckpoint = -1;
     context.benchmarkSampling = false;
     context.routeReplayActive = false;
     context.captureActive = false;
     context.capturePresentedFrames = 0u;
-    context.inAppBenchmark.Start();
     {
         std::lock_guard<std::mutex> lock(gReportMutex);
+        context.inAppBenchmark.Start(
+            horde::gameplay::ShowcaseBenchmarkRun::kDefaultLaps,
+            gRequestedBenchmarkWorkload);
         gLatestBenchmarkReport.clear();
         gLatestBenchmarkProgress = context.inAppBenchmark.ProgressText();
     }
@@ -703,6 +730,7 @@ void FinishInAppBenchmark(SwapchainContext& context)
         PublishInputLocked();
     }
     ResetShowcaseSimulation();
+    context.lanternBenchmarkSceneStaged = false;
 }
 
 void ResetBenchmarkTiming(SwapchainContext& context)
@@ -1974,6 +2002,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
         {
             context.inAppBenchmark.Cancel();
             ResetShowcaseSimulation();
+            context.lanternBenchmarkSceneStaged = false;
             {
                 std::lock_guard<std::mutex> lock(gReportMutex);
                 gLatestBenchmarkProgress = "BENCHMARK CANCELLED";
@@ -2017,6 +2046,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             simulationInput.commands.retry > beforeCommands.lastConsumedRetrySequence;
         if (routeResetPending)
         {
+            context.lanternBenchmarkSceneStaged = false;
             if (context.inAppBenchmark.IsRunning())
             {
                 context.inAppBenchmark.Cancel();
@@ -2059,18 +2089,40 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             {
                 ResetShowcaseSimulation();
             }
+            const bool lanternBenchmark =
+                horde::gameplay::IsLanternBenchmark(context.inAppBenchmark.Workload());
+            if (lanternBenchmark && advance.frameInLap == 1u)
+            {
+                context.lanternBenchmarkSceneStaged = true;
+                if (!horde::gameplay::StageLanternBenchmark(
+                        gGameSimulation, context.inAppBenchmark.Workload()))
+                {
+                    context.inAppBenchmark.Cancel();
+                    gInAppBenchmarkStatus.store(3, std::memory_order_release);
+                    return false;
+                }
+            }
             simulationInput.paused = false;
             simulationInput.damageEnabled = false;
             simulationInput.hasAuthoritativePlayerPose = true;
             simulationInput.authoritativePlayerX = advance.replay.x;
             simulationInput.authoritativePlayerZ = advance.replay.z;
             simulationInput.yawRadians = advance.replay.yaw;
-            simulationInput.pitchRadians = -0.04f;
-            gGameSimulation.StepFixed(
-                simulationInput,
-                static_cast<float>(horde::gameplay::simulation::FixedStepRunner::kFixedDeltaSeconds),
-                publishedInput.publicationSequence);
-            if (advance.replay.waypointReached || advance.lapStarted || advance.finished)
+            simulationInput.pitchRadians = lanternBenchmark
+                ? horde::gameplay::kLanternBenchmarkPitch : -0.04f;
+            if (horde::gameplay::IsFrozenBenchmark(context.inAppBenchmark.Workload()))
+            {
+                gGameSimulation.AdvanceFrame(simulationInput, 0.0, publishedInput.publicationSequence);
+            }
+            else
+            {
+                gGameSimulation.StepFixed(
+                    simulationInput,
+                    static_cast<float>(horde::gameplay::simulation::FixedStepRunner::kFixedDeltaSeconds),
+                    publishedInput.publicationSequence);
+            }
+            if (advance.replay.waypointReached || advance.lapStarted || advance.finished ||
+                (lanternBenchmark && advance.frameInLap % 60u == 0u))
             {
                 PublishBenchmarkProgress(context);
             }
@@ -2142,7 +2194,8 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
         PublishSimulationUiState();
         const horde::gameplay::simulation::SimulationSnapshot& renderedSimulation =
             gGameSimulation.Snapshot();
-        const bool benchmarkActive = context.benchmarkSampling || context.inAppBenchmark.IsRunning();
+        // Advance marks the final frame complete before its actual presentation.
+        const bool benchmarkActive = context.benchmarkSampling || inAppBenchmarkFrame;
         gRtLabUnlockEligible.store(
             horde::platform::android::ShouldPersistRtLabUnlock({
                 renderedSimulation.finaleComplete,
@@ -2448,6 +2501,12 @@ void SwapchainRenderLoop()
 
     gSwapchainRunning.store(false, std::memory_order_release);
 
+    if (gSwapchainContext.lanternBenchmarkSceneStaged)
+    {
+        // Surface cancellation must not retain the authored measurement scene.
+        // Reset on this owning thread before handing the context back to teardown.
+        ResetShowcaseSimulation();
+    }
     SwapchainContext cleanup = std::move(gSwapchainContext);
     gSwapchainContext = {};
     DestroySwapchainContext(cleanup);
@@ -3101,16 +3160,26 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestDebugRouteReplay(JNIEnv*, jcl
 extern "C" JNIEXPORT jboolean JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_requestBenchmark(JNIEnv*, jclass)
 {
-    if (gRuntimeState.load(std::memory_order_acquire) != 1 ||
-        gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1)
-    {
-        return JNI_FALSE;
-    }
-    gInAppBenchmarkCancelRequested.store(false, std::memory_order_release);
-    gRtLabBenchmarkRoute.store(true, std::memory_order_release);
-    gInAppBenchmarkStatus.store(1, std::memory_order_release);
-    gInAppBenchmarkRequested.store(true, std::memory_order_release);
-    return JNI_TRUE;
+    return QueueInAppBenchmark(horde::gameplay::BenchmarkWorkload::ShowcaseRoute) ? JNI_TRUE : JNI_FALSE;
+}
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_requestBenchmarkWorkload(
+    JNIEnv* env, jclass, jstring name)
+{
+#if defined(HORDE_RT_BASELINE_BENCHMARK_HARNESS)
+    if (name == nullptr || env->GetStringUTFLength(name) > 64) return JNI_FALSE;
+    const char* utf = env->GetStringUTFChars(name, nullptr);
+    if (utf == nullptr) return JNI_FALSE;
+    horde::gameplay::BenchmarkWorkload workload{};
+    const bool valid = horde::gameplay::ParseBenchmarkWorkload(utf, workload);
+    env->ReleaseStringUTFChars(name, utf);
+    return valid && QueueInAppBenchmark(workload) ? JNI_TRUE : JNI_FALSE;
+#else
+    (void)env;
+    (void)name;
+    return JNI_FALSE;
+#endif
 }
 
 extern "C" JNIEXPORT void JNICALL

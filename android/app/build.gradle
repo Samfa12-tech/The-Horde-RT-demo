@@ -4,10 +4,14 @@ plugins {
 
 def runtimeAssetsDir = layout.buildDirectory.dir('generated/runtimeAssets')
 def validationUnsigned = System.getenv('HORDE_VALIDATION_UNSIGNED') == '1'
-def releaseStoreFile = validationUnsigned ? null : System.getenv('HORDE_RELEASE_STORE_FILE')
-def releaseStorePassword = validationUnsigned ? null : System.getenv('HORDE_RELEASE_STORE_PASSWORD')
-def releaseKeyAlias = validationUnsigned ? null : System.getenv('HORDE_RELEASE_KEY_ALIAS')
-def releaseKeyPassword = validationUnsigned ? null : System.getenv('HORDE_RELEASE_KEY_PASSWORD')
+def hordeSourceBaseline = providers.gradleProperty('hordeSourceBaseline').orNull == 'true'
+def hordeValidationUnsigned = validationUnsigned || hordeSourceBaseline
+// The source-baseline harness is development-only; do not read production
+// signing environment variables when its explicit opt-in is present.
+def releaseStoreFile = hordeValidationUnsigned ? null : System.getenv('HORDE_RELEASE_STORE_FILE')
+def releaseStorePassword = hordeValidationUnsigned ? null : System.getenv('HORDE_RELEASE_STORE_PASSWORD')
+def releaseKeyAlias = hordeValidationUnsigned ? null : System.getenv('HORDE_RELEASE_KEY_ALIAS')
+def releaseKeyPassword = hordeValidationUnsigned ? null : System.getenv('HORDE_RELEASE_KEY_PASSWORD')
 
 tasks.register('prepareRuntimeAssets', Sync) {
     from('../../assets') {
@@ -59,6 +63,7 @@ android {
         targetSdk 34
         versionCode 8
         versionName '1.6.0'
+        buildConfigField 'boolean', 'SOURCE_BASELINE_HARNESS', 'false'
 
         externalNativeBuild {
             cmake {
@@ -78,7 +83,7 @@ android {
     }
 
     signingConfigs {
-        if (!validationUnsigned && releaseStoreFile && releaseStorePassword && releaseKeyAlias && releaseKeyPassword) {
+        if (!hordeValidationUnsigned && releaseStoreFile && releaseStorePassword && releaseKeyAlias && releaseKeyPassword) {
             release {
                 storeFile file(releaseStoreFile)
                 storePassword releaseStorePassword
@@ -110,6 +115,22 @@ android {
                 signingConfig signingConfigs.release
             }
         }
+        if (hordeSourceBaseline) {
+            baseline {
+                initWith release
+                applicationIdSuffix '.baseline'
+                versionNameSuffix '-source-baseline'
+                debuggable false
+                jniDebuggable false
+                signingConfig signingConfigs.debug
+                buildConfigField 'boolean', 'SOURCE_BASELINE_HARNESS', 'true'
+                externalNativeBuild {
+                    cmake {
+                        arguments '-DHORDE_RT_BASELINE_BENCHMARK_HARNESS=ON'
+                    }
+                }
+            }
+        }
     }
 
     compileOptions {
@@ -123,6 +144,10 @@ android {
 
     sourceSets {
         main.assets.srcDirs = [runtimeAssetsDir.get().asFile]
+    }
+
+    buildFeatures {
+        buildConfig true
     }
 }
 
