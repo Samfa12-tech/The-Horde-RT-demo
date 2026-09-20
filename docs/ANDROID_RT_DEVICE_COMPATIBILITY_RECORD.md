@@ -1,6 +1,6 @@
 # Android RT Device Compatibility Record
 
-Last updated: 2026-09-13
+Last updated: 2026-09-20
 
 This is a living compatibility record for the Horde Lantern RT Android build. It separates direct project evidence from reports and hardware-based predictions. A device is not marked as working solely because its GPU advertises Vulkan or hardware ray tracing.
 
@@ -210,6 +210,43 @@ Add one block per new result rather than changing a prediction into an implied f
 - Attachments: <repo-relative report, screenshot, log, or validation bundle>
 - Qualification: <what this proves and what it does not prove>
 ```
+
+## September 20, 2026 - Shipping/Mobile lantern benchmark on SM-S948B
+
+- Evidence type: local exact-APK installation/pullback, native RT presentation,
+  screenshot, five complete benchmark reports and thermal observations.
+- Exact raw model `SM-S948B`, Android 16, Adreno 840, Vulkan 1.4.295;
+  fresh system Vulkan JSON reports driver 2150932499 / 512.842.19.
+- Development-signed, non-debuggable `.benchmark` package; APK SHA-256
+  `0f30a72535a532f770d59f817b23934a2152f087588de95e8982698c60d80a95`.
+  Installation was pulled back byte-identically; stable and Debug packages were
+  not replaced or cleared. Runtime source is committed at `7ccb753` (built before
+  commit); later progress-label-only change `2cbad44` is not in this artifact.
+- Shipping/Mobile, strict ASTC and RayTracingPipeline honestly presented the real
+  held reward lantern. All five cases completed 600 measured frames apiece with
+  exact CPU/GPU completion joins, zero missing/rejected/cancelled/outstanding
+  records and diagnostics compiled out. Same PID was retained across Activity
+  recreations; final owning completion serials increased through 1201, 2407,
+  3611, 4814 and 6017.
+- Unchanged 100% / 1440x2980 median frame times: held-high 130.469 ms;
+  held-low 118.4801 ms; grazing 103.5469 ms; frozen motion-extreme 100.855 ms;
+  live reveal 146.9541 ms. These are baseline observations, not an optimization
+  claim or matched 1.6.0 comparison. The first four cases freeze authored state;
+  the last runs the live sequence. Do not generalize them to ordinary gameplay.
+- Android thermal status rose from 0 to 2; later GPU thermal power observations
+  ranged 0–3. GPU clock reads were permission-denied and remain unavailable; no
+  workaround was attempted. Start/warm-up/process history is retained rather
+  than claiming thermal equivalence across cases.
+- Evidence: `reports/phone-shipping-lantern-20260920/`; scope and exact boundaries
+  in [lantern benchmark validation](ENGINEERING_1_6_1_LANTERN_BENCHMARK_2026-09-20.md).
+  No S24/S25, final candidate, glass improvement or subjective viewmodel pass.
+- Home interruption rejected stale completion correctly but exposed a temporary
+  scene cleanup gap, fixed in `6576950`. Cleanup APK
+  `faf42c587379238796bfae987382386ea31028a643a9a28f6081827aadfc0eb1`
+  was installed/pulled back identically. Its interrupted run exported only an
+  invalid marker; subsequent normal relaunch presented RT at the ordinary
+  opening torch scene. This targeted lifecycle pass does not recertify the
+  earlier APK's timing figures for the cleanup artifact. Phone returned Home.
 
 ## Research sources
 

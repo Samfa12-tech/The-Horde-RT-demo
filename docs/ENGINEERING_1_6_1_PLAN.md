@@ -28,8 +28,17 @@ set is complete. It does not authorise publication or relax any RT requirement.
   its exact artifact and limitations. Android native route integration (`f46de7a`)
   passed a targeted four-ABI Debug build. Android unattended Release export
   (`2961ad0`, `e856161`) now has [native build and unit-test evidence](ANDROID_RELEASE_BENCHMARK_AUTOMATION_2026-09-20.md),
-  but still needs exact-APK device acceptance. Clean matched A/B remains open;
-  this does not close the original observability phase or final matrix.
+  and now has exact non-debuggable Shipping/Mobile phone export evidence for five
+  new [lantern workloads](ENGINEERING_1_6_1_LANTERN_BENCHMARK_2026-09-20.md).
+  The original route does not exercise the held lantern. Shared cases `6335049`,
+  Windows `efb04d1` and Android `7ccb753` preserve that route while adding explicit
+  frozen views and a live reveal sequence. [Clean Windows route A/B](ENGINEERING_1_6_1_CLEAN_SHIPPING_COMPARISON_2026-09-20.md)
+  records short-run evidence, not a speedup. Fresh Windows High Shipping/Diagnostic
+  shader parity passes 15 pairs including two held-lantern views; diagnostic glass
+  counter failures remain visible and open. Sustained thermal-matched 1.6.0/1.6.1
+  baseline A/B remains open; this does not close the original observability phase
+  or final matrix. Exact Android Home-cancel cleanup was fixed/device-checked at
+  `6576950` without replacing stable/Debug packages.
 - Hardware RayQuery native integration was accepted at `99b8565`, after shader,
   provider and capability prerequisites. [Targeted backend evidence](ENGINEERING_1_6_1_RAYQUERY_BACKEND_2026-09-13.md)
   records Windows and exact SM-S948B functional/lifecycle checks. Exact S24/S25

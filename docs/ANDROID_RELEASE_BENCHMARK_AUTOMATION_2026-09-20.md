@@ -48,7 +48,7 @@ an authorised, newly packaged candidate containing this implementation. Publishe
 $serial = 'VERIFIED_DEVICE_SERIAL'
 $package = 'com.samfa12.hordelanternrt.debug' # Use the exact candidate package.
 $runId = 'bench-' + [guid]::NewGuid().ToString('N')
-adb -s $serial shell am start -S -W -n "$package/.MainActivity" `
+adb -s $serial shell am start -S -W -n "$package/com.samfa12.hordelanternrt.MainActivity" `
     -a com.samfa12.hordelanternrt.action.BENCHMARK `
     --es horde.benchmark.run_id $runId
 # After the export marker appears, pull this run only:
