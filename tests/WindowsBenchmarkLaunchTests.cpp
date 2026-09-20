@@ -47,5 +47,23 @@ int main()
     check(!ParseWindowsBenchmarkLaunch(capture).requested &&
               ParseWindowsBenchmarkLaunch(capture).error.empty(),
           "existing capture-only launch remains the capture parser's responsibility");
+    for (const auto workload : horde::gameplay::kBenchmarkWorkloads)
+    {
+        const auto name = horde::gameplay::BenchmarkWorkloadName(workload);
+        const std::wstring wideName(name.begin(), name.end());
+        const std::array<std::wstring_view, 4> args{
+            L"--benchmark-showcase", L"reports", L"--benchmark-workload", wideName};
+        const auto launch = ParseWindowsBenchmarkLaunch(args);
+        check(launch.requested && launch.error.empty() && launch.workload == workload,
+              "each exact allowlisted workload must select its shared simulation case");
+    }
+    const std::array<std::wstring_view, 2> orphan{L"--benchmark-workload", L"lantern-held-high-v1"};
+    check(!ParseWindowsBenchmarkLaunch(orphan).error.empty(), "workload must not modify an ordinary launch");
+    const std::array<std::wstring_view, 3> missingWorkload{L"--benchmark-showcase", L"reports", L"--benchmark-workload"};
+    check(!ParseWindowsBenchmarkLaunch(missingWorkload).error.empty(), "missing workload must fail");
+    const std::array<std::wstring_view, 4> unknownWorkload{L"--benchmark-showcase", L"reports", L"--benchmark-workload", L"glass-fast"};
+    check(!ParseWindowsBenchmarkLaunch(unknownWorkload).error.empty(), "unknown workload must not silently run the route");
+    const std::array<std::wstring_view, 6> duplicateWorkload{L"--benchmark-showcase", L"reports", L"--benchmark-workload", L"lantern-held-high-v1", L"--benchmark-workload", L"lantern-held-low-v1"};
+    check(!ParseWindowsBenchmarkLaunch(duplicateWorkload).error.empty(), "duplicate workloads must fail");
     return passed ? 0 : 1;
 }

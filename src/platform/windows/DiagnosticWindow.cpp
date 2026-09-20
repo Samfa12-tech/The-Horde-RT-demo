@@ -52,6 +52,7 @@
 #include "gameplay/ShowcaseBenchmark.h"
 #include "telemetry/RtBenchmarkEvidenceRun.h"
 #include "gameplay/ShowcaseCheckpoints.h"
+#include "gameplay/LanternBenchmarkScenario.h"
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/SpatialAudio.h"
 #include "gameplay/SwordCombat.h"
@@ -1946,10 +1947,12 @@ void UpdateBenchmarkHud(VulkanSurfaceContext& context)
     }
 }
 
-void StartBenchmark(VulkanSurfaceContext& context)
+void StartBenchmark(VulkanSurfaceContext& context,
+                    const horde::gameplay::BenchmarkWorkload workload =
+                        horde::gameplay::BenchmarkWorkload::ShowcaseRoute)
 {
     ResetRoute(context);
-    context.benchmark.Start();
+    context.benchmark.Start(horde::gameplay::ShowcaseBenchmarkRun::kDefaultLaps, workload);
     (void)context.benchmarkEvidence.Start(
         horde::gameplay::ShowcaseBenchmarkRun::kMaximumFramesPerLap);
     context.expectedBenchmarkFrame.reset();
@@ -2904,6 +2907,14 @@ void UpdateDesktopSceneControls(
                     horde::telemetry::RtLifecycleEvent::WarmupToMeasure);
             }
         }
+        const auto workload = context.benchmark.Workload();
+        if (horde::gameplay::IsLanternBenchmark(workload) && advance.frameInLap == 1u &&
+            !horde::gameplay::StageLanternBenchmark(context.simulation, workload))
+        {
+            context.benchmark.Cancel();
+            context.benchmarkEvidence.Cancel();
+            return;
+        }
         if (context.benchmark.CurrentLap() == context.benchmark.TotalLaps())
         {
             if (context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Allocated)
@@ -2925,7 +2936,9 @@ void UpdateDesktopSceneControls(
         input.authoritativePlayerX = advance.replay.x;
         input.authoritativePlayerZ = advance.replay.z;
         input.yawRadians = advance.replay.yaw;
-        input.pitchRadians = -0.04f;
+        input.pitchRadians = horde::gameplay::IsLanternBenchmark(workload)
+            ? horde::gameplay::kLanternBenchmarkPitch : -0.04f;
+        if (horde::gameplay::IsFrozenBenchmark(workload)) context.frameDeltaSeconds = 0.0f;
         input.torchLightStrength = context.torchLightStrength;
         input.commands.attack = context.attackSequence;
         input.commands.parry = context.parrySequence;
@@ -2957,6 +2970,10 @@ void UpdateDesktopSceneControls(
     {
         UpdateVitalityHud(context);
     }
+    if (horde::gameplay::IsLanternBenchmark(context.benchmark.Workload()) &&
+        !context.benchmarkCompletionHandled &&
+        (context.benchmark.FrameInLap() == 1u || context.benchmark.FrameInLap() % 60u == 0u))
+        UpdateBenchmarkHud(context);
 }
 
 #if defined(_DEBUG)
@@ -3878,7 +3895,8 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         {
             ShowDeathMenu(ctx);
         }
-        if (simulation.finaleComplete)
+        if (simulation.finaleComplete &&
+            (!ctx.benchmark.HasStarted() || ctx.benchmarkCompletionHandled))
         {
             TryGrantRtLabUnlock(ctx, true);
             ShowEndingMenu(ctx);
@@ -4680,7 +4698,8 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                                  const std::filesystem::path* captureDirectory,
                                  const std::string* developmentCheckpoint,
                                  const bool requireRayQueryCompute,
-                                 const bool unattendedBenchmark)
+                                 const bool unattendedBenchmark,
+                                 const horde::gameplay::BenchmarkWorkload benchmarkWorkload)
 {
     VulkanSurfaceContext context;
     context.windowHandle = hWnd;
@@ -4858,7 +4877,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             DestroyRenderContext(context);
             return 1;
         }
-        StartBenchmark(context);
+        StartBenchmark(context, benchmarkWorkload);
     }
     const VkClearColorValue clearColor = ClearColorForMode(capabilities.rtMode);
     MSG message{};
@@ -6362,7 +6381,8 @@ int CreateAndShowWindow(const std::string& diagnosticText,
                         const std::filesystem::path* captureDirectory,
                         const std::string* developmentCheckpoint,
                         const bool requireRayQueryCompute,
-                        const bool unattendedBenchmark)
+                        const bool unattendedBenchmark,
+                        const horde::gameplay::BenchmarkWorkload benchmarkWorkload)
 {
     const HINSTANCE instance = GetModuleHandleA(nullptr);
     INITCOMMONCONTROLSEX commonControls{sizeof(INITCOMMONCONTROLSEX), ICC_BAR_CLASSES};
@@ -6623,7 +6643,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
 
     const int result = RunDiagnosticSwapchainWindow(
         hWnd, capabilities, textReportPath, jsonReportPath, captureDirectory,
-        developmentCheckpoint, requireRayQueryCompute, unattendedBenchmark);
+        developmentCheckpoint, requireRayQueryCompute, unattendedBenchmark, benchmarkWorkload);
     if ((captureDirectory != nullptr || unattendedBenchmark) && IsWindow(hWnd))
     {
         DestroyWindow(hWnd);
@@ -6704,7 +6724,7 @@ int RunDiagnosticWindow(const int showCommand)
         : &launchOptions.developmentCheckpoint;
     return CreateAndShowWindow(diagnosticText, capabilities, textReportPath, jsonReportPath,
                                captureDirectory, developmentCheckpoint, launchOptions.requireRayQueryCompute,
-                               launchOptions.benchmark.requested);
+                               launchOptions.benchmark.requested, launchOptions.benchmark.workload);
 }
 
 } // namespace horde::platform::windows
