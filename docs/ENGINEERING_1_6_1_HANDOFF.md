@@ -1,7 +1,7 @@
 # 1.6.1 recovery handoff
 
 Updated 2026-09-20. Branch: `codex/horde-1.6.1-engineering-pass`.
-The full goal remains active, not complete. See [programme scope](ENGINEERING_1_6_1_PLAN.md)
+The full goal is paused at the owner's 5% usage threshold, not complete. See [programme scope](ENGINEERING_1_6_1_PLAN.md)
 and [latest lantern evidence](ENGINEERING_1_6_1_LANTERN_BENCHMARK_2026-09-20.md).
 
 ## Owner's quota and backup instruction
@@ -13,7 +13,29 @@ models, redeem credits or shrink the goal. Before pausing, preserve a current
 handoff and safely commit/push task-owned work without credentials, unrelated
 files, force-push or release publication; verify the remote SHA. Keep GitHub
 current after subsequent coherent, reviewed slices rather than waiting for 5%.
-The latest September 20 check reported 6% weekly remaining, so it did not trigger a pause.
+The final September 20 check reported **5% weekly remaining** (95% used), triggering
+the requested pause. No more engineering work starts until the owner resumes.
+The usage guard is also paused; resuming the project does not reduce its scope.
+
+### Quota checkpoint
+
+Engineering work through `614a0e2daea00f4eec3ce02792cbc1af3317ec5c` is pushed and
+remote-verified; this final handoff-only checkpoint follows it on the same branch.
+Measurement-only baseline `186068a4adcb223d3096eee779fcf2b607117503` is also
+remote-verified and clean. Phase 2 commits since the Phase 1 gate:
+
+- `4063f90`: shared typed four-way contract (3/3 targeted MSVC tests).
+- `d26f1c9`: manifest/loader enforcement (5/5 targeted MSVC tests).
+- `ef8fdc0`: canonical texture groups (4/4 targeted MSVC tests; four-ABI Android build).
+- `81908e1`: actual skinned malformed/reordered fixtures (final 2/2 MSVC tests).
+- `614a0e2`: reproducible single-thread export runner, evidence and metadata reconciliation.
+
+No worker/build/benchmark remains active. No phone action, release publication,
+signing change, source-asset replacement or licence change occurred in this slice.
+Four pre-existing untracked scratch paths remain deliberately uncommitted. Curated
+evidence and reproducible sources are backed up; local APKs/build caches/generated
+validation GLBs are not a full workstation backup. Fresh GCC/CI, generated-runtime
+admission and affected RT image/device checks remain open; do not mark Phase 2 green.
 
 ## Accepted work and current boundaries
 
