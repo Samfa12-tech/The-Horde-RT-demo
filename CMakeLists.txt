@@ -523,6 +523,8 @@ if(BUILD_TESTING)
     add_executable(horde_rt_desktop_controller_input_tests tests/DesktopControllerInputTests.cpp)
     target_include_directories(horde_rt_desktop_controller_input_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_desktop_controller_input_tests COMMAND horde_rt_desktop_controller_input_tests)
+    set_tests_properties(horde_rt_desktop_controller_input_tests PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 
     add_executable(horde_rt_gpu_timestamp_math_tests tests/GpuTimestampMathTests.cpp)
     target_include_directories(horde_rt_gpu_timestamp_math_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)

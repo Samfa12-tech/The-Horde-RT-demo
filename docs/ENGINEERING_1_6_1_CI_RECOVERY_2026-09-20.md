@@ -32,10 +32,32 @@ This is merge review, not compiler, hardware or release acceptance.
 
 | Finding | Status |
 | --- | --- |
-| PR conflicts hide current compiler checks | Main reconciled in merge commit `d3a7225`; exact branch-push trigger added; remote mergeability and fresh jobs still to verify |
-| Portable lane excludes actual skinned smoke/fixtures | Vulkan-enabled Ubuntu GCC CPU-host lane added for eight focused tests, with required LFS assets and no-tests rejection; not yet a passing job |
+| PR conflicts hide current compiler checks | Resolved: main reconciled in `d3a7225`; PR is MERGEABLE, description updated, and fresh push/PR jobs exist for `cd8614b` |
+| Portable lane excludes actual skinned smoke/fixtures | Resolved coverage gap: Vulkan-enabled GCC 13.3 / SDK 1.3.275 CPU-host lane passes 8/8 on both fresh push and PR runs at `cd8614b`; local MSVC Shipping/Mobile also passes 8/8 |
+| Portable suite current-source failure | `cd8614b` passes 42/43; stale Windows RT Lab source assertion repaired and locally revalidated, fresh remote full result pending |
 | Phase 2 generated-runtime admission | Open; repeatable single-thread artifact differs in vertex ordering/tangents and has not replaced the accepted runtime |
 | Phase 1 measurement foundation | Accepted; not being restarted |
 | Dedicated viewmodel, glass/backend parity, music/reporting and final matrix | Remain in scope and incomplete |
 
 Audio/haptic manual revalidation required: **NO** for this documentation/CI work.
+
+## Fresh evidence and first follow-up
+
+- Push run [35500137514](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/35500137514)
+  and PR run [35500139386](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/35500139386)
+  are new runs for `cd8614bf83404bd342b9f84fb434254d39d58e1e`, not old-job reruns.
+- Both focused player lanes pass all eight tests. The retained portable lane
+  exposes one failure in `horde_rt_desktop_controller_input_tests`: it still looked
+  for an inline UI pause assignment superseded by `MeasurementPausedByUi`.
+  Actual tuning forwarding and UI pause propagation are intact in current source.
+- Reproduced the exact RED locally. The repaired assertion requires the helper's
+  settings/RT Lab/diagnostics/report logic, its actual assignment to
+  `simulationPaused`, propagation to `simulationInput.paused`, tuning forwarding
+  and reset. Runtime code was not changed to satisfy this test. External-build
+  source lookup is fixed by an explicit CTest working directory.
+- Final local MSVC targeted test passes 1/1 (1.41s). The broader CI result remains
+  pending until a new run includes the fix. Logs stay under ignored `reports/`;
+  the immutable GitHub run links retain remote evidence.
+- Imported main roadmap files are byte-preserved, including intentional Markdown
+  two-space line breaks reported by `git diff --check`; new/resolved edits pass
+  the scoped whitespace check. No unrelated formatting churn was applied.
