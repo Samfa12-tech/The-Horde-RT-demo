@@ -82,8 +82,10 @@ const char* ShowcaseBenchmarkStatusName(const ShowcaseBenchmarkStatus status)
     }
 }
 
-void ShowcaseBenchmarkRun::Start(const std::uint32_t laps)
+void ShowcaseBenchmarkRun::Start(const std::uint32_t laps,
+                                 const BenchmarkWorkload workload)
 {
+    workload_ = workload;
     totalLaps_ = std::max(1u, laps);
     currentLap_ = 1u;
     completedLaps_ = 0u;
@@ -92,14 +94,15 @@ void ShowcaseBenchmarkRun::Start(const std::uint32_t laps)
     pendingLapRestart_ = false;
     presentedEveryFrame_ = true;
     frames_.clear();
-    replay_.Reset();
-    status_ = ShowcaseBenchmarkStatus::Running;
+    currentReplay_ = replay_.Reset();
+    status_ = BenchmarkWorkloadName(workload) == "invalid"
+        ? ShowcaseBenchmarkStatus::Failed : ShowcaseBenchmarkStatus::Running;
 }
 
 ShowcaseBenchmarkAdvance ShowcaseBenchmarkRun::Advance()
 {
     ShowcaseBenchmarkAdvance result;
-    result.replay = replay_.Snapshot();
+    result.replay = currentReplay_;
     if (!IsRunning())
     {
         result.finished = status_ == ShowcaseBenchmarkStatus::Complete ||
@@ -116,8 +119,24 @@ ShowcaseBenchmarkAdvance ShowcaseBenchmarkRun::Advance()
         result.lapStarted = true;
     }
 
-    result.replay = replay_.Update();
-    if (++lapFrames_ > 4000u)
+    if (IsLanternBenchmark(workload_))
+    {
+        result.replay = {};
+        result.replay.x = kLanternBenchmarkX;
+        result.replay.z = kLanternBenchmarkZ;
+        result.replay.yaw = kLanternBenchmarkYaw;
+        result.replay.zone = QueryShowcaseZone(kLanternBenchmarkX, kLanternBenchmarkZ);
+        result.replay.complete = lapFrames_ + 1u == kLanternBenchmarkFramesPerLap;
+        result.replay.waypointReached = result.replay.complete;
+        result.replay.reachedWaypoints = result.replay.complete ? 1u : 0u;
+    }
+    else
+    {
+        result.replay = replay_.Update();
+    }
+    currentReplay_ = result.replay;
+    result.frameInLap = lapFrames_ + 1u;
+    if (++lapFrames_ > kMaximumFramesPerLap)
     {
         status_ = ShowcaseBenchmarkStatus::Failed;
         result.finished = true;
@@ -157,7 +176,7 @@ void ShowcaseBenchmarkRun::RecordFrame(const double frameTimeMs, const bool rtFr
     {
         return;
     }
-    frames_.push_back({frameTimeMs, replay_.Snapshot().zone, currentLap_});
+    frames_.push_back({frameTimeMs, currentReplay_.zone, currentLap_});
     presentedEveryFrame_ = presentedEveryFrame_ && rtFramePresented;
 }
 
@@ -173,8 +192,11 @@ bool ShowcaseBenchmarkRun::Passed() const
 {
     return status_ == ShowcaseBenchmarkStatus::Complete &&
            completedLaps_ == totalLaps_ &&
-           reachedWaypoints_ == static_cast<std::size_t>(totalLaps_) * kShowcaseReplayPath.size() &&
-           presentedEveryFrame_ && !frames_.empty();
+           reachedWaypoints_ == static_cast<std::size_t>(totalLaps_) *
+               (IsLanternBenchmark(workload_) ? 1u : kShowcaseReplayPath.size()) &&
+           presentedEveryFrame_ && !frames_.empty() &&
+           (!IsLanternBenchmark(workload_) ||
+            frames_.size() == kLanternBenchmarkFramesPerLap);
 }
 
 ShowcaseBenchmarkStatistics ShowcaseBenchmarkRun::StatisticsFor(const ShowcaseZone zone,
@@ -222,10 +244,16 @@ ShowcaseBenchmarkStatistics ShowcaseBenchmarkRun::ZoneStatistics(const ShowcaseZ
 std::string ShowcaseBenchmarkRun::ProgressText() const
 {
     std::ostringstream out;
+    if (IsLanternBenchmark(workload_))
+    {
+        out << BenchmarkWorkloadName(workload_) << ' ' << currentLap_ << '/' << totalLaps_
+            << " | FRAME " << lapFrames_ << '/' << kLanternBenchmarkFramesPerLap;
+        return out.str();
+    }
     out << "BENCHMARK " << std::max(1u, currentLap_) << '/' << totalLaps_
-        << "  |  WAYPOINT " << replay_.Snapshot().reachedWaypoints << '/'
+        << "  |  WAYPOINT " << currentReplay_.reachedWaypoints << '/'
         << kShowcaseReplayPath.size()
-        << "  |  " << ShowcaseZoneName(replay_.Snapshot().zone);
+        << "  |  " << ShowcaseZoneName(currentReplay_.zone);
     return out.str();
 }
 
@@ -249,13 +277,29 @@ std::string ShowcaseBenchmarkRun::BuildTextReport(const ShowcaseBenchmarkMetadat
         << "Render scale: " << metadata.renderScalePercent << "%\n"
         << "Internal RT extent: " << metadata.internalWidth << 'x' << metadata.internalHeight << '\n'
         << "Presentation extent: " << metadata.presentationWidth << 'x' << metadata.presentationHeight << "\n\n"
-        << "COURSE\n"
-        << "Preset: deterministic 13-waypoint complete showcase route\n"
+        << "COURSE\n";
+    if (IsLanternBenchmark(workload_))
+    {
+        out << "Workload: " << BenchmarkWorkloadName(workload_) << '\n'
+            << "Simulation policy: "
+            << (IsFrozenBenchmark(workload_) ? "frozen-authored-snapshot" : "fixed-step-60hz")
+            << '\n'
+            << "Preset: " << BenchmarkWorkloadName(workload_) << '\n';
+    }
+    else
+    {
+        out << "Preset: deterministic 13-waypoint complete showcase route\n";
+    }
+    out
         << "Pass policy: lap 1 warm-up, final lap measured\n"
-        << "Simulation: fixed 0.032 world units/frame and 1/60 second gameplay step\n"
+        << "Simulation: " << (IsFrozenBenchmark(workload_) ? "frozen authored gameplay snapshot" :
+            IsLanternBenchmark(workload_) ? "stationary camera; live 1/60 second reveal sequence" :
+            "fixed 0.032 world units/frame and 1/60 second gameplay step") << '\n'
         << "Laps completed: " << completedLaps_ << '/' << totalLaps_ << '\n'
-        << "Waypoints reached: " << reachedWaypoints_ << '/'
-        << static_cast<std::size_t>(totalLaps_) * kShowcaseReplayPath.size() << '\n'
+        << (IsLanternBenchmark(workload_) ? "Cases completed: " : "Waypoints reached: ")
+        << reachedWaypoints_ << '/'
+        << static_cast<std::size_t>(totalLaps_) *
+            (IsLanternBenchmark(workload_) ? 1u : kShowcaseReplayPath.size()) << '\n'
         << "Measured frames: " << overall.frames << "\n\n"
         << std::fixed << std::setprecision(3)
         << "OVERALL FRAME TIME\n"
@@ -284,7 +328,17 @@ std::string ShowcaseBenchmarkRun::BuildJsonReport(const ShowcaseBenchmarkMetadat
     out << std::fixed << std::setprecision(4)
         << "{\n"
         << "  \"schema\": 1,\n"
-        << "  \"result\": \"" << (Passed() ? "complete" : "invalid") << "\",\n"
+        << "  \"result\": \"" << (Passed() ? "complete" : "invalid") << "\",\n";
+    if (IsLanternBenchmark(workload_))
+    {
+        out << "  \"workload\": \"" << BenchmarkWorkloadName(workload_) << "\",\n"
+            << "  \"workloadComplete\": " << (Passed() ? "true" : "false") << ",\n"
+            << "  \"simulationPolicy\": \""
+            << (IsFrozenBenchmark(workload_) ? "frozen-authored-snapshot" : "fixed-step-60hz")
+            << "\",\n"
+            << "  \"routeTraversalComplete\": false,\n";
+    }
+    out
         << "  \"status\": \"" << ShowcaseBenchmarkStatusName(status_) << "\",\n"
         << "  \"timestampUtc\": \"" << JsonEscape(metadata.timestampUtc) << "\",\n"
         << "  \"build\": \"" << JsonEscape(metadata.buildIdentity) << "\",\n"
@@ -302,7 +356,7 @@ std::string ShowcaseBenchmarkRun::BuildJsonReport(const ShowcaseBenchmarkMetadat
         << ", \"height\": " << metadata.presentationHeight << "},\n"
         << "  \"lapsCompleted\": " << completedLaps_ << ",\n"
         << "  \"lapsRequested\": " << totalLaps_ << ",\n"
-        << "  \"waypointsReached\": " << reachedWaypoints_ << ",\n"
+        << "  \"waypointsReached\": " << ReachedWaypoints() << ",\n"
         << "  \"measuredFrames\": " << overall.frames << ",\n"
         << "  \"overall\": {\"averageMs\": " << overall.averageMs
         << ", \"medianMs\": " << overall.medianMs

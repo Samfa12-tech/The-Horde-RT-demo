@@ -130,6 +130,16 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AN
 endif()
 
 if(BUILD_TESTING)
+    add_executable(horde_rt_lantern_benchmark_tests
+        tests/LanternBenchmarkTests.cpp
+        src/gameplay/ShowcaseBenchmark.cpp)
+    target_include_directories(horde_rt_lantern_benchmark_tests PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(horde_rt_lantern_benchmark_tests PRIVATE
+        horde_gameplay_simulation)
+    add_test(NAME horde_rt_lantern_benchmark_tests
+        COMMAND horde_rt_lantern_benchmark_tests)
+
     add_executable(horde_rt_github_release_updater_tests
         tests/GitHubReleaseUpdaterTests.cpp
         src/update/GitHubReleaseUpdater.cpp

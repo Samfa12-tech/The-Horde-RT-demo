@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "gameplay/BenchmarkWorkload.h"
 #include "gameplay/ShowcaseReplay.h"
 
 namespace horde::gameplay
@@ -22,6 +23,7 @@ enum class ShowcaseBenchmarkStatus
 struct ShowcaseBenchmarkAdvance
 {
     ShowcaseReplaySnapshot replay;
+    std::uint32_t frameInLap = 0u;
     bool lapStarted = false;
     bool lapCompleted = false;
     bool finished = false;
@@ -64,8 +66,10 @@ class ShowcaseBenchmarkRun
 {
 public:
     static constexpr std::uint32_t kDefaultLaps = 2u;
+    static constexpr std::uint32_t kMaximumFramesPerLap = 4000u;
 
-    void Start(std::uint32_t laps = kDefaultLaps);
+    void Start(std::uint32_t laps = kDefaultLaps,
+               BenchmarkWorkload workload = BenchmarkWorkload::ShowcaseRoute);
     ShowcaseBenchmarkAdvance Advance();
     void RecordFrame(double frameTimeMs, bool rtFramePresented);
     void Cancel();
@@ -75,11 +79,16 @@ public:
     bool HasStarted() const { return status_ != ShowcaseBenchmarkStatus::Idle; }
     bool Passed() const;
     std::uint32_t CurrentLap() const { return currentLap_; }
+    std::uint32_t FrameInLap() const { return lapFrames_; }
     std::uint32_t CompletedLaps() const { return completedLaps_; }
     std::uint32_t TotalLaps() const { return totalLaps_; }
-    std::size_t ReachedWaypoints() const { return reachedWaypoints_; }
+    std::size_t ReachedWaypoints() const
+    {
+        return IsLanternBenchmark(workload_) ? 0u : reachedWaypoints_;
+    }
     bool PresentedEveryFrame() const { return presentedEveryFrame_; }
-    const ShowcaseReplaySnapshot& ReplaySnapshot() const { return replay_.Snapshot(); }
+    BenchmarkWorkload Workload() const { return workload_; }
+    const ShowcaseReplaySnapshot& ReplaySnapshot() const { return currentReplay_; }
     const std::vector<ShowcaseBenchmarkFrame>& Frames() const { return frames_; }
 
     ShowcaseBenchmarkStatistics OverallStatistics() const;
@@ -92,6 +101,8 @@ private:
     ShowcaseBenchmarkStatistics StatisticsFor(ShowcaseZone zone, bool filterZone) const;
 
     ShowcaseRouteReplay replay_;
+    ShowcaseReplaySnapshot currentReplay_{};
+    BenchmarkWorkload workload_ = BenchmarkWorkload::ShowcaseRoute;
     ShowcaseBenchmarkStatus status_ = ShowcaseBenchmarkStatus::Idle;
     std::uint32_t totalLaps_ = kDefaultLaps;
     std::uint32_t currentLap_ = 0u;
