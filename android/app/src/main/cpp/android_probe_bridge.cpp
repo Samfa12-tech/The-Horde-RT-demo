@@ -736,6 +736,10 @@ void CancelActiveInAppBenchmark(SwapchainContext& context)
     context.benchmarkExpectedFrame.reset();
     if (cancelled)
     {
+        // All active-context callers run on the owning render thread, including
+        // surface teardown. Home can stop the loop before the queued cancel
+        // command runs; restore the benchmark's temporary gameplay state here.
+        ResetShowcaseSimulation();
         gInAppBenchmarkStatus.store(3, std::memory_order_release);
     }
 }
@@ -2466,7 +2470,6 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
              context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring))
         {
             CancelActiveInAppBenchmark(context);
-            ResetShowcaseSimulation();
             if (context.rtFrameEvidenceInitialised)
             {
                 (void)context.rtFrameEvidence.ApplyEvent(

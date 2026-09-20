@@ -100,6 +100,11 @@ int main()
         check(json.find(BenchmarkWorkloadName(workload)) != std::string::npos &&
               json.find(IsFrozenBenchmark(workload) ? "frozen-authored-snapshot" : "fixed-step-60hz") != std::string::npos,
               "Report must distinguish workload and frozen/live simulation");
+        game.ResetRoute();
+        check(game.Snapshot().interaction.heldLightKind == HeldLightKind::Torch &&
+              !game.Snapshot().finale.lanternClaimed && !game.Snapshot().finaleComplete &&
+              game.Snapshot().playerX == kPlayerSpawn.x && game.Snapshot().playerZ == kPlayerSpawn.z,
+              "Benchmark cancellation cleanup must restore ordinary spawn/torch state");
     }
     ShowcaseBenchmarkRun invalid;
     invalid.Start(2, static_cast<BenchmarkWorkload>(255));
