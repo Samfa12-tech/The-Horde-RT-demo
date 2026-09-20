@@ -13,7 +13,7 @@ models, redeem credits or shrink the goal. Before pausing, preserve a current
 handoff and safely commit/push task-owned work without credentials, unrelated
 files, force-push or release publication; verify the remote SHA. Keep GitHub
 current after subsequent coherent, reviewed slices rather than waiting for 5%.
-The latest September 20 check reported 8% weekly remaining, so it did not trigger a pause.
+The latest September 20 check reported 7% weekly remaining, so it did not trigger a pause.
 
 ## Accepted work and current boundaries
 
@@ -76,12 +76,13 @@ fresh-process `am start -S -W`; without `-S` one attempt only brought a task for
 and was excluded. Baseline/candidate remain100%, stable76%; phone Home, no sampler,
 build, benchmark or worker remains active.
 
-1. **Continue Phase 2:** the [first typed-contract slice](ENGINEERING_1_6_1_PLAYER_CONTRACT_2026-09-20.md)
-   now covers Body/Head/NearFace/Gauntlet and passes 3/3 targeted MSVC Release tests.
-   The processor/runtime GLB already emit all four, but the clip manifest still
-   describes only three. Make manifest/loader/texture mapping order-independent,
-   reject missing/unknown/duplicate/conflicting semantics, regenerate cleanly and
-   validate GCC/MSVC. Preserve primary masking of Head/NearFace.
+1. **Continue Phase 2:** the [typed contract and loader enforcement](ENGINEERING_1_6_1_PLAYER_CONTRACT_2026-09-20.md)
+   now cover Body/Head/NearFace/Gauntlet, synchronize both manifests, and pass 5/5
+   targeted MSVC Release tests. Static/skinned loaders enforce actual named parts;
+   production player loading requires the declaration. Next replace implicit
+   first-seen texture allocation in `RtStaticMeshSlot.cpp`, add texture/skinned
+   malformed fixtures, regenerate cleanly and validate GCC/MSVC/Android.
+   Preserve primary masking of Head/NearFace. Phase 2 is not complete.
 2. Dedicated real-geometry RT viewmodel/world-body ownership remains unimplemented.
    Keep gameplay-owned IK/grip authority and independent small dynamic resources;
    no full-body primary-ray switch, overlays or permanent procedural block arms.

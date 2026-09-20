@@ -1747,6 +1747,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             diagnostic) ||
         !horde::scene::assets::AssetManifest::Load(
             playerDirectory / "asset.manifest.json", playerManifest, diagnostic) ||
+        !playerManifest.ValidatePlayerSemantics(diagnostic) ||
         !horde::scene::assets::StaticMeshAsset::Load(
             playerDirectory / "gothic-traveller-lod0.runtime.glb",
             playerManifest, productionPlayerAsset_, diagnostic) ||

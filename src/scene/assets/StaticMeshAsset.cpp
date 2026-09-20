@@ -835,6 +835,8 @@ bool StaticMeshAsset::Load(const std::filesystem::path& runtimeGlb,
                            std::string& diagnostic)
 {
     asset = {};
+    if (!manifest.primitiveSemantics.empty() && !manifest.ValidatePlayerSemantics(diagnostic))
+        return false;
     GltfDocument document;
     if (!GltfDocument::Load(runtimeGlb, document, diagnostic)) return false;
     const cgltf_data& data = *document.Data();
@@ -1193,6 +1195,18 @@ bool StaticMeshAsset::Load(const std::filesystem::path& runtimeGlb,
     {
         diagnostic = "Static GLB contains no presentable triangle primitives.";
         return false;
+    }
+    if (!manifest.primitiveSemantics.empty())
+    {
+        std::vector<std::string_view> names;
+        names.reserve(asset.primitives.size());
+        for (const auto& primitive : asset.primitives)
+            names.push_back(asset.materials[primitive.materialIndex].name);
+        if (!ValidatePlayerPrimitiveNames(names, diagnostic))
+        {
+            asset = {};
+            return false;
+        }
     }
     if (!ValidateThickDielectricTopology(asset, diagnostic)) return false;
     diagnostic.clear();

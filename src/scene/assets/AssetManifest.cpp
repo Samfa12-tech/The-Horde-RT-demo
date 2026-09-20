@@ -1,4 +1,5 @@
 #include "scene/assets/AssetManifest.h"
+#include "scene/assets/PlayerPrimitiveContract.h"
 
 #include <algorithm>
 #include <array>
@@ -554,6 +555,26 @@ bool ParseMaterialOverrides(JsonReader& reader, AssetManifest& manifest)
     });
 }
 
+bool ParsePrimitiveSemantics(JsonReader& reader, AssetManifest& manifest)
+{
+    return reader.Array([&](std::size_t index) {
+        if (index >= kPlayerPrimitiveContract.size()) return false;
+        AssetPrimitiveSemantic declaration;
+        std::array<bool, 4> present{};
+        const bool parsed = reader.Object([&](const std::string& key) {
+            if (key == "material") return present[0] = reader.String(declaration.material);
+            if (key == "firstPersonPrimary") return present[1] = reader.Boolean(declaration.firstPersonPrimary);
+            if (key == "shadow") return present[2] = reader.Boolean(declaration.shadow);
+            if (key == "reflection") return present[3] = reader.Boolean(declaration.reflection);
+            return reader.RejectField("primitiveSemantics", key);
+        });
+        if (!parsed || !std::all_of(present.begin(), present.end(), [](bool value) { return value; }))
+            return false;
+        manifest.primitiveSemantics.push_back(std::move(declaration));
+        return true;
+    });
+}
+
 bool ParseManifest(std::string_view text, AssetManifest& manifest, std::string& diagnostic)
 {
     JsonReader reader(text);
@@ -566,6 +587,7 @@ bool ParseManifest(std::string_view text, AssetManifest& manifest, std::string& 
     bool hasRequiredSockets = false;
     bool hasTextureProfile = false;
     bool hasMaterialOverrides = false;
+    bool hasPrimitiveSemantics = false;
     double metresPerUnit = 0.0;
 
     const bool parsed = reader.Object([&](const std::string& key) {
@@ -614,6 +636,11 @@ bool ParseManifest(std::string_view text, AssetManifest& manifest, std::string& 
             hasMaterialOverrides = ParseMaterialOverrides(reader, manifest);
             return hasMaterialOverrides;
         }
+        if (key == "primitiveSemantics")
+        {
+            hasPrimitiveSemantics = ParsePrimitiveSemantics(reader, manifest);
+            return hasPrimitiveSemantics;
+        }
         if (key == "distribution" || key == "licenceStatus")
         {
             std::string ignored;
@@ -637,10 +664,27 @@ bool ParseManifest(std::string_view text, AssetManifest& manifest, std::string& 
         return false;
     }
     manifest.metresPerUnit = static_cast<float>(metresPerUnit);
+    if (hasPrimitiveSemantics && !manifest.ValidatePlayerSemantics(diagnostic)) return false;
     return true;
 }
 
 } // namespace
+
+bool AssetManifest::ValidatePlayerSemantics(std::string& diagnostic) const
+{
+    if (primitiveSemantics.size() != kPlayerPrimitiveContract.size())
+    {
+        diagnostic = "Player manifest requires exactly four primitive semantics.";
+        return false;
+    }
+    std::array<PlayerPrimitiveDeclaration, kPlayerPrimitiveContract.size()> declarations{};
+    for (std::size_t i = 0; i < declarations.size(); ++i)
+    {
+        const auto& source = primitiveSemantics[i];
+        declarations[i] = {source.material, source.firstPersonPrimary, source.shadow, source.reflection};
+    }
+    return ValidatePlayerPrimitiveDeclarations(declarations, diagnostic);
+}
 
 bool AssetManifest::Load(const std::filesystem::path& path,
                          AssetManifest& manifest,

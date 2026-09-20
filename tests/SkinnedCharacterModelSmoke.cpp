@@ -672,7 +672,8 @@ int main()
         horde::scene::assets::AssetManifest::Load(
             root / "assets/models/player/runtime/asset.manifest.json",
             playerManifest, diagnostic);
-    if (!Require(playerManifestLoaded, diagnostic.c_str())) return 1;
+    if (!Require(playerManifestLoaded, diagnostic.c_str()) ||
+        !Require(playerManifest.ValidatePlayerSemantics(diagnostic), diagnostic.c_str())) return 1;
     const bool playerStaticLoaded = horde::scene::assets::StaticMeshAsset::Load(
         playerPath, playerManifest, playerStatic, diagnostic);
     if (!Require(playerStaticLoaded, diagnostic.c_str()) ||

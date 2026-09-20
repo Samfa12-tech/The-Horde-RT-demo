@@ -26,14 +26,40 @@ No shaders, asset bytes, ray masks, gameplay or feedback inputs were changed.
 Current GLB SHA-256 remains
 `cd64a8447097f59f825620ef43e2425f9286ff075f5bfdb48c25c5d96f2c479d`.
 
+## Second slice: manifest and loader enforcement
+
+Both runtime and clip manifests now declare all four semantics. The generic
+manifest parser owns material strings and distinguishes an absent optional field
+from an explicitly empty field during parsing. A supplied field must contain the
+exact four valid declarations; production player loading explicitly requires it.
+Other assets remain compatible without player metadata. Programmatically supplied
+nonempty declarations are revalidated by the static loader.
+
+Static loading validates actual per-primitive material references, not just the
+GLB material table. The skinned player slot validates its primitive names before
+deriving grip sockets and clears a semantically invalid loaded asset. These are
+load-time checks; no per-frame work or presentation switch was added.
+
+New regressions exercise owned-string copying, parser presence/type/duplicate-key
+handling, malformed declarations, 24 manifest orders, 24 independently reordered
+four-primitive GLBs, actual missing/duplicate/unknown geometry semantics, existing
+primary mask bits, and runtime/clip manifest agreement. The shipped player GLB
+also passes the existing static/skinned stream and grip/animation smoke.
+
+Fresh MSVC Release build succeeded. The first CTest attempt passed 3/4; the skinned
+smoke could not locate repository assets from the external build directory. Its
+CTest working directory is now the source directory. Final targeted run passes
+**5/5** (3.31 seconds): contract, manifest agreement, animation, static glTF and
+skinned-character smoke. This is host validation, not new phone/visual evidence.
+No asset binary or shader was regenerated in this slice.
+
 ## Remaining gate
 
-Synchronize manifests; enforce the four-way declaration in the asset loader;
-replace first-seen texture allocation with explicit named groups; exercise real
-loader/texture permutations and malformed fixtures; regenerate into a clean
+Replace first-seen texture allocation with explicit named groups; exercise real
+texture permutations and skinned malformed fixtures; regenerate into a clean
 validation destination from existing licensed sources; verify generated agreement
-and GCC/MSVC. Manifest storage must own strings: the contract's declaration views
-are borrowed validation inputs, not persistent parsed storage.
+and GCC/MSVC. The current host checks do not establish generated-asset agreement
+or a fresh GCC/Android pass. Phase 2 remains open.
 
 Dedicated viewmodel geometry/resource ownership and owner phone acceptance follow
 this gate. Preserve current primary masks and do not substitute the full world body.

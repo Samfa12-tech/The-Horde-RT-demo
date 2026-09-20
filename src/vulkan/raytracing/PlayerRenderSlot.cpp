@@ -475,6 +475,15 @@ bool PlayerRenderSlot::LoadAsset(const std::string& runtimeGlbPath,
     bootGroundingProfilesReady_ = false;
     if (!asset_.LoadClips(runtimeGlbPath, horde::scene::PlayerLocomotionClipSet(), diagnostic))
         return false;
+    std::vector<std::string_view> primitiveNames;
+    primitiveNames.reserve(asset_.PrimitiveRanges().size());
+    for (const auto& primitive : asset_.PrimitiveRanges())
+        primitiveNames.push_back(primitive.materialName);
+    if (!horde::scene::assets::ValidatePlayerPrimitiveNames(primitiveNames, diagnostic))
+    {
+        asset_ = {};
+        return false;
+    }
     return DeriveAssetGripSockets(diagnostic) &&
            BuildBootGroundingProfiles(diagnostic);
 }

@@ -2,8 +2,10 @@
 #include "scene/assets/AssetValidation.h"
 #include "scene/assets/DielectricTopologyMath.h"
 #include "scene/assets/StaticMeshAsset.h"
+#include "scene/assets/PlayerPrimitiveContract.h"
 #include "cgltf/cgltf.h"
 
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <cstdlib>
@@ -504,6 +506,109 @@ void TestManifestContract(const std::filesystem::path& temporaryRoot)
     }
     ExpectManifestFailure(oversizedManifest,
                           "Asset manifest exceeds the bounded JSON size limit.");
+}
+
+void TestPlayerSemanticManifestAndGeometry(const std::filesystem::path& temporaryRoot)
+{
+    using namespace horde::scene::assets;
+    AssetManifest manifest;
+    std::string diagnostic;
+    Check(AssetManifest::Load(kFixtureRoot / "valid.manifest.json", manifest, diagnostic),
+          "generic asset remains compatible without player semantics");
+    Check(!manifest.ValidatePlayerSemantics(diagnostic), "player consumer rejects an undeclared contract");
+
+    const std::array<std::string, 4> declarations{{
+        R"({"material":"BodyPrimaryVisible","firstPersonPrimary":true,"shadow":true,"reflection":true})",
+        R"({"material":"HeadPrimaryMasked","firstPersonPrimary":false,"shadow":true,"reflection":true})",
+        R"({"material":"NearFacePrimaryMasked","firstPersonPrimary":false,"shadow":true,"reflection":true})",
+        R"({"material":"GauntletPrimaryVisible","firstPersonPrimary":true,"shadow":true,"reflection":true})",
+    }};
+    const auto writeManifest = [&](const std::vector<std::string>& entries) {
+        std::string field = "\"primitiveSemantics\":[";
+        for (std::size_t i = 0; i < entries.size(); ++i) field += (i ? "," : "") + entries[i];
+        field += "],\"schema\": 1,";
+        return RewriteManifest(temporaryRoot, "player.manifest.json", "\"schema\": 1,", field);
+    };
+    std::array<unsigned, 4> order{{0, 1, 2, 3}};
+    do {
+        std::vector<std::string> entries;
+        for (const auto index : order) entries.push_back(declarations[index]);
+        Check(AssetManifest::Load(writeManifest(entries), manifest, diagnostic) &&
+                  manifest.ValidatePlayerSemantics(diagnostic), "manifest order must not determine semantics");
+        auto copied = manifest;
+        manifest = {};
+        Check(copied.ValidatePlayerSemantics(diagnostic), "copied parsed manifest owns its material strings");
+    } while (std::next_permutation(order.begin(), order.end()));
+    const auto rejected = [&](std::vector<std::string> entries, const char* message) {
+        Check(!AssetManifest::Load(writeManifest(entries), manifest, diagnostic) && !diagnostic.empty(), message);
+    };
+    rejected({}, "explicit empty semantics rejected");
+    rejected({declarations[0], declarations[1], declarations[2]}, "stale three-way manifest rejected");
+    rejected({declarations[0], declarations[1], declarations[2], declarations[0]}, "duplicate semantic rejected");
+    rejected({declarations[0], declarations[1], declarations[2], declarations[3], declarations[3]}, "extra semantic rejected");
+    const auto mutateLast = [&](std::string_view before, std::string_view after, const char* message) {
+        std::vector<std::string> entries(declarations.begin(), declarations.end());
+        const auto offset = entries.back().find(before);
+        Check(offset != std::string::npos, "semantic mutation source exists");
+        if (offset != std::string::npos) entries.back().replace(offset, before.size(), after);
+        rejected(entries, message);
+    };
+    mutateLast("GauntletPrimaryVisible", "Unknown", "unknown manifest semantic rejected");
+    mutateLast("\"firstPersonPrimary\":true", "\"firstPersonPrimary\":false", "visibility conflict rejected");
+    mutateLast("\"reflection\":true", "\"reflection\":1", "nonboolean visibility rejected");
+    mutateLast(",\"reflection\":true", "", "missing visibility field rejected");
+    mutateLast("\"shadow\":true", "\"shadow\":true,\"shadow\":true", "duplicate visibility field rejected");
+    mutateLast("\"shadow\":true", "\"shadow\":true,\"unexpected\":true", "unknown semantic field rejected");
+    Check(AssetManifest::Load(writeManifest({declarations.begin(), declarations.end()}), manifest, diagnostic),
+          "four-way manifest restored for geometry tests");
+    manifest.materialOverrides.clear();
+
+    // A small real GLB fixture: four primitives share triangle accessors but have
+    // distinct named materials. Reorder geometry independently of declarations.
+    std::vector<std::uint8_t> binary;
+    for (const float value : {0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f, 0.f}) AppendFloat(binary, value);
+    for (unsigned i = 0; i < 3; ++i)
+        for (const float value : {0.f, 0.f, 1.f}) AppendFloat(binary, value);
+    for (const float value : {0.f, 0.f, 1.f, 0.f, 0.f, 1.f}) AppendFloat(binary, value);
+    for (std::uint16_t i = 0; i < 3; ++i) AppendU16(binary, i);
+    const auto writeGeometry = [&](const std::vector<unsigned>& primitiveOrder, bool unknownName = false) {
+        std::string json = R"({"asset":{"version":"2.0"},"buffers":[{"byteLength":102}],"bufferViews":[{"buffer":0,"byteOffset":0,"byteLength":36},{"buffer":0,"byteOffset":36,"byteLength":36},{"buffer":0,"byteOffset":72,"byteLength":24},{"buffer":0,"byteOffset":96,"byteLength":6}],"accessors":[{"bufferView":0,"componentType":5126,"count":3,"type":"VEC3","min":[0,0,0],"max":[1,1,0]},{"bufferView":1,"componentType":5126,"count":3,"type":"VEC3"},{"bufferView":2,"componentType":5126,"count":3,"type":"VEC2"},{"bufferView":3,"componentType":5123,"count":3,"type":"SCALAR"}],"materials":[)";
+        for (std::size_t i = 0; i < kPlayerPrimitiveContract.size(); ++i) {
+            if (i) json += ',';
+            json += "{\"name\":\"" + std::string(unknownName && i == 3 ? "Unknown" : kPlayerPrimitiveContract[i].material) + "\"}";
+        }
+        json += "],\"meshes\":[{\"primitives\":[";
+        for (std::size_t i = 0; i < primitiveOrder.size(); ++i) {
+            if (i) json += ',';
+            json += R"({"attributes":{"POSITION":0,"NORMAL":1,"TEXCOORD_0":2},"indices":3,"material":)" +
+                std::to_string(primitiveOrder[i]) + "}";
+        }
+        json += R"(]}],"nodes":[{"name":"grip","mesh":0}],"scenes":[{"nodes":[0]}],"scene":0})";
+        const auto path = temporaryRoot / "player-semantics.glb";
+        WriteGlb(path, json, binary);
+        return path;
+    };
+    StaticMeshAsset asset;
+    do {
+        const auto path = writeGeometry({order.begin(), order.end()});
+        const bool loaded = StaticMeshAsset::Load(path, manifest, asset, diagnostic);
+        Check(loaded, std::string("four-way reordered geometry loads: ") + diagnostic);
+        if (loaded) for (const auto& material : asset.materials) {
+            const auto* contract = FindPlayerPrimitiveContract(material.name);
+            const std::uint32_t expected = contract->semantic == PlayerPrimitiveSemantic::Head ? 128u :
+                contract->semantic == PlayerPrimitiveSemantic::NearFace ? 256u : 0u;
+            Check((material.flags & (128u | 256u)) == expected, "name-based primary masks survive geometry reordering");
+        }
+    } while (std::next_permutation(order.begin(), order.end()));
+    for (const auto& bad : {std::vector<unsigned>{0, 1, 2}, std::vector<unsigned>{0, 1, 2, 0}}) {
+        Check(!StaticMeshAsset::Load(writeGeometry(bad), manifest, asset, diagnostic) && asset.primitives.empty(),
+              "missing/duplicate geometry rejected without retaining presentable asset");
+    }
+    Check(!StaticMeshAsset::Load(writeGeometry({0, 1, 2, 3}, true), manifest, asset, diagnostic),
+          "unknown actual geometry semantic rejected");
+    manifest.primitiveSemantics[0].shadow = false;
+    Check(!StaticMeshAsset::Load(writeGeometry({0, 1, 2, 3}), manifest, asset, diagnostic),
+          "programmatically conflicting manifest cannot bypass loader enforcement");
 }
 
 void TestAccessorRangeRejectsOverflow()
@@ -1168,6 +1273,7 @@ int main(int argc, char** argv)
     TestAccessorRangeRejectsOverflow();
     TestCyclicNodeGraphIsRejectedBeforeTraversal(temporaryRoot);
     TestExactDielectricWeldCellDomain();
+    TestPlayerSemanticManifestAndGeometry(temporaryRoot);
     TestProductionDielectricFixture();
     TestRuntimeOfflineDielectricComponentParity();
 

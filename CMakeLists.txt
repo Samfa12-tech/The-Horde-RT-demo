@@ -37,6 +37,9 @@ if(BUILD_TESTING)
     # Resolve the runner before registering any PowerShell-backed fixture.  CTest
     # records this exact executable in its generated command line.
     find_program(HORDE_RT_POWERSHELL_EXECUTABLE NAMES pwsh powershell REQUIRED)
+    add_test(NAME horde_rt_player_manifest_agreement_tests
+        COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
+            ${CMAKE_CURRENT_SOURCE_DIR}/tests/PlayerManifestAgreementTests.ps1)
 endif()
 
 include(cmake/HordeRtSources.cmake)
@@ -677,6 +680,8 @@ if(BUILD_TESTING)
         target_include_directories(horde_rt_skinned_character_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
         target_link_libraries(horde_rt_skinned_character_smoke PRIVATE horde_rt_probe_core)
         add_test(NAME horde_rt_skinned_character_smoke COMMAND horde_rt_skinned_character_smoke)
+        set_tests_properties(horde_rt_skinned_character_smoke PROPERTIES
+            WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 
         add_executable(horde_rt_character_render_slot_smoke tests/CharacterRenderSlotSmoke.cpp)
         target_include_directories(horde_rt_character_render_slot_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
