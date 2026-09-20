@@ -1,6 +1,6 @@
 # 1.6.1 engineering programme and release gates
 
-Updated 2026-09-13. Status: **in development; not ready for final comprehensive validation or release**.
+Updated 2026-09-20. Status: **in development; not ready for final comprehensive validation or release**.
 
 This is the current next-step index for `codex/horde-1.6.1-engineering-pass`.
 The owner-authorised full repository audit remains in scope. The 2026-09-13
@@ -21,6 +21,12 @@ set is complete. It does not authorise publication or relax any RT requirement.
 - Frame-evidence integration was recovered, reviewed and accepted at `f443904`;
   [C2b evidence](ENGINEERING_1_6_1_FRAME_EVIDENCE_2026-09-13.md) preserves its exact
   build boundaries. Shared report/benchmark migration remains next, not complete.
+- Full-route evidence storage (`7287d57`), versioned report projection (`badcd23`)
+  and Windows Release benchmark export/exit (`762cd35`) are implemented. A fresh
+  staged Shipping/High Windows run retained all 1,838 CPU/GPU completions and
+  exited0; [route evidence](ENGINEERING_1_6_1_ROUTE_EVIDENCE_2026-09-13.md) records
+  its exact artifact and limitations. Android integration and matched A/B remain
+  open; this does not close the original observability phase or final matrix.
 - Hardware RayQuery native integration was accepted at `99b8565`, after shader,
   provider and capability prerequisites. [Targeted backend evidence](ENGINEERING_1_6_1_RAYQUERY_BACKEND_2026-09-13.md)
   records Windows and exact SM-S948B functional/lifecycle checks. Exact S24/S25
