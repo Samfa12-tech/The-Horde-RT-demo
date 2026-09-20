@@ -1,23 +1,17 @@
 # 1.6.1 recovery handoff
 
 Updated 2026-09-20. Branch: `codex/horde-1.6.1-engineering-pass`.
-The full goal is paused at the owner's 5% usage threshold, not complete. See [programme scope](ENGINEERING_1_6_1_PLAN.md)
+Engineering work has resumed by explicit owner instruction; the goal is not complete. See [programme scope](ENGINEERING_1_6_1_PLAN.md)
 and [latest lantern evidence](ENGINEERING_1_6_1_LANTERN_BENCHMARK_2026-09-20.md).
 
 ## Owner's quota and backup instruction
 
-Pause this goal when the lowest **available** Codex usage window reaches about
-5% remaining. Missing windows are not zero. Check usage at work boundaries as
-well as the task's five-minute `horde-usage-pause-guard` heartbeat. Do not switch
-models, redeem credits or shrink the goal. Before pausing, preserve a current
-handoff and safely commit/push task-owned work without credentials, unrelated
-files, force-push or release publication; verify the remote SHA. Keep GitHub
-current after subsequent coherent, reviewed slices rather than waiting for 5%.
-The original September 20 checkpoint reported **5% weekly remaining** (95% used),
-triggering the requested usage pause. A later check reports **4% remaining**.
-The owner has removed the separate requirement to stay paused until an explicit
-resume. Do not restore that instruction from older handoffs. The approximately
-5% usage guard remains binding; the current pause is for that guard only.
+The owner explicitly removed the approximately 5% usage guard and resumed work
+on September 20. The `horde-usage-pause-guard` automation is confirmed absent.
+Do not restore either the quota pause or explicit-resume restriction from older
+handoffs. Preserve the full scope, selected model and effort, and normal service
+limits; do not redeem credits or publish without authorization. Keep GitHub current
+after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
 ### Latest owner steering for continued work
 

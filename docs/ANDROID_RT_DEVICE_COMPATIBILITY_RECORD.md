@@ -131,7 +131,7 @@ The working gate is a real RT-produced frame reaching the Android swapchain afte
 
 ## Research candidates
 
-These entries are hardware/driver candidates, not confirmed project support. Every named model still needs the project's runtime probe, followed by a real scene/presentation and performance check.
+These entries are hardware/driver candidates, not confirmed project support. Every named model still needs the project's runtime probe, followed by a real scene/presentation and performance check unless a specific tested configuration is called out below.
 
 ### Qualcomm Adreno candidates
 

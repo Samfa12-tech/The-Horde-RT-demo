@@ -31,6 +31,12 @@ The APK declares Android 7 / API 24 as its packaging minimum, but hardware suppo
 
 Device compatibility is tracked in [`docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md`](docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md). New device results should be recorded there with the exact model code and evidence class: locally tested confirmation, user-reported plus screenshot evidence, user-reported, vendor/SoC inference, or unverified candidate. Hardware marketing claims alone do not establish support; the runtime capability probe and honest RT swapchain presentation are the deciding checks.
 
+## Roadmap and future chapters
+
+The [Campaign and Engine Roadmap](docs/ROADMAP.md) records the forward direction: [1.7.0 — Beyond the Tomb](docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md), then [1.8.0 — Village Hub](docs/superpowers/plans/2026-09-11-village-hub-1.8.0.md), followed by three themed dungeons with enemies, puzzles, bosses and Horde/key/map-related pieces. Dungeon-specific items and ray-traced light as gameplay are central design considerations; exact themes, lore and later versions remain open.
+
+These are plans, not shipped features. Finish and accept the separate 1.6.1 engineering baseline before 1.7, and make, test and accept 1.7 before finalising or implementing the provisional village hub. The published package/version above is unchanged. The [Phase Plan](docs/PHASE_PLAN.md) retains the historical implementation sequence.
+
 ## RT or nothing
 
 The preferred backend uses Vulkan acceleration structures, an RT pipeline and shader binding table, `vkCmdTraceRaysKHR`, an RT storage image, and swapchain presentation. Its phone-safe shading uses `rayQueryEXT` inside raygen with pipeline recursion depth 1. The unpublished 1.6.1 branch also supports a hardware `RayQueryCompute` launcher for RayQuery-only drivers: compute dispatch executes the same shading over real BLAS/TLAS and presents through the same storage-image/swapchain path, without an SBT. Unsupported devices show explicit diagnostics; there is no browser, raster, baked, screen-space, software-traversal or fake-RT fallback.
