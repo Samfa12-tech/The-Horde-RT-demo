@@ -2665,7 +2665,8 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
                     static_cast<std::uint32_t>(advance.replay.zone),
                     context.inAppBenchmark.CurrentLap()});
             }
-            if (advance.replay.waypointReached || advance.lapStarted || advance.finished)
+            if (advance.replay.waypointReached || advance.lapStarted || advance.finished ||
+                (lanternBenchmark && (advance.frameInLap == 1u || advance.frameInLap % 60u == 0u)))
             {
                 PublishBenchmarkProgress(context);
             }
