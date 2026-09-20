@@ -13,7 +13,7 @@ models, redeem credits or shrink the goal. Before pausing, preserve a current
 handoff and safely commit/push task-owned work without credentials, unrelated
 files, force-push or release publication; verify the remote SHA. Keep GitHub
 current after subsequent coherent, reviewed slices rather than waiting for 5%.
-The September 20 check reported 26% weekly remaining, so it did not trigger a pause.
+The latest September 20 check reported 8% weekly remaining, so it did not trigger a pause.
 
 ## Accepted work and current boundaries
 
@@ -76,9 +76,10 @@ fresh-process `am start -S -W`; without `-S` one attempt only brought a task for
 and was excluded. Baseline/candidate remain100%, stable76%; phone Home, no sampler,
 build, benchmark or worker remains active.
 
-1. **Start Phase 2:** repair the four-way player semantic contract: processor/runtime GLB already
-   emit Body/Head/NearFace/Gauntlet; the clip manifest and C++ semantic routing still
-   describe only three. Make manifest/loader/texture mapping order-independent,
+1. **Continue Phase 2:** the [first typed-contract slice](ENGINEERING_1_6_1_PLAYER_CONTRACT_2026-09-20.md)
+   now covers Body/Head/NearFace/Gauntlet and passes 3/3 targeted MSVC Release tests.
+   The processor/runtime GLB already emit all four, but the clip manifest still
+   describes only three. Make manifest/loader/texture mapping order-independent,
    reject missing/unknown/duplicate/conflicting semantics, regenerate cleanly and
    validate GCC/MSVC. Preserve primary masking of Head/NearFace.
 2. Dedicated real-geometry RT viewmodel/world-body ownership remains unimplemented.

@@ -30,6 +30,10 @@ option(HORDE_RT_BUILD_VULKAN_TARGETS "Build targets that require a Vulkan SDK" O
 
 include(CTest)
 if(BUILD_TESTING)
+    add_executable(horde_rt_player_primitive_contract_tests tests/PlayerPrimitiveContractTests.cpp)
+    target_include_directories(horde_rt_player_primitive_contract_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_player_primitive_contract_tests COMMAND horde_rt_player_primitive_contract_tests)
+
     # Resolve the runner before registering any PowerShell-backed fixture.  CTest
     # records this exact executable in its generated command line.
     find_program(HORDE_RT_POWERSHELL_EXECUTABLE NAMES pwsh powershell REQUIRED)

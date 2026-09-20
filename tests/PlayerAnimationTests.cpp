@@ -454,13 +454,21 @@ int main()
         PlayerPrimitiveSemantic::Body,
         PlayerPrimitiveSemantic::Head,
         PlayerPrimitiveSemantic::NearFace,
+        PlayerPrimitiveSemantic::GauntletPrimaryVisible,
     });
     if (!Require(primitiveVisibility[0].primaryVisible &&
                  !primitiveVisibility[1].primaryVisible &&
                  !primitiveVisibility[2].primaryVisible &&
+                 primitiveVisibility[3].primaryVisible &&
+                 primitiveVisibility[3].shadowVisible &&
+                 primitiveVisibility[3].reflectionVisible &&
                  primitiveVisibility[1].shadowVisible &&
                  primitiveVisibility[2].reflectionVisible,
                  "material/primitive metadata must hide only head/near-face primary hits")) return 1;
+    const auto unknownVisibility = BuildPlayerPrimitiveVisibility({static_cast<PlayerPrimitiveSemantic>(255)});
+    if (!Require(!unknownVisibility[0].primaryVisible && !unknownVisibility[0].shadowVisible &&
+                 !unknownVisibility[0].reflectionVisible,
+                 "an invalid primitive semantic must not acquire implicit visibility")) return 1;
 
     const PlayerSocketPlan sockets = EvaluatePlayerSocketPlan(authoritative.playerAnimation);
     if (!Require(sockets.leftErrorMetres <= kPlayerGripSocketToleranceMetres &&

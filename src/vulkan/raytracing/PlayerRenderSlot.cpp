@@ -264,9 +264,10 @@ std::vector<PlayerPrimitiveVisibility> BuildPlayerPrimitiveVisibility(
     result.reserve(semantics.size());
     for (const PlayerPrimitiveSemantic semantic : semantics)
     {
-        PlayerPrimitiveVisibility visibility;
-        visibility.primaryVisible = semantic == PlayerPrimitiveSemantic::Body;
-        result.push_back(visibility);
+        const auto* part = horde::scene::assets::FindPlayerPrimitiveContract(semantic);
+        result.push_back(part != nullptr
+            ? PlayerPrimitiveVisibility{part->firstPersonPrimary, part->shadow, part->reflection}
+            : PlayerPrimitiveVisibility{false, false, false});
     }
     return result;
 }

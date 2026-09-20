@@ -3,6 +3,7 @@
 #include "scene/assets/AssetValidation.h"
 #include "scene/assets/DielectricTopologyMath.h"
 #include "scene/assets/GltfDocument.h"
+#include "scene/assets/PlayerPrimitiveContract.h"
 #include "cgltf/cgltf.h"
 
 #include <algorithm>
@@ -243,8 +244,12 @@ StaticMaterial ConvertMaterial(const cgltf_data& data,
     if (source.double_sided) result.flags |= 1u;
     if (source.alpha_mode != cgltf_alpha_mode_opaque) result.flags |= 2u;
     if (result.transmissionFactor > 0.0f) result.flags |= 4u;
-    if (result.name == "HeadPrimaryMasked") result.flags |= 128u;
-    if (result.name == "NearFacePrimaryMasked") result.flags |= 256u;
+    if (const auto* playerPart = FindPlayerPrimitiveContract(result.name))
+    {
+        // Preserve the existing CPU/GLSL bits; semantic lookup is name-based.
+        if (playerPart->semantic == PlayerPrimitiveSemantic::Head) result.flags |= 128u;
+        if (playerPart->semantic == PlayerPrimitiveSemantic::NearFace) result.flags |= 256u;
+    }
     return result;
 }
 

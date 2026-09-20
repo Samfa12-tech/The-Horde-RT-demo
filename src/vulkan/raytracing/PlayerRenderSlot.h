@@ -9,6 +9,7 @@
 
 #include "gameplay/animation/PlayerAnimationState.h"
 #include "scene/assets/SkinnedMeshAsset.h"
+#include "scene/assets/PlayerPrimitiveContract.h"
 
 namespace horde::vulkan::raytracing
 {
@@ -95,12 +96,7 @@ std::array<float, 3u> GroundPlayerRootOnRouteFloor(
     float routeFloorWorldY,
     float assetGroundingOffsetMetres);
 
-enum class PlayerPrimitiveSemantic : std::uint8_t
-{
-    Body,
-    Head,
-    NearFace,
-};
+using PlayerPrimitiveSemantic = horde::scene::assets::PlayerPrimitiveSemantic;
 
 struct PlayerPrimitiveVisibility
 {
