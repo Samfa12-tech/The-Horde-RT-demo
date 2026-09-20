@@ -12,6 +12,9 @@ third_party/cgltf/cgltf.h whitespace=-trailing-space
 # stable even when core.autocrlf is enabled on Windows.
 VERSION text eol=lf
 
+# The pipeline catalog adapter is byte-checked during clean configure too.
+src/vulkan/raytracing/RtPipelineVariantCatalog.generated.h text eol=lf
+
 # Compute shader artifacts and their generated provenance are byte-checked.
 src/vulkan/raytracing/variants/rayquery_compute_*.inc text eol=lf
 src/vulkan/raytracing/RtRayQueryVariantCatalog.generated.h text eol=lf
