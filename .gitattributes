@@ -19,3 +19,6 @@ src/vulkan/raytracing/RtPipelineVariantCatalog.generated.h text eol=lf
 src/vulkan/raytracing/variants/rayquery_compute_*.inc text eol=lf
 src/vulkan/raytracing/RtRayQueryVariantCatalog.generated.h text eol=lf
 tools/rayquery-variant-catalog.json text eol=lf
+
+# Retained validation reports are bound to their original byte hashes.
+docs/evidence/2026-09-20-lantern/** -text
