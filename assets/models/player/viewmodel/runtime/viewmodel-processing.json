@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "role": "Viewmodel",
+  "sourceWorldSha256": "e8737f10e7669b284e04109d9c3acdf537df284093a21511656bf191a70450fd",
+  "runtime": "gothic-traveller-viewmodel.runtime.glb",
+  "runtimeSha256": "1e3b041ee7aa896a84fe462c182f6012d026b4a577b2d4ddf59d764b823f2538",
+  "primitiveSemantics": {
+    "ViewmodelSleeves": 5532,
+    "ViewmodelGauntlets": 8838
+  },
+  "processingVertices": 15850,
+  "ownership": "Primary-only modelled geometry; world body owns secondary visibility",
+  "animationAuthority": "Same authored rig, Idle/Walking NLA tracks and named grip bones as world reference",
+  "licence": "Derivative of existing licensed Meshy player/gauntlet inputs; see ASSET_LICENSES.md",
+  "status": "Offline candidate only; GPU ownership, grip/pitch/motion and owner acceptance not yet established"
+}

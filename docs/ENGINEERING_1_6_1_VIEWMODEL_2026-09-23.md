@@ -24,9 +24,32 @@ Fresh MSVC Release focused verification: 5/5 passed (7.64 seconds):
 `player_skinned_semantic_fixtures` (all use the `horde_rt_` prefix). The last
 fixture exercises the actual four-part world GLB, not the new arms candidate.
 
+## Reproducible geometry candidate
+
+`tools/process-player-viewmodel-runtime.py` derives the two existing modelled
+arm partitions from the accepted rig/source pipeline, retaining the original
+26-joint rig and Idle/Walking tracks. Head, torso and leg faces are absent.
+No paid generation, source replacement or licence change occurred.
+
+Two successful clean single-thread Blender 5.2.0 LTS exports are byte-identical:
+SHA-256 `1e3b041ee7aa896a84fe462c182f6012d026b4a577b2d4ddf59d764b823f2538`,
+1,725,820 bytes, 23,162 unique vertices and 14,370 triangles (5,532 sleeves,
+8,838 gauntlets). Both world-reference exports match the admitted world hash
+`e8737f10e7669b284e04109d9c3acdf537df284093a21511656bf191a70450fd`.
+The initial material-slot clearing attempt failed its nonempty-part gate; it was
+not admitted. Material indices are now preserved across slot replacement.
+
+The candidate lives under `assets/models/player/viewmodel/`, outside existing
+package allowlists. Its manifest, receipt and regeneration command are recorded
+there. The registered `horde_rt_player_viewmodel_admission` CTest verifies actual
+static/skinned addressing, finite textured poses and exact authored hand/grip
+transforms at three phases of both clips. Its first MSVC Release run passed.
+The focused Vulkan CPU-host CI lane now includes this ninth test and its LFS input.
+This is offline/host evidence only; it is not a rendered or production arms route.
+
 ## Remaining gates
 
-- Reproducible arms-only runtime with provenance and real static/skinned admission.
+- Native rendering admission of the reproducible arms-only runtime candidate.
 - One gameplay-derived animation/IK/grip authority, consumed by separate world-body
   and viewmodel geometry. No arms-only boot-grounding requirement.
 - Independent dynamic buffers and BLAS ownership, named TLAS semantics, correct

@@ -688,6 +688,14 @@ if(BUILD_TESTING)
             COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
                 ${CMAKE_CURRENT_SOURCE_DIR}/tests/PlayerSkinnedSemanticFixtures.ps1
                 -TestExecutable $<TARGET_FILE:horde_rt_skinned_character_smoke>)
+        add_test(NAME horde_rt_player_viewmodel_admission
+            COMMAND horde_rt_skinned_character_smoke
+                --validate-viewmodel-admission
+                ${CMAKE_CURRENT_SOURCE_DIR}/assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb
+                ${CMAKE_CURRENT_SOURCE_DIR}/assets/models/player/viewmodel/runtime/asset.manifest.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/assets/models/player/runtime/gothic-traveller-lod0.runtime.glb)
+        set_tests_properties(horde_rt_player_viewmodel_admission PROPERTIES
+            WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 
         add_executable(horde_rt_character_render_slot_smoke tests/CharacterRenderSlotSmoke.cpp)
         target_include_directories(horde_rt_character_render_slot_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)

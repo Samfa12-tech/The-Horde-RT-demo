@@ -593,6 +593,44 @@ GripSurfaceMetrics MeasureGripSurface(
 int main(int argc, char** argv)
 {
     using namespace horde::scene;
+    if (argc == 5 && std::string(argv[1]) == "--validate-viewmodel-admission")
+    {
+        horde::scene::assets::AssetManifest manifest;
+        horde::scene::assets::StaticMeshAsset fixed;
+        SkinnedMeshAsset viewmodel;
+        SkinnedMeshAsset world;
+        std::string diagnostic;
+        if (!horde::scene::assets::AssetManifest::Load(argv[3], manifest, diagnostic) ||
+            !manifest.ValidatePlayerViewmodelSemantics(diagnostic) ||
+            !horde::scene::assets::StaticMeshAsset::Load(argv[2], manifest, fixed, diagnostic) ||
+            !viewmodel.LoadClips(argv[2], PlayerLocomotionClipSet(), diagnostic) ||
+            !viewmodel.ValidateStaticVertexLayout(fixed, diagnostic) ||
+            !world.LoadClips(argv[4], PlayerLocomotionClipSet(), diagnostic))
+        {
+            std::cerr << "FAIL: viewmodel admission: " << diagnostic << '\n';
+            return 1;
+        }
+        for (const auto clip : {SkinnedClip::Idle, SkinnedClip::Walking})
+        {
+            if (!Require(viewmodel.ClipDuration(clip) == world.ClipDuration(clip), "world/viewmodel clip duration differs")) return 1;
+            for (const float phase : {0.0f, 0.25f, 0.75f})
+            {
+                const float time = phase * world.ClipDuration(clip);
+                std::vector<TexturedSkinnedRtVertex> posed;
+                if (!Require(viewmodel.SkinUniqueTextured(clip, time, posed, diagnostic) &&
+                             FiniteTexturedVertices(posed), "viewmodel skin must remain finite and textured")) return 1;
+                for (const char* name : {"LeftHand", "RightHand", "LeftGrip", "RightGrip"})
+                {
+                    SkinnedNodeTransform bodySocket{}, viewmodelSocket{};
+                    if (!Require(world.NodeTransform(clip, time, name, bodySocket, diagnostic) &&
+                                 viewmodel.NodeTransform(clip, time, name, viewmodelSocket, diagnostic) &&
+                                 bodySocket == viewmodelSocket, "world/viewmodel authored hand/grip transform differs")) return 1;
+                }
+            }
+        }
+        std::cout << "Viewmodel static/skinned addressing, finite poses and exact authored grip transforms passed\n";
+        return 0;
+    }
     if (argc == 4 && std::string(argv[1]) == "--validate-player-admission")
     {
         horde::scene::assets::AssetManifest manifest;
