@@ -151,11 +151,32 @@ version notices occurred, with build exit zero.
 The normal block-arm route is unchanged; no modelled-viewmodel or subjective
 phone acceptance is implied by this technical asset admission.
 
-## Remaining gate
+## Phase 2 technical exit gate — accepted 2026-09-23
 
-Finish fresh admitted-asset GCC/CI checks, then record the
-technical Phase 2 gate. Exact phone/final-candidate evidence remains separate
-from the five frozen Windows image checks. Phase 2 closeout is still pending.
+Admitted commit `56cd5397b981355e0bdacebc0a94480d4de60611` has fresh successful
+push [35786929799](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/35786929799)
+and PR integration [35786935979](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/35786935979):
+each passes 43/43 portable GCC tests and 8/8 actual Vulkan-enabled player host tests.
+MSVC passed 8/8 focused tests plus 2/2 additional production/development asset tests
+(2.85s), and the strengthened receipt/manifest assertion passes. The exact admitted
+GLB, two manifests and four-ABI unsigned Android package are verified above.
+
+Exit evidence now covers the reproducible generated hash, exact four-way semantic
+set, loader rejection tests, static/skinned addressing, atlas routing, GCC/MSVC
+checks and five unchanged native RTX images. The generated derivative is admitted;
+no further effort is required to reproduce historical parallel-export ordering.
+All ten committed native manifest blobs were checked against their original hashes.
+
+This closes technical semantic-contract repair only. It does not accept the
+current development arms as final art, prove live motion, certify a new phone build,
+close backend image parity or change the production block-arm route. Those retain
+their explicit Phase 3/final-candidate evidence requirements.
+
+## Next phase
+
+Implement dedicated modelled RT viewmodel ownership with its own arms-only
+contract, small dynamic geometry/BLAS/TLAS route and shared gameplay-owned pose/grip
+authority. Preserve the complete world-body secondary owner and avoid double shadows.
 
 Dedicated viewmodel geometry/resource ownership and owner phone acceptance follow
 this gate. Preserve current primary masks and do not substitute the full world body.

@@ -1,6 +1,6 @@
 # 1.6.1 recovery handoff
 
-Updated 2026-09-20. Branch: `codex/horde-1.6.1-engineering-pass`.
+Updated 2026-09-23. Branch: `codex/horde-1.6.1-engineering-pass`.
 Engineering work has resumed by explicit owner instruction; the goal is not complete. See [programme scope](ENGINEERING_1_6_1_PLAN.md)
 and [latest lantern evidence](ENGINEERING_1_6_1_LANTERN_BENCHMARK_2026-09-20.md).
 
@@ -109,19 +109,16 @@ fresh-process `am start -S -W`; without `-S` one attempt only brought a task for
 and was excluded. Baseline/candidate remain100%, stable76%; phone Home, no sampler,
 build, benchmark or worker remains active.
 
-1. **Continue Phase 2:** the [typed contract and loader enforcement](ENGINEERING_1_6_1_PLAYER_CONTRACT_2026-09-20.md)
-   now cover Body/Head/NearFace/Gauntlet, synchronize both manifests, and pass 5/5
-   targeted MSVC Release tests. Static/skinned loaders enforce actual named parts;
-   production player loading requires the declaration. The next texture-group
-   slice passes 4/4 MSVC tests, including all 24 actual-player material orders and
-   generated Body/Gauntlet atlas mapping. Actual skinned malformed/reordered
-   fixtures now pass 2/2 with the full smoke; unsigned Shipping/Mobile Android
-   build at `ef8fdc0` passed all four ABIs, not installed. Single-threaded clean
-   regeneration is repeatable but differs in vertex order/tiny tangent rounding
-   from the tracked GLB. See the [reproducibility receipt](evidence/2026-09-20-player-regeneration/README.md).
-   Next validate generated-runtime admission, fresh GCC/CI and affected RT images.
-   Preserve primary masking of Head/NearFace. Phase 2 is not complete.
-2. Dedicated real-geometry RT viewmodel/world-body ownership remains unimplemented.
+1. **Phase 2 is technically accepted at `56cd539`:** four-way manifests/processor/
+   loaders/atlas agree; actual static/skinned addressing is checked before upload;
+   reproducible `e8737f10…450fd` runtime is admitted. Five paired native RTX pose
+   images are byte-identical. Fresh push/PR CI each pass 43/43 portable plus 8/8
+   Vulkan-host player tests; MSVC and four-ABI Android packaging also pass. See
+   [phase gate](ENGINEERING_1_6_1_PLAYER_CONTRACT_2026-09-20.md) and
+   [image evidence](evidence/2026-09-23-player-admission/README.md). No new phone or
+   subjective arm acceptance is claimed. Main documentation conflicts were resolved
+   in `d3a7225`, current-source CI restored, and PR #15 is clean/mergeable.
+2. **Start Phase 3:** dedicated real-geometry RT viewmodel/world-body ownership remains unimplemented.
    Keep gameplay-owned IK/grip authority and independent small dynamic resources;
    no full-body primary-ray switch, overlays or permanent procedural block arms.
 3. Physical glass correctness/performance remains open. Diagnostic held-high still
