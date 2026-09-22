@@ -128,11 +128,34 @@ mode as well as grip/boot setup. Reordered real-GLB fixtures also pass both load
 addressing agreement (fresh fixture rerun 1/1, 3.63s). This is host admission
 evidence, not replacement or native RT image acceptance.
 
+## Generated runtime admitted — 2026-09-23
+
+Admitted reproducible GLB `e8737f10…450fd` after static/skinned addressing proof
+and [five byte-identical matched native RTX pose pairs](evidence/2026-09-23-player-admission/README.md).
+The previous derivative remains in history; original inputs/licences are unchanged.
+All generated processing metrics match the new receipt; the live report additionally
+records the installed filename/hash, Blender build, thread count and admission link.
+The manifest test now binds the admitted bytes and processor's four nonempty part
+counts to the runtime/clip declarations and shared atlas order.
+
+Post-admission local MSVC Release targeted tests pass **8/8** (13.66s), followed by
+the strengthened manifest test passing. CI for prior source `adc4579` is green
+(43/43 portable, 8/8 focused GCC player) on both push and PR. Fresh admitted-asset
+CI is pending before the Phase 2 closeout. The targeted unsigned Android
+Shipping/Mobile build passed all four ABIs in 1m13s; APK SHA-256
+`6079a3495839b94d65651840cebbfbdc3091291f7c66671ac12bc479b181f6db`
+(85,992,539 bytes). ZIP inspection verifies the admitted GLB hash and both four-way
+manifests byte-for-byte against source. This was built from native `adc4579` plus
+the pending-commit admitted asset; it was not installed or released. SDK XML
+version notices occurred, with build exit zero.
+The normal block-arm route is unchanged; no modelled-viewmodel or subjective
+phone acceptance is implied by this technical asset admission.
+
 ## Remaining gate
 
-Complete clean-regeneration reconciliation and generated-asset admission; obtain
-fresh GCC/CI and affected renderer/phone evidence. The targeted MSVC and Android
-build checks are not visual acceptance. Phase 2 remains open.
+Finish fresh admitted-asset GCC/CI checks, then record the
+technical Phase 2 gate. Exact phone/final-candidate evidence remains separate
+from the five frozen Windows image checks. Phase 2 closeout is still pending.
 
 Dedicated viewmodel geometry/resource ownership and owner phone acceptance follow
 this gate. Preserve current primary masks and do not substitute the full world body.

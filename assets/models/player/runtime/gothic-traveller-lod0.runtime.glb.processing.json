@@ -1,7 +1,11 @@
 {
   "sourceRig": "player-rigged.glb",
   "sourceWalk": "player-walking.glb",
-  "runtime": "gothic-traveller-lod0.candidate.glb",
+  "runtime": "gothic-traveller-lod0.runtime.glb",
+  "runtimeSha256": "e8737f10e7669b284e04109d9c3acdf537df284093a21511656bf191a70450fd",
+  "exportThreads": 1,
+  "blenderBuild": "5.2.0 LTS fbe6228777e7",
+  "admissionEvidence": "docs/evidence/2026-09-23-player-admission/README.md",
   "triangles": 27775,
   "vertices": 33894,
   "heightMetres": 1.8000002951953888,
