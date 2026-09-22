@@ -4,6 +4,7 @@
 #include <string>
 
 #include "scene/assets/PlayerPrimitiveContract.h"
+#include "scene/assets/PlayerViewmodelContract.h"
 
 int main()
 {
@@ -72,5 +73,61 @@ int main()
     check(!FindPlayerPrimitiveContract("Gauntlet"), "Partial names must not imply a semantic");
     check(ValidatePlayerPrimitiveDeclarations(declarations, diagnostic) && diagnostic.empty(),
           "A successful validation must clear a previous diagnostic");
+
+    std::array<PlayerViewmodelPrimitiveDeclaration, 2> viewmodelDeclarations{{
+        {"ViewmodelSleeves", true, false, false},
+        {"ViewmodelGauntlets", true, false, false},
+    }};
+    check(ValidatePlayerViewmodelPrimitiveDeclarations(viewmodelDeclarations, diagnostic),
+          "the exact two-part viewmodel contract must be valid");
+    std::array<unsigned, 2> viewmodelOrder{{0, 1}};
+    unsigned viewmodelPermutations = 0;
+    do {
+        std::array<std::string_view, 2> names{};
+        std::array<PlayerViewmodelPrimitiveDeclaration, 2> reordered{};
+        for (unsigned i = 0; i < viewmodelOrder.size(); ++i) {
+            names[i] = viewmodelDeclarations[viewmodelOrder[i]].material;
+            reordered[i] = viewmodelDeclarations[viewmodelOrder[i]];
+        }
+        check(ValidatePlayerViewmodelPrimitiveNames(names, diagnostic),
+              "viewmodel primitive order must not define semantics");
+        check(ValidatePlayerViewmodelPrimitiveDeclarations(reordered, diagnostic),
+              "viewmodel declaration order must not define semantics");
+        ++viewmodelPermutations;
+    } while (std::next_permutation(viewmodelOrder.begin(), viewmodelOrder.end()));
+    check(viewmodelPermutations == 2, "both viewmodel primitive orders must be exercised");
+    check(!ValidatePlayerViewmodelPrimitiveDeclarations(
+              std::span(viewmodelDeclarations).first(1), diagnostic),
+          "missing viewmodel primitive must be rejected");
+    auto badViewmodel = viewmodelDeclarations;
+    badViewmodel[1].material = "BodyPrimaryVisible";
+    check(!ValidatePlayerViewmodelPrimitiveDeclarations(badViewmodel, diagnostic),
+          "world-body contamination must be rejected from viewmodel declarations");
+    badViewmodel[1].material = "ViewmodelSleeves";
+    check(!ValidatePlayerViewmodelPrimitiveDeclarations(badViewmodel, diagnostic),
+          "duplicate viewmodel semantics must be rejected");
+    badViewmodel = viewmodelDeclarations;
+    badViewmodel[1].material = "UnknownViewmodelPart";
+    check(!ValidatePlayerViewmodelPrimitiveDeclarations(badViewmodel, diagnostic),
+          "unknown viewmodel semantics must be rejected");
+    for (unsigned index = 0; index < badViewmodel.size(); ++index) {
+        badViewmodel = viewmodelDeclarations;
+        badViewmodel[index].firstPersonPrimary = false;
+        check(!ValidatePlayerViewmodelPrimitiveDeclarations(badViewmodel, diagnostic),
+              "viewmodel primary visibility conflicts must be rejected");
+        badViewmodel = viewmodelDeclarations;
+        badViewmodel[index].shadow = true;
+        check(!ValidatePlayerViewmodelPrimitiveDeclarations(badViewmodel, diagnostic),
+              "viewmodel shadow visibility conflicts must be rejected");
+        badViewmodel = viewmodelDeclarations;
+        badViewmodel[index].reflection = true;
+        check(!ValidatePlayerViewmodelPrimitiveDeclarations(badViewmodel, diagnostic),
+              "viewmodel reflection visibility conflicts must be rejected");
+    }
+    const auto* sleeves = FindPlayerViewmodelPrimitiveContract("ViewmodelSleeves");
+    const auto* gauntlets = FindPlayerViewmodelPrimitiveContract("ViewmodelGauntlets");
+    check(sleeves != nullptr && sleeves->textureGroup == PlayerTextureGroup::Body &&
+              gauntlets != nullptr && gauntlets->textureGroup == PlayerTextureGroup::Gauntlet,
+          "viewmodel sleeves and gauntlets must retain named body/gauntlet texture groups");
     return ok ? 0 : 1;
 }

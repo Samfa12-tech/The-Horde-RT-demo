@@ -1,5 +1,7 @@
 #pragma once
 
+#include "scene/assets/PlayerViewmodelContract.h"
+
 #include <array>
 #include <cstdint>
 #include <filesystem>
@@ -74,9 +76,13 @@ struct AssetManifest
     RuntimeTextureProfile textureProfile;
     std::vector<MaterialOverride> materialOverrides;
     std::vector<AssetPrimitiveSemantic> primitiveSemantics;
+    bool hasPrimitiveSemantics = false;
+    PlayerAssetRole playerAssetRole = PlayerAssetRole::Unspecified;
 
     // Required explicitly by the player consumer; other assets need no player semantics.
     bool ValidatePlayerSemantics(std::string& diagnostic) const;
+    bool ValidatePlayerViewmodelSemantics(std::string& diagnostic) const;
+    bool ValidatePlayerAssetRole(std::string& diagnostic) const;
 
     static bool Load(const std::filesystem::path& path,
                      AssetManifest& manifest,

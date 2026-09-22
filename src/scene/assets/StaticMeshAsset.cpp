@@ -251,6 +251,10 @@ StaticMaterial ConvertMaterial(const cgltf_data& data,
         if (playerPart->semantic == PlayerPrimitiveSemantic::Head) result.flags |= 128u;
         if (playerPart->semantic == PlayerPrimitiveSemantic::NearFace) result.flags |= 256u;
     }
+    else if (const auto* viewmodelPart = FindPlayerViewmodelPrimitiveContract(result.name))
+    {
+        result.textureGroup = static_cast<std::int32_t>(viewmodelPart->textureGroup);
+    }
     return result;
 }
 
@@ -836,8 +840,7 @@ bool StaticMeshAsset::Load(const std::filesystem::path& runtimeGlb,
                            std::string& diagnostic)
 {
     asset = {};
-    if (!manifest.primitiveSemantics.empty() && !manifest.ValidatePlayerSemantics(diagnostic))
-        return false;
+    if (!manifest.ValidatePlayerAssetRole(diagnostic)) return false;
     GltfDocument document;
     if (!GltfDocument::Load(runtimeGlb, document, diagnostic)) return false;
     const cgltf_data& data = *document.Data();
@@ -1197,13 +1200,17 @@ bool StaticMeshAsset::Load(const std::filesystem::path& runtimeGlb,
         diagnostic = "Static GLB contains no presentable triangle primitives.";
         return false;
     }
-    if (!manifest.primitiveSemantics.empty())
+    if (manifest.playerAssetRole == PlayerAssetRole::Viewmodel ||
+        !manifest.primitiveSemantics.empty())
     {
         std::vector<std::string_view> names;
         names.reserve(asset.primitives.size());
         for (const auto& primitive : asset.primitives)
             names.push_back(asset.materials[primitive.materialIndex].name);
-        if (!ValidatePlayerPrimitiveNames(names, diagnostic))
+        const bool valid = manifest.playerAssetRole == PlayerAssetRole::Viewmodel
+            ? ValidatePlayerViewmodelPrimitiveNames(names, diagnostic)
+            : ValidatePlayerPrimitiveNames(names, diagnostic);
+        if (!valid)
         {
             asset = {};
             return false;

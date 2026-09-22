@@ -609,6 +609,134 @@ void TestPlayerSemanticManifestAndGeometry(const std::filesystem::path& temporar
     manifest.primitiveSemantics[0].shadow = false;
     Check(!StaticMeshAsset::Load(writeGeometry({0, 1, 2, 3}), manifest, asset, diagnostic),
           "programmatically conflicting manifest cannot bypass loader enforcement");
+
+    const std::array<std::string, 2> viewmodelDeclarations{{
+        R"({"material":"ViewmodelSleeves","firstPersonPrimary":true,"shadow":false,"reflection":false})",
+        R"({"material":"ViewmodelGauntlets","firstPersonPrimary":true,"shadow":false,"reflection":false})",
+    }};
+    AssetManifest directViewmodel;
+    directViewmodel.playerAssetRole = PlayerAssetRole::Viewmodel;
+    directViewmodel.primitiveSemantics = {
+        {"ViewmodelSleeves", true, false, false},
+        {"ViewmodelGauntlets", true, false, false},
+    };
+    Check(directViewmodel.ValidatePlayerViewmodelSemantics(diagnostic),
+          "direct viewmodel validator accepts only its explicit role");
+    directViewmodel.playerAssetRole = PlayerAssetRole::Unspecified;
+    Check(!directViewmodel.ValidatePlayerViewmodelSemantics(diagnostic),
+          "direct viewmodel validator rejects a missing role");
+    directViewmodel.playerAssetRole = PlayerAssetRole::WorldBody;
+    Check(!directViewmodel.ValidatePlayerViewmodelSemantics(diagnostic),
+          "direct viewmodel validator rejects the world-body role");
+    directViewmodel.playerAssetRole = static_cast<PlayerAssetRole>(255u);
+    Check(!directViewmodel.ValidatePlayerViewmodelSemantics(diagnostic),
+          "direct viewmodel validator rejects an invalid role");
+
+    AssetManifest directWorld;
+    directWorld.primitiveSemantics = {
+        {"BodyPrimaryVisible", true, true, true},
+        {"HeadPrimaryMasked", false, true, true},
+        {"NearFacePrimaryMasked", false, true, true},
+        {"GauntletPrimaryVisible", true, true, true},
+    };
+    directWorld.playerAssetRole = PlayerAssetRole::Unspecified;
+    Check(directWorld.ValidatePlayerSemantics(diagnostic),
+          "direct world validator accepts legacy unspecified role");
+    directWorld.playerAssetRole = PlayerAssetRole::WorldBody;
+    Check(directWorld.ValidatePlayerSemantics(diagnostic),
+          "direct world validator accepts explicit world-body role");
+    directWorld.playerAssetRole = PlayerAssetRole::Viewmodel;
+    Check(!directWorld.ValidatePlayerSemantics(diagnostic),
+          "direct world validator rejects the viewmodel role");
+    directWorld.playerAssetRole = static_cast<PlayerAssetRole>(255u);
+    Check(!directWorld.ValidatePlayerSemantics(diagnostic),
+          "direct world validator rejects an invalid role");
+    const auto writeViewmodelManifest = [&](const std::vector<std::string>& entries,
+                                            std::string_view role = "Viewmodel") {
+        std::string field = "\"playerAssetRole\":\"" + std::string(role) +
+            "\",\"primitiveSemantics\":[";
+        for (std::size_t i = 0u; i < entries.size(); ++i)
+            field += (i ? "," : "") + entries[i];
+        field += "],\"schema\": 1,";
+        return RewriteManifest(temporaryRoot, "viewmodel.manifest.json",
+                               "\"schema\": 1,", field);
+    };
+    const auto writeViewmodelGeometry = [&](const std::vector<unsigned>& primitiveOrder,
+                                            bool unknownName = false) {
+        std::string json = R"({"asset":{"version":"2.0"},"buffers":[{"byteLength":102}],"bufferViews":[{"buffer":0,"byteOffset":0,"byteLength":36},{"buffer":0,"byteOffset":36,"byteLength":36},{"buffer":0,"byteOffset":72,"byteLength":24},{"buffer":0,"byteOffset":96,"byteLength":6}],"accessors":[{"bufferView":0,"componentType":5126,"count":3,"type":"VEC3","min":[0,0,0],"max":[1,1,0]},{"bufferView":1,"componentType":5126,"count":3,"type":"VEC3"},{"bufferView":2,"componentType":5126,"count":3,"type":"VEC2"},{"bufferView":3,"componentType":5123,"count":3,"type":"SCALAR"}],"materials":[)";
+        for (std::size_t i = 0u; i < kPlayerViewmodelPrimitiveContract.size(); ++i)
+        {
+            if (i) json += ',';
+            json += "{\"name\":\"" + std::string(
+                unknownName && i == 1u ? "UnknownViewmodelPart" :
+                    kPlayerViewmodelPrimitiveContract[i].material) + "\"}";
+        }
+        json += "] ,\"meshes\":[{\"primitives\":[";
+        for (std::size_t i = 0u; i < primitiveOrder.size(); ++i)
+        {
+            if (i) json += ',';
+            json += R"({"attributes":{"POSITION":0,"NORMAL":1,"TEXCOORD_0":2},"indices":3,"material":)" +
+                std::to_string(primitiveOrder[i]) + "}";
+        }
+        json += R"(]}],"nodes":[{"name":"grip","mesh":0}],"scenes":[{"nodes":[0]}],"scene":0})";
+        const auto path = temporaryRoot / "viewmodel-semantics.glb";
+        WriteGlb(path, json, binary);
+        return path;
+    };
+    AssetManifest viewmodelManifest;
+    Check(AssetManifest::Load(
+              writeViewmodelManifest({viewmodelDeclarations.begin(), viewmodelDeclarations.end()}),
+              viewmodelManifest, diagnostic) &&
+              viewmodelManifest.playerAssetRole == PlayerAssetRole::Viewmodel &&
+              viewmodelManifest.ValidatePlayerViewmodelSemantics(diagnostic),
+          "explicit viewmodel role and declarations load");
+    for (const auto order : {std::vector<unsigned>{0u, 1u}, std::vector<unsigned>{1u, 0u}})
+    {
+        Check(StaticMeshAsset::Load(writeViewmodelGeometry(order), viewmodelManifest,
+                                    asset, diagnostic),
+              std::string("both viewmodel primitive orders load: ") + diagnostic);
+        if (asset.materials.size() == 2u)
+        {
+            for (const auto& material : asset.materials)
+            {
+                const auto* contract = FindPlayerViewmodelPrimitiveContract(material.name);
+                Check(contract != nullptr &&
+                          material.textureGroup == static_cast<std::int32_t>(contract->textureGroup),
+                      "viewmodel materials receive their named body/gauntlet texture groups");
+            }
+        }
+    }
+    Check(!AssetManifest::Load(writeViewmodelManifest({}, "Viewmodel"), viewmodelManifest, diagnostic),
+          "explicit viewmodel role requires declarations");
+    Check(!AssetManifest::Load(writeViewmodelManifest(
+                                   {viewmodelDeclarations[0], viewmodelDeclarations[0]}),
+                               viewmodelManifest, diagnostic),
+          "duplicate viewmodel declarations are rejected by the parser");
+    auto contaminated = std::vector<std::string>{viewmodelDeclarations[0], viewmodelDeclarations[1]};
+    contaminated[1] = R"({"material":"BodyPrimaryVisible","firstPersonPrimary":true,"shadow":true,"reflection":true})";
+    Check(!AssetManifest::Load(writeViewmodelManifest(contaminated), viewmodelManifest, diagnostic),
+          "world-body declaration cannot contaminate a viewmodel role");
+    auto conflicting = std::vector<std::string>{viewmodelDeclarations[0], viewmodelDeclarations[1]};
+    conflicting[0] = R"({"material":"ViewmodelSleeves","firstPersonPrimary":true,"shadow":true,"reflection":false})";
+    Check(!AssetManifest::Load(writeViewmodelManifest(conflicting), viewmodelManifest, diagnostic),
+          "viewmodel visibility conflicts are rejected by the parser");
+    Check(!AssetManifest::Load(writeViewmodelManifest(
+                                   {viewmodelDeclarations.begin(), viewmodelDeclarations.end()}, "WorldBody"),
+                               viewmodelManifest, diagnostic),
+          "world-body role rejects viewmodel declarations");
+    Check(AssetManifest::Load(
+              writeViewmodelManifest({viewmodelDeclarations.begin(), viewmodelDeclarations.end()}),
+              viewmodelManifest, diagnostic),
+          "viewmodel manifest is restored for geometry validation");
+    Check(!StaticMeshAsset::Load(writeViewmodelGeometry({0u}), viewmodelManifest,
+                                 asset, diagnostic),
+          "missing actual viewmodel primitive is rejected");
+    Check(!StaticMeshAsset::Load(writeViewmodelGeometry({0u, 0u}), viewmodelManifest,
+                                 asset, diagnostic),
+          "duplicate actual viewmodel primitive is rejected");
+    Check(!StaticMeshAsset::Load(writeViewmodelGeometry({0u, 1u}, true), viewmodelManifest,
+                                 asset, diagnostic),
+          "unknown actual viewmodel primitive is rejected");
 }
 
 void TestAccessorRangeRejectsOverflow()
