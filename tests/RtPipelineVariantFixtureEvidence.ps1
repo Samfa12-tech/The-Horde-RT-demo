@@ -42,6 +42,13 @@ function Get-IncludeBytes([string]$key) {
     for ($index = 0; $index -lt $words.Count; ++$index) { [Array]::Copy([BitConverter]::GetBytes([uint32]$words[$index]), 0, $bytes, $index * 4, 4) }
     return $bytes
 }
+function Get-FrozenCatalogVariant([string]$key) {
+    $catalogPath = Join-Path $repoRoot ([IO.Path]::Join('tools', 'raygen-variant-catalog.json'))
+    $catalog = Get-Content -LiteralPath $catalogPath -Raw | ConvertFrom-Json
+    $matches = @($catalog.variants | Where-Object { $_.key -ceq $key })
+    Assert-True ($matches.Count -eq 1) "Frozen catalog must contain exactly one variant: $key"
+    return $matches[0]
+}
 function Test-ByteEqual([byte[]]$left, [byte[]]$right) {
     if ($left.Length -ne $right.Length) { return $false }
     for ($index = 0; $index -lt $left.Length; ++$index) { if ($left[$index] -ne $right[$index]) { return $false } }
@@ -68,13 +75,24 @@ function Assert-ProviderContainment([byte[]]$providerBytes, [byte[]]$selectedOpa
 $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) ('horde-rt-provider-fixture-' + [guid]::NewGuid().ToString('N'))
 try {
     New-Item -ItemType Directory -Path $temporaryRoot | Out-Null
+    $opaqueCatalog = Get-FrozenCatalogVariant $RequiredKey
+    $genericKey = $RequiredKey -replace 'opaque_fast$', 'generic_dielectric'
+    $genericCatalog = Get-FrozenCatalogVariant $genericKey
+    Assert-True ($opaqueCatalog.spirvSha256 -cmatch '^[0-9a-f]{64}$' -and
+                 $genericCatalog.spirvSha256 -cmatch '^[0-9a-f]{64}$' -and
+                 $OpaqueSha256 -cmatch '^[0-9a-fA-F]{64}$' -and
+                 $GenericSha256 -cmatch '^[0-9a-fA-F]{64}$') 'Provider fixture hash arguments or frozen catalog hashes are malformed.'
+    Assert-True ($OpaqueSha256.ToLowerInvariant() -ceq [string]$opaqueCatalog.spirvSha256 -and
+                 $GenericSha256.ToLowerInvariant() -ceq [string]$genericCatalog.spirvSha256) 'Provider fixture hash arguments do not match the frozen catalog.'
     & $Fixture $temporaryRoot
     if ($LASTEXITCODE -ne 0) { throw 'Provider fixture did not reconstruct its selected word streams.' }
-    Assert-True ((Get-FileHash (Join-Path $temporaryRoot 'opaque.spv') -Algorithm SHA256).Hash.ToLowerInvariant() -eq $OpaqueSha256) 'Opaque stream raw SHA-256 changed.'
-    Assert-True ((Get-FileHash (Join-Path $temporaryRoot 'generic.spv') -Algorithm SHA256).Hash.ToLowerInvariant() -eq $GenericSha256) 'Generic stream raw SHA-256 changed.'
-    $providerBytes = [IO.File]::ReadAllBytes($ProviderObject)
     $selectedOpaque = Get-IncludeBytes -key $RequiredKey
-    $selectedGeneric = Get-IncludeBytes -key ($RequiredKey -replace 'opaque_fast$', 'generic_dielectric')
+    $selectedGeneric = Get-IncludeBytes -key $genericKey
+    Assert-True ($selectedOpaque.Length -eq ([int]$opaqueCatalog.words * 4) -and
+                 $selectedGeneric.Length -eq ([int]$genericCatalog.words * 4)) 'Frozen catalog word counts do not match selected embedded streams.'
+    Assert-True ((Get-FileHash (Join-Path $temporaryRoot 'opaque.spv') -Algorithm SHA256).Hash.ToLowerInvariant() -eq $opaqueCatalog.spirvSha256) 'Opaque stream raw SHA-256 changed.'
+    Assert-True ((Get-FileHash (Join-Path $temporaryRoot 'generic.spv') -Algorithm SHA256).Hash.ToLowerInvariant() -eq $genericCatalog.spirvSha256) 'Generic stream raw SHA-256 changed.'
+    $providerBytes = [IO.File]::ReadAllBytes($ProviderObject)
     $forbiddenStreams = @(Assert-ProviderContainment $providerBytes $selectedOpaque $selectedGeneric $RequiredKey)
     Assert-True ($forbiddenStreams.Count -gt 0) 'Containment fixture must have distinguishable forbidden streams.'
     # Scanner controls use the exact same predicate.  Metadata and word-stream

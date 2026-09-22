@@ -195,8 +195,39 @@ still rejects unknown files; a portable regression test covers this boundary.
 See the [native evidence bundle](evidence/2026-09-23-viewmodel-rt/README.md) for
 exact executable/image hashes, controls, reproducer and explicit limitations.
 
+### Broader validation follow-up
+
+GPU integration `d8b1b7f` is pushed and remote-verified. Its fresh branch/PR runs
+`35797498248` / `35797806653` pass all ten Vulkan CPU-host player tests but expose
+six stale portable expectations (38/44). Provider word counts/hashes now bind to
+the reviewed frozen catalog; fixture arguments must agree with it and actual
+SPIR-V bytes must still match. Containment/negative controls remain intact,
+including rejection of a valid-format but wrong hash. The development checkpoint
+test now checks all eight new stable names/IDs and exclusion from the release route.
+
+Fresh out-of-tree MSVC Release non-Vulkan build succeeded. The full 59-test run
+passed 56 and exposed three further test issues: the shader helper-order assertion
+still looked in the old launcher instead of shared `rt_frame.glsl`, compatibility
+artifact pins predated the reviewed ABI change, and spatial-audio source lookup
+assumed an in-repository build directory. All three were fixed and rerun
+successfully (the two shader scripts directly, audio through CTest). No runtime
+audio logic, image tolerance, physical shader behavior or diagnostic gate was
+relaxed. Both actual eight-mode shader compile/validation paths are freshly covered.
+This is a full run plus focused repair reruns, not a claim of one clean 59/59 run.
+
+The follow-up needs fresh remote CI for its new source; the failed GPU checkpoint
+runs above are retained as honest history, not relabelled green.
+
 ## Remaining gates
 
+- Shape-investigation checkpoint (hypothesis, not a fix): static sleeve GLB indices
+  are local/in range and maximum bind-pose edge is about 55 mm. The existing
+  world-player CPU smoke passes and reports about 122 mm ordinary posed maximum
+  edge and 211 mm at the worst wall approach. Its normal/clearance output does not
+  certify attractive sleeves. Inspect per-primitive viewmodel CPU posed geometry
+  at the exact native capture pose next, then distinguish sleeve partition/weight
+  deformation from GPU decode. Do not regenerate or replace the accepted world
+  runtime merely to investigate the dedicated viewmodel.
 - Fix the visibly angular/open-looking sleeve/shoulder surfaces and near-camera
   composition with model/skin investigation and geometry changes, not visual cheats.
 - Live-motion transitions, legal extreme pitch, retraction, grip agreement and

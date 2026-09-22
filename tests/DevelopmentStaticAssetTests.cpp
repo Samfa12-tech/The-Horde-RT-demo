@@ -63,8 +63,21 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 36u,
-          "thirty-six isolated render-development, lantern stress, wall, pitch, and chest-clearance checkpoints are exposed");
+    Check(kDevelopmentCheckpoints.size() == 44u,
+          "forty-four isolated render-development checkpoints include the eight dedicated viewmodel poses");
+    int viewmodelId = 136;
+    for (const auto name : {"player-viewmodel-grips", "player-viewmodel-forward",
+                           "player-viewmodel-downward-cut", "player-viewmodel-upward-slice",
+                           "player-viewmodel-look-up", "player-viewmodel-look-down",
+                           "player-viewmodel-lantern-high", "player-viewmodel-lantern-low"})
+    {
+        const auto* viewmodel = FindDevelopmentCheckpoint(name);
+        Check(viewmodel != nullptr && viewmodel->id == viewmodelId &&
+                  FindDevelopmentCheckpoint(viewmodelId) == viewmodel &&
+                  FindShowcaseCheckpoint(name) == nullptr,
+              "viewmodel pose has a stable development-only name/ID and never enters the release route");
+        ++viewmodelId;
+    }
     const DevelopmentCheckpoint* checkpoint = FindDevelopmentCheckpoint("pbr-sword-closeup");
     Check(checkpoint != nullptr && checkpoint->id == 100 && checkpoint->baseShowcaseCheckpointId == 0 &&
               checkpoint->name == std::string_view("pbr-sword-closeup") &&

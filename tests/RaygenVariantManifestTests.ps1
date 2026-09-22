@@ -8,9 +8,11 @@ $manifestPath = Join-Path $repoRoot 'tools\raygen-variants.json'
 $budgetsPath = Join-Path $repoRoot 'tools\raygen-variant-budgets.json'
 $configPath = Join-Path $repoRoot 'shaders\raytracing\include\rt_variant_config.glsl'
 $diagnosticsPath = Join-Path $repoRoot 'shaders\raytracing\include\rt_diagnostics.glsl'
+$framePath = Join-Path $repoRoot 'shaders\raytracing\include\rt_frame.glsl'
 $raygenPath = Join-Path $repoRoot 'shaders\raytracing\minimal.rgen'
 $diagnosticConsumerPaths = @(
     $raygenPath
+    $framePath
     Join-Path $repoRoot 'shaders\raytracing\include\rt_lighting.glsl'
     Join-Path $repoRoot 'shaders\raytracing\include\rt_dielectric_transport.glsl'
 )
@@ -86,14 +88,16 @@ try {
             "Direct diagnostics atomics remain in $consumerPath."
     }
     $raygenSource = Get-Content -LiteralPath $raygenPath -Raw
-    $abiInclude = '#include "include/rt_scene_abi.glsl"'
-    $diagnosticsInclude = '#include "include/rt_diagnostics.glsl"'
-    $lightingInclude = '#include "include/rt_lighting.glsl"'
-    $transportInclude = '#include "include/rt_dielectric_transport.glsl"'
-    Assert-True (($raygenSource.IndexOf($abiInclude) -ge 0) -and
-        ($raygenSource.IndexOf($diagnosticsInclude) -gt $raygenSource.IndexOf($abiInclude)) -and
-        ($raygenSource.IndexOf($lightingInclude) -gt $raygenSource.IndexOf($diagnosticsInclude)) -and
-        ($raygenSource.IndexOf($transportInclude) -gt $raygenSource.IndexOf($diagnosticsInclude))) `
+    $frameSource = Get-Content -LiteralPath $framePath -Raw
+    $abiInclude = '#include "rt_scene_abi.glsl"'
+    $diagnosticsInclude = '#include "rt_diagnostics.glsl"'
+    $lightingInclude = '#include "rt_lighting.glsl"'
+    $transportInclude = '#include "rt_dielectric_transport.glsl"'
+    Assert-True ($raygenSource.IndexOf('#include "include/rt_frame.glsl"') -ge 0 -and
+        ($frameSource.IndexOf($abiInclude) -ge 0) -and
+        ($frameSource.IndexOf($diagnosticsInclude) -gt $frameSource.IndexOf($abiInclude)) -and
+        ($frameSource.IndexOf($lightingInclude) -gt $frameSource.IndexOf($diagnosticsInclude)) -and
+        ($frameSource.IndexOf($transportInclude) -gt $frameSource.IndexOf($diagnosticsInclude))) `
         'The diagnostics helper must follow the ABI declaration and precede lighting and transport.'
 
     $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
@@ -133,8 +137,8 @@ try {
 
     $genericHashBefore = Get-CanonicalFileHash (Join-Path $repoRoot 'src\vulkan\raytracing\MinimalRayGenShader.inc')
     $legacyHashBefore = Get-CanonicalFileHash (Join-Path $repoRoot 'src\vulkan\raytracing\MinimalLegacyRayGenShader.inc')
-    Assert-True ($genericHashBefore -eq 'fd534d390fc5d73aa65fb291fc847dde6d94a70da4d611eb274c4739d65c7087') 'Generic include hash changed before matrix compilation.'
-    Assert-True ($legacyHashBefore -eq 'b8ec454582c7b7e0a4f0734286b3475596b817b785b857ddc2c563e40a70bb82') 'Legacy include hash changed before matrix compilation.'
+    Assert-True ($genericHashBefore -eq '7bac11146c3ac632711147005757406025f39ae71f32ed0236908a7c453fbd03') 'Generic include hash changed before matrix compilation.'
+    Assert-True ($legacyHashBefore -eq '6aa3ee289eb31e8bd17468d6ef69bc068402ac9c1506e72c16523e3cf9317219') 'Legacy include hash changed before matrix compilation.'
 
     $matrixOutputRoot = Join-Path $temporaryRoot 'matrix'
     $matrixCompilerOutput = @(& $compiler -Matrix -OutputDirectory $matrixOutputRoot)

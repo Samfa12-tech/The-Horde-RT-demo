@@ -1,4 +1,6 @@
 #include "vulkan/raytracing/RtPipelineVariantProvider.h"
+#include "vulkan/raytracing/RtPipelineVariantCatalog.generated.h"
+#include "vulkan/raytracing/RtRayQueryVariantCatalog.generated.h"
 
 #include <iostream>
 #include <string>
@@ -29,8 +31,25 @@ int main()
         {RtInstrumentation::Shipping, DielectricQuality::Mobile, RtMaterialStrategy::GenericDielectric}, &error);
     ok &= Require(opaque.has_value() && generic.has_value(), "both exact selected strategies must resolve");
     if (opaque && generic) {
-        ok &= Require(opaque->words.size() == 122292 && generic->words.size() == 54232,
-                      "selected frozen word counts changed");
+        const auto& opaqueCatalog = detail::kSelectedRtPipelineCatalog[0];
+        const auto& genericCatalog = detail::kSelectedRtPipelineCatalog[1];
+        ok &= Require(opaqueCatalog.canonicalKey == "shipping_mobile_opaque_fast" &&
+                          genericCatalog.canonicalKey == "shipping_mobile_generic_dielectric" &&
+                          opaque->words.size() == opaqueCatalog.words &&
+                          generic->words.size() == genericCatalog.words &&
+                          opaque->expectedWordCount == opaqueCatalog.words &&
+                          generic->expectedWordCount == genericCatalog.words &&
+                          opaque->spirvSha256 == opaqueCatalog.spirvSha256 &&
+                          generic->spirvSha256 == genericCatalog.spirvSha256 &&
+                          opaque->includeSha256 == opaqueCatalog.includeSha256 &&
+                          generic->includeSha256 == genericCatalog.includeSha256 &&
+                          opaque->artifactPath == opaqueCatalog.artifactPath &&
+                          generic->artifactPath == genericCatalog.artifactPath &&
+                          opaque->atomicInstructions == opaqueCatalog.atomicInstructions &&
+                          generic->atomicInstructions == genericCatalog.atomicInstructions &&
+                          opaque->hasDiagnosticsBinding == opaqueCatalog.hasDiagnosticsBinding &&
+                          generic->hasDiagnosticsBinding == genericCatalog.hasDiagnosticsBinding,
+                      "selected frozen artifact metadata changed");
         ok &= Require(opaque->canonicalKey == "shipping_mobile_opaque_fast" &&
                           generic->canonicalKey == "shipping_mobile_generic_dielectric",
                       "provider must keep complete independent semantic keys");
@@ -62,7 +81,25 @@ int main()
                       computeOpaque && computeGeneric,
                   "compiled compute provider must resolve its exact two hardware-query artifacts");
     if (computeOpaque && computeGeneric && opaque && generic) {
-        ok &= Require(computeOpaque->canonicalKey == "rayquery_compute_shipping_mobile_opaque_fast" &&
+        const auto& computeOpaqueCatalog = detail::kSelectedRtRayQueryCatalog[0];
+        const auto& computeGenericCatalog = detail::kSelectedRtRayQueryCatalog[1];
+        ok &= Require(computeOpaqueCatalog.canonicalKey == "rayquery_compute_shipping_mobile_opaque_fast" &&
+                          computeGenericCatalog.canonicalKey == "rayquery_compute_shipping_mobile_generic_dielectric" &&
+                          computeOpaque->words.size() == computeOpaqueCatalog.words &&
+                          computeGeneric->words.size() == computeGenericCatalog.words &&
+                          computeOpaque->expectedWordCount == computeOpaqueCatalog.words &&
+                          computeGeneric->expectedWordCount == computeGenericCatalog.words &&
+                          computeOpaque->spirvSha256 == computeOpaqueCatalog.spirvSha256 &&
+                          computeGeneric->spirvSha256 == computeGenericCatalog.spirvSha256 &&
+                          computeOpaque->includeSha256 == computeOpaqueCatalog.includeSha256 &&
+                          computeGeneric->includeSha256 == computeGenericCatalog.includeSha256 &&
+                          computeOpaque->artifactPath == computeOpaqueCatalog.artifactPath &&
+                          computeGeneric->artifactPath == computeGenericCatalog.artifactPath &&
+                          computeOpaque->atomicInstructions == computeOpaqueCatalog.atomicInstructions &&
+                          computeGeneric->atomicInstructions == computeGenericCatalog.atomicInstructions &&
+                          computeOpaque->hasDiagnosticsBinding == computeOpaqueCatalog.hasDiagnosticsBinding &&
+                          computeGeneric->hasDiagnosticsBinding == computeGenericCatalog.hasDiagnosticsBinding &&
+                          computeOpaque->canonicalKey == "rayquery_compute_shipping_mobile_opaque_fast" &&
                           computeGeneric->canonicalKey == "rayquery_compute_shipping_mobile_generic_dielectric" &&
                           computeOpaque->words.data() != opaque->words.data() &&
                           computeGeneric->words.data() != generic->words.data() &&

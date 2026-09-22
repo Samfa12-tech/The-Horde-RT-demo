@@ -48,6 +48,14 @@ files, then invoke the exact Debug executable once per checkpoint with
 `--capture-showcase <new-output-directory> --development-checkpoint <name>`.
 Keep all stages/artifact hashes and inspect complete manifests, not exit codes alone.
 
+An additional isolated stage with the same executable and runtime roster except
+the two optional viewmodel files verifies absence behavior. `player-body-grips`
+still presents RT and exits zero. `player-viewmodel-grips` exits one with an
+incomplete manifest and the explicit missing-validated-runtime error; it does not
+silently switch to full-body primary rendering. Original manifests are retained
+under `optional-asset-absent/`; local stage is
+`C:\Dev\tmp\horde-viewmodel-absent-20260923\stage`.
+
 ## Explicitly open
 
 - Lead image inspection found severe angular/open-looking sleeve and shoulder

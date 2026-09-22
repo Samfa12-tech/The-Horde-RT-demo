@@ -280,21 +280,66 @@ if(BUILD_TESTING)
                 -OpaqueSha256 ${opaque_hash} -GenericSha256 ${generic_hash}
                 -RequiredKey ${required_key})
     endfunction()
+
+    function(horde_rt_catalog_spirv_sha256 variant_key output_variable)
+        file(READ "${CMAKE_CURRENT_SOURCE_DIR}/tools/raygen-variant-catalog.json" catalog_text)
+        string(JSON variant_count ERROR_VARIABLE catalog_error LENGTH "${catalog_text}" variants)
+        if(NOT catalog_error STREQUAL "NOTFOUND")
+            message(FATAL_ERROR "Frozen RT catalog JSON is malformed: ${catalog_error}")
+        endif()
+        math(EXPR last_variant_index "${variant_count} - 1")
+        set(match_count 0)
+        set(found_hash "")
+        foreach(index RANGE 0 ${last_variant_index})
+            string(JSON row_key ERROR_VARIABLE row_error GET "${catalog_text}" variants ${index} key)
+            if(NOT row_error STREQUAL "NOTFOUND")
+                message(FATAL_ERROR "Frozen RT catalog row is malformed: ${row_error}")
+            endif()
+            if(row_key STREQUAL variant_key)
+                math(EXPR match_count "${match_count} + 1")
+                string(JSON row_hash ERROR_VARIABLE hash_error GET "${catalog_text}" variants ${index} spirvSha256)
+                string(LENGTH "${row_hash}" row_hash_length)
+                if(NOT hash_error STREQUAL "NOTFOUND" OR
+                   NOT row_hash_length EQUAL 64 OR
+                   NOT row_hash MATCHES "^[0-9a-f]+$")
+                    message(FATAL_ERROR "Frozen RT catalog hash is malformed: ${variant_key}")
+                endif()
+                set(found_hash "${row_hash}")
+            endif()
+        endforeach()
+        if(match_count EQUAL 0)
+            message(FATAL_ERROR "Frozen RT catalog key is missing: ${variant_key}")
+        endif()
+        if(match_count GREATER 1)
+            message(FATAL_ERROR "Frozen RT catalog key is duplicated: ${variant_key}")
+        endif()
+        set(${output_variable} "${found_hash}" PARENT_SCOPE)
+    endfunction()
+
+    horde_rt_catalog_spirv_sha256(shipping_mobile_opaque_fast shipping_mobile_opaque_hash)
+    horde_rt_catalog_spirv_sha256(shipping_mobile_generic_dielectric shipping_mobile_generic_hash)
+    horde_rt_catalog_spirv_sha256(shipping_high_opaque_fast shipping_high_opaque_hash)
+    horde_rt_catalog_spirv_sha256(shipping_high_generic_dielectric shipping_high_generic_hash)
+    horde_rt_catalog_spirv_sha256(diagnostic_mobile_opaque_fast diagnostic_mobile_opaque_hash)
+    horde_rt_catalog_spirv_sha256(diagnostic_mobile_generic_dielectric diagnostic_mobile_generic_hash)
+    horde_rt_catalog_spirv_sha256(diagnostic_high_opaque_fast diagnostic_high_opaque_hash)
+    horde_rt_catalog_spirv_sha256(diagnostic_high_generic_dielectric diagnostic_high_generic_hash)
+
     horde_rt_add_pipeline_variant_fixture(horde_rt_provider_shipping_mobile_fixture 0 0
-        7ebdb794794a854b6cb5c44c75dd9a9decd42f4999c44a9cfa78f13b12a13f21
-        c52a143c5e0e96f7bf187a9278937a5d17534690cbc0e8e7d70f2d95ae104a01
+        ${shipping_mobile_opaque_hash}
+        ${shipping_mobile_generic_hash}
         shipping_mobile_opaque_fast)
     horde_rt_add_pipeline_variant_fixture(horde_rt_provider_shipping_high_fixture 0 1
-        7ebdb794794a854b6cb5c44c75dd9a9decd42f4999c44a9cfa78f13b12a13f21
-        1be2b430ba190ae82250693ae079adf3f0712b361914b1355f386fb1f57fc5aa
+        ${shipping_high_opaque_hash}
+        ${shipping_high_generic_hash}
         shipping_high_opaque_fast)
     horde_rt_add_pipeline_variant_fixture(horde_rt_provider_diagnostic_mobile_fixture 1 0
-        d7b0722e572e63bd96e62bae85cc6a5b968ae71bf157526b513b50b56e515c3b
-        d8f4c915955836f6693c5c5a073c23155944a8a3048dbfdcee6c3a0c4d8f57f7
+        ${diagnostic_mobile_opaque_hash}
+        ${diagnostic_mobile_generic_hash}
         diagnostic_mobile_opaque_fast)
     horde_rt_add_pipeline_variant_fixture(horde_rt_provider_diagnostic_high_fixture 1 1
-        d7b0722e572e63bd96e62bae85cc6a5b968ae71bf157526b513b50b56e515c3b
-        2b61176f676227adfd13a880cd415478536e1403b46317ea3321dc463bebecd0
+        ${diagnostic_high_opaque_hash}
+        ${diagnostic_high_generic_hash}
         diagnostic_high_opaque_fast)
 
     add_executable(horde_rt_github_release_updater_tests
@@ -572,6 +617,8 @@ if(BUILD_TESTING)
     add_executable(horde_rt_spatial_audio_smoke tests/SpatialAudioSmoke.cpp)
     target_include_directories(horde_rt_spatial_audio_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_spatial_audio_smoke COMMAND horde_rt_spatial_audio_smoke)
+    set_tests_properties(horde_rt_spatial_audio_smoke PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 
     if(HORDE_RT_BUILD_VULKAN_TARGETS)
         add_executable(horde_rt_gpu_frame_timer_collection_tests
