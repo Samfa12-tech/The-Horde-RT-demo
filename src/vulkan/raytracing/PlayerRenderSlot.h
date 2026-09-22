@@ -224,6 +224,8 @@ public:
         return uniqueTangents_;
     }
     const horde::scene::SkinnedPlayerSockets& BoneSockets() const { return sockets_; }
+    // Consume only after successful PreparePose, before the next pose update.
+    const horde::scene::SkinnedPlayerPose& SolvedPose() const { return solvedPose_; }
     float LeftSocketErrorMetres() const { return leftSocketErrorMetres_; }
     float RightSocketErrorMetres() const { return rightSocketErrorMetres_; }
     const PlayerGripAgreement& LeftGripAgreement() const { return leftGripAgreement_; }
@@ -238,6 +240,7 @@ private:
     bool BuildBootGroundingProfiles(std::string& diagnostic);
 
     horde::scene::SkinnedMeshAsset asset_;
+    horde::scene::SkinnedPlayerPose solvedPose_;
     std::vector<horde::scene::TexturedSkinnedRtVertex> uniqueVertices_;
     std::vector<horde::scene::SkinnedPbrTangent> uniqueTangents_;
     horde::scene::SkinnedPlayerSockets sockets_{};

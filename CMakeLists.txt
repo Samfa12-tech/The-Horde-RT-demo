@@ -696,6 +696,10 @@ if(BUILD_TESTING)
                 ${CMAKE_CURRENT_SOURCE_DIR}/assets/models/player/runtime/gothic-traveller-lod0.runtime.glb)
         set_tests_properties(horde_rt_player_viewmodel_admission PROPERTIES
             WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+        add_test(NAME horde_rt_player_viewmodel_pose_fixtures
+            COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
+                ${CMAKE_CURRENT_SOURCE_DIR}/tests/PlayerViewmodelPoseFixtures.ps1
+                -TestExecutable $<TARGET_FILE:horde_rt_skinned_character_smoke>)
 
         add_executable(horde_rt_character_render_slot_smoke tests/CharacterRenderSlotSmoke.cpp)
         target_include_directories(horde_rt_character_render_slot_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)

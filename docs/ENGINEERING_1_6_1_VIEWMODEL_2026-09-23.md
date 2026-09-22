@@ -47,6 +47,48 @@ transforms at three phases of both clips. Its first MSVC Release run passed.
 The focused Vulkan CPU-host CI lane now includes this ninth test and its LFS input.
 This is offline/host evidence only; it is not a rendered or production arms route.
 
+## Shared solved pose
+
+The existing player animation/IK evaluation now produces an opaque
+`SkinnedPlayerPose`. `PlayerRenderSlot` retains it and skins the world geometry
+from it; a viewmodel consumer can skin its own geometry from the same palette
+and grips without a second animation clock or IK solve. Gameplay snapshot,
+held-item ownership and the existing cadence/imported-same-tick rules are unchanged.
+The old combined skinning API remains a wrapper for existing callers.
+
+Cross-mesh binding requires exact ordered joint names and inverse-bind matrices.
+The immutable rig identity survives moves; a checked compatible binding is cached,
+not inferred from matching joint counts or raw asset addresses. Reload clears
+that cache. A failed pose evaluation invalidates the old palette; failed skinning
+clears output instead of exposing partial geometry. Normal successful updates
+reuse output storage rather than clearing and zero-initialising the whole mesh.
+
+New malformed-fixture coverage rejects changed inverse binds, a renamed non-hand
+joint, a genuine hierarchy cycle, invalid animation-channel target, NaN position
+and NaN weight. The admission test also checks exact shared-versus-independent
+vertices/tangents/grips at six clip/phase combinations, pose moves and invalid
+time/IK input. Finite geometry/rig/channel admission checks happen at load time;
+the solved palette and produced vertices are checked before use.
+
+This is the CPU ownership seam, not completed GPU viewmodel ownership. Separate
+buffers/BLAS/TLAS and native-rendered acceptance remain the next integration work.
+
+Fresh validation of the shared-pose source before its commit:
+
+- MSVC Release: 5/5 passed in 13.25 seconds: skinned-character smoke, world semantic
+  fixtures, viewmodel admission, viewmodel pose fixtures and character-slot smoke.
+- Android unsigned Shipping/Mobile RelWithDebInfo: four ABI build succeeded
+  (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`), 35 seconds. APK SHA-256
+  `cc03de6974aee6e836df81839edbda783c77cc01a52ee1da6207c69c6521fd1e`,
+  86,060,003 bytes. ZIP inspection confirms all four native libraries and the
+  existing world asset; the offline viewmodel is not accidentally packaged.
+- No new phone installation, device evidence, native image capture, frame-time
+  improvement or owner acceptance is claimed by these checks.
+
+Preceding geometry commit `6a93eb7` has fresh green push/PR runs
+`35789772367` / `35789776592`: 43 portable tests and 9 focused Vulkan CPU-host tests.
+That CI evidence does not certify subsequent shared-pose edits.
+
 ## Remaining gates
 
 - Native rendering admission of the reproducible arms-only runtime candidate.

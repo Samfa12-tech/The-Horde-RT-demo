@@ -12,9 +12,11 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <filesystem>
 #include <iostream>
 #include <fstream>
+#include <limits>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -602,8 +604,8 @@ int main(int argc, char** argv)
         std::string diagnostic;
         if (!horde::scene::assets::AssetManifest::Load(argv[3], manifest, diagnostic) ||
             !manifest.ValidatePlayerViewmodelSemantics(diagnostic) ||
-            !horde::scene::assets::StaticMeshAsset::Load(argv[2], manifest, fixed, diagnostic) ||
             !viewmodel.LoadClips(argv[2], PlayerLocomotionClipSet(), diagnostic) ||
+            !horde::scene::assets::StaticMeshAsset::Load(argv[2], manifest, fixed, diagnostic) ||
             !viewmodel.ValidateStaticVertexLayout(fixed, diagnostic) ||
             !world.LoadClips(argv[4], PlayerLocomotionClipSet(), diagnostic))
         {
@@ -626,9 +628,49 @@ int main(int argc, char** argv)
                                  viewmodel.NodeTransform(clip, time, name, viewmodelSocket, diagnostic) &&
                                  bodySocket == viewmodelSocket, "world/viewmodel authored hand/grip transform differs")) return 1;
                 }
+                SkinnedNodeTransform leftHand{}, rightHand{};
+                if (!world.NodeTransform(clip, time, "LeftHand", leftHand, diagnostic) ||
+                    !world.NodeTransform(clip, time, "RightHand", rightHand, diagnostic))
+                    return 1;
+                SkinnedArmIkTarget left{{{leftHand[12], leftHand[13] - 0.05f, leftHand[14] + phase * 0.1f}}, {{1.0f, -1.0f, 0.0f}}};
+                SkinnedArmIkTarget right{{{rightHand[12], rightHand[13] - 0.05f, rightHand[14] + phase * 0.1f}}, {{-1.0f, -1.0f, 0.0f}}};
+                SkinnedPlayerPose sharedPose, independentPose;
+                std::vector<TexturedSkinnedRtVertex> sharedVertices, independentVertices;
+                std::vector<SkinnedPbrTangent> sharedTangents, independentTangents;
+                if (!world.EvaluatePlayerPose(clip, time, left, right, sharedPose, diagnostic) ||
+                    !viewmodel.EvaluatePlayerPose(clip, time, left, right, independentPose, diagnostic) ||
+                    !viewmodel.SkinPlayerPoseUniqueTextured(sharedPose, sharedVertices, sharedTangents, diagnostic) ||
+                    !viewmodel.SkinPlayerPoseUniqueTextured(independentPose, independentVertices, independentTangents, diagnostic))
+                {
+                    std::cerr << "FAIL: viewmodel shared pose: " << diagnostic << '\n';
+                    return 1;
+                }
+                if (!Require(sharedPose.Sockets().leftGrip == independentPose.Sockets().leftGrip &&
+                             sharedPose.Sockets().rightGrip == independentPose.Sockets().rightGrip &&
+                             sharedVertices.size() == independentVertices.size() &&
+                             sharedTangents.size() == independentTangents.size() &&
+                             FiniteTexturedVertices(sharedVertices) &&
+                             std::memcmp(sharedVertices.data(), independentVertices.data(),
+                                         sharedVertices.size() * sizeof(TexturedSkinnedRtVertex)) == 0 &&
+                             std::memcmp(sharedTangents.data(), independentTangents.data(),
+                                         sharedTangents.size() * sizeof(SkinnedPbrTangent)) == 0,
+                             "shared world pose must produce exact viewmodel vertices, tangents and grips")) return 1;
+                SkinnedPlayerPose movedPose = std::move(sharedPose);
+                if (!Require(!sharedPose.IsValid() && movedPose.IsValid() &&
+                             viewmodel.SkinPlayerPoseUniqueTextured(movedPose, sharedVertices, sharedTangents, diagnostic),
+                             "moving a solved pose preserves its independent mesh binding")) return 1;
+                if (!Require(!viewmodel.SkinPlayerPoseUniqueTextured(sharedPose, sharedVertices, sharedTangents, diagnostic) &&
+                             sharedVertices.empty() && sharedTangents.empty(),
+                             "an invalid moved-from pose cannot retain stale mesh output")) return 1;
+                if (!Require(!world.EvaluatePlayerPose(clip, std::numeric_limits<float>::quiet_NaN(),
+                                                      left, right, movedPose, diagnostic) && !movedPose.IsValid(),
+                             "failed evaluation invalidates the old shared pose")) return 1;
+                left.target[0] = std::numeric_limits<float>::infinity();
+                if (!Require(!world.EvaluatePlayerPose(clip, time, left, right, movedPose, diagnostic) &&
+                             !movedPose.IsValid(), "non-finite IK input must be rejected")) return 1;
             }
         }
-        std::cout << "Viewmodel static/skinned addressing, finite poses and exact authored grip transforms passed\n";
+        std::cout << "Viewmodel addressing, shared pose/vertex/tangent/grip agreement and invalid-pose rejection passed\n";
         return 0;
     }
     if (argc == 4 && std::string(argv[1]) == "--validate-player-admission")

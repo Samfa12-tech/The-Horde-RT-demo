@@ -460,6 +460,8 @@ bool PlayerRenderSlot::LoadAsset(const std::string& runtimeGlbPath,
                                  std::string& diagnostic)
 {
     uniqueVertices_.clear();
+    uniqueTangents_.clear();
+    solvedPose_ = {};
     sockets_ = {};
     lastSkinnedTick_ = std::numeric_limits<std::uint64_t>::max();
     lastPreparedAnimation_ = {};
@@ -689,13 +691,15 @@ bool PlayerRenderSlot::PreparePose(
         return false;
     }
     RtSceneStageScope skinScope(observation, horde::telemetry::RtStage::PlayerSkin);
-    if (!asset_.SkinPlayerUniqueTextured(
-            clip, animation.locomotionTime, left, right, uniqueVertices_,
-            uniqueTangents_, sockets_, diagnostic))
+    if (!asset_.EvaluatePlayerPose(
+            clip, animation.locomotionTime, left, right, solvedPose_, diagnostic) ||
+        !asset_.SkinPlayerPoseUniqueTextured(
+            solvedPose_, uniqueVertices_, uniqueTangents_, diagnostic))
     {
         skinScope.Cancel();
         return false;
     }
+    sockets_ = solvedPose_.Sockets();
     skinScope.Complete(1u);
     const auto socketError = [](const horde::scene::SkinnedNodeTransform& socket,
                                 const horde::gameplay::animation::PlayerArmIkTarget& intended) {
