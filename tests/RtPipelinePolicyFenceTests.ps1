@@ -69,7 +69,14 @@ try {
     Assert-True $rejectedCatalog 'A duplicate/missing frozen catalog key must fail closed.'
     Copy-Item -LiteralPath (Join-Path $repoRoot 'tools\raygen-variant-catalog.json') -Destination $catalogFixture -Force
     $catalogText = Get-Content -LiteralPath $catalogFixture -Raw
-    [IO.File]::WriteAllText($catalogFixture, $catalogText.Replace('7ebdb794794a854b6cb5c44c75dd9a9decd42f4999c44a9cfa78f13b12a13f21', ('0' * 64)), [Text.UTF8Encoding]::new($false))
+    $catalogForHash = $catalogText | ConvertFrom-Json
+    $currentIncludeHash = [string]$catalogForHash.variants[0].includeSha256
+    $zeroIncludeHash = '0' * 64
+    Assert-True ($currentIncludeHash -cmatch '^[0-9a-f]{64}$' -and
+                 $currentIncludeHash -cne $zeroIncludeHash) 'Current frozen include hash fixture is invalid.'
+    $staleCatalogText = $catalogText.Replace($currentIncludeHash, $zeroIncludeHash)
+    Assert-True ($staleCatalogText -cne $catalogText) 'Stale frozen include fixture mutation was a no-op.'
+    [IO.File]::WriteAllText($catalogFixture, $staleCatalogText, [Text.UTF8Encoding]::new($false))
     $rejectedInclude = $false
     try { & (Join-Path $repoRoot 'tools\GenerateRtPipelineVariantCatalog.ps1') -Check -CatalogPath $catalogFixture -OutputPath (Join-Path $repoRoot 'src\vulkan\raytracing\RtPipelineVariantCatalog.generated.h') } catch { $rejectedInclude = $true }
     Assert-True $rejectedInclude 'A stale frozen include hash must fail before provider compilation.'
