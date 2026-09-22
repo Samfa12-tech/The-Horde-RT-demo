@@ -34,12 +34,23 @@ This is merge review, not compiler, hardware or release acceptance.
 | --- | --- |
 | PR conflicts hide current compiler checks | Resolved: main reconciled in `d3a7225`; PR is MERGEABLE, description updated, and fresh push/PR jobs exist for `cd8614b` |
 | Portable lane excludes actual skinned smoke/fixtures | Resolved coverage gap: Vulkan-enabled GCC 13.3 / SDK 1.3.275 CPU-host lane passes 8/8 on both fresh push and PR runs at `cd8614b`; local MSVC Shipping/Mobile also passes 8/8 |
-| Portable suite current-source failure | `cd8614b` passes 42/43; stale Windows RT Lab source assertion repaired and locally revalidated, fresh remote full result pending |
+| Portable suite current-source failure | Resolved in `c46e255`; fresh `adc4579` push and PR runs pass 43/43 portable tests and 8/8 focused Vulkan-host tests |
 | Phase 2 generated-runtime admission | Open; repeatable single-thread artifact differs in vertex ordering/tangents and has not replaced the accepted runtime |
 | Phase 1 measurement foundation | Accepted; not being restarted |
 | Dedicated viewmodel, glass/backend parity, music/reporting and final matrix | Remain in scope and incomplete |
 
 Audio/haptic manual revalidation required: **NO** for this documentation/CI work.
+
+## Recovery gate closed — results verified 2026-09-23
+
+Fresh push [35500684339](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/35500684339)
+and PR integration [35500686564](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/35500686564)
+both completed successfully at `adc4579763abe474a08cf8aa9172e0d622579a34`.
+Each passes **43/43 portable tests and 8/8 Vulkan-enabled CPU-host player tests**
+with GCC 13.3. PR #15 is `MERGEABLE` / `CLEAN`; its full-scope description was
+updated. Main was not changed. These results close CI recovery, not the remaining
+engineering programme or physical-device gates. Subsequent runtime-asset admission
+will receive its own fresh CI run.
 
 ## Fresh evidence and first follow-up
 
