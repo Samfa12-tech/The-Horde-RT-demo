@@ -28,7 +28,26 @@ without loosening tolerance. Include live motion, not just frozen extreme poses.
 Music, consent-based reporting, resource work and final gates remain in scope;
 licensing, signing recovery and publication remain owner-controlled.
 
-### Quota checkpoint
+### Current Phase 3 checkpoint
+
+`fff46495dd33019bf89b486d8342a0c08a3e6f5c` is pushed; branch/PR CI runs
+`35790685040` / `35790688872` pass 43 portable and 10 Vulkan CPU-host tests.
+New reviewed slices are `6404976` (explicit arms-only role), `6a93eb7`
+(reproducible 14,370-triangle modelled candidate and admission CI), and `fff4649`
+(one solved player pose shared across independently owned meshes, malformed-rig
+gates and fixtures). MSVC affected tests pass 5/5; unsigned Android Shipping/Mobile
+build passes all four ABIs. See [Phase 3 record](ENGINEERING_1_6_1_VIEWMODEL_2026-09-23.md).
+
+The candidate is under `assets/models/player/viewmodel/`; its SHA-256 is
+`1e3b041ee7aa896a84fe462c182f6012d026b4a577b2d4ddf59d764b823f2538`.
+It is not yet packaged or rendered. Normal block arms remain unchanged. A subsequent
+reviewed shared texture-source registration slice passes 4/4 affected MSVC tests,
+including actual world/viewmodel group reuse without duplicate layers. Next:
+independent world/viewmodel dynamic
+buffers and BLAS/TLAS with named semantics, then native checkpoint/live-motion and
+owner phone acceptance. Do not redo Phase 2 or restore a quota pause.
+
+### Historical quota checkpoint (superseded status)
 
 Engineering work through `614a0e2daea00f4eec3ce02792cbc1af3317ec5c` is pushed and
 remote-verified; this final handoff-only checkpoint follows it on the same branch.
@@ -118,7 +137,9 @@ build, benchmark or worker remains active.
    [image evidence](evidence/2026-09-23-player-admission/README.md). No new phone or
    subjective arm acceptance is claimed. Main documentation conflicts were resolved
    in `d3a7225`, current-source CI restored, and PR #15 is clean/mergeable.
-2. **Start Phase 3:** dedicated real-geometry RT viewmodel/world-body ownership remains unimplemented.
+2. **Phase 3 in progress:** the reproducible arms asset, explicit two-part role,
+   and shared solved-pose CPU seam are implemented. Dedicated GPU viewmodel/world-body
+   ownership and native/owner acceptance remain open.
    Keep gameplay-owned IK/grip authority and independent small dynamic resources;
    no full-body primary-ray switch, overlays or permanent procedural block arms.
 3. Physical glass correctness/performance remains open. Diagnostic held-high still

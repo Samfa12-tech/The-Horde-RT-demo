@@ -382,6 +382,7 @@ if(BUILD_TESTING)
         src/scene/assets/AssetValidation.cpp
         src/scene/assets/GltfDocument.cpp
         src/scene/assets/StaticMeshAsset.cpp
+        src/vulkan/raytracing/RtStaticMeshSlot.cpp
     )
     target_compile_definitions(horde_rt_static_gltf_asset_tests PRIVATE
         HORDE_RT_STATIC_GLTF_FIXTURE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/static-gltf"

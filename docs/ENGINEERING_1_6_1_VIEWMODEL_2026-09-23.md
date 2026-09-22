@@ -89,7 +89,51 @@ Preceding geometry commit `6a93eb7` has fresh green push/PR runs
 `35789772367` / `35789776592`: 43 portable tests and 9 focused Vulkan CPU-host tests.
 That CI evidence does not certify subsequent shared-pose edits.
 
+Shared-pose commit `fff4649` subsequently passed fresh branch/PR runs
+`35790685040` / `35790688872`: 43 portable tests and 10 focused Vulkan CPU-host
+tests, including the newly registered malformed-pose fixtures.
+
+## Shared immutable texture ownership
+
+`StaticRtAssetRegistration::textureSource` explicitly reuses an earlier,
+self-owning provider's named texture groups. Geometry and material factors remain
+independent. Default registrations preserve their previous per-asset allocation.
+Unknown/forward providers, alias chains, inconsistent repeated sources, missing
+groups, conflicting texture-category presence and textured ungrouped aliases are
+rejected. This is a reusable registration contract, not a player-name shader branch.
+
+Self-contained host fixtures check layer reuse/counts, separate geometry/materials
+and negative cases. The actual world/viewmodel GLBs also pass registration checks:
+viewmodel materials resolve to the matching Body/Gauntlet groups without adding
+atlas layers. The existing production atlas remains unchanged (ten base/normal/ORM
+layers and one emissive layer). No renderer registration uses the new alias yet;
+its allocation benefit is prepared, not a measured production performance gain.
+
+Fresh MSVC Release: 4/4 affected CTests passed in 6.93 seconds (static GLB tests,
+skinned smoke, actual viewmodel admission and malformed viewmodel pose fixtures).
+
 ## Remaining gates
+
+The next GPU integration must remove world-player dynamic vertices from the
+shared immutable vertex allocation, not keep a duplicate and label it independent
+ownership. Static indices/materials/textures may remain shared. The current asset
+registry is full at eight assets; the ninth viewmodel needs an explicit capacity
+change and tests. Keep twenty TLAS slots: world-body index 4 is existing ownership;
+the replacement may use index 10 only when the legacy arms occupying 10-13 are
+disabled. Replace player consumers' raw slot assumptions with named roles and
+metadata flags.
+
+Use fixed, separately owned dynamic vertex bindings (proposed 23/24); binding 22
+stays Diagnostic-only. Shipping's binding list would then be non-contiguous, so
+the descriptor/preflight tests must validate actual bindings, not just a prefix
+count. Check device descriptor limits and both shader backends. Avoid introducing
+descriptor-indexing features simply to select these two fixed streams.
+
+A dedicated primary-only mask bit (proposed `0x40`) can avoid applying the legacy
+screen-Y `0x04` arm-culling boundary to the modelled mesh. Current secondary masks
+`0x23`/`0x35`/`0x37` exclude that bit; verify all traversals during integration.
+World-body secondary bit `0x10` remains responsible for shadows/reflections. These
+are next-step design constraints, not implemented or validated GPU behaviour.
 
 - Native rendering admission of the reproducible arms-only runtime candidate.
 - One gameplay-derived animation/IK/grip authority, consumed by separate world-body

@@ -20,6 +20,10 @@ struct StaticRtAssetRegistration
     std::uint32_t flags = 0u;
     std::uint32_t emitterIndex = 0u;
     const horde::scene::assets::StaticMeshAsset* asset = nullptr;
+    // Optional alias source. When set, it must be an earlier, self-owning
+    // registration; only its named texture groups may be reused. Geometry and
+    // material factors remain asset-local.
+    const horde::scene::assets::StaticMeshAsset* textureSource = nullptr;
 };
 
 struct RtStaticMeshMeasurements

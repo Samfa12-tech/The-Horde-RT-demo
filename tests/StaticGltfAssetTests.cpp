@@ -3,6 +3,7 @@
 #include "scene/assets/DielectricTopologyMath.h"
 #include "scene/assets/StaticMeshAsset.h"
 #include "scene/assets/PlayerPrimitiveContract.h"
+#include "vulkan/raytracing/RtStaticMeshSlot.h"
 #include "cgltf/cgltf.h"
 
 #include <algorithm>
@@ -18,6 +19,7 @@
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #if defined(_WIN32)
@@ -739,6 +741,127 @@ void TestPlayerSemanticManifestAndGeometry(const std::filesystem::path& temporar
           "unknown actual viewmodel primitive is rejected");
 }
 
+void TestSharedTextureSourceRouting()
+{
+    using horde::scene::assets::StaticMaterial;
+    using horde::scene::assets::StaticMeshAsset;
+    using horde::vulkan::raytracing::RtStaticMeshSlot;
+    using horde::vulkan::raytracing::StaticRtAssetRegistration;
+
+    const auto makeMaterial = [](std::string name, std::int32_t group,
+                                 std::int32_t seed,
+                                 std::array<bool, 4u> presence = {{true, true, true, true}},
+                                 float factor = 1.0f) {
+        StaticMaterial material;
+        material.name = std::move(name);
+        material.textureGroup = group;
+        material.baseColorFactor = {{factor, 0.5f, 0.25f, 1.0f}};
+        material.baseColorTexture = presence[0] ? seed : -1;
+        material.normalTexture = presence[1] ? seed + 10 : -1;
+        material.ormTexture = presence[2] ? seed + 20 : -1;
+        material.emissiveTexture = presence[3] ? seed + 30 : -1;
+        return material;
+    };
+    const auto makeAsset = [](std::vector<StaticMaterial> materials) {
+        StaticMeshAsset asset;
+        asset.materials = std::move(materials);
+        asset.nodeTransforms.resize(1u);
+        asset.vertices.resize(asset.materials.size() * 3u);
+        asset.indices.resize(asset.materials.size() * 3u);
+        for (std::size_t i = 0u; i < asset.materials.size(); ++i)
+        {
+            asset.indices[i * 3u + 0u] = 0u;
+            asset.indices[i * 3u + 1u] = 1u;
+            asset.indices[i * 3u + 2u] = 2u;
+            asset.primitives.push_back({static_cast<std::uint32_t>(i * 3u),
+                                        static_cast<std::uint32_t>(i * 3u), 3u,
+                                        static_cast<std::uint32_t>(i), 0u});
+        }
+        return asset;
+    };
+
+    auto world = makeAsset({
+        makeMaterial("WorldBody", 7, 1, {{true, true, true, true}}, 1.0f),
+        makeMaterial("WorldGauntlet", 9, 2, {{true, true, true, true}}, 1.1f)});
+    auto viewmodel = makeAsset({
+        makeMaterial("ViewmodelSleeves", 7, 101, {{true, true, true, true}}, 2.0f),
+        makeMaterial("ViewmodelGauntlets", 9, 102, {{true, true, true, true}}, 2.1f)});
+    const StaticRtAssetRegistration worldRegistration{
+        0u, 1u, 0u, 0u, &world};
+    const StaticRtAssetRegistration viewmodelDefaultRegistration{
+        1u, 2u, 0u, 0u, &viewmodel};
+    const StaticRtAssetRegistration viewmodelAliasRegistration{
+        1u, 2u, 0u, 0u, &viewmodel, &world};
+
+    std::string diagnostic;
+    RtStaticMeshSlot defaultSlot;
+    Check(defaultSlot.Initialize(
+              std::array<StaticRtAssetRegistration, 2u>{{
+                  worldRegistration, viewmodelDefaultRegistration}}, diagnostic),
+          std::string("default per-asset texture routing remains valid: ") + diagnostic);
+    const auto defaultCounts = defaultSlot.TextureArrayCounts();
+    Check(defaultCounts.baseColor == 4u && defaultCounts.normal == 4u &&
+              defaultCounts.orm == 4u && defaultCounts.emissive == 4u,
+          "default registrations retain independent per-asset texture layers");
+    Check(defaultSlot.Materials().size() == 4u &&
+              defaultSlot.Materials()[2u].textureLayers != defaultSlot.Materials()[0u].textureLayers &&
+              defaultSlot.Vertices().size() == world.vertices.size() + viewmodel.vertices.size(),
+          "default routing preserves consumer geometry and does not alias layers");
+
+    RtStaticMeshSlot aliasedSlot;
+    Check(aliasedSlot.Initialize(
+              std::array<StaticRtAssetRegistration, 2u>{{
+                  worldRegistration, viewmodelAliasRegistration}}, diagnostic),
+          std::string("explicit texture source routing is valid: ") + diagnostic);
+    const auto aliasedCounts = aliasedSlot.TextureArrayCounts();
+    Check(aliasedCounts.baseColor == 2u && aliasedCounts.normal == 2u &&
+              aliasedCounts.orm == 2u && aliasedCounts.emissive == 2u,
+          "aliased named groups preserve provider layer counts without allocation");
+    Check(aliasedSlot.Materials().size() == 4u &&
+              aliasedSlot.Materials()[2u].textureLayers == aliasedSlot.Materials()[0u].textureLayers &&
+              aliasedSlot.Materials()[3u].textureLayers == aliasedSlot.Materials()[1u].textureLayers &&
+              aliasedSlot.Materials()[2u].baseColorFactor != aliasedSlot.Materials()[0u].baseColorFactor &&
+              aliasedSlot.Vertices().size() == world.vertices.size() + viewmodel.vertices.size() &&
+              aliasedSlot.InstanceMetadata()[1u].primitiveBase == world.primitives.size(),
+          "aliased consumer retains independent material factors and geometry metadata");
+
+    const auto expectFailure = [&](std::vector<StaticRtAssetRegistration> registrations,
+                                   std::string_view fragment, std::string_view label) {
+        RtStaticMeshSlot slot;
+        diagnostic.clear();
+        const bool loaded = slot.Initialize(registrations, diagnostic);
+        Check(!loaded && diagnostic.find(fragment) != std::string::npos,
+              std::string(label) + ": " + diagnostic);
+    };
+
+    auto unregistered = makeAsset({makeMaterial("Unregistered", 7, 201)});
+    expectFailure({worldRegistration, {1u, 3u, 0u, 0u, &viewmodel, &unregistered}},
+                  "not registered", "unknown texture source is rejected");
+    expectFailure({{1u, 2u, 0u, 0u, &viewmodel, &world}, worldRegistration},
+                  "registered earlier", "forward texture source is rejected");
+
+    auto intermediary = makeAsset({makeMaterial("Intermediary", 7, 301)});
+    expectFailure({worldRegistration,
+                   {1u, 2u, 0u, 0u, &intermediary, &world},
+                   {2u, 3u, 0u, 0u, &viewmodel, &intermediary}},
+                  "alias chains", "texture source alias chains are rejected");
+    expectFailure({worldRegistration,
+                   viewmodelAliasRegistration,
+                   {2u, 3u, 0u, 0u, &viewmodel}},
+                  "consistent texture source", "repeated asset source conflicts are rejected");
+
+    auto missingGroup = makeAsset({makeMaterial("MissingGroup", 99, 401)});
+    expectFailure({worldRegistration, {1u, 2u, 0u, 0u, &missingGroup, &world}},
+                  "absent from its provider", "consumer unknown texture group is rejected");
+    auto conflictingPresence = makeAsset({
+        makeMaterial("ConflictingBody", 7, 501, {{true, false, true, true}})});
+    expectFailure({worldRegistration, {1u, 2u, 0u, 0u, &conflictingPresence, &world}},
+                  "conflicting four-category", "consumer texture presence conflict is rejected");
+    auto ungroupedTextured = makeAsset({makeMaterial("UngroupedTextured", -1, 601)});
+    expectFailure({worldRegistration, {1u, 2u, 0u, 0u, &ungroupedTextured, &world}},
+                  "explicit texture group", "textured ungrouped alias is rejected");
+}
+
 void TestAccessorRangeRejectsOverflow()
 {
     std::uint8_t byte = 0u;
@@ -1402,6 +1525,7 @@ int main(int argc, char** argv)
     TestCyclicNodeGraphIsRejectedBeforeTraversal(temporaryRoot);
     TestExactDielectricWeldCellDomain();
     TestPlayerSemanticManifestAndGeometry(temporaryRoot);
+    TestSharedTextureSourceRouting();
     TestProductionDielectricFixture();
     TestRuntimeOfflineDielectricComponentParity();
 

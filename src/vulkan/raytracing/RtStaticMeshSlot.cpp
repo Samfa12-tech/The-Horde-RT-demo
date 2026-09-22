@@ -4,6 +4,7 @@
 #include <limits>
 #include <map>
 #include <unordered_map>
+#include <utility>
 
 namespace horde::vulkan::raytracing
 {
@@ -56,8 +57,14 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
 
     std::array<bool, kRtInstanceMetadataCapacity> occupied{};
     std::vector<const horde::scene::assets::StaticMeshAsset*> uniqueAssets;
-    for (const StaticRtAssetRegistration& registration : registrations)
+    std::unordered_map<const horde::scene::assets::StaticMeshAsset*, std::size_t>
+        firstRegistrationIndex;
+    std::unordered_map<const horde::scene::assets::StaticMeshAsset*,
+                       const horde::scene::assets::StaticMeshAsset*> textureSources;
+    for (std::size_t registrationIndex = 0u;
+         registrationIndex < registrations.size(); ++registrationIndex)
     {
+        const StaticRtAssetRegistration& registration = registrations[registrationIndex];
         if (registration.instanceCustomIndex >= kRtInstanceMetadataCapacity)
         {
             diagnostic = "RtStaticMeshSlot capacity overflow: instanceCustomIndex exceeds RtInstanceMetadata[20].";
@@ -75,6 +82,42 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
             diagnostic = "RtStaticMeshSlot registration has no static asset.";
             return false;
         }
+        firstRegistrationIndex.emplace(registration.asset, registrationIndex);
+        const auto [sourceAsset, insertedSource] = textureSources.emplace(
+            registration.asset, registration.textureSource);
+        if (!insertedSource && sourceAsset->second != registration.textureSource)
+        {
+            diagnostic = "RtStaticMeshSlot repeated registration of one asset must keep a consistent texture source.";
+            return false;
+        }
+        if (registration.textureSource != nullptr)
+        {
+            const auto sourceFirst = firstRegistrationIndex.find(registration.textureSource);
+            if (sourceFirst == firstRegistrationIndex.end())
+            {
+                const bool appearsLater = std::any_of(
+                    registrations.begin() + registrationIndex + 1u,
+                    registrations.end(),
+                    [&registration](const StaticRtAssetRegistration& candidate) {
+                        return candidate.asset == registration.textureSource;
+                    });
+                diagnostic = appearsLater
+                    ? "RtStaticMeshSlot texture source must be registered earlier than its consumer."
+                    : "RtStaticMeshSlot texture source is not registered by this slot.";
+                return false;
+            }
+            if (sourceFirst->second >= registrationIndex)
+            {
+                diagnostic = "RtStaticMeshSlot texture source must be registered earlier than its consumer.";
+                return false;
+            }
+            const auto sourceAlias = textureSources.find(registration.textureSource);
+            if (sourceAlias != textureSources.end() && sourceAlias->second != nullptr)
+            {
+                diagnostic = "RtStaticMeshSlot texture source alias chains are not allowed; provider must self-own its groups.";
+                return false;
+            }
+        }
         if (std::find(uniqueAssets.begin(), uniqueAssets.end(), registration.asset) == uniqueAssets.end())
             uniqueAssets.push_back(registration.asset);
     }
@@ -89,6 +132,8 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
         std::uint32_t assetIndex;
         std::uint32_t primitiveBase;
         std::uint32_t primitiveCount;
+        std::map<std::int32_t, std::array<bool, 4u>> groupPresence;
+        std::map<std::int32_t, std::array<std::uint32_t, 4u>> groupLayers;
     };
     std::unordered_map<const horde::scene::assets::StaticMeshAsset*, AssetRoute> routes;
     std::array<std::uint32_t, 4u> nextTextureLayers{};
@@ -118,37 +163,52 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
         vertices_.insert(vertices_.end(), asset.vertices.begin(), asset.vertices.end());
         indices_.insert(indices_.end(), asset.indices.begin(), asset.indices.end());
         std::array<std::unordered_map<std::int32_t, std::uint32_t>, 4u> textureRoutes;
-        // Explicit asset-local groups are allocated canonically before the
-        // ordinary per-texture routes. Visibility-only material duplication
-        // cannot exchange body/gauntlet atlas layers by changing material order.
         std::map<std::int32_t, std::array<bool, 4u>> groupPresence;
         std::map<std::int32_t, std::array<std::uint32_t, 4u>> groupLayers;
-        for (const auto& material : asset.materials)
+        const auto textureSource = textureSources.at(uniqueAssets[assetIndex]);
+        if (textureSource != nullptr)
         {
-            if (material.textureGroup < 0) continue;
-            const std::array<bool, 4u> present{{material.baseColorTexture >= 0,
-                material.normalTexture >= 0, material.ormTexture >= 0, material.emissiveTexture >= 0}};
-            const auto [entry, inserted] = groupPresence.try_emplace(material.textureGroup, present);
-            if (!inserted && entry->second != present)
+            const auto sourceRoute = routes.find(textureSource);
+            if (sourceRoute == routes.end())
             {
-                diagnostic = "RtStaticMeshSlot texture group has conflicting texture presence.";
+                diagnostic = "RtStaticMeshSlot texture source route was not built before its consumer.";
                 return false;
             }
+            groupPresence = sourceRoute->second.groupPresence;
+            groupLayers = sourceRoute->second.groupLayers;
         }
-        constexpr std::array<const char*, 4u> categoryNames{{"baseColor", "normal", "ORM", "emissive"}};
-        for (const auto& [group, present] : groupPresence)
+        else
         {
-            auto& layers = groupLayers[group];
-            for (std::size_t category = 0; category < layers.size(); ++category)
+            // Explicit asset-local groups are allocated canonically before the
+            // ordinary per-texture routes. Visibility-only material duplication
+            // cannot exchange body/gauntlet atlas layers by changing material order.
+            for (const auto& material : asset.materials)
             {
-                if (!present[category]) continue;
-                if (nextTextureLayers[category] >= kRtTextureLayerCapacity)
+                if (material.textureGroup < 0) continue;
+                const std::array<bool, 4u> present{{material.baseColorTexture >= 0,
+                    material.normalTexture >= 0, material.ormTexture >= 0, material.emissiveTexture >= 0}};
+                const auto [entry, inserted] = groupPresence.try_emplace(material.textureGroup, present);
+                if (!inserted && entry->second != present)
                 {
-                    diagnostic = std::string("RtStaticMeshSlot capacity overflow: ") +
-                        categoryNames[category] + " texture layers exceed 16.";
+                    diagnostic = "RtStaticMeshSlot texture group has conflicting texture presence.";
                     return false;
                 }
-                layers[category] = nextTextureLayers[category]++;
+            }
+            constexpr std::array<const char*, 4u> categoryNames{{"baseColor", "normal", "ORM", "emissive"}};
+            for (const auto& [group, present] : groupPresence)
+            {
+                auto& layers = groupLayers[group];
+                for (std::size_t category = 0; category < layers.size(); ++category)
+                {
+                    if (!present[category]) continue;
+                    if (nextTextureLayers[category] >= kRtTextureLayerCapacity)
+                    {
+                        diagnostic = std::string("RtStaticMeshSlot capacity overflow: ") +
+                            categoryNames[category] + " texture layers exceed 16.";
+                        return false;
+                    }
+                    layers[category] = nextTextureLayers[category]++;
+                }
             }
         }
         const auto routeTexture = [&textureRoutes, &nextTextureLayers, &diagnostic](
@@ -179,7 +239,37 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
         for (const auto& sourceMaterial : asset.materials)
         {
             std::array<std::uint32_t, 4u> layers{};
-            if (sourceMaterial.textureGroup >= 0)
+            if (textureSource != nullptr)
+            {
+                const std::array<bool, 4u> present{{sourceMaterial.baseColorTexture >= 0,
+                    sourceMaterial.normalTexture >= 0, sourceMaterial.ormTexture >= 0,
+                    sourceMaterial.emissiveTexture >= 0}};
+                if (sourceMaterial.textureGroup < 0)
+                {
+                    if (std::any_of(present.begin(), present.end(), [](bool value) { return value; }))
+                    {
+                        diagnostic = "RtStaticMeshSlot aliased material with textures must declare an explicit texture group.";
+                        return false;
+                    }
+                }
+                else
+                {
+                    const auto presence = groupPresence.find(sourceMaterial.textureGroup);
+                    const auto route = groupLayers.find(sourceMaterial.textureGroup);
+                    if (presence == groupPresence.end() || route == groupLayers.end())
+                    {
+                        diagnostic = "RtStaticMeshSlot aliased material references a texture group absent from its provider.";
+                        return false;
+                    }
+                    if (presence->second != present)
+                    {
+                        diagnostic = "RtStaticMeshSlot aliased texture group has conflicting four-category texture presence.";
+                        return false;
+                    }
+                    layers = route->second;
+                }
+            }
+            else if (sourceMaterial.textureGroup >= 0)
             {
                 layers = groupLayers.at(sourceMaterial.textureGroup);
             }
@@ -217,7 +307,8 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
         }
         routes.emplace(&asset, AssetRoute{
             static_cast<std::uint32_t>(assetIndex), primitiveBase,
-            static_cast<std::uint32_t>(asset.primitives.size())});
+            static_cast<std::uint32_t>(asset.primitives.size()),
+            std::move(groupPresence), std::move(groupLayers)});
     }
 
     for (const StaticRtAssetRegistration& registration : registrations)

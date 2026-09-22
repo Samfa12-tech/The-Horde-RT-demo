@@ -5,6 +5,7 @@
 #include "gameplay/ShowcaseRoute.h"
 #include "gameplay/simulation/GameSimulation.h"
 #include "vulkan/raytracing/PlayerRenderSlot.h"
+#include "vulkan/raytracing/RtStaticMeshSlot.h"
 #include "vulkan/raytracing/RtSceneRecordObservation.h"
 
 #include <algorithm>
@@ -611,6 +612,44 @@ int main(int argc, char** argv)
         {
             std::cerr << "FAIL: viewmodel admission: " << diagnostic << '\n';
             return 1;
+        }
+        horde::scene::assets::AssetManifest worldManifest;
+        horde::scene::assets::StaticMeshAsset worldStatic;
+        if (!horde::scene::assets::AssetManifest::Load(
+                std::filesystem::path(argv[4]).parent_path() / "asset.manifest.json", worldManifest, diagnostic) ||
+            !worldManifest.ValidatePlayerSemantics(diagnostic) ||
+            !horde::scene::assets::StaticMeshAsset::Load(argv[4], worldManifest, worldStatic, diagnostic))
+        {
+            std::cerr << "FAIL: world texture provider admission: " << diagnostic << '\n';
+            return 1;
+        }
+        using namespace horde::vulkan::raytracing;
+        const std::array<StaticRtAssetRegistration, 2u> registrations{{
+            {4u, 1u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &worldStatic},
+            {10u, 2u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &fixed, &worldStatic},
+        }};
+        RtStaticMeshSlot providerOnly, sharedTextures;
+        if (!providerOnly.Initialize(std::span(registrations).first(1u), diagnostic) ||
+            !sharedTextures.Initialize(registrations, diagnostic))
+        {
+            std::cerr << "FAIL: viewmodel shared textures: " << diagnostic << '\n';
+            return 1;
+        }
+        const auto providerCounts = providerOnly.TextureArrayCounts();
+        const auto sharedCounts = sharedTextures.TextureArrayCounts();
+        if (!Require(providerCounts.baseColor == sharedCounts.baseColor &&
+                     providerCounts.normal == sharedCounts.normal && providerCounts.orm == sharedCounts.orm &&
+                     providerCounts.emissive == sharedCounts.emissive,
+                     "actual viewmodel must add no duplicate body/gauntlet atlas layers")) return 1;
+        for (std::size_t material = 0; material < fixed.materials.size(); ++material)
+        {
+            const auto provider = std::find_if(worldStatic.materials.begin(), worldStatic.materials.end(),
+                [&](const auto& candidate) { return candidate.textureGroup == fixed.materials[material].textureGroup; });
+            if (!Require(provider != worldStatic.materials.end(), "viewmodel texture group must have a world owner")) return 1;
+            const auto providerIndex = static_cast<std::size_t>(provider - worldStatic.materials.begin());
+            if (!Require(sharedTextures.Materials()[worldStatic.materials.size() + material].textureLayers ==
+                         sharedTextures.Materials()[providerIndex].textureLayers,
+                         "actual sleeves/gauntlets must resolve to the matching world-body atlas layers")) return 1;
         }
         for (const auto clip : {SkinnedClip::Idle, SkinnedClip::Walking})
         {
