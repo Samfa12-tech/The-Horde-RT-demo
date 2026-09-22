@@ -16,7 +16,8 @@ also reject the opposite role and invalid role values.
 
 The existing four-part world contract remains unchanged. Legacy manifests with
 world declarations remain supported; generic non-player assets require no player
-role. This slice changes no shader ABI, production route or GPU resource ownership.
+role. The initial contract slice (`6404976`) changed no shader ABI, production
+route or GPU ownership; the later native integration is recorded below.
 
 Fresh MSVC Release focused verification: 5/5 passed (7.64 seconds):
 `player_primitive_contract_tests`, `player_manifest_agreement_tests`,
@@ -45,7 +46,7 @@ there. The registered `horde_rt_player_viewmodel_admission` CTest verifies actua
 static/skinned addressing, finite textured poses and exact authored hand/grip
 transforms at three phases of both clips. Its first MSVC Release run passed.
 The focused Vulkan CPU-host CI lane now includes this ninth test and its LFS input.
-This is offline/host evidence only; it is not a rendered or production arms route.
+That initial `6a93eb7` evidence was offline/host only, before native integration.
 
 ## Shared solved pose
 
@@ -70,8 +71,8 @@ vertices/tangents/grips at six clip/phase combinations, pose moves and invalid
 time/IK input. Finite geometry/rig/channel admission checks happen at load time;
 the solved palette and produced vertices are checked before use.
 
-This is the CPU ownership seam, not completed GPU viewmodel ownership. Separate
-buffers/BLAS/TLAS and native-rendered acceptance remain the next integration work.
+At `fff4649`, this established the CPU ownership seam; separate buffers/BLAS/TLAS
+and native evidence followed in the GPU integration checkpoint below.
 
 Fresh validation of the shared-pose source before its commit:
 
@@ -106,8 +107,9 @@ Self-contained host fixtures check layer reuse/counts, separate geometry/materia
 and negative cases. The actual world/viewmodel GLBs also pass registration checks:
 viewmodel materials resolve to the matching Body/Gauntlet groups without adding
 atlas layers. The existing production atlas remains unchanged (ten base/normal/ORM
-layers and one emissive layer). No renderer registration uses the new alias yet;
-its allocation benefit is prepared, not a measured production performance gain.
+layers and one emissive layer). At `051fcde` no renderer registration used the
+alias yet; the GPU integration below activates it. Neither is a measured
+production performance gain.
 
 Fresh MSVC Release: 4/4 affected CTests passed in 6.93 seconds (static GLB tests,
 skinned smoke, actual viewmodel admission and malformed viewmodel pose fixtures).
@@ -215,8 +217,12 @@ audio logic, image tolerance, physical shader behavior or diagnostic gate was
 relaxed. Both actual eight-mode shader compile/validation paths are freshly covered.
 This is a full run plus focused repair reruns, not a claim of one clean 59/59 run.
 
-The follow-up needs fresh remote CI for its new source; the failed GPU checkpoint
-runs above are retained as honest history, not relabelled green.
+Follow-up `6b219832514b3e36bda3792ad6639119894675c2` is pushed and remote-verified.
+Fresh branch run [35799096847](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/35799096847)
+and PR integration run [35799100216](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/35799100216)
+both pass 44/44 portable and 10/10 Vulkan CPU-host tests (logs inspected).
+PR #15 is MERGEABLE/CLEAN at that source. The earlier failures remain honest
+history, not relabelled green. The following handoff-only commit changes no runtime.
 
 ## Remaining gates
 

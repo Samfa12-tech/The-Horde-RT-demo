@@ -30,16 +30,19 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### Current Phase 3 checkpoint
 
-Previously pushed `051fcde00aa3084164f17a99b2c75aa1581b4fe8` passed fresh branch/PR
-CI `35791581940` / `35791587978`: 43 portable and 10 Vulkan CPU-host tests.
-Reviewed CPU/asset slices are `6404976` (explicit arms-only role), `6a93eb7`
-(reproducible 14,370-triangle modelled candidate), `fff4649` (one solved pose and
-malformed-rig gates), and `051fcde` (shared named texture domains).
-The next native GPU integration checkpoint now has independent world/viewmodel
-vertex buffers, BLAS/scratch ownership, named geometry roles and fixed bindings
-23/24. Slot 20 is a new primary-only instance; normal gameplay still uses block
-arms. See [Phase 3 record](ENGINEERING_1_6_1_VIEWMODEL_2026-09-23.md) and
-[nine native captures](evidence/2026-09-23-viewmodel-rt/README.md).
+`6b219832514b3e36bda3792ad6639119894675c2` is pushed and remote-verified.
+Fresh branch/PR CI `35799096847` / `35799100216` passes 44/44 portable and 10/10
+Vulkan CPU-host tests; PR #15 is MERGEABLE/CLEAN. This handoff-only follow-up
+changes no runtime. New commits are `34b27b4` (non-no-op stale-hash fixture),
+`d8b1b7f` (native GPU geometry ownership), and `6b21983` (current shader/checkpoint
+validation, including fresh failure-driven repairs). Earlier CPU/asset slices
+`6404976`, `6a93eb7`, `fff4649`, `051fcde` remain accepted foundations.
+
+World/viewmodel now have independent vertex buffers, BLAS/scratch ownership,
+shared solved gameplay/IK/grip pose, named geometry roles, shared texture domains,
+and fixed bindings 23/24. Slot 20 is a new primary-only instance; normal gameplay
+still uses block arms. See [Phase 3 record](ENGINEERING_1_6_1_VIEWMODEL_2026-09-23.md)
+and [nine native captures](evidence/2026-09-23-viewmodel-rt/README.md).
 
 The candidate is under `assets/models/player/viewmodel/`; its SHA-256 is
 `1e3b041ee7aa896a84fe462c182f6012d026b4a577b2d4ddf59d764b823f2538`.
@@ -47,12 +50,20 @@ It is rendered only in opt-in Windows development checkpoints and remains outsid
 Android packaging. The unchanged Phase 2 world-image tolerance passes, 13/13 MSVC
 focused checks pass (plus the final inventory regression), both sets of eight
 SPIR-V modules validate, and unsigned Android Shipping/Mobile builds all four
-ABIs. Fresh CI for this integration is still required; prior CI is not its proof.
+ABIs. Broader Windows non-Vulkan validation passed 56/59 initially, then all three
+failed tests passed focused repair reruns; do not call that one clean 59/59 run.
+The missing-optional-asset native check also passes: world-body presentation works,
+and explicit viewmodel requests fail clearly without a full-body fallback.
 Severe sleeve/shoulder presentation, live motion, retraction, exact phone and owner
 acceptance remain open. One raised-lantern transport overflow is preserved as an
 open finding, not hidden by capture success. Next: refine the model/skin presentation,
 package and validate the candidate, and then obtain owner phone acceptance before
-retiring block arms. Do not redo Phase 2 or restore a quota pause.
+retiring block arms. Static sleeves have bounded indices/55 mm maximum bind-pose
+edges; inspect exact posed CPU geometry next to distinguish deformation from
+GPU decoding. That is a hypothesis, not a diagnosed/fixed art defect. Do not redo
+Phase 2 or restore a quota pause. Audio/haptic manual revalidation required: NO
+for this slice; feedback semantics/playback did not change. No phone installation,
+paid generation, signing/licence change or publication occurred.
 
 ### Historical quota checkpoint (superseded status)
 
