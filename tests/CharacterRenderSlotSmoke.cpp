@@ -233,8 +233,8 @@ int main()
                   "Android RT Lab unlock was not restricted to genuine live finale completion");
 
     ok &= Require(PresentableTinyRtScene::kBlasCount == 16u &&
-                      PresentableTinyRtScene::kTlasInstanceCount == 20u,
-                  "production props and generic dielectric fixture must add bounded BLAS resources while TLAS remains capped at twenty instances");
+                      PresentableTinyRtScene::kTlasInstanceCount == 21u,
+                  "production props and generic dielectric fixture must add bounded BLAS resources while TLAS reserves the appended viewmodel slot");
     const DynamicBlasToTlasDependency noDynamicBlasDependency =
         BuildDynamicBlasToTlasDependency({});
     const DynamicBlasToTlasDependency playerOnlyDependency =

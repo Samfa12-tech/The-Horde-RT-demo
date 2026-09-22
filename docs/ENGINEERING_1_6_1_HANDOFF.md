@@ -30,22 +30,29 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### Current Phase 3 checkpoint
 
-`fff46495dd33019bf89b486d8342a0c08a3e6f5c` is pushed; branch/PR CI runs
-`35790685040` / `35790688872` pass 43 portable and 10 Vulkan CPU-host tests.
-New reviewed slices are `6404976` (explicit arms-only role), `6a93eb7`
-(reproducible 14,370-triangle modelled candidate and admission CI), and `fff4649`
-(one solved player pose shared across independently owned meshes, malformed-rig
-gates and fixtures). MSVC affected tests pass 5/5; unsigned Android Shipping/Mobile
-build passes all four ABIs. See [Phase 3 record](ENGINEERING_1_6_1_VIEWMODEL_2026-09-23.md).
+Previously pushed `051fcde00aa3084164f17a99b2c75aa1581b4fe8` passed fresh branch/PR
+CI `35791581940` / `35791587978`: 43 portable and 10 Vulkan CPU-host tests.
+Reviewed CPU/asset slices are `6404976` (explicit arms-only role), `6a93eb7`
+(reproducible 14,370-triangle modelled candidate), `fff4649` (one solved pose and
+malformed-rig gates), and `051fcde` (shared named texture domains).
+The next native GPU integration checkpoint now has independent world/viewmodel
+vertex buffers, BLAS/scratch ownership, named geometry roles and fixed bindings
+23/24. Slot 20 is a new primary-only instance; normal gameplay still uses block
+arms. See [Phase 3 record](ENGINEERING_1_6_1_VIEWMODEL_2026-09-23.md) and
+[nine native captures](evidence/2026-09-23-viewmodel-rt/README.md).
 
 The candidate is under `assets/models/player/viewmodel/`; its SHA-256 is
 `1e3b041ee7aa896a84fe462c182f6012d026b4a577b2d4ddf59d764b823f2538`.
-It is not yet packaged or rendered. Normal block arms remain unchanged. A subsequent
-reviewed shared texture-source registration slice passes 4/4 affected MSVC tests,
-including actual world/viewmodel group reuse without duplicate layers. Next:
-independent world/viewmodel dynamic
-buffers and BLAS/TLAS with named semantics, then native checkpoint/live-motion and
-owner phone acceptance. Do not redo Phase 2 or restore a quota pause.
+It is rendered only in opt-in Windows development checkpoints and remains outside
+Android packaging. The unchanged Phase 2 world-image tolerance passes, 13/13 MSVC
+focused checks pass (plus the final inventory regression), both sets of eight
+SPIR-V modules validate, and unsigned Android Shipping/Mobile builds all four
+ABIs. Fresh CI for this integration is still required; prior CI is not its proof.
+Severe sleeve/shoulder presentation, live motion, retraction, exact phone and owner
+acceptance remain open. One raised-lantern transport overflow is preserved as an
+open finding, not hidden by capture success. Next: refine the model/skin presentation,
+package and validate the candidate, and then obtain owner phone acceptance before
+retiring block arms. Do not redo Phase 2 or restore a quota pause.
 
 ### Historical quota checkpoint (superseded status)
 

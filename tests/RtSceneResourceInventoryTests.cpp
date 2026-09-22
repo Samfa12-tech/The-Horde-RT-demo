@@ -125,10 +125,11 @@ struct PresentableTinyRtSceneObservationTestAccess
             accelerationStructure.address = next++;
         };
 
-        for (RtGpuBuffer* buffer : std::array<RtGpuBuffer*, 13u>{
+        for (RtGpuBuffer* buffer : std::array{
                  &scene.vertexBuffer_, &scene.indexBuffer_, &scene.transformBuffer_,
                  &scene.instanceBuffer_, &scene.heldLightBuffer_, &scene.fireEmitterBuffer_,
                  &scene.worldSurfaceBuffer_, &scene.staticVertexBuffer_,
+                 &scene.worldPlayerVertexBuffer_, &scene.viewmodelVertexBuffer_,
                  &scene.staticIndexBuffer_, &scene.staticGeometryTransformBuffer_,
                  &scene.instanceMetadataBuffer_, &scene.primitiveMetadataBuffer_,
                  &scene.materialMetadataBuffer_})
@@ -136,17 +137,19 @@ struct PresentableTinyRtSceneObservationTestAccess
             populateBuffer(*buffer);
         }
         for (RtAccelerationStructure* accelerationStructure :
-             std::array<RtAccelerationStructure*, 13u>{
+             std::array{
                  &scene.blas_, &scene.waterfallBlas_, &scene.finaleRoofBlas_,
                  &scene.torchBlas_, &scene.swordBlas_, &scene.gothicChestBaseBlas_,
                  &scene.gothicChestLidBlas_, &scene.rewardLanternRingBlas_,
                  &scene.rewardLanternBodyBlas_, &scene.dielectricFixtureBlas_,
                  &scene.playerBodyBlas_, &scene.playerLimbBlas_,
-                 &scene.skinnedPlayerBlas_})
+                 &scene.skinnedPlayerBlas_, &scene.viewmodelBlas_})
         {
             populateBlas(*accelerationStructure);
         }
         populateBuffer(scene.skinnedPlayerBlasUpdateScratch_);
+        populateBuffer(scene.viewmodelBlasUpdateScratch_);
+        scene.ready_ = true;
         populateBlas(scene.tlas_);
         populateBuffer(scene.tlasUpdateScratch_);
 
@@ -454,31 +457,33 @@ int main()
                       scene.PrimaryRewardBodyPixelCount() == 41u,
                   "legacy getters must project one explicitly published completed record");
     const auto diagnostic = scene.ResourceInventory();
-    ok &= Require(diagnostic.bufferCount == 41u &&
-                      diagnostic.memoryAllocationCount == 51u &&
-                      diagnostic.bottomLevelAccelerationStructureCount == 16u &&
+    ok &= Require(diagnostic.bufferCount == 45u &&
+                      diagnostic.memoryAllocationCount == 55u &&
+                      diagnostic.bottomLevelAccelerationStructureCount == 17u &&
+                      scene.BlasCount() == 17u &&
                       diagnostic.topLevelAccelerationStructureCount == 1u &&
-                      diagnostic.tlasInstanceCount == 20u &&
+                      diagnostic.tlasInstanceCount == 21u &&
                       diagnostic.pipelineCount == 2u &&
                       diagnostic.shaderBindingTableCount == 2u &&
                       diagnostic.descriptorSetCount == 1u,
                   "live inventory must include direct, character, image, and both SBT owners");
-    ok &= Require(diagnostic.hostVisibleBytes == 2752u &&
-                      diagnostic.deviceLocalBytes == 3904u,
+    ok &= Require(diagnostic.hostVisibleBytes == 3008u &&
+                      diagnostic.deviceLocalBytes == 4160u,
                   "host-visible and device-local bytes must use inclusive allocation classes");
 
     PresentableTinyRtSceneObservationTestAccess::RemoveDiagnosticBuffer(scene);
     const auto shipping = scene.ResourceInventory();
-    ok &= Require(shipping.bufferCount == 40u &&
-                      shipping.memoryAllocationCount == 50u &&
-                      shipping.hostVisibleBytes == 2688u &&
-                      shipping.deviceLocalBytes == 3840u,
+    ok &= Require(shipping.bufferCount == 44u &&
+                      shipping.memoryAllocationCount == 54u &&
+                      shipping.hostVisibleBytes == 2944u &&
+                      shipping.deviceLocalBytes == 4096u,
                   "inventory must count only a genuinely live Diagnostic buffer");
 
     PresentableTinyRtScene moved(std::move(scene));
     const auto movedFrom = scene.ResourceInventory();
     const auto movedTo = moved.ResourceInventory();
-    ok &= Require(movedFrom.bufferCount == 0u &&
+    ok &= Require(scene.BlasCount() == 0u && moved.BlasCount() == 17u &&
+                      movedFrom.bufferCount == 0u &&
                       movedFrom.memoryAllocationCount == 0u &&
                       movedFrom.hostVisibleBytes == 0u &&
                       movedFrom.deviceLocalBytes == 0u,

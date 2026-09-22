@@ -625,8 +625,10 @@ int main(int argc, char** argv)
         }
         using namespace horde::vulkan::raytracing;
         const std::array<StaticRtAssetRegistration, 2u> registrations{{
-            {4u, 1u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &worldStatic},
-            {10u, 2u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &fixed, &worldStatic},
+            {kPlayerWorldBodyInstanceIndex, 1u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
+             0u, &worldStatic, nullptr, RtGeometryRole::PlayerWorldBody},
+            {kPlayerViewmodelInstanceIndex, 2u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
+             0u, &fixed, &worldStatic, RtGeometryRole::PlayerViewmodel},
         }};
         RtStaticMeshSlot providerOnly, sharedTextures;
         if (!providerOnly.Initialize(std::span(registrations).first(1u), diagnostic) ||
@@ -637,6 +639,11 @@ int main(int argc, char** argv)
         }
         const auto providerCounts = providerOnly.TextureArrayCounts();
         const auto sharedCounts = sharedTextures.TextureArrayCounts();
+        if (!Require(sharedTextures.Vertices().empty() &&
+                     sharedTextures.Vertices(RtGeometryRole::PlayerWorldBody).size() == worldStatic.vertices.size() &&
+                     sharedTextures.Vertices(RtGeometryRole::PlayerViewmodel).size() == fixed.vertices.size() &&
+                     sharedTextures.PrimitiveMetadata()[worldStatic.primitives.size()].vertexOffset == 0u,
+                     "actual world/viewmodel must use independent role-local vertex streams with no static duplicate")) return 1;
         if (!Require(providerCounts.baseColor == sharedCounts.baseColor &&
                      providerCounts.normal == sharedCounts.normal && providerCounts.orm == sharedCounts.orm &&
                      providerCounts.emissive == sharedCounts.emissive,

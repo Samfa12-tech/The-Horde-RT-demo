@@ -37,7 +37,8 @@ void main()
     // pitch extreme, so move the boundary upward for both upward and downward
     // look. Raising it with positive pitch used to cull the lantern forearm.
     float playerPrimaryStart = clamp(0.68 - abs(controls.pitch), 0.34, 0.68);
-    uint primaryMask = uv.y > playerPrimaryStart ? 0x27u : 0x23u;
+    uint primaryMask = (uv.y > playerPrimaryStart ? 0x27u : 0x23u) |
+                       kPlayerViewmodelPrimaryMask;
     HitInfo primary = traceScene(origin, rayDirection, 10000.0, primaryMask,
                                  0.002, controls.waterQuality < 0.5, true);
     if (primary.hit)
@@ -46,7 +47,8 @@ void main()
             RT_DIAG_ADD(primaryTorchPixelCount, 1u);
         else if (primary.instance == 3)
             RT_DIAG_ADD(primarySwordPixelCount, 1u);
-        else if (primary.instance == 4 ||
+        else if (rtInstances.values[primary.instance].geometryRole == kRtGeometryRolePlayerWorldBody ||
+                 rtInstances.values[primary.instance].geometryRole == kRtGeometryRolePlayerViewmodel ||
                  (primary.instance >= 10 && primary.instance <= 13))
             RT_DIAG_ADD(primaryPlayerPixelCount, 1u);
         else if (primary.instance == 7)

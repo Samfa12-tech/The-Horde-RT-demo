@@ -43,7 +43,9 @@ struct RtDiagnosticIoContract {
 
 struct RtDescriptorIoContract {
     RtInstrumentation instrumentation = RtInstrumentation::Shipping;
-    std::array<RtDescriptorBindingContract, 23u> bindings{};
+    // Entries are the actual descriptor roster in binding order. Shipping is
+    // deliberately non-contiguous because binding 22 is Diagnostic-only.
+    std::array<RtDescriptorBindingContract, 25u> bindings{};
     std::uint32_t bindingCount = 0u;
     std::uint32_t storageBufferDescriptorCount = 0u;
     std::uint32_t descriptorWriteCount = 0u;

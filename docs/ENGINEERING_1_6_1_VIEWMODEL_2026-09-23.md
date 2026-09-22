@@ -112,38 +112,102 @@ its allocation benefit is prepared, not a measured production performance gain.
 Fresh MSVC Release: 4/4 affected CTests passed in 6.93 seconds (static GLB tests,
 skinned smoke, actual viewmodel admission and malformed viewmodel pose fixtures).
 
+## Native GPU integration checkpoint
+
+The shared texture slice was committed as `051fcde`; fresh push/PR CI runs
+`35791581940` / `35791587978` passed 43 portable and 10 Vulkan CPU-host tests.
+The subsequent integration adds three explicit vertex streams: Static,
+PlayerWorldBody and PlayerViewmodel. Dynamic world vertices are removed from the
+static allocation, not duplicated. Indices, materials and immutable texture arrays
+remain shared; viewmodel materials reuse the named world texture groups without
+adding atlas layers. Each player mesh owns its vertex buffer, updatable BLAS and
+scratch resource, consumes the same solved pose, and refits only when needed.
+Viewmodel skinning does not apply the world-body boot-grounding step.
+
+`RtGeometryRole` occupies the former reserved metadata word at byte offset 24;
+the 32-byte instance ABI is unchanged. Primitive vertex offsets are role-local,
+with separately validated per-primitive vertex counts for AS addressing. The
+fixed bindings are 23 (world) and 24 (viewmodel); 22 remains Diagnostic-only.
+Descriptor preflight checks the actual non-contiguous Shipping roster and rejects
+unknown/duplicate/missing bindings, allowing only the unused legacy held-light
+binding 20 to be optimized out. Device storage-descriptor limits are checked.
+No descriptor-indexing extension or additional frame-in-flight was introduced.
+
+The earlier proposed reuse of TLAS slot 10 is deliberately superseded. Normal
+hybrid rendering still uses the procedural BLAS at 10-13; registering PBR
+viewmodel metadata at 10 would decode the legacy BLAS incorrectly while inactive.
+The registry now has nine asset slots and 21 TLAS/metadata slots, preserving all
+original indices and adding named viewmodel index 20 beside world-body index 4.
+Modelled primary rays include `0x40`, outside legacy `0x04` screen-Y culling;
+secondary masks exclude it and world-body `0x10` supplies shadows/reflections.
+All procedural arms are disabled only in the opt-in modelled route. Missing
+optional viewmodel assets fail explicit requests without a full-body fallback.
+
+Both shader backends compile and validate with fixed streams. Triangle-level
+buffer selection was compared with three per-vertex helper calls. Generic is
+692 bytes / 37 instructions / 4 branches larger, with two fewer function calls;
+Opaque is 720 bytes / 126 instructions / 72 branches smaller. The retained
+triangle helper selects once per triangle and reduces Opaque divergence. These
+are compiler statistics, not measured driver speedups.
+
+| RTP variant (High/Mobile same counts) | Bytes | Instructions | Functions/calls | Ray-query sites | Atomics |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Diagnostic Generic | 227084 | 13381 | 60 / 193 | 3 | 32 |
+| Shipping Generic | 219304 | 13012 | 60 / 193 | 3 | 0 |
+| Diagnostic Opaque | 505660 | 27733 | 1 / 0 | 23 | 5 |
+| Shipping Opaque | 501424 | 27554 | 1 / 0 | 23 | 0 |
+
+Compute adds 252 bytes / 16 instructions for Generic and 260 bytes / 19
+instructions for Opaque. All eight Shipping modules across both backends have
+zero diagnostic atomics and no binding 22; 23/24 remain present. Frozen numeric
+budgets were rebaselined for the explicit stream-selection feature (roughly
+1.1% Generic / 2.5% Opaque byte growth), not to claim an optimization. Ray-query
+site counts, bounded loops, instrumentation, quality and physical-strategy guards
+remain unchanged. The compatibility includes and both catalogs were regenerated.
+
+The raygen publisher now recognizes only the exact eight compute counterparts
+beside its eight owned artifacts. It preserves those files byte-for-byte and
+still rejects unknown files; a portable regression test covers this boundary.
+
+### Fresh implementation evidence
+
+- MSVC Release focused suite: 13/13 passed in 59.56 seconds. The stale-shader
+  negative fixture originally failed because its obsolete hardcoded hash made
+  mutation a no-op; it now derives the current hash, proves mutation and verifies
+  rejection. The later live BLAS-count/inventory move test passed separately
+  (1/1, 1.80 seconds). Both player buffers, viewmodel scratch/backing and the 17th
+  optional BLAS are included in actual inventory rather than a fixed report count.
+- Native Debug Diagnostic/High Windows build succeeded. Nine frozen RTX captures
+  passed presentation/ownership/grip gates, including all eight viewmodel poses.
+  Actual camera state is recorded separately from requested checkpoint state;
+  legal pitch endpoints are -0.32/+0.28 radians and a host regression checks all
+  eight authored requests against staged simulation state.
+- The old world-body control passes the unchanged image tolerance: maximum RGB
+  delta 2, one pixel over 1, fraction 0.0000019290123456790124.
+- All 16 variants passed actual compilation/SPIR-V validation. Shipping remains
+  free of Diagnostic atomics/binding 22; this is not backend pixel-parity proof.
+- Android unsigned Shipping/Mobile final four-ABI build succeeded in 34 seconds. Exact APK
+  SHA-256 `323710dd1628708ae28045bce911d017070d4f2701c575eb95b3a3d17df39016`,
+  86,300,051 bytes. ZIP inspection confirms all four native libraries and the
+  existing world asset. The viewmodel remains outside the Android package
+  allowlist, so no Android viewmodel-rendering or device result is claimed.
+
+See the [native evidence bundle](evidence/2026-09-23-viewmodel-rt/README.md) for
+exact executable/image hashes, controls, reproducer and explicit limitations.
+
 ## Remaining gates
 
-The next GPU integration must remove world-player dynamic vertices from the
-shared immutable vertex allocation, not keep a duplicate and label it independent
-ownership. Static indices/materials/textures may remain shared. The current asset
-registry is full at eight assets; the ninth viewmodel needs an explicit capacity
-change and tests. Keep twenty TLAS slots: world-body index 4 is existing ownership;
-the replacement may use index 10 only when the legacy arms occupying 10-13 are
-disabled. Replace player consumers' raw slot assumptions with named roles and
-metadata flags.
-
-Use fixed, separately owned dynamic vertex bindings (proposed 23/24); binding 22
-stays Diagnostic-only. Shipping's binding list would then be non-contiguous, so
-the descriptor/preflight tests must validate actual bindings, not just a prefix
-count. Check device descriptor limits and both shader backends. Avoid introducing
-descriptor-indexing features simply to select these two fixed streams.
-
-A dedicated primary-only mask bit (proposed `0x40`) can avoid applying the legacy
-screen-Y `0x04` arm-culling boundary to the modelled mesh. Current secondary masks
-`0x23`/`0x35`/`0x37` exclude that bit; verify all traversals during integration.
-World-body secondary bit `0x10` remains responsible for shadows/reflections. These
-are next-step design constraints, not implemented or validated GPU behaviour.
-
-- Native rendering admission of the reproducible arms-only runtime candidate.
-- One gameplay-derived animation/IK/grip authority, consumed by separate world-body
-  and viewmodel geometry. No arms-only boot-grounding requirement.
-- Independent dynamic buffers and BLAS ownership, named TLAS semantics, correct
-  primary/secondary masks, shared immutable texture ownership and bounded updates.
-- Native RT sword/torch/reward-lantern checkpoint and live-motion matrix, including
-  extreme pitch, retraction and grip agreement; no full-body-primary substitute.
-- Windows RTX and exact phone evidence, then owner phone acceptance before retiring
-  block arms. Offline geometry and host tests do not satisfy these gates.
+- Fix the visibly angular/open-looking sleeve/shoulder surfaces and near-camera
+  composition with model/skin investigation and geometry changes, not visual cheats.
+- Live-motion transitions, legal extreme pitch, retraction, grip agreement and
+  final owner phone acceptance. Frozen native capture success is insufficient.
+- Package the opt-in candidate, validate actual Android RT presentation/resources,
+  and retain normal block arms until the replacement passes owner acceptance.
+- Investigate the one retained raised-lantern transport overflow; do not waive it
+  because the ownership capture completed. Glass correctness/performance and
+  Shipping/Diagnostic versus pipeline/compute parity remain separate gates.
+- Justified persistent mapping/device-local static memory and reusable renderer
+  extraction remain measured follow-on work, not claims of this ownership slice.
 
 Audio/haptic manual revalidation required: NO for the contract slice; no feedback,
 playback, event timing or listener/source semantics changed.

@@ -200,6 +200,8 @@ struct RtLabDebugLaunchOptions
 struct ShowcaseCaptureRecord
 {
     const horde::gameplay::ShowcaseCheckpoint* checkpoint = nullptr;
+    // Record the rendered simulation state, not an unclamped authored request.
+    std::array<float, 4u> camera{};
     std::string torchFailurePhase;
     std::string selectedEnemy;
     std::string lichPhase;
@@ -3915,7 +3917,9 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         const bool usesProductionRewardProps =
             development != nullptr && development->usesProductionRewardProps;
         frameInputs.playerRenderRoute =
-            ctx.developmentCheckpoint.starts_with("player-body-")
+            ctx.developmentCheckpoint.starts_with("player-viewmodel-")
+            ? horde::vulkan::raytracing::PlayerRenderRoute::ModelledViewmodel
+            : ctx.developmentCheckpoint.starts_with("player-body-")
             ? horde::vulkan::raytracing::PlayerRenderRoute::Skinned
             : ((usesGlassFixture || usesProductionRewardProps)
                 ? horde::vulkan::raytracing::PlayerRenderRoute::HybridBlockPrimary
@@ -4378,7 +4382,9 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                  << "      \"checkpoint\": \"" << JsonEscape(checkpoint.name) << "\",\n"
                  << "      \"preset\": \"" << CapturePresetName(checkpoint.preset) << "\",\n"
                  << "      \"zone\": \"" << horde::gameplay::ShowcaseZoneName(checkpoint.expectedZone) << "\",\n"
-                 << "      \"camera\": {\"x\": " << checkpoint.x << ", \"z\": " << checkpoint.z
+                 << "      \"camera\": {\"x\": " << capture.camera[0] << ", \"z\": " << capture.camera[1]
+                 << ", \"yaw\": " << capture.camera[2] << ", \"pitch\": " << capture.camera[3] << "},\n"
+                 << "      \"requestedCamera\": {\"x\": " << checkpoint.x << ", \"z\": " << checkpoint.z
                  << ", \"yaw\": " << checkpoint.yaw << ", \"pitch\": " << checkpoint.pitch << "},\n"
                  << "      \"state\": {\"torchFailurePhase\": \"" << capture.torchFailurePhase
                  << "\", \"selectedEnemy\": \"" << capture.selectedEnemy
@@ -4560,6 +4566,8 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         ShowcaseCaptureRecord record;
         record.checkpoint = &checkpoint;
         const horde::gameplay::simulation::SimulationSnapshot& simulation = context.simulation.Snapshot();
+        record.camera = {simulation.playerX, simulation.playerZ,
+                         simulation.playerYawRadians, simulation.playerPitchRadians};
         record.torchFailurePhase = horde::gameplay::TorchFailurePhaseName(simulation.torchFailure.phase);
         record.selectedEnemy = horde::gameplay::EnemyKindName(simulation.enemyRoster.selectedEnemy);
         record.lichPhase = horde::gameplay::LichPhaseName(simulation.lich.phase);
@@ -4601,6 +4609,18 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         const bool diagnosticPixelCountersAvailable =
             context.rtScene.DiagnosticsAvailability() ==
             horde::vulkan::raytracing::RtDiagnosticAvailability::Available;
+        const bool viewmodelCapture = context.developmentCheckpoint.starts_with("player-viewmodel-");
+        if (viewmodelCapture &&
+            (record.instanceMasks[horde::vulkan::raytracing::kPlayerWorldBodyInstanceIndex] != 0x10u ||
+             record.instanceMasks[horde::vulkan::raytracing::kPlayerViewmodelInstanceIndex] !=
+                 horde::vulkan::raytracing::kPlayerViewmodelPrimaryMask ||
+             std::any_of(record.instanceMasks.begin() + 10u, record.instanceMasks.begin() + 17u,
+                         [](std::uint8_t mask) { return mask != 0u; }) ||
+             !record.playerPrimaryVisible ||
+             (diagnosticPixelCountersAvailable && record.primaryPlayerPixels == 0u)))
+        {
+            return fail("Dedicated viewmodel capture lacks modelled primary arms or contains legacy/full-body primary ownership.");
+        }
         if (context.developmentCheckpoint.empty() &&
             !simulationRewardClaimed &&
             (record.instanceMasks[1] != 0x02u ||
@@ -4626,10 +4646,10 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         }
         if (claimedRewardCapture &&
             (record.instanceMasks[4] != 0x10u ||
-             record.instanceMasks[10] != 0x04u ||
+             (!viewmodelCapture && (record.instanceMasks[10] != 0x04u ||
              record.instanceMasks[11] != 0x04u ||
              record.instanceMasks[12] != 0x04u ||
-             record.instanceMasks[13] != 0x04u ||
+             record.instanceMasks[13] != 0x04u)) ||
              !record.playerPrimaryVisible ||
              record.instanceMasks[7] != 0x01u ||
              record.instanceMasks[8] != 0x01u ||

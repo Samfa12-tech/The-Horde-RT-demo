@@ -48,10 +48,10 @@ int main()
     ok &= Require(shipping.has_value() && diagnostic.has_value(),
                   "both instrumentation plans must exist");
     if (shipping && diagnostic) {
-        ok &= Require(shipping->bindingCount == 22u &&
-                          shipping->storageBufferDescriptorCount == 11u &&
-                          shipping->descriptorWriteCount == 22u,
-                      "Shipping must use the exact 0-21/11-storage/22-write plan");
+        ok &= Require(shipping->bindingCount == 24u &&
+                          shipping->storageBufferDescriptorCount == 13u &&
+                          shipping->descriptorWriteCount == 24u,
+                      "Shipping must use the exact 0-21,23-24/13-storage/24-write plan");
         ok &= Require(shipping->diagnosticAvailability ==
                               RtDiagnosticAvailability::CompiledOut &&
                           !shipping->diagnosticIo.allocateBuffer &&
@@ -61,10 +61,10 @@ int main()
                           !shipping->diagnosticIo.zeroReset &&
                           !shipping->diagnosticIo.shaderWriteBarrier,
                       "Shipping must compile every diagnostic resource and IO action out");
-        ok &= Require(diagnostic->bindingCount == 23u &&
-                          diagnostic->storageBufferDescriptorCount == 12u &&
-                          diagnostic->descriptorWriteCount == 23u,
-                      "Diagnostic must use the exact 0-22/12-storage/23-write plan");
+        ok &= Require(diagnostic->bindingCount == 25u &&
+                          diagnostic->storageBufferDescriptorCount == 14u &&
+                          diagnostic->descriptorWriteCount == 25u,
+                      "Diagnostic must use the exact 0-24/14-storage/25-write plan");
         ok &= Require(diagnostic->diagnosticAvailability ==
                               RtDiagnosticAvailability::Available &&
                           diagnostic->diagnosticIo.allocateBuffer &&
@@ -74,17 +74,25 @@ int main()
                           diagnostic->diagnosticIo.zeroReset &&
                           diagnostic->diagnosticIo.shaderWriteBarrier,
                       "Diagnostic must retain the exact counter IO route");
-        for (std::uint32_t binding = 0u; binding < shipping->bindingCount; ++binding) {
-            ok &= Require(shipping->bindings[binding].binding == binding,
-                          "Shipping bindings must be the contiguous 0-21 interface");
+        constexpr std::array<std::uint32_t, 24u> expectedShipping{
+            0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u, 11u,
+            12u, 13u, 14u, 15u, 16u, 17u, 18u, 19u, 20u, 21u, 23u, 24u,
+        };
+        for (std::size_t index = 0u; index < expectedShipping.size(); ++index) {
+            ok &= Require(shipping->bindings[index].binding == expectedShipping[index],
+                          "Shipping bindings must preserve the non-contiguous 0-21,23-24 roster");
         }
-        for (std::uint32_t binding = 0u; binding < diagnostic->bindingCount; ++binding) {
-            ok &= Require(diagnostic->bindings[binding].binding == binding,
-                          "Diagnostic bindings must be the contiguous 0-22 interface");
+        for (std::uint32_t index = 0u; index < diagnostic->bindingCount; ++index) {
+            ok &= Require(diagnostic->bindings[index].binding == index,
+                          "Diagnostic bindings must use the contiguous 0-24 interface");
         }
-        ok &= Require(diagnostic->bindings[22u].kind ==
+        ok &= Require(shipping->bindings[22u].kind ==
+                          RtDescriptorResourceKind::StorageBuffer &&
+                          shipping->bindings[23u].kind ==
+                          RtDescriptorResourceKind::StorageBuffer &&
+                          diagnostic->bindings[22u].kind ==
                           RtDescriptorResourceKind::StorageBuffer,
-                      "binding 22 must retain the generated diagnostics storage-buffer ABI");
+                      "bindings 22, 23 and 24 must remain storage-buffer ABI entries");
     }
     ok &= Require(!TryMakeRtDescriptorIoContract(static_cast<RtInstrumentation>(99)).has_value(),
                   "invalid instrumentation must not inherit a nearby descriptor plan");

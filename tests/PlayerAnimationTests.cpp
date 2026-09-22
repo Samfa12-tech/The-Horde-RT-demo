@@ -1,6 +1,7 @@
 #include "gameplay/animation/PlayerAnimationState.h"
 #include "gameplay/animation/PlayerIkTargets.h"
 #include "gameplay/simulation/GameSimulation.h"
+#include "gameplay/DevelopmentCheckpointSimulation.h"
 #include "gameplay/items/LanternPendulum.h"
 #include "vulkan/raytracing/PlayerRenderSlot.h"
 
@@ -376,9 +377,34 @@ int main()
                  "the +Z player rig must use a proper 180-degree rotation that keeps anatomical Left on gameplay left"))
         return 1;
     const PlayerRouteMasks proceduralMasks = BuildPlayerRouteMasks(PlayerRenderRoute::Procedural);
+    unsigned viewmodelCheckpointCount = 0u;
+    for (const auto& checkpoint : horde::gameplay::kDevelopmentCheckpoints)
+    {
+        if (!checkpoint.name.starts_with("player-viewmodel-")) continue;
+        horde::gameplay::simulation::GameSimulation staged;
+        if (!Require(horde::gameplay::StageDevelopmentCheckpointSimulation(staged, checkpoint) &&
+                     std::abs(staged.Snapshot().playerPitchRadians - checkpoint.pitch) < 0.000001f,
+                     "viewmodel checkpoint pitch must match actual gameplay pose, not an out-of-range request")) return 1;
+        ++viewmodelCheckpointCount;
+    }
+    if (!Require(viewmodelCheckpointCount == 8u, "all eight viewmodel checkpoint pitches must be staged")) return 1;
     const PlayerRouteMasks skinnedMasks = BuildPlayerRouteMasks(PlayerRenderRoute::Skinned);
     const PlayerRouteMasks hybridMasks =
         BuildPlayerRouteMasks(PlayerRenderRoute::HybridBlockPrimary);
+    const PlayerRouteMasks viewmodelMasks = BuildPlayerRouteMasks(PlayerRenderRoute::ModelledViewmodel);
+    if (!Require(viewmodelMasks.instanceMasks[kPlayerWorldBodyInstanceIndex] == 0x10u &&
+                 viewmodelMasks.instanceMasks[kPlayerViewmodelInstanceIndex] == kPlayerViewmodelPrimaryMask &&
+                 (kPlayerViewmodelPrimaryMask & 0x37u) == 0u,
+                 "dedicated viewmodel owns primary rays while world body owns secondary rays")) return 1;
+    for (std::size_t slot = 5u; slot <= 16u; ++slot)
+        if (!Require(viewmodelMasks.instanceMasks[slot] == 0u,
+                     "modelled route must disable every procedural player instance")) return 1;
+    const auto viewmodelVisibility = BuildProductionSceneVisibility(
+        {PlayerRenderRoute::ModelledViewmodel, false, false, false});
+    if (!Require(viewmodelVisibility.playerRoute == PlayerRenderRoute::ModelledViewmodel &&
+                 viewmodelVisibility.playerPrimaryVisible && viewmodelVisibility.playerReflectionVisible &&
+                 viewmodelVisibility.playerMask == 0x10u,
+                 "production props must not silently replace an explicit modelled viewmodel request")) return 1;
     if (!Require(proceduralMasks.instanceMasks[4] == 0x10u &&
                  proceduralMasks.instanceMasks[5] == 0x04u &&
                  proceduralMasks.instanceMasks[16] == 0x10u &&

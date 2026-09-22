@@ -19,7 +19,7 @@ constexpr std::uint32_t kExecutionModelRayGenerationKhr = 5313u;
 constexpr std::uint32_t kExecutionModelGlCompute = 5u;
 constexpr std::uint32_t kDecorationBinding = 33u;
 
-constexpr std::array<RtDescriptorResourceKind, 23u> kDescriptorKinds{
+constexpr std::array<RtDescriptorResourceKind, 25u> kDescriptorKinds{
     RtDescriptorResourceKind::AccelerationStructure,
     RtDescriptorResourceKind::StorageImage,
     RtDescriptorResourceKind::StorageBuffer,
@@ -43,6 +43,18 @@ constexpr std::array<RtDescriptorResourceKind, 23u> kDescriptorKinds{
     RtDescriptorResourceKind::StorageBuffer,
     RtDescriptorResourceKind::StorageBuffer,
     RtDescriptorResourceKind::StorageBuffer,
+    RtDescriptorResourceKind::StorageBuffer,
+    RtDescriptorResourceKind::StorageBuffer,
+};
+
+constexpr std::array<std::uint32_t, 25u> kDiagnosticBindingRoster{
+    0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u, 11u, 12u,
+    13u, 14u, 15u, 16u, 17u, 18u, 19u, 20u, 21u, 22u, 23u, 24u,
+};
+
+constexpr std::array<std::uint32_t, 24u> kShippingBindingRoster{
+    0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u, 11u, 12u,
+    13u, 14u, 15u, 16u, 17u, 18u, 19u, 20u, 21u, 23u, 24u,
 };
 
 constexpr std::uint32_t RotateRight(std::uint32_t value, std::uint32_t bits) noexcept
@@ -134,6 +146,8 @@ struct ReflectedModuleContract {
     std::size_t matchingEntryPoints = 0u;
     std::size_t diagnosticsBindings = 0u;
     std::size_t atomicInstructions = 0u;
+    std::array<std::uint32_t, 32u> descriptorBindings{};
+    std::size_t descriptorBindingCount = 0u;
 };
 
 bool IsAtomicOpcode(std::uint16_t opcode) noexcept
@@ -159,14 +173,51 @@ bool ReflectModule(std::span<const std::uint32_t> words,
             ++reflected.matchingEntryPoints;
         }
         if (opcode == kOpDecorate && wordCount >= 4u &&
-            words[offset + 2u] == kDecorationBinding &&
-            words[offset + 3u] == kRtBindingDielectricDiagnostics) {
-            ++reflected.diagnosticsBindings;
+            words[offset + 2u] == kDecorationBinding) {
+            if (reflected.descriptorBindingCount >= reflected.descriptorBindings.size()) {
+                return false;
+            }
+            reflected.descriptorBindings[reflected.descriptorBindingCount++] =
+                words[offset + 3u];
+            if (words[offset + 3u] == kRtBindingDielectricDiagnostics) {
+                ++reflected.diagnosticsBindings;
+            }
         }
         if (IsAtomicOpcode(opcode)) { ++reflected.atomicInstructions; }
         offset += wordCount;
     }
     return reflected.matchingEntryPoints == 1u;
+}
+
+bool MatchesDescriptorBindingRoster(
+    const ReflectedModuleContract& reflected,
+    const RtDescriptorIoContract& descriptorIo) noexcept
+{
+    if (reflected.descriptorBindingCount > descriptorIo.bindingCount) {
+        return false;
+    }
+    std::array<std::uint32_t, 32u> actual = reflected.descriptorBindings;
+    std::array<std::uint32_t, 25u> expected{};
+    std::size_t expectedCount = 0u;
+    for (std::size_t index = 0u; index < descriptorIo.bindingCount; ++index) {
+        const auto binding = descriptorIo.bindings[index].binding;
+        // The legacy held-light record remains layout-compatible, but current
+        // world-space fire shaders source lighting from binding 21 and optimize
+        // binding 20 away. All other bindings (including 23/24) remain required.
+        if (binding == kRtBindingHeldLight &&
+            std::find(actual.begin(), actual.begin() + reflected.descriptorBindingCount, binding) ==
+                actual.begin() + reflected.descriptorBindingCount) continue;
+        expected[expectedCount++] = binding;
+    }
+    if (reflected.descriptorBindingCount != expectedCount) return false;
+    std::sort(actual.begin(), actual.begin() + reflected.descriptorBindingCount);
+    std::sort(expected.begin(), expected.begin() + expectedCount);
+    for (std::size_t index = 0u; index < expectedCount; ++index) {
+        if (actual[index] != expected[index]) {
+            return false;
+        }
+    }
+    return true;
 }
 
 bool ValidateRecord(const RtPipelineVariantArtifact& record,
@@ -187,6 +238,7 @@ bool ValidateRecord(const RtPipelineVariantArtifact& record,
     ReflectedModuleContract reflected{};
     if (!ReflectModule(record.words, expected.executionBackend, reflected) ||
         reflected.atomicInstructions != record.atomicInstructions ||
+        !MatchesDescriptorBindingRoster(reflected, descriptorIo) ||
         (reflected.diagnosticsBindings != 0u) != record.hasDiagnosticsBinding ||
         record.hasDiagnosticsBinding != descriptorIo.diagnosticIo.descriptorWrite ||
         (descriptorIo.instrumentation == RtInstrumentation::Shipping &&
@@ -220,15 +272,19 @@ std::optional<RtDescriptorIoContract> TryMakeRtDescriptorIoContract(
     const bool diagnostic = instrumentation == RtInstrumentation::Diagnostic;
     RtDescriptorIoContract contract{};
     contract.instrumentation = instrumentation;
-    contract.bindingCount = diagnostic ? 23u : 22u;
+    const std::span<const std::uint32_t> roster = diagnostic
+        ? std::span<const std::uint32_t>(kDiagnosticBindingRoster)
+        : std::span<const std::uint32_t>(kShippingBindingRoster);
+    contract.bindingCount = static_cast<std::uint32_t>(roster.size());
     contract.descriptorWriteCount = contract.bindingCount;
     contract.diagnosticAvailability = diagnostic
         ? RtDiagnosticAvailability::Available : RtDiagnosticAvailability::CompiledOut;
     contract.diagnosticIo = diagnostic
         ? RtDiagnosticIoContract{true, true, true, true, true, true}
         : RtDiagnosticIoContract{};
-    for (std::uint32_t binding = 0u; binding < contract.bindingCount; ++binding) {
-        contract.bindings[binding] = {binding, kDescriptorKinds[binding]};
+    for (std::uint32_t index = 0u; index < contract.bindingCount; ++index) {
+        const std::uint32_t binding = roster[index];
+        contract.bindings[index] = {binding, kDescriptorKinds[binding]};
         if (kDescriptorKinds[binding] == RtDescriptorResourceKind::StorageBuffer) {
             ++contract.storageBufferDescriptorCount;
         }

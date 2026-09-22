@@ -108,9 +108,10 @@ public:
         std::vector<std::uint8_t> rgba;
     };
 
+    // Baseline without the optional development viewmodel. Live reports count owners.
     static constexpr std::uint32_t kBlasCount = 16u;
     static constexpr std::uint32_t kTlasCount = 1u;
-    static constexpr std::uint32_t kTlasInstanceCount = 20u;
+    static constexpr std::uint32_t kTlasInstanceCount = kRtInstanceMetadataCapacity;
 
     PresentableTinyRtScene() = default;
     ~PresentableTinyRtScene();
@@ -146,7 +147,10 @@ public:
     }
     VkExtent2D DispatchExtent() const { return dispatchExtent_; }
     const std::string& MaterialEncoding() const { return materialEncoding_; }
-    std::uint32_t BlasCount() const { return ready_ ? kBlasCount : 0u; }
+    std::uint32_t BlasCount() const
+    {
+        return ready_ ? static_cast<std::uint32_t>(ResourceInventory().bottomLevelAccelerationStructureCount) : 0u;
+    }
     std::uint32_t TlasCount() const { return ready_ ? kTlasCount : 0u; }
     std::uint32_t TlasInstanceCount() const { return ready_ ? kTlasInstanceCount : 0u; }
     std::size_t SkeletonPoseBucketCount() const { return characterSlot_.SkeletonPoseBucketCount(); }
@@ -460,6 +464,7 @@ private:
                                   const std::string& productionAssetRoot,
                                   std::string& diagnostic);
     bool CreateStaticMeshResources(std::string& diagnostic);
+    const Buffer& VertexBufferForRole(RtGeometryRole role) const;
     bool BuildAccelerationStructures(std::string& diagnostic);
     bool CreateSelectedPipelineBundle(std::string& diagnostic);
     [[nodiscard]] bool CapturePipelineEvidenceIdentity() noexcept;
@@ -543,6 +548,8 @@ private:
     Buffer fireEmitterBuffer_;
     Buffer worldSurfaceBuffer_;
     Buffer staticVertexBuffer_;
+    Buffer worldPlayerVertexBuffer_;
+    Buffer viewmodelVertexBuffer_;
     Buffer staticIndexBuffer_;
     Buffer staticGeometryTransformBuffer_;
     Buffer instanceMetadataBuffer_;
@@ -562,6 +569,8 @@ private:
     AccelerationStructure playerLimbBlas_;
     AccelerationStructure skinnedPlayerBlas_;
     Buffer skinnedPlayerBlasUpdateScratch_;
+    AccelerationStructure viewmodelBlas_;
+    Buffer viewmodelBlasUpdateScratch_;
     AccelerationStructure tlas_;
     Buffer tlasUpdateScratch_;
     RtGpuResources gpuResources_;
@@ -570,6 +579,13 @@ private:
     horde::scene::assets::StaticMeshAsset developmentStaticAsset_;
     horde::scene::assets::StaticMeshAsset productionTorchAsset_;
     horde::scene::assets::StaticMeshAsset productionPlayerAsset_;
+    horde::scene::assets::StaticMeshAsset viewmodelAsset_;
+    horde::scene::SkinnedMeshAsset viewmodelSkin_;
+    std::vector<horde::scene::TexturedSkinnedRtVertex> viewmodelPoseVertices_;
+    std::vector<horde::scene::SkinnedPbrTangent> viewmodelPoseTangents_;
+    std::vector<horde::scene::assets::StaticRtVertex> viewmodelUpload_;
+    bool viewmodelAvailable_ = false;
+    bool viewmodelPoseCurrent_ = false;
     horde::scene::assets::StaticMeshAsset gothicChestBaseAsset_;
     horde::scene::assets::StaticMeshAsset gothicChestLidAsset_;
     horde::scene::assets::StaticMeshAsset rewardLanternRingAsset_;

@@ -819,7 +819,7 @@ function Test-RaygenFrozenCatalogBundle
     if (-not (Test-Path -LiteralPath $ArtifactRoot -PathType Container) -or -not (Test-Path -LiteralPath $CatalogFile -PathType Leaf) -or -not (Test-Path -LiteralPath $BudgetFile -PathType Leaf))
     { throw 'Frozen raygen fixture is missing an artifact directory, catalog, or budget file.' }
     $expectedArtifactNames = @($ExpectedCatalog.variants | ForEach-Object { "$($_.key).inc" } | Sort-Object)
-    $actualArtifactNames = @(Get-ChildItem -LiteralPath $ArtifactRoot -File -ErrorAction Stop | ForEach-Object Name | Sort-Object)
+    $actualArtifactNames = @(Get-RaygenOwnedArtifactNames -ArtifactRoot $ArtifactRoot -ExpectedNames $expectedArtifactNames)
     if (-not (Test-RaygenOrderedStringEqual -Left $expectedArtifactNames -Right $actualArtifactNames))
     { throw 'Frozen raygen artifact directory has unexpected or missing files.' }
     $fixtureBudgets = Get-Content -LiteralPath $BudgetFile -Raw | ConvertFrom-Json
@@ -855,6 +855,18 @@ function Test-RaygenFrozenCatalogBundle
     }
 }
 
+function Get-RaygenOwnedArtifactNames
+{
+    param([string]$ArtifactRoot, [string[]]$ExpectedNames)
+    # The hardware compute backend has its own publisher/catalog in this same
+    # directory. Ignore only its exact eight known counterparts, not a prefix
+    # wildcard that could conceal an unknown artifact. Never publish/delete them.
+    $computeNames = @($ExpectedNames | ForEach-Object { "rayquery_compute_$_" })
+    @(Get-ChildItem -LiteralPath $ArtifactRoot -File -ErrorAction Stop |
+        Where-Object { $_.Name -cnotin $computeNames } |
+        ForEach-Object Name | Sort-Object)
+}
+
 function Publish-RaygenFrozenCatalogBundle
 {
     param(
@@ -868,7 +880,7 @@ function Publish-RaygenFrozenCatalogBundle
 
     $expectedNames = @($Manifest.Variants | ForEach-Object { "$($_.name).inc" } | Sort-Object)
     $actualNames = if (Test-Path -LiteralPath $ArtifactRoot -PathType Container) {
-        @(Get-ChildItem -LiteralPath $ArtifactRoot -File -ErrorAction Stop | ForEach-Object Name | Sort-Object)
+        @(Get-RaygenOwnedArtifactNames -ArtifactRoot $ArtifactRoot -ExpectedNames $expectedNames)
     } else { @() }
     if ($actualNames.Count -ne 0 -and -not (Test-RaygenOrderedStringEqual -Left $actualNames -Right $expectedNames))
     { throw 'Artifact directory contains an unexpected file; refusing to publish a partial catalog.' }

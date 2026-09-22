@@ -37,6 +37,9 @@ if(BUILD_TESTING)
     # Resolve the runner before registering any PowerShell-backed fixture.  CTest
     # records this exact executable in its generated command line.
     find_program(HORDE_RT_POWERSHELL_EXECUTABLE NAMES pwsh powershell REQUIRED)
+    add_test(NAME horde_rt_raygen_artifact_ownership_tests
+        COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
+            ${CMAKE_CURRENT_SOURCE_DIR}/tests/RaygenArtifactOwnershipTests.ps1)
     add_test(NAME horde_rt_player_manifest_agreement_tests
         COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
             ${CMAKE_CURRENT_SOURCE_DIR}/tests/PlayerManifestAgreementTests.ps1)

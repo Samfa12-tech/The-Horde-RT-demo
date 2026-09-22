@@ -10,6 +10,7 @@
 #include "gameplay/animation/PlayerAnimationState.h"
 #include "scene/assets/SkinnedMeshAsset.h"
 #include "scene/assets/PlayerPrimitiveContract.h"
+#include "vulkan/raytracing/RtSceneAbi.generated.h"
 
 namespace horde::vulkan::raytracing
 {
@@ -29,11 +30,12 @@ enum class PlayerRenderRoute : std::uint8_t
     // primary-camera view. This keeps the authored rig/socket authority without
     // presenting the deferred hand mesh in the player's view.
     HybridBlockPrimary,
+    ModelledViewmodel,
 };
 
 struct PlayerRouteMasks
 {
-    std::array<std::uint8_t, 20u> instanceMasks{};
+    std::array<std::uint8_t, kRtInstanceMetadataCapacity> instanceMasks{};
 };
 
 PlayerRouteMasks BuildPlayerRouteMasks(PlayerRenderRoute route);

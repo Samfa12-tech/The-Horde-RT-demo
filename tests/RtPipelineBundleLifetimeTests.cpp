@@ -334,6 +334,10 @@ int main()
     ++forgedDescriptor.descriptorIo.descriptorWriteCount;
     ok &= Require(RejectsForgedAdoption(std::move(forgedDescriptor)),
                   "adoption must reject a forged descriptor/IO plan before ownership");
+    auto forgedBindingRoster = MakePreflight();
+    forgedBindingRoster.descriptorIo.bindings[22u].binding = 22u;
+    ok &= Require(RejectsForgedAdoption(std::move(forgedBindingRoster)),
+                  "adoption must reject a forged non-contiguous descriptor binding roster");
     auto forgedPath = MakePreflight();
     forgedPath.strategies[0].artifactPath = "forged-selected-module.inc";
     ok &= Require(RejectsForgedAdoption(std::move(forgedPath)),

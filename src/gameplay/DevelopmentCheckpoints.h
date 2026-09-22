@@ -52,7 +52,7 @@ struct DevelopmentCheckpoint
     bool stagesUnlockedChest = false;
 };
 
-inline constexpr std::array<DevelopmentCheckpoint, 36u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 44u> kDevelopmentCheckpoints{{
     {100, "pbr-sword-closeup", 0, 0.0f, 1.85f, 0.0f, -0.18f},
     {101, "pbr-torch-fire", 0, 0.0f, 1.85f, 0.0f, -0.14f},
     {102, "player-body-grips", 0, 0.0f, 1.85f, 0.0f, -0.32f},
@@ -158,6 +158,20 @@ inline constexpr std::array<DevelopmentCheckpoint, 36u> kDevelopmentCheckpoints{
      -1.57079632679f, -0.05f,
      DevelopmentCombatPose::Rest, false, 1.0f, {{0.72f, 0.90f, 1.0f}}, 2.4f,
      true, false, DevelopmentRewardPose::HeldHigh},
+    {136, "player-viewmodel-grips", 0, 0.0f, 1.85f, 0.0f, -0.32f},
+    {137, "player-viewmodel-forward", 0, 0.0f, 1.85f, 0.0f, -0.05f},
+    {138, "player-viewmodel-downward-cut", 0, 0.0f, 1.85f, 0.0f, -0.28f,
+     DevelopmentCombatPose::DownwardCutActive},
+    {139, "player-viewmodel-upward-slice", 0, 0.0f, 1.85f, 0.0f, -0.28f,
+     DevelopmentCombatPose::UpwardSliceActive},
+    {140, "player-viewmodel-look-up", 0, 0.0f, 1.85f, 0.0f, 0.28f},
+    {141, "player-viewmodel-look-down", 0, 0.0f, 1.85f, 0.0f, -0.32f},
+    {142, "player-viewmodel-lantern-high", 5, -10.65f, -15.20f, -1.57079632679f, -0.30f,
+     DevelopmentCombatPose::Rest, false, 1.0f, {{0.72f, 0.90f, 1.0f}}, 2.4f,
+     true, false, DevelopmentRewardPose::HeldHigh},
+    {143, "player-viewmodel-lantern-low", 5, -10.65f, -15.20f, -1.57079632679f, -0.30f,
+     DevelopmentCombatPose::Rest, false, 1.0f, {{0.72f, 0.90f, 1.0f}}, 2.4f,
+     true, false, DevelopmentRewardPose::HeldLow},
 }};
 
 constexpr const DevelopmentCheckpoint* FindDevelopmentCheckpoint(std::string_view name)

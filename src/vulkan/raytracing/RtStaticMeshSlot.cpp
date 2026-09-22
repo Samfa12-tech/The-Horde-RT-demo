@@ -48,8 +48,11 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
 {
     instanceMetadata_ = {};
     primitiveMetadata_.clear();
+    primitiveVertexCounts_.clear();
     materials_.clear();
     vertices_.clear();
+    worldBodyVertices_.clear();
+    viewmodelVertices_.clear();
     indices_.clear();
     geometryTransforms_.clear();
     textureArrayCounts_ = {};
@@ -61,13 +64,18 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
         firstRegistrationIndex;
     std::unordered_map<const horde::scene::assets::StaticMeshAsset*,
                        const horde::scene::assets::StaticMeshAsset*> textureSources;
+    std::unordered_map<const horde::scene::assets::StaticMeshAsset*, RtGeometryRole>
+        geometryRoles;
+    const horde::scene::assets::StaticMeshAsset* worldBodyAsset = nullptr;
+    const horde::scene::assets::StaticMeshAsset* viewmodelAsset = nullptr;
     for (std::size_t registrationIndex = 0u;
          registrationIndex < registrations.size(); ++registrationIndex)
     {
         const StaticRtAssetRegistration& registration = registrations[registrationIndex];
         if (registration.instanceCustomIndex >= kRtInstanceMetadataCapacity)
         {
-            diagnostic = "RtStaticMeshSlot capacity overflow: instanceCustomIndex exceeds RtInstanceMetadata[20].";
+            diagnostic = "RtStaticMeshSlot capacity overflow: instanceCustomIndex exceeds RtInstanceMetadata[" +
+                         std::to_string(kRtInstanceMetadataCapacity) + "].";
             return false;
         }
         if (occupied[registration.instanceCustomIndex])
@@ -80,6 +88,47 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
         if (registration.asset == nullptr)
         {
             diagnostic = "RtStaticMeshSlot registration has no static asset.";
+            return false;
+        }
+        switch (registration.geometryRole)
+        {
+        case RtGeometryRole::Static:
+            break;
+        case RtGeometryRole::PlayerWorldBody:
+            if ((registration.flags & static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr)) == 0u)
+            {
+                diagnostic = "RtStaticMeshSlot player world-body geometry requires the StaticPbr flag.";
+                return false;
+            }
+            if (worldBodyAsset != nullptr && worldBodyAsset != registration.asset)
+            {
+                diagnostic = "RtStaticMeshSlot permits only one unique PlayerWorldBody asset.";
+                return false;
+            }
+            worldBodyAsset = registration.asset;
+            break;
+        case RtGeometryRole::PlayerViewmodel:
+            if ((registration.flags & static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr)) == 0u)
+            {
+                diagnostic = "RtStaticMeshSlot player viewmodel geometry requires the StaticPbr flag.";
+                return false;
+            }
+            if (viewmodelAsset != nullptr && viewmodelAsset != registration.asset)
+            {
+                diagnostic = "RtStaticMeshSlot permits only one unique PlayerViewmodel asset.";
+                return false;
+            }
+            viewmodelAsset = registration.asset;
+            break;
+        default:
+            diagnostic = "RtStaticMeshSlot registration has an invalid geometry role.";
+            return false;
+        }
+        const auto [roleAsset, insertedRole] = geometryRoles.emplace(
+            registration.asset, registration.geometryRole);
+        if (!insertedRole && roleAsset->second != registration.geometryRole)
+        {
+            diagnostic = "RtStaticMeshSlot repeated registration of one asset must keep a consistent geometry role.";
             return false;
         }
         firstRegistrationIndex.emplace(registration.asset, registrationIndex);
@@ -123,12 +172,14 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
     }
     if (uniqueAssets.size() > kRtStaticAssetCapacity)
     {
-        diagnostic = "RtStaticMeshSlot capacity overflow: static assets exceed 8.";
+        diagnostic = "RtStaticMeshSlot capacity overflow: static assets exceed " +
+                     std::to_string(kRtStaticAssetCapacity) + ".";
         return false;
     }
 
     struct AssetRoute
     {
+        RtGeometryRole geometryRole;
         std::uint32_t assetIndex;
         std::uint32_t primitiveBase;
         std::uint32_t primitiveCount;
@@ -140,6 +191,17 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
     for (std::size_t assetIndex = 0u; assetIndex < uniqueAssets.size(); ++assetIndex)
     {
         const auto& asset = *uniqueAssets[assetIndex];
+        const RtGeometryRole geometryRole = geometryRoles.at(uniqueAssets[assetIndex]);
+        std::vector<horde::scene::assets::StaticRtVertex>* roleVertices = &vertices_;
+        switch (geometryRole)
+        {
+        case RtGeometryRole::Static: roleVertices = &vertices_; break;
+        case RtGeometryRole::PlayerWorldBody: roleVertices = &worldBodyVertices_; break;
+        case RtGeometryRole::PlayerViewmodel: roleVertices = &viewmodelVertices_; break;
+        default:
+            diagnostic = "RtStaticMeshSlot registration has an invalid geometry role.";
+            return false;
+        }
         if (primitiveMetadata_.size() + asset.primitives.size() > kRtPrimitiveMetadataCapacity)
         {
             diagnostic = "RtStaticMeshSlot capacity overflow: primitives exceed 32.";
@@ -150,17 +212,17 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
             diagnostic = "RtStaticMeshSlot capacity overflow: materials exceed 32.";
             return false;
         }
-        if (vertices_.size() + asset.vertices.size() > std::numeric_limits<std::uint32_t>::max() ||
+        if (roleVertices->size() + asset.vertices.size() > std::numeric_limits<std::uint32_t>::max() ||
             indices_.size() + asset.indices.size() > std::numeric_limits<std::uint32_t>::max())
         {
             diagnostic = "RtStaticMeshSlot geometry exceeds 32-bit addressable offsets.";
             return false;
         }
-        const std::uint32_t vertexBase = static_cast<std::uint32_t>(vertices_.size());
+        const std::uint32_t vertexBase = static_cast<std::uint32_t>(roleVertices->size());
         const std::uint32_t indexBase = static_cast<std::uint32_t>(indices_.size());
         const std::uint32_t materialBase = static_cast<std::uint32_t>(materials_.size());
         const std::uint32_t primitiveBase = static_cast<std::uint32_t>(primitiveMetadata_.size());
-        vertices_.insert(vertices_.end(), asset.vertices.begin(), asset.vertices.end());
+        roleVertices->insert(roleVertices->end(), asset.vertices.begin(), asset.vertices.end());
         indices_.insert(indices_.end(), asset.indices.begin(), asset.indices.end());
         std::array<std::unordered_map<std::int32_t, std::uint32_t>, 4u> textureRoutes;
         std::map<std::int32_t, std::array<bool, 4u>> groupPresence;
@@ -283,11 +345,27 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
             }
             materials_.push_back(ConvertMaterial(sourceMaterial, layers));
         }
-        for (const auto& primitive : asset.primitives)
+        for (std::size_t primitiveIndex = 0u;
+             primitiveIndex < asset.primitives.size(); ++primitiveIndex)
         {
+            const auto& primitive = asset.primitives[primitiveIndex];
             if (primitive.materialIndex >= asset.materials.size())
             {
                 diagnostic = "RtStaticMeshSlot primitive references an out-of-range material.";
+                return false;
+            }
+            const std::uint32_t vertexEnd = primitiveIndex + 1u < asset.primitives.size()
+                ? asset.primitives[primitiveIndex + 1u].vertexOffset
+                : static_cast<std::uint32_t>(asset.vertices.size());
+            if (primitive.vertexOffset >= asset.vertices.size() ||
+                vertexEnd > asset.vertices.size() || vertexEnd <= primitive.vertexOffset)
+            {
+                diagnostic = "RtStaticMeshSlot primitive has an empty or out-of-range asset-local vertex span.";
+                return false;
+            }
+            if (primitive.nodeTransformIndex >= asset.nodeTransforms.size())
+            {
+                diagnostic = "RtStaticMeshSlot primitive references an out-of-range node transform.";
                 return false;
             }
             primitiveMetadata_.push_back({
@@ -295,18 +373,14 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
                 indexBase + primitive.indexOffset,
                 primitive.indexCount,
                 materialBase + primitive.materialIndex});
-            if (primitive.nodeTransformIndex >= asset.nodeTransforms.size())
-            {
-                diagnostic = "RtStaticMeshSlot primitive references an out-of-range node transform.";
-                return false;
-            }
+            primitiveVertexCounts_.push_back(vertexEnd - primitive.vertexOffset);
             geometryTransforms_.push_back({{
                 1.0f, 0.0f, 0.0f, 0.0f,
                 0.0f, 1.0f, 0.0f, 0.0f,
                 0.0f, 0.0f, 1.0f, 0.0f}});
         }
         routes.emplace(&asset, AssetRoute{
-            static_cast<std::uint32_t>(assetIndex), primitiveBase,
+            geometryRole, static_cast<std::uint32_t>(assetIndex), primitiveBase,
             static_cast<std::uint32_t>(asset.primitives.size()),
             std::move(groupPresence), std::move(groupLayers)});
     }
@@ -317,12 +391,15 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
         instanceMetadata_[registration.instanceCustomIndex] = {
             route.primitiveBase, route.primitiveCount,
             registration.stableObjectId, registration.flags,
-            registration.emitterIndex, route.assetIndex, 0u, 0u};
+            registration.emitterIndex, route.assetIndex,
+            static_cast<std::uint32_t>(route.geometryRole), 0u};
     }
     textureArrayCounts_ = {
         nextTextureLayers[0], nextTextureLayers[1],
         nextTextureLayers[2], nextTextureLayers[3]};
-    measurements_.vertexBytes = vertices_.size() * sizeof(horde::scene::assets::StaticRtVertex);
+    measurements_.vertexBytes =
+        (vertices_.size() + worldBodyVertices_.size() + viewmodelVertices_.size()) *
+        sizeof(horde::scene::assets::StaticRtVertex);
     measurements_.indexBytes = indices_.size() * sizeof(std::uint32_t);
     measurements_.materialBytes = materials_.size() * sizeof(RtMaterialGpu);
     measurements_.instanceMetadataBytes = instanceMetadata_.size() * sizeof(RtInstanceMetadata);

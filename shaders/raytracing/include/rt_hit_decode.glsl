@@ -348,6 +348,29 @@ void materialForPrimitive(int primitive,
     }
 }
 
+void loadPbrTriangle(RtInstanceMetadata instance, uint i0, uint i1, uint i2,
+                     out StaticRtVertex v0, out StaticRtVertex v1, out StaticRtVertex v2)
+{
+    if (instance.geometryRole == kRtGeometryRolePlayerWorldBody)
+    {
+        v0 = rtWorldPlayerVertices.values[i0];
+        v1 = rtWorldPlayerVertices.values[i1];
+        v2 = rtWorldPlayerVertices.values[i2];
+    }
+    else if (instance.geometryRole == kRtGeometryRolePlayerViewmodel)
+    {
+        v0 = rtViewmodelVertices.values[i0];
+        v1 = rtViewmodelVertices.values[i1];
+        v2 = rtViewmodelVertices.values[i2];
+    }
+    else
+    {
+        v0 = rtStaticVertices.values[i0];
+        v1 = rtStaticVertices.values[i1];
+        v2 = rtStaticVertices.values[i2];
+    }
+}
+
 HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
                    float minimumDistance, bool ignoreWater,
                    bool ignorePlayerNearFace)
@@ -391,7 +414,8 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
             (candidateInstance == 0 &&
              int(worldSurfaces.codes[candidatePrimitive] & 0xffu) == kMaterialWater);
         bool candidateIsPlayerNearFace = false;
-        if (ignorePlayerNearFace && candidateInstance == 4)
+        if (ignorePlayerNearFace &&
+            rtInstances.values[candidateInstance].geometryRole == kRtGeometryRolePlayerWorldBody)
         {
             RtInstanceMetadata playerMetadata = rtInstances.values[4];
             uint geometryIndex = rayQueryGetIntersectionGeometryIndexEXT(query, false);
@@ -433,9 +457,8 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
                 uint i2 = primitiveMetadata.vertexOffset + rtStaticIndices.values[triangleIndex + 2u];
                 vec2 bary = rayQueryGetIntersectionBarycentricsEXT(query, true);
                 vec3 weights = vec3(1.0 - bary.x - bary.y, bary.x, bary.y);
-                StaticRtVertex v0 = rtStaticVertices.values[i0];
-                StaticRtVertex v1 = rtStaticVertices.values[i1];
-                StaticRtVertex v2 = rtStaticVertices.values[i2];
+                StaticRtVertex v0, v1, v2;
+                loadPbrTriangle(instanceMetadata, i0, i1, i2, v0, v1, v2);
                 vec2 uv = v0.uv0.xy * weights.x + v1.uv0.xy * weights.y +
                           v2.uv0.xy * weights.z;
                 mat3 objectToWorld = mat3(rayQueryGetIntersectionObjectToWorldEXT(query, true));

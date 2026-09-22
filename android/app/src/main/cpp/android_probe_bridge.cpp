@@ -954,7 +954,9 @@ bool ResolveDebugCheckpoint(const std::int32_t id, DebugCheckpointSelection& sel
     // authored gauntlets. Every gameplay/reward/glass checkpoint uses the same
     // block-primary route as the live phone game until the hands are accepted
     // across sword, torch and reward-lantern poses.
-    selection.playerRoute = development->name.starts_with("player-body-")
+    selection.playerRoute = development->name.starts_with("player-viewmodel-")
+        ? horde::vulkan::raytracing::PlayerRenderRoute::ModelledViewmodel
+        : development->name.starts_with("player-body-")
         ? horde::vulkan::raytracing::PlayerRenderRoute::Skinned
         : ((development->usesGlassFixture ||
             development->usesProductionRewardProps)
@@ -1099,7 +1101,9 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
          << "  \"executionBackend\": \""
          << horde::vulkan::ToString(context.rtScene.ExecutionBackend()) << "\",\n"
          << "  \"playerRenderRoute\": \""
-         << (context.playerRenderRoute == horde::vulkan::raytracing::PlayerRenderRoute::Skinned
+         << (context.playerRenderRoute == horde::vulkan::raytracing::PlayerRenderRoute::ModelledViewmodel
+                 ? "modelled-viewmodel"
+                 : context.playerRenderRoute == horde::vulkan::raytracing::PlayerRenderRoute::Skinned
                  ? "skinned"
                  : (context.playerRenderRoute ==
                         horde::vulkan::raytracing::PlayerRenderRoute::HybridBlockPrimary

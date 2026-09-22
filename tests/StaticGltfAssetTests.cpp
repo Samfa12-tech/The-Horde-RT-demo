@@ -830,7 +830,7 @@ void TestSharedTextureSourceRouting()
         RtStaticMeshSlot slot;
         diagnostic.clear();
         const bool loaded = slot.Initialize(registrations, diagnostic);
-        Check(!loaded && diagnostic.find(fragment) != std::string::npos,
+    Check(!loaded && diagnostic.find(fragment) != std::string::npos,
               std::string(label) + ": " + diagnostic);
     };
 
@@ -860,6 +860,119 @@ void TestSharedTextureSourceRouting()
     auto ungroupedTextured = makeAsset({makeMaterial("UngroupedTextured", -1, 601)});
     expectFailure({worldRegistration, {1u, 2u, 0u, 0u, &ungroupedTextured, &world}},
                   "explicit texture group", "textured ungrouped alias is rejected");
+}
+
+void TestGeometryRolePartitioning()
+{
+    using horde::scene::assets::StaticMaterial;
+    using horde::scene::assets::StaticMeshAsset;
+    using horde::vulkan::raytracing::RtGeometryRole;
+    using horde::vulkan::raytracing::kRtStaticAssetCapacity;
+    using horde::vulkan::raytracing::RtInstanceFlag;
+    using horde::vulkan::raytracing::RtStaticMeshSlot;
+    using horde::vulkan::raytracing::StaticRtAssetRegistration;
+
+    const auto makeAsset = [](std::string_view prefix, std::size_t materialCount) {
+        StaticMeshAsset asset;
+        asset.nodeTransforms.resize(1u);
+        asset.materials.resize(materialCount);
+        asset.vertices.resize(materialCount * 3u);
+        asset.indices.resize(materialCount * 3u);
+        for (std::size_t i = 0u; i < materialCount; ++i)
+        {
+            asset.materials[i].name = std::string(prefix) + std::to_string(i);
+            asset.primitives.push_back({static_cast<std::uint32_t>(i * 3u),
+                                        static_cast<std::uint32_t>(i * 3u), 3u,
+                                        static_cast<std::uint32_t>(i), 0u});
+            asset.indices[i * 3u + 0u] = 0u;
+            asset.indices[i * 3u + 1u] = 1u;
+            asset.indices[i * 3u + 2u] = 2u;
+        }
+        return asset;
+    };
+    const auto staticPbr = static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr);
+    auto staticAsset = makeAsset("static", 1u);
+    auto worldAsset = makeAsset("world", 2u);
+    auto viewmodelAsset = makeAsset("viewmodel", 2u);
+    const StaticRtAssetRegistration staticRegistration{
+        0u, 1u, 0u, 0u, &staticAsset, nullptr, RtGeometryRole::Static};
+    const StaticRtAssetRegistration worldRegistration{
+        1u, 2u, staticPbr, 0u, &worldAsset, nullptr, RtGeometryRole::PlayerWorldBody};
+    const StaticRtAssetRegistration viewmodelRegistration{
+        2u, 3u, staticPbr, 0u, &viewmodelAsset, nullptr, RtGeometryRole::PlayerViewmodel};
+    const StaticRtAssetRegistration worldDuplicate{
+        3u, 4u, staticPbr, 0u, &worldAsset, nullptr, RtGeometryRole::PlayerWorldBody};
+
+    std::string diagnostic;
+    RtStaticMeshSlot slot;
+    Check(slot.Initialize(std::array<StaticRtAssetRegistration, 4u>{{
+              staticRegistration, worldRegistration, viewmodelRegistration, worldDuplicate}}, diagnostic),
+          std::string("static/world/viewmodel streams initialize: ") + diagnostic);
+    Check(slot.Vertices().size() == staticAsset.vertices.size() &&
+              slot.Vertices(RtGeometryRole::PlayerWorldBody).size() == worldAsset.vertices.size() &&
+              slot.Vertices(RtGeometryRole::PlayerViewmodel).size() == viewmodelAsset.vertices.size() &&
+              slot.Vertices(static_cast<RtGeometryRole>(255u)).empty(),
+          "role vertex vectors are separate and invalid role lookup is safe");
+    const auto& primitiveMetadata = slot.PrimitiveMetadata();
+    const auto& primitiveVertexCounts = slot.PrimitiveVertexCounts();
+    Check(primitiveMetadata.size() == 5u && primitiveVertexCounts ==
+              std::vector<std::uint32_t>{3u, 3u, 3u, 3u, 3u} &&
+              primitiveMetadata[0u].vertexOffset == 0u &&
+              primitiveMetadata[1u].vertexOffset == 0u &&
+              primitiveMetadata[2u].vertexOffset == 3u &&
+              primitiveMetadata[3u].vertexOffset == 0u &&
+              primitiveMetadata[4u].vertexOffset == 3u,
+          "primitive vertex offsets and counts stay local to each role stream");
+    Check(slot.InstanceMetadata()[0u].geometryRole == static_cast<std::uint32_t>(RtGeometryRole::Static) &&
+              slot.InstanceMetadata()[1u].geometryRole == static_cast<std::uint32_t>(RtGeometryRole::PlayerWorldBody) &&
+              slot.InstanceMetadata()[2u].geometryRole == static_cast<std::uint32_t>(RtGeometryRole::PlayerViewmodel) &&
+              slot.InstanceMetadata()[1u].primitiveBase == slot.InstanceMetadata()[3u].primitiveBase,
+          "instance metadata records role identity and duplicate role routes");
+    Check(slot.Measurements().vertexBytes ==
+              (staticAsset.vertices.size() + worldAsset.vertices.size() + viewmodelAsset.vertices.size()) *
+                  sizeof(horde::scene::assets::StaticRtVertex),
+          "vertex byte measurement totals independent role streams");
+
+    const auto expectFailure = [&](std::vector<StaticRtAssetRegistration> registrations,
+                                   std::string_view fragment, std::string_view label) {
+        RtStaticMeshSlot failed;
+        diagnostic.clear();
+        const bool initialized = failed.Initialize(registrations, diagnostic);
+        Check(!initialized && diagnostic.find(fragment) != std::string::npos,
+              std::string(label) + ": " + diagnostic);
+    };
+    expectFailure({worldRegistration,
+                   {3u, 4u, staticPbr, 0u, &worldAsset, nullptr, RtGeometryRole::Static}},
+                  "consistent geometry role", "duplicate asset role conflict is rejected");
+    auto otherWorld = makeAsset("other-world", 1u);
+    expectFailure({worldRegistration,
+                   {3u, 4u, staticPbr, 0u, &otherWorld, nullptr, RtGeometryRole::PlayerWorldBody}},
+                  "only one unique PlayerWorldBody", "multiple unique world-body assets are rejected");
+    expectFailure({{0u, 1u, 0u, 0u, &staticAsset, nullptr,
+                    static_cast<RtGeometryRole>(255u)}},
+                  "invalid geometry role", "invalid geometry role is rejected");
+    expectFailure({{0u, 1u, 0u, 0u, &worldAsset, nullptr, RtGeometryRole::PlayerWorldBody}},
+                  "requires the StaticPbr flag", "player role without StaticPbr is rejected");
+
+    auto invalidSpan = makeAsset("invalid-span", 1u);
+    invalidSpan.primitives[0u].vertexOffset = static_cast<std::uint32_t>(invalidSpan.vertices.size());
+    expectFailure({{0u, 1u, 0u, 0u, &invalidSpan}},
+                  "empty or out-of-range asset-local vertex span",
+                  "empty asset-local primitive span is rejected");
+
+    std::vector<StaticMeshAsset> capacityAssets;
+    std::vector<StaticRtAssetRegistration> capacityRegistrations;
+    capacityAssets.reserve(kRtStaticAssetCapacity + 1u);
+    capacityRegistrations.reserve(kRtStaticAssetCapacity + 1u);
+    for (std::uint32_t i = 0u; i <= kRtStaticAssetCapacity; ++i)
+    {
+        capacityAssets.push_back(makeAsset("capacity", 1u));
+        capacityRegistrations.push_back({i, i + 1u, 0u, 0u, &capacityAssets.back(), nullptr,
+                                          RtGeometryRole::Static});
+    }
+    expectFailure(capacityRegistrations,
+                  "static assets exceed " + std::to_string(kRtStaticAssetCapacity),
+                  "static asset capacity remains generated and bounded");
 }
 
 void TestAccessorRangeRejectsOverflow()
@@ -1526,6 +1639,7 @@ int main(int argc, char** argv)
     TestExactDielectricWeldCellDomain();
     TestPlayerSemanticManifestAndGeometry(temporaryRoot);
     TestSharedTextureSourceRouting();
+    TestGeometryRolePartitioning();
     TestProductionDielectricFixture();
     TestRuntimeOfflineDielectricComponentParity();
 
