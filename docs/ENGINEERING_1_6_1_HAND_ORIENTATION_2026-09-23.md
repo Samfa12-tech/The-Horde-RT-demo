@@ -1,5 +1,11 @@
 # Hand orientation investigation — not asset admission
 
+**Latest owner correction:** the supplied source is a right hand. The earlier
+left-handed identification is withdrawn. The new explicit Right-source export
+mirrors the mesh for the torch's Left hand and preserves the source for Right;
+it does not swap named bones. Earlier roll candidates are not accepted fixes and
+must be rechecked with corrected chirality. See the final section below.
+
 **Follow-up correction:** the large rectangular panels in the opening captures
 are authored world gallery swatches and a wall mirror, not sleeve geometry.
 The later isolation below supersedes that part of the initial visual attribution.
@@ -14,8 +20,9 @@ and opt-in viewmodel GLBs remain unchanged; normal gameplay still uses block arm
 
 - Named Left/Right chains and grip targets are not swapped. The model-to-world
   basis is a proper 180-degree Y rotation, not a reflection. The source gauntlet
-  is anatomically left-handed despite its historical `right-` filenames; the
-  processor explicitly mirrors the right copy and reverses its winding. Do not
+  was previously classified as left-handed; that identification is now withdrawn
+  following the owner's correction. The historical processor mirrored Right
+  instead of Left. Do not
   repair an apparent reversal by swapping bones or changing gameplay item poses.
 - Player-side inspection of the exact posed gauntlets shows a bad cuff direction.
   A controlled 180-degree roll of both authored Grip bones changes that direction
@@ -185,3 +192,44 @@ threshold or a waiver of remaining fold/normal/motion/physical-phone gates.
 Checkpoint `f584be2` also has fresh successful branch/PR CI `35802962127` /
 `35802965472`: logs show 44/44 portable and 10/10 Vulkan CPU-host tests in each.
 Those jobs do not certify the subsequent source edits described here.
+
+## Right-source correction and mirrored UV integrity
+
+The owner explicitly identified the torch/source hand as Right. The corrected
+candidate uses `--gauntlet-source-hand Right --blend-elbows`, with zero added
+Grip roll so chirality is checked separately from the prior roll experiments.
+Left is a real offline reflection of the right-hand source; Right is unmirrored.
+Both retain scale 0.090 and rigid named Hand weights. No gameplay transform,
+animation authority, source asset, accepted runtime or licence was changed.
+
+The audit of this path also found that the old mirror reversed face winding but
+left UV corners in their original order. Corrected exports reverse both together,
+preserving each source vertex's texture coordinate. The pure geometry helper has
+six passing regression cases, including Right→Left mapping, corner correspondence,
+unchanged Right, malformed input rejection and explicitly isolated legacy output.
+The portable CI job now runs those tests separately from its CTests.
+
+World candidate SHA: `5d4e07a6f92e82b4cda35c528bfc15f50ed68a482cabecbfe55bee7f26a8661c`.
+Viewmodel candidate SHA: `7d364d5ed0cb335f523796c2c7691527325e836ae04d1f869fe080454d504f13`.
+Two independent exports reproduce both hashes exactly. Each first reproduces
+and verifies the unchanged admitted world reference before making the candidate.
+The corrected UV association reduces candidate unique gauntlet vertices from
+18,527 to 11,220 while preserving all 8,838 triangles. Total viewmodel vertices
+are 15,855 (sleeves remain 4,635). This is an actual deduplication result, not a
+measured frame-time claim or reduced geometry quality.
+
+Existing static/skinned addressing, shared pose/vertex/tangent/grip agreement and
+invalid-pose rejection pass for the paired candidate. Native grips and upward-slice
+captures complete on the unchanged Debug RTX executable. Their source is
+`C:/Dev/tmp/horde-right-source-rt-20260923-a`; generated files are in
+`C:/Dev/tmp/horde-right-source-20260923-a`. These checks do not establish final
+orientation, sleeve shape, live motion or phone acceptance. Corrected source
+classification does not make previous roll choices automatically valid.
+
+The source's actual +X end was visually verified as the cuff with a labelled
+Blender geometry preview (−X is the finger end). Do not invert cuff direction
+based on an unlabelled extreme-vertex or hilt-removal boundary cluster. Blender
+inspection remains separate from native RT evidence and owner acceptance.
+The [corrected-chirality evidence](evidence/2026-09-23-hand-orientation/right-source-correction/)
+retains the processor receipts, two native images/manifests, exact stage roster
+and labelled source preview. No old failed experiment is relabelled an accepted fix.

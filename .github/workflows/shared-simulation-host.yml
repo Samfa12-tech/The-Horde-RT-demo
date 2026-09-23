@@ -42,6 +42,9 @@ jobs:
       - name: Run shared gameplay tests
         run: ctest --test-dir build/host-ci --build-config Release --output-on-failure
 
+      - name: Check offline gauntlet chirality and UV winding
+        run: python3 -m unittest discover -s tests -p test_player_gauntlet_geometry.py -v
+
   player-vulkan-host:
     runs-on: ubuntu-latest
     timeout-minutes: 20

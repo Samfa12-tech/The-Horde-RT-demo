@@ -30,6 +30,16 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### Current Phase 3 checkpoint
 
+Latest owner correction: the source hand is **Right**, not Left. The historical
+left-source classification is withdrawn. New `--gauntlet-source-hand Right`
+candidate exports mirror Left and preserve Right, with correct winding/UV-corner
+association; no bone-label swap or accepted asset replacement. The UV correction
+reduces unique viewmodel vertices to 15,855 without removing triangles. Six pure
+geometry tests and paired admission smoke pass; two native corrected-chirality
+captures complete. Re-evaluate wrist roll on this corrected source before admission.
+The earlier 90/180 and 105/145 roll experiments used the superseded chirality and
+are not accepted fixes. See the latest section of the hand/roll record.
+
 The owner's hand-orientation report is investigated in the
 [hand/roll record](ENGINEERING_1_6_1_HAND_ORIENTATION_2026-09-23.md).
 There is no literal Left/Right chain swap; an isolated authored Grip-roll
