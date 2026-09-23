@@ -38,6 +38,7 @@ commits must not be presented as a clean-source rebuild of these exact bytes.
 | ARM64 unsigned Release build with candidate property | Passed, including lintVital; candidate flag OFF, zero viewmodel ZIP entries, original world hash retained |
 | APK resolver | 10/10 fixtures: ordinary/redirected outputs and malformed/missing/traversal rejection |
 | Candidate negative gates | Gradle rejects independently wrong source handedness and runtime hash; real Android/Clang CMake configuration rejects candidate ON in Release after compiler checks |
+| Current-source remote CI | `ed78452` push `35808891150` and PR integration `35808893925` both pass 44 portable, 10 Vulkan CPU-host, six mirror and ten resolver tests; logs inspected |
 | Six gauntlet mirror/UV tests | Passed afresh; source Right mirrors only for Left, winding/UV association preserved |
 | Physical SM-S948B | Not run: ADB lists no devices; no installed-byte, presentation, capture, lifecycle or live-motion result |
 

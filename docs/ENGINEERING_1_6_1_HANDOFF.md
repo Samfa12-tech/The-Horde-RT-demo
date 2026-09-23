@@ -40,8 +40,10 @@ the [Android candidate record](ENGINEERING_1_6_1_VIEWMODEL_ANDROID_CANDIDATE_202
 ADB currently exposes no device; no install or new phone acceptance occurred.
 Do not use the stale conventional Debug APK path: follow Gradle's artifact listing
 or the immutable recorded artifact. Accepted runtime GLBs remain unchanged.
-`b352599` push/PR CI passed 44/44 portable, 10/10 Vulkan CPU-host and six mirror
-tests, with logs inspected. Later candidate-package source needs its own CI.
+Implementation checkpoint `ed78452567682563e071cc117870eb6e00c57da5` is pushed
+and remote-verified. Its push/PR CI `35808891150` / `35808893925` passed 44/44
+portable, 10/10 Vulkan CPU-host, six mirror and ten APK-resolver tests, with logs
+inspected. This later handoff-only edit changes no implementation.
 
 Latest owner correction: the source hand is **Right**, not Left. The historical
 left-source classification is withdrawn. New `--gauntlet-source-hand Right`
@@ -90,8 +92,9 @@ and [nine native captures](evidence/2026-09-23-viewmodel-rt/README.md).
 
 The candidate is under `assets/models/player/viewmodel/`; its SHA-256 is
 `1e3b041ee7aa896a84fe462c182f6012d026b4a577b2d4ddf59d764b823f2538`.
-It is rendered only in opt-in Windows development checkpoints and remains outside
-Android packaging. The unchanged Phase 2 world-image tolerance passes, 13/13 MSVC
+That tracked candidate is rendered in opt-in Windows development checkpoints and
+remains outside normal Android packaging; the separate corrected candidate app is
+described above. The unchanged Phase 2 world-image tolerance passes, 13/13 MSVC
 focused checks pass (plus the final inventory regression), both sets of eight
 SPIR-V modules validate, and unsigned Android Shipping/Mobile builds all four
 ABIs. Broader Windows non-Vulkan validation passed 56/59 initially, then all three
@@ -200,8 +203,8 @@ build, benchmark or worker remains active.
    subjective arm acceptance is claimed. Main documentation conflicts were resolved
    in `d3a7225`, current-source CI restored, and PR #15 is clean/mergeable.
 2. **Phase 3 in progress:** the reproducible arms asset, explicit two-part role,
-   and shared solved-pose CPU seam are implemented. Dedicated GPU viewmodel/world-body
-   ownership and native/owner acceptance remain open.
+   shared solved-pose CPU seam and dedicated GPU viewmodel/world-body ownership are
+   implemented. Anatomical/surface/live-motion and owner-device acceptance remain open.
    Keep gameplay-owned IK/grip authority and independent small dynamic resources;
    no full-body primary-ray switch, overlays or permanent procedural block arms.
 3. Physical glass correctness/performance remains open. Diagnostic held-high still
