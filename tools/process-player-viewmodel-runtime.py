@@ -11,6 +11,7 @@ Investigation-only switches (not admission or production defaults):
   --stabilize-sleeves: transfer sleeve Hand weights to the same-side ForeArm.
   --blend-elbows: test a continuous elbow-centred sleeve weight field (implies stabilization).
   --fit-sleeves: fit the retained cloth surface to a bounded anatomical arm envelope.
+  --close-sleeves: close the authored garment openings with real offline cloth panels.
 These retain gameplay sockets/prop authority. None establishes visual acceptance;
 the candidates still require anatomical, surface and live-motion validation.
 """
@@ -31,6 +32,7 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('output', type=Path)
 parser.add_argument('--blend-elbows', action='store_true')
 parser.add_argument('--fit-sleeves', action='store_true')
+parser.add_argument('--close-sleeves', action='store_true')
 parser.add_argument('--stabilize-sleeves', action='store_true')
 parser.add_argument('--gauntlet-source-hand', choices=('Left', 'Right'),
                     help='Explicit anatomical source handedness; omission reproduces the historical export')
@@ -42,7 +44,7 @@ roll_degrees = options.grip_roll_degrees or ([180.0, 180.0] if options.correct_g
 if any(not math.isfinite(value) or abs(value) > 360.0 for value in roll_degrees):
     parser.error('Grip roll must be finite and within [-360, 360] degrees')
 grip_rolls = dict(zip(('Left', 'Right'), map(math.radians, roll_degrees)))
-blend_elbows = options.blend_elbows or options.fit_sleeves
+blend_elbows = options.blend_elbows or options.fit_sleeves or options.close_sleeves
 stabilize_sleeves = options.stabilize_sleeves or blend_elbows
 correct_grip_roll = any(grip_rolls.values())
 output = options.output.resolve()
@@ -215,11 +217,20 @@ if stabilize_sleeves:
                     forearm.add([index], blend, 'REPLACE')
                 changed += 1
             elbow_corrections[side] = dict(vertices=changed, halfWidthMetres=half_width)
+sleeve_closure = {}
+if options.close_sleeves:
+    from player_viewmodel_surface import close_sleeve_openings
+    sleeve_closure = close_sleeve_openings(player)
 counts = {name: 0 for _, name in parts}
 for polygon in player.data.polygons:
     counts[parts[polygon.material_index][1]] += len(polygon.vertices) - 2
-if counts != {'ViewmodelSleeves': 5532, 'ViewmodelGauntlets': 8838}:
+if (counts['ViewmodelGauntlets'] != 8838 or
+        (not options.close_sleeves and counts['ViewmodelSleeves'] != 5532) or
+        (options.close_sleeves and counts['ViewmodelSleeves'] <= 5532)):
     raise RuntimeError(f'Unexpected authored arms partition: {counts}')
+viewmodel_manifest = json.loads((root / 'assets/models/player/viewmodel/runtime/asset.manifest.json').read_text(encoding='utf-8'))
+if sum(counts.values()) > viewmodel_manifest['lods'][0]['maxTriangles']:
+    raise RuntimeError('Viewmodel candidate exceeds the existing manifest triangle budget')
 bpy.ops.object.select_all(action='DESELECT')
 player.select_set(True)
 rig.select_set(True)
@@ -239,6 +250,7 @@ report = dict(schema=1, role='Viewmodel', sourceWorldSha256=sha(accepted_world),
               sleeveHandWeightsMovedToForearm=weight_corrections,
               elbowWeightField=elbow_corrections,
               sleeveEnvelopeFit=sleeve_fit,
+              sleeveClosure=sleeve_closure,
               runtime=viewmodel_output.name, runtimeSha256=sha(viewmodel_output),
               primitiveSemantics=counts, processingVertices=len(player.data.vertices),
               ownership='Primary-only modelled geometry; world body owns secondary visibility',

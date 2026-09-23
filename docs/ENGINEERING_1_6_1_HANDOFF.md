@@ -30,6 +30,17 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### Current Phase 3 checkpoint
 
+Latest surface work: [sleeve closure checkpoint](evidence/2026-09-23-viewmodel-sleeve-closure/README.md).
+The adjacent-cloth recovery attempt worsened the rim and was removed. An opt-in
+real-geometry closure now preserves original normals and all gauntlet accessor
+bytes, stays below the existing 15k-triangle budget, passes three Blender fixtures
+and actual paired admission, and has two native poses per candidate. It is **not**
+admitted: intersection/shape/motion gates remain; fitting retains two pre-existing
+normal failures. Neither tracked GLB nor the earlier Android candidate was replaced.
+The preceding portrait checkpoint `6f282bb` is pushed; fresh push/PR CI
+`35810546291` / `35810550084` passed 44 portable, 10 Vulkan-host, six mirror and
+ten APK-resolver tests (logs inspected). Do not reuse that CI for later tool edits.
+
 The corrected-hand candidate now has an isolated **Android Debug** package, not a
 production switch: `.debug.viewmodel` defaults to the real modelled route for live
 play/replay and carries its matched world counterpart. Normal Debug/Release remain

@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "role": "Viewmodel",
+  "sourceWorldSha256": "e8737f10e7669b284e04109d9c3acdf537df284093a21511656bf191a70450fd",
+  "gauntletSourceHandedness": "Right",
+  "gripRollCorrectionRadians": null,
+  "gripRollRadiansBySide": {
+    "Left": 1.8325957145940461,
+    "Right": 2.530727415391778
+  },
+  "pairedWorldRuntime": "world-grip-calibrated.runtime.glb",
+  "pairedWorldSha256": "4050e15b5084bfa83ad9db09f8bb8ececd872be89a27d0b08447c12f9f7a501d",
+  "sleeveWeightMode": "ElbowCentredArmForeArm",
+  "sleeveHandWeightsMovedToForearm": {
+    "Left": 222,
+    "Right": 184
+  },
+  "elbowWeightField": {
+    "Left": {
+      "vertices": 2647,
+      "halfWidthMetres": 0.05410755714952701
+    },
+    "Right": {
+      "vertices": 1983,
+      "halfWidthMetres": 0.051390516825712766
+    }
+  },
+  "sleeveEnvelopeFit": {},
+  "sleeveClosure": {
+    "boundaryEdgesBefore": 278,
+    "capFaces": 5,
+    "trianglesAdded": 278,
+    "boundaryEdgesAfter": 0,
+    "construction": "Authored cloth opening fill; source surface positions and loop UVs retained"
+  },
+  "runtime": "gothic-traveller-viewmodel.runtime.glb",
+  "runtimeSha256": "e93d3b3b3b07856cc50712e6c2c9824171dacf7157e703e3b12ac73b949280bb",
+  "primitiveSemantics": {
+    "ViewmodelSleeves": 5810,
+    "ViewmodelGauntlets": 8838
+  },
+  "processingVertices": 14129,
+  "ownership": "Primary-only modelled geometry; world body owns secondary visibility",
+  "animationAuthority": "Same authored rig, Idle/Walking NLA tracks and named grip bones as world reference",
+  "licence": "Derivative of existing licensed Meshy player/gauntlet inputs; see ASSET_LICENSES.md",
+  "status": "Offline candidate only; GPU ownership, grip/pitch/motion and owner acceptance not yet established"
+}

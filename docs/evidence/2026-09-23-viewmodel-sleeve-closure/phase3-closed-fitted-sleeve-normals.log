@@ -1,0 +1,11 @@
+12:58:03 | INFO: Data are loaded, start creating Blender stuff
+12:58:03 | INFO: Blender create Mesh node char1.002
+12:58:03 | INFO: glTF import finished in 0.08s
+{"source": "C:/Dev/tmp/horde-fitted-right-arms-20260923-a/gothic-traveller-viewmodel.runtime.glb", "triangles": 5532, "degenerate": 0, "negativeNormalAlignment": 2, "minimumCosine": -0.9565954133868217, "maximumEdgeRatio": 16.54835347174104, "newPositions": 0, "capTriangles": 0, "capNegativeNormalAlignment": 0}
+12:58:04 | INFO: Data are loaded, start creating Blender stuff
+12:58:04 | INFO: Blender create Mesh node char1.002
+12:58:04 | INFO: glTF import finished in 0.08s
+{"source": "C:/Dev/tmp/horde-closed-fitted-sleeves-20260923-c/gothic-traveller-viewmodel.runtime.glb", "triangles": 5810, "degenerate": 0, "negativeNormalAlignment": 2, "minimumCosine": -0.9566119611263275, "maximumEdgeRatio": 49.40193539565175, "newPositions": 5, "capTriangles": 278, "capNegativeNormalAlignment": 0}
+Blender 5.2.0 LTS (hash fbe6228777e7 built 2026-07-14 01:35:40)
+
+Blender quit
