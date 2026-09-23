@@ -233,3 +233,35 @@ inspection remains separate from native RT evidence and owner acceptance.
 The [corrected-chirality evidence](evidence/2026-09-23-hand-orientation/right-source-correction/)
 retains the processor receipts, two native images/manifests, exact stage roster
 and labelled source preview. No old failed experiment is relabelled an accepted fix.
+
+## Corrected-source roll and sleeve candidates (not accepted)
+
+The Right-source candidate has now also been exported with Left/Right Grip rolls
+105/145 degrees and continuous elbow weights. These are test values, not an
+owner-approved wrist calibration. Its paired world SHA is
+`4050e15b5084bfa83ad9db09f8bb8ececd872be89a27d0b08447c12f9f7a501d`;
+viewmodel SHA is
+`194aab2874993c68b0ab5950ed82085564e8567b9a5f8126f27ceb11283f5e06`.
+Local generation/capture roots are `C:/Dev/tmp/horde-calibrated-right-arms-20260923-a`
+and `C:/Dev/tmp/horde-calibrated-right-arms-rt-20260923-a`. Native grips and upward
+slice captures complete; the rest-frame landscape image does not provide a good
+enough view of the hand anatomy to certify it. Paired shared-pose admission passes.
+
+`--fit-sleeves` is a further **offline investigation-only** switch, implying the
+elbow weighting. It narrows retained cloth in bind/model space using a continuous
+radial map around the arm segments, without a camera-dependent adjustment. It
+preserves topology/UVs and gauntlet corner normals, recomputes cloth normals, and
+records displacement. The fitted candidate is
+`ec58ec4049f028438528f05f7ed305ca9b964dd34713dac63d4455bcc8288a0f`, with
+the same paired world as above; maximum displacements are Left 0.08484 m and
+Right 0.07741 m. It passes actual static/skinned addressing and shared
+pose/vertex/tangent/grip admission, but the source cloth's ragged boundaries and
+folds remain visible. A subsequent local boundary-cap experiment failed closure
+and was removed from the processor; no successful cap/retopology is claimed.
+The fitted candidate is **not** selected for the Android package.
+
+No candidate replaces either tracked runtime. Sleeve finishing, anatomical
+orientation, live motion, retraction and owner phone acceptance remain open.
+Six mirror/UV unit tests pass afresh; branch/PR CI at `b352599` each passes
+44/44 portable, 10/10 Vulkan CPU-host and all six mirror tests (logs inspected).
+Those CI runs do not certify later Android candidate packaging changes.

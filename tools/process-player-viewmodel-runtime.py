@@ -10,6 +10,7 @@ Investigation-only switches (not admission or production defaults):
   --grip-roll-degrees LEFT RIGHT: test explicit per-hand authored Grip calibration.
   --stabilize-sleeves: transfer sleeve Hand weights to the same-side ForeArm.
   --blend-elbows: test a continuous elbow-centred sleeve weight field (implies stabilization).
+  --fit-sleeves: fit the retained cloth surface to a bounded anatomical arm envelope.
 These retain gameplay sockets/prop authority. None establishes visual acceptance;
 the candidates still require anatomical, surface and live-motion validation.
 """
@@ -29,6 +30,7 @@ arguments = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('output', type=Path)
 parser.add_argument('--blend-elbows', action='store_true')
+parser.add_argument('--fit-sleeves', action='store_true')
 parser.add_argument('--stabilize-sleeves', action='store_true')
 parser.add_argument('--gauntlet-source-hand', choices=('Left', 'Right'),
                     help='Explicit anatomical source handedness; omission reproduces the historical export')
@@ -40,7 +42,7 @@ roll_degrees = options.grip_roll_degrees or ([180.0, 180.0] if options.correct_g
 if any(not math.isfinite(value) or abs(value) > 360.0 for value in roll_degrees):
     parser.error('Grip roll must be finite and within [-360, 360] degrees')
 grip_rolls = dict(zip(('Left', 'Right'), map(math.radians, roll_degrees)))
-blend_elbows = options.blend_elbows
+blend_elbows = options.blend_elbows or options.fit_sleeves
 stabilize_sleeves = options.stabilize_sleeves or blend_elbows
 correct_grip_roll = any(grip_rolls.values())
 output = options.output.resolve()
@@ -119,6 +121,7 @@ player.name = 'PlayerViewmodel'
 player.data.update()
 weight_corrections = {}
 elbow_corrections = {}
+sleeve_fit = {}
 if stabilize_sleeves:
     # A rigid anatomical glove follows Hand; cloth stops at the wrist and
     # follows ForeArm. Mixing those palettes stretched the old wrist seam >5x
@@ -129,6 +132,46 @@ if stabilize_sleeves:
                          if polygon.material_index == 1 for index in polygon.vertices}
     if sleeve_vertices & gauntlet_vertices:
         raise RuntimeError('Sleeve reweight must not touch a gauntlet vertex')
+    if options.fit_sleeves:
+        # Offline model-space tailoring, independent of camera and checkpoint.
+        # Preserve topology/UVs and the original wrinkle directions; a monotone
+        # radial map avoids collapsing multiple cloth layers onto one cylinder.
+        original_normals = [tuple(normal.vector) for normal in player.data.corner_normals]
+        inverse_mesh = player.matrix_world.inverted()
+        for side in ('Left', 'Right'):
+            group_ids = {player.vertex_groups[side + suffix].index for suffix in ('Arm', 'ForeArm', 'Hand')}
+            shoulder = rig.matrix_world @ rig.data.bones[side + 'Arm'].head_local
+            elbow = rig.matrix_world @ rig.data.bones[side + 'ForeArm'].head_local
+            wrist = rig.matrix_world @ rig.data.bones[side + 'Hand'].head_local
+            count, max_displacement = 0, 0.0
+            for index in sorted(sleeve_vertices):
+                vertex = player.data.vertices[index]
+                if sum(g.weight for g in vertex.groups if g.group in group_ids) < 0.99:
+                    continue
+                point = player.matrix_world @ vertex.co
+                candidates = []
+                for start, end, first_radius, last_radius in (
+                        (shoulder, elbow, 0.075, 0.055), (elbow, wrist, 0.055, 0.038)):
+                    axis = end - start
+                    t = max(0.0, min(1.0, (point - start).dot(axis) / axis.length_squared))
+                    centre = start + axis * t
+                    candidates.append(((point - centre).length, centre,
+                                       first_radius * (1.0 - t) + last_radius * t))
+                radius, centre, limit = min(candidates, key=lambda item: item[0])
+                if radius > 1.0e-8:
+                    fitted = centre + (point - centre) * (limit * math.tanh(radius / limit) / radius)
+                    max_displacement = max(max_displacement, (fitted - point).length)
+                    vertex.co = inverse_mesh @ fitted
+                count += 1
+            sleeve_fit[side] = dict(vertices=count, maximumDisplacementMetres=max_displacement)
+        player.data.update()
+        # Recompute cloth normals for the new real surface, retaining all
+        # unmodified gauntlet corner normals rather than changing its shading.
+        for polygon in player.data.polygons:
+            if polygon.material_index == 0:
+                for loop in polygon.loop_indices:
+                    original_normals[loop] = (0.0, 0.0, 0.0)
+        player.data.normals_split_custom_set(original_normals)
     for side in ('Left', 'Right'):
         hand = player.vertex_groups[side + 'Hand']
         forearm = player.vertex_groups[side + 'ForeArm']
@@ -195,6 +238,7 @@ report = dict(schema=1, role='Viewmodel', sourceWorldSha256=sha(accepted_world),
                   ('ArmForeArm' if stabilize_sleeves else 'OriginalArmForeArmHand'),
               sleeveHandWeightsMovedToForearm=weight_corrections,
               elbowWeightField=elbow_corrections,
+              sleeveEnvelopeFit=sleeve_fit,
               runtime=viewmodel_output.name, runtimeSha256=sha(viewmodel_output),
               primitiveSemantics=counts, processingVertices=len(player.data.vertices),
               ownership='Primary-only modelled geometry; world body owns secondary visibility',
