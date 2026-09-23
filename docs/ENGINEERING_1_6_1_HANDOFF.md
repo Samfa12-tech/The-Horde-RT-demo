@@ -30,6 +30,18 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### Current Phase 3 checkpoint
 
+The owner's hand-orientation report is investigated in the
+[hand/roll record](ENGINEERING_1_6_1_HAND_ORIENTATION_2026-09-23.md).
+There is no literal Left/Right chain swap; an isolated authored Grip-roll
+candidate changes the bad cuff direction, but is not admitted. Exact Debug CPU
+upload capture proves substantial sleeve deformation before GPU decoding. A
+combined sleeve-weight candidate reduces stretch but still looks broken in RT;
+finish anatomical mounting, sleeve shape and live motion before phone acceptance.
+Both accepted GLBs remain byte-identical, and a fresh default offline export
+reproduces the accepted viewmodel. No new phone evidence or production switch.
+The `8277df2` documentation checkpoint's branch/PR runs `35799440728` /
+`35799446606` also completed successfully; current changes need their own CI.
+
 `6b219832514b3e36bda3792ad6639119894675c2` is pushed and remote-verified.
 Fresh branch/PR CI `35799096847` / `35799100216` passes 44/44 portable and 10/10
 Vulkan CPU-host tests; PR #15 is MERGEABLE/CLEAN. This handoff-only follow-up
@@ -59,8 +71,8 @@ acceptance remain open. One raised-lantern transport overflow is preserved as an
 open finding, not hidden by capture success. Next: refine the model/skin presentation,
 package and validate the candidate, and then obtain owner phone acceptance before
 retiring block arms. Static sleeves have bounded indices/55 mm maximum bind-pose
-edges; inspect exact posed CPU geometry next to distinguish deformation from
-GPU decoding. That is a hypothesis, not a diagnosed/fixed art defect. Do not redo
+edges; exact posed CPU geometry now confirms sleeve deformation (see the newer
+hand/roll record), without establishing every visible defect's cause. Do not redo
 Phase 2 or restore a quota pause. Audio/haptic manual revalidation required: NO
 for this slice; feedback semantics/playback did not change. No phone installation,
 paid generation, signing/licence change or publication occurred.

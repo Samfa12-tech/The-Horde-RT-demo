@@ -396,8 +396,8 @@ def create_authored_viewmodel_gauntlet(side):
 
     # Reorient the accepted Meshy 7 glove into this asset-owned grip frame.
     # The generated concept is anatomically a left palm despite the text label;
-    # preserve it for Left and mirror the local X axis for a true Right copy.
-    # Its long local +Z axis follows the cylindrical power grip/forearm.
+    # preserve it for Left and mirror local Y for the Right copy (with reversed
+    # winding below). Local +Z follows the handle, not the forearm/cuff axis.
     handle_centre = frame["handleCentreWorld"]
     handle_axis = frame["handleAxisWorld"]
     palm_direction = frame["palmDirectionWorld"]

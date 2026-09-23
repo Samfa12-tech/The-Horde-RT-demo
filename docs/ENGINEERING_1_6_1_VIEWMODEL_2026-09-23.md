@@ -226,14 +226,12 @@ history, not relabelled green. The following handoff-only commit changes no runt
 
 ## Remaining gates
 
-- Shape-investigation checkpoint (hypothesis, not a fix): static sleeve GLB indices
-  are local/in range and maximum bind-pose edge is about 55 mm. The existing
-  world-player CPU smoke passes and reports about 122 mm ordinary posed maximum
-  edge and 211 mm at the worst wall approach. Its normal/clearance output does not
-  certify attractive sleeves. Inspect per-primitive viewmodel CPU posed geometry
-  at the exact native capture pose next, then distinguish sleeve partition/weight
-  deformation from GPU decode. Do not regenerate or replace the accepted world
-  runtime merely to investigate the dedicated viewmodel.
+- The [hand-orientation investigation](ENGINEERING_1_6_1_HAND_ORIENTATION_2026-09-23.md)
+  supersedes the initial shape hypothesis: exact CPU uploads confirm sleeve
+  deformation, and an isolated Grip-roll candidate changes cuff direction without
+  swapping named Left/Right chains or changing prop authority. Combined reweighting
+  improves stretch but the RT result is still unacceptable. Accepted runtimes are
+  unchanged; finish anatomical mounting and sleeve shape before admission.
 - Fix the visibly angular/open-looking sleeve/shoulder surfaces and near-camera
   composition with model/skin investigation and geometry changes, not visual cheats.
 - Live-motion transitions, legal extreme pitch, retraction, grip agreement and
