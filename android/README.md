@@ -11,6 +11,7 @@ The `android/` module is the supported phone path for Horde Lantern RT. It owns 
 - Coherent JNI input publication through the two-slot `InputMailbox`, with independent monotonic attack/parry/dodge/reset/retry counters
 - Ordered semantic gameplay events with per-event spatial gains drive SoundPool and haptics without collapsing repeated cues
 - Native Vulkan RT presentation through the Android swapchain
+- Development 1.6.1 selects the existing RT-pipeline backend when supported, or shared BLAS/TLAS-backed `RayQueryCompute` on verified RayQuery-only devices. Raw capability, selected backend and successful presentation are separate report fields; see [targeted backend evidence](../docs/ENGINEERING_1_6_1_RAYQUERY_BACKEND_2026-09-13.md) for exact device limitations.
 - Optional Vulkan timestamp queries report a separate GPU RT command-buffer interval without changing CPU benchmark pass/fail
 - One frame in flight while the held-prop TLAS uses a host-written instance buffer
 - Portrait-first branded entry/pause/settings/controls/diagnostics/credits UI; touch movement/look plus `SWING` and `PARRY`; a bounded two-skeleton opening encounter followed by a singular lich route; layered articulated body/head with a smoothed walk gait, roof-water drench and lantern drop, rounded catchment/drain runnel, coloured bays, mirror, low ritual mist, sliding-roof dawn reveal, and Continue/Begin Again/Quit ending; a persistent post-lich RT Lab with route-local tuning; strict ASTC assets; and phone-safe ray-query shading inside `vkCmdTraceRaysKHR`
@@ -28,6 +29,8 @@ adb shell am start -n com.samfa12.hordelanternrt.debug/com.samfa12.hordelanternr
 ```
 
 The debug build uses `com.samfa12.hordelanternrt.debug`, so it can be installed beside the stable-key-signed public alpha without uninstalling or changing the release app. Release builds retain `com.samfa12.hordelanternrt`.
+
+For a focused Debug validation of the alternate hardware backend, force-stop only the Debug package and append `--ez horde_require_rayquery_compute true` to its launch intent. Omit the flag on a fresh launch to restore normal backend preference. The native Release build ignores this private flag; RayQuery-only supported devices select compute automatically. Do not change system settings or clear app data for this check.
 
 Expected RT success log:
 
@@ -74,7 +77,7 @@ The exact 2026-08-12 two-skeleton candidate supersedes that performance failure.
 
 That historical exact candidate is clean commit `b3428a7`; it does not validate later animation/parry/water work. Final 0.1.4 reconciliation commit `547d89d` remains the accepted two-skeleton/parry baseline. Showcase Alpha 0.1.5 adds the bounded RT waterfall, catchment/runoff/drain, lich mist, positional water loop, and shared directional dodge. The exact Debug water candidate passed 13 captures, replay, Home/resume, and the descriptive six-checkpoint route; owner hands-on acceptance covered the Windows water/mist presentation and controller path. See `../docs/RT_WATERFALL_LICH_MIST_VALIDATION_2026-08-23.md`.
 
-The current showcase release identity is `1.6.0` with `versionCode 8`. Public candidates must be signed by the established Horde release key, retain strict ASTC routing and 16 KiB compatibility, and pass the guarded package/push verification; never replace the existing update identity with a new keystore. Future releases require a new version and `versionCode > 8`.
+The current development candidate identity is `1.6.1` with `versionCode 9`; it is not published and has no device-performance or owner-feel claim. The latest published itch release remains exact `1.6.0` with `versionCode 8`. Public candidates must be signed by the established Horde release key, retain strict ASTC routing and 16 KiB compatibility, and pass the guarded package/push verification; never replace the existing update identity with a new keystore.
 
 The exact signed 1.6.0 APK is published as itch build `#1931951`; SHA-256 `52a64255ad5dec82cc866fb2ea3545be498ca06c73a789019be851c77e5d6c48`. The established certificate, identity, version, credits, strict package layout, static C++ runtime, APK/ELF compatibility, native libraries, runtime assets, licence checks, and lint passed. On 2026-08-31 it was installed and pulled back byte-for-byte on `SM-S948B`; strict ASTC, `RayTracingPipeline`, honest RT presentation, Home/resume, and a short route smoke passed with no fatal marker. This is functional/presentation evidence only, not deterministic checkpoint/replay or sustained Release performance/owner-feel evidence. The same final feature runtime was accepted on exact Debug APK `0b5a59b6e41d2c4d717eff885aaa310b7f5f1512002f6a89cb77e5989ab7edd3`; see `../docs/SHOWCASE_ALPHA_1_6_0_RELEASE_VALIDATION_2026-08-30.md`.
 

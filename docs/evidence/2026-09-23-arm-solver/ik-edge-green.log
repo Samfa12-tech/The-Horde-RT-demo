@@ -1,0 +1,5 @@
+Unequal folded IK: elbow=(-0.075,0.290474,0), upper=0.3, lower=0.4
+Owner portrait safe-frame NDC x=[-0.886294, 0.864117]
+Downward portrait safe-frame NDC x=[-0.886294, 0.818936]
+Upward portrait safe-frame NDC x=[-0.886294, 0.730322]
+Player animation, IK, socket, reset/import, visibility, and delivery contracts passed

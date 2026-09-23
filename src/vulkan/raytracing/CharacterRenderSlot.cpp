@@ -1,4 +1,5 @@
 #include "vulkan/raytracing/CharacterRenderSlot.h"
+#include "vulkan/raytracing/RtSceneRecordObservation.h"
 
 #include "gameplay/ShowcaseRoute.h"
 
@@ -298,7 +299,8 @@ bool CharacterRenderSlot::PrepareFrame(
     const horde::gameplay::EnemyRosterSnapshot& roster,
     const horde::gameplay::LichSnapshot& lich,
     const RtGpuResources& resources,
-    std::string& diagnostic)
+    std::string& diagnostic,
+    RtSceneRecordObservation* observation)
 {
     pendingRefit_ = CharacterBlasRefit::None;
     if (!CacheFramePlan(skeletons, skeletonCount, roster, lich, diagnostic))
@@ -328,16 +330,21 @@ bool CharacterRenderSlot::PrepareFrame(
                 continue;
             }
             auto& vertices = skeletonSkinnedVertices_[bucket];
+            RtSceneStageScope skinScope(
+                observation, horde::telemetry::RtStage::CharacterSkin);
             if (!skeletonModel_.Skin(representative->clip, representative->time, vertices, diagnostic))
             {
+                skinScope.Cancel();
                 return false;
             }
+            skinScope.Complete(1u);
             const VkDeviceSize byteSize = sizeof(horde::scene::SkinnedRtVertex) * vertices.size();
             if (!resources.WriteBuffer(skeletonGpus_[bucket].vertices,
                                        vertices.data(),
                                        byteSize,
                                        bucket == 0u ? "animated skeleton pose 0 vertex" : "animated skeleton pose 1 vertex",
-                                       diagnostic))
+                                       diagnostic,
+                                       observation))
             {
                 return false;
             }
@@ -352,13 +359,17 @@ bool CharacterRenderSlot::PrepareFrame(
         const int clipIndex = static_cast<int>(framePlan.lichClip);
         if (CharacterPoseNeedsRefresh(clipIndex, framePlan.lichTime, lastLichClip_, lastLichUpdateTime_))
         {
+            RtSceneStageScope skinScope(
+                observation, horde::telemetry::RtStage::CharacterSkin);
             if (!lichModel_.SkinTextured(framePlan.lichClip, framePlan.lichTime, lichSkinnedVertices_, diagnostic))
             {
+                skinScope.Cancel();
                 return false;
             }
+            skinScope.Complete(1u);
             const VkDeviceSize byteSize = sizeof(horde::scene::TexturedSkinnedRtVertex) * lichSkinnedVertices_.size();
             if (!resources.WriteBuffer(lichGpu_.vertices, lichSkinnedVertices_.data(), byteSize,
-                                       "animated lich vertex", diagnostic) ||
+                                       "animated lich vertex", diagnostic, observation) ||
                 !UpdateLichStaffSample(diagnostic))
             {
                 return false;
@@ -370,6 +381,25 @@ bool CharacterRenderSlot::PrepareFrame(
     }
     diagnostic.clear();
     return true;
+}
+
+void CharacterRenderSlot::AccumulateResourceInventory(
+    horde::telemetry::RtResourceInventory& inventory) const noexcept
+{
+    const auto accumulate = [&inventory](const RtUpdatableTriangleBlas& gpu) {
+        AccumulateRtGpuBuffer(inventory, gpu.vertices);
+        AccumulateRtGpuBuffer(inventory, gpu.accelerationStructure.backing);
+        AccumulateRtGpuBuffer(inventory, gpu.updateScratch);
+        if (gpu.accelerationStructure.handle != VK_NULL_HANDLE)
+        {
+            AccumulateRtResourceCount(inventory.bottomLevelAccelerationStructureCount);
+        }
+    };
+    for (const auto& gpu : skeletonGpus_)
+    {
+        accumulate(gpu);
+    }
+    accumulate(lichGpu_);
 }
 
 std::array<VkAccelerationStructureInstanceKHR, CharacterRenderSlot::kMaximumActiveSkeletons>

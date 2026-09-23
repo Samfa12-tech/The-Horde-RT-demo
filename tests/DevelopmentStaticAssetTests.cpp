@@ -4,6 +4,7 @@
 #include "vulkan/raytracing/DevelopmentStaticAssetPolicy.h"
 
 #include <cmath>
+#include <cstdint>
 #include <filesystem>
 #include <iostream>
 #include <string>
@@ -23,6 +24,30 @@ void Check(bool condition, std::string_view message)
     }
 }
 
+struct StepFixedObservationCounter
+{
+    std::uint32_t started = 0u;
+    std::uint32_t completed = 0u;
+    bool active = false;
+    bool invalidPairing = false;
+};
+
+void BeginObservedStepFixed(void* user) noexcept
+{
+    auto& counter = *static_cast<StepFixedObservationCounter*>(user);
+    counter.invalidPairing = counter.invalidPairing || counter.active;
+    counter.active = true;
+    ++counter.started;
+}
+
+void CompleteObservedStepFixed(void* user) noexcept
+{
+    auto& counter = *static_cast<StepFixedObservationCounter*>(user);
+    counter.invalidPairing = counter.invalidPairing || !counter.active;
+    counter.active = false;
+    ++counter.completed;
+}
+
 } // namespace
 
 int main()
@@ -38,8 +63,21 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 36u,
-          "thirty-six isolated render-development, lantern stress, wall, pitch, and chest-clearance checkpoints are exposed");
+    Check(kDevelopmentCheckpoints.size() == 44u,
+          "forty-four isolated render-development checkpoints include the eight dedicated viewmodel poses");
+    int viewmodelId = 136;
+    for (const auto name : {"player-viewmodel-grips", "player-viewmodel-forward",
+                           "player-viewmodel-downward-cut", "player-viewmodel-upward-slice",
+                           "player-viewmodel-look-up", "player-viewmodel-look-down",
+                           "player-viewmodel-lantern-high", "player-viewmodel-lantern-low"})
+    {
+        const auto* viewmodel = FindDevelopmentCheckpoint(name);
+        Check(viewmodel != nullptr && viewmodel->id == viewmodelId &&
+                  FindDevelopmentCheckpoint(viewmodelId) == viewmodel &&
+                  FindShowcaseCheckpoint(name) == nullptr,
+              "viewmodel pose has a stable development-only name/ID and never enters the release route");
+        ++viewmodelId;
+    }
     const DevelopmentCheckpoint* checkpoint = FindDevelopmentCheckpoint("pbr-sword-closeup");
     Check(checkpoint != nullptr && checkpoint->id == 100 && checkpoint->baseShowcaseCheckpointId == 0 &&
               checkpoint->name == std::string_view("pbr-sword-closeup") &&
@@ -155,36 +193,60 @@ int main()
     horde::gameplay::simulation::GameSimulation stagedUpward;
     DevelopmentCheckpointStageEvidence downwardEvidence{};
     DevelopmentCheckpointStageEvidence upwardEvidence{};
+    StepFixedObservationCounter downwardStepCount{};
+    StepFixedObservationCounter upwardStepCount{};
+    const DevelopmentCheckpointStepFixedObservation downwardStepObservation{
+        &downwardStepCount, BeginObservedStepFixed, CompleteObservedStepFixed};
+    const DevelopmentCheckpointStepFixedObservation upwardStepObservation{
+        &upwardStepCount, BeginObservedStepFixed, CompleteObservedStepFixed};
     Check(downward != nullptr &&
               StageDevelopmentCheckpointSimulation(stagedDownward, *downward,
-                                                   &downwardEvidence) &&
+                                                   &downwardEvidence,
+                                                   &downwardStepObservation) &&
               stagedDownward.Snapshot().playerCombat.action ==
                   PlayerCombatAction::SwingActive &&
               downwardEvidence.actionTime >=
                   SwordCombat::kSwingActiveDuration - 0.025f &&
               downwardEvidence.consumedAttackEdges == 1u &&
-              downwardEvidence.playerSwingEvents == 1u && stagedDownward.Events().Empty(),
-          "downward capture must stage one exact shared swing before freezing feedback");
+              downwardEvidence.playerSwingEvents == 1u && stagedDownward.Events().Empty() &&
+              downwardStepCount.started == downwardStepCount.completed &&
+              downwardStepCount.completed == stagedDownward.Snapshot().tickIndex &&
+              downwardStepCount.completed > 1u && !downwardStepCount.active &&
+              !downwardStepCount.invalidPairing,
+          "downward capture must stage one exact shared swing and observe every helper-owned fixed step before freezing feedback");
     Check(upward != nullptr &&
               StageDevelopmentCheckpointSimulation(stagedUpward, *upward,
-                                                   &upwardEvidence) &&
+                                                   &upwardEvidence,
+                                                   &upwardStepObservation) &&
               stagedUpward.Snapshot().playerCombat.action ==
                   PlayerCombatAction::UpwardSliceActive &&
               upwardEvidence.actionTime >=
                   SwordCombat::kUpwardSliceActiveDuration - 0.025f &&
               upwardEvidence.consumedAttackEdges == 2u &&
-              upwardEvidence.playerSwingEvents == 2u && stagedUpward.Events().Empty(),
-          "upward capture must stage two exact shared swings before freezing feedback");
+              upwardEvidence.playerSwingEvents == 2u && stagedUpward.Events().Empty() &&
+              upwardStepCount.started == upwardStepCount.completed &&
+              upwardStepCount.completed == stagedUpward.Snapshot().tickIndex &&
+              upwardStepCount.completed > downwardStepCount.completed &&
+              !upwardStepCount.active && !upwardStepCount.invalidPairing,
+          "upward capture must stage two exact shared swings and observe every helper-owned fixed step before freezing feedback");
     horde::gameplay::simulation::GameSimulation stagedHigh;
     horde::gameplay::simulation::GameSimulation stagedLow;
     horde::gameplay::simulation::GameSimulation stagedGlassTransmission;
     horde::gameplay::simulation::GameSimulation stagedMotionExtreme;
-    Check(heldHigh != nullptr && StageDevelopmentCheckpointSimulation(stagedHigh, *heldHigh) &&
+    StepFixedObservationCounter restStepCount{};
+    const DevelopmentCheckpointStepFixedObservation restStepObservation{
+        &restStepCount, BeginObservedStepFixed, CompleteObservedStepFixed};
+    Check(heldHigh != nullptr &&
+              StageDevelopmentCheckpointSimulation(
+                  stagedHigh, *heldHigh, nullptr, &restStepObservation) &&
               stagedHigh.Snapshot().interaction.heldLightPose ==
                   interactions::HeldLightPose::High &&
               stagedHigh.Snapshot().lanternPendulum.forwardAngleRadians == 0.0f &&
-              stagedHigh.Snapshot().lanternPendulum.torsionAngleRadians == 0.0f,
-          "held-high checkpoint imports a frozen rest pendulum and real high carry state");
+              stagedHigh.Snapshot().lanternPendulum.torsionAngleRadians == 0.0f &&
+              restStepCount.started == 1u && restStepCount.completed == 1u &&
+              restStepCount.completed == stagedHigh.Snapshot().tickIndex &&
+              !restStepCount.active && !restStepCount.invalidPairing,
+          "held-high checkpoint imports a frozen rest pendulum and observes its one helper-owned fixed step");
     Check(heldLow != nullptr && StageDevelopmentCheckpointSimulation(stagedLow, *heldLow) &&
               stagedLow.Snapshot().interaction.heldLightPose ==
                   interactions::HeldLightPose::Low &&

@@ -185,7 +185,7 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
         ? sceneShadowTransmittanceMask(offsetRayOrigin(h, localDirection),
                                   localDirection, localDistance - 0.02, 0x35u)
         : vec3(0.0);
-    int skySample = int((gl_LaunchIDEXT.x + gl_LaunchIDEXT.y) & 1u);
+    int skySample = int((HORDE_RT_PIXEL_ID.x + HORDE_RT_PIXEL_ID.y) & 1u);
     vec3 skyDirection;
     float skyDistance;
     vec3 skyRadiance;

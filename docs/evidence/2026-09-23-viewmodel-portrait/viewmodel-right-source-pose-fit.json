@@ -1,0 +1,493 @@
+{
+  "bindSha256": "194aab2874993c68b0ab5950ed82085564e8567b9a5f8126f27ceb11283f5e06",
+  "poses": {
+    "player-viewmodel-grips": {
+      "objSha256": "18db5a4727f5a80bfee5c9ba361bc55f3d6e176970a687f8dd1de73f3a5cc3a3",
+      "fit": {
+        "Left": {
+          "cuffVsSolvedForearmDot": 0.9068106598149132,
+          "estimatedAdditionalGripRollDegrees": -5.404620231737263,
+          "wristContinuityMetres": 1.9129312852487684e-07,
+          "solvedElbow": [
+            0.18658602155181414,
+            1.2032692145074602,
+            -0.014334925134604548
+          ],
+          "solvedWrist": [
+            0.19127547618998242,
+            1.050307660813579,
+            0.1387108080401931
+          ],
+          "cuffAxis": [
+            0.07111428929516517,
+            0.3511175649206871,
+            -0.9336269134200291
+          ],
+          "handFit": {
+            "samples": 5610,
+            "maxFitError": 1.71390181491482e-07
+          },
+          "forearmFit": {
+            "samples": 864,
+            "maxFitError": 1.542555527755951e-07
+          }
+        },
+        "Right": {
+          "cuffVsSolvedForearmDot": 0.7687283442238402,
+          "estimatedAdditionalGripRollDegrees": 29.115586773011117,
+          "wristContinuityMetres": 4.1697014913545425e-07,
+          "solvedElbow": [
+            -0.1807922747452777,
+            1.1951941968323545,
+            0.09167631807585397
+          ],
+          "solvedWrist": [
+            -0.18932983312187024,
+            0.9980374413257123,
+            0.2196244830416736
+          ],
+          "cuffAxis": [
+            -0.5327783994578099,
+            0.4943510355501031,
+            -0.6868509523337032
+          ],
+          "handFit": {
+            "samples": 5610,
+            "maxFitError": 1.290135555054306e-07
+          },
+          "forearmFit": {
+            "samples": 670,
+            "maxFitError": 1.522747907489741e-07
+          }
+        }
+      }
+    },
+    "player-viewmodel-upward-slice": {
+      "objSha256": "9d1e6210e1e7be480eae5058b0446b9cf3a530d3b6aaf275c8b12e80e77670ea",
+      "fit": {
+        "Left": {
+          "cuffVsSolvedForearmDot": 0.946334952981239,
+          "estimatedAdditionalGripRollDegrees": -3.896392444536612,
+          "wristContinuityMetres": 1.1796622873536607e-07,
+          "solvedElbow": [
+            0.18741899594241174,
+            1.199671909637152,
+            -0.03151911790828965
+          ],
+          "solvedWrist": [
+            0.18686449404700545,
+            1.0693415589015292,
+            0.14126947164503573
+          ],
+          "cuffAxis": [
+            0.07111429011174616,
+            0.3176344355119712,
+            -0.9455427664145571
+          ],
+          "handFit": {
+            "samples": 5610,
+            "maxFitError": 1.7126323348382044e-07
+          },
+          "forearmFit": {
+            "samples": 864,
+            "maxFitError": 1.352832530443493e-07
+          }
+        },
+        "Right": {
+          "cuffVsSolvedForearmDot": 0.4306337893567407,
+          "estimatedAdditionalGripRollDegrees": -29.39965063751181,
+          "wristContinuityMetres": 4.6662966803089463e-07,
+          "solvedElbow": [
+            -0.1326607755241852,
+            1.2328445851222631,
+            0.07282792275219252
+          ],
+          "solvedWrist": [
+            -0.0788579414491562,
+            1.3243743486432207,
+            0.24884686176605234
+          ],
+          "cuffAxis": [
+            -0.6752227125972075,
+            0.49001639627792104,
+            -0.5513240605775052
+          ],
+          "handFit": {
+            "samples": 5610,
+            "maxFitError": 1.5562166888472007e-07
+          },
+          "forearmFit": {
+            "samples": 670,
+            "maxFitError": 1.5907953687666065e-07
+          }
+        }
+      }
+    },
+    "player-viewmodel-downward-cut": {
+      "objSha256": "0016fb5717e32770219d436e9abf98c40af83e00fd43fabb47f6ab56fcf7dfc7",
+      "fit": {
+        "Left": {
+          "cuffVsSolvedForearmDot": 0.9443452799727411,
+          "estimatedAdditionalGripRollDegrees": -4.125427898778568,
+          "wristContinuityMetres": 1.6310843196813214e-07,
+          "solvedElbow": [
+            0.18780625642659543,
+            1.1997846853242402,
+            -0.0310827052236482
+          ],
+          "solvedWrist": [
+            0.18807363386620257,
+            1.0685212804727753,
+            0.1409988665608029
+          ],
+          "cuffAxis": [
+            0.07111428963326835,
+            0.31763445133939167,
+            -0.9455427611336672
+          ],
+          "handFit": {
+            "samples": 5610,
+            "maxFitError": 1.7109662148184768e-07
+          },
+          "forearmFit": {
+            "samples": 864,
+            "maxFitError": 1.3550643429560694e-07
+          }
+        },
+        "Right": {
+          "cuffVsSolvedForearmDot": 0.9351615057528558,
+          "estimatedAdditionalGripRollDegrees": -19.464194640324134,
+          "wristContinuityMetres": 2.5504428092813937e-07,
+          "solvedElbow": [
+            -0.07058232020508631,
+            1.1093022344973142,
+            -0.03167266210252717
+          ],
+          "solvedWrist": [
+            0.004700415420664461,
+            0.8473543898613428,
+            0.004109777330549069
+          ],
+          "cuffAxis": [
+            0.0844727024626163,
+            0.9860685503377085,
+            -0.14329402141594172
+          ],
+          "handFit": {
+            "samples": 5610,
+            "maxFitError": 1.7109807732076932e-07
+          },
+          "forearmFit": {
+            "samples": 670,
+            "maxFitError": 1.53974387864797e-07
+          }
+        }
+      }
+    },
+    "player-viewmodel-forward": {
+      "objSha256": "107c91e6169dfd804102267e9581eeb686086fd6493f2da36f6a46fa559d550d",
+      "fit": {
+        "Left": {
+          "cuffVsSolvedForearmDot": 0.9983020661751064,
+          "estimatedAdditionalGripRollDegrees": -2.8113087566181,
+          "wristContinuityMetres": 1.457281986689783e-07,
+          "solvedElbow": [
+            0.196067079718009,
+            1.1962990836667395,
+            -0.07200054918469406
+          ],
+          "solvedWrist": [
+            0.19127547618998242,
+            1.1804176984872352,
+            0.14379341980250476
+          ],
+          "cuffAxis": [
+            0.07111427985503779,
+            0.10454690863851676,
+            -0.9919741443681025
+          ],
+          "handFit": {
+            "samples": 5610,
+            "maxFitError": 1.71390181491482e-07
+          },
+          "forearmFit": {
+            "samples": 864,
+            "maxFitError": 1.66455750294503e-07
+          }
+        },
+        "Right": {
+          "cuffVsSolvedForearmDot": 0.8512191772198533,
+          "estimatedAdditionalGripRollDegrees": 31.473847189706657,
+          "wristContinuityMetres": 4.963340310851513e-07,
+          "solvedElbow": [
+            -0.1918686253565935,
+            1.2126438396611885,
+            0.03943918675866581
+          ],
+          "solvedWrist": [
+            -0.1893302870732546,
+            1.1502144649405817,
+            0.2352740449445403
+          ],
+          "cuffAxis": [
+            -0.5327784192229441,
+            0.3053382649997782,
+            -0.7892500870682411
+          ],
+          "handFit": {
+            "samples": 5610,
+            "maxFitError": 1.2052694869923997e-07
+          },
+          "forearmFit": {
+            "samples": 670,
+            "maxFitError": 1.5981599355008314e-07
+          }
+        }
+      }
+    },
+    "player-viewmodel-lantern-high": {
+      "objSha256": "d43961f2ab3819673ea13294743179bfee6a55e1cf0e3a587ec29b1ae603933a",
+      "fit": {
+        "Left": {
+          "cuffVsSolvedForearmDot": 0.9951502815195459,
+          "estimatedAdditionalGripRollDegrees": -3.8138778350131504,
+          "wristContinuityMetres": 1.9979350576206922e-07,
+          "solvedElbow": [
+            0.16273136522839682,
+            1.3614297973267038,
+            0.29967169429743523
+          ],
+          "solvedWrist": [
+            0.16127586240961533,
+            1.279050405154914,
+            0.5982309796413005
+          ],
+          "cuffAxis": [
+            0.07111428634888581,
+            0.33453336491594915,
+            -0.9396968585853105
+          ],
+          "handFit": {
+            "samples": 5610,
+            "maxFitError": 1.71645306024093e-07
+          },
+          "forearmFit": {
+            "samples": 864,
+            "maxFitError": 1.74627571292163e-07
+          }
+        },
+        "Right": {
+          "cuffVsSolvedForearmDot": 0.7666875426070778,
+          "estimatedAdditionalGripRollDegrees": 29.068923435008045,
+          "wristContinuityMetres": 3.9937874481659425e-07,
+          "solvedElbow": [
+            -0.18079046118729902,
+            1.200520481463332,
+            0.09268783619340581
+          ],
+          "solvedWrist": [
+            -0.18932998410831692,
+            1.007355275382595,
+            0.22135269118632783
+          ],
+          "cuffAxis": [
+            -0.5327783489199246,
+            0.4821134070331475,
+            -0.6954954303811418
+          ],
+          "handFit": {
+            "samples": 5610,
+            "maxFitError": 1.258583129382096e-07
+          },
+          "forearmFit": {
+            "samples": 670,
+            "maxFitError": 1.653640213095109e-07
+          }
+        }
+      }
+    },
+    "player-viewmodel-lantern-low": {
+      "objSha256": "08c1b93c294611829b6dd5b20b258b0125407552f24cc2bde6f38cdb6c63575a",
+      "fit": {
+        "Left": {
+          "cuffVsSolvedForearmDot": 0.9790441442371995,
+          "estimatedAdditionalGripRollDegrees": -3.7911746054587177,
+          "wristContinuityMetres": 1.5319484897884564e-07,
+          "solvedElbow": [
+            0.16274134043053706,
+            1.2610322190315373,
+            0.26400815385136445
+          ],
+          "solvedWrist": [
+            0.16127586240961533,
+            1.0997197004093588,
+            0.5354659171592766
+          ],
+          "cuffAxis": [
+            0.07111428527925151,
+            0.33453340373727886,
+            -0.9396968448458108
+          ],
+          "handFit": {
+            "samples": 5610,
+            "maxFitError": 1.71645306024093e-07
+          },
+          "forearmFit": {
+            "samples": 864,
+            "maxFitError": 1.633499817632611e-07
+          }
+        },
+        "Right": {
+          "cuffVsSolvedForearmDot": 0.7666875426070778,
+          "estimatedAdditionalGripRollDegrees": 29.068923435008045,
+          "wristContinuityMetres": 3.9937874481659425e-07,
+          "solvedElbow": [
+            -0.18079046118729902,
+            1.200520481463332,
+            0.09268783619340581
+          ],
+          "solvedWrist": [
+            -0.18932998410831692,
+            1.007355275382595,
+            0.22135269118632783
+          ],
+          "cuffAxis": [
+            -0.5327783489199246,
+            0.4821134070331475,
+            -0.6954954303811418
+          ],
+          "handFit": {
+            "samples": 5610,
+            "maxFitError": 1.258583129382096e-07
+          },
+          "forearmFit": {
+            "samples": 670,
+            "maxFitError": 1.653640213095109e-07
+          }
+        }
+      }
+    },
+    "player-viewmodel-look-down": {
+      "objSha256": "18db5a4727f5a80bfee5c9ba361bc55f3d6e176970a687f8dd1de73f3a5cc3a3",
+      "fit": {
+        "Left": {
+          "cuffVsSolvedForearmDot": 0.9068106598149132,
+          "estimatedAdditionalGripRollDegrees": -5.404620231737263,
+          "wristContinuityMetres": 1.9129312852487684e-07,
+          "solvedElbow": [
+            0.18658602155181414,
+            1.2032692145074602,
+            -0.014334925134604548
+          ],
+          "solvedWrist": [
+            0.19127547618998242,
+            1.050307660813579,
+            0.1387108080401931
+          ],
+          "cuffAxis": [
+            0.07111428929516517,
+            0.3511175649206871,
+            -0.9336269134200291
+          ],
+          "handFit": {
+            "samples": 5610,
+            "maxFitError": 1.71390181491482e-07
+          },
+          "forearmFit": {
+            "samples": 864,
+            "maxFitError": 1.542555527755951e-07
+          }
+        },
+        "Right": {
+          "cuffVsSolvedForearmDot": 0.7687283442238402,
+          "estimatedAdditionalGripRollDegrees": 29.115586773011117,
+          "wristContinuityMetres": 4.1697014913545425e-07,
+          "solvedElbow": [
+            -0.1807922747452777,
+            1.1951941968323545,
+            0.09167631807585397
+          ],
+          "solvedWrist": [
+            -0.18932983312187024,
+            0.9980374413257123,
+            0.2196244830416736
+          ],
+          "cuffAxis": [
+            -0.5327783994578099,
+            0.4943510355501031,
+            -0.6868509523337032
+          ],
+          "handFit": {
+            "samples": 5610,
+            "maxFitError": 1.290135555054306e-07
+          },
+          "forearmFit": {
+            "samples": 670,
+            "maxFitError": 1.522747907489741e-07
+          }
+        }
+      }
+    },
+    "player-viewmodel-look-up": {
+      "objSha256": "c971950cb821cffec6d6df79a081160cb414116be6b0d015ac43a2443c6c7fba",
+      "fit": {
+        "Left": {
+          "cuffVsSolvedForearmDot": 0.7311687216477398,
+          "estimatedAdditionalGripRollDegrees": -1.502216984348408,
+          "wristContinuityMetres": 1.329238356109459e-07,
+          "solvedElbow": [
+            0.19859676670119614,
+            1.210938482952122,
+            0.007479953011896523
+          ],
+          "solvedWrist": [
+            0.1912755120041294,
+            1.3895739470144084,
+            0.1294552286082878
+          ],
+          "cuffAxis": [
+            0.0711142519916135,
+            -0.21838949365417748,
+            -0.9732670713761693
+          ],
+          "handFit": {
+            "samples": 5610,
+            "maxFitError": 1.6898023516564997e-07
+          },
+          "forearmFit": {
+            "samples": 864,
+            "maxFitError": 1.2559945861134736e-07
+          }
+        },
+        "Right": {
+          "cuffVsSolvedForearmDot": 0.5808079998515221,
+          "estimatedAdditionalGripRollDegrees": 38.89168579706934,
+          "wristContinuityMetres": 5.789210868270875e-07,
+          "solvedElbow": [
+            -0.2005912087878202,
+            1.2407124397429325,
+            0.08517861674265415
+          ],
+          "solvedWrist": [
+            -0.18933021242614112,
+            1.3902338441199842,
+            0.22579069617422853
+          ],
+          "cuffAxis": [
+            -0.5327783405008994,
+            0.03671644019091736,
+            -0.845457948636604
+          ],
+          "handFit": {
+            "samples": 5610,
+            "maxFitError": 1.221434990927861e-07
+          },
+          "forearmFit": {
+            "samples": 670,
+            "maxFitError": 1.8087641429076484e-07
+          }
+        }
+      }
+    }
+  }
+}

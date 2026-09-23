@@ -1,0 +1,2 @@
+Unequal folded IK: elbow=(0,0.3,0), upper=0.3, lower=0.360555
+FAIL: reachable unequal-arm fold must preserve both segment lengths and signed elbow projection

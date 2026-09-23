@@ -3,12 +3,15 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <string_view>
 #include <vector>
 
 namespace horde::scene
 {
+
+namespace assets { class StaticMeshAsset; }
 
 using SkinnedNodeTransform = std::array<float, 16u>;
 
@@ -69,6 +72,8 @@ struct SkinnedPrimitiveRange
     std::size_t firstExpandedVertex = 0u;
     std::size_t expandedVertexCount = 0u;
     std::string materialName;
+    std::size_t firstUniqueVertex = 0u;
+    std::size_t uniqueVertexCount = 0u;
 };
 
 struct SkinnedArmIkTarget
@@ -87,6 +92,29 @@ struct SkinnedPlayerSockets
     SkinnedNodeTransform rightHand{};
     SkinnedNodeTransform leftGrip{};
     SkinnedNodeTransform rightGrip{};
+};
+
+struct SkinnedPlayerPoseData;
+struct SkinnedPlayerRigLayout;
+
+// One solved animation/IK pose may drive multiple independently owned meshes.
+// Consumers cannot edit the palette or substitute their own grip transforms.
+class SkinnedPlayerPose
+{
+public:
+    SkinnedPlayerPose();
+    ~SkinnedPlayerPose();
+    SkinnedPlayerPose(SkinnedPlayerPose&&) noexcept;
+    SkinnedPlayerPose& operator=(SkinnedPlayerPose&&) noexcept;
+    SkinnedPlayerPose(const SkinnedPlayerPose&) = delete;
+    SkinnedPlayerPose& operator=(const SkinnedPlayerPose&) = delete;
+    bool IsValid() const;
+    // Borrowed until this pose is evaluated/reset/destroyed; copy for retention.
+    const SkinnedPlayerSockets& Sockets() const;
+
+private:
+    friend class SkinnedMeshAsset;
+    std::unique_ptr<SkinnedPlayerPoseData> data_;
 };
 
 const SkinnedClipSet& SkeletonCombatClipSet();
@@ -112,6 +140,10 @@ public:
     bool HasTangents() const { return hasTangents_; }
     std::size_t ExpandedVertexCount() const { return expandedIndices_.size(); }
     std::size_t UniqueVertexCount() const;
+    // Static indices/UVs remain resident while skinning replaces positions,
+    // normals and tangents. Validate their exact addressing before GPU upload.
+    bool ValidateStaticVertexLayout(const assets::StaticMeshAsset& asset,
+                                    std::string& diagnostic) const;
     std::size_t BootGroundingCandidateVertexCount() const
     {
         return bootGroundingVertexIndices_.size();
@@ -142,6 +174,16 @@ public:
                                   std::vector<SkinnedPbrTangent>& outputTangents,
                                   SkinnedPlayerSockets& sockets,
                                   std::string& diagnostic) const;
+    bool EvaluatePlayerPose(SkinnedClip clip, float timeSeconds,
+                            const SkinnedArmIkTarget& leftArm,
+                            const SkinnedArmIkTarget& rightArm,
+                            SkinnedPlayerPose& pose, std::string& diagnostic) const;
+    // Requires exact ordered joint names and inverse-bind agreement. A successful
+    // binding is cached by immutable rig identity, never by raw asset addresses.
+    bool SkinPlayerPoseUniqueTextured(const SkinnedPlayerPose& pose,
+                                      std::vector<TexturedSkinnedRtVertex>& output,
+                                      std::vector<SkinnedPbrTangent>& outputTangents,
+                                      std::string& diagnostic) const;
 
 private:
     struct SourceVertex;
@@ -161,6 +203,8 @@ private:
     std::vector<std::uint32_t> bootGroundingVertexIndices_;
     mutable std::vector<SkinnedRtVertex> skinnedUniqueVertices_;
     mutable std::vector<SkinnedRtVertex> texturedSkinScratch_;
+    std::shared_ptr<const SkinnedPlayerRigLayout> playerRigLayout_;
+    mutable std::weak_ptr<const SkinnedPlayerRigLayout> compatiblePoseRig_;
     bool hasTexcoords_ = false;
     bool hasTangents_ = false;
     bool loaded_ = false;

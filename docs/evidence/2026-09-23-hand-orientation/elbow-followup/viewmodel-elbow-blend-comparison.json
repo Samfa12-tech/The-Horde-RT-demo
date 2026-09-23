@@ -1,0 +1,819 @@
+{
+  "bindGlbSha256": "1e3b041ee7aa896a84fe462c182f6012d026b4a577b2d4ddf59d764b823f2538",
+  "baseline": {
+    "player-viewmodel-grips": {
+      "objSha256": "d44ca3e48382061b6aefd28e951c8e095a1d873451ea8ca992f87bd766c0af35",
+      "vertexCount": 23162,
+      "faceCount": 14370,
+      "primitives": {
+        "ViewmodelSleeves": {
+          "faceCount": 5532,
+          "vertexCount": 4635,
+          "bounds": [
+            [
+              -0.243623316,
+              0.282939255
+            ],
+            [
+              0.952991366,
+              1.44853032
+            ],
+            [
+              -0.129549533,
+              0.223490953
+            ]
+          ],
+          "posedEdgeMetres": {
+            "max": 0.09180193843140147,
+            "p99": 0.051458008868700625,
+            "median": 0.013285839939145923
+          },
+          "stretchRatio": {
+            "max": 4.0140314031882935,
+            "p99": 1.990605968184007,
+            "median": 1.0533829352957662,
+            "gt2": 51,
+            "gt3": 2,
+            "gt4": 1,
+            "gt5": 0
+          },
+          "normalAlignment": {
+            "count": 5532,
+            "negative": 148,
+            "lt0_5": 193,
+            "lt0_9": 427,
+            "minimum": -0.9987570506598404,
+            "median": 0.9962275602171515
+          },
+          "degenerateFaces": 0,
+          "topStretch": [
+            {
+              "face": 4536,
+              "vertices": [
+                2428,
+                2430,
+                1496
+              ],
+              "posedEdgeMetres": 0.028597159749289874,
+              "bindEdgeMetres": 0.007124298959538662,
+              "ratio": 4.0140314031882935
+            },
+            {
+              "face": 291,
+              "vertices": [
+                1498,
+                2355,
+                2354
+              ],
+              "posedEdgeMetres": 0.024046735040695235,
+              "bindEdgeMetres": 0.007949522366805633,
+              "ratio": 3.0249282826230934
+            },
+            {
+              "face": 4657,
+              "vertices": [
+                2354,
+                2355,
+                2320
+              ],
+              "posedEdgeMetres": 0.0226681954838402,
+              "bindEdgeMetres": 0.007949548239523221,
+              "ratio": 2.85150738140558
+            },
+            {
+              "face": 2410,
+              "vertices": [
+                3933,
+                3934,
+                3935
+              ],
+              "posedEdgeMetres": 0.04466765264215798,
+              "bindEdgeMetres": 0.016613090671724232,
+              "ratio": 2.688702152103648
+            },
+            {
+              "face": 2411,
+              "vertices": [
+                3934,
+                206,
+                3935
+              ],
+              "posedEdgeMetres": 0.04466765264215798,
+              "bindEdgeMetres": 0.016613090671724232,
+              "ratio": 2.688702152103648
+            }
+          ]
+        },
+        "ViewmodelGauntlets": {
+          "faceCount": 8838,
+          "vertexCount": 18527,
+          "bounds": [
+            [
+              -0.213331223,
+              0.258577168
+            ],
+            [
+              0.927637935,
+              1.07580328
+            ],
+            [
+              0.119889617,
+              0.308603168
+            ]
+          ],
+          "posedEdgeMetres": {
+            "max": 0.03889281272035189,
+            "p99": 0.015087271232038636,
+            "median": 0.0042979063823852725
+          },
+          "stretchRatio": {
+            "max": 1.0000947319327533,
+            "p99": 1.0000358339299178,
+            "median": 0.9999995260985988,
+            "gt2": 0,
+            "gt3": 0,
+            "gt4": 0,
+            "gt5": 0
+          },
+          "normalAlignment": {
+            "count": 8838,
+            "negative": 0,
+            "lt0_5": 0,
+            "lt0_9": 4,
+            "minimum": 0.887254392281001,
+            "median": 0.9952714945019056
+          },
+          "degenerateFaces": 0,
+          "topStretch": [
+            {
+              "face": 3059,
+              "vertices": [
+                4687,
+                4697,
+                4652
+              ],
+              "posedEdgeMetres": 0.001152107505896039,
+              "bindEdgeMetres": 0.0011519983748634595,
+              "ratio": 1.0000947319327533
+            },
+            {
+              "face": 4706,
+              "vertices": [
+                9074,
+                9067,
+                9080
+              ],
+              "posedEdgeMetres": 0.0016214716497447439,
+              "bindEdgeMetres": 0.0016213241798660094,
+              "ratio": 1.0000909564420033
+            },
+            {
+              "face": 1032,
+              "vertices": [
+                1769,
+                1753,
+                1763
+              ],
+              "posedEdgeMetres": 0.0016414036846827149,
+              "bindEdgeMetres": 0.001641266552834669,
+              "ratio": 1.000083552453932
+            },
+            {
+              "face": 6075,
+              "vertices": [
+                8088,
+                10822,
+                8065
+              ],
+              "posedEdgeMetres": 0.001944722800367714,
+              "bindEdgeMetres": 0.0019445777612202028,
+              "ratio": 1.000074586447713
+            },
+            {
+              "face": 1335,
+              "vertices": [
+                2251,
+                2332,
+                2312
+              ],
+              "posedEdgeMetres": 0.0023652695166859273,
+              "bindEdgeMetres": 0.0023650974196743396,
+              "ratio": 1.0000727652950598
+            }
+          ]
+        }
+      }
+    },
+    "player-viewmodel-lantern-high": {
+      "objSha256": "7f6657d26b070148aea65c57600ca5ed123871c40b37225fb3a7ea916249e615",
+      "vertexCount": 23162,
+      "faceCount": 14370,
+      "primitives": {
+        "ViewmodelSleeves": {
+          "faceCount": 5532,
+          "vertexCount": 4635,
+          "bounds": [
+            [
+              -0.243604779,
+              0.274007976
+            ],
+            [
+              0.960976362,
+              1.47902942
+            ],
+            [
+              -0.0928764045,
+              0.650164127
+            ]
+          ],
+          "posedEdgeMetres": {
+            "max": 0.09168553995351686,
+            "p99": 0.062024876222752816,
+            "median": 0.01452522738445819
+          },
+          "stretchRatio": {
+            "max": 3.967423318713252,
+            "p99": 2.410306837102453,
+            "median": 1.131968423645445,
+            "gt2": 122,
+            "gt3": 23,
+            "gt4": 0,
+            "gt5": 0
+          },
+          "normalAlignment": {
+            "count": 5532,
+            "negative": 148,
+            "lt0_5": 198,
+            "lt0_9": 412,
+            "minimum": -0.9973981907591651,
+            "median": 0.996540201490577
+          },
+          "degenerateFaces": 0,
+          "topStretch": [
+            {
+              "face": 4536,
+              "vertices": [
+                2428,
+                2430,
+                1496
+              ],
+              "posedEdgeMetres": 0.02826510982155825,
+              "bindEdgeMetres": 0.007124298959538662,
+              "ratio": 3.967423318713252
+            },
+            {
+              "face": 2410,
+              "vertices": [
+                3933,
+                3934,
+                3935
+              ],
+              "posedEdgeMetres": 0.06464478875369126,
+              "bindEdgeMetres": 0.016613090671724232,
+              "ratio": 3.8911958064322016
+            },
+            {
+              "face": 2411,
+              "vertices": [
+                3934,
+                206,
+                3935
+              ],
+              "posedEdgeMetres": 0.06464478875369126,
+              "bindEdgeMetres": 0.016613090671724232,
+              "ratio": 3.8911958064322016
+            },
+            {
+              "face": 2382,
+              "vertices": [
+                3955,
+                3957,
+                194
+              ],
+              "posedEdgeMetres": 0.04510016897920919,
+              "bindEdgeMetres": 0.011761101114113158,
+              "ratio": 3.834689332369536
+            },
+            {
+              "face": 941,
+              "vertices": [
+                879,
+                3724,
+                3696
+              ],
+              "posedEdgeMetres": 0.042551128187497934,
+              "bindEdgeMetres": 0.01134389373980497,
+              "ratio": 3.7510161117067637
+            }
+          ]
+        },
+        "ViewmodelGauntlets": {
+          "faceCount": 8838,
+          "vertexCount": 18527,
+          "bounds": [
+            [
+              -0.213331342,
+              0.22857821
+            ],
+            [
+              0.937823534,
+              1.30559683
+            ],
+            [
+              0.163579419,
+              0.695255399
+            ]
+          ],
+          "posedEdgeMetres": {
+            "max": 0.038892869109632154,
+            "p99": 0.015087287229495186,
+            "median": 0.004297823883375622
+          },
+          "stretchRatio": {
+            "max": 1.0001007475740071,
+            "p99": 1.0000395907475212,
+            "median": 0.9999995986422633,
+            "gt2": 0,
+            "gt3": 0,
+            "gt4": 0,
+            "gt5": 0
+          },
+          "normalAlignment": {
+            "count": 8838,
+            "negative": 0,
+            "lt0_5": 0,
+            "lt0_9": 4,
+            "minimum": 0.887199099450396,
+            "median": 0.9952689804268782
+          },
+          "degenerateFaces": 0,
+          "topStretch": [
+            {
+              "face": 5451,
+              "vertices": [
+                9480,
+                9465,
+                9492
+              ],
+              "posedEdgeMetres": 0.001641437115855204,
+              "bindEdgeMetres": 0.0016412717617069258,
+              "ratio": 1.0001007475740071
+            },
+            {
+              "face": 1024,
+              "vertices": [
+                1712,
+                1652,
+                2576
+              ],
+              "posedEdgeMetres": 0.0019621017999325013,
+              "bindEdgeMetres": 0.0019619369627657435,
+              "ratio": 1.000084017565236
+            },
+            {
+              "face": 218,
+              "vertices": [
+                1878,
+                1883,
+                1887
+              ],
+              "posedEdgeMetres": 0.0020766747134596856,
+              "bindEdgeMetres": 0.0020765066102473887,
+              "ratio": 1.0000809548168386
+            },
+            {
+              "face": 1032,
+              "vertices": [
+                1769,
+                1753,
+                1763
+              ],
+              "posedEdgeMetres": 0.001641394594119543,
+              "bindEdgeMetres": 0.001641266552834669,
+              "ratio": 1.0000780137051186
+            },
+            {
+              "face": 4634,
+              "vertices": [
+                11910,
+                11857,
+                11917
+              ],
+              "posedEdgeMetres": 0.001973549978589345,
+              "bindEdgeMetres": 0.001973397909394922,
+              "ratio": 1.0000770595700437
+            }
+          ]
+        }
+      }
+    }
+  },
+  "correctedGrip": {
+    "player-viewmodel-grips": {
+      "objSha256": "31919d942509a028f4a8be523d14f54413db611078d43ad13342ed6b6d01843f",
+      "vertexCount": 23162,
+      "faceCount": 14370,
+      "primitives": {
+        "ViewmodelSleeves": {
+          "faceCount": 5532,
+          "vertexCount": 4635,
+          "bounds": [
+            [
+              -0.241397887,
+              0.283228308
+            ],
+            [
+              0.952991366,
+              1.44853032
+            ],
+            [
+              -0.129549533,
+              0.223490953
+            ]
+          ],
+          "posedEdgeMetres": {
+            "max": 0.06332675368372927,
+            "p99": 0.04811431851257582,
+            "median": 0.012795970941969692
+          },
+          "stretchRatio": {
+            "max": 1.953997596564759,
+            "p99": 1.4999118535040565,
+            "median": 1.0455793071026995,
+            "gt2": 0,
+            "gt3": 0,
+            "gt4": 0,
+            "gt5": 0
+          },
+          "normalAlignment": {
+            "count": 5532,
+            "negative": 110,
+            "lt0_5": 191,
+            "lt0_9": 338,
+            "minimum": -0.9897765747348831,
+            "median": 0.9946870547442104
+          },
+          "degenerateFaces": 0,
+          "topStretch": [
+            {
+              "face": 3053,
+              "vertices": [
+                3484,
+                127,
+                3485
+              ],
+              "posedEdgeMetres": 0.012795970941969692,
+              "bindEdgeMetres": 0.0065486114028316875,
+              "ratio": 1.953997596564759
+            },
+            {
+              "face": 3051,
+              "vertices": [
+                3437,
+                3485,
+                120
+              ],
+              "posedEdgeMetres": 0.012581494855446296,
+              "bindEdgeMetres": 0.0065485295534788756,
+              "ratio": 1.9212702260406591
+            },
+            {
+              "face": 3052,
+              "vertices": [
+                3437,
+                3484,
+                3485
+              ],
+              "posedEdgeMetres": 0.012581494855446296,
+              "bindEdgeMetres": 0.0065485295534788756,
+              "ratio": 1.9212702260406591
+            },
+            {
+              "face": 826,
+              "vertices": [
+                105,
+                3484,
+                3437
+              ],
+              "posedEdgeMetres": 0.012302692829010572,
+              "bindEdgeMetres": 0.006548545862630788,
+              "ratio": 1.8786907944274722
+            },
+            {
+              "face": 4536,
+              "vertices": [
+                2428,
+                2430,
+                1496
+              ],
+              "posedEdgeMetres": 0.012729259935758764,
+              "bindEdgeMetres": 0.007124298959538662,
+              "ratio": 1.7867385981487578
+            }
+          ]
+        },
+        "ViewmodelGauntlets": {
+          "faceCount": 8838,
+          "vertexCount": 18527,
+          "bounds": [
+            [
+              -0.213331223,
+              0.258577168
+            ],
+            [
+              0.927637935,
+              1.07580328
+            ],
+            [
+              0.119889617,
+              0.308603168
+            ]
+          ],
+          "posedEdgeMetres": {
+            "max": 0.03889281272035189,
+            "p99": 0.015087271232038636,
+            "median": 0.0042979063823852725
+          },
+          "stretchRatio": {
+            "max": 1.0000947319327533,
+            "p99": 1.0000358339299178,
+            "median": 0.9999995260985988,
+            "gt2": 0,
+            "gt3": 0,
+            "gt4": 0,
+            "gt5": 0
+          },
+          "normalAlignment": {
+            "count": 8838,
+            "negative": 0,
+            "lt0_5": 0,
+            "lt0_9": 4,
+            "minimum": 0.887254392281001,
+            "median": 0.9952714945019056
+          },
+          "degenerateFaces": 0,
+          "topStretch": [
+            {
+              "face": 3059,
+              "vertices": [
+                4687,
+                4697,
+                4652
+              ],
+              "posedEdgeMetres": 0.001152107505896039,
+              "bindEdgeMetres": 0.0011519983748634595,
+              "ratio": 1.0000947319327533
+            },
+            {
+              "face": 4706,
+              "vertices": [
+                9074,
+                9067,
+                9080
+              ],
+              "posedEdgeMetres": 0.0016214716497447439,
+              "bindEdgeMetres": 0.0016213241798660094,
+              "ratio": 1.0000909564420033
+            },
+            {
+              "face": 1032,
+              "vertices": [
+                1769,
+                1753,
+                1763
+              ],
+              "posedEdgeMetres": 0.0016414036846827149,
+              "bindEdgeMetres": 0.001641266552834669,
+              "ratio": 1.000083552453932
+            },
+            {
+              "face": 6075,
+              "vertices": [
+                8088,
+                10822,
+                8065
+              ],
+              "posedEdgeMetres": 0.001944722800367714,
+              "bindEdgeMetres": 0.0019445777612202028,
+              "ratio": 1.000074586447713
+            },
+            {
+              "face": 1335,
+              "vertices": [
+                2251,
+                2332,
+                2312
+              ],
+              "posedEdgeMetres": 0.0023652695166859273,
+              "bindEdgeMetres": 0.0023650974196743396,
+              "ratio": 1.0000727652950598
+            }
+          ]
+        }
+      }
+    },
+    "player-viewmodel-lantern-high": {
+      "objSha256": "14e64fcac2d656be1d042d25eb9b8eb23c2c68a730ef471a7d0add9a0afcf54e",
+      "vertexCount": 23162,
+      "faceCount": 14370,
+      "primitives": {
+        "ViewmodelSleeves": {
+          "faceCount": 5532,
+          "vertexCount": 4635,
+          "bounds": [
+            [
+              -0.241396636,
+              0.274007976
+            ],
+            [
+              0.960976362,
+              1.47902942
+            ],
+            [
+              -0.0928764045,
+              0.650164127
+            ]
+          ],
+          "posedEdgeMetres": {
+            "max": 0.08431888579986468,
+            "p99": 0.057603130633064326,
+            "median": 0.013959333104871529
+          },
+          "stretchRatio": {
+            "max": 2.7964241644908956,
+            "p99": 1.88173856536534,
+            "median": 1.1236595424113542,
+            "gt2": 38,
+            "gt3": 0,
+            "gt4": 0,
+            "gt5": 0
+          },
+          "normalAlignment": {
+            "count": 5532,
+            "negative": 118,
+            "lt0_5": 193,
+            "lt0_9": 334,
+            "minimum": -0.9916690022517016,
+            "median": 0.9951019542763029
+          },
+          "degenerateFaces": 0,
+          "topStretch": [
+            {
+              "face": 3053,
+              "vertices": [
+                3484,
+                127,
+                3485
+              ],
+              "posedEdgeMetres": 0.018312695170739152,
+              "bindEdgeMetres": 0.0065486114028316875,
+              "ratio": 2.7964241644908956
+            },
+            {
+              "face": 3051,
+              "vertices": [
+                3437,
+                3485,
+                120
+              ],
+              "posedEdgeMetres": 0.017835335495491992,
+              "bindEdgeMetres": 0.0065485295534788756,
+              "ratio": 2.7235634121887795
+            },
+            {
+              "face": 3052,
+              "vertices": [
+                3437,
+                3484,
+                3485
+              ],
+              "posedEdgeMetres": 0.017835335495491992,
+              "bindEdgeMetres": 0.0065485295534788756,
+              "ratio": 2.7235634121887795
+            },
+            {
+              "face": 826,
+              "vertices": [
+                105,
+                3484,
+                3437
+              ],
+              "posedEdgeMetres": 0.017373924215997028,
+              "bindEdgeMetres": 0.006548545862630788,
+              "ratio": 2.653096516455837
+            },
+            {
+              "face": 3122,
+              "vertices": [
+                3437,
+                120,
+                3438
+              ],
+              "posedEdgeMetres": 0.02569993284308894,
+              "bindEdgeMetres": 0.01042395409676467,
+              "ratio": 2.4654687275594918
+            }
+          ]
+        },
+        "ViewmodelGauntlets": {
+          "faceCount": 8838,
+          "vertexCount": 18527,
+          "bounds": [
+            [
+              -0.213331342,
+              0.22857821
+            ],
+            [
+              0.937823534,
+              1.30559683
+            ],
+            [
+              0.163579419,
+              0.695255399
+            ]
+          ],
+          "posedEdgeMetres": {
+            "max": 0.038892869109632154,
+            "p99": 0.015087287229495186,
+            "median": 0.004297823883375622
+          },
+          "stretchRatio": {
+            "max": 1.0001007475740071,
+            "p99": 1.0000395907475212,
+            "median": 0.9999995986422633,
+            "gt2": 0,
+            "gt3": 0,
+            "gt4": 0,
+            "gt5": 0
+          },
+          "normalAlignment": {
+            "count": 8838,
+            "negative": 0,
+            "lt0_5": 0,
+            "lt0_9": 4,
+            "minimum": 0.887199099450396,
+            "median": 0.9952689804268782
+          },
+          "degenerateFaces": 0,
+          "topStretch": [
+            {
+              "face": 5451,
+              "vertices": [
+                9480,
+                9465,
+                9492
+              ],
+              "posedEdgeMetres": 0.001641437115855204,
+              "bindEdgeMetres": 0.0016412717617069258,
+              "ratio": 1.0001007475740071
+            },
+            {
+              "face": 1024,
+              "vertices": [
+                1712,
+                1652,
+                2576
+              ],
+              "posedEdgeMetres": 0.0019621017999325013,
+              "bindEdgeMetres": 0.0019619369627657435,
+              "ratio": 1.000084017565236
+            },
+            {
+              "face": 218,
+              "vertices": [
+                1878,
+                1883,
+                1887
+              ],
+              "posedEdgeMetres": 0.0020766747134596856,
+              "bindEdgeMetres": 0.0020765066102473887,
+              "ratio": 1.0000809548168386
+            },
+            {
+              "face": 1032,
+              "vertices": [
+                1769,
+                1753,
+                1763
+              ],
+              "posedEdgeMetres": 0.001641394594119543,
+              "bindEdgeMetres": 0.001641266552834669,
+              "ratio": 1.0000780137051186
+            },
+            {
+              "face": 4634,
+              "vertices": [
+                11910,
+                11857,
+                11917
+              ],
+              "posedEdgeMetres": 0.001973549978589345,
+              "bindEdgeMetres": 0.001973397909394922,
+              "ratio": 1.0000770595700437
+            }
+          ]
+        }
+      }
+    }
+  }
+}

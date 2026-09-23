@@ -1,4 +1,5 @@
 #include "scene/assets/AssetManifest.h"
+#include "scene/assets/PlayerPrimitiveContract.h"
 
 #include <algorithm>
 #include <array>
@@ -554,6 +555,43 @@ bool ParseMaterialOverrides(JsonReader& reader, AssetManifest& manifest)
     });
 }
 
+bool ParsePrimitiveSemantics(JsonReader& reader, AssetManifest& manifest)
+{
+    return reader.Array([&](std::size_t index) {
+        if (index >= kPlayerPrimitiveContract.size()) return false;
+        AssetPrimitiveSemantic declaration;
+        std::array<bool, 4> present{};
+        const bool parsed = reader.Object([&](const std::string& key) {
+            if (key == "material") return present[0] = reader.String(declaration.material);
+            if (key == "firstPersonPrimary") return present[1] = reader.Boolean(declaration.firstPersonPrimary);
+            if (key == "shadow") return present[2] = reader.Boolean(declaration.shadow);
+            if (key == "reflection") return present[3] = reader.Boolean(declaration.reflection);
+            return reader.RejectField("primitiveSemantics", key);
+        });
+        if (!parsed || !std::all_of(present.begin(), present.end(), [](bool value) { return value; }))
+            return false;
+        manifest.primitiveSemantics.push_back(std::move(declaration));
+        return true;
+    });
+}
+
+bool ParsePlayerAssetRole(JsonReader& reader, AssetManifest& manifest)
+{
+    std::string role;
+    if (!reader.String(role)) return false;
+    if (role == "WorldBody")
+    {
+        manifest.playerAssetRole = PlayerAssetRole::WorldBody;
+        return true;
+    }
+    if (role == "Viewmodel")
+    {
+        manifest.playerAssetRole = PlayerAssetRole::Viewmodel;
+        return true;
+    }
+    return false;
+}
+
 bool ParseManifest(std::string_view text, AssetManifest& manifest, std::string& diagnostic)
 {
     JsonReader reader(text);
@@ -614,6 +652,15 @@ bool ParseManifest(std::string_view text, AssetManifest& manifest, std::string& 
             hasMaterialOverrides = ParseMaterialOverrides(reader, manifest);
             return hasMaterialOverrides;
         }
+        if (key == "primitiveSemantics")
+        {
+            manifest.hasPrimitiveSemantics = true;
+            return ParsePrimitiveSemantics(reader, manifest);
+        }
+        if (key == "playerAssetRole")
+        {
+            return ParsePlayerAssetRole(reader, manifest);
+        }
         if (key == "distribution" || key == "licenceStatus")
         {
             std::string ignored;
@@ -637,10 +684,95 @@ bool ParseManifest(std::string_view text, AssetManifest& manifest, std::string& 
         return false;
     }
     manifest.metresPerUnit = static_cast<float>(metresPerUnit);
+    if (!manifest.ValidatePlayerAssetRole(diagnostic)) return false;
     return true;
 }
 
 } // namespace
+
+bool AssetManifest::ValidatePlayerSemantics(std::string& diagnostic) const
+{
+    switch (playerAssetRole)
+    {
+    case PlayerAssetRole::Unspecified:
+    case PlayerAssetRole::WorldBody:
+        break;
+    case PlayerAssetRole::Viewmodel:
+        diagnostic = "World-body player semantics cannot validate a Viewmodel asset role.";
+        return false;
+    default:
+        diagnostic = "Player asset role is invalid.";
+        return false;
+    }
+    if (primitiveSemantics.size() != kPlayerPrimitiveContract.size())
+    {
+        diagnostic = "Player manifest requires exactly four primitive semantics.";
+        return false;
+    }
+    std::array<PlayerPrimitiveDeclaration, kPlayerPrimitiveContract.size()> declarations{};
+    for (std::size_t i = 0; i < declarations.size(); ++i)
+    {
+        const auto& source = primitiveSemantics[i];
+        declarations[i] = {source.material, source.firstPersonPrimary, source.shadow, source.reflection};
+    }
+    return ValidatePlayerPrimitiveDeclarations(declarations, diagnostic);
+}
+
+bool AssetManifest::ValidatePlayerViewmodelSemantics(std::string& diagnostic) const
+{
+    if (playerAssetRole != PlayerAssetRole::Viewmodel)
+    {
+        diagnostic = playerAssetRole == PlayerAssetRole::Unspecified
+            ? "Player viewmodel semantics require an explicit Viewmodel asset role."
+            : "Player viewmodel semantics require the Viewmodel asset role.";
+        return false;
+    }
+    if (primitiveSemantics.size() != kPlayerViewmodelPrimitiveContract.size())
+    {
+        diagnostic = "Player viewmodel manifest requires exactly two primitive semantics.";
+        return false;
+    }
+    std::array<PlayerViewmodelPrimitiveDeclaration,
+               kPlayerViewmodelPrimitiveContract.size()> declarations{};
+    for (std::size_t i = 0u; i < declarations.size(); ++i)
+    {
+        const auto& source = primitiveSemantics[i];
+        declarations[i] = {source.material, source.firstPersonPrimary,
+                            source.shadow, source.reflection};
+    }
+    return ValidatePlayerViewmodelPrimitiveDeclarations(declarations, diagnostic);
+}
+
+bool AssetManifest::ValidatePlayerAssetRole(std::string& diagnostic) const
+{
+    const bool hasDeclarations = hasPrimitiveSemantics || !primitiveSemantics.empty();
+    switch (playerAssetRole)
+    {
+    case PlayerAssetRole::Unspecified:
+        if (!hasDeclarations)
+        {
+            diagnostic.clear();
+            return true;
+        }
+        return ValidatePlayerSemantics(diagnostic);
+    case PlayerAssetRole::WorldBody:
+        if (!hasDeclarations)
+        {
+            diagnostic = "WorldBody player asset role requires primitive semantics.";
+            return false;
+        }
+        return ValidatePlayerSemantics(diagnostic);
+    case PlayerAssetRole::Viewmodel:
+        if (!hasDeclarations)
+        {
+            diagnostic = "Viewmodel player asset role requires primitive semantics.";
+            return false;
+        }
+        return ValidatePlayerViewmodelSemantics(diagnostic);
+    }
+    diagnostic = "Player asset role is invalid.";
+    return false;
+}
 
 bool AssetManifest::Load(const std::filesystem::path& path,
                          AssetManifest& manifest,

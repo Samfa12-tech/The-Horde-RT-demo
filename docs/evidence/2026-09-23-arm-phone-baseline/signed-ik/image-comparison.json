@@ -1,0 +1,71 @@
+[
+  {
+    "file": "capture-01-player-viewmodel-grips-75.png",
+    "pixels": 4492800,
+    "changedPixels": 0,
+    "pixelsOverOne": 0,
+    "maxChannelDelta": 0,
+    "bbox": null
+  },
+  {
+    "file": "capture-02-player-viewmodel-forward-75.png",
+    "pixels": 4492800,
+    "changedPixels": 2,
+    "pixelsOverOne": 0,
+    "maxChannelDelta": 1,
+    "bbox": [
+      301,
+      1499,
+      303,
+      1500
+    ]
+  },
+  {
+    "file": "capture-03-player-viewmodel-downward-cut-75.png",
+    "pixels": 4492800,
+    "changedPixels": 0,
+    "pixelsOverOne": 0,
+    "maxChannelDelta": 0,
+    "bbox": null
+  },
+  {
+    "file": "capture-04-player-viewmodel-upward-slice-75.png",
+    "pixels": 4492800,
+    "changedPixels": 0,
+    "pixelsOverOne": 0,
+    "maxChannelDelta": 0,
+    "bbox": null
+  },
+  {
+    "file": "capture-05-player-viewmodel-look-up-75.png",
+    "pixels": 4492800,
+    "changedPixels": 0,
+    "pixelsOverOne": 0,
+    "maxChannelDelta": 0,
+    "bbox": null
+  },
+  {
+    "file": "capture-06-player-viewmodel-look-down-75.png",
+    "pixels": 4492800,
+    "changedPixels": 0,
+    "pixelsOverOne": 0,
+    "maxChannelDelta": 0,
+    "bbox": null
+  },
+  {
+    "file": "capture-07-player-viewmodel-lantern-high-75.png",
+    "pixels": 4492800,
+    "changedPixels": 0,
+    "pixelsOverOne": 0,
+    "maxChannelDelta": 0,
+    "bbox": null
+  },
+  {
+    "file": "capture-08-player-viewmodel-lantern-low-75.png",
+    "pixels": 4492800,
+    "changedPixels": 0,
+    "pixelsOverOne": 0,
+    "maxChannelDelta": 0,
+    "bbox": null
+  }
+]

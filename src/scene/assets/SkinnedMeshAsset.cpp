@@ -1,4 +1,5 @@
 #include "scene/assets/SkinnedMeshAsset.h"
+#include "scene/assets/StaticMeshAsset.h"
 
 #include <algorithm>
 #include <array>
@@ -416,6 +417,30 @@ struct SkinnedMeshAsset::Clip
     bool loops = false;
 };
 
+struct SkinnedPlayerRigLayout
+{
+    std::vector<std::string> jointNames;
+    std::vector<float> inverseBindMatrices;
+};
+
+struct SkinnedPlayerPoseData
+{
+    std::vector<Matrix> skinMatrices;
+    std::shared_ptr<const SkinnedPlayerRigLayout> rig;
+    SkinnedPlayerSockets sockets{};
+};
+
+SkinnedPlayerPose::SkinnedPlayerPose() : data_(std::make_unique<SkinnedPlayerPoseData>()) {}
+SkinnedPlayerPose::~SkinnedPlayerPose() = default;
+SkinnedPlayerPose::SkinnedPlayerPose(SkinnedPlayerPose&&) noexcept = default;
+SkinnedPlayerPose& SkinnedPlayerPose::operator=(SkinnedPlayerPose&&) noexcept = default;
+bool SkinnedPlayerPose::IsValid() const { return data_ && data_->rig; }
+const SkinnedPlayerSockets& SkinnedPlayerPose::Sockets() const
+{
+    static const SkinnedPlayerSockets empty{};
+    return IsValid() ? data_->sockets : empty;
+}
+
 const SkinnedClipSet& SkeletonCombatClipSet()
 {
     static const SkinnedClipSet clips{{{
@@ -583,6 +608,8 @@ bool SkinnedMeshAsset::LoadCombatClips(const std::string& glbPath, std::string& 
 bool SkinnedMeshAsset::LoadClips(const std::string& glbPath, const SkinnedClipSet& clipSet, std::string& diagnostic)
 {
     loaded_ = false;
+    playerRigLayout_.reset();
+    compatiblePoseRig_.reset();
     hasTexcoords_ = false;
     hasTangents_ = false;
     vertices_.clear(); expandedIndices_.clear(); primitiveRanges_.clear(); nodes_.clear(); joints_.clear(); inverseBindMatrices_.clear(); clips_.clear(); idleBootMinimumY_.clear(); walkingBootMinimumY_.clear(); bootGroundingVertexIndices_.clear(); skinnedUniqueVertices_.clear(); texturedSkinScratch_.clear();
@@ -710,8 +737,13 @@ bool SkinnedMeshAsset::LoadClips(const std::string& glbPath, const SkinnedClipSe
                 vertex.tangent = {ReadFloat(binary, tangents, i, 0u),
                                   ReadFloat(binary, tangents, i, 1u),
                                   ReadFloat(binary, tangents, i, 2u)};
-                vertex.tangentSign = ReadFloat(binary, tangents, i, 3u) < 0.0f
-                    ? -1.0f : 1.0f;
+                const float sign = ReadFloat(binary, tangents, i, 3u);
+                if (!std::isfinite(sign))
+                {
+                    diagnostic = "Skinned GLB tangent handedness is not finite.";
+                    return false;
+                }
+                vertex.tangentSign = sign < 0.0f ? -1.0f : 1.0f;
             }
             if (primitiveHasTexcoords)
             {
@@ -724,11 +756,25 @@ bool SkinnedMeshAsset::LoadClips(const std::string& glbPath, const SkinnedClipSe
                     ReadUnsigned(binary, joints, i, component));
                 vertex.weights[component] = ReadFloat(binary, weights, i, component);
             }
+            for (const float value : {vertex.position.x, vertex.position.y, vertex.position.z,
+                    vertex.normal.x, vertex.normal.y, vertex.normal.z,
+                    vertex.tangent.x, vertex.tangent.y, vertex.tangent.z,
+                    vertex.texcoord[0], vertex.texcoord[1],
+                    vertex.weights[0], vertex.weights[1], vertex.weights[2], vertex.weights[3]})
+            {
+                if (!std::isfinite(value))
+                {
+                    diagnostic = "Skinned GLB vertex attribute is not finite.";
+                    return false;
+                }
+            }
         }
 
         SkinnedPrimitiveRange range;
         range.firstExpandedVertex = expandedIndices_.size();
         range.expandedVertexCount = indices.count;
+        range.firstUniqueVertex = vertexBase;
+        range.uniqueVertexCount = positions.count;
         if (const JsonValue* materialIndex = primitive.Find("material");
             materialIndex != nullptr && materialValues != nullptr &&
             materialValues->type == JsonType::Array &&
@@ -823,8 +869,34 @@ bool SkinnedMeshAsset::LoadClips(const std::string& glbPath, const SkinnedClipSe
             }
         }
         if (const JsonValue* children = node.Find("children"); children != nullptr)
+        {
             for (const JsonValue& child : children->array)
-                if (child.Uint() < nodes_.size()) nodes_[child.Uint()].parent = static_cast<int>(nodeIndex);
+            {
+                if (child.type != JsonType::Number || child.number < 0.0 ||
+                    child.number >= static_cast<double>(nodes_.size()) ||
+                    std::floor(child.number) != child.number ||
+                    nodes_[child.Uint()].parent >= 0)
+                {
+                    diagnostic = "Skinned GLB hierarchy has an invalid child or multiple parents.";
+                    return false;
+                }
+                nodes_[child.Uint()].parent = static_cast<int>(nodeIndex);
+            }
+        }
+    }
+    for (std::size_t node = 0u; node < nodes_.size(); ++node)
+    {
+        int ancestor = static_cast<int>(node);
+        std::size_t depth = 0u;
+        while (ancestor >= 0)
+        {
+            if (++depth > nodes_.size())
+            {
+                diagnostic = "Skinned GLB hierarchy contains a cycle.";
+                return false;
+            }
+            ancestor = nodes_[static_cast<std::size_t>(ancestor)].parent;
+        }
     }
     const JsonValue& skin = (*skins)[0];
     const JsonValue* skinJoints = skin.Find("joints");
@@ -838,7 +910,15 @@ bool SkinnedMeshAsset::LoadClips(const std::string& glbPath, const SkinnedClipSe
         return false;
     }
     inverseBindMatrices_.resize(inverseBinds.count * 16u);
-    for (std::size_t i = 0u; i < inverseBindMatrices_.size(); ++i) inverseBindMatrices_[i] = ReadFloat(binary, inverseBinds, i / 16u, i % 16u);
+    for (std::size_t i = 0u; i < inverseBindMatrices_.size(); ++i)
+    {
+        inverseBindMatrices_[i] = ReadFloat(binary, inverseBinds, i / 16u, i % 16u);
+        if (!std::isfinite(inverseBindMatrices_[i]))
+        {
+            diagnostic = "Skinned GLB inverse-bind matrix is not finite.";
+            return false;
+        }
+    }
 
     for (std::size_t clipIndex = 0u; clipIndex < clipSet.clips.size(); ++clipIndex)
     {
@@ -880,6 +960,13 @@ bool SkinnedMeshAsset::LoadClips(const std::string& glbPath, const SkinnedClipSe
             const JsonValue* targetNode = target == nullptr ? nullptr : target->Find("node");
             const JsonValue* path = target == nullptr ? nullptr : target->Find("path");
             if (samplerIndex == nullptr || targetNode == nullptr || path == nullptr || samplerIndex->Uint() >= samplers->array.size()) continue;
+            if (targetNode->type != JsonType::Number || targetNode->number < 0.0 ||
+                targetNode->number >= static_cast<double>(nodes_.size()) ||
+                std::floor(targetNode->number) != targetNode->number)
+            {
+                diagnostic = "Skinned animation channel has an invalid target node.";
+                return false;
+            }
             const JsonValue& sampler = samplers->array[samplerIndex->Uint()];
             const JsonValue* input = sampler.Find("input");
             const JsonValue* output = sampler.Find("output");
@@ -888,6 +975,12 @@ bool SkinnedMeshAsset::LoadClips(const std::string& glbPath, const SkinnedClipSe
             if (!ReadAccessor(*accessors, *views, input->Uint(), inputAccessor, diagnostic) || !ReadAccessor(*accessors, *views, output->Uint(), outputAccessor, diagnostic) ||
                 inputAccessor.componentType != 5126u || outputAccessor.componentType != 5126u || inputAccessor.count != outputAccessor.count ||
                 (path->string != "translation" && path->string != "rotation" && path->string != "scale")) return false;
+            if (inputAccessor.components != 1u || inputAccessor.count == 0u ||
+                outputAccessor.components != (path->string == "rotation" ? 4u : 3u))
+            {
+                diagnostic = "Skinned animation channel accessor shape is invalid.";
+                return false;
+            }
             Channel channel;
             channel.node = targetNode->Uint();
             channel.path = path->string == "rotation" ? Channel::Path::Rotation : (path->string == "scale" ? Channel::Path::Scale : Channel::Path::Translation);
@@ -896,9 +989,23 @@ bool SkinnedMeshAsset::LoadClips(const std::string& glbPath, const SkinnedClipSe
             for (std::size_t key = 0u; key < channel.times.size(); ++key)
             {
                 channel.times[key] = ReadFloat(binary, inputAccessor, key, 0u);
+                if (!std::isfinite(channel.times[key]) || channel.times[key] < 0.0f ||
+                    (key > 0u && channel.times[key] <= channel.times[key - 1u]))
+                {
+                    diagnostic = "Skinned animation key times must be finite and increasing.";
+                    return false;
+                }
                 clip.duration = std::max(clip.duration, channel.times[key]);
                 for (std::size_t component = 0u; component < outputAccessor.components; ++component) channel.values[key][component] = ReadFloat(binary, outputAccessor, key, component);
                 if (outputAccessor.components == 3u) channel.values[key][3u] = 0.0f;
+                for (const float value : channel.values[key])
+                {
+                    if (!std::isfinite(value))
+                    {
+                        diagnostic = "Skinned animation channel value is not finite.";
+                        return false;
+                    }
+                }
             }
             clip.channels.push_back(std::move(channel));
         }
@@ -909,6 +1016,18 @@ bool SkinnedMeshAsset::LoadClips(const std::string& glbPath, const SkinnedClipSe
         }
         clips_.push_back(std::move(clip));
     }
+    auto rig = std::make_shared<SkinnedPlayerRigLayout>();
+    rig->inverseBindMatrices = inverseBindMatrices_;
+    for (const auto joint : joints_)
+    {
+        if (joint >= nodes_.size())
+        {
+            diagnostic = "Skinned rig joint node is invalid.";
+            return false;
+        }
+        rig->jointNames.push_back(nodes_[joint].name);
+    }
+    playerRigLayout_ = std::move(rig);
     loaded_ = true;
     diagnostic.clear();
     return true;
@@ -1032,6 +1151,45 @@ bool SkinnedMeshAsset::BootGroundingMinimumY(
         diagnostic = "Exact player boot grounding exceeded the audited +/-75 mm envelope.";
         return false;
     }
+    diagnostic.clear();
+    return true;
+}
+
+bool SkinnedMeshAsset::ValidateStaticVertexLayout(const assets::StaticMeshAsset& asset,
+                                                 std::string& diagnostic) const
+{
+    const auto reject = [&diagnostic]() {
+        diagnostic = "Skinned/static vertex layout disagrees on primitive identity, indices or UV ordering.";
+        return false;
+    };
+    if (!loaded_ || !hasTexcoords_ || asset.vertices.size() != vertices_.size() ||
+        asset.indices.size() != expandedIndices_.size() ||
+        asset.primitives.size() != primitiveRanges_.size()) return reject();
+    for (std::size_t i = 0; i < primitiveRanges_.size(); ++i)
+    {
+        const auto& skin = primitiveRanges_[i];
+        const auto& fixed = asset.primitives[i];
+        if (fixed.materialIndex >= asset.materials.size() ||
+            asset.materials[fixed.materialIndex].name != skin.materialName ||
+            fixed.vertexOffset != skin.firstUniqueVertex ||
+            fixed.indexOffset != skin.firstExpandedVertex ||
+            fixed.indexCount != skin.expandedVertexCount ||
+            skin.firstUniqueVertex > vertices_.size() ||
+            skin.uniqueVertexCount > vertices_.size() - skin.firstUniqueVertex ||
+            skin.firstExpandedVertex > expandedIndices_.size() ||
+            skin.expandedVertexCount > expandedIndices_.size() - skin.firstExpandedVertex)
+            return reject();
+        for (std::size_t j = 0; j < skin.expandedVertexCount; ++j)
+        {
+            const auto local = asset.indices[skin.firstExpandedVertex + j];
+            if (local >= skin.uniqueVertexCount ||
+                skin.firstUniqueVertex + local != expandedIndices_[skin.firstExpandedVertex + j])
+                return reject();
+        }
+    }
+    for (std::size_t i = 0; i < vertices_.size(); ++i)
+        if (asset.vertices[i].uv0[0] != vertices_[i].texcoord[0] ||
+            asset.vertices[i].uv0[1] != vertices_[i].texcoord[1]) return reject();
     diagnostic.clear();
     return true;
 }
@@ -1279,9 +1437,52 @@ bool SkinnedMeshAsset::SkinPlayerUniqueTextured(
     SkinnedPlayerSockets& sockets,
     std::string& diagnostic) const
 {
+    SkinnedPlayerPose pose;
+    if (!EvaluatePlayerPose(clipId, timeSeconds, leftArm, rightArm, pose, diagnostic) ||
+        !SkinPlayerPoseUniqueTextured(pose, output, outputTangents, diagnostic))
+    {
+        output.clear();
+        outputTangents.clear();
+        sockets = {};
+        return false;
+    }
+    sockets = pose.Sockets();
+    return true;
+}
+
+bool SkinnedMeshAsset::EvaluatePlayerPose(
+    const SkinnedClip clipId, const float timeSeconds,
+    const SkinnedArmIkTarget& leftArm, const SkinnedArmIkTarget& rightArm,
+    SkinnedPlayerPose& outputPose, std::string& diagnostic) const
+{
+    if (!outputPose.data_) outputPose.data_ = std::make_unique<SkinnedPlayerPoseData>();
+    auto& solved = *outputPose.data_;
+    solved.rig.reset();
+    solved.skinMatrices.clear();
+    solved.sockets = {};
+    auto& sockets = solved.sockets;
     if (!loaded_ || !hasTexcoords_ || !hasTangents_)
     {
         diagnostic = "Textured PBR player model was not loaded.";
+        return false;
+    }
+    if (!std::isfinite(timeSeconds))
+    {
+        diagnostic = "Player pose time is not finite.";
+        return false;
+    }
+    const auto finiteArm = [](const SkinnedArmIkTarget& arm) {
+        for (const float value : arm.target) if (!std::isfinite(value)) return false;
+        for (const float value : arm.pole) if (!std::isfinite(value)) return false;
+        if (arm.shoulderTargetEnabled)
+            for (const float value : arm.shoulder) if (!std::isfinite(value)) return false;
+        if (arm.handOrientationTargetEnabled)
+            for (const float value : arm.handOrientation) if (!std::isfinite(value)) return false;
+        return true;
+    };
+    if (!finiteArm(leftArm) || !finiteArm(rightArm))
+    {
+        diagnostic = "Player IK target is not finite.";
         return false;
     }
     const std::size_t clipIndex = static_cast<std::size_t>(clipId);
@@ -1434,7 +1635,9 @@ bool SkinnedMeshAsset::SkinPlayerUniqueTextured(
         const float adjacent = std::clamp(
             (upperLength * upperLength + solvedDistance * solvedDistance -
              lowerLength * lowerLength) / (2.0f * solvedDistance),
-            0.0f, upperLength);
+            // A longer forearm can fold the elbow behind the shoulder along
+            // this axis. Preserve the signed projection and both bone lengths.
+            -upperLength, upperLength);
         const float height = std::sqrt(std::max(
             upperLength * upperLength - adjacent * adjacent, 0.0f));
         const Vec3 solvedElbow = Add(Add(shoulder, Scale(direction, adjacent)),
@@ -1534,7 +1737,8 @@ bool SkinnedMeshAsset::SkinPlayerUniqueTextured(
     if (!leftSolved || !rightSolved)
         return false;
 
-    std::vector<Matrix> skinMatrices(joints_.size());
+    auto& skinMatrices = solved.skinMatrices;
+    skinMatrices.resize(joints_.size());
     for (std::size_t joint = 0u; joint < joints_.size(); ++joint)
     {
         if (joints_[joint] >= globals.size())
@@ -1546,8 +1750,46 @@ bool SkinnedMeshAsset::SkinPlayerUniqueTextured(
         std::memcpy(inverse.m.data(), inverseBindMatrices_.data() + joint * 16u,
                     sizeof(float) * 16u);
         skinMatrices[joint] = Multiply(globals[joints_[joint]], inverse);
+        for (const auto value : skinMatrices[joint].m)
+        {
+            if (!std::isfinite(value))
+            {
+                diagnostic = "Player IK produced a non-finite joint palette.";
+                return false;
+            }
+        }
     }
-    skinnedUniqueVertices_.resize(vertices_.size());
+    solved.rig = playerRigLayout_;
+    diagnostic.clear();
+    return true;
+}
+
+bool SkinnedMeshAsset::SkinPlayerPoseUniqueTextured(
+    const SkinnedPlayerPose& pose, std::vector<TexturedSkinnedRtVertex>& output,
+    std::vector<SkinnedPbrTangent>& outputTangents, std::string& diagnostic) const
+{
+    if (!loaded_ || !playerRigLayout_ || !hasTexcoords_ || !hasTangents_ || !pose.IsValid() ||
+        pose.data_->skinMatrices.size() != joints_.size())
+    {
+        diagnostic = "Player mesh or shared pose is not ready for skinning.";
+        output.clear();
+        outputTangents.clear();
+        return false;
+    }
+    const auto& sourceRig = pose.data_->rig;
+    if (sourceRig != playerRigLayout_ && sourceRig != compatiblePoseRig_.lock())
+    {
+        if (sourceRig->jointNames != playerRigLayout_->jointNames ||
+            sourceRig->inverseBindMatrices != playerRigLayout_->inverseBindMatrices)
+        {
+            diagnostic = "Shared player pose requires exact joint order and inverse-bind agreement.";
+            output.clear();
+            outputTangents.clear();
+            return false;
+        }
+        compatiblePoseRig_ = sourceRig;
+    }
+    const auto& skinMatrices = pose.data_->skinMatrices;
     output.resize(vertices_.size());
     outputTangents.resize(vertices_.size());
     for (std::size_t sourceIndex = 0u; sourceIndex < vertices_.size(); ++sourceIndex)
@@ -1567,6 +1809,8 @@ bool SkinnedMeshAsset::SkinPlayerUniqueTextured(
                                  transformedNormal))
             {
                 diagnostic = "Player IK produced a non-invertible normal transform.";
+                output.clear();
+                outputTangents.clear();
                 return false;
             }
             normal = Add(normal, Scale(transformedNormal, weight));
@@ -1583,6 +1827,18 @@ bool SkinnedMeshAsset::SkinPlayerUniqueTextured(
                 normal);
         }
         tangent = Normalise(tangent);
+        for (const float value : {position.x, position.y, position.z,
+                                  normal.x, normal.y, normal.z,
+                                  tangent.x, tangent.y, tangent.z})
+        {
+            if (!std::isfinite(value))
+            {
+                diagnostic = "Shared player skinning produced a non-finite vertex.";
+                output.clear();
+                outputTangents.clear();
+                return false;
+            }
+        }
         TexturedSkinnedRtVertex& destination = output[sourceIndex];
         destination.position[0] = position.x;
         destination.position[1] = position.y;

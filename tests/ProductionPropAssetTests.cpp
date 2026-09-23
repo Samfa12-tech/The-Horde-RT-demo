@@ -571,7 +571,8 @@ ProjectedSafeFrame ProjectAuthoredBoundsToSafeFrame(
     }
     constexpr float safeMinimum = -0.90f;
     constexpr float safeMaximum = 0.90f;
-    const auto coverage = [](const float minimum, const float maximum) {
+    const auto coverage = [safeMinimum, safeMaximum](const float minimum,
+                                                      const float maximum) {
         const float span = maximum - minimum;
         if (!std::isfinite(span) || span <= 0.000001f) return 0.0f;
         const float visible = std::max(

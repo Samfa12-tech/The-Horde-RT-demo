@@ -1,0 +1,15 @@
+#version 460
+#extension GL_GOOGLE_include_directive : require
+#extension GL_EXT_ray_query : require
+
+#include "include/rt_variant_config.glsl"
+#if HORDE_RT_VARIANT_MATERIAL == HORDE_RT_MATERIAL_OPAQUE_FAST
+#define HORDE_GENERIC_TRANSMISSION_VARIANT 0
+#else
+#define HORDE_GENERIC_TRANSMISSION_VARIANT 1
+#endif
+#define HORDE_RT_COMPUTE_ENTRY
+#define HORDE_RT_PIXEL_ID gl_GlobalInvocationID
+#define HORDE_RT_PIXEL_EXTENT imageSize(outputImage)
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+#include "include/rt_frame.glsl"

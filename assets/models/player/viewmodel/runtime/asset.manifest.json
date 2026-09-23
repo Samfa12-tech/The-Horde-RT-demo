@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "asset": "gothic-traveller-viewmodel-lod0",
+  "playerAssetRole": "Viewmodel",
+  "metresPerUnit": 1.0,
+  "coordinateSystem": { "up": "+Y", "forward": "+Z" },
+  "budgets": {
+    "maxVertices": 24000,
+    "maxIndices": 44000,
+    "maxPrimitives": 2,
+    "maxMaterials": 2,
+    "maxTextureLayersPerKind": 2
+  },
+  "lods": [{ "name": "lod0", "maxTriangles": 15000 }],
+  "requiredSockets": ["LeftHand", "RightHand", "LeftGrip", "RightGrip"],
+  "runtimeTextureProfile": { "android": "astc", "windows": "rgba8", "mipmapped": true, "resolution": 1024 },
+  "materialOverrides": [],
+  "primitiveSemantics": [
+    { "material": "ViewmodelSleeves", "firstPersonPrimary": true, "shadow": false, "reflection": false },
+    { "material": "ViewmodelGauntlets", "firstPersonPrimary": true, "shadow": false, "reflection": false }
+  ],
+  "distribution": "development",
+  "licenceStatus": "Derivative of existing Meshy player/gauntlet; existing CC BY 4.0 attribution in ASSET_LICENSES.md"
+}

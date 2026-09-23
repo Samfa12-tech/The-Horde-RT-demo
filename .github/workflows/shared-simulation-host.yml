@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - codex/horde-1.6.1-engineering-pass
 
 permissions:
   contents: read
@@ -16,6 +17,17 @@ jobs:
     steps:
       - name: Check out source
         uses: actions/checkout@v6
+
+      - name: Fetch portable-test GLB assets
+        run: >-
+          git -c lfs.fetchexclude= lfs fetch
+          --include="assets/models/player/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,tests/fixtures/*/*.glb"
+          && git lfs checkout
+          "assets/models/player/runtime/*.glb"
+          "assets/models/props/runtime/*.glb"
+          "assets/models/props/runtime/*/*.glb"
+          "assets/models/weapons/runtime/*.glb"
+          "tests/fixtures/*/*.glb"
 
       - name: Configure non-hardware host tests
         run: >-
@@ -29,3 +41,71 @@ jobs:
 
       - name: Run shared gameplay tests
         run: ctest --test-dir build/host-ci --build-config Release --output-on-failure
+
+      - name: Check offline gauntlet chirality and UV winding
+        run: python3 -m unittest discover -s tests -p test_player_gauntlet_geometry.py -v
+
+      - name: Check Gradle APK artifact resolution
+        shell: pwsh
+        run: ./tools/test-resolve-android-apk.ps1
+
+      - name: Check Android combat capture expectations
+        shell: pwsh
+        run: ./tests/AndroidCombatCaptureExpectations.ps1
+
+  player-vulkan-host:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+
+      - name: Install Vulkan host development package
+        run: sudo apt-get update && sudo apt-get install --yes libvulkan-dev
+
+      - name: Fetch player smoke GLB and texture assets
+        run: >-
+          git -c lfs.fetchexclude= lfs fetch
+          --include="assets/models/enemies/meshy/*.glb,assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,assets/textures/meshy/lich_placeholder_v01/*.ktx2,tests/fixtures/*/*.glb"
+          && git lfs checkout
+          "assets/models/enemies/meshy/*.glb"
+          "assets/models/player/runtime/*.glb"
+          "assets/models/player/viewmodel/runtime/*.glb"
+          "assets/models/props/runtime/*.glb"
+          "assets/models/props/runtime/*/*.glb"
+          "assets/models/weapons/runtime/*.glb"
+          "assets/textures/meshy/lich_placeholder_v01/*.ktx2"
+          "tests/fixtures/*/*.glb"
+
+      - name: Configure Vulkan CPU-host player lane
+        run: >-
+          cmake -S . -B build/player-vulkan-host
+          -DCMAKE_BUILD_TYPE=Release
+          -DBUILD_TESTING=ON
+          -DHORDE_RT_BUILD_VULKAN_TARGETS=ON
+          -DHORDE_RT_BUILD_CAPABILITY_PROBE_EXECUTABLE=OFF
+          -DHORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW=OFF
+          -DHORDE_RT_INSTRUMENTATION_OVERRIDE=Shipping
+          -DHORDE_RT_DIELECTRIC_QUALITY_OVERRIDE=Mobile
+
+      - name: Build focused player Vulkan-host targets
+        run: >-
+          cmake --build build/player-vulkan-host
+          --config Release
+          --parallel 2
+          --target
+          horde_rt_player_primitive_contract_tests
+          horde_rt_player_animation_tests
+          horde_rt_held_item_socket_tests
+          horde_rt_scene_abi_tests
+          horde_rt_static_gltf_asset_tests
+          horde_rt_skinned_character_smoke
+          horde_rt_skinned_arm_reference_tests
+
+      - name: Run focused player contract and semantic fixtures
+        run: >-
+          ctest --test-dir build/player-vulkan-host
+          --build-config Release
+          --output-on-failure
+          --no-tests=error
+          -R "^(horde_rt_player_primitive_contract_tests|horde_rt_player_manifest_agreement_tests|horde_rt_player_animation_tests|horde_rt_held_item_socket_tests|horde_rt_scene_abi_tests|horde_rt_static_gltf_asset_tests|horde_rt_skinned_character_smoke|horde_rt_skinned_arm_reference_tests|horde_rt_player_skinned_semantic_fixtures|horde_rt_player_viewmodel_admission|horde_rt_player_viewmodel_pose_fixtures)$"

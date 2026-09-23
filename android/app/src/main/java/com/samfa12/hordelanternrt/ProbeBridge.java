@@ -48,10 +48,13 @@ public final class ProbeBridge {
     public static native int getCurrentRenderScalePercent();
     public static native int getCurrentWaterQuality();
     public static native void setGpuTimingEnabled(boolean enabled);
+    public static native void setRequiredRayQueryCompute(boolean required);
     public static native boolean requestDebugCheckpoint(int checkpointId);
     public static native boolean requestDebugCaptureCheckpoint(int checkpointId);
     public static native boolean requestDebugRouteReplay();
     public static native boolean requestBenchmark();
+    public static native boolean requestBenchmarkWithId(String runId);
+    public static native boolean requestBenchmarkWithIdAndWorkload(String runId, String workload);
     public static native void cancelBenchmark();
     public static native int getBenchmarkStatus();
     public static native String getBenchmarkProgress();

@@ -166,7 +166,9 @@ void TestAbiLayout()
               offsetof(RtInstanceMetadata, stableObjectId) == 8u &&
               offsetof(RtInstanceMetadata, flags) == 12u &&
               offsetof(RtInstanceMetadata, emitterIndex) == 16u &&
-              offsetof(RtInstanceMetadata, assetIndex) == 20u,
+              offsetof(RtInstanceMetadata, assetIndex) == 20u &&
+              offsetof(RtInstanceMetadata, geometryRole) == 24u &&
+              offsetof(RtInstanceMetadata, reserved1) == 28u,
           "RtInstanceMetadata CPU offsets match two GLSL uvec4 fields");
 
     Check(sizeof(RtPrimitiveMetadata) == 16u, "RtPrimitiveMetadata size is 16 bytes");
@@ -197,8 +199,8 @@ void TestGeneratedConstants()
     using namespace horde::vulkan::raytracing;
     Check(static_cast<std::uint32_t>(RtMaterialFlag::CertifiedClosedVolume) == 1024u,
           "topology-certified closed volume is an append-only material ABI flag");
-    Check(kRtInstanceMetadataCapacity == 20u, "instance metadata capacity retains all TLAS custom indices");
-    Check(kRtStaticAssetCapacity == 8u, "static asset capacity is 8");
+    Check(kRtInstanceMetadataCapacity == 21u, "instance metadata capacity reserves the appended viewmodel slot");
+    Check(kRtStaticAssetCapacity == 9u, "static asset capacity is 9");
     Check(kRtPrimitiveMetadataCapacity == 32u, "primitive capacity is 32");
     Check(kRtMaterialCapacity == 32u, "material capacity is 32");
     Check(kRtTextureLayerCapacity == 16u, "each PBR texture category has 16 layers");
@@ -207,8 +209,16 @@ void TestGeneratedConstants()
               kRtBindingStaticIndices == 15u && kRtBindingBaseColorTextures == 16u &&
               kRtBindingNormalTextures == 17u && kRtBindingOrmTextures == 18u &&
               kRtBindingEmissiveTextures == 19u && kRtBindingHeldLight == 20u &&
-              kRtBindingFireEmitters == 21u && kRtBindingDielectricDiagnostics == 22u,
-          "descriptor bindings append dielectric diagnostics at 22 without changing 0-21");
+              kRtBindingFireEmitters == 21u && kRtBindingDielectricDiagnostics == 22u &&
+              kRtBindingWorldPlayerVertices == 23u && kRtBindingViewmodelVertices == 24u,
+          "descriptor bindings append separate world-player and viewmodel vertex streams at 23/24");
+    Check(static_cast<std::uint32_t>(RtGeometryRole::Static) == 0u &&
+              static_cast<std::uint32_t>(RtGeometryRole::PlayerWorldBody) == 1u &&
+              static_cast<std::uint32_t>(RtGeometryRole::PlayerViewmodel) == 2u &&
+              kPlayerWorldBodyInstanceIndex == 4u &&
+              kPlayerViewmodelInstanceIndex == 20u &&
+              kPlayerViewmodelPrimaryMask == 64u,
+          "generated geometry roles and named player instance indices remain explicit");
     Check(static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr) == 1u &&
               static_cast<std::uint32_t>(RtInstanceFlag::Emissive) == 2u &&
               static_cast<std::uint32_t>(RtInstanceFlag::Transmissive) == 4u,
@@ -272,10 +282,43 @@ void TestGenericRegistrationAndMeasurements()
     Check(slot.Measurements().vertexBytes == 6u * 64u &&
               slot.Measurements().indexBytes == 6u * 4u &&
               slot.Measurements().materialBytes == 2u * 112u &&
-              slot.Measurements().instanceMetadataBytes == 20u * 32u &&
+              slot.Measurements().instanceMetadataBytes == 21u * 32u &&
               slot.Measurements().primitiveMetadataBytes == 2u * 16u &&
               slot.Measurements().descriptorCount == 9u,
           "resource measurements use literal ABI sizes and descriptor count");
+}
+
+void TestExplicitTextureGroups()
+{
+    using namespace horde::vulkan::raytracing;
+    auto asset = MakeAsset(4u, 4u);
+    // Groups are generic asset metadata, not string branches or material indices.
+    for (std::size_t i = 0; i < asset.materials.size(); ++i)
+    {
+        auto& material = asset.materials[i];
+        material.textureGroup = i == 0 ? 1 : 0;
+        material.baseColorTexture = static_cast<std::int32_t>(i);
+        material.normalTexture = static_cast<std::int32_t>(i + 4);
+    }
+    const StaticRtAssetRegistration request{3u, 1u, 1u, 0u, &asset};
+    RtStaticMeshSlot slot;
+    std::string diagnostic;
+    Check(slot.Initialize(std::span(&request, 1), diagnostic), "explicit texture groups initialize");
+    Check(slot.Materials()[0].textureLayers == std::array<std::uint32_t, 4u>{{1u, 1u, 0u, 0u}} &&
+              slot.Materials()[3].textureLayers == std::array<std::uint32_t, 4u>{{0u, 0u, 0u, 0u}},
+          "canonical group order overrides first encountered material");
+    asset.materials[2].normalTexture = -1;
+    Check(!slot.Initialize(std::span(&request, 1), diagnostic) &&
+              diagnostic == "RtStaticMeshSlot texture group has conflicting texture presence.",
+          "grouped materials cannot silently disagree on texture presence");
+    asset.materials[2].normalTexture = 6;
+    auto preceding = MakeAsset(1u, 15u);
+    for (std::size_t i = 0; i < preceding.materials.size(); ++i)
+        preceding.materials[i].baseColorTexture = static_cast<std::int32_t>(i);
+    const std::array<StaticRtAssetRegistration, 2> registrations{{{1u, 2u, 1u, 0u, &preceding}, request}};
+    Check(!slot.Initialize(registrations, diagnostic) &&
+              diagnostic == "RtStaticMeshSlot capacity overflow: baseColor texture layers exceed 16.",
+          "canonical groups still enforce bounded texture capacity");
 }
 
 void TestNamedCapacityFailures()
@@ -285,14 +328,18 @@ void TestNamedCapacityFailures()
     std::string diagnostic;
     auto one = MakeAsset(1u, 1u);
     StaticRtAssetRegistration badIndex{
-        20u, 1u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &one};
+        kRtInstanceMetadataCapacity, 1u,
+        static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &one};
     Check(!slot.Initialize(std::span<const StaticRtAssetRegistration>(&badIndex, 1u), diagnostic) &&
-              diagnostic == "RtStaticMeshSlot capacity overflow: instanceCustomIndex exceeds RtInstanceMetadata[20].",
-          "instance metadata overflow fails initialization by name");
+              diagnostic == "RtStaticMeshSlot capacity overflow: instanceCustomIndex exceeds RtInstanceMetadata[" +
+                  std::to_string(kRtInstanceMetadataCapacity) + "].",
+              "instance metadata overflow fails initialization by name");
 
     std::vector<horde::scene::assets::StaticMeshAsset> assets;
     std::vector<StaticRtAssetRegistration> registrations;
-    for (std::uint32_t i = 0u; i < 9u; ++i)
+    assets.reserve(kRtStaticAssetCapacity + 1u);
+    registrations.reserve(kRtStaticAssetCapacity + 1u);
+    for (std::uint32_t i = 0u; i <= kRtStaticAssetCapacity; ++i)
     {
         assets.push_back(MakeAsset(1u, 1u));
         registrations.push_back({i, i + 1u, 1u, 0u, &assets.back()});
@@ -300,7 +347,8 @@ void TestNamedCapacityFailures()
     // Vector growth moves assets, so rebind pointers after construction.
     for (std::size_t i = 0u; i < registrations.size(); ++i) registrations[i].asset = &assets[i];
     Check(!slot.Initialize(registrations, diagnostic) &&
-              diagnostic == "RtStaticMeshSlot capacity overflow: static assets exceed 8.",
+              diagnostic == "RtStaticMeshSlot capacity overflow: static assets exceed " +
+                  std::to_string(kRtStaticAssetCapacity) + ".",
           "static asset overflow fails initialization by name");
 
     auto primitiveOverflow = MakeAsset(33u, 1u);
@@ -351,6 +399,7 @@ int main()
     TestAbiLayout();
     TestGeneratedConstants();
     TestGenericRegistrationAndMeasurements();
+    TestExplicitTextureGroups();
     TestNamedCapacityFailures();
     TestTextureArrayCapacities();
     if (failures != 0)

@@ -1,0 +1,2 @@
+Left target=0.2 elbow=(0.4,1,0) upper=0.3 lower=0.360555
+FAIL: actual skinned elbow must preserve signed analytic projection

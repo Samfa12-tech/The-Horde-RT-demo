@@ -19,6 +19,12 @@
     "resolution": 1024
   },
   "materialOverrides": [],
+  "primitiveSemantics": [
+    { "material": "BodyPrimaryVisible", "firstPersonPrimary": true, "shadow": true, "reflection": true },
+    { "material": "HeadPrimaryMasked", "firstPersonPrimary": false, "shadow": true, "reflection": true },
+    { "material": "NearFacePrimaryMasked", "firstPersonPrimary": false, "shadow": true, "reflection": true },
+    { "material": "GauntletPrimaryVisible", "firstPersonPrimary": true, "shadow": true, "reflection": true }
+  ],
   "distribution": "runtime",
   "licenceStatus": "Meshy output distributed conservatively under CC BY 4.0; attribution in ASSET_LICENSES.md"
 }

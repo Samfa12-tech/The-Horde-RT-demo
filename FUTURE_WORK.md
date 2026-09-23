@@ -1,41 +1,16 @@
-# Horde Lantern RT - Future Work
+# Horde Lantern RT - Current and Future Work
 
-This file is the canonical **post-current-release work queue** for Horde Lantern RT. It exists so future Codex sessions do not lose the intended sequencing or the reasoning behind deferred renderer work.
-
-Do not treat this file as permission to interrupt active release work. Work through the phases below **in order unless the project owner explicitly changes the priority**.
+Owner update: 2026-09-13. The [1.6.1 engineering programme](docs/ENGINEERING_1_6_1_PLAN.md) is the current execution authority. It supersedes the 2026-09-11 post-1.6.1 ordering while retaining the detailed compatibility design below. No release/publication is authorised.
 
 ## Ordered sequence
 
-### 1. Finish Showcase Alpha 1.6.1
+1. Reconcile lean branch guidance and current plans/evidence.
+2. Resolve S24/S25 hardware-RT compatibility through the reusable alternate backend below.
+3. Finish the original 1.6.1 audit, adaptive What the Dark Keeps A-H score and Briarhold-derived player reporting. Music has separate persisted 0-100% volume on Android and Windows, shared simulation/event-driven transitions, and the supplied composition/handoff as authority.
+4. Run targeted checks during implementation. Only after the full feature set is complete, run the comprehensive Windows/Android/device/release candidate matrix and fix regressions.
+5. Request the owner's release decision; no automatic publishing. Later campaign milestones remain outside this engineering pass.
 
-**Status:** active/current work.
-
-Complete the already-scoped 1.6.1 work first. Do not start the music or compatibility projects inside 1.6.1 unless specifically authorised.
-
-The point of this separation is to preserve a clean release/evidence boundary: 1.6.1 should be completed, validated and released on its own terms before the next feature programme begins.
-
-### 2. Add background music
-
-**Status:** next after 1.6.1.
-
-After 1.6.1 is complete, integrate the supplied Horde music pack using the existing Pocket Chordsmith / Chordsmith music-engine direction.
-
-Goals:
-
-- Add the game-ready adaptive background music without disturbing the shared gameplay authority or renderer architecture.
-- Support the intended sections/states of the demo, including exploration, combat, torch-loss tension, lich finale and the post-finale/skylight release where appropriate to the supplied music package.
-- Add a **music volume** control in Settings, separate from other audio where practical.
-- Keep pause/resume, lifecycle and platform audio behaviour correct on Android and Windows.
-- Preserve deterministic gameplay and do not make music playback state authoritative for gameplay.
-- Apply the normal change-triggered owner audio-validation rule in `AGENTS.md` because this work intentionally changes audible content and playback behaviour.
-
-The exact supplied music pack and its integration notes may supersede implementation details here. This section records the required sequencing, not a frozen audio implementation.
-
-### 3. Expand Android hardware-RT compatibility with a RayQuery backend
-
-**Status:** planned after music.
-
-This is the next major renderer programme after music.
+## S24/S25 compatibility programme - required within 1.6.1
 
 The immediate motivation is now confirmed across two Qualcomm flagship generations: real Samsung Galaxy S25 Ultra and Galaxy S24 Ultra tests performed on 2026-09-11 both reached Horde's Vulkan diagnostics and exposed acceleration structures plus `VK_KHR_ray_query`, but neither tested driver exposed `VK_KHR_ray_tracing_pipeline`. The current renderer therefore selected `RayQuery` capability mode but did not attempt or present the Horde RT scene.
 
@@ -275,16 +250,6 @@ Suggested slices:
 
 Each slice should leave a runnable build and should end with files changed, build/run instructions, evidence gathered, limitations and the exact next task.
 
-## Future Codex handoff
+## Execution and acceptance boundary
 
-When 1.6.1 and the music milestone are complete, the owner can start this programme with a prompt as small as:
-
-> Read `AGENTS.md`, `PROJECT_DECISIONS.md`, `PROJECT_MEMORY.md`, `docs/PHASE_PLAN.md`, `docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md`, `docs/validation/horde-galaxy-s24-ultra-rayquery-2026-09-11.md`, and `FUTURE_WORK.md`. The 1.6.1 and music milestones are complete. Begin the planned **RayQuery hardware-RT compatibility programme** in `FUTURE_WORK.md`. First audit current main and produce an implementation/validation plan grounded in the actual architecture; then execute the smallest safe vertical slice. Preserve the existing RayTracingPipeline backend and all RT-or-nothing rules. The Galaxy S25 Ultra / Adreno 830 / driver 512.800.64 is the primary acceptance device and the Galaxy S24 Ultra / Adreno 750 / driver 512.762.41 is the secondary acceptance device. Do not fake RT or remove visual features to gain compatibility.
-
-For a larger autonomous Codex run, add:
-
-> You may continue through subsequent slices when the previous slice is verified, but stop on any architectural contradiction, unproven hardware assumption, unexplained >15% matched performance regression, broken existing S26/Windows pipeline path, or evidence that feature parity would require weakening the project's RT rules. Keep documentation and compatibility evidence current as you work.
-
----
-
-**Priority reminder:** finish **1.6.1 -> music -> RayQuery compatibility**, in that order, unless the project owner explicitly reprioritises.
+This programme is now authorised inside 1.6.1 and takes priority over the remaining engineering features. Continue safe implementation through targeted tests; reserve the large cross-device matrix for the complete candidate. Missing physical devices remain explicit validation gaps, not reason to abandon independent local work or claim support. Follow the current [engineering programme](docs/ENGINEERING_1_6_1_PLAN.md) for all remaining audit, music, reporting and final release requirements.

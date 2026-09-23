@@ -1,9 +1,10 @@
 # Shared native renderer sources. Keep platform entry points and UI shells in
 # their platform-specific targets; this list is consumed by Windows and Android.
-set(HORDE_RT_DISPLAY_VERSION "1.6.0")
-set(HORDE_RT_PACKAGE_VERSION "1.6.0")
-
 set(HORDE_RT_CORE_RELATIVE_SOURCES
+    telemetry/RtPerformanceEvidence.cpp
+    telemetry/RtEvidencePublication.cpp
+    telemetry/RtBenchmarkEvidenceRun.cpp
+    telemetry/RtBenchmarkEvidenceReport.cpp
     gameplay/simulation/GameSimulation.cpp
     gameplay/animation/PlayerAnimationState.cpp
     gameplay/animation/PlayerIkTargets.cpp
@@ -33,6 +34,11 @@ set(HORDE_RT_CORE_RELATIVE_SOURCES
     vulkan/raytracing/RtTextureArrays.cpp
     vulkan/raytracing/CharacterRenderSlot.cpp
     vulkan/raytracing/PlayerRenderSlot.cpp
+    vulkan/raytracing/RtPipelineVariants.cpp
+    vulkan/raytracing/RtPipelineVariantProvider.cpp
+    vulkan/raytracing/RtPipelineBundleContracts.cpp
+    vulkan/raytracing/RtPipelineBundle.cpp
+    vulkan/raytracing/RtFrameEvidenceCoordinator.cpp
     vulkan/raytracing/PresentableTinyRtScene.cpp
     vulkan/raytracing/SimulationFrameAdapter.cpp
     scene/assets/SkinnedMeshAsset.cpp

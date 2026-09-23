@@ -1,6 +1,6 @@
 # Android RT Device Compatibility Record
 
-Last updated: 2026-09-11
+Last updated: 2026-09-23
 
 This is a living compatibility record for the Horde Lantern RT Android build. It separates direct project evidence from reports and hardware-based predictions. A device is not marked as working solely because its GPU advertises Vulkan or hardware ray tracing.
 
@@ -14,15 +14,22 @@ This is a living compatibility record for the Horde Lantern RT Android build. It
 - **Vendor/SoC inference** - the GPU family is advertised as supporting hardware ray tracing, but this project has not yet confirmed the Android driver extensions and scene presentation.
 - **Unverified candidate** - a plausible device that still needs the project's capability probe.
 
-The working gate is the project's presentable Vulkan RT path: acceleration structures, ray-query support, ray-tracing pipeline support, buffer device address, ASTC materials, device creation, and a real RT-produced frame reaching the Android swapchain. The Android bridge currently enables the RT device path only when `RtMode::RayTracingPipeline` is selected; a ray-query-only driver is therefore not enough. See [`RayTracingRequirements.cpp`](../src/vulkan/raytracing/RayTracingRequirements.cpp), [`android_probe_bridge.cpp`](../android/app/src/main/cpp/android_probe_bridge.cpp), and [`android/README.md`](../android/README.md).
+The working gate is a real RT-produced frame reaching the Android swapchain after verified device/queue/features, BLAS/TLAS and ASTC setup. The published 1.6.0 path requires ray-tracing-pipeline support. The 1.6.1 development branch also implements hardware `RayQueryCompute` for RayQuery-only drivers, using the same acceleration structures and shading; pipeline remains preferred when available. That implementation is not blanket S24/S25 certification. Raw capability mode, selected execution backend and successful presentation are reported separately. See [1.6.1 backend evidence](ENGINEERING_1_6_1_RAYQUERY_BACKEND_2026-09-13.md).
 
 ## Confirmed evidence
 
 ### Samsung Galaxy S26 Ultra - `SM-S948B`
 
+- **2026-09-23 current-source IK correction check:** ARM64 Debug from `c7bb1c1`, APK/installed SHA-256 `51b257c0d50c8b5068a024a54a86ca9774c6050d873f522e1ec27ec48737efda`, passes the same isolated modelled route, 13-waypoint replay, eight captures and honest RT Home/resume on exact `SM-S948B` in `run-20260923-164314`. Earlier run `163852` reached waypoint 12/13 before the 120-second timeout; the successful rerun uses the existing 300-second timeout, no rendering/gate changes. Seven images match preceding APK pixels exactly; forward has two pixels differing by one channel level. High/low volume-budget overflows stay 4/2. Evidence type: direct exact-current-source installation/presentation/capture/replay/lifecycle, **not** arm-art acceptance, physical glass correctness, sustained Shipping performance or S24/S25 support. [Full boundaries and evidence](evidence/2026-09-23-arm-phone-baseline/README.md#fresh-signed-projection-fix-apk).
+
+- **2026-09-23 isolated arm-candidate baseline:** ADB and `ro.product.model` identify raw model `SM-S948B`. The `.debug.viewmodel` APK SHA-256 `6047b285d6507ce84ccc90b48faa52b07cc917446167dc271f5bc6ebd244b2f9` installed with `-t` after ordinary install correctly rejected this test-only APK; installed bytes match. No data was cleared or production app replaced. Run `run-20260923-161421` completed replay/eight captures/Home-resume but failed stale capture-time expectations. After correcting those expectations against actual shared staging (24 positive/negative guard tests), fresh run `run-20260923-162801` passes the harness: modelled route, strict ASTC, hardware RayTracingPipeline presentation, 60 Hz selected skinning with actual updates, 21 instances, bounded grip error and Home/resume. This is the **unchanged old candidate APK**, not a rebuild of the new signed-IK fix. High/low lantern captures retain 4/2 transport volume-budget overflows. Art is not accepted: foreground hand/sleeve presentation and absent look-down body remain open; replay is not hands-on transition/owner acceptance or Shipping performance. See [phone baseline](evidence/2026-09-23-arm-phone-baseline/README.md).
+
+- **2026-09-13 focused 1.6.1 dual-backend smoke:** Locally tested exact Debug APK SHA-256 `1f64d3328cd9a17c4c39690523b3572201e846f67b04d9b1e724669debd8bbfa` matched its installed/pulled-back bytes. Android 16 / Adreno 840 / Vulkan 1.4.295 / driver 512.842.19. Forced `RayQueryCompute` passed strict ASTC and twelve stable honestly presented `lantern-held-high` frames at 75% portrait (1080x2235 RT image); Home/resume recreated and presented again. A fresh default launch preferred `RayTracingPipeline` and passed the same checkpoint. This is targeted implementation/functional/lifecycle evidence, not sustained performance, full visual parity, final-candidate acceptance or S24/S25 proof. Existing glass budget failures remain open. Exact artifact/source boundaries, image inspection and limitations: [backend report](ENGINEERING_1_6_1_RAYQUERY_BACKEND_2026-09-13.md).
+- **2026-09-13 connection check:** Lead ADB inspection confirms raw model `SM-S948B`, Android 16, on the already-authorised development phone. This is local connection/identity evidence only; no new APK was installed or exercised at this checkpoint, and it does not certify the in-development RayQueryCompute backend or another Galaxy model.
 - **Status:** Locally tested confirmation - works; primary development platform.
 - **Evidence type:** Direct local Android device testing: installation, strict ASTC selection, honest RT swapchain presentation, showcase traversal, lifecycle checks, and warm timing measurements.
 - **Reported hardware:** Android 16, Qualcomm Adreno 840.
+- **2026-09-05 Engineering 1.6.1 exact Debug observation baseline:** Source `33832460184f342dea612fd0b1f2309e74bd6c77` produced `com.samfa12.hordelanternrt.debug` / `1.6.1 DEBUG`; the local, installed, and retained `candidate-app-debug.apk` bytes matched at SHA-256 `01855453ea1804d39f75bc9d519362d8acbdc247c42897fed6b3ec200fac6130` on sole authorised serial `R5GL219SZGK`, raw model `SM-S948B`, Android 16/API 36, Adreno 840 driver `512.842.19`. The run selected strict ASTC, `RayTracingPipeline`, and the exact Diagnostic/Mobile pair `diagnostic_mobile_opaque_fast@d7b0722e572e63bd96e62bae85cc6a5b968ae71bf157526b513b50b56e515c3b` plus `diagnostic_mobile_generic_dielectric@d8f4c915955836f6693c5c5a073c23155944a8a3048dbfdcee6c3a0c4d8f57f7`; these are not Shipping identities. Automation passed six ordered three-window checkpoints, all 13 replay waypoints, all 13 manifest/hash/zone/scene-only/honest-presentation capture checks, and Home/resume with zero warnings/failures. Ordered 75% CPU-present-loop medians were 53.467 / 49.271 / 47.447 / 41.301 / 45.237 / 55.140 ms for opening / two-enemy-combat / worst-bend / skylight / green / lich at thermal status 0/1/2/2/2/2; all are below the descriptive 30 FPS reference and do not create an automatic product failure. This is not a matched A/B and supports no speedup/regression conclusion. GPU timestamp instrumentation was enabled, but the final recreated capability report remained pending with zero valid samples, so no GPU aggregate is claimed. `sourceDirty=true` records four pre-existing untracked tooling scratch paths even though tracked source was unchanged at build; do not relabel this artifact with later HEAD. The post-run `4c69928` repair adds only the renderer-telemetry source to a standalone host-test target in `CMakeLists.txt`; it does not alter Android source. Candidate review was open during the phone run, so this phone evidence itself does not establish host acceptance; host acceptance subsequently closed at `4c69928` after clean rereview and CI run `33948503458` passed 35/35. Lead inspection of only opening, skylight, mirror, and two-enemy-combat originals confirmed rendered scenes, the held sword, authored warm torch where present, a dark mirror/body silhouette, and still-procedural lower-corner arms; this is sample capture inspection, not all-13 art/motion approval or closure of a dedicated viewmodel/reward-glass gate. Evidence type: exact local Debug artifact install/hash, automated presentation/ASTC/timing/capture/replay/lifecycle evidence, and bounded sample-image inspection. It does not touch or validate the public package, establish Release performance, prove resource stability, or supply owner-feel acceptance. Audio/haptic manual revalidation required: NO - observation/accounting and standalone host-test linkage preserve feedback inputs and routes. See [`ENGINEERING_1_6_1_ANDROID_OBSERVATION_BASELINE_2026-09-05.md`](ENGINEERING_1_6_1_ANDROID_OBSERVATION_BASELINE_2026-09-05.md); retained raw evidence is in ignored local path `reports/engineering-1.6.1-c2a-phone/run-20260905-153927/`.
 - **2026-08-31 Showcase Alpha 1.6.0 signed-package publication boundary:** Stable-key-signed `1.6.0` / `versionCode 8` APK SHA-256 `52a64255ad5dec82cc866fb2ea3545be498ca06c73a789019be851c77e5d6c48` is active as itch build `#1931951`. Static inspection passed the established certificate, identity, version, signature, ABI, native-library, strict runtime-asset, licence, lint, and compatibility guards. ADB exposed zero devices at publication, so this is package/publication evidence only: there was no exact signed-1.6.0 install, pullback, strict-ASTC runtime, honest phone presentation, performance, Home/resume, or owner-feel test. The exact accepted Debug runtime below is supporting feature evidence and must not be relabelled as signed-package proof. See `SHOWCASE_ALPHA_1_6_0_RELEASE_VALIDATION_2026-08-30.md`.
 - **2026-08-31 exact signed 1.6.0 device smoke:** The published APK was installed on sole authorised serial `R5GL219SZGK`, raw model `SM-S948B`, and its installed `base.apk` matched the local candidate byte-for-byte at SHA-256 `52a64255ad5dec82cc866fb2ea3545be498ca06c73a789019be851c77e5d6c48`. Package manager reported `com.samfa12.hordelanternrt`, `versionName 1.6.0`, `versionCode 8`. The release process selected strict ASTC and `RayTracingPipeline`, presented RT-produced swapchain frames at startup and after Home/resume, and survived a short opening-to-route visual smoke with no fatal/native/Vulkan-startup markers. Evidence is exact signed install/pull/hash, logcat, lifecycle, and screenshots in `reports/release-device-smoke/android-1.6.0-20260831/`; it is not a deterministic Debug checkpoint/replay or sustained Release performance/owner-feel run.
 - **2026-08-30 final Fire/PBR/reward-lantern development candidate:** Runtime source committed unchanged as `a04dcb9` produced Debug APK SHA-256 `0b5a59b6e41d2c4d717eff885aaa310b7f5f1512002f6a89cb77e5989ab7edd3`; local and installed bytes matched on sole authorised serial `R5GL219SZGK`, raw model `SM-S948B`. Host run `reports/chest-guidance-foundation-final-20260830/run-20260830-192950` passed fresh Debug/Release 31/31 CTests, 13 Windows captures, Android builds/lint, shader/package/licence gates. Device benchmark/install run `reports/chest-guidance-device-final-20260830/run-20260830-194037` retained strict ASTC, `RayTracingPipeline`, honest RT presentation, replay, two focused captures, and Home/resume; its only reported failure was a harness-only `finale-room` versus canonical `finale` expected-zone label. Corrected unchanged-APK run `reports/chest-guidance-device-replay-final-20260830/run-20260830-194713` passed replay, both captures, and Home/resume with no warning/failure. Ordered 75% Debug medians were 53.392 / 48.868 / 47.966 / 37.704 / 44.453 / 52.840 ms for opening / two-enemy / worst-bend / skylight / green / lich at thermal status 0 and Samsung GPU power level 0-1. Captures prove the closed chest lit by its post-delay overhead RT light and the claimed lantern retained at the exact chest stand-off. The owner reported that phone play feels good and accepted the preceding candidate's sound/haptics; the new two-second unlock timing needs one listening check. Evidence type: exact local artifact install/hash, automated RT/ASTC/timing/capture/replay/lifecycle evidence, agent capture inspection, and owner-reported physical-device feel. This does not sign or publish the candidate, certify another device, or approve the deferred skinned hands and reflected/shadow arms.
@@ -207,6 +214,100 @@ Add one block per new result rather than changing a prediction into an implied f
 - Attachments: <repo-relative report, screenshot, log, or validation bundle>
 - Qualification: <what this proves and what it does not prove>
 ```
+
+## September 20, 2026 - Shipping/Mobile lantern benchmark on SM-S948B
+
+- Evidence type: local exact-APK installation/pullback, native RT presentation,
+  screenshot, five complete benchmark reports and thermal observations.
+- Exact raw model `SM-S948B`, Android 16, Adreno 840, Vulkan 1.4.295;
+  fresh system Vulkan JSON reports driver 2150932499 / 512.842.19.
+- Development-signed, non-debuggable `.benchmark` package; APK SHA-256
+  `0f30a72535a532f770d59f817b23934a2152f087588de95e8982698c60d80a95`.
+  Installation was pulled back byte-identically; stable and Debug packages were
+  not replaced or cleared. Runtime source is committed at `7ccb753` (built before
+  commit); later progress-label-only change `2cbad44` is not in this artifact.
+- Shipping/Mobile, strict ASTC and RayTracingPipeline honestly presented the real
+  held reward lantern. All five cases completed 600 measured frames apiece with
+  exact CPU/GPU completion joins, zero missing/rejected/cancelled/outstanding
+  records and diagnostics compiled out. Same PID was retained across Activity
+  recreations; final owning completion serials increased through 1201, 2407,
+  3611, 4814 and 6017.
+- Unchanged 100% / 1440x2980 median frame times: held-high 130.469 ms;
+  held-low 118.4801 ms; grazing 103.5469 ms; frozen motion-extreme 100.855 ms;
+  live reveal 146.9541 ms. These are baseline observations, not an optimization
+  claim or matched 1.6.0 comparison. The first four cases freeze authored state;
+  the last runs the live sequence. Do not generalize them to ordinary gameplay.
+- Android thermal status rose from 0 to 2; later GPU thermal power observations
+  ranged 0–3. GPU clock reads were permission-denied and remain unavailable; no
+  workaround was attempted. Start/warm-up/process history is retained rather
+  than claiming thermal equivalence across cases.
+- Evidence: `reports/phone-shipping-lantern-20260920/`; scope and exact boundaries
+  in [lantern benchmark validation](ENGINEERING_1_6_1_LANTERN_BENCHMARK_2026-09-20.md).
+  No S24/S25, final candidate, glass improvement or subjective viewmodel pass.
+- Home interruption rejected stale completion correctly but exposed a temporary
+  scene cleanup gap, fixed in `6576950`. Cleanup APK
+  `faf42c587379238796bfae987382386ea31028a643a9a28f6081827aadfc0eb1`
+  was installed/pulled back identically. Its interrupted run exported only an
+  invalid marker; subsequent normal relaunch presented RT at the ordinary
+  opening torch scene. This targeted lifecycle pass does not recertify the
+  earlier APK's timing figures for the cleanup artifact. Phone returned Home.
+
+## September 20, 2026 - Warmed published/candidate route A/B on SM-S948B
+
+- Evidence type: local exact installed-APK pullback, settings/UI observations,
+  four complete native benchmark reports, completion-owned candidate records,
+  thermal sampling and fresh system Vulkan JSON. Raw model **SM-S948B**, Android
+  16, Adreno 840, Vulkan 1.4.295, driver 2150932499 / 512.842.19.
+- Published stable APK `52a64255ad5dec82cc866fb2ea3545be498ca06c73a789019be851c77e5d6c48`
+  was not replaced or cleared. Clean candidate source `167ce8b`, APK
+  `02112a48aea45431f52270ab9ee82d68091497aed0816dfcc359ba4068ee24bc`,
+  was development-signed, non-debuggable Shipping/Mobile in `.benchmark`, and
+  installed/pulled back byte-identically. Four-ABI build/package and external
+  packaged ARM64 SPIR-V checks passed.
+- A1/B1/B2/A2 all completed 1,838 measured RT-presented frames, two laps and 26
+  waypoints at **76%**, internal 1094x2265 / presentation 1440x2980, Mobile water,
+  strict ASTC and RayTracingPipeline. Candidate rows have exact identity joins,
+  valid CPU/GPU samples and zero missing/rejected/cancelled/outstanding samples.
+- Medians in order: **52.329 / 54.1482 / 56.5649 / 58.795 ms**. Mean-of-run-medians
+  difference is −0.37%, not proof of improvement. Thermal status rose 2→3 and
+  battery temperature 39.5→44.1 C; ranges/power-level differences are retained.
+  This general route does not include the held reward lantern and cannot close
+  its glass gate. No S24/S25, viewmodel, owner-feel or final-candidate pass.
+- Candidate scale was explicitly matched to the stable app's existing 76%, then
+  restored to its original 100%. Stable settings were unchanged. Phone returned
+  Home; no benchmark/sampler remains running.
+- Full exact-artifact report, comparison limitations and GitHub recovery data:
+  [Android Release route A/B](ENGINEERING_1_6_1_ANDROID_RELEASE_ABBA_2026-09-20.md).
+
+## September 20, 2026 - Exact held-high source-baseline A/B on SM-S948B
+
+- Evidence type: local installed/pulled-back source-baseline APK, real held-lantern
+  screenshots, Home/resume cleanup check, four complete native reports and thermal
+  context. Exact model **SM-S948B**, Android 16, Adreno 840, Vulkan 1.4.295.
+- A is **not the public APK**: source `84104e3` backports only the measurement
+  harness onto runtime `57c81b6`; APK
+  `5f92533a75a9079ac6892b7c8f89781896bdcb9420c124023139036c29c4fee2`.
+  All 51 packaged assets and both old raygen modules match the original renderer;
+  old diagnostic atomics are deliberately retained. It is an isolated, non-debuggable,
+  development-signed `.baseline` package, with checkpoints OFF.
+- B is clean-source `167ce8b`, Shipping/Mobile `.benchmark` APK
+  `02112a48aea45431f52270ab9ee82d68091497aed0816dfcc359ba4068ee24bc`.
+  Both sides use 100%/1440x2980, Mobile water, ASTC, MAILBOX, RayTracingPipeline,
+  frozen `lantern-held-high-v1`, 600 warm-up and 600 measured frames per run.
+- A1/B1/B2/A2 medians: **134.387 / 130.6903 / 130.5626 / 134.578 ms**.
+  Descriptive mean-of-run-medians difference −2.867%; not a material gain or
+  causal attribution. Whole-run thermal status 0→2, battery33.0–37.7 C and GPU
+  thermal power level0–9; states are not identical. Candidate GPU medians are
+  about129 ms, so the heavy cost remains. All intended candidate rows are valid.
+- Presented frozen-scene pixels match exactly below the changing HUD band
+  (maximum RGB delta0). This is not whole-image/raw-RT-image parity or proof that
+  the outstanding physical dielectric budget/termination findings are fixed.
+- Home interruption restored the normal spawn/torch scene. A later live-step
+  alignment rebuild `4cbd08c2d57314697b01284ccb31b8af1cba4d99e79915356c7104e0535a3461`
+  passed build/package checks but was **not installed**; timings are not transferred.
+  Phone returned Home; sampler stopped. No stable data/settings were changed.
+- [Full source/artifact report and recovery bundle](ENGINEERING_1_6_1_LANTERN_ABBA_2026-09-20.md).
+  No S24/S25, subjective arms, full glass-performance matrix or final release pass.
 
 ## Research sources
 

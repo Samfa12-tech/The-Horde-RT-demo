@@ -1,0 +1,95 @@
+{
+  "rgbTolerance": 3,
+  "pairs": [
+    {
+      "checkpoint": "opening",
+      "changedPixels": 1,
+      "aboveTolerance3": 0,
+      "maximumChannelDelta": 1
+    },
+    {
+      "checkpoint": "skeleton",
+      "changedPixels": 25,
+      "aboveTolerance3": 0,
+      "maximumChannelDelta": 2
+    },
+    {
+      "checkpoint": "worst-bend",
+      "changedPixels": 1,
+      "aboveTolerance3": 0,
+      "maximumChannelDelta": 1
+    },
+    {
+      "checkpoint": "lantern-drop",
+      "changedPixels": 0,
+      "aboveTolerance3": 0,
+      "maximumChannelDelta": 0
+    },
+    {
+      "checkpoint": "skylight",
+      "changedPixels": 0,
+      "aboveTolerance3": 0,
+      "maximumChannelDelta": 0
+    },
+    {
+      "checkpoint": "yellow",
+      "changedPixels": 0,
+      "aboveTolerance3": 0,
+      "maximumChannelDelta": 0
+    },
+    {
+      "checkpoint": "blue",
+      "changedPixels": 0,
+      "aboveTolerance3": 0,
+      "maximumChannelDelta": 0
+    },
+    {
+      "checkpoint": "red",
+      "changedPixels": 1,
+      "aboveTolerance3": 0,
+      "maximumChannelDelta": 1
+    },
+    {
+      "checkpoint": "green",
+      "changedPixels": 14,
+      "aboveTolerance3": 0,
+      "maximumChannelDelta": 1
+    },
+    {
+      "checkpoint": "mirror",
+      "changedPixels": 0,
+      "aboveTolerance3": 0,
+      "maximumChannelDelta": 0
+    },
+    {
+      "checkpoint": "lich",
+      "changedPixels": 6,
+      "aboveTolerance3": 0,
+      "maximumChannelDelta": 1
+    },
+    {
+      "checkpoint": "finale-roof",
+      "changedPixels": 0,
+      "aboveTolerance3": 0,
+      "maximumChannelDelta": 0
+    },
+    {
+      "checkpoint": "two-enemy-combat",
+      "changedPixels": 9,
+      "aboveTolerance3": 0,
+      "maximumChannelDelta": 2
+    },
+    {
+      "checkpoint": "lantern-held-high",
+      "changedPixels": 0,
+      "aboveTolerance3": 0,
+      "maximumChannelDelta": 0
+    },
+    {
+      "checkpoint": "lantern-glass-transmission",
+      "changedPixels": 0,
+      "aboveTolerance3": 0,
+      "maximumChannelDelta": 0
+    }
+  ]
+}

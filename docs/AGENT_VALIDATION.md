@@ -29,6 +29,14 @@ ctest --test-dir build/host-ci --build-config Release --output-on-failure
 
 This covers non-hardware shared tests, not Vulkan presentation or phone behaviour. Use CTest selection for an affected subset when appropriate; report the actual selection and result instead of hard-coding a test count.
 
+The same workflow also runs on pushes to `codex/horde-1.6.1-engineering-pass`, so
+PR merge conflicts cannot suppress all current-source compiler coverage. Its
+`player-vulkan-host` lane enables Vulkan targets with the Ubuntu development
+package and builds/runs the focused player contracts, actual skinned-player smoke
+and malformed/reordered GLB fixtures. The tests do not create a Vulkan device:
+SDK-enabled host compilation is **not** physical RT presentation, backend image
+parity or Android-device acceptance. Keep the portable lane as separate coverage.
+
 Windows configure/build/test presets are in `CMakePresets.json`:
 
 ```powershell
@@ -74,3 +82,9 @@ The [README](../README.md) package summary, `release/` metadata, current release
 Existing reports such as `SHOWCASE_ALPHA_1_6_0_RELEASE_VALIDATION_2026-08-30.md` retain their source IDs, hashes, test counts and limitations. Those details belong in the evidence record rather than an always-loaded instruction file. A past pass does not certify a later commit or device driver.
 
 Signing, public uploads and release identity changes require an authorised release task. Follow [OWNER_RELEASE_SAFETY_CHECKLIST.md](OWNER_RELEASE_SAFETY_CHECKLIST.md): preserve the stable Android certificate; never expose signing material; never inspect/copy recovery material or mark owner-only backup/recovery checks complete. A configured in-memory signing handoff is allowed only as documented for an authorised release and is not proof of independent backup. Asset licences must be recorded before shipping.
+
+## Current 1.6.1 programme sequencing
+
+The owner's 2026-09-13 update supersedes older task briefs that demand a full Host/device programme after each implementation slice. Use relevant targeted checks during development, broaden only when coupling or failures warrant it, and reserve the comprehensive Windows/Android/cross-device/release matrix for the complete final candidate. S24/S25 compatibility, adaptive Pocket Chordsmith music and cross-platform player reporting are required before that final pass. This changes validation scheduling, not any RT, correctness, exact-artifact or final acceptance requirement.
+
+Existing 1.6.1 evidence remains tied to its original source/build: `ENGINEERING_1_6_1_ANDROID_OBSERVATION_BASELINE_2026-09-05.md` is Diagnostic/Debug evidence, not Shipping/Release performance. Preserve matched A/B build, pipeline, workload, scale and thermal identity. A window-average median must not be relabelled as a per-frame median. The full route exceeds the 128-sample window collector; retain all intended samples with explicit capacity/invalid-run handling.

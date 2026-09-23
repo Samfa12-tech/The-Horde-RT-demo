@@ -5,16 +5,22 @@
 #include "gameplay/ShowcaseRoute.h"
 #include "gameplay/simulation/GameSimulation.h"
 #include "vulkan/raytracing/PlayerRenderSlot.h"
+#include "vulkan/raytracing/RtStaticMeshSlot.h"
+#include "vulkan/raytracing/RtSceneRecordObservation.h"
 
 #include <algorithm>
 #include <array>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <filesystem>
 #include <iostream>
 #include <fstream>
+#include <limits>
 #include <string>
+#include <string_view>
+#include <utility>
 #include <vector>
 
 namespace
@@ -37,6 +43,18 @@ bool Require(bool condition, const char* message)
     if (condition) return true;
     std::cerr << "FAIL: " << message << '\n';
     return false;
+}
+
+struct ObservationClock
+{
+    std::array<std::uint64_t, 2u> values{{100u, 127u}};
+    std::size_t reads = 0u;
+};
+
+std::uint64_t ReadObservationClock(void* user) noexcept
+{
+    auto& clock = *static_cast<ObservationClock*>(user);
+    return clock.values.at(clock.reads++);
 }
 
 bool FiniteTexturedVertices(const std::vector<horde::scene::TexturedSkinnedRtVertex>& vertices)
@@ -575,9 +593,157 @@ GripSurfaceMetrics MeasureGripSurface(
 
 } // namespace
 
-int main()
+int main(int argc, char** argv)
 {
     using namespace horde::scene;
+    if (argc == 5 && std::string(argv[1]) == "--validate-viewmodel-admission")
+    {
+        horde::scene::assets::AssetManifest manifest;
+        horde::scene::assets::StaticMeshAsset fixed;
+        SkinnedMeshAsset viewmodel;
+        SkinnedMeshAsset world;
+        std::string diagnostic;
+        if (!horde::scene::assets::AssetManifest::Load(argv[3], manifest, diagnostic) ||
+            !manifest.ValidatePlayerViewmodelSemantics(diagnostic) ||
+            !viewmodel.LoadClips(argv[2], PlayerLocomotionClipSet(), diagnostic) ||
+            !horde::scene::assets::StaticMeshAsset::Load(argv[2], manifest, fixed, diagnostic) ||
+            !viewmodel.ValidateStaticVertexLayout(fixed, diagnostic) ||
+            !world.LoadClips(argv[4], PlayerLocomotionClipSet(), diagnostic))
+        {
+            std::cerr << "FAIL: viewmodel admission: " << diagnostic << '\n';
+            return 1;
+        }
+        horde::scene::assets::AssetManifest worldManifest;
+        horde::scene::assets::StaticMeshAsset worldStatic;
+        if (!horde::scene::assets::AssetManifest::Load(
+                std::filesystem::path(argv[4]).parent_path() / "asset.manifest.json", worldManifest, diagnostic) ||
+            !worldManifest.ValidatePlayerSemantics(diagnostic) ||
+            !horde::scene::assets::StaticMeshAsset::Load(argv[4], worldManifest, worldStatic, diagnostic))
+        {
+            std::cerr << "FAIL: world texture provider admission: " << diagnostic << '\n';
+            return 1;
+        }
+        using namespace horde::vulkan::raytracing;
+        const std::array<StaticRtAssetRegistration, 2u> registrations{{
+            {kPlayerWorldBodyInstanceIndex, 1u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
+             0u, &worldStatic, nullptr, RtGeometryRole::PlayerWorldBody},
+            {kPlayerViewmodelInstanceIndex, 2u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
+             0u, &fixed, &worldStatic, RtGeometryRole::PlayerViewmodel},
+        }};
+        RtStaticMeshSlot providerOnly, sharedTextures;
+        if (!providerOnly.Initialize(std::span(registrations).first(1u), diagnostic) ||
+            !sharedTextures.Initialize(registrations, diagnostic))
+        {
+            std::cerr << "FAIL: viewmodel shared textures: " << diagnostic << '\n';
+            return 1;
+        }
+        const auto providerCounts = providerOnly.TextureArrayCounts();
+        const auto sharedCounts = sharedTextures.TextureArrayCounts();
+        if (!Require(sharedTextures.Vertices().empty() &&
+                     sharedTextures.Vertices(RtGeometryRole::PlayerWorldBody).size() == worldStatic.vertices.size() &&
+                     sharedTextures.Vertices(RtGeometryRole::PlayerViewmodel).size() == fixed.vertices.size() &&
+                     sharedTextures.PrimitiveMetadata()[worldStatic.primitives.size()].vertexOffset == 0u,
+                     "actual world/viewmodel must use independent role-local vertex streams with no static duplicate")) return 1;
+        if (!Require(providerCounts.baseColor == sharedCounts.baseColor &&
+                     providerCounts.normal == sharedCounts.normal && providerCounts.orm == sharedCounts.orm &&
+                     providerCounts.emissive == sharedCounts.emissive,
+                     "actual viewmodel must add no duplicate body/gauntlet atlas layers")) return 1;
+        for (std::size_t material = 0; material < fixed.materials.size(); ++material)
+        {
+            const auto provider = std::find_if(worldStatic.materials.begin(), worldStatic.materials.end(),
+                [&](const auto& candidate) { return candidate.textureGroup == fixed.materials[material].textureGroup; });
+            if (!Require(provider != worldStatic.materials.end(), "viewmodel texture group must have a world owner")) return 1;
+            const auto providerIndex = static_cast<std::size_t>(provider - worldStatic.materials.begin());
+            if (!Require(sharedTextures.Materials()[worldStatic.materials.size() + material].textureLayers ==
+                         sharedTextures.Materials()[providerIndex].textureLayers,
+                         "actual sleeves/gauntlets must resolve to the matching world-body atlas layers")) return 1;
+        }
+        for (const auto clip : {SkinnedClip::Idle, SkinnedClip::Walking})
+        {
+            if (!Require(viewmodel.ClipDuration(clip) == world.ClipDuration(clip), "world/viewmodel clip duration differs")) return 1;
+            for (const float phase : {0.0f, 0.25f, 0.75f})
+            {
+                const float time = phase * world.ClipDuration(clip);
+                std::vector<TexturedSkinnedRtVertex> posed;
+                if (!Require(viewmodel.SkinUniqueTextured(clip, time, posed, diagnostic) &&
+                             FiniteTexturedVertices(posed), "viewmodel skin must remain finite and textured")) return 1;
+                for (const char* name : {"LeftHand", "RightHand", "LeftGrip", "RightGrip"})
+                {
+                    SkinnedNodeTransform bodySocket{}, viewmodelSocket{};
+                    if (!Require(world.NodeTransform(clip, time, name, bodySocket, diagnostic) &&
+                                 viewmodel.NodeTransform(clip, time, name, viewmodelSocket, diagnostic) &&
+                                 bodySocket == viewmodelSocket, "world/viewmodel authored hand/grip transform differs")) return 1;
+                }
+                SkinnedNodeTransform leftHand{}, rightHand{};
+                if (!world.NodeTransform(clip, time, "LeftHand", leftHand, diagnostic) ||
+                    !world.NodeTransform(clip, time, "RightHand", rightHand, diagnostic))
+                    return 1;
+                SkinnedArmIkTarget left{{{leftHand[12], leftHand[13] - 0.05f, leftHand[14] + phase * 0.1f}}, {{1.0f, -1.0f, 0.0f}}};
+                SkinnedArmIkTarget right{{{rightHand[12], rightHand[13] - 0.05f, rightHand[14] + phase * 0.1f}}, {{-1.0f, -1.0f, 0.0f}}};
+                SkinnedPlayerPose sharedPose, independentPose;
+                std::vector<TexturedSkinnedRtVertex> sharedVertices, independentVertices;
+                std::vector<SkinnedPbrTangent> sharedTangents, independentTangents;
+                if (!world.EvaluatePlayerPose(clip, time, left, right, sharedPose, diagnostic) ||
+                    !viewmodel.EvaluatePlayerPose(clip, time, left, right, independentPose, diagnostic) ||
+                    !viewmodel.SkinPlayerPoseUniqueTextured(sharedPose, sharedVertices, sharedTangents, diagnostic) ||
+                    !viewmodel.SkinPlayerPoseUniqueTextured(independentPose, independentVertices, independentTangents, diagnostic))
+                {
+                    std::cerr << "FAIL: viewmodel shared pose: " << diagnostic << '\n';
+                    return 1;
+                }
+                if (!Require(sharedPose.Sockets().leftGrip == independentPose.Sockets().leftGrip &&
+                             sharedPose.Sockets().rightGrip == independentPose.Sockets().rightGrip &&
+                             sharedVertices.size() == independentVertices.size() &&
+                             sharedTangents.size() == independentTangents.size() &&
+                             FiniteTexturedVertices(sharedVertices) &&
+                             std::memcmp(sharedVertices.data(), independentVertices.data(),
+                                         sharedVertices.size() * sizeof(TexturedSkinnedRtVertex)) == 0 &&
+                             std::memcmp(sharedTangents.data(), independentTangents.data(),
+                                         sharedTangents.size() * sizeof(SkinnedPbrTangent)) == 0,
+                             "shared world pose must produce exact viewmodel vertices, tangents and grips")) return 1;
+                SkinnedPlayerPose movedPose = std::move(sharedPose);
+                if (!Require(!sharedPose.IsValid() && movedPose.IsValid() &&
+                             viewmodel.SkinPlayerPoseUniqueTextured(movedPose, sharedVertices, sharedTangents, diagnostic),
+                             "moving a solved pose preserves its independent mesh binding")) return 1;
+                if (!Require(!viewmodel.SkinPlayerPoseUniqueTextured(sharedPose, sharedVertices, sharedTangents, diagnostic) &&
+                             sharedVertices.empty() && sharedTangents.empty(),
+                             "an invalid moved-from pose cannot retain stale mesh output")) return 1;
+                if (!Require(!world.EvaluatePlayerPose(clip, std::numeric_limits<float>::quiet_NaN(),
+                                                      left, right, movedPose, diagnostic) && !movedPose.IsValid(),
+                             "failed evaluation invalidates the old shared pose")) return 1;
+                left.target[0] = std::numeric_limits<float>::infinity();
+                if (!Require(!world.EvaluatePlayerPose(clip, time, left, right, movedPose, diagnostic) &&
+                             !movedPose.IsValid(), "non-finite IK input must be rejected")) return 1;
+            }
+        }
+        std::cout << "Viewmodel addressing, shared pose/vertex/tangent/grip agreement and invalid-pose rejection passed\n";
+        return 0;
+    }
+    if (argc == 4 && std::string(argv[1]) == "--validate-player-admission")
+    {
+        horde::scene::assets::AssetManifest manifest;
+        horde::scene::assets::StaticMeshAsset fixed;
+        horde::vulkan::raytracing::PlayerRenderSlot slot;
+        std::string diagnostic;
+        const bool valid = horde::scene::assets::AssetManifest::Load(argv[3], manifest, diagnostic) &&
+            manifest.ValidatePlayerSemantics(diagnostic) &&
+            horde::scene::assets::StaticMeshAsset::Load(argv[2], manifest, fixed, diagnostic) &&
+            slot.LoadAsset(argv[2], diagnostic) && slot.ValidateStaticVertexLayout(fixed, diagnostic);
+        return Require(valid, diagnostic.c_str()) ? 0 : 1;
+    }
+    if (argc == 4 && std::string(argv[1]) == "--validate-player-asset")
+    {
+        horde::vulkan::raytracing::PlayerRenderSlot slot;
+        std::string diagnostic;
+        const bool loaded = slot.LoadAsset(argv[2], diagnostic);
+        const std::string expectation(argv[3]);
+        if (expectation == "accept")
+            return Require(loaded && slot.IsLoaded(), diagnostic.c_str()) ? 0 : 1;
+        if (expectation == "reject-semantic")
+            return Require(!loaded && !slot.IsLoaded() && diagnostic.starts_with("Player primitive"),
+                           "malformed player must fail its semantic gate and retain no loaded asset") ? 0 : 1;
+        return 2;
+    }
     static_assert(sizeof(SkinnedRtVertex) == 32u);
     static_assert(sizeof(TexturedSkinnedRtVertex) == 48u);
 
@@ -623,16 +789,19 @@ int main()
                  "player exact-grounding subset must remain bounded to the authored lower body"))
         return 1;
     const auto& playerPrimitives = player.PrimitiveRanges();
-    if (!Require(playerPrimitives.size() == 4u &&
-                 playerPrimitives[0].materialName == "BodyPrimaryVisible" &&
-                 playerPrimitives[1].materialName == "GauntletPrimaryVisible" &&
-                 playerPrimitives[2].materialName == "HeadPrimaryMasked" &&
-                 playerPrimitives[3].materialName == "NearFacePrimaryMasked" &&
-                 playerPrimitives[0].expandedVertexCount == 16596u &&
-                 playerPrimitives[1].expandedVertexCount == 26514u &&
-                 playerPrimitives[2].expandedVertexCount == 5439u &&
-                 playerPrimitives[3].expandedVertexCount == 34776u,
-                 "player authored complete-arm and reflection-only body triangle ranges changed")) return 1;
+    std::vector<std::string_view> playerNames;
+    for (const auto& primitive : playerPrimitives) playerNames.push_back(primitive.materialName);
+    if (!Require(horde::scene::assets::ValidatePlayerPrimitiveNames(playerNames, diagnostic), diagnostic.c_str()))
+        return 1;
+    for (const auto& [name, count] : std::array<std::pair<std::string_view, std::size_t>, 4>{{
+             {"BodyPrimaryVisible", 16596u}, {"GauntletPrimaryVisible", 26514u},
+             {"HeadPrimaryMasked", 5439u}, {"NearFacePrimaryMasked", 34776u}}})
+    {
+        const auto part = std::find_if(playerPrimitives.begin(), playerPrimitives.end(),
+            [&](const auto& primitive) { return primitive.materialName == name; });
+        if (!Require(part != playerPrimitives.end() && part->expandedVertexCount == count,
+                     "named player primitive triangle count changed")) return 1;
+    }
     if (!Require(player.HasNode("LeftHand") && player.HasNode("RightHand") &&
                  player.HasNode("LeftGrip") && player.HasNode("RightGrip") &&
                  player.ClipDuration(SkinnedClip::Idle) > 0.9f &&
@@ -659,12 +828,27 @@ int main()
         horde::scene::assets::AssetManifest::Load(
             root / "assets/models/player/runtime/asset.manifest.json",
             playerManifest, diagnostic);
-    if (!Require(playerManifestLoaded, diagnostic.c_str())) return 1;
+    if (!Require(playerManifestLoaded, diagnostic.c_str()) ||
+        !Require(playerManifest.ValidatePlayerSemantics(diagnostic), diagnostic.c_str())) return 1;
     const bool playerStaticLoaded = horde::scene::assets::StaticMeshAsset::Load(
         playerPath, playerManifest, playerStatic, diagnostic);
     if (!Require(playerStaticLoaded, diagnostic.c_str()) ||
-        !Require(player.UniqueVertexCount() == playerStatic.vertices.size(),
-                 "static-PBR and skinned player vertex streams must have identical unique ordering")) return 1;
+        !Require(player.ValidateStaticVertexLayout(playerStatic, diagnostic), diagnostic.c_str())) return 1;
+    auto badStatic = playerStatic;
+    badStatic.primitives[0].vertexOffset += 1;
+    if (!Require(!player.ValidateStaticVertexLayout(badStatic, diagnostic), "changed unique offset must reject")) return 1;
+    badStatic = playerStatic;
+    badStatic.primitives[0].materialIndex = badStatic.primitives[1].materialIndex;
+    if (!Require(!player.ValidateStaticVertexLayout(badStatic, diagnostic), "changed material identity must reject")) return 1;
+    badStatic = playerStatic;
+    badStatic.indices[0] = (badStatic.indices[0] + 1u) % 4630u;
+    if (!Require(!player.ValidateStaticVertexLayout(badStatic, diagnostic), "changed expanded index must reject")) return 1;
+    badStatic = playerStatic;
+    badStatic.vertices[0].uv0[0] += 0.125f;
+    if (!Require(!player.ValidateStaticVertexLayout(badStatic, diagnostic), "changed static UV ordering must reject")) return 1;
+    badStatic = playerStatic;
+    badStatic.vertices.pop_back();
+    if (!Require(!player.ValidateStaticVertexLayout(badStatic, diagnostic), "changed unique vertex count must reject")) return 1;
     std::cout << "player static/skinned stream agreement passed\n";
     horde::scene::assets::AssetManifest rewardRingManifest;
     horde::scene::assets::StaticMeshAsset rewardRingStatic;
@@ -776,6 +960,41 @@ int main()
                  playerSlot.LeftSocketErrorMetres() <= 0.015f &&
                  playerSlot.RightSocketErrorMetres() <= 0.015f,
                  "authoritative held-item targets must drive the final rig bone sockets")) return 1;
+
+    horde::vulkan::raytracing::PlayerRenderSlot observedPlayerSlot;
+    if (!observedPlayerSlot.LoadAsset(playerPath.string(), diagnostic))
+    {
+        std::cerr << "FAIL: observed player load: " << diagnostic << '\n';
+        return 1;
+    }
+    horde::telemetry::RtStageAccumulator playerStages;
+    ObservationClock observationClock;
+    horde::vulkan::raytracing::RtSceneRecordObservation playerObservation{
+        &playerStages, &observationClock, ReadObservationClock};
+    bool observedPoseUpdated = false;
+    horde::telemetry::RtStageFrameSample playerStageSample{};
+    if (!Require(playerStages.Begin(), "observed player stage attempt must begin") ||
+        !observedPlayerSlot.PreparePose(
+            rigSnapshot, simulation.Snapshot().tickIndex,
+            horde::vulkan::raytracing::PlayerCpuSkinCadence::Hz60,
+            observedPoseUpdated, diagnostic, &playerObservation) ||
+        !Require(observedPoseUpdated, "first observed player pose must skin") ||
+        !observedPlayerSlot.PreparePose(
+            rigSnapshot, simulation.Snapshot().tickIndex,
+            horde::vulkan::raytracing::PlayerCpuSkinCadence::Hz60,
+            observedPoseUpdated, diagnostic, &playerObservation) ||
+        !Require(!observedPoseUpdated,
+                 "same-tick unchanged player pose must be a cadence skip") ||
+        !Require(playerStages.Commit(playerStageSample),
+                 "observed player stage attempt must commit"))
+        return 1;
+    const auto& observedPlayerSkin = playerStageSample.values[
+        horde::telemetry::RtStageIndex(horde::telemetry::RtStage::PlayerSkin)];
+    if (!Require(observationClock.reads == 2u &&
+                     observedPlayerSkin.durationNanoseconds == 27u &&
+                     observedPlayerSkin.workInvocationCount == 1u,
+                 "player skin observation must time only actual skin and skip cached cadence work"))
+        return 1;
 
     const auto* restCheckpoint = horde::gameplay::FindDevelopmentCheckpoint(106);
     const auto* downCheckpoint = horde::gameplay::FindDevelopmentCheckpoint(107);

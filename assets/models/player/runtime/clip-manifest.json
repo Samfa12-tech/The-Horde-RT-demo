@@ -11,6 +11,7 @@
   "primitiveSemantics": [
     { "material": "BodyPrimaryVisible", "firstPersonPrimary": true, "shadow": true, "reflection": true },
     { "material": "HeadPrimaryMasked", "firstPersonPrimary": false, "shadow": true, "reflection": true },
-    { "material": "NearFacePrimaryMasked", "firstPersonPrimary": false, "shadow": true, "reflection": true }
+    { "material": "NearFacePrimaryMasked", "firstPersonPrimary": false, "shadow": true, "reflection": true },
+    { "material": "GauntletPrimaryVisible", "firstPersonPrimary": true, "shadow": true, "reflection": true }
   ]
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "scene/assets/PlayerViewmodelContract.h"
+
 #include <array>
 #include <cstdint>
 #include <filesystem>
@@ -52,6 +54,15 @@ struct MaterialOverride
     bool hasThinWall = false;
 };
 
+// Own parsed strings; borrowed contract views are formed only for validation.
+struct AssetPrimitiveSemantic
+{
+    std::string material;
+    bool firstPersonPrimary = false;
+    bool shadow = false;
+    bool reflection = false;
+};
+
 struct AssetManifest
 {
     std::uint32_t schema = 0u;
@@ -64,6 +75,14 @@ struct AssetManifest
     std::vector<std::string> requiredSockets;
     RuntimeTextureProfile textureProfile;
     std::vector<MaterialOverride> materialOverrides;
+    std::vector<AssetPrimitiveSemantic> primitiveSemantics;
+    bool hasPrimitiveSemantics = false;
+    PlayerAssetRole playerAssetRole = PlayerAssetRole::Unspecified;
+
+    // Required explicitly by the player consumer; other assets need no player semantics.
+    bool ValidatePlayerSemantics(std::string& diagnostic) const;
+    bool ValidatePlayerViewmodelSemantics(std::string& diagnostic) const;
+    bool ValidatePlayerAssetRole(std::string& diagnostic) const;
 
     static bool Load(const std::filesystem::path& path,
                      AssetManifest& manifest,

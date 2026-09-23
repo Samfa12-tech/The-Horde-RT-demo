@@ -3,7 +3,8 @@
 #include "scene/assets/AssetValidation.h"
 #include "scene/assets/DielectricTopologyMath.h"
 #include "scene/assets/GltfDocument.h"
-#include "third_party/cgltf/cgltf.h"
+#include "scene/assets/PlayerPrimitiveContract.h"
+#include "cgltf/cgltf.h"
 
 #include <algorithm>
 #include <array>
@@ -243,8 +244,17 @@ StaticMaterial ConvertMaterial(const cgltf_data& data,
     if (source.double_sided) result.flags |= 1u;
     if (source.alpha_mode != cgltf_alpha_mode_opaque) result.flags |= 2u;
     if (result.transmissionFactor > 0.0f) result.flags |= 4u;
-    if (result.name == "HeadPrimaryMasked") result.flags |= 128u;
-    if (result.name == "NearFacePrimaryMasked") result.flags |= 256u;
+    if (const auto* playerPart = FindPlayerPrimitiveContract(result.name))
+    {
+        result.textureGroup = static_cast<std::int32_t>(playerPart->textureGroup);
+        // Preserve the existing CPU/GLSL bits; semantic lookup is name-based.
+        if (playerPart->semantic == PlayerPrimitiveSemantic::Head) result.flags |= 128u;
+        if (playerPart->semantic == PlayerPrimitiveSemantic::NearFace) result.flags |= 256u;
+    }
+    else if (const auto* viewmodelPart = FindPlayerViewmodelPrimitiveContract(result.name))
+    {
+        result.textureGroup = static_cast<std::int32_t>(viewmodelPart->textureGroup);
+    }
     return result;
 }
 
@@ -830,6 +840,7 @@ bool StaticMeshAsset::Load(const std::filesystem::path& runtimeGlb,
                            std::string& diagnostic)
 {
     asset = {};
+    if (!manifest.ValidatePlayerAssetRole(diagnostic)) return false;
     GltfDocument document;
     if (!GltfDocument::Load(runtimeGlb, document, diagnostic)) return false;
     const cgltf_data& data = *document.Data();
@@ -1188,6 +1199,22 @@ bool StaticMeshAsset::Load(const std::filesystem::path& runtimeGlb,
     {
         diagnostic = "Static GLB contains no presentable triangle primitives.";
         return false;
+    }
+    if (manifest.playerAssetRole == PlayerAssetRole::Viewmodel ||
+        !manifest.primitiveSemantics.empty())
+    {
+        std::vector<std::string_view> names;
+        names.reserve(asset.primitives.size());
+        for (const auto& primitive : asset.primitives)
+            names.push_back(asset.materials[primitive.materialIndex].name);
+        const bool valid = manifest.playerAssetRole == PlayerAssetRole::Viewmodel
+            ? ValidatePlayerViewmodelPrimitiveNames(names, diagnostic)
+            : ValidatePlayerPrimitiveNames(names, diagnostic);
+        if (!valid)
+        {
+            asset = {};
+            return false;
+        }
     }
     if (!ValidateThickDielectricTopology(asset, diagnostic)) return false;
     diagnostic.clear();

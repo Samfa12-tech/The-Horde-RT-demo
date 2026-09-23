@@ -1,4 +1,5 @@
 #include "vulkan/raytracing/PlayerRenderSlot.h"
+#include "vulkan/raytracing/RtSceneRecordObservation.h"
 
 #include "gameplay/ShowcaseRoute.h"
 
@@ -194,12 +195,18 @@ float GripOrientationError(const HeldItemTransform& left,
 PlayerRouteMasks BuildPlayerRouteMasks(const PlayerRenderRoute route)
 {
     PlayerRouteMasks result;
+    if (route == PlayerRenderRoute::ModelledViewmodel)
+    {
+        result.instanceMasks[kPlayerWorldBodyInstanceIndex] = 0x10u;
+        result.instanceMasks[kPlayerViewmodelInstanceIndex] = kPlayerViewmodelPrimaryMask;
+        return result;
+    }
     if (route == PlayerRenderRoute::Skinned)
     {
         // One skinned full body participates in primary-body and reflection
         // rays. Head/near-face primary exclusion is primitive metadata, not a
         // second hidden instance.
-        result.instanceMasks[4] = 0x14u;
+        result.instanceMasks[kPlayerWorldBodyInstanceIndex] = 0x14u;
         return result;
     }
     if (route == PlayerRenderRoute::HybridBlockPrimary)
@@ -208,12 +215,12 @@ PlayerRouteMasks BuildPlayerRouteMasks(const PlayerRenderRoute route)
         // rays. Reward props own TLAS slots 5-8 and the dielectric fixture owns
         // metadata index 9, so the bounded fallback arms use the otherwise
         // available procedural slots/custom indices 10-13.
-        result.instanceMasks[4] = 0x10u;
+        result.instanceMasks[kPlayerWorldBodyInstanceIndex] = 0x10u;
         for (std::size_t slot = 10u; slot <= 13u; ++slot)
             result.instanceMasks[slot] = 0x04u;
         return result;
     }
-    result.instanceMasks[4] = 0x10u;
+    result.instanceMasks[kPlayerWorldBodyInstanceIndex] = 0x10u;
     for (std::size_t slot = 5u; slot <= 15u; ++slot)
     {
         result.instanceMasks[slot] = 0x04u;
@@ -234,7 +241,9 @@ ProductionSceneVisibility BuildProductionSceneVisibility(
     // skinned body in reflections/shadows, stable block arms in free slots
     // 10-13. This is intentionally one route switch, not a second animation or
     // socket authority.
-    result.playerRoute = input.requestedPlayerRoute == PlayerRenderRoute::Skinned
+    result.playerRoute = input.requestedPlayerRoute == PlayerRenderRoute::ModelledViewmodel
+        ? PlayerRenderRoute::ModelledViewmodel
+        : input.requestedPlayerRoute == PlayerRenderRoute::Skinned
         ? PlayerRenderRoute::Skinned
         : ((result.rewardWorldVisible || input.glassFixtureVisible)
             ? PlayerRenderRoute::HybridBlockPrimary
@@ -247,11 +256,11 @@ ProductionSceneVisibility BuildProductionSceneVisibility(
         ? 0u : 0x02u;
     result.swordMask = input.productionInspection ? 0u : 0x02u;
     result.playerMask = input.productionInspection
-        ? 0u : playerMasks.instanceMasks[4];
+        ? 0u : playerMasks.instanceMasks[kPlayerWorldBodyInstanceIndex];
     result.playerPrimaryVisible = !input.productionInspection &&
         std::any_of(playerMasks.instanceMasks.begin(),
                     playerMasks.instanceMasks.end(),
-                    [](const std::uint8_t mask) { return (mask & 0x04u) != 0u; });
+                    [](const std::uint8_t mask) { return (mask & (0x04u | kPlayerViewmodelPrimaryMask)) != 0u; });
     result.playerReflectionVisible = (result.playerMask & 0x10u) != 0u;
     return result;
 }
@@ -263,9 +272,10 @@ std::vector<PlayerPrimitiveVisibility> BuildPlayerPrimitiveVisibility(
     result.reserve(semantics.size());
     for (const PlayerPrimitiveSemantic semantic : semantics)
     {
-        PlayerPrimitiveVisibility visibility;
-        visibility.primaryVisible = semantic == PlayerPrimitiveSemantic::Body;
-        result.push_back(visibility);
+        const auto* part = horde::scene::assets::FindPlayerPrimitiveContract(semantic);
+        result.push_back(part != nullptr
+            ? PlayerPrimitiveVisibility{part->firstPersonPrimary, part->shadow, part->reflection}
+            : PlayerPrimitiveVisibility{false, false, false});
     }
     return result;
 }
@@ -458,6 +468,8 @@ bool PlayerRenderSlot::LoadAsset(const std::string& runtimeGlbPath,
                                  std::string& diagnostic)
 {
     uniqueVertices_.clear();
+    uniqueTangents_.clear();
+    solvedPose_ = {};
     sockets_ = {};
     lastSkinnedTick_ = std::numeric_limits<std::uint64_t>::max();
     lastPreparedAnimation_ = {};
@@ -473,6 +485,15 @@ bool PlayerRenderSlot::LoadAsset(const std::string& runtimeGlbPath,
     bootGroundingProfilesReady_ = false;
     if (!asset_.LoadClips(runtimeGlbPath, horde::scene::PlayerLocomotionClipSet(), diagnostic))
         return false;
+    std::vector<std::string_view> primitiveNames;
+    primitiveNames.reserve(asset_.PrimitiveRanges().size());
+    for (const auto& primitive : asset_.PrimitiveRanges())
+        primitiveNames.push_back(primitive.materialName);
+    if (!horde::scene::assets::ValidatePlayerPrimitiveNames(primitiveNames, diagnostic))
+    {
+        asset_ = {};
+        return false;
+    }
     return DeriveAssetGripSockets(diagnostic) &&
            BuildBootGroundingProfiles(diagnostic);
 }
@@ -602,7 +623,8 @@ bool PlayerRenderSlot::PreparePose(
     const std::uint64_t tickIndex,
     const PlayerCpuSkinCadence cadence,
     bool& poseUpdated,
-    std::string& diagnostic)
+    std::string& diagnostic,
+    RtSceneRecordObservation* observation)
 {
     poseUpdated = false;
     if (!asset_.IsLoaded())
@@ -676,10 +698,17 @@ bool PlayerRenderSlot::PreparePose(
                      std::to_string(determinant(right.handOrientation)) + ".";
         return false;
     }
-    if (!asset_.SkinPlayerUniqueTextured(
-            clip, animation.locomotionTime, left, right, uniqueVertices_,
-            uniqueTangents_, sockets_, diagnostic))
+    RtSceneStageScope skinScope(observation, horde::telemetry::RtStage::PlayerSkin);
+    if (!asset_.EvaluatePlayerPose(
+            clip, animation.locomotionTime, left, right, solvedPose_, diagnostic) ||
+        !asset_.SkinPlayerPoseUniqueTextured(
+            solvedPose_, uniqueVertices_, uniqueTangents_, diagnostic))
+    {
+        skinScope.Cancel();
         return false;
+    }
+    sockets_ = solvedPose_.Sockets();
+    skinScope.Complete(1u);
     const auto socketError = [](const horde::scene::SkinnedNodeTransform& socket,
                                 const horde::gameplay::animation::PlayerArmIkTarget& intended) {
         return std::hypot(std::hypot(socket[12] - intended.target[0],

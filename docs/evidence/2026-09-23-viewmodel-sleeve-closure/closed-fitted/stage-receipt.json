@@ -1,0 +1,213 @@
+{
+  "executableSha256": "23B774C949FCEF3977109B43DF6B760B39061D6CA44597CDFD795075A879C312",
+  "assets": [
+    {
+      "sha256": "340A8A354BD57A8167DA84FC26CCDFE03C5EF536195E260CD27C24E0059DE6DB",
+      "path": "assets\\models\\enemies\\meshy\\skeleton_biped_merged_animations_v01.glb"
+    },
+    {
+      "sha256": "049979A83ACA55358F54AF8D3AF1F7D518607BEF634474A4EF015BFDFF947A42",
+      "path": "assets\\models\\enemies\\meshy\\lich_placeholder_merged_animations_v01.glb"
+    },
+    {
+      "sha256": "EB1EED6D5990C47FB98C7489A5BA7B5B47B8BBBD41AFD73A42457A668B82B168",
+      "path": "assets\\textures\\meshy\\lich_placeholder_v01\\base-color-2048-rgba8.ktx2"
+    },
+    {
+      "sha256": "AA22C00F6E89D74D93B689E8B3C5E50101031D0595B04451A3EBCF15D559DA98",
+      "path": "assets\\textures\\meshy\\lich_placeholder_v01\\emissive-2048-rgba8.ktx2"
+    },
+    {
+      "sha256": "93CEF18042DD442DA94F8729807BBA28A4F1FA9E29737CC86061D0707FE06883",
+      "path": "assets\\textures\\polyhaven\\mobile_1k\\diff-array-512.rgba"
+    },
+    {
+      "sha256": "AD59D24C5E03B255224E7C33DDB2C9366ED9DB0434FEFC9E018317D8D57E85DF",
+      "path": "assets\\textures\\polyhaven\\mobile_1k\\normal-array-512.rgba"
+    },
+    {
+      "sha256": "3FEBB9EDA7B0B4AE1469F9D889C291B479FB50713A5717F545184BE755FB6151",
+      "path": "assets\\textures\\polyhaven\\mobile_1k\\arm-array-512.rgba"
+    },
+    {
+      "sha256": "C6203D4AF94A74F317C826D6821F2B12C5B3E2316F3C2DE58EF4F76A444AC980",
+      "path": "assets\\models\\weapons\\runtime\\asset.manifest.json"
+    },
+    {
+      "sha256": "477FF6C53C4B407BC16E9E84D16AAF47DC72131B812DEBF2B92D0AB2FCFAB5C1",
+      "path": "assets\\models\\weapons\\runtime\\gothic-arming-sword-rh-lod0.runtime.glb"
+    },
+    {
+      "sha256": "B96C47284C0DE4197F69836AAFE25F4C307B724FCD5B29B34D3010CE9E8F733F",
+      "path": "assets\\models\\props\\runtime\\asset.manifest.json"
+    },
+    {
+      "sha256": "B1A2078C78D54DAE548B89E20168C9922C7DFE33851D47F3D98E7FF1E7C14B8D",
+      "path": "assets\\models\\props\\runtime\\gothic-hand-torch-lod0.runtime.glb"
+    },
+    {
+      "sha256": "65A7CC8C20506541F0B04165DE6117868E201A95A500571C826BEF27A8F4AD20",
+      "path": "assets\\models\\props\\runtime\\dielectric-fixture\\asset.manifest.json"
+    },
+    {
+      "sha256": "843FD245DA61352A124E3DE03F4CCF01923A293AFEDEE2ED73B65A8A18EEBF5B",
+      "path": "assets\\models\\props\\runtime\\dielectric-fixture\\closed-glass-lod0.runtime.glb"
+    },
+    {
+      "sha256": "4C187FA4B45ECA1001137027D38E0CD20F86927B0FFB9CA3BC12905C55C892A2",
+      "path": "assets\\models\\props\\runtime\\gothic-chest-base\\asset.manifest.json"
+    },
+    {
+      "sha256": "B65E6E5C5E8C69EA4695C16E0085BDAA0209F5F963BC0AF75EDA5174354A04F2",
+      "path": "assets\\models\\props\\runtime\\gothic-chest-base\\gothic-chest-base-lod0.runtime.glb"
+    },
+    {
+      "sha256": "22C0701F4B1402C616CD56F6996AB0B4D2AD2D5979D204797D52DC540E887EFB",
+      "path": "assets\\models\\props\\runtime\\gothic-chest-lid\\asset.manifest.json"
+    },
+    {
+      "sha256": "CD0DB348FAD0939197F36A02E14F87ABD15E7284C6701B1DB1E679C8F7AF03E2",
+      "path": "assets\\models\\props\\runtime\\gothic-chest-lid\\gothic-chest-lid-lod0.runtime.glb"
+    },
+    {
+      "sha256": "C4F840EC9375628A6638ECAEFAEFF8868ECB0578C519589C48680C5726515860",
+      "path": "assets\\models\\props\\runtime\\reward-lantern-ring\\asset.manifest.json"
+    },
+    {
+      "sha256": "75BF4F0D7C64C67848F08F1B2FB5B802527160C79DEF7F71CA964BDCF72799F5",
+      "path": "assets\\models\\props\\runtime\\reward-lantern-ring\\reward-lantern-ring-lod0.runtime.glb"
+    },
+    {
+      "sha256": "3C6352DC4FB1680E3AA3684294008BBBB189295CA1D5B8145C0F23E704C55E35",
+      "path": "assets\\models\\props\\runtime\\reward-lantern-body\\asset.manifest.json"
+    },
+    {
+      "sha256": "34A2522F2027D3FB04B77480CC929D36C5A19C6E0F33BF3FA0F0AE0959C99EC4",
+      "path": "assets\\models\\props\\runtime\\reward-lantern-body\\reward-lantern-body-lod0.runtime.glb"
+    },
+    {
+      "sha256": "451E39EFB1D23BF46E5104F0D5D57BC5C9B1080F827C1064E804DCB7D80C7D86",
+      "path": "assets\\models\\player\\runtime\\asset.manifest.json"
+    },
+    {
+      "sha256": "A63577589A4EF79B7BEEF7FBAA767A6DA518B423DAA1DE055FFF18E39F042A1C",
+      "path": "assets\\models\\player\\runtime\\clip-manifest.json"
+    },
+    {
+      "sha256": "4050E15B5084BFA83AD9DB09F8BB8ECECD872BE89A27D0B08447C12F9F7A501D",
+      "path": "assets\\models\\player\\runtime\\gothic-traveller-lod0.runtime.glb"
+    },
+    {
+      "sha256": "1F32F8FFF8832450291E7BA655A6C392840457883BFFFC977D517398CBCDFEB8",
+      "path": "assets\\textures\\props\\runtime\\asset.manifest.json"
+    },
+    {
+      "sha256": "459AEE2320B09248C975463F0540015FF3C9CD1341E598687C883A7547E69DF3",
+      "path": "assets\\textures\\props\\runtime\\base-color.windows.ktx2"
+    },
+    {
+      "sha256": "22876139676970909C2284223031850BF6852482E9E41885C58ADA408CBF97F0",
+      "path": "assets\\textures\\props\\runtime\\normal.windows.ktx2"
+    },
+    {
+      "sha256": "85EEA39067C5C9382727B885618379F9C43E49AE9B1A390756AD001F14B7A132",
+      "path": "assets\\textures\\props\\runtime\\orm.windows.ktx2"
+    },
+    {
+      "sha256": "C642D3972A14BF477D88F2ECB34FFC177AD4DC6308DFE8F507AF6033C292DD56",
+      "path": "assets\\textures\\props\\runtime\\emissive.windows.ktx2"
+    },
+    {
+      "sha256": "720B938A688DA6C4EE85939261680676D859FB62BE96926385183D33C3DB67C5",
+      "path": "assets/models/player/viewmodel/runtime/asset.manifest.json"
+    },
+    {
+      "sha256": "F785D970BBC10BDEF7A939D14F8BBD3BB5285A0C77631CBC090106CD24214C42",
+      "path": "assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb"
+    },
+    {
+      "sha256": "BE5BB75FD09A4D24313A32B23D70A92D3C7AB81B5B838231BE17FA92E952B217",
+      "path": "assets\\audio\\filmcow\\enemy_fall.wav"
+    },
+    {
+      "sha256": "37D8FC97F20A64737970459D3CBCB6F6D1894E730DC0B7F6021C535492F4CF30",
+      "path": "assets\\audio\\filmcow\\lich_charge.wav"
+    },
+    {
+      "sha256": "B953F591C317A00B687073E78D0328FBDD3994C4EAE34E77C0EC6A20CE1C520A",
+      "path": "assets\\audio\\filmcow\\lich_fall.wav"
+    },
+    {
+      "sha256": "020BE6FF7E8BFD14AA946EE72E31F4A66230097E23FBA98B0DDF5BF4672E8488",
+      "path": "assets\\audio\\filmcow\\lich_hurt.wav"
+    },
+    {
+      "sha256": "5E7672DAA9A7248D022756FAF2998221C3CBC6AB4A4193114F66E080BFDD83F0",
+      "path": "assets\\audio\\filmcow\\lich_impact.wav"
+    },
+    {
+      "sha256": "9D511866154C859D3250229A9CBC03948E57AFAB833A2DD68BBD25B61BB27E08",
+      "path": "assets\\audio\\filmcow\\menu_toggle.wav"
+    },
+    {
+      "sha256": "CDAAA9C321E6F4FBF12757FDC20633D4B8F0BE30B127038D3CFE0581A8DEA0FB",
+      "path": "assets\\audio\\filmcow\\player_step_1.wav"
+    },
+    {
+      "sha256": "261413FB6C185F9E7038A980FC7B124EF9BC7F6F93B258ED83D1D76EB7B9883E",
+      "path": "assets\\audio\\filmcow\\player_step_2.wav"
+    },
+    {
+      "sha256": "81EABE7C1BB196F1DF5876419A85348128DF2D864F79857C18849091218DF11E",
+      "path": "assets\\audio\\filmcow\\skeleton_attack.wav"
+    },
+    {
+      "sha256": "78EDE28CEBBAD2B61E8A373C45D072AB719FB69A3CF103E57EA7C926C06C176E",
+      "path": "assets\\audio\\filmcow\\skeleton_step_1.wav"
+    },
+    {
+      "sha256": "E4A080064FDCCD821096D9B42DCB312F0FB40AC8227242999B904602A4786122",
+      "path": "assets\\audio\\filmcow\\skeleton_step_2.wav"
+    },
+    {
+      "sha256": "11BA4CA02139ED59BBB71B901603314FE3772E29827A8B368F463FD33F8AB76F",
+      "path": "assets\\audio\\filmcow\\sword_hit_1.wav"
+    },
+    {
+      "sha256": "372C2F83656C7FE6B1098C9FE1565CD43F0C42A5FA927D3D8DEB3A562D7ED57B",
+      "path": "assets\\audio\\filmcow\\sword_hit_2.wav"
+    },
+    {
+      "sha256": "1007AF0E6B21CBFEA341032E55C7944B4FDD097F55979679840C77745F3DB267",
+      "path": "assets\\audio\\filmcow\\sword_swing_1.wav"
+    },
+    {
+      "sha256": "DED16A59E6760342CC90C0E7FEDACBD061CE1C661F6226ECB63AD98EBD672BF3",
+      "path": "assets\\audio\\filmcow\\sword_swing_2.wav"
+    },
+    {
+      "sha256": "B26DF842011AE1813CE4D2129A099E1DB449F56325FA1B2770F3380C160C219E",
+      "path": "assets\\audio\\filmcow\\ui_back.wav"
+    },
+    {
+      "sha256": "37483938D3D68E6309E881E1D32BB976E2744743F3869B0BCA7A8B6E217E1F33",
+      "path": "assets\\audio\\filmcow\\ui_select.wav"
+    },
+    {
+      "sha256": "788B1C31C504C8EEA9E5316C87859013ABA6A49F205E0E4A66B181AAFBDFB4A6",
+      "path": "assets\\audio\\pixabay\\chest_open.wav"
+    },
+    {
+      "sha256": "A1DAE01ADB6534A2E1504F0D5BC41ABFF0305E619264DFF0339577D4D5B2D808",
+      "path": "assets\\audio\\pixabay\\chest_unlock.wav"
+    },
+    {
+      "sha256": "EF2E85D4219CCE2E5789D6326755909F59E302BD26BC2DBD8F3E39C270614AB8",
+      "path": "assets\\audio\\pixabay\\torch_extinguish.wav"
+    },
+    {
+      "sha256": "DE7711F0E6EF9CF0BDD3D04BA7A1B713CE09EF18169BD994182B09AB2017EE62",
+      "path": "assets\\audio\\pixabay\\waterfall_loop.wav"
+    }
+  ]
+}

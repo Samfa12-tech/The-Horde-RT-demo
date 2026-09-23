@@ -1,0 +1,5 @@
+{
+  "baseline-a1": {"startedUtc": "2026-09-20T07:07:14.9290809Z", "processId": "3860"},
+  "baseline-a2": {"startedUtc": "2026-09-20T07:17:00.4482570Z", "processId": "20966"},
+  "rejectedLaunch": {"startedUtc": "2026-09-20T07:03:05.8624699Z", "reason": "existing task was brought forward without a new workload Intent; no completed measurement accepted"}
+}

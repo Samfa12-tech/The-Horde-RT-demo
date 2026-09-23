@@ -12,6 +12,8 @@ param(
     [switch]$RtLabWorkloadComparison,
     [switch]$SkipBuild,
     [switch]$SkipInstall,
+    [string]$ViewmodelCandidateDirectory = "",
+    [string]$ApkPath = "",
     [ValidateNotNullOrEmpty()]
     [string]$DeviceSerial = "R5GL219SZGK",
     [ValidateNotNullOrEmpty()]
@@ -24,8 +26,9 @@ param(
 $ErrorActionPreference = "Stop"
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 $androidRoot = Join-Path $repoRoot "android"
-$apk = Join-Path $androidRoot "app\build\outputs\apk\debug\app-debug.apk"
-$packageName = "com.samfa12.hordelanternrt.debug"
+if ($ApkPath -and -not $SkipBuild) { throw 'An explicit immutable ApkPath requires SkipBuild.' }
+$apk = ""
+$packageName = if ($ViewmodelCandidateDirectory) { "com.samfa12.hordelanternrt.debug.viewmodel" } else { "com.samfa12.hordelanternrt.debug" }
 $activityName = "$packageName/com.samfa12.hordelanternrt.MainActivity"
 $adb = Join-Path $env:LOCALAPPDATA "Android\Sdk\platform-tools\adb.exe"
 $runId = Get-Date -Format "yyyyMMdd-HHmmss"
@@ -39,7 +42,6 @@ $reference30FpsMs = 1000.0 / 30.0
 $sourceCommit = (& git -C $repoRoot rev-parse HEAD 2>&1 | Out-String).Trim()
 if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($sourceCommit)) { throw "Could not resolve the source Git commit." }
 $sourceDirty = -not [string]::IsNullOrWhiteSpace((& git -C $repoRoot status --porcelain 2>&1 | Out-String).Trim())
-$raygenSha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $repoRoot "src\vulkan\raytracing\MinimalRayGenShader.inc")).Hash.ToLowerInvariant()
 $checkpointZones = @{
     "opening" = "opening"
     "skeleton" = "skeleton-room"
@@ -68,6 +70,14 @@ $checkpointZones = @{
     "pbr-torch-fire" = "opening"
     "player-body-forward" = "opening"
     "player-fallback-forward" = "opening"
+    "player-viewmodel-grips" = "opening"
+    "player-viewmodel-forward" = "opening"
+    "player-viewmodel-downward-cut" = "opening"
+    "player-viewmodel-upward-slice" = "opening"
+    "player-viewmodel-look-up" = "opening"
+    "player-viewmodel-look-down" = "opening"
+    "player-viewmodel-lantern-high" = "yellow-torch-bay"
+    "player-viewmodel-lantern-low" = "yellow-torch-bay"
     "lantern-chest-unlock" = "finale"
     "lantern-glass-production" = "finale"
     "lantern-held-high" = "yellow-torch-bay"
@@ -92,24 +102,35 @@ $checkpointZones = @{
     "lantern-chest-held-high" = "finale"
 }
 $baselineCheckpoints = @("opening", "two-enemy-combat", "worst-bend", "skylight", "green", "lich")
+$viewmodelCheckpoints = @(
+    "player-viewmodel-grips", "player-viewmodel-forward",
+    "player-viewmodel-downward-cut", "player-viewmodel-upward-slice",
+    "player-viewmodel-look-up", "player-viewmodel-look-down",
+    "player-viewmodel-lantern-high", "player-viewmodel-lantern-low")
 $captureCheckpoints = @("opening", "skeleton", "worst-bend", "lantern-drop", "skylight", "yellow", "blue", "red", "green", "mirror", "lich", "finale-roof", "two-enemy-combat")
 if ($CaptureSelection.Count -gt 0) { $captureCheckpoints = @($CaptureSelection) }
 $combatCaptureExpectations = @{
     "player-body-downward-cut" = @{
-        action = "swing-active"; animationTime = 0.2500; minimumConsumedAttackSequence = 1
+        action = "swing-active"; animationTime = 0.5833; actionTime = 0.4033; minimumConsumedAttackSequence = 1
         stagedAttackEdges = 1; stagedSwingEvents = 1
     }
     "player-body-upward-slice" = @{
-        action = "upward-active"; animationTime = 0.5167; minimumConsumedAttackSequence = 2
+        action = "upward-active"; animationTime = 0.6167; actionTime = 0.1667; minimumConsumedAttackSequence = 2
         stagedAttackEdges = 2; stagedSwingEvents = 2
     }
 }
+# Both routes stage the same late active poses through the shared 60 Hz
+# simulation. They differ in render ownership, not combat timing.
+$combatCaptureExpectations['player-viewmodel-downward-cut'] = $combatCaptureExpectations['player-body-downward-cut']
+$combatCaptureExpectations['player-viewmodel-upward-slice'] = $combatCaptureExpectations['player-body-upward-slice']
 $rtLabComparisonCheckpoints = @('lantern-drop', 'skylight', 'finale-roof')
 $rtLabExpectedWaterQuality = 1
 $timingRows = [System.Collections.Generic.List[object]]::new()
 $captureRecords = [System.Collections.Generic.List[object]]::new()
 $failures = [System.Collections.Generic.List[string]]::new()
 $warnings = [System.Collections.Generic.List[string]]::new()
+$selectedRtPipelineBundle = $null
+$selectedRtPipelineBundleSerialized = $null
 $initialWakefulness = ""
 $lifecycleEvidence = [ordered]@{
     requested = [bool]$Capture
@@ -199,9 +220,37 @@ function Get-ShowcaseState {
     param([string]$Destination)
     Save-PrivateFile -RemotePath "files/reports/showcase_debug_state.json" -Destination $Destination
     try {
-        return Get-Content -LiteralPath $Destination -Raw | ConvertFrom-Json
+        $state = Get-Content -LiteralPath $Destination -Raw | ConvertFrom-Json
     } catch {
         throw "Native showcase state is not valid JSON: $Destination`n$($_.Exception.Message)"
+    }
+    Register-SelectedRtPipelineBundle -Bundle $state.selectedRtPipelineBundle -Context $Destination
+    return $state
+}
+
+function Register-SelectedRtPipelineBundle {
+    param([Parameter(Mandatory = $true)]$Bundle,
+          [Parameter(Mandatory = $true)][string]$Context)
+    foreach ($strategy in @("opaqueFast", "genericDielectric")) {
+        $entry = $Bundle.$strategy
+        if ($null -eq $entry -or [string]::IsNullOrWhiteSpace([string]$entry.key) -or
+            [string]$entry.sha256 -cnotmatch '^[0-9a-f]{64}$') {
+            throw "$Context is missing exact selected $strategy key/hash identity."
+        }
+    }
+    $opaquePolicy = ([string]$Bundle.opaqueFast.key) -replace '_opaque_fast$', ''
+    $genericPolicy = ([string]$Bundle.genericDielectric.key) -replace '_generic_dielectric$', ''
+    if ($opaquePolicy -ceq [string]$Bundle.opaqueFast.key -or
+        $genericPolicy -ceq [string]$Bundle.genericDielectric.key -or
+        $opaquePolicy -cne $genericPolicy) {
+        throw "$Context does not identify one coherent selected RT pipeline policy pair."
+    }
+    $serialized = $Bundle | ConvertTo-Json -Depth 4 -Compress
+    if ($null -eq $script:selectedRtPipelineBundle) {
+        $script:selectedRtPipelineBundle = $Bundle
+        $script:selectedRtPipelineBundleSerialized = $serialized
+    } elseif ($serialized -cne $script:selectedRtPipelineBundleSerialized) {
+        throw "$Context selected RT pipeline bundle changed during one evidence run."
     }
 }
 
@@ -273,8 +322,7 @@ function Invoke-CaptureCheckpoint {
             $failures.Add("$Checkpoint capture animation time $($state.animationTime) did not retain its authoritative staged time $($expectedCombat.animationTime).")
         }
         if ($state.playerCombat.action -ne $expectedCombat.action -or
-            [double]$state.playerCombat.actionTime -lt 0.06 -or
-            [double]$state.playerCombat.actionTime -gt 0.10) {
+            [math]::Abs([double]$state.playerCombat.actionTime - [double]$expectedCombat.actionTime) -gt 0.001) {
             $failures.Add("$Checkpoint capture combat phase '$($state.playerCombat.action)' at $($state.playerCombat.actionTime) s did not match the staged active phase.")
         }
         if ([int64]$state.playerCombat.lastConsumedAttackSequence -lt [int64]$expectedCombat.minimumConsumedAttackSequence) {
@@ -297,8 +345,16 @@ function Invoke-CaptureCheckpoint {
     if ($Checkpoint -eq "player-fallback-grips" -and $state.playerRenderRoute -ne "procedural") {
         $failures.Add("Procedural player capture reported route '$($state.playerRenderRoute)'.")
     }
-    if ($Checkpoint.StartsWith("player-") -and [int]$state.tlasInstanceCount -ne 20) {
-        $failures.Add("$Checkpoint reported $($state.tlasInstanceCount) TLAS instances instead of 20.")
+    if ($viewmodelCheckpoints -contains $Checkpoint -and (
+        $state.playerRenderRoute -ne "modelled-viewmodel" -or [int]$state.playerSkinCadenceHz -ne 60 -or
+        [int64]$state.playerSkinUpdates -lt 1 -or [double]$state.playerMaxSocketErrorM -gt 0.015)) {
+        $failures.Add("$Checkpoint did not retain modelled-viewmodel, 60 Hz skinning and exact grip authority.")
+    }
+    # Exact per-instance masks are asserted by the native PlayerAnimationTests
+    # route contract; Android state currently exposes the selected route and
+    # total capacity, but not the mask array itself.
+    if ($Checkpoint.StartsWith("player-") -and [int]$state.tlasInstanceCount -ne 21) {
+        $failures.Add("$Checkpoint reported $($state.tlasInstanceCount) TLAS instances instead of the generated capacity 21 (RtSceneAbi.def instanceMetadata=21).")
     }
     $image = Save-Screenshot ("capture-{0:d2}-{1}-{2}" -f $Index, $Checkpoint, $RequestedScale)
     $captureRecords.Add([PSCustomObject]@{
@@ -314,6 +370,7 @@ function Invoke-CaptureCheckpoint {
         gpu = $state.gpu
         buildIdentity = $state.buildIdentity
         shaderIdentity = $state.shaderIdentity
+        selectedRtPipelineBundle = $state.selectedRtPipelineBundle
         outputRedBlueSwap = [bool]$state.outputRedBlueSwap
         animationTime = $state.animationTime
         playerCombat = $state.playerCombat
@@ -449,8 +506,15 @@ function Invoke-CheckpointBenchmark {
     if ($Checkpoint -eq "player-fallback-grips" -and $state.playerRenderRoute -ne "procedural") {
         $failures.Add("Procedural player benchmark reported route '$($state.playerRenderRoute)'.")
     }
-    if ($Checkpoint.StartsWith("player-") -and [int]$state.tlasInstanceCount -ne 20) {
-        $failures.Add("$Checkpoint benchmark reported $($state.tlasInstanceCount) TLAS instances instead of 20.")
+    if ($viewmodelCheckpoints -contains $Checkpoint -and (
+        $state.playerRenderRoute -ne "modelled-viewmodel" -or [int]$state.playerSkinCadenceHz -ne 60 -or
+        [int64]$state.playerSkinUpdates -lt 1 -or [double]$state.playerMaxSocketErrorM -gt 0.015)) {
+        $failures.Add("$Checkpoint benchmark did not retain modelled-viewmodel, 60 Hz skinning and exact grip authority.")
+    }
+    # Exact per-instance masks are covered by the native route contract; this
+    # Android state surface exposes route/capacity but not the mask array.
+    if ($Checkpoint.StartsWith("player-") -and [int]$state.tlasInstanceCount -ne 21) {
+        $failures.Add("$Checkpoint benchmark reported $($state.tlasInstanceCount) TLAS instances instead of the generated capacity 21 (RtSceneAbi.def instanceMetadata=21).")
     }
     if ($RtWorkload -ge 0 -and [int]$state.rtLab.workloadPreset -ne $RtWorkload) {
         $failures.Add("$Checkpoint $RtLabProfile state reported workload $($state.rtLab.workloadPreset) instead of $RtWorkload.")
@@ -505,11 +569,29 @@ try {
     if (-not $SkipBuild) {
         Push-Location $androidRoot
         try {
-            .\gradlew.bat assembleDebug --console=plain 2>&1 | Tee-Object -FilePath (Join-Path $outputDirectory "gradle-build.txt")
+            $buildArguments = @('assembleDebug', '--console=plain')
+            if ($ViewmodelCandidateDirectory) {
+                $buildArguments += "-PhordeViewmodelCandidateDir=$([IO.Path]::GetFullPath($ViewmodelCandidateDirectory))"
+            }
+            & .\gradlew.bat @buildArguments 2>&1 | Tee-Object -FilePath (Join-Path $outputDirectory "gradle-build.txt")
             if ($LASTEXITCODE -ne 0) { throw "Android debug build failed." }
         } finally { Pop-Location }
     }
+    $apk = if ($ApkPath) { [IO.Path]::GetFullPath($ApkPath) } else {
+        & (Join-Path $PSScriptRoot 'resolve-android-apk.ps1') -AndroidRoot $androidRoot -Variant debug
+    }
     if (-not (Test-Path -LiteralPath $apk)) { throw "Debug APK not found: $apk" }
+    # Verify package identity BEFORE install: a stale APK must not overwrite the
+    # ordinary Debug app when the separate viewmodel candidate was requested.
+    $buildTools = Join-Path $env:LOCALAPPDATA 'Android\Sdk\build-tools'
+    $aapt = Get-ChildItem -LiteralPath $buildTools -Directory | Sort-Object Name -Descending |
+        ForEach-Object { Join-Path $_.FullName 'aapt.exe' } | Where-Object { Test-Path -LiteralPath $_ } |
+        Select-Object -First 1
+    if (-not $aapt) { throw 'Android aapt is required to verify the APK package before installation.' }
+    $badging = (& $aapt dump badging $apk 2>&1 | Out-String)
+    if ($LASTEXITCODE -ne 0 -or $badging -notmatch "package: name='([^']+)'" -or $Matches[1] -cne $packageName) {
+        throw "Local APK package does not match the requested validation target $packageName."
+    }
     $apkHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $apk).Hash.ToLowerInvariant()
     if (-not $SkipInstall) { Invoke-AdbText @("install", "-r", $apk) | Set-Content -LiteralPath (Join-Path $outputDirectory "install.txt") }
     $installedApkHash = Get-InstalledApkSha256
@@ -567,7 +649,7 @@ try {
         }
         Invoke-HomeResumeLifecycleCheck
         $captureManifest = [ordered]@{
-            schema = 1
+            schema = 2
             runId = $runId
             captureMode = "debug-only deterministic checkpoint intent plus ADB screencap"
             scale = $Scale
@@ -584,7 +666,7 @@ try {
             installedApkSha256 = $installedApkHash
             sourceCommit = $sourceCommit
             sourceDirty = $sourceDirty
-            raygenSha256 = $raygenSha256
+            selectedRtPipelineBundle = $script:selectedRtPipelineBundle
             checkpointCount = $captureRecords.Count
             checkpoints = @($captureRecords)
             lifecycle = $lifecycleEvidence
@@ -631,7 +713,7 @@ try {
     Invoke-AdbText @("shell", "dumpsys", "battery") -AllowFailure | Set-Content -LiteralPath (Join-Path $outputDirectory "battery-after.txt") -Encoding utf8
     $timingRows | Export-Csv -LiteralPath (Join-Path $outputDirectory "timing.csv") -NoTypeInformation
     $metadata = [ordered]@{
-        schema = 7
+        schema = 8
         runId = $runId
         mode = $Mode
         scale = $Scale
@@ -657,7 +739,7 @@ try {
         installedApkSha256 = $installedApkHash
         sourceCommit = $sourceCommit
         sourceDirty = $sourceDirty
-        raygenSha256 = $raygenSha256
+        selectedRtPipelineBundle = $script:selectedRtPipelineBundle
         captureRequested = [bool]$Capture
         captureCheckpointCount = $captureRecords.Count
         captureManifest = $(if ($Capture) { "capture-manifest.json" } else { $null })
@@ -685,7 +767,7 @@ try {
         "- Debug APK SHA-256: ``$apkHash``"
         "- Installed base APK SHA-256: ``$installedApkHash`` (exact match)"
         "- Source: ``$sourceCommit``$(if ($sourceDirty) { ' with a dirty worktree recorded' } else { ' from a clean worktree' })"
-        "- Embedded raygen SHA-256: ``$raygenSha256``"
+        "- Selected RT pipeline pair: ``$($script:selectedRtPipelineBundle.opaqueFast.key)@$($script:selectedRtPipelineBundle.opaqueFast.sha256) | $($script:selectedRtPipelineBundle.genericDielectric.key)@$($script:selectedRtPipelineBundle.genericDielectric.sha256)``"
         "- Scale: $Scale%$(if ($Include100) { ' plus report-only 100% opening' } else { '' })"
         "- GPU timestamp instrumentation: $gpuTimingLabel (RT rendering unchanged)"
         "- Evidence type: automated deterministic checkpoint/replay evidence; visual quality and perceived spatial audio remain hands-on checks."

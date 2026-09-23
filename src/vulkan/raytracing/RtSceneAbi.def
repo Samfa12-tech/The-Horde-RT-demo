@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "capacities": {
-    "instanceMetadata": 20,
-    "staticAssets": 8,
+    "instanceMetadata": 21,
+    "staticAssets": 9,
     "primitives": 32,
     "materials": 32,
     "textureLayers": 16,
@@ -21,8 +21,12 @@
     "emissiveTextures": 19,
     "heldLight": 20,
     "fireEmitters": 21,
-    "dielectricDiagnostics": 22
+    "dielectricDiagnostics": 22,
+    "worldPlayerVertices": 23,
+    "viewmodelVertices": 24
   },
+  "geometryRoles": { "static": 0, "playerWorldBody": 1, "playerViewmodel": 2 },
+  "playerInstances": { "worldBody": 4, "viewmodel": 20, "viewmodelPrimaryMask": 64 },
   "instanceFlags": {
     "staticPbr": 1,
     "emissive": 2,
@@ -60,7 +64,7 @@
         { "name": "flags", "type": "uint", "offset": 12 },
         { "name": "emitterIndex", "type": "uint", "offset": 16 },
         { "name": "assetIndex", "type": "uint", "offset": 20 },
-        { "name": "reserved0", "type": "uint", "offset": 24 },
+        { "name": "geometryRole", "type": "uint", "offset": 24 },
         { "name": "reserved1", "type": "uint", "offset": 28 }
       ]
     },

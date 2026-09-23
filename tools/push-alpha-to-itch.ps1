@@ -1,6 +1,8 @@
 param(
     [Parameter(Mandatory = $true)]
     [string]$Version,
+    [Parameter(Mandatory = $true)]
+    [int]$VersionCode,
     [ValidateSet("Both", "Windows", "Android")]
     [string]$Channels = "Both",
     [switch]$ConfirmPush,
@@ -9,7 +11,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot "release-version-policy.ps1")
-Assert-HordeReleaseVersionIsMutable -Version $Version -UploadOnly
+Assert-HordeReleaseVersionIsMutable -Version $Version -VersionCode $VersionCode
 $expectedCertificateSha256 = "8245277a11bca5576f116724507f799d6f4c178ce5fbb7e3981415c9e6b3c245"
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 $candidateRoot = [IO.Path]::GetFullPath((Join-Path $repoRoot "releases\candidates"))

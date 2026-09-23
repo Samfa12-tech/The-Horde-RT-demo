@@ -3,6 +3,7 @@
 #include <array>
 #include <cstdint>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <vulkan/vulkan.h>
@@ -21,11 +22,23 @@
 #include "vulkan/raytracing/HeldItemBlasMeasurements.h"
 #include "vulkan/raytracing/PlayerRenderSlot.h"
 #include "vulkan/raytracing/RtGpuResources.h"
+#include "vulkan/raytracing/RtPipelineBundle.h"
+#include "vulkan/raytracing/RtExecutionPolicy.h"
 #include "vulkan/raytracing/RtSceneTuning.h"
 #include "vulkan/raytracing/RtStaticMeshSlot.h"
 
 namespace horde::vulkan::raytracing
 {
+
+struct PresentableTinyRtScenePreflightTestAccess;
+struct PresentableTinyRtSceneObservationTestAccess;
+struct RtDiagnosticCounterPayload;
+
+[[nodiscard]] bool TryMakeRtPipelineEvidenceIdentity(
+    const RtPipelineBundleRequest& request,
+    const RtPipelineVariantArtifact& opaqueFast,
+    const RtPipelineVariantArtifact& genericDielectric,
+    horde::telemetry::RtPipelineEvidenceIdentity& identity) noexcept;
 
 enum class WaterQuality : std::uint32_t
 {
@@ -95,9 +108,10 @@ public:
         std::vector<std::uint8_t> rgba;
     };
 
+    // Baseline without the optional development viewmodel. Live reports count owners.
     static constexpr std::uint32_t kBlasCount = 16u;
     static constexpr std::uint32_t kTlasCount = 1u;
-    static constexpr std::uint32_t kTlasInstanceCount = 20u;
+    static constexpr std::uint32_t kTlasInstanceCount = kRtInstanceMetadataCapacity;
 
     PresentableTinyRtScene() = default;
     ~PresentableTinyRtScene();
@@ -120,14 +134,23 @@ public:
                     const std::string& lichTextureDirectory,
                     std::string& diagnostic,
                     const std::string& developmentStaticAssetDirectory = {},
-                    const std::string& productionAssetRoot = {});
+                    const std::string& productionAssetRoot = {},
+                    RtExecutionBackend executionBackend = RtExecutionBackend::RayTracingPipeline);
 
     void Destroy();
 
     bool IsReady() const { return ready_; }
+    RtExecutionBackend ExecutionBackend() const
+    {
+        return pipelineBundle_.HasSelection() ? pipelineBundle_.Request().executionBackend
+                                              : RtExecutionBackend::Unsupported;
+    }
     VkExtent2D DispatchExtent() const { return dispatchExtent_; }
     const std::string& MaterialEncoding() const { return materialEncoding_; }
-    std::uint32_t BlasCount() const { return ready_ ? kBlasCount : 0u; }
+    std::uint32_t BlasCount() const
+    {
+        return ready_ ? static_cast<std::uint32_t>(ResourceInventory().bottomLevelAccelerationStructureCount) : 0u;
+    }
     std::uint32_t TlasCount() const { return ready_ ? kTlasCount : 0u; }
     std::uint32_t TlasInstanceCount() const { return ready_ ? kTlasInstanceCount : 0u; }
     std::size_t SkeletonPoseBucketCount() const { return characterSlot_.SkeletonPoseBucketCount(); }
@@ -289,6 +312,31 @@ public:
     {
         return primaryRewardBodyPixelCount_;
     }
+    RtDiagnosticAvailability DiagnosticsAvailability() const
+    {
+        return pipelineBundle_.DiagnosticAvailability();
+    }
+    std::string_view SelectedOpaqueFastKey() const { return pipelineBundle_.OpaqueFastKey(); }
+    std::string_view SelectedGenericDielectricKey() const
+    {
+        return pipelineBundle_.GenericDielectricKey();
+    }
+    std::string_view SelectedOpaqueFastSha256() const
+    {
+        return pipelineBundle_.OpaqueFastSha256();
+    }
+    std::string_view SelectedGenericDielectricSha256() const
+    {
+        return pipelineBundle_.GenericDielectricSha256();
+    }
+    std::string SelectedPipelineBundleIdentity() const
+    {
+        return pipelineBundle_.FullPairIdentity();
+    }
+    std::string SelectedPipelineBundleDisplayIdentity() const
+    {
+        return pipelineBundle_.ShortPairIdentity();
+    }
     bool GenericStaticAssetEnabled() const { return genericStaticAssetEnabled_; }
     const RtStaticMeshMeasurements& StaticMeshMeasurements() const { return staticMeshSlot_.Measurements(); }
     VkDeviceSize StaticMeshBlasBytes() const { return staticMeshBlasBytes_; }
@@ -309,29 +357,82 @@ public:
     {
         return productionPropBlasBuildMilliseconds_;
     }
+    [[nodiscard]] horde::telemetry::RtResourceInventory ResourceInventory() const noexcept;
+    [[nodiscard]] bool CollectCompletedDiagnostic(
+        RtDiagnosticCounterPayload& payload,
+        std::string& diagnostic);
+    void PublishCompletedDiagnostic(
+        const RtDiagnosticCounterPayload& payload) noexcept;
 
     bool RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                             VkImage swapchainImage,
                             VkImageLayout& swapchainImageLayout,
                             VkExtent2D swapchainExtent,
                             const RtSceneFrameInputs& frame,
-                            std::string& diagnostic);
+                            std::string& diagnostic,
+                            RtSceneRecordObservation* observation = nullptr);
 
     // Synchronously reads the last RT-produced storage image. The returned
     // bytes are canonical RGBA even when the presentation push constant had
     // swapped red/blue for a raw copy to a BGRA swapchain.
     bool CaptureStorageImage(StorageImageCapture& capture, std::string& diagnostic);
+#ifndef NDEBUG
+    // Debug asset inspection only: model-space copy of the exact current upload.
+    // This is CPU geometry evidence, not a GPU readback or a second pose solve.
+    bool CaptureViewmodelMesh(const std::string& path, std::string& diagnostic) const;
+#endif
 
 private:
+    friend struct PresentableTinyRtScenePreflightTestAccess;
+    friend struct PresentableTinyRtSceneObservationTestAccess;
+
     using Buffer = RtGpuBuffer;
     using AccelerationStructure = RtAccelerationStructure;
+
+    struct InitialiseOrchestrationApi
+    {
+        void* user = nullptr;
+        bool (*resolvePreflight)(void*, RtPipelineBundlePreflight&, std::string&) = nullptr;
+        bool (*continueAfterPreflight)(
+            void*, PresentableTinyRtScene&, VkFormat, const std::string&,
+            const std::string&, const std::string&, const std::string&,
+            const std::string&, const std::string&, std::string&) = nullptr;
+    };
 
     struct TextureArray
     {
         VkImage image = VK_NULL_HANDLE;
         VkDeviceMemory memory = VK_NULL_HANDLE;
         VkImageView view = VK_NULL_HANDLE;
+        VkDeviceSize allocationSize = 0u;
+        VkMemoryPropertyFlags memoryPropertyFlags = 0u;
     };
+
+    bool InitialiseWithOrchestration(
+        VkInstance instance,
+        VkPhysicalDevice physicalDevice,
+        VkDevice device,
+        VkQueue queue,
+        VkCommandPool commandPool,
+        VkExtent2D dispatchExtent,
+        VkFormat presentationFormat,
+        const std::string& skeletonAssetPath,
+        const std::string& lichAssetPath,
+        const std::string& materialAssetDirectory,
+        const std::string& lichTextureDirectory,
+        std::string& diagnostic,
+        const std::string& developmentStaticAssetDirectory,
+        const std::string& productionAssetRoot,
+        const InitialiseOrchestrationApi& api);
+    bool ContinueInitialiseAfterPreflight(
+        VkFormat presentationFormat,
+        const std::string& skeletonAssetPath,
+        const std::string& lichAssetPath,
+        const std::string& materialAssetDirectory,
+        const std::string& lichTextureDirectory,
+        const std::string& developmentStaticAssetDirectory,
+        const std::string& productionAssetRoot,
+        std::string& diagnostic);
 
     bool LoadEntryPoints(std::string& diagnostic);
     bool CreateBuffer(VkDeviceSize size,
@@ -344,7 +445,8 @@ private:
                      const void* data,
                      VkDeviceSize size,
                      const char* label,
-                     std::string& diagnostic) const;
+                     std::string& diagnostic,
+                     RtSceneRecordObservation* observation = nullptr) const;
     bool ReadBuffer(const Buffer& buffer,
                     VkDeviceSize offset,
                     void* data,
@@ -367,13 +469,47 @@ private:
                                   const std::string& productionAssetRoot,
                                   std::string& diagnostic);
     bool CreateStaticMeshResources(std::string& diagnostic);
+    const Buffer& VertexBufferForRole(RtGeometryRole role) const;
     bool BuildAccelerationStructures(std::string& diagnostic);
-    bool CreateDescriptors(std::string& diagnostic);
-    bool CreatePipeline(std::string& diagnostic);
-    bool CreateShaderBindingTable(std::string& diagnostic);
+    bool CreateSelectedPipelineBundle(std::string& diagnostic);
+    [[nodiscard]] bool CapturePipelineEvidenceIdentity() noexcept;
+    bool CreateBundleDescriptorSetLayout(const RtDescriptorIoContract& contract,
+                                         VkDescriptorSetLayout& out,
+                                         std::string& diagnostic);
+    bool CreateBundleDescriptorPool(const RtDescriptorIoContract& contract,
+                                    VkDescriptorPool& out,
+                                    std::string& diagnostic);
+    bool AllocateBundleDescriptorSet(VkDescriptorPool pool,
+                                     VkDescriptorSetLayout layout,
+                                     VkDescriptorSet& out,
+                                     std::string& diagnostic);
+    bool CreateBundleDiagnosticBuffer(Buffer& out, std::string& diagnostic);
+    bool WriteBundleDescriptors(RtPipelineBundle& bundle, std::string& diagnostic);
+    bool CreateBundlePipelineLayout(VkDescriptorSetLayout descriptorSetLayout,
+                                    VkPipelineLayout& out,
+                                    std::string& diagnostic);
+    bool CreateBundleSharedShaderModules(VkShaderModule& miss,
+                                         VkShaderModule& hit,
+                                         std::string& diagnostic);
+    bool CreateBundleEntryShaderModule(const RtPipelineVariantArtifact& artifact,
+                                        VkShaderModule& out,
+                                        std::string& diagnostic);
+    bool CreateBundleStrategyPipeline(RtMaterialStrategy strategy,
+                                      VkShaderModule raygen,
+                                      VkShaderModule miss,
+                                      VkShaderModule hit,
+                                      VkPipelineLayout layout,
+                                      VkPipeline& out,
+                                      std::string& diagnostic);
+    bool CreateBundleStrategySbt(RtMaterialStrategy strategy,
+                                 VkPipeline pipeline,
+                                 Buffer& out,
+                                 std::array<VkStridedDeviceAddressRegionKHR, 4u>& regions,
+                                 std::string& diagnostic);
     bool UpdateDynamicInstances(VkCommandBuffer commandBuffer,
                                 const RtSceneFrameInputs& frame,
-                                std::string& diagnostic);
+                                std::string& diagnostic,
+                                RtSceneRecordObservation* observation = nullptr);
     bool RunOneTimeCommands(void (*record)(VkCommandBuffer, void*), void* userData, std::string& diagnostic) const;
     void DestroyBuffer(Buffer& buffer) const;
     void DestroyAccelerationStructure(AccelerationStructure& accelerationStructure);
@@ -393,6 +529,8 @@ private:
     VkImage storageImage_ = VK_NULL_HANDLE;
     VkDeviceMemory storageImageMemory_ = VK_NULL_HANDLE;
     VkImageView storageImageView_ = VK_NULL_HANDLE;
+    VkDeviceSize storageImageAllocationSize_ = 0u;
+    VkMemoryPropertyFlags storageImageMemoryPropertyFlags_ = 0u;
     VkImageLayout storageImageLayout_ = VK_IMAGE_LAYOUT_UNDEFINED;
     bool lastOutputRedBlueSwapApplied_ = false;
     TextureArray materialDiffuse_;
@@ -415,12 +553,13 @@ private:
     Buffer fireEmitterBuffer_;
     Buffer worldSurfaceBuffer_;
     Buffer staticVertexBuffer_;
+    Buffer worldPlayerVertexBuffer_;
+    Buffer viewmodelVertexBuffer_;
     Buffer staticIndexBuffer_;
     Buffer staticGeometryTransformBuffer_;
     Buffer instanceMetadataBuffer_;
     Buffer primitiveMetadataBuffer_;
     Buffer materialMetadataBuffer_;
-    Buffer dielectricDiagnosticsBuffer_;
     AccelerationStructure blas_;
     AccelerationStructure waterfallBlas_;
     AccelerationStructure finaleRoofBlas_;
@@ -435,6 +574,8 @@ private:
     AccelerationStructure playerLimbBlas_;
     AccelerationStructure skinnedPlayerBlas_;
     Buffer skinnedPlayerBlasUpdateScratch_;
+    AccelerationStructure viewmodelBlas_;
+    Buffer viewmodelBlasUpdateScratch_;
     AccelerationStructure tlas_;
     Buffer tlasUpdateScratch_;
     RtGpuResources gpuResources_;
@@ -443,6 +584,16 @@ private:
     horde::scene::assets::StaticMeshAsset developmentStaticAsset_;
     horde::scene::assets::StaticMeshAsset productionTorchAsset_;
     horde::scene::assets::StaticMeshAsset productionPlayerAsset_;
+    horde::scene::assets::StaticMeshAsset viewmodelAsset_;
+    horde::scene::SkinnedMeshAsset viewmodelSkin_;
+    std::vector<horde::scene::TexturedSkinnedRtVertex> viewmodelPoseVertices_;
+    std::vector<horde::scene::SkinnedPbrTangent> viewmodelPoseTangents_;
+    std::vector<horde::scene::assets::StaticRtVertex> viewmodelUpload_;
+    bool viewmodelAvailable_ = false;
+    bool viewmodelPoseCurrent_ = false;
+#ifndef NDEBUG
+    VkTransformMatrixKHR viewmodelCaptureTransform_{};
+#endif
     horde::scene::assets::StaticMeshAsset gothicChestBaseAsset_;
     horde::scene::assets::StaticMeshAsset gothicChestLidAsset_;
     horde::scene::assets::StaticMeshAsset rewardLanternRingAsset_;
@@ -517,22 +668,13 @@ private:
     double productionPropBlasBuildMilliseconds_ = 0.0;
     HeldItemBlasMeasurements heldItemBlasMeasurements_{};
 
-    VkDescriptorSetLayout descriptorSetLayout_ = VK_NULL_HANDLE;
-    VkDescriptorPool descriptorPool_ = VK_NULL_HANDLE;
-    VkDescriptorSet descriptorSet_ = VK_NULL_HANDLE;
-    VkPipelineLayout pipelineLayout_ = VK_NULL_HANDLE;
-    VkPipeline pipeline_ = VK_NULL_HANDLE;
-    VkPipeline legacyPipeline_ = VK_NULL_HANDLE;
-    Buffer shaderBindingTable_;
-    Buffer legacyShaderBindingTable_;
-    VkStridedDeviceAddressRegionKHR raygenRegion_{};
-    VkStridedDeviceAddressRegionKHR missRegion_{};
-    VkStridedDeviceAddressRegionKHR hitRegion_{};
-    VkStridedDeviceAddressRegionKHR callableRegion_{};
-    VkStridedDeviceAddressRegionKHR legacyRaygenRegion_{};
-    VkStridedDeviceAddressRegionKHR legacyMissRegion_{};
-    VkStridedDeviceAddressRegionKHR legacyHitRegion_{};
-    VkStridedDeviceAddressRegionKHR legacyCallableRegion_{};
+    RtPipelineBundle pipelineBundle_;
+    RtExecutionPolicy executionPolicy_{};
+    std::array<std::uint32_t, 3u> computeDispatchGroups_{};
+    horde::telemetry::RtPipelineEvidenceIdentity pipelineEvidenceIdentity_{};
+    bool pipelineEvidenceIdentityValid_ = false;
+    horde::telemetry::RtPipelineEvidenceIdentity framePipelineEvidence_{};
+    bool framePipelineEvidenceValid_ = false;
 
     PFN_vkCreateAccelerationStructureKHR vkCreateAccelerationStructureKHR_ = nullptr;
     PFN_vkDestroyAccelerationStructureKHR vkDestroyAccelerationStructureKHR_ = nullptr;

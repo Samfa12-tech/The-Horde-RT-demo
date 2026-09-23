@@ -1,6 +1,7 @@
 #include "gameplay/animation/PlayerAnimationState.h"
 #include "gameplay/animation/PlayerIkTargets.h"
 #include "gameplay/simulation/GameSimulation.h"
+#include "gameplay/DevelopmentCheckpointSimulation.h"
 #include "gameplay/items/LanternPendulum.h"
 #include "vulkan/raytracing/PlayerRenderSlot.h"
 
@@ -35,6 +36,66 @@ int main()
 {
     using namespace horde::gameplay;
     using namespace horde::gameplay::animation;
+
+    const TwoBoneIkSolution foldedUnequal = SolveTwoBoneIk(
+        {{0.0f, 0.0f, 0.0f}}, {{0.20f, 0.0f, 0.0f}}, {{0.0f, 1.0f, 0.0f}}, 0.30f, 0.40f);
+    std::cout << "Unequal folded IK: elbow=(" << foldedUnequal.elbow[0] << ','
+              << foldedUnequal.elbow[1] << ',' << foldedUnequal.elbow[2]
+              << "), upper=" << Distance(foldedUnequal.shoulder, foldedUnequal.elbow)
+              << ", lower=" << Distance(foldedUnequal.elbow, foldedUnequal.hand) << '\n';
+    if (!Require(foldedUnequal.reachable &&
+                 Near(Distance(foldedUnequal.shoulder, foldedUnequal.elbow), 0.30f, 0.000002f) &&
+                 Near(Distance(foldedUnequal.elbow, foldedUnequal.hand), 0.40f, 0.000002f) &&
+                 Near(foldedUnequal.elbow[0], -0.075f, 0.000002f),
+                 "reachable unequal-arm fold must preserve both segment lengths and signed elbow projection")) return 1;
+
+    // A pole is a direction, not a point. Check length preservation across
+    // reachable folds, both reach boundaries, clamping, and rigid root changes.
+    for (const auto lengths : {std::array<float, 2u>{0.30f, 0.40f},
+                               std::array<float, 2u>{0.40f, 0.30f},
+                               std::array<float, 2u>{0.40f, 0.40f}})
+    {
+        const float inner = std::abs(lengths[0] - lengths[1]);
+        const float outer = lengths[0] + lengths[1];
+        for (const float distance : {0.0f, inner * 0.5f, inner + 0.00002f,
+                                     0.20f, outer - 0.00002f, outer, outer + 0.20f})
+        {
+            const auto solved = SolveTwoBoneIk(
+                {{0.0f, 0.0f, 0.0f}}, {{distance, 0.0f, 0.0f}},
+                {{0.0f, 1.0f, 0.0f}}, lengths[0], lengths[1]);
+            if (!Require(Near(Distance(solved.shoulder, solved.elbow), lengths[0], 0.000002f) &&
+                         Near(Distance(solved.elbow, solved.hand), lengths[1], 0.000002f) &&
+                         Near(solved.solvedDistance,
+                              std::clamp(distance, inner + 0.00001f, outer), 0.000002f),
+                         "IK must preserve both bone lengths at folds and clamped reach boundaries")) return 1;
+            if (!Require(solved.reachable == (distance >= inner && distance <= outer),
+                         "IK reachability must retain the existing inclusive boundary policy")) return 1;
+            if (distance == 0.0f) continue; // Zero target has a documented world-axis fallback.
+            const auto rotate = [](const PlayerIkVector& v) -> PlayerIkVector {
+                return {{-v[1], v[0], v[2]}};
+            };
+            const auto transform = [&rotate](const PlayerIkVector& v) -> PlayerIkVector {
+                const auto r = rotate(v);
+                return {{r[0] + 2.0f, r[1] - 1.0f, r[2] + 0.5f}};
+            };
+            const auto transformed = SolveTwoBoneIk(
+                transform({{0.0f, 0.0f, 0.0f}}), transform({{distance, 0.0f, 0.0f}}),
+                rotate({{0.0f, 1.0f, 0.0f}}), lengths[0], lengths[1]);
+            if (!Require(Distance(transformed.elbow, transform(solved.elbow)) < 0.00002f &&
+                         Distance(transformed.hand, transform(solved.hand)) < 0.000002f,
+                         "IK positions must follow a rigid root while the pole follows rotation only")) return 1;
+        }
+    }
+    for (const PlayerIkVector pole : {PlayerIkVector{{1.0f, 0.0f, 0.0f}},
+                                     PlayerIkVector{{1.0f, 0.0000001f, 0.0f}},
+                                     PlayerIkVector{{1.0f, 0.00001f, 0.0f}}})
+    {
+        const auto solved = SolveTwoBoneIk(
+            {{0.0f, 0.0f, 0.0f}}, {{0.2f, 0.0f, 0.0f}}, pole, 0.3f, 0.4f);
+        if (!Require(Near(Distance(solved.shoulder, solved.elbow), 0.3f, 0.000002f) &&
+                     Near(Distance(solved.elbow, solved.hand), 0.4f, 0.000002f),
+                     "collinear and nearly collinear poles must retain finite length-preserving output")) return 1;
+    }
 
     if (!Require(MapPlayerLocomotionClip(0.0f) == PlayerLocomotionClip::Idle,
                  "zero locomotion must map to idle")) return 1;
@@ -376,9 +437,41 @@ int main()
                  "the +Z player rig must use a proper 180-degree rotation that keeps anatomical Left on gameplay left"))
         return 1;
     const PlayerRouteMasks proceduralMasks = BuildPlayerRouteMasks(PlayerRenderRoute::Procedural);
+    unsigned viewmodelCheckpointCount = 0u;
+    for (const auto& checkpoint : horde::gameplay::kDevelopmentCheckpoints)
+    {
+        if (!checkpoint.name.starts_with("player-viewmodel-")) continue;
+        horde::gameplay::simulation::GameSimulation staged;
+        if (!Require(horde::gameplay::StageDevelopmentCheckpointSimulation(staged, checkpoint) &&
+                     std::abs(staged.Snapshot().playerPitchRadians - checkpoint.pitch) < 0.000001f,
+                     "viewmodel checkpoint pitch must match actual gameplay pose, not an out-of-range request")) return 1;
+        ++viewmodelCheckpointCount;
+        if (checkpoint.combatPose != DevelopmentCombatPose::Rest)
+        {
+            const bool upward = checkpoint.combatPose == DevelopmentCombatPose::UpwardSliceActive;
+            if (!Require(Near(staged.Snapshot().walkTime, upward ? 0.6167f : 0.5833f) &&
+                         Near(staged.Snapshot().playerCombat.actionTime, upward ? 0.1667f : 0.4033f),
+                         "Android capture timing must match the shared late-active attack checkpoint")) return 1;
+        }
+    }
+    if (!Require(viewmodelCheckpointCount == 8u, "all eight viewmodel checkpoint pitches must be staged")) return 1;
     const PlayerRouteMasks skinnedMasks = BuildPlayerRouteMasks(PlayerRenderRoute::Skinned);
     const PlayerRouteMasks hybridMasks =
         BuildPlayerRouteMasks(PlayerRenderRoute::HybridBlockPrimary);
+    const PlayerRouteMasks viewmodelMasks = BuildPlayerRouteMasks(PlayerRenderRoute::ModelledViewmodel);
+    if (!Require(viewmodelMasks.instanceMasks[kPlayerWorldBodyInstanceIndex] == 0x10u &&
+                 viewmodelMasks.instanceMasks[kPlayerViewmodelInstanceIndex] == kPlayerViewmodelPrimaryMask &&
+                 (kPlayerViewmodelPrimaryMask & 0x37u) == 0u,
+                 "dedicated viewmodel owns primary rays while world body owns secondary rays")) return 1;
+    for (std::size_t slot = 5u; slot <= 16u; ++slot)
+        if (!Require(viewmodelMasks.instanceMasks[slot] == 0u,
+                     "modelled route must disable every procedural player instance")) return 1;
+    const auto viewmodelVisibility = BuildProductionSceneVisibility(
+        {PlayerRenderRoute::ModelledViewmodel, false, false, false});
+    if (!Require(viewmodelVisibility.playerRoute == PlayerRenderRoute::ModelledViewmodel &&
+                 viewmodelVisibility.playerPrimaryVisible && viewmodelVisibility.playerReflectionVisible &&
+                 viewmodelVisibility.playerMask == 0x10u,
+                 "production props must not silently replace an explicit modelled viewmodel request")) return 1;
     if (!Require(proceduralMasks.instanceMasks[4] == 0x10u &&
                  proceduralMasks.instanceMasks[5] == 0x04u &&
                  proceduralMasks.instanceMasks[16] == 0x10u &&
@@ -454,13 +547,21 @@ int main()
         PlayerPrimitiveSemantic::Body,
         PlayerPrimitiveSemantic::Head,
         PlayerPrimitiveSemantic::NearFace,
+        PlayerPrimitiveSemantic::GauntletPrimaryVisible,
     });
     if (!Require(primitiveVisibility[0].primaryVisible &&
                  !primitiveVisibility[1].primaryVisible &&
                  !primitiveVisibility[2].primaryVisible &&
+                 primitiveVisibility[3].primaryVisible &&
+                 primitiveVisibility[3].shadowVisible &&
+                 primitiveVisibility[3].reflectionVisible &&
                  primitiveVisibility[1].shadowVisible &&
                  primitiveVisibility[2].reflectionVisible,
                  "material/primitive metadata must hide only head/near-face primary hits")) return 1;
+    const auto unknownVisibility = BuildPlayerPrimitiveVisibility({static_cast<PlayerPrimitiveSemantic>(255)});
+    if (!Require(!unknownVisibility[0].primaryVisible && !unknownVisibility[0].shadowVisible &&
+                 !unknownVisibility[0].reflectionVisible,
+                 "an invalid primitive semantic must not acquire implicit visibility")) return 1;
 
     const PlayerSocketPlan sockets = EvaluatePlayerSocketPlan(authoritative.playerAnimation);
     if (!Require(sockets.leftErrorMetres <= kPlayerGripSocketToleranceMetres &&

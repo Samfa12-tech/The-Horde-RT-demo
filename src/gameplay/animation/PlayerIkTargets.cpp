@@ -76,7 +76,9 @@ TwoBoneIkSolution SolveTwoBoneIk(const PlayerIkVector& shoulder,
     const float adjacent = std::clamp(
         (upperArmLength * upperArmLength + solvedDistance * solvedDistance -
          lowerArmLength * lowerArmLength) / (2.0f * solvedDistance),
-        0.0f,
+        // A folded chain with a longer forearm can put the elbow behind the
+        // shoulder along the target axis. Clamping to zero shortens that bone.
+        -upperArmLength,
         upperArmLength);
     const float height = std::sqrt(std::max(
         0.0f, upperArmLength * upperArmLength - adjacent * adjacent));
