@@ -208,6 +208,8 @@ struct ShowcaseCaptureRecord
     float finaleSkylightOpenProgress = 0.0f;
     std::string filename;
     std::string pngSha256;
+    std::string viewmodelGeometryFile;
+    std::string viewmodelGeometrySha256;
     std::uint32_t width = 0u;
     std::uint32_t height = 0u;
     bool redBlueSwapNormalised = false;
@@ -4438,6 +4440,11 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                  << (capture.redBlueSwapNormalised ? "true" : "false") << ",\n"
                  << "      \"pixelFormat\": \"RGBA8\",\n"
                  << "      \"file\": \"" << JsonEscape(capture.filename) << "\",\n"
+                 << "      \"viewmodelGeometry\": {\"available\": "
+                 << (capture.viewmodelGeometryFile.empty() ? "false" : "true")
+                 << ", \"space\": \"model\", \"source\": \"cpu-upload\", \"file\": \""
+                 << JsonEscape(capture.viewmodelGeometryFile) << "\", \"sha256\": \""
+                 << capture.viewmodelGeometrySha256 << "\"},\n"
                  << "      \"pngSha256\": \"" << capture.pngSha256 << "\"\n"
                  << "    }" << (index + 1u == captures.size() ? "\n" : ",\n");
     }
@@ -4696,6 +4703,14 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         if (!Sha256File(pngPath, record.pngSha256, diagnostic))
         {
             return fail(std::string("Checkpoint '") + checkpoint.name + "' hash failed: " + diagnostic);
+        }
+        if (viewmodelCapture)
+        {
+            record.viewmodelGeometryFile = std::filesystem::path(record.filename).replace_extension(".obj").string();
+            const auto geometryPath = outputDirectory / record.viewmodelGeometryFile;
+            if (!context.rtScene.CaptureViewmodelMesh(geometryPath.string(), diagnostic) ||
+                !Sha256File(geometryPath, record.viewmodelGeometrySha256, diagnostic))
+                return fail(std::string("Checkpoint '") + checkpoint.name + "' geometry capture failed: " + diagnostic);
         }
         captures.push_back(std::move(record));
         std::cout << "Captured " << checkpoint.name << " -> " << pngPath << '\n';

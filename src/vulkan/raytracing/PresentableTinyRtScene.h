@@ -376,6 +376,11 @@ public:
     // bytes are canonical RGBA even when the presentation push constant had
     // swapped red/blue for a raw copy to a BGRA swapchain.
     bool CaptureStorageImage(StorageImageCapture& capture, std::string& diagnostic);
+#ifndef NDEBUG
+    // Debug asset inspection only: model-space copy of the exact current upload.
+    // This is CPU geometry evidence, not a GPU readback or a second pose solve.
+    bool CaptureViewmodelMesh(const std::string& path, std::string& diagnostic) const;
+#endif
 
 private:
     friend struct PresentableTinyRtScenePreflightTestAccess;

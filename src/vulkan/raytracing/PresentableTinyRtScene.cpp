@@ -17,6 +17,8 @@
 #include <cstring>
 #include <filesystem>
 #include <fstream>
+#include <iomanip>
+#include <locale>
 #include <limits>
 #include <optional>
 #include <span>
@@ -5608,6 +5610,59 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
     diagnostic.clear();
     return true;
 }
+
+#ifndef NDEBUG
+bool PresentableTinyRtScene::CaptureViewmodelMesh(const std::string& path,
+                                                 std::string& diagnostic) const
+{
+    if (!ready_ || !viewmodelPoseCurrent_ || viewmodelUpload_.empty() ||
+        viewmodelUpload_.size() != viewmodelAsset_.vertices.size())
+    {
+        diagnostic = "No current modelled viewmodel upload is available for geometry capture.";
+        return false;
+    }
+    std::error_code pathError;
+    const bool pathExists = std::filesystem::exists(path, pathError);
+    if (pathExists || pathError)
+    {
+        diagnostic = "Viewmodel geometry capture path already exists or cannot be inspected.";
+        return false;
+    }
+    std::ofstream output(path, std::ios::binary);
+    output.imbue(std::locale::classic());
+    output << std::setprecision(std::numeric_limits<float>::max_digits10)
+           << "# Exact CPU viewmodel upload, model-space metres; not GPU readback.\n";
+    for (const auto& vertex : viewmodelUpload_)
+        output << "v " << vertex.position[0] << ' ' << vertex.position[1] << ' ' << vertex.position[2] << '\n';
+    for (const auto& vertex : viewmodelUpload_)
+        output << "vt " << vertex.uv0[0] << ' ' << vertex.uv0[1] << '\n';
+    for (const auto& vertex : viewmodelUpload_)
+        output << "vn " << vertex.normal[0] << ' ' << vertex.normal[1] << ' ' << vertex.normal[2] << '\n';
+    for (const auto& primitive : viewmodelAsset_.primitives)
+    {
+        output << "g " << viewmodelAsset_.materials.at(primitive.materialIndex).name << '\n';
+        for (std::uint32_t offset = 0; offset < primitive.indexCount; offset += 3u)
+        {
+            output << 'f';
+            for (std::uint32_t corner = 0; corner < 3u; ++corner)
+            {
+                const auto index = primitive.vertexOffset +
+                    viewmodelAsset_.indices.at(primitive.indexOffset + offset + corner) + 1u;
+                output << ' ' << index << '/' << index << '/' << index;
+            }
+            output << '\n';
+        }
+    }
+    output.close();
+    if (!output)
+    {
+        diagnostic = "Failed to write the viewmodel geometry capture.";
+        return false;
+    }
+    diagnostic.clear();
+    return true;
+}
+#endif
 
 bool PresentableTinyRtScene::CaptureStorageImage(StorageImageCapture& capture, std::string& diagnostic)
 {

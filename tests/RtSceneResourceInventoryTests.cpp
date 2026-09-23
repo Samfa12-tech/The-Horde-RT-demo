@@ -199,6 +199,48 @@ struct PresentableTinyRtSceneObservationTestAccess
     {
         scene.pipelineBundle_.diagnosticBuffer = {};
     }
+
+#ifndef NDEBUG
+    static StaticRtVertex MakeCaptureVertex(
+        const std::array<float, 3u>& position,
+        const std::array<float, 3u>& normal,
+        const std::array<float, 2u>& uv)
+    {
+        StaticRtVertex vertex{};
+        vertex.position = {position[0], position[1], position[2], 1.0f};
+        vertex.normal = {normal[0], normal[1], normal[2], 0.0f};
+        vertex.tangent = {1.0f, 0.0f, 0.0f, 1.0f};
+        vertex.uv0 = {uv[0], uv[1], 0.0f, 1.0f};
+        return vertex;
+    }
+
+    static void ConfigureCaptureFixture(PresentableTinyRtScene& scene,
+                                        const bool ready,
+                                        const bool poseCurrent)
+    {
+        scene.ready_ = ready;
+        scene.viewmodelPoseCurrent_ = poseCurrent;
+        scene.viewmodelUpload_ = {
+            MakeCaptureVertex({1.0f, 2.0f, 3.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}),
+            MakeCaptureVertex({4.0f, 5.0f, 6.0f}, {0.0f, 1.0f, 0.0f}, {0.25f, 0.5f}),
+            MakeCaptureVertex({-1.0f, -2.0f, -3.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}),
+            MakeCaptureVertex({7.0f, 8.0f, 9.0f}, {0.0f, 0.0f, -1.0f}, {0.125f, 0.875f}),
+            MakeCaptureVertex({-4.0f, -5.0f, -6.0f}, {0.0f, -1.0f, 0.0f}, {0.75f, 0.25f}),
+            MakeCaptureVertex({10.0f, 11.0f, 12.0f}, {-1.0f, 0.0f, 0.0f}, {0.625f, 0.375f}),
+        };
+        scene.viewmodelAsset_.vertices = scene.viewmodelUpload_;
+        scene.viewmodelAsset_.indices = {0u, 1u, 2u, 2u, 0u, 1u};
+        scene.viewmodelAsset_.primitives = {
+            {0u, 0u, 3u, 0u, 0u},
+            {3u, 3u, 3u, 1u, 0u},
+        };
+        scene.viewmodelAsset_.materials.clear();
+        scene.viewmodelAsset_.materials.push_back({});
+        scene.viewmodelAsset_.materials.push_back({});
+        scene.viewmodelAsset_.materials[0].name = "ViewmodelSleeves";
+        scene.viewmodelAsset_.materials[1].name = "ViewmodelGauntlets";
+    }
+#endif
 };
 
 } // namespace horde::vulkan::raytracing
@@ -493,6 +535,93 @@ int main()
                       movedTo.hostVisibleBytes == shipping.hostVisibleBytes &&
                       movedTo.deviceLocalBytes == shipping.deviceLocalBytes,
                   "scene move must preserve one live inventory owner");
+
+#ifndef NDEBUG
+    const auto captureBase = std::filesystem::absolute(
+        std::filesystem::temp_directory_path()).lexically_normal();
+    auto normalizedCaptureBase = captureBase;
+    if (!normalizedCaptureBase.has_filename())
+        normalizedCaptureBase = normalizedCaptureBase.parent_path();
+    const auto captureRoot = normalizedCaptureBase /
+        ("horde-rt-viewmodel-capture-tests-" +
+         std::to_string(reinterpret_cast<std::uintptr_t>(&ok)));
+    const bool captureRootSafe = captureRoot.parent_path().lexically_normal() ==
+            normalizedCaptureBase &&
+        captureRoot.filename().string().starts_with("horde-rt-viewmodel-capture-tests-");
+    std::error_code captureError;
+    bool captureRootCreated = false;
+    if (captureRootSafe)
+        captureRootCreated = std::filesystem::create_directory(captureRoot, captureError);
+    if (!(captureRootSafe && captureRootCreated && !captureError))
+    {
+        std::cerr << "FAIL: viewmodel capture test directory creation failed: base='"
+                  << normalizedCaptureBase.string() << "' root='" << captureRoot.string()
+                  << "' safe=" << captureRootSafe << " created=" << captureRootCreated
+                  << " error='" << captureError.message() << "'\n";
+        ok = false;
+    }
+    if (captureRootSafe && captureRootCreated && !captureError)
+    {
+        const auto notReadyPath = captureRoot / "not-ready.obj";
+        std::string captureDiagnostic;
+        PresentableTinyRtScene notReady;
+        ok &= Require(!notReady.CaptureViewmodelMesh(
+                          notReadyPath.string(), captureDiagnostic) &&
+                          !std::filesystem::exists(notReadyPath),
+                      "viewmodel capture must reject a scene that is not ready");
+
+        const auto notCurrentPath = captureRoot / "not-current.obj";
+        PresentableTinyRtScene notCurrent;
+        PresentableTinyRtSceneObservationTestAccess::ConfigureCaptureFixture(
+            notCurrent, true, false);
+        captureDiagnostic.clear();
+        ok &= Require(!notCurrent.CaptureViewmodelMesh(
+                          notCurrentPath.string(), captureDiagnostic) &&
+                          !std::filesystem::exists(notCurrentPath),
+                      "viewmodel capture must reject a non-current pose");
+
+        const auto outputPath = captureRoot / "synthetic.obj";
+        PresentableTinyRtScene synthetic;
+        PresentableTinyRtSceneObservationTestAccess::ConfigureCaptureFixture(
+            synthetic, true, true);
+        captureDiagnostic.clear();
+        ok &= Require(synthetic.CaptureViewmodelMesh(
+                          outputPath.string(), captureDiagnostic) &&
+                          captureDiagnostic.empty(),
+                      "viewmodel capture must write a current synthetic upload");
+        std::ifstream output(outputPath, std::ios::binary);
+        const std::string outputText((std::istreambuf_iterator<char>(output)),
+                                     std::istreambuf_iterator<char>());
+        const std::string expectedText =
+            "# Exact CPU viewmodel upload, model-space metres; not GPU readback.\n"
+            "v 1 2 3\nv 4 5 6\nv -1 -2 -3\nv 7 8 9\nv -4 -5 -6\nv 10 11 12\n"
+            "vt 0 0\nvt 0.25 0.5\nvt 1 0\nvt 0.125 0.875\nvt 0.75 0.25\nvt 0.625 0.375\n"
+            "vn 0 0 1\nvn 0 1 0\nvn 1 0 0\nvn 0 0 -1\nvn 0 -1 0\nvn -1 0 0\n"
+            "g ViewmodelSleeves\n"
+            "f 1/1/1 2/2/2 3/3/3\n"
+            "g ViewmodelGauntlets\n"
+            "f 6/6/6 4/4/4 5/5/5\n";
+        ok &= Require(outputText == expectedText,
+                      "viewmodel capture must preserve exact upload attributes, groups, and indices");
+
+        const std::string sentinel = "do-not-overwrite\n";
+        {
+            std::ofstream existing(outputPath, std::ios::binary | std::ios::trunc);
+            existing << sentinel;
+        }
+        captureDiagnostic.clear();
+        ok &= Require(!synthetic.CaptureViewmodelMesh(
+                          outputPath.string(), captureDiagnostic),
+                      "viewmodel capture must reject an existing output path");
+        std::ifstream preserved(outputPath, std::ios::binary);
+        const std::string preservedText((std::istreambuf_iterator<char>(preserved)),
+                                         std::istreambuf_iterator<char>());
+        ok &= Require(preservedText == sentinel,
+                      "existing viewmodel capture output must remain unchanged");
+    }
+    if (captureRootCreated)
+        std::filesystem::remove_all(captureRoot, captureError);
+#endif
 
     return ok ? 0 : 1;
 }
