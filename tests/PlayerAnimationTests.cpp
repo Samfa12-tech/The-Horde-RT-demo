@@ -37,6 +37,66 @@ int main()
     using namespace horde::gameplay;
     using namespace horde::gameplay::animation;
 
+    const TwoBoneIkSolution foldedUnequal = SolveTwoBoneIk(
+        {{0.0f, 0.0f, 0.0f}}, {{0.20f, 0.0f, 0.0f}}, {{0.0f, 1.0f, 0.0f}}, 0.30f, 0.40f);
+    std::cout << "Unequal folded IK: elbow=(" << foldedUnequal.elbow[0] << ','
+              << foldedUnequal.elbow[1] << ',' << foldedUnequal.elbow[2]
+              << "), upper=" << Distance(foldedUnequal.shoulder, foldedUnequal.elbow)
+              << ", lower=" << Distance(foldedUnequal.elbow, foldedUnequal.hand) << '\n';
+    if (!Require(foldedUnequal.reachable &&
+                 Near(Distance(foldedUnequal.shoulder, foldedUnequal.elbow), 0.30f, 0.000002f) &&
+                 Near(Distance(foldedUnequal.elbow, foldedUnequal.hand), 0.40f, 0.000002f) &&
+                 Near(foldedUnequal.elbow[0], -0.075f, 0.000002f),
+                 "reachable unequal-arm fold must preserve both segment lengths and signed elbow projection")) return 1;
+
+    // A pole is a direction, not a point. Check length preservation across
+    // reachable folds, both reach boundaries, clamping, and rigid root changes.
+    for (const auto lengths : {std::array<float, 2u>{0.30f, 0.40f},
+                               std::array<float, 2u>{0.40f, 0.30f},
+                               std::array<float, 2u>{0.40f, 0.40f}})
+    {
+        const float inner = std::abs(lengths[0] - lengths[1]);
+        const float outer = lengths[0] + lengths[1];
+        for (const float distance : {0.0f, inner * 0.5f, inner + 0.00002f,
+                                     0.20f, outer - 0.00002f, outer, outer + 0.20f})
+        {
+            const auto solved = SolveTwoBoneIk(
+                {{0.0f, 0.0f, 0.0f}}, {{distance, 0.0f, 0.0f}},
+                {{0.0f, 1.0f, 0.0f}}, lengths[0], lengths[1]);
+            if (!Require(Near(Distance(solved.shoulder, solved.elbow), lengths[0], 0.000002f) &&
+                         Near(Distance(solved.elbow, solved.hand), lengths[1], 0.000002f) &&
+                         Near(solved.solvedDistance,
+                              std::clamp(distance, inner + 0.00001f, outer), 0.000002f),
+                         "IK must preserve both bone lengths at folds and clamped reach boundaries")) return 1;
+            if (!Require(solved.reachable == (distance >= inner && distance <= outer),
+                         "IK reachability must retain the existing inclusive boundary policy")) return 1;
+            if (distance == 0.0f) continue; // Zero target has a documented world-axis fallback.
+            const auto rotate = [](const PlayerIkVector& v) -> PlayerIkVector {
+                return {{-v[1], v[0], v[2]}};
+            };
+            const auto transform = [&rotate](const PlayerIkVector& v) -> PlayerIkVector {
+                const auto r = rotate(v);
+                return {{r[0] + 2.0f, r[1] - 1.0f, r[2] + 0.5f}};
+            };
+            const auto transformed = SolveTwoBoneIk(
+                transform({{0.0f, 0.0f, 0.0f}}), transform({{distance, 0.0f, 0.0f}}),
+                rotate({{0.0f, 1.0f, 0.0f}}), lengths[0], lengths[1]);
+            if (!Require(Distance(transformed.elbow, transform(solved.elbow)) < 0.00002f &&
+                         Distance(transformed.hand, transform(solved.hand)) < 0.000002f,
+                         "IK positions must follow a rigid root while the pole follows rotation only")) return 1;
+        }
+    }
+    for (const PlayerIkVector pole : {PlayerIkVector{{1.0f, 0.0f, 0.0f}},
+                                     PlayerIkVector{{1.0f, 0.0000001f, 0.0f}},
+                                     PlayerIkVector{{1.0f, 0.00001f, 0.0f}}})
+    {
+        const auto solved = SolveTwoBoneIk(
+            {{0.0f, 0.0f, 0.0f}}, {{0.2f, 0.0f, 0.0f}}, pole, 0.3f, 0.4f);
+        if (!Require(Near(Distance(solved.shoulder, solved.elbow), 0.3f, 0.000002f) &&
+                     Near(Distance(solved.elbow, solved.hand), 0.4f, 0.000002f),
+                     "collinear and nearly collinear poles must retain finite length-preserving output")) return 1;
+    }
+
     if (!Require(MapPlayerLocomotionClip(0.0f) == PlayerLocomotionClip::Idle,
                  "zero locomotion must map to idle")) return 1;
     if (!Require(MapPlayerLocomotionClip(0.8f) == PlayerLocomotionClip::Walk,

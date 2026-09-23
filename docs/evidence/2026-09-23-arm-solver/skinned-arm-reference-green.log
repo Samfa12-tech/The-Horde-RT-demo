@@ -1,0 +1,5 @@
+Left target=0.2 elbow=(0.475,1.00953,0) upper=0.3 lower=0.4
+Right target=0.2 elbow=(-0.475,1.00953,0) upper=0.3 lower=0.4
+Left target=0.5 elbow=(0.22,1.06,0) upper=0.3 lower=0.4
+Right target=0.5 elbow=(-0.22,1.06,0) upper=0.3 lower=0.4
+Skinned arm analytic reference passed: bind 0.30/0.40 m, folded 0.20 m, mirrored mounts, grip sockets, LBS and topology

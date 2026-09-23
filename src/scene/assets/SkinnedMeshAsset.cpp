@@ -1635,7 +1635,9 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
         const float adjacent = std::clamp(
             (upperLength * upperLength + solvedDistance * solvedDistance -
              lowerLength * lowerLength) / (2.0f * solvedDistance),
-            0.0f, upperLength);
+            // A longer forearm can fold the elbow behind the shoulder along
+            // this axis. Preserve the signed projection and both bone lengths.
+            -upperLength, upperLength);
         const float height = std::sqrt(std::max(
             upperLength * upperLength - adjacent * adjacent, 0.0f));
         const Vec3 solvedElbow = Add(Add(shoulder, Scale(direction, adjacent)),

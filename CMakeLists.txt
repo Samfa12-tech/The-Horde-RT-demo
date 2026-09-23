@@ -729,6 +729,11 @@ if(BUILD_TESTING)
                 PROPERTIES TIMEOUT 300)
         endif()
 
+        add_executable(horde_rt_skinned_arm_reference_tests tests/SkinnedArmReferenceTests.cpp)
+        target_include_directories(horde_rt_skinned_arm_reference_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+        target_link_libraries(horde_rt_skinned_arm_reference_tests PRIVATE horde_rt_probe_core)
+        add_test(NAME horde_rt_skinned_arm_reference_tests COMMAND horde_rt_skinned_arm_reference_tests)
+
         add_executable(horde_rt_skinned_character_smoke tests/SkinnedCharacterModelSmoke.cpp)
         target_include_directories(horde_rt_skinned_character_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
         target_link_libraries(horde_rt_skinned_character_smoke PRIVATE horde_rt_probe_core)
