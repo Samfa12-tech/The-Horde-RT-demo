@@ -591,6 +591,9 @@ private:
     std::vector<horde::scene::assets::StaticRtVertex> viewmodelUpload_;
     bool viewmodelAvailable_ = false;
     bool viewmodelPoseCurrent_ = false;
+#ifndef NDEBUG
+    VkTransformMatrixKHR viewmodelCaptureTransform_{};
+#endif
     horde::scene::assets::StaticMeshAsset gothicChestBaseAsset_;
     horde::scene::assets::StaticMeshAsset gothicChestLidAsset_;
     horde::scene::assets::StaticMeshAsset rewardLanternRingAsset_;

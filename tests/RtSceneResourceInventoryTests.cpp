@@ -220,6 +220,9 @@ struct PresentableTinyRtSceneObservationTestAccess
     {
         scene.ready_ = ready;
         scene.viewmodelPoseCurrent_ = poseCurrent;
+        scene.viewmodelCaptureTransform_ = {{-1.0f, 0.0f, 0.0f, 2.0f,
+                                             0.0f, 1.0f, 0.0f, -0.75f,
+                                             0.0f, 0.0f, -1.0f, 3.0f}};
         scene.viewmodelUpload_ = {
             MakeCaptureVertex({1.0f, 2.0f, 3.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}),
             MakeCaptureVertex({4.0f, 5.0f, 6.0f}, {0.0f, 1.0f, 0.0f}, {0.25f, 0.5f}),
@@ -594,6 +597,7 @@ int main()
                                      std::istreambuf_iterator<char>());
         const std::string expectedText =
             "# Exact CPU viewmodel upload, model-space metres; not GPU readback.\n"
+            "# model_to_world_row_major_3x4 -1 0 0 2 0 1 0 -0.75 0 0 -1 3\n"
             "v 1 2 3\nv 4 5 6\nv -1 -2 -3\nv 7 8 9\nv -4 -5 -6\nv 10 11 12\n"
             "vt 0 0\nvt 0.25 0.5\nvt 1 0\nvt 0.125 0.875\nvt 0.75 0.25\nvt 0.625 0.375\n"
             "vn 0 0 1\nvn 0 1 0\nvn 1 0 0\nvn 0 0 -1\nvn 0 -1 0\nvn -1 0 0\n"

@@ -481,6 +481,9 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     viewmodelUpload_ = std::move(other.viewmodelUpload_);
     viewmodelAvailable_ = std::exchange(other.viewmodelAvailable_, false);
     viewmodelPoseCurrent_ = std::exchange(other.viewmodelPoseCurrent_, false);
+#ifndef NDEBUG
+    viewmodelCaptureTransform_ = std::exchange(other.viewmodelCaptureTransform_, {});
+#endif
     playerStaticVertexBase_ = std::exchange(other.playerStaticVertexBase_, 0u);
     dielectricFixtureMaterialIndex_ =
         std::exchange(other.dielectricFixtureMaterialIndex_, 0u);
@@ -891,6 +894,9 @@ void PresentableTinyRtScene::Destroy()
     viewmodelUpload_.clear();
     viewmodelAvailable_ = false;
     viewmodelPoseCurrent_ = false;
+#ifndef NDEBUG
+    viewmodelCaptureTransform_ = {};
+#endif
     playerStaticVertexBase_ = 0u;
     dielectricFixtureMaterialIndex_ = 0u;
     dielectricTransportOverflowCount_ = 0u;
@@ -4951,6 +4957,9 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         0.0f, 0.0f, waterfallScale.crossLane, -15.26f}};
     for (std::size_t instance = 0u; instance < instances.size(); ++instance)
         lastInstanceMasks_[instance] = instances[instance].mask;
+#ifndef NDEBUG
+    viewmodelCaptureTransform_ = instances[kPlayerViewmodelInstanceIndex].transform;
+#endif
     lastPlayerPrimaryVisible_ = productionVisibility.playerPrimaryVisible;
     RtHeldLightGpu heldLightGpu{{
         frame.heldLight.worldFromLight[12],
@@ -5632,6 +5641,10 @@ bool PresentableTinyRtScene::CaptureViewmodelMesh(const std::string& path,
     output.imbue(std::locale::classic());
     output << std::setprecision(std::numeric_limits<float>::max_digits10)
            << "# Exact CPU viewmodel upload, model-space metres; not GPU readback.\n";
+    output << "# model_to_world_row_major_3x4";
+    for (const auto& row : viewmodelCaptureTransform_.matrix)
+        for (const float value : row) output << ' ' << value;
+    output << '\n';
     for (const auto& vertex : viewmodelUpload_)
         output << "v " << vertex.position[0] << ' ' << vertex.position[1] << ' ' << vertex.position[2] << '\n';
     for (const auto& vertex : viewmodelUpload_)
