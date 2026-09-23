@@ -1,5 +1,11 @@
 # Hand orientation investigation — not asset admission
 
+**Follow-up correction:** the large rectangular panels in the opening captures
+are authored world gallery swatches and a wall mirror, not sleeve geometry.
+The later isolation below supersedes that part of the initial visual attribution.
+The measured CPU sleeve deformation and unresolved hand orientation are real,
+separate findings; neither image interpretation alone admits the candidate.
+
 The owner reported upside-down-looking hands and possible left/right reversal in
 the Phase 3 images. This record follows checkpoint `8277df2`. The accepted world
 and opt-in viewmodel GLBs remain unchanged; normal gameplay still uses block arms.
@@ -106,3 +112,76 @@ remain open. No asset replacement, paid generation, licence change, phone instal
 signing or publication occurred in this investigation.
 
 Audio/haptic manual revalidation required: NO; playback and semantic inputs are unchanged.
+
+## Continuous elbow weights and world-space isolation follow-up
+
+The new opt-in `--blend-elbows` field is a smoothstep centred on the actual elbow,
+along the bisector of the bind upper/lower arm, with half-width one quarter of
+the shorter bone. It changes only sleeve weights, not geometry, UVs, the rig,
+gauntlets or gameplay authority. Two independent exports produce the same
+viewmodel SHA `293dbce6ecbeddc47f2dfb42162c45763c8785f3dc274636ad14266fed15b0b6`.
+The paired world remains `a08643bc...a12a91` (the prior Grip-roll experiment).
+
+Compared with the preceding roll-plus-wrist-weight candidate:
+
+| CPU sleeve metric | Grips, before → after | Raised lantern, before → after |
+| --- | --- | --- |
+| Maximum edge, metres | .09180 → .06333 | .09169 → .08432 |
+| Maximum triangle stretch | 4.014 → 1.954 | 3.967 → 2.796 |
+| Triangles over 3x | 2 → 0 | 23 → 0 |
+| Negative geometric/supplied-normal alignment | 148 → 110 | 148 → 118 |
+
+All 1,309 coincident-position sleeve vertex groups remain coincident after the
+grips pose (maximum gap zero); UV/normal splits are not open cracks. Residual
+normal disagreement and live-motion/art gates remain open. This is not a
+performance improvement or final sleeve acceptance.
+
+The Debug OBJ now records the exact row-major 3x4 model-to-world instance matrix,
+with move/reset ownership and a nonidentity regression fixture. The grips matrix
+is `[-1,0,0,-.002399676; 0,1,0,-.949749291; 0,0,-1,1.54908919]`.
+Camera rays reconstructed from the unchanged `rt_frame.glsl` intersect gallery
+swatches 3/4 at pixels (180,400)/(230,350), distances 1.809/1.992 m, and the right
+wall mirror at (820,330), distance 2.571 m. They miss the viewmodel there. Actual
+sleeve hits at (280,480)/(650,485) are about .482/.480 m away. This numerical
+localization is joined to native isolation, not offered as a substitute renderer.
+
+Temporarily masking the viewmodel preserved those world panels while removing
+the actual arms. The normal capture gate correctly **failed** with zero primary
+player pixels; its negative manifest is retained, not labelled a pass. A separate
+chest-mask isolation also preserved the panels. All temporary mask overrides were
+removed; the restored native grips PNG is byte-identical to the pre-isolation
+image, SHA `3a04b82a2872f31f85baca48837da0954984ddbe2bb927fc8ccec5831ec0fe61`.
+Do not remove or reshape scene swatches/mirrors as an arm fix.
+
+An independent proposed cuff-axis sign flip did not reproduce in the actual
+Blender processor: its reconstruction mixed glTF Y-up with Blender Z-up. A guard
+rejected that experiment before any replacement export; the unsupported change
+was removed. No anatomical axis flip is accepted from that hypothesis.
+
+Current local roots: `C:/Dev/tmp/horde-elbow-blend-20260923-a` and
+`horde-elbow-blend-repeat-20260923-b` (exports), `horde-elbow-blend-rt-20260923-a`
+(two native poses), `horde-elbow-frame-restored-20260923-a` (restored frame evidence),
+and `horde-no-viewmodel-isolation-20260923-a` (expected-negative isolation).
+Restored Debug executable SHA is
+`6cc233238b8d98ee48d512410e9f5dfcdf2ccd0658dccfdde4c74deaa1a06652`.
+The focused Debug regression passes 1/1 after restoration (3.68 s).
+The Release/Shipping native executable also rebuilds successfully. Six further
+frozen native checkpoints completed and were visually inspected in
+`C:/Dev/tmp/horde-elbow-matrix-20260923-a`, with unchanged masks/grip gates:
+
+| Pose | Maximum triangle stretch | Negative sleeve normal alignment |
+| --- | --- | --- |
+| Forward | 1.382 | 0 |
+| Downward cut | 2.143 | 121 |
+| Upward slice | 1.898 | 61 |
+| Look up | 1.766 | 0 |
+| Look down | 1.954 | 110 |
+| Lantern low | 2.839 | 118 |
+
+Together with grips/raised lantern, none of the eight poses has a triangle over
+3x stretch. This is a useful deformation improvement, **not** an art-quality
+threshold or a waiver of remaining fold/normal/motion/physical-phone gates.
+
+Checkpoint `f584be2` also has fresh successful branch/PR CI `35802962127` /
+`35802965472`: logs show 44/44 portable and 10/10 Vulkan CPU-host tests in each.
+Those jobs do not certify the subsequent source edits described here.

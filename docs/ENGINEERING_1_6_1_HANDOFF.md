@@ -35,12 +35,19 @@ The owner's hand-orientation report is investigated in the
 There is no literal Left/Right chain swap; an isolated authored Grip-roll
 candidate changes the bad cuff direction, but is not admitted. Exact Debug CPU
 upload capture proves substantial sleeve deformation before GPU decoding. A
-combined sleeve-weight candidate reduces stretch but still looks broken in RT;
-finish anatomical mounting, sleeve shape and live motion before phone acceptance.
+continuous elbow-weight candidate now stays below 3x maximum-triangle stretch in
+all eight frozen poses, but residual fold/normal and anatomical gates remain.
+World-space ray checks and native isolation corrected a mistaken attribution:
+large rectangular panels are gallery swatches/a wall mirror, not sleeves. Do not
+change that scene geometry as an arm fix. Exact Debug OBJ now includes the actual
+instance transform; no Shipping readback was added. All isolation overrides were
+removed, the restored native image is byte-identical, and the normal missing-arms
+capture gate correctly failed the no-viewmodel experiment. Finish anatomical
+mounting, sleeve shape and live motion before phone acceptance.
 Both accepted GLBs remain byte-identical, and a fresh default offline export
 reproduces the accepted viewmodel. No new phone evidence or production switch.
-The `8277df2` documentation checkpoint's branch/PR runs `35799440728` /
-`35799446606` also completed successfully; current changes need their own CI.
+`f584be2` branch/PR runs `35802962127` / `35802965472` passed 44/44 portable and
+10/10 Vulkan CPU-host tests (logs inspected); newer changes need their own CI.
 
 `6b219832514b3e36bda3792ad6639119894675c2` is pushed and remote-verified.
 Fresh branch/PR CI `35799096847` / `35799100216` passes 44/44 portable and 10/10

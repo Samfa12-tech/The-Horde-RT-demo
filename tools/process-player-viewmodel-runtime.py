@@ -7,8 +7,9 @@ No source or currently admitted runtime file is overwritten.
 Investigation-only switches (not admission or production defaults):
   --correct-grip-roll: test a 180-degree Grip roll, with a paired world GLB.
   --stabilize-sleeves: transfer sleeve Hand weights to the same-side ForeArm.
-Both retain gameplay sockets/prop authority. Neither establishes visual acceptance;
-the combined candidate still has visible sleeve defects in native RT captures.
+  --blend-elbows: test a continuous elbow-centred sleeve weight field (implies stabilization).
+These retain gameplay sockets/prop authority. None establishes visual acceptance;
+the candidates still require anatomical, surface and live-motion validation.
 """
 import hashlib
 import json
@@ -22,9 +23,10 @@ import bmesh
 
 root = Path(__file__).resolve().parents[1]
 arguments = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
-stabilize_sleeves = '--stabilize-sleeves' in arguments
+blend_elbows = '--blend-elbows' in arguments
+stabilize_sleeves = '--stabilize-sleeves' in arguments or blend_elbows
 correct_grip_roll = '--correct-grip-roll' in arguments
-arguments = [argument for argument in arguments if argument not in ('--stabilize-sleeves', '--correct-grip-roll')]
+arguments = [argument for argument in arguments if argument not in ('--stabilize-sleeves', '--correct-grip-roll', '--blend-elbows')]
 if len(arguments) != 1:
     raise RuntimeError('Expected one new output directory')
 output = Path(arguments[0]).resolve()
@@ -91,6 +93,7 @@ for polygon, material_index in zip(player.data.polygons, polygon_materials):
 player.name = 'PlayerViewmodel'
 player.data.update()
 weight_corrections = {}
+elbow_corrections = {}
 if stabilize_sleeves:
     # A rigid anatomical glove follows Hand; cloth stops at the wrist and
     # follows ForeArm. Mixing those palettes stretched the old wrist seam >5x
@@ -115,6 +118,35 @@ if stabilize_sleeves:
         weight_corrections[side] = changed
     if not all(weight_corrections.values()):
         raise RuntimeError('Expected both sleeves to contain the diagnosed hand-weight seam')
+    if blend_elbows:
+        for side in ('Left', 'Right'):
+            arm = player.vertex_groups[side + 'Arm']
+            forearm = player.vertex_groups[side + 'ForeArm']
+            shoulder = rig.matrix_world @ rig.data.bones[side + 'Arm'].head_local
+            elbow = rig.matrix_world @ rig.data.bones[side + 'ForeArm'].head_local
+            wrist = rig.matrix_world @ rig.data.bones[side + 'Hand'].head_local
+            upper, lower = elbow - shoulder, wrist - elbow
+            direction = (upper.normalized() + lower.normalized()).normalized()
+            half_width = min(upper.length, lower.length) * 0.25
+            if half_width < 0.001 or direction.length < 0.99:
+                raise RuntimeError('Invalid anatomical elbow blend frame')
+            changed = 0
+            for index in sorted(sleeve_vertices):
+                weights = {group.group: group.weight for group in player.data.vertices[index].groups}
+                total = weights.get(arm.index, 0.0) + weights.get(forearm.index, 0.0)
+                if total < 0.99:
+                    continue
+                point = player.matrix_world @ player.data.vertices[index].co
+                t = max(0.0, min(1.0, 0.5 + (point - elbow).dot(direction) / (2.0 * half_width)))
+                blend = t * t * (3.0 - 2.0 * t)
+                arm.remove([index])
+                forearm.remove([index])
+                if blend < 1.0:
+                    arm.add([index], 1.0 - blend, 'REPLACE')
+                if blend > 0.0:
+                    forearm.add([index], blend, 'REPLACE')
+                changed += 1
+            elbow_corrections[side] = dict(vertices=changed, halfWidthMetres=half_width)
 counts = {name: 0 for _, name in parts}
 for polygon in player.data.polygons:
     counts[parts[polygon.material_index][1]] += len(polygon.vertices) - 2
@@ -132,8 +164,10 @@ report = dict(schema=1, role='Viewmodel', sourceWorldSha256=sha(accepted_world),
               gripRollCorrectionRadians=math.pi if correct_grip_roll else 0.0,
               pairedWorldRuntime=calibrated_world.name if calibrated_world else None,
               pairedWorldSha256=sha(calibrated_world) if calibrated_world else None,
-              sleeveWeightMode='ArmForeArm' if stabilize_sleeves else 'OriginalArmForeArmHand',
+              sleeveWeightMode='ElbowCentredArmForeArm' if blend_elbows else
+                  ('ArmForeArm' if stabilize_sleeves else 'OriginalArmForeArmHand'),
               sleeveHandWeightsMovedToForearm=weight_corrections,
+              elbowWeightField=elbow_corrections,
               runtime=viewmodel_output.name, runtimeSha256=sha(viewmodel_output),
               primitiveSemantics=counts, processingVertices=len(player.data.vertices),
               ownership='Primary-only modelled geometry; world body owns secondary visibility',

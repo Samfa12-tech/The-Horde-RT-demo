@@ -230,8 +230,11 @@ history, not relabelled green. The following handoff-only commit changes no runt
   supersedes the initial shape hypothesis: exact CPU uploads confirm sleeve
   deformation, and an isolated Grip-roll candidate changes cuff direction without
   swapping named Left/Right chains or changing prop authority. Combined reweighting
-  improves stretch but the RT result is still unacceptable. Accepted runtimes are
-  unchanged; finish anatomical mounting and sleeve shape before admission.
+  improves stretch. Follow-up isolation corrects the visual attribution of large
+  panels: gallery swatches and a wall mirror are not sleeve defects. Continuous
+  elbow weights remove all >3x triangle stretches in eight frozen poses, but
+  residual fold/normal, anatomical and live-motion gates remain. Accepted runtimes
+  are unchanged; finish anatomical mounting and sleeve shape before admission.
 - Fix the visibly angular/open-looking sleeve/shoulder surfaces and near-camera
   composition with model/skin investigation and geometry changes, not visual cheats.
 - Live-motion transitions, legal extreme pitch, retraction, grip agreement and
