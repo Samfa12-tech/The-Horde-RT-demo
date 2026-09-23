@@ -133,6 +133,14 @@ const char* DebugPlayerCombatActionName(const horde::gameplay::PlayerCombatActio
     return "unknown";
 }
 
+#if defined(HORDE_RT_DEBUG_VIEWMODEL_CANDIDATE)
+constexpr auto kDefaultPlayerPresentationRoute =
+    horde::vulkan::raytracing::PlayerRenderRoute::ModelledViewmodel;
+#else
+constexpr auto kDefaultPlayerPresentationRoute =
+    horde::vulkan::raytracing::PlayerRenderRoute::Procedural;
+#endif
+
 struct SwapchainContext
 {
     ANativeWindow* window = nullptr;
@@ -177,7 +185,7 @@ struct SwapchainContext
     std::int32_t activeBenchmarkCheckpoint = -1;
     std::string activeBenchmarkName;
     horde::vulkan::raytracing::PlayerRenderRoute playerRenderRoute =
-        horde::vulkan::raytracing::PlayerRenderRoute::Procedural;
+        kDefaultPlayerPresentationRoute;
     bool glassFixtureRequested = false;
     bool productionRewardPropsRequested = false;
     bool productionLanternGlassOnly = false;
@@ -937,7 +945,7 @@ bool ResolveDebugCheckpoint(const std::int32_t id, DebugCheckpointSelection& sel
     if (const auto* showcase = horde::gameplay::FindShowcaseCheckpoint(id))
     {
         selection = {*showcase, showcase->id,
-                     horde::vulkan::raytracing::PlayerRenderRoute::Procedural};
+                     kDefaultPlayerPresentationRoute};
         return true;
     }
     const auto* development = horde::gameplay::FindDevelopmentCheckpoint(id);
@@ -1332,7 +1340,7 @@ void ApplyRouteReplay(SwapchainContext& context)
     }
     context.activeBenchmarkCheckpoint = -1;
     context.activeBenchmarkName.clear();
-    context.playerRenderRoute = horde::vulkan::raytracing::PlayerRenderRoute::Procedural;
+    context.playerRenderRoute = kDefaultPlayerPresentationRoute;
     context.glassFixtureRequested = false;
     context.productionRewardPropsRequested = false;
     context.productionLanternGlassOnly = false;

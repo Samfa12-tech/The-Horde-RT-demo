@@ -12,6 +12,8 @@ param(
     [switch]$RtLabWorkloadComparison,
     [switch]$SkipBuild,
     [switch]$SkipInstall,
+    [string]$ViewmodelCandidateDirectory = "",
+    [string]$ApkPath = "",
     [ValidateNotNullOrEmpty()]
     [string]$DeviceSerial = "R5GL219SZGK",
     [ValidateNotNullOrEmpty()]
@@ -24,8 +26,9 @@ param(
 $ErrorActionPreference = "Stop"
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 $androidRoot = Join-Path $repoRoot "android"
-$apk = Join-Path $androidRoot "app\build\outputs\apk\debug\app-debug.apk"
-$packageName = "com.samfa12.hordelanternrt.debug"
+if ($ApkPath -and -not $SkipBuild) { throw 'An explicit immutable ApkPath requires SkipBuild.' }
+$apk = ""
+$packageName = if ($ViewmodelCandidateDirectory) { "com.samfa12.hordelanternrt.debug.viewmodel" } else { "com.samfa12.hordelanternrt.debug" }
 $activityName = "$packageName/com.samfa12.hordelanternrt.MainActivity"
 $adb = Join-Path $env:LOCALAPPDATA "Android\Sdk\platform-tools\adb.exe"
 $runId = Get-Date -Format "yyyyMMdd-HHmmss"
@@ -67,6 +70,14 @@ $checkpointZones = @{
     "pbr-torch-fire" = "opening"
     "player-body-forward" = "opening"
     "player-fallback-forward" = "opening"
+    "player-viewmodel-grips" = "opening"
+    "player-viewmodel-forward" = "opening"
+    "player-viewmodel-downward-cut" = "opening"
+    "player-viewmodel-upward-slice" = "opening"
+    "player-viewmodel-look-up" = "opening"
+    "player-viewmodel-look-down" = "opening"
+    "player-viewmodel-lantern-high" = "yellow-torch-bay"
+    "player-viewmodel-lantern-low" = "yellow-torch-bay"
     "lantern-chest-unlock" = "finale"
     "lantern-glass-production" = "finale"
     "lantern-held-high" = "yellow-torch-bay"
@@ -91,6 +102,11 @@ $checkpointZones = @{
     "lantern-chest-held-high" = "finale"
 }
 $baselineCheckpoints = @("opening", "two-enemy-combat", "worst-bend", "skylight", "green", "lich")
+$viewmodelCheckpoints = @(
+    "player-viewmodel-grips", "player-viewmodel-forward",
+    "player-viewmodel-downward-cut", "player-viewmodel-upward-slice",
+    "player-viewmodel-look-up", "player-viewmodel-look-down",
+    "player-viewmodel-lantern-high", "player-viewmodel-lantern-low")
 $captureCheckpoints = @("opening", "skeleton", "worst-bend", "lantern-drop", "skylight", "yellow", "blue", "red", "green", "mirror", "lich", "finale-roof", "two-enemy-combat")
 if ($CaptureSelection.Count -gt 0) { $captureCheckpoints = @($CaptureSelection) }
 $combatCaptureExpectations = @{
@@ -326,8 +342,16 @@ function Invoke-CaptureCheckpoint {
     if ($Checkpoint -eq "player-fallback-grips" -and $state.playerRenderRoute -ne "procedural") {
         $failures.Add("Procedural player capture reported route '$($state.playerRenderRoute)'.")
     }
-    if ($Checkpoint.StartsWith("player-") -and [int]$state.tlasInstanceCount -ne 20) {
-        $failures.Add("$Checkpoint reported $($state.tlasInstanceCount) TLAS instances instead of 20.")
+    if ($viewmodelCheckpoints -contains $Checkpoint -and (
+        $state.playerRenderRoute -ne "modelled-viewmodel" -or [int]$state.playerSkinCadenceHz -ne 60 -or
+        [int64]$state.playerSkinUpdates -lt 1 -or [double]$state.playerMaxSocketErrorM -gt 0.015)) {
+        $failures.Add("$Checkpoint did not retain modelled-viewmodel, 60 Hz skinning and exact grip authority.")
+    }
+    # Exact per-instance masks are asserted by the native PlayerAnimationTests
+    # route contract; Android state currently exposes the selected route and
+    # total capacity, but not the mask array itself.
+    if ($Checkpoint.StartsWith("player-") -and [int]$state.tlasInstanceCount -ne 21) {
+        $failures.Add("$Checkpoint reported $($state.tlasInstanceCount) TLAS instances instead of the generated capacity 21 (RtSceneAbi.def instanceMetadata=21).")
     }
     $image = Save-Screenshot ("capture-{0:d2}-{1}-{2}" -f $Index, $Checkpoint, $RequestedScale)
     $captureRecords.Add([PSCustomObject]@{
@@ -479,8 +503,15 @@ function Invoke-CheckpointBenchmark {
     if ($Checkpoint -eq "player-fallback-grips" -and $state.playerRenderRoute -ne "procedural") {
         $failures.Add("Procedural player benchmark reported route '$($state.playerRenderRoute)'.")
     }
-    if ($Checkpoint.StartsWith("player-") -and [int]$state.tlasInstanceCount -ne 20) {
-        $failures.Add("$Checkpoint benchmark reported $($state.tlasInstanceCount) TLAS instances instead of 20.")
+    if ($viewmodelCheckpoints -contains $Checkpoint -and (
+        $state.playerRenderRoute -ne "modelled-viewmodel" -or [int]$state.playerSkinCadenceHz -ne 60 -or
+        [int64]$state.playerSkinUpdates -lt 1 -or [double]$state.playerMaxSocketErrorM -gt 0.015)) {
+        $failures.Add("$Checkpoint benchmark did not retain modelled-viewmodel, 60 Hz skinning and exact grip authority.")
+    }
+    # Exact per-instance masks are covered by the native route contract; this
+    # Android state surface exposes route/capacity but not the mask array.
+    if ($Checkpoint.StartsWith("player-") -and [int]$state.tlasInstanceCount -ne 21) {
+        $failures.Add("$Checkpoint benchmark reported $($state.tlasInstanceCount) TLAS instances instead of the generated capacity 21 (RtSceneAbi.def instanceMetadata=21).")
     }
     if ($RtWorkload -ge 0 -and [int]$state.rtLab.workloadPreset -ne $RtWorkload) {
         $failures.Add("$Checkpoint $RtLabProfile state reported workload $($state.rtLab.workloadPreset) instead of $RtWorkload.")
@@ -535,11 +566,29 @@ try {
     if (-not $SkipBuild) {
         Push-Location $androidRoot
         try {
-            .\gradlew.bat assembleDebug --console=plain 2>&1 | Tee-Object -FilePath (Join-Path $outputDirectory "gradle-build.txt")
+            $buildArguments = @('assembleDebug', '--console=plain')
+            if ($ViewmodelCandidateDirectory) {
+                $buildArguments += "-PhordeViewmodelCandidateDir=$([IO.Path]::GetFullPath($ViewmodelCandidateDirectory))"
+            }
+            & .\gradlew.bat @buildArguments 2>&1 | Tee-Object -FilePath (Join-Path $outputDirectory "gradle-build.txt")
             if ($LASTEXITCODE -ne 0) { throw "Android debug build failed." }
         } finally { Pop-Location }
     }
+    $apk = if ($ApkPath) { [IO.Path]::GetFullPath($ApkPath) } else {
+        & (Join-Path $PSScriptRoot 'resolve-android-apk.ps1') -AndroidRoot $androidRoot -Variant debug
+    }
     if (-not (Test-Path -LiteralPath $apk)) { throw "Debug APK not found: $apk" }
+    # Verify package identity BEFORE install: a stale APK must not overwrite the
+    # ordinary Debug app when the separate viewmodel candidate was requested.
+    $buildTools = Join-Path $env:LOCALAPPDATA 'Android\Sdk\build-tools'
+    $aapt = Get-ChildItem -LiteralPath $buildTools -Directory | Sort-Object Name -Descending |
+        ForEach-Object { Join-Path $_.FullName 'aapt.exe' } | Where-Object { Test-Path -LiteralPath $_ } |
+        Select-Object -First 1
+    if (-not $aapt) { throw 'Android aapt is required to verify the APK package before installation.' }
+    $badging = (& $aapt dump badging $apk 2>&1 | Out-String)
+    if ($LASTEXITCODE -ne 0 -or $badging -notmatch "package: name='([^']+)'" -or $Matches[1] -cne $packageName) {
+        throw "Local APK package does not match the requested validation target $packageName."
+    }
     $apkHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $apk).Hash.ToLowerInvariant()
     if (-not $SkipInstall) { Invoke-AdbText @("install", "-r", $apk) | Set-Content -LiteralPath (Join-Path $outputDirectory "install.txt") }
     $installedApkHash = Get-InstalledApkSha256

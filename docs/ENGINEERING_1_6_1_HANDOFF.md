@@ -30,6 +30,19 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### Current Phase 3 checkpoint
 
+The corrected-hand candidate now has an isolated **Android Debug** package, not a
+production switch: `.debug.viewmodel` defaults to the real modelled route for live
+play/replay and carries its matched world counterpart. Normal Debug/Release remain
+unchanged. ARM64 Debug and unsigned Release isolation builds pass; a fresh targeted
+Java run passes 4/4, and the APK resolver passes 10/10. Package/source/hash checks,
+exact local artifact, pending eight-pose/live-motion matrix and limitations are in
+the [Android candidate record](ENGINEERING_1_6_1_VIEWMODEL_ANDROID_CANDIDATE_2026-09-23.md).
+ADB currently exposes no device; no install or new phone acceptance occurred.
+Do not use the stale conventional Debug APK path: follow Gradle's artifact listing
+or the immutable recorded artifact. Accepted runtime GLBs remain unchanged.
+`b352599` push/PR CI passed 44/44 portable, 10/10 Vulkan CPU-host and six mirror
+tests, with logs inspected. Later candidate-package source needs its own CI.
+
 Latest owner correction: the source hand is **Right**, not Left. The historical
 left-source classification is withdrawn. New `--gauntlet-source-hand Right`
 candidate exports mirror Left and preserve Right, with correct winding/UV-corner
@@ -38,7 +51,9 @@ reduces unique viewmodel vertices to 15,855 without removing triangles. Six pure
 geometry tests and paired admission smoke pass; two native corrected-chirality
 captures complete. Re-evaluate wrist roll on this corrected source before admission.
 The earlier 90/180 and 105/145 roll experiments used the superseded chirality and
-are not accepted fixes. See the latest section of the hand/roll record.
+are not accepted fixes. A new Right-source 105/145 candidate is now packaged for
+investigation, not admitted. Optional sleeve-envelope fitting still leaves ragged
+boundaries and is not packaged. See the latest section of the hand/roll record.
 
 The owner's hand-orientation report is investigated in the
 [hand/roll record](ENGINEERING_1_6_1_HAND_ORIENTATION_2026-09-23.md).

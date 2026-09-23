@@ -7,6 +7,7 @@ import java.nio.ByteBuffer
 import java.nio.charset.CharacterCodingException
 import java.nio.charset.CodingErrorAction
 import java.nio.charset.StandardCharsets
+import java.security.MessageDigest
 
 def hordeVersionFile = rootProject.file('../VERSION')
 def hordeVersionCodeMapFile = rootProject.file('../version-code-map.json')
@@ -90,6 +91,57 @@ def hordeRtNativePolicyArguments = { String defaultInstrumentation ->
             "-DHORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY=${quality}"]
 }
 
+// Explicit local-only asset experiment. Release and ordinary Debug never consume
+// this overlay, and its separate application id prevents stale private-file assets.
+def viewmodelCandidatePath = providers.gradleProperty('hordeViewmodelCandidateDir').orNull
+def viewmodelCandidate = viewmodelCandidatePath ? file(viewmodelCandidatePath).canonicalFile : null
+def viewmodelOverlayDir = layout.buildDirectory.dir('generated/viewmodelCandidateAssets')
+def viewmodelReceipt = viewmodelCandidate ? new JsonSlurper().parse(
+    new File(viewmodelCandidate, 'viewmodel-processing.json'), 'UTF-8') : null
+def candidateFile = { String name ->
+    if (!name || new File(name).name != name || name.contains('\\') || name.contains('/')) {
+        throw new GradleException('Candidate receipt requires plain local file names.')
+    }
+    def resolved = new File(viewmodelCandidate, name).canonicalFile
+    if (resolved.parentFile != viewmodelCandidate || !resolved.isFile()) {
+        throw new GradleException('Candidate file is absent or outside its declared directory.')
+    }
+    return resolved
+}
+if (viewmodelCandidate) {
+    def candidateWorld = candidateFile(viewmodelReceipt.pairedWorldRuntime as String)
+    def candidateView = candidateFile(viewmodelReceipt.runtime as String)
+    tasks.register('prepareViewmodelCandidateAssets', Sync) {
+        into viewmodelOverlayDir
+        inputs.file new File(viewmodelCandidate, 'viewmodel-processing.json')
+        inputs.file file('../../assets/models/player/runtime/gothic-traveller-lod0.runtime.glb')
+        doFirst {
+            def digest = { File input -> MessageDigest.getInstance('SHA-256').digest(input.bytes).encodeHex().toString() }
+            if (viewmodelReceipt.role != 'Viewmodel' || viewmodelReceipt.gauntletSourceHandedness != 'Right' ||
+                digest(candidateWorld) != viewmodelReceipt.pairedWorldSha256 ||
+                digest(candidateView) != viewmodelReceipt.runtimeSha256 ||
+                digest(file('../../assets/models/player/runtime/gothic-traveller-lod0.runtime.glb')) != viewmodelReceipt.sourceWorldSha256) {
+                throw new GradleException('Viewmodel candidate role, handedness, hashes or source authority disagree.')
+            }
+        }
+        from(candidateWorld) {
+            into 'models/player/runtime'
+            rename { 'gothic-traveller-lod0.runtime.glb' }
+        }
+        from(candidateView) {
+            into 'models/player/viewmodel/runtime'
+            rename { 'gothic-traveller-viewmodel.runtime.glb' }
+        }
+        from('../../assets/models/player/viewmodel/runtime/asset.manifest.json') {
+            into 'models/player/viewmodel/runtime'
+        }
+        from(new File(viewmodelCandidate, 'viewmodel-processing.json')) {
+            into 'models/player/viewmodel/runtime'
+            rename { 'candidate-receipt.json' }
+        }
+    }
+}
+
 tasks.register('prepareRuntimeAssets', Sync) {
     from('../../assets') {
         include 'models/enemies/meshy/skeleton_biped_merged_animations_v01.glb'
@@ -133,6 +185,7 @@ tasks.register('prepareRuntimeAssets', Sync) {
 android {
     namespace 'com.samfa12.hordelanternrt'
     compileSdk 34
+    buildFeatures { buildConfig true }
 
     defaultConfig {
         applicationId 'com.samfa12.hordelanternrt'
@@ -140,6 +193,7 @@ android {
         targetSdk 34
         versionCode hordeVersionCode.intValue()
         versionName hordeVersionName
+        buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', 'false'
         resValue 'string', 'alpha_version', "SHOWCASE · ALPHA ${hordeVersionName}"
 
         externalNativeBuild {
@@ -172,12 +226,16 @@ android {
 
     buildTypes {
         debug {
-            applicationIdSuffix '.debug'
+            applicationIdSuffix viewmodelCandidate ? '.debug.viewmodel' : '.debug'
+            buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', viewmodelCandidate ? 'true' : 'false'
+            if (viewmodelCandidate) resValue 'string', 'app_name', 'Horde RT Viewmodel Candidate'
             versionNameSuffix '-debug'
             minifyEnabled false
             externalNativeBuild {
                 cmake {
-                    arguments '-DHORDE_RT_DEBUG_CHECKPOINTS=ON', *hordeRtNativePolicyArguments('Diagnostic')
+                    arguments '-DHORDE_RT_DEBUG_CHECKPOINTS=ON',
+                        "-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=${viewmodelCandidate ? 'ON' : 'OFF'}",
+                        *hordeRtNativePolicyArguments('Diagnostic')
                 }
             }
         }
@@ -185,7 +243,8 @@ android {
             minifyEnabled false
             externalNativeBuild {
                 cmake {
-                    arguments '-DHORDE_RT_DEBUG_CHECKPOINTS=OFF', *hordeRtNativePolicyArguments('Shipping')
+                    arguments '-DHORDE_RT_DEBUG_CHECKPOINTS=OFF', '-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=OFF',
+                        *hordeRtNativePolicyArguments('Shipping')
                 }
             }
             if (signingConfigs.findByName('release') != null) {
@@ -215,6 +274,7 @@ android {
 
     sourceSets {
         main.assets.srcDirs = [runtimeAssetsDir.get().asFile]
+        if (viewmodelCandidate) debug.assets.srcDir(viewmodelOverlayDir)
     }
 }
 
@@ -225,6 +285,11 @@ dependencies {
 
 tasks.named('preBuild').configure {
     dependsOn tasks.named('prepareRuntimeAssets')
+}
+if (viewmodelCandidate) {
+    tasks.matching { it.name == 'preDebugBuild' }.configureEach {
+        dependsOn tasks.named('prepareViewmodelCandidateAssets')
+    }
 }
 
 // Hermetic policy evidence invokes this narrow task with explicit -P inputs.

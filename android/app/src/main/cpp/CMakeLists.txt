@@ -3,6 +3,10 @@ cmake_minimum_required(VERSION 3.22.1)
 project(horde_rt_probe_android)
 
 option(HORDE_RT_DEBUG_CHECKPOINTS "Enable debug-only showcase checkpoint and replay commands" OFF)
+option(HORDE_RT_DEBUG_VIEWMODEL_CANDIDATE "Use the explicitly packaged viewmodel candidate for live Debug play" OFF)
+if(HORDE_RT_DEBUG_VIEWMODEL_CANDIDATE AND (NOT HORDE_RT_DEBUG_CHECKPOINTS OR NOT CMAKE_BUILD_TYPE STREQUAL "Debug"))
+    message(FATAL_ERROR "The viewmodel candidate is restricted to Debug checkpoint-enabled builds.")
+endif()
 
 get_filename_component(HORDE_RT_REPO_ROOT "${CMAKE_CURRENT_LIST_DIR}/../../../../.." ABSOLUTE)
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtVersion.cmake")
@@ -41,6 +45,9 @@ if(HORDE_RT_DEBUG_CHECKPOINTS)
     target_compile_definitions(horde_rt_probe_android PRIVATE
         HORDE_RT_DEBUG_CHECKPOINTS=1
     )
+endif()
+if(HORDE_RT_DEBUG_VIEWMODEL_CANDIDATE)
+    target_compile_definitions(horde_rt_probe_android PRIVATE HORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=1)
 endif()
 # Keep the locally installable debug APK inspectable while avoiding an -O0
 # CPU skinning path that is not representative of a shipped phone build.

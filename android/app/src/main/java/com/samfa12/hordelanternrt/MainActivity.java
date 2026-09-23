@@ -413,6 +413,11 @@ public class MainActivity extends Activity {
                     && stageAsset("textures/props/runtime/normal.android.ktx2", "textures/props/runtime/normal.android.ktx2")
                     && stageAsset("textures/props/runtime/orm.android.ktx2", "textures/props/runtime/orm.android.ktx2")
                     && stageAsset("textures/props/runtime/emissive.android.ktx2", "textures/props/runtime/emissive.android.ktx2");
+            final boolean viewmodelStaged = !BuildConfig.VIEWMODEL_CANDIDATE || (
+                    stageAsset("models/player/viewmodel/runtime/asset.manifest.json", "models/player/viewmodel/runtime/asset.manifest.json")
+                    && stageAsset("models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb", "models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb")
+                    && stageAsset("models/player/viewmodel/runtime/candidate-receipt.json", "models/player/viewmodel/runtime/candidate-receipt.json"));
+            if (!viewmodelStaged) throw new IllegalStateException("Opt-in viewmodel candidate assets could not be staged.");
             final boolean written = ProbeBridge.writeReports(filesRoot);
             final StringBuilder output = new StringBuilder(textReport).append('\n');
             if (textReport.contains("RT mode: Unsupported")) {
@@ -1777,6 +1782,14 @@ public class MainActivity extends Activity {
             case "lantern-wall-low": return 133;
             case "lantern-held-look-up": return 134;
             case "lantern-chest-held-high": return 135;
+            case "player-viewmodel-grips": return 136;
+            case "player-viewmodel-forward": return 137;
+            case "player-viewmodel-downward-cut": return 138;
+            case "player-viewmodel-upward-slice": return 139;
+            case "player-viewmodel-look-up": return 140;
+            case "player-viewmodel-look-down": return 141;
+            case "player-viewmodel-lantern-high": return 142;
+            case "player-viewmodel-lantern-low": return 143;
             default: return -1;
         }
     }
