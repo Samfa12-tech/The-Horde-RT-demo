@@ -45,6 +45,10 @@ jobs:
       - name: Check offline gauntlet chirality and UV winding
         run: python3 -m unittest discover -s tests -p test_player_gauntlet_geometry.py -v
 
+      - name: Check Gradle APK artifact resolution
+        shell: pwsh
+        run: ./tools/test-resolve-android-apk.ps1
+
   player-vulkan-host:
     runs-on: ubuntu-latest
     timeout-minutes: 20
