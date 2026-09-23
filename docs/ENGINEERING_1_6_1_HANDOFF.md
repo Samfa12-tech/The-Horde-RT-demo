@@ -30,14 +30,41 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### Current Phase 3 checkpoint
 
+Solver-first checkpoint `69014cf` is pushed/remote-verified. The documented
+negative projection defect RED/GREENs in both the pure helper and actual
+skinned solver using one independent analytic GLB control. Pinned ozz agrees;
+Debug/Release focused tests pass 11/11. Current rig ratios do not encounter this
+case and all eight native portrait images remain byte-identical after the fix:
+**not the proven cause of the visual defect**. See the
+[solver isolation](ENGINEERING_1_6_1_ARM_SOLVER_ISOLATION_2026-09-23.md).
+The connected SM-S948B has now run the unchanged isolated APK: installed-byte
+identity, replay, eight captures and Home/resume pass after fixing stale attack
+capture expectations. Preserve 4/2 high/low lantern volume-budget overflows and
+the visibly unaccepted art. [Phone baseline](evidence/2026-09-23-arm-phone-baseline/README.md).
+Next: labelled anatomical mounting and production sleeve-layer isolation,
+then explicit nonduplicating look-down body geometry and live/owner gates.
+No further roll/weight sweep, broad arm rewrite or glass diversion.
+
+Owner's subsequent research steering supersedes the next-step suggestions below:
+freeze the current mesh/roll candidates; no broad rewrite or unrestricted weight/
+roll search. First reproduce the signed-projection IK counterexample, distinguish
+the helper from the actual skinned solver, and test one independent analytic arm
+fixture. Use pinned ozz-animation as a solver reference, not a new runtime
+dependency. Repair only demonstrated defects in mounting, IK, LBS or topology.
+Visible torso/legs on look-down is an explicit remaining requirement, with no
+duplicate primary/secondary arms or primary head. Current modelled masks do not
+provide it. Existing eight-pose captures, live transitions/retraction and owner
+phone acceptance remain gates. The phone is now connected as `SM-S948B`; older
+"no device" statements below describe their historical runs, not current access.
+
 Latest surface work: [sleeve closure checkpoint](evidence/2026-09-23-viewmodel-sleeve-closure/README.md).
 The adjacent-cloth recovery attempt worsened the rim and was removed. Closure
 preserved normals/gauntlet data and passed edge/paired-pose checks, but the later
 intersection check **rejects** both candidates (221/191 cap/cloth triangle pairs).
 The processor now fails before exporting this source; four Blender fixtures pass,
-including rejection of crossing panels despite closed edges. Next: proper sleeve
-retopology with clean deformation loops/finished rims, not more automatic bands
-or caps. Deliberately open garment cuffs are valid; edge closure alone is not the
+including rejection of crossing panels despite closed edges. Sleeve retopology
+was the proposed next step before the owner's solver/control-first steering;
+do not begin it before that isolation. Deliberately open garment cuffs are valid; edge closure alone is not the
 goal. Preserve gauntlets/rig/RT ownership. Neither tracked GLB nor the earlier
 Android candidate was replaced. Fitting also retains two normal failures.
 The preceding portrait checkpoint `6f282bb` is pushed; fresh push/PR CI
@@ -65,7 +92,8 @@ candidate exports mirror Left and preserve Right, with correct winding/UV-corner
 association; no bone-label swap or accepted asset replacement. The UV correction
 reduces unique viewmodel vertices to 15,855 without removing triangles. Six pure
 geometry tests and paired admission smoke pass; two native corrected-chirality
-captures complete. Re-evaluate wrist roll on this corrected source before admission.
+captures complete. Anatomical mounting remains unaccepted; freeze roll values
+until the new layered investigation establishes the hand-to-grip frame.
 The earlier 90/180 and 105/145 roll experiments used the superseded chirality and
 are not accepted fixes. A new Right-source 105/145 candidate is now packaged for
 investigation, not admitted. Optional sleeve-envelope fitting still leaves ragged

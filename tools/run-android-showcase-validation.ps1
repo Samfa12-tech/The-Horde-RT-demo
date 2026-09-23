@@ -111,14 +111,18 @@ $captureCheckpoints = @("opening", "skeleton", "worst-bend", "lantern-drop", "sk
 if ($CaptureSelection.Count -gt 0) { $captureCheckpoints = @($CaptureSelection) }
 $combatCaptureExpectations = @{
     "player-body-downward-cut" = @{
-        action = "swing-active"; animationTime = 0.2500; minimumConsumedAttackSequence = 1
+        action = "swing-active"; animationTime = 0.5833; actionTime = 0.4033; minimumConsumedAttackSequence = 1
         stagedAttackEdges = 1; stagedSwingEvents = 1
     }
     "player-body-upward-slice" = @{
-        action = "upward-active"; animationTime = 0.5167; minimumConsumedAttackSequence = 2
+        action = "upward-active"; animationTime = 0.6167; actionTime = 0.1667; minimumConsumedAttackSequence = 2
         stagedAttackEdges = 2; stagedSwingEvents = 2
     }
 }
+# Both routes stage the same late active poses through the shared 60 Hz
+# simulation. They differ in render ownership, not combat timing.
+$combatCaptureExpectations['player-viewmodel-downward-cut'] = $combatCaptureExpectations['player-body-downward-cut']
+$combatCaptureExpectations['player-viewmodel-upward-slice'] = $combatCaptureExpectations['player-body-upward-slice']
 $rtLabComparisonCheckpoints = @('lantern-drop', 'skylight', 'finale-roof')
 $rtLabExpectedWaterQuality = 1
 $timingRows = [System.Collections.Generic.List[object]]::new()
@@ -318,8 +322,7 @@ function Invoke-CaptureCheckpoint {
             $failures.Add("$Checkpoint capture animation time $($state.animationTime) did not retain its authoritative staged time $($expectedCombat.animationTime).")
         }
         if ($state.playerCombat.action -ne $expectedCombat.action -or
-            [double]$state.playerCombat.actionTime -lt 0.06 -or
-            [double]$state.playerCombat.actionTime -gt 0.10) {
+            [math]::Abs([double]$state.playerCombat.actionTime - [double]$expectedCombat.actionTime) -gt 0.001) {
             $failures.Add("$Checkpoint capture combat phase '$($state.playerCombat.action)' at $($state.playerCombat.actionTime) s did not match the staged active phase.")
         }
         if ([int64]$state.playerCombat.lastConsumedAttackSequence -lt [int64]$expectedCombat.minimumConsumedAttackSequence) {

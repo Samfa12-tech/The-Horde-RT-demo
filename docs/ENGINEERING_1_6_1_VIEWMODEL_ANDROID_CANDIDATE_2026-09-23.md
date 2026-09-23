@@ -1,7 +1,11 @@
 # Isolated Android viewmodel candidate — not accepted
 
-This is development packaging and host evidence, **not** a phone, art or performance
-pass. ADB enumerated no devices on September 23, so no install was attempted.
+The initial packaging checks below preceded phone access. The later exact-device
+[baseline run](evidence/2026-09-23-arm-phone-baseline/README.md) installs this
+unchanged APK and passes replay/capture/lifecycle contracts, **not** art, live
+transition, Shipping performance or final acceptance. It does not contain the
+subsequent signed-projection solver fix. Historical no-device notes below refer
+only to the initial packaging checkpoint.
 The normal production/block-arm route and both tracked runtime GLBs are unchanged.
 
 ## Candidate and ownership

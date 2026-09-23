@@ -1,6 +1,6 @@
 # Android RT Device Compatibility Record
 
-Last updated: 2026-09-20
+Last updated: 2026-09-23
 
 This is a living compatibility record for the Horde Lantern RT Android build. It separates direct project evidence from reports and hardware-based predictions. A device is not marked as working solely because its GPU advertises Vulkan or hardware ray tracing.
 
@@ -19,6 +19,8 @@ The working gate is a real RT-produced frame reaching the Android swapchain afte
 ## Confirmed evidence
 
 ### Samsung Galaxy S26 Ultra - `SM-S948B`
+
+- **2026-09-23 isolated arm-candidate baseline:** ADB and `ro.product.model` identify raw model `SM-S948B`. The `.debug.viewmodel` APK SHA-256 `6047b285d6507ce84ccc90b48faa52b07cc917446167dc271f5bc6ebd244b2f9` installed with `-t` after ordinary install correctly rejected this test-only APK; installed bytes match. No data was cleared or production app replaced. Run `run-20260923-161421` completed replay/eight captures/Home-resume but failed stale capture-time expectations. After correcting those expectations against actual shared staging (24 positive/negative guard tests), fresh run `run-20260923-162801` passes the harness: modelled route, strict ASTC, hardware RayTracingPipeline presentation, 60 Hz selected skinning with actual updates, 21 instances, bounded grip error and Home/resume. This is the **unchanged old candidate APK**, not a rebuild of the new signed-IK fix. High/low lantern captures retain 4/2 transport volume-budget overflows. Art is not accepted: foreground hand/sleeve presentation and absent look-down body remain open; replay is not hands-on transition/owner acceptance or Shipping performance. See [phone baseline](evidence/2026-09-23-arm-phone-baseline/README.md).
 
 - **2026-09-13 focused 1.6.1 dual-backend smoke:** Locally tested exact Debug APK SHA-256 `1f64d3328cd9a17c4c39690523b3572201e846f67b04d9b1e724669debd8bbfa` matched its installed/pulled-back bytes. Android 16 / Adreno 840 / Vulkan 1.4.295 / driver 512.842.19. Forced `RayQueryCompute` passed strict ASTC and twelve stable honestly presented `lantern-held-high` frames at 75% portrait (1080x2235 RT image); Home/resume recreated and presented again. A fresh default launch preferred `RayTracingPipeline` and passed the same checkpoint. This is targeted implementation/functional/lifecycle evidence, not sustained performance, full visual parity, final-candidate acceptance or S24/S25 proof. Existing glass budget failures remain open. Exact artifact/source boundaries, image inspection and limitations: [backend report](ENGINEERING_1_6_1_RAYQUERY_BACKEND_2026-09-13.md).
 - **2026-09-13 connection check:** Lead ADB inspection confirms raw model `SM-S948B`, Android 16, on the already-authorised development phone. This is local connection/identity evidence only; no new APK was installed or exercised at this checkpoint, and it does not certify the in-development RayQueryCompute backend or another Galaxy model.

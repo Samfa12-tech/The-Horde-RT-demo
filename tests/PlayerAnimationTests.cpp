@@ -446,6 +446,13 @@ int main()
                      std::abs(staged.Snapshot().playerPitchRadians - checkpoint.pitch) < 0.000001f,
                      "viewmodel checkpoint pitch must match actual gameplay pose, not an out-of-range request")) return 1;
         ++viewmodelCheckpointCount;
+        if (checkpoint.combatPose != DevelopmentCombatPose::Rest)
+        {
+            const bool upward = checkpoint.combatPose == DevelopmentCombatPose::UpwardSliceActive;
+            if (!Require(Near(staged.Snapshot().walkTime, upward ? 0.6167f : 0.5833f) &&
+                         Near(staged.Snapshot().playerCombat.actionTime, upward ? 0.1667f : 0.4033f),
+                         "Android capture timing must match the shared late-active attack checkpoint")) return 1;
+        }
     }
     if (!Require(viewmodelCheckpointCount == 8u, "all eight viewmodel checkpoint pitches must be staged")) return 1;
     const PlayerRouteMasks skinnedMasks = BuildPlayerRouteMasks(PlayerRenderRoute::Skinned);

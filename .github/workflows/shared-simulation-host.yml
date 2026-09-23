@@ -49,6 +49,10 @@ jobs:
         shell: pwsh
         run: ./tools/test-resolve-android-apk.ps1
 
+      - name: Check Android combat capture expectations
+        shell: pwsh
+        run: ./tests/AndroidCombatCaptureExpectations.ps1
+
   player-vulkan-host:
     runs-on: ubuntu-latest
     timeout-minutes: 20
