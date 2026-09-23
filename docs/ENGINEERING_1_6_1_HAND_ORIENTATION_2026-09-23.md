@@ -265,3 +265,10 @@ orientation, live motion, retraction and owner phone acceptance remain open.
 Six mirror/UV unit tests pass afresh; branch/PR CI at `b352599` each passes
 44/44 portable, 10/10 Vulkan CPU-host and all six mirror tests (logs inspected).
 Those CI runs do not certify later Android candidate packaging changes.
+
+The later [eight-pose native portrait investigation](evidence/2026-09-23-viewmodel-portrait/README.md)
+retains all eight 540x960 RTX images and exact candidate receipts. Default landscape
+output remains byte-identical. This improves inspection coverage, not visual
+acceptance: sleeve/cuff transitions and anatomical/motion gates are still open.
+Raised-lantern portrait diagnostics retain two primary budget/overflow events;
+the changed pixel workload must not be compared directly with landscape counters.

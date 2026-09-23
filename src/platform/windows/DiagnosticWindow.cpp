@@ -182,6 +182,7 @@ struct CaptureLaunchOptions
     horde::platform::windows::WindowsBenchmarkLaunch benchmark;
     bool requested = false;
     bool requireRayQueryCompute = false;
+    bool portrait = false;
     std::filesystem::path outputDirectory;
     std::string developmentCheckpoint;
     std::string error;
@@ -410,6 +411,16 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
             options.requireRayQueryCompute = true;
             continue;
         }
+        if (argument == L"--capture-portrait")
+        {
+            if (options.portrait)
+            {
+                options.error = "--capture-portrait may only be specified once.";
+                break;
+            }
+            options.portrait = true;
+            continue;
+        }
         if (argument == L"--development-checkpoint")
         {
             if (!options.developmentCheckpoint.empty())
@@ -444,6 +455,8 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     }
     if (options.error.empty() && !options.developmentCheckpoint.empty() && !options.requested)
         options.error = "--development-checkpoint requires --capture-showcase.";
+    if (options.error.empty() && options.portrait && !options.requested)
+        options.error = "--capture-portrait requires --capture-showcase.";
     if (options.error.empty() && !options.developmentCheckpoint.empty() &&
         horde::gameplay::FindDevelopmentCheckpoint(options.developmentCheckpoint) == nullptr)
         options.error = "Unknown development checkpoint: " + options.developmentCheckpoint;
@@ -6415,10 +6428,15 @@ int CreateAndShowWindow(const std::string& diagnosticText,
                         const std::filesystem::path& jsonReportPath,
                         const std::filesystem::path* captureDirectory,
                         const std::string* developmentCheckpoint,
+                        const bool portraitCapture,
                         const bool requireRayQueryCompute,
                         const bool unattendedBenchmark,
                         const horde::gameplay::BenchmarkWorkload benchmarkWorkload)
 {
+    // Only the Debug capture surface changes aspect; camera, gameplay pose,
+    // renderer quality and normal interactive-window sizing are untouched.
+    const auto captureWidth = portraitCapture ? kCaptureHeight : kCaptureWidth;
+    const auto captureHeight = portraitCapture ? kCaptureWidth : kCaptureHeight;
     const HINSTANCE instance = GetModuleHandleA(nullptr);
     INITCOMMONCONTROLSEX commonControls{sizeof(INITCOMMONCONTROLSEX), ICC_BAR_CLASSES};
     InitCommonControlsEx(&commonControls);
@@ -6442,7 +6460,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     int windowHeight = MulDiv(700, static_cast<int>(systemDpi == 0u ? kDefaultDpi : systemDpi), static_cast<int>(kDefaultDpi));
     if (captureDirectory != nullptr)
     {
-        RECT captureRect{0, 0, static_cast<LONG>(kCaptureWidth), static_cast<LONG>(kCaptureHeight)};
+        RECT captureRect{0, 0, static_cast<LONG>(captureWidth), static_cast<LONG>(captureHeight)};
         AdjustWindowRectEx(&captureRect, windowStyle, TRUE, 0u);
         windowWidth = captureRect.right - captureRect.left;
         windowHeight = captureRect.bottom - captureRect.top;
@@ -6474,9 +6492,9 @@ int CreateAndShowWindow(const std::string& diagnosticText,
         GetWindowRect(hWnd, &windowRect);
         GetClientRect(hWnd, &actualClientRect);
         const int adjustedWidth = (windowRect.right - windowRect.left) +
-                                  static_cast<int>(kCaptureWidth) - (actualClientRect.right - actualClientRect.left);
+                                  static_cast<int>(captureWidth) - (actualClientRect.right - actualClientRect.left);
         const int adjustedHeight = (windowRect.bottom - windowRect.top) +
-                                   static_cast<int>(kCaptureHeight) - (actualClientRect.bottom - actualClientRect.top);
+                                   static_cast<int>(captureHeight) - (actualClientRect.bottom - actualClientRect.top);
         SetWindowPos(hWnd, nullptr, 0, 0, adjustedWidth, adjustedHeight,
                      SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER);
     }
@@ -6664,9 +6682,9 @@ int CreateAndShowWindow(const std::string& diagnosticText,
         GetWindowRect(hWnd, &windowRect);
         GetClientRect(hWnd, &actualClientRect);
         SetWindowPos(hWnd, nullptr, 0, 0,
-                     (windowRect.right - windowRect.left) + static_cast<int>(kCaptureWidth) -
+                     (windowRect.right - windowRect.left) + static_cast<int>(captureWidth) -
                          (actualClientRect.right - actualClientRect.left),
-                     (windowRect.bottom - windowRect.top) + static_cast<int>(kCaptureHeight) -
+                     (windowRect.bottom - windowRect.top) + static_cast<int>(captureHeight) -
                          (actualClientRect.bottom - actualClientRect.top),
                      SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER);
     }
@@ -6758,7 +6776,8 @@ int RunDiagnosticWindow(const int showCommand)
         ? nullptr
         : &launchOptions.developmentCheckpoint;
     return CreateAndShowWindow(diagnosticText, capabilities, textReportPath, jsonReportPath,
-                               captureDirectory, developmentCheckpoint, launchOptions.requireRayQueryCompute,
+                               captureDirectory, developmentCheckpoint, launchOptions.portrait,
+                               launchOptions.requireRayQueryCompute,
                                launchOptions.benchmark.requested, launchOptions.benchmark.workload);
 }
 
