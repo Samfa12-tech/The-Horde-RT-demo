@@ -45,6 +45,17 @@ Next: labelled anatomical mounting and production sleeve-layer isolation,
 then explicit nonduplicating look-down body geometry and live/owner gates.
 No further roll/weight sweep, broad arm rewrite or glass diversion.
 
+Follow-up `c7bb1c1` is pushed and passes fresh branch/PR CI
+`35827593090` / `35827596896`: 44 portable, 11 Vulkan CPU-host, six mirror,
+ten resolver and 24 capture guard tests (logs inspected). PR #15 is draft/clean.
+Fresh ARM64 Debug also builds. Exact APK `51b257c0...` passes the physical phone
+matrix in run `20260923-164314` after one preserved 120-second replay timeout
+(12/13 waypoints); successful rerun used the existing 300-second timeout. Seven
+images are pixel-identical to the old APK, forward differs by 1 in two pixels.
+The new math fix still does not resolve arm art; overflows stay 4/2. See the
+phone record for exact hashes and limits. No app/test worker remains active
+after this checkpoint; the installed isolated candidate is unaccepted.
+
 Owner's subsequent research steering supersedes the next-step suggestions below:
 freeze the current mesh/roll candidates; no broad rewrite or unrestricted weight/
 roll search. First reproduce the signed-projection IK counterexample, distinguish

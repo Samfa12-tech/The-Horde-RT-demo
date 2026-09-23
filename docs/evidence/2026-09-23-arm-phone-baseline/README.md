@@ -59,3 +59,34 @@ from this public copy). This is a scoped evidence
 checkpoint, not a full APK/build-cache backup. Reproduce using the existing
 runner, same immutable APK, candidate directory and eight checkpoint names in
 the Android candidate document; use explicit serial/model as that runner requires.
+
+## Fresh signed-projection-fix APK
+
+Source `c7bb1c1062a19f3ae6d63f4adc52f3f6210701dd` then built ARM64 Debug
+successfully (Android/Clang; SDK XML-version warning retained). Immutable APK:
+`C:/Dev/tmp/horde-android-signed-ik-20260923-a/HordeLanternRT-1.6.1-viewmodel-debug-arm64.apk`,
+SHA-256 `51b257c0d50c8b5068a024a54a86ca9774c6050d873f522e1ec27ec48737efda`.
+Its native library is `5ffcc5c24a4d4234418815921a2ab150d1ab2dbb64be00ffd52e011ae30dc8cd`;
+the two asset hashes above remain exact. All tracked source was committed; the
+run's dirty flag includes preserved unrelated untracked scratch.
+
+First fresh-APK run `run-20260923-163852` timed out at 120 seconds after waypoint
+12/13, with continuing GPU/frame and waypoint logs and no observed crash. Its
+scoped log is preserved locally. Rerun `run-20260923-164314` used the existing
+`-TimeoutSeconds 300` parameter without changing rendering or acceptance gates:
+installed bytes match, 13-waypoint replay, eight captures, and Home/resume all
+pass with zero harness warnings/failures. This is not a performance A/B claim or
+an explanation of that timing difference.
+
+All eight current-source states, replay state, serial-omitted capture manifest
+and image comparison are under [signed-ik](signed-ik/). Seven PNGs have identical
+pixels to the preceding APK; forward differs in **two of 4,492,800 pixels by one
+channel level**, no pixel over one. Full new images/logs remain in the local run.
+The 4/2 high/low volume-budget overflows and unaccepted arm art remain unchanged.
+No image tolerance was relaxed. Automated replay is still not live visual/owner
+acceptance; look-down torso/legs still need implementation.
+
+Fresh source CI at `c7bb1c1`: push `35827593090`, PR integration `35827596896`,
+both successful with logs inspected: **44 portable / 11 Vulkan CPU-host** CTests,
+six mirror/UV tests, ten APK resolver cases and 24 combat-capture guard cases.
+PR #15 remains draft, mergeable/clean, not authorised for merge/publication.
