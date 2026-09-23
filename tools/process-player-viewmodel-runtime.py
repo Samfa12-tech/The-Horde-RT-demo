@@ -5,12 +5,15 @@ The world-reference and arms-only GLBs share one authored rig/animation evaluati
 No source or currently admitted runtime file is overwritten.
 
 Investigation-only switches (not admission or production defaults):
+  --gauntlet-source-hand Right: owner-corrected source anatomy, with paired world export.
   --correct-grip-roll: test a 180-degree Grip roll, with a paired world GLB.
+  --grip-roll-degrees LEFT RIGHT: test explicit per-hand authored Grip calibration.
   --stabilize-sleeves: transfer sleeve Hand weights to the same-side ForeArm.
   --blend-elbows: test a continuous elbow-centred sleeve weight field (implies stabilization).
 These retain gameplay sockets/prop authority. None establishes visual acceptance;
 the candidates still require anatomical, surface and live-motion validation.
 """
+import argparse
 import hashlib
 import json
 import math
@@ -23,13 +26,24 @@ import bmesh
 
 root = Path(__file__).resolve().parents[1]
 arguments = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
-blend_elbows = '--blend-elbows' in arguments
-stabilize_sleeves = '--stabilize-sleeves' in arguments or blend_elbows
-correct_grip_roll = '--correct-grip-roll' in arguments
-arguments = [argument for argument in arguments if argument not in ('--stabilize-sleeves', '--correct-grip-roll', '--blend-elbows')]
-if len(arguments) != 1:
-    raise RuntimeError('Expected one new output directory')
-output = Path(arguments[0]).resolve()
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('output', type=Path)
+parser.add_argument('--blend-elbows', action='store_true')
+parser.add_argument('--stabilize-sleeves', action='store_true')
+parser.add_argument('--gauntlet-source-hand', choices=('Left', 'Right'),
+                    help='Explicit anatomical source handedness; omission reproduces the historical export')
+roll_options = parser.add_mutually_exclusive_group()
+roll_options.add_argument('--correct-grip-roll', action='store_true')
+roll_options.add_argument('--grip-roll-degrees', nargs=2, type=float, metavar=('LEFT', 'RIGHT'))
+options = parser.parse_args(arguments)
+roll_degrees = options.grip_roll_degrees or ([180.0, 180.0] if options.correct_grip_roll else [0.0, 0.0])
+if any(not math.isfinite(value) or abs(value) > 360.0 for value in roll_degrees):
+    parser.error('Grip roll must be finite and within [-360, 360] degrees')
+grip_rolls = dict(zip(('Left', 'Right'), map(math.radians, roll_degrees)))
+blend_elbows = options.blend_elbows
+stabilize_sleeves = options.stabilize_sleeves or blend_elbows
+correct_grip_roll = any(grip_rolls.values())
+output = options.output.resolve()
 if output.exists():
     raise RuntimeError('Output directory already exists; source and prior results are never overwritten')
 output.mkdir(parents=True)
@@ -50,8 +64,19 @@ accepted_world = root / 'assets/models/player/runtime/gothic-traveller-lod0.runt
 if sha(world_reference) != sha(accepted_world):
     raise RuntimeError('World reference differs from the admitted rig; reconcile inputs/Blender threading first')
 
+chirality_world = None
+if options.gauntlet_source_hand:
+    chirality_world = output / 'world-chirality-corrected.runtime.glb'
+    sys.argv = ['blender', '--', str(source / 'player-rigged.glb'), str(source / 'player-walking.glb'),
+                str(root / 'assets/textures/player/source'),
+                str(root / 'assets/models/player/source/meshy-2026-08-30-viewmodel-gauntlet/right-gauntlet-5k-stripped.glb'),
+                str(chirality_world), '--gauntlet-source-hand', options.gauntlet_source_hand]
+    try:
+        world = runpy.run_path(str(root / 'tools/process-player-rig-runtime.py'), run_name='__main__')
+    finally:
+        sys.argv = saved_arguments
 player, rig = world['player'], world['rig']
-calibrated_world = None
+calibrated_world = chirality_world
 if correct_grip_roll:
     # Investigation-only paired rig candidate. Keep the accepted world/runtime
     # untouched, and keep Grip origins/axes and gameplay prop transforms fixed.
@@ -59,8 +84,8 @@ if correct_grip_roll:
     rig.select_set(True)
     bpy.context.view_layer.objects.active = rig
     bpy.ops.object.mode_set(mode='EDIT')
-    for name in ('LeftGrip', 'RightGrip'):
-        rig.data.edit_bones[name].roll += math.pi
+    for side, roll in grip_rolls.items():
+        rig.data.edit_bones[side + 'Grip'].roll += roll
     bpy.ops.object.mode_set(mode='OBJECT')
     bpy.context.view_layer.update()
     player.select_set(True)
@@ -161,7 +186,9 @@ bpy.ops.export_scene.gltf(filepath=str(viewmodel_output), export_format='GLB', u
                           export_frame_range=True, export_skins=True, export_morph=False,
                           export_cameras=False, export_lights=False, export_extras=True)
 report = dict(schema=1, role='Viewmodel', sourceWorldSha256=sha(accepted_world),
-              gripRollCorrectionRadians=math.pi if correct_grip_roll else 0.0,
+              gauntletSourceHandedness=options.gauntlet_source_hand or 'LegacyLeftClassification',
+              gripRollCorrectionRadians=grip_rolls['Left'] if grip_rolls['Left'] == grip_rolls['Right'] else None,
+              gripRollRadiansBySide=grip_rolls,
               pairedWorldRuntime=calibrated_world.name if calibrated_world else None,
               pairedWorldSha256=sha(calibrated_world) if calibrated_world else None,
               sleeveWeightMode='ElbowCentredArmForeArm' if blend_elbows else

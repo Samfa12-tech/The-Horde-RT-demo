@@ -5,6 +5,10 @@ import math
 import os
 import sys
 from mathutils import Vector
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from player_gauntlet_geometry import authored_face_and_uvs, mirror_for_hand
 
 
 if "--" not in sys.argv:
@@ -12,6 +16,17 @@ if "--" not in sys.argv:
         "usage: blender --background --python process-player-rig-runtime.py -- idle.glb walking.glb pbr-directory gauntlet.glb output.glb"
     )
 arguments = sys.argv[sys.argv.index("--") + 1:]
+# Omission is historical-export compatibility, not an anatomical judgement.
+# The owner's 2026-09-23 correction identifies the supplied source as Right.
+gauntlet_source_hand = 'Left'
+legacy_gauntlet_export = True
+if '--gauntlet-source-hand' in arguments:
+    option = arguments.index('--gauntlet-source-hand')
+    if option + 1 >= len(arguments) or arguments[option + 1] not in ('Left', 'Right'):
+        raise RuntimeError('Gauntlet source handedness must be Left or Right')
+    gauntlet_source_hand = arguments[option + 1]
+    legacy_gauntlet_export = False
+    del arguments[option:option + 2]
 if len(arguments) != 5:
     raise RuntimeError("player runtime processing requires the audited gauntlet source")
 idle_source, walking_source, pbr_directory, gauntlet_source, destination = arguments
@@ -395,9 +410,10 @@ def create_authored_viewmodel_gauntlet(side):
     forearm_direction = forearm.normalized()
 
     # Reorient the accepted Meshy 7 glove into this asset-owned grip frame.
-    # The generated concept is anatomically a left palm despite the text label;
-    # preserve it for Left and mirror local Y for the Right copy (with reversed
-    # winding below). Local +Z follows the handle, not the forearm/cuff axis.
+    # Reflect actual mesh chirality, never swap the named gameplay/rig chains.
+    # New candidates use the owner-corrected Right source classification.
+    # Local +Z follows the handle, not the forearm/cuff axis.
+    mirrored = mirror_for_hand(gauntlet_source_hand, side)
     handle_centre = frame["handleCentreWorld"]
     handle_axis = frame["handleAxisWorld"]
     palm_direction = frame["palmDirectionWorld"]
@@ -421,16 +437,20 @@ def create_authored_viewmodel_gauntlet(side):
             relative.dot(gauntlet_source_y),
             relative.dot(gauntlet_source_z),
         ))
-        if side == "Right":
+        if mirrored:
             local.y = -local.y
         vertices.append(tuple(
             handle_centre +
             target_x * (local.x * gauntlet_scale) +
             target_y * (local.y * gauntlet_scale) +
             target_z * (local.z * gauntlet_scale)))
-    for source_face in gauntlet_faces:
-        face = tuple(gauntlet_first + index for index in source_face)
-        faces.append(tuple(reversed(face)) if side == "Right" else face)
+    target_face_uvs = []
+    for source_face, source_uvs in zip(gauntlet_faces, gauntlet_face_uvs):
+        face, uvs = authored_face_and_uvs(
+            tuple(gauntlet_first + index for index in source_face), source_uvs,
+            mirror=mirrored, legacy_uv_order=legacy_gauntlet_export)
+        faces.append(face)
+        target_face_uvs.append(uvs)
 
     mesh = bpy.data.meshes.new(f"{side}AuthoredViewmodelGauntletMesh")
     mesh.from_pydata(vertices, [], faces)
@@ -438,7 +458,7 @@ def create_authored_viewmodel_gauntlet(side):
     authored_uv = mesh.uv_layers.new(name="UVMap")
     if len(mesh.polygons) != len(gauntlet_face_uvs):
         raise RuntimeError(f"{side} gauntlet polygon order changed before UV copy")
-    for polygon, source_uvs in zip(mesh.polygons, gauntlet_face_uvs):
+    for polygon, source_uvs in zip(mesh.polygons, target_face_uvs):
         if len(polygon.loop_indices) != len(source_uvs):
             raise RuntimeError(f"{side} gauntlet loop order changed before UV copy")
         for loop, uv in zip(polygon.loop_indices, source_uvs):
@@ -490,6 +510,10 @@ def create_authored_viewmodel_gauntlet(side):
         "gripConstruction": "accepted Meshy 7 anatomical gauntlet rigid to Hand; side-mirrored by chirality; authored fitted character sleeve retained beneath cuff",
         "gauntletScale": gauntlet_scale,
         "handleForearmDot": handle_axis.dot(forearm_direction),
+        "sourceHandedness": gauntlet_source_hand,
+        "targetHandedness": side,
+        "mirrored": mirrored,
+        "legacyUvOrder": legacy_gauntlet_export,
     }
 
 
