@@ -1,0 +1,100 @@
+{
+  "probe": {
+    "aabb_overlap_but_triangles_disjoint": false,
+    "proper_noncoplanar_crossing": true,
+    "coplanar_contained": false
+  },
+  "baseline": "C:/Dev/tmp/horde-fitted-right-arms-20260923-a/gothic-traveller-viewmodel.runtime.glb",
+  "candidate": "C:/Dev/tmp/horde-closed-fitted-sleeves-20260923-c/gothic-traveller-viewmodel.runtime.glb",
+  "capTriangles": 278,
+  "retainedTriangles": 5532,
+  "nonAdjacentCapBodyCrossings": 191,
+  "nonAdjacentCapCapCrossings": 0,
+  "capBodyPairs": [
+    [
+      258,
+      1283
+    ],
+    [
+      258,
+      1295
+    ],
+    [
+      259,
+      1295
+    ],
+    [
+      257,
+      1283
+    ],
+    [
+      256,
+      1283
+    ],
+    [
+      256,
+      1295
+    ],
+    [
+      233,
+      1114
+    ],
+    [
+      233,
+      2201
+    ],
+    [
+      234,
+      2201
+    ],
+    [
+      234,
+      1895
+    ],
+    [
+      260,
+      1295
+    ],
+    [
+      261,
+      1529
+    ],
+    [
+      261,
+      1295
+    ],
+    [
+      255,
+      1529
+    ],
+    [
+      255,
+      1295
+    ],
+    [
+      255,
+      1528
+    ],
+    [
+      235,
+      2201
+    ],
+    [
+      235,
+      1895
+    ],
+    [
+      235,
+      2200
+    ],
+    [
+      236,
+      2200
+    ]
+  ],
+  "capCapPairs": [],
+  "limitation": "Shared-vertex pairs and self-contact are excluded; coplanar coverage depends on probe result"
+}
+Blender 5.2.0 LTS (hash fbe6228777e7 built 2026-07-14 01:35:40)
+
+Blender quit

@@ -31,12 +31,15 @@ licensing, signing recovery and publication remain owner-controlled.
 ### Current Phase 3 checkpoint
 
 Latest surface work: [sleeve closure checkpoint](evidence/2026-09-23-viewmodel-sleeve-closure/README.md).
-The adjacent-cloth recovery attempt worsened the rim and was removed. An opt-in
-real-geometry closure now preserves original normals and all gauntlet accessor
-bytes, stays below the existing 15k-triangle budget, passes three Blender fixtures
-and actual paired admission, and has two native poses per candidate. It is **not**
-admitted: intersection/shape/motion gates remain; fitting retains two pre-existing
-normal failures. Neither tracked GLB nor the earlier Android candidate was replaced.
+The adjacent-cloth recovery attempt worsened the rim and was removed. Closure
+preserved normals/gauntlet data and passed edge/paired-pose checks, but the later
+intersection check **rejects** both candidates (221/191 cap/cloth triangle pairs).
+The processor now fails before exporting this source; four Blender fixtures pass,
+including rejection of crossing panels despite closed edges. Next: proper sleeve
+retopology with clean deformation loops/finished rims, not more automatic bands
+or caps. Deliberately open garment cuffs are valid; edge closure alone is not the
+goal. Preserve gauntlets/rig/RT ownership. Neither tracked GLB nor the earlier
+Android candidate was replaced. Fitting also retains two normal failures.
 The preceding portrait checkpoint `6f282bb` is pushed; fresh push/PR CI
 `35810546291` / `35810550084` passed 44 portable, 10 Vulkan-host, six mirror and
 ten APK-resolver tests (logs inspected). Do not reuse that CI for later tool edits.

@@ -14,11 +14,15 @@ class SleeveSurfaceTests(unittest.TestCase):
     def setUp(self):
         bpy.ops.wm.read_factory_settings(use_empty=True)
 
-    def make_mesh(self, shared_glove_vertex=False, closed=False):
+    def make_mesh(self, shared_glove_vertex=False, closed=False, crossing_surfaces=False):
         points = [(-1,-1,0),(1,-1,0),(1,1,0),(-1,1,0),
                   (-1,-1,2),(1,-1,2),(1,1,2),(-1,1,2),
                   (4,0,0),(5,0,0),(4,1,0)]
         faces = [(0,1,5,4),(1,2,6,5),(2,3,7,6),(3,0,4,7)]
+        if crossing_surfaces:
+            offset = len(points)
+            points += [(x+.5,y+.5,z-.5) for x,y,z in points[:8]]
+            faces += [tuple(i+offset for i in face) for face in faces[:4]]
         if closed:
             faces += [(3,2,1,0),(4,5,6,7)]
         faces += [(0 if shared_glove_vertex else 8,9,10)]
@@ -82,6 +86,10 @@ class SleeveSurfaceTests(unittest.TestCase):
     def test_already_closed_source_is_rejected(self):
         with self.assertRaisesRegex(RuntimeError, 'Expected authored sleeve openings'):
             close_sleeve_openings(self.make_mesh(closed=True))
+
+    def test_crossing_panels_are_rejected_even_when_edges_close(self):
+        with self.assertRaisesRegex(RuntimeError, 'intersects authored cloth'):
+            close_sleeve_openings(self.make_mesh(crossing_surfaces=True))
 
 
 unittest.main(argv=[__file__])

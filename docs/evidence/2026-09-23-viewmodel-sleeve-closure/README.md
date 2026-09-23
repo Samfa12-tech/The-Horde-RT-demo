@@ -1,4 +1,11 @@
-# Sleeve closure checkpoint — not production admission
+# Sleeve closure checkpoint — candidates rejected
+
+**Superseding result:** the later non-adjacent intersection check rejects both
+retained artifacts below: closure-only has 221 cap/cloth intersecting triangle
+pairs, and fitted closure has 191. These are no longer merely unverified
+intersection gates. The active processor now fails before exporting this viewmodel.
+The images and earlier successful topology/normal checks remain failure evidence,
+not an accepted fix. See the final section for the rejection guard.
 
 Phase 3 remains open. The real viewmodel still needs surface/intersection,
 deformation, live-motion and exact-phone/owner acceptance. Accepted runtime GLBs,
@@ -73,7 +80,7 @@ Closed edges are **not** proof of a well-shaped or self-intersection-free garmen
 The new closing triangles can be skinny: maximum longest/shortest edge ratio is
 26.33 for closure-only and 49.40 for fitted closure. A projection of the earlier
 nonplanar fans raised concavity warnings, not a verified 3D intersection verdict.
-No direct self-intersection pass is claimed. The fitted variant still has the two
+No complete self-intersection pass is claimed. The fitted variant still has the two
 original fitted-surface normal failures and is not eligible for admission.
 
 Native review finds a narrower sleeve with fitting, but appearance is still dark
@@ -83,3 +90,27 @@ the owner's phone acceptance before retiring block arms. The existing isolated
 Android APK still contains the earlier unclosed candidate, not these new assets.
 No performance gain is claimed. Audio/haptic manual revalidation required: **NO**;
 feedback, listener, playback and haptic semantics are unchanged.
+
+## Non-adjacent intersection rejection
+
+The Blender BVH probe distinguishes a real noncoplanar crossing from disjoint
+triangles whose bounding boxes overlap. It does **not** detect the synthetic
+coplanar-contained case, so an empty result would not certify the surface. Shared
+vertex pairs are excluded; the positive 221/191 cap/cloth results still reject
+these assets. No non-adjacent cap/cap pairs were returned.
+
+`player_viewmodel_surface.py` now applies the same conservative rejection guard
+before writing the modified mesh. The current source rejects with 220 pre-export
+face pairs (its original cloth polygons are not yet the exported triangle roster),
+and creates no viewmodel GLB. Four Blender fixtures pass, including a case whose
+edges close but whose new panels cross another cloth surface. Preserved logs:
+`crossings-closed.log`, `crossings-closed-fitted.log`, `crossing-rejection.log`, and
+`surface-fixtures-crossings.log`.
+
+The next asset step is purpose-built sleeve retopology with clean deformation
+loops and finished garment rims. A garment may legitimately have open cuff or
+shoulder boundaries; blindly capping every opening is not the desired contract.
+Do not keep adding face bands or fans to make an edge-count test pass. Preserve
+the source gauntlets, actual rig/grip authority, texture provenance and independent
+RT ownership while repairing the surface. None of these rejected variants belongs
+in the Android candidate or normal production route.

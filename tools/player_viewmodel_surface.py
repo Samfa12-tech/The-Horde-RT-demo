@@ -1,5 +1,6 @@
 """Close authored garment openings offline; preserve gauntlet corner data."""
 import bmesh
+from mathutils.bvhtree import BVHTree
 
 
 def close_sleeve_openings(player):
@@ -47,6 +48,25 @@ def close_sleeve_openings(player):
                 open=sum(len(e.link_faces) == 1 for e in sleeve_edges),
                 overfull=sum(len(e.link_faces) > 2 for e in sleeve_edges), caps=cap_count,
                 capBoundaryEdges=len(edges))))
+        # Edge closure alone admitted crossing panels in the historical sleeve
+        # trial. Reject detected non-adjacent cap/cloth intersections as well.
+        # BVHTree does not cover coplanar overlap; this is a rejection guard,
+        # never a complete self-intersection or visual-acceptance certificate.
+        bm.faces.index_update()
+        bm.faces.ensure_lookup_table()
+        tree = BVHTree.FromBMesh(bm, epsilon=0.0)
+        crossings = []
+        for a, b in tree.overlap(tree):
+            if a >= b:
+                continue
+            first, second = bm.faces[a], bm.faces[b]
+            if (first.material_index != sleeve or second.material_index != sleeve or
+                    (first[original_face] and second[original_face]) or
+                    set(first.verts) & set(second.verts)):
+                continue
+            crossings.append((a, b))
+        if crossings:
+            raise RuntimeError(f'Sleeve closure intersects authored cloth: {len(crossings)} non-adjacent pairs')
         after_triangles = sum(len(f.verts) - 2 for f in sleeve_faces)
         bm.to_mesh(mesh)
     finally:
