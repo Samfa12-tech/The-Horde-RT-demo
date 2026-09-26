@@ -1,6 +1,6 @@
 # 1.6.1 recovery handoff
 
-Updated 2026-09-23. Branch: `codex/horde-1.6.1-engineering-pass`.
+Updated 2026-09-27. Branch: `codex/horde-1.6.1-engineering-pass`.
 Engineering work has resumed by explicit owner instruction; the goal is not complete. See [programme scope](ENGINEERING_1_6_1_PLAN.md)
 and [latest lantern evidence](ENGINEERING_1_6_1_LANTERN_BENCHMARK_2026-09-20.md).
 
@@ -29,6 +29,25 @@ Music, consent-based reporting, resource work and final gates remain in scope;
 licensing, signing recovery and publication remain owner-controlled.
 
 ### Current Phase 3 checkpoint
+
+**Latest owner live feedback (September 27):** the installed modelled candidate
+is now pretty good and substantially improved. Preserve that direction; do not
+restart IK or a broad arm rewrite. Remaining acceptance issues are (1) sword /
+lantern / arm separation through the complete attack, (2) natural lantern-arm
+compliance during walking/look/attacks/high-low and lantern motion, and (3)
+slightly undersized hands relative to forearms. Diagnose and change each at its
+own gameplay-pose or asset/mount layer; no capture-only prop movement, hidden
+geometry or unrestricted roll/weight search. Continuous live motion and owner
+feedback supersede relying solely on the eight frozen poses. The explicit
+look-down torso/legs and nonduplicating visibility requirement still stands.
+Read-only ADB matches installed APK `51b257c0...` on exact `SM-S948B`.
+
+Owner explicitly requests default RT scale **75%** for current phone gameplay;
+preserve saved choices and benchmark overrides, and do not claim a rendering
+optimisation from this requested default. After Phase 3 acceptance, investigate
+a bounded Android render-scale resize preserving resolution-independent assets,
+BLAS/TLAS, pipelines, textures and state. Current device-idle/full-scene recreate
+pause is owner-observed; preserve lifecycle/evidence and measure before/after.
 
 Solver-first checkpoint `69014cf` is pushed/remote-verified. The documented
 negative projection defect RED/GREENs in both the pure helper and actual

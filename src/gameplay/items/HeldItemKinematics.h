@@ -106,7 +106,8 @@ struct FirstPersonSafeFrame
 
 HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
                                    float swordSwingRadians,
-                                   float heldPropDepth);
+                                   float heldPropDepth,
+                                   bool bulkyLeftHandCarry = false);
 
 std::array<float, 3u> EvaluateSwordBladeAxisInView(float inwardRadians,
                                                    float forwardRadians);

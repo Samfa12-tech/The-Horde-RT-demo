@@ -164,7 +164,8 @@ float ComputeRewardLanternForwardClearance(const float cameraX,
 
 HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
                                    const float swordSwingRadians,
-                                   const float heldPropDepth)
+                                   const float heldPropDepth,
+                                   const bool bulkyLeftHandCarry)
 {
     float parryBlend = 0.0f;
     switch (playerCombat.action)
@@ -194,14 +195,19 @@ HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
         return Lerp(from, to, amount);
     };
     const float swordGripDepth = heldPropDepth - 0.05f;
+    // A bulky off-hand carry reserves the left-side cage volume. Author a
+    // right-side cut through all windup/active/recovery phases, not a rendered
+    // prop offset: this same grip pose drives the sword hand/arm IK and item.
+    // Vertical/depth travel, combat timing and the free-torch arc are unchanged.
+    const float cutInward = bulkyLeftHandCarry ? 0.18f : 0.78f;
     const Vec3 restHand{{0.18f, -0.44f, swordGripDepth}};
-    const Vec3 downwardWindupHand{{0.08f, -0.17f,
+    const Vec3 downwardWindupHand{{bulkyLeftHandCarry ? 0.18f : 0.08f, -0.17f,
                                    std::max(0.56f, swordGripDepth - 0.01f)}};
-    const Vec3 downwardImpactHand{{0.02f, -0.70f,
+    const Vec3 downwardImpactHand{{bulkyLeftHandCarry ? 0.17f : 0.02f, -0.70f,
                                    std::max(0.48f, swordGripDepth - 0.18f)}};
-    const Vec3 upwardStartHand{{0.01f, -0.72f,
+    const Vec3 upwardStartHand{{bulkyLeftHandCarry ? 0.17f : 0.01f, -0.72f,
                                 std::max(0.48f, swordGripDepth - 0.16f)}};
-    const Vec3 upwardEndHand{{0.06f, -0.15f,
+    const Vec3 upwardEndHand{{bulkyLeftHandCarry ? 0.18f : 0.06f, -0.15f,
                               std::max(0.52f, swordGripDepth - 0.08f)}};
 
     Vec3 swingHand = restHand;
@@ -229,7 +235,7 @@ HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
         // The blade tilts strongly into depth while the hand travels down.
         // This reads as a real camera-facing cut without sweeping the full
         // metre-long blade beyond a narrow phone's horizontal safe frame.
-        swingInwardRadians = -0.05f + (0.78f + 0.05f) * amount;
+        swingInwardRadians = -0.05f + (cutInward + 0.05f) * amount;
         swingForwardRadians = 0.55f + (1.00f - 0.55f) * amount;
         break;
     }
@@ -238,8 +244,8 @@ HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
         const float amount = smooth(
             playerCombat.actionTime / SwordCombat::kSwingRecoveryDuration);
         swingHand = blendHand(downwardImpactHand, restHand, amount);
-        swingInwardRadians = 0.78f +
-            (kSwordRestInwardRadians - 0.78f) * amount;
+        swingInwardRadians = cutInward +
+            (kSwordRestInwardRadians - cutInward) * amount;
         swingForwardRadians = 1.00f +
             (kSwordRestForwardRadians - 1.00f) * amount;
         break;
@@ -249,7 +255,7 @@ HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
         const float amount = smooth(
             playerCombat.actionTime / SwordCombat::kUpwardSliceWindupDuration);
         swingHand = blendHand(downwardImpactHand, upwardStartHand, amount);
-        swingInwardRadians = 0.78f + 0.04f * amount;
+        swingInwardRadians = cutInward + 0.04f * amount;
         swingForwardRadians = 1.00f - 0.02f * amount;
         break;
     }
@@ -258,7 +264,7 @@ HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
         const float amount = smooth(
             playerCombat.actionTime / SwordCombat::kUpwardSliceActiveDuration);
         swingHand = blendHand(upwardStartHand, upwardEndHand, amount);
-        swingInwardRadians = 0.82f + (-0.30f - 0.82f) * amount;
+        swingInwardRadians = cutInward + 0.04f + (-0.30f - cutInward - 0.04f) * amount;
         swingForwardRadians = 0.98f + (0.60f - 0.98f) * amount;
         break;
     }
@@ -284,7 +290,7 @@ HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
                 0.0f, 1.0f));
             swingHand = blendHand(restHand, downwardImpactHand, amount);
             swingInwardRadians = kSwordRestInwardRadians +
-                (0.78f - kSwordRestInwardRadians) * amount;
+                (cutInward - kSwordRestInwardRadians) * amount;
             swingForwardRadians = kSwordRestForwardRadians +
                 (1.00f - kSwordRestForwardRadians) * amount;
         }
@@ -499,7 +505,7 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
         }
     }
     const HeldSwordPose sword = EvaluateHeldSwordPose(
-        input.playerCombat, input.swordSwingRadians, swordPropDepth);
+        input.playerCombat, input.swordSwingRadians, swordPropDepth, rewardLantern);
 
     HeldItemKinematicsState result;
     // Props move the hand effector only. Keep the calibrated clavicle/shoulder

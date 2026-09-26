@@ -315,6 +315,42 @@ int main()
                  upwardFrame.maximumNdcX <= 0.94f,
                  "upward-slice blade bounds must remain inside the 75% portrait safe frame"))
         return 1;
+    // Neutral carried-lantern control for the owner-reported live slice
+    // intersection. Actual body bounds are +/-0.223589 X, [-.975,-.015] Y,
+    // +/-0.255336 Z metres, scaled .5 below the ring's .097 m hinge offset.
+    // A blade centre-line inside this cage envelope is unacceptable even if
+    // a particular sample happens to lie between individual frame triangles.
+    const std::array<std::pair<PlayerCombatAction, float>, 6> carryAttackPhases{{
+        {PlayerCombatAction::SwingWindup, SwordCombat::kSwingWindupDuration},
+        {PlayerCombatAction::SwingActive, SwordCombat::kSwingActiveDuration},
+        {PlayerCombatAction::SwingRecovery, SwordCombat::kSwingRecoveryDuration},
+        {PlayerCombatAction::UpwardSliceWindup, SwordCombat::kUpwardSliceWindupDuration},
+        {PlayerCombatAction::UpwardSliceActive, SwordCombat::kUpwardSliceActiveDuration},
+        {PlayerCombatAction::UpwardSliceRecovery, SwordCombat::kUpwardSliceRecoveryDuration}}};
+    for (const auto carry : {interactions::HeldLightPose::High, interactions::HeldLightPose::Low})
+        for (const auto& [action, duration] : carryAttackPhases)
+            for (int frame = 0; frame <= 60; ++frame)
+            {
+                items::HeldItemKinematicsInput carryInput;
+                carryInput.interaction.heldLightKind = interactions::HeldLightKind::RewardLantern;
+                carryInput.interaction.heldLightPose = carry;
+                carryInput.playerCombat.action = action;
+                carryInput.playerCombat.actionTime = duration * frame / 60.0f;
+                const auto pose = items::EvaluateHeldItemKinematics(carryInput);
+                const auto blade = items::EvaluateSwordBladeAxisInView(
+                    pose.swordRadians, pose.swordForwardRadians);
+                for (int along = 0; along <= 100; ++along)
+                {
+                    const float distance = .915f * along / 100.0f;
+                    const float x = pose.rightHandLocal[0] + blade[0] * distance - pose.leftHandLocal[0];
+                    const float y = pose.rightHandLocal[1] + blade[1] * distance - pose.leftHandLocal[1] + .0485f;
+                    const float z = pose.rightHandLocal[2] + blade[2] * distance - pose.leftHandLocal[2];
+                    if (!Require(!(std::abs(x) < .111795f && y > -.4875f && y < -.0075f &&
+                                   std::abs(z) < .127668f),
+                                 "complete sword attack must not pass through the neutral carried-lantern cage")) return 1;
+                }
+            }
+
     for (int sample = 0; sample <= 24; ++sample)
     {
         const float amount = static_cast<float>(sample) / 24.0f;
