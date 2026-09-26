@@ -68,6 +68,8 @@ import org.json.JSONObject;
 public class MainActivity extends Activity {
     private static final String TAG = "HordeLanternAudio";
     private static final String PREFS = "horde_lantern_alpha_settings";
+    static final String PREF_RENDER_SCALE = "render_scale";
+    static final int DEFAULT_ANDROID_RT_RENDER_SCALE_PERCENT = 75;
     private static final String PREF_RT_LAB_UNLOCKED = "rt_lab_unlocked";
     private static final String REPORT_DIRECTORY = "reports";
     private static final String ACTION_BENCHMARK = "com.samfa12.hordelanternrt.action.BENCHMARK";
@@ -235,8 +237,18 @@ public class MainActivity extends Activity {
     private int lastPlayerLifePhase = PLAYER_ALIVE;
     private int lastPlayerVitality = 3;
     private long delayedGameplayFeedbackGeneration;
+    static int renderScalePercent(final SharedPreferences preferences) {
+        return preferences.getInt(PREF_RENDER_SCALE,
+                DEFAULT_ANDROID_RT_RENDER_SCALE_PERCENT);
+    }
+
+    static void persistRenderScaleSelection(final SharedPreferences preferences,
+                                            final int percentage) {
+        preferences.edit().putInt(PREF_RENDER_SCALE, percentage).apply();
+    }
+
     private final Runnable applyPendingRenderScale = () ->
-            ProbeBridge.setRenderScale(preferences.getInt("render_scale", 100) / 100.0f);
+            ProbeBridge.setRenderScale(renderScalePercent(preferences) / 100.0f);
     private final Runnable runStartupUpdateCheck = () -> {
         startupUpdateCheckScheduled = false;
         if (!resumed || startupUpdateCheckCompleted) return;
@@ -271,7 +283,7 @@ public class MainActivity extends Activity {
         rtLabUnlocked = preferences.getBoolean(PREF_RT_LAB_UNLOCKED, false);
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         ProbeBridge.resetRtSceneTuning();
-        ProbeBridge.setRenderScale(preferences.getInt("render_scale", 100) / 100.0f);
+        ProbeBridge.setRenderScale(renderScalePercent(preferences) / 100.0f);
         ProbeBridge.setWaterQuality(preferences.getInt("water_quality", WATER_QUALITY_MOBILE));
         if (!consumeBenchmarkAutomationIntent(getIntent(), true)) consumeDebugAutomationIntent(getIntent());
 
@@ -831,9 +843,9 @@ public class MainActivity extends Activity {
                 value -> preferences.edit().putInt("sfx_volume", value).apply());
         addSlider(panel, getString(R.string.look_sensitivity), preferences.getInt("look_sensitivity", 100), 50, 175,
                 value -> preferences.edit().putInt("look_sensitivity", value).apply());
-        addSlider(panel, getString(R.string.render_scale), preferences.getInt("render_scale", 100), 50, 100,
+        addSlider(panel, getString(R.string.render_scale), renderScalePercent(preferences), 50, 100,
                 value -> {
-                    preferences.edit().putInt("render_scale", value).apply();
+                    persistRenderScaleSelection(preferences, value);
                     handler.removeCallbacks(applyPendingRenderScale);
                     handler.postDelayed(applyPendingRenderScale, 350L);
                 });
@@ -878,7 +890,8 @@ public class MainActivity extends Activity {
                             .putBoolean(PREF_RT_LAB_UNLOCKED, rtLabUnlocked)
                             .apply();
                     handler.removeCallbacks(applyPendingRenderScale);
-                    ProbeBridge.setRenderScale(1.0f);
+                    ProbeBridge.setRenderScale(
+                            DEFAULT_ANDROID_RT_RENDER_SCALE_PERCENT / 100.0f);
                     ProbeBridge.setWaterQuality(WATER_QUALITY_MOBILE);
                     showSettings();
                 },

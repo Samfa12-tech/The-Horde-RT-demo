@@ -64,6 +64,7 @@ constexpr const char* kReportDirectory = "reports";
 constexpr const char* kTextReportFilename = "vulkan_capability_report.txt";
 constexpr const char* kJsonReportFilename = "vulkan_capability_report.json";
 constexpr const char* kShowcaseDebugStateFilename = "showcase_debug_state.json";
+constexpr float kDefaultAndroidRtRenderScale = 0.75f;
 // One frame in flight keeps the dynamically refit held-torch TLAS safely synchronized with its host-written instance buffer.
 constexpr uint32_t kMaxFramesInFlight = 1u;
 
@@ -155,7 +156,7 @@ struct SwapchainContext
     VkColorSpaceKHR swapchainColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
     VkPresentModeKHR swapchainPresentMode = VK_PRESENT_MODE_FIFO_KHR;
     VkExtent2D swapchainExtent{};
-    float renderScale = 1.0f;
+    float renderScale = kDefaultAndroidRtRenderScale;
     float frameDeltaSeconds = 1.0f / 60.0f;
     uint32_t timingFrameCount = 0u;
     double timingFenceMs = 0.0;
@@ -257,7 +258,7 @@ horde::telemetry::RtLifecycleSeeds gPreservedRtEvidenceSeeds = [] {
 }();
 std::mutex gRtEvidenceSeedMutex;
 std::atomic<int> gRuntimeState{0}; // 0 starting/stopped, 1 honestly presented RT, 2 unsupported, 3 render error.
-std::atomic<float> gRequestedRenderScale{1.0f};
+std::atomic<float> gRequestedRenderScale{kDefaultAndroidRtRenderScale};
 std::atomic<int> gRequestedWaterQuality{1};
 std::atomic<bool> gRequestedGpuFrameTimingEnabled{true};
 std::atomic<bool> gRequiredRayQueryCompute{false};
