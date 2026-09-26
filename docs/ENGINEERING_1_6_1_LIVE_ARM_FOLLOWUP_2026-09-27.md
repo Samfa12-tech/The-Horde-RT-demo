@@ -120,3 +120,32 @@ first run was rejected; the existing `player-viewmodel-forward` was used on
 rerun. Native image inspection does not replace phone motion/contact/owner
 proportion checks. These are isolated assets, not a replacement of admitted
 production GLBs or retirement of block arms.
+
+## Phone and CI checkpoint
+
+Installed APK `fce8b40c...` passed fresh 13-waypoint replay, eight modelled-route
+captures and Home/resume on SM-S948B. A separate 45-second unfrozen recording
+retains high/low attacks and carry/walk/look transitions. Reviewed sequences
+show no visible sword/cage crossing, but subjective compliance/proportions and
+complete Phase3 acceptance remain with the owner. [Exact artifact, evidence,
+limitations and owner checks](evidence/2026-09-27-live-arm-followup/README.md).
+Both runtime-source CI runs at `54493cf` pass (push36273603275/PR36273605905):
+44 portable and11 Vulkan-enabled CPU tests, including the actual skinned
+reference/smoke/semantic/viewmodel contracts. PR15 remains draft and mergeable.
+
+## New owner lighting finding — open
+
+The owner reports excessive yellow wash on the hands/sword, especially backs
+of hands/arms expected to occlude lantern light. Treat this as a transport/
+emitter/visibility investigation before final lantern and Phase3 acceptance,
+not an art-direction request to darken gauntlet materials. First checks should
+separate actual emitter placement and direct-shadow rays from indirect,
+emissive and participating-medium contributions on the same native capture.
+
+A targeted source check shows the modelled viewmodel is primary-only and the
+world body owns secondary visibility (`0x10`); the normal light visibility mask
+`0x35` includes that world body and excludes the viewmodel. This alone neither
+proves missing occlusion nor certifies correct self-shadowing: compare actual
+world/view surfaces and the light/shading paths. No shader was changed and no
+cause is yet demonstrated. Preserve genuine RT visibility and useful failure
+diagnostics; no scalar fake shadows, screen-space fixes or masking geometry.

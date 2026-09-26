@@ -30,6 +30,22 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### Current Phase 3 checkpoint
 
+**September 27 implementation/evidence checkpoint:** pushed `ed6e4bb` (default75),
+`bf0334b` (shared sword carry lane), `e706f61` (bounded carry bend), `54493cf`
+(single grip-anchored +10% gauntlet candidate). Current runtime-source CI push
+`36273603275` and PR `36273605905` pass: 44 portable +11 Vulkan-enabled CPU
+contracts; PR15 is draft, mergeable/CLEAN. Exact isolated APK `fce8b40c...`
+passes phone replay/eight captures/Home-resume and has retained unfrozen live
+motion video. It is installed and paused via Menu, not a paused engineering
+goal. [Causes/checks](ENGINEERING_1_6_1_LIVE_ARM_FOLLOWUP_2026-09-27.md) and
+[phone artifact/owner matrix](evidence/2026-09-27-live-arm-followup/README.md).
+The three owner visual gates remain open pending feedback. **New owner note:**
+lantern yellow wash lights hand/arm backs and sword implausibly; investigate
+emitter placement, real shadow visibility/ownership and indirect/emissive/fog
+contribution before final lantern/Phase3 acceptance. No proven cause or shader
+fix yet. Do not mask this by darkening materials. Explicit look-down body,
+glass correctness/performance and the wider programme still remain open.
+
 **Latest owner live feedback (September 27):** the installed modelled candidate
 is now pretty good and substantially improved. Preserve that direction; do not
 restart IK or a broad arm rewrite. Remaining acceptance issues are (1) sword /
