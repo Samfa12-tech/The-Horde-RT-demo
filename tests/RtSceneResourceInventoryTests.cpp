@@ -242,6 +242,45 @@ struct PresentableTinyRtSceneObservationTestAccess
         scene.viewmodelAsset_.materials.push_back({});
         scene.viewmodelAsset_.materials[0].name = "ViewmodelSleeves";
         scene.viewmodelAsset_.materials[1].name = "ViewmodelGauntlets";
+
+        scene.playerWorldBodyPoseCurrent_ = poseCurrent;
+        scene.playerWorldBodyCaptureTransform_ = {{1.0f, 0.0f, 0.0f, -2.0f,
+                                                   0.0f, 1.0f, 0.0f, 0.75f,
+                                                   0.0f, 0.0f, 1.0f, -3.0f}};
+        scene.skinnedPlayerUpload_ = scene.viewmodelUpload_;
+        scene.productionPlayerAsset_.vertices = scene.viewmodelUpload_;
+        scene.productionPlayerAsset_.indices = {0u, 1u, 2u, 2u, 0u, 1u};
+        scene.productionPlayerAsset_.primitives = {
+            {0u, 0u, 3u, 0u, 0u},
+            {3u, 3u, 3u, 1u, 0u},
+        };
+        scene.productionPlayerAsset_.materials.clear();
+        scene.productionPlayerAsset_.materials.push_back({});
+        scene.productionPlayerAsset_.materials.push_back({});
+        scene.productionPlayerAsset_.materials[0].name = "BodyPrimaryVisible";
+        scene.productionPlayerAsset_.materials[1].name = "NearFacePrimaryMasked";
+    }
+
+    static void SetFirstWorldBodyIndex(PresentableTinyRtScene& scene,
+                                       const std::uint32_t index)
+    {
+        scene.productionPlayerAsset_.indices[0] = index;
+    }
+
+    static void SetWorldBodyPrimitives(PresentableTinyRtScene& scene,
+                                       const bool present)
+    {
+        scene.productionPlayerAsset_.primitives = present
+            ? std::vector<horde::scene::assets::StaticPrimitiveRecord>{
+                  {0u, 0u, 3u, 0u, 0u}, {3u, 3u, 3u, 1u, 0u}}
+            : std::vector<horde::scene::assets::StaticPrimitiveRecord>{};
+    }
+
+    static void ForceUnsupportedScaledPresentation(
+        PresentableTinyRtScene& scene)
+    {
+        scene.dispatchExtent_ = {1u, 1u};
+        scene.scaledBlitSupported_ = false;
     }
 #endif
 };
@@ -572,6 +611,12 @@ int main()
                           notReadyPath.string(), captureDiagnostic) &&
                           !std::filesystem::exists(notReadyPath),
                       "viewmodel capture must reject a scene that is not ready");
+        const auto worldNotReadyPath = captureRoot / "world-not-ready.obj";
+        captureDiagnostic.clear();
+        ok &= Require(!notReady.CapturePlayerWorldBodyMesh(
+                          worldNotReadyPath.string(), captureDiagnostic) &&
+                          !std::filesystem::exists(worldNotReadyPath),
+                      "world-body capture must reject a scene that is not ready");
 
         const auto notCurrentPath = captureRoot / "not-current.obj";
         PresentableTinyRtScene notCurrent;
@@ -582,6 +627,34 @@ int main()
                           notCurrentPath.string(), captureDiagnostic) &&
                           !std::filesystem::exists(notCurrentPath),
                       "viewmodel capture must reject a non-current pose");
+        const auto worldNotCurrentPath = captureRoot / "world-not-current.obj";
+        captureDiagnostic.clear();
+        ok &= Require(!notCurrent.CapturePlayerWorldBodyMesh(
+                          worldNotCurrentPath.string(), captureDiagnostic) &&
+                          !std::filesystem::exists(worldNotCurrentPath),
+                      "world-body capture must reject a stale or absent upload");
+
+        PresentableTinyRtScene rejectedRecord;
+        PresentableTinyRtSceneObservationTestAccess::ConfigureCaptureFixture(
+            rejectedRecord, true, true);
+        PresentableTinyRtSceneObservationTestAccess::ForceUnsupportedScaledPresentation(
+            rejectedRecord);
+        VkImageLayout rejectedLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        captureDiagnostic.clear();
+        ok &= Require(!rejectedRecord.RecordTraceAndCopy(
+                          VK_NULL_HANDLE, VK_NULL_HANDLE, rejectedLayout,
+                          VkExtent2D{2u, 2u}, RtSceneFrameInputs{},
+                          captureDiagnostic) &&
+                          captureDiagnostic.find("cannot linearly upscale") !=
+                              std::string::npos,
+                      "unsupported scaled presentation must return before renderer/Vulkan work");
+        const auto afterRejectedRecordPath =
+            captureRoot / "world-after-rejected-record.obj";
+        captureDiagnostic.clear();
+        ok &= Require(!rejectedRecord.CapturePlayerWorldBodyMesh(
+                          afterRejectedRecordPath.string(), captureDiagnostic) &&
+                          !std::filesystem::exists(afterRejectedRecordPath),
+                      "early RecordTraceAndCopy failure must invalidate prior world-body capture evidence");
 
         const auto outputPath = captureRoot / "synthetic.obj";
         PresentableTinyRtScene synthetic;
@@ -608,6 +681,47 @@ int main()
         ok &= Require(outputText == expectedText,
                       "viewmodel capture must preserve exact upload attributes, groups, and indices");
 
+        const auto worldOutputPath = captureRoot / "synthetic-world-body.obj";
+        captureDiagnostic.clear();
+        ok &= Require(synthetic.CapturePlayerWorldBodyMesh(
+                          worldOutputPath.string(), captureDiagnostic) &&
+                          captureDiagnostic.empty(),
+                      "world-body capture must write the current skinned upload");
+        std::ifstream worldOutput(worldOutputPath, std::ios::binary);
+        const std::string worldOutputText((std::istreambuf_iterator<char>(worldOutput)),
+                                          std::istreambuf_iterator<char>());
+        const std::string expectedWorldText =
+            "# Exact CPU PlayerWorldBody upload, model-space metres; not GPU readback.\n"
+            "# model_to_world_row_major_3x4 1 0 0 -2 0 1 0 0.75 0 0 1 -3\n"
+            "v 1 2 3\nv 4 5 6\nv -1 -2 -3\nv 7 8 9\nv -4 -5 -6\nv 10 11 12\n"
+            "vt 0 0\nvt 0.25 0.5\nvt 1 0\nvt 0.125 0.875\nvt 0.75 0.25\nvt 0.625 0.375\n"
+            "vn 0 0 1\nvn 0 1 0\nvn 1 0 0\nvn 0 0 -1\nvn 0 -1 0\nvn -1 0 0\n"
+            "g BodyPrimaryVisible\nf 1/1/1 2/2/2 3/3/3\n"
+            "g NearFacePrimaryMasked\nf 6/6/6 4/4/4 5/5/5\n";
+        ok &= Require(worldOutputText == expectedWorldText,
+                      "world-body capture must preserve uploaded pose, TLAS transform, ranges and indices");
+
+        const auto worldBadIndexPath = captureRoot / "world-bad-index.obj";
+        PresentableTinyRtSceneObservationTestAccess::SetFirstWorldBodyIndex(
+            synthetic, 3u);
+        captureDiagnostic.clear();
+        ok &= Require(!synthetic.CapturePlayerWorldBodyMesh(
+                          worldBadIndexPath.string(), captureDiagnostic) &&
+                          !std::filesystem::exists(worldBadIndexPath),
+                      "world-body capture must reject indices outside the primitive vertex range");
+        PresentableTinyRtSceneObservationTestAccess::SetFirstWorldBodyIndex(
+            synthetic, 0u);
+        const auto worldEmptyRosterPath = captureRoot / "world-empty-roster.obj";
+        PresentableTinyRtSceneObservationTestAccess::SetWorldBodyPrimitives(
+            synthetic, false);
+        captureDiagnostic.clear();
+        ok &= Require(!synthetic.CapturePlayerWorldBodyMesh(
+                          worldEmptyRosterPath.string(), captureDiagnostic) &&
+                          !std::filesystem::exists(worldEmptyRosterPath),
+                      "world-body capture must reject an empty primitive roster");
+        PresentableTinyRtSceneObservationTestAccess::SetWorldBodyPrimitives(
+            synthetic, true);
+
         const std::string sentinel = "do-not-overwrite\n";
         {
             std::ofstream existing(outputPath, std::ios::binary | std::ios::trunc);
@@ -622,6 +736,22 @@ int main()
                                          std::istreambuf_iterator<char>());
         ok &= Require(preservedText == sentinel,
                       "existing viewmodel capture output must remain unchanged");
+
+        const std::string worldSentinel = "do-not-overwrite-world\n";
+        {
+            std::ofstream existing(worldOutputPath, std::ios::binary | std::ios::trunc);
+            existing << worldSentinel;
+        }
+        captureDiagnostic.clear();
+        ok &= Require(!synthetic.CapturePlayerWorldBodyMesh(
+                          worldOutputPath.string(), captureDiagnostic),
+                      "world-body capture must reject an existing output path");
+        std::ifstream worldPreserved(worldOutputPath, std::ios::binary);
+        const std::string preservedWorldText(
+            (std::istreambuf_iterator<char>(worldPreserved)),
+            std::istreambuf_iterator<char>());
+        ok &= Require(preservedWorldText == worldSentinel,
+                      "existing world-body capture output must remain unchanged");
     }
     if (captureRootCreated)
         std::filesystem::remove_all(captureRoot, captureError);

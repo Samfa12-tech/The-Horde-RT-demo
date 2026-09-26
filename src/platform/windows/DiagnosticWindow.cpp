@@ -211,6 +211,8 @@ struct ShowcaseCaptureRecord
     std::string pngSha256;
     std::string viewmodelGeometryFile;
     std::string viewmodelGeometrySha256;
+    std::string playerWorldBodyGeometryFile;
+    std::string playerWorldBodyGeometrySha256;
     std::uint32_t width = 0u;
     std::uint32_t height = 0u;
     bool redBlueSwapNormalised = false;
@@ -4458,6 +4460,11 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                  << ", \"space\": \"model\", \"source\": \"cpu-upload\", \"file\": \""
                  << JsonEscape(capture.viewmodelGeometryFile) << "\", \"sha256\": \""
                  << capture.viewmodelGeometrySha256 << "\"},\n"
+                 << "      \"playerWorldBodyGeometry\": {\"available\": "
+                 << (capture.playerWorldBodyGeometryFile.empty() ? "false" : "true")
+                 << ", \"space\": \"model\", \"source\": \"cpu-upload\", \"file\": \""
+                 << JsonEscape(capture.playerWorldBodyGeometryFile) << "\", \"sha256\": \""
+                 << capture.playerWorldBodyGeometrySha256 << "\"},\n"
                  << "      \"pngSha256\": \"" << capture.pngSha256 << "\"\n"
                  << "    }" << (index + 1u == captures.size() ? "\n" : ",\n");
     }
@@ -4724,6 +4731,17 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             if (!context.rtScene.CaptureViewmodelMesh(geometryPath.string(), diagnostic) ||
                 !Sha256File(geometryPath, record.viewmodelGeometrySha256, diagnostic))
                 return fail(std::string("Checkpoint '") + checkpoint.name + "' geometry capture failed: " + diagnostic);
+
+            record.playerWorldBodyGeometryFile =
+                std::filesystem::path(record.filename).replace_extension(".player-world-body.obj").string();
+            const auto worldBodyGeometryPath =
+                outputDirectory / record.playerWorldBodyGeometryFile;
+            if (!context.rtScene.CapturePlayerWorldBodyMesh(
+                    worldBodyGeometryPath.string(), diagnostic) ||
+                !Sha256File(worldBodyGeometryPath,
+                            record.playerWorldBodyGeometrySha256, diagnostic))
+                return fail(std::string("Checkpoint '") + checkpoint.name +
+                            "' world-body geometry capture failed: " + diagnostic);
         }
         captures.push_back(std::move(record));
         std::cout << "Captured " << checkpoint.name << " -> " << pngPath << '\n';

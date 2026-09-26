@@ -48,6 +48,16 @@ that material retains arm-weighted coat panels. A correct primary body partition
 must preserve the real shoulder boundary and exclude duplicated arm geometry;
 arbitrary bone-weight thresholds alone do not establish that contract.
 
+The paired native dump now demonstrates posed disagreement at coincident
+bind-space seam endpoints (low/down left wrist max100.75mm, upper seam49.24mm).
+198/278 viewmodel sleeve boundary edges exactly adjoin retained NearFace cloth;
+unmatched edges may include subdivision T-junctions, not necessarily true holes.
+The cuff-strip worker exported no candidate; a strip before paired seam/cloth
+ownership repair risks overlap. Next step is a bounded offline partition/seam
+repair, not more IK tuning or blanket caps. [Exact paired evidence and tests](evidence/2026-09-27-player-boundary/README.md).
+The installed phone is unchanged. CI for `e584ba5` passed push36278751279 and
+PR36278752909.
+
 **Newest owner follow-up:** `fce8b40c...` is quite good; sword swings no longer
 hit the lantern (owner-confirmed). Remaining: low-carry parry hits the arm;
 mirror swing arm penetrates torso (lower priority); reduce carried lantern

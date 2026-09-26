@@ -483,6 +483,10 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     viewmodelPoseCurrent_ = std::exchange(other.viewmodelPoseCurrent_, false);
 #ifndef NDEBUG
     viewmodelCaptureTransform_ = std::exchange(other.viewmodelCaptureTransform_, {});
+    playerWorldBodyCaptureTransform_ =
+        std::exchange(other.playerWorldBodyCaptureTransform_, {});
+    playerWorldBodyPoseCurrent_ =
+        std::exchange(other.playerWorldBodyPoseCurrent_, false);
 #endif
     playerStaticVertexBase_ = std::exchange(other.playerStaticVertexBase_, 0u);
     dielectricFixtureMaterialIndex_ =
@@ -896,6 +900,8 @@ void PresentableTinyRtScene::Destroy()
     viewmodelPoseCurrent_ = false;
 #ifndef NDEBUG
     viewmodelCaptureTransform_ = {};
+    playerWorldBodyCaptureTransform_ = {};
+    playerWorldBodyPoseCurrent_ = false;
 #endif
     playerStaticVertexBase_ = 0u;
     dielectricFixtureMaterialIndex_ = 0u;
@@ -4300,6 +4306,11 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                                                      std::string& diagnostic,
                                                      RtSceneRecordObservation* observation)
 {
+#ifndef NDEBUG
+    // Captures after this call are valid only if this frame finishes preparing
+    // and recording the current skinned world-body instance successfully.
+    playerWorldBodyPoseCurrent_ = false;
+#endif
     const RtSceneTuning clampedTuning = ClampRtSceneTuning(frame.tuning);
     const bool glassFixtureVisible =
         clampedTuning.glassFixtureVisible &&
@@ -4959,6 +4970,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         lastInstanceMasks_[instance] = instances[instance].mask;
 #ifndef NDEBUG
     viewmodelCaptureTransform_ = instances[kPlayerViewmodelInstanceIndex].transform;
+    playerWorldBodyCaptureTransform_ =
+        instances[kPlayerWorldBodyInstanceIndex].transform;
 #endif
     lastPlayerPrimaryVisible_ = productionVisibility.playerPrimaryVisible;
     RtHeldLightGpu heldLightGpu{{
@@ -5358,6 +5371,11 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         });
     tlasUpdateScope.Complete(1u);
 
+#ifndef NDEBUG
+    playerWorldBodyPoseCurrent_ = usesSkinnedPlayer &&
+        !productionPlayerAsset_.vertices.empty() &&
+        skinnedPlayerUpload_.size() == productionPlayerAsset_.vertices.size();
+#endif
     diagnostic.clear();
     return true;
 }
@@ -5370,6 +5388,11 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                                                 std::string& diagnostic,
                                                 RtSceneRecordObservation* observation)
 {
+#ifndef NDEBUG
+    // A rejected presentation attempt invalidates geometry evidence from the
+    // prior recorded frame, including failures before dynamic scene updates.
+    playerWorldBodyPoseCurrent_ = false;
+#endif
     if (observation != nullptr)
     {
         observation->failure = RtSceneRecordFailure::None;
@@ -5670,6 +5693,113 @@ bool PresentableTinyRtScene::CaptureViewmodelMesh(const std::string& path,
     if (!output)
     {
         diagnostic = "Failed to write the viewmodel geometry capture.";
+        return false;
+    }
+    diagnostic.clear();
+    return true;
+}
+
+bool PresentableTinyRtScene::CapturePlayerWorldBodyMesh(
+    const std::string& path, std::string& diagnostic) const
+{
+    if (!ready_ || !playerWorldBodyPoseCurrent_ ||
+        productionPlayerAsset_.vertices.empty() ||
+        skinnedPlayerUpload_.size() != productionPlayerAsset_.vertices.size())
+    {
+        diagnostic = "No current skinned player world-body upload is available for geometry capture.";
+        return false;
+    }
+    for (const auto& row : playerWorldBodyCaptureTransform_.matrix)
+        for (const float value : row)
+            if (!std::isfinite(value))
+            {
+                diagnostic = "Current player world-body TLAS transform is not finite.";
+                return false;
+            }
+    if (productionPlayerAsset_.primitives.empty())
+    {
+        diagnostic = "Player world-body asset has no primitives for geometry capture.";
+        return false;
+    }
+    for (const auto& primitive : productionPlayerAsset_.primitives)
+    {
+        if (primitive.materialIndex >= productionPlayerAsset_.materials.size() ||
+            primitive.indexCount == 0u || primitive.indexCount % 3u != 0u ||
+            primitive.indexOffset > productionPlayerAsset_.indices.size() ||
+            primitive.indexCount > productionPlayerAsset_.indices.size() -
+                                       primitive.indexOffset ||
+            primitive.vertexOffset > skinnedPlayerUpload_.size())
+        {
+            diagnostic = "Player world-body primitive ranges are invalid for geometry capture.";
+            return false;
+        }
+        std::size_t primitiveVertexEnd = skinnedPlayerUpload_.size();
+        for (const auto& candidate : productionPlayerAsset_.primitives)
+            if (candidate.vertexOffset > primitive.vertexOffset)
+                primitiveVertexEnd = std::min<std::size_t>(
+                    primitiveVertexEnd, candidate.vertexOffset);
+        if (primitiveVertexEnd <= primitive.vertexOffset)
+        {
+            diagnostic = "Player world-body primitive vertex range is empty or invalid.";
+            return false;
+        }
+        for (std::uint32_t offset = 0u; offset < primitive.indexCount; ++offset)
+        {
+            const std::uint32_t localIndex = productionPlayerAsset_.indices[
+                primitive.indexOffset + offset];
+            if (localIndex >= primitiveVertexEnd - primitive.vertexOffset)
+            {
+                diagnostic = "Player world-body index exceeds its current CPU upload.";
+                return false;
+            }
+        }
+    }
+
+    std::error_code pathError;
+    const bool pathExists = std::filesystem::exists(path, pathError);
+    if (pathExists || pathError)
+    {
+        diagnostic = "Player world-body geometry capture path already exists or cannot be inspected.";
+        return false;
+    }
+    std::ofstream output(path, std::ios::binary);
+    output.imbue(std::locale::classic());
+    output << std::setprecision(std::numeric_limits<float>::max_digits10)
+           << "# Exact CPU PlayerWorldBody upload, model-space metres; not GPU readback.\n";
+    output << "# model_to_world_row_major_3x4";
+    for (const auto& row : playerWorldBodyCaptureTransform_.matrix)
+        for (const float value : row) output << ' ' << value;
+    output << '\n';
+    for (const auto& vertex : skinnedPlayerUpload_)
+        output << "v " << vertex.position[0] << ' ' << vertex.position[1] << ' '
+               << vertex.position[2] << '\n';
+    for (const auto& vertex : skinnedPlayerUpload_)
+        output << "vt " << vertex.uv0[0] << ' ' << vertex.uv0[1] << '\n';
+    for (const auto& vertex : skinnedPlayerUpload_)
+        output << "vn " << vertex.normal[0] << ' ' << vertex.normal[1] << ' '
+               << vertex.normal[2] << '\n';
+    for (const auto& primitive : productionPlayerAsset_.primitives)
+    {
+        output << "g "
+               << productionPlayerAsset_.materials[primitive.materialIndex].name
+               << '\n';
+        for (std::uint32_t offset = 0u; offset < primitive.indexCount; offset += 3u)
+        {
+            output << 'f';
+            for (std::uint32_t corner = 0u; corner < 3u; ++corner)
+            {
+                const auto index = primitive.vertexOffset +
+                    productionPlayerAsset_.indices[
+                        primitive.indexOffset + offset + corner] + 1u;
+                output << ' ' << index << '/' << index << '/' << index;
+            }
+            output << '\n';
+        }
+    }
+    output.close();
+    if (!output)
+    {
+        diagnostic = "Failed to write the player world-body geometry capture.";
         return false;
     }
     diagnostic.clear();

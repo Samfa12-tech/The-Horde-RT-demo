@@ -380,6 +380,9 @@ public:
     // Debug asset inspection only: model-space copy of the exact current upload.
     // This is CPU geometry evidence, not a GPU readback or a second pose solve.
     bool CaptureViewmodelMesh(const std::string& path, std::string& diagnostic) const;
+    // Debug asset inspection only: model-space copy of the exact current world-body
+    // upload and its actual TLAS transform. This is CPU geometry evidence, not readback.
+    bool CapturePlayerWorldBodyMesh(const std::string& path, std::string& diagnostic) const;
 #endif
 
 private:
@@ -593,6 +596,8 @@ private:
     bool viewmodelPoseCurrent_ = false;
 #ifndef NDEBUG
     VkTransformMatrixKHR viewmodelCaptureTransform_{};
+    VkTransformMatrixKHR playerWorldBodyCaptureTransform_{};
+    bool playerWorldBodyPoseCurrent_ = false;
 #endif
     horde::scene::assets::StaticMeshAsset gothicChestBaseAsset_;
     horde::scene::assets::StaticMeshAsset gothicChestLidAsset_;
