@@ -32,3 +32,4 @@ docs/evidence/2026-09-27-live-arm-followup/** -text whitespace=cr-at-eol
 docs/evidence/2026-09-27-yellow-wash/** -text whitespace=cr-at-eol
 docs/evidence/2026-09-27-parry-guard/** -text whitespace=cr-at-eol
 docs/evidence/2026-09-27-parry-guard/*.obj filter=lfs diff=lfs merge=lfs -text
+docs/evidence/2026-09-27-phone-parry-followup/** -text whitespace=cr-at-eol

@@ -2,6 +2,18 @@
 
 Last updated: 2026-09-27
 
+Latest local follow-up: isolated ARM64 Debug `b5d486b2...` from `f227b64`
+is installed byte-matched on **SM-S948B**. Fresh `run-20260927-090032` passes
+13-waypoint replay, six selected modelled-route captures and Home/resume,
+with strict ASTC and honest RayTracingPipeline presentation at explicit 75%.
+It includes the 12% lantern reduction, low-parry guard and yellow-floor removal.
+A retained 50-second unfrozen touch-driven recording exercises low/high parry,
+swings, carry transitions and movement/look; this is bounded local evidence,
+not new owner acceptance. Wrist/armpit/body/mirror issues and glass overflows
+(1–3 on lantern captures) remain open. No matched Shipping/performance claim,
+S24/S25 certification, production asset replacement or app-data clearing.
+See [exact artifact and limits](evidence/2026-09-27-phone-parry-followup/README.md).
+
 This is a living compatibility record for the Horde Lantern RT Android build. It separates direct project evidence from reports and hardware-based predictions. A device is not marked as working solely because its GPU advertises Vulkan or hardware ray tracing.
 
 **Primary development platform:** Samsung Galaxy S26 Ultra (`SM-S948B`). This is the main Android development device and has locally tested success on the current project route.
@@ -20,7 +32,7 @@ The working gate is a real RT-produced frame reaching the Android swapchain afte
 
 ### Samsung Galaxy S26 Ultra - `SM-S948B`
 
-- **2026-09-27 subsequent owner playtest of `fce8b40c...`:** Owner says the current phone candidate is quite good and confirms sword swings no longer hit the lantern. Keep that as **owner-confirmed live swing separation**, not complete Phase3 acceptance. Remaining reported issues: parry contacts the arm in low carry; mirror-view sword swings penetrate the character torso (owner considers potentially minor); lantern should be10–15% smaller; low carry while looking down exposes an untextured/open left armpit/inner bicep; raised carry while looking up exposes a wrist join. Lead selected a12% carried-size candidate for the next bounded pass, not yet implemented. The yellow-wash shader correction is now isolated on Windows but is **not installed on this phone**. Preserve newer positive owner assessment and these exact combined-pose requirements; do not restart broad IK/roll/weight work.
+- **2026-09-27 subsequent owner playtest of `fce8b40c...`:** Owner says the current phone candidate is quite good and confirms sword swings no longer hit the lantern. Keep that as **owner-confirmed live swing separation**, not complete Phase3 acceptance. Remaining reported issues: parry contacts the arm in low carry; mirror-view sword swings penetrate the character torso (owner considers potentially minor); lantern should be10–15% smaller; low carry while looking down exposes an untextured/open left armpit/inner bicep; raised carry while looking up exposes a wrist join. Follow-up commits implement a12% size reduction and reward-carry parry separation, with matched host RT evidence. The yellow-wash correction is also implemented; none of these changes was in the owner's tested `fce8b40c...` artifact. Preserve newer positive owner assessment and these exact combined-pose requirements; do not restart broad IK/roll/weight work.
 
 - **2026-09-27 follow-up candidate and new owner lighting observation:** Installed isolated ARM64 Debug SHA-256 `fce8b40cb0a80b403f49edf4318b91ed9147c69a0d99da68269e31578c8229c9` matches built bytes. Native/Java source `e706f61` plus the single .099 gauntlet candidate recipe in `54493cf`; no production asset replacement. `run-20260927-073831` passes 13-waypoint replay, eight modelled-route captures, strict ASTC, honest RayTracingPipeline presentation and Home/resume at explicit 75%. A separate retained 45-second unfrozen touch-driven recording exercises high/low attacks, walking/look and carry transitions. No sword/cage crossing was observed in reviewed sequences; **owner acceptance of separation, compliance and proportions remains open**. High/low captures retain 3/1 dielectric transport overflows; warm Diagnostic lantern play is slow, not a Shipping performance pass. The owner additionally reports yellow wash on hands/sword, including hand/arm backs expected to occlude lantern light: **owner-reported lighting correctness issue, unproven cause**, to investigate before final lantern/Phase3 acceptance. Do not fix via arbitrary material darkening or fake shadow terms. See [exact evidence and owner matrix](evidence/2026-09-27-live-arm-followup/README.md).
 

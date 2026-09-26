@@ -30,6 +30,24 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### Current Phase 3 checkpoint
 
+**Latest installed follow-up:** ARM64 Debug `b5d486b2...`, runtime source
+`f227b64`, passed exact install hash, 13-waypoint replay, six selected captures
+and Home/resume on SM-S948B. This now puts yellow-floor removal, 12% lantern
+scale and reward-carry parry guard on the phone. Retained 50-second live video
+exercises low/high parry, swings and carry/look/movement transitions; owner
+acceptance and the wrist/armpit/body/mirror issues remain open. Glass failures
+remain 1–3 transport overflows in lantern captures. Phone app is Menu-paused
+and Home-backgrounded. [Evidence](evidence/2026-09-27-phone-parry-followup/README.md).
+
+Wrist investigation corrected a false contour match before asset edits: the
+52/97-vertex open gauntlet loops are finger/grip openings, not the cuff. Mapping
+through the verified source affine identifies the actual closed +X cuff, where
+a small local cloth underlap is being evaluated. Do not bridge to the rejected
+loops or retry global sleeve caps. Torso/legs cannot simply reuse all NearFace:
+that material retains arm-weighted coat panels. A correct primary body partition
+must preserve the real shoulder boundary and exclude duplicated arm geometry;
+arbitrary bone-weight thresholds alone do not establish that contract.
+
 **Newest owner follow-up:** `fce8b40c...` is quite good; sword swings no longer
 hit the lantern (owner-confirmed). Remaining: low-carry parry hits the arm;
 mirror swing arm penetrates torso (lower priority); reduce carried lantern
@@ -39,14 +57,14 @@ combined-pose captures and topology/mount fixes, not another broad arm rewrite.
 The yellow-wash contributor is isolated: unoccluded bay-light colour was added
 after surface shadowing/fog. Its removal restores dark hand backs in matched
 RTX captures without geometry changes, while the torch control is pixel-identical.
-[Evidence](evidence/2026-09-27-yellow-wash/README.md). Phone remains unchanged
-until the next coherent candidate; current shared core lighting fix is pending
-Android acceptance. Full look-down body visibility and all later phases remain.
+[Evidence](evidence/2026-09-27-yellow-wash/README.md). The newer `b5d486b2...`
+phone candidate above now includes this fix; final owner lighting acceptance
+remains open. Full look-down body visibility and all later phases remain.
 
 Lighting fix `178b332` is pushed with green current-source CI. The next small
 candidate sets shared lantern scale .50 -> .44 (12%), preserving GripRing and
 scaled Flame/Light sockets; focused host3/3 and native high/low captures pass.
-It is not on the phone yet. Existing pendulum angular calibration is unchanged;
+It is now on the phone in `b5d486b2...`. Existing pendulum angular calibration is unchanged;
 size is an owner-requested art change, not a measured optimization. Exact
 low-parry, low+look-down and high+look-up development poses now use IDs144–146.
 Parry stages one real command at the ninth60Hz tick (active time.11s); Android

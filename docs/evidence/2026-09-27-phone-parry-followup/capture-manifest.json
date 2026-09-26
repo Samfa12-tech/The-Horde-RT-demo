@@ -1,0 +1,470 @@
+{
+  "schema": 2,
+  "runId": "20260927-090032",
+  "captureMode": "debug-only deterministic checkpoint intent plus ADB screencap",
+  "scale": 75,
+  "device": {
+    "serial": "R5GL219SZGK",
+    "model": "SM-S948B",
+    "androidVersion": "16",
+    "apiLevel": "36",
+    "displaySize": "Physical size: 1440x3120",
+    "displayDensity": "Physical density: 600\r\nOverride density: 560"
+  },
+  "package": "com.samfa12.hordelanternrt.debug.viewmodel",
+  "apkSha256": "b5d486b2e8dbb8fdb13e57c323ecae1a051e640513938d17d70a1086b4514fab",
+  "installedApkSha256": "b5d486b2e8dbb8fdb13e57c323ecae1a051e640513938d17d70a1086b4514fab",
+  "sourceCommit": "f227b6453487ccd1caf34972a163f58e954ddc10",
+  "sourceDirty": true,
+  "selectedRtPipelineBundle": {
+    "opaqueFast": {
+      "key": "diagnostic_mobile_opaque_fast",
+      "sha256": "56a5097a62fd717619d64909ac5ddd489b80ec43b4c121f741fdbb5e8b4af6d8"
+    },
+    "genericDielectric": {
+      "key": "diagnostic_mobile_generic_dielectric",
+      "sha256": "aa4bde53f36359ce1f68a1110fb42e40722aed6db550dc8b3a6bf2ca90dd721e"
+    }
+  },
+  "checkpointCount": 6,
+  "checkpoints": [
+    {
+      "index": 1,
+      "checkpoint": "player-viewmodel-lantern-low-parry",
+      "expectedZone": "yellow-torch-bay",
+      "zone": "yellow-torch-bay",
+      "generation": 1,
+      "camera": {
+        "x": -10.65,
+        "z": -15.2,
+        "yaw": -1.5708,
+        "pitch": -0.3,
+        "vitality": 3,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false
+      },
+      "renderScale": 0.75,
+      "internalExtent": {
+        "width": 1080,
+        "height": 2235
+      },
+      "swapchainExtent": {
+        "width": 1440,
+        "height": 2980
+      },
+      "gpu": "Adreno (TM) 840",
+      "buildIdentity": "1.6.1 DEBUG",
+      "shaderIdentity": "56a5097a+aa4bde53",
+      "selectedRtPipelineBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_mobile_opaque_fast",
+          "sha256": "56a5097a62fd717619d64909ac5ddd489b80ec43b4c121f741fdbb5e8b4af6d8"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_mobile_generic_dielectric",
+          "sha256": "aa4bde53f36359ce1f68a1110fb42e40722aed6db550dc8b3a6bf2ca90dd721e"
+        }
+      },
+      "outputRedBlueSwap": false,
+      "animationTime": 0.15,
+      "playerCombat": {
+        "action": "parry-active",
+        "actionTime": 0.11,
+        "comboQueued": false,
+        "swordRadians": 0.0,
+        "lastConsumedAttackSequence": 0,
+        "lastConsumedParrySequence": 1
+      },
+      "stablePresentedFrames": 12,
+      "presented": true,
+      "playerRenderRoute": "modelled-viewmodel",
+      "playerSkinCadenceHz": 60,
+      "playerSkinUpdates": 4,
+      "playerSkinCpuAverageMs": 3.7041,
+      "playerMaxSocketErrorM": 0.0,
+      "tlasInstanceCount": 21,
+      "sceneOnly": true,
+      "overlaysHidden": [
+        "menu",
+        "touch-actions",
+        "HUD",
+        "diagnostics",
+        "developer-overlay"
+      ],
+      "png": {
+        "file": "capture-01-player-viewmodel-lantern-low-parry-75.png",
+        "width": 1440,
+        "height": 3120,
+        "sha256": "60fd51fc49adf5da6c3909b09059a3386d5d478070866542751904e71a6d9a8c"
+      },
+      "nativeStateFile": "capture-01-player-viewmodel-lantern-low-parry-state.json"
+    },
+    {
+      "index": 2,
+      "checkpoint": "player-viewmodel-lantern-low-look-down",
+      "expectedZone": "yellow-torch-bay",
+      "zone": "yellow-torch-bay",
+      "generation": 1,
+      "camera": {
+        "x": -10.65,
+        "z": -15.2,
+        "yaw": -1.5708,
+        "pitch": -0.32,
+        "vitality": 3,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false
+      },
+      "renderScale": 0.75,
+      "internalExtent": {
+        "width": 1080,
+        "height": 2235
+      },
+      "swapchainExtent": {
+        "width": 1440,
+        "height": 2980
+      },
+      "gpu": "Adreno (TM) 840",
+      "buildIdentity": "1.6.1 DEBUG",
+      "shaderIdentity": "56a5097a+aa4bde53",
+      "selectedRtPipelineBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_mobile_opaque_fast",
+          "sha256": "56a5097a62fd717619d64909ac5ddd489b80ec43b4c121f741fdbb5e8b4af6d8"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_mobile_generic_dielectric",
+          "sha256": "aa4bde53f36359ce1f68a1110fb42e40722aed6db550dc8b3a6bf2ca90dd721e"
+        }
+      },
+      "outputRedBlueSwap": false,
+      "animationTime": 0.0,
+      "playerCombat": {
+        "action": "idle",
+        "actionTime": 0.0,
+        "comboQueued": false,
+        "swordRadians": 0.0,
+        "lastConsumedAttackSequence": 0,
+        "lastConsumedParrySequence": 1
+      },
+      "stablePresentedFrames": 12,
+      "presented": true,
+      "playerRenderRoute": "modelled-viewmodel",
+      "playerSkinCadenceHz": 60,
+      "playerSkinUpdates": 3,
+      "playerSkinCpuAverageMs": 4.6285,
+      "playerMaxSocketErrorM": 0.0,
+      "tlasInstanceCount": 21,
+      "sceneOnly": true,
+      "overlaysHidden": [
+        "menu",
+        "touch-actions",
+        "HUD",
+        "diagnostics",
+        "developer-overlay"
+      ],
+      "png": {
+        "file": "capture-02-player-viewmodel-lantern-low-look-down-75.png",
+        "width": 1440,
+        "height": 3120,
+        "sha256": "77c84ba4040c008128acd7cddaa44f424ce2e45175a756bb71823ce243dbfa6a"
+      },
+      "nativeStateFile": "capture-02-player-viewmodel-lantern-low-look-down-state.json"
+    },
+    {
+      "index": 3,
+      "checkpoint": "player-viewmodel-lantern-high-look-up",
+      "expectedZone": "yellow-torch-bay",
+      "zone": "yellow-torch-bay",
+      "generation": 1,
+      "camera": {
+        "x": -10.65,
+        "z": -15.2,
+        "yaw": -1.5708,
+        "pitch": 0.28,
+        "vitality": 3,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false
+      },
+      "renderScale": 0.75,
+      "internalExtent": {
+        "width": 1080,
+        "height": 2235
+      },
+      "swapchainExtent": {
+        "width": 1440,
+        "height": 2980
+      },
+      "gpu": "Adreno (TM) 840",
+      "buildIdentity": "1.6.1 DEBUG",
+      "shaderIdentity": "56a5097a+aa4bde53",
+      "selectedRtPipelineBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_mobile_opaque_fast",
+          "sha256": "56a5097a62fd717619d64909ac5ddd489b80ec43b4c121f741fdbb5e8b4af6d8"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_mobile_generic_dielectric",
+          "sha256": "aa4bde53f36359ce1f68a1110fb42e40722aed6db550dc8b3a6bf2ca90dd721e"
+        }
+      },
+      "outputRedBlueSwap": false,
+      "animationTime": 0.0,
+      "playerCombat": {
+        "action": "idle",
+        "actionTime": 0.0,
+        "comboQueued": false,
+        "swordRadians": 0.0,
+        "lastConsumedAttackSequence": 0,
+        "lastConsumedParrySequence": 1
+      },
+      "stablePresentedFrames": 12,
+      "presented": true,
+      "playerRenderRoute": "modelled-viewmodel",
+      "playerSkinCadenceHz": 60,
+      "playerSkinUpdates": 3,
+      "playerSkinCpuAverageMs": 5.3375,
+      "playerMaxSocketErrorM": 0.0,
+      "tlasInstanceCount": 21,
+      "sceneOnly": true,
+      "overlaysHidden": [
+        "menu",
+        "touch-actions",
+        "HUD",
+        "diagnostics",
+        "developer-overlay"
+      ],
+      "png": {
+        "file": "capture-03-player-viewmodel-lantern-high-look-up-75.png",
+        "width": 1440,
+        "height": 3120,
+        "sha256": "2bbf8ee873110a5cb18f93363a9c6da0f101052a164e7b8473deedd71d55f4c2"
+      },
+      "nativeStateFile": "capture-03-player-viewmodel-lantern-high-look-up-state.json"
+    },
+    {
+      "index": 4,
+      "checkpoint": "player-viewmodel-lantern-high",
+      "expectedZone": "yellow-torch-bay",
+      "zone": "yellow-torch-bay",
+      "generation": 1,
+      "camera": {
+        "x": -10.65,
+        "z": -15.2,
+        "yaw": -1.5708,
+        "pitch": -0.3,
+        "vitality": 3,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false
+      },
+      "renderScale": 0.75,
+      "internalExtent": {
+        "width": 1080,
+        "height": 2235
+      },
+      "swapchainExtent": {
+        "width": 1440,
+        "height": 2980
+      },
+      "gpu": "Adreno (TM) 840",
+      "buildIdentity": "1.6.1 DEBUG",
+      "shaderIdentity": "56a5097a+aa4bde53",
+      "selectedRtPipelineBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_mobile_opaque_fast",
+          "sha256": "56a5097a62fd717619d64909ac5ddd489b80ec43b4c121f741fdbb5e8b4af6d8"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_mobile_generic_dielectric",
+          "sha256": "aa4bde53f36359ce1f68a1110fb42e40722aed6db550dc8b3a6bf2ca90dd721e"
+        }
+      },
+      "outputRedBlueSwap": false,
+      "animationTime": 0.0,
+      "playerCombat": {
+        "action": "idle",
+        "actionTime": 0.0,
+        "comboQueued": false,
+        "swordRadians": 0.0,
+        "lastConsumedAttackSequence": 0,
+        "lastConsumedParrySequence": 1
+      },
+      "stablePresentedFrames": 12,
+      "presented": true,
+      "playerRenderRoute": "modelled-viewmodel",
+      "playerSkinCadenceHz": 60,
+      "playerSkinUpdates": 3,
+      "playerSkinCpuAverageMs": 5.5039,
+      "playerMaxSocketErrorM": 0.0,
+      "tlasInstanceCount": 21,
+      "sceneOnly": true,
+      "overlaysHidden": [
+        "menu",
+        "touch-actions",
+        "HUD",
+        "diagnostics",
+        "developer-overlay"
+      ],
+      "png": {
+        "file": "capture-04-player-viewmodel-lantern-high-75.png",
+        "width": 1440,
+        "height": 3120,
+        "sha256": "dcd0f4db84026e50fec1339ce57e3b0891f8810aab901d2d34ea5256867765c2"
+      },
+      "nativeStateFile": "capture-04-player-viewmodel-lantern-high-state.json"
+    },
+    {
+      "index": 5,
+      "checkpoint": "player-viewmodel-lantern-low",
+      "expectedZone": "yellow-torch-bay",
+      "zone": "yellow-torch-bay",
+      "generation": 1,
+      "camera": {
+        "x": -10.65,
+        "z": -15.2,
+        "yaw": -1.5708,
+        "pitch": -0.3,
+        "vitality": 3,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false
+      },
+      "renderScale": 0.75,
+      "internalExtent": {
+        "width": 1080,
+        "height": 2235
+      },
+      "swapchainExtent": {
+        "width": 1440,
+        "height": 2980
+      },
+      "gpu": "Adreno (TM) 840",
+      "buildIdentity": "1.6.1 DEBUG",
+      "shaderIdentity": "56a5097a+aa4bde53",
+      "selectedRtPipelineBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_mobile_opaque_fast",
+          "sha256": "56a5097a62fd717619d64909ac5ddd489b80ec43b4c121f741fdbb5e8b4af6d8"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_mobile_generic_dielectric",
+          "sha256": "aa4bde53f36359ce1f68a1110fb42e40722aed6db550dc8b3a6bf2ca90dd721e"
+        }
+      },
+      "outputRedBlueSwap": false,
+      "animationTime": 0.0,
+      "playerCombat": {
+        "action": "idle",
+        "actionTime": 0.0,
+        "comboQueued": false,
+        "swordRadians": 0.0,
+        "lastConsumedAttackSequence": 0,
+        "lastConsumedParrySequence": 1
+      },
+      "stablePresentedFrames": 12,
+      "presented": true,
+      "playerRenderRoute": "modelled-viewmodel",
+      "playerSkinCadenceHz": 60,
+      "playerSkinUpdates": 3,
+      "playerSkinCpuAverageMs": 4.8823,
+      "playerMaxSocketErrorM": 0.0,
+      "tlasInstanceCount": 21,
+      "sceneOnly": true,
+      "overlaysHidden": [
+        "menu",
+        "touch-actions",
+        "HUD",
+        "diagnostics",
+        "developer-overlay"
+      ],
+      "png": {
+        "file": "capture-05-player-viewmodel-lantern-low-75.png",
+        "width": 1440,
+        "height": 3120,
+        "sha256": "05c99c947f7e23983cac2ff93229b7bc43f63fe09fd67465b870d230b434013a"
+      },
+      "nativeStateFile": "capture-05-player-viewmodel-lantern-low-state.json"
+    },
+    {
+      "index": 6,
+      "checkpoint": "player-viewmodel-grips",
+      "expectedZone": "opening",
+      "zone": "opening",
+      "generation": 1,
+      "camera": {
+        "x": 0.0,
+        "z": 1.85,
+        "yaw": 0.0,
+        "pitch": -0.32,
+        "vitality": 3,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false
+      },
+      "renderScale": 0.75,
+      "internalExtent": {
+        "width": 1080,
+        "height": 2235
+      },
+      "swapchainExtent": {
+        "width": 1440,
+        "height": 2980
+      },
+      "gpu": "Adreno (TM) 840",
+      "buildIdentity": "1.6.1 DEBUG",
+      "shaderIdentity": "56a5097a+aa4bde53",
+      "selectedRtPipelineBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_mobile_opaque_fast",
+          "sha256": "56a5097a62fd717619d64909ac5ddd489b80ec43b4c121f741fdbb5e8b4af6d8"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_mobile_generic_dielectric",
+          "sha256": "aa4bde53f36359ce1f68a1110fb42e40722aed6db550dc8b3a6bf2ca90dd721e"
+        }
+      },
+      "outputRedBlueSwap": false,
+      "animationTime": 0.0,
+      "playerCombat": {
+        "action": "idle",
+        "actionTime": 0.0,
+        "comboQueued": false,
+        "swordRadians": 0.0,
+        "lastConsumedAttackSequence": 0,
+        "lastConsumedParrySequence": 1
+      },
+      "stablePresentedFrames": 12,
+      "presented": true,
+      "playerRenderRoute": "modelled-viewmodel",
+      "playerSkinCadenceHz": 60,
+      "playerSkinUpdates": 3,
+      "playerSkinCpuAverageMs": 4.7221,
+      "playerMaxSocketErrorM": 0.0,
+      "tlasInstanceCount": 21,
+      "sceneOnly": true,
+      "overlaysHidden": [
+        "menu",
+        "touch-actions",
+        "HUD",
+        "diagnostics",
+        "developer-overlay"
+      ],
+      "png": {
+        "file": "capture-06-player-viewmodel-grips-75.png",
+        "width": 1440,
+        "height": 3120,
+        "sha256": "e6a23df3b4aebc8ff16ab6905ccc067435b7e9e4f1bfe2cb89f8d6f69a58e9d1"
+      },
+      "nativeStateFile": "capture-06-player-viewmodel-grips-state.json"
+    }
+  ],
+  "lifecycle": {
+    "requested": true,
+    "homeResumePassed": true,
+    "honestPresentationAfterResume": true,
+    "log": "lifecycle-home-resume-logcat.txt"
+  }
+}
