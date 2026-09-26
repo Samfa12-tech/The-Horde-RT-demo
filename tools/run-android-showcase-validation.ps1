@@ -78,6 +78,9 @@ $checkpointZones = @{
     "player-viewmodel-look-down" = "opening"
     "player-viewmodel-lantern-high" = "yellow-torch-bay"
     "player-viewmodel-lantern-low" = "yellow-torch-bay"
+    "player-viewmodel-lantern-low-parry" = "yellow-torch-bay"
+    "player-viewmodel-lantern-low-look-down" = "yellow-torch-bay"
+    "player-viewmodel-lantern-high-look-up" = "yellow-torch-bay"
     "lantern-chest-unlock" = "finale"
     "lantern-glass-production" = "finale"
     "lantern-held-high" = "yellow-torch-bay"
@@ -106,7 +109,9 @@ $viewmodelCheckpoints = @(
     "player-viewmodel-grips", "player-viewmodel-forward",
     "player-viewmodel-downward-cut", "player-viewmodel-upward-slice",
     "player-viewmodel-look-up", "player-viewmodel-look-down",
-    "player-viewmodel-lantern-high", "player-viewmodel-lantern-low")
+    "player-viewmodel-lantern-high", "player-viewmodel-lantern-low",
+    "player-viewmodel-lantern-low-parry", "player-viewmodel-lantern-low-look-down",
+    "player-viewmodel-lantern-high-look-up")
 $captureCheckpoints = @("opening", "skeleton", "worst-bend", "lantern-drop", "skylight", "yellow", "blue", "red", "green", "mirror", "lich", "finale-roof", "two-enemy-combat")
 if ($CaptureSelection.Count -gt 0) { $captureCheckpoints = @($CaptureSelection) }
 $combatCaptureExpectations = @{
@@ -123,6 +128,10 @@ $combatCaptureExpectations = @{
 # simulation. They differ in render ownership, not combat timing.
 $combatCaptureExpectations['player-viewmodel-downward-cut'] = $combatCaptureExpectations['player-body-downward-cut']
 $combatCaptureExpectations['player-viewmodel-upward-slice'] = $combatCaptureExpectations['player-body-upward-slice']
+$combatCaptureExpectations['player-viewmodel-lantern-low-parry'] = @{
+    action = "parry-active"; animationTime = 0.15; actionTime = 0.11
+    minimumConsumedParrySequence = 1; stagedParryEdges = 1
+}
 $rtLabComparisonCheckpoints = @('lantern-drop', 'skylight', 'finale-roof')
 $rtLabExpectedWaterQuality = 1
 $timingRows = [System.Collections.Generic.List[object]]::new()
@@ -325,12 +334,22 @@ function Invoke-CaptureCheckpoint {
             [math]::Abs([double]$state.playerCombat.actionTime - [double]$expectedCombat.actionTime) -gt 0.001) {
             $failures.Add("$Checkpoint capture combat phase '$($state.playerCombat.action)' at $($state.playerCombat.actionTime) s did not match the staged active phase.")
         }
-        if ([int64]$state.playerCombat.lastConsumedAttackSequence -lt [int64]$expectedCombat.minimumConsumedAttackSequence) {
-            $failures.Add("$Checkpoint capture consumed attack sequence $($state.playerCombat.lastConsumedAttackSequence), below the required monotonic minimum $($expectedCombat.minimumConsumedAttackSequence).")
-        }
-        $stagePattern = "HORDE_COMBO_STAGE checkpoint=$escapedName staged=1 consumed_attack_edges=$($expectedCombat.stagedAttackEdges) player_swing_events=$($expectedCombat.stagedSwingEvents) enemy_hit_events=0 action=$($expectedCombat.action) action_time=[0-9.]+ events_cleared=1"
-        if ($log -notmatch $stagePattern) {
-            $failures.Add("$Checkpoint did not log its relative attack-edge and exact-once swing-event staging contract.")
+        if ($expectedCombat.ContainsKey('stagedParryEdges')) {
+            if ([int64]$state.playerCombat.lastConsumedParrySequence -lt [int64]$expectedCombat.minimumConsumedParrySequence) {
+                $failures.Add("$Checkpoint capture consumed parry sequence $($state.playerCombat.lastConsumedParrySequence), below the required monotonic minimum $($expectedCombat.minimumConsumedParrySequence).")
+            }
+            $stagePattern = "HORDE_PARRY_STAGE checkpoint=$escapedName staged=1 consumed_parry_edges=$($expectedCombat.stagedParryEdges) parry_success_events=0 player_damaged_events=0 player_killed_events=0 enemy_hit_events=0 action=$($expectedCombat.action) action_time=[0-9.]+ events_cleared=1"
+            if ($log -notmatch $stagePattern) {
+                $failures.Add("$Checkpoint did not log a real isolated parry edge without hit/damage feedback.")
+            }
+        } else {
+            if ([int64]$state.playerCombat.lastConsumedAttackSequence -lt [int64]$expectedCombat.minimumConsumedAttackSequence) {
+                $failures.Add("$Checkpoint capture consumed attack sequence $($state.playerCombat.lastConsumedAttackSequence), below the required monotonic minimum $($expectedCombat.minimumConsumedAttackSequence).")
+            }
+            $stagePattern = "HORDE_COMBO_STAGE checkpoint=$escapedName staged=1 consumed_attack_edges=$($expectedCombat.stagedAttackEdges) player_swing_events=$($expectedCombat.stagedSwingEvents) enemy_hit_events=0 action=$($expectedCombat.action) action_time=[0-9.]+ events_cleared=1"
+            if ($log -notmatch $stagePattern) {
+                $failures.Add("$Checkpoint did not log its relative attack-edge and exact-once swing-event staging contract.")
+            }
         }
     } elseif ([double]$state.animationTime -ne 0.0) {
         $failures.Add("$Checkpoint capture animation time was not fixed at zero.")

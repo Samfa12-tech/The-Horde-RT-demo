@@ -1009,7 +1009,22 @@ void ApplyDebugCheckpointSimulation(
         const bool staged = horde::gameplay::StageDevelopmentCheckpointSimulation(
             gGameSimulation, *selection.development, &evidence,
             observation != nullptr ? &stepObservation : nullptr);
-        if (selection.development->combatPose != horde::gameplay::DevelopmentCombatPose::Rest)
+        if (selection.development->combatPose ==
+            horde::gameplay::DevelopmentCombatPose::ParryActive)
+        {
+            __android_log_print(
+                ANDROID_LOG_INFO, kTag,
+                "HORDE_PARRY_STAGE checkpoint=%s staged=%d consumed_parry_edges=%u "
+                "parry_success_events=%u player_damaged_events=%u player_killed_events=%u "
+                "enemy_hit_events=%u action=%s action_time=%.4f events_cleared=1",
+                selection.development->name.data(), staged ? 1 : 0,
+                evidence.consumedParryEdges,
+                evidence.playerParrySucceededEvents, evidence.playerDamagedEvents,
+                evidence.playerKilledEvents, evidence.enemyHitEvents,
+                DebugPlayerCombatActionName(evidence.action), evidence.actionTime);
+        }
+        else if (selection.development->combatPose !=
+                 horde::gameplay::DevelopmentCombatPose::Rest)
         {
             __android_log_print(
                 ANDROID_LOG_INFO, kTag,
@@ -1082,6 +1097,7 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
          << ", \"comboQueued\": " << (simulation.playerCombat.comboQueued ? "true" : "false")
          << ", \"swordRadians\": " << simulation.swordCombat.swordSwingRadians
          << ", \"lastConsumedAttackSequence\": " << simulation.lastConsumedAttackSequence
+         << ", \"lastConsumedParrySequence\": " << simulation.lastConsumedParrySequence
          << "},\n"
          << "  \"zone\": \"" << horde::gameplay::ShowcaseZoneName(zone) << "\",\n"
          << "  \"renderScale\": " << context.renderScale << ",\n"

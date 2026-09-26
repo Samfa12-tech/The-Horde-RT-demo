@@ -47,8 +47,12 @@ Lighting fix `178b332` is pushed with green current-source CI. The next small
 candidate sets shared lantern scale .50 -> .44 (12%), preserving GripRing and
 scaled Flame/Light sockets; focused host3/3 and native high/low captures pass.
 It is not on the phone yet. Existing pendulum angular calibration is unchanged;
-size is an owner-requested art change, not a measured optimization. Next add
-exact low-parry, low+look-down and high+look-up diagnostic poses. Read-only
+size is an owner-requested art change, not a measured optimization. Exact
+low-parry, low+look-down and high+look-up development poses now use IDs144–146.
+Parry stages one real command at the ninth60Hz tick (active time.11s); Android
+camera pose restoration now covers136–146. Host2/2, Android units19/19 and
+34 actual capture-guard positive/negative cases pass; native combined captures
+succeed. These are diagnostic additions, not physical acceptance. Read-only
 inspection finds open sleeve shoulder/wrist contours with intact UV/PBR data;
 separate ForeArm sleeve and Hand gauntlet deformation makes a local wrist
 overlap/bridge worth investigating. Rejected global caps remain rejected.

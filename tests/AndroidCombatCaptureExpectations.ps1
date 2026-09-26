@@ -8,7 +8,10 @@ $assignments = @($ast.FindAll({ param($node)
     $node -is [Management.Automation.Language.AssignmentStatementAst] -and
     $node.Left.Extent.Text -match '^\$combatCaptureExpectations(?:\[|$)'
 }, $false))
-if ($assignments.Count -ne 3) { throw 'Review changed combat expectation declarations' }
+if ($assignments.Count -ne 4) { throw 'Review changed combat expectation declarations' }
+if (-not ($assignments | Where-Object { $_.Extent.Text -match "player-viewmodel-lantern-low-parry" })) {
+    throw 'Expected an explicit low-lantern parry combat expectation'
+}
 foreach ($assignment in $assignments) { . ([scriptblock]::Create($assignment.Extent.Text)) }
 $guards = @($ast.FindAll({ param($node)
     $node -is [Management.Automation.Language.IfStatementAst] -and
@@ -44,5 +47,36 @@ foreach ($Checkpoint in @('player-body-downward-cut', 'player-body-upward-slice'
         }
         ++$cases
     }
+}
+
+$Checkpoint = 'player-viewmodel-lantern-low-parry'
+$expectedCombat = $combatCaptureExpectations[$Checkpoint]
+$state = [pscustomobject]@{ animationTime = 0.15; playerCombat = [pscustomobject]@{
+    action = 'parry-active'; actionTime = 0.11; lastConsumedParrySequence = 1 } }
+$escapedName = [regex]::Escape($Checkpoint)
+$log = "HORDE_PARRY_STAGE checkpoint=$Checkpoint staged=1 consumed_parry_edges=1 parry_success_events=0 player_damaged_events=0 player_killed_events=0 enemy_hit_events=0 action=parry-active action_time=0.1100 events_cleared=1"
+foreach ($mutation in @('valid', 'wrong-phase', 'wrong-time', 'missing-parry-edge',
+                        'parry-success-event', 'player-damage-event', 'player-killed-event',
+                        'stage-failed', 'missing-log', 'enemy-hit-event')) {
+    $state = [pscustomobject]@{ animationTime = 0.15; playerCombat = [pscustomobject]@{
+        action = 'parry-active'; actionTime = 0.11; lastConsumedParrySequence = 1 } }
+    $log = "HORDE_PARRY_STAGE checkpoint=$Checkpoint staged=1 consumed_parry_edges=1 parry_success_events=0 player_damaged_events=0 player_killed_events=0 enemy_hit_events=0 action=parry-active action_time=0.1100 events_cleared=1"
+    switch ($mutation) {
+        'wrong-phase' { $state.playerCombat.action = 'parry-startup' }
+        'wrong-time' { $state.playerCombat.actionTime = 0.04 }
+        'missing-parry-edge' { $state.playerCombat.lastConsumedParrySequence = 0 }
+        'parry-success-event' { $log = $log.Replace('parry_success_events=0', 'parry_success_events=1') }
+        'player-damage-event' { $log = $log.Replace('player_damaged_events=0', 'player_damaged_events=1') }
+        'player-killed-event' { $log = $log.Replace('player_killed_events=0', 'player_killed_events=1') }
+        'stage-failed' { $log = $log.Replace('staged=1', 'staged=0') }
+        'missing-log' { $log = '' }
+        'enemy-hit-event' { $log = $log.Replace('enemy_hit_events=0', 'enemy_hit_events=1') }
+    }
+    $failures = [Collections.Generic.List[string]]::new()
+    . $guard
+    if (($failures.Count -eq 0) -ne ($mutation -eq 'valid')) {
+        throw "$Checkpoint/$mutation produced unexpected guard result: $failures"
+    }
+    ++$cases
 }
 Write-Output "Android combat capture expectations: $cases cases passed."

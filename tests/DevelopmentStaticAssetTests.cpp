@@ -63,13 +63,16 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 44u,
-          "forty-four isolated render-development checkpoints include the eight dedicated viewmodel poses");
+    Check(kDevelopmentCheckpoints.size() == 47u,
+          "forty-seven isolated render-development checkpoints include eleven dedicated viewmodel poses");
     int viewmodelId = 136;
     for (const auto name : {"player-viewmodel-grips", "player-viewmodel-forward",
                            "player-viewmodel-downward-cut", "player-viewmodel-upward-slice",
                            "player-viewmodel-look-up", "player-viewmodel-look-down",
-                           "player-viewmodel-lantern-high", "player-viewmodel-lantern-low"})
+                           "player-viewmodel-lantern-high", "player-viewmodel-lantern-low",
+                           "player-viewmodel-lantern-low-parry",
+                           "player-viewmodel-lantern-low-look-down",
+                           "player-viewmodel-lantern-high-look-up"})
     {
         const auto* viewmodel = FindDevelopmentCheckpoint(name);
         Check(viewmodel != nullptr && viewmodel->id == viewmodelId &&
@@ -78,6 +81,49 @@ int main()
               "viewmodel pose has a stable development-only name/ID and never enters the release route");
         ++viewmodelId;
     }
+    const auto* lowParry = FindDevelopmentCheckpoint(144);
+    const auto* lowLookDown = FindDevelopmentCheckpoint(145);
+    const auto* highLookUp = FindDevelopmentCheckpoint(146);
+    Check(lowParry != nullptr && lowParry->name == "player-viewmodel-lantern-low-parry" &&
+              lowParry->baseShowcaseCheckpointId == 5 && lowParry->cameraX == -10.65f &&
+              lowParry->cameraZ == -15.20f && lowParry->yaw == -1.57079632679f &&
+              lowParry->pitch == -0.30f &&
+              lowParry->rewardPose == DevelopmentRewardPose::HeldLow &&
+              lowParry->combatPose == DevelopmentCombatPose::ParryActive &&
+              FindShowcaseCheckpoint(lowParry->id) == nullptr,
+          "low-lantern parry capture appends an isolated combined gameplay/render state");
+    Check(lowLookDown != nullptr && lowLookDown->name == "player-viewmodel-lantern-low-look-down" &&
+              lowLookDown->baseShowcaseCheckpointId == 5 && lowLookDown->cameraX == -10.65f &&
+              lowLookDown->cameraZ == -15.20f && lowLookDown->yaw == -1.57079632679f &&
+              lowLookDown->pitch == -0.32f &&
+              lowLookDown->rewardPose == DevelopmentRewardPose::HeldLow &&
+              lowLookDown->combatPose == DevelopmentCombatPose::Rest &&
+              FindShowcaseCheckpoint(lowLookDown->id) == nullptr,
+          "low-lantern look-down capture preserves the existing base-five carry state");
+    Check(highLookUp != nullptr && highLookUp->name == "player-viewmodel-lantern-high-look-up" &&
+              highLookUp->baseShowcaseCheckpointId == 5 && highLookUp->cameraX == -10.65f &&
+              highLookUp->cameraZ == -15.20f && highLookUp->yaw == -1.57079632679f &&
+              highLookUp->pitch == 0.28f &&
+              highLookUp->rewardPose == DevelopmentRewardPose::HeldHigh &&
+              highLookUp->combatPose == DevelopmentCombatPose::Rest &&
+              FindShowcaseCheckpoint(highLookUp->id) == nullptr,
+          "high-lantern look-up capture preserves the existing base-five carry state");
+    horde::gameplay::simulation::GameSimulation stagedLowLookDown;
+    horde::gameplay::simulation::GameSimulation stagedHighLookUp;
+    Check(lowLookDown != nullptr && StageDevelopmentCheckpointSimulation(stagedLowLookDown, *lowLookDown) &&
+              stagedLowLookDown.Snapshot().playerPitchRadians == -0.32f &&
+              stagedLowLookDown.Snapshot().interaction.heldLightKind ==
+                  interactions::HeldLightKind::RewardLantern &&
+              stagedLowLookDown.Snapshot().interaction.heldLightPose ==
+                  interactions::HeldLightPose::Low,
+          "low-look-down viewmodel checkpoint stages both its actual camera pitch and low lantern state");
+    Check(highLookUp != nullptr && StageDevelopmentCheckpointSimulation(stagedHighLookUp, *highLookUp) &&
+              stagedHighLookUp.Snapshot().playerPitchRadians == 0.28f &&
+              stagedHighLookUp.Snapshot().interaction.heldLightKind ==
+                  interactions::HeldLightKind::RewardLantern &&
+              stagedHighLookUp.Snapshot().interaction.heldLightPose ==
+                  interactions::HeldLightPose::High,
+          "high-look-up viewmodel checkpoint stages both its actual camera pitch and high lantern state");
     const DevelopmentCheckpoint* checkpoint = FindDevelopmentCheckpoint("pbr-sword-closeup");
     Check(checkpoint != nullptr && checkpoint->id == 100 && checkpoint->baseShowcaseCheckpointId == 0 &&
               checkpoint->name == std::string_view("pbr-sword-closeup") &&

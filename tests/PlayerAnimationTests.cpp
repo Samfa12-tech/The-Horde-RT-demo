@@ -518,13 +518,46 @@ int main()
         ++viewmodelCheckpointCount;
         if (checkpoint.combatPose != DevelopmentCombatPose::Rest)
         {
-            const bool upward = checkpoint.combatPose == DevelopmentCombatPose::UpwardSliceActive;
-            if (!Require(Near(staged.Snapshot().walkTime, upward ? 0.6167f : 0.5833f) &&
-                         Near(staged.Snapshot().playerCombat.actionTime, upward ? 0.1667f : 0.4033f),
-                         "Android capture timing must match the shared late-active attack checkpoint")) return 1;
+            if (checkpoint.combatPose == DevelopmentCombatPose::ParryActive)
+            {
+                if (!Require(Near(staged.Snapshot().walkTime, 0.15f) &&
+                             Near(staged.Snapshot().playerCombat.actionTime, 0.11f) &&
+                             staged.Snapshot().playerCombat.action == PlayerCombatAction::ParryActive,
+                             "lantern parry capture must freeze a real fixed-step sample inside ParryActive")) return 1;
+            }
+            else
+            {
+                const bool upward = checkpoint.combatPose == DevelopmentCombatPose::UpwardSliceActive;
+                if (!Require(Near(staged.Snapshot().walkTime, upward ? 0.6167f : 0.5833f) &&
+                             Near(staged.Snapshot().playerCombat.actionTime, upward ? 0.1667f : 0.4033f),
+                             "Android capture timing must match the shared late-active attack checkpoint")) return 1;
+            }
         }
     }
-    if (!Require(viewmodelCheckpointCount == 8u, "all eight viewmodel checkpoint pitches must be staged")) return 1;
+    if (!Require(viewmodelCheckpointCount == 11u, "all eleven viewmodel checkpoint pitches must be staged")) return 1;
+    const auto* lowParryCheckpoint = horde::gameplay::FindDevelopmentCheckpoint(144);
+    horde::gameplay::simulation::GameSimulation stagedLowLanternParry;
+    horde::gameplay::DevelopmentCheckpointStageEvidence lowParryEvidence{};
+    if (!Require(lowParryCheckpoint != nullptr &&
+                 horde::gameplay::StageDevelopmentCheckpointSimulation(
+                     stagedLowLanternParry, *lowParryCheckpoint, &lowParryEvidence) &&
+                 stagedLowLanternParry.Snapshot().interaction.heldLightKind ==
+                     horde::gameplay::interactions::HeldLightKind::RewardLantern &&
+                 stagedLowLanternParry.Snapshot().interaction.heldLightPose ==
+                     horde::gameplay::interactions::HeldLightPose::Low &&
+                 stagedLowLanternParry.Snapshot().playerCombat.action == PlayerCombatAction::ParryActive &&
+                 Near(stagedLowLanternParry.Snapshot().playerCombat.actionTime, 0.11f) &&
+                 lowParryEvidence.consumedAttackEdges == 0u &&
+                 lowParryEvidence.consumedParryEdges == 1u &&
+                 lowParryEvidence.playerSwingEvents == 0u &&
+                 lowParryEvidence.playerParrySucceededEvents == 0u &&
+                 lowParryEvidence.playerDamagedEvents == 0u &&
+                 lowParryEvidence.playerKilledEvents == 0u &&
+                 lowParryEvidence.enemyHitEvents == 0u &&
+                 stagedLowLanternParry.Snapshot().playerVitals.vitality ==
+                     horde::gameplay::PlayerVitals::kMaxVitality &&
+                 stagedLowLanternParry.Events().Size() == 0u,
+                 "low-lantern parry capture must use one real parry edge and clear all feedback without hits")) return 1;
     const PlayerRouteMasks skinnedMasks = BuildPlayerRouteMasks(PlayerRenderRoute::Skinned);
     const PlayerRouteMasks hybridMasks =
         BuildPlayerRouteMasks(PlayerRenderRoute::HybridBlockPrimary);

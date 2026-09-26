@@ -9,7 +9,11 @@ namespace horde::gameplay
 struct DevelopmentCheckpointStageEvidence
 {
     std::uint32_t consumedAttackEdges = 0u;
+    std::uint32_t consumedParryEdges = 0u;
     std::uint32_t playerSwingEvents = 0u;
+    std::uint32_t playerParrySucceededEvents = 0u;
+    std::uint32_t playerDamagedEvents = 0u;
+    std::uint32_t playerKilledEvents = 0u;
     std::uint32_t enemyHitEvents = 0u;
     PlayerCombatAction action = PlayerCombatAction::Idle;
     float actionTime = 0.0f;
@@ -53,6 +57,8 @@ inline bool StageDevelopmentCheckpointSimulation(
 
     const std::uint64_t initialConsumedAttackSequence =
         gameSimulation.Snapshot().lastConsumedAttackSequence;
+    const std::uint64_t initialConsumedParrySequence =
+        gameSimulation.Snapshot().lastConsumedParrySequence;
     const auto finalize = [&](const bool staged)
     {
         if (evidence != nullptr)
@@ -61,12 +67,21 @@ inline bool StageDevelopmentCheckpointSimulation(
             evidence->consumedAttackEdges = static_cast<std::uint32_t>(
                 gameSimulation.Snapshot().lastConsumedAttackSequence -
                 initialConsumedAttackSequence);
+            evidence->consumedParryEdges = static_cast<std::uint32_t>(
+                gameSimulation.Snapshot().lastConsumedParrySequence -
+                initialConsumedParrySequence);
             evidence->action = gameSimulation.Snapshot().playerCombat.action;
             evidence->actionTime = gameSimulation.Snapshot().playerCombat.actionTime;
             for (const simulation::GameplayEvent& event : gameSimulation.Events().Events())
             {
                 if (event.type == simulation::GameplayEventType::PlayerSwing)
                     ++evidence->playerSwingEvents;
+                if (event.type == simulation::GameplayEventType::PlayerParrySucceeded)
+                    ++evidence->playerParrySucceededEvents;
+                if (event.type == simulation::GameplayEventType::PlayerDamaged)
+                    ++evidence->playerDamagedEvents;
+                if (event.type == simulation::GameplayEventType::PlayerKilled)
+                    ++evidence->playerKilledEvents;
                 if (event.type == simulation::GameplayEventType::EnemyHit)
                     ++evidence->enemyHitEvents;
             }
@@ -140,11 +155,31 @@ inline bool StageDevelopmentCheckpointSimulation(
     }
     if (checkpoint.combatPose == DevelopmentCombatPose::Rest)
         return finalize(true);
+    constexpr float fixedDelta =
+        static_cast<float>(simulation::FixedStepRunner::kFixedDeltaSeconds);
+
+    if (checkpoint.combatPose == DevelopmentCombatPose::ParryActive)
+    {
+        // Drive the same monotonic parry command and fixed-step combat path as
+        // live play, then freeze the first 60 Hz sample at/after 0.10 s into
+        // the 0.22 s active window (the authored sample is 0.11 s).
+        input.commands.parry =
+            gameSimulation.Snapshot().lastConsumedParrySequence + 1u;
+        constexpr float kParryCaptureActionTimeSeconds = 0.10f;
+        for (std::uint32_t tick = 0u; tick < 20u; ++tick)
+        {
+            stepFixed(input, fixedDelta,
+                      gameSimulation.Snapshot().inputPublicationSequence + 1u);
+            const PlayerCombatSnapshot& after = gameSimulation.Snapshot().playerCombat;
+            if (after.action == PlayerCombatAction::ParryActive &&
+                after.actionTime >= kParryCaptureActionTimeSeconds)
+                return finalize(true);
+        }
+        return finalize(false);
+    }
 
     input.commands.attack = gameSimulation.Snapshot().lastConsumedAttackSequence + 1u;
     bool upwardEdgePublished = false;
-    constexpr float fixedDelta =
-        static_cast<float>(simulation::FixedStepRunner::kFixedDeltaSeconds);
     for (std::uint32_t tick = 0u; tick < 90u; ++tick)
     {
         const PlayerCombatSnapshot& before = gameSimulation.Snapshot().playerCombat;

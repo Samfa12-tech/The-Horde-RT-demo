@@ -1803,6 +1803,9 @@ public class MainActivity extends Activity {
             case "player-viewmodel-look-down": return 141;
             case "player-viewmodel-lantern-high": return 142;
             case "player-viewmodel-lantern-low": return 143;
+            case "player-viewmodel-lantern-low-parry": return 144;
+            case "player-viewmodel-lantern-low-look-down": return 145;
+            case "player-viewmodel-lantern-high-look-up": return 146;
             default: return -1;
         }
     }
@@ -1938,7 +1941,30 @@ public class MainActivity extends Activity {
         clearTouchState();
     }
 
+    static float[] developmentCheckpointViewPose(final int checkpoint) {
+        switch (checkpoint) {
+            case 136: return new float[]{0.0f, -0.32f};
+            case 137: return new float[]{0.0f, -0.05f};
+            case 138: return new float[]{0.0f, -0.28f};
+            case 139: return new float[]{0.0f, -0.28f};
+            case 140: return new float[]{0.0f, 0.28f};
+            case 141: return new float[]{0.0f, -0.32f};
+            case 142:
+            case 143:
+            case 144: return new float[]{-1.5707963f, -0.30f};
+            case 145: return new float[]{-1.5707963f, -0.32f};
+            case 146: return new float[]{-1.5707963f, 0.28f};
+            default: return null;
+        }
+    }
+
     private void applyCheckpointViewPose(final int checkpoint) {
+        final float[] developmentPose = developmentCheckpointViewPose(checkpoint);
+        if (developmentPose != null) {
+            viewControls[0] = developmentPose[0];
+            viewControls[1] = developmentPose[1];
+            return;
+        }
         switch (checkpoint) {
             case 0: viewControls[0] = 0.0f; viewControls[1] = -0.05f; break;
             case 1: viewControls[0] = 0.0f; viewControls[1] = 0.0f; break;
