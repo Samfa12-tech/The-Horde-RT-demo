@@ -17,6 +17,7 @@
 #include <filesystem>
 #include <iostream>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace
@@ -816,6 +817,41 @@ void TestProductionSocketsMatchSharedFixedStepContracts()
 
 } // namespace
 
+void TestRewardCarryParryKeepsGuardOnSwordSide()
+{
+    using namespace horde::gameplay;
+    using namespace horde::gameplay::items;
+    bool separated = true;
+    bool leftGripUnchanged = true;
+    const std::array<std::pair<PlayerCombatAction, float>, 3> phases{{
+        {PlayerCombatAction::ParryStartup, SwordCombat::kParryStartupDuration},
+        {PlayerCombatAction::ParryActive, SwordCombat::kParryActiveDuration},
+        {PlayerCombatAction::ParryRecovery, SwordCombat::kParryRecoveryDuration}}};
+    for (const auto carry : {interactions::HeldLightPose::High, interactions::HeldLightPose::Low})
+        for (const auto& [action, duration] : phases)
+            for (int sample = 0; sample <= 60; ++sample)
+                for (float reactionTime : {0.0f, .06f, .12f})
+                {
+                    HeldItemKinematicsInput input;
+                    input.interaction.heldLightKind = interactions::HeldLightKind::RewardLantern;
+                    input.interaction.heldLightPose = carry;
+                    const auto idle = EvaluateHeldItemKinematics(input);
+                    input.playerCombat.action = action;
+                    input.playerCombat.actionTime = duration * sample / 60.0f;
+                    input.playerCombat.reaction = CombatReaction::Parried;
+                    input.playerCombat.reactionTime = reactionTime;
+                    const auto parry = EvaluateHeldItemKinematics(input);
+                    separated &= parry.rightHandLocal[0] >= .0799f &&
+                        parry.rightHandLocal[0] - parry.leftHandLocal[0] >= .18f;
+                    leftGripUnchanged &= parry.leftHandLocal == idle.leftHandLocal &&
+                        parry.leftGripXInView == idle.leftGripXInView &&
+                        parry.leftGripYInView == idle.leftGripYInView &&
+                        parry.leftGripZInView == idle.leftGripZInView;
+                }
+    Check(separated, "reward-carry parry must retain a sword-side guard through startup, active, recovery and success reaction");
+    Check(leftGripUnchanged, "parry clearance must not be obtained by moving the lantern grip");
+}
+
 int main()
 {
     TestSocketLookupIsNamedAndOrderIndependent();
@@ -834,6 +870,7 @@ int main()
     TestSimulationOwnsResetAndCheckpointParentState();
     TestSharedKinematicsOwnsWallDepthHandsAndSwordPose();
     TestRewardLanternHighLowUsesSharedLeftArmTarget();
+    TestRewardCarryParryKeepsGuardOnSwordSide();
     TestProductionSwordAssetMeetsGenericSocketAndPbrBudget();
     TestProductionTorchAssetMeetsGenericSocketAndPbrBudget();
     TestProductionAssetsShareOneGenericStaticSlot();

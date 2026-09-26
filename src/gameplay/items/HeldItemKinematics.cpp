@@ -297,9 +297,13 @@ HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
         break;
     }
     const std::array<float, 3u> parryHand{{
-        -0.16f + 0.055f * successJolt,
+        (bulkyLeftHandCarry ? 0.08f : -0.16f) + 0.055f * successJolt,
         -0.29f + 0.025f * successJolt,
         std::min(heldPropDepth, 0.90f)}};
+    // With the lantern carried, keep the guard/forearm on the sword side.
+    // A more upright blade retains a similar blocking tip position without
+    // driving the right hand through the low left arm. The lantern stays put.
+    const float parryInwardRadians = bulkyLeftHandCarry ? -0.28f : -0.62f;
 
     HeldSwordPose pose;
     for (std::size_t axis = 0u; axis < pose.rightHandLocal.size(); ++axis)
@@ -308,7 +312,7 @@ HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
             (parryHand[axis] - swingHand[axis]) * parryBlend;
     }
     pose.swordRadians = swingInwardRadians +
-                        parryBlend * (-0.62f + 0.14f * successJolt -
+                        parryBlend * (parryInwardRadians + 0.14f * successJolt -
                                       swingInwardRadians);
     pose.swordForwardRadians = swingForwardRadians +
         parryBlend * (kSwordRestForwardRadians - swingForwardRadians);

@@ -57,6 +57,14 @@ inspection finds open sleeve shoulder/wrist contours with intact UV/PBR data;
 separate ForeArm sleeve and Hand gauntlet deformation makes a local wrist
 overlap/bridge worth investigating. Rejected global caps remain rejected.
 
+Low-parry pose candidate now moves only the sword-side guard (X -.16 -> .08,
+blade inward -.62 -> -.28 for reward carry). Matched exact-upload diagnostics
+prove baseline472 right-arm/left-sleeve crossings and307 sword/left-sleeve
+crossings become zero broadphase pairs, with unchanged assets/left Grip.
+The1098-pose shared-kinematics regression RED/GREENs; normal torch parry is
+unchanged. [Reproducible native evidence](evidence/2026-09-27-parry-guard/README.md).
+Do not declare live/phone acceptance until the next coherent APK is exercised.
+
 **September 27 implementation/evidence checkpoint:** pushed `ed6e4bb` (default75),
 `bf0334b` (shared sword carry lane), `e706f61` (bounded carry bend), `54493cf`
 (single grip-anchored +10% gauntlet candidate). Current runtime-source CI push

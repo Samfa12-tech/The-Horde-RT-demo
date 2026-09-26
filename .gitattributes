@@ -30,3 +30,5 @@ docs/evidence/2026-09-23-viewmodel-portrait/** -text whitespace=cr-at-eol
 docs/evidence/2026-09-23-viewmodel-sleeve-closure/** -text whitespace=cr-at-eol
 docs/evidence/2026-09-27-live-arm-followup/** -text whitespace=cr-at-eol
 docs/evidence/2026-09-27-yellow-wash/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-27-parry-guard/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-27-parry-guard/*.obj filter=lfs diff=lfs merge=lfs -text
