@@ -6,6 +6,8 @@ No source or currently admitted runtime file is overwritten.
 
 Investigation-only switches (not admission or production defaults):
   --gauntlet-source-hand Right: owner-corrected source anatomy, with paired world export.
+  --gauntlet-scale FACTOR: size gauntlet geometry about its authored GripOrigin,
+    with the same paired world/viewmodel scale.
   --correct-grip-roll: test a 180-degree Grip roll, with a paired world GLB.
   --grip-roll-degrees LEFT RIGHT: test explicit per-hand authored Grip calibration.
   --stabilize-sleeves: transfer sleeve Hand weights to the same-side ForeArm.
@@ -27,6 +29,8 @@ import bpy
 import bmesh
 
 root = Path(__file__).resolve().parents[1]
+MIN_GAUNTLET_SCALE = 0.080
+MAX_GAUNTLET_SCALE = 0.105
 arguments = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('output', type=Path)
@@ -36,6 +40,8 @@ parser.add_argument('--close-sleeves', action='store_true')
 parser.add_argument('--stabilize-sleeves', action='store_true')
 parser.add_argument('--gauntlet-source-hand', choices=('Left', 'Right'),
                     help='Explicit anatomical source handedness; omission reproduces the historical export')
+parser.add_argument('--gauntlet-scale', type=float,
+                    help='Uniform source scale applied about the authored grip origin')
 roll_options = parser.add_mutually_exclusive_group()
 roll_options.add_argument('--correct-grip-roll', action='store_true')
 roll_options.add_argument('--grip-roll-degrees', nargs=2, type=float, metavar=('LEFT', 'RIGHT'))
@@ -43,6 +49,12 @@ options = parser.parse_args(arguments)
 roll_degrees = options.grip_roll_degrees or ([180.0, 180.0] if options.correct_grip_roll else [0.0, 0.0])
 if any(not math.isfinite(value) or abs(value) > 360.0 for value in roll_degrees):
     parser.error('Grip roll must be finite and within [-360, 360] degrees')
+if options.gauntlet_scale is not None and (
+        not math.isfinite(options.gauntlet_scale) or
+        not MIN_GAUNTLET_SCALE <= options.gauntlet_scale <= MAX_GAUNTLET_SCALE):
+    parser.error(
+        f'Gauntlet scale must be finite and within '
+        f'[{MIN_GAUNTLET_SCALE:.3f}, {MAX_GAUNTLET_SCALE:.3f}]')
 grip_rolls = dict(zip(('Left', 'Right'), map(math.radians, roll_degrees)))
 blend_elbows = options.blend_elbows or options.fit_sleeves or options.close_sleeves
 stabilize_sleeves = options.stabilize_sleeves or blend_elbows
@@ -68,19 +80,30 @@ accepted_world = root / 'assets/models/player/runtime/gothic-traveller-lod0.runt
 if sha(world_reference) != sha(accepted_world):
     raise RuntimeError('World reference differs from the admitted rig; reconcile inputs/Blender threading first')
 
-chirality_world = None
-if options.gauntlet_source_hand:
-    chirality_world = output / 'world-chirality-corrected.runtime.glb'
-    sys.argv = ['blender', '--', str(source / 'player-rigged.glb'), str(source / 'player-walking.glb'),
-                str(root / 'assets/textures/player/source'),
-                str(root / 'assets/models/player/source/meshy-2026-08-30-viewmodel-gauntlet/right-gauntlet-5k-stripped.glb'),
-                str(chirality_world), '--gauntlet-source-hand', options.gauntlet_source_hand]
+paired_gauntlet_world = None
+if options.gauntlet_source_hand or options.gauntlet_scale is not None:
+    world_name = 'world-chirality-corrected.runtime.glb' if options.gauntlet_source_hand else \
+        'world-gauntlet-size-candidate.runtime.glb'
+    paired_gauntlet_world = output / world_name
+    paired_arguments = ['blender', '--', str(source / 'player-rigged.glb'), str(source / 'player-walking.glb'),
+                        str(root / 'assets/textures/player/source'),
+                        str(root / 'assets/models/player/source/meshy-2026-08-30-viewmodel-gauntlet/right-gauntlet-5k-stripped.glb'),
+                        str(paired_gauntlet_world)]
+    if options.gauntlet_source_hand:
+        paired_arguments.extend(['--gauntlet-source-hand', options.gauntlet_source_hand])
+    if options.gauntlet_scale is not None:
+        paired_arguments.extend(['--gauntlet-scale', format(options.gauntlet_scale, '.17g')])
+    sys.argv = paired_arguments
     try:
         world = runpy.run_path(str(root / 'tools/process-player-rig-runtime.py'), run_name='__main__')
     finally:
         sys.argv = saved_arguments
 player, rig = world['player'], world['rig']
-calibrated_world = chirality_world
+gauntlet_scale = world['gauntlet_scale']
+if options.gauntlet_scale is not None and not math.isclose(
+        gauntlet_scale, options.gauntlet_scale, rel_tol=0.0, abs_tol=1.0e-12):
+    raise RuntimeError('Paired world gauntlet scale disagrees with the viewmodel request')
+calibrated_world = paired_gauntlet_world
 if correct_grip_roll:
     # Investigation-only paired rig candidate. Keep the accepted world/runtime
     # untouched, and keep Grip origins/axes and gameplay prop transforms fixed.
@@ -239,7 +262,10 @@ bpy.ops.export_scene.gltf(filepath=str(viewmodel_output), export_format='GLB', u
                           export_tangents=True, export_animations=True, export_animation_mode='NLA_TRACKS',
                           export_frame_range=True, export_skins=True, export_morph=False,
                           export_cameras=False, export_lights=False, export_extras=True)
-report = dict(schema=1, role='Viewmodel', sourceWorldSha256=sha(accepted_world),
+report = dict(schema=1, role='Viewmodel',
+              sourceWorldSha256=sha(accepted_world),
+              gauntletScale=gauntlet_scale,
+              gauntletScaleAppliedAbout='AuthoredGripOrigin',
               gauntletSourceHandedness=options.gauntlet_source_hand or 'LegacyLeftClassification',
               gripRollCorrectionRadians=grip_rolls['Left'] if grip_rolls['Left'] == grip_rolls['Right'] else None,
               gripRollRadiansBySide=grip_rolls,

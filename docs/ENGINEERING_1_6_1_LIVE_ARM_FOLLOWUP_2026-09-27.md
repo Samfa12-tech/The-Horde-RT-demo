@@ -91,3 +91,32 @@ capture succeeds. Frozen images still do not certify natural live motion.
 - Explicit look-down torso/legs and nonduplicating visibility remain open.
 - Audio/haptic manual revalidation required: **NO** for these visual-only
   changes; event-time audio/haptic inputs and transport are unchanged.
+
+## Hand-proportion candidate and reproducibility
+
+Both processors expose a bounded `--gauntlet-scale` parameter (default .090,
+allowed .080–.105); no-option exports reproduce the tracked world/view GLB
+hashes exactly. One .099 candidate was generated with Blender 5.2.0 LTS
+`fbe6228777e7`, single-threaded, without changing rolls, weights, UVs or sources:
+
+```powershell
+& 'C:/Program Files/Blender Foundation/Blender 5.2/blender.exe' --background --factory-startup --threads 1 --python tools/process-player-viewmodel-runtime.py -- C:/Dev/tmp/horde-gauntlet-proportion-20260927-a --gauntlet-source-hand Right --grip-roll-degrees 105 145 --blend-elbows --gauntlet-scale .099
+```
+
+Use a **new output directory** to reproduce, never overwrite previous evidence.
+The paired world is `world-grip-calibrated.runtime.glb`, SHA-256
+`baa5b7dc78a180eda94de813c71f890e46a27cc19b1d3122330ba873ec75c23a`;
+viewmodel SHA-256 is
+`6f06d77e754d7e2d9017b84c1204879aba2be302b69c077c5f84578408d5166b`.
+Receipt `sourceWorldSha256` retains its established meaning (tracked source
+authority); `pairedWorldSha256` identifies the candidate world.
+
+Existing offline gauntlet geometry tests pass 6/6. Actual C++ viewmodel admission
+smoke passes against the paired world (semantic/static-skinned/rig agreement).
+The candidate retains 5,532 sleeve and 8,838 gauntlet triangles. Eight native
+RTX portrait checkpoints succeed across `C:/Dev/tmp/horde-arm-followup-native-20260927-a`
+(grips) and `-b` (remaining seven). A mistyped `forward-attack` name in the
+first run was rejected; the existing `player-viewmodel-forward` was used on
+rerun. Native image inspection does not replace phone motion/contact/owner
+proportion checks. These are isolated assets, not a replacement of admitted
+production GLBs or retirement of block arms.

@@ -11,6 +11,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from player_gauntlet_geometry import authored_face_and_uvs, mirror_for_hand
 
 
+DEFAULT_GAUNTLET_SCALE = 0.090
+MIN_GAUNTLET_SCALE = 0.080
+MAX_GAUNTLET_SCALE = 0.105
+
 if "--" not in sys.argv:
     raise RuntimeError(
         "usage: blender --background --python process-player-rig-runtime.py -- idle.glb walking.glb pbr-directory gauntlet.glb output.glb"
@@ -19,7 +23,21 @@ arguments = sys.argv[sys.argv.index("--") + 1:]
 # Omission is historical-export compatibility, not an anatomical judgement.
 # The owner's 2026-09-23 correction identifies the supplied source as Right.
 gauntlet_source_hand = 'Left'
+gauntlet_scale = DEFAULT_GAUNTLET_SCALE
 legacy_gauntlet_export = True
+if '--gauntlet-scale' in arguments:
+    option = arguments.index('--gauntlet-scale')
+    if option + 1 >= len(arguments):
+        raise RuntimeError('Gauntlet scale requires a number')
+    try:
+        gauntlet_scale = float(arguments[option + 1])
+    except ValueError as error:
+        raise RuntimeError('Gauntlet scale must be numeric') from error
+    if not math.isfinite(gauntlet_scale) or not MIN_GAUNTLET_SCALE <= gauntlet_scale <= MAX_GAUNTLET_SCALE:
+        raise RuntimeError(
+            f'Gauntlet scale must be finite and within '
+            f'[{MIN_GAUNTLET_SCALE:.3f}, {MAX_GAUNTLET_SCALE:.3f}]')
+    del arguments[option:option + 2]
 if '--gauntlet-source-hand' in arguments:
     option = arguments.index('--gauntlet-source-hand')
     if option + 1 >= len(arguments) or arguments[option + 1] not in ('Left', 'Right'):
@@ -428,7 +446,6 @@ def create_authored_viewmodel_gauntlet(side):
     if target_y.dot(palm_direction) < 0.0:
         target_x.negate()
         target_y.negate()
-    gauntlet_scale = 0.090
     gauntlet_first = len(vertices)
     for source_point in gauntlet_world_vertices:
         relative = source_point - gauntlet_grip_source
@@ -936,6 +953,8 @@ report = {
     "upAxis": "+Y",
     "forwardAxis": "+Z",
     "origin": "ground-centred within rigging tolerance",
+    "gauntletScale": gauntlet_scale,
+    "gauntletScaleAppliedAbout": "AuthoredGripOrigin",
     "bones": [bone.name for bone in rig.data.bones],
     "gripCorrection": grip_corrections,
     "sourceGloveReferenceVertices": source_glove_reference_vertices,
