@@ -149,3 +149,42 @@ proves missing occlusion nor certifies correct self-shadowing: compare actual
 world/view surfaces and the light/shading paths. No shader was changed and no
 cause is yet demonstrated. Preserve genuine RT visibility and useful failure
 diagnostics; no scalar fake shadows, screen-space fixes or masking geometry.
+
+### Follow-up: demonstrated lighting correction and latest owner feedback
+
+The unoccluded post-fog bay-light colour term was isolated and removed in
+`178b332`. Matched RTX capture geometry is byte-identical, the occluded hand
+back loses the flat yellow floor, and the ordinary torch control remains
+pixel-identical. Both shader backends were regenerated/validated; Shipping
+retains zero diagnostic atomics/no binding22. Push36275529648 and PR36275533059
+pass. [Full A/B evidence](evidence/2026-09-27-yellow-wash/README.md).
+This correction is not yet installed on the phone.
+
+The owner's subsequent test calls the phone candidate quite good and confirms
+swings do not hit the lantern. Keep that as owner-confirmed swing separation.
+New remaining details: low-carry parry contacts the arm; mirror swing penetrates
+torso (lower priority); lantern size; open inner left bicep/armpit in low carry
+while looking down; wrist join in high carry while looking up.
+
+The requested size candidate uses scale **.44 instead of .50 (12% smaller)**.
+This is the existing shared physical prop composition: ring/cage/dielectric
+geometry and authored Flame/Light socket locations scale together in reveal,
+inspection and carry; the GripRing remains anchored to the same hand socket.
+It is not a camera-space shrink or benchmark-only change. Source GLBs, UVs,
+light intensity and existing gameplay pendulum angular calibration are unchanged.
+Performance comparisons must use matching geometry/scale; this owner-requested
+size change is not evidence of an engine optimization.
+
+Fresh Debug player-animation, production-prop asset and actual skinned smoke
+pass3/3. Native high/low captures succeed in
+`C:/Dev/tmp/horde-lantern-size-20260927-a`; the earlier .50 lighting-only images
+provide the size control. Phone size/grasp acceptance remains open; do not
+replace the installed candidate until the next coherent visual pass.
+
+Read-only sleeve inspection identifies open shoulder and wrist contours despite
+existing UV/PBR textures; ordinary backface culling is disabled. The sleeve
+hem follows Arm/ForeArm while the gauntlet cuff follows Hand, so their seam is
+a separate mount/topology issue. This is evidence for targeted investigation,
+not final proof of the exact combined-pose defect. Capture low+maximum-down,
+high+maximum-up and low parry explicitly next. Do not retry rejected all-sleeve
+caps or broaden into an IK/roll/weight rewrite.

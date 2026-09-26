@@ -14,7 +14,10 @@
 namespace horde::gameplay::items
 {
 
-inline constexpr float kClaimedRewardLanternScale = 0.50f;
+// Owner-requested 12% reduction from the .50 presentation. Ring, cage,
+// dielectric geometry and authored Flame/Light sockets share this scale;
+// the gameplay-owned hand Grip remains fixed.
+inline constexpr float kClaimedRewardLanternScale = 0.44f;
 
 inline constexpr float kSwordGripRollRadians = 1.3962634f;
 

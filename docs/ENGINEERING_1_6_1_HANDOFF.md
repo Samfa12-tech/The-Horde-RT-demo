@@ -43,6 +43,16 @@ RTX captures without geometry changes, while the torch control is pixel-identica
 until the next coherent candidate; current shared core lighting fix is pending
 Android acceptance. Full look-down body visibility and all later phases remain.
 
+Lighting fix `178b332` is pushed with green current-source CI. The next small
+candidate sets shared lantern scale .50 -> .44 (12%), preserving GripRing and
+scaled Flame/Light sockets; focused host3/3 and native high/low captures pass.
+It is not on the phone yet. Existing pendulum angular calibration is unchanged;
+size is an owner-requested art change, not a measured optimization. Next add
+exact low-parry, low+look-down and high+look-up diagnostic poses. Read-only
+inspection finds open sleeve shoulder/wrist contours with intact UV/PBR data;
+separate ForeArm sleeve and Hand gauntlet deformation makes a local wrist
+overlap/bridge worth investigating. Rejected global caps remain rejected.
+
 **September 27 implementation/evidence checkpoint:** pushed `ed6e4bb` (default75),
 `bf0334b` (shared sword carry lane), `e706f61` (bounded carry bend), `54493cf`
 (single grip-anchored +10% gauntlet candidate). Current runtime-source CI push

@@ -349,7 +349,7 @@ int main()
         return 1;
     // Neutral carried-lantern control for the owner-reported live slice
     // intersection. Actual body bounds are +/-0.223589 X, [-.975,-.015] Y,
-    // +/-0.255336 Z metres, scaled .5 below the ring's .097 m hinge offset.
+    // +/-0.255336 Z metres, uniformly scaled below the ring's .097 m hinge offset.
     // A blade centre-line inside this cage envelope is unacceptable even if
     // a particular sample happens to lie between individual frame triangles.
     const std::array<std::pair<PlayerCombatAction, float>, 6> carryAttackPhases{{
@@ -375,10 +375,12 @@ int main()
                 {
                     const float distance = .915f * along / 100.0f;
                     const float x = pose.rightHandLocal[0] + blade[0] * distance - pose.leftHandLocal[0];
-                    const float y = pose.rightHandLocal[1] + blade[1] * distance - pose.leftHandLocal[1] + .0485f;
+                    constexpr float lanternScale = items::kClaimedRewardLanternScale;
+                    const float y = pose.rightHandLocal[1] + blade[1] * distance - pose.leftHandLocal[1] + .097f * lanternScale;
                     const float z = pose.rightHandLocal[2] + blade[2] * distance - pose.leftHandLocal[2];
-                    if (!Require(!(std::abs(x) < .111795f && y > -.4875f && y < -.0075f &&
-                                   std::abs(z) < .127668f),
+                    if (!Require(!(std::abs(x) < .223590f * lanternScale &&
+                                   y > -.975f * lanternScale && y < -.015f * lanternScale &&
+                                   std::abs(z) < .255336f * lanternScale),
                                  "complete sword attack must not pass through the neutral carried-lantern cage")) return 1;
                 }
             }
