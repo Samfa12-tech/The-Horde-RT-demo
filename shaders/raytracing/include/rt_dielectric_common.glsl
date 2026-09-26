@@ -314,10 +314,9 @@ vec3 shadeOpaquePrimary(HitInfo h, vec3 rayDirection)
             skyVisibility * skyDiffuse * 0.55),
         kLightSkylight);
     color = mix(color, fogColor, fog);
-    // This close-range haze belongs to the selected local emitter. Keeping the
-    // old unconditional warm term made the lantern-off skylight chamber brown
-    // and also contaminated every authored bay colour.
-    color += localLightColor * 0.16 * clamp(localLightStrength, 0.0, 1.0) * exp(-h.t * 0.24);
+    // Local-emitter surface radiance is already visibility-tested above.
+    // A camera-distance colour floor here would light even a fully occluded
+    // receiver; it is not a participating-medium integration.
     return color;
 }
 

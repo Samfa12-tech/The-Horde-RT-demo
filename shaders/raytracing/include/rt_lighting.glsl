@@ -1178,7 +1178,8 @@ vec3 shadeOpaqueSecondary(HitInfo h, vec3 incoming)
             skyVisibility * skyDiffuse * 0.55),
         kLightSkylight);
     color = mix(color, fogColor, fog);
-    color += localColor * 0.16 * clamp(localStrength, 0.0, 1.0) * exp(-h.t * 0.24);
+    // Match primary receivers: do not add unoccluded local-emitter colour
+    // after the shared visibility-tested surface lighting and fog.
     return color;
 }
 

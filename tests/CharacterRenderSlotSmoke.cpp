@@ -1043,6 +1043,15 @@ int main()
                       primaryDispatch.find("return shadeOpaquePrimary(h, rayDirection);") !=
                           std::string::npos,
                       "primary and refracted opaque hits must share real direct visibility and bounded bounce shading");
+        const auto hasUnoccludedPostFogColour = [](const std::string& shader) {
+            const auto fog = shader.find("color = mix(color, fogColor, fog);");
+            const auto end = shader.find("return color;", fog);
+            return fog == std::string::npos || end == std::string::npos ||
+                shader.substr(fog, end - fog).find("color +=") != std::string::npos;
+        };
+        ok &= Require(!hasUnoccludedPostFogColour(opaquePrimary) &&
+                      !hasUnoccludedPostFogColour(opaqueSecondary),
+                      "opaque receivers must not regain unoccluded local-emitter colour after visibility and fog");
         ok &= Require(raygenSource.find("rayBoxInterval(rayOrigin, rayDirection") != std::string::npos &&
                       raygenSource.find("const float sampleCount = 6.0") != std::string::npos &&
                       raygenSource.find("color = color * lichMist.a + lichMist.rgb") != std::string::npos &&

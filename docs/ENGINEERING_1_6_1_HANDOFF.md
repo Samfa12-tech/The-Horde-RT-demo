@@ -30,6 +30,19 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### Current Phase 3 checkpoint
 
+**Newest owner follow-up:** `fce8b40c...` is quite good; sword swings no longer
+hit the lantern (owner-confirmed). Remaining: low-carry parry hits the arm;
+mirror swing arm penetrates torso (lower priority); reduce carried lantern
+10–15% (lead selected12% candidate); low+look-down exposes inner bicep/armpit;
+high+look-up exposes wrist join. Preserve this direction, with targeted
+combined-pose captures and topology/mount fixes, not another broad arm rewrite.
+The yellow-wash contributor is isolated: unoccluded bay-light colour was added
+after surface shadowing/fog. Its removal restores dark hand backs in matched
+RTX captures without geometry changes, while the torch control is pixel-identical.
+[Evidence](evidence/2026-09-27-yellow-wash/README.md). Phone remains unchanged
+until the next coherent candidate; current shared core lighting fix is pending
+Android acceptance. Full look-down body visibility and all later phases remain.
+
 **September 27 implementation/evidence checkpoint:** pushed `ed6e4bb` (default75),
 `bf0334b` (shared sword carry lane), `e706f61` (bounded carry bend), `54493cf`
 (single grip-anchored +10% gauntlet candidate). Current runtime-source CI push
