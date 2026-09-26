@@ -135,6 +135,38 @@ int main()
                  "parry layer must be continuous across startup/active")) return 1;
 
     PlayerAnimationState state;
+    {
+        PlayerAnimationState carryState;
+        PlayerAnimationInput carryInput;
+        carryInput.heldItemKinematics = items::EvaluateHeldItemKinematics({});
+        carryState.StepFixed(carryInput, 0.0f);
+        if (!Require(carryState.Snapshot().leftIk.preferredElbowFlexionRadians == 0.0f,
+                     "ordinary torch must preserve its existing chain stretch")) return 1;
+        carryInput.carryingRewardLantern = true;
+        carryState.StepFixed(carryInput, 0.0f);
+        const auto neutral = carryState.Snapshot();
+        if (!Require(Near(neutral.leftIk.preferredElbowFlexionRadians, 22.0f * .01745329252f) &&
+                     neutral.leftIk.target == carryInput.heldItemKinematics.leftHandLocal,
+                     "reward carry must reserve bend even at frozen zero-delta evaluation without moving grip")) return 1;
+        carryInput.lanternForwardAngleRadians = .5f;
+        carryInput.lanternStrafeAngleRadians = .4f;
+        carryState.StepFixed(carryInput, 1.0f / 60.0f);
+        const auto moving = carryState.Snapshot();
+        if (!Require(moving.leftIk.preferredElbowFlexionRadians > neutral.leftIk.preferredElbowFlexionRadians &&
+                     moving.leftIk.pole != neutral.leftIk.pole &&
+                     moving.leftIk.target == neutral.leftIk.target &&
+                     moving.leftIk.gripY == neutral.leftIk.gripY && moving.rightIk == neutral.rightIk,
+                     "lantern motion must affect elbow compliance without moving either grip or changing the sword arm")) return 1;
+        carryInput.heldItemKinematics.rightHandLocal[1] += .2f;
+        carryState.StepFixed(carryInput, 1.0f / 60.0f);
+        if (!Require(carryState.Snapshot().leftIk.preferredElbowFlexionRadians > moving.leftIk.preferredElbowFlexionRadians,
+                     "off-hand carry must respond to the authoritative sword lift")) return 1;
+        carryInput.carryingRewardLantern = false;
+        carryState.StepFixed(carryInput, 0.0f);
+        if (!Require(carryState.Snapshot().leftIk.preferredElbowFlexionRadians == 0.0f &&
+                     carryState.Snapshot().leftIk.pole == neutral.leftIk.pole,
+                     "leaving reward carry must clear its bend and pole allowance")) return 1;
+    }
     PlayerAnimationInput input{};
     input.walkAmount = 1.0f;
     input.walkTime = 0.5f;

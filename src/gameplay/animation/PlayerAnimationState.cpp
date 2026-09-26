@@ -116,6 +116,23 @@ void PlayerAnimationState::StepFixed(const PlayerAnimationInput& input,
     // equally down-and-out pole flared elbows beyond the shoulders and made
     // the complete sleeve read as one straight shoulder-to-hand bar.
     snapshot_.leftIk.pole = {{-0.12f, -1.0f, 0.0f}};
+    snapshot_.leftIk.preferredElbowFlexionRadians = 0.0f;
+    if (input.carryingRewardLantern)
+    {
+        // The authored chain is shorter than the held-grip envelope. Stretching
+        // it only to straight-line reach locks the elbow regardless of pole.
+        // Reserve a small bend, responding to existing movement/pendulum state
+        // without feeding the solved arm back into the grip or lantern physics.
+        constexpr float radiansPerDegree = 0.01745329252f;
+        const float gait = snapshot_.locomotionBlend * std::sin(snapshot_.locomotionTime * 6.2f);
+        const float forward = std::clamp(FiniteOr(input.lanternForwardAngleRadians, 0.0f), -1.0f, 1.0f);
+        const float strafe = std::clamp(FiniteOr(input.lanternStrafeAngleRadians, 0.0f), -1.0f, 1.0f);
+        const float swordLift = std::clamp(
+            (FiniteOr(input.heldItemKinematics.rightHandLocal[1], -0.44f) + 0.44f) / 0.4f, -1.0f, 1.0f);
+        snapshot_.leftIk.preferredElbowFlexionRadians =
+            (22.0f + 3.0f * gait + 5.0f * forward + 2.0f * swordLift) * radiansPerDegree;
+        snapshot_.leftIk.pole[0] += 0.10f * strafe;
+    }
     snapshot_.leftIk.gripX = input.heldItemKinematics.leftGripXInView;
     snapshot_.leftIk.gripY = input.heldItemKinematics.leftGripYInView;
     snapshot_.leftIk.gripZ = input.heldItemKinematics.leftGripZInView;

@@ -41,7 +41,7 @@ This mesh sweep is **not** a continuous GPU or phone result. It does not prove
 skinned sleeve/arm separation or parry clearance. Live native RT motion and
 owner acceptance remain open; no production-route switch is authorized by it.
 
-## Lantern-arm stiffness: isolated mechanism, fix under investigation
+## Lantern-arm stiffness: isolated mechanism and candidate
 
 UV-correspondence recovery of the actual captured high-carry skin palette
 measures left elbow flexion .612 degrees, reach fraction .99998595 and axial
@@ -55,6 +55,27 @@ continuity were checked against the uploaded vertices.
 No renewed signed-projection fix, broad sleeve rewrite, grip-roll search or
 weight sweep is justified by this finding. Preserve the secure shared grip
 and independent world/view geometry while testing a bounded carry-pose change.
+
+The candidate adds a gameplay-owned preferred elbow-flexion allowance for the
+reward carry only: 22 degrees at rest, varying by at most 3 degrees with the
+existing gait, 5 with pendulum forward angle and 2 with sword-hand lift. The
+pole also follows bounded pendulum strafe. The actual chain keeps the existing
+1.75 axial-stretch cap; cosine-law reach reserves the requested bend when
+possible. Zero allowance preserves the old denominator exactly. Targets,
+Grip basis, shoulder attachment, signed projection and gameplay lantern
+physics are unchanged. This is modest additional axial stretching of the
+existing rig (1.43103 to 1.45741 at high carry), not a claim of constant-length
+anatomical bones or a repair of unsuitable sleeve topology.
+
+Fresh Debug analytic fixture checks cover overreach at .8/1 m, multiple bend
+requests, the unchanged cap at 2 m and invalid input rejection. Animation
+contracts prove grip invariance, pendulum/sword response and clearing the
+allowance outside reward carry. Both tests pass; rebuilt simulation timing,
+gameplay and actual skinned smoke pass 3/3. Native high/low captures succeed;
+UV correspondence on the new high-carry upload measures 21.99995-degree
+flexion and wrist discontinuity below .0000002 m. An initially mistyped upward
+checkpoint was rejected (exit 2); the corrected `player-viewmodel-upward-slice`
+capture succeeds. Frozen images still do not certify natural live motion.
 
 ## Other requirements
 

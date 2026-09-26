@@ -607,6 +607,56 @@ bool CheckPose(horde::scene::SkinnedMeshAsset& asset,
     return true;
 }
 
+bool CheckCarryAllowance(horde::scene::SkinnedMeshAsset& asset, const FixtureData& fixture)
+{
+    using namespace horde::scene;
+    const auto& arm = fixture.arms[0];
+    SkinnedArmIkTarget left, right;
+    left.pole = right.pole = {{0.0f, -1.0f, 0.0f}};
+    right.target = fixture.arms[1].hand;
+    // Both 0.8 m and 1 m exceed this fixture's .7 m bind reach. At 2 m the
+    // unchanged 1.75x stretch cap wins over preferred flexion and exact reach.
+    for (float distance : {.8f, 1.0f, 2.0f})
+        for (float flexion : {0.0f, .3f, .5f})
+        {
+            left.target = {{arm.shoulder[0] - distance, arm.shoulder[1], arm.shoulder[2]}};
+            left.preferredElbowFlexionRadians = flexion;
+            SkinnedPlayerPose pose;
+            std::string diagnostic;
+            std::vector<TexturedSkinnedRtVertex> vertices;
+            std::vector<SkinnedPbrTangent> tangents;
+            if (!Require(asset.EvaluatePlayerPose(SkinnedClip::Idle, 0.0f, left, right, pose, diagnostic), diagnostic) ||
+                !Require(asset.SkinPlayerPoseUniqueTextured(pose, vertices, tangents, diagnostic), diagnostic)) return false;
+            const Vec3 elbow = Scale(Add(OutputPosition(vertices, arm.rings[2][0]),
+                                         OutputPosition(vertices, arm.rings[2][2])), .5f);
+            const auto& sockets = pose.Sockets();
+            const Vec3 hand{{sockets.leftHand[12], sockets.leftHand[13], sockets.leftHand[14]}};
+            const float upper = Distance(arm.shoulder, elbow), lower = Distance(elbow, hand);
+            const float angle = std::acos(std::clamp(Dot(Normalize(Subtract(elbow, arm.shoulder)),
+                                                        Normalize(Subtract(hand, elbow))), -1.0f, 1.0f));
+            if (!Require(std::abs(upper / kUpperLength - lower / kLowerLength) < .0001f &&
+                         upper / kUpperLength <= 1.7501f,
+                         "carry allowance must retain chain proportions and the existing stretch cap")) return false;
+            if (distance < 1.2f)
+            {
+                if (!Require(Distance(hand, left.target) < .00002f && std::abs(angle - flexion) < .012f,
+                             "overreaching carry fixture must preserve target and requested bend")) return false;
+            }
+            else if (!Require(Distance(hand, arm.shoulder) < 1.225f && angle < .02f,
+                              "maximum stretch must take precedence over the carry allowance")) return false;
+        }
+    for (float invalid : {-0.1f, 0.8f, std::numeric_limits<float>::quiet_NaN()})
+    {
+        left.preferredElbowFlexionRadians = invalid;
+        SkinnedPlayerPose pose;
+        std::string diagnostic;
+        if (!Require(!asset.EvaluatePlayerPose(SkinnedClip::Idle, 0.0f, left, right, pose, diagnostic) &&
+                     diagnostic.find("flexion") != std::string::npos,
+                     "invalid carry allowance must fail with a useful diagnostic")) return false;
+    }
+    return true;
+}
+
 } // namespace
 
 int main(int argc, char** argv)
@@ -729,6 +779,7 @@ int main(int argc, char** argv)
     if (!CheckPose(asset, fixture, kFoldDistance, true)) return 1;
     // Keep an ordinary reachable pose as a control for the same importer/LBS path.
     if (!CheckPose(asset, fixture, 0.50f, false)) return 1;
+    if (!CheckCarryAllowance(asset, fixture)) return 1;
 
     std::cout << "Skinned arm analytic reference passed: bind 0.30/0.40 m, "
                  "folded 0.20 m, mirrored mounts, grip sockets, LBS and topology\n";

@@ -657,6 +657,7 @@ bool PlayerRenderSlot::PreparePose(
                            const HeldItemTransform& handFromGripSocket) {
         horde::scene::SkinnedArmIkTarget result;
         result.pole = source.pole;
+        result.preferredElbowFlexionRadians = source.preferredElbowFlexionRadians;
         result.shoulder = source.shoulder;
         result.shoulderTargetEnabled = false;
         // PresentableTinyRtScene converts the gameplay view frame through the

@@ -80,6 +80,9 @@ struct PlayerAnimationInput
     horde::gameplay::PlayerCombatSnapshot playerCombat{};
     horde::gameplay::items::HeldItemKinematicsState heldItemKinematics{};
     float lanternPoseTarget = 0.0f;
+    bool carryingRewardLantern = false;
+    float lanternForwardAngleRadians = 0.0f;
+    float lanternStrafeAngleRadians = 0.0f;
 };
 
 PlayerLocomotionClip MapPlayerLocomotionClip(float locomotionBlend);

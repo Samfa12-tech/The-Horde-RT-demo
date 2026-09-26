@@ -646,7 +646,10 @@ void GameSimulation::ResolvePlayerAnimation(const float fixedDeltaSeconds)
          walkTime_,
          combatSnapshot_.player,
          heldItemFixedStepState_.kinematics,
-         leftArmWeight},
+         leftArmWeight,
+         interactionState_.heldLightKind == horde::gameplay::interactions::HeldLightKind::RewardLantern,
+         lanternPendulum_.Snapshot().forwardAngleRadians,
+         lanternPendulum_.Snapshot().strafeAngleRadians},
         fixedDeltaSeconds);
 }
 

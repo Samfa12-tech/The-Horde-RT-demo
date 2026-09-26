@@ -1472,6 +1472,9 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
         return false;
     }
     const auto finiteArm = [](const SkinnedArmIkTarget& arm) {
+        if (!std::isfinite(arm.preferredElbowFlexionRadians) ||
+            arm.preferredElbowFlexionRadians < 0.0f ||
+            arm.preferredElbowFlexionRadians > 0.7853981634f) return false;
         for (const float value : arm.target) if (!std::isfinite(value)) return false;
         for (const float value : arm.pole) if (!std::isfinite(value)) return false;
         if (arm.shoulderTargetEnabled)
@@ -1482,7 +1485,7 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
     };
     if (!finiteArm(leftArm) || !finiteArm(rightArm))
     {
-        diagnostic = "Player IK target is not finite.";
+        diagnostic = "Player IK target is not finite or elbow flexion is outside [0, pi/4].";
         return false;
     }
     const std::size_t clipIndex = static_cast<std::size_t>(clipId);
@@ -1608,8 +1611,15 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
         // first-person grip envelope. Bounded uniform chain stretch retains
         // the two-bone solve and reaches gameplay-owned sockets without moving
         // sword/lantern authority into the renderer.
-        const float chainStretch = std::clamp(
-            requestedDistance / (bindUpperLength + bindLowerLength), 1.0f, 1.75f);
+        const float flexion = arm.preferredElbowFlexionRadians;
+        // Preserve the exact old denominator for the default pose. A positive
+        // carry allowance uses cosine-law reach at the requested bend, not a
+        // target offset or a change to the signed two-bone solution below.
+        const float preferredReach = flexion == 0.0f
+            ? bindUpperLength + bindLowerLength
+            : std::sqrt(bindUpperLength * bindUpperLength + bindLowerLength * bindLowerLength +
+                        2.0f * bindUpperLength * bindLowerLength * std::cos(flexion));
+        const float chainStretch = std::clamp(requestedDistance / preferredReach, 1.0f, 1.75f);
         const float upperLength = bindUpperLength * chainStretch;
         const float lowerLength = bindLowerLength * chainStretch;
         const float solvedDistance = std::clamp(requestedDistance,
