@@ -30,6 +30,17 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### Current Phase 3 checkpoint
 
+**Segmented cloth repair implemented, phone verification underway:** candidate
+world `f2c3f62b...` adds 40 existing-edge subdivisions, not panels/cuffs, and
+matches all 278 sleeve boundaries (previously 198 exact plus 80 segmented).
+Normal low/down CPU-upload gap was 32.17 mm; four new native poses now measure
+zero at every boundary. View `6f06d77e...` is byte-identical; protected head,
+near-face and gauntlet attributes remain exact. 28 pure and 8 Blender tests,
+C++ admission, glTF validation and ARM64 build pass. Isolated APK `66de46e6...`
+is installed/pullback-matched on SM-S948B; targeted captures/live validation are
+not yet complete. Preserve normal pitch and owner-accepted wrist mounting.
+[Recipe, exact artifacts and limits](evidence/2026-09-27-segmented-seams/README.md).
+
 **Owner accepts current wrist appearance:** on installed normal-range `c68fa94e...`,
 raised lantern/look-up now looks like a normal cuff seam. Preserve it; no cuff
 underlap/extra geometry or hand retuning is warranted. Separate read-only analysis

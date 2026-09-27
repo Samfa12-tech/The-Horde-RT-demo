@@ -24,6 +24,15 @@ retune the hands on the strength of surface-distance diagnostics alone. This is
 not a blanket acceptance of the separate upper-arm/armpit seam, body presence,
 mirror motion, glass or the whole Phase3 programme.
 
+Subsequent local installation on **SM-S948B**: isolated modelled-viewmodel Debug
+APK `66de46e6a045dacea88864adb153b2d4505bb640c9dbab0111262018e6a31816`
+contains the bounded segmented-cloth repair (world `f2c3f62b...`, unchanged view
+`6f06d77e...`). Installed with preserved app data and pulled back byte-for-byte.
+This initially establishes installation/artifact identity only; fresh phone
+captures and live-motion checks are in progress. It does not transfer the old
+build's owner acceptance to the complete new asset pair. See
+[seam repair evidence](evidence/2026-09-27-segmented-seams/README.md).
+
 Superseded local installation (extreme-look camera policy withdrawn): **SM-S948B**, isolated
 `.debug.viewmodel` APK `210d3bf234ef53e08e80fbef0c7574e37c6f9eaf6335cca7310751eff583b898`,
 built on branch checkpoint `bda5c2c` with the deeper camera and upper-torso

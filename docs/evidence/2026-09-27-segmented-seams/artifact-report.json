@@ -1,0 +1,292 @@
+{
+  "hashes": {
+    "C:\\Dev\\tmp\\horde-upper-torso-20260927-a\\world-seam-reconciled.runtime.glb": "58c8033850d9783c95c04e4040e015d1492d92437a6407642609633cd5bfa31b",
+    "C:\\Dev\\tmp\\horde-segmented-seams-20260927-e\\world-seam-reconciled.runtime.glb": "f2c3f62b2696c4630309b1d0b0ecb366151054fb48f7c0c6bcc6956980ff81eb",
+    "C:\\Dev\\tmp\\horde-upper-torso-20260927-a\\gothic-traveller-viewmodel.runtime.glb": "6f06d77e754d7e2d9017b84c1204879aba2be302b69c077c5f84578408d5166b",
+    "C:\\Dev\\tmp\\horde-segmented-seams-20260927-e\\gothic-traveller-viewmodel.runtime.glb": "6f06d77e754d7e2d9017b84c1204879aba2be302b69c077c5f84578408d5166b"
+  },
+  "viewmodelByteIdentical": true,
+  "worldStructureIdentical": {
+    "nodes": true,
+    "skins": true,
+    "animations": true,
+    "materials": true,
+    "textures": true,
+    "images": true
+  },
+  "primitives": {
+    "BodyPrimaryVisible": {
+      "vertices": [
+        4630,
+        4630
+      ],
+      "triangles": [
+        5532,
+        5532
+      ],
+      "exactFullAttributeTriangles": 5508,
+      "samePositionTriangles": 5532,
+      "positionTrianglesRemovedAdded": [
+        0,
+        0
+      ],
+      "unchangedPositionTriangleAttributes": {
+        "NORMAL": {
+          "exactTriangles": 5528,
+          "changedTriangles": 4,
+          "changedCorners": 4,
+          "maxComponentDelta": 9.854137897491455e-05,
+          "maxVectorDelta": 9.926357835229546e-05
+        },
+        "TANGENT": {
+          "exactTriangles": 5527,
+          "changedTriangles": 5,
+          "changedCorners": 5,
+          "maxComponentDelta": 0.00010000169277191162,
+          "maxVectorDelta": 0.00014138160490032795
+        },
+        "TEXCOORD_0": {
+          "exactTriangles": 5532,
+          "changedTriangles": 0,
+          "changedCorners": 0,
+          "maxComponentDelta": 0.0,
+          "maxVectorDelta": 0.0
+        },
+        "JOINTS_0": {
+          "exactTriangles": 5514,
+          "changedTriangles": 18,
+          "changedCorners": 20,
+          "maxComponentDelta": 23.0,
+          "maxVectorDelta": 23.021728866442675
+        },
+        "WEIGHTS_0": {
+          "exactTriangles": 5514,
+          "changedTriangles": 18,
+          "changedCorners": 20,
+          "maxComponentDelta": 0.47852158546447754,
+          "maxVectorDelta": 0.6767317160521402
+        }
+      }
+    },
+    "BodyRemainderPrimaryVisible": {
+      "vertices": [
+        16084,
+        16124
+      ],
+      "triangles": [
+        11592,
+        11632
+      ],
+      "exactFullAttributeTriangles": 11517,
+      "samePositionTriangles": 11552,
+      "positionTrianglesRemovedAdded": [
+        40,
+        80
+      ],
+      "unchangedPositionTriangleAttributes": {
+        "NORMAL": {
+          "exactTriangles": 11531,
+          "changedTriangles": 21,
+          "changedCorners": 25,
+          "maxComponentDelta": 9.997840970754623e-05,
+          "maxVectorDelta": 9.998775936695173e-05
+        },
+        "TANGENT": {
+          "exactTriangles": 11531,
+          "changedTriangles": 21,
+          "changedCorners": 22,
+          "maxComponentDelta": 0.00010001659393310547,
+          "maxVectorDelta": 0.00014140267675404947
+        },
+        "TEXCOORD_0": {
+          "exactTriangles": 11552,
+          "changedTriangles": 0,
+          "changedCorners": 0,
+          "maxComponentDelta": 0.0,
+          "maxVectorDelta": 0.0
+        },
+        "JOINTS_0": {
+          "exactTriangles": 11544,
+          "changedTriangles": 8,
+          "changedCorners": 8,
+          "maxComponentDelta": 21.0,
+          "maxVectorDelta": 24.939927826679853
+        },
+        "WEIGHTS_0": {
+          "exactTriangles": 11544,
+          "changedTriangles": 8,
+          "changedCorners": 8,
+          "maxComponentDelta": 0.136644184589386,
+          "maxVectorDelta": 0.18256792516312478
+        }
+      },
+      "insertedWorldPositions": {
+        "count": 40,
+        "matchingViewSleevePositions": 40,
+        "matchingViewSleeveSkinWeights": 40,
+        "oldEdgeMidpointAt6dp": 39,
+        "interiorOldEdgeSplitSegments": 40,
+        "maxDistanceFromOldEdgeMetres": 1.1506031247664932e-07
+      }
+    },
+    "GauntletPrimaryVisible": {
+      "vertices": [
+        11220,
+        11220
+      ],
+      "triangles": [
+        8838,
+        8838
+      ],
+      "exactFullAttributeTriangles": 8838,
+      "samePositionTriangles": 8838,
+      "positionTrianglesRemovedAdded": [
+        0,
+        0
+      ],
+      "unchangedPositionTriangleAttributes": {
+        "NORMAL": {
+          "exactTriangles": 8838,
+          "changedTriangles": 0,
+          "changedCorners": 0,
+          "maxComponentDelta": 0.0,
+          "maxVectorDelta": 0.0
+        },
+        "TANGENT": {
+          "exactTriangles": 8838,
+          "changedTriangles": 0,
+          "changedCorners": 0,
+          "maxComponentDelta": 0.0,
+          "maxVectorDelta": 0.0
+        },
+        "TEXCOORD_0": {
+          "exactTriangles": 8838,
+          "changedTriangles": 0,
+          "changedCorners": 0,
+          "maxComponentDelta": 0.0,
+          "maxVectorDelta": 0.0
+        },
+        "JOINTS_0": {
+          "exactTriangles": 8838,
+          "changedTriangles": 0,
+          "changedCorners": 0,
+          "maxComponentDelta": 0.0,
+          "maxVectorDelta": 0.0
+        },
+        "WEIGHTS_0": {
+          "exactTriangles": 8838,
+          "changedTriangles": 0,
+          "changedCorners": 0,
+          "maxComponentDelta": 0.0,
+          "maxVectorDelta": 0.0
+        }
+      }
+    },
+    "HeadPrimaryMasked": {
+      "vertices": [
+        1777,
+        1777
+      ],
+      "triangles": [
+        1345,
+        1345
+      ],
+      "exactFullAttributeTriangles": 1345,
+      "samePositionTriangles": 1345,
+      "positionTrianglesRemovedAdded": [
+        0,
+        0
+      ],
+      "unchangedPositionTriangleAttributes": {
+        "NORMAL": {
+          "exactTriangles": 1345,
+          "changedTriangles": 0,
+          "changedCorners": 0,
+          "maxComponentDelta": 0.0,
+          "maxVectorDelta": 0.0
+        },
+        "TANGENT": {
+          "exactTriangles": 1345,
+          "changedTriangles": 0,
+          "changedCorners": 0,
+          "maxComponentDelta": 0.0,
+          "maxVectorDelta": 0.0
+        },
+        "TEXCOORD_0": {
+          "exactTriangles": 1345,
+          "changedTriangles": 0,
+          "changedCorners": 0,
+          "maxComponentDelta": 0.0,
+          "maxVectorDelta": 0.0
+        },
+        "JOINTS_0": {
+          "exactTriangles": 1345,
+          "changedTriangles": 0,
+          "changedCorners": 0,
+          "maxComponentDelta": 0.0,
+          "maxVectorDelta": 0.0
+        },
+        "WEIGHTS_0": {
+          "exactTriangles": 1345,
+          "changedTriangles": 0,
+          "changedCorners": 0,
+          "maxComponentDelta": 0.0,
+          "maxVectorDelta": 0.0
+        }
+      }
+    },
+    "NearFacePrimaryMasked": {
+      "vertices": [
+        553,
+        553
+      ],
+      "triangles": [
+        468,
+        468
+      ],
+      "exactFullAttributeTriangles": 468,
+      "samePositionTriangles": 468,
+      "positionTrianglesRemovedAdded": [
+        0,
+        0
+      ],
+      "unchangedPositionTriangleAttributes": {
+        "NORMAL": {
+          "exactTriangles": 468,
+          "changedTriangles": 0,
+          "changedCorners": 0,
+          "maxComponentDelta": 0.0,
+          "maxVectorDelta": 0.0
+        },
+        "TANGENT": {
+          "exactTriangles": 468,
+          "changedTriangles": 0,
+          "changedCorners": 0,
+          "maxComponentDelta": 0.0,
+          "maxVectorDelta": 0.0
+        },
+        "TEXCOORD_0": {
+          "exactTriangles": 468,
+          "changedTriangles": 0,
+          "changedCorners": 0,
+          "maxComponentDelta": 0.0,
+          "maxVectorDelta": 0.0
+        },
+        "JOINTS_0": {
+          "exactTriangles": 468,
+          "changedTriangles": 0,
+          "changedCorners": 0,
+          "maxComponentDelta": 0.0,
+          "maxVectorDelta": 0.0
+        },
+        "WEIGHTS_0": {
+          "exactTriangles": 468,
+          "changedTriangles": 0,
+          "changedCorners": 0,
+          "maxComponentDelta": 0.0,
+          "maxVectorDelta": 0.0
+        }
+      }
+    }
+  }
+}

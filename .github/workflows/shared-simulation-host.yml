@@ -51,6 +51,9 @@ jobs:
       - name: Check upper torso partition preserves the head mask
         run: python3 -m unittest discover -s tests -p test_player_body_partition.py -v
 
+      - name: Check bounded segmented cloth seam plans
+        run: python3 -m unittest discover -s tests -p test_player_segmented_seams.py -v
+
       - name: Check Gradle APK artifact resolution
         shell: pwsh
         run: ./tools/test-resolve-android-apk.ps1

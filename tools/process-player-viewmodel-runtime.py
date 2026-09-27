@@ -20,6 +20,8 @@ Investigation-only switches (not admission or production defaults):
     with a paired WorldBody manifest; preserve the dedicated arm extraction.
   --retain-upper-torso: keep the old near-face torso cloth in that remainder,
     preserving the existing head mask and all geometry/weights.
+  --reconcile-segmented-seams: split proven coarse world cloth edges at the
+    unchanged view sleeve midpoints before exact boundary-weight transfer.
 These retain gameplay sockets/prop authority. None establishes visual acceptance;
 the candidates still require anatomical, surface and live-motion validation.
 """
@@ -46,6 +48,7 @@ parser.add_argument('--close-sleeves', action='store_true')
 parser.add_argument('--reconcile-sleeve-seams', action='store_true')
 parser.add_argument('--body-remainder', action='store_true')
 parser.add_argument('--retain-upper-torso', action='store_true')
+parser.add_argument('--reconcile-segmented-seams', action='store_true')
 parser.add_argument('--stabilize-sleeves', action='store_true')
 parser.add_argument('--gauntlet-source-hand', choices=('Left', 'Right'),
                     help='Explicit anatomical source handedness; omission reproduces the historical export')
@@ -59,6 +62,8 @@ if options.body_remainder and not options.reconcile_sleeve_seams:
     parser.error('Body remainder requires the demonstrated shared-seam reconciliation')
 if options.retain_upper_torso and not options.body_remainder:
     parser.error('Upper torso retention requires the explicit body remainder')
+if options.reconcile_segmented_seams and not options.reconcile_sleeve_seams:
+    parser.error('Segmented seam repair requires exact sleeve seam reconciliation')
 if options.reconcile_sleeve_seams and (options.fit_sleeves or options.close_sleeves):
     parser.error('Seam reconciliation requires unchanged source positions/topology, not fitted or capped sleeves')
 roll_degrees = options.grip_roll_degrees or ([180.0, 180.0] if options.correct_grip_roll else [0.0, 0.0])
@@ -286,6 +291,7 @@ bpy.ops.export_scene.gltf(filepath=str(viewmodel_output), export_format='GLB', u
                           export_frame_range=True, export_skins=True, export_morph=False,
                           export_cameras=False, export_lights=False, export_extras=True)
 seam_reconciliation = {}
+segmented_seam_reconciliation = {}
 if options.reconcile_sleeve_seams:
     from player_sleeve_seams import plan_sleeve_seam_weight_transfers
 
@@ -308,6 +314,38 @@ if options.reconcile_sleeve_seams:
 
     view_input = seam_input(view_mesh)
     world_input = seam_input(seam_world_mesh)
+    if options.reconcile_segmented_seams:
+        from player_sleeve_seams import plan_segmented_sleeve_seam_splits
+        from player_segmented_seams_blender import split_segmented_cloth_seams
+
+        # Imported authoring vertices are centimetre-space. The planner's
+        # physical tolerances are metres, so evaluate both meshes through the
+        # same object transform; never enlarge a tolerance to mask unit errors.
+        def metric_positions(mesh):
+            return [tuple(player.matrix_world @ vertex.co) for vertex in mesh.vertices]
+
+        world_metric, view_metric = metric_positions(seam_world_mesh), metric_positions(view_mesh)
+        split_plan, split_stats = plan_segmented_sleeve_seam_splits(
+            world_metric, world_input[1], view_metric, view_input[1])
+        print('SEGMENTED_SEAM_PLAN ' + json.dumps(split_stats))
+        if split_stats['coveredViewBoundaryEdges'] != split_stats['unmatchedViewBoundaryEdges']:
+            (output / 'segmented-seam-plan-failure.json').write_text(json.dumps(dict(
+                stats=split_stats, coordinateSpace='Blender world metres',
+                worldPositions=world_metric, worldFaces=world_input[1],
+                viewPositions=view_metric, viewFaces=view_input[1])), encoding='utf-8')
+            raise RuntimeError('Some unmatched sleeve boundaries lack proven coarse cloth coverage')
+        for plan in split_plan:
+            for point in plan['points']:
+                # Copy the exact canonical authoring vertex, avoiding an
+                # inverse-transform round trip before subsequent exact matching.
+                point['position'] = view_input[0][point['viewVertex']]
+        segmented_seam_reconciliation = dict(plan=split_stats,
+            applied=split_segmented_cloth_seams(seam_world_mesh, split_plan))
+        world_input = seam_input(seam_world_mesh)
+        _, remaining = plan_segmented_sleeve_seam_splits(
+            metric_positions(seam_world_mesh), world_input[1], view_metric, view_input[1])
+        if remaining['unmatchedViewBoundaryEdges'] != 0:
+            raise RuntimeError('Segmented seam repair left unmatched sleeve boundaries')
     source_weight_sums = {
         role: {'minimum': min(sum(weights.values()) for weights in data[2] if weights),
                'maximum': max(sum(weights.values()) for weights in data[2] if weights)}
@@ -382,6 +420,8 @@ report = dict(schema=1, role='Viewmodel',
               sleeveEnvelopeFit=sleeve_fit,
               sleeveClosure=sleeve_closure,
               sleeveSeamReconciliation=seam_reconciliation,
+              **({'segmentedSeamReconciliation': segmented_seam_reconciliation}
+                 if options.reconcile_segmented_seams else {}),
               **({'bodyPrimaryPartition': world['report']['bodyPrimaryPartition']}
                  if options.retain_upper_torso else {}),
               runtime=viewmodel_output.name, runtimeSha256=sha(viewmodel_output),

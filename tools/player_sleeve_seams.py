@@ -1,7 +1,7 @@
-"""Plan exact bind-boundary skin-weight transfers for player sleeve seams.
+"""Plan bind-boundary subdivisions and skin-weight transfers for sleeve seams.
 
 The helper is intentionally data-only: it identifies already-coincident seam
-vertices and returns canonical view-sleeve weights without editing geometry.
+vertices and returns explicit split/weight plans without mutating input data.
 """
 
 from collections import defaultdict
@@ -84,6 +84,109 @@ def _validated_faces(faces, vertex_count: int, label: str):
 
 def _edge_key(first, second):
     return tuple(sorted((first, second)))
+
+
+def plan_segmented_sleeve_seam_splits(world_positions, world_faces,
+                                     view_positions, view_faces):
+    """Plan coarse cloth-edge splits at existing canonical sleeve vertices.
+
+    Only a complete, oppositely wound sleeve boundary backed by the world's
+    same BodyPrimaryVisible edges can authorize a split. No proximity welds,
+    new surface panels, head/gauntlet edits, or fitted weight fields are planned.
+    Apply the existing exact weight-transfer planner AFTER splitting topology.
+    """
+    world_keys = _positions_and_keys(world_positions, 'world')
+    view_keys = _positions_and_keys(view_positions, 'view')
+    world_triangles = _validated_faces(world_faces, len(world_positions), 'world')
+    view_triangles = _validated_faces(view_faces, len(view_positions), 'view')
+    world_edges, view_edges = defaultdict(list), defaultdict(list)
+    world_vertex_materials = defaultdict(set)
+    for face_index, (material, indices) in enumerate(world_triangles):
+        for index in indices:
+            world_vertex_materials[index].add(material)
+        for a, b in zip(indices, indices[1:] + indices[:1]):
+            if world_keys[a] == world_keys[b]:
+                raise ValueError('world has a degenerate keyed edge')
+            world_edges[_edge_key(world_keys[a], world_keys[b])].append(
+                (material, face_index, a, b))
+    for material, indices in view_triangles:
+        if material != _SLEEVE:
+            continue
+        for a, b in zip(indices, indices[1:] + indices[:1]):
+            if view_keys[a] == view_keys[b]:
+                raise ValueError('view sleeve has a degenerate keyed edge')
+            view_edges[_edge_key(view_keys[a], view_keys[b])].append((a, b))
+    if any(len(records) > 2 for records in view_edges.values()):
+        raise ValueError('view sleeve has a nonmanifold edge')
+    boundaries = {}
+    for edge, records in view_edges.items():
+        if len(records) != 1:
+            continue
+        materials = {record[0] for record in world_edges.get(edge, ())}
+        if 'BodyPrimaryVisible' in materials and not (_WORLD_CONTINUATION_MATERIALS & materials):
+            boundaries[edge] = records[0]
+    tolerance = 2 * POSITION_QUANTUM_METRES
+    plans, covered_edges = [], set()
+    for edge, records in sorted(world_edges.items()):
+        if len(records) != 1 or records[0][0] not in _WORLD_CONTINUATION_MATERIALS:
+            continue
+        material, face_index, a_index, b_index = records[0]
+        a, b = world_positions[a_index], world_positions[b_index]
+        delta = tuple(y-x for x,y in zip(a,b))
+        length_squared = sum(value*value for value in delta)
+        if length_squared <= tolerance*tolerance:
+            continue
+        length = math.sqrt(length_squared)
+        intervals, points, matches = [], {}, []
+        for view_edge, (va, vb) in boundaries.items():
+            endpoints = (view_positions[va], view_positions[vb])
+            if any(value < min(a[axis], b[axis])-tolerance or
+                   value > max(a[axis], b[axis])+tolerance
+                   for point in endpoints for axis,value in enumerate(point)):
+                continue
+            parameters = []
+            for point in endpoints:
+                t = sum((value-origin)*direction for value,origin,direction in zip(point,a,delta))/length_squared
+                distance_squared = sum((value-(origin+t*direction))**2
+                                       for value,origin,direction in zip(point,a,delta))
+                if distance_squared > tolerance*tolerance:
+                    break
+                parameters.append(t)
+            if len(parameters) != 2:
+                continue
+            if parameters[1] >= parameters[0]:
+                raise ValueError('segmented sleeve and retained cloth edges have inconsistent winding')
+            lo, hi = max(0., parameters[1]), min(1., parameters[0])
+            if hi <= lo:
+                continue
+            intervals.append((lo, hi))
+            matches.append(view_edge)
+            for index,t in zip((va,vb),parameters):
+                if view_keys[index] not in edge and tolerance/length < t < 1-tolerance/length:
+                    points[view_keys[index]] = (t, index)
+        if not points:
+            continue
+        through = 0.
+        for lo,hi in sorted(intervals):
+            if lo > through+tolerance/length:
+                raise ValueError('segmented sleeve only partially covers the retained cloth edge')
+            through = max(through,hi)
+        if through < 1-tolerance/length:
+            raise ValueError('segmented sleeve only partially covers the retained cloth edge')
+        if any(not world_vertex_materials[index] <= _WORLD_TARGET_MATERIALS
+               for index in (a_index,b_index)):
+            raise ValueError('segmented cloth edge shares protected head or gauntlet vertices')
+        if covered_edges.intersection(matches):
+            raise ValueError('segmented sleeve boundary ambiguously covers multiple cloth edges')
+        covered_edges.update(matches)
+        plans.append(dict(worldEdge=(a_index,b_index), worldFace=face_index,
+            material=material, points=[dict(fraction=t, viewVertex=index,
+                position=tuple(view_positions[index])) for t,index in sorted(points.values())]))
+    stats = dict(unmatchedViewBoundaryEdges=len(boundaries),
+                 coveredViewBoundaryEdges=len(covered_edges),
+                 coarseWorldEdges=len(plans),
+                 insertedWorldVertices=sum(len(plan['points']) for plan in plans))
+    return plans, stats
 
 
 def plan_sleeve_seam_weight_transfers(

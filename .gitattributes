@@ -40,3 +40,4 @@ docs/evidence/2026-09-27-player-seam-repair/**/*.obj filter=lfs diff=lfs merge=l
 docs/evidence/2026-09-27-deep-body-look/** -text whitespace=cr-at-eol
 docs/evidence/2026-09-27-upper-torso/** -text whitespace=cr-at-eol
 docs/evidence/2026-09-27-normal-look/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-27-segmented-seams/** -text whitespace=cr-at-eol
