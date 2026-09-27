@@ -30,7 +30,14 @@ Prepared corrected APK:
 `C:/Dev/tmp/horde-normal-look-android-20260927-a/HordeLanternRT-1.6.1-viewmodel-debug-arm64.apk`,
 SHA256 `c68fa94e75be1827dd8a1fb87ae83ab00f77ebef2b215ea8dd7b9aaad1ea3263`.
 Actual packaged Mobile pipeline/compute SPIR-V containment/validation passes.
-Installation/device results must be recorded separately before calling them passed.
+It is now installed on SM-S948B with exact pulled APK hash. Focused run125552
+passes four normal-range captures141/145/146/144, strict ASTC, actual RT
+presentation, dedicated ownership and Home/resume at75%. It is capture/lifecycle
+evidence only: no route replay or performance sample was requested. Transport
+overflows0/0/8/1 remain an open glass gate. A separate45-second normal-range live
+sequence now covers walking/look, parries/swings and raise/lower transitions;
+see [exact evidence and limits](evidence/2026-09-27-normal-look/phone/README.md).
+It does not establish all-pose surface/body visibility or owner acceptance.
 
 Historical [upper-torso phone evidence](evidence/2026-09-27-upper-torso/phone/README.md)
 remains labelled as an extreme-camera investigation. Its glass failures remain

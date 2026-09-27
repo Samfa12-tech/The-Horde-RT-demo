@@ -2,7 +2,22 @@
 
 Last updated: 2026-09-27
 
-Newest local installation (extreme-look camera policy now superseded): **SM-S948B**, isolated
+Newest local installation: **SM-S948B**, isolated normal-range Debug APK
+`c68fa94e75be1827dd8a1fb87ae83ab00f77ebef2b215ea8dd7b9aaad1ea3263`,
+runtime source equivalent to `35ba2f9`, world58c80338/view6f06d77e. Restores the
+established[-.32,.28] gameplay camera range; no extreme147/148 fixture remains.
+Explicit `install -r -t` and pulled APK SHA256 match pass. Capture-only run125552
+passes normal141/145/146/144 poses, strict ASTC, honest RT presentation,
+nonduplicating ownership, zero reported socket error and Home/resume at75%.
+This run deliberately has no route replay or performance sample. Glass transport
+overflows are0/0/8/1 (shadow0 throughout), so glass acceptance stays open.
+Separate45.036s live recording shows walking/look, parry/swing and high/low
+transitions inside the restored range. Sampled1Hz/8Hz review found no obvious
+crossing, but dark surfaces/UI and a slow-charging toast limit seam inspection.
+No new owner acceptance or full body/seam acceptance is inferred. The app is
+Home-backgrounded. [Exact normal-range evidence](evidence/2026-09-27-normal-look/phone/README.md).
+
+Superseded local installation (extreme-look camera policy withdrawn): **SM-S948B**, isolated
 `.debug.viewmodel` APK `210d3bf234ef53e08e80fbef0c7574e37c6f9eaf6335cca7310751eff583b898`,
 built on branch checkpoint `bda5c2c` with the deeper camera and upper-torso
 candidate world `58c80338...` / unchanged view `6f06d77e...`. Explicit

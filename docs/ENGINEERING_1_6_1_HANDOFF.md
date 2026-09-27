@@ -40,8 +40,15 @@ The `-4.0` extension and checkpoints147/148 are withdrawn with a forward source
 change; historical study evidence remains labelled, not erased. The upper-torso
 partition/seam repairs and liked anatomical mounting are retained. Six focused
 host tests, ARM64 build and four normal-range native captures pass; restored
-shader artifacts match66f1149 exactly. Prepared corrected APK `c68fa94e...` awaits
-its separately recorded device checks. See [normal-look acceptance](ENGINEERING_1_6_1_NORMAL_LOOK_ACCEPTANCE_2026-09-27.md).
+shader artifacts match66f1149 exactly. Source35ba2f9 is pushed/remote-verified.
+Corrected APK `c68fa94e...` is installed and hash-matched on SM-S948B; run125552
+passes four normal-range captures plus Home/resume at75%. It is not a route replay
+or performance run; high/up8 and low/parry1 glass overflows remain. A separate
+45-second live normal-range sequence is retained: actual movement/look,
+parry/swing and raise/lower transitions; no obvious crossing in sampled review,
+but dark surfaces/UI/toast limit surface inspection. It is not final seam/body,
+mirror or owner acceptance. Phone remains corrected `c68fa94e...`, Home-backgrounded.
+Source35ba2f9 is green on branch36289915624 /PR36289917713. See [normal-look acceptance](ENGINEERING_1_6_1_NORMAL_LOOK_ACCEPTANCE_2026-09-27.md).
 
 **Upper-torso partition repaired in an opt-in candidate:** `--retain-upper-torso`
 retains the old1116-triangle shoulder/torso band, while repartitioning the old
