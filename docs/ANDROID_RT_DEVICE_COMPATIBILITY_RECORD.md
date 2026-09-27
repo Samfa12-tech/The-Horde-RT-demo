@@ -38,6 +38,13 @@ Owner armpit and body/mirror acceptance remain open; no blanket acceptance is
 transferred from the earlier APK. Phone is Home-backgrounded. See
 [seam repair evidence](evidence/2026-09-27-segmented-seams/README.md).
 
+Owner follow-up on installed `66de46e6...` (SM-S948B): "i checked the inner bicep
+with lowered lantern and it looks correct now". The lowered-lantern inner-bicep/
+armpit appearance is accepted for this candidate. Preserve this repair and the
+already accepted wrist direction; do not reopen grip/roll/weight tuning. This
+does not close normal look-down torso/waist/legs presence, mirror/live body
+visibility, glass, performance or the complete Phase 3/release gates.
+
 Superseded local installation (extreme-look camera policy withdrawn): **SM-S948B**, isolated
 `.debug.viewmodel` APK `210d3bf234ef53e08e80fbef0c7574e37c6f9eaf6335cca7310751eff583b898`,
 built on branch checkpoint `bda5c2c` with the deeper camera and upper-torso

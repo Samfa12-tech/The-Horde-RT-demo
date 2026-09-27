@@ -45,11 +45,13 @@ new seam opening was seen in those samples. Dark cloth and touch controls limit
 fine surface inspection; this is not every-frame/every-pose or owner acceptance.
 The recording has no slow-charging toast obscuring the previous run's view.
 
-The body-presence/mirror gate is not proven by this footage. A focused owner
-question is pending for low-lantern, normal-look-down, walking/turning armpit
-appearance. Prior wrist acceptance remains recorded for the previous APK; its
+The body-presence/mirror gate is not proven by this footage. The owner subsequently
+checked the inner bicep with lowered lantern and reports it "looks correct now".
+Record the armpit/inner-bicep appearance as accepted on this installed candidate.
+Prior wrist acceptance remains recorded for the previous APK; its
 viewmodel/cuff and mounting are unchanged, without claiming acceptance of all
-new world-body geometry. Do not retire the production fallback yet.
+new world-body geometry. Preserve this accepted arm direction. Do not retire the
+production fallback before the remaining player acceptance gates.
 
 The phone remains on this APK and Home-backgrounded after recording. No system
 settings, render quality or lighting were changed. This does not certify S24/S25.

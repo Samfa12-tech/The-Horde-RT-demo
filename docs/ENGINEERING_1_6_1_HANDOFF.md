@@ -30,7 +30,7 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### Current Phase 3 checkpoint
 
-**Segmented cloth repair implemented and phone-tested, owner armpit gate open:** candidate
+**Segmented cloth repair implemented, phone-tested and owner armpit-accepted:** candidate
 world `f2c3f62b...` adds 40 existing-edge subdivisions, not panels/cuffs, and
 matches all 278 sleeve boundaries (previously 198 exact plus 80 segmented).
 Normal low/down CPU-upload gap was 32.17 mm; four new native poses now measure
@@ -40,7 +40,9 @@ C++ admission, glTF validation and ARM64 build pass. Isolated APK `66de46e6...`
 is installed/pullback-matched on SM-S948B. Run134811 passes four captures plus
 Home/resume at75%; separate44.94s footage covers movement/look, parry/swing and
 high/low transitions. No obvious crossing/seam opening in sampled review, with
-dark cloth/UI limits. A narrow owner armpit check is pending. Body presence and
+dark cloth/UI limits. The owner has now checked the lowered-lantern inner bicep
+and says it looks correct; close that appearance issue on installed66de46e6.
+Do not reopen sleeve/cuff/grip tuning. Body presence and
 mirror/live acceptance remain open; do not promote the production route yet.
 Preserve normal pitch and owner-accepted wrist mounting. Source6dd9c1f is pushed
 and passes branch36292515083 /PR36292517668 CI. Phone remains66de46e6 and Home.
