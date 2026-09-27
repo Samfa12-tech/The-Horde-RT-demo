@@ -14,6 +14,8 @@ Investigation-only switches (not admission or production defaults):
   --blend-elbows: test a continuous elbow-centred sleeve weight field (implies stabilization).
   --fit-sleeves: fit the retained cloth surface to a bounded anatomical arm envelope.
   --close-sleeves: close the authored garment openings with real offline cloth panels.
+  --reconcile-sleeve-seams: copy accepted view weights to coincident world cloth
+    seam vertices, retaining geometry, UVs and separate world/view ownership.
 These retain gameplay sockets/prop authority. None establishes visual acceptance;
 the candidates still require anatomical, surface and live-motion validation.
 """
@@ -37,6 +39,7 @@ parser.add_argument('output', type=Path)
 parser.add_argument('--blend-elbows', action='store_true')
 parser.add_argument('--fit-sleeves', action='store_true')
 parser.add_argument('--close-sleeves', action='store_true')
+parser.add_argument('--reconcile-sleeve-seams', action='store_true')
 parser.add_argument('--stabilize-sleeves', action='store_true')
 parser.add_argument('--gauntlet-source-hand', choices=('Left', 'Right'),
                     help='Explicit anatomical source handedness; omission reproduces the historical export')
@@ -46,6 +49,8 @@ roll_options = parser.add_mutually_exclusive_group()
 roll_options.add_argument('--correct-grip-roll', action='store_true')
 roll_options.add_argument('--grip-roll-degrees', nargs=2, type=float, metavar=('LEFT', 'RIGHT'))
 options = parser.parse_args(arguments)
+if options.reconcile_sleeve_seams and (options.fit_sleeves or options.close_sleeves):
+    parser.error('Seam reconciliation requires unchanged source positions/topology, not fitted or capped sleeves')
 roll_degrees = options.grip_roll_degrees or ([180.0, 180.0] if options.correct_grip_roll else [0.0, 0.0])
 if any(not math.isfinite(value) or abs(value) > 360.0 for value in roll_degrees):
     parser.error('Grip roll must be finite and within [-360, 360] degrees')
@@ -121,6 +126,10 @@ if correct_grip_roll:
                               export_tangents=True, export_animations=True, export_animation_mode='NLA_TRACKS',
                               export_frame_range=True, export_skins=True, export_morph=False,
                               export_cameras=False, export_lights=False, export_extras=True)
+# Retain the original mesh, without creating another object or datablock that
+# could change default export naming. The viewmodel below always edits a copy.
+seam_world_mesh = player.data if options.reconcile_sleeve_seams else None
+seam_world_name = player.name
 parts = [('BodyPrimaryVisible', 'ViewmodelSleeves'), ('GauntletPrimaryVisible', 'ViewmodelGauntlets')]
 old_names = [material.name for material in player.data.materials]
 kept_indices = [old_names.index(name) for name, _ in parts]
@@ -262,6 +271,71 @@ bpy.ops.export_scene.gltf(filepath=str(viewmodel_output), export_format='GLB', u
                           export_tangents=True, export_animations=True, export_animation_mode='NLA_TRACKS',
                           export_frame_range=True, export_skins=True, export_morph=False,
                           export_cameras=False, export_lights=False, export_extras=True)
+seam_reconciliation = {}
+if options.reconcile_sleeve_seams:
+    from player_sleeve_seams import plan_sleeve_seam_weight_transfers
+
+    # Export the accepted viewmodel BEFORE touching the world seam. No new
+    # weight field is fitted; only the already chosen view endpoint weights
+    # are transferred across demonstrated bind-space cloth adjacencies.
+    view_mesh, view_name = player.data, player.name
+    deform_names = {bone.name for bone in rig.data.bones}
+    group_names = {group.index: group.name for group in player.vertex_groups}
+
+    def seam_input(mesh):
+        mesh.calc_loop_triangles()
+        positions = [tuple(vertex.co) for vertex in mesh.vertices]
+        faces = [(mesh.materials[mesh.polygons[triangle.polygon_index].material_index].name,
+                  tuple(triangle.vertices)) for triangle in mesh.loop_triangles]
+        weights = [{group_names[item.group]: item.weight for item in vertex.groups
+                    if group_names[item.group] in deform_names and item.weight > 0.0}
+                   for vertex in mesh.vertices]
+        return positions, faces, weights
+
+    view_input = seam_input(view_mesh)
+    world_input = seam_input(seam_world_mesh)
+    source_weight_sums = {
+        role: {'minimum': min(sum(weights.values()) for weights in data[2] if weights),
+               'maximum': max(sum(weights.values()) for weights in data[2] if weights)}
+        for role, data in (('world', world_input), ('view', view_input))}
+    print('SEAM_INPUT_WEIGHT_SUMS ' + json.dumps(source_weight_sums))
+    transfers, seam_reconciliation = plan_sleeve_seam_weight_transfers(
+        *world_input, *view_input)
+    # Include removed influences in the report, not just target influences.
+    maximum_weight_delta = max(
+        (abs(target.get(name, 0.0) - world_input[2][index].get(name, 0.0))
+         for index, target in transfers.items()
+         for name in world_input[2][index].keys() | target.keys()), default=0.0)
+    try:
+        player.data = seam_world_mesh
+        player.name = seam_world_name
+        target_indices = sorted(transfers)
+        for group in player.vertex_groups:
+            if group.name in deform_names:
+                group.remove(target_indices)
+        for index, weights in transfers.items():
+            for name, weight in weights.items():
+                player.vertex_groups[name].add([index], weight, 'REPLACE')
+        after_positions, after_faces, after_weights = seam_input(seam_world_mesh)
+        if after_positions != world_input[0] or after_faces != world_input[1]:
+            raise RuntimeError('Seam reconciliation changed world geometry/topology')
+        if any(after_weights[index] != weights for index, weights in
+               enumerate(world_input[2]) if index not in transfers):
+            raise RuntimeError('Seam reconciliation changed a vertex outside its explicit plan')
+        if any(after_weights[index] != weights for index, weights in transfers.items()):
+            raise RuntimeError('Seam reconciliation did not apply its exact canonical weights')
+        calibrated_world = output / 'world-seam-reconciled.runtime.glb'
+        bpy.ops.export_scene.gltf(filepath=str(calibrated_world), export_format='GLB', use_selection=True,
+                                  export_tangents=True, export_animations=True, export_animation_mode='NLA_TRACKS',
+                                  export_frame_range=True, export_skins=True, export_morph=False,
+                                  export_cameras=False, export_lights=False, export_extras=True)
+    finally:
+        player.data = view_mesh
+        player.name = view_name
+    seam_reconciliation['maximumWeightDelta'] = maximum_weight_delta
+    seam_reconciliation['sourceAuthoringWeightSums'] = source_weight_sums
+    seam_reconciliation['scope'] = 'Coincident Body/NearFace world vertices at matched view sleeve boundary edges only'
+    seam_reconciliation['canonicalWeights'] = 'Unchanged exported viewmodel sleeve endpoints'
 report = dict(schema=1, role='Viewmodel',
               sourceWorldSha256=sha(accepted_world),
               gauntletScale=gauntlet_scale,
@@ -277,6 +351,7 @@ report = dict(schema=1, role='Viewmodel',
               elbowWeightField=elbow_corrections,
               sleeveEnvelopeFit=sleeve_fit,
               sleeveClosure=sleeve_closure,
+              sleeveSeamReconciliation=seam_reconciliation,
               runtime=viewmodel_output.name, runtimeSha256=sha(viewmodel_output),
               primitiveSemantics=counts, processingVertices=len(player.data.vertices),
               ownership='Primary-only modelled geometry; world body owns secondary visibility',

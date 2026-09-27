@@ -30,6 +30,20 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### Current Phase 3 checkpoint
 
+**Exact seam repair candidate:** opt-in `--reconcile-sleeve-seams` transfers the
+accepted view endpoint weights to 355 world vertices at 198 matched Body/NearFace
+edges. Fresh native low/down, high/up and low/parry now have zero measured shared
+edge separation; view GLB and all three posed view uploads remain byte-identical.
+Default exports remain exact; helper 11/11, gauntlet 6/6, C++ paired admission and
+three RT captures pass. World candidate `2385fbb8...` is retained with its unchanged
+view in [reproducible evidence](evidence/2026-09-27-player-seam-repair/README.md).
+This is NOT a complete armpit/cuff repair: first-person connecting-cloth/body
+ownership and actual cuff geometry remain open. No phone install or production
+asset replacement; phone stays on `b5d486b2...`. Next fix must address anatomical
+surface partition/visibility without exposing duplicate world arms or discarding
+connecting faces by an arbitrary weight threshold. CI at preceding `acc73b9`
+passed push36279842949 / PR36279844890.
+
 **Latest installed follow-up:** ARM64 Debug `b5d486b2...`, runtime source
 `f227b64`, passed exact install hash, 13-waypoint replay, six selected captures
 and Home/resume on SM-S948B. This now puts yellow-floor removal, 12% lantern
