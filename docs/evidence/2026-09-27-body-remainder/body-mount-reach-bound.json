@@ -1,0 +1,24 @@
+{
+  "checkpoint": "player-viewmodel-lantern-low-look-down",
+  "cameraModel": [
+    -0.0023995868467785336,
+    1.649749291,
+    -0.3009106001048898
+  ],
+  "headJointModel": [
+    -6.47269e-08,
+    1.61908,
+    -0.09829
+  ],
+  "headJointIsNotAnEyeLandmark": true,
+  "upperLengthMetres": 0.27633423991000466,
+  "lowerLengthMetres": 0.21643085810484602,
+  "handToGripMetres": 0.06852911822721795,
+  "existingMaximumChainStretch": 1.75,
+  "maximumShoulderToGripMetres": 0.9308680397532066,
+  "currentShoulderToGripMetres": 0.7860557944334572,
+  "bodyBackwardTranslationToHeadJointPlaneMetres": 0.2026206001048898,
+  "translatedShoulderToGripMetres": 0.9649279378276233,
+  "translatedReachExcessMetres": 0.03405989807441667,
+  "qualification": "Upper bound with fully straight chain and optimally aligned socket; actual oriented reach can be smaller. No production transform changed."
+}

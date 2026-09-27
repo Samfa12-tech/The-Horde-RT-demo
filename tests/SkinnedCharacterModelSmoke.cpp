@@ -596,6 +596,33 @@ GripSurfaceMetrics MeasureGripSurface(
 int main(int argc, char** argv)
 {
     using namespace horde::scene;
+    if (argc == 3 && std::string(argv[1]) == "--inspect-player-mount")
+    {
+        // Read the same animated node transforms used by the native renderer;
+        // imported Blender display-bone tails are not anatomical measurements.
+        SkinnedMeshAsset world;
+        std::string diagnostic;
+        if (!world.LoadClips(argv[2], PlayerLocomotionClipSet(), diagnostic))
+        {
+            std::cerr << diagnostic << '\n';
+            return 1;
+        }
+        constexpr std::array<const char*, 9u> names{{"Head", "Spine", "LeftArm",
+            "LeftForeArm", "LeftHand", "LeftGrip", "RightArm", "RightForeArm", "RightHand"}};
+        std::array<SkinnedNodeTransform, names.size()> nodes{};
+        for (std::size_t i = 0u; i < names.size(); ++i)
+            if (!world.NodeTransform(SkinnedClip::Idle, 0.0f, names[i], nodes[i], diagnostic))
+            {
+                std::cerr << diagnostic << '\n';
+                return 1;
+            }
+        std::cout << "{\"space\":\"native model metres\",\"clip\":\"Idle\",\"timeSeconds\":0,\"nodes\":{";
+        for (std::size_t i = 0u; i < names.size(); ++i)
+            std::cout << (i ? "," : "") << '\"' << names[i] << "\":["
+                      << nodes[i][12] << ',' << nodes[i][13] << ',' << nodes[i][14] << ']';
+        std::cout << "}}\n";
+        return 0;
+    }
     if (argc == 5 && std::string(argv[1]) == "--validate-viewmodel-admission")
     {
         horde::scene::assets::AssetManifest manifest;

@@ -98,5 +98,29 @@ owner acceptance. Keep the installed accepted-improvement candidate intact
 until a replacement satisfies those gates. Do not reopen the fixed signed IK
 projection or tune weights/roll to conceal this placement issue.
 
+### Mount/reach constraint isolated after the checkpoint
+
+The existing native smoke tool now exposes read-only `--inspect-player-mount
+WORLD_GLB`, reporting actual Idle/0 node positions. This avoids treating Blender
+imported display-bone tails as real arm lengths. Native upper/lower left arm
+lengths are 0.276334/0.216431 m; Hand-to-Grip length is 0.068529 m. With the
+existing maximum 1.75 chain stretch, the most generous shoulder-to-grip reach
+is 0.930868 m (straight arm, optimally aligned socket).
+
+For the exact low/down capture, translating the body backward just 0.202621 m
+would bring the camera to the Head **joint** depth plane; this is deliberately
+not claimed as an eye landmark or a final anatomical mount. Keeping the current
+gameplay grip fixed would then require 0.964928 m reach, exceeding even that
+generous bound by 34.060 mm. Actual oriented/bent reach can be smaller. Thus a
+blind body-only translation is not a complete fix and cannot preserve the 15 mm
+grip gate. No body transform, stretch bound, grip, pole, roll or weight was changed
+for this probe. Next implementation must establish an anatomical body/camera
+mount and compatible shared gameplay-held pose together, without faking arm
+length or concealing body surfaces. Retain the owner's accepted swing separation.
+
+Branch/PR CI at `53c786a` passes push36283401416 / PR36283405115, including the
+portable and Vulkan-enabled player host lanes. This remains host evidence,
+not final Android/RT-device acceptance.
+
 Audio/haptic manual revalidation required: **NO**. This slice changes geometry
 semantics/visibility and candidate packaging, not gameplay feedback inputs.
