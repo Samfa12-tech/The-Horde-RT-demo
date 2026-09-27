@@ -191,6 +191,8 @@ tasks.register('prepareRuntimeAssets', Sync) {
         include 'models/player/runtime/asset.manifest.json'
         include 'models/player/runtime/clip-manifest.json'
         include 'models/player/runtime/gothic-traveller-lod0.runtime.glb'
+        include 'models/player/viewmodel/runtime/asset.manifest.json'
+        include 'models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb'
         include 'textures/props/runtime/*.android.ktx2'
         include 'textures/props/runtime/asset.manifest.json'
         include 'audio/filmcow/*.wav'

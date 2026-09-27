@@ -30,6 +30,16 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### Current Phase 3 checkpoint
 
+**Production preparation verified, route switch next:** accepted world/view/manifest
+reproduce byte-exact in two clean exports; original base-rig guard no longer
+depends on whichever derived world is shipped. Viewmodel pair is now included
+in default Android staging and Windows/Android package inventories, with a new
+CTest guard. Ordinary ARM64 Debug build and actual APK pair hashes pass; that
+preparation APK was not installed. The source runtime pair and normal renderer
+route are still the old ones: next admit exactf2c3f62b/6f06d77e, update paired
+metadata/semantic tests, and enable the anatomical modelled production route.
+[Evidence and exact limits](evidence/2026-09-27-segmented-seams/production-preparation/README.md).
+
 **Owner visual acceptance complete for current candidate:** overall arms,
 wrist, repaired armpit, normal look-down/occlusion and mirror appearance have
 now been accepted on the evolving exact phone candidate, latest66de46e6.

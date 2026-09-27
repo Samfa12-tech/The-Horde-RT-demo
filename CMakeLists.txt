@@ -43,6 +43,9 @@ if(BUILD_TESTING)
     add_test(NAME horde_rt_player_manifest_agreement_tests
         COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
             ${CMAKE_CURRENT_SOURCE_DIR}/tests/PlayerManifestAgreementTests.ps1)
+    add_test(NAME horde_rt_player_package_inventory_tests
+        COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
+            ${CMAKE_CURRENT_SOURCE_DIR}/tests/PlayerPackageInventoryTests.ps1)
 endif()
 
 include(cmake/HordeRtSources.cmake)

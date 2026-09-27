@@ -97,8 +97,13 @@ finally:
     sys.argv = saved_arguments
 sha = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()
 accepted_world = root / 'assets/models/player/runtime/gothic-traveller-lod0.runtime.glb'
-if sha(world_reference) != sha(accepted_world):
-    raise RuntimeError('World reference differs from the admitted rig; reconcile inputs/Blender threading first')
+# The base rig recipe remains the Phase2 reference even after its derived world
+# becomes production. Comparing against the current world would make a promoted
+# seam-repaired pair impossible to regenerate from its original inputs.
+admitted_view_receipt = json.loads((root / 'assets/models/player/viewmodel/runtime/viewmodel-processing.json').read_text(encoding='utf-8'))
+base_world_sha256 = sha(world_reference)
+if base_world_sha256 != admitted_view_receipt['sourceWorldSha256']:
+    raise RuntimeError('World reference differs from the admitted base-rig receipt; reconcile inputs/Blender threading first')
 
 paired_gauntlet_world = None
 if options.gauntlet_source_hand or options.gauntlet_scale is not None or options.body_remainder:
@@ -398,12 +403,14 @@ if options.body_remainder:
     # shares the Body atlas group at runtime; admit its fifth embedded identity
     # without allocating another production atlas layer.
     manifest['budgets']['maxTextureLayersPerKind'] = 5
+    manifest['primitiveSemantics'] = [part for part in manifest['primitiveSemantics']
+                                    if part['material'] != 'BodyRemainderPrimaryVisible']
     manifest['primitiveSemantics'].append(dict(material='BodyRemainderPrimaryVisible',
         firstPersonPrimary=True, shadow=True, reflection=True))
     paired_world_manifest = output / 'asset.manifest.json'
     paired_world_manifest.write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
 report = dict(schema=1, role='Viewmodel',
-              sourceWorldSha256=sha(accepted_world),
+              sourceWorldSha256=base_world_sha256,
               gauntletScale=gauntlet_scale,
               gauntletScaleAppliedAbout='AuthoredGripOrigin',
               gauntletSourceHandedness=options.gauntlet_source_hand or 'LegacyLeftClassification',
