@@ -217,6 +217,7 @@ android {
         versionCode hordeVersionCode.intValue()
         versionName hordeVersionName
         buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', 'false'
+        buildConfigField 'boolean', 'ANATOMICAL_PLAYER_MOUNT', 'false'
         resValue 'string', 'alpha_version', "SHOWCASE · ALPHA ${hordeVersionName}"
 
         externalNativeBuild {
@@ -251,6 +252,7 @@ android {
         debug {
             applicationIdSuffix viewmodelCandidate ? '.debug.viewmodel' : '.debug'
             buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', viewmodelCandidate ? 'true' : 'false'
+            buildConfigField 'boolean', 'ANATOMICAL_PLAYER_MOUNT', useAnatomicalPlayerMount ? 'true' : 'false'
             if (viewmodelCandidate) resValue 'string', 'app_name', 'Horde RT Viewmodel Candidate'
             versionNameSuffix '-debug'
             minifyEnabled false

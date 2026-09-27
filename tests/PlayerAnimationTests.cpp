@@ -531,7 +531,10 @@ int main()
     for (const auto& checkpoint : horde::gameplay::kDevelopmentCheckpoints)
     {
         if (!checkpoint.name.starts_with("player-viewmodel-")) continue;
-        horde::gameplay::simulation::GameSimulation staged;
+        horde::gameplay::simulation::GameSimulationConfig stagingConfig;
+        if (checkpoint.requiresAnatomicalPlayerMount)
+            stagingConfig.playerMountProfile = items::PlayerMountProfile::AnatomicalBody;
+        horde::gameplay::simulation::GameSimulation staged(stagingConfig);
         if (!Require(horde::gameplay::StageDevelopmentCheckpointSimulation(staged, checkpoint) &&
                      std::abs(staged.Snapshot().playerPitchRadians - checkpoint.pitch) < 0.000001f,
                      "viewmodel checkpoint pitch must match actual gameplay pose, not an out-of-range request")) return 1;
@@ -554,7 +557,7 @@ int main()
             }
         }
     }
-    if (!Require(viewmodelCheckpointCount == 11u, "all eleven viewmodel checkpoint pitches must be staged")) return 1;
+    if (!Require(viewmodelCheckpointCount == 13u, "all thirteen viewmodel checkpoint pitches must be staged")) return 1;
     const auto* lowParryCheckpoint = horde::gameplay::FindDevelopmentCheckpoint(144);
     horde::gameplay::simulation::GameSimulation stagedLowLanternParry;
     horde::gameplay::DevelopmentCheckpointStageEvidence lowParryEvidence{};

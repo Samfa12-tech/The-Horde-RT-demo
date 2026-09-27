@@ -107,7 +107,9 @@ struct ScenePushConstants
     float staffZ = -13.1f;
     float finaleSkylightOpen = 0.0f;
     float finaleDawnReveal = 0.0f;
-    float heldPropDepth = 1.05f;
+    // Reuses the shader-unused heldPropDepth slot at byte 68. Every embedded
+    // pipeline/compute module is regenerated with this matching declaration.
+    float minimumCameraPitch = -0.32f;
     float waterQuality = 2.0f;
     float waterfallWidthScale = 1.0f;
     float fogDensityScale = 1.0f;
@@ -128,6 +130,8 @@ static_assert(sizeof(ScenePushConstants) == 128u,
               "CPU and raygen push-constant ABI must remain 32 packed floats");
 static_assert(sizeof(ScenePushConstants) <= 128u,
               "push constants must fit Vulkan's required minimum device limit");
+static_assert(offsetof(ScenePushConstants, minimumCameraPitch) == 68u,
+              "camera limit reuses the retired unused depth slot without shifting the ABI");
 static_assert(offsetof(ScenePushConstants, waterQuality) == 72u,
               "water quality must stay appended after every released push field");
 static_assert(offsetof(ScenePushConstants, waterfallWidthScale) == 76u,
@@ -5484,7 +5488,6 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
     const std::array<float, 3u> staffWorldPosition = characterSlot_.LichStaffWorldPosition(frame.lich);
     const RtGuidanceLight guidanceLight = ResolveChestGuidanceLight(frame.chestReward);
     const bool guidanceLightActive = guidanceLight.strength > 0.0f;
-    const float heldPropDepth = frame.heldItemKinematics.heldPropDepth;
     const RtSceneTuning tuning = ClampRtSceneTuning(frame.tuning);
     const RtLightTuning& torchTuning = tuning.lights[static_cast<std::size_t>(RtLightGroup::Torch)];
     const RtLightTuning& skylightTuning = tuning.lights[static_cast<std::size_t>(RtLightGroup::Skylight)];
@@ -5509,7 +5512,7 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                                             guidanceLightActive ? guidanceLight.position[2] : staffWorldPosition[2],
                                              std::clamp(frame.lich.finaleSkylightOpenProgress, 0.0f, 1.0f),
                                              std::clamp(frame.lich.finaleDawnRevealProgress, 0.0f, 1.0f),
-                                             heldPropDepth,
+                                             horde::gameplay::items::MinimumPlayerCameraPitch(frame.playerMountProfile),
                                              static_cast<float>(frame.waterQuality),
                                              tuning.waterfallWidthScale,
                                              tuning.fogDensityScale,

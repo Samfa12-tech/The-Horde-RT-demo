@@ -30,6 +30,21 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### Current Phase 3 checkpoint
 
+**Deeper-look implementation, not body acceptance:** the explicit AnatomicalBody
+camera now permits about76 degrees downward while physical held poses retain
+their old clamp. Legacy behaviour stays unchanged. Two new native checkpoints
+expose unfinished upper-torso surfaces/self-occlusion, not clearly readable feet;
+do not claim torso/legs or seam acceptance. The normal anatomical145 PNG remains
+exactly `93601b60...`, preserving the owner's liked direction. Six targeted host
+tests and ARM64 build/contained pipeline+compute validation pass. All shader
+modules use the repurposed byte68 camera-bound push field, with unchanged128-byte
+layout/budgets and Shipping diagnostics absent. Android rejects incompatible
+checkpoint requests before JNI publication. [Evidence and bounded next action](evidence/2026-09-27-deep-body-look/README.md).
+New precommit APK `3cce3c61...` is deliberately **not installed**; phone remains
+owner-liked `bd9b348c...`. Inspect the actual newly exposed near-face/body surface
+boundary before another phone install; no broad mounting/roll/weight rewrite.
+Previous checkpoint66f1149 is freshly green on push36285861795 / PR36285865217.
+
 **Anatomical mounting candidate:** explicit immutable simulation profile grounds
 the world/view body under the player, with shared reachable sword/reward targets
 and .10 m higher hand paths. Original torch depth, grip roll, weights, .44 lantern

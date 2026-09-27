@@ -56,7 +56,8 @@ layout(push_constant) uniform SceneControls
     float staffZ;
     float finaleSkylightOpen;
     float finaleDawnReveal;
-    float heldPropDepth;
+    // Byte 68 was an unused heldPropDepth field. CPU and all modules agree.
+    float minimumCameraPitch;
     float waterQuality;
     float waterfallWidthScale;
     float fogDensityScale;

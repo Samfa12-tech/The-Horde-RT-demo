@@ -38,6 +38,9 @@ inline bool StageDevelopmentCheckpointSimulation(
     DevelopmentCheckpointStageEvidence* evidence = nullptr,
     const DevelopmentCheckpointStepFixedObservation* stepObservation = nullptr)
 {
+    if (checkpoint.requiresAnatomicalPlayerMount &&
+        gameSimulation.Snapshot().playerMountProfile != items::PlayerMountProfile::AnatomicalBody)
+        return false;
     if (!gameSimulation.ApplyShowcaseCheckpoint(checkpoint.baseShowcaseCheckpointId))
         return false;
 

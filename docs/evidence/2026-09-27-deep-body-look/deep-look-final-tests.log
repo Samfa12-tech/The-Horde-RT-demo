@@ -1,0 +1,14 @@
+Internal ctest changing into directory: C:/Dev/tmp/horde-phase3-native-20260923
+Test project C:/Dev/tmp/horde-phase3-native-20260923
+    Start 27: horde_rt_player_animation_tests
+1/4 Test #27: horde_rt_player_animation_tests ...........   Passed    4.95 sec
+    Start 30: horde_rt_development_static_asset_tests
+2/4 Test #30: horde_rt_development_static_asset_tests ...   Passed    5.71 sec
+    Start 50: horde_rt_simulation_gameplay_tests
+3/4 Test #50: horde_rt_simulation_gameplay_tests ........   Passed    5.00 sec
+    Start 54: horde_rt_desktop_controller_input_tests
+4/4 Test #54: horde_rt_desktop_controller_input_tests ...   Passed    2.25 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =  17.92 sec

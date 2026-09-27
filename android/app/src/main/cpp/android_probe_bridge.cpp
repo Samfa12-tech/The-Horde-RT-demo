@@ -142,6 +142,12 @@ constexpr auto kDefaultPlayerPresentationRoute =
     horde::vulkan::raytracing::PlayerRenderRoute::Procedural;
 #endif
 
+#if defined(HORDE_RT_DEBUG_ANATOMICAL_PLAYER_MOUNT)
+constexpr auto kDefaultPlayerMountProfile = horde::gameplay::items::PlayerMountProfile::AnatomicalBody;
+#else
+constexpr auto kDefaultPlayerMountProfile = horde::gameplay::items::PlayerMountProfile::LegacyViewRelative;
+#endif
+
 struct SwapchainContext
 {
     ANativeWindow* window = nullptr;
@@ -232,9 +238,7 @@ horde::gameplay::BenchmarkWorkload gRequestedBenchmarkWorkload =
     horde::gameplay::BenchmarkWorkload::ShowcaseRoute;
 horde::gameplay::simulation::GameSimulation gGameSimulation([] {
     horde::gameplay::simulation::GameSimulationConfig config;
-#if defined(HORDE_RT_DEBUG_ANATOMICAL_PLAYER_MOUNT)
-    config.playerMountProfile = horde::gameplay::items::PlayerMountProfile::AnatomicalBody;
-#endif
+    config.playerMountProfile = kDefaultPlayerMountProfile;
     return config;
 }());
 horde::gameplay::simulation::InputMailbox gInputMailbox;
@@ -959,6 +963,12 @@ bool ResolveDebugCheckpoint(const std::int32_t id, DebugCheckpointSelection& sel
     const auto* base = development == nullptr ? nullptr :
         horde::gameplay::FindShowcaseCheckpoint(development->baseShowcaseCheckpointId);
     if (development == nullptr || base == nullptr)
+        return false;
+    // Reject before publishing a JNI request as well as on the owning thread.
+    // A rejected stage must not be labelled as a successful deep-look capture.
+    // The profile is immutable build configuration, not a cross-thread snapshot.
+    if (development->requiresAnatomicalPlayerMount &&
+        kDefaultPlayerMountProfile != horde::gameplay::items::PlayerMountProfile::AnatomicalBody)
         return false;
     selection.checkpoint = {development->id, development->name.data(),
                             development->cameraX, development->cameraZ,
@@ -3608,7 +3618,8 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_setViewControls(JNIEnv*, jclass, jfl
 {
     std::lock_guard<std::mutex> lock(gInputPublisherMutex);
     gInputPublisherState.yawRadians = static_cast<float>(yaw);
-    gInputPublisherState.pitchRadians = std::clamp(static_cast<float>(pitch), -0.32f, 0.28f);
+    gInputPublisherState.pitchRadians = std::clamp(static_cast<float>(pitch),
+        horde::gameplay::items::MinimumPlayerCameraPitch(kDefaultPlayerMountProfile), 0.28f);
     gInputPublisherState.torchLightStrength =
         std::clamp(static_cast<float>(torchLightStrength), 0.65f, 2.4f);
     gInputPublisherState.moveStrafe = std::clamp(static_cast<float>(moveStrafe), -1.0f, 1.0f);

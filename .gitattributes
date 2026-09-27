@@ -37,3 +37,4 @@ docs/evidence/2026-09-27-player-boundary/** -text whitespace=cr-at-eol
 docs/evidence/2026-09-27-player-boundary/**/*.obj filter=lfs diff=lfs merge=lfs -text
 docs/evidence/2026-09-27-player-seam-repair/** -text whitespace=cr-at-eol
 docs/evidence/2026-09-27-player-seam-repair/**/*.obj filter=lfs diff=lfs merge=lfs -text
+docs/evidence/2026-09-27-deep-body-look/** -text whitespace=cr-at-eol
