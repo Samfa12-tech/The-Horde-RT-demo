@@ -109,6 +109,8 @@ struct SimulationSnapshot
     std::uint64_t eventQueueOverflowCount = 0;
     std::size_t eventsEmittedThisTick = 0;
     std::size_t eventsEmittedThisFrame = 0;
+    horde::gameplay::items::PlayerMountProfile playerMountProfile =
+        horde::gameplay::items::PlayerMountProfile::LegacyViewRelative;
 };
 
 } // namespace horde::gameplay::simulation

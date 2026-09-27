@@ -979,6 +979,34 @@ int main()
           finaleRoofCapture.Events().Empty(),
           "finale-roof zero-delta finalization must preserve the authored dead/open-roof state without a tick or event");
 
+    GameSimulation legacyMount;
+    GameSimulationConfig anatomicalMountConfig{};
+    anatomicalMountConfig.playerMountProfile = items::PlayerMountProfile::AnatomicalBody;
+    GameSimulation anatomicalMount(anatomicalMountConfig);
+    check(legacyMount.Snapshot().playerMountProfile == items::PlayerMountProfile::LegacyViewRelative &&
+          NearlyEqual(legacyMount.Snapshot().heldItemKinematics.heldPropDepth,
+                      GameSimulation(GameSimulationConfig{}).Snapshot().heldItemKinematics.heldPropDepth),
+          "default game simulation retains the legacy view-relative mount profile and target");
+    check(anatomicalMount.Snapshot().playerMountProfile == items::PlayerMountProfile::AnatomicalBody &&
+          NearlyEqual(anatomicalMount.Snapshot().heldItemKinematics.leftHandLocal[1] -
+                          legacyMount.Snapshot().heldItemKinematics.leftHandLocal[1],
+                      0.10f) &&
+          !NearlyEqual(anatomicalMount.Snapshot().heldItemKinematics.leftShoulderLocal[0],
+                       legacyMount.Snapshot().heldItemKinematics.leftShoulderLocal[0]),
+          "configured anatomical profile reaches shared held-item resolution and changes hand height and shoulder frame");
+    check(anatomicalMount.ApplyShowcaseCheckpoint(0) &&
+          anatomicalMount.Snapshot().playerMountProfile == items::PlayerMountProfile::AnatomicalBody,
+          "authored checkpoint import preserves the configured player mount profile");
+    anatomicalMount.RetryEncounter();
+    check(anatomicalMount.Snapshot().playerMountProfile == items::PlayerMountProfile::AnatomicalBody,
+          "encounter retry preserves the configured player mount profile");
+    anatomicalMount.ResetRoute();
+    check(anatomicalMount.Snapshot().playerMountProfile == items::PlayerMountProfile::AnatomicalBody,
+          "route reset preserves the configured player mount profile");
+    anatomicalMount.ImportRewardCheckpoint({}, {}, {});
+    check(anatomicalMount.Snapshot().playerMountProfile == items::PlayerMountProfile::AnatomicalBody,
+          "reward checkpoint import preserves the configured player mount profile");
+
     GameSimulation pausedRetry;
     InputSnapshot pausedFinale = finaleInput;
     pausedFinale.commands = {};

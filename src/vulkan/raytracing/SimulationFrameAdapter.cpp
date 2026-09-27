@@ -47,6 +47,7 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     frame.heldItems = simulation.heldItems;
     frame.heldItemKinematics = simulation.heldItemKinematics;
     frame.playerAnimation = simulation.playerAnimation;
+    frame.playerMountProfile = simulation.playerMountProfile;
     frame.heldLight = simulation.heldLight;
     frame.interaction = simulation.interaction;
     frame.chestReward = simulation.chestReward;

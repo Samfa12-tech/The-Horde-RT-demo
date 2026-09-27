@@ -83,6 +83,8 @@ struct RtSceneFrameInputs
     horde::gameplay::items::HeldItemKinematicsState heldItemKinematics{};
     horde::gameplay::animation::PlayerAnimationSnapshot playerAnimation{};
     PlayerRenderRoute playerRenderRoute = PlayerRenderRoute::Procedural;
+    horde::gameplay::items::PlayerMountProfile playerMountProfile =
+        horde::gameplay::items::PlayerMountProfile::LegacyViewRelative;
     horde::gameplay::items::HeldLightState heldLight{};
     horde::gameplay::interactions::InteractionState interaction{};
     horde::gameplay::interactions::ChestRewardSnapshot chestReward{};

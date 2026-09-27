@@ -230,7 +230,13 @@ std::string gLatestBenchmarkProgress;
 std::string gRequestedBenchmarkRunId;
 horde::gameplay::BenchmarkWorkload gRequestedBenchmarkWorkload =
     horde::gameplay::BenchmarkWorkload::ShowcaseRoute;
-horde::gameplay::simulation::GameSimulation gGameSimulation;
+horde::gameplay::simulation::GameSimulation gGameSimulation([] {
+    horde::gameplay::simulation::GameSimulationConfig config;
+#if defined(HORDE_RT_DEBUG_ANATOMICAL_PLAYER_MOUNT)
+    config.playerMountProfile = horde::gameplay::items::PlayerMountProfile::AnatomicalBody;
+#endif
+    return config;
+}());
 horde::gameplay::simulation::InputMailbox gInputMailbox;
 std::mutex gInputPublisherMutex;
 horde::gameplay::simulation::InputSnapshot gInputPublisherState = []
@@ -1134,6 +1140,13 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
                         horde::vulkan::raytracing::PlayerRenderRoute::HybridBlockPrimary
                         ? "hybrid-block-primary" : "procedural")) << "\",\n"
          << "  \"playerSkinCadenceHz\": " << context.rtScene.PlayerSkinCadenceHz() << ",\n"
+         << "  \"playerMountProfile\": \""
+         << (simulation.playerMountProfile == horde::gameplay::items::PlayerMountProfile::AnatomicalBody
+                 ? "AnatomicalBody" : "LegacyViewRelative") << "\",\n"
+         << "  \"dedicatedPlayerPrimaryOwnership\": "
+         << (horde::vulkan::raytracing::HasDedicatedPlayerPrimaryOwnership(
+                 context.rtScene.LastInstanceMasks(), context.rtScene.LastPlayerWorldBodyInstanceFlags())
+                 ? "true" : "false") << ",\n"
          << "  \"playerSkinUpdates\": " << context.rtScene.PlayerSkinUpdateCount() << ",\n"
          << "  \"playerSkinCpuAverageMs\": " << context.rtScene.PlayerSkinAverageMilliseconds() << ",\n"
          << "  \"playerMaxSocketErrorM\": " << context.rtScene.PlayerMaxSocketErrorMetres() << ",\n"

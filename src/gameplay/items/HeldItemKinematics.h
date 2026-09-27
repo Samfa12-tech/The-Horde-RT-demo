@@ -8,6 +8,7 @@
 #include "scene/assets/StaticMeshAsset.h"
 
 #include <span>
+#include <cstdint>
 #include <string>
 #include <string_view>
 
@@ -21,6 +22,10 @@ inline constexpr float kClaimedRewardLanternScale = 0.44f;
 
 inline constexpr float kSwordGripRollRadians = 1.3962634f;
 
+// Shared pose authority, not a renderer-only offset. The anatomical profile is
+// opt-in until the modelled body/viewmodel route passes live owner acceptance.
+enum class PlayerMountProfile : std::uint8_t { LegacyViewRelative, AnatomicalBody };
+
 struct HeldItemKinematicsInput
 {
     float cameraX = 0.0f;
@@ -32,6 +37,8 @@ struct HeldItemKinematicsInput
     PlayerCombatSnapshot playerCombat{};
     float swordSwingRadians = 0.0f;
     horde::gameplay::interactions::InteractionState interaction{};
+    PlayerMountProfile playerMountProfile = PlayerMountProfile::LegacyViewRelative;
+    float cameraPitchRadians = 0.0f;
 };
 
 struct HeldSwordPose
@@ -77,6 +84,7 @@ struct HeldItemFixedStepInput
     PlayerCombatSnapshot playerCombat{};
     float swordSwingRadians = 0.0f;
     horde::gameplay::interactions::InteractionState interaction{};
+    PlayerMountProfile playerMountProfile = PlayerMountProfile::LegacyViewRelative;
 };
 
 struct HeldItemFixedStepState

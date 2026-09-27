@@ -4473,6 +4473,12 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     bool updateSkinnedPlayer = false;
     bool updateViewmodel = false;
     const bool usesViewmodel = effectivePlayerRenderRoute == PlayerRenderRoute::ModelledViewmodel;
+    if (frame.playerMountProfile == horde::gameplay::items::PlayerMountProfile::AnatomicalBody &&
+        (!usesViewmodel || !playerBodyRemainderAvailable_))
+    {
+        diagnostic = "Anatomical player mount requires the dedicated viewmodel and explicit body remainder.";
+        return false;
+    }
     if (!usesViewmodel) viewmodelPoseCurrent_ = false;
     if (usesViewmodel && (!viewmodelAvailable_ || viewmodelBlas_.handle == VK_NULL_HANDLE))
     {
@@ -4504,6 +4510,15 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             shoulderAnchoredRootWorld, kRouteFloorWorldY,
             playerRenderSlot_.BootGroundingOffsetMetres(
                 frame.playerAnimation));
+        if (frame.playerMountProfile == horde::gameplay::items::PlayerMountProfile::AnatomicalBody)
+        {
+            // The authored face lies near model Z=0. Put the grounded body
+            // beneath the player, not at the old view-relative .40 m shoulder
+            // plane behind which the camera saw the character's back.
+            skinnedPlayerRootWorld = GroundPlayerRootOnRouteFloor(
+                animatedBodyOrigin, kRouteFloorWorldY,
+                playerRenderSlot_.BootGroundingOffsetMetres(frame.playerAnimation));
+        }
         const auto worldPointToPlayer = [&subtract, &playerModelBasis,
                                          &skinnedPlayerRootWorld](
                                             const Vec3& worldPoint) {

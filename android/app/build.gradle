@@ -98,6 +98,14 @@ def viewmodelCandidate = viewmodelCandidatePath ? file(viewmodelCandidatePath).c
 def viewmodelOverlayDir = layout.buildDirectory.dir('generated/viewmodelCandidateAssets')
 def viewmodelReceipt = viewmodelCandidate ? new JsonSlurper().parse(
     new File(viewmodelCandidate, 'viewmodel-processing.json'), 'UTF-8') : null
+def anatomicalPlayerMount = providers.gradleProperty('hordeAnatomicalPlayerMount').orElse('false').get()
+if (!(anatomicalPlayerMount in ['true', 'false'])) {
+    throw new GradleException('hordeAnatomicalPlayerMount must be true or false.')
+}
+def useAnatomicalPlayerMount = anatomicalPlayerMount == 'true'
+if (useAnatomicalPlayerMount && (!viewmodelCandidate || !viewmodelReceipt.pairedWorldManifest)) {
+    throw new GradleException('Anatomical player mount requires an explicit paired-manifest viewmodel candidate.')
+}
 def candidateFile = { String name ->
     if (!name || new File(name).name != name || name.contains('\\') || name.contains('/')) {
         throw new GradleException('Candidate receipt requires plain local file names.')
@@ -250,6 +258,7 @@ android {
                 cmake {
                     arguments '-DHORDE_RT_DEBUG_CHECKPOINTS=ON',
                         "-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=${viewmodelCandidate ? 'ON' : 'OFF'}",
+                        "-DHORDE_RT_DEBUG_ANATOMICAL_PLAYER_MOUNT=${useAnatomicalPlayerMount ? 'ON' : 'OFF'}",
                         *hordeRtNativePolicyArguments('Diagnostic')
                 }
             }

@@ -13,6 +13,7 @@ param(
     [switch]$SkipBuild,
     [switch]$SkipInstall,
     [string]$ViewmodelCandidateDirectory = "",
+    [switch]$AnatomicalPlayerMount,
     [string]$ApkPath = "",
     [ValidateNotNullOrEmpty()]
     [string]$DeviceSerial = "R5GL219SZGK",
@@ -27,6 +28,7 @@ $ErrorActionPreference = "Stop"
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 $androidRoot = Join-Path $repoRoot "android"
 if ($ApkPath -and -not $SkipBuild) { throw 'An explicit immutable ApkPath requires SkipBuild.' }
+if ($AnatomicalPlayerMount -and -not $ViewmodelCandidateDirectory) { throw 'Anatomical mounting requires an explicit viewmodel candidate.' }
 $apk = ""
 $packageName = if ($ViewmodelCandidateDirectory) { "com.samfa12.hordelanternrt.debug.viewmodel" } else { "com.samfa12.hordelanternrt.debug" }
 $activityName = "$packageName/com.samfa12.hordelanternrt.MainActivity"
@@ -369,9 +371,10 @@ function Invoke-CaptureCheckpoint {
         [int64]$state.playerSkinUpdates -lt 1 -or [double]$state.playerMaxSocketErrorM -gt 0.015)) {
         $failures.Add("$Checkpoint did not retain modelled-viewmodel, 60 Hz skinning and exact grip authority.")
     }
-    # Exact per-instance masks are asserted by the native PlayerAnimationTests
-    # route contract; Android state currently exposes the selected route and
-    # total capacity, but not the mask array itself.
+    if ($AnatomicalPlayerMount -and ($state.playerMountProfile -cne 'AnatomicalBody' -or
+        $state.dedicatedPlayerPrimaryOwnership -ne $true)) {
+        $failures.Add("$Checkpoint lacks the requested anatomical gameplay profile or nonduplicating primary ownership.")
+    }
     if ($Checkpoint.StartsWith("player-") -and [int]$state.tlasInstanceCount -ne 21) {
         $failures.Add("$Checkpoint reported $($state.tlasInstanceCount) TLAS instances instead of the generated capacity 21 (RtSceneAbi.def instanceMetadata=21).")
     }
@@ -530,8 +533,10 @@ function Invoke-CheckpointBenchmark {
         [int64]$state.playerSkinUpdates -lt 1 -or [double]$state.playerMaxSocketErrorM -gt 0.015)) {
         $failures.Add("$Checkpoint benchmark did not retain modelled-viewmodel, 60 Hz skinning and exact grip authority.")
     }
-    # Exact per-instance masks are covered by the native route contract; this
-    # Android state surface exposes route/capacity but not the mask array.
+    if ($AnatomicalPlayerMount -and ($state.playerMountProfile -cne 'AnatomicalBody' -or
+        $state.dedicatedPlayerPrimaryOwnership -ne $true)) {
+        $failures.Add("$Checkpoint benchmark lacks the requested anatomical gameplay profile or nonduplicating primary ownership.")
+    }
     if ($Checkpoint.StartsWith("player-") -and [int]$state.tlasInstanceCount -ne 21) {
         $failures.Add("$Checkpoint benchmark reported $($state.tlasInstanceCount) TLAS instances instead of the generated capacity 21 (RtSceneAbi.def instanceMetadata=21).")
     }
@@ -592,6 +597,7 @@ try {
             if ($ViewmodelCandidateDirectory) {
                 $buildArguments += "-PhordeViewmodelCandidateDir=$([IO.Path]::GetFullPath($ViewmodelCandidateDirectory))"
             }
+            if ($AnatomicalPlayerMount) { $buildArguments += '-PhordeAnatomicalPlayerMount=true' }
             & .\gradlew.bat @buildArguments 2>&1 | Tee-Object -FilePath (Join-Path $outputDirectory "gradle-build.txt")
             if ($LASTEXITCODE -ne 0) { throw "Android debug build failed." }
         } finally { Pop-Location }

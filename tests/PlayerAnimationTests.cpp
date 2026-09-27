@@ -359,11 +359,14 @@ int main()
         {PlayerCombatAction::UpwardSliceWindup, SwordCombat::kUpwardSliceWindupDuration},
         {PlayerCombatAction::UpwardSliceActive, SwordCombat::kUpwardSliceActiveDuration},
         {PlayerCombatAction::UpwardSliceRecovery, SwordCombat::kUpwardSliceRecoveryDuration}}};
+    for (const auto profile : {items::PlayerMountProfile::LegacyViewRelative,
+                              items::PlayerMountProfile::AnatomicalBody})
     for (const auto carry : {interactions::HeldLightPose::High, interactions::HeldLightPose::Low})
         for (const auto& [action, duration] : carryAttackPhases)
             for (int frame = 0; frame <= 60; ++frame)
             {
                 items::HeldItemKinematicsInput carryInput;
+                carryInput.playerMountProfile = profile;
                 carryInput.interaction.heldLightKind = interactions::HeldLightKind::RewardLantern;
                 carryInput.interaction.heldLightPose = carry;
                 carryInput.playerCombat.action = action;
@@ -384,6 +387,23 @@ int main()
                                  "complete sword attack must not pass through the neutral carried-lantern cage")) return 1;
                 }
             }
+
+    for (const float pitch : {-0.32f, 0.0f, 0.28f})
+    {
+        items::HeldItemKinematicsInput anatomical;
+        anatomical.playerMountProfile = items::PlayerMountProfile::AnatomicalBody;
+        anatomical.cameraPitchRadians = pitch;
+        anatomical.interaction.heldLightKind = interactions::HeldLightKind::RewardLantern;
+        const auto pose = items::EvaluateHeldItemKinematics(anatomical);
+        const float vertical = -0.05f + pitch;
+        const float inverseLength = 1.0f / std::sqrt(1.0f + vertical * vertical);
+        const float bodyY = (pose.leftShoulderLocal[1] + vertical * pose.leftShoulderLocal[2]) * inverseLength;
+        const float bodyZ = (-vertical * pose.leftShoulderLocal[1] + pose.leftShoulderLocal[2]) * inverseLength;
+        if (!Require(Near(bodyY, -0.184f) && Near(bodyZ, -0.078f) &&
+                     Near(pose.leftShoulderLocal[0], -0.166f) &&
+                     pose.leftHandLocal[2] < 0.75f,
+                     "anatomical carry uses a bounded shared target and yaw-relative shoulders at every pitch")) return 1;
+    }
 
     for (int sample = 0; sample <= 24; ++sample)
     {

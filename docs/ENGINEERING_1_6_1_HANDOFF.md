@@ -30,6 +30,19 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### Current Phase 3 checkpoint
 
+**Anatomical mounting candidate:** explicit immutable simulation profile grounds
+the world/view body under the player, with shared reachable sword/reward targets
+and .10 m higher hand paths. Original torch depth, grip roll, weights, .44 lantern
+scale and stretch bound stay unchanged. Eleven existing native poses pass;
+three torch poses were repeated after restoring original torch depth. Combined
+low/down, high/up and low/parry retain zero measured shared-seam separation.
+Legacy control PNG is exact. Host tests and ARM64 build pass; current phone is
+still `b5d486b2...` pending a separately recorded install/live run. The candidate
+changes apparent framing and is not owner-accepted. See [evidence and next bounded
+camera-look change](evidence/2026-09-27-anatomical-mount/README.md). Deeper look
+must rotate the camera independently of the existing bounded held-pose pitch;
+the old 20-degree centre-look limit cannot naturally show the legs beneath it.
+
 **Explicit body remainder, not yet visually accepted:** opt-in five-region
 WorldBody contract and native primary filtering retain connecting cloth/torso/legs
 without duplicating viewmodel arms. Host admission, shader validation and six

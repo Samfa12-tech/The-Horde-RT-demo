@@ -183,6 +183,7 @@ struct CaptureLaunchOptions
     bool requested = false;
     bool requireRayQueryCompute = false;
     bool portrait = false;
+    bool anatomicalPlayerMount = false;
     std::filesystem::path outputDirectory;
     std::string developmentCheckpoint;
     std::string error;
@@ -409,6 +410,15 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     for (int index = 1; index < argumentCount; ++index)
     {
         const std::wstring_view argument(arguments[index]);
+        if (argument == L"--anatomical-player-mount")
+        {
+#if defined(_DEBUG)
+            options.anatomicalPlayerMount = true;
+#else
+            options.error = "--anatomical-player-mount is an unaccepted Debug-only candidate.";
+#endif
+            continue;
+        }
         if (argument == L"--require-rayquery-compute")
         {
             options.requireRayQueryCompute = true;
@@ -460,6 +470,9 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
         options.error = "--development-checkpoint requires --capture-showcase.";
     if (options.error.empty() && options.portrait && !options.requested)
         options.error = "--capture-portrait requires --capture-showcase.";
+    if (options.error.empty() && options.anatomicalPlayerMount &&
+        (!options.requested || !options.developmentCheckpoint.starts_with("player-viewmodel-")))
+        options.error = "--anatomical-player-mount requires a modelled-viewmodel development capture.";
     if (options.error.empty() && !options.developmentCheckpoint.empty() &&
         horde::gameplay::FindDevelopmentCheckpoint(options.developmentCheckpoint) == nullptr)
         options.error = "Unknown development checkpoint: " + options.developmentCheckpoint;
@@ -4242,6 +4255,10 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
              << "  \"settlingFrames\": " << kCaptureSettlingFrames << ",\n"
              << "  \"fixedAnimationTimeSeconds\": 0.000000,\n"
              << "  \"buildId\": \"" << JsonEscape(HORDE_RT_BUILD_ID) << "\",\n"
+             << "  \"playerMountProfile\": \""
+             << (context.simulation.Snapshot().playerMountProfile ==
+                     horde::gameplay::items::PlayerMountProfile::AnatomicalBody
+                 ? "AnatomicalBody" : "LegacyViewRelative") << "\",\n"
              << "  \"executionBackend\": \""
              << JsonEscape(horde::vulkan::ToString(context.rtScene.ExecutionBackend())) << "\",\n"
              << "  \"selectedRtPipelineBundle\": {\"opaqueFast\": {\"key\": \""
@@ -4766,9 +4783,16 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                                  const std::string* developmentCheckpoint,
                                  const bool requireRayQueryCompute,
                                  const bool unattendedBenchmark,
-                                 const horde::gameplay::BenchmarkWorkload benchmarkWorkload)
+                                 const horde::gameplay::BenchmarkWorkload benchmarkWorkload,
+                                 const bool anatomicalPlayerMount)
 {
     VulkanSurfaceContext context;
+    if (anatomicalPlayerMount)
+    {
+        horde::gameplay::simulation::GameSimulationConfig config;
+        config.playerMountProfile = horde::gameplay::items::PlayerMountProfile::AnatomicalBody;
+        context.simulation = horde::gameplay::simulation::GameSimulation(config);
+    }
     context.windowHandle = hWnd;
     context.unattendedBenchmark = unattendedBenchmark;
     if (developmentCheckpoint != nullptr) context.developmentCheckpoint = *developmentCheckpoint;
@@ -6450,7 +6474,8 @@ int CreateAndShowWindow(const std::string& diagnosticText,
                         const bool portraitCapture,
                         const bool requireRayQueryCompute,
                         const bool unattendedBenchmark,
-                        const horde::gameplay::BenchmarkWorkload benchmarkWorkload)
+                        const horde::gameplay::BenchmarkWorkload benchmarkWorkload,
+                        const bool anatomicalPlayerMount)
 {
     // Only the Debug capture surface changes aspect; camera, gameplay pose,
     // renderer quality and normal interactive-window sizing are untouched.
@@ -6715,7 +6740,8 @@ int CreateAndShowWindow(const std::string& diagnosticText,
 
     const int result = RunDiagnosticSwapchainWindow(
         hWnd, capabilities, textReportPath, jsonReportPath, captureDirectory,
-        developmentCheckpoint, requireRayQueryCompute, unattendedBenchmark, benchmarkWorkload);
+        developmentCheckpoint, requireRayQueryCompute, unattendedBenchmark, benchmarkWorkload,
+        anatomicalPlayerMount);
     if ((captureDirectory != nullptr || unattendedBenchmark) && IsWindow(hWnd))
     {
         DestroyWindow(hWnd);
@@ -6797,7 +6823,8 @@ int RunDiagnosticWindow(const int showCommand)
     return CreateAndShowWindow(diagnosticText, capabilities, textReportPath, jsonReportPath,
                                captureDirectory, developmentCheckpoint, launchOptions.portrait,
                                launchOptions.requireRayQueryCompute,
-                               launchOptions.benchmark.requested, launchOptions.benchmark.workload);
+                               launchOptions.benchmark.requested, launchOptions.benchmark.workload,
+                               launchOptions.anatomicalPlayerMount);
 }
 
 } // namespace horde::platform::windows

@@ -52,10 +52,11 @@ function Invoke-OverlayTask(
     [string]$Directory,
     [bool]$ExpectedPass,
     [string]$CaseName,
-    [string]$ExpectedDiagnostic = '') {
+    [string]$ExpectedDiagnostic = '',
+    [string[]]$ExtraArguments = @()) {
     Push-Location $androidRoot
     try {
-        $output = & $gradle ':app:prepareViewmodelCandidateAssets' "-PhordeViewmodelCandidateDir=$Directory" '--console=plain' 2>&1
+        $output = & $gradle ':app:prepareViewmodelCandidateAssets' "-PhordeViewmodelCandidateDir=$Directory" '--console=plain' @ExtraArguments 2>&1
         $exitCode = $LASTEXITCODE
     } finally {
         Pop-Location
@@ -82,6 +83,14 @@ try {
     $snapshotReady = $true
 
     Invoke-OverlayTask $candidateSource $true 'paired manifest stages'
+    Invoke-OverlayTask '' $false 'anatomical profile without candidate rejects' `
+        'Anatomical player mount requires an explicit paired-manifest viewmodel candidate.' `
+        @('-PhordeAnatomicalPlayerMount=true')
+    Invoke-OverlayTask $candidateSource $false 'malformed anatomical profile selector rejects' `
+        'hordeAnatomicalPlayerMount must be true or false.' `
+        @('-PhordeAnatomicalPlayerMount=invalid')
+    Invoke-OverlayTask $candidateSource $true 'explicit anatomical candidate stages' '' `
+        @('-PhordeAnatomicalPlayerMount=true')
     $stagedManifest = Join-Path $overlayRoot 'models/player/runtime/asset.manifest.json'
     if (-not (Test-Path -LiteralPath $stagedManifest -PathType Leaf) -or
         (Get-Sha256 $stagedManifest) -cne ([string]$sourceReceipt.pairedWorldManifestSha256).ToLowerInvariant()) {
@@ -126,6 +135,9 @@ try {
         $receipt.PSObject.Properties.Remove('pairedWorldManifestSha256')
     }
     Invoke-OverlayTask $legacy $true 'legacy receipt stages without a world-manifest overlay'
+    Invoke-OverlayTask $legacy $false 'anatomical profile without paired manifest rejects' `
+        'Anatomical player mount requires an explicit paired-manifest viewmodel candidate.' `
+        @('-PhordeAnatomicalPlayerMount=true')
     if (Test-Path -LiteralPath $stagedManifest) {
         throw 'Legacy receipt unexpectedly retained a paired world-manifest overlay.'
     }

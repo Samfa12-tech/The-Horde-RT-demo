@@ -1,0 +1,16 @@
+Internal ctest changing into directory: C:/Dev/tmp/horde-phase3-native-20260923
+Test project C:/Dev/tmp/horde-phase3-native-20260923
+    Start 27: horde_rt_player_animation_tests
+1/5 Test #27: horde_rt_player_animation_tests ........   Passed    0.03 sec
+    Start 29: horde_rt_held_item_socket_tests
+2/5 Test #29: horde_rt_held_item_socket_tests ........   Passed    4.86 sec
+    Start 50: horde_rt_simulation_gameplay_tests
+3/5 Test #50: horde_rt_simulation_gameplay_tests .....   Passed    4.09 sec
+    Start 70: horde_rt_skinned_character_smoke
+4/5 Test #70: horde_rt_skinned_character_smoke .......   Passed   27.88 sec
+    Start 74: horde_rt_character_render_slot_smoke
+5/5 Test #74: horde_rt_character_render_slot_smoke ...   Passed    4.34 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Total Test time (real) =  41.22 sec

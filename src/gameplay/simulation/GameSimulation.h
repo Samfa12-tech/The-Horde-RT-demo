@@ -29,6 +29,8 @@ struct GameSimulationConfig
     float playerStartYawRadians = 0.0f;
     float playerStartPitchRadians = 0.0f;
     float movementSpeedMetresPerSecond = 1.9f;
+    horde::gameplay::items::PlayerMountProfile playerMountProfile =
+        horde::gameplay::items::PlayerMountProfile::LegacyViewRelative;
 };
 
 class GameSimulation
