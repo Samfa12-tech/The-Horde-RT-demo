@@ -30,6 +30,14 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### Current Phase 3 checkpoint
 
+**Owner accepts current wrist appearance:** on installed normal-range `c68fa94e...`,
+raised lantern/look-up now looks like a normal cuff seam. Preserve it; no cuff
+underlap/extra geometry or hand retuning is warranted. Separate read-only analysis
+finds all80 unmatched cloth edges have collinear supporting cloth in bind but
+can separate up32.17mm after skinning in normal low/down. These are40 coarse
+continuation edges with one missing canonical midpoint each. Work in progress
+repairs that explicit segmented-seam topology, not the accepted cuff presentation.
+
 **Owner clarification supersedes the extreme-look study:** use the existing
 normal gameplay pitch range as the acceptance boundary. No literal vertical-down
 or camera-inside-body requirement. A future small pitch adjustment needs a

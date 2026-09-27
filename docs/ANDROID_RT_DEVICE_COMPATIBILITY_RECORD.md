@@ -17,6 +17,13 @@ crossing, but dark surfaces/UI and a slow-charging toast limit seam inspection.
 No new owner acceptance or full body/seam acceptance is inferred. The app is
 Home-backgrounded. [Exact normal-range evidence](evidence/2026-09-27-normal-look/phone/README.md).
 
+Owner follow-up on this exact installed normal-range build: raising the lantern
+and looking up now **"Looks like a normal cuff seam now"**. Record the wrist
+appearance concern as owner-accepted for this build; do not add cuff geometry or
+retune the hands on the strength of surface-distance diagnostics alone. This is
+not a blanket acceptance of the separate upper-arm/armpit seam, body presence,
+mirror motion, glass or the whole Phase3 programme.
+
 Superseded local installation (extreme-look camera policy withdrawn): **SM-S948B**, isolated
 `.debug.viewmodel` APK `210d3bf234ef53e08e80fbef0c7574e37c6f9eaf6335cca7310751eff583b898`,
 built on branch checkpoint `bda5c2c` with the deeper camera and upper-torso

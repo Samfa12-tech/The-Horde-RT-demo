@@ -37,12 +37,17 @@ evidence only: no route replay or performance sample was requested. Transport
 overflows0/0/8/1 remain an open glass gate. A separate45-second normal-range live
 sequence now covers walking/look, parries/swings and raise/lower transitions;
 see [exact evidence and limits](evidence/2026-09-27-normal-look/phone/README.md).
-It does not establish all-pose surface/body visibility or owner acceptance.
+It does not establish all-pose surface/body visibility. The subsequent owner
+check on this installed APK accepts raised-lantern/look-up wrist appearance:
+"Looks like a normal cuff seam now". Preserve that cuff and hand mounting;
+separate upper-arm/armpit continuity, body presence and mirror/live acceptance
+remain open. Source95792de now has successful branch36290289203 and PR36290291624
+CI runs; these do not substitute for physical acceptance.
 
 Historical [upper-torso phone evidence](evidence/2026-09-27-upper-torso/phone/README.md)
 remains labelled as an extreme-camera investigation. Its glass failures remain
 real open findings, but its camera-inside-body poses are not visual acceptance gates.
-Next finish normal-range wrist/armpit continuity, appropriate body presence and
+Next finish normal-range upper-arm/armpit continuity, appropriate body presence and
 continuous movement/combat/carry checks while preserving the owner's liked arms.
 
 Audio/haptic manual revalidation required: **NO additional check for this camera
