@@ -48,6 +48,9 @@ jobs:
       - name: Check exact player cloth seam weight transfers
         run: python3 -m unittest discover -s tests -p test_player_sleeve_seams.py -v
 
+      - name: Check upper torso partition preserves the head mask
+        run: python3 -m unittest discover -s tests -p test_player_body_partition.py -v
+
       - name: Check Gradle APK artifact resolution
         shell: pwsh
         run: ./tools/test-resolve-android-apk.ps1

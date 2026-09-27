@@ -1,0 +1,251 @@
+{
+  "description": "Read-only CPU geometry diagnostic; not native RT/image acceptance.",
+  "world": "C:\\Dev\\tmp\\horde-deep-look-native-20260927-b\\player-viewmodel-body-look-down\\147-player-viewmodel-body-look-down.player-world-body.obj",
+  "view": "C:\\Dev\\tmp\\horde-deep-look-native-20260927-b\\player-viewmodel-body-look-down\\147-player-viewmodel-body-look-down.obj",
+  "sampleGrid": [
+    135,
+    240
+  ],
+  "camera": [
+    0.0,
+    0.699999988079071,
+    1.850000023841858
+  ],
+  "pitch": -4.0,
+  "counts": {
+    "current": {
+      "miss": 11431,
+      "ViewmodelSleeves": 5308,
+      "BodyRemainderPrimaryVisible": 15143,
+      "ViewmodelGauntlets": 518
+    },
+    "plus_near_face": {
+      "miss": 10227,
+      "ViewmodelSleeves": 5308,
+      "BodyRemainderPrimaryVisible": 1868,
+      "ViewmodelGauntlets": 518,
+      "NearFacePrimaryMasked": 14479
+    },
+    "full_world": {
+      "HeadPrimaryMasked": 30062,
+      "NearFacePrimaryMasked": 2338
+    }
+  },
+  "changes": {
+    "miss -> NearFace (front)": 1204,
+    "BodyRemainderPrimaryVisible -> NearFace (front)": 10932,
+    "BodyRemainderPrimaryVisible -> NearFace (back)": 2343
+  },
+  "examples": [
+    {
+      "pixel": [
+        134,
+        562
+      ],
+      "previous": "BodyRemainderPrimaryVisible",
+      "facing": "front",
+      "worldPosition": [
+        -0.038205698132514954,
+        0.5362009406089783,
+        1.827114224433899
+      ],
+      "distance": 0.16774556040763855
+    },
+    {
+      "pixel": [
+        270,
+        562
+      ],
+      "previous": "miss",
+      "facing": "front",
+      "worldPosition": [
+        0.0,
+        0.5533491373062134,
+        1.8295100927352905
+      ],
+      "distance": 0.14607533812522888
+    },
+    {
+      "pixel": [
+        406,
+        562
+      ],
+      "previous": "miss",
+      "facing": "front",
+      "worldPosition": [
+        0.03558896854519844,
+        0.5474196672439575,
+        1.8286817073822021
+      ],
+      "distance": 0.15611958503723145
+    },
+    {
+      "pixel": [
+        134,
+        642
+      ],
+      "previous": "BodyRemainderPrimaryVisible",
+      "facing": "front",
+      "worldPosition": [
+        -0.03189612552523613,
+        0.5599237084388733,
+        1.844373106956482
+      ],
+      "distance": 0.14177197217941284
+    },
+    {
+      "pixel": [
+        270,
+        642
+      ],
+      "previous": "BodyRemainderPrimaryVisible",
+      "facing": "front",
+      "worldPosition": [
+        0.0,
+        0.5660665035247803,
+        1.8446199893951416
+      ],
+      "distance": 0.13204152882099152
+    },
+    {
+      "pixel": [
+        406,
+        642
+      ],
+      "previous": "BodyRemainderPrimaryVisible",
+      "facing": "front",
+      "worldPosition": [
+        0.028064848855137825,
+        0.576749324798584,
+        1.8450490236282349
+      ],
+      "distance": 0.12450248003005981
+    },
+    {
+      "pixel": [
+        134,
+        722
+      ],
+      "previous": "BodyRemainderPrimaryVisible",
+      "facing": "front",
+      "worldPosition": [
+        -0.03125191107392311,
+        0.5594918727874756,
+        1.8576939105987549
+      ],
+      "distance": 0.14214718341827393
+    },
+    {
+      "pixel": [
+        270,
+        722
+      ],
+      "previous": "BodyRemainderPrimaryVisible",
+      "facing": "front",
+      "worldPosition": [
+        0.0,
+        0.565102756023407,
+        1.8573867082595825
+      ],
+      "distance": 0.13309933245182037
+    },
+    {
+      "pixel": [
+        406,
+        722
+      ],
+      "previous": "BodyRemainderPrimaryVisible",
+      "facing": "front",
+      "worldPosition": [
+        0.026387467980384827,
+        0.5813623666763306,
+        1.8564963340759277
+      ],
+      "distance": 0.1197102963924408
+    },
+    {
+      "pixel": [
+        134,
+        802
+      ],
+      "previous": "BodyRemainderPrimaryVisible",
+      "facing": "front",
+      "worldPosition": [
+        -0.031627584248781204,
+        0.5545026063919067,
+        1.871152400970459
+      ],
+      "distance": 0.14839018881320953
+    },
+    {
+      "pixel": [
+        270,
+        802
+      ],
+      "previous": "BodyRemainderPrimaryVisible",
+      "facing": "back",
+      "worldPosition": [
+        0.0,
+        0.5944591760635376,
+        1.865343451499939
+      ],
+      "distance": 0.10465028882026672
+    },
+    {
+      "pixel": [
+        406,
+        802
+      ],
+      "previous": "BodyRemainderPrimaryVisible",
+      "facing": "front",
+      "worldPosition": [
+        0.025410622358322144,
+        0.5831027030944824,
+        1.8669945001602173
+      ],
+      "distance": 0.11882833391427994
+    },
+    {
+      "pixel": [
+        134,
+        882
+      ],
+      "previous": "BodyRemainderPrimaryVisible",
+      "facing": "front",
+      "worldPosition": [
+        -0.03221147507429123,
+        0.5484553575515747,
+        1.8851555585861206
+      ],
+      "distance": 0.15686866641044617
+    },
+    {
+      "pixel": [
+        270,
+        882
+      ],
+      "previous": "BodyRemainderPrimaryVisible",
+      "facing": "back",
+      "worldPosition": [
+        0.0,
+        0.5931869149208069,
+        1.8747786283493042
+      ],
+      "distance": 0.10764951258897781
+    },
+    {
+      "pixel": [
+        406,
+        882
+      ],
+      "previous": "BodyRemainderPrimaryVisible",
+      "facing": "back",
+      "worldPosition": [
+        0.021271653473377228,
+        0.5999236702919006,
+        1.873215913772583
+      ],
+      "distance": 0.10291289538145065
+    }
+  ]
+}

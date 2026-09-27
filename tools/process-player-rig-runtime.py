@@ -9,6 +9,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from player_gauntlet_geometry import authored_face_and_uvs, mirror_for_hand
+from player_body_partition import upper_torso_partition_limits
 
 
 DEFAULT_GAUNTLET_SCALE = 0.090
@@ -23,6 +24,11 @@ arguments = sys.argv[sys.argv.index("--") + 1:]
 body_remainder = '--body-remainder' in arguments
 if body_remainder:
     arguments.remove('--body-remainder')
+retain_upper_torso = '--retain-upper-torso' in arguments
+if retain_upper_torso:
+    arguments.remove('--retain-upper-torso')
+    if not body_remainder:
+        raise RuntimeError('Upper torso retention requires the explicit body remainder')
 # Omission is historical-export compatibility, not an anatomical judgement.
 # The owner's 2026-09-23 correction identifies the supplied source as Right.
 gauntlet_source_hand = 'Left'
@@ -800,6 +806,13 @@ maximum = Vector(tuple(max(point[axis] for point in points) for axis in range(3)
 height = maximum.z - minimum.z
 head_start = minimum.z + height * 0.86
 near_face_start = minimum.z + height * 0.79
+if retain_upper_torso:
+    head_bone = rig.data.bones.get('Head')
+    if head_bone is None:
+        raise RuntimeError('Upper torso partition requires the authored Head landmark')
+    head_origin_height = (rig.matrix_world @ head_bone.head_local).z
+    head_start, near_face_start = upper_torso_partition_limits(
+        minimum.z, maximum.z, head_origin_height)
 viewmodel_group_indices = {}
 gauntlet_group_indices = {}
 for side in ("Left", "Right"):
@@ -995,6 +1008,12 @@ report = {
         "NearFacePrimaryMasked": semantic_triangles[3],
         **({"BodyRemainderPrimaryVisible": semantic_triangles[4]} if body_remainder else {}),
     },
+    **({"bodyPrimaryPartition": {
+        "mode": "RetainUpperTorsoBelowExistingHeadMask",
+        "headStartMetres": head_start,
+        "nearFaceStartMetres": near_face_start,
+        "preservesOriginalHeadMask": True,
+    }} if retain_upper_torso else {}),
     "processing": "texture-before-rig PBR UV transfer, retained fitted character sleeves with bounded shoulder-elbow-wrist reweighting, accepted Meshy 7 grip surfaces rigid to Hand and mirrored by chirality without voxel remesh or decimation, gauntlet authored loop UV0 and distinct PBR material retained, asset-owned LeftGrip/RightGrip sockets, replaced unstable source glove surfaces, complete boot-grounded body retained for reflection and shadow rays, idle/walk-only clip packaging, semantic material primitives, generated tangents, 4x4 embedded identity textures",
 }
 with open(destination + ".processing.json", "w", encoding="utf-8") as handle:

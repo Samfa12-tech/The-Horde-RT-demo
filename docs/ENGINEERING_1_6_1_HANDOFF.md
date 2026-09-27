@@ -30,6 +30,21 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### Current Phase 3 checkpoint
 
+**Upper-torso partition repaired in an opt-in candidate:** `--retain-upper-torso`
+retains the old1116-triangle shoulder/torso band, while repartitioning the old
+1813-triangle head mask into1345Head+468NearFace without exposing any of it.
+World candidate `58c80338...` in `C:/Dev/tmp/horde-upper-torso-20260927-a` has exact
+expanded geometry/UVs/normals/tangents/weights and unchanged view `6f06d77e...`.
+21 Python tests, C++ world/view admission, glTF validation and four native poses
+pass. Low/down145 remains pixel-identical to the owner's liked mounting direction;
+all198 matched cloth edges remain closed. Deep148 still records2 glass overflows.
+The extreme view has a remaining collar/interior appearance issue; feet are not
+clearly readable at idle. Do not mark complete body/live acceptance. Next build
+and check walking/look/attack/parry/high-low continuous motion with this paired
+candidate before changing mounting further. [Exact evidence and recipe](evidence/2026-09-27-upper-torso/README.md).
+Phone is still owner-liked `bd9b348c...`, not the new offline candidate.
+Both branch and PR CI at11ca383 passed (36287731866 /36287734123).
+
 **Deeper-look implementation, not body acceptance:** the explicit AnatomicalBody
 camera now permits about76 degrees downward while physical held poses retain
 their old clamp. Legacy behaviour stays unchanged. Two new native checkpoints

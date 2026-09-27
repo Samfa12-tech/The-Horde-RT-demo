@@ -18,6 +18,8 @@ Investigation-only switches (not admission or production defaults):
     seam vertices, retaining geometry, UVs and separate world/view ownership.
   --body-remainder: add an explicit world connecting-cloth/torso/legs region
     with a paired WorldBody manifest; preserve the dedicated arm extraction.
+  --retain-upper-torso: keep the old near-face torso cloth in that remainder,
+    preserving the existing head mask and all geometry/weights.
 These retain gameplay sockets/prop authority. None establishes visual acceptance;
 the candidates still require anatomical, surface and live-motion validation.
 """
@@ -43,6 +45,7 @@ parser.add_argument('--fit-sleeves', action='store_true')
 parser.add_argument('--close-sleeves', action='store_true')
 parser.add_argument('--reconcile-sleeve-seams', action='store_true')
 parser.add_argument('--body-remainder', action='store_true')
+parser.add_argument('--retain-upper-torso', action='store_true')
 parser.add_argument('--stabilize-sleeves', action='store_true')
 parser.add_argument('--gauntlet-source-hand', choices=('Left', 'Right'),
                     help='Explicit anatomical source handedness; omission reproduces the historical export')
@@ -54,6 +57,8 @@ roll_options.add_argument('--grip-roll-degrees', nargs=2, type=float, metavar=('
 options = parser.parse_args(arguments)
 if options.body_remainder and not options.reconcile_sleeve_seams:
     parser.error('Body remainder requires the demonstrated shared-seam reconciliation')
+if options.retain_upper_torso and not options.body_remainder:
+    parser.error('Upper torso retention requires the explicit body remainder')
 if options.reconcile_sleeve_seams and (options.fit_sleeves or options.close_sleeves):
     parser.error('Seam reconciliation requires unchanged source positions/topology, not fitted or capped sleeves')
 roll_degrees = options.grip_roll_degrees or ([180.0, 180.0] if options.correct_grip_roll else [0.0, 0.0])
@@ -105,6 +110,8 @@ if options.gauntlet_source_hand or options.gauntlet_scale is not None or options
         paired_arguments.extend(['--gauntlet-scale', format(options.gauntlet_scale, '.17g')])
     if options.body_remainder:
         paired_arguments.append('--body-remainder')
+    if options.retain_upper_torso:
+        paired_arguments.append('--retain-upper-torso')
     sys.argv = paired_arguments
     try:
         world = runpy.run_path(str(root / 'tools/process-player-rig-runtime.py'), run_name='__main__')
@@ -375,6 +382,8 @@ report = dict(schema=1, role='Viewmodel',
               sleeveEnvelopeFit=sleeve_fit,
               sleeveClosure=sleeve_closure,
               sleeveSeamReconciliation=seam_reconciliation,
+              **({'bodyPrimaryPartition': world['report']['bodyPrimaryPartition']}
+                 if options.retain_upper_torso else {}),
               runtime=viewmodel_output.name, runtimeSha256=sha(viewmodel_output),
               primitiveSemantics=counts, processingVertices=len(player.data.vertices),
               ownership='Primary-only modelled geometry; world body owns secondary visibility',
