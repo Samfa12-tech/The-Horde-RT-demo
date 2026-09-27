@@ -256,11 +256,10 @@ ProductionSceneVisibility BuildProductionSceneVisibility(
     result.rewardWorldVisible = !input.glassFixtureVisible;
     result.inspectionOverride = input.productionInspection;
     // The production reward world owns TLAS slots 5-8 (chest, lid, ring,
-    // body), which are the legacy procedural arm slots. The owner-deferred
-    // skinned first-person hands therefore use the bounded hybrid route:
-    // skinned body in reflections/shadows, stable block arms in free slots
-    // 10-13. This is intentionally one route switch, not a second animation or
-    // socket authority.
+    // body), which are the legacy procedural arm slots. Explicit procedural
+    // comparisons therefore use the hybrid route's free slots10-13; normal
+    // gameplay keeps the accepted ModelledViewmodel route. This does not add
+    // a second animation or socket authority.
     result.playerRoute = input.requestedPlayerRoute == PlayerRenderRoute::ModelledViewmodel
         ? PlayerRenderRoute::ModelledViewmodel
         : input.requestedPlayerRoute == PlayerRenderRoute::Skinned

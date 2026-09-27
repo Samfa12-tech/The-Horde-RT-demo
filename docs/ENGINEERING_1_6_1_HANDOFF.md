@@ -30,6 +30,18 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### Current Phase 3 checkpoint
 
+Promoted native source is backed up on GitHub at7f35e2f; portable CI asset-fetch
+follow-upd7b24fb has green push36296744145/PR36296747147 (45portable,11Vulkan-host,
+28Python,10resolver,34combat cases; logs inspected). Same-APK isolated glass
+run151740 exposed a harness classification mismatch; the bounded checkpoint115
+predicate now passes16new ownership cases and phone run152018 alongside low-parry
+andHome/resume. Isolated glass pixels are unchanged. **Glass11/1transport overflow
+counts remain failures**, not fixed by this harness correction. Next investigate
+the existing volume-enter/volume-open failure at its physical/numerical layer;
+do not raise budgets blindly or suppress diagnostics. Current ordinary DebugAPK
+is14927941; the separate owner-accepted candidate remains untouched. No phone run
+is active after harness completion.
+
 **Normal production route integrated and phone startup regression fixed:** exact
 accepted world/view pair is admitted; normal Windows/Android paths select the
 anatomical modelled route, with old routes only in explicit comparison captures.

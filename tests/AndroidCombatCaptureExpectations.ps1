@@ -80,3 +80,33 @@ foreach ($mutation in @('valid', 'wrong-phase', 'wrong-time', 'missing-parry-edg
     ++$cases
 }
 Write-Output "Android combat capture expectations: $cases cases passed."
+
+$ownershipFunction = @($ast.FindAll({ param($node)
+    $node -is [Management.Automation.Language.FunctionDefinitionAst] -and
+    $node.Name -ceq 'Test-CheckpointPlayerOwnership'
+}, $false))
+if ($ownershipFunction.Count -ne 1) { throw 'Expected the shared capture/benchmark ownership guard' }
+. ([scriptblock]::Create($ownershipFunction[0].Extent.Text))
+$ownershipCases = 0
+foreach ($checkpointName in @('opening', 'lantern-held-high',
+        'player-viewmodel-lantern-low-parry', 'lantern-glass-production')) {
+    foreach ($owned in @($true, $false)) {
+        foreach ($inspectionFlags in @($true, $false)) {
+            $state = [pscustomobject]@{
+                dedicatedPlayerPrimaryOwnership = $owned
+                rtLab = [pscustomobject]@{
+                    productionRewardPropsVisible = $inspectionFlags
+                    productionLanternGlassOnly = $inspectionFlags
+                }
+            }
+            $expected = if ($checkpointName -ceq 'lantern-glass-production') {
+                $inspectionFlags -and -not $owned
+            } else { $owned }
+            if ((Test-CheckpointPlayerOwnership $checkpointName $state) -ne $expected) {
+                throw "Unexpected player ownership result: $checkpointName/$owned/$inspectionFlags"
+            }
+            ++$ownershipCases
+        }
+    }
+}
+Write-Output "Android gameplay versus isolated-glass ownership: $ownershipCases cases passed."

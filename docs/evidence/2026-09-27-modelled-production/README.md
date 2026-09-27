@@ -107,6 +107,31 @@ covered only the old player world GLB. Add the viewmodel to both lists and cover
 the dependency in the package-inventory regression. No contract is skipped or
 relaxed. Fresh follow-up workflow results must be checked, not inferred.
 
+Follow-up `d7b24fbba381ae59d9dfa66498dabac45919a704`: push36296744145 and
+PR36296747147 both pass. Logs inspected:45/45 portable CTests,11/11 Vulkan-host
+CTest selection,6chirality/12seam/3partition/7segmented-seam Python tests,
+10APK resolver cases and34combat capture guards. These host lanes do not prove
+hardware presentation; exact Windows/phone evidence is recorded above.
+
+### Glass-harness handoff
+
+Before shader changes, same-APK run151740 exposed a harness-only mismatch:
+checkpoint115 (`lantern-glass-production`) intentionally masks all player
+geometry in its isolated glass inspection, but the generalized normal-route
+guard demanded visible-player ownership. Keep that run failed. The predicate
+now requires the exact checkpoint name, both production/glass-only flags and
+ownership=false for this inspection, while all normal/held scenes still require
+ownership=true. Route, anatomical profile, skin cadence and socket gates remain.
+Sixteen positive/negative ownership cases plus the existing34combat cases pass.
+
+Same-APK run152018 passes isolated-glass and low-parry capture/state checks plus
+Home/resume. Isolated glass pixels are byte-identical before/after the harness
+fix: no renderer, shader, geometry/mask or APK changed. Retained reports in
+`glass-harness/` keep11/1transport overflows respectively, both shadow0. Thus the
+harness can collect the next investigation's evidence, but **glass correctness
+is still failing**. This is not a performance comparison or a newly passing
+physical-transport gate.
+
 Phase3 normal-route integration is verified; preserve accepted geometry. Glass
 is still open: low-parry reports one transport/volume-budget overflow, shadow0.
 Prior high/look-up overflow evidence is not erased. No matched performance gain,

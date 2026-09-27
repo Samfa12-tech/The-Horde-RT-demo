@@ -309,6 +309,19 @@ function Send-AutomationIntent {
     Invoke-AdbText $arguments | Out-Null
 }
 
+function Test-CheckpointPlayerOwnership {
+    param([string]$Checkpoint, $State)
+    # Authored checkpoint115 inspects the isolated production glass while its
+    # locked chest state deliberately masks the player. It is not gameplay or
+    # a held-lantern capture. Do not exempt any other checkpoint by flags alone.
+    if ($Checkpoint -ceq 'lantern-glass-production') {
+        return $State.rtLab.productionRewardPropsVisible -eq $true -and
+               $State.rtLab.productionLanternGlassOnly -eq $true -and
+               $State.dedicatedPlayerPrimaryOwnership -eq $false
+    }
+    return $State.dedicatedPlayerPrimaryOwnership -eq $true
+}
+
 function Invoke-CaptureCheckpoint {
     param([string]$Checkpoint, [int]$RequestedScale, [int]$Index)
     if (-not $checkpointZones.ContainsKey($Checkpoint)) { throw "Unknown capture checkpoint '$Checkpoint'." }
@@ -373,7 +386,7 @@ function Invoke-CaptureCheckpoint {
         $failures.Add("$Checkpoint did not retain modelled-viewmodel, 60 Hz skinning and exact grip authority.")
     }
     if ($requiresModelledRoute -and ($state.playerMountProfile -cne 'AnatomicalBody' -or
-        $state.dedicatedPlayerPrimaryOwnership -ne $true)) {
+        -not (Test-CheckpointPlayerOwnership $Checkpoint $state))) {
         $failures.Add("$Checkpoint lacks the requested anatomical gameplay profile or nonduplicating primary ownership.")
     }
     if ($Checkpoint.StartsWith("player-") -and [int]$state.tlasInstanceCount -ne 21) {
@@ -537,7 +550,7 @@ function Invoke-CheckpointBenchmark {
         $failures.Add("$Checkpoint benchmark did not retain modelled-viewmodel, 60 Hz skinning and exact grip authority.")
     }
     if ($requiresModelledRoute -and ($state.playerMountProfile -cne 'AnatomicalBody' -or
-        $state.dedicatedPlayerPrimaryOwnership -ne $true)) {
+        -not (Test-CheckpointPlayerOwnership $Checkpoint $state))) {
         $failures.Add("$Checkpoint benchmark lacks the requested anatomical gameplay profile or nonduplicating primary ownership.")
     }
     if ($Checkpoint.StartsWith("player-") -and [int]$state.tlasInstanceCount -ne 21) {

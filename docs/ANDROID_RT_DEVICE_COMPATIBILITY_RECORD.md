@@ -92,6 +92,23 @@ it was not installed. The accepted candidate app remains untouched; the harness
 force-stopped only the tested ordinary Debug package on completion. See
 [production integration evidence](evidence/2026-09-27-modelled-production/README.md).
 
+Same exact APK14927941 on **SM-S948B**, run151740: the authored isolated
+`lantern-glass-production` scene presents native RT and passes Home/resume,
+but the newly generalized harness fails its player-ownership check. Source and
+state agree that checkpoint115 intentionally masks player geometry in this
+locked-chest glass-only inspection; ordinary/held-lantern scenes do not. This is
+a harness classification regression, not another app startup failure. Keep this
+run failed. Its11transport overflows/shadow0 are new exact-device glass evidence,
+not a glass correctness pass. A narrowly named inspection-state predicate is
+being validated without changing the APK, scene masks or shader diagnostics.
+
+Same-APK run152018 on **SM-S948B** passes the corrected harness for isolated
+glass and gameplay low-parry captures, plus Home/resume. The isolated glass PNG
+is byte-identical to failed-harness run151740. Inspection correctly reports
+ownership=false, gameplay ownership=true; both retain the anatomical modelled
+route. The11/1transport overflows and0/0shadow overflows remain visible failures
+for glass acceptance. No new binary, shader, geometry, mask or quality change.
+
 Superseded local installation (extreme-look camera policy withdrawn): **SM-S948B**, isolated
 `.debug.viewmodel` APK `210d3bf234ef53e08e80fbef0c7574e37c6f9eaf6335cca7310751eff583b898`,
 built on branch checkpoint `bda5c2c` with the deeper camera and upper-torso
