@@ -100,6 +100,13 @@ final log includes triangle-count/finite guards and actual viewmodel skinning.
 
 ## Remaining gates
 
+CI follow-up: push36296518065 and PR36296520882 on7f35e2f passed the focused
+Vulkan-host lane, but portable CTest was44/45. Its manifest/hash test found an
+unhydrated viewmodel LFS pointer: that lane's narrow fetch/checkout lists still
+covered only the old player world GLB. Add the viewmodel to both lists and cover
+the dependency in the package-inventory regression. No contract is skipped or
+relaxed. Fresh follow-up workflow results must be checked, not inferred.
+
 Phase3 normal-route integration is verified; preserve accepted geometry. Glass
 is still open: low-parry reports one transport/volume-budget overflow, shadow0.
 Prior high/look-up overflow evidence is not erased. No matched performance gain,

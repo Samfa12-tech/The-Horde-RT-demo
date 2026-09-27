@@ -5,6 +5,12 @@ $repo = Split-Path -Parent $PSScriptRoot
 $required = @(
     'assets/models/player/viewmodel/runtime/asset.manifest.json',
     'assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb')
+$workflow = Get-Content (Join-Path $repo '.github/workflows/shared-simulation-host.yml') -Raw
+$portableLane = [regex]::Match($workflow, '(?s)  shared-gameplay:(.*?)  player-vulkan-host:')
+if (-not $portableLane.Success -or [regex]::Matches($portableLane.Groups[1].Value,
+        [regex]::Escape('assets/models/player/viewmodel/runtime/*.glb')).Count -ne 2) {
+    throw 'Portable manifest checks require viewmodel GLBs in both LFS fetch and checkout lists'
+}
 foreach ($relative in @('tools/package-alpha.ps1', 'tools/run-foundation-validation.ps1')) {
     $errors = $null
     $ast = [Management.Automation.Language.Parser]::ParseFile(

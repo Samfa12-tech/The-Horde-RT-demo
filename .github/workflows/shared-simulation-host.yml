@@ -21,9 +21,10 @@ jobs:
       - name: Fetch portable-test GLB assets
         run: >-
           git -c lfs.fetchexclude= lfs fetch
-          --include="assets/models/player/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,tests/fixtures/*/*.glb"
+          --include="assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,tests/fixtures/*/*.glb"
           && git lfs checkout
           "assets/models/player/runtime/*.glb"
+          "assets/models/player/viewmodel/runtime/*.glb"
           "assets/models/props/runtime/*.glb"
           "assets/models/props/runtime/*/*.glb"
           "assets/models/weapons/runtime/*.glb"
