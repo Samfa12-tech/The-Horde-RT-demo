@@ -89,7 +89,19 @@ with its receipt hash and a canonical file inside the candidate directory.
 The real Gradle Sync task passes valid and legacy staging cases; missing name,
 missing hash, wrong hash and traversal cases each reject with the expected
 diagnostic. The focused test restores the previous generated overlay. This is
-staging evidence, **not** an Android build, installation or physical-device pass.
+staging evidence; the separate subsequent build/package result follows below.
+
+ARM64 Debug `:app:assembleDebug` subsequently succeeds (20 s), with the exact
+five-region candidate manifest overlay. Archived APK SHA-256:
+`a19fc1cfde52150461dd4c28debd348db0cfe54231a9301db00779f08ed149d4`, at
+`C:/Dev/tmp/horde-body-remainder-android-20260927-a/HordeLanternRT-1.6.1-viewmodel-debug-arm64.apk`.
+Runtime source is unchanged between `53c786a` and the test-probe-only `c339b6b`.
+ZIP-entry hashes match the world, view and manifest above. The extracted actual
+ARM64 library is `29f621a799227dd42f1faa8d121b14534b242c831ad8cae97f74b55f14296ce3`;
+containment confirms the four Diagnostic Mobile pipeline/compute modules and
+passes `spirv-val`/`spirv-dis`. Initial inspection incorrectly supplied the APK
+to the ELF inspector and was rejected; the successful check used its extracted
+library. No install, phone claim, release signing or publication.
 
 New body visibility is investigation-only and **not accepted**. Required next:
 anatomical camera/body mounting and reach, nonduplicating visible torso/legs,

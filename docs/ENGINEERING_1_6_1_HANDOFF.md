@@ -42,6 +42,15 @@ No production replacement or phone install. See [bounded evidence and remaining
 gates](evidence/2026-09-27-body-remainder/README.md). CI at parent `363bc72` passed
 push36281339999 / PR36281341324; that does not validate this later source.
 
+Follow-up commits `01a6500` (remainder ownership), `53c786a` (paired Android
+manifest staging) and `c339b6b` (native mount/reach probe) are pushed. `53c786a`
+passes fresh branch/PR CI. New five-region ARM64 Debug APK `a19fc1cf...` builds,
+has exact packaged assets and valid contained Mobile shaders, but is deliberately
+not installed. Mount probe proves a body-only translation toward the Head joint
+plane would exceed the current fixed-grip reach bound by 34 mm. Establish the
+anatomical body/camera mount and compatible shared held pose together; do not
+increase stretch or tune sleeves to conceal it. Full Phase 3 acceptance remains open.
+
 **Exact seam repair candidate:** opt-in `--reconcile-sleeve-seams` transfers the
 accepted view endpoint weights to 355 world vertices at 198 matched Body/NearFace
 edges. Fresh native low/down, high/up and low/parry now have zero measured shared
