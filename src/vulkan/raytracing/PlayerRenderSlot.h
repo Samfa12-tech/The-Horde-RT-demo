@@ -38,7 +38,14 @@ struct PlayerRouteMasks
     std::array<std::uint8_t, kRtInstanceMetadataCapacity> instanceMasks{};
 };
 
-PlayerRouteMasks BuildPlayerRouteMasks(PlayerRenderRoute route);
+PlayerRouteMasks BuildPlayerRouteMasks(PlayerRenderRoute route,
+                                      bool bodyRemainderAvailable = false);
+
+// A primary-visible world remainder is valid only with the matching per-instance
+// primitive filter. Never accept full-body primary visibility as a viewmodel.
+bool HasDedicatedPlayerPrimaryOwnership(
+    const std::array<std::uint8_t, kRtInstanceMetadataCapacity>& masks,
+    std::uint32_t worldBodyInstanceFlags);
 
 // The imported player is authored +Z forward with anatomical Left on +X.
 // Facing the gameplay -Z direction therefore requires a 180-degree Y rotation:
@@ -70,6 +77,7 @@ struct ProductionSceneVisibilityInput
     bool glassFixtureVisible = false;
     bool productionInspection = false;
     bool rewardLanternClaimed = false;
+    bool bodyRemainderAvailable = false;
 };
 
 struct ProductionSceneVisibility

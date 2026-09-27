@@ -250,6 +250,9 @@ StaticMaterial ConvertMaterial(const cgltf_data& data,
         // Preserve the existing CPU/GLSL bits; semantic lookup is name-based.
         if (playerPart->semantic == PlayerPrimitiveSemantic::Head) result.flags |= 128u;
         if (playerPart->semantic == PlayerPrimitiveSemantic::NearFace) result.flags |= 256u;
+        if (playerPart->semantic == PlayerPrimitiveSemantic::BodyRemainderPrimaryVisible)
+            result.flags |= static_cast<std::uint32_t>(
+                horde::vulkan::raytracing::RtMaterialFlag::BodyRemainderPrimaryVisible);
     }
     else if (const auto* viewmodelPart = FindPlayerViewmodelPrimitiveContract(result.name))
     {

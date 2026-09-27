@@ -220,6 +220,7 @@ struct ShowcaseCaptureRecord
                horde::vulkan::raytracing::PresentableTinyRtScene::kTlasInstanceCount>
         instanceMasks{};
     bool playerPrimaryVisible = false;
+    std::uint32_t playerWorldBodyInstanceFlags = 0u;
     std::uint32_t primaryTorchPixels = 0u;
     std::uint32_t primarySwordPixels = 0u;
     std::uint32_t primaryPlayerPixels = 0u;
@@ -4412,6 +4413,7 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                  << "      \"honestlyPresentedRtFrame\": true,\n"
                  << "      \"visibility\": {\"playerPrimaryVisible\": "
                  << (capture.playerPrimaryVisible ? "true" : "false")
+                 << ", \"playerWorldBodyInstanceFlags\": " << capture.playerWorldBodyInstanceFlags
                  << ", \"instanceMasks\": [";
         for (std::size_t mask = 0u; mask < capture.instanceMasks.size(); ++mask)
             manifest << (mask == 0u ? "" : ", ")
@@ -4605,6 +4607,7 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         record.redBlueSwapNormalised = image.redBlueSwapNormalised;
         record.instanceMasks = context.rtScene.LastInstanceMasks();
         record.playerPrimaryVisible = context.rtScene.LastPlayerPrimaryVisible();
+        record.playerWorldBodyInstanceFlags = context.rtScene.LastPlayerWorldBodyInstanceFlags();
         record.primaryTorchPixels = context.rtScene.PrimaryTorchPixelCount();
         record.primarySwordPixels = context.rtScene.PrimarySwordPixelCount();
         record.primaryPlayerPixels = context.rtScene.PrimaryPlayerPixelCount();
@@ -4637,12 +4640,10 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             context.rtScene.DiagnosticsAvailability() ==
             horde::vulkan::raytracing::RtDiagnosticAvailability::Available;
         const bool viewmodelCapture = context.developmentCheckpoint.starts_with("player-viewmodel-");
+        const bool dedicatedPlayerOwnership = horde::vulkan::raytracing::HasDedicatedPlayerPrimaryOwnership(
+            record.instanceMasks, record.playerWorldBodyInstanceFlags);
         if (viewmodelCapture &&
-            (record.instanceMasks[horde::vulkan::raytracing::kPlayerWorldBodyInstanceIndex] != 0x10u ||
-             record.instanceMasks[horde::vulkan::raytracing::kPlayerViewmodelInstanceIndex] !=
-                 horde::vulkan::raytracing::kPlayerViewmodelPrimaryMask ||
-             std::any_of(record.instanceMasks.begin() + 10u, record.instanceMasks.begin() + 17u,
-                         [](std::uint8_t mask) { return mask != 0u; }) ||
+            (!dedicatedPlayerOwnership ||
              !record.playerPrimaryVisible ||
              (diagnosticPixelCountersAvailable && record.primaryPlayerPixels == 0u)))
         {
@@ -4672,7 +4673,7 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             return fail("Opening capture lacks primary-visible block arms, torch, or sword (floating-prop regression).");
         }
         if (claimedRewardCapture &&
-            (record.instanceMasks[4] != 0x10u ||
+            ((viewmodelCapture ? !dedicatedPlayerOwnership : record.instanceMasks[4] != 0x10u) ||
              (!viewmodelCapture && (record.instanceMasks[10] != 0x04u ||
              record.instanceMasks[11] != 0x04u ||
              record.instanceMasks[12] != 0x04u ||

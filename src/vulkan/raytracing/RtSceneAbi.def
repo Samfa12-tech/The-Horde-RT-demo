@@ -26,11 +26,12 @@
     "viewmodelVertices": 24
   },
   "geometryRoles": { "static": 0, "playerWorldBody": 1, "playerViewmodel": 2 },
-  "playerInstances": { "worldBody": 4, "viewmodel": 20, "viewmodelPrimaryMask": 64 },
+  "playerInstances": { "worldBody": 4, "viewmodel": 20, "viewmodelPrimaryMask": 64, "bodyRemainderPrimaryMask": 128 },
   "instanceFlags": {
     "staticPbr": 1,
     "emissive": 2,
-    "transmissive": 4
+    "transmissive": 4,
+    "bodyRemainderOnlyPrimary": 8
   },
   "materialFlags": {
     "doubleSided": 1,
@@ -43,7 +44,8 @@
     "headPrimaryMasked": 128,
     "nearFacePrimaryMasked": 256,
     "thinWall": 512,
-    "certifiedClosedVolume": 1024
+    "certifiedClosedVolume": 1024,
+    "bodyRemainderPrimaryVisible": 2048
   },
   "records": [
     {

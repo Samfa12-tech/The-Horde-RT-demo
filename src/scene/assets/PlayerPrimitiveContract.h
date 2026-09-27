@@ -16,6 +16,7 @@ enum class PlayerPrimitiveSemantic : std::uint8_t
     Head,
     NearFace,
     GauntletPrimaryVisible,
+    BodyRemainderPrimaryVisible,
 };
 
 // Relative texture groups; the renderer owns actual array-layer allocation.
@@ -39,12 +40,15 @@ struct PlayerPrimitiveContract
     PlayerTextureGroup textureGroup;
 };
 
-inline constexpr std::array<PlayerPrimitiveContract, 4> kPlayerPrimitiveContract{{
+inline constexpr std::array<PlayerPrimitiveContract, 5> kPlayerPrimitiveContract{{
     {PlayerPrimitiveSemantic::Body, "BodyPrimaryVisible", true, true, true, PlayerTextureGroup::Body},
     {PlayerPrimitiveSemantic::Head, "HeadPrimaryMasked", false, true, true, PlayerTextureGroup::Body},
     {PlayerPrimitiveSemantic::NearFace, "NearFacePrimaryMasked", false, true, true, PlayerTextureGroup::Body},
     {PlayerPrimitiveSemantic::GauntletPrimaryVisible, "GauntletPrimaryVisible", true, true, true, PlayerTextureGroup::Gauntlet},
+    {PlayerPrimitiveSemantic::BodyRemainderPrimaryVisible, "BodyRemainderPrimaryVisible", true, true, true, PlayerTextureGroup::Body},
 }};
+
+inline constexpr std::size_t kLegacyPlayerPrimitiveCount = 4u;
 
 constexpr const PlayerPrimitiveContract* FindPlayerPrimitiveContract(std::string_view material)
 {
@@ -64,9 +68,9 @@ inline bool ValidatePlayerPrimitiveNames(std::span<const std::string_view> names
                                          std::string& diagnostic)
 {
     diagnostic.clear();
-    if (names.size() != kPlayerPrimitiveContract.size())
+    if (names.size() != kLegacyPlayerPrimitiveCount && names.size() != kPlayerPrimitiveContract.size())
     {
-        diagnostic = "Player primitive contract requires exactly four named primitives.";
+        diagnostic = "Player primitive contract requires exactly four or five named primitives.";
         return false;
     }
     std::array<bool, kPlayerPrimitiveContract.size()> seen{};
@@ -86,6 +90,15 @@ inline bool ValidatePlayerPrimitiveNames(std::span<const std::string_view> names
         }
         seen[index] = true;
     }
+    const std::size_t expectedCount = names.size();
+    for (std::size_t i = 0; i < expectedCount; ++i)
+    {
+        if (!seen[i])
+        {
+            diagnostic = "Player primitive contract is missing a required material semantic.";
+            return false;
+        }
+    }
     return true;
 }
 
@@ -93,14 +106,15 @@ inline bool ValidatePlayerPrimitiveDeclarations(
     std::span<const PlayerPrimitiveDeclaration> declarations, std::string& diagnostic)
 {
     diagnostic.clear();
-    if (declarations.size() != kPlayerPrimitiveContract.size())
+    if (declarations.size() != kLegacyPlayerPrimitiveCount &&
+        declarations.size() != kPlayerPrimitiveContract.size())
     {
-        diagnostic = "Player primitive contract requires exactly four declarations.";
+        diagnostic = "Player primitive contract requires exactly four or five declarations.";
         return false;
     }
     std::array<std::string_view, kPlayerPrimitiveContract.size()> names{};
     for (std::size_t i = 0; i < declarations.size(); ++i) names[i] = declarations[i].material;
-    if (!ValidatePlayerPrimitiveNames(names, diagnostic)) return false;
+    if (!ValidatePlayerPrimitiveNames(std::span<const std::string_view>(names).first(declarations.size()), diagnostic)) return false;
     for (const auto& declaration : declarations)
     {
         const auto* part = FindPlayerPrimitiveContract(declaration.material);

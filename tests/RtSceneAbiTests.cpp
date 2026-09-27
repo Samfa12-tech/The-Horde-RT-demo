@@ -217,11 +217,13 @@ void TestGeneratedConstants()
               static_cast<std::uint32_t>(RtGeometryRole::PlayerViewmodel) == 2u &&
               kPlayerWorldBodyInstanceIndex == 4u &&
               kPlayerViewmodelInstanceIndex == 20u &&
-              kPlayerViewmodelPrimaryMask == 64u,
+              kPlayerViewmodelPrimaryMask == 64u &&
+              kPlayerBodyRemainderPrimaryMask == 128u,
           "generated geometry roles and named player instance indices remain explicit");
     Check(static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr) == 1u &&
               static_cast<std::uint32_t>(RtInstanceFlag::Emissive) == 2u &&
-              static_cast<std::uint32_t>(RtInstanceFlag::Transmissive) == 4u,
+              static_cast<std::uint32_t>(RtInstanceFlag::Transmissive) == 4u &&
+              static_cast<std::uint32_t>(RtInstanceFlag::BodyRemainderOnlyPrimary) == 8u,
           "instance flag enum agrees with hand-checked literals");
     Check(static_cast<std::uint32_t>(RtMaterialFlag::DoubleSided) == 1u &&
               static_cast<std::uint32_t>(RtMaterialFlag::Alpha) == 2u &&
@@ -230,7 +232,8 @@ void TestGeneratedConstants()
               static_cast<std::uint32_t>(RtMaterialFlag::NormalTexture) == 16u &&
               static_cast<std::uint32_t>(RtMaterialFlag::OrmTexture) == 32u &&
               static_cast<std::uint32_t>(RtMaterialFlag::EmissiveTexture) == 64u &&
-              static_cast<std::uint32_t>(RtMaterialFlag::ThinWall) == 512u,
+              static_cast<std::uint32_t>(RtMaterialFlag::ThinWall) == 512u &&
+              static_cast<std::uint32_t>(RtMaterialFlag::BodyRemainderPrimaryVisible) == 2048u,
           "material flag enum agrees with hand-checked literals");
 }
 

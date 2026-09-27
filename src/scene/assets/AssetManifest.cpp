@@ -704,18 +704,26 @@ bool AssetManifest::ValidatePlayerSemantics(std::string& diagnostic) const
         diagnostic = "Player asset role is invalid.";
         return false;
     }
-    if (primitiveSemantics.size() != kPlayerPrimitiveContract.size())
+    if (primitiveSemantics.size() != kLegacyPlayerPrimitiveCount &&
+        primitiveSemantics.size() != kPlayerPrimitiveContract.size())
     {
-        diagnostic = "Player manifest requires exactly four primitive semantics.";
+        diagnostic = "Player manifest requires exactly four or five primitive semantics.";
+        return false;
+    }
+    if (primitiveSemantics.size() == kPlayerPrimitiveContract.size() &&
+        playerAssetRole != PlayerAssetRole::WorldBody)
+    {
+        diagnostic = "Five-part world-body semantics require an explicit WorldBody asset role.";
         return false;
     }
     std::array<PlayerPrimitiveDeclaration, kPlayerPrimitiveContract.size()> declarations{};
-    for (std::size_t i = 0; i < declarations.size(); ++i)
+    for (std::size_t i = 0; i < primitiveSemantics.size(); ++i)
     {
         const auto& source = primitiveSemantics[i];
         declarations[i] = {source.material, source.firstPersonPrimary, source.shadow, source.reflection};
     }
-    return ValidatePlayerPrimitiveDeclarations(declarations, diagnostic);
+    return ValidatePlayerPrimitiveDeclarations(
+        std::span<const PlayerPrimitiveDeclaration>(declarations).first(primitiveSemantics.size()), diagnostic);
 }
 
 bool AssetManifest::ValidatePlayerViewmodelSemantics(std::string& diagnostic) const

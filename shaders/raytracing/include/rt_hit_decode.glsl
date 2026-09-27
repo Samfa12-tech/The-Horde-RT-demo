@@ -417,16 +417,21 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
         if (ignorePlayerNearFace &&
             rtInstances.values[candidateInstance].geometryRole == kRtGeometryRolePlayerWorldBody)
         {
-            RtInstanceMetadata playerMetadata = rtInstances.values[4];
+            RtInstanceMetadata playerMetadata = rtInstances.values[candidateInstance];
             uint geometryIndex = rayQueryGetIntersectionGeometryIndexEXT(query, false);
             if (geometryIndex < playerMetadata.primitiveCount)
             {
                 RtPrimitiveMetadata playerPrimitive =
                     rtPrimitives.values[playerMetadata.primitiveBase + geometryIndex];
                 uint playerFlags = rtMaterials.values[playerPrimitive.materialIndex].materialFlags.x;
-                candidateIsPlayerNearFace =
-                    (playerFlags & (kRtMaterialFlagHeadPrimaryMasked |
-                                    kRtMaterialFlagNearFacePrimaryMasked)) != 0u;
+                // A dedicated viewmodel owns the primary arm/gauntlet surfaces.
+                // Only the explicit disjoint remainder may enter primary rays
+                // from this world-body instance; secondary visibility is intact.
+                uint excludedRegion = playerFlags & (kRtMaterialFlagHeadPrimaryMasked |
+                                                     kRtMaterialFlagNearFacePrimaryMasked);
+                uint remainderOnly = uint((playerMetadata.flags & kRtInstanceFlagBodyRemainderOnlyPrimary) != 0u);
+                uint outsideRemainder = uint((playerFlags & kRtMaterialFlagBodyRemainderPrimaryVisible) == 0u);
+                candidateIsPlayerNearFace = (excludedRegion | (remainderOnly & outsideRemainder)) != 0u;
             }
         }
         if ((!ignoreWater || !candidateIsWater) &&

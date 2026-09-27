@@ -143,6 +143,7 @@ enum class RtGeometryRole : std::uint32_t
 inline constexpr std::uint32_t kPlayerWorldBodyInstanceIndex = $($p.worldBody)u;
 inline constexpr std::uint32_t kPlayerViewmodelInstanceIndex = $($p.viewmodel)u;
 inline constexpr std::uint8_t kPlayerViewmodelPrimaryMask = $($p.viewmodelPrimaryMask)u;
+inline constexpr std::uint8_t kPlayerBodyRemainderPrimaryMask = $($p.bodyRemainderPrimaryMask)u;
 static_assert(kPlayerWorldBodyInstanceIndex < kRtInstanceMetadataCapacity);
 static_assert(kPlayerViewmodelInstanceIndex < kRtInstanceMetadataCapacity);
 static_assert(kPlayerWorldBodyInstanceIndex != kPlayerViewmodelInstanceIndex);
@@ -152,6 +153,7 @@ enum class RtInstanceFlag : std::uint32_t
     StaticPbr = $($i.staticPbr)u,
     Emissive = $($i.emissive)u,
     Transmissive = $($i.transmissive)u,
+    BodyRemainderOnlyPrimary = $($i.bodyRemainderOnlyPrimary)u,
 };
 
 enum class RtMaterialFlag : std::uint32_t
@@ -167,6 +169,7 @@ enum class RtMaterialFlag : std::uint32_t
     NearFacePrimaryMasked = $($m.nearFacePrimaryMasked)u,
     ThinWall = $($m.thinWall)u,
     CertifiedClosedVolume = $($m.certifiedClosedVolume)u,
+    BodyRemainderPrimaryVisible = $($m.bodyRemainderPrimaryVisible)u,
 };
 
 $cpuRecords
@@ -187,10 +190,12 @@ const uint kRtGeometryRoleStatic = $($g.static)u;
 const uint kRtGeometryRolePlayerWorldBody = $($g.playerWorldBody)u;
 const uint kRtGeometryRolePlayerViewmodel = $($g.playerViewmodel)u;
 const uint kPlayerViewmodelPrimaryMask = $($p.viewmodelPrimaryMask)u;
+const uint kPlayerBodyRemainderPrimaryMask = $($p.bodyRemainderPrimaryMask)u;
 
 const uint kRtInstanceFlagStaticPbr = $($i.staticPbr)u;
 const uint kRtInstanceFlagEmissive = $($i.emissive)u;
 const uint kRtInstanceFlagTransmissive = $($i.transmissive)u;
+const uint kRtInstanceFlagBodyRemainderOnlyPrimary = $($i.bodyRemainderOnlyPrimary)u;
 const uint kRtMaterialFlagDoubleSided = $($m.doubleSided)u;
 const uint kRtMaterialFlagAlpha = $($m.alpha)u;
 const uint kRtMaterialFlagTransmission = $($m.transmission)u;
@@ -202,6 +207,7 @@ const uint kRtMaterialFlagHeadPrimaryMasked = $($m.headPrimaryMasked)u;
 const uint kRtMaterialFlagNearFacePrimaryMasked = $($m.nearFacePrimaryMasked)u;
 const uint kRtMaterialFlagThinWall = $($m.thinWall)u;
 const uint kRtMaterialFlagCertifiedClosedVolume = $($m.certifiedClosedVolume)u;
+const uint kRtMaterialFlagBodyRemainderPrimaryVisible = $($m.bodyRemainderPrimaryVisible)u;
 
 $glslRecords
 layout(std430, set = 0, binding = $($b.instanceMetadata)) readonly buffer RtInstanceMetadataBuffer

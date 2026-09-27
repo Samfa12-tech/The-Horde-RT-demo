@@ -38,7 +38,7 @@ void main()
     // look. Raising it with positive pitch used to cull the lantern forearm.
     float playerPrimaryStart = clamp(0.68 - abs(controls.pitch), 0.34, 0.68);
     uint primaryMask = (uv.y > playerPrimaryStart ? 0x27u : 0x23u) |
-                       kPlayerViewmodelPrimaryMask;
+                       kPlayerViewmodelPrimaryMask | kPlayerBodyRemainderPrimaryMask;
     HitInfo primary = traceScene(origin, rayDirection, 10000.0, primaryMask,
                                  0.002, controls.waterQuality < 0.5, true);
     if (primary.hit)

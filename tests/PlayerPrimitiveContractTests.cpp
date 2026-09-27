@@ -21,7 +21,7 @@ int main()
         {"GauntletPrimaryVisible", true, true, true},
     }};
     check(ValidatePlayerPrimitiveDeclarations(declarations, diagnostic) && diagnostic.empty(),
-          "The exact four-way declaration must be valid");
+          "The exact legacy four-way declaration must be valid");
     std::array<unsigned, 4> order{{0, 1, 2, 3}};
     unsigned permutations = 0;
     do {
@@ -36,6 +36,28 @@ int main()
         ++permutations;
     } while (std::next_permutation(order.begin(), order.end()));
     check(permutations == 24, "All four-way permutations must be exercised");
+    std::array<PlayerPrimitiveDeclaration, 5> extendedDeclarations{{
+        declarations[0], declarations[1], declarations[2], declarations[3],
+        {"BodyRemainderPrimaryVisible", true, true, true},
+    }};
+    check(ValidatePlayerPrimitiveDeclarations(extendedDeclarations, diagnostic) && diagnostic.empty(),
+          "The exact five-way declaration must be valid");
+    std::array<unsigned, 5> extendedOrder{{0, 1, 2, 3, 4}};
+    unsigned extendedPermutations = 0;
+    do {
+        std::array<std::string_view, 5> names{};
+        std::array<PlayerPrimitiveDeclaration, 5> reordered{};
+        for (unsigned i = 0; i < extendedOrder.size(); ++i) {
+            names[i] = extendedDeclarations[extendedOrder[i]].material;
+            reordered[i] = extendedDeclarations[extendedOrder[i]];
+        }
+        check(ValidatePlayerPrimitiveNames(names, diagnostic),
+              "five-way GLB primitive order must not define semantics");
+        check(ValidatePlayerPrimitiveDeclarations(reordered, diagnostic),
+              "five-way manifest order must not define semantics");
+        ++extendedPermutations;
+    } while (std::next_permutation(extendedOrder.begin(), extendedOrder.end()));
+    check(extendedPermutations == 120, "All five-way permutations must be exercised");
     check(!ValidatePlayerPrimitiveDeclarations(std::span(declarations).first(3), diagnostic) && !diagnostic.empty(),
           "Stale three-way manifests must be rejected");
     auto bad = declarations;
@@ -57,6 +79,18 @@ int main()
     std::array<std::string_view, 5> extra{{"BodyPrimaryVisible", "HeadPrimaryMasked", "NearFacePrimaryMasked",
                                          "GauntletPrimaryVisible", "Unexpected"}};
     check(!ValidatePlayerPrimitiveNames(extra, diagnostic), "Extra primitives must not be silently accepted");
+    std::array<std::string_view, 4> onlyExtendedPart{{
+        "BodyPrimaryVisible", "HeadPrimaryMasked", "NearFacePrimaryMasked", "BodyRemainderPrimaryVisible"}};
+    check(!ValidatePlayerPrimitiveNames(onlyExtendedPart, diagnostic),
+          "The five-part semantic cannot replace a missing legacy semantic");
+    auto missingExtended = extendedDeclarations;
+    missingExtended[4].material = "BodyPrimaryVisible";
+    check(!ValidatePlayerPrimitiveDeclarations(missingExtended, diagnostic),
+          "Five-part profile must contain each required semantic exactly once");
+    missingExtended = extendedDeclarations;
+    missingExtended[4].material = "Unknown";
+    check(!ValidatePlayerPrimitiveDeclarations(missingExtended, diagnostic),
+          "Five-part profile rejects an unknown semantic");
     extra[3] = "Unknown";
     check(!ValidatePlayerPrimitiveNames(std::span(extra).first(4), diagnostic), "Unknown GLB material names must fail closed");
     extra[3] = extra[0];
@@ -69,10 +103,15 @@ int main()
         const auto* part = FindPlayerPrimitiveContract(name);
         check(part && part->textureGroup == PlayerTextureGroup::Body, "Body/head/near-face must share a named texture group");
     }
+    const auto* bodyRemainder = FindPlayerPrimitiveContract("BodyRemainderPrimaryVisible");
+    check(bodyRemainder && bodyRemainder->semantic == PlayerPrimitiveSemantic::BodyRemainderPrimaryVisible &&
+          bodyRemainder->firstPersonPrimary && bodyRemainder->shadow && bodyRemainder->reflection &&
+          bodyRemainder->textureGroup == PlayerTextureGroup::Body,
+          "Body remainder must be independently primary-visible and use the body texture group");
     check(!FindPlayerPrimitiveContract(static_cast<PlayerPrimitiveSemantic>(255)), "Invalid enum must not imply a body");
     check(!FindPlayerPrimitiveContract("Gauntlet"), "Partial names must not imply a semantic");
     check(ValidatePlayerPrimitiveDeclarations(declarations, diagnostic) && diagnostic.empty(),
-          "A successful validation must clear a previous diagnostic");
+          "A successful legacy validation must clear a previous diagnostic");
 
     std::array<PlayerViewmodelPrimitiveDeclaration, 2> viewmodelDeclarations{{
         {"ViewmodelSleeves", true, false, false},

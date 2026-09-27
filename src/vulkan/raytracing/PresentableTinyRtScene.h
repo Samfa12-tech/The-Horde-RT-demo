@@ -167,6 +167,7 @@ public:
         return lastInstanceMasks_;
     }
     bool LastPlayerPrimaryVisible() const { return lastPlayerPrimaryVisible_; }
+    std::uint32_t LastPlayerWorldBodyInstanceFlags() const { return lastPlayerWorldBodyInstanceFlags_; }
     const PlayerGripAgreement& RewardLanternGripAgreement() const
     {
         return rewardLanternGripAgreement_;
@@ -593,6 +594,7 @@ private:
     std::vector<horde::scene::SkinnedPbrTangent> viewmodelPoseTangents_;
     std::vector<horde::scene::assets::StaticRtVertex> viewmodelUpload_;
     bool viewmodelAvailable_ = false;
+    bool playerBodyRemainderAvailable_ = false;
     bool viewmodelPoseCurrent_ = false;
 #ifndef NDEBUG
     VkTransformMatrixKHR viewmodelCaptureTransform_{};
@@ -614,6 +616,7 @@ private:
     float playerMaxSocketErrorMetres_ = 0.0f;
     std::array<std::uint8_t, kTlasInstanceCount> lastInstanceMasks_{};
     bool lastPlayerPrimaryVisible_ = false;
+    std::uint32_t lastPlayerWorldBodyInstanceFlags_ = 0u;
     PlayerGripAgreement rewardLanternGripAgreement_{};
     PlayerGripAgreement rewardLanternAuthorityAgreement_{};
     std::array<float, 3u> rewardLanternFinalGripPosition_{};

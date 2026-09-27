@@ -1,0 +1,18 @@
+Internal ctest changing into directory: C:/Dev/tmp/horde-phase3-native-20260923
+Test project C:/Dev/tmp/horde-phase3-native-20260923
+    Start  1: horde_rt_player_primitive_contract_tests
+1/6 Test  #1: horde_rt_player_primitive_contract_tests ...   Passed    0.02 sec
+    Start 27: horde_rt_player_animation_tests
+2/6 Test #27: horde_rt_player_animation_tests ............   Passed    0.03 sec
+    Start 31: horde_rt_scene_abi_tests
+3/6 Test #31: horde_rt_scene_abi_tests ...................   Passed    0.02 sec
+    Start 32: horde_rt_static_gltf_asset_tests
+4/6 Test #32: horde_rt_static_gltf_asset_tests ...........   Passed    0.18 sec
+    Start 70: horde_rt_skinned_character_smoke
+5/6 Test #70: horde_rt_skinned_character_smoke ...........   Passed   27.99 sec
+    Start 74: horde_rt_character_render_slot_smoke
+6/6 Test #74: horde_rt_character_render_slot_smoke .......   Passed    4.07 sec
+
+100% tests passed, 0 tests failed out of 6
+
+Total Test time (real) =  32.33 sec

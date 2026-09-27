@@ -30,6 +30,18 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### Current Phase 3 checkpoint
 
+**Explicit body remainder, not yet visually accepted:** opt-in five-region
+WorldBody contract and native primary filtering retain connecting cloth/torso/legs
+without duplicating viewmodel arms. Host admission, shader validation and six
+focused CTests pass; legacy four-region PNGs remain byte-identical. High/up
+captures pass, but low/down and low/parry fail the unchanged lantern-body pixel
+gate. Native geometry places the camera behind the torso; investigate anatomical
+camera/body mounting and reach, not another IK/weight search. Natural occlusion
+is valid (owner clarification); zero lantern pixels alone is not a defect.
+No production replacement or phone install. See [bounded evidence and remaining
+gates](evidence/2026-09-27-body-remainder/README.md). CI at parent `363bc72` passed
+push36281339999 / PR36281341324; that does not validate this later source.
+
 **Exact seam repair candidate:** opt-in `--reconcile-sleeve-seams` transfers the
 accepted view endpoint weights to 355 world vertices at 198 matched Body/NearFace
 edges. Fresh native low/down, high/up and low/parry now have zero measured shared

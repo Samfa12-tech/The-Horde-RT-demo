@@ -20,6 +20,9 @@ if "--" not in sys.argv:
         "usage: blender --background --python process-player-rig-runtime.py -- idle.glb walking.glb pbr-directory gauntlet.glb output.glb"
     )
 arguments = sys.argv[sys.argv.index("--") + 1:]
+body_remainder = '--body-remainder' in arguments
+if body_remainder:
+    arguments.remove('--body-remainder')
 # Omission is historical-export compatibility, not an anatomical judgement.
 # The owner's 2026-09-23 correction identifies the supplied source as Right.
 gauntlet_source_hand = 'Left'
@@ -786,6 +789,10 @@ for name in ("HeadPrimaryMasked", "NearFacePrimaryMasked"):
     copy = material.copy()
     copy.name = name
     player.data.materials.append(copy)
+if body_remainder:
+    copy = material.copy()
+    copy.name = "BodyRemainderPrimaryVisible"
+    player.data.materials.append(copy)
 
 points = [player.matrix_world @ vertex.co for vertex in player.data.vertices]
 minimum = Vector(tuple(min(point[axis] for point in points) for axis in range(3)))
@@ -806,7 +813,7 @@ for side in ("Left", "Right"):
     gauntlet_group_indices[side] = gauntlet_marker.index
 
 
-semantic_triangles = [0, 0, 0, 0]
+semantic_triangles = [0] * (5 if body_remainder else 4)
 primary_side_triangles = {"Left": 0, "Right": 0}
 gauntlet_side_triangles = {"Left": 0, "Right": 0}
 for polygon in player.data.polygons:
@@ -845,16 +852,23 @@ for polygon in player.data.polygons:
             0, len(polygon.vertices) - 2)
     elif centre.z >= head_start:
         polygon.material_index = 2
+    elif body_remainder and centre.z < near_face_start:
+        # Retain the disjoint connecting cloth, torso, pelvis and legs. This is
+        # NOT a second set of sleeve/gauntlet faces: their exact named regions
+        # were assigned above. The head/collar region remains primary-masked.
+        polygon.material_index = 4
     else:
-        # The camera remains inside the complete, boot-grounded body. Torso,
-        # pelvis and legs stay available to shadow/reflection rays while only
-        # the two bounded authored viewmodel arm surfaces enter primary rays.
+        # Preserve the historical four-region export when not requested.
+        # Extended exports retain just the near-face collar in this region;
+        # the disjoint lower connecting cloth/body uses its explicit semantic.
         polygon.material_index = 3
     semantic_triangles[polygon.material_index] += max(0, len(polygon.vertices) - 2)
     polygon.use_smooth = True
 if semantic_triangles[1] == 0 or semantic_triangles[2] == 0 or \
         semantic_triangles[3] == 0:
     raise RuntimeError("player semantic material split produced an empty masked primitive")
+if body_remainder and semantic_triangles[4] == 0:
+    raise RuntimeError("extended player split produced an empty body remainder")
 if (primary_side_triangles["Left"] < 500 or
         primary_side_triangles["Right"] < 450):
     raise RuntimeError(
@@ -979,6 +993,7 @@ report = {
         "GauntletPrimaryVisible": semantic_triangles[1],
         "HeadPrimaryMasked": semantic_triangles[2],
         "NearFacePrimaryMasked": semantic_triangles[3],
+        **({"BodyRemainderPrimaryVisible": semantic_triangles[4]} if body_remainder else {}),
     },
     "processing": "texture-before-rig PBR UV transfer, retained fitted character sleeves with bounded shoulder-elbow-wrist reweighting, accepted Meshy 7 grip surfaces rigid to Hand and mirrored by chirality without voxel remesh or decimation, gauntlet authored loop UV0 and distinct PBR material retained, asset-owned LeftGrip/RightGrip sockets, replaced unstable source glove surfaces, complete boot-grounded body retained for reflection and shadow rays, idle/walk-only clip packaging, semantic material primitives, generated tangents, 4x4 embedded identity textures",
 }

@@ -562,6 +562,40 @@ int main()
     const PlayerRouteMasks hybridMasks =
         BuildPlayerRouteMasks(PlayerRenderRoute::HybridBlockPrimary);
     const PlayerRouteMasks viewmodelMasks = BuildPlayerRouteMasks(PlayerRenderRoute::ModelledViewmodel);
+    const PlayerRouteMasks remainderMasks = BuildPlayerRouteMasks(PlayerRenderRoute::ModelledViewmodel, true);
+    const auto staticPlayerFlag = static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr);
+    const auto remainderPlayerFlags = staticPlayerFlag |
+        static_cast<std::uint32_t>(RtInstanceFlag::BodyRemainderOnlyPrimary);
+    auto duplicateMasks = remainderMasks.instanceMasks;
+    duplicateMasks[10] = 0x04u;
+    auto fullBodyMasks = remainderMasks.instanceMasks;
+    fullBodyMasks[kPlayerWorldBodyInstanceIndex] |= 0x04u;
+    if (!Require(HasDedicatedPlayerPrimaryOwnership(viewmodelMasks.instanceMasks, staticPlayerFlag) &&
+                 HasDedicatedPlayerPrimaryOwnership(remainderMasks.instanceMasks, remainderPlayerFlags) &&
+                 !HasDedicatedPlayerPrimaryOwnership(remainderMasks.instanceMasks, staticPlayerFlag) &&
+                 !HasDedicatedPlayerPrimaryOwnership(viewmodelMasks.instanceMasks, remainderPlayerFlags) &&
+                 !HasDedicatedPlayerPrimaryOwnership(remainderMasks.instanceMasks, 0u) &&
+                 !HasDedicatedPlayerPrimaryOwnership(duplicateMasks, remainderPlayerFlags) &&
+                 !HasDedicatedPlayerPrimaryOwnership(fullBodyMasks, remainderPlayerFlags),
+                 "capture ownership rejects missing filters, full-body primary and duplicate procedural arms")) return 1;
+    if (!Require(remainderMasks.instanceMasks[kPlayerWorldBodyInstanceIndex] ==
+                     (0x10u | kPlayerBodyRemainderPrimaryMask) &&
+                 remainderMasks.instanceMasks[kPlayerViewmodelInstanceIndex] == kPlayerViewmodelPrimaryMask &&
+                 (kPlayerBodyRemainderPrimaryMask & (0x37u | kPlayerViewmodelPrimaryMask)) == 0u,
+                 "explicit body remainder has its own full-view primary bit and retains secondary visibility")) return 1;
+    for (std::size_t slot = 5u; slot <= 16u; ++slot)
+        if (!Require(remainderMasks.instanceMasks[slot] == 0u,
+                     "body remainder must not enable procedural or duplicate arm instances")) return 1;
+    const auto remainderVisibility = BuildProductionSceneVisibility(
+        {PlayerRenderRoute::ModelledViewmodel, false, false, false, true});
+    const auto remainderInspection = BuildProductionSceneVisibility(
+        {PlayerRenderRoute::ModelledViewmodel, false, true, false, true});
+    if (!Require(remainderVisibility.playerMask == (0x10u | kPlayerBodyRemainderPrimaryMask) &&
+                 remainderVisibility.playerPrimaryVisible && remainderVisibility.playerReflectionVisible &&
+                 remainderInspection.playerMask == 0u && !remainderInspection.playerPrimaryVisible &&
+                 BuildPlayerRouteMasks(PlayerRenderRoute::HybridBlockPrimary, true).instanceMasks ==
+                     hybridMasks.instanceMasks,
+                 "remainder availability affects only the requested modelled route and respects inspection isolation")) return 1;
     if (!Require(viewmodelMasks.instanceMasks[kPlayerWorldBodyInstanceIndex] == 0x10u &&
                  viewmodelMasks.instanceMasks[kPlayerViewmodelInstanceIndex] == kPlayerViewmodelPrimaryMask &&
                  (kPlayerViewmodelPrimaryMask & 0x37u) == 0u,
@@ -651,6 +685,7 @@ int main()
         PlayerPrimitiveSemantic::Head,
         PlayerPrimitiveSemantic::NearFace,
         PlayerPrimitiveSemantic::GauntletPrimaryVisible,
+        PlayerPrimitiveSemantic::BodyRemainderPrimaryVisible,
     });
     if (!Require(primitiveVisibility[0].primaryVisible &&
                  !primitiveVisibility[1].primaryVisible &&
@@ -658,6 +693,9 @@ int main()
                  primitiveVisibility[3].primaryVisible &&
                  primitiveVisibility[3].shadowVisible &&
                  primitiveVisibility[3].reflectionVisible &&
+                 primitiveVisibility[4].primaryVisible &&
+                 primitiveVisibility[4].shadowVisible &&
+                 primitiveVisibility[4].reflectionVisible &&
                  primitiveVisibility[1].shadowVisible &&
                  primitiveVisibility[2].reflectionVisible,
                  "material/primitive metadata must hide only head/near-face primary hits")) return 1;

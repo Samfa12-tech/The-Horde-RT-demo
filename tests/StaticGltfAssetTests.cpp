@@ -525,8 +525,13 @@ void TestPlayerSemanticManifestAndGeometry(const std::filesystem::path& temporar
         R"({"material":"NearFacePrimaryMasked","firstPersonPrimary":false,"shadow":true,"reflection":true})",
         R"({"material":"GauntletPrimaryVisible","firstPersonPrimary":true,"shadow":true,"reflection":true})",
     }};
-    const auto writeManifest = [&](const std::vector<std::string>& entries) {
-        std::string field = "\"primitiveSemantics\":[";
+    const std::string bodyRemainderDeclaration =
+        R"({"material":"BodyRemainderPrimaryVisible","firstPersonPrimary":true,"shadow":true,"reflection":true})";
+    const auto writeManifest = [&](const std::vector<std::string>& entries,
+                                   std::string_view role = {}) {
+        std::string field;
+        if (!role.empty()) field = "\"playerAssetRole\":\"" + std::string(role) + "\",";
+        field += "\"primitiveSemantics\":[";
         for (std::size_t i = 0; i < entries.size(); ++i) field += (i ? "," : "") + entries[i];
         field += "],\"schema\": 1,";
         return RewriteManifest(temporaryRoot, "player.manifest.json", "\"schema\": 1,", field);
@@ -541,6 +546,16 @@ void TestPlayerSemanticManifestAndGeometry(const std::filesystem::path& temporar
         manifest = {};
         Check(copied.ValidatePlayerSemantics(diagnostic), "copied parsed manifest owns its material strings");
     } while (std::next_permutation(order.begin(), order.end()));
+    std::vector<std::string> extendedDeclarations(declarations.begin(), declarations.end());
+    extendedDeclarations.push_back(bodyRemainderDeclaration);
+    Check(AssetManifest::Load(writeManifest(extendedDeclarations, "WorldBody"), manifest, diagnostic) &&
+              manifest.playerAssetRole == PlayerAssetRole::WorldBody &&
+              manifest.ValidatePlayerSemantics(diagnostic),
+          "explicit WorldBody role accepts the exact five-part profile");
+    Check(AssetManifest::Load(writeManifest({declarations.begin(), declarations.end()}), manifest, diagnostic) &&
+              manifest.playerAssetRole == PlayerAssetRole::Unspecified &&
+              manifest.ValidatePlayerSemantics(diagnostic),
+          "legacy four-part manifest remains compatible without an explicit role");
     const auto rejected = [&](std::vector<std::string> entries, const char* message) {
         Check(!AssetManifest::Load(writeManifest(entries), manifest, diagnostic) && !diagnostic.empty(), message);
     };
@@ -548,6 +563,18 @@ void TestPlayerSemanticManifestAndGeometry(const std::filesystem::path& temporar
     rejected({declarations[0], declarations[1], declarations[2]}, "stale three-way manifest rejected");
     rejected({declarations[0], declarations[1], declarations[2], declarations[0]}, "duplicate semantic rejected");
     rejected({declarations[0], declarations[1], declarations[2], declarations[3], declarations[3]}, "extra semantic rejected");
+    rejected({declarations[0], declarations[1], declarations[2], bodyRemainderDeclaration},
+             "five-part profile cannot replace a legacy semantic");
+    rejected({declarations[0], declarations[1], declarations[2], declarations[3], declarations[3]},
+             "five-part profile rejects duplicate names");
+    auto extendedWithUnknown = extendedDeclarations;
+    extendedWithUnknown.back() = R"({"material":"Unknown","firstPersonPrimary":true,"shadow":true,"reflection":true})";
+    Check(!AssetManifest::Load(writeManifest(extendedWithUnknown, "WorldBody"), manifest, diagnostic) &&
+              !diagnostic.empty(),
+          "five-part profile rejects unknown semantics");
+    Check(!AssetManifest::Load(writeManifest(extendedDeclarations), manifest, diagnostic) &&
+              !diagnostic.empty(),
+          "five-part profile requires explicit WorldBody role");
     const auto mutateLast = [&](std::string_view before, std::string_view after, const char* message) {
         std::vector<std::string> entries(declarations.begin(), declarations.end());
         const auto offset = entries.back().find(before);
@@ -573,9 +600,13 @@ void TestPlayerSemanticManifestAndGeometry(const std::filesystem::path& temporar
         for (const float value : {0.f, 0.f, 1.f}) AppendFloat(binary, value);
     for (const float value : {0.f, 0.f, 1.f, 0.f, 0.f, 1.f}) AppendFloat(binary, value);
     for (std::uint16_t i = 0; i < 3; ++i) AppendU16(binary, i);
-    const auto writeGeometry = [&](const std::vector<unsigned>& primitiveOrder, bool unknownName = false) {
+    const auto writeGeometry = [&](const std::vector<unsigned>& primitiveOrder,
+                                   bool unknownName = false,
+                                   bool extendedProfile = false) {
         std::string json = R"({"asset":{"version":"2.0"},"buffers":[{"byteLength":102}],"bufferViews":[{"buffer":0,"byteOffset":0,"byteLength":36},{"buffer":0,"byteOffset":36,"byteLength":36},{"buffer":0,"byteOffset":72,"byteLength":24},{"buffer":0,"byteOffset":96,"byteLength":6}],"accessors":[{"bufferView":0,"componentType":5126,"count":3,"type":"VEC3","min":[0,0,0],"max":[1,1,0]},{"bufferView":1,"componentType":5126,"count":3,"type":"VEC3"},{"bufferView":2,"componentType":5126,"count":3,"type":"VEC2"},{"bufferView":3,"componentType":5123,"count":3,"type":"SCALAR"}],"materials":[)";
-        for (std::size_t i = 0; i < kPlayerPrimitiveContract.size(); ++i) {
+        const std::size_t materialCount = extendedProfile
+            ? kPlayerPrimitiveContract.size() : kLegacyPlayerPrimitiveCount;
+        for (std::size_t i = 0; i < materialCount; ++i) {
             if (i) json += ',';
             json += "{\"name\":\"" + std::string(unknownName && i == 3 ? "Unknown" : kPlayerPrimitiveContract[i].material) + "\"}";
         }
@@ -602,6 +633,35 @@ void TestPlayerSemanticManifestAndGeometry(const std::filesystem::path& temporar
             Check((material.flags & (128u | 256u)) == expected, "name-based primary masks survive geometry reordering");
         }
     } while (std::next_permutation(order.begin(), order.end()));
+    Check(AssetManifest::Load(writeManifest(extendedDeclarations, "WorldBody"), manifest, diagnostic),
+          "extended manifest reloads for geometry validation");
+    if (manifest.playerAssetRole == PlayerAssetRole::WorldBody)
+    {
+        const auto extendedPath = writeGeometry({0u, 1u, 2u, 3u, 4u}, false, true);
+        Check(!StaticMeshAsset::Load(extendedPath, manifest, asset, diagnostic),
+              "extended semantics must not bypass the legacy four-primitive budget");
+        manifest.budgets.maxPrimitives = 5u;
+        manifest.budgets.maxMaterials = 5u;
+        const bool loaded = StaticMeshAsset::Load(
+            extendedPath, manifest, asset, diagnostic);
+        Check(loaded, std::string("five-part body geometry loads: ") + diagnostic);
+        if (loaded)
+        {
+            constexpr std::uint32_t kBodyRemainderPrimaryVisible = 2048u;
+            for (const auto& material : asset.materials)
+            {
+                const auto* contract = FindPlayerPrimitiveContract(material.name);
+                Check(contract != nullptr &&
+                          material.textureGroup == static_cast<std::int32_t>(contract->textureGroup),
+                      "five-part materials retain their named Body or Gauntlet atlas group");
+                const bool isRemainder = material.name == "BodyRemainderPrimaryVisible";
+                Check(((material.flags & kBodyRemainderPrimaryVisible) != 0u) == isRemainder,
+                      "only BodyRemainderPrimaryVisible receives its dedicated material flag");
+            }
+        }
+    }
+    Check(AssetManifest::Load(writeManifest({declarations.begin(), declarations.end()}), manifest, diagnostic),
+          "legacy manifest restored after extended geometry validation");
     for (const auto& bad : {std::vector<unsigned>{0, 1, 2}, std::vector<unsigned>{0, 1, 2, 0}}) {
         Check(!StaticMeshAsset::Load(writeGeometry(bad), manifest, asset, diagnostic) && asset.primitives.empty(),
               "missing/duplicate geometry rejected without retaining presentable asset");
@@ -653,6 +713,14 @@ void TestPlayerSemanticManifestAndGeometry(const std::filesystem::path& temporar
     directWorld.playerAssetRole = static_cast<PlayerAssetRole>(255u);
     Check(!directWorld.ValidatePlayerSemantics(diagnostic),
           "direct world validator rejects an invalid role");
+    directWorld.playerAssetRole = PlayerAssetRole::Unspecified;
+    directWorld.primitiveSemantics.push_back(
+        {"BodyRemainderPrimaryVisible", true, true, true});
+    Check(!directWorld.ValidatePlayerSemantics(diagnostic),
+          "direct validator rejects five-part semantics without explicit WorldBody role");
+    directWorld.playerAssetRole = PlayerAssetRole::WorldBody;
+    Check(directWorld.ValidatePlayerSemantics(diagnostic),
+          "direct validator accepts exact five-part semantics with explicit WorldBody role");
     const auto writeViewmodelManifest = [&](const std::vector<std::string>& entries,
                                             std::string_view role = "Viewmodel") {
         std::string field = "\"playerAssetRole\":\"" + std::string(role) +

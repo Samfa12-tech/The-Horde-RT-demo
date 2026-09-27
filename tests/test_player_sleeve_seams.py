@@ -88,6 +88,14 @@ class PlayerSleeveSeamTests(unittest.TestCase):
         self.assertIn(3, transfers)
         self.assertIn(4, transfers)
 
+    def test_explicit_body_remainder_preserves_the_same_cloth_seam(self):
+        original = fixture()
+        expected = plan_sleeve_seam_weight_transfers(*original)
+        extended = copy.deepcopy(original)
+        extended[1][:] = [('BodyRemainderPrimaryVisible' if material == 'NearFacePrimaryMasked'
+                          else material, indices) for material, indices in extended[1]]
+        self.assertEqual(plan_sleeve_seam_weight_transfers(*extended), expected)
+
     def test_conflicting_coincident_view_endpoint_records_fail(self):
         inputs = fixture()
         inputs[5][3] = weights(UpperArm=0.9, ForeArm=0.1)

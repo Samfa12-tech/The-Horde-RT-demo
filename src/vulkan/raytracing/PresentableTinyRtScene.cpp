@@ -480,6 +480,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     viewmodelPoseTangents_ = std::move(other.viewmodelPoseTangents_);
     viewmodelUpload_ = std::move(other.viewmodelUpload_);
     viewmodelAvailable_ = std::exchange(other.viewmodelAvailable_, false);
+    playerBodyRemainderAvailable_ = std::exchange(other.playerBodyRemainderAvailable_, false);
     viewmodelPoseCurrent_ = std::exchange(other.viewmodelPoseCurrent_, false);
 #ifndef NDEBUG
     viewmodelCaptureTransform_ = std::exchange(other.viewmodelCaptureTransform_, {});
@@ -498,6 +499,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     playerMaxSocketErrorMetres_ = std::exchange(other.playerMaxSocketErrorMetres_, 0.0f);
     lastInstanceMasks_ = std::exchange(other.lastInstanceMasks_, {});
     lastPlayerPrimaryVisible_ = std::exchange(other.lastPlayerPrimaryVisible_, false);
+    lastPlayerWorldBodyInstanceFlags_ = std::exchange(other.lastPlayerWorldBodyInstanceFlags_, 0u);
     rewardLanternGripAgreement_ = std::exchange(other.rewardLanternGripAgreement_, {});
     rewardLanternAuthorityAgreement_ = std::exchange(other.rewardLanternAuthorityAgreement_, {});
     rewardLanternFinalGripPosition_ = std::exchange(other.rewardLanternFinalGripPosition_, {});
@@ -897,6 +899,8 @@ void PresentableTinyRtScene::Destroy()
     viewmodelPoseTangents_.clear();
     viewmodelUpload_.clear();
     viewmodelAvailable_ = false;
+    playerBodyRemainderAvailable_ = false;
+    lastPlayerWorldBodyInstanceFlags_ = 0u;
     viewmodelPoseCurrent_ = false;
 #ifndef NDEBUG
     viewmodelCaptureTransform_ = {};
@@ -1858,14 +1862,22 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             &viewmodelAsset_, &productionPlayerAsset_, RtGeometryRole::PlayerViewmodel});
     if (!staticMeshSlot_.Initialize(registrations, diagnostic)) return false;
     const RtInstanceMetadata playerMetadata = staticMeshSlot_.InstanceMetadata()[kPlayerWorldBodyInstanceIndex];
-    if (playerMetadata.primitiveCount != 4u ||
-        playerMetadata.primitiveBase >= staticMeshSlot_.PrimitiveMetadata().size())
+    if (playerMetadata.primitiveCount == 0u ||
+        playerMetadata.primitiveCount != productionPlayerAsset_.primitives.size() ||
+        playerMetadata.primitiveBase >= staticMeshSlot_.PrimitiveMetadata().size() ||
+        playerMetadata.primitiveCount > staticMeshSlot_.PrimitiveMetadata().size() - playerMetadata.primitiveBase)
     {
         diagnostic = "Runtime player static-PBR primitive metadata is incomplete.";
         return false;
     }
     playerStaticVertexBase_ =
         staticMeshSlot_.PrimitiveMetadata()[playerMetadata.primitiveBase].vertexOffset;
+    playerBodyRemainderAvailable_ = std::any_of(
+        productionPlayerAsset_.primitives.begin(), productionPlayerAsset_.primitives.end(),
+        [this](const auto& primitive) {
+            return (productionPlayerAsset_.materials[primitive.materialIndex].flags &
+                static_cast<std::uint32_t>(RtMaterialFlag::BodyRemainderPrimaryVisible)) != 0u;
+        });
     const RtInstanceMetadata dielectricMetadata =
         staticMeshSlot_.InstanceMetadata()[9u];
     if (dielectricMetadata.primitiveCount != 1u ||
@@ -4327,7 +4339,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         BuildProductionSceneVisibility({frame.playerRenderRoute,
                                         glassFixtureVisible,
                                         productionInspection,
-                                        rewardLanternClaimed});
+                                        rewardLanternClaimed,
+                                        playerBodyRemainderAvailable_});
     const bool productionRewardWorldVisible =
         productionVisibility.rewardWorldVisible;
     const PlayerRenderRoute effectivePlayerRenderRoute =
@@ -4705,7 +4718,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     instances[3].transform = heldItemInstanceTransform(renderHeldItems[1]);
     instances[kPlayerWorldBodyInstanceIndex] = instances[0];
     instances[kPlayerWorldBodyInstanceIndex].instanceCustomIndex = kPlayerWorldBodyInstanceIndex;
-    const PlayerRouteMasks playerRouteMasks = BuildPlayerRouteMasks(effectivePlayerRenderRoute);
+    const PlayerRouteMasks playerRouteMasks = BuildPlayerRouteMasks(
+        effectivePlayerRenderRoute, playerBodyRemainderAvailable_);
     instances[kPlayerWorldBodyInstanceIndex].mask = productionVisibility.playerMask;
     instances[kPlayerWorldBodyInstanceIndex].accelerationStructureReference =
         usesSkinnedPlayer
@@ -5043,6 +5057,10 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         pipelineBundle_.DiagnosticAvailability() == RtDiagnosticAvailability::Available;
     const RtDielectricDiagnostics clearedDielectricDiagnostics{};
     auto frameInstanceMetadata = staticMeshSlot_.InstanceMetadata();
+    if (effectivePlayerRenderRoute == PlayerRenderRoute::ModelledViewmodel &&
+        playerBodyRemainderAvailable_)
+        frameInstanceMetadata[kPlayerWorldBodyInstanceIndex].flags |=
+            static_cast<std::uint32_t>(RtInstanceFlag::BodyRemainderOnlyPrimary);
     if (effectivePlayerRenderRoute == PlayerRenderRoute::Procedural)
     {
         frameInstanceMetadata[kPlayerWorldBodyInstanceIndex].flags = 0u;
@@ -5067,6 +5085,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         if (!glassFixtureVisible)
             frameInstanceMetadata[9u].flags = 0u;
     }
+    lastPlayerWorldBodyInstanceFlags_ = frameInstanceMetadata[kPlayerWorldBodyInstanceIndex].flags;
     auto frameMaterials = staticMeshSlot_.Materials();
     if (dielectricFixtureMaterialIndex_ >= frameMaterials.size())
     {

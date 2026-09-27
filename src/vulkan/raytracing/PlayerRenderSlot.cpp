@@ -10,6 +10,21 @@
 namespace horde::vulkan::raytracing
 {
 
+bool HasDedicatedPlayerPrimaryOwnership(
+    const std::array<std::uint8_t, kRtInstanceMetadataCapacity>& masks,
+    std::uint32_t worldBodyInstanceFlags)
+{
+    const bool remainderOnly = (worldBodyInstanceFlags &
+        static_cast<std::uint32_t>(RtInstanceFlag::BodyRemainderOnlyPrimary)) != 0u;
+    const auto expectedWorldMask = static_cast<std::uint8_t>(
+        0x10u | (remainderOnly ? kPlayerBodyRemainderPrimaryMask : 0u));
+    return masks[kPlayerWorldBodyInstanceIndex] == expectedWorldMask &&
+        masks[kPlayerViewmodelInstanceIndex] == kPlayerViewmodelPrimaryMask &&
+        (worldBodyInstanceFlags & static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr)) != 0u &&
+        std::all_of(masks.begin() + 10u, masks.begin() + 17u,
+                    [](std::uint8_t mask) { return mask == 0u; });
+}
+
 std::array<float, 3u> EvaluatePlayerTorsoAnchorLocal(
     const horde::gameplay::animation::PlayerAnimationSnapshot& animation)
 {
@@ -192,12 +207,17 @@ float GripOrientationError(const HeldItemTransform& left,
 
 } // namespace
 
-PlayerRouteMasks BuildPlayerRouteMasks(const PlayerRenderRoute route)
+PlayerRouteMasks BuildPlayerRouteMasks(const PlayerRenderRoute route,
+                                      const bool bodyRemainderAvailable)
 {
     PlayerRouteMasks result;
     if (route == PlayerRenderRoute::ModelledViewmodel)
     {
-        result.instanceMasks[kPlayerWorldBodyInstanceIndex] = 0x10u;
+        // The explicit remainder gets unrestricted primary geometry traversal,
+        // not the legacy screen-window body bit. Primitive metadata excludes
+        // the world arms/head while the independent viewmodel owns its surfaces.
+        result.instanceMasks[kPlayerWorldBodyInstanceIndex] = bodyRemainderAvailable
+            ? static_cast<std::uint8_t>(0x10u | kPlayerBodyRemainderPrimaryMask) : 0x10u;
         result.instanceMasks[kPlayerViewmodelInstanceIndex] = kPlayerViewmodelPrimaryMask;
         return result;
     }
@@ -248,7 +268,8 @@ ProductionSceneVisibility BuildProductionSceneVisibility(
         : ((result.rewardWorldVisible || input.glassFixtureVisible)
             ? PlayerRenderRoute::HybridBlockPrimary
             : input.requestedPlayerRoute);
-    const PlayerRouteMasks playerMasks = BuildPlayerRouteMasks(result.playerRoute);
+    const PlayerRouteMasks playerMasks = BuildPlayerRouteMasks(
+        result.playerRoute, input.bodyRemainderAvailable);
     // The claimed reward is the active left-hand light and replaces the
     // ordinary torch. Keep the normal-route torch before the claim, but never
     // render both rigid props through the same final skinned grip.
@@ -260,7 +281,8 @@ ProductionSceneVisibility BuildProductionSceneVisibility(
     result.playerPrimaryVisible = !input.productionInspection &&
         std::any_of(playerMasks.instanceMasks.begin(),
                     playerMasks.instanceMasks.end(),
-                    [](const std::uint8_t mask) { return (mask & (0x04u | kPlayerViewmodelPrimaryMask)) != 0u; });
+                    [](const std::uint8_t mask) { return (mask &
+                        (0x04u | kPlayerViewmodelPrimaryMask | kPlayerBodyRemainderPrimaryMask)) != 0u; });
     result.playerReflectionVisible = (result.playerMask & 0x10u) != 0u;
     return result;
 }

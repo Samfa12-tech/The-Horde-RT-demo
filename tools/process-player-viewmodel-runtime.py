@@ -16,6 +16,8 @@ Investigation-only switches (not admission or production defaults):
   --close-sleeves: close the authored garment openings with real offline cloth panels.
   --reconcile-sleeve-seams: copy accepted view weights to coincident world cloth
     seam vertices, retaining geometry, UVs and separate world/view ownership.
+  --body-remainder: add an explicit world connecting-cloth/torso/legs region
+    with a paired WorldBody manifest; preserve the dedicated arm extraction.
 These retain gameplay sockets/prop authority. None establishes visual acceptance;
 the candidates still require anatomical, surface and live-motion validation.
 """
@@ -40,6 +42,7 @@ parser.add_argument('--blend-elbows', action='store_true')
 parser.add_argument('--fit-sleeves', action='store_true')
 parser.add_argument('--close-sleeves', action='store_true')
 parser.add_argument('--reconcile-sleeve-seams', action='store_true')
+parser.add_argument('--body-remainder', action='store_true')
 parser.add_argument('--stabilize-sleeves', action='store_true')
 parser.add_argument('--gauntlet-source-hand', choices=('Left', 'Right'),
                     help='Explicit anatomical source handedness; omission reproduces the historical export')
@@ -49,6 +52,8 @@ roll_options = parser.add_mutually_exclusive_group()
 roll_options.add_argument('--correct-grip-roll', action='store_true')
 roll_options.add_argument('--grip-roll-degrees', nargs=2, type=float, metavar=('LEFT', 'RIGHT'))
 options = parser.parse_args(arguments)
+if options.body_remainder and not options.reconcile_sleeve_seams:
+    parser.error('Body remainder requires the demonstrated shared-seam reconciliation')
 if options.reconcile_sleeve_seams and (options.fit_sleeves or options.close_sleeves):
     parser.error('Seam reconciliation requires unchanged source positions/topology, not fitted or capped sleeves')
 roll_degrees = options.grip_roll_degrees or ([180.0, 180.0] if options.correct_grip_roll else [0.0, 0.0])
@@ -86,7 +91,7 @@ if sha(world_reference) != sha(accepted_world):
     raise RuntimeError('World reference differs from the admitted rig; reconcile inputs/Blender threading first')
 
 paired_gauntlet_world = None
-if options.gauntlet_source_hand or options.gauntlet_scale is not None:
+if options.gauntlet_source_hand or options.gauntlet_scale is not None or options.body_remainder:
     world_name = 'world-chirality-corrected.runtime.glb' if options.gauntlet_source_hand else \
         'world-gauntlet-size-candidate.runtime.glb'
     paired_gauntlet_world = output / world_name
@@ -98,6 +103,8 @@ if options.gauntlet_source_hand or options.gauntlet_scale is not None:
         paired_arguments.extend(['--gauntlet-source-hand', options.gauntlet_source_hand])
     if options.gauntlet_scale is not None:
         paired_arguments.extend(['--gauntlet-scale', format(options.gauntlet_scale, '.17g')])
+    if options.body_remainder:
+        paired_arguments.append('--body-remainder')
     sys.argv = paired_arguments
     try:
         world = runpy.run_path(str(root / 'tools/process-player-rig-runtime.py'), run_name='__main__')
@@ -334,8 +341,22 @@ if options.reconcile_sleeve_seams:
         player.name = view_name
     seam_reconciliation['maximumWeightDelta'] = maximum_weight_delta
     seam_reconciliation['sourceAuthoringWeightSums'] = source_weight_sums
-    seam_reconciliation['scope'] = 'Coincident Body/NearFace world vertices at matched view sleeve boundary edges only'
+    seam_reconciliation['scope'] = 'Coincident world sleeve/connecting-cloth vertices at matched view sleeve boundary edges only'
     seam_reconciliation['canonicalWeights'] = 'Unchanged exported viewmodel sleeve endpoints'
+paired_world_manifest = None
+if options.body_remainder:
+    manifest = json.loads((accepted_world.parent / 'asset.manifest.json').read_text(encoding='utf-8'))
+    manifest['playerAssetRole'] = 'WorldBody'
+    manifest['budgets']['maxPrimitives'] = 5
+    manifest['budgets']['maxMaterials'] = 5
+    # Blender emits a 4x4 texture-identity record per material. The added region
+    # shares the Body atlas group at runtime; admit its fifth embedded identity
+    # without allocating another production atlas layer.
+    manifest['budgets']['maxTextureLayersPerKind'] = 5
+    manifest['primitiveSemantics'].append(dict(material='BodyRemainderPrimaryVisible',
+        firstPersonPrimary=True, shadow=True, reflection=True))
+    paired_world_manifest = output / 'asset.manifest.json'
+    paired_world_manifest.write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
 report = dict(schema=1, role='Viewmodel',
               sourceWorldSha256=sha(accepted_world),
               gauntletScale=gauntlet_scale,
@@ -345,6 +366,8 @@ report = dict(schema=1, role='Viewmodel',
               gripRollRadiansBySide=grip_rolls,
               pairedWorldRuntime=calibrated_world.name if calibrated_world else None,
               pairedWorldSha256=sha(calibrated_world) if calibrated_world else None,
+              pairedWorldManifest=paired_world_manifest.name if paired_world_manifest else None,
+              pairedWorldManifestSha256=sha(paired_world_manifest) if paired_world_manifest else None,
               sleeveWeightMode='ElbowCentredArmForeArm' if blend_elbows else
                   ('ArmForeArm' if stabilize_sleeves else 'OriginalArmForeArmHand'),
               sleeveHandWeightsMovedToForearm=weight_corrections,

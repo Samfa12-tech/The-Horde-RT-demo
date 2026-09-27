@@ -18,7 +18,8 @@ WORLD_AUTHORING_WEIGHT_SUM_TOLERANCE = 1.0e-4
 WEIGHT_AGREEMENT_TOLERANCE = 1.0e-5
 
 _SLEEVE = "ViewmodelSleeves"
-_WORLD_TARGET_MATERIALS = frozenset({"BodyPrimaryVisible", "NearFacePrimaryMasked"})
+_WORLD_CONTINUATION_MATERIALS = frozenset({"NearFacePrimaryMasked", "BodyRemainderPrimaryVisible"})
+_WORLD_TARGET_MATERIALS = _WORLD_CONTINUATION_MATERIALS | {"BodyPrimaryVisible"}
 
 
 def _positions_and_keys(positions: Sequence[Sequence[float]], label: str):
@@ -97,7 +98,9 @@ def plan_sleeve_seam_weight_transfers(
 
     Faces are ``(material_name, (i0, i1, i2))`` triples. Only boundary edges
     of ViewmodelSleeves that coincide with world edges incident to both
-    BodyPrimaryVisible and NearFacePrimaryMasked can authorize a transfer.
+    BodyPrimaryVisible and a named world cloth continuation can authorize a
+    transfer. The explicit five-region profile splits the historical NearFace
+    continuation into NearFace and BodyRemainder without changing this seam.
     """
     world_keys = _positions_and_keys(world_positions, "world")
     view_keys = _positions_and_keys(view_positions, "view")
@@ -155,7 +158,8 @@ def plan_sleeve_seam_weight_transfers(
 
     matched_edges = {
         edge for edge in view_boundary_edges
-        if _WORLD_TARGET_MATERIALS.issubset(world_edge_materials.get(edge, set()))
+        if 'BodyPrimaryVisible' in world_edge_materials.get(edge, set()) and
+           (_WORLD_CONTINUATION_MATERIALS & world_edge_materials.get(edge, set()))
     }
     if not matched_edges:
         raise ValueError("no ViewmodelSleeves boundary edge matches a world edge shared by both target materials")

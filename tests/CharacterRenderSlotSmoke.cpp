@@ -795,6 +795,16 @@ int main()
                           std::string::npos &&
                       raygenSource.find("gl_LaunchIDEXT.y * 100u") == std::string::npos,
                       "direct RT visibility must include player/world shadow casters independent of screen position");
+        ok &= Require(raygenSource.find("kPlayerViewmodelPrimaryMask | kPlayerBodyRemainderPrimaryMask;") !=
+                          std::string::npos &&
+                      raygenSource.find("RtInstanceMetadata playerMetadata = rtInstances.values[candidateInstance];") !=
+                          std::string::npos &&
+                      raygenSource.find("(playerMetadata.flags & kRtInstanceFlagBodyRemainderOnlyPrimary) != 0u") !=
+                          std::string::npos &&
+                      raygenSource.find("(playerFlags & kRtMaterialFlagBodyRemainderPrimaryVisible) == 0u") !=
+                          std::string::npos &&
+                      sceneSource.find("RtInstanceFlag::BodyRemainderOnlyPrimary") != std::string::npos,
+                      "explicit body remainder must traverse full-view primary rays with named nonduplicating primitive ownership");
         ok &= Require(raygenSource.find(
                           "uint rayFlags = (ignoreWater || ignorePlayerNearFace)") !=
                           std::string::npos &&

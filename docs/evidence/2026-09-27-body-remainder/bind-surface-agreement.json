@@ -1,0 +1,14 @@
+{
+  "beforeSha256": "2385fbb8c0415f5c39f6b1ce7e8bdccc36aba79971492a682c6f6e6df26771c6",
+  "afterSha256": "e8e0488809ab350ddcca29127fb6827eeecc3ba90c99516643d0b6c431496583",
+  "exactExpandedSurfaceAgreement": true,
+  "triangles": {
+    "BodyPrimaryVisible": 5532,
+    "GauntletPrimaryVisible": 8838,
+    "HeadPrimaryMasked": 1813,
+    "NearFacePrimaryMasked": 1116,
+    "BodyRemainderPrimaryVisible": 10476
+  },
+  "rejoinedBodyRemainderForPartitionCheck": true,
+  "scope": "Bind surface only; skin weights intentionally excluded"
+}
