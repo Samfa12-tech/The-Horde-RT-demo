@@ -265,10 +265,6 @@ int main()
         turnedView.yawRadians, 0.27f, 0.0f, -1.0f, 1.0f / 30.0f);
     Require(pitchedView.pitchRadians <= 0.28f && pitchedView.pitchRadians > 0.27f,
             "right-stick pitch must advance and retain the authored clamp");
-    Require(ApplyControllerLook(0.0f, -0.32f, 0.0f, 1.0f, 0.1f).pitchRadians == -0.32f &&
-            ApplyControllerLook(0.0f, -0.32f, 0.0f, 1.0f, 0.1f, -4.0f).pitchRadians < -0.32f &&
-            ApplyControllerLook(0.0f, -3.99f, 0.0f, 1.0f, 0.1f, -4.0f).pitchRadians == -4.0f,
-            "anatomical camera look extends explicitly without changing the legacy controller clamp");
 
     // Exact Backbone menu topology: D-pad is a WinMM POV hat and the standard
     // A/B/Menu fields occupy buttons 1/2/12. All are edge-triggered.

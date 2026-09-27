@@ -30,6 +30,19 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### Current Phase 3 checkpoint
 
+**Owner clarification supersedes the extreme-look study:** use the existing
+normal gameplay pitch range as the acceptance boundary. No literal vertical-down
+or camera-inside-body requirement. A future small pitch adjustment needs a
+normal-play justification. Preserve convincing torso/waist/legs/body presence,
+nonduplicating arms, closed wrist/armpit surfaces, shared grips and correct RT
+shadows/reflections. Do not redesign Phase3 around the extreme fixtures.
+The `-4.0` extension and checkpoints147/148 are withdrawn with a forward source
+change; historical study evidence remains labelled, not erased. The upper-torso
+partition/seam repairs and liked anatomical mounting are retained. Six focused
+host tests, ARM64 build and four normal-range native captures pass; restored
+shader artifacts match66f1149 exactly. Prepared corrected APK `c68fa94e...` awaits
+its separately recorded device checks. See [normal-look acceptance](ENGINEERING_1_6_1_NORMAL_LOOK_ACCEPTANCE_2026-09-27.md).
+
 **Upper-torso partition repaired in an opt-in candidate:** `--retain-upper-torso`
 retains the old1116-triangle shoulder/torso band, while repartitioning the old
 1813-triangle head mask into1345Head+468NearFace without exposing any of it.

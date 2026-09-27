@@ -83,8 +83,6 @@ $checkpointZones = @{
     "player-viewmodel-lantern-low-parry" = "yellow-torch-bay"
     "player-viewmodel-lantern-low-look-down" = "yellow-torch-bay"
     "player-viewmodel-lantern-high-look-up" = "yellow-torch-bay"
-    "player-viewmodel-body-look-down" = "opening"
-    "player-viewmodel-lantern-body-look-down" = "yellow-torch-bay"
     "lantern-chest-unlock" = "finale"
     "lantern-glass-production" = "finale"
     "lantern-held-high" = "yellow-torch-bay"
@@ -115,8 +113,7 @@ $viewmodelCheckpoints = @(
     "player-viewmodel-look-up", "player-viewmodel-look-down",
     "player-viewmodel-lantern-high", "player-viewmodel-lantern-low",
     "player-viewmodel-lantern-low-parry", "player-viewmodel-lantern-low-look-down",
-    "player-viewmodel-lantern-high-look-up", "player-viewmodel-body-look-down",
-    "player-viewmodel-lantern-body-look-down")
+    "player-viewmodel-lantern-high-look-up")
 $captureCheckpoints = @("opening", "skeleton", "worst-bend", "lantern-drop", "skylight", "yellow", "blue", "red", "green", "mirror", "lich", "finale-roof", "two-enemy-combat")
 if ($CaptureSelection.Count -gt 0) { $captureCheckpoints = @($CaptureSelection) }
 $combatCaptureExpectations = @{

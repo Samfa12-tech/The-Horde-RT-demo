@@ -6,7 +6,6 @@
 
 #include "gameplay/simulation/BoundedTransportQueue.h"
 #include "gameplay/simulation/GameSimulation.h"
-#include "gameplay/DevelopmentCheckpointSimulation.h"
 
 namespace
 {
@@ -995,96 +994,28 @@ int main()
           !NearlyEqual(anatomicalMount.Snapshot().heldItemKinematics.leftShoulderLocal[0],
                        legacyMount.Snapshot().heldItemKinematics.leftShoulderLocal[0]),
           "configured anatomical profile reaches shared held-item resolution and changes hand height and shoulder frame");
-
-    GameSimulationConfig legacyDeepPitchConfig{};
-    legacyDeepPitchConfig.playerStartPitchRadians = -4.0f;
-    GameSimulation legacyDeepPitch(legacyDeepPitchConfig);
-    check(NearlyEqual(legacyDeepPitch.Snapshot().playerPitchRadians, -0.32f),
-          "legacy profile keeps the existing -0.32 pitch parameter minimum at construction");
-    InputSnapshot deepPitchInput;
-    deepPitchInput.pitchRadians = -4.0f;
-    legacyDeepPitch.StepFixed(deepPitchInput);
-    check(NearlyEqual(legacyDeepPitch.Snapshot().playerPitchRadians, -0.32f),
-          "legacy profile keeps the existing -0.32 pitch parameter minimum for live input");
-    legacyDeepPitch.ResetRoute();
-    check(NearlyEqual(legacyDeepPitch.Snapshot().playerPitchRadians, -0.32f),
-          "legacy route reset keeps the existing -0.32 pitch parameter minimum");
-
-    GameSimulationConfig anatomicalDeepPitchConfig{};
-    anatomicalDeepPitchConfig.playerMountProfile = items::PlayerMountProfile::AnatomicalBody;
-    anatomicalDeepPitchConfig.playerStartPitchRadians = -4.0f;
-    GameSimulation anatomicalDeepPitch(anatomicalDeepPitchConfig);
-    GameSimulationConfig anatomicalClampedPitchConfig = anatomicalDeepPitchConfig;
-    anatomicalClampedPitchConfig.playerStartPitchRadians = -0.32f;
-    GameSimulation anatomicalClampedPitch(anatomicalClampedPitchConfig);
-    check(NearlyEqual(anatomicalDeepPitch.Snapshot().playerPitchRadians, -4.0f) &&
-          NearlyEqual(anatomicalClampedPitch.Snapshot().playerPitchRadians, -0.32f),
-          "anatomical profile accepts deep camera pitch while preserving the ordinary comparison pitch");
-    const auto arraysNearlyEqual = [](const auto& left, const auto& right) {
-        for (std::size_t index = 0u; index < left.size(); ++index)
-            if (!NearlyEqual(left[index], right[index], 0.000001f)) return false;
-        return true;
-    };
-    bool heldItemTransformsEqual = arraysNearlyEqual(
-        anatomicalDeepPitch.Snapshot().rewardLanternWorldFromHinge,
-        anatomicalClampedPitch.Snapshot().rewardLanternWorldFromHinge);
-    for (std::size_t index = 0u;
-         index < anatomicalDeepPitch.Snapshot().heldItems.size(); ++index)
+    for (const auto profile : {items::PlayerMountProfile::LegacyViewRelative,
+                               items::PlayerMountProfile::AnatomicalBody})
     {
-        const auto& deepItem = anatomicalDeepPitch.Snapshot().heldItems[index];
-        const auto& clampedItem = anatomicalClampedPitch.Snapshot().heldItems[index];
-        heldItemTransformsEqual = heldItemTransformsEqual &&
-            arraysNearlyEqual(deepItem.worldFromItem, clampedItem.worldFromItem) &&
-            arraysNearlyEqual(deepItem.worldFromDetach, clampedItem.worldFromDetach);
+        GameSimulationConfig boundedLookConfig;
+        boundedLookConfig.playerMountProfile = profile;
+        boundedLookConfig.playerStartPitchRadians = -4.0f;
+        GameSimulation boundedLook(boundedLookConfig);
+        check(NearlyEqual(boundedLook.Snapshot().playerPitchRadians, -0.32f),
+              "both player mounts use the established gameplay look limit at construction");
+        InputSnapshot extremeLook;
+        extremeLook.pitchRadians = -4.0f;
+        boundedLook.StepFixed(extremeLook);
+        check(NearlyEqual(boundedLook.Snapshot().playerPitchRadians, -0.32f),
+              "an extreme diagnostic input cannot extend normal gameplay camera pitch");
+        extremeLook.pitchRadians = 1.0f;
+        boundedLook.StepFixed(extremeLook);
+        check(NearlyEqual(boundedLook.Snapshot().playerPitchRadians, 0.28f),
+              "both player mounts retain the normal upper look limit");
+        boundedLook.ResetRoute();
+        check(NearlyEqual(boundedLook.Snapshot().playerPitchRadians, -0.32f),
+              "reset retains the normal gameplay pitch boundary");
     }
-    const auto& deepPitchSnapshot = anatomicalDeepPitch.Snapshot();
-    const auto& clampedPitchSnapshot = anatomicalClampedPitch.Snapshot();
-    const auto& deepKinematics = deepPitchSnapshot.heldItemKinematics;
-    const auto& clampedKinematics = clampedPitchSnapshot.heldItemKinematics;
-    const auto& deepAnimation = deepPitchSnapshot.playerAnimation;
-    const auto& clampedAnimation = clampedPitchSnapshot.playerAnimation;
-    const bool heldTargetsEqual =
-        arraysNearlyEqual(deepKinematics.leftShoulderLocal, clampedKinematics.leftShoulderLocal) &&
-        arraysNearlyEqual(deepKinematics.rightShoulderLocal, clampedKinematics.rightShoulderLocal) &&
-        arraysNearlyEqual(deepKinematics.leftHandLocal, clampedKinematics.leftHandLocal) &&
-        arraysNearlyEqual(deepKinematics.rightHandLocal, clampedKinematics.rightHandLocal) &&
-        arraysNearlyEqual(deepAnimation.leftIk.shoulder, clampedAnimation.leftIk.shoulder) &&
-        arraysNearlyEqual(deepAnimation.leftIk.target, clampedAnimation.leftIk.target) &&
-        arraysNearlyEqual(deepAnimation.rightIk.shoulder, clampedAnimation.rightIk.shoulder) &&
-        arraysNearlyEqual(deepAnimation.rightIk.target, clampedAnimation.rightIk.target);
-    const auto& deepLight = deepPitchSnapshot.heldLight;
-    const auto& clampedLight = clampedPitchSnapshot.heldLight;
-    const bool heldLightsEqual = arraysNearlyEqual(deepLight.worldFromFlame, clampedLight.worldFromFlame) &&
-        arraysNearlyEqual(deepLight.worldFromLight, clampedLight.worldFromLight) &&
-        NearlyEqual(deepLight.flameStrength, clampedLight.flameStrength) &&
-        deepLight.active == clampedLight.active;
-    check(heldItemTransformsEqual && heldTargetsEqual && heldLightsEqual,
-          "deep anatomical camera pitch does not alter clamped held transforms, IK targets, or held light");
-
-    GameSimulation shallowRewardLook(anatomicalMountConfig);
-    GameSimulation deepRewardLook(anatomicalMountConfig);
-    check(StageDevelopmentCheckpointSimulation(shallowRewardLook, *FindDevelopmentCheckpoint(145)) &&
-          StageDevelopmentCheckpointSimulation(deepRewardLook, *FindDevelopmentCheckpoint(148)),
-          "ordinary and deep low-lantern fixtures stage with the anatomical profile");
-    const auto& shallowRewardState = shallowRewardLook.Snapshot();
-    const auto& deepRewardState = deepRewardLook.Snapshot();
-    check(deepRewardState.playerPitchRadians == -4.0f &&
-          deepRewardState.rewardLanternWorldFromHinge == shallowRewardState.rewardLanternWorldFromHinge &&
-          deepRewardState.heldItems[1].worldFromItem == shallowRewardState.heldItems[1].worldFromItem &&
-          deepRewardState.playerAnimation.leftIk == shallowRewardState.playerAnimation.leftIk &&
-          deepRewardState.playerAnimation.rightIk == shallowRewardState.playerAnimation.rightIk &&
-          deepRewardState.heldLight.worldFromLight == shallowRewardState.heldLight.worldFromLight &&
-          deepRewardState.heldLight.worldFromFlame == shallowRewardState.heldLight.worldFromFlame,
-          "deeper look leaves the exact physical lantern, sword, both IK targets and lighting unchanged");
-
-    check(anatomicalDeepPitch.ApplyShowcaseCheckpoint(0) &&
-          anatomicalDeepPitch.Snapshot().playerMountProfile == items::PlayerMountProfile::AnatomicalBody,
-          "deep-pitch anatomical profile survives authored checkpoint import");
-    anatomicalDeepPitch.ResetRoute();
-    check(anatomicalDeepPitch.Snapshot().playerMountProfile == items::PlayerMountProfile::AnatomicalBody &&
-          NearlyEqual(anatomicalDeepPitch.Snapshot().playerPitchRadians, -4.0f),
-          "deep-pitch anatomical profile and configured pitch survive route reset");
-
     check(anatomicalMount.ApplyShowcaseCheckpoint(0) &&
           anatomicalMount.Snapshot().playerMountProfile == items::PlayerMountProfile::AnatomicalBody,
           "authored checkpoint import preserves the configured player mount profile");

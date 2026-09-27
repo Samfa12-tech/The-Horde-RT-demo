@@ -2901,9 +2901,7 @@ void UpdateDesktopSceneControls(
                 context.cameraPitch,
                 context.controllerLookHorizontal,
                 context.controllerLookVertical,
-                deltaSeconds,
-                horde::gameplay::items::MinimumPlayerCameraPitch(
-                    context.simulation.Snapshot().playerMountProfile));
+                deltaSeconds);
         context.cameraYaw = view.yawRadians;
         context.cameraPitch = view.pitchRadians;
     }
@@ -6264,8 +6262,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             const LONG deltaY = currentMousePosition.y - sceneContext->lastMousePosition.y;
             sceneContext->lastMousePosition = currentMousePosition;
             sceneContext->cameraYaw += static_cast<float>(deltaX) * 0.0036f * sceneContext->mouseSensitivity;
-            sceneContext->cameraPitch = std::clamp(sceneContext->cameraPitch - static_cast<float>(deltaY) * 0.0028f * sceneContext->mouseSensitivity,
-                horde::gameplay::items::MinimumPlayerCameraPitch(sceneContext->simulation.Snapshot().playerMountProfile), 0.28f);
+            sceneContext->cameraPitch = std::clamp(sceneContext->cameraPitch - static_cast<float>(deltaY) * 0.0028f * sceneContext->mouseSensitivity, -0.32f, 0.28f);
             RECT clientRect{};
             GetClientRect(hWnd, &clientRect);
             const POINT centre{(clientRect.right - clientRect.left) / 2, (clientRect.bottom - clientRect.top) / 2};

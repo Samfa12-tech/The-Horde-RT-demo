@@ -12,6 +12,7 @@ namespace horde::gameplay::simulation
 namespace
 {
 
+constexpr float kMinimumPitch = -0.32f;
 constexpr float kMaximumPitch = 0.28f;
 constexpr float kDodgeDurationSeconds = 0.20f;
 constexpr float kDodgeDistanceMetres = 0.90f;
@@ -39,10 +40,8 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
       playerX_(config.playerStartX),
       playerZ_(config.playerStartZ),
       playerYawRadians_(config.playerStartYawRadians),
-      playerPitchRadians_(std::clamp(
-          FiniteOr(config.playerStartPitchRadians, 0.0f),
-          horde::gameplay::items::MinimumPlayerCameraPitch(config.playerMountProfile),
-          kMaximumPitch))
+      playerPitchRadians_(std::clamp(FiniteOr(config.playerStartPitchRadians, 0.0f),
+                                    kMinimumPitch, kMaximumPitch))
 {
     if (!IsShowcasePlayerPositionWalkable(playerX_, playerZ_))
     {
@@ -311,8 +310,7 @@ void GameSimulation::ResetRoute()
     }
     playerYawRadians_ = FiniteOr(config_.playerStartYawRadians, 0.0f);
     playerPitchRadians_ = std::clamp(FiniteOr(config_.playerStartPitchRadians, 0.0f),
-                                     horde::gameplay::items::MinimumPlayerCameraPitch(
-                                         config_.playerMountProfile),
+                                     kMinimumPitch,
                                      kMaximumPitch);
     swordCombat_.Reset(kSkeletonEnemyCapacity);
     combatSnapshot_ = swordCombat_.Update(0.0f,
@@ -673,8 +671,7 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
 {
     playerYawRadians_ = FiniteOr(input.yawRadians, playerYawRadians_);
     playerPitchRadians_ = std::clamp(FiniteOr(input.pitchRadians, playerPitchRadians_),
-                                     horde::gameplay::items::MinimumPlayerCameraPitch(
-                                         config_.playerMountProfile),
+                                     kMinimumPitch,
                                      kMaximumPitch);
     const float previousX = playerX_;
     const float previousZ = playerZ_;

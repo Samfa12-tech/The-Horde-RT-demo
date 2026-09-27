@@ -239,15 +239,14 @@ inline ControllerView ApplyControllerLook(
     const float pitchRadians,
     const float horizontal,
     const float vertical,
-    const float deltaSeconds,
-    const float minimumPitch = -0.32f)
+    const float deltaSeconds)
 {
     const float safeDelta = std::clamp(deltaSeconds, 0.0f, 0.1f);
     return {
         .yawRadians = yawRadians + std::clamp(horizontal, -1.0f, 1.0f) * safeDelta * 2.5f,
         .pitchRadians = std::clamp(
             pitchRadians - std::clamp(vertical, -1.0f, 1.0f) * safeDelta * 1.8f,
-            minimumPitch,
+            -0.32f,
             0.28f),
     };
 }

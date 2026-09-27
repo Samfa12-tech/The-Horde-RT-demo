@@ -26,14 +26,6 @@ inline constexpr float kSwordGripRollRadians = 1.3962634f;
 // opt-in until the modelled body/viewmodel route passes live owner acceptance.
 enum class PlayerMountProfile : std::uint8_t { LegacyViewRelative, AnatomicalBody };
 
-constexpr float MinimumPlayerCameraPitch(const PlayerMountProfile profile)
-{
-    // The established camera parameter is a forward-vector vertical component,
-    // not a true Euler angle. -4.0 looks about 76 degrees down at the body/feet; held-pose
-    // evaluation deliberately retains its separate [-.32, .28] range.
-    return profile == PlayerMountProfile::AnatomicalBody ? -4.0f : -0.32f;
-}
-
 struct HeldItemKinematicsInput
 {
     float cameraX = 0.0f;

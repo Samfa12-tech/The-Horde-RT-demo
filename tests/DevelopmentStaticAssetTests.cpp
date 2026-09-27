@@ -63,8 +63,10 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 49u,
-          "forty-nine isolated render-development checkpoints include thirteen dedicated viewmodel poses");
+    Check(kDevelopmentCheckpoints.size() == 47u,
+          "forty-seven isolated render-development checkpoints include eleven dedicated viewmodel poses");
+    Check(FindDevelopmentCheckpoint(147) == nullptr && FindDevelopmentCheckpoint(148) == nullptr,
+          "withdrawn extreme-down studies must not define the normal player acceptance matrix");
     int viewmodelId = 136;
     for (const auto name : {"player-viewmodel-grips", "player-viewmodel-forward",
                            "player-viewmodel-downward-cut", "player-viewmodel-upward-slice",
@@ -72,9 +74,7 @@ int main()
                            "player-viewmodel-lantern-high", "player-viewmodel-lantern-low",
                            "player-viewmodel-lantern-low-parry",
                            "player-viewmodel-lantern-low-look-down",
-                           "player-viewmodel-lantern-high-look-up",
-                           "player-viewmodel-body-look-down",
-                           "player-viewmodel-lantern-body-look-down"})
+                           "player-viewmodel-lantern-high-look-up"})
     {
         const auto* viewmodel = FindDevelopmentCheckpoint(name);
         Check(viewmodel != nullptr && viewmodel->id == viewmodelId &&
@@ -86,15 +86,6 @@ int main()
     const auto* lowParry = FindDevelopmentCheckpoint(144);
     const auto* lowLookDown = FindDevelopmentCheckpoint(145);
     const auto* highLookUp = FindDevelopmentCheckpoint(146);
-    for (const auto id : {147, 148})
-    {
-        const auto* bodyLook = FindDevelopmentCheckpoint(id);
-        Check(bodyLook != nullptr && bodyLook->requiresAnatomicalPlayerMount && bodyLook->pitch == -4.0f,
-              "deep body capture has explicit anatomical profile admission");
-        horde::gameplay::simulation::GameSimulation legacy;
-        Check(bodyLook != nullptr && !StageDevelopmentCheckpointSimulation(legacy, *bodyLook),
-              "deep body capture cannot silently clamp into a legacy pose");
-    }
     Check(lowParry != nullptr && lowParry->name == "player-viewmodel-lantern-low-parry" &&
               lowParry->baseShowcaseCheckpointId == 5 && lowParry->cameraX == -10.65f &&
               lowParry->cameraZ == -15.20f && lowParry->yaw == -1.57079632679f &&

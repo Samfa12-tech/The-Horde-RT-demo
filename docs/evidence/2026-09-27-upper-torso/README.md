@@ -1,5 +1,11 @@
 # Upper-torso partition repair candidate
 
+**Acceptance clarification:** the owner subsequently confirmed the existing
+gameplay pitch range, not the extreme147/148 study, defines acceptance. The
+material-partition fix is retained, but do not engineer torso/legs specifically
+for the withdrawn near-vertical camera. Normal-range seam/visibility and live
+checks remain required.
+
 2026-09-27, parent `11ca3836ef3f6a87bce79daaa1af98abc5a0d028`.
 Phase3 remains in progress. No production asset replacement or phone installation
 is claimed by this offline/native slice.

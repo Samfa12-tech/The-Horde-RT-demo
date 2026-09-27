@@ -21,10 +21,7 @@ void main()
     vec3 origin = vec3(controls.cameraX + sin(step * 0.5) * 0.035 * controls.walkAmount,
                        0.70 + abs(sin(step)) * 0.035 * controls.walkAmount,
                        controls.cameraZ);
-    // Camera look may extend below the physical held-pose range. Preserve the
-    // exact old bob clamp for legacy profiles rather than widening it globally.
-    float pitch = clamp(controls.pitch + sin(step) * 0.012 * controls.walkAmount,
-                        controls.minimumCameraPitch, 0.28);
+    float pitch = clamp(controls.pitch + sin(step) * 0.012 * controls.walkAmount, -0.32, 0.28);
     vec3 forward = normalize(vec3(sin(controls.yaw), -0.05 + pitch, -cos(controls.yaw)));
     vec3 right = normalize(cross(forward, vec3(0.0, 1.0, 0.0)));
     vec3 up = normalize(cross(right, forward));

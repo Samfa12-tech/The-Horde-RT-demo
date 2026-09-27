@@ -1,5 +1,10 @@
 # Bounded anatomical camera look: implementation, not body acceptance
 
+**Superseded by owner clarification on 2026-09-27:** the near-vertical diagnostic
+extension is not the first-person acceptance boundary. Restore the established
+gameplay range; retain this evidence only as an investigation record. No further
+geometry work should target rendering the camera-inside-body extreme itself.
+
 Parent `66f1149225c3cbb7547d2f7ad4c5cf2e5b2d52af`; the accompanying commit
 contains this source slice. The phone-tested anatomical mounting/profile and
 unchanged candidate meshes remain the working direction accepted as looking good

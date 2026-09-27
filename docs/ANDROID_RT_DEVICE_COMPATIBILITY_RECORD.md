@@ -2,9 +2,26 @@
 
 Last updated: 2026-09-27
 
-Latest installation: anatomical-mount candidate runtime `259bd26`, isolated
+Newest local installation (extreme-look camera policy now superseded): **SM-S948B**, isolated
+`.debug.viewmodel` APK `210d3bf234ef53e08e80fbef0c7574e37c6f9eaf6335cca7310751eff583b898`,
+built on branch checkpoint `bda5c2c` with the deeper camera and upper-torso
+candidate world `58c80338...` / unchanged view `6f06d77e...`. Explicit
+`adb install -r -t` succeeded without clearing data; production package untouched.
+Packaged Mobile pipeline/compute SPIR-V validates. Initial run123053 timed out at
+the120-second replay wait after waypoint12/13 and stopped the app. That attempt
+is not a pass. Fresh same-APK run123412 passed13/13 replay, four captures and
+Home/resume with the supported300-second wait and unchanged75% scale/RT quality.
+Pulled APK SHA256 matched exactly. Glass transport overflows at147/148/145/146
+were0/14/0/8; no shadow overflows. Those remain failures for glass acceptance.
+Two live videos were recorded; neither establishes final body acceptance.
+The owner then clarified that the normal gameplay pitch range, not the extreme
+camera-inside-body study, is the acceptance boundary. The app is Home-backgrounded
+while that range is restored. No newer owner acceptance is claimed. The prior
+owner-liked APK is retained locally.
+
+Previous installation: anatomical-mount candidate runtime `259bd26`, isolated
 ARM64 Debug APK `bd9b348ce351dc2e511e2f1c4f9aa7eaac050fcf7e1dfb3c05e7ffe98b991da9`,
-is installed and on-device SHA-256 matched on **SM-S948B**. The first ordinary
+was installed and on-device SHA-256 matched on **SM-S948B**. The first ordinary
 install was rejected with `INSTALL_FAILED_TEST_ONLY`; explicit developer
 `adb install -r -t` succeeded without clearing data. Exact-candidate run
 `run-20260927-112636` passes 13-waypoint replay, four combined/control captures,

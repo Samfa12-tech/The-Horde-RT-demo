@@ -696,7 +696,6 @@ int main()
                       "first-person arm traversal must not cull the lantern forearm while looking up");
         ok &= Require(sceneSource.find("sizeof(ScenePushConstants) == 128u") != std::string::npos &&
                       sceneSource.find("sizeof(ScenePushConstants) <= 128u") != std::string::npos &&
-                      sceneSource.find("offsetof(ScenePushConstants, minimumCameraPitch) == 68u") != std::string::npos &&
                       sceneSource.find("offsetof(ScenePushConstants, waterQuality) == 72u") != std::string::npos &&
                       sceneSource.find("offsetof(ScenePushConstants, waterfallWidthScale) == 76u") != std::string::npos &&
                       sceneSource.find("offsetof(ScenePushConstants, genericTransmissionActive) == 120u") != std::string::npos &&
@@ -709,21 +708,6 @@ int main()
                       raygenSource.find("HORDE_GENERIC_TRANSMISSION_VARIANT") != std::string::npos &&
                       raygenSource.find("genericTransmissionEnabled()") != std::string::npos,
                       "RT lab tuning, generic transmission, and chest guidance must append within the 128-byte phone-safe ABI");
-        ok &= Require(raygenSource.find("float minimumCameraPitch;") != std::string::npos &&
-                      raygenSource.find("float heldPropDepth;") == std::string::npos &&
-                      raygenSource.find("controls.minimumCameraPitch, 0.28)") != std::string::npos &&
-                      sceneSource.find("MinimumPlayerCameraPitch(frame.playerMountProfile)") != std::string::npos,
-                      "camera look must consume the profile bound through the reused byte-68 slot without changing physical held poses");
-        const auto androidCheckpointResolverBegin = androidBridgeSource.find("bool ResolveDebugCheckpoint(");
-        const auto androidCheckpointResolverEnd = androidBridgeSource.find("void ApplyDebugCheckpointSimulation(", androidCheckpointResolverBegin);
-        const auto androidCheckpointResolver = androidCheckpointResolverBegin != std::string::npos &&
-            androidCheckpointResolverEnd != std::string::npos
-            ? androidBridgeSource.substr(androidCheckpointResolverBegin,
-                androidCheckpointResolverEnd - androidCheckpointResolverBegin) : std::string{};
-        ok &= Require(androidCheckpointResolver.find("development->requiresAnatomicalPlayerMount &&") != std::string::npos &&
-                      androidCheckpointResolver.find("kDefaultPlayerMountProfile != horde::gameplay::items::PlayerMountProfile::AnatomicalBody") != std::string::npos &&
-                      androidCheckpointResolver.find("gGameSimulation.Snapshot()") == std::string::npos,
-                      "Android must reject incompatible deep-look requests using immutable configuration before publishing them across JNI");
         ok &= Require(sceneSource.find("properties.limits.maxPushConstantsSize") !=
                           std::string::npos &&
                       sceneSource.find("BuildRtPipelineBundleResources(pipelineBundle_") !=

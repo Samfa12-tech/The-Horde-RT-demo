@@ -530,8 +530,7 @@ public class MainActivity extends Activity {
                         viewControls[3] = event.getX(i);
                         viewControls[4] = event.getY(i);
                         viewControls[0] += dx * 0.0036f * sensitivity;
-                        viewControls[1] = clamp(viewControls[1] - dy * 0.0028f * sensitivity,
-                                BuildConfig.ANATOMICAL_PLAYER_MOUNT ? -4.0f : -0.32f, 0.28f);
+                        viewControls[1] = clamp(viewControls[1] - dy * 0.0028f * sensitivity, -0.32f, 0.28f);
                     }
                 }
                 pushViewControls();
@@ -1807,8 +1806,6 @@ public class MainActivity extends Activity {
             case "player-viewmodel-lantern-low-parry": return 144;
             case "player-viewmodel-lantern-low-look-down": return 145;
             case "player-viewmodel-lantern-high-look-up": return 146;
-            case "player-viewmodel-body-look-down": return 147;
-            case "player-viewmodel-lantern-body-look-down": return 148;
             default: return -1;
         }
     }
@@ -1957,8 +1954,6 @@ public class MainActivity extends Activity {
             case 144: return new float[]{-1.5707963f, -0.30f};
             case 145: return new float[]{-1.5707963f, -0.32f};
             case 146: return new float[]{-1.5707963f, 0.28f};
-            case 147: return new float[]{0.0f, -4.0f};
-            case 148: return new float[]{-1.5707963f, -4.0f};
             default: return null;
         }
     }

@@ -51,10 +51,9 @@ struct DevelopmentCheckpoint
     float rewardTorsionAngleRadians = 0.0f;
     float rewardTorsionAngularVelocity = 0.0f;
     bool stagesUnlockedChest = false;
-    bool requiresAnatomicalPlayerMount = false;
 };
 
-inline constexpr std::array<DevelopmentCheckpoint, 49u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 47u> kDevelopmentCheckpoints{{
     {100, "pbr-sword-closeup", 0, 0.0f, 1.85f, 0.0f, -0.18f},
     {101, "pbr-torch-fire", 0, 0.0f, 1.85f, 0.0f, -0.14f},
     {102, "player-body-grips", 0, 0.0f, 1.85f, 0.0f, -0.32f},
@@ -186,13 +185,6 @@ inline constexpr std::array<DevelopmentCheckpoint, 49u> kDevelopmentCheckpoints{
      -1.57079632679f, 0.28f,
      DevelopmentCombatPose::Rest, false, 1.0f, {{0.72f, 0.90f, 1.0f}}, 2.4f,
      true, false, DevelopmentRewardPose::HeldHigh},
-    {.id = 147, .name = "player-viewmodel-body-look-down", .baseShowcaseCheckpointId = 0,
-     .cameraX = 0.0f, .cameraZ = 1.85f, .yaw = 0.0f, .pitch = -4.0f,
-     .requiresAnatomicalPlayerMount = true},
-    {.id = 148, .name = "player-viewmodel-lantern-body-look-down", .baseShowcaseCheckpointId = 5,
-     .cameraX = -10.65f, .cameraZ = -15.20f, .yaw = -1.57079632679f, .pitch = -4.0f,
-     .usesProductionRewardProps = true, .rewardPose = DevelopmentRewardPose::HeldLow,
-     .requiresAnatomicalPlayerMount = true},
 }};
 
 constexpr const DevelopmentCheckpoint* FindDevelopmentCheckpoint(std::string_view name)
