@@ -11,6 +11,7 @@
 #include "scene/assets/SkinnedMeshAsset.h"
 #include "scene/assets/PlayerPrimitiveContract.h"
 #include "vulkan/raytracing/RtSceneAbi.generated.h"
+#include "vulkan/raytracing/PlayerRenderRoute.h"
 
 namespace horde::vulkan::raytracing
 {
@@ -20,18 +21,6 @@ struct RtSceneRecordObservation;
 inline constexpr float kPlayerGripSocketToleranceMetres = 0.015f;
 inline constexpr float kPlayerGripOrientationToleranceRadians = 0.02f;
 inline constexpr float kPlayerBootGroundingSafetyMetres = 0.00025f;
-
-enum class PlayerRenderRoute : std::uint8_t
-{
-    Procedural,
-    Skinned,
-    // Stable first-person fallback: the skinned character remains available to
-    // reflection/shadow rays, while four procedural arm segments own the
-    // primary-camera view. This keeps the authored rig/socket authority without
-    // presenting the deferred hand mesh in the player's view.
-    HybridBlockPrimary,
-    ModelledViewmodel,
-};
 
 struct PlayerRouteMasks
 {

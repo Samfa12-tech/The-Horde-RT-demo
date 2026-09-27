@@ -33,6 +33,15 @@ struct GameSimulationConfig
         horde::gameplay::items::PlayerMountProfile::LegacyViewRelative;
 };
 
+// Keep the historical constructor configuration available for deterministic
+// legacy fixtures. Applications explicitly select the owner-accepted profile.
+inline constexpr GameSimulationConfig ProductionGameSimulationConfig()
+{
+    GameSimulationConfig config;
+    config.playerMountProfile = horde::gameplay::items::PlayerMountProfile::AnatomicalBody;
+    return config;
+}
+
 class GameSimulation
 {
 public:

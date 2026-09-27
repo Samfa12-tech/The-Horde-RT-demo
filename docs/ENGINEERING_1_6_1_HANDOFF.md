@@ -30,6 +30,21 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### Current Phase 3 checkpoint
 
+**Normal production route integrated and phone startup regression fixed:** exact
+accepted world/view pair is admitted; normal Windows/Android paths select the
+anatomical modelled route, with old routes only in explicit comparison captures.
+Fresh15/15 targeted host tests,13 normal native Windows captures, Android Debug/
+unsigned Release builds,19 Java tests and two exact post-admission regenerations
+pass. Ordinary DebugAPK14927941 passes SM-S948B13/13 replay,3captures andHome/resume
+at75%; failed predecessor0bea9464 is retained as failed evidence. MainActivity's
+candidate-only viewmodel staging caused that startup failure and is corrected,
+with a red/green regression check. Shipping modules have zero diagnostic atomics/
+binding22. [Evidence, exact artifacts and test-contract reconciliation](evidence/2026-09-27-modelled-production/README.md).
+Do not retune accepted arms. Next is Phase4 glass correctness and matched Shipping
+evidence; low-parry still reports1transport overflow. Anatomical-profile feedback
+acceptance and full programme/final-candidate gates remain separate and open.
+
+Historical preparation checkpoint (superseded by integration above):
 **Production preparation verified, route switch next:** accepted world/view/manifest
 reproduce byte-exact in two clean exports; original base-rig guard no longer
 depends on whichever derived world is shipped. Viewmodel pair is now included

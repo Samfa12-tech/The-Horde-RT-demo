@@ -1,0 +1,36 @@
+Internal ctest changing into directory: C:/Dev/tmp/horde-phase3-native-20260923
+Test project C:/Dev/tmp/horde-phase3-native-20260923
+      Start  1: horde_rt_player_primitive_contract_tests
+ 1/15 Test  #1: horde_rt_player_primitive_contract_tests ....   Passed    0.02 sec
+      Start  3: horde_rt_player_manifest_agreement_tests
+ 2/15 Test  #3: horde_rt_player_manifest_agreement_tests ....   Passed    1.10 sec
+      Start  4: horde_rt_player_package_inventory_tests
+ 3/15 Test  #4: horde_rt_player_package_inventory_tests .....   Passed    1.28 sec
+      Start 28: horde_rt_player_animation_tests
+ 4/15 Test #28: horde_rt_player_animation_tests .............   Passed    0.03 sec
+      Start 30: horde_rt_held_item_socket_tests
+ 5/15 Test #30: horde_rt_held_item_socket_tests .............   Passed    0.61 sec
+      Start 32: horde_rt_scene_abi_tests
+ 6/15 Test #32: horde_rt_scene_abi_tests ....................   Passed    0.02 sec
+      Start 33: horde_rt_static_gltf_asset_tests
+ 7/15 Test #33: horde_rt_static_gltf_asset_tests ............   Passed    0.17 sec
+      Start 50: horde_rt_simulation_timing_tests
+ 8/15 Test #50: horde_rt_simulation_timing_tests ............   Passed    0.03 sec
+      Start 51: horde_rt_simulation_gameplay_tests
+ 9/15 Test #51: horde_rt_simulation_gameplay_tests ..........   Passed    0.06 sec
+      Start 70: horde_rt_skinned_arm_reference_tests
+10/15 Test #70: horde_rt_skinned_arm_reference_tests ........   Passed    0.02 sec
+      Start 71: horde_rt_skinned_character_smoke
+11/15 Test #71: horde_rt_skinned_character_smoke ............   Passed   27.21 sec
+      Start 72: horde_rt_player_skinned_semantic_fixtures
+12/15 Test #72: horde_rt_player_skinned_semantic_fixtures ...   Passed    3.81 sec
+      Start 73: horde_rt_player_viewmodel_admission
+13/15 Test #73: horde_rt_player_viewmodel_admission .........   Passed    0.55 sec
+      Start 74: horde_rt_player_viewmodel_pose_fixtures
+14/15 Test #74: horde_rt_player_viewmodel_pose_fixtures .....   Passed    3.08 sec
+      Start 75: horde_rt_character_render_slot_smoke
+15/15 Test #75: horde_rt_character_render_slot_smoke ........   Passed    0.85 sec
+
+100% tests passed, 0 tests failed out of 15
+
+Total Test time (real) =  38.85 sec

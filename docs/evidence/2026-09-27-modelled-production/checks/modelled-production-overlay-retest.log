@@ -1,0 +1,10 @@
+paired manifest stages: passed
+retired legacy mounting rejects: rejected
+malformed anatomical profile selector rejects: rejected
+explicit anatomical candidate stages: passed
+manifest name without hash rejects: rejected
+manifest hash without name rejects: rejected
+manifest hash mismatch rejects: rejected
+manifest path traversal rejects: rejected
+missing paired manifest rejects by default: rejected
+anatomical profile without paired manifest rejects: rejected

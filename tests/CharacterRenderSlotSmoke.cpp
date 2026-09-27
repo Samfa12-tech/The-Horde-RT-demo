@@ -1308,14 +1308,14 @@ int main()
                           std::string::npos,
                       "authoritative Android route replay must not freeze behind menu/death pause state");
         ok &= Require(androidBridgeSource.find(
-                          "development->name.starts_with(\"player-body-\")") !=
+                          "PlayerRenderRouteForCheckpoint(") !=
                           std::string::npos &&
                       androidBridgeSource.find(
-                          "PlayerRenderRoute::HybridBlockPrimary") !=
+                          "kProductionPlayerRenderRoute") !=
                           std::string::npos &&
-                      androidBridgeSource.find("\"hybrid-block-primary\"") !=
+                      androidBridgeSource.find("ProductionGameSimulationConfig()") !=
                           std::string::npos,
-                      "Android reward/glass checkpoints must use and report the same block-primary arm route as live gameplay");
+                      "Android gameplay/reward/glass must use the accepted production route and shared anatomical profile");
         ok &= Require(androidBridgeSource.find("AndroidRtLabState gRtLabState;") != std::string::npos &&
                       androidBridgeSource.find("const horde::vulkan::raytracing::RtSceneTuning rtLabTuning = gRtLabState.Snapshot();") != std::string::npos &&
                       androidBridgeSource.find("rtLabTuning);") != std::string::npos &&

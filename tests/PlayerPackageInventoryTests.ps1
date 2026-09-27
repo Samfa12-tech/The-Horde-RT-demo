@@ -21,9 +21,19 @@ foreach ($relative in @('tools/package-alpha.ps1', 'tools/run-foundation-validat
     }
 }
 $gradle = Get-Content (Join-Path $repo 'android/app/build.gradle') -Raw
+$activity = Get-Content (Join-Path $repo 'android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java') -Raw
+# APK inclusion is insufficient: the native loader reads the private files root.
+# Keep the production pair in the unconditional held-item/player staging chain.
+$staging = [regex]::Match($activity, '(?s)final boolean heldItemsStaged\s*=([^;]+);')
+if (-not $staging.Success -or $staging.Groups[1].Value -match 'BuildConfig|\?|\|\|') {
+    throw 'Production player staging must not be gated by a candidate/build switch'
+}
 foreach ($name in $required) {
     $entry = $name.Substring('assets/'.Length)
     if (-not $gradle.Contains("include '$entry'")) { throw "Default Android staging lacks $entry" }
+    if (-not $staging.Groups[1].Value.Contains("stageAsset(`"$entry`", `"$entry`")")) {
+        throw "Normal Android startup does not stage required runtime asset: $entry"
+    }
 }
 if ($AndroidApk) {
     Add-Type -AssemblyName System.IO.Compression.FileSystem

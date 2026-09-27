@@ -58,6 +58,40 @@ cycle during sideways/backward movement is explicitly deferred to a later
 animation pass in `FUTURE_WORK.md`, not a1.6.1 acceptance blocker. This approval
 does not certify glass, sustained performance, a different APK or other devices.
 
+Local production-route integration test on **SM-S948B**: ordinary `.debug` APK
+`0bea94649d67856a36db576258023b2422d88403f890eb091b468f31b3f291a9`
+is installed/pullback-matched without clearing data. This build uses the admitted
+world/view assets and anatomical modelled default without a candidate overlay.
+The accepted `.debug.viewmodel` app remains untouched. Fresh ordinary opening/
+mirror and low-parry capture/lifecycle validation failed at startup; installation
+does not establish those results or sustained performance. Embedded Mobile
+pipeline/compute modules pass containment, SPIR-V validation and disassembly.
+
+Failed-run evidence: `run-20260927-145531` timed out waiting for honest RT
+presentation. App-scoped `HordeRtProbeBridge` logcat at14:55:44 reports
+"Dedicated modelled RT viewmodel requested without its validated runtime geometry."
+The owner-observed error screen was captured before restarting anything at
+`C:/Dev/tmp/horde-modelled-production-android-20260927-a/startup-failure.png`;
+it reports RT surface stopped and presented=no. Source inspection finds that
+MainActivity still stages the viewmodel runtime only for VIEWMODEL_CANDIDATE,
+although the ordinary build now requests the modelled production route. This
+startup integration defect is open; no capture/lifecycle pass is claimed for
+this APK, and the separate accepted candidate remains untouched.
+
+Corrected ordinary Debug APK on **SM-S948B**:
+`14927941cc7e7596943b0a2092c01ae1ff30277d376697e170c1d44381057688`.
+Unconditional production viewmodel staging fixes the demonstrated startup gap.
+Install/pulled-base hashes match without data clearing. Fresh run150451 passes
+13/13 deterministic replay, opening/mirror/low-parry captures and Home/resume at
+75% (1080x2235), strict ASTC and honest native RT presentation. All capture states
+report anatomical modelled route, dedicated ownership and zero socket error.
+Low-parry retains1transport overflow/shadow0: glass remains open. This is
+functional/integration evidence, not a performance run or new owner acceptance.
+Unsigned Release build/package and actual Shipping module checks pass separately;
+it was not installed. The accepted candidate app remains untouched; the harness
+force-stopped only the tested ordinary Debug package on completion. See
+[production integration evidence](evidence/2026-09-27-modelled-production/README.md).
+
 Superseded local installation (extreme-look camera policy withdrawn): **SM-S948B**, isolated
 `.debug.viewmodel` APK `210d3bf234ef53e08e80fbef0c7574e37c6f9eaf6335cca7310751eff583b898`,
 built on branch checkpoint `bda5c2c` with the deeper camera and upper-torso

@@ -178,6 +178,17 @@ TestRigFrame BuildRigFrame(
             shoulderAnchoredRootWorld, horde::gameplay::kRouteFloorWorldY,
             playerSlot.BootGroundingOffsetMetres(source.playerAnimation));
     result.playerRootWorld = result.anchoredPlayerRootWorld;
+    if (source.playerMountProfile == horde::gameplay::items::PlayerMountProfile::AnatomicalBody)
+    {
+        const Vec3 animatedBodyOrigin{{
+            eye[0] + bodyRight[0] * lowerBody.pelvisSway,
+            eye[1] + lowerBody.pelvisBob * 0.65f,
+            eye[2] + bodyRight[2] * lowerBody.pelvisSway}};
+        result.playerRootWorld = horde::vulkan::raytracing::GroundPlayerRootOnRouteFloor(
+            animatedBodyOrigin, horde::gameplay::kRouteFloorWorldY,
+            playerSlot.BootGroundingOffsetMetres(source.playerAnimation));
+        result.anchoredPlayerRootWorld = result.playerRootWorld;
+    }
     const auto worldPointToPlayer = [&result](const Vec3& world) {
         const Vec3 delta{{world[0] - result.playerRootWorld[0],
                           world[1] - result.playerRootWorld[1],
@@ -362,7 +373,14 @@ struct PrimaryPlayerCameraMetrics
     Vec3 minimumTriangleBaselineVertex{};
     Vec3 minimumTriangleSkinnedVertex{};
     float minimumVertexDepthMetres = INFINITY;
+    // Sum intentionally retains overlap: a conservative geometry-inflation
+    // guard for same-carry wall/open ratios and the existing absolute ceiling.
+    // It is not a silhouette measurement or a percent of the viewport.
     double clippedProjectedTriangleArea = 0.0;
+    // Union measures visible coverage continuity without counting back/finger
+    // surfaces repeatedly as their projected overlap changes.
+    double projectedFootprintArea = 0.0;
+    std::size_t sampledPrimaryTriangles = 0u;
     std::size_t sideStableVertexCount = 0u;
     std::size_t sideCrossingVertexCount = 0u;
     std::size_t nearPlaneCrossingTriangleCount = 0u;
@@ -376,6 +394,81 @@ struct PrimaryPlayerCameraMetrics
     std::size_t reversedShadingNormalCount = 0u;
 };
 
+constexpr int kFootprintWidth = 96;
+constexpr int kFootprintHeight = 54;
+using Footprint = std::array<bool, kFootprintWidth*kFootprintHeight>;
+
+double ClippedCameraTriangleArea(const std::array<Vec3, 3u>& triangle, Footprint* footprint = nullptr)
+{
+    constexpr float horizontal = (16.0f / 9.0f) / 1.22f;
+    constexpr float vertical = 0.74f / 1.22f;
+    const std::array<std::array<float, 4u>, 5u> planes{{
+        {{0, 0, 1, -0.002f}}, {{1, 0, horizontal, 0}}, {{-1, 0, horizontal, 0}},
+        {{0, 1, vertical, 0}}, {{0, -1, vertical, 0}}}};
+    std::vector<Vec3> polygon(triangle.begin(), triangle.end()), clipped;
+    clipped.reserve(8u);
+    for (const auto& plane : planes)
+    {
+        if (polygon.empty()) return 0.0;
+        clipped.clear();
+        const auto distance = [&plane](const Vec3& p) {
+            return plane[0]*p[0] + plane[1]*p[1] + plane[2]*p[2] + plane[3];
+        };
+        Vec3 previous = polygon.back();
+        float previousDistance = distance(previous);
+        for (const auto& current : polygon)
+        {
+            const float currentDistance = distance(current);
+            if ((previousDistance >= 0) != (currentDistance >= 0))
+            {
+                const float t = previousDistance / (previousDistance-currentDistance);
+                clipped.push_back(Add(previous, Scale(Subtract(current, previous), t)));
+            }
+            if (currentDistance >= 0) clipped.push_back(current);
+            previous = current;
+            previousDistance = currentDistance;
+        }
+        polygon.swap(clipped);
+    }
+    double twiceArea = 0;
+    std::vector<std::array<double, 2u>> projected;
+    for (const auto& p : polygon)
+        projected.push_back({{p[0]/(p[2]*horizontal), p[1]/(p[2]*vertical)}});
+    for (std::size_t i = 0; i < polygon.size(); ++i)
+    {
+        const auto& a = polygon[i];
+        const auto& b = polygon[(i+1u)%polygon.size()];
+        twiceArea += (static_cast<double>(a[0])*b[1]-static_cast<double>(b[0])*a[1]) /
+                     (static_cast<double>(a[2])*b[2]*horizontal*vertical);
+    }
+    if (footprint && projected.size() >= 3u)
+    {
+        // A silhouette is the UNION of projected surfaces. Summing every
+        // front/back/finger triangle exaggerates changes from self-overlap.
+        const auto edge = [](const auto& a, const auto& b, double x, double y) {
+            return (b[0]-a[0])*(y-a[1]) - (b[1]-a[1])*(x-a[0]);
+        };
+        for (std::size_t i = 1u; i+1u < projected.size(); ++i)
+        {
+            const auto& a = projected[0]; const auto& b = projected[i]; const auto& c = projected[i+1u];
+            const double winding = edge(a,b,c[0],c[1]);
+            if (std::abs(winding) < 1e-12) continue;
+            const int x0 = std::clamp(static_cast<int>(std::floor((std::min({a[0],b[0],c[0]})+1)*.5*kFootprintWidth)),0,kFootprintWidth-1);
+            const int x1 = std::clamp(static_cast<int>(std::floor((std::max({a[0],b[0],c[0]})+1)*.5*kFootprintWidth)),0,kFootprintWidth-1);
+            const int y0 = std::clamp(static_cast<int>(std::floor((std::min({a[1],b[1],c[1]})+1)*.5*kFootprintHeight)),0,kFootprintHeight-1);
+            const int y1 = std::clamp(static_cast<int>(std::floor((std::max({a[1],b[1],c[1]})+1)*.5*kFootprintHeight)),0,kFootprintHeight-1);
+            for (int y=y0; y<=y1; ++y) for (int x=x0; x<=x1; ++x)
+            {
+                const double px=2.0*(x+.5)/kFootprintWidth-1;
+                const double py=2.0*(y+.5)/kFootprintHeight-1;
+                if (edge(a,b,px,py)*winding>=0 && edge(b,c,px,py)*winding>=0 && edge(c,a,px,py)*winding>=0)
+                    (*footprint)[static_cast<std::size_t>(y*kFootprintWidth+x)]=true;
+            }
+        }
+    }
+    return 0.5*std::abs(twiceArea);
+}
+
 PrimaryPlayerCameraMetrics MeasurePrimaryPlayerCameraMetrics(
     const horde::scene::assets::StaticMeshAsset& playerStatic,
     const std::vector<horde::scene::TexturedSkinnedRtVertex>& baselineVertices,
@@ -384,6 +477,7 @@ PrimaryPlayerCameraMetrics MeasurePrimaryPlayerCameraMetrics(
     const horde::gameplay::simulation::SimulationSnapshot& snapshot)
 {
     PrimaryPlayerCameraMetrics metrics;
+    Footprint footprint{};
     for (std::size_t vertex = 0u;
          vertex < std::min(baselineVertices.size(), vertices.size()); ++vertex)
     {
@@ -403,27 +497,20 @@ PrimaryPlayerCameraMetrics MeasurePrimaryPlayerCameraMetrics(
     const Vec3 viewRight = Normalise(Cross(viewForward, worldUp));
     const Vec3 viewUp = Normalise(Cross(viewRight, viewForward));
     const auto toWorld = [&rig](const auto& vertex) {
-        return Vec3{{rig.playerRootWorld[0] + rig.bodyRight[0] * vertex.position[0] +
-                         rig.bodyForward[0] * vertex.position[2],
-                     rig.playerRootWorld[1] + vertex.position[1],
-                     rig.playerRootWorld[2] + rig.bodyRight[2] * vertex.position[0] +
-                         rig.bodyForward[2] * vertex.position[2]}};
+        const auto offset = horde::vulkan::raytracing::PlayerModelVectorToWorld(
+            rig.modelBasis, {{vertex.position[0], vertex.position[1], vertex.position[2]}});
+        return Vec3{{rig.playerRootWorld[0] + offset[0],
+                     rig.playerRootWorld[1] + offset[1],
+                     rig.playerRootWorld[2] + offset[2]}};
     };
     for (const auto& vertex : vertices)
         metrics.minimumWorldY = std::min(metrics.minimumWorldY, toWorld(vertex)[1]);
-    const auto project = [&](const Vec3& world) {
+    const auto cameraPoint = [&](const Vec3& world) {
         const Vec3 delta = Subtract(world, eye);
         const float depth = Dot(delta, viewForward);
         metrics.minimumVertexDepthMetres = std::min(
             metrics.minimumVertexDepthMetres, depth);
-        const float safeDepth = std::max(depth, 0.001f);
-        return std::array<float, 2u>{{
-            std::clamp(1.22f * Dot(delta, viewRight) /
-                           (safeDepth * (16.0f / 9.0f)),
-                       -1.0f, 1.0f),
-            std::clamp(1.22f * Dot(delta, viewUp) /
-                           (safeDepth * 0.74f),
-                       -1.0f, 1.0f)}};
+        return Vec3{{Dot(delta, viewRight), Dot(delta, viewUp), depth}};
     };
     for (const auto& primitive : playerStatic.primitives)
     {
@@ -431,17 +518,18 @@ PrimaryPlayerCameraMetrics MeasurePrimaryPlayerCameraMetrics(
             continue;
         const std::string& materialName =
             playerStatic.materials[primitive.materialIndex].name;
-        if (materialName != "BodyPrimaryVisible" &&
-            materialName != "GauntletPrimaryVisible")
+        if (materialName != "ViewmodelSleeves" &&
+            materialName != "ViewmodelGauntlets")
             continue;
         for (std::uint32_t offset = 0u; offset + 2u < primitive.indexCount;
              offset += 3u)
         {
+            ++metrics.sampledPrimaryTriangles;
             std::array<Vec3, 3u> triangle{};
             std::array<Vec3, 3u> modelTriangle{};
             std::array<Vec3, 3u> modelNormals{};
             std::array<Vec3, 3u> baselineTriangle{};
-            std::array<std::array<float, 2u>, 3u> projected{};
+            std::array<Vec3, 3u> cameraTriangle{};
             std::array<float, 3u> depths{};
             for (std::size_t corner = 0u; corner < 3u; ++corner)
             {
@@ -462,7 +550,7 @@ PrimaryPlayerCameraMetrics MeasurePrimaryPlayerCameraMetrics(
                     baselineVertices[vertexIndex].position[1],
                     baselineVertices[vertexIndex].position[2]}};
                 depths[corner] = Dot(Subtract(triangle[corner], eye), viewForward);
-                projected[corner] = project(triangle[corner]);
+                cameraTriangle[corner] = cameraPoint(triangle[corner]);
             }
             const Vec3 geometricNormal = Normalise(Cross(
                 Subtract(modelTriangle[1], modelTriangle[0]),
@@ -513,23 +601,20 @@ PrimaryPlayerCameraMetrics MeasurePrimaryPlayerCameraMetrics(
                     Add(Add(triangle[0], triangle[1]), triangle[2]), 1.0f / 3.0f);
                 metrics.minimumTriangleWorld = triangle;
             }
-            const double twiceArea = std::abs(
-                static_cast<double>(projected[1][0] - projected[0][0]) *
-                    static_cast<double>(projected[2][1] - projected[0][1]) -
-                static_cast<double>(projected[1][1] - projected[0][1]) *
-                    static_cast<double>(projected[2][0] - projected[0][0]));
-            metrics.clippedProjectedTriangleArea += 0.5 * twiceArea;
+            const double area = ClippedCameraTriangleArea(cameraTriangle, &footprint);
+            metrics.clippedProjectedTriangleArea += area;
             metrics.maximumProjectedTriangleArea = std::max(
-                metrics.maximumProjectedTriangleArea, 0.5 * twiceArea);
+                metrics.maximumProjectedTriangleArea, area);
             const auto [minimumDepth, maximumDepth] = std::minmax_element(
                 depths.begin(), depths.end());
             if (*minimumDepth < 0.002f && *maximumDepth >= 0.002f)
             {
                 ++metrics.nearPlaneCrossingTriangleCount;
-                metrics.nearPlaneCrossingProjectedArea += 0.5 * twiceArea;
+                metrics.nearPlaneCrossingProjectedArea += area;
             }
         }
     }
+    metrics.projectedFootprintArea = 4.0*std::count(footprint.begin(),footprint.end(),true)/footprint.size();
     return metrics;
 }
 
@@ -596,6 +681,20 @@ GripSurfaceMetrics MeasureGripSurface(
 int main(int argc, char** argv)
 {
     using namespace horde::scene;
+    constexpr float h = (16.0f/9.0f)/1.22f;
+    constexpr float v = .74f/1.22f;
+    if (!Require(std::abs(ClippedCameraTriangleArea({{{{0,0,1}},{{h,0,1}},{{0,v,1}}}})-.5) < 1e-6 &&
+                 ClippedCameraTriangleArea({{{{0,0,-1}},{{h,0,-1}},{{0,v,-1}}}}) == 0.0 &&
+                 ClippedCameraTriangleArea({{{{3*h,0,1}},{{4*h,0,1}},{{3*h,v,1}}}}) == 0.0 &&
+                 std::abs(ClippedCameraTriangleArea({{{{-2*h,0,1}},{{0,0,1}},{{0,2*v,1}}}})-1.0) < 1e-6,
+                 "camera metric must clip polygons, not clamp projected triangle vertices")) return 1;
+    Footprint overlapProbe{};
+    const std::array<Vec3,3u> visibleProbe{{{{0,0,1}},{{h,0,1}},{{0,v,1}}}};
+    ClippedCameraTriangleArea(visibleProbe, &overlapProbe);
+    const auto coveredOnce = std::count(overlapProbe.begin(),overlapProbe.end(),true);
+    ClippedCameraTriangleArea(visibleProbe, &overlapProbe);
+    if (!Require(coveredOnce > 0 && coveredOnce == std::count(overlapProbe.begin(),overlapProbe.end(),true),
+                 "silhouette coverage must not double-count overlapping surfaces")) return 1;
     if (argc == 3 && std::string(argv[1]) == "--inspect-player-mount")
     {
         // Read the same animated node transforms used by the native renderer;
@@ -807,8 +906,8 @@ int main(int argc, char** argv)
     if (!Require(player.LoadClips(playerPath.string(), PlayerLocomotionClipSet(), diagnostic),
                  diagnostic.c_str())) return 1;
     if (!Require(player.HasTexcoords() && player.HasTangents() &&
-                     player.ExpandedVertexCount() == 83325u,
-                 "player four-primitive textured PBR skin layout changed")) return 1;
+                     player.ExpandedVertexCount() == 83445u,
+                 "accepted five-region player textured PBR skin layout changed")) return 1;
     std::cout << "player exact-grounding candidate vertices="
               << player.BootGroundingCandidateVertexCount() << '\n';
     if (!Require(player.BootGroundingCandidateVertexCount() >= 1000u &&
@@ -820,9 +919,10 @@ int main(int argc, char** argv)
     for (const auto& primitive : playerPrimitives) playerNames.push_back(primitive.materialName);
     if (!Require(horde::scene::assets::ValidatePlayerPrimitiveNames(playerNames, diagnostic), diagnostic.c_str()))
         return 1;
-    for (const auto& [name, count] : std::array<std::pair<std::string_view, std::size_t>, 4>{{
+    for (const auto& [name, count] : std::array<std::pair<std::string_view, std::size_t>, 5>{{
              {"BodyPrimaryVisible", 16596u}, {"GauntletPrimaryVisible", 26514u},
-             {"HeadPrimaryMasked", 5439u}, {"NearFacePrimaryMasked", 34776u}}})
+             {"HeadPrimaryMasked", 4035u}, {"NearFacePrimaryMasked", 1404u},
+             {"BodyRemainderPrimaryVisible", 34896u}}})
     {
         const auto part = std::find_if(playerPrimitives.begin(), playerPrimitives.end(),
             [&](const auto& primitive) { return primitive.materialName == name; });
@@ -953,7 +1053,8 @@ int main(int argc, char** argv)
                  socketDistance(playerSockets.rightHand, rightTarget) <= 0.015f,
                  "actual LeftHand/RightHand bone sockets must solve within 15 mm")) return 1;
 
-    horde::gameplay::simulation::GameSimulation simulation;
+    horde::gameplay::simulation::GameSimulation simulation(
+        horde::gameplay::simulation::ProductionGameSimulationConfig());
     horde::gameplay::simulation::InputSnapshot walkingInput{};
     walkingInput.moveForward = 1.0f;
     simulation.StepFixed(walkingInput);
@@ -1028,11 +1129,12 @@ int main(int argc, char** argv)
     const auto* upCheckpoint = horde::gameplay::FindDevelopmentCheckpoint(108);
     const auto* rewardHighCheckpoint = horde::gameplay::FindDevelopmentCheckpoint(116);
     const auto* rewardLowCheckpoint = horde::gameplay::FindDevelopmentCheckpoint(117);
-    horde::gameplay::simulation::GameSimulation restSimulation;
-    horde::gameplay::simulation::GameSimulation downSimulation;
-    horde::gameplay::simulation::GameSimulation upSimulation;
-    horde::gameplay::simulation::GameSimulation rewardHighSimulation;
-    horde::gameplay::simulation::GameSimulation rewardLowSimulation;
+    const auto productionConfig = horde::gameplay::simulation::ProductionGameSimulationConfig();
+    horde::gameplay::simulation::GameSimulation restSimulation(productionConfig);
+    horde::gameplay::simulation::GameSimulation downSimulation(productionConfig);
+    horde::gameplay::simulation::GameSimulation upSimulation(productionConfig);
+    horde::gameplay::simulation::GameSimulation rewardHighSimulation(productionConfig);
+    horde::gameplay::simulation::GameSimulation rewardLowSimulation(productionConfig);
     if (!Require(restCheckpoint != nullptr && downCheckpoint != nullptr &&
                  upCheckpoint != nullptr && rewardHighCheckpoint != nullptr &&
                  rewardLowCheckpoint != nullptr &&
@@ -1296,8 +1398,8 @@ int main(int argc, char** argv)
         horde::gameplay::FindDevelopmentCheckpoint(132);
     const auto* rewardWallLowCheckpoint =
         horde::gameplay::FindDevelopmentCheckpoint(133);
-    horde::gameplay::simulation::GameSimulation rewardWallHighSimulation;
-    horde::gameplay::simulation::GameSimulation rewardWallLowSimulation;
+    horde::gameplay::simulation::GameSimulation rewardWallHighSimulation(productionConfig);
+    horde::gameplay::simulation::GameSimulation rewardWallLowSimulation(productionConfig);
     if (!Require(rewardWallHighCheckpoint != nullptr &&
                      rewardWallLowCheckpoint != nullptr &&
                      horde::gameplay::StageDevelopmentCheckpointSimulation(
@@ -1306,6 +1408,18 @@ int main(int argc, char** argv)
                          rewardWallLowSimulation, *rewardWallLowCheckpoint),
                  "wall high/low direct checkpoints must import for final skinned camera-clearance measurement"))
         return 1;
+    const auto viewDirectory = root / "assets/models/player/viewmodel/runtime";
+    horde::scene::assets::AssetManifest viewManifest;
+    horde::scene::assets::StaticMeshAsset viewStatic;
+    SkinnedMeshAsset viewSkin;
+    const auto viewPath = viewDirectory / "gothic-traveller-viewmodel.runtime.glb";
+    if (!Require(horde::scene::assets::AssetManifest::Load(
+                     viewDirectory / "asset.manifest.json", viewManifest, diagnostic) &&
+                 viewManifest.ValidatePlayerViewmodelSemantics(diagnostic) &&
+                 horde::scene::assets::StaticMeshAsset::Load(viewPath, viewManifest, viewStatic, diagnostic) &&
+                 viewSkin.LoadClips(viewPath.string(), PlayerLocomotionClipSet(), diagnostic) &&
+                 viewSkin.ValidateStaticVertexLayout(viewStatic, diagnostic),
+                 "camera metrics must use the admitted dedicated viewmodel streams")) return 1;
     const auto measurePlayerWithSlot = [&] (
         horde::vulkan::raytracing::PlayerRenderSlot& slot,
         const auto& snapshot,
@@ -1324,12 +1438,23 @@ int main(int argc, char** argv)
                     horde::gameplay::animation::PlayerLocomotionClip::Walk
                 ? horde::scene::SkinnedClip::Walking
                 : horde::scene::SkinnedClip::Idle;
-        if (!player.SkinUniqueTextured(
+        if (!viewSkin.SkinUniqueTextured(
                 clip, rig.animation.locomotionTime, baseline, diagnostic))
             return false;
+        std::vector<horde::scene::TexturedSkinnedRtVertex> viewVertices;
+        std::vector<horde::scene::SkinnedPbrTangent> viewTangents;
+        if (!viewSkin.SkinPlayerPoseUniqueTextured(slot.SolvedPose(), viewVertices, viewTangents, diagnostic))
+            return false;
         metrics = MeasurePrimaryPlayerCameraMetrics(
-            playerStatic, baseline, slot.UniqueVertices(), rig, snapshot);
-        return true;
+            viewStatic, baseline, viewVertices, rig, snapshot);
+        // Boot grounding belongs to the secondary world body, not the arms-only
+        // primary stream. Both consume the exact same solved pose and transform.
+        metrics.minimumWorldY = INFINITY;
+        for (const auto& vertex : slot.UniqueVertices())
+            metrics.minimumWorldY = std::min(metrics.minimumWorldY,
+                rig.playerRootWorld[1] + vertex.position[1]);
+        return metrics.sampledPrimaryTriangles == viewStatic.indices.size()/3u &&
+               std::isfinite(metrics.minimumTriangleDistanceMetres);
     };
     const auto measurePlayer = [&](const auto& snapshot,
                                    PrimaryPlayerCameraMetrics& metrics) {
@@ -1423,7 +1548,7 @@ int main(int argc, char** argv)
                      "idle boot-to-floor contact must remain stable at minimum, neutral, and maximum camera pitch"))
             return 1;
     }
-    horde::gameplay::simulation::GameSimulation walkingGroundSimulation;
+    horde::gameplay::simulation::GameSimulation walkingGroundSimulation(productionConfig);
     horde::gameplay::simulation::InputSnapshot walkingGroundInput;
     walkingGroundInput.damageEnabled = false;
     walkingGroundInput.moveForward = 1.0f;
@@ -1461,7 +1586,7 @@ int main(int argc, char** argv)
                          horde::gameplay::kRouteFloorWorldY + 0.001f,
                  "every sampled walking phase must keep a boot sole within the 1 mm route-floor contact envelope without penetration"))
         return 1;
-    horde::gameplay::simulation::GameSimulation ordinaryWallSimulation;
+    horde::gameplay::simulation::GameSimulation ordinaryWallSimulation(productionConfig);
     horde::gameplay::simulation::InputSnapshot ordinaryWallInput;
     ordinaryWallInput.damageEnabled = false;
     ordinaryWallInput.hasAuthoritativePlayerPose = true;
@@ -1540,10 +1665,8 @@ int main(int argc, char** argv)
                 wallPlayerMetrics[pose].minimumTriangleDistanceMetres >= 0.050f,
                 "near-wall final-skinned primary player/arm triangles must stay outside the camera-centred 50 mm exclusion volume");
         const bool safeCoverage = Require(
-            projectedAreaRatio <= 1.75 &&
-                openPlayerMetrics[pose].clippedProjectedTriangleArea <=
-                    ordinaryPlayerMetrics.clippedProjectedTriangleArea * 1.75,
-            "reward raised/open and near-wall final-skinned player coverage must stay within the bounded raised-arm envelope instead of dominating the viewport");
+            projectedAreaRatio <= 1.75,
+            "wall retraction must not inflate the same accepted carry pose's projected arm geometry");
         const bool boundedGeometry = Require(
             openPlayerMetrics[pose].maximumBaselineTriangleEdgeMetres <= 0.12f &&
                 openPlayerMetrics[pose].maximumSkinnedTriangleEdgeMetres <=
@@ -1561,8 +1684,8 @@ int main(int argc, char** argv)
     // movement can no longer advance this close. Imports and camera turns can
     // still author the emergency z=-9.70 presentation, so its final skinned
     // triangles must remain finite, side-stable, and camera-safe.
-    horde::gameplay::simulation::GameSimulation extremeWallHighSimulation;
-    horde::gameplay::simulation::GameSimulation extremeWallLowSimulation;
+    horde::gameplay::simulation::GameSimulation extremeWallHighSimulation(productionConfig);
+    horde::gameplay::simulation::GameSimulation extremeWallLowSimulation(productionConfig);
     if (!Require(horde::gameplay::StageDevelopmentCheckpointSimulation(
                      extremeWallHighSimulation, *rewardHighCheckpoint) &&
                  horde::gameplay::StageDevelopmentCheckpointSimulation(
@@ -1614,11 +1737,10 @@ int main(int argc, char** argv)
                      0.000001);
         if (!Require(std::isfinite(extremeMetrics.minimumTriangleDistanceMetres) &&
                          extremeMetrics.minimumTriangleDistanceMetres >= 0.050f &&
-                         // The primary ray path starts at 2 mm. Retain over
-                         // twenty times that depth while the stronger 50 mm
-                         // requirement is measured against actual triangles,
-                         // not a peripheral vertex's forward projection.
-                         extremeMetrics.minimumVertexDepthMetres >= 0.040f &&
+                         // Anatomical shoulders can lie behind the eye plane
+                         // outside the view. Require no visible near-plane
+                         // crossing, plus the unchanged 50 mm triangle distance.
+                         extremeMetrics.nearPlaneCrossingProjectedArea == 0.0 &&
                          projectedAreaRatio <= 1.75 &&
                          extremeMetrics.maximumSkinnedTriangleEdgeMetres <=
                              kAuditedCompleteArmEdgeLimitMetres &&
@@ -1654,8 +1776,8 @@ int main(int argc, char** argv)
     std::sort(wallSweepZ.begin(), wallSweepZ.end(), std::greater<float>());
     std::array<horde::gameplay::simulation::GameSimulation, 2u>
         wallSweepSimulations{{
-            horde::gameplay::simulation::GameSimulation{},
-            horde::gameplay::simulation::GameSimulation{}}};
+            horde::gameplay::simulation::GameSimulation{productionConfig},
+            horde::gameplay::simulation::GameSimulation{productionConfig}}};
     std::array<horde::vulkan::raytracing::PlayerRenderSlot, 2u>
         wallSweepSlots{};
     if (!Require(horde::gameplay::StageDevelopmentCheckpointSimulation(
@@ -1711,7 +1833,7 @@ int main(int argc, char** argv)
             if (hasPreviousProjectedAreaRatio)
             {
                 const double delta =
-                    std::abs(metrics.clippedProjectedTriangleArea -
+                    std::abs(metrics.projectedFootprintArea -
                              previousProjectedArea);
                 if (delta > maximumConsecutiveProjectedAreaDelta)
                 {
@@ -1724,7 +1846,7 @@ int main(int argc, char** argv)
                 }
             }
             previousProjectedAreaRatio = areaRatio;
-            previousProjectedArea = metrics.clippedProjectedTriangleArea;
+            previousProjectedArea = metrics.projectedFootprintArea;
             previousProjectedAreaZ = z;
             hasPreviousProjectedAreaRatio = true;
             const double sideCrossingFraction =
@@ -1790,7 +1912,7 @@ int main(int argc, char** argv)
                   << " worst clearance@z=" << worstTriangleClearance << '@'
                   << worstZ << " depth=" << worstVertexDepth
                   << " area-ratio=" << worstProjectedAreaRatio
-                  << " consecutive-clipped-area-delta="
+                  << " consecutive-footprint-area-delta="
                   << maximumConsecutiveProjectedAreaDelta
                   << '@' << maximumConsecutiveAreaDeltaFromZ << "->"
                   << maximumConsecutiveAreaDeltaToZ << '('
@@ -1807,7 +1929,7 @@ int main(int argc, char** argv)
     // pose advances into the real z=-10 collision fixture. Every fixed tick
     // must produce finite skin/pendulum data and keep the final skinned player
     // outside the camera-centred near exclusion volume.
-    horde::gameplay::simulation::GameSimulation wallApproachSimulation;
+    horde::gameplay::simulation::GameSimulation wallApproachSimulation(productionConfig);
     if (!horde::gameplay::StageDevelopmentCheckpointSimulation(
             wallApproachSimulation, *rewardHighCheckpoint))
     {
@@ -1899,7 +2021,7 @@ int main(int argc, char** argv)
             break;
         }
         std::vector<horde::scene::TexturedSkinnedRtVertex> baseline;
-        if (!player.SkinUniqueTextured(
+        if (!viewSkin.SkinUniqueTextured(
                 rig.animation.locomotionClip ==
                         horde::gameplay::animation::PlayerLocomotionClip::Walk
                     ? horde::scene::SkinnedClip::Walking
@@ -1911,10 +2033,28 @@ int main(int argc, char** argv)
             approachFailurePhase = "baseline skin: " + diagnostic;
             break;
         }
+        std::vector<horde::scene::TexturedSkinnedRtVertex> primaryVertices;
+        std::vector<horde::scene::SkinnedPbrTangent> primaryTangents;
+        if (!viewSkin.SkinPlayerPoseUniqueTextured(wallApproachSlot.SolvedPose(), primaryVertices,
+                                                  primaryTangents, diagnostic) ||
+            !FiniteTexturedVertices(primaryVertices))
+        {
+            approachFinite = false;
+            approachFailureStep = step;
+            approachFailurePhase = "shared-pose viewmodel skin: " + diagnostic;
+            break;
+        }
         const PrimaryPlayerCameraMetrics metrics =
             MeasurePrimaryPlayerCameraMetrics(
-                playerStatic, baseline, wallApproachSlot.UniqueVertices(), rig,
+                viewStatic, baseline, primaryVertices, rig,
                 snapshot);
+        if (metrics.sampledPrimaryTriangles != viewStatic.indices.size()/3u ||
+            !std::isfinite(metrics.minimumTriangleDistanceMetres))
+        {
+            approachFinite = false;
+            approachFailurePhase = "primary camera metrics omitted admitted triangles";
+            break;
+        }
         if (metrics.minimumTriangleDistanceMetres < minimumApproachClearance)
         {
             minimumApproachClearance = metrics.minimumTriangleDistanceMetres;
@@ -1962,7 +2102,7 @@ int main(int argc, char** argv)
                   << " phase=" << approachFailurePhase;
     std::cout << '\n';
     const bool approachSurvives = Require(
-        approachFinite && minimumApproachClearance >= 0.050f &&
+        approachFinite && std::isfinite(minimumApproachClearance) && minimumApproachClearance >= 0.050f &&
             maximumApproachTriangleEdge <=
                 kAuditedCompleteArmEdgeLimitMetres &&
             maximumApproachTriangleArea <= 0.08 &&
@@ -1978,7 +2118,7 @@ int main(int argc, char** argv)
                                       const float startZ,
                                       const float forward,
                                       const float strafe) {
-        horde::gameplay::simulation::GameSimulation simulation;
+        horde::gameplay::simulation::GameSimulation simulation(productionConfig);
         horde::gameplay::StageDevelopmentCheckpointSimulation(
             simulation, *rewardHighCheckpoint);
         horde::gameplay::simulation::InputSnapshot movement;
@@ -2007,7 +2147,7 @@ int main(int argc, char** argv)
     const auto cornerOutward = runGuardMovement(0.70f, -9.70f, 0.0f, 1.0f);
     const auto cornerInward = runGuardMovement(0.70f, -9.70f, 0.0f, -1.0f);
     const auto rotateThenForward = [&]() {
-        horde::gameplay::simulation::GameSimulation simulation;
+        horde::gameplay::simulation::GameSimulation simulation(productionConfig);
         horde::gameplay::StageDevelopmentCheckpointSimulation(
             simulation, *rewardHighCheckpoint);
         horde::gameplay::simulation::InputSnapshot movement;

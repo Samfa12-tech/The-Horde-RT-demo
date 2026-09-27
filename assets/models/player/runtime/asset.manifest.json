@@ -2,16 +2,29 @@
   "schema": 1,
   "asset": "gothic-traveller-lod0",
   "metresPerUnit": 1.0,
-  "coordinateSystem": { "up": "+Y", "forward": "+Z" },
+  "coordinateSystem": {
+    "up": "+Y",
+    "forward": "+Z"
+  },
   "budgets": {
     "maxVertices": 42000,
     "maxIndices": 84000,
-    "maxPrimitives": 4,
-    "maxMaterials": 4,
-    "maxTextureLayersPerKind": 4
+    "maxPrimitives": 5,
+    "maxMaterials": 5,
+    "maxTextureLayersPerKind": 5
   },
-  "lods": [{ "name": "lod0", "maxTriangles": 28000 }],
-  "requiredSockets": ["LeftHand", "RightHand", "LeftGrip", "RightGrip"],
+  "lods": [
+    {
+      "name": "lod0",
+      "maxTriangles": 28000
+    }
+  ],
+  "requiredSockets": [
+    "LeftHand",
+    "RightHand",
+    "LeftGrip",
+    "RightGrip"
+  ],
   "runtimeTextureProfile": {
     "android": "astc",
     "windows": "rgba8",
@@ -20,11 +33,38 @@
   },
   "materialOverrides": [],
   "primitiveSemantics": [
-    { "material": "BodyPrimaryVisible", "firstPersonPrimary": true, "shadow": true, "reflection": true },
-    { "material": "HeadPrimaryMasked", "firstPersonPrimary": false, "shadow": true, "reflection": true },
-    { "material": "NearFacePrimaryMasked", "firstPersonPrimary": false, "shadow": true, "reflection": true },
-    { "material": "GauntletPrimaryVisible", "firstPersonPrimary": true, "shadow": true, "reflection": true }
+    {
+      "material": "BodyPrimaryVisible",
+      "firstPersonPrimary": true,
+      "shadow": true,
+      "reflection": true
+    },
+    {
+      "material": "HeadPrimaryMasked",
+      "firstPersonPrimary": false,
+      "shadow": true,
+      "reflection": true
+    },
+    {
+      "material": "NearFacePrimaryMasked",
+      "firstPersonPrimary": false,
+      "shadow": true,
+      "reflection": true
+    },
+    {
+      "material": "GauntletPrimaryVisible",
+      "firstPersonPrimary": true,
+      "shadow": true,
+      "reflection": true
+    },
+    {
+      "material": "BodyRemainderPrimaryVisible",
+      "firstPersonPrimary": true,
+      "shadow": true,
+      "reflection": true
+    }
   ],
   "distribution": "runtime",
-  "licenceStatus": "Meshy output distributed conservatively under CC BY 4.0; attribution in ASSET_LICENSES.md"
+  "licenceStatus": "Meshy output distributed conservatively under CC BY 4.0; attribution in ASSET_LICENSES.md",
+  "playerAssetRole": "WorldBody"
 }

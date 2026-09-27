@@ -19,6 +19,6 @@
     { "material": "ViewmodelSleeves", "firstPersonPrimary": true, "shadow": false, "reflection": false },
     { "material": "ViewmodelGauntlets", "firstPersonPrimary": true, "shadow": false, "reflection": false }
   ],
-  "distribution": "development",
+  "distribution": "runtime",
   "licenceStatus": "Derivative of existing Meshy player/gauntlet; existing CC BY 4.0 attribution in ASSET_LICENSES.md"
 }

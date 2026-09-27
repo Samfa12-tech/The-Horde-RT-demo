@@ -27,6 +27,7 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     const RtSceneTuning& tuning)
 {
     RtSceneFrameInputs frame;
+    frame.playerRenderRoute = kProductionPlayerRenderRoute;
     frame.tickIndex = simulation.tickIndex;
     frame.cameraYaw = simulation.playerYawRadians;
     frame.cameraPitch = simulation.playerPitchRadians;

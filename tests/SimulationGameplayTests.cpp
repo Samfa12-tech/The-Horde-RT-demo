@@ -983,6 +983,13 @@ int main()
     GameSimulationConfig anatomicalMountConfig{};
     anatomicalMountConfig.playerMountProfile = items::PlayerMountProfile::AnatomicalBody;
     GameSimulation anatomicalMount(anatomicalMountConfig);
+    GameSimulation productionMount(ProductionGameSimulationConfig());
+    check(productionMount.Snapshot().playerMountProfile == items::PlayerMountProfile::AnatomicalBody &&
+          productionMount.Snapshot().heldItemKinematics.leftHandLocal ==
+              anatomicalMount.Snapshot().heldItemKinematics.leftHandLocal &&
+          productionMount.Snapshot().heldItemKinematics.rightHandLocal ==
+              anatomicalMount.Snapshot().heldItemKinematics.rightHandLocal,
+          "production application configuration must preserve the exact accepted anatomical targets");
     check(legacyMount.Snapshot().playerMountProfile == items::PlayerMountProfile::LegacyViewRelative &&
           NearlyEqual(legacyMount.Snapshot().heldItemKinematics.heldPropDepth,
                       GameSimulation(GameSimulationConfig{}).Snapshot().heldItemKinematics.heldPropDepth),

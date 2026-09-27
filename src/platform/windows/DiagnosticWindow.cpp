@@ -3938,23 +3938,16 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         horde::vulkan::raytracing::RtSceneFrameInputs frameInputs =
             horde::vulkan::raytracing::BuildRtSceneFrameInputs(
                 simulation, ctx.outputExposure, ctx.waterQuality, ctx.rtSceneTuning);
-        // Player-body checkpoints remain a deliberate skinned-route A/B proof.
-        // Ordinary gameplay, reward/glass proofs, and player-fallback captures
-        // use the production hybrid block-primary route selected below.
+        // Only explicit diagnostic comparisons opt out of the accepted
+        // modelled production presentation; gameplay and glass share one route.
         const horde::gameplay::DevelopmentCheckpoint* development =
             horde::gameplay::FindDevelopmentCheckpoint(ctx.developmentCheckpoint);
         const bool usesGlassFixture =
             development != nullptr && development->usesGlassFixture;
         const bool usesProductionRewardProps =
             development != nullptr && development->usesProductionRewardProps;
-        frameInputs.playerRenderRoute =
-            ctx.developmentCheckpoint.starts_with("player-viewmodel-")
-            ? horde::vulkan::raytracing::PlayerRenderRoute::ModelledViewmodel
-            : ctx.developmentCheckpoint.starts_with("player-body-")
-            ? horde::vulkan::raytracing::PlayerRenderRoute::Skinned
-            : ((usesGlassFixture || usesProductionRewardProps)
-                ? horde::vulkan::raytracing::PlayerRenderRoute::HybridBlockPrimary
-                : horde::vulkan::raytracing::PlayerRenderRoute::Procedural);
+        frameInputs.playerRenderRoute = horde::vulkan::raytracing::PlayerRenderRouteForCheckpoint(
+            ctx.developmentCheckpoint);
         if (usesGlassFixture)
         {
             frameInputs.tuning.glassFixtureVisible = true;
@@ -4656,10 +4649,13 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         const bool diagnosticPixelCountersAvailable =
             context.rtScene.DiagnosticsAvailability() ==
             horde::vulkan::raytracing::RtDiagnosticAvailability::Available;
-        const bool viewmodelCapture = context.developmentCheckpoint.starts_with("player-viewmodel-");
+        const bool viewmodelCapture = horde::vulkan::raytracing::PlayerRenderRouteForCheckpoint(
+            context.developmentCheckpoint) == horde::vulkan::raytracing::kProductionPlayerRenderRoute;
+        const bool inspectionCapture = development != nullptr && development->usesProductionRewardProps &&
+            simulation.chestReward.phase == horde::gameplay::interactions::ChestRewardPhase::Locked;
         const bool dedicatedPlayerOwnership = horde::vulkan::raytracing::HasDedicatedPlayerPrimaryOwnership(
             record.instanceMasks, record.playerWorldBodyInstanceFlags);
-        if (viewmodelCapture &&
+        if (viewmodelCapture && !inspectionCapture &&
             (!dedicatedPlayerOwnership ||
              !record.playerPrimaryVisible ||
              (diagnosticPixelCountersAvailable && record.primaryPlayerPixels == 0u)))
@@ -4670,24 +4666,20 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             !simulationRewardClaimed &&
             (record.instanceMasks[1] != 0x02u ||
              record.instanceMasks[3] != 0x02u ||
-             record.instanceMasks[4] != 0x10u ||
-             record.instanceMasks[10] != 0x04u ||
-             record.instanceMasks[11] != 0x04u ||
-             record.instanceMasks[12] != 0x04u ||
-             record.instanceMasks[13] != 0x04u ||
+             !dedicatedPlayerOwnership ||
              !record.playerPrimaryVisible ||
              (diagnosticPixelCountersAvailable &&
               record.primaryPlayerPixels == 0u)))
         {
             return fail(std::string("Checkpoint '") + checkpoint.name +
-                        "' masked the ordinary torch/sword or hybrid block-primary player instances.");
+                        "' masked the ordinary torch/sword or lost dedicated modelled player ownership.");
         }
         if (diagnosticPixelCountersAvailable && checkpoint.name == "opening" &&
             (record.primaryTorchPixels == 0u ||
              record.primarySwordPixels == 0u ||
              record.primaryPlayerPixels == 0u))
         {
-            return fail("Opening capture lacks primary-visible block arms, torch, or sword (floating-prop regression).");
+            return fail("Opening capture lacks primary-visible modelled arms, torch, or sword (floating-prop regression).");
         }
         if (claimedRewardCapture &&
             ((viewmodelCapture ? !dedicatedPlayerOwnership : record.instanceMasks[4] != 0x10u) ||
@@ -4787,12 +4779,15 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                                  const bool anatomicalPlayerMount)
 {
     VulkanSurfaceContext context;
-    if (anatomicalPlayerMount)
-    {
-        horde::gameplay::simulation::GameSimulationConfig config;
-        config.playerMountProfile = horde::gameplay::items::PlayerMountProfile::AnatomicalBody;
-        context.simulation = horde::gameplay::simulation::GameSimulation(config);
-    }
+    const bool explicitComparison = developmentCheckpoint != nullptr &&
+        horde::vulkan::raytracing::PlayerRenderRouteForCheckpoint(*developmentCheckpoint) !=
+            horde::vulkan::raytracing::kProductionPlayerRenderRoute;
+    context.simulation = horde::gameplay::simulation::GameSimulation(
+        explicitComparison ? horde::gameplay::simulation::GameSimulationConfig{} :
+                             horde::gameplay::simulation::ProductionGameSimulationConfig());
+    // The former opt-in argument remains compatible with recorded capture
+    // commands; every normal application now uses this accepted profile.
+    (void)anatomicalPlayerMount;
     context.windowHandle = hWnd;
     context.unattendedBenchmark = unattendedBenchmark;
     if (developmentCheckpoint != nullptr) context.developmentCheckpoint = *developmentCheckpoint;

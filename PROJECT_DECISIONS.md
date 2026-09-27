@@ -2,6 +2,22 @@
 
 This file records locked decisions for the native Vulkan hardware ray-tracing demo.
 
+## 1.6.1 player presentation acceptance - 2026-09-27
+
+The owner accepts the dedicated modelled RT arms, wrist/cuff, repaired inner-bicep/
+armpit, normal look-down angle/occlusion and mirror appearance. The accepted world
+`f2c3f62b...` and viewmodel `6f06d77e...` replace the development block-arm route in
+normal gameplay; procedural/full-body-primary routes remain explicit diagnostic
+comparisons only, never silent fallbacks. Preserve shared gameplay animation/IK/
+grip authority and separate world-body/viewmodel geometry and GPU ownership.
+
+Keep the current camera range. Visible feet, steeper look and direction-aware
+sideways/backward locomotion are owner-deferred future work, not1.6.1 acceptance
+blockers. See `FUTURE_WORK.md` and the exact owner/device evidence in
+`docs/evidence/2026-09-27-segmented-seams/phone/README.md`. This supersedes the
+historical 1.6.0 block-arm decision for1.6.1 development; it does not authorize
+publication or certify performance, glass, audio or other devices.
+
 ## Identity
 
 - Public project: Samfa12 technology demo.

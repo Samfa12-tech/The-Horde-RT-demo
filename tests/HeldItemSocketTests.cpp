@@ -12,6 +12,10 @@
 
 #include <algorithm>
 #include <array>
+#include <numeric>
+#if defined(_MSC_VER)
+#include <crtdbg.h>
+#endif
 #include <cmath>
 #include <cstdint>
 #include <filesystem>
@@ -752,7 +756,7 @@ void TestProductionAssetsShareOneGenericStaticSlot()
     const auto& metadata = slot.InstanceMetadata();
     Check(metadata[3].primitiveCount == sword.primitives.size() &&
               metadata[1].primitiveCount == torch.primitives.size() &&
-              metadata[4].primitiveCount == 4u &&
+              metadata[4].primitiveCount == player.primitives.size() &&
               metadata[1].emitterIndex == 1u &&
               metadata[3].emitterIndex == 0u,
           "generic registrations must retain stable TLAS routes and engine-emitter ownership");
@@ -762,17 +766,29 @@ void TestProductionAssetsShareOneGenericStaticSlot()
           "generic material routing must include the player in audited shared texture array layers");
     const auto originalMaterials = player.materials;
     const auto originalPrimitives = player.primitives;
-    std::array<unsigned, 4u> order{{0, 1, 2, 3}};
+    constexpr auto regionCount = horde::scene::assets::kPlayerPrimitiveContract.size();
+    Check(player.materials.size() == regionCount && player.primitives.size() == regionCount,
+          "promoted world body must exercise all five named regions");
+    if (player.materials.size() != regionCount || player.primitives.size() != regionCount) return;
+    std::array<unsigned, regionCount> order{};
+    std::iota(order.begin(), order.end(), 0u);
+    unsigned permutations = 0u;
     do
     {
-        std::array<unsigned, 4u> remap{};
+        std::array<unsigned, regionCount> remap{};
         for (unsigned i = 0; i < order.size(); ++i)
         {
             player.materials[i] = originalMaterials[order[i]];
             remap[order[i]] = i;
         }
         player.primitives = originalPrimitives;
-        for (auto& primitive : player.primitives) primitive.materialIndex = remap[primitive.materialIndex];
+        for (auto& primitive : player.primitives)
+        {
+            Check(primitive.materialIndex < remap.size(), "material remap must stay within admitted regions");
+            if (primitive.materialIndex >= remap.size()) return;
+            primitive.materialIndex = remap[primitive.materialIndex];
+        }
+        ++permutations;
         const bool initialized = slot.Initialize(registrations, diagnostic);
         Check(initialized, "all player material orders must register");
         if (!initialized) continue;
@@ -790,6 +806,7 @@ void TestProductionAssetsShareOneGenericStaticSlot()
         Check(slot.TextureArrayCounts().baseColor == 4u && slot.TextureArrayCounts().normal == 4u &&
                   slot.TextureArrayCounts().orm == 4u, "reordered player cannot grow texture allocations");
     } while (std::next_permutation(order.begin(), order.end()));
+    Check(permutations == 120u, "all 120 five-region atlas permutations must be exercised");
 }
 
 void TestProductionSocketsMatchSharedFixedStepContracts()
@@ -854,6 +871,12 @@ void TestRewardCarryParryKeepsGuardOnSwordSide()
 
 int main()
 {
+#if defined(_MSC_VER) && defined(_DEBUG)
+    // CTest must receive diagnostics and a failure, never a blocking desktop
+    // Retry/Ignore dialog. Bounds checks themselves remain enabled.
+    _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
+    _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);
+#endif
     TestSocketLookupIsNamedAndOrderIndependent();
     TestWorldFromItemUsesRequiredCompositionOrder();
     TestScaledGripSocketIsRejected();

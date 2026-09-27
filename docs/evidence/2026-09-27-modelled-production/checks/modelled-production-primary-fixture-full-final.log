@@ -1,0 +1,35 @@
+Start testing: Sep 27 14:48 AUS Eastern Standard Time
+----------------------------------------------------------
+71/77 Testing: horde_rt_skinned_character_smoke
+71/77 Test: horde_rt_skinned_character_smoke
+Command: "C:/Dev/tmp/horde-phase3-native-20260923/Debug/horde_rt_skinned_character_smoke.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass
+"horde_rt_skinned_character_smoke" start time: Sep 27 14:48 AUS Eastern Standard Time
+Output:
+----------------------------------------------------------
+player exact-grounding candidate vertices=5638
+player basic idle/walk skin passed
+player static/skinned stream agreement passed
+Stable final Grip agreement rest=1.0154e-05m/0.000345267rad down=1.00006e-05m/0rad up=1.00312e-05m/0rad
+authored Grip surface left axis/surface/contact/bins/span=0.00971155/7.41892e-06/2539/24/0.0955135 right=0.00973/1.47149e-07/2547/24/0.0954864
+ordinary final-skinned clearance triangle/depth/area/side-cross=0.246637/0.0119556/0.205049/0/15855 near-cross=0/0 max-edge bind/skinned=0.0550014/0.0708674 max-triangle-area=0.00141588 normal-dot/reversed=-0.951945/353/0.000166646 sole-y=-0.94975
+grounded boot envelope idle/walk=-0.94975/-0.94975..-0.94975
+ordinary-wall final-skinned clearance/depth/area/near-cross=0.27565/-0.134798/0/207/0
+high wall final-skinned clearance triangle/depth=0.270617/-0.138872 projected-area wall/open=0 (0/0.811734) side-cross=0/15855 open/ordinary-area=3.95873 near-cross=199/0 max-edge open/wall=0.0764185/0.0734252 max-triangle-area open/wall=0.00330326/0
+low wall final-skinned clearance triangle/depth=0.274715/-0.143037 projected-area wall/open=0 (0/0.462912) side-cross=0/15855 open/ordinary-area=2.25756 near-cross=208/0 max-edge open/wall=0.0719549/0.0734252 max-triangle-area open/wall=0.00276535/0
+former z=-9.70 final-skinned clearance=0.270617 depth=-0.138872 projected-area=0 near-cross=199/0 side-cross=0/15855 max-edge/triangle-area=0.0734252/0
+former z=-9.70 final-skinned clearance=0.275184 depth=-0.145455 projected-area=0 near-cross=207/0 side-cross=0/15855 max-edge/triangle-area=0.0734252/0
+high full wall sweep samples=46 worst clearance@z=0.222394@-7.5 depth=-0.138872 area-ratio=1.42665 consecutive-footprint-area-delta=0.0516975@-8.2->-8.25(1.09963->0.873196) side-cross=0
+low full wall sweep samples=46 worst clearance@z=0.234326@-7.5 depth=-0.145455 area-ratio=0.988379 consecutive-footprint-area-delta=0.0239198@-8.4->-8.45(0.388119->0.303091) side-cross=0
+held-lantern wall approach final-skinned clearance=0.27312 finite=1 final-z=-9.735 blocked-ticks=141 max-edge/triangle-area=0.0982251/0.00142628 worst-step/first/centroid/bind/skinned=0/3326/-0.20772,0.528372,-8.58431/0.230297,1.43295,0.0716676/0.211276,1.46717,0.0493764 camera=0,0.7,-8.53167 triangle=-0.21138,0.53098,-8.58099;-0.206322,0.528837,-8.58391;-0.205458,0.525297,-8.58802;
+reward wall-safe movement strafe=0.0316667,-9.7 diagonal=0.0223917,-9.72239 retreat=0,-9.66833 corner-out/in=0.731667/0.668333 rotate-forward=0.0316667,-9.7
+Skinned character model smoke passed: skeleton=28206 player=83445 lich=27564 textured std430 stride=48 emissiveVertices=377 emissiveX=-0.813946..1.00981 outer=40 avg=0.943092,0.789989,0.636973
+<end of output>
+Test time =  33.42 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_skinned_character_smoke" end time: Sep 27 14:48 AUS Eastern Standard Time
+"horde_rt_skinned_character_smoke" time elapsed: 00:00:33
+----------------------------------------------------------
+
+End testing: Sep 27 14:48 AUS Eastern Standard Time

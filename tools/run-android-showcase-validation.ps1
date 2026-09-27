@@ -28,7 +28,6 @@ $ErrorActionPreference = "Stop"
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 $androidRoot = Join-Path $repoRoot "android"
 if ($ApkPath -and -not $SkipBuild) { throw 'An explicit immutable ApkPath requires SkipBuild.' }
-if ($AnatomicalPlayerMount -and -not $ViewmodelCandidateDirectory) { throw 'Anatomical mounting requires an explicit viewmodel candidate.' }
 $apk = ""
 $packageName = if ($ViewmodelCandidateDirectory) { "com.samfa12.hordelanternrt.debug.viewmodel" } else { "com.samfa12.hordelanternrt.debug" }
 $activityName = "$packageName/com.samfa12.hordelanternrt.MainActivity"
@@ -366,12 +365,14 @@ function Invoke-CaptureCheckpoint {
     if ($Checkpoint -eq "player-fallback-grips" -and $state.playerRenderRoute -ne "procedural") {
         $failures.Add("Procedural player capture reported route '$($state.playerRenderRoute)'.")
     }
-    if ($viewmodelCheckpoints -contains $Checkpoint -and (
+    $requiresModelledRoute = -not $Checkpoint.StartsWith('player-body-') -and
+                            -not $Checkpoint.StartsWith('player-fallback-')
+    if ($requiresModelledRoute -and (
         $state.playerRenderRoute -ne "modelled-viewmodel" -or [int]$state.playerSkinCadenceHz -ne 60 -or
         [int64]$state.playerSkinUpdates -lt 1 -or [double]$state.playerMaxSocketErrorM -gt 0.015)) {
         $failures.Add("$Checkpoint did not retain modelled-viewmodel, 60 Hz skinning and exact grip authority.")
     }
-    if ($AnatomicalPlayerMount -and ($state.playerMountProfile -cne 'AnatomicalBody' -or
+    if ($requiresModelledRoute -and ($state.playerMountProfile -cne 'AnatomicalBody' -or
         $state.dedicatedPlayerPrimaryOwnership -ne $true)) {
         $failures.Add("$Checkpoint lacks the requested anatomical gameplay profile or nonduplicating primary ownership.")
     }
@@ -528,12 +529,14 @@ function Invoke-CheckpointBenchmark {
     if ($Checkpoint -eq "player-fallback-grips" -and $state.playerRenderRoute -ne "procedural") {
         $failures.Add("Procedural player benchmark reported route '$($state.playerRenderRoute)'.")
     }
-    if ($viewmodelCheckpoints -contains $Checkpoint -and (
+    $requiresModelledRoute = -not $Checkpoint.StartsWith('player-body-') -and
+                            -not $Checkpoint.StartsWith('player-fallback-')
+    if ($requiresModelledRoute -and (
         $state.playerRenderRoute -ne "modelled-viewmodel" -or [int]$state.playerSkinCadenceHz -ne 60 -or
         [int64]$state.playerSkinUpdates -lt 1 -or [double]$state.playerMaxSocketErrorM -gt 0.015)) {
         $failures.Add("$Checkpoint benchmark did not retain modelled-viewmodel, 60 Hz skinning and exact grip authority.")
     }
-    if ($AnatomicalPlayerMount -and ($state.playerMountProfile -cne 'AnatomicalBody' -or
+    if ($requiresModelledRoute -and ($state.playerMountProfile -cne 'AnatomicalBody' -or
         $state.dedicatedPlayerPrimaryOwnership -ne $true)) {
         $failures.Add("$Checkpoint benchmark lacks the requested anatomical gameplay profile or nonduplicating primary ownership.")
     }

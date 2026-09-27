@@ -134,13 +134,8 @@ const char* DebugPlayerCombatActionName(const horde::gameplay::PlayerCombatActio
     return "unknown";
 }
 
-#if defined(HORDE_RT_DEBUG_VIEWMODEL_CANDIDATE)
 constexpr auto kDefaultPlayerPresentationRoute =
-    horde::vulkan::raytracing::PlayerRenderRoute::ModelledViewmodel;
-#else
-constexpr auto kDefaultPlayerPresentationRoute =
-    horde::vulkan::raytracing::PlayerRenderRoute::Procedural;
-#endif
+    horde::vulkan::raytracing::kProductionPlayerRenderRoute;
 
 struct SwapchainContext
 {
@@ -230,13 +225,8 @@ std::string gLatestBenchmarkProgress;
 std::string gRequestedBenchmarkRunId;
 horde::gameplay::BenchmarkWorkload gRequestedBenchmarkWorkload =
     horde::gameplay::BenchmarkWorkload::ShowcaseRoute;
-horde::gameplay::simulation::GameSimulation gGameSimulation([] {
-    horde::gameplay::simulation::GameSimulationConfig config;
-#if defined(HORDE_RT_DEBUG_ANATOMICAL_PLAYER_MOUNT)
-    config.playerMountProfile = horde::gameplay::items::PlayerMountProfile::AnatomicalBody;
-#endif
-    return config;
-}());
+horde::gameplay::simulation::GameSimulation gGameSimulation(
+    horde::gameplay::simulation::ProductionGameSimulationConfig());
 horde::gameplay::simulation::InputMailbox gInputMailbox;
 std::mutex gInputPublisherMutex;
 horde::gameplay::simulation::InputSnapshot gInputPublisherState = []
@@ -683,7 +673,12 @@ void PublishRuntimeReports(const SwapchainContext& context,
 
 void ResetShowcaseSimulation()
 {
-    gGameSimulation.ResetRoute();
+    if (gGameSimulation.Snapshot().playerMountProfile !=
+        horde::gameplay::items::PlayerMountProfile::AnatomicalBody)
+        gGameSimulation = horde::gameplay::simulation::GameSimulation(
+            horde::gameplay::simulation::ProductionGameSimulationConfig());
+    else
+        gGameSimulation.ResetRoute();
     gGameSimulation.ClearEvents();
     ClearPlatformGameplayEvents();
     PublishSimulationUiState();
@@ -965,18 +960,8 @@ bool ResolveDebugCheckpoint(const std::int32_t id, DebugCheckpointSelection& sel
                             development->yaw, development->pitch,
                             base->expectedZone, base->preset};
     selection.simulationCheckpointId = base->id;
-    // Only the explicit player-body A/B is allowed to expose the unfinished
-    // authored gauntlets. Every gameplay/reward/glass checkpoint uses the same
-    // block-primary route as the live phone game until the hands are accepted
-    // across sword, torch and reward-lantern poses.
-    selection.playerRoute = development->name.starts_with("player-viewmodel-")
-        ? horde::vulkan::raytracing::PlayerRenderRoute::ModelledViewmodel
-        : development->name.starts_with("player-body-")
-        ? horde::vulkan::raytracing::PlayerRenderRoute::Skinned
-        : ((development->usesGlassFixture ||
-            development->usesProductionRewardProps)
-            ? horde::vulkan::raytracing::PlayerRenderRoute::HybridBlockPrimary
-            : horde::vulkan::raytracing::PlayerRenderRoute::Procedural);
+    selection.playerRoute = horde::vulkan::raytracing::PlayerRenderRouteForCheckpoint(
+        development->name);
     selection.development = development;
     return true;
 }
@@ -985,6 +970,12 @@ void ApplyDebugCheckpointSimulation(
     const DebugCheckpointSelection& selection,
     horde::vulkan::raytracing::RtSceneRecordObservation* observation)
 {
+    // Owning-thread, explicit full checkpoint import; not JNI or a fallback.
+    const auto config = selection.playerRoute == kDefaultPlayerPresentationRoute
+        ? horde::gameplay::simulation::ProductionGameSimulationConfig()
+        : horde::gameplay::simulation::GameSimulationConfig{};
+    if (gGameSimulation.Snapshot().playerMountProfile != config.playerMountProfile)
+        gGameSimulation = horde::gameplay::simulation::GameSimulation(config);
     if (selection.development != nullptr)
     {
         horde::gameplay::DevelopmentCheckpointStageEvidence evidence{};

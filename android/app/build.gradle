@@ -98,13 +98,13 @@ def viewmodelCandidate = viewmodelCandidatePath ? file(viewmodelCandidatePath).c
 def viewmodelOverlayDir = layout.buildDirectory.dir('generated/viewmodelCandidateAssets')
 def viewmodelReceipt = viewmodelCandidate ? new JsonSlurper().parse(
     new File(viewmodelCandidate, 'viewmodel-processing.json'), 'UTF-8') : null
-def anatomicalPlayerMount = providers.gradleProperty('hordeAnatomicalPlayerMount').orElse('false').get()
+// Keep old candidate commands valid; the accepted profile is now production.
+def anatomicalPlayerMount = providers.gradleProperty('hordeAnatomicalPlayerMount').orElse('true').get()
 if (!(anatomicalPlayerMount in ['true', 'false'])) {
     throw new GradleException('hordeAnatomicalPlayerMount must be true or false.')
 }
-def useAnatomicalPlayerMount = anatomicalPlayerMount == 'true'
-if (useAnatomicalPlayerMount && (!viewmodelCandidate || !viewmodelReceipt.pairedWorldManifest)) {
-    throw new GradleException('Anatomical player mount requires an explicit paired-manifest viewmodel candidate.')
+if (anatomicalPlayerMount == 'false') {
+    throw new GradleException('Legacy player mounting is retired; production uses the accepted anatomical profile.')
 }
 def candidateFile = { String name ->
     if (!name || new File(name).name != name || name.contains('\\') || name.contains('/')) {
@@ -124,12 +124,15 @@ if (viewmodelCandidate) {
     if ((pairedWorldManifestName == null) != (pairedWorldManifestSha256 == null)) {
         throw new GradleException('Candidate paired-world manifest name and SHA-256 must be supplied together.')
     }
+    if (pairedWorldManifestName == null) {
+        throw new GradleException('Modelled viewmodel candidates require an explicit paired-world manifest.')
+    }
     def candidateWorldManifest = pairedWorldManifestName == null
         ? null : candidateFile(pairedWorldManifestName)
     tasks.register('prepareViewmodelCandidateAssets', Sync) {
         into viewmodelOverlayDir
         inputs.file new File(viewmodelCandidate, 'viewmodel-processing.json')
-        inputs.file file('../../assets/models/player/runtime/gothic-traveller-lod0.runtime.glb')
+        inputs.file file('../../assets/models/player/viewmodel/runtime/viewmodel-processing.json')
         if (candidateWorldManifest != null) inputs.file candidateWorldManifest
         doFirst {
             def digest = { File input -> MessageDigest.getInstance('SHA-256').digest(input.bytes).encodeHex().toString() }
@@ -137,7 +140,7 @@ if (viewmodelCandidate) {
                 digest(candidateWorld) != viewmodelReceipt.pairedWorldSha256 ||
                 digest(candidateView) != viewmodelReceipt.runtimeSha256 ||
                 (candidateWorldManifest != null && digest(candidateWorldManifest) != pairedWorldManifestSha256) ||
-                digest(file('../../assets/models/player/runtime/gothic-traveller-lod0.runtime.glb')) != viewmodelReceipt.sourceWorldSha256) {
+                new JsonSlurper().parse(file('../../assets/models/player/viewmodel/runtime/viewmodel-processing.json'), 'UTF-8').sourceWorldSha256 != viewmodelReceipt.sourceWorldSha256) {
                 throw new GradleException('Viewmodel candidate role, handedness, hashes or source authority disagree.')
             }
         }
@@ -260,7 +263,6 @@ android {
                 cmake {
                     arguments '-DHORDE_RT_DEBUG_CHECKPOINTS=ON',
                         "-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=${viewmodelCandidate ? 'ON' : 'OFF'}",
-                        "-DHORDE_RT_DEBUG_ANATOMICAL_PLAYER_MOUNT=${useAnatomicalPlayerMount ? 'ON' : 'OFF'}",
                         *hordeRtNativePolicyArguments('Diagnostic')
                 }
             }

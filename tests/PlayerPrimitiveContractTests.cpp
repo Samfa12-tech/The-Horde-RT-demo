@@ -5,6 +5,7 @@
 
 #include "scene/assets/PlayerPrimitiveContract.h"
 #include "scene/assets/PlayerViewmodelContract.h"
+#include "vulkan/raytracing/PlayerRenderRoute.h"
 
 int main()
 {
@@ -14,6 +15,15 @@ int main()
         if (!condition) { std::cerr << message << '\n'; ok = false; }
     };
     std::string diagnostic;
+    using horde::vulkan::raytracing::PlayerRenderRoute;
+    using horde::vulkan::raytracing::PlayerRenderRouteForCheckpoint;
+    for (const auto name : {"", "opening", "mirror", "player-viewmodel-look-down",
+                            "lantern-held-high", "glass-transport"})
+        check(PlayerRenderRouteForCheckpoint(name) == PlayerRenderRoute::ModelledViewmodel,
+              "Normal gameplay/showcase/glass must keep the modelled production route");
+    check(PlayerRenderRouteForCheckpoint("player-body-forward") == PlayerRenderRoute::Skinned &&
+          PlayerRenderRouteForCheckpoint("player-fallback-forward") == PlayerRenderRoute::Procedural,
+          "Explicit diagnostic comparisons must remain available");
     std::array<PlayerPrimitiveDeclaration, 4> declarations{{
         {"BodyPrimaryVisible", true, true, true},
         {"HeadPrimaryMasked", false, true, true},

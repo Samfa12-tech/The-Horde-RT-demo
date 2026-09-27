@@ -14,14 +14,18 @@ New-Item -ItemType Directory -Path $temporaryRoot | Out-Null
 try {
     foreach ($case in @('unchanged', 'reordered', 'missing', 'duplicate', 'unknown')) {
         $document = $jsonText | ConvertFrom-Json
-        if ($document.meshes.Count -ne 1 -or $document.meshes[0].primitives.Count -ne 4) {
-            throw 'Authored fixture source must have one four-primitive mesh'
+        if ($document.meshes.Count -ne 1 -or $document.meshes[0].primitives.Count -ne 5) {
+            throw 'Admitted WorldBody fixture must have one five-primitive mesh'
         }
         switch ($case) {
-            'reordered' { $document.meshes[0].primitives = @($document.meshes[0].primitives[3..0]) }
-            'missing' { $document.meshes[0].primitives = @($document.meshes[0].primitives[0..2]) }
-            'duplicate' { $document.meshes[0].primitives[3].material = $document.meshes[0].primitives[0].material }
-            'unknown' { $document.materials[$document.meshes[0].primitives[3].material].name = 'UnknownPlayerPart' }
+            'reordered' { $document.meshes[0].primitives = @($document.meshes[0].primitives[4..0]) }
+            # Removing only the fifth region would form a valid legacy profile.
+            # Remove a required core semantic instead, retaining the remainder.
+            'missing' { $document.meshes[0].primitives = @($document.meshes[0].primitives | Where-Object {
+                $document.materials[$_.material].name -cne 'HeadPrimaryMasked'
+            }) }
+            'duplicate' { $document.meshes[0].primitives[4].material = $document.meshes[0].primitives[0].material }
+            'unknown' { $document.materials[$document.meshes[0].primitives[4].material].name = 'UnknownPlayerPart' }
         }
         $json = $document | ConvertTo-Json -Depth 80 -Compress
         $jsonBytes = [Text.Encoding]::UTF8.GetBytes($json)

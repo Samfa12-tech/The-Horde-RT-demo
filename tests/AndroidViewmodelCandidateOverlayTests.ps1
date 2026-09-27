@@ -83,9 +83,9 @@ try {
     $snapshotReady = $true
 
     Invoke-OverlayTask $candidateSource $true 'paired manifest stages'
-    Invoke-OverlayTask '' $false 'anatomical profile without candidate rejects' `
-        'Anatomical player mount requires an explicit paired-manifest viewmodel candidate.' `
-        @('-PhordeAnatomicalPlayerMount=true')
+    Invoke-OverlayTask $candidateSource $false 'retired legacy mounting rejects' `
+        'Legacy player mounting is retired; production uses the accepted anatomical profile.' `
+        @('-PhordeAnatomicalPlayerMount=false')
     Invoke-OverlayTask $candidateSource $false 'malformed anatomical profile selector rejects' `
         'hordeAnatomicalPlayerMount must be true or false.' `
         @('-PhordeAnatomicalPlayerMount=invalid')
@@ -134,12 +134,14 @@ try {
         $receipt.PSObject.Properties.Remove('pairedWorldManifest')
         $receipt.PSObject.Properties.Remove('pairedWorldManifestSha256')
     }
-    Invoke-OverlayTask $legacy $true 'legacy receipt stages without a world-manifest overlay'
+    Invoke-OverlayTask $legacy $false 'missing paired manifest rejects by default' `
+        'Modelled viewmodel candidates require an explicit paired-world manifest.'
     Invoke-OverlayTask $legacy $false 'anatomical profile without paired manifest rejects' `
-        'Anatomical player mount requires an explicit paired-manifest viewmodel candidate.' `
+        'Modelled viewmodel candidates require an explicit paired-world manifest.' `
         @('-PhordeAnatomicalPlayerMount=true')
-    if (Test-Path -LiteralPath $stagedManifest) {
-        throw 'Legacy receipt unexpectedly retained a paired world-manifest overlay.'
+    if (-not (Test-Path -LiteralPath $stagedManifest) -or
+        (Get-Sha256 $stagedManifest) -cne ([string]$sourceReceipt.pairedWorldManifestSha256).ToLowerInvariant()) {
+        throw 'Rejected candidate must not remove or alter the valid paired world-manifest overlay.'
     }
 } finally {
     $resolvedOverlay = [IO.Path]::GetFullPath($overlayRoot)
