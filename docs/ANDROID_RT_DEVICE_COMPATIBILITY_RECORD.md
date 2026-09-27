@@ -45,6 +45,19 @@ already accepted wrist direction; do not reopen grip/roll/weight tuning. This
 does not close normal look-down torso/waist/legs presence, mirror/live body
 visibility, glass, performance or the complete Phase 3/release gates.
 
+Further owner playtest clarification on the same installed candidate: current
+look-down angle is fine for gameplay, with no noticeable occlusion issues.
+Visible feet are not required at this stage; revisit steeper look only if a later
+gameplay need arises. This supersedes the remaining normal look-down/body-presence
+acceptance concern above. Keep the current pitch range and accepted geometry;
+mirror motion, glass and final-candidate validation remain separate requirements.
+
+The owner then reports the mirror looks good on the current candidate. Close
+mirror appearance acceptance as user playtest evidence. The observed forward-walk
+cycle during sideways/backward movement is explicitly deferred to a later
+animation pass in `FUTURE_WORK.md`, not a1.6.1 acceptance blocker. This approval
+does not certify glass, sustained performance, a different APK or other devices.
+
 Superseded local installation (extreme-look camera policy withdrawn): **SM-S948B**, isolated
 `.debug.viewmodel` APK `210d3bf234ef53e08e80fbef0c7574e37c6f9eaf6335cca7310751eff583b898`,
 built on branch checkpoint `bda5c2c` with the deeper camera and upper-torso

@@ -105,6 +105,16 @@ The broad cross-device matrix runs against the final candidate, not every patch.
 
 ## Remaining original audit work
 
+Owner Phase3 acceptance update (2026-09-27): the current modelled candidate's
+wrist, repaired inner-bicep/armpit, normal look-down angle and mirror appearance
+are accepted. Directional walking is deferred to a later animation pass.
+There are no noticeable look-down occlusion issues in owner playtesting. Visible
+feet/steeper pitch are deliberately deferred until justified by future gameplay,
+not1.6.1 exit criteria. Preserve the current range and accepted arm configuration;
+finish coherent production integration and its affected validation without
+reopening those accepted appearance decisions. Exact device evidence is in
+`evidence/2026-09-27-segmented-seams/phone/README.md`.
+
 1. Finish fence/submission/epoch-owned observations and shared report/benchmark
    migration. Preserve non-fatal optional telemetry, diagnostic-free Shipping,
    fixed strategy identity, exact CPU/GPU labels, and every intended route sample.

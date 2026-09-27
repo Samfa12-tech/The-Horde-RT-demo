@@ -30,6 +30,27 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### Current Phase 3 checkpoint
 
+**Owner visual acceptance complete for current candidate:** overall arms,
+wrist, repaired armpit, normal look-down/occlusion and mirror appearance have
+now been accepted on the evolving exact phone candidate, latest66de46e6.
+Directional walking (forward cycle currently reused for side/back movement) and
+visible feet/steeper pitch are owner-deferred future work, recorded in
+`FUTURE_WORK.md`. Do not reopen arm tuning or use those deferred items to block
+1.6.1. Next integrate the exact accepted world/view pair and anatomical profile
+as the normal production route, preserve explicit diagnostic comparisons, and
+run affected integration tests. Production promotion and its checks are not yet
+done; earlier anatomical-profile audio/haptic check remains separate.
+
+**Normal look-down accepted; feet/steeper look deferred:** the owner reports the
+current angle is fine for gameplay with no noticeable occlusion issues. Feet
+are not needed for1.6.1; revisit a steeper angle only for a later gameplay reason.
+Keep the current[-.32,.28] parameter range. Close the normal look-down/body-presence
+gate on installed66de46e6 without a camera change; do not revive the withdrawn
+extreme-pose work. A read-only CPU projection probe was stopped when this owner
+clarification arrived; it made no runtime/camera/asset changes. Remaining Phase3
+work is mirror/live secondary visibility and coherent production-route integration,
+not further arm/cuff/seam or camera tuning.
+
 **Segmented cloth repair implemented, phone-tested and owner armpit-accepted:** candidate
 world `f2c3f62b...` adds 40 existing-edge subdivisions, not panels/cuffs, and
 matches all 278 sleeve boundaries (previously 198 exact plus 80 segmented).
@@ -42,8 +63,8 @@ Home/resume at75%; separate44.94s footage covers movement/look, parry/swing and
 high/low transitions. No obvious crossing/seam opening in sampled review, with
 dark cloth/UI limits. The owner has now checked the lowered-lantern inner bicep
 and says it looks correct; close that appearance issue on installed66de46e6.
-Do not reopen sleeve/cuff/grip tuning. Body presence and
-mirror/live acceptance remain open; do not promote the production route yet.
+Do not reopen sleeve/cuff/grip tuning. Normal body presence is now accepted above;
+mirror/live checks and production integration remain open.
 Preserve normal pitch and owner-accepted wrist mounting. Source6dd9c1f is pushed
 and passes branch36292515083 /PR36292517668 CI. Phone remains66de46e6 and Home.
 [Recipe, exact artifacts and limits](evidence/2026-09-27-segmented-seams/README.md).

@@ -10,6 +10,19 @@ Owner update: 2026-09-13. The [1.6.1 engineering programme](docs/ENGINEERING_1_6
 4. Run targeted checks during implementation. Only after the full feature set is complete, run the comprehensive Windows/Android/device/release candidate matrix and fix regressions.
 5. Request the owner's release decision; no automatic publishing. Later campaign milestones remain outside this engineering pass.
 
+## Later animation work - not a 1.6.1 acceptance blocker
+
+Owner mirror playtest on 2026-09-27 accepts the current appearance, but notes
+that the existing forward-walk cycle also plays during strafing and backward
+movement. Add direction-aware locomotion (sideways/backward clips or a justified
+blend) in a later animation pass, driven by shared gameplay movement authority
+and preserving world-body/viewmodel pose agreement, grips and RT visibility.
+Do not retune the accepted arms or expand this engineering pass to solve it.
+
+The owner also accepts the current look-down angle and occlusion. Visible feet
+and a steeper look range are deferred until a gameplay need justifies revisiting
+them; they are not remaining1.6.1 visual gates.
+
 ## S24/S25 compatibility programme - required within 1.6.1
 
 The immediate motivation is now confirmed across two Qualcomm flagship generations: real Samsung Galaxy S25 Ultra and Galaxy S24 Ultra tests performed on 2026-09-11 both reached Horde's Vulkan diagnostics and exposed acceleration structures plus `VK_KHR_ray_query`, but neither tested driver exposed `VK_KHR_ray_tracing_pipeline`. The current renderer therefore selected `RayQuery` capability mode but did not attempt or present the Horde RT scene.
