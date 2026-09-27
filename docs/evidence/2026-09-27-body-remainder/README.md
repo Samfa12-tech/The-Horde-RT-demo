@@ -84,6 +84,13 @@ executable containment finds exactly the four Diagnostic High pipeline/compute
 modules; `spirv-val` and `spirv-dis` pass. This is not backend image parity or
 performance acceptance.
 
+Android candidate staging separately accepts an optional paired manifest only
+with its receipt hash and a canonical file inside the candidate directory.
+The real Gradle Sync task passes valid and legacy staging cases; missing name,
+missing hash, wrong hash and traversal cases each reject with the expected
+diagnostic. The focused test restores the previous generated overlay. This is
+staging evidence, **not** an Android build, installation or physical-device pass.
+
 New body visibility is investigation-only and **not accepted**. Required next:
 anatomical camera/body mounting and reach, nonduplicating visible torso/legs,
 inner sleeve and cuff continuity, mirror motion, live phone transitions and

@@ -111,15 +111,24 @@ def candidateFile = { String name ->
 if (viewmodelCandidate) {
     def candidateWorld = candidateFile(viewmodelReceipt.pairedWorldRuntime as String)
     def candidateView = candidateFile(viewmodelReceipt.runtime as String)
+    def pairedWorldManifestName = viewmodelReceipt.pairedWorldManifest as String
+    def pairedWorldManifestSha256 = viewmodelReceipt.pairedWorldManifestSha256 as String
+    if ((pairedWorldManifestName == null) != (pairedWorldManifestSha256 == null)) {
+        throw new GradleException('Candidate paired-world manifest name and SHA-256 must be supplied together.')
+    }
+    def candidateWorldManifest = pairedWorldManifestName == null
+        ? null : candidateFile(pairedWorldManifestName)
     tasks.register('prepareViewmodelCandidateAssets', Sync) {
         into viewmodelOverlayDir
         inputs.file new File(viewmodelCandidate, 'viewmodel-processing.json')
         inputs.file file('../../assets/models/player/runtime/gothic-traveller-lod0.runtime.glb')
+        if (candidateWorldManifest != null) inputs.file candidateWorldManifest
         doFirst {
             def digest = { File input -> MessageDigest.getInstance('SHA-256').digest(input.bytes).encodeHex().toString() }
             if (viewmodelReceipt.role != 'Viewmodel' || viewmodelReceipt.gauntletSourceHandedness != 'Right' ||
                 digest(candidateWorld) != viewmodelReceipt.pairedWorldSha256 ||
                 digest(candidateView) != viewmodelReceipt.runtimeSha256 ||
+                (candidateWorldManifest != null && digest(candidateWorldManifest) != pairedWorldManifestSha256) ||
                 digest(file('../../assets/models/player/runtime/gothic-traveller-lod0.runtime.glb')) != viewmodelReceipt.sourceWorldSha256) {
                 throw new GradleException('Viewmodel candidate role, handedness, hashes or source authority disagree.')
             }
@@ -127,6 +136,12 @@ if (viewmodelCandidate) {
         from(candidateWorld) {
             into 'models/player/runtime'
             rename { 'gothic-traveller-lod0.runtime.glb' }
+        }
+        if (candidateWorldManifest != null) {
+            from(candidateWorldManifest) {
+                into 'models/player/runtime'
+                rename { 'asset.manifest.json' }
+            }
         }
         from(candidateView) {
             into 'models/player/viewmodel/runtime'
