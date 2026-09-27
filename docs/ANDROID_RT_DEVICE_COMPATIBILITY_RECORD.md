@@ -28,9 +28,14 @@ Subsequent local installation on **SM-S948B**: isolated modelled-viewmodel Debug
 APK `66de46e6a045dacea88864adb153b2d4505bb640c9dbab0111262018e6a31816`
 contains the bounded segmented-cloth repair (world `f2c3f62b...`, unchanged view
 `6f06d77e...`). Installed with preserved app data and pulled back byte-for-byte.
-This initially establishes installation/artifact identity only; fresh phone
-captures and live-motion checks are in progress. It does not transfer the old
-build's owner acceptance to the complete new asset pair. See
+Fresh run134811 passes four normal-range captures plus Home/resume at75%, strict
+ASTC and honest RT presentation. Dedicated ownership and reported socket error0
+pass; transport overflows0/0/8/1 and shadow0 remain unchanged open glass evidence.
+This is not a timing or route-replay run. Separate44.94s continuous live footage
+shows movement/look, parry/swing and high/low transitions; no obvious crossing
+or seam opening in sampled review, but dark cloth/UI limit fine inspection.
+Owner armpit and body/mirror acceptance remain open; no blanket acceptance is
+transferred from the earlier APK. Phone is Home-backgrounded. See
 [seam repair evidence](evidence/2026-09-27-segmented-seams/README.md).
 
 Superseded local installation (extreme-look camera policy withdrawn): **SM-S948B**, isolated

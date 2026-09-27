@@ -1,0 +1,57 @@
+{
+  "schema": 8,
+  "runId": "20260927-134811",
+  "mode": "Benchmark",
+  "scale": 75,
+  "include100": false,
+  "rtLabWorkloadComparison": false,
+  "rtLabComparisonCheckpoints": null,
+  "checkpoints": [],
+  "gpuTiming": "enabled",
+  "deviceSerial": "R5GL219SZGK",
+  "deviceModel": "SM-S948B",
+  "androidVersion": "16",
+  "apiLevel": "36",
+  "osBuildFingerprint": "samsung/m3qxxx/m3q:16/BP4A.251205.006/S948BXXS4AZHL_OXM4AZHL:user/release-keys",
+  "gpuName": "Adreno (TM) 840",
+  "gpuVendorId": 20803,
+  "gpuDeviceId": 1141180977,
+  "gpuDriverVersion": 2150932499,
+  "vulkanApiVersion": 4210983,
+  "displaySize": "Physical size: 1440x3120",
+  "displayDensity": "Physical density: 600\r\nOverride density: 560",
+  "package": "com.samfa12.hordelanternrt.debug.viewmodel",
+  "apkSha256": "66de46e6a045dacea88864adb153b2d4505bb640c9dbab0111262018e6a31816",
+  "installedApkSha256": "66de46e6a045dacea88864adb153b2d4505bb640c9dbab0111262018e6a31816",
+  "sourceCommit": "cc9b898186d31ed3c998d606c0cc60997855c745",
+  "sourceDirty": true,
+  "selectedRtPipelineBundle": {
+    "opaqueFast": {
+      "key": "diagnostic_mobile_opaque_fast",
+      "sha256": "68335206a8226cdf197ba5a5f575e18f33485529a7b0c30c0ab5c720de4f0029"
+    },
+    "genericDielectric": {
+      "key": "diagnostic_mobile_generic_dielectric",
+      "sha256": "8068f2a517bda8aad19b1816bd91a543e94d5d31f92049c2a6020bfac8258378"
+    }
+  },
+  "captureRequested": true,
+  "captureCheckpointCount": 4,
+  "captureManifest": "capture-manifest.json",
+  "lifecycle": {
+    "requested": true,
+    "homeResumePassed": true,
+    "honestPresentationAfterResume": true,
+    "log": "lifecycle-home-resume-logcat.txt"
+  },
+  "timingMethod": "CPU wall-clock from frame start through vkQueuePresentKHR; not a Vulkan GPU timestamp",
+  "performanceReference": {
+    "policy": "descriptive FPS-equivalent bands; no single frame-time threshold is a product acceptance gate",
+    "sixtyFpsMs": 16.667,
+    "fiftyFpsMs": 20.0,
+    "thirtyFpsMs": 33.333,
+    "matchedRegressionInvestigationPercent": 15.0
+  },
+  "warnings": [],
+  "failures": []
+}

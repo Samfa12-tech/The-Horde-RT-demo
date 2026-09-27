@@ -83,8 +83,10 @@ normal re-encoding evidence locally. Candidate E GLBs/receipt are retained here.
   `36eb0be2aab7201105e5e071242ac1d48b529dcef4a4c0281af642ec67288fbb`.
 
 The isolated APK is now installed and pulled back hash-exact on SM-S948B.
-Affected phone captures, live transitions and owner seam/body acceptance are
-still pending for this new asset pair. Frozen poses alone do not
+Four affected phone captures plus Home/resume pass. A separate 44.94-second
+live sequence covers movement/look, parry/swing and high/low transitions; see
+[phone evidence and limits](phone/README.md). Owner armpit acceptance and normal
+body/mirror acceptance remain open. Frozen poses alone do not
 close Phase 3; mirror/body visibility, glass, performance and the full 1.6.1
 programme remain open. No production promotion or publication is authorized.
 

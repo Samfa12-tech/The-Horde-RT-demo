@@ -1,0 +1,204 @@
+[
+  {
+    "seconds": 1.0103164,
+    "action": "low lantern parry hold",
+    "arguments": [
+      "swipe",
+      "768",
+      "2882",
+      "768",
+      "2882",
+      "650"
+    ]
+  },
+  {
+    "seconds": 2.3385737,
+    "action": "low lantern swing",
+    "arguments": [
+      "tap",
+      "1174",
+      "2882"
+    ]
+  },
+  {
+    "seconds": 2.7429459,
+    "action": "queue next swing",
+    "arguments": [
+      "tap",
+      "1174",
+      "2882"
+    ]
+  },
+  {
+    "seconds": 3.7067303,
+    "action": "look down",
+    "arguments": [
+      "swipe",
+      "1080",
+      "800",
+      "1080",
+      "2250",
+      "1300"
+    ]
+  },
+  {
+    "seconds": 5.0640994,
+    "action": "walk while looking down",
+    "arguments": [
+      "swipe",
+      "300",
+      "1600",
+      "300",
+      "1200",
+      "2000"
+    ]
+  },
+  {
+    "seconds": 7.1242378,
+    "action": "diagonal walk while looking down",
+    "arguments": [
+      "swipe",
+      "300",
+      "1600",
+      "450",
+      "1250",
+      "1600"
+    ]
+  },
+  {
+    "seconds": 8.790669,
+    "action": "look back up",
+    "arguments": [
+      "swipe",
+      "1080",
+      "2250",
+      "1080",
+      "800",
+      "1300"
+    ]
+  },
+  {
+    "seconds": 10.1549019,
+    "action": "raise lantern",
+    "arguments": [
+      "tap",
+      "642",
+      "2609"
+    ]
+  },
+  {
+    "seconds": 11.4328036,
+    "action": "high lantern parry hold",
+    "arguments": [
+      "swipe",
+      "768",
+      "2882",
+      "768",
+      "2882",
+      "650"
+    ]
+  },
+  {
+    "seconds": 12.6517153,
+    "action": "high lantern swing",
+    "arguments": [
+      "tap",
+      "1174",
+      "2882"
+    ]
+  },
+  {
+    "seconds": 13.6327867,
+    "action": "look right and up",
+    "arguments": [
+      "swipe",
+      "1050",
+      "1400",
+      "1180",
+      "1150",
+      "900"
+    ]
+  },
+  {
+    "seconds": 14.6042584,
+    "action": "return yaw toward corridor",
+    "arguments": [
+      "swipe",
+      "1180",
+      "1150",
+      "1050",
+      "1400",
+      "900"
+    ]
+  },
+  {
+    "seconds": 15.5700133,
+    "action": "lower lantern",
+    "arguments": [
+      "tap",
+      "642",
+      "2609"
+    ]
+  },
+  {
+    "seconds": 16.8333071,
+    "action": "look down again",
+    "arguments": [
+      "swipe",
+      "1080",
+      "800",
+      "1080",
+      "2250",
+      "1300"
+    ]
+  },
+  {
+    "seconds": 18.2014715,
+    "action": "walk down-view again",
+    "arguments": [
+      "swipe",
+      "300",
+      "1600",
+      "300",
+      "1200",
+      "2000"
+    ]
+  },
+  {
+    "seconds": 20.27447,
+    "action": "down-view low lantern parry",
+    "arguments": [
+      "swipe",
+      "768",
+      "2882",
+      "768",
+      "2882",
+      "650"
+    ]
+  },
+  {
+    "seconds": 20.9911682,
+    "action": "down-view swing",
+    "arguments": [
+      "tap",
+      "1174",
+      "2882"
+    ]
+  },
+  {
+    "seconds": 21.9578887,
+    "action": "return to normal look",
+    "arguments": [
+      "swipe",
+      "1080",
+      "2250",
+      "1080",
+      "800",
+      "1300"
+    ]
+  },
+  {
+    "seconds": 23.3274743,
+    "action": "input complete"
+  }
+]
