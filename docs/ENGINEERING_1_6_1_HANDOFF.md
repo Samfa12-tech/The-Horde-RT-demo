@@ -36,9 +36,14 @@ and .10 m higher hand paths. Original torch depth, grip roll, weights, .44 lante
 scale and stretch bound stay unchanged. Eleven existing native poses pass;
 three torch poses were repeated after restoring original torch depth. Combined
 low/down, high/up and low/parry retain zero measured shared-seam separation.
-Legacy control PNG is exact. Host tests and ARM64 build pass; current phone is
-still `b5d486b2...` pending a separately recorded install/live run. The candidate
-changes apparent framing and is not owner-accepted. See [evidence and next bounded
+Legacy control PNG is exact. Host tests and ARM64 build pass. Current phone is
+now exact `bd9b348c...` from `259bd26`; run112636 passes 13-waypoint replay, four
+captures and Home/resume at75%, with verified anatomical profile/ownership.
+The owner watched this test and says it looks really good: retain this mounting
+and framing as the working direction. Deeper-look, surface and continuous live
+checks remain open; high/up glass records8 transport overflows and low/parry1.
+Phone is Home-backgrounded. See [device evidence](evidence/2026-09-27-anatomical-mount/phone/README.md)
+and [evidence and next bounded
 camera-look change](evidence/2026-09-27-anatomical-mount/README.md). Deeper look
 must rotate the camera independently of the existing bounded held-pose pitch;
 the old 20-degree centre-look limit cannot naturally show the legs beneath it.

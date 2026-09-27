@@ -2,7 +2,24 @@
 
 Last updated: 2026-09-27
 
-Latest local follow-up: isolated ARM64 Debug `b5d486b2...` from `f227b64`
+Latest installation: anatomical-mount candidate runtime `259bd26`, isolated
+ARM64 Debug APK `bd9b348ce351dc2e511e2f1c4f9aa7eaac050fcf7e1dfb3c05e7ffe98b991da9`,
+is installed and on-device SHA-256 matched on **SM-S948B**. The first ordinary
+install was rejected with `INSTALL_FAILED_TEST_ONLY`; explicit developer
+`adb install -r -t` succeeded without clearing data. Exact-candidate run
+`run-20260927-112636` passes 13-waypoint replay, four combined/control captures,
+strict ASTC, honest RayTracingPipeline presentation and Home/resume at 75%.
+All four reports confirm `AnatomicalBody`, nonduplicating primary ownership and
+the existing grip tolerance. The owner watched this test and reports:
+**"I think it looks really good!"** This is positive owner visual feedback for
+the current mounting/framing, tied to this exact APK, not completion of the
+remaining deeper-look, surface and continuous-live-motion checks. Glass
+transport overflow remains 8 in high/up and 1 in low/parry (0 in low/down and
+torch control); all four shadow overflow counts are 0. No Shipping performance
+claim or S24/S25 certification. The app is Home-backgrounded; production package
+and app data are unchanged. See [exact evidence](evidence/2026-09-27-anatomical-mount/phone/README.md).
+
+Previous validated follow-up: isolated ARM64 Debug `b5d486b2...` from `f227b64`
 is installed byte-matched on **SM-S948B**. Fresh `run-20260927-090032` passes
 13-waypoint replay, six selected modelled-route captures and Home/resume,
 with strict ASTC and honest RayTracingPipeline presentation at explicit 75%.

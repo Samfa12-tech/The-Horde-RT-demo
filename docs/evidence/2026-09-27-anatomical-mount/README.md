@@ -1,7 +1,9 @@
 # Anatomical body mounting candidate (Phase 3 still open)
 
-Prepared on `30e2679`. This is an explicit, unaccepted development profile,
-not a production asset replacement or completion of the arm programme.
+Prepared on `30e2679`, implemented in `259bd26`. This is an explicit development
+profile, not a production asset replacement or completion of the arm programme.
+The owner subsequently watched its exact phone test and gave positive visual
+feedback; see [device evidence and acceptance boundary](phone/README.md).
 
 ## Cause and bounded change
 
@@ -56,7 +58,8 @@ checks that predicate and the requested profile rather than trusting a route nam
 
 Native checks are not continuous live-motion or subjective phone acceptance.
 The nearer lantern changes its apparent framing despite retaining the owner's
-12% physical reduction; this must be reviewed honestly, not called accepted.
+12% physical reduction. The owner likes the observed phone result; preserve this
+working direction while completing the remaining checks.
 Armpit and wrist surface appearance, mirror motion, live attack/parry/carry,
 and owner acceptance remain open. Natural occlusion and shadowing are valid.
 
