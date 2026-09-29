@@ -47,6 +47,8 @@ docs/evidence/2026-09-30-glass-corner/** -text whitespace=cr-at-eol
 # Unified-diff context lines intentionally contain a single space; keep probe bytes.
 docs/evidence/2026-09-27-glass-path/probe/*.patch whitespace=-blank-at-eol,cr-at-eol
 docs/evidence/2026-09-30-glass-candidates/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-30-glass-recovery/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-30-glass-recovery/probe/*.patch whitespace=-blank-at-eol,cr-at-eol
 
 # Exact accepted paired-manifest bytes are part of runtime admission/provenance.
 assets/models/player/runtime/asset.manifest.json -text whitespace=cr-at-eol

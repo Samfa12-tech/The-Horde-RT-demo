@@ -30,6 +30,19 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### Current Phase 4 checkpoint
 
+September30 continuation from pushed `632322d`: remaining recoveries isolated,
+not another broad rewrite. [Exact phone/RTX path evidence](evidence/2026-09-30-glass-recovery/README.md)
+separates real Mobile interface exhaustion (including two TIR events before a
+fifth pane interface, throughput about.70), coincident fixture/floor contact,
+and one demonstrated raised-lantern hit-position precision defect. Exact phone
+probe reconstructing the triangle barycentric point finds the missing1.924um
+exit with unchanged30.090um bias/1um Tmin; ray-t point misses with0/2/8um biases.
+Temporary probe code and generated artifacts are removed before this checkpoint;
+the evidence patches are investigation-only, not production features. Next repair
+the demonstrated surface-position layer and validate exact phone/RTX, then shadow
+geometry/live glass. Do not increase budgets, give TIR free interfaces or globally
+accept every open-volume opaque terminal. Player work remains accepted/untouched.
+
 Two bounded physical correctness defects are demonstrated, with accepted player
 geometry and animation unchanged:
 

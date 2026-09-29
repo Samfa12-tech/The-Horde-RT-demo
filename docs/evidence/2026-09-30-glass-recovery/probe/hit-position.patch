@@ -1,0 +1,227 @@
+diff --git a/android/app/src/main/cpp/android_probe_bridge.cpp b/android/app/src/main/cpp/android_probe_bridge.cpp
+index 6643d4b..1d87ab8 100644
+--- a/android/app/src/main/cpp/android_probe_bridge.cpp
++++ b/android/app/src/main/cpp/android_probe_bridge.cpp
+@@ -3099,6 +3099,19 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
+         ++context.capturePresentedFrames;
+         if (context.capturePresentedFrames == 12u)
+         {
++            // Temporary investigation: retain exact storage bytes before Android
++            // colour management/rescaling, removed before production builds.
++            horde::vulkan::raytracing::PresentableTinyRtScene::StorageImageCapture probeCapture;
++            std::string probeDiagnostic;
++            if (context.rtScene.CaptureStorageImage(probeCapture, probeDiagnostic))
++            {
++                std::ofstream probeOutput(context.reportDirectory + "/glass-recovery-" +
++                    context.activeBenchmarkName + ".rgba", std::ios::binary);
++                probeOutput.write(reinterpret_cast<const char*>(&probeCapture.width), sizeof(probeCapture.width));
++                probeOutput.write(reinterpret_cast<const char*>(&probeCapture.height), sizeof(probeCapture.height));
++                probeOutput.write(reinterpret_cast<const char*>(probeCapture.rgba.data()),
++                    static_cast<std::streamsize>(probeCapture.rgba.size()));
++            }
+             WriteShowcaseDebugState(context, "capture-ready");
+             __android_log_print(ANDROID_LOG_INFO,
+                                 kTag,
+diff --git a/shaders/raytracing/include/rt_dielectric_transport.glsl b/shaders/raytracing/include/rt_dielectric_transport.glsl
+index 8458089..3ff5d69 100644
+--- a/shaders/raytracing/include/rt_dielectric_transport.glsl
++++ b/shaders/raytracing/include/rt_dielectric_transport.glsl
+@@ -371,6 +371,23 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
+         }
+ 
+         float epsilon = dielectricRayEpsilon(currentHit.position, totalDistance);
++#if defined(HORDE_RT_GLASS_RECOVERY_PROBE)
++        if (interfaceIndex == 0 && investigationRecoveryTarget() == 3)
++        {
++            for (int probe = 0; probe < 5; ++probe)
++            {
++                float bias = probe == 0 ? 0.0 : (probe == 2 ? 0.000008 :
++                    (probe == 3 ? epsilon : 0.000002));
++                vec3 position = probe >= 3 ? investigationBarycentricPosition : currentHit.position;
++                vec3 side = dot(outwardNormal, transmissionDirection) >= 0.0 ? outwardNormal : -outwardNormal;
++                HitInfo alternative = traceScene(position + side * bias,
++                    transmissionDirection, 10000.0, 0x23u,
++                    kDielectricRayMinimumDistance, false, false);
++                investigationRecordRecoveryInterface(8 + probe, alternative,
++                    transmissionDirection, true, 0, bias, vec3(1.0));
++            }
++        }
++#endif
+         vec3 nextOrigin = advanceDielectricRayOrigin(
+             currentHit.position, outwardNormal, transmissionDirection, epsilon);
+         float advancedDistance = max(
+@@ -515,12 +532,22 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
+                 volumeAttenuationDistance);
+         }
+ 
++#if defined(HORDE_RT_GLASS_RECOVERY_PROBE)
++        investigationRecordRecoveryInterface(interfaceIndex, currentHit,
++            transmissionDirection, volumeOpen, tirSinceTransition, totalDistance,
++            throughput);
++#endif
++
+         if (!isGenericDielectric(currentHit))
+         {
+             if (volumeOpen)
+             {
+                 if (volumeCertified)
+                 {
++#if defined(HORDE_RT_GLASS_RECOVERY_PROBE)
++                    investigationGlassRecovery = currentHit.hit
++                        ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
++#endif
+                     RT_DIAG_ADD(primaryCertifiedClosedVolumeRecoveryCount,
+                         1u);
+                     RT_DIAG_OR(certifiedClosedVolumeRecoveryReasonMask,
+@@ -564,6 +591,9 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
+             }
+             else if (volumeOpen && volumeCertified)
+             {
++#if defined(HORDE_RT_GLASS_RECOVERY_PROBE)
++                investigationGlassRecovery = vec3(1.0, 1.0, 0.0);
++#endif
+                 RT_DIAG_ADD(primaryCertifiedClosedVolumeRecoveryCount,
+                     1u);
+                 RT_DIAG_OR(certifiedClosedVolumeRecoveryReasonMask,
+@@ -575,6 +605,9 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
+             {
+                 RT_DIAG_ADD(primaryInterfaceBudgetCount,
+                     1u);
++#if defined(HORDE_RT_GLASS_RECOVERY_PROBE)
++                investigationGlassRecovery = vec3(0.0, 0.0, 1.0);
++#endif
+                 if (volumeOpen)
+                     RT_DIAG_ADD(primaryInterfaceBudgetOpenVolumeCount,
+                         1u);
+@@ -661,6 +694,23 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
+         }
+ 
+         float epsilon = dielectricRayEpsilon(currentHit.position, totalDistance);
++#if defined(HORDE_RT_GLASS_RECOVERY_PROBE)
++        if (interfaceIndex == 0 && investigationRecoveryTarget() == 3)
++        {
++            for (int probe = 0; probe < 5; ++probe)
++            {
++                float bias = probe == 0 ? 0.0 : (probe == 2 ? 0.000008 :
++                    (probe == 3 ? epsilon : 0.000002));
++                vec3 position = probe >= 3 ? investigationBarycentricPosition : currentHit.position;
++                vec3 side = dot(outwardNormal, transmissionDirection) >= 0.0 ? outwardNormal : -outwardNormal;
++                HitInfo alternative = traceScene(position + side * bias,
++                    transmissionDirection, 10000.0, 0x23u,
++                    kDielectricRayMinimumDistance, false, false);
++                investigationRecordRecoveryInterface(8 + probe, alternative,
++                    transmissionDirection, true, 0, bias, vec3(1.0));
++            }
++        }
++#endif
+         vec3 nextOrigin = advanceDielectricRayOrigin(
+             currentHit.position, outwardNormal, transmissionDirection, epsilon);
+         float advancedDistance = max(
+diff --git a/shaders/raytracing/include/rt_frame.glsl b/shaders/raytracing/include/rt_frame.glsl
+index 3b988b6..120780d 100644
+--- a/shaders/raytracing/include/rt_frame.glsl
++++ b/shaders/raytracing/include/rt_frame.glsl
+@@ -14,6 +14,13 @@ void main()
+     {
+         return;
+     }
++#endif
++#if defined(HORDE_RT_GLASS_RECOVERY_PROBE)
++    if (HORDE_RT_PIXEL_ID.y < 6u) return;
++    int recoveryTarget = investigationRecoveryTarget();
++    if (recoveryTarget >= 0)
++        for (int i = 0; i < 650; ++i)
++            imageStore(outputImage, ivec2(i, recoveryTarget), vec4(0.0, 0.0, 0.0, 1.0));
+ #endif
+     vec2 uv = (vec2(HORDE_RT_PIXEL_ID.xy) + vec2(0.5)) / vec2(HORDE_RT_PIXEL_EXTENT.xy);
+     float aspect = float(HORDE_RT_PIXEL_EXTENT.x) / max(float(HORDE_RT_PIXEL_EXTENT.y), 1.0);
+@@ -69,6 +76,10 @@ void main()
+     color = color * (0.62 + 0.38 * vignette);
+     color += vec3(0.46, 0.012, 0.004) * controls.damageFlash * (0.28 + 0.72 * (1.0 - vignette));
+     color = linearToSrgb(toneMapAces(max(color, vec3(0.0)) * controls.outputExposure));
++#if defined(HORDE_RT_GLASS_RECOVERY_PROBE)
++    if (any(greaterThan(investigationGlassRecovery, vec3(0.0))))
++        color = investigationGlassRecovery;
++#endif
+     // The RT storage image is RGBA, while common Android/Windows swapchains are BGRA and receive a raw image copy.
+     if (controls.outputRedBlueSwap > 0.5)
+     {
+diff --git a/shaders/raytracing/include/rt_hit_decode.glsl b/shaders/raytracing/include/rt_hit_decode.glsl
+index a3a8da2..8951adf 100644
+--- a/shaders/raytracing/include/rt_hit_decode.glsl
++++ b/shaders/raytracing/include/rt_hit_decode.glsl
+@@ -536,6 +536,23 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
+                 h.attenuationColor = clamp(staticMaterial.attenuationColor.rgb,
+                                             vec3(0.0), vec3(1.0));
+                 h.materialFlags = staticMaterial.materialFlags.x;
++#if defined(HORDE_RT_GLASS_RECOVERY_PROBE)
++                if (investigationRecoveryTarget() == 3 && h.instance == 8 && h.primitive == 59)
++                {
++                    mat4x3 transform = rayQueryGetIntersectionObjectToWorldEXT(query, true);
++                    vec3 localPosition = v0.position.xyz + bary.x *
++                        (v1.position.xyz - v0.position.xyz) + bary.y *
++                        (v2.position.xyz - v0.position.xyz);
++                    investigationBarycentricPosition = transform * vec4(localPosition, 1.0);
++                    HitInfo vertex = h;
++                    vertex.position = transform * vec4(v0.position.xyz, 1.0);
++                    investigationRecordRecoveryInterface(5, vertex, vec3(bary, 0.0), false, 0, 0.0, vec3(1.0));
++                    vertex.position = transform * vec4(v1.position.xyz, 1.0);
++                    investigationRecordRecoveryInterface(6, vertex, vec3(bary, 0.0), false, 0, 0.0, vec3(1.0));
++                    vertex.position = transform * vec4(v2.position.xyz, 1.0);
++                    investigationRecordRecoveryInterface(7, vertex, investigationBarycentricPosition, false, 0, 0.0, vec3(1.0));
++                }
++#endif
+                 vec3 emission = emissiveSample * staticMaterial.emissiveFactorStrength.rgb *
+                                 staticMaterial.emissiveFactorStrength.w;
+                 h.emissive = max(emission.r, max(emission.g, emission.b));
+diff --git a/shaders/raytracing/include/rt_scene_abi.glsl b/shaders/raytracing/include/rt_scene_abi.glsl
+index 0dfa1b2..ff96c4e 100644
+--- a/shaders/raytracing/include/rt_scene_abi.glsl
++++ b/shaders/raytracing/include/rt_scene_abi.glsl
+@@ -108,6 +108,46 @@ struct HitInfo
+     uint materialFlags;
+ };
+ 
++// Local investigation only; remove before production regeneration.
++#if defined(HORDE_RT_VARIANT_INSTRUMENTATION) && HORDE_RT_VARIANT_INSTRUMENTATION == HORDE_RT_INSTRUMENTATION_DIAGNOSTIC && HORDE_RT_VARIANT_MATERIAL == HORDE_RT_MATERIAL_GENERIC_DIELECTRIC
++#define HORDE_RT_GLASS_RECOVERY_PROBE
++vec3 investigationGlassRecovery = vec3(0.0);
++vec3 investigationBarycentricPosition = vec3(0.0);
++int investigationRecoveryTarget()
++{
++    uvec2 pixel = HORDE_RT_PIXEL_ID.xy;
++    if (pixel == uvec2(346u, 1200u)) return 0;
++    if (pixel == uvec2(340u, 1046u)) return 1;
++    if (pixel == uvec2(638u, 1216u)) return 2;
++    if (pixel == uvec2(193u, 1537u)) return 3;
++    if (pixel == uvec2(427u, 1520u)) return 4;
++    if (pixel == uvec2(328u, 842u)) return 5;
++    return -1;
++}
++void investigationRecordRecoveryInterface(int slot, HitInfo hit, vec3 direction,
++    bool open, int tirCount, float totalDistance, vec3 throughput)
++{
++    int target = investigationRecoveryTarget();
++    if (target < 0) return;
++    float fields[25] = float[25](hit.position.x, hit.position.y, hit.position.z,
++        hit.geometricNormal.x, hit.geometricNormal.y, hit.geometricNormal.z,
++        direction.x, direction.y, direction.z, hit.t, float(hit.instance),
++        float(hit.material), float(hit.primitive), open ? 1.0 : 0.0,
++        hit.hit ? 1.0 : 0.0, float(tirCount), totalDistance, hit.roughness,
++        hit.ior, hit.attenuationDistance, throughput.x, throughput.y, throughput.z,
++        float(hit.materialFlags), hit.transmission);
++    for (int i = 0; i < 25; ++i)
++    {
++        uint bits = floatBitsToUint(fields[i]);
++        vec3 low = vec3(uvec3(bits & 255u, (bits >> 8) & 255u, (bits >> 16) & 255u)) / 255.0;
++        vec3 high = vec3(float(bits >> 24) / 255.0, 0.0, 0.0);
++        if (controls.outputRedBlueSwap > 0.5) { low = low.bgr; high = high.bgr; }
++        imageStore(outputImage, ivec2(slot * 50 + i * 2, target), vec4(low, 1.0));
++        imageStore(outputImage, ivec2(slot * 50 + i * 2 + 1, target), vec4(high, 1.0));
++    }
++}
++#endif
++
+ const vec3 kMoonDirection = vec3(-0.180027, 0.930140, -0.320048);
+ const int kMaterialDryStone = 0;
+ const int kMaterialWetCobble = 1;

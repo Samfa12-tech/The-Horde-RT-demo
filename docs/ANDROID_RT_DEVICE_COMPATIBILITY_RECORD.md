@@ -2,6 +2,25 @@
 
 Last updated: 2026-09-30
 
+## September 30: remaining glass path probes (local SM-S948B evidence)
+
+Exact **SM-S948B**, Android16/Adreno840/driver2150932499, native pipeline RT,
+strict ASTC,75%/1080x2235. Investigation-only ordinary Debug APKfd41de34/run073651
+passes installed-byte matching, three captures and Home/resume. Raw native RGBA
+shows isolated80 open-budget recoveries+1 closed-budget failure; grazing30081
+opaque terminals; high/look-up527 budget recoveries+1 opaque terminal; no miss
+markers in these views. These are remaining failures, not a compatibility upgrade.
+
+Exact b222efb1/run074801 records the high-view selected ray and alternate next
+queries: triangle barycentric hit position reaches the missing glass exit1.924um
+away with current bias/Tmin; original ray-t hit position reaches the floor.
+Probe SPIR-V/patches/raw data are retained as investigation evidence, not promoted
+to Shipping or a final pass. Stable and accepted viewmodel packages/data untouched.
+No performance, live visual acceptance, compute-backend or S24/S25 claim.
+Ordinary Debug APKea1c6265 is restored/pullback-matched in run075136; three
+captures/Home-resume pass. Temporary instrumentation is removed from source.
+[Exact hashes, decoder, proven causes and remaining gates](evidence/2026-09-30-glass-recovery/README.md).
+
 ## September 30: bounded glass corner fix (local SM-S948B evidence)
 
 Exact ordinary Debug APK
