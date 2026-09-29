@@ -30,6 +30,23 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### Current Phase 4 checkpoint
 
+Selected geometric shadow absorption is now implemented and backed by
+[September30 native segment/image evidence](evidence/2026-09-30-glass-shadow/README.md).
+RTX pipeline/compute and exactSM-S948B each pass6 analytical segment checks,
+including near-origin entry/1mm glass. Fixed4/8 interfaces and2/4 volumes remain;
+no materials/geometry/player tuning, masks or ABI changes. Shipping stays
+0 atomics/no Binding22. Debug3de01bb8 installs/pulls back identically,7 captures/
+Home-resume pass; probe artifacts are removed and ordinary candidate restored
+in run091047. ARM64 Debug/unsigned Shipping builds/containment and focused tests
+pass. Standard12/13 remain byte-identical; all14 focused AB pairs and12/14 backend
+pairs fail unchanged image gates. One investigated finale peak is real sub-1.5mm
+opaque cuff occlusion, not permission to accept every changed pixel.
+Initial-medium/no-boundary absorption, genuine isolated budget failures, grazing
+contact recovery, live glass, matched Shipping performance and backend parity
+remain open. Do not restart accepted player work or Phase1.
+Precedingcbc135f push36639470345/PR36639474785 CI is green (45+11 tests);
+new-source CI must belong to its own later push.
+
 Production surface-position repair now follows the isolated path evidence:
 static transmitting hits reconstruct the triangle barycentric point in object
 space, transform linearly and add translation last. No epsilon/material/geometry/

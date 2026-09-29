@@ -1,0 +1,52 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+Build started 30/09/2026 8:41:01 AM.
+
+     1>Project "C:\Dev\tmp\horde-phase3-native-20260923\horde_rt_dielectric_math_tests.vcxproj" on node 1 (Build target(s)).
+     1>Project "C:\Dev\tmp\horde-phase3-native-20260923\horde_rt_dielectric_math_tests.vcxproj" (1) is building "C:\Dev\tmp\horde-phase3-native-20260923\ZERO_CHECK.vcxproj" (2) on node 1 (default targets).
+     2>PrepareForBuild:
+         Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+       InitializeBuildStatus:
+         Creating "x64\Debug\ZERO_CHECK\ZERO_CHECK.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+         Touching "x64\Debug\ZERO_CHECK\ZERO_CHECK.tlog\unsuccessfulbuild".
+       CustomBuild:
+         1>Checking Build System
+         CMake is re-running because C:/Dev/tmp/horde-phase3-native-20260923/CMakeFiles/generate.stamp is out-of-date.
+           the file 'C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/src/vulkan/raytracing/MinimalLegacyRayGenShader.inc'
+           is newer than 'C:/Dev/tmp/horde-phase3-native-20260923/CMakeFiles/generate.stamp.depend'
+           result='-1'
+         -- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26200.
+         Generated RT catalog adapter is current.
+         -- Strict non-contracted asset-transform arithmetic enabled for GltfDocument.cpp and StaticMeshAsset.cpp: /fp:strict
+         -- Vulkan SDK found: 1.4.350
+         -- Legacy torch-failure identifiers were rejected by the configured MSVC compiler.
+         -- Horde Lantern RT: Vulkan capability probe and Windows diagnostic targets are available; Android builds from android/.
+         -- Configuring done (15.1s)
+         -- Generating done (0.5s)
+         -- Build files have been written to: C:/Dev/tmp/horde-phase3-native-20260923
+       FinalizeBuildStatus:
+         Deleting file "x64\Debug\ZERO_CHECK\ZERO_CHECK.tlog\unsuccessfulbuild".
+         Touching "x64\Debug\ZERO_CHECK\ZERO_CHECK.tlog\ZERO_CHECK.lastbuildstate".
+     2>Done Building Project "C:\Dev\tmp\horde-phase3-native-20260923\ZERO_CHECK.vcxproj" (default targets).
+     1>PrepareForBuild:
+         Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+       InitializeBuildStatus:
+         Creating "horde_rt_dielectric_math_tests.dir\Debug\horde_rt.E0CF51E6.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+         Touching "horde_rt_dielectric_math_tests.dir\Debug\horde_rt.E0CF51E6.tlog\unsuccessfulbuild".
+       CustomBuild:
+         All outputs are up-to-date.
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\bin\HostX64\x64\CL.exe /c /I"C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\src" /Zi /nologo /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\"Debug\"" /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /std:c++20 /Fo"horde_rt_dielectric_math_tests.dir\Debug\\" /Fd"horde_rt_dielectric_math_tests.dir\Debug\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\tests\DielectricMathTests.cpp"
+         DielectricMathTests.cpp
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\bin\HostX64\x64\link.exe /ERRORREPORT:QUEUE /OUT:"C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_dielectric_math_tests.exe" /INCREMENTAL /ILK:"horde_rt_dielectric_math_tests.dir\Debug\horde_rt_dielectric_math_tests.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Dev/tmp/horde-phase3-native-20260923/Debug/horde_rt_dielectric_math_tests.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/Dev/tmp/horde-phase3-native-20260923/Debug/horde_rt_dielectric_math_tests.lib" /MACHINE:X64  /machine:x64 horde_rt_dielectric_math_tests.dir\Debug\DielectricMathTests.obj
+         horde_rt_dielectric_math_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_dielectric_math_tests.exe
+       FinalizeBuildStatus:
+         Deleting file "horde_rt_dielectric_math_tests.dir\Debug\horde_rt.E0CF51E6.tlog\unsuccessfulbuild".
+         Touching "horde_rt_dielectric_math_tests.dir\Debug\horde_rt.E0CF51E6.tlog\horde_rt_dielectric_math_tests.lastbuildstate".
+     1>Done Building Project "C:\Dev\tmp\horde-phase3-native-20260923\horde_rt_dielectric_math_tests.vcxproj" (Build target(s)).
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:17.28

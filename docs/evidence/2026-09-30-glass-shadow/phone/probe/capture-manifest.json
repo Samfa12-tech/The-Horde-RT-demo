@@ -1,0 +1,182 @@
+{
+  "schema": 2,
+  "runId": "20260930-090738",
+  "captureMode": "debug-only deterministic checkpoint intent plus ADB screencap",
+  "scale": 75,
+  "device": {
+    "serial": "R5GL219SZGK",
+    "model": "SM-S948B",
+    "androidVersion": "16",
+    "apiLevel": "36",
+    "displaySize": "Physical size: 1440x3120",
+    "displayDensity": "Physical density: 600\r\nOverride density: 560"
+  },
+  "package": "com.samfa12.hordelanternrt.debug",
+  "apkSha256": "fc7ad292afd1b187da204c28828d84fb779d5917b81692be4734b003d8b6b8a0",
+  "installedApkSha256": "fc7ad292afd1b187da204c28828d84fb779d5917b81692be4734b003d8b6b8a0",
+  "sourceCommit": "cbc135ffb7b98167a20a40a72b3e39b96cf36d34",
+  "sourceDirty": true,
+  "selectedRtPipelineBundle": {
+    "opaqueFast": {
+      "key": "diagnostic_mobile_opaque_fast",
+      "sha256": "8f523334ea42bf14932e3eecb5d1447d5f0015a3f1185b5e3431d5aa9dffab55"
+    },
+    "genericDielectric": {
+      "key": "diagnostic_mobile_generic_dielectric",
+      "sha256": "987cd243ef082937e6798f6ec1a931d3521775e8fcfa03b2eb632bb52257e120"
+    }
+  },
+  "checkpointCount": 2,
+  "checkpoints": [
+    {
+      "index": 1,
+      "checkpoint": "glass-tinted-transport",
+      "expectedZone": "skylight-chamber",
+      "zone": "skylight-chamber",
+      "generation": 1,
+      "camera": {
+        "x": -7.6,
+        "z": -15.2,
+        "yaw": -1.5708,
+        "pitch": -0.05,
+        "vitality": 3,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false
+      },
+      "renderScale": 0.75,
+      "internalExtent": {
+        "width": 1080,
+        "height": 2235
+      },
+      "swapchainExtent": {
+        "width": 1440,
+        "height": 2980
+      },
+      "gpu": "Adreno (TM) 840",
+      "buildIdentity": "1.6.1 DEBUG",
+      "shaderIdentity": "8f523334+987cd243",
+      "selectedRtPipelineBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_mobile_opaque_fast",
+          "sha256": "8f523334ea42bf14932e3eecb5d1447d5f0015a3f1185b5e3431d5aa9dffab55"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_mobile_generic_dielectric",
+          "sha256": "987cd243ef082937e6798f6ec1a931d3521775e8fcfa03b2eb632bb52257e120"
+        }
+      },
+      "outputRedBlueSwap": false,
+      "animationTime": 0.0,
+      "playerCombat": {
+        "action": "idle",
+        "actionTime": 0.0,
+        "comboQueued": false,
+        "swordRadians": 0.0,
+        "lastConsumedAttackSequence": 0,
+        "lastConsumedParrySequence": 0
+      },
+      "stablePresentedFrames": 12,
+      "presented": true,
+      "playerRenderRoute": "modelled-viewmodel",
+      "playerSkinCadenceHz": 60,
+      "playerSkinUpdates": 3,
+      "playerSkinCpuAverageMs": 6.7926,
+      "playerMaxSocketErrorM": 0.0,
+      "tlasInstanceCount": 21,
+      "sceneOnly": true,
+      "overlaysHidden": [
+        "menu",
+        "touch-actions",
+        "HUD",
+        "diagnostics",
+        "developer-overlay"
+      ],
+      "png": {
+        "file": "capture-01-glass-tinted-transport-75.png",
+        "width": 1440,
+        "height": 3120,
+        "sha256": "83e9d51c01e366a0d49440dc1756527e4f201bd497dfd652fef554cfe06f828f"
+      },
+      "nativeStateFile": "capture-01-glass-tinted-transport-state.json"
+    },
+    {
+      "index": 2,
+      "checkpoint": "glass-millimetre-closed",
+      "expectedZone": "skylight-chamber",
+      "zone": "skylight-chamber",
+      "generation": 1,
+      "camera": {
+        "x": -7.6,
+        "z": -15.2,
+        "yaw": -1.5708,
+        "pitch": -0.05,
+        "vitality": 3,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false
+      },
+      "renderScale": 0.75,
+      "internalExtent": {
+        "width": 1080,
+        "height": 2235
+      },
+      "swapchainExtent": {
+        "width": 1440,
+        "height": 2980
+      },
+      "gpu": "Adreno (TM) 840",
+      "buildIdentity": "1.6.1 DEBUG",
+      "shaderIdentity": "8f523334+987cd243",
+      "selectedRtPipelineBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_mobile_opaque_fast",
+          "sha256": "8f523334ea42bf14932e3eecb5d1447d5f0015a3f1185b5e3431d5aa9dffab55"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_mobile_generic_dielectric",
+          "sha256": "987cd243ef082937e6798f6ec1a931d3521775e8fcfa03b2eb632bb52257e120"
+        }
+      },
+      "outputRedBlueSwap": false,
+      "animationTime": 0.0,
+      "playerCombat": {
+        "action": "idle",
+        "actionTime": 0.0,
+        "comboQueued": false,
+        "swordRadians": 0.0,
+        "lastConsumedAttackSequence": 0,
+        "lastConsumedParrySequence": 0
+      },
+      "stablePresentedFrames": 12,
+      "presented": true,
+      "playerRenderRoute": "modelled-viewmodel",
+      "playerSkinCadenceHz": 60,
+      "playerSkinUpdates": 4,
+      "playerSkinCpuAverageMs": 3.5648,
+      "playerMaxSocketErrorM": 0.0,
+      "tlasInstanceCount": 21,
+      "sceneOnly": true,
+      "overlaysHidden": [
+        "menu",
+        "touch-actions",
+        "HUD",
+        "diagnostics",
+        "developer-overlay"
+      ],
+      "png": {
+        "file": "capture-02-glass-millimetre-closed-75.png",
+        "width": 1440,
+        "height": 3120,
+        "sha256": "f090bb1d17ebb864d278394cea0ffd9b2ca0fb4ea33ef19f5658a4ec3b1a854f"
+      },
+      "nativeStateFile": "capture-02-glass-millimetre-closed-state.json"
+    }
+  ],
+  "lifecycle": {
+    "requested": true,
+    "homeResumePassed": true,
+    "honestPresentationAfterResume": true,
+    "log": "lifecycle-home-resume-logcat.txt"
+  }
+}

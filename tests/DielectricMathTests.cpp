@@ -207,7 +207,7 @@ void TestNearestShadowTraversalIsCandidateOrderIndependent()
         {4.0f, 30u, 303u, true, true, 0.75f, 0.0f,
          Vec3{0.5f, 1.0f, 0.25f}, 0.0f},
     }};
-    const Vec3 expected{0.1269f, 0.5400f, 0.12285f};
+    const Vec3 expected{0.0486f, 0.3888f, 0.0243f};
     std::array<int, ordered.size()> permutation{{0, 1, 2, 3, 4}};
     do
     {
@@ -260,8 +260,8 @@ void TestShadowBlockersAndUnclosedVolumesFailDeterministically()
     }};
     const auto mismatched = EvaluateBoundedShadow<4u, 2u>(mismatchedInstance, 3.0f);
     Check(mismatched.unclosedVolume && !mismatched.blocked &&
-              NearlyEqual(mismatched.transmittance, Vec3{0.072f, 0.072f, 0.072f}),
-          "an exit from a different instance still uses the bounded stack-failure fallback");
+              NearlyEqual(mismatched.transmittance, Vec3{}),
+          "an exit from a different instance fails closed instead of creating pseudo-light");
 }
 
 void TestShadowOriginInsideClosedVolumes()
@@ -297,7 +297,7 @@ void TestShadowOriginInsideClosedVolumes()
          Vec3{0.5f, 0.8f, 1.0f}, 2.0f},
     }};
     const auto unmatched = EvaluateBoundedShadow<4u, 2u>(laterUnmatchedExit, 3.0f);
-    Check(unmatched.unclosedVolume,
+    Check(unmatched.unclosedVolume && NearlyEqual(unmatched.transmittance, Vec3{}),
           "an unmatched exit after a complete entry-exit pair is not reclassified as an inside-origin segment");
 }
 
@@ -313,6 +313,7 @@ void TestMobileAndHighShadowBounds()
     const auto mobileInterfaces = EvaluateBoundedShadow<4u, 2u>(thinInterfaces, 2.0f);
     const auto highInterfaces = EvaluateBoundedShadow<8u, 4u>(thinInterfaces, 2.0f);
     Check(mobileInterfaces.overflow && mobileInterfaces.interfaceCount == 4u &&
+              NearlyEqual(mobileInterfaces.transmittance, Vec3{}) &&
               !highInterfaces.overflow && highInterfaces.interfaceCount == 5u,
           "Mobile enforces four shadow interfaces while High accepts the same five-interface path");
 
@@ -327,6 +328,7 @@ void TestMobileAndHighShadowBounds()
     const auto mobileVolumes = EvaluateBoundedShadow<8u, 2u>(threeNestedVolumes, 2.0f);
     const auto highVolumes = EvaluateBoundedShadow<8u, 4u>(threeNestedVolumes, 2.0f);
     Check(mobileVolumes.overflow && mobileVolumes.interfaceCount == 3u &&
+              NearlyEqual(mobileVolumes.transmittance, Vec3{}) &&
               !highVolumes.overflow && !highVolumes.unclosedVolume &&
               highVolumes.interfaceCount == 6u,
           "Mobile enforces two nested shadow volumes while High closes the same three-volume path");
@@ -367,6 +369,85 @@ void TestGenericShadowOriginKeepsMillimetreClearance()
           "generic shadow origin cannot jump a 1.5 mm cage-to-glass clearance");
     Check(NearlyEqual(legacy, Vec3{position.x - 0.004f, position.y, position.z}),
           "legacy-inactive shadow origin retains the reviewed four-millimetre normal offset");
+}
+
+void TestBoundedShadowPhysicalSegmentLengthsAndCoincidentCandidates()
+{
+    const Vec3 color{0.25f, 0.5f, 1.0f};
+    const std::array<ShadowInterfaceSample, 2u> normalPath{{
+        {1.0f, 1u, 7u, true, false, 0.8f, 0.0f, color, 1.0f, 3u},
+        {2.0f, 2u, 7u, false, false, 0.8f, 0.0f, color, 1.0f, 3u},
+    }};
+    const auto normal = EvaluateBoundedShadow<4u, 2u>(normalPath, 4.0f);
+    Check(!normal.overflow && !normal.unclosedVolume && normal.interfaceCount == 2u &&
+              NearlyEqual(normal.transmittance, Vec3{0.16f, 0.32f, 0.64f}),
+          "normal-incidence closed segment applies measured unit path absorption and both interface transmissions");
+
+    const std::array<ShadowInterfaceSample, 2u> obliquePath{{
+        {1.0f, 1u, 7u, true, false, 0.8f, 0.0f, color, 1.0f, 3u},
+        {3.0f, 2u, 7u, false, false, 0.8f, 0.0f, color, 1.0f, 3u},
+    }};
+    const auto oblique = EvaluateBoundedShadow<4u, 2u>(obliquePath, 4.0f);
+    Check(!oblique.unclosedVolume && oblique.interfaceCount == 2u &&
+              NearlyEqual(oblique.transmittance, Vec3{0.04f, 0.16f, 0.64f}),
+          "oblique closed segment uses its longer measured ray distance rather than pane thickness");
+
+    const auto partial = EvaluateBoundedShadow<4u, 2u>(normalPath, 1.5f);
+    Check(!partial.unclosedVolume && partial.interfaceCount == 1u &&
+              NearlyEqual(partial.transmittance, Vec3{0.4f, 0.5656854f, 0.8f}),
+          "finite endpoint inside a volume integrates only the measured entry-to-endpoint segment");
+
+    const std::array<ShadowInterfaceSample, 1u> thinSheet{{
+        {1.0f, 1u, 8u, true, true, 0.75f, 0.0f, Vec3{0.5f, 0.25f, 1.0f}, 0.0f, 5u},
+    }};
+    const auto thin = EvaluateBoundedShadow<4u, 2u>(thinSheet, 2.0f);
+    Check(thin.interfaceCount == 1u &&
+              NearlyEqual(thin.transmittance, Vec3{0.375f, 0.1875f, 0.75f}),
+          "thin-sheet transmission multiplies the full supplied RGB tint without an arbitrary blend");
+
+    const std::array<ShadowInterfaceSample, 3u> exactDuplicate{{
+        {1.0f, 1u, 7u, true, false, 0.8f, 0.0f, color, 1.0f, 3u},
+        {1.0f, 99u, 7u, true, false, 0.8f, 0.0f, color, 1.0f, 3u},
+        {2.0f, 2u, 7u, false, false, 0.8f, 0.0f, color, 1.0f, 3u},
+    }};
+    const auto deduplicated = EvaluateBoundedShadow<4u, 2u>(exactDuplicate, 3.0f);
+    Check(!deduplicated.unclosedVolume && !deduplicated.overflow &&
+              deduplicated.interfaceCount == 2u &&
+              NearlyEqual(deduplicated.transmittance, normal.transmittance),
+          "only exact same instance/material/distance/orientation seam candidates are suppressed");
+
+    const std::array<ShadowInterfaceSample, 2u> coincidentOppositeFaces{{
+        {1.0f, 1u, 7u, true, false, 0.8f, 0.0f, Vec3{1.0f, 1.0f, 1.0f}, 0.0f, 3u},
+        {1.0f, 1u, 7u, false, false, 0.8f, 0.0f, Vec3{1.0f, 1.0f, 1.0f}, 0.0f, 3u},
+    }};
+    const auto oppositeFaces = EvaluateBoundedShadow<4u, 2u>(coincidentOppositeFaces, 2.0f);
+    Check(!oppositeFaces.unclosedVolume && oppositeFaces.interfaceCount == 2u &&
+              NearlyEqual(oppositeFaces.transmittance, Vec3{0.64f, 0.64f, 0.64f}),
+          "opposite orientations at an exactly coincident distance remain distinct interfaces");
+
+    const std::array<ShadowInterfaceSample, 4u> distinctIdentity{{
+        {1.0f, 1u, 7u, true, false, 0.8f, 0.0f, Vec3{1.0f, 1.0f, 1.0f}, 0.0f, 3u},
+        {1.0f, 2u, 8u, true, false, 0.8f, 0.0f, Vec3{1.0f, 1.0f, 1.0f}, 0.0f, 4u},
+        {2.0f, 3u, 8u, false, false, 0.8f, 0.0f, Vec3{1.0f, 1.0f, 1.0f}, 0.0f, 4u},
+        {3.0f, 4u, 7u, false, false, 0.8f, 0.0f, Vec3{1.0f, 1.0f, 1.0f}, 0.0f, 3u},
+    }};
+    const auto distinct = EvaluateBoundedShadow<4u, 2u>(distinctIdentity, 4.0f);
+    Check(!distinct.unclosedVolume && distinct.interfaceCount == 4u &&
+              NearlyEqual(distinct.transmittance, Vec3{0.4096f, 0.4096f, 0.4096f}),
+          "coincident candidates from different instance/material identities remain independently paired");
+
+    std::vector<ShadowInterfaceSample> overCandidateCapacity(33u);
+    const auto candidateOverflow = EvaluateBoundedShadow<8u, 4u>(overCandidateCapacity, 2.0f);
+    Check(candidateOverflow.overflow && candidateOverflow.interfaceCount == 0u &&
+              NearlyEqual(candidateOverflow.transmittance, Vec3{}),
+          "candidate-array overflow is an explicit zero-transmittance failure");
+
+    const std::array<ShadowInterfaceSample, 0u> noBoundaries{};
+    const auto noBoundaryEvidence = EvaluateBoundedShadow<4u, 2u>(noBoundaries, 2.0f);
+    Check(noBoundaryEvidence.interfaceCount == 0u &&
+              NearlyEqual(noBoundaryEvidence.transmittance, Vec3{1.0f, 1.0f, 1.0f}),
+          "without boundary or initial-medium evidence the segment cannot infer an enclosing volume");
+
 }
 
 void TestClosedPaneEntryNearEdgeKeepsExitReachable()
@@ -582,6 +663,7 @@ int main()
     TestNearestShadowTraversalIsCandidateOrderIndependent();
     TestShadowBlockersAndUnclosedVolumesFailDeterministically();
     TestShadowOriginInsideClosedVolumes();
+    TestBoundedShadowPhysicalSegmentLengthsAndCoincidentCandidates();
     TestMobileAndHighShadowBounds();
     TestMillimetreScaleRayAdvance();
     TestGenericShadowOriginKeepsMillimetreClearance();

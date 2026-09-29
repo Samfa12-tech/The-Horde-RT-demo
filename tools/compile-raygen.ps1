@@ -334,7 +334,10 @@ function Assert-RaygenFrozenBudgets
         { throw "Raygen variant exact budget invariant changed: $($variant.key)/atomicInstructions" }
         if ($variant.instrumentation -eq 'Shipping' -and ($variant.atomicInstructions -ne 0 -or $variant.hasDiagnosticsBinding))
         { throw "Shipping variant violates diagnostic budget invariants: $($variant.key)" }
-        $expectedDiagnosticAtomics = if ($variant.material -eq 'GenericDielectric') { 32 } else { 5 }
+        # Geometric shadow traversal adds finite-endpoint, implicit-origin and
+        # explicit stack-failure diagnostics. Keep their reviewed shape exact;
+        # Shipping must still contain no atomics or diagnostics descriptor.
+        $expectedDiagnosticAtomics = if ($variant.material -eq 'GenericDielectric') { 41 } else { 5 }
         if ($variant.instrumentation -eq 'Diagnostic' -and (-not $variant.hasDiagnosticsBinding -or $variant.atomicInstructions -ne $expectedDiagnosticAtomics))
         { throw "Diagnostic variant violates reviewed counter shape: $($variant.key)" }
     }

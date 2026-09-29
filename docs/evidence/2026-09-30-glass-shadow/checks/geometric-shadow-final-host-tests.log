@@ -1,0 +1,12 @@
+Internal ctest changing into directory: C:/Dev/tmp/horde-phase3-native-20260923
+Test project C:/Dev/tmp/horde-phase3-native-20260923
+    Start 13: horde_rt_pipeline_variants_tests
+1/3 Test #13: horde_rt_pipeline_variants_tests .......   Passed    0.01 sec
+    Start 27: horde_rt_dielectric_math_tests
+2/3 Test #27: horde_rt_dielectric_math_tests .........   Passed    0.13 sec
+    Start 75: horde_rt_character_render_slot_smoke
+3/3 Test #75: horde_rt_character_render_slot_smoke ...   Passed    0.87 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =   1.02 sec

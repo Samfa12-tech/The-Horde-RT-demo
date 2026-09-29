@@ -1,0 +1,269 @@
+{
+  "investigationOnly": true,
+  "meshes": [
+    {
+      "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high-standard-complete\\11-finale-roof.obj",
+      "sha256": "82809fdf9263ea87c21ddcbcdd1b4396d0c6cb4bf242f6e453afa7ce22146884",
+      "note": "CPU-upload witness, not GPU readback. Native query records remain primary device evidence.",
+      "results": [
+        {
+          "slot": 0.0,
+          "nativeT": 0.0009187972755171359,
+          "closest": null,
+          "nativeDeltaMetres": null
+        },
+        {
+          "slot": 1.0,
+          "nativeT": 0.02680880017578602,
+          "closest": null,
+          "nativeDeltaMetres": null
+        },
+        {
+          "slot": 2.0,
+          "nativeT": 0.0008990317001007497,
+          "closest": null,
+          "nativeDeltaMetres": null
+        },
+        {
+          "slot": -1,
+          "nativeT": -1,
+          "closest": {
+            "t": 0.7012100214886207,
+            "face": 11728,
+            "group": "ViewmodelGauntlets",
+            "vertices": [
+              [
+                -34.85302520551266,
+                0.492674649,
+                -15.028130195719834
+              ],
+              [
+                -34.8527351696003,
+                0.492515029,
+                -15.026125154707156
+              ],
+              [
+                -34.85206056355445,
+                0.49488550899999995,
+                -15.027174077677667
+              ]
+            ],
+            "barycentric": [
+              0.4637474300279317,
+              0.5120493327924194,
+              0.024203237179648965
+            ],
+            "frontFace": true,
+            "geometricNormal": [
+              -0.9282255083488803,
+              0.3353889291331111,
+              0.160971028031158
+            ],
+            "position": [
+              -34.852853345359144,
+              0.4926464256544507,
+              -15.027080374655325
+            ]
+          },
+          "nativeDeltaMetres": null
+        }
+      ]
+    },
+    {
+      "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high-standard-complete\\11-finale-roof.player-world-body.obj",
+      "sha256": "ea5e67f67d12dde6434d2722ac1e1b192f1ec624ccf65e92e166df52b684e976",
+      "note": "CPU-upload witness, not GPU readback. Native query records remain primary device evidence.",
+      "results": [
+        {
+          "slot": 0.0,
+          "nativeT": 0.0009187972755171359,
+          "closest": {
+            "t": 0.0009183694264692215,
+            "face": 16248,
+            "group": "BodyRemainderPrimaryVisible",
+            "vertices": [
+              [
+                -34.9674129547483,
+                0.482570229,
+                -15.068493974719882
+              ],
+              [
+                -34.97157031872883,
+                0.4990594989999999,
+                -15.068939369901605
+              ],
+              [
+                -34.91493911333929,
+                0.555823739,
+                -15.032096470426177
+              ]
+            ],
+            "barycentric": [
+              0.008817473098563844,
+              0.5650759927891695,
+              0.4261065341122666
+            ],
+            "frontFace": false,
+            "geometricNormal": [
+              0.473605410829003,
+              0.09575921271118108,
+              -0.8755158982076946
+            ],
+            "position": [
+              -34.94740273463263,
+              0.5231017188732769,
+              -15.05323644243945
+            ]
+          },
+          "nativeDeltaMetres": 4.278490479143332e-07
+        },
+        {
+          "slot": 1.0,
+          "nativeT": 0.02680880017578602,
+          "closest": {
+            "t": 0.026806465635868096,
+            "face": 16243,
+            "group": "BodyRemainderPrimaryVisible",
+            "vertices": [
+              [
+                -34.96325558976777,
+                0.46608107899999984,
+                -15.068048593538157
+              ],
+              [
+                -34.91493911333929,
+                0.555823739,
+                -15.032096470426177
+              ],
+              [
+                -34.9333525965692,
+                0.545301139,
+                -15.049713995231055
+              ]
+            ],
+            "barycentric": [
+              0.06494193609410281,
+              0.26006056292041346,
+              0.6749975009854837
+            ],
+            "frontFace": true,
+            "geometricNormal": [
+              -0.7198974694800323,
+              0.1132535731135076,
+              0.684778257257975
+            ],
+            "position": [
+              -34.930505934028425,
+              0.5428929482054954,
+              -15.046323056124605
+            ]
+          },
+          "nativeDeltaMetres": 2.33453991792254e-06
+        },
+        {
+          "slot": 2.0,
+          "nativeT": 0.0008990317001007497,
+          "closest": {
+            "t": 0.0008986101986962381,
+            "face": 16248,
+            "group": "BodyRemainderPrimaryVisible",
+            "vertices": [
+              [
+                -34.9674129547483,
+                0.482570229,
+                -15.068493974719882
+              ],
+              [
+                -34.97157031872883,
+                0.4990594989999999,
+                -15.068939369901605
+              ],
+              [
+                -34.91493911333929,
+                0.555823739,
+                -15.032096470426177
+              ]
+            ],
+            "barycentric": [
+              0.0267113467610553,
+              0.5369561808985863,
+              0.4363324723403584
+            ],
+            "frontFace": false,
+            "geometricNormal": [
+              0.473605410829003,
+              0.09575921271118108,
+              -0.8755158982076946
+            ],
+            "position": [
+              -34.9467492360787,
+              0.5233871295709147,
+              -15.05285171938016
+            ]
+          },
+          "nativeDeltaMetres": 4.2150140451167536e-07
+        },
+        {
+          "slot": -1,
+          "nativeT": -1,
+          "closest": {
+            "t": 0.5988148892575241,
+            "face": 16246,
+            "group": "BodyRemainderPrimaryVisible",
+            "vertices": [
+              [
+                -34.91493911333929,
+                0.555823739,
+                -15.032096470426177
+              ],
+              [
+                -34.97157031872883,
+                0.4990594989999999,
+                -15.068939369901605
+              ],
+              [
+                -34.90764702190909,
+                0.5591751889999999,
+                -15.01906087410743
+              ]
+            ],
+            "barycentric": [
+              0.31142809748130734,
+              0.5856365340025144,
+              0.10293536851617828
+            ],
+            "frontFace": true,
+            "geometricNormal": [
+              -0.7641962651721292,
+              0.5820734255725398,
+              0.27783915407878995
+            ],
+            "position": [
+              -34.947353802061386,
+              0.5229255089719266,
+              -15.052331194466671
+            ]
+          },
+          "nativeDeltaMetres": null
+        }
+      ]
+    }
+  ],
+  "receiverLightRelationships": [
+    {
+      "slot": 0.0,
+      "geometricNormalDotLightDirection": -0.04503545178778752,
+      "originOffsetAlongOutwardNormal": -7.019295986884286e-05
+    },
+    {
+      "slot": 1.0,
+      "geometricNormalDotLightDirection": 0.012956235662304881,
+      "originOffsetAlongOutwardNormal": 6.942311619115247e-05
+    },
+    {
+      "slot": 2.0,
+      "geometricNormalDotLightDirection": -0.2979481256845228,
+      "originOffsetAlongOutwardNormal": -7.019295986884286e-05
+    }
+  ]
+}

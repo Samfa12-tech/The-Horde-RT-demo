@@ -17,16 +17,16 @@
     {
       "key": "diagnostic_high_generic_dielectric",
       "max": {
-        "bytes": 227840,
-        "words": 56960,
-        "instructions": 13424,
-        "branchOperations": 695,
-        "loops": 10,
-        "selectionMerges": 290,
-        "functions": 60,
+        "bytes": 235040,
+        "words": 58760,
+        "instructions": 13890,
+        "branchOperations": 760,
+        "loops": 13,
+        "selectionMerges": 315,
+        "functions": 59,
         "functionCalls": 193,
-        "rayQueryInitializations": 3,
-        "atomicInstructions": 32
+        "rayQueryInitializations": 2,
+        "atomicInstructions": 41
       },
       "exact": {
         "instrumentation": "Diagnostic",
@@ -34,7 +34,7 @@
         "material": "GenericDielectric",
         "strategy": "GenericRetained",
         "shippingAllowed": false,
-        "atomicInstructions": 32,
+        "atomicInstructions": 41,
         "hasDiagnosticsBinding": true,
         "driverSafeFullyInlined": false,
         "boundedGenericFunctionsRetained": true
@@ -69,16 +69,16 @@
     {
       "key": "diagnostic_mobile_generic_dielectric",
       "max": {
-        "bytes": 227840,
-        "words": 56960,
-        "instructions": 13424,
-        "branchOperations": 695,
-        "loops": 10,
-        "selectionMerges": 290,
-        "functions": 60,
+        "bytes": 235040,
+        "words": 58760,
+        "instructions": 13890,
+        "branchOperations": 760,
+        "loops": 13,
+        "selectionMerges": 315,
+        "functions": 59,
         "functionCalls": 193,
-        "rayQueryInitializations": 3,
-        "atomicInstructions": 32
+        "rayQueryInitializations": 2,
+        "atomicInstructions": 41
       },
       "exact": {
         "instrumentation": "Diagnostic",
@@ -86,7 +86,7 @@
         "material": "GenericDielectric",
         "strategy": "GenericRetained",
         "shippingAllowed": false,
-        "atomicInstructions": 32,
+        "atomicInstructions": 41,
         "hasDiagnosticsBinding": true,
         "driverSafeFullyInlined": false,
         "boundedGenericFunctionsRetained": true
@@ -121,15 +121,15 @@
     {
       "key": "shipping_high_generic_dielectric",
       "max": {
-        "bytes": 220060,
-        "words": 55015,
-        "instructions": 13055,
-        "branchOperations": 654,
-        "loops": 10,
-        "selectionMerges": 267,
-        "functions": 60,
+        "bytes": 226212,
+        "words": 56553,
+        "instructions": 13466,
+        "branchOperations": 713,
+        "loops": 13,
+        "selectionMerges": 287,
+        "functions": 59,
         "functionCalls": 193,
-        "rayQueryInitializations": 3,
+        "rayQueryInitializations": 2,
         "atomicInstructions": 0
       },
       "exact": {
@@ -173,15 +173,15 @@
     {
       "key": "shipping_mobile_generic_dielectric",
       "max": {
-        "bytes": 220060,
-        "words": 55015,
-        "instructions": 13055,
-        "branchOperations": 654,
-        "loops": 10,
-        "selectionMerges": 267,
-        "functions": 60,
+        "bytes": 226212,
+        "words": 56553,
+        "instructions": 13466,
+        "branchOperations": 713,
+        "loops": 13,
+        "selectionMerges": 287,
+        "functions": 59,
         "functionCalls": 193,
-        "rayQueryInitializations": 3,
+        "rayQueryInitializations": 2,
         "atomicInstructions": 0
       },
       "exact": {

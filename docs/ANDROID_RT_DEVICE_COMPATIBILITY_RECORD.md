@@ -2,6 +2,25 @@
 
 Last updated: 2026-09-30
 
+## September 30: geometric shadow segments (local SM-S948B evidence)
+
+Exact ordinary Debug APK3de01bb86cc26c3c930ebe7af0f1fe760a2701de7f9c2031f81d3a794d323043,
+installed/pulled back identically, run085838: Android16/Adreno840/driver2150932499,
+native pipeline RT, strict ASTC,75%/1080x2235. All7 captures/Home-resume complete.
+Shadow absorption now follows real geometric segment lengths, with unchanged
+physical traversal/volume budgets. Isolated overflow1/80 budget recoveries and
+grazing recovery counts remain open; no shadow overflow/unclosed regression.
+Separate investigation APKfc7ad292…8b6b8a0 / run090738 records exact raw storage:
+6 normal/oblique/inside-exit/finite-endpoint/near-entry/1mm analytical RGB checks
+pass within6.05e-8. Both-endpoints-inside/no-boundary absorption remains unhandled
+and is not counted as a physical pass. No phone compute parity is inferred.
+Ordinary3de01bb8 restored/byte-verified in run091047,2 captures/Home-resume pass,
+phone returned Home. Temporary probe code/artifacts removed from source.
+Unsigned Shipping214cee5b builds/actual SPIR-V containment passes, not installed.
+No live glass, sustained performance, S24/S25 or final acceptance claim.
+Stable/owner-accepted apps/data untouched; audio/haptic manual revalidation:NO.
+[Exact evidence and unchanged failing image gates](evidence/2026-09-30-glass-shadow/README.md).
+
 ## September 30: triangle-surface position repair (local SM-S948B evidence)
 
 Exact ordinary Debug APK457641fdec90e3cfda220934060c34413014e8aeafe64f8b50c0969c465e3570,

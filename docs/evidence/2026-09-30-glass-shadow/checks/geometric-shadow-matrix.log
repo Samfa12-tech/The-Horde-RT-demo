@@ -1,0 +1,16 @@
+C:\Dev\tmp\horde-geometric-shadow-20260930\matrix\diagnostic_high_generic_dielectric\minimal.rgen.resolved
+Raygen variant diagnostic_high_generic_dielectric: 236776 bytes; functions=60; calls=195; ray-query sites=3; dependency SHA-256=5e6cc0344ee44be4e5bfd5585676d2d831b5297385ef1c4de665b7b33f27bbe7
+C:\Dev\tmp\horde-geometric-shadow-20260930\matrix\diagnostic_high_opaque_fast\minimal.rgen.resolved
+Raygen variant diagnostic_high_opaque_fast: 505248 bytes; functions=1; calls=0; ray-query sites=23; dependency SHA-256=742a552a889d0409d0b2f9b76e2cbaf8f8aeee79e0b30aa846e64238398f6526
+C:\Dev\tmp\horde-geometric-shadow-20260930\matrix\diagnostic_mobile_generic_dielectric\minimal.rgen.resolved
+Raygen variant diagnostic_mobile_generic_dielectric: 236776 bytes; functions=60; calls=195; ray-query sites=3; dependency SHA-256=53ecf3069f898378096d4bbd8daa5e0ddf619a83b34938c852078f14e29706d5
+C:\Dev\tmp\horde-geometric-shadow-20260930\matrix\diagnostic_mobile_opaque_fast\minimal.rgen.resolved
+Raygen variant diagnostic_mobile_opaque_fast: 505248 bytes; functions=1; calls=0; ray-query sites=23; dependency SHA-256=65d5ba68cd2864e09b5886b6028972a3b5c90242addaedfb3545eba274fef8b4
+C:\Dev\tmp\horde-geometric-shadow-20260930\matrix\shipping_high_generic_dielectric\minimal.rgen.resolved
+Raygen variant shipping_high_generic_dielectric: 227948 bytes; functions=60; calls=195; ray-query sites=3; dependency SHA-256=e7a332d023efbe5ac172d92e202a81ca934a476060f7f3d2486c59bf9c1e6576
+C:\Dev\tmp\horde-geometric-shadow-20260930\matrix\shipping_high_opaque_fast\minimal.rgen.resolved
+Raygen variant shipping_high_opaque_fast: 501012 bytes; functions=1; calls=0; ray-query sites=23; dependency SHA-256=5628def69800ed719fba55a35013f1797ee3893268f68938ed32d65bcd149da8
+C:\Dev\tmp\horde-geometric-shadow-20260930\matrix\shipping_mobile_generic_dielectric\minimal.rgen.resolved
+Raygen variant shipping_mobile_generic_dielectric: 227948 bytes; functions=60; calls=195; ray-query sites=3; dependency SHA-256=766a9aab9e1ba55f1acfd2fe25b4009e41a920aa319c698cb9dbfce85c1cc461
+C:\Dev\tmp\horde-geometric-shadow-20260930\matrix\shipping_mobile_opaque_fast\minimal.rgen.resolved
+Raygen variant shipping_mobile_opaque_fast: 501012 bytes; functions=1; calls=0; ray-query sites=23; dependency SHA-256=360a532bff2e73e9687d6bb98f369d3aca157ccca422ac22cee56f72b7a860c2

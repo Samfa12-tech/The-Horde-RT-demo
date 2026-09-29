@@ -619,33 +619,39 @@ bool shadowSegmentCrossesTransparentWorld(vec3 origin, vec3 direction,
                vec3(-5.45, -1.02, -16.90), vec3(-1.75, 2.60, -13.50));
 }
 
-// One ray query can visit every candidate interface on a finite light segment.
-// Opaque candidates are committed normally; transmissive candidates instead
-// contribute bounded per-interface Fresnel-independent transmission, tint and
-// half of the material's validated closed-volume thickness. A closed pane's
-// entry and exit therefore accumulate its complete Beer-Lambert path without
-// relaunching a query or keeping a per-ray dynamic stack. Primary camera
-// transport still measures exact geometric entry/exit distance and refraction.
+// Collect real intersections on one finite light segment, then consume them
+// nearest-first: Vulkan candidate visitation order is not distance order.
+// Closed-medium absorption uses measured entry/exit (or finite endpoint)
+// distances, never the authored thickness. This remains a straight visibility
+// segment, not a refractive caustic solver; primary transport owns refraction.
+// Scratch storage and crossing/volume limits remain quality-specialised.
+#if HORDE_GENERIC_TRANSMISSION_VARIANT
 vec3 boundedShadowTransmittanceMask(vec3 origin, vec3 direction,
                                     float maxDistance, uint mask)
 {
 #if defined(HORDE_RT_VARIANT_QUALITY)
     const int interfaceBudget = kRtVariantShadowInterfaceBudget;
+    const int volumeBudget = kRtVariantShadowVolumeBudget;
 #else
     int interfaceBudget = controls.waterQuality >= 1.5
         ? kHighShadowInterfaces : kMobileShadowInterfaces;
+    int volumeBudget = controls.waterQuality >= 1.5
+        ? kHighShadowVolumes : kMobileShadowVolumes;
 #endif
+    if (maxDistance <= 0.000001)
+        return vec3(1.0);
     int interfaceCount = 0;
     bool overflow = false;
     bool productionPaneOverflow = false;
-    vec3 transmittance = vec3(1.0);
+    float interfaceDistances[HORDE_RT_SHADOW_INTERFACE_CEILING];
+    // instance, material, entering/thin flags, primitive (stable tie break).
+    uvec4 interfaceMetadata[HORDE_RT_SHADOW_INTERFACE_CEILING];
 
     rayQueryEXT query;
     uint shadowFlags = shadowSegmentCrossesTransparentWorld(
         origin, direction, maxDistance) ? gl_RayFlagsNoOpaqueEXT : 0u;
     rayQueryInitializeEXT(query, topLevelAS, shadowFlags, mask,
-                          origin, 0.0015, direction,
-                          max(maxDistance, 0.004));
+                          origin, 0.000001, direction, maxDistance);
     while (rayQueryProceedEXT(query))
     {
         if (rayQueryGetIntersectionTypeEXT(query, false) !=
@@ -666,6 +672,7 @@ vec3 boundedShadowTransmittanceMask(vec3 origin, vec3 direction,
             continue;
 
         bool materialTransmits = false;
+        uint materialIndex = 0u;
         RtMaterialGpu material;
         RtInstanceMetadata instanceMetadata = rtInstances.values[instance];
         if ((instanceMetadata.flags & kRtInstanceFlagStaticPbr) != 0u)
@@ -676,6 +683,7 @@ vec3 boundedShadowTransmittanceMask(vec3 origin, vec3 direction,
             {
                 RtPrimitiveMetadata primitiveMetadata = rtPrimitives.values[
                     instanceMetadata.primitiveBase + geometryIndex];
+                materialIndex = primitiveMetadata.materialIndex;
                 material = rtMaterials.values[primitiveMetadata.materialIndex];
                 float transmission = clamp(
                     material.metallicRoughnessOcclusionTransmission.w,
@@ -696,29 +704,30 @@ vec3 boundedShadowTransmittanceMask(vec3 origin, vec3 direction,
             continue;
         }
 
+        float distance = rayQueryGetIntersectionTEXT(query, false);
+        uint flags = (rayQueryGetIntersectionFrontFaceEXT(query, false) ? 1u : 0u) |
+            ((material.materialFlags.x & kRtMaterialFlagThinWall) != 0u ? 2u : 0u);
+        // A watertight shared edge can expose coincident triangle candidates.
+        // Merge only an exactly identical oriented boundary of the same medium;
+        // no epsilon may erase a distinct micrometre-scale crossing.
+        bool duplicate = false;
+        for (int index = 0; index < interfaceCount; ++index)
+        {
+            uvec4 prior = interfaceMetadata[index];
+            duplicate = duplicate || (interfaceDistances[index] == distance &&
+                prior.x == instance && prior.y == materialIndex && prior.z == flags);
+        }
+        if (duplicate) continue;
         if (interfaceCount >= interfaceBudget)
         {
             overflow = true;
             productionPaneOverflow = productionPaneOverflow || instance == 8u;
             continue;
         }
+        interfaceDistances[interfaceCount] = distance;
+        interfaceMetadata[interfaceCount] =
+            uvec4(instance, materialIndex, flags, uint(primitive));
         ++interfaceCount;
-
-        float transmission = clamp(
-            material.metallicRoughnessOcclusionTransmission.w, 0.0, 1.0);
-        vec3 tint = clamp(material.baseColorFactor.rgb,
-                          vec3(0.0), vec3(1.0));
-        transmittance *= transmission * mix(vec3(1.0), tint, 0.12);
-        if ((material.materialFlags.x & kRtMaterialFlagThinWall) == 0u)
-        {
-            float closedThickness = max(
-                material.iorThicknessAttenuationDistance.y, 0.0);
-            transmittance *= dielectricBeerLambert(
-                clamp(material.attenuationColor.rgb,
-                      vec3(0.0), vec3(1.0)),
-                closedThickness * 0.5,
-                material.iorThicknessAttenuationDistance.z);
-        }
     }
 
     if (rayQueryGetIntersectionTypeEXT(query, true) !=
@@ -730,10 +739,109 @@ vec3 boundedShadowTransmittanceMask(vec3 origin, vec3 direction,
         if (productionPaneOverflow)
             RT_DIAG_ADD(productionPaneStackFailureCount,
                 1u);
-        transmittance *= vec3(0.08);
+        // This is an invalid bounded path, not permission to invent 8% light.
+        return vec3(0.0);
+    }
+
+    vec3 transmittance = vec3(1.0);
+    uvec2 volumeIdentity[HORDE_RT_SHADOW_VOLUME_CAPACITY];
+    float volumeEntryDistances[HORDE_RT_SHADOW_VOLUME_CAPACITY];
+    vec4 volumeAttenuation[HORDE_RT_SHADOW_VOLUME_CAPACITY];
+    int volumeDepth = 0;
+    bool observedClosedVolumeEntry = false;
+    for (int crossing = 0; crossing < HORDE_RT_SHADOW_INTERFACE_CEILING; ++crossing)
+    {
+        if (crossing >= interfaceCount) break;
+        int nearest = -1;
+        for (int index = 0; index < interfaceCount; ++index)
+        {
+            if (interfaceDistances[index] < 0.0) continue;
+            bool choose = nearest < 0;
+            if (!choose)
+            {
+                uvec4 next = interfaceMetadata[index];
+                uvec4 previous = interfaceMetadata[nearest];
+                // At exactly coincident distances close before opening another
+                // volume. Stable identity makes this independent of BVH order.
+                bool tieFirst = next.z < previous.z ||
+                    (next.z == previous.z && (next.x < previous.x ||
+                    (next.x == previous.x && (next.y < previous.y ||
+                    (next.y == previous.y && next.w < previous.w)))));
+                choose = interfaceDistances[index] < interfaceDistances[nearest] ||
+                    (interfaceDistances[index] == interfaceDistances[nearest] && tieFirst);
+            }
+            if (choose) nearest = index;
+        }
+        if (nearest < 0) break;
+        float distance = interfaceDistances[nearest];
+        interfaceDistances[nearest] = -1.0;
+        uvec4 boundary = interfaceMetadata[nearest];
+        RtMaterialGpu material = rtMaterials.values[boundary.y];
+        transmittance *= clamp(
+            material.metallicRoughnessOcclusionTransmission.w, 0.0, 1.0);
+        if ((boundary.z & 2u) != 0u)
+        {
+            // A thin sheet has no volume path length; use its authored RGB tint.
+            transmittance *= clamp(material.baseColorFactor.rgb, vec3(0.0), vec3(1.0));
+            continue;
+        }
+        if ((boundary.z & 1u) != 0u)
+        {
+            if (volumeDepth >= volumeBudget)
+            {
+                RT_DIAG_ADD(shadowOverflowCount, 1u);
+                if (boundary.x == 8u)
+                    RT_DIAG_ADD(productionPaneStackFailureCount, 1u);
+                return vec3(0.0);
+            }
+            observedClosedVolumeEntry = true;
+            volumeIdentity[volumeDepth] = boundary.xy;
+            volumeEntryDistances[volumeDepth] = distance;
+            volumeAttenuation[volumeDepth] = vec4(
+                clamp(material.attenuationColor.rgb, vec3(0.0), vec3(1.0)),
+                material.iorThicknessAttenuationDistance.z);
+            ++volumeDepth;
+        }
+        else if (volumeDepth == 0 && !observedClosedVolumeEntry)
+        {
+            transmittance *= dielectricBeerLambert(material.attenuationColor.rgb,
+                distance, material.iorThicknessAttenuationDistance.z);
+            RT_DIAG_ADD(shadowImplicitOriginExitCount, 1u);
+        }
+        else if (volumeDepth == 0 ||
+                 any(notEqual(volumeIdentity[volumeDepth - 1], boundary.xy)))
+        {
+            RT_DIAG_ADD(unclosedVolumeCount, 1u);
+            RT_DIAG_ADD(shadowUnclosedVolumeCount, 1u);
+            RT_DIAG_ADD(shadowMismatchedExitCount, 1u);
+            if (volumeDepth == 0)
+                RT_DIAG_ADD(shadowMismatchEmptyCount, 1u);
+            if (boundary.x == 8u || (volumeDepth > 0 &&
+                volumeIdentity[volumeDepth - 1].x == 8u))
+                RT_DIAG_ADD(productionPaneStackFailureCount, 1u);
+            return vec3(0.0);
+        }
+        else
+        {
+            --volumeDepth;
+            vec4 attenuation = volumeAttenuation[volumeDepth];
+            transmittance *= dielectricBeerLambert(attenuation.rgb,
+                max(distance - volumeEntryDistances[volumeDepth], 0.0), attenuation.a);
+        }
+    }
+    if (volumeDepth > 0)
+    {
+        RT_DIAG_ADD(shadowFiniteEndpointVolumeCount, uint(volumeDepth));
+        for (int volume = 0; volume < volumeDepth; ++volume)
+        {
+            vec4 attenuation = volumeAttenuation[volume];
+            transmittance *= dielectricBeerLambert(attenuation.rgb,
+                max(maxDistance - volumeEntryDistances[volume], 0.0), attenuation.a);
+        }
     }
     return clamp(transmittance, vec3(0.0), vec3(1.0));
 }
+#endif
 
 float visibilityMask(vec3 origin, vec3 direction, float maxDistance, uint mask)
 {
@@ -763,12 +871,12 @@ float visibilityMask(vec3 origin, vec3 direction, float maxDistance, uint mask)
 vec3 sceneShadowTransmittanceMask(vec3 origin, vec3 direction,
                                   float maxDistance, uint mask)
 {
-    if (!genericTransmissionEnabled())
-    {
-        return vec3(visibilityMask(origin, direction, maxDistance, mask));
-    }
+#if HORDE_GENERIC_TRANSMISSION_VARIANT
     return boundedShadowTransmittanceMask(
         origin, direction, maxDistance, mask);
+#else
+    return vec3(visibilityMask(origin, direction, maxDistance, mask));
+#endif
 }
 
 vec3 offsetRayOrigin(HitInfo h, vec3 direction)

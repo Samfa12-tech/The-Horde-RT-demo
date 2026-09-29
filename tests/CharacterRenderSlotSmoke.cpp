@@ -645,6 +645,19 @@ int main()
                       hitDecodeSource.find("precise vec3 surfacePosition = objectToWorld * localPosition +") != std::string::npos &&
                       hitDecodeSource.find("h.position = surfacePosition;") != std::string::npos,
                       "transmitting triangle hits must reconstruct the geometric surface point before spawning dielectric rays");
+        const std::size_t shadowStart = lightingSource.find("vec3 boundedShadowTransmittanceMask(");
+        const std::size_t shadowEnd = lightingSource.find("float visibilityMask(", shadowStart);
+        const std::string selectedShadow = shadowStart != std::string::npos &&
+            shadowEnd != std::string::npos ? lightingSource.substr(shadowStart, shadowEnd - shadowStart) : "";
+        ok &= Require(!selectedShadow.empty() &&
+                      selectedShadow.find("rayQueryGetIntersectionTEXT(query, false)") != std::string::npos &&
+                      selectedShadow.find("distance - volumeEntryDistances[volumeDepth]") != std::string::npos &&
+                      selectedShadow.find("maxDistance - volumeEntryDistances[volume]") != std::string::npos &&
+                      selectedShadow.find("closedThickness") == std::string::npos &&
+                      selectedShadow.find("iorThicknessAttenuationDistance.y") == std::string::npos &&
+                      selectedShadow.find("vec3(0.08)") == std::string::npos &&
+                      selectedShadow.find("origin, 0.000001, direction, maxDistance") != std::string::npos,
+                      "selected glass shadows must measure finite geometric medium segments without authored half-thickness or scalar recovery light");
         ok &= Require(raygenSource.find(
                           "layout(std430, set = 0, binding = 10) readonly buffer SecondSkeletonVertices") !=
                           std::string::npos,

@@ -317,10 +317,11 @@ try {
     New-Item -ItemType Directory -Path $temporaryRoot | Out-Null
     $genericInclude = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalRayGenShader.inc'
     $legacyInclude = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalLegacyRayGenShader.inc'
-    # Compatibility pins reflect the September 30 corner-bias fix, not immutable phase-3d artifacts.
-    Assert-True ((Get-CanonicalTextHash $genericInclude) -eq 'd29d82df7d167568fa87833542594ab8ff5ee2b2b9523b4d9de0d0e71bb8d214') `
+    # Compatibility pins reflect September 30 geometric shadow transport;
+    # the independent fresh compiler check below still validates source identity.
+    Assert-True ((Get-CanonicalTextHash $genericInclude) -eq 'e9fd2aaf58f02cc4c324b6b7be5e2c7ad4ede2369376499fe2aae98b6aa41fd3') `
         'Compatibility generic include changed unexpectedly.'
-    Assert-True ((Get-CanonicalTextHash $legacyInclude) -eq '74a09bb23dc56def752f12a1265265ac136847ead6168bdc60944077f97ede81') `
+    Assert-True ((Get-CanonicalTextHash $legacyInclude) -eq 'a3ef23ee716bf1f2ba19171f13e715d5ec7fe631d62edac938416dbe934d8834') `
         'Compatibility legacy include changed unexpectedly.'
 
     $lfFixture = Join-Path $temporaryRoot 'canonical-lf-fixture.txt'
@@ -532,13 +533,13 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     & $compiler -Check -OutputDirectory $compatibilityGenericOutput
     if ($LASTEXITCODE -ne 0) { throw "Generic compatibility freshness failed with exit code $LASTEXITCODE." }
     Assert-True ((Get-RawFileHash (Join-Path $compatibilityGenericOutput 'minimal.rgen.spv')) -eq
-        '38feab15ed38059b0dfd56baaa16bb25f0e4dc61b1a47047c93a2415466beb92') `
+        '2b2e88b5b363925a9663798f529e578a47a8360cb37863782c5b27580c9cd94b') `
         'Compatibility generic SPIR-V words changed.'
     $compatibilityLegacyOutput = Join-Path $temporaryRoot 'compatibility-legacy'
     & $compiler -Legacy -Check -OutputDirectory $compatibilityLegacyOutput
     if ($LASTEXITCODE -ne 0) { throw "Legacy compatibility freshness failed with exit code $LASTEXITCODE." }
     Assert-True ((Get-RawFileHash (Join-Path $compatibilityLegacyOutput 'minimal.legacy.rgen.spv')) -eq
-        'f3720730760f6f4b4ead6c5cd0ddd79a33a23910647dd8dac596fa56007eabc7') `
+        '3f94d1547c68fa1750c2ab67506bd5f93a1b396096854633a440efdc5e444e4a') `
         'Compatibility legacy SPIR-V words changed.'
     Assert-True ((& git -C $repoRoot status --porcelain) -join "`n" -eq $worktreeStatusBefore) `
         'Temporary artifact compilation modified the worktree.'

@@ -1,0 +1,56 @@
+{
+  "sourceBase": "cbc135ffb7b98167a20a40a72b3e39b96cf36d34",
+  "branch": "codex/horde-1.6.1-engineering-pass",
+  "sourceDirty": true,
+  "note": "Production candidate and temporary investigation artifacts are separate. No publication or performance acceptance.",
+  "artifacts": [
+    {
+      "key": "androidDebug",
+      "path": "C:/Dev/tmp/horde-geometric-shadow-20260930/android/HordeLanternRT-geometric-debug-arm64.apk",
+      "sha256": "3de01bb86cc26c3c930ebe7af0f1fe760a2701de7f9c2031f81d3a794d323043",
+      "bytes": 82006662
+    },
+    {
+      "key": "androidUnsignedShipping",
+      "path": "C:/Dev/tmp/horde-geometric-shadow-20260930/android/HordeLanternRT-geometric-shipping-unsigned-arm64.apk",
+      "sha256": "214cee5b3f586353e5d861bf4d02a457d379a2986057fe8e5b031eea8e9cd946",
+      "bytes": 76337409
+    },
+    {
+      "key": "androidInvestigation",
+      "path": "C:/Dev/tmp/horde-geometric-shadow-20260930/probe/android/HordeLanternRT-geometric-shadow-probe-arm64.apk",
+      "sha256": "fc7ad292afd1b187da204c28828d84fb779d5917b81692be4734b003d8b6b8a0",
+      "bytes": 82021014
+    },
+    {
+      "key": "windowsDiagnosticMobile",
+      "path": "C:/Dev/tmp/horde-glass-corner-ab-20260930/candidate-stage/HordeLanternRT.geometric-mobile.exe",
+      "sha256": "d33bf67a6346430bb7288e3aaa0bc2d4f3cda206ee660ac32620582b1b6a47e4",
+      "bytes": 7991296
+    },
+    {
+      "key": "windowsDiagnosticHigh",
+      "path": "C:/Dev/tmp/horde-glass-corner-ab-20260930/candidate-stage/HordeLanternRT.geometric-high.exe",
+      "sha256": "630a2456ee4ed264114466fffb64977dae43da2443d0368237a21590420094da",
+      "bytes": 7991296
+    },
+    {
+      "key": "windowsSegmentInvestigation",
+      "path": "C:/Dev/tmp/horde-glass-corner-ab-20260930/candidate-stage/HordeLanternRT.geometric-shadow-probe.exe",
+      "sha256": "9394e5c6bf283702e12488c8e3c84004a8fa0f94d361ce0559d614dbe28518f3",
+      "bytes": 7991296
+    },
+    {
+      "key": "windowsComputeSegmentInvestigation",
+      "path": "C:/Dev/tmp/horde-glass-corner-ab-20260930/candidate-stage/HordeLanternRT.geometric-shadow-probe-compute.exe",
+      "sha256": "bd4e6bda9041fa1f45b38162b7cd8de2d95ba841808223bd41ee41069d82c372",
+      "bytes": 7991296
+    },
+    {
+      "key": "windowsPeakInvestigation",
+      "path": "C:/Dev/tmp/horde-glass-corner-ab-20260930/candidate-stage/HordeLanternRT.geometric-shadow-peak-probe.exe",
+      "sha256": "2283dfb3623f8803c1b7f61355c2d42349da048c39f189de0b8de3cbbf0ca79b",
+      "bytes": 7991296
+    }
+  ]
+}

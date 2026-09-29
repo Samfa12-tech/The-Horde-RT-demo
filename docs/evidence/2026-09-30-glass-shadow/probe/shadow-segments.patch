@@ -1,0 +1,116 @@
+diff --git a/android/app/src/main/cpp/android_probe_bridge.cpp b/android/app/src/main/cpp/android_probe_bridge.cpp
+index 6643d4b..94c6007 100644
+--- a/android/app/src/main/cpp/android_probe_bridge.cpp
++++ b/android/app/src/main/cpp/android_probe_bridge.cpp
+@@ -3099,6 +3099,18 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
+         ++context.capturePresentedFrames;
+         if (context.capturePresentedFrames == 12u)
+         {
++            // Investigation only: exact native bytes, not a colour-managed screenshot.
++            horde::vulkan::raytracing::PresentableTinyRtScene::StorageImageCapture probeCapture;
++            std::string probeDiagnostic;
++            if (context.rtScene.CaptureStorageImage(probeCapture, probeDiagnostic))
++            {
++                std::ofstream probeOutput(context.reportDirectory + "/glass-shadow-" +
++                    context.activeBenchmarkName + ".rgba", std::ios::binary);
++                probeOutput.write(reinterpret_cast<const char*>(&probeCapture.width), sizeof(probeCapture.width));
++                probeOutput.write(reinterpret_cast<const char*>(&probeCapture.height), sizeof(probeCapture.height));
++                probeOutput.write(reinterpret_cast<const char*>(probeCapture.rgba.data()),
++                    static_cast<std::streamsize>(probeCapture.rgba.size()));
++            }
+             WriteShowcaseDebugState(context, "capture-ready");
+             __android_log_print(ANDROID_LOG_INFO,
+                                 kTag,
+diff --git a/shaders/raytracing/include/rt_frame.glsl b/shaders/raytracing/include/rt_frame.glsl
+index 3b988b6..018c2bc 100644
+--- a/shaders/raytracing/include/rt_frame.glsl
++++ b/shaders/raytracing/include/rt_frame.glsl
+@@ -6,6 +6,66 @@
+ #include "rt_dielectric_transport.glsl"
+ #include "rt_atmosphere.glsl"
+ 
++#if HORDE_GENERIC_TRANSMISSION_VARIANT
++// Investigation-only native-storage records; removed before production.
++void investigationShadowSegment(int testCase)
++{
++    vec3 origin = vec3(-9.30, -0.20, -15.20);
++    vec3 direction = vec3(1.0, 0.0, 0.0);
++    float distance = 0.50;
++    if (testCase == 1) { direction = normalize(vec3(1.0, 1.0, 0.0)); distance = 0.60; }
++    if (testCase == 2) { origin.x = -9.10; distance = 0.30; }
++    if (testCase == 3) { distance = 0.20; }
++    if (testCase == 4) { origin.x = -9.15; distance = 0.05; }
++    if (testCase == 5) { origin.x = -9.2001; distance = 0.4001; }
++    if (testCase == 6) { origin.x = -9.101; distance = 0.002; }
++    vec3 measured = boundedShadowTransmittanceMask(origin, direction, distance, 0x01u);
++    float nearDistance = -1.0;
++    float farDistance = -1.0;
++    uint nearInstance = 0u, farInstance = 0u;
++    bool nearEntering = false, farEntering = false;
++    int crossingCount = 0;
++    rayQueryEXT probe;
++    rayQueryInitializeEXT(probe, topLevelAS, gl_RayFlagsNoOpaqueEXT, 0x01u,
++        origin, 0.000001, direction, distance);
++    while (rayQueryProceedEXT(probe))
++    {
++        if (rayQueryGetIntersectionTypeEXT(probe, false) !=
++            gl_RayQueryCandidateIntersectionTriangleEXT) continue;
++        uint instance = uint(rayQueryGetIntersectionInstanceCustomIndexEXT(probe, false));
++        if (instance != 9u) continue;
++        float t = rayQueryGetIntersectionTEXT(probe, false);
++        bool entering = rayQueryGetIntersectionFrontFaceEXT(probe, false);
++        ++crossingCount;
++        if (nearDistance < 0.0 || t < nearDistance)
++        { nearDistance = t; nearInstance = instance; nearEntering = entering; }
++        if (farDistance < 0.0 || t > farDistance)
++        { farDistance = t; farInstance = instance; farEntering = entering; }
++    }
++    RtInstanceMetadata instance = rtInstances.values[9];
++    uint materialIndex = rtPrimitives.values[instance.primitiveBase].materialIndex;
++    RtMaterialGpu material = rtMaterials.values[materialIndex];
++    float fields[25] = float[25](float(testCase), origin.x, origin.y, origin.z,
++        direction.x, direction.y, direction.z, distance, measured.r, measured.g,
++        measured.b, nearDistance, farDistance, float(crossingCount),
++        float(nearInstance), float(farInstance), nearEntering ? 1.0 : 0.0,
++        farEntering ? 1.0 : 0.0, float(materialIndex),
++        material.metallicRoughnessOcclusionTransmission.w,
++        material.attenuationColor.r, material.attenuationColor.g,
++        material.attenuationColor.b, material.iorThicknessAttenuationDistance.z,
++        float(material.materialFlags.x));
++    for (int i = 0; i < 25; ++i)
++    {
++        uint bits = floatBitsToUint(fields[i]);
++        vec3 low = vec3(uvec3(bits & 255u, (bits >> 8) & 255u, (bits >> 16) & 255u)) / 255.0;
++        vec3 high = vec3(float(bits >> 24) / 255.0, 0.0, 0.0);
++        if (controls.outputRedBlueSwap > 0.5) { low = low.bgr; high = high.bgr; }
++        imageStore(outputImage, ivec2(i * 2, testCase), vec4(low, 1.0));
++        imageStore(outputImage, ivec2(i * 2 + 1, testCase), vec4(high, 1.0));
++    }
++}
++#endif
++
+ void main()
+ {
+ #ifdef HORDE_RT_COMPUTE_ENTRY
+@@ -14,6 +74,10 @@ void main()
+     {
+         return;
+     }
++#endif
++#if HORDE_GENERIC_TRANSMISSION_VARIANT
++    // Owners at x=60 write the reserved rows; no other invocation races them.
++    if (HORDE_RT_PIXEL_ID.x < 50u && HORDE_RT_PIXEL_ID.y < 7u) return;
+ #endif
+     vec2 uv = (vec2(HORDE_RT_PIXEL_ID.xy) + vec2(0.5)) / vec2(HORDE_RT_PIXEL_EXTENT.xy);
+     float aspect = float(HORDE_RT_PIXEL_EXTENT.x) / max(float(HORDE_RT_PIXEL_EXTENT.y), 1.0);
+@@ -69,6 +133,10 @@ void main()
+     color = color * (0.62 + 0.38 * vignette);
+     color += vec3(0.46, 0.012, 0.004) * controls.damageFlash * (0.28 + 0.72 * (1.0 - vignette));
+     color = linearToSrgb(toneMapAces(max(color, vec3(0.0)) * controls.outputExposure));
++#if HORDE_GENERIC_TRANSMISSION_VARIANT
++    if (HORDE_RT_PIXEL_ID.x == 60u && HORDE_RT_PIXEL_ID.y < 7u)
++        investigationShadowSegment(int(HORDE_RT_PIXEL_ID.y));
++#endif
+     // The RT storage image is RGBA, while common Android/Windows swapchains are BGRA and receive a raw image copy.
+     if (controls.outputRedBlueSwap > 0.5)
+     {
