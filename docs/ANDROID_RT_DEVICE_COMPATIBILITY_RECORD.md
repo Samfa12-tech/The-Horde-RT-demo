@@ -33,6 +33,17 @@ motion acceptance or proof of zero glass errors: the export does not contain
 per-frame glass counters. No matched Shipping performance claim is made.
 [Exact artifacts, counters and open gates](evidence/2026-09-30-glass-corner/README.md).
 
+September30 follow-on, same **SM-S948B**: ordinary Debug APK
+`ea1c6265e49713cc3f5bd3061e38ddd64054b10a614d3ff24dbe949e016503e3`
+adds only duplicate-candidate suppression on transmissive BLAS geometries.
+Run064746 passes exact installed-byte matching, seven captures and Home/resume
+at75%, strict ASTC/native RT. All7PNGs are byte-identical to previousfd11d9db;
+phone counters are unchanged. On RTX, the corresponding flag-only comparison
+removes the reproduced Mobile4759/1110/8166 and High0/46/0 shadow overflows.
+That is not a performance claim, whole-glass pass or S24/S25 evidence.
+Unsigned Release built and packaged Shipping SPIR-V passed; not installed.
+[Exact duplicate-candidate evidence](evidence/2026-09-30-glass-candidates/README.md).
+
 ## September 27 history (preserved)
 
 Newest local installation: **SM-S948B**, isolated normal-range Debug APK

@@ -634,6 +634,11 @@ int main()
             root / "android/app/src/test/java/com/samfa12/hordelanternrt/ContextualControlsLayoutTest.java");
         const std::string androidValidationSource =
             ReadTextFile(root / "tools/run-android-showcase-validation.ps1");
+        ok &= Require(sceneSource.find(
+                          "geometry.flags = transmissive\n"
+                          "                ? VK_GEOMETRY_NO_DUPLICATE_ANY_HIT_INVOCATION_BIT_KHR\n"
+                          "                : VK_GEOMETRY_OPAQUE_BIT_KHR;") != std::string::npos,
+                      "transmissive BLAS geometry must suppress duplicate candidates without making glass opaque");
         ok &= Require(raygenSource.find(
                           "layout(std430, set = 0, binding = 10) readonly buffer SecondSkeletonVertices") !=
                           std::string::npos,

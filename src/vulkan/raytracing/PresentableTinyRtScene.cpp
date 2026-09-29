@@ -2954,9 +2954,12 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
             const bool transmissive =
                 (materialMetadata[primitive.materialIndex].materialFlags[0] &
                  static_cast<std::uint32_t>(RtMaterialFlag::Transmission)) != 0u;
-            // Let rayQuery NoOpaque filtering see physical dielectric
-            // interfaces while retaining the fast opaque path for metal/wood.
-            geometry.flags = transmissive ? 0u : VK_GEOMETRY_OPAQUE_BIT_KHR;
+            // Transparent-shadow accumulation is not idempotent: Vulkan may
+            // otherwise report the same triangle candidate more than once.
+            // Preserve non-opaque dielectric filtering and the opaque fast path.
+            geometry.flags = transmissive
+                ? VK_GEOMETRY_NO_DUPLICATE_ANY_HIT_INVOCATION_BIT_KHR
+                : VK_GEOMETRY_OPAQUE_BIT_KHR;
             geometry.geometry.triangles.sType =
                 VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
             geometry.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;

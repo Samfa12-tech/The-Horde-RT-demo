@@ -1,0 +1,12 @@
+Internal ctest changing into directory: C:/Dev/tmp/horde-phase3-native-20260923
+Test project C:/Dev/tmp/horde-phase3-native-20260923
+    Start 33: horde_rt_static_gltf_asset_tests
+1/3 Test #33: horde_rt_static_gltf_asset_tests .......   Passed    0.17 sec
+    Start 34: horde_rt_production_prop_asset_tests
+2/3 Test #34: horde_rt_production_prop_asset_tests ...   Passed    6.43 sec
+    Start 75: horde_rt_character_render_slot_smoke
+3/3 Test #75: horde_rt_character_render_slot_smoke ...   Passed    4.39 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =  11.00 sec

@@ -1,6 +1,6 @@
 # 1.6.1 recovery handoff
 
-Updated 2026-09-27. Branch: `codex/horde-1.6.1-engineering-pass`.
+Updated 2026-09-30. Branch: `codex/horde-1.6.1-engineering-pass`.
 Engineering work has resumed by explicit owner instruction; the goal is not complete. See [programme scope](ENGINEERING_1_6_1_PLAN.md)
 and [latest lantern evidence](ENGINEERING_1_6_1_LANTERN_BENCHMARK_2026-09-20.md).
 
@@ -28,7 +28,36 @@ without loosening tolerance. Include live motion, not just frozen extreme poses.
 Music, consent-based reporting, resource work and final gates remain in scope;
 licensing, signing recovery and publication remain owner-controlled.
 
-### Current Phase 3 checkpoint
+### Current Phase 4 checkpoint
+
+Two bounded physical correctness defects are demonstrated, with accepted player
+geometry and animation unchanged:
+
+- Near-corner origin bias/query minimum: `3b92329` repairs skipped pane exits.
+  SM-S948B three-pose primary-volume failures10/8/1 become0/0/0; isolated
+  transport still has one separate interface-budget failure. Seven captures and
+  lifecycle pass. Live reveal completes600/600 identity-joined frames, but its
+  export does not contain per-frame glass counts or visual-motion acceptance.
+- Duplicate transparent candidates: a flag-only shared BLAS change eliminates
+  RTX Mobile shadow failures4759/1110/8166 and High0/46/0. Exact phone APK
+  `ea1c6265...` passes seven captures/lifecycle, all seven PNGs byte-identical to
+  preceding `fd11d9db...`. No shader/mask/material/budget change in this slice.
+
+`bbb00f0` separately fixes glass capture-zone expectations and test-only Debug
+installation. Push36628423833 and PR36628429974 are green for `3b92329`.
+Keep exact older evidence attached to its original artifact, not promoted to a
+new full pass. [Corner proof](evidence/2026-09-30-glass-corner/README.md) and
+[duplicate-candidate proof](evidence/2026-09-30-glass-candidates/README.md).
+
+Phase4 is **not complete**: remaining primary budget/certified recoveries,
+geometric shadow attenuation, live visual glass, matched Shipping performance,
+changed-image reconciliation and backend parity are open. Standard comparisons
+retain12/13 byte-identical images; the affected finale fails the old pixel gate,
+which has not been loosened. No performance gain or S24/S25 pass is claimed.
+Preserve the full music/reporting/resource/pacing/final-matrix scope below.
+Audio/haptic manual revalidation required: **NO** for these RT-only fixes.
+
+### Earlier Phase 3 checkpoint (September 27)
 
 Promoted native source is backed up on GitHub at7f35e2f; portable CI asset-fetch
 follow-upd7b24fb has green push36296744145/PR36296747147 (45portable,11Vulkan-host,
