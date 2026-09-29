@@ -63,8 +63,8 @@ $checkpointZones = @{
     "player-body-downward-cut" = "opening"
     "player-body-upward-slice" = "opening"
     "glass-transport" = "skylight-chamber"
-    "glass-fire-transport" = "opening"
-    "glass-tinted-transport" = "opening"
+    "glass-fire-transport" = "skylight-chamber"
+    "glass-tinted-transport" = "skylight-chamber"
     "glass-millimetre-closed" = "skylight-chamber"
     "glass-edge-fresnel" = "skylight-chamber"
     "pbr-sword-closeup" = "opening"
@@ -634,7 +634,10 @@ try {
         throw "Local APK package does not match the requested validation target $packageName."
     }
     $apkHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $apk).Hash.ToLowerInvariant()
-    if (-not $SkipInstall) { Invoke-AdbText @("install", "-r", $apk) | Set-Content -LiteralPath (Join-Path $outputDirectory "install.txt") }
+    # This runner targets the verified Debug package only. ABI-targeted Gradle
+    # builds can be testOnly; explicitly allow that developer artifact, while
+    # retaining app data and the pre-install package/hash checks.
+    if (-not $SkipInstall) { Invoke-AdbText @("install", "-r", "-t", $apk) | Set-Content -LiteralPath (Join-Path $outputDirectory "install.txt") }
     $installedApkHash = Get-InstalledApkSha256
     if ($installedApkHash -ne $apkHash) {
         throw "Installed base APK SHA-256 $installedApkHash does not match local debug APK $apkHash."

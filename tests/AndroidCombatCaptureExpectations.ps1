@@ -4,6 +4,18 @@ $runner = Join-Path $PSScriptRoot '../tools/run-android-showcase-validation.ps1'
 $tokens = $null; $parseErrors = $null
 $ast = [Management.Automation.Language.Parser]::ParseFile($runner, [ref]$tokens, [ref]$parseErrors)
 if ($parseErrors.Count) { throw 'Android capture runner did not parse' }
+$zoneMap = @($ast.FindAll({ param($node)
+    $node -is [Management.Automation.Language.AssignmentStatementAst] -and
+    $node.Left.Extent.Text -ceq '$checkpointZones'
+}, $false))
+if ($zoneMap.Count -ne 1) { throw 'Expected one explicit capture zone map' }
+. ([scriptblock]::Create($zoneMap[0].Extent.Text))
+foreach ($name in @('glass-transport', 'glass-fire-transport', 'glass-tinted-transport',
+        'glass-millimetre-closed', 'glass-edge-fresnel')) {
+    if ($checkpointZones[$name] -cne 'skylight-chamber') {
+        throw "$name must match the real shared-simulation staged zone"
+    }
+}
 $assignments = @($ast.FindAll({ param($node)
     $node -is [Management.Automation.Language.AssignmentStatementAst] -and
     $node.Left.Extent.Text -match '^\$combatCaptureExpectations(?:\[|$)'

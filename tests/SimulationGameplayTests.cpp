@@ -6,6 +6,7 @@
 
 #include "gameplay/simulation/BoundedTransportQueue.h"
 #include "gameplay/simulation/GameSimulation.h"
+#include "gameplay/DevelopmentCheckpointSimulation.h"
 
 namespace
 {
@@ -1056,6 +1057,18 @@ int main()
           NearlyEqual(pausedRetry.Snapshot().playerX, -33.70f) &&
           NearlyEqual(pausedRetry.Snapshot().playerZ, -15.20f),
           "paused retry must consume the competing attack exactly once, discard stale events, and clear catch-up time");
+
+    for (const auto name : {"glass-transport", "glass-fire-transport",
+                            "glass-tinted-transport", "glass-millimetre-closed",
+                            "glass-edge-fresnel"})
+    {
+        GameSimulation glassCheckpoint(ProductionGameSimulationConfig());
+        const auto* checkpoint = FindDevelopmentCheckpoint(name);
+        check(checkpoint != nullptr &&
+              StageDevelopmentCheckpointSimulation(glassCheckpoint, *checkpoint) &&
+              glassCheckpoint.Snapshot().zone == ShowcaseZone::SkylightChamber,
+              "glass captures use the staged camera's skylight zone, not the borrowed lighting preset's opening zone");
+    }
 
     if (!passed)
     {
