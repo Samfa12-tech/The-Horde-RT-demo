@@ -536,6 +536,21 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
                 h.attenuationColor = clamp(staticMaterial.attenuationColor.rgb,
                                             vec3(0.0), vec3(1.0));
                 h.materialFlags = staticMaterial.materialFlags.x;
+#if HORDE_GENERIC_TRANSMISSION_VARIANT
+                if ((h.materialFlags & kRtMaterialFlagTransmission) != 0u)
+                {
+                    // Spawn dielectric paths on the intersected triangle, not
+                    // origin+direction*t: cancellation can place a near-corner
+                    // entry outside its adjacent micrometre-scale exit. Keep
+                    // object-space interpolation and add translation last.
+                    precise vec3 localPosition = v0.position.xyz +
+                        (bary.x * (v1.position.xyz - v0.position.xyz) +
+                         bary.y * (v2.position.xyz - v0.position.xyz));
+                    precise vec3 surfacePosition = objectToWorld * localPosition +
+                        rayQueryGetIntersectionObjectToWorldEXT(query, true)[3];
+                    h.position = surfacePosition;
+                }
+#endif
                 vec3 emission = emissiveSample * staticMaterial.emissiveFactorStrength.rgb *
                                 staticMaterial.emissiveFactorStrength.w;
                 h.emissive = max(emission.r, max(emission.g, emission.b));

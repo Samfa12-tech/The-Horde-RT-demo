@@ -1,0 +1,12 @@
+C:\Users\sam_s\AppData\Local\Temp\horde-raygen-check-0f825095480e4f198a5cacbf04b58666\minimal.rgen.resolved
+Raygen check artifacts: C:\Users\sam_s\AppData\Local\Temp\horde-raygen-check-0f825095480e4f198a5cacbf04b58666
+Source dependency SHA-256: f1cd3334839023373ae7a9f1aefe1b822373f985398fdaad2b07eeddabeddd49; embedded include SHA-256: bd4a4083051bc1de6ab7191e2ee32a4b57fecd47cca8f25fcf31d3a7f5a36d18
+SPIR-V bytes: 228136; words: 57034; instructions: 13440; branch operations: 695; loops: 10; selection merges: 290; SHA-256: e0e9509ab9713a30dec2edcee078f37ea05da5730ccb85528791f1734c57728c
+Raygen optimizer shape: functions=60; calls=193; ray-query sites=3
+Embedded raygen SPIR-V words match the compiled shader.
+C:\Users\sam_s\AppData\Local\Temp\horde-raygen-check-0f825095480e4f198a5cacbf04b58666\legacy\minimal.legacy.rgen.resolved
+Raygen check artifacts: C:\Users\sam_s\AppData\Local\Temp\horde-raygen-check-0f825095480e4f198a5cacbf04b58666\legacy
+Source dependency SHA-256: 5cea7cd3e85ec8e26cf309457b08663c10ed6a2dcc8e4fadf93d1f9c67524f60; embedded include SHA-256: 04003c675d34d6ce22ee5313c6cc75a0a1f51c17290c11049e108bd72e90539d
+SPIR-V bytes: 505248; words: 126312; instructions: 27715; branch operations: 3715; loops: 49; selection merges: 1519; SHA-256: f3720730760f6f4b4ead6c5cd0ddd79a33a23910647dd8dac596fa56007eabc7
+Raygen optimizer shape: functions=1; calls=0; ray-query sites=23
+Embedded raygen SPIR-V words match the compiled shader.

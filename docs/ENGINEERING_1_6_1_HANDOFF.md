@@ -30,6 +30,22 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### Current Phase 4 checkpoint
 
+Production surface-position repair now follows the isolated path evidence:
+static transmitting hits reconstruct the triangle barycentric point in object
+space, transform linearly and add translation last. No epsilon/material/geometry/
+physical-budget changes. [Exact new phone/RTX evidence](evidence/2026-09-30-glass-surface/README.md)
+records Debug APK457641fd,7 captures/Home-resume, MSVC3/3, both quality builds,
+Android Debug/unsigned Release and actual Shipping SPIR-V containment. Phone
+raised-view opaque-terminal reason disappears (recoveries528->527, mask3->2).
+The isolated budget failure remains1; grazing recoveries30081->30703 remain open.
+RTX standard12/13 images are byte-identical; finale24 changed pixels/max89 fails
+the unchanged pixel gate. All24 focused captures complete, but backend parity
+still fails raised/low-parry/grazing. No corrected pixels are forced back to the
+buggy baseline. Generic module footprint increases255 words (explicit narrow
+footprint-ceiling revision); physical4/8 interfaces stay fixed. Next resolve
+contact/budget admission, geometric shadow attenuation and live glass, before
+Shipping performance/backend parity. Accepted player work remains untouched.
+
 September30 continuation from pushed `632322d`: remaining recoveries isolated,
 not another broad rewrite. [Exact phone/RTX path evidence](evidence/2026-09-30-glass-recovery/README.md)
 separates real Mobile interface exhaustion (including two TIR events before a

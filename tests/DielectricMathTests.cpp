@@ -419,6 +419,33 @@ void TestRoughClosedVolumeTransmissionReachesPairedBoundary()
           "rough reflection and exit lobes cannot cross the physical ideal interface hemisphere at grazing angles");
 }
 
+void TestRecordedTriangleSurfacePointKeepsMicrometreExit()
+{
+    // Exact SM-S948B pixel(193,1537), cap59 -> side57. The storage-image
+    // probe records both surface points and the adjacent edge. These are
+    // float32 world coordinates, not a generic hardware error-bound claim.
+    const Vec3 rayPoint{-11.275285720825195f, 0.7012073397636414f, -15.045056343078613f};
+    const Vec3 surfacePoint{-11.275285720825195f, 0.701207160949707f, -15.045053482055664f};
+    const Vec3 edgeAnchor{-11.264504432678223f, 0.6987274885177612f, -15.064215660095215f};
+    const auto inwardDistance = [&](const Vec3& point) {
+        // Relative subtraction and double arithmetic isolate the recorded
+        // geometric error rather than rounding this tiny plane test again.
+        return 0.8439831927183018 * (double(point.x) - edgeAnchor.x) -
+            0.1941153799393518 * (double(point.y) - edgeAnchor.y) +
+            0.5000115895457053 * (double(point.z) - edgeAnchor.z);
+    };
+    const double sideDistance = inwardDistance(surfacePoint);
+    Check(inwardDistance(rayPoint) < 0.0 && sideDistance > 0.0,
+          "ray-t reconstruction can be outside an adjacent pane side while its triangle surface point remains inside");
+    const Vec3 outgoing{-0.7785452008247375f, -0.6073121428489685f, 0.15823812782764435f};
+    const double outwardSpeed = -(0.8439831927183018 * outgoing.x -
+        0.1941153799393518 * outgoing.y + 0.5000115895457053 * outgoing.z);
+    const double sideExitDistance = sideDistance / outwardSpeed;
+    Check(sideExitDistance > horde::vulkan::raytracing::kDielectricRayMinimumDistance &&
+              sideExitDistance < 0.00001,
+          "the captured triangle surface point retains a real micrometre-scale adjacent exit above the unchanged query minimum");
+}
+
 void TestBoundedTirAndWaterTerminationContracts()
 {
     Check(ResolveDielectricInterfaceBudget(1u, 8u) ==
@@ -559,6 +586,7 @@ int main()
     TestMillimetreScaleRayAdvance();
     TestGenericShadowOriginKeepsMillimetreClearance();
     TestClosedPaneEntryNearEdgeKeepsExitReachable();
+    TestRecordedTriangleSurfacePointKeepsMicrometreExit();
     TestRoughClosedVolumeTransmissionReachesPairedBoundary();
     TestBoundedTirAndWaterTerminationContracts();
     TestSelfHitClassificationUsesBoundedEpsilon();

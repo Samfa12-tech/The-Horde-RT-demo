@@ -639,6 +639,12 @@ int main()
                           "                ? VK_GEOMETRY_NO_DUPLICATE_ANY_HIT_INVOCATION_BIT_KHR\n"
                           "                : VK_GEOMETRY_OPAQUE_BIT_KHR;") != std::string::npos,
                       "transmissive BLAS geometry must suppress duplicate candidates without making glass opaque");
+        ok &= Require(hitDecodeSource.find("#if HORDE_GENERIC_TRANSMISSION_VARIANT\n") != std::string::npos &&
+                      hitDecodeSource.find("if ((h.materialFlags & kRtMaterialFlagTransmission) != 0u)") != std::string::npos &&
+                      hitDecodeSource.find("precise vec3 localPosition = v0.position.xyz +") != std::string::npos &&
+                      hitDecodeSource.find("precise vec3 surfacePosition = objectToWorld * localPosition +") != std::string::npos &&
+                      hitDecodeSource.find("h.position = surfacePosition;") != std::string::npos,
+                      "transmitting triangle hits must reconstruct the geometric surface point before spawning dielectric rays");
         ok &= Require(raygenSource.find(
                           "layout(std430, set = 0, binding = 10) readonly buffer SecondSkeletonVertices") !=
                           std::string::npos,

@@ -2,6 +2,21 @@
 
 Last updated: 2026-09-30
 
+## September 30: triangle-surface position repair (local SM-S948B evidence)
+
+Exact ordinary Debug APK457641fdec90e3cfda220934060c34413014e8aeafe64f8b50c0969c465e3570,
+installed/pulled back identically, run080757: Android16/Adreno840/driver2150932499,
+native pipeline RT, strict ASTC,75%/1080x2235. All7 deterministic captures and
+Home/resume complete. Raised/look-up opaque-terminal reason disappears;
+certified recoveries528->527, mask3->2, consistent with the prior measured missed
+exit. Isolated transport overflow1 and80 budget recoveries remain; grazing
+recoveries30081->30703 remain unaccepted contact/path work. All shadow overflows0.
+No budgets, materials, player geometry, animation or diagnostics are changed.
+Unsigned Shipping APKc02b0815 builds/packages but is not installed/published.
+No live glass, sustained performance, phone compute parity or S24/S25 claim.
+Stable/owner-accepted candidate packages and data remain untouched.
+[Artifacts, images, unchanged failing gates and remaining work](evidence/2026-09-30-glass-surface/README.md).
+
 ## September 30: remaining glass path probes (local SM-S948B evidence)
 
 Exact **SM-S948B**, Android16/Adreno840/driver2150932499, native pipeline RT,
