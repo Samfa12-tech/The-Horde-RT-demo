@@ -346,9 +346,8 @@ void TestMillimetreScaleRayAdvance()
     const Vec3 advanced = AdvanceDielectricRayOrigin(
         Vec3{0.0f, 0.0f, 0.0f}, Vec3{-1.0f, 0.0f, 0.0f},
         grazingDirection, epsilon);
-    Check(advanced.x > epsilon && advanced.x < epsilon * 1.10f &&
-              advanced.z > epsilon * 0.99f,
-          "grazing entry uses the bounded normal-aware bias and remains far below a one-millimetre wall");
+    Check(NearlyEqual(advanced.x, epsilon, epsilon * 0.00001f) && advanced.z == 0.0f,
+          "grazing entry uses bounded normal-only bias without moving along a nearby side edge");
 }
 
 void TestGenericShadowOriginKeepsMillimetreClearance()
@@ -368,6 +367,24 @@ void TestGenericShadowOriginKeepsMillimetreClearance()
           "generic shadow origin cannot jump a 1.5 mm cage-to-glass clearance");
     Check(NearlyEqual(legacy, Vec3{position.x - 0.004f, position.y, position.z}),
           "legacy-inactive shadow origin retains the reviewed four-millimetre normal offset");
+}
+
+void TestClosedPaneEntryNearEdgeKeepsExitReachable()
+{
+    // A thick pane still has arbitrarily short valid paths near its side edge.
+    // Corridor-scale bias cannot be justified by comparing only wall thickness.
+    constexpr float sideBoundary = 0.08f;
+    const Vec3 entry{sideBoundary - 0.000012f, 0.0f, 0.0f};
+    const Vec3 outward{0.0f, -1.0f, 0.0f};
+    const Vec3 transmitted{0.6f, 0.8f, 0.0f};
+    const float epsilon = DielectricRayEpsilon(Vec3{-35.03f, 0.16f, -17.3f}, 1.69f);
+    const Vec3 advanced = AdvanceDielectricRayOrigin(entry, outward, transmitted, epsilon);
+    Check(advanced.x == entry.x && advanced.y > 0.0f && advanced.y < 0.00308f,
+          "entry bias must stay inside a closed pane instead of stepping laterally beyond its side exit");
+    const float sideExitDistance = (sideBoundary - advanced.x) / transmitted.x;
+    Check(sideExitDistance > horde::vulkan::raytracing::kDielectricRayMinimumDistance &&
+              sideExitDistance < epsilon * 0.5f,
+          "a valid corner exit can precede half the normal bias; the next query must not skip it");
 }
 
 void TestRoughClosedVolumeTransmissionReachesPairedBoundary()
@@ -541,6 +558,7 @@ int main()
     TestMobileAndHighShadowBounds();
     TestMillimetreScaleRayAdvance();
     TestGenericShadowOriginKeepsMillimetreClearance();
+    TestClosedPaneEntryNearEdgeKeepsExitReachable();
     TestRoughClosedVolumeTransmissionReachesPairedBoundary();
     TestBoundedTirAndWaterTerminationContracts();
     TestSelfHitClassificationUsesBoundedEpsilon();

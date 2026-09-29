@@ -78,7 +78,7 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     HitInfo reflectedHit = traceScene(
         advanceDielectricRayOrigin(firstHit.position, firstOutward,
                                    reflectionDirection, reflectionEpsilon),
-        reflectionDirection, 12.0, 0x37u, reflectionEpsilon * 0.5,
+        reflectionDirection, 12.0, 0x37u, kDielectricRayMinimumDistance,
         false, false);
     float reflectedLocalDistance = reflectedHit.t;
     reflectedHit.t += firstHit.t;
@@ -377,7 +377,7 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
             dot(nextOrigin - currentHit.position, transmissionDirection), 0.0);
         HitInfo nextHit = traceScene(
             nextOrigin, transmissionDirection, 10000.0, 0x23u,
-            epsilon * 0.5, false, false);
+            kDielectricRayMinimumDistance, false, false);
         nextHit.t += advancedDistance;
         totalDistance += nextHit.t;
         currentHit = nextHit;
@@ -445,7 +445,7 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     HitInfo reflectedHit = traceScene(
         advanceDielectricRayOrigin(firstHit.position, firstOutward,
                                    reflectionDirection, reflectionEpsilon),
-        reflectionDirection, 12.0, 0x37u, reflectionEpsilon * 0.5,
+        reflectionDirection, 12.0, 0x37u, kDielectricRayMinimumDistance,
         false, false);
     float reflectedLocalDistance = reflectedHit.hit ? reflectedHit.t : 12.0;
     reflectedHit.t += firstHit.t;
@@ -667,7 +667,7 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
             dot(nextOrigin - currentHit.position, transmissionDirection), 0.0);
         HitInfo nextHit = traceScene(
             nextOrigin, transmissionDirection, 10000.0, 0x23u,
-            epsilon * 0.5, false, false);
+            kDielectricRayMinimumDistance, false, false);
         nextHit.t += advancedDistance;
         totalDistance += nextHit.t;
         currentHit = nextHit;

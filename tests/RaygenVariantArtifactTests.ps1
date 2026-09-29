@@ -12,7 +12,9 @@ $abiDefinitionPath = Join-Path $repoRoot 'src\vulkan\raytracing\RtSceneAbi.def'
 $generatedAbiPath = Join-Path $repoRoot 'shaders\raytracing\include\rt_scene_abi.generated.glsl'
 $diagnosticsPath = Join-Path $repoRoot 'shaders\raytracing\include\rt_diagnostics.glsl'
 $variantConfigPath = Join-Path $repoRoot 'shaders\raytracing\include\rt_variant_config.glsl'
+$dielectricCommonPath = Join-Path $repoRoot 'shaders\raytracing\include\rt_dielectric_common.glsl'
 $transportPath = Join-Path $repoRoot 'shaders\raytracing\include\rt_dielectric_transport.glsl'
+$dielectricMathPath = Join-Path $repoRoot 'src\vulkan\raytracing\DielectricMath.h'
 $lightingPath = Join-Path $repoRoot 'shaders\raytracing\include\rt_lighting.glsl'
 $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) ('horde-raygen-artifacts-' + [guid]::NewGuid().ToString('N'))
 $worktreeStatusBefore = (& git -C $repoRoot status --porcelain) -join "`n"
@@ -158,6 +160,48 @@ function Get-BracedFunctionBody {
     throw "Missing preprocessed function definition: $FunctionName"
 }
 
+function Get-DielectricTransportQueryArguments {
+    param([string]$TransportSource)
+
+    $queries = [System.Collections.Generic.List[object]]::new()
+    foreach ($functionName in @('shadeBoundedDielectric', 'shadeProductionBoundedDielectric')) {
+        $body = Get-BracedFunctionBody -Source $TransportSource -FunctionName $functionName
+        $bodyOffset = $TransportSource.IndexOf($body, [StringComparison]::Ordinal)
+        foreach ($query in @(
+            @{ Name = 'reflection'; Pattern = '(?s)\bHitInfo\s+reflectedHit\s*=\s*traceScene\s*\(\s*advanceDielectricRayOrigin\s*\([^)]*\)\s*,\s*reflectionDirection\s*,\s*[^,]+,\s*[^,]+,\s*(?<minimum>[^,]+),\s*[^,]+,\s*[^)]+\)' },
+            @{ Name = 'continuation'; Pattern = '(?s)\bHitInfo\s+nextHit\s*=\s*traceScene\s*\(\s*nextOrigin\s*,\s*transmissionDirection\s*,\s*[^,]+,\s*[^,]+,\s*(?<minimum>[^,]+),\s*[^,]+,\s*[^)]+\)' })) {
+            $matches = [regex]::Matches($body, $query.Pattern)
+            Assert-True ($matches.Count -eq 1) "$functionName must contain exactly one $($query.Name) query with the expected named origin and direction."
+            $minimum = $matches[0].Groups['minimum']
+            $queries.Add([pscustomobject]@{
+                FunctionName = $functionName
+                QueryName = $query.Name
+                MinimumArgument = $minimum.Value.Trim()
+                MinimumOffset = $bodyOffset + $minimum.Index
+                MinimumLength = $minimum.Length
+            })
+        }
+    }
+    return @($queries)
+}
+
+function Assert-DielectricRayMinimumDistanceContract {
+    param([string]$TransportSource, [string]$GlslCommonSource, [string]$CppMathSource)
+
+    Assert-True ($GlslCommonSource -match '(?m)^const\s+float\s+kDielectricRayMinimumDistance\s*=\s*0\.000001\s*;') `
+        'GLSL dielectric minimum query distance must remain the independent 1 µm constant.'
+    Assert-True ($CppMathSource -match '(?m)^inline\s+constexpr\s+float\s+kDielectricRayMinimumDistance\s*=\s*0\.000001f\s*;') `
+        'CPU dielectric minimum query distance must remain the independent 1 µm constant.'
+
+    $queries = @(Get-DielectricTransportQueryArguments -TransportSource $TransportSource)
+    Assert-True ($queries.Count -eq 4) 'Both dielectric transport routes must retain all four independently bounded ray queries.'
+    foreach ($query in $queries) {
+        Assert-True ($query.MinimumArgument -eq 'kDielectricRayMinimumDistance') `
+            "$($query.FunctionName) $($query.QueryName) query must use the independent minimum query distance."
+    }
+    return $queries
+}
+
 function Assert-MatrixRouteBudget {
     param(
         [string]$PreprocessedSource,
@@ -242,7 +286,21 @@ try {
         Assert-True ($variantConfig.Contains($expectedConstant)) "Missing compile-time matrix budget: $expectedConstant"
     }
     $transport = Get-Content -LiteralPath $transportPath -Raw
+    $dielectricCommon = Get-Content -LiteralPath $dielectricCommonPath -Raw
+    $dielectricMath = Get-Content -LiteralPath $dielectricMathPath -Raw
     $lighting = Get-Content -LiteralPath $lightingPath -Raw
+    $dielectricQueries = @(Assert-DielectricRayMinimumDistanceContract -TransportSource $transport `
+        -GlslCommonSource $dielectricCommon -CppMathSource $dielectricMath
+    )
+    foreach ($dielectricQuery in $dielectricQueries) {
+        $mutatedTransport = $transport.Substring(0, $dielectricQuery.MinimumOffset) +
+            'epsilon * 0.5' +
+            $transport.Substring($dielectricQuery.MinimumOffset + $dielectricQuery.MinimumLength)
+        Assert-Throws {
+            Assert-DielectricRayMinimumDistanceContract -TransportSource $mutatedTransport `
+                -GlslCommonSource $dielectricCommon -CppMathSource $dielectricMath
+        } "A $($dielectricQuery.FunctionName) $($dielectricQuery.QueryName) query using epsilon/2 must fail the independent-minimum contract."
+    }
     Assert-True ($transport.Contains('HORDE_RT_DIELECTRIC_INTERFACE_CEILING') -and
         $transport.Contains('HORDE_RT_DIELECTRIC_VOLUME_CAPACITY') -and
         $lighting.Contains('HORDE_RT_SHADOW_INTERFACE_CEILING') -and
@@ -259,9 +317,10 @@ try {
     New-Item -ItemType Directory -Path $temporaryRoot | Out-Null
     $genericInclude = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalRayGenShader.inc'
     $legacyInclude = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalLegacyRayGenShader.inc'
-    Assert-True ((Get-CanonicalTextHash $genericInclude) -eq '7bac11146c3ac632711147005757406025f39ae71f32ed0236908a7c453fbd03') `
+    # Compatibility pins reflect the September 30 corner-bias fix, not immutable phase-3d artifacts.
+    Assert-True ((Get-CanonicalTextHash $genericInclude) -eq 'd29d82df7d167568fa87833542594ab8ff5ee2b2b9523b4d9de0d0e71bb8d214') `
         'Compatibility generic include changed unexpectedly.'
-    Assert-True ((Get-CanonicalTextHash $legacyInclude) -eq '6aa3ee289eb31e8bd17468d6ef69bc068402ac9c1506e72c16523e3cf9317219') `
+    Assert-True ((Get-CanonicalTextHash $legacyInclude) -eq '74a09bb23dc56def752f12a1265265ac136847ead6168bdc60944077f97ede81') `
         'Compatibility legacy include changed unexpectedly.'
 
     $lfFixture = Join-Path $temporaryRoot 'canonical-lf-fixture.txt'
@@ -473,13 +532,13 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     & $compiler -Check -OutputDirectory $compatibilityGenericOutput
     if ($LASTEXITCODE -ne 0) { throw "Generic compatibility freshness failed with exit code $LASTEXITCODE." }
     Assert-True ((Get-RawFileHash (Join-Path $compatibilityGenericOutput 'minimal.rgen.spv')) -eq
-        'e27883db3b74638aa18ef5b281e76caaae4332fdbebbc7eb33a8092d625192ab') `
+        '38feab15ed38059b0dfd56baaa16bb25f0e4dc61b1a47047c93a2415466beb92') `
         'Compatibility generic SPIR-V words changed.'
     $compatibilityLegacyOutput = Join-Path $temporaryRoot 'compatibility-legacy'
     & $compiler -Legacy -Check -OutputDirectory $compatibilityLegacyOutput
     if ($LASTEXITCODE -ne 0) { throw "Legacy compatibility freshness failed with exit code $LASTEXITCODE." }
     Assert-True ((Get-RawFileHash (Join-Path $compatibilityLegacyOutput 'minimal.legacy.rgen.spv')) -eq
-        '5fead6842ee6da9279e90833286fce3162f430743c145823c6007765f73051e7') `
+        'f3720730760f6f4b4ead6c5cd0ddd79a33a23910647dd8dac596fa56007eabc7') `
         'Compatibility legacy SPIR-V words changed.'
     Assert-True ((& git -C $repoRoot status --porcelain) -join "`n" -eq $worktreeStatusBefore) `
         'Temporary artifact compilation modified the worktree.'

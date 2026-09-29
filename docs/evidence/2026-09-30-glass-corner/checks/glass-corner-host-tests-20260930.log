@@ -1,0 +1,20 @@
+Internal ctest changing into directory: C:/Dev/tmp/horde-phase3-native-20260923
+Test project C:/Dev/tmp/horde-phase3-native-20260923
+    Start  2: horde_rt_raygen_artifact_ownership_tests
+1/7 Test  #2: horde_rt_raygen_artifact_ownership_tests ...   Passed    1.29 sec
+    Start 13: horde_rt_pipeline_variants_tests
+2/7 Test #13: horde_rt_pipeline_variants_tests ...........   Passed    1.62 sec
+    Start 14: horde_rt_pipeline_variant_provider_tests
+3/7 Test #14: horde_rt_pipeline_variant_provider_tests ...   Passed    1.83 sec
+    Start 15: horde_rt_pipeline_bundle_contracts_tests
+4/7 Test #15: horde_rt_pipeline_bundle_contracts_tests ...   Passed    3.22 sec
+    Start 27: horde_rt_dielectric_math_tests
+5/7 Test #27: horde_rt_dielectric_math_tests .............   Passed    2.94 sec
+    Start 33: horde_rt_static_gltf_asset_tests
+6/7 Test #33: horde_rt_static_gltf_asset_tests ...........   Passed    2.95 sec
+    Start 75: horde_rt_character_render_slot_smoke
+7/7 Test #75: horde_rt_character_render_slot_smoke .......   Passed    4.01 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Total Test time (real) =  17.87 sec

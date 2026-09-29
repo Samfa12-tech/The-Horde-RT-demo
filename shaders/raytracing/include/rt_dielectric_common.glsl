@@ -38,11 +38,16 @@ float dielectricRayEpsilon(vec3 position, float interfaceDistance)
                  0.00002, 0.00025);
 }
 
+const float kDielectricRayMinimumDistance = 0.000001;
+
 vec3 advanceDielectricRayOrigin(vec3 position, vec3 geometricNormal,
                                 vec3 direction, float epsilon)
 {
     float side = dot(geometricNormal, direction) >= 0.0 ? 1.0 : -1.0;
-    return position + geometricNormal * side * epsilon + direction * epsilon;
+    // Do not advance tangentially past a nearby side exit at a pane corner.
+    // The normal offset supplies source-face separation; traversal tMin is
+    // independently small so that it cannot discard that valid short exit.
+    return position + geometricNormal * side * epsilon;
 }
 
 vec3 dielectricBeerLambert(vec3 attenuationColor, float pathLength,

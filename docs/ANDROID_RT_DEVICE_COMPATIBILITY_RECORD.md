@@ -1,6 +1,39 @@
 # Android RT Device Compatibility Record
 
-Last updated: 2026-09-27
+Last updated: 2026-09-30
+
+## September 30: bounded glass corner fix (local SM-S948B evidence)
+
+Exact ordinary Debug APK
+`fd11d9dbe11d2087b60b56fb7446d281afde93d908b175ea6124b699f989df4b`
+is installed/pullback-matched on **SM-S948B**, Android16/Adreno840/driver2150932499.
+Source is5935db9 plus the near-corner origin/query-minimum fix, not a clean final
+candidate. Seven native RT captures at75% (1080x2235) and Home/resume pass,
+strict ASTC retained. Accepted world/viewmodel assets and separate owner-accepted
+candidate app remain untouched; application data was not cleared.
+
+Against exact baseline14927941, primary volume failures in isolated lantern,
+high/look-up and low/parry fall10/8/1→0/0/0; transport totals11/8/1→1/0/0.
+The remaining isolated interface-budget failure is unchanged. Four glass fixture
+controls remain transport/shadow0. Certified recovery counts remain substantial;
+this is a specific corner-defect fix, not complete physical-glass acceptance.
+
+Baseline run062025 remains failed overall for a stale tinted-capture zone
+expectation. Same-APK affected-control rerun062520 passes after the tested
+harness correction; candidate062611 passes all7. Initial install attempt061828
+failed testOnly admission, now explicitly supported for verified Debug APKs.
+These captures provide no sustained or Shipping performance result and no
+S24/S25 certification. Unsigned Release built/validated but was not installed.
+Windows standard image equivalence also remains failed for82 changed finale
+pixels; its tolerance was not weakened.
+The same APK subsequently completes `lantern-reveal-sequence-v1` with600/600
+presented, identity-joined valid CPU/GPU/Diagnostic rows and no rejected or
+outstanding samples. This is live-simulation execution evidence, not visual
+motion acceptance or proof of zero glass errors: the export does not contain
+per-frame glass counters. No matched Shipping performance claim is made.
+[Exact artifacts, counters and open gates](evidence/2026-09-30-glass-corner/README.md).
+
+## September 27 history (preserved)
 
 Newest local installation: **SM-S948B**, isolated normal-range Debug APK
 `c68fa94e75be1827dd8a1fb87ae83ab00f77ebef2b215ea8dd7b9aaad1ea3263`,

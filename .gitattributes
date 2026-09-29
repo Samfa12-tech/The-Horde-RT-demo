@@ -42,6 +42,8 @@ docs/evidence/2026-09-27-upper-torso/** -text whitespace=cr-at-eol
 docs/evidence/2026-09-27-normal-look/** -text whitespace=cr-at-eol
 docs/evidence/2026-09-27-segmented-seams/** -text whitespace=cr-at-eol
 docs/evidence/2026-09-27-modelled-production/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-27-glass-path/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-30-glass-corner/** -text whitespace=cr-at-eol
 
 # Exact accepted paired-manifest bytes are part of runtime admission/provenance.
 assets/models/player/runtime/asset.manifest.json -text whitespace=cr-at-eol

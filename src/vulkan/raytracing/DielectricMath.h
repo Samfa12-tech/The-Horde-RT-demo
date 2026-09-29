@@ -178,6 +178,10 @@ inline float DielectricRayEpsilon(const Vec3& position, float interfaceDistance)
         2.0e-5f, 2.5e-4f);
 }
 
+// A normal bias already separates the ray from its source face. A side exit
+// near a corner can be closer than that bias, despite millimetre wall thickness.
+inline constexpr float kDielectricRayMinimumDistance = 0.000001f;
+
 inline Vec3 AdvanceDielectricRayOrigin(const Vec3& position,
                                        const Vec3& geometricNormal,
                                        const Vec3& direction,
@@ -192,9 +196,7 @@ inline Vec3 AdvanceDielectricRayOrigin(const Vec3& position,
     const float side = dielectric_detail::Dot(outward, rayDirection) >= 0.0f
         ? 1.0f : -1.0f;
     return dielectric_detail::Add(position,
-        dielectric_detail::Add(
-            dielectric_detail::Scale(outward, side * epsilon),
-            dielectric_detail::Scale(rayDirection, epsilon)));
+        dielectric_detail::Scale(outward, side * epsilon));
 }
 
 inline Vec3 OffsetShadowRayOrigin(const Vec3& position,
