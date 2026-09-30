@@ -1,0 +1,9 @@
+{
+  "backend": "compute",
+  "liveRow": 43,
+  "liveSimulationTick": 646,
+  "frozenSimulationTick": 646,
+  "comparedCounters": 41,
+  "differences": [],
+  "allCountersMatch": true
+}

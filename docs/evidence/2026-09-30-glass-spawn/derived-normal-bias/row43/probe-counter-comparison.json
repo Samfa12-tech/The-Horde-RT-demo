@@ -1,0 +1,14 @@
+[
+  {
+    "backend": "pipeline",
+    "compared": 41,
+    "differences": [],
+    "allMatch": true
+  },
+  {
+    "backend": "compute",
+    "compared": 41,
+    "differences": [],
+    "allMatch": true
+  }
+]

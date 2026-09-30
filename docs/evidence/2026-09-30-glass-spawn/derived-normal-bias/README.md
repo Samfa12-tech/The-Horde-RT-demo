@@ -2,8 +2,9 @@
 
 Implementation: `d63e29c7f119a180ce2a6504831d501e8ba0a95e`, based on
 `3140aca9ae528df65766bda6f63a2bfe28ba742d`. Candidate **derived-normal-bias-01**.
-Phone removed by owner: all new execution here is RTX or host-only. This closes
+The first host checkpoint preceded phone reconnection. Its evidence below closes
 the demonstrated row237 numerical defect, **not Phase 4 or phone acceptance**.
+New exactSM-S948B evidence is separately identified in the follow-up section.
 
 ## Proven cause and correction
 
@@ -89,7 +90,8 @@ imply byte-identical Opaque SPIR-V.
 Android ARM64 Debug and unsigned Shipping build successfully. Actual four native
 modules per exact APK validate/disassemble against current catalogs. Shipping
 has0 atomics/0 image reads/noBinding22; Diagnostic Generic retains41 atomics.
-See packaged summaries and containment logs. **Neither new APK is installed**.
+See packaged summaries and containment logs. Neither APK had been installed at
+the host checkpoint; the later Debug installation is recorded below.
 No signing/publication or owner-accepted app/data changes. Audio/haptic manual
 revalidation required: **NO**, RT-only with semantic inputs/cues unchanged.
 
@@ -113,8 +115,54 @@ transport or performance substitute. Source patches bind each output-row format.
 Large OBJ dumps, full disassembly and executable/package binaries stay local.
 The parent `artifacts.json` hashes the curated files.
 
-Next: classify pipeline row43, remaining isolated Mobile interface exhaustion/
-contact recoveries, geometric shadows and live glass; then matched Shipping
-performance and separate backend parity. Repeat exactSM-S948B evidence only
-after owner reconnects. Keep the prior phone regression warning open, S24/S25
-unverified, accepted players closed, and full later programme scope intact.
+## Phone reconnection and row43 follow-up
+
+Evidence source checkpoint25a379c; exact DebugAPK389d6954 above, built before
+Windows-only probes and independently module-matched to d63e29c. Runner records
+`sourceDirty:true` honestly; scratch/probe state is not relabelled a clean build.
+ExactSM-S948B/Android16/Adreno840/driver2150932499 installs/pulls back identically.
+Run152111:13replay/7capture/Home-resume PASS, strictASTC/nativepipeline75%/
+1080x2235. Stable and accepted candidate apps/data untouched; Shipping uninstalled.
+
+| Phone evidence | Result, not whole-glass acceptance |
+| --- | --- |
+| Isolated lantern | interfacefailure1, recoveries80; changed PNG remains unattributed |
+| Raised/low-parry/grazing | failures0; recoveries527/0/30702 respectively |
+| Millimetre/tinted/fire | failure/recovery0 in these captures only |
+| Live600warm+600measured |600/600 valid41-counter rows, exact joins,0rejected/cancelled |
+| Live transport |12events/12rows:5volume-budget,7mismatch; interfacefailure0 |
+| Live recovery |299513events across600rows; reasons remain explicit |
+| Live shadow |failure/recovery/unclosed0, not universal segment proof |
+
+Six of seven capture PNGs equal03c; isolated image changes3179pixels/max187,
+at[y1523..1784,x455..658]. The unchanged pixel gate remains open: corrected
+transport is plausible but these changes have not all been attributed. Live
+volume failures57→5 versus03c is correctness evidence, not a platform-wide pass.
+Seven live mismatches remain. Existing counter definitions/budgets are unchanged.
+
+`phone/live-benchmark.json`, result/context/analysis retain exact ledger/settings
+and thermal sampling. Diagnosticmedian329.7271ms/p95349.7533ms, GPUmedian319.7446ms;
+thermal0→2/battery35.8→43.3C. These recorded, unmatched Debug runs do not establish
+Shipping performance or explain away the prior major regression warning. Median
+is slower than all16.667/20.000/33.333ms reference bands. Matched Shipping remains
+required after physical correctness.
+
+Only two visually verified in-game frames (warmup/measuredlap frame420) are
+curated. Third recording continued onto Android Home after benchmark export;
+that video/private frames are excluded and preserved local-only, not displayed,
+committed or counted as motion acceptance. Raw videos stay local. This is not an
+exhaustive live visual or owner-feel pass. Phone returned Home after completion.
+
+[Row43 native evidence](row43/README.md) narrows the remaining RTX mismatch to
+outside-origin corner edge/arithmetic sensitivity. No source correction is
+claimed. Probe sources/modules are removed; production byte identity restores
+25a379c. Restored native Debug build and focused2/2 pass; eight compute variants
+regenerate identically. Source25a379c push36672645385/PR36672649224 CI are green
+45portable+11Vulkan-host (not hardware acceptance).
+
+The retained decoder's83-field secondary-row stride is repaired to48;106/107
+remain80. All three historical formats are checked against retained JSON.
+Next isolate Mobile interface exhaustion/contact recoveries and remaining live
+events, geometric shadows and changed pixels; then matched Shipping/backend
+parity. Keep S24/S25 and phone compute unverified, accepted players closed, all
+later programme scope intact. Audio/haptic manual revalidation:NO, RT-only.

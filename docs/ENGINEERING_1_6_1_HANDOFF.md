@@ -50,17 +50,39 @@ MSVC Debug build, focused4/4, full artifact/compatibility/negative checks and
 fresh eight-compute compilation PASS. Generic +548words/+128instructions,
 query sites/loops/physical budgets unchanged; correctness cost, not speedup.
 Android ARM64 Debug389d6954 and unsigned Shipping7a03f076 build and actual APK
-modules validate/disassemble. Shipping0atomics/0imageReads/noBinding22. Neither
-new APK installed: phone is away, no device commands until owner reconnects.
-Prior exactSM-S948B evidence/remaining failures and performance regression
-warning stay open; RTX is not phone orS24/S25 acceptance. Audio/haptic manual
-revalidation:NO (RT-only, semantic inputs/cues unchanged).
+modules validate/disassemble. Shipping0atomics/0imageReads/noBinding22. Owner
+reconnected exactSM-S948B: Debug installs/pulls back identically; run152111 passes
+13replay/7capture/Home-resume,75%/1080x2235/strictASTC/nativepipeline. Six PNGs
+equal03c; isolated lantern changes remain unattributed and its interfacefailure1/
+recoveries80 remain. New live600/600 valid:12transport events(5volume+7mismatch),
+299513certifiedrecoveries; liveinterface/shadowfailures0 is not universal proof.
+Diagnostic329.7271ms median/349.7533p95, thermal0→2/battery35.8→43.3C is unmatched,
+recorded Debug evidence, not Shipping performance; prior regression warning open.
+Only two verified game frames are curated; recording continued into Home after
+automatic benchmark exit, so third segment/private frames are local-only excluded.
+No exhaustive live-motion/owner acceptance. Unsigned Shipping is not installed.
 
-Next classify remaining pipeline row43, isolated Mobile interface exhaustion/
-contact recovery and geometric-shadow/live cases, then matched Shipping/backend
-parity. Do not restart Phase1 or reopen accepted player tuning. The Goal remains
-active; phone absence does not pause independent host work. Preserve all later
-music/reporting/resource/pacing/final-matrix scope and owner-only release gates.
+[RTX row43 evidence](evidence/2026-09-30-glass-spawn/derived-normal-bias/row43/README.md):
+same owning replay tick646; all41 counters match ordinary live/frozen and both
+witnesses. One pipeline mismatch at(524,552): nativefirsthittri63 exits with
+mediumclosed. Objectorigin is outside component4, not camera-inside. Two actual
+objectdirections differ2.384e-7; corner entry/exit candidates are near-coincident,
+both outside strict double triangle bounds. Compute returns next validtri9.
+This supports edge/arithmetic sensitivity, not proof of driver traversal or an
+excuse to suppress mismatch. Unconditional firsthit probe was blocked by Windows
+Smart App Control: no capture result; security unchanged. All temporary source,
+catalogs/modules removed; production equals25a379c. Restored native Debug build
+and focused2/2 pass, fresh eightcompute generation identical to committed bundle.
+Current25a379c push36672645385/PR36672649224 CI green45portable+11Vulkan-host.
+
+Next isolate Mobile interface exhaustion/contact recovery and remaining live
+events, geometric-shadow/changed-pixel cases; then matched Shipping/backend
+parity. Do not restart Phase1 or reopen accepted player tuning. Goal active,
+phone available/Home. RTX is not phone/S24/S25 acceptance; phone compute remains
+unverified. Audio/haptic manual revalidation:NO (RT-only, semantic inputs/cues
+unchanged). Preserve later music/reporting/resource/pacing/final scope and owner
+licensing/signing/publication gates. Retained decoder now correctly uses the
+83-field output stride48 (106/107stride80); evidence-only reproduction repair.
 
 #### Previous September 30 checkpoint (03c / d504bfe / c604e89)
 

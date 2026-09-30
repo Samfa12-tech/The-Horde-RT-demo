@@ -2,6 +2,32 @@
 
 Last updated: 2026-09-30
 
+## September 30: per-hit bias candidate01 (new local SM-S948B evidence)
+
+Owner reconnected the phone after the host checkpoint. Exact ARM64 Debug APK
+`389d6954f7a3fddde1ced690470029fa4b14cc6f825fa34bf7269dc617f946e0`
+installed/pulled back identically in run20260930-152111: **SM-S948B**, Android16,
+Adreno840/driver2150932499,75%/1080x2235, strictASTC/native pipeline RT.
+13-waypoint replay, seven glass captures and Home/resume PASS. Isolated physical
+interface exhaustion/recoveries remain open; harness execution is not whole-glass
+acceptance. The600warm+600measured live reveal completed:600/600 valid41-counter
+rows and exact submission/completion joins,0rejects/cancellations. Transport12
+in12rows includes5volume-budget and7mismatch events; certified recoveries299513
+remain explicit. Live interface/shadow failure/recovery/unclosed counters0 do
+not close the isolated capture's interface failure1 or universal shadow gates.
+Six of seven PNGs equal03c; isolated lantern changes remain unattributed at the
+unchanged pixel tolerance. Diagnostic median329.7271ms/p95349.7533ms, thermal0→2,
+battery35.8→43.3C; unmatched recording/thermal/build conditions preclude Shipping
+performance attribution. The earlier regression warning remains open. Only two
+verified in-game live samples are curated; post-exit Home footage is excluded,
+not committed or treated as live acceptance. No exhaustive owner-motion pass.
+The APK was built/hashed before the temporary Windows-only row43 replay; its
+actual modules match d63e29c. The runner honestly records a dirty worktree rather
+than pretending its metadata is a clean source build. Stable/accepted candidate
+apps/data untouched. Unsigned Shipping7a03f076 remains host-only, not installed/
+published. Audio/haptic manual revalidation:NO. S24/S25 and phone compute remain
+unverified. [Artifact identities and open gates](evidence/2026-09-30-glass-spawn/derived-normal-bias/README.md).
+
 ## September 30: bounded spawn correction03c (local SM-S948B evidence)
 
 Exact ordinary Debug APK

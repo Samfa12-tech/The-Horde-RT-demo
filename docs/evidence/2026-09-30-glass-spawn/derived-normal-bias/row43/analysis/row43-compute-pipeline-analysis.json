@@ -1,0 +1,225 @@
+{
+  "investigationOnly": true,
+  "glbSha256": "34a2522f2027d3fb04b77480cc929d36c5a19c6e0f33bf3fa0f0ae0959c99ec4",
+  "triangles": 72,
+  "backends": {
+    "pipeline": {
+      "pixel": [
+        524,
+        552
+      ],
+      "firstHit": {
+        "primitive": 63,
+        "t": 0.6298525929450989,
+        "entering": false,
+        "bary": [
+          0.13649806380271912,
+          3.486895217008623e-09
+        ]
+      },
+      "capturedTriangleMaxAbsVertexError": 0.0,
+      "nativeHitTMinusDoublePlaneTForReturnedPrimitive": 4.3978005903611006e-08,
+      "worldQueryOrigin": [
+        -10.649999618530273,
+        0.699999988079071,
+        -15.199999809265137
+      ],
+      "worldQueryDirection": [
+        -0.8330438733100891,
+        -0.523387610912323,
+        0.17917372286319733
+      ],
+      "objectOrigin": [
+        0.29004669189453125,
+        -0.01810014247894287,
+        1.5681824684143066
+      ],
+      "objectDirection": [
+        -0.4049122929573059,
+        -0.4991641342639923,
+        -2.1799464225769043
+      ],
+      "objectDirectionLength": 2.272726381073909,
+      "component": 4,
+      "componentOutwardPlaneDistances": [
+        {
+          "primitive": 24,
+          "signedDistance": -0.6254056069990858
+        },
+        {
+          "primitive": 25,
+          "signedDistance": 1.3096092016455132
+        },
+        {
+          "primitive": 26,
+          "signedDistance": 0.4404031919983637
+        },
+        {
+          "primitive": 27,
+          "signedDistance": -1.3166091854425905
+        },
+        {
+          "primitive": 28,
+          "signedDistance": -0.6593998670578003
+        },
+        {
+          "primitive": 29,
+          "signedDistance": 0.3143998384475708
+        }
+      ],
+      "maximumOutwardPlaneDistance": 1.3096092016455132,
+      "nearestValidUploadedFloatTriangleHit": {
+        "t": 0.8082919771786382,
+        "u": 0.15041076396175546,
+        "v": 0.10776465397122104,
+        "insideTriangle": true,
+        "entering": true,
+        "component": 1,
+        "primitive": 9
+      },
+      "nearestValidSameComponentHits": [],
+      "sameComponentEdgeCandidates": [
+        {
+          "t": 0.6265038184286528,
+          "u": 0.8817295432838214,
+          "v": -0.004845223680938842,
+          "insideTriangle": false,
+          "entering": true,
+          "component": 4,
+          "primitive": 61
+        },
+        {
+          "t": 0.629852548967093,
+          "u": 0.13649819957825862,
+          "v": -1.0472011617346364e-07,
+          "insideTriangle": false,
+          "entering": false,
+          "component": 4,
+          "primitive": 63
+        },
+        {
+          "t": 0.6298526213449753,
+          "u": 0.13651999760887,
+          "v": 0.8635016158993406,
+          "insideTriangle": false,
+          "entering": true,
+          "component": 4,
+          "primitive": 65
+        }
+      ]
+    },
+    "compute": {
+      "pixel": [
+        524,
+        552
+      ],
+      "firstHit": {
+        "primitive": 9,
+        "t": 0.8082919716835022,
+        "entering": true,
+        "bary": [
+          0.15041092038154602,
+          0.10776440054178238
+        ]
+      },
+      "capturedTriangleMaxAbsVertexError": 0.0,
+      "nativeHitTMinusDoublePlaneTForReturnedPrimitive": 8.010690299986578e-08,
+      "worldQueryOrigin": [
+        -10.649999618530273,
+        0.699999988079071,
+        -15.199999809265137
+      ],
+      "worldQueryDirection": [
+        -0.8330439329147339,
+        -0.523387610912323,
+        0.17917373776435852
+      ],
+      "objectOrigin": [
+        0.29004669189453125,
+        -0.01810014247894287,
+        1.5681824684143066
+      ],
+      "objectDirection": [
+        -0.4049123227596283,
+        -0.4991641044616699,
+        -2.1799466609954834
+      ],
+      "objectDirectionLength": 2.272726608523554,
+      "component": 4,
+      "componentOutwardPlaneDistances": [
+        {
+          "primitive": 24,
+          "signedDistance": -0.6254056069990858
+        },
+        {
+          "primitive": 25,
+          "signedDistance": 1.3096092016455132
+        },
+        {
+          "primitive": 26,
+          "signedDistance": 0.4404031919983637
+        },
+        {
+          "primitive": 27,
+          "signedDistance": -1.3166091854425905
+        },
+        {
+          "primitive": 28,
+          "signedDistance": -0.6593998670578003
+        },
+        {
+          "primitive": 29,
+          "signedDistance": 0.3143998384475708
+        }
+      ],
+      "maximumOutwardPlaneDistance": 1.3096092016455132,
+      "nearestValidUploadedFloatTriangleHit": {
+        "t": 0.8082918915765992,
+        "u": 0.15041069797315793,
+        "v": 0.10776452628318753,
+        "insideTriangle": true,
+        "entering": true,
+        "component": 1,
+        "primitive": 9
+      },
+      "nearestValidSameComponentHits": [],
+      "sameComponentEdgeCandidates": [
+        {
+          "t": 0.626503752078861,
+          "u": 0.8817296422543005,
+          "v": -0.004845373798906767,
+          "insideTriangle": false,
+          "entering": true,
+          "component": 4,
+          "primitive": 61
+        },
+        {
+          "t": 0.6298524822626543,
+          "u": 0.13649840191950546,
+          "v": -2.5564048068856777e-07,
+          "insideTriangle": false,
+          "entering": false,
+          "component": 4,
+          "primitive": 63
+        },
+        {
+          "t": 0.6298526589499849,
+          "u": 0.13655161480881983,
+          "v": 0.8635011476282726,
+          "insideTriangle": false,
+          "entering": true,
+          "component": 4,
+          "primitive": 65
+        }
+      ]
+    }
+  },
+  "rayComparison": {
+    "samePixel": true,
+    "sameCapturedWorldCameraOrigin": true,
+    "worldCameraDirectionMaxAbsDelta": 5.960464477539063e-08,
+    "objectOriginMaxAbsDelta": 0.0,
+    "objectDirectionMaxAbsDelta": 2.384185791015625e-07,
+    "matrixMaxAbsDelta": 0.0
+  }
+}

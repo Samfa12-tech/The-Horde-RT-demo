@@ -25,7 +25,7 @@ fields += ["spawnErrorX", "spawnErrorY", "spawnErrorZ", "normalClearance", "norm
            "insetDisplacement", "insetLimit"]
 fields += ["minimumNormalBias"]
 assert len(fields) == 107
-field_count = int(sys.argv[2]) if len(sys.argv) > 2 else 107
+field_count = int(sys.argv[2]) if len(sys.argv) > 2 else 83
 assert field_count in (83, 106, 107)
 fields = fields[:field_count]
 path = Path(sys.argv[1])
@@ -33,7 +33,7 @@ im = Image.open(path).convert("RGBA")
 assert im.size == (1232, 803)
 data = im.tobytes()
 paths = []
-for row, pixel in enumerate([(515, 569), (515, 570)]):
+for row, pixel in enumerate([(524, 552)]):
     slots = []
     for slot in range(9):
         record = {}

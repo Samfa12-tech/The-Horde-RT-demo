@@ -1,0 +1,27 @@
+[
+  {
+    "record": "paths.json",
+    "fieldCount": 83,
+    "matches": true
+  },
+  {
+    "record": "guard-paths.json",
+    "fieldCount": 106,
+    "matches": true
+  },
+  {
+    "record": "candidate-paths.json",
+    "fieldCount": 107,
+    "matches": true
+  },
+  {
+    "record": "native-path.json",
+    "fieldCount": 83,
+    "matches": true
+  },
+  {
+    "record": "compute-native-path.json",
+    "fieldCount": 83,
+    "matches": true
+  }
+]

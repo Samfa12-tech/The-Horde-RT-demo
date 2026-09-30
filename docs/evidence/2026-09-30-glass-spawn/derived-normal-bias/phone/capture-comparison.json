@@ -1,0 +1,86 @@
+[
+  {
+    "checkpoint": "lantern-glass-production",
+    "png": "capture-01-lantern-glass-production-75.png",
+    "byteIdenticalTo03c": false,
+    "transport": 1,
+    "interface": 1,
+    "volume": 0,
+    "mismatch": 0,
+    "recoveries": 80,
+    "shadowFailures": 0,
+    "shadowRecoveries": 0
+  },
+  {
+    "checkpoint": "player-viewmodel-lantern-high-look-up",
+    "png": "capture-02-player-viewmodel-lantern-high-look-up-75.png",
+    "byteIdenticalTo03c": true,
+    "transport": 0,
+    "interface": 0,
+    "volume": 0,
+    "mismatch": 0,
+    "recoveries": 527,
+    "shadowFailures": 0,
+    "shadowRecoveries": 0
+  },
+  {
+    "checkpoint": "player-viewmodel-lantern-low-parry",
+    "png": "capture-03-player-viewmodel-lantern-low-parry-75.png",
+    "byteIdenticalTo03c": true,
+    "transport": 0,
+    "interface": 0,
+    "volume": 0,
+    "mismatch": 0,
+    "recoveries": 0,
+    "shadowFailures": 0,
+    "shadowRecoveries": 0
+  },
+  {
+    "checkpoint": "glass-edge-fresnel",
+    "png": "capture-04-glass-edge-fresnel-75.png",
+    "byteIdenticalTo03c": true,
+    "transport": 0,
+    "interface": 0,
+    "volume": 0,
+    "mismatch": 0,
+    "recoveries": 30702,
+    "shadowFailures": 0,
+    "shadowRecoveries": 0
+  },
+  {
+    "checkpoint": "glass-millimetre-closed",
+    "png": "capture-05-glass-millimetre-closed-75.png",
+    "byteIdenticalTo03c": true,
+    "transport": 0,
+    "interface": 0,
+    "volume": 0,
+    "mismatch": 0,
+    "recoveries": 0,
+    "shadowFailures": 0,
+    "shadowRecoveries": 0
+  },
+  {
+    "checkpoint": "glass-tinted-transport",
+    "png": "capture-06-glass-tinted-transport-75.png",
+    "byteIdenticalTo03c": true,
+    "transport": 0,
+    "interface": 0,
+    "volume": 0,
+    "mismatch": 0,
+    "recoveries": 0,
+    "shadowFailures": 0,
+    "shadowRecoveries": 0
+  },
+  {
+    "checkpoint": "glass-fire-transport",
+    "png": "capture-07-glass-fire-transport-75.png",
+    "byteIdenticalTo03c": true,
+    "transport": 0,
+    "interface": 0,
+    "volume": 0,
+    "mismatch": 0,
+    "recoveries": 0,
+    "shadowFailures": 0,
+    "shadowRecoveries": 0
+  }
+]
