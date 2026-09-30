@@ -30,6 +30,19 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### October 1 bounded render-scale resource checkpoint
 
+**Sealed opaque-secondary checkpoint:** [packet](evidence/2026-10-01-opaque-secondary/README.md)
+retains all8 strict runs/9,752owning rows, original v1/v2 receipts and eight actual
+packaged modules. Lead independently reparses all archived raw inputs/aggregate
+with every field equal except raw-path/creation-time, and reruns portable verifier/
+val/dis PASS. Partial curation mistakes are disclosed; original phone/source
+receipts unchanged. APK/native bytes omitted from archive, identity pins retained.
+OpeningGPU66.55/40.91/38.11/80.80ms; live223.39/275.97/302.41/258.07ms. This is
+a nonphysical omitted-work bound, not causal/additive savings or30FPS acceptance.
+Do not promote it or repeat completed profiles. Normal physical control retained,
+phone Home, no active device run; DebugC11/stable unchanged. Next: combined native
+Mobile schedule decision with explicitS/r/H, current physical glass/parity gates
+still open. Accepted player work remains untouched. Audio/haptic manual:NO.
+
 **Current post-update Core checkpoint:** resumed after the owner's Codex update,
 preserving all four unrelated scratch paths. Canonical Core534a6e6 is reviewed,
 committed, pushed/remote-verified on `codex/horde-native-pcm-core`; draft PR75
@@ -48,7 +61,9 @@ Fresh Horde MSVC Debug/Release each8/8 focused PASS; real Windows RT executables
 compile/link in both. Android Debug builds all four ABIs. Universal APK eab79c4a…
 89d21a is not installed; its actual ARM64 Diagnostic/Mobile modules freshly
 val/dis PASS and match acceptedC11, all53assets equal. CTest inventory confirms
-50 common CPU tests; fresh Horde CI required after push. Final Core `/EHsc`
+50 common CPU tests. Source5dbb7df push36784556913/PR36784563898 now pass50/50
+on each GCC/Clang/MSVC plus13/13 Vulkan CPU-host fixtures; actual logs read.
+PR15 is CLEAN/MERGEABLE, still draft; no merge/publication. Final Core `/EHsc`
 removes C4530; prior ASan loader failure and incorrect pin-test PATH invocation
 remain distinct from corrected passes. [Exact integration evidence](evidence/2026-10-01-pocket-audio-core/README.md).
 

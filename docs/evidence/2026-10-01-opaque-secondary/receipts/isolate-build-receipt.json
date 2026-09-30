@@ -1,0 +1,165 @@
+{
+  "schema": 1,
+  "classification": "investigation-only-nonphysical-opaque-primary-secondary-bounce-omission",
+  "source": {
+    "root": "C:\\Dev\\tmp\\horde-opaque-secondary-profile-20261001\\source",
+    "head": "71cb366c5cbe5cf6fe338c4cd6fd7bec0bd12d95",
+    "expectedHead": "71cb366c5cbe5cf6fe338c4cd6fd7bec0bd12d95",
+    "initialWorktreeClean": true,
+    "sourceFiles": [
+      "shaders/raytracing/include/rt_dielectric_common.glsl",
+      "shaders/raytracing/include/rt_opaque_secondary_investigation.glsl"
+    ],
+    "commonSha256": "2013aec30df3262b69481e8ac5a620f7d762b04898cdcb07c7827643dfff9d0b",
+    "guardHeaderSha256": "50b3ffab8dda7875bd7623932bf82f403431ade42dc210e99475376bf40ec4e3",
+    "patchFile": "C:\\Dev\\tmp\\horde-opaque-secondary-profile-20261001\\artifacts\\revised-candidate\\source-diff.patch",
+    "patchSha256": "a2257b68366da59f493d7f9fd53c96fb34fa181a6e928bf139166cc9f7feca63",
+    "headerSnapshot": "C:\\Dev\\tmp\\horde-opaque-secondary-profile-20261001\\artifacts\\revised-candidate\\rt_opaque_secondary_investigation.glsl",
+    "headerSnapshotSha256": "50b3ffab8dda7875bd7623932bf82f403431ade42dc210e99475376bf40ec4e3",
+    "guard": "exact instrumentation Shipping (0) and quality Mobile (0), independent of material strategy",
+    "behavior": "Removes only !leanWorkload opaque-primary secondary trace, bounce sampling, reflected-fire composition, and bounce contribution including puddle bounce. Direct-light arguments and production direct-light/shadow code remain unchanged. Does not alter primary traversal/decode, generic primary dielectric transport, material geometry, budgets, masks, assets, gameplay, or other variants.",
+    "noCommit": true
+  },
+  "build": {
+    "command": ":app:assembleBenchmark '-Pandroid.injected.build.abi=arm64-v8a' -PhordeBenchmarkValidation=true --max-workers=2 --console=plain",
+    "workingDirectory": "C:\\Dev\\tmp\\horde-opaque-secondary-profile-20261001\\source\\android",
+    "HORDE_VALIDATION_UNSIGNED": "1 (process-scoped; restored after build)",
+    "exitCode": 0,
+    "log": "C:\\Dev\\tmp\\horde-opaque-secondary-profile-20261001\\logs\\assembleBenchmark-arm64-02.log",
+    "logSha256": "f5911da21b6062f293377e74eb3965e01e9be7923a62d2b588e978ec279586ea",
+    "result": "BUILD SUCCESSFUL in 12s",
+    "resolver": "tools/resolve-android-apk.ps1 -AndroidRoot <absolute android root> -Variant benchmark",
+    "resolvedApk": "C:\\Dev\\tmp\\horde-opaque-secondary-profile-20261001\\source\\android\\app\\build\\intermediates\\apk\\benchmark\\app-benchmark.apk",
+    "sealedApk": "C:\\Dev\\tmp\\horde-opaque-secondary-profile-20261001\\artifacts\\revised-candidate\\HordeLanternRT-opaque-secondary-shipping-mobile-benchmark-arm64.apk",
+    "apkSha256": "ce1c1548ed3937d1ab99b57c523b62a8a1e244538c01e9075bb2f7e56e766cce",
+    "package": "com.samfa12.hordelanternrt.benchmark",
+    "versionName": "1.6.1-benchmark",
+    "minSdk": 24,
+    "targetSdk": 34,
+    "debuggable": false,
+    "debuggableEvidence": "android:debuggable absent from binary manifest; default false",
+    "certificateType": "Android Debug development certificate; no production credentials",
+    "certificateSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736",
+    "matchesControlCertificate": true,
+    "nativeArm64Sha256": "75c7410f7ef30cc0e9f2ccb231c7792cbf2947907006a37f8b7bc2ae1f3d51f3"
+  },
+  "control": {
+    "apk": "C:\\Dev\\tmp\\horde-primary-hit-profile-20261001\\artifacts\\control\\HordeLanternRT-primary-hit-normal-control-arm64.apk",
+    "apkSha256": "a6329657e585e9605098e667fc07fa1ef278626a4242f81a94f9f79d1d3cd033",
+    "sourceReceipt": "C:\\Dev\\tmp\\horde-primary-hit-profile-20261001\\artifacts\\control\\all-shadow-build-receipt.json",
+    "rebuilt": false,
+    "usedByteIdentically": true
+  },
+  "catalogChecks": {
+    "raygenFreezeWriteLog": "C:\\Dev\\tmp\\horde-opaque-secondary-profile-20261001\\logs\\raygen-freeze-02.log",
+    "raygenCheckCatalogLog": "C:\\Dev\\tmp\\horde-opaque-secondary-profile-20261001\\logs\\raygen-checkcatalog-02.log",
+    "computeWriteLog": "C:\\Dev\\tmp\\horde-opaque-secondary-profile-20261001\\logs\\compute-generator-write-02.log",
+    "computeCheckLog": "C:\\Dev\\tmp\\horde-opaque-secondary-profile-20261001\\logs\\compute-generator-check-02.log",
+    "pipelineAdapterWriteLog": "C:\\Dev\\tmp\\horde-opaque-secondary-profile-20261001\\logs\\pipeline-adapter-write-02.log",
+    "pipelineAdapterCheckLog": "C:\\Dev\\tmp\\horde-opaque-secondary-profile-20261001\\logs\\pipeline-adapter-check-02.log",
+    "moduleRows": 16,
+    "changedRows": 4,
+    "unchangedRows": 12,
+    "changed": [
+      {
+        "catalog": "raygen-variant-catalog.json",
+        "key": "shipping_mobile_generic_dielectric",
+        "controlSha256": "ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532",
+        "candidateSha256": "ca364d129f6360ec9772c884d30c544916eecd6ef616fccdf5135c6c2512db9a",
+        "controlWords": 60963,
+        "candidateWords": 60211
+      },
+      {
+        "catalog": "raygen-variant-catalog.json",
+        "key": "shipping_mobile_opaque_fast",
+        "controlSha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+        "candidateSha256": "4e9623aad963e123f6b8ce5a8dde4f2ac2c48f20faa1ac205a8235a9c75f5f38",
+        "controlWords": 125253,
+        "candidateWords": 96637
+      },
+      {
+        "catalog": "rayquery-variant-catalog.json",
+        "key": "rayquery_compute_shipping_mobile_generic_dielectric",
+        "controlSha256": "c2bd389812841161951f819e0f12e95c929aa3f49ec87d9849393a687d20ebde",
+        "candidateSha256": "ad24fdfb746a3dfb0505d515e3063acd96c6fa20d343af976fa323735ee21cc9",
+        "controlWords": 61022,
+        "candidateWords": 60270
+      },
+      {
+        "catalog": "rayquery-variant-catalog.json",
+        "key": "rayquery_compute_shipping_mobile_opaque_fast",
+        "controlSha256": "5002afa7ac6ce0d03fc749742bb0832a1006b9f01bb1c6ab8490710790a79133",
+        "candidateSha256": "caefd75b78f829721bcbfa04bdf05bf3da608de162c96f8f703190a16eda6693",
+        "controlWords": 125318,
+        "candidateWords": 96702
+      }
+    ],
+    "comparisonLog": "C:\\Dev\\tmp\\horde-opaque-secondary-profile-20261001\\logs\\catalog-module-comparison-02.json"
+  },
+  "packageInspection": {
+    "containmentReceipt": "C:\\Dev\\tmp\\horde-opaque-secondary-profile-20261001\\logs\\candidate-package-containment-02.json",
+    "assetAndShaderComparison": "C:\\Dev\\tmp\\horde-opaque-secondary-profile-20261001\\logs\\apk-assets-module-comparison-02.json",
+    "assets": {
+      "baselineCount": 53,
+      "candidateCount": 53,
+      "identicalCount": 53,
+      "changedCount": 0
+    },
+    "spirvVal": "passed",
+    "spirvDis": "passed",
+    "semanticKeys": [
+      "shipping_mobile_generic_dielectric",
+      "shipping_mobile_opaque_fast",
+      "rayquery_compute_shipping_mobile_generic_dielectric",
+      "rayquery_compute_shipping_mobile_opaque_fast"
+    ],
+    "modules": [
+      {
+        "semanticKey": "rayquery_compute_shipping_mobile_opaque_fast",
+        "sha256": "caefd75b78f829721bcbfa04bdf05bf3da608de162c96f8f703190a16eda6693",
+        "words": 96702,
+        "atomicInstructions": 0,
+        "opImageReadCount": 0,
+        "binding22": false,
+        "spirvVal": "passed",
+        "spirvDis": "passed"
+      },
+      {
+        "semanticKey": "rayquery_compute_shipping_mobile_generic_dielectric",
+        "sha256": "ad24fdfb746a3dfb0505d515e3063acd96c6fa20d343af976fa323735ee21cc9",
+        "words": 60270,
+        "atomicInstructions": 0,
+        "opImageReadCount": 0,
+        "binding22": false,
+        "spirvVal": "passed",
+        "spirvDis": "passed"
+      },
+      {
+        "semanticKey": "shipping_mobile_opaque_fast",
+        "sha256": "4e9623aad963e123f6b8ce5a8dde4f2ac2c48f20faa1ac205a8235a9c75f5f38",
+        "words": 96637,
+        "atomicInstructions": 0,
+        "opImageReadCount": 0,
+        "binding22": false,
+        "spirvVal": "passed",
+        "spirvDis": "passed"
+      },
+      {
+        "semanticKey": "shipping_mobile_generic_dielectric",
+        "sha256": "ca364d129f6360ec9772c884d30c544916eecd6ef616fccdf5135c6c2512db9a",
+        "words": 60211,
+        "atomicInstructions": 0,
+        "opImageReadCount": 0,
+        "binding22": false,
+        "spirvVal": "passed",
+        "spirvDis": "passed"
+      }
+    ],
+    "standardShippingContainment": "passed"
+  },
+  "limitations": [
+    "No phone installation, runtime, visual, or performance evidence was collected.",
+    "The isolate intentionally removes physically meaningful opaque-primary reflection and reflected-fire contribution; it is not a shippable optimization or visual-acceptance candidate.",
+    "The previous OpaqueFast-only attempt is preserved separately as superseded and unmeasured; this receipt covers only the reviewed Shipping/Mobile both-strategy scope."
+  ]
+}

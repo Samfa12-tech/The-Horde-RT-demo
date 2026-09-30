@@ -1,0 +1,209 @@
+{
+  "schema": 1,
+  "origin": "C:\\Dev\\tmp\\horde-opaque-secondary-profile-20261001",
+  "classification": "nonphysical-opaque-primary-secondary-omission-cost-bound-investigation-only",
+  "groups": [
+    {
+      "category": "actual-packaged-spirv",
+      "files": [
+        "modules/control/rayquery_compute_shipping_mobile_opaque_fast.spv",
+        "modules/control/rayquery_compute_shipping_mobile_generic_dielectric.spv",
+        "modules/control/shipping_mobile_opaque_fast.spv",
+        "modules/control/shipping_mobile_generic_dielectric.spv",
+        "modules/isolate/rayquery_compute_shipping_mobile_opaque_fast.spv",
+        "modules/isolate/rayquery_compute_shipping_mobile_generic_dielectric.spv",
+        "modules/isolate/shipping_mobile_opaque_fast.spv",
+        "modules/isolate/shipping_mobile_generic_dielectric.spv"
+      ]
+    },
+    {
+      "category": "aggregate",
+      "files": [
+        "opaque-secondary-abba-v2-final-20261001.json"
+      ]
+    },
+    {
+      "category": "asset-provenance",
+      "files": [
+        "receipts/assets-and-package-module-comparison.json"
+      ]
+    },
+    {
+      "category": "build-log",
+      "files": [
+        "logs/isolate-arm64-build.log"
+      ]
+    },
+    {
+      "category": "build-provenance",
+      "files": [
+        "build-receipt.json",
+        "artifacts/revised-candidate/build-receipt.json",
+        "receipts/control-canonical-build-receipt.json",
+        "receipts/isolate-build-receipt.json"
+      ]
+    },
+    {
+      "category": "catalog",
+      "files": [
+        "artifacts/control/raygen-variant-catalog.json",
+        "artifacts/control/rayquery-variant-catalog.json",
+        "artifacts/revised-candidate/raygen-variant-catalog.json",
+        "artifacts/revised-candidate/rayquery-variant-catalog.json"
+      ]
+    },
+    {
+      "category": "curation-history",
+      "files": [
+        "curation/initial-verification-failures.json"
+      ]
+    },
+    {
+      "category": "method",
+      "files": [
+        "methods/curate-opaque-secondary-evidence.ps1",
+        "methods/run-curation-spv-check.ps1",
+        "methods/analyse-opaque-secondary-trial-v2.ps1",
+        "methods/aggregate-opaque-secondary-abba-v2.ps1",
+        "methods/test-opaque-secondary-parser-v2.ps1",
+        "methods/test-curated-classification-negative.ps1"
+      ]
+    },
+    {
+      "category": "module-provenance",
+      "files": [
+        "receipts/curation-spv-check-receipt.json",
+        "receipts/control-package-module-audit.json",
+        "receipts/isolate-module-sealing-log.txt",
+        "receipts/catalog-module-comparison.json",
+        "module-pins.json"
+      ]
+    },
+    {
+      "category": "package-provenance",
+      "files": [
+        "receipts/control-package-containment.json",
+        "receipts/isolate-package-containment.json"
+      ]
+    },
+    {
+      "category": "raw-run",
+      "files": [
+        "phone/opaque-secondary-c1-route-20261001/trial.json",
+        "phone/opaque-secondary-c1-route-20261001/context-samples.jsonl",
+        "phone/opaque-secondary-c1-route-20261001/opaque-secondary-c1-route-20261001/benchmark.json",
+        "phone/opaque-secondary-c1-route-20261001/opaque-secondary-c1-route-20261001/result.json",
+        "phone/opaque-secondary-c1-live-20261001/trial.json",
+        "phone/opaque-secondary-c1-live-20261001/context-samples.jsonl",
+        "phone/opaque-secondary-c1-live-20261001/opaque-secondary-c1-live-20261001/benchmark.json",
+        "phone/opaque-secondary-c1-live-20261001/opaque-secondary-c1-live-20261001/result.json",
+        "phone/opaque-secondary-s1-route-20261001/trial.json",
+        "phone/opaque-secondary-s1-route-20261001/context-samples.jsonl",
+        "phone/opaque-secondary-s1-route-20261001/opaque-secondary-s1-route-20261001/benchmark.json",
+        "phone/opaque-secondary-s1-route-20261001/opaque-secondary-s1-route-20261001/result.json",
+        "phone/opaque-secondary-s1-live-20261001/trial.json",
+        "phone/opaque-secondary-s1-live-20261001/context-samples.jsonl",
+        "phone/opaque-secondary-s1-live-20261001/opaque-secondary-s1-live-20261001/benchmark.json",
+        "phone/opaque-secondary-s1-live-20261001/opaque-secondary-s1-live-20261001/result.json",
+        "phone/opaque-secondary-s2-route-20261001/trial.json",
+        "phone/opaque-secondary-s2-route-20261001/context-samples.jsonl",
+        "phone/opaque-secondary-s2-route-20261001/opaque-secondary-s2-route-20261001/benchmark.json",
+        "phone/opaque-secondary-s2-route-20261001/opaque-secondary-s2-route-20261001/result.json",
+        "phone/opaque-secondary-s2-live-20261001/trial.json",
+        "phone/opaque-secondary-s2-live-20261001/context-samples.jsonl",
+        "phone/opaque-secondary-s2-live-20261001/opaque-secondary-s2-live-20261001/benchmark.json",
+        "phone/opaque-secondary-s2-live-20261001/opaque-secondary-s2-live-20261001/result.json",
+        "phone/opaque-secondary-c2-route-20261001/trial.json",
+        "phone/opaque-secondary-c2-route-20261001/context-samples.jsonl",
+        "phone/opaque-secondary-c2-route-20261001/opaque-secondary-c2-route-20261001/benchmark.json",
+        "phone/opaque-secondary-c2-route-20261001/opaque-secondary-c2-route-20261001/result.json",
+        "phone/opaque-secondary-c2-live-20261001/trial.json",
+        "phone/opaque-secondary-c2-live-20261001/context-samples.jsonl",
+        "phone/opaque-secondary-c2-live-20261001/opaque-secondary-c2-live-20261001/benchmark.json",
+        "phone/opaque-secondary-c2-live-20261001/opaque-secondary-c2-live-20261001/result.json"
+      ]
+    },
+    {
+      "category": "report",
+      "files": [
+        "README.md"
+      ]
+    },
+    {
+      "category": "source-guard-header",
+      "files": [
+        "artifacts/revised-candidate/rt_opaque_secondary_investigation.glsl"
+      ]
+    },
+    {
+      "category": "source-patch",
+      "files": [
+        "artifacts/revised-candidate/source-diff.patch"
+      ]
+    },
+    {
+      "category": "spirv-disassembly-proof",
+      "files": [
+        "modules/control/rayquery_compute_shipping_mobile_opaque_fast-spirv-dis.log",
+        "modules/control/rayquery_compute_shipping_mobile_generic_dielectric-spirv-dis.log",
+        "modules/control/shipping_mobile_opaque_fast-spirv-dis.log",
+        "modules/control/shipping_mobile_generic_dielectric-spirv-dis.log",
+        "modules/isolate/rayquery_compute_shipping_mobile_opaque_fast-spirv-dis.log",
+        "modules/isolate/rayquery_compute_shipping_mobile_generic_dielectric-spirv-dis.log",
+        "modules/isolate/shipping_mobile_opaque_fast-spirv-dis.log",
+        "modules/isolate/shipping_mobile_generic_dielectric-spirv-dis.log"
+      ]
+    },
+    {
+      "category": "spirv-validation-proof",
+      "files": [
+        "modules/control/rayquery_compute_shipping_mobile_opaque_fast-spirv-val.log",
+        "modules/control/rayquery_compute_shipping_mobile_generic_dielectric-spirv-val.log",
+        "modules/control/shipping_mobile_opaque_fast-spirv-val.log",
+        "modules/control/shipping_mobile_generic_dielectric-spirv-val.log",
+        "modules/isolate/rayquery_compute_shipping_mobile_opaque_fast-spirv-val.log",
+        "modules/isolate/rayquery_compute_shipping_mobile_generic_dielectric-spirv-val.log",
+        "modules/isolate/shipping_mobile_opaque_fast-spirv-val.log",
+        "modules/isolate/shipping_mobile_generic_dielectric-spirv-val.log"
+      ]
+    },
+    {
+      "category": "strict-analysis-v2",
+      "files": [
+        "analyses-v2/opaque-secondary-c1-route-20261001-control.v2.analysis.json",
+        "analyses-v2/opaque-secondary-c1-live-20261001-control.v2.analysis.json",
+        "analyses-v2/opaque-secondary-s1-route-20261001-isolate.v2.analysis.json",
+        "analyses-v2/opaque-secondary-s1-live-20261001-isolate.v2.analysis.json",
+        "analyses-v2/opaque-secondary-s2-route-20261001-isolate.v2.analysis.json",
+        "analyses-v2/opaque-secondary-s2-live-20261001-isolate.v2.analysis.json",
+        "analyses-v2/opaque-secondary-c2-route-20261001-control.v2.analysis.json",
+        "analyses-v2/opaque-secondary-c2-live-20261001-control.v2.analysis.json"
+      ]
+    },
+    {
+      "category": "superseded-v1",
+      "files": [
+        "superseded/v1/first-scope-superseded.json",
+        "superseded/v1/analyse-opaque-secondary-trial.ps1",
+        "superseded/v1/aggregate-opaque-secondary-abba.ps1",
+        "superseded/v1/test-opaque-secondary-parser.ps1",
+        "superseded/v1/negative-test-receipt.json",
+        "superseded/v1/analyses/opaque-secondary-c1-route-20261001-control.analysis.json",
+        "superseded/v1/analyses/opaque-secondary-c1-live-20261001-control.analysis.json"
+      ]
+    },
+    {
+      "category": "test-receipt",
+      "files": [
+        "tests/v2-negative-test-receipt.json",
+        "tests/classification-negative-test-receipt.json"
+      ]
+    },
+    {
+      "category": "verification",
+      "files": [
+        "verify-curated-opaque-secondary.ps1"
+      ]
+    }
+  ]
+}

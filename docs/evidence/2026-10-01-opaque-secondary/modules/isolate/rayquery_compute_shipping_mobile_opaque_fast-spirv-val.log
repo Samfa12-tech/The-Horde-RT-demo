@@ -1,0 +1,5 @@
+moduleSha256=caefd75b78f829721bcbfa04bdf05bf3da608de162c96f8f703190a16eda6693
+command=spirv-val --target-env vulkan1.2 <module>
+exitCode=0
+result=passed
+output=

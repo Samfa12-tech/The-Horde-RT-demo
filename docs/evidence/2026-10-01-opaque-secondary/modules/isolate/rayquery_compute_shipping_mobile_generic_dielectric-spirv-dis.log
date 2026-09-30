@@ -1,0 +1,7 @@
+moduleSha256=ad24fdfb746a3dfb0505d515e3063acd96c6fa20d343af976fa323735ee21cc9
+command=spirv-dis <module> -o <temporary>
+exitCode=0
+result=passed
+output=
+fullDisassemblyRetained=True
+archivePolicy=not-included

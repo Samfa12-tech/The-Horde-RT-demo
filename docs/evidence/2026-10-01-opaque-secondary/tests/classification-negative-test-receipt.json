@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "classification": "synthetic-negative-fixture-only",
+  "result": "PASS: exact verifier rejects physical/production classification",
+  "sourceArchive": "C:\\Dev\\tmp\\horde-opaque-secondary-profile-20261001\\curated-v3",
+  "fixturePath": "C:\\Dev\\tmp\\horde-opaque-secondary-profile-20261001\\classification-negative-fixture-v2",
+  "fixtureUsesHardlinks": true,
+  "manifestAndBuildReceiptCopied": true,
+  "alteredReceipt": "build-receipt.json",
+  "alteredClassification": "physical-production-accepted",
+  "expectedDiagnostic": "build classification expected 'nonphysical-opaque-primary-secondary-omission-investigation-only', found 'physical-production-accepted'",
+  "originalArchiveModified": false
+}

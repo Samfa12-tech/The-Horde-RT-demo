@@ -145,3 +145,9 @@ docs/evidence/2026-10-01-music-pcm/**/*.log whitespace=-trailing-space,-blank-at
 # Exact Core-integration logs and source/package receipts, not runtime assets.
 docs/evidence/2026-10-01-pocket-audio-core/** -text whitespace=cr-at-eol
 docs/evidence/2026-10-01-pocket-audio-core/**/*.log whitespace=-trailing-space,-blank-at-eof,-space-before-tab,cr-at-eol
+
+# Non-shippable opaque-secondary investigation: exact raw evidence and modules.
+docs/evidence/2026-10-01-opaque-secondary/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-01-opaque-secondary/**/*.spv filter=lfs diff=lfs merge=lfs -text
+docs/evidence/2026-10-01-opaque-secondary/**/*.log whitespace=-trailing-space,-blank-at-eof,-space-before-tab,cr-at-eol
+docs/evidence/2026-10-01-opaque-secondary/**/*.patch whitespace=-trailing-space,-blank-at-eof,cr-at-eol

@@ -1,0 +1,2641 @@
+{
+  "runId": "opaque-secondary-c1-route-20261001",
+  "integrity": "PASS",
+  "artifactRole": "control",
+  "runDirectory": "C:\\Dev\\tmp\\horde-opaque-secondary-profile-20261001\\phone\\opaque-secondary-c1-route-20261001",
+  "sourceCommit": "71cb366c5cbe5cf6fe338c4cd6fd7bec0bd12d95",
+  "apkSha256": "a6329657e585e9605098e667fc07fa1ef278626a4242f81a94f9f79d1d3cd033",
+  "buildLabel": "opaque-secondary-control",
+  "sourceHashes": {
+    "trialJson": "9b272b0ce478cdcd5709fe74fda99933186c53f4bfaec3e617e39631c443cb89",
+    "resultJson": "22945817a4aa82cad1505e9194bd2a24d94455adda822324bc9699716aeb7ba1",
+    "benchmarkJson": "17622e7afba53fbe40171c9d9a4693d3025954859a182f35b48e29a9fe771941",
+    "contextSamplesJsonl": "f13bf379b95c36f18ac40063559bce21a04e0dc996b7ea685d9fbd0f7e3fad67"
+  },
+  "workload": "showcase-route-v1",
+  "deviceModel": "SM-S948B",
+  "shader": "opaqueFast:shipping_mobile_opaque_fast@66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b|genericDielectric:shipping_mobile_generic_dielectric@ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532",
+  "frames": 1838,
+  "presentMode": "MAILBOX",
+  "internalExtent": {
+    "width": 1080,
+    "height": 2235
+  },
+  "overall": {
+    "averageMs": 59.8073,
+    "medianMs": 59.0983,
+    "p95Ms": 79.3641,
+    "onePercentLowFps": 11.6597
+  },
+  "medianDerivedFps": 16.921,
+  "gpuRtDurationMs": {
+    "sampleCount": 1838,
+    "meanMilliseconds": 48.8481,
+    "medianMilliseconds": 48.0944,
+    "p90Milliseconds": 61.975,
+    "p95Milliseconds": 67.3736,
+    "slowestOnePercentMeanMilliseconds": 73.4703
+  },
+  "cpuStages": {
+    "simulationStepCpuMs": {
+      "sampleCount": 1838,
+      "meanMilliseconds": 0.0221,
+      "medianMilliseconds": 0.0215,
+      "p90Milliseconds": 0.029,
+      "p95Milliseconds": 0.0306,
+      "slowestOnePercentMeanMilliseconds": 0.0614
+    },
+    "skinCpuMs": {
+      "sampleCount": 1838,
+      "meanMilliseconds": 8.3465,
+      "medianMilliseconds": 8.7692,
+      "p90Milliseconds": 9.6211,
+      "p95Milliseconds": 10.1003,
+      "slowestOnePercentMeanMilliseconds": 11.7462
+    },
+    "playerSkinCpuMs": {
+      "sampleCount": 1838,
+      "meanMilliseconds": 8.2211,
+      "medianMilliseconds": 8.7083,
+      "p90Milliseconds": 9.5081,
+      "p95Milliseconds": 9.6149,
+      "slowestOnePercentMeanMilliseconds": 10.2642
+    },
+    "characterSkinCpuMs": {
+      "sampleCount": 1838,
+      "meanMilliseconds": 0.1255,
+      "medianMilliseconds": 0.0,
+      "p90Milliseconds": 0.0,
+      "p95Milliseconds": 1.1755,
+      "slowestOnePercentMeanMilliseconds": 2.4844
+    },
+    "dynamicUploadCpuMs": {
+      "sampleCount": 1838,
+      "meanMilliseconds": 0.3743,
+      "medianMilliseconds": 0.3533,
+      "p90Milliseconds": 0.5004,
+      "p95Milliseconds": 0.5614,
+      "slowestOnePercentMeanMilliseconds": 1.0611
+    },
+    "blasRefitRecordCpuMs": {
+      "sampleCount": 1838,
+      "meanMilliseconds": 0.0342,
+      "medianMilliseconds": 0.0326,
+      "p90Milliseconds": 0.0429,
+      "p95Milliseconds": 0.0479,
+      "slowestOnePercentMeanMilliseconds": 0.1142
+    },
+    "tlasUpdateRecordCpuMs": {
+      "sampleCount": 1838,
+      "meanMilliseconds": 0.0092,
+      "medianMilliseconds": 0.0088,
+      "p90Milliseconds": 0.0117,
+      "p95Milliseconds": 0.0127,
+      "slowestOnePercentMeanMilliseconds": 0.0342
+    },
+    "traceCopyRecordCpuMs": {
+      "sampleCount": 1838,
+      "meanMilliseconds": 0.1749,
+      "medianMilliseconds": 0.1681,
+      "p90Milliseconds": 0.2136,
+      "p95Milliseconds": 0.2408,
+      "slowestOnePercentMeanMilliseconds": 0.4691
+    },
+    "frameFenceWaitCpuMs": {
+      "sampleCount": 1838,
+      "meanMilliseconds": 49.2519,
+      "medianMilliseconds": 48.5709,
+      "p90Milliseconds": 62.4087,
+      "p95Milliseconds": 67.7182,
+      "slowestOnePercentMeanMilliseconds": 73.8287
+    },
+    "imageAcquireCpuMs": {
+      "sampleCount": 1838,
+      "meanMilliseconds": 0.0358,
+      "medianMilliseconds": 0.0379,
+      "p90Milliseconds": 0.0426,
+      "p95Milliseconds": 0.0441,
+      "slowestOnePercentMeanMilliseconds": 0.1021
+    },
+    "queueSubmitCpuMs": {
+      "sampleCount": 1838,
+      "meanMilliseconds": 0.2432,
+      "medianMilliseconds": 0.2247,
+      "p90Milliseconds": 0.346,
+      "p95Milliseconds": 0.4253,
+      "slowestOnePercentMeanMilliseconds": 0.6309
+    },
+    "presentCallCpuMs": {
+      "sampleCount": 1838,
+      "meanMilliseconds": 0.1959,
+      "medianMilliseconds": 0.1807,
+      "p90Milliseconds": 0.2661,
+      "p95Milliseconds": 0.2882,
+      "slowestOnePercentMeanMilliseconds": 0.4146
+    },
+    "wholeFrameCycleCpuMs": {
+      "sampleCount": 1838,
+      "meanMilliseconds": 59.8072,
+      "medianMilliseconds": 59.0983,
+      "p90Milliseconds": 73.35,
+      "p95Milliseconds": 79.364,
+      "slowestOnePercentMeanMilliseconds": 85.7657,
+      "onePercentLowFps": 11.6597
+    }
+  },
+  "zones": [
+    {
+      "name": "opening",
+      "frames": 160,
+      "averageMs": 77.0219,
+      "medianMs": 78.0712,
+      "p95Ms": 86.0608,
+      "onePercentLowFps": 11.4203
+    },
+    {
+      "name": "skeleton-room",
+      "frames": 98,
+      "averageMs": 68.322,
+      "medianMs": 68.5552,
+      "p95Ms": 73.1625,
+      "onePercentLowFps": 13.5124
+    },
+    {
+      "name": "shadow-corridor",
+      "frames": 599,
+      "averageMs": 66.099,
+      "medianMs": 64.9395,
+      "p95Ms": 77.9222,
+      "onePercentLowFps": 12.1556
+    },
+    {
+      "name": "skylight-chamber",
+      "frames": 189,
+      "averageMs": 47.4248,
+      "medianMs": 46.0154,
+      "p95Ms": 65.399,
+      "onePercentLowFps": 14.5877
+    },
+    {
+      "name": "yellow-torch-bay",
+      "frames": 157,
+      "averageMs": 51.536,
+      "medianMs": 51.1308,
+      "p95Ms": 57.0331,
+      "onePercentLowFps": 17.2326
+    },
+    {
+      "name": "blue-torch-bay",
+      "frames": 157,
+      "averageMs": 53.1972,
+      "medianMs": 52.852,
+      "p95Ms": 58.8482,
+      "onePercentLowFps": 16.648
+    },
+    {
+      "name": "red-torch-bay",
+      "frames": 157,
+      "averageMs": 54.4001,
+      "medianMs": 53.8786,
+      "p95Ms": 62.3148,
+      "onePercentLowFps": 14.6077
+    },
+    {
+      "name": "green-torch-bay",
+      "frames": 157,
+      "averageMs": 57.7039,
+      "medianMs": 57.1454,
+      "p95Ms": 66.1945,
+      "onePercentLowFps": 14.3797
+    },
+    {
+      "name": "transmission-threshold",
+      "frames": 63,
+      "averageMs": 49.2667,
+      "medianMs": 49.4426,
+      "p95Ms": 51.8553,
+      "onePercentLowFps": 14.4133
+    },
+    {
+      "name": "finale",
+      "frames": 101,
+      "averageMs": 51.5146,
+      "medianMs": 49.4311,
+      "p95Ms": 69.003,
+      "onePercentLowFps": 13.9783
+    }
+  ],
+  "owningActiveStrategy": {
+    "exported": true,
+    "counts": {
+      "opaque-fast": 1838
+    },
+    "openingCounts": {
+      "opaque-fast": 160
+    }
+  },
+  "zoneGpuCommandBufferTiming": [
+    {
+      "zone": "blue-torch-bay",
+      "frames": 157,
+      "medianMs": 42.05177,
+      "p95NearestRankMs": 47.630468,
+      "within33_333Ms": 0
+    },
+    {
+      "zone": "finale",
+      "frames": 101,
+      "medianMs": 37.68703,
+      "p95NearestRankMs": 55.830519,
+      "within33_333Ms": 7
+    },
+    {
+      "zone": "green-torch-bay",
+      "frames": 157,
+      "medianMs": 46.366041,
+      "p95NearestRankMs": 55.626613,
+      "within33_333Ms": 0
+    },
+    {
+      "zone": "opening",
+      "frames": 160,
+      "medianMs": 66.551613,
+      "p95NearestRankMs": 73.47104,
+      "within33_333Ms": 0
+    },
+    {
+      "zone": "red-torch-bay",
+      "frames": 157,
+      "medianMs": 41.962655,
+      "p95NearestRankMs": 51.153697,
+      "within33_333Ms": 0
+    },
+    {
+      "zone": "shadow-corridor",
+      "frames": 599,
+      "medianMs": 53.990467,
+      "p95NearestRankMs": 66.640155,
+      "within33_333Ms": 0
+    },
+    {
+      "zone": "skeleton-room",
+      "frames": 98,
+      "medianMs": 56.9492695,
+      "p95NearestRankMs": 60.573801,
+      "within33_333Ms": 0
+    },
+    {
+      "zone": "skylight-chamber",
+      "frames": 189,
+      "medianMs": 34.224322,
+      "p95NearestRankMs": 54.380363,
+      "within33_333Ms": 43
+    },
+    {
+      "zone": "transmission-threshold",
+      "frames": 63,
+      "medianMs": 38.093905,
+      "p95NearestRankMs": 39.964166,
+      "within33_333Ms": 0
+    },
+    {
+      "zone": "yellow-torch-bay",
+      "frames": 157,
+      "medianMs": 40.674843,
+      "p95NearestRankMs": 45.918697,
+      "within33_333Ms": 0
+    }
+  ],
+  "openingVsHeavyRouteStages": {
+    "opening": {
+      "frames": 160,
+      "gpuCommandBuffer": {
+        "zone": "opening",
+        "frames": 160,
+        "medianMs": 66.551613,
+        "p95NearestRankMs": 73.47104,
+        "within33_333Ms": 0
+      },
+      "cpuStages": {
+        "simulationStepCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.0189,
+          "medianMilliseconds": 0.0191,
+          "p90Milliseconds": 0.0224,
+          "p95Milliseconds": 0.0231,
+          "slowestOnePercentMeanMilliseconds": 0.0473
+        },
+        "skinCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 8.7185,
+          "medianMilliseconds": 8.9077,
+          "p90Milliseconds": 10.6857,
+          "p95Milliseconds": 11.0984,
+          "slowestOnePercentMeanMilliseconds": 11.7864
+        },
+        "playerSkinCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 8.2295,
+          "medianMilliseconds": 8.6839,
+          "p90Milliseconds": 9.5735,
+          "p95Milliseconds": 9.7391,
+          "slowestOnePercentMeanMilliseconds": 10.1889
+        },
+        "characterSkinCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.4891,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 1.4197,
+          "p95Milliseconds": 1.6791,
+          "slowestOnePercentMeanMilliseconds": 2.8479
+        },
+        "dynamicUploadCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.4036,
+          "medianMilliseconds": 0.3682,
+          "p90Milliseconds": 0.5511,
+          "p95Milliseconds": 0.614,
+          "slowestOnePercentMeanMilliseconds": 0.9671
+        },
+        "blasRefitRecordCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.0366,
+          "medianMilliseconds": 0.0346,
+          "p90Milliseconds": 0.0465,
+          "p95Milliseconds": 0.0506,
+          "slowestOnePercentMeanMilliseconds": 0.0826
+        },
+        "tlasUpdateRecordCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.0091,
+          "medianMilliseconds": 0.0086,
+          "p90Milliseconds": 0.0122,
+          "p95Milliseconds": 0.0131,
+          "slowestOnePercentMeanMilliseconds": 0.0144
+        },
+        "traceCopyRecordCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.1806,
+          "medianMilliseconds": 0.1725,
+          "p90Milliseconds": 0.2191,
+          "p95Milliseconds": 0.2499,
+          "slowestOnePercentMeanMilliseconds": 0.4673
+        },
+        "frameFenceWaitCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 66.016,
+          "medianMilliseconds": 66.8913,
+          "p90Milliseconds": 73.2826,
+          "p95Milliseconds": 73.7927,
+          "slowestOnePercentMeanMilliseconds": 74.8967
+        },
+        "imageAcquireCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.0365,
+          "medianMilliseconds": 0.0375,
+          "p90Milliseconds": 0.0441,
+          "p95Milliseconds": 0.0479,
+          "slowestOnePercentMeanMilliseconds": 0.1127
+        },
+        "queueSubmitCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.2384,
+          "medianMilliseconds": 0.2277,
+          "p90Milliseconds": 0.3191,
+          "p95Milliseconds": 0.4135,
+          "slowestOnePercentMeanMilliseconds": 0.5607
+        },
+        "presentCallCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.2066,
+          "medianMilliseconds": 0.1991,
+          "p90Milliseconds": 0.2817,
+          "p95Milliseconds": 0.2992,
+          "slowestOnePercentMeanMilliseconds": 0.4668
+        },
+        "wholeFrameCycleCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 77.0218,
+          "medianMilliseconds": 78.0711,
+          "p90Milliseconds": 84.5772,
+          "p95Milliseconds": 86.0607,
+          "slowestOnePercentMeanMilliseconds": 87.5635,
+          "onePercentLowFps": 11.4203
+        }
+      }
+    },
+    "heavyZones": [
+      {
+        "zone": "blue-torch-bay",
+        "frames": 157,
+        "medianMs": 42.05177,
+        "p95NearestRankMs": 47.630468,
+        "within33_333Ms": 0
+      },
+      {
+        "zone": "finale",
+        "frames": 101,
+        "medianMs": 37.68703,
+        "p95NearestRankMs": 55.830519,
+        "within33_333Ms": 7
+      },
+      {
+        "zone": "green-torch-bay",
+        "frames": 157,
+        "medianMs": 46.366041,
+        "p95NearestRankMs": 55.626613,
+        "within33_333Ms": 0
+      },
+      {
+        "zone": "red-torch-bay",
+        "frames": 157,
+        "medianMs": 41.962655,
+        "p95NearestRankMs": 51.153697,
+        "within33_333Ms": 0
+      },
+      {
+        "zone": "shadow-corridor",
+        "frames": 599,
+        "medianMs": 53.990467,
+        "p95NearestRankMs": 66.640155,
+        "within33_333Ms": 0
+      },
+      {
+        "zone": "skeleton-room",
+        "frames": 98,
+        "medianMs": 56.9492695,
+        "p95NearestRankMs": 60.573801,
+        "within33_333Ms": 0
+      },
+      {
+        "zone": "skylight-chamber",
+        "frames": 189,
+        "medianMs": 34.224322,
+        "p95NearestRankMs": 54.380363,
+        "within33_333Ms": 43
+      },
+      {
+        "zone": "transmission-threshold",
+        "frames": 63,
+        "medianMs": 38.093905,
+        "p95NearestRankMs": 39.964166,
+        "within33_333Ms": 0
+      },
+      {
+        "zone": "yellow-torch-bay",
+        "frames": 157,
+        "medianMs": 40.674843,
+        "p95NearestRankMs": 45.918697,
+        "within33_333Ms": 0
+      }
+    ],
+    "heavyZoneCpuStages": [
+      {
+        "zone": "skeleton-room",
+        "frames": 98,
+        "cpuStages": {
+          "simulationStepCpuMs": {
+            "sampleCount": 98,
+            "meanMilliseconds": 0.0194,
+            "medianMilliseconds": 0.0197,
+            "p90Milliseconds": 0.0234,
+            "p95Milliseconds": 0.0246,
+            "slowestOnePercentMeanMilliseconds": 0.0427
+          },
+          "skinCpuMs": {
+            "sampleCount": 98,
+            "meanMilliseconds": 9.1396,
+            "medianMilliseconds": 9.507,
+            "p90Milliseconds": 10.8351,
+            "p95Milliseconds": 11.1015,
+            "slowestOnePercentMeanMilliseconds": 12.3582
+          },
+          "playerSkinCpuMs": {
+            "sampleCount": 98,
+            "meanMilliseconds": 8.3535,
+            "medianMilliseconds": 8.7413,
+            "p90Milliseconds": 9.5838,
+            "p95Milliseconds": 9.6831,
+            "slowestOnePercentMeanMilliseconds": 10.3489
+          },
+          "characterSkinCpuMs": {
+            "sampleCount": 98,
+            "meanMilliseconds": 0.7861,
+            "medianMilliseconds": 0.9805,
+            "p90Milliseconds": 1.6649,
+            "p95Milliseconds": 2.0093,
+            "slowestOnePercentMeanMilliseconds": 2.8317
+          },
+          "dynamicUploadCpuMs": {
+            "sampleCount": 98,
+            "meanMilliseconds": 0.4182,
+            "medianMilliseconds": 0.4079,
+            "p90Milliseconds": 0.5371,
+            "p95Milliseconds": 0.6517,
+            "slowestOnePercentMeanMilliseconds": 0.7401
+          },
+          "blasRefitRecordCpuMs": {
+            "sampleCount": 98,
+            "meanMilliseconds": 0.0347,
+            "medianMilliseconds": 0.033,
+            "p90Milliseconds": 0.0441,
+            "p95Milliseconds": 0.0555,
+            "slowestOnePercentMeanMilliseconds": 0.0806
+          },
+          "tlasUpdateRecordCpuMs": {
+            "sampleCount": 98,
+            "meanMilliseconds": 0.0086,
+            "medianMilliseconds": 0.0074,
+            "p90Milliseconds": 0.0127,
+            "p95Milliseconds": 0.0152,
+            "slowestOnePercentMeanMilliseconds": 0.0253
+          },
+          "traceCopyRecordCpuMs": {
+            "sampleCount": 98,
+            "meanMilliseconds": 0.1702,
+            "medianMilliseconds": 0.1653,
+            "p90Milliseconds": 0.2151,
+            "p95Milliseconds": 0.2352,
+            "slowestOnePercentMeanMilliseconds": 0.2575
+          },
+          "frameFenceWaitCpuMs": {
+            "sampleCount": 98,
+            "meanMilliseconds": 56.9264,
+            "medianMilliseconds": 57.5324,
+            "p90Milliseconds": 60.6216,
+            "p95Milliseconds": 61.0953,
+            "slowestOnePercentMeanMilliseconds": 61.498
+          },
+          "imageAcquireCpuMs": {
+            "sampleCount": 98,
+            "meanMilliseconds": 0.038,
+            "medianMilliseconds": 0.038,
+            "p90Milliseconds": 0.0432,
+            "p95Milliseconds": 0.0527,
+            "slowestOnePercentMeanMilliseconds": 0.1819
+          },
+          "queueSubmitCpuMs": {
+            "sampleCount": 98,
+            "meanMilliseconds": 0.244,
+            "medianMilliseconds": 0.2103,
+            "p90Milliseconds": 0.3984,
+            "p95Milliseconds": 0.4827,
+            "slowestOnePercentMeanMilliseconds": 0.6109
+          },
+          "presentCallCpuMs": {
+            "sampleCount": 98,
+            "meanMilliseconds": 0.1835,
+            "medianMilliseconds": 0.1653,
+            "p90Milliseconds": 0.2491,
+            "p95Milliseconds": 0.2909,
+            "slowestOnePercentMeanMilliseconds": 0.3303
+          },
+          "wholeFrameCycleCpuMs": {
+            "sampleCount": 98,
+            "meanMilliseconds": 68.3219,
+            "medianMilliseconds": 68.5551,
+            "p90Milliseconds": 72.4988,
+            "p95Milliseconds": 73.1624,
+            "slowestOnePercentMeanMilliseconds": 74.0062,
+            "onePercentLowFps": 13.5124
+          }
+        }
+      },
+      {
+        "zone": "shadow-corridor",
+        "frames": 599,
+        "cpuStages": {
+          "simulationStepCpuMs": {
+            "sampleCount": 599,
+            "meanMilliseconds": 0.0226,
+            "medianMilliseconds": 0.0212,
+            "p90Milliseconds": 0.0299,
+            "p95Milliseconds": 0.0321,
+            "slowestOnePercentMeanMilliseconds": 0.0592
+          },
+          "skinCpuMs": {
+            "sampleCount": 599,
+            "meanMilliseconds": 8.3264,
+            "medianMilliseconds": 8.7279,
+            "p90Milliseconds": 9.5252,
+            "p95Milliseconds": 9.6699,
+            "slowestOnePercentMeanMilliseconds": 10.2606
+          },
+          "playerSkinCpuMs": {
+            "sampleCount": 599,
+            "meanMilliseconds": 8.3247,
+            "medianMilliseconds": 8.7279,
+            "p90Milliseconds": 9.5251,
+            "p95Milliseconds": 9.6648,
+            "slowestOnePercentMeanMilliseconds": 10.2539
+          },
+          "characterSkinCpuMs": {
+            "sampleCount": 599,
+            "meanMilliseconds": 0.0016,
+            "medianMilliseconds": 0.0,
+            "p90Milliseconds": 0.0,
+            "p95Milliseconds": 0.0,
+            "slowestOnePercentMeanMilliseconds": 0.1647
+          },
+          "dynamicUploadCpuMs": {
+            "sampleCount": 599,
+            "meanMilliseconds": 0.3664,
+            "medianMilliseconds": 0.3468,
+            "p90Milliseconds": 0.4867,
+            "p95Milliseconds": 0.5604,
+            "slowestOnePercentMeanMilliseconds": 1.1611
+          },
+          "blasRefitRecordCpuMs": {
+            "sampleCount": 599,
+            "meanMilliseconds": 0.0335,
+            "medianMilliseconds": 0.0319,
+            "p90Milliseconds": 0.0416,
+            "p95Milliseconds": 0.0461,
+            "slowestOnePercentMeanMilliseconds": 0.0895
+          },
+          "tlasUpdateRecordCpuMs": {
+            "sampleCount": 599,
+            "meanMilliseconds": 0.0093,
+            "medianMilliseconds": 0.0088,
+            "p90Milliseconds": 0.0115,
+            "p95Milliseconds": 0.0122,
+            "slowestOnePercentMeanMilliseconds": 0.0371
+          },
+          "traceCopyRecordCpuMs": {
+            "sampleCount": 599,
+            "meanMilliseconds": 0.1756,
+            "medianMilliseconds": 0.1689,
+            "p90Milliseconds": 0.2095,
+            "p95Milliseconds": 0.2454,
+            "slowestOnePercentMeanMilliseconds": 0.5018
+          },
+          "frameFenceWaitCpuMs": {
+            "sampleCount": 599,
+            "meanMilliseconds": 55.5526,
+            "medianMilliseconds": 54.3794,
+            "p90Milliseconds": 62.6293,
+            "p95Milliseconds": 67.1645,
+            "slowestOnePercentMeanMilliseconds": 71.4672
+          },
+          "imageAcquireCpuMs": {
+            "sampleCount": 599,
+            "meanMilliseconds": 0.0359,
+            "medianMilliseconds": 0.0382,
+            "p90Milliseconds": 0.0424,
+            "p95Milliseconds": 0.0436,
+            "slowestOnePercentMeanMilliseconds": 0.0855
+          },
+          "queueSubmitCpuMs": {
+            "sampleCount": 599,
+            "meanMilliseconds": 0.2463,
+            "medianMilliseconds": 0.2259,
+            "p90Milliseconds": 0.3586,
+            "p95Milliseconds": 0.4322,
+            "slowestOnePercentMeanMilliseconds": 0.6326
+          },
+          "presentCallCpuMs": {
+            "sampleCount": 599,
+            "meanMilliseconds": 0.1957,
+            "medianMilliseconds": 0.1794,
+            "p90Milliseconds": 0.2667,
+            "p95Milliseconds": 0.2882,
+            "slowestOnePercentMeanMilliseconds": 0.4112
+          },
+          "wholeFrameCycleCpuMs": {
+            "sampleCount": 599,
+            "meanMilliseconds": 66.0988,
+            "medianMilliseconds": 64.9394,
+            "p90Milliseconds": 73.5892,
+            "p95Milliseconds": 77.9221,
+            "slowestOnePercentMeanMilliseconds": 82.2665,
+            "onePercentLowFps": 12.1556
+          }
+        }
+      },
+      {
+        "zone": "skylight-chamber",
+        "frames": 189,
+        "cpuStages": {
+          "simulationStepCpuMs": {
+            "sampleCount": 189,
+            "meanMilliseconds": 0.0251,
+            "medianMilliseconds": 0.0251,
+            "p90Milliseconds": 0.0302,
+            "p95Milliseconds": 0.031,
+            "slowestOnePercentMeanMilliseconds": 0.0583
+          },
+          "skinCpuMs": {
+            "sampleCount": 189,
+            "meanMilliseconds": 8.2773,
+            "medianMilliseconds": 8.9274,
+            "p90Milliseconds": 9.5006,
+            "p95Milliseconds": 9.5285,
+            "slowestOnePercentMeanMilliseconds": 10.9746
+          },
+          "playerSkinCpuMs": {
+            "sampleCount": 189,
+            "meanMilliseconds": 8.2649,
+            "medianMilliseconds": 8.9274,
+            "p90Milliseconds": 9.5006,
+            "p95Milliseconds": 9.5285,
+            "slowestOnePercentMeanMilliseconds": 10.0551
+          },
+          "characterSkinCpuMs": {
+            "sampleCount": 189,
+            "meanMilliseconds": 0.0124,
+            "medianMilliseconds": 0.0,
+            "p90Milliseconds": 0.0,
+            "p95Milliseconds": 0.0,
+            "slowestOnePercentMeanMilliseconds": 1.1684
+          },
+          "dynamicUploadCpuMs": {
+            "sampleCount": 189,
+            "meanMilliseconds": 0.3711,
+            "medianMilliseconds": 0.356,
+            "p90Milliseconds": 0.4726,
+            "p95Milliseconds": 0.5453,
+            "slowestOnePercentMeanMilliseconds": 0.9478
+          },
+          "blasRefitRecordCpuMs": {
+            "sampleCount": 189,
+            "meanMilliseconds": 0.0328,
+            "medianMilliseconds": 0.0316,
+            "p90Milliseconds": 0.0416,
+            "p95Milliseconds": 0.0459,
+            "slowestOnePercentMeanMilliseconds": 0.112
+          },
+          "tlasUpdateRecordCpuMs": {
+            "sampleCount": 189,
+            "meanMilliseconds": 0.0092,
+            "medianMilliseconds": 0.0087,
+            "p90Milliseconds": 0.0119,
+            "p95Milliseconds": 0.0127,
+            "slowestOnePercentMeanMilliseconds": 0.0348
+          },
+          "traceCopyRecordCpuMs": {
+            "sampleCount": 189,
+            "meanMilliseconds": 0.173,
+            "medianMilliseconds": 0.1676,
+            "p90Milliseconds": 0.2143,
+            "p95Milliseconds": 0.2401,
+            "slowestOnePercentMeanMilliseconds": 0.4789
+          },
+          "frameFenceWaitCpuMs": {
+            "sampleCount": 189,
+            "meanMilliseconds": 36.999,
+            "medianMilliseconds": 34.6586,
+            "p90Milliseconds": 54.0086,
+            "p95Milliseconds": 54.8329,
+            "slowestOnePercentMeanMilliseconds": 56.513
+          },
+          "imageAcquireCpuMs": {
+            "sampleCount": 189,
+            "meanMilliseconds": 0.0351,
+            "medianMilliseconds": 0.0377,
+            "p90Milliseconds": 0.042,
+            "p95Milliseconds": 0.043,
+            "slowestOnePercentMeanMilliseconds": 0.0706
+          },
+          "queueSubmitCpuMs": {
+            "sampleCount": 189,
+            "meanMilliseconds": 0.2349,
+            "medianMilliseconds": 0.221,
+            "p90Milliseconds": 0.3259,
+            "p95Milliseconds": 0.3974,
+            "slowestOnePercentMeanMilliseconds": 0.4832
+          },
+          "presentCallCpuMs": {
+            "sampleCount": 189,
+            "meanMilliseconds": 0.1893,
+            "medianMilliseconds": 0.1733,
+            "p90Milliseconds": 0.2647,
+            "p95Milliseconds": 0.2864,
+            "slowestOnePercentMeanMilliseconds": 0.3305
+          },
+          "wholeFrameCycleCpuMs": {
+            "sampleCount": 189,
+            "meanMilliseconds": 47.4246,
+            "medianMilliseconds": 46.0153,
+            "p90Milliseconds": 60.1666,
+            "p95Milliseconds": 65.3989,
+            "slowestOnePercentMeanMilliseconds": 68.5507,
+            "onePercentLowFps": 14.5877
+          }
+        }
+      },
+      {
+        "zone": "yellow-torch-bay",
+        "frames": 157,
+        "cpuStages": {
+          "simulationStepCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.0223,
+            "medianMilliseconds": 0.0227,
+            "p90Milliseconds": 0.0266,
+            "p95Milliseconds": 0.0278,
+            "slowestOnePercentMeanMilliseconds": 0.0573
+          },
+          "skinCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 8.1966,
+            "medianMilliseconds": 8.5746,
+            "p90Milliseconds": 9.502,
+            "p95Milliseconds": 9.8245,
+            "slowestOnePercentMeanMilliseconds": 10.2413
+          },
+          "playerSkinCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 8.1966,
+            "medianMilliseconds": 8.5746,
+            "p90Milliseconds": 9.502,
+            "p95Milliseconds": 9.8245,
+            "slowestOnePercentMeanMilliseconds": 10.2413
+          },
+          "characterSkinCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.0,
+            "medianMilliseconds": 0.0,
+            "p90Milliseconds": 0.0,
+            "p95Milliseconds": 0.0,
+            "slowestOnePercentMeanMilliseconds": 0.0
+          },
+          "dynamicUploadCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.3656,
+            "medianMilliseconds": 0.3536,
+            "p90Milliseconds": 0.5062,
+            "p95Milliseconds": 0.5467,
+            "slowestOnePercentMeanMilliseconds": 0.5922
+          },
+          "blasRefitRecordCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.0333,
+            "medianMilliseconds": 0.0329,
+            "p90Milliseconds": 0.0415,
+            "p95Milliseconds": 0.0468,
+            "slowestOnePercentMeanMilliseconds": 0.0644
+          },
+          "tlasUpdateRecordCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.009,
+            "medianMilliseconds": 0.0089,
+            "p90Milliseconds": 0.0112,
+            "p95Milliseconds": 0.0119,
+            "slowestOnePercentMeanMilliseconds": 0.0208
+          },
+          "traceCopyRecordCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.1719,
+            "medianMilliseconds": 0.1676,
+            "p90Milliseconds": 0.2082,
+            "p95Milliseconds": 0.2308,
+            "slowestOnePercentMeanMilliseconds": 0.3745
+          },
+          "frameFenceWaitCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 41.1616,
+            "medianMilliseconds": 41.1875,
+            "p90Milliseconds": 44.2776,
+            "p95Milliseconds": 46.1976,
+            "slowestOnePercentMeanMilliseconds": 47.1081
+          },
+          "imageAcquireCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.0355,
+            "medianMilliseconds": 0.0374,
+            "p90Milliseconds": 0.0422,
+            "p95Milliseconds": 0.0442,
+            "slowestOnePercentMeanMilliseconds": 0.1314
+          },
+          "queueSubmitCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.2594,
+            "medianMilliseconds": 0.2368,
+            "p90Milliseconds": 0.3774,
+            "p95Milliseconds": 0.5141,
+            "slowestOnePercentMeanMilliseconds": 0.6904
+          },
+          "presentCallCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.1973,
+            "medianMilliseconds": 0.1814,
+            "p90Milliseconds": 0.2619,
+            "p95Milliseconds": 0.2891,
+            "slowestOnePercentMeanMilliseconds": 0.4521
+          },
+          "wholeFrameCycleCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 51.5358,
+            "medianMilliseconds": 51.1308,
+            "p90Milliseconds": 55.8086,
+            "p95Milliseconds": 57.033,
+            "slowestOnePercentMeanMilliseconds": 58.0293,
+            "onePercentLowFps": 17.2327
+          }
+        }
+      },
+      {
+        "zone": "blue-torch-bay",
+        "frames": 157,
+        "cpuStages": {
+          "simulationStepCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.0209,
+            "medianMilliseconds": 0.0218,
+            "p90Milliseconds": 0.0253,
+            "p95Milliseconds": 0.0259,
+            "slowestOnePercentMeanMilliseconds": 0.0456
+          },
+          "skinCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 8.0007,
+            "medianMilliseconds": 8.7467,
+            "p90Milliseconds": 9.5114,
+            "p95Milliseconds": 9.6485,
+            "slowestOnePercentMeanMilliseconds": 10.3034
+          },
+          "playerSkinCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 8.0007,
+            "medianMilliseconds": 8.7467,
+            "p90Milliseconds": 9.5114,
+            "p95Milliseconds": 9.6485,
+            "slowestOnePercentMeanMilliseconds": 10.3034
+          },
+          "characterSkinCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.0,
+            "medianMilliseconds": 0.0,
+            "p90Milliseconds": 0.0,
+            "p95Milliseconds": 0.0,
+            "slowestOnePercentMeanMilliseconds": 0.0
+          },
+          "dynamicUploadCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.367,
+            "medianMilliseconds": 0.3538,
+            "p90Milliseconds": 0.5022,
+            "p95Milliseconds": 0.5649,
+            "slowestOnePercentMeanMilliseconds": 1.0773
+          },
+          "blasRefitRecordCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.0338,
+            "medianMilliseconds": 0.0316,
+            "p90Milliseconds": 0.0422,
+            "p95Milliseconds": 0.046,
+            "slowestOnePercentMeanMilliseconds": 0.1564
+          },
+          "tlasUpdateRecordCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.0089,
+            "medianMilliseconds": 0.0087,
+            "p90Milliseconds": 0.0114,
+            "p95Milliseconds": 0.0118,
+            "slowestOnePercentMeanMilliseconds": 0.0194
+          },
+          "traceCopyRecordCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.171,
+            "medianMilliseconds": 0.1627,
+            "p90Milliseconds": 0.2061,
+            "p95Milliseconds": 0.2462,
+            "slowestOnePercentMeanMilliseconds": 0.3685
+          },
+          "frameFenceWaitCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 42.986,
+            "medianMilliseconds": 42.4556,
+            "p90Milliseconds": 47.2064,
+            "p95Milliseconds": 47.8648,
+            "slowestOnePercentMeanMilliseconds": 48.6306
+          },
+          "imageAcquireCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.0346,
+            "medianMilliseconds": 0.0377,
+            "p90Milliseconds": 0.0424,
+            "p95Milliseconds": 0.0431,
+            "slowestOnePercentMeanMilliseconds": 0.0606
+          },
+          "queueSubmitCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.2368,
+            "medianMilliseconds": 0.2259,
+            "p90Milliseconds": 0.3337,
+            "p95Milliseconds": 0.419,
+            "slowestOnePercentMeanMilliseconds": 0.6642
+          },
+          "presentCallCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.192,
+            "medianMilliseconds": 0.1778,
+            "p90Milliseconds": 0.2661,
+            "p95Milliseconds": 0.2857,
+            "slowestOnePercentMeanMilliseconds": 0.3335
+          },
+          "wholeFrameCycleCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 53.1971,
+            "medianMilliseconds": 52.8519,
+            "p90Milliseconds": 57.9556,
+            "p95Milliseconds": 58.848,
+            "slowestOnePercentMeanMilliseconds": 60.0672,
+            "onePercentLowFps": 16.648
+          }
+        }
+      },
+      {
+        "zone": "red-torch-bay",
+        "frames": 157,
+        "cpuStages": {
+          "simulationStepCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.0207,
+            "medianMilliseconds": 0.0212,
+            "p90Milliseconds": 0.0244,
+            "p95Milliseconds": 0.0255,
+            "slowestOnePercentMeanMilliseconds": 0.0447
+          },
+          "skinCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 8.16,
+            "medianMilliseconds": 8.7921,
+            "p90Milliseconds": 9.4893,
+            "p95Milliseconds": 9.5958,
+            "slowestOnePercentMeanMilliseconds": 10.1922
+          },
+          "playerSkinCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 8.16,
+            "medianMilliseconds": 8.7921,
+            "p90Milliseconds": 9.4893,
+            "p95Milliseconds": 9.5958,
+            "slowestOnePercentMeanMilliseconds": 10.1922
+          },
+          "characterSkinCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.0,
+            "medianMilliseconds": 0.0,
+            "p90Milliseconds": 0.0,
+            "p95Milliseconds": 0.0,
+            "slowestOnePercentMeanMilliseconds": 0.0
+          },
+          "dynamicUploadCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.362,
+            "medianMilliseconds": 0.3493,
+            "p90Milliseconds": 0.4252,
+            "p95Milliseconds": 0.5279,
+            "slowestOnePercentMeanMilliseconds": 1.2554
+          },
+          "blasRefitRecordCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.0353,
+            "medianMilliseconds": 0.0335,
+            "p90Milliseconds": 0.043,
+            "p95Milliseconds": 0.0487,
+            "slowestOnePercentMeanMilliseconds": 0.1252
+          },
+          "tlasUpdateRecordCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.0101,
+            "medianMilliseconds": 0.0096,
+            "p90Milliseconds": 0.0118,
+            "p95Milliseconds": 0.0145,
+            "slowestOnePercentMeanMilliseconds": 0.0534
+          },
+          "traceCopyRecordCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.1781,
+            "medianMilliseconds": 0.1695,
+            "p90Milliseconds": 0.2114,
+            "p95Milliseconds": 0.2357,
+            "slowestOnePercentMeanMilliseconds": 0.4747
+          },
+          "frameFenceWaitCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 44.0433,
+            "medianMilliseconds": 42.387,
+            "p90Milliseconds": 49.4058,
+            "p95Milliseconds": 51.3247,
+            "slowestOnePercentMeanMilliseconds": 57.441
+          },
+          "imageAcquireCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.0353,
+            "medianMilliseconds": 0.0382,
+            "p90Milliseconds": 0.0426,
+            "p95Milliseconds": 0.044,
+            "slowestOnePercentMeanMilliseconds": 0.0644
+          },
+          "queueSubmitCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.2408,
+            "medianMilliseconds": 0.2192,
+            "p90Milliseconds": 0.333,
+            "p95Milliseconds": 0.423,
+            "slowestOnePercentMeanMilliseconds": 0.5731
+          },
+          "presentCallCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.2041,
+            "medianMilliseconds": 0.1981,
+            "p90Milliseconds": 0.2717,
+            "p95Milliseconds": 0.287,
+            "slowestOnePercentMeanMilliseconds": 0.4197
+          },
+          "wholeFrameCycleCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 54.4,
+            "medianMilliseconds": 53.8784,
+            "p90Milliseconds": 59.9402,
+            "p95Milliseconds": 62.3147,
+            "slowestOnePercentMeanMilliseconds": 68.4572,
+            "onePercentLowFps": 14.6077
+          }
+        }
+      },
+      {
+        "zone": "green-torch-bay",
+        "frames": 157,
+        "cpuStages": {
+          "simulationStepCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.0245,
+            "medianMilliseconds": 0.0239,
+            "p90Milliseconds": 0.0313,
+            "p95Milliseconds": 0.0329,
+            "slowestOnePercentMeanMilliseconds": 0.08
+          },
+          "skinCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 8.2447,
+            "medianMilliseconds": 8.7185,
+            "p90Milliseconds": 9.4902,
+            "p95Milliseconds": 9.5356,
+            "slowestOnePercentMeanMilliseconds": 10.3024
+          },
+          "playerSkinCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 8.2447,
+            "medianMilliseconds": 8.7185,
+            "p90Milliseconds": 9.4902,
+            "p95Milliseconds": 9.5356,
+            "slowestOnePercentMeanMilliseconds": 10.3024
+          },
+          "characterSkinCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.0,
+            "medianMilliseconds": 0.0,
+            "p90Milliseconds": 0.0,
+            "p95Milliseconds": 0.0,
+            "slowestOnePercentMeanMilliseconds": 0.0
+          },
+          "dynamicUploadCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.3641,
+            "medianMilliseconds": 0.3506,
+            "p90Milliseconds": 0.4301,
+            "p95Milliseconds": 0.5166,
+            "slowestOnePercentMeanMilliseconds": 1.0659
+          },
+          "blasRefitRecordCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.035,
+            "medianMilliseconds": 0.034,
+            "p90Milliseconds": 0.0432,
+            "p95Milliseconds": 0.0519,
+            "slowestOnePercentMeanMilliseconds": 0.0737
+          },
+          "tlasUpdateRecordCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.0098,
+            "medianMilliseconds": 0.0094,
+            "p90Milliseconds": 0.0117,
+            "p95Milliseconds": 0.0144,
+            "slowestOnePercentMeanMilliseconds": 0.0296
+          },
+          "traceCopyRecordCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.1799,
+            "medianMilliseconds": 0.175,
+            "p90Milliseconds": 0.2164,
+            "p95Milliseconds": 0.2489,
+            "slowestOnePercentMeanMilliseconds": 0.3692
+          },
+          "frameFenceWaitCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 47.2463,
+            "medianMilliseconds": 46.8281,
+            "p90Milliseconds": 52.8135,
+            "p95Milliseconds": 55.7761,
+            "slowestOnePercentMeanMilliseconds": 57.6803
+          },
+          "imageAcquireCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.0364,
+            "medianMilliseconds": 0.0382,
+            "p90Milliseconds": 0.0428,
+            "p95Milliseconds": 0.0444,
+            "slowestOnePercentMeanMilliseconds": 0.0973
+          },
+          "queueSubmitCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.2511,
+            "medianMilliseconds": 0.2318,
+            "p90Milliseconds": 0.3413,
+            "p95Milliseconds": 0.4216,
+            "slowestOnePercentMeanMilliseconds": 0.5695
+          },
+          "presentCallCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 0.2076,
+            "medianMilliseconds": 0.194,
+            "p90Milliseconds": 0.2793,
+            "p95Milliseconds": 0.3222,
+            "slowestOnePercentMeanMilliseconds": 0.3869
+          },
+          "wholeFrameCycleCpuMs": {
+            "sampleCount": 157,
+            "meanMilliseconds": 57.7037,
+            "medianMilliseconds": 57.1453,
+            "p90Milliseconds": 63.4221,
+            "p95Milliseconds": 66.1944,
+            "slowestOnePercentMeanMilliseconds": 69.5426,
+            "onePercentLowFps": 14.3797
+          }
+        }
+      },
+      {
+        "zone": "transmission-threshold",
+        "frames": 63,
+        "cpuStages": {
+          "simulationStepCpuMs": {
+            "sampleCount": 63,
+            "meanMilliseconds": 0.0254,
+            "medianMilliseconds": 0.026,
+            "p90Milliseconds": 0.0294,
+            "p95Milliseconds": 0.0298,
+            "slowestOnePercentMeanMilliseconds": 0.0304
+          },
+          "skinCpuMs": {
+            "sampleCount": 63,
+            "meanMilliseconds": 8.4811,
+            "medianMilliseconds": 8.7048,
+            "p90Milliseconds": 9.37,
+            "p95Milliseconds": 9.4665,
+            "slowestOnePercentMeanMilliseconds": 9.5367
+          },
+          "playerSkinCpuMs": {
+            "sampleCount": 63,
+            "meanMilliseconds": 8.4811,
+            "medianMilliseconds": 8.7048,
+            "p90Milliseconds": 9.37,
+            "p95Milliseconds": 9.4665,
+            "slowestOnePercentMeanMilliseconds": 9.5367
+          },
+          "characterSkinCpuMs": {
+            "sampleCount": 63,
+            "meanMilliseconds": 0.0,
+            "medianMilliseconds": 0.0,
+            "p90Milliseconds": 0.0,
+            "p95Milliseconds": 0.0,
+            "slowestOnePercentMeanMilliseconds": 0.0
+          },
+          "dynamicUploadCpuMs": {
+            "sampleCount": 63,
+            "meanMilliseconds": 0.356,
+            "medianMilliseconds": 0.344,
+            "p90Milliseconds": 0.4136,
+            "p95Milliseconds": 0.4777,
+            "slowestOnePercentMeanMilliseconds": 0.6328
+          },
+          "blasRefitRecordCpuMs": {
+            "sampleCount": 63,
+            "meanMilliseconds": 0.0367,
+            "medianMilliseconds": 0.0313,
+            "p90Milliseconds": 0.0413,
+            "p95Milliseconds": 0.052,
+            "slowestOnePercentMeanMilliseconds": 0.2934
+          },
+          "tlasUpdateRecordCpuMs": {
+            "sampleCount": 63,
+            "meanMilliseconds": 0.0091,
+            "medianMilliseconds": 0.0086,
+            "p90Milliseconds": 0.0112,
+            "p95Milliseconds": 0.0133,
+            "slowestOnePercentMeanMilliseconds": 0.0248
+          },
+          "traceCopyRecordCpuMs": {
+            "sampleCount": 63,
+            "meanMilliseconds": 0.1723,
+            "medianMilliseconds": 0.162,
+            "p90Milliseconds": 0.219,
+            "p95Milliseconds": 0.234,
+            "slowestOnePercentMeanMilliseconds": 0.4389
+          },
+          "frameFenceWaitCpuMs": {
+            "sampleCount": 63,
+            "meanMilliseconds": 38.636,
+            "medianMilliseconds": 38.568,
+            "p90Milliseconds": 40.2133,
+            "p95Milliseconds": 40.6877,
+            "slowestOnePercentMeanMilliseconds": 58.8472
+          },
+          "imageAcquireCpuMs": {
+            "sampleCount": 63,
+            "meanMilliseconds": 0.0365,
+            "medianMilliseconds": 0.0383,
+            "p90Milliseconds": 0.0414,
+            "p95Milliseconds": 0.0427,
+            "slowestOnePercentMeanMilliseconds": 0.0827
+          },
+          "queueSubmitCpuMs": {
+            "sampleCount": 63,
+            "meanMilliseconds": 0.2393,
+            "medianMilliseconds": 0.2194,
+            "p90Milliseconds": 0.3218,
+            "p95Milliseconds": 0.3966,
+            "slowestOnePercentMeanMilliseconds": 0.6142
+          },
+          "presentCallCpuMs": {
+            "sampleCount": 63,
+            "meanMilliseconds": 0.1795,
+            "medianMilliseconds": 0.1663,
+            "p90Milliseconds": 0.2395,
+            "p95Milliseconds": 0.2571,
+            "slowestOnePercentMeanMilliseconds": 0.3072
+          },
+          "wholeFrameCycleCpuMs": {
+            "sampleCount": 63,
+            "meanMilliseconds": 49.2666,
+            "medianMilliseconds": 49.4424,
+            "p90Milliseconds": 51.4557,
+            "p95Milliseconds": 51.8553,
+            "slowestOnePercentMeanMilliseconds": 69.3802,
+            "onePercentLowFps": 14.4133
+          }
+        }
+      },
+      {
+        "zone": "finale",
+        "frames": 101,
+        "cpuStages": {
+          "simulationStepCpuMs": {
+            "sampleCount": 101,
+            "meanMilliseconds": 0.0199,
+            "medianMilliseconds": 0.0193,
+            "p90Milliseconds": 0.0231,
+            "p95Milliseconds": 0.0241,
+            "slowestOnePercentMeanMilliseconds": 0.0767
+          },
+          "skinCpuMs": {
+            "sampleCount": 101,
+            "meanMilliseconds": 8.3714,
+            "medianMilliseconds": 8.5229,
+            "p90Milliseconds": 11.0099,
+            "p95Milliseconds": 11.4709,
+            "slowestOnePercentMeanMilliseconds": 12.3436
+          },
+          "playerSkinCpuMs": {
+            "sampleCount": 101,
+            "meanMilliseconds": 7.6587,
+            "medianMilliseconds": 8.3373,
+            "p90Milliseconds": 9.0962,
+            "p95Milliseconds": 9.4398,
+            "slowestOnePercentMeanMilliseconds": 9.6321
+          },
+          "characterSkinCpuMs": {
+            "sampleCount": 101,
+            "meanMilliseconds": 0.7128,
+            "medianMilliseconds": 0.0,
+            "p90Milliseconds": 2.1458,
+            "p95Milliseconds": 2.4192,
+            "slowestOnePercentMeanMilliseconds": 3.0741
+          },
+          "dynamicUploadCpuMs": {
+            "sampleCount": 101,
+            "meanMilliseconds": 0.4093,
+            "medianMilliseconds": 0.369,
+            "p90Milliseconds": 0.5732,
+            "p95Milliseconds": 0.6602,
+            "slowestOnePercentMeanMilliseconds": 0.7778
+          },
+          "blasRefitRecordCpuMs": {
+            "sampleCount": 101,
+            "meanMilliseconds": 0.0333,
+            "medianMilliseconds": 0.0307,
+            "p90Milliseconds": 0.0449,
+            "p95Milliseconds": 0.0465,
+            "slowestOnePercentMeanMilliseconds": 0.0796
+          },
+          "tlasUpdateRecordCpuMs": {
+            "sampleCount": 101,
+            "meanMilliseconds": 0.0085,
+            "medianMilliseconds": 0.0078,
+            "p90Milliseconds": 0.0116,
+            "p95Milliseconds": 0.0131,
+            "slowestOnePercentMeanMilliseconds": 0.0227
+          },
+          "traceCopyRecordCpuMs": {
+            "sampleCount": 101,
+            "meanMilliseconds": 0.17,
+            "medianMilliseconds": 0.156,
+            "p90Milliseconds": 0.2191,
+            "p95Milliseconds": 0.2627,
+            "slowestOnePercentMeanMilliseconds": 0.3987
+          },
+          "frameFenceWaitCpuMs": {
+            "sampleCount": 101,
+            "meanMilliseconds": 40.9623,
+            "medianMilliseconds": 38.1158,
+            "p90Milliseconds": 55.1952,
+            "p95Milliseconds": 56.0585,
+            "slowestOnePercentMeanMilliseconds": 58.2654
+          },
+          "imageAcquireCpuMs": {
+            "sampleCount": 101,
+            "meanMilliseconds": 0.0352,
+            "medianMilliseconds": 0.0361,
+            "p90Milliseconds": 0.0427,
+            "p95Milliseconds": 0.0452,
+            "slowestOnePercentMeanMilliseconds": 0.0941
+          },
+          "queueSubmitCpuMs": {
+            "sampleCount": 101,
+            "meanMilliseconds": 0.2264,
+            "medianMilliseconds": 0.2104,
+            "p90Milliseconds": 0.3251,
+            "p95Milliseconds": 0.3733,
+            "slowestOnePercentMeanMilliseconds": 0.4443
+          },
+          "presentCallCpuMs": {
+            "sampleCount": 101,
+            "meanMilliseconds": 0.1884,
+            "medianMilliseconds": 0.1672,
+            "p90Milliseconds": 0.2567,
+            "p95Milliseconds": 0.2836,
+            "slowestOnePercentMeanMilliseconds": 0.4025
+          },
+          "wholeFrameCycleCpuMs": {
+            "sampleCount": 101,
+            "meanMilliseconds": 51.5145,
+            "medianMilliseconds": 49.431,
+            "p90Milliseconds": 65.9205,
+            "p95Milliseconds": 69.0029,
+            "slowestOnePercentMeanMilliseconds": 71.5392,
+            "onePercentLowFps": 13.9784
+          }
+        }
+      }
+    ],
+    "gpuStageBoundary": "The current benchmark schema emits a completion-owned GPU command-buffer interval per frame/zone, not separate GPU AS-build and RT-dispatch durations. CPU BlasRefitRecord/TlasUpdateRecord/TraceCopyRecord are CPU record-stage timings, not GPU-stage timings."
+  },
+  "liveRevealZoneStages": null,
+  "completionOwnedZoneCpuStages": [
+    {
+      "zone": "opening",
+      "frames": 160,
+      "cpuStages": {
+        "simulationStepCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.0189,
+          "medianMilliseconds": 0.0191,
+          "p90Milliseconds": 0.0224,
+          "p95Milliseconds": 0.0231,
+          "slowestOnePercentMeanMilliseconds": 0.0473
+        },
+        "skinCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 8.7185,
+          "medianMilliseconds": 8.9077,
+          "p90Milliseconds": 10.6857,
+          "p95Milliseconds": 11.0984,
+          "slowestOnePercentMeanMilliseconds": 11.7864
+        },
+        "playerSkinCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 8.2295,
+          "medianMilliseconds": 8.6839,
+          "p90Milliseconds": 9.5735,
+          "p95Milliseconds": 9.7391,
+          "slowestOnePercentMeanMilliseconds": 10.1889
+        },
+        "characterSkinCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.4891,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 1.4197,
+          "p95Milliseconds": 1.6791,
+          "slowestOnePercentMeanMilliseconds": 2.8479
+        },
+        "dynamicUploadCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.4036,
+          "medianMilliseconds": 0.3682,
+          "p90Milliseconds": 0.5511,
+          "p95Milliseconds": 0.614,
+          "slowestOnePercentMeanMilliseconds": 0.9671
+        },
+        "blasRefitRecordCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.0366,
+          "medianMilliseconds": 0.0346,
+          "p90Milliseconds": 0.0465,
+          "p95Milliseconds": 0.0506,
+          "slowestOnePercentMeanMilliseconds": 0.0826
+        },
+        "tlasUpdateRecordCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.0091,
+          "medianMilliseconds": 0.0086,
+          "p90Milliseconds": 0.0122,
+          "p95Milliseconds": 0.0131,
+          "slowestOnePercentMeanMilliseconds": 0.0144
+        },
+        "traceCopyRecordCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.1806,
+          "medianMilliseconds": 0.1725,
+          "p90Milliseconds": 0.2191,
+          "p95Milliseconds": 0.2499,
+          "slowestOnePercentMeanMilliseconds": 0.4673
+        },
+        "frameFenceWaitCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 66.016,
+          "medianMilliseconds": 66.8913,
+          "p90Milliseconds": 73.2826,
+          "p95Milliseconds": 73.7927,
+          "slowestOnePercentMeanMilliseconds": 74.8967
+        },
+        "imageAcquireCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.0365,
+          "medianMilliseconds": 0.0375,
+          "p90Milliseconds": 0.0441,
+          "p95Milliseconds": 0.0479,
+          "slowestOnePercentMeanMilliseconds": 0.1127
+        },
+        "queueSubmitCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.2384,
+          "medianMilliseconds": 0.2277,
+          "p90Milliseconds": 0.3191,
+          "p95Milliseconds": 0.4135,
+          "slowestOnePercentMeanMilliseconds": 0.5607
+        },
+        "presentCallCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.2066,
+          "medianMilliseconds": 0.1991,
+          "p90Milliseconds": 0.2817,
+          "p95Milliseconds": 0.2992,
+          "slowestOnePercentMeanMilliseconds": 0.4668
+        },
+        "wholeFrameCycleCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 77.0218,
+          "medianMilliseconds": 78.0711,
+          "p90Milliseconds": 84.5772,
+          "p95Milliseconds": 86.0607,
+          "slowestOnePercentMeanMilliseconds": 87.5635,
+          "onePercentLowFps": 11.4203
+        }
+      }
+    },
+    {
+      "zone": "skeleton-room",
+      "frames": 98,
+      "cpuStages": {
+        "simulationStepCpuMs": {
+          "sampleCount": 98,
+          "meanMilliseconds": 0.0194,
+          "medianMilliseconds": 0.0197,
+          "p90Milliseconds": 0.0234,
+          "p95Milliseconds": 0.0246,
+          "slowestOnePercentMeanMilliseconds": 0.0427
+        },
+        "skinCpuMs": {
+          "sampleCount": 98,
+          "meanMilliseconds": 9.1396,
+          "medianMilliseconds": 9.507,
+          "p90Milliseconds": 10.8351,
+          "p95Milliseconds": 11.1015,
+          "slowestOnePercentMeanMilliseconds": 12.3582
+        },
+        "playerSkinCpuMs": {
+          "sampleCount": 98,
+          "meanMilliseconds": 8.3535,
+          "medianMilliseconds": 8.7413,
+          "p90Milliseconds": 9.5838,
+          "p95Milliseconds": 9.6831,
+          "slowestOnePercentMeanMilliseconds": 10.3489
+        },
+        "characterSkinCpuMs": {
+          "sampleCount": 98,
+          "meanMilliseconds": 0.7861,
+          "medianMilliseconds": 0.9805,
+          "p90Milliseconds": 1.6649,
+          "p95Milliseconds": 2.0093,
+          "slowestOnePercentMeanMilliseconds": 2.8317
+        },
+        "dynamicUploadCpuMs": {
+          "sampleCount": 98,
+          "meanMilliseconds": 0.4182,
+          "medianMilliseconds": 0.4079,
+          "p90Milliseconds": 0.5371,
+          "p95Milliseconds": 0.6517,
+          "slowestOnePercentMeanMilliseconds": 0.7401
+        },
+        "blasRefitRecordCpuMs": {
+          "sampleCount": 98,
+          "meanMilliseconds": 0.0347,
+          "medianMilliseconds": 0.033,
+          "p90Milliseconds": 0.0441,
+          "p95Milliseconds": 0.0555,
+          "slowestOnePercentMeanMilliseconds": 0.0806
+        },
+        "tlasUpdateRecordCpuMs": {
+          "sampleCount": 98,
+          "meanMilliseconds": 0.0086,
+          "medianMilliseconds": 0.0074,
+          "p90Milliseconds": 0.0127,
+          "p95Milliseconds": 0.0152,
+          "slowestOnePercentMeanMilliseconds": 0.0253
+        },
+        "traceCopyRecordCpuMs": {
+          "sampleCount": 98,
+          "meanMilliseconds": 0.1702,
+          "medianMilliseconds": 0.1653,
+          "p90Milliseconds": 0.2151,
+          "p95Milliseconds": 0.2352,
+          "slowestOnePercentMeanMilliseconds": 0.2575
+        },
+        "frameFenceWaitCpuMs": {
+          "sampleCount": 98,
+          "meanMilliseconds": 56.9264,
+          "medianMilliseconds": 57.5324,
+          "p90Milliseconds": 60.6216,
+          "p95Milliseconds": 61.0953,
+          "slowestOnePercentMeanMilliseconds": 61.498
+        },
+        "imageAcquireCpuMs": {
+          "sampleCount": 98,
+          "meanMilliseconds": 0.038,
+          "medianMilliseconds": 0.038,
+          "p90Milliseconds": 0.0432,
+          "p95Milliseconds": 0.0527,
+          "slowestOnePercentMeanMilliseconds": 0.1819
+        },
+        "queueSubmitCpuMs": {
+          "sampleCount": 98,
+          "meanMilliseconds": 0.244,
+          "medianMilliseconds": 0.2103,
+          "p90Milliseconds": 0.3984,
+          "p95Milliseconds": 0.4827,
+          "slowestOnePercentMeanMilliseconds": 0.6109
+        },
+        "presentCallCpuMs": {
+          "sampleCount": 98,
+          "meanMilliseconds": 0.1835,
+          "medianMilliseconds": 0.1653,
+          "p90Milliseconds": 0.2491,
+          "p95Milliseconds": 0.2909,
+          "slowestOnePercentMeanMilliseconds": 0.3303
+        },
+        "wholeFrameCycleCpuMs": {
+          "sampleCount": 98,
+          "meanMilliseconds": 68.3219,
+          "medianMilliseconds": 68.5551,
+          "p90Milliseconds": 72.4988,
+          "p95Milliseconds": 73.1624,
+          "slowestOnePercentMeanMilliseconds": 74.0062,
+          "onePercentLowFps": 13.5124
+        }
+      }
+    },
+    {
+      "zone": "shadow-corridor",
+      "frames": 599,
+      "cpuStages": {
+        "simulationStepCpuMs": {
+          "sampleCount": 599,
+          "meanMilliseconds": 0.0226,
+          "medianMilliseconds": 0.0212,
+          "p90Milliseconds": 0.0299,
+          "p95Milliseconds": 0.0321,
+          "slowestOnePercentMeanMilliseconds": 0.0592
+        },
+        "skinCpuMs": {
+          "sampleCount": 599,
+          "meanMilliseconds": 8.3264,
+          "medianMilliseconds": 8.7279,
+          "p90Milliseconds": 9.5252,
+          "p95Milliseconds": 9.6699,
+          "slowestOnePercentMeanMilliseconds": 10.2606
+        },
+        "playerSkinCpuMs": {
+          "sampleCount": 599,
+          "meanMilliseconds": 8.3247,
+          "medianMilliseconds": 8.7279,
+          "p90Milliseconds": 9.5251,
+          "p95Milliseconds": 9.6648,
+          "slowestOnePercentMeanMilliseconds": 10.2539
+        },
+        "characterSkinCpuMs": {
+          "sampleCount": 599,
+          "meanMilliseconds": 0.0016,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 0.0,
+          "p95Milliseconds": 0.0,
+          "slowestOnePercentMeanMilliseconds": 0.1647
+        },
+        "dynamicUploadCpuMs": {
+          "sampleCount": 599,
+          "meanMilliseconds": 0.3664,
+          "medianMilliseconds": 0.3468,
+          "p90Milliseconds": 0.4867,
+          "p95Milliseconds": 0.5604,
+          "slowestOnePercentMeanMilliseconds": 1.1611
+        },
+        "blasRefitRecordCpuMs": {
+          "sampleCount": 599,
+          "meanMilliseconds": 0.0335,
+          "medianMilliseconds": 0.0319,
+          "p90Milliseconds": 0.0416,
+          "p95Milliseconds": 0.0461,
+          "slowestOnePercentMeanMilliseconds": 0.0895
+        },
+        "tlasUpdateRecordCpuMs": {
+          "sampleCount": 599,
+          "meanMilliseconds": 0.0093,
+          "medianMilliseconds": 0.0088,
+          "p90Milliseconds": 0.0115,
+          "p95Milliseconds": 0.0122,
+          "slowestOnePercentMeanMilliseconds": 0.0371
+        },
+        "traceCopyRecordCpuMs": {
+          "sampleCount": 599,
+          "meanMilliseconds": 0.1756,
+          "medianMilliseconds": 0.1689,
+          "p90Milliseconds": 0.2095,
+          "p95Milliseconds": 0.2454,
+          "slowestOnePercentMeanMilliseconds": 0.5018
+        },
+        "frameFenceWaitCpuMs": {
+          "sampleCount": 599,
+          "meanMilliseconds": 55.5526,
+          "medianMilliseconds": 54.3794,
+          "p90Milliseconds": 62.6293,
+          "p95Milliseconds": 67.1645,
+          "slowestOnePercentMeanMilliseconds": 71.4672
+        },
+        "imageAcquireCpuMs": {
+          "sampleCount": 599,
+          "meanMilliseconds": 0.0359,
+          "medianMilliseconds": 0.0382,
+          "p90Milliseconds": 0.0424,
+          "p95Milliseconds": 0.0436,
+          "slowestOnePercentMeanMilliseconds": 0.0855
+        },
+        "queueSubmitCpuMs": {
+          "sampleCount": 599,
+          "meanMilliseconds": 0.2463,
+          "medianMilliseconds": 0.2259,
+          "p90Milliseconds": 0.3586,
+          "p95Milliseconds": 0.4322,
+          "slowestOnePercentMeanMilliseconds": 0.6326
+        },
+        "presentCallCpuMs": {
+          "sampleCount": 599,
+          "meanMilliseconds": 0.1957,
+          "medianMilliseconds": 0.1794,
+          "p90Milliseconds": 0.2667,
+          "p95Milliseconds": 0.2882,
+          "slowestOnePercentMeanMilliseconds": 0.4112
+        },
+        "wholeFrameCycleCpuMs": {
+          "sampleCount": 599,
+          "meanMilliseconds": 66.0988,
+          "medianMilliseconds": 64.9394,
+          "p90Milliseconds": 73.5892,
+          "p95Milliseconds": 77.9221,
+          "slowestOnePercentMeanMilliseconds": 82.2665,
+          "onePercentLowFps": 12.1556
+        }
+      }
+    },
+    {
+      "zone": "skylight-chamber",
+      "frames": 189,
+      "cpuStages": {
+        "simulationStepCpuMs": {
+          "sampleCount": 189,
+          "meanMilliseconds": 0.0251,
+          "medianMilliseconds": 0.0251,
+          "p90Milliseconds": 0.0302,
+          "p95Milliseconds": 0.031,
+          "slowestOnePercentMeanMilliseconds": 0.0583
+        },
+        "skinCpuMs": {
+          "sampleCount": 189,
+          "meanMilliseconds": 8.2773,
+          "medianMilliseconds": 8.9274,
+          "p90Milliseconds": 9.5006,
+          "p95Milliseconds": 9.5285,
+          "slowestOnePercentMeanMilliseconds": 10.9746
+        },
+        "playerSkinCpuMs": {
+          "sampleCount": 189,
+          "meanMilliseconds": 8.2649,
+          "medianMilliseconds": 8.9274,
+          "p90Milliseconds": 9.5006,
+          "p95Milliseconds": 9.5285,
+          "slowestOnePercentMeanMilliseconds": 10.0551
+        },
+        "characterSkinCpuMs": {
+          "sampleCount": 189,
+          "meanMilliseconds": 0.0124,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 0.0,
+          "p95Milliseconds": 0.0,
+          "slowestOnePercentMeanMilliseconds": 1.1684
+        },
+        "dynamicUploadCpuMs": {
+          "sampleCount": 189,
+          "meanMilliseconds": 0.3711,
+          "medianMilliseconds": 0.356,
+          "p90Milliseconds": 0.4726,
+          "p95Milliseconds": 0.5453,
+          "slowestOnePercentMeanMilliseconds": 0.9478
+        },
+        "blasRefitRecordCpuMs": {
+          "sampleCount": 189,
+          "meanMilliseconds": 0.0328,
+          "medianMilliseconds": 0.0316,
+          "p90Milliseconds": 0.0416,
+          "p95Milliseconds": 0.0459,
+          "slowestOnePercentMeanMilliseconds": 0.112
+        },
+        "tlasUpdateRecordCpuMs": {
+          "sampleCount": 189,
+          "meanMilliseconds": 0.0092,
+          "medianMilliseconds": 0.0087,
+          "p90Milliseconds": 0.0119,
+          "p95Milliseconds": 0.0127,
+          "slowestOnePercentMeanMilliseconds": 0.0348
+        },
+        "traceCopyRecordCpuMs": {
+          "sampleCount": 189,
+          "meanMilliseconds": 0.173,
+          "medianMilliseconds": 0.1676,
+          "p90Milliseconds": 0.2143,
+          "p95Milliseconds": 0.2401,
+          "slowestOnePercentMeanMilliseconds": 0.4789
+        },
+        "frameFenceWaitCpuMs": {
+          "sampleCount": 189,
+          "meanMilliseconds": 36.999,
+          "medianMilliseconds": 34.6586,
+          "p90Milliseconds": 54.0086,
+          "p95Milliseconds": 54.8329,
+          "slowestOnePercentMeanMilliseconds": 56.513
+        },
+        "imageAcquireCpuMs": {
+          "sampleCount": 189,
+          "meanMilliseconds": 0.0351,
+          "medianMilliseconds": 0.0377,
+          "p90Milliseconds": 0.042,
+          "p95Milliseconds": 0.043,
+          "slowestOnePercentMeanMilliseconds": 0.0706
+        },
+        "queueSubmitCpuMs": {
+          "sampleCount": 189,
+          "meanMilliseconds": 0.2349,
+          "medianMilliseconds": 0.221,
+          "p90Milliseconds": 0.3259,
+          "p95Milliseconds": 0.3974,
+          "slowestOnePercentMeanMilliseconds": 0.4832
+        },
+        "presentCallCpuMs": {
+          "sampleCount": 189,
+          "meanMilliseconds": 0.1893,
+          "medianMilliseconds": 0.1733,
+          "p90Milliseconds": 0.2647,
+          "p95Milliseconds": 0.2864,
+          "slowestOnePercentMeanMilliseconds": 0.3305
+        },
+        "wholeFrameCycleCpuMs": {
+          "sampleCount": 189,
+          "meanMilliseconds": 47.4246,
+          "medianMilliseconds": 46.0153,
+          "p90Milliseconds": 60.1666,
+          "p95Milliseconds": 65.3989,
+          "slowestOnePercentMeanMilliseconds": 68.5507,
+          "onePercentLowFps": 14.5877
+        }
+      }
+    },
+    {
+      "zone": "yellow-torch-bay",
+      "frames": 157,
+      "cpuStages": {
+        "simulationStepCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.0223,
+          "medianMilliseconds": 0.0227,
+          "p90Milliseconds": 0.0266,
+          "p95Milliseconds": 0.0278,
+          "slowestOnePercentMeanMilliseconds": 0.0573
+        },
+        "skinCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 8.1966,
+          "medianMilliseconds": 8.5746,
+          "p90Milliseconds": 9.502,
+          "p95Milliseconds": 9.8245,
+          "slowestOnePercentMeanMilliseconds": 10.2413
+        },
+        "playerSkinCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 8.1966,
+          "medianMilliseconds": 8.5746,
+          "p90Milliseconds": 9.502,
+          "p95Milliseconds": 9.8245,
+          "slowestOnePercentMeanMilliseconds": 10.2413
+        },
+        "characterSkinCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.0,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 0.0,
+          "p95Milliseconds": 0.0,
+          "slowestOnePercentMeanMilliseconds": 0.0
+        },
+        "dynamicUploadCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.3656,
+          "medianMilliseconds": 0.3536,
+          "p90Milliseconds": 0.5062,
+          "p95Milliseconds": 0.5467,
+          "slowestOnePercentMeanMilliseconds": 0.5922
+        },
+        "blasRefitRecordCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.0333,
+          "medianMilliseconds": 0.0329,
+          "p90Milliseconds": 0.0415,
+          "p95Milliseconds": 0.0468,
+          "slowestOnePercentMeanMilliseconds": 0.0644
+        },
+        "tlasUpdateRecordCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.009,
+          "medianMilliseconds": 0.0089,
+          "p90Milliseconds": 0.0112,
+          "p95Milliseconds": 0.0119,
+          "slowestOnePercentMeanMilliseconds": 0.0208
+        },
+        "traceCopyRecordCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.1719,
+          "medianMilliseconds": 0.1676,
+          "p90Milliseconds": 0.2082,
+          "p95Milliseconds": 0.2308,
+          "slowestOnePercentMeanMilliseconds": 0.3745
+        },
+        "frameFenceWaitCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 41.1616,
+          "medianMilliseconds": 41.1875,
+          "p90Milliseconds": 44.2776,
+          "p95Milliseconds": 46.1976,
+          "slowestOnePercentMeanMilliseconds": 47.1081
+        },
+        "imageAcquireCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.0355,
+          "medianMilliseconds": 0.0374,
+          "p90Milliseconds": 0.0422,
+          "p95Milliseconds": 0.0442,
+          "slowestOnePercentMeanMilliseconds": 0.1314
+        },
+        "queueSubmitCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.2594,
+          "medianMilliseconds": 0.2368,
+          "p90Milliseconds": 0.3774,
+          "p95Milliseconds": 0.5141,
+          "slowestOnePercentMeanMilliseconds": 0.6904
+        },
+        "presentCallCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.1973,
+          "medianMilliseconds": 0.1814,
+          "p90Milliseconds": 0.2619,
+          "p95Milliseconds": 0.2891,
+          "slowestOnePercentMeanMilliseconds": 0.4521
+        },
+        "wholeFrameCycleCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 51.5358,
+          "medianMilliseconds": 51.1308,
+          "p90Milliseconds": 55.8086,
+          "p95Milliseconds": 57.033,
+          "slowestOnePercentMeanMilliseconds": 58.0293,
+          "onePercentLowFps": 17.2327
+        }
+      }
+    },
+    {
+      "zone": "blue-torch-bay",
+      "frames": 157,
+      "cpuStages": {
+        "simulationStepCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.0209,
+          "medianMilliseconds": 0.0218,
+          "p90Milliseconds": 0.0253,
+          "p95Milliseconds": 0.0259,
+          "slowestOnePercentMeanMilliseconds": 0.0456
+        },
+        "skinCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 8.0007,
+          "medianMilliseconds": 8.7467,
+          "p90Milliseconds": 9.5114,
+          "p95Milliseconds": 9.6485,
+          "slowestOnePercentMeanMilliseconds": 10.3034
+        },
+        "playerSkinCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 8.0007,
+          "medianMilliseconds": 8.7467,
+          "p90Milliseconds": 9.5114,
+          "p95Milliseconds": 9.6485,
+          "slowestOnePercentMeanMilliseconds": 10.3034
+        },
+        "characterSkinCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.0,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 0.0,
+          "p95Milliseconds": 0.0,
+          "slowestOnePercentMeanMilliseconds": 0.0
+        },
+        "dynamicUploadCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.367,
+          "medianMilliseconds": 0.3538,
+          "p90Milliseconds": 0.5022,
+          "p95Milliseconds": 0.5649,
+          "slowestOnePercentMeanMilliseconds": 1.0773
+        },
+        "blasRefitRecordCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.0338,
+          "medianMilliseconds": 0.0316,
+          "p90Milliseconds": 0.0422,
+          "p95Milliseconds": 0.046,
+          "slowestOnePercentMeanMilliseconds": 0.1564
+        },
+        "tlasUpdateRecordCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.0089,
+          "medianMilliseconds": 0.0087,
+          "p90Milliseconds": 0.0114,
+          "p95Milliseconds": 0.0118,
+          "slowestOnePercentMeanMilliseconds": 0.0194
+        },
+        "traceCopyRecordCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.171,
+          "medianMilliseconds": 0.1627,
+          "p90Milliseconds": 0.2061,
+          "p95Milliseconds": 0.2462,
+          "slowestOnePercentMeanMilliseconds": 0.3685
+        },
+        "frameFenceWaitCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 42.986,
+          "medianMilliseconds": 42.4556,
+          "p90Milliseconds": 47.2064,
+          "p95Milliseconds": 47.8648,
+          "slowestOnePercentMeanMilliseconds": 48.6306
+        },
+        "imageAcquireCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.0346,
+          "medianMilliseconds": 0.0377,
+          "p90Milliseconds": 0.0424,
+          "p95Milliseconds": 0.0431,
+          "slowestOnePercentMeanMilliseconds": 0.0606
+        },
+        "queueSubmitCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.2368,
+          "medianMilliseconds": 0.2259,
+          "p90Milliseconds": 0.3337,
+          "p95Milliseconds": 0.419,
+          "slowestOnePercentMeanMilliseconds": 0.6642
+        },
+        "presentCallCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.192,
+          "medianMilliseconds": 0.1778,
+          "p90Milliseconds": 0.2661,
+          "p95Milliseconds": 0.2857,
+          "slowestOnePercentMeanMilliseconds": 0.3335
+        },
+        "wholeFrameCycleCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 53.1971,
+          "medianMilliseconds": 52.8519,
+          "p90Milliseconds": 57.9556,
+          "p95Milliseconds": 58.848,
+          "slowestOnePercentMeanMilliseconds": 60.0672,
+          "onePercentLowFps": 16.648
+        }
+      }
+    },
+    {
+      "zone": "red-torch-bay",
+      "frames": 157,
+      "cpuStages": {
+        "simulationStepCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.0207,
+          "medianMilliseconds": 0.0212,
+          "p90Milliseconds": 0.0244,
+          "p95Milliseconds": 0.0255,
+          "slowestOnePercentMeanMilliseconds": 0.0447
+        },
+        "skinCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 8.16,
+          "medianMilliseconds": 8.7921,
+          "p90Milliseconds": 9.4893,
+          "p95Milliseconds": 9.5958,
+          "slowestOnePercentMeanMilliseconds": 10.1922
+        },
+        "playerSkinCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 8.16,
+          "medianMilliseconds": 8.7921,
+          "p90Milliseconds": 9.4893,
+          "p95Milliseconds": 9.5958,
+          "slowestOnePercentMeanMilliseconds": 10.1922
+        },
+        "characterSkinCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.0,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 0.0,
+          "p95Milliseconds": 0.0,
+          "slowestOnePercentMeanMilliseconds": 0.0
+        },
+        "dynamicUploadCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.362,
+          "medianMilliseconds": 0.3493,
+          "p90Milliseconds": 0.4252,
+          "p95Milliseconds": 0.5279,
+          "slowestOnePercentMeanMilliseconds": 1.2554
+        },
+        "blasRefitRecordCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.0353,
+          "medianMilliseconds": 0.0335,
+          "p90Milliseconds": 0.043,
+          "p95Milliseconds": 0.0487,
+          "slowestOnePercentMeanMilliseconds": 0.1252
+        },
+        "tlasUpdateRecordCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.0101,
+          "medianMilliseconds": 0.0096,
+          "p90Milliseconds": 0.0118,
+          "p95Milliseconds": 0.0145,
+          "slowestOnePercentMeanMilliseconds": 0.0534
+        },
+        "traceCopyRecordCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.1781,
+          "medianMilliseconds": 0.1695,
+          "p90Milliseconds": 0.2114,
+          "p95Milliseconds": 0.2357,
+          "slowestOnePercentMeanMilliseconds": 0.4747
+        },
+        "frameFenceWaitCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 44.0433,
+          "medianMilliseconds": 42.387,
+          "p90Milliseconds": 49.4058,
+          "p95Milliseconds": 51.3247,
+          "slowestOnePercentMeanMilliseconds": 57.441
+        },
+        "imageAcquireCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.0353,
+          "medianMilliseconds": 0.0382,
+          "p90Milliseconds": 0.0426,
+          "p95Milliseconds": 0.044,
+          "slowestOnePercentMeanMilliseconds": 0.0644
+        },
+        "queueSubmitCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.2408,
+          "medianMilliseconds": 0.2192,
+          "p90Milliseconds": 0.333,
+          "p95Milliseconds": 0.423,
+          "slowestOnePercentMeanMilliseconds": 0.5731
+        },
+        "presentCallCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.2041,
+          "medianMilliseconds": 0.1981,
+          "p90Milliseconds": 0.2717,
+          "p95Milliseconds": 0.287,
+          "slowestOnePercentMeanMilliseconds": 0.4197
+        },
+        "wholeFrameCycleCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 54.4,
+          "medianMilliseconds": 53.8784,
+          "p90Milliseconds": 59.9402,
+          "p95Milliseconds": 62.3147,
+          "slowestOnePercentMeanMilliseconds": 68.4572,
+          "onePercentLowFps": 14.6077
+        }
+      }
+    },
+    {
+      "zone": "green-torch-bay",
+      "frames": 157,
+      "cpuStages": {
+        "simulationStepCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.0245,
+          "medianMilliseconds": 0.0239,
+          "p90Milliseconds": 0.0313,
+          "p95Milliseconds": 0.0329,
+          "slowestOnePercentMeanMilliseconds": 0.08
+        },
+        "skinCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 8.2447,
+          "medianMilliseconds": 8.7185,
+          "p90Milliseconds": 9.4902,
+          "p95Milliseconds": 9.5356,
+          "slowestOnePercentMeanMilliseconds": 10.3024
+        },
+        "playerSkinCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 8.2447,
+          "medianMilliseconds": 8.7185,
+          "p90Milliseconds": 9.4902,
+          "p95Milliseconds": 9.5356,
+          "slowestOnePercentMeanMilliseconds": 10.3024
+        },
+        "characterSkinCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.0,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 0.0,
+          "p95Milliseconds": 0.0,
+          "slowestOnePercentMeanMilliseconds": 0.0
+        },
+        "dynamicUploadCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.3641,
+          "medianMilliseconds": 0.3506,
+          "p90Milliseconds": 0.4301,
+          "p95Milliseconds": 0.5166,
+          "slowestOnePercentMeanMilliseconds": 1.0659
+        },
+        "blasRefitRecordCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.035,
+          "medianMilliseconds": 0.034,
+          "p90Milliseconds": 0.0432,
+          "p95Milliseconds": 0.0519,
+          "slowestOnePercentMeanMilliseconds": 0.0737
+        },
+        "tlasUpdateRecordCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.0098,
+          "medianMilliseconds": 0.0094,
+          "p90Milliseconds": 0.0117,
+          "p95Milliseconds": 0.0144,
+          "slowestOnePercentMeanMilliseconds": 0.0296
+        },
+        "traceCopyRecordCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.1799,
+          "medianMilliseconds": 0.175,
+          "p90Milliseconds": 0.2164,
+          "p95Milliseconds": 0.2489,
+          "slowestOnePercentMeanMilliseconds": 0.3692
+        },
+        "frameFenceWaitCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 47.2463,
+          "medianMilliseconds": 46.8281,
+          "p90Milliseconds": 52.8135,
+          "p95Milliseconds": 55.7761,
+          "slowestOnePercentMeanMilliseconds": 57.6803
+        },
+        "imageAcquireCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.0364,
+          "medianMilliseconds": 0.0382,
+          "p90Milliseconds": 0.0428,
+          "p95Milliseconds": 0.0444,
+          "slowestOnePercentMeanMilliseconds": 0.0973
+        },
+        "queueSubmitCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.2511,
+          "medianMilliseconds": 0.2318,
+          "p90Milliseconds": 0.3413,
+          "p95Milliseconds": 0.4216,
+          "slowestOnePercentMeanMilliseconds": 0.5695
+        },
+        "presentCallCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 0.2076,
+          "medianMilliseconds": 0.194,
+          "p90Milliseconds": 0.2793,
+          "p95Milliseconds": 0.3222,
+          "slowestOnePercentMeanMilliseconds": 0.3869
+        },
+        "wholeFrameCycleCpuMs": {
+          "sampleCount": 157,
+          "meanMilliseconds": 57.7037,
+          "medianMilliseconds": 57.1453,
+          "p90Milliseconds": 63.4221,
+          "p95Milliseconds": 66.1944,
+          "slowestOnePercentMeanMilliseconds": 69.5426,
+          "onePercentLowFps": 14.3797
+        }
+      }
+    },
+    {
+      "zone": "transmission-threshold",
+      "frames": 63,
+      "cpuStages": {
+        "simulationStepCpuMs": {
+          "sampleCount": 63,
+          "meanMilliseconds": 0.0254,
+          "medianMilliseconds": 0.026,
+          "p90Milliseconds": 0.0294,
+          "p95Milliseconds": 0.0298,
+          "slowestOnePercentMeanMilliseconds": 0.0304
+        },
+        "skinCpuMs": {
+          "sampleCount": 63,
+          "meanMilliseconds": 8.4811,
+          "medianMilliseconds": 8.7048,
+          "p90Milliseconds": 9.37,
+          "p95Milliseconds": 9.4665,
+          "slowestOnePercentMeanMilliseconds": 9.5367
+        },
+        "playerSkinCpuMs": {
+          "sampleCount": 63,
+          "meanMilliseconds": 8.4811,
+          "medianMilliseconds": 8.7048,
+          "p90Milliseconds": 9.37,
+          "p95Milliseconds": 9.4665,
+          "slowestOnePercentMeanMilliseconds": 9.5367
+        },
+        "characterSkinCpuMs": {
+          "sampleCount": 63,
+          "meanMilliseconds": 0.0,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 0.0,
+          "p95Milliseconds": 0.0,
+          "slowestOnePercentMeanMilliseconds": 0.0
+        },
+        "dynamicUploadCpuMs": {
+          "sampleCount": 63,
+          "meanMilliseconds": 0.356,
+          "medianMilliseconds": 0.344,
+          "p90Milliseconds": 0.4136,
+          "p95Milliseconds": 0.4777,
+          "slowestOnePercentMeanMilliseconds": 0.6328
+        },
+        "blasRefitRecordCpuMs": {
+          "sampleCount": 63,
+          "meanMilliseconds": 0.0367,
+          "medianMilliseconds": 0.0313,
+          "p90Milliseconds": 0.0413,
+          "p95Milliseconds": 0.052,
+          "slowestOnePercentMeanMilliseconds": 0.2934
+        },
+        "tlasUpdateRecordCpuMs": {
+          "sampleCount": 63,
+          "meanMilliseconds": 0.0091,
+          "medianMilliseconds": 0.0086,
+          "p90Milliseconds": 0.0112,
+          "p95Milliseconds": 0.0133,
+          "slowestOnePercentMeanMilliseconds": 0.0248
+        },
+        "traceCopyRecordCpuMs": {
+          "sampleCount": 63,
+          "meanMilliseconds": 0.1723,
+          "medianMilliseconds": 0.162,
+          "p90Milliseconds": 0.219,
+          "p95Milliseconds": 0.234,
+          "slowestOnePercentMeanMilliseconds": 0.4389
+        },
+        "frameFenceWaitCpuMs": {
+          "sampleCount": 63,
+          "meanMilliseconds": 38.636,
+          "medianMilliseconds": 38.568,
+          "p90Milliseconds": 40.2133,
+          "p95Milliseconds": 40.6877,
+          "slowestOnePercentMeanMilliseconds": 58.8472
+        },
+        "imageAcquireCpuMs": {
+          "sampleCount": 63,
+          "meanMilliseconds": 0.0365,
+          "medianMilliseconds": 0.0383,
+          "p90Milliseconds": 0.0414,
+          "p95Milliseconds": 0.0427,
+          "slowestOnePercentMeanMilliseconds": 0.0827
+        },
+        "queueSubmitCpuMs": {
+          "sampleCount": 63,
+          "meanMilliseconds": 0.2393,
+          "medianMilliseconds": 0.2194,
+          "p90Milliseconds": 0.3218,
+          "p95Milliseconds": 0.3966,
+          "slowestOnePercentMeanMilliseconds": 0.6142
+        },
+        "presentCallCpuMs": {
+          "sampleCount": 63,
+          "meanMilliseconds": 0.1795,
+          "medianMilliseconds": 0.1663,
+          "p90Milliseconds": 0.2395,
+          "p95Milliseconds": 0.2571,
+          "slowestOnePercentMeanMilliseconds": 0.3072
+        },
+        "wholeFrameCycleCpuMs": {
+          "sampleCount": 63,
+          "meanMilliseconds": 49.2666,
+          "medianMilliseconds": 49.4424,
+          "p90Milliseconds": 51.4557,
+          "p95Milliseconds": 51.8553,
+          "slowestOnePercentMeanMilliseconds": 69.3802,
+          "onePercentLowFps": 14.4133
+        }
+      }
+    },
+    {
+      "zone": "finale",
+      "frames": 101,
+      "cpuStages": {
+        "simulationStepCpuMs": {
+          "sampleCount": 101,
+          "meanMilliseconds": 0.0199,
+          "medianMilliseconds": 0.0193,
+          "p90Milliseconds": 0.0231,
+          "p95Milliseconds": 0.0241,
+          "slowestOnePercentMeanMilliseconds": 0.0767
+        },
+        "skinCpuMs": {
+          "sampleCount": 101,
+          "meanMilliseconds": 8.3714,
+          "medianMilliseconds": 8.5229,
+          "p90Milliseconds": 11.0099,
+          "p95Milliseconds": 11.4709,
+          "slowestOnePercentMeanMilliseconds": 12.3436
+        },
+        "playerSkinCpuMs": {
+          "sampleCount": 101,
+          "meanMilliseconds": 7.6587,
+          "medianMilliseconds": 8.3373,
+          "p90Milliseconds": 9.0962,
+          "p95Milliseconds": 9.4398,
+          "slowestOnePercentMeanMilliseconds": 9.6321
+        },
+        "characterSkinCpuMs": {
+          "sampleCount": 101,
+          "meanMilliseconds": 0.7128,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 2.1458,
+          "p95Milliseconds": 2.4192,
+          "slowestOnePercentMeanMilliseconds": 3.0741
+        },
+        "dynamicUploadCpuMs": {
+          "sampleCount": 101,
+          "meanMilliseconds": 0.4093,
+          "medianMilliseconds": 0.369,
+          "p90Milliseconds": 0.5732,
+          "p95Milliseconds": 0.6602,
+          "slowestOnePercentMeanMilliseconds": 0.7778
+        },
+        "blasRefitRecordCpuMs": {
+          "sampleCount": 101,
+          "meanMilliseconds": 0.0333,
+          "medianMilliseconds": 0.0307,
+          "p90Milliseconds": 0.0449,
+          "p95Milliseconds": 0.0465,
+          "slowestOnePercentMeanMilliseconds": 0.0796
+        },
+        "tlasUpdateRecordCpuMs": {
+          "sampleCount": 101,
+          "meanMilliseconds": 0.0085,
+          "medianMilliseconds": 0.0078,
+          "p90Milliseconds": 0.0116,
+          "p95Milliseconds": 0.0131,
+          "slowestOnePercentMeanMilliseconds": 0.0227
+        },
+        "traceCopyRecordCpuMs": {
+          "sampleCount": 101,
+          "meanMilliseconds": 0.17,
+          "medianMilliseconds": 0.156,
+          "p90Milliseconds": 0.2191,
+          "p95Milliseconds": 0.2627,
+          "slowestOnePercentMeanMilliseconds": 0.3987
+        },
+        "frameFenceWaitCpuMs": {
+          "sampleCount": 101,
+          "meanMilliseconds": 40.9623,
+          "medianMilliseconds": 38.1158,
+          "p90Milliseconds": 55.1952,
+          "p95Milliseconds": 56.0585,
+          "slowestOnePercentMeanMilliseconds": 58.2654
+        },
+        "imageAcquireCpuMs": {
+          "sampleCount": 101,
+          "meanMilliseconds": 0.0352,
+          "medianMilliseconds": 0.0361,
+          "p90Milliseconds": 0.0427,
+          "p95Milliseconds": 0.0452,
+          "slowestOnePercentMeanMilliseconds": 0.0941
+        },
+        "queueSubmitCpuMs": {
+          "sampleCount": 101,
+          "meanMilliseconds": 0.2264,
+          "medianMilliseconds": 0.2104,
+          "p90Milliseconds": 0.3251,
+          "p95Milliseconds": 0.3733,
+          "slowestOnePercentMeanMilliseconds": 0.4443
+        },
+        "presentCallCpuMs": {
+          "sampleCount": 101,
+          "meanMilliseconds": 0.1884,
+          "medianMilliseconds": 0.1672,
+          "p90Milliseconds": 0.2567,
+          "p95Milliseconds": 0.2836,
+          "slowestOnePercentMeanMilliseconds": 0.4025
+        },
+        "wholeFrameCycleCpuMs": {
+          "sampleCount": 101,
+          "meanMilliseconds": 51.5145,
+          "medianMilliseconds": 49.431,
+          "p90Milliseconds": 65.9205,
+          "p95Milliseconds": 69.0029,
+          "slowestOnePercentMeanMilliseconds": 71.5392,
+          "onePercentLowFps": 13.9784
+        }
+      }
+    }
+  ],
+  "diagnosticRowsCompiledOut": 1838,
+  "firstMeasuredSimulationTick": 1839,
+  "lastMeasuredSimulationTick": 3676,
+  "context": {
+    "samples": 43,
+    "firstUtc": "2026-09-30T20:50:27.4295141Z",
+    "lastUtc": "2026-09-30T20:54:08.3137293Z",
+    "batteryStartC": 25.4,
+    "batteryEndC": 32.7,
+    "thermalStatuses": [
+      0
+    ],
+    "gpuThermalPowerLevels": [
+      0
+    ],
+    "processIds": [
+      "27257"
+    ]
+  },
+  "classification": "nonphysical-opaque-primary-secondary-omission-cost-bound-investigation-only",
+  "optimizationClaim": "none",
+  "causalAcceptance": "not-evaluated",
+  "qualityAcceptance": "not-evaluated",
+  "productionPromotion": "not-authorized",
+  "limitations": [
+    "Thermal context starts after am-start observation and is not frame-aligned measured-lap telemetry.",
+    "Render-entry-through-present timing is not display pacing or input latency.",
+    "GPU command-buffer timestamps include AS work/RT/copy, not isolated shader timing.",
+    "The investigation removes opaque-primary secondary bounce/reflected-fire contributions; the isolate is deliberately nonphysical and not a candidate.",
+    "The whole-GPU interval includes all work in the frame; it is not additive secondary-ray cost or an isolated shader measurement.",
+    "CPU BLAS/TLAS record timings do not establish GPU AS cost; current GPU schema does not separate AS from RT dispatch.",
+    "This parser validates individual runs only; it does not calculate an ABBA effect or accept a performance or quality claim."
+  ]
+}

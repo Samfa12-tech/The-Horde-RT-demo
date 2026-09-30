@@ -1,0 +1,17 @@
+{
+  "worktree": {
+    "head": "71cb366c5cbe5cf6fe338c4cd6fd7bec0bd12d95"
+  },
+  "control": {
+    "apkPath": "C:\\Dev\\tmp\\horde-primary-hit-profile-20261001\\artifacts\\control\\HordeLanternRT-primary-hit-normal-control-arm64.apk",
+    "apkSha256": "a6329657e585e9605098e667fc07fa1ef278626a4242f81a94f9f79d1d3cd033",
+    "package": "com.samfa12.hordelanternrt.benchmark"
+  },
+  "isolate": {
+    "apkPath": "C:\\Dev\\tmp\\horde-opaque-secondary-profile-20261001\\artifacts\\revised-candidate\\HordeLanternRT-opaque-secondary-shipping-mobile-benchmark-arm64.apk",
+    "apkSha256": "ce1c1548ed3937d1ab99b57c523b62a8a1e244538c01e9075bb2f7e56e766cce",
+    "package": "com.samfa12.hordelanternrt.benchmark"
+  },
+  "classification": "nonphysical-opaque-primary-secondary-omission-investigation-only",
+  "plan": "C1/S1/S2/C2, route and live reveal only; frozen held-high not repeated"
+}

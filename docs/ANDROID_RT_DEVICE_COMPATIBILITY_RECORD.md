@@ -2,6 +2,31 @@
 
 Last updated: 2026-10-01
 
+## October 1: opaque-secondary Shipping omission profile (local SM-S948B)
+
+ExactSM-S948B/R5GL219SZGK/Adreno840, Shipping/Mobile pipeline at75%, strict ASTC,
+1080x2235 internal/1440x2980 presentation/MAILBOX. Source71cb366 normala6329657
+and deliberately nonphysical isolatece1c1548 `.benchmark` APKs are install/
+pullback-checked. Eight C1/S1/S2/C2 route1838/live600 runs admit9,752 owning
+presented/GPU-valid rows. All640 opening rows actuallyOpaqueFast. No production
+gain, quality, physical-glass or sustained30FPS acceptance is inferred.
+
+OpeningGPU66.55/40.91/38.11/80.80ms; live223.39/275.97/302.41/258.07ms in run
+order. Opening improves descriptively but live worsens; both remain outside30FPS.
+Route cycles59.10/42.53/41.09/70.85ms; live235.06/288.14/314.08/270.23ms.
+Context25.4–43.4C/status0–2, unequal power/process/order/compiler footprints;
+uncooled, context not frame-aligned. GPU interval includesAS/RT/copy, not isolated
+secondary cost. No negative result is forced into Shipping.
+
+All53assets identical; eight actual control/isolate SPIR-V modules fresh val/dis
+PASS, no diagnostic atomics/image reads/binding22. Lead reparses all8 archived
+raw inputs and aggregate with exact field agreement (path/timestamp excepted),
+9,752rows. Portable archive checker independently passes. APK/native bytes are
+excluded from Git archive; their pins are receipt claims there. Normalcontrol
+restored/retained beforeC2, phone Home; normalDebugC11/stable unchanged. Not phone
+compute, RTX, S24/S25 or owner-feel evidence. Audio/haptic manual revalidation:NO.
+[Exact mixed/negative result](evidence/2026-10-01-opaque-secondary/README.md).
+
 ## October 1: Pocket Audio Core build only (no new device acceptance)
 
 Core integration over engineering basebaa8bfe builds Android Debug for all four

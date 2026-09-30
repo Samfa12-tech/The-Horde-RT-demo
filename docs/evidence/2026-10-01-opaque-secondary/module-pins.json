@@ -1,0 +1,143 @@
+{
+  "schema": 1,
+  "classification": "nonphysical-opaque-primary-secondary-omission-cost-bound-investigation-only",
+  "control": {
+    "apkSha256": "a6329657e585e9605098e667fc07fa1ef278626a4242f81a94f9f79d1d3cd033",
+    "artifactBytesArchived": false
+  },
+  "isolate": {
+    "apkSha256": "ce1c1548ed3937d1ab99b57c523b62a8a1e244538c01e9075bb2f7e56e766cce",
+    "artifactBytesArchived": false
+  },
+  "artifacts": [
+    {
+      "role": "control",
+      "apkSha256": "a6329657e585e9605098e667fc07fa1ef278626a4242f81a94f9f79d1d3cd033",
+      "nativeLibrarySha256": "41b34e601fa486e5cb5eeea24dd31df9771badb485b7cb74530344637644b049",
+      "artifactBytesArchived": false,
+      "modules": [
+        {
+          "semanticKey": "rayquery_compute_shipping_mobile_opaque_fast",
+          "backend": "RayQueryCompute",
+          "sha256": "5002afa7ac6ce0d03fc749742bb0832a1006b9f01bb1c6ab8490710790a79133",
+          "words": 125318,
+          "spvPath": "modules/control/rayquery_compute_shipping_mobile_opaque_fast.spv",
+          "spirvVal": "PASS",
+          "spirvDis": "PASS",
+          "valLog": "modules/control/rayquery_compute_shipping_mobile_opaque_fast-spirv-val.log",
+          "disLog": "modules/control/rayquery_compute_shipping_mobile_opaque_fast-spirv-dis.log",
+          "atomicInstructions": 0,
+          "opImageReadCount": 0,
+          "binding22": false
+        },
+        {
+          "semanticKey": "rayquery_compute_shipping_mobile_generic_dielectric",
+          "backend": "RayQueryCompute",
+          "sha256": "c2bd389812841161951f819e0f12e95c929aa3f49ec87d9849393a687d20ebde",
+          "words": 61022,
+          "spvPath": "modules/control/rayquery_compute_shipping_mobile_generic_dielectric.spv",
+          "spirvVal": "PASS",
+          "spirvDis": "PASS",
+          "valLog": "modules/control/rayquery_compute_shipping_mobile_generic_dielectric-spirv-val.log",
+          "disLog": "modules/control/rayquery_compute_shipping_mobile_generic_dielectric-spirv-dis.log",
+          "atomicInstructions": 0,
+          "opImageReadCount": 0,
+          "binding22": false
+        },
+        {
+          "semanticKey": "shipping_mobile_opaque_fast",
+          "backend": "RayTracingPipeline",
+          "sha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+          "words": 125253,
+          "spvPath": "modules/control/shipping_mobile_opaque_fast.spv",
+          "spirvVal": "PASS",
+          "spirvDis": "PASS",
+          "valLog": "modules/control/shipping_mobile_opaque_fast-spirv-val.log",
+          "disLog": "modules/control/shipping_mobile_opaque_fast-spirv-dis.log",
+          "atomicInstructions": 0,
+          "opImageReadCount": 0,
+          "binding22": false
+        },
+        {
+          "semanticKey": "shipping_mobile_generic_dielectric",
+          "backend": "RayTracingPipeline",
+          "sha256": "ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532",
+          "words": 60963,
+          "spvPath": "modules/control/shipping_mobile_generic_dielectric.spv",
+          "spirvVal": "PASS",
+          "spirvDis": "PASS",
+          "valLog": "modules/control/shipping_mobile_generic_dielectric-spirv-val.log",
+          "disLog": "modules/control/shipping_mobile_generic_dielectric-spirv-dis.log",
+          "atomicInstructions": 0,
+          "opImageReadCount": 0,
+          "binding22": false
+        }
+      ]
+    },
+    {
+      "role": "isolate",
+      "apkSha256": "ce1c1548ed3937d1ab99b57c523b62a8a1e244538c01e9075bb2f7e56e766cce",
+      "nativeLibrarySha256": "75c7410f7ef30cc0e9f2ccb231c7792cbf2947907006a37f8b7bc2ae1f3d51f3",
+      "artifactBytesArchived": false,
+      "modules": [
+        {
+          "semanticKey": "rayquery_compute_shipping_mobile_opaque_fast",
+          "backend": "RayQueryCompute",
+          "sha256": "caefd75b78f829721bcbfa04bdf05bf3da608de162c96f8f703190a16eda6693",
+          "words": 96702,
+          "spvPath": "modules/isolate/rayquery_compute_shipping_mobile_opaque_fast.spv",
+          "spirvVal": "PASS",
+          "spirvDis": "PASS",
+          "valLog": "modules/isolate/rayquery_compute_shipping_mobile_opaque_fast-spirv-val.log",
+          "disLog": "modules/isolate/rayquery_compute_shipping_mobile_opaque_fast-spirv-dis.log",
+          "atomicInstructions": 0,
+          "opImageReadCount": 0,
+          "binding22": false
+        },
+        {
+          "semanticKey": "rayquery_compute_shipping_mobile_generic_dielectric",
+          "backend": "RayQueryCompute",
+          "sha256": "ad24fdfb746a3dfb0505d515e3063acd96c6fa20d343af976fa323735ee21cc9",
+          "words": 60270,
+          "spvPath": "modules/isolate/rayquery_compute_shipping_mobile_generic_dielectric.spv",
+          "spirvVal": "PASS",
+          "spirvDis": "PASS",
+          "valLog": "modules/isolate/rayquery_compute_shipping_mobile_generic_dielectric-spirv-val.log",
+          "disLog": "modules/isolate/rayquery_compute_shipping_mobile_generic_dielectric-spirv-dis.log",
+          "atomicInstructions": 0,
+          "opImageReadCount": 0,
+          "binding22": false
+        },
+        {
+          "semanticKey": "shipping_mobile_opaque_fast",
+          "backend": "RayTracingPipeline",
+          "sha256": "4e9623aad963e123f6b8ce5a8dde4f2ac2c48f20faa1ac205a8235a9c75f5f38",
+          "words": 96637,
+          "spvPath": "modules/isolate/shipping_mobile_opaque_fast.spv",
+          "spirvVal": "PASS",
+          "spirvDis": "PASS",
+          "valLog": "modules/isolate/shipping_mobile_opaque_fast-spirv-val.log",
+          "disLog": "modules/isolate/shipping_mobile_opaque_fast-spirv-dis.log",
+          "atomicInstructions": 0,
+          "opImageReadCount": 0,
+          "binding22": false
+        },
+        {
+          "semanticKey": "shipping_mobile_generic_dielectric",
+          "backend": "RayTracingPipeline",
+          "sha256": "ca364d129f6360ec9772c884d30c544916eecd6ef616fccdf5135c6c2512db9a",
+          "words": 60211,
+          "spvPath": "modules/isolate/shipping_mobile_generic_dielectric.spv",
+          "spirvVal": "PASS",
+          "spirvDis": "PASS",
+          "valLog": "modules/isolate/shipping_mobile_generic_dielectric-spirv-val.log",
+          "disLog": "modules/isolate/shipping_mobile_generic_dielectric-spirv-dis.log",
+          "atomicInstructions": 0,
+          "opImageReadCount": 0,
+          "binding22": false
+        }
+      ]
+    }
+  ],
+  "limitation": "APK and native libraries are omitted; APK SHA values are receipt pins and are not rehashed by this archive."
+}

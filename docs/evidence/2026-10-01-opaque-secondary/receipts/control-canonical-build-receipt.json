@@ -1,0 +1,123 @@
+{
+  "schema": 1,
+  "createdUtc": "2026-09-30T17:22:56Z",
+  "worktree": {
+    "path": "C:\\Dev\\tmp\\horde-all-shadow-profile-20261001\\source",
+    "initialState": "verified exact requested commit and clean before control build",
+    "noCommit": true,
+    "head": "71cb366c5cbe5cf6fe338c4cd6fd7bec0bd12d95"
+  },
+  "control": {
+    "apkSha256": "a6329657e585e9605098e667fc07fa1ef278626a4242f81a94f9f79d1d3cd033",
+    "package": "com.samfa12.hordelanternrt.benchmark",
+    "certificateSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736",
+    "gradleExit": 0,
+    "gradleCommand": ":app:assembleBenchmark -Pandroid.injected.build.abi=arm64-v8a -PhordeBenchmarkValidation=true --max-workers=2 --console=plain",
+    "resolverPath": "C:\\Dev\\tmp\\horde-all-shadow-profile-20261001\\source\\android\\app\\build\\intermediates\\apk\\benchmark\\app-benchmark.apk",
+    "nativeLibrarySha256": "41b34e601fa486e5cb5eeea24dd31df9771badb485b7cb74530344637644b049",
+    "log": "logs/control-assembleBenchmark.log",
+    "apkPath": "C:\\Dev\\tmp\\horde-all-shadow-profile-20261001\\artifacts\\control\\HordeLanternRT-all-shadow-control-benchmark-arm64.apk",
+    "bytes": 76391325,
+    "debuggable": "false"
+  },
+  "isolate": {
+    "apkSha256": "b57abb9127929665102a9de70b44085d6c469aeeee10fb016f09d6ffbd6d4829",
+    "package": "com.samfa12.hordelanternrt.benchmark",
+    "certificateSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736",
+    "gradleExit": 0,
+    "gradleCommand": ":app:assembleBenchmark -Pandroid.injected.build.abi=arm64-v8a -PhordeBenchmarkValidation=true --max-workers=2 --console=plain",
+    "resolverPath": "C:\\Dev\\tmp\\horde-all-shadow-profile-20261001\\source\\android\\app\\build\\intermediates\\apk\\benchmark\\app-benchmark.apk",
+    "nativeLibrarySha256": "0353ae686671c322cc1439c50becc51e1c527b5820892ea996f46ca80fe62866",
+    "log": "logs/isolate-assembleBenchmark-retry.log",
+    "apkPath": "C:\\Dev\\tmp\\horde-all-shadow-profile-20261001\\artifacts\\isolate\\HordeLanternRT-all-shadow-isolate-benchmark-arm64.apk",
+    "bytes": 76306557,
+    "initialBuildFailure": "logs/isolate-assembleBenchmark.log: generated pipeline catalog adapter stale after Freeze; fixed using GenerateRtPipelineVariantCatalog.ps1 -Write; original log retained.",
+    "debuggable": "false"
+  },
+  "shaderRegeneration": {
+    "computeWrite": "passed; tools/GenerateRayQueryComputeVariants.ps1 -Write -OutputDirectory outside source",
+    "computeFreshness": "passed; tools/GenerateRayQueryComputeVariants.ps1 -Check -OutputDirectory outside source",
+    "failedInitialInvocation": "logs/isolate-raygen-freeze.log retained: omitted required absolute output paths; retry log isolate-raygen-freeze-retry.log",
+    "raygenFreshness": "passed; tools/compile-raygen.ps1 -CheckCatalog",
+    "adapter": "passed; GenerateRtPipelineVariantCatalog.ps1 -Write then -Check",
+    "raygenFreeze": "passed; tools/compile-raygen.ps1 -Freeze with exact ArtifactDirectory/CatalogPath/BudgetPath"
+  },
+  "sourceChange": {
+    "sourceHead": "71cb366c5cbe5cf6fe338c4cd6fd7bec0bd12d95",
+    "sourceStatus": [
+      " M shaders/raytracing/include/rt_lighting.glsl",
+      " M src/vulkan/raytracing/RtPipelineVariantCatalog.generated.h",
+      " M src/vulkan/raytracing/RtRayQueryVariantCatalog.generated.h",
+      " M src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
+      " M src/vulkan/raytracing/variants/diagnostic_high_opaque_fast.inc",
+      " M src/vulkan/raytracing/variants/diagnostic_mobile_generic_dielectric.inc",
+      " M src/vulkan/raytracing/variants/diagnostic_mobile_opaque_fast.inc",
+      " M src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_generic_dielectric.inc",
+      " M src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_opaque_fast.inc",
+      " M src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_generic_dielectric.inc",
+      " M src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_opaque_fast.inc",
+      " M src/vulkan/raytracing/variants/rayquery_compute_shipping_high_generic_dielectric.inc",
+      " M src/vulkan/raytracing/variants/rayquery_compute_shipping_high_opaque_fast.inc",
+      " M src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_generic_dielectric.inc",
+      " M src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_opaque_fast.inc",
+      " M src/vulkan/raytracing/variants/shipping_high_generic_dielectric.inc",
+      " M src/vulkan/raytracing/variants/shipping_high_opaque_fast.inc",
+      " M src/vulkan/raytracing/variants/shipping_mobile_generic_dielectric.inc",
+      " M src/vulkan/raytracing/variants/shipping_mobile_opaque_fast.inc",
+      " M tools/raygen-variant-catalog.json",
+      " M tools/rayquery-variant-catalog.json",
+      "?? shaders/raytracing/include/rt_all_direct_visibility_investigation.glsl"
+    ],
+    "files": [
+      {
+        "sourceSha256": "d76f119bbcc19f2a22149b4d4800c091d87a8b681820f306c8365b85bdd20cf2",
+        "patchSha256": "51758423eacdbdfbdf5f01295e38289a4057422c4f8fa1be7ff752c72a97b70b",
+        "path": "shaders/raytracing/include/rt_lighting.glsl"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_all_direct_visibility_investigation.glsl",
+        "headerSha256": "09fb71d595fd89b7de525acef59735862b3584ecfb9d772690ab42b234acfa52"
+      }
+    ],
+    "isolateDescription": "All direct-light visibility and generic shadow-transmittance evaluation return unity for Shipping/Mobile only. This deliberately removes opaque blocker shadows and dielectric/glass shadow attenuation. Primary and secondary transport remain untouched. Investigation only; not a promotion candidate."
+  },
+  "moduleAudit": "packaged-module-audit.json",
+  "catalogComparison": "artifacts/isolate/catalog-delta.json",
+  "apkZipComparison": "artifacts/isolate/paired-diff-summary.json",
+  "assetPayloadEntries": 53,
+  "assetPayloadChanges": 0,
+  "apkEntryChange": "lib/arm64-v8a/libhorde_rt_probe_android.so only",
+  "changedSpirvKeys": [
+    "shipping_mobile_opaque_fast",
+    "shipping_mobile_generic_dielectric",
+    "rayquery_compute_shipping_mobile_opaque_fast",
+    "rayquery_compute_shipping_mobile_generic_dielectric"
+  ],
+  "unchangedVariantCount": 12,
+  "shippingModuleRequirements": {
+    "spirvDis": "passed",
+    "spirvVal": "passed",
+    "atomics": 0,
+    "binding22": false,
+    "imageReads": 0
+  },
+  "limitations": [
+    "Investigation-only all-direct-visibility isolate: returns unity for opaque visibility and GenericDielectric shadow transmittance in Shipping/Mobile. It removes direct geometric blocker shadows and glass/dielectric shadow attenuation.",
+    "Primary/secondary ray traversal, Fresnel/refraction/IOR, geometry, materials, fire volume, player, C++, and benchmark timing source were not edited.",
+    "No device install, ADB, image capture, runtime/performance measurement, or physical/visual acceptance. The isolate is not a promotion candidate."
+  ],
+  "logs": [
+    "logs/control-assembleBenchmark.log",
+    "logs/isolate-raygen-freeze.log",
+    "logs/isolate-raygen-freeze-retry.log",
+    "logs/isolate-compute-generator-write.log",
+    "logs/isolate-raygen-adapter-write.log",
+    "logs/isolate-assembleBenchmark.log",
+    "logs/isolate-assembleBenchmark-retry.log",
+    "logs/isolate-raygen-checkcatalog.log",
+    "logs/isolate-compute-generator-check.log",
+    "logs/packaged-module-audit.log",
+    "logs/packaged-module-audit-retry1.log",
+    "logs/packaged-module-audit-retry2.log"
+  ]
+}

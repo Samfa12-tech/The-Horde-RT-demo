@@ -27,6 +27,11 @@ Android Debug builds all four ABIs. These do not establish playback/device/
 listening acceptance. [Exact integration evidence](evidence/2026-10-01-pocket-audio-core/README.md)
 records actual source/build/package scope and retained failed checks.
 
+Source5dbb7df fresh push36784556913 and PR36784563898 both pass GCC/Clang/MSVC
+50/50 common CPU-host CTests and13/13 Vulkan CPU-host fixtures; actual current-head
+logs inspected. New decoder/Core/pin contracts pass on all three compilers.
+This does not establish physical RT or platform playback acceptance.
+
 The owner-observed MSVC modal was a standalone Core test fixture supplying a
 12-float output span over an8-float test array, not a game-loading diagnosis.
 Its storage/span construction is fixed and fresh sanitizer/contracts pass.

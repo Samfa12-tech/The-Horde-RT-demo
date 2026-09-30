@@ -138,6 +138,33 @@ At opening GPU66.4 ms this implies approximately 63–66% reduction; at live225 
 approximately 89–90%. Frozen held-high has skin median zero, so applying the live
 9–11 ms assumption to it would be wrong. A 60 FPS cycle allows only16.667 ms total.
 
+### Completed opaque-secondary profile: no isolated30FPS solution
+
+The [opaque-primary secondary omission](evidence/2026-10-01-opaque-secondary/README.md)
+now completes8 strict C1/S1/S2/C2 route/live runs,9,752 owning rows. At unchanged
+75% openingGPU66.55/40.91/38.11/80.80ms; live223.39/275.97/302.41/258.07ms.
+Opening group median-of-run-medians73.68→39.51ms, live240.73→289.19ms. Route
+cycles64.97→41.81ms, live252.64→301.11ms are different statistics. Descriptive
+route improvement/live regression is neither causal nor additive secondary cost:
+thermal/power/order/process/compiler footprint confounds remain material.
+
+The isolate removes actual opaque-primary bounce/reflected-fire radiance and is
+not a production candidate. Even omitting it does not put ordinary opening within
+the planning22.333–24.333ms GPU budget, and does not help this measured live case.
+Do not force the negative/mixed result into Shipping. Exact primary/current glass,
+direct visibility and other work remain; whole-buffer timestamps do not identify
+GPU AS versus shading cost. The shader word reduction is not a dynamic ray count.
+
+These profiles reject a single secondary-frequency switch or shadow-sample
+micro-optimisation as a supported30FPS promise. They do not prove native Mobile RT
+cannot reach30FPS with a genuinely different coherent schedule. Next decision is
+one combined sample/work-ownership design with explicit eligibleS, ratio r and
+measured overheadH, preserving current primary visibility and physical transport.
+The9.23ms primary-reference illustration leaves only13.1–15.1ms for all restored
+radiance/scheduling under the live CPU allowance; no validated quality-preserving
+solution or credible net-ms prediction is yet established. Keep30FPS minimum as
+the requested design target,60FPS as a stretch, not an achieved capability claim.
+
 ## Source-backed cost boundaries
 
 - [Frame primary](../shaders/raytracing/include/rt_frame.glsl) issues one native
@@ -210,10 +237,11 @@ Use only as a solver/scheduling reference; no SDK/framework import is selected.
    infrastructure to prepare current Mobile/High native witnesses and cost probes.
    Prove the remaining fifth-interface/recovery paths rather than reusing historical
    paths after numerical fixes. Keep RTX results explicitly RTX-only.
-2. On phone reconnection: one exact-control75% ordinary opening/held-high/live
-   sequence, existing ownership/timestamps/thermal protocol, not a full audit restart.
+2. The current exact-control75% primary/visibility/secondary profiles are complete;
+   do not repeat them merely on resumption or phone reconnection. Reuse their
+   ownership/timestamps/thermal protocol for a justified next candidate, not a full audit restart.
    Use scoped investigation-only work-category isolation or supported native GPU
-   profiling to separate primary/material, direct physical visibility, dielectric
+   profiling when a new hypothesis needs it to separate primary/material, direct physical visibility, dielectric
    continuation/reflection, fire volume and memory/occupancy costs. First report
    aggregate timer overhead and exact unchanged baseline. Omitted-work isolates
    are cost bounds, never Shipping candidates. Avoid diagnostic atomics in Shipping.
