@@ -2,6 +2,35 @@
 
 Last updated: 2026-09-30
 
+## September 30: Shipping75% performance foundation (local SM-S948B evidence)
+
+Exact ARM64 non-debuggable development-signed Shipping/Mobile benchmark APK
+`b5a4344b6f860259d88a4d7bae3d349f462704c9f5a689773626f8a93dc39c6f`
+(source8cbe0ac, runtime d63e29c) installs/pulls back identically on **SM-S948B**.
+Only isolated `.benchmark` changes; stable/owner-accepted app data are untouched.
+RelWithDebInfo, checkpointsOFF,75%/1080x2235/native RT pipeline/strictASTC/Mailbox.
+Actual four packaged SPIR-V modules validate/disassemble:0atomics/0imageReads/
+noBinding22. Initial uncooled route completes1838/1838 valid rows,60.2439ms median/
+79.8899p95 (16.60FPS median-derived); held-high600/600,238.7385/248.8321ms
+(4.19FPS). Corresponding GPU-command medians50.0545/236.8249ms; all diagnostic
+rows compiled-out with null counters, not an assertion that glass failures vanish.
+Post-launch sampled thermal context: route battery36.2→39.5C/status0–1,
+high42.3→43.5C/status2–3; samples are not frame-aligned. Not a matched A/B gain,
+steady display-pacing proof or30FPS pass.
+
+Owner supplied external ice-brick cooling around06:49UTC for subsequent testing.
+Cooled trials are explicitly separate from ordinary uncooled sustained acceptance;
+first cooldown-spanning A1 route is exploratory. Baseline d504bfe APK
+`13a8676998c14fed139a14174757a5b1aecb48e50b902834799ab4c970875cf3` also installs/
+pulls back identically; same certificate/build policy/asset semantics/workload.
+Three text-only asset payload differences are formatting, other50 assets match
+bytes. Active repeated comparisons are not yet a final performance conclusion.
+Source8cbe0ac push/PR CI green45portable+11Vulkan-host is distinct evidence.
+Opening-room cost before the lantern, actual OpaqueFast selection, GPU lighting/
+shadow versus geometry, pacing and warm30FPS feasibility remain open. RTX, phone
+compute, exactS24/S25 and final correctness/acceptance remain separate/open.
+Audio/haptic manual revalidation:NO; no cues/playback/semantic inputs changed.
+
 ## September 30: per-hit bias candidate01 (new local SM-S948B evidence)
 
 Owner reconnected the phone after the host checkpoint. Exact ARM64 Debug APK

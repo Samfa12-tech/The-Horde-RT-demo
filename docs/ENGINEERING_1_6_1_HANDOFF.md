@@ -73,16 +73,35 @@ excuse to suppress mismatch. Unconditional firsthit probe was blocked by Windows
 Smart App Control: no capture result; security unchanged. All temporary source,
 catalogs/modules removed; production equals25a379c. Restored native Debug build
 and focused2/2 pass, fresh eightcompute generation identical to committed bundle.
-Current25a379c push36672645385/PR36672649224 CI green45portable+11Vulkan-host.
+Current8cbe0ac push36677149341/PR36677153132 CI green45portable+11Vulkan-host;
+both current-head logs inspected, PR15 draft/unmerged/mergeable. This is host
+coverage, not RT-device/glass acceptance.
 
-Next isolate Mobile interface exhaustion/contact recovery and remaining live
-events, geometric-shadow/changed-pixel cases; then matched Shipping/backend
-parity. Do not restart Phase1 or reopen accepted player tuning. Goal active,
-phone available/Home. RTX is not phone/S24/S25 acceptance; phone compute remains
+Owner's newer priority: establish achievable exact-phone performance and run
+matched Shipping comparisons at unchanged75% now, preserving every correctness
+gate. Proposed minimum is sustained30FPS for ordinary and lantern-heavy play;
+recover towards45–60 only where measured headroom allows. No30FPS achievement
+is yet demonstrated. Include the opening room before the lantern: verify actual
+OpaqueFast dispatch and separate lighting/shadow GPU work from player geometry
+updates; do not let glass correctness explain ordinary-gameplay cost by proxy.
+Then return to Mobile interface exhaustion/contact recovery and remaining live
+events, geometric-shadow/changed-pixel cases and separate backend parity.
+Do not restart Phase1 or reopen accepted player tuning. Goal active,
+phone available, isolated `.benchmark` measurement active. RTX is not phone/S24/S25 acceptance; phone compute remains
 unverified. Audio/haptic manual revalidation:NO (RT-only, semantic inputs/cues
 unchanged). Preserve later music/reporting/resource/pacing/final scope and owner
 licensing/signing/publication gates. Retained decoder now correctly uses the
 83-field output stride48 (106/107stride80); evidence-only reproduction repair.
+
+Opening-path evidence follow-up retains the already-validated owning completion's
+active material strategy in each benchmark row. It does not create new GPU
+collection, shader instrumentation or a telemetry framework. Uncompleted/invalid
+rows export null rather than inventing default OpaqueFast; loaded-pair names alone
+do not prove which pipeline dispatches. Red report fixture fails on old export;
+focused completion/report tests cover alternating strategies and invalid metadata.
+Fresh MSVC Debug focused5/5 pass (report/run/publication/performance/coordinator);
+this export follow-up has not yet been installed on the phone.
+Current A/B APKs are frozen at8cbe0ac/d504bfe and do not include this export change.
 
 #### Previous September 30 checkpoint (03c / d504bfe / c604e89)
 
