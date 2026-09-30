@@ -1,7 +1,7 @@
 # Horde Lantern RT — Campaign and Engine Roadmap
 
 **Owner:** Sam Small / Samfa12  
-**Planning update:** 30 September 2026  
+**Planning update:** 1 October 2026  
 **Status:** Owner-approved direction; future milestones are provisional, not implemented or release promises.
 
 ## Authority and navigation
@@ -23,7 +23,7 @@ The defining design pillar is **light as gameplay, powered by the actual ray-tra
 | Milestone | Direction | Status / start condition |
 |---|---|---|
 | 1.6.1 engineering baseline | Finish the current engineering programme and its validation. | Complete, accept, merge and release 1.6.1 before starting 1.6.2 implementation. Preserve the active engineering pass. |
-| 1.6.2 — Engine readiness and demo polish | Measured temporal/upscaling readiness and targeted polish of the existing dungeon demo. | Planned after released 1.6.1 and before 1.7 gameplay expansion; see the brief below. |
+| 1.6.2 — Engine readiness and demo polish | Measured temporal/upscaling readiness, material depth foundations and targeted polish of the existing dungeon demo. | Planned after released 1.6.1 and before 1.7 gameplay expansion; see the brief below. |
 | 1.7.0 — Beyond the Tomb | Existing dungeon becomes prologue; physical rope rescue, companion, moonlit woodland, dialogue, world-zone ownership, checkpoints and themed controls/menus. | Scoped planning handoff exists. Start after 1.6.2 is implemented, validated and accepted; then complete and obtain owner acceptance of the agreed 1.7 scope. |
 | 1.8.0 — Village Hub | Continue from the forest to a small village with a few explorable interiors, a hero tavern and a small NPC cast. Reveal more of the wider Horde and establish the hub. | Pencilled in. Begin only after 1.7 is made, tested and accepted; use its actual performance and system evidence to finalise scope. |
 | Beyond 1.8 — three themed dungeons | Three distinct adventure dungeons, each with enemies, puzzles, a boss and one campaign piece; consider a dungeon-specific item that enables puzzle solving and boss defeat. | Big-picture direction only. Build and validate one complete dungeon before expanding to the next. No version numbers or release dates are assigned. |
@@ -46,6 +46,29 @@ Finish, accept, merge and release **1.6.1 first**, then undertake this bounded p
 - Evaluate platform adapters over that foundation: DLSS Super Resolution on supported Windows RTX hardware, and SGSR 2 or another justified Android option. Inspect actual SDK/licence, Vulkan and device requirements, then measure image quality, memory, latency and sustained cost. This is a measured feasibility/integration direction, not a promise to ship either vendor integration or claim support before evidence exists.
 - Audit dynamic resolution and efficient render-target resizing on the final 1.6.1 baseline; finish only the missing work. Keep resource/descriptor lifetime and temporal-history reset correct, avoid unnecessary full-scene rebuilds or resize stalls, and report actual internal dimensions and adaptive behaviour.
 - Retain the fixed **75% Galaxy S26 Ultra sustained 30 FPS baseline/target** as a distinct acceptance comparison. Record exact source/artifact, scene, workload, dimensions, build type and warm thermal conditions. Adaptive-resolution, upscaled and cooled runs are separate labelled evidence; none substitutes for the fixed-scale baseline or proves an unmeasured pass. Preserve real hardware RT and investigate matched regressions.
+
+### Material depth foundation
+
+After 1.6.1 is released and accepted, audit its actual material/import/shader paths before implementing this bounded 1.6.2 slice. Historical claims about two normal-map paths, a fixed `mix(..., 0.34)` strength or existing ASTC/KTX2 support are audit leads, not verified facts about the final baseline. Extend the shared material ABI/import infrastructure; do not introduce a parallel legacy bump system, redesign the renderer or mass-produce 1.7 forest assets.
+
+**Core scope**
+
+- Audit normal-map correctness across existing dungeon/environment and imported PBR paths. Provide material-controlled strength and correctly carry glTF `normalTexture.scale` through import, GPU material data and RT shading; preserve normalisation, tangent/bitangent handedness, orientation and a tested missing-tangent policy. Strength changes must be deliberate authoring choices, not an automatic global visual retune.
+- Make real-world texture scale/tiling authorable where appropriate, keeping stone, wood/bark, metal and ground at believable scales without forcing every existing asset to be re-authored. Preserve safe defaults, established static/skinned asset contracts and accepted lighting/glass/fire/gameplay behaviour.
+- Document the authoring rule: large forms and silhouettes use real geometry; important medium relief uses geometry and/or high-to-low baked surface detail as appropriate; fine surface detail uses normal maps. Normal maps do not change physical silhouettes or actual ray intersections. Support high-to-low normal baking from Blender/Meshy sources through the existing provenance-controlled pipeline; do not bake scene lighting, shadows or reflections.
+- Keep roughness and metallic response coherent. Define any AO-map policy explicitly: glTF occlusion affects indirect lighting, not direct torch illumination; avoid double-counting visibility already evaluated by RT. Reference the [glTF material specification](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html).
+
+**Optional, measured extensions**
+
+- Detail normals are optional and off by default. Evaluate a bounded reusable combination of a primary normal and fine repeating detail only on suitable materials; measure sample cost, memory and secondary-hit shading cost. They are not required to declare the core slice complete and may be deferred if the benefit does not justify sustained phone cost.
+- Parallax/height mapping is deferred by default and is not a completion requirement. A separately agreed, one-material experiment may later measure its benefit against GPU/sample cost and consistency with actual RT geometry, reflected/transmitted views, shadows and grazing angles. Never use it to replace silhouette or substantial physical depth. Record a keep/defer decision if an experiment is undertaken; no automatic production admission.
+- Use supported compression/mip/texture routes only after verifying the accepted baseline. Bound memory and sampling growth; do not silently reduce resolution, lighting or quality to pay for new material features.
+
+**Validation and acceptance**
+
+Use a compact reusable validation scene or existing captures covering stone, wet stone, wood/bark, metal and ground under moving torch/lantern lighting. Capture matched before/after stills and motion on the exact Galaxy S26 Ultra and Windows RTX 5050, with build/artifact, backend, camera, scale and thermal context recorded. Include the fixed 75% baseline and separately labelled intended lower-resolution/temporal modes when available; inspect shimmering, aliasing and temporal stability, not only attractive frozen captures. Retain genuinely hardware-ray-traced presentation.
+
+Test normal import/scale, tangent failure/fallback cases, material ABI and deterministic configuration, and absent normal/detail/height maps. Run affected shader compilation/staleness checks, Windows Debug/Release CTests and Android builds; verify real RT presentation and matched sustained device costs. Missing-device evidence is an open gap, not a pass. Core completion means correct authorable normals and texture scale, useful material evidence and 1.7 asset-authoring guidance, with optional extensions explicitly accepted or deferred. This planning entry does not add new 1.6.1 blockers or authorise implementation, paid assets, signing or release.
 
 ### Existing-demo visual and enemy/audio polish
 
@@ -117,6 +140,6 @@ Village final name/layout and supporting character names (avoid Mara); precise t
 
 ## Documentation-only change boundary
 
-This update preserves the owner's 11 September campaign direction and records the 30 September 1.6.2 sequencing, demo-polish and asset-reuse additions. It implements no gameplay, changes no package/release identity, generates no assets, authorises no paid work and publishes no build.
+This update preserves the owner's 11 September campaign direction and records the 30 September 1.6.2 sequencing, demo-polish and asset-reuse additions and the 1 October material-depth foundation. It implements no gameplay, changes no package/release identity, generates no assets, authorises no paid work and publishes no build.
 
 **Audio/haptic manual revalidation required: NO — documentation only; runtime and semantic inputs are unchanged.**
