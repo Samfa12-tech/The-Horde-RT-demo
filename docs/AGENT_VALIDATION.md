@@ -36,6 +36,12 @@ tools not provisioned by this compiler lane. This is additive MSVC coverage, not
 a replacement for the separate full Windows tooling/shader gate. Keep that scope
 and the workflow's fail-on-empty-test behaviour explicit in validation reports.
 
+The mailbox stress fixture retains 125,000 publications, four concurrent readers,
+coherence/monotonic/final-publication checks and its 30-second deadline. Readers
+yield after each 64 validated samples to share oversubscribed CPUs; timeout output
+reports writer and sampled reader progress. A local pass is not proof of the
+precise cause of a Windows CI timeout or a substitute for fresh current-source CI.
+
 The same workflow also runs on pushes to `codex/horde-1.6.1-engineering-pass`, so
 PR merge conflicts cannot suppress all current-source compiler coverage. Its
 `player-vulkan-host` lane enables Vulkan targets with the Ubuntu development
