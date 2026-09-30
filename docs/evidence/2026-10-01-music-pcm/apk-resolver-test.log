@@ -1,0 +1,11 @@
+PASS normal Gradle output
+PASS redirected intermediates output
+PASS wrong variant (rejected)
+PASS wrong artifact type (rejected)
+PASS missing output element (rejected)
+PASS multiple output elements (rejected)
+PASS missing APK file (rejected)
+PASS filename path traversal (rejected)
+PASS escaped listing path (rejected)
+PASS duplicate redirect entries (rejected)
+All 10 resolver cases passed.

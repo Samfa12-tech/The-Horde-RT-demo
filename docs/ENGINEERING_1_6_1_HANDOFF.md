@@ -30,6 +30,16 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### October 1 bounded render-scale resource checkpoint
 
+Independent music slice: original `MusicPcmStream` cursor/mixer now handles exact
+12s PCM loops with3s overlap tails, bounded250ms cue fades and natural C→D/G→H
+tail continuity, suspension/discontinuity/reset/independent gain. One audio-thread
+owner, no Render allocation/lock/I/O; no platform wiring or packaged audio admission.
+MSVC Debug/Release4/4each + lead4/4reruns; ARM64Debug16154b5d compiles/links helper,
+all53assets equal acceptedDebugC11, actual4module val/disPASS. Not installed or
+native listening acceptance. Owner score grant is Horde-only; runtime music,
+persisted volume and warning/SFX owner listening remain open. Audio/haptic manual
+revalidation:NO until playback/mix wiring. [Evidence](evidence/2026-10-01-music-pcm/README.md).
+
 Latest [primary-hit reference ABBA](evidence/2026-10-01-primary-hit-reference/README.md)
 completes12,152owning Shipping/Mobile pipeline rows at75%, exact71cb APKs.
 Normal openingGPU66.46/72.15ms versus nonphysical7.50/7.55; held222.57/225.27

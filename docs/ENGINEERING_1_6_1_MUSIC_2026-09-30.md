@@ -61,6 +61,35 @@ New-head CI is required after push.
 
 ## Remaining integration
 
+October 1: `MusicPcmStream.*` adds a small original, audio-thread-owned PCM
+cursor/mixer, not a synthesizer or platform playback backend. Caller-owned
+immutable stereo PCM16 clips at48kHz have exact576000-frame looping bodies
+(C144000, G288000) and144000-frame tails. Loops add the previous complete tail
+over the first3s of the next12s body without moving the loop boundary. One-shots
+append their tail; natural C→D/G→H handoffs preserve only the remaining tail
+after the body actually ends. Early interruptions use a bounded250ms crossfade.
+At most current+outgoing streams exist. Repeated selection updates retain the
+cursor; revisions/discontinuity edges seek, suspension/bad clocks silence/freeze,
+and reset cancels stale streams while retaining the separately configured gain.
+No allocation, locking or I/O occurs in Render; all methods require one owner
+thread and spans must outlive it. This is not concurrent platform command routing.
+
+Lead-reviewed synthetic tests cover20 actual576000-frame sample periods with
+irregular chunks, full/partial/exhausted one-shot tails, early/natural handoffs,
+discontinuity edges, rapid replacement, invalid inputs and volume persistence.
+MSVC Debug/Release each4/4PASS including unchanged resolver and simulation tests.
+These are sample-cursor contracts, not audible20-loop/native-clock acceptance.
+[Exact helper evidence](evidence/2026-10-01-music-pcm/README.md) keeps build/source
+identity separate from native playback. Android compilation is recorded there.
+
+An offline sum of the actual rendered bodies/tails preserves20 exact12s starts
+with no new overrange samples or overall-peak increase; largest same-sample
+increase0.002747FS. Start boundary deltas decrease to0.000031–0.000092FS, but
+15s tail-off remains measured up to0.001495FS. That is not listening approval
+or proof of musical phase continuity. Large transient float WAVs were verified
+then removed; original PCM prototypes remain unchanged. No score/FX-rate change,
+normalisation, paid generation or source-tool code copy is admitted.
+
 Current local Chordsmith inspected at2b87d7b / v68 (schema17 accepts16).
 App HTML SHA-256 `b266814fff749bd4d7be9d8725e4d7becc2d944122bc2a302602457fa9b6e2cf`
 differs from the supplied preview's historical tested app. The UI WAV exporter

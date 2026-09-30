@@ -6,6 +6,7 @@ set(HORDE_RT_CORE_RELATIVE_SOURCES
     telemetry/RtBenchmarkEvidenceRun.cpp
     telemetry/RtBenchmarkEvidenceReport.cpp
     audio/MusicDirector.cpp
+    audio/MusicPcmStream.cpp
     gameplay/simulation/GameSimulation.cpp
     gameplay/animation/PlayerAnimationState.cpp
     gameplay/animation/PlayerIkTargets.cpp

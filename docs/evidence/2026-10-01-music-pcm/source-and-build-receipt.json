@@ -1,0 +1,107 @@
+{
+  "schema": 1,
+  "classification": "original-unwired-PCM-helper-build-and-sample-contracts",
+  "sourceBaseHead": "37e0882e453f21d89a41c2855ab86d684ebea0a3",
+  "sourceFiles": [
+    {
+      "path": "src/audio/MusicPcmStream.cpp",
+      "bytes": 11689,
+      "sha256": "56a4448399220865790c4ddd7931c4ff495511ca5488a9dcde7a824b0591fb6a"
+    },
+    {
+      "path": "src/audio/MusicPcmStream.h",
+      "bytes": 2961,
+      "sha256": "0ac0ef4becef4d45ff477a6f4c2ee4ee08da66cdb14d0445271043f2d4f7d92e"
+    },
+    {
+      "path": "tests/MusicPcmStreamTests.cpp",
+      "bytes": 23609,
+      "sha256": "17bf17be6ce5776b81e5bc60299ff706a139787307a98c3ce3e83b420dd7527a"
+    },
+    {
+      "path": "src/audio/MusicDirector.cpp",
+      "bytes": 12230,
+      "sha256": "eec1e5eb7be8993817ba8c39a65bf9fbd7b0dfada381b890eac7887a5769fb82"
+    },
+    {
+      "path": "src/audio/MusicDirector.h",
+      "bytes": 2736,
+      "sha256": "608624b62d9dc89027e3a8e82317f3d7b723e4b6b16ee69cf7aa9fa36142acec"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "bytes": 46288,
+      "sha256": "ad386b9c86ace754d4934807341eb5180b16299bfa5f15af0a5bd91c6af80bc2"
+    },
+    {
+      "path": "cmake/HordeRtSources.cmake",
+      "bytes": 1996,
+      "sha256": "60849efa213e0f27f93b20ccbf5dc165bb0cfbb8e9c9c6fddc62562cd23c8e2a"
+    }
+  ],
+  "hostTests": {
+    "Debug": "4/4PASS",
+    "Release": "4/4PASS",
+    "leadFinalReruns": "4/4PASS each",
+    "resolver": "10/10PASS"
+  },
+  "android": {
+    "command": ":app:assembleDebug -Pandroid.injected.build.abi=arm64-v8a --max-workers=2 --console=plain",
+    "resolvedApk": "android/app/build/intermediates/apk/debug/app-debug.apk",
+    "apkSha256": "16154b5d0df518054db26b7606fc9d5ddb32d1284c7109d212803c638a357000",
+    "nativeSha256": "06b35169513542d786fbb1b9b96bc75fe5c111747af04273bb7c46245504cbb0",
+    "modules": [
+      {
+        "offset": 469052,
+        "backend": "RayQueryCompute",
+        "executionModel": "GLCompute",
+        "sha256": "c1e4622ae5df0c87a06c36d803617c7d4e0227845cd33a9dd38de5f0d956ff58",
+        "words": 126377,
+        "rayQueryCapability": true,
+        "rayQueryInitializations": 23,
+        "binding22": true,
+        "atomicInstructions": 5
+      },
+      {
+        "offset": 974560,
+        "backend": "RayQueryCompute",
+        "executionModel": "GLCompute",
+        "sha256": "e18171591d4b07ccc3e7fb071400a6581e1fc132aec06dd37c09f88c7792e302",
+        "words": 63229,
+        "rayQueryCapability": true,
+        "rayQueryInitializations": 2,
+        "binding22": true,
+        "atomicInstructions": 41
+      },
+      {
+        "offset": 1227476,
+        "backend": "RayTracingPipeline",
+        "executionModel": "RayGenerationKHR",
+        "sha256": "8dbebd86eeed23b388626719e6f9946b8027df754869b5811673e24036ae12c9",
+        "words": 126312,
+        "rayQueryCapability": true,
+        "rayQueryInitializations": 23,
+        "binding22": true,
+        "atomicInstructions": 5
+      },
+      {
+        "offset": 1732724,
+        "backend": "RayTracingPipeline",
+        "executionModel": "RayGenerationKHR",
+        "sha256": "9865690c11de315c1c4e49af7d14eb8963b24dc522abfc01c53979bb1a5f5a91",
+        "words": 63170,
+        "rayQueryCapability": true,
+        "rayQueryInitializations": 2,
+        "binding22": true,
+        "atomicInstructions": 41
+      }
+    ],
+    "spirvVal": "passed",
+    "spirvDis": "passed",
+    "packagedAssetsUnchanged": 53,
+    "installed": false,
+    "playbackWired": false
+  },
+  "manualAudioRevalidation": "NO unwired; YES on actual playback/mix change",
+  "publicationAuthorized": false
+}

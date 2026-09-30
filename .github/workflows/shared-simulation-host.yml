@@ -31,7 +31,7 @@ jobs:
             compiler: MSVC
             compiler_args: ''
             # The separate WIN32 tool matrix includes SDK/Android/tool-dependent fixtures.
-            # This additive compiler lane runs the same 46 common CPU-host tests.
+            # This additive compiler lane runs the same common CPU-host tests.
             ctest_filter_args: >-
               -E '^(horde_rt_scene_abi_generator_tests|horde_rt_raygen_compiler_strategy_tests|horde_rt_raygen_variant_manifest_tests|horde_rt_raygen_variant_artifact_tests|horde_rt_rayquery_compute_shader_tests|horde_rt_pipeline_policy_fence_tests|horde_rt_pipeline_policy_execution_tests|horde_rt_static_texture_array_tool_tests|horde_rt_static_preparation_lod_policy_tests|horde_rt_static_preparation_skip_policy_tests|horde_rt_static_preparation_colliding_lod_policy_tests|horde_rt_dielectric_topology_tool_tests|horde_rt_version_contract_powershell_tests|horde_rt_github_release_preflight_tests|horde_rt_version_contract_windows_powershell_tests)$'
     steps:
