@@ -1,0 +1,87 @@
+{
+  "analysis": "03b second Android diagnostic ledger and bounded recording context. Not 03c evidence, not visual-motion certification, and not performance acceptance.",
+  "buildIdentity": {
+    "reportedBuild": "1.6.1",
+    "backend": "RayTracingPipeline",
+    "gpu": "Adreno (TM) 840",
+    "renderScalePercent": 75,
+    "shaderArtifactIdentity": "opaqueFast:diagnostic_mobile_opaque_fast@fa3b41774785b8c7a658145fa4ec9d2a29f0cb52e184cf05a4a5954d77d8dd7e|genericDielectric:diagnostic_mobile_generic_dielectric@75630c890e906dc94f987682dde8eacfb55d2bc2e979afa3c844b86ef9590321",
+    "scopeNote": "Keep this evidence labelled 03b. The benchmark does not carry an APK SHA or identify the newer 03c candidate; do not attribute it to 03c. Its mobile shader identity matches the retained phone run 01."
+  },
+  "secondPhoneLedger": {
+    "runId": "glass-rectangular-live-20260930-02",
+    "timestampUtc": "2026-09-30T02:38:27Z",
+    "benchmark": "C:/Dev/tmp/horde-glass-live-20260930/rectangular-phone-live-02/glass-rectangular-live-20260930-02/benchmark.json",
+    "benchmarkSha256": "d00786c98cf1894998fae09a24b169f9d7b9c4208f0e65bb11fe20cdeefbd1c4",
+    "resultMarker": "C:/Dev/tmp/horde-glass-live-20260930/rectangular-phone-live-02/glass-rectangular-live-20260930-02/result.json",
+    "resultMarkerSha256": "4f547b5f399aecc0967f5ee05e2d97d6c936b2520618b0a241fd08f5fe8f8b4c",
+    "resultMarkerValid": true,
+    "ledger": {
+      "expected": 600,
+      "completed": 600,
+      "rejected": 0,
+      "cancelled": 0,
+      "cpuAccepted": 600,
+      "gpuValid": 600,
+      "validCounterRows": 600,
+      "identityMismatchRows": 0,
+      "submittedEqualsCompletion": true,
+      "submissionAndCompletionSerialsStrictlyIncrease": true,
+      "firstSimulationTick": 603,
+      "lastSimulationTick": 1202,
+      "validationErrors": []
+    },
+    "failureAndRecoverySummary": {
+      "transportOverflowCount": {"frames":58,"sum":64,"max":4,"maxWitness":{"row":298,"tick":901,"value":4},"firstWitness":{"row":39,"tick":642,"value":1}},
+      "productionPaneStackFailureCount": {"frames":58,"sum":64,"max":4,"maxWitness":{"row":298,"tick":901,"value":4}},
+      "primaryMismatchedExitCount": {"frames":7,"sum":7,"max":1,"firstWitness":{"row":107,"tick":710,"value":1},"lastWitness":{"row":598,"tick":1201,"value":1}},
+      "primaryVolumeBudgetCount": {"frames":52,"sum":57,"max":4,"maxWitness":{"row":298,"tick":901,"value":4},"firstWitness":{"row":39,"tick":642,"value":1},"lastWitness":{"row":598,"tick":1201,"value":1}},
+      "primaryCertifiedClosedVolumeRecoveryCount": {"frames":600,"sum":299636,"max":538,"maxWitness":{"row":181,"tick":784,"value":538}},
+      "shadowCertifiedClosedVolumeRecoveryCount": 0,
+      "allOtherFailureCounters": 0
+    }
+  },
+  "comparisonToPhoneRun01": {
+    "firstReport": "C:/Dev/tmp/horde-glass-live-20260930/rectangular-phone-live/glass-rectangular-live-20260930-01/benchmark.json",
+    "firstReportSha256": "a5da6491c8715b03063309fcfd39a204019002a55b151b0f09db89cc61c74037",
+    "same600RowIndexAndSimulationTickAlignment": true,
+    "all41DiagnosticCounterValuesEqualAtEveryAlignedRow": true,
+    "differentCounterFields": [],
+    "differentCounterRowCount": 0,
+    "identityMetadataDifferences": [],
+    "note": "Compared all generated RtSceneAbi fields row-by-row. Serial fields were allowed to differ; in fact all compared submitted/completion identity fields also matched. Thus every nonzero counter window and recovery value is identical to phone run 01."
+  },
+  "context": {
+    "source": "C:/Dev/tmp/horde-glass-live-20260930/rectangular-phone-live-02/context.json",
+    "sha256": "809333709962cb380fda94fac50df1e43d87d3aad7fb6cf8995129a3ac014a3b",
+    "runId": "glass-rectangular-live-20260930-02",
+    "startUtc": "2026-09-30T02:35:02.1479397Z",
+    "endUtc": "2026-09-30T02:38:32.7077884Z",
+    "sampleCount": 39,
+    "recordingEnabled": true,
+    "recordingLimitSeconds": 30,
+    "attachedToExistingRun": false,
+    "foregroundBeforeRecording": "Horde Lantern RT debug MainActivity",
+    "contextAndRecordingMayNotCoverFullRun": true,
+    "reportedBatteryTemperatureRaw": [330,376],
+    "batteryTemperatureCelsiusIfRawIsTenthsC": [33.0,37.6],
+    "reportedThermalStatusValues": [0],
+    "reportedGpuThermalPowerLevels": [0,1],
+    "interpretation": "These are bounded Android context samples, not proof of sustained performance or full-run thermal state."
+  },
+  "recording": {
+    "path": "C:/Dev/tmp/horde-glass-live-20260930/rectangular-phone-live-02/live-reveal.mp4",
+    "sha256": "d00895159cfe8eec48a4dc4686838839b83ae47783af0fe5240b1b28f6fd702e",
+    "durationSeconds": 30.0649,
+    "frames": 344,
+    "reviewedSampleSeconds": [0,5,10,15,20,25],
+    "boundedObservation": "Samples show game scene only; the supplied review describes the first 120 recording frames as warm-up.",
+    "notEstablished": ["full-motion or route acceptance","measured-lap timing","owner-feel acceptance","performance acceptance"]
+  },
+  "sourceEvidenceAppendixText": "03b Android follow-up (2026-09-30): phone run glass-rectangular-live-20260930-02 completed its 600-row diagnostic ledger with 600/600 valid counters and exact submitted/completed identities. All 41 counter values match phone run 01 at every aligned row; this repeat therefore reproduces, rather than clears, the remaining volume/transport/pane failures and certified recoveries. Bounded context recorded battery temperature raw 330-376 (33.0-37.6 C if tenths-C), thermal status 0 and GPU thermal level 0-1. A 30.0649-second, 344-frame scene-only recording was sampled at 0/5/10/15/20/25 seconds; this does not establish full motion, measured-lap timing, owner feel, or performance acceptance. This is 03b evidence and must not be attributed to 03c.",
+  "limitations": [
+    "Counter comparisons use generated ABI field names and aligned completed rows; matching diagnostics do not prove visual correctness.",
+    "Do not transfer run 01 screenshot baselines or APK identity to this run or to 03c without an exact artifact match.",
+    "No source edits, builds, phone interactions, or performance conclusions were made."
+  ]
+}

@@ -76,9 +76,9 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     float reflectionEpsilon = dielectricRayEpsilon(
         firstHit.position, firstHit.t);
     HitInfo reflectedHit = traceScene(
-        advanceDielectricRayOrigin(firstHit.position, firstOutward,
+        advanceDielectricRayOrigin(dielectricSpawnPoint(firstHit), firstOutward,
                                    reflectionDirection, reflectionEpsilon),
-        reflectionDirection, 12.0, 0x37u, kDielectricRayMinimumDistance,
+        reflectionDirection, 12.0, 0x37u, dielectricQueryMinimum(firstHit),
         false, false);
     float reflectedLocalDistance = reflectedHit.t;
     reflectedHit.t += firstHit.t;
@@ -372,12 +372,12 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
 
         float epsilon = dielectricRayEpsilon(currentHit.position, totalDistance);
         vec3 nextOrigin = advanceDielectricRayOrigin(
-            currentHit.position, outwardNormal, transmissionDirection, epsilon);
+            dielectricSpawnPoint(currentHit), outwardNormal, transmissionDirection, epsilon);
         float advancedDistance = max(
             dot(nextOrigin - currentHit.position, transmissionDirection), 0.0);
         HitInfo nextHit = traceScene(
             nextOrigin, transmissionDirection, 10000.0, 0x23u,
-            kDielectricRayMinimumDistance, false, false);
+            dielectricQueryMinimum(currentHit), false, false);
         nextHit.t += advancedDistance;
         totalDistance += nextHit.t;
         currentHit = nextHit;
@@ -443,9 +443,9 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
         firstHit.position, firstHit.roughness);
     float reflectionEpsilon = dielectricRayEpsilon(firstHit.position, firstHit.t);
     HitInfo reflectedHit = traceScene(
-        advanceDielectricRayOrigin(firstHit.position, firstOutward,
+        advanceDielectricRayOrigin(dielectricSpawnPoint(firstHit), firstOutward,
                                    reflectionDirection, reflectionEpsilon),
-        reflectionDirection, 12.0, 0x37u, kDielectricRayMinimumDistance,
+        reflectionDirection, 12.0, 0x37u, dielectricQueryMinimum(firstHit),
         false, false);
     float reflectedLocalDistance = reflectedHit.hit ? reflectedHit.t : 12.0;
     reflectedHit.t += firstHit.t;
@@ -662,12 +662,12 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
 
         float epsilon = dielectricRayEpsilon(currentHit.position, totalDistance);
         vec3 nextOrigin = advanceDielectricRayOrigin(
-            currentHit.position, outwardNormal, transmissionDirection, epsilon);
+            dielectricSpawnPoint(currentHit), outwardNormal, transmissionDirection, epsilon);
         float advancedDistance = max(
             dot(nextOrigin - currentHit.position, transmissionDirection), 0.0);
         HitInfo nextHit = traceScene(
             nextOrigin, transmissionDirection, 10000.0, 0x23u,
-            kDielectricRayMinimumDistance, false, false);
+            dielectricQueryMinimum(currentHit), false, false);
         nextHit.t += advancedDistance;
         totalDistance += nextHit.t;
         currentHit = nextHit;

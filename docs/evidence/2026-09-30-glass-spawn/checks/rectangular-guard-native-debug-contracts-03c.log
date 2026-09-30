@@ -1,0 +1,156 @@
+Internal ctest changing into directory: C:/Dev/tmp/horde-phase3-native-20260923
+Test project C:/Dev/tmp/horde-phase3-native-20260923
+      Start  1: horde_rt_player_primitive_contract_tests
+ 1/75 Test  #1: horde_rt_player_primitive_contract_tests .................   Passed    0.01 sec
+      Start  2: horde_rt_raygen_artifact_ownership_tests
+ 2/75 Test  #2: horde_rt_raygen_artifact_ownership_tests .................   Passed    0.98 sec
+      Start  3: horde_rt_player_manifest_agreement_tests
+ 3/75 Test  #3: horde_rt_player_manifest_agreement_tests .................   Passed    0.99 sec
+      Start  4: horde_rt_player_package_inventory_tests
+ 4/75 Test  #4: horde_rt_player_package_inventory_tests ..................   Passed    1.16 sec
+      Start  5: horde_rt_lantern_benchmark_tests
+ 5/75 Test  #5: horde_rt_lantern_benchmark_tests .........................   Passed    0.05 sec
+      Start  6: horde_rt_benchmark_evidence_report_tests
+ 6/75 Test  #6: horde_rt_benchmark_evidence_report_tests .................   Passed    0.02 sec
+      Start  7: horde_rt_windows_benchmark_launch_tests
+ 7/75 Test  #7: horde_rt_windows_benchmark_launch_tests ..................   Passed    0.02 sec
+      Start  8: horde_rt_benchmark_evidence_run_tests
+ 8/75 Test  #8: horde_rt_benchmark_evidence_run_tests ....................   Passed    0.03 sec
+      Start  9: horde_rt_evidence_publication_tests
+ 9/75 Test  #9: horde_rt_evidence_publication_tests ......................   Passed    0.01 sec
+      Start 10: horde_rt_ray_tracing_requirements_tests
+10/75 Test #10: horde_rt_ray_tracing_requirements_tests ..................   Passed    0.01 sec
+      Start 11: horde_rt_performance_evidence_tests
+11/75 Test #11: horde_rt_performance_evidence_tests ......................   Passed    1.06 sec
+      Start 12: horde_rt_scene_record_observation_tests
+12/75 Test #12: horde_rt_scene_record_observation_tests ..................   Passed    0.02 sec
+      Start 13: horde_rt_pipeline_variants_tests
+13/75 Test #13: horde_rt_pipeline_variants_tests .........................   Passed    0.01 sec
+      Start 14: horde_rt_pipeline_variant_provider_tests
+14/75 Test #14: horde_rt_pipeline_variant_provider_tests .................   Passed    2.15 sec
+      Start 15: horde_rt_pipeline_bundle_contracts_tests
+15/75 Test #15: horde_rt_pipeline_bundle_contracts_tests .................   Passed    3.47 sec
+      Start 16: horde_rt_provider_shipping_mobile_fixture
+16/75 Test #16: horde_rt_provider_shipping_mobile_fixture ................   Passed    3.14 sec
+      Start 17: horde_rt_provider_shipping_mobile_fixture_evidence
+17/75 Test #17: horde_rt_provider_shipping_mobile_fixture_evidence .......   Passed   25.25 sec
+      Start 18: horde_rt_provider_shipping_high_fixture
+18/75 Test #18: horde_rt_provider_shipping_high_fixture ..................   Passed    3.13 sec
+      Start 19: horde_rt_provider_shipping_high_fixture_evidence
+19/75 Test #19: horde_rt_provider_shipping_high_fixture_evidence .........   Passed   25.25 sec
+      Start 20: horde_rt_provider_diagnostic_mobile_fixture
+20/75 Test #20: horde_rt_provider_diagnostic_mobile_fixture ..............   Passed    2.80 sec
+      Start 21: horde_rt_provider_diagnostic_mobile_fixture_evidence
+21/75 Test #21: horde_rt_provider_diagnostic_mobile_fixture_evidence .....   Passed   28.72 sec
+      Start 22: horde_rt_provider_diagnostic_high_fixture
+22/75 Test #22: horde_rt_provider_diagnostic_high_fixture ................   Passed    3.24 sec
+      Start 23: horde_rt_provider_diagnostic_high_fixture_evidence
+23/75 Test #23: horde_rt_provider_diagnostic_high_fixture_evidence .......   Passed   24.81 sec
+      Start 24: horde_rt_github_release_updater_tests
+24/75 Test #24: horde_rt_github_release_updater_tests ....................   Passed    0.02 sec
+      Start 25: horde_rt_version_contract_tests
+25/75 Test #25: horde_rt_version_contract_tests ..........................   Passed    0.28 sec
+      Start 26: horde_rt_version_contract_incremental_configure_tests
+26/75 Test #26: horde_rt_version_contract_incremental_configure_tests ....   Passed    5.82 sec
+      Start 27: horde_rt_dielectric_math_tests
+27/75 Test #27: horde_rt_dielectric_math_tests ...........................   Passed    0.13 sec
+      Start 28: horde_rt_player_animation_tests
+28/75 Test #28: horde_rt_player_animation_tests ..........................   Passed    0.03 sec
+      Start 29: horde_rt_fire_emitter_tests
+29/75 Test #29: horde_rt_fire_emitter_tests ..............................   Passed    0.02 sec
+      Start 30: horde_rt_held_item_socket_tests
+30/75 Test #30: horde_rt_held_item_socket_tests ..........................   Passed    0.59 sec
+      Start 31: horde_rt_development_static_asset_tests
+31/75 Test #31: horde_rt_development_static_asset_tests ..................   Passed    0.02 sec
+      Start 32: horde_rt_scene_abi_tests
+32/75 Test #32: horde_rt_scene_abi_tests .................................   Passed    0.01 sec
+      Start 33: horde_rt_static_gltf_asset_tests
+33/75 Test #33: horde_rt_static_gltf_asset_tests .........................   Passed    0.17 sec
+      Start 34: horde_rt_production_prop_asset_tests
+34/75 Test #34: horde_rt_production_prop_asset_tests .....................   Passed    0.48 sec
+      Start 35: horde_rt_scene_abi_generator_tests
+35/75 Test #35: horde_rt_scene_abi_generator_tests .......................   Passed    1.42 sec
+      Start 36: horde_rt_raygen_compiler_strategy_tests
+36/75 Test #36: horde_rt_raygen_compiler_strategy_tests ..................   Passed   23.13 sec
+      Start 37: horde_rt_raygen_variant_manifest_tests
+37/75 Test #37: horde_rt_raygen_variant_manifest_tests ...................   Passed   29.27 sec
+      Start 38: horde_rt_pipeline_policy_fence_tests
+38/75 Test #38: horde_rt_pipeline_policy_fence_tests .....................   Passed   46.78 sec
+      Start 39: horde_rt_pipeline_policy_execution_tests
+39/75 Test #39: horde_rt_pipeline_policy_execution_tests .................   Passed   77.29 sec
+      Start 40: horde_rt_static_texture_array_tool_tests
+40/75 Test #40: horde_rt_static_texture_array_tool_tests .................   Passed    1.75 sec
+      Start 41: horde_rt_static_preparation_lod_policy_tests
+41/75 Test #41: horde_rt_static_preparation_lod_policy_tests .............   Passed    4.48 sec
+      Start 42: horde_rt_static_preparation_skip_policy_tests
+42/75 Test #42: horde_rt_static_preparation_skip_policy_tests ............   Passed    1.16 sec
+      Start 43: horde_rt_static_preparation_colliding_lod_policy_tests
+43/75 Test #43: horde_rt_static_preparation_colliding_lod_policy_tests ...   Passed    9.44 sec
+      Start 44: horde_rt_dielectric_topology_tool_tests
+44/75 Test #44: horde_rt_dielectric_topology_tool_tests ..................   Passed    4.45 sec
+      Start 45: horde_rt_version_contract_powershell_tests
+45/75 Test #45: horde_rt_version_contract_powershell_tests ...............   Passed    1.23 sec
+      Start 46: horde_rt_github_release_preflight_tests
+46/75 Test #46: horde_rt_github_release_preflight_tests ..................   Passed   13.83 sec
+      Start 47: horde_rt_version_contract_windows_powershell_tests
+47/75 Test #47: horde_rt_version_contract_windows_powershell_tests .......   Passed    0.82 sec
+      Start 48: horde_rt_simulation_timing_tests
+48/75 Test #48: horde_rt_simulation_timing_tests .........................   Passed    0.03 sec
+      Start 49: horde_rt_simulation_gameplay_tests
+49/75 Test #49: horde_rt_simulation_gameplay_tests .......................   Passed    0.06 sec
+      Start 50: horde_rt_lantern_reward_tests
+50/75 Test #50: horde_rt_lantern_reward_tests ............................   Passed    0.02 sec
+      Start 51: horde_rt_lantern_pendulum_tests
+51/75 Test #51: horde_rt_lantern_pendulum_tests ..........................   Passed    0.02 sec
+      Start 52: horde_rt_input_mailbox_stress
+52/75 Test #52: horde_rt_input_mailbox_stress ............................   Passed    0.07 sec
+      Start 53: horde_rt_desktop_controller_input_tests
+53/75 Test #53: horde_rt_desktop_controller_input_tests ..................   Passed    0.02 sec
+      Start 54: horde_rt_gpu_timestamp_math_tests
+54/75 Test #54: horde_rt_gpu_timestamp_math_tests ........................   Passed    0.01 sec
+      Start 55: horde_rt_combat_smoke
+55/75 Test #55: horde_rt_combat_smoke ....................................   Passed    0.01 sec
+      Start 56: horde_rt_showcase_route_smoke
+56/75 Test #56: horde_rt_showcase_route_smoke ............................   Passed    0.01 sec
+      Start 57: horde_rt_showcase_gameplay_smoke
+57/75 Test #57: horde_rt_showcase_gameplay_smoke .........................   Passed    0.01 sec
+      Start 58: horde_rt_spatial_audio_smoke
+58/75 Test #58: horde_rt_spatial_audio_smoke .............................   Passed    0.03 sec
+      Start 59: horde_rt_gpu_frame_timer_collection_tests
+59/75 Test #59: horde_rt_gpu_frame_timer_collection_tests ................   Passed    0.01 sec
+      Start 60: horde_rt_frame_evidence_coordinator_tests
+60/75 Test #60: horde_rt_frame_evidence_coordinator_tests ................   Passed    0.02 sec
+      Start 61: horde_rt_gpu_resources_observation_tests
+61/75 Test #61: horde_rt_gpu_resources_observation_tests .................   Passed    0.01 sec
+      Start 62: horde_rt_pipeline_bundle_lifetime_tests
+62/75 Test #62: horde_rt_pipeline_bundle_lifetime_tests ..................   Passed    1.91 sec
+      Start 63: horde_rt_scene_initialise_preflight_tests
+63/75 Test #63: horde_rt_scene_initialise_preflight_tests ................   Passed    3.96 sec
+      Start 64: horde_rt_scene_resource_inventory_tests
+64/75 Test #64: horde_rt_scene_resource_inventory_tests ..................   Passed    3.43 sec
+      Start 65: horde_rt_final_windows_bundle_containment
+65/75 Test #65: horde_rt_final_windows_bundle_containment ................   Passed    9.15 sec
+      Start 66: horde_rt_final_windows_bundle_containment_controls
+66/75 Test #66: horde_rt_final_windows_bundle_containment_controls .......   Passed  106.88 sec
+      Start 67: horde_rt_final_windows_bundle_containment_registration
+67/75 Test #67: horde_rt_final_windows_bundle_containment_registration ...   Passed   49.41 sec
+      Start 68: horde_rt_skinned_arm_reference_tests
+68/75 Test #68: horde_rt_skinned_arm_reference_tests .....................   Passed    3.69 sec
+      Start 69: horde_rt_skinned_character_smoke
+69/75 Test #69: horde_rt_skinned_character_smoke .........................   Passed   31.14 sec
+      Start 70: horde_rt_player_skinned_semantic_fixtures
+70/75 Test #70: horde_rt_player_skinned_semantic_fixtures ................   Passed    3.39 sec
+      Start 71: horde_rt_player_viewmodel_admission
+71/75 Test #71: horde_rt_player_viewmodel_admission ......................   Passed    0.53 sec
+      Start 72: horde_rt_player_viewmodel_pose_fixtures
+72/75 Test #72: horde_rt_player_viewmodel_pose_fixtures ..................   Passed    3.14 sec
+      Start 73: horde_rt_character_render_slot_smoke
+73/75 Test #73: horde_rt_character_render_slot_smoke .....................   Passed    4.73 sec
+      Start 74: horde_rt_developer_overlay_smoke
+74/75 Test #74: horde_rt_developer_overlay_smoke .........................   Passed    3.05 sec
+      Start 75: horde_rt_showcase_benchmark_smoke
+75/75 Test #75: horde_rt_showcase_benchmark_smoke ........................   Passed    5.62 sec
+
+100% tests passed, 0 tests failed out of 75
+
+Total Test time (real) = 579.42 sec

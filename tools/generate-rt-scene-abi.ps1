@@ -68,6 +68,7 @@ $cpuRecords = @($records | ForEach-Object {
     $record = $_
     $fieldLines = @($record.fields | ForEach-Object {
         $info = $typeInfo[[string]$_.type]
+        if ($_.comment) { "    // $($_.comment)" }
         "    $($info.Cpu) $($_.name)$($info.Initializer)"
     }) -join "`n"
     $offsetAssertions = @($record.fields | ForEach-Object {
@@ -88,6 +89,7 @@ $glslRecords = @($records | ForEach-Object {
     $record = $_
     $fieldLines = @($record.fields | ForEach-Object {
         $info = $typeInfo[[string]$_.type]
+        if ($_.comment) { "    // $($_.comment)" }
         "    $($info.Glsl) $($_.name);"
     }) -join "`n"
 @"
@@ -169,6 +171,7 @@ enum class RtMaterialFlag : std::uint32_t
     NearFacePrimaryMasked = $($m.nearFacePrimaryMasked)u,
     ThinWall = $($m.thinWall)u,
     CertifiedClosedVolume = $($m.certifiedClosedVolume)u,
+    CertifiedRectangularVolume = $($m.certifiedRectangularVolume)u,
     BodyRemainderPrimaryVisible = $($m.bodyRemainderPrimaryVisible)u,
 };
 
@@ -207,6 +210,7 @@ const uint kRtMaterialFlagHeadPrimaryMasked = $($m.headPrimaryMasked)u;
 const uint kRtMaterialFlagNearFacePrimaryMasked = $($m.nearFacePrimaryMasked)u;
 const uint kRtMaterialFlagThinWall = $($m.thinWall)u;
 const uint kRtMaterialFlagCertifiedClosedVolume = $($m.certifiedClosedVolume)u;
+const uint kRtMaterialFlagCertifiedRectangularVolume = $($m.certifiedRectangularVolume)u;
 const uint kRtMaterialFlagBodyRemainderPrimaryVisible = $($m.bodyRemainderPrimaryVisible)u;
 
 $glslRecords

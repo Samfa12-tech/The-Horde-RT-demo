@@ -258,13 +258,15 @@ std::filesystem::path WriteClosedDielectricGlb(const std::filesystem::path& root
                                                bool includeVolume = true,
                                                float thicknessFactor = 1.0f,
                                                int windingMutation = 0,
-                                               std::string_view nodeTransform = {})
+                                               std::string_view nodeTransform = {},
+                                               bool tetrahedron = false,
+                                               int geometryMutation = 0)
 {
-    constexpr std::array<std::array<float, 3u>, 8u> positions{{
+    std::vector<std::array<float, 3u>> positions{
         {{-0.5f, -0.5f, -0.5f}}, {{0.5f, -0.5f, -0.5f}},
         {{0.5f, 0.5f, -0.5f}}, {{-0.5f, 0.5f, -0.5f}},
         {{-0.5f, -0.5f, 0.5f}}, {{0.5f, -0.5f, 0.5f}},
-        {{0.5f, 0.5f, 0.5f}}, {{-0.5f, 0.5f, 0.5f}}}};
+        {{0.5f, 0.5f, 0.5f}}, {{-0.5f, 0.5f, 0.5f}}};
     constexpr std::array<std::uint16_t, 36u> closedIndices{{
         0, 2, 1, 0, 3, 2,
         4, 5, 6, 4, 6, 7,
@@ -273,6 +275,16 @@ std::filesystem::path WriteClosedDielectricGlb(const std::filesystem::path& root
         0, 1, 5, 0, 5, 4,
         3, 7, 6, 3, 6, 2}};
     std::vector<std::uint16_t> indices(closedIndices.begin(), closedIndices.end());
+    if (geometryMutation == 1)
+        for (auto& position : positions) position[0] += position[2] * 0.00001f;
+    if (geometryMutation == 2) positions[7u][0] += 0.000005f;
+    if (tetrahedron)
+    {
+        positions = {{{1.0f, 1.0f, 1.0f}}, {{2.0f, 1.0f, 1.0f}},
+                     {{1.0f, 2.0f, 1.0f}}, {{1.0f, 1.0f, 2.0f}}};
+        indices = {0u, 2u, 1u, 0u, 1u, 3u,
+                   0u, 3u, 2u, 1u, 2u, 3u};
+    }
     if (omitFrontFace) indices.erase(indices.begin() + 6, indices.begin() + 12);
     if (duplicateBottomTriangle) indices.insert(indices.end(), {0u, 1u, 5u});
     if (windingMutation == 1)
@@ -305,6 +317,25 @@ std::filesystem::path WriteClosedDielectricGlb(const std::filesystem::path& root
     const std::size_t indexOffset = binary.size();
     for (std::uint16_t index : indices) AppendU16(binary, index);
 
+    std::array<float, 3u> positionMinimum{{
+        std::numeric_limits<float>::max(),
+        std::numeric_limits<float>::max(),
+        std::numeric_limits<float>::max()}};
+    std::array<float, 3u> positionMaximum{{
+        std::numeric_limits<float>::lowest(),
+        std::numeric_limits<float>::lowest(),
+        std::numeric_limits<float>::lowest()}};
+    for (const auto& position : positions)
+        for (std::size_t axis = 0u; axis < 3u; ++axis)
+        {
+            positionMinimum[axis] = std::min(positionMinimum[axis], position[axis]);
+            positionMaximum[axis] = std::max(positionMaximum[axis], position[axis]);
+        }
+    const auto jsonVector = [](const std::array<float, 3u>& value) {
+        return "[" + std::to_string(value[0]) + "," +
+            std::to_string(value[1]) + "," + std::to_string(value[2]) + "]";
+    };
+
     const std::string extensionNames = includeVolume
         ? "[\"KHR_materials_transmission\",\"KHR_materials_volume\",\"KHR_materials_ior\"]"
         : "[\"KHR_materials_transmission\",\"KHR_materials_ior\"]";
@@ -319,18 +350,25 @@ std::filesystem::path WriteClosedDielectricGlb(const std::filesystem::path& root
         "\"extensionsRequired\":" + extensionNames + ","
         "\"buffers\":[{\"byteLength\":" + std::to_string(binary.size()) + "}],"
         "\"bufferViews\":["
-        "{\"buffer\":0,\"byteOffset\":0,\"byteLength\":96,\"target\":34962},"
+        "{\"buffer\":0,\"byteOffset\":0,\"byteLength\":" +
+            std::to_string(positions.size() * 3u * sizeof(float)) + ",\"target\":34962},"
         "{\"buffer\":0,\"byteOffset\":" + std::to_string(normalOffset) +
-            ",\"byteLength\":96,\"target\":34962},"
+            ",\"byteLength\":" +
+            std::to_string(positions.size() * 3u * sizeof(float)) + ",\"target\":34962},"
         "{\"buffer\":0,\"byteOffset\":" + std::to_string(uvOffset) +
-            ",\"byteLength\":64,\"target\":34962},"
+            ",\"byteLength\":" +
+            std::to_string(positions.size() * 2u * sizeof(float)) + ",\"target\":34962},"
         "{\"buffer\":0,\"byteOffset\":" + std::to_string(indexOffset) +
             ",\"byteLength\":" + std::to_string(indices.size() * 2u) +
             ",\"target\":34963}],"
         "\"accessors\":["
-        "{\"bufferView\":0,\"componentType\":5126,\"count\":8,\"type\":\"VEC3\",\"min\":[-0.5,-0.5,-0.5],\"max\":[0.5,0.5,0.5]},"
-        "{\"bufferView\":1,\"componentType\":5126,\"count\":8,\"type\":\"VEC3\"},"
-        "{\"bufferView\":2,\"componentType\":5126,\"count\":8,\"type\":\"VEC2\"},"
+        "{\"bufferView\":0,\"componentType\":5126,\"count\":" +
+            std::to_string(positions.size()) + ",\"type\":\"VEC3\",\"min\":" +
+            jsonVector(positionMinimum) + ",\"max\":" + jsonVector(positionMaximum) + "},"
+        "{\"bufferView\":1,\"componentType\":5126,\"count\":" +
+            std::to_string(positions.size()) + ",\"type\":\"VEC3\"},"
+        "{\"bufferView\":2,\"componentType\":5126,\"count\":" +
+            std::to_string(positions.size()) + ",\"type\":\"VEC2\"},"
         "{\"bufferView\":3,\"componentType\":5123,\"count\":" +
             std::to_string(indices.size()) + ",\"type\":\"SCALAR\"}],"
         "\"materials\":[{\"name\":\"ClosedGlass\",\"doubleSided\":true,"
@@ -1173,8 +1211,63 @@ void TestThickDielectricTopology(const std::filesystem::path& temporaryRoot,
     Check(horde::scene::assets::StaticMeshAsset::Load(closed, manifest, asset, diagnostic),
           std::string("closed manifold thick dielectric loads: ") + diagnostic);
     Check(asset.materials.size() == 1u &&
-              (asset.materials[0].flags & 1024u) != 0u,
-          "validated outward closed thick dielectric receives the runtime certification flag");
+              (asset.materials[0].flags & 1024u) != 0u &&
+              (asset.materials[0].flags & 4096u) != 0u,
+          "validated outward closed unit cube receives both closed-volume and derived rectangular-volume certification");
+    const auto& cubeMaterial = asset.materials[0];
+    Check(cubeMaterial.numericalSpawnMinimumWidth > 0.9999f &&
+              cubeMaterial.numericalSpawnMinimumWidth < 1.0f &&
+              cubeMaterial.numericalSpawnGeometryError > 0.0f &&
+              cubeMaterial.numericalSpawnGeometryError < 1e-10f,
+          "unit cube certificate rounds clearance down and measured error up");
+    horde::vulkan::raytracing::RtStaticMeshSlot slot;
+    const horde::vulkan::raytracing::StaticRtAssetRegistration registration{
+        0u, 1u, 0u, 0u, &asset, nullptr};
+    Check(slot.Initialize(std::array{registration}, diagnostic),
+          std::string("certified material uploads: ") + diagnostic);
+    if (slot.Materials().size() == 1u)
+        Check(slot.Materials()[0].iorThicknessAttenuationDistance[3] ==
+                  cubeMaterial.numericalSpawnMinimumWidth &&
+                  slot.Materials()[0].attenuationColor[3] ==
+                  cubeMaterial.numericalSpawnGeometryError &&
+                  slot.Materials()[0].iorThicknessAttenuationDistance[1] ==
+                  cubeMaterial.thicknessFactor,
+              "GPU numerical lanes preserve loader bounds and separate authored thickness");
+    for (int mutation : {1, 2})
+    {
+        const auto malformed = WriteClosedDielectricGlb(
+            temporaryRoot, "near-rectangular-lod0.runtime.glb", false, false,
+            true, 1.0f, 0, {}, false, mutation);
+        Check(horde::scene::assets::StaticMeshAsset::Load(malformed, manifest, asset, diagnostic) &&
+                  (asset.materials[0].flags & 1024u) != 0u &&
+                  (asset.materials[0].flags & 4096u) == 0u &&
+                  asset.materials[0].numericalSpawnMinimumWidth == 0.0f &&
+                  asset.materials[0].numericalSpawnGeometryError == 0.0f,
+              "closed near-rectangular shear/warp does not acquire an unsafe numerical certificate");
+    }
+
+    const auto tetrahedron = WriteClosedDielectricGlb(
+        temporaryRoot, "closed-tetrahedron-lod0.runtime.glb", false, false,
+        true, 0.1f, 0, {}, true);
+    Check(horde::scene::assets::StaticMeshAsset::Load(
+              tetrahedron, manifest, asset, diagnostic) &&
+              (asset.materials[0].flags & 1024u) != 0u &&
+              (asset.materials[0].flags & 4096u) == 0u,
+          std::string("closed tetrahedron keeps ordinary closed-volume certification without rectangular certification: ") +
+              diagnostic);
+
+    const auto oversizedThickness = WriteClosedDielectricGlb(
+        temporaryRoot, "oversized-thickness-lod0.runtime.glb", false, false,
+        true, 1.0001f);
+    Check(horde::scene::assets::StaticMeshAsset::Load(
+              oversizedThickness, manifest, asset, diagnostic) &&
+              (asset.materials[0].flags & 1024u) != 0u &&
+              (asset.materials[0].flags & 4096u) != 0u &&
+              asset.materials[0].thicknessFactor == 1.0001f &&
+              asset.materials[0].numericalSpawnMinimumWidth < 1.0f &&
+              asset.materials[0].numericalSpawnMinimumWidth > 0.9999f,
+          std::string("numerical clearance derives from geometry, not a larger authored optical thickness: ") +
+              diagnostic);
 
     const auto open = WriteClosedDielectricGlb(
         temporaryRoot, "open-dielectric-lod0.runtime.glb", true, false);

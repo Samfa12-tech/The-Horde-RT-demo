@@ -2,6 +2,35 @@
 
 Last updated: 2026-09-30
 
+## September 30: bounded spawn correction03c (local SM-S948B evidence)
+
+Exact ordinary Debug APK
+`2dcd65b27768ca1a3b02375df9f20724849e006b1e795d78d2f5c1c98676c658`
+installed/pulled back identically in run20260930-125343: **SM-S948B**, Android16,
+Adreno840/driver2150932499,75%/1080x2235, strictASTC and honest native pipeline RT.
+13 replay waypoints,7 captures and Home/resume PASS; all7 images/41counter
+snapshots match predecessor03b. Isolated overflow1/recoveries80, high/look-up
+0/527 and grazing0/30702 remain open, not a whole-glass acceptance.
+
+Current live `glass-rectangular-live-20260930-03c` completes600warm+600measured,
+600/600 valid submission/completion joins. All41row counters equal predecessor
+03b:64transport failures/58rows (57volume/52rows+7mismatch),299636certified
+recoveries; firstfailure39/tick642, peak4at298/tick901. Zero shadow failures
+does not prove every shadow segment case. The benchmark identifies its shader
+bundle; the separate installed/capture receipt binds the APK bytes. RTXHigh
+pipeline/compute results are separate. S24/S25 and phone compute are unverified.
+
+Game-only29.852s recording/contact sheet covers mostly startup/frame1 and first
+60warmupframes, not the measured lap or owner motion acceptance. Thermal context
+is retained; Diagnostic timing is descriptive only, no matchedShipping gain.
+Thermal0→2/GPU0–1/battery33.8→42.1C; frame273ms/GPU261ms median versus preceding
+03b167ms/156ms is a substantial unresolved regression warning, not an accepted
+Shipping regression attribution or a reason to dismiss the measured slowdown.
+Unsigned ARM64Shippinga76fe241 builds and actual four-module scans show0atomics/
+noBinding22/readback; not installed or published. Ordinary Debug remains installed,
+phone returned Home; accepted candidate/stable apps/data untouched. Audio/haptic
+manual revalidation:NO. [Exact evidence/open gates](evidence/2026-09-30-glass-spawn/README.md).
+
 ## September 30: live completed-frame glass counts (local SM-S948B evidence)
 
 Exact ordinary Debug APKad6ebaa581f9ed874a268d373922e1b0b6cbc5ef3e19fd369c58adc28549d1f0,

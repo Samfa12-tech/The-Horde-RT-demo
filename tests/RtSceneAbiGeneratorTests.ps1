@@ -40,7 +40,8 @@ try {
         $generatedGlsl -notmatch 'uint primaryCertifiedClosedVolumeRecoveryCount;' -or
         $generatedGlsl -notmatch 'uint shadowCertifiedClosedVolumeRecoveryCount;' -or
         $generatedGlsl -notmatch 'uint certifiedClosedVolumeRecoveryReasonMask;' -or
-        $generatedGlsl -notmatch 'kRtMaterialFlagCertifiedClosedVolume = 1024u;') {
+        $generatedGlsl -notmatch 'kRtMaterialFlagCertifiedClosedVolume = 1024u;' -or
+        $generatedGlsl -notmatch 'kRtMaterialFlagCertifiedRectangularVolume = 4096u;') {
         throw "Dielectric diagnostics must append independent primary and shadow unclosed-volume counters."
     }
 

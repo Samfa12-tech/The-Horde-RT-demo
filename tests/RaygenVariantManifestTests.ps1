@@ -139,8 +139,8 @@ try {
     $legacyHashBefore = Get-CanonicalFileHash (Join-Path $repoRoot 'src\vulkan\raytracing\MinimalLegacyRayGenShader.inc')
     # Reviewed geometric-shadow compatibility artifacts; matrix mode must not
     # mutate them, and the artifact suite independently checks fresh compilation.
-    Assert-True ($genericHashBefore -eq 'e9fd2aaf58f02cc4c324b6b7be5e2c7ad4ede2369376499fe2aae98b6aa41fd3') 'Generic include hash changed before matrix compilation.'
-    Assert-True ($legacyHashBefore -eq 'a3ef23ee716bf1f2ba19171f13e715d5ec7fe631d62edac938416dbe934d8834') 'Legacy include hash changed before matrix compilation.'
+    Assert-True ($genericHashBefore -eq 'd0a633203e830889e63e552360899e6a41c66bcd4baa27b172c1d6f008e68e99') 'Generic include hash changed before matrix compilation.'
+    Assert-True ($legacyHashBefore -eq '7fb4f60f90c4db51c37522e09b71808ff8d7862b40280567af5c2ee04bf915a1') 'Legacy include hash changed before matrix compilation.'
 
     $matrixOutputRoot = Join-Path $temporaryRoot 'matrix'
     $matrixCompilerOutput = @(& $compiler -Matrix -OutputDirectory $matrixOutputRoot)

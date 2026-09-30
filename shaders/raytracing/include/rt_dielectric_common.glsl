@@ -40,6 +40,23 @@ float dielectricRayEpsilon(vec3 position, float interfaceDistance)
 
 const float kDielectricRayMinimumDistance = 0.000001;
 
+vec3 dielectricSpawnPoint(HitInfo hit)
+{
+#if HORDE_GENERIC_TRANSMISSION_VARIANT
+    if (hit.dielectricSpawnGuarded) return hit.dielectricSpawnPosition;
+#endif
+    return hit.position;
+}
+
+float dielectricQueryMinimum(HitInfo hit)
+{
+#if HORDE_GENERIC_TRANSMISSION_VARIANT
+    // A proven source-face-separated spawn must not discard a valid tiny exit.
+    if (hit.dielectricSpawnGuarded) return 0.0;
+#endif
+    return kDielectricRayMinimumDistance;
+}
+
 vec3 advanceDielectricRayOrigin(vec3 position, vec3 geometricNormal,
                                 vec3 direction, float epsilon)
 {

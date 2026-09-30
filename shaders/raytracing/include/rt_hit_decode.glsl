@@ -1,3 +1,5 @@
+#include "rt_dielectric_spawn.glsl"
+
 vec3 normalForSurfaceCode(uint code)
 {
     uint normalCode = (code >> 8u) & 0xffu;
@@ -395,12 +397,16 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
     h.attenuationDistance = 0.0;
     h.attenuationColor = vec3(1.0);
     h.materialFlags = 0u;
+#if HORDE_GENERIC_TRANSMISSION_VARIANT
+    h.dielectricSpawnPosition = h.position;
+    h.dielectricSpawnGuarded = false;
+#endif
 
     rayQueryEXT query;
     uint rayFlags = (ignoreWater || ignorePlayerNearFace)
         ? gl_RayFlagsNoOpaqueEXT : gl_RayFlagsOpaqueEXT;
     rayQueryInitializeEXT(query, topLevelAS, rayFlags, mask, origin,
-                          max(minimumDistance, 0.000001), direction, maxDistance);
+                          max(minimumDistance, 0.0), direction, maxDistance);
     while (rayQueryProceedEXT(query))
     {
         if ((!ignoreWater && !ignorePlayerNearFace) ||
@@ -549,6 +555,16 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
                     precise vec3 surfacePosition = objectToWorld * localPosition +
                         rayQueryGetIntersectionObjectToWorldEXT(query, true)[3];
                     h.position = surfacePosition;
+                    h.dielectricSpawnPosition = surfacePosition;
+                    if ((h.materialFlags & kRtMaterialFlagCertifiedRectangularVolume) != 0u)
+                        h.dielectricSpawnGuarded = guardedRectangularDielectricSpawn(
+                            v0.position.xyz, v1.position.xyz, v2.position.xyz, bary,
+                            localPosition, surfacePosition, h.geometricNormal,
+                            rayQueryGetIntersectionObjectToWorldEXT(query, true),
+                            rayQueryGetIntersectionWorldToObjectEXT(query, true),
+                            staticMaterial.iorThicknessAttenuationDistance.w,
+                            staticMaterial.attenuationColor.w,
+                            h.dielectricSpawnPosition);
                 }
 #endif
                 vec3 emission = emissiveSample * staticMaterial.emissiveFactorStrength.rgb *

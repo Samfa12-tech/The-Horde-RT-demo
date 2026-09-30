@@ -1,0 +1,238 @@
+{
+  "investigationOnly": true,
+  "precision": "double using captured float inputs",
+  "glbSha256": "34a2522f2027d3fb04b77480cc929d36c5a19c6e0f33bf3fa0f0ae0959c99ec4",
+  "paths": [
+    {
+      "pixel": [
+        576,
+        574
+      ],
+      "interfaces": [
+        {
+          "primitive": 25,
+          "component": 4,
+          "loadedTriangleMaxError": 0.0,
+          "biasedOriginMaximumOutsideMetres": -3.0342539143217472e-05,
+          "limitingFace": 25,
+          "hitSignedDistanceToLimitingFaceMetres": 1.89902428237871e-08,
+          "unbiasedIntersections": [
+            {
+              "t": 2.004422204653667e-08,
+              "primitive": 25,
+              "component": 4,
+              "entering": true
+            },
+            {
+              "t": 0.003221472112783029,
+              "primitive": 24,
+              "component": 4,
+              "entering": false
+            },
+            {
+              "t": 0.12685806505596572,
+              "primitive": 39,
+              "component": 0,
+              "entering": true
+            },
+            {
+              "t": 0.1311924058656143,
+              "primitive": 37,
+              "component": 0,
+              "entering": false
+            }
+          ],
+          "biasedIntersections": [
+            {
+              "t": 0.0032189212974700282,
+              "primitive": 63,
+              "component": 4,
+              "entering": false
+            },
+            {
+              "t": 0.12683681187066867,
+              "primitive": 39,
+              "component": 0,
+              "entering": true
+            },
+            {
+              "t": 0.13117115267964807,
+              "primitive": 37,
+              "component": 0,
+              "entering": false
+            }
+          ]
+        },
+        {
+          "primitive": 24,
+          "component": 4,
+          "loadedTriangleMaxError": 0.0,
+          "biasedOriginMaximumOutsideMetres": -1.1547104684025977e-06,
+          "limitingFace": 63,
+          "hitSignedDistanceToLimitingFaceMetres": -1.3551590541602265e-06,
+          "unbiasedIntersections": [
+            {
+              "t": 3.6716100000065093e-07,
+              "primitive": 24,
+              "component": 4,
+              "entering": true
+            },
+            {
+              "t": 1.4303356949893383e-06,
+              "primitive": 63,
+              "component": 4,
+              "entering": false
+            },
+            {
+              "t": 0.17322590007329408,
+              "primitive": 45,
+              "component": 1,
+              "entering": true
+            },
+            {
+              "t": 0.17647676434631857,
+              "primitive": 43,
+              "component": 1,
+              "entering": false
+            }
+          ],
+          "biasedIntersections": [
+            {
+              "t": 1.2187673434122083e-06,
+              "primitive": 63,
+              "component": 4,
+              "entering": false
+            },
+            {
+              "t": 0.17322568850494252,
+              "primitive": 45,
+              "component": 1,
+              "entering": true
+            },
+            {
+              "t": 0.1764765527792703,
+              "primitive": 43,
+              "component": 1,
+              "entering": false
+            }
+          ]
+        },
+        {
+          "primitive": 45,
+          "component": 1,
+          "loadedTriangleMaxError": 0.0
+        }
+      ]
+    },
+    {
+      "pixel": [
+        504,
+        577
+      ],
+      "interfaces": [
+        {
+          "primitive": 19,
+          "component": 3,
+          "loadedTriangleMaxError": 0.0,
+          "biasedOriginMaximumOutsideMetres": 3.1458518992251785e-08,
+          "limitingFace": 54,
+          "hitSignedDistanceToLimitingFaceMetres": -4.871191333676375e-08,
+          "unbiasedIntersections": [
+            {
+              "t": 3.190662889527877e-07,
+              "primitive": 19,
+              "component": 3,
+              "entering": true
+            },
+            {
+              "t": 0.0034751650373970795,
+              "primitive": 57,
+              "component": 3,
+              "entering": false
+            }
+          ],
+          "biasedIntersections": [
+            {
+              "t": 7.276631064669305e-08,
+              "primitive": 54,
+              "component": 3,
+              "entering": true
+            },
+            {
+              "t": 0.003440892181993398,
+              "primitive": 57,
+              "component": 3,
+              "entering": false
+            }
+          ]
+        },
+        {
+          "primitive": 54,
+          "component": 3,
+          "loadedTriangleMaxError": 0.0
+        }
+      ]
+    },
+    {
+      "pixel": [
+        515,
+        652
+      ],
+      "interfaces": [
+        {
+          "primitive": 62,
+          "component": 4,
+          "loadedTriangleMaxError": 0.0,
+          "biasedOriginMaximumOutsideMetres": -2.3589491667338645e-07,
+          "limitingFace": 63,
+          "hitSignedDistanceToLimitingFaceMetres": -5.03809274940496e-07,
+          "unbiasedIntersections": [
+            {
+              "t": 8.616238757908243e-07,
+              "primitive": 27,
+              "component": 4,
+              "entering": false
+            },
+            {
+              "t": 0.1638775304241988,
+              "primitive": 3,
+              "component": 0,
+              "entering": true
+            },
+            {
+              "t": 0.16706530840158393,
+              "primitive": 37,
+              "component": 0,
+              "entering": false
+            }
+          ],
+          "biasedIntersections": [
+            {
+              "t": 4.034318193272391e-07,
+              "primitive": 27,
+              "component": 4,
+              "entering": false
+            },
+            {
+              "t": 0.16385060289784187,
+              "primitive": 3,
+              "component": 0,
+              "entering": true
+            },
+            {
+              "t": 0.16703838087597192,
+              "primitive": 37,
+              "component": 0,
+              "entering": false
+            }
+          ]
+        },
+        {
+          "primitive": 3,
+          "component": 0,
+          "loadedTriangleMaxError": 0.0
+        }
+      ]
+    }
+  ]
+}

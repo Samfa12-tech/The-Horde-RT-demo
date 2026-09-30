@@ -24,10 +24,11 @@ RtMaterialGpu ConvertMaterial(const horde::scene::assets::StaticMaterial& source
         source.metallicFactor, source.roughnessFactor,
         source.occlusionStrength, source.transmissionFactor}};
     result.iorThicknessAttenuationDistance = {{
-        source.ior, source.thicknessFactor, source.attenuationDistance, 0.0f}};
+        source.ior, source.thicknessFactor, source.attenuationDistance,
+        source.numericalSpawnMinimumWidth}};
     result.attenuationColor = {{
         source.attenuationColor[0], source.attenuationColor[1],
-        source.attenuationColor[2], 0.0f}};
+        source.attenuationColor[2], source.numericalSpawnGeometryError}};
     result.textureLayers = textureLayers;
     result.materialFlags[0] = source.flags;
     if (source.baseColorTexture >= 0)

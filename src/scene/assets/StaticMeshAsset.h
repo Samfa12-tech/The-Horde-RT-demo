@@ -56,6 +56,10 @@ struct StaticMaterial
     float ior = 1.5f;
     float thicknessFactor = 0.0f;
     float attenuationDistance = 0.0f;
+    // Loader-derived numerical bounds, never authored optical parameters.
+    // Zero means ordinary closed-volume transport, without a spawn certificate.
+    float numericalSpawnMinimumWidth = 0.0f;
+    float numericalSpawnGeometryError = 0.0f;
     std::int32_t baseColorTexture = -1;
     std::int32_t normalTexture = -1;
     std::int32_t ormTexture = -1;

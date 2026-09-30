@@ -45,7 +45,8 @@
     "nearFacePrimaryMasked": 256,
     "thinWall": 512,
     "certifiedClosedVolume": 1024,
-    "bodyRemainderPrimaryVisible": 2048
+    "bodyRemainderPrimaryVisible": 2048,
+    "certifiedRectangularVolume": 4096
   },
   "records": [
     {
@@ -131,8 +132,8 @@
         { "name": "baseColorFactor", "type": "float4", "offset": 0 },
         { "name": "emissiveFactorStrength", "type": "float4", "offset": 16 },
         { "name": "metallicRoughnessOcclusionTransmission", "type": "float4", "offset": 32 },
-        { "name": "iorThicknessAttenuationDistance", "type": "float4", "offset": 48 },
-        { "name": "attenuationColor", "type": "float4", "offset": 64 },
+        { "name": "iorThicknessAttenuationDistance", "type": "float4", "offset": 48, "comment": "xyz: authored IOR/thickness/attenuation distance; w: loader-derived numerical spawn minimum width (zero without certificate)." },
+        { "name": "attenuationColor", "type": "float4", "offset": 64, "comment": "rgb: authored attenuation color; w: loader-derived numerical spawn geometry error, rounded upward." },
         { "name": "textureLayers", "type": "uint4", "offset": 80 },
         { "name": "materialFlags", "type": "uint4", "offset": 96 }
       ]

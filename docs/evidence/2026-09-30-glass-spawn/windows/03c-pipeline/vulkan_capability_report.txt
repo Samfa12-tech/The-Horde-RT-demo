@@ -1,0 +1,33 @@
+Backend: Vulkan
+RT mode: RayTracingPipeline
+Execution backend: RayTracingPipeline
+GPU name: NVIDIA GeForce RTX 5050 Laptop GPU
+Vendor ID: 4318
+Device ID: 11672
+Driver version: 610.188.0
+Vulkan API version: 1.4.341
+VK_KHR_acceleration_structure: yes
+VK_KHR_ray_tracing_pipeline: yes
+VK_KHR_ray_query: yes
+VK_KHR_buffer_device_address: yes
+VK_KHR_deferred_host_operations: yes
+Internal render resolution: 1232x803
+FPS / frame time: N/A
+GPU RT command-buffer time: N/A (GPU timestamp queries are ready; awaiting the first RT submission.)
+RT scene status: Presented via swapchain
+RT scene geometry: Complete Horde showcase route with sequential animated skeleton and staff-lit lich
+RT scene dispatch resolution: 1232x803
+RT scene presented: yes
+RT EVIDENCE PUBLICATION version=1
+Observer: available
+Lifecycle: epoch=2 generation=4 running=yes paused=no presented=no
+Diagnostic status: pending
+GPU status: pending
+Completed frame: N/A (no-accepted-completed-frame)
+Diagnostics:
+- Inspecting candidate 1
+- Driver version packed: 2559295488
+- Driver version: 610.188.0
+- Vulkan API version: 1.4.341
+- RT capability mode: RayTracingPipeline
+- FPS / frame time: not measured yet.

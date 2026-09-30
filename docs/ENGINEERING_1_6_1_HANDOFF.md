@@ -30,6 +30,55 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### Current Phase 4 checkpoint
 
+Bounded rectangular spawn correction candidate03c is now validated locally:
+[September30 numerical-spawn evidence](evidence/2026-09-30-glass-spawn/README.md).
+Loader-derived width/error and flag4096 occupy formerly unused material lanes;
+GPU stride/descriptors/counter ABI stay unchanged. Every eligible continuation
+still uses native RT. Metric-nearest local inset rejects unsafe/non-finite cases;
+zero Tmin is restricted to admitted source-face-separated spawns. No player,
+asset/material authoring, ray-mask or4/8-interface/2/4-volume-budget changes.
+RTX replay231/tick833 removes all3 demonstrated defects on both backends.
+This is not a disjointness/contact/nesting or universal precision certificate.
+
+Fresh native Debug build/75 CTests pass; separate final artifact/compatibility
+and fresh8-compute checks also PASS exit0 (no concurrent worktree mutations).
+All16 variants regenerated; actual eight APK modules independently validate,
+Shipping0atomics/noBinding22/readback. Debug four-ABI APK2dcd65b2 installs/pulls
+back identically on exactSM-S948B; ARM64 unsignedShippinga76fe241 builds/scans,
+not installed/published. Phone run125343 passes13replay/7capture/Home-resume at75%,
+strictASTC/nativepipeline. Accepted/stable apps and scratch files are untouched.
+Separate descriptor-test repairc4169ac is pushed/byte-verified; current CI
+push36661824032/PR36661828721 is green45portable+11Vulkan-host. PR15 stays draft.
+
+Fresh03c live ledgers all600/600 valid, native process exits0/0. Their41counter
+arrays are identical to03b, so remaining failures are explicit: RTXpipeline4
+transport events/3rows (mismatch row43/tick646), compute3/2; both volume3/2 at
+rows237/tick840 and454/tick1057. Exactphone64/58 transport,57/52volume,7mismatch;
+firstfailure39/tick642, peak4at298/tick901, recoveries299636/600rows. Shadow
+overflow/unclosed/recovery0 does not certify both-inside/no-boundary absorption.
+Phone7PNG/counter snapshots and Windows13PNG unchanged versus03b; combined
+Windows comparison still FAILS timing4.067% versus2% (not matchedShipping).
+Earlier affected finale and backend pixel gates still FAIL unchanged tolerance.
+Short phone video covers earlywarmup only, not measuredlive/owner acceptance.
+Phone Diagnostic273ms versus predecessor167ms is an unresolved regression
+warning, with unmatched thermal0→2/battery33.8→42.1C; require matchedShipping
+follow-up after correctness, not an assumed thermal explanation or speedup.
+No performance improvement orS24/S25 pass. Audio/haptic manual revalidation:NO.
+
+Next classify remaining exact live rows/interface exhaustion/contact recoveries,
+finish geometric-shadow/live acceptance and changed-pixel attribution; only then
+matchedShipping performance/backend parity. Do not restart Phase1 or accepted
+player tuning. Preserve full later music/reporting/resource/pacing/final scope.
+
+Owner removed the phone on September30 after these runs; do not issue device
+commands until the owner reports it connected again. Continue independent RTX/
+host work. The synthetic both-endpoints-inside shadow probe is an explicit
+coverage gap, not a demonstrated production ray: ordinary terminal shading
+expects the medium to be closed. Do not guess absorption from an unknown medium
+or promote synthetic success into a production acceptance claim.
+
+#### Earlier September 30 checkpoints (historical artifact identities)
+
 Exact RTX live row230 is now reproduced through the owning gameplay replay on
 both backends, with all41 ordinary counters matching. [Three native object-ray
 witnesses](evidence/2026-09-30-glass-live/rays/README.md) prove near-edge continuation

@@ -1,0 +1,83 @@
+CMake is re-running because C:/Dev/tmp/horde-phase3-native-20260923/CMakeFiles/generate.stamp is out-of-date.
+  the file 'C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/src/vulkan/raytracing/MinimalLegacyRayGenShader.inc'
+  is newer than 'C:/Dev/tmp/horde-phase3-native-20260923/CMakeFiles/generate.stamp.depend'
+  result='-1'
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26200.
+Generated RT catalog adapter is current.
+-- Strict non-contracted asset-transform arithmetic enabled for GltfDocument.cpp and StaticMeshAsset.cpp: /fp:strict
+-- Vulkan SDK found: 1.4.350
+-- Legacy torch-failure identifiers were rejected by the configured MSVC compiler.
+-- Horde Lantern RT: Vulkan capability probe and Windows diagnostic targets are available; Android builds from android/.
+-- Configuring done (12.5s)
+-- Generating done (0.5s)
+-- Build files have been written to: C:/Dev/tmp/horde-phase3-native-20260923
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  RtPipelineVariantProvider.cpp
+  RtPipelineVariantProvider.cpp
+  RtPipelineVariantProvider.cpp
+  horde_rtpv_0_1_obj.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\horde_rtpv_0_1_obj.dir\Debug\horde_rtpv_0_1_obj.lib
+  RtPipelineVariantProvider.cpp
+  horde_rtpv_1_0_obj.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\horde_rtpv_1_0_obj.dir\Debug\horde_rtpv_1_0_obj.lib
+  horde_rtpv_0_0_obj.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\horde_rtpv_0_0_obj.dir\Debug\horde_rtpv_0_0_obj.lib
+  horde_rtpv_1_1_obj.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\horde_rtpv_1_1_obj.dir\Debug\horde_rtpv_1_1_obj.lib
+  horde_gameplay_simulation.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_gameplay_simulation.lib
+  horde_rt_combat_smoke.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_combat_smoke.exe
+  horde_rt_desktop_controller_input_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_desktop_controller_input_tests.exe
+  horde_rt_development_static_asset_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_development_static_asset_tests.exe
+  horde_rt_benchmark_evidence_run_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_benchmark_evidence_run_tests.exe
+  horde_rt_benchmark_evidence_report_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_benchmark_evidence_report_tests.exe
+  horde_rt_dielectric_math_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_dielectric_math_tests.exe
+  horde_rt_evidence_publication_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_evidence_publication_tests.exe
+  RtPipelineVariantProvider.cpp
+  horde_rt_fire_emitter_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_fire_emitter_tests.exe
+  horde_rt_frame_evidence_coordinator_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_frame_evidence_coordinator_tests.exe
+  horde_rt_gpu_frame_timer_collection_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_gpu_frame_timer_collection_tests.exe
+  horde_rt_github_release_updater_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_github_release_updater_tests.exe
+  horde_rt_gpu_resources_observation_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_gpu_resources_observation_tests.exe
+  horde_rt_gpu_timestamp_math_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_gpu_timestamp_math_tests.exe
+  horde_rt_held_item_socket_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_held_item_socket_tests.exe
+  horde_rt_input_mailbox_stress.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_input_mailbox_stress.exe
+  horde_rt_lantern_benchmark_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_lantern_benchmark_tests.exe
+  horde_rt_lantern_pendulum_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_lantern_pendulum_tests.exe
+  horde_rt_lantern_reward_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_lantern_reward_tests.exe
+  horde_rt_performance_evidence_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_performance_evidence_tests.exe
+  RtPipelineVariantProvider.cpp
+  RtPipelineVariantProvider.cpp
+  horde_rt_probe_core.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_probe_core.lib
+  RtPipelineVariantProvider.cpp
+  horde_rt_pipeline_bundle_lifetime_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_pipeline_bundle_lifetime_tests.exe
+  horde_rt_pipeline_bundle_contracts_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_pipeline_bundle_contracts_tests.exe
+  horde_rt_pipeline_variants_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_pipeline_variants_tests.exe
+  horde_rt_developer_overlay_smoke.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_developer_overlay_smoke.exe
+  horde_rt_character_render_slot_smoke.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_character_render_slot_smoke.exe
+  horde_rt_player_animation_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_player_animation_tests.exe
+  horde_rt_player_primitive_contract_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_player_primitive_contract_tests.exe
+  horde_rt_player_skinning_benchmark.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_player_skinning_benchmark.exe
+  RtPipelineVariantProviderTests.cpp
+  horde_rt_diagnostic_window.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\HordeLanternRT.exe
+  horde_rt_production_prop_asset_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_production_prop_asset_tests.exe
+  horde_rt_provider_diagnostic_mobile_fixture.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_provider_diagnostic_mobile_fixture.exe
+  horde_rt_ray_tracing_requirements_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_ray_tracing_requirements_tests.exe
+  horde_rt_provider_shipping_mobile_fixture.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_provider_shipping_mobile_fixture.exe
+  horde_rt_scene_abi_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_scene_abi_tests.exe
+  Generating Code...
+  horde_rt_provider_diagnostic_high_fixture.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_provider_diagnostic_high_fixture.exe
+  horde_rt_scene_initialise_preflight_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_scene_initialise_preflight_tests.exe
+  horde_rt_scene_record_observation_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_scene_record_observation_tests.exe
+  horde_rt_provider_shipping_high_fixture.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_provider_shipping_high_fixture.exe
+  horde_rt_scene_resource_inventory_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_scene_resource_inventory_tests.exe
+  LINK : C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_pipeline_variant_provider_tests.exe not found or not built by the last incremental link; performing full link
+  horde_rt_showcase_benchmark_smoke.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_showcase_benchmark_smoke.exe
+  horde_rt_showcase_gameplay_smoke.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_showcase_gameplay_smoke.exe
+  horde_rt_pipeline_variant_provider_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_pipeline_variant_provider_tests.exe
+  horde_rt_showcase_route_smoke.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_showcase_route_smoke.exe
+  horde_rt_simulation_gameplay_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_simulation_gameplay_tests.exe
+  horde_rt_simulation_timing_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_simulation_timing_tests.exe
+  horde_rt_skinned_arm_reference_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_skinned_arm_reference_tests.exe
+  horde_rt_skinned_character_smoke.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_skinned_character_smoke.exe
+  horde_rt_spatial_audio_smoke.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_spatial_audio_smoke.exe
+  horde_rt_version_contract_incremental_configure_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_version_contract_incremental_configure_tests.exe
+  horde_rt_static_gltf_asset_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_static_gltf_asset_tests.exe
+  horde_rt_version_contract_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_version_contract_tests.exe
+  horde_rt_windows_benchmark_launch_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_windows_benchmark_launch_tests.exe

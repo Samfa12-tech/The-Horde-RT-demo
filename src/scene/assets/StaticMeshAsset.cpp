@@ -465,14 +465,266 @@ std::string DielectricComponentSources(
     return stream.str();
 }
 
+bool IsCertifiedRectangularVolume(
+    const std::vector<DielectricTriangle>& triangles,
+    const std::vector<std::size_t>& component,
+    double weldTolerance,
+    double& minimumWidth,
+    double& geometryError)
+{
+    struct SupportingPlane
+    {
+        std::array<double, 3u> normal{};
+        double distanceSum = 0.0;
+        std::size_t triangleCount = 0u;
+        double distance = 0.0;
+    };
+
+    constexpr double angularTolerance = 1.0e-4;
+    std::array<double, 3u> minimum{{
+        std::numeric_limits<double>::max(),
+        std::numeric_limits<double>::max(),
+        std::numeric_limits<double>::max()}};
+    std::array<double, 3u> maximum{{
+        std::numeric_limits<double>::lowest(),
+        std::numeric_limits<double>::lowest(),
+        std::numeric_limits<double>::lowest()}};
+    std::vector<std::array<double, 3u>> vertices;
+    vertices.reserve(component.size() * 3u);
+    for (const std::size_t triangleIndex : component)
+    {
+        const DielectricTriangle& triangle = triangles[triangleIndex];
+        for (const auto& position : triangle.positions)
+        {
+            vertices.push_back(position);
+            for (std::size_t axis = 0u; axis < 3u; ++axis)
+            {
+                minimum[axis] = std::min(minimum[axis], position[axis]);
+                maximum[axis] = std::max(maximum[axis], position[axis]);
+            }
+        }
+    }
+    if (vertices.empty()) return false;
+
+    double extent = 0.0;
+    double coordinateMagnitude = 1.0;
+    for (std::size_t axis = 0u; axis < 3u; ++axis)
+    {
+        extent = std::max(extent, maximum[axis] - minimum[axis]);
+        coordinateMagnitude = std::max(
+            coordinateMagnitude,
+            std::max(std::abs(minimum[axis]), std::abs(maximum[axis])));
+    }
+    // These are recognition ceilings, not error bounds passed to the GPU.
+    // Actual residuals are measured below and must fit the float domain.
+    const double planeTolerance = std::max(
+        weldTolerance * 4.0,
+        static_cast<double>(std::numeric_limits<float>::epsilon()) *
+            coordinateMagnitude * 4.0);
+
+    const auto dot = [](const std::array<double, 3u>& left,
+                        const std::array<double, 3u>& right) {
+        return left[0] * right[0] + left[1] * right[1] + left[2] * right[2];
+    };
+    const auto normalize = [&dot](std::array<double, 3u>& value) {
+        const double lengthSquared = dot(value, value);
+        if (!std::isfinite(lengthSquared) || lengthSquared <= 1.0e-24)
+            return false;
+        const double inverseLength = 1.0 / std::sqrt(lengthSquared);
+        for (double& component : value) component *= inverseLength;
+        return true;
+    };
+    const auto squaredDifference = [](const std::array<double, 3u>& left,
+                                     const std::array<double, 3u>& right) {
+        double result = 0.0;
+        for (std::size_t axis = 0u; axis < 3u; ++axis)
+        {
+            const double difference = left[axis] - right[axis];
+            result += difference * difference;
+        }
+        return result;
+    };
+
+    std::vector<SupportingPlane> planes;
+    std::vector<std::size_t> trianglePlaneIndices;
+    trianglePlaneIndices.reserve(component.size());
+    for (const std::size_t triangleIndex : component)
+    {
+        const DielectricTriangle& triangle = triangles[triangleIndex];
+        std::array<double, 3u> left{};
+        std::array<double, 3u> right{};
+        for (std::size_t axis = 0u; axis < 3u; ++axis)
+        {
+            left[axis] = triangle.positions[1u][axis] - triangle.positions[0u][axis];
+            right[axis] = triangle.positions[2u][axis] - triangle.positions[0u][axis];
+        }
+        std::array<double, 3u> normal{{
+            left[1] * right[2] - left[2] * right[1],
+            left[2] * right[0] - left[0] * right[2],
+            left[0] * right[1] - left[1] * right[0]}};
+        if (!normalize(normal)) return false;
+        const double distance = dot(normal, triangle.positions[0u]);
+        auto plane = std::find_if(planes.begin(), planes.end(),
+            [&normal, distance, &squaredDifference, planeTolerance,
+             angularTolerance](
+                const SupportingPlane& candidate) {
+                return squaredDifference(normal, candidate.normal) <=
+                           angularTolerance * angularTolerance &&
+                       std::abs(distance - candidate.distance) <= planeTolerance;
+            });
+        if (plane == planes.end())
+        {
+            planes.push_back({normal, distance, 1u, distance});
+            trianglePlaneIndices.push_back(planes.size() - 1u);
+        }
+        else
+        {
+            trianglePlaneIndices.push_back(
+                static_cast<std::size_t>(plane - planes.begin()));
+            for (std::size_t axis = 0u; axis < 3u; ++axis)
+                plane->normal[axis] = plane->normal[axis] *
+                    static_cast<double>(plane->triangleCount) + normal[axis];
+            plane->distanceSum += distance;
+            ++plane->triangleCount;
+            if (!normalize(plane->normal)) return false;
+            plane->distance = plane->distanceSum /
+                static_cast<double>(plane->triangleCount);
+        }
+    }
+    if (planes.size() != 6u) return false;
+
+    // The assigned triangles must be planar within the recognition allowance,
+    // and every component vertex must lie behind every outward face plane.
+    const double convexityTolerance = planeTolerance + angularTolerance * extent;
+    double maximumPlaneResidual = 0.0;
+    double maximumNormalResidual = 0.0;
+    for (const SupportingPlane& plane : planes)
+    {
+        for (const auto& vertex : vertices)
+        {
+            maximumPlaneResidual = std::max(maximumPlaneResidual,
+                std::max(0.0, dot(plane.normal, vertex) - plane.distance));
+            if (dot(plane.normal, vertex) > plane.distance + convexityTolerance)
+                return false;
+        }
+    }
+    for (std::size_t componentTriangleIndex = 0u;
+         componentTriangleIndex < component.size(); ++componentTriangleIndex)
+    {
+        const DielectricTriangle& triangle =
+            triangles[component[componentTriangleIndex]];
+        std::array<double, 3u> left{};
+        std::array<double, 3u> right{};
+        for (std::size_t axis = 0u; axis < 3u; ++axis)
+        {
+            left[axis] = triangle.positions[1u][axis] - triangle.positions[0u][axis];
+            right[axis] = triangle.positions[2u][axis] - triangle.positions[0u][axis];
+        }
+        std::array<double, 3u> normal{{
+            left[1] * right[2] - left[2] * right[1],
+            left[2] * right[0] - left[0] * right[2],
+            left[0] * right[1] - left[1] * right[0]}};
+        if (!normalize(normal)) return false;
+        const double distance = dot(normal, triangle.positions[0u]);
+        const SupportingPlane& assignedPlane =
+            planes[trianglePlaneIndices[componentTriangleIndex]];
+        maximumNormalResidual = std::max(maximumNormalResidual,
+            std::sqrt(squaredDifference(normal, assignedPlane.normal)));
+        for (const auto& vertex : triangle.positions)
+            maximumPlaneResidual = std::max(maximumPlaneResidual,
+                std::abs(dot(assignedPlane.normal, vertex) - assignedPlane.distance));
+        if (squaredDifference(normal, assignedPlane.normal) >
+                angularTolerance * angularTolerance ||
+            std::abs(distance - assignedPlane.distance) > convexityTolerance)
+            return false;
+    }
+
+    std::array<bool, 6u> paired{};
+    std::array<std::array<double, 3u>, 3u> axes{};
+    std::size_t pairCount = 0u;
+    minimumWidth = std::numeric_limits<double>::max();
+    for (std::size_t left = 0u; left < planes.size(); ++left)
+    {
+        if (paired[left]) continue;
+        std::size_t opposite = planes.size();
+        for (std::size_t right = left + 1u; right < planes.size(); ++right)
+        {
+            if (paired[right]) continue;
+            std::array<double, 3u> negativeNormal{{
+                -planes[right].normal[0], -planes[right].normal[1],
+                -planes[right].normal[2]}};
+            if (squaredDifference(planes[left].normal, negativeNormal) <=
+                angularTolerance * angularTolerance)
+            {
+                if (opposite != planes.size()) return false;
+                opposite = right;
+            }
+        }
+        if (opposite == planes.size() || pairCount >= axes.size()) return false;
+        paired[left] = true;
+        paired[opposite] = true;
+
+        std::array<double, 3u> axis{{
+            planes[left].normal[0] - planes[opposite].normal[0],
+            planes[left].normal[1] - planes[opposite].normal[1],
+            planes[left].normal[2] - planes[opposite].normal[2]}};
+        if (!normalize(axis)) return false;
+        maximumNormalResidual = std::max(maximumNormalResidual,
+            std::sqrt(squaredDifference(axis, planes[left].normal)));
+        std::array<double, 3u> negativeOpposite{{-planes[opposite].normal[0],
+            -planes[opposite].normal[1], -planes[opposite].normal[2]}};
+        maximumNormalResidual = std::max(maximumNormalResidual,
+            std::sqrt(squaredDifference(axis, negativeOpposite)));
+        for (std::size_t previous = 0u; previous < pairCount; ++previous)
+        {
+            if (std::abs(dot(axis, axes[previous])) > angularTolerance)
+                return false;
+            maximumNormalResidual = std::max(maximumNormalResidual,
+                std::abs(dot(axis, axes[previous])));
+        }
+        axes[pairCount++] = axis;
+
+        double minimumProjection = std::numeric_limits<double>::max();
+        double maximumProjection = std::numeric_limits<double>::lowest();
+        for (const auto& vertex : vertices)
+        {
+            const double projection = dot(axis, vertex);
+            minimumProjection = std::min(minimumProjection, projection);
+            maximumProjection = std::max(maximumProjection, projection);
+        }
+        const double measuredWidth = maximumProjection - minimumProjection;
+        if (!std::isfinite(measuredWidth) ||
+            measuredWidth <= planeTolerance)
+            return false;
+        minimumWidth = std::min(minimumWidth, measuredWidth);
+    }
+    // Enclose departure from orthogonal supporting planes, including motion
+    // along slightly non-orthogonal face normals. The shader adds this measured
+    // bound to its arithmetic error; it is not permitted to assume ideal faces.
+    geometryError = 2.0 * maximumPlaneResidual +
+        4.0 * extent * maximumNormalResidual +
+        16.0 * std::numeric_limits<double>::epsilon() * coordinateMagnitude;
+    const double quantizationCeiling = 32.0 *
+        static_cast<double>(std::numeric_limits<float>::epsilon()) * coordinateMagnitude;
+    minimumWidth -= 2.0 * geometryError;
+    return pairCount == axes.size() && std::isfinite(geometryError) &&
+        geometryError <= quantizationCeiling && minimumWidth > 8.0 * geometryError;
+}
+
 bool ValidateThickDielectricTopology(StaticMeshAsset& asset,
                                      std::string& diagnostic)
 {
     constexpr std::uint32_t thinWallFlag = 512u;
     constexpr std::uint32_t certifiedClosedVolumeFlag = 1024u;
+    constexpr std::uint32_t certifiedRectangularVolumeFlag =
+        static_cast<std::uint32_t>(
+            horde::vulkan::raytracing::RtMaterialFlag::CertifiedRectangularVolume);
     for (std::size_t materialIndex = 0u; materialIndex < asset.materials.size(); ++materialIndex)
     {
         StaticMaterial& material = asset.materials[materialIndex];
+        material.flags &= ~certifiedRectangularVolumeFlag;
+        material.numericalSpawnMinimumWidth = 0.0f;
+        material.numericalSpawnGeometryError = 0.0f;
         if (material.transmissionFactor <= 0.0f || material.thicknessFactor <= 0.0f ||
             (material.flags & thinWallFlag) != 0u)
             continue;
@@ -635,6 +887,9 @@ bool ValidateThickDielectricTopology(StaticMeshAsset& asset,
                       return left.vertexKey < right.vertexKey;
                   });
 
+        bool everyComponentIsRectangular = true;
+        double minimumSpawnWidth = std::numeric_limits<double>::max();
+        double maximumSpawnGeometryError = 0.0;
         for (std::size_t componentIndex = 0u;
              componentIndex < components.size(); ++componentIndex)
         {
@@ -711,11 +966,28 @@ bool ValidateThickDielectricTopology(StaticMeshAsset& asset,
                     "is inward-wound after baked node transforms; reverse every triangle winding so normals face outward.";
                 return false;
             }
+            double componentWidth = 0.0;
+            double componentError = 0.0;
+            const bool rectangular = IsCertifiedRectangularVolume(
+                triangles, component, weldTolerance, componentWidth, componentError);
+            everyComponentIsRectangular = everyComponentIsRectangular && rectangular;
+            minimumSpawnWidth = std::min(minimumSpawnWidth, componentWidth);
+            maximumSpawnGeometryError = std::max(maximumSpawnGeometryError, componentError);
         }
         // Certification is loader-owned and can only be appended after every
         // component using this thick material passed closed-manifold, winding,
         // and finite weld-domain validation above.
         material.flags |= certifiedClosedVolumeFlag;
+        if (everyComponentIsRectangular)
+        {
+            material.flags |= certifiedRectangularVolumeFlag;
+            // Round inward for clearance and outward for uncertainty.
+            material.numericalSpawnMinimumWidth = std::nextafter(
+                static_cast<float>(minimumSpawnWidth), 0.0f);
+            material.numericalSpawnGeometryError = std::nextafter(
+                static_cast<float>(maximumSpawnGeometryError),
+                std::numeric_limits<float>::infinity());
+        }
     }
     return true;
 }

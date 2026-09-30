@@ -1,0 +1,51 @@
+[
+  {
+    "checkpoint": "lantern-glass-production",
+    "pngIdentical": true,
+    "all41CountersIdentical": true,
+    "overflow": 1,
+    "recoveries": 80
+  },
+  {
+    "checkpoint": "player-viewmodel-lantern-high-look-up",
+    "pngIdentical": true,
+    "all41CountersIdentical": true,
+    "overflow": 0,
+    "recoveries": 527
+  },
+  {
+    "checkpoint": "player-viewmodel-lantern-low-parry",
+    "pngIdentical": true,
+    "all41CountersIdentical": true,
+    "overflow": 0,
+    "recoveries": 0
+  },
+  {
+    "checkpoint": "glass-edge-fresnel",
+    "pngIdentical": true,
+    "all41CountersIdentical": true,
+    "overflow": 0,
+    "recoveries": 30702
+  },
+  {
+    "checkpoint": "glass-millimetre-closed",
+    "pngIdentical": true,
+    "all41CountersIdentical": true,
+    "overflow": 0,
+    "recoveries": 0
+  },
+  {
+    "checkpoint": "glass-tinted-transport",
+    "pngIdentical": true,
+    "all41CountersIdentical": true,
+    "overflow": 0,
+    "recoveries": 0
+  },
+  {
+    "checkpoint": "glass-fire-transport",
+    "pngIdentical": true,
+    "all41CountersIdentical": true,
+    "overflow": 0,
+    "recoveries": 0
+  }
+]

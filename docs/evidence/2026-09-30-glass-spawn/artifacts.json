@@ -1,0 +1,522 @@
+{
+  "schemaVersion": 1,
+  "createdUtcDate": "2026-09-30",
+  "scope": "Exact curated 03c host/shader/RTX and SM-S948B evidence, with explicitly labelled 03b predecessors and investigation-only witnesses; no Shipping performance or whole-glass acceptance.",
+  "artifacts": [
+    {
+      "path": "build/rectangular-admission-build-02.log",
+      "bytes": 1033,
+      "sha256": "d251d0a7925009e4726ba4145e4fbac3517c78cb39944408d29a6b867da37614"
+    },
+    {
+      "path": "build/rectangular-admission-tests-03.log",
+      "bytes": 718,
+      "sha256": "0389a5fb4dbeaf1bff05f308494ca4d3676066804944f1606c85a092985b53f6"
+    },
+    {
+      "path": "build/rectangular-guard-new-fixture-tests.log",
+      "bytes": 341,
+      "sha256": "c20de95a9e38a542f659b937341f6acad819ea4fb0baaa8e8d41764342587fc2"
+    },
+    {
+      "path": "build/rectangular-guard-selected-candidate-03b-build.log",
+      "bytes": 1757,
+      "sha256": "51cfb3225c2bcfb02c4fd145a81bb44a135876953dd342fd7ce8b2fe4fe99bf1"
+    },
+    {
+      "path": "build/rectangular-guard-selected-candidate-03b-compile.log",
+      "bytes": 338,
+      "sha256": "06fae27b972aefd11d5d0793932cb1d5c9847bb7f8de5eb7d5b0c5ec7ab1b678"
+    },
+    {
+      "path": "checks/03c-diagnostic-embedded-module-disassembly-summary.json",
+      "bytes": 1277,
+      "sha256": "27c452db4a4ba5b91c014992a7a63bd4051a1ef28e5b90417b78bf4855c99e46"
+    },
+    {
+      "path": "checks/03c-diagnostic-so-containment.log",
+      "bytes": 1609,
+      "sha256": "b28eef90459fba126069a311b48a6328cb24c80a00288e153e531ab66e5d8ea5"
+    },
+    {
+      "path": "checks/03c-shipping-embedded-module-disassembly-summary.json",
+      "bytes": 1267,
+      "sha256": "f978aaa4ae979979fb92efb5bbdcfd6725afb136f8192f2074542b4224d29b78"
+    },
+    {
+      "path": "checks/03c-shipping-so-containment.log",
+      "bytes": 1599,
+      "sha256": "321ed1fe47f78c2488310a4fe9d261e76a7fd8fbeb5627bdb038440026c97805"
+    },
+    {
+      "path": "checks/descriptor-roster-red-green-test.log",
+      "bytes": 355,
+      "sha256": "6537a653d04e2d35866d01afbe42a1fc0f3c76c06a6a1b4428020409c23c814e"
+    },
+    {
+      "path": "checks/rectangular-guard-android-debug-03c.log",
+      "bytes": 2142,
+      "sha256": "f9362879a02e12e77cf401b7e87c8a20ab938a26c74b52dcd322df56084584cc"
+    },
+    {
+      "path": "checks/rectangular-guard-android-shipping-03c.log",
+      "bytes": 2624,
+      "sha256": "d9481bb7d5ad96fb219c95a442347688827bd3cfb56053605b2f59e0e5b2def2"
+    },
+    {
+      "path": "checks/rectangular-guard-artifact-tests-03b-final.log",
+      "bytes": 5138,
+      "sha256": "4cbd90fd07ac1d3a8ebe62ee03afa1d632e81e07eca7f11a1eaa9723a52e1b25"
+    },
+    {
+      "path": "checks/rectangular-guard-artifact-tests-03c-final.log",
+      "bytes": 5138,
+      "sha256": "c91dd09db1745f9753f148803e37a455331e2f0e470ff47d8008af6a44e9fb82"
+    },
+    {
+      "path": "checks/rectangular-guard-catalog-03c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "checks/rectangular-guard-compatibility-03c.log",
+      "bytes": 1466,
+      "sha256": "a0cfb0906cd2b4073948051c67b37a8061df668ab3546bc75c4b965e5237c06e"
+    },
+    {
+      "path": "checks/rectangular-guard-compute-03c.log",
+      "bytes": 1875,
+      "sha256": "69e21f04af3199f962fb75f7a2c1f8e59b8e1541631c417b82bfe98e7c211024"
+    },
+    {
+      "path": "checks/rectangular-guard-compute-check-03c-final.log",
+      "bytes": 1906,
+      "sha256": "e3f0042468a1c1b38d17bf761efbba146a493245e41a081aeafdb2d4a1797037"
+    },
+    {
+      "path": "checks/rectangular-guard-freeze-03c.log",
+      "bytes": 2700,
+      "sha256": "f883955317ae173e277c6200cf6372cd19a836342de95caa5578b36dc535a1ca"
+    },
+    {
+      "path": "checks/rectangular-guard-legacy-compatibility-03c.log",
+      "bytes": 740,
+      "sha256": "4f9a2989a4bd1ee4c1dc87a0fb99144497c988855652440fbea5ef2ee18e871a"
+    },
+    {
+      "path": "checks/rectangular-guard-native-all-debug-03c.log",
+      "bytes": 9184,
+      "sha256": "b58b8f6eb56c91a936281ddacbda2fdb8c5434d4c88e344a16daa2c055519802"
+    },
+    {
+      "path": "checks/rectangular-guard-native-debug-contracts-03c.log",
+      "bytes": 11695,
+      "sha256": "a2c7d13f65464b8986024ae4acfde844e223ac54ecb564223c2f579a3cb996a5"
+    },
+    {
+      "path": "checks/rectangular-spawn-03b-03c-standard-comparison.json",
+      "bytes": 3122,
+      "sha256": "2ed0fd2593929ee543a19e54a5f047d92643d4c2b2774011c57933ab89fe9ec0"
+    },
+    {
+      "path": "checks/rectangular-spawn-live-analysis-03c.json",
+      "bytes": 39562,
+      "sha256": "95ecc9b6351d633e8ec719e617a2a0286965d3b697825d89df357abcbbc27531"
+    },
+    {
+      "path": "checks/rectangular-spawn-live-analysis-20260930-03b-phone-appendix.json",
+      "bytes": 6116,
+      "sha256": "28a236caf819647682d887d68fb47a24cbf12a9fcad21f8ed0c48365d604b416"
+    },
+    {
+      "path": "checks/rectangular-spawn-live-analysis-20260930-a.json",
+      "bytes": 10630,
+      "sha256": "940658fce815fe37647d76019c31e97d054162e545bcab49e99d008f85884d95"
+    },
+    {
+      "path": "checks/rectangular-spawn-phone-03b-03c-comparison.json",
+      "bytes": 1163,
+      "sha256": "af171b6ce677706b8f6bcf09e4f5ad0d2c2288bd84d55dcd5062cf940e6515c2"
+    },
+    {
+      "path": "checks/rectangular-spawn-phone-validation-02.log",
+      "bytes": 803,
+      "sha256": "e0329f0a974f7476b5056f116f023fb1420a163317353445b087b0dad0dd0868"
+    },
+    {
+      "path": "checks/rectangular-spawn-phone-validation-03c.log",
+      "bytes": 807,
+      "sha256": "302052ca87d24009233057b0e4ca42c482ac4cb50281960f09a6639917002e1c"
+    },
+    {
+      "path": "cpu/triangle-guard-closest-capture/11-finale-roof.png",
+      "bytes": 1163314,
+      "sha256": "626bf66f21b55f0ff560d139bf6457d1eabd16e286cac5aad4640ff40cae664e"
+    },
+    {
+      "path": "cpu/triangle-guard-closest-capture/alternatives.json",
+      "bytes": 130535,
+      "sha256": "44360f7d7a005a804b89ac17abdb033584db85b40be0a23af9849abdfc096815"
+    },
+    {
+      "path": "cpu/triangle-guard-closest-capture/capture-manifest.json",
+      "bytes": 5422,
+      "sha256": "ef6ecdb3a8d71ddbfd684e0d1f83dedbec4b2d2e89090409cedfac56182026c5"
+    },
+    {
+      "path": "cpu/triangle-guard-closest-capture/paths.json",
+      "bytes": 19111,
+      "sha256": "8eb0c559ea5a00d113bda85f4141607dd9db79d767a89a562a0e892cf693e549"
+    },
+    {
+      "path": "cpu/triangle-guard-closest-objectray-analysis.json",
+      "bytes": 28407,
+      "sha256": "4e7164c31063594e0922098771a17cc4373f794d27d255ba3ac9db47d63dee71"
+    },
+    {
+      "path": "cpu/triangle-guard-closest-source.patch",
+      "bytes": 22637,
+      "sha256": "3112678b650e37d639f03e911891d31e10d665faed6219aa11aa0a6255ec2baa"
+    },
+    {
+      "path": "cpu/volume-alternatives-capture/11-finale-roof.png",
+      "bytes": 1169065,
+      "sha256": "2c8133b247fa067ec8851b00408ae5350c64973c56d2577ab841effa165af887"
+    },
+    {
+      "path": "cpu/volume-alternatives-capture/alternatives.json",
+      "bytes": 80513,
+      "sha256": "3de4acbae691530c95e337574a7b789baedc43a5304f6df1caf7e43cd2e16b46"
+    },
+    {
+      "path": "cpu/volume-alternatives-capture/capture-manifest.json",
+      "bytes": 5422,
+      "sha256": "3ba1e6966525247628e63b6ed6af99df796cfbd93a02a147aa36ba31438e103c"
+    },
+    {
+      "path": "cpu/volume-alternatives-capture/stderr.log",
+      "bytes": 53,
+      "sha256": "a2d30c85627c146d186166b5fb993d781b874ba8d0a4987e01d235c9da57440c"
+    },
+    {
+      "path": "cpu/volume-alternatives-capture/stdout.log",
+      "bytes": 2166,
+      "sha256": "5ab20552c637c7e3c9f43c911210d916db26218c629ff9ad9667909dd8855ea0"
+    },
+    {
+      "path": "cpu/volume-geometry-analysis.json",
+      "bytes": 6482,
+      "sha256": "97cb478099bd01007e431d2b7959bbb79f7ccafb8acd27e95be969cf43abf7e2"
+    },
+    {
+      "path": "phone/03b/capture-01-lantern-glass-production-state.json",
+      "bytes": 6962,
+      "sha256": "e1a323ac6fa75df12234b31b86626c4897adde94eff953dd22b7b94711cef477"
+    },
+    {
+      "path": "phone/03b/capture-02-player-viewmodel-lantern-high-look-up-state.json",
+      "bytes": 7004,
+      "sha256": "223a520bb8a9708a68edb68084fac4977d3d154290789b072c250caee33b49fc"
+    },
+    {
+      "path": "phone/03b/capture-03-player-viewmodel-lantern-low-parry-state.json",
+      "bytes": 7003,
+      "sha256": "41700a4b55c8faf15365b3a69aa6ab414e811e6f9deec545a220b6703e08ed7f"
+    },
+    {
+      "path": "phone/03b/capture-04-glass-edge-fresnel-state.json",
+      "bytes": 6945,
+      "sha256": "204c5aab2a3758167cacbd50edf0add4499c4326c53292fe211f46e8ffd34392"
+    },
+    {
+      "path": "phone/03b/capture-05-glass-millimetre-closed-state.json",
+      "bytes": 6936,
+      "sha256": "d53d5bcd783ac17515af423a66f332164e79014fa677f649b6d5f9520ad74e01"
+    },
+    {
+      "path": "phone/03b/capture-06-glass-tinted-transport-state.json",
+      "bytes": 6948,
+      "sha256": "8ff0cceded56e82154baced6a7d529da41625e777eb79f9fe664c7e51cfcce96"
+    },
+    {
+      "path": "phone/03b/capture-07-glass-fire-transport-state.json",
+      "bytes": 6948,
+      "sha256": "9db8c9d70170bb7a1f0b572da38e078e504498663e7a72e10949150b3a473a42"
+    },
+    {
+      "path": "phone/03b/capture-manifest.json",
+      "bytes": 16771,
+      "sha256": "fa19f4b08b8683d74ec34b04275a143253f3523ee788d79c2697c6e407420127"
+    },
+    {
+      "path": "phone/03b/live-benchmark.json",
+      "bytes": 547832,
+      "sha256": "d00786c98cf1894998fae09a24b169f9d7b9c4208f0e65bb11fe20cdeefbd1c4"
+    },
+    {
+      "path": "phone/03b/live-context.json",
+      "bytes": 7272,
+      "sha256": "809333709962cb380fda94fac50df1e43d87d3aad7fb6cf8995129a3ac014a3b"
+    },
+    {
+      "path": "phone/03b/live-result.json",
+      "bytes": 114,
+      "sha256": "4f547b5f399aecc0967f5ee05e2d97d6c936b2520618b0a241fd08f5fe8f8b4c"
+    },
+    {
+      "path": "phone/03b/summary.json",
+      "bytes": 2224,
+      "sha256": "8bf3665f7b93c46e2cabb6bd6e26de9a04cb4c3bd8b7bf82581f71cc5bcb9d48"
+    },
+    {
+      "path": "phone/03c/capture-01-lantern-glass-production-state.json",
+      "bytes": 6965,
+      "sha256": "0866f2dde821c041e3d44c5272e0597ffadb0c95871afc3309c0f4ddd78cbfea"
+    },
+    {
+      "path": "phone/03c/capture-02-player-viewmodel-lantern-high-look-up-state.json",
+      "bytes": 7004,
+      "sha256": "790cdc049246b0ec91c19da1a71b82bb2ed3415f4345a80b47b69090557c471c"
+    },
+    {
+      "path": "phone/03c/capture-03-player-viewmodel-lantern-low-parry-state.json",
+      "bytes": 7003,
+      "sha256": "c5367cbf4978244af48599bd9624bd3f70c970bca8a21bfb28a4e7d9a3f1da24"
+    },
+    {
+      "path": "phone/03c/capture-04-glass-edge-fresnel-state.json",
+      "bytes": 6948,
+      "sha256": "a71273807f7024d82b0706ddabbe36d36af9838c77bbad9ccf6300a9ed9daec7"
+    },
+    {
+      "path": "phone/03c/capture-05-glass-millimetre-closed-state.json",
+      "bytes": 6939,
+      "sha256": "5cd2002eef22fd1fe4a204c4f249f180865b5ea71d560fa1c6941ac35baccbbc"
+    },
+    {
+      "path": "phone/03c/capture-06-glass-tinted-transport-state.json",
+      "bytes": 6948,
+      "sha256": "79b3bd5803f2995943923fbb68f46999fde6fe39959ef213d7203b060e1f89f9"
+    },
+    {
+      "path": "phone/03c/capture-07-glass-fire-transport-state.json",
+      "bytes": 6948,
+      "sha256": "948d1a548cf7c4832c399417d134f24aa2f0092de2c2bb61623ea8d23bba5f39"
+    },
+    {
+      "path": "phone/03c/capture-manifest.json",
+      "bytes": 16770,
+      "sha256": "837d6729682a2da4f6195ae703a6bd97eb8e17848af4e884e7efad80915c8461"
+    },
+    {
+      "path": "phone/03c/lifecycle-home-resume-logcat.txt",
+      "bytes": 18978,
+      "sha256": "52a278ff433c3bbf922aa30a58eb52f6d8ccfa9995241e005c0d20daf5daafb9"
+    },
+    {
+      "path": "phone/03c/live-benchmark.json",
+      "bytes": 547833,
+      "sha256": "4746b099a66e3eaab9ae08c40e542dee719e9f88d364f523b6e01c5f347e1606"
+    },
+    {
+      "path": "phone/03c/live-context.json",
+      "bytes": 11771,
+      "sha256": "69080b29f1eaa900e4efae61387ea6a28a72999a664cbf9bed1ac96ce9fd37f2"
+    },
+    {
+      "path": "phone/03c/live-result.json",
+      "bytes": 115,
+      "sha256": "7f2fe275493b3ea8240ad7224aa5ebdef722680cf3938744d060acfb440531c6"
+    },
+    {
+      "path": "phone/03c/live-six-samples.png",
+      "bytes": 496343,
+      "sha256": "c2df10b50d8b920d60343b05695e789816d6c2a78dd302a69a92cc5c3dd288f3"
+    },
+    {
+      "path": "phone/03c/route-replay-state.json",
+      "bytes": 6899,
+      "sha256": "e46aea8e3a791cce20b1b8c900a7b2f68d36bacd701d968c6e49a28824697750"
+    },
+    {
+      "path": "phone/03c/summary.json",
+      "bytes": 2224,
+      "sha256": "fa52f9feb2a94fbbcadb42b9148eda9cf3cee925682971ab8b21a5f510991e18"
+    },
+    {
+      "path": "phone/03c/validation.md",
+      "bytes": 1295,
+      "sha256": "69cb9f0b99dbd1935413395c40e38517ea6d8f4240df9738ab5d5e548586f9b3"
+    },
+    {
+      "path": "phone/03c/vulkan_capability_report.json",
+      "bytes": 1966,
+      "sha256": "b8f0ffbfad64057050b5e338e9526d17acaf13a9c5e9084606ee33ada2036f06"
+    },
+    {
+      "path": "runtime/03b-compute/11-finale-roof.png",
+      "bytes": 1189530,
+      "sha256": "8c8ad6fdbab85e2b568a9b86a33d6e255c5e29c10db9ebc55e446d0e0afd0d4d"
+    },
+    {
+      "path": "runtime/03b-compute/capture-manifest.json",
+      "bytes": 5452,
+      "sha256": "e73e9ccbc8af8f3f739eb970f7adfd62306e0d6d9122d3c1bd4f3c2fa6fb3568"
+    },
+    {
+      "path": "runtime/03b-compute/stderr.log",
+      "bytes": 53,
+      "sha256": "a2d30c85627c146d186166b5fb993d781b874ba8d0a4987e01d235c9da57440c"
+    },
+    {
+      "path": "runtime/03b-compute/stdout.log",
+      "bytes": 2194,
+      "sha256": "b9507b260f27d491a08bdd46cbf09b7bebcea405aedd9a4fbefd8df8a2a4917e"
+    },
+    {
+      "path": "runtime/03b-pipeline/11-finale-roof.png",
+      "bytes": 1189401,
+      "sha256": "f6ba1446c0d468e7ab8d5f94a219bdd64e5e155aa4d7f4090290afe2482c7b32"
+    },
+    {
+      "path": "runtime/03b-pipeline/capture-manifest.json",
+      "bytes": 5421,
+      "sha256": "2c07b58594a68f9db26b978eb58809040b93cc12c07fa5362c1ff6a0fe654e87"
+    },
+    {
+      "path": "runtime/03b-pipeline/stderr.log",
+      "bytes": 53,
+      "sha256": "a2d30c85627c146d186166b5fb993d781b874ba8d0a4987e01d235c9da57440c"
+    },
+    {
+      "path": "runtime/03b-pipeline/stdout.log",
+      "bytes": 2196,
+      "sha256": "ae634d192d56fff3329fb0fa2ea2f101a59d33cd70819052c5f4f460f177ba08"
+    },
+    {
+      "path": "windows/03b-compute/rectangular-spawn-high-live-compute/HordeLanternRT-benchmark-20260930-022445.json",
+      "bytes": 541893,
+      "sha256": "7416df64cf43bf040a3f0a4f8f435564cf4047bbdcc09d884ccd34c3d162ee9a"
+    },
+    {
+      "path": "windows/03b-compute/rectangular-spawn-high-live-compute/HordeLanternRT-benchmark-20260930-022445.txt",
+      "bytes": 4480,
+      "sha256": "dff0a50e511980e438f1886cdc2a7f2cd689db691e0ec8f9c05c0fb4c807942f"
+    },
+    {
+      "path": "windows/03b-compute/rectangular-spawn-high-live-compute/vulkan_capability_report.json",
+      "bytes": 1912,
+      "sha256": "dc31cc318befb87a2aa4af190e123ea62d5c0f0e2e5437dc95b223c1380ec99d"
+    },
+    {
+      "path": "windows/03b-compute/rectangular-spawn-high-live-compute/vulkan_capability_report.txt",
+      "bytes": 1168,
+      "sha256": "4d049cf45388b4b1aed29e6f0bfbe10b9d23065a1f69afa0059967951df519e5"
+    },
+    {
+      "path": "windows/03b-compute/rectangular-spawn-high-live-compute/windows_showcase_timing.csv",
+      "bytes": 91,
+      "sha256": "289745e82478d7f78a307808c2b300531bb9413ffa36bea326ab1848b3c3b593"
+    },
+    {
+      "path": "windows/03b-pipeline/rectangular-spawn-high-live-pipeline/HordeLanternRT-benchmark-20260930-022215.json",
+      "bytes": 542131,
+      "sha256": "c3a891612b0d478540dd42b11479ab221687a8cd8fe34f35c447d3ba8fbe70f8"
+    },
+    {
+      "path": "windows/03b-pipeline/rectangular-spawn-high-live-pipeline/HordeLanternRT-benchmark-20260930-022215.txt",
+      "bytes": 4463,
+      "sha256": "c6734b1d3d67cefe5fcf4672441c93211c81b8dbaa8b90f07c56a638e1531b73"
+    },
+    {
+      "path": "windows/03b-pipeline/rectangular-spawn-high-live-pipeline/vulkan_capability_report.json",
+      "bytes": 1915,
+      "sha256": "1cd6467378f8f09c16bb9f06c7e57bfb32dd6b8ce4143d27de8b79924f6e5351"
+    },
+    {
+      "path": "windows/03b-pipeline/rectangular-spawn-high-live-pipeline/vulkan_capability_report.txt",
+      "bytes": 1171,
+      "sha256": "75e8779b815850eb70dc0c41540cb06b4866ef231dcd3ce9308fcfc25753f6e9"
+    },
+    {
+      "path": "windows/03b-pipeline/rectangular-spawn-high-live-pipeline/windows_showcase_timing.csv",
+      "bytes": 91,
+      "sha256": "289745e82478d7f78a307808c2b300531bb9413ffa36bea326ab1848b3c3b593"
+    },
+    {
+      "path": "windows/03c-compute/HordeLanternRT-benchmark-20260930-030532.json",
+      "bytes": 541885,
+      "sha256": "8fe1805744d37afed5c0913b447fde8b9e43d5a2766e9266ebc1980f897bd4a0"
+    },
+    {
+      "path": "windows/03c-compute/HordeLanternRT-benchmark-20260930-030532.txt",
+      "bytes": 4494,
+      "sha256": "f156288b4c482d7f61913105bc5edde62350df5d737e0e06769cfc76f25cb66f"
+    },
+    {
+      "path": "windows/03c-compute/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "windows/03c-compute/stdout.log",
+      "bytes": 1959,
+      "sha256": "3b3b46cb5d0bdc605bf9312517a5aea66b58e871a1b4604df963a12d849f9a9c"
+    },
+    {
+      "path": "windows/03c-compute/vulkan_capability_report.json",
+      "bytes": 1912,
+      "sha256": "dc31cc318befb87a2aa4af190e123ea62d5c0f0e2e5437dc95b223c1380ec99d"
+    },
+    {
+      "path": "windows/03c-compute/vulkan_capability_report.txt",
+      "bytes": 1168,
+      "sha256": "4d049cf45388b4b1aed29e6f0bfbe10b9d23065a1f69afa0059967951df519e5"
+    },
+    {
+      "path": "windows/03c-compute/windows_showcase_timing.csv",
+      "bytes": 91,
+      "sha256": "289745e82478d7f78a307808c2b300531bb9413ffa36bea326ab1848b3c3b593"
+    },
+    {
+      "path": "windows/03c-pipeline/HordeLanternRT-benchmark-20260930-030348.json",
+      "bytes": 542155,
+      "sha256": "a825fa05ff073c3c1354635e4022ce509c1fe137f97c609cd2374574a1093501"
+    },
+    {
+      "path": "windows/03c-pipeline/HordeLanternRT-benchmark-20260930-030348.txt",
+      "bytes": 4471,
+      "sha256": "3dd269cf1c4049836cced90da1cde0f4f80a5fbe63258852d196fe3905fc44f6"
+    },
+    {
+      "path": "windows/03c-pipeline/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "windows/03c-pipeline/stdout.log",
+      "bytes": 1960,
+      "sha256": "3f354b7a79c452b2607f0d679c578c6b15f0a5eaaf8fcb7b99cf449e7ac4b03c"
+    },
+    {
+      "path": "windows/03c-pipeline/vulkan_capability_report.json",
+      "bytes": 1915,
+      "sha256": "1cd6467378f8f09c16bb9f06c7e57bfb32dd6b8ce4143d27de8b79924f6e5351"
+    },
+    {
+      "path": "windows/03c-pipeline/vulkan_capability_report.txt",
+      "bytes": 1171,
+      "sha256": "75e8779b815850eb70dc0c41540cb06b4866ef231dcd3ce9308fcfc25753f6e9"
+    },
+    {
+      "path": "windows/03c-pipeline/windows_showcase_timing.csv",
+      "bytes": 91,
+      "sha256": "289745e82478d7f78a307808c2b300531bb9413ffa36bea326ab1848b3c3b593"
+    },
+    {
+      "path": "windows/03c-standard/capture-manifest.json",
+      "bytes": 27950,
+      "sha256": "dbcc65870b42fbf653c4892fca713f25c194f60378158e37269306fab4848c0d"
+    }
+  ]
+}

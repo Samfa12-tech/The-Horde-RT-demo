@@ -199,6 +199,8 @@ void TestGeneratedConstants()
     using namespace horde::vulkan::raytracing;
     Check(static_cast<std::uint32_t>(RtMaterialFlag::CertifiedClosedVolume) == 1024u,
           "topology-certified closed volume is an append-only material ABI flag");
+    Check(static_cast<std::uint32_t>(RtMaterialFlag::CertifiedRectangularVolume) == 4096u,
+          "rectangular geometry certification has a distinct append-only material flag");
     Check(kRtInstanceMetadataCapacity == 21u, "instance metadata capacity reserves the appended viewmodel slot");
     Check(kRtStaticAssetCapacity == 9u, "static asset capacity is 9");
     Check(kRtPrimitiveMetadataCapacity == 32u, "primitive capacity is 32");
