@@ -845,12 +845,8 @@ vec3 boundedShadowTransmittanceMask(vec3 origin, vec3 direction,
 
 float visibilityMask(vec3 origin, vec3 direction, float maxDistance, uint mask)
 {
-    // Only the binary blocker answer is consumed here. Transparent candidates
-    // stay unconfirmed; the first confirmed opaque blocker may end traversal.
-    // Ordered dielectric shadow transport must still find its nearest surface.
     rayQueryEXT query;
-    rayQueryInitializeEXT(query, topLevelAS,
-                          gl_RayFlagsNoOpaqueEXT | gl_RayFlagsTerminateOnFirstHitEXT, mask,
+    rayQueryInitializeEXT(query, topLevelAS, gl_RayFlagsNoOpaqueEXT, mask,
                           origin, 0.0015, direction, max(maxDistance, 0.004));
     while (rayQueryProceedEXT(query))
     {

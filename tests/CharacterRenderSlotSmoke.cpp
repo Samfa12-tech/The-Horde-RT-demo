@@ -665,7 +665,7 @@ int main()
                 ? lightingSource.substr(shadowEnd, binaryVisibilityEnd - shadowEnd) : "";
         ok &= Require(!binaryVisibility.empty() &&
                       binaryVisibility.find(
-                          "gl_RayFlagsNoOpaqueEXT | gl_RayFlagsTerminateOnFirstHitEXT, mask") != std::string::npos &&
+                          "rayQueryInitializeEXT(query, topLevelAS, gl_RayFlagsNoOpaqueEXT, mask,") != std::string::npos &&
                       binaryVisibility.find(
                           "origin, 0.0015, direction, max(maxDistance, 0.004)") != std::string::npos &&
                       binaryVisibility.find("instance == kWaterfallInstance") != std::string::npos &&
@@ -676,11 +676,11 @@ int main()
                           "if (!transparentWorldPane) rayQueryConfirmIntersectionEXT(query);") != std::string::npos &&
                       binaryVisibility.find(
                           "gl_RayQueryCommittedIntersectionNoneEXT ? 1.0 : 0.0;") != std::string::npos,
-                      "binary visibility must terminate only after an admitted opaque blocker without changing transparency, masks or ray bounds");
-        ok &= Require(shadowEnd != std::string::npos &&
-                      lightingSource.substr(0u, shadowEnd).find(
-                          "gl_RayFlagsTerminateOnFirstHitEXT") == std::string::npos,
-                      "nearest-surface and ordered dielectric shadows must not terminate on their first candidate");
+                      "binary visibility must preserve measured traversal, transparent admission, masks and ray bounds");
+        // The September 30 exact-phone ABBA trial did not admit the first-hit
+        // optimisation. Ordered dielectric traversal must also remain intact.
+        ok &= Require(lightingSource.find("gl_RayFlagsTerminateOnFirstHitEXT") == std::string::npos,
+                      "lighting traversal must not restore the unaccepted first-hit optimisation");
         ok &= Require(raygenSource.find(
                           "layout(std430, set = 0, binding = 10) readonly buffer SecondSkeletonVertices") !=
                           std::string::npos,
