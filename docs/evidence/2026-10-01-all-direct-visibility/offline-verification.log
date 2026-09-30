@@ -1,0 +1,14 @@
+all-shadow-c1-route-20261001 integrity PASS: 1838 rows; median 63.2657 ms (15.806 FPS), p95 84.0814 ms; GPU median 51.978957 ms.
+all-shadow-c1-high-20261001 integrity PASS: 600 rows; median 225.065 ms (4.443 FPS), p95 240.1227 ms; GPU median 223.1766615 ms.
+all-shadow-c1-live-20261001 integrity PASS: 600 rows; median 242.922 ms (4.117 FPS), p95 262.0987 ms; GPU median 231.906765 ms.
+all-shadow-s1-route-20261001 integrity PASS: 1838 rows; median 33.2084 ms (30.113 FPS), p95 42.7026 ms; GPU median 22.413229 ms.
+all-shadow-s1-high-20261001 integrity PASS: 600 rows; median 58.0105 ms (17.238 FPS), p95 59.7389 ms; GPU median 56.21966 ms.
+all-shadow-s1-live-20261001 integrity PASS: 600 rows; median 65.7211 ms (15.216 FPS), p95 70.4623 ms; GPU median 56.342733 ms.
+all-shadow-s2-route-20261001 integrity PASS: 1838 rows; median 33.8086 ms (29.578 FPS), p95 43.058 ms; GPU median 22.5263015 ms.
+all-shadow-s2-high-20261001 integrity PASS: 600 rows; median 58.1393 ms (17.2 FPS), p95 60.3501 ms; GPU median 56.322186 ms.
+all-shadow-s2-live-20261001 integrity PASS: 600 rows; median 65.8856 ms (15.178 FPS), p95 71.527 ms; GPU median 56.4086965 ms.
+all-shadow-c2-route-20261001 integrity PASS: 1838 rows; median 62.4113 ms (16.023 FPS), p95 83.725 ms; GPU median 51.4948685 ms.
+all-shadow-c2-high-20261001 integrity PASS: 600 rows; median 240.3811 ms (4.16 FPS), p95 258.7807 ms; GPU median 238.454135 ms.
+all-shadow-c2-live-20261001 integrity PASS: 600 rows; median 249.9314 ms (4.001 FPS), p95 253.1557 ms; GPU median 238.3216085 ms.
+Aggregate all-12-analyzed: 12/12 strict analyses; C:\Dev\tmp\horde-all-shadow-offline-verification-20261001\recomputed-aggregate.json
+Offline verification PASS:8 actual modules,12 raw-ledger reanalyses, aggregate recomputation.

@@ -1,0 +1,37 @@
+diff --git a/shaders/raytracing/include/rt_lighting.glsl b/shaders/raytracing/include/rt_lighting.glsl
+index fa0a436..e7d5806 100644
+--- a/shaders/raytracing/include/rt_lighting.glsl
++++ b/shaders/raytracing/include/rt_lighting.glsl
+@@ -1,4 +1,5 @@
+ #include "rt_fire.glsl"
++#include "rt_all_direct_visibility_investigation.glsl"
+ 
+ vec2 lightTuning(int group)
+ {
+@@ -845,6 +846,9 @@ vec3 boundedShadowTransmittanceMask(vec3 origin, vec3 direction,
+ 
+ float visibilityMask(vec3 origin, vec3 direction, float maxDistance, uint mask)
+ {
++#if HORDE_INVESTIGATION_ALL_DIRECT_VISIBILITY_ISOLATE
++    return 1.0;
++#else
+     rayQueryEXT query;
+     rayQueryInitializeEXT(query, topLevelAS, gl_RayFlagsNoOpaqueEXT, mask,
+                           origin, 0.0015, direction, max(maxDistance, 0.004));
+@@ -866,12 +870,15 @@ float visibilityMask(vec3 origin, vec3 direction, float maxDistance, uint mask)
+     }
+     return rayQueryGetIntersectionTypeEXT(query, true) ==
+         gl_RayQueryCommittedIntersectionNoneEXT ? 1.0 : 0.0;
++#endif
+ }
+ 
+ vec3 sceneShadowTransmittanceMask(vec3 origin, vec3 direction,
+                                   float maxDistance, uint mask)
+ {
+-#if HORDE_GENERIC_TRANSMISSION_VARIANT
++#if HORDE_INVESTIGATION_ALL_DIRECT_VISIBILITY_ISOLATE
++    return vec3(1.0);
++#elif HORDE_GENERIC_TRANSMISSION_VARIANT
+     return boundedShadowTransmittanceMask(
+         origin, direction, maxDistance, mask);
+ #else

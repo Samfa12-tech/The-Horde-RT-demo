@@ -45,13 +45,29 @@ MSVC explicitly runs the46commonCPU-host tests, not15extra platform tooling chec
 Existing13-test Vulkan CPU-host lane unchanged. Local MSVC builds Release and
 passes46common; full61test attempt60/61 has a concurrentworktree-status race,
 focused manifest rerun1/1PASS after additions settle. Four Python suites28/28PASS.
-Fresh571141b push36756982005/PR36756990569 are RED: new MSVC lane's mailbox stress
+Fresh571141b push36756982005/PR36756990569 were RED: new MSVC lane's mailbox stress
 hits its30s progress deadline; GCC/Clang portable and Vulkan CPU-host jobs PASS.
-Local success does not replace that failure. Focused Windows oversubscription/
-fixture investigation is underway; no production mailbox change or deadline lift.
-Matched uncooled75% all-direct-visibility cost A/B/B/A is in progress on exact
-71cb paired Shipping/Mobile APKs. The isolate removes real opaque/glass shadows,
-is nonphysical and never a production candidate; no saving/30FPS claim yet.
+20c2a04 push36758510458/PR36758520164 repeat the same MSVC-only failure.
+9623d5b adds only fixture scheduling/progress diagnostics: readers yield every64
+validated samples;125,000publications/four readers/coherence/monotonic/final checks/
+30s deadline unchanged, production mailbox unchanged. Precise timeout cause was
+not reproduced locally; affinity/contention runs support a scheduling hypothesis,
+not proof. Lead's final repeated CTest10/10PASS. Fresh9623d5b push36760200750 and
+PR36760207594 now PASS46common tests on each GCC/Clang/MSVC+13Vulkan CPU-host;
+actual logs inspected, not old-job reruns. Offline/resolver checks PASS too.
+
+[Matched uncooled75% all-direct-visibility A/B/B/A](evidence/2026-10-01-all-direct-visibility/README.md)
+completes12,152 owning Shipping rows on exact71cb paired APKs. All640opening rows
+executeOpaqueFast. Normal openingGPU71.40/71.18 versus nonphysical31.30/30.86ms;
+held223.18/238.45 versus56.22/56.32; live231.91/238.32 versus56.34/56.41.
+Opening isolate native cycles42.25/41.83ms, live65.72/65.89ms: not30FPS. Shadow
+removal alone is not a credible30FPS proposal. Thermal/compiler confounding forbids
+causal/additive savings; normal control is reinstalled/pullback-checked beforeC2
+and retained afterward, Home command issued. Eight actual Shipping modules validate
+with no diagnostic atomics/image reads/binding22;53asset payloads equal. All12raw
+ledgers and aggregate independently recompute. No nonphysical variant promoted.
+Next: bounded native-primary/hit-material and residual-secondary cost profiling,
+then one quantified Mobile schedule slice; preserve all correctness/image gates.
 
 Pushed5405768 preserves the Android RT scene during scale-only changes; b74559c
 adds resource/preflight tests to the Vulkan CPU-host CI lane. This independently

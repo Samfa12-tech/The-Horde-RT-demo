@@ -1,0 +1,19 @@
+{
+  "oldEntryCount": 65,
+  "newEntryCount": 65,
+  "changedEntries": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+  "added": null,
+  "missing": null,
+  "assetCount": 53,
+  "changedAssets": null,
+  "catalogChanges": {
+    "pipeline": [
+      "shipping_mobile_generic_dielectric",
+      "shipping_mobile_opaque_fast"
+    ],
+    "compute": [
+      "rayquery_compute_shipping_mobile_generic_dielectric",
+      "rayquery_compute_shipping_mobile_opaque_fast"
+    ]
+  }
+}

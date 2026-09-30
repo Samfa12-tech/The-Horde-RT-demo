@@ -1,0 +1,39 @@
+{
+  "sourceHead": "71cb366c5cbe5cf6fe338c4cd6fd7bec0bd12d95",
+  "sourceStatus": [
+    " M shaders/raytracing/include/rt_lighting.glsl",
+    " M src/vulkan/raytracing/RtPipelineVariantCatalog.generated.h",
+    " M src/vulkan/raytracing/RtRayQueryVariantCatalog.generated.h",
+    " M src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
+    " M src/vulkan/raytracing/variants/diagnostic_high_opaque_fast.inc",
+    " M src/vulkan/raytracing/variants/diagnostic_mobile_generic_dielectric.inc",
+    " M src/vulkan/raytracing/variants/diagnostic_mobile_opaque_fast.inc",
+    " M src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_generic_dielectric.inc",
+    " M src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_opaque_fast.inc",
+    " M src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_generic_dielectric.inc",
+    " M src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_opaque_fast.inc",
+    " M src/vulkan/raytracing/variants/rayquery_compute_shipping_high_generic_dielectric.inc",
+    " M src/vulkan/raytracing/variants/rayquery_compute_shipping_high_opaque_fast.inc",
+    " M src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_generic_dielectric.inc",
+    " M src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_opaque_fast.inc",
+    " M src/vulkan/raytracing/variants/shipping_high_generic_dielectric.inc",
+    " M src/vulkan/raytracing/variants/shipping_high_opaque_fast.inc",
+    " M src/vulkan/raytracing/variants/shipping_mobile_generic_dielectric.inc",
+    " M src/vulkan/raytracing/variants/shipping_mobile_opaque_fast.inc",
+    " M tools/raygen-variant-catalog.json",
+    " M tools/rayquery-variant-catalog.json",
+    "?? shaders/raytracing/include/rt_all_direct_visibility_investigation.glsl"
+  ],
+  "files": [
+    {
+      "sourceSha256": "d76f119bbcc19f2a22149b4d4800c091d87a8b681820f306c8365b85bdd20cf2",
+      "patchSha256": "51758423eacdbdfbdf5f01295e38289a4057422c4f8fa1be7ff752c72a97b70b",
+      "path": "shaders/raytracing/include/rt_lighting.glsl"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_all_direct_visibility_investigation.glsl",
+      "headerSha256": "09fb71d595fd89b7de525acef59735862b3584ecfb9d772690ab42b234acfa52"
+    }
+  ],
+  "isolateDescription": "All direct-light visibility and generic shadow-transmittance evaluation return unity for Shipping/Mobile only. This deliberately removes opaque blocker shadows and dielectric/glass shadow attenuation. Primary and secondary transport remain untouched. Investigation only; not a promotion candidate."
+}

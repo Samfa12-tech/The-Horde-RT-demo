@@ -1,0 +1,17 @@
+C:\Users\sam_s\AppData\Local\Temp\horde-raygen-freeze-31502744824547a48dc69c78b3924c41\diagnostic_high_generic_dielectric\minimal.rgen.resolved
+Raygen variant diagnostic_high_generic_dielectric: 252680 bytes; functions=63; calls=199; ray-query sites=2; dependency SHA-256=857c1f00e51cd0d583219433fca7720c3fd1029654b746efc5f09797bcb09cba
+C:\Users\sam_s\AppData\Local\Temp\horde-raygen-freeze-31502744824547a48dc69c78b3924c41\diagnostic_high_opaque_fast\minimal.rgen.resolved
+Raygen variant diagnostic_high_opaque_fast: 505248 bytes; functions=1; calls=0; ray-query sites=23; dependency SHA-256=c723f40ebc953c3d370b8fbd1042ecb9035b78b1a79d2141d97bf1996709c8dd
+C:\Users\sam_s\AppData\Local\Temp\horde-raygen-freeze-31502744824547a48dc69c78b3924c41\diagnostic_mobile_generic_dielectric\minimal.rgen.resolved
+Raygen variant diagnostic_mobile_generic_dielectric: 252680 bytes; functions=63; calls=199; ray-query sites=2; dependency SHA-256=925e43203d82222ca25abc9a1cdcd4e988d1836fa0bf82a59458aace53c5a358
+C:\Users\sam_s\AppData\Local\Temp\horde-raygen-freeze-31502744824547a48dc69c78b3924c41\diagnostic_mobile_opaque_fast\minimal.rgen.resolved
+Raygen variant diagnostic_mobile_opaque_fast: 505248 bytes; functions=1; calls=0; ray-query sites=23; dependency SHA-256=0a35c2dc790ff0abbdf31b9c440b6cf3d1a69911caa45555fb7a9f034f4cf05c
+C:\Users\sam_s\AppData\Local\Temp\horde-raygen-freeze-31502744824547a48dc69c78b3924c41\shipping_high_generic_dielectric\minimal.rgen.resolved
+Raygen variant shipping_high_generic_dielectric: 243852 bytes; functions=63; calls=199; ray-query sites=2; dependency SHA-256=0c946b5c2ca6a02117407095b1817b1c8bbe0c5768d1df61edce34de3646305f
+C:\Users\sam_s\AppData\Local\Temp\horde-raygen-freeze-31502744824547a48dc69c78b3924c41\shipping_high_opaque_fast\minimal.rgen.resolved
+Raygen variant shipping_high_opaque_fast: 501012 bytes; functions=1; calls=0; ray-query sites=23; dependency SHA-256=b8dd7b7553cb9ce23bcb52d8b2d91ed261dc143b1837ca21ae5682419f93e429
+C:\Users\sam_s\AppData\Local\Temp\horde-raygen-freeze-31502744824547a48dc69c78b3924c41\shipping_mobile_generic_dielectric\minimal.rgen.resolved
+Raygen variant shipping_mobile_generic_dielectric: 228372 bytes; functions=60; calls=192; ray-query sites=1; dependency SHA-256=6bd2950884db58e5282e73dacb7c3750a848a89ef947e121f8acda0646ef8b76
+C:\Users\sam_s\AppData\Local\Temp\horde-raygen-freeze-31502744824547a48dc69c78b3924c41\shipping_mobile_opaque_fast\minimal.rgen.resolved
+Raygen variant shipping_mobile_opaque_fast: 474100 bytes; functions=1; calls=0; ray-query sites=6; dependency SHA-256=d49270f5eaa7abcd83bbd01458df43b1df396e365684fabd34422835ad553e46
+Frozen eight raygen variant artifacts and catalog.

@@ -2,6 +2,32 @@
 
 Last updated: 2026-10-01
 
+## October 1: all-direct-visibility Shipping cost isolation (local SM-S948B)
+
+ExactSM-S948B/R5GL219SZGK, Adreno840, uncooled Shipping/Mobile pipeline,75%,
+1080x2235 internal/1440x2980 presentation, strict ASTC/MAILBOX. Detached71cb366
+controla6329657 and isolateb57abb91 are exact install/pullback-checked `.benchmark`
+APKs; this is performance evidence, not signed-release or owner quality acceptance.
+Twelve C1/S1/S2/C2 route/held-high/live runs complete12,152 owning presented/GPU-valid
+rows. All640opening completions actually useOpaqueFast; no diagnostic readback rows.
+
+The isolate deliberately removes real opaque shadows and glass attenuation and
+must never ship. Normal openingGPU71.40/71.18ms versus31.30/30.86ms; held-high
+223.18/238.45 versus56.22/56.32; live231.91/238.32 versus56.34/56.41. Its live
+cycles65.72/65.89ms and opening42.25/41.83ms still exceed30FPS. Direct visibility
+alone is not a credible30FPS solution; no causal/additive or production-gain claim.
+Battery36.4-43.5C/status1-3, unequal power/process context (C2held includeslevel7),
+not frame-aligned. Compiler footprint also changes. GPU interval includesAS/RT/copy,
+CPU skin/refit record timings are separate. No external cooling in these runs.
+
+Eight actual packaged Shipping modules val/dis PASS with zero diagnostic atomics,
+image reads/binding22; all53asset payloads equal. Independent offline reparse of
+all12owning ledgers and aggregate PASS. Controla6329657 restores beforeC2 and is
+retained afterward; Home command issued. Normal DebugC11 remains installed separately.
+Stable app/data untouched. Physical glass/live and pixel parity gates remain open;
+not phone compute, RTX, S24 or S25 certification. Audio/haptic manual revalidation:NO.
+[Exact reports, packages and interpretation](evidence/2026-10-01-all-direct-visibility/README.md).
+
 ## October 1: current isolated-lantern native ray witness (local SM-S948B)
 
 Exact SM-S948B/R5GL219SZGK, Android16/Adreno840/driver2150932499, strict ASTC,

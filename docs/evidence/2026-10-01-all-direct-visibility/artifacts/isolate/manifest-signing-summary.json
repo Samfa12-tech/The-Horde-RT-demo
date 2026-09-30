@@ -1,0 +1,7 @@
+{
+  "kind": "isolate",
+  "apkSha256": "b57abb9127929665102a9de70b44085d6c469aeeee10fb016f09d6ffbd6d4829",
+  "package": "com.samfa12.hordelanternrt.benchmark",
+  "debuggable": "false",
+  "certificateText": "V2 Signer: certificate DN: C=US, O=Android, CN=Android Debug\nV2 Signer: certificate SHA-256 digest: 2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736\nV2 Signer: certificate SHA-1 digest: 4045662c884f1af8d2e5075c4aa5341f7d3afe16\nV2 Signer: certificate MD5 digest: 55892df1b6cb27ce451ec40b50dd3fb2"
+}

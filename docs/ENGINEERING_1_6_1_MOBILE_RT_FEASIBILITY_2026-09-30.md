@@ -44,6 +44,37 @@ Even these unaccepted opening medians require approximately47–57% additional G
 reduction to the planning live22.333–24.333ms budget. Focused pixel attribution is
 justified; the unchanged workload is not thereby a30FPS architecture.
 
+October1 [all-direct-visibility ABBA](evidence/2026-10-01-all-direct-visibility/README.md)
+now admits12,152 owning Shipping rows, including640 opening rows all actually
+OpaqueFast. It deliberately removes **all** opaque blocker shadows and physical
+glass shadow attenuation, never a Shipping candidate. Normal opening GPU medians
+71.40/71.18ms versus isolate31.30/30.86ms; held-high223.18/238.45 versus56.22/56.32;
+live231.91/238.32 versus56.34/56.41. The live isolate cycles are65.72/65.89ms, not
+30FPS. Opening isolate cycles42.25/41.83ms, not the whole-route33.51ms statistic.
+Warm contexts span36.4-43.5C/status1-3 with unequal power levels/processes. Removing
+code also changes compiler footprint. Differences are descriptive, not additive
+ray-cost estimates or causal production savings.
+
+This rejects direct-visibility reduction **alone** as a credible30FPS plan for the
+measured workload: even omitting it leaves about56ms heavy GPU before live CPU.
+That residual is not a fundamental hardware lower bound or measured fixed-cost
+partition; a coherent new schedule can change compiler/bandwidth behaviour too.
+At the live control's235.11ms median-of-run-medians, the planning22.333-24.333ms GPU
+budget requires approximately89.65-90.50% reduction. Even the nonphysical56.38ms
+residual needs another56.84-60.38% reduction before history overhead **and before
+restoring real shadows**. Ordinary71.29ms needs approximately65.87-68.67% reduction.
+
+Thus prioritise a combined **native-RT** Mobile schedule: full-resolution primary
+geometry and current physical glass interfaces; coherent hit/material/lighting
+work separation; measured sample eligibility for physical direct lighting and
+secondary radiance reuse. No raster G-buffer, cached scalar glass visibility, SSR,
+silhouette downscale, or unchecked old-frame blockers. Measure a bounded primary/
+hit-material lower-cost reference and the residual secondary/fire work next, then
+select one implementation slice with explicit S,r,H. Preserve dynamic arms/held
+props, disocclusions, shadows and mirrors as quality gates; source sample ceilings
+are not runtime counts. The existing bounded-interface correctness gate remains
+open independently of this performance design.
+
 Target: at least sustained 30 FPS for ordinary and lantern-heavy gameplay at 75%,
 with consistent display pacing. Recovery toward 60 is a headroom-dependent
 stretch target, not a forecast. Current measured medians do not certify either
@@ -127,6 +158,18 @@ are measured; the following are explicit conditional predictions/upper bounds.
 | Adaptive quarter-rate secondary sampling with validated history | `0.75*S` | If S20 ms, saves15−H ms. Even quartering **all**223–237 ms GPU would leave55.8–59.2 ms, so this alone cannot reach30. Primary glass/interfaces, TIR, sharp reflections, moving grips/shadows and disocclusions need current native evidence; no image-space reflection substitute. |
 | Native-RT hit/material work split and coherent specialised queues | Measured module/dispatch tax saved minus queue/bandwidth cost | No assumed percentage. Opaque receivers still need physical transparent shadows where reachable. Primary-opaque alone is not a safe OpaqueFast classifier. A 32–64-byte full-resolution hit record alone is77.2–154.5 MB before histories, double buffering or read/write traffic. |
 | CPU-only skin preparation overlap into private scratch | At most the affected measured CPU preparation, approximately8–9 ms in the cited route | No GPU reduction and not a remedy for225 ms GPU. Uploads/shared TLAS/BLAS writes remain after the owning fence. Snapshot/input timing and resource ownership require design review; do not simply increase frames in flight. |
+
+The new isolate cannot supply S directly. For illustration only, assume its56.38ms
+were an unaffected F and the control-minus-isolate178.74ms were eligible S, ignoring
+thermal/compiler changes and H. Keeping half that work would still leave145.75ms;
+quarter would leave101.06ms; one-sixteenth would leave67.55ms. These are **not
+predictions**; they demonstrate why an impressive shadow contrast is insufficient.
+Even quartering the entire235.11ms would leave58.78ms. Current non-dual opaque
+lighting has a static ceiling2+N samples (N<=2 eligible fire emitters), not dozens
+of equally important lights. One selected sample cannot be assumed to eliminate
+96% of that work, nor can many-light desktop speedups be transferred to this scene.
+Measured overhead and eligibility, not this illustrative partition, must determine
+the proposed net-ms saving before a production architecture change.
 
 Reservoir sample reuse is a researched native-RT lighting estimator, not permission
 to cache a fake visibility scalar. Relevant primary references: [original ReSTIR](https://research.nvidia.com/publication/2020-07_spatiotemporal-reservoir-resampling-real-time-ray-tracing-dynamic-direct)

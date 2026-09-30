@@ -1,0 +1,78 @@
+> Task :app:prepareRuntimeAssets UP-TO-DATE
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preBenchmarkBuild UP-TO-DATE
+> Task :app:generateBenchmarkBuildConfig UP-TO-DATE
+> Task :app:javaPreCompileBenchmark UP-TO-DATE
+> Task :app:checkBenchmarkAarMetadata UP-TO-DATE
+> Task :app:generateBenchmarkResValues UP-TO-DATE
+> Task :app:mapBenchmarkSourceSetPaths UP-TO-DATE
+> Task :app:generateBenchmarkResources UP-TO-DATE
+> Task :app:mergeBenchmarkResources UP-TO-DATE
+> Task :app:createBenchmarkCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksBenchmark UP-TO-DATE
+> Task :app:processBenchmarkMainManifest UP-TO-DATE
+> Task :app:processBenchmarkManifest UP-TO-DATE
+> Task :app:processBenchmarkManifestForPackage UP-TO-DATE
+> Task :app:processBenchmarkResources UP-TO-DATE
+> Task :app:compileBenchmarkJavaWithJavac UP-TO-DATE
+> Task :app:extractProguardFiles UP-TO-DATE
+> Task :app:generateBenchmarkLintVitalReportModel UP-TO-DATE
+> Task :app:lintVitalAnalyzeBenchmark UP-TO-DATE
+> Task :app:lintVitalReportBenchmark UP-TO-DATE
+> Task :app:lintVitalBenchmark
+> Task :app:configureCMakeRelWithDebInfo[arm64-v8a]
+
+> Task :app:buildCMakeRelWithDebInfo[arm64-v8a]
+C/C++: Exception: C:\Dev\tmp\horde-all-shadow-profile-20261001\source\tools\GenerateRtPipelineVariantCatalog.ps1:80
+C/C++: Line |
+C/C++:   80 |  . edBytes)) { throw 'Generated RT catalog adapter is stale, malformed,  .
+C/C++:      |                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++:      | Generated RT catalog adapter is stale, malformed, or hand-edited.
+C/C++: CMake Error at C:/Dev/tmp/horde-all-shadow-profile-20261001/source/cmake/HordeRtRaygenArtifacts.cmake:10 (message):
+C/C++:   Frozen RT catalog adapter is stale or malformed.
+C/C++: Call Stack (most recent call first):
+C/C++:   CMakeLists.txt:18 (horde_rt_configure_raygen_artifacts)
+C/C++: ninja: error: rebuilding 'build.ninja': subcommand failed
+
+> Task :app:buildCMakeRelWithDebInfo[arm64-v8a] FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:buildCMakeRelWithDebInfo[arm64-v8a]'.
+> com.android.ide.common.process.ProcessException: -- Strict non-contracted asset-transform arithmetic enabled for GltfDocument.cpp and StaticMeshAsset.cpp: -fno-fast-math;-ffp-contract=off
+  -- Configuring incomplete, errors occurred!
+  See also "C:/Dev/tmp/horde-all-shadow-profile-20261001/source/android/app/.cxx/RelWithDebInfo/1j1i2969/arm64-v8a/CMakeFiles/CMakeOutput.log".
+  ninja: Entering directory `C:\Dev\tmp\horde-all-shadow-profile-20261001\source\android\app\.cxx\RelWithDebInfo\1j1i2969\arm64-v8a'
+  [0/1] Re-running CMake...
+  FAILED: build.ninja 
+  C:\Users\sam_s\AppData\Local\Android\Sdk\cmake\3.22.1\bin\cmake.exe --regenerate-during-build -SC:\Dev\tmp\horde-all-shadow-profile-20261001\source\android\app\src\main\cpp -BC:\Dev\tmp\horde-all-shadow-profile-20261001\source\android\app\.cxx\RelWithDebInfo\1j1i2969\arm64-v8a
+  
+  C++ build system [build] failed while executing:
+      @echo off
+      "C:\\Users\\sam_s\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe" ^
+        -C ^
+        "C:\\Dev\\tmp\\horde-all-shadow-profile-20261001\\source\\android\\app\\.cxx\\RelWithDebInfo\\1j1i2969\\arm64-v8a" ^
+        horde_rt_probe_android
+    from C:\Dev\tmp\horde-all-shadow-profile-20261001\source\android\app
+  Exception: C:\Dev\tmp\horde-all-shadow-profile-20261001\source\tools\GenerateRtPipelineVariantCatalog.ps1:80
+  Line |
+    80 |  . edBytes)) { throw 'Generated RT catalog adapter is stale, malformed,  .
+       |                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+       | Generated RT catalog adapter is stale, malformed, or hand-edited.
+  CMake Error at C:/Dev/tmp/horde-all-shadow-profile-20261001/source/cmake/HordeRtRaygenArtifacts.cmake:10 (message):
+    Frozen RT catalog adapter is stale or malformed.
+  Call Stack (most recent call first):
+    CMakeLists.txt:18 (horde_rt_configure_raygen_artifacts)
+  
+  
+  ninja: error: rebuilding 'build.ninja': subcommand failed
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 10s
+22 actionable tasks: 3 executed, 19 up-to-date

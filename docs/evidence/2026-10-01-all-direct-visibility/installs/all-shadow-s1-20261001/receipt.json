@@ -1,0 +1,13 @@
+{
+  "member": "isolate",
+  "package": "com.samfa12.hordelanternrt.benchmark",
+  "deviceModel": "SM-S948B",
+  "serial": "R5GL219SZGK",
+  "installedApkSha256": "b57abb9127929665102a9de70b44085d6c469aeeee10fb016f09d6ffbd6d4829",
+  "sourceCommit": "71cb366c5cbe5cf6fe338c4cd6fd7bec0bd12d95",
+  "utc": "2026-09-30T18:04:32.1857572Z",
+  "nonphysicalWorkloadIsolation": true,
+  "publishable": false,
+  "appDataCleared": false,
+  "stableAppTouched": false
+}

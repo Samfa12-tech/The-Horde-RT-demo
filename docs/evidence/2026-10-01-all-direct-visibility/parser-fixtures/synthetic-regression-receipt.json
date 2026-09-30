@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "syntheticRegressionOnly": true,
+  "phoneEvidence": false,
+  "description": "Copies of completed earlier trial JSON were altered only inside this fixture root to exercise parser logic. These are not all-shadow runs, phone measurements, or validation of the forthcoming artifact pair.",
+  "sourceFixtures": {
+    "live": "shipping-a1-live-20260930",
+    "route": "shipping-active-strategy-route-20260930"
+  },
+  "expectedControlApkSha256": "a6329657e585e9605098e667fc07fa1ef278626a4242f81a94f9f79d1d3cd033",
+  "expectedControlPipelineModules": {
+    "genericDielectric": "ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532",
+    "opaqueFast": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b"
+  },
+  "results": [
+    {
+      "name": "synthetic-live-positive",
+      "expected": "PASS",
+      "observed": "PASS",
+      "diagnostic": "synthetic fixture accepted"
+    },
+    {
+      "name": "synthetic-route-positive",
+      "expected": "PASS",
+      "observed": "PASS",
+      "diagnostic": "synthetic fixture accepted"
+    },
+    {
+      "name": "forged-installed-apk",
+      "expected": "REJECT",
+      "observed": "REJECT",
+      "diagnostic": "installed APK versus exact all-shadow artifact expected 'a6329657e585e9605098e667fc07fa1ef278626a4242f81a94f9f79d1d3cd033', found '0000000000000000000000000000000000000000000000000000000000000000'"
+    },
+    {
+      "name": "wrong-loaded-shader-pair",
+      "expected": "REJECT",
+      "observed": "REJECT",
+      "diagnostic": "loaded artifact pair versus actual APK shader identity expected 'opaqueFast:shipping_mobile_opaque_fast@66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b|genericDielectric:shipping_mobile_generic_dielectric@ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532', found 'opaqueFast:shipping_mobile_opaque_fast@0000000000000000000000000000000000000000000000000000000000000000'"
+    },
+    {
+      "name": "invalid-opening-strategy",
+      "expected": "REJECT",
+      "observed": "REJECT",
+      "diagnostic": "actual opening OpaqueFast completions expected '160', found '159'"
+    },
+    {
+      "name": "mismatched-completion-identity",
+      "expected": "REJECT",
+      "observed": "REJECT",
+      "diagnostic": "identity submissionSerial at row 0 expected '5487', found '5486'"
+    },
+    {
+      "name": "diagnostic-not-compiled-out",
+      "expected": "REJECT",
+      "observed": "REJECT",
+      "diagnostic": "diagnostic status expected 'compiled-out', found 'valid'"
+    }
+  ],
+  "passedTests": 7,
+  "rejectedTests": 5
+}
