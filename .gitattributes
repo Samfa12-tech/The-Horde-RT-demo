@@ -56,6 +56,8 @@ docs/evidence/2026-09-30-glass-shadow/probe/near-field/*.obj filter=lfs diff=lfs
 docs/evidence/2026-09-30-glass-shadow/checks/*.log whitespace=-blank-at-eol,cr-at-eol
 docs/evidence/2026-09-30-glass-live/** -text whitespace=cr-at-eol
 docs/evidence/2026-09-30-glass-live/checks/*.log whitespace=-blank-at-eol,cr-at-eol
+docs/evidence/2026-09-30-glass-live/rays/probe/*.log whitespace=-blank-at-eol,cr-at-eol
+docs/evidence/2026-09-30-glass-live/rays/probe/*.patch whitespace=-blank-at-eol,cr-at-eol
 # Preserve the native optional empty Run ID line exactly in benchmark text.
 docs/evidence/2026-09-30-glass-live/windows-high-*/HordeLanternRT-benchmark-*.txt whitespace=-blank-at-eol,cr-at-eol
 

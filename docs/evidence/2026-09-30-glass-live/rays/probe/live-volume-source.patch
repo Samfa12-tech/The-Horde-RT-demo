@@ -1,0 +1,325 @@
+diff --git a/shaders/raytracing/include/rt_dielectric_transport.glsl b/shaders/raytracing/include/rt_dielectric_transport.glsl
+index 8458089..3ca81aa 100644
+--- a/shaders/raytracing/include/rt_dielectric_transport.glsl
++++ b/shaders/raytracing/include/rt_dielectric_transport.glsl
+@@ -515,6 +515,12 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
+                 volumeAttenuationDistance);
+         }
+ 
++#if defined(HORDE_RT_LIVE_VOLUME_PROBE)
++        investigationVolumeInterface(interfaceIndex, currentHit, transmissionDirection,
++            volumeOpen, tirSinceTransition, totalDistance, throughput, volumeInstance,
++            volumeMaterial, volumeIor, volumeCertified);
++#endif
++
+         if (!isGenericDielectric(currentHit))
+         {
+             if (volumeOpen)
+@@ -595,6 +601,9 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
+         vec3 orientedNormal = entering ? outwardNormal : -outwardNormal;
+         float incidentIor = volumeOpen ? volumeIor : 1.0;
+         float transmittedIor = entering ? currentHit.ior : 1.0;
++#if defined(HORDE_RT_LIVE_VOLUME_PROBE)
++        investigationWriteFloat(interfaceIndex, 29, entering ? 1.0 : 0.0);
++#endif
+         float cosine = clamp(
+             dot(orientedNormal, -transmissionDirection), 0.0, 1.0);
+         float fresnel = dielectricEffectiveFresnel(
+@@ -622,6 +631,9 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
+                 // nested stack on every phone ray.
+                 if (volumeOpen)
+                 {
++#if defined(HORDE_RT_LIVE_VOLUME_PROBE)
++                    investigationVolumeFailure = vec3(1.0, 0.0, 0.0);
++#endif
+                     RT_DIAG_ADD(primaryVolumeBudgetCount,
+                         1u);
+                     overflowed = true;
+@@ -642,6 +654,9 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
+                 if (!volumeOpen || volumeInstance != currentHit.instance ||
+                     volumeMaterial != uint(currentHit.material))
+                 {
++#if defined(HORDE_RT_LIVE_VOLUME_PROBE)
++                    investigationVolumeFailure = vec3(0.0, 0.0, 1.0);
++#endif
+                     RT_DIAG_ADD(primaryMismatchedExitCount,
+                         1u);
+                     overflowed = true;
+@@ -663,6 +678,41 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
+         float epsilon = dielectricRayEpsilon(currentHit.position, totalDistance);
+         vec3 nextOrigin = advanceDielectricRayOrigin(
+             currentHit.position, outwardNormal, transmissionDirection, epsilon);
++#if defined(HORDE_RT_LIVE_VOLUME_PROBE)
++        investigationWriteFloat(interfaceIndex, 30, nextOrigin.x);
++        investigationWriteFloat(interfaceIndex, 31, nextOrigin.y);
++        investigationWriteFloat(interfaceIndex, 32, nextOrigin.z);
++        investigationWriteFloat(interfaceIndex, 33, epsilon);
++        investigationWriteFloat(interfaceIndex, 34, transmissionDirection.x);
++        investigationWriteFloat(interfaceIndex, 35, transmissionDirection.y);
++        investigationWriteFloat(interfaceIndex, 36, transmissionDirection.z);
++        int target = investigationVolumeTarget();
++        if ((target == 0 && interfaceIndex == 1) || (target > 0 && interfaceIndex == 0))
++        {
++            for (int probe = 0; probe < 6; ++probe)
++            {
++                float bias = probe / 2 == 0 ? epsilon : (probe / 2 == 1 ? 0.000002 : 0.0);
++                float minimum = probe % 2 == 0 ? 0.000001 : 0.0;
++                vec3 origin = advanceDielectricRayOrigin(currentHit.position,
++                    outwardNormal, transmissionDirection, bias);
++                HitInfo alternative = traceScene(origin, transmissionDirection,
++                    10000.0, 0x23u, minimum, false, false);
++                investigationRecordRow = 3 + target * 6 + probe;
++                investigationVolumeInterface(0, currentHit, transmissionDirection,
++                    volumeOpen, tirSinceTransition, totalDistance, throughput,
++                    volumeInstance, volumeMaterial, volumeIor, volumeCertified);
++                investigationWriteFloat(0, 29, minimum);
++                investigationWriteFloat(0, 30, origin.x);
++                investigationWriteFloat(0, 31, origin.y);
++                investigationWriteFloat(0, 32, origin.z);
++                investigationWriteFloat(0, 33, bias);
++                investigationVolumeInterface(1, alternative, transmissionDirection,
++                    volumeOpen, tirSinceTransition, totalDistance, throughput,
++                    volumeInstance, volumeMaterial, volumeIor, volumeCertified);
++                investigationRecordRow = -1;
++            }
++        }
++#endif
+         float advancedDistance = max(
+             dot(nextOrigin - currentHit.position, transmissionDirection), 0.0);
+         HitInfo nextHit = traceScene(
+diff --git a/shaders/raytracing/include/rt_frame.glsl b/shaders/raytracing/include/rt_frame.glsl
+index 3b988b6..4b7ef0e 100644
+--- a/shaders/raytracing/include/rt_frame.glsl
++++ b/shaders/raytracing/include/rt_frame.glsl
+@@ -14,6 +14,17 @@ void main()
+     {
+         return;
+     }
++#endif
++#if defined(HORDE_RT_LIVE_VOLUME_PROBE)
++    if (HORDE_RT_PIXEL_ID.y < 21u) return;
++    int investigationTarget = investigationVolumeTarget();
++    if (investigationTarget >= 0)
++        for (int i = 0; i < 1224; ++i)
++            imageStore(outputImage, ivec2(i, investigationTarget), vec4(0.0, 0.0, 0.0, 1.0));
++    if (investigationTarget >= 0)
++        for (int row = 0; row < 6; ++row)
++            for (int i = 0; i < 272; ++i)
++                imageStore(outputImage, ivec2(i, 3 + investigationTarget * 6 + row), vec4(0.0, 0.0, 0.0, 1.0));
+ #endif
+     vec2 uv = (vec2(HORDE_RT_PIXEL_ID.xy) + vec2(0.5)) / vec2(HORDE_RT_PIXEL_EXTENT.xy);
+     float aspect = float(HORDE_RT_PIXEL_EXTENT.x) / max(float(HORDE_RT_PIXEL_EXTENT.y), 1.0);
+@@ -69,6 +80,10 @@ void main()
+     color = color * (0.62 + 0.38 * vignette);
+     color += vec3(0.46, 0.012, 0.004) * controls.damageFlash * (0.28 + 0.72 * (1.0 - vignette));
+     color = linearToSrgb(toneMapAces(max(color, vec3(0.0)) * controls.outputExposure));
++#if defined(HORDE_RT_LIVE_VOLUME_PROBE)
++    if (any(greaterThan(investigationVolumeFailure, vec3(0.0))))
++        color = investigationVolumeFailure;
++#endif
+     // The RT storage image is RGBA, while common Android/Windows swapchains are BGRA and receive a raw image copy.
+     if (controls.outputRedBlueSwap > 0.5)
+     {
+diff --git a/shaders/raytracing/include/rt_hit_decode.glsl b/shaders/raytracing/include/rt_hit_decode.glsl
+index 4ba8bc6..5fea5f0 100644
+--- a/shaders/raytracing/include/rt_hit_decode.glsl
++++ b/shaders/raytracing/include/rt_hit_decode.glsl
+@@ -400,7 +400,7 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
+     uint rayFlags = (ignoreWater || ignorePlayerNearFace)
+         ? gl_RayFlagsNoOpaqueEXT : gl_RayFlagsOpaqueEXT;
+     rayQueryInitializeEXT(query, topLevelAS, rayFlags, mask, origin,
+-                          max(minimumDistance, 0.000001), direction, maxDistance);
++                          max(minimumDistance, 0.0), direction, maxDistance);
+     while (rayQueryProceedEXT(query))
+     {
+         if ((!ignoreWater && !ignorePlayerNearFace) ||
+@@ -549,6 +549,14 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
+                     precise vec3 surfacePosition = objectToWorld * localPosition +
+                         rayQueryGetIntersectionObjectToWorldEXT(query, true)[3];
+                     h.position = surfacePosition;
++#if defined(HORDE_RT_LIVE_VOLUME_PROBE)
++                    h.investigationV0 = v0.position.xyz;
++                    h.investigationV1 = v1.position.xyz;
++                    h.investigationV2 = v2.position.xyz;
++                    h.investigationTransform = rayQueryGetIntersectionObjectToWorldEXT(query, true);
++                    h.investigationObjectOrigin = rayQueryGetIntersectionObjectRayOriginEXT(query, true);
++                    h.investigationObjectDirection = rayQueryGetIntersectionObjectRayDirectionEXT(query, true);
++#endif
+                 }
+ #endif
+                 vec3 emission = emissiveSample * staticMaterial.emissiveFactorStrength.rgb *
+diff --git a/shaders/raytracing/include/rt_scene_abi.glsl b/shaders/raytracing/include/rt_scene_abi.glsl
+index 0dfa1b2..96c7926 100644
+--- a/shaders/raytracing/include/rt_scene_abi.glsl
++++ b/shaders/raytracing/include/rt_scene_abi.glsl
+@@ -85,6 +85,10 @@ bool genericTransmissionEnabled()
+     return HORDE_GENERIC_TRANSMISSION_VARIANT != 0;
+ }
+ 
++// Investigation-only local values; no buffer, descriptor or CPU ABI change.
++#if defined(HORDE_RT_VARIANT_INSTRUMENTATION) && HORDE_RT_VARIANT_INSTRUMENTATION == HORDE_RT_INSTRUMENTATION_DIAGNOSTIC && HORDE_RT_VARIANT_MATERIAL == HORDE_RT_MATERIAL_GENERIC_DIELECTRIC
++#define HORDE_RT_LIVE_VOLUME_PROBE
++#endif
+ struct HitInfo
+ {
+     bool hit;
+@@ -106,8 +110,70 @@ struct HitInfo
+     float attenuationDistance;
+     vec3 attenuationColor;
+     uint materialFlags;
++#if defined(HORDE_RT_LIVE_VOLUME_PROBE)
++    vec3 investigationV0;
++    vec3 investigationV1;
++    vec3 investigationV2;
++    mat4x3 investigationTransform;
++    vec3 investigationObjectOrigin;
++    vec3 investigationObjectDirection;
++#endif
+ };
+ 
++// Investigation-only output marker; never promote this capture module.
++#if defined(HORDE_RT_VARIANT_INSTRUMENTATION) && HORDE_RT_VARIANT_INSTRUMENTATION == HORDE_RT_INSTRUMENTATION_DIAGNOSTIC && HORDE_RT_VARIANT_MATERIAL == HORDE_RT_MATERIAL_GENERIC_DIELECTRIC
++vec3 investigationVolumeFailure = vec3(0.0);
++int investigationRecordRow = -1;
++int investigationVolumeTarget()
++{
++    uvec2 pixel = HORDE_RT_PIXEL_ID.xy;
++    if (pixel == uvec2(576u, 574u)) return 0;
++    if (pixel == uvec2(504u, 577u)) return 1;
++    if (pixel == uvec2(515u, 652u)) return 2;
++    return -1;
++}
++void investigationWriteFloat(int slot, int field, float value)
++{
++    int target = investigationVolumeTarget();
++    if (target < 0) return;
++    if (investigationRecordRow >= 0) target = investigationRecordRow;
++    uint bits = floatBitsToUint(value);
++    vec3 low = vec3(uvec3(bits & 255u, (bits >> 8) & 255u, (bits >> 16) & 255u)) / 255.0;
++    vec3 high = vec3(float(bits >> 24) / 255.0, 0.0, 0.0);
++    if (controls.outputRedBlueSwap > 0.5) { low = low.bgr; high = high.bgr; }
++    imageStore(outputImage, ivec2(slot * 136 + field * 2, target), vec4(low, 1.0));
++    imageStore(outputImage, ivec2(slot * 136 + field * 2 + 1, target), vec4(high, 1.0));
++}
++void investigationVolumeInterface(int slot, HitInfo hit, vec3 direction,
++    bool open, int tir, float distance, vec3 throughput, uint instance,
++    uint material, float ior, bool certified)
++{
++    float fields[29] = float[29](hit.position.x, hit.position.y, hit.position.z,
++        hit.geometricNormal.x, hit.geometricNormal.y, hit.geometricNormal.z,
++        direction.x, direction.y, direction.z, hit.t, float(hit.instance),
++        float(hit.material), float(hit.primitive), open ? 1.0 : 0.0,
++        hit.hit ? 1.0 : 0.0, float(tir), distance, hit.roughness, hit.ior,
++        hit.attenuationDistance, throughput.x, throughput.y, throughput.z,
++        float(hit.materialFlags), hit.transmission, float(instance), float(material),
++        ior, certified ? 1.0 : 0.0);
++    for (int i = 0; i < 29; ++i) investigationWriteFloat(slot, i, fields[i]);
++    float geometry[21] = float[21](hit.investigationV0.x, hit.investigationV0.y, hit.investigationV0.z,
++        hit.investigationV1.x, hit.investigationV1.y, hit.investigationV1.z,
++        hit.investigationV2.x, hit.investigationV2.y, hit.investigationV2.z,
++        hit.investigationTransform[0].x, hit.investigationTransform[0].y, hit.investigationTransform[0].z,
++        hit.investigationTransform[1].x, hit.investigationTransform[1].y, hit.investigationTransform[1].z,
++        hit.investigationTransform[2].x, hit.investigationTransform[2].y, hit.investigationTransform[2].z,
++        hit.investigationTransform[3].x, hit.investigationTransform[3].y, hit.investigationTransform[3].z);
++    for (int i = 0; i < 21; ++i) investigationWriteFloat(slot, 37 + i, geometry[i]);
++    investigationWriteFloat(slot, 58, hit.investigationObjectOrigin.x);
++    investigationWriteFloat(slot, 59, hit.investigationObjectOrigin.y);
++    investigationWriteFloat(slot, 60, hit.investigationObjectOrigin.z);
++    investigationWriteFloat(slot, 61, hit.investigationObjectDirection.x);
++    investigationWriteFloat(slot, 62, hit.investigationObjectDirection.y);
++    investigationWriteFloat(slot, 63, hit.investigationObjectDirection.z);
++}
++#endif
++
+ const vec3 kMoonDirection = vec3(-0.180027, 0.930140, -0.320048);
+ const int kMaterialDryStone = 0;
+ const int kMaterialWetCobble = 1;
+diff --git a/src/platform/windows/DiagnosticWindow.cpp b/src/platform/windows/DiagnosticWindow.cpp
+index 6f51c3d..7282323 100644
+--- a/src/platform/windows/DiagnosticWindow.cpp
++++ b/src/platform/windows/DiagnosticWindow.cpp
+@@ -90,8 +90,8 @@ constexpr char kAboutText[] = "Horde Lantern RT\nShowcase Alpha " HORDE_RT_DISPL
+ constexpr char kReportDirectory[] = "reports";
+ constexpr char kTextReportFilename[] = "vulkan_capability_report.txt";
+ constexpr char kJsonReportFilename[] = "vulkan_capability_report.json";
+-constexpr std::uint32_t kCaptureWidth = 960u;
+-constexpr std::uint32_t kCaptureHeight = 540u;
++constexpr std::uint32_t kCaptureWidth = 1232u;
++constexpr std::uint32_t kCaptureHeight = 803u;
+ constexpr int kCaptureSettlingFrames = 12;
+ constexpr int kEditControlId = 101;
+ constexpr int kHudControlId = 102;
+@@ -3915,7 +3915,8 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
+         PollDesktopController(ctx);
+         const bool frozenDevelopmentCheckpoint =
+             ctx.simulationPaused && ctx.frameDeltaSeconds == 0.0f &&
+-            !ctx.developmentCheckpoint.empty();
++            (!ctx.developmentCheckpoint.empty() ||
++             GetPropA(ctx.windowHandle, kCaptureModeProperty) != nullptr);
+         if (!frozenDevelopmentCheckpoint)
+         {
+             UpdateDesktopSceneControls(ctx, evidenceFrame ? &observation : nullptr);
+@@ -4181,7 +4182,30 @@ const char* CapturePresetName(const horde::gameplay::ShowcaseCheckpointPreset pr
+ void ApplyCaptureCheckpoint(VulkanSurfaceContext& context,
+                             const horde::gameplay::ShowcaseCheckpoint& checkpoint)
+ {
+-    context.simulation.ApplyShowcaseCheckpoint(checkpoint.id);
++    // Investigation only: replay the exact live case, then freeze measured row230.
++    constexpr std::uint32_t measuredFrame = 231u;
++    horde::gameplay::simulation::InputSnapshot liveInput{};
++    liveInput.damageEnabled = false;
++    liveInput.hasAuthoritativePlayerPose = true;
++    liveInput.authoritativePlayerX = horde::gameplay::kLanternBenchmarkX;
++    liveInput.authoritativePlayerZ = horde::gameplay::kLanternBenchmarkZ;
++    liveInput.yawRadians = horde::gameplay::kLanternBenchmarkYaw;
++    liveInput.pitchRadians = horde::gameplay::kLanternBenchmarkPitch;
++    liveInput.torchLightStrength = 1.8f;
++    for (std::uint32_t lap = 0u; lap < 2u; ++lap)
++    {
++        if (!horde::gameplay::StageLanternBenchmark(
++                context.simulation, horde::gameplay::BenchmarkWorkload::LanternRevealSequence))
++            throw std::runtime_error("Investigation live replay failed to stage.");
++        const std::uint32_t frames = lap == 0u
++            ? horde::gameplay::kLanternBenchmarkFramesPerLap : measuredFrame;
++        for (std::uint32_t frame = 0u; frame < frames; ++frame)
++            context.simulation.AdvanceFrame(liveInput, 1.0f / 60.0f,
++                                            ++context.inputPublicationSequence);
++    }
++    std::cerr << "INVESTIGATION live frame=" << measuredFrame
++              << " tick=" << context.simulation.Snapshot().tickIndex
++              << " walkTime=" << context.simulation.Snapshot().walkTime << '\n';
+     context.benchmarkEvidence.Cancel();
+     if (context.rtFrameEvidenceInitialised)
+     {
+@@ -4196,9 +4220,6 @@ void ApplyCaptureCheckpoint(VulkanSurfaceContext& context,
+     context.simulationInput.damageEnabled = false;
+     context.simulationInput.hasAuthoritativePlayerPose = false;
+     context.simulationInput.torchLightStrength = context.torchLightStrength;
+-    context.simulation.AdvanceFrame(context.simulationInput,
+-                                    0.0,
+-                                    ++context.inputPublicationSequence);
+     MirrorSimulationSnapshot(context);
+     context.debugEnemyOverride = horde::gameplay::EnemyKind::None;
+ }
+@@ -4246,7 +4267,10 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
+              << "  \"sceneOnly\": true,\n"
+              << "  \"overlaysIncluded\": false,\n"
+              << "  \"settlingFrames\": " << kCaptureSettlingFrames << ",\n"
+-             << "  \"fixedAnimationTimeSeconds\": 0.000000,\n"
++             << "  \"investigationOnly\": true,\n"
++             << "  \"liveBenchmarkFrame\": 231,\n"
++             << "  \"liveSimulationTick\": " << context.simulation.Snapshot().tickIndex << ",\n"
++             << "  \"fixedAnimationTimeSeconds\": " << context.simulation.Snapshot().walkTime << ",\n"
+              << "  \"buildId\": \"" << JsonEscape(HORDE_RT_BUILD_ID) << "\",\n"
+              << "  \"playerMountProfile\": \""
+              << (context.simulation.Snapshot().playerMountProfile ==
+@@ -4525,7 +4549,8 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
+     else
+     {
+         for (const auto& checkpoint : horde::gameplay::kShowcaseCheckpoints)
+-            checkpoints.push_back(&checkpoint);
++            if (checkpoint.id == 11)
++                checkpoints.push_back(&checkpoint);
+     }
+     captures.reserve(checkpoints.size());
+     auto fail = [&](const std::string& diagnostic) {

@@ -59,8 +59,10 @@ termination are retained bounded events, not erased or equated with solved
 physical transport. Older live exports lacked these arrays and cannot establish
 whether these failures are new; this row-only patch does not modify rendering.
 
-The next precise witnesses are phone row20/tick623/submission622 (42 volume
-events) and RTX row230/tick833/submission831 (3 events). Phone first volume
+The precise witnesses are phone row20/tick623/submission622 (42 volume
+events) and RTX row230/tick833/submission831 (3 events). [RTX ray proof](rays/README.md)
+now reproduces the latter on both backends and isolates three numerical
+continuation failures using captured native object rays. Phone first volume
 failure is row1/tick604; first mismatched exit is row107/tick710. Preserve exact
 report identities when reproducing a pose; do not infer a volume overlap or
 missed exit from the counter name alone. `checks/live-analysis.json` retains
@@ -89,9 +91,10 @@ Run `python docs/evidence/2026-09-30-glass-live/analyze-live.py` from repo root
 to verify source ABI field order, rows, identities, marker and counter summaries.
 Its stdout is the retained analysis; original reports remain unchanged.
 `artifacts.json` identifies the exact precommit development builds and clips.
-The preceding shadow-fix sourceaaf973a CI is freshly green: push36646736906 /
-PR36646741212,45 portable +11 Vulkan-host tests. Later-source CI belongs to
-its own later push; this evidence does not substitute for it.
+The reporting-fix sourcefec73b8 CI is freshly green: push36649013510 /
+PR36649016938,45 portable +11 Vulkan-host tests, with both current logs inspected.
+Remote head matches the local commit; PR15 stays draft/unmerged. Later source
+requires its own validation; these jobs do not substitute for it.
 
 Next: trace the demonstrated live volume/mismatch witnesses without changing
 budgets or suppressing diagnostics, reconcile contact/certified truncation and

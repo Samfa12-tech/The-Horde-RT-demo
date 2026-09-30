@@ -30,21 +30,33 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### Current Phase 4 checkpoint
 
+Exact RTX live row230 is now reproduced through the owning gameplay replay on
+both backends, with all41 ordinary counters matching. [Three native object-ray
+witnesses](evidence/2026-09-30-glass-live/rays/README.md) prove near-edge continuation
+defects: one valid exit below1um tMin and two spawn points outside adjacent faces
+after float coordinate transformation. A single global bias/minimum adjustment
+does not fix all three. Probe sources/modules are removed; production budgets,
+assets, materials and accepted players stay unchanged. Next implement a bounded
+geometric/numerical continuation fix, then validate RTX and exactSM-S948B separately.
+Do not infer a pane overlap or BVH bug from an ideal double world-ray replay.
+
 Live failure evidence is now available per exact completed submission in the
 existing benchmark ledger; no new shader counters/ABI/readback/framework.
 [September30 live proof](evidence/2026-09-30-glass-live/README.md) records600/600
 valid rows on RTXHigh pipeline/compute and exactSM-S948B Mobile pipeline.
 Phone918 transport/production failures in458 rows (911 volume-budget +7 mismatch
 events); RTX107/105 transport events. Shadow overflow/unclosed remain0.
-Next trace phone row20/tick623 (42 volume events) and RTXrow230/tick833 (3),
+Phone row20/tick623 (42 volume events) still requires exact ray classification;
+RTXrow230/tick833 (3) is classified above,
 without assuming overlap/missed exit from names or reopening accepted players.
 Current ordinary Debug APKad6ebaa5 is installed/byte-matched, phone Home;
 unsigned Shipping6040516b builds/scans but is not installed. Reporting tests
 RED/GREEN2/2, scenario1/1, Java8+3 and both exact APK SPIR-V scans pass.
 Game-only live excerpts exclude startup/Home/private wallpaper; full measured
 visual coverage and owner acceptance remain open. No matched performance claim.
-Pushed geometric fix `aaf973a` CI push36646736906/PR36646741212 is freshly green,
-45 portable +11 Vulkan-host tests; the reporting slice needs its own push CI.
+Pushed reporting fix `fec73b8` CI push36649013510/PR36649016938 is freshly green,
+45 portable +11 Vulkan-host tests. Remote head byte-matches the local commit;
+PR15 remains draft/unmerged and its description reflects the open live failures.
 
 Selected geometric shadow absorption is now implemented and backed by
 [September30 native segment/image evidence](evidence/2026-09-30-glass-shadow/README.md).

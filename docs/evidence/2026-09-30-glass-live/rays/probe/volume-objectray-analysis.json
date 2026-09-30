@@ -1,0 +1,829 @@
+{
+  "investigationOnly": true,
+  "precision": "double using captured float inputs",
+  "glbSha256": "34a2522f2027d3fb04b77480cc929d36c5a19c6e0f33bf3fa0f0ae0959c99ec4",
+  "paths": [
+    {
+      "pixel": [
+        576,
+        574
+      ],
+      "recordRow": 3,
+      "sourcePrimitive": 24.0,
+      "bias": 3.0295839678728953e-05,
+      "minimum": 9.999999974752427e-07,
+      "returnedPrimitive": 45.0,
+      "nativeRawT": 0.17322511970996857,
+      "objectOrigin": [
+        0.17329788208007812,
+        -0.3977491855621338,
+        0.11529973149299622
+      ],
+      "inverseOriginDouble": [
+        0.1732983867609003,
+        -0.39774972622703064,
+        0.11530079596818656
+      ],
+      "objectOriginDifferenceLocal": [
+        -5.046808221886856e-07,
+        5.406648968531158e-07,
+        -1.0644751903404748e-06
+      ],
+      "actualObjectOriginMaximumOutsideLocalMetres": -1.450138733177786e-06,
+      "limitingFace": 63,
+      "objectRayDoubleIntersections": [
+        {
+          "t": 6.734571358171079e-07,
+          "primitive": 63,
+          "component": 4,
+          "entering": false
+        },
+        {
+          "t": 0.1732251344330611,
+          "primitive": 45,
+          "component": 1,
+          "entering": true
+        },
+        {
+          "t": 0.1764759985429527,
+          "primitive": 43,
+          "component": 1,
+          "entering": false
+        }
+      ]
+    },
+    {
+      "pixel": [
+        576,
+        574
+      ],
+      "recordRow": 4,
+      "sourcePrimitive": 24.0,
+      "bias": 3.0295839678728953e-05,
+      "minimum": 0.0,
+      "returnedPrimitive": 63.0,
+      "nativeRawT": 6.809219712522463e-07,
+      "objectOrigin": [
+        0.17329788208007812,
+        -0.3977491855621338,
+        0.11529973149299622
+      ],
+      "inverseOriginDouble": [
+        0.1732983867609003,
+        -0.39774972622703064,
+        0.11530079596818656
+      ],
+      "objectOriginDifferenceLocal": [
+        -5.046808221886856e-07,
+        5.406648968531158e-07,
+        -1.0644751903404748e-06
+      ],
+      "actualObjectOriginMaximumOutsideLocalMetres": -1.450138733177786e-06,
+      "limitingFace": 63,
+      "objectRayDoubleIntersections": [
+        {
+          "t": 6.734571358171079e-07,
+          "primitive": 63,
+          "component": 4,
+          "entering": false
+        },
+        {
+          "t": 0.1732251344330611,
+          "primitive": 45,
+          "component": 1,
+          "entering": true
+        },
+        {
+          "t": 0.1764759985429527,
+          "primitive": 43,
+          "component": 1,
+          "entering": false
+        }
+      ]
+    },
+    {
+      "pixel": [
+        576,
+        574
+      ],
+      "recordRow": 5,
+      "sourcePrimitive": 24.0,
+      "bias": 1.9999999949504854e-06,
+      "minimum": 9.999999974752427e-07,
+      "returnedPrimitive": 63.0,
+      "nativeRawT": 1.0103442491526948e-06,
+      "objectOrigin": [
+        0.1733551025390625,
+        -0.3977491855621338,
+        0.11526751518249512
+      ],
+      "inverseOriginDouble": [
+        0.17335474061047854,
+        -0.3977497079948779,
+        0.11526857528597455
+      ],
+      "objectOriginDifferenceLocal": [
+        3.6192858396399963e-07,
+        5.224327441211152e-07,
+        -1.0601034794305297e-06
+      ],
+      "actualObjectOriginMaximumOutsideLocalMetres": -2.160227907513357e-06,
+      "limitingFace": 63,
+      "objectRayDoubleIntersections": [
+        {
+          "t": 1.0032287711669644e-06,
+          "primitive": 63,
+          "component": 4,
+          "entering": false
+        },
+        {
+          "t": 0.17322546420469645,
+          "primitive": 45,
+          "component": 1,
+          "entering": true
+        },
+        {
+          "t": 0.17647632831336377,
+          "primitive": 43,
+          "component": 1,
+          "entering": false
+        }
+      ]
+    },
+    {
+      "pixel": [
+        576,
+        574
+      ],
+      "recordRow": 6,
+      "sourcePrimitive": 24.0,
+      "bias": 1.9999999949504854e-06,
+      "minimum": 0.0,
+      "returnedPrimitive": 63.0,
+      "nativeRawT": 1.0103442491526948e-06,
+      "objectOrigin": [
+        0.1733551025390625,
+        -0.3977491855621338,
+        0.11526751518249512
+      ],
+      "inverseOriginDouble": [
+        0.17335474061047854,
+        -0.3977497079948779,
+        0.11526857528597455
+      ],
+      "objectOriginDifferenceLocal": [
+        3.6192858396399963e-07,
+        5.224327441211152e-07,
+        -1.0601034794305297e-06
+      ],
+      "actualObjectOriginMaximumOutsideLocalMetres": -2.160227907513357e-06,
+      "limitingFace": 63,
+      "objectRayDoubleIntersections": [
+        {
+          "t": 1.0032287711669644e-06,
+          "primitive": 63,
+          "component": 4,
+          "entering": false
+        },
+        {
+          "t": 0.17322546420469645,
+          "primitive": 45,
+          "component": 1,
+          "entering": true
+        },
+        {
+          "t": 0.17647632831336377,
+          "primitive": 43,
+          "component": 1,
+          "entering": false
+        }
+      ]
+    },
+    {
+      "pixel": [
+        576,
+        574
+      ],
+      "recordRow": 7,
+      "sourcePrimitive": 24.0,
+      "bias": 0.0,
+      "minimum": 9.999999974752427e-07,
+      "returnedPrimitive": 45.0,
+      "nativeRawT": 0.17322541773319244,
+      "objectOrigin": [
+        0.17335891723632812,
+        -0.3977491855621338,
+        0.11526522040367126
+      ],
+      "inverseOriginDouble": [
+        0.17335907540919787,
+        -0.3977496780698678,
+        0.11526628339813924
+      ],
+      "objectOriginDifferenceLocal": [
+        -1.58172869746398e-07,
+        4.925077339845707e-07,
+        -1.0629944679763081e-06
+      ],
+      "actualObjectOriginMaximumOutsideLocalMetres": 6.22845609971671e-07,
+      "limitingFace": 60,
+      "objectRayDoubleIntersections": [
+        {
+          "t": 0.17322542705760455,
+          "primitive": 45,
+          "component": 1,
+          "entering": true
+        },
+        {
+          "t": 0.1764762911661882,
+          "primitive": 43,
+          "component": 1,
+          "entering": false
+        }
+      ]
+    },
+    {
+      "pixel": [
+        576,
+        574
+      ],
+      "recordRow": 8,
+      "sourcePrimitive": 24.0,
+      "bias": 0.0,
+      "minimum": 0.0,
+      "returnedPrimitive": 45.0,
+      "nativeRawT": 0.17322541773319244,
+      "objectOrigin": [
+        0.17335891723632812,
+        -0.3977491855621338,
+        0.11526522040367126
+      ],
+      "inverseOriginDouble": [
+        0.17335907540919787,
+        -0.3977496780698678,
+        0.11526628339813924
+      ],
+      "objectOriginDifferenceLocal": [
+        -1.58172869746398e-07,
+        4.925077339845707e-07,
+        -1.0629944679763081e-06
+      ],
+      "actualObjectOriginMaximumOutsideLocalMetres": 6.22845609971671e-07,
+      "limitingFace": 60,
+      "objectRayDoubleIntersections": [
+        {
+          "t": 0.17322542705760455,
+          "primitive": 45,
+          "component": 1,
+          "entering": true
+        },
+        {
+          "t": 0.1764762911661882,
+          "primitive": 43,
+          "component": 1,
+          "entering": false
+        }
+      ]
+    },
+    {
+      "pixel": [
+        504,
+        577
+      ],
+      "recordRow": 9,
+      "sourcePrimitive": 19.0,
+      "bias": 3.0128701837384142e-05,
+      "minimum": 9.999999974752427e-07,
+      "returnedPrimitive": 54.0,
+      "nativeRawT": 2.197063849962433e-06,
+      "objectOrigin": [
+        -0.016605377197265625,
+        -0.3795182704925537,
+        0.21376566588878632
+      ],
+      "inverseOriginDouble": [
+        -0.016608390960727863,
+        -0.37951881573323876,
+        0.21376671160776753
+      ],
+      "objectOriginDifferenceLocal": [
+        3.013763462237501e-06,
+        5.452406850459113e-07,
+        -1.045718981212973e-06
+      ],
+      "actualObjectOriginMaximumOutsideLocalMetres": 2.1586333067277405e-06,
+      "limitingFace": 54,
+      "objectRayDoubleIntersections": [
+        {
+          "t": 2.1969674244290903e-06,
+          "primitive": 54,
+          "component": 3,
+          "entering": true
+        },
+        {
+          "t": 0.0034396943273031113,
+          "primitive": 57,
+          "component": 3,
+          "entering": false
+        }
+      ]
+    },
+    {
+      "pixel": [
+        504,
+        577
+      ],
+      "recordRow": 10,
+      "sourcePrimitive": 19.0,
+      "bias": 3.0128701837384142e-05,
+      "minimum": 0.0,
+      "returnedPrimitive": 54.0,
+      "nativeRawT": 2.197063849962433e-06,
+      "objectOrigin": [
+        -0.016605377197265625,
+        -0.3795182704925537,
+        0.21376566588878632
+      ],
+      "inverseOriginDouble": [
+        -0.016608390960727863,
+        -0.37951881573323876,
+        0.21376671160776753
+      ],
+      "objectOriginDifferenceLocal": [
+        3.013763462237501e-06,
+        5.452406850459113e-07,
+        -1.045718981212973e-06
+      ],
+      "actualObjectOriginMaximumOutsideLocalMetres": 2.1586333067277405e-06,
+      "limitingFace": 54,
+      "objectRayDoubleIntersections": [
+        {
+          "t": 2.1969674244290903e-06,
+          "primitive": 54,
+          "component": 3,
+          "entering": true
+        },
+        {
+          "t": 0.0034396943273031113,
+          "primitive": 57,
+          "component": 3,
+          "entering": false
+        }
+      ]
+    },
+    {
+      "pixel": [
+        504,
+        577
+      ],
+      "recordRow": 11,
+      "sourcePrimitive": 19.0,
+      "bias": 1.9999999949504854e-06,
+      "minimum": 9.999999974752427e-07,
+      "returnedPrimitive": 57.0,
+      "nativeRawT": 0.0034719370305538177,
+      "objectOrigin": [
+        -0.01663970947265625,
+        -0.37951815128326416,
+        0.21382084488868713
+      ],
+      "inverseOriginDouble": [
+        -0.016640903139493464,
+        -0.3795187396674748,
+        0.21382189591932574
+      ],
+      "objectOriginDifferenceLocal": [
+        1.193666837213947e-06,
+        5.88384210631343e-07,
+        -1.0510306386046775e-06
+      ],
+      "actualObjectOriginMaximumOutsideLocalMetres": 1.5498551424880658e-08,
+      "limitingFace": 54,
+      "objectRayDoubleIntersections": [
+        {
+          "t": 1.5773782652287092e-08,
+          "primitive": 54,
+          "component": 3,
+          "entering": true
+        },
+        {
+          "t": 0.0034719371917760786,
+          "primitive": 57,
+          "component": 3,
+          "entering": false
+        }
+      ]
+    },
+    {
+      "pixel": [
+        504,
+        577
+      ],
+      "recordRow": 12,
+      "sourcePrimitive": 19.0,
+      "bias": 1.9999999949504854e-06,
+      "minimum": 0.0,
+      "returnedPrimitive": 54.0,
+      "nativeRawT": 1.5917967388645593e-08,
+      "objectOrigin": [
+        -0.01663970947265625,
+        -0.37951815128326416,
+        0.21382084488868713
+      ],
+      "inverseOriginDouble": [
+        -0.016640903139493464,
+        -0.3795187396674748,
+        0.21382189591932574
+      ],
+      "objectOriginDifferenceLocal": [
+        1.193666837213947e-06,
+        5.88384210631343e-07,
+        -1.0510306386046775e-06
+      ],
+      "actualObjectOriginMaximumOutsideLocalMetres": 1.5498551424880658e-08,
+      "limitingFace": 54,
+      "objectRayDoubleIntersections": [
+        {
+          "t": 1.5773782652287092e-08,
+          "primitive": 54,
+          "component": 3,
+          "entering": true
+        },
+        {
+          "t": 0.0034719371917760786,
+          "primitive": 57,
+          "component": 3,
+          "entering": false
+        }
+      ]
+    },
+    {
+      "pixel": [
+        504,
+        577
+      ],
+      "recordRow": 13,
+      "sourcePrimitive": 19.0,
+      "bias": 0.0,
+      "minimum": 9.999999974752427e-07,
+      "returnedPrimitive": 54.0,
+      "nativeRawT": 2.305766429344658e-06,
+      "objectOrigin": [
+        -0.01663970947265625,
+        -0.37951838970184326,
+        0.21382534503936768
+      ],
+      "inverseOriginDouble": [
+        -0.0166430697046496,
+        -0.379518965594025,
+        0.21382641256875765
+      ],
+      "objectOriginDifferenceLocal": [
+        3.3602319933490055e-06,
+        5.758921817200502e-07,
+        -1.0675293899697902e-06
+      ],
+      "actualObjectOriginMaximumOutsideLocalMetres": 2.2655731688162213e-06,
+      "limitingFace": 54,
+      "objectRayDoubleIntersections": [
+        {
+          "t": 2.3058063794522165e-06,
+          "primitive": 54,
+          "component": 3,
+          "entering": true
+        },
+        {
+          "t": 0.003473871809065603,
+          "primitive": 57,
+          "component": 3,
+          "entering": false
+        }
+      ]
+    },
+    {
+      "pixel": [
+        504,
+        577
+      ],
+      "recordRow": 14,
+      "sourcePrimitive": 19.0,
+      "bias": 0.0,
+      "minimum": 0.0,
+      "returnedPrimitive": 54.0,
+      "nativeRawT": 2.305766429344658e-06,
+      "objectOrigin": [
+        -0.01663970947265625,
+        -0.37951838970184326,
+        0.21382534503936768
+      ],
+      "inverseOriginDouble": [
+        -0.0166430697046496,
+        -0.379518965594025,
+        0.21382641256875765
+      ],
+      "objectOriginDifferenceLocal": [
+        3.3602319933490055e-06,
+        5.758921817200502e-07,
+        -1.0675293899697902e-06
+      ],
+      "actualObjectOriginMaximumOutsideLocalMetres": 2.2655731688162213e-06,
+      "limitingFace": 54,
+      "objectRayDoubleIntersections": [
+        {
+          "t": 2.3058063794522165e-06,
+          "primitive": 54,
+          "component": 3,
+          "entering": true
+        },
+        {
+          "t": 0.003473871809065603,
+          "primitive": 57,
+          "component": 3,
+          "entering": false
+        }
+      ]
+    },
+    {
+      "pixel": [
+        515,
+        652
+      ],
+      "recordRow": 15,
+      "sourcePrimitive": 62.0,
+      "bias": 3.0154373234836385e-05,
+      "minimum": 9.999999974752427e-07,
+      "returnedPrimitive": 3.0,
+      "nativeRawT": 0.16385018825531006,
+      "objectOrigin": [
+        0.013202667236328125,
+        -0.5351541638374329,
+        0.20772862434387207
+      ],
+      "inverseOriginDouble": [
+        0.013202704109318205,
+        -0.5351547308714875,
+        0.20772967990550814
+      ],
+      "objectOriginDifferenceLocal": [
+        -3.687299007966438e-08,
+        5.670340545993469e-07,
+        -1.0555616360707898e-06
+      ],
+      "actualObjectOriginMaximumOutsideLocalMetres": 3.964549107204257e-07,
+      "limitingFace": 63,
+      "objectRayDoubleIntersections": [
+        {
+          "t": 0.16385018298390897,
+          "primitive": 3,
+          "component": 0,
+          "entering": true
+        },
+        {
+          "t": 0.16703796072832308,
+          "primitive": 37,
+          "component": 0,
+          "entering": false
+        }
+      ]
+    },
+    {
+      "pixel": [
+        515,
+        652
+      ],
+      "recordRow": 16,
+      "sourcePrimitive": 62.0,
+      "bias": 3.0154373234836385e-05,
+      "minimum": 0.0,
+      "returnedPrimitive": 3.0,
+      "nativeRawT": 0.16385018825531006,
+      "objectOrigin": [
+        0.013202667236328125,
+        -0.5351541638374329,
+        0.20772862434387207
+      ],
+      "inverseOriginDouble": [
+        0.013202704109318205,
+        -0.5351547308714875,
+        0.20772967990550814
+      ],
+      "objectOriginDifferenceLocal": [
+        -3.687299007966438e-08,
+        5.670340545993469e-07,
+        -1.0555616360707898e-06
+      ],
+      "actualObjectOriginMaximumOutsideLocalMetres": 3.964549107204257e-07,
+      "limitingFace": 63,
+      "objectRayDoubleIntersections": [
+        {
+          "t": 0.16385018298390897,
+          "primitive": 3,
+          "component": 0,
+          "entering": true
+        },
+        {
+          "t": 0.16703796072832308,
+          "primitive": 37,
+          "component": 0,
+          "entering": false
+        }
+      ]
+    },
+    {
+      "pixel": [
+        515,
+        652
+      ],
+      "recordRow": 17,
+      "sourcePrimitive": 62.0,
+      "bias": 1.9999999949504854e-06,
+      "minimum": 9.999999974752427e-07,
+      "returnedPrimitive": 3.0,
+      "nativeRawT": 0.1638750433921814,
+      "objectOrigin": [
+        0.013149261474609375,
+        -0.5351542234420776,
+        0.20776082575321198
+      ],
+      "inverseOriginDouble": [
+        0.013148517937167472,
+        -0.5351548044624835,
+        0.20776187821230727
+      ],
+      "objectOriginDifferenceLocal": [
+        7.435374419027113e-07,
+        5.810204058986912e-07,
+        -1.0524590952909474e-06
+      ],
+      "actualObjectOriginMaximumOutsideLocalMetres": -7.878999145062979e-07,
+      "limitingFace": 63,
+      "objectRayDoubleIntersections": [
+        {
+          "t": 5.928915764732565e-07,
+          "primitive": 27,
+          "component": 4,
+          "entering": false
+        },
+        {
+          "t": 0.16387504312254458,
+          "primitive": 3,
+          "component": 0,
+          "entering": true
+        },
+        {
+          "t": 0.16706282086628413,
+          "primitive": 37,
+          "component": 0,
+          "entering": false
+        }
+      ]
+    },
+    {
+      "pixel": [
+        515,
+        652
+      ],
+      "recordRow": 18,
+      "sourcePrimitive": 62.0,
+      "bias": 1.9999999949504854e-06,
+      "minimum": 0.0,
+      "returnedPrimitive": 27.0,
+      "nativeRawT": 5.928916948505503e-07,
+      "objectOrigin": [
+        0.013149261474609375,
+        -0.5351542234420776,
+        0.20776082575321198
+      ],
+      "inverseOriginDouble": [
+        0.013148517937167472,
+        -0.5351548044624835,
+        0.20776187821230727
+      ],
+      "objectOriginDifferenceLocal": [
+        7.435374419027113e-07,
+        5.810204058986912e-07,
+        -1.0524590952909474e-06
+      ],
+      "actualObjectOriginMaximumOutsideLocalMetres": -7.878999145062979e-07,
+      "limitingFace": 63,
+      "objectRayDoubleIntersections": [
+        {
+          "t": 5.928915764732565e-07,
+          "primitive": 27,
+          "component": 4,
+          "entering": false
+        },
+        {
+          "t": 0.16387504312254458,
+          "primitive": 3,
+          "component": 0,
+          "entering": true
+        },
+        {
+          "t": 0.16706282086628413,
+          "primitive": 37,
+          "component": 0,
+          "entering": false
+        }
+      ]
+    },
+    {
+      "pixel": [
+        515,
+        652
+      ],
+      "recordRow": 19,
+      "sourcePrimitive": 62.0,
+      "bias": 0.0,
+      "minimum": 9.999999974752427e-07,
+      "returnedPrimitive": 3.0,
+      "nativeRawT": 0.16387681663036346,
+      "objectOrigin": [
+        0.01314544677734375,
+        -0.5351542234420776,
+        0.20776312053203583
+      ],
+      "inverseOriginDouble": [
+        0.01314418313844816,
+        -0.5351548343874937,
+        0.20776417010014253
+      ],
+      "objectOriginDifferenceLocal": [
+        1.2636388955905575e-06,
+        6.109454160352357e-07,
+        -1.0495681067035356e-06
+      ],
+      "actualObjectOriginMaximumOutsideLocalMetres": -8.678878363795536e-07,
+      "limitingFace": 63,
+      "objectRayDoubleIntersections": [
+        {
+          "t": 6.530821720363626e-07,
+          "primitive": 27,
+          "component": 4,
+          "entering": false
+        },
+        {
+          "t": 0.16387681674787904,
+          "primitive": 3,
+          "component": 0,
+          "entering": true
+        },
+        {
+          "t": 0.16706459449157035,
+          "primitive": 37,
+          "component": 0,
+          "entering": false
+        }
+      ]
+    },
+    {
+      "pixel": [
+        515,
+        652
+      ],
+      "recordRow": 20,
+      "sourcePrimitive": 62.0,
+      "bias": 0.0,
+      "minimum": 0.0,
+      "returnedPrimitive": 27.0,
+      "nativeRawT": 6.530821110573015e-07,
+      "objectOrigin": [
+        0.01314544677734375,
+        -0.5351542234420776,
+        0.20776312053203583
+      ],
+      "inverseOriginDouble": [
+        0.01314418313844816,
+        -0.5351548343874937,
+        0.20776417010014253
+      ],
+      "objectOriginDifferenceLocal": [
+        1.2636388955905575e-06,
+        6.109454160352357e-07,
+        -1.0495681067035356e-06
+      ],
+      "actualObjectOriginMaximumOutsideLocalMetres": -8.678878363795536e-07,
+      "limitingFace": 63,
+      "objectRayDoubleIntersections": [
+        {
+          "t": 6.530821720363626e-07,
+          "primitive": 27,
+          "component": 4,
+          "entering": false
+        },
+        {
+          "t": 0.16387681674787904,
+          "primitive": 3,
+          "component": 0,
+          "entering": true
+        },
+        {
+          "t": 0.16706459449157035,
+          "primitive": 37,
+          "component": 0,
+          "entering": false
+        }
+      ]
+    }
+  ]
+}
