@@ -29,6 +29,8 @@ option(HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW "Build the Win32 diagnostic shel
 option(HORDE_RT_BUILD_VULKAN_TARGETS "Build targets that require a Vulkan SDK" ON)
 
 include(CTest)
+include(cmake/HordeRtPocketAudioCore.cmake)
+horde_rt_add_pocket_audio_core("${CMAKE_CURRENT_SOURCE_DIR}" "${BUILD_TESTING}")
 if(BUILD_TESTING)
     add_executable(horde_rt_player_primitive_contract_tests tests/PlayerPrimitiveContractTests.cpp)
     target_include_directories(horde_rt_player_primitive_contract_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
@@ -55,11 +57,12 @@ set(HORDE_RT_SOURCE_FILES)
 foreach(source IN LISTS HORDE_RT_CORE_RELATIVE_SOURCES)
     list(APPEND HORDE_RT_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/${source}")
 endforeach()
-list(FILTER HORDE_RT_SOURCE_FILES EXCLUDE REGEX "/(audio/(MusicDirector|MusicPcmStream)|gameplay/(simulation/GameSimulation|animation/(PlayerAnimationState|PlayerIkTargets)|effects/FireEmitterState|interactions/(InteractionState|ChestRewardSequence|FinaleSequence)|items/(HeldItemState|HeldItemKinematics|HeldLightState|LanternPendulum)))\\.cpp$")
+list(FILTER HORDE_RT_SOURCE_FILES EXCLUDE REGEX "/(audio/(MusicDirector|MusicPcmStream|MusicPcmWave)|gameplay/(simulation/GameSimulation|animation/(PlayerAnimationState|PlayerIkTargets)|effects/FireEmitterState|interactions/(InteractionState|ChestRewardSequence|FinaleSequence)|items/(HeldItemState|HeldItemKinematics|HeldLightState|LanternPendulum)))\\.cpp$")
 
 add_library(horde_gameplay_simulation STATIC
     src/audio/MusicDirector.cpp
     src/audio/MusicPcmStream.cpp
+    src/audio/MusicPcmWave.cpp
     src/gameplay/simulation/GameSimulation.cpp
     src/gameplay/animation/PlayerAnimationState.cpp
     src/gameplay/animation/PlayerIkTargets.cpp
@@ -77,6 +80,7 @@ target_include_directories(horde_gameplay_simulation
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 target_compile_features(horde_gameplay_simulation PUBLIC cxx_std_20)
+target_link_libraries(horde_gameplay_simulation PUBLIC pocket_audio_native_pcm)
 
 if(HORDE_RT_BUILD_VULKAN_TARGETS)
     find_package(Vulkan REQUIRED)
@@ -570,6 +574,17 @@ if(BUILD_TESTING)
     target_include_directories(horde_rt_music_pcm_stream_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_link_libraries(horde_rt_music_pcm_stream_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_music_pcm_stream_tests COMMAND horde_rt_music_pcm_stream_tests)
+
+    add_executable(horde_rt_music_pcm_wave_tests tests/MusicPcmWaveTests.cpp)
+    target_include_directories(horde_rt_music_pcm_wave_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_compile_definitions(horde_rt_music_pcm_wave_tests PRIVATE
+        HORDE_RT_MUSIC_PROTOTYPE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/docs/evidence/2026-10-01-music-render/audio")
+    target_link_libraries(horde_rt_music_pcm_wave_tests PRIVATE horde_gameplay_simulation)
+    add_test(NAME horde_rt_music_pcm_wave_tests COMMAND horde_rt_music_pcm_wave_tests)
+    add_test(NAME horde_rt_pocket_audio_core_pin_tests
+        COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
+            ${CMAKE_CURRENT_SOURCE_DIR}/tests/PocketAudioCorePinTests.ps1
+            -CmakeExecutable ${CMAKE_COMMAND})
 
     add_executable(horde_rt_lantern_reward_tests tests/LanternRewardTests.cpp)
     target_include_directories(horde_rt_lantern_reward_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)

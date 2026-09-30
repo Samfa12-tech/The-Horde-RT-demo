@@ -16,6 +16,9 @@ docs/evidence/2026-10-01-isolated-glass-rays/path-module/minimal.rgen.preprocess
 # Preserve the audited upstream cgltf bytes, including its one trailing tab.
 third_party/cgltf/cgltf.h whitespace=-trailing-space
 
+# Native Core is a byte-hashed upstream subset, not a locally edited engine.
+third_party/pocket-audio-core/** text eol=lf
+
 # The release identity contract is one UTF-8 line. Keep its checkout bytes
 # stable even when core.autocrlf is enabled on Windows.
 VERSION text eol=lf
@@ -138,3 +141,7 @@ docs/evidence/2026-10-01-primary-hit-reference/**/*.patch whitespace=-trailing-s
 # Original unwired PCM helper validation; no packaged music admission.
 docs/evidence/2026-10-01-music-pcm/** -text whitespace=cr-at-eol
 docs/evidence/2026-10-01-music-pcm/**/*.log whitespace=-trailing-space,-blank-at-eof,-space-before-tab,cr-at-eol
+
+# Exact Core-integration logs and source/package receipts, not runtime assets.
+docs/evidence/2026-10-01-pocket-audio-core/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-01-pocket-audio-core/**/*.log whitespace=-trailing-space,-blank-at-eof,-space-before-tab,cr-at-eol

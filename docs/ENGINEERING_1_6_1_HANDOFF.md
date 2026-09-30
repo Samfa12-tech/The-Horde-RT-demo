@@ -30,6 +30,36 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### October 1 bounded render-scale resource checkpoint
 
+**Current post-update Core checkpoint:** resumed after the owner's Codex update,
+preserving all four unrelated scratch paths. Canonical Core534a6e6 is reviewed,
+committed, pushed/remote-verified on `codex/horde-native-pcm-core`; draft PR75
+is open, not merged. Fresh CI36781667753 passes all six GCC/Clang/MSVC Debug/
+Release jobs; local final Debug/Release/ASan each1/1PASS. Core remains private/
+UNLICENSED, with unchanged metadata; original Chordsmith checkout is untouched.
+
+Horde now consumes only the byte-exact eight-file native utility subset plus
+upstream licence metadata, with configure-time hash/size/inventory admission
+and seven positive/negative pin checks. MusicDirector is unchanged; stream and
+decoder are thin cue-policy adapters. No editor/synth, score rewrite, package
+relicensing, platform playback or publication. Native PCM behaviour is no longer
+a Horde-only implementation. Canonical PCS JSON/PCS1 remains the revisable score.
+
+Fresh Horde MSVC Debug/Release each8/8 focused PASS; real Windows RT executables
+compile/link in both. Android Debug builds all four ABIs. Universal APK eab79c4a…
+89d21a is not installed; its actual ARM64 Diagnostic/Mobile modules freshly
+val/dis PASS and match acceptedC11, all53assets equal. CTest inventory confirms
+50 common CPU tests; fresh Horde CI required after push. Final Core `/EHsc`
+removes C4530; prior ASan loader failure and incorrect pin-test PATH invocation
+remain distinct from corrected passes. [Exact integration evidence](evidence/2026-10-01-pocket-audio-core/README.md).
+
+Next: canonical/runtime music asset admission, platform playback/sample clock,
+persisted music volume and exact-candidate listening. Phase4 glass remains open;
+this independent slice does not advance its gate. Audio/haptic manual revalidation:
+NO until audible playback/mix changes. The following interruption snapshot's
+uncommitted/unbuildable/pending statuses are historical and superseded above.
+
+#### Historical interrupted migration snapshot
+
 **Interruption checkpoint — October 1, owner updating Codex:** last validated
 pushed code checkpoint is `4870532638e3ca4b6fd89735bdf292c7bba16713`; this
 handoff-only preservation commit changes no production code. Verify actual HEAD

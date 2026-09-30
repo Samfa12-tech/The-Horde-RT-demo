@@ -2,6 +2,19 @@
 
 Last updated: 2026-10-01
 
+## October 1: Pocket Audio Core build only (no new device acceptance)
+
+Core integration over engineering basebaa8bfe builds Android Debug for all four
+ABIs. Resolver-selected universal APK SHA-256
+`eab79c4a5f6757b600824f85e08b290ce3fe57e735022647c41377c69589d21a`
+contains an ARM64 library whose four actual Diagnostic/Mobile pipeline/compute
+SPIR-V modules match accepted C11 exactly and freshly val/dis PASS. All53assets
+match C11; native library and manifest differ. Two SDK XML tooling warnings,
+no C++ build errors. Not installed: package/compile evidence only, not new
+SM-S948B playback, RT presentation, performance or owner acceptance. S24/S25
+remain unverified. Audio/haptic manual revalidation:NO while unwired; YES when
+audible playback is integrated. [Exact logs](evidence/2026-10-01-pocket-audio-core/README.md).
+
 ## October 1: native primary-hit Shipping reference (local SM-S948B)
 
 ExactSM-S948B/R5GL219SZGK/Adreno840, uncooled Shipping/Mobile pipeline at75%,

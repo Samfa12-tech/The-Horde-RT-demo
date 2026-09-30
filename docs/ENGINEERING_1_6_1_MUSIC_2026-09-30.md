@@ -7,6 +7,32 @@ Owner explicitly confirmed: **Owner-supplied; authorised for Horde use only**.
 This is not a general permissive redistribution grant or a change to Chordsmith,
 Hotstrike or existing project licence statements. Publication remains unauthorised.
 
+## Current Core ownership checkpoint - October 1
+
+The owner's architecture clarification is implemented without discarding the
+validated cue or sample behaviour. `MusicDirector` is unchanged. Horde's
+`MusicPcmStream` now only validates/maps its nine cue slots and C→D/G→H policy;
+`MusicPcmWave` delegates decoding. All reusable PCM looping/tails/crossfades and
+strict RIFF parsing are in canonical Pocket Audio Core's native C++20 target at
+`534a6e6811ce653efd5422138c5772b967263ed0`. Horde consumes a byte-exact native-only
+subset with configure-time size/hash/inventory admission on Windows and Android.
+No build-time network fetch, editor/synth app copy, cue/score change or package
+relicensing. The canonical PCS JSON/PCS1 and sixteen rendered WAVs are unchanged.
+
+Fresh canonical Core CI passes GCC/Clang/MSVC Debug+Release (six jobs); local
+Debug/Release and MSVC ASan each pass1/1. Horde integration passes8/8 focused
+MSVC Debug and Release (resolver, stream, decoder, pin, Core, simulation gameplay/
+timing and existing spatial feedback); real Windows RT executables link in both.
+Android Debug builds all four ABIs. These do not establish playback/device/
+listening acceptance. [Exact integration evidence](evidence/2026-10-01-pocket-audio-core/README.md)
+records actual source/build/package scope and retained failed checks.
+
+The owner-observed MSVC modal was a standalone Core test fixture supplying a
+12-float output span over an8-float test array, not a game-loading diagnosis.
+Its storage/span construction is fixed and fresh sanitizer/contracts pass.
+The generic natural-tail port also retains the body-complete precondition;
+early interruptions remain bounded fades, not prematurely replayed tails.
+
 ## Implemented contract
 
 `src/audio/MusicDirector.*` owns no playback resources or allocation. It reads
@@ -61,7 +87,8 @@ New-head CI is required after push.
 
 ## Remaining integration
 
-October 1: `MusicPcmStream.*` adds a small original, audio-thread-owned PCM
+Historical original helper checkpoint at4870532 (now superseded by the Core
+ownership seam above): `MusicPcmStream.*` added an audio-thread-owned PCM
 cursor/mixer, not a synthesizer or platform playback backend. Caller-owned
 immutable stereo PCM16 clips at48kHz have exact576000-frame looping bodies
 (C144000, G288000) and144000-frame tails. Loops add the previous complete tail
@@ -97,8 +124,10 @@ tries Core0.2.0 first; its documented PCM renderer lacks app sound/FX parity.
 The fallback offline exporter also has a distinct compressor graph and event-plus-
 tail duration, not certified musical loop windows. Do not accept either as the
 supplied score's faithful game audio without actual rendering/trace/listening proof.
-No Chordsmith/Core code copied, shared source modified or supplied music regenerated.
-Their source is UNLICENSED; the owner's score grant does not relicense that code.
+At that historical rendering checkpoint, no Chordsmith/Core code was copied or
+shared source modified. The newer native Core utility seam above is deliberate;
+the supplied music is not regenerated. Core remains private/UNLICENSED and the
+owner's score grant does not relicense software.
 
 [A-H rendering prototypes](evidence/2026-10-01-music-render/README.md) now retain
 actual app-voice/live-FX outputs, exact musical windows (40ms leader excluded),

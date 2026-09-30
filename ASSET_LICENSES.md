@@ -66,5 +66,8 @@ The sixteen A-H PCM body/tail prototypes under
 `docs/evidence/2026-10-01-music-render/audio/` carry that same Horde-only owner grant.
 They are non-runtime rendering evidence, excluded from game packages, not a
 general asset library or seamless/playback acceptance. Source/tool hashes and
-original unmodified-score processing are recorded in that directory; no upstream
-Chordsmith code is vendored or relicensed.
+original unmodified-score processing are recorded in that directory. The separate
+native-only Pocket Audio Core utility pin is documented in
+`third_party/pocket-audio-core/README.horde.md`; no Chordsmith editor/synth app is
+vendored and no upstream code is relicensed. Its software permission is separate
+from this Horde-only score grant.

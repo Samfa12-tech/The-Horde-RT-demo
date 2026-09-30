@@ -38,10 +38,10 @@ jobs:
       - name: Check out source
         uses: actions/checkout@v6
 
-      - name: Fetch portable-test GLB assets
+      - name: Fetch portable-test GLB and music PCM assets
         run: >-
           git -c lfs.fetchexclude= lfs fetch
-          --include="assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,tests/fixtures/*/*.glb"
+          --include="assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,tests/fixtures/*/*.glb,docs/evidence/2026-10-01-music-render/audio/*.wav"
           && git lfs checkout
           "assets/models/player/runtime/*.glb"
           "assets/models/player/viewmodel/runtime/*.glb"
@@ -49,6 +49,7 @@ jobs:
           "assets/models/props/runtime/*/*.glb"
           "assets/models/weapons/runtime/*.glb"
           "tests/fixtures/*/*.glb"
+          "docs/evidence/2026-10-01-music-render/audio/*.wav"
 
       - name: Configure non-hardware host tests
         run: >-

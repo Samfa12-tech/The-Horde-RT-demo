@@ -18,6 +18,21 @@ blockers. See `FUTURE_WORK.md` and the exact owner/device evidence in
 historical 1.6.0 block-arm decision for1.6.1 development; it does not authorize
 publication or certify performance, glass, audio or other devices.
 
+## Shared music runtime ownership - 2026-10-01
+
+The owner directs Horde-specific gameplay-to-cue decisions to remain in
+`MusicDirector`, while reusable PCM looping, tails, crossfades and decoding live
+in/use Pocket Audio Core. The initial native-only Core subset is pinned to
+Pocket-Chordsmith `534a6e6811ce653efd5422138c5772b967263ed0`; it is not a copy of
+the editor/synth application. Keep one canonical reusable implementation, exact
+source admission and existing Core private/UNLICENSED notices. The owner-directed
+integration is not a general third-party licence grant or publication permission.
+
+Canonical PCS JSON/PCS1 remains the revisable musical source. Preserve the
+accepted A-H cue logic and rendered bodies/tails; platform playback, independent
+persisted music volume and exact-candidate listening remain separate open gates.
+See [integration evidence](docs/evidence/2026-10-01-pocket-audio-core/README.md).
+
 ## Identity
 
 - Public project: Samfa12 technology demo.

@@ -13,6 +13,8 @@ include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtVersion.cmake")
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtRaygenArtifacts.cmake")
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtRaygenPolicy.cmake")
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtSources.cmake")
+include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtPocketAudioCore.cmake")
+horde_rt_add_pocket_audio_core("${HORDE_RT_REPO_ROOT}" OFF)
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtStrictAssetMath.cmake")
 horde_rt_enable_strict_asset_math("${HORDE_RT_REPO_ROOT}")
 horde_rt_configure_raygen_artifacts("${HORDE_RT_REPO_ROOT}")
@@ -79,6 +81,7 @@ if (NOT ANDROID_LIBRARY)
 endif()
 
 target_link_libraries(horde_rt_probe_android
+    pocket_audio_native_pcm
     ${VULKAN_LIBRARY}
     ${ANDROID_LOG_LIBRARY}
     ${ANDROID_LIBRARY}

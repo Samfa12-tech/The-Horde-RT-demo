@@ -1,0 +1,1134 @@
+GCC Release	Set up job	﻿2026-09-30T21:47:39.8971156Z Current runner version: '2.337.0'
+GCC Release	Set up job	2026-09-30T21:47:39.8995933Z ##[group]Runner Image Provisioner
+GCC Release	Set up job	2026-09-30T21:47:39.8996881Z Hosted Compute Agent
+GCC Release	Set up job	2026-09-30T21:47:39.8997507Z Version: 20260901.588
+GCC Release	Set up job	2026-09-30T21:47:39.8998192Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+GCC Release	Set up job	2026-09-30T21:47:39.8998999Z Build Date: 2026-09-01T19:56:44Z
+GCC Release	Set up job	2026-09-30T21:47:39.8999713Z Worker ID: {7977a6f3-19d1-46a9-b9a8-b43de5bd7302}
+GCC Release	Set up job	2026-09-30T21:47:39.9000436Z Azure Region: westus
+GCC Release	Set up job	2026-09-30T21:47:39.9001098Z ##[endgroup]
+GCC Release	Set up job	2026-09-30T21:47:39.9002685Z ##[group]Operating System
+GCC Release	Set up job	2026-09-30T21:47:39.9003705Z Ubuntu
+GCC Release	Set up job	2026-09-30T21:47:39.9004264Z 24.04.5
+GCC Release	Set up job	2026-09-30T21:47:39.9004777Z LTS
+GCC Release	Set up job	2026-09-30T21:47:39.9005395Z ##[endgroup]
+GCC Release	Set up job	2026-09-30T21:47:39.9005997Z ##[group]Runner Image
+GCC Release	Set up job	2026-09-30T21:47:39.9006635Z Image: ubuntu-24.04
+GCC Release	Set up job	2026-09-30T21:47:39.9007235Z Version: 20260927.320.1
+GCC Release	Set up job	2026-09-30T21:47:39.9008499Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+GCC Release	Set up job	2026-09-30T21:47:39.9010319Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+GCC Release	Set up job	2026-09-30T21:47:39.9011325Z ##[endgroup]
+GCC Release	Set up job	2026-09-30T21:47:39.9012459Z ##[group]GITHUB_TOKEN Permissions
+GCC Release	Set up job	2026-09-30T21:47:39.9014932Z Contents: read
+GCC Release	Set up job	2026-09-30T21:47:39.9015646Z Metadata: read
+GCC Release	Set up job	2026-09-30T21:47:39.9016222Z ##[endgroup]
+GCC Release	Set up job	2026-09-30T21:47:39.9018337Z Secret source: Actions
+GCC Release	Set up job	2026-09-30T21:47:39.9019323Z Cache mode: write
+GCC Release	Set up job	2026-09-30T21:47:39.9020130Z Prepare workflow directory
+GCC Release	Set up job	2026-09-30T21:47:39.9357245Z Prepare all required actions
+GCC Release	Set up job	2026-09-30T21:47:39.9407605Z Getting action download info
+GCC Release	Set up job	2026-09-30T21:47:40.3124253Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+GCC Release	Set up job	2026-09-30T21:47:40.4922008Z Complete job name: GCC Release
+GCC Release	Check out canonical source	﻿2026-09-30T21:47:40.5804868Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+GCC Release	Check out canonical source	2026-09-30T21:47:40.5805984Z with:
+GCC Release	Check out canonical source	2026-09-30T21:47:40.5806512Z   repository: Samfa12-tech/Pocket-Chordsmith
+GCC Release	Check out canonical source	2026-09-30T21:47:40.5810617Z   token: ***
+GCC Release	Check out canonical source	2026-09-30T21:47:40.5811090Z   ssh-strict: true
+GCC Release	Check out canonical source	2026-09-30T21:47:40.5811562Z   ssh-user: git
+GCC Release	Check out canonical source	2026-09-30T21:47:40.5812049Z   persist-credentials: true
+GCC Release	Check out canonical source	2026-09-30T21:47:40.5812568Z   clean: true
+GCC Release	Check out canonical source	2026-09-30T21:47:40.5813299Z   sparse-checkout-cone-mode: true
+GCC Release	Check out canonical source	2026-09-30T21:47:40.5813835Z   fetch-depth: 1
+GCC Release	Check out canonical source	2026-09-30T21:47:40.5814273Z   fetch-tags: false
+GCC Release	Check out canonical source	2026-09-30T21:47:40.5814731Z   show-progress: true
+GCC Release	Check out canonical source	2026-09-30T21:47:40.5815192Z   lfs: false
+GCC Release	Check out canonical source	2026-09-30T21:47:40.5815625Z   submodules: false
+GCC Release	Check out canonical source	2026-09-30T21:47:40.5816093Z   set-safe-directory: true
+GCC Release	Check out canonical source	2026-09-30T21:47:40.5816616Z   allow-unsafe-pr-checkout: false
+GCC Release	Check out canonical source	2026-09-30T21:47:40.5817427Z ##[endgroup]
+GCC Release	Check out canonical source	2026-09-30T21:47:40.6810653Z Syncing repository: Samfa12-tech/Pocket-Chordsmith
+GCC Release	Check out canonical source	2026-09-30T21:47:40.6813949Z ##[group]Getting Git version info
+GCC Release	Check out canonical source	2026-09-30T21:47:40.6815394Z Working directory is '/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith'
+GCC Release	Check out canonical source	2026-09-30T21:47:40.6817260Z [command]/usr/bin/git version
+GCC Release	Check out canonical source	2026-09-30T21:47:40.6908519Z git version 2.55.0
+GCC Release	Check out canonical source	2026-09-30T21:47:40.6939960Z ##[endgroup]
+GCC Release	Check out canonical source	2026-09-30T21:47:40.6964740Z Temporarily overriding HOME='/home/runner/work/_temp/5823153f-d9bc-45e6-b0d8-baab623ff578' before making global git config changes
+GCC Release	Check out canonical source	2026-09-30T21:47:40.6967276Z Adding repository directory to the temporary git global config as a safe directory
+GCC Release	Check out canonical source	2026-09-30T21:47:40.6969281Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7026199Z Deleting the contents of '/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith'
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7029646Z ##[group]Determining repository object format
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7031406Z ##[endgroup]
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7032636Z ##[group]Initializing the repository
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7036896Z [command]/usr/bin/git init /home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7164188Z hint: Using 'master' as the name for the initial branch. This default branch name
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7167400Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7169340Z hint: to use in all of your new repositories, which will suppress this warning,
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7170786Z hint: call:
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7171617Z hint:
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7172650Z hint: 	git config --global init.defaultBranch <name>
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7174335Z hint:
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7175558Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7177256Z hint: 'development'. The just-created branch can be renamed via this command:
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7178640Z hint:
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7179483Z hint: 	git branch -m <name>
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7180782Z hint:
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7182104Z hint: Disable this message with "git config set advice.defaultBranchName false"
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7184532Z Initialized empty Git repository in /home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git/
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7188161Z [command]/usr/bin/git remote add origin https://github.com/Samfa12-tech/Pocket-Chordsmith
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7235781Z ##[endgroup]
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7237379Z ##[group]Disabling automatic garbage collection
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7238490Z [command]/usr/bin/git config --local gc.auto 0
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7272964Z ##[endgroup]
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7274492Z ##[group]Setting up auth
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7275502Z Removing SSH command configuration
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7284548Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7315959Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7692477Z Removing HTTP extra header
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7699743Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7743836Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7973434Z Removing includeIf entries pointing to credentials config files
+GCC Release	Check out canonical source	2026-09-30T21:47:40.7979775Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+GCC Release	Check out canonical source	2026-09-30T21:47:40.8025078Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+GCC Release	Check out canonical source	2026-09-30T21:47:40.8263302Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-8701a8f8-5e4e-4a5d-bfd8-0a94850d8341.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+GCC Release	Check out canonical source	2026-09-30T21:47:40.8305973Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git.path /home/runner/work/_temp/git-credentials-8701a8f8-5e4e-4a5d-bfd8-0a94850d8341.config
+GCC Release	Check out canonical source	2026-09-30T21:47:40.8341121Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-8701a8f8-5e4e-4a5d-bfd8-0a94850d8341.config
+GCC Release	Check out canonical source	2026-09-30T21:47:40.8379110Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-8701a8f8-5e4e-4a5d-bfd8-0a94850d8341.config
+GCC Release	Check out canonical source	2026-09-30T21:47:40.8414731Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-8701a8f8-5e4e-4a5d-bfd8-0a94850d8341.config
+GCC Release	Check out canonical source	2026-09-30T21:47:40.8448896Z ##[endgroup]
+GCC Release	Check out canonical source	2026-09-30T21:47:40.8449704Z ##[group]Fetching the repository
+GCC Release	Check out canonical source	2026-09-30T21:47:40.8456181Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +534a6e6811ce653efd5422138c5772b967263ed0:refs/remotes/origin/codex/horde-native-pcm-core
+GCC Release	Check out canonical source	2026-09-30T21:47:41.9277386Z From https://github.com/Samfa12-tech/Pocket-Chordsmith
+GCC Release	Check out canonical source	2026-09-30T21:47:41.9295459Z  * [new ref]         534a6e6811ce653efd5422138c5772b967263ed0 -> origin/codex/horde-native-pcm-core
+GCC Release	Check out canonical source	2026-09-30T21:47:41.9299274Z [command]/usr/bin/git branch --list --remote origin/codex/horde-native-pcm-core
+GCC Release	Check out canonical source	2026-09-30T21:47:41.9326491Z   origin/codex/horde-native-pcm-core
+GCC Release	Check out canonical source	2026-09-30T21:47:41.9337343Z [command]/usr/bin/git rev-parse refs/remotes/origin/codex/horde-native-pcm-core
+GCC Release	Check out canonical source	2026-09-30T21:47:41.9365558Z 534a6e6811ce653efd5422138c5772b967263ed0
+GCC Release	Check out canonical source	2026-09-30T21:47:41.9374917Z ##[endgroup]
+GCC Release	Check out canonical source	2026-09-30T21:47:41.9375750Z ##[group]Determining the checkout info
+GCC Release	Check out canonical source	2026-09-30T21:47:41.9376630Z ##[endgroup]
+GCC Release	Check out canonical source	2026-09-30T21:47:41.9378925Z [command]/usr/bin/git sparse-checkout disable
+GCC Release	Check out canonical source	2026-09-30T21:47:41.9439532Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+GCC Release	Check out canonical source	2026-09-30T21:47:41.9481111Z ##[group]Checking out the ref
+GCC Release	Check out canonical source	2026-09-30T21:47:41.9488057Z [command]/usr/bin/git checkout --progress --force -B codex/horde-native-pcm-core refs/remotes/origin/codex/horde-native-pcm-core
+GCC Release	Check out canonical source	2026-09-30T21:47:42.0661003Z Switched to a new branch 'codex/horde-native-pcm-core'
+GCC Release	Check out canonical source	2026-09-30T21:47:42.0666901Z branch 'codex/horde-native-pcm-core' set up to track 'origin/codex/horde-native-pcm-core'.
+GCC Release	Check out canonical source	2026-09-30T21:47:42.0680495Z ##[endgroup]
+GCC Release	Check out canonical source	2026-09-30T21:47:42.0731999Z [command]/usr/bin/git log -1 --format=%H
+GCC Release	Check out canonical source	2026-09-30T21:47:42.0761842Z 534a6e6811ce653efd5422138c5772b967263ed0
+GCC Release	Configure standalone Core tests	﻿2026-09-30T21:47:42.1062594Z ##[group]Run cmake -S packages/pocket-audio-core/native -B build/native-pcm -DCMAKE_BUILD_TYPE=Release -DPOCKET_AUDIO_NATIVE_BUILD_TESTS=ON
+GCC Release	Configure standalone Core tests	2026-09-30T21:47:42.1067487Z ^[[36;1mcmake -S packages/pocket-audio-core/native -B build/native-pcm -DCMAKE_BUILD_TYPE=Release -DPOCKET_AUDIO_NATIVE_BUILD_TESTS=ON^[[0m
+GCC Release	Configure standalone Core tests	2026-09-30T21:47:42.1335019Z shell: /usr/bin/bash -e {0}
+GCC Release	Configure standalone Core tests	2026-09-30T21:47:42.1336352Z env:
+GCC Release	Configure standalone Core tests	2026-09-30T21:47:42.1337302Z   CXX: g++
+GCC Release	Configure standalone Core tests	2026-09-30T21:47:42.1338282Z ##[endgroup]
+GCC Release	Configure standalone Core tests	2026-09-30T21:47:42.3802779Z -- The CXX compiler identification is GNU 13.3.0
+GCC Release	Configure standalone Core tests	2026-09-30T21:47:42.3966072Z -- Detecting CXX compiler ABI info
+GCC Release	Configure standalone Core tests	2026-09-30T21:47:42.5763244Z -- Detecting CXX compiler ABI info - done
+GCC Release	Configure standalone Core tests	2026-09-30T21:47:42.5947008Z -- Check for working CXX compiler: /usr/bin/g++ - skipped
+GCC Release	Configure standalone Core tests	2026-09-30T21:47:42.5954946Z -- Detecting CXX compile features
+GCC Release	Configure standalone Core tests	2026-09-30T21:47:42.5964102Z -- Detecting CXX compile features - done
+GCC Release	Configure standalone Core tests	2026-09-30T21:47:42.6171598Z -- Configuring done (0.4s)
+GCC Release	Configure standalone Core tests	2026-09-30T21:47:42.6719034Z -- Generating done (0.1s)
+GCC Release	Configure standalone Core tests	2026-09-30T21:47:42.6722813Z -- Build files have been written to: /home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/build/native-pcm
+GCC Release	Build	﻿2026-09-30T21:47:42.6821371Z ##[group]Run cmake --build build/native-pcm --config Release --parallel 2
+GCC Release	Build	2026-09-30T21:47:42.6823730Z ^[[36;1mcmake --build build/native-pcm --config Release --parallel 2^[[0m
+GCC Release	Build	2026-09-30T21:47:42.6888830Z shell: /usr/bin/bash -e {0}
+GCC Release	Build	2026-09-30T21:47:42.6889864Z ##[endgroup]
+GCC Release	Build	2026-09-30T21:47:42.7139820Z [ 20%] Building CXX object CMakeFiles/pocket_audio_native_pcm.dir/src/PcmLoopStream.cpp.o
+GCC Release	Build	2026-09-30T21:47:42.7142820Z [ 40%] Building CXX object CMakeFiles/pocket_audio_native_pcm.dir/src/PcmWave.cpp.o
+GCC Release	Build	2026-09-30T21:47:43.1941681Z [ 60%] Linking CXX static library libpocket_audio_native_pcm.a
+GCC Release	Build	2026-09-30T21:47:43.8902088Z [ 60%] Built target pocket_audio_native_pcm
+GCC Release	Build	2026-09-30T21:47:43.8971017Z [ 80%] Building CXX object CMakeFiles/pocket_audio_native_pcm_tests.dir/tests/PcmNativeTests.cpp.o
+GCC Release	Build	2026-09-30T21:47:45.1791271Z [100%] Linking CXX executable pocket_audio_native_pcm_tests
+GCC Release	Build	2026-09-30T21:47:45.2300437Z [100%] Built target pocket_audio_native_pcm_tests
+GCC Release	Test	﻿2026-09-30T21:47:45.2375824Z ##[group]Run ctest --test-dir build/native-pcm -C Release --output-on-failure --no-tests=error
+GCC Release	Test	2026-09-30T21:47:45.2376588Z ^[[36;1mctest --test-dir build/native-pcm -C Release --output-on-failure --no-tests=error^[[0m
+GCC Release	Test	2026-09-30T21:47:45.2443321Z shell: /usr/bin/bash -e {0}
+GCC Release	Test	2026-09-30T21:47:45.2443617Z ##[endgroup]
+GCC Release	Test	2026-09-30T21:47:45.9783877Z Internal ctest changing into directory: /home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/build/native-pcm
+GCC Release	Test	2026-09-30T21:47:46.1179767Z Test project /home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/build/native-pcm
+GCC Release	Test	2026-09-30T21:47:46.1900813Z     Start 1: pocket_audio_native_pcm_tests
+GCC Release	Test	2026-09-30T21:47:46.1984367Z 1/1 Test #1: pocket_audio_native_pcm_tests ....   Passed    0.00 sec
+GCC Release	Test	2026-09-30T21:47:46.2059108Z 
+GCC Release	Test	2026-09-30T21:47:46.2059306Z 100% tests passed, 0 tests failed out of 1
+GCC Release	Test	2026-09-30T21:47:46.2059735Z 
+GCC Release	Test	2026-09-30T21:47:46.2059876Z Total Test time (real) =   0.09 sec
+GCC Release	Post Check out canonical source	﻿2026-09-30T21:47:46.2625477Z Post job cleanup.
+GCC Release	Post Check out canonical source	2026-09-30T21:47:46.3451084Z [command]/usr/bin/git version
+GCC Release	Post Check out canonical source	2026-09-30T21:47:46.3496746Z git version 2.55.0
+GCC Release	Post Check out canonical source	2026-09-30T21:47:46.3541840Z Temporarily overriding HOME='/home/runner/work/_temp/c9da099a-6178-4108-b482-9aa5793ba949' before making global git config changes
+GCC Release	Post Check out canonical source	2026-09-30T21:47:46.3543457Z Adding repository directory to the temporary git global config as a safe directory
+GCC Release	Post Check out canonical source	2026-09-30T21:47:46.3549358Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith
+GCC Release	Post Check out canonical source	2026-09-30T21:47:46.3582402Z Removing SSH command configuration
+GCC Release	Post Check out canonical source	2026-09-30T21:47:46.3589659Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+GCC Release	Post Check out canonical source	2026-09-30T21:47:46.3625635Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+GCC Release	Post Check out canonical source	2026-09-30T21:47:46.3878011Z Removing HTTP extra header
+GCC Release	Post Check out canonical source	2026-09-30T21:47:46.3885207Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+GCC Release	Post Check out canonical source	2026-09-30T21:47:46.3922123Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+GCC Release	Post Check out canonical source	2026-09-30T21:47:46.4181870Z Removing includeIf entries pointing to credentials config files
+GCC Release	Post Check out canonical source	2026-09-30T21:47:46.4189079Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+GCC Release	Post Check out canonical source	2026-09-30T21:47:46.4223871Z includeif.gitdir:/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git.path
+GCC Release	Post Check out canonical source	2026-09-30T21:47:46.4225301Z includeif.gitdir:/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git/worktrees/*.path
+GCC Release	Post Check out canonical source	2026-09-30T21:47:46.4226507Z includeif.gitdir:/github/workspace/.git.path
+GCC Release	Post Check out canonical source	2026-09-30T21:47:46.4227361Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+GCC Release	Post Check out canonical source	2026-09-30T21:47:46.4233725Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git.path
+GCC Release	Post Check out canonical source	2026-09-30T21:47:46.4262599Z /home/runner/work/_temp/git-credentials-8701a8f8-5e4e-4a5d-bfd8-0a94850d8341.config
+GCC Release	Post Check out canonical source	2026-09-30T21:47:46.4275096Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-8701a8f8\-5e4e\-4a5d\-bfd8\-0a94850d8341\.config
+GCC Release	Post Check out canonical source	2026-09-30T21:47:46.4335610Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git/worktrees/*.path
+GCC Release	Post Check out canonical source	2026-09-30T21:47:46.4364870Z /home/runner/work/_temp/git-credentials-8701a8f8-5e4e-4a5d-bfd8-0a94850d8341.config
+GCC Release	Post Check out canonical source	2026-09-30T21:47:46.4383466Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-8701a8f8\-5e4e\-4a5d\-bfd8\-0a94850d8341\.config
+GCC Release	Post Check out canonical source	2026-09-30T21:47:46.4422771Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+GCC Release	Post Check out canonical source	2026-09-30T21:47:46.4451391Z /github/runner_temp/git-credentials-8701a8f8-5e4e-4a5d-bfd8-0a94850d8341.config
+GCC Release	Post Check out canonical source	2026-09-30T21:47:46.4459060Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-8701a8f8\-5e4e\-4a5d\-bfd8\-0a94850d8341\.config
+GCC Release	Post Check out canonical source	2026-09-30T21:47:46.4497375Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+GCC Release	Post Check out canonical source	2026-09-30T21:47:46.4523717Z /github/runner_temp/git-credentials-8701a8f8-5e4e-4a5d-bfd8-0a94850d8341.config
+GCC Release	Post Check out canonical source	2026-09-30T21:47:46.4531720Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-8701a8f8\-5e4e\-4a5d\-bfd8\-0a94850d8341\.config
+GCC Release	Post Check out canonical source	2026-09-30T21:47:46.4569307Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+GCC Release	Post Check out canonical source	2026-09-30T21:47:46.4790655Z Removing credentials config '/home/runner/work/_temp/git-credentials-8701a8f8-5e4e-4a5d-bfd8-0a94850d8341.config'
+GCC Release	Complete job	﻿2026-09-30T21:47:46.4929664Z Cleaning up orphan processes
+MSVC Release	Set up job	﻿2026-09-30T21:47:43.3126366Z Current runner version: '2.337.0'
+MSVC Release	Set up job	2026-09-30T21:47:43.3553090Z ##[group]Runner Image Provisioner
+MSVC Release	Set up job	2026-09-30T21:47:43.3554291Z Hosted Compute Agent
+MSVC Release	Set up job	2026-09-30T21:47:43.3555119Z Version: 20260828.587
+MSVC Release	Set up job	2026-09-30T21:47:43.3556026Z Commit: abac92662cab4cc7352de4f9f9d2e2419aad9c29
+MSVC Release	Set up job	2026-09-30T21:47:43.3557300Z Build Date: 2026-08-28T16:44:25Z
+MSVC Release	Set up job	2026-09-30T21:47:43.3558333Z Worker ID: {68fed79f-9dfe-465f-af64-c1ae19dcebc3}
+MSVC Release	Set up job	2026-09-30T21:47:43.3559459Z Azure Region: westus2
+MSVC Release	Set up job	2026-09-30T21:47:43.3560348Z ##[endgroup]
+MSVC Release	Set up job	2026-09-30T21:47:43.3562495Z ##[group]Operating System
+MSVC Release	Set up job	2026-09-30T21:47:43.3563554Z Microsoft Windows Server 2022
+MSVC Release	Set up job	2026-09-30T21:47:43.3564454Z 10.0.20348
+MSVC Release	Set up job	2026-09-30T21:47:43.3565233Z Datacenter
+MSVC Release	Set up job	2026-09-30T21:47:43.3566008Z ##[endgroup]
+MSVC Release	Set up job	2026-09-30T21:47:43.3566811Z ##[group]Runner Image
+MSVC Release	Set up job	2026-09-30T21:47:43.3567685Z Image: windows-2022
+MSVC Release	Set up job	2026-09-30T21:47:43.3568575Z Version: 20260920.314.1
+MSVC Release	Set up job	2026-09-30T21:47:43.3570488Z Included Software: https://github.com/actions/runner-images/blob/win22/20260920.314/images/windows/Windows2022-Readme.md
+MSVC Release	Set up job	2026-09-30T21:47:43.3573374Z Image Release: https://github.com/actions/runner-images/releases/tag/win22%2F20260920.314
+MSVC Release	Set up job	2026-09-30T21:47:43.3574943Z ##[endgroup]
+MSVC Release	Set up job	2026-09-30T21:47:43.3576635Z ##[group]GITHUB_TOKEN Permissions
+MSVC Release	Set up job	2026-09-30T21:47:43.3579427Z Contents: read
+MSVC Release	Set up job	2026-09-30T21:47:43.3580371Z Metadata: read
+MSVC Release	Set up job	2026-09-30T21:47:43.3581241Z ##[endgroup]
+MSVC Release	Set up job	2026-09-30T21:47:43.3584159Z Secret source: Actions
+MSVC Release	Set up job	2026-09-30T21:47:43.3585570Z Cache mode: write
+MSVC Release	Set up job	2026-09-30T21:47:43.3587352Z Prepare workflow directory
+MSVC Release	Set up job	2026-09-30T21:47:43.3956322Z Prepare all required actions
+MSVC Release	Set up job	2026-09-30T21:47:43.4003734Z Getting action download info
+MSVC Release	Set up job	2026-09-30T21:47:43.8291557Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+MSVC Release	Set up job	2026-09-30T21:47:44.6185193Z Complete job name: MSVC Release
+MSVC Release	Check out canonical source	﻿2026-09-30T21:47:44.9055102Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+MSVC Release	Check out canonical source	2026-09-30T21:47:44.9056560Z with:
+MSVC Release	Check out canonical source	2026-09-30T21:47:44.9057219Z   repository: Samfa12-tech/Pocket-Chordsmith
+MSVC Release	Check out canonical source	2026-09-30T21:47:44.9061882Z   token: ***
+MSVC Release	Check out canonical source	2026-09-30T21:47:44.9062390Z   ssh-strict: true
+MSVC Release	Check out canonical source	2026-09-30T21:47:44.9062901Z   ssh-user: git
+MSVC Release	Check out canonical source	2026-09-30T21:47:44.9063412Z   persist-credentials: true
+MSVC Release	Check out canonical source	2026-09-30T21:47:44.9063988Z   clean: true
+MSVC Release	Check out canonical source	2026-09-30T21:47:44.9064510Z   sparse-checkout-cone-mode: true
+MSVC Release	Check out canonical source	2026-09-30T21:47:44.9065116Z   fetch-depth: 1
+MSVC Release	Check out canonical source	2026-09-30T21:47:44.9065620Z   fetch-tags: false
+MSVC Release	Check out canonical source	2026-09-30T21:47:44.9066143Z   show-progress: true
+MSVC Release	Check out canonical source	2026-09-30T21:47:44.9066664Z   lfs: false
+MSVC Release	Check out canonical source	2026-09-30T21:47:44.9067151Z   submodules: false
+MSVC Release	Check out canonical source	2026-09-30T21:47:44.9067721Z   set-safe-directory: true
+MSVC Release	Check out canonical source	2026-09-30T21:47:44.9068319Z   allow-unsafe-pr-checkout: false
+MSVC Release	Check out canonical source	2026-09-30T21:47:44.9069145Z ##[endgroup]
+MSVC Release	Check out canonical source	2026-09-30T21:47:45.1131939Z Syncing repository: Samfa12-tech/Pocket-Chordsmith
+MSVC Release	Check out canonical source	2026-09-30T21:47:45.1133930Z ##[group]Getting Git version info
+MSVC Release	Check out canonical source	2026-09-30T21:47:45.1134822Z Working directory is 'D:\a\Pocket-Chordsmith\Pocket-Chordsmith'
+MSVC Release	Check out canonical source	2026-09-30T21:47:45.2741365Z [command]"C:\Program Files\Git\bin\git.exe" version
+MSVC Release	Check out canonical source	2026-09-30T21:47:45.8570128Z git version 2.55.0.windows.5
+MSVC Release	Check out canonical source	2026-09-30T21:47:45.8610710Z ##[endgroup]
+MSVC Release	Check out canonical source	2026-09-30T21:47:45.8625397Z Temporarily overriding HOME='D:\a\_temp\d5d730a9-756c-46de-af30-f46abe69d56f' before making global git config changes
+MSVC Release	Check out canonical source	2026-09-30T21:47:45.8626832Z Adding repository directory to the temporary git global config as a safe directory
+MSVC Release	Check out canonical source	2026-09-30T21:47:45.8635677Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\Pocket-Chordsmith\Pocket-Chordsmith
+MSVC Release	Check out canonical source	2026-09-30T21:47:45.9351335Z Deleting the contents of 'D:\a\Pocket-Chordsmith\Pocket-Chordsmith'
+MSVC Release	Check out canonical source	2026-09-30T21:47:45.9355240Z ##[group]Determining repository object format
+MSVC Release	Check out canonical source	2026-09-30T21:47:45.9357780Z ##[endgroup]
+MSVC Release	Check out canonical source	2026-09-30T21:47:45.9358905Z ##[group]Initializing the repository
+MSVC Release	Check out canonical source	2026-09-30T21:47:45.9366374Z [command]"C:\Program Files\Git\bin\git.exe" init D:\a\Pocket-Chordsmith\Pocket-Chordsmith
+MSVC Release	Check out canonical source	2026-09-30T21:47:46.0560574Z Initialized empty Git repository in D:/a/Pocket-Chordsmith/Pocket-Chordsmith/.git/
+MSVC Release	Check out canonical source	2026-09-30T21:47:46.0596783Z [command]"C:\Program Files\Git\bin\git.exe" remote add origin https://github.com/Samfa12-tech/Pocket-Chordsmith
+MSVC Release	Check out canonical source	2026-09-30T21:47:46.1311325Z ##[endgroup]
+MSVC Release	Check out canonical source	2026-09-30T21:47:46.1312449Z ##[group]Disabling automatic garbage collection
+MSVC Release	Check out canonical source	2026-09-30T21:47:46.1319603Z [command]"C:\Program Files\Git\bin\git.exe" config --local gc.auto 0
+MSVC Release	Check out canonical source	2026-09-30T21:47:46.1538953Z ##[endgroup]
+MSVC Release	Check out canonical source	2026-09-30T21:47:46.1540541Z ##[group]Setting up auth
+MSVC Release	Check out canonical source	2026-09-30T21:47:46.1541690Z Removing SSH command configuration
+MSVC Release	Check out canonical source	2026-09-30T21:47:46.1550662Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+MSVC Release	Check out canonical source	2026-09-30T21:47:46.1828519Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+MSVC Release	Check out canonical source	2026-09-30T21:47:48.1280522Z Removing HTTP extra header
+MSVC Release	Check out canonical source	2026-09-30T21:47:48.1289222Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+MSVC Release	Check out canonical source	2026-09-30T21:47:48.1506897Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+MSVC Release	Check out canonical source	2026-09-30T21:47:48.5560450Z Removing includeIf entries pointing to credentials config files
+MSVC Release	Check out canonical source	2026-09-30T21:47:48.5574930Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+MSVC Release	Check out canonical source	2026-09-30T21:47:48.5803378Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+MSVC Release	Check out canonical source	2026-09-30T21:47:48.9539138Z [command]"C:\Program Files\Git\bin\git.exe" config --file D:\a\_temp\git-credentials-efd085c7-3691-4283-a291-b063b07df043.config http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
+MSVC Release	Check out canonical source	2026-09-30T21:47:48.9772971Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:D:/a/Pocket-Chordsmith/Pocket-Chordsmith/.git.path D:\a\_temp\git-credentials-efd085c7-3691-4283-a291-b063b07df043.config
+MSVC Release	Check out canonical source	2026-09-30T21:47:48.9998523Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:D:/a/Pocket-Chordsmith/Pocket-Chordsmith/.git/worktrees/*.path D:\a\_temp\git-credentials-efd085c7-3691-4283-a291-b063b07df043.config
+MSVC Release	Check out canonical source	2026-09-30T21:47:49.0317536Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-efd085c7-3691-4283-a291-b063b07df043.config
+MSVC Release	Check out canonical source	2026-09-30T21:47:49.0534110Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-efd085c7-3691-4283-a291-b063b07df043.config
+MSVC Release	Check out canonical source	2026-09-30T21:47:49.0767950Z ##[endgroup]
+MSVC Release	Check out canonical source	2026-09-30T21:47:49.0768744Z ##[group]Fetching the repository
+MSVC Release	Check out canonical source	2026-09-30T21:47:49.0784219Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +534a6e6811ce653efd5422138c5772b967263ed0:refs/remotes/origin/codex/horde-native-pcm-core
+MSVC Release	Check out canonical source	2026-09-30T21:47:50.8122189Z From https://github.com/Samfa12-tech/Pocket-Chordsmith
+MSVC Release	Check out canonical source	2026-09-30T21:47:50.8123674Z  * [new ref]         534a6e6811ce653efd5422138c5772b967263ed0 -> origin/codex/horde-native-pcm-core
+MSVC Release	Check out canonical source	2026-09-30T21:47:50.8164159Z [command]"C:\Program Files\Git\bin\git.exe" branch --list --remote origin/codex/horde-native-pcm-core
+MSVC Release	Check out canonical source	2026-09-30T21:47:50.8519132Z   origin/codex/horde-native-pcm-core
+MSVC Release	Check out canonical source	2026-09-30T21:47:50.8550105Z [command]"C:\Program Files\Git\bin\git.exe" rev-parse refs/remotes/origin/codex/horde-native-pcm-core
+MSVC Release	Check out canonical source	2026-09-30T21:47:50.8952618Z 534a6e6811ce653efd5422138c5772b967263ed0
+MSVC Release	Check out canonical source	2026-09-30T21:47:50.8976308Z ##[endgroup]
+MSVC Release	Check out canonical source	2026-09-30T21:47:50.8976774Z ##[group]Determining the checkout info
+MSVC Release	Check out canonical source	2026-09-30T21:47:50.8978435Z ##[endgroup]
+MSVC Release	Check out canonical source	2026-09-30T21:47:50.8985132Z [command]"C:\Program Files\Git\bin\git.exe" sparse-checkout disable
+MSVC Release	Check out canonical source	2026-09-30T21:47:50.9326802Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all extensions.worktreeConfig
+MSVC Release	Check out canonical source	2026-09-30T21:47:50.9541693Z ##[group]Checking out the ref
+MSVC Release	Check out canonical source	2026-09-30T21:47:50.9548667Z [command]"C:\Program Files\Git\bin\git.exe" checkout --progress --force -B codex/horde-native-pcm-core refs/remotes/origin/codex/horde-native-pcm-core
+MSVC Release	Check out canonical source	2026-09-30T21:47:51.2527842Z Switched to a new branch 'codex/horde-native-pcm-core'
+MSVC Release	Check out canonical source	2026-09-30T21:47:51.2620692Z branch 'codex/horde-native-pcm-core' set up to track 'origin/codex/horde-native-pcm-core'.
+MSVC Release	Check out canonical source	2026-09-30T21:47:51.2671052Z ##[endgroup]
+MSVC Release	Check out canonical source	2026-09-30T21:47:51.3031769Z [command]"C:\Program Files\Git\bin\git.exe" log -1 --format=%H
+MSVC Release	Check out canonical source	2026-09-30T21:47:51.3253178Z 534a6e6811ce653efd5422138c5772b967263ed0
+MSVC Release	Configure standalone Core tests	﻿2026-09-30T21:47:51.3636489Z ##[group]Run cmake -S packages/pocket-audio-core/native -B build/native-pcm -DCMAKE_BUILD_TYPE=Release -DPOCKET_AUDIO_NATIVE_BUILD_TESTS=ON
+MSVC Release	Configure standalone Core tests	2026-09-30T21:47:51.3637632Z ^[[36;1mcmake -S packages/pocket-audio-core/native -B build/native-pcm -DCMAKE_BUILD_TYPE=Release -DPOCKET_AUDIO_NATIVE_BUILD_TESTS=ON^[[0m
+MSVC Release	Configure standalone Core tests	2026-09-30T21:47:51.3743223Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+MSVC Release	Configure standalone Core tests	2026-09-30T21:47:51.3743617Z env:
+MSVC Release	Configure standalone Core tests	2026-09-30T21:47:51.3743798Z   CXX: 
+MSVC Release	Configure standalone Core tests	2026-09-30T21:47:51.3743973Z ##[endgroup]
+MSVC Release	Configure standalone Core tests	2026-09-30T21:47:52.9528012Z -- Building for: Visual Studio 17 2022
+MSVC Release	Configure standalone Core tests	2026-09-30T21:47:53.3737476Z -- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.20348.
+MSVC Release	Configure standalone Core tests	2026-09-30T21:48:16.8281215Z -- The CXX compiler identification is MSVC 19.44.35229.0
+MSVC Release	Configure standalone Core tests	2026-09-30T21:48:17.1873794Z -- Detecting CXX compiler ABI info
+MSVC Release	Configure standalone Core tests	2026-09-30T21:48:19.0271609Z -- Detecting CXX compiler ABI info - done
+MSVC Release	Configure standalone Core tests	2026-09-30T21:48:19.0405758Z -- Check for working CXX compiler: C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+MSVC Release	Configure standalone Core tests	2026-09-30T21:48:19.0434908Z -- Detecting CXX compile features
+MSVC Release	Configure standalone Core tests	2026-09-30T21:48:19.0524701Z -- Detecting CXX compile features - done
+MSVC Release	Configure standalone Core tests	2026-09-30T21:48:19.5964002Z -- Configuring done (26.6s)
+MSVC Release	Configure standalone Core tests	2026-09-30T21:48:19.6368684Z -- Generating done (0.0s)
+MSVC Release	Configure standalone Core tests	2026-09-30T21:48:19.6371632Z CMake Warning:
+MSVC Release	Configure standalone Core tests	2026-09-30T21:48:19.6372553Z   Manually-specified variables were not used by the project:
+MSVC Release	Configure standalone Core tests	2026-09-30T21:48:19.6373091Z 
+MSVC Release	Configure standalone Core tests	2026-09-30T21:48:19.6373229Z     CMAKE_BUILD_TYPE
+MSVC Release	Configure standalone Core tests	2026-09-30T21:48:19.6373444Z 
+MSVC Release	Configure standalone Core tests	2026-09-30T21:48:19.6373451Z 
+MSVC Release	Configure standalone Core tests	2026-09-30T21:48:19.6380260Z -- Build files have been written to: D:/a/Pocket-Chordsmith/Pocket-Chordsmith/build/native-pcm
+MSVC Release	Build	﻿2026-09-30T21:48:19.7498645Z ##[group]Run cmake --build build/native-pcm --config Release --parallel 2
+MSVC Release	Build	2026-09-30T21:48:19.7499271Z ^[[36;1mcmake --build build/native-pcm --config Release --parallel 2^[[0m
+MSVC Release	Build	2026-09-30T21:48:19.7540524Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+MSVC Release	Build	2026-09-30T21:48:19.7540899Z ##[endgroup]
+MSVC Release	Build	2026-09-30T21:48:20.0781814Z MSBuild version 17.14.60+43b635718 for .NET Framework
+MSVC Release	Build	2026-09-30T21:48:20.1237524Z 
+MSVC Release	Build	2026-09-30T21:48:20.6590838Z   1>Checking Build System
+MSVC Release	Build	2026-09-30T21:48:20.9445841Z   Building Custom Rule D:/a/Pocket-Chordsmith/Pocket-Chordsmith/packages/pocket-audio-core/native/CMakeLists.txt
+MSVC Release	Build	2026-09-30T21:48:21.0807358Z   PcmLoopStream.cpp
+MSVC Release	Build	2026-09-30T21:48:23.8711806Z   PcmWave.cpp
+MSVC Release	Build	2026-09-30T21:48:24.4259866Z   Generating Code...
+MSVC Release	Build	2026-09-30T21:48:25.1992738Z   pocket_audio_native_pcm.vcxproj -> D:\a\Pocket-Chordsmith\Pocket-Chordsmith\build\native-pcm\Release\pocket_audio_native_pcm.lib
+MSVC Release	Build	2026-09-30T21:48:25.3117261Z   Building Custom Rule D:/a/Pocket-Chordsmith/Pocket-Chordsmith/packages/pocket-audio-core/native/CMakeLists.txt
+MSVC Release	Build	2026-09-30T21:48:25.4402258Z   PcmNativeTests.cpp
+MSVC Release	Build	2026-09-30T21:48:27.9249588Z   pocket_audio_native_pcm_tests.vcxproj -> D:\a\Pocket-Chordsmith\Pocket-Chordsmith\build\native-pcm\Release\pocket_audio_native_pcm_tests.exe
+MSVC Release	Build	2026-09-30T21:48:27.9943614Z   Building Custom Rule D:/a/Pocket-Chordsmith/Pocket-Chordsmith/packages/pocket-audio-core/native/CMakeLists.txt
+MSVC Release	Test	﻿2026-09-30T21:48:28.1879218Z ##[group]Run ctest --test-dir build/native-pcm -C Release --output-on-failure --no-tests=error
+MSVC Release	Test	2026-09-30T21:48:28.1879995Z ^[[36;1mctest --test-dir build/native-pcm -C Release --output-on-failure --no-tests=error^[[0m
+MSVC Release	Test	2026-09-30T21:48:28.1918198Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+MSVC Release	Test	2026-09-30T21:48:28.1918558Z ##[endgroup]
+MSVC Release	Test	2026-09-30T21:48:30.2137332Z Internal ctest changing into directory: D:/a/Pocket-Chordsmith/Pocket-Chordsmith/build/native-pcm
+MSVC Release	Test	2026-09-30T21:48:30.4636403Z Test project D:/a/Pocket-Chordsmith/Pocket-Chordsmith/build/native-pcm
+MSVC Release	Test	2026-09-30T21:48:30.5747587Z     Start 1: pocket_audio_native_pcm_tests
+MSVC Release	Test	2026-09-30T21:48:30.5964965Z 1/1 Test #1: pocket_audio_native_pcm_tests ....   Passed    0.01 sec
+MSVC Release	Test	2026-09-30T21:48:30.5986134Z 
+MSVC Release	Test	2026-09-30T21:48:30.5986510Z 100% tests passed, 0 tests failed out of 1
+MSVC Release	Test	2026-09-30T21:48:30.5987125Z 
+MSVC Release	Test	2026-09-30T21:48:30.5987351Z Total Test time (real) =   0.13 sec
+MSVC Release	Post Check out canonical source	﻿2026-09-30T21:48:30.7759125Z Post job cleanup.
+MSVC Release	Post Check out canonical source	2026-09-30T21:48:30.9576920Z [command]"C:\Program Files\Git\bin\git.exe" version
+MSVC Release	Post Check out canonical source	2026-09-30T21:48:30.9777998Z git version 2.55.0.windows.5
+MSVC Release	Post Check out canonical source	2026-09-30T21:48:30.9845843Z Temporarily overriding HOME='D:\a\_temp\1eb14ee3-8854-4acb-939e-2e9928481742' before making global git config changes
+MSVC Release	Post Check out canonical source	2026-09-30T21:48:30.9847210Z Adding repository directory to the temporary git global config as a safe directory
+MSVC Release	Post Check out canonical source	2026-09-30T21:48:30.9858328Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\Pocket-Chordsmith\Pocket-Chordsmith
+MSVC Release	Post Check out canonical source	2026-09-30T21:48:31.0163053Z Removing SSH command configuration
+MSVC Release	Post Check out canonical source	2026-09-30T21:48:31.0173574Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+MSVC Release	Post Check out canonical source	2026-09-30T21:48:31.0415897Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+MSVC Release	Post Check out canonical source	2026-09-30T21:48:31.5061494Z Removing HTTP extra header
+MSVC Release	Post Check out canonical source	2026-09-30T21:48:31.5071450Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+MSVC Release	Post Check out canonical source	2026-09-30T21:48:31.5313629Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+MSVC Release	Post Check out canonical source	2026-09-30T21:48:31.9574095Z Removing includeIf entries pointing to credentials config files
+MSVC Release	Post Check out canonical source	2026-09-30T21:48:31.9584977Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+MSVC Release	Post Check out canonical source	2026-09-30T21:48:31.9785869Z includeif.gitdir:D:/a/Pocket-Chordsmith/Pocket-Chordsmith/.git.path
+MSVC Release	Post Check out canonical source	2026-09-30T21:48:31.9786791Z includeif.gitdir:D:/a/Pocket-Chordsmith/Pocket-Chordsmith/.git/worktrees/*.path
+MSVC Release	Post Check out canonical source	2026-09-30T21:48:31.9787630Z includeif.gitdir:/github/workspace/.git.path
+MSVC Release	Post Check out canonical source	2026-09-30T21:48:31.9788259Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+MSVC Release	Post Check out canonical source	2026-09-30T21:48:31.9817732Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:D:/a/Pocket-Chordsmith/Pocket-Chordsmith/.git.path
+MSVC Release	Post Check out canonical source	2026-09-30T21:48:32.0008390Z D:\a\_temp\git-credentials-efd085c7-3691-4283-a291-b063b07df043.config
+MSVC Release	Post Check out canonical source	2026-09-30T21:48:32.0042217Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:D:/a/Pocket-Chordsmith/Pocket-Chordsmith/.git.path D\:\\a\\_temp\\git\-credentials\-efd085c7\-3691\-4283\-a291\-b063b07df043\.config
+MSVC Release	Post Check out canonical source	2026-09-30T21:48:32.0326970Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:D:/a/Pocket-Chordsmith/Pocket-Chordsmith/.git/worktrees/*.path
+MSVC Release	Post Check out canonical source	2026-09-30T21:48:32.0521088Z D:\a\_temp\git-credentials-efd085c7-3691-4283-a291-b063b07df043.config
+MSVC Release	Post Check out canonical source	2026-09-30T21:48:32.0549557Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:D:/a/Pocket-Chordsmith/Pocket-Chordsmith/.git/worktrees/*.path D\:\\a\\_temp\\git\-credentials\-efd085c7\-3691\-4283\-a291\-b063b07df043\.config
+MSVC Release	Post Check out canonical source	2026-09-30T21:48:32.0765477Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:/github/workspace/.git.path
+MSVC Release	Post Check out canonical source	2026-09-30T21:48:32.0981428Z /github/runner_temp/git-credentials-efd085c7-3691-4283-a291-b063b07df043.config
+MSVC Release	Post Check out canonical source	2026-09-30T21:48:32.1010479Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-efd085c7\-3691\-4283\-a291\-b063b07df043\.config
+MSVC Release	Post Check out canonical source	2026-09-30T21:48:32.1293707Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+MSVC Release	Post Check out canonical source	2026-09-30T21:48:32.1485099Z /github/runner_temp/git-credentials-efd085c7-3691-4283-a291-b063b07df043.config
+MSVC Release	Post Check out canonical source	2026-09-30T21:48:32.1518413Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-efd085c7\-3691\-4283\-a291\-b063b07df043\.config
+MSVC Release	Post Check out canonical source	2026-09-30T21:48:32.1736889Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+MSVC Release	Post Check out canonical source	2026-09-30T21:48:32.5974390Z Removing credentials config 'D:\a\_temp\git-credentials-efd085c7-3691-4283-a291-b063b07df043.config'
+MSVC Release	Complete job	﻿2026-09-30T21:48:32.6141496Z Cleaning up orphan processes
+MSVC Release	Complete job	2026-09-30T21:48:32.6338617Z Terminate orphan process: pid (1388) (vctip)
+MSVC Release	Complete job	2026-09-30T21:48:32.6448712Z Terminate orphan process: pid (7076) (MSBuild)
+MSVC Release	Complete job	2026-09-30T21:48:32.6593909Z Terminate orphan process: pid (5600) (conhost)
+Clang Release	Set up job	﻿2026-09-30T21:47:39.4320629Z Current runner version: '2.337.0'
+Clang Release	Set up job	2026-09-30T21:47:39.4341733Z ##[group]Runner Image Provisioner
+Clang Release	Set up job	2026-09-30T21:47:39.4342425Z Hosted Compute Agent
+Clang Release	Set up job	2026-09-30T21:47:39.4342866Z Version: 20260901.588
+Clang Release	Set up job	2026-09-30T21:47:39.4343327Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+Clang Release	Set up job	2026-09-30T21:47:39.4343765Z Build Date: 2026-09-01T19:56:44Z
+Clang Release	Set up job	2026-09-30T21:47:39.4344412Z Worker ID: {5bb6cebb-4156-40fe-ab18-629c3f23caa3}
+Clang Release	Set up job	2026-09-30T21:47:39.4344853Z Azure Region: westus3
+Clang Release	Set up job	2026-09-30T21:47:39.4345235Z ##[endgroup]
+Clang Release	Set up job	2026-09-30T21:47:39.4346431Z ##[group]Operating System
+Clang Release	Set up job	2026-09-30T21:47:39.4346978Z Ubuntu
+Clang Release	Set up job	2026-09-30T21:47:39.4347568Z 24.04.5
+Clang Release	Set up job	2026-09-30T21:47:39.4347995Z LTS
+Clang Release	Set up job	2026-09-30T21:47:39.4348466Z ##[endgroup]
+Clang Release	Set up job	2026-09-30T21:47:39.4348918Z ##[group]Runner Image
+Clang Release	Set up job	2026-09-30T21:47:39.4349295Z Image: ubuntu-24.04
+Clang Release	Set up job	2026-09-30T21:47:39.4349719Z Version: 20260927.320.1
+Clang Release	Set up job	2026-09-30T21:47:39.4350358Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+Clang Release	Set up job	2026-09-30T21:47:39.4351506Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+Clang Release	Set up job	2026-09-30T21:47:39.4352083Z ##[endgroup]
+Clang Release	Set up job	2026-09-30T21:47:39.4352866Z ##[group]GITHUB_TOKEN Permissions
+Clang Release	Set up job	2026-09-30T21:47:39.4354568Z Contents: read
+Clang Release	Set up job	2026-09-30T21:47:39.4355360Z Metadata: read
+Clang Release	Set up job	2026-09-30T21:47:39.4355710Z ##[endgroup]
+Clang Release	Set up job	2026-09-30T21:47:39.4357331Z Secret source: Actions
+Clang Release	Set up job	2026-09-30T21:47:39.4358012Z Cache mode: write
+Clang Release	Set up job	2026-09-30T21:47:39.4358596Z Prepare workflow directory
+Clang Release	Set up job	2026-09-30T21:47:39.4635027Z Prepare all required actions
+Clang Release	Set up job	2026-09-30T21:47:39.4670431Z Getting action download info
+Clang Release	Set up job	2026-09-30T21:47:39.8143405Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+Clang Release	Set up job	2026-09-30T21:47:40.1590394Z Complete job name: Clang Release
+Clang Release	Check out canonical source	﻿2026-09-30T21:47:40.2167465Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+Clang Release	Check out canonical source	2026-09-30T21:47:40.2168045Z with:
+Clang Release	Check out canonical source	2026-09-30T21:47:40.2168327Z   repository: Samfa12-tech/Pocket-Chordsmith
+Clang Release	Check out canonical source	2026-09-30T21:47:40.2170678Z   token: ***
+Clang Release	Check out canonical source	2026-09-30T21:47:40.2170930Z   ssh-strict: true
+Clang Release	Check out canonical source	2026-09-30T21:47:40.2171187Z   ssh-user: git
+Clang Release	Check out canonical source	2026-09-30T21:47:40.2171445Z   persist-credentials: true
+Clang Release	Check out canonical source	2026-09-30T21:47:40.2171728Z   clean: true
+Clang Release	Check out canonical source	2026-09-30T21:47:40.2171995Z   sparse-checkout-cone-mode: true
+Clang Release	Check out canonical source	2026-09-30T21:47:40.2172295Z   fetch-depth: 1
+Clang Release	Check out canonical source	2026-09-30T21:47:40.2172548Z   fetch-tags: false
+Clang Release	Check out canonical source	2026-09-30T21:47:40.2172807Z   show-progress: true
+Clang Release	Check out canonical source	2026-09-30T21:47:40.2173065Z   lfs: false
+Clang Release	Check out canonical source	2026-09-30T21:47:40.2173309Z   submodules: false
+Clang Release	Check out canonical source	2026-09-30T21:47:40.2173573Z   set-safe-directory: true
+Clang Release	Check out canonical source	2026-09-30T21:47:40.2173985Z   allow-unsafe-pr-checkout: false
+Clang Release	Check out canonical source	2026-09-30T21:47:40.2174358Z ##[endgroup]
+Clang Release	Check out canonical source	2026-09-30T21:47:40.2906155Z Syncing repository: Samfa12-tech/Pocket-Chordsmith
+Clang Release	Check out canonical source	2026-09-30T21:47:40.2908134Z ##[group]Getting Git version info
+Clang Release	Check out canonical source	2026-09-30T21:47:40.2908956Z Working directory is '/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith'
+Clang Release	Check out canonical source	2026-09-30T21:47:40.2910009Z [command]/usr/bin/git version
+Clang Release	Check out canonical source	2026-09-30T21:47:40.2986971Z git version 2.55.0
+Clang Release	Check out canonical source	2026-09-30T21:47:40.3000538Z ##[endgroup]
+Clang Release	Check out canonical source	2026-09-30T21:47:40.3011215Z Temporarily overriding HOME='/home/runner/work/_temp/87eb591a-8c83-4744-9a6a-ab448c318523' before making global git config changes
+Clang Release	Check out canonical source	2026-09-30T21:47:40.3012515Z Adding repository directory to the temporary git global config as a safe directory
+Clang Release	Check out canonical source	2026-09-30T21:47:40.3016374Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith
+Clang Release	Check out canonical source	2026-09-30T21:47:40.3752935Z Deleting the contents of '/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith'
+Clang Release	Check out canonical source	2026-09-30T21:47:40.3756434Z ##[group]Determining repository object format
+Clang Release	Check out canonical source	2026-09-30T21:47:40.3757818Z ##[endgroup]
+Clang Release	Check out canonical source	2026-09-30T21:47:40.3758519Z ##[group]Initializing the repository
+Clang Release	Check out canonical source	2026-09-30T21:47:40.3762111Z [command]/usr/bin/git init /home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith
+Clang Release	Check out canonical source	2026-09-30T21:47:40.4952055Z hint: Using 'master' as the name for the initial branch. This default branch name
+Clang Release	Check out canonical source	2026-09-30T21:47:40.4954159Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+Clang Release	Check out canonical source	2026-09-30T21:47:40.4955278Z hint: to use in all of your new repositories, which will suppress this warning,
+Clang Release	Check out canonical source	2026-09-30T21:47:40.4956185Z hint: call:
+Clang Release	Check out canonical source	2026-09-30T21:47:40.4956680Z hint:
+Clang Release	Check out canonical source	2026-09-30T21:47:40.4957278Z hint: 	git config --global init.defaultBranch <name>
+Clang Release	Check out canonical source	2026-09-30T21:47:40.4957895Z hint:
+Clang Release	Check out canonical source	2026-09-30T21:47:40.4958485Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+Clang Release	Check out canonical source	2026-09-30T21:47:40.4959679Z hint: 'development'. The just-created branch can be renamed via this command:
+Clang Release	Check out canonical source	2026-09-30T21:47:40.4960505Z hint:
+Clang Release	Check out canonical source	2026-09-30T21:47:40.4960973Z hint: 	git branch -m <name>
+Clang Release	Check out canonical source	2026-09-30T21:47:40.4961523Z hint:
+Clang Release	Check out canonical source	2026-09-30T21:47:40.4962196Z hint: Disable this message with "git config set advice.defaultBranchName false"
+Clang Release	Check out canonical source	2026-09-30T21:47:40.4963464Z Initialized empty Git repository in /home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git/
+Clang Release	Check out canonical source	2026-09-30T21:47:40.4965613Z [command]/usr/bin/git remote add origin https://github.com/Samfa12-tech/Pocket-Chordsmith
+Clang Release	Check out canonical source	2026-09-30T21:47:40.5249802Z ##[endgroup]
+Clang Release	Check out canonical source	2026-09-30T21:47:40.5250697Z ##[group]Disabling automatic garbage collection
+Clang Release	Check out canonical source	2026-09-30T21:47:40.5251444Z [command]/usr/bin/git config --local gc.auto 0
+Clang Release	Check out canonical source	2026-09-30T21:47:40.5448690Z ##[endgroup]
+Clang Release	Check out canonical source	2026-09-30T21:47:40.5449639Z ##[group]Setting up auth
+Clang Release	Check out canonical source	2026-09-30T21:47:40.5450272Z Removing SSH command configuration
+Clang Release	Check out canonical source	2026-09-30T21:47:40.5454233Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Clang Release	Check out canonical source	2026-09-30T21:47:40.5488989Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Clang Release	Check out canonical source	2026-09-30T21:47:40.6053747Z Removing HTTP extra header
+Clang Release	Check out canonical source	2026-09-30T21:47:40.6058496Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Clang Release	Check out canonical source	2026-09-30T21:47:40.6091743Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Clang Release	Check out canonical source	2026-09-30T21:47:40.6287586Z Removing includeIf entries pointing to credentials config files
+Clang Release	Check out canonical source	2026-09-30T21:47:40.6292278Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Clang Release	Check out canonical source	2026-09-30T21:47:40.6325526Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Clang Release	Check out canonical source	2026-09-30T21:47:40.6531831Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-b2027b71-9850-4beb-94da-f28013c17c0d.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+Clang Release	Check out canonical source	2026-09-30T21:47:40.6635877Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git.path /home/runner/work/_temp/git-credentials-b2027b71-9850-4beb-94da-f28013c17c0d.config
+Clang Release	Check out canonical source	2026-09-30T21:47:40.6756403Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-b2027b71-9850-4beb-94da-f28013c17c0d.config
+Clang Release	Check out canonical source	2026-09-30T21:47:40.6836347Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-b2027b71-9850-4beb-94da-f28013c17c0d.config
+Clang Release	Check out canonical source	2026-09-30T21:47:40.6942875Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-b2027b71-9850-4beb-94da-f28013c17c0d.config
+Clang Release	Check out canonical source	2026-09-30T21:47:40.7041670Z ##[endgroup]
+Clang Release	Check out canonical source	2026-09-30T21:47:40.7042336Z ##[group]Fetching the repository
+Clang Release	Check out canonical source	2026-09-30T21:47:40.7047941Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +534a6e6811ce653efd5422138c5772b967263ed0:refs/remotes/origin/codex/horde-native-pcm-core
+Clang Release	Check out canonical source	2026-09-30T21:47:42.3771777Z From https://github.com/Samfa12-tech/Pocket-Chordsmith
+Clang Release	Check out canonical source	2026-09-30T21:47:42.3774010Z  * [new ref]         534a6e6811ce653efd5422138c5772b967263ed0 -> origin/codex/horde-native-pcm-core
+Clang Release	Check out canonical source	2026-09-30T21:47:42.3781986Z [command]/usr/bin/git branch --list --remote origin/codex/horde-native-pcm-core
+Clang Release	Check out canonical source	2026-09-30T21:47:42.3816170Z   origin/codex/horde-native-pcm-core
+Clang Release	Check out canonical source	2026-09-30T21:47:42.3827221Z [command]/usr/bin/git rev-parse refs/remotes/origin/codex/horde-native-pcm-core
+Clang Release	Check out canonical source	2026-09-30T21:47:42.3857963Z 534a6e6811ce653efd5422138c5772b967263ed0
+Clang Release	Check out canonical source	2026-09-30T21:47:42.3866137Z ##[endgroup]
+Clang Release	Check out canonical source	2026-09-30T21:47:42.3866826Z ##[group]Determining the checkout info
+Clang Release	Check out canonical source	2026-09-30T21:47:42.3867467Z ##[endgroup]
+Clang Release	Check out canonical source	2026-09-30T21:47:42.3868200Z [command]/usr/bin/git sparse-checkout disable
+Clang Release	Check out canonical source	2026-09-30T21:47:42.3934120Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+Clang Release	Check out canonical source	2026-09-30T21:47:42.4112910Z ##[group]Checking out the ref
+Clang Release	Check out canonical source	2026-09-30T21:47:42.4118073Z [command]/usr/bin/git checkout --progress --force -B codex/horde-native-pcm-core refs/remotes/origin/codex/horde-native-pcm-core
+Clang Release	Check out canonical source	2026-09-30T21:47:42.5116201Z Switched to a new branch 'codex/horde-native-pcm-core'
+Clang Release	Check out canonical source	2026-09-30T21:47:42.5118105Z branch 'codex/horde-native-pcm-core' set up to track 'origin/codex/horde-native-pcm-core'.
+Clang Release	Check out canonical source	2026-09-30T21:47:42.5218113Z ##[endgroup]
+Clang Release	Check out canonical source	2026-09-30T21:47:42.5220939Z [command]/usr/bin/git log -1 --format=%H
+Clang Release	Check out canonical source	2026-09-30T21:47:42.5252106Z 534a6e6811ce653efd5422138c5772b967263ed0
+Clang Release	Configure standalone Core tests	﻿2026-09-30T21:47:42.5482985Z ##[group]Run cmake -S packages/pocket-audio-core/native -B build/native-pcm -DCMAKE_BUILD_TYPE=Release -DPOCKET_AUDIO_NATIVE_BUILD_TESTS=ON
+Clang Release	Configure standalone Core tests	2026-09-30T21:47:42.5485404Z ^[[36;1mcmake -S packages/pocket-audio-core/native -B build/native-pcm -DCMAKE_BUILD_TYPE=Release -DPOCKET_AUDIO_NATIVE_BUILD_TESTS=ON^[[0m
+Clang Release	Configure standalone Core tests	2026-09-30T21:47:42.6308451Z shell: /usr/bin/bash -e {0}
+Clang Release	Configure standalone Core tests	2026-09-30T21:47:42.6309085Z env:
+Clang Release	Configure standalone Core tests	2026-09-30T21:47:42.6309390Z   CXX: clang++
+Clang Release	Configure standalone Core tests	2026-09-30T21:47:42.6309722Z ##[endgroup]
+Clang Release	Configure standalone Core tests	2026-09-30T21:47:48.6822693Z -- The CXX compiler identification is Clang 18.1.3
+Clang Release	Configure standalone Core tests	2026-09-30T21:47:48.9926277Z -- Detecting CXX compiler ABI info
+Clang Release	Configure standalone Core tests	2026-09-30T21:47:49.3963378Z -- Detecting CXX compiler ABI info - done
+Clang Release	Configure standalone Core tests	2026-09-30T21:47:49.4061834Z -- Check for working CXX compiler: /usr/bin/clang++ - skipped
+Clang Release	Configure standalone Core tests	2026-09-30T21:47:49.4105410Z -- Detecting CXX compile features
+Clang Release	Configure standalone Core tests	2026-09-30T21:47:49.4152985Z -- Detecting CXX compile features - done
+Clang Release	Configure standalone Core tests	2026-09-30T21:47:49.4507424Z -- Configuring done (6.1s)
+Clang Release	Configure standalone Core tests	2026-09-30T21:47:49.4974757Z -- Generating done (0.0s)
+Clang Release	Configure standalone Core tests	2026-09-30T21:47:49.4975852Z -- Build files have been written to: /home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/build/native-pcm
+Clang Release	Build	﻿2026-09-30T21:47:49.5079881Z ##[group]Run cmake --build build/native-pcm --config Release --parallel 2
+Clang Release	Build	2026-09-30T21:47:49.5080248Z ^[[36;1mcmake --build build/native-pcm --config Release --parallel 2^[[0m
+Clang Release	Build	2026-09-30T21:47:49.5136398Z shell: /usr/bin/bash -e {0}
+Clang Release	Build	2026-09-30T21:47:49.5136592Z ##[endgroup]
+Clang Release	Build	2026-09-30T21:47:49.5343582Z [ 20%] Building CXX object CMakeFiles/pocket_audio_native_pcm.dir/src/PcmLoopStream.cpp.o
+Clang Release	Build	2026-09-30T21:47:49.5344761Z [ 40%] Building CXX object CMakeFiles/pocket_audio_native_pcm.dir/src/PcmWave.cpp.o
+Clang Release	Build	2026-09-30T21:47:51.3591174Z [ 60%] Linking CXX static library libpocket_audio_native_pcm.a
+Clang Release	Build	2026-09-30T21:47:56.0722196Z [ 60%] Built target pocket_audio_native_pcm
+Clang Release	Build	2026-09-30T21:47:56.0783521Z [ 80%] Building CXX object CMakeFiles/pocket_audio_native_pcm_tests.dir/tests/PcmNativeTests.cpp.o
+Clang Release	Build	2026-09-30T21:47:57.0120391Z [100%] Linking CXX executable pocket_audio_native_pcm_tests
+Clang Release	Build	2026-09-30T21:47:57.0634241Z [100%] Built target pocket_audio_native_pcm_tests
+Clang Release	Test	﻿2026-09-30T21:47:57.0695640Z ##[group]Run ctest --test-dir build/native-pcm -C Release --output-on-failure --no-tests=error
+Clang Release	Test	2026-09-30T21:47:57.0696050Z ^[[36;1mctest --test-dir build/native-pcm -C Release --output-on-failure --no-tests=error^[[0m
+Clang Release	Test	2026-09-30T21:47:57.0750526Z shell: /usr/bin/bash -e {0}
+Clang Release	Test	2026-09-30T21:47:57.0750702Z ##[endgroup]
+Clang Release	Test	2026-09-30T21:47:57.5977190Z Internal ctest changing into directory: /home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/build/native-pcm
+Clang Release	Test	2026-09-30T21:47:57.6614865Z Test project /home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/build/native-pcm
+Clang Release	Test	2026-09-30T21:47:57.7056240Z     Start 1: pocket_audio_native_pcm_tests
+Clang Release	Test	2026-09-30T21:47:57.7126872Z 1/1 Test #1: pocket_audio_native_pcm_tests ....   Passed    0.00 sec
+Clang Release	Test	2026-09-30T21:47:57.7186711Z 
+Clang Release	Test	2026-09-30T21:47:57.7186858Z 100% tests passed, 0 tests failed out of 1
+Clang Release	Test	2026-09-30T21:47:57.7187022Z 
+Clang Release	Test	2026-09-30T21:47:57.7187107Z Total Test time (real) =   0.06 sec
+Clang Release	Post Check out canonical source	﻿2026-09-30T21:47:57.7934295Z Post job cleanup.
+Clang Release	Post Check out canonical source	2026-09-30T21:47:57.8524158Z [command]/usr/bin/git version
+Clang Release	Post Check out canonical source	2026-09-30T21:47:57.8560652Z git version 2.55.0
+Clang Release	Post Check out canonical source	2026-09-30T21:47:57.8596238Z Temporarily overriding HOME='/home/runner/work/_temp/2ed4e9de-8d48-4d76-9a54-95804f758162' before making global git config changes
+Clang Release	Post Check out canonical source	2026-09-30T21:47:57.8597227Z Adding repository directory to the temporary git global config as a safe directory
+Clang Release	Post Check out canonical source	2026-09-30T21:47:57.8602377Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith
+Clang Release	Post Check out canonical source	2026-09-30T21:47:57.8639835Z Removing SSH command configuration
+Clang Release	Post Check out canonical source	2026-09-30T21:47:57.8643158Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Clang Release	Post Check out canonical source	2026-09-30T21:47:57.8682660Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Clang Release	Post Check out canonical source	2026-09-30T21:47:57.8895968Z Removing HTTP extra header
+Clang Release	Post Check out canonical source	2026-09-30T21:47:57.8901633Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Clang Release	Post Check out canonical source	2026-09-30T21:47:57.8939485Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Clang Release	Post Check out canonical source	2026-09-30T21:47:57.9153711Z Removing includeIf entries pointing to credentials config files
+Clang Release	Post Check out canonical source	2026-09-30T21:47:57.9160110Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Clang Release	Post Check out canonical source	2026-09-30T21:47:57.9189925Z includeif.gitdir:/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git.path
+Clang Release	Post Check out canonical source	2026-09-30T21:47:57.9190369Z includeif.gitdir:/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git/worktrees/*.path
+Clang Release	Post Check out canonical source	2026-09-30T21:47:57.9190672Z includeif.gitdir:/github/workspace/.git.path
+Clang Release	Post Check out canonical source	2026-09-30T21:47:57.9190883Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+Clang Release	Post Check out canonical source	2026-09-30T21:47:57.9197763Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git.path
+Clang Release	Post Check out canonical source	2026-09-30T21:47:57.9222428Z /home/runner/work/_temp/git-credentials-b2027b71-9850-4beb-94da-f28013c17c0d.config
+Clang Release	Post Check out canonical source	2026-09-30T21:47:57.9230894Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-b2027b71\-9850\-4beb\-94da\-f28013c17c0d\.config
+Clang Release	Post Check out canonical source	2026-09-30T21:47:57.9266023Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git/worktrees/*.path
+Clang Release	Post Check out canonical source	2026-09-30T21:47:57.9289746Z /home/runner/work/_temp/git-credentials-b2027b71-9850-4beb-94da-f28013c17c0d.config
+Clang Release	Post Check out canonical source	2026-09-30T21:47:57.9296503Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-b2027b71\-9850\-4beb\-94da\-f28013c17c0d\.config
+Clang Release	Post Check out canonical source	2026-09-30T21:47:57.9337947Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+Clang Release	Post Check out canonical source	2026-09-30T21:47:57.9362625Z /github/runner_temp/git-credentials-b2027b71-9850-4beb-94da-f28013c17c0d.config
+Clang Release	Post Check out canonical source	2026-09-30T21:47:57.9368990Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-b2027b71\-9850\-4beb\-94da\-f28013c17c0d\.config
+Clang Release	Post Check out canonical source	2026-09-30T21:47:57.9401495Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+Clang Release	Post Check out canonical source	2026-09-30T21:47:57.9425372Z /github/runner_temp/git-credentials-b2027b71-9850-4beb-94da-f28013c17c0d.config
+Clang Release	Post Check out canonical source	2026-09-30T21:47:57.9431726Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-b2027b71\-9850\-4beb\-94da\-f28013c17c0d\.config
+Clang Release	Post Check out canonical source	2026-09-30T21:47:57.9467799Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Clang Release	Post Check out canonical source	2026-09-30T21:47:57.9657805Z Removing credentials config '/home/runner/work/_temp/git-credentials-b2027b71-9850-4beb-94da-f28013c17c0d.config'
+Clang Release	Complete job	﻿2026-09-30T21:47:57.9786355Z Cleaning up orphan processes
+GCC Debug	Set up job	﻿2026-09-30T21:47:39.3758314Z Current runner version: '2.337.0'
+GCC Debug	Set up job	2026-09-30T21:47:39.3795252Z ##[group]Runner Image Provisioner
+GCC Debug	Set up job	2026-09-30T21:47:39.3796923Z Hosted Compute Agent
+GCC Debug	Set up job	2026-09-30T21:47:39.3798038Z Version: 20260901.588
+GCC Debug	Set up job	2026-09-30T21:47:39.3799118Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+GCC Debug	Set up job	2026-09-30T21:47:39.3800393Z Build Date: 2026-09-01T19:56:44Z
+GCC Debug	Set up job	2026-09-30T21:47:39.3801567Z Worker ID: {f56e6cdd-1040-47b3-a7a7-fc4452cd7013}
+GCC Debug	Set up job	2026-09-30T21:47:39.3802751Z Azure Region: eastus2
+GCC Debug	Set up job	2026-09-30T21:47:39.3803862Z ##[endgroup]
+GCC Debug	Set up job	2026-09-30T21:47:39.3806483Z ##[group]Operating System
+GCC Debug	Set up job	2026-09-30T21:47:39.3807748Z Ubuntu
+GCC Debug	Set up job	2026-09-30T21:47:39.3808703Z 24.04.5
+GCC Debug	Set up job	2026-09-30T21:47:39.3809639Z LTS
+GCC Debug	Set up job	2026-09-30T21:47:39.3810568Z ##[endgroup]
+GCC Debug	Set up job	2026-09-30T21:47:39.3811476Z ##[group]Runner Image
+GCC Debug	Set up job	2026-09-30T21:47:39.3812592Z Image: ubuntu-24.04
+GCC Debug	Set up job	2026-09-30T21:47:39.3813505Z Version: 20260927.320.1
+GCC Debug	Set up job	2026-09-30T21:47:39.3815294Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+GCC Debug	Set up job	2026-09-30T21:47:39.3818803Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+GCC Debug	Set up job	2026-09-30T21:47:39.3821138Z ##[endgroup]
+GCC Debug	Set up job	2026-09-30T21:47:39.3823046Z ##[group]GITHUB_TOKEN Permissions
+GCC Debug	Set up job	2026-09-30T21:47:39.3826089Z Contents: read
+GCC Debug	Set up job	2026-09-30T21:47:39.3827379Z Metadata: read
+GCC Debug	Set up job	2026-09-30T21:47:39.3828355Z ##[endgroup]
+GCC Debug	Set up job	2026-09-30T21:47:39.3831341Z Secret source: Actions
+GCC Debug	Set up job	2026-09-30T21:47:39.3833030Z Cache mode: write
+GCC Debug	Set up job	2026-09-30T21:47:39.3834467Z Prepare workflow directory
+GCC Debug	Set up job	2026-09-30T21:47:39.4317849Z Prepare all required actions
+GCC Debug	Set up job	2026-09-30T21:47:39.4388670Z Getting action download info
+GCC Debug	Set up job	2026-09-30T21:47:39.6404181Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+GCC Debug	Set up job	2026-09-30T21:47:39.8167277Z Complete job name: GCC Debug
+GCC Debug	Check out canonical source	﻿2026-09-30T21:47:39.9261955Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+GCC Debug	Check out canonical source	2026-09-30T21:47:39.9263062Z with:
+GCC Debug	Check out canonical source	2026-09-30T21:47:39.9263563Z   repository: Samfa12-tech/Pocket-Chordsmith
+GCC Debug	Check out canonical source	2026-09-30T21:47:39.9268126Z   token: ***
+GCC Debug	Check out canonical source	2026-09-30T21:47:39.9268593Z   ssh-strict: true
+GCC Debug	Check out canonical source	2026-09-30T21:47:39.9269038Z   ssh-user: git
+GCC Debug	Check out canonical source	2026-09-30T21:47:39.9269497Z   persist-credentials: true
+GCC Debug	Check out canonical source	2026-09-30T21:47:39.9269991Z   clean: true
+GCC Debug	Check out canonical source	2026-09-30T21:47:39.9270435Z   sparse-checkout-cone-mode: true
+GCC Debug	Check out canonical source	2026-09-30T21:47:39.9270963Z   fetch-depth: 1
+GCC Debug	Check out canonical source	2026-09-30T21:47:39.9271404Z   fetch-tags: false
+GCC Debug	Check out canonical source	2026-09-30T21:47:39.9271857Z   show-progress: true
+GCC Debug	Check out canonical source	2026-09-30T21:47:39.9272305Z   lfs: false
+GCC Debug	Check out canonical source	2026-09-30T21:47:39.9272724Z   submodules: false
+GCC Debug	Check out canonical source	2026-09-30T21:47:39.9273180Z   set-safe-directory: true
+GCC Debug	Check out canonical source	2026-09-30T21:47:39.9273689Z   allow-unsafe-pr-checkout: false
+GCC Debug	Check out canonical source	2026-09-30T21:47:39.9274505Z ##[endgroup]
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0327468Z Syncing repository: Samfa12-tech/Pocket-Chordsmith
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0330612Z ##[group]Getting Git version info
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0332253Z Working directory is '/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith'
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0334329Z [command]/usr/bin/git version
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0401608Z git version 2.55.0
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0433967Z ##[endgroup]
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0443899Z Temporarily overriding HOME='/home/runner/work/_temp/cb123ef0-242c-45a9-8f10-3171d52df7a3' before making global git config changes
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0448702Z Adding repository directory to the temporary git global config as a safe directory
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0451464Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0506077Z Deleting the contents of '/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith'
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0516976Z ##[group]Determining repository object format
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0518681Z ##[endgroup]
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0520215Z ##[group]Initializing the repository
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0521722Z [command]/usr/bin/git init /home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0660656Z hint: Using 'master' as the name for the initial branch. This default branch name
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0662374Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0663855Z hint: to use in all of your new repositories, which will suppress this warning,
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0664732Z hint: call:
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0665199Z hint:
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0665789Z hint: 	git config --global init.defaultBranch <name>
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0666946Z hint:
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0667967Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0669774Z hint: 'development'. The just-created branch can be renamed via this command:
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0671300Z hint:
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0672123Z hint: 	git branch -m <name>
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0673062Z hint:
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0674295Z hint: Disable this message with "git config set advice.defaultBranchName false"
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0685632Z Initialized empty Git repository in /home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git/
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0700745Z [command]/usr/bin/git remote add origin https://github.com/Samfa12-tech/Pocket-Chordsmith
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0794645Z ##[endgroup]
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0796032Z ##[group]Disabling automatic garbage collection
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0800723Z [command]/usr/bin/git config --local gc.auto 0
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0842486Z ##[endgroup]
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0843834Z ##[group]Setting up auth
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0844847Z Removing SSH command configuration
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0848834Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.0897834Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.1279610Z Removing HTTP extra header
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.1285539Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.1323743Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.1548511Z Removing includeIf entries pointing to credentials config files
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.1554321Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.1600543Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.1830763Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-eca4f33f-f48b-49ef-8dcc-02caa63221c2.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.1872729Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git.path /home/runner/work/_temp/git-credentials-eca4f33f-f48b-49ef-8dcc-02caa63221c2.config
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.1908503Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-eca4f33f-f48b-49ef-8dcc-02caa63221c2.config
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.1947564Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-eca4f33f-f48b-49ef-8dcc-02caa63221c2.config
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.1985177Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-eca4f33f-f48b-49ef-8dcc-02caa63221c2.config
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.2020150Z ##[endgroup]
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.2020933Z ##[group]Fetching the repository
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.2029016Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +534a6e6811ce653efd5422138c5772b967263ed0:refs/remotes/origin/codex/horde-native-pcm-core
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.9764769Z From https://github.com/Samfa12-tech/Pocket-Chordsmith
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.9768479Z  * [new ref]         534a6e6811ce653efd5422138c5772b967263ed0 -> origin/codex/horde-native-pcm-core
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.9784334Z [command]/usr/bin/git branch --list --remote origin/codex/horde-native-pcm-core
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.9805671Z   origin/codex/horde-native-pcm-core
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.9814810Z [command]/usr/bin/git rev-parse refs/remotes/origin/codex/horde-native-pcm-core
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.9842433Z 534a6e6811ce653efd5422138c5772b967263ed0
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.9847575Z ##[endgroup]
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.9848908Z ##[group]Determining the checkout info
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.9851293Z ##[endgroup]
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.9852915Z [command]/usr/bin/git sparse-checkout disable
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.9911658Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.9947454Z ##[group]Checking out the ref
+GCC Debug	Check out canonical source	2026-09-30T21:47:40.9954245Z [command]/usr/bin/git checkout --progress --force -B codex/horde-native-pcm-core refs/remotes/origin/codex/horde-native-pcm-core
+GCC Debug	Check out canonical source	2026-09-30T21:47:41.1123500Z Switched to a new branch 'codex/horde-native-pcm-core'
+GCC Debug	Check out canonical source	2026-09-30T21:47:41.1128169Z branch 'codex/horde-native-pcm-core' set up to track 'origin/codex/horde-native-pcm-core'.
+GCC Debug	Check out canonical source	2026-09-30T21:47:41.1142069Z ##[endgroup]
+GCC Debug	Check out canonical source	2026-09-30T21:47:41.1195405Z [command]/usr/bin/git log -1 --format=%H
+GCC Debug	Check out canonical source	2026-09-30T21:47:41.1227092Z 534a6e6811ce653efd5422138c5772b967263ed0
+GCC Debug	Configure standalone Core tests	﻿2026-09-30T21:47:41.1539790Z ##[group]Run cmake -S packages/pocket-audio-core/native -B build/native-pcm -DCMAKE_BUILD_TYPE=Debug -DPOCKET_AUDIO_NATIVE_BUILD_TESTS=ON
+GCC Debug	Configure standalone Core tests	2026-09-30T21:47:41.1544277Z ^[[36;1mcmake -S packages/pocket-audio-core/native -B build/native-pcm -DCMAKE_BUILD_TYPE=Debug -DPOCKET_AUDIO_NATIVE_BUILD_TESTS=ON^[[0m
+GCC Debug	Configure standalone Core tests	2026-09-30T21:47:41.1815814Z shell: /usr/bin/bash -e {0}
+GCC Debug	Configure standalone Core tests	2026-09-30T21:47:41.1817340Z env:
+GCC Debug	Configure standalone Core tests	2026-09-30T21:47:41.1818302Z   CXX: g++
+GCC Debug	Configure standalone Core tests	2026-09-30T21:47:41.1819274Z ##[endgroup]
+GCC Debug	Configure standalone Core tests	2026-09-30T21:47:42.9467314Z -- The CXX compiler identification is GNU 13.3.0
+GCC Debug	Configure standalone Core tests	2026-09-30T21:47:42.9742151Z -- Detecting CXX compiler ABI info
+GCC Debug	Configure standalone Core tests	2026-09-30T21:47:43.1276703Z -- Detecting CXX compiler ABI info - done
+GCC Debug	Configure standalone Core tests	2026-09-30T21:47:43.1453196Z -- Check for working CXX compiler: /usr/bin/g++ - skipped
+GCC Debug	Configure standalone Core tests	2026-09-30T21:47:43.1460170Z -- Detecting CXX compile features
+GCC Debug	Configure standalone Core tests	2026-09-30T21:47:43.1469688Z -- Detecting CXX compile features - done
+GCC Debug	Configure standalone Core tests	2026-09-30T21:47:43.1651142Z -- Configuring done (1.9s)
+GCC Debug	Configure standalone Core tests	2026-09-30T21:47:43.1865204Z -- Generating done (0.0s)
+GCC Debug	Configure standalone Core tests	2026-09-30T21:47:43.1868998Z -- Build files have been written to: /home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/build/native-pcm
+GCC Debug	Build	﻿2026-09-30T21:47:43.1936640Z ##[group]Run cmake --build build/native-pcm --config Debug --parallel 2
+GCC Debug	Build	2026-09-30T21:47:43.1937280Z ^[[36;1mcmake --build build/native-pcm --config Debug --parallel 2^[[0m
+GCC Debug	Build	2026-09-30T21:47:43.2002257Z shell: /usr/bin/bash -e {0}
+GCC Debug	Build	2026-09-30T21:47:43.2002579Z ##[endgroup]
+GCC Debug	Build	2026-09-30T21:47:43.2244228Z [ 20%] Building CXX object CMakeFiles/pocket_audio_native_pcm.dir/src/PcmLoopStream.cpp.o
+GCC Debug	Build	2026-09-30T21:47:43.2245871Z [ 40%] Building CXX object CMakeFiles/pocket_audio_native_pcm.dir/src/PcmWave.cpp.o
+GCC Debug	Build	2026-09-30T21:47:44.4885063Z [ 60%] Linking CXX static library libpocket_audio_native_pcm.a
+GCC Debug	Build	2026-09-30T21:47:45.2262396Z [ 60%] Built target pocket_audio_native_pcm
+GCC Debug	Build	2026-09-30T21:47:45.2333372Z [ 80%] Building CXX object CMakeFiles/pocket_audio_native_pcm_tests.dir/tests/PcmNativeTests.cpp.o
+GCC Debug	Build	2026-09-30T21:47:46.2115827Z [100%] Linking CXX executable pocket_audio_native_pcm_tests
+GCC Debug	Build	2026-09-30T21:47:46.2685988Z [100%] Built target pocket_audio_native_pcm_tests
+GCC Debug	Test	﻿2026-09-30T21:47:46.2756631Z ##[group]Run ctest --test-dir build/native-pcm -C Debug --output-on-failure --no-tests=error
+GCC Debug	Test	2026-09-30T21:47:46.2757385Z ^[[36;1mctest --test-dir build/native-pcm -C Debug --output-on-failure --no-tests=error^[[0m
+GCC Debug	Test	2026-09-30T21:47:46.2820240Z shell: /usr/bin/bash -e {0}
+GCC Debug	Test	2026-09-30T21:47:46.2820516Z ##[endgroup]
+GCC Debug	Test	2026-09-30T21:47:46.7300841Z Internal ctest changing into directory: /home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/build/native-pcm
+GCC Debug	Test	2026-09-30T21:47:46.8262072Z Test project /home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/build/native-pcm
+GCC Debug	Test	2026-09-30T21:47:46.8772142Z     Start 1: pocket_audio_native_pcm_tests
+GCC Debug	Test	2026-09-30T21:47:46.8842256Z 1/1 Test #1: pocket_audio_native_pcm_tests ....   Passed    0.00 sec
+GCC Debug	Test	2026-09-30T21:47:46.8907827Z 
+GCC Debug	Test	2026-09-30T21:47:46.8908117Z 100% tests passed, 0 tests failed out of 1
+GCC Debug	Test	2026-09-30T21:47:46.8908552Z 
+GCC Debug	Test	2026-09-30T21:47:46.8908756Z Total Test time (real) =   0.06 sec
+GCC Debug	Post Check out canonical source	﻿2026-09-30T21:47:46.9540888Z Post job cleanup.
+GCC Debug	Post Check out canonical source	2026-09-30T21:47:47.0391535Z [command]/usr/bin/git version
+GCC Debug	Post Check out canonical source	2026-09-30T21:47:47.0442088Z git version 2.55.0
+GCC Debug	Post Check out canonical source	2026-09-30T21:47:47.0497834Z Temporarily overriding HOME='/home/runner/work/_temp/fe7a51d2-7bef-4735-98eb-48872319ce82' before making global git config changes
+GCC Debug	Post Check out canonical source	2026-09-30T21:47:47.0499416Z Adding repository directory to the temporary git global config as a safe directory
+GCC Debug	Post Check out canonical source	2026-09-30T21:47:47.0504176Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith
+GCC Debug	Post Check out canonical source	2026-09-30T21:47:47.0542051Z Removing SSH command configuration
+GCC Debug	Post Check out canonical source	2026-09-30T21:47:47.0549946Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+GCC Debug	Post Check out canonical source	2026-09-30T21:47:47.0597997Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+GCC Debug	Post Check out canonical source	2026-09-30T21:47:47.0878483Z Removing HTTP extra header
+GCC Debug	Post Check out canonical source	2026-09-30T21:47:47.0907583Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+GCC Debug	Post Check out canonical source	2026-09-30T21:47:47.0970004Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+GCC Debug	Post Check out canonical source	2026-09-30T21:47:47.1326825Z Removing includeIf entries pointing to credentials config files
+GCC Debug	Post Check out canonical source	2026-09-30T21:47:47.1328787Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+GCC Debug	Post Check out canonical source	2026-09-30T21:47:47.1360112Z includeif.gitdir:/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git.path
+GCC Debug	Post Check out canonical source	2026-09-30T21:47:47.1375481Z includeif.gitdir:/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git/worktrees/*.path
+GCC Debug	Post Check out canonical source	2026-09-30T21:47:47.1394308Z includeif.gitdir:/github/workspace/.git.path
+GCC Debug	Post Check out canonical source	2026-09-30T21:47:47.1395590Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+GCC Debug	Post Check out canonical source	2026-09-30T21:47:47.1398673Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git.path
+GCC Debug	Post Check out canonical source	2026-09-30T21:47:47.1417912Z /home/runner/work/_temp/git-credentials-eca4f33f-f48b-49ef-8dcc-02caa63221c2.config
+GCC Debug	Post Check out canonical source	2026-09-30T21:47:47.1430209Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-eca4f33f\-f48b\-49ef\-8dcc\-02caa63221c2\.config
+GCC Debug	Post Check out canonical source	2026-09-30T21:47:47.1479555Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git/worktrees/*.path
+GCC Debug	Post Check out canonical source	2026-09-30T21:47:47.1512832Z /home/runner/work/_temp/git-credentials-eca4f33f-f48b-49ef-8dcc-02caa63221c2.config
+GCC Debug	Post Check out canonical source	2026-09-30T21:47:47.1522934Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-eca4f33f\-f48b\-49ef\-8dcc\-02caa63221c2\.config
+GCC Debug	Post Check out canonical source	2026-09-30T21:47:47.1603700Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+GCC Debug	Post Check out canonical source	2026-09-30T21:47:47.1631716Z /github/runner_temp/git-credentials-eca4f33f-f48b-49ef-8dcc-02caa63221c2.config
+GCC Debug	Post Check out canonical source	2026-09-30T21:47:47.1639898Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-eca4f33f\-f48b\-49ef\-8dcc\-02caa63221c2\.config
+GCC Debug	Post Check out canonical source	2026-09-30T21:47:47.1677188Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+GCC Debug	Post Check out canonical source	2026-09-30T21:47:47.1703561Z /github/runner_temp/git-credentials-eca4f33f-f48b-49ef-8dcc-02caa63221c2.config
+GCC Debug	Post Check out canonical source	2026-09-30T21:47:47.1711514Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-eca4f33f\-f48b\-49ef\-8dcc\-02caa63221c2\.config
+GCC Debug	Post Check out canonical source	2026-09-30T21:47:47.1749678Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+GCC Debug	Post Check out canonical source	2026-09-30T21:47:47.1975317Z Removing credentials config '/home/runner/work/_temp/git-credentials-eca4f33f-f48b-49ef-8dcc-02caa63221c2.config'
+GCC Debug	Complete job	﻿2026-09-30T21:47:47.2124336Z Cleaning up orphan processes
+Clang Debug	Set up job	﻿2026-09-30T21:48:14.9362146Z Current runner version: '2.337.0'
+Clang Debug	Set up job	2026-09-30T21:48:14.9390203Z ##[group]Runner Image Provisioner
+Clang Debug	Set up job	2026-09-30T21:48:14.9391085Z Hosted Compute Agent
+Clang Debug	Set up job	2026-09-30T21:48:14.9391921Z Version: 20260828.587
+Clang Debug	Set up job	2026-09-30T21:48:14.9392977Z Commit: abac92662cab4cc7352de4f9f9d2e2419aad9c29
+Clang Debug	Set up job	2026-09-30T21:48:14.9393757Z Build Date: 2026-08-28T16:44:25Z
+Clang Debug	Set up job	2026-09-30T21:48:14.9394877Z Worker ID: {2efd9f1b-491c-4295-9101-8e10daf76525}
+Clang Debug	Set up job	2026-09-30T21:48:14.9395622Z Azure Region: eastus
+Clang Debug	Set up job	2026-09-30T21:48:14.9396175Z ##[endgroup]
+Clang Debug	Set up job	2026-09-30T21:48:14.9397804Z ##[group]Operating System
+Clang Debug	Set up job	2026-09-30T21:48:14.9398448Z Ubuntu
+Clang Debug	Set up job	2026-09-30T21:48:14.9399030Z 24.04.5
+Clang Debug	Set up job	2026-09-30T21:48:14.9399588Z LTS
+Clang Debug	Set up job	2026-09-30T21:48:14.9400125Z ##[endgroup]
+Clang Debug	Set up job	2026-09-30T21:48:14.9400844Z ##[group]Runner Image
+Clang Debug	Set up job	2026-09-30T21:48:14.9401444Z Image: ubuntu-24.04
+Clang Debug	Set up job	2026-09-30T21:48:14.9402086Z Version: 20260920.314.1
+Clang Debug	Set up job	2026-09-30T21:48:14.9403220Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260920.314/images/ubuntu/Ubuntu2404-Readme.md
+Clang Debug	Set up job	2026-09-30T21:48:14.9405520Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260920.314
+Clang Debug	Set up job	2026-09-30T21:48:14.9406489Z ##[endgroup]
+Clang Debug	Set up job	2026-09-30T21:48:14.9408043Z ##[group]GITHUB_TOKEN Permissions
+Clang Debug	Set up job	2026-09-30T21:48:14.9410247Z Contents: read
+Clang Debug	Set up job	2026-09-30T21:48:14.9410930Z Metadata: read
+Clang Debug	Set up job	2026-09-30T21:48:14.9411521Z ##[endgroup]
+Clang Debug	Set up job	2026-09-30T21:48:14.9413659Z Secret source: Actions
+Clang Debug	Set up job	2026-09-30T21:48:14.9415085Z Cache mode: write
+Clang Debug	Set up job	2026-09-30T21:48:14.9416108Z Prepare workflow directory
+Clang Debug	Set up job	2026-09-30T21:48:14.9752414Z Prepare all required actions
+Clang Debug	Set up job	2026-09-30T21:48:14.9800517Z Getting action download info
+Clang Debug	Set up job	2026-09-30T21:48:15.1737110Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+Clang Debug	Set up job	2026-09-30T21:48:15.3584733Z Complete job name: Clang Debug
+Clang Debug	Check out canonical source	﻿2026-09-30T21:48:15.4511144Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.4512254Z with:
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.4512756Z   repository: Samfa12-tech/Pocket-Chordsmith
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.4516940Z   token: ***
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.4517393Z   ssh-strict: true
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.4517836Z   ssh-user: git
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.4518289Z   persist-credentials: true
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.4518792Z   clean: true
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.4519245Z   sparse-checkout-cone-mode: true
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.4519779Z   fetch-depth: 1
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.4520226Z   fetch-tags: false
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.4520671Z   show-progress: true
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.4521129Z   lfs: false
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.4521551Z   submodules: false
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.4522009Z   set-safe-directory: true
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.4522519Z   allow-unsafe-pr-checkout: false
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.4523306Z ##[endgroup]
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.5522142Z Syncing repository: Samfa12-tech/Pocket-Chordsmith
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.5525343Z ##[group]Getting Git version info
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.5526914Z Working directory is '/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith'
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.5528890Z [command]/usr/bin/git version
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.5649371Z git version 2.55.0
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.5674481Z ##[endgroup]
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.5685804Z Temporarily overriding HOME='/home/runner/work/_temp/8b1bdfbe-6875-4d05-b50d-0ba4b0a02ee5' before making global git config changes
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.5688096Z Adding repository directory to the temporary git global config as a safe directory
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.5691723Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.5749125Z Deleting the contents of '/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith'
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.5754222Z ##[group]Determining repository object format
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.5755728Z ##[endgroup]
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.5757133Z ##[group]Initializing the repository
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.5760680Z [command]/usr/bin/git init /home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.5890455Z hint: Using 'master' as the name for the initial branch. This default branch name
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.5892408Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.5893867Z hint: to use in all of your new repositories, which will suppress this warning,
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.5895446Z hint: call:
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.5895939Z hint:
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.5896488Z hint: 	git config --global init.defaultBranch <name>
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.5897123Z hint:
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.5897718Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.5898647Z hint: 'development'. The just-created branch can be renamed via this command:
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.5899392Z hint:
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.5899820Z hint: 	git branch -m <name>
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.5900303Z hint:
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.5900927Z hint: Disable this message with "git config set advice.defaultBranchName false"
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.5902042Z Initialized empty Git repository in /home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git/
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.5914891Z [command]/usr/bin/git remote add origin https://github.com/Samfa12-tech/Pocket-Chordsmith
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.5978189Z ##[endgroup]
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.5980077Z ##[group]Disabling automatic garbage collection
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.5981996Z [command]/usr/bin/git config --local gc.auto 0
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.6016210Z ##[endgroup]
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.6017430Z ##[group]Setting up auth
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.6018240Z Removing SSH command configuration
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.6023481Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.6065361Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.6457314Z Removing HTTP extra header
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.6463905Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.6500847Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.6722070Z Removing includeIf entries pointing to credentials config files
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.6727561Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.6761498Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.6994948Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-c75a2c3e-6b24-4572-90bb-597595d2b812.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.7035917Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git.path /home/runner/work/_temp/git-credentials-c75a2c3e-6b24-4572-90bb-597595d2b812.config
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.7070606Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-c75a2c3e-6b24-4572-90bb-597595d2b812.config
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.7108126Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-c75a2c3e-6b24-4572-90bb-597595d2b812.config
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.7143839Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-c75a2c3e-6b24-4572-90bb-597595d2b812.config
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.7175136Z ##[endgroup]
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.7176350Z ##[group]Fetching the repository
+Clang Debug	Check out canonical source	2026-09-30T21:48:15.7180888Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +534a6e6811ce653efd5422138c5772b967263ed0:refs/remotes/origin/codex/horde-native-pcm-core
+Clang Debug	Check out canonical source	2026-09-30T21:48:16.4892996Z From https://github.com/Samfa12-tech/Pocket-Chordsmith
+Clang Debug	Check out canonical source	2026-09-30T21:48:16.4896566Z  * [new ref]         534a6e6811ce653efd5422138c5772b967263ed0 -> origin/codex/horde-native-pcm-core
+Clang Debug	Check out canonical source	2026-09-30T21:48:16.4903181Z [command]/usr/bin/git branch --list --remote origin/codex/horde-native-pcm-core
+Clang Debug	Check out canonical source	2026-09-30T21:48:16.4934682Z   origin/codex/horde-native-pcm-core
+Clang Debug	Check out canonical source	2026-09-30T21:48:16.4943095Z [command]/usr/bin/git rev-parse refs/remotes/origin/codex/horde-native-pcm-core
+Clang Debug	Check out canonical source	2026-09-30T21:48:16.4970459Z 534a6e6811ce653efd5422138c5772b967263ed0
+Clang Debug	Check out canonical source	2026-09-30T21:48:16.4975795Z ##[endgroup]
+Clang Debug	Check out canonical source	2026-09-30T21:48:16.4977113Z ##[group]Determining the checkout info
+Clang Debug	Check out canonical source	2026-09-30T21:48:16.4979185Z ##[endgroup]
+Clang Debug	Check out canonical source	2026-09-30T21:48:16.4980801Z [command]/usr/bin/git sparse-checkout disable
+Clang Debug	Check out canonical source	2026-09-30T21:48:16.5040360Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+Clang Debug	Check out canonical source	2026-09-30T21:48:16.5079647Z ##[group]Checking out the ref
+Clang Debug	Check out canonical source	2026-09-30T21:48:16.5081977Z [command]/usr/bin/git checkout --progress --force -B codex/horde-native-pcm-core refs/remotes/origin/codex/horde-native-pcm-core
+Clang Debug	Check out canonical source	2026-09-30T21:48:16.6288085Z Switched to a new branch 'codex/horde-native-pcm-core'
+Clang Debug	Check out canonical source	2026-09-30T21:48:16.6315654Z branch 'codex/horde-native-pcm-core' set up to track 'origin/codex/horde-native-pcm-core'.
+Clang Debug	Check out canonical source	2026-09-30T21:48:16.6318387Z ##[endgroup]
+Clang Debug	Check out canonical source	2026-09-30T21:48:16.6365342Z [command]/usr/bin/git log -1 --format=%H
+Clang Debug	Check out canonical source	2026-09-30T21:48:16.6397912Z 534a6e6811ce653efd5422138c5772b967263ed0
+Clang Debug	Configure standalone Core tests	﻿2026-09-30T21:48:16.6655190Z ##[group]Run cmake -S packages/pocket-audio-core/native -B build/native-pcm -DCMAKE_BUILD_TYPE=Debug -DPOCKET_AUDIO_NATIVE_BUILD_TESTS=ON
+Clang Debug	Configure standalone Core tests	2026-09-30T21:48:16.6656364Z ^[[36;1mcmake -S packages/pocket-audio-core/native -B build/native-pcm -DCMAKE_BUILD_TYPE=Debug -DPOCKET_AUDIO_NATIVE_BUILD_TESTS=ON^[[0m
+Clang Debug	Configure standalone Core tests	2026-09-30T21:48:16.6948379Z shell: /usr/bin/bash -e {0}
+Clang Debug	Configure standalone Core tests	2026-09-30T21:48:16.6948796Z env:
+Clang Debug	Configure standalone Core tests	2026-09-30T21:48:16.6949075Z   CXX: clang++
+Clang Debug	Configure standalone Core tests	2026-09-30T21:48:16.6949364Z ##[endgroup]
+Clang Debug	Configure standalone Core tests	2026-09-30T21:48:21.9081030Z -- The CXX compiler identification is Clang 18.1.3
+Clang Debug	Configure standalone Core tests	2026-09-30T21:48:22.0337704Z -- Detecting CXX compiler ABI info
+Clang Debug	Configure standalone Core tests	2026-09-30T21:48:22.2995846Z -- Detecting CXX compiler ABI info - done
+Clang Debug	Configure standalone Core tests	2026-09-30T21:48:22.3140572Z -- Check for working CXX compiler: /usr/bin/clang++ - skipped
+Clang Debug	Configure standalone Core tests	2026-09-30T21:48:22.3206297Z -- Detecting CXX compile features
+Clang Debug	Configure standalone Core tests	2026-09-30T21:48:22.3265099Z -- Detecting CXX compile features - done
+Clang Debug	Configure standalone Core tests	2026-09-30T21:48:22.3666011Z -- Configuring done (5.2s)
+Clang Debug	Configure standalone Core tests	2026-09-30T21:48:22.3929992Z -- Generating done (0.0s)
+Clang Debug	Configure standalone Core tests	2026-09-30T21:48:22.3933442Z -- Build files have been written to: /home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/build/native-pcm
+Clang Debug	Build	﻿2026-09-30T21:48:22.4041309Z ##[group]Run cmake --build build/native-pcm --config Debug --parallel 2
+Clang Debug	Build	2026-09-30T21:48:22.4041920Z ^[[36;1mcmake --build build/native-pcm --config Debug --parallel 2^[[0m
+Clang Debug	Build	2026-09-30T21:48:22.4106640Z shell: /usr/bin/bash -e {0}
+Clang Debug	Build	2026-09-30T21:48:22.4106995Z ##[endgroup]
+Clang Debug	Build	2026-09-30T21:48:22.4349965Z [ 20%] Building CXX object CMakeFiles/pocket_audio_native_pcm.dir/src/PcmLoopStream.cpp.o
+Clang Debug	Build	2026-09-30T21:48:22.4351458Z [ 40%] Building CXX object CMakeFiles/pocket_audio_native_pcm.dir/src/PcmWave.cpp.o
+Clang Debug	Build	2026-09-30T21:48:23.7081085Z [ 60%] Linking CXX static library libpocket_audio_native_pcm.a
+Clang Debug	Build	2026-09-30T21:48:29.4290329Z [ 60%] Built target pocket_audio_native_pcm
+Clang Debug	Build	2026-09-30T21:48:29.4359553Z [ 80%] Building CXX object CMakeFiles/pocket_audio_native_pcm_tests.dir/tests/PcmNativeTests.cpp.o
+Clang Debug	Build	2026-09-30T21:48:30.7092541Z [100%] Linking CXX executable pocket_audio_native_pcm_tests
+Clang Debug	Build	2026-09-30T21:48:30.7748482Z [100%] Built target pocket_audio_native_pcm_tests
+Clang Debug	Test	﻿2026-09-30T21:48:30.7815242Z ##[group]Run ctest --test-dir build/native-pcm -C Debug --output-on-failure --no-tests=error
+Clang Debug	Test	2026-09-30T21:48:30.7815973Z ^[[36;1mctest --test-dir build/native-pcm -C Debug --output-on-failure --no-tests=error^[[0m
+Clang Debug	Test	2026-09-30T21:48:30.7878580Z shell: /usr/bin/bash -e {0}
+Clang Debug	Test	2026-09-30T21:48:30.7878850Z ##[endgroup]
+Clang Debug	Test	2026-09-30T21:48:31.1309351Z Internal ctest changing into directory: /home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/build/native-pcm
+Clang Debug	Test	2026-09-30T21:48:31.1964838Z Test project /home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/build/native-pcm
+Clang Debug	Test	2026-09-30T21:48:31.2430125Z     Start 1: pocket_audio_native_pcm_tests
+Clang Debug	Test	2026-09-30T21:48:31.2496203Z 1/1 Test #1: pocket_audio_native_pcm_tests ....   Passed    0.00 sec
+Clang Debug	Test	2026-09-30T21:48:31.2557717Z 
+Clang Debug	Test	2026-09-30T21:48:31.2557995Z 100% tests passed, 0 tests failed out of 1
+Clang Debug	Test	2026-09-30T21:48:31.2558411Z 
+Clang Debug	Test	2026-09-30T21:48:31.2558606Z Total Test time (real) =   0.06 sec
+Clang Debug	Post Check out canonical source	﻿2026-09-30T21:48:31.3037927Z Post job cleanup.
+Clang Debug	Post Check out canonical source	2026-09-30T21:48:31.3884757Z [command]/usr/bin/git version
+Clang Debug	Post Check out canonical source	2026-09-30T21:48:31.3934301Z git version 2.55.0
+Clang Debug	Post Check out canonical source	2026-09-30T21:48:31.4005821Z Temporarily overriding HOME='/home/runner/work/_temp/1f07cdf8-5dad-49bd-be58-ff6946bb6155' before making global git config changes
+Clang Debug	Post Check out canonical source	2026-09-30T21:48:31.4007390Z Adding repository directory to the temporary git global config as a safe directory
+Clang Debug	Post Check out canonical source	2026-09-30T21:48:31.4012531Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith
+Clang Debug	Post Check out canonical source	2026-09-30T21:48:31.4065765Z Removing SSH command configuration
+Clang Debug	Post Check out canonical source	2026-09-30T21:48:31.4066738Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Clang Debug	Post Check out canonical source	2026-09-30T21:48:31.4101981Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Clang Debug	Post Check out canonical source	2026-09-30T21:48:31.4349467Z Removing HTTP extra header
+Clang Debug	Post Check out canonical source	2026-09-30T21:48:31.4356599Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Clang Debug	Post Check out canonical source	2026-09-30T21:48:31.4397770Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Clang Debug	Post Check out canonical source	2026-09-30T21:48:31.4645742Z Removing includeIf entries pointing to credentials config files
+Clang Debug	Post Check out canonical source	2026-09-30T21:48:31.4652960Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Clang Debug	Post Check out canonical source	2026-09-30T21:48:31.4687659Z includeif.gitdir:/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git.path
+Clang Debug	Post Check out canonical source	2026-09-30T21:48:31.4696518Z includeif.gitdir:/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git/worktrees/*.path
+Clang Debug	Post Check out canonical source	2026-09-30T21:48:31.4697866Z includeif.gitdir:/github/workspace/.git.path
+Clang Debug	Post Check out canonical source	2026-09-30T21:48:31.4699076Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+Clang Debug	Post Check out canonical source	2026-09-30T21:48:31.4705528Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git.path
+Clang Debug	Post Check out canonical source	2026-09-30T21:48:31.4736328Z /home/runner/work/_temp/git-credentials-c75a2c3e-6b24-4572-90bb-597595d2b812.config
+Clang Debug	Post Check out canonical source	2026-09-30T21:48:31.4748374Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-c75a2c3e\-6b24\-4572\-90bb\-597595d2b812\.config
+Clang Debug	Post Check out canonical source	2026-09-30T21:48:31.4789003Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git/worktrees/*.path
+Clang Debug	Post Check out canonical source	2026-09-30T21:48:31.4822109Z /home/runner/work/_temp/git-credentials-c75a2c3e-6b24-4572-90bb-597595d2b812.config
+Clang Debug	Post Check out canonical source	2026-09-30T21:48:31.4845887Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/Pocket-Chordsmith/Pocket-Chordsmith/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-c75a2c3e\-6b24\-4572\-90bb\-597595d2b812\.config
+Clang Debug	Post Check out canonical source	2026-09-30T21:48:31.4882481Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+Clang Debug	Post Check out canonical source	2026-09-30T21:48:31.4908931Z /github/runner_temp/git-credentials-c75a2c3e-6b24-4572-90bb-597595d2b812.config
+Clang Debug	Post Check out canonical source	2026-09-30T21:48:31.4916600Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-c75a2c3e\-6b24\-4572\-90bb\-597595d2b812\.config
+Clang Debug	Post Check out canonical source	2026-09-30T21:48:31.4953795Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+Clang Debug	Post Check out canonical source	2026-09-30T21:48:31.4979602Z /github/runner_temp/git-credentials-c75a2c3e-6b24-4572-90bb-597595d2b812.config
+Clang Debug	Post Check out canonical source	2026-09-30T21:48:31.4987381Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-c75a2c3e\-6b24\-4572\-90bb\-597595d2b812\.config
+Clang Debug	Post Check out canonical source	2026-09-30T21:48:31.5025268Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Clang Debug	Post Check out canonical source	2026-09-30T21:48:31.5251758Z Removing credentials config '/home/runner/work/_temp/git-credentials-c75a2c3e-6b24-4572-90bb-597595d2b812.config'
+Clang Debug	Complete job	﻿2026-09-30T21:48:31.5394278Z Cleaning up orphan processes
+MSVC Debug	Set up job	﻿2026-09-30T21:47:39.5143125Z Current runner version: '2.337.0'
+MSVC Debug	Set up job	2026-09-30T21:47:39.5205553Z ##[group]Runner Image Provisioner
+MSVC Debug	Set up job	2026-09-30T21:47:39.5207565Z Hosted Compute Agent
+MSVC Debug	Set up job	2026-09-30T21:47:39.5208311Z Version: 20260901.588
+MSVC Debug	Set up job	2026-09-30T21:47:39.5209105Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+MSVC Debug	Set up job	2026-09-30T21:47:39.5210031Z Build Date: 2026-09-01T19:56:44Z
+MSVC Debug	Set up job	2026-09-30T21:47:39.5210975Z Worker ID: {5e040e27-d0ee-4740-b5aa-0165a9b59695}
+MSVC Debug	Set up job	2026-09-30T21:47:39.5212229Z Azure Region: eastus
+MSVC Debug	Set up job	2026-09-30T21:47:39.5213025Z ##[endgroup]
+MSVC Debug	Set up job	2026-09-30T21:47:39.5214846Z ##[group]Operating System
+MSVC Debug	Set up job	2026-09-30T21:47:39.5215794Z Microsoft Windows Server 2022
+MSVC Debug	Set up job	2026-09-30T21:47:39.5216596Z 10.0.20348
+MSVC Debug	Set up job	2026-09-30T21:47:39.5217328Z Datacenter
+MSVC Debug	Set up job	2026-09-30T21:47:39.5217985Z ##[endgroup]
+MSVC Debug	Set up job	2026-09-30T21:47:39.5218620Z ##[group]Runner Image
+MSVC Debug	Set up job	2026-09-30T21:47:39.5219373Z Image: windows-2022
+MSVC Debug	Set up job	2026-09-30T21:47:39.5220081Z Version: 20260927.320.1
+MSVC Debug	Set up job	2026-09-30T21:47:39.5221473Z Included Software: https://github.com/actions/runner-images/blob/win22/20260927.320/images/windows/Windows2022-Readme.md
+MSVC Debug	Set up job	2026-09-30T21:47:39.5224128Z Image Release: https://github.com/actions/runner-images/releases/tag/win22%2F20260927.320
+MSVC Debug	Set up job	2026-09-30T21:47:39.5225528Z ##[endgroup]
+MSVC Debug	Set up job	2026-09-30T21:47:39.5227022Z ##[group]GITHUB_TOKEN Permissions
+MSVC Debug	Set up job	2026-09-30T21:47:39.5230145Z Contents: read
+MSVC Debug	Set up job	2026-09-30T21:47:39.5231085Z Metadata: read
+MSVC Debug	Set up job	2026-09-30T21:47:39.5231796Z ##[endgroup]
+MSVC Debug	Set up job	2026-09-30T21:47:39.5234764Z Secret source: Actions
+MSVC Debug	Set up job	2026-09-30T21:47:39.5235913Z Cache mode: write
+MSVC Debug	Set up job	2026-09-30T21:47:39.5236782Z Prepare workflow directory
+MSVC Debug	Set up job	2026-09-30T21:47:39.5582226Z Prepare all required actions
+MSVC Debug	Set up job	2026-09-30T21:47:39.5642604Z Getting action download info
+MSVC Debug	Set up job	2026-09-30T21:47:39.7387979Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+MSVC Debug	Set up job	2026-09-30T21:47:40.0633080Z Complete job name: MSVC Debug
+MSVC Debug	Check out canonical source	﻿2026-09-30T21:47:40.3474548Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+MSVC Debug	Check out canonical source	2026-09-30T21:47:40.3476703Z with:
+MSVC Debug	Check out canonical source	2026-09-30T21:47:40.3477495Z   repository: Samfa12-tech/Pocket-Chordsmith
+MSVC Debug	Check out canonical source	2026-09-30T21:47:40.3484952Z   token: ***
+MSVC Debug	Check out canonical source	2026-09-30T21:47:40.3485655Z   ssh-strict: true
+MSVC Debug	Check out canonical source	2026-09-30T21:47:40.3486368Z   ssh-user: git
+MSVC Debug	Check out canonical source	2026-09-30T21:47:40.3487100Z   persist-credentials: true
+MSVC Debug	Check out canonical source	2026-09-30T21:47:40.3487948Z   clean: true
+MSVC Debug	Check out canonical source	2026-09-30T21:47:40.3488790Z   sparse-checkout-cone-mode: true
+MSVC Debug	Check out canonical source	2026-09-30T21:47:40.3489695Z   fetch-depth: 1
+MSVC Debug	Check out canonical source	2026-09-30T21:47:40.3490407Z   fetch-tags: false
+MSVC Debug	Check out canonical source	2026-09-30T21:47:40.3491140Z   show-progress: true
+MSVC Debug	Check out canonical source	2026-09-30T21:47:40.3491871Z   lfs: false
+MSVC Debug	Check out canonical source	2026-09-30T21:47:40.3492543Z   submodules: false
+MSVC Debug	Check out canonical source	2026-09-30T21:47:40.3493318Z   set-safe-directory: true
+MSVC Debug	Check out canonical source	2026-09-30T21:47:40.3494263Z   allow-unsafe-pr-checkout: false
+MSVC Debug	Check out canonical source	2026-09-30T21:47:40.3495438Z ##[endgroup]
+MSVC Debug	Check out canonical source	2026-09-30T21:47:40.5214691Z Syncing repository: Samfa12-tech/Pocket-Chordsmith
+MSVC Debug	Check out canonical source	2026-09-30T21:47:40.5219253Z ##[group]Getting Git version info
+MSVC Debug	Check out canonical source	2026-09-30T21:47:40.5221678Z Working directory is 'D:\a\Pocket-Chordsmith\Pocket-Chordsmith'
+MSVC Debug	Check out canonical source	2026-09-30T21:47:40.6621758Z [command]"C:\Program Files\Git\bin\git.exe" version
+MSVC Debug	Check out canonical source	2026-09-30T21:47:41.5587617Z git version 2.55.0.windows.5
+MSVC Debug	Check out canonical source	2026-09-30T21:47:41.5624344Z ##[endgroup]
+MSVC Debug	Check out canonical source	2026-09-30T21:47:41.5640187Z Temporarily overriding HOME='D:\a\_temp\f24ed92f-be0d-4b9e-8cb6-210e9d96c3bc' before making global git config changes
+MSVC Debug	Check out canonical source	2026-09-30T21:47:41.5641149Z Adding repository directory to the temporary git global config as a safe directory
+MSVC Debug	Check out canonical source	2026-09-30T21:47:41.5651065Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\Pocket-Chordsmith\Pocket-Chordsmith
+MSVC Debug	Check out canonical source	2026-09-30T21:47:41.6740591Z Deleting the contents of 'D:\a\Pocket-Chordsmith\Pocket-Chordsmith'
+MSVC Debug	Check out canonical source	2026-09-30T21:47:41.6743605Z ##[group]Determining repository object format
+MSVC Debug	Check out canonical source	2026-09-30T21:47:41.6745525Z ##[endgroup]
+MSVC Debug	Check out canonical source	2026-09-30T21:47:41.6746374Z ##[group]Initializing the repository
+MSVC Debug	Check out canonical source	2026-09-30T21:47:41.6754463Z [command]"C:\Program Files\Git\bin\git.exe" init D:\a\Pocket-Chordsmith\Pocket-Chordsmith
+MSVC Debug	Check out canonical source	2026-09-30T21:47:41.8327994Z Initialized empty Git repository in D:/a/Pocket-Chordsmith/Pocket-Chordsmith/.git/
+MSVC Debug	Check out canonical source	2026-09-30T21:47:41.8366562Z [command]"C:\Program Files\Git\bin\git.exe" remote add origin https://github.com/Samfa12-tech/Pocket-Chordsmith
+MSVC Debug	Check out canonical source	2026-09-30T21:47:41.9383767Z ##[endgroup]
+MSVC Debug	Check out canonical source	2026-09-30T21:47:41.9384360Z ##[group]Disabling automatic garbage collection
+MSVC Debug	Check out canonical source	2026-09-30T21:47:41.9393048Z [command]"C:\Program Files\Git\bin\git.exe" config --local gc.auto 0
+MSVC Debug	Check out canonical source	2026-09-30T21:47:41.9647383Z ##[endgroup]
+MSVC Debug	Check out canonical source	2026-09-30T21:47:41.9648389Z ##[group]Setting up auth
+MSVC Debug	Check out canonical source	2026-09-30T21:47:41.9648887Z Removing SSH command configuration
+MSVC Debug	Check out canonical source	2026-09-30T21:47:41.9660448Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+MSVC Debug	Check out canonical source	2026-09-30T21:47:41.9923903Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+MSVC Debug	Check out canonical source	2026-09-30T21:47:44.7604211Z Removing HTTP extra header
+MSVC Debug	Check out canonical source	2026-09-30T21:47:44.7616273Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+MSVC Debug	Check out canonical source	2026-09-30T21:47:44.7868950Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+MSVC Debug	Check out canonical source	2026-09-30T21:47:45.3113479Z Removing includeIf entries pointing to credentials config files
+MSVC Debug	Check out canonical source	2026-09-30T21:47:45.3129157Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+MSVC Debug	Check out canonical source	2026-09-30T21:47:45.3426159Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+MSVC Debug	Check out canonical source	2026-09-30T21:47:45.8114794Z [command]"C:\Program Files\Git\bin\git.exe" config --file D:\a\_temp\git-credentials-85881e0f-5b6b-4463-ad55-b9f87b2697dd.config http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
+MSVC Debug	Check out canonical source	2026-09-30T21:47:45.8379144Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:D:/a/Pocket-Chordsmith/Pocket-Chordsmith/.git.path D:\a\_temp\git-credentials-85881e0f-5b6b-4463-ad55-b9f87b2697dd.config
+MSVC Debug	Check out canonical source	2026-09-30T21:47:45.8653592Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:D:/a/Pocket-Chordsmith/Pocket-Chordsmith/.git/worktrees/*.path D:\a\_temp\git-credentials-85881e0f-5b6b-4463-ad55-b9f87b2697dd.config
+MSVC Debug	Check out canonical source	2026-09-30T21:47:45.9028841Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-85881e0f-5b6b-4463-ad55-b9f87b2697dd.config
+MSVC Debug	Check out canonical source	2026-09-30T21:47:45.9294107Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-85881e0f-5b6b-4463-ad55-b9f87b2697dd.config
+MSVC Debug	Check out canonical source	2026-09-30T21:47:45.9559190Z ##[endgroup]
+MSVC Debug	Check out canonical source	2026-09-30T21:47:45.9559720Z ##[group]Fetching the repository
+MSVC Debug	Check out canonical source	2026-09-30T21:47:45.9584703Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +534a6e6811ce653efd5422138c5772b967263ed0:refs/remotes/origin/codex/horde-native-pcm-core
+MSVC Debug	Check out canonical source	2026-09-30T21:47:48.2726156Z From https://github.com/Samfa12-tech/Pocket-Chordsmith
+MSVC Debug	Check out canonical source	2026-09-30T21:47:48.2727239Z  * [new ref]         534a6e6811ce653efd5422138c5772b967263ed0 -> origin/codex/horde-native-pcm-core
+MSVC Debug	Check out canonical source	2026-09-30T21:47:48.2768508Z [command]"C:\Program Files\Git\bin\git.exe" branch --list --remote origin/codex/horde-native-pcm-core
+MSVC Debug	Check out canonical source	2026-09-30T21:47:48.3217702Z   origin/codex/horde-native-pcm-core
+MSVC Debug	Check out canonical source	2026-09-30T21:47:48.3261481Z [command]"C:\Program Files\Git\bin\git.exe" rev-parse refs/remotes/origin/codex/horde-native-pcm-core
+MSVC Debug	Check out canonical source	2026-09-30T21:47:48.3820980Z 534a6e6811ce653efd5422138c5772b967263ed0
+MSVC Debug	Check out canonical source	2026-09-30T21:47:48.3850712Z ##[endgroup]
+MSVC Debug	Check out canonical source	2026-09-30T21:47:48.3851309Z ##[group]Determining the checkout info
+MSVC Debug	Check out canonical source	2026-09-30T21:47:48.3853582Z ##[endgroup]
+MSVC Debug	Check out canonical source	2026-09-30T21:47:48.3862780Z [command]"C:\Program Files\Git\bin\git.exe" sparse-checkout disable
+MSVC Debug	Check out canonical source	2026-09-30T21:47:48.4278656Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all extensions.worktreeConfig
+MSVC Debug	Check out canonical source	2026-09-30T21:47:48.4534256Z ##[group]Checking out the ref
+MSVC Debug	Check out canonical source	2026-09-30T21:47:48.4544599Z [command]"C:\Program Files\Git\bin\git.exe" checkout --progress --force -B codex/horde-native-pcm-core refs/remotes/origin/codex/horde-native-pcm-core
+MSVC Debug	Check out canonical source	2026-09-30T21:47:48.7551234Z Switched to a new branch 'codex/horde-native-pcm-core'
+MSVC Debug	Check out canonical source	2026-09-30T21:47:48.7680831Z branch 'codex/horde-native-pcm-core' set up to track 'origin/codex/horde-native-pcm-core'.
+MSVC Debug	Check out canonical source	2026-09-30T21:47:48.7732982Z ##[endgroup]
+MSVC Debug	Check out canonical source	2026-09-30T21:47:48.8133590Z [command]"C:\Program Files\Git\bin\git.exe" log -1 --format=%H
+MSVC Debug	Check out canonical source	2026-09-30T21:47:48.8355459Z 534a6e6811ce653efd5422138c5772b967263ed0
+MSVC Debug	Configure standalone Core tests	﻿2026-09-30T21:47:48.8764253Z ##[group]Run cmake -S packages/pocket-audio-core/native -B build/native-pcm -DCMAKE_BUILD_TYPE=Debug -DPOCKET_AUDIO_NATIVE_BUILD_TESTS=ON
+MSVC Debug	Configure standalone Core tests	2026-09-30T21:47:48.8765365Z ^[[36;1mcmake -S packages/pocket-audio-core/native -B build/native-pcm -DCMAKE_BUILD_TYPE=Debug -DPOCKET_AUDIO_NATIVE_BUILD_TESTS=ON^[[0m
+MSVC Debug	Configure standalone Core tests	2026-09-30T21:47:48.8858736Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+MSVC Debug	Configure standalone Core tests	2026-09-30T21:47:48.8859112Z env:
+MSVC Debug	Configure standalone Core tests	2026-09-30T21:47:48.8859305Z   CXX: 
+MSVC Debug	Configure standalone Core tests	2026-09-30T21:47:48.8859492Z ##[endgroup]
+MSVC Debug	Configure standalone Core tests	2026-09-30T21:47:51.9151951Z -- Building for: Visual Studio 17 2022
+MSVC Debug	Configure standalone Core tests	2026-09-30T21:47:52.4513215Z -- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.20348.
+MSVC Debug	Configure standalone Core tests	2026-09-30T21:48:21.4614246Z -- The CXX compiler identification is MSVC 19.44.35229.0
+MSVC Debug	Configure standalone Core tests	2026-09-30T21:48:22.2227126Z -- Detecting CXX compiler ABI info
+MSVC Debug	Configure standalone Core tests	2026-09-30T21:48:24.2632799Z -- Detecting CXX compiler ABI info - done
+MSVC Debug	Configure standalone Core tests	2026-09-30T21:48:24.2788085Z -- Check for working CXX compiler: C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+MSVC Debug	Configure standalone Core tests	2026-09-30T21:48:24.2802122Z -- Detecting CXX compile features
+MSVC Debug	Configure standalone Core tests	2026-09-30T21:48:24.2915939Z -- Detecting CXX compile features - done
+MSVC Debug	Configure standalone Core tests	2026-09-30T21:48:24.7107957Z -- Configuring done (32.8s)
+MSVC Debug	Configure standalone Core tests	2026-09-30T21:48:24.7488561Z -- Generating done (0.0s)
+MSVC Debug	Configure standalone Core tests	2026-09-30T21:48:24.7490708Z CMake Warning:
+MSVC Debug	Configure standalone Core tests	2026-09-30T21:48:24.7491175Z   Manually-specified variables were not used by the project:
+MSVC Debug	Configure standalone Core tests	2026-09-30T21:48:24.7491537Z 
+MSVC Debug	Configure standalone Core tests	2026-09-30T21:48:24.7491649Z     CMAKE_BUILD_TYPE
+MSVC Debug	Configure standalone Core tests	2026-09-30T21:48:24.7491823Z 
+MSVC Debug	Configure standalone Core tests	2026-09-30T21:48:24.7491829Z 
+MSVC Debug	Configure standalone Core tests	2026-09-30T21:48:24.7500376Z -- Build files have been written to: D:/a/Pocket-Chordsmith/Pocket-Chordsmith/build/native-pcm
+MSVC Debug	Build	﻿2026-09-30T21:48:24.8664290Z ##[group]Run cmake --build build/native-pcm --config Debug --parallel 2
+MSVC Debug	Build	2026-09-30T21:48:24.8664901Z ^[[36;1mcmake --build build/native-pcm --config Debug --parallel 2^[[0m
+MSVC Debug	Build	2026-09-30T21:48:24.8701139Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+MSVC Debug	Build	2026-09-30T21:48:24.8701494Z ##[endgroup]
+MSVC Debug	Build	2026-09-30T21:48:25.2278256Z MSBuild version 17.14.60+43b635718 for .NET Framework
+MSVC Debug	Build	2026-09-30T21:48:25.2629639Z 
+MSVC Debug	Build	2026-09-30T21:48:25.8345659Z   1>Checking Build System
+MSVC Debug	Build	2026-09-30T21:48:26.1017527Z   Building Custom Rule D:/a/Pocket-Chordsmith/Pocket-Chordsmith/packages/pocket-audio-core/native/CMakeLists.txt
+MSVC Debug	Build	2026-09-30T21:48:26.2402822Z   PcmLoopStream.cpp
+MSVC Debug	Build	2026-09-30T21:48:30.7194063Z   PcmWave.cpp
+MSVC Debug	Build	2026-09-30T21:48:31.4252364Z   Generating Code...
+MSVC Debug	Build	2026-09-30T21:48:31.8865399Z   pocket_audio_native_pcm.vcxproj -> D:\a\Pocket-Chordsmith\Pocket-Chordsmith\build\native-pcm\Debug\pocket_audio_native_pcm.lib
+MSVC Debug	Build	2026-09-30T21:48:32.0098197Z   Building Custom Rule D:/a/Pocket-Chordsmith/Pocket-Chordsmith/packages/pocket-audio-core/native/CMakeLists.txt
+MSVC Debug	Build	2026-09-30T21:48:32.1596249Z   PcmNativeTests.cpp
+MSVC Debug	Build	2026-09-30T21:48:34.1145464Z   pocket_audio_native_pcm_tests.vcxproj -> D:\a\Pocket-Chordsmith\Pocket-Chordsmith\build\native-pcm\Debug\pocket_audio_native_pcm_tests.exe
+MSVC Debug	Build	2026-09-30T21:48:34.1902389Z   Building Custom Rule D:/a/Pocket-Chordsmith/Pocket-Chordsmith/packages/pocket-audio-core/native/CMakeLists.txt
+MSVC Debug	Test	﻿2026-09-30T21:48:34.4071297Z ##[group]Run ctest --test-dir build/native-pcm -C Debug --output-on-failure --no-tests=error
+MSVC Debug	Test	2026-09-30T21:48:34.4072186Z ^[[36;1mctest --test-dir build/native-pcm -C Debug --output-on-failure --no-tests=error^[[0m
+MSVC Debug	Test	2026-09-30T21:48:34.4109690Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+MSVC Debug	Test	2026-09-30T21:48:34.4110036Z ##[endgroup]
+MSVC Debug	Test	2026-09-30T21:48:35.8282931Z Internal ctest changing into directory: D:/a/Pocket-Chordsmith/Pocket-Chordsmith/build/native-pcm
+MSVC Debug	Test	2026-09-30T21:48:36.0766083Z Test project D:/a/Pocket-Chordsmith/Pocket-Chordsmith/build/native-pcm
+MSVC Debug	Test	2026-09-30T21:48:36.2025591Z     Start 1: pocket_audio_native_pcm_tests
+MSVC Debug	Test	2026-09-30T21:48:37.1740698Z 1/1 Test #1: pocket_audio_native_pcm_tests ....   Passed    0.97 sec
+MSVC Debug	Test	2026-09-30T21:48:37.1755580Z 
+MSVC Debug	Test	2026-09-30T21:48:37.1755878Z 100% tests passed, 0 tests failed out of 1
+MSVC Debug	Test	2026-09-30T21:48:37.1756127Z 
+MSVC Debug	Test	2026-09-30T21:48:37.1756263Z Total Test time (real) =   1.10 sec
+MSVC Debug	Post Check out canonical source	﻿2026-09-30T21:48:37.3382162Z Post job cleanup.
+MSVC Debug	Post Check out canonical source	2026-09-30T21:48:37.5061668Z [command]"C:\Program Files\Git\bin\git.exe" version
+MSVC Debug	Post Check out canonical source	2026-09-30T21:48:37.5284748Z git version 2.55.0.windows.5
+MSVC Debug	Post Check out canonical source	2026-09-30T21:48:37.5345395Z Temporarily overriding HOME='D:\a\_temp\43565d5a-21a4-4b1f-8d2f-f1ab31fd79dd' before making global git config changes
+MSVC Debug	Post Check out canonical source	2026-09-30T21:48:37.5346586Z Adding repository directory to the temporary git global config as a safe directory
+MSVC Debug	Post Check out canonical source	2026-09-30T21:48:37.5358992Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\Pocket-Chordsmith\Pocket-Chordsmith
+MSVC Debug	Post Check out canonical source	2026-09-30T21:48:37.5668740Z Removing SSH command configuration
+MSVC Debug	Post Check out canonical source	2026-09-30T21:48:37.5681379Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+MSVC Debug	Post Check out canonical source	2026-09-30T21:48:37.6007059Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+MSVC Debug	Post Check out canonical source	2026-09-30T21:48:38.0480260Z Removing HTTP extra header
+MSVC Debug	Post Check out canonical source	2026-09-30T21:48:38.0494954Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+MSVC Debug	Post Check out canonical source	2026-09-30T21:48:38.0757075Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+MSVC Debug	Post Check out canonical source	2026-09-30T21:48:38.5568753Z Removing includeIf entries pointing to credentials config files
+MSVC Debug	Post Check out canonical source	2026-09-30T21:48:38.5580227Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+MSVC Debug	Post Check out canonical source	2026-09-30T21:48:38.5788425Z includeif.gitdir:D:/a/Pocket-Chordsmith/Pocket-Chordsmith/.git.path
+MSVC Debug	Post Check out canonical source	2026-09-30T21:48:38.5789068Z includeif.gitdir:D:/a/Pocket-Chordsmith/Pocket-Chordsmith/.git/worktrees/*.path
+MSVC Debug	Post Check out canonical source	2026-09-30T21:48:38.5789565Z includeif.gitdir:/github/workspace/.git.path
+MSVC Debug	Post Check out canonical source	2026-09-30T21:48:38.5789923Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+MSVC Debug	Post Check out canonical source	2026-09-30T21:48:38.5828746Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:D:/a/Pocket-Chordsmith/Pocket-Chordsmith/.git.path
+MSVC Debug	Post Check out canonical source	2026-09-30T21:48:38.6051397Z D:\a\_temp\git-credentials-85881e0f-5b6b-4463-ad55-b9f87b2697dd.config
+MSVC Debug	Post Check out canonical source	2026-09-30T21:48:38.6095618Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:D:/a/Pocket-Chordsmith/Pocket-Chordsmith/.git.path D\:\\a\\_temp\\git\-credentials\-85881e0f\-5b6b\-4463\-ad55\-b9f87b2697dd\.config
+MSVC Debug	Post Check out canonical source	2026-09-30T21:48:38.6379284Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:D:/a/Pocket-Chordsmith/Pocket-Chordsmith/.git/worktrees/*.path
+MSVC Debug	Post Check out canonical source	2026-09-30T21:48:38.6586150Z D:\a\_temp\git-credentials-85881e0f-5b6b-4463-ad55-b9f87b2697dd.config
+MSVC Debug	Post Check out canonical source	2026-09-30T21:48:38.6623172Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:D:/a/Pocket-Chordsmith/Pocket-Chordsmith/.git/worktrees/*.path D\:\\a\\_temp\\git\-credentials\-85881e0f\-5b6b\-4463\-ad55\-b9f87b2697dd\.config
+MSVC Debug	Post Check out canonical source	2026-09-30T21:48:38.6869860Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:/github/workspace/.git.path
+MSVC Debug	Post Check out canonical source	2026-09-30T21:48:38.7067339Z /github/runner_temp/git-credentials-85881e0f-5b6b-4463-ad55-b9f87b2697dd.config
+MSVC Debug	Post Check out canonical source	2026-09-30T21:48:38.7100328Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-85881e0f\-5b6b\-4463\-ad55\-b9f87b2697dd\.config
+MSVC Debug	Post Check out canonical source	2026-09-30T21:48:38.7341915Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+MSVC Debug	Post Check out canonical source	2026-09-30T21:48:38.7557208Z /github/runner_temp/git-credentials-85881e0f-5b6b-4463-ad55-b9f87b2697dd.config
+MSVC Debug	Post Check out canonical source	2026-09-30T21:48:38.7638470Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-85881e0f\-5b6b\-4463\-ad55\-b9f87b2697dd\.config
+MSVC Debug	Post Check out canonical source	2026-09-30T21:48:38.7884538Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+MSVC Debug	Post Check out canonical source	2026-09-30T21:48:39.3025595Z Removing credentials config 'D:\a\_temp\git-credentials-85881e0f-5b6b-4463-ad55-b9f87b2697dd.config'
+MSVC Debug	Complete job	﻿2026-09-30T21:48:39.3230003Z Cleaning up orphan processes
+MSVC Debug	Complete job	2026-09-30T21:48:39.3467927Z Terminate orphan process: pid (744) (vctip)
+MSVC Debug	Complete job	2026-09-30T21:48:39.3523944Z Terminate orphan process: pid (5460) (MSBuild)
+MSVC Debug	Complete job	2026-09-30T21:48:39.3662228Z Terminate orphan process: pid (756) (conhost)

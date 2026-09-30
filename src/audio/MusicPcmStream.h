@@ -6,11 +6,12 @@
 #include <span>
 
 #include "audio/MusicDirector.h"
+#include "pocket_audio/PcmLoopStream.h"
 
 namespace horde::audio
 {
 
-inline constexpr std::uint32_t kMusicPcmSampleRate = 48'000u;
+inline constexpr std::uint32_t kMusicPcmSampleRate = pocket_audio::kPcmSampleRate;
 inline constexpr std::uint64_t kMusicPcmLoopFrames = 576'000u;
 inline constexpr std::uint64_t kMusicPcmTailFrames = 144'000u;
 inline constexpr std::uint64_t kMusicPcmCrossfadeFrames = 12'000u;
@@ -24,18 +25,11 @@ struct MusicPcmClip
     std::span<const std::int16_t> tail;
 };
 
-enum class MusicPcmStatus : std::uint8_t
-{
-    Ok,
-    Suspended,
-    ClockInvalid,
-    InvalidClips,
-    InvalidSelection,
-    InvalidOutput,
-};
+using MusicPcmStatus = pocket_audio::PcmStatus;
 
-// Audio-thread-owned PCM cursor/mixer for the nine MusicCue rows. SetSelection,
-// SetVolumePercent, Render, and Reset must be called by one owner thread; this
+// Thin Horde cue/asset adapter to Pocket Audio Core's native PCM cursor/mixer.
+// Horde owns the nine MusicCue rows and C->D/G->H handoff policy, not PCM mixing.
+// SetSelection, SetVolumePercent, Render, and Reset require one owner thread; this
 // class makes no concurrent-call guarantee. Render performs no allocation,
 // locks, or I/O and reads only the caller-owned immutable clip spans.
 // Normal cue changes retain at most one 250 ms outgoing stream; a newer cue
@@ -47,38 +41,15 @@ class MusicPcmStream
 public:
     explicit MusicPcmStream(std::span<const MusicPcmClip> clips) noexcept;
 
-    [[nodiscard]] bool IsValid() const noexcept { return clipsValid_; }
+    [[nodiscard]] bool IsValid() const noexcept { return core_.IsValid(); }
     [[nodiscard]] MusicPcmStatus SetSelection(const MusicSelection& selection) noexcept;
     [[nodiscard]] bool SetVolumePercent(float percent) noexcept;
     [[nodiscard]] MusicPcmStatus Render(std::span<float> interleavedStereoOutput) noexcept;
     void Reset() noexcept;
 
 private:
-    struct StreamState
-    {
-        MusicCue cue = MusicCue::None;
-        std::uint64_t cursorFrames = 0u;
-        bool completedLoop = false;
-        bool active = false;
-        bool tailOnly = false;
-    };
-
-    [[nodiscard]] bool ValidateClips(std::span<const MusicPcmClip> clips) noexcept;
-    [[nodiscard]] bool ValidateSelection(const MusicSelection& selection) const noexcept;
-    [[nodiscard]] StreamState MakeState(const MusicSelection& selection) const noexcept;
-    [[nodiscard]] bool ReadFrame(StreamState& state, float& left, float& right) const noexcept;
-    void ClearPlayback() noexcept;
-
-    std::array<MusicPcmClip, kMusicPcmCueCount> clips_{};
-    StreamState current_{};
-    StreamState outgoing_{};
-    MusicSelection selection_{};
-    std::uint64_t crossfadePosition_ = kMusicPcmCrossfadeFrames;
-    float volume_ = 1.0f;
-    bool clipsValid_ = false;
-    bool selectionInitialized_ = false;
-    bool suspended_ = true;
-    bool lastDiscontinuity_ = false;
+    pocket_audio::PcmLoopStream core_;
+    MusicCue previousCue_ = MusicCue::None;
 };
 
 } // namespace horde::audio

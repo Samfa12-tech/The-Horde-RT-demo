@@ -46,6 +46,14 @@ For relevant background, consult `SHARED_SIMULATION_FOUNDATION_2026-08-10.md` or
 
 ## 1.6.1 integration contracts (development)
 
+- Horde's `MusicDirector` owns gameplay-state/event-to-cue decisions. Reusable
+  sample cursors, PCM looping/tails/crossfades and strict WAV decoding belong to
+  Pocket Audio Core, currently a byte-exact native-only pinned target under
+  `third_party/pocket-audio-core/`. Change reusable behaviour in the canonical
+  Core source, review/test it and deliberately update the pin; do not fork a
+  Horde-only mixer or import the Chordsmith editor/synth application. Preserve
+  canonical PCS JSON/PCS1 as the revisable score and existing event/SFX authority.
+  CPU helper contracts are not platform playback or owner listening acceptance.
 - Shipping consumes its immutable compiled Mobile/High strategy pair and performs no Diagnostic buffer IO; final Shipping SPIR-V must remain free of diagnostic atomics and binding 22. Policy selection must not become a nonphysical glass or fake-RT fallback.
 - Frame evidence joins recorded CPU/resource/strategy facts with the exact successful submission and its owning fence/final successful idle. Initial signalled fences own no submission. Never read Diagnostic buffers after failed idle or label prior GPU/counter results as the current recorded frame.
 - Optional telemetry identity, clock or timestamp failure must not stop otherwise valid rendering. Preserve independent real-graphics fence ownership for tokenless drains, explicit unavailable/error evidence, and monotonic identity seed floors through Android moves/restarts. No second submission counter or reused serials.
