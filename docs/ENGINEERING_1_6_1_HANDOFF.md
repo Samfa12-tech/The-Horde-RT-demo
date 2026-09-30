@@ -83,6 +83,16 @@ Measured60–66ms ordinary/225–237ms heavy GPU already miss33.333ms; this esta
 failure of the current workload, not inability of the hardware under a new genuine
 RT design. Preserve all physical/visual gates, accepted player work and full scope.
 
+Reviewed rollback/evidence checkpoints are pushed: f77dc4d traversal restoration,
+20c13c4 compute-wrapper repair, f50c32f retained trial/restoration. Fresh f50c32f
+push36708542328/PR36708549428 pass45portable+11Vulkan-host,10resolver/34combat/
+16ownership each; actual logs independently inspected, PR15 description readback
+verified and draft/CLEAN/MERGEABLE. No main merge/publication or scratch removal.
+[Mobile feasibility assessment](ENGINEERING_1_6_1_MOBILE_RT_FEASIBILITY_2026-09-30.md)
+separates native-cycle/GPU time, serial CPU cost and conditional savings. Current
+workload misses30FPS; quartering even all heavy GPU work is insufficient. No
+architecture promoted or net saving invented before eligible costs/overhead profile.
+
 Follow-on [opening fire-cost evidence](evidence/2026-09-30-opening-lighting-isolation/README.md)
 retains C1,S1,V1,V2 and separate uncooled C2:all9,190 completions and800 opening
 OpaqueFast rows pass exact admission. Opening GPU medianC1 66.670ms,
