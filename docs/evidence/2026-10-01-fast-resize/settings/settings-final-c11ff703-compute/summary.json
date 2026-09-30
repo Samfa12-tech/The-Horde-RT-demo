@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "model": "SM-S948B",
+  "apkSha256": "c11ff703794d74dbfb75dc7a0186af0f6c5c416e8383755a5cd8f84310daf0fe",
+  "cooled": false,
+  "method": "Observed Settings SeekBar, same process/surface; device shell timestamp preceding touch to first successful RT swapchain presentation. Includes input/debounce/whole-device idle; excludes compositor/touchscreen latency. Not Shipping FPS.",
+  "rows": [
+    {
+      "sequence": 1,
+      "scale": 100,
+      "pid": "13167",
+      "requestDeviceEpochSeconds": 1790784684.5061827,
+      "presentationLog": "         1790784684.956 13167 13554 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.",
+      "requestToPresentedMs": 449.817419052124,
+      "surfaceRestart": false,
+      "fastPathLog": "         1790784684.955 13167 13554 I HordeRtProbeBridge: HORDE_RT_SCALE_RESIZE scale=100 extent=1440x2980 output_only=1 idle_and_resize_ms=72.233"
+    },
+    {
+      "sequence": 2,
+      "scale": 75,
+      "pid": "13167",
+      "requestDeviceEpochSeconds": 1790784689.490883,
+      "presentationLog": "         1790784690.045 13167 13554 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.",
+      "requestToPresentedMs": 554.11696434021,
+      "surfaceRestart": false,
+      "fastPathLog": "         1790784690.043 13167 13554 I HordeRtProbeBridge: HORDE_RT_SCALE_RESIZE scale=75 extent=1080x2235 output_only=1 idle_and_resize_ms=112.597"
+    },
+    {
+      "sequence": 3,
+      "scale": 50,
+      "pid": "13167",
+      "requestDeviceEpochSeconds": 1790784694.477428,
+      "presentationLog": "         1790784694.983 13167 13554 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.",
+      "requestToPresentedMs": 505.5720806121826,
+      "surfaceRestart": false,
+      "fastPathLog": "         1790784694.982 13167 13554 I HordeRtProbeBridge: HORDE_RT_SCALE_RESIZE scale=50 extent=720x1490 output_only=1 idle_and_resize_ms=75.980"
+    },
+    {
+      "sequence": 4,
+      "scale": 75,
+      "pid": "13167",
+      "requestDeviceEpochSeconds": 1790784699.4913883,
+      "presentationLog": "         1790784699.919 13167 13554 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.",
+      "requestToPresentedMs": 427.6115894317627,
+      "surfaceRestart": false,
+      "fastPathLog": "         1790784699.918 13167 13554 I HordeRtProbeBridge: HORDE_RT_SCALE_RESIZE scale=75 extent=1080x2235 output_only=1 idle_and_resize_ms=40.390"
+    }
+  ]
+}

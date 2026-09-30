@@ -1,0 +1,6 @@
+--------- beginning of main
+         1790781519.938 10517 10517 I HordeRtProbeBridge: HORDE_GPU_TIMING mode=enabled rt_rendering=unchanged
+         1790781531.322 10517 10517 I HordeRtProbeBridge: PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich
+         1790781531.322 10517 10517 I HordeRtProbeBridge: RT render scale 75%: 1080x2235 -> 1440x2980
+         1790781531.322 10517 10517 I HordeRtProbeBridge: Started Android diagnostic surface rendering loop.
+         1790781531.329 10517 11058 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.

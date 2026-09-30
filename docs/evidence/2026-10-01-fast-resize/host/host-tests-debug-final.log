@@ -1,0 +1,14 @@
+Internal ctest changing into directory: C:/Dev/tmp/horde-fast-resize-20261001/host
+Test project C:/Dev/tmp/horde-fast-resize-20261001/host
+    Start 11: horde_rt_performance_evidence_tests
+1/4 Test #11: horde_rt_performance_evidence_tests .........   Passed    1.04 sec
+    Start 66: horde_rt_scene_initialise_preflight_tests
+2/4 Test #66: horde_rt_scene_initialise_preflight_tests ...   Passed    3.76 sec
+    Start 67: horde_rt_scene_resource_inventory_tests
+3/4 Test #67: horde_rt_scene_resource_inventory_tests .....   Passed    4.58 sec
+    Start 76: horde_rt_character_render_slot_smoke
+4/4 Test #76: horde_rt_character_render_slot_smoke ........   Passed    3.95 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =  13.35 sec

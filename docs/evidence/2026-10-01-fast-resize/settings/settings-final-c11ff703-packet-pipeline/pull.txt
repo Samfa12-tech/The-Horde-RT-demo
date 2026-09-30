@@ -1,0 +1,1 @@
+/data/app/~~kPfMlCYwOyPx-QfaS5ixXA==/com.samfa12.hordelanternrt.debug-3foWSUgq5ctkIj4Llvu_Vw==/base.apk: 1 file pulled, 0 skipped. 41.5 MB/s (78232323 bytes in 1.799s)

@@ -2,6 +2,41 @@
 
 Last updated: 2026-10-01
 
+## October 1: bounded render-scale resize (local SM-S948B evidence)
+
+Implementation5405768, focused CIb74559c. Exact SM-S948B/R5GL219SZGK,
+Android16/Adreno840/driver2150932499, uncooled, strict ASTC. Final Debug APK
+`c11ff703794d74dbfb75dc7a0186af0f6c5c416e8383755a5cd8f84310daf0fe`
+installs/pulls back identically. It was built before5405768 from113200e plus the
+retained patch; all affected source blobs independently match5405768. Existing
+render assets and all four embedded shader modules match normal Debug389d6954;
+only the packaged licence/provenance text differs.
+
+Actual Settings75→100→75→50→75, same process/render thread/surface: old full-scene
+controls13.28–14.24seconds request→first successful RT presentation; final output-only
+pipeline0.414–0.586seconds and required compute0.428–0.554seconds. Includes350ms
+debounce and GPU idle; Debug UI latency, not Shipping FPS/pacing. Eight final
+before/after owning packets confirm newer epochs, correct extents and unchanged
+backend, valid frame-owned41-counter diagnostics and stable reported scene owner
+counts. Only output-dependent device-local bytes vary; aggregate counts are not
+proof of Vulkan handle identity. The independently tested code retains BLAS/TLAS,
+pipelines, textures and accepted modelled-player resources. Whole-device idle and
+full surface/Home recreation remain; failed resize is diagnostic/fail-closed.
+
+Opening/Home020500 and full13-waypoint replay/opening/Home022603 PASS at75%, with
+honest RT presentation and strict ASTC. OpeningPNGd3ec98a8 is byte-identical to
+control. Opening captures validate initialization/readback, not inline resize.
+Native Windows standard captures13/13 on each RTX backend and focused MSVC
+Debug/Release4/4 also pass, but are separate evidence. Dedicated glass, backend
+pixel parity, Shipping heavy-scene/continuous gameplay resize acceptance and
+exact S24/S25 remain open. No changed materials, quality, budgets, ray work,
+player tuning or personal/stable-app data. Audio/haptic manual revalidation:NO.
+[Retained resize evidence](evidence/2026-10-01-fast-resize/README.md).
+
+Same-source ARM64 unsigned Shipping build/package check PASS, APKd501c394b8:
+all four actual packaged Mobile modules val/dis PASS, zero diagnostic atomics,
+no binding22. Not installed/signed/published; not device evidence for Shipping.
+
 ## October 1: compiler-only OpaqueFast investigation (local SM-S948B evidence)
 
 Exact SM-S948B/R5GL219SZGK, Android16/Adreno840/driver2150932499, strict ASTC,

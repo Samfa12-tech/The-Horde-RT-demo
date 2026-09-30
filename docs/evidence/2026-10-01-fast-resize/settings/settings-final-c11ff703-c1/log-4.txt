@@ -1,0 +1,44 @@
+--------- beginning of main
+         1790784443.361 11068 11068 I HordeLanternAudio: SFX loaded: 2
+         1790784443.361 11068 11068 I HordeLanternAudio: SFX loaded: 1
+         1790784443.361 11068 11068 I HordeLanternAudio: SFX loaded: 3
+         1790784443.361 11068 11068 I HordeLanternAudio: SFX loaded: 4
+         1790784443.361 11068 11068 I HordeLanternAudio: SFX loaded: 5
+         1790784443.361 11068 11068 I HordeLanternAudio: SFX loaded: 6
+         1790784443.361 11068 11068 I HordeLanternAudio: SFX loaded: 7
+         1790784443.361 11068 11068 I HordeLanternAudio: SFX loaded: 8
+         1790784443.361 11068 11068 I HordeLanternAudio: SFX loaded: 9
+         1790784443.361 11068 11068 I HordeLanternAudio: SFX loaded: 10
+         1790784443.361 11068 11068 I HordeLanternAudio: SFX loaded: 11
+         1790784443.361 11068 11068 I HordeLanternAudio: SFX loaded: 12
+         1790784443.361 11068 11068 I HordeLanternAudio: SFX loaded: 13
+         1790784443.361 11068 11068 I HordeLanternAudio: SFX loaded: 14
+         1790784443.361 11068 11068 I HordeLanternAudio: SFX loaded: 15
+         1790784443.361 11068 11068 I HordeLanternAudio: SFX loaded: 16
+         1790784443.361 11068 11068 I HordeLanternAudio: SFX loaded: 17
+         1790784443.361 11068 11068 I HordeLanternAudio: SFX loaded: 18
+         1790784443.361 11068 11068 I HordeLanternAudio: SFX loaded: 20
+         1790784443.361 11068 11068 I HordeLanternAudio: SFX loaded: 19
+         1790784443.373 11068 11068 I HordeRtProbeBridge: HORDE_GPU_TIMING mode=enabled rt_rendering=unchanged
+         1790784455.646 11068 11068 I HordeRtProbeBridge: PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich
+         1790784455.646 11068 11068 I HordeRtProbeBridge: RT render scale 75%: 1080x2235 -> 1440x2980
+         1790784455.646 11068 11068 I HordeRtProbeBridge: Started Android diagnostic surface rendering loop.
+         1790784455.653 11068 11385 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
+         1790784459.137 11068 11385 I HordeRtProbeBridge: RT frame timing avg ms: total=116.299 fence=114.378 record=0.910 submit+present=0.740
+         1790784459.137 11068 11385 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=111.722 average_ms=118.080 samples=29 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+         1790784472.420 11068 11385 I HordeRtProbeBridge: RT frame timing avg ms: total=110.654 fence=109.049 record=0.668 submit+present=0.694
+         1790784472.420 11068 11385 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=89.027 average_ms=110.534 samples=149 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+         1790784479.709 11068 11385 I HordeRtProbeBridge: HORDE_RT_SCALE_RESIZE scale=100 extent=1440x2980 output_only=1 idle_and_resize_ms=76.811
+         1790784479.710 11068 11385 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
+         1790784483.224 11068 11385 I HordeRtProbeBridge: RT frame timing avg ms: total=117.115 fence=115.532 record=0.662 submit+present=0.699
+         1790784483.224 11068 11385 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=118.316 average_ms=119.232 samples=29 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+         1790784484.756 11068 11385 I HordeRtProbeBridge: HORDE_RT_SCALE_RESIZE scale=75 extent=1080x2235 output_only=1 idle_and_resize_ms=123.042
+         1790784484.757 11068 11385 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
+         1790784486.888 11068 11385 I HordeRtProbeBridge: RT frame timing avg ms: total=71.009 fence=69.449 record=0.655 submit+present=0.702
+         1790784486.888 11068 11385 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=69.972 average_ms=71.569 samples=29 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+         1790784489.757 11068 11385 I HordeRtProbeBridge: HORDE_RT_SCALE_RESIZE scale=50 extent=720x1490 output_only=1 idle_and_resize_ms=70.549
+         1790784489.759 11068 11385 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
+         1790784490.877 11068 11385 I HordeRtProbeBridge: RT frame timing avg ms: total=37.266 fence=35.921 record=0.532 submit+present=0.583
+         1790784490.877 11068 11385 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=38.397 average_ms=36.828 samples=29 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+         1790784494.678 11068 11385 I HordeRtProbeBridge: HORDE_RT_SCALE_RESIZE scale=75 extent=1080x2235 output_only=1 idle_and_resize_ms=38.907
+         1790784494.679 11068 11385 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.

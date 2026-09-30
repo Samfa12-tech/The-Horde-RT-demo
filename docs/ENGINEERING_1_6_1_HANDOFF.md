@@ -28,6 +28,45 @@ without loosening tolerance. Include live motion, not just frozen extreme poses.
 Music, consent-based reporting, resource work and final gates remain in scope;
 licensing, signing recovery and publication remain owner-controlled.
 
+### October 1 bounded render-scale resource checkpoint
+
+Pushed5405768 preserves the Android RT scene during scale-only changes; b74559c
+adds resource/preflight tests to the Vulkan CPU-host CI lane. This independently
+justified owner-requested resource slice does not replace Phase4 glass work.
+Actual Settings controls (same process/thread/surface) take13.28–14.24seconds;
+final exact DebugC11ff703 takes0.414–0.586seconds on pipeline and0.428–0.554seconds
+on required compute, including350ms debounce. Not Shipping FPS or pacing.
+Allocation rollback retains old ownership but Android fails closed on error;
+whole-device idle, one frame in flight and full surface/Home recreation remain.
+Descriptor binding1/output image/extent/groups change, not BLAS/TLAS, textures,
+pipelines/SBT, accepted player resources or shared animation/gameplay state.
+Capture counter restarts at the new extent; unwritten output readback is rejected.
+
+FinalC11 was built from113200e+retained patch before5405768; affected source blobs
+match that commit. All four APK shader modules/render payload assets equal normal
+Debug389; only asset licence/provenance text differs. Debug/Release4/4 focused tests,
+ARM64 Debug build/module val/dis, opening/Home020500 and full replay/opening/Home022603
+PASS. OpeningPNGd3ec byte-identical; native Windows standard captures13/13 on each
+backend PASS, not pixel parity or Windows inline-resize proof. Eight physical-phone
+before/after owning packets preserve backend/extent joins, diagnostics and reported
+scene owner counts. Counts do not prove individual Vulkan handle identity.
+Current b74559c push36743947124/PR36743955283 both PASS46portable+13Vulkan CPU-host
+and existing10resolver/offline contracts, actual logs inspected.
+ARM64 unsigned Shipping APKd501c394 builds/packages PASS/all4module val/dis,
+zero atomics/no binding22; not installed/signed/published or device accepted.
+[Durable resize evidence](evidence/2026-10-01-fast-resize/README.md) distinguishes
+true `settings-control-*` runs from excluded Activity-intent/surface-restart trials.
+Shipping/heavy-lantern/live-gameplay resize stress remains a final-candidate gate.
+Audio/haptic manual revalidation required:NO (unchanged semantic inputs/playback).
+
+Next: remaining physical-glass budget/recovery witness and unchanged-tolerance
+compiler/backend pixel attribution; retain negative micro-optimisation results.
+Prioritize matched Shipping phone measurements and quality-preserving Mobile ray
+workload design. Music native playback/separate persisted volume, explicit-consent
+reporting, deferred live benchmark FPS and remaining final matrix stay in scope.
+Accepted player geometry/presentation is not reopened. Signing, Hotstrike
+redistribution and publication remain owner-controlled; exact S24/S25 unverified.
+
 ### September 30 Shipping comparison and opening-room checkpoint
 
 October1 follow-on: compiler-only OpaqueFast probe keeps identical normal
@@ -45,7 +84,7 @@ intervals exceed33.333ms; pixelFAIL14 still forbids promotion. No glass/30FPS cl
 includes actual-module inspection, unchanged RED production guards and parser negatives.
 Normal Debug389d6954 restored/pulled back: opening/Home-resume010627 PASS, PNGd3ec
 equals control; optional APK upload declined, stable app/data unchanged.
-Current452d4ff push36729104556/PR36729112120 pass46portable+11Vulkan CPU-host each,
+Then-current452d4ff push36729104556/PR36729112120 pass46portable+11Vulkan CPU-host each,
 actual logs inspected. Owner-authorised music prototypes are pushed/LFS verified;
 runtime music/separate volume and final gates remain open. Accepted players unchanged.
 

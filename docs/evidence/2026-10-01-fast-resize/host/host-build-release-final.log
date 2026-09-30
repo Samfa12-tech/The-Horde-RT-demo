@@ -1,0 +1,24 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  horde_gameplay_simulation.vcxproj -> C:\Dev\tmp\horde-fast-resize-20261001\host\Release\horde_gameplay_simulation.lib
+  PresentableTinyRtScene.cpp
+  SimulationFrameAdapter.cpp
+  Generating Code...
+  horde_rt_probe_core.vcxproj -> C:\Dev\tmp\horde-fast-resize-20261001\host\Release\horde_rt_probe_core.lib
+  RtSceneResourceInventoryTests.cpp
+  horde_rt_scene_resource_inventory_tests.vcxproj -> C:\Dev\tmp\horde-fast-resize-20261001\host\Release\horde_rt_scene_resource_inventory_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  horde_gameplay_simulation.vcxproj -> C:\Dev\tmp\horde-fast-resize-20261001\host\Release\horde_gameplay_simulation.lib
+  horde_rt_probe_core.vcxproj -> C:\Dev\tmp\horde-fast-resize-20261001\host\Release\horde_rt_probe_core.lib
+  CharacterRenderSlotSmoke.cpp
+  horde_rt_character_render_slot_smoke.vcxproj -> C:\Dev\tmp\horde-fast-resize-20261001\host\Release\horde_rt_character_render_slot_smoke.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  horde_gameplay_simulation.vcxproj -> C:\Dev\tmp\horde-fast-resize-20261001\host\Release\horde_gameplay_simulation.lib
+  horde_rt_probe_core.vcxproj -> C:\Dev\tmp\horde-fast-resize-20261001\host\Release\horde_rt_probe_core.lib
+  RtSceneInitialisePreflightTests.cpp
+  horde_rt_scene_initialise_preflight_tests.vcxproj -> C:\Dev\tmp\horde-fast-resize-20261001\host\Release\horde_rt_scene_initialise_preflight_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  horde_rt_performance_evidence_tests.vcxproj -> C:\Dev\tmp\horde-fast-resize-20261001\host\Release\horde_rt_performance_evidence_tests.exe

@@ -107,3 +107,10 @@ docs/evidence/2026-10-01-music-render/audio/*.wav filter=lfs diff=lfs merge=lfs 
 docs/evidence/2026-10-01-opaque-compiler/** -text whitespace=cr-at-eol
 docs/evidence/2026-10-01-opaque-compiler/**/*.log whitespace=-trailing-space,-blank-at-eof,-space-before-tab,cr-at-eol
 docs/evidence/2026-10-01-opaque-compiler/**/*.patch whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+
+# Exact output-only resize comparisons and ownership/validation receipts.
+docs/evidence/2026-10-01-fast-resize/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-01-fast-resize/**/*.log whitespace=-trailing-space,-blank-at-eof,-space-before-tab,cr-at-eol
+docs/evidence/2026-10-01-fast-resize/**/*.patch whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-01-fast-resize/**/battery*.txt whitespace=-trailing-space,cr-at-eol
+docs/evidence/2026-10-01-fast-resize/**/runtime-*.txt whitespace=-trailing-space,cr-at-eol

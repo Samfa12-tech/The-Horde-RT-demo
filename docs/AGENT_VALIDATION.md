@@ -33,7 +33,9 @@ The same workflow also runs on pushes to `codex/horde-1.6.1-engineering-pass`, s
 PR merge conflicts cannot suppress all current-source compiler coverage. Its
 `player-vulkan-host` lane enables Vulkan targets with the Ubuntu development
 package and builds/runs the focused player contracts, actual skinned-player smoke
-and malformed/reordered GLB fixtures. The tests do not create a Vulkan device:
+and malformed/reordered GLB fixtures. Focused initialization preflight and scene
+resource-inventory tests also cover output-only resize rollback and ownership.
+The tests do not create a Vulkan device:
 SDK-enabled host compilation is **not** physical RT presentation, backend image
 parity or Android-device acceptance. Keep the portable lane as separate coverage.
 

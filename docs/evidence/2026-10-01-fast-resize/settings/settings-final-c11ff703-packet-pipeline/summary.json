@@ -1,0 +1,109 @@
+{
+  "schema": 2,
+  "model": "SM-S948B",
+  "apkSha256": "c11ff703794d74dbfb75dc7a0186af0f6c5c416e8383755a5cd8f84310daf0fe",
+  "cooled": false,
+  "method": "Observed Settings SeekBar, same process/surface; device shell timestamp preceding touch to first successful RT swapchain presentation. Includes input/debounce/whole-device idle; excludes compositor/touchscreen latency. Not Shipping FPS. Subsequent owning-packet/extent/backend validation is outside the timed interval.",
+  "rows": [
+    {
+      "sequence": 1,
+      "scale": 100,
+      "pid": "16080",
+      "requestDeviceEpochSeconds": 1790785042.2826676,
+      "presentationLog": "         1790785042.773 16080 16347 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.",
+      "requestToPresentedMs": 490.33236503601074,
+      "surfaceRestart": false,
+      "fastPathLog": "         1790785042.772 16080 16347 I HordeRtProbeBridge: HORDE_RT_SCALE_RESIZE scale=100 extent=1440x2980 output_only=1 idle_and_resize_ms=75.547",
+      "beforeEpoch": 2,
+      "afterEpoch": 3,
+      "executionBackend": "RayTracingPipeline",
+      "resources": {
+        "bufferCount": 45,
+        "memoryAllocationCount": 55,
+        "bottomLevelAccelerationStructureCount": 17,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 21,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 9815360,
+        "deviceLocalBytes": 84304192
+      }
+    },
+    {
+      "sequence": 2,
+      "scale": 75,
+      "pid": "16080",
+      "requestDeviceEpochSeconds": 1790785050.3787434,
+      "presentationLog": "         1790785050.941 16080 16347 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.",
+      "requestToPresentedMs": 562.2565746307373,
+      "surfaceRestart": false,
+      "fastPathLog": "         1790785050.939 16080 16347 I HordeRtProbeBridge: HORDE_RT_SCALE_RESIZE scale=75 extent=1080x2235 output_only=1 idle_and_resize_ms=102.867",
+      "beforeEpoch": 3,
+      "afterEpoch": 4,
+      "executionBackend": "RayTracingPipeline",
+      "resources": {
+        "bufferCount": 45,
+        "memoryAllocationCount": 55,
+        "bottomLevelAccelerationStructureCount": 17,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 21,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 9815360,
+        "deviceLocalBytes": 76411200
+      }
+    },
+    {
+      "sequence": 3,
+      "scale": 50,
+      "pid": "16080",
+      "requestDeviceEpochSeconds": 1790785057.3626204,
+      "presentationLog": "         1790785057.797 16080 16347 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.",
+      "requestToPresentedMs": 434.37957763671875,
+      "surfaceRestart": false,
+      "fastPathLog": "         1790785057.795 16080 16347 I HordeRtProbeBridge: HORDE_RT_SCALE_RESIZE scale=50 extent=720x1490 output_only=1 idle_and_resize_ms=65.449",
+      "beforeEpoch": 4,
+      "afterEpoch": 5,
+      "executionBackend": "RayTracingPipeline",
+      "resources": {
+        "bufferCount": 45,
+        "memoryAllocationCount": 55,
+        "bottomLevelAccelerationStructureCount": 17,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 21,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 9815360,
+        "deviceLocalBytes": 71233856
+      }
+    },
+    {
+      "sequence": 4,
+      "scale": 75,
+      "pid": "16080",
+      "requestDeviceEpochSeconds": 1790785063.3348897,
+      "presentationLog": "         1790785063.749 16080 16347 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.",
+      "requestToPresentedMs": 414.1104221343994,
+      "surfaceRestart": false,
+      "fastPathLog": "         1790785063.749 16080 16347 I HordeRtProbeBridge: HORDE_RT_SCALE_RESIZE scale=75 extent=1080x2235 output_only=1 idle_and_resize_ms=34.154",
+      "beforeEpoch": 5,
+      "afterEpoch": 6,
+      "executionBackend": "RayTracingPipeline",
+      "resources": {
+        "bufferCount": 45,
+        "memoryAllocationCount": 55,
+        "bottomLevelAccelerationStructureCount": 17,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 21,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 9815360,
+        "deviceLocalBytes": 76411200
+      }
+    }
+  ]
+}
