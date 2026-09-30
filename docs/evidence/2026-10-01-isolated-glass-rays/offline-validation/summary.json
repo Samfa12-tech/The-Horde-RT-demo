@@ -1,0 +1,1600 @@
+{
+  "schema": 1,
+  "classification": "investigation-only; corroboration, not GPU traversal emulation",
+  "capture": {
+    "analysisJsonSha256": "f76d4bb7b3687d37f0a0d737c80c145bd079966b80c9c6b6181f0cf18746be4e",
+    "nativeRawSha256": "d36581ce3a875e03f0d6dadc1098505e3d1738a224cbaf5156a0be710bf72916",
+    "extent": {
+      "width": 1080,
+      "height": 2235
+    },
+    "paths": 81,
+    "capturedHits": 405,
+    "reason2Rows": 80,
+    "closedInterfaceBudgetRows": 1,
+    "moduleScope": "Diagnostic/Mobile/GenericDielectric pipeline only; compute unchanged"
+  },
+  "glb": {
+    "absolutePath": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.6.1-engineering-pass\\assets\\models\\props\\runtime\\reward-lantern-body\\reward-lantern-body-lod0.runtime.glb",
+    "sha256": "34a2522f2027d3fb04b77480cc929d36c5a19c6e0f33bf3fa0f0ae0959c99ec4",
+    "node": "LanternGlass",
+    "triangleCount": 72,
+    "capturedTriangleVertexMismatches": 0
+  },
+  "method": {
+    "intersection": "double-precision Moller-Trumbore over captured float object-ray origin/direction",
+    "searchScope": "all 72 pinned LanternGlass triangles per captured query",
+    "tMinComparisonTolerance": 1e-09,
+    "determinantMinimum": 1e-15,
+    "barycentricTolerance": 1e-09,
+    "nearestTMatchAndTieTolerance": 1e-06,
+    "hardwareTraversalEmulated": false,
+    "limitation": "Uses actual captured native query O/D and selected hits, but double-precision CPU intersections do not reproduce device BVH traversal/rounding or unrecorded rays."
+  },
+  "validation": {
+    "capturedTriangleMismatches": 0,
+    "committedCandidatesNotNearestOrTied": 0,
+    "maxRawTResidual": 4.0691543131896046e-07,
+    "reason2Slot4MaxRawTResidual": 6.657779373902412e-08,
+    "maxAbsoluteBarycentricResidual": 0.00013110781310476938,
+    "reason2ComponentTransitionCounts": {
+      "(3, 4)": 30,
+      "(4, 1)": 18,
+      "(5, 0)": 21,
+      "(3, 2)": 11
+    },
+    "allPathStatePatterns": {
+      "interfaceBudget | ('EXXXE', (0, 1, 1, 1, 0), (0, 0, 1, 2, 0))": 1,
+      "certifiedBudgetReason2 | ('EXXEX', (0, 1, 1, 0, 1), (0, 0, 1, 0, 0))": 80
+    },
+    "reason2StatePatterns": {
+      "certifiedBudgetReason2 | ('EXXEX', (0, 1, 1, 0, 1), (0, 0, 1, 0, 0))": 80
+    },
+    "reason2Slot4RawTRange": [
+      0.0030913318041712046,
+      0.005437989253550768
+    ],
+    "reason2Slot3Slot4FaceRelation": {
+      "opposingParallelCount": 79,
+      "otherDistinctFaceCount": 1,
+      "parallelPlaneGapLocalMinMax": [
+        0.006999999284744171,
+        0.007000008984208758
+      ],
+      "otherFaces": [
+        {
+          "pixel": [
+            347,
+            1201
+          ],
+          "slot3Primitive": 12,
+          "slot4Primitive": 13,
+          "normalDot": 1.6109363245198797e-07,
+          "candidateBarycentricInteriorMargin": 0.050943631678819656
+        }
+      ]
+    },
+    "minimumReason2Slot4BarycentricInteriorMargin": 0.0007752478122711182,
+    "closedBudgetWitness": {
+      "pixel": [
+        346,
+        1200
+      ],
+      "primitiveSequence": [
+        19,
+        58,
+        20,
+        21,
+        27
+      ],
+      "componentSequence": [
+        3,
+        3,
+        3,
+        3,
+        4
+      ],
+      "directionNormalSigns": "EXXXE",
+      "openBeforeEachHit": [
+        0,
+        1,
+        1,
+        1,
+        0
+      ],
+      "priorTirCountBeforeEachHit": [
+        0,
+        0,
+        1,
+        2,
+        0
+      ],
+      "fifthCandidateRawT": 0.13058379292488098,
+      "fifthCandidateQueryMinimum": 0.0,
+      "fifthCandidateBarycentricInteriorMargin": 0.12773236632347107,
+      "fifthCandidateDirectionNormalDot": -0.5782492756843567
+    }
+  },
+  "owningEvidence": {
+    "differentCounterFields": 0,
+    "controlStatus": "valid",
+    "probeStatus": "valid",
+    "controlPresented": true,
+    "probePresented": true,
+    "controlIdentity": {
+      "sceneEpoch": 6,
+      "measurementGeneration": 6,
+      "recordAttemptSerial": 518,
+      "recordSerial": 518,
+      "submissionSerial": 518,
+      "completionSerial": 518,
+      "simulationTick": 76,
+      "frameSlot": 0
+    },
+    "probeIdentity": {
+      "sceneEpoch": 6,
+      "measurementGeneration": 6,
+      "recordAttemptSerial": 514,
+      "recordSerial": 514,
+      "submissionSerial": 514,
+      "completionSerial": 514,
+      "simulationTick": 57,
+      "frameSlot": 0
+    },
+    "identityNote": "serial and simulationTick differ; equal arrays are not same-frame identity proof"
+  },
+  "imageScope": {
+    "pathVsMarkerOutsideReservedRowsChangedPixels": 0,
+    "markerVsControlChangedPixels": 81,
+    "markerPixels": {
+      "interfaceBudget": 1,
+      "certifiedBudgetReason2": 80,
+      "certifiedTerminalReason1": 0,
+      "certifiedUnresolvedReason16": 0
+    },
+    "productionAcceptance": false
+  },
+  "perReason2Candidate": [
+    {
+      "pixel": [
+        340,
+        1046
+      ],
+      "primitive": 61,
+      "componentA": 3,
+      "componentB": 4,
+      "rawT": 0.0035396229941397905,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.848763644695282,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.1657814383506775,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.003539597592807535
+    },
+    {
+      "pixel": [
+        340,
+        1047
+      ],
+      "primitive": 61,
+      "componentA": 3,
+      "componentB": 4,
+      "rawT": 0.0035467022098600864,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8491260409355164,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.16389603912830353,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.0035466754907290876
+    },
+    {
+      "pixel": [
+        340,
+        1048
+      ],
+      "primitive": 61,
+      "componentA": 3,
+      "componentB": 4,
+      "rawT": 0.003538485849276185,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8490307331085205,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.15764737129211426,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.0035384613787281297
+    },
+    {
+      "pixel": [
+        340,
+        1049
+      ],
+      "primitive": 61,
+      "componentA": 3,
+      "componentB": 4,
+      "rawT": 0.003539290511980653,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8489652872085571,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.1515912562608719,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.0035392638811084912
+    },
+    {
+      "pixel": [
+        340,
+        1050
+      ],
+      "primitive": 61,
+      "componentA": 3,
+      "componentB": 4,
+      "rawT": 0.00354017224162817,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8487101793289185,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.14325305819511414,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.0035401475602912414
+    },
+    {
+      "pixel": [
+        340,
+        1051
+      ],
+      "primitive": 61,
+      "componentA": 3,
+      "componentB": 4,
+      "rawT": 0.0035463469102978706,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8490526080131531,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.14194375276565552,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.003546320728736999
+    },
+    {
+      "pixel": [
+        340,
+        1052
+      ],
+      "primitive": 61,
+      "componentA": 3,
+      "componentB": 4,
+      "rawT": 0.003546609776094556,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8489474058151245,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.1353190839290619,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.0035465853980509664
+    },
+    {
+      "pixel": [
+        340,
+        1053
+      ],
+      "primitive": 61,
+      "componentA": 3,
+      "componentB": 4,
+      "rawT": 0.0035459536593407393,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8487829566001892,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.12807755172252655,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.003545928860518449
+    },
+    {
+      "pixel": [
+        340,
+        1054
+      ],
+      "primitive": 61,
+      "componentA": 3,
+      "componentB": 4,
+      "rawT": 0.003541791345924139,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8488683104515076,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.12380626052618027,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.0035417647347797806
+    },
+    {
+      "pixel": [
+        340,
+        1055
+      ],
+      "primitive": 61,
+      "componentA": 3,
+      "componentB": 4,
+      "rawT": 0.003545735264196992,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8488451242446899,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.1181957870721817,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.00354571212750646
+    },
+    {
+      "pixel": [
+        340,
+        1056
+      ],
+      "primitive": 61,
+      "componentA": 3,
+      "componentB": 4,
+      "rawT": 0.0035426064860075712,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8489277362823486,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.11408405750989914,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.003542581302887861
+    },
+    {
+      "pixel": [
+        340,
+        1057
+      ],
+      "primitive": 61,
+      "componentA": 3,
+      "componentB": 4,
+      "rawT": 0.0035470675211399794,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8488062024116516,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.10711236298084259,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.0035470437120777663
+    },
+    {
+      "pixel": [
+        340,
+        1058
+      ],
+      "primitive": 61,
+      "componentA": 3,
+      "componentB": 4,
+      "rawT": 0.0035414472222328186,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8485103845596313,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.09813343733549118,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.0035414226476652095
+    },
+    {
+      "pixel": [
+        341,
+        1067
+      ],
+      "primitive": 61,
+      "componentA": 3,
+      "componentB": 4,
+      "rawT": 0.00354085979051888,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8484838604927063,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.023019369691610336,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.0035408357694876025
+    },
+    {
+      "pixel": [
+        341,
+        1068
+      ],
+      "primitive": 61,
+      "componentA": 3,
+      "componentB": 4,
+      "rawT": 0.0035438062623143196,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8483957648277283,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.016463015228509903,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.003543782929401969
+    },
+    {
+      "pixel": [
+        341,
+        1069
+      ],
+      "primitive": 61,
+      "componentA": 3,
+      "componentB": 4,
+      "rawT": 0.003540958743542433,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8483427166938782,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.01043678354471922,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.0035409328339178403
+    },
+    {
+      "pixel": [
+        341,
+        1070
+      ],
+      "primitive": 61,
+      "componentA": 3,
+      "componentB": 4,
+      "rawT": 0.003550074528902769,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8480880856513977,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.0021229544654488564,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.0035500494386968345
+    },
+    {
+      "pixel": [
+        341,
+        1071
+      ],
+      "primitive": 25,
+      "componentA": 3,
+      "componentB": 4,
+      "rawT": 0.003542746650055051,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8479817509651184,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.004378848243504763,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.003542719120008768
+    },
+    {
+      "pixel": [
+        341,
+        1072
+      ],
+      "primitive": 25,
+      "componentA": 3,
+      "componentB": 4,
+      "rawT": 0.00354944821447134,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8479525446891785,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.0102859390899539,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.0035494192315896956
+    },
+    {
+      "pixel": [
+        341,
+        1073
+      ],
+      "primitive": 25,
+      "componentA": 3,
+      "componentB": 4,
+      "rawT": 0.003541685175150633,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8482977747917175,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.011358693242073059,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.0035416608313590956
+    },
+    {
+      "pixel": [
+        377,
+        1096
+      ],
+      "primitive": 7,
+      "componentA": 4,
+      "componentB": 1,
+      "rawT": 0.0030955870170146227,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.9724172353744507,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.2584311068058014,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.0030955633137295796
+    },
+    {
+      "pixel": [
+        377,
+        1097
+      ],
+      "primitive": 7,
+      "componentA": 4,
+      "componentB": 1,
+      "rawT": 0.0030941918957978487,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.9724010825157166,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.26031312346458435,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.00309416968982151
+    },
+    {
+      "pixel": [
+        377,
+        1098
+      ],
+      "primitive": 7,
+      "componentA": 4,
+      "componentB": 1,
+      "rawT": 0.003092725994065404,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.9723386168479919,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.26043790578842163,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.0030927040250348713
+    },
+    {
+      "pixel": [
+        377,
+        1099
+      ],
+      "primitive": 7,
+      "componentA": 4,
+      "componentB": 1,
+      "rawT": 0.0030962321907281876,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.9721678495407104,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.26149770617485046,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.0030962092818794204
+    },
+    {
+      "pixel": [
+        377,
+        1100
+      ],
+      "primitive": 7,
+      "componentA": 4,
+      "componentB": 1,
+      "rawT": 0.0030913318041712046,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.9720993638038635,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.26154711842536926,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.00309130934494694
+    },
+    {
+      "pixel": [
+        377,
+        1101
+      ],
+      "primitive": 7,
+      "componentA": 4,
+      "componentB": 1,
+      "rawT": 0.0030978741124272346,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.9719714522361755,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.260761022567749,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.0030978510024178485
+    },
+    {
+      "pixel": [
+        378,
+        1127
+      ],
+      "primitive": 7,
+      "componentA": 4,
+      "componentB": 1,
+      "rawT": 0.0031006759963929653,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.9700579643249512,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.25526919960975647,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.003100654245533723
+    },
+    {
+      "pixel": [
+        378,
+        1128
+      ],
+      "primitive": 7,
+      "componentA": 4,
+      "componentB": 1,
+      "rawT": 0.0031017207074910402,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.9701367020606995,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.24950233101844788,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.0031016978467655696
+    },
+    {
+      "pixel": [
+        378,
+        1129
+      ],
+      "primitive": 7,
+      "componentA": 4,
+      "componentB": 1,
+      "rawT": 0.0031020191963762045,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.9699671864509583,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.2421034276485443,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.0031019958162899004
+    },
+    {
+      "pixel": [
+        378,
+        1130
+      ],
+      "primitive": 7,
+      "componentA": 4,
+      "componentB": 1,
+      "rawT": 0.0031029419042170048,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.9697845578193665,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.2342206835746765,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.003102919517195938
+    },
+    {
+      "pixel": [
+        378,
+        1131
+      ],
+      "primitive": 7,
+      "componentA": 4,
+      "componentB": 1,
+      "rawT": 0.003102994291111827,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.9699234962463379,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.2294231653213501,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.0031029721305448166
+    },
+    {
+      "pixel": [
+        378,
+        1132
+      ],
+      "primitive": 7,
+      "componentA": 4,
+      "componentB": 1,
+      "rawT": 0.0031027640216052532,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.9698309302330017,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.22240576148033142,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.003102742362262511
+    },
+    {
+      "pixel": [
+        344,
+        1143
+      ],
+      "primitive": 25,
+      "componentA": 3,
+      "componentB": 4,
+      "rawT": 0.003558694152161479,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8458485007286072,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.06221124529838562,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.0035586704778227687
+    },
+    {
+      "pixel": [
+        344,
+        1144
+      ],
+      "primitive": 25,
+      "componentA": 3,
+      "componentB": 4,
+      "rawT": 0.0035603323485702276,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8454833626747131,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.0551275908946991,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.003560306731752132
+    },
+    {
+      "pixel": [
+        344,
+        1145
+      ],
+      "primitive": 25,
+      "componentA": 3,
+      "componentB": 4,
+      "rawT": 0.0035598406102508307,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8457461595535278,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.048081934452056885,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.003559813653748536
+    },
+    {
+      "pixel": [
+        344,
+        1146
+      ],
+      "primitive": 25,
+      "componentA": 3,
+      "componentB": 4,
+      "rawT": 0.0035546303261071444,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8453052639961243,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.04087287187576294,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.0035546058852336175
+    },
+    {
+      "pixel": [
+        344,
+        1147
+      ],
+      "primitive": 25,
+      "componentA": 3,
+      "componentB": 4,
+      "rawT": 0.003561343066394329,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8454478979110718,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.034035444259643555,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.0035613162866334146
+    },
+    {
+      "pixel": [
+        344,
+        1148
+      ],
+      "primitive": 25,
+      "componentA": 3,
+      "componentB": 4,
+      "rawT": 0.003553191665560007,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8454820513725281,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.027018100023269653,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.0035531652902920804
+    },
+    {
+      "pixel": [
+        344,
+        1149
+      ],
+      "primitive": 25,
+      "componentA": 3,
+      "componentB": 4,
+      "rawT": 0.0035607879981398582,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8452343344688416,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.020449012517929077,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.0035607624706677503
+    },
+    {
+      "pixel": [
+        344,
+        1150
+      ],
+      "primitive": 25,
+      "componentA": 3,
+      "componentB": 4,
+      "rawT": 0.003559520933777094,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8456730246543884,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.014543086290359497,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.003559495421807933
+    },
+    {
+      "pixel": [
+        344,
+        1151
+      ],
+      "primitive": 25,
+      "componentA": 3,
+      "componentB": 4,
+      "rawT": 0.0035597574897110462,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8456252813339233,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.007300645112991333,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.0035597347045521186
+    },
+    {
+      "pixel": [
+        344,
+        1152
+      ],
+      "primitive": 25,
+      "componentA": 3,
+      "componentB": 4,
+      "rawT": 0.0035567767918109894,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8452374339103699,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.0007752478122711182,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.003556749892872181
+    },
+    {
+      "pixel": [
+        379,
+        1158
+      ],
+      "primitive": 7,
+      "componentA": 4,
+      "componentB": 1,
+      "rawT": 0.0031108479015529156,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.9677819013595581,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.04375913739204407,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.0031108257126541534
+    },
+    {
+      "pixel": [
+        379,
+        1159
+      ],
+      "primitive": 7,
+      "componentA": 4,
+      "componentB": 1,
+      "rawT": 0.003112121718004346,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.9675019383430481,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.03523716330528259,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.003112099657078806
+    },
+    {
+      "pixel": [
+        379,
+        1160
+      ],
+      "primitive": 7,
+      "componentA": 4,
+      "componentB": 1,
+      "rawT": 0.0031071999110281467,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.9673272967338562,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.027492940425872803,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.0031071779506873553
+    },
+    {
+      "pixel": [
+        379,
+        1161
+      ],
+      "primitive": 7,
+      "componentA": 4,
+      "componentB": 1,
+      "rawT": 0.003110536141321063,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.9674080610275269,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.02192416787147522,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.0031105132898469313
+    },
+    {
+      "pixel": [
+        379,
+        1162
+      ],
+      "primitive": 7,
+      "componentA": 4,
+      "componentB": 1,
+      "rawT": 0.0031114208977669477,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.9674118161201477,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.015488505363464355,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.0031113975312842632
+    },
+    {
+      "pixel": [
+        379,
+        1163
+      ],
+      "primitive": 7,
+      "componentA": 4,
+      "componentB": 1,
+      "rawT": 0.0031097179744392633,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.96723872423172,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.008137106895446777,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000008984208758,
+      "nearestDoubleT": 0.003109696194747079
+    },
+    {
+      "pixel": [
+        494,
+        1200
+      ],
+      "primitive": 1,
+      "componentA": 5,
+      "componentB": 0,
+      "rawT": 0.0037434776313602924,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.805026650428772,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.0012239526258781552,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000001533627551,
+      "nearestDoubleT": 0.0037434495137003447
+    },
+    {
+      "pixel": [
+        347,
+        1201
+      ],
+      "primitive": 13,
+      "componentA": 3,
+      "componentB": 2,
+      "rawT": 0.005437989253550768,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.37945348024368286,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.050943631678819656,
+      "slot3Slot4FaceNormalDot": 1.6109363245198797e-07,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.0,
+      "nearestDoubleT": 0.005437922675757029
+    },
+    {
+      "pixel": [
+        493,
+        1201
+      ],
+      "primitive": 1,
+      "componentA": 5,
+      "componentB": 0,
+      "rawT": 0.0037375607062131166,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8045381903648376,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.02233433909714222,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000001533627551,
+      "nearestDoubleT": 0.0037375328549264794
+    },
+    {
+      "pixel": [
+        348,
+        1202
+      ],
+      "primitive": 13,
+      "componentA": 3,
+      "componentB": 2,
+      "rawT": 0.003568898653611541,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8434310555458069,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.028233211487531662,
+      "slot3Slot4FaceNormalDot": -0.9999999999999998,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.006999999284744171,
+      "nearestDoubleT": 0.003568868158722124
+    },
+    {
+      "pixel": [
+        492,
+        1202
+      ],
+      "primitive": 1,
+      "componentA": 5,
+      "componentB": 0,
+      "rawT": 0.003738904371857643,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8044822216033936,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.04260237142443657,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000001533627551,
+      "nearestDoubleT": 0.003738876378606143
+    },
+    {
+      "pixel": [
+        491,
+        1203
+      ],
+      "primitive": 1,
+      "componentA": 5,
+      "componentB": 0,
+      "rawT": 0.0037396051920950413,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.804284393787384,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.06299460679292679,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000001533627551,
+      "nearestDoubleT": 0.0037395775168407403
+    },
+    {
+      "pixel": [
+        349,
+        1204
+      ],
+      "primitive": 13,
+      "componentA": 3,
+      "componentB": 2,
+      "rawT": 0.0035687412600964308,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8429979085922241,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.051391419023275375,
+      "slot3Slot4FaceNormalDot": -0.9999999999999998,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.006999999284744171,
+      "nearestDoubleT": 0.003568711206695025
+    },
+    {
+      "pixel": [
+        490,
+        1204
+      ],
+      "primitive": 1,
+      "componentA": 5,
+      "componentB": 0,
+      "rawT": 0.0037397926207631826,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8043245077133179,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.08265651762485504,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000001533627551,
+      "nearestDoubleT": 0.0037397657911122013
+    },
+    {
+      "pixel": [
+        350,
+        1205
+      ],
+      "primitive": 13,
+      "componentA": 3,
+      "componentB": 2,
+      "rawT": 0.003571112407371402,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8429081439971924,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.07478591054677963,
+      "slot3Slot4FaceNormalDot": -0.9999999999999998,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.006999999284744171,
+      "nearestDoubleT": 0.0035710825942345857
+    },
+    {
+      "pixel": [
+        489,
+        1205
+      ],
+      "primitive": 1,
+      "componentA": 5,
+      "componentB": 0,
+      "rawT": 0.003743382403627038,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8039472103118896,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.10406579822301865,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000001533627551,
+      "nearestDoubleT": 0.003743354644641993
+    },
+    {
+      "pixel": [
+        351,
+        1206
+      ],
+      "primitive": 13,
+      "componentA": 3,
+      "componentB": 2,
+      "rawT": 0.003569423221051693,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8428367376327515,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.09535475075244904,
+      "slot3Slot4FaceNormalDot": -0.9999999999999998,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.006999999284744171,
+      "nearestDoubleT": 0.003569393976561941
+    },
+    {
+      "pixel": [
+        488,
+        1206
+      ],
+      "primitive": 1,
+      "componentA": 5,
+      "componentB": 0,
+      "rawT": 0.003747345879673958,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8036822080612183,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.1253500133752823,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000001533627551,
+      "nearestDoubleT": 0.0037473180913573994
+    },
+    {
+      "pixel": [
+        486,
+        1207
+      ],
+      "primitive": 1,
+      "componentA": 5,
+      "componentB": 0,
+      "rawT": 0.0037454075645655394,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8036513328552246,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.145493283867836,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000001533627551,
+      "nearestDoubleT": 0.003745379709780908
+    },
+    {
+      "pixel": [
+        485,
+        1208
+      ],
+      "primitive": 1,
+      "componentA": 5,
+      "componentB": 0,
+      "rawT": 0.0037471994291990995,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.803476095199585,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.15922193229198456,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000001533627551,
+      "nearestDoubleT": 0.003747171947921233
+    },
+    {
+      "pixel": [
+        484,
+        1209
+      ],
+      "primitive": 1,
+      "componentA": 5,
+      "componentB": 0,
+      "rawT": 0.0037448089569807053,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8033338189125061,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.17275124788284302,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000001533627551,
+      "nearestDoubleT": 0.0037447818417928676
+    },
+    {
+      "pixel": [
+        357,
+        1213
+      ],
+      "primitive": 13,
+      "componentA": 3,
+      "componentB": 2,
+      "rawT": 0.003580632619559765,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8411358594894409,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.17164897918701172,
+      "slot3Slot4FaceNormalDot": -0.9999999999999998,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.006999999284744171,
+      "nearestDoubleT": 0.003580605322532721
+    },
+    {
+      "pixel": [
+        358,
+        1214
+      ],
+      "primitive": 13,
+      "componentA": 3,
+      "componentB": 2,
+      "rawT": 0.003578375792130828,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8411972522735596,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.18297332525253296,
+      "slot3Slot4FaceNormalDot": -0.9999999999999998,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.006999999284744171,
+      "nearestDoubleT": 0.0035783491284521857
+    },
+    {
+      "pixel": [
+        478,
+        1214
+      ],
+      "primitive": 1,
+      "componentA": 5,
+      "componentB": 0,
+      "rawT": 0.003751537296921015,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8022773861885071,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.24923357367515564,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000001533627551,
+      "nearestDoubleT": 0.003751510242542587
+    },
+    {
+      "pixel": [
+        359,
+        1215
+      ],
+      "primitive": 13,
+      "componentA": 3,
+      "componentB": 2,
+      "rawT": 0.0035765869542956352,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8411486148834229,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.19464674592018127,
+      "slot3Slot4FaceNormalDot": -0.9999999999999998,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.006999999284744171,
+      "nearestDoubleT": 0.003576560669586775
+    },
+    {
+      "pixel": [
+        477,
+        1215
+      ],
+      "primitive": 1,
+      "componentA": 5,
+      "componentB": 0,
+      "rawT": 0.0037510741967707872,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8019235730171204,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.26396822929382324,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000001533627551,
+      "nearestDoubleT": 0.003751048813146467
+    },
+    {
+      "pixel": [
+        476,
+        1216
+      ],
+      "primitive": 1,
+      "componentA": 5,
+      "componentB": 0,
+      "rawT": 0.0037536846939474344,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8019651174545288,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.2774883508682251,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000001533627551,
+      "nearestDoubleT": 0.0037536589061566445
+    },
+    {
+      "pixel": [
+        360,
+        1217
+      ],
+      "primitive": 13,
+      "componentA": 3,
+      "componentB": 2,
+      "rawT": 0.003579583251848817,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8409135341644287,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.21326139569282532,
+      "slot3Slot4FaceNormalDot": -0.9999999999999998,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.006999999284744171,
+      "nearestDoubleT": 0.0035795569164719064
+    },
+    {
+      "pixel": [
+        475,
+        1217
+      ],
+      "primitive": 1,
+      "componentA": 5,
+      "componentB": 0,
+      "rawT": 0.003756971098482609,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8015779852867126,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.2921519875526428,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000001533627551,
+      "nearestDoubleT": 0.0037569461679835712
+    },
+    {
+      "pixel": [
+        361,
+        1218
+      ],
+      "primitive": 13,
+      "componentA": 3,
+      "componentB": 2,
+      "rawT": 0.0035792330745607615,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.840526819229126,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.22485825419425964,
+      "slot3Slot4FaceNormalDot": -0.9999999999999998,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.006999999284744171,
+      "nearestDoubleT": 0.003579207143536233
+    },
+    {
+      "pixel": [
+        474,
+        1218
+      ],
+      "primitive": 1,
+      "componentA": 5,
+      "componentB": 0,
+      "rawT": 0.003757009282708168,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8012701272964478,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.25622040033340454,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000001533627551,
+      "nearestDoubleT": 0.0037569826322656637
+    },
+    {
+      "pixel": [
+        362,
+        1219
+      ],
+      "primitive": 13,
+      "componentA": 3,
+      "componentB": 2,
+      "rawT": 0.0035788430832326412,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.840618371963501,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.2362332046031952,
+      "slot3Slot4FaceNormalDot": -0.9999999999999998,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.006999999284744171,
+      "nearestDoubleT": 0.0035788175539139397
+    },
+    {
+      "pixel": [
+        472,
+        1219
+      ],
+      "primitive": 1,
+      "componentA": 5,
+      "componentB": 0,
+      "rawT": 0.0037579161580652,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.800992488861084,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.18469680845737457,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000001533627551,
+      "nearestDoubleT": 0.0037578909736642094
+    },
+    {
+      "pixel": [
+        473,
+        1219
+      ],
+      "primitive": 1,
+      "componentA": 5,
+      "componentB": 0,
+      "rawT": 0.003755865851417184,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8012039065361023,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.2215282917022705,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000001533627551,
+      "nearestDoubleT": 0.003755840428659762
+    },
+    {
+      "pixel": [
+        471,
+        1220
+      ],
+      "primitive": 1,
+      "componentA": 5,
+      "componentB": 0,
+      "rawT": 0.003758621634915471,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8011839389801025,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.15474744141101837,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000001533627551,
+      "nearestDoubleT": 0.0037585969638848707
+    },
+    {
+      "pixel": [
+        470,
+        1221
+      ],
+      "primitive": 1,
+      "componentA": 5,
+      "componentB": 0,
+      "rawT": 0.003755834884941578,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8009350895881653,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.11755028367042542,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000001533627551,
+      "nearestDoubleT": 0.0037558099107646986
+    },
+    {
+      "pixel": [
+        469,
+        1222
+      ],
+      "primitive": 1,
+      "componentA": 5,
+      "componentB": 0,
+      "rawT": 0.0037571245338767767,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.8007897138595581,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.08173441141843796,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000001533627551,
+      "nearestDoubleT": 0.0037570997154117046
+    },
+    {
+      "pixel": [
+        468,
+        1223
+      ],
+      "primitive": 1,
+      "componentA": 5,
+      "componentB": 0,
+      "rawT": 0.0037602977827191353,
+      "queryMinimum": 0.0,
+      "enteringDot": 0.800689697265625,
+      "volumeOpen": true,
+      "priorTirCount": 0,
+      "barycentricInteriorMargin": 0.045858852565288544,
+      "slot3Slot4FaceNormalDot": -0.9999999999999993,
+      "slot3PlaneToSlot4VertexDistanceLocal": 0.007000001533627551,
+      "nearestDoubleT": 0.0037602731289272896
+    }
+  ],
+  "conclusion": "All 80 reason-2 fifth candidates are corroborated as distinct real exits from the second pane along the recorded native object rays; they are genuine fifth-interface budget truncations, not duplicate candidates. This does not establish visible contribution magnitude, all-ray behavior, or compute/RTX behavior."
+}

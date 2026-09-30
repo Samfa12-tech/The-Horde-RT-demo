@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "sourceCommit": "71cb366c5cbe5cf6fe338c4cd6fd7bec0bd12d95",
+  "sourceDirty": true,
+  "investigationOnly": true,
+  "artifacts": {
+    "control": {
+      "file": "HordeLanternRT-isolated-raw-control-debug-arm64.apk",
+      "sha256": "0ec752303b30a5b05dd45bdafc888f18b55c97918ac30439ebc8d090cbaf789a",
+      "package": "com.samfa12.hordelanternrt.debug",
+      "pipelineOnly": false,
+      "production": false
+    },
+    "marker": {
+      "file": "HordeLanternRT-isolated-marker-debug-arm64.apk",
+      "sha256": "14b352ebd85d573f2af2f571a2cd506b4c3ad4da9787787553a34218d816f0d3",
+      "package": "com.samfa12.hordelanternrt.debug",
+      "pipelineOnly": true,
+      "production": false
+    },
+    "path": {
+      "file": "HordeLanternRT-isolated-path-debug-arm64.apk",
+      "sha256": "3277fe818871e7a2a02073dac815e278ec1c9ad6cb0c89c33d3f1afc9062c20d",
+      "package": "com.samfa12.hordelanternrt.debug",
+      "pipelineOnly": true,
+      "production": false
+    }
+  },
+  "nativeFormat": "LE width,height uint32 then normalized native RGBA8; gzip is lossless",
+  "scope": "isolated named frozen checkpoint; not live motion, RTX, compute, Shipping or performance acceptance",
+  "normalRestoredApkSha256": "c11ff703794d74dbfb75dc7a0186af0f6c5c416e8383755a5cd8f84310daf0fe"
+}

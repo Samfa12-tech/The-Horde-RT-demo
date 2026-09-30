@@ -1,0 +1,4243 @@
+#version 460
+#extension GL_EXT_ray_tracing : require
+#extension GL_EXT_ray_query : require
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const int kRtVariantDielectricInterfaceBudget = 4;
+const int kRtVariantDielectricVolumeBudget = 2;
+const int kRtVariantShadowInterfaceBudget = 4;
+const int kRtVariantShadowVolumeBudget = 2;
+
+
+
+
+
+
+
+
+
+layout(set = 0, binding = 0) uniform accelerationStructureEXT topLevelAS;
+layout(set = 0, binding = 1, rgba8) uniform writeonly image2D outputImage;
+
+struct SkeletonVertex
+{
+    vec4 position;
+    vec4 normal;
+};
+layout(std430, set = 0, binding = 2) readonly buffer SkeletonVertices
+{
+    SkeletonVertex vertices[];
+} skeleton;
+layout(set = 0, binding = 3) uniform sampler2DArray materialDiffuse;
+layout(set = 0, binding = 4) uniform sampler2DArray materialNormal;
+layout(set = 0, binding = 5) uniform sampler2DArray materialArm;
+layout(std430, set = 0, binding = 6) readonly buffer WorldSurfaceCodes
+{
+    uint codes[];
+} worldSurfaces;
+
+struct LichVertex
+{
+    vec4 position;
+    vec4 normal;
+    vec4 texcoord;
+};
+layout(std430, set = 0, binding = 7) readonly buffer LichVertices
+{
+    LichVertex vertices[];
+} lich;
+layout(set = 0, binding = 8) uniform sampler2DArray lichBaseColor;
+layout(set = 0, binding = 9) uniform sampler2DArray lichEmissive;
+layout(std430, set = 0, binding = 10) readonly buffer SecondSkeletonVertices
+{
+    SkeletonVertex vertices[];
+} secondSkeleton;
+
+
+
+const uint kRtInstanceMetadataCapacity = 21u;
+const uint kRtStaticAssetCapacity = 9u;
+const uint kRtPrimitiveMetadataCapacity = 32u;
+const uint kRtMaterialCapacity = 32u;
+const uint kRtTextureLayerCapacity = 16u;
+const uint kRtFireEmitterCapacity = 4u;
+const uint kRtActiveFireEmitterCapacity = 2u;
+const uint kRtGeometryRoleStatic = 0u;
+const uint kRtGeometryRolePlayerWorldBody = 1u;
+const uint kRtGeometryRolePlayerViewmodel = 2u;
+const uint kPlayerViewmodelPrimaryMask = 64u;
+const uint kPlayerBodyRemainderPrimaryMask = 128u;
+
+const uint kRtInstanceFlagStaticPbr = 1u;
+const uint kRtInstanceFlagEmissive = 2u;
+const uint kRtInstanceFlagTransmissive = 4u;
+const uint kRtInstanceFlagBodyRemainderOnlyPrimary = 8u;
+const uint kRtMaterialFlagDoubleSided = 1u;
+const uint kRtMaterialFlagAlpha = 2u;
+const uint kRtMaterialFlagTransmission = 4u;
+const uint kRtMaterialFlagBaseColorTexture = 8u;
+const uint kRtMaterialFlagNormalTexture = 16u;
+const uint kRtMaterialFlagOrmTexture = 32u;
+const uint kRtMaterialFlagEmissiveTexture = 64u;
+const uint kRtMaterialFlagHeadPrimaryMasked = 128u;
+const uint kRtMaterialFlagNearFacePrimaryMasked = 256u;
+const uint kRtMaterialFlagThinWall = 512u;
+const uint kRtMaterialFlagCertifiedClosedVolume = 1024u;
+const uint kRtMaterialFlagCertifiedRectangularVolume = 4096u;
+const uint kRtMaterialFlagBodyRemainderPrimaryVisible = 2048u;
+
+struct StaticRtVertex
+{
+    vec4 position;
+    vec4 normal;
+    vec4 tangent;
+    vec4 uv0;
+};
+struct RtInstanceMetadata
+{
+    uint primitiveBase;
+    uint primitiveCount;
+    uint stableObjectId;
+    uint flags;
+    uint emitterIndex;
+    uint assetIndex;
+    uint geometryRole;
+    uint reserved1;
+};
+struct RtPrimitiveMetadata
+{
+    uint vertexOffset;
+    uint indexOffset;
+    uint indexCount;
+    uint materialIndex;
+};
+struct RtDielectricDiagnostics
+{
+    uint transportOverflowCount;
+    uint shadowOverflowCount;
+    uint secondaryDielectricRejectCount;
+    uint unclosedVolumeCount;
+    uint primaryUnclosedVolumeCount;
+    uint shadowUnclosedVolumeCount;
+    uint productionPaneStackFailureCount;
+    uint productionPaneSecondaryOriginCount;
+    uint productionPaneSecondaryTerminalCount;
+    uint productionPaneSecondarySameMediumCount;
+    uint productionPaneSecondaryDifferentMediumCount;
+    uint secondaryNearSelfHitCount;
+    uint primaryOpenMissCount;
+    uint primaryOpenOpaqueCount;
+    uint primaryMismatchedExitCount;
+    uint primaryInterfaceBudgetCount;
+    uint primaryVolumeBudgetCount;
+    uint shadowOpenMissCount;
+    uint shadowMismatchedExitCount;
+    uint primaryTirCount;
+    uint primaryInterfaceBudgetOpenVolumeCount;
+    uint primaryInterfaceBudgetClosedVolumeCount;
+    uint shadowMismatchEmptyCount;
+    uint shadowImplicitOriginExitCount;
+    uint secondaryDielectricTerminalCount;
+    uint primaryTirTerminationCount;
+    uint shadowFiniteEndpointVolumeCount;
+    uint primaryOpenOpaqueSameInstanceDifferentMaterialCount;
+    uint primaryOpenOpaqueAfterTirCount;
+    uint primaryOpenOpaqueTerminalInstanceMask;
+    uint primaryOpenOpaqueVolumeInstanceMask;
+    uint primaryOpenOpaqueTerminalMaterialMask;
+    uint primaryClosedVolumeAbsorptionCount;
+    uint primaryCertifiedClosedVolumeRecoveryCount;
+    uint shadowCertifiedClosedVolumeRecoveryCount;
+    uint certifiedClosedVolumeRecoveryReasonMask;
+    uint primaryTorchPixelCount;
+    uint primarySwordPixelCount;
+    uint primaryPlayerPixelCount;
+    uint primaryRewardRingPixelCount;
+    uint primaryRewardBodyPixelCount;
+};
+struct RtMaterialGpu
+{
+    vec4 baseColorFactor;
+    vec4 emissiveFactorStrength;
+    vec4 metallicRoughnessOcclusionTransmission;
+
+    vec4 iorThicknessAttenuationDistance;
+
+    vec4 attenuationColor;
+    uvec4 textureLayers;
+    uvec4 materialFlags;
+};
+struct RtHeldLightGpu
+{
+    vec4 positionStrength;
+};
+struct RtFireEmitterGpu
+{
+    vec4 worldFromLocal0;
+    vec4 worldFromLocal1;
+    vec4 worldFromLocal2;
+    vec4 worldFromLocal3;
+    vec4 lightPositionStrength;
+    vec4 colourIntensity;
+    vec4 shape;
+    vec4 animation;
+    vec4 smokeEmbers;
+    uvec4 identity;
+};
+layout(std430, set = 0, binding = 11) readonly buffer RtInstanceMetadataBuffer
+{
+    RtInstanceMetadata values[];
+} rtInstances;
+layout(std430, set = 0, binding = 12) readonly buffer RtPrimitiveMetadataBuffer
+{
+    RtPrimitiveMetadata values[];
+} rtPrimitives;
+layout(std430, set = 0, binding = 13) readonly buffer RtMaterialBuffer
+{
+    RtMaterialGpu values[];
+} rtMaterials;
+layout(std430, set = 0, binding = 14) readonly buffer RtStaticVertexBuffer
+{
+    StaticRtVertex values[];
+} rtStaticVertices;
+layout(std430, set = 0, binding = 23) readonly buffer RtWorldPlayerVertexBuffer
+{
+    StaticRtVertex values[];
+} rtWorldPlayerVertices;
+layout(std430, set = 0, binding = 24) readonly buffer RtViewmodelVertexBuffer
+{
+    StaticRtVertex values[];
+} rtViewmodelVertices;
+layout(std430, set = 0, binding = 15) readonly buffer RtStaticIndexBuffer
+{
+    uint values[];
+} rtStaticIndices;
+layout(set = 0, binding = 16) uniform sampler2DArray rtBaseColorTextures;
+layout(set = 0, binding = 17) uniform sampler2DArray rtNormalTextures;
+layout(set = 0, binding = 18) uniform sampler2DArray rtOrmTextures;
+layout(set = 0, binding = 19) uniform sampler2DArray rtEmissiveTextures;
+layout(std430, set = 0, binding = 20) readonly buffer RtHeldLightBuffer
+{
+    RtHeldLightGpu value;
+} rtHeldLight;
+layout(std430, set = 0, binding = 21) readonly buffer RtFireEmitterBuffer
+{
+    RtFireEmitterGpu values[4];
+} rtFireEmitters;
+
+layout(std430, set = 0, binding = 22) restrict buffer RtDielectricDiagnosticsBuffer
+{
+    RtDielectricDiagnostics value;
+} rtDielectricDiagnostics;
+
+
+layout(push_constant) uniform SceneControls
+{
+    float yaw;
+    float pitch;
+    float torchLight;
+    float time;
+    float cameraX;
+    float cameraZ;
+    float walkAmount;
+    float outputRedBlueSwap;
+    float outputExposure;
+    float damageFlash;
+    float enemyKind;
+    float staffLightStrength;
+    float staffX;
+    float staffY;
+    float staffZ;
+    float finaleSkylightOpen;
+    float finaleDawnReveal;
+    float heldPropDepth;
+    float waterQuality;
+    float waterfallWidthScale;
+    float fogDensityScale;
+    float torchHueDegrees;
+    float torchIntensityScale;
+    float skylightHueDegrees;
+    float skylightIntensityScale;
+    float passageHueDegrees;
+    float passageIntensityScale;
+    float staffHueDegrees;
+    float staffIntensityScale;
+    float workloadPreset;
+    float genericTransmissionActive;
+    float guidanceLightStrength;
+} controls;
+
+
+
+
+
+
+
+
+bool genericTransmissionEnabled()
+{
+    return 1 != 0;
+}
+
+
+
+
+
+
+
+
+vec3 isolatedGlassMarker = vec3(0.0);
+
+
+struct HitInfo
+{
+    bool hit;
+    float t;
+    int primitive;
+    int instance;
+    int material;
+    vec3 position;
+    vec3 normal;
+    vec3 geometricNormal;
+    vec3 base;
+    float metallic;
+    float reflectivity;
+    float roughness;
+    float emissive;
+    float transmission;
+    float ior;
+    float thickness;
+    float attenuationDistance;
+    vec3 attenuationColor;
+    uint materialFlags;
+
+    vec3 dielectricSpawnPosition;
+    bool dielectricSpawnGuarded;
+    float dielectricSpawnMinimumNormalBias;
+
+
+    vec3 investigationQueryOrigin;
+    vec3 investigationQueryDirection;
+    vec3 investigationObjectOrigin;
+    vec3 investigationObjectDirection;
+    vec3 investigationVertex0;
+    vec3 investigationVertex1;
+    vec3 investigationVertex2;
+    vec2 investigationBarycentrics;
+    float investigationQueryMinimum;
+    float investigationRawDistance;
+    uint investigationGeometryIndex;
+
+};
+
+
+
+const int kIsolatedTargetCount = 81;
+const uvec2 kIsolatedTargets[81] = uvec2[81] (
+    uvec2(346u, 1200u),
+    uvec2(340u, 1046u),
+    uvec2(340u, 1047u),
+    uvec2(340u, 1048u),
+    uvec2(340u, 1049u),
+    uvec2(340u, 1050u),
+    uvec2(340u, 1051u),
+    uvec2(340u, 1052u),
+    uvec2(340u, 1053u),
+    uvec2(340u, 1054u),
+    uvec2(340u, 1055u),
+    uvec2(340u, 1056u),
+    uvec2(340u, 1057u),
+    uvec2(340u, 1058u),
+    uvec2(341u, 1067u),
+    uvec2(341u, 1068u),
+    uvec2(341u, 1069u),
+    uvec2(341u, 1070u),
+    uvec2(341u, 1071u),
+    uvec2(341u, 1072u),
+    uvec2(341u, 1073u),
+    uvec2(377u, 1096u),
+    uvec2(377u, 1097u),
+    uvec2(377u, 1098u),
+    uvec2(377u, 1099u),
+    uvec2(377u, 1100u),
+    uvec2(377u, 1101u),
+    uvec2(378u, 1127u),
+    uvec2(378u, 1128u),
+    uvec2(378u, 1129u),
+    uvec2(378u, 1130u),
+    uvec2(378u, 1131u),
+    uvec2(378u, 1132u),
+    uvec2(344u, 1143u),
+    uvec2(344u, 1144u),
+    uvec2(344u, 1145u),
+    uvec2(344u, 1146u),
+    uvec2(344u, 1147u),
+    uvec2(344u, 1148u),
+    uvec2(344u, 1149u),
+    uvec2(344u, 1150u),
+    uvec2(344u, 1151u),
+    uvec2(344u, 1152u),
+    uvec2(379u, 1158u),
+    uvec2(379u, 1159u),
+    uvec2(379u, 1160u),
+    uvec2(379u, 1161u),
+    uvec2(379u, 1162u),
+    uvec2(379u, 1163u),
+    uvec2(494u, 1200u),
+    uvec2(347u, 1201u),
+    uvec2(493u, 1201u),
+    uvec2(348u, 1202u),
+    uvec2(492u, 1202u),
+    uvec2(491u, 1203u),
+    uvec2(349u, 1204u),
+    uvec2(490u, 1204u),
+    uvec2(350u, 1205u),
+    uvec2(489u, 1205u),
+    uvec2(351u, 1206u),
+    uvec2(488u, 1206u),
+    uvec2(486u, 1207u),
+    uvec2(485u, 1208u),
+    uvec2(484u, 1209u),
+    uvec2(357u, 1213u),
+    uvec2(358u, 1214u),
+    uvec2(478u, 1214u),
+    uvec2(359u, 1215u),
+    uvec2(477u, 1215u),
+    uvec2(476u, 1216u),
+    uvec2(360u, 1217u),
+    uvec2(475u, 1217u),
+    uvec2(361u, 1218u),
+    uvec2(474u, 1218u),
+    uvec2(362u, 1219u),
+    uvec2(472u, 1219u),
+    uvec2(473u, 1219u),
+    uvec2(471u, 1220u),
+    uvec2(470u, 1221u),
+    uvec2(469u, 1222u),
+    uvec2(468u, 1223u));
+
+
+int isolatedTargetRow()
+{
+    for (int i = 0; i < kIsolatedTargetCount; ++ i)
+        if (gl_LaunchIDEXT.xy == kIsolatedTargets[i]) return i;
+    return - 1;
+}
+
+void isolatedRecordInterface(int slot, HitInfo hit, vec3 direction,
+    bool open, bool certified, int tirCount, float totalDistance, vec3 throughput)
+{
+    int row = isolatedTargetRow();
+    if (row < 0) return;
+    const int fieldsPerSlot = 59;
+    float fields[59] = float[59] (
+        hit.position.x, hit.position.y, hit.position.z,
+        hit.geometricNormal.x, hit.geometricNormal.y, hit.geometricNormal.z,
+        direction.x, direction.y, direction.z, hit.t, float(hit.instance),
+        float(hit.material), float(hit.primitive), open ? 1.0 : 0.0,
+        hit.hit ? 1.0 : 0.0, float(tirCount), totalDistance, hit.roughness,
+        hit.ior, hit.attenuationDistance, throughput.x, throughput.y, throughput.z,
+        float(hit.materialFlags), hit.transmission,
+        hit.dielectricSpawnPosition.x, hit.dielectricSpawnPosition.y, hit.dielectricSpawnPosition.z,
+        hit.dielectricSpawnGuarded ? 1.0 : 0.0, hit.dielectricSpawnMinimumNormalBias,
+        hit.investigationQueryOrigin.x, hit.investigationQueryOrigin.y, hit.investigationQueryOrigin.z,
+        hit.investigationQueryDirection.x, hit.investigationQueryDirection.y, hit.investigationQueryDirection.z,
+        hit.investigationObjectOrigin.x, hit.investigationObjectOrigin.y, hit.investigationObjectOrigin.z,
+        hit.investigationObjectDirection.x, hit.investigationObjectDirection.y, hit.investigationObjectDirection.z,
+        hit.investigationBarycentrics.x, hit.investigationBarycentrics.y,
+        hit.investigationQueryMinimum, hit.investigationRawDistance, float(hit.investigationGeometryIndex),
+        hit.investigationVertex0.x, hit.investigationVertex0.y, hit.investigationVertex0.z,
+        hit.investigationVertex1.x, hit.investigationVertex1.y, hit.investigationVertex1.z,
+        hit.investigationVertex2.x, hit.investigationVertex2.y, hit.investigationVertex2.z,
+        certified ? 1.0 : 0.0, dot(direction, hit.geometricNormal), float(slot));
+    for (int i = 0; i < fieldsPerSlot; ++ i)
+    {
+        uint bits = floatBitsToUint(fields[i]);
+        vec3 low = vec3(uvec3(bits & 255u, (bits >> 8) & 255u, (bits >> 16) & 255u)) / 255.0;
+        vec3 high = vec3(float(bits >> 24) / 255.0, 0.0, 0.0);
+        if (controls.outputRedBlueSwap > 0.5) { low = low.bgr; high = high.bgr; }
+        imageStore(outputImage, ivec2(slot * fieldsPerSlot * 2 + i * 2, row), vec4(low, 1.0));
+        imageStore(outputImage, ivec2(slot * fieldsPerSlot * 2 + i * 2 + 1, row), vec4(high, 1.0));
+    }
+}
+
+
+const vec3 kMoonDirection = vec3(- 0.180027, 0.930140, - 0.320048);
+const int kMaterialDryStone = 0;
+const int kMaterialWetCobble = 1;
+const int kMaterialMossyStone = 2;
+const int kMaterialDampGround = 3;
+const int kMaterialAgedMetal = 4;
+const int kMaterialFlame = 5;
+const int kMaterialDarkFigure = 6;
+const int kMaterialHiddenShell = 7;
+const int kMaterialMirror = 8;
+const int kMaterialClearGlass = 9;
+const int kMaterialWater = 10;
+const int kWaterfallInstance = 19;
+const int kLightTorch = 0;
+const int kLightSkylight = 1;
+const int kLightPassage = 2;
+const int kLightStaff = 3;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+uint fireHash(uint value)
+{
+    value ^= value >> 16u;
+    value *= 0x7feb352du;
+    value ^= value >> 15u;
+    value *= 0x846ca68bu;
+    value ^= value >> 16u;
+    return value;
+}
+
+float fireHash01(uint seed, uint lattice)
+{
+    return float(fireHash(seed ^ (lattice * 0x9e3779b9u)) & 0x00ffffffu) / 16777215.0;
+}
+
+float fireValueNoise(uint seed, float domain)
+{
+    float base = floor(domain);
+    float blend = fract(domain);
+    blend = blend * blend * (3.0 - 2.0 * blend);
+    uint lattice = uint(max(base, 0.0));
+    return mix(fireHash01(seed, lattice), fireHash01(seed, lattice + 1u), blend) * 2.0 - 1.0;
+}
+
+bool findFireEmitter(uint stableId, out RtFireEmitterGpu emitter)
+{
+    for (uint index = 0u; index < kRtActiveFireEmitterCapacity; ++ index)
+    {
+        if (rtFireEmitters.values[index].identity.x == stableId)
+        {
+            emitter = rtFireEmitters.values[index];
+            return true;
+        }
+    }
+    emitter = rtFireEmitters.values[0];
+    emitter.lightPositionStrength.w = 0.0;
+    emitter.colourIntensity.w = 0.0;
+    return false;
+}
+
+vec3 fireLocalToWorld(RtFireEmitterGpu emitter, vec3 localPosition)
+{
+    return emitter.worldFromLocal0.xyz * localPosition.x
+         + emitter.worldFromLocal1.xyz * localPosition.y
+         + emitter.worldFromLocal2.xyz * localPosition.z
+         + emitter.worldFromLocal3.xyz;
+}
+
+vec3 fireWorldToLocalPoint(RtFireEmitterGpu emitter, vec3 worldPosition)
+{
+    vec3 relative = worldPosition - emitter.worldFromLocal3.xyz;
+    return vec3(dot(relative, emitter.worldFromLocal0.xyz),
+                dot(relative, emitter.worldFromLocal1.xyz),
+                dot(relative, emitter.worldFromLocal2.xyz));
+}
+
+vec3 fireWorldToLocalDirection(RtFireEmitterGpu emitter, vec3 worldDirection)
+{
+    return vec3(dot(worldDirection, emitter.worldFromLocal0.xyz),
+                dot(worldDirection, emitter.worldFromLocal1.xyz),
+                dot(worldDirection, emitter.worldFromLocal2.xyz));
+}
+
+bool fireSphereInterval(vec3 rayOrigin, vec3 rayDirection, vec3 centre,
+                        float radius, float maximumDistance,
+                        out float nearDistance, out float farDistance)
+{
+    vec3 toOrigin = rayOrigin - centre;
+    float projection = dot(toOrigin, rayDirection);
+    float discriminant = projection * projection -
+        (dot(toOrigin, toOrigin) - radius * radius);
+    if (discriminant <= 0.0)
+    {
+        nearDistance = 0.0;
+        farDistance = 0.0;
+        return false;
+    }
+    float root = sqrt(discriminant);
+    nearDistance = max(0.0, - projection - root);
+    farDistance = min(maximumDistance, - projection + root);
+    return farDistance > nearDistance;
+}
+
+vec4 integrateOneFireEmitter(RtFireEmitterGpu emitter,
+                             vec3 rayOrigin,
+                             vec3 rayDirection,
+                             float maximumDistance,
+                             bool reflectionPath)
+{
+    float strength = emitter.colourIntensity.w;
+    if (strength <= 0.0001)
+        return vec4(0.0, 0.0, 0.0, 1.0);
+
+    float radius = max(emitter.shape.x, 0.005);
+    float height = max(emitter.shape.y, 0.02);
+    float smokeHeight = height * (1.0 + emitter.smokeEmbers.x * 1.8);
+    vec3 localCentre = vec3(0.0, smokeHeight * 0.48, 0.0);
+    vec3 worldCentre = fireLocalToWorld(emitter, localCentre);
+    float boundRadius = sqrt(smokeHeight * smokeHeight * 0.36 + radius * radius * 3.2);
+    float nearDistance;
+    float farDistance;
+    if (! fireSphereInterval(rayOrigin, rayDirection, worldCentre, boundRadius,
+                            maximumDistance, nearDistance, farDistance))
+        return vec4(0.0, 0.0, 0.0, 1.0);
+
+    int volumeSteps = int(clamp(emitter.identity.z, 1u, 10u));
+    if (reflectionPath)
+    {
+        int reflectionSamples = int(clamp(emitter.identity.w, 0u, 2u));
+        if (reflectionSamples == 0)
+            return vec4(0.0, 0.0, 0.0, 1.0);
+        volumeSteps = min(volumeSteps, reflectionSamples * 4);
+    }
+    vec3 localOrigin = fireWorldToLocalPoint(emitter, rayOrigin);
+    vec3 localDirection = fireWorldToLocalDirection(emitter, rayDirection);
+    float stepLength = (farDistance - nearDistance) / float(max(volumeSteps, 1));
+    vec3 emission = vec3(0.0);
+    float transmittance = 1.0;
+    for (int stepIndex = 0; stepIndex < 10; ++ stepIndex)
+    {
+        if (stepIndex >= volumeSteps) break;
+        float distanceAlongRay = nearDistance + (float(stepIndex) + 0.5) * stepLength;
+        vec3 local = localOrigin + localDirection * distanceAlongRay;
+        float heightFraction = clamp( (local.y + height * 0.16) / (height * 1.16), 0.0, 1.0);
+        vec2 centreLine = emitter.animation.zw * heightFraction;
+        float domainNoise = fireValueNoise(
+            emitter.identity.y,
+            local.y * 8.5 + emitter.animation.x * 7.0 +
+                dot(local.xz, vec2(4.1, - 3.7)));
+        float turbulence = emitter.smokeEmbers.z;
+        centreLine += vec2(domainNoise, - domainNoise * 0.73) *
+            radius * (0.12 + 0.20 * turbulence) * heightFraction;
+        float taper = mix(1.0, 0.12, pow(heightFraction, 0.72));
+        float localRadius = max(radius * taper, emitter.shape.z * 0.55);
+        float radial = length(local.xz - centreLine) / max(localRadius, 0.001);
+        float body = (1.0 - smoothstep(0.22, 1.0, radial)) *
+                     smoothstep(- 0.16, 0.05, local.y / height) *
+                     (1.0 - smoothstep(0.72, 1.03, local.y / height));
+        float breakup = clamp(0.76 + domainNoise * (0.18 + turbulence * 0.10), 0.22, 1.0);
+        float density = body * breakup;
+        float core = (1.0 - smoothstep(0.0, max(emitter.shape.z, 0.005),
+                                       length(local.xz - centreLine))) *
+                     (1.0 - smoothstep(0.30, 0.88, heightFraction));
+        float opticalDepth = density * emitter.shape.w * stepLength;
+        float sampleAlpha = 1.0 - exp(- max(opticalDepth, 0.0));
+        vec3 hotCore = mix(emitter.colourIntensity.rgb,
+                           vec3(1.0, 0.76, 0.30), core * 0.72);
+        emission += transmittance * hotCore * strength *
+            sampleAlpha * (2.2 + core * 2.8);
+        transmittance *= 1.0 - sampleAlpha * 0.62;
+
+        float smokeStart = height * 0.62;
+        float smokeFraction = clamp( (local.y - smokeStart) /
+                                    max(smokeHeight - smokeStart, 0.01), 0.0, 1.0);
+        float smokeRadius = radius * mix(0.72, 1.85, smokeFraction);
+        float smokeRadial = length(local.xz - centreLine * 1.4) /
+                            max(smokeRadius, 0.001);
+        float smoke = emitter.smokeEmbers.x *
+            (1.0 - smoothstep(0.28, 1.0, smokeRadial)) *
+            smoothstep(0.0, 0.18, smokeFraction) * (1.0 - smokeFraction) *
+            clamp(0.72 + 0.28 * domainNoise, 0.0, 1.0);
+        transmittance *= exp(- smoke * stepLength * 1.7);
+        emission += transmittance * vec3(0.030, 0.024, 0.020) * smoke * stepLength;
+    }
+
+    if (! reflectionPath && emitter.smokeEmbers.y > 0.001)
+    {
+        for (uint emberIndex = 0u; emberIndex < 4u; ++ emberIndex)
+        {
+            float lateral = fireHash01(emitter.identity.y, 41u + emberIndex * 7u) * 2.0 - 1.0;
+            float depth = fireHash01(emitter.identity.y, 59u + emberIndex * 11u) * 2.0 - 1.0;
+            float speed = 0.48 + fireHash01(emitter.identity.y, 83u + emberIndex) * 0.44;
+            float life = fract(emitter.animation.x * speed +
+                               fireHash01(emitter.identity.y, 101u + emberIndex * 13u));
+            vec3 emberLocal = vec3(lateral * radius * (0.45 + life * 0.8),
+                                   height * (0.48 + life * 1.65),
+                                   depth * radius * (0.45 + life * 0.8));
+            emberLocal.xz += emitter.animation.zw * life;
+            vec3 emberWorld = fireLocalToWorld(emitter, emberLocal);
+            float emberDistance = dot(emberWorld - rayOrigin, rayDirection);
+            vec3 nearest = rayOrigin + rayDirection * emberDistance;
+            float emberRadius = mix(0.010, 0.003, life);
+            float spark = 1.0 - smoothstep(emberRadius * 0.45, emberRadius,
+                                           length(nearest - emberWorld));
+            bool depthVisible = emberDistance > 0.0 && emberDistance < maximumDistance;
+            emission += depthVisible
+                ? emitter.colourIntensity.rgb * strength * emitter.smokeEmbers.y *
+                    spark * (1.0 - life) * 2.4
+                : vec3(0.0);
+        }
+    }
+    return vec4(emission, clamp(transmittance, 0.0, 1.0));
+}
+
+vec4 integrateFireEmitters(vec3 rayOrigin, vec3 rayDirection,
+                           float maximumDistance, bool reflectionPath)
+{
+    vec3 accumulated = vec3(0.0);
+    float transmittance = 1.0;
+    for (uint index = 0u; index < kRtActiveFireEmitterCapacity; ++ index)
+    {
+        RtFireEmitterGpu emitter = rtFireEmitters.values[index];
+        if (emitter.identity.x == 0u) continue;
+        vec4 sampleValue = integrateOneFireEmitter(
+            emitter, rayOrigin, rayDirection, maximumDistance, reflectionPath);
+        accumulated += transmittance * sampleValue.rgb;
+        transmittance *= sampleValue.a;
+    }
+    return vec4(accumulated, transmittance);
+}
+
+vec2 lightTuning(int group)
+{
+    if (group == kLightTorch)
+        return vec2(controls.torchHueDegrees, controls.torchIntensityScale);
+    if (group == kLightSkylight)
+        return vec2(controls.skylightHueDegrees, controls.skylightIntensityScale);
+    if (group == kLightPassage)
+        return vec2(controls.passageHueDegrees, controls.passageIntensityScale);
+    return vec2(controls.staffHueDegrees, controls.staffIntensityScale);
+}
+
+vec3 tunedLightColor(vec3 authoredColor, int group)
+{
+    vec2 tuning = lightTuning(group);
+    float maximum = max(authoredColor.r, max(authoredColor.g, authoredColor.b));
+    float intensityScale = tuning.y;
+    if (maximum <= 0.0 || intensityScale <= 0.0)
+    {
+        return vec3(0.0);
+    }
+    if (abs(tuning.x) <= 0.0001)
+    {
+        return authoredColor * intensityScale;
+    }
+
+    float minimum = min(authoredColor.r, min(authoredColor.g, authoredColor.b));
+    float chroma = maximum - minimum;
+    float hue = 0.0;
+    if (chroma > 0.000001)
+    {
+        hue = authoredColor.r >= maximum
+            ? (authoredColor.g - authoredColor.b) / chroma
+            : (authoredColor.g >= maximum
+                ? 2.0 + (authoredColor.b - authoredColor.r) / chroma
+                : 4.0 + (authoredColor.r - authoredColor.g) / chroma);
+        hue = fract(hue / 6.0 + tuning.x / 360.0);
+    }
+    float saturation = chroma / maximum;
+    vec3 phase = abs(fract(hue + vec3(0.0, 2.0 / 3.0, 1.0 / 3.0)) * 6.0 - 3.0);
+    vec3 rotated = maximum * mix(vec3(1.0), clamp(phase - 1.0, 0.0, 1.0), saturation);
+    return rotated * intensityScale;
+}
+
+vec3 skyColor(vec3 d)
+{
+    float moonAlignment = max(dot(d, kMoonDirection), 0.0);
+    float moonDisc = smoothstep(0.99945, 0.99988, moonAlignment);
+    float moonHalo = pow(moonAlignment, 96.0);
+    float horizon = smoothstep(- 0.22, 0.45, d.y);
+    vec3 sky = mix(vec3(0.015, 0.018, 0.024), vec3(0.04, 0.065, 0.105), horizon);
+    sky += vec3(0.52, 0.62, 0.82) * moonDisc;
+    sky += vec3(0.10, 0.14, 0.23) * moonHalo;
+    sky += vec3(0.045, 0.018, 0.008) * smoothstep(- 0.35, 0.15, - d.y);
+    return tunedLightColor(sky, kLightSkylight);
+}
+
+float puddleMask(vec3 p)
+{
+    return(1.0 - smoothstep(0.0, 0.20, abs(p.x + 0.28)))
+         * (1.0 - smoothstep(0.0, 2.1, abs(p.z - 0.4)));
+}
+
+
+
+
+
+bool guardedRectangularDielectricSpawn(vec3 v0, vec3 v1, vec3 v2, vec2 bary,
+    vec3 localPosition, vec3 surfacePosition, vec3 geometricNormal,
+    mat4x3 objectToWorld, mat4x3 worldToObject, float minimumWidth, float geometryError,
+    out vec3 spawnPosition, out float minimumNormalBias)
+{
+    spawnPosition = surfacePosition;
+    minimumNormalBias = 0.0;
+
+
+    if (any(isnan(localPosition)) || any(isinf(localPosition)) ||
+        any(isnan(surfacePosition)) || any(isinf(surfacePosition)) ||
+        any(isnan(geometricNormal)) || any(isinf(geometricNormal))) return false;
+    vec3 weights = vec3(1.0 - bary.x - bary.y, bary);
+    if (any(lessThan(weights, vec3(0.0))) || any(isnan(weights)) ||
+        minimumWidth <= 0.0 || isnan(minimumWidth) || isinf(minimumWidth) ||
+        geometryError < 0.0 || isnan(geometryError) || isinf(geometryError)) return false;
+    vec3 e1 = v1 - v0;
+    vec3 e2 = v2 - v0;
+    vec3 areaNormal = cross(e1, e2);
+    float doubleArea = length(areaNormal);
+    if (doubleArea <= 0.0 || isinf(doubleArea) || isnan(doubleArea)) return false;
+    vec3 objectNormal = areaNormal / doubleArea;
+    mat3 absoluteO2w = mat3(abs(objectToWorld[0]), abs(objectToWorld[1]), abs(objectToWorld[2]));
+    mat3 absoluteW2o = mat3(abs(worldToObject[0]), abs(worldToObject[1]), abs(worldToObject[2]));
+    const float unitRoundoff = 5.9604644775390625e-8;
+    const float gamma5 = (5.0 * unitRoundoff) / (1.0 - 5.0 * unitRoundoff);
+
+    const float gamma8 = (8.0 * unitRoundoff) / (1.0 - 8.0 * unitRoundoff);
+    const float gamma16 = (16.0 * unitRoundoff) / (1.0 - 16.0 * unitRoundoff);
+    const float gamma32 = (32.0 * unitRoundoff) / (1.0 - 32.0 * unitRoundoff);
+    vec3 localError = gamma5 * (abs(v0) + abs(bary.x * e1) + abs(bary.y * e2));
+    vec3 worldError = absoluteO2w * localError + gamma8 *
+        (absoluteO2w * abs(localPosition) + abs(objectToWorld[3]));
+
+
+    vec3 inversePosition = mat3(worldToObject) * surfacePosition + worldToObject[3];
+    vec3 objectError = localError + absoluteW2o * (worldError +
+        unitRoundoff * (abs(surfacePosition) + vec3(0.00025))) + gamma8 *
+        (absoluteW2o * abs(surfacePosition) + abs(worldToObject[3])) +
+        abs(inversePosition - localPosition) + vec3(geometryError);
+
+
+
+    objectError += gamma8 * (abs(v0) + abs(e1) + abs(e2));
+
+
+    objectError = uintBitsToFloat(floatBitsToUint(objectError * (1.0 + gamma32)) + uvec3(1u));
+    if (any(isnan(objectError)) || any(isinf(objectError))) return false;
+    float lowerNormalBias = clamp(max(0.00002,
+        max(max(abs(surfacePosition.x), abs(surfacePosition.y)), abs(surfacePosition.z)) * 0.000002),
+        0.00002, 0.00025);
+    vec3 objectOffsetDirection = mat3(worldToObject) * geometricNormal;
+    if (any(isnan(objectOffsetDirection)) || any(isinf(objectOffsetDirection))) return false;
+
+
+    float separationScaleLower = (abs(dot(objectNormal, objectOffsetDirection)) -
+        gamma16 * dot(abs(objectNormal), absoluteW2o * abs(geometricNormal))) * (1.0 - gamma8);
+    if (isnan(separationScaleLower) || isinf(separationScaleLower) || separationScaleLower <= 0.0) return false;
+    float separationErrorUpper = dot(abs(objectNormal), objectError) * (1.0 + gamma8);
+
+
+    if (separationScaleLower * lowerNormalBias <= separationErrorUpper)
+    {
+        float requiredBias = (separationErrorUpper / separationScaleLower) * (1.0 + gamma8);
+        requiredBias = uintBitsToFloat(floatBitsToUint(requiredBias) + 1u);
+        if (isnan(requiredBias) || isinf(requiredBias) || requiredBias > 0.00025) return false;
+        lowerNormalBias = max(lowerNormalBias, requiredBias);
+    }
+
+    if (separationScaleLower * lowerNormalBias <= separationErrorUpper ||
+        (length(objectOffsetDirection) * 0.00025 + 2.0 * length(objectError)) *
+            (1.0 + gamma8) >= minimumWidth * 0.25)
+        return false;
+    vec3 oppositeEdges[3] = vec3[3] (v2 - v1, - e2, e1);
+    vec3 minimumWeights;
+    for (int edge = 0; edge < 3; ++ edge)
+    {
+        float edgeLength = length(oppositeEdges[edge]);
+        if (edgeLength <= 0.0) return false;
+        vec3 inward = cross(objectNormal, oppositeEdges[edge]) / edgeLength;
+        float minimumWeight = dot(abs(inward), objectError) / (doubleArea / edgeLength);
+        minimumWeights[edge] = uintBitsToFloat(floatBitsToUint(minimumWeight *
+            (1.0 + gamma8)) + 1u);
+    }
+    float minimumSum = (minimumWeights.x + minimumWeights.y + minimumWeights.z) * (1.0 + gamma8);
+    if (minimumSum >= 1.0) return false;
+    vec3 guardedLocal = localPosition;
+    if (any(lessThan(weights, minimumWeights)))
+    {
+
+
+        vec3 insetBase = v0 + minimumWeights.y * e1 + minimumWeights.z * e2;
+        vec3 insetVertices[3] = vec3[3] (insetBase,
+            insetBase + (1.0 - minimumSum) * e1,
+            insetBase + (1.0 - minimumSum) * e2);
+        float nearestSquared = 1e30;
+        for (int edge = 0; edge < 3; ++ edge)
+        {
+            vec3 start = insetVertices[edge];
+            vec3 delta = insetVertices[ (edge + 1) % 3] - start;
+            float squaredLength = dot(delta, delta);
+            if (squaredLength <= 0.0) return false;
+            vec3 candidate = start + delta * clamp(dot(localPosition - start, delta) / squaredLength, 0.0, 1.0);
+            float squared = dot(candidate - localPosition, candidate - localPosition);
+            if (squared < nearestSquared) { nearestSquared = squared; guardedLocal = candidate; }
+        }
+        if (length(guardedLocal - localPosition) * (1.0 + gamma8) >
+            2.0 * length(objectError) * (1.0 - gamma8)) return false;
+    }
+    precise vec3 guardedWorld = mat3(objectToWorld) * guardedLocal + objectToWorld[3];
+    if (any(isnan(guardedWorld)) || any(isinf(guardedWorld))) return false;
+    spawnPosition = guardedWorld;
+    minimumNormalBias = lowerNormalBias;
+    return true;
+}
+
+
+vec3 normalForSurfaceCode(uint code)
+{
+    uint normalCode = (code >> 8u) & 0xffu;
+    if (normalCode == 0u) return vec3(0.0, 1.0, 0.0);
+    if (normalCode == 1u) return vec3(0.0, - 1.0, 0.0);
+    if (normalCode == 2u) return vec3(1.0, 0.0, 0.0);
+    if (normalCode == 3u) return vec3(- 1.0, 0.0, 0.0);
+    if (normalCode == 4u) return vec3(0.0, 0.0, 1.0);
+    if (normalCode == 5u) return vec3(0.0, 0.0, - 1.0);
+    return normalize(vec3(0.46, 0.42, 0.0));
+}
+
+const float kWaterStreamBottomY = - 0.91;
+const float kWaterStreamTopY = 2.16;
+const float kWaterStreamBottomScale = 0.70;
+const float kWaterStreamTaperSlope = 0.30 / (kWaterStreamTopY - kWaterStreamBottomY);
+
+float waterStreamScale(float y)
+{
+    return kWaterStreamBottomScale
+        + clamp(y - kWaterStreamBottomY, 0.0,
+                kWaterStreamTopY - kWaterStreamBottomY)
+        * kWaterStreamTaperSlope;
+}
+
+void waterStreamProfile(vec3 p, out float centreZ, out float radiusX,
+                        out float radiusZ)
+{
+    float scale = waterStreamScale(p.y);
+    float widthScale = controls.waterfallWidthScale;
+    centreZ = - 15.26;
+    radiusX = 0.006;
+    radiusZ = 0.065 * widthScale;
+    float nearest = abs(p.z - centreZ) / (radiusZ * scale);
+    float sideCentreZ = - 15.26 + (- 15.44 + 15.26) * widthScale;
+    float candidate = abs(p.z - sideCentreZ) / (0.014 * widthScale * scale);
+    if (candidate < nearest)
+    {
+        centreZ = sideCentreZ;
+        radiusX = 0.003;
+        radiusZ = 0.014 * widthScale;
+        nearest = candidate;
+    }
+    sideCentreZ = - 15.26 + (- 15.06 + 15.26) * widthScale;
+    candidate = abs(p.z - sideCentreZ) / (0.012 * widthScale * scale);
+    if (candidate < nearest)
+    {
+        centreZ = sideCentreZ;
+        radiusX = 0.003;
+        radiusZ = 0.012 * widthScale;
+    }
+}
+
+vec3 waterBaseNormal(vec3 p, vec3 geometricNormal)
+{
+    vec3 authoredNormal = normalize(geometricNormal);
+    if (abs(authoredNormal.y) > 0.65)
+    {
+        return authoredNormal;
+    }
+
+
+
+
+    float centreZ = 0.0;
+    float radiusX = 0.0;
+    float radiusZ = 0.0;
+    waterStreamProfile(p, centreZ, radiusX, radiusZ);
+    float scale = waterStreamScale(p.y);
+    vec3 radialGradient = vec3( (p.x + 2.32) / (radiusX * radiusX),
+                               - scale * kWaterStreamTaperSlope,
+                               (p.z - centreZ) / (radiusZ * radiusZ));
+    return normalize(radialGradient);
+}
+
+vec3 waterSurfaceNormal(vec3 p, vec3 geometricNormal)
+{
+    vec3 n = waterBaseNormal(p, geometricNormal);
+    bool runoff = abs(n.y) > 0.65;
+    bool catchment = runoff && p.x > - 2.88;
+    if (catchment)
+    {
+
+
+
+        vec2 impactOffset = p.xz - vec2(- 2.32, - 15.26);
+        float impactDistance = length(impactOffset);
+        vec2 radial = impactOffset / max(impactDistance, 0.001);
+        float angularWarp = sin(atan(impactOffset.y, impactOffset.x) * 3.0
+                              + controls.time * 0.37) * 0.28;
+        float ripple = sin(impactDistance * 31.0 - controls.time * 6.2
+                           + angularWarp);
+        float rippleEnvelope = 1.0 - smoothstep(0.07, 0.72, impactDistance);
+        vec3 radialDirection = vec3(radial.x, 0.0, radial.y);
+        return normalize(n + radialDirection * ripple * rippleEnvelope * 0.020
+                           + vec3(0.006 * sin(p.z * 23.0 - controls.time * 3.7),
+                                  0.0,
+                                  0.004 * sin(p.x * 29.0 + controls.time * 4.1)));
+    }
+    vec3 flow = runoff ? vec3(- 1.0, 0.0, 0.0) : vec3(0.0, - 1.0, 0.0);
+    vec3 across = normalize(cross(flow, n));
+    float alongPosition = dot(p, flow);
+    float acrossPosition = dot(p, across);
+    float slopeA = sin(alongPosition * 3.6 - controls.time * 4.0
+                     + sin(acrossPosition * 1.7) * 0.24);
+    float slopeB = sin(alongPosition * 7.1 - controls.time * 6.8
+                     + acrossPosition * 2.9);
+    float amplitude = runoff ? 0.008 : 0.018;
+    return normalize(n + flow * slopeA * amplitude
+                       + across * slopeB * amplitude * 0.65);
+}
+
+bool waterStreamExit(vec3 entryPoint, vec3 insideDirection,
+                     out vec3 exitPoint, out vec3 exitOutwardNormal,
+                     out float waterDistance)
+{
+    float centreZ = 0.0;
+    float radiusX = 0.0;
+    float radiusZ = 0.0;
+    waterStreamProfile(entryPoint, centreZ, radiusX, radiusZ);
+
+
+
+
+
+
+    vec3 insideStart = entryPoint + insideDirection * 0.0004;
+    float localX = insideStart.x + 2.32;
+    float localZ = insideStart.z - centreZ;
+    float inverseRadiusXSquared = 1.0 / (radiusX * radiusX);
+    float inverseRadiusZSquared = 1.0 / (radiusZ * radiusZ);
+    float scale = waterStreamScale(insideStart.y);
+    float scaleRate = kWaterStreamTaperSlope * insideDirection.y;
+    float a = insideDirection.x * insideDirection.x * inverseRadiusXSquared
+            + insideDirection.z * insideDirection.z * inverseRadiusZSquared
+            - scaleRate * scaleRate;
+    float b = 2.0 * (localX * insideDirection.x * inverseRadiusXSquared
+                   + localZ * insideDirection.z * inverseRadiusZSquared
+                   - scale * scaleRate);
+    float c = localX * localX * inverseRadiusXSquared
+            + localZ * localZ * inverseRadiusZSquared - scale * scale;
+    float discriminant = b * b - 4.0 * a * c;
+    if (a <= 0.000001 || discriminant < 0.0)
+    {
+        exitPoint = entryPoint;
+        exitOutwardNormal = waterBaseNormal(entryPoint, vec3(1.0, 0.0, 0.0));
+        waterDistance = 0.0;
+        return false;
+    }
+
+    float root = sqrt(discriminant);
+    float firstDistance = (- b - root) / (2.0 * a);
+    float secondDistance = (- b + root) / (2.0 * a);
+    float exitDistance = max(firstDistance, secondDistance);
+    if (exitDistance <= 0.0002 || exitDistance > 0.20)
+    {
+        exitPoint = entryPoint;
+        exitOutwardNormal = waterBaseNormal(entryPoint, vec3(1.0, 0.0, 0.0));
+        waterDistance = 0.0;
+        return false;
+    }
+
+    exitPoint = insideStart + insideDirection * exitDistance;
+    float exitScale = waterStreamScale(exitPoint.y);
+    exitOutwardNormal = normalize(vec3(
+        (exitPoint.x + 2.32) * inverseRadiusXSquared,
+        - exitScale * kWaterStreamTaperSlope,
+        (exitPoint.z - centreZ) * inverseRadiusZSquared));
+    waterDistance = exitDistance + 0.0004;
+    return true;
+}
+
+void materialForPrimitive(int primitive,
+                          int instance,
+                          vec3 p,
+                          out int material,
+                          out vec3 normal,
+                          out vec3 geometricNormal,
+                          out vec3 base,
+                          out float metallic,
+                          out float reflectivity,
+                          out float emissive)
+{
+    material = - 1;
+    if (instance == kWaterfallInstance)
+    {
+        material = kMaterialWater;
+        geometricNormal = waterBaseNormal(p, vec3(1.0, 0.0, 0.0));
+        normal = waterSurfaceNormal(p, geometricNormal);
+        base = vec3(1.0);
+        metallic = 0.0;
+        reflectivity = 0.0204;
+        emissive = 0.0;
+        return;
+    }
+    if (instance >= 4 && instance <= 16)
+    {
+        normal = normalize(vec3(controls.cameraX, 0.75, controls.cameraZ) - p);
+        geometricNormal = normal;
+        if (instance == 4)
+        {
+            bool brass = primitive >= 60 && primitive < 72;
+            bool leather = (primitive >= 48 && primitive < 60) ||
+                           (primitive >= 72 && primitive < 96) || primitive >= 120;
+            base = brass ? vec3(0.52, 0.29, 0.065) :
+                   (leather ? vec3(0.24, 0.090, 0.030) : vec3(0.18, 0.028, 0.034));
+            metallic = brass ? 0.82 : (leather ? 0.08 : 0.0);
+            reflectivity = brass ? 0.72 : (leather ? 0.20 : 0.08);
+        }
+        else
+        {
+            bool boots = instance == 14 || instance == 15;
+            bool leather = instance == 6 || instance == 8 || instance == 9 ||
+                           instance == 11 || instance == 13;
+            bool head = instance == 16;
+            base = boots ? vec3(0.028, 0.014, 0.011) :
+                   (head ? vec3(0.16, 0.085, 0.055) :
+                   (leather ? vec3(0.19, 0.064, 0.023) : vec3(0.14, 0.024, 0.030)));
+            metallic = boots ? 0.02 : (leather ? 0.05 : 0.0);
+            reflectivity = boots ? 0.13 : (leather ? 0.18 : 0.08);
+        }
+        emissive = 0.0;
+        return;
+    }
+
+    if (instance == 17)
+    {
+        int face = (primitive % 12) / 2;
+        normal = face == 0 ? vec3(0.0, 0.0, - 1.0) :
+                 (face == 1 ? vec3(0.0, 0.0, 1.0) :
+                 (face == 2 ? vec3(- 1.0, 0.0, 0.0) :
+                 (face == 3 ? vec3(1.0, 0.0, 0.0) :
+                 (face == 4 ? vec3(0.0, 1.0, 0.0) : vec3(0.0, - 1.0, 0.0)))));
+        geometricNormal = normal;
+        base = vec3(0.115, 0.105, 0.092);
+        metallic = 0.0;
+        reflectivity = 0.06;
+        emissive = 0.0;
+        return;
+    }
+
+    if (instance == 2 || instance == 18)
+    {
+        normal = vec3(0.0, 1.0, 0.0);
+        geometricNormal = normal;
+
+
+
+        float age = 0.5 + 0.5 * sin(p.y * 3.1 + p.x * 1.7 + p.z * 2.3);
+        bool lichInstance = instance == 2 && controls.enemyKind > 0.5;
+        base = lichInstance ? vec3(0.16, 0.13, 0.19)
+                            : mix(vec3(0.34, 0.29, 0.21), vec3(0.48, 0.42, 0.30), age * 0.42);
+        metallic = lichInstance ? 0.08 : 0.04;
+        reflectivity = lichInstance ? 0.18 : 0.24;
+        emissive = 0.0;
+        return;
+    }
+
+    uint code = worldSurfaces.codes[primitive];
+    uint normalCode = (code >> 8u) & 0xffu;
+    material = int(code & 0xffu);
+    normal = normalForSurfaceCode(code);
+    geometricNormal = normal;
+    base = vec3(0.16, 0.15, 0.135);
+    metallic = 0.0;
+    reflectivity = 0.07;
+    emissive = 0.0;
+
+    if (material >= kMaterialDryStone && material <= kMaterialAgedMetal)
+    {
+        float layer = float(material);
+        float puddle = material == kMaterialWetCobble && normalCode == 0u ? puddleMask(p) : 0.0;
+        vec2 uv;
+        vec3 galleryBitangent = vec3(0.0);
+        if (normalCode == 6u)
+        {
+            galleryBitangent = normalize(cross(geometricNormal, vec3(0.0, 0.0, 1.0)));
+            uv = vec2(p.z, dot(p, galleryBitangent)) * 0.42;
+        }
+        else
+        {
+            uv = abs(normal.y) > 0.5 ? p.xz * 0.42 : (abs(normal.x) > 0.5 ? p.zy * 0.42 : p.xy * 0.42);
+        }
+        vec4 albedo = texture(materialDiffuse, vec3(uv, layer));
+        vec3 arm = texture(materialArm, vec3(uv, layer)).rgb;
+        if (puddle > 0.18)
+        {
+            albedo = mix(albedo, texture(materialDiffuse, vec3(uv * 0.72, float(kMaterialDampGround))), puddle * 0.65);
+            arm.g = mix(arm.g, 0.08, puddle);
+        }
+        base = albedo.rgb * mix(0.62, 1.0, arm.r);
+        metallic = arm.b;
+        reflectivity = clamp(1.0 - arm.g, 0.05, 0.96);
+        vec3 tangentNormal = texture(materialNormal, vec3(uv, layer)).xyz * 2.0 - 1.0;
+        vec3 mapped;
+        if (normalCode == 6u)
+        {
+            mapped = normalize(vec3(0.0, 0.0, 1.0) * tangentNormal.x
+                + galleryBitangent * tangentNormal.y + geometricNormal * tangentNormal.z);
+        }
+        else
+        {
+            mapped = abs(normal.y) > 0.5 ? vec3(tangentNormal.x, tangentNormal.z * sign(normal.y), tangentNormal.y)
+                : (abs(normal.x) > 0.5 ? vec3(tangentNormal.z * sign(normal.x), tangentNormal.y, tangentNormal.x)
+                                           : vec3(tangentNormal.x, tangentNormal.y, tangentNormal.z * sign(normal.z)));
+        }
+        normal = normalize(mix(normal, mapped, 0.34));
+    }
+    else if (material == kMaterialFlame)
+    {
+        vec3 authoredFlame = p.x < - 23.5 ? vec3(0.19, 0.95, 0.26) :
+                              (p.x < - 18.5 ? vec3(1.0, 0.055, 0.018) :
+                              (p.x < - 13.5 ? vec3(0.055, 0.24, 1.0) : vec3(1.0, 0.44, 0.055)));
+        base = tunedLightColor(authoredFlame, kLightPassage);
+        emissive = 2.2 + 0.45 * sin( (p.y + p.x) * 35.0 + controls.time * 18.0);
+    }
+    else if (material == kMaterialMirror)
+    {
+        base = vec3(0.045, 0.032, 0.022);
+        metallic = 0.95;
+        reflectivity = 0.95;
+    }
+    else if (material == kMaterialDarkFigure)
+    {
+        base = vec3(0.012, 0.016, 0.014);
+        reflectivity = 0.12;
+        float eyeBand = 1.0 - smoothstep(0.0, 0.055, abs(p.y + 0.13));
+        float eyePair = 1.0 - smoothstep(0.0, 0.11, abs(abs(fract(p.x * 3.7) - 0.5) - 0.19));
+        base += vec3(0.08, 0.82, 0.21) * eyeBand * eyePair;
+    }
+    else if (material == kMaterialHiddenShell)
+    {
+        base = vec3(0.15, 0.14, 0.125);
+        reflectivity = 0.06;
+    }
+    else if (material == kMaterialClearGlass)
+    {
+        base = vec3(0.32, 0.48, 0.52);
+        reflectivity = 0.22;
+    }
+    else if (material == kMaterialWater)
+    {
+        base = vec3(1.0);
+        geometricNormal = waterBaseNormal(p, geometricNormal);
+        normal = waterSurfaceNormal(p, geometricNormal);
+        metallic = 0.0;
+        reflectivity = 0.0204;
+    }
+}
+
+void loadPbrTriangle(RtInstanceMetadata instance, uint i0, uint i1, uint i2,
+                     out StaticRtVertex v0, out StaticRtVertex v1, out StaticRtVertex v2)
+{
+    if (instance.geometryRole == kRtGeometryRolePlayerWorldBody)
+    {
+        v0 = rtWorldPlayerVertices.values[i0];
+        v1 = rtWorldPlayerVertices.values[i1];
+        v2 = rtWorldPlayerVertices.values[i2];
+    }
+    else if (instance.geometryRole == kRtGeometryRolePlayerViewmodel)
+    {
+        v0 = rtViewmodelVertices.values[i0];
+        v1 = rtViewmodelVertices.values[i1];
+        v2 = rtViewmodelVertices.values[i2];
+    }
+    else
+    {
+        v0 = rtStaticVertices.values[i0];
+        v1 = rtStaticVertices.values[i1];
+        v2 = rtStaticVertices.values[i2];
+    }
+}
+
+HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
+                   float minimumDistance, bool ignoreWater,
+                   bool ignorePlayerNearFace)
+{
+    HitInfo h;
+    h.hit = false;
+    h.t = maxDistance;
+    h.primitive = - 1;
+    h.instance = 0;
+    h.material = - 1;
+    h.position = origin + direction * maxDistance;
+    h.normal = vec3(0.0, 1.0, 0.0);
+    h.geometricNormal = h.normal;
+    h.base = vec3(0.0);
+    h.metallic = 0.0;
+    h.reflectivity = 0.0;
+    h.roughness = 1.0;
+    h.emissive = 0.0;
+    h.transmission = 0.0;
+    h.ior = 1.5;
+    h.thickness = 0.0;
+    h.attenuationDistance = 0.0;
+    h.attenuationColor = vec3(1.0);
+    h.materialFlags = 0u;
+
+    h.investigationQueryOrigin = origin;
+    h.investigationQueryDirection = direction;
+    h.investigationQueryMinimum = max(minimumDistance, 0.0);
+    h.investigationObjectOrigin = vec3(0.0);
+    h.investigationObjectDirection = vec3(0.0);
+    h.investigationVertex0 = vec3(0.0);
+    h.investigationVertex1 = vec3(0.0);
+    h.investigationVertex2 = vec3(0.0);
+    h.investigationBarycentrics = vec2(0.0);
+    h.investigationRawDistance = maxDistance;
+    h.investigationGeometryIndex = 0u;
+
+
+    h.dielectricSpawnPosition = h.position;
+    h.dielectricSpawnGuarded = false;
+    h.dielectricSpawnMinimumNormalBias = 0.0;
+
+
+    rayQueryEXT query;
+    uint rayFlags = (ignoreWater || ignorePlayerNearFace)
+        ? gl_RayFlagsNoOpaqueEXT : gl_RayFlagsOpaqueEXT;
+    rayQueryInitializeEXT(query, topLevelAS, rayFlags, mask, origin,
+                          max(minimumDistance, 0.0), direction, maxDistance);
+    while (rayQueryProceedEXT(query))
+    {
+        if ( (! ignoreWater && ! ignorePlayerNearFace) ||
+            rayQueryGetIntersectionTypeEXT(query, false) != gl_RayQueryCandidateIntersectionTriangleEXT)
+        {
+            continue;
+        }
+        int candidateInstance = int(rayQueryGetIntersectionInstanceCustomIndexEXT(query, false));
+        int candidatePrimitive = rayQueryGetIntersectionPrimitiveIndexEXT(query, false);
+        bool candidateIsWater = candidateInstance == kWaterfallInstance ||
+            (candidateInstance == 0 &&
+             int(worldSurfaces.codes[candidatePrimitive] & 0xffu) == kMaterialWater);
+        bool candidateIsPlayerNearFace = false;
+        if (ignorePlayerNearFace &&
+            rtInstances.values[candidateInstance].geometryRole == kRtGeometryRolePlayerWorldBody)
+        {
+            RtInstanceMetadata playerMetadata = rtInstances.values[candidateInstance];
+            uint geometryIndex = rayQueryGetIntersectionGeometryIndexEXT(query, false);
+            if (geometryIndex < playerMetadata.primitiveCount)
+            {
+                RtPrimitiveMetadata playerPrimitive =
+                    rtPrimitives.values[playerMetadata.primitiveBase + geometryIndex];
+                uint playerFlags = rtMaterials.values[playerPrimitive.materialIndex].materialFlags.x;
+
+
+
+                uint excludedRegion = playerFlags & (kRtMaterialFlagHeadPrimaryMasked |
+                                                     kRtMaterialFlagNearFacePrimaryMasked);
+                uint remainderOnly = uint( (playerMetadata.flags & kRtInstanceFlagBodyRemainderOnlyPrimary) != 0u);
+                uint outsideRemainder = uint( (playerFlags & kRtMaterialFlagBodyRemainderPrimaryVisible) == 0u);
+                candidateIsPlayerNearFace = (excludedRegion | (remainderOnly & outsideRemainder)) != 0u;
+            }
+        }
+        if ( (! ignoreWater || ! candidateIsWater) &&
+            (! ignorePlayerNearFace || ! candidateIsPlayerNearFace))
+        {
+            rayQueryConfirmIntersectionEXT(query);
+        }
+    }
+
+    if (rayQueryGetIntersectionTypeEXT(query, true) != gl_RayQueryCommittedIntersectionNoneEXT)
+    {
+        h.hit = true;
+        h.t = rayQueryGetIntersectionTEXT(query, true);
+        h.primitive = rayQueryGetIntersectionPrimitiveIndexEXT(query, true);
+        h.instance = int(rayQueryGetIntersectionInstanceCustomIndexEXT(query, true));
+        h.position = origin + direction * h.t;
+        RtInstanceMetadata instanceMetadata = rtInstances.values[h.instance];
+        uint geometryIndex = rayQueryGetIntersectionGeometryIndexEXT(query, true);
+
+        h.investigationObjectOrigin = rayQueryGetIntersectionObjectRayOriginEXT(query, true);
+        h.investigationObjectDirection = rayQueryGetIntersectionObjectRayDirectionEXT(query, true);
+        h.investigationBarycentrics = rayQueryGetIntersectionBarycentricsEXT(query, true);
+        h.investigationRawDistance = h.t;
+        h.investigationGeometryIndex = geometryIndex;
+
+        if ( (instanceMetadata.flags & kRtInstanceFlagStaticPbr) != 0u)
+        {
+            if (geometryIndex < instanceMetadata.primitiveCount)
+            {
+                RtPrimitiveMetadata primitiveMetadata =
+                    rtPrimitives.values[instanceMetadata.primitiveBase + geometryIndex];
+                uint triangleIndex = primitiveMetadata.indexOffset + uint(h.primitive) * 3u;
+                uint i0 = primitiveMetadata.vertexOffset + rtStaticIndices.values[triangleIndex];
+                uint i1 = primitiveMetadata.vertexOffset + rtStaticIndices.values[triangleIndex + 1u];
+                uint i2 = primitiveMetadata.vertexOffset + rtStaticIndices.values[triangleIndex + 2u];
+                vec2 bary = rayQueryGetIntersectionBarycentricsEXT(query, true);
+                vec3 weights = vec3(1.0 - bary.x - bary.y, bary.x, bary.y);
+                StaticRtVertex v0, v1, v2;
+                loadPbrTriangle(instanceMetadata, i0, i1, i2, v0, v1, v2);
+
+                h.investigationVertex0 = v0.position.xyz;
+                h.investigationVertex1 = v1.position.xyz;
+                h.investigationVertex2 = v2.position.xyz;
+
+                vec2 uv = v0.uv0.xy * weights.x + v1.uv0.xy * weights.y +
+                          v2.uv0.xy * weights.z;
+                mat3 objectToWorld = mat3(rayQueryGetIntersectionObjectToWorldEXT(query, true));
+                mat3 normalToWorld = transpose(inverse(objectToWorld));
+                vec3 localNormal = normalize(v0.normal.xyz * weights.x +
+                                             v1.normal.xyz * weights.y +
+                                             v2.normal.xyz * weights.z);
+                vec4 localTangent = v0.tangent * weights.x +
+                                    v1.tangent * weights.y +
+                                    v2.tangent * weights.z;
+                vec3 p0 = objectToWorld * v0.position.xyz;
+                vec3 p1 = objectToWorld * v1.position.xyz;
+                vec3 p2 = objectToWorld * v2.position.xyz;
+                h.geometricNormal = normalize(cross(p1 - p0, p2 - p0));
+                vec3 worldNormal = normalize(normalToWorld * localNormal);
+                if (dot(worldNormal, h.geometricNormal) < 0.0)
+                    worldNormal = - worldNormal;
+                vec3 worldTangent = objectToWorld * localTangent.xyz;
+                worldTangent -= worldNormal * dot(worldNormal, worldTangent);
+                if (dot(worldTangent, worldTangent) <= 0.00000001)
+                    worldTangent = normalize(cross(
+                        abs(worldNormal.y) < 0.9 ? vec3(0.0, 1.0, 0.0)
+                                                 : vec3(1.0, 0.0, 0.0),
+                        worldNormal));
+                else
+                    worldTangent = normalize(worldTangent);
+                vec3 worldBitangent = normalize(cross(worldNormal, worldTangent)) *
+                                      (localTangent.w < 0.0 ? - 1.0 : 1.0);
+                RtMaterialGpu staticMaterial =
+                    rtMaterials.values[primitiveMetadata.materialIndex];
+                vec3 sampledNormal = (staticMaterial.materialFlags.x &
+                    kRtMaterialFlagNormalTexture) != 0u
+                    ? texture(rtNormalTextures,
+                        vec3(uv, float(staticMaterial.textureLayers.y))).xyz * 2.0 - 1.0
+                    : vec3(0.0, 0.0, 1.0);
+                h.normal = normalize(worldTangent * sampledNormal.x +
+                                     worldBitangent * sampledNormal.y +
+                                     worldNormal * sampledNormal.z);
+                if (dot(h.normal, h.geometricNormal) < 0.0)
+                    h.normal = - h.normal;
+                vec4 baseSample = (staticMaterial.materialFlags.x &
+                    kRtMaterialFlagBaseColorTexture) != 0u
+                    ? texture(rtBaseColorTextures,
+                        vec3(uv, float(staticMaterial.textureLayers.x)))
+                    : vec4(1.0);
+                vec3 orm = (staticMaterial.materialFlags.x &
+                    kRtMaterialFlagOrmTexture) != 0u
+                    ? texture(rtOrmTextures,
+                        vec3(uv, float(staticMaterial.textureLayers.z))).rgb
+                    : vec3(1.0);
+                vec3 emissiveSample = (staticMaterial.materialFlags.x &
+                    kRtMaterialFlagEmissiveTexture) != 0u
+                    ? texture(rtEmissiveTextures,
+                        vec3(uv, float(staticMaterial.textureLayers.w))).rgb
+                    : vec3(1.0);
+                h.material = 100 + int(primitiveMetadata.materialIndex);
+                h.base = baseSample.rgb * staticMaterial.baseColorFactor.rgb *
+                         mix(1.0, orm.r, staticMaterial.metallicRoughnessOcclusionTransmission.z);
+                h.metallic = clamp(orm.b *
+                    staticMaterial.metallicRoughnessOcclusionTransmission.x, 0.0, 1.0);
+                float roughness = clamp(orm.g *
+                    staticMaterial.metallicRoughnessOcclusionTransmission.y, 0.04, 1.0);
+                h.roughness = roughness;
+                h.reflectivity = mix(0.04, 0.92, h.metallic) * (1.0 - roughness * 0.45);
+                h.transmission = clamp(
+                    staticMaterial.metallicRoughnessOcclusionTransmission.w, 0.0, 1.0);
+                h.ior = clamp(staticMaterial.iorThicknessAttenuationDistance.x, 1.0, 4.0);
+                h.thickness = max(staticMaterial.iorThicknessAttenuationDistance.y, 0.0);
+                h.attenuationDistance = staticMaterial.iorThicknessAttenuationDistance.z;
+                h.attenuationColor = clamp(staticMaterial.attenuationColor.rgb,
+                                            vec3(0.0), vec3(1.0));
+                h.materialFlags = staticMaterial.materialFlags.x;
+
+                if ( (h.materialFlags & kRtMaterialFlagTransmission) != 0u)
+                {
+
+
+
+
+                    precise vec3 localPosition = v0.position.xyz +
+                        (bary.x * (v1.position.xyz - v0.position.xyz) +
+                         bary.y * (v2.position.xyz - v0.position.xyz));
+                    precise vec3 surfacePosition = objectToWorld * localPosition +
+                        rayQueryGetIntersectionObjectToWorldEXT(query, true)[3];
+                    h.position = surfacePosition;
+                    h.dielectricSpawnPosition = surfacePosition;
+                    if ( (h.materialFlags & kRtMaterialFlagCertifiedRectangularVolume) != 0u)
+                        h.dielectricSpawnGuarded = guardedRectangularDielectricSpawn(
+                            v0.position.xyz, v1.position.xyz, v2.position.xyz, bary,
+                            localPosition, surfacePosition, h.geometricNormal,
+                            rayQueryGetIntersectionObjectToWorldEXT(query, true),
+                            rayQueryGetIntersectionWorldToObjectEXT(query, true),
+                            staticMaterial.iorThicknessAttenuationDistance.w,
+                            staticMaterial.attenuationColor.w,
+                            h.dielectricSpawnPosition, h.dielectricSpawnMinimumNormalBias);
+                }
+
+                vec3 emission = emissiveSample * staticMaterial.emissiveFactorStrength.rgb *
+                                staticMaterial.emissiveFactorStrength.w;
+                h.emissive = max(emission.r, max(emission.g, emission.b));
+                if (h.emissive > 0.0001) h.base = emission / h.emissive;
+            }
+            else if (instanceMetadata.emitterIndex != 0u &&
+                     geometryIndex >= instanceMetadata.primitiveCount)
+            {
+                RtFireEmitterGpu emitter;
+                bool emitterActive = findFireEmitter(instanceMetadata.emitterIndex, emitter);
+                h.base = emitterActive
+                    ? tunedLightColor(emitter.colourIntensity.rgb, kLightTorch)
+                    : vec3(0.045, 0.025, 0.018);
+                h.emissive = emitterActive ? emitter.colourIntensity.w * 4.6 : 0.0;
+                if (! emitterActive || emitter.colourIntensity.w <= 0.001)
+                    h.base = vec3(0.045, 0.025, 0.018);
+                h.normal = normalize(- direction);
+                h.geometricNormal = h.normal;
+                h.metallic = 0.0;
+                h.reflectivity = 0.0;
+            }
+        }
+        else
+        {
+            materialForPrimitive(h.primitive, h.instance, h.position, h.material,
+                                 h.normal, h.geometricNormal, h.base, h.metallic,
+                                 h.reflectivity, h.emissive);
+        }
+        if (h.instance == 2 || h.instance == 18)
+        {
+            const int firstVertex = h.primitive * 3;
+            const vec2 bary = rayQueryGetIntersectionBarycentricsEXT(query, true);
+            const float w0 = 1.0 - bary.x - bary.y;
+            bool lichInstance = h.instance == 2 && controls.enemyKind > 0.5;
+            bool secondSkeletonPose = h.instance == 18;
+            vec3 localNormal = lichInstance
+                ? normalize(lich.vertices[firstVertex].normal.xyz * w0
+                    + lich.vertices[firstVertex + 1].normal.xyz * bary.x
+                    + lich.vertices[firstVertex + 2].normal.xyz * bary.y)
+                : (secondSkeletonPose
+                    ? normalize(secondSkeleton.vertices[firstVertex].normal.xyz * w0
+                        + secondSkeleton.vertices[firstVertex + 1].normal.xyz * bary.x
+                        + secondSkeleton.vertices[firstVertex + 2].normal.xyz * bary.y)
+                    : normalize(skeleton.vertices[firstVertex].normal.xyz * w0
+                        + skeleton.vertices[firstVertex + 1].normal.xyz * bary.x
+                        + skeleton.vertices[firstVertex + 2].normal.xyz * bary.y));
+            const mat3 objectToWorld = mat3(rayQueryGetIntersectionObjectToWorldEXT(query, true));
+            h.normal = normalize(objectToWorld * localNormal);
+            vec3 edgeA = lichInstance
+                ? lich.vertices[firstVertex + 1].position.xyz - lich.vertices[firstVertex].position.xyz
+                : (secondSkeletonPose
+                    ? secondSkeleton.vertices[firstVertex + 1].position.xyz - secondSkeleton.vertices[firstVertex].position.xyz
+                    : skeleton.vertices[firstVertex + 1].position.xyz - skeleton.vertices[firstVertex].position.xyz);
+            vec3 edgeB = lichInstance
+                ? lich.vertices[firstVertex + 2].position.xyz - lich.vertices[firstVertex].position.xyz
+                : (secondSkeletonPose
+                    ? secondSkeleton.vertices[firstVertex + 2].position.xyz - secondSkeleton.vertices[firstVertex].position.xyz
+                    : skeleton.vertices[firstVertex + 2].position.xyz - skeleton.vertices[firstVertex].position.xyz);
+            vec3 faceNormal = cross(edgeA, edgeB);
+            h.geometricNormal = length(faceNormal) > 0.00001
+                ? normalize(objectToWorld * normalize(faceNormal))
+                : h.normal;
+            if (dot(h.geometricNormal, - direction) < 0.0)
+            {
+                h.geometricNormal = - h.geometricNormal;
+            }
+            if (lichInstance)
+            {
+                vec2 uv = lich.vertices[firstVertex].texcoord.xy * w0
+                    + lich.vertices[firstVertex + 1].texcoord.xy * bary.x
+                    + lich.vertices[firstVertex + 2].texcoord.xy * bary.y;
+                vec3 albedo = texture(lichBaseColor, vec3(uv, 0.0)).rgb;
+                vec3 glow = texture(lichEmissive, vec3(uv, 0.0)).rgb;
+                float glowMask = smoothstep(0.025, 0.50, max(glow.r, max(glow.g, glow.b)));
+                vec3 authoredStaffEmission = mix(albedo * 0.72, vec3(0.72, 0.12, 1.0), glowMask);
+                h.base = glowMask > 0.0 ? tunedLightColor(authoredStaffEmission, kLightStaff)
+                                        : albedo * 0.72;
+                h.emissive = glowMask * (3.8 + controls.staffLightStrength * 2.3);
+            }
+        }
+    }
+    return h;
+}
+vec3 dielectricBeerLambert(vec3 attenuationColor, float pathLength,
+                           float attenuationDistance);
+float dielectricRayEpsilon(vec3 position, float interfaceDistance);
+vec3 advanceDielectricRayOrigin(vec3 position, vec3 geometricNormal,
+                                vec3 direction, float epsilon);
+
+const int kMobileShadowInterfaces = 4;
+const int kHighShadowInterfaces = 8;
+const int kMobileShadowVolumes = 2;
+const int kHighShadowVolumes = 4;
+
+
+
+
+
+
+
+
+
+struct ShadowHit
+{
+    bool hit;
+    bool transparent;
+    bool thinWall;
+    bool certifiedClosedVolume;
+    bool entering;
+    float t;
+    uint instance;
+    uint material;
+    float transmission;
+    vec3 tint;
+    vec3 attenuationColor;
+    float attenuationDistance;
+};
+
+ShadowHit traceNearestShadowHit(vec3 origin, vec3 direction,
+                                float maxDistance, uint mask,
+                                float minimumDistance)
+{
+    ShadowHit result;
+    result.hit = false;
+    result.transparent = false;
+    result.thinWall = false;
+    result.certifiedClosedVolume = false;
+    result.entering = true;
+    result.t = maxDistance;
+    result.instance = 0u;
+    result.material = 0u;
+    result.transmission = 0.0;
+    result.tint = vec3(1.0);
+    result.attenuationColor = vec3(1.0);
+    result.attenuationDistance = 0.0;
+
+    rayQueryEXT query;
+    rayQueryInitializeEXT(query, topLevelAS, gl_RayFlagsNoOpaqueEXT, mask,
+                          origin, max(minimumDistance, 0.000001), direction,
+                          max(maxDistance, 0.000004));
+    while (rayQueryProceedEXT(query))
+    {
+        if (rayQueryGetIntersectionTypeEXT(query, false) !=
+            gl_RayQueryCandidateIntersectionTriangleEXT)
+            continue;
+        int candidateInstance = int(
+            rayQueryGetIntersectionInstanceCustomIndexEXT(query, false));
+        int candidatePrimitive = rayQueryGetIntersectionPrimitiveIndexEXT(query, false);
+        bool transparentWorldPane = candidateInstance == kWaterfallInstance;
+        if (candidateInstance == 0)
+        {
+            int material = int(worldSurfaces.codes[candidatePrimitive] & 0xffu);
+            transparentWorldPane = material == kMaterialClearGlass ||
+                                   material == kMaterialWater;
+        }
+        if (! transparentWorldPane)
+            rayQueryConfirmIntersectionEXT(query);
+    }
+
+    if (rayQueryGetIntersectionTypeEXT(query, true) ==
+        gl_RayQueryCommittedIntersectionNoneEXT)
+        return result;
+
+    result.hit = true;
+    result.t = rayQueryGetIntersectionTEXT(query, true);
+    result.instance = uint(
+        rayQueryGetIntersectionInstanceCustomIndexEXT(query, true));
+    result.entering = rayQueryGetIntersectionFrontFaceEXT(query, true);
+    RtInstanceMetadata instanceMetadata = rtInstances.values[result.instance];
+    if ( (instanceMetadata.flags & kRtInstanceFlagStaticPbr) == 0u)
+        return result;
+    uint geometryIndex = rayQueryGetIntersectionGeometryIndexEXT(query, true);
+    if (geometryIndex >= instanceMetadata.primitiveCount)
+        return result;
+    RtPrimitiveMetadata primitiveMetadata = rtPrimitives.values[
+        instanceMetadata.primitiveBase + geometryIndex];
+    RtMaterialGpu material = rtMaterials.values[primitiveMetadata.materialIndex];
+    float transmission = clamp(
+        material.metallicRoughnessOcclusionTransmission.w, 0.0, 1.0);
+    float metallic = clamp(
+        material.metallicRoughnessOcclusionTransmission.x, 0.0, 1.0);
+    bool materialTransmits =
+        (material.materialFlags.x & kRtMaterialFlagTransmission) != 0u &&
+        transmission > 0.001 && metallic <= 0.5;
+    if (! materialTransmits)
+        return result;
+    result.transparent = true;
+    result.thinWall =
+        (material.materialFlags.x & kRtMaterialFlagThinWall) != 0u;
+    result.certifiedClosedVolume =
+        (material.materialFlags.x & kRtMaterialFlagCertifiedClosedVolume) != 0u;
+    result.material = primitiveMetadata.materialIndex;
+    result.transmission = transmission;
+    result.tint = clamp(material.baseColorFactor.rgb, vec3(0.0), vec3(1.0));
+    result.attenuationColor = clamp(
+        material.attenuationColor.rgb, vec3(0.0), vec3(1.0));
+    result.attenuationDistance =
+        material.iorThicknessAttenuationDistance.z;
+    return result;
+}
+
+vec3 shadowTransmittanceMask(vec3 origin, vec3 direction,
+                             float maxDistance, uint mask)
+{
+
+    const int interfaceBudget = kRtVariantShadowInterfaceBudget;
+    const int volumeBudget = kRtVariantShadowVolumeBudget;
+
+
+
+
+
+
+    int interfaceCount = 0;
+    uint volumeInstances[kRtVariantShadowVolumeBudget];
+    uint volumeMaterials[kRtVariantShadowVolumeBudget];
+    uint volumeMaterialFlags[kRtVariantShadowVolumeBudget];
+    float volumeEntryDistances[kRtVariantShadowVolumeBudget];
+    vec4 volumeAttenuation[kRtVariantShadowVolumeBudget];
+    int volumeDepth = 0;
+    bool observedClosedVolumeEntry = false;
+    vec3 transmittance = vec3(1.0);
+    vec3 currentOrigin = origin;
+    float travelledDistance = 0.0;
+    float remainingDistance = max(maxDistance, 0.0);
+    for (int traversal = 0; traversal <= kRtVariantShadowInterfaceBudget; ++ traversal)
+    {
+        if (remainingDistance <= 0.0)
+        {
+            if (volumeDepth > 0)
+
+                                           atomicAdd(rtDielectricDiagnostics.value.shadowFiniteEndpointVolumeCount, uint(volumeDepth));
+            for (int volumeIndex = 0; volumeIndex < volumeDepth; ++ volumeIndex)
+            {
+                vec4 attenuation = volumeAttenuation[volumeIndex];
+                transmittance *= dielectricBeerLambert(
+                    attenuation.rgb,
+                    max(maxDistance - volumeEntryDistances[volumeIndex], 0.0),
+                    attenuation.a);
+            }
+            return clamp(transmittance, vec3(0.0), vec3(1.0));
+        }
+        float epsilon = dielectricRayEpsilon(currentOrigin, travelledDistance);
+        float minimumDistance = interfaceCount == 0 ? 0.0015 : epsilon * 0.5;
+        ShadowHit nearest = traceNearestShadowHit(
+            currentOrigin, direction, remainingDistance, mask, minimumDistance);
+        if (! nearest.hit)
+        {
+
+
+
+
+            if (volumeDepth > 0)
+
+                                           atomicAdd(rtDielectricDiagnostics.value.shadowFiniteEndpointVolumeCount, uint(volumeDepth));
+            for (int volumeIndex = 0; volumeIndex < volumeDepth; ++ volumeIndex)
+            {
+                vec4 attenuation = volumeAttenuation[volumeIndex];
+                transmittance *= dielectricBeerLambert(
+                    attenuation.rgb,
+                    max(maxDistance - volumeEntryDistances[volumeIndex], 0.0),
+                    attenuation.a);
+            }
+            return clamp(transmittance, vec3(0.0), vec3(1.0));
+        }
+        if (! nearest.transparent)
+        {
+            bool everyOpenVolumeCertified = volumeDepth > 0;
+            for (int volumeIndex = 0; volumeIndex < kRtVariantShadowVolumeBudget;
+                 ++ volumeIndex)
+            {
+                if (volumeIndex < volumeDepth)
+                    everyOpenVolumeCertified = everyOpenVolumeCertified &&
+                        (volumeMaterialFlags[volumeIndex] &
+                         kRtMaterialFlagCertifiedClosedVolume) != 0u;
+            }
+            if (everyOpenVolumeCertified)
+            {
+
+                            atomicAdd(rtDielectricDiagnostics.value.shadowCertifiedClosedVolumeRecoveryCount, 1u);
+
+                            atomicOr(rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask, 32u);
+            }
+            return vec3(0.0);
+        }
+        if (interfaceCount >= interfaceBudget)
+        {
+            bool everyOpenVolumeCertified = nearest.certifiedClosedVolume;
+            for (int volumeIndex = 0; volumeIndex < kRtVariantShadowVolumeBudget;
+                 ++ volumeIndex)
+            {
+                if (volumeIndex < volumeDepth)
+                    everyOpenVolumeCertified = everyOpenVolumeCertified &&
+                        (volumeMaterialFlags[volumeIndex] &
+                         kRtMaterialFlagCertifiedClosedVolume) != 0u;
+            }
+            if (everyOpenVolumeCertified)
+            {
+
+                            atomicAdd(rtDielectricDiagnostics.value.shadowCertifiedClosedVolumeRecoveryCount, 1u);
+
+                            atomicOr(rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask, 64u);
+                return vec3(0.0);
+            }
+                                               atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);
+            if (nearest.instance == 8u ||
+                (volumeDepth > 0 && volumeInstances[volumeDepth - 1] == 8u))
+                                                               atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
+            return clamp(transmittance * vec3(0.08), vec3(0.0), vec3(1.0));
+        }
+        ++ interfaceCount;
+        float absoluteDistance = travelledDistance + nearest.t;
+        if (nearest.thinWall)
+        {
+            transmittance *= nearest.transmission *
+                mix(vec3(1.0), nearest.tint, 0.12);
+        }
+        else if (nearest.entering)
+        {
+            if (volumeDepth >= volumeBudget)
+            {
+                bool everyOpenVolumeCertified = nearest.certifiedClosedVolume;
+                for (int volumeIndex = 0; volumeIndex < kRtVariantShadowVolumeBudget;
+                     ++ volumeIndex)
+                {
+                    if (volumeIndex < volumeDepth)
+                        everyOpenVolumeCertified = everyOpenVolumeCertified &&
+                            (volumeMaterialFlags[volumeIndex] &
+                             kRtMaterialFlagCertifiedClosedVolume) != 0u;
+                }
+                if (everyOpenVolumeCertified)
+                {
+
+                                atomicAdd(rtDielectricDiagnostics.value.shadowCertifiedClosedVolumeRecoveryCount, 1u);
+
+                                 atomicOr(rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask, 128u);
+                    return vec3(0.0);
+                }
+                                                   atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);
+                if (nearest.instance == 8u)
+                                                                   atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
+                return clamp(transmittance * vec3(0.08), vec3(0.0), vec3(1.0));
+            }
+            observedClosedVolumeEntry = true;
+            volumeInstances[volumeDepth] = nearest.instance;
+            volumeMaterials[volumeDepth] = nearest.material;
+            volumeMaterialFlags[volumeDepth] = nearest.certifiedClosedVolume
+                ? kRtMaterialFlagCertifiedClosedVolume : 0u;
+            volumeEntryDistances[volumeDepth] = absoluteDistance;
+            volumeAttenuation[volumeDepth] = vec4(
+                nearest.attenuationColor, nearest.attenuationDistance);
+            ++ volumeDepth;
+            transmittance *= nearest.transmission;
+        }
+        else
+        {
+            if (volumeDepth <= 0 && ! observedClosedVolumeEntry)
+            {
+
+
+
+
+                transmittance *= nearest.transmission * dielectricBeerLambert(
+                    nearest.attenuationColor, absoluteDistance,
+                    nearest.attenuationDistance);
+                                                             atomicAdd(rtDielectricDiagnostics.value.shadowImplicitOriginExitCount, 1u);
+            }
+            else if (volumeDepth <= 0 ||
+                volumeInstances[volumeDepth - 1] != nearest.instance ||
+                volumeMaterials[volumeDepth - 1] != nearest.material)
+            {
+                bool everyOpenVolumeCertified = nearest.certifiedClosedVolume;
+                for (int volumeIndex = 0; volumeIndex < kRtVariantShadowVolumeBudget;
+                     ++ volumeIndex)
+                {
+                    if (volumeIndex < volumeDepth)
+                        everyOpenVolumeCertified = everyOpenVolumeCertified &&
+                            (volumeMaterialFlags[volumeIndex] &
+                             kRtMaterialFlagCertifiedClosedVolume) != 0u;
+                }
+                if (everyOpenVolumeCertified)
+                {
+
+
+
+
+                                atomicAdd(rtDielectricDiagnostics.value.shadowCertifiedClosedVolumeRecoveryCount, 1u);
+
+                                 atomicOr(rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask, 256u);
+                    return vec3(0.0);
+                }
+                                                   atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);
+                                                         atomicAdd(rtDielectricDiagnostics.value.shadowUnclosedVolumeCount, 1u);
+                if (nearest.instance == 8u ||
+                    (volumeDepth > 0 && volumeInstances[volumeDepth - 1] == 8u))
+                                                                   atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
+                                                         atomicAdd(rtDielectricDiagnostics.value.shadowMismatchedExitCount, 1u);
+                if (volumeDepth <= 0)
+                                                            atomicAdd(rtDielectricDiagnostics.value.shadowMismatchEmptyCount, 1u);
+                return clamp(transmittance * vec3(0.08), vec3(0.0), vec3(1.0));
+            }
+            else
+            {
+                -- volumeDepth;
+                vec4 attenuation = volumeAttenuation[volumeDepth];
+                transmittance *= dielectricBeerLambert(
+                    attenuation.rgb,
+                    max(absoluteDistance - volumeEntryDistances[volumeDepth], 0.0),
+                    attenuation.a);
+            }
+        }
+
+        vec3 hitPosition = currentOrigin + direction * nearest.t;
+        epsilon = dielectricRayEpsilon(hitPosition, absoluteDistance);
+        currentOrigin = hitPosition + direction * epsilon;
+        travelledDistance = absoluteDistance + epsilon;
+        remainingDistance = max(maxDistance - travelledDistance, 0.0);
+    }
+    bool everyOpenVolumeCertified = volumeDepth > 0;
+    for (int volumeIndex = 0; volumeIndex < kRtVariantShadowVolumeBudget; ++ volumeIndex)
+    {
+        if (volumeIndex < volumeDepth)
+            everyOpenVolumeCertified = everyOpenVolumeCertified &&
+                (volumeMaterialFlags[volumeIndex] &
+                 kRtMaterialFlagCertifiedClosedVolume) != 0u;
+    }
+    if (everyOpenVolumeCertified)
+    {
+
+                    atomicAdd(rtDielectricDiagnostics.value.shadowCertifiedClosedVolumeRecoveryCount, 1u);
+
+                     atomicOr(rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask, 512u);
+        return vec3(0.0);
+    }
+                                       atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);
+    if (volumeDepth > 0 && volumeInstances[volumeDepth - 1] == 8u)
+                                                       atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
+    return clamp(transmittance * vec3(0.08), vec3(0.0), vec3(1.0));
+}
+
+
+
+
+
+
+
+
+vec3 compactShadowTransmittanceMask(vec3 origin, vec3 direction,
+                                    float maxDistance, uint mask)
+{
+
+    const int interfaceBudget = kRtVariantShadowInterfaceBudget;
+
+
+
+
+    int interfaceCount = 0;
+    bool volumeOpen = false;
+    bool observedClosedVolumeEntry = false;
+    bool volumeCertified = false;
+    uint volumeInstance = 0u;
+    uint volumeMaterial = 0u;
+    float volumeEntryDistance = 0.0;
+    vec3 volumeAttenuationColor = vec3(1.0);
+    float volumeAttenuationDistance = 0.0;
+    vec3 transmittance = vec3(1.0);
+    vec3 currentOrigin = origin;
+    float travelledDistance = 0.0;
+    float remainingDistance = max(maxDistance, 0.0);
+
+    for (int traversal = 0; traversal <= kRtVariantShadowInterfaceBudget; ++ traversal)
+    {
+        if (remainingDistance <= 0.0)
+        {
+            if (volumeOpen)
+            {
+                transmittance *= dielectricBeerLambert(
+                    volumeAttenuationColor,
+                    max(maxDistance - volumeEntryDistance, 0.0),
+                    volumeAttenuationDistance);
+
+                            atomicAdd(rtDielectricDiagnostics.value.shadowFiniteEndpointVolumeCount, 1u);
+            }
+            return clamp(transmittance, vec3(0.0), vec3(1.0));
+        }
+
+        float epsilon = dielectricRayEpsilon(currentOrigin, travelledDistance);
+        float minimumDistance = interfaceCount == 0 ? 0.0015 : epsilon * 0.5;
+        ShadowHit nearest = traceNearestShadowHit(
+            currentOrigin, direction, remainingDistance, mask, minimumDistance);
+        if (! nearest.hit)
+        {
+            if (volumeOpen)
+            {
+                transmittance *= dielectricBeerLambert(
+                    volumeAttenuationColor,
+                    max(maxDistance - volumeEntryDistance, 0.0),
+                    volumeAttenuationDistance);
+
+                            atomicAdd(rtDielectricDiagnostics.value.shadowFiniteEndpointVolumeCount, 1u);
+            }
+            return clamp(transmittance, vec3(0.0), vec3(1.0));
+        }
+        if (! nearest.transparent)
+        {
+            if (volumeOpen && volumeCertified)
+            {
+
+                      atomicAdd(rtDielectricDiagnostics.value.shadowCertifiedClosedVolumeRecoveryCount, 1u);
+
+                       atomicOr(rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask, 32u);
+            }
+            return vec3(0.0);
+        }
+        if (interfaceCount >= interfaceBudget)
+        {
+                                               atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);
+            if (nearest.instance == 8u || (volumeOpen && volumeInstance == 8u))
+                                                               atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
+            return clamp(transmittance * vec3(0.08), vec3(0.0), vec3(1.0));
+        }
+        ++ interfaceCount;
+
+        float absoluteDistance = travelledDistance + nearest.t;
+        if (nearest.thinWall)
+        {
+            transmittance *= nearest.transmission *
+                mix(vec3(1.0), nearest.tint, 0.12);
+        }
+        else if (nearest.entering)
+        {
+
+
+            if (volumeOpen)
+            {
+                                                   atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);
+                if (nearest.instance == 8u || volumeInstance == 8u)
+
+                          atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
+                return vec3(0.0);
+            }
+            observedClosedVolumeEntry = true;
+            volumeOpen = true;
+            volumeCertified = nearest.certifiedClosedVolume;
+            volumeInstance = nearest.instance;
+            volumeMaterial = nearest.material;
+            volumeEntryDistance = absoluteDistance;
+            volumeAttenuationColor = nearest.attenuationColor;
+            volumeAttenuationDistance = nearest.attenuationDistance;
+            transmittance *= nearest.transmission;
+        }
+        else if (! volumeOpen && ! observedClosedVolumeEntry)
+        {
+
+            transmittance *= nearest.transmission * dielectricBeerLambert(
+                nearest.attenuationColor, absoluteDistance,
+                nearest.attenuationDistance);
+
+                        atomicAdd(rtDielectricDiagnostics.value.shadowImplicitOriginExitCount, 1u);
+        }
+        else if (! volumeOpen || volumeInstance != nearest.instance ||
+                 volumeMaterial != nearest.material)
+        {
+            if (volumeCertified && nearest.certifiedClosedVolume)
+            {
+
+                      atomicAdd(rtDielectricDiagnostics.value.shadowCertifiedClosedVolumeRecoveryCount, 1u);
+
+                        atomicOr(rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask, 256u);
+                return vec3(0.0);
+            }
+                                               atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);
+                                                     atomicAdd(rtDielectricDiagnostics.value.shadowUnclosedVolumeCount, 1u);
+                                                     atomicAdd(rtDielectricDiagnostics.value.shadowMismatchedExitCount, 1u);
+            if (! volumeOpen)
+                                                        atomicAdd(rtDielectricDiagnostics.value.shadowMismatchEmptyCount, 1u);
+            if (nearest.instance == 8u || (volumeOpen && volumeInstance == 8u))
+                                                               atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
+            return clamp(transmittance * vec3(0.08), vec3(0.0), vec3(1.0));
+        }
+        else
+        {
+            transmittance *= dielectricBeerLambert(
+                volumeAttenuationColor,
+                max(absoluteDistance - volumeEntryDistance, 0.0),
+                volumeAttenuationDistance);
+            volumeOpen = false;
+            volumeCertified = false;
+        }
+
+        if (max(transmittance.r, max(transmittance.g, transmittance.b)) <= 0.001)
+            return vec3(0.0);
+
+        vec3 hitPosition = currentOrigin + direction * nearest.t;
+        epsilon = dielectricRayEpsilon(hitPosition, absoluteDistance);
+        currentOrigin = hitPosition + direction * epsilon;
+        travelledDistance = absoluteDistance + epsilon;
+        remainingDistance = max(maxDistance - travelledDistance, 0.0);
+    }
+
+                                       atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);
+    if (volumeOpen && volumeInstance == 8u)
+                                                       atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
+    return clamp(transmittance * vec3(0.08), vec3(0.0), vec3(1.0));
+}
+
+bool shadowSegmentIntersectsBounds(vec3 origin, vec3 direction,
+                                   float maxDistance,
+                                   vec3 boundsMin, vec3 boundsMax)
+{
+    vec3 safeDirection = sign(direction + vec3(0.0000001)) *
+        max(abs(direction), vec3(0.0001));
+    vec3 first = (boundsMin - origin) / safeDirection;
+    vec3 second = (boundsMax - origin) / safeDirection;
+    vec3 nearPlane = min(first, second);
+    vec3 farPlane = max(first, second);
+    float intervalStart = max(max(nearPlane.x, nearPlane.y), nearPlane.z);
+    float intervalEnd = min(min(farPlane.x, farPlane.y), farPlane.z);
+    return intervalEnd > max(intervalStart, 0.0) &&
+           intervalStart < maxDistance;
+}
+
+bool shadowSegmentCrossesTransparentWorld(vec3 origin, vec3 direction,
+                                          float maxDistance)
+{
+
+
+
+
+
+
+    return shadowSegmentIntersectsBounds(
+               origin, direction, maxDistance,
+               vec3(- 0.80, 1.27, - 5.30), vec3(0.70, 1.40, - 3.30)) ||
+           shadowSegmentIntersectsBounds(
+               origin, direction, maxDistance,
+               vec3(- 5.45, - 1.02, - 16.90), vec3(- 1.75, 2.60, - 13.50));
+}
+
+
+
+
+
+
+
+
+vec3 boundedShadowTransmittanceMask(vec3 origin, vec3 direction,
+                                    float maxDistance, uint mask)
+{
+
+    const int interfaceBudget = kRtVariantShadowInterfaceBudget;
+    const int volumeBudget = kRtVariantShadowVolumeBudget;
+
+
+
+
+
+
+    if (maxDistance <= 0.000001)
+        return vec3(1.0);
+    int interfaceCount = 0;
+    bool overflow = false;
+    bool productionPaneOverflow = false;
+    float interfaceDistances[kRtVariantShadowInterfaceBudget];
+
+    uvec4 interfaceMetadata[kRtVariantShadowInterfaceBudget];
+
+    rayQueryEXT query;
+    uint shadowFlags = shadowSegmentCrossesTransparentWorld(
+        origin, direction, maxDistance) ? gl_RayFlagsNoOpaqueEXT : 0u;
+    rayQueryInitializeEXT(query, topLevelAS, shadowFlags, mask,
+                          origin, 0.000001, direction, maxDistance);
+    while (rayQueryProceedEXT(query))
+    {
+        if (rayQueryGetIntersectionTypeEXT(query, false) !=
+            gl_RayQueryCandidateIntersectionTriangleEXT)
+            continue;
+
+        uint instance = uint(
+            rayQueryGetIntersectionInstanceCustomIndexEXT(query, false));
+        int primitive = rayQueryGetIntersectionPrimitiveIndexEXT(query, false);
+        bool transparentWorldPane = int(instance) == kWaterfallInstance;
+        if (instance == 0u)
+        {
+            int material = int(worldSurfaces.codes[primitive] & 0xffu);
+            transparentWorldPane = material == kMaterialClearGlass ||
+                                   material == kMaterialWater;
+        }
+        if (transparentWorldPane)
+            continue;
+
+        bool materialTransmits = false;
+        uint materialIndex = 0u;
+        RtMaterialGpu material;
+        RtInstanceMetadata instanceMetadata = rtInstances.values[instance];
+        if ( (instanceMetadata.flags & kRtInstanceFlagStaticPbr) != 0u)
+        {
+            uint geometryIndex =
+                rayQueryGetIntersectionGeometryIndexEXT(query, false);
+            if (geometryIndex < instanceMetadata.primitiveCount)
+            {
+                RtPrimitiveMetadata primitiveMetadata = rtPrimitives.values[
+                    instanceMetadata.primitiveBase + geometryIndex];
+                materialIndex = primitiveMetadata.materialIndex;
+                material = rtMaterials.values[primitiveMetadata.materialIndex];
+                float transmission = clamp(
+                    material.metallicRoughnessOcclusionTransmission.w,
+                    0.0, 1.0);
+                float metallic = clamp(
+                    material.metallicRoughnessOcclusionTransmission.x,
+                    0.0, 1.0);
+                materialTransmits =
+                    (material.materialFlags.x &
+                     kRtMaterialFlagTransmission) != 0u &&
+                    transmission > 0.001 && metallic <= 0.5;
+            }
+        }
+
+        if (! materialTransmits)
+        {
+            rayQueryConfirmIntersectionEXT(query);
+            continue;
+        }
+
+        float distance = rayQueryGetIntersectionTEXT(query, false);
+        uint flags = (rayQueryGetIntersectionFrontFaceEXT(query, false) ? 1u : 0u) |
+            ( (material.materialFlags.x & kRtMaterialFlagThinWall) != 0u ? 2u : 0u);
+
+
+
+        bool duplicate = false;
+        for (int index = 0; index < interfaceCount; ++ index)
+        {
+            uvec4 prior = interfaceMetadata[index];
+            duplicate = duplicate || (interfaceDistances[index] == distance &&
+                prior.x == instance && prior.y == materialIndex && prior.z == flags);
+        }
+        if (duplicate) continue;
+        if (interfaceCount >= interfaceBudget)
+        {
+            overflow = true;
+            productionPaneOverflow = productionPaneOverflow || instance == 8u;
+            continue;
+        }
+        interfaceDistances[interfaceCount] = distance;
+        interfaceMetadata[interfaceCount] =
+            uvec4(instance, materialIndex, flags, uint(primitive));
+        ++ interfaceCount;
+    }
+
+    if (rayQueryGetIntersectionTypeEXT(query, true) !=
+        gl_RayQueryCommittedIntersectionNoneEXT)
+        return vec3(0.0);
+    if (overflow)
+    {
+                                           atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);
+        if (productionPaneOverflow)
+
+                  atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
+
+        return vec3(0.0);
+    }
+
+    vec3 transmittance = vec3(1.0);
+    uvec2 volumeIdentity[kRtVariantShadowVolumeBudget];
+    float volumeEntryDistances[kRtVariantShadowVolumeBudget];
+    vec4 volumeAttenuation[kRtVariantShadowVolumeBudget];
+    int volumeDepth = 0;
+    bool observedClosedVolumeEntry = false;
+    for (int crossing = 0; crossing < kRtVariantShadowInterfaceBudget; ++ crossing)
+    {
+        if (crossing >= interfaceCount) break;
+        int nearest = - 1;
+        for (int index = 0; index < interfaceCount; ++ index)
+        {
+            if (interfaceDistances[index] < 0.0) continue;
+            bool choose = nearest < 0;
+            if (! choose)
+            {
+                uvec4 next = interfaceMetadata[index];
+                uvec4 previous = interfaceMetadata[nearest];
+
+
+                bool tieFirst = next.z < previous.z ||
+                    (next.z == previous.z && (next.x < previous.x ||
+                    (next.x == previous.x && (next.y < previous.y ||
+                    (next.y == previous.y && next.w < previous.w)))));
+                choose = interfaceDistances[index] < interfaceDistances[nearest] ||
+                    (interfaceDistances[index] == interfaceDistances[nearest] && tieFirst);
+            }
+            if (choose) nearest = index;
+        }
+        if (nearest < 0) break;
+        float distance = interfaceDistances[nearest];
+        interfaceDistances[nearest] = - 1.0;
+        uvec4 boundary = interfaceMetadata[nearest];
+        RtMaterialGpu material = rtMaterials.values[boundary.y];
+        transmittance *= clamp(
+            material.metallicRoughnessOcclusionTransmission.w, 0.0, 1.0);
+        if ( (boundary.z & 2u) != 0u)
+        {
+
+            transmittance *= clamp(material.baseColorFactor.rgb, vec3(0.0), vec3(1.0));
+            continue;
+        }
+        if ( (boundary.z & 1u) != 0u)
+        {
+            if (volumeDepth >= volumeBudget)
+            {
+                                                   atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);
+                if (boundary.x == 8u)
+                                                                   atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
+                return vec3(0.0);
+            }
+            observedClosedVolumeEntry = true;
+            volumeIdentity[volumeDepth] = boundary.xy;
+            volumeEntryDistances[volumeDepth] = distance;
+            volumeAttenuation[volumeDepth] = vec4(
+                clamp(material.attenuationColor.rgb, vec3(0.0), vec3(1.0)),
+                material.iorThicknessAttenuationDistance.z);
+            ++ volumeDepth;
+        }
+        else if (volumeDepth == 0 && ! observedClosedVolumeEntry)
+        {
+            transmittance *= dielectricBeerLambert(material.attenuationColor.rgb,
+                distance, material.iorThicknessAttenuationDistance.z);
+                                                         atomicAdd(rtDielectricDiagnostics.value.shadowImplicitOriginExitCount, 1u);
+        }
+        else if (volumeDepth == 0 ||
+                 any(notEqual(volumeIdentity[volumeDepth - 1], boundary.xy)))
+        {
+                                               atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);
+                                                     atomicAdd(rtDielectricDiagnostics.value.shadowUnclosedVolumeCount, 1u);
+                                                     atomicAdd(rtDielectricDiagnostics.value.shadowMismatchedExitCount, 1u);
+            if (volumeDepth == 0)
+                                                        atomicAdd(rtDielectricDiagnostics.value.shadowMismatchEmptyCount, 1u);
+            if (boundary.x == 8u || (volumeDepth > 0 &&
+                volumeIdentity[volumeDepth - 1].x == 8u))
+                                                               atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
+            return vec3(0.0);
+        }
+        else
+        {
+            -- volumeDepth;
+            vec4 attenuation = volumeAttenuation[volumeDepth];
+            transmittance *= dielectricBeerLambert(attenuation.rgb,
+                max(distance - volumeEntryDistances[volumeDepth], 0.0), attenuation.a);
+        }
+    }
+    if (volumeDepth > 0)
+    {
+                                                                      atomicAdd(rtDielectricDiagnostics.value.shadowFiniteEndpointVolumeCount, uint(volumeDepth));
+        for (int volume = 0; volume < volumeDepth; ++ volume)
+        {
+            vec4 attenuation = volumeAttenuation[volume];
+            transmittance *= dielectricBeerLambert(attenuation.rgb,
+                max(maxDistance - volumeEntryDistances[volume], 0.0), attenuation.a);
+        }
+    }
+    return clamp(transmittance, vec3(0.0), vec3(1.0));
+}
+
+
+float visibilityMask(vec3 origin, vec3 direction, float maxDistance, uint mask)
+{
+    rayQueryEXT query;
+    rayQueryInitializeEXT(query, topLevelAS, gl_RayFlagsNoOpaqueEXT, mask,
+                          origin, 0.0015, direction, max(maxDistance, 0.004));
+    while (rayQueryProceedEXT(query))
+    {
+        if (rayQueryGetIntersectionTypeEXT(query, false) !=
+            gl_RayQueryCandidateIntersectionTriangleEXT)
+            continue;
+        int instance = int(rayQueryGetIntersectionInstanceCustomIndexEXT(query, false));
+        int primitive = rayQueryGetIntersectionPrimitiveIndexEXT(query, false);
+        bool transparentWorldPane = instance == kWaterfallInstance;
+        if (instance == 0)
+        {
+            int material = int(worldSurfaces.codes[primitive] & 0xffu);
+            transparentWorldPane = material == kMaterialClearGlass ||
+                                   material == kMaterialWater;
+        }
+        if (! transparentWorldPane) rayQueryConfirmIntersectionEXT(query);
+    }
+    return rayQueryGetIntersectionTypeEXT(query, true) ==
+        gl_RayQueryCommittedIntersectionNoneEXT ? 1.0 : 0.0;
+}
+
+vec3 sceneShadowTransmittanceMask(vec3 origin, vec3 direction,
+                                  float maxDistance, uint mask)
+{
+
+    return boundedShadowTransmittanceMask(
+        origin, direction, maxDistance, mask);
+
+
+
+}
+
+vec3 offsetRayOrigin(HitInfo h, vec3 direction)
+{
+    bool genericTransmissionActive = genericTransmissionEnabled();
+    if (genericTransmissionActive)
+    {
+        return advanceDielectricRayOrigin(
+            h.position, h.geometricNormal, direction,
+            dielectricRayEpsilon(h.position, h.t));
+    }
+    float side = dot(h.geometricNormal, direction) >= 0.0 ? 1.0 : - 1.0;
+    return h.position + h.geometricNormal * side * 0.004;
+}
+
+float visibility(vec3 origin, vec3 direction, float maxDistance)
+{
+
+
+
+
+
+
+
+    return visibilityMask(origin, direction, maxDistance, 0x35u);
+}
+
+float transparentVisibility(vec3 origin, vec3 direction, float maxDistance)
+{
+    vec3 transmittance = sceneShadowTransmittanceMask(
+        origin, direction, maxDistance, 0x35u);
+    return dot(transmittance, vec3(0.2126, 0.7152, 0.0722));
+}
+
+const int kShadowSampleCapacity = 4;
+
+mat4 transparentTransmittanceBatch(vec3 origins[kShadowSampleCapacity],
+                                   vec3 directions[kShadowSampleCapacity],
+                                   float distances[kShadowSampleCapacity],
+                                   bvec4 enabled)
+{
+
+
+
+    mat4 result = mat4(0.0);
+    for (int shadowSample = 0; shadowSample < kShadowSampleCapacity; ++ shadowSample)
+    {
+        if (! enabled[shadowSample]) continue;
+        result[shadowSample] = vec4(sceneShadowTransmittanceMask(
+            origins[shadowSample], directions[shadowSample],
+            distances[shadowSample], 0x35u), 1.0);
+    }
+    return result;
+}
+
+void activeLocalLight(out vec3 position, out vec3 color, out float strength);
+vec3 fireEmitterDirectLighting(HitInfo h, vec3 rayDirection, bool dualVisibility,
+                               bool allowAnalyticSpecular);
+
+vec3 bounceSample(HitInfo h, vec3 incoming, bool lightAwareMirror)
+{
+    if (! h.hit)
+    {
+
+        return skyColor(incoming) * 0.22;
+    }
+    if (h.emissive > 0.0)
+    {
+        return h.base * h.emissive;
+    }
+    if (h.material == kMaterialWater)
+    {
+
+
+
+        return skyColor(incoming) * 0.18 + h.base * 0.35;
+    }
+    if (! lightAwareMirror)
+    {
+        return h.base * (0.11 + 0.16 * max(dot(h.normal, kMoonDirection), 0.0));
+    }
+
+
+
+
+
+    vec3 localLightPosition;
+    vec3 localLightColor;
+    float localLightStrength;
+    activeLocalLight(localLightPosition, localLightColor, localLightStrength);
+
+    vec3 toLight = localLightPosition - h.position;
+    float lightDistance = length(toLight);
+    vec3 lightDirection = toLight / max(lightDistance, 0.001);
+    bool genericTransmissionActive = genericTransmissionEnabled();
+
+
+
+
+    vec3 lightTransmittance = localLightStrength > 0.001
+        ? sceneShadowTransmittanceMask(
+            offsetRayOrigin(h, lightDirection), lightDirection,
+            lightDistance - 0.02, 0x35u)
+        : vec3(0.0);
+    float lightVisibility = lightTransmittance.x;
+    float diffuse = max(dot(h.normal, lightDirection), 0.0);
+    float attenuation = 1.0 / (1.0 + lightDistance * lightDistance * 0.58);
+    vec3 authoredDirect;
+    if (! genericTransmissionActive)
+    {
+        authoredDirect = h.base *
+            (0.008 + localLightColor * diffuse * attenuation * lightVisibility *
+             localLightStrength * 2.25);
+    }
+    else
+    {
+        authoredDirect = h.base *
+            (0.008 + localLightColor * lightTransmittance * diffuse * attenuation *
+             localLightStrength * 2.25);
+    }
+    return authoredDirect + fireEmitterDirectLighting(h, incoming, false, false);
+}
+
+void activeLocalLight(out vec3 position, out vec3 color, out float strength)
+{
+    position = vec3(0.0);
+    color = vec3(0.0);
+    strength = 0.0;
+    if (controls.guidanceLightStrength > 0.001)
+    {
+        position = vec3(controls.staffX, controls.staffY, controls.staffZ);
+        color = tunedLightColor(vec3(1.0, 0.48, 0.12), kLightPassage);
+        strength = controls.guidanceLightStrength;
+        return;
+    }
+    if (controls.cameraX <= - 8.5 && controls.cameraX >= - 28.5 &&
+        controls.cameraZ >= - 16.8 && controls.cameraZ <= - 13.6)
+    {
+        float bayX = controls.cameraX > - 13.5 ? - 11.0 :
+                     (controls.cameraX > - 18.5 ? - 16.0 :
+                     (controls.cameraX > - 23.5 ? - 21.0 : - 26.0));
+        position = vec3(bayX, 0.67, - 13.98);
+        vec3 authoredColor = bayX > - 13.5 ? vec3(1.0, 0.42, 0.06) :
+                             (bayX > - 18.5 ? vec3(0.055, 0.22, 1.0) :
+                             (bayX > - 23.5 ? vec3(1.0, 0.045, 0.018) :
+                                             vec3(0.16, 0.78, 0.22)));
+        color = tunedLightColor(authoredColor, kLightPassage);
+        strength = 1.0;
+    }
+    if (controls.enemyKind > 0.5 && controls.staffLightStrength > 0.001)
+    {
+        position = vec3(controls.staffX, controls.staffY, controls.staffZ);
+        color = tunedLightColor(vec3(0.58, 0.10, 1.0), kLightStaff);
+        strength = controls.staffLightStrength;
+    }
+}
+
+vec3 fireEmitterDirectLighting(HitInfo h, vec3 rayDirection, bool dualVisibility,
+                               bool allowAnalyticSpecular)
+{
+    const vec3 areaOffsets[2] = vec3[2] (vec3(- 0.075, 0.03, - 0.045),
+                                        vec3(0.070, 0.10, 0.060));
+    int sampleIndex = int( (gl_LaunchIDEXT.x + gl_LaunchIDEXT.y) & 1u);
+    float reflective = max(h.metallic, h.reflectivity);
+    bool genericTransmissionActive = genericTransmissionEnabled();
+    vec3 result = vec3(0.0);
+    for (uint emitterIndex = 0u; emitterIndex < kRtActiveFireEmitterCapacity;
+         ++ emitterIndex)
+    {
+        RtFireEmitterGpu emitter = rtFireEmitters.values[emitterIndex];
+        float strength = emitter.lightPositionStrength.w;
+        if (emitter.identity.x == 0u || strength <= 0.001) continue;
+
+        vec3 lightPosition = emitter.lightPositionStrength.xyz;
+        vec3 lightColor = tunedLightColor(emitter.colourIntensity.rgb, kLightTorch);
+        vec3 toLight = lightPosition - h.position;
+        float lightDistance = length(toLight);
+        vec3 lightDirection = toLight / max(lightDistance, 0.001);
+        vec3 sampleVector = lightPosition + areaOffsets[sampleIndex] - h.position;
+        float sampleDistance = length(sampleVector);
+        vec3 sampleDirection = sampleVector / max(sampleDistance, 0.001);
+        float attenuation = 1.0 / (1.0 + lightDistance * lightDistance * 0.58);
+        float diffuse = max(dot(h.normal, lightDirection), 0.0);
+        float specular = allowAnalyticSpecular
+            ? pow(max(dot(reflect(- lightDirection, h.normal),
+                          - rayDirection), 0.0),
+                  mix(34.0, 5.0, reflective))
+            : 0.0;
+
+
+
+        if (diffuse <= 0.0 && specular <= 0.0)
+            continue;
+        vec3 lightTransmittance = sceneShadowTransmittanceMask(
+            offsetRayOrigin(h, sampleDirection), sampleDirection,
+            sampleDistance - 0.02, 0x35u);
+        if (dualVisibility)
+        {
+            vec3 otherVector = lightPosition + areaOffsets[1 - sampleIndex] - h.position;
+            float otherDistance = length(otherVector);
+            vec3 otherDirection = otherVector / max(otherDistance, 0.001);
+            lightTransmittance = 0.5 * (lightTransmittance +
+                sceneShadowTransmittanceMask(
+                    offsetRayOrigin(h, otherDirection), otherDirection,
+                    otherDistance - 0.02, 0x35u));
+        }
+        float lightVisibility = lightTransmittance.x;
+        if (! genericTransmissionActive)
+        {
+            result += h.base * lightColor * diffuse * attenuation * lightVisibility *
+                      strength * 2.65;
+        }
+        else
+        {
+            result += h.base * lightColor * lightTransmittance * diffuse * attenuation *
+                      strength * 2.65;
+        }
+        if (allowAnalyticSpecular)
+        {
+            if (! genericTransmissionActive)
+            {
+                result += lightColor * specular * attenuation * lightVisibility *
+                          strength * (0.12 + reflective * 1.04);
+            }
+            else
+            {
+                result += lightColor * lightTransmittance * specular * attenuation *
+                          strength * (0.12 + reflective * 1.04);
+            }
+        }
+    }
+    return result;
+}
+
+void activeSkyLight(vec3 surfacePosition, int sampleIndex, out vec3 direction,
+                    out float distance, out vec3 radiance, out float gain)
+{
+    bool inSkylightChamber = surfacePosition.x >= - 8.5 && surfacePosition.x <= - 2.5 &&
+                             surfacePosition.z >= - 18.0 && surfacePosition.z <= - 12.4;
+    bool inFinaleChamber = surfacePosition.x >= - 36.9 && surfacePosition.x <= - 30.5 &&
+                           surfacePosition.z >= - 18.4 && surfacePosition.z <= - 12.0;
+    bool finaleActive = inFinaleChamber && controls.finaleSkylightOpen > 0.001;
+    vec3 target = finaleActive
+        ? (sampleIndex == 0 ? vec3(- 34.35, 2.76, - 16.02) : vec3(- 33.05, 2.76, - 14.38))
+        : vec3(0.0);
+    vec3 toSky = target - surfacePosition;
+
+
+
+
+    distance = finaleActive ? length(toSky) : 18.0;
+    direction = finaleActive ? toSky / max(distance, 0.001) : kMoonDirection;
+    gain = finaleActive ? smoothstep(0.0, 0.88, controls.finaleSkylightOpen) : 1.0;
+    vec3 finaleRadiance = tunedLightColor(
+        mix(vec3(0.38, 0.52, 0.76), vec3(1.12, 0.54, 0.23),
+            smoothstep(0.0, 1.0, controls.finaleDawnReveal)),
+        kLightSkylight);
+    radiance = finaleActive ? finaleRadiance : tunedLightColor(
+        inSkylightChamber ? vec3(0.28, 0.44, 0.72) : vec3(0.26, 0.34, 0.48),
+        kLightSkylight);
+}
+
+vec3 shadeOpaqueDirect(HitInfo h, vec3 rayDirection, bool dualVisibility,
+                       bool allowAnalyticFireSpecular,
+                       out float localVisibility, out float skyVisibility,
+                       out float skyDiffuse, out vec3 localColor,
+                       out float localStrength)
+{
+    vec3 localPosition;
+    activeLocalLight(localPosition, localColor, localStrength);
+    vec3 localVector = localPosition - h.position;
+    float localDistance = length(localVector);
+    vec3 localDirection = localVector / max(localDistance, 0.001);
+    const vec3 areaOffsets[2] = vec3[2] (vec3(- 0.075, 0.03, - 0.045),
+                                        vec3(0.070, 0.10, 0.060));
+    int sampleIndex = int( (gl_LaunchIDEXT.x + gl_LaunchIDEXT.y) & 1u);
+    vec3 sampleVector = localPosition + areaOffsets[sampleIndex] - h.position;
+    float sampleDistance = length(sampleVector);
+    vec3 sampleDirection = sampleVector / max(sampleDistance, 0.001);
+    bool genericTransmissionActive = genericTransmissionEnabled();
+    vec3 localTransmittance = vec3(0.0);
+    vec3 skyTransmittance = vec3(0.0);
+    vec3 skyDirection;
+    float skyDistance;
+    vec3 skyRadiance;
+    float skyGain;
+    vec3 otherDirection = sampleDirection;
+    float otherDistance = sampleDistance;
+    if (dualVisibility && localStrength > 0.001)
+    {
+        vec3 otherVector = localPosition + areaOffsets[1 - sampleIndex] - h.position;
+        otherDistance = length(otherVector);
+        otherDirection = otherVector / max(otherDistance, 0.001);
+    }
+    activeSkyLight(h.position, sampleIndex, skyDirection, skyDistance,
+                   skyRadiance, skyGain);
+    vec3 otherSkyDirection = skyDirection;
+    float otherSkyDistance = skyDistance;
+    float otherSkyGain = skyGain;
+    if (dualVisibility)
+    {
+        vec3 otherSkyRadiance;
+        activeSkyLight(h.position, 1 - sampleIndex, otherSkyDirection,
+                       otherSkyDistance, otherSkyRadiance, otherSkyGain);
+        skyRadiance = 0.5 * (skyRadiance + otherSkyRadiance);
+    }
+    float reflective = max(h.metallic, h.reflectivity);
+    float localDiffuse = max(dot(h.normal, localDirection), 0.0);
+    float localSpecular = pow(max(dot(reflect(- localDirection, h.normal),
+                                      - rayDirection), 0.0),
+                              mix(34.0, 5.0, reflective));
+    float localAttenuation = 1.0 / (1.0 + localDistance * localDistance * 0.58);
+    skyDiffuse = max(dot(h.normal, skyDirection), 0.0);
+    vec3 skyHalf = normalize(skyDirection - rayDirection);
+    float skySpecular = pow(max(dot(h.normal, skyHalf), 0.0),
+                            mix(12.0, 96.0, reflective));
+    bool localContributes = localStrength > 0.001 &&
+        (localDiffuse > 0.0 || localSpecular > 0.0);
+    bool skyContributes = (skyGain > 0.0 || otherSkyGain > 0.0) &&
+        (skyDiffuse > 0.0 || skySpecular > 0.0);
+    vec3 visibilityOrigins[kShadowSampleCapacity] = vec3[kShadowSampleCapacity] (
+        offsetRayOrigin(h, sampleDirection), offsetRayOrigin(h, otherDirection),
+        offsetRayOrigin(h, skyDirection), offsetRayOrigin(h, otherSkyDirection));
+    vec3 visibilityDirections[kShadowSampleCapacity] = vec3[kShadowSampleCapacity] (
+        sampleDirection, otherDirection, skyDirection, otherSkyDirection);
+    float visibilityDistances[kShadowSampleCapacity] = float[kShadowSampleCapacity] (
+        sampleDistance - 0.02, otherDistance - 0.02,
+        skyDistance - 0.02, otherSkyDistance - 0.02);
+    mat4 transmittanceSamples = transparentTransmittanceBatch(
+        visibilityOrigins, visibilityDirections, visibilityDistances,
+        bvec4(localContributes,
+              dualVisibility && localContributes,
+              skyContributes, dualVisibility && skyContributes));
+    localTransmittance = dualVisibility
+        ? 0.5 * (transmittanceSamples[0].xyz + transmittanceSamples[1].xyz)
+        : transmittanceSamples[0].xyz;
+    skyTransmittance = dualVisibility
+        ? 0.5 * (transmittanceSamples[2].xyz * skyGain +
+                 transmittanceSamples[3].xyz * otherSkyGain)
+        : transmittanceSamples[2].xyz * skyGain;
+    localVisibility = ! genericTransmissionActive
+        ? localTransmittance.x
+        : dot(localTransmittance, vec3(0.2126, 0.7152, 0.0722));
+    skyVisibility = ! genericTransmissionActive
+        ? skyTransmittance.x
+        : dot(skyTransmittance, vec3(0.2126, 0.7152, 0.0722));
+
+    float skyFresnel = pow(1.0 - max(dot(h.normal, - rayDirection), 0.0), 5.0);
+    vec3 cold = tunedLightColor(vec3(0.15, 0.20, 0.28), kLightSkylight);
+
+    vec3 color = h.base * vec3(0.025, 0.028, 0.032);
+    color += fireEmitterDirectLighting(
+        h, rayDirection, dualVisibility, allowAnalyticFireSpecular);
+    if (! genericTransmissionActive)
+    {
+        color += h.base * localColor * localDiffuse * localAttenuation * localVisibility
+            * localStrength * 2.65;
+        color += localColor * localSpecular * localAttenuation * localVisibility
+            * localStrength * (0.12 + reflective * 1.04);
+        color += h.base * cold * skyDiffuse * skyVisibility * 0.10;
+        color += h.base * skyRadiance * skyDiffuse * skyVisibility * 0.86;
+        color += skyRadiance * skySpecular * skyVisibility
+            * mix(0.025, 0.44, reflective) * (0.45 + 0.55 * skyFresnel);
+    }
+    else
+    {
+        color += h.base * localColor * localTransmittance * localDiffuse * localAttenuation
+            * localStrength * 2.65;
+        color += localColor * localTransmittance * localSpecular * localAttenuation
+            * localStrength * (0.12 + reflective * 1.04);
+        color += h.base * cold * skyTransmittance * skyDiffuse * 0.10;
+        color += h.base * skyRadiance * skyTransmittance * skyDiffuse * 0.86;
+        color += skyRadiance * skyTransmittance * skySpecular
+            * mix(0.025, 0.44, reflective) * (0.45 + 0.55 * skyFresnel);
+    }
+    return color;
+}
+
+vec3 shadeOpaqueSecondary(HitInfo h, vec3 incoming)
+{
+
+
+
+    if (! h.hit)
+    {
+        return skyColor(incoming);
+    }
+    if (h.emissive > 0.0)
+    {
+        return h.base * h.emissive;
+    }
+    if (h.material == kMaterialWater)
+    {
+        return skyColor(reflect(incoming, h.geometricNormal)) * 0.06 + vec3(0.008);
+    }
+    float localVisibility;
+    float skyVisibility;
+    float skyDiffuse;
+    vec3 localColor;
+    float localStrength;
+    vec3 color = shadeOpaqueDirect(h, incoming, false, false, localVisibility,
+                                   skyVisibility, skyDiffuse, localColor,
+                                   localStrength);
+    float fog = 1.0 - exp(- h.t * h.t * 0.012 * controls.fogDensityScale);
+    vec3 fogColor = tunedLightColor(
+        mix(vec3(0.028, 0.034, 0.046), vec3(0.052, 0.064, 0.086),
+            skyVisibility * skyDiffuse * 0.55),
+        kLightSkylight);
+    color = mix(color, fogColor, fog);
+
+
+    return color;
+}
+
+vec3 shadeTerminalOpaqueEmissive(HitInfo h, vec3 incoming)
+{
+
+
+    return shadeOpaqueSecondary(h, incoming);
+}
+
+vec3 shadeOpaquePrimary(HitInfo h, vec3 rayDirection);
+vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection);
+vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection);
+
+float dielectricSchlickFromR0(float incidentCosine, float r0)
+{
+    float cosine = clamp(incidentCosine, 0.0, 1.0);
+    float reflectance = clamp(r0, 0.0, 1.0);
+    return reflectance + (1.0 - reflectance) * pow(1.0 - cosine, 5.0);
+}
+
+float dielectricSchlick(float incidentCosine, float incidentIor, float transmittedIor)
+{
+    float etaI = clamp(incidentIor, 1.0, 4.0);
+    float etaT = clamp(transmittedIor, 1.0, 4.0);
+    float ratio = (etaI - etaT) / max(etaI + etaT, 0.000001);
+    return dielectricSchlickFromR0(incidentCosine, ratio * ratio);
+}
+
+float dielectricEffectiveFresnel(float incidentCosine, float incidentIor,
+                                  float transmittedIor, float roughness)
+{
+    float smoothFresnel = dielectricSchlick(
+        incidentCosine, incidentIor, transmittedIor);
+    float normalFresnel = dielectricSchlick(
+        1.0, incidentIor, transmittedIor);
+    float clampedRoughness = clamp(roughness, 0.0, 1.0);
+    float roughnessBlend = clampedRoughness * clampedRoughness * 0.25;
+    return clamp(mix(smoothFresnel, normalFresnel, roughnessBlend), 0.0, 1.0);
+}
+
+float dielectricRayEpsilon(vec3 position, float interfaceDistance)
+{
+    float maximumCoordinate = max(max(abs(position.x), abs(position.y)),
+                                  max(abs(position.z), 1.0));
+    return clamp(max(0.00002,
+                     max(maximumCoordinate * 0.000002,
+                         abs(interfaceDistance) * 0.0000001)),
+                 0.00002, 0.00025);
+}
+
+const float kDielectricRayMinimumDistance = 0.000001;
+
+vec3 dielectricSpawnPoint(HitInfo hit)
+{
+
+    if (hit.dielectricSpawnGuarded) return hit.dielectricSpawnPosition;
+
+    return hit.position;
+}
+
+float dielectricQueryMinimum(HitInfo hit)
+{
+
+
+    if (hit.dielectricSpawnGuarded) return 0.0;
+
+    return kDielectricRayMinimumDistance;
+}
+
+float dielectricSpawnEpsilon(HitInfo hit, float interfaceDistance)
+{
+    float epsilon = dielectricRayEpsilon(hit.position, interfaceDistance);
+
+    if (hit.dielectricSpawnGuarded) return max(epsilon, hit.dielectricSpawnMinimumNormalBias);
+
+    return epsilon;
+}
+
+vec3 advanceDielectricRayOrigin(vec3 position, vec3 geometricNormal,
+                                vec3 direction, float epsilon)
+{
+    float side = dot(geometricNormal, direction) >= 0.0 ? 1.0 : - 1.0;
+
+
+
+    return position + geometricNormal * side * epsilon;
+}
+
+vec3 dielectricBeerLambert(vec3 attenuationColor, float pathLength,
+                           float attenuationDistance)
+{
+    if (attenuationDistance <= 0.0 || isinf(attenuationDistance))
+    {
+        return vec3(1.0);
+    }
+    float distanceRatio = max(pathLength, 0.0) / max(attenuationDistance, 0.000001);
+    return pow(clamp(attenuationColor, vec3(0.0), vec3(1.0)), vec3(distanceRatio));
+}
+
+vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
+{
+    vec3 baseNormal = waterBaseNormal(h.position, h.geometricNormal);
+    vec3 geometricNormal = dot(baseNormal, - rayDirection) < 0.0
+        ? - baseNormal : baseNormal;
+    vec3 surfaceNormal = dot(h.normal, - rayDirection) < 0.0 ? - h.normal : h.normal;
+
+    const float waterIor = 1.333;
+    const float inverseWaterIor = 0.7501875;
+    bool runoff = abs(geometricNormal.y) > 0.65;
+
+
+    vec3 insideDirection = rayDirection;
+    vec3 transmissionDirection = rayDirection;
+    vec3 exitSurfaceNormal = surfaceNormal;
+    vec3 exitPoint = h.position;
+    float waterPathLength = 0.0;
+    bool transmissionAvailable = true;
+    if (controls.waterQuality >= 0.5)
+    {
+        insideDirection = refract(rayDirection, surfaceNormal, inverseWaterIor);
+        if (dot(insideDirection, insideDirection) < 0.25)
+        {
+            insideDirection = rayDirection;
+        }
+
+        if (runoff)
+        {
+
+            waterPathLength = 0.006 /
+                max(- dot(insideDirection, geometricNormal), 0.18);
+            exitPoint += insideDirection * waterPathLength;
+            exitSurfaceNormal = waterSurfaceNormal(
+                exitPoint + vec3(- 0.08, 0.0, 0.012), geometricNormal);
+        }
+        else
+        {
+
+
+
+            vec3 exitOutwardNormal = geometricNormal;
+            if (waterStreamExit(h.position, insideDirection, exitPoint,
+                                exitOutwardNormal, waterPathLength))
+            {
+                exitSurfaceNormal = waterSurfaceNormal(
+                    exitPoint + vec3(0.0, - 0.08, 0.0), exitOutwardNormal);
+            }
+            else
+            {
+
+
+                waterPathLength = 0.010 /
+                    max(- dot(insideDirection, geometricNormal), 0.18);
+                exitPoint += insideDirection * waterPathLength;
+                exitSurfaceNormal = surfaceNormal;
+            }
+        }
+        if (dot(exitSurfaceNormal, - insideDirection) < 0.0)
+        {
+            exitSurfaceNormal = - exitSurfaceNormal;
+        }
+        transmissionDirection = refract(insideDirection, exitSurfaceNormal, waterIor);
+        if (dot(transmissionDirection, transmissionDirection) < 0.25)
+        {
+
+
+            transmissionAvailable = false;
+        }
+    }
+    vec3 transmitted = vec3(0.0);
+    if (transmissionAvailable)
+    {
+        HitInfo transmittedHit = traceScene(exitPoint + transmissionDirection * 0.004,
+                                             transmissionDirection, 12.0, 0x23u,
+                                             0.002, true, false);
+        transmittedHit.t += h.t + waterPathLength;
+        transmitted = shadeOpaqueSecondary(transmittedHit, transmissionDirection);
+        transmitted *= exp(- vec3(0.060, 0.018, 0.008) * waterPathLength);
+    }
+    if (controls.waterQuality < 0.5)
+    {
+        return transmitted;
+    }
+
+    vec3 reflectionDirection = reflect(rayDirection, surfaceNormal);
+    vec3 reflected = skyColor(reflectionDirection);
+    bool fireRayReflectionOwned = controls.waterQuality >= 1.5;
+    if (controls.waterQuality >= 1.5)
+    {
+        HitInfo reflectedHit = traceScene(h.position + geometricNormal * 0.006,
+                                          reflectionDirection, 12.0, 0x37u,
+                                          0.002, false, false);
+        float reflectedLocalDistance = reflectedHit.hit ? reflectedHit.t : 12.0;
+        reflectedHit.t += h.t;
+        reflected = shadeOpaqueSecondary(reflectedHit, reflectionDirection);
+        vec4 reflectedFire = integrateFireEmitters(
+            h.position + geometricNormal * 0.006,
+            reflectionDirection,
+            min(reflectedLocalDistance, 12.0),
+            true);
+        reflected = reflected * reflectedFire.a + reflectedFire.rgb;
+    }
+
+    float viewCosine = clamp(dot(surfaceNormal, - rayDirection), 0.0, 1.0);
+    float fresnel = transmissionAvailable
+        ? dielectricSchlickFromR0(viewCosine, 0.0204) : 1.0;
+    vec3 localPosition;
+    vec3 localColor;
+    float localStrength;
+    activeLocalLight(localPosition, localColor, localStrength);
+    vec3 toLocal = localPosition - h.position;
+    float localDistanceSquared = max(dot(toLocal, toLocal), 0.001);
+    float localDistance = sqrt(localDistanceSquared);
+    vec3 localDirection = toLocal / localDistance;
+    vec3 localHalf = normalize(localDirection - rayDirection);
+    float localHighlight = pow(max(dot(surfaceNormal, localHalf), 0.0), 72.0);
+
+
+
+
+
+
+    float runoffLocalHighlight = runoff
+        ? pow(max(dot(surfaceNormal, localHalf), 0.0), 14.0) : 0.0;
+    bool genericTransmissionActive = genericTransmissionEnabled();
+    vec3 localInterfaceTransmittance = localStrength > 0.001
+        ? sceneShadowTransmittanceMask(offsetRayOrigin(h, localDirection),
+                                  localDirection, localDistance - 0.02, 0x35u)
+        : vec3(0.0);
+    int skySample = int( (gl_LaunchIDEXT.x + gl_LaunchIDEXT.y) & 1u);
+    vec3 skyDirection;
+    float skyDistance;
+    vec3 skyRadiance;
+    float skyGain;
+    activeSkyLight(h.position, skySample, skyDirection, skyDistance,
+                   skyRadiance, skyGain);
+    vec3 skyInterfaceTransmittance = sceneShadowTransmittanceMask(
+        offsetRayOrigin(h, skyDirection), skyDirection,
+        skyDistance - 0.02, 0x35u) * skyGain;
+    float localInterfaceVisibility = localInterfaceTransmittance.x;
+    float skyInterfaceVisibility = skyInterfaceTransmittance.x;
+    float skyHighlight = pow(max(dot(surfaceNormal,
+        normalize(skyDirection - rayDirection)), 0.0), 96.0);
+    vec3 interfaceLight = ! genericTransmissionActive
+        ? localColor * (localHighlight * 3.2 + runoffLocalHighlight * 1.15)
+            * localStrength * localInterfaceVisibility
+            / (1.0 + localDistanceSquared * 0.58)
+        : localColor * localInterfaceTransmittance
+            * (localHighlight * 3.2 + runoffLocalHighlight * 1.15)
+            * localStrength / (1.0 + localDistanceSquared * 0.58);
+    interfaceLight += fireEmitterDirectLighting(
+        h, rayDirection, false, ! fireRayReflectionOwned);
+    interfaceLight += ! genericTransmissionActive
+        ? skyRadiance * skyHighlight * skyInterfaceVisibility * 0.10
+        : skyRadiance * skyInterfaceTransmittance * skyHighlight * 0.10;
+    if (runoff && h.position.x > - 2.88)
+    {
+        float impactDistance = length(h.position.xz - vec2(- 2.32, - 15.26));
+        float impactCrest = pow(0.5 + 0.5 * sin(
+            impactDistance * 31.0 - controls.time * 6.2), 8.0)
+            * (1.0 - smoothstep(0.07, 0.68, impactDistance));
+        float impactCore = 1.0 - smoothstep(0.04, 0.22, impactDistance);
+        vec3 impactLight = ! genericTransmissionActive
+            ? skyRadiance * skyInterfaceVisibility * 0.44
+                + localColor * localStrength * localInterfaceVisibility * 0.24
+            : skyRadiance * skyInterfaceTransmittance * 0.44
+                + localColor * localInterfaceTransmittance * localStrength * 0.24;
+        interfaceLight += impactLight * (impactCrest * 0.12 + impactCore * 0.045);
+    }
+    float surfaceTurbulence = clamp(length(surfaceNormal - exitSurfaceNormal) * 5.0, 0.0, 1.0);
+    vec3 surfaceRadiance = mix(transmitted, reflected, fresnel) + interfaceLight;
+
+
+
+    float breakup = clamp(0.56
+        + sin(h.position.y * 7.3 - controls.time * 5.1) * 0.27
+        + sin(h.position.y * 13.7 + h.position.z * 17.0
+              - controls.time * 8.4) * 0.17, 0.0, 1.0);
+    float entrainedAir = runoff ? 0.004
+        : 0.010 + pow(breakup, 3.0) * 0.028 + surfaceTurbulence * 0.010;
+    vec3 scatteringRadiance = ! genericTransmissionActive
+        ? skyRadiance * skyInterfaceVisibility * 0.38
+            + localColor * localStrength * localInterfaceVisibility * 0.18
+        : skyRadiance * skyInterfaceTransmittance * 0.38
+            + localColor * localInterfaceTransmittance * localStrength * 0.18;
+    return mix(surfaceRadiance, scatteringRadiance, entrainedAir);
+}
+
+vec3 shadeOpaquePrimary(HitInfo h, vec3 rayDirection)
+{
+    if (! h.hit)
+    {
+        vec3 nightSky = skyColor(rayDirection);
+        bool cameraInFinale = controls.cameraX >= - 36.9 && controls.cameraX <= - 30.5 &&
+                              controls.cameraZ >= - 18.4 && controls.cameraZ <= - 12.0;
+        float dawn = cameraInFinale ? smoothstep(0.0, 1.0, controls.finaleDawnReveal) : 0.0;
+        vec3 dawnSky = tunedLightColor(
+            mix(vec3(0.34, 0.14, 0.09), vec3(1.05, 0.52, 0.22),
+                smoothstep(- 0.12, 0.52, rayDirection.y)),
+            kLightSkylight);
+        return mix(nightSky, dawnSky, dawn);
+    }
+    if (h.emissive > 0.0)
+    {
+        return h.base * h.emissive;
+    }
+
+    bool leanWorkload = controls.workloadPreset < 0.5;
+    bool maxWorkload = controls.workloadPreset >= 1.5;
+    float reflective = max(h.metallic, h.reflectivity);
+    bool wantsPlayerReflection = reflective > 0.38 ||
+        (h.instance == 0 && h.material == kMaterialWetCobble && puddleMask(h.position) > 0.05);
+    bool fireRayReflectionOwned = ! leanWorkload && wantsPlayerReflection;
+    float localVisibility;
+    float skyVisibility;
+    float skyDiffuse;
+    vec3 localLightColor;
+    float localLightStrength;
+    vec3 color = shadeOpaqueDirect(h, rayDirection, maxWorkload, ! fireRayReflectionOwned,
+                                   localVisibility, skyVisibility, skyDiffuse,
+                                   localLightColor, localLightStrength);
+
+    vec3 bounce = vec3(0.0);
+    if (! leanWorkload)
+    {
+        vec3 bounceDirection = reflective > 0.38
+            ? reflect(rayDirection, h.normal)
+            : normalize(h.normal + vec3(0.18, 0.58, - 0.34));
+        uint bounceMask = wantsPlayerReflection ? 0x37u : 0x23u;
+        HitInfo bounceHit = traceScene(offsetRayOrigin(h, bounceDirection), bounceDirection,
+                                       12.0, bounceMask, 0.002, false, false);
+        bounce = bounceSample(bounceHit, bounceDirection, wantsPlayerReflection);
+        if (wantsPlayerReflection)
+        {
+            vec4 reflectedFire = integrateFireEmitters(
+                offsetRayOrigin(h, bounceDirection), bounceDirection,
+                min(bounceHit.hit ? bounceHit.t : 12.0, 12.0), true);
+            bounce = bounce * reflectedFire.a + reflectedFire.rgb;
+        }
+    }
+
+    color += h.base * bounce * (0.10 + reflective * 0.16);
+    float reflectionGain = h.instance == 0 && h.material == kMaterialMirror ? 0.82 : 0.32;
+    color += bounce * reflective * reflectionGain;
+
+    if (h.instance == 0 && h.material == kMaterialWetCobble)
+    {
+        float puddle = puddleMask(h.position);
+        color += localLightColor * puddle * localVisibility * localLightStrength * 0.28;
+        color += bounce * puddle * 0.46;
+    }
+
+    float fog = 1.0 - exp(- h.t * h.t * 0.012 * controls.fogDensityScale);
+    vec3 fogColor = tunedLightColor(
+        mix(vec3(0.028, 0.034, 0.046), vec3(0.052, 0.064, 0.086),
+            skyVisibility * skyDiffuse * 0.55),
+        kLightSkylight);
+    color = mix(color, fogColor, fog);
+
+
+
+    return color;
+}
+
+vec3 shadePrimary(HitInfo h, vec3 rayDirection)
+{
+    if (! h.hit || h.emissive > 0.0)
+    {
+        return shadeOpaquePrimary(h, rayDirection);
+    }
+
+    if (genericTransmissionEnabled() && h.transmission > 0.001 &&
+        (h.materialFlags & kRtMaterialFlagTransmission) != 0u)
+    {
+        return shadeProductionBoundedDielectric(h, rayDirection);
+    }
+
+    bool isThinGlass = h.instance == 0 && h.material == kMaterialClearGlass;
+    if (isThinGlass)
+    {
+
+
+
+
+        HitInfo transmittedHit = traceScene(h.position + rayDirection * 0.012,
+                                            rayDirection, 10000.0, 0x23u,
+                                            0.002, false, false);
+        vec3 transmitted = transmittedHit.hit
+            ? bounceSample(transmittedHit, rayDirection, false) : skyColor(rayDirection);
+        vec3 tint = vec3(0.82, 0.94, 1.0);
+        float viewCosine = clamp(dot(h.geometricNormal, - rayDirection), 0.0, 1.0);
+        float fresnel = dielectricSchlickFromR0(viewCosine, 0.04);
+        vec3 reflected = skyColor(reflect(rayDirection, h.geometricNormal));
+        float transmission = 0.88;
+        return mix(transmitted * tint * transmission, reflected, fresnel);
+    }
+
+    bool isThinWater = h.material == kMaterialWater;
+    if (isThinWater)
+    {
+        return shadeThinWater(h, rayDirection);
+    }
+
+    return shadeOpaquePrimary(h, rayDirection);
+}
+const int kMobileDielectricInterfaces = 4;
+const int kHighDielectricInterfaces = 8;
+const int kMobileDielectricVolumes = 2;
+const int kHighDielectricVolumes = 4;
+
+
+
+
+
+
+
+
+
+bool isGenericDielectric(HitInfo hit)
+{
+    return hit.hit && hit.transmission > 0.001 &&
+        (hit.materialFlags & kRtMaterialFlagTransmission) != 0u;
+}
+
+vec3 roughDielectricDirection(vec3 idealDirection, vec3 surfaceNormal,
+                              vec3 surfacePosition, float roughness)
+{
+    vec3 ideal = normalize(idealDirection);
+    vec3 interfaceNormal = normalize(surfaceNormal);
+    vec3 tangent = abs(interfaceNormal.y) < 0.92
+        ? normalize(cross(interfaceNormal, vec3(0.0, 1.0, 0.0)))
+        : normalize(cross(interfaceNormal, vec3(1.0, 0.0, 0.0)));
+    vec3 bitangent = normalize(cross(interfaceNormal, tangent));
+    float phase = fract(sin(dot(surfacePosition,
+        vec3(12.9898, 78.233, 37.719))) * 43758.5453) * 6.2831853;
+    float spread = clamp(roughness, 0.0, 1.0);
+    vec3 perturbed = normalize(ideal +
+        (tangent * cos(phase) + bitangent * sin(phase)) * spread * spread * 0.24);
+    vec3 result = normalize(mix(ideal, perturbed, spread));
+
+
+
+
+    float idealSide = dot(ideal, interfaceNormal) >= 0.0 ? 1.0 : - 1.0;
+    float signedAlignment = dot(result, interfaceNormal) * idealSide;
+    if (signedAlignment < 0.0001)
+        result = normalize(result + interfaceNormal * idealSide *
+                           (0.0001 - signedAlignment));
+    return result;
+}
+
+vec3 dielectricOverflowFallback(vec3 direction, vec3 throughput)
+{
+
+    return throughput * (skyColor(direction) * 0.12 + vec3(0.028, 0.009, 0.036));
+}
+
+vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
+{
+
+    const int interfaceBudget = kRtVariantDielectricInterfaceBudget;
+    const int volumeBudget = kRtVariantDielectricVolumeBudget;
+
+
+
+
+
+
+
+
+    vec3 firstOutward = normalize(firstHit.geometricNormal);
+    vec3 firstNormal = dot(rayDirection, firstOutward) < 0.0
+        ? firstOutward : - firstOutward;
+    float firstCosine = clamp(dot(firstNormal, - rayDirection), 0.0, 1.0);
+    float firstFresnel = dielectricEffectiveFresnel(
+        firstCosine, 1.0, firstHit.ior, firstHit.roughness);
+
+    vec3 reflectionDirection = roughDielectricDirection(
+        reflect(rayDirection, firstNormal), firstNormal,
+        firstHit.position, firstHit.roughness);
+    float reflectionEpsilon = dielectricSpawnEpsilon(firstHit, firstHit.t);
+    HitInfo reflectedHit = traceScene(
+        advanceDielectricRayOrigin(dielectricSpawnPoint(firstHit), firstOutward,
+                                   reflectionDirection, reflectionEpsilon),
+        reflectionDirection, 12.0, 0x37u, dielectricQueryMinimum(firstHit),
+        false, false);
+    float reflectedLocalDistance = reflectedHit.t;
+    reflectedHit.t += firstHit.t;
+    vec3 reflected;
+    if (isGenericDielectric(reflectedHit) ||
+        (reflectedHit.hit && reflectedHit.material == kMaterialWater))
+    {
+                                                        atomicAdd(rtDielectricDiagnostics.value.secondaryDielectricTerminalCount, 1u);
+
+
+
+
+        if (firstHit.instance == 8u)
+                                                              atomicAdd(rtDielectricDiagnostics.value.productionPaneSecondaryOriginCount, 1u);
+        if (reflectedHit.instance == 8u)
+                                                                atomicAdd(rtDielectricDiagnostics.value.productionPaneSecondaryTerminalCount, 1u);
+        if (isGenericDielectric(reflectedHit) &&
+            firstHit.instance == 8u && reflectedHit.instance == 8u &&
+            firstHit.instance == reflectedHit.instance &&
+            firstHit.material == reflectedHit.material)
+        {
+                                                                  atomicAdd(rtDielectricDiagnostics.value.productionPaneSecondarySameMediumCount, 1u);
+            if (reflectedLocalDistance <= reflectionEpsilon * 8.0)
+                                                         atomicAdd(rtDielectricDiagnostics.value.secondaryNearSelfHitCount, 1u);
+        }
+        else if (firstHit.instance == 8u || reflectedHit.instance == 8u)
+                                                                       atomicAdd(rtDielectricDiagnostics.value.productionPaneSecondaryDifferentMediumCount, 1u);
+        reflected = skyColor(reflectionDirection) * 0.18 +
+            (reflectedHit.hit ? reflectedHit.base * 0.12 : vec3(0.0));
+    }
+    else
+    {
+        reflected = shadeTerminalOpaqueEmissive(reflectedHit, reflectionDirection);
+    }
+    reflectedLocalDistance = reflectedHit.hit
+        ? max(reflectedHit.t - firstHit.t, 0.0) : 12.0;
+    vec4 reflectedFire = integrateFireEmitters(
+        firstHit.position + reflectionDirection * 0.004,
+        reflectionDirection, min(reflectedLocalDistance, 12.0), true);
+    reflected = reflected * reflectedFire.a + reflectedFire.rgb;
+
+    uint volumeMaterials[kRtVariantDielectricVolumeBudget];
+    uint volumeInstances[kRtVariantDielectricVolumeBudget];
+    uint volumeMaterialFlags[kRtVariantDielectricVolumeBudget];
+    float volumeIors[kRtVariantDielectricVolumeBudget];
+    vec4 volumeAttenuation[kRtVariantDielectricVolumeBudget];
+    int volumeDepth = 0;
+    vec3 throughput = vec3(1.0);
+    vec3 transmissionDirection = rayDirection;
+    HitInfo currentHit = firstHit;
+    float totalDistance = firstHit.t;
+    vec3 transmitted = vec3(0.0);
+    bool terminalResolved = false;
+    bool overflowed = false;
+    bool touchedProductionPane = false;
+    int tirSinceLastTransition = 0;
+
+    for (int interfaceIndex = 0; interfaceIndex <= kRtVariantDielectricInterfaceBudget;
+         ++ interfaceIndex)
+    {
+        float segmentLength = currentHit.t;
+        if (interfaceIndex > 0 && volumeDepth > 0)
+        {
+            vec4 attenuation = volumeAttenuation[volumeDepth - 1];
+            throughput *= dielectricBeerLambert(
+                attenuation.rgb, segmentLength, attenuation.a);
+        }
+        if (! isGenericDielectric(currentHit))
+        {
+            if (volumeDepth > 0)
+            {
+                bool everyOpenVolumeCertified = true;
+                for (int volumeIndex = 0; volumeIndex < kRtVariantDielectricVolumeBudget;
+                     ++ volumeIndex)
+                {
+                    if (volumeIndex < volumeDepth)
+                        everyOpenVolumeCertified = everyOpenVolumeCertified &&
+                            (volumeMaterialFlags[volumeIndex] &
+                             kRtMaterialFlagCertifiedClosedVolume) != 0u;
+                }
+                if (everyOpenVolumeCertified)
+                {
+
+
+
+
+
+                                atomicAdd(rtDielectricDiagnostics.value.primaryCertifiedClosedVolumeRecoveryCount, 1u);
+
+                               atomicOr(rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask, 1u);
+                    transmitted = vec3(0.0);
+                    terminalResolved = true;
+                    break;
+                }
+                                                   atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);
+                                                          atomicAdd(rtDielectricDiagnostics.value.primaryUnclosedVolumeCount, 1u);
+                if (currentHit.hit)
+                {
+                                                          atomicAdd(rtDielectricDiagnostics.value.primaryOpenOpaqueCount, 1u);
+                    if (tirSinceLastTransition > 0)
+
+                                    atomicAdd(rtDielectricDiagnostics.value.primaryOpenOpaqueAfterTirCount, 1u);
+
+                                                                      atomicOr(rtDielectricDiagnostics.value.primaryOpenOpaqueTerminalInstanceMask, 1u << min(uint(currentHit.instance), 31u));
+
+                                                                             atomicOr(rtDielectricDiagnostics.value.primaryOpenOpaqueVolumeInstanceMask, 1u << min(volumeInstances[volumeDepth - 1], 31u));
+
+                                                                    atomicOr(rtDielectricDiagnostics.value.primaryOpenOpaqueTerminalMaterialMask, 1u << (uint(currentHit.material) & 31u));
+                    if (currentHit.instance == int(volumeInstances[volumeDepth - 1]) &&
+                        uint(currentHit.material) != volumeMaterials[volumeDepth - 1])
+
+                                    atomicAdd(rtDielectricDiagnostics.value.primaryOpenOpaqueSameInstanceDifferentMaterialCount, 1u);
+                }
+                else
+                                                        atomicAdd(rtDielectricDiagnostics.value.primaryOpenMissCount, 1u);
+                overflowed = true;
+            }
+            else
+            {
+                currentHit.t = totalDistance;
+                transmitted = throughput *
+                    shadeTerminalOpaqueEmissive(currentHit, transmissionDirection);
+            }
+            terminalResolved = volumeDepth == 0;
+            break;
+        }
+        if (interfaceIndex >= interfaceBudget)
+        {
+            if (volumeDepth > 0 && tirSinceLastTransition > 0)
+            {
+
+
+
+
+                                                          atomicAdd(rtDielectricDiagnostics.value.primaryTirTerminationCount, 1u);
+                transmitted = vec3(0.0);
+                terminalResolved = true;
+            }
+            else if (volumeDepth > 0)
+            {
+                bool everyOpenVolumeCertified = true;
+                for (int volumeIndex = 0; volumeIndex < kRtVariantDielectricVolumeBudget;
+                     ++ volumeIndex)
+                {
+                    if (volumeIndex < volumeDepth)
+                        everyOpenVolumeCertified = everyOpenVolumeCertified &&
+                            (volumeMaterialFlags[volumeIndex] &
+                             kRtMaterialFlagCertifiedClosedVolume) != 0u;
+                }
+                if (everyOpenVolumeCertified)
+                {
+
+                                atomicAdd(rtDielectricDiagnostics.value.primaryCertifiedClosedVolumeRecoveryCount, 1u);
+
+                               atomicOr(rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask, 2u);
+                    transmitted = vec3(0.0);
+                    terminalResolved = true;
+                    break;
+                }
+                                                           atomicAdd(rtDielectricDiagnostics.value.primaryInterfaceBudgetCount, 1u);
+                                                                     atomicAdd(rtDielectricDiagnostics.value.primaryInterfaceBudgetOpenVolumeCount, 1u);
+                overflowed = true;
+            }
+            else
+            {
+                                                           atomicAdd(rtDielectricDiagnostics.value.primaryInterfaceBudgetCount, 1u);
+                                                                       atomicAdd(rtDielectricDiagnostics.value.primaryInterfaceBudgetClosedVolumeCount, 1u);
+                overflowed = true;
+            }
+            break;
+        }
+
+        bool thinWall = (currentHit.materialFlags & kRtMaterialFlagThinWall) != 0u;
+        touchedProductionPane = touchedProductionPane || currentHit.instance == 8u;
+        vec3 outwardNormal = normalize(currentHit.geometricNormal);
+        bool entering = dot(transmissionDirection, outwardNormal) < 0.0;
+        vec3 orientedNormal = entering ? outwardNormal : - outwardNormal;
+        float incidentIor = volumeDepth > 0 ? volumeIors[volumeDepth - 1] : 1.0;
+        float transmittedIor = entering ? currentHit.ior
+            : (volumeDepth > 1 ? volumeIors[volumeDepth - 2] : 1.0);
+        float cosine = clamp(dot(orientedNormal, - transmissionDirection), 0.0, 1.0);
+        float fresnel = dielectricEffectiveFresnel(
+            cosine, incidentIor, transmittedIor, currentHit.roughness);
+        vec3 idealTransmission = thinWall
+            ? transmissionDirection
+            : refract(transmissionDirection, orientedNormal,
+                      incidentIor / max(transmittedIor, 1.0));
+
+        if (! thinWall && dot(idealTransmission, idealTransmission) < 0.25)
+        {
+
+                                           atomicAdd(rtDielectricDiagnostics.value.primaryTirCount, 1u);
+            ++ tirSinceLastTransition;
+            transmissionDirection = roughDielectricDirection(
+                reflect(transmissionDirection, orientedNormal), orientedNormal,
+                currentHit.position, currentHit.roughness);
+        }
+        else
+        {
+            if (! thinWall)
+            {
+                tirSinceLastTransition = 0;
+                if (entering)
+                {
+                    if (volumeDepth >= volumeBudget)
+                    {
+                        bool everyOpenVolumeCertified =
+                            (currentHit.materialFlags &
+                             kRtMaterialFlagCertifiedClosedVolume) != 0u;
+                        for (int volumeIndex = 0;
+                             volumeIndex < kRtVariantDielectricVolumeBudget; ++ volumeIndex)
+                        {
+                            if (volumeIndex < volumeDepth)
+                                everyOpenVolumeCertified = everyOpenVolumeCertified &&
+                                    (volumeMaterialFlags[volumeIndex] &
+                                     kRtMaterialFlagCertifiedClosedVolume) != 0u;
+                        }
+                        if (everyOpenVolumeCertified)
+                        {
+
+                                        atomicAdd(rtDielectricDiagnostics.value.primaryCertifiedClosedVolumeRecoveryCount, 1u);
+
+                                       atomicOr(rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask, 4u);
+                            transmitted = vec3(0.0);
+                            terminalResolved = true;
+                            break;
+                        }
+                                                                atomicAdd(rtDielectricDiagnostics.value.primaryVolumeBudgetCount, 1u);
+                        overflowed = true;
+                        break;
+                    }
+                    volumeMaterials[volumeDepth] = uint(currentHit.material);
+                    volumeInstances[volumeDepth] = currentHit.instance;
+                    volumeMaterialFlags[volumeDepth] = currentHit.materialFlags;
+                    volumeIors[volumeDepth] = currentHit.ior;
+                    volumeAttenuation[volumeDepth] = vec4(
+                        currentHit.attenuationColor,
+                        currentHit.attenuationDistance);
+                    ++ volumeDepth;
+                }
+                else
+                {
+                    if (volumeDepth <= 0 ||
+                        volumeMaterials[volumeDepth - 1] != uint(currentHit.material) ||
+                        volumeInstances[volumeDepth - 1] != currentHit.instance)
+                    {
+                        bool everyOpenVolumeCertified =
+                            (currentHit.materialFlags &
+                             kRtMaterialFlagCertifiedClosedVolume) != 0u;
+                        for (int volumeIndex = 0;
+                             volumeIndex < kRtVariantDielectricVolumeBudget; ++ volumeIndex)
+                        {
+                            if (volumeIndex < volumeDepth)
+                                everyOpenVolumeCertified = everyOpenVolumeCertified &&
+                                    (volumeMaterialFlags[volumeIndex] &
+                                     kRtMaterialFlagCertifiedClosedVolume) != 0u;
+                        }
+                        if (everyOpenVolumeCertified)
+                        {
+
+                                        atomicAdd(rtDielectricDiagnostics.value.primaryCertifiedClosedVolumeRecoveryCount, 1u);
+
+                                       atomicOr(rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask, 8u);
+                            transmitted = vec3(0.0);
+                            terminalResolved = true;
+                            break;
+                        }
+                                                                  atomicAdd(rtDielectricDiagnostics.value.primaryMismatchedExitCount, 1u);
+                        overflowed = true;
+                        break;
+                    }
+                    -- volumeDepth;
+                }
+            }
+
+
+
+
+
+
+
+
+            vec3 roughTransmission = roughDielectricDirection(
+                idealTransmission, orientedNormal,
+                currentHit.position, currentHit.roughness);
+            transmissionDirection = (! thinWall && entering)
+                ? normalize(idealTransmission) : roughTransmission;
+            throughput *= clamp(currentHit.transmission, 0.0, 1.0) *
+                (1.0 - fresnel);
+        }
+
+        float epsilon = dielectricSpawnEpsilon(currentHit, totalDistance);
+        vec3 nextOrigin = advanceDielectricRayOrigin(
+            dielectricSpawnPoint(currentHit), outwardNormal, transmissionDirection, epsilon);
+        float advancedDistance = max(
+            dot(nextOrigin - currentHit.position, transmissionDirection), 0.0);
+        HitInfo nextHit = traceScene(
+            nextOrigin, transmissionDirection, 10000.0, 0x23u,
+            dielectricQueryMinimum(currentHit), false, false);
+        nextHit.t += advancedDistance;
+        totalDistance += nextHit.t;
+        currentHit = nextHit;
+    }
+
+    if (! terminalResolved && ! overflowed)
+    {
+        bool everyOpenVolumeCertified = volumeDepth > 0;
+        for (int volumeIndex = 0; volumeIndex < kRtVariantDielectricVolumeBudget;
+             ++ volumeIndex)
+        {
+            if (volumeIndex < volumeDepth)
+                everyOpenVolumeCertified = everyOpenVolumeCertified &&
+                    (volumeMaterialFlags[volumeIndex] &
+                     kRtMaterialFlagCertifiedClosedVolume) != 0u;
+        }
+        if (everyOpenVolumeCertified)
+        {
+
+                        atomicAdd(rtDielectricDiagnostics.value.primaryCertifiedClosedVolumeRecoveryCount, 1u);
+
+                        atomicOr(rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask, 16u);
+            transmitted = vec3(0.0);
+        }
+        else
+        {
+            overflowed = true;
+                                                  atomicAdd(rtDielectricDiagnostics.value.transportOverflowCount, 1u);
+            if (touchedProductionPane)
+                                                               atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
+            transmitted = dielectricOverflowFallback(transmissionDirection, throughput);
+        }
+    }
+
+
+    return reflected * firstFresnel + transmitted;
+}
+
+
+
+
+
+
+
+vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
+{
+
+    const int interfaceBudget = kRtVariantDielectricInterfaceBudget;
+
+
+
+
+
+    vec3 firstOutward = normalize(firstHit.geometricNormal);
+    vec3 firstNormal = dot(rayDirection, firstOutward) < 0.0
+        ? firstOutward : - firstOutward;
+    float firstCosine = clamp(dot(firstNormal, - rayDirection), 0.0, 1.0);
+    float firstFresnel = dielectricEffectiveFresnel(
+        firstCosine, 1.0, firstHit.ior, firstHit.roughness);
+
+    vec3 reflectionDirection = roughDielectricDirection(
+        reflect(rayDirection, firstNormal), firstNormal,
+        firstHit.position, firstHit.roughness);
+    float reflectionEpsilon = dielectricSpawnEpsilon(firstHit, firstHit.t);
+    HitInfo reflectedHit = traceScene(
+        advanceDielectricRayOrigin(dielectricSpawnPoint(firstHit), firstOutward,
+                                   reflectionDirection, reflectionEpsilon),
+        reflectionDirection, 12.0, 0x37u, dielectricQueryMinimum(firstHit),
+        false, false);
+    float reflectedLocalDistance = reflectedHit.hit ? reflectedHit.t : 12.0;
+    reflectedHit.t += firstHit.t;
+    vec3 reflected;
+    if (isGenericDielectric(reflectedHit) ||
+        (reflectedHit.hit && reflectedHit.material == kMaterialWater))
+    {
+
+                    atomicAdd(rtDielectricDiagnostics.value.secondaryDielectricTerminalCount, 1u);
+        if (firstHit.instance == 8u)
+
+                  atomicAdd(rtDielectricDiagnostics.value.productionPaneSecondaryOriginCount, 1u);
+        if (reflectedHit.instance == 8u)
+
+                  atomicAdd(rtDielectricDiagnostics.value.productionPaneSecondaryTerminalCount, 1u);
+        if (isGenericDielectric(reflectedHit) && firstHit.instance == 8u &&
+            reflectedHit.instance == 8u &&
+            firstHit.material == reflectedHit.material)
+        {
+
+                  atomicAdd(rtDielectricDiagnostics.value.productionPaneSecondarySameMediumCount, 1u);
+            if (reflectedLocalDistance <= reflectionEpsilon * 8.0)
+                                                         atomicAdd(rtDielectricDiagnostics.value.secondaryNearSelfHitCount, 1u);
+        }
+        else if (firstHit.instance == 8u || reflectedHit.instance == 8u)
+        {
+
+                  atomicAdd(rtDielectricDiagnostics.value.productionPaneSecondaryDifferentMediumCount, 1u);
+        }
+        reflected = skyColor(reflectionDirection) * 0.18 +
+            (reflectedHit.hit ? reflectedHit.base * 0.12 : vec3(0.0));
+    }
+    else
+    {
+        reflected = shadeTerminalOpaqueEmissive(
+            reflectedHit, reflectionDirection);
+    }
+    vec4 reflectedFire = integrateFireEmitters(
+        firstHit.position + reflectionDirection * 0.004,
+        reflectionDirection, min(reflectedLocalDistance, 12.0), true);
+    reflected = reflected * reflectedFire.a + reflectedFire.rgb;
+
+    bool volumeOpen = false;
+    bool volumeCertified = false;
+    uint volumeInstance = 0u;
+    uint volumeMaterial = 0u;
+    float volumeIor = 1.0;
+    vec3 volumeAttenuationColor = vec3(1.0);
+    float volumeAttenuationDistance = 0.0;
+    int tirSinceTransition = 0;
+    bool touchedProductionPane = false;
+    bool terminalResolved = false;
+    bool overflowed = false;
+    vec3 throughput = vec3(1.0);
+    vec3 transmissionDirection = rayDirection;
+    HitInfo currentHit = firstHit;
+    float totalDistance = firstHit.t;
+    vec3 transmitted = vec3(0.0);
+
+    for (int interfaceIndex = 0; interfaceIndex <= kRtVariantDielectricInterfaceBudget;
+         ++ interfaceIndex)
+    {
+        if (interfaceIndex > 0 && volumeOpen)
+        {
+            throughput *= dielectricBeerLambert(
+                volumeAttenuationColor, currentHit.t,
+                volumeAttenuationDistance);
+        }
+
+
+        isolatedRecordInterface(interfaceIndex, currentHit, transmissionDirection,
+            volumeOpen, volumeCertified, tirSinceTransition, totalDistance, throughput);
+
+
+        if (! isGenericDielectric(currentHit))
+        {
+            if (volumeOpen)
+            {
+                if (volumeCertified)
+                {
+
+                    isolatedGlassMarker = vec3(1.0, 0.0, 0.0);
+
+
+                          atomicAdd(rtDielectricDiagnostics.value.primaryCertifiedClosedVolumeRecoveryCount, 1u);
+
+                          atomicOr(rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask, 1u);
+                    transmitted = vec3(0.0);
+                    terminalResolved = true;
+                }
+                else
+                {
+
+                                atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);
+
+                          atomicAdd(rtDielectricDiagnostics.value.primaryUnclosedVolumeCount, 1u);
+                    if (currentHit.hit)
+
+                              atomicAdd(rtDielectricDiagnostics.value.primaryOpenOpaqueCount, 1u);
+                    else
+
+                              atomicAdd(rtDielectricDiagnostics.value.primaryOpenMissCount, 1u);
+                    overflowed = true;
+                }
+            }
+            else
+            {
+                currentHit.t = totalDistance;
+                transmitted = throughput * shadeTerminalOpaqueEmissive(
+                    currentHit, transmissionDirection);
+                terminalResolved = true;
+            }
+            break;
+        }
+
+        if (interfaceIndex >= interfaceBudget)
+        {
+            if (volumeOpen && tirSinceTransition > 0)
+            {
+
+                      atomicAdd(rtDielectricDiagnostics.value.primaryTirTerminationCount, 1u);
+                transmitted = vec3(0.0);
+                terminalResolved = true;
+            }
+            else if (volumeOpen && volumeCertified)
+            {
+
+                isolatedGlassMarker = vec3(1.0, 1.0, 0.0);
+
+
+                      atomicAdd(rtDielectricDiagnostics.value.primaryCertifiedClosedVolumeRecoveryCount, 1u);
+
+                      atomicOr(rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask, 2u);
+                transmitted = vec3(0.0);
+                terminalResolved = true;
+            }
+            else
+            {
+
+                isolatedGlassMarker = vec3(0.0, 0.0, 1.0);
+
+
+                      atomicAdd(rtDielectricDiagnostics.value.primaryInterfaceBudgetCount, 1u);
+                if (volumeOpen)
+
+                          atomicAdd(rtDielectricDiagnostics.value.primaryInterfaceBudgetOpenVolumeCount, 1u);
+                else
+
+                          atomicAdd(rtDielectricDiagnostics.value.primaryInterfaceBudgetClosedVolumeCount, 1u);
+                overflowed = true;
+            }
+            break;
+        }
+
+        bool thinWall =
+            (currentHit.materialFlags & kRtMaterialFlagThinWall) != 0u;
+        touchedProductionPane =
+            touchedProductionPane || currentHit.instance == 8u;
+        vec3 outwardNormal = normalize(currentHit.geometricNormal);
+        bool entering = dot(transmissionDirection, outwardNormal) < 0.0;
+        vec3 orientedNormal = entering ? outwardNormal : - outwardNormal;
+        float incidentIor = volumeOpen ? volumeIor : 1.0;
+        float transmittedIor = entering ? currentHit.ior : 1.0;
+        float cosine = clamp(
+            dot(orientedNormal, - transmissionDirection), 0.0, 1.0);
+        float fresnel = dielectricEffectiveFresnel(
+            cosine, incidentIor, transmittedIor, currentHit.roughness);
+        vec3 idealTransmission = thinWall
+            ? transmissionDirection
+            : refract(transmissionDirection, orientedNormal,
+                      incidentIor / max(transmittedIor, 1.0));
+
+        if (! thinWall && dot(idealTransmission, idealTransmission) < 0.25)
+        {
+                                           atomicAdd(rtDielectricDiagnostics.value.primaryTirCount, 1u);
+            ++ tirSinceTransition;
+            transmissionDirection = roughDielectricDirection(
+                reflect(transmissionDirection, orientedNormal), orientedNormal,
+                currentHit.position, currentHit.roughness);
+        }
+        else
+        {
+            tirSinceTransition = 0;
+            if (! thinWall && entering)
+            {
+
+
+
+                if (volumeOpen)
+                {
+
+                          atomicAdd(rtDielectricDiagnostics.value.primaryVolumeBudgetCount, 1u);
+                    overflowed = true;
+                    break;
+                }
+                volumeOpen = true;
+                volumeCertified =
+                    (currentHit.materialFlags &
+                     kRtMaterialFlagCertifiedClosedVolume) != 0u;
+                volumeInstance = currentHit.instance;
+                volumeMaterial = uint(currentHit.material);
+                volumeIor = currentHit.ior;
+                volumeAttenuationColor = currentHit.attenuationColor;
+                volumeAttenuationDistance = currentHit.attenuationDistance;
+            }
+            else if (! thinWall)
+            {
+                if (! volumeOpen || volumeInstance != currentHit.instance ||
+                    volumeMaterial != uint(currentHit.material))
+                {
+
+                          atomicAdd(rtDielectricDiagnostics.value.primaryMismatchedExitCount, 1u);
+                    overflowed = true;
+                    break;
+                }
+                volumeOpen = false;
+                volumeCertified = false;
+            }
+
+            vec3 roughTransmission = roughDielectricDirection(
+                idealTransmission, orientedNormal,
+                currentHit.position, currentHit.roughness);
+            transmissionDirection = (! thinWall && entering)
+                ? normalize(idealTransmission) : roughTransmission;
+            throughput *= clamp(currentHit.transmission, 0.0, 1.0) *
+                (1.0 - fresnel);
+        }
+
+        float epsilon = dielectricSpawnEpsilon(currentHit, totalDistance);
+        vec3 nextOrigin = advanceDielectricRayOrigin(
+            dielectricSpawnPoint(currentHit), outwardNormal, transmissionDirection, epsilon);
+        float advancedDistance = max(
+            dot(nextOrigin - currentHit.position, transmissionDirection), 0.0);
+        HitInfo nextHit = traceScene(
+            nextOrigin, transmissionDirection, 10000.0, 0x23u,
+            dielectricQueryMinimum(currentHit), false, false);
+        nextHit.t += advancedDistance;
+        totalDistance += nextHit.t;
+        currentHit = nextHit;
+    }
+
+    if (! terminalResolved)
+    {
+        if (volumeOpen && volumeCertified)
+        {
+
+            isolatedGlassMarker = vec3(1.0, 0.0, 1.0);
+
+
+                  atomicAdd(rtDielectricDiagnostics.value.primaryCertifiedClosedVolumeRecoveryCount, 1u);
+
+                   atomicOr(rtDielectricDiagnostics.value.certifiedClosedVolumeRecoveryReasonMask, 16u);
+            transmitted = vec3(0.0);
+        }
+        else
+            overflowed = true;
+    }
+    if (overflowed)
+    {
+                                              atomicAdd(rtDielectricDiagnostics.value.transportOverflowCount, 1u);
+        if (touchedProductionPane)
+
+                  atomicAdd(rtDielectricDiagnostics.value.productionPaneStackFailureCount, 1u);
+        transmitted = dielectricOverflowFallback(
+            transmissionDirection, throughput);
+    }
+    return reflected * firstFresnel + transmitted;
+}
+float raySegmentGlow(vec3 rayOrigin, vec3 rayDirection, vec3 segmentStart, vec3 segmentEnd,
+                     float radius, float sceneDepth)
+{
+    vec3 segment = segmentEnd - segmentStart;
+    float segmentLengthSquared = max(dot(segment, segment), 0.00001);
+    vec3 fromStart = rayOrigin - segmentStart;
+    float raySegmentDot = dot(rayDirection, segment);
+    float rayOriginDot = dot(rayDirection, fromStart);
+    float segmentOriginDot = dot(segment, fromStart);
+    float denominator = max(segmentLengthSquared - raySegmentDot * raySegmentDot, 0.00001);
+    float segmentT = clamp( (segmentOriginDot - raySegmentDot * rayOriginDot) / denominator, 0.0, 1.0);
+    float rayT = max(dot(segmentStart + segment * segmentT - rayOrigin, rayDirection), 0.0);
+    segmentT = clamp(dot(rayOrigin + rayDirection * rayT - segmentStart, segment) / segmentLengthSquared, 0.0, 1.0);
+    rayT = max(dot(segmentStart + segment * segmentT - rayOrigin, rayDirection), 0.0);
+    float distanceToSegment = length( (rayOrigin + rayDirection * rayT) - (segmentStart + segment * segmentT));
+    float visible = step(0.001, rayT) * step(rayT, sceneDepth + 0.02);
+    return(1.0 - smoothstep(radius * 0.18, radius, distanceToSegment)) * visible;
+}
+
+vec3 staffElectricity(vec3 rayOrigin, vec3 rayDirection, float sceneDepth)
+{
+    if (controls.enemyKind < 0.5 || controls.staffLightStrength < 0.05)
+    {
+        return vec3(0.0);
+    }
+
+    vec3 staff = vec3(controls.staffX, controls.staffY, controls.staffZ);
+    vec3 target = vec3(controls.cameraX, 0.28, controls.cameraZ);
+    vec3 attackDirection = normalize(target - staff);
+    vec3 side = normalize(cross(attackDirection, vec3(0.0, 1.0, 0.0)));
+    vec3 arcUp = normalize(cross(side, attackDirection));
+    float phase = controls.time * 19.0;
+    vec3 firstKink = mix(staff, target, 0.34)
+        + side * sin(phase) * 0.11 + arcUp * cos(phase * 1.31) * 0.055;
+    vec3 secondKink = mix(staff, target, 0.68)
+        - side * cos(phase * 1.17) * 0.10 + arcUp * sin(phase * 1.53) * 0.050;
+    vec3 forkEnd = staff + attackDirection * 0.34
+        + side * (0.16 + sin(phase * 1.7) * 0.035) + arcUp * 0.10;
+
+    float bolt = raySegmentGlow(rayOrigin, rayDirection, staff, firstKink, 0.036, sceneDepth)
+        + raySegmentGlow(rayOrigin, rayDirection, firstKink, secondKink, 0.034, sceneDepth)
+        + raySegmentGlow(rayOrigin, rayDirection, secondKink, target, 0.032, sceneDepth)
+        + raySegmentGlow(rayOrigin, rayDirection, staff, forkEnd, 0.026, sceneDepth);
+
+    vec3 toStaff = staff - rayOrigin;
+    float staffDepth = max(dot(toStaff, rayDirection), 0.0);
+    float staffDistance = length(rayOrigin + rayDirection * staffDepth - staff);
+    float coronaVisible = step(0.001, staffDepth) * step(staffDepth, sceneDepth + 0.18);
+    float corona = (1.0 - smoothstep(0.035, 0.24, staffDistance)) * coronaVisible;
+    float charge = clamp(controls.staffLightStrength / 2.2, 0.0, 1.0);
+    float flicker = 0.88 + 0.12 * sin(phase * 1.91);
+    return tunedLightColor(vec3(0.72, 0.10, 1.45), kLightStaff)
+        * (bolt + corona * 0.72) * (0.42 + charge * 2.65) * flicker;
+}
+
+bool rayBoxInterval(vec3 origin, vec3 direction, vec3 boundsMin, vec3 boundsMax,
+                    out float intervalStart, out float intervalEnd)
+{
+
+
+    vec3 safeDirection = sign(direction + vec3(0.0000001))
+        * max(abs(direction), vec3(0.0001));
+    vec3 first = (boundsMin - origin) / safeDirection;
+    vec3 second = (boundsMax - origin) / safeDirection;
+    vec3 nearPlane = min(first, second);
+    vec3 farPlane = max(first, second);
+    intervalStart = max(max(nearPlane.x, nearPlane.y), nearPlane.z);
+    intervalEnd = min(min(farPlane.x, farPlane.y), farPlane.z);
+    return intervalEnd > max(intervalStart, 0.0);
+}
+
+vec4 lichMistSample(vec3 p)
+{
+
+
+    float curlA = sin(p.x * 1.32 + p.z * 0.86 + controls.time * 0.19
+                    + sin(p.z * 0.71 - controls.time * 0.11) * 0.72);
+    float curlB = sin(p.x * - 0.63 + p.z * 1.57 - controls.time * 0.14
+                    + sin(p.x * 0.84 + controls.time * 0.09) * 0.58);
+    float flowNoise = clamp(0.54 + curlA * 0.23 + curlB * 0.19, 0.12, 1.0);
+
+    float floorHeight = clamp(p.y + 0.95, 0.0, 1.15);
+    float heightFalloff = exp(- floorHeight * 3.25)
+        * (1.0 - smoothstep(0.82, 1.12, floorHeight));
+    vec2 fromLich = p.xz - vec2(- 32.20, - 13.10);
+    float ritualFocus = 1.0 - smoothstep(1.25, 3.05, length(fromLich));
+    float dawnFade = 1.0 - 0.78 * smoothstep(0.12, 1.0, controls.finaleDawnReveal);
+    float density = (0.080 + ritualFocus * 0.27) * heightFalloff
+        * flowNoise * dawnFade;
+
+    vec3 staff = vec3(controls.staffX, controls.staffY, controls.staffZ);
+    float staffGlow = controls.staffLightStrength /
+        (1.0 + dot(p - staff, p - staff) * 1.15);
+    vec3 ambientScattering = tunedLightColor(vec3(0.45, 0.60, 0.80), kLightSkylight);
+    vec3 ritualScattering = tunedLightColor(vec3(0.75, 0.16, 1.00), kLightStaff);
+    vec3 incidentLight = ambientScattering
+        + ritualScattering * clamp(staffGlow * 1.35, 0.0, 1.8);
+
+    return vec4(incidentLight * density * 0.82, density);
+}
+
+void integrateLichMistSample(vec4 sampleValue, float stepLength,
+                             inout vec3 scattered, inout float transmittance)
+{
+    scattered += transmittance * sampleValue.rgb * stepLength;
+    transmittance *= exp(- sampleValue.a * stepLength);
+}
+
+vec4 lichGroundMist(vec3 rayOrigin, vec3 rayDirection, float sceneDepth)
+{
+    if (controls.enemyKind < 0.5)
+    {
+        return vec4(0.0, 0.0, 0.0, 1.0);
+    }
+
+    float marchStart = 0.0;
+    float marchEnd = 0.0;
+
+
+
+    if (! rayBoxInterval(rayOrigin, rayDirection,
+                        vec3(- 36.65, - 0.95, - 18.15),
+                        vec3(- 30.65, 0.20, - 12.25),
+                        marchStart, marchEnd))
+    {
+        return vec4(0.0, 0.0, 0.0, 1.0);
+    }
+    marchStart = max(marchStart, 0.0);
+    marchEnd = min(marchEnd, sceneDepth);
+    if (marchEnd <= marchStart + 0.01)
+    {
+        return vec4(0.0, 0.0, 0.0, 1.0);
+    }
+
+    vec3 scattered = vec3(0.0);
+    float transmittance = 1.0;
+    if (controls.workloadPreset < 0.5)
+    {
+        const float sampleCount = 2.0;
+        float stepLength = (marchEnd - marchStart) / sampleCount;
+        integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+            * (marchStart + stepLength * 0.5)), stepLength, scattered, transmittance);
+        integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+            * (marchStart + stepLength * 1.5)), stepLength, scattered, transmittance);
+    }
+    else if (controls.workloadPreset < 1.5)
+    {
+        const float sampleCount = 6.0;
+        float stepLength = (marchEnd - marchStart) / sampleCount;
+        integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+            * (marchStart + stepLength * 0.5)), stepLength, scattered, transmittance);
+        integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+            * (marchStart + stepLength * 1.5)), stepLength, scattered, transmittance);
+        integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+            * (marchStart + stepLength * 2.5)), stepLength, scattered, transmittance);
+        integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+            * (marchStart + stepLength * 3.5)), stepLength, scattered, transmittance);
+        integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+            * (marchStart + stepLength * 4.5)), stepLength, scattered, transmittance);
+        integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+            * (marchStart + stepLength * 5.5)), stepLength, scattered, transmittance);
+    }
+    else
+    {
+        const float sampleCount = 8.0;
+        float stepLength = (marchEnd - marchStart) / sampleCount;
+        integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+            * (marchStart + stepLength * 0.5)), stepLength, scattered, transmittance);
+        integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+            * (marchStart + stepLength * 1.5)), stepLength, scattered, transmittance);
+        integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+            * (marchStart + stepLength * 2.5)), stepLength, scattered, transmittance);
+        integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+            * (marchStart + stepLength * 3.5)), stepLength, scattered, transmittance);
+        integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+            * (marchStart + stepLength * 4.5)), stepLength, scattered, transmittance);
+        integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+            * (marchStart + stepLength * 5.5)), stepLength, scattered, transmittance);
+        integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+            * (marchStart + stepLength * 6.5)), stepLength, scattered, transmittance);
+        integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
+            * (marchStart + stepLength * 7.5)), stepLength, scattered, transmittance);
+    }
+    return vec4(scattered, transmittance);
+}
+
+vec3 toneMapAces(vec3 color)
+{
+    const float a = 2.51;
+    const float b = 0.03;
+    const float c = 2.43;
+    const float d = 0.59;
+    const float e = 0.14;
+    return clamp( (color * (a * color + b)) / (color * (c * color + d) + e), 0.0, 1.0);
+}
+
+vec3 linearToSrgb(vec3 color)
+{
+    vec3 low = color * 12.92;
+    vec3 high = 1.055 * pow(max(color, vec3(0.0)), vec3(1.0 / 2.4)) - 0.055;
+    return mix(low, high, step(vec3(0.0031308), color));
+}
+
+void main()
+{
+
+
+
+
+
+
+
+
+    int isolatedRow = isolatedTargetRow();
+    if (isolatedRow >= 0)
+        for (uint x = 0u; x < gl_LaunchSizeEXT.x; ++ x)
+            imageStore(outputImage, ivec2(x, isolatedRow), vec4(0.0, 0.0, 0.0, 1.0));
+
+    vec2 uv = (vec2(gl_LaunchIDEXT.xy) + vec2(0.5)) / vec2(gl_LaunchSizeEXT.xy);
+    float aspect = float(gl_LaunchSizeEXT.x) / max(float(gl_LaunchSizeEXT.y), 1.0);
+    float step = controls.time * 6.2;
+    vec3 origin = vec3(controls.cameraX + sin(step * 0.5) * 0.035 * controls.walkAmount,
+                       0.70 + abs(sin(step)) * 0.035 * controls.walkAmount,
+                       controls.cameraZ);
+    float pitch = clamp(controls.pitch + sin(step) * 0.012 * controls.walkAmount, - 0.32, 0.28);
+    vec3 forward = normalize(vec3(sin(controls.yaw), - 0.05 + pitch, - cos(controls.yaw)));
+    vec3 right = normalize(cross(forward, vec3(0.0, 1.0, 0.0)));
+    vec3 up = normalize(cross(right, forward));
+    vec2 screen = uv * 2.0 - 1.0;
+    screen.x *= aspect;
+    screen.y *= - 0.74;
+    vec3 rayDirection = normalize(forward * 1.22 + right * screen.x + up * screen.y);
+
+
+
+
+
+
+
+    float playerPrimaryStart = clamp(0.68 - abs(controls.pitch), 0.34, 0.68);
+    uint primaryMask = (uv.y > playerPrimaryStart ? 0x27u : 0x23u) |
+                       kPlayerViewmodelPrimaryMask | kPlayerBodyRemainderPrimaryMask;
+    HitInfo primary = traceScene(origin, rayDirection, 10000.0, primaryMask,
+                                 0.002, controls.waterQuality < 0.5, true);
+    if (primary.hit)
+    {
+        if (primary.instance == 1)
+                                                  atomicAdd(rtDielectricDiagnostics.value.primaryTorchPixelCount, 1u);
+        else if (primary.instance == 3)
+                                                  atomicAdd(rtDielectricDiagnostics.value.primarySwordPixelCount, 1u);
+        else if (rtInstances.values[primary.instance].geometryRole == kRtGeometryRolePlayerWorldBody ||
+                 rtInstances.values[primary.instance].geometryRole == kRtGeometryRolePlayerViewmodel ||
+                 (primary.instance >= 10 && primary.instance <= 13))
+                                                   atomicAdd(rtDielectricDiagnostics.value.primaryPlayerPixelCount, 1u);
+        else if (primary.instance == 7)
+                                                       atomicAdd(rtDielectricDiagnostics.value.primaryRewardRingPixelCount, 1u);
+        else if (primary.instance == 8)
+                                                       atomicAdd(rtDielectricDiagnostics.value.primaryRewardBodyPixelCount, 1u);
+    }
+    vec3 color = shadePrimary(primary, rayDirection);
+    vec4 fireVolume = integrateFireEmitters(
+        origin, rayDirection, primary.hit ? primary.t : 10000.0, false);
+    color = color * fireVolume.a + fireVolume.rgb;
+    vec4 lichMist = lichGroundMist(origin, rayDirection, primary.t);
+    color = color * lichMist.a + lichMist.rgb;
+    color += staffElectricity(origin, rayDirection, primary.t);
+
+    vec2 centered = uv * 2.0 - 1.0;
+    float vignette = 1.0 - smoothstep(0.28, 1.22, length(centered * vec2(0.82, 1.08)));
+    color = color * (0.62 + 0.38 * vignette);
+    color += vec3(0.46, 0.012, 0.004) * controls.damageFlash * (0.28 + 0.72 * (1.0 - vignette));
+    color = linearToSrgb(toneMapAces(max(color, vec3(0.0)) * controls.outputExposure));
+
+    if (any(greaterThan(isolatedGlassMarker, vec3(0.0))))
+        color = isolatedGlassMarker;
+
+
+    if (controls.outputRedBlueSwap > 0.5)
+    {
+        color = color.bgr;
+    }
+
+
+
+    if (gl_LaunchIDEXT.y < uint(kIsolatedTargetCount)) return;
+
+    imageStore(outputImage, ivec2(gl_LaunchIDEXT.xy), vec4(clamp(color, 0.0, 1.0), 1.0));
+}
+

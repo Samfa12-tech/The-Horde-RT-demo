@@ -1,0 +1,110 @@
+{
+  "schema": 2,
+  "runId": "20261001-034218",
+  "captureMode": "debug-only deterministic checkpoint intent plus ADB screencap",
+  "scale": 75,
+  "device": {
+    "serial": "R5GL219SZGK",
+    "model": "SM-S948B",
+    "androidVersion": "16",
+    "apiLevel": "36",
+    "displaySize": "Physical size: 1440x3120",
+    "displayDensity": "Physical density: 600\r\nOverride density: 560"
+  },
+  "package": "com.samfa12.hordelanternrt.debug",
+  "apkSha256": "3277fe818871e7a2a02073dac815e278ec1c9ad6cb0c89c33d3f1afc9062c20d",
+  "installedApkSha256": "3277fe818871e7a2a02073dac815e278ec1c9ad6cb0c89c33d3f1afc9062c20d",
+  "sourceCommit": "71cb366c5cbe5cf6fe338c4cd6fd7bec0bd12d95",
+  "sourceDirty": true,
+  "selectedRtPipelineBundle": {
+    "opaqueFast": {
+      "key": "diagnostic_mobile_opaque_fast",
+      "sha256": "8dbebd86eeed23b388626719e6f9946b8027df754869b5811673e24036ae12c9"
+    },
+    "genericDielectric": {
+      "key": "diagnostic_mobile_generic_dielectric",
+      "sha256": "a1f236da37f20ddd7af20bc815b04e2d90fed14c1b883f733a4e042640079add"
+    }
+  },
+  "checkpointCount": 1,
+  "checkpoints": [
+    {
+      "index": 1,
+      "checkpoint": "lantern-glass-production",
+      "expectedZone": "finale",
+      "zone": "finale",
+      "generation": 1,
+      "camera": {
+        "x": -33.45,
+        "z": -17.55,
+        "yaw": -1.5708,
+        "pitch": -0.32,
+        "vitality": 3,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false
+      },
+      "renderScale": 0.75,
+      "internalExtent": {
+        "width": 1080,
+        "height": 2235
+      },
+      "swapchainExtent": {
+        "width": 1440,
+        "height": 2980
+      },
+      "gpu": "Adreno (TM) 840",
+      "buildIdentity": "1.6.1 DEBUG",
+      "shaderIdentity": "8dbebd86+a1f236da",
+      "selectedRtPipelineBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_mobile_opaque_fast",
+          "sha256": "8dbebd86eeed23b388626719e6f9946b8027df754869b5811673e24036ae12c9"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_mobile_generic_dielectric",
+          "sha256": "a1f236da37f20ddd7af20bc815b04e2d90fed14c1b883f733a4e042640079add"
+        }
+      },
+      "outputRedBlueSwap": false,
+      "animationTime": 0.0,
+      "playerCombat": {
+        "action": "idle",
+        "actionTime": 0.0,
+        "comboQueued": false,
+        "swordRadians": 0.0,
+        "lastConsumedAttackSequence": 0,
+        "lastConsumedParrySequence": 0
+      },
+      "stablePresentedFrames": 12,
+      "presented": true,
+      "playerRenderRoute": "modelled-viewmodel",
+      "playerSkinCadenceHz": 60,
+      "playerSkinUpdates": 6,
+      "playerSkinCpuAverageMs": 5.6088,
+      "playerMaxSocketErrorM": 0.0,
+      "tlasInstanceCount": 21,
+      "sceneOnly": true,
+      "overlaysHidden": [
+        "menu",
+        "touch-actions",
+        "HUD",
+        "diagnostics",
+        "developer-overlay"
+      ],
+      "png": {
+        "file": "capture-01-lantern-glass-production-75.png",
+        "width": 1440,
+        "height": 3120,
+        "sha256": "7e10324c894431cb6ea0d2d585a13fd04bf89b0dea5f7f6aa875fb017221f8c7"
+      },
+      "nativeStateFile": "capture-01-lantern-glass-production-state.json"
+    }
+  ],
+  "lifecycle": {
+    "requested": true,
+    "homeResumePassed": true,
+    "honestPresentationAfterResume": true,
+    "log": "lifecycle-home-resume-logcat.txt"
+  }
+}

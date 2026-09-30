@@ -1,0 +1,219 @@
+diff --git a/android/app/src/main/cpp/android_probe_bridge.cpp b/android/app/src/main/cpp/android_probe_bridge.cpp
+index a4486bd..a25c326 100644
+--- a/android/app/src/main/cpp/android_probe_bridge.cpp
++++ b/android/app/src/main/cpp/android_probe_bridge.cpp
+@@ -3099,6 +3099,35 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
+         ++context.capturePresentedFrames;
+         if (context.capturePresentedFrames == 12u)
+         {
++#if defined(HORDE_RT_DEBUG_CHECKPOINTS)
++            // Temporary isolated-glass investigation, not a production readback
++            // route or performance sample. Preserve native bytes before Android
++            // presentation scaling and join the same completed frame packet.
++            if (context.activeBenchmarkName == "lantern-glass-production")
++            {
++                horde::vulkan::raytracing::PresentableTinyRtScene::StorageImageCapture raw;
++                std::string rawDiagnostic;
++                const VkResult idle = vkDeviceWaitIdle(context.device);
++                if (idle == VK_SUCCESS && CompleteRtEvidenceAfterDeviceIdle(context, idle) &&
++                    context.rtScene.CaptureStorageImage(raw, rawDiagnostic))
++                {
++                    std::ofstream output(context.reportDirectory + "/isolated-transport.rgba",
++                                         std::ios::binary);
++                    output.write(reinterpret_cast<const char*>(&raw.width), sizeof(raw.width));
++                    output.write(reinterpret_cast<const char*>(&raw.height), sizeof(raw.height));
++                    output.write(reinterpret_cast<const char*>(raw.rgba.data()),
++                                 static_cast<std::streamsize>(raw.rgba.size()));
++                    output.flush();
++                    __android_log_print(output.good() ? ANDROID_LOG_INFO : ANDROID_LOG_ERROR,
++                        kTag, "HORDE_ISOLATED_RAW_CAPTURE width=%u height=%u bytes=%zu written=%d",
++                        raw.width, raw.height, raw.rgba.size(), output.good() ? 1 : 0);
++                }
++                else
++                    __android_log_print(ANDROID_LOG_ERROR, kTag,
++                        "HORDE_ISOLATED_RAW_CAPTURE failed idle=%d diagnostic=%s",
++                        static_cast<int>(idle), rawDiagnostic.c_str());
++            }
++#endif
+             WriteShowcaseDebugState(context, "capture-ready");
+             __android_log_print(ANDROID_LOG_INFO,
+                                 kTag,
+diff --git a/shaders/raytracing/include/rt_dielectric_transport.glsl b/shaders/raytracing/include/rt_dielectric_transport.glsl
+index da96a52..5502f34 100644
+--- a/shaders/raytracing/include/rt_dielectric_transport.glsl
++++ b/shaders/raytracing/include/rt_dielectric_transport.glsl
+@@ -514,12 +514,20 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
+                 volumeAttenuationDistance);
+         }
+ 
++#if HORDE_LOCAL_ISOLATED_GLASS_MARKER
++        isolatedRecordInterface(interfaceIndex, currentHit, transmissionDirection,
++            volumeOpen, volumeCertified, tirSinceTransition, totalDistance, throughput);
++#endif
++
+         if (!isGenericDielectric(currentHit))
+         {
+             if (volumeOpen)
+             {
+                 if (volumeCertified)
+                 {
++#if HORDE_LOCAL_ISOLATED_GLASS_MARKER
++                    isolatedGlassMarker = vec3(1.0, 0.0, 0.0);
++#endif
+                     RT_DIAG_ADD(primaryCertifiedClosedVolumeRecoveryCount,
+                         1u);
+                     RT_DIAG_OR(certifiedClosedVolumeRecoveryReasonMask,
+@@ -563,6 +571,9 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
+             }
+             else if (volumeOpen && volumeCertified)
+             {
++#if HORDE_LOCAL_ISOLATED_GLASS_MARKER
++                isolatedGlassMarker = vec3(1.0, 1.0, 0.0);
++#endif
+                 RT_DIAG_ADD(primaryCertifiedClosedVolumeRecoveryCount,
+                     1u);
+                 RT_DIAG_OR(certifiedClosedVolumeRecoveryReasonMask,
+@@ -572,6 +583,9 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
+             }
+             else
+             {
++#if HORDE_LOCAL_ISOLATED_GLASS_MARKER
++                isolatedGlassMarker = vec3(0.0, 0.0, 1.0);
++#endif
+                 RT_DIAG_ADD(primaryInterfaceBudgetCount,
+                     1u);
+                 if (volumeOpen)
+@@ -676,6 +690,9 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
+     {
+         if (volumeOpen && volumeCertified)
+         {
++#if HORDE_LOCAL_ISOLATED_GLASS_MARKER
++            isolatedGlassMarker = vec3(1.0, 0.0, 1.0);
++#endif
+             RT_DIAG_ADD(primaryCertifiedClosedVolumeRecoveryCount,
+                 1u);
+             RT_DIAG_OR(certifiedClosedVolumeRecoveryReasonMask,
+diff --git a/shaders/raytracing/include/rt_frame.glsl b/shaders/raytracing/include/rt_frame.glsl
+index 3b988b6..3a007e1 100644
+--- a/shaders/raytracing/include/rt_frame.glsl
++++ b/shaders/raytracing/include/rt_frame.glsl
+@@ -14,6 +14,12 @@ void main()
+     {
+         return;
+     }
++#endif
++#if HORDE_LOCAL_ISOLATED_GLASS_MARKER
++    int isolatedRow = isolatedTargetRow();
++    if (isolatedRow >= 0)
++        for (uint x = 0u; x < HORDE_RT_PIXEL_EXTENT.x; ++x)
++            imageStore(outputImage, ivec2(x, isolatedRow), vec4(0.0, 0.0, 0.0, 1.0));
+ #endif
+     vec2 uv = (vec2(HORDE_RT_PIXEL_ID.xy) + vec2(0.5)) / vec2(HORDE_RT_PIXEL_EXTENT.xy);
+     float aspect = float(HORDE_RT_PIXEL_EXTENT.x) / max(float(HORDE_RT_PIXEL_EXTENT.y), 1.0);
+@@ -69,10 +75,19 @@ void main()
+     color = color * (0.62 + 0.38 * vignette);
+     color += vec3(0.46, 0.012, 0.004) * controls.damageFlash * (0.28 + 0.72 * (1.0 - vignette));
+     color = linearToSrgb(toneMapAces(max(color, vec3(0.0)) * controls.outputExposure));
++#if HORDE_LOCAL_ISOLATED_GLASS_MARKER
++    if (any(greaterThan(isolatedGlassMarker, vec3(0.0))))
++        color = isolatedGlassMarker;
++#endif
+     // The RT storage image is RGBA, while common Android/Windows swapchains are BGRA and receive a raw image copy.
+     if (controls.outputRedBlueSwap > 0.5)
+     {
+         color = color.bgr;
+     }
++#if HORDE_LOCAL_ISOLATED_GLASS_MARKER
++    // Reserved output rows still execute every original ray and counter; only
++    // their final image write is withheld to avoid racing selected record writers.
++    if (HORDE_RT_PIXEL_ID.y < uint(kIsolatedTargetCount)) return;
++#endif
+     imageStore(outputImage, ivec2(HORDE_RT_PIXEL_ID.xy), vec4(clamp(color, 0.0, 1.0), 1.0));
+ }
+diff --git a/shaders/raytracing/include/rt_hit_decode.glsl b/shaders/raytracing/include/rt_hit_decode.glsl
+index 2089f56..3c64e39 100644
+--- a/shaders/raytracing/include/rt_hit_decode.glsl
++++ b/shaders/raytracing/include/rt_hit_decode.glsl
+@@ -397,6 +397,19 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
+     h.attenuationDistance = 0.0;
+     h.attenuationColor = vec3(1.0);
+     h.materialFlags = 0u;
++#if HORDE_LOCAL_ISOLATED_GLASS_MARKER
++    h.investigationQueryOrigin = origin;
++    h.investigationQueryDirection = direction;
++    h.investigationQueryMinimum = max(minimumDistance, 0.0);
++    h.investigationObjectOrigin = vec3(0.0);
++    h.investigationObjectDirection = vec3(0.0);
++    h.investigationVertex0 = vec3(0.0);
++    h.investigationVertex1 = vec3(0.0);
++    h.investigationVertex2 = vec3(0.0);
++    h.investigationBarycentrics = vec2(0.0);
++    h.investigationRawDistance = maxDistance;
++    h.investigationGeometryIndex = 0u;
++#endif
+ #if HORDE_GENERIC_TRANSMISSION_VARIANT
+     h.dielectricSpawnPosition = h.position;
+     h.dielectricSpawnGuarded = false;
+@@ -457,6 +470,13 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
+         h.position = origin + direction * h.t;
+         RtInstanceMetadata instanceMetadata = rtInstances.values[h.instance];
+         uint geometryIndex = rayQueryGetIntersectionGeometryIndexEXT(query, true);
++#if HORDE_LOCAL_ISOLATED_GLASS_MARKER
++        h.investigationObjectOrigin = rayQueryGetIntersectionObjectRayOriginEXT(query, true);
++        h.investigationObjectDirection = rayQueryGetIntersectionObjectRayDirectionEXT(query, true);
++        h.investigationBarycentrics = rayQueryGetIntersectionBarycentricsEXT(query, true);
++        h.investigationRawDistance = h.t;
++        h.investigationGeometryIndex = geometryIndex;
++#endif
+         if ((instanceMetadata.flags & kRtInstanceFlagStaticPbr) != 0u)
+         {
+             if (geometryIndex < instanceMetadata.primitiveCount)
+@@ -471,6 +491,11 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
+                 vec3 weights = vec3(1.0 - bary.x - bary.y, bary.x, bary.y);
+                 StaticRtVertex v0, v1, v2;
+                 loadPbrTriangle(instanceMetadata, i0, i1, i2, v0, v1, v2);
++#if HORDE_LOCAL_ISOLATED_GLASS_MARKER
++                h.investigationVertex0 = v0.position.xyz;
++                h.investigationVertex1 = v1.position.xyz;
++                h.investigationVertex2 = v2.position.xyz;
++#endif
+                 vec2 uv = v0.uv0.xy * weights.x + v1.uv0.xy * weights.y +
+                           v2.uv0.xy * weights.z;
+                 mat3 objectToWorld = mat3(rayQueryGetIntersectionObjectToWorldEXT(query, true));
+diff --git a/shaders/raytracing/include/rt_scene_abi.glsl b/shaders/raytracing/include/rt_scene_abi.glsl
+index 804e601..4d1f92d 100644
+--- a/shaders/raytracing/include/rt_scene_abi.glsl
++++ b/shaders/raytracing/include/rt_scene_abi.glsl
+@@ -85,6 +85,8 @@ bool genericTransmissionEnabled()
+     return HORDE_GENERIC_TRANSMISSION_VARIANT != 0;
+ }
+ 
++#include "rt_isolated_glass_investigation.glsl"
++
+ struct HitInfo
+ {
+     bool hit;
+@@ -111,8 +113,23 @@ struct HitInfo
+     bool dielectricSpawnGuarded;
+     float dielectricSpawnMinimumNormalBias;
+ #endif
++#if HORDE_LOCAL_ISOLATED_GLASS_MARKER
++    vec3 investigationQueryOrigin;
++    vec3 investigationQueryDirection;
++    vec3 investigationObjectOrigin;
++    vec3 investigationObjectDirection;
++    vec3 investigationVertex0;
++    vec3 investigationVertex1;
++    vec3 investigationVertex2;
++    vec2 investigationBarycentrics;
++    float investigationQueryMinimum;
++    float investigationRawDistance;
++    uint investigationGeometryIndex;
++#endif
+ };
+ 
++#include "rt_isolated_glass_records.glsl"
++
+ const vec3 kMoonDirection = vec3(-0.180027, 0.930140, -0.320048);
+ const int kMaterialDryStone = 0;
+ const int kMaterialWetCobble = 1;

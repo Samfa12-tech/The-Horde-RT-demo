@@ -2,6 +2,35 @@
 
 Last updated: 2026-10-01
 
+## October 1: current isolated-lantern native ray witness (local SM-S948B)
+
+Exact SM-S948B/R5GL219SZGK, Android16/Adreno840/driver2150932499, strict ASTC,
+75%/1080x2235, Debug Diagnostic/Mobile pipeline. Temporary detached71cb366 probes
+do not alter production budgets/materials/geometry or accepted player work.
+Normal native readback reproduces1closed interface-budget event/80reason2 recoveries;
+an output marker localizes exactly81pixels, all other native pixels unchanged.
+The detailed probe records81rays/405native candidates and actual uploaded triangle,
+object ray, barycentrics, minimum, spawn and volume/TIR state. All41 owning counters
+match; pixels outside81reserved record rows match the marker image exactly.
+Frames have different serials/ticks; this is instrumentation stability, not an
+unchanged production image gate or shared-frame identity claim.
+
+All80reason2 paths genuinely enter A, TIR, exit A, enter B and reach B's real exit
+at the four-interface boundary. The one failure enters A, TIR twice, exits A, then
+reaches a real entry into another pane. Independent GLB/double-intersection checks
+corroborate405/405hits, no duplicate/nearest tie; they do not emulate GPU rounding.
+The reason2 branch discards nonzero transmitted contribution: finite-budget loss,
+not successful recovery. Phase4 remains open; final radiance impact unmeasured.
+No budget increase, diagnostics suppression, fake/scalar glass or tolerance change.
+
+Raw-control0ec75230, marker14b352eb and path3277fe81 Debug APKs each pass exact
+install/pullback and focused benchmark/capture/Home-resume checks; actual packaged
+path module val/dis PASS. Native bytes are read only from the Debug app's private
+report file, not resampled phone screenshots. Afterward normalC11ff703 restores
+and passes opening/capture/Home-resume034808. These are not Shipping/performance,
+live-motion, compute, RTX or exact S24/S25 acceptance. Stable app/data unchanged.
+Audio/haptic manual revalidation:NO. [Exact evidence](evidence/2026-10-01-isolated-glass-rays/README.md).
+
 ## October 1: bounded render-scale resize (local SM-S948B evidence)
 
 Implementation5405768, focused CIb74559c. Exact SM-S948B/R5GL219SZGK,

@@ -30,6 +30,29 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### October 1 bounded render-scale resource checkpoint
 
+Current follow-on: [isolated native-ray witness](evidence/2026-10-01-isolated-glass-rays/README.md)
+closes the ambiguity, not Phase4. Normal1closed budget event/80reason2 are all real
+fifth interfaces. The80 traverse enter A/TIR/exit A/enter B/exit B; the single
+failure traverses enter A/twoTIR/exit A/enter B. All405native hits match the uploaded
+GLB and nearest double intersections; all41counters and nonrecord native pixels
+remain unchanged. Reason2 discards nonzero transmission, not successful recovery.
+No budget, diagnostic, tolerance, geometry/material or player change is promoted.
+Normal DebugC11 restored with fresh opening/capture/Home-resume034808 PASS.
+Phone pipeline Diagnostic/Mobile only; live/compute/RTX/image-impact gates open.
+
+Pushed571141b adds GCC/Clang Linux and MSVC Windows portable compiler coverage;
+MSVC explicitly runs the46commonCPU-host tests, not15extra platform tooling checks.
+Existing13-test Vulkan CPU-host lane unchanged. Local MSVC builds Release and
+passes46common; full61test attempt60/61 has a concurrentworktree-status race,
+focused manifest rerun1/1PASS after additions settle. Four Python suites28/28PASS.
+Fresh571141b push36756982005/PR36756990569 are RED: new MSVC lane's mailbox stress
+hits its30s progress deadline; GCC/Clang portable and Vulkan CPU-host jobs PASS.
+Local success does not replace that failure. Focused Windows oversubscription/
+fixture investigation is underway; no production mailbox change or deadline lift.
+Matched uncooled75% all-direct-visibility cost A/B/B/A is in progress on exact
+71cb paired Shipping/Mobile APKs. The isolate removes real opaque/glass shadows,
+is nonphysical and never a production candidate; no saving/30FPS claim yet.
+
 Pushed5405768 preserves the Android RT scene during scale-only changes; b74559c
 adds resource/preflight tests to the Vulkan CPU-host CI lane. This independently
 justified owner-requested resource slice does not replace Phase4 glass work.

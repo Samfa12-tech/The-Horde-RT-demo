@@ -1,0 +1,38 @@
+{
+  "count": 41,
+  "differences": [],
+  "controlIdentity": {
+    "sceneEpoch": 6,
+    "measurementGeneration": 6,
+    "recordAttemptSerial": 518,
+    "recordSerial": 518,
+    "submissionSerial": 518,
+    "completionSerial": 518,
+    "simulationTick": 76,
+    "frameSlot": 0
+  },
+  "probeIdentity": {
+    "sceneEpoch": 6,
+    "measurementGeneration": 6,
+    "recordAttemptSerial": 514,
+    "recordSerial": 514,
+    "submissionSerial": 514,
+    "completionSerial": 514,
+    "simulationTick": 57,
+    "frameSlot": 0
+  },
+  "controlPresented": {
+    "outcome": "presented",
+    "presented": true,
+    "lastSuccessfulPresentSubmissionSerial": 518,
+    "finalIdleCompletion": true
+  },
+  "probePresented": {
+    "outcome": "presented",
+    "presented": true,
+    "lastSuccessfulPresentSubmissionSerial": 514,
+    "finalIdleCompletion": true
+  },
+  "controlStatus": "valid",
+  "probeStatus": "valid"
+}
