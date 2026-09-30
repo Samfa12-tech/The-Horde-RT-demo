@@ -71,5 +71,10 @@ docs/evidence/2026-09-30-shipping-phone/**/*.patch whitespace=-trailing-space,-b
 docs/evidence/2026-09-30-shipping-phone/candidate/*.txt whitespace=-blank-at-eof,cr-at-eol
 docs/evidence/2026-09-30-shipping-phone/opening-stage-proposal/PROPOSAL.md whitespace=-blank-at-eof,cr-at-eol
 
+# Exact non-shippable opening-work isolation reports and patches.
+docs/evidence/2026-09-30-opening-lighting-isolation/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-30-opening-lighting-isolation/**/*.log whitespace=-trailing-space,-blank-at-eof,-space-before-tab,cr-at-eol
+docs/evidence/2026-09-30-opening-lighting-isolation/**/*.patch whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+
 # Exact accepted paired-manifest bytes are part of runtime admission/provenance.
 assets/models/player/runtime/asset.manifest.json -text whitespace=cr-at-eol

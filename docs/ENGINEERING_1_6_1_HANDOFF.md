@@ -30,6 +30,27 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### September 30 Shipping comparison and opening-room checkpoint
 
+Follow-on [opening fire-cost evidence](evidence/2026-09-30-opening-lighting-isolation/README.md)
+retains C1,S1,V1,V2 and separate uncooled C2:all9,190 completions and800 opening
+OpaqueFast rows pass exact admission. Opening GPU medianC1 66.670ms,
+fire-shadow-isolateS1 52.867ms, volume-isolatesV1/V2 63.364/63.484ms;
+normal uncooled-after-removalC2 66.423ms. All800 GPU intervals exceed33.333ms.
+The nonphysical isolates rank investigation, not real optimisation gains or30FPS
+acceptance. Main preserved all player geometry/masks/authority, asset semantics,
+other lights and shader budgets; no isolate source is promoted. Final normal
+exact control APKab3e2261 restored/byte-verified beforeC2.
+
+Owner reported thawed ice-brick removal, observed09:11:04UTC; exact removal/thaw
+timeline unknown. V2was already complete at message receipt, but cooling efficacy
+is not certified. Planned cooled sequence stops afterV2; S2not run. Do not pool
+C2 with cooled runs or call it steady-state sustained evidence. All future phone
+measurements are uncooled unless new owner evidence says otherwise; never repeat
+phone coordination just because of compaction. Next quality-preserving candidate
+is early termination only after confirmed opaque blocking in binary visibility,
+not ordered dielectric shadow traversal; reviewed but not implemented/measured.
+Fresh7a095c7 push36690246101/PR36690251617 pass45portable+11Vulkan-host each,
+logs inspected and PR15 description reconciled. Audio/haptic revalidation:NO.
+
 [Complete retained phone evidence](evidence/2026-09-30-shipping-phone/README.md):
 frozen A(d504bfe)/B(8cbe0ac, runtime d63e29c) ABBA route/high/live completes all
 12ledgers, plus uncooled B0context. Shipping/Mobile,75%, exactSM-S948B,

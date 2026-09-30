@@ -2,6 +2,32 @@
 
 Last updated: 2026-09-30
 
+## September 30: opening fire-cost isolation and cooling change (local SM-S948B evidence)
+
+[Exact five-run evidence](evidence/2026-09-30-opening-lighting-isolation/README.md)
+on **SM-S948B/R5GL219SZGK**, Android16/Adreno840/driver2150932499, nativepipeline,
+strictASTC,75%/1080x2235→1440x2980:all9,190 owning completions and800 opening
+OpaqueFast rows pass. ControlAPKab3e2261, nonphysical shadow-isolateAPK23aa0cf6
+and volume-isolateAPKe063e7cf install/pull back byte-identically in authorised
+`.benchmark`; no data clear/stable-package mutation or production publication.
+Opening GPU mediansC1 66.670ms,S1 52.867ms,V1/V2 63.364/63.484ms,C2 66.423ms.
+No opening GPU interval reaches33.333ms. Isolates deliberately remove fire
+visibility or volume composition and are NOT physical visual/performance
+acceptance or Shipping candidates; no probe source is promoted. Actual packaged
+four modules per isolate val/dis PASS,0atomics/0imageReads/noBinding22; asset
+receipts preserve50exact payloads and3text-only semantic/line-ending differences.
+
+Owner reported removal of the thawed ice brick; observed09:11:04UTC, physical
+removal/thaw timeline unknown. Cooled plan stopped afterV2 (complete before report
+receipt); S2not run. C2restores normal shader control with a separate uncooled-
+after-removal route:28.5→34.3C, thermal0/GPU power0–1, whole-route61.0903ms
+median/80.1728p95. C1/S1/V1/V2 contexts differ17.3→33.5C/power0–3. No causal
+gain across cooling/power changes; no uncooled steady-state/display-pacing/30FPS
+acceptance. Torch shadow work is a supported investigation priority, not the
+proven whole ordinary-gameplay cause. Exact S24/S25, phonecompute, RTX images,
+glass correctness and final matrix remain separate/open. Audio/haptic manual
+revalidation:NO (no semantic/playback changes).
+
 ## September 30: Shipping75% performance foundation (local SM-S948B evidence)
 
 Follow-on [complete ABBA/opening evidence](evidence/2026-09-30-shipping-phone/README.md)

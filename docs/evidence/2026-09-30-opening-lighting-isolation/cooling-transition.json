@@ -1,0 +1,12 @@
+{
+  "ownerReportObservedUtc": "2026-09-30T09:11:04Z",
+  "ownerReport": "Ice brick removed because it thawed; phone no longer externally cooled.",
+  "exactPhysicalRemovalUtc": null,
+  "coolingEfficacyOrThawTimeline": "unknown",
+  "lastCompletedRun": "shipping-lighting-volume-2-route-20260930",
+  "lastRetainedContextUtc": "2026-09-30T09:08:23.9822206Z",
+  "runWasCompleteBeforeReportObservation": true,
+  "plannedCooledSequenceStopped": true,
+  "subsequentControlCondition": "uncooled after reported removal; initial thermal transition and steady-state remain separate",
+  "causalGainAcceptance": false
+}

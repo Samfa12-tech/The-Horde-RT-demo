@@ -1,0 +1,13 @@
+{
+  "baseCommit": "7a095c7836058f2129f1c3b08b1e8482671cbc72",
+  "sourceDirty": true,
+  "mode": "volume",
+  "nonphysicalWorkloadIsolation": true,
+  "publishable": false,
+  "apkPath": "C:\\Dev\\tmp\\horde-shipping-ab-20260930\\opening-lighting-volume\\HordeLanternRT-nonshipping-fire-volume-isolation-arm64.apk",
+  "apkSha256": "e063e7cfaef964f8b023cb318f86620597f3b4aeaaab40ad7899bec951e7c749",
+  "nativeSha256": "49b0df9e775370964e190b1aaddd88bef61a56e0255ba52c1835e36961b54132",
+  "patchSha256": "d5cb17b5850fc1b5ea02555ce4c962786da3355d4587c737741e9fdbfa4cdcb7",
+  "headerSha256": "04b6e18bc8f0edeb7d50e55baee005a2321689316c05aed2eb396b370d0a220f",
+  "purpose": "Opening cost attribution only; never a physical/quality-preserving candidate"
+}

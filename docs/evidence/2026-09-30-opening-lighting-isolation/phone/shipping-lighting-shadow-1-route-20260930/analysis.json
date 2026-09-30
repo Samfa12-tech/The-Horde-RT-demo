@@ -1,0 +1,329 @@
+{
+  "runId": "shipping-lighting-shadow-1-route-20260930",
+  "integrity": "PASS",
+  "sourceCommit": "7a095c7836058f2129f1c3b08b1e8482671cbc72",
+  "apkSha256": "23aa0cf67f5f0612290f8607078d47e7e47bdf81202d9290ab15cc796dd73fea",
+  "buildLabel": "opening-lighting-shadow",
+  "workload": "showcase-route-v1",
+  "deviceModel": "SM-S948B",
+  "shader": "opaqueFast:shipping_mobile_opaque_fast@a2afd1eb4e812c3390b8cbe8bd088064f08ee63aa1eb6c3ebaf170132389aa37|genericDielectric:shipping_mobile_generic_dielectric@c8da67f52f718c52b5c40a225a9e05f5e5c1163e76c9bfaccd9f464a4629b517",
+  "frames": 1838,
+  "presentMode": "MAILBOX",
+  "internalExtent": {
+    "width": 1080,
+    "height": 2235
+  },
+  "overall": {
+    "averageMs": 53.6768,
+    "medianMs": 53.5834,
+    "p95Ms": 65.5105,
+    "onePercentLowFps": 14.1804
+  },
+  "medianDerivedFps": 18.662,
+  "gpuRtDurationMs": {
+    "sampleCount": 1838,
+    "meanMilliseconds": 42.7659,
+    "medianMilliseconds": 42.7985,
+    "p90Milliseconds": 50.8799,
+    "p95Milliseconds": 54.0357,
+    "slowestOnePercentMeanMilliseconds": 57.9644
+  },
+  "cpuStages": {
+    "simulationStepCpuMs": {
+      "sampleCount": 1838,
+      "meanMilliseconds": 0.0228,
+      "medianMilliseconds": 0.0218,
+      "p90Milliseconds": 0.0295,
+      "p95Milliseconds": 0.0312,
+      "slowestOnePercentMeanMilliseconds": 0.0658
+    },
+    "skinCpuMs": {
+      "sampleCount": 1838,
+      "meanMilliseconds": 8.3805,
+      "medianMilliseconds": 8.7238,
+      "p90Milliseconds": 9.584,
+      "p95Milliseconds": 10.0441,
+      "slowestOnePercentMeanMilliseconds": 11.3489
+    },
+    "playerSkinCpuMs": {
+      "sampleCount": 1838,
+      "meanMilliseconds": 8.262,
+      "medianMilliseconds": 8.6802,
+      "p90Milliseconds": 9.4834,
+      "p95Milliseconds": 9.5793,
+      "slowestOnePercentMeanMilliseconds": 10.2397
+    },
+    "characterSkinCpuMs": {
+      "sampleCount": 1838,
+      "meanMilliseconds": 0.1185,
+      "medianMilliseconds": 0.0,
+      "p90Milliseconds": 0.0,
+      "p95Milliseconds": 1.1973,
+      "slowestOnePercentMeanMilliseconds": 2.1023
+    },
+    "dynamicUploadCpuMs": {
+      "sampleCount": 1838,
+      "meanMilliseconds": 0.344,
+      "medianMilliseconds": 0.3295,
+      "p90Milliseconds": 0.4584,
+      "p95Milliseconds": 0.5251,
+      "slowestOnePercentMeanMilliseconds": 0.7583
+    },
+    "blasRefitRecordCpuMs": {
+      "sampleCount": 1838,
+      "meanMilliseconds": 0.0333,
+      "medianMilliseconds": 0.0318,
+      "p90Milliseconds": 0.0414,
+      "p95Milliseconds": 0.0456,
+      "slowestOnePercentMeanMilliseconds": 0.1051
+    },
+    "tlasUpdateRecordCpuMs": {
+      "sampleCount": 1838,
+      "meanMilliseconds": 0.0095,
+      "medianMilliseconds": 0.0088,
+      "p90Milliseconds": 0.0117,
+      "p95Milliseconds": 0.0128,
+      "slowestOnePercentMeanMilliseconds": 0.0551
+    },
+    "traceCopyRecordCpuMs": {
+      "sampleCount": 1838,
+      "meanMilliseconds": 0.1748,
+      "medianMilliseconds": 0.1687,
+      "p90Milliseconds": 0.2118,
+      "p95Milliseconds": 0.2381,
+      "slowestOnePercentMeanMilliseconds": 0.4291
+    },
+    "frameFenceWaitCpuMs": {
+      "sampleCount": 1838,
+      "meanMilliseconds": 43.1365,
+      "medianMilliseconds": 43.175,
+      "p90Milliseconds": 51.2845,
+      "p95Milliseconds": 54.4097,
+      "slowestOnePercentMeanMilliseconds": 58.4072
+    },
+    "imageAcquireCpuMs": {
+      "sampleCount": 1838,
+      "meanMilliseconds": 0.0355,
+      "medianMilliseconds": 0.0374,
+      "p90Milliseconds": 0.0425,
+      "p95Milliseconds": 0.0446,
+      "slowestOnePercentMeanMilliseconds": 0.1003
+    },
+    "queueSubmitCpuMs": {
+      "sampleCount": 1838,
+      "meanMilliseconds": 0.2436,
+      "medianMilliseconds": 0.2248,
+      "p90Milliseconds": 0.3493,
+      "p95Milliseconds": 0.4196,
+      "slowestOnePercentMeanMilliseconds": 0.6683
+    },
+    "presentCallCpuMs": {
+      "sampleCount": 1838,
+      "meanMilliseconds": 0.1938,
+      "medianMilliseconds": 0.1768,
+      "p90Milliseconds": 0.2682,
+      "p95Milliseconds": 0.2877,
+      "slowestOnePercentMeanMilliseconds": 0.4325
+    },
+    "wholeFrameCycleCpuMs": {
+      "sampleCount": 1838,
+      "meanMilliseconds": 53.6767,
+      "medianMilliseconds": 53.5833,
+      "p90Milliseconds": 62.323,
+      "p95Milliseconds": 65.5104,
+      "slowestOnePercentMeanMilliseconds": 70.52,
+      "onePercentLowFps": 14.1804
+    }
+  },
+  "zones": [
+    {
+      "name": "opening",
+      "frames": 160,
+      "averageMs": 63.2575,
+      "medianMs": 64.131,
+      "p95Ms": 69.9405,
+      "onePercentLowFps": 13.9405
+    },
+    {
+      "name": "skeleton-room",
+      "frames": 98,
+      "averageMs": 57.5611,
+      "medianMs": 58.0593,
+      "p95Ms": 62.1541,
+      "onePercentLowFps": 15.8384
+    },
+    {
+      "name": "shadow-corridor",
+      "frames": 599,
+      "averageMs": 56.3608,
+      "medianMs": 55.8885,
+      "p95Ms": 66.0576,
+      "onePercentLowFps": 14.1364
+    },
+    {
+      "name": "skylight-chamber",
+      "frames": 189,
+      "averageMs": 45.3265,
+      "medianMs": 43.9912,
+      "p95Ms": 56.4184,
+      "onePercentLowFps": 17.098
+    },
+    {
+      "name": "yellow-torch-bay",
+      "frames": 157,
+      "averageMs": 49.9199,
+      "medianMs": 49.7284,
+      "p95Ms": 55.7043,
+      "onePercentLowFps": 17.7089
+    },
+    {
+      "name": "blue-torch-bay",
+      "frames": 157,
+      "averageMs": 50.5978,
+      "medianMs": 50.2195,
+      "p95Ms": 56.1268,
+      "onePercentLowFps": 17.4495
+    },
+    {
+      "name": "red-torch-bay",
+      "frames": 157,
+      "averageMs": 52.2826,
+      "medianMs": 51.4491,
+      "p95Ms": 59.2324,
+      "onePercentLowFps": 16.3026
+    },
+    {
+      "name": "green-torch-bay",
+      "frames": 157,
+      "averageMs": 54.7136,
+      "medianMs": 55.2869,
+      "p95Ms": 60.1526,
+      "onePercentLowFps": 15.9508
+    },
+    {
+      "name": "transmission-threshold",
+      "frames": 63,
+      "averageMs": 46.5038,
+      "medianMs": 47.1931,
+      "p95Ms": 49.0469,
+      "onePercentLowFps": 17.1261
+    },
+    {
+      "name": "finale",
+      "frames": 101,
+      "averageMs": 50.0944,
+      "medianMs": 47.4275,
+      "p95Ms": 66.2601,
+      "onePercentLowFps": 14.6549
+    }
+  ],
+  "owningActiveStrategy": {
+    "exported": true,
+    "counts": {
+      "opaque-fast": 1838
+    },
+    "openingCounts": {
+      "opaque-fast": 160
+    }
+  },
+  "zoneGpuCommandBufferTiming": [
+    {
+      "zone": "blue-torch-bay",
+      "frames": 157,
+      "medianMs": 39.084947,
+      "p95NearestRankMs": 45.197238,
+      "within33_333Ms": 0
+    },
+    {
+      "zone": "finale",
+      "frames": 101,
+      "medianMs": 35.969999,
+      "p95NearestRankMs": 53.434113,
+      "within33_333Ms": 14
+    },
+    {
+      "zone": "green-torch-bay",
+      "frames": 157,
+      "medianMs": 43.930676,
+      "p95NearestRankMs": 49.634843,
+      "within33_333Ms": 0
+    },
+    {
+      "zone": "opening",
+      "frames": 160,
+      "medianMs": 52.867004,
+      "p95NearestRankMs": 57.493228,
+      "within33_333Ms": 0
+    },
+    {
+      "zone": "red-torch-bay",
+      "frames": 157,
+      "medianMs": 40.017968,
+      "p95NearestRankMs": 48.350728,
+      "within33_333Ms": 0
+    },
+    {
+      "zone": "shadow-corridor",
+      "frames": 599,
+      "medianMs": 45.138593,
+      "p95NearestRankMs": 54.496145,
+      "within33_333Ms": 0
+    },
+    {
+      "zone": "skeleton-room",
+      "frames": 98,
+      "medianMs": 46.837603,
+      "p95NearestRankMs": 49.812759,
+      "within33_333Ms": 0
+    },
+    {
+      "zone": "skylight-chamber",
+      "frames": 189,
+      "medianMs": 32.765051,
+      "p95NearestRankMs": 45.490676,
+      "within33_333Ms": 126
+    },
+    {
+      "zone": "transmission-threshold",
+      "frames": 63,
+      "medianMs": 35.37703,
+      "p95NearestRankMs": 37.551666,
+      "within33_333Ms": 7
+    },
+    {
+      "zone": "yellow-torch-bay",
+      "frames": 157,
+      "medianMs": 39.080832,
+      "p95NearestRankMs": 43.712239,
+      "within33_333Ms": 0
+    }
+  ],
+  "diagnosticRowsCompiledOut": 1838,
+  "firstMeasuredSimulationTick": 1839,
+  "lastMeasuredSimulationTick": 3676,
+  "context": {
+    "samples": 39,
+    "firstUtc": "2026-09-30T08:56:02.3848431Z",
+    "lastUtc": "2026-09-30T08:59:22.0912507Z",
+    "batteryStartC": 20.7,
+    "batteryEndC": 27.8,
+    "thermalStatuses": [
+      0
+    ],
+    "gpuThermalPowerLevels": [
+      0
+    ]
+  },
+  "limitations": [
+    "Thermal context starts after am-start observation and is not frame-aligned measured-lap telemetry.",
+    "Render-entry-through-present timing is not display pacing or input latency.",
+    "GPU command-buffer timestamps include AS work/RT/copy, not isolated shader timing.",
+    "Shipping compiled-out counters do not prove glass correctness.",
+    "No causal A/B acceptance from this individual trial.",
+    "Shader isolate is investigation-only and is not a physical-performance or visual-contract acceptance build.",
+    "No performance gain is claimed from this isolate."
+  ],
+  "physicalEvidenceClass": "nonphysical-investigation-only",
+  "gainClaim": "none",
+  "physicalAcceptance": "not-evaluated"
+}
