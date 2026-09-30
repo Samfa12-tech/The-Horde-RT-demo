@@ -2,6 +2,25 @@
 
 Last updated: 2026-09-30
 
+## September 30: exact binary-blocker candidate (local SM-S948B evidence)
+
+SM-S948B / R5GL219SZGK, Android 16, Adreno 840, driver 2150932499: immutable
+Diagnostic/Debug APK `5b93c3497953d1c938450352f32b9dd0f4a733c41f99b0fe257d21ac180b46c9`
+installs/pulls back byte-identically in the authorised `.debug` package. The
+first-confirmed opaque blocker candidate passes deterministic replay, nine
+scene-only captures and Home/resume with honest RT presentation, strict ASTC and
+75% rendering. Opening/worst-bend PNGs equal fresh control APK `389d6954` captures;
+seven glass PNGs equal their previously retained same-artifact baseline images.
+Captured geometry/mounting remains the accepted modelled route, not new tuning.
+
+The separate ARM64 Shipping/Mobile benchmark APK `0383edca` builds and its actual
+four packaged modules validate/disassemble with zero atomics/image reads/binding22;
+all 53 asset payloads equal control `ab3e2261`. Uncooled A/B/B/A performance work is
+in progress, not a gain or sustained/display-pacing/30 FPS pass. Exact evidence
+working root: `C:/Dev/tmp/horde-first-blocker-20260930`. This does not close ongoing
+glass correctness/live acceptance, phone compute, RTX backend parity or exact
+S24/S25 gates. Audio/haptic manual revalidation: NO (no semantic/playback change).
+
 ## September 30: opening fire-cost isolation and cooling change (local SM-S948B evidence)
 
 [Exact five-run evidence](evidence/2026-09-30-opening-lighting-isolation/README.md)

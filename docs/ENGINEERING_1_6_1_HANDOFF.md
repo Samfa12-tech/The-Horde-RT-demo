@@ -30,6 +30,30 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### September 30 Shipping comparison and opening-room checkpoint
 
+First-confirmed-blocker candidate: `visibilityMask` now combines NoOpaque with
+TerminateOnFirstHit. Only its binary blocker result permits early termination;
+the existing transparent admission, masks/bounds and ordered dielectric queries
+are unchanged. Focused MSVC Debug/Release smoke passes 1/1 each. Compiler strategy,
+variant manifest, eight-compute freshness and full artifact/negative/compatibility
+contracts pass (stale pinned compatibility hashes were updated to the freshly
+validated generated includes; no budgets or assertions removed). All four
+pipeline GenericDielectric SPIR-V hashes remain unchanged; OpaqueFast word and
+instruction counts are unchanged. Exact packaged Shipping modules validate with
+zero atomics/image reads/binding22; all 53 APK asset payloads are byte-identical.
+
+RTX pipeline's 13 standard PNGs equal accepted d63 bytes. Exact SM-S948B candidate
+Debug APK `5b93c3497953d1c938450352f32b9dd0f4a733c41f99b0fe257d21ac180b46c9`
+passes replay, nine captures and Home/resume at 75% with strict ASTC/native RT.
+The two affected opaque PNGs equal fresh exact-control images, and seven glass
+PNGs equal their prior exact-artifact counterparts. This is no blanket glass/live
+or backend-parity pass. Compute's standard capture completed but differs from
+pipeline; existing tolerance is unchanged and its separate parity gate is open.
+Uncooled normal Shipping A/B/B/A route measurement is now in progress using frozen
+control `ab3e2261` and candidate `0383edca`; no performance gain or 30 FPS acceptance
+is claimed yet. External working evidence: `C:/Dev/tmp/horde-first-blocker-20260930`.
+Do not change frozen artifacts while measurements run. Audio/haptic revalidation:
+NO (no semantic or playback changes). Preserve the deferred benchmark FPS counter.
+
 Follow-on [opening fire-cost evidence](evidence/2026-09-30-opening-lighting-isolation/README.md)
 retains C1,S1,V1,V2 and separate uncooled C2:all9,190 completions and800 opening
 OpaqueFast rows pass exact admission. Opening GPU medianC1 66.670ms,

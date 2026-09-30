@@ -658,6 +658,29 @@ int main()
                       selectedShadow.find("vec3(0.08)") == std::string::npos &&
                       selectedShadow.find("origin, 0.000001, direction, maxDistance") != std::string::npos,
                       "selected glass shadows must measure finite geometric medium segments without authored half-thickness or scalar recovery light");
+        const std::size_t binaryVisibilityEnd = lightingSource.find(
+            "vec3 sceneShadowTransmittanceMask(", shadowEnd);
+        const std::string binaryVisibility = shadowEnd != std::string::npos &&
+            binaryVisibilityEnd != std::string::npos
+                ? lightingSource.substr(shadowEnd, binaryVisibilityEnd - shadowEnd) : "";
+        ok &= Require(!binaryVisibility.empty() &&
+                      binaryVisibility.find(
+                          "gl_RayFlagsNoOpaqueEXT | gl_RayFlagsTerminateOnFirstHitEXT, mask") != std::string::npos &&
+                      binaryVisibility.find(
+                          "origin, 0.0015, direction, max(maxDistance, 0.004)") != std::string::npos &&
+                      binaryVisibility.find("instance == kWaterfallInstance") != std::string::npos &&
+                      binaryVisibility.find("if (instance == 0)") != std::string::npos &&
+                      binaryVisibility.find("material == kMaterialClearGlass ||") != std::string::npos &&
+                      binaryVisibility.find("material == kMaterialWater;") != std::string::npos &&
+                      binaryVisibility.find(
+                          "if (!transparentWorldPane) rayQueryConfirmIntersectionEXT(query);") != std::string::npos &&
+                      binaryVisibility.find(
+                          "gl_RayQueryCommittedIntersectionNoneEXT ? 1.0 : 0.0;") != std::string::npos,
+                      "binary visibility must terminate only after an admitted opaque blocker without changing transparency, masks or ray bounds");
+        ok &= Require(shadowEnd != std::string::npos &&
+                      lightingSource.substr(0u, shadowEnd).find(
+                          "gl_RayFlagsTerminateOnFirstHitEXT") == std::string::npos,
+                      "nearest-surface and ordered dielectric shadows must not terminate on their first candidate");
         ok &= Require(raygenSource.find(
                           "layout(std430, set = 0, binding = 10) readonly buffer SecondSkeletonVertices") !=
                           std::string::npos,
