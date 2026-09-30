@@ -50,8 +50,8 @@
     },
     {
       "path": "checks/d504bfe-pr-ci-tests.log",
-      "bytes": 263,
-      "sha256": "c75b30f3a6be5b9ac33e5cc100fc99c425aa037a49ebb4199b0093084bd6af07"
+      "bytes": 259,
+      "sha256": "6d3563dd5480ceb44b544400123580218b79a2770d442a0ccb343292ec3dbd87"
     },
     {
       "path": "checks/d504bfe-pr-ci.json",
@@ -60,8 +60,8 @@
     },
     {
       "path": "checks/d504bfe-push-ci-tests.log",
-      "bytes": 263,
-      "sha256": "1c22701aa3deff08935d3a1c797437312d96edfa9c145556a125acabe884fb52"
+      "bytes": 259,
+      "sha256": "680d86567789d939531315152f63bdba9f4d9f23311b38441aad7175bb3ea8a3"
     },
     {
       "path": "checks/d504bfe-push-ci.json",
