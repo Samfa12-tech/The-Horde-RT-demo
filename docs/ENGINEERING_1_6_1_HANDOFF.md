@@ -30,6 +30,64 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### October 1 bounded render-scale resource checkpoint
 
+**Interruption checkpoint — October 1, owner updating Codex:** last validated
+pushed code checkpoint is `4870532638e3ca4b6fd89735bdf292c7bba16713`; this
+handoff-only preservation commit changes no production code. Verify actual HEAD
+and remote on resumption rather than assuming that earlier code SHA is the tip.
+The current worktree contains authorised, **uncommitted/incomplete** music changes;
+preserve them and all unrelated `.superpowers` scratch paths. Do not reset or
+declare their earlier pre-migration build evidence current.
+
+Owner's newest architecture steering: keep MusicDirector/A–H score/renders/tails/
+transitions; Horde owns gameplay-to-cue decisions. Reusable PCM looping/tail/
+crossfade/decoder code now moves into Pocket Audio Core, not a Horde-only engine.
+Canonical PCS JSON/PCS1 remains the musical source of truth. No editor/synth app
+code, score rewrite, package relicensing or production publication is authorised.
+The original owner score and sixteen prototype WAVs remain unchanged.
+
+Core work is isolated at `C:/Dev/tmp/horde-pocket-audio-core-native-20261001/source`,
+branch `codex/horde-native-pcm-core`, base `e803ae08042aef4f536ecd4478dac8cdf24def06`
+of Pocket-Chordsmith. Only `packages/pocket-audio-core/native/` is being added;
+the original Chordsmith checkout's unrelated changes are untouched. Generic
+fixed-capacity C++20 PCM stream and strict little-endian WAV decoder are in that
+subtree. Horde's current `MusicPcmStream`/`MusicPcmWave` changes are thin adapters,
+**not yet buildable here until the reviewed native-only Core pin/CMake admission
+is installed**. The Core package remains private/UNLICENSED; preserve metadata.
+Next: finish/review native Core tests, commit/push its scoped branch, pin only
+the native runtime/test subset with source hashes and unchanged licence metadata,
+wire Windows/Android CMake, rerun existing Horde contracts and current CI. Platform
+playback, persisted volume, asset admission and owner listening remain open.
+
+Owner-observed MSVC Debug modal was the **new standalone Core test**, not a game
+load: its test allocated8 output floats but supplied a12-float span. Lead verified
+and terminated only exact blocked PID99352. Worker corrected the test capacity,
+added bounded output construction and stderr/nonmodal CRT reports. Fresh focused
+Debug1/1 (1.03s), Release1/1 (0.68s), MSVC ASan1/1 (1.45s) pass; lead read actual
+logs. Original failures are retained externally. Lead also caught and the worker
+fixed an early natural-tail handoff regression in the generic port; body-complete
+precondition/early-interruption test now pass. ASan configuration still warns
+C4530 (`/EHsc` missing); resolve that build-option warning before final acceptance.
+Core is uncommitted and Horde integration tests/builds remain pending.
+
+Phone opaque-secondary cost-bound run has **completed all8 reports** (C1/S1/S2/C2,
+route1838/live600 each, expected9752 owning rows), log under
+`C:/Dev/tmp/horde-opaque-secondary-profile-20261001/logs/lead-abba-20261001.log`.
+Exec4214 exited0; normal physical benchmark control retained/Home, normal DebugC11
+untouched. Isolate APK `ce1c1548ed3937d1ab99b57c523b62a8a1e244538c01e9075bb2f7e56e766cce`
+is deliberately nonphysical and **never a Shipping/quality candidate**. No new
+production-performance conclusion follows from this omitted-work variant. All8
+v2 parses and aggregate now pass9752 owning rows; exact output is
+`opaque-secondary-abba-v2-final-20261001.json` under the external root. Lead read
+the compact per-run table/context; independent raw reparse/portable curation is
+still pending. OpeningGPU C1/S1/S2/C2 medians66.55/40.91/38.11/80.80ms; live
+223.39/275.97/302.41/258.07ms. Live got slower descriptively; do not force this
+variant into production or treat omitted-work results as additive ray savings.
+Versioned v2 parser strengthens context/13 CPU stages/row ownership;13 negative
+tests pass, v1 artifacts remain superseded, not rewritten. Workers have stopped
+and saved external `HANDOFF.md` in each root; resume from those exact results,
+not new phone runs. No active device/build/test process remains from these tasks.
+Audio/haptic manual revalidation:NO for this unwired source/profiling checkpoint.
+
 Independent music slice: original `MusicPcmStream` cursor/mixer now handles exact
 12s PCM loops with3s overlap tails, bounded250ms cue fades and natural C→D/G→H
 tail continuity, suspension/discontinuity/reset/independent gain. One audio-thread
@@ -60,9 +118,10 @@ primary/direct/physical-glass/geometry. No omitted-work reference will ship.
 Current30FPS remains a design target, not an achieved/quality-preserving forecast.
 Audio/haptic manual revalidation:NO (unchanged semantic inputs/playback).
 
-Fresh37e0882 push36763806722/PR36763810540 PASS46portable on eachGCC/Clang/MSVC
-plus13Vulkan CPU-host fixtures; actual logs read, MSVCstress0.13s inPR. PR15draft
-description updated, CLEAN; no merge/publication. Later source needs fresh CI.
+Fresh4870532 push36774441284/PR36774451968 PASS47portable on eachGCC/Clang/MSVC
+plus13Vulkan CPU-host fixtures; actual current-head logs read. PCM stream test
+passes0.16–0.21s. PR15draft description updated/read back at4870532, CLEAN/MERGEABLE;
+no merge/publication. The additional WAV loading slice needs fresh source CI.
 
 Current follow-on: [isolated native-ray witness](evidence/2026-10-01-isolated-glass-rays/README.md)
 closes the ambiguity, not Phase4. Normal1closed budget event/80reason2 are all real
