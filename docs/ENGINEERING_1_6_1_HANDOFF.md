@@ -78,10 +78,10 @@ warning, with unmatched thermal0→2/battery33.8→42.1C; require matchedShippin
 follow-up after correctness, not an assumed thermal explanation or speedup.
 No performance improvement orS24/S25 pass. Audio/haptic manual revalidation:NO.
 
-Product-state note: September30 `get_goal` still reports `blocked` despite the
-owner's explicit continuation request. The available goal tools cannot set it
-active; automatic resumption needs the product's Resume control. This is not a
-new pause instruction, usage guard or claim that independent host work is blocked.
+Product-state note: an earlier September30 `get_goal` read reported `blocked`
+despite the owner's continuation request. A later fresh read now reports
+**active**. No additional owner action, pause instruction or usage guard applies;
+continue independent host work while physical-phone actions wait for reconnection.
 
 Next classify remaining exact live rows/interface exhaustion/contact recoveries,
 finish geometric-shadow/live acceptance and changed-pixel attribution; only then
