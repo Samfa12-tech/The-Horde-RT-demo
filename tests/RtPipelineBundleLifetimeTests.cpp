@@ -335,7 +335,9 @@ int main()
     ok &= Require(RejectsForgedAdoption(std::move(forgedDescriptor)),
                   "adoption must reject a forged descriptor/IO plan before ownership");
     auto forgedBindingRoster = MakePreflight();
-    forgedBindingRoster.descriptorIo.bindings[22u].binding = 22u;
+    // Diagnostic already has binding 22 here; assigning 22 was a no-op.
+    // Increment the actual roster value so both compiled policies are forged.
+    ++forgedBindingRoster.descriptorIo.bindings[22u].binding;
     ok &= Require(RejectsForgedAdoption(std::move(forgedBindingRoster)),
                   "adoption must reject a forged non-contiguous descriptor binding roster");
     auto forgedPath = MakePreflight();
