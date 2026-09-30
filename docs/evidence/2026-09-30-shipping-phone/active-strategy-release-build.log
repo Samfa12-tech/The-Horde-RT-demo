@@ -1,0 +1,52 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  PlayerAnimationState.cpp
+  PlayerIkTargets.cpp
+  HeldItemKinematics.cpp
+  HeldLightState.cpp
+  GameSimulation.cpp
+  Generating Code...
+  horde_gameplay_simulation.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Release\horde_gameplay_simulation.lib
+  Building Custom Rule C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/CMakeLists.txt
+  RtBenchmarkEvidenceRunTests.cpp
+  RtBenchmarkEvidenceRun.cpp
+  RtBenchmarkEvidenceReport.cpp
+  RtPerformanceEvidence.cpp
+  ShowcaseBenchmark.cpp
+  Generating Code...
+  horde_rt_benchmark_evidence_run_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Release\horde_rt_benchmark_evidence_run_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  horde_gameplay_simulation.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Release\horde_gameplay_simulation.lib
+  Building Custom Rule C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/CMakeLists.txt
+  RtBenchmarkEvidenceReportTests.cpp
+  ShowcaseBenchmark.cpp
+  RtBenchmarkEvidenceReport.cpp
+  RtBenchmarkEvidenceRun.cpp
+  RtPerformanceEvidence.cpp
+  Generating Code...
+  horde_rt_benchmark_evidence_report_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Release\horde_rt_benchmark_evidence_report_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  Building Custom Rule C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/CMakeLists.txt
+  RtFrameEvidenceCoordinatorTests.cpp
+  RtFrameEvidenceCoordinator.cpp
+  GpuFrameTimer.cpp
+  RtPerformanceEvidence.cpp
+  Generating Code...
+  horde_rt_frame_evidence_coordinator_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Release\horde_rt_frame_evidence_coordinator_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  Building Custom Rule C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/CMakeLists.txt
+  RtEvidencePublicationTests.cpp
+  RtEvidencePublication.cpp
+  RtPerformanceEvidence.cpp
+  Generating Code...
+  horde_rt_evidence_publication_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Release\horde_rt_evidence_publication_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  Building Custom Rule C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/CMakeLists.txt
+  RtPerformanceEvidenceTests.cpp
+  RtPerformanceEvidence.cpp
+  Generating Code...
+  horde_rt_performance_evidence_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Release\horde_rt_performance_evidence_tests.exe

@@ -1,0 +1,83 @@
+Start testing: Sep 30 17:15 AUS Eastern Standard Time
+----------------------------------------------------------
+6/77 Testing: horde_rt_benchmark_evidence_report_tests
+6/77 Test: horde_rt_benchmark_evidence_report_tests
+Command: "C:/Dev/tmp/horde-phase3-native-20260923/Release/horde_rt_benchmark_evidence_report_tests.exe"
+Directory: C:/Dev/tmp/horde-phase3-native-20260923
+"horde_rt_benchmark_evidence_report_tests" start time: Sep 30 17:15 AUS Eastern Standard Time
+Output:
+----------------------------------------------------------
+RT benchmark evidence report tests passed.
+<end of output>
+Test time =   1.64 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_benchmark_evidence_report_tests" end time: Sep 30 17:15 AUS Eastern Standard Time
+"horde_rt_benchmark_evidence_report_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+8/77 Testing: horde_rt_benchmark_evidence_run_tests
+8/77 Test: horde_rt_benchmark_evidence_run_tests
+Command: "C:/Dev/tmp/horde-phase3-native-20260923/Release/horde_rt_benchmark_evidence_run_tests.exe"
+Directory: C:/Dev/tmp/horde-phase3-native-20260923
+"horde_rt_benchmark_evidence_run_tests" start time: Sep 30 17:15 AUS Eastern Standard Time
+Output:
+----------------------------------------------------------
+Full-route RT benchmark evidence owner tests passed.
+<end of output>
+Test time =   1.63 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_benchmark_evidence_run_tests" end time: Sep 30 17:15 AUS Eastern Standard Time
+"horde_rt_benchmark_evidence_run_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+9/77 Testing: horde_rt_evidence_publication_tests
+9/77 Test: horde_rt_evidence_publication_tests
+Command: "C:/Dev/tmp/horde-phase3-native-20260923/Release/horde_rt_evidence_publication_tests.exe"
+Directory: C:/Dev/tmp/horde-phase3-native-20260923
+"horde_rt_evidence_publication_tests" start time: Sep 30 17:15 AUS Eastern Standard Time
+Output:
+----------------------------------------------------------
+RT evidence publication tests passed.
+<end of output>
+Test time =   1.61 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_evidence_publication_tests" end time: Sep 30 17:15 AUS Eastern Standard Time
+"horde_rt_evidence_publication_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+11/77 Testing: horde_rt_performance_evidence_tests
+11/77 Test: horde_rt_performance_evidence_tests
+Command: "C:/Dev/tmp/horde-phase3-native-20260923/Release/horde_rt_performance_evidence_tests.exe"
+Directory: C:/Dev/tmp/horde-phase3-native-20260923
+"horde_rt_performance_evidence_tests" start time: Sep 30 17:15 AUS Eastern Standard Time
+Output:
+----------------------------------------------------------
+Immutable RT performance evidence tests passed.
+<end of output>
+Test time =   1.81 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_performance_evidence_tests" end time: Sep 30 17:15 AUS Eastern Standard Time
+"horde_rt_performance_evidence_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+62/77 Testing: horde_rt_frame_evidence_coordinator_tests
+62/77 Test: horde_rt_frame_evidence_coordinator_tests
+Command: "C:/Dev/tmp/horde-phase3-native-20260923/Release/horde_rt_frame_evidence_coordinator_tests.exe"
+Directory: C:/Dev/tmp/horde-phase3-native-20260923
+"horde_rt_frame_evidence_coordinator_tests" start time: Sep 30 17:15 AUS Eastern Standard Time
+Output:
+----------------------------------------------------------
+RT frame evidence coordinator tests passed.
+<end of output>
+Test time =   1.24 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_frame_evidence_coordinator_tests" end time: Sep 30 17:15 AUS Eastern Standard Time
+"horde_rt_frame_evidence_coordinator_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+End testing: Sep 30 17:15 AUS Eastern Standard Time

@@ -28,7 +28,44 @@ without loosening tolerance. Include live motion, not just frozen extreme poses.
 Music, consent-based reporting, resource work and final gates remain in scope;
 licensing, signing recovery and publication remain owner-controlled.
 
-### Current Phase 4 checkpoint
+### September 30 Shipping comparison and opening-room checkpoint
+
+[Complete retained phone evidence](evidence/2026-09-30-shipping-phone/README.md):
+frozen A(d504bfe)/B(8cbe0ac, runtime d63e29c) ABBA route/high/live completes all
+12ledgers, plus uncooled B0context. Shipping/Mobile,75%, exactSM-S948B,
+nativepipeline/strictASTC; every row is completed/presented/validGPU with null
+compiled-out diagnostics. Owner ice-brick cooling is a separate condition;
+A1route spans cooldown and is excluded from causal ordinary-route comparison.
+Descriptive held-high238.523→225.329ms(−5.53%), live248.414→236.645(−4.74%)
+mean-of-run-medians are not causal gain or30FPS acceptance. Candidate route
+~16.61FPS, held-high~4.44, live~4.23. GPU clock unavailable, actual display
+pacing/uncooled sustained target remain open; do not manufacture a quality cut.
+
+Minimal export8fbd46c validated Debug5/5 andRelease5/5; exact export-only APK
+ab3e2261 (sourceeafbf82, shader bytes=B) proves all1,838 ordinary rows and all160
+opening rows actually use OpaqueFast. Opening cycle77.7652ms/GPU66.4793median:
+the ordinary-gameplay problem is not accidental generic-glass dispatch.
+
+Temporary detached18616f4 plus v3patch (NOT accepted production source), exact
+APKcbfc5cf4, reuses two timers and real transaction/fence ownership. Stage admission
+joins1,838/1,838 rows through seven identity fields. Opening GPU AS0.4956ms median,
+RTdispatch65.6335ms; geometry updates are not the dominant GPU cost, though player
+geometry traversal inside dispatch is not excluded. Torch/lighting/shadow cost
+still needs controlled attribution. v2stage admission rejected its missing final
+pair; v3 fixes captured-frame versus post-Advance run state. Both raw ledgers/
+patches remain, counts/tolerances unchanged. No shader or player change promoted.
+Probe query/log overhead and22.3→27.6C cooling prohibit a frame-time gain claim.
+
+Fresh18616f4 push36684658361/PR36684662870 green45portable+11Vulkan-host,
+logs inspected; PR15 draft/clean/mergeable, not merged. Android ARM64 benchmark/
+probe builds and actual shader containment pass; not four-ABI/final matrix,
+Windows RTX acceptance or phonecompute/S24/S25 certification. No audio/haptic
+manual revalidation (semantic/playback unchanged). Next: controlled opening
+lighting/shadow attribution, then demonstrated glass failures/recovery admission,
+physical attenuation/live/changed-pixel/backend gates. Preserve accepted players
+and later music/reporting/resource/pacing/FPS-counter/final scope. Goal active.
+
+### Current Phase 4 glass-correctness checkpoint
 
 Implementation `d63e29c7f119a180ce2a6504831d501e8ba0a95e` closes the demonstrated
 row237 numerical defect: [per-hit normal-separation proof and ordinary evidence](evidence/2026-09-30-glass-spawn/derived-normal-bias/README.md).

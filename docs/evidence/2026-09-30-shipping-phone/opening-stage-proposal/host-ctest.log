@@ -1,0 +1,8 @@
+Internal ctest changing into directory: C:/Dev/tmp/horde-shipping-ab-20260930/opening-stage-proposal/host
+Test project C:/Dev/tmp/horde-shipping-ab-20260930/opening-stage-proposal/host
+    Start 61: horde_rt_gpu_frame_timer_collection_tests
+1/1 Test #61: horde_rt_gpu_frame_timer_collection_tests ...   Passed    1.64 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   1.65 sec

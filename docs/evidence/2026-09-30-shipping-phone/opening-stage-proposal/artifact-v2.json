@@ -1,0 +1,10 @@
+{
+  "baseCommit": "18616f4fdab2da24e822c999006f39f6cff258eb",
+  "sourceDirty": true,
+  "patchSha256": "c4c65e9f232509a4dd8b530e878cbc5ce1ed7ffebf067cc98eba358a08dcf2c9",
+  "apkSha256": "dfd5c35e6e663b8ef1d8c74c44c6329b9c25f87ad7faef0626f606f3b061dd3e",
+  "nativeSha256": "2d87757ad45081a51c154c7a999767a94d7b8c6041cbe68fdf16c92ec5f0b500",
+  "purpose": "Temporary opt-in GPU AS/RT-stage timestamps with explicit uncompleted statuses",
+  "shaderHashesMatchFrozenB": true,
+  "installed": false
+}

@@ -4,6 +4,29 @@ Last updated: 2026-09-30
 
 ## September 30: Shipping75% performance foundation (local SM-S948B evidence)
 
+Follow-on [complete ABBA/opening evidence](evidence/2026-09-30-shipping-phone/README.md)
+retains12repeated plus2uncooled ledgers, exact installed pullbacks and complete
+thermal samples on **SM-S948B**. Cooled candidate B1/B2 ordinary median60.1974/
+60.2236ms; held-high225.0845/225.5739ms; live236.4664/236.8237ms. Descriptive
+mean-of-run-medians high−5.53%, live−4.74%, not a causal gain/30FPS pass. A1route
+crosses cooldown and is excluded from causal ordinary comparison; uncooled
+sustained and actual display pacing remain open.
+
+Export-only eafbf82 APKab3e2261fd081f87e667a6e4967e2476077fa96554702330e6aa49baa8133eae
+installs/pulls back identically, same four GPU shader hashes as B:1,838/1,838 valid
+ordinary completions, allOpaqueFast including160opening frames. Opening cycle
+median77.7652ms/GPU66.4793ms. Temporary opt-in detached18616f4/v3patch APK
+cbfc5cf40d15b8a7c64561d4eff11a2dbf0a9dd9c7179da9a53850ef74905204 also installs/
+pulls back identically;1,838 exact seven-field stage joins including final frame.
+Opening GPU AS0.4956ms/dispatch65.6335ms median, external cooling22.3→27.6C/
+thermal0/GPUpower0. This separates update cost from RT dispatch, not torch/shadow
+or geometry-traversal attribution. No probe source/shader optimisation promoted;
+v2missing-final-pair admission rejection retained. All runs remain75%/native
+pipeline/strictASTC, Shipping null diagnostics are not correctness acceptance.
+Only `.benchmark` changed, no app data cleared/stable package touched. Current
+18616f4 push/PR green45portable+11Vulkan-host; phonecompute, exactS24/S25 and
+final RT-device acceptance remain separate/open. Audio/haptic revalidation:NO.
+
 Exact ARM64 non-debuggable development-signed Shipping/Mobile benchmark APK
 `b5a4344b6f860259d88a4d7bae3d349f462704c9f5a689773626f8a93dc39c6f`
 (source8cbe0ac, runtime d63e29c) installs/pulls back identically on **SM-S948B**.

@@ -1,0 +1,10 @@
+{
+  "artifact": "opening-stage-probe",
+  "package": "com.samfa12.hordelanternrt.benchmark",
+  "deviceModel": "SM-S948B",
+  "serial": "R5GL219SZGK",
+  "installedApkSha256": "dfd5c35e6e663b8ef1d8c74c44c6329b9c25f87ad7faef0626f606f3b061dd3e",
+  "utc": "2026-09-30T08:02:54.7423117Z",
+  "appDataCleared": false,
+  "stableAppTouched": false
+}

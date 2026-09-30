@@ -65,6 +65,11 @@ docs/evidence/2026-09-30-glass-spawn/cpu/*.patch whitespace=-blank-at-eol,cr-at-
 docs/evidence/2026-09-30-glass-spawn/remaining-row237/*.patch whitespace=-blank-at-eol,cr-at-eol
 docs/evidence/2026-09-30-glass-spawn/checks/*.log whitespace=-blank-at-eol,cr-at-eol
 docs/evidence/2026-09-30-glass-spawn/windows/**/HordeLanternRT-benchmark-*.txt whitespace=-blank-at-eol,cr-at-eol
+docs/evidence/2026-09-30-shipping-phone/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-30-shipping-phone/**/*.log whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+docs/evidence/2026-09-30-shipping-phone/**/*.patch whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-09-30-shipping-phone/candidate/*.txt whitespace=-blank-at-eof,cr-at-eol
+docs/evidence/2026-09-30-shipping-phone/opening-stage-proposal/PROPOSAL.md whitespace=-blank-at-eof,cr-at-eol
 
 # Exact accepted paired-manifest bytes are part of runtime admission/provenance.
 assets/models/player/runtime/asset.manifest.json -text whitespace=cr-at-eol

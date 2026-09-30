@@ -1,6 +1,6 @@
 # 1.6.1 engineering programme and release gates
 
-Updated 2026-09-20. Status: **in development; not ready for final comprehensive validation or release**.
+Updated 2026-09-30. Status: **in development; not ready for final comprehensive validation or release**.
 
 This is the current next-step index for `codex/horde-1.6.1-engineering-pass`.
 The owner-authorised full repository audit remains in scope. The 2026-09-13
@@ -60,7 +60,11 @@ set is complete. It does not authorise publication or relax any RT requirement.
 Phase1 measurement-foundation gate is accepted after the
 [exact held-high source-baseline A/B](ENGINEERING_1_6_1_LANTERN_ABBA_2026-09-20.md),
 which records the gate-by-gate evidence and its public-APK/source-harness boundary.
-Next is Phase2 player semantic repair. This is not closure of physical glass
+Phase2 technical admission and Phase3 owner-accepted presentation are recorded
+in the current [handoff](ENGINEERING_1_6_1_HANDOFF.md); do not restart them. Current
+priority is Phase4 correctness and exact-phone Shipping performance, including
+the [opening-room/ABBA evidence](evidence/2026-09-30-shipping-phone/README.md).
+This is not closure of physical glass
 correctness, all-view/causal performance, exact S24/S25 acceptance or final validation.
 Historical entries above retain their original evidence status; the new gate
 decision supersedes their then-open measurement-foundation status only.
