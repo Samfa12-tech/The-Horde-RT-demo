@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "algorithm": "SHA-256",
+  "root": "docs/evidence/2026-10-01-music-bank",
+  "manifestExcludesSelf": true,
+  "fileCount": 16,
+  "files": [
+    {
+      "path": "asan-build-noincremental.log",
+      "bytes": 741,
+      "sha256": "bc7234862bfda9ab03f8ce61ada8a38c373c39e2c8be8d6a289c5013d37cafdb"
+    },
+    {
+      "path": "asan-build.log",
+      "bytes": 1547,
+      "sha256": "471aeb7fbb2e36f313e55f8e7e6f5423ba337440df2452b04465dc34eb856a85"
+    },
+    {
+      "path": "asan-configure-noincremental.log",
+      "bytes": 548,
+      "sha256": "6517d7e31434f268d7874a2d14cfebbcc79704087792b23d6df3780947681632"
+    },
+    {
+      "path": "asan-configure.log",
+      "bytes": 920,
+      "sha256": "bb5c85bc24e593d95ac55bad057022f95245c42402cce9f9c5318c6a9f0104fd"
+    },
+    {
+      "path": "asan-run-noincremental.log",
+      "bytes": 144,
+      "sha256": "5d81ed2f575bad1cb5b7694fff22d42986aa71e3e17af99804f279c35bb85ed5"
+    },
+    {
+      "path": "asan-run.log",
+      "bytes": 144,
+      "sha256": "5d81ed2f575bad1cb5b7694fff22d42986aa71e3e17af99804f279c35bb85ed5"
+    },
+    {
+      "path": "music-bank-actual-module-validation.log",
+      "bytes": 3733,
+      "sha256": "378e89313f95d74bbb267174eb33b4d558f235aad19be90515727784f43eadcb"
+    },
+    {
+      "path": "music-bank-android-debug.log",
+      "bytes": 2232,
+      "sha256": "019059dfec9ab7049dc8d96c7e439af84b790643f0ec4750522b5dd5daa0a7b1"
+    },
+    {
+      "path": "music-bank-build-debug.log",
+      "bytes": 1304,
+      "sha256": "5003c85e697e4ae976efc600bbfd1f6348a2d19b3e2213d831383d1b2b527700"
+    },
+    {
+      "path": "music-bank-build-release.log",
+      "bytes": 1318,
+      "sha256": "df323c4ec4f816e4a4ee2913a177b6790c3d7f7387dddf77ee5112ad91864b77"
+    },
+    {
+      "path": "music-bank-configure.log",
+      "bytes": 630,
+      "sha256": "edc1cfc4b7e3120a58e1d91e8c28cc6cf8ca332b0764b103cc5ffb087d992f79"
+    },
+    {
+      "path": "music-bank-ctest-debug.log",
+      "bytes": 1013,
+      "sha256": "33c9f59f0fb7fa7193c271e5f1b9ad78b4d7e7a3061180bf8f6611cf760015c0"
+    },
+    {
+      "path": "music-bank-ctest-release.log",
+      "bytes": 1013,
+      "sha256": "2c30484f47f47162f5173d7aaf1e0435b20f5dcf93cb23dd48b0ce1e6e7e7a7f"
+    },
+    {
+      "path": "music-bank-package-receipt.json",
+      "bytes": 1226,
+      "sha256": "2a50297e4bf2841871a3f1cff6378562d273bbd55898021515ecc8e069d0fc34"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3015,
+      "sha256": "5d9db16da0ee309c24fdc4dcfe7d593ea64ee9d414dc4d370d44c9ce13ad918c"
+    },
+    {
+      "path": "verify-music-bank-package.ps1",
+      "bytes": 4468,
+      "sha256": "e222ac28f333df4a7aa194cc22ad47b1f686a8c21e4d0f73871299e3d324a53f"
+    }
+  ]
+}

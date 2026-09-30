@@ -28,6 +28,29 @@ without loosening tolerance. Include live motion, not just frozen extreme poses.
 Music, consent-based reporting, resource work and final gates remain in scope;
 licensing, signing recovery and publication remain owner-controlled.
 
+### October 1 immutable music bank checkpoint
+
+`MusicPcmAssetBank` transactionally loads sixteen bounded WAVs through Core,
+owns20,160,000B immutable PCM, and exports spans only after complete success.
+Read/size/format/allocation failures release all partial storage and permit a
+clean pre-playback retry. Ready banks cannot reload/move/copy; stop/join audio
+before destruction. No platform output, event-routing, thread or sample clock
+is wired. Score/PCM/Core pin and accepted player/renderer are unchanged.
+
+Lead fresh MSVC Debug/Release6/6 focused PASS; real Windows RT links both.
+Focused bank MSVC ASan PASS with no diagnostics; initial incremental-link warning
+is retained separately from the corrected warning-free run. Android Debug builds
+four ABIs; actual APK450d2cf6…dfb3f2d is not installed. Exact17 music entries/current
+licence and52 prior assets pass. Four actual ARM64 Diagnostic/Mobile modules
+fresh val/dis PASS and matchC11. [Exact bank evidence](evidence/2026-10-01-music-bank/README.md).
+
+Pushed199697b fresh push36789021436/PR36789031208 each passed51/51 GCC/Clang/MSVC
+and13/13 Vulkan CPU-host fixtures; actual logs inspected. Bank adds the52nd common
+test; obtain its current-source CI after push. PR15 remains draft, not merged.
+Preserve four unrelated scratch paths. Next: platform PCM output/consumed clock,
+separate persisted volume, owner listening. Glass/Mobile performance gates open.
+Audio/haptic manual revalidation:NO while unwired; YES for audible integration.
+
 ### October 1 runtime music asset checkpoint
 
 Canonical JSON/PCS1 imported verbatim; all18 source/runtime hashes and parsed
@@ -47,8 +70,8 @@ Native PCM budget20,160,000B; no playback/thread/clock/listening claim.
 
 Pushed0db0d0b current-source push36785502646/PR36785508204 each pass50/50
 GCC/Clang/MSVC and13/13 Vulkan CPU-host fixtures; lead read actual logs.
-PR15 description updated/read back, draft/CLEAN/MERGEABLE. This new asset slice
-adds the51st common host test; its pushed-source CI must be obtained separately.
+PR15 description updated/read back, draft/CLEAN/MERGEABLE. This asset slice's
+51st common host test now passes current-source CI as recorded above.
 Phone unavailable per latest owner instruction; no device actions attempted.
 Next: immutable native bank loading, platform PCM output/consumed sample clock,
 separate persisted volume and owner listening. Physical glass remains open.

@@ -2,6 +2,18 @@
 
 Last updated: 2026-10-01
 
+## October 1: immutable music bank build only (no new device acceptance)
+
+Android Debug compiles the bounded transactional native bank for four ABIs.
+Actual universal APK450d2cf6…dfb3f2d (113,350,863B) is not installed. Exact17 music
+entries/current attribution and52 prior render/SFX assets pass; actual ARM64
+native5b122656…27619d is3,719,384B. Four actual Diagnostic/Mobile pipeline/compute
+modules freshly val/dis PASS with unchangedC11 identities. Host bank tests and
+MSVC ASan pass, but platform PCM output/lifecycle/listening are not wired/proven.
+No new SM-S948B RT, audio, pacing or performance acceptance; S24/S25 unverified.
+Audio/haptic manual:NO while unwired, YES for later playback/mix changes.
+[Build-only bank evidence](evidence/2026-10-01-music-bank/README.md).
+
 ## October 1: runtime music admission build only (no new device acceptance)
 
 Android Debug builds all four ABIs and admits only the reviewed manifest plus

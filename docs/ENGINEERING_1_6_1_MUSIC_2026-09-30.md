@@ -62,6 +62,32 @@ No phone install, listening or performance acceptance follows from package tests
 Audio/haptic manual revalidation:NO for unwired assets; YES when audible music
 or mixing is integrated.
 
+## Immutable native bank - October 1
+
+`MusicPcmAssetBank` now owns the admitted20,160,000-byte decoded bank. Sixteen
+bounded file/asset reads occur before audio starts; all decoding delegates to
+Pocket Audio Core. A late read/size/format/allocation failure releases every
+partial clip and exposes no playback spans. Ready storage cannot reload, move
+or copy; the playback owner must stop/join before its destruction. No platform
+reader, PCM output callback, game event drain or shared-source change is wired yet.
+
+Fresh MSVC Debug/Release each6/6 focused tests pass, including the real asset
+bank, thirteen-successful-clip failure/retry cases and actual Core output. The
+focused bank test also passes MSVC AddressSanitizer; initial incremental-link
+warning and corrected warning-free run are retained separately. Real Windows RT
+executables link both configurations. Android Debug builds four ABIs; actual
+APK450d2cf6…dfb3f2d has exact17 music entries, current attribution and52 unchanged
+render/SFX assets. Four actual ARM64 Diagnostic/Mobile modules freshly val/dis
+PASS, identities unchanged. Not installed, and no native playback/listening or
+device claim. [Bank evidence](evidence/2026-10-01-music-bank/README.md).
+
+Asset checkpoint199697b fresh push36789021436/PR36789031208 each passed51/51
+GCC/Clang/MSVC plus13/13 Vulkan CPU-host fixtures. Bank adds the52nd common test;
+its current-source CI must be obtained separately after push. Next remains
+platform output/consumed-sample clock, persisted independent Music Volume and
+native seam/transition/lifecycle/SFX listening. Audio/haptic manual revalidation:
+NO while unwired; YES when playback is audible.
+
 ## Implemented contract
 
 `src/audio/MusicDirector.*` owns no playback resources or allocation. It reads
