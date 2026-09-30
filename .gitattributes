@@ -62,6 +62,7 @@ docs/evidence/2026-09-30-glass-live/rays/probe/*.patch whitespace=-blank-at-eol,
 docs/evidence/2026-09-30-glass-live/windows-high-*/HordeLanternRT-benchmark-*.txt whitespace=-blank-at-eol,cr-at-eol
 docs/evidence/2026-09-30-glass-spawn/** -text whitespace=cr-at-eol
 docs/evidence/2026-09-30-glass-spawn/cpu/*.patch whitespace=-blank-at-eol,cr-at-eol
+docs/evidence/2026-09-30-glass-spawn/remaining-row237/*.patch whitespace=-blank-at-eol,cr-at-eol
 docs/evidence/2026-09-30-glass-spawn/checks/*.log whitespace=-blank-at-eol,cr-at-eol
 docs/evidence/2026-09-30-glass-spawn/windows/**/HordeLanternRT-benchmark-*.txt whitespace=-blank-at-eol,cr-at-eol
 

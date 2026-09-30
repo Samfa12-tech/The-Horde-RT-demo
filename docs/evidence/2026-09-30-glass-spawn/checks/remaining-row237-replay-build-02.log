@@ -1,0 +1,6 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  horde_gameplay_simulation.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_gameplay_simulation.lib
+  horde_rt_probe_core.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_probe_core.lib
+  DiagnosticWindow.cpp
+  horde_rt_diagnostic_window.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\HordeLanternRT.exe

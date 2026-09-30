@@ -30,6 +30,19 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### Current Phase 4 checkpoint
 
+Pushed implementation checkpoint: `d504bfed51976e71e496ead81dbd284bec03da33`.
+Fresh push36664721346 and PR36664727983 CI are green45portable+11Vulkan-host;
+both logs inspected. PR15 is draft/mergeable and description updated. This is
+current source/host coverage, not whole-glass or physical acceptance.
+
+Remaining [RTX row237/tick840 is reproduced](evidence/2026-09-30-glass-spawn/remaining-row237/README.md)
+with all41 counters matching each backend's live row; native exits0/0. Output-only
+marker locates two failures at(515,569),(515,570) without changing counters.
+Cause is not yet classified. Probe sources/modules are removed; eight-key
+production Freeze/adapter/native rebuild restored exact d504bfe source/modules.
+Next collect native object-ray and guard-eligibility records for those two rays,
+then independently classify row43 mismatch and row454 failure. No player tuning.
+
 Bounded rectangular spawn correction candidate03c is now validated locally:
 [September30 numerical-spawn evidence](evidence/2026-09-30-glass-spawn/README.md).
 Loader-derived width/error and flag4096 occupy formerly unused material lanes;
@@ -64,6 +77,11 @@ Phone Diagnostic273ms versus predecessor167ms is an unresolved regression
 warning, with unmatched thermal0→2/battery33.8→42.1C; require matchedShipping
 follow-up after correctness, not an assumed thermal explanation or speedup.
 No performance improvement orS24/S25 pass. Audio/haptic manual revalidation:NO.
+
+Product-state note: September30 `get_goal` still reports `blocked` despite the
+owner's explicit continuation request. The available goal tools cannot set it
+active; automatic resumption needs the product's Resume control. This is not a
+new pause instruction, usage guard or claim that independent host work is blocked.
 
 Next classify remaining exact live rows/interface exhaustion/contact recoveries,
 finish geometric-shadow/live acceptance and changed-pixel attribution; only then
