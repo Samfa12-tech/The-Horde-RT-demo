@@ -87,7 +87,7 @@ jobs:
           "assets/textures/meshy/lich_placeholder_v01/*.ktx2"
           "tests/fixtures/*/*.glb"
 
-      - name: Configure Vulkan CPU-host player lane
+      - name: Configure Vulkan CPU-host player and resource lane
         run: >-
           cmake -S . -B build/player-vulkan-host
           -DCMAKE_BUILD_TYPE=Release
@@ -98,7 +98,7 @@ jobs:
           -DHORDE_RT_INSTRUMENTATION_OVERRIDE=Shipping
           -DHORDE_RT_DIELECTRIC_QUALITY_OVERRIDE=Mobile
 
-      - name: Build focused player Vulkan-host targets
+      - name: Build focused player and resource Vulkan-host targets
         run: >-
           cmake --build build/player-vulkan-host
           --config Release
@@ -111,11 +111,13 @@ jobs:
           horde_rt_static_gltf_asset_tests
           horde_rt_skinned_character_smoke
           horde_rt_skinned_arm_reference_tests
+          horde_rt_scene_initialise_preflight_tests
+          horde_rt_scene_resource_inventory_tests
 
-      - name: Run focused player contract and semantic fixtures
+      - name: Run focused player, semantic and output-ownership fixtures
         run: >-
           ctest --test-dir build/player-vulkan-host
           --build-config Release
           --output-on-failure
           --no-tests=error
-          -R "^(horde_rt_player_primitive_contract_tests|horde_rt_player_manifest_agreement_tests|horde_rt_player_animation_tests|horde_rt_held_item_socket_tests|horde_rt_scene_abi_tests|horde_rt_static_gltf_asset_tests|horde_rt_skinned_character_smoke|horde_rt_skinned_arm_reference_tests|horde_rt_player_skinned_semantic_fixtures|horde_rt_player_viewmodel_admission|horde_rt_player_viewmodel_pose_fixtures)$"
+          -R "^(horde_rt_player_primitive_contract_tests|horde_rt_player_manifest_agreement_tests|horde_rt_player_animation_tests|horde_rt_held_item_socket_tests|horde_rt_scene_abi_tests|horde_rt_static_gltf_asset_tests|horde_rt_skinned_character_smoke|horde_rt_skinned_arm_reference_tests|horde_rt_player_skinned_semantic_fixtures|horde_rt_player_viewmodel_admission|horde_rt_player_viewmodel_pose_fixtures|horde_rt_scene_initialise_preflight_tests|horde_rt_scene_resource_inventory_tests)$"
