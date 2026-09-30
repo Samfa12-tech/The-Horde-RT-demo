@@ -477,8 +477,9 @@ if(BUILD_TESTING)
                 ${CMAKE_CURRENT_SOURCE_DIR}/tests/RaygenVariantArtifactTests.ps1)
         add_test(NAME horde_rt_rayquery_compute_shader_tests
             COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
-                ${CMAKE_CURRENT_SOURCE_DIR}/tests/ValidateRayQueryComputeShader.ps1
-                -OutputDirectory ${CMAKE_CURRENT_BINARY_DIR}/rayquery-shader-contract)
+                ${CMAKE_CURRENT_SOURCE_DIR}/tests/ValidateRayQueryComputeShader.ps1)
+        # The validator owns a unique external temp directory and cleans it up.
+        # In-repository presets must not stage compiler output inside the checkout.
         set_tests_properties(horde_rt_rayquery_compute_shader_tests PROPERTIES TIMEOUT 180)
         add_test(NAME horde_rt_pipeline_policy_fence_tests
             COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
