@@ -12,6 +12,8 @@ param(
 
 $ErrorActionPreference = "Stop"
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
+. (Join-Path $PSScriptRoot "music-asset-policy.ps1")
+$null = Assert-HordeMusicAssets -RepositoryRoot $repoRoot
 . (Join-Path $PSScriptRoot "version-contract.ps1")
 $sourceIdentity = Get-HordeSourceIdentity -RepoRoot $repoRoot
 $outputRootFull = [IO.Path]::GetFullPath($OutputRoot)
@@ -308,6 +310,7 @@ function Write-ValidationPackage {
     $pixabayAudioDestination = Join-Path $windowsStage "assets\audio\pixabay"
     New-Item -ItemType Directory -Force -Path $pixabayAudioDestination | Out-Null
     Copy-Item -Path (Join-Path $repoRoot "assets\audio\pixabay\*.wav") -Destination $pixabayAudioDestination
+    $null = Copy-HordeMusicRuntimeAssets -RepositoryRoot $repoRoot -AssetRoot (Join-Path $windowsStage "assets")
     Compress-Archive -Path (Join-Path $windowsStage "*") -DestinationPath $windowsZip -CompressionLevel Optimal
     Copy-Item -LiteralPath $AndroidApk -Destination $androidValidationApk
     @(
@@ -332,6 +335,7 @@ function Assert-ZipContainsEntries {
 }
 
 function Test-ValidationPackages {
+    $null = Assert-HordeMusicAssets -RepositoryRoot $repoRoot
     $entries = @(Assert-ZipContainsEntries -ArchivePath $windowsZip -PackageLabel "Windows validation zip" -RequiredEntries @(
         "HordeLanternRT.exe", "README.txt", "ASSET_LICENSES.md", "UNPUBLISHABLE_VALIDATION_BUILD.txt",
         "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb",
@@ -364,6 +368,7 @@ function Test-ValidationPackages {
         "assets/audio/pixabay/chest_unlock.wav",
         "assets/audio/pixabay/chest_open.wav",
         "assets/audio/pixabay/torch_extinguish.wav"))
+    $null = Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $windowsZip
     foreach ($forbidden in @("/source/", "/high/", "runtime-development", "gothic_arming_sword", "models/props/meshy/production-", ".processing.json", ".android.ktx2")) {
         if (@($entries | Where-Object { $_ -like "*$forbidden*" }).Count -ne 0) {
             throw "Windows validation zip contains forbidden development static asset content: $forbidden"
@@ -406,6 +411,7 @@ function Test-ValidationPackages {
         "assets/audio/pixabay/chest_unlock.wav",
         "assets/audio/pixabay/chest_open.wav",
         "assets/audio/pixabay/torch_extinguish.wav"))
+    $null = Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $androidValidationApk
     foreach ($forbidden in @("/source/", "/high/", "runtime-development", "gothic_arming_sword", "models/props/meshy/production-", ".processing.json", ".windows.ktx2")) {
         if (@($entries | Where-Object { $_ -like "*$forbidden*" }).Count -ne 0) {
             throw "Android validation APK contains forbidden development static asset content: $forbidden"

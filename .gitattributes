@@ -19,6 +19,11 @@ third_party/cgltf/cgltf.h whitespace=-trailing-space
 # Native Core is a byte-hashed upstream subset, not a locally edited engine.
 third_party/pocket-audio-core/** text eol=lf
 
+# Verbatim editable music sources, pinned manifest and measured derivatives.
+assets/audio/music/what-the-dark-keeps/source/** -text
+assets/audio/music/what-the-dark-keeps/asset.manifest.json text eol=lf
+assets/audio/music/what-the-dark-keeps/runtime/*.wav filter=lfs diff=lfs merge=lfs -text
+
 # The release identity contract is one UTF-8 line. Keep its checkout bytes
 # stable even when core.autocrlf is enabled on Windows.
 VERSION text eol=lf
@@ -151,3 +156,7 @@ docs/evidence/2026-10-01-opaque-secondary/** -text whitespace=cr-at-eol
 docs/evidence/2026-10-01-opaque-secondary/**/*.spv filter=lfs diff=lfs merge=lfs -text
 docs/evidence/2026-10-01-opaque-secondary/**/*.log whitespace=-trailing-space,-blank-at-eof,-space-before-tab,cr-at-eol
 docs/evidence/2026-10-01-opaque-secondary/**/*.patch whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+
+# Exact unwired music admission build/negative-check receipts.
+docs/evidence/2026-10-01-music-admission/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-01-music-admission/**/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol

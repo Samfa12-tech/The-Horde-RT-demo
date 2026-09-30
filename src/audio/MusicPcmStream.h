@@ -5,17 +5,10 @@
 #include <cstdint>
 #include <span>
 
-#include "audio/MusicDirector.h"
-#include "pocket_audio/PcmLoopStream.h"
+#include "audio/MusicPcmAssets.h"
 
 namespace horde::audio
 {
-
-inline constexpr std::uint32_t kMusicPcmSampleRate = pocket_audio::kPcmSampleRate;
-inline constexpr std::uint64_t kMusicPcmLoopFrames = 576'000u;
-inline constexpr std::uint64_t kMusicPcmTailFrames = 144'000u;
-inline constexpr std::uint64_t kMusicPcmCrossfadeFrames = 12'000u;
-inline constexpr std::size_t kMusicPcmCueCount = 9u;
 
 // Non-owning interleaved stereo PCM16. The caller retains both spans for the
 // complete lifetime of MusicPcmStream. No decoding or file access occurs here.

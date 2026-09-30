@@ -1,4 +1,5 @@
 #include "audio/MusicPcmWave.h"
+#include "audio/MusicPcmAssets.h"
 
 #include <algorithm>
 #include <array>
@@ -305,28 +306,43 @@ void TestFormatAndFrameValidation()
                    "container overhead beyond the explicit parser bound is rejected");
 }
 
-void TestActualMusicPrototypes()
+void TestActualRuntimeMusicAssets()
 {
-    constexpr std::array<char, 8u> cues{'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
-    const std::filesystem::path prototypeDirectory{HORDE_RT_MUSIC_PROTOTYPE_DIR};
-    for (const char cue : cues)
+    using namespace horde::audio;
+    const std::filesystem::path assetDirectory{HORDE_RT_MUSIC_ASSET_DIR};
+    Check(kMusicPcmAssets[0].bodyPath.empty() && kMusicPcmAssets[0].tailPath.empty() &&
+          kMusicPcmAssets[0].bodyFrames == 0u && !kMusicPcmAssets[0].looping,
+          "None is the empty, non-looping silence slot");
+    std::uint64_t totalPcmBytes = 0u;
+    for (std::size_t index = 1u; index < kMusicPcmAssets.size(); ++index)
     {
-        const std::uint32_t bodyFrames = cue == 'C' ? 144'000u
-            : cue == 'G' ? 288'000u : 576'000u;
-        for (const char* part : {"loop", "tail"})
+        const auto& asset = kMusicPcmAssets[index];
+        Check(static_cast<std::size_t>(asset.cue) == index,
+              "compiled asset ordering agrees with gameplay cue slots");
+        const bool oneShot = asset.cue == MusicCue::C || asset.cue == MusicCue::G;
+        Check(asset.looping == !oneShot, "C/G are one-shots, other beds loop");
+        const std::uint32_t bodyFrames = asset.cue == MusicCue::C ? 144'000u
+            : asset.cue == MusicCue::G ? 288'000u : 576'000u;
+        Check(asset.bodyFrames == bodyFrames, "compiled cue body has exact musical duration");
+        const char cue = static_cast<char>('A' + index - 1u);
+        for (const bool isTail : {false, true})
         {
-            const std::uint32_t expectedFrames = std::string(part) == "tail"
-                ? 144'000u : bodyFrames;
-            const std::filesystem::path path = prototypeDirectory /
-                (std::string(1u, cue) + "-" + part + ".wav");
+            const std::uint32_t expectedFrames = isTail
+                ? static_cast<std::uint32_t>(kMusicPcmTailFrames) : bodyFrames;
+            const auto relativePath = isTail ? asset.tailPath : asset.bodyPath;
+            const std::string expectedPath = "audio/music/what-the-dark-keeps/runtime/" +
+                std::string(1u, cue) + (isTail ? "-tail.wav" : "-body.wav");
+            Check(relativePath == expectedPath, "compiled path agrees with admitted runtime roster");
+            const std::filesystem::path path = assetDirectory / relativePath;
             std::ifstream input(path, std::ios::binary | std::ios::ate);
-            Check(static_cast<bool>(input), "actual rendered prototype WAV is readable");
+            Check(static_cast<bool>(input), "actual admitted runtime WAV is readable");
             if (!input)
             {
                 continue;
             }
             const std::streamsize fileSize = input.tellg();
-            Check(fileSize > 0, "prototype WAV has nonzero bytes");
+            Check(fileSize == static_cast<std::streamsize>(expectedFrames * 4u + 44u),
+                  "admitted WAV has exact container bytes");
             if (fileSize <= 0)
             {
                 continue;
@@ -334,7 +350,7 @@ void TestActualMusicPrototypes()
             std::vector<char> rawBytes(static_cast<std::size_t>(fileSize));
             input.seekg(0, std::ios::beg);
             input.read(rawBytes.data(), fileSize);
-            Check(static_cast<bool>(input), "prototype WAV bytes are fully read");
+            Check(static_cast<bool>(input), "runtime WAV bytes are fully read");
             if (!input)
             {
                 continue;
@@ -350,13 +366,15 @@ void TestActualMusicPrototypes()
             const MusicPcmWaveStatus status = DecodeMusicPcmWave(
                 fileBytes, expectedFrames, samples);
             Check(status == MusicPcmWaveStatus::Ok,
-                  "actual prototype body/tail satisfies strict decoder format");
+                  "actual runtime body/tail satisfies strict Core decoder format");
             Check(samples.size() == static_cast<std::size_t>(expectedFrames) * 2u,
-                  "actual prototype decodes to exact expected interleaved frame count");
+                  "actual runtime decodes to exact expected interleaved frame count");
             Check(std::any_of(samples.begin(), samples.end(), [](const std::int16_t value)
-                  { return value != 0; }), "actual prototype audio is not all zero");
+                  { return value != 0; }), "actual runtime audio is not all zero");
+            totalPcmBytes += samples.size() * sizeof(std::int16_t);
         }
     }
+    Check(totalPcmBytes == 20'160'000u, "runtime bank PCM ownership is the admitted 20,160,000 bytes");
 }
 
 } // namespace
@@ -368,6 +386,6 @@ int main()
     TestHeaderAndChunkBoundaries();
     TestChunkUniquenessAndPresence();
     TestFormatAndFrameValidation();
-    TestActualMusicPrototypes();
+    TestActualRuntimeMusicAssets();
     return passed ? 0 : 1;
 }

@@ -5,33 +5,6 @@ namespace horde::audio
 namespace
 {
 
-constexpr bool IsLoopingCue(const MusicCue cue) noexcept
-{
-    return cue == MusicCue::A || cue == MusicCue::B || cue == MusicCue::D ||
-           cue == MusicCue::E || cue == MusicCue::F || cue == MusicCue::H;
-}
-
-constexpr std::uint64_t BodyFrames(const MusicCue cue) noexcept
-{
-    switch (cue)
-    {
-    case MusicCue::A:
-    case MusicCue::B:
-    case MusicCue::D:
-    case MusicCue::E:
-    case MusicCue::F:
-    case MusicCue::H:
-        return kMusicPcmLoopFrames;
-    case MusicCue::C:
-        return 144'000u;
-    case MusicCue::G:
-        return 288'000u;
-    case MusicCue::None:
-        return 0u;
-    }
-    return 0u;
-}
-
 // Core copies only the immutable spans/metadata during construction. The
 // temporary fixed array need not survive; the caller-owned PCM samples must.
 std::array<pocket_audio::PcmClip, kMusicPcmCueCount> CoreClips(
@@ -45,13 +18,13 @@ std::array<pocket_audio::PcmClip, kMusicPcmCueCount> CoreClips(
     }
     for (std::size_t index = 1u; index < clips.size(); ++index)
     {
-        const auto cue = static_cast<MusicCue>(index);
-        if (clips[index].body.size() != BodyFrames(cue) * 2u ||
+        const auto& asset = kMusicPcmAssets[index];
+        if (clips[index].body.size() != asset.bodyFrames * 2u ||
             clips[index].tail.size() != kMusicPcmTailFrames * 2u)
         {
             return {};
         }
-        result[index] = {clips[index].body, clips[index].tail, IsLoopingCue(cue)};
+        result[index] = {clips[index].body, clips[index].tail, asset.looping};
     }
     return result;
 }

@@ -28,6 +28,32 @@ without loosening tolerance. Include live motion, not just frozen extreme poses.
 Music, consent-based reporting, resource work and final gates remain in scope;
 licensing, signing recovery and publication remain owner-controlled.
 
+### October 1 runtime music asset checkpoint
+
+Canonical JSON/PCS1 imported verbatim; all18 source/runtime hashes and parsed
+score agreement pass. Sixteen existing WAVs admitted unchanged under
+`assets/audio/music/what-the-dark-keeps/`, manifest1126f9f…5c9ff3. Shared compiled
+A–H paths/frames/loop metadata feed the Core adapter. Only exact17 runtime
+manifest/WAV entries enter Windows/Android packages; sources never do.
+Owner grant remains Horde-only; no editor/synth application, regeneration,
+normalisation, score change or relicensing. [Evidence](evidence/2026-10-01-music-admission/README.md).
+
+Lead Debug/Release each5/5 focused PASS, asset admission14/14 positive/negative;
+real Windows RT links both. Android Debug all4ABIs, actual universal APKe7f7c92…
+23d44f is not installed. Exact music entries/current licence pass; all52 prior
+render/SFX assets equalC11, excluding intentionally updated attribution. Four
+actual ARM64 Diagnostic/Mobile modules fresh val/dis PASS, identities unchanged.
+Native PCM budget20,160,000B; no playback/thread/clock/listening claim.
+
+Pushed0db0d0b current-source push36785502646/PR36785508204 each pass50/50
+GCC/Clang/MSVC and13/13 Vulkan CPU-host fixtures; lead read actual logs.
+PR15 description updated/read back, draft/CLEAN/MERGEABLE. This new asset slice
+adds the51st common host test; its pushed-source CI must be obtained separately.
+Phone unavailable per latest owner instruction; no device actions attempted.
+Next: immutable native bank loading, platform PCM output/consumed sample clock,
+separate persisted volume and owner listening. Physical glass remains open.
+Audio/haptic manual revalidation:NO while unwired; YES for audible integration.
+
 ### October 1 bounded render-scale resource checkpoint
 
 **Sealed opaque-secondary checkpoint:** [packet](evidence/2026-10-01-opaque-secondary/README.md)

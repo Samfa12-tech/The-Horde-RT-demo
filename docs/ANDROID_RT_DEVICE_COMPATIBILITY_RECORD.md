@@ -2,6 +2,18 @@
 
 Last updated: 2026-10-01
 
+## October 1: runtime music admission build only (no new device acceptance)
+
+Android Debug builds all four ABIs and admits only the reviewed manifest plus
+sixteen byte-exact PCM WAVs. Actual universal APKe7f7c92e…223d44f is not installed;
+canonical JSON/PCS1 and metadata are excluded. Current attribution is packaged
+exactly;52 prior render/SFX assets match acceptedC11 (old53 includes attribution,
+which intentionally gains music admission). Four actual ARM64 Diagnostic/Mobile
+pipeline/compute modules fresh val/dis PASS with unchanged C11 identities.
+No new SM-S948B presentation, playback, listening or performance acceptance.
+Phone unavailable per owner; S24/S25 unverified. Audio/haptic manual:NO while
+unwired, YES for later audible integration. [Build/package evidence](evidence/2026-10-01-music-admission/README.md).
+
 ## October 1: opaque-secondary Shipping omission profile (local SM-S948B)
 
 ExactSM-S948B/R5GL219SZGK/Adreno840, Shipping/Mobile pipeline at75%, strict ASTC,

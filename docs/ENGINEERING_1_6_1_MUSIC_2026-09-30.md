@@ -38,6 +38,30 @@ Its storage/span construction is fixed and fresh sanitizer/contracts pass.
 The generic natural-tail port also retains the body-complete precondition;
 early interruptions remain bounded fades, not prematurely replayed tails.
 
+## Runtime asset admission - October 1
+
+The canonical owner ZIP is rehashed; its editable schema16 JSON and equivalent
+PCS1 entries are imported verbatim under `assets/audio/music/what-the-dark-keeps/source/`.
+Both source hashes and all16 runtime derivatives agree with the original/archive
+receipts. No generation, synthesis/editor vendoring, score/effect/gain/sample
+changes or new licence inference. Historical `-loop` becomes `-body` because
+C/G are one-shots. The reviewed manifest hash is
+`1126f9f537efb607b11bd492e1c79d6e8b94814567ce06b654e03b0d915c9ff3`.
+
+Windows/foundation packaging and Android Gradle stage only that manifest plus
+the16 WAVs; closed-roster/hash checks reject source or unrecognised content,
+missing/corrupted files and altered manifest/cue metadata. The shared compiled
+`MusicPcmAssets.h` is the assets-relative A–H path/frame/loop contract used by the
+Core adapter and actual-WAV test. Immutable PCM is20,160,000 bytes, WAV payload
+20,160,704 bytes plus manifest. This is admitted pre-rendered music, not a new
+runtime synthesizer. Prototype evidence remains unchanged and non-runtime.
+
+Native platform playback, consumed-sample clock, independent persisted volume,
+native seam/transition and owner warning/SFX listening still remain open.
+No phone install, listening or performance acceptance follows from package tests.
+Audio/haptic manual revalidation:NO for unwired assets; YES when audible music
+or mixing is integrated.
+
 ## Implemented contract
 
 `src/audio/MusicDirector.*` owns no playback resources or allocation. It reads

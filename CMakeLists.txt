@@ -578,9 +578,12 @@ if(BUILD_TESTING)
     add_executable(horde_rt_music_pcm_wave_tests tests/MusicPcmWaveTests.cpp)
     target_include_directories(horde_rt_music_pcm_wave_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_compile_definitions(horde_rt_music_pcm_wave_tests PRIVATE
-        HORDE_RT_MUSIC_PROTOTYPE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/docs/evidence/2026-10-01-music-render/audio")
+        HORDE_RT_MUSIC_ASSET_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets")
     target_link_libraries(horde_rt_music_pcm_wave_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_music_pcm_wave_tests COMMAND horde_rt_music_pcm_wave_tests)
+    add_test(NAME horde_rt_music_asset_admission_tests
+        COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
+            ${CMAKE_CURRENT_SOURCE_DIR}/tests/MusicAssetAdmissionTests.ps1)
     add_test(NAME horde_rt_pocket_audio_core_pin_tests
         COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
             ${CMAKE_CURRENT_SOURCE_DIR}/tests/PocketAudioCorePinTests.ps1

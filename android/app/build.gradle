@@ -168,7 +168,61 @@ if (viewmodelCandidate) {
     }
 }
 
+def hordeMusicRoot = file('../../assets/audio/music/what-the-dark-keeps')
+def hordeMusicManifest = new File(hordeMusicRoot, 'asset.manifest.json')
+tasks.register('verifyMusicRuntimeAssets') {
+    inputs.file hordeMusicManifest
+    inputs.dir new File(hordeMusicRoot, 'runtime')
+    doLast {
+        def digest = { File input -> MessageDigest.getInstance('SHA-256').digest(input.bytes).encodeHex().toString() }
+        if (digest(hordeMusicManifest) != '1126f9f537efb607b11bd492e1c79d6e8b94814567ce06b654e03b0d915c9ff3') {
+            throw new GradleException('Music manifest differs from the reviewed Horde admission pin.')
+        }
+        def manifest = new JsonSlurper().parse(hordeMusicManifest, 'UTF-8')
+        if (manifest.schemaVersion != 1 || manifest.assetId != 'what-the-dark-keeps' ||
+            manifest.rights != 'Owner-supplied; authorised for Horde use only' ||
+            manifest.format.encoding != 'PCM16_LE' || manifest.format.sampleRate != 48000 ||
+            manifest.format.channels != 2 || manifest.tailFrames != 144000 ||
+            manifest.crossfadeFrames != 12000 || manifest.cues.size() != 8) {
+            throw new GradleException('Music rights, encoding or cue contract disagree.')
+        }
+        def expectedPaths = [] as Set
+        long waveBytes = 0
+        long pcmBytes = 0
+        manifest.cues.eachWithIndex { cue, index ->
+            def name = String.valueOf((char) (65 + index))
+            def bodyFrames = name == 'C' ? 144000 : name == 'G' ? 288000 : 576000
+            if (cue.cue != name || cue.looping != !(name in ['C', 'G'])) {
+                throw new GradleException("Music ${name} cue/loop policy disagrees.")
+            }
+            ['body', 'tail'].each { part ->
+                def record = cue[part]
+                def path = "runtime/${name}-${part}.wav".toString()
+                def frames = part == 'body' ? bodyFrames : 144000
+                if (record.path != path || record.frames != frames || record.bytes != frames * 4 + 44 ||
+                    !expectedPaths.add(path)) {
+                    throw new GradleException("Music ${name}-${part} path/frame contract disagrees.")
+                }
+                def input = new File(hordeMusicRoot, path)
+                if (!input.isFile() || input.length() != record.bytes || digest(input) != record.sha256) {
+                    throw new GradleException("Music runtime identity differs: ${path}")
+                }
+                waveBytes += record.bytes
+                pcmBytes += frames * 4
+            }
+        }
+        def actualPaths = fileTree(new File(hordeMusicRoot, 'runtime')).files.collect {
+            hordeMusicRoot.toPath().relativize(it.toPath()).toString().replace('\\', '/')
+        } as Set
+        if (actualPaths != expectedPaths || waveBytes != 20160704 || pcmBytes != 20160000 ||
+            manifest.totalWaveBytes != waveBytes || manifest.totalPcmBytes != pcmBytes) {
+            throw new GradleException('Music runtime inventory or byte budget disagrees; no unknown assets may be packaged.')
+        }
+    }
+}
+
 tasks.register('prepareRuntimeAssets', Sync) {
+    dependsOn tasks.named('verifyMusicRuntimeAssets')
     from('../../assets') {
         include 'models/enemies/meshy/skeleton_biped_merged_animations_v01.glb'
         include 'models/enemies/meshy/lich_placeholder_merged_animations_v01.glb'
@@ -203,6 +257,8 @@ tasks.register('prepareRuntimeAssets', Sync) {
         include 'audio/pixabay/chest_unlock.wav'
         include 'audio/pixabay/chest_open.wav'
         include 'audio/pixabay/torch_extinguish.wav'
+        include 'audio/music/what-the-dark-keeps/asset.manifest.json'
+        include 'audio/music/what-the-dark-keeps/runtime/*.wav'
     }
     from('../..') {
         include 'ASSET_LICENSES.md'

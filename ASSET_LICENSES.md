@@ -52,21 +52,27 @@ Android runtime derivatives for the five CC0 rows are strict KTX2 arrays using A
 
 Poly Haven's asset license states that its assets are CC0 and may be used commercially without required attribution: https://polyhaven.com/license. Attribution is retained here as project provenance.
 
-## Supplied adaptive score (1.6.1 integration pending)
+## Supplied adaptive score (1.6.1 runtime assets admitted; playback pending)
 
 `What the Dark Keeps`, supplied in `What_the_Dark_Keeps_Horde_RT_Music_Pack.zip`
 SHA-256 `e28e5936189919fed25f6208dd7a8b97172eb5f7d25f69732cc7339c45f386fa`.
 Owner-confirmed rights statement,2026-09-30: **Owner-supplied; authorised for Horde use only**.
-No general permissive redistribution licence is inferred. The score, preview and
-derived runtime cues are not yet packaged; rendering/provenance and playback gates
-remain open. This grant does not relicense Pocket Chordsmith/Pocket Audio source,
+No general permissive redistribution licence is inferred. Verbatim editable JSON/
+PCS1 under `assets/audio/music/what-the-dark-keeps/source/` remains the revisable
+source of truth and is excluded from game packages, as is the supplied preview.
+Only the hash-pinned manifest and sixteen measured stereo48kHz PCM16 body/tail
+derivatives under that asset's `runtime/` enter Windows/Android packages.
+Playback, native-clock/seam/mix and owner listening gates remain open; asset
+admission is not their acceptance. This grant does not relicense Pocket Chordsmith/Pocket Audio source,
 change existing asset licence statements or authorise production publication.
 See [music integration checkpoint](docs/ENGINEERING_1_6_1_MUSIC_2026-09-30.md).
 The sixteen A-H PCM body/tail prototypes under
 `docs/evidence/2026-10-01-music-render/audio/` carry that same Horde-only owner grant.
 They are non-runtime rendering evidence, excluded from game packages, not a
 general asset library or seamless/playback acceptance. Source/tool hashes and
-original unmodified-score processing are recorded in that directory. The separate
+original unmodified-score processing are recorded in that directory. Admitted
+runtime copies are byte-identical; only historical `-loop` filenames become
+`-body` to distinguish the C/G one-shots. The separate
 native-only Pocket Audio Core utility pin is documented in
 `third_party/pocket-audio-core/README.horde.md`; no Chordsmith editor/synth app is
 vendored and no upstream code is relicensed. Its software permission is separate

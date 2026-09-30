@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "algorithm": "SHA-256",
+  "root": "docs/evidence/2026-10-01-music-admission",
+  "manifestExcludesSelf": true,
+  "fileCount": 15,
+  "files": [
+    {
+      "path": "asset-admission-actual-module-validation.log",
+      "bytes": 3733,
+      "sha256": "40813399bfcd9f8fdf17db7b0c582801866763c3db1f13b5ba0697f14aade708"
+    },
+    {
+      "path": "asset-admission-android-debug-final.log",
+      "bytes": 2198,
+      "sha256": "a27aaf7fea478755c70865065a9e6b498284be679bc7858967bac38268adad7b"
+    },
+    {
+      "path": "asset-admission-build-debug.log",
+      "bytes": 1477,
+      "sha256": "31ca428e5ed53781941e067413ec26697bd7dfd7e8afa65becd4aa36bfa370d2"
+    },
+    {
+      "path": "asset-admission-build-release.log",
+      "bytes": 1096,
+      "sha256": "81c8d748b23c6458675012df64b3bca6638340f9dce324a84b7419658cca1811"
+    },
+    {
+      "path": "asset-admission-configure.log",
+      "bytes": 630,
+      "sha256": "68c37a8f129becdb39df9cfb5cb6f1cb848e7d537a9afb57c299ab7b919ab2c1"
+    },
+    {
+      "path": "asset-admission-ctest-debug-final.log",
+      "bytes": 885,
+      "sha256": "6a350d4a0e56c90b9bf5511edd4c46c5778d63865d093507ef5282393698d054"
+    },
+    {
+      "path": "asset-admission-ctest-output.log",
+      "bytes": 5248,
+      "sha256": "f94ed246dacaf8b0377b6da391f0128894e32c8363832fa48cd5b52225a1d728"
+    },
+    {
+      "path": "asset-admission-ctest-release-final.log",
+      "bytes": 885,
+      "sha256": "6f00758bc4ddb34081cf14cc255c85f454fe75fc41c38b535c9ac1197aa7e912"
+    },
+    {
+      "path": "asset-admission-gradle-prepare.log",
+      "bytes": 130,
+      "sha256": "116a16532430460a215fb8417de080a5317af73cf28d40a0a9708a7cd4672ef5"
+    },
+    {
+      "path": "asset-admission-package-receipt.json",
+      "bytes": 1222,
+      "sha256": "22d982eaba0402bb13c4462b3b76512cdc67f9db972d178f5eed87e12e9cccf5"
+    },
+    {
+      "path": "asset-admission-windows-debug-link.log",
+      "bytes": 856,
+      "sha256": "4c4d49a88590ac25d398405c1041cd37d746070b9f7bc5f7184572a03c837108"
+    },
+    {
+      "path": "asset-admission-windows-release-link.log",
+      "bytes": 620,
+      "sha256": "ac49bb2d8d0555569654a546729155cfcc0d5dc7c43235ff325bfab4af57c2b4"
+    },
+    {
+      "path": "package-count-red-note.md",
+      "bytes": 767,
+      "sha256": "794d4e5cbe2aa3da0a152a1254e11a2ae084b51c827b1f83a00b1c387430c189"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3346,
+      "sha256": "acae364ab67a141eab49a7e0ca89680c9229dfffba531493f44e18a93d45f4f1"
+    },
+    {
+      "path": "method/verify-music-admission-package.ps1",
+      "bytes": 4653,
+      "sha256": "fecd452b5121f3d761e0380d273e9fc00ab372332af26431a89af5c61bbf944b"
+    }
+  ]
+}
