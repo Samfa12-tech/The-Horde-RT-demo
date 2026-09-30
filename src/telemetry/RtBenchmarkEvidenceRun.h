@@ -84,6 +84,10 @@ struct RtExpectedFrameRecord
     RtPresentationOutcome presentationOutcome = RtPresentationOutcome::NotAttempted;
     RtSampleStatus cpuStageStatus = RtSampleStatus::NotReady;
     RtSampleStatus diagnosticStatus = RtSampleStatus::NotReady;
+    // Retain the validated owning scene selection, not the loaded shader pair
+    // or a later observer. An uncompleted row has no active-strategy evidence.
+    bool hasActiveStrategy = false;
+    RtMaterialStrategy activeStrategy = RtMaterialStrategy::OpaqueFast;
     // Copied from the validated owning completion, never the latest observer.
     // An unavailable/Shipping sample is distinct from an available all-zero one.
     bool hasDiagnosticCounters = false;

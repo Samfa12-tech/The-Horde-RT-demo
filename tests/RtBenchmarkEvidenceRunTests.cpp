@@ -1080,6 +1080,41 @@ void TestMoveTransfersOwnershipWithoutAliasing(TestContext& context)
                   "reusing the moved-from owner must not alias the transferred sample arrays");
 }
 
+void TestActiveStrategyIsCompletionOwned(TestContext& context)
+{
+    RtBenchmarkEvidenceRun run;
+    context.Check(run.Start(3u) && run.ArmMeasurement(330u, 340u),
+                  "active strategy fixture must start");
+    auto opaque = MakeSnapshot(
+        1u, 330u, 340u, 0u, 1'000'000u, RtSampleStatus::Valid, 2'000'000u);
+    auto generic = MakeSnapshot(
+        2u, 330u, 340u, 1u, 1'000'000u, RtSampleStatus::Valid, 2'000'000u);
+    generic.scene.pipeline.activeStrategy = RtMaterialStrategy::GenericDielectric;
+    generic.scene.pipeline.active = generic.scene.pipeline.genericDielectric;
+    const auto opaqueIndex = ExpectAndBind(context, run, {1u, 2u}, opaque);
+    const auto genericIndex = ExpectAndBind(context, run, {2u, 2u}, generic);
+    context.Check(run.Complete(opaque) && run.Complete(generic),
+                  "both strategies must complete with their exact frame identities");
+    generic.scene.pipeline.activeStrategy = RtMaterialStrategy::OpaqueFast;
+    RtExpectedFrameRecord opaqueRow{}, genericRow{};
+    context.Check(opaqueIndex.has_value() && genericIndex.has_value() &&
+                      run.TryGetExpectedFrame(*opaqueIndex, opaqueRow) &&
+                      run.TryGetExpectedFrame(*genericIndex, genericRow) &&
+                      opaqueRow.hasActiveStrategy && genericRow.hasActiveStrategy &&
+                      opaqueRow.activeStrategy == RtMaterialStrategy::OpaqueFast &&
+                      genericRow.activeStrategy == RtMaterialStrategy::GenericDielectric,
+                  "a later scene selection must not change an earlier row's strategy");
+    auto malformed = MakeSnapshot(
+        3u, 330u, 340u, 0u, 1'000'000u, RtSampleStatus::Valid, 2'000'000u);
+    const auto malformedIndex = ExpectAndBind(context, run, {3u, 2u}, malformed);
+    malformed.scene.pipeline.activeStrategy = static_cast<RtMaterialStrategy>(255u);
+    RtExpectedFrameRecord pending{};
+    context.Check(!run.Complete(malformed) && malformedIndex.has_value() &&
+                      run.TryGetExpectedFrame(*malformedIndex, pending) &&
+                      !pending.hasActiveStrategy && !pending.hasCompletionIdentity,
+                  "invalid pipeline completion must not create false default-strategy evidence");
+}
+
 } // namespace
 
 int main()
@@ -1098,6 +1133,7 @@ int main()
     TestRejectionsAndIdentityFailures(context);
     TestCpuIneligibleAndCancellation(context);
     TestMoveTransfersOwnershipWithoutAliasing(context);
+    TestActiveStrategyIsCompletionOwned(context);
 
     if (context.failures == 0)
     {

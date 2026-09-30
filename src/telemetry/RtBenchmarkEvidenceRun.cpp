@@ -496,6 +496,8 @@ bool RtBenchmarkEvidenceRun::Complete(const RtPerformanceEvidenceSnapshot& snaps
     row.presentationOutcome = snapshot.presentation.outcome;
     row.cpuStageStatus = snapshot.scene.stages.status;
     row.diagnosticStatus = snapshot.dielectric.status;
+    row.hasActiveStrategy = true;
+    row.activeStrategy = snapshot.scene.pipeline.activeStrategy;
     row.hasDiagnosticCounters = snapshot.dielectric.status == RtSampleStatus::Valid &&
                                 snapshot.dielectric.hasCounters;
     if (row.hasDiagnosticCounters)

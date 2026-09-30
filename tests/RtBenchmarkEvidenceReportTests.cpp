@@ -522,6 +522,36 @@ void TestReportsUseClassicLocale(TestContext& context)
                   "JSON and text numeric formatting must remain classic-locale under hostile globals");
 }
 
+void TestActiveStrategyComesFromEachOwningCompletion(TestContext& context)
+{
+    RtBenchmarkEvidenceRun run;
+    context.Check(run.Start(3u) && run.ArmMeasurement(79u, 89u),
+                  "active strategy report fixture must start");
+    auto opaque = MakeSnapshot(
+        1u, 79u, 89u, 0u, 1'000'000u, RtSampleStatus::Valid, 2'000'000u);
+    auto generic = MakeSnapshot(
+        2u, 79u, 89u, 1u, 1'000'000u, RtSampleStatus::Valid, 2'000'000u);
+    generic.scene.pipeline.activeStrategy = RtMaterialStrategy::GenericDielectric;
+    generic.scene.pipeline.active = generic.scene.pipeline.genericDielectric;
+    ExpectAndBind(context, run, {1u, 2u}, opaque);
+    ExpectAndBind(context, run, {2u, 2u}, generic);
+    context.Check(run.Complete(opaque) && run.Complete(generic) &&
+                      run.ExpectFrame({3u, 2u}).has_value(),
+                  "two canonical completions and an unavailable row must be retained");
+    // A later observer/snapshot mutation must not relabel an earlier GPU frame.
+    generic.scene.pipeline.activeStrategy = RtMaterialStrategy::OpaqueFast;
+    generic.scene.pipeline.active = generic.scene.pipeline.opaqueFast;
+    const std::string json = BuildRtBenchmarkEvidenceJson(run);
+    context.Check(ArrayObjectWith(json, "\"index\": 0").find(
+                      "\"activeStrategy\": \"opaque-fast\"") != std::string::npos &&
+                      ArrayObjectWith(json, "\"index\": 1").find(
+                      "\"activeStrategy\": \"generic-dielectric\"") != std::string::npos,
+                  "active strategy must describe each owning completed frame, not the loaded pair or latest observer");
+    context.Check(ArrayObjectWith(json, "\"index\": 2").find(
+                      "\"activeStrategy\": null") != std::string::npos,
+                  "an unavailable completion must not be mislabeled as default OpaqueFast");
+}
+
 void TestDiagnosticCounterRowsPreserveAvailability(TestContext& context)
 {
     RtBenchmarkEvidenceRun run;
@@ -598,6 +628,7 @@ int main()
     TestAllocatedCancelledAndMissingCompletionAreExplicit(context);
     TestCpuAndGpuEligibilityRemainIndependent(context);
     TestReportsUseClassicLocale(context);
+    TestActiveStrategyComesFromEachOwningCompletion(context);
     TestDiagnosticCounterRowsPreserveAvailability(context);
     if (context.failures == 0)
     {

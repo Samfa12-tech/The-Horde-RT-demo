@@ -471,6 +471,15 @@ std::string BuildRtBenchmarkEvidenceJson(const RtBenchmarkEvidenceRun& run)
         WriteJsonString(out, SampleStatusName(row.cpuStageStatus));
         out << ", \"diagnosticStatus\": ";
         WriteJsonString(out, SampleStatusName(row.diagnosticStatus));
+        out << ", \"activeStrategy\": ";
+        if (row.hasActiveStrategy)
+        {
+            WriteJsonString(out, RtMaterialStrategyName(row.activeStrategy));
+        }
+        else
+        {
+            out << "null";
+        }
         out << ", \"diagnosticCounters\": ";
         if (row.hasDiagnosticCounters)
         {
