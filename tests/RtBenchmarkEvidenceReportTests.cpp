@@ -1,5 +1,6 @@
 #include "telemetry/RtBenchmarkEvidenceReport.h"
 
+#include <array>
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
@@ -132,6 +133,40 @@ RtPerformanceEvidenceSnapshot MakeSnapshot(
         (gpuStatus == RtSampleStatus::Valid || gpuStatus == RtSampleStatus::Disabled ||
          gpuStatus == RtSampleStatus::Unsupported);
     return snapshot;
+}
+
+void SetDiagnosticCounters(
+    RtPerformanceEvidenceSnapshot& snapshot,
+    const std::array<std::uint32_t, kRtDielectricCounterCount>& counters)
+{
+    snapshot.scene.pipeline.instrumentation = RtInstrumentationMode::Diagnostic;
+    snapshot.dielectric.status = RtSampleStatus::Valid;
+    snapshot.dielectric.compiled = true;
+    snapshot.dielectric.hasCounters = true;
+    snapshot.dielectric.completedSubmissionSerial =
+        snapshot.identity.submitted.submissionSerial;
+    snapshot.dielectric.readCount = 1u;
+    snapshot.dielectric.resetCount = 1u;
+    snapshot.dielectric.counters = counters;
+    snapshot.scene.player.primaryPixelCountAvailable = true;
+    snapshot.scene.player.primaryPixelCount = counters[kRtPrimaryPlayerPixelCounterIndex];
+    snapshot.scene.player.primaryVisible = snapshot.scene.player.primaryPixelCount != 0u;
+}
+
+std::string CounterArrayJson(
+    const std::array<std::uint32_t, kRtDielectricCounterCount>& counters)
+{
+    std::string result = "[";
+    for (std::size_t index = 0u; index < counters.size(); ++index)
+    {
+        if (index != 0u)
+        {
+            result += ", ";
+        }
+        result += std::to_string(counters[index]);
+    }
+    result += ']';
+    return result;
 }
 
 std::optional<std::size_t> ExpectAndBind(TestContext& context,
@@ -487,6 +522,73 @@ void TestReportsUseClassicLocale(TestContext& context)
                   "JSON and text numeric formatting must remain classic-locale under hostile globals");
 }
 
+void TestDiagnosticCounterRowsPreserveAvailability(TestContext& context)
+{
+    RtBenchmarkEvidenceRun run;
+    context.Check(run.Start(4u) && run.ArmMeasurement(78u, 88u),
+                  "diagnostic counter report fixture must start");
+
+    RtPerformanceEvidenceSnapshot diagnostic = MakeSnapshot(
+        1u, 78u, 88u, 0u, 1'000'000u, RtSampleStatus::Valid, 2'000'000u);
+    const std::array<std::uint32_t, kRtDielectricCounterCount> zeroCounters{};
+    SetDiagnosticCounters(diagnostic, zeroCounters);
+    auto nonzeroDiagnostic = MakeSnapshot(
+        2u, 78u, 88u, 1u, 1'500'000u, RtSampleStatus::Valid, 2'500'000u);
+    std::array<std::uint32_t, kRtDielectricCounterCount> nonzeroCounters{};
+    nonzeroCounters.fill(23u);
+    nonzeroCounters[kRtPrimaryPlayerPixelCounterIndex] = 42u;
+    SetDiagnosticCounters(nonzeroDiagnostic, nonzeroCounters);
+    auto compiledOut = MakeSnapshot(
+        3u, 78u, 88u, 2u, 1'750'000u, RtSampleStatus::Valid, 2'750'000u);
+    auto diagnosticError = MakeSnapshot(
+        4u, 78u, 88u, 3u, 2'000'000u, RtSampleStatus::Valid, 3'000'000u, false);
+    diagnosticError.scene.pipeline.instrumentation = RtInstrumentationMode::Diagnostic;
+    diagnosticError.dielectric.status = RtSampleStatus::Error;
+    diagnosticError.dielectric.compiled = true;
+    diagnosticError.dielectric.completedSubmissionSerial =
+        diagnosticError.identity.submitted.submissionSerial;
+    SetText(diagnosticError.dielectric.detail, "diagnostic-read-error");
+
+    const auto diagnosticIndex = ExpectAndBind(context, run, {1u, 2u}, diagnostic);
+    const auto nonzeroIndex = ExpectAndBind(context, run, {2u, 2u}, nonzeroDiagnostic);
+    const auto compiledOutIndex = ExpectAndBind(context, run, {3u, 2u}, compiledOut);
+    const auto errorIndex = ExpectAndBind(context, run, {4u, 2u}, diagnosticError);
+    context.Check(run.Complete(diagnostic) && run.Complete(nonzeroDiagnostic) &&
+                      run.Complete(compiledOut) &&
+                      run.Complete(diagnosticError),
+                  "valid, compiled-out and error diagnostic rows must all retain their ledger slots");
+
+    const std::string json = BuildRtBenchmarkEvidenceJson(run);
+    const std::string diagnosticRow = ArrayObjectWith(json, "\"index\": 0");
+    const std::string nonzeroRow = ArrayObjectWith(json, "\"index\": 1");
+    const std::string compiledOutRow = ArrayObjectWith(json, "\"index\": 2");
+    const std::string errorRow = ArrayObjectWith(json, "\"index\": 3");
+    context.Check(diagnosticIndex.has_value() && !diagnosticRow.empty() &&
+                      diagnosticRow.find("\"diagnosticStatus\": \"valid\"") !=
+                          std::string::npos &&
+                      diagnosticRow.find("\"diagnosticCounters\": " +
+                                         CounterArrayJson(zeroCounters)) != std::string::npos,
+                  "a valid all-zero Diagnostic sample must serialize a full zero array, not null");
+    context.Check(nonzeroIndex.has_value() && !nonzeroRow.empty() &&
+                      nonzeroRow.find("\"completionIdentity\": {") != std::string::npos &&
+                      nonzeroRow.find("\"submissionSerial\": 402") != std::string::npos &&
+                      nonzeroRow.find("\"diagnosticCounters\": " +
+                                      CounterArrayJson(nonzeroCounters)) != std::string::npos,
+                  "nonzero counters must serialize beside the exact completed submission identity in their row");
+    context.Check(compiledOutIndex.has_value() && !compiledOutRow.empty() &&
+                      compiledOutRow.find("\"diagnosticStatus\": \"compiled-out\"") !=
+                          std::string::npos &&
+                      compiledOutRow.find("\"diagnosticCounters\": null") !=
+                          std::string::npos,
+                  "Shipping compiled-out rows must serialize unavailable counters as null");
+    context.Check(errorIndex.has_value() && !errorRow.empty() &&
+                      errorRow.find("\"diagnosticStatus\": \"error\"") !=
+                          std::string::npos &&
+                      errorRow.find("\"diagnosticCounters\": null") !=
+                          std::string::npos,
+                  "Diagnostic read errors must serialize unavailable counters as null");
+}
+
 } // namespace
 
 int main()
@@ -496,6 +598,7 @@ int main()
     TestAllocatedCancelledAndMissingCompletionAreExplicit(context);
     TestCpuAndGpuEligibilityRemainIndependent(context);
     TestReportsUseClassicLocale(context);
+    TestDiagnosticCounterRowsPreserveAvailability(context);
     if (context.failures == 0)
     {
         std::cout << "RT benchmark evidence report tests passed.\n";

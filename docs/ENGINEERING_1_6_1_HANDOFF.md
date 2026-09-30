@@ -30,6 +30,22 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### Current Phase 4 checkpoint
 
+Live failure evidence is now available per exact completed submission in the
+existing benchmark ledger; no new shader counters/ABI/readback/framework.
+[September30 live proof](evidence/2026-09-30-glass-live/README.md) records600/600
+valid rows on RTXHigh pipeline/compute and exactSM-S948B Mobile pipeline.
+Phone918 transport/production failures in458 rows (911 volume-budget +7 mismatch
+events); RTX107/105 transport events. Shadow overflow/unclosed remain0.
+Next trace phone row20/tick623 (42 volume events) and RTXrow230/tick833 (3),
+without assuming overlap/missed exit from names or reopening accepted players.
+Current ordinary Debug APKad6ebaa5 is installed/byte-matched, phone Home;
+unsigned Shipping6040516b builds/scans but is not installed. Reporting tests
+RED/GREEN2/2, scenario1/1, Java8+3 and both exact APK SPIR-V scans pass.
+Game-only live excerpts exclude startup/Home/private wallpaper; full measured
+visual coverage and owner acceptance remain open. No matched performance claim.
+Pushed geometric fix `aaf973a` CI push36646736906/PR36646741212 is freshly green,
+45 portable +11 Vulkan-host tests; the reporting slice needs its own push CI.
+
 Selected geometric shadow absorption is now implemented and backed by
 [September30 native segment/image evidence](evidence/2026-09-30-glass-shadow/README.md).
 RTX pipeline/compute and exactSM-S948B each pass6 analytical segment checks,
@@ -44,8 +60,7 @@ opaque cuff occlusion, not permission to accept every changed pixel.
 Initial-medium/no-boundary absorption, genuine isolated budget failures, grazing
 contact recovery, live glass, matched Shipping performance and backend parity
 remain open. Do not restart accepted player work or Phase1.
-Precedingcbc135f push36639470345/PR36639474785 CI is green (45+11 tests);
-new-source CI must belong to its own later push.
+Precedingcbc135f push36639470345/PR36639474785 CI is also green (45+11 tests).
 
 Production surface-position repair now follows the isolated path evidence:
 static transmitting hits reconstruct the triangle barycentric point in object
@@ -96,7 +111,7 @@ new full pass. [Corner proof](evidence/2026-09-30-glass-corner/README.md) and
 [duplicate-candidate proof](evidence/2026-09-30-glass-candidates/README.md).
 
 Phase4 is **not complete**: remaining primary budget/certified recoveries,
-geometric shadow attenuation, live visual glass, matched Shipping performance,
+universal geometric shadow/live visual acceptance, matched Shipping performance,
 changed-image reconciliation and backend parity are open. Standard comparisons
 retain12/13 byte-identical images; the affected finale fails the old pixel gate,
 which has not been loosened. No performance gain or S24/S25 pass is claimed.

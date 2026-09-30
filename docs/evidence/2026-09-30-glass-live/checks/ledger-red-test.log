@@ -1,0 +1,21 @@
+Internal ctest changing into directory: C:/Dev/tmp/horde-phase3-native-20260923
+Test project C:/Dev/tmp/horde-phase3-native-20260923
+    Start 6: horde_rt_benchmark_evidence_report_tests
+1/2 Test #6: horde_rt_benchmark_evidence_report_tests ...***Failed    5.13 sec
+FAIL: nonzero counters must serialize beside the exact completed submission identity in their row
+
+    Start 8: horde_rt_benchmark_evidence_run_tests
+2/2 Test #8: horde_rt_benchmark_evidence_run_tests ......***Failed    3.88 sec
+FAIL: delayed completion must retain frame A's saved zone and exact counter payload
+FAIL: different delayed frame rows must retain their own independent counter values
+FAIL: slot reuse and later snapshot mutation must not overwrite prior row-owned counters
+
+
+0% tests passed, 2 tests failed out of 2
+
+Total Test time (real) =   9.02 sec
+
+The following tests FAILED:
+	  6 - horde_rt_benchmark_evidence_report_tests (Failed)
+	  8 - horde_rt_benchmark_evidence_run_tests (Failed)
+Errors while running CTest

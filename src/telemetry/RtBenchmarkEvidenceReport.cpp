@@ -471,6 +471,24 @@ std::string BuildRtBenchmarkEvidenceJson(const RtBenchmarkEvidenceRun& run)
         WriteJsonString(out, SampleStatusName(row.cpuStageStatus));
         out << ", \"diagnosticStatus\": ";
         WriteJsonString(out, SampleStatusName(row.diagnosticStatus));
+        out << ", \"diagnosticCounters\": ";
+        if (row.hasDiagnosticCounters)
+        {
+            out << '[';
+            for (std::size_t counter = 0u; counter < row.diagnosticCounters.size(); ++counter)
+            {
+                if (counter != 0u)
+                {
+                    out << ", ";
+                }
+                out << row.diagnosticCounters[counter];
+            }
+            out << ']';
+        }
+        else
+        {
+            out << "null";
+        }
         out << ", \"gpuStatus\": ";
         if (row.hasGpuStatus)
         {

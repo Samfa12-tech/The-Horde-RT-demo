@@ -2,6 +2,28 @@
 
 Last updated: 2026-09-30
 
+## September 30: live completed-frame glass counts (local SM-S948B evidence)
+
+Exact ordinary Debug APKad6ebaa581f9ed874a268d373922e1b0b6cbc5ef3e19fd369c58adc28549d1f0,
+installed/pulled back identically: Android16/Adreno840/driver2150932499,
+native pipeline RT, strict ASTC,75%/1080x2235. The existing live reveal run
+`glass-geometric-live-20260930-01` completes600 warm-up +600 measured frames,
+all600 exact submitted/completed identity joins and valid41-counter arrays.
+The new export retains existing fence-latched counters; rendering is unchanged.
+Glass correctness is **not accepted**:918 transport/production failure events
+in458 rows include911 volume-budget events and7 mismatched exits. Certified
+recoveries301049 remain explicit. Shadow overflow/unclosed are0. Older live
+exports had no counter arrays and cannot certify absence of these failures.
+RTXHigh pipeline/compute findings are separate, not a phone equivalence pass.
+Continuous warm-up and partial measured video retained in game-only excerpts;
+no exhaustive live/owner feel, matched Shipping performance, S24/S25 or final
+acceptance claim. Thermal status0, GPU thermal levels0-1, battery26.2-34.7C;
+Diagnostic timing with recording is descriptive only. Current ordinary Debug
+remains installed; phone returned Home, accepted/stable apps/data untouched.
+Unsigned Shipping6040516b builds/actual four-module scan passes (0 atomics/no
+Binding22), not installed/published. Audio/haptic manual revalidation:NO.
+[Exact reports, witnesses, builds/tests and qualified video](evidence/2026-09-30-glass-live/README.md).
+
 ## September 30: geometric shadow segments (local SM-S948B evidence)
 
 Exact ordinary Debug APK3de01bb86cc26c3c930ebe7af0f1fe760a2701de7f9c2031f81d3a794d323043,

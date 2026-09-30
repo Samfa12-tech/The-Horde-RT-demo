@@ -84,6 +84,10 @@ struct RtExpectedFrameRecord
     RtPresentationOutcome presentationOutcome = RtPresentationOutcome::NotAttempted;
     RtSampleStatus cpuStageStatus = RtSampleStatus::NotReady;
     RtSampleStatus diagnosticStatus = RtSampleStatus::NotReady;
+    // Copied from the validated owning completion, never the latest observer.
+    // An unavailable/Shipping sample is distinct from an available all-zero one.
+    bool hasDiagnosticCounters = false;
+    std::array<std::uint32_t, kRtDielectricCounterCount> diagnosticCounters{};
     bool hasGpuDuration = false;
     std::uint64_t gpuDurationNanoseconds = 0u;
     bool cpuAccepted = false;

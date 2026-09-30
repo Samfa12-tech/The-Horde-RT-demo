@@ -1,0 +1,8 @@
+Internal ctest changing into directory: C:/Dev/tmp/horde-phase3-native-20260923
+Test project C:/Dev/tmp/horde-phase3-native-20260923
+    Start 5: horde_rt_lantern_benchmark_tests
+1/1 Test #5: horde_rt_lantern_benchmark_tests ...   Passed    4.62 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   4.63 sec

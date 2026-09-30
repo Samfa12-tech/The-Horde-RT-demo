@@ -78,3 +78,14 @@ data, modify system font/render settings or substitute Debug timing for Release.
 
 Audio/haptic manual revalidation required: **NO**. Normal gameplay/input/event
 consumption is unchanged; this adds an explicit benchmark automation/export route.
+
+## September30 additive completed-row diagnostics
+
+The native completed-frame ledger now retains the existing fence-latched41
+dielectric counters for each exact owning completion, not the latest observer.
+Each row adds `diagnosticCounters`: an array when Diagnostic status is valid,
+`null` when Shipping/failed unavailable. All-zero available arrays remain arrays.
+No shader/ABI/counter/readback change; JSON is still the existing native schema,
+copied unchanged by the Android exporter. Availability/status does not establish
+that counts are acceptable. Older reports lacking this field cannot prove zero
+live glass failures. [Exact live evidence and open failures](evidence/2026-09-30-glass-live/README.md).

@@ -1,0 +1,10 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  horde_gameplay_simulation.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_gameplay_simulation.lib
+  RtBenchmarkEvidenceRun.cpp
+  horde_rt_benchmark_evidence_run_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_benchmark_evidence_run_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  horde_gameplay_simulation.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_gameplay_simulation.lib
+  RtBenchmarkEvidenceRun.cpp
+  horde_rt_benchmark_evidence_report_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_benchmark_evidence_report_tests.exe

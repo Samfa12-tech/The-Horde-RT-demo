@@ -196,6 +196,24 @@ RtPerformanceEvidenceSnapshot MakeSnapshot(const std::uint64_t serial,
     return snapshot;
 }
 
+void SetDiagnosticCounters(
+    RtPerformanceEvidenceSnapshot& snapshot,
+    const std::array<std::uint32_t, kRtDielectricCounterCount>& counters)
+{
+    snapshot.scene.pipeline.instrumentation = RtInstrumentationMode::Diagnostic;
+    snapshot.dielectric.status = RtSampleStatus::Valid;
+    snapshot.dielectric.compiled = true;
+    snapshot.dielectric.hasCounters = true;
+    snapshot.dielectric.completedSubmissionSerial =
+        snapshot.identity.submitted.submissionSerial;
+    snapshot.dielectric.readCount = 1u;
+    snapshot.dielectric.resetCount = 1u;
+    snapshot.dielectric.counters = counters;
+    snapshot.scene.player.primaryPixelCountAvailable = true;
+    snapshot.scene.player.primaryPixelCount = counters[kRtPrimaryPlayerPixelCounterIndex];
+    snapshot.scene.player.primaryVisible = snapshot.scene.player.primaryPixelCount != 0u;
+}
+
 void CheckCanonical(TestContext& context,
                     const RtPerformanceEvidenceSnapshot& snapshot,
                     const std::string_view message)
@@ -355,27 +373,89 @@ void TestOneFrameLateAssociationAndFinalDrain(TestContext& context)
     RtBenchmarkEvidenceRun run;
     context.Check(run.Start(4u) && run.ArmMeasurement(50u, 60u),
                   "association fixture must start and arm");
-    const RtPerformanceEvidenceSnapshot frameA =
+    RtPerformanceEvidenceSnapshot frameA =
         MakeSnapshot(1u, 50u, 60u, 0u, 10'000'000u, RtSampleStatus::Valid, 8'000'000u);
-    const RtPerformanceEvidenceSnapshot frameB =
+    RtPerformanceEvidenceSnapshot frameB =
         MakeSnapshot(2u, 50u, 60u, 1u, 20'000'000u, RtSampleStatus::Valid, 9'000'000u);
+    std::array<std::uint32_t, kRtDielectricCounterCount> countersA{};
+    std::array<std::uint32_t, kRtDielectricCounterCount> countersB{};
+    std::array<std::uint32_t, kRtDielectricCounterCount> countersC{};
+    for (std::size_t index = 0u; index < kRtDielectricCounterCount; ++index)
+    {
+        countersA[index] = static_cast<std::uint32_t>(100u + index);
+        countersB[index] = static_cast<std::uint32_t>(200u + index);
+        countersC[index] = static_cast<std::uint32_t>(300u + index);
+    }
+    SetDiagnosticCounters(frameA, countersA);
+    SetDiagnosticCounters(frameB, countersB);
     const auto a = ExpectAndBind(context, run, {3u, 2u}, frameA);
     const auto b = ExpectAndBind(context, run, {8u, 2u}, frameB);
     context.Check(run.Complete(frameA),
                   "frame A must complete after the current replay tag has advanced to B");
     RtExpectedFrameRecord row{};
     context.Check(a.has_value() && run.TryGetExpectedFrame(*a, row) && row.tag.zone == 3u &&
-                      row.disposition == RtExpectedFrameDisposition::Completed,
-                  "completion must retain frame A's saved submitted zone");
+                      row.disposition == RtExpectedFrameDisposition::Completed &&
+                      row.hasDiagnosticCounters && row.diagnosticCounters == countersA,
+                  "delayed completion must retain frame A's saved zone and exact counter payload");
+    // The run owns a value copy, not an alias to the caller's reusable snapshot.
+    frameA.dielectric.counters.fill(999u);
     context.Check(b.has_value() && run.TryGetExpectedFrame(*b, row) && row.tag.zone == 8u &&
                       row.disposition == RtExpectedFrameDisposition::PendingCompletion,
                   "the newer current frame must remain a distinct pending row");
     context.Check(!run.Finalize() && run.Status() == RtBenchmarkRunStatus::Measuring &&
                       run.PendingCompletionCount() == 1u,
                   "the last pending frame must prevent publication before an explicit drain");
-    context.Check(run.Complete(frameB) && run.RecordOwnerDrainResult(true) && run.Finalize() &&
-                      run.CompletedCount() == 2u && run.OutstandingCount() == 0u,
-                  "the exact final token plus successful drain must complete the full ledger");
+    context.Check(run.Complete(frameB),
+                  "the newer frame must complete against its own row after delayed frame A");
+
+    RtExpectedFrameRecord rowA{};
+    RtExpectedFrameRecord rowB{};
+    context.Check(a.has_value() && run.TryGetExpectedFrame(*a, rowA) &&
+                      rowA.hasDiagnosticCounters && rowA.diagnosticCounters == countersA &&
+                      b.has_value() && run.TryGetExpectedFrame(*b, rowB) &&
+                      rowB.hasDiagnosticCounters && rowB.diagnosticCounters == countersB,
+                  "different delayed frame rows must retain their own independent counter values");
+
+    RtPerformanceEvidenceSnapshot frameC =
+        MakeSnapshot(3u, 50u, 60u, 0u, 30'000'000u, RtSampleStatus::Valid, 10'000'000u);
+    SetDiagnosticCounters(frameC, countersC);
+    const auto c = ExpectAndBind(context, run, {9u, 2u}, frameC);
+    context.Check(c.has_value() && run.Complete(frameC),
+                  "a later submission may reuse frame A's slot after A completed");
+    frameC.dielectric.counters.fill(777u);
+    RtExpectedFrameRecord rowC{};
+    context.Check(c.has_value() && run.TryGetExpectedFrame(*c, rowC) &&
+                      rowC.hasDiagnosticCounters && rowC.diagnosticCounters == countersC &&
+                      run.TryGetExpectedFrame(*a, rowA) && rowA.diagnosticCounters == countersA,
+                  "slot reuse and later snapshot mutation must not overwrite prior row-owned counters");
+    context.Check(run.RecordOwnerDrainResult(true) && run.Finalize() &&
+                      run.CompletedCount() == 3u && run.OutstandingCount() == 0u,
+                  "the exact tokens plus successful drain must complete the full ledger");
+}
+
+void TestMismatchedDiagnosticSerialDoesNotAdmitCounters(TestContext& context)
+{
+    RtBenchmarkEvidenceRun run;
+    context.Check(run.Start(1u) && run.ArmMeasurement(55u, 65u),
+                  "diagnostic identity fixture must start and arm");
+    RtPerformanceEvidenceSnapshot snapshot =
+        MakeSnapshot(7u, 55u, 65u, 0u, 1'000'000u, RtSampleStatus::Valid, 2'000'000u);
+    std::array<std::uint32_t, kRtDielectricCounterCount> counters{};
+    counters.fill(17u);
+    SetDiagnosticCounters(snapshot, counters);
+    const auto index = ExpectAndBind(context, run, {4u, 2u}, snapshot);
+    snapshot.dielectric.completedSubmissionSerial += 1u;
+
+    context.Check(index.has_value() && !run.Complete(snapshot) &&
+                      run.LastFailureReason() == RtBenchmarkFailureReason::InvalidCompletion,
+                  "diagnostic counters with another submission serial must fail snapshot validation");
+    RtExpectedFrameRecord row{};
+    context.Check(index.has_value() && run.TryGetExpectedFrame(*index, row) &&
+                      row.disposition == RtExpectedFrameDisposition::PendingCompletion &&
+                      !row.hasDiagnosticCounters &&
+                      std::all_of(row.diagnosticCounters.begin(), row.diagnosticCounters.end(),
+                                  [](const std::uint32_t value) { return value == 0u; }),
+                  "a rejected identity must leave the pending row's counter storage untouched");
 }
 
 void TestDrainSealsSubmissionButStillAcceptsItsExistingCompletion(TestContext& context)
@@ -1008,6 +1088,7 @@ int main()
     TestStartCapacityAndAllocationFailure(context);
     TestStatisticsUseSharedFullRouteMath(context);
     TestOneFrameLateAssociationAndFinalDrain(context);
+    TestMismatchedDiagnosticSerialDoesNotAdmitCounters(context);
     TestDrainSealsSubmissionButStillAcceptsItsExistingCompletion(context);
     TestCommittedBindingIsMonotonicWithoutInventingIdentity(context);
     TestCompletionIdentityIsMonotonicIndependentOfCpuAdmission(context);

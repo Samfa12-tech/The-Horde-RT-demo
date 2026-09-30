@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.samfa12.hordelanternrt.BenchmarkAutomationExportTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-09-29T23:54:15" hostname="SAM_LAPPY" time="3.317">
+  <properties/>
+  <testcase name="validReportsAreCopiedAndCompleteMarkerIsWrittenLast" classname="com.samfa12.hordelanternrt.BenchmarkAutomationExportTest" time="3.041"/>
+  <testcase name="countMismatchIsInvalid" classname="com.samfa12.hordelanternrt.BenchmarkAutomationExportTest" time="0.032"/>
+  <testcase name="missingMalformedAndOversizedReportsAreInvalid" classname="com.samfa12.hordelanternrt.BenchmarkAutomationExportTest" time="0.056"/>
+  <testcase name="nativeFailureStatusCannotClaimSuccess" classname="com.samfa12.hordelanternrt.BenchmarkAutomationExportTest" time="0.038"/>
+  <testcase name="invalidRunIdsAndRepeatedDestinationsAreRejected" classname="com.samfa12.hordelanternrt.BenchmarkAutomationExportTest" time="0.044"/>
+  <testcase name="workloadMarkerMustMatchRequestedAllowlistedCase" classname="com.samfa12.hordelanternrt.BenchmarkAutomationExportTest" time="0.035"/>
+  <testcase name="staleJsonRunIdIsRejectedWithoutCopyingPayload" classname="com.samfa12.hordelanternrt.BenchmarkAutomationExportTest" time="0.032"/>
+  <testcase name="numericFieldsMustBeIntegralAndWithinIntRange" classname="com.samfa12.hordelanternrt.BenchmarkAutomationExportTest" time="0.038"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

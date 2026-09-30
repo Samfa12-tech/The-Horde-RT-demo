@@ -496,6 +496,12 @@ bool RtBenchmarkEvidenceRun::Complete(const RtPerformanceEvidenceSnapshot& snaps
     row.presentationOutcome = snapshot.presentation.outcome;
     row.cpuStageStatus = snapshot.scene.stages.status;
     row.diagnosticStatus = snapshot.dielectric.status;
+    row.hasDiagnosticCounters = snapshot.dielectric.status == RtSampleStatus::Valid &&
+                                snapshot.dielectric.hasCounters;
+    if (row.hasDiagnosticCounters)
+    {
+        row.diagnosticCounters = snapshot.dielectric.counters;
+    }
     row.hasGpuDuration = snapshot.gpu.status == RtSampleStatus::Valid;
     row.gpuDurationNanoseconds = row.hasGpuDuration ? snapshot.gpu.durationNanoseconds : 0u;
     ++completedCount_;

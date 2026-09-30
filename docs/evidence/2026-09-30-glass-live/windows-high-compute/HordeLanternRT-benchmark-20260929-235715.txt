@@ -1,0 +1,82 @@
+HORDE LANTERN RT - IN-APP BENCHMARK
+====================================
+Integrity: COMPLETE
+Status: complete
+Run ID: 
+Timestamp (UTC): 2026-09-29T23:57:15Z
+Build: 1.6.1
+Shader: opaqueFast:rayquery_compute_diagnostic_high_opaque_fast@dec20fd1e03799ebd71cc7605f6d5da8bb15e69c2c77f636683e6a748eddb0c8|genericDielectric:rayquery_compute_diagnostic_high_generic_dielectric@7a16485746fd8f78dcdfdc0b2b83d8d43346560bb0af65b2330c3457d2253843
+GPU: NVIDIA GeForce RTX 5050 Laptop GPU
+Vulkan API: 1.4.341
+RT mode: RayTracingPipeline
+Execution backend: RayQueryCompute
+Swapchain present mode: MAILBOX
+RT presented every measured frame: yes
+Material route: RGBA8 raw fallback + raw RGBA8 KTX2 lich
+Render scale: 100%
+Internal RT extent: 1232x803
+Presentation extent: 1232x803
+
+COURSE
+Preset: lantern-reveal-sequence-v1
+Pass policy: lap 1 warm-up, final lap measured
+Simulation: stationary camera; live 1/60 second reveal sequence
+Laps completed: 2/2
+Cases completed: 2/2
+Measured frames: 600
+
+LEGACY PLATFORM FRAME TIME
+Clock: windows-render-plus-rtlab-telemetry
+Average: 64.092 ms
+Median: 39.414 ms (25.372 FPS)
+P95: 428.299 ms
+1% low: 2.160 FPS
+
+PER-ZONE FRAME TIME
+zone,frames,average_ms,median_ms,p95_ms,one_percent_low_fps
+opening,0,0.000,0.000,0.000,0.000
+skeleton-room,0,0.000,0.000,0.000,0.000
+shadow-corridor,0,0.000,0.000,0.000,0.000
+skylight-chamber,0,0.000,0.000,0.000,0.000
+yellow-torch-bay,600,64.092,39.414,428.299,2.160
+blue-torch-bay,0,0.000,0.000,0.000,0.000
+red-torch-bay,0,0.000,0.000,0.000,0.000
+green-torch-bay,0,0.000,0.000,0.000,0.000
+transmission-threshold,0,0.000,0.000,0.000,0.000
+finale,0,0.000,0.000,0.000,0.000
+
+This deterministic in-app course is intended for comparing Horde Lantern RT settings and builds.
+
+HORDE LANTERN RT - BENCHMARK EVIDENCE
+Schema: 1
+Whole-frame FPS is an inverse-duration proxy, not achieved presentation rate.
+Status: complete
+Identity: epoch 2, generation 6
+Capacity: 4000
+Rows: expected 600, completed 600, rejected 0, cancelled 0, outstanding 0
+CPU: accepted 600, rejected 0
+GPU statuses (denominator 600): valid 600, pending 0, error 0, disabled 0, unsupported 0, compiled-out 0, not-ready 0, unknown 0, missing 0
+Failures: none
+
+CPU STAGES
+simulationStepCpuMs: samples=600 mean=0.045 ms median=0.043 ms p90=0.053 ms p95=0.057 ms slowest1%Mean=0.123 ms
+skinCpuMs: samples=600 mean=25.198 ms median=24.971 ms p90=26.124 ms p95=26.477 ms slowest1%Mean=29.774 ms
+playerSkinCpuMs: samples=600 mean=25.198 ms median=24.971 ms p90=26.124 ms p95=26.477 ms slowest1%Mean=29.774 ms
+characterSkinCpuMs: samples=600 mean=0.000 ms median=0.000 ms p90=0.000 ms p95=0.000 ms slowest1%Mean=0.000 ms
+dynamicUploadCpuMs: samples=600 mean=0.147 ms median=0.137 ms p90=0.178 ms p95=0.200 ms slowest1%Mean=0.606 ms
+blasRefitRecordCpuMs: samples=600 mean=0.062 ms median=0.058 ms p90=0.066 ms p95=0.072 ms slowest1%Mean=0.307 ms
+tlasUpdateRecordCpuMs: samples=600 mean=0.008 ms median=0.006 ms p90=0.007 ms p95=0.007 ms slowest1%Mean=0.213 ms
+traceCopyRecordCpuMs: samples=600 mean=0.031 ms median=0.030 ms p90=0.034 ms p95=0.037 ms slowest1%Mean=0.090 ms
+frameFenceWaitCpuMs: samples=600 mean=7.848 ms median=7.002 ms p90=10.755 ms p95=11.073 ms slowest1%Mean=14.490 ms
+imageAcquireCpuMs: samples=600 mean=24.150 ms median=0.007 ms p90=0.013 ms p95=388.604 ms slowest1%Mean=423.537 ms
+queueSubmitCpuMs: samples=600 mean=0.076 ms median=0.070 ms p90=0.090 ms p95=0.099 ms slowest1%Mean=0.233 ms
+presentCallCpuMs: samples=600 mean=0.082 ms median=0.063 ms p90=0.137 ms p95=0.148 ms slowest1%Mean=0.395 ms
+wholeFrameCycleCpuMs: samples=600 mean=64.085 ms median=39.407 ms p90=44.124 ms p95=428.293 ms slowest1%Mean=462.984 ms onePercentLow=2.160 FPS
+gpuRtDurationMs: samples=600 mean=6.970 ms median=6.341 ms p90=9.971 ms p95=10.227 ms slowest1%Mean=10.350 ms
+
+ZONES
+yellow-torch-bay (5): intended=600 completed=600 rejected=0 cancelled=0 outstanding=0 cpuAccepted=600 cpuRejected=0 gpuValid=600/600 cpuWholeFrame=samples=600 mean=64.085 ms median=39.407 ms p90=44.124 ms p95=428.293 ms slowest1%Mean=462.984 ms onePercentLow=2.160 FPS gpuRt=samples=600 mean=6.970 ms median=6.341 ms p90=9.971 ms p95=10.227 ms slowest1%Mean=10.350 ms
+
+Saved text report: C:\Dev\tmp\horde-glass-live-20260930\windows-high-compute\HordeLanternRT-benchmark-20260929-235715.txt
+Saved JSON report: C:\Dev\tmp\horde-glass-live-20260930\windows-high-compute\HordeLanternRT-benchmark-20260929-235715.json
+Use the buttons below or Ctrl+A, Ctrl+C to copy.
