@@ -1,0 +1,14 @@
+diff --git a/src/vulkan/raytracing/PresentableTinyRtScene.cpp b/src/vulkan/raytracing/PresentableTinyRtScene.cpp
+--- a/src/vulkan/raytracing/PresentableTinyRtScene.cpp
++++ b/src/vulkan/raytracing/PresentableTinyRtScene.cpp
+@@ -5121,7 +5121,10 @@
+     fixtureMaterial.attenuationColor[1] = clampedTuning.glassAttenuationColor[1];
+     fixtureMaterial.attenuationColor[2] = clampedTuning.glassAttenuationColor[2];
+     genericTransmissionActive_ = HasActiveGenericTransmission(frameInstanceMetadata,
+         staticMeshSlot_.PrimitiveMetadata(), frameMaterials);
++    // Investigation-only profile: exercise the GenericDielectric pipeline on
++    // the unchanged opaque opening scene; frame evidence follows this selection.
++    genericTransmissionActive_ = true;
+     framePipelineEvidence_ = pipelineEvidenceIdentity_;
+     framePipelineEvidenceValid_ = pipelineEvidenceIdentityValid_;
+     framePipelineEvidence_.activeStrategy = genericTransmissionActive_

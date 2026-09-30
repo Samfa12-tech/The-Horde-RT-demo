@@ -2,6 +2,35 @@
 
 Last updated: 2026-09-30
 
+## September 30: whole-Generic opaque-scene profile (local SM-S948B evidence)
+
+SM-S948B/R5GL219SZGK, Android 16/Adreno 840/driver2150932499, strict ASTC,
+75%/1080x2235, native RayTracingPipeline. No external cooling. Diagnostic profile
+APK6ec1d66c (detached eafbf826 plus C++ force-selection patch) installs/pulls back
+identically. Full replay hits the existing 300s observation deadline and is
+force-stopped by the harness; incomplete native replay is retained. A separate
+focused opening capture/Home-resume passes, not full replay. Exact-control
+Debug389d6954 passes full 13-waypoint replay/opening/Home and matches old PNG bytes.
+
+Authored scenes/resources/player ownership agree, with owning frame packets
+proving OpaqueFast versus GenericDielectric. Unchanged pixel-only subset FAILS:
+max214, fraction-over-one0.036708066 (limits3/0.001 unchanged). First 35 dielectric
+counters are zero in both opaque images, not a glass correctness gate. No shader,
+asset/material, mask, resolution, physical-budget or accepted-player change.
+[Retained containment/images](evidence/2026-09-30-generic-strategy/README.md).
+
+Shipping/Mobile ARM64 profile APK6c2621dc installs/pulls back identically; its four
+packaged modules equal frozen control ab3e2261, val/dis PASS with zero diagnostic
+atomics/image reads/binding22. 53 assets agree (50 exact, three formatting only).
+Whole strategy includes different ordered-shadow/secondary-spawn behaviour, so
+this is investigation-only, not isolated compiler/pure glass cost or a Shipping
+optimisation. Control warmup 1,838 owning rows is context-only, excluded from ABBA;
+A1 control passes 1,838 rows/160 opening OpaqueFast, median63.3133ms cycle/52.0154ms GPU.
+Remaining ABBA collection is open; no causal gain, 30 FPS, steady-state or pacing
+claim. Optional Play Protect APK-upload prompt was declined for the known test
+artifact; no global security settings/data/stable-app mutation. Physical glass,
+phone compute and exact S24/S25 remain unverified/open. Audio/haptic revalidation: NO.
+
 ## September 30: exact binary-blocker candidate (local SM-S948B evidence)
 
 SM-S948B / R5GL219SZGK, Android 16, Adreno 840, driver 2150932499: immutable

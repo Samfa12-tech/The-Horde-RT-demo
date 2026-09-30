@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "scope": "Same exact-phone opaque opening Diagnostic/Mobile subset, whole-strategy investigation; not Shipping/Diagnostic parity or full backend/visual acceptance",
+  "deviceModel": "SM-S948B",
+  "scale": 75,
+  "backend": "RayTracingPipeline",
+  "source": "Control reused exact389d6954; profile eafbf826 plus force-generic patch, not clean engineering HEAD",
+  "exactApkSha256": [
+    "389d6954f7a3fddde1ced690470029fa4b14cc6f825fa34bf7269dc617f946e0",
+    "6ec1d66cad09eb50a3ce9340a2d2031e259f477f13a949be0e4ce98cdc6f1d96"
+  ],
+  "pngSha256": [
+    "d3ec98a838e61194c340343ae4e293aea0ce8b39697962dbac17e134c62dbbcf",
+    "7e4b80fc95fb2b6a751e97d672372f3078989a50ff809c0acc85a77d4c0cd03a"
+  ],
+  "authoredSceneEqual": true,
+  "owningStrategies": [
+    "opaque-fast",
+    "generic-dielectric"
+  ],
+  "owningFrameIdentities": [
+    {
+      "sceneEpoch": 6,
+      "measurementGeneration": 4,
+      "recordAttemptSerial": 1875,
+      "recordSerial": 1875,
+      "submissionSerial": 1875,
+      "completionSerial": 1875,
+      "simulationTick": 1911,
+      "frameSlot": 0
+    },
+    {
+      "sceneEpoch": 4,
+      "measurementGeneration": 3,
+      "recordAttemptSerial": 15,
+      "recordSerial": 15,
+      "submissionSerial": 15,
+      "completionSerial": 15,
+      "simulationTick": 0,
+      "frameSlot": 0
+    }
+  ],
+  "toleranceSource": "tools/compare-foundation-captures.ps1, pixel-only limits unchanged",
+  "tolerance": {
+    "maximumChannelDifference": 3,
+    "maximumFractionOverOne": 0.001
+  },
+  "pixels": 4492800,
+  "differentPixels": 780444,
+  "pixelsDifferentByMoreThanOne": 164922,
+  "maximumChannelDifference": 214,
+  "fractionOverOne": 0.03670806623931624,
+  "meanAbsoluteRgbDifference": 0.2500076418566002,
+  "width": 1440,
+  "height": 3120,
+  "pixelSubsetPassed": false,
+  "optimisationAcceptance": false,
+  "performanceClaim": "none",
+  "phase4Complete": false
+}

@@ -92,3 +92,9 @@ docs/evidence/2026-09-30-mobile-rtx/**/*.log whitespace=-trailing-space,-blank-a
 # Shared unwired music resolver build/red-green evidence.
 docs/evidence/2026-09-30-music-resolver/** -text whitespace=cr-at-eol
 docs/evidence/2026-09-30-music-resolver/**/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+
+# Exact whole-strategy containment, image mismatch and profiling evidence.
+docs/evidence/2026-09-30-generic-strategy/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-30-generic-strategy/**/*.log whitespace=-trailing-space,-blank-at-eof,-space-before-tab,cr-at-eol
+docs/evidence/2026-09-30-generic-strategy/captures/generic-profile-timeout/timeout-app-logcat.txt whitespace=-trailing-space,cr-at-eol
+docs/evidence/2026-09-30-generic-strategy/**/*.patch whitespace=-trailing-space,-blank-at-eof,cr-at-eol

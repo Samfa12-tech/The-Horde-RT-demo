@@ -1,0 +1,245 @@
+{
+  "schema": 1,
+  "purpose": "Investigation-only forced GenericDielectric strategy build; no physical-shading deletion and no device timing evidence",
+  "source": {
+    "worktree": "C:\\Dev\\tmp\\horde-generic-route-profile-20260930\\source-eaf",
+    "head": "eafbf8262442a82e0835edf5cf5306d718e64633",
+    "detached": true,
+    "dirtyTrackedPaths": [
+      "src/vulkan/raytracing/PresentableTinyRtScene.cpp"
+    ],
+    "modifiedSourceSha256": "adf5859dbfed1ff2bf79204dc109799f61da6b435eda249ad1f51c782ef6d716",
+    "externalPatch": "C:\\Dev\\tmp\\horde-generic-route-profile-20260930\\force-generic-investigation.patch",
+    "patchSha256": "0775f22d28e91966707db8e62407eb5738c1654e97da30fa239792f8dbd4c474",
+    "patchApplied": true,
+    "gitDiffCheck": "passed",
+    "engineeringWorktreeUntouched": true
+  },
+  "build": {
+    "command": ":app:assembleBenchmark :app:assembleDebug '-Pandroid.injected.build.abi=arm64-v8a' -PhordeBenchmarkValidation=true --max-workers=2 --console=plain",
+    "environment": {
+      "HORDE_VALIDATION_UNSIGNED": "1",
+      "restoredAfterBuild": true
+    },
+    "exitCode": 0,
+    "durationSeconds": 57,
+    "gradleLog": "C:\\Dev\\tmp\\horde-generic-route-profile-20260930\\profile\\logs\\gradle-assembleBenchmark-assembleDebug-arm64-20260930.log",
+    "gradleLogSha256": "ad3be5b0d5f0d033a30fc07ed60e761a4ae5b9d8da8662a260d3783db6565936",
+    "tail": "BUILD SUCCESSFUL; 83 actionable tasks: 83 executed",
+    "cmakeCaches": [
+      {
+        "path": "C:\\Dev\\tmp\\horde-generic-route-profile-20260930\\source-eaf\\android\\app\\.cxx\\Debug\\1f1e2x4i\\arm64-v8a\\CMakeCache.txt",
+        "sha256": "965fb6a7d0d84ed8a8ade280eb770b1d39581e77b99d1fe767bd4068378a7acf",
+        "values": {
+          "ANDROID_ABI": "arm64-v8a",
+          "ANDROID_PLATFORM": "android-24",
+          "CMAKE_BUILD_TYPE": "Debug",
+          "HORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION": "Diagnostic",
+          "HORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY": "Mobile",
+          "HORDE_RT_DEBUG_CHECKPOINTS": "ON",
+          "HORDE_RT_DEBUG_VIEWMODEL_CANDIDATE": "OFF",
+          "HORDE_RT_INSTRUMENTATION_OVERRIDE": "",
+          "HORDE_RT_DIELECTRIC_QUALITY_OVERRIDE": ""
+        }
+      },
+      {
+        "path": "C:\\Dev\\tmp\\horde-generic-route-profile-20260930\\source-eaf\\android\\app\\.cxx\\RelWithDebInfo\\1j1i2969\\arm64-v8a\\CMakeCache.txt",
+        "sha256": "37b5f338ffdb86f7edcc22da3c94f8343361b837c3eb97fef51af3482711162c",
+        "values": {
+          "ANDROID_ABI": "arm64-v8a",
+          "ANDROID_PLATFORM": "android-24",
+          "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+          "HORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION": "Shipping",
+          "HORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY": "Mobile",
+          "HORDE_RT_DEBUG_CHECKPOINTS": "OFF",
+          "HORDE_RT_DEBUG_VIEWMODEL_CANDIDATE": "OFF",
+          "HORDE_RT_INSTRUMENTATION_OVERRIDE": "",
+          "HORDE_RT_DIELECTRIC_QUALITY_OVERRIDE": ""
+        }
+      }
+    ],
+    "buildModels": [
+      {
+        "path": "C:\\Dev\\tmp\\horde-generic-route-profile-20260930\\source-eaf\\android\\app\\build\\intermediates\\cxx\\Debug\\1f1e2x4i\\logs\\arm64-v8a\\build_model.json",
+        "variant": "debug",
+        "abi": "arm64-v8a",
+        "optimizationTag": "Debug",
+        "debuggable": true,
+        "buildSystemArguments": [
+          "-DANDROID_STL=c++_static",
+          "-DHORDE_RT_DEBUG_CHECKPOINTS=ON",
+          "-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=OFF",
+          "-DHORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION=Diagnostic",
+          "-DHORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY=Mobile"
+        ],
+        "sha256": "ca475f09330796c2cf09ee9006549e0fc77eba58b128ffd9e15dddad16ec75f2"
+      },
+      {
+        "path": "C:\\Dev\\tmp\\horde-generic-route-profile-20260930\\source-eaf\\android\\app\\build\\intermediates\\cxx\\RelWithDebInfo\\1j1i2969\\logs\\arm64-v8a\\build_model.json",
+        "variant": "benchmark",
+        "abi": "arm64-v8a",
+        "optimizationTag": "RelWithDebInfo",
+        "debuggable": false,
+        "buildSystemArguments": [
+          "-DANDROID_STL=c++_static",
+          "-DHORDE_RT_DEBUG_CHECKPOINTS=OFF",
+          "-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=OFF",
+          "-DHORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION=Shipping",
+          "-DHORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY=Mobile"
+        ],
+        "sha256": "245e62cfa960299a922a428bc68839041e144f2783e83041c3e963ad94424441"
+      }
+    ]
+  },
+  "apks": [
+    {
+      "kind": "Shipping/Mobile benchmark",
+      "path": "C:\\Dev\\tmp\\horde-generic-route-profile-20260930\\profile\\artifacts\\benchmark\\HordeLanternRT-generic-dielectric-arm64.apk",
+      "gradleResolvedOutput": "C:\\Dev\\tmp\\horde-generic-route-profile-20260930\\source-eaf\\android\\app\\build\\intermediates\\apk\\benchmark\\app-benchmark.apk",
+      "bytes": 76382709,
+      "sha256": "6c2621dc2b233f339773d1a686ad832cf16c875e3ea7a7718c70d08e9ba9fc2f",
+      "package": "com.samfa12.hordelanternrt.benchmark",
+      "versionCode": "9",
+      "versionName": "1.6.1-benchmark",
+      "debuggable": false,
+      "certificateDn": "C=US, O=Android, CN=Android Debug\r",
+      "certificateSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736"
+    },
+    {
+      "kind": "Diagnostic/Mobile debug",
+      "path": "C:\\Dev\\tmp\\horde-generic-route-profile-20260930\\profile\\artifacts\\debug\\HordeLanternRT-generic-dielectric-debug-arm64.apk",
+      "gradleResolvedOutput": "C:\\Dev\\tmp\\horde-generic-route-profile-20260930\\source-eaf\\android\\app\\build\\intermediates\\apk\\debug\\app-debug.apk",
+      "bytes": 78222510,
+      "sha256": "6ec1d66cad09eb50a3ce9340a2d2031e259f477f13a949be0e4ce98cdc6f1d96",
+      "package": "com.samfa12.hordelanternrt.debug",
+      "versionCode": "9",
+      "versionName": "1.6.1-debug",
+      "debuggable": true,
+      "certificateDn": "C=US, O=Android, CN=Android Debug\r",
+      "certificateSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736"
+    }
+  ],
+  "control": {
+    "apk": "C:\\Dev\\tmp\\horde-shipping-ab-20260930\\active-strategy\\HordeLanternRT-eaf-active-strategy-benchmark-arm64.apk",
+    "apkSha256": "ab3e2261fd081f87e667a6e4967e2476077fa96554702330e6aa49baa8133eae",
+    "certificateSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736"
+  },
+  "shippingPackagedModules": [
+    {
+      "semanticKey": "rayquery_compute_shipping_mobile_opaque_fast",
+      "controlSha256": "5002afa7ac6ce0d03fc749742bb0832a1006b9f01bb1c6ab8490710790a79133",
+      "candidateSha256": "5002afa7ac6ce0d03fc749742bb0832a1006b9f01bb1c6ab8490710790a79133",
+      "exactEqual": true,
+      "words": 125318,
+      "rayQueryInitializations": 23,
+      "atomics": 0,
+      "imageReads": 0,
+      "binding22": false,
+      "spirvVal": "passed",
+      "spirvDis": "passed"
+    },
+    {
+      "semanticKey": "rayquery_compute_shipping_mobile_generic_dielectric",
+      "controlSha256": "c2bd389812841161951f819e0f12e95c929aa3f49ec87d9849393a687d20ebde",
+      "candidateSha256": "c2bd389812841161951f819e0f12e95c929aa3f49ec87d9849393a687d20ebde",
+      "exactEqual": true,
+      "words": 61022,
+      "rayQueryInitializations": 2,
+      "atomics": 0,
+      "imageReads": 0,
+      "binding22": false,
+      "spirvVal": "passed",
+      "spirvDis": "passed"
+    },
+    {
+      "semanticKey": "shipping_mobile_opaque_fast",
+      "controlSha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+      "candidateSha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+      "exactEqual": true,
+      "words": 125253,
+      "rayQueryInitializations": 23,
+      "atomics": 0,
+      "imageReads": 0,
+      "binding22": false,
+      "spirvVal": "passed",
+      "spirvDis": "passed"
+    },
+    {
+      "semanticKey": "shipping_mobile_generic_dielectric",
+      "controlSha256": "ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532",
+      "candidateSha256": "ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532",
+      "exactEqual": true,
+      "words": 60963,
+      "rayQueryInitializations": 2,
+      "atomics": 0,
+      "imageReads": 0,
+      "binding22": false,
+      "spirvVal": "passed",
+      "spirvDis": "passed"
+    }
+  ],
+  "moduleEqualityAllFour": true,
+  "containment": {
+    "benchmark": "C:\\Dev\\tmp\\horde-generic-route-profile-20260930\\profile\\provenance\\containment-generic-benchmark-shipping-mobile.json",
+    "debug": "C:\\Dev\\tmp\\horde-generic-route-profile-20260930\\profile\\provenance\\containment-generic-debug-diagnostic-mobile.json",
+    "control": "C:\\Dev\\tmp\\horde-generic-route-profile-20260930\\profile\\provenance\\containment-control-benchmark-shipping-mobile-eaf-scanner.json",
+    "benchmarkShippingPolicy": {
+      "imageReads": 0,
+      "binding22": false,
+      "atomics": 0,
+      "spirvVal": "passed",
+      "spirvDis": "passed"
+    }
+  },
+  "assets": {
+    "comparisonJson": "C:\\Dev\\tmp\\horde-generic-route-profile-20260930\\profile\\provenance\\asset-shader-comparison-eaf-scanner.json",
+    "comparisonJsonSha256": "5fa4544d6e1258e62801108ffbbdfe042111f7b78cbfea4256748984babb31c1",
+    "countBaseline": 53,
+    "countCandidate": 53,
+    "byteIdentical": 50,
+    "byteDifferent": 3,
+    "allChangedTextPayloadsSemanticOrLineEqual": true,
+    "changedTextEntries": [
+      {
+        "name": "assets/ASSET_LICENSES.md",
+        "baselineSha256": "3cd9f2c5367d471390ff82de98e60a0e22b766b1cf15199196ad0d90da3c2b48",
+        "candidateSha256": "bc3bc86da3f55a22db17c223498b8e9bf23a9d312737c73894d58935e947d796",
+        "lineContentEqual": true,
+        "semanticEqual": null
+      },
+      {
+        "name": "assets/models/player/runtime/clip-manifest.json",
+        "baselineSha256": "c53fd3a4c5d9e9095c683b2062a9e3c7c53662c3440d8980fe3c71d3bad400a1",
+        "candidateSha256": "1f8075bd1ff97010685172176535482f2b6fc262cc0f5c1daf63e5e8222f648d",
+        "lineContentEqual": null,
+        "semanticEqual": true
+      },
+      {
+        "name": "assets/models/player/viewmodel/runtime/asset.manifest.json",
+        "baselineSha256": "e90020ba31fe22d888e3db02ad4a6bc830c015ea9e03fbccc83c2d4517bdcbe6",
+        "candidateSha256": "7dd3749f9e4153eace88dd849a20ab344f89ebbc111d27c35dde44476b86cd28",
+        "lineContentEqual": null,
+        "semanticEqual": true
+      }
+    ],
+    "all53PerEntryHashesAndModuleComparisonsIn": "C:\\Dev\\tmp\\horde-generic-route-profile-20260930\\profile\\provenance\\asset-shader-comparison-eaf-scanner.json"
+  },
+  "catalogSnapshots": [
+    {
+      "path": "C:\\Dev\\tmp\\horde-generic-route-profile-20260930\\profile\\provenance\\raygen-variant-catalog.json",
+      "source": "C:\\Dev\\tmp\\horde-generic-route-profile-20260930\\source-eaf\\tools\\raygen-variant-catalog.json",
+      "sha256": "4330a0711733a3c73b49eef350c4ed7a1672abe4bc4510daa1f767ef5c529bd1"
+    },
+    {
+      "path": "C:\\Dev\\tmp\\horde-generic-route-profile-20260930\\profile\\provenance\\rayquery-variant-catalog.json",
+      "source": "C:\\Dev\\tmp\\horde-generic-route-profile-20260930\\source-eaf\\tools\\rayquery-variant-catalog.json",
+      "sha256": "20b98150b58653b471415ef78e9f95c2065ef2e003e97754be8785a84d9353d6"
+    }
+  ],
+  "limitations": [
+    "No phone/install/recording performed.",
+    "Generic strategy comparison includes its compile-time opaque spawn/ordered-shadow path; it is not isolated compiler occupancy and strict pixel equivalence is not assumed.",
+    "Lead must inspect ordinary opening captures before any paired timing.",
+    "One older baseline-source scanner rejected the control module; the eaf source scanner then validated and disassembled both exact packages and the full comparison passed."
+  ]
+}

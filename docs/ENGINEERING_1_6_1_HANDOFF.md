@@ -114,6 +114,20 @@ Horde-only use; no Chordsmith source copied/relicensed. Faithful cue rendering,
 playback/focus, separate persisted volume and listening remain open. Audio/haptic
 manual revalidation:NO for unwired logic, YES when playback/mix is integrated.
 
+Fresh `ca57e55` push36714405912/PR36714410910 pass 46 portable + 11 Vulkan-host
+each (new music resolver included); actual logs inspected and PR15 description
+read back. Goal remains active; no final matrix inferred from these host checks.
+[Whole-Generic strategy probe](evidence/2026-09-30-generic-strategy/README.md)
+changes only C++ strategy selection in detached eaf source. Exact four Shipping
+modules equal control; 53 assets agree (50 byte-identical, three formatting only).
+Same authored phone opening/owning strategy verified, but pixel subset FAILS
+max214/fraction-over-one0.036708 under unchanged limits. Profile replay300s
+times out; separate focused capture/Home passes, not full replay. Warmup 1,838 rows
+all OpaqueFast is context-only. Matched Shipping ABBA is now being collected;
+no optimisation or 30 FPS claim. Preserve optional upload-prompt/install evidence
+and exact pullback; no global security settings changed. Do not promote the
+forced strategy or reinterpret it as isolated compiler/pure glass cost.
+
 Follow-on [opening fire-cost evidence](evidence/2026-09-30-opening-lighting-isolation/README.md)
 retains C1,S1,V1,V2 and separate uncooled C2:all9,190 completions and800 opening
 OpaqueFast rows pass exact admission. Opening GPU medianC1 66.670ms,
