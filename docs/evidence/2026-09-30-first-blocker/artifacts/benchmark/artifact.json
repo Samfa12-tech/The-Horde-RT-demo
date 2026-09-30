@@ -1,0 +1,10 @@
+{
+  "baseCommit": "3e5bd64a6eff533f6255cd48e18b694a9bba8bfb",
+  "sourceDirty": true,
+  "apkSha256": "0383edcad0ffb0ab9e116ff5df7f8e20bbdb4cdca1f06a30986709257e42387e",
+  "instrumentation": "Shipping",
+  "quality": "Mobile",
+  "abi": "arm64-v8a",
+  "purpose": "Exact first-confirmed opaque blocker candidate; full provenance in ../provenance.json",
+  "publishable": false
+}

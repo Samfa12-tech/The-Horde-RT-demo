@@ -1,0 +1,172 @@
+{
+  "schema": 1,
+  "evidenceClass": "descriptive-uncooled-abba-with-power-drift",
+  "gainClaim": "none",
+  "phaseAcceptance": "not-complete",
+  "target30Fps": "not-demonstrated",
+  "externallyCooled": false,
+  "fullRouteRows": 7352,
+  "openingRows": 640,
+  "runs": [
+    {
+      "runId": "first-blocker-control-a1-route-20260930",
+      "apkSha256": "ab3e2261fd081f87e667a6e4967e2476077fa96554702330e6aa49baa8133eae",
+      "analysisSha256": "2e3ce84295c40defce4449622d426d2687ec0194f7978bf0bad2b36578cc3c52",
+      "routeMedianMs": 70.0435,
+      "routeP95Ms": 93.2592,
+      "medianDerivedFps": 14.277,
+      "routeGpuMedianMs": 59.676,
+      "openingGpuMedianMs": 80.154399,
+      "openingGpuP95Ms": 86.997029,
+      "openingGpuWithin33_333Ms": 0,
+      "context": {
+        "samples": 51,
+        "firstUtc": "2026-09-30T10:01:36.0112459Z",
+        "lastUtc": "2026-09-30T10:06:00.521214Z",
+        "batteryStartC": 36.4,
+        "batteryEndC": 38.3,
+        "thermalStatuses": [
+          0,
+          1
+        ],
+        "gpuThermalPowerLevels": [
+          0,
+          2,
+          3,
+          4,
+          5,
+          7
+        ]
+      }
+    },
+    {
+      "runId": "first-blocker-candidate-b1-route-20260930",
+      "apkSha256": "0383edcad0ffb0ab9e116ff5df7f8e20bbdb4cdca1f06a30986709257e42387e",
+      "analysisSha256": "17cbb105a18af3291acbb17d6a1809df70c39c37857bd86c5dcab9277b8896a5",
+      "routeMedianMs": 79.2882,
+      "routeP95Ms": 106.2341,
+      "medianDerivedFps": 12.612,
+      "routeGpuMedianMs": 68.5583,
+      "openingGpuMedianMs": 91.234555,
+      "openingGpuP95Ms": 105.424268,
+      "openingGpuWithin33_333Ms": 0,
+      "context": {
+        "samples": 59,
+        "firstUtc": "2026-09-30T10:07:46.5932216Z",
+        "lastUtc": "2026-09-30T10:12:52.12443Z",
+        "batteryStartC": 35.4,
+        "batteryEndC": 36.4,
+        "thermalStatuses": [
+          0
+        ],
+        "gpuThermalPowerLevels": [
+          0,
+          4,
+          5,
+          6,
+          7,
+          8
+        ]
+      }
+    },
+    {
+      "runId": "first-blocker-candidate-b2-route-20260930",
+      "apkSha256": "0383edcad0ffb0ab9e116ff5df7f8e20bbdb4cdca1f06a30986709257e42387e",
+      "analysisSha256": "69e4f2b50e0e98ca140a169fc767c0240422d66b52bc4fc0970b3fde671b15ea",
+      "routeMedianMs": 78.1312,
+      "routeP95Ms": 105.9836,
+      "medianDerivedFps": 12.799,
+      "routeGpuMedianMs": 67.0556,
+      "openingGpuMedianMs": 90.7692945,
+      "openingGpuP95Ms": 104.147185,
+      "openingGpuWithin33_333Ms": 0,
+      "context": {
+        "samples": 59,
+        "firstUtc": "2026-09-30T10:13:03.5777608Z",
+        "lastUtc": "2026-09-30T10:18:09.9536493Z",
+        "batteryStartC": 36.3,
+        "batteryEndC": 36.3,
+        "thermalStatuses": [
+          0
+        ],
+        "gpuThermalPowerLevels": [
+          0,
+          4,
+          5,
+          6,
+          7,
+          8
+        ]
+      }
+    },
+    {
+      "runId": "first-blocker-control-a2-route-20260930",
+      "apkSha256": "ab3e2261fd081f87e667a6e4967e2476077fa96554702330e6aa49baa8133eae",
+      "analysisSha256": "07c47ec34c69ea683c6a33596d2b5828b1fb4d221c8215c3d427d482d8665635",
+      "routeMedianMs": 77.2206,
+      "routeP95Ms": 103.6876,
+      "medianDerivedFps": 12.95,
+      "routeGpuMedianMs": 66.3298,
+      "openingGpuMedianMs": 89.4686175,
+      "openingGpuP95Ms": 98.368123,
+      "openingGpuWithin33_333Ms": 0,
+      "context": {
+        "samples": 57,
+        "firstUtc": "2026-09-30T10:19:15.0441118Z",
+        "lastUtc": "2026-09-30T10:24:10.7289391Z",
+        "batteryStartC": 35.9,
+        "batteryEndC": 36.3,
+        "thermalStatuses": [
+          0
+        ],
+        "gpuThermalPowerLevels": [
+          0,
+          4,
+          5,
+          6,
+          7,
+          8
+        ]
+      }
+    }
+  ],
+  "contrasts": [
+    {
+      "metric": "routeMedianMs",
+      "controlMeanOfRunStatistics": 73.63204999999999,
+      "candidateMeanOfRunStatistics": 78.7097,
+      "descriptiveChangePercent": 6.895978042170503
+    },
+    {
+      "metric": "routeP95Ms",
+      "controlMeanOfRunStatistics": 98.4734,
+      "candidateMeanOfRunStatistics": 106.10884999999999,
+      "descriptiveChangePercent": 7.753819813269369
+    },
+    {
+      "metric": "routeGpuMedianMs",
+      "controlMeanOfRunStatistics": 63.002900000000004,
+      "candidateMeanOfRunStatistics": 67.80695,
+      "descriptiveChangePercent": 7.625125192649862
+    },
+    {
+      "metric": "openingGpuMedianMs",
+      "controlMeanOfRunStatistics": 84.81150825,
+      "candidateMeanOfRunStatistics": 91.00192475,
+      "descriptiveChangePercent": 7.299028902719695
+    },
+    {
+      "metric": "openingGpuP95Ms",
+      "controlMeanOfRunStatistics": 92.682576,
+      "candidateMeanOfRunStatistics": 104.7857265,
+      "descriptiveChangePercent": 13.058711812239654
+    }
+  ],
+  "limitations": [
+    "Same exact phone, Shipping/Mobile, pipeline, 75%, scene, compiler options and admitted complete ledgers; no quality reduction.",
+    "Battery temperatures and GPU thermal power levels vary; context is not aligned to individual measured frames. This is not a causal effect estimate or steady-state thermal certification.",
+    "Mean of per-run statistics is descriptive, not a pooled-frame median or display-pacing measurement.",
+    "GPU command duration includes AS work, RT dispatch and copy; CPU skinning remains separate.",
+    "This route contains no reward lantern; it does not replace glass-heavy performance/correctness or backend/device acceptance."
+  ]
+}

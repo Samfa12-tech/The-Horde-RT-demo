@@ -1,0 +1,12 @@
+{
+  "artifact": "first-blocker",
+  "package": "com.samfa12.hordelanternrt.benchmark",
+  "deviceModel": "SM-S948B",
+  "serial": "R5GL219SZGK",
+  "installedApkSha256": "0383edcad0ffb0ab9e116ff5df7f8e20bbdb4cdca1f06a30986709257e42387e",
+  "utc": "2026-09-30T10:07:36.0617196Z",
+  "externallyCooled": false,
+  "appDataCleared": false,
+  "stableAppTouched": false,
+  "publishable": false
+}

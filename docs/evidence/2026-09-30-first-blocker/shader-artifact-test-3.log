@@ -1,0 +1,8 @@
+Internal ctest changing into directory: C:/Dev/tmp/horde-phase3-native-20260923
+Test project C:/Dev/tmp/horde-phase3-native-20260923
+    Start 38: horde_rt_raygen_variant_artifact_tests
+1/1 Test #38: horde_rt_raygen_variant_artifact_tests ...   Passed   78.21 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =  78.22 sec

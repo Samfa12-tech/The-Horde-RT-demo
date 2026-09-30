@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "task": "generated shader and compatibility output restoration after rejected first-hit experiment",
+  "repository": "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass",
+  "head": "e12aabe1f3b7d42b60e3faa9d49c29148d15ac66",
+  "controlCatalogSource": "C:/Dev/tmp/horde-first-blocker-20260930/artifacts/benchmark/control-reference-source/tools",
+  "handSourceCheck": {
+    "command": "git diff --exit-code e12aabe^ -- shaders/raytracing/include/rt_lighting.glsl",
+    "result": "pass; restored hand source exactly matches control parent",
+    "log": "restored-hand-source-check.log"
+  },
+  "generated": {
+    "pipeline": "tools/compile-raygen.ps1 -Freeze",
+    "compute": "tools/GenerateRayQueryComputeVariants.ps1 -Write",
+    "compatibility": [
+      "tools/compile-raygen.ps1",
+      "tools/compile-raygen.ps1 -Legacy"
+    ],
+    "pipelineAdapter": "tools/GenerateRtPipelineVariantCatalog.ps1 -Write",
+    "changedTrackedGeneratedOutputs": [
+      {"path":"src/vulkan/raytracing/MinimalRayGenShader.inc","bytes":854392,"sha256":"f4170abbf7f68364d7eeb5d9d01baeed0efacb2fc6db7ab4d1f4c0075dddacd4"},
+      {"path":"src/vulkan/raytracing/MinimalLegacyRayGenShader.inc","bytes":1705307,"sha256":"a3b32262260a25e31fbc880f851baabc5df14bbbb7995fd532e5696afd3e06bb"},
+      {"path":"src/vulkan/raytracing/RtPipelineVariantCatalog.generated.h","bytes":4575,"sha256":"98b8924f36238c5c4cdac92428192564a3260d6cf63e4255a4c813c051617f0e"},
+      {"path":"src/vulkan/raytracing/RtRayQueryVariantCatalog.generated.h","bytes":4820,"sha256":"d577af7326b56ea2cdf7fd348770357e9896103a0b5ba2d27feebfc047d6a202"},
+      {"path":"tools/raygen-variant-catalog.json","bytes":33642,"sha256":"1a262500da9098d5de9921f25e07423aeb59354445fe6c8a8a735a9eba6d65c4"},
+      {"path":"tools/rayquery-variant-catalog.json","bytes":37795,"sha256":"20b98150b58653b471415ef78e9f95c2065ef2e003e97754be8785a84d9353d6"},
+      {"path":"src/vulkan/raytracing/variants/shipping_mobile_opaque_fast.inc","bytes":1691063,"sha256":"7cb9e0a45cd0fef2aab1f6644d078f08000f16e5f84ee8c8ddbb5387c6be99ee"},
+      {"path":"src/vulkan/raytracing/variants/shipping_mobile_generic_dielectric.inc","bytes":823156,"sha256":"ad6f66655be9bb29301762c714e0ed30153a04ae69edcfde1d7576fe5714d4ad"},
+      {"path":"src/vulkan/raytracing/variants/shipping_high_opaque_fast.inc","bytes":1691061,"sha256":"2a9407c1de754f3b458e647a90f97ad2f021a9ad5e7119774c905965fe580aba"},
+      {"path":"src/vulkan/raytracing/variants/shipping_high_generic_dielectric.inc","bytes":823154,"sha256":"2a8765174ebd813bec7a5b9078a0b81d9551d0f74c9c5577c4ff1e0839dec0ac"},
+      {"path":"src/vulkan/raytracing/variants/diagnostic_mobile_opaque_fast.inc","bytes":1705360,"sha256":"4fe71a8cdb3b0e78c0bca176aca3818a0197be9c435d310ea417bd0e1a6423ab"},
+      {"path":"src/vulkan/raytracing/variants/diagnostic_mobile_generic_dielectric.inc","bytes":852953,"sha256":"783d488784b8a6d73f1f0fda968009fb081bcbdef55cc485116dc74ff8174538"},
+      {"path":"src/vulkan/raytracing/variants/diagnostic_high_opaque_fast.inc","bytes":1705358,"sha256":"f37216a88e565b0025f6dce618cc77cc25e463200202543f89f648c46867ecfa"},
+      {"path":"src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc","bytes":852951,"sha256":"9f79c78ffe0c01f6652c7fe7916ecc06e8e15ac5516ce7657acefa6d6319c5f0"},
+      {"path":"src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_opaque_fast.inc","bytes":1691977,"sha256":"07d31a4ac20ae288399d4bb4544cc7f4ba63b2bd67eb8239c057ce592da34436"},
+      {"path":"src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_generic_dielectric.inc","bytes":823988,"sha256":"58fe2c8692abc509e623d4035c76792e007d5bd83e4f6ef72ce61a60e2b4bd82"},
+      {"path":"src/vulkan/raytracing/variants/rayquery_compute_shipping_high_opaque_fast.inc","bytes":1691975,"sha256":"13a8c043ac5ef39e0c300b40ff13000fea940fff0622d6f487b068e5c78b318b"},
+      {"path":"src/vulkan/raytracing/variants/rayquery_compute_shipping_high_generic_dielectric.inc","bytes":823986,"sha256":"3b13df5557f0ebeb09d6de9ca5f0b05d59915760f332c81ceb25e60984666ef9"},
+      {"path":"src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_opaque_fast.inc","bytes":1706278,"sha256":"c3f3570ef2caf9941e5a86d0d0d7fff83d425e8f20afbed0abf116a570cc5286"},
+      {"path":"src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_generic_dielectric.inc","bytes":853785,"sha256":"eb412a64169e334fd0c17e7efcca7210f51b72cb74d311d57d2d4850ceb336f9"},
+      {"path":"src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_opaque_fast.inc","bytes":1706276,"sha256":"0ad07dfcc3bbf63204942cd93166b6b7b809dba8b94cbdd0966122cfd7428a7b"},
+      {"path":"src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_generic_dielectric.inc","bytes":853783,"sha256":"dc4ac8654d2c831c44e714c54508da7ce3a6270a1841728caec7efea8dc8f293"}
+    ]
+  },
+  "embeddedSpirvComparison": {
+    "result": "pass",
+    "method": "Parsed every uint32 word from all 16 checked-in pipeline/compute includes, rebuilt little-endian SPIR-V payload bytes, SHA-256 compared against both current catalog and independent 3e control catalog snapshot.",
+    "moduleCount": 16,
+    "allMatchCurrentAndControlCatalogs": true,
+    "modules": [
+      {"family":"pipeline","key":"diagnostic_high_generic_dielectric","words":63170,"sha256":"feac38eca1df17159bca4d490825b7e3750742b05bb07cd2f6db4eec42261b5c"},
+      {"family":"pipeline","key":"diagnostic_high_opaque_fast","words":126312,"sha256":"8dbebd86eeed23b388626719e6f9946b8027df754869b5811673e24036ae12c9"},
+      {"family":"pipeline","key":"diagnostic_mobile_generic_dielectric","words":63170,"sha256":"9865690c11de315c1c4e49af7d14eb8963b24dc522abfc01c53979bb1a5f5a91"},
+      {"family":"pipeline","key":"diagnostic_mobile_opaque_fast","words":126312,"sha256":"8dbebd86eeed23b388626719e6f9946b8027df754869b5811673e24036ae12c9"},
+      {"family":"pipeline","key":"shipping_high_generic_dielectric","words":60963,"sha256":"79e80a489e93f02f99292cf76bc8f7405645159b63d1fe2bcca407b65f16b8fa"},
+      {"family":"pipeline","key":"shipping_high_opaque_fast","words":125253,"sha256":"66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b"},
+      {"family":"pipeline","key":"shipping_mobile_generic_dielectric","words":60963,"sha256":"ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532"},
+      {"family":"pipeline","key":"shipping_mobile_opaque_fast","words":125253,"sha256":"66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b"},
+      {"family":"compute","key":"rayquery_compute_diagnostic_high_generic_dielectric","words":63229,"sha256":"a88abd1880da54d159e0e912cc9030a51a46cb5759bf29bc548c99b08c62cbd8"},
+      {"family":"compute","key":"rayquery_compute_diagnostic_high_opaque_fast","words":126377,"sha256":"c1e4622ae5df0c87a06c36d803617c7d4e0227845cd33a9dd38de5f0d956ff58"},
+      {"family":"compute","key":"rayquery_compute_diagnostic_mobile_generic_dielectric","words":63229,"sha256":"e18171591d4b07ccc3e7fb071400a6581e1fc132aec06dd37c09f88c7792e302"},
+      {"family":"compute","key":"rayquery_compute_diagnostic_mobile_opaque_fast","words":126377,"sha256":"c1e4622ae5df0c87a06c36d803617c7d4e0227845cd33a9dd38de5f0d956ff58"},
+      {"family":"compute","key":"rayquery_compute_shipping_high_generic_dielectric","words":61022,"sha256":"f0e10d5af6017aa9b27e0538cd90375da215f366aac1bb35e02ba60468e94c60"},
+      {"family":"compute","key":"rayquery_compute_shipping_high_opaque_fast","words":125318,"sha256":"5002afa7ac6ce0d03fc749742bb0832a1006b9f01bb1c6ab8490710790a79133"},
+      {"family":"compute","key":"rayquery_compute_shipping_mobile_generic_dielectric","words":61022,"sha256":"c2bd389812841161951f819e0f12e95c929aa3f49ec87d9849393a687d20ebde"},
+      {"family":"compute","key":"rayquery_compute_shipping_mobile_opaque_fast","words":125318,"sha256":"5002afa7ac6ce0d03fc749742bb0832a1006b9f01bb1c6ab8490710790a79133"}
+    ]
+  },
+  "checks": [
+    {"name":"Generic compatibility compile/check","result":"pass","durationSeconds":10.69,"log":"final-compat-generic-check.log"},
+    {"name":"Legacy compatibility compile/check","result":"pass","durationSeconds":7.55,"log":"final-compat-legacy-check.log"},
+    {"name":"Pipeline adapter freshness","result":"pass","durationSeconds":16.77,"log":"final-pipeline-adapter-check.log"},
+    {"name":"Compute eight-mode catalog/header/artifact freshness","result":"pass","durationSeconds":44.81,"log":"final-compute-check.log"},
+    {"name":"Pipeline eight-mode catalog/artifact freshness","result":"pass","durationSeconds":70.17,"log":"final-pipeline-check-catalog-corrected.log"},
+    {"name":"Debug compiler-strategy CTest","result":"pass","durationSeconds":31.79},
+    {"name":"Debug variant-manifest CTest","result":"pass","durationSeconds":38.95},
+    {"name":"Debug variant-artifact CTest","result":"pass","durationSeconds":124.28},
+    {"name":"Debug CharacterRenderSlotSmoke CTest","result":"pass","durationSeconds":4.10},
+    {"name":"Release CharacterRenderSlotSmoke CTest","result":"pass","durationSeconds":1.92,"log":"character-slot-release-ctest.log"},
+    {"name":"External-output RayQuery compute conformance","result":"pass","durationSeconds":40.52,"log":"final-compute-shader-contract.log"},
+    {"name":"CTest RayQuery compute wrapper","result":"harness failure; generator correctly rejected CMake's in-repository staging path","durationSeconds":1.28,"log":"focused-shader-and-character-debug-ctest.log"}
+  ],
+  "builds": [
+    {"name":"Debug CharacterRenderSlotSmoke target","result":"pass","durationSeconds":52.18,"log":"character-slot-debug-build-restored.log"},
+    {"name":"Release CharacterRenderSlotSmoke target","result":"pass","durationSeconds":91.53,"log":"character-slot-release-build-restored.log"},
+    {"name":"Initial Debug configure","result":"failed due stale generated pipeline catalog adapter; corrected with existing adapter generator, original log preserved","log":"character-slot-debug-build.log"}
+  ],
+  "scope": {
+    "phoneOrApkWork": false,
+    "repositoryHandSourceEdits": false,
+    "commitsOrPushes": false,
+    "unrelatedWorktreeChangesPreserved": true
+  },
+  "logsDirectory": "C:/Dev/tmp/horde-first-blocker-20260930/restore-control"
+}

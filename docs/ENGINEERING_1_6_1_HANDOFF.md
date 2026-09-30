@@ -30,8 +30,17 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### September 30 Shipping comparison and opening-room checkpoint
 
-First-confirmed-blocker candidate: `visibilityMask` now combines NoOpaque with
-TerminateOnFirstHit. Only its binary blocker result permits early termination;
+First-confirmed-blocker candidate `e12aabe` temporarily combined NoOpaque with
+TerminateOnFirstHit. It is NOT admitted: complete uncooled A/B/B/A trials found
+no demonstrated gain. Main restored the previous flags, retaining the new
+transparency/mask/bounds regression guard and forbidding the unaccepted flag.
+All16 regenerated pipeline/compute payloads exactly equal the independent control
+catalog and control parent. Fresh compiler/manifest/artifact/freshness checks and
+Debug/Release smoke pass. The original focused Debug batch was4/5: CMake's compute
+wrapper staged inside the checkout and was correctly rejected. The separate
+wrapper fix uses the validator's existing external temp directory; rerun1/1PASS,
+generator guard unchanged. Retained restoration receipts distinguish red/green.
+Only the candidate's binary blocker result permitted early termination;
 the existing transparent admission, masks/bounds and ordered dielectric queries
 are unchanged. Focused MSVC Debug/Release smoke passes 1/1 each. Compiler strategy,
 variant manifest, eight-compute freshness and full artifact/negative/compatibility
@@ -48,11 +57,31 @@ The two affected opaque PNGs equal fresh exact-control images, and seven glass
 PNGs equal their prior exact-artifact counterparts. This is no blanket glass/live
 or backend-parity pass. Compute's standard capture completed but differs from
 pipeline; existing tolerance is unchanged and its separate parity gate is open.
-Uncooled normal Shipping A/B/B/A route measurement is now in progress using frozen
-control `ab3e2261` and candidate `0383edca`; no performance gain or 30 FPS acceptance
-is claimed yet. External working evidence: `C:/Dev/tmp/horde-first-blocker-20260930`.
-Do not change frozen artifacts while measurements run. Audio/haptic revalidation:
+Uncooled Shipping A/B/B/A route measurement is complete: all7,352 owning rows and
+640 opening OpaqueFast rows pass. A1/B1/B2/A2 route medians are70.0435/79.2882/
+78.1312/77.2206ms; opening GPU medians80.154399/91.234555/90.7692945/89.4686175ms.
+Mean-of-run-statistics contrasts are+6.90% route and+7.30% opening GPU, descriptive
+only: A1/A2 drift and power-state changes prevent a causal regression estimate.
+No gain, steady-state, display-pacing or30FPS acceptance; every opening interval
+exceeds33.333ms. Frozen control `ab3e2261` was restored/byte-verified beforeA2;
+candidate `0383edca` retains its own3e-base-plus-patch recipe. Stable app untouched.
+[Retained trial](evidence/2026-09-30-first-blocker/README.md) preserves full reports,
+exact module/asset proof, parser negatives, images and decision. No further flag
+variants/shadow rewrite in this single iteration. Audio/haptic revalidation:
 NO (no semantic or playback changes). Preserve the deferred benchmark FPS counter.
+
+Normal exact Debug APK389d6954 was also restored after Shipping. Original120s
+replay deadline timed out while native logs progressed; existing300s retry
+run20260930-204834 passes replay/isolated-lantern PNG/Home-resume. PNG equals prior
+same-artifact bytes; fresh owning epoch6/gen4/submission1866/tick1873 counters
+retain1closed interface-budget failure/80reason2recoveries. No new glass gate
+closed or new-head CI inferred; checkout metadata is not reused-APK provenance.
+Owner then disconnected the phone; no ADB/coordination until owner reconnection.
+Prioritise profiling and dedicated Mobile RT feasibility: quantify affected cost,
+reduction and overhead before implementation, not further unmeasured micro-tuning.
+Measured60–66ms ordinary/225–237ms heavy GPU already miss33.333ms; this establishes
+failure of the current workload, not inability of the hardware under a new genuine
+RT design. Preserve all physical/visual gates, accepted player work and full scope.
 
 Follow-on [opening fire-cost evidence](evidence/2026-09-30-opening-lighting-isolation/README.md)
 retains C1,S1,V1,V2 and separate uncooled C2:all9,190 completions and800 opening
@@ -70,8 +99,9 @@ is not certified. Planned cooled sequence stops afterV2; S2not run. Do not pool
 C2 with cooled runs or call it steady-state sustained evidence. All future phone
 measurements are uncooled unless new owner evidence says otherwise; never repeat
 phone coordination just because of compaction. Next quality-preserving candidate
-is early termination only after confirmed opaque blocking in binary visibility,
-not ordered dielectric shadow traversal; reviewed but not implemented/measured.
+was early termination only after confirmed opaque blocking in binary visibility,
+not ordered dielectric shadow traversal; now evaluated and rejected for admission
+above. Do not restart that completed experiment.
 Fresh7a095c7 push36690246101/PR36690251617 pass45portable+11Vulkan-host each,
 logs inspected and PR15 description reconciled. Audio/haptic revalidation:NO.
 

@@ -1,0 +1,152 @@
+{
+  "deviceModel": "SM-S948B",
+  "serial": "R5GL219SZGK",
+  "scale": 75,
+  "candidateApkSha256": "5b93c3497953d1c938450352f32b9dd0f4a733c41f99b0fe257d21ac180b46c9",
+  "candidateSourceBase": "3e5bd64 plus reviewed first-blocker patch",
+  "backend": "RayTracingPipeline",
+  "checkpoints": [
+    {
+      "checkpoint": "opening",
+      "baselineClass": "fresh exact-control",
+      "baselineSha256": "d3ec98a838e61194c340343ae4e293aea0ce8b39697962dbac17e134c62dbbcf",
+      "candidateSha256": "d3ec98a838e61194c340343ae4e293aea0ce8b39697962dbac17e134c62dbbcf",
+      "exactPngEqual": true,
+      "honestlyPresented": true
+    },
+    {
+      "checkpoint": "worst-bend",
+      "baselineClass": "fresh exact-control",
+      "baselineSha256": "1ccb6a442f8f566b694f4e01daecd8855f2a601a9679ac0b9215ade64340ef8e",
+      "candidateSha256": "1ccb6a442f8f566b694f4e01daecd8855f2a601a9679ac0b9215ade64340ef8e",
+      "exactPngEqual": true,
+      "honestlyPresented": true
+    },
+    {
+      "checkpoint": "lantern-glass-production",
+      "baselineClass": "accepted d63 historical exact-artifact",
+      "baselineSha256": "de462da3d7294ad91ca8e845ea7d53f189a0c449d3b6671457f6d25ce4fc9531",
+      "candidateSha256": "de462da3d7294ad91ca8e845ea7d53f189a0c449d3b6671457f6d25ce4fc9531",
+      "exactPngEqual": true,
+      "honestlyPresented": true
+    },
+    {
+      "checkpoint": "player-viewmodel-lantern-high-look-up",
+      "baselineClass": "accepted d63 historical exact-artifact",
+      "baselineSha256": "aa5766ff2e29c458a24a39f533acd5ece93b790343ad8035d142e31ea8f6e117",
+      "candidateSha256": "aa5766ff2e29c458a24a39f533acd5ece93b790343ad8035d142e31ea8f6e117",
+      "exactPngEqual": true,
+      "honestlyPresented": true
+    },
+    {
+      "checkpoint": "player-viewmodel-lantern-low-parry",
+      "baselineClass": "accepted d63 historical exact-artifact",
+      "baselineSha256": "0fb906c870de8fb10667b8d2fc54f7a0e21dfafaec1f88d5c74efde34c53d63d",
+      "candidateSha256": "0fb906c870de8fb10667b8d2fc54f7a0e21dfafaec1f88d5c74efde34c53d63d",
+      "exactPngEqual": true,
+      "honestlyPresented": true
+    },
+    {
+      "checkpoint": "glass-edge-fresnel",
+      "baselineClass": "accepted d63 historical exact-artifact",
+      "baselineSha256": "c20e4ef74c8a78902f354f24a9d8f959ac510abc5592cefdd8cd84d0df626df3",
+      "candidateSha256": "c20e4ef74c8a78902f354f24a9d8f959ac510abc5592cefdd8cd84d0df626df3",
+      "exactPngEqual": true,
+      "honestlyPresented": true
+    },
+    {
+      "checkpoint": "glass-millimetre-closed",
+      "baselineClass": "accepted d63 historical exact-artifact",
+      "baselineSha256": "52d730b0093bf52f58ab39440074b2dd58f51bc809d1e97dfb602399eb05364a",
+      "candidateSha256": "52d730b0093bf52f58ab39440074b2dd58f51bc809d1e97dfb602399eb05364a",
+      "exactPngEqual": true,
+      "honestlyPresented": true
+    },
+    {
+      "checkpoint": "glass-tinted-transport",
+      "baselineClass": "accepted d63 historical exact-artifact",
+      "baselineSha256": "201e0f6ff709a5b799e080b24904a94cdf3c37dba3001f7a4cdc1e6f45ae551c",
+      "candidateSha256": "201e0f6ff709a5b799e080b24904a94cdf3c37dba3001f7a4cdc1e6f45ae551c",
+      "exactPngEqual": true,
+      "honestlyPresented": true
+    },
+    {
+      "checkpoint": "glass-fire-transport",
+      "baselineClass": "accepted d63 historical exact-artifact",
+      "baselineSha256": "b015d16bce7ef48ae618ee25fd1139a4fa8488ebec3e708de1874f232b379dd8",
+      "candidateSha256": "b015d16bce7ef48ae618ee25fd1139a4fa8488ebec3e708de1874f232b379dd8",
+      "exactPngEqual": true,
+      "honestlyPresented": true
+    }
+  ],
+  "imageResult": "PASS exact PNG bytes",
+  "runnerSummary": {
+    "schema": 8,
+    "runId": "20260930-195349",
+    "mode": "Replay",
+    "scale": 75,
+    "include100": false,
+    "rtLabWorkloadComparison": false,
+    "rtLabComparisonCheckpoints": null,
+    "checkpoints": [
+      "opening",
+      "two-enemy-combat",
+      "worst-bend",
+      "skylight",
+      "green",
+      "lich"
+    ],
+    "gpuTiming": "enabled",
+    "deviceSerial": "R5GL219SZGK",
+    "deviceModel": "SM-S948B",
+    "androidVersion": "16",
+    "apiLevel": "36",
+    "osBuildFingerprint": "samsung/m3qxxx/m3q:16/BP4A.251205.006/S948BXXS4AZHL_OXM4AZHL:user/release-keys",
+    "gpuName": "Adreno (TM) 840",
+    "gpuVendorId": 20803,
+    "gpuDeviceId": 1141180977,
+    "gpuDriverVersion": 2150932499,
+    "vulkanApiVersion": 4210983,
+    "displaySize": "Physical size: 1440x3120",
+    "displayDensity": "Physical density: 600\r\nOverride density: 560",
+    "package": "com.samfa12.hordelanternrt.debug",
+    "apkSha256": "5b93c3497953d1c938450352f32b9dd0f4a733c41f99b0fe257d21ac180b46c9",
+    "installedApkSha256": "5b93c3497953d1c938450352f32b9dd0f4a733c41f99b0fe257d21ac180b46c9",
+    "sourceCommit": "3e5bd64a6eff533f6255cd48e18b694a9bba8bfb",
+    "sourceDirty": true,
+    "selectedRtPipelineBundle": {
+      "opaqueFast": {
+        "key": "diagnostic_mobile_opaque_fast",
+        "sha256": "353780e5a1b991f65daa0be031f6451d0acd474d6c238814763bff8c95dca7a1"
+      },
+      "genericDielectric": {
+        "key": "diagnostic_mobile_generic_dielectric",
+        "sha256": "9865690c11de315c1c4e49af7d14eb8963b24dc522abfc01c53979bb1a5f5a91"
+      }
+    },
+    "captureRequested": true,
+    "captureCheckpointCount": 9,
+    "captureManifest": "capture-manifest.json",
+    "lifecycle": {
+      "requested": true,
+      "homeResumePassed": true,
+      "honestPresentationAfterResume": true,
+      "log": "lifecycle-home-resume-logcat.txt"
+    },
+    "timingMethod": "CPU wall-clock from frame start through vkQueuePresentKHR; not a Vulkan GPU timestamp",
+    "performanceReference": {
+      "policy": "descriptive FPS-equivalent bands; no single frame-time threshold is a product acceptance gate",
+      "sixtyFpsMs": 16.667,
+      "fiftyFpsMs": 20.0,
+      "thirtyFpsMs": 33.333,
+      "matchedRegressionInvestigationPercent": 15.0
+    },
+    "warnings": [],
+    "failures": []
+  },
+  "limitations": [
+    "Diagnostic frozen captures are not Shipping performance or live glass acceptance.",
+    "Two opaque images have fresh exact-control counterparts; seven glass images are historical same-artifact baselines.",
+    "No backend parity or S24/S25 certification."
+  ]
+}

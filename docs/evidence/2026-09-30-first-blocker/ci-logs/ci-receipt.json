@@ -1,0 +1,464 @@
+{
+  "schema": 1,
+  "headCommit": "e12aabe1f3b7d42b60e3faa9d49c29148d15ac66",
+  "runs": [
+    {
+      "run": {
+        "conclusion": "success",
+        "databaseId": 36700295969,
+        "event": "push",
+        "headBranch": "codex/horde-1.6.1-engineering-pass",
+        "headSha": "e12aabe1f3b7d42b60e3faa9d49c29148d15ac66",
+        "jobs": [
+          {
+            "completedAt": "2026-09-30T10:07:17Z",
+            "conclusion": "success",
+            "databaseId": 109837886591,
+            "name": "player-vulkan-host",
+            "startedAt": "2026-09-30T10:05:51Z",
+            "status": "completed",
+            "steps": [
+              {
+                "completedAt": "2026-09-30T10:05:53Z",
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "startedAt": "2026-09-30T10:05:52Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:05:56Z",
+                "conclusion": "success",
+                "name": "Check out source",
+                "number": 2,
+                "startedAt": "2026-09-30T10:05:53Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:06:09Z",
+                "conclusion": "success",
+                "name": "Install Vulkan host development package",
+                "number": 3,
+                "startedAt": "2026-09-30T10:05:56Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:06:14Z",
+                "conclusion": "success",
+                "name": "Fetch player smoke GLB and texture assets",
+                "number": 4,
+                "startedAt": "2026-09-30T10:06:09Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:06:22Z",
+                "conclusion": "success",
+                "name": "Configure Vulkan CPU-host player lane",
+                "number": 5,
+                "startedAt": "2026-09-30T10:06:14Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:07:05Z",
+                "conclusion": "success",
+                "name": "Build focused player Vulkan-host targets",
+                "number": 6,
+                "startedAt": "2026-09-30T10:06:22Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:07:14Z",
+                "conclusion": "success",
+                "name": "Run focused player contract and semantic fixtures",
+                "number": 7,
+                "startedAt": "2026-09-30T10:07:05Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:07:14Z",
+                "conclusion": "success",
+                "name": "Post Check out source",
+                "number": 14,
+                "startedAt": "2026-09-30T10:07:14Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:07:14Z",
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 15,
+                "startedAt": "2026-09-30T10:07:14Z",
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/36700295969/job/109837886591"
+          },
+          {
+            "completedAt": "2026-09-30T10:08:18Z",
+            "conclusion": "success",
+            "databaseId": 109837886887,
+            "name": "shared-gameplay",
+            "startedAt": "2026-09-30T10:05:51Z",
+            "status": "completed",
+            "steps": [
+              {
+                "completedAt": "2026-09-30T10:05:52Z",
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "startedAt": "2026-09-30T10:05:52Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:05:55Z",
+                "conclusion": "success",
+                "name": "Check out source",
+                "number": 2,
+                "startedAt": "2026-09-30T10:05:52Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:05:56Z",
+                "conclusion": "success",
+                "name": "Fetch portable-test GLB assets",
+                "number": 3,
+                "startedAt": "2026-09-30T10:05:55Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:06:04Z",
+                "conclusion": "success",
+                "name": "Configure non-hardware host tests",
+                "number": 4,
+                "startedAt": "2026-09-30T10:05:56Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:07:08Z",
+                "conclusion": "success",
+                "name": "Build shared gameplay tests",
+                "number": 5,
+                "startedAt": "2026-09-30T10:06:04Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:08:16Z",
+                "conclusion": "success",
+                "name": "Run shared gameplay tests",
+                "number": 6,
+                "startedAt": "2026-09-30T10:07:08Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:08:16Z",
+                "conclusion": "success",
+                "name": "Check offline gauntlet chirality and UV winding",
+                "number": 7,
+                "startedAt": "2026-09-30T10:08:16Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:08:16Z",
+                "conclusion": "success",
+                "name": "Check exact player cloth seam weight transfers",
+                "number": 8,
+                "startedAt": "2026-09-30T10:08:16Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:08:16Z",
+                "conclusion": "success",
+                "name": "Check upper torso partition preserves the head mask",
+                "number": 9,
+                "startedAt": "2026-09-30T10:08:16Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:08:16Z",
+                "conclusion": "success",
+                "name": "Check bounded segmented cloth seam plans",
+                "number": 10,
+                "startedAt": "2026-09-30T10:08:16Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:08:16Z",
+                "conclusion": "success",
+                "name": "Check Gradle APK artifact resolution",
+                "number": 11,
+                "startedAt": "2026-09-30T10:08:16Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:08:17Z",
+                "conclusion": "success",
+                "name": "Check Android combat capture expectations",
+                "number": 12,
+                "startedAt": "2026-09-30T10:08:16Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:08:17Z",
+                "conclusion": "success",
+                "name": "Post Check out source",
+                "number": 24,
+                "startedAt": "2026-09-30T10:08:17Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:08:17Z",
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 25,
+                "startedAt": "2026-09-30T10:08:17Z",
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/36700295969/job/109837886887"
+          }
+        ],
+        "name": "Shared simulation host tests",
+        "status": "completed",
+        "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/36700295969"
+      },
+      "logPath": "C:\\Dev\\tmp\\horde-first-blocker-20260930\\ci-logs\\36700295969.log.txt",
+      "logSha256": "b4469f4833affe2948490b1a35401f448b6f6c78b9b610fb6c2b3f4d7d416bf7",
+      "portableAndVulkanSummaries": [
+        "player-vulkan-host\tRun focused player contract and semantic fixtures\t2026-09-30T10:07:14.4092437Z 100% tests passed, 0 tests failed out of 11",
+        "shared-gameplay\tRun shared gameplay tests\t2026-09-30T10:08:16.0796069Z 100% tests passed, 0 tests failed out of 45",
+        "shared-gameplay\tCheck Gradle APK artifact resolution\t2026-09-30T10:08:16.8811212Z All 10 resolver cases passed.",
+        "shared-gameplay\tCheck Android combat capture expectations\t2026-09-30T10:08:17.4250986Z Android combat capture expectations: 34 cases passed.",
+        "shared-gameplay\tCheck Android combat capture expectations\t2026-09-30T10:08:17.4530293Z Android gameplay versus isolated-glass ownership: 16 cases passed."
+      ]
+    },
+    {
+      "run": {
+        "conclusion": "success",
+        "databaseId": 36700301099,
+        "event": "pull_request",
+        "headBranch": "codex/horde-1.6.1-engineering-pass",
+        "headSha": "e12aabe1f3b7d42b60e3faa9d49c29148d15ac66",
+        "jobs": [
+          {
+            "completedAt": "2026-09-30T10:07:12Z",
+            "conclusion": "success",
+            "databaseId": 109837903888,
+            "name": "player-vulkan-host",
+            "startedAt": "2026-09-30T10:05:54Z",
+            "status": "completed",
+            "steps": [
+              {
+                "completedAt": "2026-09-30T10:05:56Z",
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "startedAt": "2026-09-30T10:05:55Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:06:01Z",
+                "conclusion": "success",
+                "name": "Check out source",
+                "number": 2,
+                "startedAt": "2026-09-30T10:05:56Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:06:14Z",
+                "conclusion": "success",
+                "name": "Install Vulkan host development package",
+                "number": 3,
+                "startedAt": "2026-09-30T10:06:01Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:06:19Z",
+                "conclusion": "success",
+                "name": "Fetch player smoke GLB and texture assets",
+                "number": 4,
+                "startedAt": "2026-09-30T10:06:14Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:06:26Z",
+                "conclusion": "success",
+                "name": "Configure Vulkan CPU-host player lane",
+                "number": 5,
+                "startedAt": "2026-09-30T10:06:19Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:07:03Z",
+                "conclusion": "success",
+                "name": "Build focused player Vulkan-host targets",
+                "number": 6,
+                "startedAt": "2026-09-30T10:06:26Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:07:10Z",
+                "conclusion": "success",
+                "name": "Run focused player contract and semantic fixtures",
+                "number": 7,
+                "startedAt": "2026-09-30T10:07:03Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:07:10Z",
+                "conclusion": "success",
+                "name": "Post Check out source",
+                "number": 14,
+                "startedAt": "2026-09-30T10:07:10Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:07:10Z",
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 15,
+                "startedAt": "2026-09-30T10:07:10Z",
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/36700301099/job/109837903888"
+          },
+          {
+            "completedAt": "2026-09-30T10:08:03Z",
+            "conclusion": "success",
+            "databaseId": 109837904007,
+            "name": "shared-gameplay",
+            "startedAt": "2026-09-30T10:05:54Z",
+            "status": "completed",
+            "steps": [
+              {
+                "completedAt": "2026-09-30T10:05:56Z",
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "startedAt": "2026-09-30T10:05:55Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:06:00Z",
+                "conclusion": "success",
+                "name": "Check out source",
+                "number": 2,
+                "startedAt": "2026-09-30T10:05:56Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:06:02Z",
+                "conclusion": "success",
+                "name": "Fetch portable-test GLB assets",
+                "number": 3,
+                "startedAt": "2026-09-30T10:06:00Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:06:12Z",
+                "conclusion": "success",
+                "name": "Configure non-hardware host tests",
+                "number": 4,
+                "startedAt": "2026-09-30T10:06:02Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:07:03Z",
+                "conclusion": "success",
+                "name": "Build shared gameplay tests",
+                "number": 5,
+                "startedAt": "2026-09-30T10:06:12Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:07:58Z",
+                "conclusion": "success",
+                "name": "Run shared gameplay tests",
+                "number": 6,
+                "startedAt": "2026-09-30T10:07:03Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:07:59Z",
+                "conclusion": "success",
+                "name": "Check offline gauntlet chirality and UV winding",
+                "number": 7,
+                "startedAt": "2026-09-30T10:07:58Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:07:59Z",
+                "conclusion": "success",
+                "name": "Check exact player cloth seam weight transfers",
+                "number": 8,
+                "startedAt": "2026-09-30T10:07:59Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:07:59Z",
+                "conclusion": "success",
+                "name": "Check upper torso partition preserves the head mask",
+                "number": 9,
+                "startedAt": "2026-09-30T10:07:59Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:07:59Z",
+                "conclusion": "success",
+                "name": "Check bounded segmented cloth seam plans",
+                "number": 10,
+                "startedAt": "2026-09-30T10:07:59Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:08:00Z",
+                "conclusion": "success",
+                "name": "Check Gradle APK artifact resolution",
+                "number": 11,
+                "startedAt": "2026-09-30T10:07:59Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:08:01Z",
+                "conclusion": "success",
+                "name": "Check Android combat capture expectations",
+                "number": 12,
+                "startedAt": "2026-09-30T10:08:00Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:08:01Z",
+                "conclusion": "success",
+                "name": "Post Check out source",
+                "number": 24,
+                "startedAt": "2026-09-30T10:08:01Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-30T10:08:01Z",
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 25,
+                "startedAt": "2026-09-30T10:08:01Z",
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/36700301099/job/109837904007"
+          }
+        ],
+        "name": "Shared simulation host tests",
+        "status": "completed",
+        "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/36700301099"
+      },
+      "logPath": "C:\\Dev\\tmp\\horde-first-blocker-20260930\\ci-logs\\36700301099.log.txt",
+      "logSha256": "d42b9723d53ea94236963cc6bcbd11d1e486118092e0f57f4a4a4854096c9c0a",
+      "portableAndVulkanSummaries": [
+        "player-vulkan-host\tRun focused player contract and semantic fixtures\t2026-09-30T10:07:09.9459451Z 100% tests passed, 0 tests failed out of 11",
+        "shared-gameplay\tRun shared gameplay tests\t2026-09-30T10:07:58.8517618Z 100% tests passed, 0 tests failed out of 45",
+        "shared-gameplay\tCheck Gradle APK artifact resolution\t2026-09-30T10:08:00.4259554Z All 10 resolver cases passed.",
+        "shared-gameplay\tCheck Android combat capture expectations\t2026-09-30T10:08:01.2491027Z Android combat capture expectations: 34 cases passed.",
+        "shared-gameplay\tCheck Android combat capture expectations\t2026-09-30T10:08:01.2686778Z Android gameplay versus isolated-glass ownership: 16 cases passed."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,290 @@
+{
+  "schema": 1,
+  "source": {
+    "baseCommit": "3e5bd64a6eff533f6255cd48e18b694a9bba8bfb",
+    "explicitlyHandEditedFiles": [
+      {
+        "path": "shaders/raytracing/include/rt_lighting.glsl",
+        "workingSha256": "5fe973881bb0bb050d732b60bf487c54b212a30d367db9c82fb3877ddbecc232",
+        "baseBlobSha1": "fa0a4366a156cb2190bdaaf9d8141ed12dbc32e4",
+        "status": "M shaders/raytracing/include/rt_lighting.glsl"
+      },
+      {
+        "path": "tests/CharacterRenderSlotSmoke.cpp",
+        "workingSha256": "e2fedf92d2593f5911f680b0f44b06e5dd897d73ab65e3904baaf5f866f57f38",
+        "baseBlobSha1": "7b443821124797a00367bef85a7a56c0454643f3",
+        "status": "M tests/CharacterRenderSlotSmoke.cpp"
+      },
+      {
+        "path": "tools/raygen-variant-catalog.json",
+        "workingSha256": "c77cd1fac1d2292f3a626e6ae8b9996cb65e1d70c1722d8f6d44e85baba5c8d2",
+        "baseBlobSha1": "cbe7d600ccd54a59b490b01bf09d3079eddc2582",
+        "status": "M tools/raygen-variant-catalog.json"
+      },
+      {
+        "path": "tools/rayquery-variant-catalog.json",
+        "workingSha256": "2ac80c05de81b0971c61f5e905679fd6bc02e8a600d1c43d8f8e64f1eaa95e5a",
+        "baseBlobSha1": "288ac5ce4f655991ca5e0f475c4b81e73f24f10a",
+        "status": "M tools/rayquery-variant-catalog.json"
+      }
+    ],
+    "twoFilePatch": {
+      "path": "C:\\Dev\\tmp\\horde-first-blocker-20260930\\artifacts\\two-hand-edited-files.patch",
+      "bytes": 3701,
+      "sha256": "c7e3fed6e240e3254051203e231a347165b5bfa54e0afbc2cb746a93259a83b9"
+    },
+    "workingTreeStatus": [
+      " M shaders/raytracing/include/rt_lighting.glsl",
+      " M src/vulkan/raytracing/MinimalLegacyRayGenShader.inc",
+      " M src/vulkan/raytracing/MinimalRayGenShader.inc",
+      " M src/vulkan/raytracing/RtPipelineVariantCatalog.generated.h",
+      " M src/vulkan/raytracing/RtRayQueryVariantCatalog.generated.h",
+      " M src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
+      " M src/vulkan/raytracing/variants/diagnostic_high_opaque_fast.inc",
+      " M src/vulkan/raytracing/variants/diagnostic_mobile_generic_dielectric.inc",
+      " M src/vulkan/raytracing/variants/diagnostic_mobile_opaque_fast.inc",
+      " M src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_generic_dielectric.inc",
+      " M src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_opaque_fast.inc",
+      " M src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_generic_dielectric.inc",
+      " M src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_opaque_fast.inc",
+      " M src/vulkan/raytracing/variants/rayquery_compute_shipping_high_generic_dielectric.inc",
+      " M src/vulkan/raytracing/variants/rayquery_compute_shipping_high_opaque_fast.inc",
+      " M src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_generic_dielectric.inc",
+      " M src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_opaque_fast.inc",
+      " M src/vulkan/raytracing/variants/shipping_high_generic_dielectric.inc",
+      " M src/vulkan/raytracing/variants/shipping_high_opaque_fast.inc",
+      " M src/vulkan/raytracing/variants/shipping_mobile_generic_dielectric.inc",
+      " M src/vulkan/raytracing/variants/shipping_mobile_opaque_fast.inc",
+      " M tests/CharacterRenderSlotSmoke.cpp",
+      " M tests/RaygenVariantArtifactTests.ps1",
+      " M tests/RaygenVariantManifestTests.ps1",
+      " M tools/raygen-variant-catalog.json",
+      " M tools/rayquery-variant-catalog.json",
+      "?? .superpowers/lead-task3e-b-shipping-mobile/",
+      "?? .superpowers/tmp-task7-critique/",
+      "?? .superpowers/tmp-task7-gauntlet-metadata.cjs",
+      "?? .superpowers/tmp-task7-player-metadata.cjs"
+    ]
+  },
+  "artifacts": [
+    {
+      "variant": "benchmark",
+      "apk": {
+        "path": "C:\\Dev\\tmp\\horde-first-blocker-20260930\\artifacts\\benchmark\\candidate-benchmark.apk",
+        "bytes": 76382741,
+        "sha256": "0383edcad0ffb0ab9e116ff5df7f8e20bbdb4cdca1f06a30986709257e42387e"
+      },
+      "elf": {
+        "path": "C:\\Dev\\tmp\\horde-first-blocker-20260930\\artifacts\\benchmark\\libhorde_rt_probe_android.so",
+        "bytes": 3583224,
+        "sha256": "a9bfb1ac88382b06e744e50b4aa80e84c601090677e79ce8b9290fae1ea55f54"
+      },
+      "containmentReceiptSha256": "dcbfdcef65ad02783941f4f358b1a53db6e2793d66687249e6bc4b8036d5bafb",
+      "catalogs": [
+        {
+          "path": "C:\\Dev\\tmp\\horde-first-blocker-20260930\\artifacts\\benchmark\\raygen-variant-catalog.json",
+          "sha256": "c77cd1fac1d2292f3a626e6ae8b9996cb65e1d70c1722d8f6d44e85baba5c8d2"
+        },
+        {
+          "path": "C:\\Dev\\tmp\\horde-first-blocker-20260930\\artifacts\\benchmark\\rayquery-variant-catalog.json",
+          "sha256": "2ac80c05de81b0971c61f5e905679fd6bc02e8a600d1c43d8f8e64f1eaa95e5a"
+        }
+      ]
+    },
+    {
+      "variant": "debug",
+      "apk": {
+        "path": "C:\\Dev\\tmp\\horde-first-blocker-20260930\\artifacts\\debug\\candidate-debug.apk",
+        "bytes": 78222658,
+        "sha256": "5b93c3497953d1c938450352f32b9dd0f4a733c41f99b0fe257d21ac180b46c9"
+      },
+      "elf": {
+        "path": "C:\\Dev\\tmp\\horde-first-blocker-20260930\\artifacts\\debug\\libhorde_rt_probe_android.so",
+        "bytes": 3672912,
+        "sha256": "3d7be9befb506802011ddfa4449428a33974485c132d1a8b45d6d4c31c542c42"
+      },
+      "containmentReceiptSha256": "09a255e9ba3dc12be69123a7a95a96918c711cf5041030175cc77d8e49dfdfca",
+      "catalogs": [
+        {
+          "path": "C:\\Dev\\tmp\\horde-first-blocker-20260930\\artifacts\\debug\\raygen-variant-catalog.json",
+          "sha256": "c77cd1fac1d2292f3a626e6ae8b9996cb65e1d70c1722d8f6d44e85baba5c8d2"
+        },
+        {
+          "path": "C:\\Dev\\tmp\\horde-first-blocker-20260930\\artifacts\\debug\\rayquery-variant-catalog.json",
+          "sha256": "2ac80c05de81b0971c61f5e905679fd6bc02e8a600d1c43d8f8e64f1eaa95e5a"
+        }
+      ]
+    }
+  ],
+  "benchmarkAssetComparison": {
+    "controlApkSha256": "ab3e2261fd081f87e667a6e4967e2476077fa96554702330e6aa49baa8133eae",
+    "candidateApkSha256": "0383edcad0ffb0ab9e116ff5df7f8e20bbdb4cdca1f06a30986709257e42387e",
+    "payloads": {
+      "baselineCount": 53,
+      "candidateCount": 53,
+      "identicalCount": 53,
+      "changedCount": 0
+    },
+    "changedTextSemantics": [
+      {
+        "name": "assets/ASSET_LICENSES.md",
+        "kind": "markdown",
+        "lineContentEqual": true,
+        "semanticEqual": null
+      },
+      {
+        "name": "assets/models/player/runtime/clip-manifest.json",
+        "kind": "json",
+        "lineContentEqual": null,
+        "semanticEqual": true
+      },
+      {
+        "name": "assets/models/player/viewmodel/runtime/asset.manifest.json",
+        "kind": "json",
+        "lineContentEqual": null,
+        "semanticEqual": true
+      }
+    ],
+    "shippingModules": [
+      {
+        "label": "baseline",
+        "apkSha256": "ab3e2261fd081f87e667a6e4967e2476077fa96554702330e6aa49baa8133eae",
+        "librarySha256": "5d770ee5eab33a4566f15316a0059269e62233c6efe2230cb0dde25c16e789cc",
+        "modules": [
+          {
+            "key": "rayquery_compute_shipping_mobile_opaque_fast",
+            "sha256": "5002afa7ac6ce0d03fc749742bb0832a1006b9f01bb1c6ab8490710790a79133",
+            "words": 125318,
+            "atomics": 0,
+            "imageReads": 0,
+            "binding22": false,
+            "spirvVal": "passed",
+            "spirvDis": "passed"
+          },
+          {
+            "key": "rayquery_compute_shipping_mobile_generic_dielectric",
+            "sha256": "c2bd389812841161951f819e0f12e95c929aa3f49ec87d9849393a687d20ebde",
+            "words": 61022,
+            "atomics": 0,
+            "imageReads": 0,
+            "binding22": false,
+            "spirvVal": "passed",
+            "spirvDis": "passed"
+          },
+          {
+            "key": "shipping_mobile_opaque_fast",
+            "sha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+            "words": 125253,
+            "atomics": 0,
+            "imageReads": 0,
+            "binding22": false,
+            "spirvVal": "passed",
+            "spirvDis": "passed"
+          },
+          {
+            "key": "shipping_mobile_generic_dielectric",
+            "sha256": "ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532",
+            "words": 60963,
+            "atomics": 0,
+            "imageReads": 0,
+            "binding22": false,
+            "spirvVal": "passed",
+            "spirvDis": "passed"
+          }
+        ]
+      },
+      {
+        "label": "candidate",
+        "apkSha256": "0383edcad0ffb0ab9e116ff5df7f8e20bbdb4cdca1f06a30986709257e42387e",
+        "librarySha256": "a9bfb1ac88382b06e744e50b4aa80e84c601090677e79ce8b9290fae1ea55f54",
+        "modules": [
+          {
+            "key": "rayquery_compute_shipping_mobile_opaque_fast",
+            "sha256": "3efe4b74a81ca7626818e898160fdd5545146a7a3e09a011bfa0def09293b083",
+            "words": 125318,
+            "atomics": 0,
+            "imageReads": 0,
+            "binding22": false,
+            "spirvVal": "passed",
+            "spirvDis": "passed"
+          },
+          {
+            "key": "rayquery_compute_shipping_mobile_generic_dielectric",
+            "sha256": "c2bd389812841161951f819e0f12e95c929aa3f49ec87d9849393a687d20ebde",
+            "words": 61022,
+            "atomics": 0,
+            "imageReads": 0,
+            "binding22": false,
+            "spirvVal": "passed",
+            "spirvDis": "passed"
+          },
+          {
+            "key": "shipping_mobile_opaque_fast",
+            "sha256": "eef1d05592d96655c6298920bac023ec782c2aa9c916171794bdcde9f37e88df",
+            "words": 125253,
+            "atomics": 0,
+            "imageReads": 0,
+            "binding22": false,
+            "spirvVal": "passed",
+            "spirvDis": "passed"
+          },
+          {
+            "key": "shipping_mobile_generic_dielectric",
+            "sha256": "ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532",
+            "words": 60963,
+            "atomics": 0,
+            "imageReads": 0,
+            "binding22": false,
+            "spirvVal": "passed",
+            "spirvDis": "passed"
+          }
+        ]
+      }
+    ],
+    "normalizedExecutableComparison": [
+      {
+        "semanticKey": "rayquery_compute_shipping_mobile_opaque_fast",
+        "baselineInstructionCount": 27421,
+        "candidateInstructionCount": 27421,
+        "normalizedInstructionsEqual": false,
+        "firstDifference": {
+          "zeroBasedInstructionIndex": 4317,
+          "baseline": "OpRayQueryInitializeKHR %v26 %v716 %v112 %v388 %v3348 %v384 %v3350 %v3353",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v716 %v324 %v388 %v3348 %v384 %v3350 %v3353"
+        }
+      },
+      {
+        "semanticKey": "rayquery_compute_shipping_mobile_generic_dielectric",
+        "baselineInstructionCount": 12924,
+        "candidateInstructionCount": 12924,
+        "normalizedInstructionsEqual": true,
+        "firstDifference": null
+      },
+      {
+        "semanticKey": "shipping_mobile_opaque_fast",
+        "baselineInstructionCount": 27402,
+        "candidateInstructionCount": 27402,
+        "normalizedInstructionsEqual": false,
+        "firstDifference": {
+          "zeroBasedInstructionIndex": 4300,
+          "baseline": "OpRayQueryInitializeKHR %v26 %v704 %v112 %v388 %v3336 %v384 %v3338 %v3341",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v704 %v324 %v388 %v3336 %v384 %v3338 %v3341"
+        }
+      },
+      {
+        "semanticKey": "shipping_mobile_generic_dielectric",
+        "baselineInstructionCount": 12909,
+        "candidateInstructionCount": 12909,
+        "normalizedInstructionsEqual": true,
+        "firstDifference": null
+      }
+    ]
+  },
+  "notes": [
+    "APK paths were selected through tools/resolve-android-apk.ps1: benchmark and debug.",
+    "Baseline asset/shader control is exact APK SHA ab3e2261fd081f87e667a6e4967e2476077fa96554702330e6aa49baa8133eae.",
+    "Benchmark opaque-fast shader executable differs; generic-dielectric modules normalize equal. First normalized divergence is retained in comparison receipt, not interpreted as performance.",
+    "Debug is Diagnostic, so its diagnostic atomics and binding 22 are expected; Shipping invariants apply only to benchmark APK.",
+    "No phone operation or candidate installation was performed."
+  ]
+}

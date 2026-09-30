@@ -1,0 +1,58 @@
+=== Horde RT Diagnostic Window ===
+Probe initialisation: OK
+
+Backend: Vulkan
+RT mode: RayTracingPipeline
+Execution backend: Unsupported
+GPU name: NVIDIA GeForce RTX 5050 Laptop GPU
+Vendor ID: 4318
+Device ID: 11672
+Driver version: 610.188.0
+Vulkan API version: 1.4.341
+VK_KHR_acceleration_structure: yes
+VK_KHR_ray_tracing_pipeline: yes
+VK_KHR_ray_query: yes
+VK_KHR_buffer_device_address: yes
+VK_KHR_deferred_host_operations: yes
+Internal render resolution: N/A
+FPS / frame time: N/A
+GPU RT command-buffer time: N/A (Not initialised)
+RT scene status: Not attempted
+RT scene geometry: Complete Horde showcase route with sequential animated skeleton and staff-lit lich
+RT scene dispatch resolution: N/A
+RT scene presented: no
+RT EVIDENCE PUBLICATION version=1
+Observer: unavailable
+Lifecycle: N/A
+Diagnostic status: unavailable
+GPU status: unavailable
+Completed frame: N/A (observer-unavailable)
+Diagnostics:
+- Inspecting candidate 1
+- Driver version packed: 2559295488
+- Driver version: 610.188.0
+- Vulkan API version: 1.4.341
+- RT capability mode: RayTracingPipeline
+- Internal render resolution: not measured yet.
+- FPS / frame time: not measured yet.
+
+
+Stored report (text): "C:\\Dev\\tmp\\horde-phase3-native-20260923\\Debug\\reports\\vulkan_capability_report.txt"
+Stored report (json): "C:\\Dev\\tmp\\horde-phase3-native-20260923\\Debug\\reports\\vulkan_capability_report.json"
+PBR material encoding: RGBA8 raw fallback + raw RGBA8 KTX2 lich
+RT render scale 100%: 960x540 -> 960x540
+Development static RT asset: vertexBytes=5803648, indexBytes=825972, materialBytes=2016, instanceMetadataBytes=672, primitiveMetadataBytes=320, descriptors=9, textureBytes=173364524, blasBytes=1032704, blasBuildMs=2.939, swordBlasBytes=717696, swordBlasBuildMs=1.9235, torchBlasBytes=315008, torchBlasBuildMs=1.0155, productionPropBlasBytes=648064, productionPropBlasBuildMs=5.3342
+Captured opening -> "C:\\Dev\\tmp\\horde-first-blocker-20260930\\windows-standard-pipeline\\00-opening.png"
+Captured skeleton -> "C:\\Dev\\tmp\\horde-first-blocker-20260930\\windows-standard-pipeline\\01-skeleton.png"
+Captured worst-bend -> "C:\\Dev\\tmp\\horde-first-blocker-20260930\\windows-standard-pipeline\\02-worst-bend.png"
+Captured lantern-drop -> "C:\\Dev\\tmp\\horde-first-blocker-20260930\\windows-standard-pipeline\\03-lantern-drop.png"
+Captured skylight -> "C:\\Dev\\tmp\\horde-first-blocker-20260930\\windows-standard-pipeline\\04-skylight.png"
+Captured yellow -> "C:\\Dev\\tmp\\horde-first-blocker-20260930\\windows-standard-pipeline\\05-yellow.png"
+Captured blue -> "C:\\Dev\\tmp\\horde-first-blocker-20260930\\windows-standard-pipeline\\06-blue.png"
+Captured red -> "C:\\Dev\\tmp\\horde-first-blocker-20260930\\windows-standard-pipeline\\07-red.png"
+Captured green -> "C:\\Dev\\tmp\\horde-first-blocker-20260930\\windows-standard-pipeline\\08-green.png"
+Captured mirror -> "C:\\Dev\\tmp\\horde-first-blocker-20260930\\windows-standard-pipeline\\09-mirror.png"
+Captured lich -> "C:\\Dev\\tmp\\horde-first-blocker-20260930\\windows-standard-pipeline\\10-lich.png"
+Captured finale-roof -> "C:\\Dev\\tmp\\horde-first-blocker-20260930\\windows-standard-pipeline\\11-finale-roof.png"
+Captured two-enemy-combat -> "C:\\Dev\\tmp\\horde-first-blocker-20260930\\windows-standard-pipeline\\12-two-enemy-combat.png"
+Captured all 13 showcase checkpoints to "C:\\Dev\\tmp\\horde-first-blocker-20260930\\windows-standard-pipeline"

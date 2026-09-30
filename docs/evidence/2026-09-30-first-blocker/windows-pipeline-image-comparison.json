@@ -1,0 +1,89 @@
+{
+  "backend": "RayTracingPipeline",
+  "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+  "baseline": "d63 accepted ordinary captures",
+  "candidate": "3e5bd64 plus first-blocker patch",
+  "captures": [
+    {
+      "checkpoint": "opening",
+      "baselineSha256": "3afe620967f40985737f82cd119edc48424d482add83d542ebfad8bf09bd8189",
+      "candidateSha256": "3afe620967f40985737f82cd119edc48424d482add83d542ebfad8bf09bd8189",
+      "exactPngEqual": true
+    },
+    {
+      "checkpoint": "skeleton",
+      "baselineSha256": "8094a7867beeba2fe25307f7674ff6c21dc16eb337900768c4efda2856a2f4be",
+      "candidateSha256": "8094a7867beeba2fe25307f7674ff6c21dc16eb337900768c4efda2856a2f4be",
+      "exactPngEqual": true
+    },
+    {
+      "checkpoint": "worst-bend",
+      "baselineSha256": "ef88dd62f554740dd69130cbd7d0bd2eacc77e6f8400e0be1a007d35b266957c",
+      "candidateSha256": "ef88dd62f554740dd69130cbd7d0bd2eacc77e6f8400e0be1a007d35b266957c",
+      "exactPngEqual": true
+    },
+    {
+      "checkpoint": "lantern-drop",
+      "baselineSha256": "0946c14e616c994c44e9cc39bda8b9eafbd2dd547fd5178c11841c359afbd2ed",
+      "candidateSha256": "0946c14e616c994c44e9cc39bda8b9eafbd2dd547fd5178c11841c359afbd2ed",
+      "exactPngEqual": true
+    },
+    {
+      "checkpoint": "skylight",
+      "baselineSha256": "9c3a1f7922d5b416fd3f2fe9353812eef73d0924fb01aa35cf23a71914e8bcdf",
+      "candidateSha256": "9c3a1f7922d5b416fd3f2fe9353812eef73d0924fb01aa35cf23a71914e8bcdf",
+      "exactPngEqual": true
+    },
+    {
+      "checkpoint": "yellow",
+      "baselineSha256": "3967003e88cce6cef8edb7af8989cb5f06ccfe05b9ae1931516a5e172e6e1dad",
+      "candidateSha256": "3967003e88cce6cef8edb7af8989cb5f06ccfe05b9ae1931516a5e172e6e1dad",
+      "exactPngEqual": true
+    },
+    {
+      "checkpoint": "blue",
+      "baselineSha256": "37115a233662bd831be50f41e2ededd30666e94d412ffe8d029b15c2a31aadf6",
+      "candidateSha256": "37115a233662bd831be50f41e2ededd30666e94d412ffe8d029b15c2a31aadf6",
+      "exactPngEqual": true
+    },
+    {
+      "checkpoint": "red",
+      "baselineSha256": "3f72d742b9705c857285b7c53e5e071c8317731b1b23ab4f1fa57b805f4af58e",
+      "candidateSha256": "3f72d742b9705c857285b7c53e5e071c8317731b1b23ab4f1fa57b805f4af58e",
+      "exactPngEqual": true
+    },
+    {
+      "checkpoint": "green",
+      "baselineSha256": "5d7f53b156a6aa0f5d7aa3380273aed77288cd5742deeee5fa6608a87e0127df",
+      "candidateSha256": "5d7f53b156a6aa0f5d7aa3380273aed77288cd5742deeee5fa6608a87e0127df",
+      "exactPngEqual": true
+    },
+    {
+      "checkpoint": "mirror",
+      "baselineSha256": "efdc76cb16d3cc47e7b246e50277f64cc6762948475702c7e6f53ce4165f2dd3",
+      "candidateSha256": "efdc76cb16d3cc47e7b246e50277f64cc6762948475702c7e6f53ce4165f2dd3",
+      "exactPngEqual": true
+    },
+    {
+      "checkpoint": "lich",
+      "baselineSha256": "a7f2e6cf1c2a1d4649749096f82634557673c1deadd9bff07cf8d237fbb529af",
+      "candidateSha256": "a7f2e6cf1c2a1d4649749096f82634557673c1deadd9bff07cf8d237fbb529af",
+      "exactPngEqual": true
+    },
+    {
+      "checkpoint": "finale-roof",
+      "baselineSha256": "89635ce7a34481000ee33e122659ddec3a83ec80c23f223f738f5e4b42c9b561",
+      "candidateSha256": "89635ce7a34481000ee33e122659ddec3a83ec80c23f223f738f5e4b42c9b561",
+      "exactPngEqual": true
+    },
+    {
+      "checkpoint": "two-enemy-combat",
+      "baselineSha256": "3457acd16a693dac2f7143dbc72416592ca5fc9f87b0fdc41b2947a3b6b615e6",
+      "candidateSha256": "3457acd16a693dac2f7143dbc72416592ca5fc9f87b0fdc41b2947a3b6b615e6",
+      "exactPngEqual": true
+    }
+  ],
+  "imageResult": "PASS exact bytes",
+  "timing": "not evaluated by image equality",
+  "backendParity": "not evaluated"
+}

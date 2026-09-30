@@ -1,0 +1,24 @@
+Internal ctest changing into directory: C:/Dev/tmp/horde-phase3-native-20260923
+Test project C:/Dev/tmp/horde-phase3-native-20260923
+    Start 36: horde_rt_raygen_compiler_strategy_tests
+1/4 Test #36: horde_rt_raygen_compiler_strategy_tests ...   Passed   24.58 sec
+    Start 37: horde_rt_raygen_variant_manifest_tests
+2/4 Test #37: horde_rt_raygen_variant_manifest_tests ....   Passed   30.10 sec
+    Start 38: horde_rt_raygen_variant_artifact_tests
+3/4 Test #38: horde_rt_raygen_variant_artifact_tests ....***Failed    1.81 sec
+Exception: C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\tests\RaygenVariantArtifactTests.ps1:28
+Line |
+  28 |      if (-not $Condition) { throw $Message }
+     |                             ~~~~~~~~~~~~~~
+     | Compatibility generic include changed unexpectedly.
+
+    Start 39: horde_rt_rayquery_compute_shader_tests
+4/4 Test #39: horde_rt_rayquery_compute_shader_tests ....   Passed   30.98 sec
+
+75% tests passed, 1 tests failed out of 4
+
+Total Test time (real) =  87.47 sec
+
+The following tests FAILED:
+	 38 - horde_rt_raygen_variant_artifact_tests (Failed)
+Errors while running CTest

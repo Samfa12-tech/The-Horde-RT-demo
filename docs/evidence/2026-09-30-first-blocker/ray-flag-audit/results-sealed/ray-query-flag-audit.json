@@ -1,0 +1,715 @@
+{
+  "schema": 1,
+  "generatedUtc": "2026-09-30T10:08:13.1495940Z",
+  "controlApk": {
+    "path": "C:\\Dev\\tmp\\horde-shipping-ab-20260930\\active-strategy\\HordeLanternRT-eaf-active-strategy-benchmark-arm64.apk",
+    "sha256": "ab3e2261fd081f87e667a6e4967e2476077fa96554702330e6aa49baa8133eae"
+  },
+  "candidateApk": {
+    "path": "C:\\Dev\\tmp\\horde-first-blocker-20260930\\artifacts\\benchmark\\candidate-benchmark.apk",
+    "sha256": "0383edcad0ffb0ab9e116ff5df7f8e20bbdb4cdca1f06a30986709257e42387e"
+  },
+  "controlElfSha256": "5d770ee5eab33a4566f15316a0059269e62233c6efe2230cb0dde25c16e789cc",
+  "candidateElfSha256": "a9bfb1ac88382b06e744e50b4aa80e84c601090677e79ce8b9290fae1ea55f54",
+  "spirvTools": {
+    "validator": "C:\\VulkanSDK\\1.4.350.0\\Bin\\spirv-val.exe",
+    "disassembler": "C:\\VulkanSDK\\1.4.350.0\\Bin\\spirv-dis.exe",
+    "spirvHeader": "C:\\VulkanSDK\\1.4.350.0\\Include\\spirv-headers\\spirv.h",
+    "noOpaqueMask": "0x00000002",
+    "terminateOnFirstHitMask": "0x00000004"
+  },
+  "flags": {
+    "gl_RayFlagsNoOpaqueEXT": 2,
+    "gl_RayFlagsTerminateOnFirstHitEXT": 4,
+    "binaryBlockerCombined": 6
+  },
+  "modulePairs": [
+    {
+      "semanticKey": "rayquery_compute_shipping_mobile_opaque_fast",
+      "controlSha256": "5002afa7ac6ce0d03fc749742bb0832a1006b9f01bb1c6ab8490710790a79133",
+      "candidateSha256": "3efe4b74a81ca7626818e898160fdd5545146a7a3e09a011bfa0def09293b083",
+      "controlWords": 125318,
+      "candidateWords": 125318,
+      "rawWordDiffCount": 17,
+      "rawWordDiffsFirst32": [
+        {
+          "wordIndex": 20071,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        },
+        {
+          "wordIndex": 21331,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        },
+        {
+          "wordIndex": 21604,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        },
+        {
+          "wordIndex": 33464,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        },
+        {
+          "wordIndex": 34371,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        },
+        {
+          "wordIndex": 63998,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        },
+        {
+          "wordIndex": 65053,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        },
+        {
+          "wordIndex": 79498,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        },
+        {
+          "wordIndex": 80553,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        },
+        {
+          "wordIndex": 84431,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        },
+        {
+          "wordIndex": 85803,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        },
+        {
+          "wordIndex": 86807,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        },
+        {
+          "wordIndex": 92814,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        },
+        {
+          "wordIndex": 94074,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        },
+        {
+          "wordIndex": 94347,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        },
+        {
+          "wordIndex": 106207,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        },
+        {
+          "wordIndex": 107114,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        }
+      ],
+      "normalizedInstructionCountControl": 27421,
+      "normalizedInstructionCountCandidate": 27421,
+      "normalizedInstructionDiffCount": 17,
+      "normalizedInstructionDiffs": [
+        {
+          "instructionIndex": 4317,
+          "control": "OpRayQueryInitializeKHR %v26 %v716 %v112 %v388 %v3348 %v384 %v3350 %v3353",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v716 %v324 %v388 %v3348 %v384 %v3350 %v3353"
+        },
+        {
+          "instructionIndex": 4606,
+          "control": "OpRayQueryInitializeKHR %v26 %v716 %v112 %v388 %v3570 %v384 %v3544 %v3572",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v716 %v324 %v388 %v3570 %v384 %v3544 %v3572"
+        },
+        {
+          "instructionIndex": 4672,
+          "control": "OpRayQueryInitializeKHR %v26 %v716 %v112 %v388 %v3619 %v384 %v3613 %v3621",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v716 %v324 %v388 %v3619 %v384 %v3613 %v3621"
+        },
+        {
+          "instructionIndex": 7297,
+          "control": "OpRayQueryInitializeKHR %v26 %v716 %v112 %v388 %v5700 %v384 %v5690 %v5702",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v716 %v324 %v388 %v5700 %v384 %v5690 %v5702"
+        },
+        {
+          "instructionIndex": 7504,
+          "control": "OpRayQueryInitializeKHR %v26 %v716 %v112 %v388 %v5863 %v384 %v5848 %v5865",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v716 %v324 %v388 %v5863 %v384 %v5848 %v5865"
+        },
+        {
+          "instructionIndex": 13986,
+          "control": "OpRayQueryInitializeKHR %v26 %v716 %v112 %v388 %v11073 %v384 %v11075 %v11078",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v716 %v324 %v388 %v11073 %v384 %v11075 %v11078"
+        },
+        {
+          "instructionIndex": 14228,
+          "control": "OpRayQueryInitializeKHR %v26 %v716 %v112 %v388 %v11261 %v384 %v11246 %v11263",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v716 %v324 %v388 %v11261 %v384 %v11246 %v11263"
+        },
+        {
+          "instructionIndex": 17437,
+          "control": "OpRayQueryInitializeKHR %v26 %v716 %v112 %v388 %v13778 %v384 %v13780 %v13783",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v716 %v324 %v388 %v13778 %v384 %v13780 %v13783"
+        },
+        {
+          "instructionIndex": 17679,
+          "control": "OpRayQueryInitializeKHR %v26 %v716 %v112 %v388 %v13966 %v384 %v13951 %v13968",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v716 %v324 %v388 %v13966 %v384 %v13951 %v13968"
+        },
+        {
+          "instructionIndex": 18530,
+          "control": "OpRayQueryInitializeKHR %v26 %v716 %v112 %v388 %v14649 %v384 %v14629 %v14651",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v716 %v324 %v388 %v14649 %v384 %v14629 %v14651"
+        },
+        {
+          "instructionIndex": 18866,
+          "control": "OpRayQueryInitializeKHR %v26 %v716 %v112 %v388 %v14886 %v384 %v14745 %v14888",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v716 %v324 %v388 %v14886 %v384 %v14745 %v14888"
+        },
+        {
+          "instructionIndex": 19092,
+          "control": "OpRayQueryInitializeKHR %v26 %v716 %v112 %v388 %v15066 %v384 %v15039 %v15068",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v716 %v324 %v388 %v15066 %v384 %v15039 %v15068"
+        },
+        {
+          "instructionIndex": 20507,
+          "control": "OpRayQueryInitializeKHR %v26 %v716 %v112 %v388 %v16105 %v384 %v16107 %v16110",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v716 %v324 %v388 %v16105 %v384 %v16107 %v16110"
+        },
+        {
+          "instructionIndex": 20796,
+          "control": "OpRayQueryInitializeKHR %v26 %v716 %v112 %v388 %v16327 %v384 %v16301 %v16329",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v716 %v324 %v388 %v16327 %v384 %v16301 %v16329"
+        },
+        {
+          "instructionIndex": 20862,
+          "control": "OpRayQueryInitializeKHR %v26 %v716 %v112 %v388 %v16376 %v384 %v16370 %v16378",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v716 %v324 %v388 %v16376 %v384 %v16370 %v16378"
+        },
+        {
+          "instructionIndex": 23487,
+          "control": "OpRayQueryInitializeKHR %v26 %v716 %v112 %v388 %v18457 %v384 %v18447 %v18459",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v716 %v324 %v388 %v18457 %v384 %v18447 %v18459"
+        },
+        {
+          "instructionIndex": 23694,
+          "control": "OpRayQueryInitializeKHR %v26 %v716 %v112 %v388 %v18620 %v384 %v18605 %v18622",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v716 %v324 %v388 %v18620 %v384 %v18605 %v18622"
+        }
+      ],
+      "changedFlagConstantDefinitionCount": 0,
+      "controlRayQueryInitializeCount": 23,
+      "candidateRayQueryInitializeCount": 23,
+      "controlFlagCounts": {
+        "1": 4,
+        "2": 19
+      },
+      "candidateFlagCounts": {
+        "1": 4,
+        "2": 2,
+        "6": 17
+      },
+      "changedFlagSites": [
+        {
+          "site": 1,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8907 %465 %4033 %15155 %3912 %15157 %15194",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8907 %2398 %4033 %15155 %3912 %15157 %15194"
+        },
+        {
+          "site": 2,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8907 %465 %4033 %15875 %3912 %15508 %15941",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8907 %2398 %4033 %15875 %3912 %15508 %15941"
+        },
+        {
+          "site": 3,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8907 %465 %4033 %16018 %3912 %15568 %16084",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8907 %2398 %4033 %16018 %3912 %15568 %16084"
+        },
+        {
+          "site": 5,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8907 %465 %4033 %20589 %3912 %19426 %20655",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8907 %2398 %4033 %20589 %3912 %19426 %20655"
+        },
+        {
+          "site": 6,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8907 %465 %4033 %21164 %3912 %20797 %21230",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8907 %2398 %4033 %21164 %3912 %20797 %21230"
+        },
+        {
+          "site": 9,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8907 %465 %4033 %53236 %3912 %53238 %53275",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8907 %2398 %4033 %53236 %3912 %53238 %53275"
+        },
+        {
+          "site": 10,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8907 %465 %4033 %53956 %3912 %53589 %54022",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8907 %2398 %4033 %53956 %3912 %53589 %54022"
+        },
+        {
+          "site": 12,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8907 %465 %4033 %60630 %3912 %60632 %60669",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8907 %2398 %4033 %60630 %3912 %60632 %60669"
+        },
+        {
+          "site": 13,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8907 %465 %4033 %61350 %3912 %60983 %61416",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8907 %2398 %4033 %61350 %3912 %60983 %61416"
+        },
+        {
+          "site": 14,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8907 %465 %4033 %63389 %3912 %45620 %63455",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8907 %2398 %4033 %63389 %3912 %45620 %63455"
+        },
+        {
+          "site": 15,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8907 %465 %4033 %63992 %3912 %105039 %64058",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8907 %2398 %4033 %63992 %3912 %105039 %64058"
+        },
+        {
+          "site": 16,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8907 %465 %4033 %64567 %3912 %64200 %64633",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8907 %2398 %4033 %64567 %3912 %64200 %64633"
+        },
+        {
+          "site": 17,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8907 %465 %4033 %67921 %3912 %67923 %67960",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8907 %2398 %4033 %67921 %3912 %67923 %67960"
+        },
+        {
+          "site": 18,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8907 %465 %4033 %68641 %3912 %68274 %68707",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8907 %2398 %4033 %68641 %3912 %68274 %68707"
+        },
+        {
+          "site": 19,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8907 %465 %4033 %68784 %3912 %68334 %68850",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8907 %2398 %4033 %68784 %3912 %68334 %68850"
+        },
+        {
+          "site": 21,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8907 %465 %4033 %73355 %3912 %72192 %73421",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8907 %2398 %4033 %73355 %3912 %72192 %73421"
+        },
+        {
+          "site": 22,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8907 %465 %4033 %73930 %3912 %73563 %73996",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8907 %2398 %4033 %73930 %3912 %73563 %73996"
+        }
+      ],
+      "byteIdentical": false
+    },
+    {
+      "semanticKey": "shipping_mobile_opaque_fast",
+      "controlSha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+      "candidateSha256": "eef1d05592d96655c6298920bac023ec782c2aa9c916171794bdcde9f37e88df",
+      "controlWords": 125253,
+      "candidateWords": 125253,
+      "rawWordDiffCount": 17,
+      "rawWordDiffsFirst32": [
+        {
+          "wordIndex": 20010,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        },
+        {
+          "wordIndex": 21270,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        },
+        {
+          "wordIndex": 21543,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        },
+        {
+          "wordIndex": 33403,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        },
+        {
+          "wordIndex": 34310,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        },
+        {
+          "wordIndex": 63937,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        },
+        {
+          "wordIndex": 64992,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        },
+        {
+          "wordIndex": 79437,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        },
+        {
+          "wordIndex": 80492,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        },
+        {
+          "wordIndex": 84370,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        },
+        {
+          "wordIndex": 85742,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        },
+        {
+          "wordIndex": 86746,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        },
+        {
+          "wordIndex": 92753,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        },
+        {
+          "wordIndex": 94013,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        },
+        {
+          "wordIndex": 94286,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        },
+        {
+          "wordIndex": 106146,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        },
+        {
+          "wordIndex": 107053,
+          "control": "0x000001D1",
+          "candidate": "0x0000095E"
+        }
+      ],
+      "normalizedInstructionCountControl": 27402,
+      "normalizedInstructionCountCandidate": 27402,
+      "normalizedInstructionDiffCount": 17,
+      "normalizedInstructionDiffs": [
+        {
+          "instructionIndex": 4300,
+          "control": "OpRayQueryInitializeKHR %v26 %v704 %v112 %v388 %v3336 %v384 %v3338 %v3341",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v704 %v324 %v388 %v3336 %v384 %v3338 %v3341"
+        },
+        {
+          "instructionIndex": 4589,
+          "control": "OpRayQueryInitializeKHR %v26 %v704 %v112 %v388 %v3558 %v384 %v3532 %v3560",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v704 %v324 %v388 %v3558 %v384 %v3532 %v3560"
+        },
+        {
+          "instructionIndex": 4655,
+          "control": "OpRayQueryInitializeKHR %v26 %v704 %v112 %v388 %v3607 %v384 %v3601 %v3609",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v704 %v324 %v388 %v3607 %v384 %v3601 %v3609"
+        },
+        {
+          "instructionIndex": 7280,
+          "control": "OpRayQueryInitializeKHR %v26 %v704 %v112 %v388 %v5688 %v384 %v5678 %v5690",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v704 %v324 %v388 %v5688 %v384 %v5678 %v5690"
+        },
+        {
+          "instructionIndex": 7487,
+          "control": "OpRayQueryInitializeKHR %v26 %v704 %v112 %v388 %v5851 %v384 %v5836 %v5853",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v704 %v324 %v388 %v5851 %v384 %v5836 %v5853"
+        },
+        {
+          "instructionIndex": 13969,
+          "control": "OpRayQueryInitializeKHR %v26 %v704 %v112 %v388 %v11061 %v384 %v11063 %v11066",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v704 %v324 %v388 %v11061 %v384 %v11063 %v11066"
+        },
+        {
+          "instructionIndex": 14211,
+          "control": "OpRayQueryInitializeKHR %v26 %v704 %v112 %v388 %v11249 %v384 %v11234 %v11251",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v704 %v324 %v388 %v11249 %v384 %v11234 %v11251"
+        },
+        {
+          "instructionIndex": 17420,
+          "control": "OpRayQueryInitializeKHR %v26 %v704 %v112 %v388 %v13766 %v384 %v13768 %v13771",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v704 %v324 %v388 %v13766 %v384 %v13768 %v13771"
+        },
+        {
+          "instructionIndex": 17662,
+          "control": "OpRayQueryInitializeKHR %v26 %v704 %v112 %v388 %v13954 %v384 %v13939 %v13956",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v704 %v324 %v388 %v13954 %v384 %v13939 %v13956"
+        },
+        {
+          "instructionIndex": 18513,
+          "control": "OpRayQueryInitializeKHR %v26 %v704 %v112 %v388 %v14637 %v384 %v14617 %v14639",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v704 %v324 %v388 %v14637 %v384 %v14617 %v14639"
+        },
+        {
+          "instructionIndex": 18849,
+          "control": "OpRayQueryInitializeKHR %v26 %v704 %v112 %v388 %v14874 %v384 %v14733 %v14876",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v704 %v324 %v388 %v14874 %v384 %v14733 %v14876"
+        },
+        {
+          "instructionIndex": 19075,
+          "control": "OpRayQueryInitializeKHR %v26 %v704 %v112 %v388 %v15054 %v384 %v15027 %v15056",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v704 %v324 %v388 %v15054 %v384 %v15027 %v15056"
+        },
+        {
+          "instructionIndex": 20490,
+          "control": "OpRayQueryInitializeKHR %v26 %v704 %v112 %v388 %v16093 %v384 %v16095 %v16098",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v704 %v324 %v388 %v16093 %v384 %v16095 %v16098"
+        },
+        {
+          "instructionIndex": 20779,
+          "control": "OpRayQueryInitializeKHR %v26 %v704 %v112 %v388 %v16315 %v384 %v16289 %v16317",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v704 %v324 %v388 %v16315 %v384 %v16289 %v16317"
+        },
+        {
+          "instructionIndex": 20845,
+          "control": "OpRayQueryInitializeKHR %v26 %v704 %v112 %v388 %v16364 %v384 %v16358 %v16366",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v704 %v324 %v388 %v16364 %v384 %v16358 %v16366"
+        },
+        {
+          "instructionIndex": 23470,
+          "control": "OpRayQueryInitializeKHR %v26 %v704 %v112 %v388 %v18445 %v384 %v18435 %v18447",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v704 %v324 %v388 %v18445 %v384 %v18435 %v18447"
+        },
+        {
+          "instructionIndex": 23677,
+          "control": "OpRayQueryInitializeKHR %v26 %v704 %v112 %v388 %v18608 %v384 %v18593 %v18610",
+          "candidate": "OpRayQueryInitializeKHR %v26 %v704 %v324 %v388 %v18608 %v384 %v18593 %v18610"
+        }
+      ],
+      "changedFlagConstantDefinitionCount": 0,
+      "controlRayQueryInitializeCount": 23,
+      "candidateRayQueryInitializeCount": 23,
+      "controlFlagCounts": {
+        "1": 4,
+        "2": 19
+      },
+      "candidateFlagCounts": {
+        "1": 4,
+        "2": 2,
+        "6": 17
+      },
+      "changedFlagSites": [
+        {
+          "site": 1,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8891 %465 %4033 %15139 %3912 %15141 %15178",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8891 %2398 %4033 %15139 %3912 %15141 %15178"
+        },
+        {
+          "site": 2,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8891 %465 %4033 %15859 %3912 %15492 %15925",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8891 %2398 %4033 %15859 %3912 %15492 %15925"
+        },
+        {
+          "site": 3,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8891 %465 %4033 %16002 %3912 %15552 %16068",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8891 %2398 %4033 %16002 %3912 %15552 %16068"
+        },
+        {
+          "site": 5,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8891 %465 %4033 %20573 %3912 %19410 %20639",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8891 %2398 %4033 %20573 %3912 %19410 %20639"
+        },
+        {
+          "site": 6,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8891 %465 %4033 %21148 %3912 %20781 %21214",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8891 %2398 %4033 %21148 %3912 %20781 %21214"
+        },
+        {
+          "site": 9,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8891 %465 %4033 %53220 %3912 %53222 %53259",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8891 %2398 %4033 %53220 %3912 %53222 %53259"
+        },
+        {
+          "site": 10,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8891 %465 %4033 %53940 %3912 %53573 %54006",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8891 %2398 %4033 %53940 %3912 %53573 %54006"
+        },
+        {
+          "site": 12,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8891 %465 %4033 %60614 %3912 %60616 %60653",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8891 %2398 %4033 %60614 %3912 %60616 %60653"
+        },
+        {
+          "site": 13,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8891 %465 %4033 %61334 %3912 %60967 %61400",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8891 %2398 %4033 %61334 %3912 %60967 %61400"
+        },
+        {
+          "site": 14,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8891 %465 %4033 %63373 %3912 %45604 %63439",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8891 %2398 %4033 %63373 %3912 %45604 %63439"
+        },
+        {
+          "site": 15,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8891 %465 %4033 %63976 %3912 %105023 %64042",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8891 %2398 %4033 %63976 %3912 %105023 %64042"
+        },
+        {
+          "site": 16,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8891 %465 %4033 %64551 %3912 %64184 %64617",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8891 %2398 %4033 %64551 %3912 %64184 %64617"
+        },
+        {
+          "site": 17,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8891 %465 %4033 %67905 %3912 %67907 %67944",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8891 %2398 %4033 %67905 %3912 %67907 %67944"
+        },
+        {
+          "site": 18,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8891 %465 %4033 %68625 %3912 %68258 %68691",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8891 %2398 %4033 %68625 %3912 %68258 %68691"
+        },
+        {
+          "site": 19,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8891 %465 %4033 %68768 %3912 %68318 %68834",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8891 %2398 %4033 %68768 %3912 %68318 %68834"
+        },
+        {
+          "site": 21,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8891 %465 %4033 %73339 %3912 %72176 %73405",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8891 %2398 %4033 %73339 %3912 %72176 %73405"
+        },
+        {
+          "site": 22,
+          "control": 2,
+          "candidate": 6,
+          "controlLine": "OpRayQueryInitializeKHR %3908 %8891 %465 %4033 %73914 %3912 %73547 %73980",
+          "candidateLine": "OpRayQueryInitializeKHR %3908 %8891 %2398 %4033 %73914 %3912 %73547 %73980"
+        }
+      ],
+      "byteIdentical": false
+    },
+    {
+      "semanticKey": "rayquery_compute_shipping_mobile_generic_dielectric",
+      "controlSha256": "c2bd389812841161951f819e0f12e95c929aa3f49ec87d9849393a687d20ebde",
+      "candidateSha256": "c2bd389812841161951f819e0f12e95c929aa3f49ec87d9849393a687d20ebde",
+      "controlWords": 61022,
+      "candidateWords": 61022,
+      "rawWordDiffCount": 0,
+      "rawWordDiffsFirst32": [],
+      "normalizedInstructionCountControl": 12924,
+      "normalizedInstructionCountCandidate": 12924,
+      "normalizedInstructionDiffCount": 0,
+      "normalizedInstructionDiffs": [],
+      "changedFlagConstantDefinitionCount": 0,
+      "controlRayQueryInitializeCount": 2,
+      "candidateRayQueryInitializeCount": 2,
+      "controlFlagCounts": {
+        "unresolved": 2
+      },
+      "candidateFlagCounts": {
+        "unresolved": 2
+      },
+      "changedFlagSites": [],
+      "byteIdentical": true
+    },
+    {
+      "semanticKey": "shipping_mobile_generic_dielectric",
+      "controlSha256": "ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532",
+      "candidateSha256": "ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532",
+      "controlWords": 60963,
+      "candidateWords": 60963,
+      "rawWordDiffCount": 0,
+      "rawWordDiffsFirst32": [],
+      "normalizedInstructionCountControl": 12909,
+      "normalizedInstructionCountCandidate": 12909,
+      "normalizedInstructionDiffCount": 0,
+      "normalizedInstructionDiffs": [],
+      "changedFlagConstantDefinitionCount": 0,
+      "controlRayQueryInitializeCount": 2,
+      "candidateRayQueryInitializeCount": 2,
+      "controlFlagCounts": {
+        "unresolved": 2
+      },
+      "candidateFlagCounts": {
+        "unresolved": 2
+      },
+      "changedFlagSites": [],
+      "byteIdentical": true
+    }
+  ],
+  "conclusion": "Both GenericDielectric modules are byte-identical. Each OpaqueFast module changes only the binary-blocker ray-query flag operand at 17 static initialize sites (2 to 6); the other 6 of 23 sites retain their numeric flags and all other normalized instructions are unchanged. No constant definition changed. Raw word differences equal those 17 query-flag operand differences."
+}

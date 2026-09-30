@@ -15,11 +15,30 @@ Captured geometry/mounting remains the accepted modelled route, not new tuning.
 
 The separate ARM64 Shipping/Mobile benchmark APK `0383edca` builds and its actual
 four packaged modules validate/disassemble with zero atomics/image reads/binding22;
-all 53 asset payloads equal control `ab3e2261`. Uncooled A/B/B/A performance work is
-in progress, not a gain or sustained/display-pacing/30 FPS pass. Exact evidence
-working root: `C:/Dev/tmp/horde-first-blocker-20260930`. This does not close ongoing
+all 53 asset payloads equal control `ab3e2261`. All four uncooled A/B/B/A trials
+complete:7,352 admitted owning rows/640 opening OpaqueFast rows. A1/B1/B2/A2 route
+medians70.0435/79.2882/78.1312/77.2206ms; opening GPU medians80.154399/91.234555/
+90.7692945/89.4686175ms. Power/thermal drift precludes causal gain/regression or
+steady-state/display-pacing acceptance; all opening intervals exceed33.333ms.
+Candidate production admission is rejected for no demonstrated gain; the lead
+restores prior shader flags/artifacts and retains stronger regression guards.
+Normal controlAPKab3e2261 installs/pulls back identically beforeA2; stable app/data
+untouched. All these runs are after observed09:11:04UTC removal report, uncooled;
+actual prior thaw/removal timeline remains unknown. [Exact retained evidence](evidence/2026-09-30-first-blocker/README.md)
+records the unchanged images, complete ledgers, module proof and limitations.
+No sustained30FPS pass. This does not close ongoing
 glass correctness/live acceptance, phone compute, RTX backend parity or exact
 S24/S25 gates. Audio/haptic manual revalidation: NO (no semantic/playback change).
+
+Subsequent local restoration evidence: immutable normal Debug APK389d6954
+installs/pulls back identically in `.debug`. First120s route deadline times out
+with native progress; run20260930-204834 retry at existing300s deadline passes
+replay/scene-only75% isolated-lantern/Home-resume. Offline exact PNG comparison
+equals same-artifact historical image. Fresh owning epoch6/gen4/submission1866/
+tick1873 remains1closed interface-budget failure and80reason2recoveries; neither
+counter suppression nor glass correctness acceptance. Single228.609474ms
+Diagnostic GPU frame is not Shipping performance. Owner disconnected the phone
+after this evidence; no new tests until reconnection. S24/S25/compute still open.
 
 ## September 30: opening fire-cost isolation and cooling change (local SM-S948B evidence)
 

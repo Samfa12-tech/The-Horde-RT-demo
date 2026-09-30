@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "testScript": "analyse-trial.ps1",
+  "testUtc": "2026-09-30",
+  "rawReportsModified": false,
+  "positiveRuns": [
+    {
+      "runId": "first-blocker-candidate-b1-route-20260930",
+      "sourceCommit": "3e5bd64a6eff533f6255cd48e18b694a9bba8bfb+reviewed-first-blocker-patch",
+      "apkSha256": "0383edcad0ffb0ab9e116ff5df7f8e20bbdb4cdca1f06a30986709257e42387e",
+      "integrity": "PASS",
+      "frames": 1838,
+      "owningStrategyExported": true,
+      "openingOpaqueFastFrames": 160,
+      "physicalEvidenceClass": "quality-preserving-candidate-unaccepted",
+      "gainClaim": "none",
+      "physicalAcceptance": "not-evaluated"
+    },
+    {
+      "runId": "first-blocker-candidate-b2-route-20260930",
+      "sourceCommit": "3e5bd64a6eff533f6255cd48e18b694a9bba8bfb+reviewed-first-blocker-patch",
+      "apkSha256": "0383edcad0ffb0ab9e116ff5df7f8e20bbdb4cdca1f06a30986709257e42387e",
+      "integrity": "PASS",
+      "frames": 1838,
+      "owningStrategyExported": true,
+      "openingOpaqueFastFrames": 160,
+      "physicalEvidenceClass": "quality-preserving-candidate-unaccepted",
+      "gainClaim": "none",
+      "physicalAcceptance": "not-evaluated"
+    }
+  ],
+  "negativeCopyFixtures": [
+    {
+      "runId": "candidate-negative-shader-copy-20260930",
+      "copiedFrom": "first-blocker-candidate-b1-route-20260930",
+      "mutation": "benchmark shader pair opaqueFast module hash changed to zeroes",
+      "rejectedAt": "loaded artifact pair versus actual APK shader identity"
+    },
+    {
+      "runId": "candidate-negative-strategy-copy-20260930",
+      "copiedFrom": "first-blocker-candidate-b1-route-20260930",
+      "mutation": "row 0 activeStrategy changed to invalid-strategy",
+      "rejectedAt": "Invalid owning strategy at row 0"
+    },
+    {
+      "runId": "candidate-negative-identity-copy-20260930",
+      "copiedFrom": "first-blocker-candidate-b1-route-20260930",
+      "mutation": "row 0 completionIdentity.submissionSerial changed from 1840 to 1841",
+      "rejectedAt": "identity submissionSerial at row 0"
+    }
+  ],
+  "limitations": [
+    "Negative fixtures are disposable report copies; original B1/B2 reports remain unchanged.",
+    "These parser checks do not establish a performance gain or physical acceptance."
+  ]
+}

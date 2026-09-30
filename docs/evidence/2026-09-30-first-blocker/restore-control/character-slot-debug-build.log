@@ -1,0 +1,18 @@
+CMake is re-running because C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/build/presets/windows-x64-debug/CMakeFiles/generate.stamp is out-of-date.
+  the file 'C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/CMakeLists.txt'
+  is newer than 'C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/build/presets/windows-x64-debug/CMakeFiles/generate.stamp.depend'
+  result='-1'
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26200.
+Exception: C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\tools\GenerateRtPipelineVariantCatalog.ps1:80
+Line |
+  80 |  ÔÇª edBytes)) { throw 'Generated RT catalog adapter is stale, malformed,  ÔÇª
+     |                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | Generated RT catalog adapter is stale, malformed, or hand-edited.
+CMake Error at cmake/HordeRtRaygenArtifacts.cmake:10 (message):
+  Frozen RT catalog adapter is stale or malformed.
+Call Stack (most recent call first):
+  CMakeLists.txt:18 (horde_rt_configure_raygen_artifacts)
+
+
+-- Configuring incomplete, errors occurred!
+CMake Configure step failed.  Build files cannot be regenerated correctly.
