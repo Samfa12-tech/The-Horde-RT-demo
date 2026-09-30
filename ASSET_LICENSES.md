@@ -62,3 +62,9 @@ derived runtime cues are not yet packaged; rendering/provenance and playback gat
 remain open. This grant does not relicense Pocket Chordsmith/Pocket Audio source,
 change existing asset licence statements or authorise production publication.
 See [music integration checkpoint](docs/ENGINEERING_1_6_1_MUSIC_2026-09-30.md).
+The sixteen A-H PCM body/tail prototypes under
+`docs/evidence/2026-10-01-music-render/audio/` carry that same Horde-only owner grant.
+They are non-runtime rendering evidence, excluded from game packages, not a
+general asset library or seamless/playback acceptance. Source/tool hashes and
+original unmodified-score processing are recorded in that directory; no upstream
+Chordsmith code is vendored or relicensed.

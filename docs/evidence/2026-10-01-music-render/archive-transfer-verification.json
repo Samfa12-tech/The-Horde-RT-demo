@@ -1,0 +1,37 @@
+{
+  "status": "PASS",
+  "sourceExternalDirectory": "C:/Dev/tmp/horde-music-render-preparation-20260930/all-cue-render-corrected",
+  "audioCopy": {
+    "fileCount": 16,
+    "allCopiedBytesEqualSource": true,
+    "files": [
+      { "path": "audio/A-loop.wav", "bytes": 2304044, "sha256": "8e5be0c046d95a3058037c311ea6a1b7a330f82536788fd33954980d31dfcc02" },
+      { "path": "audio/A-tail.wav", "bytes": 576044, "sha256": "bb1c5be7c74f1026ff0ab7f2fd566e4ab81c756370246b3143c2e128ed6ed223" },
+      { "path": "audio/B-loop.wav", "bytes": 2304044, "sha256": "e05b2efcd5220be7c83538c24a52e9438726ac4c9f7d23c6c8ffa98778ce2d47" },
+      { "path": "audio/B-tail.wav", "bytes": 576044, "sha256": "99a0dc08f2249977e8e19f1b944ca1173b91a3ce171c62195696cf21f4b114ed" },
+      { "path": "audio/C-loop.wav", "bytes": 576044, "sha256": "7e378cdb37adaa3f88a3594ba080fac9be65c7c0e1d69c479263a516638223af" },
+      { "path": "audio/C-tail.wav", "bytes": 576044, "sha256": "0929b0a19a49fd8d1e6779db3d1a8db2a1edc30c25ef3fcab1321b1a0609f243" },
+      { "path": "audio/D-loop.wav", "bytes": 2304044, "sha256": "088d08a78ad55cffa3806b6f8daebf772fb4cf08528c6deb475938537fa09ff2" },
+      { "path": "audio/D-tail.wav", "bytes": 576044, "sha256": "0ad9b252052c45572ddcc1bc2acf3c2aa1a8e80ccbe8a347947d38cd8c91a812" },
+      { "path": "audio/E-loop.wav", "bytes": 2304044, "sha256": "070278efd96e8259733801bc30fe87e232cb26b4aeb3075cb927c9c89c8afb32" },
+      { "path": "audio/E-tail.wav", "bytes": 576044, "sha256": "aac330fb178822e86b0ea71307955eae95f1886de01a9bebf1620ad313877ddd" },
+      { "path": "audio/F-loop.wav", "bytes": 2304044, "sha256": "3d5b3562e716a99870151613adeda519f351602151c4a50eb5d93a4b98f4de80" },
+      { "path": "audio/F-tail.wav", "bytes": 576044, "sha256": "00b6c72aeb8ec50d7906ad4a12dc5a8cf53bbc862070902c625f31f1cc78d4f7" },
+      { "path": "audio/G-loop.wav", "bytes": 1152044, "sha256": "03b72d16b6bbc12c8bffc65173795925e69e1bb9356be4ad2737f7de9d2b0692" },
+      { "path": "audio/G-tail.wav", "bytes": 576044, "sha256": "a8a2afd26e7ad2bc97e032cd83b5f0c5084aecd8741692c091d841aa64c610c7" },
+      { "path": "audio/H-loop.wav", "bytes": 2304044, "sha256": "bb52cfa875b6fc359b380a2834df2ea8f633d2ae65f9e6f59f60c2c09fae9c0d" },
+      { "path": "audio/H-tail.wav", "bytes": 576044, "sha256": "62653fc9ae162c21a18e36646f23899642f56cf9094599d501cd681818a25d2c" }
+    ]
+  },
+  "renderReceiptCompression": {
+    "storedPath": "verification/all-cues.json.gz",
+    "originalBytes": 233688,
+    "originalSha256": "8df28c20da6088ed1230067faa2f507525d349bc5903a110bd9c1310a15ffb09",
+    "gzipBytes": 15449,
+    "gzipSha256": "d47a1e1dd23a1f31d43ce83c68880b93fa5e36c70b31eba8252d0d7f0483b678",
+    "gzipRoundTripExactBytes": true,
+    "roundTripBytes": 233688,
+    "roundTripSha256": "8df28c20da6088ed1230067faa2f507525d349bc5903a110bd9c1310a15ffb09"
+  },
+  "methodAndSmallReceipts": "Four method scripts and three small receipts were independently SHA-256 checked byte-identical to the corrected external source artifacts before this record was written."
+}

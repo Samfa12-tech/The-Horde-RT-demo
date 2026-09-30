@@ -1,6 +1,6 @@
 # 1.6.1 recovery handoff
 
-Updated 2026-09-30. Branch: `codex/horde-1.6.1-engineering-pass`.
+Updated 2026-10-01. Branch: `codex/horde-1.6.1-engineering-pass`.
 Engineering work has resumed by explicit owner instruction; the goal is not complete. See [programme scope](ENGINEERING_1_6_1_PLAN.md)
 and [latest lantern evidence](ENGINEERING_1_6_1_LANTERN_BENCHMARK_2026-09-20.md).
 
@@ -141,6 +141,16 @@ Runner head metadata is not reused-APK build provenance. Next prepare compiler-o
 same preprocessed material/shadow/origin code, no production patch or claimed gain.
 Fresh pushed b56d1bf CI36721846883/36721855646 actual logs pass46portable+11Vulkan
 CPU-host each; no device/final matrix inferred. Player work unchanged, goal open.
+Follow-on88a1546 push36724733377/PR36724739323 also pass46portable+11Vulkan
+CPU-host each; actual logs inspected, PR15 draft/CLEAN and description refreshed.
+
+Independent [music rendering prototypes](evidence/2026-10-01-music-render/README.md)
+retain A-H actual app voices/FX, corrected40ms crop/3s tails and verified source/
+score/traces/16PCM files. Initial wrong source-hash receipt remains red externally;
+new before/after hashes pass. Exact durations do not prove seamless loops: nonzero
+tails and chorus0.421Hz phase do not repeat every12s. No audio processing, score
+change, runtime asset admission, new framework or playback/listening acceptance.
+Music integration/separate volume remain open; ownerHorde-only grant is recorded.
 
 Follow-on [opening fire-cost evidence](evidence/2026-09-30-opening-lighting-isolation/README.md)
 retains C1,S1,V1,V2 and separate uncooled C2:all9,190 completions and800 opening

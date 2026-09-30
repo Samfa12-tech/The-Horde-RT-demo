@@ -71,9 +71,21 @@ supplied score's faithful game audio without actual rendering/trace/listening pr
 No Chordsmith/Core code copied, shared source modified or supplied music regenerated.
 Their source is UNLICENSED; the owner's score grant does not relicense that code.
 
-Next use a bounded local-tool rendering route retaining actual app synthesis/FX,
+[A-H rendering prototypes](evidence/2026-10-01-music-render/README.md) now retain
+actual app-voice/live-FX outputs, exact musical windows (40ms leader excluded),
+separate3s tails and pre/post source hashes. Source starts/holds/repeated pitches
+and actual scheduler traces agree; G's F-sharp4 is4.50s. Independent16-WAV PCM audit
+passes exact headers/frames/hashes and peak/RMS/seam quantisation checks. Original
+bad61-hex source-hash receipt is rejected and preserved externally; the rerender
+is a new run. At most1LSB repeat differences are documented, not bit-exactness.
+These are non-runtime prototypes, not admitted music assets or listening proof.
+Nonzero FX tails and0.421Hz chorus (5.052cycles/12s) mean exact-duration crops alone
+cannot certify seamless looping. This is not proof of an audible problem and does
+not approve a new synthesis framework, altered score/effect rate or licensing.
+
+The bounded local-tool rendering route retains actual app synthesis/FX,
 deterministic noise, exact musical windows and separately accounted tails; preserve
-the source JSON/hold/repeated-pitch masks and relative cue dynamics. Then admit
+the source JSON/hold/repeated-pitch masks and relative cue dynamics. Next admit
 hash/provenance/loop metadata, wire bounded playback/crossfades and pause/focus/
 retry/late-ending reconstruction on both platforms, add independent persisted
 Music Volume0–100%, validate actual20-loop seams/drift and final owner listening.

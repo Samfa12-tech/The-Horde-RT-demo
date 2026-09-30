@@ -1,0 +1,20 @@
+{
+  "status": "RED_ORIGINAL_RECEIPT_PROVENANCE_MISMATCH_PRESERVED",
+  "originalExternalReceipt": "C:/Dev/tmp/horde-music-render-preparation-20260930/all-cue-render/all-cues.json",
+  "originalExternalReceiptSha256": "38d0c402ab9902c0fb9ee24e75891fd34502307ab837f519661633f14028964b",
+  "htmlPathInReceipt": "apps/chordsmith-web/pocket_chordsmith_v68_core_bridge.html",
+  "originalRecordedHtmlSha256": "b266814fff749bd4d7be9d8725e4d7becc2d944122bc2a302457fa9b6e2cf",
+  "originalRecordedHtmlSha256Characters": 61,
+  "verifiedHtmlSha256": "b266814fff749bd4d7be9d8725e4d7becc2d944122bc2a302602457fa9b6e2cf",
+  "verifiedHtmlSha256Characters": 64,
+  "finding": "Original receipt's HTML hash omitted the '602' segment and did not match the current app HTML. Original receipt and original faulty-provenance WAVs were not copied into this evidence directory; this record preserves the red discrepancy without presenting those renders as corrected.",
+  "correctedRun": {
+    "externalReceipt": "C:/Dev/tmp/horde-music-render-preparation-20260930/all-cue-render-corrected/all-cues.json",
+    "htmlSha256": "b266814fff749bd4d7be9d8725e4d7becc2d944122bc2a302602457fa9b6e2cf",
+    "ownerArchiveSha256": "e28e5936189919fed25f6208dd7a8b97172eb5f7d25f69732cc7339c45f386fa",
+    "scoreEntry": "What_the_Dark_Keeps_Pocket_Chordsmith.json",
+    "scoreSha256": "bc092a0f7489e52ab1e7e55e42c813ae58517ea4a73e6808de8fbbc71595d4a6",
+    "adapterSha256": "689fa7124ef39ef7e36b2c122d1510ac495091cb0d0b3c37b575d481cd9e05aa",
+    "preAndPostHashesEqual": true
+  }
+}

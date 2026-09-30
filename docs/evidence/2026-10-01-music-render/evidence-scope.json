@@ -1,0 +1,42 @@
+{
+  "classification": "PROTOTYPE_INVESTIGATION_EVIDENCE_NOT_SHIPPING_ASSETS",
+  "renderSource": {
+    "app": "Pocket Chordsmith v68 core bridge HTML app",
+    "htmlPath": "apps/chordsmith-web/pocket_chordsmith_v68_core_bridge.html",
+    "htmlSha256": "b266814fff749bd4d7be9d8725e4d7becc2d944122bc2a302602457fa9b6e2cf",
+    "browser": "Playwright Chromium 148.0.7778.96",
+    "adapterSha256": "689fa7124ef39ef7e36b2c122d1510ac495091cb0d0b3c37b575d481cd9e05aa"
+  },
+  "scoreSource": {
+    "ownerArchive": "What_the_Dark_Keeps_Horde_RT_Music_Pack.zip",
+    "ownerArchiveSha256": "e28e5936189919fed25f6208dd7a8b97172eb5f7d25f69732cc7339c45f386fa",
+    "scoreEntry": "What_the_Dark_Keeps_Pocket_Chordsmith.json",
+    "scoreSha256": "bc092a0f7489e52ab1e7e55e42c813ae58517ea4a73e6808de8fbbc71595d4a6",
+    "ownerAuthorization": "Owner-supplied; authorised for Horde use only."
+  },
+  "method": {
+    "description": "One-off local adapter manually invokes the current app's existing section playback plan and voices through OfflineAudioContext with deterministic Math.random and a virtual currentTime shim; 40 ms leader omitted, exact score-duration body copied, 3 s FX tail stored separately.",
+    "limitations": [
+      "The app does not expose a supported offline rendering API; these scripts are an investigation adapter, not normal project tooling.",
+      "Nonfinite/clipping counters originate from the pre-PCM OfflineAudioContext buffer; PCM payload verification independently recomputes decoded WAV metrics but cannot recover NaNs sanitized by conversion or samples outside the crops.",
+      "The corrected receipt's complete JSON is gzip-compressed losslessly; original byte length and SHA-256 are recorded by the archive verification receipt.",
+      "No listening or owner acceptance is represented; these WAVs are not admitted as final game audio, runtime/package content, or seamless loops.",
+      "The per-cue 0.421 Hz chorus LFO is not phase-aligned to the 3, 6, or 12 second body lengths; tails and boundary differences remain.",
+      "The original bad-hash receipt discrepancy is retained in provenance-red.json; no WAVs from that run are included."
+    ]
+  },
+  "rightsBoundary": {
+    "included": "Corrected generated WAV renders, original investigation scripts, and compact verification receipts only.",
+    "excluded": [
+      "Pocket Chordsmith upstream application/source code",
+      "Owner ZIP and original score JSON",
+      "Paid-generation files or newly processed variants"
+    ],
+    "unresolved": "Redistribution, licensing, and source/tool distribution rights are not established by this archive. Owner authorization is limited to Horde use."
+  },
+  "notApproved": [
+    "Runtime or package integration",
+    "Final asset admission",
+    "Seamless-loop or cross-platform acceptance"
+  ]
+}
