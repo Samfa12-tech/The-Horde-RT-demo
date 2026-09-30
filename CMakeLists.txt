@@ -55,9 +55,10 @@ set(HORDE_RT_SOURCE_FILES)
 foreach(source IN LISTS HORDE_RT_CORE_RELATIVE_SOURCES)
     list(APPEND HORDE_RT_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/${source}")
 endforeach()
-list(FILTER HORDE_RT_SOURCE_FILES EXCLUDE REGEX "/gameplay/(simulation/GameSimulation|animation/(PlayerAnimationState|PlayerIkTargets)|effects/FireEmitterState|interactions/(InteractionState|ChestRewardSequence|FinaleSequence)|items/(HeldItemState|HeldItemKinematics|HeldLightState|LanternPendulum))\\.cpp$")
+list(FILTER HORDE_RT_SOURCE_FILES EXCLUDE REGEX "/(audio/MusicDirector|gameplay/(simulation/GameSimulation|animation/(PlayerAnimationState|PlayerIkTargets)|effects/FireEmitterState|interactions/(InteractionState|ChestRewardSequence|FinaleSequence)|items/(HeldItemState|HeldItemKinematics|HeldLightState|LanternPendulum)))\\.cpp$")
 
 add_library(horde_gameplay_simulation STATIC
+    src/audio/MusicDirector.cpp
     src/gameplay/simulation/GameSimulation.cpp
     src/gameplay/animation/PlayerAnimationState.cpp
     src/gameplay/animation/PlayerIkTargets.cpp
@@ -558,6 +559,11 @@ if(BUILD_TESTING)
     target_include_directories(horde_rt_simulation_gameplay_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_link_libraries(horde_rt_simulation_gameplay_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_simulation_gameplay_tests COMMAND horde_rt_simulation_gameplay_tests)
+
+    add_executable(horde_rt_music_director_tests tests/MusicDirectorTests.cpp)
+    target_include_directories(horde_rt_music_director_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(horde_rt_music_director_tests PRIVATE horde_gameplay_simulation)
+    add_test(NAME horde_rt_music_director_tests COMMAND horde_rt_music_director_tests)
 
     add_executable(horde_rt_lantern_reward_tests tests/LanternRewardTests.cpp)
     target_include_directories(horde_rt_lantern_reward_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)

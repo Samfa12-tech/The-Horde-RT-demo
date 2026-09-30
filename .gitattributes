@@ -88,3 +88,7 @@ docs/evidence/2026-09-30-first-blocker/**/*.patch whitespace=-trailing-space,-bl
 # Exact native Mobile-dielectric RTX subset evidence (not phone acceptance).
 docs/evidence/2026-09-30-mobile-rtx/** -text whitespace=cr-at-eol
 docs/evidence/2026-09-30-mobile-rtx/**/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+
+# Shared unwired music resolver build/red-green evidence.
+docs/evidence/2026-09-30-music-resolver/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-30-music-resolver/**/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol

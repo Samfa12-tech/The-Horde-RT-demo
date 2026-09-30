@@ -51,3 +51,14 @@ Anatomy correction, 2026-09-23: the gauntlet row's left-source/right-mirror desc
 Android runtime derivatives for the five CC0 rows are strict KTX2 arrays using ASTC 6x6 for diffuse/AO-roughness-metal and ASTC 4x4 for normals. The retained raw RGBA arrays and original 1K JPGs remain the provenance/source chain; layer order is unchanged.
 
 Poly Haven's asset license states that its assets are CC0 and may be used commercially without required attribution: https://polyhaven.com/license. Attribution is retained here as project provenance.
+
+## Supplied adaptive score (1.6.1 integration pending)
+
+`What the Dark Keeps`, supplied in `What_the_Dark_Keeps_Horde_RT_Music_Pack.zip`
+SHA-256 `e28e5936189919fed25f6208dd7a8b97172eb5f7d25f69732cc7339c45f386fa`.
+Owner-confirmed rights statement,2026-09-30: **Owner-supplied; authorised for Horde use only**.
+No general permissive redistribution licence is inferred. The score, preview and
+derived runtime cues are not yet packaged; rendering/provenance and playback gates
+remain open. This grant does not relicense Pocket Chordsmith/Pocket Audio source,
+change existing asset licence statements or authorise production publication.
+See [music integration checkpoint](docs/ENGINEERING_1_6_1_MUSIC_2026-09-30.md).

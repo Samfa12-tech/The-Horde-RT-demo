@@ -103,6 +103,17 @@ It does not reproduce phone1closed-budget/80recovery; no performance/phone pass.
 Owner subsequently reported phone reconnection; no repeated coordination needed.
 Historical disconnection above remains the condition of that earlier checkpoint.
 
+[Original shared music resolver](ENGINEERING_1_6_1_MUSIC_2026-09-30.md) now covers
+A–H, actual torch release after the pre-existing Guttering event, engagement/
+reward priority, session dedup and audio-clock suspension/late-ending/G-to-H.
+No SFX queue drain, simulation or playback change. Lead-reviewed real240tick
+torch sequence and focusedMSVC Debug/Release2/2PASS; new shared source also builds/
+packages AndroidARM64 Debug (exact intermediateAPKdc9215a2, not installed).
+Red argument/queue-reset failures retained separately. Owner grants supplied score
+Horde-only use; no Chordsmith source copied/relicensed. Faithful cue rendering,
+playback/focus, separate persisted volume and listening remain open. Audio/haptic
+manual revalidation:NO for unwired logic, YES when playback/mix is integrated.
+
 Follow-on [opening fire-cost evidence](evidence/2026-09-30-opening-lighting-isolation/README.md)
 retains C1,S1,V1,V2 and separate uncooled C2:all9,190 completions and800 opening
 OpaqueFast rows pass exact admission. Opening GPU medianC1 66.670ms,
