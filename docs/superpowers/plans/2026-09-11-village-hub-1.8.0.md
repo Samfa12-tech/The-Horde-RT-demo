@@ -3,7 +3,7 @@
 **Owner:** Sam Small / Samfa12  
 **Prepared:** 11 September 2026  
 **Working release label:** Showcase Alpha 1.8.0 — Village Hub  
-**Status:** Pencilled-in direction, not an executable implementation specification or a delivered feature.  
+**Status:** Campaign direction updated 30 September 2026; implementation scope must be reworked against the accepted 1.7 baseline. Not a delivered feature.  
 **Roadmap:** [Campaign and Engine Roadmap](../../ROADMAP.md)
 
 > Implement only after 1.7.0 has been made, tested on the supported devices and accepted by the owner. Do not expand the unfinished 1.6.1 engineering pass or the agreed 1.7 chapter to start village work. Re-audit the accepted 1.7 baseline and write the concrete implementation/test plan at that point.
@@ -12,9 +12,9 @@
 
 Extend the moonlit woodland into a small, believable village with a few explorable houses/interiors, a tavern and NPCs. The settlement should become the recurring hub for later adventures, while the tavern reveals more about the wider **Horde**.
 
-Beyond 1.8, the owner's big picture is three themed dungeons, each with enemies, puzzles, a boss and a piece of the Horde/key/map. A dungeon-specific item may be needed for its puzzles and boss, in the structural spirit of Zelda dungeons. Light that harnesses the real ray-tracing engine is an important gameplay pillar. Those later dungeons are roadmap direction, **not 1.8 implementation scope**.
+Beyond 1.8: Drowned Abbey and Ashen Foundry in either order, then Glass Court, followed by the treasury finale. Each dungeon combines contextual enemies, light puzzles, a local tool, boss and treasury seal. Read [CAMPAIGN_DESIGN.md](../../CAMPAIGN_DESIGN.md) for approved narrative, alternative access quests and remaining design decisions; later dungeons are not 1.8 implementation scope.
 
-Preserve the working term **the Horde**. Do not rename it the Hoard, assume it is an army or treasure, define the three pieces prematurely or invent the final mythology. Village/NPC names, dungeon themes and exact revelations remain open.
+Preserve The Horde as the working title and its lost-army/treasure ambiguity. Kit accompanies a silent player; the eventual narrative is fully voiced. Bellwether and supporting names remain provisional; do not use Mara. Spoilers and reveal order belong to CAMPAIGN_DESIGN.md.
 
 This is a compact authored hub, not an open-world RPG conversion. Prioritise atmosphere, meaningful interactions and reliable continuity over settlement size.
 
@@ -40,7 +40,7 @@ These are initial authoring targets, **not fixed minimums or measured capacity c
 | Cast | Approximately 4–7 named/present village characters including the companion where resident; total cast is not a promise that all are simultaneously visible or animated. |
 | Important conversations | One or two substantial NPC exchanges, with shorter contextual lines for others. Keep the speaking cast and voice production bounded. |
 | Time and weather | Continue the authored night from 1.7. No day/night or weather simulation. |
-| Gameplay | Explore, speak, inspect, establish a safe return/checkpoint and receive a clear next lead. No village combat is required in the first hub milestone. |
+| Gameplay | Explore, interact, establish a safe return, gain bounded gear/training benefits, use treasure currency and begin area-access preparation. Magic, Tech and Constitution offer complementary routes. No village combat required. |
 
 Avoid a large empty square surrounded by decorative shells with no purpose. The few accessible interiors should reward entry through character, story or a useful interaction, not merely demonstrate that a door opens.
 
@@ -60,11 +60,11 @@ Doors, NPCs and furniture must not trap the player or collide with the held lant
 
 ### Tavern and the wider Horde
 
-The tavern is the narrative anchor. A conversation should acknowledge the tomb, companion and recovered lantern, then reveal a bounded new clue about the wider Horde and a reason to continue investigating. The exact clue and speaker require later story design.
+The tavern is the narrative anchor. A conversation should acknowledge the tomb, companion and recovered lantern, then reveal a bounded new clue about the wider Horde and a reason to continue investigating. Stage the early keeper/treasury lead without revealing the lantern deception. Exact script and supporting speaker remain authoring work.
 
-Allow the player to pause, skip/revisit appropriate conversation and understand the next objective without hearing every line. Do not dump the entire mystery on arrival. Future returns should support new dialogue conditioned on the relevant dungeon piece and knowledge; 1.8 needs only the reusable, bounded state foundation and its own arrival exchange.
+Allow the player to pause, skip/revisit appropriate conversation and understand the next objective without hearing every line. Do not dump the entire mystery on arrival. Future returns should support new dialogue conditioned on the relevant dungeon piece and knowledge; 1.8 also needs the bounded useful services and access-preparation slice agreed at its scope gate.
 
-The hub is not just a level-selection menu disguised as a room: its people, recoverable checkpoint and evolving information should give it a purpose. An honest future-content endpoint is acceptable until the next dungeon exists.
+The hub is not just a level-selection menu: people, practical upgrades/training, treasure spending, access mini-quests, checkpoint and evolving information give it purpose. Define a small playable service/quest slice for 1.8; a conversation-only hub no longer meets the direction. An honest future-content endpoint is acceptable until the next dungeon exists.
 
 ### Light and atmosphere
 
@@ -92,7 +92,7 @@ Build on 1.7's line IDs, subtitles, speaker identity, playback completion and ca
 
 Use stable IDs and versioned logical flags for village arrival, completed introductions, relevant knowledge and available leads. Keep lantern ownership, player state and the accepted checkpoint system coherent. Save after meaningful progress and restore to a safe position, without duplicating rewards or replaying completed one-time scenes.
 
-Provide an extensible place for later dungeon completion/piece IDs without implementing three nonexistent campaigns. Do not require a full inventory/economy just to remember a unique campaign item. Unavailable content remains clearly unavailable.
+Provide an extensible place for later dungeon completion/piece IDs without implementing three nonexistent campaigns. Use bounded currency, unique component and training/upgrade records for the selected playable services. Full inventory grids, crafting, XP and simulated economy remain undecided or unnecessary; prevent double-spends, duplicated rewards and build-dependent progression traps. Unavailable content remains clearly unavailable.
 
 ### Interaction, audio and controls
 
@@ -112,7 +112,7 @@ Adjust optional density, ornament and activity counts before widening the scene.
 
 ## 7. Explicitly outside 1.8
 
-The three later dungeons and their bosses/items; a general optical puzzle framework; new village combat/friendly-fire/crime systems; full NPC schedules; shops/economy/crafting; a general inventory grid; procedural quests; open-world streaming; day/night/weather simulation; multiplayer; a broad renderer/engine replacement; and a fully written final Horde mythology.
+The three later dungeons and their bosses/items; a general optical puzzle framework; new village combat/friendly-fire/crime systems; full NPC schedules; a general simulated economy and broad crafting (bounded treasure spending, gear/training services and access preparation are now in the hub direction); a general inventory grid; procedural quests; open-world streaming; day/night/weather simulation; multiplayer; a broad renderer/engine replacement; and production of later campaign content. The narrative direction is now approved in CAMPAIGN_DESIGN.md, while detailed scripts and encounters remain future authoring.
 
 Do not prebuild these as speculative infrastructure. Add only the reusable seams required by the playable hub, documenting later dependencies separately in the roadmap.
 
@@ -121,7 +121,7 @@ Do not prebuild these as speculative infrastructure. Add only the reusable seams
 1. Audit the accepted 1.7 source, saves, zone/actor/dialogue contracts and exact-device evidence; settle the hub layout, story beat and measured scope.
 2. Build the representative exterior/interior/NPC workload and prove the residency, interaction and performance approach before producing the whole asset set.
 3. Complete one playable arrival-to-tavern slice with one NPC exchange, safe checkpoint and reliable return outside.
-4. Extend the proven slice to the agreed houses and cast; add bounded progress-aware dialogue and the selected lantern/clue interaction.
+4. Extend to the agreed houses/cast and implement the scoped useful service, treasure/training and access-quest slice, progress-aware dialogue and lantern clue. Validate alternate progression routes and save/reward/spending integrity.
 5. Apply final art/audio polish, verify repeat visits and previous chapters, and complete cross-platform acceptance before proposing release.
 
 This order is guidance for the later implementation plan, not permission to begin now or to report an incomplete village as 1.8 complete.
@@ -132,6 +132,8 @@ The final implementation handoff should cover the following gates at the accepte
 
 - Natural arrival from 1.7; navigable exterior and all promised interiors; coherent doors/windows/collision; no NPC doorway traps or unavailable-content deception.
 - Working tavern reveal and next lead, readable subtitles, skip/pause/resume and repeat interactions; no duplicated ownership or progression, including missing-audio paths.
+- Practical benefit from the scoped gear/training and access-preparation services; correct treasure transactions and alternative-build progression; no mandatory unavailable dungeon advertised as playable.
+- Silent player; Kit and NPCs carry dialogue without asserting unchosen player beliefs, with eventual full voice coverage and current milestone's recorded lines verified.
 - Safe saves and recovery at the village and across interiors, process termination, Android lifecycle changes and return to prior available areas.
 - Real RT presentation, consistent light/shadow/reflection/transmission through relevant openings, and no disappearing off-camera contributors. Any light interaction must agree with its visible optical cause across supported settings.
 - Exact-candidate sustained phone and Windows evidence, resource stability over repeated visits, representative NPC density and matched regression checks on unchanged earlier chapters.

@@ -70,7 +70,7 @@ Explicitly outside 1.7.0: an open world, extra dungeons, a new forest boss, new 
 
 Do not remove a required feature merely to finish quickly. When a required subsystem is blocked, record it honestly and continue independent work; final acceptance remains open. Optional density and ornamentation can scale before required features are cut.
 
-**Story terminology:** Keep the owner's working term **the Horde**. Do not silently rename it to the Hoard, reinterpret it as an army, decide what it ultimately is, or invent a larger mythology. The pair are dungeon crawlers searching for a legendary objective; the lantern is their first tangible piece of the puzzle. Final proper names and lore are not needed for this chapter.
+**Story and voice authority (30 September 2026):** Read [CAMPAIGN_DESIGN.md](../../CAMPAIGN_DESIGN.md). The Horde retains the lost-army/treasure ambiguity; the lantern contains a deceptive entity claiming to be the dead king. Kit is the loyal companion and the player is silent. Preserve spoiler pacing: 1.7 hints at the mystery, not the late-game reveal.
 
 ## 4. Authored player experience
 
@@ -110,7 +110,7 @@ The companion approaches a safe conversation position, asks about the lantern an
 
 If the lantern was raised before climbing, stowing and restoring it leaves it lowered for this lesson. Consume a **new raise action during the reunion**, not a stale input edge from before the climb. The player may look away, pause or take time; the story cannot soft-lock. One delayed reminder is allowed, not constant repeated dialogue.
 
-The warm lantern lights the companion, nearby bark and appropriate fog against cold moonlight. The player answer and companion reaction follow the raise event. This is the chapter's central lighting/character moment.
+The warm lantern lights the companion, nearby bark and appropriate fog against cold moonlight. The silent player's gesture and Kit's reaction follow the raise event; there is no voiced player answer. This is the chapter's central lighting/character moment.
 
 ### 4.6 Woodland continuation and stopping point
 
@@ -180,7 +180,7 @@ Pause freezes progression and the rope. Restart cancels the sequence and pending
 
 Add one friendly actor with a stable entity identity. Reuse existing skinned-asset/animation/render-slot infrastructure, but do not overwrite a skeleton or Lich slot without explicit lifetime ownership. Avoid widening combat enemy limits as a side effect. The forest requires only the player and one companion to be animated characters.
 
-Default visual brief: an original practical adult human dungeon crawler, travel-worn layered clothing, restrained gothic detail, belt equipment, readable hands/face and a short coat or garment that skins well. No ornate full-body armor, long simulated cloak or complex hair. Final face, presentation and colors should be selected from a small reference set; use `Companion` as the internal/speaker working name until the owner names them.
+Default visual brief: an original practical adult human dungeon crawler, travel-worn layered clothing, restrained gothic detail, belt equipment, readable hands/face and a short coat or garment that skins well. No ornate full-body armor, long simulated cloak or complex hair. Final face, presentation and colors should be selected from a small reference set; use **Kit** as the companion's narrative/speaker name; a stable generic internal entity ID may remain.
 
 Required animation behaviors: idle/breathing, look down, throw/release rope, recover/stand, approach, concerned talk, lantern reaction, turn, walk, wait and natural look-at. Reuse compatible clips, blend layers and author missing actions in Blender. The rope release is a semantic marker in the body action, connected to the same simulation event that releases the rope.
 
@@ -188,7 +188,7 @@ Walking follows an authored collision-aware route with stopping points and speed
 
 ### 7.2 Voice deliverable
 
-Ship actual offline voice audio for the mandatory exchange, with one consistent companion voice and one consistent player voice. Owner recordings, a licensed synthetic voice or authorized actors are acceptable. Do not clone or imitate an identifiable real person without authorization. Select/verify any provider and commercial distribution terms before paid generation; no provider, subscription or specific model is assumed by this plan.
+Ship actual offline voice audio for the mandatory exchange, with one consistent Kit voice. The player is silent: do not produce player dialogue clips. Owner recordings, a licensed synthetic voice or authorized actors are acceptable. Do not clone or imitate an identifiable real person without authorization. Select/verify any provider and commercial distribution terms before paid generation; no provider, subscription or specific model is assumed by this plan.
 
 Store lossless source recordings outside runtime packaging; produce normalized, trimmed mono runtime clips through the accepted audio pipeline. Record provider/performer permission, voice identifier, generation/recording date, source hash and derivative processing. No API keys, private account data or signed temporary download URLs in Git. Gameplay must run offline, with no live TTS or network request on an interaction.
 
@@ -196,7 +196,7 @@ Subtitles and temporary voice are valid development scaffolding, but **subtitles
 
 ### 7.3 Initial script and triggers
 
-These are the implementation script defaults. Keep line IDs stable when the owner edits wording. Direction labels are not spoken.
+These are provisional implementation script defaults, updated for the owner-approved silent protagonist. Kit provides conversational momentum without speaking the player's thoughts; leave room for quiet and player agency. Keep line IDs stable when the owner edits wording. Direction labels are not spoken.
 
 | Line ID | Speaker / delivery | Text | Trigger |
 |---|---|---|---|
@@ -204,18 +204,18 @@ These are the implementation script defaults. Keep line IDs stable when the owne
 | `rescue.rope` | Companion, practical | Hold on. Rope coming down. | After first line; rope throw prepared. |
 | `reunion.question` | Companion, eager but believable | Did you find it? Tell me you found it. | Player safely at summit and companion at reunion mark. |
 | `reunion.hint` | Companion, gentle reminder | Let me see. Raise it. | Once only, after a generous idle delay during the raise lesson. |
-| `reunion.answer` | Player, tired satisfaction | I found it. | Fresh valid player raise action during the lesson. |
-| `reunion.proof` | Companion, wonder | Then we're not chasing a story anymore. | After answer; lantern visibly presented. |
-| `reunion.first_piece` | Player, grounded | It's only the first piece. | After companion reaction. |
+| `reunion.answer` | Silent player action/event; no audio or subtitle line | — | Fresh valid raise action; wait for visibly presented lantern. |
+| `reunion.proof` | Kit, wonder | Then we're not chasing a story anymore. | After silent raise event; lantern visibly presented. |
+| `reunion.first_piece` | Kit, thoughtful | A start, then. Let's see where it leads. | After wonder reaction; provisional wording, no claim to know the prison's nature. |
 | `reunion.depart` | Companion, quiet purpose | Good. Let's find the rest. | Exchange complete; begin trail-leading state. |
 
-The hint is conditional, not an extra line forced into every playthrough. Do not require camera aim at the NPC for quest progress. Avoid playing the answer before the lantern has reached its presented pose. The story context can use a short objective such as `The Horde — follow your companion`; do not add a lore monologue.
+The hint is conditional, not an extra line forced into every playthrough. Do not require camera aim at the NPC for quest progress. The answer event is nonverbal; do not trigger Kit's response before the lantern has reached its presented pose. The story context can use a short objective such as `The Horde — follow your companion`; do not add a lore monologue.
 
 ### 7.4 Dialogue infrastructure
 
 Use a small line manifest: stable line ID, speaker/entity, subtitle, audio asset, gesture, start condition, once-per-run/checkpoint policy and skip/completion behavior. A dialogue controller sequences state; platform backends play audio and report completion with a generation/line token. Stale completion messages must be ignored after pause/reset/reload or a skip. Audio duration/metadata provides a bounded fallback when playback fails, so missing audio cannot lock the game.
 
-Subtitles default on, with speaker label, configurable size and opaque-enough scrim. Companion speech is world-positioned with distance/pan and appropriate interior-to-exterior treatment; player speech remains centered. Retain intelligibility, and do not bake tomb reverb permanently into a clip also heard outside. Use subtle animation/head/jaw response if the rig supports it, but cinematic phoneme-perfect facial animation is not required.
+Subtitles default on, with speaker label, configurable size and opaque-enough scrim. Companion speech is world-positioned with distance/pan and appropriate interior-to-exterior treatment; the player has no speech channel or spoken lines. Future lantern-entity voice positioning is a separate scoped design decision. Retain intelligibility, and do not bake tomb reverb permanently into a clip also heard outside. Use subtle animation/head/jaw response if the rig supports it, but cinematic phoneme-perfect facial animation is not required.
 
 Dialogue can pause/resume with gameplay. Provide an explicit skip for the current spoken line; skip is not the gameplay Interact action and must not skip the player-controlled raise lesson. Missing optional audio falls back to subtitle timing and a diagnostic. Story events are exactly-once state transitions, never dependent on the player hearing the clip.
 
