@@ -1287,7 +1287,8 @@ int main()
                       "every in-frame StepFixed/AdvanceFrame path must have exactly one simulation-step scope");
         const auto resourceResetOrdered = [](const std::string& source,
                                              const std::string_view beginMarker,
-                                             const std::string_view endMarker) {
+                                             const std::string_view endMarker,
+                                             const std::string_view resourceAction = "rtScene.Destroy") {
             const std::size_t begin = source.find(beginMarker);
             const std::size_t end = source.find(endMarker, begin);
             if (begin == std::string::npos || end == std::string::npos)
@@ -1301,8 +1302,7 @@ int main()
                 "rtFrameEvidence.Recreate", complete);
             const std::size_t timerReset = body.find(
                 "gpuFrameTimer.ResetAfterDeviceIdle", recreate);
-            const std::size_t sceneDestroy = body.find(
-                "rtScene.Destroy", timerReset);
+            const std::size_t sceneDestroy = body.find(resourceAction, timerReset);
             return complete != std::string_view::npos &&
                    recreate != std::string_view::npos &&
                    timerReset != std::string_view::npos &&
@@ -1328,8 +1328,24 @@ int main()
                       resourceResetOrdered(
                           androidBridgeSource,
                           "if (gSwapchainContext.useRtPath && std::abs(requestedRenderScale",
-                          "const auto frameStart = std::chrono::steady_clock::now();"),
-                      "both render-scale paths must complete owned work, invalidate the epoch, then reset timer/scene resources");
+                          "const auto frameStart = std::chrono::steady_clock::now();",
+                          "rtScene.ResizeOutputAfterDeviceIdle"),
+                      "render-scale paths must complete owned work, invalidate the epoch, then reset timer/output resources");
+        const std::size_t resizeBegin = androidBridgeSource.find(
+            "if (gSwapchainContext.useRtPath && std::abs(requestedRenderScale");
+        const std::size_t resizeEnd = androidBridgeSource.find(
+            "const auto frameStart = std::chrono::steady_clock::now();", resizeBegin);
+        const bool resizeMarkersValid = resizeBegin != std::string::npos &&
+                                        resizeEnd != std::string::npos && resizeEnd > resizeBegin;
+        const std::string resizeBody = resizeMarkersValid
+            ? androidBridgeSource.substr(resizeBegin, resizeEnd - resizeBegin) : std::string{};
+        ok &= Require(resizeMarkersValid &&
+                      resizeBody.find("rtScene.Destroy") == std::string::npos &&
+                      resizeBody.find("InitialiseRtSceneForSwapchain") == std::string::npos &&
+                      resizeBody.find("if (!evidenceCompleted)") != std::string::npos &&
+                      resizeBody.find("capturePresentedFrames = 0u") != std::string::npos &&
+                      androidBridgeSource.find("vkResetCommandBuffer(context.commandBuffers[imageIndex]") != std::string::npos,
+                      "Android scale-only resize must preserve the scene and reset commands after completed GPU work");
         ok &= Require(pendulumSource.find("torsionAngularAcceleration") != std::string::npos &&
                       pendulumSource.find("SignedYawDelta") != std::string::npos &&
                       pendulumSource.find("kHandBasisTeleportRadians") != std::string::npos &&

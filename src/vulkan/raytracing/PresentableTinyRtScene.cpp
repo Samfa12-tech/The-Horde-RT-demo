@@ -409,6 +409,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     storageImageMemoryPropertyFlags_ =
         std::exchange(other.storageImageMemoryPropertyFlags_, 0u);
     storageImageLayout_ = std::exchange(other.storageImageLayout_, VK_IMAGE_LAYOUT_UNDEFINED);
+    storageImageFrameRecorded_ = std::exchange(other.storageImageFrameRecorded_, false);
     lastOutputRedBlueSwapApplied_ = std::exchange(other.lastOutputRedBlueSwapApplied_, false);
     materialDiffuse_ = std::exchange(other.materialDiffuse_, TextureArray{});
     materialNormal_ = std::exchange(other.materialNormal_, TextureArray{});
@@ -967,24 +968,10 @@ void PresentableTinyRtScene::Destroy()
     framePipelineEvidence_ = {};
     framePipelineEvidenceValid_ = false;
 
-    if (storageImageView_ != VK_NULL_HANDLE)
-    {
-        vkDestroyImageView(device_, storageImageView_, nullptr);
-        storageImageView_ = VK_NULL_HANDLE;
-    }
-    if (storageImage_ != VK_NULL_HANDLE)
-    {
-        vkDestroyImage(device_, storageImage_, nullptr);
-        storageImage_ = VK_NULL_HANDLE;
-    }
-    if (storageImageMemory_ != VK_NULL_HANDLE)
-    {
-        vkFreeMemory(device_, storageImageMemory_, nullptr);
-        storageImageMemory_ = VK_NULL_HANDLE;
-    }
-    storageImageAllocationSize_ = 0u;
-    storageImageMemoryPropertyFlags_ = 0u;
-    storageImageLayout_ = VK_IMAGE_LAYOUT_UNDEFINED;
+    auto output = OutputImage();
+    DestroyOutputImage(output);
+    AdoptOutputImage(output);
+    storageImageFrameRecorded_ = false;
     lastOutputRedBlueSwapApplied_ = false;
 
     scaledBlitSupported_ = false;
@@ -1308,13 +1295,154 @@ bool PresentableTinyRtScene::RunOneTimeCommands(void (*record)(VkCommandBuffer, 
 
 bool PresentableTinyRtScene::CreateStorageImage(std::string& diagnostic)
 {
+    OutputImageResources output{};
+    if (!CreateOutputImage(dispatchExtent_, output, diagnostic))
+    {
+        DestroyOutputImage(output);
+        return false;
+    }
+    AdoptOutputImage(output);
+    storageImageFrameRecorded_ = false;
+    return true;
+}
+
+PresentableTinyRtScene::OutputImageResources PresentableTinyRtScene::OutputImage() const noexcept
+{
+    return {storageImage_, storageImageMemory_, storageImageView_,
+            storageImageAllocationSize_, storageImageMemoryPropertyFlags_, storageImageLayout_};
+}
+
+void PresentableTinyRtScene::AdoptOutputImage(const OutputImageResources& image) noexcept
+{
+    storageImage_ = image.image;
+    storageImageMemory_ = image.memory;
+    storageImageView_ = image.view;
+    storageImageAllocationSize_ = image.allocationSize;
+    storageImageMemoryPropertyFlags_ = image.memoryFlags;
+    storageImageLayout_ = image.layout;
+}
+
+void PresentableTinyRtScene::DestroyOutputImage(OutputImageResources& image) const noexcept
+{
+    if (image.view != VK_NULL_HANDLE) vkDestroyImageView(device_, image.view, nullptr);
+    if (image.image != VK_NULL_HANDLE) vkDestroyImage(device_, image.image, nullptr);
+    if (image.memory != VK_NULL_HANDLE) vkFreeMemory(device_, image.memory, nullptr);
+    image = {};
+}
+
+bool PresentableTinyRtScene::ResizeOutputAfterDeviceIdle(VkExtent2D extent, std::string& diagnostic)
+{
+    if (!ready_ || device_ == VK_NULL_HANDLE || extent.width == 0u || extent.height == 0u)
+    {
+        diagnostic = "Cannot resize an unready RT output or use a zero extent.";
+        return false;
+    }
+    VkPhysicalDeviceRayTracingPipelinePropertiesKHR rayProperties{
+        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR};
+    VkPhysicalDeviceProperties2 properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2};
+    if (ExecutionBackend() == RtExecutionBackend::RayTracingPipeline)
+        properties.pNext = &rayProperties;
+    // Android minSdk24 cannot link the Vulkan1.1 symbol directly. Resolve it
+    // through the same loader route used by the existing pipeline/SBT setup.
+    auto getProperties = reinterpret_cast<PFN_vkGetPhysicalDeviceProperties2>(
+        vkGetInstanceProcAddr(instance_, "vkGetPhysicalDeviceProperties2"));
+    if (getProperties == nullptr)
+        getProperties = reinterpret_cast<PFN_vkGetPhysicalDeviceProperties2>(
+            vkGetInstanceProcAddr(instance_, "vkGetPhysicalDeviceProperties2KHR"));
+    if (getProperties == nullptr)
+    {
+        diagnostic = "Vulkan properties2 entry point is unavailable for RT output resize.";
+        return false;
+    }
+    getProperties(physicalDevice_, &properties);
+    if (extent.width > properties.properties.limits.maxImageDimension2D ||
+        extent.height > properties.properties.limits.maxImageDimension2D ||
+        (ExecutionBackend() == RtExecutionBackend::RayTracingPipeline &&
+         static_cast<std::uint64_t>(extent.width) * extent.height >
+             rayProperties.maxRayDispatchInvocationCount))
+    {
+        diagnostic = "Requested RT output exceeds the device image/dispatch limits.";
+        return false;
+    }
+    auto groups = computeDispatchGroups_;
+    if (ExecutionBackend() == RtExecutionBackend::RayQueryCompute)
+    {
+        const auto selected = TryMakeRtComputeDispatch(extent, properties.properties.limits);
+        if (!selected)
+        {
+            diagnostic = "Device compute limits cannot execute the requested RT output.";
+            return false;
+        }
+        groups = *selected;
+    }
+    OutputResizeApi api{};
+    api.user = this;
+    api.create = [](void* user, VkExtent2D size, OutputImageResources& image, std::string& failure) {
+        return static_cast<PresentableTinyRtScene*>(user)->CreateOutputImage(size, image, failure);
+    };
+    api.writeDescriptor = [](void* user, VkImageView view) noexcept {
+        auto& scene = *static_cast<PresentableTinyRtScene*>(user);
+        const VkDescriptorImageInfo info{VK_NULL_HANDLE, view, VK_IMAGE_LAYOUT_GENERAL};
+        VkWriteDescriptorSet write{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
+        write.dstSet = scene.pipelineBundle_.descriptorSet;
+        write.dstBinding = 1u;
+        write.descriptorCount = 1u;
+        write.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+        write.pImageInfo = &info;
+        vkUpdateDescriptorSets(scene.device_, 1u, &write, 0u, nullptr);
+    };
+    api.destroy = [](void* user, OutputImageResources& image) noexcept {
+        static_cast<PresentableTinyRtScene*>(user)->DestroyOutputImage(image);
+    };
+    return ResizeOutputWithApi(extent, groups, api, diagnostic);
+}
+
+bool PresentableTinyRtScene::ResizeOutputWithApi(VkExtent2D extent, std::array<std::uint32_t, 3u> groups,
+                                               const OutputResizeApi& api, std::string& diagnostic)
+{
+    if (!ready_ || device_ == VK_NULL_HANDLE || storageImage_ == VK_NULL_HANDLE ||
+        pipelineBundle_.descriptorSet == VK_NULL_HANDLE || extent.width == 0u || extent.height == 0u ||
+        api.create == nullptr || api.writeDescriptor == nullptr || api.destroy == nullptr)
+    {
+        diagnostic = "Invalid RT output resize transaction.";
+        return false;
+    }
+    if (extent.width == dispatchExtent_.width && extent.height == dispatchExtent_.height)
+    {
+        diagnostic.clear();
+        return true;
+    }
+    OutputImageResources replacement{};
+    if (!api.create(api.user, extent, replacement, diagnostic))
+    {
+        api.destroy(api.user, replacement);
+        return false;
+    }
+    auto old = OutputImage();
+    api.writeDescriptor(api.user, replacement.view);
+    AdoptOutputImage(replacement);
+    dispatchExtent_ = extent;
+    computeDispatchGroups_ = groups;
+    // No recorded frame identifies the newly allocated, as-yet unpresented output.
+    framePipelineEvidence_ = {};
+    framePipelineEvidenceValid_ = false;
+    storageImageFrameRecorded_ = false;
+    lastOutputRedBlueSwapApplied_ = false;
+    api.destroy(api.user, old);
+    diagnostic.clear();
+    return true;
+}
+
+bool PresentableTinyRtScene::CreateOutputImage(VkExtent2D extent, OutputImageResources& out,
+                                              std::string& diagnostic)
+{
     const VkImageCreateInfo imageInfo{
         VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
         nullptr,
         0u,
         VK_IMAGE_TYPE_2D,
         kStorageImageFormat,
-        {dispatchExtent_.width, dispatchExtent_.height, 1u},
+        {extent.width, extent.height, 1u},
         1u,
         1u,
         VK_SAMPLE_COUNT_1_BIT,
@@ -1324,14 +1452,14 @@ bool PresentableTinyRtScene::CreateStorageImage(std::string& diagnostic)
         0u,
         nullptr,
         VK_IMAGE_LAYOUT_UNDEFINED};
-    if (vkCreateImage(device_, &imageInfo, nullptr, &storageImage_) != VK_SUCCESS)
+    if (vkCreateImage(device_, &imageInfo, nullptr, &out.image) != VK_SUCCESS)
     {
         diagnostic = "Failed to create RT storage image.";
         return false;
     }
 
     VkMemoryRequirements requirements{};
-    vkGetImageMemoryRequirements(device_, storageImage_, &requirements);
+    vkGetImageMemoryRequirements(device_, out.image, &requirements);
     VkMemoryPropertyFlags selectedMemoryFlags = 0u;
     const std::uint32_t memoryType = gpuResources_.FindMemoryType(
         requirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
@@ -1347,25 +1475,25 @@ bool PresentableTinyRtScene::CreateStorageImage(std::string& diagnostic)
         nullptr,
         requirements.size,
         memoryType};
-    if (vkAllocateMemory(device_, &allocateInfo, nullptr, &storageImageMemory_) != VK_SUCCESS ||
-        vkBindImageMemory(device_, storageImage_, storageImageMemory_, 0u) != VK_SUCCESS)
+    if (vkAllocateMemory(device_, &allocateInfo, nullptr, &out.memory) != VK_SUCCESS ||
+        vkBindImageMemory(device_, out.image, out.memory, 0u) != VK_SUCCESS)
     {
         diagnostic = "Failed to allocate RT storage image memory.";
         return false;
     }
-    storageImageAllocationSize_ = requirements.size;
-    storageImageMemoryPropertyFlags_ = selectedMemoryFlags;
+    out.allocationSize = requirements.size;
+    out.memoryFlags = selectedMemoryFlags;
 
     const VkImageViewCreateInfo viewInfo{
         VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
         nullptr,
         0u,
-        storageImage_,
+        out.image,
         VK_IMAGE_VIEW_TYPE_2D,
         kStorageImageFormat,
         {VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY},
         {VK_IMAGE_ASPECT_COLOR_BIT, 0u, 1u, 0u, 1u}};
-    if (vkCreateImageView(device_, &viewInfo, nullptr, &storageImageView_) != VK_SUCCESS)
+    if (vkCreateImageView(device_, &viewInfo, nullptr, &out.view) != VK_SUCCESS)
     {
         diagnostic = "Failed to create RT storage image view.";
         return false;
@@ -1375,7 +1503,7 @@ bool PresentableTinyRtScene::CreateStorageImage(std::string& diagnostic)
     {
         VkImage image;
         VkPipelineStageFlags shaderStage;
-    } data{storageImage_, executionPolicy_.shaderPipelineStage};
+    } data{out.image, executionPolicy_.shaderPipelineStage};
     const auto record = [](VkCommandBuffer commandBuffer, void* userData) {
         const auto* transition = static_cast<const TransitionData*>(userData);
         SetImageBarrier(commandBuffer,
@@ -1392,7 +1520,7 @@ bool PresentableTinyRtScene::CreateStorageImage(std::string& diagnostic)
         return false;
     }
 
-    storageImageLayout_ = VK_IMAGE_LAYOUT_GENERAL;
+    out.layout = VK_IMAGE_LAYOUT_GENERAL;
     diagnostic.clear();
     return true;
 }
@@ -5634,6 +5762,7 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                     VK_ACCESS_SHADER_WRITE_BIT);
     storageImageLayout_ = VK_IMAGE_LAYOUT_GENERAL;
 
+    storageImageFrameRecorded_ = true;
     traceCopyScope.Complete(1u);
     if (observation != nullptr && observation->recordedScene != nullptr)
     {
@@ -5847,7 +5976,8 @@ bool PresentableTinyRtScene::CapturePlayerWorldBodyMesh(
 bool PresentableTinyRtScene::CaptureStorageImage(StorageImageCapture& capture, std::string& diagnostic)
 {
     capture = {};
-    if (!ready_ || storageImage_ == VK_NULL_HANDLE || storageImageLayout_ != VK_IMAGE_LAYOUT_GENERAL)
+    if (!ready_ || storageImage_ == VK_NULL_HANDLE ||
+        storageImageLayout_ != VK_IMAGE_LAYOUT_GENERAL || !storageImageFrameRecorded_)
     {
         diagnostic = "RT storage image is not ready for capture.";
         return false;

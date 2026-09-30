@@ -375,7 +375,15 @@ public:
                             std::string& diagnostic,
                             RtSceneRecordObservation* observation = nullptr);
 
-    // Synchronously reads the last RT-produced storage image. The returned
+    // Owning render thread only, after successful device-idle/evidence completion.
+    // Replaces only the extent-dependent output image; caller must reset and
+    // re-record command buffers invalidated by the descriptor update.
+    // Allocation/preflight failure leaves the previous output resources intact.
+    bool ResizeOutputAfterDeviceIdle(VkExtent2D extent, std::string& diagnostic);
+
+    // Submit a successfully recorded frame before calling. Synchronously reads
+    // the last RT-produced storage image; rejects a new output with no frame.
+    // The returned
     // bytes are canonical RGBA even when the presentation push constant had
     // swapped red/blue for a raw copy to a BGRA swapchain.
     bool CaptureStorageImage(StorageImageCapture& capture, std::string& diagnostic);
@@ -391,9 +399,36 @@ public:
 private:
     friend struct PresentableTinyRtScenePreflightTestAccess;
     friend struct PresentableTinyRtSceneObservationTestAccess;
+    friend struct PresentableTinyRtSceneOutputResizeTestAccess;
 
     using Buffer = RtGpuBuffer;
     using AccelerationStructure = RtAccelerationStructure;
+
+    struct OutputImageResources
+    {
+        VkImage image = VK_NULL_HANDLE;
+        VkDeviceMemory memory = VK_NULL_HANDLE;
+        VkImageView view = VK_NULL_HANDLE;
+        VkDeviceSize allocationSize = 0u;
+        VkMemoryPropertyFlags memoryFlags = 0u;
+        VkImageLayout layout = VK_IMAGE_LAYOUT_UNDEFINED;
+    };
+    // Focused transaction seam for failure/ownership tests; production callbacks
+    // allocate, bind only storage-image binding1, then retire the old image.
+    struct OutputResizeApi
+    {
+        void* user = nullptr;
+        bool (*create)(void*, VkExtent2D, OutputImageResources&, std::string&) = nullptr;
+        void (*writeDescriptor)(void*, VkImageView) noexcept = nullptr;
+        void (*destroy)(void*, OutputImageResources&) noexcept = nullptr;
+    };
+    bool ResizeOutputWithApi(VkExtent2D extent, std::array<std::uint32_t, 3u> groups,
+                             const OutputResizeApi& api, std::string& diagnostic);
+    bool CreateOutputImage(VkExtent2D extent, OutputImageResources& out,
+                           std::string& diagnostic);
+    void DestroyOutputImage(OutputImageResources& image) const noexcept;
+    OutputImageResources OutputImage() const noexcept;
+    void AdoptOutputImage(const OutputImageResources& image) noexcept;
 
     struct InitialiseOrchestrationApi
     {
@@ -538,6 +573,7 @@ private:
     VkDeviceSize storageImageAllocationSize_ = 0u;
     VkMemoryPropertyFlags storageImageMemoryPropertyFlags_ = 0u;
     VkImageLayout storageImageLayout_ = VK_IMAGE_LAYOUT_UNDEFINED;
+    bool storageImageFrameRecorded_ = false;
     bool lastOutputRedBlueSwapApplied_ = false;
     TextureArray materialDiffuse_;
     TextureArray materialNormal_;

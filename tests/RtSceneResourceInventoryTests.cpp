@@ -16,6 +16,7 @@
 #include <string_view>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 namespace
 {
@@ -30,6 +31,19 @@ Handle FakeHandle(const std::uintptr_t value)
     else
     {
         return static_cast<Handle>(value);
+    }
+}
+
+template <typename Handle>
+std::uint64_t HandleBits(const Handle value)
+{
+    if constexpr (std::is_pointer_v<Handle>)
+    {
+        return static_cast<std::uint64_t>(reinterpret_cast<std::uintptr_t>(value));
+    }
+    else
+    {
+        return static_cast<std::uint64_t>(value);
     }
 }
 
@@ -190,6 +204,7 @@ struct PresentableTinyRtSceneObservationTestAccess
         {
             texture->image = FakeHandle<VkImage>(next++);
             texture->memory = FakeHandle<VkDeviceMemory>(next++);
+            texture->view = FakeHandle<VkImageView>(next++);
             texture->allocationSize = 128u;
             texture->memoryPropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
         }
@@ -285,6 +300,416 @@ struct PresentableTinyRtSceneObservationTestAccess
 #endif
 };
 
+struct PresentableTinyRtSceneOutputResizeTestAccess
+{
+    using Scene = PresentableTinyRtScene;
+    using Output = Scene::OutputImageResources;
+
+    enum class CreateProgress : std::uint8_t
+    {
+        None,
+        Image,
+        Memory,
+        View,
+        Complete,
+    };
+
+    struct CallbackState
+    {
+        Scene* scene = nullptr;
+        CreateProgress progress = CreateProgress::Complete;
+        VkExtent2D requestedExtent{};
+        Output oldOutput{};
+        Output createdOutput{};
+        Output destroyedOutput{};
+        std::array<char, 4u> events{};
+        std::size_t eventCount = 0u;
+        bool eventOverflow = false;
+        std::size_t createCount = 0u;
+        std::size_t writeCount = 0u;
+        std::size_t destroyCount = 0u;
+        VkImageView writtenView = VK_NULL_HANDLE;
+        bool descriptorSawOldState = false;
+        bool destroySawPublishedState = false;
+        std::string diagnostic = "transaction failure sentinel";
+    };
+
+    static void RecordEvent(CallbackState& state, const char event) noexcept
+    {
+        if (state.eventCount < state.events.size())
+            state.events[state.eventCount] = event;
+        else
+            state.eventOverflow = true;
+        ++state.eventCount;
+    }
+
+    static void Configure(Scene& scene)
+    {
+        PresentableTinyRtSceneObservationTestAccess::Populate(scene);
+        scene.device_ = FakeHandle<VkDevice>(0x90000u);
+        scene.storageImageView_ = FakeHandle<VkImageView>(0x90001u);
+        scene.pipelineBundle_.descriptorSetLayout = FakeHandle<VkDescriptorSetLayout>(0x90002u);
+        scene.pipelineBundle_.descriptorPool = FakeHandle<VkDescriptorPool>(0x90003u);
+        scene.pipelineBundle_.pipelineLayout = FakeHandle<VkPipelineLayout>(0x90004u);
+        scene.materialSampler_ = FakeHandle<VkSampler>(0x90005u);
+        scene.dispatchExtent_ = {640u, 360u};
+        scene.computeDispatchGroups_ = {80u, 45u, 1u};
+        scene.storageImageLayout_ = VK_IMAGE_LAYOUT_GENERAL;
+        scene.storageImageFrameRecorded_ = true;
+        scene.lastOutputRedBlueSwapApplied_ = true;
+        scene.pipelineEvidenceIdentityValid_ = true;
+        scene.framePipelineEvidenceValid_ = true;
+        scene.pipelineEvidenceIdentity_ = {};
+        scene.pipelineEvidenceIdentity_.executionMode =
+            horde::telemetry::RtExecutionMode::RayQueryCompute;
+        scene.pipelineEvidenceIdentity_.instrumentation =
+            horde::telemetry::RtInstrumentationMode::Diagnostic;
+        scene.pipelineEvidenceIdentity_.activeStrategy =
+            horde::telemetry::RtMaterialStrategy::GenericDielectric;
+        (void)horde::telemetry::AssignRtFixedText(
+            scene.pipelineEvidenceIdentity_.bundleKey, "resize-test-bundle");
+        scene.pipelineEvidenceIdentity_.opaqueFast.key = {};
+        (void)horde::telemetry::AssignRtFixedText(
+            scene.pipelineEvidenceIdentity_.opaqueFast.key, "opaque-test");
+        (void)horde::telemetry::AssignRtFixedText(
+            scene.pipelineEvidenceIdentity_.opaqueFast.sha256, "opaque-sha");
+        scene.pipelineEvidenceIdentity_.genericDielectric.key = {};
+        (void)horde::telemetry::AssignRtFixedText(
+            scene.pipelineEvidenceIdentity_.genericDielectric.key, "generic-test");
+        (void)horde::telemetry::AssignRtFixedText(
+            scene.pipelineEvidenceIdentity_.genericDielectric.sha256, "generic-sha");
+        scene.pipelineEvidenceIdentity_.active =
+            scene.pipelineEvidenceIdentity_.genericDielectric;
+        scene.framePipelineEvidence_ = scene.pipelineEvidenceIdentity_;
+    }
+
+    static bool SameIdentity(
+        const horde::telemetry::RtPipelineEvidenceIdentity& left,
+        const horde::telemetry::RtPipelineEvidenceIdentity& right)
+    {
+        return left.executionMode == right.executionMode &&
+               left.instrumentation == right.instrumentation &&
+               left.dielectricQuality == right.dielectricQuality &&
+               left.activeStrategy == right.activeStrategy &&
+               left.waterQuality == right.waterQuality &&
+               left.bundleKey.value == right.bundleKey.value &&
+               left.opaqueFast.key.value == right.opaqueFast.key.value &&
+               left.opaqueFast.sha256.value == right.opaqueFast.sha256.value &&
+               left.genericDielectric.key.value == right.genericDielectric.key.value &&
+               left.genericDielectric.sha256.value == right.genericDielectric.sha256.value &&
+               left.active.key.value == right.active.key.value &&
+               left.active.sha256.value == right.active.sha256.value;
+    }
+
+    static bool SameOutput(const Output& left, const Output& right)
+    {
+        return left.image == right.image && left.memory == right.memory &&
+               left.view == right.view && left.allocationSize == right.allocationSize &&
+               left.memoryFlags == right.memoryFlags && left.layout == right.layout;
+    }
+
+    static std::vector<std::uint64_t> OwnershipSnapshot(const Scene& scene)
+    {
+        std::vector<std::uint64_t> values;
+        const auto addBuffer = [&values](const RtGpuBuffer& buffer) {
+            values.push_back(HandleBits(buffer.buffer));
+            values.push_back(HandleBits(buffer.memory));
+            values.push_back(buffer.address);
+            values.push_back(buffer.size);
+            values.push_back(buffer.allocationSize);
+            values.push_back(buffer.memoryPropertyFlags);
+        };
+        const auto addAs = [&values, &addBuffer](const RtAccelerationStructure& as) {
+            addBuffer(as.backing);
+            values.push_back(HandleBits(as.handle));
+            values.push_back(as.address);
+        };
+
+        for (const RtGpuBuffer* buffer : std::array{
+                 &scene.vertexBuffer_, &scene.indexBuffer_, &scene.transformBuffer_,
+                 &scene.instanceBuffer_, &scene.heldLightBuffer_, &scene.fireEmitterBuffer_,
+                 &scene.worldSurfaceBuffer_, &scene.staticVertexBuffer_,
+                 &scene.worldPlayerVertexBuffer_, &scene.viewmodelVertexBuffer_,
+                 &scene.staticIndexBuffer_, &scene.staticGeometryTransformBuffer_,
+                 &scene.instanceMetadataBuffer_, &scene.primitiveMetadataBuffer_,
+                 &scene.materialMetadataBuffer_, &scene.skinnedPlayerBlasUpdateScratch_,
+                 &scene.viewmodelBlasUpdateScratch_, &scene.tlasUpdateScratch_,
+                 &scene.pipelineBundle_.diagnosticBuffer})
+        {
+            addBuffer(*buffer);
+        }
+        for (const RtAccelerationStructure* as : std::array{
+                 &scene.blas_, &scene.waterfallBlas_, &scene.finaleRoofBlas_,
+                 &scene.torchBlas_, &scene.swordBlas_, &scene.gothicChestBaseBlas_,
+                 &scene.gothicChestLidBlas_, &scene.rewardLanternRingBlas_,
+                 &scene.rewardLanternBodyBlas_, &scene.dielectricFixtureBlas_,
+                 &scene.playerBodyBlas_, &scene.playerLimbBlas_,
+                 &scene.skinnedPlayerBlas_, &scene.viewmodelBlas_, &scene.tlas_})
+        {
+            addAs(*as);
+        }
+        for (std::size_t index = 0u;
+             index < CharacterRenderSlot::kMaximumSkeletonPoseBuckets; ++index)
+        {
+            const auto& skeleton = scene.characterSlot_.SkeletonGpu(index);
+            addBuffer(skeleton.vertices);
+            addAs(skeleton.accelerationStructure);
+            addBuffer(skeleton.updateScratch);
+        }
+        const auto& lich = scene.characterSlot_.LichGpu();
+        addBuffer(lich.vertices);
+        addAs(lich.accelerationStructure);
+        addBuffer(lich.updateScratch);
+
+        values.push_back(HandleBits(scene.pipelineBundle_.descriptorSetLayout));
+        values.push_back(HandleBits(scene.pipelineBundle_.descriptorPool));
+        values.push_back(HandleBits(scene.pipelineBundle_.descriptorSet));
+        values.push_back(HandleBits(scene.pipelineBundle_.pipelineLayout));
+        values.push_back(HandleBits(scene.materialSampler_));
+        for (const RtMaterialStrategy strategy : {
+                 RtMaterialStrategy::OpaqueFast, RtMaterialStrategy::GenericDielectric})
+        {
+            const auto& pipeline = scene.pipelineBundle_.Strategy(strategy);
+            values.push_back(HandleBits(pipeline.pipeline));
+            addBuffer(pipeline.shaderBindingTable);
+        }
+        for (const Scene::TextureArray* texture : std::array<const Scene::TextureArray*, 9u>{
+                 &scene.materialDiffuse_, &scene.materialNormal_, &scene.materialArm_,
+                 &scene.lichBaseColor_, &scene.lichEmissive_, &scene.staticBaseColor_,
+                 &scene.staticNormal_, &scene.staticOrm_, &scene.staticEmissive_})
+        {
+            values.push_back(HandleBits(texture->image));
+            values.push_back(HandleBits(texture->memory));
+            values.push_back(HandleBits(texture->view));
+            values.push_back(texture->allocationSize);
+            values.push_back(texture->memoryPropertyFlags);
+        }
+        return values;
+    }
+
+    static bool Create(void* user, VkExtent2D extent, Output& output,
+                       std::string& diagnostic)
+    {
+        auto& state = *static_cast<CallbackState*>(user);
+        ++state.createCount;
+        state.requestedExtent = extent;
+        RecordEvent(state, 'C');
+        if (state.progress >= CreateProgress::Image)
+            output.image = FakeHandle<VkImage>(0xA001u);
+        if (state.progress >= CreateProgress::Memory)
+            output.memory = FakeHandle<VkDeviceMemory>(0xA002u);
+        if (state.progress >= CreateProgress::View)
+            output.view = FakeHandle<VkImageView>(0xA003u);
+        if (state.progress == CreateProgress::Complete)
+        {
+            output.allocationSize = 4096u;
+            output.memoryFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+            output.layout = VK_IMAGE_LAYOUT_GENERAL;
+            state.createdOutput = output;
+            diagnostic.clear();
+            return true;
+        }
+        diagnostic = "synthetic partial output allocation failure";
+        return false;
+    }
+
+    static void WriteDescriptor(void* user, VkImageView view) noexcept
+    {
+        auto& state = *static_cast<CallbackState*>(user);
+        ++state.writeCount;
+        RecordEvent(state, 'W');
+        state.writtenView = view;
+        state.descriptorSawOldState =
+            SameOutput(state.scene->OutputImage(), state.oldOutput) &&
+            state.scene->dispatchExtent_.width == 640u &&
+            state.scene->dispatchExtent_.height == 360u;
+    }
+
+    static void Destroy(void* user, Output& output) noexcept
+    {
+        auto& state = *static_cast<CallbackState*>(user);
+        ++state.destroyCount;
+        RecordEvent(state, 'D');
+        state.destroyedOutput = output;
+        if (SameOutput(output, state.oldOutput))
+        {
+            const horde::telemetry::RtPipelineEvidenceIdentity defaultIdentity{};
+            state.destroySawPublishedState =
+                SameOutput(state.scene->OutputImage(), state.createdOutput) &&
+                state.scene->dispatchExtent_.width == 1280u &&
+                state.scene->dispatchExtent_.height == 720u &&
+                state.scene->computeDispatchGroups_[0] == 160u &&
+                state.scene->computeDispatchGroups_[1] == 90u &&
+                state.scene->computeDispatchGroups_[2] == 1u &&
+                !state.scene->framePipelineEvidenceValid_ &&
+                SameIdentity(state.scene->framePipelineEvidence_, defaultIdentity);
+        }
+        output = {};
+    }
+
+    static bool Resize(Scene& scene, CallbackState& state, VkExtent2D extent,
+                       std::array<std::uint32_t, 3u> groups,
+                       const bool includeDestroy = true,
+                       const bool includeWrite = true)
+    {
+        state.scene = &scene;
+        state.oldOutput = scene.OutputImage();
+        Scene::OutputResizeApi api{};
+        api.user = &state;
+        api.create = Create;
+        api.writeDescriptor = includeWrite ? WriteDescriptor : nullptr;
+        api.destroy = includeDestroy ? Destroy : nullptr;
+        return scene.ResizeOutputWithApi(extent, groups, api, state.diagnostic);
+    }
+
+    static bool FailurePreservesScene(const CreateProgress progress)
+    {
+        Scene scene;
+        Configure(scene);
+        const auto oldOutput = scene.OutputImage();
+        const auto oldExtent = scene.dispatchExtent_;
+        const auto oldGroups = scene.computeDispatchGroups_;
+        const auto oldPipelineIdentity = scene.pipelineEvidenceIdentity_;
+        const auto oldFrameIdentity = scene.framePipelineEvidence_;
+        const auto oldOwners = OwnershipSnapshot(scene);
+        CallbackState state{};
+        state.progress = progress;
+        const bool resized = Resize(scene, state, {1280u, 720u}, {160u, 90u, 1u});
+        const auto partial = state.destroyedOutput;
+        const bool hasExpectedPartialOwnership =
+            (progress >= CreateProgress::Image) == (partial.image != VK_NULL_HANDLE) &&
+            (progress >= CreateProgress::Memory) == (partial.memory != VK_NULL_HANDLE) &&
+            (progress >= CreateProgress::View) == (partial.view != VK_NULL_HANDLE);
+        const bool preserved =
+            !resized && state.createCount == 1u && state.writeCount == 0u &&
+            state.destroyCount == 1u && state.eventCount == 2u && !state.eventOverflow &&
+            state.events[0] == 'C' && state.events[1] == 'D' &&
+            hasExpectedPartialOwnership &&
+            state.diagnostic == "synthetic partial output allocation failure" &&
+            SameOutput(scene.OutputImage(), oldOutput) &&
+            scene.dispatchExtent_.width == oldExtent.width &&
+            scene.dispatchExtent_.height == oldExtent.height &&
+            scene.computeDispatchGroups_ == oldGroups && scene.framePipelineEvidenceValid_ &&
+            scene.storageImageFrameRecorded_ && scene.lastOutputRedBlueSwapApplied_ &&
+            SameIdentity(scene.pipelineEvidenceIdentity_, oldPipelineIdentity) &&
+            SameIdentity(scene.framePipelineEvidence_, oldFrameIdentity) &&
+            OwnershipSnapshot(scene) == oldOwners;
+        scene.device_ = VK_NULL_HANDLE;
+        return Require(preserved,
+                      "partial output allocation failure must destroy only the partial candidate and preserve the published scene");
+    }
+
+    static bool RunTests()
+    {
+        bool ok = true;
+        ok &= FailurePreservesScene(CreateProgress::Image);
+        ok &= FailurePreservesScene(CreateProgress::Memory);
+        ok &= FailurePreservesScene(CreateProgress::View);
+
+        {
+            Scene unready;
+            Configure(unready);
+            unready.ready_ = false;
+            CallbackState state{};
+            const bool resized = Resize(unready, state, {1280u, 720u}, {160u, 90u, 1u});
+            const bool rejected = !resized && state.createCount == 0u &&
+                                  state.writeCount == 0u && state.destroyCount == 0u;
+            unready.device_ = VK_NULL_HANDLE;
+            ok &= Require(rejected,
+                          "an unready scene must reject resize before invoking allocation callbacks");
+        }
+        {
+            Scene zeroExtent;
+            Configure(zeroExtent);
+            CallbackState state{};
+            const bool resized = Resize(zeroExtent, state, {0u, 720u}, {160u, 90u, 1u});
+            const bool rejected = !resized && state.createCount == 0u &&
+                                  state.writeCount == 0u && state.destroyCount == 0u;
+            zeroExtent.device_ = VK_NULL_HANDLE;
+            ok &= Require(rejected,
+                          "a zero extent must reject resize before invoking allocation callbacks");
+        }
+        {
+            Scene invalidApi;
+            Configure(invalidApi);
+            CallbackState state{};
+            const bool resized = Resize(
+                invalidApi, state, {1280u, 720u}, {160u, 90u, 1u}, true, false);
+            const bool rejected = !resized && state.createCount == 0u &&
+                                  state.writeCount == 0u && state.destroyCount == 0u;
+            invalidApi.device_ = VK_NULL_HANDLE;
+            ok &= Require(rejected,
+                          "an incomplete transaction API must reject before invoking allocation callbacks");
+        }
+        {
+            Scene noOp;
+            Configure(noOp);
+            const auto oldOutput = noOp.OutputImage();
+            const auto oldGroups = noOp.computeDispatchGroups_;
+            const auto oldFrameIdentity = noOp.framePipelineEvidence_;
+            CallbackState state{};
+            const bool resized = Resize(noOp, state, {640u, 360u}, {80u, 45u, 1u});
+            const bool unchanged = resized && state.createCount == 0u &&
+                                   state.writeCount == 0u && state.destroyCount == 0u &&
+                                   state.diagnostic.empty() &&
+                                   SameOutput(noOp.OutputImage(), oldOutput) &&
+                                   noOp.dispatchExtent_.width == 640u &&
+                                   noOp.dispatchExtent_.height == 360u &&
+                                   noOp.computeDispatchGroups_ == oldGroups &&
+                                   noOp.framePipelineEvidenceValid_ &&
+                                   noOp.storageImageFrameRecorded_ && noOp.lastOutputRedBlueSwapApplied_ &&
+                                   SameIdentity(noOp.framePipelineEvidence_, oldFrameIdentity);
+            noOp.device_ = VK_NULL_HANDLE;
+            ok &= Require(unchanged,
+                          "an equal extent must be a true no-op, preserving descriptors, groups, and frame evidence");
+        }
+        {
+            Scene scene;
+            Configure(scene);
+            const auto oldOutput = scene.OutputImage();
+            const auto oldPipelineIdentity = scene.pipelineEvidenceIdentity_;
+            const auto oldOwners = OwnershipSnapshot(scene);
+            CallbackState state{};
+            const bool resized = Resize(scene, state, {1280u, 720u}, {160u, 90u, 1u});
+            const horde::telemetry::RtPipelineEvidenceIdentity defaultFrameIdentity{};
+            const bool committed = resized && state.createCount == 1u &&
+                                   state.writeCount == 1u && state.destroyCount == 1u &&
+                                   state.eventCount == 3u && state.events[0] == 'C' &&
+                                   !state.eventOverflow && state.events[1] == 'W' &&
+                                   state.events[2] == 'D' &&
+                                   state.requestedExtent.width == 1280u &&
+                                   state.requestedExtent.height == 720u &&
+                                   state.writtenView == state.createdOutput.view &&
+                                   state.descriptorSawOldState && state.destroySawPublishedState &&
+                                   SameOutput(state.destroyedOutput, oldOutput) &&
+                                   !SameOutput(scene.OutputImage(), oldOutput) &&
+                                   SameOutput(scene.OutputImage(), state.createdOutput) &&
+                                   scene.dispatchExtent_.width == 1280u &&
+                                   scene.dispatchExtent_.height == 720u &&
+                                   scene.computeDispatchGroups_ ==
+                                       std::array<std::uint32_t, 3u>{160u, 90u, 1u} &&
+                                   !scene.framePipelineEvidenceValid_ &&
+                                   !scene.storageImageFrameRecorded_ && !scene.lastOutputRedBlueSwapApplied_ &&
+                                   SameIdentity(scene.framePipelineEvidence_, defaultFrameIdentity) &&
+                                   scene.pipelineEvidenceIdentityValid_ &&
+                                   SameIdentity(scene.pipelineEvidenceIdentity_, oldPipelineIdentity) &&
+                                   OwnershipSnapshot(scene) == oldOwners;
+            Scene::StorageImageCapture unwrittenCapture;
+            unwrittenCapture.width = 99u;
+            unwrittenCapture.rgba = {1u, 2u, 3u, 4u};
+            std::string captureDiagnostic;
+            ok &= Require(!scene.CaptureStorageImage(unwrittenCapture, captureDiagnostic) &&
+                          unwrittenCapture.width == 0u && unwrittenCapture.rgba.empty() &&
+                          captureDiagnostic == "RT storage image is not ready for capture.",
+                          "a resized but unwritten output must reject capture before Vulkan readback");
+            scene.device_ = VK_NULL_HANDLE;
+            ok &= Require(committed,
+                          "successful resize must update only output ownership, refresh groups, invalidate old frame evidence, then retire the old image");
+        }
+        return ok;
+    }
+};
+
 } // namespace horde::vulkan::raytracing
 
 int main()
@@ -292,6 +717,7 @@ int main()
     using namespace horde::vulkan::raytracing;
 
     bool ok = true;
+    ok &= PresentableTinyRtSceneOutputResizeTestAccess::RunTests();
     const auto pipelinePolicy = TryMakeRtExecutionPolicy(
         horde::vulkan::RtExecutionBackend::RayTracingPipeline);
     const auto computePolicy = TryMakeRtExecutionPolicy(

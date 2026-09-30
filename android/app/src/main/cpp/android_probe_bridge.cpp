@@ -3145,10 +3145,17 @@ void SwapchainRenderLoop()
         const float requestedRenderScale = std::clamp(gRequestedRenderScale.load(std::memory_order_acquire), 0.50f, 1.0f);
         if (gSwapchainContext.useRtPath && std::abs(requestedRenderScale - gSwapchainContext.renderScale) > 0.001f)
         {
+            const auto resizeStart = std::chrono::steady_clock::now();
             const VkResult idleResult = vkDeviceWaitIdle(gSwapchainContext.device);
             const bool evidenceCompleted = CompleteRtEvidenceAfterDeviceIdle(
                 gSwapchainContext, idleResult);
             CancelActiveInAppBenchmark(gSwapchainContext);
+            if (!evidenceCompleted)
+            {
+                gRuntimeState.store(3, std::memory_order_release);
+                __android_log_print(ANDROID_LOG_ERROR, kTag, "Cannot resize RT output before owned GPU work completes.");
+                break;
+            }
             const bool evidenceRecreated =
                 !gSwapchainContext.rtFrameEvidenceInitialised ||
                 gSwapchainContext.rtFrameEvidence.Recreate(
@@ -3158,9 +3165,10 @@ void SwapchainRenderLoop()
             gSwapchainContext.gpuFrameTimingTotalMs = 0.0;
             gSwapchainContext.gpuFrameTimingSampleCount = 0u;
             RefreshGpuTimingTelemetry(gSwapchainContext);
-            gSwapchainContext.rtScene.Destroy();
-            gSwapchainContext.renderScale = requestedRenderScale;
             gSwapchainContext.capabilities.rtScene.presented = false;
+            // Capture readiness must count frames at the new extent, not mix
+            // previously presented frames with the replacement output.
+            gSwapchainContext.capturePresentedFrames = 0u;
             gSwapchainContext.capabilities.rtScene.dispatchWidth = 0u;
             gSwapchainContext.capabilities.rtScene.dispatchHeight = 0u;
             gSwapchainContext.capabilities.performance.internalRenderWidth = 0u;
@@ -3171,8 +3179,11 @@ void SwapchainRenderLoop()
             gSwapchainContext.timingFenceMs = gSwapchainContext.timingRecordMs = 0.0;
             gSwapchainContext.timingPresentMs = gSwapchainContext.timingTotalMs = 0.0;
             gRuntimeState.store(0, std::memory_order_release);
-            if (!evidenceCompleted || !evidenceRecreated ||
-                !InitialiseRtSceneForSwapchain(gSwapchainContext))
+            std::string resizeDiagnostic;
+            const VkExtent2D requestedExtent = ScaledRenderExtent(
+                gSwapchainContext.swapchainExtent, requestedRenderScale);
+            if (!evidenceRecreated || !gSwapchainContext.rtScene.ResizeOutputAfterDeviceIdle(
+                    requestedExtent, resizeDiagnostic))
             {
                 if (gSwapchainContext.inAppBenchmark.IsRunning() ||
                     gSwapchainContext.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Allocated ||
@@ -3181,9 +3192,18 @@ void SwapchainRenderLoop()
                     CancelActiveInAppBenchmark(gSwapchainContext);
                 }
                 gRuntimeState.store(3, std::memory_order_release);
-                __android_log_print(ANDROID_LOG_ERROR, kTag, "Failed to apply requested RT render scale.");
+                __android_log_print(ANDROID_LOG_ERROR, kTag, "Failed to apply requested RT render scale: %s", resizeDiagnostic.c_str());
                 break;
             }
+            // The next RenderFrame resets/re-records its invalidated command
+            // buffer; no old output descriptor may be submitted after resize.
+            gSwapchainContext.renderScale = requestedRenderScale;
+            const double resizeMilliseconds = std::chrono::duration<double, std::milli>(
+                std::chrono::steady_clock::now() - resizeStart).count();
+            __android_log_print(ANDROID_LOG_INFO, kTag,
+                                "HORDE_RT_SCALE_RESIZE scale=%.0f extent=%ux%u output_only=1 idle_and_resize_ms=%.3f",
+                                requestedRenderScale * 100.0f, requestedExtent.width,
+                                requestedExtent.height, resizeMilliseconds);
         }
         const auto frameStart = std::chrono::steady_clock::now();
         gSwapchainContext.frameDeltaSeconds = std::clamp(std::chrono::duration<float>(frameStart - previousFrameStart).count(), 1.0f / 240.0f, 0.1f);
