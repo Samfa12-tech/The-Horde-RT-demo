@@ -173,6 +173,10 @@ function Get-DielectricTransportQueryArguments {
         $bodyOffset = $TransportSource.IndexOf($body, [StringComparison]::Ordinal)
         $traceQueryCount = [regex]::Matches($body, '\btraceScene\s*\(').Count
         Assert-True ($traceQueryCount -eq 2) "$functionName must retain exactly its reflection and continuation scene queries."
+        Assert-True ($body -match '(?s)float\s+reflectionEpsilon\s*=\s*dielectricSpawnEpsilon\s*\(\s*firstHit\s*,\s*firstHit\.t\s*\)\s*;') `
+            "$functionName reflection must carry the matching hit's proven minimum normal bias."
+        Assert-True ($body -match '(?s)float\s+epsilon\s*=\s*dielectricSpawnEpsilon\s*\(\s*currentHit\s*,\s*totalDistance\s*\)\s*;') `
+            "$functionName continuation must carry the matching hit's proven minimum normal bias."
         Assert-True ($body -match '(?s)\badvanceDielectricRayOrigin\s*\(\s*dielectricSpawnPoint\s*\(\s*firstHit\s*\)') `
             "$functionName reflection query must use the guarded first-hit spawn point."
         Assert-True ($body -match '(?s)\bvec3\s+nextOrigin\s*=\s*advanceDielectricRayOrigin\s*\(\s*dielectricSpawnPoint\s*\(\s*currentHit\s*\)') `
@@ -181,6 +185,10 @@ function Get-DielectricTransportQueryArguments {
             "$functionName reflection query must pass the guarded first-hit origin to traceScene."
         Assert-True ($body -match '(?s)\bHitInfo\s+nextHit\s*=\s*traceScene\s*\(\s*nextOrigin\s*,\s*transmissionDirection\s*,') `
             "$functionName continuation query must pass nextOrigin and transmissionDirection to traceScene."
+        Assert-True ($body -match '(?s)advanceDielectricRayOrigin\s*\(\s*dielectricSpawnPoint\s*\(\s*firstHit\s*\)\s*,\s*firstOutward\s*,\s*reflectionDirection\s*,\s*reflectionEpsilon\s*\)') `
+            "$functionName actual reflection origin must use the matching guarded epsilon."
+        Assert-True ($body -match '(?s)vec3\s+nextOrigin\s*=\s*advanceDielectricRayOrigin\s*\(\s*dielectricSpawnPoint\s*\(\s*currentHit\s*\)\s*,\s*outwardNormal\s*,\s*transmissionDirection\s*,\s*epsilon\s*\)') `
+            "$functionName actual continuation origin must use the matching guarded epsilon."
 
         foreach ($query in @(
             @{ Name = 'reflection'; Pattern = '(?s)\bHitInfo\s+reflectedHit\s*=\s*traceScene\s*\(\s*advanceDielectricRayOrigin\s*\(\s*dielectricSpawnPoint\s*\(\s*firstHit\s*\).*?\)\s*,\s*reflectionDirection\s*,\s*[^,]+,\s*[^,]+,\s*(?<minimum>[^,]+),' },
@@ -223,6 +231,9 @@ function Assert-DielectricRayMinimumDistanceContract {
     $minimumBody = Get-BracedFunctionBody -Source $GlslCommonSource -FunctionName 'dielectricQueryMinimum'
     Assert-True ($minimumBody -match '(?s)if\s*\(\s*hit\.dielectricSpawnGuarded\s*\)\s*return\s+0\.0\s*;\s*#endif\s*return\s+kDielectricRayMinimumDistance\s*;') `
         'Only a proven guarded spawn may use zero minimum; all fallback queries must retain the independent 1 µm minimum.'
+    $epsilonBody = Get-BracedFunctionBody -Source $GlslCommonSource -FunctionName 'dielectricSpawnEpsilon'
+    Assert-True ($epsilonBody -match '(?s)float\s+epsilon\s*=\s*dielectricRayEpsilon\s*\(\s*hit\.position\s*,\s*interfaceDistance\s*\)\s*;.*if\s*\(\s*hit\.dielectricSpawnGuarded\s*\)\s*return\s+max\s*\(\s*epsilon\s*,\s*hit\.dielectricSpawnMinimumNormalBias\s*\)\s*;\s*#endif\s*return\s+epsilon\s*;') `
+        'Only an admitted guard may raise the origin offset to its calculated normal-separation minimum; fallback epsilon stays unchanged.'
 
     $guardBody = Get-BracedFunctionBody -Source $SpawnSource -FunctionName 'guardedRectangularDielectricSpawn'
     foreach ($finiteValue in @('localPosition', 'surfacePosition', 'geometricNormal', 'objectOffsetDirection', 'guardedWorld')) {
@@ -231,6 +242,15 @@ function Assert-DielectricRayMinimumDistanceContract {
     }
     Assert-True ($guardBody -match '(?s)spawnPosition\s*=\s*surfacePosition\s*;') `
         'The rectangular spawn helper must initialize its output to the unmodified surface fallback before any rejection.'
+    Assert-True ($guardBody.Contains('minimumNormalBias = 0.0;') -and
+        $guardBody.Contains('isnan(separationScaleLower)') -and $guardBody.Contains('isinf(separationScaleLower)') -and
+        $guardBody.Contains('separationScaleLower <= 0.0') -and
+        $guardBody.Contains('gamma16 * dot(abs(objectNormal), absoluteW2o * abs(geometricNormal))') -and
+        $guardBody.Contains('requiredBias = uintBitsToFloat(floatBitsToUint(requiredBias) + 1u);') -and
+        $guardBody.Contains('requiredBias > 0.00025') -and
+        $guardBody.Contains('if (separationScaleLower * lowerNormalBias <= separationErrorUpper ||') -and
+        $guardBody -match '(?s)spawnPosition\s*=\s*guardedWorld\s*;\s*minimumNormalBias\s*=\s*lowerNormalBias\s*;\s*return\s+true\s*;') `
+        'Per-hit normal bias must use an absolute projection bound, upward rounding, strict finite separation and the unchanged 250 µm cap, publishing only on guard success.'
     Assert-True ($guardBody -match '(?s)\+\s*vec3\s*\(\s*geometryError\s*\)') `
         'The conservative loader-derived geometry error must contribute to the spawn uncertainty bound.'
     Assert-True ($guardBody -match '(?s)vec3\s+candidate\s*=\s*start\s*\+\s*delta\s*\*\s*clamp\s*\(\s*dot\s*\(\s*localPosition\s*-\s*start\s*,\s*delta\s*\)\s*/\s*squaredLength\s*,\s*0\.0\s*,\s*1\.0\s*\)\s*;\s*float\s+squared\s*=\s*dot\s*\(\s*candidate\s*-\s*localPosition\s*,\s*candidate\s*-\s*localPosition\s*\)\s*;\s*if\s*\(\s*squared\s*<\s*nearestSquared\s*\)') `
@@ -249,6 +269,9 @@ function Assert-DielectricRayMinimumDistanceContract {
         'Spawn clearance width and geometry error must use their loader-derived fields, independently of authored thickness.'
     Assert-True ($HitDecodeSource -match '(?s)h\.dielectricSpawnGuarded\s*=\s*false\s*;') `
         'Every trace result must default to unguarded so a rejected or ineligible hit cannot inherit zero-minimum eligibility.'
+    Assert-True ($HitDecodeSource.Contains('h.dielectricSpawnMinimumNormalBias = 0.0;') -and
+        $HitDecodeSource.Contains('h.dielectricSpawnPosition, h.dielectricSpawnMinimumNormalBias);')) `
+        'Hit decoding must initialize and carry the guard minimum, not discard its source-face separation result.'
     Assert-True ($GeneratedAbiSource -match '\bkRtMaterialFlagCertifiedRectangularVolume\s*=\s*4096u\s*;') `
         'The guarded spawn eligibility bit must remain the canonical 4096 ABI flag.'
     Assert-True ($AssetSource -match '(?s)if\s*\(everyComponentIsRectangular\)\s*\{\s*material\.flags\s*\|=\s*certifiedRectangularVolumeFlag\s*;') `
@@ -422,6 +445,45 @@ try {
         $transport.Contains('controls.waterQuality >= 1.5') -and
         $lighting.Contains('controls.waterQuality >= 1.5')) `
         'Matrix budgets must specialise all bounded dielectric/shadow routes while macro-absent compatibility retains runtime WaterQuality selection.'
+    foreach ($brokenGuard in @(
+        $dielectricSpawn.Replace('requiredBias > 0.00025', 'false'),
+        $dielectricSpawn.Replace('floatBitsToUint(requiredBias) + 1u', 'floatBitsToUint(requiredBias) + 0u'),
+        $dielectricSpawn.Replace('gamma16 * dot(abs(objectNormal), absoluteW2o * abs(geometricNormal))', '0.0'),
+        $dielectricSpawn.Replace('isnan(separationScaleLower)', 'false'))) {
+        Assert-Throws {
+            Assert-DielectricRayMinimumDistanceContract -TransportSource $transport `
+                -GlslCommonSource $dielectricCommon -CppMathSource $dielectricMath -SpawnSource $brokenGuard `
+                -HitDecodeSource $hitDecode -AssetSource $staticMeshAsset -StaticMeshSlotSource $staticMeshSlot `
+                -GeneratedAbiSource $generatedAbi
+        } 'Removing a per-hit normal-separation cap, upward rounding, absolute projection bound or finite check must fail.'
+    }
+    $discardedBias = $dielectricCommon.Replace('max(epsilon, hit.dielectricSpawnMinimumNormalBias)', 'epsilon')
+    Assert-Throws {
+        Assert-DielectricRayMinimumDistanceContract -TransportSource $transport `
+            -GlslCommonSource $discardedBias -CppMathSource $dielectricMath -SpawnSource $dielectricSpawn `
+            -HitDecodeSource $hitDecode -AssetSource $staticMeshAsset -StaticMeshSlotSource $staticMeshSlot `
+            -GeneratedAbiSource $generatedAbi
+    } 'A calculated but discarded guarded minimum must fail the origin-selection contract.'
+    foreach ($offsetMatch in [regex]::Matches($transport, 'dielectricSpawnEpsilon\((firstHit, firstHit\.t|currentHit, totalDistance)\)')) {
+        $wrongOffset = $transport.Substring(0, $offsetMatch.Index) + 'dielectricRayEpsilon(vec3(0.0), 0.0)' +
+            $transport.Substring($offsetMatch.Index + $offsetMatch.Length)
+        Assert-Throws {
+            Assert-DielectricRayMinimumDistanceContract -TransportSource $wrongOffset `
+                -GlslCommonSource $dielectricCommon -CppMathSource $dielectricMath -SpawnSource $dielectricSpawn `
+                -HitDecodeSource $hitDecode -AssetSource $staticMeshAsset -StaticMeshSlotSource $staticMeshSlot `
+                -GeneratedAbiSource $generatedAbi
+        } 'Each actual reflection/continuation offset must carry its matching hit minimum; unused helper calls are insufficient.'
+    }
+    foreach ($offsetUse in [regex]::Matches($transport, '(reflectionDirection, reflectionEpsilon|transmissionDirection, epsilon)\)')) {
+        $wrongUse = $transport.Substring(0, $offsetUse.Index) + 'vec3(0.0), 0.00002)' +
+            $transport.Substring($offsetUse.Index + $offsetUse.Length)
+        Assert-Throws {
+            Assert-DielectricRayMinimumDistanceContract -TransportSource $wrongUse `
+                -GlslCommonSource $dielectricCommon -CppMathSource $dielectricMath -SpawnSource $dielectricSpawn `
+                -HitDecodeSource $hitDecode -AssetSource $staticMeshAsset -StaticMeshSlotSource $staticMeshSlot `
+                -GeneratedAbiSource $generatedAbi
+        } 'Discarding the calculated epsilon at an actual origin call must fail even with an unused helper assignment.'
+    }
 
     $budgets = Get-Content -LiteralPath $budgetPath -Raw | ConvertFrom-Json
     Assert-True ($budgets.schema -eq 1 -and $budgets.status -eq 'frozen' -and
@@ -431,11 +493,11 @@ try {
     New-Item -ItemType Directory -Path $temporaryRoot | Out-Null
     $genericInclude = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalRayGenShader.inc'
     $legacyInclude = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalLegacyRayGenShader.inc'
-    # Compatibility pins reflect September 30 bounded numerical spawn guards;
+    # Compatibility pins reflect September 30 per-hit normal-separation bounds;
     # the independent fresh compiler check below still validates source identity.
-    Assert-True ((Get-CanonicalTextHash $genericInclude) -eq 'd0a633203e830889e63e552360899e6a41c66bcd4baa27b172c1d6f008e68e99') `
+    Assert-True ((Get-CanonicalTextHash $genericInclude) -eq 'f4170abbf7f68364d7eeb5d9d01baeed0efacb2fc6db7ab4d1f4c0075dddacd4') `
         'Compatibility generic include changed unexpectedly.'
-    Assert-True ((Get-CanonicalTextHash $legacyInclude) -eq '7fb4f60f90c4db51c37522e09b71808ff8d7862b40280567af5c2ee04bf915a1') `
+    Assert-True ((Get-CanonicalTextHash $legacyInclude) -eq 'a3b32262260a25e31fbc880f851baabc5df14bbbb7995fd532e5696afd3e06bb') `
         'Compatibility legacy include changed unexpectedly.'
 
     $lfFixture = Join-Path $temporaryRoot 'canonical-lf-fixture.txt'
@@ -647,13 +709,13 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     & $compiler -Check -OutputDirectory $compatibilityGenericOutput
     if ($LASTEXITCODE -ne 0) { throw "Generic compatibility freshness failed with exit code $LASTEXITCODE." }
     Assert-True ((Get-RawFileHash (Join-Path $compatibilityGenericOutput 'minimal.rgen.spv')) -eq
-        '0d4db8e6aaf97e22f88a8d6c2f7d29f271da93583387bdfe8781cea44e4104a8') `
+        '03526a113daed58e6b9dc3565e7a0837c2040acdb685339dcd48b9d7219de658') `
         'Compatibility generic SPIR-V words changed.'
     $compatibilityLegacyOutput = Join-Path $temporaryRoot 'compatibility-legacy'
     & $compiler -Legacy -Check -OutputDirectory $compatibilityLegacyOutput
     if ($LASTEXITCODE -ne 0) { throw "Legacy compatibility freshness failed with exit code $LASTEXITCODE." }
     Assert-True ((Get-RawFileHash (Join-Path $compatibilityLegacyOutput 'minimal.legacy.rgen.spv')) -eq
-        '136a2f81559bf381d32ca064368af14ef7512ea8561dbd954e960168b59aedd4') `
+        'dcf51ae9a3a19689d7b71bf0e15cc0a00c07947d1417657301b196926b21665b') `
         'Compatibility legacy SPIR-V words changed.'
     Assert-True ((& git -C $repoRoot status --porcelain) -join "`n" -eq $worktreeStatusBefore) `
         'Temporary artifact compilation modified the worktree.'

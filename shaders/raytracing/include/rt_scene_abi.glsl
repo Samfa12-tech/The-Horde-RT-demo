@@ -109,6 +109,7 @@ struct HitInfo
 #if HORDE_GENERIC_TRANSMISSION_VARIANT
     vec3 dielectricSpawnPosition;
     bool dielectricSpawnGuarded;
+    float dielectricSpawnMinimumNormalBias;
 #endif
 };
 

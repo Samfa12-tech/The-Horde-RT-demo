@@ -182,6 +182,32 @@ inline float DielectricRayEpsilon(const Vec3& position, float interfaceDistance)
 // near a corner can be closer than that bias, despite millimetre wall thickness.
 inline constexpr float kDielectricRayMinimumDistance = 0.000001f;
 
+// CPU reference for the shader's per-hit normal-separation selection. The
+// caller supplies a conservative lower scale / upper projection error and
+// still owns opposite-face clearance and admissible triangle-inset checks.
+// Zero means reject; it is never a valid production offset.
+inline float SelectDielectricNormalBias(float coordinateFloor,
+                                        float separationScaleLower,
+                                        float separationErrorUpper)
+{
+    if (!std::isfinite(coordinateFloor) || coordinateFloor < 0.00002f ||
+        coordinateFloor > 0.00025f || !std::isfinite(separationScaleLower) ||
+        separationScaleLower <= 0.0f || !std::isfinite(separationErrorUpper) ||
+        separationErrorUpper < 0.0f)
+        return 0.0f;
+    if (separationScaleLower * coordinateFloor > separationErrorUpper)
+        return coordinateFloor;
+    constexpr float unitRoundoff = 5.9604644775390625e-8f;
+    constexpr float gamma8 = (8.0f * unitRoundoff) / (1.0f - 8.0f * unitRoundoff);
+    const float requiredBias = std::nextafter(
+        (separationErrorUpper / separationScaleLower) * (1.0f + gamma8),
+        std::numeric_limits<float>::infinity());
+    if (!std::isfinite(requiredBias) || requiredBias > 0.00025f)
+        return 0.0f;
+    const float selected = std::max(coordinateFloor, requiredBias);
+    return separationScaleLower * selected > separationErrorUpper ? selected : 0.0f;
+}
+
 inline Vec3 AdvanceDielectricRayOrigin(const Vec3& position,
                                        const Vec3& geometricNormal,
                                        const Vec3& direction,

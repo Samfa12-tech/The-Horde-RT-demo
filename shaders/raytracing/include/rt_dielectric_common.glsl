@@ -57,6 +57,15 @@ float dielectricQueryMinimum(HitInfo hit)
     return kDielectricRayMinimumDistance;
 }
 
+float dielectricSpawnEpsilon(HitInfo hit, float interfaceDistance)
+{
+    float epsilon = dielectricRayEpsilon(hit.position, interfaceDistance);
+#if HORDE_GENERIC_TRANSMISSION_VARIANT
+    if (hit.dielectricSpawnGuarded) return max(epsilon, hit.dielectricSpawnMinimumNormalBias);
+#endif
+    return epsilon;
+}
+
 vec3 advanceDielectricRayOrigin(vec3 position, vec3 geometricNormal,
                                 vec3 direction, float epsilon)
 {

@@ -400,6 +400,7 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
 #if HORDE_GENERIC_TRANSMISSION_VARIANT
     h.dielectricSpawnPosition = h.position;
     h.dielectricSpawnGuarded = false;
+    h.dielectricSpawnMinimumNormalBias = 0.0;
 #endif
 
     rayQueryEXT query;
@@ -564,7 +565,7 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
                             rayQueryGetIntersectionWorldToObjectEXT(query, true),
                             staticMaterial.iorThicknessAttenuationDistance.w,
                             staticMaterial.attenuationColor.w,
-                            h.dielectricSpawnPosition);
+                            h.dielectricSpawnPosition, h.dielectricSpawnMinimumNormalBias);
                 }
 #endif
                 vec3 emission = emissiveSample * staticMaterial.emissiveFactorStrength.rgb *

@@ -5,9 +5,10 @@
 bool guardedRectangularDielectricSpawn(vec3 v0, vec3 v1, vec3 v2, vec2 bary,
     vec3 localPosition, vec3 surfacePosition, vec3 geometricNormal,
     mat4x3 objectToWorld, mat4x3 worldToObject, float minimumWidth, float geometryError,
-    out vec3 spawnPosition)
+    out vec3 spawnPosition, out float minimumNormalBias)
 {
     spawnPosition = surfacePosition;
+    minimumNormalBias = 0.0;
     // Certification is object-space only; reject non-finite runtime transforms
     // or derived normals instead of letting NaN ordered comparisons fail open.
     if (any(isnan(localPosition)) || any(isinf(localPosition)) ||
@@ -29,6 +30,7 @@ bool guardedRectangularDielectricSpawn(vec3 v0, vec3 v1, vec3 v2, vec2 bary,
     const float gamma5 = (5.0 * unitRoundoff) / (1.0 - 5.0 * unitRoundoff);
     // Affine dot3 + translation must be safe without assuming FMA contraction.
     const float gamma8 = (8.0 * unitRoundoff) / (1.0 - 8.0 * unitRoundoff);
+    const float gamma16 = (16.0 * unitRoundoff) / (1.0 - 16.0 * unitRoundoff);
     const float gamma32 = (32.0 * unitRoundoff) / (1.0 - 32.0 * unitRoundoff);
     vec3 localError = gamma5 * (abs(v0) + abs(bary.x * e1) + abs(bary.y * e2));
     vec3 worldError = absoluteO2w * localError + gamma8 *
@@ -53,9 +55,23 @@ bool guardedRectangularDielectricSpawn(vec3 v0, vec3 v1, vec3 v2, vec2 bary,
         0.00002, 0.00025);
     vec3 objectOffsetDirection = mat3(worldToObject) * geometricNormal;
     if (any(isnan(objectOffsetDirection)) || any(isinf(objectOffsetDirection))) return false;
+    // Absolute projection error covers the matrix-vector and dot operations;
+    // multiplying a cancelled dot by a relative gamma is not conservative.
+    float separationScaleLower = (abs(dot(objectNormal, objectOffsetDirection)) -
+        gamma16 * dot(abs(objectNormal), absoluteW2o * abs(geometricNormal))) * (1.0 - gamma8);
+    if (isnan(separationScaleLower) || isinf(separationScaleLower) || separationScaleLower <= 0.0) return false;
+    float separationErrorUpper = dot(abs(objectNormal), objectError) * (1.0 + gamma8);
+    // Derive a per-hit minimum only when the coordinate floor cannot separate
+    // this face. Inflate division/multiplication and round upward by one ULP.
+    if (separationScaleLower * lowerNormalBias <= separationErrorUpper)
+    {
+        float requiredBias = (separationErrorUpper / separationScaleLower) * (1.0 + gamma8);
+        requiredBias = uintBitsToFloat(floatBitsToUint(requiredBias) + 1u);
+        if (isnan(requiredBias) || isinf(requiredBias) || requiredBias > 0.00025) return false;
+        lowerNormalBias = max(lowerNormalBias, requiredBias);
+    }
     // Both source-face separation and the opposite-face clearance must fit.
-    if (abs(dot(objectNormal, objectOffsetDirection)) * lowerNormalBias * (1.0 - gamma8) <=
-            dot(abs(objectNormal), objectError) * (1.0 + gamma8) ||
+    if (separationScaleLower * lowerNormalBias <= separationErrorUpper ||
         (length(objectOffsetDirection) * 0.00025 + 2.0 * length(objectError)) *
             (1.0 + gamma8) >= minimumWidth * 0.25)
         return false;
@@ -98,6 +114,7 @@ bool guardedRectangularDielectricSpawn(vec3 v0, vec3 v1, vec3 v2, vec2 bary,
     precise vec3 guardedWorld = mat3(objectToWorld) * guardedLocal + objectToWorld[3];
     if (any(isnan(guardedWorld)) || any(isinf(guardedWorld))) return false;
     spawnPosition = guardedWorld;
+    minimumNormalBias = lowerNormalBias;
     return true;
 }
 #endif

@@ -31,6 +31,7 @@ using horde::vulkan::raytracing::RefractDirection;
 using horde::vulkan::raytracing::ResolveDielectricInterfaceBudget;
 using horde::vulkan::raytracing::ResolveDielectricTerminal;
 using horde::vulkan::raytracing::SchlickFresnel;
+using horde::vulkan::raytracing::SelectDielectricNormalBias;
 using horde::vulkan::raytracing::ShadowInterfaceSample;
 using horde::vulkan::raytracing::ThinWallTransition;
 using horde::vulkan::raytracing::Vec3;
@@ -371,6 +372,38 @@ void TestGenericShadowOriginKeepsMillimetreClearance()
           "legacy-inactive shadow origin retains the reviewed four-millimetre normal offset");
 }
 
+void TestRecordedNormalSeparationSelectsBoundedBias()
+{
+    // Exact RTX row237 guard intermediates at (515,569)/(515,570). These are
+    // object-space projection bounds, not an invented geometry/material knob.
+    constexpr float floor = 3.0154373234836385e-5f;
+    constexpr float oldClearance = 6.853263039374724e-5f;
+    const float scaleLower = oldClearance / floor;
+    for (const float errorUpper : {6.928406219230965e-5f, 6.964926433283836e-5f})
+    {
+        Check(scaleLower * floor <= errorUpper,
+              "recorded coordinate-only bias fails the conservative separation check");
+        const float selected = SelectDielectricNormalBias(floor, scaleLower, errorUpper);
+        Check(selected > floor && selected < 3.1e-5f &&
+                  scaleLower * selected > errorUpper,
+              "per-hit projected error selects a strict bounded separation without global bias inflation");
+    }
+    Check(SelectDielectricNormalBias(floor, scaleLower, oldClearance * 0.8f) == floor,
+          "an already sufficient coordinate floor remains byte-identical");
+    Check(SelectDielectricNormalBias(0.00025f, 1.0f, 0.00025f) == 0.0f &&
+              SelectDielectricNormalBias(floor, 1.0f, 0.001f) == 0.0f,
+          "a separation requiring more than the unchanged quarter-millimetre cap fails closed");
+    const float nan = std::numeric_limits<float>::quiet_NaN();
+    const float infinity = std::numeric_limits<float>::infinity();
+    Check(SelectDielectricNormalBias(nan, 1.0f, 0.0f) == 0.0f &&
+              SelectDielectricNormalBias(floor, infinity, 0.0f) == 0.0f &&
+              SelectDielectricNormalBias(floor, 1.0f, nan) == 0.0f &&
+              SelectDielectricNormalBias(floor, 0.0f, 0.0f) == 0.0f &&
+              SelectDielectricNormalBias(floor, -1.0f, 0.0f) == 0.0f &&
+              SelectDielectricNormalBias(floor, 1.0f, -1.0f) == 0.0f,
+          "non-finite and invalid projection inputs cannot admit a guarded offset");
+}
+
 void TestBoundedShadowPhysicalSegmentLengthsAndCoincidentCandidates()
 {
     const Vec3 color{0.25f, 0.5f, 1.0f};
@@ -666,6 +699,7 @@ int main()
     TestBoundedShadowPhysicalSegmentLengthsAndCoincidentCandidates();
     TestMobileAndHighShadowBounds();
     TestMillimetreScaleRayAdvance();
+    TestRecordedNormalSeparationSelectsBoundedBias();
     TestGenericShadowOriginKeepsMillimetreClearance();
     TestClosedPaneEntryNearEdgeKeepsExitReachable();
     TestRecordedTriangleSurfacePointKeepsMicrometreExit();

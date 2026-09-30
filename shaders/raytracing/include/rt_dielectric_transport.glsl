@@ -73,8 +73,7 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     vec3 reflectionDirection = roughDielectricDirection(
         reflect(rayDirection, firstNormal), firstNormal,
         firstHit.position, firstHit.roughness);
-    float reflectionEpsilon = dielectricRayEpsilon(
-        firstHit.position, firstHit.t);
+    float reflectionEpsilon = dielectricSpawnEpsilon(firstHit, firstHit.t);
     HitInfo reflectedHit = traceScene(
         advanceDielectricRayOrigin(dielectricSpawnPoint(firstHit), firstOutward,
                                    reflectionDirection, reflectionEpsilon),
@@ -370,7 +369,7 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
                 (1.0 - fresnel);
         }
 
-        float epsilon = dielectricRayEpsilon(currentHit.position, totalDistance);
+        float epsilon = dielectricSpawnEpsilon(currentHit, totalDistance);
         vec3 nextOrigin = advanceDielectricRayOrigin(
             dielectricSpawnPoint(currentHit), outwardNormal, transmissionDirection, epsilon);
         float advancedDistance = max(
@@ -441,7 +440,7 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     vec3 reflectionDirection = roughDielectricDirection(
         reflect(rayDirection, firstNormal), firstNormal,
         firstHit.position, firstHit.roughness);
-    float reflectionEpsilon = dielectricRayEpsilon(firstHit.position, firstHit.t);
+    float reflectionEpsilon = dielectricSpawnEpsilon(firstHit, firstHit.t);
     HitInfo reflectedHit = traceScene(
         advanceDielectricRayOrigin(dielectricSpawnPoint(firstHit), firstOutward,
                                    reflectionDirection, reflectionEpsilon),
@@ -660,7 +659,7 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
                 (1.0 - fresnel);
         }
 
-        float epsilon = dielectricRayEpsilon(currentHit.position, totalDistance);
+        float epsilon = dielectricSpawnEpsilon(currentHit, totalDistance);
         vec3 nextOrigin = advanceDielectricRayOrigin(
             dielectricSpawnPoint(currentHit), outwardNormal, transmissionDirection, epsilon);
         float advancedDistance = max(
