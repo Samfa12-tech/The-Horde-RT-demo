@@ -28,10 +28,21 @@ completes7,352 Shipping rows: ordinary OpaqueFast opening GPU70.696118/80.360987
 versus forced Generic164.3430425/193.3582765ms. This is an unchanged opaque scene,
 not a lantern routed through the wrong shader. Different algorithms, compiler
 treatment, failed image equivalence and thermal drift exclude causal/glass-only
-savings. Keep production selection unchanged. Next isolate compiler treatment on
-identical OpaqueFast source before deciding how much kernel tax is recoverable.
+savings. Keep production selection unchanged. Compiler treatment is now isolated
+as a group on identical OpaqueFast source; the following is not recovered-cost proof.
 At these two normal opening medians, the planning22.333-24.333ms live GPU budget
 requires approximately66-72% GPU reduction; no new performance capability claimed.
+
+October1 [compiler-only ABBA](evidence/2026-10-01-opaque-compiler/README.md)
+completes7,352 owning Shipping rows/640opening without changing maths or runtime
+selection. Normal openingGPU66.419686/72.1915605ms versus probe46.043827/51.478931ms;
+route cycles60.9232/66.8472 versus44.0113/50.1984ms. The −29.64% opening contrast
+is descriptive, not causal: thermal/power contexts differ and separate Diagnostic
+image gate fails maximum14 against unchanged limit3. Production compiler/compute
+parity guards remain RED. No promotion or lantern timing assigned to this probe.
+Even these unaccepted opening medians require approximately47–57% additional GPU
+reduction to the planning live22.333–24.333ms budget. Focused pixel attribution is
+justified; the unchanged workload is not thereby a30FPS architecture.
 
 Target: at least sustained 30 FPS for ordinary and lantern-heavy gameplay at 75%,
 with consistent display pacing. Recovery toward 60 is a headroom-dependent

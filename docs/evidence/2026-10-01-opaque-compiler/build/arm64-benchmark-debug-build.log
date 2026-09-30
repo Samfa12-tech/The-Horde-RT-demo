@@ -1,0 +1,107 @@
+> Task :app:prepareRuntimeAssets
+> Task :app:preBuild
+> Task :app:preBenchmarkBuild
+> Task :app:generateBenchmarkBuildConfig
+> Task :app:javaPreCompileBenchmark
+> Task :app:checkBenchmarkAarMetadata
+> Task :app:generateBenchmarkResValues
+> Task :app:mapBenchmarkSourceSetPaths
+> Task :app:generateBenchmarkResources
+> Task :app:createBenchmarkCompatibleScreenManifests
+> Task :app:extractDeepLinksBenchmark
+> Task :app:processBenchmarkMainManifest
+> Task :app:processBenchmarkManifest
+> Task :app:extractProguardFiles
+> Task :app:mergeBenchmarkResources
+> Task :app:configureCMakeRelWithDebInfo[arm64-v8a]
+> Task :app:buildCMakeRelWithDebInfo[arm64-v8a]
+> Task :app:mergeBenchmarkJniLibFolders
+> Task :app:mergeBenchmarkArtProfile
+> Task :app:desugarBenchmarkFileDependencies
+> Task :app:checkBenchmarkDuplicateClasses
+> Task :app:mergeBenchmarkStartupProfile
+> Task :app:mergeExtDexBenchmark
+> Task :app:mergeBenchmarkShaders
+> Task :app:compileBenchmarkShaders NO-SOURCE
+> Task :app:generateBenchmarkAssets UP-TO-DATE
+> Task :app:mergeBenchmarkNativeLibs
+> Task :app:mergeBenchmarkAssets
+> Task :app:extractBenchmarkVersionControlInfo
+> Task :app:processBenchmarkJavaRes NO-SOURCE
+> Task :app:collectBenchmarkDependencies
+> Task :app:sdkBenchmarkDependencyData
+> Task :app:validateSigningBenchmark
+> Task :app:writeBenchmarkAppMetadata
+> Task :app:writeBenchmarkSigningConfigVersions
+> Task :app:preDebugBuild
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:generateDebugBuildConfig
+> Task :app:stripBenchmarkDebugSymbols
+> Task :app:javaPreCompileDebug
+> Task :app:mergeBenchmarkJavaResource
+> Task :app:checkDebugAarMetadata
+> Task :app:generateDebugResValues
+> Task :app:mapDebugSourceSetPaths
+> Task :app:generateDebugResources
+> Task :app:createDebugCompatibleScreenManifests
+> Task :app:extractDeepLinksDebug
+> Task :app:mergeDebugResources
+> Task :app:extractBenchmarkNativeSymbolTables
+> Task :app:processDebugMainManifest
+> Task :app:processDebugManifest
+> Task :app:mergeDebugShaders
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:mergeBenchmarkNativeDebugMetadata
+> Task :app:mergeDebugAssets
+> Task :app:processDebugManifestForPackage
+> Task :app:processDebugJavaRes NO-SOURCE
+> Task :app:processBenchmarkManifestForPackage
+> Task :app:mergeDebugJavaResource
+> Task :app:checkDebugDuplicateClasses
+> Task :app:desugarDebugFileDependencies
+> Task :app:mergeExtDexDebug
+> Task :app:mergeLibDexDebug
+> Task :app:processDebugResources
+> Task :app:processBenchmarkResources
+> Task :app:compressBenchmarkAssets
+> Task :app:compressDebugAssets
+> Task :app:configureCMakeDebug[arm64-v8a]
+
+> Task :app:compileBenchmarkJavaWithJavac
+Note: C:\Dev\tmp\horde-opaque-retained-profile-20260930\source-eaf\android\app\src\main\java\com\samfa12\hordelanternrt\MainActivity.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :app:generateBenchmarkLintVitalReportModel
+> Task :app:dexBuilderBenchmark
+> Task :app:mergeBenchmarkGlobalSynthetics
+> Task :app:mergeDexBenchmark
+> Task :app:lintVitalAnalyzeBenchmark
+
+> Task :app:compileDebugJavaWithJavac
+Note: C:\Dev\tmp\horde-opaque-retained-profile-20260930\source-eaf\android\app\src\main\java\com\samfa12\hordelanternrt\MainActivity.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :app:compileBenchmarkArtProfile
+> Task :app:lintVitalReportBenchmark
+> Task :app:dexBuilderDebug
+> Task :app:lintVitalBenchmark
+> Task :app:optimizeBenchmarkResources
+> Task :app:mergeProjectDexDebug
+> Task :app:buildCMakeDebug[arm64-v8a]
+> Task :app:mergeDebugJniLibFolders
+> Task :app:validateSigningDebug
+> Task :app:writeDebugAppMetadata
+> Task :app:writeDebugSigningConfigVersions
+> Task :app:mergeDebugNativeLibs
+> Task :app:packageBenchmark
+> Task :app:createBenchmarkApkListingFileRedirect
+> Task :app:assembleBenchmark
+> Task :app:stripDebugDebugSymbols
+> Task :app:packageDebug
+> Task :app:createDebugApkListingFileRedirect
+> Task :app:assembleDebug
+[Incubating] Problems report is available at: file:///C:/Dev/tmp/horde-opaque-retained-profile-20260930/source-eaf/android/build/reports/problems/problems-report.html
+
+BUILD SUCCESSFUL in 52s
+83 actionable tasks: 83 executed

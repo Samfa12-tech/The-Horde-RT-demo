@@ -1,6 +1,38 @@
 # Android RT Device Compatibility Record
 
-Last updated: 2026-09-30
+Last updated: 2026-10-01
+
+## October 1: compiler-only OpaqueFast investigation (local SM-S948B evidence)
+
+Exact SM-S948B/R5GL219SZGK, Android16/Adreno840/driver2150932499, strict ASTC,
+75%/1080x2235, native RayTracingPipeline. Detached eaf source changes only two
+Mobile OpaqueFast compiled artifacts/catalog metadata; preprocessed shader inputs
+are identical to normal control. No shader maths, C++ strategy, geometry, material,
+player, light, budget or quality changes. The experimental compiler treatment is
+not admitted; normal production compiler and pipeline/compute policy-parity gates
+correctly reject it. Independent actual APK ELF scans validate all eight modules;
+Shipping0 atomics/image reads/binding22, Diagnostic opaque30 static atomics versus
+normal5, unchanged41-counter ABI. Static representation is not runtime workload.
+
+Exact Diagnostic APK1a515220 installs/pulls back identically in `.debug`.
+Focused opening/Home-resume run20261001-003239 PASS with owning OpaqueFast module
+4ba45dce and honest RT presentation/modelled ownership. All41 counters match the
+normal Debug389d6954 control; authored scene agrees. Pixel gate FAIL: maximum14,
+125/4,492,800 pixels differ by more than1 (fraction0.0000278223); unchanged limits
+remain3/0.001. No visual acceptance or compiler-optimisation promotion.
+Shipping control/probe matched cost investigation completes7,352 owning rows/640
+opening: A1/B1/B2/A2 cycle60.9232/44.0113/50.1984/66.8472ms; openingGPU66.419686/
+46.043827/51.478931/72.1915605ms. Thermal status0, battery27.2–36.5C, GPU power0–5
+with different per-run contexts. Descriptive cycle−26.27%/openingGPU−29.64% are
+not causal gains; all640 opening GPU intervals exceed33.333ms. PixelFAIL persists,
+not a steady-state, pacing, physical-glass or final-candidate pass.
+[Full compiler evidence](evidence/2026-10-01-opaque-compiler/README.md).
+Normal Shipping control restored/pulled back beforeA2; stable app/data untouched.
+Normal Debug389d6954 restores/pulls back byte-identically after investigation:
+focused opening/Home-resume20261001-010627 PASS, PNGd3ec98a8 matches prior control.
+Optional Play Protect upload prompt declined; no global security setting changed.
+Phone compute, exact S24/S25 and RTX remain separate. Audio/haptic
+manual revalidation:NO (same semantics and playback).
 
 ## September 30: whole-Generic opaque-scene profile (local SM-S948B evidence)
 

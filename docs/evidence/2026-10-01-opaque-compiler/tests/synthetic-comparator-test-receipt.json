@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "classification": "synthetic comparator fixtures only; not actual ABBA results",
+  "positive": {
+    "result": "PASS",
+    "runCount": 4,
+    "routeRows": 7352,
+    "openingRows": 640,
+    "evidenceClass": "investigation-only-compiler-treatment",
+    "gainClaim": "none",
+    "causalConclusion": "none"
+  },
+  "negative": {
+    "result": "expected rejection",
+    "diagnostic": "Compiler-treatment evidence classification failed: opaque-compiler-profile-b1-20261001"
+  }
+}

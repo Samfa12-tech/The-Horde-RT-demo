@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "scope": "Same exact-phone opaque opening Diagnostic/Mobile subset, compiler-treatment investigation; not Shipping/Diagnostic parity or full backend/visual acceptance",
+  "deviceModel": "SM-S948B",
+  "scale": 75,
+  "backend": "RayTracingPipeline",
+  "source": "Control reused exact389d6954; profile exact eafbf826 with only two experimental Mobile OpaqueFast compiler artifacts/catalog; no C++ strategy or shader maths changes",
+  "exactApkSha256": [
+    "389d6954f7a3fddde1ced690470029fa4b14cc6f825fa34bf7269dc617f946e0",
+    "1a515220ff77f33b89f675b6f96de64b55e33331cde2286758d39dbc2baeb069"
+  ],
+  "pngSha256": [
+    "d3ec98a838e61194c340343ae4e293aea0ce8b39697962dbac17e134c62dbbcf",
+    "b944259d62f68fece59e79af3bc0299ece880a1fb6b1883caf1149706b9003aa"
+  ],
+  "authoredSceneEqual": true,
+  "owningStrategies": [
+    "opaque-fast",
+    "opaque-fast"
+  ],
+  "completeDiagnosticCounterDifferences": [],
+  "completeDiagnosticCountersEqual": true,
+  "owningFrameIdentities": [
+    {
+      "sceneEpoch": 4,
+      "measurementGeneration": 3,
+      "recordAttemptSerial": 23,
+      "recordSerial": 23,
+      "submissionSerial": 23,
+      "completionSerial": 23,
+      "simulationTick": 42,
+      "frameSlot": 0
+    },
+    {
+      "sceneEpoch": 4,
+      "measurementGeneration": 3,
+      "recordAttemptSerial": 26,
+      "recordSerial": 26,
+      "submissionSerial": 26,
+      "completionSerial": 26,
+      "simulationTick": 29,
+      "frameSlot": 0
+    }
+  ],
+  "toleranceSource": "tools/compare-foundation-captures.ps1, pixel-only limits unchanged",
+  "tolerance": {
+    "maximumChannelDifference": 3,
+    "maximumFractionOverOne": 0.001
+  },
+  "pixels": 4492800,
+  "differentPixels": 2987,
+  "pixelsDifferentByMoreThanOne": 125,
+  "maximumChannelDifference": 14,
+  "fractionOverOne": 2.7822293447293448E-05,
+  "meanAbsoluteRgbDifference": 0.0003016678537511871,
+  "width": 1440,
+  "height": 3120,
+  "pixelSubsetPassed": false,
+  "optimisationAcceptance": false,
+  "performanceClaim": "none",
+  "phase4Complete": false
+}

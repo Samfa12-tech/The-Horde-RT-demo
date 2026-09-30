@@ -1,0 +1,10 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  1>Checking Build System
+  Building Custom Rule C:/Dev/tmp/horde-opaque-retained-profile-20260930/source-eaf/CMakeLists.txt
+  RtPipelineBundleContractsTests.cpp
+  RtPipelineBundleContracts.cpp
+  RtPipelineVariants.cpp
+  RtPipelineVariantProvider.cpp
+  Generating Code...
+  horde_rt_pipeline_bundle_contracts_tests.vcxproj -> C:\Dev\tmp\horde-opaque-retained-profile-20260930\host-debug-external\Debug\horde_rt_pipeline_bundle_contracts_tests.exe

@@ -1,0 +1,306 @@
+{
+  "runId": "opaque-compiler-profile-b2-20261001",
+  "buildLabel": "opaque-retained-profile",
+  "sourceCommit": "eafbf8262442a82e0835edf5cf5306d718e64633",
+  "installedApkSha256": "4827a3c2e26d3328ed53608e15c77afe12a34077e96dcd0564c8d65532e21ff4",
+  "workload": "showcase-route-v1",
+  "deviceModel": "SM-S948B",
+  "serial": "R5GL219SZGK",
+  "package": "com.samfa12.hordelanternrt.benchmark",
+  "requestedScalePercent": 75,
+  "requestedBackend": "RayTracingPipeline",
+  "instrumentation": "Shipping",
+  "quality": "Mobile",
+  "startUtc": "2026-09-30T14:48:32.0279229Z",
+  "recordingEnabled": false,
+  "contextIntervalSeconds": 5,
+  "observationDeadlineMinutes": 30,
+  "resumeExisting": false,
+  "status": "complete",
+  "processId": "27337",
+  "endUtc": "2026-09-30T14:51:57.7741985Z",
+  "samples": [
+    {
+      "utc": "2026-09-30T14:48:42.3569814Z",
+      "processId": "27337",
+      "batteryC": 32.0,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 0
+    },
+    {
+      "utc": "2026-09-30T14:48:47.6543612Z",
+      "processId": "27337",
+      "batteryC": 32.2,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 0
+    },
+    {
+      "utc": "2026-09-30T14:48:52.9463541Z",
+      "processId": "27337",
+      "batteryC": 32.2,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 0
+    },
+    {
+      "utc": "2026-09-30T14:48:58.2335839Z",
+      "processId": "27337",
+      "batteryC": 32.2,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 0
+    },
+    {
+      "utc": "2026-09-30T14:49:03.5015036Z",
+      "processId": "27337",
+      "batteryC": 32.2,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 0
+    },
+    {
+      "utc": "2026-09-30T14:49:08.7752845Z",
+      "processId": "27337",
+      "batteryC": 32.2,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 5
+    },
+    {
+      "utc": "2026-09-30T14:49:14.0501600Z",
+      "processId": "27337",
+      "batteryC": 34.4,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 4
+    },
+    {
+      "utc": "2026-09-30T14:49:19.3289084Z",
+      "processId": "27337",
+      "batteryC": 34.4,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 4
+    },
+    {
+      "utc": "2026-09-30T14:49:24.6082266Z",
+      "processId": "27337",
+      "batteryC": 34.4,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 3
+    },
+    {
+      "utc": "2026-09-30T14:49:29.8843043Z",
+      "processId": "27337",
+      "batteryC": 34.4,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 3
+    },
+    {
+      "utc": "2026-09-30T14:49:35.1660513Z",
+      "processId": "27337",
+      "batteryC": 34.4,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 3
+    },
+    {
+      "utc": "2026-09-30T14:49:40.4330026Z",
+      "processId": "27337",
+      "batteryC": 34.4,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 3
+    },
+    {
+      "utc": "2026-09-30T14:49:45.6983083Z",
+      "processId": "27337",
+      "batteryC": 34.4,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 3
+    },
+    {
+      "utc": "2026-09-30T14:49:50.9794203Z",
+      "processId": "27337",
+      "batteryC": 34.4,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 3
+    },
+    {
+      "utc": "2026-09-30T14:49:56.2652468Z",
+      "processId": "27337",
+      "batteryC": 34.4,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 3
+    },
+    {
+      "utc": "2026-09-30T14:50:01.5553117Z",
+      "processId": "27337",
+      "batteryC": 34.4,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 3
+    },
+    {
+      "utc": "2026-09-30T14:50:06.8390467Z",
+      "processId": "27337",
+      "batteryC": 34.4,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 3
+    },
+    {
+      "utc": "2026-09-30T14:50:12.1119075Z",
+      "processId": "27337",
+      "batteryC": 34.4,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 2
+    },
+    {
+      "utc": "2026-09-30T14:50:17.3735114Z",
+      "processId": "27337",
+      "batteryC": 34.7,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 3
+    },
+    {
+      "utc": "2026-09-30T14:50:22.6510067Z",
+      "processId": "27337",
+      "batteryC": 34.7,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 2
+    },
+    {
+      "utc": "2026-09-30T14:50:27.9401569Z",
+      "processId": "27337",
+      "batteryC": 34.7,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 2
+    },
+    {
+      "utc": "2026-09-30T14:50:33.2075201Z",
+      "processId": "27337",
+      "batteryC": 34.7,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 3
+    },
+    {
+      "utc": "2026-09-30T14:50:38.4759453Z",
+      "processId": "27337",
+      "batteryC": 34.7,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 3
+    },
+    {
+      "utc": "2026-09-30T14:50:43.7681320Z",
+      "processId": "27337",
+      "batteryC": 34.7,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 2
+    },
+    {
+      "utc": "2026-09-30T14:50:49.0339515Z",
+      "processId": "27337",
+      "batteryC": 34.9,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 2
+    },
+    {
+      "utc": "2026-09-30T14:50:54.2752057Z",
+      "processId": "27337",
+      "batteryC": 34.9,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 3
+    },
+    {
+      "utc": "2026-09-30T14:50:59.5362940Z",
+      "processId": "27337",
+      "batteryC": 34.9,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 3
+    },
+    {
+      "utc": "2026-09-30T14:51:04.7872529Z",
+      "processId": "27337",
+      "batteryC": 34.9,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 3
+    },
+    {
+      "utc": "2026-09-30T14:51:10.0122854Z",
+      "processId": "27337",
+      "batteryC": 34.9,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 3
+    },
+    {
+      "utc": "2026-09-30T14:51:15.2819152Z",
+      "processId": "27337",
+      "batteryC": 34.9,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 5
+    },
+    {
+      "utc": "2026-09-30T14:51:20.5810511Z",
+      "processId": "27337",
+      "batteryC": 35.1,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 4
+    },
+    {
+      "utc": "2026-09-30T14:51:25.8531811Z",
+      "processId": "27337",
+      "batteryC": 35.1,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 3
+    },
+    {
+      "utc": "2026-09-30T14:51:31.1240874Z",
+      "processId": "27337",
+      "batteryC": 35.1,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 3
+    },
+    {
+      "utc": "2026-09-30T14:51:36.4044610Z",
+      "processId": "27337",
+      "batteryC": 35.1,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 3
+    },
+    {
+      "utc": "2026-09-30T14:51:41.6702279Z",
+      "processId": "27337",
+      "batteryC": 35.1,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 3
+    },
+    {
+      "utc": "2026-09-30T14:51:46.9171136Z",
+      "processId": "27337",
+      "batteryC": 35.1,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 3
+    },
+    {
+      "utc": "2026-09-30T14:51:52.1797577Z",
+      "processId": "27337",
+      "batteryC": 35.2,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 3
+    },
+    {
+      "utc": "2026-09-30T14:51:57.4393779Z",
+      "processId": "27337",
+      "batteryC": 35.2,
+      "thermalStatus": 0,
+      "gpuThermalPowerLevel": 1
+    }
+  ],
+  "renderScalePercent": 75,
+  "internalExtent": {
+    "width": 1080,
+    "height": 2235
+  },
+  "presentationExtent": {
+    "width": 1440,
+    "height": 2980
+  },
+  "presentMode": "MAILBOX",
+  "overall": {
+    "averageMs": 51.5138,
+    "medianMs": 50.1984,
+    "p95Ms": 65.3972,
+    "onePercentLowFps": 12.8882
+  }
+}

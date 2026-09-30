@@ -1,0 +1,758 @@
+{
+  "schema": 1,
+  "evidenceClass": "investigation-only-compiler-treatment",
+  "gainClaim": "none",
+  "optimizationAcceptance": "none",
+  "physicalAcceptance": "not-evaluated",
+  "causalConclusion": "none",
+  "sourceCommit": "eafbf8262442a82e0835edf5cf5306d718e64633",
+  "samePreprocessedSourceSha256": "eaa0b8a9f7b1a87fce83e34ab8568c524b1a8ed4160009bf35fc1a89e728713f",
+  "phaseAcceptance": "not-complete",
+  "target30Fps": "not-demonstrated",
+  "externallyCooled": false,
+  "fullRouteRows": 7352,
+  "openingRows": 640,
+  "runs": [
+    {
+      "runId": "opaque-compiler-control-a1-20261001",
+      "apkSha256": "ab3e2261fd081f87e667a6e4967e2476077fa96554702330e6aa49baa8133eae",
+      "analysisSha256": "1806a504d930b3731d300f676b54ee22e2f8054b4872e06cdea84b17aff655ab",
+      "routeMedianMs": 60.9232,
+      "routeP95Ms": 80.6117,
+      "medianDerivedFps": 16.414,
+      "routeGpuMedianMs": 49.9261,
+      "gpuRtDurationMs": {
+        "sampleCount": 1838,
+        "meanMilliseconds": 50.7986,
+        "medianMilliseconds": 49.9261,
+        "p90Milliseconds": 65.2114,
+        "p95Milliseconds": 69.0197,
+        "slowestOnePercentMeanMilliseconds": 79.5958
+      },
+      "cpuStages": {
+        "simulationStepCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.0222,
+          "medianMilliseconds": 0.0213,
+          "p90Milliseconds": 0.0295,
+          "p95Milliseconds": 0.0314,
+          "slowestOnePercentMeanMilliseconds": 0.0678
+        },
+        "skinCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 8.4348,
+          "medianMilliseconds": 8.8219,
+          "p90Milliseconds": 9.6415,
+          "p95Milliseconds": 10.17,
+          "slowestOnePercentMeanMilliseconds": 11.7089
+        },
+        "playerSkinCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 8.314,
+          "medianMilliseconds": 8.7645,
+          "p90Milliseconds": 9.527,
+          "p95Milliseconds": 9.6841,
+          "slowestOnePercentMeanMilliseconds": 10.516
+        },
+        "characterSkinCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.1208,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 0.0,
+          "p95Milliseconds": 1.1057,
+          "slowestOnePercentMeanMilliseconds": 2.3039
+        },
+        "dynamicUploadCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.3624,
+          "medianMilliseconds": 0.338,
+          "p90Milliseconds": 0.4956,
+          "p95Milliseconds": 0.553,
+          "slowestOnePercentMeanMilliseconds": 1.1103
+        },
+        "blasRefitRecordCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.0334,
+          "medianMilliseconds": 0.0315,
+          "p90Milliseconds": 0.0417,
+          "p95Milliseconds": 0.0456,
+          "slowestOnePercentMeanMilliseconds": 0.1208
+        },
+        "tlasUpdateRecordCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.0092,
+          "medianMilliseconds": 0.0087,
+          "p90Milliseconds": 0.0117,
+          "p95Milliseconds": 0.0128,
+          "slowestOnePercentMeanMilliseconds": 0.0285
+        },
+        "traceCopyRecordCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.1729,
+          "medianMilliseconds": 0.1652,
+          "p90Milliseconds": 0.2084,
+          "p95Milliseconds": 0.2354,
+          "slowestOnePercentMeanMilliseconds": 0.5243
+        },
+        "frameFenceWaitCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 51.1869,
+          "medianMilliseconds": 50.3316,
+          "p90Milliseconds": 65.5889,
+          "p95Milliseconds": 69.2177,
+          "slowestOnePercentMeanMilliseconds": 79.9969
+        },
+        "imageAcquireCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.0363,
+          "medianMilliseconds": 0.0383,
+          "p90Milliseconds": 0.043,
+          "p95Milliseconds": 0.0449,
+          "slowestOnePercentMeanMilliseconds": 0.1013
+        },
+        "queueSubmitCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.2416,
+          "medianMilliseconds": 0.2238,
+          "p90Milliseconds": 0.3438,
+          "p95Milliseconds": 0.4128,
+          "slowestOnePercentMeanMilliseconds": 0.6867
+        },
+        "presentCallCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.1913,
+          "medianMilliseconds": 0.1724,
+          "p90Milliseconds": 0.2643,
+          "p95Milliseconds": 0.2835,
+          "slowestOnePercentMeanMilliseconds": 0.3876
+        },
+        "wholeFrameCycleCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 61.8282,
+          "medianMilliseconds": 60.9231,
+          "p90Milliseconds": 76.1949,
+          "p95Milliseconds": 80.6116,
+          "slowestOnePercentMeanMilliseconds": 91.4562,
+          "onePercentLowFps": 10.9342
+        }
+      },
+      "openingGpuMedianMs": 66.419686,
+      "openingGpuP95Ms": 73.752134,
+      "openingGpuWithin33_333Ms": 0,
+      "context": {
+        "samples": 44,
+        "firstUtc": "2026-09-30T14:38:25.930886Z",
+        "lastUtc": "2026-09-30T14:42:11.9020722Z",
+        "batteryStartC": 27.2,
+        "batteryEndC": 34.1,
+        "thermalStatuses": [
+          0
+        ],
+        "gpuThermalPowerLevels": [
+          0,
+          1
+        ]
+      },
+      "activeStrategy": {
+        "exported": true,
+        "counts": {
+          "opaque-fast": 1838
+        },
+        "openingCounts": {
+          "opaque-fast": 160
+        }
+      },
+      "actualPipelineModuleSha256": {
+        "shipping_mobile_opaque_fast": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+        "shipping_mobile_generic_dielectric": "ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532"
+      },
+      "compilerTreatment": {
+        "classification": "compiler-treatment",
+        "samePreprocessedSourceSha256": "eaa0b8a9f7b1a87fce83e34ab8568c524b1a8ed4160009bf35fc1a89e728713f",
+        "ordinaryControlModuleSha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+        "retainedModuleSha256": "14509c272fa4fa9f92a8d180abf170b2485447798b7940ec98f55150c05249d3",
+        "runtimeStrategy": "opaque-fast",
+        "optimizationAdmission": "none",
+        "gainClaim": "none",
+        "physicalAcceptance": "not-evaluated",
+        "separateOpeningPixelGate": {
+          "scope": "Diagnostic/Mobile opening capture comparison; not the Shipping route timing APK pair",
+          "pixelSubsetPassed": false,
+          "maximumChannelDifference": 14,
+          "pixelsDifferentByMoreThanOne": 125,
+          "comparisonPath": "opening-image-comparison.json"
+        }
+      },
+      "physicalEvidenceClass": "exact-control-reference"
+    },
+    {
+      "runId": "opaque-compiler-profile-b1-20261001",
+      "apkSha256": "4827a3c2e26d3328ed53608e15c77afe12a34077e96dcd0564c8d65532e21ff4",
+      "analysisSha256": "dc6db8a98dd075fbaff13b9edb74f3b1ad083a9e714f195bea397e803977bcec",
+      "routeMedianMs": 44.0113,
+      "routeP95Ms": 58.3418,
+      "medianDerivedFps": 22.721,
+      "routeGpuMedianMs": 33.5008,
+      "gpuRtDurationMs": {
+        "sampleCount": 1838,
+        "meanMilliseconds": 34.2904,
+        "medianMilliseconds": 33.5008,
+        "p90Milliseconds": 43.2558,
+        "p95Milliseconds": 46.9561,
+        "slowestOnePercentMeanMilliseconds": 59.1442
+      },
+      "cpuStages": {
+        "simulationStepCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.0211,
+          "medianMilliseconds": 0.0201,
+          "p90Milliseconds": 0.0276,
+          "p95Milliseconds": 0.03,
+          "slowestOnePercentMeanMilliseconds": 0.073
+        },
+        "skinCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 8.3586,
+          "medianMilliseconds": 8.7853,
+          "p90Milliseconds": 9.541,
+          "p95Milliseconds": 10.1064,
+          "slowestOnePercentMeanMilliseconds": 11.8884
+        },
+        "playerSkinCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 8.2355,
+          "medianMilliseconds": 8.7414,
+          "p90Milliseconds": 9.4916,
+          "p95Milliseconds": 9.5358,
+          "slowestOnePercentMeanMilliseconds": 10.3433
+        },
+        "characterSkinCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.1231,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 0.0,
+          "p95Milliseconds": 1.1639,
+          "slowestOnePercentMeanMilliseconds": 2.3241
+        },
+        "dynamicUploadCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.3622,
+          "medianMilliseconds": 0.3404,
+          "p90Milliseconds": 0.4685,
+          "p95Milliseconds": 0.5248,
+          "slowestOnePercentMeanMilliseconds": 1.2056
+        },
+        "blasRefitRecordCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.0328,
+          "medianMilliseconds": 0.0315,
+          "p90Milliseconds": 0.0407,
+          "p95Milliseconds": 0.0451,
+          "slowestOnePercentMeanMilliseconds": 0.1181
+        },
+        "tlasUpdateRecordCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.0088,
+          "medianMilliseconds": 0.0083,
+          "p90Milliseconds": 0.0111,
+          "p95Milliseconds": 0.0118,
+          "slowestOnePercentMeanMilliseconds": 0.0343
+        },
+        "traceCopyRecordCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.169,
+          "medianMilliseconds": 0.1606,
+          "p90Milliseconds": 0.2088,
+          "p95Milliseconds": 0.241,
+          "slowestOnePercentMeanMilliseconds": 0.5275
+        },
+        "frameFenceWaitCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 34.697,
+          "medianMilliseconds": 33.9024,
+          "p90Milliseconds": 43.6302,
+          "p95Milliseconds": 47.4026,
+          "slowestOnePercentMeanMilliseconds": 59.5349
+        },
+        "imageAcquireCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.035,
+          "medianMilliseconds": 0.0375,
+          "p90Milliseconds": 0.0419,
+          "p95Milliseconds": 0.0433,
+          "slowestOnePercentMeanMilliseconds": 0.0823
+        },
+        "queueSubmitCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.2397,
+          "medianMilliseconds": 0.2198,
+          "p90Milliseconds": 0.3448,
+          "p95Milliseconds": 0.419,
+          "slowestOnePercentMeanMilliseconds": 0.753
+        },
+        "presentCallCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.1866,
+          "medianMilliseconds": 0.1681,
+          "p90Milliseconds": 0.2519,
+          "p95Milliseconds": 0.2772,
+          "slowestOnePercentMeanMilliseconds": 0.4351
+        },
+        "wholeFrameCycleCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 45.2134,
+          "medianMilliseconds": 44.0112,
+          "p90Milliseconds": 55.0187,
+          "p95Milliseconds": 58.3417,
+          "slowestOnePercentMeanMilliseconds": 70.2303,
+          "onePercentLowFps": 14.2389
+        }
+      },
+      "openingGpuMedianMs": 46.043827,
+      "openingGpuP95Ms": 51.347603,
+      "openingGpuWithin33_333Ms": 0,
+      "context": {
+        "samples": 33,
+        "firstUtc": "2026-09-30T14:43:10.0861942Z",
+        "lastUtc": "2026-09-30T14:45:59.1105854Z",
+        "batteryStartC": 31.9,
+        "batteryEndC": 36.5,
+        "thermalStatuses": [
+          0
+        ],
+        "gpuThermalPowerLevels": [
+          0,
+          1
+        ]
+      },
+      "activeStrategy": {
+        "exported": true,
+        "counts": {
+          "opaque-fast": 1838
+        },
+        "openingCounts": {
+          "opaque-fast": 160
+        }
+      },
+      "actualPipelineModuleSha256": {
+        "shipping_mobile_opaque_fast": "14509c272fa4fa9f92a8d180abf170b2485447798b7940ec98f55150c05249d3",
+        "shipping_mobile_generic_dielectric": "ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532"
+      },
+      "compilerTreatment": {
+        "classification": "compiler-treatment",
+        "samePreprocessedSourceSha256": "eaa0b8a9f7b1a87fce83e34ab8568c524b1a8ed4160009bf35fc1a89e728713f",
+        "ordinaryControlModuleSha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+        "retainedModuleSha256": "14509c272fa4fa9f92a8d180abf170b2485447798b7940ec98f55150c05249d3",
+        "runtimeStrategy": "opaque-fast",
+        "optimizationAdmission": "none",
+        "gainClaim": "none",
+        "physicalAcceptance": "not-evaluated",
+        "separateOpeningPixelGate": {
+          "scope": "Diagnostic/Mobile opening capture comparison; not the Shipping route timing APK pair",
+          "pixelSubsetPassed": false,
+          "maximumChannelDifference": 14,
+          "pixelsDifferentByMoreThanOne": 125,
+          "comparisonPath": "opening-image-comparison.json"
+        }
+      },
+      "physicalEvidenceClass": "investigation-only-compiler-treatment"
+    },
+    {
+      "runId": "opaque-compiler-profile-b2-20261001",
+      "apkSha256": "4827a3c2e26d3328ed53608e15c77afe12a34077e96dcd0564c8d65532e21ff4",
+      "analysisSha256": "b23eca3569acd649ca7dd84474c00d8d7e14c211841dbd58149d7ba3f13cbe04",
+      "routeMedianMs": 50.1984,
+      "routeP95Ms": 65.3972,
+      "medianDerivedFps": 19.921,
+      "routeGpuMedianMs": 39.5027,
+      "gpuRtDurationMs": {
+        "sampleCount": 1838,
+        "meanMilliseconds": 40.6525,
+        "medianMilliseconds": 39.5027,
+        "p90Milliseconds": 50.1179,
+        "p95Milliseconds": 54.0021,
+        "slowestOnePercentMeanMilliseconds": 65.9174
+      },
+      "cpuStages": {
+        "simulationStepCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.0226,
+          "medianMilliseconds": 0.0214,
+          "p90Milliseconds": 0.0283,
+          "p95Milliseconds": 0.0311,
+          "slowestOnePercentMeanMilliseconds": 0.0873
+        },
+        "skinCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 8.2573,
+          "medianMilliseconds": 8.7973,
+          "p90Milliseconds": 9.6092,
+          "p95Milliseconds": 10.1257,
+          "slowestOnePercentMeanMilliseconds": 11.721
+        },
+        "playerSkinCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 8.1322,
+          "medianMilliseconds": 8.7473,
+          "p90Milliseconds": 9.5035,
+          "p95Milliseconds": 9.5741,
+          "slowestOnePercentMeanMilliseconds": 10.4601
+        },
+        "characterSkinCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.1251,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 0.0,
+          "p95Milliseconds": 1.2155,
+          "slowestOnePercentMeanMilliseconds": 2.3506
+        },
+        "dynamicUploadCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.357,
+          "medianMilliseconds": 0.3439,
+          "p90Milliseconds": 0.4585,
+          "p95Milliseconds": 0.5198,
+          "slowestOnePercentMeanMilliseconds": 1.1193
+        },
+        "blasRefitRecordCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.0346,
+          "medianMilliseconds": 0.032,
+          "p90Milliseconds": 0.0421,
+          "p95Milliseconds": 0.0474,
+          "slowestOnePercentMeanMilliseconds": 0.1974
+        },
+        "tlasUpdateRecordCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.0096,
+          "medianMilliseconds": 0.0087,
+          "p90Milliseconds": 0.0119,
+          "p95Milliseconds": 0.0131,
+          "slowestOnePercentMeanMilliseconds": 0.0695
+        },
+        "traceCopyRecordCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.1766,
+          "medianMilliseconds": 0.1671,
+          "p90Milliseconds": 0.2193,
+          "p95Milliseconds": 0.2517,
+          "slowestOnePercentMeanMilliseconds": 0.5024
+        },
+        "frameFenceWaitCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 41.0806,
+          "medianMilliseconds": 39.8882,
+          "p90Milliseconds": 50.5328,
+          "p95Milliseconds": 54.5184,
+          "slowestOnePercentMeanMilliseconds": 66.2774
+        },
+        "imageAcquireCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.0365,
+          "medianMilliseconds": 0.0383,
+          "p90Milliseconds": 0.043,
+          "p95Milliseconds": 0.0449,
+          "slowestOnePercentMeanMilliseconds": 0.1097
+        },
+        "queueSubmitCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.2384,
+          "medianMilliseconds": 0.2202,
+          "p90Milliseconds": 0.3433,
+          "p95Milliseconds": 0.4119,
+          "slowestOnePercentMeanMilliseconds": 0.6831
+        },
+        "presentCallCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.1959,
+          "medianMilliseconds": 0.1839,
+          "p90Milliseconds": 0.2604,
+          "p95Milliseconds": 0.2866,
+          "slowestOnePercentMeanMilliseconds": 0.4166
+        },
+        "wholeFrameCycleCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 51.5137,
+          "medianMilliseconds": 50.1984,
+          "p90Milliseconds": 61.9705,
+          "p95Milliseconds": 65.3971,
+          "slowestOnePercentMeanMilliseconds": 77.59,
+          "onePercentLowFps": 12.8883
+        }
+      },
+      "openingGpuMedianMs": 51.478931,
+      "openingGpuP95Ms": 60.740415,
+      "openingGpuWithin33_333Ms": 0,
+      "context": {
+        "samples": 38,
+        "firstUtc": "2026-09-30T14:48:42.3569814Z",
+        "lastUtc": "2026-09-30T14:51:57.4393779Z",
+        "batteryStartC": 32.0,
+        "batteryEndC": 35.2,
+        "thermalStatuses": [
+          0
+        ],
+        "gpuThermalPowerLevels": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "activeStrategy": {
+        "exported": true,
+        "counts": {
+          "opaque-fast": 1838
+        },
+        "openingCounts": {
+          "opaque-fast": 160
+        }
+      },
+      "actualPipelineModuleSha256": {
+        "shipping_mobile_opaque_fast": "14509c272fa4fa9f92a8d180abf170b2485447798b7940ec98f55150c05249d3",
+        "shipping_mobile_generic_dielectric": "ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532"
+      },
+      "compilerTreatment": {
+        "classification": "compiler-treatment",
+        "samePreprocessedSourceSha256": "eaa0b8a9f7b1a87fce83e34ab8568c524b1a8ed4160009bf35fc1a89e728713f",
+        "ordinaryControlModuleSha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+        "retainedModuleSha256": "14509c272fa4fa9f92a8d180abf170b2485447798b7940ec98f55150c05249d3",
+        "runtimeStrategy": "opaque-fast",
+        "optimizationAdmission": "none",
+        "gainClaim": "none",
+        "physicalAcceptance": "not-evaluated",
+        "separateOpeningPixelGate": {
+          "scope": "Diagnostic/Mobile opening capture comparison; not the Shipping route timing APK pair",
+          "pixelSubsetPassed": false,
+          "maximumChannelDifference": 14,
+          "pixelsDifferentByMoreThanOne": 125,
+          "comparisonPath": "opening-image-comparison.json"
+        }
+      },
+      "physicalEvidenceClass": "investigation-only-compiler-treatment"
+    },
+    {
+      "runId": "opaque-compiler-control-a2-20261001",
+      "apkSha256": "ab3e2261fd081f87e667a6e4967e2476077fa96554702330e6aa49baa8133eae",
+      "analysisSha256": "96fd9714264e88c0866a9adeb301446a3c0affbafd8b0f1571ce316648f34fb8",
+      "routeMedianMs": 66.8472,
+      "routeP95Ms": 88.7201,
+      "medianDerivedFps": 14.959,
+      "routeGpuMedianMs": 56.1994,
+      "gpuRtDurationMs": {
+        "sampleCount": 1838,
+        "meanMilliseconds": 56.902,
+        "medianMilliseconds": 56.1994,
+        "p90Milliseconds": 72.0059,
+        "p95Milliseconds": 77.4693,
+        "slowestOnePercentMeanMilliseconds": 89.3311
+      },
+      "cpuStages": {
+        "simulationStepCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.0235,
+          "medianMilliseconds": 0.0225,
+          "p90Milliseconds": 0.0302,
+          "p95Milliseconds": 0.0328,
+          "slowestOnePercentMeanMilliseconds": 0.0761
+        },
+        "skinCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 8.421,
+          "medianMilliseconds": 8.6993,
+          "p90Milliseconds": 9.6157,
+          "p95Milliseconds": 10.0659,
+          "slowestOnePercentMeanMilliseconds": 11.4818
+        },
+        "playerSkinCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 8.3,
+          "medianMilliseconds": 8.6463,
+          "p90Milliseconds": 9.5068,
+          "p95Milliseconds": 9.6127,
+          "slowestOnePercentMeanMilliseconds": 10.2993
+        },
+        "characterSkinCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.121,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 0.0,
+          "p95Milliseconds": 1.165,
+          "slowestOnePercentMeanMilliseconds": 2.2501
+        },
+        "dynamicUploadCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.3698,
+          "medianMilliseconds": 0.3402,
+          "p90Milliseconds": 0.4986,
+          "p95Milliseconds": 0.5708,
+          "slowestOnePercentMeanMilliseconds": 1.3662
+        },
+        "blasRefitRecordCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.0342,
+          "medianMilliseconds": 0.0323,
+          "p90Milliseconds": 0.0422,
+          "p95Milliseconds": 0.0472,
+          "slowestOnePercentMeanMilliseconds": 0.1172
+        },
+        "tlasUpdateRecordCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.0096,
+          "medianMilliseconds": 0.0091,
+          "p90Milliseconds": 0.0121,
+          "p95Milliseconds": 0.0132,
+          "slowestOnePercentMeanMilliseconds": 0.0301
+        },
+        "traceCopyRecordCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.1754,
+          "medianMilliseconds": 0.1678,
+          "p90Milliseconds": 0.2117,
+          "p95Milliseconds": 0.234,
+          "slowestOnePercentMeanMilliseconds": 0.5121
+        },
+        "frameFenceWaitCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 57.2896,
+          "medianMilliseconds": 56.5696,
+          "p90Milliseconds": 72.3668,
+          "p95Milliseconds": 77.7724,
+          "slowestOnePercentMeanMilliseconds": 89.6144
+        },
+        "imageAcquireCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.0365,
+          "medianMilliseconds": 0.0382,
+          "p90Milliseconds": 0.0431,
+          "p95Milliseconds": 0.0456,
+          "slowestOnePercentMeanMilliseconds": 0.1087
+        },
+        "queueSubmitCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.2436,
+          "medianMilliseconds": 0.2242,
+          "p90Milliseconds": 0.3536,
+          "p95Milliseconds": 0.4122,
+          "slowestOnePercentMeanMilliseconds": 0.6869
+        },
+        "presentCallCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 0.1995,
+          "medianMilliseconds": 0.1812,
+          "p90Milliseconds": 0.268,
+          "p95Milliseconds": 0.2974,
+          "slowestOnePercentMeanMilliseconds": 0.4522
+        },
+        "wholeFrameCycleCpuMs": {
+          "sampleCount": 1838,
+          "meanMilliseconds": 67.9603,
+          "medianMilliseconds": 66.8471,
+          "p90Milliseconds": 83.2935,
+          "p95Milliseconds": 88.7199,
+          "slowestOnePercentMeanMilliseconds": 101.7789,
+          "onePercentLowFps": 9.8252
+        }
+      },
+      "openingGpuMedianMs": 72.19156050000001,
+      "openingGpuP95Ms": 86.566248,
+      "openingGpuWithin33_333Ms": 0,
+      "context": {
+        "samples": 48,
+        "firstUtc": "2026-09-30T14:57:06.7928705Z",
+        "lastUtc": "2026-09-30T15:01:14.0018982Z",
+        "batteryStartC": 30.0,
+        "batteryEndC": 35.4,
+        "thermalStatuses": [
+          0
+        ],
+        "gpuThermalPowerLevels": [
+          0,
+          1,
+          2
+        ]
+      },
+      "activeStrategy": {
+        "exported": true,
+        "counts": {
+          "opaque-fast": 1838
+        },
+        "openingCounts": {
+          "opaque-fast": 160
+        }
+      },
+      "actualPipelineModuleSha256": {
+        "shipping_mobile_opaque_fast": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+        "shipping_mobile_generic_dielectric": "ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532"
+      },
+      "compilerTreatment": {
+        "classification": "compiler-treatment",
+        "samePreprocessedSourceSha256": "eaa0b8a9f7b1a87fce83e34ab8568c524b1a8ed4160009bf35fc1a89e728713f",
+        "ordinaryControlModuleSha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+        "retainedModuleSha256": "14509c272fa4fa9f92a8d180abf170b2485447798b7940ec98f55150c05249d3",
+        "runtimeStrategy": "opaque-fast",
+        "optimizationAdmission": "none",
+        "gainClaim": "none",
+        "physicalAcceptance": "not-evaluated",
+        "separateOpeningPixelGate": {
+          "scope": "Diagnostic/Mobile opening capture comparison; not the Shipping route timing APK pair",
+          "pixelSubsetPassed": false,
+          "maximumChannelDifference": 14,
+          "pixelsDifferentByMoreThanOne": 125,
+          "comparisonPath": "opening-image-comparison.json"
+        }
+      },
+      "physicalEvidenceClass": "exact-control-reference"
+    }
+  ],
+  "contrasts": [
+    {
+      "metric": "routeMedianMs",
+      "controlMeanOfRunStatistics": 63.8852,
+      "candidateMeanOfRunStatistics": 47.10485,
+      "descriptiveChangePercent": -26.266412251976977
+    },
+    {
+      "metric": "routeP95Ms",
+      "controlMeanOfRunStatistics": 84.6659,
+      "candidateMeanOfRunStatistics": 61.8695,
+      "descriptiveChangePercent": -26.92512569995712
+    },
+    {
+      "metric": "routeGpuMedianMs",
+      "controlMeanOfRunStatistics": 53.062749999999994,
+      "candidateMeanOfRunStatistics": 36.50175,
+      "descriptiveChangePercent": -31.210218090845267
+    },
+    {
+      "metric": "openingGpuMedianMs",
+      "controlMeanOfRunStatistics": 69.30562325,
+      "candidateMeanOfRunStatistics": 48.761379000000005,
+      "descriptiveChangePercent": -29.642968761557153
+    },
+    {
+      "metric": "openingGpuP95Ms",
+      "controlMeanOfRunStatistics": 80.15919099999999,
+      "candidateMeanOfRunStatistics": 56.044009,
+      "descriptiveChangePercent": -30.08411349860054
+    }
+  ],
+  "pixelGate": {
+    "scope": "separate Diagnostic/Mobile opening capture comparison",
+    "passed": false,
+    "maximumChannelDifference": 14,
+    "pixelsDifferentByMoreThanOne": 125,
+    "physicalAcceptance": "not-established"
+  },
+  "limitations": [
+    "This compiler-treatment group compiles the exact same OpaqueFast preprocessed source while changing glslang flags and SPIR-V pass treatment together; individual compiler-pass causality is not isolated.",
+    "The separate Diagnostic/Mobile opening pixel gate failed: maximum channel difference 14 and 125 pixels differ by more than one. This is not physical/visual acceptance for the Shipping route experiment.",
+    "Battery temperatures and GPU thermal power levels vary; context is not aligned to individual measured frames. This is not a causal effect estimate or steady-state thermal certification.",
+    "Mean of per-run statistics is descriptive, not a pooled-frame median, causal estimate, or display-pacing measurement.",
+    "GPU command duration includes AS work, RT dispatch and copy; CPU skinning remains separate.",
+    "Standard package containment remains RED on compute/raygen strategy parity; independent module extraction does not replace that guard.",
+    "No optimization admission, gain, physical acceptance, 30 FPS, sustained, or display-pacing claim is made."
+  ]
+}

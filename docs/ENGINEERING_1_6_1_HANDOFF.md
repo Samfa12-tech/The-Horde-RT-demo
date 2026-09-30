@@ -30,6 +30,25 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### September 30 Shipping comparison and opening-room checkpoint
 
+October1 follow-on: compiler-only OpaqueFast probe keeps identical normal
+preprocessed shader inputs, not forced Generic selection. External detached eaf
+changes only two Mobile opaque artifacts/catalog; production compiler/policy-parity
+checks remain RED as expected, independent actual APK module scan PASS8/8.
+Diagnostic1a515220 focused opening/Home-resume003239 PASS/all41 counters equal,
+but pixel gate FAIL maximum14/125pixels>1; no tolerance change/promotion.
+Shipping matched cost investigation now completes all7,352 owning rows/640opening:
+A1/B1/B2/A2 cycle60.9232/44.0113/50.1984/66.8472ms, openingGPU66.419686/46.043827/
+51.478931/72.1915605ms. Descriptive mean-of-run-statistic changes−26.27%cycle/
+−29.64%openingGPU are not causal gains (battery/power contexts differ). All opening
+intervals exceed33.333ms; pixelFAIL14 still forbids promotion. No glass/30FPS claim.
+[Retained compiler investigation](evidence/2026-10-01-opaque-compiler/README.md)
+includes actual-module inspection, unchanged RED production guards and parser negatives.
+Normal Debug389d6954 restored/pulled back: opening/Home-resume010627 PASS, PNGd3ec
+equals control; optional APK upload declined, stable app/data unchanged.
+Current452d4ff push36729104556/PR36729112120 pass46portable+11Vulkan CPU-host each,
+actual logs inspected. Owner-authorised music prototypes are pushed/LFS verified;
+runtime music/separate volume and final gates remain open. Accepted players unchanged.
+
 First-confirmed-blocker candidate `e12aabe` temporarily combined NoOpaque with
 TerminateOnFirstHit. It is NOT admitted: complete uncooled A/B/B/A trials found
 no demonstrated gain. Main restored the previous flags, retaining the new
