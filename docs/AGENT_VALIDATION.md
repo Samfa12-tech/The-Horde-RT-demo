@@ -30,8 +30,8 @@ ctest --test-dir build/host-ci --build-config Release --output-on-failure
 This covers non-hardware shared tests, not Vulkan presentation or phone behaviour. Use CTest selection for an affected subset when appropriate; report the actual selection and result instead of hard-coding a test count.
 
 The portable workflow has GCC/Clang Linux and MSVC Windows entries. Windows builds
-the portable targets and runs the same common tests (currently52, including the
-music resolver, Core-backed PCM cursor/WAV decoder and immutable asset bank, generic Core contracts and
+the portable targets and runs the same common tests (currently 53, including the
+music resolver, audio-worker session/inbox, Core-backed PCM cursor/WAV decoder and immutable asset bank, generic Core contracts and
 byte-exact native-only dependency and closed-roster music asset admission); its explicit exclusion is
 the 15 additional `WIN32` tooling fixtures, some of which need shader SDK/Android
 tools not provisioned by this compiler lane. This is additive MSVC coverage, not

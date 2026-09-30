@@ -1,0 +1,8 @@
+Internal ctest changing into directory: C:/Dev/tmp/horde-music-bank-asan-20261001/build
+Test project C:/Dev/tmp/horde-music-bank-asan-20261001/build
+    Start 56: horde_rt_music_playback_session_tests
+1/1 Test #56: horde_rt_music_playback_session_tests ...   Passed    3.73 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   3.74 sec

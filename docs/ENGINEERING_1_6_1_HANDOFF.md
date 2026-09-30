@@ -28,6 +28,20 @@ without loosening tolerance. Include live motion, not just frozen extreme poses.
 Music, consent-based reporting, resource work and final gates remain in scope;
 licensing, signing recovery and publication remain owner-controlled.
 
+### October 1 audio-worker music session checkpoint
+
+Shared copied-event inbox and single-owner Core session are implemented, still
+unwired from output at this checkpoint. Pause does not advance content; retry,
+queue replacement and explicit import cancel old-session state. Original/copy
+overflow fails explicitly. Irregular-buffer tests prove exact C→D/G→H sample
+boundaries without fresh gameplay publication and twenty loop periods byte-for-
+sample equal direct Core output. Generated frames are not a device-played clock.
+MSVC Debug7/7 (24.92s), Release7/7 (15.52s), focused ASan1/1 (3.74s) PASS.
+[Evidence](evidence/2026-10-01-music-session/README.md). Platform sink and persisted
+volume candidates remain authorised uncommitted follow-on work; no phone actions
+while disconnected. Owner listening stays open. Audio/haptic manual:NO while
+unwired; YES when audible output is integrated. Glass/Mobile performance unchanged.
+
 ### October 1 immutable music bank checkpoint
 
 `MusicPcmAssetBank` transactionally loads sixteen bounded WAVs through Core,
@@ -45,8 +59,10 @@ licence and52 prior assets pass. Four actual ARM64 Diagnostic/Mobile modules
 fresh val/dis PASS and matchC11. [Exact bank evidence](evidence/2026-10-01-music-bank/README.md).
 
 Pushed199697b fresh push36789021436/PR36789031208 each passed51/51 GCC/Clang/MSVC
-and13/13 Vulkan CPU-host fixtures; actual logs inspected. Bank adds the52nd common
-test; obtain its current-source CI after push. PR15 remains draft, not merged.
+and13/13 Vulkan CPU-host fixtures; actual logs inspected. Bank checkpointc122e4a
+now also passes exact-source push36790778629/PR36790782790: each compiler52/52,
+Vulkan CPU-host13/13 both; actual eight logs inspected. PR15 description updated
+and read back atc122e4a, draft/CLEAN/MERGEABLE; not merged or published.
 Preserve four unrelated scratch paths. Next: platform PCM output/consumed clock,
 separate persisted volume, owner listening. Glass/Mobile performance gates open.
 Audio/haptic manual revalidation:NO while unwired; YES for audible integration.

@@ -164,3 +164,5 @@ docs/evidence/2026-10-01-music-admission/**/*.log whitespace=-trailing-space,-bl
 # Exact unwired immutable-bank compile, sanitizer and package receipts.
 docs/evidence/2026-10-01-music-bank/** -text whitespace=cr-at-eol
 docs/evidence/2026-10-01-music-bank/**/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+# Preserve raw music-session validation logs byte for byte.
+docs/evidence/2026-10-01-music-session/*.log -text whitespace=cr-at-eol

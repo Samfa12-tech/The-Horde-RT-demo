@@ -21,6 +21,9 @@ constexpr double kLoopSeconds = 12.0;
 constexpr double kTorchStingSeconds = 3.0;
 constexpr double kSkylightCueSeconds = 6.0;
 constexpr double kSkylightOpeningSeconds = 4.5;
+// Delta accumulation over irregular PCM chunks may land just below the exact
+// body boundary. This is less than 0.00005 of a 48 kHz sample, not a timing window.
+constexpr double kSampleBoundaryEpsilon = 0.000000001;
 
 bool IsSkeleton(const EntityId id) noexcept
 {
@@ -205,9 +208,9 @@ MusicSelection MusicDirector::Update(
         {
             skylightPosition = positionSeconds_ + clockDelta;
         }
-        if (skylightPosition >= kSkylightCueSeconds)
+        if (skylightPosition + kSampleBoundaryEpsilon >= kSkylightCueSeconds)
         {
-            const double remainder = skylightPosition - kSkylightCueSeconds;
+            const double remainder = std::max(0.0, skylightPosition - kSkylightCueSeconds);
             skylightHReached_ = true;
             SetCue(MusicCue::H, true, remainder, seekFromSnapshot, discontinuity);
         }
@@ -234,11 +237,11 @@ MusicSelection MusicDirector::Update(
     else if (torchStingActive_)
     {
         const double nextPosition = positionSeconds_ + clockDelta;
-        if (nextPosition >= kTorchStingSeconds)
+        if (nextPosition + kSampleBoundaryEpsilon >= kTorchStingSeconds)
         {
             torchStingActive_ = false;
             const MusicCue bed = ResolvePersistentBed(snapshot);
-            const double remainder = nextPosition - kTorchStingSeconds;
+            const double remainder = std::max(0.0, nextPosition - kTorchStingSeconds);
             const double bedPosition = bed == MusicCue::None
                 ? 0.0 : std::fmod(remainder, kLoopSeconds);
             SetCue(bed, bed != MusicCue::None, bedPosition, false, discontinuity);
