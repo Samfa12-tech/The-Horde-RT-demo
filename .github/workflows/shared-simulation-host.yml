@@ -12,8 +12,28 @@ permissions:
 
 jobs:
   shared-gameplay:
-    runs-on: ubuntu-latest
+    name: Shared simulation host (${{ matrix.compiler }})
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            compiler: GCC
+            compiler_args: -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Release
+            ctest_filter_args: ''
+          - os: ubuntu-latest
+            compiler: Clang
+            compiler_args: -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Release
+            ctest_filter_args: ''
+          - os: windows-latest
+            compiler: MSVC
+            compiler_args: ''
+            # The separate WIN32 tool matrix includes SDK/Android/tool-dependent fixtures.
+            # This additive compiler lane runs the same 46 common CPU-host tests.
+            ctest_filter_args: >-
+              -E '^(horde_rt_scene_abi_generator_tests|horde_rt_raygen_compiler_strategy_tests|horde_rt_raygen_variant_manifest_tests|horde_rt_raygen_variant_artifact_tests|horde_rt_rayquery_compute_shader_tests|horde_rt_pipeline_policy_fence_tests|horde_rt_pipeline_policy_execution_tests|horde_rt_static_texture_array_tool_tests|horde_rt_static_preparation_lod_policy_tests|horde_rt_static_preparation_skip_policy_tests|horde_rt_static_preparation_colliding_lod_policy_tests|horde_rt_dielectric_topology_tool_tests|horde_rt_version_contract_powershell_tests|horde_rt_github_release_preflight_tests|horde_rt_version_contract_windows_powershell_tests)$'
     steps:
       - name: Check out source
         uses: actions/checkout@v6
@@ -33,7 +53,7 @@ jobs:
       - name: Configure non-hardware host tests
         run: >-
           cmake -S . -B build/host-ci
-          -DCMAKE_BUILD_TYPE=Release
+          ${{ matrix.compiler_args }}
           -DBUILD_TESTING=ON
           -DHORDE_RT_BUILD_VULKAN_TARGETS=OFF
 
@@ -41,19 +61,21 @@ jobs:
         run: cmake --build build/host-ci --config Release --parallel 2
 
       - name: Run shared gameplay tests
-        run: ctest --test-dir build/host-ci --build-config Release --output-on-failure
+        run: >-
+          ctest --test-dir build/host-ci --build-config Release
+          --output-on-failure --no-tests=error ${{ matrix.ctest_filter_args }}
 
       - name: Check offline gauntlet chirality and UV winding
-        run: python3 -m unittest discover -s tests -p test_player_gauntlet_geometry.py -v
+        run: python -m unittest discover -s tests -p test_player_gauntlet_geometry.py -v
 
       - name: Check exact player cloth seam weight transfers
-        run: python3 -m unittest discover -s tests -p test_player_sleeve_seams.py -v
+        run: python -m unittest discover -s tests -p test_player_sleeve_seams.py -v
 
       - name: Check upper torso partition preserves the head mask
-        run: python3 -m unittest discover -s tests -p test_player_body_partition.py -v
+        run: python -m unittest discover -s tests -p test_player_body_partition.py -v
 
       - name: Check bounded segmented cloth seam plans
-        run: python3 -m unittest discover -s tests -p test_player_segmented_seams.py -v
+        run: python -m unittest discover -s tests -p test_player_segmented_seams.py -v
 
       - name: Check Gradle APK artifact resolution
         shell: pwsh
