@@ -31,6 +31,23 @@ claim. Optional Play Protect APK-upload prompt was declined for the known test
 artifact; no global security settings/data/stable-app mutation. Physical glass,
 phone compute and exact S24/S25 remain unverified/open. Audio/haptic revalidation: NO.
 
+Follow-on exact Shipping ABBA now completes: all7,352 admitted owning rows and640
+opening rows. A1/B1/B2/A2 cycle medians63.3133/164.6901/193.5229/70.7659ms; opening
+GPU medians70.696118/164.3430425/193.3582765/80.3609875ms. Each B selects Generic
+in all1,838 rows, each A OpaqueFast; all GPU/identity/presentation checks pass.
+Thermal status0-2, GPU thermal power0-9 and differing battery temperatures exclude
+causal ratio/steady-state/pacing claims. All640 opening GPU intervals exceed33.333ms.
+[Complete raw evidence](evidence/2026-09-30-generic-strategy/abba/README.md) retains
+full compressed reports, context, per-run analysis and exact install receipts.
+Large whole-path cost is a profiling priority; pixel mismatch remains a failure.
+Normal Shipping control was restored/pulled back beforeA2; stable app/data unchanged.
+The A2 optional APK-upload prompt was also declined, outside measured timing.
+No shader/quality/player change or phone-compute/S24/S25/physical-glass pass.
+Normal Debug389d6954 then restores/pulls back exactly; focused opening capture and
+Home-resume run20260930-234438 PASS, honest native RT presentation/modelled route.
+PNGd3ec98a8 equals the existing same-artifact control, not new whole-route/glass
+acceptance. Harness headb56 metadata is not reused-APK source/build provenance.
+
 ## September 30: exact binary-blocker candidate (local SM-S948B evidence)
 
 SM-S948B / R5GL219SZGK, Android 16, Adreno 840, driver 2150932499: immutable

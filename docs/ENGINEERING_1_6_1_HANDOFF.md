@@ -128,6 +128,20 @@ no optimisation or 30 FPS claim. Preserve optional upload-prompt/install evidenc
 and exact pullback; no global security settings changed. Do not promote the
 forced strategy or reinterpret it as isolated compiler/pure glass cost.
 
+Follow-on [complete ABBA](evidence/2026-09-30-generic-strategy/abba/README.md)
+admits7,352/7,352 Shipping completions and640/640 opening strategy rows. Opening
+GPU medians A1/B1/B2/A2:70.696118/164.3430425/193.3582765/80.3609875ms; cycle
+medians63.3133/164.6901/193.5229/70.7659ms. Mean-of-run opening75.52855->178.85066ms
+is descriptive only; substantial thermal/power drift and whole-path differences
+prohibit causal/compiler/glass-only attribution. All opening intervals miss30FPS.
+Forced Generic remains investigation-only; no changed pixel gate accepted.
+Normal Shipping control restored/pulled back beforeA2; normal Debug389d6954 then
+passes focused opening/Home-resume run234438 with unchanged same-artifact PNGd3ec98.
+Runner head metadata is not reused-APK build provenance. Next prepare compiler-only OpaqueFast comparison on the
+same preprocessed material/shadow/origin code, no production patch or claimed gain.
+Fresh pushed b56d1bf CI36721846883/36721855646 actual logs pass46portable+11Vulkan
+CPU-host each; no device/final matrix inferred. Player work unchanged, goal open.
+
 Follow-on [opening fire-cost evidence](evidence/2026-09-30-opening-lighting-isolation/README.md)
 retains C1,S1,V1,V2 and separate uncooled C2:all9,190 completions and800 opening
 OpaqueFast rows pass exact admission. Opening GPU medianC1 66.670ms,

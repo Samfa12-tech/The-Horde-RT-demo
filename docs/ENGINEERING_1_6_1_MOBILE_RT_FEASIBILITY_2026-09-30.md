@@ -4,6 +4,8 @@ September 30; control traversal restored by `f77dc4d`. Phone unavailable by owne
 instruction after Debug restoration. No new phone measurements or architecture
 implementation in this assessment. Preserve the accepted player/physical-glass
 contract and all current failure diagnostics. Windows RTX remains a separate target.
+Subsequent owner reconnection permits the bounded phone profiles below; the
+unavailable-phone statement describes this assessment's original checkpoint.
 
 ## What the measurements actually say
 
@@ -20,6 +22,16 @@ The uncooled initial held-high control-context capture is 236.8249 ms GPU at bat
 42.3–43.5 C/status2–3. Latest uncooled first-blocker controls have opening GPU medians
 80.154399 and 89.4686175 ms. These are distinct runs/thermal contexts, not a pooled
 sustained baseline. See [exact per-run GPU/CPU statistics](evidence/2026-09-30-shipping-phone/ab-summary.json).
+
+New [whole-strategy ABBA](evidence/2026-09-30-generic-strategy/abba/README.md)
+completes7,352 Shipping rows: ordinary OpaqueFast opening GPU70.696118/80.3609875ms
+versus forced Generic164.3430425/193.3582765ms. This is an unchanged opaque scene,
+not a lantern routed through the wrong shader. Different algorithms, compiler
+treatment, failed image equivalence and thermal drift exclude causal/glass-only
+savings. Keep production selection unchanged. Next isolate compiler treatment on
+identical OpaqueFast source before deciding how much kernel tax is recoverable.
+At these two normal opening medians, the planning22.333-24.333ms live GPU budget
+requires approximately66-72% GPU reduction; no new performance capability claimed.
 
 Target: at least sustained 30 FPS for ordinary and lantern-heavy gameplay at 75%,
 with consistent display pacing. Recovery toward 60 is a headroom-dependent
