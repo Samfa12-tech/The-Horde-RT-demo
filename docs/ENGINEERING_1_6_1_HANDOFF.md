@@ -103,6 +103,12 @@ Fresh MSVC Debug focused5/5 pass (report/run/publication/performance/coordinator
 this export follow-up has not yet been installed on the phone.
 Current A/B APKs are frozen at8cbe0ac/d504bfe and do not include this export change.
 
+Owner addition (September30): add a live benchmark FPS counter as a deferred
+1.6.1 usability task, not the current priority. Reuse existing timing/UI and
+label the rolling window and native-render versus display-pacing boundary.
+Do not change frozen A/B APKs or interrupt matched Shipping/opening-room work;
+validate lifecycle cleanup and observer overhead when implementing the counter.
+
 #### Previous September 30 checkpoint (03c / d504bfe / c604e89)
 
 Pushed implementation checkpoint: `d504bfed51976e71e496ead81dbd284bec03da33`.

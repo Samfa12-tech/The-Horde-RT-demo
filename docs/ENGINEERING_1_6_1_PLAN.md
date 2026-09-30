@@ -135,6 +135,16 @@ reopening those accepted appearance decisions. Exact device evidence is in
    architecture extraction, cross-platform CI and documentation work. No gratuitous
    renderer rewrite or unrelated gameplay/enemy-capacity expansion.
 
+## Deferred benchmark usability task (owner addition, 2026-09-30)
+
+Add a live FPS counter while the benchmark runs, within this 1.6.1 goal but after
+the current matched Shipping measurements and opening-room investigation. Reuse
+existing timing/UI ownership; label the rolling sampling window and distinguish
+native render-cycle FPS from display-presentation pacing. Keep the counter out
+of the frozen A/B artifacts and avoid a new telemetry framework. Validate its
+updates during live benchmark execution and its removal on exit/cancellation;
+measure any observer overhead before using it in performance comparisons.
+
 ## Adaptive score: What the Dark Keeps
 
 Authority: supplied `What_the_Dark_Keeps_Horde_RT_Music_Pack.zip`, SHA-256
