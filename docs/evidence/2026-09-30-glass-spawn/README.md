@@ -1,6 +1,12 @@
 # Bounded dielectric spawn correction — September 30
 
-Current candidate **03c**, based on pushed `c4169ac`, adds explicit non-finite
+Latest bounded refinement: [derived-normal-bias-01](derived-normal-bias/README.md),
+implementation `d63e29c`. It classifies/fixes row237 and clears ordinary RTX volume/
+recovery events without changing physical budgets. Pipeline row43 and physical
+phone/whole-glass gates remain open. The03c evidence below retains its own
+historical source/artifacts/results; it is not relabelled as the newer pass.
+
+Preceding candidate **03c**, based on pushed `c4169ac`, adds explicit non-finite
 rejection to **03b**, its measured predecessor. The `cpu/` probes and
 `runtime/03b-*` replay are investigation artifacts, not production entry points.
 Accepted players, GLB/material authoring, ray masks, 41 counters and **4/8

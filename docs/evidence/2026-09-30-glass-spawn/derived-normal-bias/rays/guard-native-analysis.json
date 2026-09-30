@@ -1,0 +1,88 @@
+{
+  "investigationOnly": true,
+  "precision": "double using captured GPU float inputs",
+  "glbSha256": "34a2522f2027d3fb04b77480cc929d36c5a19c6e0f33bf3fa0f0ae0959c99ec4",
+  "witnessSha256": "7636d8add228ab621dac4a9459804c672cb7f714d403d6d68c437c7e6fd9c4a6",
+  "paths": [
+    {
+      "pixel": [
+        515,
+        569
+      ],
+      "sourcePrimitive": 62.0,
+      "sourceComponent": 4,
+      "guarded": 0.0,
+      "minimumNormalBias": null,
+      "nativeOriginMaximumOutsideLocalMetres": 2.6484785364625505e-07,
+      "limitingFace": 63,
+      "nativeReturnedPrimitive": 3.0,
+      "nativeRawT": 0.1618603616952896,
+      "doubleIntersectionsOfNativeObjectRay": [
+        {
+          "t": 0.16186036612003032,
+          "primitive": 3,
+          "component": 0,
+          "entering": true
+        },
+        {
+          "t": 0.1650093964491578,
+          "primitive": 37,
+          "component": 0,
+          "entering": false
+        }
+      ],
+      "followingInterfaces": [
+        {
+          "slot": 1,
+          "primitive": 3,
+          "component": 0,
+          "incomingTirCount": 0.0,
+          "cosine": 0.9780800687864062,
+          "criticalCosine": 0.7531098886437283,
+          "totalInternalReflection": false,
+          "processedBeforeEightInterfaceCeiling": true
+        }
+      ]
+    },
+    {
+      "pixel": [
+        515,
+        570
+      ],
+      "sourcePrimitive": 62.0,
+      "sourceComponent": 4,
+      "guarded": 0.0,
+      "minimumNormalBias": null,
+      "nativeOriginMaximumOutsideLocalMetres": 3.2587576952992893e-06,
+      "limitingFace": 63,
+      "nativeReturnedPrimitive": 3.0,
+      "nativeRawT": 0.1618790179491043,
+      "doubleIntersectionsOfNativeObjectRay": [
+        {
+          "t": 0.1618790256258233,
+          "primitive": 3,
+          "component": 0,
+          "entering": true
+        },
+        {
+          "t": 0.1650284451873071,
+          "primitive": 37,
+          "component": 0,
+          "entering": false
+        }
+      ],
+      "followingInterfaces": [
+        {
+          "slot": 1,
+          "primitive": 3,
+          "component": 0,
+          "incomingTirCount": 0.0,
+          "cosine": 0.9779592233515638,
+          "criticalCosine": 0.7531098886437283,
+          "totalInternalReflection": false,
+          "processedBeforeEightInterfaceCeiling": true
+        }
+      ]
+    }
+  ]
+}

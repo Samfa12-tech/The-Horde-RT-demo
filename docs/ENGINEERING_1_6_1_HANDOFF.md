@@ -30,6 +30,40 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### Current Phase 4 checkpoint
 
+Implementation `d63e29c7f119a180ce2a6504831d501e8ba0a95e` closes the demonstrated
+row237 numerical defect: [per-hit normal-separation proof and ordinary evidence](evidence/2026-09-30-glass-spawn/derived-normal-bias/README.md).
+Native first-hit guard rejects because the coordinate floor cannot separate its
+source face within the calculated error. Fallback native origins lie outside
+the adjacent face; the next query enters a different pane while medium is open.
+Bounded per-hit minima repair this at the numerical-spawn layer. No player,
+materials/geometry, physical budgets, counters/descriptors or fake RT changes.
+The r1 native witness proves real exits/TIR; final ordinary source additionally
+uses an absolute projection-error bound. Do not conflate their exact artifacts.
+
+Fresh final ordinary RTX ledgers600/600 each, process exits0/0: volume/interface
+failures and certified recoveries0 on both backends. Pipeline-only mismatch
+row43/tick646 remains1; compute has no failure/recovery events in this workload.
+Row454 also clears, without a separately demonstrated cause. All13 standard
+pipeline PNGs equal03c; unchanged image/timing comparison PASS (not Shipping
+performance). Older affected finale/backend pixel gates remain open.
+MSVC Debug build, focused4/4, full artifact/compatibility/negative checks and
+fresh eight-compute compilation PASS. Generic +548words/+128instructions,
+query sites/loops/physical budgets unchanged; correctness cost, not speedup.
+Android ARM64 Debug389d6954 and unsigned Shipping7a03f076 build and actual APK
+modules validate/disassemble. Shipping0atomics/0imageReads/noBinding22. Neither
+new APK installed: phone is away, no device commands until owner reconnects.
+Prior exactSM-S948B evidence/remaining failures and performance regression
+warning stay open; RTX is not phone orS24/S25 acceptance. Audio/haptic manual
+revalidation:NO (RT-only, semantic inputs/cues unchanged).
+
+Next classify remaining pipeline row43, isolated Mobile interface exhaustion/
+contact recovery and geometric-shadow/live cases, then matched Shipping/backend
+parity. Do not restart Phase1 or reopen accepted player tuning. The Goal remains
+active; phone absence does not pause independent host work. Preserve all later
+music/reporting/resource/pacing/final-matrix scope and owner-only release gates.
+
+#### Previous September 30 checkpoint (03c / d504bfe / c604e89)
+
 Pushed implementation checkpoint: `d504bfed51976e71e496ead81dbd284bec03da33`.
 Fresh push36664721346 and PR36664727983 CI are green45portable+11Vulkan-host;
 both logs inspected. PR15 is draft/mergeable and description updated. This is

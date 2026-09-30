@@ -1,5 +1,10 @@
 # Remaining RTX row237 witness — investigation only
 
+**Follow-up:** [native path classification and bounded correction](../derived-normal-bias/README.md)
+now prove insufficient normal separation, with final ordinary RTX volume/recovery
+events zero. This earlier isolation retains its exact source/modules and is not
+retrospectively treated as a passing production run.
+
 Base production source/module: `d504bfed51976e71e496ead81dbd284bec03da33`.
 This is new remaining-failure isolation, not a repeat of repaired row230.
 No phone actions: owner removed the phone after the preceding03c runs.
