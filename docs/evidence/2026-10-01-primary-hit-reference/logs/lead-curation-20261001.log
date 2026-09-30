@@ -1,0 +1,21 @@
+Explicit allowlist entries: 166; planned workload records: 12.
+
+runId                         role      status
+-----                         ----      ------
+primary-hit-c1-route-20261001 control   analysis-present
+primary-hit-c1-high-20261001  control   analysis-present
+primary-hit-c1-live-20261001  control   analysis-present
+primary-hit-p1-route-20261001 reference analysis-present
+primary-hit-p1-high-20261001  reference analysis-present
+primary-hit-p1-live-20261001  reference analysis-present
+primary-hit-p2-route-20261001 reference analysis-present
+primary-hit-p2-high-20261001  reference analysis-present
+primary-hit-p2-live-20261001  reference analysis-present
+primary-hit-c2-route-20261001 control   analysis-present
+primary-hit-c2-high-20261001  control   analysis-present
+primary-hit-c2-live-20261001  control   analysis-present
+
+
+Primary-hit archive verification passed: 8 packaged SPIR-V modules independently val/dis checked; 12 raw trials strictly reanalyzed; canonical 12-run aggregate reproduced.
+Primary-hit archive verification passed: 8 packaged SPIR-V modules independently val/dis checked; 12 raw trials strictly reanalyzed; canonical 12-run aggregate reproduced.
+Curated and hash-checked 166 explicit evidence files; offline archive verification passed.

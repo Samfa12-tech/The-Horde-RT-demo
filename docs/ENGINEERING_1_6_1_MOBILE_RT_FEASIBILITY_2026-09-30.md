@@ -75,7 +75,34 @@ props, disocclusions, shadows and mirrors as quality gates; source sample ceilin
 are not runtime counts. The existing bounded-interface correctness gate remains
 open independently of this performance design.
 
-Target: at least sustained 30 FPS for ordinary and lantern-heavy gameplay at 75%,
+October1 [native primary-hit reference](evidence/2026-10-01-primary-hit-reference/README.md)
+adds12,152strict owning rows. Normal opening66.46/72.15ms GPU versus7.50/7.55;
+held222.57/225.27 versus9.57/10.51; live222.86/234.85 versus9.22/9.24. The
+reference retains primary traversal and only consumed base/normal, omitting
+physical radiance/fire/mist. Unused hit attributes compile away; it is not full
+primary/material cost, an additive floor or a production improvement. Normal
+opening cycles78.15/83.24 and live234.38/245.83ms are distinct from GPU time.
+Live reference cycles20.20/20.36ms (~49median-derived FPS) do not certify60FPS.
+Opening skin8.06–8.63ms and live8.54–8.72ms are actual completion-zone CPU
+statistics; held-high frozen skin0. The archived frozen summary's null CPU
+fields are an explicit legacy-zone selector bug, recovered in a hash-joined
+supplement, not evidence of absent CPU work. Thermal/power/compiler confounds
+remain; no percentage is a causal saving or a quality-pass claim.
+
+The69.31ms normal-opening median-of-run-medians needs approximately64.89–67.78%
+GPU reduction for the planning22.333–24.333ms live budget; live228.85ms needs
+approximately89.37–90.24%. For illustration only, treating reference9.227ms asF
+and remaining219.625ms as eligibleS (not measured additive costs), half-rate
+radiance would leave119.04ms, quarter64.13ms, one-sixteenth22.95ms and one-thirty-
+second16.09ms **before H**. Even that aggressive one-sixteenth leaves at most
+1.38ms overhead at the optimistic24.333ms GPU budget and fails the22.333ms case.
+Those are feasibility bounds, not permission to shade every16th pixel/frame or
+reuse stale glass/shadows. Dynamic disocclusion, interface visibility and native
+current-frame blockers constrain eligible work. The unchanged workload cannot
+meet30; full-resolution primary geometry itself is not disproved as a route.
+No Mobile architecture or unchanged-quality30FPS promise is yet admitted.
+
+Target remains at least sustained30 FPS for ordinary and lantern-heavy gameplay at75%,
 with consistent display pacing. Recovery toward 60 is a headroom-dependent
 stretch target, not a forecast. Current measured medians do not certify either
 target; existing native timings exclude compositor/display/input latency.

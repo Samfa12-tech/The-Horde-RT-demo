@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "records": 12,
+  "classification": "offline-archived-completion-zone-CPU-replay",
+  "scriptSha256": "b4b4d6b5a50b5d3e399ee6e00ceed465618b6aad710ee4abfddb1dbde2f46ed3",
+  "supplementScriptSha256": "2e0a796bd3c499731caab4e29f14e6af547355b426abb916b258bbd13c01bae8",
+  "archivedReceiptSha256": "1e7125167710de5e317bea0e626adc223de8dd11158fd082499aa4b4db362aee",
+  "canonicalComparison": "All values identical except generatedUtc; raw benchmark hashes joined.",
+  "replayRoot": "C:\\Dev\\tmp\\horde-primary-hit-profile-20261001\\supplement-replay-b8b953c386e244ec970c5d3fc04c1ad7",
+  "deviceAccess": false
+}

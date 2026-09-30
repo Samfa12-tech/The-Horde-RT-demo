@@ -2,6 +2,32 @@
 
 Last updated: 2026-10-01
 
+## October 1: native primary-hit Shipping reference (local SM-S948B)
+
+ExactSM-S948B/R5GL219SZGK/Adreno840, uncooled Shipping/Mobile pipeline at75%,
+1080x2235 internal/1440x2980 presentation, strict ASTC/MAILBOX. Exact71cb366
+normala6329657/ref40d0f759 `.benchmark` APKs install/pullback-check; all53render
+asset payloads equal. Twelve C1/P1/P2/C2 route/held/live runs admit12,152owning
+presented/GPU-valid rows, all640opening completions actuallyOpaqueFast.
+
+Normal openingGPU66.46/72.15ms versus nonphysical7.50/7.55; held222.57/225.27
+versus9.57/10.51; live222.86/234.85 versus9.22/9.24. Native live cycles234.38/
+245.83 versus20.20/20.36ms; reference~49median-derived FPS is not display pacing.
+Reference consumes only native primary base/normal and omits physical radiance/
+secondary/fire/mist; never ship it. Not full primary/material cost, additive floor,
+causal savings or30/60FPS visual acceptance. C1starts24C/status0 after offline
+gap, P1/P2warm38.9–39.8/status1–2; C2reaches43.1/status2. Power levels0–7 and
+different processes/compiler footprints remain confounds; no external cooling.
+
+Actual completion-zone CPU shows live player skin8.54–8.72ms, frozenheld0.
+Archived null zoneCPU fields are a documented legacy-selector mistake, corrected
+by a hash-joined supplement without rewriting frozen summaries. Eight actual
+packaged SPIR-V modules independently val/dis PASS/no diagnostic atoms/image
+reads/binding22; all12raw ledgers/aggregate replay PASS. Normalcontrol restores
+beforeC2 and is retained, Home command issued; normalDebugC11/stable data unchanged.
+Glass, live visual/pacing and parity gates open. Not compute/RTX/S24/S25 evidence.
+Audio/haptic manual revalidation:NO. [Exact receipts](evidence/2026-10-01-primary-hit-reference/README.md).
+
 ## October 1: all-direct-visibility Shipping cost isolation (local SM-S948B)
 
 ExactSM-S948B/R5GL219SZGK, Adreno840, uncooled Shipping/Mobile pipeline,75%,

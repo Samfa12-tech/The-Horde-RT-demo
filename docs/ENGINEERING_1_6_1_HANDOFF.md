@@ -30,6 +30,30 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### October 1 bounded render-scale resource checkpoint
 
+Latest [primary-hit reference ABBA](evidence/2026-10-01-primary-hit-reference/README.md)
+completes12,152owning Shipping/Mobile pipeline rows at75%, exact71cb APKs.
+Normal openingGPU66.46/72.15ms versus nonphysical7.50/7.55; held222.57/225.27
+versus9.57/10.51; live222.86/234.85 versus9.22/9.24. Opening native cycles
+78.15/83.24 versus18.42/17.94; live234.38/245.83 versus20.20/20.36. This is
+native primary traversal plus consumed base/normal, not full primary/material
+cost, hardware floor, quality acceptance or additive/causal production savings.
+All640opening rows areOpaqueFast; C1starts24C after an offline gap, P1/P2
+38.9–39.8C/status1–2, C2ends43.1C/status2. Power/process/compiler confounds retained.
+Eight actual packaged modules val/dis PASS/no atoms/image reads/binding22;
+53assets equal; offline12raw-ledger/aggregate replay PASS. Normalcontrola632
+is restored beforeC2, retained, Home issued; normalDebugC11 unchanged.
+Frozen summary's null zoneCPU selector incorrectly reads legacyreport.zones;
+explicit hash-joined supplement recovers all13stages from completedFrameEvidence.
+Opening player skin8.06–8.63ms, live8.54–8.72ms, frozenheld0; not GPU AS cost.
+Next bounded profile isolates opaque secondary-bounce work without altering
+primary/direct/physical-glass/geometry. No omitted-work reference will ship.
+Current30FPS remains a design target, not an achieved/quality-preserving forecast.
+Audio/haptic manual revalidation:NO (unchanged semantic inputs/playback).
+
+Fresh37e0882 push36763806722/PR36763810540 PASS46portable on eachGCC/Clang/MSVC
+plus13Vulkan CPU-host fixtures; actual logs read, MSVCstress0.13s inPR. PR15draft
+description updated, CLEAN; no merge/publication. Later source needs fresh CI.
+
 Current follow-on: [isolated native-ray witness](evidence/2026-10-01-isolated-glass-rays/README.md)
 closes the ambiguity, not Phase4. Normal1closed budget event/80reason2 are all real
 fifth interfaces. The80 traverse enter A/TIR/exit A/enter B/exit B; the single
