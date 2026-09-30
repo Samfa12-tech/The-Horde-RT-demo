@@ -12,13 +12,13 @@
 
 **Status:** Planning only. The owner approved the preceding creative direction and requested this complete scoped handoff, adding Blender, image generation and an on-theme controls/menu refresh. No 1.7.0 runtime, artwork, voice recordings or performance evidence is delivered by this document. Numerical budgets below are proposed starting budgets, not measured capabilities.
 
-**Start condition:** Implement only after the owner has finished and accepted the 1.6.1 baseline. Do not interrupt, merge, overwrite, re-version or declare complete the unfinished 1.6.1 engineering pass. This documentation-only file may live on `main` before the implementation baseline is ready.
+**Start condition (updated 30 September 2026):** Follow the [canonical roadmap](../../ROADMAP.md): finish, accept, merge and release 1.6.1, then implement, validate and accept the 1.6.2 engine-readiness/demo-polish milestone before starting 1.7 gameplay expansion. Do not interrupt, merge, overwrite, re-version or declare complete the unfinished 1.6.1 engineering pass as part of this planning work. This documentation-only file may live on `main` before the implementation baseline is ready. Historical 1.6.1 inspection and feature-origin references remain context; re-audit the accepted 1.6.2 source and evidence as the actual 1.7 starting point. The full rope rescue, companion, forest and coherent moonlit outdoor programme remain in 1.7.
 
 ---
 
 ## 1. Source authority and what was actually inspected
 
-The owner's latest instructions govern the new experience. Preserve `AGENTS.md` engineering/safety requirements and use the eventual accepted 1.6.1 source as implementation authority. Historical documents remain evidence of their own versions, not proof of current implementation or performance.
+The owner's latest instructions govern the new experience. Preserve `AGENTS.md` engineering/safety requirements and use the accepted 1.6.2 source as implementation authority. Historical documents remain evidence of their own versions, not proof of current implementation or performance.
 
 Planning inspection used `codex/horde-1.6.1-engineering-pass` at `191d799ab7fda54fab36d9792b11f908ddaaf42d`. The branch's package note calls 1.6.1 an unpublished engineering candidate. This is an inspection snapshot, **not the mandatory future starting SHA**. Re-audit the accepted baseline before changing code.
 
@@ -82,7 +82,7 @@ Do not simulate the collapse live. It already happened. A few settling particles
 
 ### 4.2 Reward and night opening
 
-Preserve the accepted Lich/chest sequence, including the separate two-second chest unlock if it remains the accepted 1.6.1 behavior, the guidance cue and actual claim interaction. The player must own the lantern before rescue progression can complete.
+Preserve the accepted Lich/chest sequence, including the separate two-second chest unlock if it remains the accepted 1.6.2 behavior, the guidance cue and actual claim interaction. The player must own the lantern before rescue progression can complete.
 
 Replace the campaign's returning-dawn/ending-card transition with a moonlit opening. Use the same moon orientation, exposure policy and sky inside and outside. Opening stonework must have a believable place to move; do not lift an enormous roof through trees, terrain or the companion. Rework the lid/oculus and upper chamber geometry only as necessary for a traversable shaft.
 
@@ -348,7 +348,7 @@ Use design reviews on captured **real phone/Windows screens**, including bright 
 
 ## 11. Music, ambience and audio integration
 
-The owner has separately planned Pocket Chordsmith adaptive music for exploration, torch loss, combat, Lich and roof opening. Treat this as owner context, not proof that a particular music pack or engine is already in the final code. Inspect final 1.6.1 and available assets first.
+The owner has separately planned Pocket Chordsmith adaptive music for exploration, torch loss, combat, Lich and roof opening. Treat this as owner context, not proof that a particular music pack or engine is already in the final code. Inspect the accepted 1.6.2 baseline and available assets first.
 
 Extend the existing accepted music route with a short rescue/reveal transition and a restrained forest-exploration state. Preserve compatible musical motifs and avoid playing a second independent music engine. If the pack is absent, use the existing audio abstraction and record the missing integration input; do not invent a nonexistent asset or claim Chordsmith is integrated.
 
@@ -360,7 +360,7 @@ Every work package records `Audio/haptic manual revalidation required: YES/NO` w
 
 ## 12. Save, replay and recovery
 
-Add only the persistence required by this chapter. Use versioned, validated campaign state and atomic replacement, or extend the accepted save system if 1.6.1 has one. Preserve existing settings and do not confuse the persistent RT Lab-unlocked preference with complete campaign progress.
+Add only the persistence required by this chapter. Use versioned, validated campaign state and atomic replacement, or extend the accepted baseline's save system if one exists. Preserve existing settings and do not confuse the persistent RT Lab-unlocked preference with complete campaign progress.
 
 Required durable checkpoints: safely in the reward room with the lantern claimed and rescue available; safely at the summit; and the forest endpoint. Save logical state/IDs, not raw Vulkan resources or OS audio handles. Retain health, lantern ownership and relevant dialogue flags. Do not serialize a fragile instantaneous rope configuration as the only recovery path.
 
@@ -427,9 +427,9 @@ Create `docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0-execution-log.md
 
 ### WP0 — Accepted baseline, tool discovery and scope lock
 
-**Reads:** This plan, `AGENTS.md`, final 1.6.1 decisions/memory, open work/validation, asset contracts, scene/input/audio/UI sources.
+**Reads:** This plan, `AGENTS.md`, accepted 1.6.2 decisions/memory, open work/validation, asset contracts, scene/input/audio/UI sources.
 
-- [ ] Verify owner acceptance of 1.6.1; record its exact source and package identity. If still unfinished, limit work to safe planning/tool discovery; do not implement onto its active branch.
+- [ ] Verify that 1.6.1 was completed, accepted, merged and released, and that 1.6.2 is implemented, validated and owner-accepted; record the exact 1.6.2 source and package identity. If either prerequisite is unfinished, limit work to safe planning/tool discovery; do not implement onto an active foundation branch.
 - [ ] Inspect Git status and existing worktrees. Start an isolated feature worktree/branch from the accepted baseline without discarding local changes. Import this documentation-only file if it is not yet present there.
 - [ ] Establish fresh baseline tests/captures and inventory existing scene, vertical position, save, music and UI behavior. Do not hardcode historical CTest counts as current requirements.
 - [ ] Discover Blender executable/version, image generation capability, Meshy API/credits, and voice-production options. Log unavailable/cost-gated capabilities precisely.
@@ -611,7 +611,7 @@ Blender discovery can use `blender --version` where configured, followed by a re
 Treat the owner's model choice as the operating context, not a product benchmark. No specific subagent model, API access or reasoning-setting mechanism is assumed.
 
 1. **Read the whole master handoff once, then work from the current package and log.** Avoid repeated full-repository audits. Inspect the smallest relevant sources and neighboring consumers.
-2. **Protect the baseline.** Start runtime work from the completed accepted 1.6.1 state, not the older public main solely because this plan lives there. Never merge the unfinished engineering branch automatically.
+2. **Protect the baseline.** Start runtime work from the completed accepted 1.6.2 state, not the older public main solely because this plan lives there. Never merge the unfinished engineering branch automatically.
 3. **Use concrete package contracts.** Before each package, settle its public data/API and failing acceptance tests against the actual baseline. Keep files focused and do not turn `PresentableTinyRtScene`, `GameSimulation` or `MainActivity` into larger feature dumps.
 4. **Delegate sparingly.** At most two non-overlapping implementation workers by default, after interfaces are frozen. Good independent work: UI artwork cleanup, asset validation, bounded host tests. The lead owns world-state/render/input integration. Do not have two workers edit shared shader ABI, simulation snapshots or native bridge contracts concurrently.
 5. **Review before integration.** Use a fresh focused review for resource lifetime, input races, progression and changed shader paths. Available subagents are optional; perform an explicit local review when absent. Do not claim unseen reviewer/test results.
@@ -631,10 +631,11 @@ It is the approved scoped direction and master handoff for the next update,
 including Blender/image-generation/Meshy production, physical rope traversal,
 the moonlit forest, voiced companion and the themed touch HUD/menus.
 
-First verify that 1.6.1 is completed and owner-accepted. Protect existing local
-work and use an isolated feature branch/worktree from that accepted baseline.
+First verify that 1.6.1 was completed, accepted, merged and released, and that
+1.6.2 is implemented, validated and owner-accepted. Protect existing local work
+and use an isolated feature branch/worktree from the accepted 1.6.2 baseline.
 The plan was saved separately on main; obtain the documentation without
-merging or replacing unfinished runtime work. If 1.6.1 is still unfinished,
+merging or replacing unfinished runtime work. If either prerequisite is unfinished,
 report the start-condition blocker and restrict yourself to safe planning
 and tool discovery rather than changing its implementation.
 
