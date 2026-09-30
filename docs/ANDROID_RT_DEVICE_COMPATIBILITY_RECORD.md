@@ -40,6 +40,12 @@ counter suppression nor glass correctness acceptance. Single228.609474ms
 Diagnostic GPU frame is not Shipping performance. Owner disconnected the phone
 after this evidence; no new tests until reconnection. S24/S25/compute still open.
 
+Subsequent owner-reported availability: development phone reconnected. Last
+locally verified identity remains SM-S948B/R5GL219SZGK. Availability alone is not
+new capability, installed-artifact, performance or physical acceptance evidence;
+all existing exact-device gates remain unchanged. Offline RTX Mobile-dielectric
+captures are recorded separately, not used to certify this phone.
+
 ## September 30: opening fire-cost isolation and cooling change (local SM-S948B evidence)
 
 [Exact five-run evidence](evidence/2026-09-30-opening-lighting-isolation/README.md)

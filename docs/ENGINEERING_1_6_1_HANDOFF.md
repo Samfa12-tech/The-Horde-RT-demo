@@ -93,6 +93,16 @@ separates native-cycle/GPU time, serial CPU cost and conditional savings. Curren
 workload misses30FPS; quartering even all heavy GPU work is insufficient. No
 architecture promoted or net saving invented before eligible costs/overhead profile.
 
+Independent offline work: [Mobile-dielectric RTX subset](evidence/2026-09-30-mobile-rtx/README.md)
+uses exactf50c32f snapshot/Diagnostic-Mobile override. Actual four executable
+modules val/disPASS; native pipeline/requiredcompute isolated-lantern captures
+complete at540x960/100%, High WaterQuality but Mobile dielectric. Entire counters
+match: interface/volume/mismatch0, reason2recoveries20.32pixels differ only1RGB,
+within unchanged pixel limits for this subset, not the full image/parity gate.
+It does not reproduce phone1closed-budget/80recovery; no performance/phone pass.
+Owner subsequently reported phone reconnection; no repeated coordination needed.
+Historical disconnection above remains the condition of that earlier checkpoint.
+
 Follow-on [opening fire-cost evidence](evidence/2026-09-30-opening-lighting-isolation/README.md)
 retains C1,S1,V1,V2 and separate uncooled C2:all9,190 completions and800 opening
 OpaqueFast rows pass exact admission. Opening GPU medianC1 66.670ms,
