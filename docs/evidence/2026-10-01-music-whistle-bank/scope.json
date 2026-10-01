@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "ownerChoice": "whistle-lead",
+  "runtimeAdmitted": true,
+  "renderCount": 6,
+  "reused": [
+    "A",
+    "E"
+  ],
+  "pcmBytes": 20160000,
+  "waveBytes": 20160704,
+  "nativeCorePin": "534a6e6811ce653efd5422138c5772b967263ed0",
+  "priorAuditionArchive": "../2026-10-01-music-instrumentation/SHA256SUMS.json",
+  "priorAuditionSha256": "72134d1f4172e957a8fe7935ae55fba8965527de72b9cdb4a8622e42f20293e3",
+  "knownEvidenceLimits": [
+    "Early Release audition results did not pre-bind source/executable hashes.",
+    "Historical Debug-whistle and Release-bank bound PCM/source files but only named the runtime manifest; final Debug-bank also hashes the manifest/archive before and after.",
+    "Historical verification/plan runtimeNotChanged described their pre-admission step; admission.json supersedes that state.",
+    "Sequential admission is not atomic; manifest-last hash admission fails closed on partial assets. Original bank remains recoverable from Git and original render evidence.",
+    "No OS audio/native consumed clock, phone audition, audible loop/transition or SFX masking acceptance in this slice.",
+    "No Pocket DAW use, shared preset/Core change, new shader/gameplay work, publication or device actions."
+  ]
+}

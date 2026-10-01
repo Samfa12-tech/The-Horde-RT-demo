@@ -1,4 +1,4 @@
-$script:HordeMusicManifestSha256 = '1126f9f537efb607b11bd492e1c79d6e8b94814567ce06b654e03b0d915c9ff3'
+$script:HordeMusicManifestSha256 = 'ea7adbc1c248fc37d705239e6bcd529fbf10206ffb77165051658bce4e438c3e'
 $script:HordeMusicAssetRelativeRoot = 'assets/audio/music/what-the-dark-keeps'
 $script:HordeMusicAssetRootRelativeToAssets = 'audio/music/what-the-dark-keeps'
 $script:HordeMusicRights = 'Owner-supplied; authorised for Horde use only'

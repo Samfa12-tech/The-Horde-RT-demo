@@ -127,6 +127,11 @@ tools/music-instrumentation-audition.cjs -text whitespace=cr-at-eol
 tools/verify-music-instrumentation-audition.cjs -text whitespace=cr-at-eol
 tools/music-instrumentation-combat-check.cjs -text whitespace=cr-at-eol
 tools/archive-music-instrumentation-audition.cjs -text whitespace=cr-at-eol
+tools/music-instrumentation-bank.cjs -text whitespace=cr-at-eol
+tools/music-instrumentation-core-check/* -text whitespace=cr-at-eol
+docs/evidence/2026-10-01-music-whistle-bank/** -text whitespace=cr-at-eol
+# Retain raw compiler/Gradle log spaces byte-for-byte, not source formatting.
+docs/evidence/2026-10-01-music-whistle-bank/**/*.log whitespace=-blank-at-eol,cr-at-eol
 
 # Exact compiler-treatment investigation receipts; not Shipping artifacts.
 docs/evidence/2026-10-01-opaque-compiler/** -text whitespace=cr-at-eol

@@ -10,13 +10,13 @@
   "sources": [
     {
       "path": "source/What_the_Dark_Keeps_Pocket_Chordsmith.json",
-      "bytes": 72237,
-      "sha256": "bc092a0f7489e52ab1e7e55e42c813ae58517ea4a73e6808de8fbbc71595d4a6"
+      "bytes": 72393,
+      "sha256": "f5d4bbc8068ae2865216304efc22337ac190ca5b7732e02a9ed5e9062b7b92f4"
     },
     {
       "path": "source/What_the_Dark_Keeps_PCS1.txt",
-      "bytes": 93846,
-      "sha256": "b8f86ad96b168fc32014add867760aae00a3e025701266884ce0961978d5c270"
+      "bytes": 94054,
+      "sha256": "747e5a9a21f41f0fc587fe55572b03a6196cd25cece17283775dd03130164dab"
     }
   ],
   "render": {
@@ -24,54 +24,146 @@
     "version": "v68",
     "sourceCommit": "2b87d7b",
     "htmlSha256": "b266814fff749bd4d7be9d8725e4d7becc2d944122bc2a302602457fa9b6e2cf",
-    "evidenceManifest": "docs/evidence/2026-10-01-music-render/SHA256SUMS.json",
-    "processing": "Existing corrected A-H renders; no score, synthesis, gain or sample changes. Historical loop filenames renamed body; C and G are one-shots."
+    "evidenceManifest": "docs/evidence/2026-10-01-music-whistle-bank/SHA256SUMS.json",
+    "processing": "Owner-selected whistle-lead instrumentation; retained v68 actual app voices/live FX. Accepted A/E PCM reused with identical active-cue source projection; B/C/D/F/G/H rendered once. No notes/timing changes, normalization or PCM playback change."
   },
-  "format": {"encoding": "PCM16_LE", "sampleRate": 48000, "channels": 2},
+  "format": {
+    "encoding": "PCM16_LE",
+    "sampleRate": 48000,
+    "channels": 2
+  },
   "tailFrames": 144000,
   "crossfadeFrames": 12000,
   "totalWaveBytes": 20160704,
   "totalPcmBytes": 20160000,
   "cues": [
     {
-      "cue": "A", "looping": true,
-      "body": {"path": "runtime/A-body.wav", "frames": 576000, "bytes": 2304044, "sha256": "8e5be0c046d95a3058037c311ea6a1b7a330f82536788fd33954980d31dfcc02"},
-      "tail": {"path": "runtime/A-tail.wav", "frames": 144000, "bytes": 576044, "sha256": "bb1c5be7c74f1026ff0ab7f2fd566e4ab81c756370246b3143c2e128ed6ed223"}
+      "cue": "A",
+      "looping": true,
+      "body": {
+        "path": "runtime/A-body.wav",
+        "frames": 576000,
+        "bytes": 2304044,
+        "sha256": "a58cacd493bd4604cf1d51096cf03092e35c993a079c10af7fcec3debc093277"
+      },
+      "tail": {
+        "path": "runtime/A-tail.wav",
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "4fea7b227dee6b81f09fd54f202bfea33a76a2419fa07c1ec37a0d2f8d14e4e1"
+      }
     },
     {
-      "cue": "B", "looping": true,
-      "body": {"path": "runtime/B-body.wav", "frames": 576000, "bytes": 2304044, "sha256": "e05b2efcd5220be7c83538c24a52e9438726ac4c9f7d23c6c8ffa98778ce2d47"},
-      "tail": {"path": "runtime/B-tail.wav", "frames": 144000, "bytes": 576044, "sha256": "99a0dc08f2249977e8e19f1b944ca1173b91a3ce171c62195696cf21f4b114ed"}
+      "cue": "B",
+      "looping": true,
+      "body": {
+        "path": "runtime/B-body.wav",
+        "frames": 576000,
+        "bytes": 2304044,
+        "sha256": "27944d203f9453b7ff9edb2bfd653bac524d4da4db4a000f76115fb4810dd3b5"
+      },
+      "tail": {
+        "path": "runtime/B-tail.wav",
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "7a437a4641f4b99d8b21db934ece9bb3a9c4d0464fea37eb94a2841d70f3132f"
+      }
     },
     {
-      "cue": "C", "looping": false,
-      "body": {"path": "runtime/C-body.wav", "frames": 144000, "bytes": 576044, "sha256": "7e378cdb37adaa3f88a3594ba080fac9be65c7c0e1d69c479263a516638223af"},
-      "tail": {"path": "runtime/C-tail.wav", "frames": 144000, "bytes": 576044, "sha256": "0929b0a19a49fd8d1e6779db3d1a8db2a1edc30c25ef3fcab1321b1a0609f243"}
+      "cue": "C",
+      "looping": false,
+      "body": {
+        "path": "runtime/C-body.wav",
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "3ce3a8ea381c3e81c0b34841df3f1d8d236a5ef335f594001553a400b65accb3"
+      },
+      "tail": {
+        "path": "runtime/C-tail.wav",
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "ec3650bd450cebe9985c1d4d4b59749debe34301f9f9e889171d0e49a316c89c"
+      }
     },
     {
-      "cue": "D", "looping": true,
-      "body": {"path": "runtime/D-body.wav", "frames": 576000, "bytes": 2304044, "sha256": "088d08a78ad55cffa3806b6f8daebf772fb4cf08528c6deb475938537fa09ff2"},
-      "tail": {"path": "runtime/D-tail.wav", "frames": 144000, "bytes": 576044, "sha256": "0ad9b252052c45572ddcc1bc2acf3c2aa1a8e80ccbe8a347947d38cd8c91a812"}
+      "cue": "D",
+      "looping": true,
+      "body": {
+        "path": "runtime/D-body.wav",
+        "frames": 576000,
+        "bytes": 2304044,
+        "sha256": "22274bc3c17713c275b48232130299a443eb56c7cf871a5f3389e5c83c5a8d64"
+      },
+      "tail": {
+        "path": "runtime/D-tail.wav",
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "d7a934809ab1024da19dc1b86c370b692d8400e0431897f7455936cd8959c3aa"
+      }
     },
     {
-      "cue": "E", "looping": true,
-      "body": {"path": "runtime/E-body.wav", "frames": 576000, "bytes": 2304044, "sha256": "070278efd96e8259733801bc30fe87e232cb26b4aeb3075cb927c9c89c8afb32"},
-      "tail": {"path": "runtime/E-tail.wav", "frames": 144000, "bytes": 576044, "sha256": "aac330fb178822e86b0ea71307955eae95f1886de01a9bebf1620ad313877ddd"}
+      "cue": "E",
+      "looping": true,
+      "body": {
+        "path": "runtime/E-body.wav",
+        "frames": 576000,
+        "bytes": 2304044,
+        "sha256": "ddeb175cb27a3bf1e3ee1e0677a2bf6fb8c2fe8c6fd62a68e32c19bc06378f03"
+      },
+      "tail": {
+        "path": "runtime/E-tail.wav",
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "0ed95cbf3d301692c5fb9909a681df7c6d3bd6716d6dd8af6638b3bc761fc2a2"
+      }
     },
     {
-      "cue": "F", "looping": true,
-      "body": {"path": "runtime/F-body.wav", "frames": 576000, "bytes": 2304044, "sha256": "3d5b3562e716a99870151613adeda519f351602151c4a50eb5d93a4b98f4de80"},
-      "tail": {"path": "runtime/F-tail.wav", "frames": 144000, "bytes": 576044, "sha256": "00b6c72aeb8ec50d7906ad4a12dc5a8cf53bbc862070902c625f31f1cc78d4f7"}
+      "cue": "F",
+      "looping": true,
+      "body": {
+        "path": "runtime/F-body.wav",
+        "frames": 576000,
+        "bytes": 2304044,
+        "sha256": "158f015c3ffbb12169eb088206751f56fbed799e0b3dea3ab4496124634b441d"
+      },
+      "tail": {
+        "path": "runtime/F-tail.wav",
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "a4fdc4b38c8a1e7240cfad5ac364063ec8c6f27f9baefc2d2e6110a8a4429c21"
+      }
     },
     {
-      "cue": "G", "looping": false,
-      "body": {"path": "runtime/G-body.wav", "frames": 288000, "bytes": 1152044, "sha256": "03b72d16b6bbc12c8bffc65173795925e69e1bb9356be4ad2737f7de9d2b0692"},
-      "tail": {"path": "runtime/G-tail.wav", "frames": 144000, "bytes": 576044, "sha256": "a8a2afd26e7ad2bc97e032cd83b5f0c5084aecd8741692c091d841aa64c610c7"}
+      "cue": "G",
+      "looping": false,
+      "body": {
+        "path": "runtime/G-body.wav",
+        "frames": 288000,
+        "bytes": 1152044,
+        "sha256": "ab2dbe31c735cbeec11d09eaa308e5faee793a891c34b67f5f50f6b33af25736"
+      },
+      "tail": {
+        "path": "runtime/G-tail.wav",
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "c51b9851ac32e34c57e586f154d3ee1d5f2d138b9c0f21b2c983618905a42609"
+      }
     },
     {
-      "cue": "H", "looping": true,
-      "body": {"path": "runtime/H-body.wav", "frames": 576000, "bytes": 2304044, "sha256": "bb52cfa875b6fc359b380a2834df2ea8f633d2ae65f9e6f59f60c2c09fae9c0d"},
-      "tail": {"path": "runtime/H-tail.wav", "frames": 144000, "bytes": 576044, "sha256": "62653fc9ae162c21a18e36646f23899642f56cf9094599d501cd681818a25d2c"}
+      "cue": "H",
+      "looping": true,
+      "body": {
+        "path": "runtime/H-body.wav",
+        "frames": 576000,
+        "bytes": 2304044,
+        "sha256": "58ac260bd18204e9fb1aeb01aab9229de6830032f1d4be3d30b9527fde1fe6ae"
+      },
+      "tail": {
+        "path": "runtime/H-tail.wav",
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "9e50268573d85733333e10304a0e9faf8d23545e510723035aef1b9d8b0238bf"
+      }
     }
   ]
 }

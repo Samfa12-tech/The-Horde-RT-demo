@@ -1,0 +1,339 @@
+{
+  "schema": 1,
+  "scope": "Owner-selected runtime instrumentation; local validation only, listening/device/release gates open.",
+  "rights": "Owner-supplied; authorised for Horde use only",
+  "records": [
+    {
+      "path": "method/bank-render-producer.cjs",
+      "bytes": 13167,
+      "sha256": "7e12a0a125b8d4d12a8d1edc42ebb1bb71c39111c7deb0ee3e122076d7f268d3"
+    },
+    {
+      "path": "method/bank-verify-producer.cjs",
+      "bytes": 13389,
+      "sha256": "df093e93a3f0ceafe8818ef43f3230ad2433cbb2da785f76733f7e5282e681f7"
+    },
+    {
+      "path": "method/archive-whistle-bank.cjs",
+      "bytes": 7196,
+      "sha256": "2cba7473c107183bf6a585fc350a6caf342c6716d248d9205b9382e6f7de5601"
+    },
+    {
+      "path": "plan.json",
+      "bytes": 1084,
+      "sha256": "3f35c46aa765e3a87bc696d6168c71b45fbcd1a857cd42441c23cbd25c1fb3be"
+    },
+    {
+      "path": "reference-source.json",
+      "bytes": 72237,
+      "sha256": "bc092a0f7489e52ab1e7e55e42c813ae58517ea4a73e6808de8fbbc71595d4a6"
+    },
+    {
+      "path": "reference-manifest.json",
+      "bytes": 4257,
+      "sha256": "1126f9f537efb607b11bd492e1c79d6e8b94814567ce06b654e03b0d915c9ff3"
+    },
+    {
+      "path": "verification.json",
+      "bytes": 5276,
+      "sha256": "167e466de70666229b13e7a6cc0699c63898e1aa12f2da95d27df01c6035bfd9"
+    },
+    {
+      "path": "verification-first-failure.json",
+      "bytes": 573,
+      "sha256": "06d8bafd7fbab59babd032a42d2d3043a5ded8a6993113e2868031298616b4fc"
+    },
+    {
+      "path": "staging.json",
+      "bytes": 382,
+      "sha256": "626a3af25cb801dafa9c456de5deab45aac5f87bfb682f346c6c38b6f8c8c7cb"
+    },
+    {
+      "path": "admission.json",
+      "bytes": 461,
+      "sha256": "b2802e383ff61d4e93f8cd762994d0bc12b2f6d4bd7da6fcaa57dfee8301bbf3"
+    },
+    {
+      "path": "render/wrapper-config.json",
+      "bytes": 549,
+      "sha256": "f8d09e4e1c68169b3e1b2319b3d8bb9dd3bec300028269e53516524822cedd36"
+    },
+    {
+      "path": "render/all-cues.json.gz",
+      "bytes": 129086,
+      "sha256": "3fa90277f7287e401284ad0b94f92a2088f9334cbc0e311d52b0b197821c7d37"
+    },
+    {
+      "path": "render/all-cues-decompressed.json",
+      "bytes": 94,
+      "sha256": "53c3def093ca0f29afdd50a6f7606a37a1b9ffa398f85338c0a566b4ea46f106"
+    },
+    {
+      "path": "validation/native-configure.log",
+      "bytes": 616,
+      "sha256": "ac55dc5613424081e760e154167b55542a8ff92261978b754ff7c1cf4a7bb0fd"
+    },
+    {
+      "path": "validation/native-build-Release.log",
+      "bytes": 1591,
+      "sha256": "9f3a11f303e26b110196736dfef2486a1bf9523163c6e8794592e57d4d4b2927"
+    },
+    {
+      "path": "validation/native-test-Release.log",
+      "bytes": 704,
+      "sha256": "9150e175b23f007710bb30544e9634eb13b1bf111f388b0786d3de1da4b8c67e"
+    },
+    {
+      "path": "validation/native-build-Release-silent-tail-corrected.log",
+      "bytes": 545,
+      "sha256": "7792f4fef106603a39349b8ce57e54525d35069be295bec365306b590e8d3f37"
+    },
+    {
+      "path": "validation/native-build-Release-final.log",
+      "bytes": 817,
+      "sha256": "41bffb6d8f60722d086722fc5b19350932f59530cd6c0a2fdc83246ad6c25cea"
+    },
+    {
+      "path": "validation/native-test-Release-final.log",
+      "bytes": 532,
+      "sha256": "365d99f77d35d2b0312985e54a62ae22e3768c1625e1b9c65faca4eff342f1e5"
+    },
+    {
+      "path": "validation/native-build-Debug-final.log",
+      "bytes": 1583,
+      "sha256": "eb8585481e684817a232cf341a62a10399f3fc4530a048fc6bb39521e8fdb856"
+    },
+    {
+      "path": "validation/native-test-Debug-final.log",
+      "bytes": 532,
+      "sha256": "d3f3c6520d38bf78629855b562472dd40952a927442cd2d5f365e08ea99013f8"
+    },
+    {
+      "path": "validation/android-asset-tasks.log",
+      "bytes": 415,
+      "sha256": "ea85ae974db6c4dbfaa13f5798ab521909131e2e9fefcb9d94b3526463ab91fe"
+    },
+    {
+      "path": "native/configure.log",
+      "bytes": 614,
+      "sha256": "8bb7198ffde0e07a2a5289c7f7fc48a2e80d72dc9b4f6cb3e99b045115b31633"
+    },
+    {
+      "path": "native/build-release.log",
+      "bytes": 2784,
+      "sha256": "ae00f68dde5a6d5631ae3bad20cb9a27b9221302249a16c872c30cdffcfec14a"
+    },
+    {
+      "path": "native/build-release-padding-corrected.log",
+      "bytes": 1505,
+      "sha256": "ef1185ba579154173fa7e8908437a95e513a0a5fdf06a900eed9ec75c19a1a9b"
+    },
+    {
+      "path": "native/build-debug.log",
+      "bytes": 1043,
+      "sha256": "7fb235250f1533a6faea17c34e0fc3a0a1597249660090a8871f94a620b82f55"
+    },
+    {
+      "path": "native/build-Release-bank.log",
+      "bytes": 1092,
+      "sha256": "cb24fc00105400356be89d208579627f1eec9218a4d0af2709ae101d9bb27419"
+    },
+    {
+      "path": "native/build-Debug-bank.log",
+      "bytes": 413,
+      "sha256": "033d5190ed4b63a97777b51ccf72366b1f913a23ab8468ac07200a48550ee3e1"
+    },
+    {
+      "path": "native/initial-CMakeLists.txt",
+      "bytes": 1192,
+      "sha256": "475768e86240f2ef8b531e979bed727adf2ce0e3480c3e69cb2f27320e55b500"
+    },
+    {
+      "path": "native/initial-check.cpp",
+      "bytes": 10543,
+      "sha256": "5b7533e6153ef6abb4c9513b255776fbcc2169bcc959c7459d4e3363b04404a6"
+    },
+    {
+      "path": "native/Release-reference.json",
+      "bytes": 1684,
+      "sha256": "689ab3c4130ebf6a6f9033bd41197f2b464642584dcd64f57c6d69e2fa53c7ed"
+    },
+    {
+      "path": "native/Release-whistle.json",
+      "bytes": 1679,
+      "sha256": "4d16ea806ed54aa91cdd5dca6b9618afe013c277244535af99556afe73baf563"
+    },
+    {
+      "path": "native/Release-reed.json",
+      "bytes": 1674,
+      "sha256": "fd71ba542ecbed16ec9fb1fcd58af52c62b2ccb144b0b365f2cdc44a8d4ef3b7"
+    },
+    {
+      "path": "native/Release-owner-combo.json",
+      "bytes": 1683,
+      "sha256": "6fa842b2eb2f29e6bc883e429194f7f95be15394e8b057f16bf36d2ff05e09d4"
+    },
+    {
+      "path": "native/Debug-whistle.json",
+      "bytes": 1679,
+      "sha256": "4d16ea806ed54aa91cdd5dca6b9618afe013c277244535af99556afe73baf563"
+    },
+    {
+      "path": "native/Debug-whistle-bound.json",
+      "bytes": 6935,
+      "sha256": "8072d5744bc2b48cd2bea2404bc5d036d0e6f6c11d502faa286c6d08f06c6acc"
+    },
+    {
+      "path": "native/Release-bank.json",
+      "bytes": 1630,
+      "sha256": "c5566efa710c303762c876dfc6f5c77a42add56925de36582358416a8a1c9ad0"
+    },
+    {
+      "path": "native/Release-bank-bound.json",
+      "bytes": 6099,
+      "sha256": "7df86c6e8a43b7d587624183afeb259dec35161a0bf7a3e86252b6130542cedd"
+    },
+    {
+      "path": "native/Debug-bank.json",
+      "bytes": 1630,
+      "sha256": "c5566efa710c303762c876dfc6f5c77a42add56925de36582358416a8a1c9ad0"
+    },
+    {
+      "path": "native/Debug-bank-bound.json",
+      "bytes": 6400,
+      "sha256": "4683c8508347950051eb5cc1263a73c42f0b5b3494be6ed4e40c98849e5388d3"
+    },
+    {
+      "path": "native/initial-run-bank.cjs",
+      "bytes": 3944,
+      "sha256": "363a15da8957fba945f9141798678e58338045c2a6c492199db904af9b4e9c60"
+    },
+    {
+      "path": "method/MusicPcmWaveTests.cpp",
+      "bytes": 17015,
+      "sha256": "bef7d297fce203f8f7c6c6389edac080b8f48f738cd398abfe24af5eb78c3f39"
+    },
+    {
+      "path": "scope.json",
+      "bytes": 1247,
+      "sha256": "51b177bd492afbc2f50c831cc6ae452c2d87863396040a954335c56bc5055aa4"
+    }
+  ],
+  "references": [
+    {
+      "path": "../../../assets/audio/music/what-the-dark-keeps/asset.manifest.json",
+      "bytes": 5071,
+      "sha256": "ea7adbc1c248fc37d705239e6bcd529fbf10206ffb77165051658bce4e438c3e"
+    },
+    {
+      "path": "../../../tools/music-instrumentation-bank.cjs",
+      "bytes": 15466,
+      "sha256": "440b8b994e715b80f7fbb92e7c9f9c86419b699df5165ba563d27a4ad2c045f0"
+    },
+    {
+      "path": "../../../tools/music-instrumentation-core-check/CMakeLists.txt",
+      "bytes": 2685,
+      "sha256": "10e7267242b6122647775512c54c9800e214c4da4e2f50a34225efe272004602"
+    },
+    {
+      "path": "../../../tools/music-instrumentation-core-check/check.cpp",
+      "bytes": 15673,
+      "sha256": "0ec0622842d115616f8c1a88a39c8c9d7441cfe499acade5f8d1da78fd902f65"
+    },
+    {
+      "path": "../../../tools/music-instrumentation-core-check/run.cjs",
+      "bytes": 4218,
+      "sha256": "a321cadcce3bb58a323f3f6f227dc322312c85d918994e3549143b4167f5a7ec"
+    },
+    {
+      "path": "../../../assets/audio/music/what-the-dark-keeps/source/What_the_Dark_Keeps_Pocket_Chordsmith.json",
+      "bytes": 72393,
+      "sha256": "f5d4bbc8068ae2865216304efc22337ac190ca5b7732e02a9ed5e9062b7b92f4"
+    },
+    {
+      "path": "../../../assets/audio/music/what-the-dark-keeps/source/What_the_Dark_Keeps_PCS1.txt",
+      "bytes": 94054,
+      "sha256": "747e5a9a21f41f0fc587fe55572b03a6196cd25cece17283775dd03130164dab"
+    },
+    {
+      "path": "../../../assets/audio/music/what-the-dark-keeps/runtime/A-body.wav",
+      "bytes": 2304044,
+      "sha256": "a58cacd493bd4604cf1d51096cf03092e35c993a079c10af7fcec3debc093277"
+    },
+    {
+      "path": "../../../assets/audio/music/what-the-dark-keeps/runtime/A-tail.wav",
+      "bytes": 576044,
+      "sha256": "4fea7b227dee6b81f09fd54f202bfea33a76a2419fa07c1ec37a0d2f8d14e4e1"
+    },
+    {
+      "path": "../../../assets/audio/music/what-the-dark-keeps/runtime/B-body.wav",
+      "bytes": 2304044,
+      "sha256": "27944d203f9453b7ff9edb2bfd653bac524d4da4db4a000f76115fb4810dd3b5"
+    },
+    {
+      "path": "../../../assets/audio/music/what-the-dark-keeps/runtime/B-tail.wav",
+      "bytes": 576044,
+      "sha256": "7a437a4641f4b99d8b21db934ece9bb3a9c4d0464fea37eb94a2841d70f3132f"
+    },
+    {
+      "path": "../../../assets/audio/music/what-the-dark-keeps/runtime/C-body.wav",
+      "bytes": 576044,
+      "sha256": "3ce3a8ea381c3e81c0b34841df3f1d8d236a5ef335f594001553a400b65accb3"
+    },
+    {
+      "path": "../../../assets/audio/music/what-the-dark-keeps/runtime/C-tail.wav",
+      "bytes": 576044,
+      "sha256": "ec3650bd450cebe9985c1d4d4b59749debe34301f9f9e889171d0e49a316c89c"
+    },
+    {
+      "path": "../../../assets/audio/music/what-the-dark-keeps/runtime/D-body.wav",
+      "bytes": 2304044,
+      "sha256": "22274bc3c17713c275b48232130299a443eb56c7cf871a5f3389e5c83c5a8d64"
+    },
+    {
+      "path": "../../../assets/audio/music/what-the-dark-keeps/runtime/D-tail.wav",
+      "bytes": 576044,
+      "sha256": "d7a934809ab1024da19dc1b86c370b692d8400e0431897f7455936cd8959c3aa"
+    },
+    {
+      "path": "../../../assets/audio/music/what-the-dark-keeps/runtime/E-body.wav",
+      "bytes": 2304044,
+      "sha256": "ddeb175cb27a3bf1e3ee1e0677a2bf6fb8c2fe8c6fd62a68e32c19bc06378f03"
+    },
+    {
+      "path": "../../../assets/audio/music/what-the-dark-keeps/runtime/E-tail.wav",
+      "bytes": 576044,
+      "sha256": "0ed95cbf3d301692c5fb9909a681df7c6d3bd6716d6dd8af6638b3bc761fc2a2"
+    },
+    {
+      "path": "../../../assets/audio/music/what-the-dark-keeps/runtime/F-body.wav",
+      "bytes": 2304044,
+      "sha256": "158f015c3ffbb12169eb088206751f56fbed799e0b3dea3ab4496124634b441d"
+    },
+    {
+      "path": "../../../assets/audio/music/what-the-dark-keeps/runtime/F-tail.wav",
+      "bytes": 576044,
+      "sha256": "a4fdc4b38c8a1e7240cfad5ac364063ec8c6f27f9baefc2d2e6110a8a4429c21"
+    },
+    {
+      "path": "../../../assets/audio/music/what-the-dark-keeps/runtime/G-body.wav",
+      "bytes": 1152044,
+      "sha256": "ab2dbe31c735cbeec11d09eaa308e5faee793a891c34b67f5f50f6b33af25736"
+    },
+    {
+      "path": "../../../assets/audio/music/what-the-dark-keeps/runtime/G-tail.wav",
+      "bytes": 576044,
+      "sha256": "c51b9851ac32e34c57e586f154d3ee1d5f2d138b9c0f21b2c983618905a42609"
+    },
+    {
+      "path": "../../../assets/audio/music/what-the-dark-keeps/runtime/H-body.wav",
+      "bytes": 2304044,
+      "sha256": "58ac260bd18204e9fb1aeb01aab9229de6830032f1d4be3d30b9527fde1fe6ae"
+    },
+    {
+      "path": "../../../assets/audio/music/what-the-dark-keeps/runtime/H-tail.wav",
+      "bytes": 576044,
+      "sha256": "9e50268573d85733333e10304a0e9faf8d23545e510723035aef1b9d8b0238bf"
+    }
+  ]
+}

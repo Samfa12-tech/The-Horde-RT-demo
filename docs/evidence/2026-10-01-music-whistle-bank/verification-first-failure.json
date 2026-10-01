@@ -1,0 +1,9 @@
+{
+  "stage": "verification, before any runtime-bank mutation",
+  "status": "failed verifier assertion",
+  "cause": "Compared legacy PCS import against schema17 JSON export instead of the retained legacy PCS reference.",
+  "demonstratedDifferences": {"projectVersion": "PCS16 versus JSON17", "title": "Legacy PCS import drops this non-schema title; JSON export retains it."},
+  "fix": "Compare JSON import/export and PCS import to their separate pinned reference routes; source JSON/PCS1 equality remains required.",
+  "rerenderRequired": false,
+  "runtimeChanged": false
+}

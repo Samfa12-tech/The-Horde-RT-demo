@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "ownerChoice": "whistle-lead, explicitly selected October 1",
+  "sourceSha256": "f5d4bbc8068ae2865216304efc22337ac190ca5b7732e02a9ed5e9062b7b92f4",
+  "pcs1Sha256": "747e5a9a21f41f0fc587fe55572b03a6196cd25cece17283775dd03130164dab",
+  "originalSourceSha256": "bc092a0f7489e52ab1e7e55e42c813ae58517ea4a73e6808de8fbbc71595d4a6",
+  "originalManifestSha256": "1126f9f537efb607b11bd492e1c79d6e8b94814567ce06b654e03b0d915c9ff3",
+  "reused": [
+    "A",
+    "E"
+  ],
+  "renderRemaining": [
+    "B",
+    "C",
+    "D",
+    "F",
+    "G",
+    "H"
+  ],
+  "changedKeys": [
+    "chordInstrument",
+    "chordVolume",
+    "fxChorus",
+    "fxDelay",
+    "fxMix",
+    "melodyInstrumentsA",
+    "melodyInstrumentsB",
+    "melodyInstrumentsC",
+    "melodyInstrumentsD",
+    "melodyInstrumentsE",
+    "melodyInstrumentsF",
+    "melodyInstrumentsG",
+    "melodyInstrumentsH"
+  ],
+  "activeAEProjectionMatchesAcceptedCandidate": true,
+  "bells": {
+    "C": {
+      "part": 1,
+      "attacks": 3
+    },
+    "G": {
+      "part": 2,
+      "attacks": 4
+    }
+  },
+  "runtimeNotChanged": true
+}

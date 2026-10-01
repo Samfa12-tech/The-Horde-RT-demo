@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "action": "stage",
+  "destination": "C:\\Dev\\tmp\\horde-music-instrumentation-20261001\\whistle-bank\\staged-assets\\audio\\music\\what-the-dark-keeps",
+  "manifestSha256": "ea7adbc1c248fc37d705239e6bcd529fbf10206ffb77165051658bce4e438c3e",
+  "files": 19,
+  "pcmBytes": 20160000,
+  "note": "Isolated full-bank native fixture input; production bank untouched."
+}

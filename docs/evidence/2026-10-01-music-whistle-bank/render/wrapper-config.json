@@ -1,0 +1,8 @@
+{
+  "sourceSha256": "f5d4bbc8068ae2865216304efc22337ac190ca5b7732e02a9ed5e9062b7b92f4",
+  "wrapperSha256": "7e12a0a125b8d4d12a8d1edc42ebb1bb71c39111c7deb0ee3e122076d7f268d3",
+  "retainedAdapterSha256": "689fa7124ef39ef7e36b2c122d1510ac495091cb0d0b3c37b575d481cd9e05aa",
+  "effectiveAdapterSha256": "58894b6215910ca3c60ec0344fd8d24777a61df4845a9c94be18fab46dc833d8",
+  "renderer": "C:\\Dev\\tmp\\horde-music-instrumentation-20261001\\chordsmith-render-source",
+  "output": "C:\\Dev\\tmp\\horde-music-instrumentation-20261001\\whistle-bank\\render"
+}

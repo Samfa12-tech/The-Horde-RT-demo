@@ -13,7 +13,7 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
-### October 1 instrumentation audition - owner choice next
+### October 1 instrumentation - selected whistle bank admitted locally
 
 The owner requests a bounded dark-fantasy instrumental pass, not a new score or
 renderer/gameplay work. Read the [single audition record](ENGINEERING_1_6_1_MUSIC_INSTRUMENTATION_2026-10-01.md)
@@ -25,16 +25,28 @@ headroom,20-period arithmetic and corrected loop-aware crossfade supplements
 pass; no audible seams/masking/native-game acceptance. Earlier transition
 arithmetic omission is recorded, original receipts retained, no rerender.
 
-Preferred owner combo: felt_piano chords, soft_pluck melody1/2, cowboy_whistle
-melody3, original chord0.28; chorus0/delay0.04/mix0.22/reverb0.46. Separate
-whistle-lead alternative retains pluck/reed support/chord0.20. Two49.5s
-loudness-matched oldA/newA/oldE/newE comparisons are archived; preview gain is
-not runtime gain. Bank/source pins and PCM20,160,000 bytes remain unchanged;
-closed-roster policy PASS. Owner's unsaved DAW project was read-only and untouched.
-**Next owner decision:** listen/choose before full-bank rendering. Do not repeat
-completed renders after compaction or treat the screenshot as exact-game audio
-acceptance. Audio/haptic manual revalidation:YES for instrumentation/mix;
-existing pending platform listening stays open. No new phone install/publication.
+The owner's later explicit preference is **whistle-lead**; it supersedes the
+earlier soft_pluck1/2 +whistle3 screenshot allocation. Selected looping palette:
+cowboy_whistle /soft_pluck /mellow_sax, felt_piano chords0.20;
+chorus0/delay0.04/mix0.22/reverb0.46. Sparse authored bells remain only C/G.
+Accepted A/E PCM reused after active-source projection equality; six other cues
+rendered once, no notes/times/holds/register/pan/cue-authority change. Canonical
+JSONf5d4bbc8…b92f4 /PCS1747e5a9a…64dab and16 runtime WAVs now carry this palette;
+manifest/pinsea7adbc1…8c3e, PCM20,160,000 bytes unchanged. Preview gain is not
+runtime gain. Full silent C tail is retained after actual FX falls below PCM16;
+decoder regression covers it without dropping strict format/hash/frame gates.
+
+MSVC Debug/Release real-WAV+bank2/2 each PASS; production Core offline loops/
+transitions plus six-new-cue supplement PASS; Android verify/stage assets SUCCESS.
+[Bank receipts/known limits](evidence/2026-10-01-music-whistle-bank/README.md)
+preserve earlier failed checks and exact producers. Audition checkpointa1c90bb
+push36820045325/PR36820050128 freshly green (GCC/Clang55,MSVC56,focused15);
+new bank commit requires its own CI. No phone/OS-played-clock acceptance here.
+**Next music gate:** exact-game listening when owner ready, normal70% music,
+loops/transitions and SFX clarity, then affected native clock/lifecycle. Do not
+repeat completed renders. **Do not use Pocket DAW MCP/UI** while owner fixes it;
+unsaved project untouched. Audio/haptic manual:YES for audible assets/mix;
+no SFX/haptic implementation changes, phone install or publication.
 Unfinished primary-hit probe and unrelated scratch remain preserved, uncommitted;
 this side slice does not close glass or reduce the agreed programme scope.
 

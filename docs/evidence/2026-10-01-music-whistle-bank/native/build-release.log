@@ -1,0 +1,25 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  1>Checking Build System
+  Building Custom Rule C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/third_party/pocket-audio-core/native/CMakeLists.txt
+  PcmLoopStream.cpp
+  PcmWave.cpp
+  Generating Code...
+  pocket_audio_native_pcm.vcxproj -> C:\Dev\tmp\horde-music-instrumentation-20261001\core-verification\build\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  Building Custom Rule C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/tools/music-instrumentation-core-check/CMakeLists.txt
+  check.cpp
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\src\vulkan\raytracing\RtSceneAbi.generated.h(165,1): error C2220: the following warning is treated as an error [C:\Dev\tmp\horde-music-instrumentation-20261001\core-verification\build\horde_music_instrumentation_core_check.vcxproj]
+  (compiling source file '../../../../../Users/sam_s/Documents/the%20Horde%20RT%20Demo/.worktrees/horde-1.6.1-engineering-pass/tools/music-instrumentation-core-check/check.cpp')
+  
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\src\vulkan\raytracing\RtSceneAbi.generated.h(165,1): warning C4324: 'horde::vulkan::raytracing::RtDielectricDiagnostics': structure was padded due to alignment specifier [C:\Dev\tmp\horde-music-instrumentation-20261001\core-verification\build\horde_music_instrumentation_core_check.vcxproj]
+  (compiling source file '../../../../../Users/sam_s/Documents/the%20Horde%20RT%20Demo/.worktrees/horde-1.6.1-engineering-pass/tools/music-instrumentation-core-check/check.cpp')
+  
+  MusicPcmStream.cpp
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\src\vulkan\raytracing\RtSceneAbi.generated.h(165,1): error C2220: the following warning is treated as an error [C:\Dev\tmp\horde-music-instrumentation-20261001\core-verification\build\horde_music_instrumentation_core_check.vcxproj]
+  (compiling source file '../../../../../Users/sam_s/Documents/the%20Horde%20RT%20Demo/.worktrees/horde-1.6.1-engineering-pass/src/audio/MusicPcmStream.cpp')
+  
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\src\vulkan\raytracing\RtSceneAbi.generated.h(165,1): warning C4324: 'horde::vulkan::raytracing::RtDielectricDiagnostics': structure was padded due to alignment specifier [C:\Dev\tmp\horde-music-instrumentation-20261001\core-verification\build\horde_music_instrumentation_core_check.vcxproj]
+  (compiling source file '../../../../../Users/sam_s/Documents/the%20Horde%20RT%20Demo/.worktrees/horde-1.6.1-engineering-pass/src/audio/MusicPcmStream.cpp')
+  
+  MusicPcmWave.cpp
+  Generating Code...

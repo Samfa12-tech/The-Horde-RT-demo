@@ -57,7 +57,7 @@ Poly Haven's asset license states that its assets are CC0 and may be used commer
 `What the Dark Keeps`, supplied in `What_the_Dark_Keeps_Horde_RT_Music_Pack.zip`
 SHA-256 `e28e5936189919fed25f6208dd7a8b97172eb5f7d25f69732cc7339c45f386fa`.
 Owner-confirmed rights statement,2026-09-30: **Owner-supplied; authorised for Horde use only**.
-No general permissive redistribution licence is inferred. Verbatim editable JSON/
+No general permissive redistribution licence is inferred. Editable canonical JSON/
 PCS1 under `assets/audio/music/what-the-dark-keeps/source/` remains the revisable
 source of truth and is excluded from game packages, as is the supplied preview.
 Only the hash-pinned manifest and sixteen measured stereo48kHz PCM16 body/tail
@@ -70,8 +70,8 @@ The sixteen A-H PCM body/tail prototypes under
 `docs/evidence/2026-10-01-music-render/audio/` carry that same Horde-only owner grant.
 They are non-runtime rendering evidence, excluded from game packages, not a
 general asset library or seamless/playback acceptance. Source/tool hashes and
-original unmodified-score processing are recorded in that directory. Admitted
-runtime copies are byte-identical; only historical `-loop` filenames become
+original unmodified-score processing are recorded in that directory. Initial
+runtime copies were byte-identical; historical `-loop` filenames became
 `-body` to distinguish the C/G one-shots. The separate
 native-only Pocket Audio Core utility pin is documented in
 `third_party/pocket-audio-core/README.horde.md`; no Chordsmith editor/synth app is
@@ -84,3 +84,11 @@ score grant. They retain separate editable JSON/PCS1 candidates and actual v68
 app-voice/live-FX derivatives; comparison gain changes apply only to previews.
 They are excluded from runtime packages and are not a bank-replacement,
 general acoustic-instrument library, listening or publication acceptance.
+
+On October 1 the owner selected the whistle-lead instrumentation. The canonical
+JSON/PCS1 and sixteen runtime derivatives now carry that palette: retained v68
+actual app voices/live FX, unchanged notes/cue timing, accepted A/E PCM reused,
+six remaining cues rendered once. Sparse authored bell accents remain in C/G.
+No preview normalization is applied to runtime. Rights remain **Horde-only**;
+this is not public distribution, platform-listening or release acceptance. See
+`docs/evidence/2026-10-01-music-whistle-bank/README.md` for exact provenance.
