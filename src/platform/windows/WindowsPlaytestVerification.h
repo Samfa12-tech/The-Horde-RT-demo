@@ -77,6 +77,9 @@ private:
 
 [[nodiscard]] bool IsAllowedWindowsPlaytestVerificationPageUrl(std::wstring_view url) noexcept;
 [[nodiscard]] bool IsAllowedWindowsPlaytestVerificationChallengeUrl(std::wstring_view url) noexcept;
+// Child-frame-only compatibility: these two local documents are required by
+// Turnstile. They never broaden top-level navigation or outbound network hosts.
+[[nodiscard]] bool IsAllowedWindowsPlaytestVerificationFrameUrl(std::wstring_view url) noexcept;
 [[nodiscard]] WindowsPlaytestVerificationReply ParseWindowsPlaytestVerificationMessage(
     std::string_view json, std::string_view expectedNonce) noexcept;
 

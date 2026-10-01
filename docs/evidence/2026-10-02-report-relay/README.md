@@ -175,6 +175,29 @@ Receipts `windows-verification-real-smoke.log` and
 Pure stage/parser contracts pass current Debug/Release1/1. No unchanged live
 retry: next is the existing owner/configuration and real challenge gate.
 
+### Narrow child-document compatibility and real verification
+
+The owner supplied an authenticated Chrome session. Read-only widget settings
+confirm the existing public sitekey is Managed/no-pre-clearance and already
+admits `samfa12.com`. [Cloudflare hostname semantics](https://developers.cloudflare.com/turnstile/additional-configuration/hostname-management/)
+cover its `briarhold-signal.samfa12.com` subdomain. No setting, host, widget mode,
+mailbox or credential was changed; the secret was not read or revealed.
+
+[Cloudflare WebView requirements](https://developers.cloudflare.com/turnstile/get-started/mobile-implementation/)
+include local `about:blank`/`about:srcdoc` child documents. Windows now allows
+exactly those two in its child-frame predicate. The fixed top-level URL and
+HTTPS network-origin allowlist remain unchanged; queries/fragments, other about:
+URLs, data/file and unrelated hosts remain rejected. This addresses a documented
+policy mismatch, not proof that either URI caused the previous timeouts.
+
+Changed-candidate Debug/Release parser/policy CTest1/1 each passes. One justified live follow-up
+now completes real verification at `reply-received` in2.38s (status0); the token
+was immediately wiped. Receipt `windows-verification-local-child-smoke.log`.
+No report was submitted, no email sent, and server action/hostname validation
+is not inferred from the client-only success. Do not repeat this smoke unchanged.
+Pure gate receipts: `windows-verification-child-documents-debug.log` and
+`windows-verification-child-documents-release.log`.
+
 ## Next unfinished step
 
 Android reviewed checkpoint/fresh source and merge-state CI are complete.
@@ -182,8 +205,8 @@ Windows synchronous transport candidate is superseded by the reviewed bounded
 asynchronous owner above; its negative evidence is retained. Next: integrate
 and validate the remote-first native form and consented render-owner capture
 hook. The accepted Android APK has not been reinstalled for unrelated checks.
-Existing Turnstile hostname admission needs the requested owner dashboard
-sign-in; do not repeat the request or copy/broaden credentials.
+Existing Turnstile hostname admission is now verified from the authenticated
+dashboard; no owner sign-in or widget change is pending.
 Then send only the approved single labelled fixture email and verify the
 attachment/delivery. No email has been sent yet. Windows remote UI/transport and
 actual device/lifecycle acceptance remain open; local JSON remains fallback.

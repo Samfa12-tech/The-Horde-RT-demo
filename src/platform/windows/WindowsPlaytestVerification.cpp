@@ -420,7 +420,7 @@ struct Session final : std::enable_shared_from_this<Session>
             [](ICoreWebView2*, ICoreWebView2NavigationStartingEventArgs* args) -> HRESULT {
                 LPWSTR uri = nullptr;
                 if (FAILED(args->get_Uri(&uri))) { args->put_Cancel(TRUE); return S_OK; }
-                const bool allowed = IsAllowedWindowsPlaytestVerificationChallengeUrl(Wide(uri));
+                const bool allowed = IsAllowedWindowsPlaytestVerificationFrameUrl(Wide(uri));
                 CoTaskMemFree(uri);
                 if (!allowed) args->put_Cancel(TRUE);
                 return S_OK;
@@ -728,6 +728,12 @@ LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
 bool IsAllowedWindowsPlaytestVerificationPageUrl(std::wstring_view url) noexcept
 {
     return url == kWindowsPlaytestVerificationPageUrl;
+}
+
+bool IsAllowedWindowsPlaytestVerificationFrameUrl(std::wstring_view url) noexcept
+{
+    return url == L"about:blank" || url == L"about:srcdoc" ||
+        IsAllowedWindowsPlaytestVerificationChallengeUrl(url);
 }
 
 bool IsAllowedWindowsPlaytestVerificationChallengeUrl(std::wstring_view url) noexcept

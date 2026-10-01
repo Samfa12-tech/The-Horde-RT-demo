@@ -56,6 +56,17 @@ int main(int argc, char** argv)
         "Cloudflare challenge HTTPS origin is allowed");
     Check(IsAllowedWindowsPlaytestVerificationChallengeUrl(L"https://CHALLENGES.CLOUDFLARE.COM:443/cdn-cgi/challenge-platform/"),
         "challenge host comparison is case-insensitive and explicit port 443 is allowed");
+    for (const auto local : {L"about:blank", L"about:srcdoc"})
+    {
+        Check(IsAllowedWindowsPlaytestVerificationFrameUrl(local), "exact local challenge child document is allowed");
+        Check(!IsAllowedWindowsPlaytestVerificationPageUrl(local), "local child document cannot replace the top-level page");
+        Check(!IsAllowedWindowsPlaytestVerificationChallengeUrl(local), "local child document does not widen outbound hosts");
+    }
+    Check(IsAllowedWindowsPlaytestVerificationFrameUrl(L"https://challenges.cloudflare.com/turnstile/v0/api.js"),
+        "challenge origin remains allowed for child navigation");
+    for (const auto bad : {L"about:blank?x=1", L"about:blank#fragment", L"about:srcdoc#fragment",
+        L"about:config", L"data:text/html,hello", L"file:///private.txt", L"https://evil.test/"})
+        Check(!IsAllowedWindowsPlaytestVerificationFrameUrl(bad), "other local or remote child documents are rejected");
     for (const auto bad : {
         L"http://challenges.cloudflare.com/script.js",
         L"https://challenges.cloudflare.com.evil.test/script.js",
