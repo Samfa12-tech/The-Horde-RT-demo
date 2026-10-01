@@ -1,0 +1,170 @@
+{
+  "status": "PASS-objective-checks; owner-listening-pending",
+  "referenceRepeat": [
+    {
+      "cue": "A",
+      "maxPcmLsb": 1,
+      "differingSamples": 95,
+      "tailByteIdentical": true
+    },
+    {
+      "cue": "E",
+      "maxPcmLsb": 1,
+      "differingSamples": 117,
+      "tailByteIdentical": true
+    }
+  ],
+  "matching": [
+    {
+      "variant": "reference",
+      "cue": "A",
+      "path": "reference-A-matched.wav",
+      "gainDb": 0,
+      "targetLufs": -28.38,
+      "integratedLufs": -28.38,
+      "truePeakDbtp": -7.58,
+      "lraLu": 2.2,
+      "analysisOnly": true,
+      "sha256": "8e5be0c046d95a3058037c311ea6a1b7a330f82536788fd33954980d31dfcc02",
+      "processing": "constant gain only; preview not runtime asset"
+    },
+    {
+      "variant": "whistle",
+      "cue": "A",
+      "path": "whistle-A-matched.wav",
+      "gainDb": 5.510000000000002,
+      "targetLufs": -28.38,
+      "integratedLufs": -28.36,
+      "truePeakDbtp": -2.43,
+      "lraLu": 4.4,
+      "analysisOnly": true,
+      "sha256": "7eaa5520e520edcc33b90250caa78285d972e880bf9ebdd63e3f0991ab5bd8c4",
+      "processing": "constant gain only; preview not runtime asset"
+    },
+    {
+      "variant": "reed",
+      "cue": "A",
+      "path": "reed-A-matched.wav",
+      "gainDb": 6.029999999999998,
+      "targetLufs": -28.38,
+      "integratedLufs": -28.37,
+      "truePeakDbtp": -1.91,
+      "lraLu": 5.1,
+      "analysisOnly": true,
+      "sha256": "3b965343939614fd07c2158ba2494ea4d79687f1f30e56aea3df8e2e42785b81",
+      "processing": "constant gain only; preview not runtime asset"
+    },
+    {
+      "variant": "reference",
+      "cue": "E",
+      "path": "reference-E-matched.wav",
+      "gainDb": 0,
+      "targetLufs": -22.51,
+      "integratedLufs": -22.51,
+      "truePeakDbtp": -3.31,
+      "lraLu": 0.6,
+      "analysisOnly": true,
+      "sha256": "070278efd96e8259733801bc30fe87e232cb26b4aeb3075cb927c9c89c8afb32",
+      "processing": "constant gain only; preview not runtime asset"
+    },
+    {
+      "variant": "whistle",
+      "cue": "E",
+      "path": "whistle-E-matched.wav",
+      "gainDb": 0.8599999999999994,
+      "targetLufs": -22.51,
+      "integratedLufs": -22.5,
+      "truePeakDbtp": -2.44,
+      "lraLu": 0.7,
+      "analysisOnly": true,
+      "sha256": "9ba677502fad067b954bf1db38371e0c3dd310b2aededdd4a265c8e4d40f832c",
+      "processing": "constant gain only; preview not runtime asset"
+    },
+    {
+      "variant": "reed",
+      "cue": "E",
+      "path": "reed-E-matched.wav",
+      "gainDb": 0.9199999999999982,
+      "targetLufs": -22.51,
+      "integratedLufs": -22.51,
+      "truePeakDbtp": -2.42,
+      "lraLu": 0.7,
+      "analysisOnly": true,
+      "sha256": "a74949b70f0ad7f50108489122682becf36de8de4948db27c5fefe374e33e698",
+      "processing": "constant gain only; preview not runtime asset"
+    }
+  ],
+  "previews": [
+    {
+      "variant": "whistle",
+      "path": "01-whistle-comparison.wav",
+      "seconds": 49.5,
+      "sha256": "8f80dc576b94899be56a6e63dccbaed93660db91e586fb86830b5329a79f4d4c",
+      "timeline": [
+        {
+          "startSeconds": 0,
+          "variant": "reference",
+          "cue": "A",
+          "durationSeconds": 12
+        },
+        {
+          "startSeconds": 12.5,
+          "variant": "whistle",
+          "cue": "A",
+          "durationSeconds": 12
+        },
+        {
+          "startSeconds": 25,
+          "variant": "reference",
+          "cue": "E",
+          "durationSeconds": 12
+        },
+        {
+          "startSeconds": 37.5,
+          "variant": "whistle",
+          "cue": "E",
+          "durationSeconds": 12
+        }
+      ],
+      "note": "body-only short audition with0.5s silence; full bodies/tails remain separate and unchanged"
+    },
+    {
+      "variant": "reed",
+      "path": "02-reed-comparison.wav",
+      "seconds": 49.5,
+      "sha256": "757ad4707e2a07d195ec7f540657f81cdd3d0d4c4bc106b31d6fccf8746144a0",
+      "timeline": [
+        {
+          "startSeconds": 0,
+          "variant": "reference",
+          "cue": "A",
+          "durationSeconds": 12
+        },
+        {
+          "startSeconds": 12.5,
+          "variant": "reed",
+          "cue": "A",
+          "durationSeconds": 12
+        },
+        {
+          "startSeconds": 25,
+          "variant": "reference",
+          "cue": "E",
+          "durationSeconds": 12
+        },
+        {
+          "startSeconds": 37.5,
+          "variant": "reed",
+          "cue": "E",
+          "durationSeconds": 12
+        }
+      ],
+      "note": "body-only short audition with0.5s silence; full bodies/tails remain separate and unchanged"
+    }
+  ],
+  "unchangedRuntime": {
+    "manifestSha256": "1126f9f537efb607b11bd492e1c79d6e8b94814567ce06b654e03b0d915c9ff3",
+    "waveBytes": 20160704,
+    "pcmBytes": 20160000
+  }
+}

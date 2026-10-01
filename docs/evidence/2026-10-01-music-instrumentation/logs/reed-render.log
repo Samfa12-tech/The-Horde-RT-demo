@@ -1,0 +1,95 @@
+{
+  "cue": "A",
+  "errors": [],
+  "duration": 12,
+  "steps": 64,
+  "sourceStarts": 68,
+  "body": {
+    "peak": 0.4008360803127289,
+    "bodyPeak": 0.4008360803127289,
+    "tailPeak": 0.010822093114256859,
+    "finiteSamples": 1443840,
+    "nonFiniteSamples": 0,
+    "clippedSamplesAtPcm16Ceiling": 0,
+    "totalSamples": 1443840,
+    "bodyRms": 0.01769641236777302,
+    "tailRms": 0.00409696972814156,
+    "seamMaxAbsDifference": 0.0006230638828128576
+  },
+  "scoreParity": [
+    true,
+    true
+  ],
+  "calls": [
+    true,
+    true,
+    true,
+    {
+      "kick": true,
+      "snare": true,
+      "hat": true,
+      "expanded": true
+    }
+  ],
+  "firstFsharp4": [],
+  "outputs": [
+    {
+      "path": "A-loop.wav",
+      "bytes": 2304044,
+      "sha256": "b11791a5c1052910b537e7d95331623500ad208f37c478e455c5c555f0af05fa"
+    },
+    {
+      "path": "A-tail.wav",
+      "bytes": 576044,
+      "sha256": "220aa61ac377fe82558a61f51f5bf12343426dba1a7909c67e535e7bcc62b30a"
+    }
+  ]
+}
+{
+  "cue": "E",
+  "errors": [],
+  "duration": 12,
+  "steps": 64,
+  "sourceStarts": 174,
+  "body": {
+    "peak": 0.6347784399986267,
+    "bodyPeak": 0.6347784399986267,
+    "tailPeak": 0.008306298404932022,
+    "finiteSamples": 1443840,
+    "nonFiniteSamples": 0,
+    "clippedSamplesAtPcm16Ceiling": 0,
+    "totalSamples": 1443840,
+    "bodyRms": 0.05482670282103981,
+    "tailRms": 0.0026649509758866776,
+    "seamMaxAbsDifference": 0.007204439025372267
+  },
+  "scoreParity": [
+    true,
+    true
+  ],
+  "calls": [
+    true,
+    true,
+    true,
+    {
+      "kick": true,
+      "snare": true,
+      "hat": true,
+      "expanded": true
+    }
+  ],
+  "firstFsharp4": [],
+  "outputs": [
+    {
+      "path": "E-loop.wav",
+      "bytes": 2304044,
+      "sha256": "f3d22139c9231ca3e958b3a486c19013e8754f907dac5aa4c2eb915d8092e678"
+    },
+    {
+      "path": "E-tail.wav",
+      "bytes": 576044,
+      "sha256": "0f0f287e93c2160695b5c1b7f6ecd053ab3075af6a8ae8228ade43f57b77c1b5"
+    }
+  ]
+}
+ALL_CUES_RECEIPT C:\Dev\tmp\horde-music-instrumentation-20261001\reed\render\all-cues.json

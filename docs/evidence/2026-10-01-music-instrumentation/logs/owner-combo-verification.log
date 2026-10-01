@@ -1,0 +1,111 @@
+{
+  "status": "PASS-objective-checks; owner-listening-pending",
+  "referenceRepeat": [
+    {
+      "cue": "A",
+      "maxPcmLsb": 1,
+      "differingSamples": 95,
+      "tailByteIdentical": true
+    },
+    {
+      "cue": "E",
+      "maxPcmLsb": 1,
+      "differingSamples": 117,
+      "tailByteIdentical": true
+    }
+  ],
+  "matching": [
+    {
+      "variant": "reference",
+      "cue": "A",
+      "path": "reference-A-matched.wav",
+      "gainDb": 0,
+      "targetLufs": -28.38,
+      "integratedLufs": -28.38,
+      "truePeakDbtp": -7.58,
+      "lraLu": 2.2,
+      "analysisOnly": true,
+      "sha256": "8e5be0c046d95a3058037c311ea6a1b7a330f82536788fd33954980d31dfcc02",
+      "processing": "constant gain only; preview not runtime asset"
+    },
+    {
+      "variant": "owner-combo",
+      "cue": "A",
+      "path": "owner-combo-A-matched.wav",
+      "gainDb": 4.070000000000004,
+      "targetLufs": -28.38,
+      "integratedLufs": -28.36,
+      "truePeakDbtp": -3.57,
+      "lraLu": 3.8,
+      "analysisOnly": true,
+      "sha256": "4cbe97d4049216d72b8e4bcc1abf94f4a5db73ad860fa18f4c21dca35a13cf0c",
+      "processing": "constant gain only; preview not runtime asset"
+    },
+    {
+      "variant": "reference",
+      "cue": "E",
+      "path": "reference-E-matched.wav",
+      "gainDb": 0,
+      "targetLufs": -22.51,
+      "integratedLufs": -22.51,
+      "truePeakDbtp": -3.31,
+      "lraLu": 0.6,
+      "analysisOnly": true,
+      "sha256": "070278efd96e8259733801bc30fe87e232cb26b4aeb3075cb927c9c89c8afb32",
+      "processing": "constant gain only; preview not runtime asset"
+    },
+    {
+      "variant": "owner-combo",
+      "cue": "E",
+      "path": "owner-combo-E-matched.wav",
+      "gainDb": 0.7299999999999969,
+      "targetLufs": -22.51,
+      "integratedLufs": -22.52,
+      "truePeakDbtp": -2.7,
+      "lraLu": 0.8,
+      "analysisOnly": true,
+      "sha256": "3911d3d8a3ef8b81a4186c3e4080a810501d3e08addda806420e105d5971f3ec",
+      "processing": "constant gain only; preview not runtime asset"
+    }
+  ],
+  "previews": [
+    {
+      "variant": "owner-combo",
+      "path": "01-owner-combo-comparison.wav",
+      "seconds": 49.5,
+      "sha256": "c7689aaacd06ea83a0f0861d374ddc1def5a2390264eadffcf1ae6af2ca81e24",
+      "timeline": [
+        {
+          "startSeconds": 0,
+          "variant": "reference",
+          "cue": "A",
+          "durationSeconds": 12
+        },
+        {
+          "startSeconds": 12.5,
+          "variant": "owner-combo",
+          "cue": "A",
+          "durationSeconds": 12
+        },
+        {
+          "startSeconds": 25,
+          "variant": "reference",
+          "cue": "E",
+          "durationSeconds": 12
+        },
+        {
+          "startSeconds": 37.5,
+          "variant": "owner-combo",
+          "cue": "E",
+          "durationSeconds": 12
+        }
+      ],
+      "note": "body-only short audition with0.5s silence; full bodies/tails remain separate and unchanged"
+    }
+  ],
+  "unchangedRuntime": {
+    "manifestSha256": "1126f9f537efb607b11bd492e1c79d6e8b94814567ce06b654e03b0d915c9ff3",
+    "waveBytes": 20160704,
+    "pcmBytes": 20160000
+  }
+}

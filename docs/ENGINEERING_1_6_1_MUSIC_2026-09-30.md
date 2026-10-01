@@ -9,6 +9,18 @@ Owner explicitly confirmed: **Owner-supplied; authorised for Horde use only**.
 This is not a general permissive redistribution grant or a change to Chordsmith,
 Hotstrike or existing project licence statements. Publication remains unauthorised.
 
+## Instrumentation audition - October 1; choice pending
+
+Owner finds the bank too sci-fi. Bounded A/E whistle/reed studies and the owner's
+felt_piano /soft_pluck1+2 /cowboy_whistle3 allocation are rendered through the
+**retained v68 actual app voices/live FX**. Original canonical/runtime bank is
+unchanged. Separate candidate JSON/PCS1 and exact body/tail artifacts pass
+objective schedule/format/headroom checks; two loudness-matched comparisons are
+ready for listening, not game/native acceptance. Read the [finite record](ENGINEERING_1_6_1_MUSIC_INSTRUMENTATION_2026-10-01.md)
+before resumption. Next is owner choice, then full-bank derivatives/pins/checks;
+do not repeat auditions or silently use the non-equivalent Core/WAV renderer.
+Manual music listening:YES; no haptic/SFX-event implementation changes.
+
 ## Native playback checkpoint - October 1
 
 Shared single-owner worker session and copied-event inbox bridge gameplay to Core,

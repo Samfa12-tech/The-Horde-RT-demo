@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "runtimeBankChanged": false,
+  "ownerRights": "Owner-supplied; authorised for Horde use only",
+  "sourceSha256": "bc092a0f7489e52ab1e7e55e42c813ae58517ea4a73e6808de8fbbc71595d4a6",
+  "wrapperSha256": "75c53d07a372ffff282206011103bd12c345b98b0a00bc6e3565b69db827466e",
+  "retainedAdapterSha256": "689fa7124ef39ef7e36b2c122d1510ac495091cb0d0b3c37b575d481cd9e05aa",
+  "rows": [
+    {
+      "id": "owner-combo",
+      "jsonSha256": "5f5f59d02613c6093c4a62e46461445fa3f9b68bc3b4fe716dc716465af24120",
+      "pcs1Sha256": "78542874563715c63614d2137f90429a4a7e8eff2355836305b4d7bfa5b49c36",
+      "changedKeys": [
+        "chordInstrument",
+        "fxDelay",
+        "fxChorus",
+        "fxMix",
+        "melodyInstrumentsA",
+        "melodyInstrumentsE"
+      ],
+      "protectedValuesIdentical": true,
+      "pcs1Equivalent": true
+    }
+  ]
+}

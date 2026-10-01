@@ -77,3 +77,10 @@ native-only Pocket Audio Core utility pin is documented in
 `third_party/pocket-audio-core/README.horde.md`; no Chordsmith editor/synth app is
 vendored and no upstream code is relicensed. Its software permission is separate
 from this Horde-only score grant.
+
+Owner-directed instrumentation studies under
+`docs/evidence/2026-10-01-music-instrumentation/` carry the same **Horde-only**
+score grant. They retain separate editable JSON/PCS1 candidates and actual v68
+app-voice/live-FX derivatives; comparison gain changes apply only to previews.
+They are excluded from runtime packages and are not a bank-replacement,
+general acoustic-instrument library, listening or publication acceptance.

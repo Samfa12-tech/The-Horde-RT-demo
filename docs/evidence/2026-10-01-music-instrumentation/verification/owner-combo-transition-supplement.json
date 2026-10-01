@@ -1,0 +1,360 @@
+{
+  "schema": 1,
+  "status": "PASS-objective-transition-supplement; owner-listening-pending",
+  "reason": "Review found earlier illustrative transition arithmetic omitted previous-tail overlap and loop wrap. Earlier receipt retained; no render or preview regenerated.",
+  "supersedesOnly": "transitions",
+  "previousReceiptSha256": "6e3841c4f66e77464053e8419599a9f14890099652003d8c368aa2d2e3c2dbac",
+  "verifierSha256": "68791ab20fd8a6f79dfa57b8de25963d66b75c4d63cf9edc190611070c1681c9",
+  "transitions": [
+    {
+      "variant": "reference",
+      "from": "A",
+      "to": "E",
+      "repeatCycle": 0,
+      "exitFrame": 48000,
+      "crossfadeFrames": 12000,
+      "peak": 0.13180159916989656,
+      "maxAdjacentDelta": 0.006468148848943551,
+      "claim": "linear250ms arithmetic with outgoing loop wrap and previous-tail overlap; not actual Core clocks or audible acceptance"
+    },
+    {
+      "variant": "reference",
+      "from": "A",
+      "to": "E",
+      "repeatCycle": 0,
+      "exitFrame": 288000,
+      "crossfadeFrames": 12000,
+      "peak": 0.415271978413241,
+      "maxAdjacentDelta": 0.007550510676391897,
+      "claim": "linear250ms arithmetic with outgoing loop wrap and previous-tail overlap; not actual Core clocks or audible acceptance"
+    },
+    {
+      "variant": "reference",
+      "from": "A",
+      "to": "E",
+      "repeatCycle": 0,
+      "exitFrame": 575999,
+      "crossfadeFrames": 12000,
+      "peak": 0.28704519791253397,
+      "maxAdjacentDelta": 0.006893320006917534,
+      "claim": "linear250ms arithmetic with outgoing loop wrap and previous-tail overlap; not actual Core clocks or audible acceptance"
+    },
+    {
+      "variant": "reference",
+      "from": "A",
+      "to": "E",
+      "repeatCycle": 1,
+      "exitFrame": 48000,
+      "crossfadeFrames": 12000,
+      "peak": 0.13180159916989656,
+      "maxAdjacentDelta": 0.006468148848943551,
+      "claim": "linear250ms arithmetic with outgoing loop wrap and previous-tail overlap; not actual Core clocks or audible acceptance"
+    },
+    {
+      "variant": "reference",
+      "from": "A",
+      "to": "E",
+      "repeatCycle": 1,
+      "exitFrame": 288000,
+      "crossfadeFrames": 12000,
+      "peak": 0.415271978413241,
+      "maxAdjacentDelta": 0.007550510676391897,
+      "claim": "linear250ms arithmetic with outgoing loop wrap and previous-tail overlap; not actual Core clocks or audible acceptance"
+    },
+    {
+      "variant": "reference",
+      "from": "A",
+      "to": "E",
+      "repeatCycle": 1,
+      "exitFrame": 575999,
+      "crossfadeFrames": 12000,
+      "peak": 0.28704519791253397,
+      "maxAdjacentDelta": 0.006893320006917534,
+      "claim": "linear250ms arithmetic with outgoing loop wrap and previous-tail overlap; not actual Core clocks or audible acceptance"
+    },
+    {
+      "variant": "reference",
+      "from": "E",
+      "to": "A",
+      "repeatCycle": 0,
+      "exitFrame": 48000,
+      "crossfadeFrames": 12000,
+      "peak": 0.27106776635029145,
+      "maxAdjacentDelta": 0.16811008789330728,
+      "claim": "linear250ms arithmetic with outgoing loop wrap and previous-tail overlap; not actual Core clocks or audible acceptance"
+    },
+    {
+      "variant": "reference",
+      "from": "E",
+      "to": "A",
+      "repeatCycle": 0,
+      "exitFrame": 288000,
+      "crossfadeFrames": 12000,
+      "peak": 0.43794443851028986,
+      "maxAdjacentDelta": 0.011135413169754055,
+      "claim": "linear250ms arithmetic with outgoing loop wrap and previous-tail overlap; not actual Core clocks or audible acceptance"
+    },
+    {
+      "variant": "reference",
+      "from": "E",
+      "to": "A",
+      "repeatCycle": 0,
+      "exitFrame": 575999,
+      "crossfadeFrames": 12000,
+      "peak": 0.3344525996683655,
+      "maxAdjacentDelta": 0.008505579800815871,
+      "claim": "linear250ms arithmetic with outgoing loop wrap and previous-tail overlap; not actual Core clocks or audible acceptance"
+    },
+    {
+      "variant": "reference",
+      "from": "E",
+      "to": "A",
+      "repeatCycle": 1,
+      "exitFrame": 48000,
+      "crossfadeFrames": 12000,
+      "peak": 0.27106776635029145,
+      "maxAdjacentDelta": 0.16811008789330728,
+      "claim": "linear250ms arithmetic with outgoing loop wrap and previous-tail overlap; not actual Core clocks or audible acceptance"
+    },
+    {
+      "variant": "reference",
+      "from": "E",
+      "to": "A",
+      "repeatCycle": 1,
+      "exitFrame": 288000,
+      "crossfadeFrames": 12000,
+      "peak": 0.43794443851028986,
+      "maxAdjacentDelta": 0.011135413169754055,
+      "claim": "linear250ms arithmetic with outgoing loop wrap and previous-tail overlap; not actual Core clocks or audible acceptance"
+    },
+    {
+      "variant": "reference",
+      "from": "E",
+      "to": "A",
+      "repeatCycle": 1,
+      "exitFrame": 575999,
+      "crossfadeFrames": 12000,
+      "peak": 0.3344525996683655,
+      "maxAdjacentDelta": 0.008505579800815871,
+      "claim": "linear250ms arithmetic with outgoing loop wrap and previous-tail overlap; not actual Core clocks or audible acceptance"
+    },
+    {
+      "variant": "owner-combo",
+      "from": "A",
+      "to": "E",
+      "repeatCycle": 0,
+      "exitFrame": 48000,
+      "crossfadeFrames": 12000,
+      "peak": 0.11505796227912228,
+      "maxAdjacentDelta": 0.005785836359752189,
+      "claim": "linear250ms arithmetic with outgoing loop wrap and previous-tail overlap; not actual Core clocks or audible acceptance"
+    },
+    {
+      "variant": "owner-combo",
+      "from": "A",
+      "to": "E",
+      "repeatCycle": 0,
+      "exitFrame": 288000,
+      "crossfadeFrames": 12000,
+      "peak": 0.4124893948179571,
+      "maxAdjacentDelta": 0.007673500269580191,
+      "claim": "linear250ms arithmetic with outgoing loop wrap and previous-tail overlap; not actual Core clocks or audible acceptance"
+    },
+    {
+      "variant": "owner-combo",
+      "from": "A",
+      "to": "E",
+      "repeatCycle": 0,
+      "exitFrame": 575999,
+      "crossfadeFrames": 12000,
+      "peak": 0.3083881954405347,
+      "maxAdjacentDelta": 0.006035332804345872,
+      "claim": "linear250ms arithmetic with outgoing loop wrap and previous-tail overlap; not actual Core clocks or audible acceptance"
+    },
+    {
+      "variant": "owner-combo",
+      "from": "A",
+      "to": "E",
+      "repeatCycle": 1,
+      "exitFrame": 48000,
+      "crossfadeFrames": 12000,
+      "peak": 0.11505851415550197,
+      "maxAdjacentDelta": 0.005785836359752189,
+      "claim": "linear250ms arithmetic with outgoing loop wrap and previous-tail overlap; not actual Core clocks or audible acceptance"
+    },
+    {
+      "variant": "owner-combo",
+      "from": "A",
+      "to": "E",
+      "repeatCycle": 1,
+      "exitFrame": 288000,
+      "crossfadeFrames": 12000,
+      "peak": 0.4124893948179571,
+      "maxAdjacentDelta": 0.007673500269580191,
+      "claim": "linear250ms arithmetic with outgoing loop wrap and previous-tail overlap; not actual Core clocks or audible acceptance"
+    },
+    {
+      "variant": "owner-combo",
+      "from": "A",
+      "to": "E",
+      "repeatCycle": 1,
+      "exitFrame": 575999,
+      "crossfadeFrames": 12000,
+      "peak": 0.3083881954405347,
+      "maxAdjacentDelta": 0.006035332804345872,
+      "claim": "linear250ms arithmetic with outgoing loop wrap and previous-tail overlap; not actual Core clocks or audible acceptance"
+    },
+    {
+      "variant": "owner-combo",
+      "from": "E",
+      "to": "A",
+      "repeatCycle": 0,
+      "exitFrame": 48000,
+      "crossfadeFrames": 12000,
+      "peak": 0.28085107221696626,
+      "maxAdjacentDelta": 0.16624843592638933,
+      "claim": "linear250ms arithmetic with outgoing loop wrap and previous-tail overlap; not actual Core clocks or audible acceptance"
+    },
+    {
+      "variant": "owner-combo",
+      "from": "E",
+      "to": "A",
+      "repeatCycle": 0,
+      "exitFrame": 288000,
+      "crossfadeFrames": 12000,
+      "peak": 0.4407598778242337,
+      "maxAdjacentDelta": 0.01018106377351197,
+      "claim": "linear250ms arithmetic with outgoing loop wrap and previous-tail overlap; not actual Core clocks or audible acceptance"
+    },
+    {
+      "variant": "owner-combo",
+      "from": "E",
+      "to": "A",
+      "repeatCycle": 0,
+      "exitFrame": 575999,
+      "crossfadeFrames": 12000,
+      "peak": 0.3208863490707114,
+      "maxAdjacentDelta": 0.009498911506495344,
+      "claim": "linear250ms arithmetic with outgoing loop wrap and previous-tail overlap; not actual Core clocks or audible acceptance"
+    },
+    {
+      "variant": "owner-combo",
+      "from": "E",
+      "to": "A",
+      "repeatCycle": 1,
+      "exitFrame": 48000,
+      "crossfadeFrames": 12000,
+      "peak": 0.28089429405601163,
+      "maxAdjacentDelta": 0.16624842829676195,
+      "claim": "linear250ms arithmetic with outgoing loop wrap and previous-tail overlap; not actual Core clocks or audible acceptance"
+    },
+    {
+      "variant": "owner-combo",
+      "from": "E",
+      "to": "A",
+      "repeatCycle": 1,
+      "exitFrame": 288000,
+      "crossfadeFrames": 12000,
+      "peak": 0.4407598778242337,
+      "maxAdjacentDelta": 0.01018106377351197,
+      "claim": "linear250ms arithmetic with outgoing loop wrap and previous-tail overlap; not actual Core clocks or audible acceptance"
+    },
+    {
+      "variant": "owner-combo",
+      "from": "E",
+      "to": "A",
+      "repeatCycle": 1,
+      "exitFrame": 575999,
+      "crossfadeFrames": 12000,
+      "peak": 0.3208863490707114,
+      "maxAdjacentDelta": 0.009498911506495344,
+      "claim": "linear250ms arithmetic with outgoing loop wrap and previous-tail overlap; not actual Core clocks or audible acceptance"
+    }
+  ],
+  "loopChecks": [
+    {
+      "variant": "reference",
+      "cue": "A",
+      "periodFrames": 576000,
+      "periodCount": 20,
+      "totalBodyFrames": 11520000,
+      "peak": 0.41792046876430555,
+      "loopBoundaryDelta": 0.00003051850947599719,
+      "tailOffDelta": 0.0014954069643238616,
+      "claim": "offline bounded PCM arithmetic, not native playback or audible-seam acceptance"
+    },
+    {
+      "variant": "reference",
+      "cue": "E",
+      "periodFrames": 576000,
+      "periodCount": 20,
+      "totalBodyFrames": 11520000,
+      "peak": 0.6419263283181249,
+      "loopBoundaryDelta": 0.00009155552842799158,
+      "tailOffDelta": 0.0006714072084719382,
+      "claim": "offline bounded PCM arithmetic, not native playback or audible-seam acceptance"
+    },
+    {
+      "variant": "owner-combo",
+      "cue": "A",
+      "periodFrames": 576000,
+      "periodCount": 20,
+      "totalBodyFrames": 11520000,
+      "peak": 0.4149601733451338,
+      "loopBoundaryDelta": 0.0006408886989959402,
+      "tailOffDelta": 0.00039674062318796263,
+      "claim": "offline bounded PCM arithmetic, not native playback or audible-seam acceptance"
+    },
+    {
+      "variant": "owner-combo",
+      "cue": "E",
+      "periodFrames": 576000,
+      "periodCount": 20,
+      "totalBodyFrames": 11520000,
+      "peak": 0.6397900326548052,
+      "loopBoundaryDelta": 0.0006714072084719382,
+      "tailOffDelta": 0.0008545182653279214,
+      "claim": "offline bounded PCM arithmetic, not native playback or audible-seam acceptance"
+    }
+  ],
+  "retainedPreviews": [
+    {
+      "variant": "owner-combo",
+      "path": "01-owner-combo-comparison.wav",
+      "seconds": 49.5,
+      "sha256": "c7689aaacd06ea83a0f0861d374ddc1def5a2390264eadffcf1ae6af2ca81e24",
+      "timeline": [
+        {
+          "startSeconds": 0,
+          "variant": "reference",
+          "cue": "A",
+          "durationSeconds": 12
+        },
+        {
+          "startSeconds": 12.5,
+          "variant": "owner-combo",
+          "cue": "A",
+          "durationSeconds": 12
+        },
+        {
+          "startSeconds": 25,
+          "variant": "reference",
+          "cue": "E",
+          "durationSeconds": 12
+        },
+        {
+          "startSeconds": 37.5,
+          "variant": "owner-combo",
+          "cue": "E",
+          "durationSeconds": 12
+        }
+      ],
+      "note": "body-only short audition with0.5s silence; full bodies/tails remain separate and unchanged"
+    }
+  ],
+  "unchangedRuntime": {
+    "manifestSha256": "1126f9f537efb607b11bd492e1c79d6e8b94814567ce06b654e03b0d915c9ff3",
+    "waveBytes": 20160704,
+    "pcmBytes": 20160000
+  }
+}

@@ -13,6 +13,31 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
+### October 1 instrumentation audition - owner choice next
+
+The owner requests a bounded dark-fantasy instrumental pass, not a new score or
+renderer/gameplay work. Read the [single audition record](ENGINEERING_1_6_1_MUSIC_INSTRUMENTATION_2026-10-01.md)
+and [evidence/listening timeline](evidence/2026-10-01-music-instrumentation/README.md).
+Reference/whistle/reed A/E renders plus one screenshot-directed owner-combo are
+complete using the **original pinned v68 app voices/live FX**, not Core export.
+Musical source/actual events, consistent candidate JSON/PCS1,16PCM WAV contracts,
+headroom,20-period arithmetic and corrected loop-aware crossfade supplements
+pass; no audible seams/masking/native-game acceptance. Earlier transition
+arithmetic omission is recorded, original receipts retained, no rerender.
+
+Preferred owner combo: felt_piano chords, soft_pluck melody1/2, cowboy_whistle
+melody3, original chord0.28; chorus0/delay0.04/mix0.22/reverb0.46. Separate
+whistle-lead alternative retains pluck/reed support/chord0.20. Two49.5s
+loudness-matched oldA/newA/oldE/newE comparisons are archived; preview gain is
+not runtime gain. Bank/source pins and PCM20,160,000 bytes remain unchanged;
+closed-roster policy PASS. Owner's unsaved DAW project was read-only and untouched.
+**Next owner decision:** listen/choose before full-bank rendering. Do not repeat
+completed renders after compaction or treat the screenshot as exact-game audio
+acceptance. Audio/haptic manual revalidation:YES for instrumentation/mix;
+existing pending platform listening stays open. No new phone install/publication.
+Unfinished primary-hit probe and unrelated scratch remain preserved, uncommitted;
+this side slice does not close glass or reduce the agreed programme scope.
+
 ### Latest owner steering for continued work
 
 Restore current CI early: inspect/reconcile PR #15 conflicts non-destructively,

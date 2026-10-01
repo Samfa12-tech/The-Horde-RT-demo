@@ -1,0 +1,10 @@
+{
+  "variant": "whistle",
+  "renderRepo": "C:\\Dev\\tmp\\horde-music-instrumentation-20261001\\chordsmith-render-source",
+  "output": "C:\\Dev\\tmp\\horde-music-instrumentation-20261001\\whistle\\render",
+  "sourceSha256": "20cfe4eefb58b58207a3f1e008544fc461c57bbf80d3d3974fc8574d4440c4f7",
+  "wrapperSha256": "715ff1035c9112c5c2e0d62d40984d3af020d640c4505f6ea5d0f4972bbed98a",
+  "retainedAdapterSha256": "689fa7124ef39ef7e36b2c122d1510ac495091cb0d0b3c37b575d481cd9e05aa",
+  "effectiveAdapterSha256": "bee4712ac457b7771601720d73360d1f51a5e92d1b72005ab7d7895774d08ec1",
+  "route": "retained actual app voices/live FX; no synthesis/scheduler replacement"
+}

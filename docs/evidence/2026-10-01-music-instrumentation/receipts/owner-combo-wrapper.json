@@ -1,0 +1,10 @@
+{
+  "variant": "owner-combo",
+  "renderRepo": "C:\\Dev\\tmp\\horde-music-instrumentation-20261001\\chordsmith-render-source",
+  "output": "C:\\Dev\\tmp\\horde-music-instrumentation-20261001\\owner-combo\\render",
+  "sourceSha256": "5f5f59d02613c6093c4a62e46461445fa3f9b68bc3b4fe716dc716465af24120",
+  "wrapperSha256": "75c53d07a372ffff282206011103bd12c345b98b0a00bc6e3565b69db827466e",
+  "retainedAdapterSha256": "689fa7124ef39ef7e36b2c122d1510ac495091cb0d0b3c37b575d481cd9e05aa",
+  "effectiveAdapterSha256": "00792b6c6d98e1a6d0172cd87b08a7fed92fdb7e7c08a8d4ec777712249d40e9",
+  "route": "retained actual app voices/live FX; no synthesis/scheduler replacement"
+}

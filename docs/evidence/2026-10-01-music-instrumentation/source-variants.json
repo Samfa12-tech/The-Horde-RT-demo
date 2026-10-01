@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "runtimeBankChanged": false,
+  "ownerRights": "Owner-supplied; authorised for Horde use only",
+  "sourceSha256": "bc092a0f7489e52ab1e7e55e42c813ae58517ea4a73e6808de8fbbc71595d4a6",
+  "wrapperSha256": "715ff1035c9112c5c2e0d62d40984d3af020d640c4505f6ea5d0f4972bbed98a",
+  "retainedAdapterSha256": "689fa7124ef39ef7e36b2c122d1510ac495091cb0d0b3c37b575d481cd9e05aa",
+  "rows": [
+    {
+      "id": "reference",
+      "jsonSha256": "bc092a0f7489e52ab1e7e55e42c813ae58517ea4a73e6808de8fbbc71595d4a6",
+      "pcs1Sha256": "b8f86ad96b168fc32014add867760aae00a3e025701266884ce0961978d5c270",
+      "changedKeys": [],
+      "protectedValuesIdentical": true,
+      "pcs1Equivalent": true
+    },
+    {
+      "id": "whistle",
+      "jsonSha256": "20cfe4eefb58b58207a3f1e008544fc461c57bbf80d3d3974fc8574d4440c4f7",
+      "pcs1Sha256": "a6a9a07e2b0faaa000b93563488e9421f1f07f1189accf8f49265d2f378929d8",
+      "changedKeys": [
+        "chordInstrument",
+        "chordVolume",
+        "fxDelay",
+        "fxChorus",
+        "fxMix",
+        "melodyInstrumentsA",
+        "melodyInstrumentsE"
+      ],
+      "protectedValuesIdentical": true,
+      "pcs1Equivalent": true
+    },
+    {
+      "id": "reed",
+      "jsonSha256": "433e64bf02d8ad858ea2f2a3b348f5028ac926a600450c4c8d4c1857ba1797d1",
+      "pcs1Sha256": "57bbad475c96309a0ef91df03a93554e46b93238647b6d8390686449be39d17e",
+      "changedKeys": [
+        "chordInstrument",
+        "chordVolume",
+        "fxDelay",
+        "fxChorus",
+        "fxMix",
+        "melodyInstrumentsA",
+        "melodyInstrumentsE"
+      ],
+      "protectedValuesIdentical": true,
+      "pcs1Equivalent": true
+    }
+  ]
+}
