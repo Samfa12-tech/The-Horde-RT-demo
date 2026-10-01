@@ -1,0 +1,26 @@
+[
+  {
+    "image": "capture-01-opening-75.png",
+    "identical": true
+  },
+  {
+    "image": "capture-02-two-enemy-combat-75.png",
+    "identical": true
+  },
+  {
+    "image": "capture-03-skylight-75.png",
+    "identical": true
+  },
+  {
+    "image": "capture-04-player-viewmodel-lantern-high-75.png",
+    "identical": true
+  },
+  {
+    "image": "capture-05-player-viewmodel-lantern-low-look-down-75.png",
+    "identical": true
+  },
+  {
+    "image": "capture-06-glass-edge-fresnel-75.png",
+    "identical": true
+  }
+]

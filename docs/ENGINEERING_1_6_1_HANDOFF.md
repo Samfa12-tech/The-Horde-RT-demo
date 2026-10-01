@@ -13,25 +13,39 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
-### October 2 S24 visibility discriminator (current next step)
+### October 2 S24 bounded TLAS refresh (current next step)
 
 Read the [finite S24 record](ENGINEERING_1_6_1_S24_INSTANCE_HITS_2026-10-01.md), not
 the audit again. Shader probes and CPU facts are complete. Player BLAS BUILD alone
 does not restore hands; TLAS BUILD alone restores modelled hands and second-enemy
 primary intersections on exact SM-S928B. No geometry/IK/asset tuning is justified.
-Next is a normal-shader candidate that rebuilds for discrete instance-definition
-changes only and retains UPDATE for ordinary motion/refits. No repeated finished
+Reviewed normal-shader candidate9f4042f rebuilds only on discrete instance-definition
+changes and retains UPDATE for ordinary motion/refits. Cache advancement follows
+successful RT submission, not recording; move/destroy/unsubmitted tests cover
+ownership. Four-ABI Android Debug and Windows Debug/Release app builds pass;
+affected resource/preflight2/2 pass in each host configuration. Exact A627 APK
+restores hands on SM-S928B in both75% captures/Home-resume and the13-waypoint live
+replay (1840 skin updates, endpoint visible). SM-S948B six PNGs and RTX Mobile
+Diagnostic13 pipeline +13 compute PNGs are byte-identical to each normal control;
+existing Windows capture-timing gates also pass. No GPU allocation/byte changes,
+2688 CPU cache bytes plus flags. See [receipts](evidence/2026-10-02-tlas-instance-refresh/README.md).
+No new Shipping performance claim or backend-parity closure. No repeated finished
 performance sweep; opacity trial remains NO-GO. Probe code stays on separate
-`codex/horde-s24-instance-hit-probe`; only receipts/documentation are integrated.
-Normal8CB was restored/pulled identically, data preserved, with honest RT
-Home/resume in run20261002-004452. S24 live/final acceptance remains open.
+`codex/horde-s24-instance-hit-probe`, never normal runtime. S24 normal entry is
+ready for the already-requested owner live hands/enemy check; do not resend or
+interrupt it after compaction. S24 final/Shipping acceptance remains open.
 
-Normal0cf4f05 push36872121123 and PR36872130059 are freshly SUCCESS: actual GCC55,
+Normal0cf4f05 push36872121123 and PR36872130059 were SUCCESS: actual GCC55,
 Clang55, MSVC57 and focused Vulkan CPU-host15 result lines inspected in both.
 PR15 is MERGEABLE/CLEAN, still draft/unmerged. Merge b033765 has exact
 bda1b99/0cf4f05 parents and the head tree. The report-fixture startup-readiness
 fix preserves consent/privacy assertions and timeout; old-job results are not
-current validation. Remaining High/backend/report/music/final gates remain open.
+current validation. Docs-only6ec30f0 PR36879098824 passed but push36879087706
+failed only MSVC report-UI WM_SETTEXT/control106 timeout; its cause is not yet
+proven, no compiler/renderer failure observed. **Next:** integrate reviewed9f4042f/evidence,
+push coherent engineering checkpoint, inspect fresh source/merge CI and update
+PR15; then remaining High/backend/report/music/final gates. Do not repeat the
+completed finite device/image matrix. No release/main merge/publication.
 Audio/haptic manual revalidation required:NO (renderer-only/unchanged playback).
 
 ### October 1 local player-report integration (historical checkpoint)

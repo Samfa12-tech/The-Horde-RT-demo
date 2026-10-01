@@ -1314,6 +1314,30 @@ review finds no forbidden reference-zero activation transition. Next is a normal
 shader bounded instance-definition-change rebuild policy; live/current Shipping
 performance and final-device acceptance remain open. S25 remains unverified.
 
+## October 2, 2026 - bounded normal-shader TLAS refresh
+
+Source9f4042f, exact Debug A627C4A6431F40708E14327F9585BD0E6C0E7CA3133A9DED97242DFD7763D761
+installed/pulled identically, normal diagnostic shaders/counters and accepted
+player assets/poses unchanged. Policy rebuilds for discrete instance-definition
+changes only; ordinary transform/BLAS-content motion retains UPDATE. No model-name
+quality workaround, extra GPU resource or diagnostic suppression.
+
+**SM-S928B** run20261002-010051 passes combat/high-lantern75% capture, strict ASTC,
+RayQueryCompute/OpaqueFast RT presentation and Home/resume. Lead sees restored
+hands; native player pixels66584/167535. Run010411 completes the live13-waypoint
+replay,1840 skin updates, maximum socket error10 micrometres and endpoint player
+pixels12975/visible=true. Replay itself did not request lifecycle. GPU inventory
+remains43 buffers/53 allocations/17 BLAS/1 TLAS/21 instances and unchanged bytes.
+Owner live hands/enemy acceptance was requested on the normal entry build and
+is pending; no sustained Shipping or every-transition acceptance is inferred.
+
+**SM-S948B** run20261002-010625 passes six75% captures, strict ASTC, pipeline RT
+presentation and Home/resume. All six PNGs byte-identical to its normal8CB
+run20261001-222521. This is image/lifecycle regression evidence, not new performance.
+S24 and S26 evidence remain separate; S25 remains unverified. Underlying driver
+cause is not proven. [Finite receipts](evidence/2026-10-02-tlas-instance-refresh/README.md).
+Audio/haptic manual revalidation required:NO (renderer-only, semantic audio unchanged).
+
 ## Research sources
 
 - [Android NDK stable APIs - Vulkan runtime capability guidance](https://developer.android.com/ndk/guides/stable_apis)

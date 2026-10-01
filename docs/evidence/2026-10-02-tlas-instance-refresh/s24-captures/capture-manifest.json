@@ -1,0 +1,182 @@
+{
+  "schema": 2,
+  "runId": "20261002-010051",
+  "captureMode": "debug-only deterministic checkpoint intent plus ADB screencap",
+  "scale": 75,
+  "device": {
+    "serial": "R5CXC0G9GBW",
+    "model": "SM-S928B",
+    "androidVersion": "16",
+    "apiLevel": "36",
+    "displaySize": "Physical size: 1080x2340",
+    "displayDensity": "Physical density: 450"
+  },
+  "package": "com.samfa12.hordelanternrt.debug",
+  "apkSha256": "a627c4a6431f40708e14327f9585bd0e6c0e7ca3133a9ded97242dfd7763d761",
+  "installedApkSha256": "a627c4a6431f40708e14327f9585bd0e6c0e7ca3133a9ded97242dfd7763d761",
+  "sourceCommit": "9f4042f00cfd6227fb1418b92e7f3b1b5ce3e4c4",
+  "sourceDirty": true,
+  "selectedRtPipelineBundle": {
+    "opaqueFast": {
+      "key": "rayquery_compute_diagnostic_mobile_opaque_fast",
+      "sha256": "c1e4622ae5df0c87a06c36d803617c7d4e0227845cd33a9dd38de5f0d956ff58"
+    },
+    "genericDielectric": {
+      "key": "rayquery_compute_diagnostic_mobile_generic_dielectric",
+      "sha256": "e18171591d4b07ccc3e7fb071400a6581e1fc132aec06dd37c09f88c7792e302"
+    }
+  },
+  "checkpointCount": 2,
+  "checkpoints": [
+    {
+      "index": 1,
+      "checkpoint": "two-enemy-combat",
+      "expectedZone": "skeleton-room",
+      "zone": "skeleton-room",
+      "generation": 1,
+      "camera": {
+        "x": 0.0,
+        "z": -3.5,
+        "yaw": 0.0,
+        "pitch": 0.0,
+        "vitality": 3,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false
+      },
+      "renderScale": 0.75,
+      "internalExtent": {
+        "width": 810,
+        "height": 1682
+      },
+      "swapchainExtent": {
+        "width": 1080,
+        "height": 2243
+      },
+      "gpu": "Adreno (TM) 750",
+      "buildIdentity": "1.6.1 DEBUG",
+      "shaderIdentity": "c1e4622a+e1817159",
+      "selectedRtPipelineBundle": {
+        "opaqueFast": {
+          "key": "rayquery_compute_diagnostic_mobile_opaque_fast",
+          "sha256": "c1e4622ae5df0c87a06c36d803617c7d4e0227845cd33a9dd38de5f0d956ff58"
+        },
+        "genericDielectric": {
+          "key": "rayquery_compute_diagnostic_mobile_generic_dielectric",
+          "sha256": "e18171591d4b07ccc3e7fb071400a6581e1fc132aec06dd37c09f88c7792e302"
+        }
+      },
+      "outputRedBlueSwap": false,
+      "animationTime": 0.0,
+      "playerCombat": {
+        "action": "idle",
+        "actionTime": 0.0,
+        "comboQueued": false,
+        "swordRadians": 0.0,
+        "lastConsumedAttackSequence": 0,
+        "lastConsumedParrySequence": 0
+      },
+      "stablePresentedFrames": 12,
+      "presented": true,
+      "playerRenderRoute": "modelled-viewmodel",
+      "playerSkinCadenceHz": 60,
+      "playerSkinUpdates": 4,
+      "playerSkinCpuAverageMs": 9.5057,
+      "playerMaxSocketErrorM": 0.0,
+      "tlasInstanceCount": 21,
+      "sceneOnly": true,
+      "overlaysHidden": [
+        "menu",
+        "touch-actions",
+        "HUD",
+        "diagnostics",
+        "developer-overlay"
+      ],
+      "png": {
+        "file": "capture-01-two-enemy-combat-75.png",
+        "width": 1080,
+        "height": 2340,
+        "sha256": "19f28224437487149929e745917d395aef297f0ca95c4c22a98a6a6f4b3ff3e7"
+      },
+      "nativeStateFile": "capture-01-two-enemy-combat-state.json"
+    },
+    {
+      "index": 2,
+      "checkpoint": "player-viewmodel-lantern-high",
+      "expectedZone": "yellow-torch-bay",
+      "zone": "yellow-torch-bay",
+      "generation": 1,
+      "camera": {
+        "x": -10.65,
+        "z": -15.2,
+        "yaw": -1.5708,
+        "pitch": -0.3,
+        "vitality": 3,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false
+      },
+      "renderScale": 0.75,
+      "internalExtent": {
+        "width": 810,
+        "height": 1682
+      },
+      "swapchainExtent": {
+        "width": 1080,
+        "height": 2243
+      },
+      "gpu": "Adreno (TM) 750",
+      "buildIdentity": "1.6.1 DEBUG",
+      "shaderIdentity": "c1e4622a+e1817159",
+      "selectedRtPipelineBundle": {
+        "opaqueFast": {
+          "key": "rayquery_compute_diagnostic_mobile_opaque_fast",
+          "sha256": "c1e4622ae5df0c87a06c36d803617c7d4e0227845cd33a9dd38de5f0d956ff58"
+        },
+        "genericDielectric": {
+          "key": "rayquery_compute_diagnostic_mobile_generic_dielectric",
+          "sha256": "e18171591d4b07ccc3e7fb071400a6581e1fc132aec06dd37c09f88c7792e302"
+        }
+      },
+      "outputRedBlueSwap": false,
+      "animationTime": 0.0,
+      "playerCombat": {
+        "action": "idle",
+        "actionTime": 0.0,
+        "comboQueued": false,
+        "swordRadians": 0.0,
+        "lastConsumedAttackSequence": 0,
+        "lastConsumedParrySequence": 0
+      },
+      "stablePresentedFrames": 12,
+      "presented": true,
+      "playerRenderRoute": "modelled-viewmodel",
+      "playerSkinCadenceHz": 60,
+      "playerSkinUpdates": 4,
+      "playerSkinCpuAverageMs": 7.2056,
+      "playerMaxSocketErrorM": 0.0,
+      "tlasInstanceCount": 21,
+      "sceneOnly": true,
+      "overlaysHidden": [
+        "menu",
+        "touch-actions",
+        "HUD",
+        "diagnostics",
+        "developer-overlay"
+      ],
+      "png": {
+        "file": "capture-02-player-viewmodel-lantern-high-75.png",
+        "width": 1080,
+        "height": 2340,
+        "sha256": "393abef0cacd52aaa74e2c230a47e3b9d7bf84fb6c540e1e900074ff534975af"
+      },
+      "nativeStateFile": "capture-02-player-viewmodel-lantern-high-state.json"
+    }
+  ],
+  "lifecycle": {
+    "requested": true,
+    "homeResumePassed": true,
+    "honestPresentationAfterResume": true,
+    "log": "lifecycle-home-resume-logcat.txt"
+  }
+}

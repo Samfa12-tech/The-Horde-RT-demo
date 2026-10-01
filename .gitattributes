@@ -201,3 +201,6 @@ docs/evidence/2026-10-01-primary-opacity/** -text whitespace=-trailing-space,-bl
 
 # Byte-preserved bounded S24 primary-hit and acceleration-structure receipts.
 docs/evidence/2026-10-02-s24-instance-hits/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+
+# Byte-preserved bounded TLAS refresh capture and live-route receipts.
+docs/evidence/2026-10-02-tlas-instance-refresh/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol

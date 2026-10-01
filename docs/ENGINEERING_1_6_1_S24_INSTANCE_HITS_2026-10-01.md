@@ -224,7 +224,7 @@ Normal8CB restoration completed in run20261002-004452: exact install/pull SHA256
 Home/resume, no data clearing or performance/capture repetition. Probe code is
 not integrated into normal; durable receipts and this journal are retained.
 
-## Bounded normal-shader candidate (device result pending)
+## Bounded normal-shader candidate
 
 Separate branch `codex/horde-tlas-instance-refresh` starts from normal6ec30f0,
 whose runtime is0cf4f05. A small backend-neutral predicate selects BUILD for
@@ -248,7 +248,42 @@ SHA256a627c4a6431f40708e14327f9585bd0e6c0e7ca3133a9ded97242dfd7763d761.
 All70 assets equal normal8CB; CPU diagnostic probe string absent from ARM64.
 Normal shaders/counters apply (no remapping or added query). Audio/haptic manual:NO.
 
-Next finite matrix: two affected S24 captures first, then existing live deterministic
-13-waypoint route/Home-resume if restored. Relevant S26/Windows images and current
-source CI remain required before normal integration; no S25 or sustained-performance
-acceptance is implied. Keep the exact artifact, completed tests and next step here.
+### Finite device/RTX matrix completed on source9f4042f
+
+[Retained receipts](evidence/2026-10-02-tlas-instance-refresh/README.md) own the
+following completed rows. Exact A627 APK is installed/pulled identically on both
+phones; normal shaders, all70 assets and accepted geometry/animation are unchanged.
+The runner's dirty-source marker refers to preserved untracked evidence files,
+not uncommitted implementation. Do not repeat these rows without a validity reason.
+
+| Platform / run | Completed result | Scope / limitation |
+| --- | --- | --- |
+| SM-S928B capture010051 | Combat/high-lantern75%, strict ASTC, compute RT presented, Home/resume PASS; player pixels66584/167535 | Lead inspects both images: hands restored. Not owner live acceptance or Shipping performance. |
+| SM-S928B replay010411 | 13/13 waypoints, complete=true/failed=false,1840 skin updates, maximum socket error10 micrometres, endpoint player pixels12975/visible=true | Ordinary-motion UPDATE retains visibility. This row did not request lifecycle; lifecycle evidence is the separate capture row. |
+| SM-S948B capture010625 | Six75% captures and Home/resume PASS; six PNGs byte-identical to normal8CB run20261001-222521 | Within-backend image regression, not phone-performance or S24/S25 certification. |
+| RTX5050 Mobile/Diagnostic pipeline | 13/13 byte-identical images; capture median15.58345 ->15.53295ms, existing2% timing gate PASS | Debug capture timing only, not a Shipping optimisation result. |
+| RTX5050 Mobile/Diagnostic compute | 13/13 byte-identical images; capture median16.18805 ->15.51560ms, existing2% timing gate PASS | Separate within-backend control. Does not resolve the prior5/13 pipeline/compute parity failures. |
+
+Windows uses one frozen Debug executable SHA256
+485d8743c8b1a91dfdc69eec2f835926824cac6fd88996b21e92d9eaa0d3e8f3,
+960x540/100%, same GPU, unchanged controls, no portrait. Lead checks comparison
+reports,13 zero-difference entries per backend and executable hash. S24 GPU
+inventory remains43 buffers/53 allocations/17 BLAS/1 TLAS/21 instances/2 pipelines,
+9814976 host-visible /72250176 device-local bytes: no new GPU resource overhead.
+The2688-byte CPU caches are not an intermediate rendering buffer.
+
+Decision: admit the bounded renderer policy after current-head CI, retaining
+UPDATE for ordinary motion. Underlying driver cause remains unproven. S24 is at
+the regular entry screen for the already-requested owner hands/enemy check; do
+not interrupt that check or resend it after compaction. No player tuning, no
+new audio/haptic manual revalidation and no performance acceptance.
+
+Next unfinished step: integrate this exact reviewed commit and receipts into the
+engineering branch; inspect fresh push/PR compiler evidence and update PR15.
+The docs-only6ec30f0 PR run36879098824 passed, but push36879087706 failed one
+MSVC report-UI fixture: WM_SETTEXT to note control106 timed out (ERROR_TIMEOUT1460).
+Other push lanes passed; the reason for the unresponsive UI thread is unproven.
+Do not call current CI green from0cf4f05's older passes. Restore
+S26 to its normal entry/Home configuration. Owner live S24 acceptance, current
+Shipping timings with complete S24 visibility, High physical/backend and full
+final-candidate gates remain open. No S25, release/main merge/publication claim.
