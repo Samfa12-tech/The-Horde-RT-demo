@@ -2,6 +2,22 @@
 
 This file records locked decisions for the native Vulkan hardware ray-tracing demo.
 
+## Mobile lantern open-aperture quality profile - 2026-10-01
+
+The owner deliberately defers physical reward-lantern panes in the Mobile
+performance quality profile. Remove their geometry before BLAS construction;
+do not replace it with scalar transparency/shadows, raster, SSR or fake RT.
+This applies by quality profile, not Android model name or execution backend.
+Keep the native RT cage, flame, real geometric shadows, gameplay light, grips,
+animation and interactions. High (including the normal Windows profile) retains
+the canonical panes and complete physical dielectric transport unchanged.
+Preserve the full asset, glass implementation and correctness/performance evidence
+for future Mobile work. This supersedes only the Mobile-pane requirement of the
+August30 reward-lantern programme, not its other contracts. Measurement/acceptance
+remain separate from this authorised design decision; no30FPS promise or device
+certification follows from removing geometry. No publication is authorised.
+See `docs/ENGINEERING_1_6_1_MOBILE_LANTERN_PROFILE_2026-10-01.md`.
+
 ## 1.6.1 player presentation acceptance - 2026-09-27
 
 The owner accepts the dedicated modelled RT arms, wrist/cuff, repaired inner-bicep/

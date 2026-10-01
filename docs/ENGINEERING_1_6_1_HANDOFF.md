@@ -13,6 +13,20 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
+### October 1 Mobile lantern profile (current authorised work)
+
+The owner authorises omitting physical pane geometry for **Mobile quality**, not
+a model-name workaround or fake transparency. Preserve full High glass, its source
+and evidence, and accepted player/music work. No retained profiling supports a
+novel low-risk optimisation plausibly closing the physical-glass30FPS gap; do not
+repeat rejected trials or restart broad investigation. Continue from the
+[single finite experiment record](ENGINEERING_1_6_1_MOBILE_LANTERN_PROFILE_2026-10-01.md).
+Control is9f4f439; current isolated branch `codex/horde-mobile-lantern-profile`
+preserves the engineering checkout's dirty staged/probe work. Host/High containment
+and matched current-music75% S26/S24 evidence are required before playability claims.
+S26 is connected; S24 reconnection requested, not yet available. No release/main merge.
+Audio/haptic manual revalidation required: **NO**, geometry-only selection.
+
 ### October 1 instrumentation - selected whistle bank and S26 playback correction
 
 The owner requests a bounded dark-fantasy instrumental pass, not a new score or

@@ -2,6 +2,24 @@
 
 Last updated: 2026-10-01
 
+## October 1: Mobile open-aperture programme - startup setup failure (not acceptance)
+
+Exact `SM-S948B` owner report and local screenshot show RT startup error on the
+first isolated Shipping controlAPK `d41ec87c...c147777`. Direct archive inspection
+proves both enemy GLBs and sword GLB were unhydrated Git LFS pointer text. This
+control had no pane-profile hook; it produced no admitted benchmark frames and
+is excluded from performance comparison. Stop/rebuild rather than interpreting
+the missing report as slow glass. Required source objects are now hydrated;
+replacement controlAPK `3a4faf72...0540378` passes runtime header/LFS rejection
+and unchanged attribution guards. Successful build/package is not RT acceptance.
+Windows control also needed hydrated runtime assets; its held-high image then
+presented native RT. No Android gain is claimed yet.
+
+Exact `SM-S928B`/`R5CXC0G9GBW` is reconnected (ADB inventory only at this point).
+S26 is `SM-S948B`/`R5GL219SZGK`. Preserve prior S24 black-glass evidence and use
+the actual backend for its new paired75% test; S26 cannot certify S24/S25.
+See [finite profile record](ENGINEERING_1_6_1_MOBILE_LANTERN_PROFILE_2026-10-01.md).
+
 ## October 1: immutable music bank build only (no new device acceptance)
 
 Android Debug compiles the bounded transactional native bank for four ABIs.

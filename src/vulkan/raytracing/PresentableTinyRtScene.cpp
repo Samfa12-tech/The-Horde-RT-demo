@@ -8,6 +8,7 @@
 #include "vulkan/raytracing/RtFrameEvidenceCoordinator.h"
 #include "vulkan/raytracing/RtSceneRecordObservation.h"
 #include "vulkan/raytracing/RtSceneRouteConstants.h"
+#include "vulkan/raytracing/RtLanternGeometryProfile.h"
 
 #include <algorithm>
 #include <array>
@@ -2000,6 +2001,11 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         !horde::scene::assets::StaticMeshAsset::Load(
             lanternBodyDirectory / "reward-lantern-body-lod0.runtime.glb",
             lanternBodyManifest, rewardLanternBodyAsset_, diagnostic))
+        return false;
+    // The selected immutable quality bundle owns the geometry profile too.
+    // Mobile panes are absent from the BLAS, not hidden/skipped in a shader.
+    if (!SelectLanternGeometryForQuality(
+            rewardLanternBodyAsset_, pipelineBundle_.Request().quality, diagnostic))
         return false;
     staticTextureDirectory_ = (root / "textures/props/runtime").string();
     const auto viewmodelDirectory = root / "models/player/viewmodel/runtime";

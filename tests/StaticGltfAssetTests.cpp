@@ -3,6 +3,7 @@
 #include "scene/assets/DielectricTopologyMath.h"
 #include "scene/assets/StaticMeshAsset.h"
 #include "scene/assets/PlayerPrimitiveContract.h"
+#include "vulkan/raytracing/RtLanternGeometryProfile.h"
 #include "vulkan/raytracing/RtStaticMeshSlot.h"
 #include "cgltf/cgltf.h"
 
@@ -15,6 +16,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <iterator>
 #include <limits>
 #include <sstream>
 #include <string>
@@ -1591,6 +1593,301 @@ void TestProductionDielectricFixture()
           "production dielectric fixture keeps one closed twelve-triangle volume and KHR material properties");
 }
 
+void TestLanternGeometryQualityProfile()
+{
+    using horde::scene::assets::AssetManifest;
+    using horde::scene::assets::StaticMeshAsset;
+    using horde::vulkan::raytracing::DielectricQuality;
+    using horde::vulkan::raytracing::RtMaterialFlag;
+    using horde::vulkan::raytracing::RtStaticMeshSlot;
+    using horde::vulkan::raytracing::SelectLanternGeometryForQuality;
+    using horde::vulkan::raytracing::StaticRtAssetRegistration;
+
+    const auto lanternDirectory = kDielectricFixtureRoot.parent_path() / "reward-lantern-body";
+    AssetManifest manifest;
+    StaticMeshAsset source;
+    std::string diagnostic;
+    Check(AssetManifest::Load(lanternDirectory / "asset.manifest.json", manifest, diagnostic),
+          std::string("canonical reward lantern manifest loads: ") + diagnostic);
+    diagnostic.clear();
+    Check(StaticMeshAsset::Load(
+              lanternDirectory / "reward-lantern-body-lod0.runtime.glb",
+              manifest, source, diagnostic),
+          std::string("canonical reward lantern runtime asset loads: ") + diagnostic);
+    if (source.primitives.empty() || source.materials.empty()) return;
+
+    const auto sameVertex = [](const auto& a, const auto& b) {
+        return a.position == b.position && a.normal == b.normal &&
+               a.tangent == b.tangent && a.uv0 == b.uv0;
+    };
+    const auto sameMaterial = [](const auto& a, const auto& b) {
+        return a.name == b.name && a.baseColorFactor == b.baseColorFactor &&
+               a.emissiveFactor == b.emissiveFactor &&
+               a.attenuationColor == b.attenuationColor &&
+               a.emissiveStrength == b.emissiveStrength &&
+               a.metallicFactor == b.metallicFactor &&
+               a.roughnessFactor == b.roughnessFactor &&
+               a.occlusionStrength == b.occlusionStrength &&
+               a.transmissionFactor == b.transmissionFactor && a.ior == b.ior &&
+               a.thicknessFactor == b.thicknessFactor &&
+               a.attenuationDistance == b.attenuationDistance &&
+               a.numericalSpawnMinimumWidth == b.numericalSpawnMinimumWidth &&
+               a.numericalSpawnGeometryError == b.numericalSpawnGeometryError &&
+               a.baseColorTexture == b.baseColorTexture &&
+               a.normalTexture == b.normalTexture && a.ormTexture == b.ormTexture &&
+               a.emissiveTexture == b.emissiveTexture &&
+               a.textureGroup == b.textureGroup && a.flags == b.flags;
+    };
+    const auto samePrimitive = [](const auto& a, const auto& b) {
+        return a.vertexOffset == b.vertexOffset && a.indexOffset == b.indexOffset &&
+               a.indexCount == b.indexCount && a.materialIndex == b.materialIndex &&
+               a.nodeTransformIndex == b.nodeTransformIndex;
+    };
+    const auto sameNode = [](const auto& a, const auto& b) {
+        return a.name == b.name && a.world == b.world;
+    };
+    const auto sameSocket = [](const auto& a, const auto& b) {
+        return a.name == b.name && a.nodeTransformIndex == b.nodeTransformIndex &&
+               a.world == b.world;
+    };
+    const auto sameAsset = [&](const StaticMeshAsset& a, const StaticMeshAsset& b) {
+        return a.vertices.size() == b.vertices.size() &&
+               std::equal(a.vertices.begin(), a.vertices.end(), b.vertices.begin(), sameVertex) &&
+               a.indices == b.indices && a.materials.size() == b.materials.size() &&
+               std::equal(a.materials.begin(), a.materials.end(), b.materials.begin(), sameMaterial) &&
+               a.primitives.size() == b.primitives.size() &&
+               std::equal(a.primitives.begin(), a.primitives.end(), b.primitives.begin(), samePrimitive) &&
+               a.nodeTransforms.size() == b.nodeTransforms.size() &&
+               std::equal(a.nodeTransforms.begin(), a.nodeTransforms.end(), b.nodeTransforms.begin(), sameNode) &&
+               a.sockets.size() == b.sockets.size() &&
+               std::equal(a.sockets.begin(), a.sockets.end(), b.sockets.begin(), sameSocket) &&
+               a.bounds.minimum == b.bounds.minimum && a.bounds.maximum == b.bounds.maximum;
+    };
+    const auto countNamedMaterial = [](const StaticMeshAsset& asset, std::string_view name) {
+        return static_cast<std::size_t>(std::count_if(
+            asset.materials.begin(), asset.materials.end(),
+            [name](const auto& material) { return material.name == name; }));
+    };
+    const auto glassMaterialIndex = [](const StaticMeshAsset& asset) {
+        const auto found = std::find_if(asset.materials.begin(), asset.materials.end(),
+            [](const auto& material) { return material.name == "LanternGlass"; });
+        return static_cast<std::size_t>(found - asset.materials.begin());
+    };
+    const auto hasOnlyValidPrimitiveReferences = [](const StaticMeshAsset& asset) {
+        return std::all_of(asset.primitives.begin(), asset.primitives.end(),
+            [&asset](const auto& primitive) {
+                return primitive.materialIndex < asset.materials.size();
+            });
+    };
+
+    StaticMeshAsset high = source;
+    diagnostic = "stale diagnostic";
+    Check(SelectLanternGeometryForQuality(high, DielectricQuality::High, diagnostic) &&
+              diagnostic.empty() && sameAsset(high, source),
+          "High lantern geometry profile is an exact no-op");
+
+    const std::size_t glassIndex = glassMaterialIndex(source);
+    Check(countNamedMaterial(source, "LanternGlass") == 1u &&
+              source.materials[glassIndex].transmissionFactor > 0.0f &&
+              (source.materials[glassIndex].flags &
+                  static_cast<std::uint32_t>(RtMaterialFlag::Transmission)) != 0u &&
+              std::any_of(source.primitives.begin(), source.primitives.end(),
+                  [glassIndex](const auto& primitive) { return primitive.materialIndex == glassIndex; }) &&
+              std::any_of(source.primitives.begin(), source.primitives.end(),
+                  [glassIndex](const auto& primitive) { return primitive.materialIndex != glassIndex; }),
+          "canonical lantern includes named pane primitives and retained body primitives");
+    if (countNamedMaterial(source, "LanternGlass") != 1u) return;
+
+    StaticMeshAsset mobile = source;
+    diagnostic.clear();
+    Check(SelectLanternGeometryForQuality(mobile, DielectricQuality::Mobile, diagnostic),
+          std::string("Mobile lantern profile selects successfully: ") + diagnostic);
+    const auto retainedSourcePrimitive = [glassIndex](const auto& primitive) {
+        return primitive.materialIndex != glassIndex;
+    };
+    std::vector<horde::scene::assets::StaticPrimitiveRecord> expectedPrimitives;
+    std::copy_if(source.primitives.begin(), source.primitives.end(),
+                 std::back_inserter(expectedPrimitives), retainedSourcePrimitive);
+    Check(mobile.primitives.size() == expectedPrimitives.size() &&
+              std::equal(mobile.primitives.begin(), mobile.primitives.end(),
+                         expectedPrimitives.begin(), samePrimitive) &&
+              hasOnlyValidPrimitiveReferences(mobile) &&
+              std::none_of(mobile.primitives.begin(), mobile.primitives.end(),
+                  [&mobile](const auto& primitive) {
+                      return mobile.materials[primitive.materialIndex].name == "LanternGlass";
+                  }),
+          "Mobile removes every named LanternGlass primitive in stable order");
+    Check(mobile.vertices.size() == source.vertices.size() &&
+              std::equal(mobile.vertices.begin(), mobile.vertices.end(), source.vertices.begin(), sameVertex) &&
+              mobile.indices == source.indices && mobile.materials.size() == source.materials.size() &&
+              std::equal(mobile.materials.begin(), mobile.materials.end(), source.materials.begin(), sameMaterial) &&
+              mobile.nodeTransforms.size() == source.nodeTransforms.size() &&
+              std::equal(mobile.nodeTransforms.begin(), mobile.nodeTransforms.end(), source.nodeTransforms.begin(), sameNode) &&
+              mobile.sockets.size() == source.sockets.size() &&
+              std::equal(mobile.sockets.begin(), mobile.sockets.end(), source.sockets.begin(), sameSocket),
+          "Mobile retains vertex/UV/index/material/node/socket data and authored order exactly");
+    const auto hasPrimitiveUsingMaterial = [](const StaticMeshAsset& asset, std::string_view name) {
+        return std::any_of(asset.primitives.begin(), asset.primitives.end(),
+            [&asset, name](const auto& primitive) {
+                if (primitive.materialIndex >= asset.materials.size()) return false;
+                return asset.materials[primitive.materialIndex].name == name;
+            });
+    };
+    Check(hasPrimitiveUsingMaterial(mobile, "BlackIron") &&
+              hasPrimitiveUsingMaterial(mobile, "FlameCore"),
+          "Mobile retains the lantern cage and flame primitives");
+
+    // Move LanternGlass to another material index while keeping each primitive's
+    // material identity. Selection must follow the named physical material.
+    StaticMeshAsset reordered = source;
+    std::vector<std::size_t> newToOld(reordered.materials.size());
+    for (std::size_t i = 0u; i < newToOld.size(); ++i) newToOld[i] = i;
+    if (glassIndex == 0u)
+        std::rotate(newToOld.begin(), newToOld.begin() + 1, newToOld.end());
+    else
+        std::rotate(newToOld.begin(), newToOld.begin() + static_cast<std::ptrdiff_t>(glassIndex),
+                    newToOld.begin() + static_cast<std::ptrdiff_t>(glassIndex + 1u));
+    std::vector<std::size_t> oldToNew(newToOld.size());
+    std::vector<horde::scene::assets::StaticMaterial> reorderedMaterials;
+    reorderedMaterials.reserve(newToOld.size());
+    for (std::size_t newIndex = 0u; newIndex < newToOld.size(); ++newIndex)
+    {
+        oldToNew[newToOld[newIndex]] = newIndex;
+        reorderedMaterials.push_back(source.materials[newToOld[newIndex]]);
+    }
+    reordered.materials = std::move(reorderedMaterials);
+    for (auto& primitive : reordered.primitives)
+        primitive.materialIndex = static_cast<std::uint32_t>(oldToNew[primitive.materialIndex]);
+    const std::size_t reorderedGlassIndex = glassMaterialIndex(reordered);
+    std::vector<horde::scene::assets::StaticPrimitiveRecord> expectedReorderedPrimitives;
+    for (const auto& primitive : source.primitives)
+    {
+        if (primitive.materialIndex == glassIndex) continue;
+        auto expected = primitive;
+        expected.materialIndex = static_cast<std::uint32_t>(oldToNew[primitive.materialIndex]);
+        expectedReorderedPrimitives.push_back(expected);
+    }
+    diagnostic.clear();
+    Check(SelectLanternGeometryForQuality(reordered, DielectricQuality::Mobile, diagnostic) &&
+              reordered.primitives.size() == expectedReorderedPrimitives.size() &&
+              std::equal(reordered.primitives.begin(), reordered.primitives.end(),
+                         expectedReorderedPrimitives.begin(), samePrimitive) &&
+              hasOnlyValidPrimitiveReferences(reordered) &&
+              std::none_of(reordered.primitives.begin(), reordered.primitives.end(),
+                  [&reordered](const auto& primitive) {
+                      if (primitive.materialIndex >= reordered.materials.size()) return false;
+                      return reordered.materials[primitive.materialIndex].name == "LanternGlass";
+                  }) &&
+              reorderedGlassIndex != glassIndex,
+          std::string("Mobile profile follows LanternGlass by name after material reordering: ") + diagnostic);
+
+    const auto expectRejectedUnchanged = [&](StaticMeshAsset candidate, DielectricQuality quality,
+                                              std::string_view label) {
+        const StaticMeshAsset before = candidate;
+        diagnostic.clear();
+        const bool selected = SelectLanternGeometryForQuality(candidate, quality, diagnostic);
+        Check(!selected && !diagnostic.empty() && sameAsset(candidate, before), label);
+    };
+    StaticMeshAsset missingMaterial = source;
+    std::erase_if(missingMaterial.materials,
+        [](const auto& material) { return material.name == "LanternGlass"; });
+    expectRejectedUnchanged(std::move(missingMaterial), DielectricQuality::Mobile,
+                            "missing LanternGlass fails closed without mutation");
+
+    StaticMeshAsset duplicateMaterial = source;
+    duplicateMaterial.materials.push_back(*std::find_if(source.materials.begin(), source.materials.end(),
+        [](const auto& material) { return material.name == "LanternGlass"; }));
+    expectRejectedUnchanged(std::move(duplicateMaterial), DielectricQuality::Mobile,
+                            "duplicate LanternGlass fails closed without mutation");
+
+    StaticMeshAsset nonphysicalMaterial = source;
+    auto& glass = nonphysicalMaterial.materials[glassIndex];
+    glass.transmissionFactor = 0.0f;
+    expectRejectedUnchanged(std::move(nonphysicalMaterial), DielectricQuality::Mobile,
+                            "zero-transmission LanternGlass fails closed without mutation");
+
+    StaticMeshAsset unflaggedMaterial = source;
+    unflaggedMaterial.materials[glassIndex].flags &=
+        ~static_cast<std::uint32_t>(RtMaterialFlag::Transmission);
+    expectRejectedUnchanged(std::move(unflaggedMaterial), DielectricQuality::Mobile,
+                            "LanternGlass without the transmission flag fails closed without mutation");
+
+    StaticMeshAsset invalidReference = source;
+    invalidReference.primitives.front().materialIndex =
+        static_cast<std::uint32_t>(invalidReference.materials.size());
+    expectRejectedUnchanged(std::move(invalidReference), DielectricQuality::Mobile,
+                            "invalid primitive material reference fails closed without mutation");
+
+    StaticMeshAsset noPanes = source;
+    std::erase_if(noPanes.primitives,
+        [glassIndex](const auto& primitive) { return primitive.materialIndex == glassIndex; });
+    expectRejectedUnchanged(std::move(noPanes), DielectricQuality::Mobile,
+                            "lantern without pane primitives fails closed without mutation");
+
+    StaticMeshAsset allPanes = source;
+    std::erase_if(allPanes.primitives,
+        [glassIndex](const auto& primitive) { return primitive.materialIndex != glassIndex; });
+    expectRejectedUnchanged(std::move(allPanes), DielectricQuality::Mobile,
+                            "lantern containing only panes fails closed without mutation");
+
+    expectRejectedUnchanged(source, static_cast<DielectricQuality>(255u),
+                            "invalid quality fails closed without mutation");
+
+    if (mobile.primitives.size() == expectedPrimitives.size() &&
+        hasOnlyValidPrimitiveReferences(mobile))
+    {
+        RtStaticMeshSlot slot;
+        const StaticRtAssetRegistration registration{0u, 1u, 0u, 0u, &mobile};
+        diagnostic.clear();
+        Check(slot.Initialize(std::array<StaticRtAssetRegistration, 1u>{{registration}}, diagnostic),
+              std::string("Mobile lantern registers in the static RT mesh slot: ") + diagnostic);
+        const auto& instance = slot.InstanceMetadata()[0u];
+        const auto& primitiveMetadata = slot.PrimitiveMetadata();
+        const auto& vertexCounts = slot.PrimitiveVertexCounts();
+        const auto& slotIndices = slot.Indices();
+        bool metadataMatches = instance.primitiveCount == mobile.primitives.size() &&
+            instance.primitiveBase + instance.primitiveCount <= primitiveMetadata.size() &&
+            primitiveMetadata.size() == vertexCounts.size();
+        for (std::size_t i = 0u; metadataMatches && i < mobile.primitives.size(); ++i)
+        {
+            const auto& sourcePrimitive = mobile.primitives[i];
+            const auto& packedPrimitive = primitiveMetadata[instance.primitiveBase + i];
+            const auto& sourceMaterial = mobile.materials[sourcePrimitive.materialIndex];
+            metadataMatches = packedPrimitive.indexCount == sourcePrimitive.indexCount &&
+                packedPrimitive.indexOffset == sourcePrimitive.indexOffset &&
+                packedPrimitive.materialIndex == sourcePrimitive.materialIndex &&
+                packedPrimitive.vertexOffset == sourcePrimitive.vertexOffset &&
+                packedPrimitive.materialIndex < slot.Materials().size() &&
+                slot.Materials()[packedPrimitive.materialIndex].baseColorFactor ==
+                    sourceMaterial.baseColorFactor &&
+                slot.Materials()[packedPrimitive.materialIndex].emissiveFactorStrength ==
+                    std::array<float, 4u>{{sourceMaterial.emissiveFactor[0],
+                        sourceMaterial.emissiveFactor[1], sourceMaterial.emissiveFactor[2],
+                        sourceMaterial.emissiveStrength}} &&
+                slot.Materials()[packedPrimitive.materialIndex].metallicRoughnessOcclusionTransmission ==
+                    std::array<float, 4u>{{sourceMaterial.metallicFactor, sourceMaterial.roughnessFactor,
+                        sourceMaterial.occlusionStrength, sourceMaterial.transmissionFactor}} &&
+                slot.Materials()[packedPrimitive.materialIndex].iorThicknessAttenuationDistance ==
+                    std::array<float, 4u>{{sourceMaterial.ior, sourceMaterial.thicknessFactor,
+                        sourceMaterial.attenuationDistance, sourceMaterial.numericalSpawnMinimumWidth}} &&
+                slot.Materials()[packedPrimitive.materialIndex].attenuationColor ==
+                    std::array<float, 4u>{{sourceMaterial.attenuationColor[0],
+                        sourceMaterial.attenuationColor[1], sourceMaterial.attenuationColor[2],
+                        sourceMaterial.numericalSpawnGeometryError}} &&
+                (slot.Materials()[packedPrimitive.materialIndex].materialFlags[0] & sourceMaterial.flags) ==
+                    sourceMaterial.flags &&
+                static_cast<std::size_t>(packedPrimitive.indexOffset) + packedPrimitive.indexCount <=
+                    slotIndices.size();
+            for (std::size_t index = packedPrimitive.indexOffset;
+                 metadataMatches && index < static_cast<std::size_t>(packedPrimitive.indexOffset) +
+                                         packedPrimitive.indexCount; ++index)
+                metadataMatches = slotIndices[index] < vertexCounts[instance.primitiveBase + i];
+        }
+        Check(metadataMatches,
+              "static-slot geometry count/material/index metadata agrees and retained local indices fit each advertised vertex span");
+    }
+}
+
 void TestRuntimeOfflineDielectricComponentParity()
 {
     using horde::scene::assets::AssetManifest;
@@ -1802,6 +2099,7 @@ int main(int argc, char** argv)
     TestSharedTextureSourceRouting();
     TestGeometryRolePartitioning();
     TestProductionDielectricFixture();
+    TestLanternGeometryQualityProfile();
     TestRuntimeOfflineDielectricComponentParity();
 
     horde::scene::assets::AssetManifest manifest;
