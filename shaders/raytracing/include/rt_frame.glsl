@@ -6,6 +6,11 @@
 #include "rt_dielectric_transport.glsl"
 #include "rt_atmosphere.glsl"
 
+#if defined(HORDE_RT_VARIANT_INSTRUMENTATION) && HORDE_RT_VARIANT_INSTRUMENTATION == HORDE_RT_INSTRUMENTATION_DIAGNOSTIC && HORDE_RT_VARIANT_QUALITY == HORDE_RT_QUALITY_MOBILE
+#define HORDE_BACKEND_PIXEL_WITNESS
+#include "../experimental/backend_pixel_witness.glsl"
+#endif
+
 void main()
 {
 #ifdef HORDE_RT_COMPUTE_ENTRY
@@ -57,18 +62,34 @@ void main()
             RT_DIAG_ADD(primaryRewardBodyPixelCount, 1u);
     }
     vec3 color = shadePrimary(primary, rayDirection);
+#ifdef HORDE_BACKEND_PIXEL_WITNESS
+    vec3 investigationSurfaceColor = color;
+#endif
     vec4 fireVolume = integrateFireEmitters(
         origin, rayDirection, primary.hit ? primary.t : 10000.0, false);
     color = color * fireVolume.a + fireVolume.rgb;
+#ifdef HORDE_BACKEND_PIXEL_WITNESS
+    vec3 investigationAfterFire = color;
+#endif
     vec4 lichMist = lichGroundMist(origin, rayDirection, primary.t);
     color = color * lichMist.a + lichMist.rgb;
     color += staffElectricity(origin, rayDirection, primary.t);
+#ifdef HORDE_BACKEND_PIXEL_WITNESS
+    vec3 investigationAfterMist = color;
+#endif
 
     vec2 centered = uv * 2.0 - 1.0;
     float vignette = 1.0 - smoothstep(0.28, 1.22, length(centered * vec2(0.82, 1.08)));
     color = color * (0.62 + 0.38 * vignette);
     color += vec3(0.46, 0.012, 0.004) * controls.damageFlash * (0.28 + 0.72 * (1.0 - vignette));
     color = linearToSrgb(toneMapAces(max(color, vec3(0.0)) * controls.outputExposure));
+#ifdef HORDE_BACKEND_PIXEL_WITNESS
+    backendWitness(primary, rayDirection, origin, investigationSurfaceColor,
+        fireVolume, investigationAfterFire, investigationAfterMist, color);
+    // Ordinary traces/shading/counters above run even in the reserved rows.
+    // Only their final image writes are omitted to avoid racing the payload.
+    if (HORDE_RT_PIXEL_ID.y < 5u) return;
+#endif
     // The RT storage image is RGBA, while common Android/Windows swapchains are BGRA and receive a raw image copy.
     if (controls.outputRedBlueSwap > 0.5)
     {

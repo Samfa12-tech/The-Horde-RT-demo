@@ -4450,6 +4450,9 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
     manifest << std::fixed << std::setprecision(6)
              << "{\n"
              << "  \"schemaVersion\": 1,\n"
+             << "  \"investigationOnly\": true,\n"
+             << "  \"investigation\": \"six-backend-pixel-output-witness\",\n"
+             << "  \"payloadRows\": 5,\n"
              << "  \"complete\": " << (complete ? "true" : "false") << ",\n"
              << "  \"source\": \"rt-storage-image\",\n"
              << "  \"sceneOnly\": true,\n"
@@ -4737,7 +4740,9 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
     else
     {
         for (const auto& checkpoint : horde::gameplay::kShowcaseCheckpoints)
-            checkpoints.push_back(&checkpoint);
+            if (checkpoint.id == 2 || checkpoint.id == 6 || checkpoint.id == 7 ||
+                checkpoint.id == 11 || checkpoint.id == 12)
+                checkpoints.push_back(&checkpoint);
     }
     captures.reserve(checkpoints.size());
     auto fail = [&](const std::string& diagnostic) {
