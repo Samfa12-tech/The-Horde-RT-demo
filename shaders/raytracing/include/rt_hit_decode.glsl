@@ -454,6 +454,25 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
         h.t = rayQueryGetIntersectionTEXT(query, true);
         h.primitive = rayQueryGetIntersectionPrimitiveIndexEXT(query, true);
         h.instance = int(rayQueryGetIntersectionInstanceCustomIndexEXT(query, true));
+#ifdef HORDE_RT_PRIMARY_INSTANCE_HIT_PROBE
+        if (ignorePlayerNearFace)
+        {
+            // Read the actual TLAS index independently of custom-index metadata,
+            // before loading any instance/material/vertex record. These named
+            // slots are frozen to the current registry for this finite probe.
+            uint committedId = rayQueryGetIntersectionInstanceIdEXT(query, true);
+            RT_DIAG_OR(primaryOpenOpaqueTerminalInstanceMask,
+                       1u << min(committedId, 31u));
+            RT_DIAG_OR(primaryOpenOpaqueVolumeInstanceMask,
+                       1u << min(uint(h.instance), 31u));
+            RT_DIAG_ADD(primaryMismatchedExitCount,
+                        uint(committedId != uint(h.instance)));
+            RT_DIAG_ADD(primaryOpenMissCount, uint(committedId == 20u));
+            RT_DIAG_ADD(primaryOpenOpaqueCount, uint(committedId == 4u));
+            RT_DIAG_ADD(primaryInterfaceBudgetCount, uint(committedId == 2u));
+            RT_DIAG_ADD(primaryVolumeBudgetCount, uint(committedId == 18u));
+        }
+#endif
         h.position = origin + direction * h.t;
         RtInstanceMetadata instanceMetadata = rtInstances.values[h.instance];
         uint geometryIndex = rayQueryGetIntersectionGeometryIndexEXT(query, true);
