@@ -1282,6 +1282,14 @@ is claimed. Next: one independent unfiltered viewmodel-mask hardware query, not
 accepted-arm tuning. [Finite record](ENGINEERING_1_6_1_S24_INSTANCE_HITS_2026-10-01.md).
 S26/S25 certification is unchanged.
 
+Second source3e6c020 / exact3C11C209E9FA0B7CF37C27DEA86BE17EC0102579392AFCC911C28B01254C1E92
+Debug run20261002-001043 installs/pulls match, two75% compute captures and
+Home/resume pass. Normal viewmodel candidates0 and independent Opaque/viewmodel-
+only hardware query hits0 in both views; PNGs remain byte-identical. This narrows
+the missing hands below material shading/counter classification, but does not
+certify a driver or AS-update cause. One CPU geometry/instance/alignment record is
+next; no animation/asset tuning or performance rerun.
+
 ## Research sources
 
 - [Android NDK stable APIs - Vulkan runtime capability guidance](https://developer.android.com/ndk/guides/stable_apis)

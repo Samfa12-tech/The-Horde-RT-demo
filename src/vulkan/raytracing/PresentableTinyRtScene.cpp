@@ -26,6 +26,10 @@
 #include <utility>
 #include <vector>
 
+#if defined(__ANDROID__) && !defined(NDEBUG)
+#include <android/log.h>
+#endif
+
 #include "gameplay/CorridorCollision.h"
 #include "scene/assets/AssetManifest.h"
 
@@ -5466,6 +5470,56 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             static_cast<std::uint32_t>(playerGeometries.size());
         playerUpdateInfo.pGeometries = playerGeometries.data();
         playerUpdateInfo.scratchData.deviceAddress = playerScratch.address;
+#if defined(__ANDROID__) && !defined(NDEBUG)
+        // Investigation branch only; numerical CPU facts, not an RT-hit claim.
+        VkPhysicalDeviceAccelerationStructurePropertiesKHR asProperties{
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_PROPERTIES_KHR};
+        VkPhysicalDeviceProperties2 properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2};
+        properties.pNext = &asProperties;
+        auto getProperties = reinterpret_cast<PFN_vkGetPhysicalDeviceProperties2>(
+            vkGetInstanceProcAddr(instance_, "vkGetPhysicalDeviceProperties2"));
+        if (!getProperties)
+            getProperties = reinterpret_cast<PFN_vkGetPhysicalDeviceProperties2>(
+                vkGetInstanceProcAddr(instance_, "vkGetPhysicalDeviceProperties2KHR"));
+        if (getProperties) getProperties(physicalDevice_, &properties);
+        const auto& uploaded = instanceIndex == kPlayerViewmodelInstanceIndex
+            ? viewmodelUpload_ : skinnedPlayerUpload_;
+        std::array<float, 3> boundsMin{INFINITY, INFINITY, INFINITY};
+        std::array<float, 3> boundsMax{-INFINITY, -INFINITY, -INFINITY};
+        std::size_t finiteVertices = 0u;
+        const auto& transform = instances[instanceIndex].transform;
+        for (const auto& vertex : uploaded)
+        {
+            bool finite = true;
+            for (std::size_t axis = 0u; axis < 3u; ++axis)
+            {
+                const float world = transform.matrix[axis][0] * vertex.position[0] +
+                    transform.matrix[axis][1] * vertex.position[1] +
+                    transform.matrix[axis][2] * vertex.position[2] + transform.matrix[axis][3];
+                finite = finite && std::isfinite(world);
+                boundsMin[axis] = std::min(boundsMin[axis], world);
+                boundsMax[axis] = std::max(boundsMax[axis], world);
+            }
+            finiteVertices += finite ? 1u : 0u;
+        }
+        __android_log_print(ANDROID_LOG_INFO, "HordeLanternRT",
+            "HORDE_INSTANCE_CPU_PROBE id=%u mask=%u geometries=%u vertices=%zu finite=%zu "
+            "bounds_min=%g,%g,%g bounds_max=%g,%g,%g camera=%g,%g,%g "
+            "vertex_address=%llu vertex_bytes=%llu blas=%llu tlas_ref=%llu "
+            "scratch=%llu scratch_bytes=%llu scratch_alignment=%u scratch_remainder=%llu",
+            instanceIndex, instances[instanceIndex].mask, playerUpdateInfo.geometryCount,
+            uploaded.size(), finiteVertices, boundsMin[0], boundsMin[1], boundsMin[2],
+            boundsMax[0], boundsMax[1], boundsMax[2], frame.cameraX, kShowcaseEyeWorldY, frame.cameraZ,
+            static_cast<unsigned long long>(vertexBuffer.address),
+            static_cast<unsigned long long>(vertexBuffer.size),
+            static_cast<unsigned long long>(playerBlas.address),
+            static_cast<unsigned long long>(instances[instanceIndex].accelerationStructureReference),
+            static_cast<unsigned long long>(playerScratch.address),
+            static_cast<unsigned long long>(playerScratch.size),
+            asProperties.minAccelerationStructureScratchOffsetAlignment,
+            static_cast<unsigned long long>(asProperties.minAccelerationStructureScratchOffsetAlignment
+                ? playerScratch.address % asProperties.minAccelerationStructureScratchOffsetAlignment : 0u));
+#endif
         vkCmdBuildAccelerationStructuresKHR_(commandBuffer, 1u, &playerUpdateInfo,
                                              playerRangePointers.data());
     };

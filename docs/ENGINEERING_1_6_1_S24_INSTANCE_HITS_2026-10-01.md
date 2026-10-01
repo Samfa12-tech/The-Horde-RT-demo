@@ -1,6 +1,6 @@
 # S24 bounded primary-hit discriminator
 
-Status: first discriminator complete; one follow-up query pending. Normal control source0cf4f05; exact
+Status: both shader discriminators complete; CPU AS facts pending. Normal control source0cf4f05; exact
 normal Debug8CB APK and four existing captures are retained in the
 [visual follow-up](evidence/2026-10-01-s24-visual-followup/RESULTS.md).
 Do not repeat the finished opacity/performance trial or tune accepted arms.
@@ -103,7 +103,39 @@ passes (7s incremental), actual ARM64 module bytes verified, all70 assets equal
 normal8CB. Frozen `C:/Dev/tmp/horde-s24-instance-hits-20261001/instance-hits-second-debug.apk`,
 SHA2563c11c209e9fa0b7cf37c27dea86be17ec0102579392afcc911c28b01254c1e92.
 
-Next unfinished step: two second-probe captures and comparison; then restore
-normal8CB. Do not rerun the completed first-probe matrix.
+## Second discriminator completed
+
+Source3e6c020dbfde479895fb9b96fce2206a2f5320c5, exact3C11 APK install/pull
+matches on SM-S928B. Run20261002-001043 passes the two75% captures and Home/resume.
+Both PNGs again byte-identical to normal8CB. Primary normal candidate masks equal
+committed masks15 combat/131469 high; viewmodel20 candidate counts0. Independent
+Opaque/viewmodel-only query counts0 hits in both; unexpected-ID count0 and direct
+ID mask0. Original metadata-based player count remains0. The first committed
+counts are unchanged. Thus changing primary candidate handling or material shading
+alone cannot supply these absent intersections in this probe. It does not yet
+prove a driver defect, bad AS update or CPU pose/instance error.
+
+Next discriminator is one high-lantern capture with Android-Debug-only CPU facts:
+actual masks, finite uploaded-vertex/world bounds, buffer/BLAS/TLAS addresses,
+scratch size and the actual reported scratch alignment/remainder. No shader
+recompilation, extra query or animation change. Source review notes a missing
+explicit scratch-alignment guarantee, not demonstrated S24 misalignment; initial
+vs update geometry opacity is also a latent material risk (current player parts
+are opaque). Do not fix a speculative cause or repeat completed shader captures.
+
+CPU-fact candidate is built and frozen, without shader regeneration. Initial
+Debug build failed because directly linking vkGetPhysicalDeviceProperties2 is
+not supported by the existing Android API24 link target. Resolving the core/KHR
+entry point through the existing instance mechanism fixes that diagnostic-only
+link failure; minimum API and production Vulkan loading remain unchanged.
+Corrected four-ABI Debug build passes (21s); logs retain both attempts. Frozen
+`C:/Dev/tmp/horde-s24-instance-hits-20261001/instance-cpu-facts-debug.apk`, SHA256
+2904c7e2bf82c3690cd443d2ce58343cd3b236f8da5b8958609ba0c4d9481e55.
+All70 APK assets are byte-identical to the second-probe artifact. This candidate
+retains the second-probe shader and its investigation-only counter meanings.
+
+Next unfinished step: collect one high-lantern capture/CPU log with this exact
+artifact, then restore normal8CB. Do not rebuild unchanged artifacts; diagnose
+only from the actual facts. Normal Shipping stays unchanged.
 Audio/haptic manual revalidation required: **NO** (unchanged semantic playback).
 No main merge, release or publication authorised.
