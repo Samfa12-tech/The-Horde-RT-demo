@@ -34,10 +34,21 @@ records Mobile75%1080x2235/pipeline/presented; build string1.6.1 is not a hash.
 Final8CB97689 installed/pulled match separately verifies visible off/on consent
 marks after screenshot-found contrast defect; no repeated export/performance run.
 Phone Back returns paused menu, then Home. No S24 operations; it remains released.
-Current-head CI is pending push, not inferred from cc3c077's green runs.
+ca58f09 push36853938787/PR36853945981 SUCCESS: actual eight logs inspected,
+GCC55/Clang55/MSVC57/focused Vulkan CPU-host15 each. PR merge4aa5e0a has exact
+bda1b99/ca58f09 parents and the head tree. Not inferred from old green jobs.
 
-**Next:** push/verify coherent checkpoint and fresh CI; real Windows application
-entry/picker/write gate, then confirmed reporting destination/authority for any
+Actual Windows owned-process smoke opens real entry/default consent/context and
+native picker, but two bounded helper attempts fail to identify modern filename
+control1152 before any path/write. Negative receipts retained; no product save
+failure or RTX acceptance claimed. First cleanup kills only its created process;
+second cancels dialog and closes without forced cleanup. See the
+[current run status](evidence/2026-10-01-report-export/RUN_STATUS.md).
+One independent UIA follow-up also stops before save: initial metadata does not
+identify unique filename Edit; owned process exits normally0. Three incomplete
+attempts retained, no Windows file-save pass/product failure inferred.
+**Next:** inspect settled picker metadata, identify actual filename element and one bounded
+real path/write gate, then confirmed reporting destination/authority for any
 remote integration. All performance/High glass/backend, S24 visuals/S25, music
 focus/balance and final-candidate gates remain open; no player retuning or repeated
 finished matrix. Audio/haptic manual revalidation required: **NO**, existing paused

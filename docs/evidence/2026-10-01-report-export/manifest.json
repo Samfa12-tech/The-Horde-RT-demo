@@ -1,6 +1,7 @@
 {
   "schemaVersion": 1,
   "source": "69afe4e2b9c3499061fa285529d96dd01bd75766",
+  "validatedEvidenceCommit": "ca58f0956637f9063fe1cda42989ad5f74daa47d",
   "files": [
     {
       "path": "android/consent-rejected-ui.xml",
@@ -88,6 +89,16 @@
       "sha256": "d430a9b1b2f4f3e0607025ace5a1f5f8277dbc9e85403d636122fc87e10c6a69"
     },
     {
+      "path": "host/ci-pr-ca58f09.log",
+      "bytes": 390104,
+      "sha256": "79c73df634fc8766b2418dbb3fcf7f45cab145645d6a38df7369e6cc2b8e1493"
+    },
+    {
+      "path": "host/ci-push-ca58f09.log",
+      "bytes": 397288,
+      "sha256": "7f2e97f7740cd8fc03c8a847c9f05fb565b697d197e1f045330f1d1b6f0b4965"
+    },
+    {
       "path": "host/horde-report-android-checkbox-build.log",
       "bytes": 3710,
       "sha256": "9c0bbe9f3f82cc999397e9b2b17bb4e2d114e57d7538778c326d81ce5b749760"
@@ -156,6 +167,66 @@
       "path": "README.md",
       "bytes": 5741,
       "sha256": "421e53bce659b9276026b0ec56e38231e7904747c1a155b97b17e9cedf4721f1"
+    },
+    {
+      "path": "RUN_STATUS.md",
+      "bytes": 4592,
+      "sha256": "8ac22a507c4ed734b9da1cb263e077c4093a8bf1e4ed0ff68448353b9135320f"
+    },
+    {
+      "path": "windows/windows-attempt1-stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "windows/windows-attempt1-stdout.log",
+      "bytes": 2069,
+      "sha256": "d53334b6f55acf2e825bfdc307944f98a6f9f9241e331c7bb4868a52c6f93272"
+    },
+    {
+      "path": "windows/windows-attempt1.log",
+      "bytes": 534,
+      "sha256": "afd4b70fabee8a1325e1030253386fb82bac830b9af08aa5871da48ebf0623d5"
+    },
+    {
+      "path": "windows/windows-real-save-uia-once.ps1",
+      "bytes": 9583,
+      "sha256": "a27a416a58647e72977a539572e74aadbe92ae2bf5ccc32227822165eba6fd6d"
+    },
+    {
+      "path": "windows/windows-real-save.log",
+      "bytes": 829,
+      "sha256": "16e228badb6c99f62be8915f86c83587e901c6f6778048f44b523d5873d25472"
+    },
+    {
+      "path": "windows/windows-real-save.ps1",
+      "bytes": 8791,
+      "sha256": "93bca0b0ab00e3efda8c5e60bd954ea978e2972cc11d61d323d2a59f2cc48a68"
+    },
+    {
+      "path": "windows/windows-real-stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "windows/windows-real-stdout.log",
+      "bytes": 2069,
+      "sha256": "0f38950a3e2c7c56798c167f8e7febcc2f741989f4dd578f5bbb28e4bb9596eb"
+    },
+    {
+      "path": "windows/windows-real-uia-once.log",
+      "bytes": 270,
+      "sha256": "962f7371ceb06e5c907f4447645965025737e2a939d23d5dff9febeec8baca03"
+    },
+    {
+      "path": "windows/windows-real-uia-once.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "windows/windows-real-uia-once.stdout.log",
+      "bytes": 2068,
+      "sha256": "d57369bae49c1177cc2623acf1d88f241e6574ccb5991efe935efdd81bae9872"
     }
   ]
 }

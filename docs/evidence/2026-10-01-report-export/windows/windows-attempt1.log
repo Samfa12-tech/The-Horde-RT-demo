@@ -1,0 +1,29 @@
+1092:Static
+1091:Static
+1093:Static
+1120:ListBox
+1095:Static
+1028:Button
+1:Button
+2:Button
+1038:Button
+-1:ScrollBar
+0:ToolbarWindow32
+0:WorkerW
+40965:ReBarWindow32
+0:TravelBand
+0:ToolbarWindow32
+0:UpBand
+0:ToolbarWindow32
+41477:Address Band Root
+0:msctls_progress32
+0:Breadcrumb Parent
+1001:ToolbarWindow32
+0:ToolbarWindow32
+0:SeparatorBand
+0:UniversalSearchBand
+0:Search Box
+0:SearchEditBoxWrapperClass
+0:DirectUIHWND
+0:SeparatorBand
+Own smoke process required cleanup termination; not a clean exit pass

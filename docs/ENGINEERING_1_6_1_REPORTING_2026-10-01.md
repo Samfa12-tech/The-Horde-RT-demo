@@ -57,7 +57,8 @@ synthetic exported bytes, logs, native UI fixtures and limits.
 | Android Debug/lint | Build and lint pass; four ABI native builds, no shader/gameplay/music edit |
 | S26 EF2ECFE4 candidate | Actual unchecked consent rejection, note-only picker cancellation and explicit retry/save, new-form consent reset, and independently opted-in context/save pass |
 | S26 UI follow-up | Final8CB97689 installed/pulled match; visible off/on marks verified at unchanged large font scale. Disabled retry label corrected in source. Only affected visual checks repeated, not finished exports/performance/music |
-| CI | Await fresh checks for the pushed integration head; old cc3c077 jobs do not validate these changes |
+| CI | ca58f09 branch36853938787/PR36853945981 SUCCESS; actual eight logs inspected: GCC55/Clang55/MSVC57/focused Vulkan CPU-host15 in each. Exact merge parents/tree verified |
+| Windows actual picker smoke | Real entry/default consent/context/picker opening observed; two control-ID attempts and one independent UIA read cannot identify modern filename element. All stop before path/write; actual save remains inconclusive, not a product failure |
 
 The S26 context JSON actually reports SM-S948B/Adreno840/RayTracingPipeline,
 Mobile/75%/1080x2235 and `rtPresented:true`. Its embedded build string is `1.6.1`,
@@ -66,11 +67,13 @@ phone report is a new frame-rate, transport-correctness or release acceptance.
 
 ## Next unfinished step
 
-1. Final S26 UI contrast evidence is archived and code reviewed/committed. Push
-   this slice and obtain current-head compiler/integration CI. Do not repeat completed save tests
-   without a concrete invalidation.
-2. Exercise the real Windows application entry and native file picker/write at
-   the next desktop interaction gate. Mocked destinations are explicitly separate.
+1. Local integration/push and fresh source/integration CI are complete atca58f09.
+   [CI and Windows continuation](evidence/2026-10-01-report-export/RUN_STATUS.md)
+   owns exact handles and completed failures; no completed test/build replay.
+2. Inspect settled modern Windows picker metadata in the same owned process,
+   identify the actual filename element, then one bounded path/write check.
+   If reliable automation is unavailable, keep desktop interaction explicitly open. Opening the real
+   form/picker or passing mocked destinations does not close this gate.
 3. Complete remote reporting only with a confirmed appropriate backend destination
    and authority; deployment/account configuration and real delivery are still open.
    Do not send unsolicited test reports or introduce client secrets.
