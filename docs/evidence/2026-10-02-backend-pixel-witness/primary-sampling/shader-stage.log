@@ -1,0 +1,26 @@
+C:\Dev\tmp\horde-backend-pixel-witness-20261002\primary-sampling\modules\diagnostic_high_generic_dielectric\minimal.rgen.resolved
+Raygen variant diagnostic_high_generic_dielectric: 255740 bytes; functions=66; calls=208; ray-query sites=2; dependency SHA-256=2799a8529ab181410e91ebcef5596739c43a3380839f3e153230e8f0f1417465
+C:\Dev\tmp\horde-backend-pixel-witness-20261002\primary-sampling\modules\diagnostic_high_opaque_fast\minimal.rgen.resolved
+Raygen variant diagnostic_high_opaque_fast: 518312 bytes; functions=1; calls=0; ray-query sites=23; dependency SHA-256=f3cdeb441812ec86a847fdb2105584220d0ae93ce33aae2ff9b803bbe1cc8746
+C:\Dev\tmp\horde-backend-pixel-witness-20261002\primary-sampling\modules\diagnostic_mobile_generic_dielectric\minimal.rgen.resolved
+Raygen variant diagnostic_mobile_generic_dielectric: 276248 bytes; functions=70; calls=278; ray-query sites=2; dependency SHA-256=b5cafdba4b031a00dd19b47cc51402eb4f00a90ab57ec7ff0f4f82f6ba1cf813
+C:\Dev\tmp\horde-backend-pixel-witness-20261002\primary-sampling\modules\diagnostic_mobile_opaque_fast\minimal.rgen.resolved
+Raygen variant diagnostic_mobile_opaque_fast: 589680 bytes; functions=1; calls=0; ray-query sites=23; dependency SHA-256=0b8877503d6217e00458c86bfda25649ddc39513019077e7230f2553911fb6e6
+C:\Dev\tmp\horde-backend-pixel-witness-20261002\primary-sampling\modules\shipping_high_generic_dielectric\minimal.rgen.resolved
+Raygen variant shipping_high_generic_dielectric: 246912 bytes; functions=66; calls=208; ray-query sites=2; dependency SHA-256=7c62ac35ecbb6b24096b0100eba3eea7a2bf735979ef6578c20ac6aa47afc10e
+C:\Dev\tmp\horde-backend-pixel-witness-20261002\primary-sampling\modules\shipping_high_opaque_fast\minimal.rgen.resolved
+Raygen variant shipping_high_opaque_fast: 514076 bytes; functions=1; calls=0; ray-query sites=23; dependency SHA-256=a28c2702eb4c1598f62234206597c9d3ee9f0432e027f0e72db074e099c743b7
+C:\Dev\tmp\horde-backend-pixel-witness-20261002\primary-sampling\modules\shipping_mobile_generic_dielectric\minimal.rgen.resolved
+Raygen variant shipping_mobile_generic_dielectric: 246912 bytes; functions=66; calls=208; ray-query sites=2; dependency SHA-256=3646578e8fe9a43690a4fb479456d6b1183f3aa176b36833780bd8184bf85cfe
+C:\Dev\tmp\horde-backend-pixel-witness-20261002\primary-sampling\modules\shipping_mobile_opaque_fast\minimal.rgen.resolved
+Raygen variant shipping_mobile_opaque_fast: 514076 bytes; functions=1; calls=0; ray-query sites=23; dependency SHA-256=c94a4027126c5551437fd7da26bed8ddc0bfaa5beb2aaf230ab461488fe58318
+RayQuery compute variant rayquery_compute_diagnostic_high_generic_dielectric: bytes=255976; functions=66; calls=208; ray-query sites=2; atomics=41; SPIR-V SHA-256=6228d18d2951a3d8c8fe4247275236ae4c71d4457b6ab7d8e5355451be13368d
+RayQuery compute variant rayquery_compute_diagnostic_high_opaque_fast: bytes=518572; functions=1; calls=0; ray-query sites=23; atomics=5; SPIR-V SHA-256=75e9f30850c5925e064914a5f6f449bd24ba9176c54a4aa5ad24940ca59b3f59
+RayQuery compute variant rayquery_compute_diagnostic_mobile_generic_dielectric: bytes=276484; functions=70; calls=278; ray-query sites=2; atomics=41; SPIR-V SHA-256=5a93fc92b1d28b4d1fc8c460b4c8b3f279de7b129116bd6650fb14758eb34409
+RayQuery compute variant rayquery_compute_diagnostic_mobile_opaque_fast: bytes=589876; functions=1; calls=0; ray-query sites=23; atomics=5; SPIR-V SHA-256=fd07c6384ce65e4b6bee962e8cc8a0ccaf445bf65fcead046b12adbb15a4fd7f
+RayQuery compute variant rayquery_compute_shipping_high_generic_dielectric: bytes=247148; functions=66; calls=208; ray-query sites=2; atomics=0; SPIR-V SHA-256=868920c207a7a182bca8ad520c8bee6049fef4f4315c43cf29b0cbeb17b6a265
+RayQuery compute variant rayquery_compute_shipping_high_opaque_fast: bytes=514336; functions=1; calls=0; ray-query sites=23; atomics=0; SPIR-V SHA-256=a2e1d37e18535e9bdc7d6a15ee2329265a843a2cb49c638a9caf8532d136ec3e
+RayQuery compute variant rayquery_compute_shipping_mobile_generic_dielectric: bytes=247148; functions=66; calls=208; ray-query sites=2; atomics=0; SPIR-V SHA-256=b64f8c9a60e2f8e02aca23da205f0432af086884a963b1737635db2cdc486203
+RayQuery compute variant rayquery_compute_shipping_mobile_opaque_fast: bytes=514336; functions=1; calls=0; ray-query sites=23; atomics=0; SPIR-V SHA-256=a2e1d37e18535e9bdc7d6a15ee2329265a843a2cb49c638a9caf8532d136ec3e
+Frozen eight RayQuery compute artifacts, provenance catalog, and generated adapter.
+INVESTIGATION ONLY: output witness modules staged; no production frozen-cost admission claimed.

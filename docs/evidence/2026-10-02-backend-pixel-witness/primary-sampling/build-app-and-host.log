@@ -1,0 +1,28 @@
+CMake is re-running because C:/Dev/worktrees/horde-backend-six-pixel-witness/build/presets/windows-x64-debug/CMakeFiles/generate.stamp is out-of-date.
+  the file 'C:/Dev/worktrees/horde-backend-six-pixel-witness/src/vulkan/raytracing/RtPipelineVariantCatalog.generated.h'
+  is newer than 'C:/Dev/worktrees/horde-backend-six-pixel-witness/build/presets/windows-x64-debug/CMakeFiles/generate.stamp.depend'
+  result='-1'
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26200.
+Generated RT catalog adapter is current.
+-- Strict non-contracted asset-transform arithmetic enabled for GltfDocument.cpp and StaticMeshAsset.cpp: /fp:strict
+-- Vulkan SDK found: 1.4.350
+-- Legacy torch-failure identifiers were rejected by the configured MSVC compiler.
+-- Horde Lantern RT: Vulkan capability probe and Windows diagnostic targets are available; Android builds from android/.
+-- Configuring done (13.1s)
+-- Generating done (0.6s)
+-- Build files have been written to: C:/Dev/worktrees/horde-backend-six-pixel-witness/build/presets/windows-x64-debug
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> C:\Dev\worktrees\horde-backend-six-pixel-witness\build\presets\windows-x64-debug\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> C:\Dev\worktrees\horde-backend-six-pixel-witness\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.lib
+  horde_windows_music.vcxproj -> C:\Dev\worktrees\horde-backend-six-pixel-witness\build\presets\windows-x64-debug\Debug\horde_windows_music.lib
+  RtPipelineVariantProvider.cpp
+  horde_rt_probe_core.vcxproj -> C:\Dev\worktrees\horde-backend-six-pixel-witness\build\presets\windows-x64-debug\Debug\horde_rt_probe_core.lib
+  DiagnosticWindow.cpp
+  horde_rt_diagnostic_window.vcxproj -> C:\Dev\worktrees\horde-backend-six-pixel-witness\build\presets\windows-x64-debug\Debug\HordeLanternRT.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> C:\Dev\worktrees\horde-backend-six-pixel-witness\build\presets\windows-x64-debug\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> C:\Dev\worktrees\horde-backend-six-pixel-witness\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.lib
+  horde_rt_probe_core.vcxproj -> C:\Dev\worktrees\horde-backend-six-pixel-witness\build\presets\windows-x64-debug\Debug\horde_rt_probe_core.lib
+  horde_rt_character_render_slot_smoke.vcxproj -> C:\Dev\worktrees\horde-backend-six-pixel-witness\build\presets\windows-x64-debug\Debug\horde_rt_character_render_slot_smoke.exe

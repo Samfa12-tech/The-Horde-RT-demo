@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "candidate": "a41afdb41f21e632419b061682669abde1b50ba5",
+  "payloadRows": 5,
+  "toleranceMaximum": 3,
+  "toleranceFraction": 0.001,
+  "records": [
+    {
+      "file": "12-two-enemy-combat.png",
+      "pipelineSha256": "21e6cef1831651963c266d9f11e328a1318b75012cd9aad4aa778243ecf4eae5",
+      "computeSha256": "0f9c6ff45f70f3f6c0c5dad83ac116a7d2182cf16362826ed5d1d65641a37949",
+      "comparison": {
+        "maximumChannelDifference": 92,
+        "pixelsDifferentByMoreThanOne": 4,
+        "differentFraction": 7.78816199376947E-06,
+        "unchangedGate": false,
+        "outliers": [
+          {
+            "x": 542,
+            "y": 311,
+            "maximumChannelDifference": 7,
+            "pipelineRgb": [
+              183,
+              134,
+              52
+            ],
+            "computeRgb": [
+              190,
+              140,
+              54
+            ]
+          },
+          {
+            "x": 564,
+            "y": 393,
+            "maximumChannelDifference": 92,
+            "pipelineRgb": [
+              118,
+              64,
+              18
+            ],
+            "computeRgb": [
+              26,
+              14,
+              8
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -284,3 +284,44 @@ poll/install, main merge, release or publication.
 
 Audio/haptic manual revalidation required:NO: investigation output only;
 gameplay/event-time/listener/PCM/haptic inputs unchanged.
+
+## Primary PBR sampling discriminator (completed; one targeted candidate next)
+
+Source `a41afdb41f21e632419b061682669abde1b50ba5` appends30 fields from the
+existing primary PBR decode to the85-field observer. No additional query or
+texture sample is performed; five output rows remain reserved, no GPU-buffer
+or HitInfo ABI changes. Exact Debug executable SHA-256
+`f4f13c0ab13a40cdc34ef0450f1b3d3e86918c89b6db55dbbed9021eea9afe10`.
+Fresh app/host build PASS; affected Debug CTest1/1 PASS4.25s. All16 shader
+families compile/optimise/disassemble/validate;8 Shipping and4 High/Diagnostic
+SPIR-V hashes remain byte-identical to `c007066`, with all8 Shipping modules
+still zero atomics/no binding22. Only4 Mobile/Diagnostic observer modules change.
+
+Finite matrix DONE: one checkpoint12 capture per backend, both exit0. The
+[115-field comparison](primary-sampling/witness-comparison.json) reproduces
+every non-payload pixel exactly against `1975e03`, with complete scene/CPU
+geometry/visibility/allocation identity. [Backend parity](primary-sampling/backend-parity.json)
+still fails: the same two outliers, max92. These fields are interpretable
+because the original rendering recurs; they are not a corrected-image pass.
+Do not repeat this completed pair or its unchanged control build.
+
+At both542,311 and564,393, the captured hardware barycentric components are
+bit-identical across backends. UV X differs exactly one binary32 ULP (pipeline
+larger), UV Y is identical. Tangent-frame components differ only about1e-7,
+whereas sampled normal X differs9.1554e-5 and.0007019043 respectively. Base and
+ORM samples also differ. This demonstrates that interpolation has already
+diverged before the texture operations; it does not claim no other differing
+operation exists or guarantee that matching UVs alone will close parity.
+
+Next bounded candidate: constrain contraction/reassociation only at the existing
+three-vertex PBR UV interpolation with GLSL `precise`. No UV quantisation,
+texture/LOD/material changes, smoothing, reflected-ray adjustment or tolerance
+relaxation. Inspect actual SPIR-V and frozen-cost delta, then one checkpoint12
+capture pair against this retained control. Preserve expected corrected-image
+differences and evaluate the unchanged backend gate separately. This is not
+permission for a wider precision sweep. Normal Shipping remains unchanged;
+the earlier light-region candidate still fails cost admission. No phone action,
+main merge, release or publication. Owner-disconnected S26 gates remain open.
+
+Audio/haptic manual revalidation required:NO: output-only investigation;
+gameplay/event-time/listener/PCM/haptic inputs unchanged.
