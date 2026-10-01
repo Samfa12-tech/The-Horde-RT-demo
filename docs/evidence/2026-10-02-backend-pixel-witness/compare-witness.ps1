@@ -1,7 +1,8 @@
 param(
     [Parameter(Mandatory)][string]$ControlRoot,
     [Parameter(Mandatory)][string]$WitnessRoot,
-    [Parameter(Mandatory)][string]$OutputPath
+    [Parameter(Mandatory)][string]$OutputPath,
+    [ValidateSet('Output','Surface')][string]$WitnessStage = 'Output'
 )
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
@@ -17,7 +18,7 @@ public static class HordeBackendWitnessPixels {
         public int[] witnessRgb;
         public float[] fields;
     }
-    public static Result Read(string control, string witness, int x, int y, int row) {
+    public static Result Read(string control, string witness, int x, int y, int row, int fieldCount) {
         using (var a = new Bitmap(control)) using (var b = new Bitmap(witness)) {
             if (a.Width != 960 || a.Height != 540 || a.Size != b.Size)
                 throw new InvalidOperationException("Unexpected witness extent.");
@@ -32,8 +33,10 @@ public static class HordeBackendWitnessPixels {
             Color original = a.GetPixel(x,y), observed = b.GetPixel(x,y);
             result.controlRgb = new int[] {original.R,original.G,original.B};
             result.witnessRgb = new int[] {observed.R,observed.G,observed.B};
-            result.fields = new float[48];
-            for (int field = 0; field < 48; ++field) {
+            if (fieldCount != 48 && fieldCount != 85)
+                throw new InvalidOperationException("Unknown finite witness schema.");
+            result.fields = new float[fieldCount];
+            for (int field = 0; field < fieldCount; ++field) {
                 Color p = b.GetPixel(field*2,row), q = b.GetPixel(field*2+1,row);
                 if (p.A != 255 || q.A != 255 || q.G != 0 || q.B != 0)
                     throw new InvalidOperationException("Invalid lossless payload framing.");
@@ -56,6 +59,18 @@ $names = @('sentinel','x','y','hit','instance','primitive','material','t',
     'surfaceR','surfaceG','surfaceB','fireR','fireG','fireB','fireA',
     'afterFireR','afterFireG','afterFireB','afterMistR','afterMistG','afterMistB',
     'displayR','displayG','displayB','originX','originY','originZ')
+$expectedInvestigation = 'six-backend-pixel-output-witness'
+if ($WitnessStage -ceq 'Surface') {
+    $expectedInvestigation = 'six-backend-surface-split-witness'
+    $names += @('directR','directG','directB','localVisibility','skyVisibility',
+        'skyDiffuse','localStrength','bounceDirectionX','bounceDirectionY','bounceDirectionZ',
+        'bounceHit','bounceInstance','bouncePrimitive','bounceMaterial','bounceT',
+        'bouncePositionX','bouncePositionY','bouncePositionZ',
+        'bounceNormalX','bounceNormalY','bounceNormalZ','bounceBaseR','bounceBaseG','bounceBaseB',
+        'bounceRoughness','bounceReflectivity','bounceMetallic','bounceEmissive',
+        'bounceTransmission','bounceMaterialFlags','bounceR','bounceG','bounceB',
+        'afterBounceR','afterBounceG','afterBounceB','fog')
+}
 $cases = @(
     @{id=2; file='02-worst-bend.png'; x=556; y=378; row=0},
     @{id=6; file='06-blue.png'; x=396; y=262; row=1},
@@ -81,7 +96,7 @@ $rows = foreach ($backend in @('pipeline','compute')) {
     $new = Get-Content (Join-Path $newDirectory 'capture-manifest.json') -Raw | ConvertFrom-Json
     $expectedBackend = if ($backend -eq 'pipeline') {'RayTracingPipeline'} else {'RayQueryCompute'}
     if (-not $new.complete -or -not $new.investigationOnly -or $new.payloadRows -ne 5 -or
-        $new.investigation -cne 'six-backend-pixel-output-witness' -or
+        $new.investigation -cne $expectedInvestigation -or
         $new.captures.Count -ne 5 -or $new.settlingFrames -ne 12 -or
         $new.executionBackend -cne $expectedBackend -or
         ($new.captures.id -join ',') -cne '2,6,7,11,12' -or
@@ -109,7 +124,7 @@ $rows = foreach ($backend in @('pipeline','compute')) {
         $newPng = Join-Path $newDirectory $case.file
         if ((Get-FileHash $oldPng).Hash.ToLowerInvariant() -cne $a.pngSha256 -or
             (Get-FileHash $newPng).Hash.ToLowerInvariant() -cne $b.pngSha256) { throw 'PNG hash mismatch.' }
-        $result = [HordeBackendWitnessPixels]::Read($oldPng,$newPng,$case.x,$case.y,$case.row)
+        $result = [HordeBackendWitnessPixels]::Read($oldPng,$newPng,$case.x,$case.y,$case.row,$names.Count)
         $fields = [ordered]@{}
         for ($index=0; $index -lt $names.Count; ++$index) { $fields[$names[$index]] = $result.fields[$index] }
         $pixelPreserved = ($result.controlRgb -join ',') -ceq ($result.witnessRgb -join ',')
@@ -129,7 +144,7 @@ $rows = foreach ($backend in @('pipeline','compute')) {
     }
 }
 [ordered]@{
-    schema=1; investigationOnly=$true; payloadRows=5; fields=$names; records=@($rows)
+    schema=1; investigationOnly=$true; witnessStage=$WitnessStage; payloadRows=5; fields=$names; records=@($rows)
     validity='Output probe is interpretable at an original outlier only when source pixel and meaningful scene facts recur; a probe is not a corrected-image acceptance.'
 } | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $OutputPath -Encoding utf8NoBOM
 $rows | ForEach-Object {

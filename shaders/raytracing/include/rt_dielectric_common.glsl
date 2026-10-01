@@ -308,6 +308,14 @@ vec3 shadeOpaquePrimary(HitInfo h, vec3 rayDirection)
     vec3 color = shadeOpaqueDirect(h, rayDirection, maxWorkload, !fireRayReflectionOwned,
                                    localVisibility, skyVisibility, skyDiffuse,
                                    localLightColor, localLightStrength);
+#ifdef HORDE_BACKEND_PIXEL_WITNESS
+    if (backendWitnessRow() >= 0)
+    {
+        investigationDirect = color;
+        investigationLightTerms = vec4(localVisibility, skyVisibility,
+            skyDiffuse, localLightStrength);
+    }
+#endif
     // Keep the one RT bounce deterministic. The previous time-varying hemisphere sample was the main source of shimmer.
     vec3 bounce = vec3(0.0);
     if (!leanWorkload)
@@ -318,6 +326,13 @@ vec3 shadeOpaquePrimary(HitInfo h, vec3 rayDirection)
         uint bounceMask = wantsPlayerReflection ? 0x37u : 0x23u;
         HitInfo bounceHit = traceScene(offsetRayOrigin(h, bounceDirection), bounceDirection,
                                        12.0, bounceMask, 0.002, false, false);
+#ifdef HORDE_BACKEND_PIXEL_WITNESS
+        if (backendWitnessRow() >= 0)
+        {
+            investigationBounceDirection = bounceDirection;
+            investigationBounceHit = bounceHit;
+        }
+#endif
         bounce = bounceSample(bounceHit, bounceDirection, wantsPlayerReflection);
         if (wantsPlayerReflection)
         {
@@ -340,6 +355,14 @@ vec3 shadeOpaquePrimary(HitInfo h, vec3 rayDirection)
     }
 
     float fog = 1.0 - exp(-h.t * h.t * 0.012 * controls.fogDensityScale);
+#ifdef HORDE_BACKEND_PIXEL_WITNESS
+    if (backendWitnessRow() >= 0)
+    {
+        investigationBounce = bounce;
+        investigationAfterBounce = color;
+        investigationFog = fog;
+    }
+#endif
     vec3 fogColor = tunedLightColor(
         mix(vec3(0.028, 0.034, 0.046), vec3(0.052, 0.064, 0.086),
             skyVisibility * skyDiffuse * 0.55),

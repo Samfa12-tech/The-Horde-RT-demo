@@ -1,15 +1,16 @@
 // One per-pixel implementation; launchers supply only stage and pixel builtins.
 #include "rt_scene_abi.glsl"
 #include "rt_diagnostics.glsl"
+#if defined(HORDE_RT_VARIANT_INSTRUMENTATION) && HORDE_RT_VARIANT_INSTRUMENTATION == HORDE_RT_INSTRUMENTATION_DIAGNOSTIC && HORDE_RT_VARIANT_QUALITY == HORDE_RT_QUALITY_MOBILE
+#define HORDE_BACKEND_PIXEL_WITNESS
+#endif
 #include "rt_lighting.glsl"
+#ifdef HORDE_BACKEND_PIXEL_WITNESS
+#include "../experimental/backend_pixel_witness.glsl"
+#endif
 #include "rt_dielectric_common.glsl"
 #include "rt_dielectric_transport.glsl"
 #include "rt_atmosphere.glsl"
-
-#if defined(HORDE_RT_VARIANT_INSTRUMENTATION) && HORDE_RT_VARIANT_INSTRUMENTATION == HORDE_RT_INSTRUMENTATION_DIAGNOSTIC && HORDE_RT_VARIANT_QUALITY == HORDE_RT_QUALITY_MOBILE
-#define HORDE_BACKEND_PIXEL_WITNESS
-#include "../experimental/backend_pixel_witness.glsl"
-#endif
 
 void main()
 {

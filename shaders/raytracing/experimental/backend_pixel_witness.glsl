@@ -1,5 +1,12 @@
 // Investigation-only output witness. No extra rays, counters or CPU/GPU ABI.
 // Five coordinate rows cover the six retained outliers (blue/red share a pixel).
+vec3 investigationDirect;
+vec4 investigationLightTerms;
+vec3 investigationBounceDirection;
+HitInfo investigationBounceHit;
+vec3 investigationBounce;
+vec3 investigationAfterBounce;
+float investigationFog;
 int backendWitnessRow()
 {
     uvec2 pixel = HORDE_RT_PIXEL_ID.xy;
@@ -64,4 +71,27 @@ void backendWitness(HitInfo primary, vec3 direction, vec3 origin,
     backendWitnessVector(row, 39, afterMist);
     backendWitnessVector(row, 42, displayColor);
     backendWitnessVector(row, 45, origin);
+    backendWitnessVector(row, 48, investigationDirect);
+    backendWitnessFloat(row, 51, investigationLightTerms.x);
+    backendWitnessFloat(row, 52, investigationLightTerms.y);
+    backendWitnessFloat(row, 53, investigationLightTerms.z);
+    backendWitnessFloat(row, 54, investigationLightTerms.w);
+    backendWitnessVector(row, 55, investigationBounceDirection);
+    backendWitnessFloat(row, 58, investigationBounceHit.hit ? 1.0 : 0.0);
+    backendWitnessFloat(row, 59, float(investigationBounceHit.instance));
+    backendWitnessFloat(row, 60, float(investigationBounceHit.primitive));
+    backendWitnessFloat(row, 61, float(investigationBounceHit.material));
+    backendWitnessFloat(row, 62, investigationBounceHit.t);
+    backendWitnessVector(row, 63, investigationBounceHit.position);
+    backendWitnessVector(row, 66, investigationBounceHit.normal);
+    backendWitnessVector(row, 69, investigationBounceHit.base);
+    backendWitnessFloat(row, 72, investigationBounceHit.roughness);
+    backendWitnessFloat(row, 73, investigationBounceHit.reflectivity);
+    backendWitnessFloat(row, 74, investigationBounceHit.metallic);
+    backendWitnessFloat(row, 75, investigationBounceHit.emissive);
+    backendWitnessFloat(row, 76, investigationBounceHit.transmission);
+    backendWitnessFloat(row, 77, float(investigationBounceHit.materialFlags));
+    backendWitnessVector(row, 78, investigationBounce);
+    backendWitnessVector(row, 81, investigationAfterBounce);
+    backendWitnessFloat(row, 84, investigationFog);
 }
