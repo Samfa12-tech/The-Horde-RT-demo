@@ -1,4 +1,7 @@
 # Keep high-resolution source art out of normal Git history.
+# Preserve lossless backend witnesses and the exact native manifest receipts.
+docs/evidence/2026-10-02-backend-pixel-witness/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-02-backend-pixel-witness/**/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
 *.glb filter=lfs diff=lfs merge=lfs -text
 *.png filter=lfs diff=lfs merge=lfs -text
 *.ktx2 filter=lfs diff=lfs merge=lfs -text

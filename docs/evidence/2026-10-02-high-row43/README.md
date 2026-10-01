@@ -166,3 +166,23 @@ semantic playback inputs); no owner interruption/return check is repeated.
 
 Raw receipts/build will remain at `C:/Dev/tmp/horde-high-row43-current-20261002`.
 No main merge, release or publication.
+
+## Retained CPU regression (no production geometry or transport change)
+
+`70e13bd92adfff9632ac5264e5b2df7227b72e0d` adds the recorded outside-origin
+corner witness to `DielectricMathTests.cpp`. Test-only double arithmetic rejects
+triangle63: signed barycentric v=-1.0472011617346364e-7, t=0.629852548967093.
+The empty dielectric stack must reject its first exit. Both captured backend
+directions genuinely enter triangle9 (t=0.8082919771786382 and
+0.8082918915765992); the valid stack entry remains accepted. This distinguishes
+the false corner candidate from the existing valid micrometre exit contract.
+It is a reference regression, **not** a production intersection fix or a new
+universal hardware tolerance. The two directions are kept separately, and the
+captured JSON's top-level sha256 is identified as its decoded PNG identity,
+not mislabelled as the JSON file hash.
+
+Fresh affected Debug CTest1/1 PASS (3.03s), Release CTest1/1 PASS (1.89s).
+Exact logs: [Debug](checks/corner-regression-debug.log),
+[Release](checks/corner-regression-release.log). No new native capture, phone
+run or arithmetic keyword trial was needed for this test-only change.
+High row43 and the broader physical/backend gate remain open.

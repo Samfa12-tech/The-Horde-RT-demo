@@ -13,7 +13,38 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
-### October 2 shared report relay (current integration slice)
+### October 2 exact corner regression and backend discriminator (current slice)
+
+Continue from this specific unfinished step; do not repeat a status recap, broad
+audit or completed controls merely after compaction. Normal source remains on
+`codex/horde-mobile-lantern-profile`, mirrored to the engineering branch.
+`70e13bd` retains the recorded High row43 outside-origin false corner candidate
+as a CPU regression, with separate captured backend rays and valid triangle9
+entry. Fresh affected Debug/Release each1/1 pass; [receipt](evidence/2026-10-02-high-row43/README.md).
+This test is not a production intersection fix; High row43 remains open.
+
+The isolated `codex/horde-backend-six-pixel-witness` observers at d64bea1/ee71f98
+reproduce all six original Mobile RTX backend outliers at960x540. Each five-image
+pipeline/compute run exits0, honestly presents RT and preserves scene, CPU
+geometry, allocations and complete diagnostics. First observer non-payload output
+is byte-identical; second observer changes at most1 channel value (fraction over1=0).
+Five differences are dominated by reflected secondary hits/radiance; the sixth
+is a demonstrated closed-finale-room light-selector boundary discontinuity.
+All16 actual modules compile/validate; all8 Shipping and all4 High Diagnostic
+SPIR-V remain unchanged. No probe/normal shader, budget, pixel tolerance, player
+asset, gameplay/audio authority or quality-profile change enters engineering.
+[Single durable record](evidence/2026-10-02-backend-pixel-witness/README.md).
+
+Next unfinished step: inspect exact blue/red implicated world faces for overlap,
+then choose the smallest geometry/numerical-layer correction justified by that
+evidence; separately address the proven closed-room selector boundary. Keep
+other mapped-normal/reflection outliers distinct. No repeated precision keyword
+search, old phone performance trial, observer recapture or telemetry framework.
+S26 is owner-disconnected until explicitly reconnected. Previously requested
+music external-interruption/S24 live checks remain pending; do not resend.
+Audio/haptic manual revalidation required:NO for this test/output-only work.
+
+### October 2 shared report relay (accepted integration slice)
 
 Owner approved extending/deploying the existing Briarhold Cloudflare Worker and
 one labelled fixture email. Reviewed private backend `fd104d7` is deployed as
