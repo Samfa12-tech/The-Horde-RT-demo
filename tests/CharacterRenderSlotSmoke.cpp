@@ -3,6 +3,7 @@
 #include "vulkan/raytracing/RtSceneRouteConstants.h"
 #include "vulkan/raytracing/RtSceneRecordObservation.h"
 #include "vulkan/raytracing/RtSceneTuning.h"
+#include "vulkan/raytracing/RtPrimaryOpacityAdmission.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
 #include "platform/android/AndroidRtLabState.h"
 
@@ -115,6 +116,44 @@ int main()
     static_assert(static_cast<std::uint32_t>(RtWorkloadPreset::Lean) == 0u);
     static_assert(static_cast<std::uint32_t>(RtWorkloadPreset::Authored) == 1u);
     static_assert(static_cast<std::uint32_t>(RtWorkloadPreset::Max) == 2u);
+
+    {
+        std::array<VkAccelerationStructureInstanceKHR, kRtInstanceMetadataCapacity> original{};
+        for (std::uint32_t index = 0; index < original.size(); ++index)
+        {
+            original[index].instanceCustomIndex = index;
+            original[index].mask = 0xffu;
+            original[index].flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
+            original[index].accelerationStructureReference = index + 1u;
+        }
+        auto mobile = original;
+        ApplyMobilePrimaryOpacityAdmission(mobile, DielectricQuality::Mobile);
+        ApplyMobilePrimaryOpacityAdmission(mobile, DielectricQuality::Mobile);
+        for (std::uint32_t index = 0; index < original.size(); ++index)
+        {
+            const auto expectedFlags = original[index].flags |
+                (index == kPlayerWorldBodyInstanceIndex
+                    ? VK_GEOMETRY_INSTANCE_FORCE_NO_OPAQUE_BIT_KHR : 0u);
+            if (mobile[index].flags != expectedFlags ||
+                mobile[index].mask != original[index].mask ||
+                mobile[index].instanceCustomIndex != original[index].instanceCustomIndex ||
+                mobile[index].accelerationStructureReference != original[index].accelerationStructureReference)
+            {
+                std::cerr << "FAIL: primary opacity admission changed non-body flags or instance identity\n";
+                return 1;
+            }
+        }
+        auto high = original;
+        ApplyMobilePrimaryOpacityAdmission(high, DielectricQuality::High);
+        for (std::uint32_t index = 0; index < original.size(); ++index)
+        {
+            if (high[index].flags != original[index].flags)
+            {
+                std::cerr << "FAIL: primary opacity admission changed High instance policy\n";
+                return 1;
+            }
+        }
+    }
 
     using horde::platform::android::AndroidRtLabState;
     using horde::platform::android::RtLabUnlockDecisionInputs;
@@ -855,10 +894,31 @@ int main()
         ok &= Require(raygenSource.find(
                           "uint rayFlags = (ignoreWater || ignorePlayerNearFace)") !=
                           std::string::npos &&
+                      raygenSource.find("uint rayFlags = ignoreWater ? gl_RayFlagsNoOpaqueEXT\n        : (ignorePlayerNearFace ? 0u : gl_RayFlagsOpaqueEXT);") !=
+                          std::string::npos &&
+                      sceneSource.find("ApplyMobilePrimaryOpacityAdmission(instances, pipelineBundle_.Request().quality);") !=
+                          std::string::npos &&
+                      sceneSource.find("ApplyMobilePrimaryOpacityAdmission(instances, pipelineBundle_.Request().quality);") !=
+                          sceneSource.rfind("ApplyMobilePrimaryOpacityAdmission(instances, pipelineBundle_.Request().quality);") &&
                       raygenSource.find(
                           "rayQueryInitializeEXT(query, topLevelAS, gl_RayFlagsNoOpaqueEXT, mask") !=
                           std::string::npos,
-                      "water/glass filtering must force opaque BLAS triangles through candidate handling");
+                      "Mobile body-only admission must retain both TLAS uploads and force water/glass filtering through candidates");
+        const std::string admissionCall =
+            "ApplyMobilePrimaryOpacityAdmission(instances, pipelineBundle_.Request().quality);";
+        const auto initialAdmission = sceneSource.find(admissionCall);
+        const auto animatedAdmission = sceneSource.rfind(admissionCall);
+        ok &= Require(initialAdmission != std::string::npos &&
+                      initialAdmission > sceneSource.find("instances[kPlayerViewmodelInstanceIndex] = instances[0];") &&
+                      initialAdmission < sceneSource.find("\"TLAS instance\", diagnostic") &&
+                      animatedAdmission > sceneSource.find("viewmodelInstance = instances[kPlayerWorldBodyInstanceIndex];") &&
+                      animatedAdmission < sceneSource.find("\"animated TLAS instance\", diagnostic"),
+                      "primary opacity flag must be applied after viewmodel clones and before each TLAS upload");
+        ok &= Require(raygenSource.find("origin, direction, maxDistance) ? gl_RayFlagsNoOpaqueEXT : 0u;") !=
+                          std::string::npos &&
+                      raygenSource.find("if (!materialTransmits)\n        {\n            rayQueryConfirmIntersectionEXT(query);\n            continue;") !=
+                          std::string::npos,
+                      "unfiltered physical shadows must still confirm forced-nonopaque world-body candidates as opaque blockers");
         ok &= Require(raygenSource.find("vec3 waterTransmissionSample") == std::string::npos &&
                       raygenSource.find("float waterMoonVisibility") == std::string::npos &&
                       raygenSource.find("torchTransport") == std::string::npos &&

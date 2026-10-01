@@ -404,8 +404,17 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
 #endif
 
     rayQueryEXT query;
+#if defined(HORDE_RT_VARIANT_QUALITY) && HORDE_RT_VARIANT_QUALITY == HORDE_RT_QUALITY_MOBILE
+    // Investigation: WorldBody alone is forced non-opaque in the TLAS. Ordinary
+    // opaque primary hits can commit in hardware, without changing nearest-hit
+    // traversal or bypassing the body's region filter. Water-off/transmitted
+    // water filtering must keep NoOpaque for the world/waterfall candidates.
+    uint rayFlags = ignoreWater ? gl_RayFlagsNoOpaqueEXT
+        : (ignorePlayerNearFace ? 0u : gl_RayFlagsOpaqueEXT);
+#else
     uint rayFlags = (ignoreWater || ignorePlayerNearFace)
         ? gl_RayFlagsNoOpaqueEXT : gl_RayFlagsOpaqueEXT;
+#endif
     rayQueryInitializeEXT(query, topLevelAS, rayFlags, mask, origin,
                           max(minimumDistance, 0.0), direction, maxDistance);
     while (rayQueryProceedEXT(query))

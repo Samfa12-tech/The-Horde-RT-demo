@@ -9,6 +9,7 @@
 #include "vulkan/raytracing/RtSceneRecordObservation.h"
 #include "vulkan/raytracing/RtSceneRouteConstants.h"
 #include "vulkan/raytracing/RtLanternGeometryProfile.h"
+#include "vulkan/raytracing/RtPrimaryOpacityAdmission.h"
 
 #include <algorithm>
 #include <array>
@@ -3872,6 +3873,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     {
         return false;
     }
+    ApplyMobilePrimaryOpacityAdmission(instances, pipelineBundle_.Request().quality);
     if (!WriteBuffer(instanceBuffer_, instances.data(), sizeof(instances), "TLAS instance", diagnostic))
     {
         return false;
@@ -5342,6 +5344,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         framePipelineEvidenceValid_ = false;
         break;
     }
+    ApplyMobilePrimaryOpacityAdmission(instances, pipelineBundle_.Request().quality);
     if (!WriteBuffer(heldLightBuffer_, &heldLightGpu, sizeof(heldLightGpu),
                      "held light", diagnostic, observation) ||
         !WriteBuffer(fireEmitterBuffer_, fireEmitterUpload.emitters.data(),
