@@ -69,6 +69,35 @@ function Test-HeldItemPackage {
                 throw "Held-item package contract missing exact entry '$required' in $resolved"
             }
         }
+        # A ZIP entry alone is not an admitted runtime asset. Fresh isolated
+        # checkouts can package Git LFS pointer text and still build successfully.
+        foreach ($entry in $archive.Entries | Where-Object {
+            $_.FullName.Replace('\', '/').StartsWith("$AssetPrefix/", [StringComparison]::Ordinal) -and
+            $_.FullName -match '\.(glb|ktx2|wav)$'
+        }) {
+            $stream = $entry.Open()
+            $prefix = [byte[]]::new(64)
+            try { $read = $stream.Read($prefix, 0, $prefix.Length) }
+            finally { $stream.Dispose() }
+            $text = [Text.Encoding]::ASCII.GetString($prefix, 0, $read)
+            if ($text.StartsWith('version https://git-lfs.github.com/spec/v1', [StringComparison]::Ordinal)) {
+                throw "Runtime package contains an unhydrated Git LFS pointer: $($entry.FullName)"
+            }
+            if ($entry.FullName.EndsWith('.glb', [StringComparison]::Ordinal) -and
+                ($read -lt 12 -or $text.Substring(0, 4) -cne 'glTF' -or
+                 [BitConverter]::ToUInt32($prefix, 4) -ne 2 -or
+                 [BitConverter]::ToUInt32($prefix, 8) -ne $entry.Length)) {
+                throw "Runtime package contains an invalid GLB header/length: $($entry.FullName)"
+            }
+            if ($entry.FullName.EndsWith('.wav', [StringComparison]::Ordinal) -and
+                ($read -lt 12 -or $text.Substring(0, 4) -cne 'RIFF' -or $text.Substring(8, 4) -cne 'WAVE')) {
+                throw "Runtime package contains an invalid WAV header: $($entry.FullName)"
+            }
+            if ($entry.FullName.EndsWith('.ktx2', [StringComparison]::Ordinal) -and
+                ($read -lt 12 -or [BitConverter]::ToString($prefix, 0, 12) -cne 'AB-4B-54-58-20-32-30-BB-0D-0A-1A-0A')) {
+                throw "Runtime package contains an invalid KTX2 header: $($entry.FullName)"
+            }
+        }
         $forbidden = @($entries | Where-Object {
             $_ -match '(^|/)(source|high)(/|$)' -or
             $_ -match 'models/props/meshy/production-' -or
