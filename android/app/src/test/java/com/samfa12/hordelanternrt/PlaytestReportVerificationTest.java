@@ -59,6 +59,33 @@ public final class PlaytestReportVerificationTest {
         assertFalse(PlaytestReportVerification.isAllowedChallengeUrl("file:///sdcard/report.json"));
     }
 
+    @Test public void admitsOnlyExactLocalTurnstileChildDocuments() {
+        assertTrue(PlaytestReportVerification.isAllowedChildDocumentUrl("about:blank"));
+        assertTrue(PlaytestReportVerification.isAllowedChildDocumentUrl("about:srcdoc"));
+        assertTrue(PlaytestReportVerification.isAllowedWebViewRequest(false, "about:blank"));
+        assertTrue(PlaytestReportVerification.isAllowedWebViewRequest(false, "about:srcdoc"));
+        assertTrue(PlaytestReportVerification.isAllowedWebViewRequest(false,
+                "https://challenges.cloudflare.com/turnstile/v0/api.js"));
+
+        for (String variation : new String[] {
+                "ABOUT:blank", "about:blank?x=1", "about:blank#fragment", "about:blank/evil",
+                "about:srcdoc?x=1", "about:srcdoc#fragment", "about:srcdoc/evil",
+                "about:", "data:text/html,frame", "file:///sdcard/report.json",
+                "javascript:alert(1)", "https://attacker.invalid/frame"
+        }) {
+            assertFalse("child URL must stay exact: " + variation,
+                    PlaytestReportVerification.isAllowedChildDocumentUrl(variation));
+            assertFalse("child request must stay allowlisted: " + variation,
+                    PlaytestReportVerification.isAllowedWebViewRequest(false, variation));
+        }
+        assertFalse(PlaytestReportVerification.isAllowedWebViewRequest(true, "about:blank"));
+        assertFalse(PlaytestReportVerification.isAllowedWebViewRequest(true, "about:srcdoc"));
+        assertTrue(PlaytestReportVerification.isAllowedWebViewRequest(true,
+                PlaytestReportVerification.PAGE_URL));
+        assertFalse(PlaytestReportVerification.isAllowedWebViewRequest(false,
+                PlaytestReportVerification.PAGE_URL));
+    }
+
     @Test public void acceptsOnlyExactBoundedNonceMatchedBridgeReplies() {
         PlaytestReportVerification.BridgeReply verified = reply(
                 "{\"type\":\"horde-report-verification\",\"nonce\":\"" + NONCE +

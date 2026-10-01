@@ -106,6 +106,15 @@ final class PlaytestReportVerification {
         } catch (RuntimeException malformed) { return false; }
     }
 
+    static boolean isAllowedChildDocumentUrl(String value) {
+        return "about:blank".equals(value) || "about:srcdoc".equals(value);
+    }
+
+    static boolean isAllowedWebViewRequest(boolean mainFrame, String value) {
+        return mainFrame ? isAllowedTopLevelUrl(value)
+                : isAllowedChildDocumentUrl(value) || isAllowedChallengeUrl(value);
+    }
+
     static BridgeReply parseBridgeMessage(String raw, String expectedNonce) {
         if (raw == null || expectedNonce == null || !validNonce(expectedNonce) ||
                 strictUtf8ByteLength(raw, MAX_BRIDGE_MESSAGE_BYTES) < 0) return null;
@@ -306,14 +315,14 @@ final class PlaytestReportVerification {
             view.setWebViewClient(new WebViewClient() {
                 @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                     String url = request.getUrl().toString();
-                    if (request.isForMainFrame()) return !isAllowedTopLevelUrl(url);
-                    return !isAllowedChallengeUrl(url);
+                    return !isAllowedWebViewRequest(request.isForMainFrame(), url);
                 }
 
                 @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                     String url = request.getUrl().toString();
-                    boolean allowed = request.isForMainFrame()
-                            ? isAllowedTopLevelUrl(url) : isAllowedChallengeUrl(url);
+                    boolean allowed = isAllowedWebViewRequest(request.isForMainFrame(), url);
+                    // A null response lets WebView handle an allowed request. For the exact about: child
+                    // documents this is local frame content, not an outbound network request.
                     return allowed ? null : blockedResponse();
                 }
 
