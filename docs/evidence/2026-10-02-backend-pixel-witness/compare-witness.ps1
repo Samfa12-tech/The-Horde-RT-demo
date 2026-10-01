@@ -2,7 +2,7 @@ param(
     [Parameter(Mandatory)][string]$ControlRoot,
     [Parameter(Mandatory)][string]$WitnessRoot,
     [Parameter(Mandatory)][string]$OutputPath,
-    [ValidateSet('Output','Surface')][string]$WitnessStage = 'Output'
+    [ValidateSet('Output','Surface','CombatSurface')][string]$WitnessStage = 'Output'
 )
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
@@ -60,7 +60,7 @@ $names = @('sentinel','x','y','hit','instance','primitive','material','t',
     'afterFireR','afterFireG','afterFireB','afterMistR','afterMistG','afterMistB',
     'displayR','displayG','displayB','originX','originY','originZ')
 $expectedInvestigation = 'six-backend-pixel-output-witness'
-if ($WitnessStage -ceq 'Surface') {
+if ($WitnessStage -cin @('Surface','CombatSurface')) {
     $expectedInvestigation = 'six-backend-surface-split-witness'
     $names += @('directR','directG','directB','localVisibility','skyVisibility',
         'skyDiffuse','localStrength','bounceDirectionX','bounceDirectionY','bounceDirectionZ',
@@ -78,6 +78,16 @@ $cases = @(
     @{id=11; file='11-finale-roof.png'; x=552; y=395; row=2},
     @{id=11; file='11-finale-roof.png'; x=770; y=526; row=3},
     @{id=12; file='12-two-enemy-combat.png'; x=564; y=393; row=4})
+$expectedRoster = '2,6,7,11,12'
+$expectedCaptureCount = 5
+if ($WitnessStage -ceq 'CombatSurface') {
+    $expectedInvestigation = 'two-enemy-reflection-witness'
+    $expectedRoster = '12'
+    $expectedCaptureCount = 1
+    $cases = @(
+        @{id=12; file='12-two-enemy-combat.png'; x=542; y=311; row=1},
+        @{id=12; file='12-two-enemy-combat.png'; x=564; y=393; row=4})
+}
 function Get-StaticAssetIdentity($asset) {
     # Build durations are measured observations, not immutable asset identity.
     # Ignore only the four known timing fields; retain all allocation/schema fields.
@@ -91,15 +101,16 @@ function Get-StaticAssetIdentity($asset) {
 }
 $rows = foreach ($backend in @('pipeline','compute')) {
     $oldDirectory = Join-Path $ControlRoot "control-windows-$backend"
+    if ($WitnessStage -ceq 'CombatSurface') { $oldDirectory = Join-Path $ControlRoot $backend }
     $newDirectory = Join-Path $WitnessRoot $backend
     $old = Get-Content (Join-Path $oldDirectory 'capture-manifest.json') -Raw | ConvertFrom-Json
     $new = Get-Content (Join-Path $newDirectory 'capture-manifest.json') -Raw | ConvertFrom-Json
     $expectedBackend = if ($backend -eq 'pipeline') {'RayTracingPipeline'} else {'RayQueryCompute'}
     if (-not $new.complete -or -not $new.investigationOnly -or $new.payloadRows -ne 5 -or
         $new.investigation -cne $expectedInvestigation -or
-        $new.captures.Count -ne 5 -or $new.settlingFrames -ne 12 -or
+        $new.captures.Count -ne $expectedCaptureCount -or $new.settlingFrames -ne 12 -or
         $new.executionBackend -cne $expectedBackend -or
-        ($new.captures.id -join ',') -cne '2,6,7,11,12' -or
+        ($new.captures.id -join ',') -cne $expectedRoster -or
         $new.presentation.dispatchWidth -ne 960 -or $new.presentation.dispatchHeight -ne 540 -or
         $new.device.gpuName -cne $old.device.gpuName -or
         (Get-StaticAssetIdentity $new.staticRtAsset) -cne

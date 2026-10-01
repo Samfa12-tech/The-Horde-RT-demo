@@ -1,5 +1,5 @@
 // Investigation-only output witness. No extra rays, counters or CPU/GPU ABI.
-// Five coordinate rows cover the six retained outliers (blue/red share a pixel).
+// Reuse the same85 fields; row1 now localizes the newly exposed combat pixel.
 vec3 investigationDirect;
 vec4 investigationLightTerms;
 vec3 investigationBounceDirection;
@@ -11,7 +11,7 @@ int backendWitnessRow()
 {
     uvec2 pixel = HORDE_RT_PIXEL_ID.xy;
     if (pixel == uvec2(556u, 378u)) return 0;
-    if (pixel == uvec2(396u, 262u)) return 1;
+    if (pixel == uvec2(542u, 311u)) return 1;
     if (pixel == uvec2(552u, 395u)) return 2;
     if (pixel == uvec2(770u, 526u)) return 3;
     if (pixel == uvec2(564u, 393u)) return 4;

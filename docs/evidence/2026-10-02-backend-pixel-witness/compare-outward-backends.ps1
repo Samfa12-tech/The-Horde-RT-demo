@@ -1,5 +1,6 @@
 param([Parameter(Mandatory)][string]$CaptureRoot,[Parameter(Mandatory)][string]$OutputPath,
-      [string]$Candidate='7782e8eeb54850813c74c90b188969f908f4906f')
+      [string]$Candidate='7782e8eeb54850813c74c90b188969f908f4906f',
+      [ValidateSet('FiveCheckpoint','CombatOnly')][string]$Roster='FiveCheckpoint')
 $ErrorActionPreference='Stop'
 Add-Type -AssemblyName System.Drawing
 Add-Type -ReferencedAssemblies System.Drawing.Common,System.Drawing.Primitives,System.Private.Windows.GdiPlus,System.Private.Windows.Core,System.Collections -TypeDefinition @'
@@ -30,8 +31,11 @@ public static class HordeOutwardBoxParity {
 '@
 $a=Get-Content (Join-Path $CaptureRoot 'pipeline/capture-manifest.json') -Raw|ConvertFrom-Json
 $b=Get-Content (Join-Path $CaptureRoot 'compute/capture-manifest.json') -Raw|ConvertFrom-Json
-if (-not $a.complete -or -not $b.complete -or $a.captures.Count -ne 5 -or
-    $b.captures.Count -ne 5 -or $a.executionBackend -cne 'RayTracingPipeline' -or
+$expectedIds=if($Roster -ceq 'CombatOnly'){'12'}else{'2,6,7,11,12'}
+$expectedCount=if($Roster -ceq 'CombatOnly'){1}else{5}
+if (-not $a.complete -or -not $b.complete -or $a.captures.Count -ne $expectedCount -or
+    $b.captures.Count -ne $expectedCount -or ($a.captures.id -join ',') -cne $expectedIds -or
+    ($b.captures.id -join ',') -cne $expectedIds -or $a.executionBackend -cne 'RayTracingPipeline' -or
     $b.executionBackend -cne 'RayQueryCompute' -or $a.settlingFrames -ne 12 -or
     $b.settlingFrames -ne 12 -or $a.device.gpuName -cne $b.device.gpuName) {
     throw 'Finite candidate identity/backend mismatch.'
