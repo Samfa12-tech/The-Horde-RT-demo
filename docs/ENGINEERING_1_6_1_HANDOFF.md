@@ -28,6 +28,27 @@ without loosening tolerance. Include live motion, not just frozen extreme poses.
 Music, consent-based reporting, resource work and final gates remain in scope;
 licensing, signing recovery and publication remain owner-controlled.
 
+### October 1 Android music output checkpoint
+
+Core-backed native bank/session plus bounded AudioTrack worker is now wired with
+independent persisted Music Volume. Render-owner publication precedes existing
+SFX drain; no direct JNI simulation authority or changed SFX/haptic semantics.
+Pause retains PCM; explicit audio epoch flushes stale output; partial writes retain
+offset. Backend/input failures disable only music with diagnostics. Fresh Android
+Debug fourABIs+lint SUCCESS (0errors/38warnings). Final bounded-clock-log rebuild
+SUCCESS4s; exact APK509b7981…ccd1bae4, not
+installed; actual four ARM64 Diagnostic/Mobile modules val/dis PASS, unchangedC11,
+all17 music entries/current licence/52 prior render-SFX assets match. Independent
+static ownership/clock/order review found no further demonstrated bug.
+[Evidence and exact phone checklist](evidence/2026-10-01-android-music/README.md).
+Windows `84f111e` remains the separate native-output checkpoint; Debug/Release
+actual-executable bundle checks pass and actual Shipping/High four modules have
+zero atomics/no binding22. No physical backend-parity implication. Owner listening,
+Android OEM capacity/underruns/lifecycle/native clock and Shipping measurements
+remain open; Android audio-focus integration is a focused follow-up, not proven
+by lifecycle pause. Phone is disconnected. Do not rerun phone coordination on
+compaction. Audio/haptic manual:YES for new audible playback/gain/mix.
+
 ### October 1 Windows music output checkpoint
 
 Native XAudio2 sink now uses Core PCM on one worker with3×480-frame fixed queue,

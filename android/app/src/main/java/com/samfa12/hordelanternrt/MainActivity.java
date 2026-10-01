@@ -68,6 +68,7 @@ import org.json.JSONObject;
 public class MainActivity extends Activity {
     private static final String TAG = "HordeLanternAudio";
     private static final String PREFS = "horde_lantern_alpha_settings";
+    private static final String PREF_MUSIC_VOLUME = "music_volume";
     static final String PREF_RENDER_SCALE = "render_scale";
     static final int DEFAULT_ANDROID_RT_RENDER_SCALE_PERCENT = 75;
     private static final String PREF_RT_LAB_UNLOCKED = "rt_lab_unlocked";
@@ -172,6 +173,7 @@ public class MainActivity extends Activity {
     private boolean parryRequestedOnTouchDown;
     private SoundPool soundPool;
     private MediaPlayer waterfallPlayer;
+    private HordeMusicPlayback musicPlayback;
     private Vibrator vibrator;
     private String reportText = "";
     private boolean resumed;
@@ -324,6 +326,7 @@ public class MainActivity extends Activity {
         }
 
         initialiseAudio();
+        musicPlayback = new HordeMusicPlayback(getAssets(), musicVolumePercent());
         menuButton.setOnClickListener(view -> {
             playSound("menu_toggle", 0.20f);
             showMainMenu(false);
@@ -481,7 +484,7 @@ public class MainActivity extends Activity {
         if (!resumed || !surfaceAvailable || surfaceStarted || currentSurface == null) return;
         try {
             surfaceStarted = ProbeBridge.startDiagnosticSurface(currentSurface, getFilesDir().getAbsolutePath());
-            ProbeBridge.setSimulationPaused(menuVisible || diagnosticsVisible);
+            setGameplayPaused(menuVisible || diagnosticsVisible);
             if (!surfaceStarted) {
                 reportTextView.append("\n\nRenderer surface failed to start.");
                 showDiagnostics(true);
@@ -493,6 +496,7 @@ public class MainActivity extends Activity {
     }
 
     private void stopSurface() {
+        if (musicPlayback != null) musicPlayback.setSuspended(true);
         if (!surfaceStarted) return;
         ProbeBridge.stopDiagnosticSurface();
         surfaceStarted = false;
@@ -562,7 +566,7 @@ public class MainActivity extends Activity {
         diagnosticsVisible = false;
         diagnosticsPanel.setVisibility(View.GONE);
         menuVisible = true;
-        ProbeBridge.setSimulationPaused(true);
+        setGameplayPaused(true);
         clearTouchState();
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
@@ -739,7 +743,7 @@ public class MainActivity extends Activity {
         benchmarkReportVisible = true;
         menuVisible = true;
         diagnosticsVisible = false;
-        ProbeBridge.setSimulationPaused(true);
+        setGameplayPaused(true);
         clearTouchState();
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
@@ -807,7 +811,7 @@ public class MainActivity extends Activity {
                 ? View.VISIBLE : View.GONE);
         rtStatus.setVisibility(showHud ? View.VISIBLE : View.GONE);
         vitalityStatus.setVisibility(showHud && lastPlayerLifePhase == PLAYER_ALIVE ? View.VISIBLE : View.GONE);
-        ProbeBridge.setSimulationPaused(false);
+        setGameplayPaused(false);
     }
 
     private void showControls() {
@@ -844,6 +848,12 @@ public class MainActivity extends Activity {
 
         addSlider(panel, getString(R.string.sfx_volume), preferences.getInt("sfx_volume", 70), 0, 100,
                 value -> preferences.edit().putInt("sfx_volume", value).apply());
+        addSlider(panel, getString(R.string.music_volume), musicVolumePercent(), 0, 100,
+                value -> {
+                    final int clamped = Math.max(0, Math.min(100, value));
+                    preferences.edit().putInt(PREF_MUSIC_VOLUME, clamped).apply();
+                    if (musicPlayback != null) musicPlayback.setVolumePercent(clamped);
+                });
         addSlider(panel, getString(R.string.look_sensitivity), preferences.getInt("look_sensitivity", 100), 50, 175,
                 value -> preferences.edit().putInt("look_sensitivity", value).apply());
         addSlider(panel, getString(R.string.render_scale), renderScalePercent(preferences), 50, 100,
@@ -902,12 +912,22 @@ public class MainActivity extends Activity {
         attachPanel(panel);
     }
 
+    private int musicVolumePercent() {
+        return Math.max(0, Math.min(100, preferences.getInt(PREF_MUSIC_VOLUME, 70)));
+    }
+
+    private void setGameplayPaused(boolean paused) {
+        if (musicPlayback != null) musicPlayback.setSuspended(paused || !resumed ||
+                !surfaceStarted || ProbeBridge.getRuntimeState() != 1);
+        ProbeBridge.setSimulationPaused(paused); // Existing JNI mailbox authority unchanged.
+    }
+
     private void showDiagnostics(final boolean errorState) {
         menuVisible = true;
         diagnosticsVisible = true;
         diagnosticsErrorState = errorState;
         diagnosticsRefreshTick = 0;
-        ProbeBridge.setSimulationPaused(true);
+        setGameplayPaused(true);
         clearTouchState();
         menuScrim.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
@@ -965,7 +985,7 @@ public class MainActivity extends Activity {
         if (deathOverlayVisible || benchmarkRunning || debugCaptureUiSuppressed) return;
         deathOverlayVisible = true;
         menuVisible = true;
-        ProbeBridge.setSimulationPaused(true);
+        setGameplayPaused(true);
         clearTouchState();
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
@@ -990,7 +1010,7 @@ public class MainActivity extends Activity {
                 rtLabVisible || benchmarkRunning || debugCaptureUiSuppressed) return;
         endingOverlayVisible = true;
         menuVisible = true;
-        ProbeBridge.setSimulationPaused(true);
+        setGameplayPaused(true);
         clearTouchState();
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
@@ -1035,7 +1055,7 @@ public class MainActivity extends Activity {
         rtLabVisible = true;
         menuVisible = true;
         diagnosticsVisible = false;
-        ProbeBridge.setSimulationPaused(true);
+        setGameplayPaused(true);
         clearTouchState();
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
@@ -1472,6 +1492,8 @@ public class MainActivity extends Activity {
                     finishBenchmarkAutomation(3);
                 }
                 final int state = ProbeBridge.getRuntimeState();
+                if (musicPlayback != null) musicPlayback.setSuspended(!resumed || !surfaceStarted ||
+                        state != 1 || menuVisible || diagnosticsVisible);
                 if (state == 1) {
                     rtStatus.setText(R.string.rt_active);
                     rtStatus.setTextColor(0xFFFFD07A);
@@ -2452,6 +2474,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (musicPlayback != null) musicPlayback.setSuspended(true); // Wait for a ready new surface.
         resumed = true;
         enterImmersiveMode();
         startSurfaceIfReady();
@@ -2478,6 +2501,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onPause() {
         resumed = false;
+        if (musicPlayback != null) musicPlayback.setSuspended(true);
         if (benchmarkAutomationId != null && !benchmarkAutomationFinishing) {
             finishBenchmarkAutomation(3);
         }
@@ -2504,13 +2528,14 @@ public class MainActivity extends Activity {
             benchmarkRunning = false;
             showMainMenu(false);
         }
-        ProbeBridge.setSimulationPaused(true);
+        setGameplayPaused(true);
         stopSurface();
         super.onPause();
     }
 
     @Override
     protected void onDestroy() {
+        if (musicPlayback != null) { musicPlayback.close(); musicPlayback = null; }
         handler.removeCallbacksAndMessages(null);
         updateExecutor.shutdownNow();
         if (vibrator != null) vibrator.cancel();

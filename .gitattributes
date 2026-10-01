@@ -167,3 +167,6 @@ docs/evidence/2026-10-01-music-bank/**/*.log whitespace=-trailing-space,-blank-a
 # Preserve raw music-session validation logs byte for byte.
 docs/evidence/2026-10-01-music-session/*.log -text whitespace=cr-at-eol
 docs/evidence/2026-10-01-windows-music/*.log -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-01-android-music/*.log -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-01-android-music/*.json -text
+docs/evidence/2026-10-01-android-music/lint-results-debug*.txt -text whitespace=cr-at-eol

@@ -42,6 +42,7 @@
 #include "gameplay/simulation/BoundedTransportQueue.h"
 #include "gameplay/simulation/InputMailbox.h"
 #include "platform/android/AndroidRtLabState.h"
+#include "platform/android/AndroidMusicPlayback.h"
 #include "update/GitHubReleaseUpdater.h"
 #include "vulkan/GpuFrameTimer.h"
 #include "vulkan/RtCapabilityReport.h"
@@ -673,12 +674,14 @@ void PublishRuntimeReports(const SwapchainContext& context,
 
 void ResetShowcaseSimulation()
 {
-    if (gGameSimulation.Snapshot().playerMountProfile !=
-        horde::gameplay::items::PlayerMountProfile::AnatomicalBody)
+    const bool replacedQueue = gGameSimulation.Snapshot().playerMountProfile !=
+        horde::gameplay::items::PlayerMountProfile::AnatomicalBody;
+    if (replacedQueue)
         gGameSimulation = horde::gameplay::simulation::GameSimulation(
             horde::gameplay::simulation::ProductionGameSimulationConfig());
     else
         gGameSimulation.ResetRoute();
+    horde::platform::android::ResetMusicSession(replacedQueue);
     gGameSimulation.ClearEvents();
     ClearPlatformGameplayEvents();
     PublishSimulationUiState();
@@ -974,8 +977,10 @@ void ApplyDebugCheckpointSimulation(
     const auto config = selection.playerRoute == kDefaultPlayerPresentationRoute
         ? horde::gameplay::simulation::ProductionGameSimulationConfig()
         : horde::gameplay::simulation::GameSimulationConfig{};
-    if (gGameSimulation.Snapshot().playerMountProfile != config.playerMountProfile)
+    const bool replacedQueue = gGameSimulation.Snapshot().playerMountProfile != config.playerMountProfile;
+    if (replacedQueue)
         gGameSimulation = horde::gameplay::simulation::GameSimulation(config);
+    horde::platform::android::ResetMusicSession(replacedQueue);
     if (selection.development != nullptr)
     {
         horde::gameplay::DevelopmentCheckpointStageEvidence evidence{};
@@ -2782,6 +2787,10 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             simulationScope.Complete(1u);
         }
 
+        // Immutable copy before the established SFX transport is drained. Music
+        // has no authority over simulation or renderer and no second SFX drain.
+        horde::platform::android::PublishMusicSnapshot(
+            gGameSimulation.Snapshot(), gGameSimulation.Events().Events(), context.captureActive);
         DrainSimulationEventsToPlatform();
         PublishSimulationUiState();
         const horde::gameplay::simulation::SimulationSnapshot& renderedSimulation =

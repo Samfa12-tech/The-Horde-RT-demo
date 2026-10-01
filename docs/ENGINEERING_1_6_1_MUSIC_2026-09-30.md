@@ -1,11 +1,33 @@
 # What the Dark Keeps: shared resolver checkpoint
 
-Status: original shared logic implemented; playback/music integration **not complete**.
+Status: Core-backed Windows/Android playback and independent persisted volume
+implemented; exact-phone playback, loop/lifecycle and owner listening acceptance
+**not complete**. Historical checkpoints below retain their original scope.
 Source: owner-supplied `What_the_Dark_Keeps_Horde_RT_Music_Pack.zip`, SHA-256
 `e28e5936189919fed25f6208dd7a8b97172eb5f7d25f69732cc7339c45f386fa`.
 Owner explicitly confirmed: **Owner-supplied; authorised for Horde use only**.
 This is not a general permissive redistribution grant or a change to Chordsmith,
 Hotstrike or existing project licence statements. Publication remains unauthorised.
+
+## Native playback checkpoint - October 1
+
+Shared single-owner worker session and copied-event inbox bridge gameplay to Core,
+without changing the SFX queue or simulation. Native XAudio2 and AudioTrack sinks
+submit actual Core PCM with bounded queues and separate generated/accepted/device-
+consumed counters; ordinary pause retains queued content, explicit epoch reset
+discards stale output. Settings music volume is persisted independently (default70).
+Normal benchmarks now include music: obtain new matched measurements, not an
+unlabelled comparison to older silent/no-music builds.
+
+Windows fresh Debug/Release native-clock pause/resume/retry/join smoke and ASan
+PASS; Release consumed twenty actual12s loops at gainzero, not an audible-seam/mix
+pass. Android Debug builds all four ABIs and lint has0errors/38warnings; exact
+final APK509b7981…ccd1bae4 package/module admission passes, not installed. The
+initial283b receipt remains historical; Android audio-focus acquisition/loss/return
+needs a focused follow-up. Score/renders/
+Core pin/player/RT remain unchanged. [Windows evidence](evidence/2026-10-01-windows-music/README.md)
+and [Android evidence/phone matrix](evidence/2026-10-01-android-music/README.md).
+Audio/haptic manual revalidation required:YES for actual music playback/gain.
 
 ## Current Core ownership checkpoint - October 1
 

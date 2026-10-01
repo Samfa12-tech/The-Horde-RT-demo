@@ -99,6 +99,7 @@
     <string name="sfx_enabled">Sound effects</string>
     <string name="haptics_enabled">Vibration / haptics</string>
     <string name="sfx_volume">SFX volume</string>
+    <string name="music_volume">Music volume</string>
     <string name="look_sensitivity">Look sensitivity</string>
     <string name="render_scale">Render resolution</string>
     <string name="water_quality">RT water: %1$s</string>
