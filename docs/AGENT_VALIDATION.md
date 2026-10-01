@@ -30,10 +30,11 @@ ctest --test-dir build/host-ci --build-config Release --output-on-failure
 This covers non-hardware shared tests, not Vulkan presentation or phone behaviour. Use CTest selection for an affected subset when appropriate; report the actual selection and result instead of hard-coding a test count.
 
 The portable workflow has GCC/Clang Linux and MSVC Windows entries. Windows builds
-the portable targets and runs the same common tests (currently 54, including the
+the portable targets and runs the same common tests (currently 55, including the
 music resolver, audio-worker session/inbox, Core-backed PCM cursor/WAV decoder and immutable asset bank, generic Core contracts and
 byte-exact native-only dependency and closed-roster music asset admission, plus
-the unwired consent-bounded player-report contract); its explicit exclusion is
+the unwired consent-bounded player-report contract and staged-primary page/packing
+contract); its explicit exclusion is
 the 15 additional `WIN32` tooling fixtures, some of which need shader SDK/Android
 tools not provisioned by this compiler lane. This is additive MSVC coverage, not
 a replacement for the separate full Windows tooling/shader gate. Keep that scope
@@ -51,6 +52,10 @@ PR merge conflicts cannot suppress all current-source compiler coverage. Its
 package and builds/runs the focused player contracts, actual skinned-player smoke
 and malformed/reordered GLB fixtures. Focused initialization preflight and scene
 resource-inventory tests also cover output-only resize rollback and ownership.
+The investigation-only staged-primary owner has CPU fault-injection coverage in
+this focused lane (14 tests at this checkpoint). Its tiny non-SPIR-V header and
+fake Vulkan/resource functions test cleanup/resize ownership only, not real
+allocation, shader validity, device limits or image/performance acceptance.
 The tests do not create a Vulkan device:
 SDK-enabled host compilation is **not** physical RT presentation, backend image
 parity or Android-device acceptance. Keep the portable lane as separate coverage.
