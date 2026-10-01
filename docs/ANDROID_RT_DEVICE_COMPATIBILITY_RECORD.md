@@ -40,6 +40,14 @@ Mobile lantern appearance; this does not close performance, hands/enemy visibili
 or lifecycle gates. Possible physical-pane/model alignment is a future-only owner
 note, not authority to change preserved High glass geometry in this pass.
 
+S24 is released at owner request after the finite24-run two-device timing matrix
+completed (12 per device). All18 P1/P2/C2 reports pass the extended row admission;
+the six original C1 receipts retain their earlier gate scope. Matrix invoked its
+Home cleanup; a subsequent scoped stop found the device already disconnected,
+so that stop is not confirmed. No data cleared/uninstall. S24 hands and
+starting-enemy authored-state checks remain **not completed**; do not claim visual
+acceptance or run further phone checks until it is available again.
+
 ## October 1: immutable music bank build only (no new device acceptance)
 
 Android Debug compiles the bounded transactional native bank for four ABIs.

@@ -32,6 +32,10 @@ timing. Original dirty engineering checkout remains untouched. No release/main m
 Later owner comparison says water colour matches S26; do not pursue that as a
 device mismatch. Owner prefers open lantern; suspected pane/model misalignment
 is recorded for future investigation only, not a current glass geometry change.
+The full two-device timing matrix is now complete, with reports retained locally;
+S24 returned to spouse at owner request before diagnostic visibility checks.
+No more S24 device actions until renewed availability. Its hands/enemy gate stays
+open; finish/archive existing results and available S26 validation without reruns.
 Audio/haptic manual revalidation required: **NO**, geometry-only selection.
 
 ### October 1 instrumentation - selected whistle bank and S26 playback correction

@@ -1,0 +1,154 @@
+RequestedLayerState{[Gesture Monitor] PalmMotion#72 parentId=43 z=1}
+RequestedLayerState{WindowedMagnification:0:31#2 parentId=41}
+RequestedLayerState{HideDisplayCutout:0:14#3 parentId=2}
+RequestedLayerState{OneHanded:0:14#4 parentId=3}
+RequestedLayerState{AppZoomOut:0:0#5 parentId=4}
+RequestedLayerState{Leaf:0:0#6 parentId=5}
+RequestedLayerState{RemoteWallpaperAnim:1:1#7 parentId=4 z=1}
+RequestedLayerState{Leaf:1:1#8 parentId=7}
+RequestedLayerState{AppZoomOut:2:14#9 parentId=4 z=2}
+RequestedLayerState{DefaultTaskDisplayArea_d0#10 parentId=9}
+RequestedLayerState{ChangeLeashAnchor#11 parentId=10 z=10}
+RequestedLayerState{FloatingLeashAnchor#12 parentId=10 z=11}
+RequestedLayerState{Leaf:3:12#13 parentId=9 z=1}
+RequestedLayerState{ImePlaceholder:13:14#14 parentId=9 z=2}
+RequestedLayerState{ImeContainer#15 parentId=160 relativeParentId=160 z=1}
+RequestedLayerState{OneHanded:15:15#16 parentId=2 z=1}
+RequestedLayerState{Leaf:15:15#17 parentId=16}
+RequestedLayerState{HideDisplayCutout:16:16#18 parentId=2 z=2}
+RequestedLayerState{OneHanded:16:16#19 parentId=18}
+RequestedLayerState{AppZoomOut:16:16#20 parentId=19}
+RequestedLayerState{Leaf:16:16#21 parentId=20}
+RequestedLayerState{OneHanded:17:17#22 parentId=2 z=3}
+RequestedLayerState{Leaf:17:17#23 parentId=22}
+RequestedLayerState{HideDisplayCutout:18:23#24 parentId=2 z=4}
+RequestedLayerState{OneHanded:18:23#25 parentId=24}
+RequestedLayerState{Leaf:18:19#26 parentId=25}
+RequestedLayerState{AppZoomOut:20:22#27 parentId=25 z=1}
+RequestedLayerState{Leaf:20:22#28 parentId=27}
+RequestedLayerState{Leaf:23:23#29 parentId=25 z=2}
+RequestedLayerState{Leaf:24:25#30 parentId=2 z=5}
+RequestedLayerState{HideDisplayCutout:26:31#31 parentId=2 z=6}
+RequestedLayerState{OneHanded:26:31#32 parentId=31}
+RequestedLayerState{Leaf:26:31#33 parentId=32}
+RequestedLayerState{HideDisplayCutout:32:35#34 parentId=41 z=1}
+RequestedLayerState{OneHanded:32:32#35 parentId=34}
+RequestedLayerState{Leaf:32:32#36 parentId=35}
+RequestedLayerState{Leaf:33:33#37 parentId=34 z=1}
+RequestedLayerState{OneHanded:34:35#38 parentId=34 z=2}
+RequestedLayerState{Leaf:34:35#39 parentId=38}
+RequestedLayerState{Leaf:36:36#40 parentId=41 z=2}
+RequestedLayerState{Display 0 name="Built-in Screen"#41}
+RequestedLayerState{Display Overlays#42 parentId=41 z=2147483647}
+RequestedLayerState{Input Overlays#43 parentId=41 z=2147483646}
+RequestedLayerState{PointerEventDispatcherOverlay0#44 parentId=43 z=2147483647}
+RequestedLayerState{Accessibility Overlays#45 parentId=41 z=2147483645}
+RequestedLayerState{Task=1#46 parentId=10}
+RequestedLayerState{Dim layer#71 parentId=65 z=2147483647}
+RequestedLayerState{Dim layer#69 parentId=64 z=2147483647}
+RequestedLayerState{Split Background Layer#68 parentId=63 z=-1}
+RequestedLayerState{Task=21659#172 parentId=10 z=3}
+RequestedLayerState{RecentsTransitionOverlay$_6342#171 parentId=170}
+RequestedLayerState{8a1195c RecentsTransitionOverlay#170 parentId=169}
+RequestedLayerState{75c744b ActivityRecordInputSink com.samsung.android.app.notes/.memolist.MemoListActivity#94764 parentId=94761 z=-2147483648}
+RequestedLayerState{TransientLaunchOverlayToken{1ca1bcf token=android.os.BinderProxy@13ed5c4}#169 parentId=13}
+RequestedLayerState{77773b5 ActivityRecordInputSink com.sec.android.app.launcher/.Launcher#168 parentId=160 z=-2147483648}
+RequestedLayerState{home_task_overlay_container#57 parentId=46 z=2147483647}
+RequestedLayerState{WallpaperWindowToken{15eee99}#58 parentId=8}
+RequestedLayerState{d442927 com.samsung.android.wallpaper.live.layered.LayeredWallpaperService#59 parentId=58}
+RequestedLayerState{com.samsung.android.wallpaper.live.layered.LayeredWallpaperService$_5264#60 parentId=59}
+RequestedLayerState{Wallpaper Transform wrapper#61 parentId=60}
+RequestedLayerState{Wallpaper BBQ wrapper 7_systemlock#62 parentId=61}
+RequestedLayerState{Task=3(SplitRoot)#63 parentId=10 z=1}
+RequestedLayerState{Task=4#64 parentId=63}
+RequestedLayerState{Task=5#65 parentId=63 z=1}
+RequestedLayerState{WindowToken{ebf6865 type=2016 android.os.BinderProxy@726b4b6}#66 parentId=33 z=1}
+RequestedLayerState{f14a9eb ShellDropTarget#67 parentId=66}
+RequestedLayerState{[BBQ] a651c8e#95457#95461 parentId=95457}
+RequestedLayerState{WindowToken{9d3749d type=2415 android.os.BinderProxy@f16b1b0}#74 parentId=26}
+RequestedLayerState{87e2e86 LockscreenShortcutBlur#75 parentId=74}
+RequestedLayerState{NavigationBar0$_5364#92 parentId=82}
+RequestedLayerState{StatusBar$_5364#96 parentId=86}
+RequestedLayerState{ActivityRecord{65587620 u0 com.babycenter.pregnancytracker/com.babycenter.pregbaby.ui.main.MainTabActivity t22512}#95086 parentId=95062}
+RequestedLayerState{419e143 ActivityRecordInputSink com.sec.android.app.camera/.Camera#94904 parentId=94902 z=-2147483648}
+RequestedLayerState{WindowToken{f8b7e72 type=2019 android.os.BinderProxy@a2021d4}#81 parentId=30}
+RequestedLayerState{d17c2c3 NavigationBar0#82 parentId=95959}
+RequestedLayerState{WindowToken{f742bdf type=2040 android.os.BinderProxy@761650b}#83 parentId=23}
+RequestedLayerState{935c294 NotificationShade#84 parentId=83}
+RequestedLayerState{WindowToken{dd1b7d7 type=2000 android.os.BinderProxy@5aa9171}#85 parentId=17}
+RequestedLayerState{b85d3ad StatusBar#86 parentId=95960}
+RequestedLayerState{WindowToken{cb27e16 type=2009 android.os.BinderProxy@a879731}#87 parentId=26 z=2}
+RequestedLayerState{68d756d Bouncer#88 parentId=87}
+RequestedLayerState{ActivityRecord{102472266 u0 com.sec.android.app.launcher/.activities.LauncherActivity t21658}#160 parentId=159}
+RequestedLayerState{Task=22424#91901 parentId=10 z=2}
+RequestedLayerState{Surface(name=Task=22499#93696)/@0xaf99a12_transition-leash#93709 z=4}
+RequestedLayerState{Background for 105f1f6 SurfaceView[com.samfa12.hordelanternrt.benchmark/com.samfa12.hordelanternrt.MainActivity]@0#95964 parentId=95962}
+RequestedLayerState{1e85eaa com.sec.android.app.launcher/com.samsung.app.honeyspace.edge.edgepanel.app.CocktailBarService#332 parentId=331}
+RequestedLayerState{a651c8e#95457}
+RequestedLayerState{Task=22143#34188 z=1}
+RequestedLayerState{[BBQ] Sprite#8776#8777 parentId=8776}
+RequestedLayerState{Task=21658#159 parentId=46}
+RequestedLayerState{[Gesture Monitor] SpenInputDetector#161 parentId=43 z=1}
+RequestedLayerState{11f23ae com.sec.android.app.launcher/com.sec.android.app.launcher.activities.LauncherActivity#162 parentId=160}
+RequestedLayerState{WindowToken{e50d95 type=2226 android.os.BinderProxy@fac94c}#331 parentId=26 z=1}
+RequestedLayerState{Input Consumer recents_animation_input_consumer#166 z=3}
+RequestedLayerState{ActivityRecord{133547131 u0 com.sec.android.app.launcher/com.android.quickstep.RecentsActivity t21659}#173 parentId=172}
+RequestedLayerState{b04b2f0 com.sec.android.app.launcher/com.android.quickstep.RecentsActivity#174 parentId=173}
+RequestedLayerState{Task=22522#95859 z=9}
+RequestedLayerState{8d480d4 com.google.android.apps.walletnfcrel/com.google.commerce.tapandpay.android.wallet.WalletActivity#91913 parentId=91902}
+RequestedLayerState{42ab37e com.facebook.katana/com.facebook.katana.LoginActivity#94842 parentId=94825}
+RequestedLayerState{105f1f6 SurfaceView[com.samfa12.hordelanternrt.benchmark/com.samfa12.hordelanternrt.MainActivity]@0(BLAST)#95963 parentId=95962}
+RequestedLayerState{Surface(name=8e7046e InputMethod#91248)/@0x35111a5 - animation-leash of insets_animation#95947 parentId=91246}
+RequestedLayerState{105f1f6 SurfaceView[com.samfa12.hordelanternrt.benchmark/com.samfa12.hordelanternrt.MainActivity]@0#95962 parentId=95961}
+RequestedLayerState{[BBQ] Sprite#9564#9565 parentId=9564}
+RequestedLayerState{Task=22512#95062 parentId=10 z=6}
+RequestedLayerState{WindowToken{797c30a type=2011 android.os.Binder@99bc775}#91246 parentId=15}
+RequestedLayerState{4a76e8a com.samsung.android.spay.pay.HintService#310 parentId=309}
+RequestedLayerState{WindowToken{fbe36b8 type=2634 android.os.BinderProxy@dbc026e}#309 parentId=33}
+RequestedLayerState{ActivityRecord{210098318 u0 com.google.android.apps.walletnfcrel/com.google.commerce.tapandpay.android.wallet.WalletActivity t22424}#91902 parentId=91901}
+RequestedLayerState{Sprite#9564 parentId=42 z=351000}
+RequestedLayerState{c2fb2eb com.sec.android.app.camera/com.sec.android.app.camera.Camera#94913 parentId=94902}
+RequestedLayerState{63f98bc ActivityRecordInputSink com.samfa12.hordelanternrt.benchmark/com.samfa12.hordelanternrt.MainActivity#95956 parentId=95950 z=-2147483648}
+RequestedLayerState{Task=21879#13124 z=2}
+RequestedLayerState{8e7046e InputMethod#91248 parentId=95947}
+RequestedLayerState{62914df ActivityRecordInputSink com.android.chrome/org.chromium.chrome.browser.ChromeTabbedActivity#95018 parentId=95016 z=-2147483648}
+RequestedLayerState{3666712 com.android.chrome/com.google.android.apps.chrome.Main#95026 parentId=95016}
+RequestedLayerState{Shell Root Leash 0#4760 parentId=4759}
+RequestedLayerState{ActivityRecord{73518069 u0 com.android.chrome/com.google.android.apps.chrome.Main t22511}#95016 parentId=95015}
+RequestedLayerState{WindowToken{e63add4 type=2038 android.os.BinderProxy@90d727}#4759 parentId=13 z=1}
+RequestedLayerState{ActivityRecord{107071737 u0 com.sec.android.app.camera/.Camera t22509}#94902 parentId=94901}
+RequestedLayerState{74b59fd com.samsung.android.app.notes/com.samsung.android.app.notes.memolist.MemoListActivity#94771 parentId=94761}
+RequestedLayerState{Surface(name=b85d3ad StatusBar#86)/@0x777338d - animation-leash of insets_animation#95960 parentId=85}
+RequestedLayerState{Task=22511#95015 parentId=10 z=8}
+RequestedLayerState{ec4bc75 ActivityRecordInputSink com.sec.android.app.launcher/com.android.quickstep.RecentsActivity#8449 parentId=173 z=-2147483648}
+RequestedLayerState{IME Handwriting Surface#91247 parentId=43 z=2}
+RequestedLayerState{Task=22518#95727 z=9}
+RequestedLayerState{Task=22509#94901 parentId=10 z=5}
+RequestedLayerState{Task=21878#13092 z=24}
+RequestedLayerState{Sprite#8776 parentId=42 z=351000}
+RequestedLayerState{[Gesture Monitor] secinputdev#95602 parentId=43 z=1}
+RequestedLayerState{498cf90 ActivityRecordInputSink com.google.android.apps.walletnfcrel/com.google.android.apps.wallet.main.WalletActivity#91904 parentId=91902 z=-2147483648}
+RequestedLayerState{Task=22523#95889 z=9}
+RequestedLayerState{Task=22510#94964 z=6}
+RequestedLayerState{Task=22507#94760 parentId=10 z=4}
+RequestedLayerState{ActivityRecord{70444865 u0 com.samsung.android.app.notes/.memolist.MemoListActivity t22507}#94761 parentId=94760}
+RequestedLayerState{843c566 ActivityRecordInputSink com.samsung.android.app.notes/com.samsung.android.support.senl.nt.app.nativecomposer.ComposerActivity#94784 parentId=94777 z=-2147483648}
+RequestedLayerState{ActivityRecord{49506644 u0 com.samsung.android.app.notes/com.samsung.android.support.senl.nt.app.nativecomposer.ComposerActivity t22507}#94777 parentId=94760 z=1}
+RequestedLayerState{d497cb0 com.samsung.android.app.notes/com.samsung.android.support.senl.nt.app.nativecomposer.ComposerActivity#94778 parentId=94777}
+RequestedLayerState{5e131e8 com.babycenter.pregnancytracker/com.babycenter.pregbaby.ui.main.MainTabActivity#95091 parentId=95086}
+RequestedLayerState{b10f936 ActivityRecordInputSink com.babycenter.pregnancytracker/com.babycenter.pregbaby.ui.main.MainTabActivity#95090 parentId=95086 z=-2147483648}
+RequestedLayerState{4a4189e ActivityRecordInputSink com.facebook.katana/.activity.FbMainTabActivity#94828 parentId=94825 z=-2147483648}
+RequestedLayerState{Task=22508#94824 parentId=10 z=7}
+RequestedLayerState{ActivityRecord{32848716 u0 com.facebook.katana/.LoginActivity t22508}#94825 parentId=94824}
+RequestedLayerState{Task=22519#95761 z=9}
+RequestedLayerState{Task=22520#95791 z=9}
+RequestedLayerState{Task=22521#95826 z=9}
+RequestedLayerState{Task=22524#95919 z=9}
+RequestedLayerState{Task=22525#95949 parentId=10 z=9}
+RequestedLayerState{ActivityRecord{80401306 u0 com.samfa12.hordelanternrt.benchmark/com.samfa12.hordelanternrt.MainActivity t22525}#95950 parentId=95949}
+RequestedLayerState{bd93731 Splash Screen com.samfa12.hordelanternrt.benchmark#95951 parentId=95950 z=2147483647}
+RequestedLayerState{Splash Screen com.samfa12.hordelanternrt.benchmark$_5364#95952 parentId=95951}
+RequestedLayerState{Bounds for - com.samfa12.hordelanternrt.benchmark/com.samfa12.hordelanternrt.MainActivity@0#95961 parentId=95958}
+RequestedLayerState{fdf411a com.samfa12.hordelanternrt.benchmark/com.samfa12.hordelanternrt.MainActivity#95957 parentId=95950}
+RequestedLayerState{com.samfa12.hordelanternrt.benchmark/com.samfa12.hordelanternrt.MainActivity$_22592#95958 parentId=95957}
+RequestedLayerState{Surface(name=d17c2c3 NavigationBar0#82)/@0xbf437b6 - animation-leash of insets_animation#95959 parentId=81}

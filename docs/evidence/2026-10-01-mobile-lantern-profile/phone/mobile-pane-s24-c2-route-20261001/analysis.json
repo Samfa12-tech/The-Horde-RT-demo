@@ -1,0 +1,309 @@
+{
+  "runId": "mobile-pane-s24-c2-route-20261001",
+  "integrity": "PASS",
+  "analyzerScriptSha256": "b61904bdb17ab909ac6b4ed044979f3386fff3e2e455bd592eec26e7423ffa4f",
+  "member": "physical-control",
+  "workload": "showcase-route-v1",
+  "sourceCommit": "9f4f439e40a9477efe0bac42ee41b74de64b3b1b",
+  "deviceModel": "SM-S928B",
+  "requestedBackend": "RayQueryCompute",
+  "actualBackend": "RayQueryCompute",
+  "apkSha256": "3a4faf72923e24da9da859ef6cd71c221b818b97d7418a75b1c8dd0ca0540378",
+  "packageReceiptSha256": "67c1ae7225c57bd1fa27cab6ab934b910d5d8f2dd993c460c1ba74917b44ddaa",
+  "scalePercent": 75,
+  "internalExtent": {
+    "width": 810,
+    "height": 1682
+  },
+  "presentationExtent": {
+    "width": 1080,
+    "height": 2243
+  },
+  "measuredFrames": 1838,
+  "namedZoneDenominators": [
+    {
+      "name": "opening",
+      "frames": 160,
+      "averageMs": 63.5487,
+      "medianMs": 63.9982,
+      "p95Ms": 71.4721,
+      "onePercentLowFps": 13.652
+    },
+    {
+      "name": "skeleton-room",
+      "frames": 98,
+      "averageMs": 57.1315,
+      "medianMs": 56.8144,
+      "p95Ms": 64.6007,
+      "onePercentLowFps": 15.2447
+    },
+    {
+      "name": "shadow-corridor",
+      "frames": 599,
+      "averageMs": 54.6933,
+      "medianMs": 53.1088,
+      "p95Ms": 65.919,
+      "onePercentLowFps": 13.6262
+    },
+    {
+      "name": "skylight-chamber",
+      "frames": 189,
+      "averageMs": 41.625,
+      "medianMs": 40.3654,
+      "p95Ms": 56.0944,
+      "onePercentLowFps": 17.1165
+    },
+    {
+      "name": "yellow-torch-bay",
+      "frames": 157,
+      "averageMs": 50.1315,
+      "medianMs": 49.1957,
+      "p95Ms": 57.5803,
+      "onePercentLowFps": 16.7842
+    },
+    {
+      "name": "blue-torch-bay",
+      "frames": 157,
+      "averageMs": 49.3822,
+      "medianMs": 48.5873,
+      "p95Ms": 56.3157,
+      "onePercentLowFps": 17.243
+    },
+    {
+      "name": "red-torch-bay",
+      "frames": 157,
+      "averageMs": 49.5246,
+      "medianMs": 48.9169,
+      "p95Ms": 56.4552,
+      "onePercentLowFps": 17.2004
+    },
+    {
+      "name": "green-torch-bay",
+      "frames": 157,
+      "averageMs": 50.7768,
+      "medianMs": 50.3334,
+      "p95Ms": 56.7346,
+      "onePercentLowFps": 16.9815
+    },
+    {
+      "name": "transmission-threshold",
+      "frames": 63,
+      "averageMs": 39.096,
+      "medianMs": 39.7679,
+      "p95Ms": 42.4551,
+      "onePercentLowFps": 17.274
+    },
+    {
+      "name": "finale",
+      "frames": 101,
+      "averageMs": 43.9462,
+      "medianMs": 41.8453,
+      "p95Ms": 57.7426,
+      "onePercentLowFps": 16.4204
+    }
+  ],
+  "shaderIdentity": "opaqueFast:rayquery_compute_shipping_mobile_opaque_fast@5002afa7ac6ce0d03fc749742bb0832a1006b9f01bb1c6ab8490710790a79133|genericDielectric:rayquery_compute_shipping_mobile_generic_dielectric@c2bd389812841161951f819e0f12e95c929aa3f49ec87d9849393a687d20ebde",
+  "actualActiveStrategyCounts": {
+    "opaque-fast": 1838
+  },
+  "gpuOwningCompletion": {
+    "sampleCount": 1838,
+    "medianMs": 37.9707,
+    "p95NearestRankMs": 52.6631,
+    "byZone": [
+      {
+        "zone": "opening",
+        "denominator": 160,
+        "medianMs": 50.6905,
+        "p95NearestRankMs": 55.848
+      },
+      {
+        "zone": "skeleton-room",
+        "denominator": 98,
+        "medianMs": 43.6647,
+        "p95NearestRankMs": 49.6541
+      },
+      {
+        "zone": "shadow-corridor",
+        "denominator": 599,
+        "medianMs": 39.8927,
+        "p95NearestRankMs": 56.0245
+      },
+      {
+        "zone": "skylight-chamber",
+        "denominator": 189,
+        "medianMs": 28.085,
+        "p95NearestRankMs": 42.8467
+      },
+      {
+        "zone": "yellow-torch-bay",
+        "denominator": 157,
+        "medianMs": 36.2726,
+        "p95NearestRankMs": 44.6796
+      },
+      {
+        "zone": "blue-torch-bay",
+        "denominator": 157,
+        "medianMs": 35.8464,
+        "p95NearestRankMs": 41.8002
+      },
+      {
+        "zone": "red-torch-bay",
+        "denominator": 157,
+        "medianMs": 34.9174,
+        "p95NearestRankMs": 43.3844
+      },
+      {
+        "zone": "green-torch-bay",
+        "denominator": 157,
+        "medianMs": 37.4219,
+        "p95NearestRankMs": 43.9567
+      },
+      {
+        "zone": "transmission-threshold",
+        "denominator": 63,
+        "medianMs": 28.0483,
+        "p95NearestRankMs": 28.561
+      },
+      {
+        "zone": "finale",
+        "denominator": 101,
+        "medianMs": 28.5572,
+        "p95NearestRankMs": 45.1729
+      }
+    ]
+  },
+  "nativeCpuStages": {
+    "simulationStepCpuMs": {
+      "sampleCount": 1838,
+      "medianMs": 0.0283,
+      "p95Ms": 0.0411,
+      "slowestOnePercentMeanMs": 0.0971
+    },
+    "skinCpuMs": {
+      "sampleCount": 1838,
+      "medianMs": 10.4795,
+      "p95Ms": 12.8684,
+      "slowestOnePercentMeanMs": 14.3549
+    },
+    "playerSkinCpuMs": {
+      "sampleCount": 1838,
+      "medianMs": 10.4066,
+      "p95Ms": 12.7609,
+      "slowestOnePercentMeanMs": 13.9329
+    },
+    "characterSkinCpuMs": {
+      "sampleCount": 1838,
+      "medianMs": 0.0,
+      "p95Ms": 0.8386,
+      "slowestOnePercentMeanMs": 1.9654
+    },
+    "dynamicUploadCpuMs": {
+      "sampleCount": 1838,
+      "medianMs": 0.366,
+      "p95Ms": 0.5973,
+      "slowestOnePercentMeanMs": 0.9787
+    },
+    "blasRefitRecordCpuMs": {
+      "sampleCount": 1838,
+      "medianMs": 0.0369,
+      "p95Ms": 0.0533,
+      "slowestOnePercentMeanMs": 0.1498
+    },
+    "tlasUpdateRecordCpuMs": {
+      "sampleCount": 1838,
+      "medianMs": 0.0072,
+      "p95Ms": 0.0109,
+      "slowestOnePercentMeanMs": 0.0381
+    },
+    "traceCopyRecordCpuMs": {
+      "sampleCount": 1838,
+      "medianMs": 0.0327,
+      "p95Ms": 0.0462,
+      "slowestOnePercentMeanMs": 0.1374
+    },
+    "frameFenceWaitCpuMs": {
+      "sampleCount": 1838,
+      "medianMs": 38.4528,
+      "p95Ms": 53.1261,
+      "slowestOnePercentMeanMs": 60.1388
+    },
+    "imageAcquireCpuMs": {
+      "sampleCount": 1838,
+      "medianMs": 0.1449,
+      "p95Ms": 0.2539,
+      "slowestOnePercentMeanMs": 0.3538
+    },
+    "queueSubmitCpuMs": {
+      "sampleCount": 1838,
+      "medianMs": 0.159,
+      "p95Ms": 0.2635,
+      "slowestOnePercentMeanMs": 0.3958
+    },
+    "presentCallCpuMs": {
+      "sampleCount": 1838,
+      "medianMs": 0.3034,
+      "p95Ms": 0.5117,
+      "slowestOnePercentMeanMs": 0.7112
+    },
+    "wholeFrameCycleCpuMs": {
+      "sampleCount": 1838,
+      "medianMs": 50.9539,
+      "p95Ms": 65.0206,
+      "slowestOnePercentMeanMs": 72.6783
+    }
+  },
+  "nativeCycle": {
+    "scope": "android-render-entry-through-present",
+    "medianMs": 50.954,
+    "p95Ms": 65.0207,
+    "medianDerivedFps": 19.626,
+    "displayPacingProof": false
+  },
+  "thermalContext": {
+    "sampleCount": 38,
+    "firstUtc": "2026-10-01T08:44:36.3606695Z",
+    "lastUtc": "2026-10-01T08:47:53.2495312Z",
+    "batteryStartC": 40.3,
+    "batteryEndC": 40.4,
+    "thermalStatuses": [
+      2
+    ],
+    "gpuThermalPowerLevels": [
+      1,
+      2,
+      3,
+      4
+    ]
+  },
+  "ramBefore": {
+    "available": true,
+    "totalPssKb": 991290,
+    "totalRssKb": 1098408,
+    "totalSwapPssKb": 1192,
+    "nativeHeapPssKb": 843387
+  },
+  "ramAfter": {
+    "available": true,
+    "totalPssKb": 60999,
+    "totalRssKb": 176520,
+    "totalSwapPssKb": 54,
+    "nativeHeapPssKb": 31956
+  },
+  "diagnosticReadback": {
+    "status": "compiled-out",
+    "nullCounters": true,
+    "provesPhysicalGlassCorrectness": false
+  },
+  "performanceAcceptance": "none",
+  "optimizationAdmission": "none",
+  "visualAcceptance": "pending owner review",
+  "limitations": [
+    "Native-cycle median-derived FPS is not display-pacing proof.",
+    "GPU command-buffer timing includes AS build/update, RT and copy work; it is not isolated shader timing.",
+    "Context samples are not aligned to individual measured frames.",
+    "RAM before/after are non-frame-aligned boundary samples from different lifecycle states: benchmark completion hides the SurfaceView and destroys the RT scene, so a lower after reading is not a memory/performance improvement. Null fields mean the source did not provide parseable values.",
+    "Physical timing does not prove scene correctness. The open-aperture visual blocker remains open until owner review, including S24 hands, one-skeleton, and yellow-water concerns.",
+    "No matched repeated S24 candidate/control performance acceptance is implied."
+  ]
+}

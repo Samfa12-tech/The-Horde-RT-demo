@@ -154,3 +154,12 @@ Restore normal configuration afterward. Audio/haptic manual revalidation require
   rows/artifact identities once, then capture candidate live interactions/lifecycle
   and matched S24 discrepancy checkpoints after timed
   matrix. Do not repeat valid completed rows or rebuild unchanged artifacts.
+- Subsequent checkpoint: all24 physical/candidate runs complete; all18 P1/P2/C2
+  reports pass the extended admission once. Owner requests S24 returned to spouse.
+  Matrix invoked its Home cleanup; subsequent scoped stop attempt found S24
+  already disconnected, so do not claim that stop succeeded. No data cleared/uninstall.
+  **Do not launch further S24 checks without renewed availability.** Missing hands
+  and starting-enemy visibility remain open; water comparison is superseded above.
+  S26 normal Debug replay/capture/lifecycle check is underway. Next: archive remaining
+  completed reports, interpret thermal-qualified results, and finish available S26
+  visual checks; do not rerun the timed matrix.
