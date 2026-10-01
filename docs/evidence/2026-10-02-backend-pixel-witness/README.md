@@ -70,11 +70,48 @@ prove whether direct shadows or reflected secondary hits amplify them. It does
 exclude a different primary triangle/material and a newly introduced fire/mist
 effect as the original source of these six differences.
 
-Next finite step: retain these completed results, add only direct-light versus
-reflected-bounce output fields at the same six points, compile changed modules,
-and capture the same five checkpoints once per backend. Require original RGB
-recurrence and byte-identical non-payload output again before interpreting it.
-Do not repeat normal controls, rejected precision or phone measurements.
+## Completed surface discriminator
+
+Exact source `ee71f98a2e00cddb5c6b88fd5ba78834e06fc32a`; Debug executable SHA-256
+`743379cf9fc58a322d762d47847fa9a64dabd1a9cdd7be567e9d117c5a90e17f`.
+The second observer adds direct-light, reflected-hit/radiance and fog fields
+only (85 total). Changed include dependency provenance required restaging;
+all16 real modules compile/validate. The [module integrity receipt](surface/module-integrity.json)
+checks actual nonempty SPIR-V hashes: all8 Shipping and all4 High Diagnostic
+modules remain unchanged. No production budget or transport/counter work changed.
+Both five-checkpoint native runs exit0. Source pixels, camera/state, CPU geometry,
+complete visibility/diagnostics and allocations recur. All six original RGB
+pairs remain exact. Observer-only non-payload differences are maximum1 for
+pipeline worst-bend/blue/two-enemy and0 otherwise; fraction over1 is0 everywhere.
+This small quantization perturbation is recorded, not called byte identity.
+The original maximum3/fraction0.001 gate passes for observer validity, **not**
+for pipeline/compute parity (the original failures remain).
+
+Decoded [surface fields](surface/witness-comparison.json) distinguish:
+
+| Point | Demonstrated split |
+| --- | --- |
+| worst-bend556,378 | Nearly identical direct light; reflected ray hits the same world triangle226, but changed mapped sword normal alters direction/position and reflected texture/radiance. |
+| blue396,262 | Nearly identical direct light, same bounce direction; secondary hit changes from triangle627/material4 to641/material5 at approximately0.1082997m. |
+| red396,262 | Nearly identical direct light, same bounce direction; secondary hit changes from triangle675/material4 to689/material5 at approximately0.1082997m. |
+| finale552,395 | Nearly identical direct light; same reflected world triangle811, changed sword normal/direction and reflected texture/radiance. |
+| finale770,526 | Identical bounce hit/radiance; direct sky visibility1 versus0 and skyDiffuse0.6990025 versus0.35445005. |
+| two-enemy564,393 | Nearly identical direct light; reflected skeleton hit changes from triangle7109 to2259, with strongly different reflected illumination. |
+
+The finale receiver position is z=-12 exactly on pipeline and z=-11.999999 on
+compute. Existing `activeSkyLight` closed-room comparison uses z<=-12 and therefore
+selects the open-finale aperture versus ordinary moon direction for the same
+authored boundary face; finale open progress is1. This is a selector-boundary
+discontinuity, not proof of two inconsistent visibility queries for the same ray.
+No rounding-room-boundary fix, scene/material edit or tolerance relaxation is
+accepted yet. Five other points are dominated by bounce differences, so one
+blanket precision or shadow change is not supported.
+
+Next unfinished step: inspect the blue/red implicated authored faces for actual
+coplanarity/overlap and retain exact geometry/ray evidence; separately design a
+bounded numerical correction for the demonstrated closed-room light selector.
+Do not recapture the completed observers, redo normal controls or repeat rejected
+precision/phone measurements. A later actual fix must earn its own image gate.
 No main merge, release or publication. Normal worktree/configuration unchanged.
 
 Audio/haptic manual revalidation:NO: output-only diagnostics, semantic playback
