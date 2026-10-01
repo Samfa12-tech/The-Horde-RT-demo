@@ -1,4 +1,5 @@
 #include "platform/windows/DiagnosticWindow.h"
+#include "platform/windows/WindowsMusicPlayback.h"
 
 #include <algorithm>
 #include <array>
@@ -154,6 +155,8 @@ constexpr int kRtLabGlassIorSliderId = 158;
 constexpr int kRtLabGlassRoughnessLabelId = 159;
 constexpr int kRtLabGlassRoughnessSliderId = 160;
 constexpr int kChestPromptControlId = 161;
+constexpr int kMusicVolumeLabelId = 162;
+constexpr int kMusicVolumeSliderId = 163;
 constexpr int kMenuPauseId = 2001;
 constexpr int kMenuRestartId = 2002;
 constexpr int kMenuExitId = 2003;
@@ -298,6 +301,10 @@ struct VulkanSurfaceContext
     ULONGLONG lastDeveloperOverlayTick = 0u;
 #endif
     bool sfxEnabled = true;
+    int musicVolumePercent = 70;
+    std::unique_ptr<horde::platform::windows::WindowsMusicPlayback> musicPlayback;
+    std::uint64_t musicResetToken = 0u;
+    bool musicWindowActive = true;
     bool fullscreen = false;
     bool forwardHeld = false;
     bool backwardHeld = false;
@@ -667,6 +674,8 @@ void LoadSettings(VulkanSurfaceContext& context)
     // Progress is deliberately loaded independently from ordinary display/audio settings.
     context.rtLabUnlocked = GetPrivateProfileIntA("progress", "rtLabUnlocked", 0, path.c_str()) != 0;
     context.sfxEnabled = GetPrivateProfileIntA("audio", "sfx", 1, path.c_str()) != 0;
+    context.musicVolumePercent = std::clamp(
+        static_cast<int>(GetPrivateProfileIntA("audio", "musicVolume", 70, path.c_str())), 0, 100);
     const int sensitivity = std::clamp(static_cast<int>(GetPrivateProfileIntA("controls", "lookSensitivity", 100, path.c_str())), 60, 150);
     context.mouseSensitivity = static_cast<float>(sensitivity) / 100.0f;
     const int renderScale = std::clamp(static_cast<int>(GetPrivateProfileIntA("display", "renderScale", 100, path.c_str())), 50, 100);
@@ -765,6 +774,8 @@ void SaveSettings(const VulkanSurfaceContext& context)
 {
     const std::string path = SettingsPath().string();
     WritePrivateProfileStringA("audio", "sfx", context.sfxEnabled ? "1" : "0", path.c_str());
+    const std::string musicVolume = std::to_string(context.musicVolumePercent);
+    WritePrivateProfileStringA("audio", "musicVolume", musicVolume.c_str(), path.c_str());
     const std::string sensitivity = std::to_string(static_cast<int>(std::round(context.mouseSensitivity * 100.0f)));
     WritePrivateProfileStringA("controls", "lookSensitivity", sensitivity.c_str(), path.c_str());
     const std::string renderScale = std::to_string(static_cast<int>(std::round(context.renderScale * 100.0f)));
@@ -1271,6 +1282,18 @@ void PlayPositionalSoundEffect(const VulkanSurfaceContext& context,
     }
 }
 
+void PublishMusicPlayback(VulkanSurfaceContext& context)
+{
+    if (context.musicPlayback)
+    {
+        // Copy before the existing SFX drain. No worker accesses GameSimulation.
+        (void)context.musicPlayback->Publish(context.simulation.Snapshot(),
+            context.simulation.Events().Events(), 1u, context.musicResetToken,
+            !context.musicWindowActive || !context.controlsEnabled || context.simulationPaused,
+            context.musicVolumePercent);
+    }
+}
+
 void DrainGameplayEvents(VulkanSurfaceContext& context)
 {
     using horde::gameplay::simulation::EntityId;
@@ -1403,6 +1426,16 @@ void UpdateSettingsLabels(VulkanSurfaceContext& context)
     if (HWND slider = GetDlgItem(context.windowHandle, kRenderScaleSliderId))
     {
         SendMessageA(slider, TBM_SETPOS, TRUE, static_cast<LPARAM>(std::round(context.renderScale * 100.0f)));
+    }
+    if (HWND label = GetDlgItem(context.windowHandle, kMusicVolumeLabelId))
+    {
+        const std::string text = "MUSIC VOLUME: " +
+                                 std::to_string(context.musicVolumePercent) + "%";
+        SetWindowTextA(label, text.c_str());
+    }
+    if (HWND slider = GetDlgItem(context.windowHandle, kMusicVolumeSliderId))
+    {
+        SendMessageA(slider, TBM_SETPOS, TRUE, static_cast<LPARAM>(context.musicVolumePercent));
     }
 
     HMENU menu = GetMenu(context.windowHandle);
@@ -1629,7 +1662,8 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
     SetControlVisible(context.windowHandle, kRtLabButtonId,
                       pauseVisible && rtLabAccess && !context.deathOverlayVisible);
     for (const int id : {kSettingsTitleId, kSfxButtonId, kSensitivityButtonId, kWaterQualityButtonId, kRenderScaleLabelId,
-                          kRenderScaleSliderId, kFullscreenButtonId, kSettingsBackButtonId})
+                          kRenderScaleSliderId, kMusicVolumeLabelId, kMusicVolumeSliderId,
+                          kFullscreenButtonId, kSettingsBackButtonId})
     {
         SetControlVisible(context.windowHandle, id, context.settingsVisible);
     }
@@ -1673,6 +1707,7 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
     const bool wasSimulationPaused = context.simulationPaused;
     context.simulationPaused = MeasurementPausedByUi(context);
     context.simulationInput.paused = context.simulationPaused;
+    PublishMusicPlayback(context); // Menu suspension need not wait for a GPU frame.
     if (context.rtFrameEvidenceInitialised)
     {
         (void)context.rtFrameEvidence.SetPaused(context.simulationPaused);
@@ -2454,11 +2489,11 @@ void ClearDesktopInput(VulkanSurfaceContext& context)
 
 std::vector<HWND> VisibleControllerMenuControls(const VulkanSurfaceContext& context)
 {
-    constexpr std::array<int, 35u> controlIds{{
+    constexpr std::array<int, 36u> controlIds{{
         kResumeButtonId, kRestartButtonId, kControlsButtonId, kSettingsButtonId,
         kRtLabButtonId, kDiagnosticsButtonId, kRunBenchmarkButtonId, kMoreBySamfa12ButtonId,
         kExitButtonId, kSfxButtonId, kSensitivityButtonId, kWaterQualityButtonId,
-        kRenderScaleSliderId, kFullscreenButtonId, kSettingsBackButtonId,
+        kRenderScaleSliderId, kMusicVolumeSliderId, kFullscreenButtonId, kSettingsBackButtonId,
         kBenchmarkCopyButtonId, kBenchmarkSaveButtonId, kBenchmarkBackButtonId,
         kRtLabWaterfallSliderId, kRtLabRoofSliderId, kRtLabDawnSliderId,
         kRtLabFogSliderId, kRtLabFireStrengthSliderId, kRtLabFireTurbulenceSliderId,
@@ -3709,6 +3744,7 @@ bool RecreateSwapchain(VulkanSurfaceContext& ctx)
 
 void DestroyRenderContext(VulkanSurfaceContext& ctx)
 {
+    if (ctx.musicPlayback) ctx.musicPlayback->Stop(); // Join before context/storage destruction.
     if (ctx.device == VK_NULL_HANDLE)
     {
         if (ctx.rtFrameEvidenceInitialised)
@@ -3934,6 +3970,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             TryGrantRtLabUnlock(ctx, true);
             ShowEndingMenu(ctx);
         }
+        PublishMusicPlayback(ctx);
         DrainGameplayEvents(ctx);
         horde::vulkan::raytracing::RtSceneFrameInputs frameInputs =
             horde::vulkan::raytracing::BuildRtSceneFrameInputs(
@@ -4182,6 +4219,7 @@ void ApplyCaptureCheckpoint(VulkanSurfaceContext& context,
                             const horde::gameplay::ShowcaseCheckpoint& checkpoint)
 {
     context.simulation.ApplyShowcaseCheckpoint(checkpoint.id);
+    ++context.musicResetToken; // Import is an explicit audio discontinuity even at the same tick.
     context.benchmarkEvidence.Cancel();
     if (context.rtFrameEvidenceInitialised)
     {
@@ -4901,6 +4939,18 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         SetWindowLongPtrA(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(&context));
         if (captureDirectory == nullptr)
         {
+            // Normal gameplay and benchmark runs include music. Frozen image
+            // capture mode deliberately has no playback, as with existing SFX.
+            try
+            {
+                context.musicPlayback = std::make_unique<horde::platform::windows::WindowsMusicPlayback>(
+                    ResolveAssetRoot(), &LogWindowsAudio);
+            }
+            catch (const std::exception& error)
+            {
+                LogWindowsAudio(std::string("Music could not initialize; RT/SFX unchanged: ") + error.what());
+            }
+            context.musicWindowActive = GetForegroundWindow() == hWnd;
             ApplyOverlayState(context);
             if (!unattendedBenchmark)
                 horde::platform::windows::BeginGitHubReleaseUpdateCheck(
@@ -5250,7 +5300,8 @@ void ApplyDpiScaledFonts(HWND window)
                          kMoreBySamfa12ButtonId, kExitButtonId, kBenchmarkTitleId,
                          kBenchmarkCopyButtonId, kBenchmarkSaveButtonId, kBenchmarkBackButtonId,
                          kSettingsTitleId, kSfxButtonId, kSensitivityButtonId, kWaterQualityButtonId, kRenderScaleLabelId,
-                         kRenderScaleSliderId, kFullscreenButtonId, kSettingsBackButtonId,
+                         kRenderScaleSliderId, kMusicVolumeLabelId, kMusicVolumeSliderId,
+                         kFullscreenButtonId, kSettingsBackButtonId,
                          kRtLabTitleId, kRtLabTelemetryId, kRtLabWaterfallLabelId, kRtLabWaterfallSliderId,
                          kRtLabRoofLabelId, kRtLabRoofSliderId, kRtLabDawnLabelId, kRtLabDawnSliderId,
                          kRtLabFogLabelId, kRtLabFogSliderId, kRtLabLightGroupButtonId,
@@ -5428,7 +5479,7 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
 
     const int labelHeight = ScaleForDpi(window, 26);
     const int sliderHeight = ScaleForDpi(window, 38);
-    const int settingsTotal = titleHeight + 5 * buttonHeight + labelHeight + sliderHeight + 6 * gap;
+    const int settingsTotal = titleHeight + 5 * buttonHeight + 2 * labelHeight + 2 * sliderHeight + 7 * gap;
     y = std::max(ScaleForDpi(window, 54), (height - settingsTotal) / 2);
     if (HWND title = GetDlgItem(window, kSettingsTitleId)) MoveWindow(title, pauseX, y, buttonWidth, titleHeight, TRUE);
     y += titleAdvance;
@@ -5440,6 +5491,10 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
     if (HWND label = GetDlgItem(window, kRenderScaleLabelId)) MoveWindow(label, pauseX, y, buttonWidth, labelHeight, TRUE);
     y += labelHeight;
     if (HWND slider = GetDlgItem(window, kRenderScaleSliderId)) MoveWindow(slider, pauseX, y, buttonWidth, sliderHeight, TRUE);
+    y += sliderHeight + gap;
+    if (HWND label = GetDlgItem(window, kMusicVolumeLabelId)) MoveWindow(label, pauseX, y, buttonWidth, labelHeight, TRUE);
+    y += labelHeight;
+    if (HWND slider = GetDlgItem(window, kMusicVolumeSliderId)) MoveWindow(slider, pauseX, y, buttonWidth, sliderHeight, TRUE);
     y += sliderHeight + gap;
     for (const int id : {kFullscreenButtonId, kSettingsBackButtonId})
     {
@@ -5727,6 +5782,18 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         }
         break;
     case WM_HSCROLL:
+        if (sceneContext && reinterpret_cast<HWND>(lParam) == GetDlgItem(hWnd, kMusicVolumeSliderId))
+        {
+            sceneContext->musicVolumePercent = std::clamp(
+                static_cast<int>(SendMessageA(reinterpret_cast<HWND>(lParam), TBM_GETPOS, 0, 0)), 0, 100);
+            UpdateSettingsLabels(*sceneContext);
+            PublishMusicPlayback(*sceneContext);
+            if (LOWORD(wParam) != TB_THUMBTRACK)
+            {
+                SaveSettings(*sceneContext);
+            }
+            return 0;
+        }
         if (sceneContext && reinterpret_cast<HWND>(lParam) == GetDlgItem(hWnd, kRenderScaleSliderId))
         {
             const int percentage = std::clamp(static_cast<int>(SendMessageA(reinterpret_cast<HWND>(lParam), TBM_GETPOS, 0, 0)), 50, 100);
@@ -6077,6 +6144,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 sceneContext->debugEnemyOverride = horde::gameplay::EnemyKind::None;
                 // Place the validation camera inside the real 2 m sword range.
                 sceneContext->simulation.ApplyShowcaseCheckpoint(10);
+                ++sceneContext->musicResetToken;
                 if (sceneContext->rtFrameEvidenceInitialised)
                 {
                     (void)sceneContext->rtFrameEvidence.ApplyEvent(
@@ -6090,6 +6158,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             {
                 sceneContext->debugEnemyOverride = horde::gameplay::EnemyKind::None;
                 sceneContext->simulation.ApplyShowcaseCheckpoint(3);
+                ++sceneContext->musicResetToken;
                 if (sceneContext->rtFrameEvidenceInitialised)
                 {
                     (void)sceneContext->rtFrameEvidence.ApplyEvent(
@@ -6282,6 +6351,11 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         }
         break;
     case WM_ACTIVATEAPP:
+        if (sceneContext)
+        {
+            sceneContext->musicWindowActive = wParam != FALSE;
+            PublishMusicPlayback(*sceneContext);
+        }
         if (sceneContext && wParam == FALSE && sceneContext->benchmark.IsRunning())
         {
             CancelBenchmark(*sceneContext, true);
@@ -6617,6 +6691,15 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     SendMessageA(renderScaleSlider, TBM_SETRANGE, TRUE, MAKELPARAM(50, 100));
     SendMessageA(renderScaleSlider, TBM_SETTICFREQ, 10, 0);
     SendMessageA(renderScaleSlider, TBM_SETPOS, TRUE, 100);
+    createStatic(kMusicVolumeLabelId, "MUSIC VOLUME: 70%", SS_CENTER | SS_CENTERIMAGE);
+    HWND musicVolumeSlider = CreateWindowExA(0, TRACKBAR_CLASSA, "",
+                                              WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_AUTOTICKS,
+                                              0, 0, 100, 38, hWnd,
+                                              reinterpret_cast<HMENU>(static_cast<INT_PTR>(kMusicVolumeSliderId)), instance, nullptr);
+    InstallControllerFocusOutline(musicVolumeSlider);
+    SendMessageA(musicVolumeSlider, TBM_SETRANGE, TRUE, MAKELPARAM(0, 100));
+    SendMessageA(musicVolumeSlider, TBM_SETTICFREQ, 10, 0);
+    SendMessageA(musicVolumeSlider, TBM_SETPOS, TRUE, 70);
     createButton(kFullscreenButtonId, "DISPLAY: WINDOWED");
     createButton(kSettingsBackButtonId, "BACK");
 

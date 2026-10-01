@@ -1,0 +1,5 @@
+Consumed 20 actual12s PCM body periods: generated=11521440 submitted=11521440 played=11520000 queuedBuffers=3
+Native48k output advanced at gain0: generated=11521440 submitted=11521440 played=11520000
+Pause retained queue; device clock frozen through two150ms intervals at=11520000
+Resume then retry: epoch=2 generated=2400 submitted=2400 played=960
+PASS: output clock/pause/resume/retry/join; silent smoke is not owner listening

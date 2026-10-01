@@ -1,0 +1,4 @@
+Native48k output advanced at gain0: generated=1920 submitted=1920 played=480
+Pause retained queue; device clock frozen through two150ms intervals at=480
+Resume then retry: epoch=2 generated=2400 submitted=2400 played=960
+PASS: output clock/pause/resume/retry/join; silent smoke is not owner listening

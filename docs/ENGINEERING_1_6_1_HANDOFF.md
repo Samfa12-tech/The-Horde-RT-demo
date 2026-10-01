@@ -28,6 +28,27 @@ without loosening tolerance. Include live motion, not just frozen extreme poses.
 Music, consent-based reporting, resource work and final gates remain in scope;
 licensing, signing recovery and publication remain owner-controlled.
 
+### October 1 Windows music output checkpoint
+
+Native XAudio2 sink now uses Core PCM on one worker with3×480-frame fixed queue,
+independent persisted Music Volume/default70, before-SFX-drain immutable copies,
+pause/focus retention and explicit-epoch callback-quiescent voice destruction.
+COM-per-worker defect was demonstrated by an initial failed smoke and fixed.
+Fresh Debug/Release RT app links and10/10 affected host tests (20.09s/10.51s) PASS;
+native gain-zero pause/resume/retry/join smoke PASS both and under ASan. Release
+extended run consumed11520000 source frames (twenty12s loops) with3 queued buffers,
+then pause/reset/join passed. Not audible-seam/mix or phone acceptance.
+[Evidence](evidence/2026-10-01-windows-music/README.md). Normal app/benchmarks include
+music; frozen captures have no playback. Accepted player/renderer unchanged.
+Android sink is separately reviewed/build-checked but uncommitted at this slice.
+Phone remains unavailable; continue independent work. Audio/haptic manual:YES
+for actual playback/gain integration; haptic patterns/routes unchanged.
+
+`6385288` exact push36793789612 and PR36793793490 each pass53/53 GCC/Clang/MSVC
+and13/13 Vulkan CPU-host. Lead read actual eight log counts; PR synthetic integration
+617d916 againstbda1b99 includes exact source. This does not certify subsequent
+Windows/Android integration source; obtain fresh CI after its reviewed push.
+
 ### October 1 audio-worker music session checkpoint
 
 Shared copied-event inbox and single-owner Core session are implemented, still

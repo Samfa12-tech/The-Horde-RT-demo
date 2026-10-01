@@ -123,6 +123,18 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_CAPABILITY_PROBE_EXECUTABLE)
     )
 endif()
 
+if(WIN32)
+    add_library(horde_windows_music STATIC src/platform/windows/WindowsMusicPlayback.cpp)
+    target_include_directories(horde_windows_music PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(horde_windows_music PUBLIC horde_gameplay_simulation PRIVATE xaudio2 ole32)
+    if(BUILD_TESTING)
+        # Requires a real OS audio endpoint; compile in MSVC CI, do not claim a
+        # headless CTest is device/playback acceptance.
+        add_executable(horde_rt_windows_music_playback_smoke tests/WindowsMusicPlaybackSmoke.cpp)
+        target_link_libraries(horde_rt_windows_music_playback_smoke PRIVATE horde_windows_music)
+    endif()
+endif()
+
 if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AND WIN32)
     set(HORDE_RT_WINDOWS_RESOURCE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/generated/windows")
     file(MAKE_DIRECTORY "${HORDE_RT_WINDOWS_RESOURCE_DIRECTORY}")
@@ -146,6 +158,7 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AN
 
     target_link_libraries(horde_rt_diagnostic_window PRIVATE
         horde_rt_probe_core
+        horde_windows_music
         comdlg32
         comctl32
         bcrypt

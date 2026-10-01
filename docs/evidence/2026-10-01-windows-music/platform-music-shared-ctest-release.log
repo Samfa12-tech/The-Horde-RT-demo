@@ -1,0 +1,26 @@
+Internal ctest changing into directory: C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build
+Test project C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build
+      Start 50: horde_rt_simulation_timing_tests
+ 1/10 Test #50: horde_rt_simulation_timing_tests ........   Passed    1.35 sec
+      Start 51: horde_rt_simulation_gameplay_tests
+ 2/10 Test #51: horde_rt_simulation_gameplay_tests ......   Passed    1.41 sec
+      Start 52: horde_rt_music_director_tests
+ 3/10 Test #52: horde_rt_music_director_tests ...........   Passed    0.01 sec
+      Start 53: horde_rt_music_pcm_stream_tests
+ 4/10 Test #53: horde_rt_music_pcm_stream_tests .........   Passed    0.15 sec
+      Start 54: horde_rt_music_pcm_wave_tests
+ 5/10 Test #54: horde_rt_music_pcm_wave_tests ...........   Passed    0.05 sec
+      Start 55: horde_rt_music_pcm_asset_bank_tests
+ 6/10 Test #55: horde_rt_music_pcm_asset_bank_tests .....   Passed    0.30 sec
+      Start 56: horde_rt_music_playback_session_tests
+ 7/10 Test #56: horde_rt_music_playback_session_tests ...   Passed    0.15 sec
+      Start 57: horde_rt_music_asset_admission_tests
+ 8/10 Test #57: horde_rt_music_asset_admission_tests ....   Passed    7.05 sec
+      Start 67: horde_rt_spatial_audio_smoke
+ 9/10 Test #67: horde_rt_spatial_audio_smoke ............   Passed    0.01 sec
+      Start 85: pocket_audio_native_pcm_tests
+10/10 Test #85: pocket_audio_native_pcm_tests ...........   Passed    0.01 sec
+
+100% tests passed, 0 tests failed out of 10
+
+Total Test time (real) =  10.51 sec
