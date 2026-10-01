@@ -84,6 +84,26 @@ This extra query is diagnosis only, never Shipping or a traversal-budget change
 to physical transport. Repeat only the two affected captures for the changed
 module; keep first receipts, no performance rerun.
 
-Next unfinished step: compile/build the second discriminator once.
+Second-probe additional mapping: primaryOpenOpaqueTerminalMaterialMask is the
+raw normal-primary candidate ID mask; shadowImplicitOriginExitCount counts
+normal-query instance20 candidates (not unique pixels). shadowMismatchEmptyCount
+counts pixels with an independent Opaque/viewmodel-only committed hit;
+shadowOpenMissCount counts those whose ID is unexpectedly not20;
+certifiedClosedVolumeRecoveryReasonMask is the independent committed ID mask.
+These fields are also **not** physical-transport diagnostics. [Vulkan opacity
+precedence](https://docs.vulkan.org/spec/latest/chapters/raytraversal.html#ray-opacity-culling)
+defines Opaque as overriding build/instance opacity; masks and ray extents stay
+identical to the intended viewmodel part of the normal primary query.
+
+Second module compiles/validates at507096bytes,17atomics,24ray-query sites
+(one additional primary-only diagnostic query). SHA256
+8f3bd5d4b69c1ee82c6e8be308fbe017e4fe7df70a5f3751afdd24cac34657c9.
+Other seven compute SPIR-V identities remain normal. Fresh four-ABI Debug build
+passes (7s incremental), actual ARM64 module bytes verified, all70 assets equal
+normal8CB. Frozen `C:/Dev/tmp/horde-s24-instance-hits-20261001/instance-hits-second-debug.apk`,
+SHA2563c11c209e9fa0b7cf37c27dea86be17ec0102579392afcc911c28b01254c1e92.
+
+Next unfinished step: two second-probe captures and comparison; then restore
+normal8CB. Do not rerun the completed first-probe matrix.
 Audio/haptic manual revalidation required: **NO** (unchanged semantic playback).
 No main merge, release or publication authorised.

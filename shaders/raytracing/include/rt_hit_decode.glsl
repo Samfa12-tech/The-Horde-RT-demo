@@ -417,6 +417,15 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
         }
         int candidateInstance = int(rayQueryGetIntersectionInstanceCustomIndexEXT(query, false));
         int candidatePrimitive = rayQueryGetIntersectionPrimitiveIndexEXT(query, false);
+#ifdef HORDE_RT_PRIMARY_INSTANCE_HIT_PROBE
+        if (ignorePlayerNearFace)
+        {
+            uint candidateId = rayQueryGetIntersectionInstanceIdEXT(query, false);
+            RT_DIAG_OR(primaryOpenOpaqueTerminalMaterialMask,
+                       1u << min(candidateId, 31u));
+            RT_DIAG_ADD(shadowImplicitOriginExitCount, uint(candidateId == 20u));
+        }
+#endif
         bool candidateIsWater = candidateInstance == kWaterfallInstance ||
             (candidateInstance == 0 &&
              int(worldSurfaces.codes[candidatePrimitive] & 0xffu) == kMaterialWater);
@@ -448,6 +457,27 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
         }
     }
 
+#ifdef HORDE_RT_PRIMARY_INSTANCE_HIT_PROBE
+    if (ignorePlayerNearFace)
+    {
+        // Independent viewmodel-only hardware traversal. Never feeds shading or
+        // alters the original query; no region/material filtering is performed.
+        rayQueryEXT viewmodelQuery;
+        rayQueryInitializeEXT(viewmodelQuery, topLevelAS, gl_RayFlagsOpaqueEXT,
+                              kPlayerViewmodelPrimaryMask, origin,
+                              max(minimumDistance, 0.0), direction, maxDistance);
+        while (rayQueryProceedEXT(viewmodelQuery)) { }
+        if (rayQueryGetIntersectionTypeEXT(viewmodelQuery, true) !=
+            gl_RayQueryCommittedIntersectionNoneEXT)
+        {
+            uint directId = rayQueryGetIntersectionInstanceIdEXT(viewmodelQuery, true);
+            RT_DIAG_ADD(shadowMismatchEmptyCount, 1u);
+            RT_DIAG_ADD(shadowOpenMissCount, uint(directId != 20u));
+            RT_DIAG_OR(certifiedClosedVolumeRecoveryReasonMask,
+                       1u << min(directId, 31u));
+        }
+    }
+#endif
     if (rayQueryGetIntersectionTypeEXT(query, true) != gl_RayQueryCommittedIntersectionNoneEXT)
     {
         h.hit = true;

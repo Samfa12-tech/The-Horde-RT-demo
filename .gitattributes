@@ -198,3 +198,5 @@ docs/evidence/2026-10-01-report-export/**/*.log whitespace=-trailing-space,-blan
 
 # Byte-preserved bounded primary-opacity image and Shipping measurement receipts.
 docs/evidence/2026-10-01-primary-opacity/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+# Raw numeric probe receipts retain original bytes, including line endings.
+docs/evidence/2026-10-02-s24-instance-hits/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol

@@ -1267,8 +1267,6 @@ hands, not an animation/asset cause. No timing, owner-feel or S26/S25 claim.
 [Retained visual evidence](evidence/2026-10-01-s24-visual-followup/RESULTS.md).
 Private device/process rosters remain local; no data/settings/source fix.
 
-## Research sources
-
 ## October 2, 2026 - S24 raw primary instance-hit discriminator
 
 Exact **SM-S928B**, serialR5CXC0G9GBW, Android16/Adreno750. Investigation-only
@@ -1283,6 +1281,8 @@ remapped counters are **not glass diagnostic results** and no performance pass
 is claimed. Next: one independent unfiltered viewmodel-mask hardware query, not
 accepted-arm tuning. [Finite record](ENGINEERING_1_6_1_S24_INSTANCE_HITS_2026-10-01.md).
 S26/S25 certification is unchanged.
+
+## Research sources
 
 - [Android NDK stable APIs - Vulkan runtime capability guidance](https://developer.android.com/ndk/guides/stable_apis)
 - [Qualcomm Snapdragon device finder](https://www.qualcomm.com/smartphones/device-finder)
