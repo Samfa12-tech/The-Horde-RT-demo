@@ -96,8 +96,10 @@ constexpr char kAboutText[] = "Horde Lantern RT\nShowcase Alpha " HORDE_RT_DISPL
 constexpr char kReportDirectory[] = "reports";
 constexpr char kTextReportFilename[] = "vulkan_capability_report.txt";
 constexpr char kJsonReportFilename[] = "vulkan_capability_report.json";
-constexpr std::uint32_t kCaptureWidth = 960u;
-constexpr std::uint32_t kCaptureHeight = 540u;
+// Investigation only: exact retained ordinary High row43; never normal capture.
+constexpr std::uint32_t kCaptureWidth = 1232u;
+constexpr std::uint32_t kCaptureHeight = 803u;
+constexpr std::uint32_t kInvestigationLiveFrame = 44u;
 constexpr int kCaptureSettlingFrames = 12;
 constexpr int kEditControlId = 101;
 constexpr int kHudControlId = 102;
@@ -4062,7 +4064,8 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         PollDesktopController(ctx);
         const bool frozenDevelopmentCheckpoint =
             ctx.simulationPaused && ctx.frameDeltaSeconds == 0.0f &&
-            !ctx.developmentCheckpoint.empty();
+            (!ctx.developmentCheckpoint.empty() ||
+             GetPropA(ctx.windowHandle, kCaptureModeProperty) != nullptr);
         if (!frozenDevelopmentCheckpoint)
         {
             UpdateDesktopSceneControls(ctx, evidenceFrame ? &observation : nullptr);
@@ -4339,7 +4342,28 @@ const char* CapturePresetName(const horde::gameplay::ShowcaseCheckpointPreset pr
 void ApplyCaptureCheckpoint(VulkanSurfaceContext& context,
                             const horde::gameplay::ShowcaseCheckpoint& checkpoint)
 {
-    context.simulation.ApplyShowcaseCheckpoint(checkpoint.id);
+    // Reuse the previously witnessed gameplay-owned staging, not an authored pose.
+    horde::gameplay::simulation::InputSnapshot liveInput{};
+    liveInput.damageEnabled = false;
+    liveInput.hasAuthoritativePlayerPose = true;
+    liveInput.authoritativePlayerX = horde::gameplay::kLanternBenchmarkX;
+    liveInput.authoritativePlayerZ = horde::gameplay::kLanternBenchmarkZ;
+    liveInput.yawRadians = horde::gameplay::kLanternBenchmarkYaw;
+    liveInput.pitchRadians = horde::gameplay::kLanternBenchmarkPitch;
+    liveInput.torchLightStrength = 1.8f;
+    for (std::uint32_t lap = 0u; lap < 2u; ++lap)
+    {
+        if (!horde::gameplay::StageLanternBenchmark(
+                context.simulation, horde::gameplay::BenchmarkWorkload::LanternRevealSequence))
+            throw std::runtime_error("Investigation live replay failed to stage.");
+        const std::uint32_t frames = lap == 0u
+            ? horde::gameplay::kLanternBenchmarkFramesPerLap : kInvestigationLiveFrame;
+        for (std::uint32_t frame = 0u; frame < frames; ++frame)
+            context.simulation.AdvanceFrame(liveInput, 1.0f / 60.0f,
+                                            ++context.inputPublicationSequence);
+    }
+    if (context.simulation.Snapshot().tickIndex != 646u)
+        throw std::runtime_error("Investigation row43 did not reach the required tick646.");
     ++context.musicResetToken; // Import is an explicit audio discontinuity even at the same tick.
     context.benchmarkEvidence.Cancel();
     if (context.rtFrameEvidenceInitialised)
@@ -4355,9 +4379,6 @@ void ApplyCaptureCheckpoint(VulkanSurfaceContext& context,
     context.simulationInput.damageEnabled = false;
     context.simulationInput.hasAuthoritativePlayerPose = false;
     context.simulationInput.torchLightStrength = context.torchLightStrength;
-    context.simulation.AdvanceFrame(context.simulationInput,
-                                    0.0,
-                                    ++context.inputPublicationSequence);
     MirrorSimulationSnapshot(context);
     context.debugEnemyOverride = horde::gameplay::EnemyKind::None;
 }
@@ -4405,7 +4426,10 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
              << "  \"sceneOnly\": true,\n"
              << "  \"overlaysIncluded\": false,\n"
              << "  \"settlingFrames\": " << kCaptureSettlingFrames << ",\n"
-             << "  \"fixedAnimationTimeSeconds\": 0.000000,\n"
+             << "  \"investigationOnly\": true,\n"
+             << "  \"liveBenchmarkFrame\": " << kInvestigationLiveFrame << ",\n"
+             << "  \"liveSimulationTick\": " << context.simulation.Snapshot().tickIndex << ",\n"
+             << "  \"fixedAnimationTimeSeconds\": " << context.simulation.Snapshot().walkTime << ",\n"
              << "  \"buildId\": \"" << JsonEscape(HORDE_RT_BUILD_ID) << "\",\n"
              << "  \"playerMountProfile\": \""
              << (context.simulation.Snapshot().playerMountProfile ==
@@ -4687,7 +4711,8 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
     else
     {
         for (const auto& checkpoint : horde::gameplay::kShowcaseCheckpoints)
-            checkpoints.push_back(&checkpoint);
+            if (checkpoint.id == 11)
+                checkpoints.push_back(&checkpoint);
     }
     captures.reserve(checkpoints.size());
     auto fail = [&](const std::string& diagnostic) {
