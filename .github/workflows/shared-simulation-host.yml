@@ -33,9 +33,11 @@ jobs:
 
       - name: Install the repository-pinned Android SDK tools
         run: |
+          hordeSdkManager="${ANDROID_HOME:?Android SDK root is unavailable}/cmdline-tools/latest/bin/sdkmanager"
+          test -x "$hordeSdkManager"
           # Ignore only yes's expected SIGPIPE, not a failed sdkmanager command.
-          (set +o pipefail; yes | sdkmanager --licenses)
-          sdkmanager --install "platforms;android-34" "build-tools;34.0.0" "ndk;26.1.10909125" "cmake;3.22.1"
+          (set +o pipefail; yes | "$hordeSdkManager" --licenses)
+          "$hordeSdkManager" --install "platforms;android-34" "build-tools;34.0.0" "ndk;26.1.10909125" "cmake;3.22.1"
 
       - name: Fetch only Android runtime LFS payloads
         run: >-
