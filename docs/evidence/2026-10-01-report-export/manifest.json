@@ -1,0 +1,161 @@
+{
+  "schemaVersion": 1,
+  "source": "69afe4e2b9c3499061fa285529d96dd01bd75766",
+  "files": [
+    {
+      "path": "android/consent-rejected-ui.xml",
+      "bytes": 8187,
+      "sha256": "8bf9f3fd1a0915f9f024ab4c79620901320d972d15683078c00588d94946651b"
+    },
+    {
+      "path": "android/context-back-menu-ui.xml",
+      "bytes": 8908,
+      "sha256": "a377ca58adbb8e64e319be18cd876389d2ac9a74baf8195b35a79f48085af6ad"
+    },
+    {
+      "path": "android/context-both-consents-ui.xml",
+      "bytes": 8457,
+      "sha256": "155fcb30ccc7618da2ce461403904da466e1309799e45dee11f22093ef3f9094"
+    },
+    {
+      "path": "android/context-export.json",
+      "bytes": 452,
+      "sha256": "6851ad16fa7a737ea888b4decf80850ef101d9d2c37f6ef9f89902a5a508afa0"
+    },
+    {
+      "path": "android/context-save-ready-ui.xml",
+      "bytes": 8192,
+      "sha256": "e6ba75de3ac469038b8df966ad831763f2c1ff57720a6413432fea0886a85a55"
+    },
+    {
+      "path": "android/context-saved.png",
+      "bytes": 846318,
+      "sha256": "9b8a7080b4631d682724982e19d67e0a0d7098feb242a5bb944025a89c0138b1"
+    },
+    {
+      "path": "android/final-checked.png",
+      "bytes": 805474,
+      "sha256": "f5060626647490eb5f8b1ed020e30159dd308a70c47a53386b9a0fa5285c6c76"
+    },
+    {
+      "path": "android/final-ui-checked-ui.xml",
+      "bytes": 8474,
+      "sha256": "fc153fd579497f352493d0ac84aeba88314ec7c638de25c7a9184d9ce933cddd"
+    },
+    {
+      "path": "android/final-ui-unchecked-ui.xml",
+      "bytes": 8476,
+      "sha256": "23172367fbd82fd630813ec00b575cf4b6b3ced7038d95d4ebbfc96fd09a180f"
+    },
+    {
+      "path": "android/final-unchecked.png",
+      "bytes": 806342,
+      "sha256": "a6f97dce558c75dc904561dd1c4cb3c01ea14af7af1fd0574752d21f98437484"
+    },
+    {
+      "path": "android/form-corrected-ui.xml",
+      "bytes": 7894,
+      "sha256": "709bc78dd1ca4fc03f3897dfea6406048a03abd7fdb875874abc4825a92421ce"
+    },
+    {
+      "path": "android/form-start-ui.xml",
+      "bytes": 7098,
+      "sha256": "1a6a3548b83d89c6a59087a5d252fc3d15132f2fb2f1aa3f2b403a8132c4727f"
+    },
+    {
+      "path": "android/form-start.png",
+      "bytes": 859057,
+      "sha256": "299bede866ca44435555c9f71be0fe5d2bd5cd537657c3c05e1f972cdafdbbc4"
+    },
+    {
+      "path": "android/fresh-context-form-bottom-ui.xml",
+      "bytes": 8476,
+      "sha256": "e5dd8465bb7b8f26770921e2b9e63a06826c474ee66ad81f638d81829e231bc6"
+    },
+    {
+      "path": "android/note-only-export.json",
+      "bytes": 216,
+      "sha256": "7efc8d9be306aff6aa4540cf91c04587ac2e9c4836df112e502ab6fc436e73dc"
+    },
+    {
+      "path": "android/picker-cancel-ready-ui.xml",
+      "bytes": 8214,
+      "sha256": "9f8468804763793173e2ebb1fe09e0a6f6bd227af885a6dacc928c5f3f6a9a7b"
+    },
+    {
+      "path": "android/saved-note-ready-ui.xml",
+      "bytes": 8201,
+      "sha256": "d430a9b1b2f4f3e0607025ace5a1f5f8277dbc9e85403d636122fc87e10c6a69"
+    },
+    {
+      "path": "host/horde-report-android-checkbox-build.log",
+      "bytes": 3710,
+      "sha256": "9c0bbe9f3f82cc999397e9b2b17bb4e2d114e57d7538778c326d81ce5b749760"
+    },
+    {
+      "path": "host/horde-report-android-visible-choice-build.log",
+      "bytes": 3710,
+      "sha256": "e1f37f56673f2343559f552e09ded61bd47a292fbebd2a025d1feeb110f1b772"
+    },
+    {
+      "path": "host/horde-report-core-debug-build.log",
+      "bytes": 816,
+      "sha256": "22ad9430980e1a2e9fc6b14de7db3c29d88326967851dcf2161d1fd456c4eb2c"
+    },
+    {
+      "path": "host/horde-report-core-release-build.log",
+      "bytes": 2125,
+      "sha256": "6c9c25c90cef96352dc05225b20c54492c51cbd119f74630c17c6b26f810ff8e"
+    },
+    {
+      "path": "host/horde-report-core-release-test.log",
+      "bytes": 483,
+      "sha256": "84999422291b4b475771c51cc3521f19a6ca38f9f643cdd710fa5e5d0eace666"
+    },
+    {
+      "path": "host/horde-report-windows-debug-build.log",
+      "bytes": 4318,
+      "sha256": "f52c4349b801cfaaf3da55c1ffe05a1203388246fc74d62ffaaf97525dd42bd6"
+    },
+    {
+      "path": "host/horde-report-windows-debug-final-build.log",
+      "bytes": 1054,
+      "sha256": "99b29b8715cf5f122587025b39bcc31e13e3e7df78b7f3c51608bee9a8c035c6"
+    },
+    {
+      "path": "host/horde-report-windows-debug-fixed-build.log",
+      "bytes": 1555,
+      "sha256": "d3a8baa6d327e48853d487fff388193eef2bf5797d26bceca7784569b3edcbc5"
+    },
+    {
+      "path": "host/horde-report-windows-release-build.log",
+      "bytes": 4455,
+      "sha256": "e075b40a08217023a147560c44464157597610026f7883fceca5b48f084ec836"
+    },
+    {
+      "path": "host/horde-report-windows-ui-debug-test.log",
+      "bytes": 629,
+      "sha256": "270048d5698f9c4d4c52c2f8550491c951322982ef5b82c16c92c1e690f1c58e"
+    },
+    {
+      "path": "host/horde-report-windows-ui-release-test.log",
+      "bytes": 633,
+      "sha256": "408cbe250c8a5a89dff80068ed58daae1e09360d68bba2bc4b1b32434c85852b"
+    },
+    {
+      "path": "host/horde-report-windows-ui-test-build.log",
+      "bytes": 3076,
+      "sha256": "74cd235989d233eb9feb02122c735939ac5d41c6edbd89910f1e7cf54d853d71"
+    },
+    {
+      "path": "host/PlaytestReportExportTest.xml",
+      "bytes": 1203,
+      "sha256": "601c4c15ec369e2d332e226b0fc0a7484cdc060914210c983ae7d4a3d22bd5de"
+    },
+    {
+      "path": "README.md",
+      "bytes": 5741,
+      "sha256": "421e53bce659b9276026b0ec56e38231e7904747c1a155b97b17e9cedf4721f1"
+    }
+  ]
+}

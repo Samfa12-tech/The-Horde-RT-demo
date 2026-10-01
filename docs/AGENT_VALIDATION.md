@@ -30,15 +30,25 @@ ctest --test-dir build/host-ci --build-config Release --output-on-failure
 This covers non-hardware shared tests, not Vulkan presentation or phone behaviour. Use CTest selection for an affected subset when appropriate; report the actual selection and result instead of hard-coding a test count.
 
 The portable workflow has GCC/Clang Linux and MSVC Windows entries. Windows builds
-the portable targets and runs the same common tests (currently 55, including the
+the portable targets and runs common tests (including the
 music resolver, audio-worker session/inbox, Core-backed PCM cursor/WAV decoder and immutable asset bank, generic Core contracts and
 byte-exact native-only dependency and closed-roster music asset admission, plus
-the unwired consent-bounded player-report contract and staged-primary page/packing
-contract); its explicit exclusion is
+the consent-bounded player-report contract and staged-primary page/packing
+contract), plus platform-specific native CPU/UI fixtures including the real
+Windows report form with an injected file destination. Its explicit exclusion is
 the 15 additional `WIN32` tooling fixtures, some of which need shader SDK/Android
 tools not provisioned by this compiler lane. This is additive MSVC coverage, not
 a replacement for the separate full Windows tooling/shader gate. Keep that scope
 and the workflow's fail-on-empty-test behaviour explicit in validation reports.
+
+For report changes, select `horde_rt_playtest_report_tests` and, on Windows,
+`horde_rt_windows_playtest_report_ui_tests`. The latter opens only its own native
+form, with bounded waits; it is not real Windows file-picker/write, remote delivery
+or RTX evidence. Android `PlaytestReportExportTest` covers approved-byte ownership,
+consent, explicit retry/cancellation and destination failure. Actual Android
+picker/export/contrast evidence and exact artifact identities are retained in
+[the reporting record](ENGINEERING_1_6_1_REPORTING_2026-10-01.md). Neither local
+export nor mocked destinations close a backend/real-delivery gate.
 
 The mailbox stress fixture retains 125,000 publications, four concurrent readers,
 coherence/monotonic/final-publication checks and its 30-second deadline. Readers

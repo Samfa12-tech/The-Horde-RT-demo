@@ -1,0 +1,85 @@
+# 1.6.1 local player-report integration
+
+Single continuation record. Reporting remains part of the agreed programme;
+this slice does not reopen player, glass or music work. Original dirty engineering
+checkout and scratch files remain untouched. No main merge, release or publication.
+Shared contract3e0f9be; reviewed native integration69afe4e.
+
+## Implemented boundary
+
+The shared schema1 builder is now used by native Android and Windows forms,
+reached from paused/menu UI. Explicit export consent and separate basic-context
+opt-in start **off on every new form**. Foreground local file export is not remote
+delivery: neither client uploads a report, chooses a server, attaches logs/saves/
+screenshots, persists report consent, or retries in the background. A user-selected
+document provider may sync the exported file independently; Android discloses this.
+No Briarhold endpoint/account is borrowed.
+
+`PlaytestReport` owns validation, strict UTF-16-to-UTF-8 conversion, privacy-policy
+checks, note4096-byte/context512-byte limits and final16KiB cap. Authored CR/LF/TAB
+are now allowed and JSON-escaped; they remain forbidden in context. Malformed
+surrogates, NUL and other controls still fail, and credentials split by whitespace
+still reject. No silent replacement or shortening. Redaction-pattern rejection
+is a best-effort preparation policy, not comprehensive secret detection.
+
+Android publishes an owned typed context snapshot on the existing render owner
+and copies it under the existing report mutex. JNI never reads the live scene or
+extracts private diagnostic JSON. It returns raw strict UTF-8 bytes, not JNI's
+modified UTF-8. Windows captures an owned context on its application thread and
+uses the existing authoritative capability presentation flag, not a second flag.
+Compiled Mobile/High quality is independent of water settings. Unavailable
+renderer context can never be guessed into a note-only report.
+
+Prepared bytes/opaque ID are frozen across explicit cancel/failure retries.
+Android writes at most16KiB on a dedicated worker, invalidates late UI completion
+on Back/destroy, and states that a confirmed destination's already-started write
+cannot be undone. Windows uses a synchronous native foreground file picker and
+checks write, flush and close. Both disclose possible partial files on failure.
+These are local retry contracts, not server delivery/deduplication proof.
+
+The cross-platform design skill informed native controls/pickers with shared
+consent and error states, not a UI framework migration. Its nine linked reference
+files are missing from this installed skill package; repository UI/privacy
+contracts supplied the bounded fallback. Phone inspection found and corrected
+invisible selected Spinner text, then low-contrast CheckBox marks.
+
+## Finite validation record
+
+See [retained evidence](evidence/2026-10-01-report-export/README.md) for exact APKs,
+synthetic exported bytes, logs, native UI fixtures and limits.
+
+| Check | Result and boundary |
+| --- | --- |
+| Shared native Unicode/privacy/retry tests | MSVC Debug/Release pass; initial literal-fixture encoding failure retained, fixed with explicit Unicode escapes rather than weakening assertions |
+| Real Windows form with injected destination | Debug2/2 and Release2/2 (shared+UI) pass; unchecked consent, required choices, privacy rejection, exact Unicode/multiline, fixed retry bytes, no duplicate success and honest false RT context |
+| Full Windows application | Current Debug/Release executable builds pass; not a new RTX presentation or real Windows picker/write acceptance |
+| Android Java | 30/30 unit tests pass, six focused export tests; exact UTF-8, consent/envelope limits, clones, picker cancel/retry, late callbacks, stream open/close errors |
+| Android Debug/lint | Build and lint pass; four ABI native builds, no shader/gameplay/music edit |
+| S26 EF2ECFE4 candidate | Actual unchecked consent rejection, note-only picker cancellation and explicit retry/save, new-form consent reset, and independently opted-in context/save pass |
+| S26 UI follow-up | Final8CB97689 installed/pulled match; visible off/on marks verified at unchanged large font scale. Disabled retry label corrected in source. Only affected visual checks repeated, not finished exports/performance/music |
+| CI | Await fresh checks for the pushed integration head; old cc3c077 jobs do not validate these changes |
+
+The S26 context JSON actually reports SM-S948B/Adreno840/RayTracingPipeline,
+Mobile/75%/1080x2235 and `rtPresented:true`. Its embedded build string is `1.6.1`,
+not a source hash; exact artifact provenance is supplied separately. Neither
+phone report is a new frame-rate, transport-correctness or release acceptance.
+
+## Next unfinished step
+
+1. Final S26 UI contrast evidence is archived and code reviewed/committed. Push
+   this slice and obtain current-head compiler/integration CI. Do not repeat completed save tests
+   without a concrete invalidation.
+2. Exercise the real Windows application entry and native file picker/write at
+   the next desktop interaction gate. Mocked destinations are explicitly separate.
+3. Complete remote reporting only with a confirmed appropriate backend destination
+   and authority; deployment/account configuration and real delivery are still open.
+   Do not send unsolicited test reports or introduce client secrets.
+
+S24 is released to the owner's spouse: no more S24 device operations until renewed
+availability. Its missing-hands/starting-enemy checks stay open; S25 stays unverified.
+All remaining glass/High/backend, music focus/balance, performance and final-candidate
+gates remain in the [programme handoff](ENGINEERING_1_6_1_HANDOFF.md).
+
+Audio/haptic manual revalidation required: **NO**. Existing paused/menu UI selection
+feedback is reused; no listener/event identity, SFX/music assets, playback backend,
+gain, haptic pattern, gameplay feedback or animation authority changed.

@@ -1,5 +1,9 @@
 # Unwired player-report contract checkpoint
 
+Historical checkpoint below is preserved. Native forms/local export subsequently
+integrate it at3e0f9be/69afe4e; see [new evidence](../2026-10-01-report-export/README.md).
+No remote-delivery acceptance follows from that later local integration.
+
 Typed cross-platform schema1 builder and foreground delivery-state seam only;
 **reporting feature not complete**. No platform form/export/remote transport,
 endpoint, automatic upload, background retry, screenshot/log/save attachment or

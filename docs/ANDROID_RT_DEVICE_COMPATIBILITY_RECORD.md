@@ -2,6 +2,34 @@
 
 Last updated: 2026-10-01
 
+## October 1: S26 consent-based local report export
+
+**Local exact-device UI/file evidence**, only SM-S948B/serialR5GL219SZGK,
+Android16/API36/Adreno840. Native report integration69afe4e/shared3e0f9be.
+Debug package suffix used; no stable1.6.0 update, app-data/volume/font reset,
+server request or automatic attachment. S24 remains released to spouse; no
+subsequent S24 action. S25 and the S24 hands/enemy visual gate remain open.
+
+EF2ECFE41C3A157D4B228E7EDB6012E0FD0707663E3FADBE8373B156C34F2E19
+installs/pulls identically. Both consent choices default off, unchecked export
+rejects, note-only picker cancellation and explicit immutable-report retry/save
+pass, and a new form resets both choices off. Separate opted-in context export
+actually saves452B: SM-S948B/Adreno840/RayTracingPipeline/Mobile75%1080x2235/
+`rtPresented:true`, without serial/logs/saves/screenshots/account IDs. Note-only
+file216B has no context. Actual payload build string1.6.1 is not a source hash.
+Provider-created empty file observed before the asynchronous writer completes
+is not accepted; subsequent same-attempt bytes and saved UI agree.
+
+Actual screenshots revealed invisible selected Spinner text, then low-contrast
+CheckBox marks; final UI APK8CB976891E5719ECEB7FD809EC91AAC939FF3EC58EB2D6DF44F15B5526F4FF87
+installs/pulls identically and visibly distinguishes off/on choices at the
+owner's unchanged large font scale. Only the affected visual check is repeated.
+Back leaves gameplay paused, then Home. Android30/30 Java tests/build/lint pass;
+no new sustained performance, glass correctness, remote reporting or release
+acceptance. Full private document-picker dumps are excluded from Git evidence.
+[Exact retained producers/results](evidence/2026-10-01-report-export/README.md).
+Audio/haptic manual revalidation required:NO; unchanged menu feedback/playback.
+
 ## October 1: S26 unfrozen containment and completed music clock
 
 **Exact local SM-S948B functional/clock evidence**, unchanged Debug APK e10b0203

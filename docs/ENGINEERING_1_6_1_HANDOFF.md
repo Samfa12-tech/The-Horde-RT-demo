@@ -13,7 +13,37 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
-### October 1 Mobile lantern profile (current authorised work)
+### October 1 local player-report integration (current checkpoint)
+
+Shared contract3e0f9be and native integration69afe4e add paused Android/Windows
+report forms and explicit foreground local JSON export. Separate export/context
+choices reset off; strict Unicode/multiline, privacy/size limits, frozen explicit
+retry and cancellation boundaries are covered. No server/automatic upload,
+attachments, borrowed Briarhold endpoint or real-delivery claim. See the
+[single continuation record](ENGINEERING_1_6_1_REPORTING_2026-10-01.md) and
+[artifact/UI evidence](evidence/2026-10-01-report-export/README.md).
+
+Fresh MSVC Debug/Release shared+real native form fixtures2/2 each PASS;
+destinations are injected, not real Windows file-picker/write acceptance.
+Full Windows application Debug/Release builds PASS. Android30/30 Java tests,
+Debug four-ABI build and lint PASS. Exact S26 EF2ECFE4 installed/pulled match:
+unchecked consent rejection, note-only picker cancel/retry/actual save,
+new-form reset and separate actual context export PASS. Synthetic216/452-byte
+files retained, no private picker directory dumps uploaded. Context actually
+records Mobile75%1080x2235/pipeline/presented; build string1.6.1 is not a hash.
+Final8CB97689 installed/pulled match separately verifies visible off/on consent
+marks after screenshot-found contrast defect; no repeated export/performance run.
+Phone Back returns paused menu, then Home. No S24 operations; it remains released.
+Current-head CI is pending push, not inferred from cc3c077's green runs.
+
+**Next:** push/verify coherent checkpoint and fresh CI; real Windows application
+entry/picker/write gate, then confirmed reporting destination/authority for any
+remote integration. All performance/High glass/backend, S24 visuals/S25, music
+focus/balance and final-candidate gates remain open; no player retuning or repeated
+finished matrix. Audio/haptic manual revalidation required: **NO**, existing paused
+UI feedback reused and semantic playback inputs/assets/backend unchanged.
+
+### October 1 Mobile lantern profile (accepted evidence; open gates retained)
 
 The owner authorises omitting physical pane geometry for **Mobile quality**, not
 a model-name workaround or fake transparency. Preserve full High glass, its source
@@ -55,7 +85,7 @@ Output-only75→100→75 idle-plus-resize107/166ms,normal75% restored; not A/B s
 Short Debug stationary display sample80 intervals112.500ms median/116.667ms p95
 is not Shipping pacing/30FPS. Single active RAM/PSI and thermal3 context do not
 close sustained memory/GPU-counter gaps. No player/music/renderer source change.
-**Next:** explicit-consent foreground local player-report export on Android/Windows;
+Local reporting has now progressed at the checkpoint above. **Remaining:**
 owner pickup/live feel, Shipping display pacing, S24 visual, S25, High physical/
 backend and final-candidate gates remain open. Do not restart completed checks.
 Do not rerun the matrix or rebuild unchanged artifacts.
