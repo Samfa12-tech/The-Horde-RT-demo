@@ -13,7 +13,40 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
-### October 2 closed light-region result (current unfinished step)
+### October 2 ordered PBR UV result (current unfinished step)
+
+Isolated candidate `877f567` / pushed complete evidence `dc11e89` closes the four
+remaining Mobile RTX reflection outliers. Completed115-field probes reproduce
+their controls exactly: matching hardware barycentrics but one-ULP UV-X differences
+precede differing normal/base/ORM samples and reflected hits. Constraining only
+the existing three-weight PBR UV interpolation order makes samples/secondary hits
+agree, without UV snapping, material/texture/geometry changes or player tuning.
+Native paired images pass unchanged max3/.001: combat max1, worst-bend max1,
+finale max3. Expected differences from buggy old pixels remain explicit failures
+against those old images, not relabelled regression passes. No full13-image or
+uninstrumented production acceptance is claimed.
+
+Fresh affected Debug/Release CTest each1/1 passes4.21/1.97s; all16 real modules
+compile/optimise/disassemble/validate. Pipeline Mobile disassembly otherwise
+matches after removing only NoContraction decorations. Generic adds84bytes/7
+counted instructions; Opaque504bytes/42 in each backend. All8 Shipping artifacts
+remain zero-atomic/no binding22. Cost admission still open (normal frozen
+headroom is insufficient); no budget raised or frame-time gain/loss invented.
+[Single durable record](evidence/2026-10-02-backend-pixel-witness/README.md)
+links exact commits/artifacts and completed finite matrices. Normal renderer,
+accepted player/music work and configuration remain unchanged; receipts only.
+
+Next concrete step: prepare a clean uninstrumented candidate containing only
+separable outward-world-box normals and ordered PBR UV arithmetic on current
+engineering source. Do not merge the witness branch or automatically include
+the cost-failing closed-light-region helper. Earn cost/full affected RTX/High/
+device gates, keeping the known boundary and High row43 negatives explicit.
+Do not repeat completed observers/controls, restart the audit or sweep precision.
+S26 is owner-disconnected until reconnection; no polling/install or repeated
+owner requests. No main merge, release or publication. Audio/haptic manual
+revalidation required:NO: arithmetic/capture only, unchanged feedback semantics.
+
+### October 2 closed light-region result (preceding completed investigation)
 
 Do not restart controls/status/geometry inventory on resumption. Isolated shader
 candidate `cc0491e` / complete pushed evidence `ac15d64` fixes the demonstrated
@@ -28,15 +61,14 @@ avoid a normalization assumption; shadow transport/origin tolerances unchanged.
 791 instructions relative to isolated control; frozen cost admission fails.
 All8 Shipping modules remain free of diagnostic atomics/binding22. No shader
 budget, pixel tolerance, accepted player work or normal renderer changes.
-Blue/red remain passing; four >3 reflection pixels remain:556,378 max4;
+Blue/red remain passing; at this stage four >3 reflection pixels remain:556,378 max4;
 552,395 max4;542,311 max7;564,393 max92. High row43 remains separate/open.
 [Single durable experiment record](evidence/2026-10-02-backend-pixel-witness/README.md)
 links the exact source, all new images/manifests/logs and curated current receipts.
 
-Next concrete step: localize the previously unobserved combat542,311 reflection
-layer, using existing85 fields and at most one bounded two-enemy capture per
-backend if new GPU evidence is necessary. No repeat of this completed five-image
-matrix, old controls, precision/epsilon sweeps or rejected phone performance work.
+Its former next step (combat localization) is completed in the ordered-UV
+section above; do not restart it or repeat this completed five-image matrix,
+old controls, precision/epsilon sweeps or rejected phone performance work.
 Cost/integration and uninstrumented/cross-platform gates remain open. S26 stays
 owner-disconnected until reconnection; existing music-interruption/S24 owner
 checks must not be re-requested. Audio/haptic manual revalidation required:NO:

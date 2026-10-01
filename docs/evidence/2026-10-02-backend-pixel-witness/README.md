@@ -184,3 +184,51 @@ matrix or conduct another precision/epsilon sweep. Keep remaining original
 reflection outliers, High row43 and shader-cost/promotion gates distinct.
 Audio/haptic manual revalidation required:NO; lighting only, no semantic
 listener/event/playback/haptic changes. Previously requested owner gates unchanged.
+
+## Latest: ordered PBR UV arithmetic (isolated image gates pass)
+
+The former next combat-localization task is completed; do not restart it.
+Exact isolated source `877f5670f2093c72730e315491b61139fc320667`, complete pushed
+[evidence `dc11e8985f3f74774b0648b9514a5941867f955d`](https://github.com/Samfa12-tech/The-Horde-RT-demo/tree/dc11e8985f3f74774b0648b9514a5941867f955d/docs/evidence/2026-10-02-backend-pixel-witness).
+This engineering checkpoint contains only three additional curated paired-image
+receipts, not the observer code, candidate modules or a renderer/config change.
+
+The85-field combat observer localizes the new point to a reflected-hit fork;
+the subsequent115-field probe preserves every non-payload control pixel exactly.
+At both combat pixels primary hardware barycentrics match, but interpolated UV X
+differs one binary32 ULP before texture normal/base/ORM samples diverge. One
+bounded `precise vec2 uv` candidate preserves the authored three-vertex expression,
+without snapping UVs, changing assets/LOD/materials or smoothing normals. UVs and
+normal samples then match; both reflected hits agree. Paired combat image max1
+passes unchanged max3/.001. Remaining checkpoints2/11 also pass (max1/max3).
+Expected changed old-control pixels are retained as differences, not fake passes.
+
+Curated [combat](ordered-uv-combat-backend-parity.json),
+[remaining scenes](ordered-uv-remaining-backend-parity.json) and
+[prior failing combat control](combat-point-backend-parity.json) preserve the
+negative-to-candidate comparison. Each finite native run exits0, honestly presents
+RT and preserves camera/state/CPU geometry/complete diagnostics/allocations.
+Actual manifests, lossless images/fields, exact executable hashes and full logs
+are in the linked immutable investigation snapshot. No completed control,
+checkpoint12 or shader set was rebuilt for the two-scene follow-up.
+
+Fresh Debug/Release affected CTest each1/1 passes4.21/1.97s; all16 shaders compile/
+optimise/disassemble/validate. Pipeline Mobile Shipping/Diagnostic disassembly
+is otherwise identical after removing only new NoContraction decorations.
+Generic adds84bytes/7 counted instructions, Opaque504bytes/42 in both backends;
+all8 Shipping modules remain zero atomics/no binding22. These are constraints,
+not measured native instruction/register/performance costs. Normal frozen
+ceilings do not admit the growth; no budget raised or Shipping promotion.
+
+All four remaining reflection outliers are closed **in this isolated matrix**.
+It is not full13-image/uninstrumented/cross-device acceptance. Prior blue/red
+evidence remains tied to its own source. Closed-region candidate cost/integration
+and separate High row43 physical false-candidate failure remain open. Normal
+production code is unchanged. No phone action, main merge, release or publication.
+
+Next unfinished step: clean uninstrumented outward-normal/PBR-UV candidate from
+normal engineering source, without automatically including the cost-failing
+light-region helper; exact cost/full affected RTX/High/device admission remains
+required. Reuse completed finite evidence; no new precision sweep or audit restart.
+Owner-disconnected S26 checks stay parked until reconnection. Audio/haptic manual
+revalidation required:NO: arithmetic/diagnostics only, feedback inputs unchanged.
