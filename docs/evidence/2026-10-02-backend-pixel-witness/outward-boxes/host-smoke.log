@@ -1,0 +1,18 @@
+Start testing: Oct 02 08:33 AUS Eastern Standard Time
+----------------------------------------------------------
+93/96 Testing: horde_rt_character_render_slot_smoke
+93/96 Test: horde_rt_character_render_slot_smoke
+Command: "C:/Dev/worktrees/horde-backend-six-pixel-witness/build/presets/windows-x64-debug/Debug/horde_rt_character_render_slot_smoke.exe"
+Directory: C:/Dev/worktrees/horde-backend-six-pixel-witness
+"horde_rt_character_render_slot_smoke" start time: Oct 02 08:33 AUS Eastern Standard Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   4.26 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_character_render_slot_smoke" end time: Oct 02 08:33 AUS Eastern Standard Time
+"horde_rt_character_render_slot_smoke" time elapsed: 00:00:04
+----------------------------------------------------------
+
+End testing: Oct 02 08:33 AUS Eastern Standard Time

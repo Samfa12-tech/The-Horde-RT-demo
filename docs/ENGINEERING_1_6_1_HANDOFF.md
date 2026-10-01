@@ -35,10 +35,16 @@ SPIR-V remain unchanged. No probe/normal shader, budget, pixel tolerance, player
 asset, gameplay/audio authority or quality-profile change enters engineering.
 [Single durable record](evidence/2026-10-02-backend-pixel-witness/README.md).
 
-Next unfinished step: inspect exact blue/red implicated world faces for overlap,
-then choose the smallest geometry/numerical-layer correction justified by that
-evidence; separately address the proven closed-room selector boundary. Keep
-other mapped-normal/reflection outliers distinct. No repeated precision keyword
+Authored-face inventory is complete. The coincident bracket/flame interface is
+reached because closed-box normal metadata points inward. Isolated correction
+`7782e8e`/evidence`94f0c4e` fixes only six normal codes and adds a source-face
+contract; Debug smoke1/1 passes. Both whole blue/red images now pass unchanged
+backend tolerance. Four old outliers and one new combat542,311 max7 remain;
+candidate is not promoted. Full exact source/images are pushed on the witness
+branch; the normal renderer is untouched. Next unfinished step: smallest
+justified numerical correction for the proven closed-room selector boundary.
+Keep normal-candidate acceptance/new point and mapped-normal outliers separate.
+No repeated geometry inventory, completed captures or precision keyword
 search, old phone performance trial, observer recapture or telemetry framework.
 S26 is owner-disconnected until explicitly reconnected. Previously requested
 music external-interruption/S24 live checks remain pending; do not resend.

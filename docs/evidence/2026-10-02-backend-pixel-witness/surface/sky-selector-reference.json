@@ -1,0 +1,44 @@
+{
+  "source": "ee71f98a2e00cddb5c6b88fd5ba78834e06fc32a",
+  "checkpoint": "finale-roof",
+  "x": 770,
+  "y": 526,
+  "finaleOpenProgress": 1,
+  "note": "Source-direction reconstruction, not a new GPU direction/blocker payload.",
+  "records": [
+    {
+      "backend": "pipeline",
+      "receiver": [
+        -31.495165,
+        -0.52432805,
+        -12.0
+      ],
+      "insideClosedRoom": true,
+      "selectedDirectionDoubleReference": [
+        -0.48188587674928457,
+        0.5543827583403306,
+        -0.6785615366674862
+      ],
+      "doubleReferenceDiffuse": 0.6990022524362697,
+      "capturedDiffuse": 0.6990025,
+      "absoluteError": 2.4756373029344303E-07
+    },
+    {
+      "backend": "compute",
+      "receiver": [
+        -31.495165,
+        -0.52432823,
+        -11.999999
+      ],
+      "insideClosedRoom": false,
+      "selectedDirectionDoubleReference": [
+        -0.180027,
+        0.93014,
+        -0.320048
+      ],
+      "doubleReferenceDiffuse": 0.35445002613023635,
+      "capturedDiffuse": 0.35445005,
+      "absoluteError": 2.386976366564042E-08
+    }
+  ]
+}

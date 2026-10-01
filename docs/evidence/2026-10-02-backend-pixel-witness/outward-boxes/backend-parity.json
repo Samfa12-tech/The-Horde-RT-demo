@@ -1,0 +1,147 @@
+{
+  "schema": 1,
+  "candidate": "7782e8eeb54850813c74c90b188969f908f4906f",
+  "payloadRows": 5,
+  "toleranceMaximum": 3,
+  "toleranceFraction": 0.001,
+  "records": [
+    {
+      "file": "02-worst-bend.png",
+      "pipelineSha256": "fa72e302c4b66d6ac1db3de40dc01f60b368a8dc2985bde44be2602200b834ee",
+      "computeSha256": "0690df35548348650d2d30f32b193cfd53bf57fd2d5ed5857510bca99bedc994",
+      "comparison": {
+        "maximumChannelDifference": 4,
+        "pixelsDifferentByMoreThanOne": 6,
+        "differentFraction": 1.1682242990654205E-05,
+        "unchangedGate": false,
+        "outliers": [
+          {
+            "x": 556,
+            "y": 378,
+            "maximumChannelDifference": 4,
+            "pipelineRgb": [
+              29,
+              15,
+              9
+            ],
+            "computeRgb": [
+              33,
+              16,
+              9
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "file": "06-blue.png",
+      "pipelineSha256": "b9ba8300de710031f027085743d852bedee77d4e2efe0773986f6e3dcc2958cb",
+      "computeSha256": "6afb2ce457eca660cc6befff23e4708975010ef603a9001153e3add5e0ad1de1",
+      "comparison": {
+        "maximumChannelDifference": 1,
+        "pixelsDifferentByMoreThanOne": 0,
+        "differentFraction": 0.0,
+        "unchangedGate": true,
+        "outliers": []
+      }
+    },
+    {
+      "file": "07-red.png",
+      "pipelineSha256": "3d92e703aa6229392218d5bdcdcf41ec23bab1e2ba0d3bdada09e49de85e9210",
+      "computeSha256": "19bbd37b32c8f60887d643ccde6d110a236a88dd1566d8bd15496c909fd65a8c",
+      "comparison": {
+        "maximumChannelDifference": 1,
+        "pixelsDifferentByMoreThanOne": 0,
+        "differentFraction": 0.0,
+        "unchangedGate": true,
+        "outliers": []
+      }
+    },
+    {
+      "file": "11-finale-roof.png",
+      "pipelineSha256": "c1b34cdbc53b30fdd82e0cfe40b185d0da0615748537a780845d37155e716ef8",
+      "computeSha256": "d99d01842f9b9080e4b3902ec3ad9208569797235026d63a1d96965af7279dd9",
+      "comparison": {
+        "maximumChannelDifference": 6,
+        "pixelsDifferentByMoreThanOne": 3,
+        "differentFraction": 5.8411214953271025E-06,
+        "unchangedGate": false,
+        "outliers": [
+          {
+            "x": 552,
+            "y": 395,
+            "maximumChannelDifference": 4,
+            "pipelineRgb": [
+              34,
+              16,
+              2
+            ],
+            "computeRgb": [
+              38,
+              18,
+              3
+            ]
+          },
+          {
+            "x": 770,
+            "y": 526,
+            "maximumChannelDifference": 6,
+            "pipelineRgb": [
+              18,
+              21,
+              25
+            ],
+            "computeRgb": [
+              13,
+              15,
+              20
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "file": "12-two-enemy-combat.png",
+      "pipelineSha256": "37816a91cf1a15f804b429b649bbfc5906bb5b78b05501937063d4c20ab44cd2",
+      "computeSha256": "69a48e973b672133e2ec23cde7a44ce7a06f6bb5688244d36a671d10800a9a4c",
+      "comparison": {
+        "maximumChannelDifference": 92,
+        "pixelsDifferentByMoreThanOne": 4,
+        "differentFraction": 7.78816199376947E-06,
+        "unchangedGate": false,
+        "outliers": [
+          {
+            "x": 542,
+            "y": 311,
+            "maximumChannelDifference": 7,
+            "pipelineRgb": [
+              183,
+              134,
+              52
+            ],
+            "computeRgb": [
+              190,
+              140,
+              54
+            ]
+          },
+          {
+            "x": 564,
+            "y": 393,
+            "maximumChannelDifference": 92,
+            "pipelineRgb": [
+              118,
+              64,
+              18
+            ],
+            "computeRgb": [
+              26,
+              14,
+              8
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

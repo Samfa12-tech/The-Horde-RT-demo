@@ -78,9 +78,59 @@ validate again. [Actual hash checks](surface/module-integrity.json) preserve all
 Shipping and all4 High Diagnostic modules byte-for-byte; Shipping stays0 atomics/
 no diagnostic binding. No physical transport, budgets or normal settings change.
 
-Next unfinished step: inspect the blue/red authored secondary faces for real
-coplanarity/overlap and retain exact geometry/ray evidence; separately design
-a bounded numerical correction for the demonstrated closed-room light selector.
-Do not repeat completed observers/controls, rejected precision/phone performance
-experiments or owner checks. No probe enters normal shaders or runtime settings.
+## Outward-box candidate: real metadata defect, acceptance still open
+
+Geometry inventory is complete: the metal bracket top and flame bottom overlap
+at y=.50. All six closed `addWorldBox` normal codes oppose their actual outward
+winding. The affected max-X face consequently spawns its ordinary bounce inside
+the bracket and onto that internal interface. This is not a player/IK issue or
+a reason to hide geometry, remove faces or invent an equal-distance tie winner.
+
+Isolated candidate7782e8eeb54850813c74c90b188969f908f4906f corrects only the six
+normal codes and adds an actual emitted-face/code source contract to the existing
+smoke. Vertices, triangles/materials, shaders, masks and budgets stay unchanged.
+Fresh Debug app/smoke build, CTest1/1 PASS4.26s; [log](outward-boxes/host-smoke.log).
+Exact observer executable05e8247fd9b7f213c2ca328ff2673076dd424dc7807f59b821582a6c2a16b567.
+Both five-image native runs exit0, preserving complete diagnostics/CPU geometry/
+allocations. Blue/red bounce outward to identical world triangles489/488 on both
+backends, with exact final pixels9,13,28 and31,9,11. Entire non-payload blue/red
+images pass the unchanged backend gate (max1/fraction over1=0).
+
+[Complete paired scan](outward-boxes/backend-parity.json) still fails worst-bend,
+finale and combat. Four earlier outliers persist; newly exposed combat542,311
+adds max7 (183,134,52 versus190,140,54). Original-buggy-control comparisons also
+fail after this physically motivated normal correction; those differences are
+retained, not forced away or admitted by looser tolerances. The source fix remains
+**isolated, not promoted**. No phone evidence/performance claim or accepted
+uninstrumented/full High/image gate belongs to it. Exact source, ten lossless
+images, manifests, field receipts and build log are preserved at
+[investigation94f0c4e](https://github.com/Samfa12-tech/The-Horde-RT-demo/tree/94f0c4ea0121a4704347bfc49d4e4b8d1211c218/docs/evidence/2026-10-02-backend-pixel-witness).
+
+[Sky direction source reference](surface/sky-selector-reference.json) matches
+captured skyDiffuse within2.48e-7/2.39e-8, corroborating different selected rays;
+it is not a new GPU direction/blocker payload.
+
+Next unfinished step: the smallest justified numerical correction for the
+closed-room light selector, on an isolated candidate. Keep outward-normal
+acceptance and new542,311 point separate. No repeat geometry inventory,
+completed observers/controls, rejected precision/phone performance experiments
+or owner checks. S26 is disconnected until owner reconnection. Normal renderer
+and settings remain unchanged; only receipts enter engineering.
 Audio/haptic manual revalidation required:NO; semantic playback unchanged.
+
+## Engineering checkpoint CI (not isolated-candidate acceptance)
+
+Exact engineering source970b520a05f6b9dca68219402b43c70a937bf15f passes fresh
+[push36935141405](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/36935141405)
+and [PR36935147063](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/36935147063).
+All ten actual job logs inspected: each GCC56/Clang56/MSVC62/Vulkan CPU-host15/
+Android76 passes, with0 failures/errors/skips. Android four-ABI Debug build,
+required suite admission, lint/package gates pass. These jobs do not certify the
+isolated7782e8e normal candidate, physical phones or full RT/backend acceptance.
+PR15 draft/open/CLEAN/MERGEABLE; no merge. Synthetic merge
+1da7cd772857c923a5fbf52542c92ed56dfac5f3 has exact mainbda1b99/source970b520
+parents and matching tree d71dda2d1ba26e4dc46cee390ec5c6fddcbc64d2.
+Raw logs remain at C:/Dev/tmp/horde-backend-pixel-witness-20261002:
+push SHA-2561a5c05caf482390b48824413fad1318bf1dae4275aa70d9d9c77c4a85df7604e;
+PR SHA-25659131bcb31bca141c8ec3a4ce0d65d70a7c55fd7f8d5ad96f6762372765bcade.
+Later prose/receipt updates are not silently relabelled as this exact-source CI.
