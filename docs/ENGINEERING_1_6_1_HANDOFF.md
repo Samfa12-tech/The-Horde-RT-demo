@@ -25,6 +25,11 @@ owner states it will not block publishing this update. Asset/licence/history sta
 unchanged, no permission is inferred and publication is still unauthorised.
 Exact S24 is reconnected by renewed owner instruction; previous handback notes
 are historical, not a current prohibition. Use explicit serial/model matching.
+Its [four-capture follow-up](evidence/2026-10-01-s24-visual-followup/RESULTS.md)
+confirms missing hands on exact8CB Debug/compute, despite honest RT presentation.
+Opening's single skeleton matches the authored/native count; the two-enemy
+checkpoint has two native entities but no distinguishable skeleton in that view.
+No timing rerun or player tuning; visual acceptance remains open.
 The next bounded performance candidate is tracked in the [primary opacity
 experiment](ENGINEERING_1_6_1_PRIMARY_OPACITY_2026-10-01.md). No gain or image
 equivalence is established yet; do not repeat rejected first-blocker/split trials.

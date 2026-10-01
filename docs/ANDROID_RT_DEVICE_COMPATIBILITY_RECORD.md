@@ -1226,6 +1226,18 @@ This supersedes the earlier handback restriction; it is identity/availability
 evidence only, not new image, performance, RT presentation or release acceptance.
 The missing-hands/starting-enemy visual follow-up is open. S25 remains untested.
 
+Bounded run20261001-221511 on **SM-S928B** installs/pulls exact normal Debug
+8cb976891e5719eceb7fd809ec91aac939ff3ec58eb2d6df44f15b5526f4ff87 with data
+preserved. Four75% scene-only captures report RayQueryCompute,12 stable presented
+RT frames, strict ASTC and Home/resume. Opening has one native active entity and
+one visible skeleton, consistent with authored state. Two-enemy native state has
+two active entities, but neither is distinguishable in that frozen camera view;
+visual acceptance is still open. Held-high/low show props but no modelled hands;
+native primary-player pixel count is zero. This confirms the reported missing
+hands, not an animation/asset cause. No timing, owner-feel or S26/S25 claim.
+[Retained visual evidence](evidence/2026-10-01-s24-visual-followup/RESULTS.md).
+Private device/process rosters remain local; no data/settings/source fix.
+
 ## Research sources
 
 - [Android NDK stable APIs - Vulkan runtime capability guidance](https://developer.android.com/ndk/guides/stable_apis)
