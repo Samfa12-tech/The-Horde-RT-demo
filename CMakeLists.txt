@@ -156,6 +156,10 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AN
         src/platform/windows/DiagnosticWindow.cpp
         src/platform/windows/WindowsGitHubReleaseUpdate.cpp
         src/platform/windows/WindowsPlaytestReport.cpp
+        src/platform/windows/WindowsRemotePlaytestReport.cpp
+        src/platform/windows/WindowsPlaytestScreenshot.cpp
+        src/platform/windows/WindowsPlaytestSubmission.cpp
+        src/platform/windows/WindowsPlaytestVerification.cpp
         "${HORDE_RT_WINDOWS_RESOURCE_DIRECTORY}/HordeLanternRT.manifest"
         "${HORDE_RT_WINDOWS_RESOURCE_DIRECTORY}/HordeLanternRT.rc"
         src/ui/DiagnosticOverlay.cpp
@@ -168,11 +172,13 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AN
     target_link_libraries(horde_rt_diagnostic_window PRIVATE
         horde_rt_probe_core
         horde_windows_music
+        horde_rt_report_webview2
         comdlg32
         comctl32
         bcrypt
         ole32
         windowscodecs
+        oleaut32
         shell32
         winhttp
         winmm
@@ -663,6 +669,22 @@ if(BUILD_TESTING)
         add_test(NAME horde_rt_windows_playtest_verification_tests
             COMMAND horde_rt_windows_playtest_verification_tests)
         set_tests_properties(horde_rt_windows_playtest_verification_tests PROPERTIES TIMEOUT 30)
+
+        add_executable(horde_rt_windows_remote_playtest_report_ui_tests
+            tests/WindowsRemotePlaytestReportUiTests.cpp
+            src/platform/windows/WindowsRemotePlaytestReport.cpp
+            src/platform/windows/WindowsPlaytestReport.cpp
+            src/platform/windows/WindowsPlaytestScreenshot.cpp
+            src/platform/windows/WindowsPlaytestSubmission.cpp
+            src/platform/windows/WindowsPlaytestVerification.cpp)
+        target_include_directories(horde_rt_windows_remote_playtest_report_ui_tests PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/src)
+        target_link_libraries(horde_rt_windows_remote_playtest_report_ui_tests PRIVATE
+            horde_gameplay_simulation horde_rt_report_webview2 comdlg32 comctl32 bcrypt
+            windowscodecs oleaut32 winhttp)
+        add_test(NAME horde_rt_windows_remote_playtest_report_ui_tests
+            COMMAND horde_rt_windows_remote_playtest_report_ui_tests)
+        set_tests_properties(horde_rt_windows_remote_playtest_report_ui_tests PROPERTIES TIMEOUT 45)
 
         add_executable(horde_rt_windows_playtest_report_ui_tests
             tests/WindowsPlaytestReportUiTests.cpp

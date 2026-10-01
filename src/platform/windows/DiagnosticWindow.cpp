@@ -1,6 +1,7 @@
 #include "platform/windows/DiagnosticWindow.h"
 #include "platform/windows/WindowsMusicPlayback.h"
 #include "platform/windows/WindowsPlaytestReport.h"
+#include "platform/windows/WindowsRemotePlaytestReport.h"
 
 #include <algorithm>
 #include <array>
@@ -1888,8 +1889,57 @@ void OpenPlaytestReport(VulkanSurfaceContext& context)
         ShowPauseMenu(context, true);
     }
     PlaySoundEffect(context, "ui_select.wav");
-    horde::platform::windows::ShowWindowsPlaytestReport(
-        context.windowHandle, CapturePlaytestReportContext(context));
+    horde::platform::windows::WindowsRemotePlaytestServices services;
+    services.captureGameFrame = [&context](HWND,
+        horde::platform::windows::WindowsPlaytestReportContext& capturedContext,
+        horde::reporting::PlaytestScreenshotPixels& thumbnail, std::wstring& error) {
+        // Called synchronously only after native consent/preflight. The paused
+        // application/render owner owns both the RT image and this context.
+        thumbnail = {};
+        capturedContext = {};
+        try
+        {
+            const auto presentation = context.lastFramePresentation;
+            if (GetCurrentThreadId() != GetWindowThreadProcessId(context.windowHandle, nullptr) ||
+                !context.simulationPaused || !context.useRtPath || !context.rtScene.IsReady() ||
+                (presentation != horde::telemetry::RtPresentationOutcome::Presented &&
+                 presentation != horde::telemetry::RtPresentationOutcome::PresentedNeedsRecreate))
+            {
+                error = L"No paused, successfully presented game RT frame is available. Uncheck the image option or try again after playing.";
+                return false;
+            }
+            const auto extent = context.rtScene.DispatchExtent();
+            if (extent.width == 0u || extent.height == 0u ||
+                std::uint64_t{extent.width} * extent.height > horde::reporting::kPlaytestScreenshotMaxSourcePixels)
+            {
+                error = L"The game RT target exceeds the bounded report readback size. No image was captured.";
+                return false;
+            }
+            horde::vulkan::raytracing::PresentableTinyRtScene::StorageImageCapture image;
+            std::string diagnostic;
+            if (!context.rtScene.CaptureStorageImage(image, diagnostic) ||
+                image.width != extent.width || image.height != extent.height ||
+                !horde::reporting::ResizePlaytestScreenshotRgba(image.width, image.height, image.rgba, thumbnail))
+            {
+                error = L"The game-only image readback failed. No report was sent; the image was not silently omitted.";
+                return false;
+            }
+            capturedContext = CapturePlaytestReportContext(context);
+            return true;
+        }
+        catch (...)
+        {
+            thumbnail = {};
+            capturedContext = {};
+            // Error text itself may allocate. Return an empty last-resort error
+            // rather than throw out of the application/render-owner callback.
+            try { error = L"The bounded game-image allocation failed. No report was sent."; }
+            catch (...) { error.clear(); }
+            return false;
+        }
+    };
+    horde::platform::windows::ShowWindowsRemotePlaytestReport(
+        context.windowHandle, CapturePlaytestReportContext(context), std::move(services));
 }
 
 void ResetRoute(VulkanSurfaceContext& context, const bool preserveBenchmark = false)

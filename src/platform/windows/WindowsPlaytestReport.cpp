@@ -449,6 +449,21 @@ bool RegisterWindowClass()
 
 } // namespace
 
+bool ExportWindowsPlaytestReportJson(HWND owner, const std::string& json, std::wstring& message)
+{
+    if (json.empty() || json.size() > horde::reporting::kPlaytestReportMaxJsonBytes)
+    {
+        message = L"The prepared local report exceeds its bounded JSON contract. Nothing was written.";
+        return false;
+    }
+    try { return SaveJson(owner, json, message); }
+    catch (...)
+    {
+        message = L"Local export failed; a selected file may be partial. Retry explicitly with the same report.";
+        return false;
+    }
+}
+
 void ShowWindowsPlaytestReport(HWND owner, WindowsPlaytestReportContext context,
     const WindowsPlaytestReportExporter exporter)
 {

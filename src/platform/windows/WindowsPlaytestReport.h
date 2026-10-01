@@ -29,6 +29,10 @@ struct WindowsPlaytestReportContext
 // Injectable synchronous foreground destination boundary for native UI tests.
 // Null uses the real user-selected picker; no remote or automatic transport.
 using WindowsPlaytestReportExporter = bool (*)(HWND, const std::string&, std::wstring&);
+// Shared foreground local fallback: explicit picker, bounded prepared JSON,
+// checked write/flush/close. No verification or remote transport.
+[[nodiscard]] bool ExportWindowsPlaytestReportJson(HWND owner,
+    const std::string& json, std::wstring& message);
 void ShowWindowsPlaytestReport(HWND owner, WindowsPlaytestReportContext context,
     WindowsPlaytestReportExporter exporter = nullptr);
 
