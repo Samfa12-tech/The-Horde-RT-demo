@@ -26,6 +26,9 @@
 #include "vulkan/raytracing/RtExecutionPolicy.h"
 #include "vulkan/raytracing/RtSceneTuning.h"
 #include "vulkan/raytracing/RtStaticMeshSlot.h"
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+#include "vulkan/raytracing/experimental/StagedPrimaryPass.h"
+#endif
 
 namespace horde::vulkan::raytracing
 {
@@ -319,26 +322,55 @@ public:
     {
         return pipelineBundle_.DiagnosticAvailability();
     }
-    std::string_view SelectedOpaqueFastKey() const { return pipelineBundle_.OpaqueFastKey(); }
+    std::string_view SelectedOpaqueFastKey() const
+    {
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+        if (stagedPrimary_) return experimental::StagedPrimaryPass::PairKey(RtMaterialStrategy::OpaqueFast);
+#endif
+        return pipelineBundle_.OpaqueFastKey();
+    }
     std::string_view SelectedGenericDielectricKey() const
     {
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+        if (stagedPrimary_) return experimental::StagedPrimaryPass::PairKey(RtMaterialStrategy::GenericDielectric);
+#endif
         return pipelineBundle_.GenericDielectricKey();
     }
     std::string_view SelectedOpaqueFastSha256() const
     {
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+        if (stagedPrimary_) return experimental::StagedPrimaryPass::PairSha256(RtMaterialStrategy::OpaqueFast);
+#endif
         return pipelineBundle_.OpaqueFastSha256();
     }
     std::string_view SelectedGenericDielectricSha256() const
     {
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+        if (stagedPrimary_) return experimental::StagedPrimaryPass::PairSha256(RtMaterialStrategy::GenericDielectric);
+#endif
         return pipelineBundle_.GenericDielectricSha256();
     }
     std::string SelectedPipelineBundleIdentity() const
     {
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+        if (stagedPrimary_) return std::string(SelectedOpaqueFastKey()) + "@" + std::string(SelectedOpaqueFastSha256()) +
+            "|" + std::string(SelectedGenericDielectricKey()) + "@" + std::string(SelectedGenericDielectricSha256());
+#endif
         return pipelineBundle_.FullPairIdentity();
     }
     std::string SelectedPipelineBundleDisplayIdentity() const
     {
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+        if (stagedPrimary_) return "StagedPrimaryV1Investigation";
+#endif
         return pipelineBundle_.ShortPairIdentity();
+    }
+    std::string ExecutionOrganisationJson() const
+    {
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+        if (stagedPrimary_) return stagedPrimary_->MetadataJson();
+#endif
+        return "{\"organisation\":\"Monolithic\"}";
     }
     bool GenericStaticAssetEnabled() const { return genericStaticAssetEnabled_; }
     const RtStaticMeshMeasurements& StaticMeshMeasurements() const { return staticMeshSlot_.Measurements(); }
@@ -715,6 +747,9 @@ private:
     HeldItemBlasMeasurements heldItemBlasMeasurements_{};
 
     RtPipelineBundle pipelineBundle_;
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+    std::unique_ptr<experimental::StagedPrimaryPass> stagedPrimary_;
+#endif
     RtExecutionPolicy executionPolicy_{};
     std::array<std::uint32_t, 3u> computeDispatchGroups_{};
     horde::telemetry::RtPipelineEvidenceIdentity pipelineEvidenceIdentity_{};

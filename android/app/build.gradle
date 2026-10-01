@@ -65,6 +65,28 @@ def releaseKeyAlias = hordeValidationUnsigned ? null : System.getenv('HORDE_RELE
 def releaseKeyPassword = hordeValidationUnsigned ? null : System.getenv('HORDE_RELEASE_KEY_PASSWORD')
 def hordeRtInstrumentationOverride = providers.gradleProperty('hordeRtInstrumentationOverride').orNull
 def hordeRtDielectricQualityOverride = providers.gradleProperty('hordeRtDielectricQualityOverride').orNull
+def hordeStagedPrimaryShaderDirProperty = providers.gradleProperty('hordeStagedPrimaryShaderDir').orNull
+def hordeStagedPrimaryShaderDir = null
+if (hordeStagedPrimaryShaderDirProperty != null) {
+    if (!hordeBenchmarkValidation) {
+        throw new GradleException('hordeStagedPrimaryShaderDir requires hordeBenchmarkValidation=true.')
+    }
+    if (hordeStagedPrimaryShaderDirProperty.isEmpty() ||
+        hordeStagedPrimaryShaderDirProperty != hordeStagedPrimaryShaderDirProperty.trim() ||
+        (hordeStagedPrimaryShaderDirProperty =~ /[;|\r\n\u0000]/).find()) {
+        throw new GradleException('hordeStagedPrimaryShaderDir must be a non-empty absolute path without Gradle/CMake argument delimiters.')
+    }
+    def stagedPrimaryDirectory = new File(hordeStagedPrimaryShaderDirProperty)
+    if (!stagedPrimaryDirectory.isAbsolute()) {
+        throw new GradleException('hordeStagedPrimaryShaderDir must be absolute.')
+    }
+    stagedPrimaryDirectory = stagedPrimaryDirectory.canonicalFile
+    def stagedPrimaryHeader = new File(stagedPrimaryDirectory, 'StagedPrimaryShaders.generated.h')
+    if (!stagedPrimaryDirectory.isDirectory() || !stagedPrimaryHeader.isFile() || stagedPrimaryHeader.length() == 0) {
+        throw new GradleException('hordeStagedPrimaryShaderDir must contain a non-empty StagedPrimaryShaders.generated.h.')
+    }
+    hordeStagedPrimaryShaderDir = stagedPrimaryDirectory.absolutePath
+}
 def hordeRtOverridePresent = { String value -> value != null && !value.isEmpty() }
 if (hordeRtOverridePresent(hordeRtInstrumentationOverride) != hordeRtOverridePresent(hordeRtDielectricQualityOverride)) {
     throw new GradleException('hordeRtInstrumentationOverride and hordeRtDielectricQualityOverride must be supplied together.')
@@ -88,8 +110,14 @@ def hordeRtNativePolicyArguments = { String defaultInstrumentation ->
     def instrumentation = hordeRtOverridePresent(hordeRtInstrumentationOverride) ? hordeRtInstrumentationOverride : defaultInstrumentation
     def quality = hordeRtOverridePresent(hordeRtDielectricQualityOverride) ? hordeRtDielectricQualityOverride : 'Mobile'
     return ["-DHORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION=${instrumentation}",
-            "-DHORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY=${quality}"]
+            "-DHORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY=${quality}",
+            '-DHORDE_RT_STAGED_PRIMARY_SHADER_DIR=',
+            '-DHORDE_RT_STAGED_PRIMARY_DEFAULT=OFF']
 }
+def hordeRtBenchmarkStagedPrimaryArguments = [
+    "-DHORDE_RT_STAGED_PRIMARY_SHADER_DIR=${hordeStagedPrimaryShaderDir ?: ''}",
+    "-DHORDE_RT_STAGED_PRIMARY_DEFAULT=${hordeStagedPrimaryShaderDir ? 'ON' : 'OFF'}"
+]
 
 // Explicit local-only asset experiment. Release and ordinary Debug never consume
 // this overlay, and its separate application id prevents stale private-file assets.
@@ -343,6 +371,12 @@ android {
                 debuggable false
                 jniDebuggable false
                 signingConfig signingConfigs.debug
+                externalNativeBuild {
+                    cmake {
+                        arguments "-DHORDE_RT_STAGED_PRIMARY_SHADER_DIR=${hordeStagedPrimaryShaderDir ?: ''}",
+                            "-DHORDE_RT_STAGED_PRIMARY_DEFAULT=${hordeStagedPrimaryShaderDir ? 'ON' : 'OFF'}"
+                    }
+                }
             }
         }
     }
@@ -382,5 +416,10 @@ tasks.register('printHordeRtPolicyForTest') {
     doLast {
         println("debug=" + hordeRtNativePolicyArguments('Diagnostic').join('|'))
         println("release=" + hordeRtNativePolicyArguments('Shipping').join('|'))
+        println("benchmark=" + (hordeBenchmarkValidation
+            ? (hordeRtNativePolicyArguments('Shipping') + hordeRtBenchmarkStagedPrimaryArguments).join('|')
+            : 'unavailable; set hordeBenchmarkValidation=true'))
+        println("benchmarkValidation=${hordeBenchmarkValidation}")
+        println("stagedPrimaryShaderDir=${hordeStagedPrimaryShaderDir ?: ''}")
     }
 }

@@ -591,6 +591,9 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     heldItemBlasMeasurements_ = std::exchange(
         other.heldItemBlasMeasurements_, HeldItemBlasMeasurements{});
     pipelineBundle_ = std::move(other.pipelineBundle_);
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+    stagedPrimary_ = std::move(other.stagedPrimary_);
+#endif
     executionPolicy_ = std::exchange(other.executionPolicy_, RtExecutionPolicy{});
     computeDispatchGroups_ = std::exchange(other.computeDispatchGroups_, {});
     pipelineEvidenceIdentity_ = std::exchange(
@@ -813,6 +816,39 @@ bool PresentableTinyRtScene::ContinueInitialiseAfterPreflight(
         return false;
     }
 
+#if defined(HORDE_RT_STAGED_PRIMARY_EXPERIMENT) && HORDE_RT_STAGED_PRIMARY_DEFAULT
+    if (ExecutionBackend() != RtExecutionBackend::RayTracingPipeline)
+    {
+        diagnostic = "StagedPrimaryV1Investigation requires RayTracingPipeline; no alternate-backend substitution.";
+        Destroy();
+        return false;
+    }
+    RtPipelineBundleBuildApi stagedApi{};
+    stagedApi.user = this;
+    stagedApi.createSharedShaderModules = [](void* user, VkShaderModule& miss, VkShaderModule& hit, std::string& error) {
+        return static_cast<PresentableTinyRtScene*>(user)->CreateBundleSharedShaderModules(miss, hit, error);
+    };
+    stagedApi.createEntryShaderModule = [](void* user, const RtPipelineVariantArtifact& artifact, VkShaderModule& out, std::string& error) {
+        return static_cast<PresentableTinyRtScene*>(user)->CreateBundleEntryShaderModule(artifact, out, error);
+    };
+    stagedApi.createStrategyPipeline = [](void* user, RtMaterialStrategy strategy, VkShaderModule entry, VkShaderModule miss,
+                                         VkShaderModule hit, VkPipelineLayout layout, VkPipeline& out, std::string& error) {
+        return static_cast<PresentableTinyRtScene*>(user)->CreateBundleStrategyPipeline(strategy, entry, miss, hit, layout, out, error);
+    };
+    stagedApi.createStrategySbt = [](void* user, RtMaterialStrategy strategy, VkPipeline pipeline, Buffer& out,
+                                   std::array<VkStridedDeviceAddressRegionKHR, 4u>& regions, std::string& error) {
+        return static_cast<PresentableTinyRtScene*>(user)->CreateBundleStrategySbt(strategy, pipeline, out, regions, error);
+    };
+    stagedApi.destroyShaderModule = [](void* user, VkShaderModule& module) noexcept {
+        auto& scene = *static_cast<PresentableTinyRtScene*>(user);
+        if (module != VK_NULL_HANDLE) vkDestroyShaderModule(scene.device_, module, nullptr);
+        module = VK_NULL_HANDLE;
+    };
+    stagedPrimary_ = experimental::StagedPrimaryPass::Create(physicalDevice_, device_, gpuResources_,
+        pipelineBundle_.descriptorSetLayout, pipelineBundle_.descriptorSet, dispatchExtent_, sizeof(ScenePushConstants),
+        vkCmdTraceRaysKHR_, stagedApi, diagnostic);
+    if (!stagedPrimary_) { Destroy(); return false; }
+#endif
     pipelineEvidenceIdentityValid_ = CapturePipelineEvidenceIdentity();
     ready_ = true;
     diagnostic.clear();
@@ -833,6 +869,9 @@ void PresentableTinyRtScene::Destroy()
         return;
     }
 
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+    stagedPrimary_.reset();
+#endif
     pipelineBundle_.Reset();
     DestroyAccelerationStructure(tlas_);
     DestroyBuffer(tlasUpdateScratch_);
@@ -1014,6 +1053,9 @@ horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory(
     }
     characterSlot_.AccumulateResourceInventory(inventory);
     pipelineBundle_.AccumulateResourceInventory(inventory);
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+    if (stagedPrimary_) stagedPrimary_->AccumulateResourceInventory(inventory);
+#endif
 
     AccumulateRtMemoryAllocation(
         inventory, storageImageMemory_, storageImageAllocationSize_,
@@ -1394,7 +1436,17 @@ bool PresentableTinyRtScene::ResizeOutputAfterDeviceIdle(VkExtent2D extent, std:
     api.destroy = [](void* user, OutputImageResources& image) noexcept {
         static_cast<PresentableTinyRtScene*>(user)->DestroyOutputImage(image);
     };
-    return ResizeOutputWithApi(extent, groups, api, diagnostic);
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+    if (stagedPrimary_ && !stagedPrimary_->PrepareResizeAfterDeviceIdle(extent, diagnostic)) return false;
+#endif
+    const bool resized = ResizeOutputWithApi(extent, groups, api, diagnostic);
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+    if (stagedPrimary_) {
+        if (resized) stagedPrimary_->CommitResizeAfterDeviceIdle();
+        else stagedPrimary_->CancelResizeAfterDeviceIdle();
+    }
+#endif
+    return resized;
 }
 
 bool PresentableTinyRtScene::ResizeOutputWithApi(VkExtent2D extent, std::array<std::uint32_t, 3u> groups,
@@ -3963,6 +4015,16 @@ bool PresentableTinyRtScene::CapturePipelineEvidenceIdentity() noexcept
         pipelineEvidenceIdentity_ = {};
         return false;
     }
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+    if (stagedPrimary_) {
+        if (!horde::telemetry::AssignRtFixedText(candidate.bundleKey, "staged_primary_v1_investigation_pair") ||
+            !horde::telemetry::AssignRtFixedText(candidate.opaqueFast.key, SelectedOpaqueFastKey()) ||
+            !horde::telemetry::AssignRtFixedText(candidate.opaqueFast.sha256, SelectedOpaqueFastSha256()) ||
+            !horde::telemetry::AssignRtFixedText(candidate.genericDielectric.key, SelectedGenericDielectricKey()) ||
+            !horde::telemetry::AssignRtFixedText(candidate.genericDielectric.sha256, SelectedGenericDielectricSha256())) return false;
+        candidate.active = candidate.opaqueFast;
+    }
+#endif
     pipelineEvidenceIdentity_ = candidate;
     return true;
 }
@@ -5665,6 +5727,14 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
     ExecuteObservedTraceCopyCommands(
         observation,
         [&]() noexcept {
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+            if (stagedPrimary_) {
+                stagedPrimary_->Record(commandBuffer,
+                    genericTransmissionActive_ ? RtMaterialStrategy::GenericDielectric : RtMaterialStrategy::OpaqueFast,
+                    std::as_bytes(std::span{&pushConstants, 1u}));
+                return;
+            }
+#endif
             if (executionPolicy_.requiresShaderBindingTable)
             {
                 vkCmdTraceRaysKHR_(commandBuffer,

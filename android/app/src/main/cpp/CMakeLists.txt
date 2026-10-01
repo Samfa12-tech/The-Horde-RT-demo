@@ -12,6 +12,7 @@ get_filename_component(HORDE_RT_REPO_ROOT "${CMAKE_CURRENT_LIST_DIR}/../../../..
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtVersion.cmake")
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtRaygenArtifacts.cmake")
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtRaygenPolicy.cmake")
+include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtStagedPrimary.cmake")
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtSources.cmake")
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtPocketAudioCore.cmake")
 horde_rt_add_pocket_audio_core("${HORDE_RT_REPO_ROOT}" OFF)
@@ -37,6 +38,7 @@ target_include_directories(horde_rt_probe_android PRIVATE
 )
 horde_rt_attach_raygen_artifacts(horde_rt_probe_android)
 horde_rt_apply_raygen_policy(horde_rt_probe_android Android)
+horde_rt_attach_staged_primary(horde_rt_probe_android "${HORDE_RT_REPO_ROOT}")
 
 target_compile_features(horde_rt_probe_android PRIVATE cxx_std_20)
 target_compile_definitions(horde_rt_probe_android PRIVATE

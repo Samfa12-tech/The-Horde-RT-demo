@@ -1153,6 +1153,9 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
          << "\"}, \"genericDielectric\": {\"key\": \""
          << context.rtScene.SelectedGenericDielectricKey() << "\", \"sha256\": \""
          << context.rtScene.SelectedGenericDielectricSha256() << "\"}},\n"
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+         << "  \"executionOrganisation\": " << context.rtScene.ExecutionOrganisationJson() << ",\n"
+#endif
          << "  \"diagnosticsAvailability\": \""
          << horde::vulkan::raytracing::ToString(
                 context.rtScene.DiagnosticsAvailability()) << "\",\n"

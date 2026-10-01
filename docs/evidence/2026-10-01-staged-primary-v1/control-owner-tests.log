@@ -1,0 +1,19 @@
+Start testing: Oct 01 11:56 AUS Eastern Standard Time
+----------------------------------------------------------
+70/88 Testing: horde_rt_staged_primary_resource_tests
+70/88 Test: horde_rt_staged_primary_resource_tests
+Command: "C:/Dev/tmp/horde-staged-rt-20261001/build-control/Debug/horde_rt_staged_primary_resource_tests.exe"
+Directory: C:/Dev/tmp/horde-staged-rt-20261001/build-control
+"horde_rt_staged_primary_resource_tests" start time: Oct 01 11:56 AUS Eastern Standard Time
+Output:
+----------------------------------------------------------
+PASS staged-primary owner fault injection (fake Vulkan; Shipping/Mobile fixture)
+<end of output>
+Test time =   2.25 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_staged_primary_resource_tests" end time: Oct 01 11:56 AUS Eastern Standard Time
+"horde_rt_staged_primary_resource_tests" time elapsed: 00:00:02
+----------------------------------------------------------
+
+End testing: Oct 01 11:56 AUS Eastern Standard Time

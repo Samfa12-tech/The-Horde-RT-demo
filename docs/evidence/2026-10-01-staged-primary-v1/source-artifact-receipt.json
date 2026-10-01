@@ -1,0 +1,1118 @@
+{
+  "schemaVersion": 1,
+  "retainedAtUtc": "2026-10-01T02:09:19.2472095Z",
+  "controlAnchor": "7ab8607e3f3297444dc17fcac9344b29b8d8ccce",
+  "headAtRetention": "783f1be06c4631101f05b4eb175cf095973ad9b7",
+  "provenance": "Experimental app builds used this dirty worktree; this source fingerprint is retained before the first prototype commit. Control compiles prototype OFF, candidate ON. This is not a retroactive clean-build claim. Later CI/docs/test-only edits did not alter compiled app inputs.",
+  "sourceFiles": [
+    {
+      "path": "android/app/build.gradle",
+      "bytes": 22123,
+      "sha256": "47d93df64aa11c6dc57a65256ae78c8db4fd1920aa755dc9c0a830d5a1a4daa1"
+    },
+    {
+      "path": "android/app/src/main/cpp/android_probe_bridge.cpp",
+      "bytes": 179422,
+      "sha256": "7f0a7483ce65b203445185eff994f26262c3ba48b7ee21e5c507762a78b9caee"
+    },
+    {
+      "path": "android/app/src/main/cpp/CMakeLists.txt",
+      "bytes": 3826,
+      "sha256": "c4b2cab99b7cc67afaa4e7c545413d334fa74d18c77c3cec469e027677b505e2"
+    },
+    {
+      "path": "cmake/HordeRtPocketAudioCore.cmake",
+      "bytes": 3724,
+      "sha256": "de004b0b7007172cce36546a833e6888b58d6ea2af67c2a8a1ceb0a82f3fe0ec"
+    },
+    {
+      "path": "cmake/HordeRtRaygenArtifacts.cmake",
+      "bytes": 3926,
+      "sha256": "934ddebab9e20b22163c0adc6b5117cd0ff61200561bfeb749b79916b93f197b"
+    },
+    {
+      "path": "cmake/HordeRtRaygenPolicy.cmake",
+      "bytes": 4064,
+      "sha256": "15d84cfa7f23ffc6d3a0074f6e2994cbcf96a58eec3c2864f03be602a3a70dda"
+    },
+    {
+      "path": "cmake/HordeRtSources.cmake",
+      "bytes": 2123,
+      "sha256": "c3898b8ce630316ad11b0ed4e151488c5e0be9ac40c17385f1e34e0e82634936"
+    },
+    {
+      "path": "cmake/HordeRtStagedPrimary.cmake",
+      "bytes": 1631,
+      "sha256": "0a0c47da5978ee63c6314b7227eaae31d496c6e3e92250a63df521f4f1c8355f"
+    },
+    {
+      "path": "cmake/HordeRtStrictAssetMath.cmake",
+      "bytes": 1513,
+      "sha256": "fdd4ea809a6c9de35a23b0f6a03ea431929263a5b79dd83de8d13a93a3636d3c"
+    },
+    {
+      "path": "cmake/HordeRtVersion.cmake",
+      "bytes": 6773,
+      "sha256": "dc63f4479502a58861d4dfba62bac3f71f86a9851fd9bc829ad739fecaec2657"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "bytes": 51100,
+      "sha256": "34677c59b729fa5ec44b74bc3bcc007aa029550c81e1a1ce2e591331cfec032a"
+    },
+    {
+      "path": "shaders/raytracing/experimental/staged_primary_record.glsl",
+      "bytes": 3882,
+      "sha256": "a12b889773f4cbd69823a5e3188f1bfa983155ecd07904e8d2aa365239f77d15"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_atmosphere.glsl",
+      "bytes": 10370,
+      "sha256": "9411bceae76c4211cde6ee2d682d5d7c4ed387cd65082d098b806d830404ffd8"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_diagnostics.glsl",
+      "bytes": 739,
+      "sha256": "17e28b3422c8218d7fa7c4183e1df9a6e07e45451ef5b86dbe0a7a16fc47df9f"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_dielectric_common.glsl",
+      "bytes": 18158,
+      "sha256": "019c3755e7da40d2b57c16c2325f50f9a12cb1504f9e5437aa3571c14aa203a6"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_dielectric_spawn.glsl",
+      "bytes": 7452,
+      "sha256": "ab76e15c20b7f5d3a390f56804db5f8afa0aa7c2709e5895c707c6ea220182c3"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_dielectric_transport.glsl",
+      "bytes": 31487,
+      "sha256": "64677d1effb0a62a4d8845482360d9051cbe6584c95ee1fd330f9e7279540377"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_fire.glsl",
+      "bytes": 9475,
+      "sha256": "bf9428b6cca9bc38d3f15d5ebccba59113b85dbc48f509cffa533fdae3264fcf"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_frame.glsl",
+      "bytes": 4059,
+      "sha256": "b00beb8ed59360d9aa4c2befd22af165b0a0305784d8556a7812de4979d942ed"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_hit_decode.glsl",
+      "bytes": 31674,
+      "sha256": "89e97cf7f55ebcc703cce214aee017c1fe319b7da0f730129d0bbe04c6a82309"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_lighting.glsl",
+      "bytes": 57341,
+      "sha256": "0b901ab5ac3fdfce3f07bf49b461ff266f2008ba24ede4b7c538adbf6e72ee66"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_scene_abi.generated.glsl",
+      "bytes": 6115,
+      "sha256": "c44875baf74ef0601f1bdfee5510eacf6c3750e90ba3052e6958b5ecb2cc9e95"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_scene_abi.glsl",
+      "bytes": 3667,
+      "sha256": "4aa020123345dbf67237f0b6b9fb8e0abd10c8ef2ac09a8b776e6804b6b81688"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_variant_config.glsl",
+      "bytes": 1985,
+      "sha256": "8d043fae9db9c3efb31071045bfc5b2922cc0ae929e748416e164988c01b4649"
+    },
+    {
+      "path": "shaders/raytracing/minimal.comp",
+      "bytes": 539,
+      "sha256": "0aa2731c6a80f3cc015cc23cc85e161970375c383d59fd807c636f981f1ee1a5"
+    },
+    {
+      "path": "shaders/raytracing/minimal.legacy.rgen.spv",
+      "bytes": 505248,
+      "sha256": "dcf51ae9a3a19689d7b71bf0e15cc0a00c07947d1417657301b196926b21665b"
+    },
+    {
+      "path": "shaders/raytracing/minimal.rchit",
+      "bytes": 174,
+      "sha256": "59a374fa105f231f9ade604212d731a475f07f22c723fff6b0e0089dd2cd2a37"
+    },
+    {
+      "path": "shaders/raytracing/minimal.rgen",
+      "bytes": 213,
+      "sha256": "033484e51931a6884517e003d8bf968f6d9e00438f5ba789cc58f3153a6740ca"
+    },
+    {
+      "path": "shaders/raytracing/minimal.rgen.spv",
+      "bytes": 253124,
+      "sha256": "03526a113daed58e6b9dc3565e7a0837c2040acdb685339dcd48b9d7219de658"
+    },
+    {
+      "path": "shaders/raytracing/minimal.rmiss",
+      "bytes": 788,
+      "sha256": "7bcc1b7fbdcf1802ed80ec25ccae50f20e9e7239026d767c0e7ba5f110ada936"
+    },
+    {
+      "path": "shaders/raytracing/README.md",
+      "bytes": 747,
+      "sha256": "edb0fbd2fae39809b6f4806d643d471a1fa243f393051bea59e2159447a4ac2c"
+    },
+    {
+      "path": "shaders/README.md",
+      "bytes": 483,
+      "sha256": "9b68e260625a9cca7e6f20cf3b3eccad45589c48033ec8bf8dac1dfe2dc98efd"
+    },
+    {
+      "path": "src/audio/MusicDirector.cpp",
+      "bytes": 12528,
+      "sha256": "d8bc9697ddbdf58eff22cf3f54ddec9b65eb21f6f90c77fa44a3f3c9cc0b6f9a"
+    },
+    {
+      "path": "src/audio/MusicDirector.h",
+      "bytes": 2736,
+      "sha256": "608624b62d9dc89027e3a8e82317f3d7b723e4b6b16ee69cf7aa9fa36142acec"
+    },
+    {
+      "path": "src/audio/MusicPcmAssetBank.cpp",
+      "bytes": 3422,
+      "sha256": "85fcf6e46e07d7ea90c98a4e00eb789efe82f2c0a2a35faf1b761075fd5b41dc"
+    },
+    {
+      "path": "src/audio/MusicPcmAssetBank.h",
+      "bytes": 2359,
+      "sha256": "6968f002cd207dc58f4acf84bb3bb96ee7b4aff0896b3d67062d059bdc0b236c"
+    },
+    {
+      "path": "src/audio/MusicPcmAssets.h",
+      "bytes": 2600,
+      "sha256": "743507ab9ee00ef0ee8cd82a835502f8536c7311430f1544a61fd447af08302d"
+    },
+    {
+      "path": "src/audio/MusicPcmStream.cpp",
+      "bytes": 2472,
+      "sha256": "479bc7c460e9bcc2d798f6f8239e1cbb4d82e923a8c42e2723ee145ef90dad6a"
+    },
+    {
+      "path": "src/audio/MusicPcmStream.h",
+      "bytes": 1746,
+      "sha256": "f311dae38a4650ce0c3af7be119c5bd36812a8119cdbbc7913bb1c3080b8ec55"
+    },
+    {
+      "path": "src/audio/MusicPcmWave.cpp",
+      "bytes": 367,
+      "sha256": "d3165d1c12ad7cf5baadfcd21701974003643acb55266853246ee7e1486531a7"
+    },
+    {
+      "path": "src/audio/MusicPcmWave.h",
+      "bytes": 1000,
+      "sha256": "bcbafb86b90b0a2b3036a8928a438fac49f3e1d1e3072c9a4c2aaffdc71e0693"
+    },
+    {
+      "path": "src/audio/MusicPlaybackSession.cpp",
+      "bytes": 4648,
+      "sha256": "11ab3ae802b446ffe6deae425f9223b1d519fd79302b5c80c7059ab5913a1f9c"
+    },
+    {
+      "path": "src/audio/MusicPlaybackSession.h",
+      "bytes": 3094,
+      "sha256": "41af1f85e5d525c36e52069a46d858c7de44d31894054dafd4fddb2abfc63795"
+    },
+    {
+      "path": "src/gameplay/animation/PlayerAnimationState.cpp",
+      "bytes": 7582,
+      "sha256": "8b095119584aeca352ba214b1ab49e09eb24f258b962927198a61c92619a8165"
+    },
+    {
+      "path": "src/gameplay/animation/PlayerAnimationState.h",
+      "bytes": 3377,
+      "sha256": "c958fe5dceaa67a407fb9d04cde64d5b32d9dc4eb1689381ba49dfa8b9c17a31"
+    },
+    {
+      "path": "src/gameplay/animation/PlayerIkTargets.cpp",
+      "bytes": 4658,
+      "sha256": "81d8eb5213e2651fe4fff8c1e960f233b3c0ed492da05063c34402973736c0f5"
+    },
+    {
+      "path": "src/gameplay/animation/PlayerIkTargets.h",
+      "bytes": 1966,
+      "sha256": "6a86f567085ae34d9110d02d1f6f53082728bdaf1508375c35d425e601479e17"
+    },
+    {
+      "path": "src/gameplay/BenchmarkWorkload.h",
+      "bytes": 2270,
+      "sha256": "ad013fdccfc29929c58e87bbe59e4424537d7add8e658c38d27b0ff66407fcd3"
+    },
+    {
+      "path": "src/gameplay/CorridorCollision.h",
+      "bytes": 7580,
+      "sha256": "6b687c9c8fa5346acffe30e1e8fc87a3ab8df9f8e7418c8384d8d519743cd30c"
+    },
+    {
+      "path": "src/gameplay/DevelopmentCheckpoints.h",
+      "bytes": 10654,
+      "sha256": "06960005466184087e1621ba9fe0aa02ca81067c1f4ef2be25fd3c9e4cb56d58"
+    },
+    {
+      "path": "src/gameplay/DevelopmentCheckpointSimulation.h",
+      "bytes": 10071,
+      "sha256": "f2a5aae544691f61118a4689181579ee8575cdd01e86ff0dab92f0af4bf0ca39"
+    },
+    {
+      "path": "src/gameplay/effects/FireEmitterState.cpp",
+      "bytes": 8122,
+      "sha256": "261bfec63e7b5d664ead5e703b13a201a78a5275991a64df995974a31e3db17b"
+    },
+    {
+      "path": "src/gameplay/effects/FireEmitterState.h",
+      "bytes": 2808,
+      "sha256": "cfd033a2d504933bf204622eb1fec841c1a29ac334b972a92c7e679b49728c43"
+    },
+    {
+      "path": "src/gameplay/FeedbackTiming.h",
+      "bytes": 2298,
+      "sha256": "9d73df2a301aa147179b9b7a4bb7fd3bff18bccbdf079f58c57a8fd7da4d633b"
+    },
+    {
+      "path": "src/gameplay/interactions/ChestRewardSequence.cpp",
+      "bytes": 4585,
+      "sha256": "5c1309d65ddf0215e625c0a5dc0482c11240f3f493a83a4925c8e8149c111b74"
+    },
+    {
+      "path": "src/gameplay/interactions/ChestRewardSequence.h",
+      "bytes": 1456,
+      "sha256": "ab2634d31a16255af2b84c3477ba7badbbf6545059edcff475790998deaece1d"
+    },
+    {
+      "path": "src/gameplay/interactions/FinaleSequence.cpp",
+      "bytes": 4129,
+      "sha256": "c082beaf1efbf532c1767280e079dc4c982adc491ec9756081fc1bcd738b6c1e"
+    },
+    {
+      "path": "src/gameplay/interactions/FinaleSequence.h",
+      "bytes": 1495,
+      "sha256": "19cc78d578d73fdc0eb5cc49f5e019d9f098d1f29d8f7232494e4ed75322b4a5"
+    },
+    {
+      "path": "src/gameplay/interactions/InteractionState.cpp",
+      "bytes": 3104,
+      "sha256": "d361324a73732e0a3841565fe1036fa906362aa19039c9ad7f5de52151260519"
+    },
+    {
+      "path": "src/gameplay/interactions/InteractionState.h",
+      "bytes": 1660,
+      "sha256": "5485125d898b8ed158e8dc53641c3979d49a1f1fa5f97192a6baa345a342216c"
+    },
+    {
+      "path": "src/gameplay/items/HeldItemKinematics.cpp",
+      "bytes": 36887,
+      "sha256": "56b6111f2798d03986547508c61bb9f9a12e5f4e58c932102c37ad2b154b8231"
+    },
+    {
+      "path": "src/gameplay/items/HeldItemKinematics.h",
+      "bytes": 6680,
+      "sha256": "788396feacf9427209b929ebe737d90ea7d781ad7bc913aa795b6de43ef50b47"
+    },
+    {
+      "path": "src/gameplay/items/HeldItemState.cpp",
+      "bytes": 2681,
+      "sha256": "669feaa4ba752661ec770b623fe8d40327ac81fc7ea546ab38d964345c2835ba"
+    },
+    {
+      "path": "src/gameplay/items/HeldItemState.h",
+      "bytes": 1687,
+      "sha256": "b8dee2d1595f6475ce7ddb44087137ac2ae56a5fc2ef7376032d74b94dab58c2"
+    },
+    {
+      "path": "src/gameplay/items/HeldLightState.cpp",
+      "bytes": 1205,
+      "sha256": "5b7bf3dd831ade62819423f53fdf000530c606c8e15185202a880549bb2bc464"
+    },
+    {
+      "path": "src/gameplay/items/HeldLightState.h",
+      "bytes": 693,
+      "sha256": "1770d2d4a2f326a4a6610f86b244a4df41bf34ca290b7c8f41d36e411d6418c1"
+    },
+    {
+      "path": "src/gameplay/items/LanternPendulum.cpp",
+      "bytes": 14844,
+      "sha256": "b5eff5a649532bd1b6fc8cadabe723317845cbb57e82b9f9ce7ca6e6c4333156"
+    },
+    {
+      "path": "src/gameplay/items/LanternPendulum.h",
+      "bytes": 2089,
+      "sha256": "a32b3944b72b747611de1eefc4f5d3f9b8ee45afb5cdc72c41897789337fa6fc"
+    },
+    {
+      "path": "src/gameplay/LanternBenchmarkScenario.h",
+      "bytes": 3302,
+      "sha256": "c3e12bca8eb261656e252acb363030f6c45734e66f406a174021c1b23c24ac9c"
+    },
+    {
+      "path": "src/gameplay/README.md",
+      "bytes": 3217,
+      "sha256": "6c775da691cd4a21811c399a05fc4f586cdf5bca6fa2be83549dea78b308d783"
+    },
+    {
+      "path": "src/gameplay/ShowcaseBenchmark.cpp",
+      "bytes": 18884,
+      "sha256": "76153ef43b47903445f2431040d4004ce7a5dc416708f9862fcbfc0db42b7527"
+    },
+    {
+      "path": "src/gameplay/ShowcaseBenchmark.h",
+      "bytes": 5056,
+      "sha256": "c687654e86bb0b0b488203d2b116c82c10e78ef0ce0c6eb5c0ce020c4d7a8823"
+    },
+    {
+      "path": "src/gameplay/ShowcaseCheckpoints.h",
+      "bytes": 9361,
+      "sha256": "5a8785cfd5e6c7b00d2e2957171774f3a226ef44b38aa2595480bfefd8542a83"
+    },
+    {
+      "path": "src/gameplay/ShowcaseGameplay.h",
+      "bytes": 25657,
+      "sha256": "604eb5aff16ebcd5625549d897959466bc245fd659a3152042c40346163b67e7"
+    },
+    {
+      "path": "src/gameplay/ShowcaseReplay.h",
+      "bytes": 3774,
+      "sha256": "549374efa85868e82771ccb7385f2103faa8e34e02b660080669f8a52c54e472"
+    },
+    {
+      "path": "src/gameplay/ShowcaseRoute.h",
+      "bytes": 7398,
+      "sha256": "73894e19d170f489e8f3f821c8a9ae4e75cd38696d529450e071d4c56a2b1709"
+    },
+    {
+      "path": "src/gameplay/simulation/BoundedTransportQueue.h",
+      "bytes": 1417,
+      "sha256": "69893ac1061d0f508e6f1bb7948a409f53943eb303f90d62020edbcddd7d0efe"
+    },
+    {
+      "path": "src/gameplay/simulation/FixedStepRunner.h",
+      "bytes": 2597,
+      "sha256": "8c5545018a2a4044875117f97cc4bee1a18a89123a45db862de4b9050d3ca3b0"
+    },
+    {
+      "path": "src/gameplay/simulation/GameplayEvent.h",
+      "bytes": 2556,
+      "sha256": "2783694566a20e07e23780cbe8deedbc716d212214d48c4a252e4ab87a2688d2"
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulation.cpp",
+      "bytes": 44971,
+      "sha256": "c131d6addb7adb191043762a47d9de70cf622ff0c2280ad28f43a20856fd6452"
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulation.h",
+      "bytes": 7368,
+      "sha256": "a32fd29c0a68c10a7d62279c6cb6362aca7a971cb8d757ba054de723d172c7bd"
+    },
+    {
+      "path": "src/gameplay/simulation/InputMailbox.h",
+      "bytes": 3996,
+      "sha256": "8753293cacfd086031b9a554d26432141a023c8c8b294a37f6ac41f25d519449"
+    },
+    {
+      "path": "src/gameplay/simulation/InputSnapshot.h",
+      "bytes": 1145,
+      "sha256": "a32177de3cb52d791d805810245a873a923e13fec9b7d9568a1fdd74d790237d"
+    },
+    {
+      "path": "src/gameplay/simulation/SimulationSnapshot.h",
+      "bytes": 4537,
+      "sha256": "649ff527fded985e0bc62ae6ac2901ca368fd08884e2d1e26721ea10f71abcd7"
+    },
+    {
+      "path": "src/gameplay/SpatialAudio.h",
+      "bytes": 7181,
+      "sha256": "fab878f9a0a9036fda507489b6f07117b2238403c701728f5063f847985a964f"
+    },
+    {
+      "path": "src/gameplay/SwordCombat.h",
+      "bytes": 33220,
+      "sha256": "adbd1318ff8ea95f2fd20a9d1c6ea67536456c3c89ef0f199cf1080c15979de6"
+    },
+    {
+      "path": "src/platform/android/AndroidMusicPlayback.h",
+      "bytes": 503,
+      "sha256": "5118aaa8a0e811dd6ffa78f57e4a6a9dfcb90b151ecb850cb59f68566fd93460"
+    },
+    {
+      "path": "src/platform/android/AndroidRtLabState.h",
+      "bytes": 3679,
+      "sha256": "d227437f6f7eb624efca865756e7efda72729f00ff825b9b523119a61e78f296"
+    },
+    {
+      "path": "src/platform/windows/CapabilityProbeMain.cpp",
+      "bytes": 2985,
+      "sha256": "4a938e3c747f0605b4c2fae7fbc174ef142e42736dd60ef62a9022156c604c2b"
+    },
+    {
+      "path": "src/platform/windows/DesktopControllerInput.h",
+      "bytes": 10015,
+      "sha256": "827aa595f44a08b3d9c1fe2cc4b660c6e4c0f3b96fa051dfa004ea7ab6a5a926"
+    },
+    {
+      "path": "src/platform/windows/DiagnosticWindow.cpp",
+      "bytes": 308726,
+      "sha256": "d15443fa5f9f6270ae425d964fad6cf4a5086c481425d1fdfbee05d868bf6c11"
+    },
+    {
+      "path": "src/platform/windows/DiagnosticWindow.h",
+      "bytes": 147,
+      "sha256": "4ba081dac7fdf642325d9bb2f0aae7d4e5fe068672e6b49975b7b40b6ad7dce6"
+    },
+    {
+      "path": "src/platform/windows/DiagnosticWindowMain.cpp",
+      "bytes": 218,
+      "sha256": "a0526c72e095429836ec6684c262cc25840008fb332311ade0c79828b2a45071"
+    },
+    {
+      "path": "src/platform/windows/HordeLanternRT.manifest.in",
+      "bytes": 1326,
+      "sha256": "e848e7647acd150c21a51ea95c31720f24f532d6b5e336e4a41b60be178042f3"
+    },
+    {
+      "path": "src/platform/windows/HordeLanternRT.rc.in",
+      "bytes": 1027,
+      "sha256": "5ad39e9bd2bde15cb140100caa3fb5228332bc8d17b320b080b310c7cc6d9bbe"
+    },
+    {
+      "path": "src/platform/windows/README.md",
+      "bytes": 2608,
+      "sha256": "2faee86fe5cf0d8687718d16646b1337b9c6bdd194c69e1bd3d52614d59516f4"
+    },
+    {
+      "path": "src/platform/windows/WindowsBenchmarkLaunch.h",
+      "bytes": 2915,
+      "sha256": "cf9e7cfc11616c06cc1946f65d7dab9918180ceeb683c2f5603dba7000f4dc7b"
+    },
+    {
+      "path": "src/platform/windows/WindowsCaptureContracts.h",
+      "bytes": 2318,
+      "sha256": "6dee3807cf0964153c37b7c665f651332e1a46ef9d03d92c4e31634f21f5f137"
+    },
+    {
+      "path": "src/platform/windows/WindowsGitHubReleaseUpdate.cpp",
+      "bytes": 11304,
+      "sha256": "fa16cc2375ec3737a594a73daf9aaed89d6f6c12b7d1686539733ac822940e87"
+    },
+    {
+      "path": "src/platform/windows/WindowsGitHubReleaseUpdate.h",
+      "bytes": 604,
+      "sha256": "7066e2e870a3a96c695dcf0b0399ad7c8a8fa5238d111b59284e2590148a1ea5"
+    },
+    {
+      "path": "src/platform/windows/WindowsInteractionPrompt.h",
+      "bytes": 1878,
+      "sha256": "f0c76bca99e4ee6d0616f746610c29880f0ac9a8246b7e8464eb0c3a39c2044a"
+    },
+    {
+      "path": "src/platform/windows/WindowsMusicPlayback.cpp",
+      "bytes": 25498,
+      "sha256": "22237c49fa0a610f7e070bf07a678cd92c3fcb76de4e457d6944aca9ffc2b9a2"
+    },
+    {
+      "path": "src/platform/windows/WindowsMusicPlayback.h",
+      "bytes": 2236,
+      "sha256": "2e810f524cfa66a6444437ecfb90b5813c453cad89a42e5f350f61f031940273"
+    },
+    {
+      "path": "src/platform/windows/WindowsRtLabState.h",
+      "bytes": 2588,
+      "sha256": "8a5763577559499778ca4f5e326882b4807dd7e5f0aad9768b032c3a7274d1a6"
+    },
+    {
+      "path": "src/README.md",
+      "bytes": 752,
+      "sha256": "ca1c128258d9b096bb6fc2c7498e26edb956d1c45300fded5e9775f4f7e4251c"
+    },
+    {
+      "path": "src/reporting/PlaytestReport.cpp",
+      "bytes": 18381,
+      "sha256": "fb392ef4f96d2afaef7944608eecf1515db5df7edf2f55223a339358e6ef0f30"
+    },
+    {
+      "path": "src/reporting/PlaytestReport.h",
+      "bytes": 3844,
+      "sha256": "c245ac2e8fb25b9109eae0c40789ff0f7318238bb9c08a5cf4f4d90da3fa2268"
+    },
+    {
+      "path": "src/scene/assets/AssetManifest.cpp",
+      "bytes": 29033,
+      "sha256": "d82224510b93b6f1a5c1d0151e53fb1882cd93d008b3c837eaac681e9184c45e"
+    },
+    {
+      "path": "src/scene/assets/AssetManifest.h",
+      "bytes": 2586,
+      "sha256": "b4c129db50cf7401342ac28e2143d6d81acf962d2c0c9531a340f1d4e8f42e22"
+    },
+    {
+      "path": "src/scene/assets/AssetValidation.cpp",
+      "bytes": 4194,
+      "sha256": "d97f46d3e527c61b6eeedd14139cc48b36a93d91614a791a1ef4e91611148f22"
+    },
+    {
+      "path": "src/scene/assets/AssetValidation.h",
+      "bytes": 480,
+      "sha256": "ff3da5a149a678fe3317415ba3df3e6296e1057fc2af30ad65876d92a9904cf7"
+    },
+    {
+      "path": "src/scene/assets/DielectricTopologyMath.h",
+      "bytes": 1078,
+      "sha256": "b12c11f7fbb72d1c72ddc6f170b0425f41712b9d283abb8c3c471874dd341b32"
+    },
+    {
+      "path": "src/scene/assets/GltfDocument.cpp",
+      "bytes": 4417,
+      "sha256": "2b199f105f11d8ef7d99e322e609422c9c3f05d6e41de765eef240f2004e5679"
+    },
+    {
+      "path": "src/scene/assets/GltfDocument.h",
+      "bytes": 722,
+      "sha256": "5ee7f0dafb2e2be3c8a54cfeb73cd4c03296337b8f47bfd16c183f996ab2a929"
+    },
+    {
+      "path": "src/scene/assets/PlayerPrimitiveContract.h",
+      "bytes": 4663,
+      "sha256": "7b163bc056113fa59c466d3fe0657d9c993ad4c9aabede670dd9ccee3c1d1753"
+    },
+    {
+      "path": "src/scene/assets/PlayerViewmodelContract.h",
+      "bytes": 3367,
+      "sha256": "012c87f8681c001f236b1f4578a89d8347365facfdfdab754368cc45ced72009"
+    },
+    {
+      "path": "src/scene/assets/SkinnedMeshAsset.cpp",
+      "bytes": 83981,
+      "sha256": "3cbf9bc4ce5131bc3665141a2fb6663d96a02892b9b3b624a8da072589dd7602"
+    },
+    {
+      "path": "src/scene/assets/SkinnedMeshAsset.h",
+      "bytes": 8404,
+      "sha256": "0c5de3cff1282cc81afb69c43e36b9143de0240b295ab2a8edc773eb32372ee5"
+    },
+    {
+      "path": "src/scene/assets/StaticMeshAsset.cpp",
+      "bytes": 69379,
+      "sha256": "6c10956fe18114eab012293239742b1a5ccf627caeb490bcb0a8aab58f6acdb8"
+    },
+    {
+      "path": "src/scene/assets/StaticMeshAsset.h",
+      "bytes": 2625,
+      "sha256": "690212830d6c7518a82ed429fa3c7285d5c750853210178b85be7ba3964227a8"
+    },
+    {
+      "path": "src/scene/README.md",
+      "bytes": 520,
+      "sha256": "10f051fc10a9ee37996786d4345c1cb1f1a37bb517def18af874f4105bda77c2"
+    },
+    {
+      "path": "src/scene/SkeletonBipedModel.h",
+      "bytes": 377,
+      "sha256": "0385a15067102df901963ef4148d6deda2cf722159b78c656d466ce91c3683c3"
+    },
+    {
+      "path": "src/telemetry/RtBenchmarkEvidenceReport.cpp",
+      "bytes": 23405,
+      "sha256": "75636a3e6c7c4f3618994b5f3f88064a91edea7c1a5c6e8ca8756b761f7c1332"
+    },
+    {
+      "path": "src/telemetry/RtBenchmarkEvidenceReport.h",
+      "bytes": 476,
+      "sha256": "53fdec6817aa5ec5c02adf6532f440248f0be35e0a12d9cbc9bc35c464997b59"
+    },
+    {
+      "path": "src/telemetry/RtBenchmarkEvidenceRun.cpp",
+      "bytes": 27765,
+      "sha256": "b427c5fbc47eda553278bbb4625b97197e0cf89ef9445d7985cb509f6c08a18e"
+    },
+    {
+      "path": "src/telemetry/RtBenchmarkEvidenceRun.h",
+      "bytes": 9232,
+      "sha256": "a57dc22a2b455a93d783d97a93b065f92c75b20b0bed3ee1484c3e64d04ae882"
+    },
+    {
+      "path": "src/telemetry/RtEvidencePublication.cpp",
+      "bytes": 11259,
+      "sha256": "384da6efe00fa1e539ccab7619cd9b0da8d5f91e0bed97ba55621f5f32d1878e"
+    },
+    {
+      "path": "src/telemetry/RtEvidencePublication.h",
+      "bytes": 792,
+      "sha256": "0879b2d0368eb0fb89cda0be1921af656e0d2a334503932a18d8caf45d69b563"
+    },
+    {
+      "path": "src/telemetry/RtPerformanceEvidence.cpp",
+      "bytes": 61024,
+      "sha256": "f9f97f3d3c34b8e5162551194b7510a53e0705f7a340f95a3479d53f99a2b859"
+    },
+    {
+      "path": "src/telemetry/RtPerformanceEvidence.h",
+      "bytes": 21136,
+      "sha256": "0c8b1100eb512ee72232d23d162488b767f91dc11d6f50655043a39eb0136e35"
+    },
+    {
+      "path": "src/ui/DiagnosticOverlay.cpp",
+      "bytes": 5308,
+      "sha256": "4a51747326585ef2b2e60a1ff5aaa7659011bb9ebb0c033a2f1d6362bc82a3f5"
+    },
+    {
+      "path": "src/ui/DiagnosticOverlay.h",
+      "bytes": 2501,
+      "sha256": "73c497d087512929c2356787bf130666b5ef23004e21e636a2d3760628c68376"
+    },
+    {
+      "path": "src/ui/README.md",
+      "bytes": 645,
+      "sha256": "94873b82314171b5b5183f60a7b43b5b233d155a5d9f9dcb1d466042602c591e"
+    },
+    {
+      "path": "src/update/GitHubReleaseUpdater.cpp",
+      "bytes": 21383,
+      "sha256": "bf192052aba5463d3176d24cb0eb35b9b0aa5b0acba2963d760c1892797f7d40"
+    },
+    {
+      "path": "src/update/GitHubReleaseUpdater.h",
+      "bytes": 2272,
+      "sha256": "1fb7437cdf6ab07519a00c30d323517977fd847e5e3a91e352cbd376e8b6c65d"
+    },
+    {
+      "path": "src/vulkan/DeviceCapabilities.cpp",
+      "bytes": 1054,
+      "sha256": "fa57cdeb3fdec45f7b86aca19fa5cdc4bf44f1d59c7ff50a99b65789d30f2615"
+    },
+    {
+      "path": "src/vulkan/DeviceCapabilities.h",
+      "bytes": 2419,
+      "sha256": "602c0005992bff5540a99376e7e5de57f07687427fa3c45b0dd5ad3e5a428bea"
+    },
+    {
+      "path": "src/vulkan/GpuFrameTimer.cpp",
+      "bytes": 13081,
+      "sha256": "b4d4132ab54d04620f1fc516f35302877f46be53bd1fd36884f8c70fbd7eee6f"
+    },
+    {
+      "path": "src/vulkan/GpuFrameTimer.h",
+      "bytes": 4495,
+      "sha256": "401cc1d0074a37c9d8ccd905eb3909f961d06d2a7e00acd0af1dc654d0067eee"
+    },
+    {
+      "path": "src/vulkan/GpuTimestampMath.h",
+      "bytes": 1400,
+      "sha256": "78bc76a67f45ecd9b7d87c4a1bec9e059de5ca5d8a92a09fa1a0b139e33ce778"
+    },
+    {
+      "path": "src/vulkan/raytracing/CharacterRenderSlot.cpp",
+      "bytes": 19969,
+      "sha256": "f34fe48767a43f0cd2ac15eb696dffd3fd1d7be6f9c476207aa6e0d193b5656f"
+    },
+    {
+      "path": "src/vulkan/raytracing/CharacterRenderSlot.h",
+      "bytes": 6174,
+      "sha256": "628d0818479b7fbf1a5f0ac126233065f8e4153df80a3a8c46806a012cf3a70d"
+    },
+    {
+      "path": "src/vulkan/raytracing/ChestGuidanceLight.h",
+      "bytes": 1183,
+      "sha256": "630f5ec7b979c812df20e55e5beff8bec0052a7321e85d3baa4c8fa62adbcca2"
+    },
+    {
+      "path": "src/vulkan/raytracing/DevelopmentStaticAssetPolicy.h",
+      "bytes": 681,
+      "sha256": "325f9c18045d6e9925c986cabb9c4783abbf8b3f115a829697592f91940be407"
+    },
+    {
+      "path": "src/vulkan/raytracing/DielectricMath.h",
+      "bytes": 25747,
+      "sha256": "7a13332a820c40a971934f5d1246348cc34f0e3d1991ba85661ea70784309b17"
+    },
+    {
+      "path": "src/vulkan/raytracing/DynamicBlasSynchronization.h",
+      "bytes": 1381,
+      "sha256": "5b125b9b7c3cbf68a5def39fc9a8bff47ded69a25a1e7c00fef675702a1f385d"
+    },
+    {
+      "path": "src/vulkan/raytracing/experimental/StagedPrimaryContract.h",
+      "bytes": 2234,
+      "sha256": "e5c241d93e8fd246785ed195a5377e7454bf0db0efb814635de0582b500ad5b7"
+    },
+    {
+      "path": "src/vulkan/raytracing/experimental/StagedPrimaryPass.cpp",
+      "bytes": 13972,
+      "sha256": "b022cfc72f107525ad3dc44af23f8cf05f71ea78fb391c15b9344912ac767dfb"
+    },
+    {
+      "path": "src/vulkan/raytracing/experimental/StagedPrimaryPass.h",
+      "bytes": 3313,
+      "sha256": "19c242bfeaf0a32d731d0880e9a856335f76176a2792e774a4d9f601f5c97d8f"
+    },
+    {
+      "path": "src/vulkan/raytracing/FireEmitterBuffer.cpp",
+      "bytes": 7454,
+      "sha256": "0e0002c6b2ff6c3db657465a9cd3d511032c0fc179a52520dca0c769c92ae246"
+    },
+    {
+      "path": "src/vulkan/raytracing/FireEmitterBuffer.h",
+      "bytes": 1608,
+      "sha256": "4505b7358561bcaf788bb2e85a4941055d8312187e35568c32345acdbb887041"
+    },
+    {
+      "path": "src/vulkan/raytracing/HeldItemBlasMeasurements.h",
+      "bytes": 876,
+      "sha256": "7fb3b34b99cd55899d3412d16bed627763ec5be747cdd44d807f76d9453fcc70"
+    },
+    {
+      "path": "src/vulkan/raytracing/HeldItemRenderSlot.cpp",
+      "bytes": 495,
+      "sha256": "337ca061f908dbc47579163c8cd57897077b62e7b3d192f2076b82d4d6f51b59"
+    },
+    {
+      "path": "src/vulkan/raytracing/HeldItemRenderSlot.h",
+      "bytes": 329,
+      "sha256": "2af7fdba12905c47bdf3dc10ba9a33da421aee25579cb3fcf407b4b43b42342a"
+    },
+    {
+      "path": "src/vulkan/raytracing/MinimalLegacyRayGenShader.inc",
+      "bytes": 1705307,
+      "sha256": "a3b32262260a25e31fbc880f851baabc5df14bbbb7995fd532e5696afd3e06bb"
+    },
+    {
+      "path": "src/vulkan/raytracing/MinimalRayGenShader.inc",
+      "bytes": 854392,
+      "sha256": "f4170abbf7f68364d7eeb5d9d01baeed0efacb2fc6db7ab4d1f4c0075dddacd4"
+    },
+    {
+      "path": "src/vulkan/raytracing/PlayerRenderRoute.h",
+      "bytes": 886,
+      "sha256": "3b01395579f22b60d8b20f885ae67232691c37fac4826f039cdb66f848ceb9f4"
+    },
+    {
+      "path": "src/vulkan/raytracing/PlayerRenderSlot.cpp",
+      "bytes": 35496,
+      "sha256": "01025f5d357a9638e81f60311be907c692389434adead3e5d0981c978fd5182b"
+    },
+    {
+      "path": "src/vulkan/raytracing/PlayerRenderSlot.h",
+      "bytes": 10626,
+      "sha256": "c7ada838f961154e67c8eaa99705904942cc162b71db22c18bd1b7646c1b9732"
+    },
+    {
+      "path": "src/vulkan/raytracing/PresentableTinyRtScene.cpp",
+      "bytes": 332693,
+      "sha256": "ab112db028b7de16ce15b4ee4efce02e6b5a81c7688008864d02b61475265874"
+    },
+    {
+      "path": "src/vulkan/raytracing/PresentableTinyRtScene.h",
+      "bytes": 35452,
+      "sha256": "20ec917355e49114d5b1e582f871928f408c70f3ec1e3150c8dc54064744797f"
+    },
+    {
+      "path": "src/vulkan/raytracing/RayTracingRequirements.cpp",
+      "bytes": 1679,
+      "sha256": "0d2cfd85d0856ee45cae9a39d64eaabcfafdaafa0e9b82b3c0f49bf229ff8b17"
+    },
+    {
+      "path": "src/vulkan/raytracing/RayTracingRequirements.h",
+      "bytes": 288,
+      "sha256": "69f9026873d0bf1be41b29ab3408c6898ce1b46f96afebff491f33a5c6f6c37b"
+    },
+    {
+      "path": "src/vulkan/raytracing/README.md",
+      "bytes": 3216,
+      "sha256": "dfc5d17ede6ea96a88a147465147ac7bb8c6ed1ab801a294ea645c59d2e3b788"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtDeviceEnablePlan.h",
+      "bytes": 2698,
+      "sha256": "8c7773b0d264e0c7fca5b7605c23659d45e5376fff915cc053ad61e86a2d92fc"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtExecutionPolicy.h",
+      "bytes": 2201,
+      "sha256": "cfd503bad3a9eb88585375c566a0d4105dda3fdad8b0425a477fa6c6a27e4912"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtFrameEvidenceCoordinator.cpp",
+      "bytes": 27388,
+      "sha256": "5c4bb7ec1306e5602539020872d34af9b1d986570071f12ac0461552b2d90600"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtFrameEvidenceCoordinator.h",
+      "bytes": 8760,
+      "sha256": "84eb566601ff331bcafe39b74bad7f2e4399652e82e289c32bfa7d4806fd21b9"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtGpuResources.cpp",
+      "bytes": 7071,
+      "sha256": "fbb8e75bb1db4282880ca2536767603d57db906c9477a0e6829ebc37b3281265"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtGpuResources.h",
+      "bytes": 4548,
+      "sha256": "be5440289baed270e32053e70aa8ae05909599f1fae6c1427332b61ca49f4131"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtPipelineBundle.cpp",
+      "bytes": 15783,
+      "sha256": "538690a6bdf83e7b4d56f5eeeda888d9d9a63b6e5cbb64ef7d507cd54891c1f4"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtPipelineBundle.h",
+      "bytes": 6331,
+      "sha256": "cd31304f983ec4663391647ca899d202e6d867a58d239b583580e402046590fc"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtPipelineBundleContracts.cpp",
+      "bytes": 17526,
+      "sha256": "12d5a90b61c336d3de258e6be3bf9784cb542a2442f7118d49d37dfb11811c6f"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtPipelineBundleContracts.h",
+      "bytes": 2444,
+      "sha256": "bc87c92674db3badf5b5eb7277b1808afcf58c8c4e6226e722b18e650a749ec6"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtPipelineVariantCatalog.generated.h",
+      "bytes": 4575,
+      "sha256": "98b8924f36238c5c4cdac92428192564a3260d6cf63e4255a4c813c051617f0e"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtPipelineVariantProvider.cpp",
+      "bytes": 6405,
+      "sha256": "d78a755ef2042bc793014879b65bd2620a4a0684d16d4603de101ea1f9fcd9ce"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtPipelineVariantProvider.h",
+      "bytes": 1199,
+      "sha256": "7b847c629d4114527b63665c8fb9ed02dba5a4e5f7d51bcdede7344a0a5cc8bf"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtPipelineVariants.cpp",
+      "bytes": 2270,
+      "sha256": "1ae758433fbcf85c7b82774e707ef2b5f45d43998307157420c3c351a4400234"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtPipelineVariants.h",
+      "bytes": 1325,
+      "sha256": "be6a4b1f23424d2bffe6554be35a2f6c896d469ebc83ee4edb3a6c4c68a1c58d"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtRayQueryVariantCatalog.generated.h",
+      "bytes": 4820,
+      "sha256": "d577af7326b56ea2cdf7fd348770357e9896103a0b5ba2d27feebfc047d6a202"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtSceneAbi.def",
+      "bytes": 8205,
+      "sha256": "51d151676ab6142210652dfd519dd6ffb8d7369142a37f0508632c9e38453f14"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtSceneAbi.generated.h",
+      "bytes": 13679,
+      "sha256": "0cc1ff9317823c1b97862d097efeff52270cbd94edf10a6cdbe9ce4de8ff963c"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtSceneRecordObservation.h",
+      "bytes": 9232,
+      "sha256": "9515670cbd1ce4548839fe823b3f3044606076a6d84f116cf1faf3780a67a9e0"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtSceneRouteConstants.h",
+      "bytes": 757,
+      "sha256": "8c5810cd96fbdd7009e8786e88909467846521d2975da805b3c70177379b53ea"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtSceneTuning.h",
+      "bytes": 4023,
+      "sha256": "ea5375f7bd92d28494e60b4092ae40610c0178488814c851a7b518482b5fa7a1"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtStaticMeshSlot.cpp",
+      "bytes": 19834,
+      "sha256": "25fa380a4ddf7f93bd3a43f844c46ebc4e327683c131157f1b197badc0debdb7"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtStaticMeshSlot.h",
+      "bytes": 3453,
+      "sha256": "3d921e70c903d455d89943952327d503eaff1bbdd8ab819ac7f873038c43d950"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtTextureArrays.cpp",
+      "bytes": 943,
+      "sha256": "388a7e283aa500b76b6225207c8a9bc8488a149d8bb4b635897b75a972d1b0e7"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtTextureArrays.h",
+      "bytes": 438,
+      "sha256": "dea1516ddd60de414a1516982355642a4ec9818ab3bc64775e24c01b78d37594"
+    },
+    {
+      "path": "src/vulkan/raytracing/SimulationFrameAdapter.cpp",
+      "bytes": 3028,
+      "sha256": "7d30763767e7ac5fc0dbc0503bf8c914491cd812b9f685b48751573f2680886d"
+    },
+    {
+      "path": "src/vulkan/raytracing/SimulationFrameAdapter.h",
+      "bytes": 1001,
+      "sha256": "8bfae15e802fe43777fd5697f2ff44117e6ccb6f71e6eb91b0c620a8fafce192"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
+      "bytes": 852951,
+      "sha256": "9f79c78ffe0c01f6652c7fe7916ecc06e8e15ac5516ce7657acefa6d6319c5f0"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/diagnostic_high_opaque_fast.inc",
+      "bytes": 1705358,
+      "sha256": "f37216a88e565b0025f6dce618cc77cc25e463200202543f89f648c46867ecfa"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/diagnostic_mobile_generic_dielectric.inc",
+      "bytes": 852953,
+      "sha256": "783d488784b8a6d73f1f0fda968009fb081bcbdef55cc485116dc74ff8174538"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/diagnostic_mobile_opaque_fast.inc",
+      "bytes": 1705360,
+      "sha256": "4fe71a8cdb3b0e78c0bca176aca3818a0197be9c435d310ea417bd0e1a6423ab"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_generic_dielectric.inc",
+      "bytes": 853783,
+      "sha256": "dc4ac8654d2c831c44e714c54508da7ce3a6270a1841728caec7efea8dc8f293"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_opaque_fast.inc",
+      "bytes": 1706276,
+      "sha256": "0ad07dfcc3bbf63204942cd93166b6b7b809dba8b94cbdd0966122cfd7428a7b"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_generic_dielectric.inc",
+      "bytes": 853785,
+      "sha256": "eb412a64169e334fd0c17e7efcca7210f51b72cb74d311d57d2d4850ceb336f9"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_opaque_fast.inc",
+      "bytes": 1706278,
+      "sha256": "c3f3570ef2caf9941e5a86d0d0d7fff83d425e8f20afbed0abf116a570cc5286"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_high_generic_dielectric.inc",
+      "bytes": 823986,
+      "sha256": "3b13df5557f0ebeb09d6de9ca5f0b05d59915760f332c81ceb25e60984666ef9"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_high_opaque_fast.inc",
+      "bytes": 1691975,
+      "sha256": "13a8c043ac5ef39e0c300b40ff13000fea940fff0622d6f487b068e5c78b318b"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_generic_dielectric.inc",
+      "bytes": 823988,
+      "sha256": "58fe2c8692abc509e623d4035c76792e007d5bd83e4f6ef72ce61a60e2b4bd82"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_opaque_fast.inc",
+      "bytes": 1691977,
+      "sha256": "07d31a4ac20ae288399d4bb4544cc7f4ba63b2bd67eb8239c057ce592da34436"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/shipping_high_generic_dielectric.inc",
+      "bytes": 823154,
+      "sha256": "2a8765174ebd813bec7a5b9078a0b81d9551d0f74c9c5577c4ff1e0839dec0ac"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/shipping_high_opaque_fast.inc",
+      "bytes": 1691061,
+      "sha256": "2a9407c1de754f3b458e647a90f97ad2f021a9ad5e7119774c905965fe580aba"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/shipping_mobile_generic_dielectric.inc",
+      "bytes": 823156,
+      "sha256": "ad6f66655be9bb29301762c714e0ed30153a04ae69edcfde1d7576fe5714d4ad"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/shipping_mobile_opaque_fast.inc",
+      "bytes": 1691063,
+      "sha256": "7cb9e0a45cd0fef2aab1f6644d078f08000f16e5f84ee8c8ddbb5387c6be99ee"
+    },
+    {
+      "path": "src/vulkan/README.md",
+      "bytes": 630,
+      "sha256": "fd299ab4b0d240e7f2dab4863ea82961fc6c0faf55cfb2ee80e8a77939064431"
+    },
+    {
+      "path": "src/vulkan/RtCapabilityReport.cpp",
+      "bytes": 11639,
+      "sha256": "2385d80b23589f4b27b3a656e5605fbfea097d15ffabd0189edd69dcf8692fde"
+    },
+    {
+      "path": "src/vulkan/RtCapabilityReport.h",
+      "bytes": 822,
+      "sha256": "96e91284351ddb21f2310c0b0ee33bbd1dfed3d4f443202be15f8d87d1c2c343"
+    },
+    {
+      "path": "src/vulkan/RtExecutionBackend.h",
+      "bytes": 243,
+      "sha256": "e08d36e9988df8e5ea9b74225306f4e64c3322de38228391736cdb7ac3155d3a"
+    },
+    {
+      "path": "src/vulkan/VulkanContext.cpp",
+      "bytes": 16362,
+      "sha256": "785019d6052e16ffbec535aa7ae50199217876b12d75aeff0448400ece3fe829"
+    },
+    {
+      "path": "src/vulkan/VulkanContext.h",
+      "bytes": 1113,
+      "sha256": "930e952c657765d282fc161e83bffe3977a074206b50325e72486459695389ee"
+    }
+  ],
+  "executables": [
+    {
+      "build": "build-control",
+      "configuration": "Debug",
+      "bytes": 8219648,
+      "sha256": "caa8cf0753d649e79caea1441acb0c56b773d7978bca02e5c30d70375d781102",
+      "lastWriteTimeUtc": "2026-10-01T01:26:46.7219671Z"
+    },
+    {
+      "build": "build-candidate",
+      "configuration": "Debug",
+      "bytes": 9308672,
+      "sha256": "ebd03c56b55685c8d6363b034a4d181b39963f9eda2a35ecf55b8253903a9525",
+      "lastWriteTimeUtc": "2026-10-01T01:28:23.6541188Z"
+    },
+    {
+      "build": "build-shipping-control",
+      "configuration": "Debug",
+      "bytes": 8188416,
+      "sha256": "64ab890e4012e18e27d8ebe36dd112ce376f7042fee07345942dca5ab2caa830",
+      "lastWriteTimeUtc": "2026-10-01T01:55:14.2588306Z"
+    },
+    {
+      "build": "build-shipping-control",
+      "configuration": "Release",
+      "bytes": 3078144,
+      "sha256": "3a172d0716d8657c5159d6d45b2df5cb55497f9b6ec7a6a6444ae123fcc4509a",
+      "lastWriteTimeUtc": "2026-10-01T01:50:48.2615357Z"
+    },
+    {
+      "build": "build-shipping-candidate",
+      "configuration": "Debug",
+      "bytes": 9257984,
+      "sha256": "bb5071128ea2662330a82b2c96e87ba7c1119e41dbe34a534dadd03c94fc6970",
+      "lastWriteTimeUtc": "2026-10-01T01:55:26.6366357Z"
+    },
+    {
+      "build": "build-shipping-candidate",
+      "configuration": "Release",
+      "bytes": 3948544,
+      "sha256": "b81738493039ee3843a28cea464cde93685a7e1d2ffbb0d4f0fb1c525f90ea52",
+      "lastWriteTimeUtc": "2026-10-01T01:51:00.9943589Z"
+    }
+  ]
+}

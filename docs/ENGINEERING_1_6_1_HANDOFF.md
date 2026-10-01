@@ -30,6 +30,20 @@ licensing, signing recovery and publication remain owner-controlled.
 
 ### October 1 safe checkpoint before staged Mobile experiment
 
+The single [staged-primary experiment record](ENGINEERING_1_6_1_STAGED_MOBILE_RT_2026-10-01.md)
+owns its finite matrix, memory-counter gaps, exact identities, completed results
+and next unfinished step. Read it on resumption; do not restart omission tests.
+
+RAM profiling sidecar `783f1be` is pushed (34 fake-ADB host assertions PASS).
+First staged-primary candidate now preserves 20 RTX image pairs for each of
+Diagnostic/Mobile and Shipping/Mobile-policy, but capture-loop medians regress
++74.498% / +71.656%; do not describe this as a performance improvement. The
+explicit isolated Android benchmark builds4ABIs and actual ARM64/Windows candidate
+eight-module SPIR-V checks pass without atomics/binding22. Dirty-build fingerprints
+and exact artifacts are retained in the experiment evidence. Normal Shipping
+defaults/closed-roster gates remain unchanged. No device action; per-pass timing,
+High images, live physical and exact warm phone/memory gates remain open.
+
 Windows84f111e and Android884dc8b native music output are pushed; exact884dc8b
 push36797092043/PR36797097338 freshly PASS GCC/Clang/MSVC53/53 each and Vulkan
 CPU-host13/13 both. Actual eight logs inspected; synthetic integration956059c

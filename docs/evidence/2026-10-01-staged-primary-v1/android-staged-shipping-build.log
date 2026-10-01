@@ -1,0 +1,70 @@
+> Task :app:verifyMusicRuntimeAssets
+> Task :app:prepareRuntimeAssets UP-TO-DATE
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preBenchmarkBuild UP-TO-DATE
+> Task :app:generateBenchmarkBuildConfig UP-TO-DATE
+> Task :app:javaPreCompileBenchmark UP-TO-DATE
+> Task :app:checkBenchmarkAarMetadata UP-TO-DATE
+> Task :app:generateBenchmarkResValues UP-TO-DATE
+> Task :app:mapBenchmarkSourceSetPaths
+> Task :app:generateBenchmarkResources
+> Task :app:createBenchmarkCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksBenchmark UP-TO-DATE
+> Task :app:mergeBenchmarkResources
+> Task :app:processBenchmarkMainManifest
+> Task :app:processBenchmarkManifest
+> Task :app:extractProguardFiles UP-TO-DATE
+> Task :app:configureCMakeRelWithDebInfo[arm64-v8a]-2
+> Task :app:processBenchmarkManifestForPackage
+> Task :app:buildCMakeRelWithDebInfo[arm64-v8a]-2
+> Task :app:configureCMakeRelWithDebInfo[armeabi-v7a]-2
+> Task :app:buildCMakeRelWithDebInfo[armeabi-v7a]-2
+> Task :app:configureCMakeRelWithDebInfo[x86]-2
+> Task :app:buildCMakeRelWithDebInfo[x86]-2
+> Task :app:configureCMakeRelWithDebInfo[x86_64]-2
+> Task :app:buildCMakeRelWithDebInfo[x86_64]-2
+> Task :app:mergeBenchmarkJniLibFolders UP-TO-DATE
+> Task :app:mergeBenchmarkArtProfile UP-TO-DATE
+> Task :app:desugarBenchmarkFileDependencies UP-TO-DATE
+> Task :app:checkBenchmarkDuplicateClasses UP-TO-DATE
+> Task :app:mergeBenchmarkStartupProfile UP-TO-DATE
+> Task :app:mergeExtDexBenchmark UP-TO-DATE
+> Task :app:mergeBenchmarkShaders UP-TO-DATE
+> Task :app:compileBenchmarkShaders NO-SOURCE
+> Task :app:generateBenchmarkAssets UP-TO-DATE
+> Task :app:mergeBenchmarkAssets
+> Task :app:extractBenchmarkVersionControlInfo UP-TO-DATE
+> Task :app:processBenchmarkJavaRes NO-SOURCE
+> Task :app:mergeBenchmarkJavaResource UP-TO-DATE
+> Task :app:compressBenchmarkAssets
+> Task :app:mergeBenchmarkNativeLibs
+> Task :app:collectBenchmarkDependencies UP-TO-DATE
+> Task :app:sdkBenchmarkDependencyData UP-TO-DATE
+> Task :app:validateSigningBenchmark UP-TO-DATE
+> Task :app:writeBenchmarkAppMetadata UP-TO-DATE
+> Task :app:writeBenchmarkSigningConfigVersions UP-TO-DATE
+> Task :app:stripBenchmarkDebugSymbols
+> Task :app:processBenchmarkResources
+> Task :app:extractBenchmarkNativeSymbolTables
+
+> Task :app:compileBenchmarkJavaWithJavac
+Note: C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\java\com\samfa12\hordelanternrt\MainActivity.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :app:generateBenchmarkLintVitalReportModel
+> Task :app:lintVitalAnalyzeBenchmark
+> Task :app:dexBuilderBenchmark
+> Task :app:mergeBenchmarkGlobalSynthetics UP-TO-DATE
+> Task :app:lintVitalReportBenchmark
+> Task :app:lintVitalBenchmark
+> Task :app:optimizeBenchmarkResources
+> Task :app:mergeDexBenchmark
+> Task :app:compileBenchmarkArtProfile
+> Task :app:mergeBenchmarkNativeDebugMetadata
+> Task :app:packageBenchmark
+> Task :app:createBenchmarkApkListingFileRedirect
+> Task :app:assembleBenchmark
+[Incubating] Problems report is available at: file:///C:/Users/sam_s/Documents/the%20Horde%20RT%20Demo/.worktrees/horde-1.6.1-engineering-pass/android/build/reports/problems/problems-report.html
+
+BUILD SUCCESSFUL in 2m 3s
+56 actionable tasks: 33 executed, 23 up-to-date

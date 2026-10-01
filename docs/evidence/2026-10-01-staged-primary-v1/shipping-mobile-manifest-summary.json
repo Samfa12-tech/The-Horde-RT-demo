@@ -1,0 +1,1137 @@
+{
+  "schemaVersion": 1,
+  "evidenceType": "retained desktop Debug-shell captures using Shipping shader policy",
+  "generatedUtc": "2026-10-01T02:12:00Z",
+  "inputHashes": {
+    "standardComparisonSha256": "45c93af48435f461d46160cc5615f38cd5fbccf0284bdd532a9bf978757a121c",
+    "candidateDiagnosticShippingParitySha256": "577815fdb0af4e8357a9c240d64856e2825bbdb9e5c375ff412b474d7d28bafa",
+    "separateDiagnosticManifestSummarySha256": "d80fbf3628d0f29db25354d49ccece75c1f7ac19cacf4463925fd69a6ff943f4"
+  },
+  "scope": {
+    "fixturePairs": 8,
+    "nativeCapturePairs": 20,
+    "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "backend": "RayTracingPipeline",
+    "build": "1.6.1",
+    "controlRenderScale": 1.0,
+    "candidateRenderScale": 1.0,
+    "controlPresentation": {
+      "renderScale": 1.0,
+      "dispatchWidth": 960,
+      "dispatchHeight": 540,
+      "swapchainWidth": 960,
+      "swapchainHeight": 540,
+      "swapchainFormat": 44
+    },
+    "candidatePresentation": {
+      "renderScale": 1.0,
+      "dispatchWidth": 960,
+      "dispatchHeight": 540,
+      "swapchainWidth": 960,
+      "swapchainHeight": 540,
+      "swapchainFormat": 44
+    },
+    "overlaysIncluded": false,
+    "source": "rt-storage-image"
+  },
+  "structuralEquality": {
+    "capturePairs": 20,
+    "exactPngPairs": 8,
+    "cameraPairs": 20,
+    "requestedCameraPairs": 20,
+    "viewmodelGeometryPairs": 20,
+    "playerBodyGeometryPairs": 20,
+    "instanceMaskPairs": 20,
+    "primaryVisibilityPairs": 20,
+    "staticMaterialAssetMetadataPairs": 20,
+    "honestlyPresentedPairs": 20,
+    "compiledOutDiagnosticPairs": 20
+  },
+  "focusPngIdentities": [
+    {
+      "fixture": "glass-edge-fresnel",
+      "checkpoint": "glass-edge-fresnel",
+      "zone": "skylight-chamber",
+      "captureId": 113,
+      "cameraEqual": true,
+      "requestedCameraEqual": true,
+      "viewmodelGeometrySha256Control": "b617a42dec1f804f9a5d231f5e75707d4aa3a9f2a7bdb94ac2ae1c4b0207b54d",
+      "viewmodelGeometrySha256Candidate": "b617a42dec1f804f9a5d231f5e75707d4aa3a9f2a7bdb94ac2ae1c4b0207b54d",
+      "playerWorldBodyGeometrySha256Control": "d2761bde7793362f9a01eb010ec0d3a45a39f18642952b45c213dc64e7a93723",
+      "playerWorldBodyGeometrySha256Candidate": "d2761bde7793362f9a01eb010ec0d3a45a39f18642952b45c213dc64e7a93723",
+      "instanceMasksEqual": true,
+      "primaryVisibilityEqual": true,
+      "honestlyPresentedBoth": true,
+      "exactPngMatch": true,
+      "controlPngSha256": "0fa500a4f505e07636c9a8ebce9354f11c1cbd82eca01db7d1bd220b31f70436",
+      "candidatePngSha256": "0fa500a4f505e07636c9a8ebce9354f11c1cbd82eca01db7d1bd220b31f70436"
+    },
+    {
+      "fixture": "glass-fire-transport",
+      "checkpoint": "glass-fire-transport",
+      "zone": "opening",
+      "captureId": 110,
+      "cameraEqual": true,
+      "requestedCameraEqual": true,
+      "viewmodelGeometrySha256Control": "dd3a8acd3e79b6b291588b0b2729013a5158ea16bef13fdafb4bf142edafd7a6",
+      "viewmodelGeometrySha256Candidate": "dd3a8acd3e79b6b291588b0b2729013a5158ea16bef13fdafb4bf142edafd7a6",
+      "playerWorldBodyGeometrySha256Control": "4bc4f14d85f44a19e52c9f99bd59b2719ae67bb02210c30b7420c85eabbbafcb",
+      "playerWorldBodyGeometrySha256Candidate": "4bc4f14d85f44a19e52c9f99bd59b2719ae67bb02210c30b7420c85eabbbafcb",
+      "instanceMasksEqual": true,
+      "primaryVisibilityEqual": true,
+      "honestlyPresentedBoth": true,
+      "exactPngMatch": true,
+      "controlPngSha256": "86c9aa58eb7ca96e5a2360b4f3f2bf26b8867250e3abbb5161de9280c45420bc",
+      "candidatePngSha256": "86c9aa58eb7ca96e5a2360b4f3f2bf26b8867250e3abbb5161de9280c45420bc"
+    },
+    {
+      "fixture": "glass-millimetre-closed",
+      "checkpoint": "glass-millimetre-closed",
+      "zone": "skylight-chamber",
+      "captureId": 112,
+      "cameraEqual": true,
+      "requestedCameraEqual": true,
+      "viewmodelGeometrySha256Control": "b0891b7591e16bf11d332716656420407dfd3479eabdfc625093ad61d3f156d8",
+      "viewmodelGeometrySha256Candidate": "b0891b7591e16bf11d332716656420407dfd3479eabdfc625093ad61d3f156d8",
+      "playerWorldBodyGeometrySha256Control": "27a4680a21c30d2895ccded628c1984a5f2d5a37e6c1a96eb26cd6d8420137c0",
+      "playerWorldBodyGeometrySha256Candidate": "27a4680a21c30d2895ccded628c1984a5f2d5a37e6c1a96eb26cd6d8420137c0",
+      "instanceMasksEqual": true,
+      "primaryVisibilityEqual": true,
+      "honestlyPresentedBoth": true,
+      "exactPngMatch": true,
+      "controlPngSha256": "ef770833f998849e0a945330c263aa8000aa11625224915e39ca78ebb54246b5",
+      "candidatePngSha256": "ef770833f998849e0a945330c263aa8000aa11625224915e39ca78ebb54246b5"
+    },
+    {
+      "fixture": "glass-tinted-transport",
+      "checkpoint": "glass-tinted-transport",
+      "zone": "opening",
+      "captureId": 111,
+      "cameraEqual": true,
+      "requestedCameraEqual": true,
+      "viewmodelGeometrySha256Control": "dd3a8acd3e79b6b291588b0b2729013a5158ea16bef13fdafb4bf142edafd7a6",
+      "viewmodelGeometrySha256Candidate": "dd3a8acd3e79b6b291588b0b2729013a5158ea16bef13fdafb4bf142edafd7a6",
+      "playerWorldBodyGeometrySha256Control": "4bc4f14d85f44a19e52c9f99bd59b2719ae67bb02210c30b7420c85eabbbafcb",
+      "playerWorldBodyGeometrySha256Candidate": "4bc4f14d85f44a19e52c9f99bd59b2719ae67bb02210c30b7420c85eabbbafcb",
+      "instanceMasksEqual": true,
+      "primaryVisibilityEqual": true,
+      "honestlyPresentedBoth": true,
+      "exactPngMatch": true,
+      "controlPngSha256": "49c1128538ed9f8d3521aabbe1ba75a9775e2f6141af17bbefc68a0cafdd27a7",
+      "candidatePngSha256": "49c1128538ed9f8d3521aabbe1ba75a9775e2f6141af17bbefc68a0cafdd27a7"
+    },
+    {
+      "fixture": "lantern-glass-production",
+      "checkpoint": "lantern-glass-production",
+      "zone": "yellow-torch-bay",
+      "captureId": 115,
+      "cameraEqual": true,
+      "requestedCameraEqual": true,
+      "viewmodelGeometrySha256Control": "dfdb4b90b7d1776cfc47589613b44a98e257788f50c22d219e04037944987ae4",
+      "viewmodelGeometrySha256Candidate": "dfdb4b90b7d1776cfc47589613b44a98e257788f50c22d219e04037944987ae4",
+      "playerWorldBodyGeometrySha256Control": "b95270e6b533d2b4ffefc71cbadec4d8b63af4d9d4877ab650a628e901efe2e3",
+      "playerWorldBodyGeometrySha256Candidate": "b95270e6b533d2b4ffefc71cbadec4d8b63af4d9d4877ab650a628e901efe2e3",
+      "instanceMasksEqual": true,
+      "primaryVisibilityEqual": true,
+      "honestlyPresentedBoth": true,
+      "exactPngMatch": true,
+      "controlPngSha256": "c714c6eb4c72fb488a35d24dd8e712e9a0617a39cf9be0dd6d92bf5eb2e10bc6",
+      "candidatePngSha256": "c714c6eb4c72fb488a35d24dd8e712e9a0617a39cf9be0dd6d92bf5eb2e10bc6"
+    },
+    {
+      "fixture": "player-viewmodel-lantern-high-look-up",
+      "checkpoint": "player-viewmodel-lantern-high-look-up",
+      "zone": "yellow-torch-bay",
+      "captureId": 146,
+      "cameraEqual": true,
+      "requestedCameraEqual": true,
+      "viewmodelGeometrySha256Control": "01879034f533eb6e0e9f5dcd7c6895b4826b74f4c7ab256f4f7fa5f0926ffa7e",
+      "viewmodelGeometrySha256Candidate": "01879034f533eb6e0e9f5dcd7c6895b4826b74f4c7ab256f4f7fa5f0926ffa7e",
+      "playerWorldBodyGeometrySha256Control": "2a62823a4351312cf55f28272a8b9ce2f1905f0831c14f5db2bb4d3fe95aea63",
+      "playerWorldBodyGeometrySha256Candidate": "2a62823a4351312cf55f28272a8b9ce2f1905f0831c14f5db2bb4d3fe95aea63",
+      "instanceMasksEqual": true,
+      "primaryVisibilityEqual": true,
+      "honestlyPresentedBoth": true,
+      "exactPngMatch": true,
+      "controlPngSha256": "e999af486122a96f1fa4760eb73b311a9d2a3fca075962e882b65cbee340eae5",
+      "candidatePngSha256": "e999af486122a96f1fa4760eb73b311a9d2a3fca075962e882b65cbee340eae5"
+    },
+    {
+      "fixture": "player-viewmodel-lantern-low-parry",
+      "checkpoint": "player-viewmodel-lantern-low-parry",
+      "zone": "yellow-torch-bay",
+      "captureId": 144,
+      "cameraEqual": true,
+      "requestedCameraEqual": true,
+      "viewmodelGeometrySha256Control": "bf2682f34192bf46b9756ed90ea122a6cf225f23f0aadbb608d6b01855579596",
+      "viewmodelGeometrySha256Candidate": "bf2682f34192bf46b9756ed90ea122a6cf225f23f0aadbb608d6b01855579596",
+      "playerWorldBodyGeometrySha256Control": "e25329b84914c5ccaf61aa72beac29edc34db1842fe395736eb4041d2a3f4e89",
+      "playerWorldBodyGeometrySha256Candidate": "e25329b84914c5ccaf61aa72beac29edc34db1842fe395736eb4041d2a3f4e89",
+      "instanceMasksEqual": true,
+      "primaryVisibilityEqual": true,
+      "honestlyPresentedBoth": true,
+      "exactPngMatch": true,
+      "controlPngSha256": "25beb6eae967b5a8e434dab161a82906e08b11998e1a94aeecb1a66c65d5d80e",
+      "candidatePngSha256": "25beb6eae967b5a8e434dab161a82906e08b11998e1a94aeecb1a66c65d5d80e"
+    }
+  ],
+  "standardPixelComparison": {
+    "tolerance": {
+      "maximumChannelDifference": 3,
+      "maximumFractionOverOne": 0.001
+    },
+    "checkpoints": [
+      {
+        "checkpoint": "opening",
+        "pixels": 518400,
+        "differentByMoreThanOne": 0,
+        "differentFraction": 0.0,
+        "maximumChannelDifference": 1,
+        "passedExistingTolerance": true,
+        "exactPngMatch": false,
+        "controlPngSha256": "cd57c71fb57f239d9cc22b4812a1b9566870f4eb637c0209e3bef4f73b5289f5",
+        "candidatePngSha256": "a68eb3349f7f709df9d0f8da0dd44e5aa44486de74b021f40a2d1d69a39e7f0d"
+      },
+      {
+        "checkpoint": "skeleton",
+        "pixels": 518400,
+        "differentByMoreThanOne": 4,
+        "differentFraction": 7.72E-06,
+        "maximumChannelDifference": 3,
+        "passedExistingTolerance": true,
+        "exactPngMatch": false,
+        "controlPngSha256": "185a99386d086a504997acfb702ffb6b1b3c64b53506e7af1c55c232327442b3",
+        "candidatePngSha256": "c9c04cac914985700613cff2f293cd8cbd11bd652cc7980f7948fb9ec5e9e47e"
+      },
+      {
+        "checkpoint": "worst-bend",
+        "pixels": 518400,
+        "differentByMoreThanOne": 2,
+        "differentFraction": 3.86E-06,
+        "maximumChannelDifference": 2,
+        "passedExistingTolerance": true,
+        "exactPngMatch": false,
+        "controlPngSha256": "4ab7f9f95ecf5ddec646e3685fa5e8d3fcf458296171e42afde2979f8d9eb8c4",
+        "candidatePngSha256": "9bb84b2b3f91bbfe8a4017fe5ab1f40099dd5a39f5976d28d09b4b43bd5eae38"
+      },
+      {
+        "checkpoint": "lantern-drop",
+        "pixels": 518400,
+        "differentByMoreThanOne": 0,
+        "differentFraction": 0.0,
+        "maximumChannelDifference": 1,
+        "passedExistingTolerance": true,
+        "exactPngMatch": false,
+        "controlPngSha256": "752abac3feb62bd523247b11d411a9ade581a0fff09f9625806ae2779f8026bb",
+        "candidatePngSha256": "65d75a70dd537c8d311e7db96850880094df8d91f584bb047d25896ccd8033b3"
+      },
+      {
+        "checkpoint": "skylight",
+        "pixels": 518400,
+        "differentByMoreThanOne": 0,
+        "differentFraction": 0.0,
+        "maximumChannelDifference": 1,
+        "passedExistingTolerance": true,
+        "exactPngMatch": false,
+        "controlPngSha256": "9c3a1f7922d5b416fd3f2fe9353812eef73d0924fb01aa35cf23a71914e8bcdf",
+        "candidatePngSha256": "771fabcd062e055c303fea5e2b18125b7ca134a0ee4a940f1f8863c6433a67c3"
+      },
+      {
+        "checkpoint": "yellow",
+        "pixels": 518400,
+        "differentByMoreThanOne": 0,
+        "differentFraction": 0.0,
+        "maximumChannelDifference": 1,
+        "passedExistingTolerance": true,
+        "exactPngMatch": false,
+        "controlPngSha256": "3967003e88cce6cef8edb7af8989cb5f06ccfe05b9ae1931516a5e172e6e1dad",
+        "candidatePngSha256": "ec31e39b117427aea8493e31dc1a6db57cc5ddd3530d2f3c5ad69fa0da8ff72e"
+      },
+      {
+        "checkpoint": "blue",
+        "pixels": 518400,
+        "differentByMoreThanOne": 0,
+        "differentFraction": 0.0,
+        "maximumChannelDifference": 1,
+        "passedExistingTolerance": true,
+        "exactPngMatch": false,
+        "controlPngSha256": "37115a233662bd831be50f41e2ededd30666e94d412ffe8d029b15c2a31aadf6",
+        "candidatePngSha256": "dc93e7a872d111cdc2f814aceba761a23a4fd8491940d97fbbd010bb6d367242"
+      },
+      {
+        "checkpoint": "red",
+        "pixels": 518400,
+        "differentByMoreThanOne": 0,
+        "differentFraction": 0.0,
+        "maximumChannelDifference": 1,
+        "passedExistingTolerance": true,
+        "exactPngMatch": false,
+        "controlPngSha256": "5f9b9f4277bce38e888483bfc07018d35dc76fcb874522ed6ae19af0827d6831",
+        "candidatePngSha256": "28fb5b45d3179b9fef574b45fb0a99f166444a68658bde6b5640d336bfd84319"
+      },
+      {
+        "checkpoint": "green",
+        "pixels": 518400,
+        "differentByMoreThanOne": 0,
+        "differentFraction": 0.0,
+        "maximumChannelDifference": 1,
+        "passedExistingTolerance": true,
+        "exactPngMatch": false,
+        "controlPngSha256": "0afdc3e4685bf8f30da7ce4442fe7966675410349a064660713b759f4041bfdc",
+        "candidatePngSha256": "2c934efa4277c12e746ca4b8c5c1567e0d75c3a6f4e9700e127e350abcfd1f21"
+      },
+      {
+        "checkpoint": "mirror",
+        "pixels": 518400,
+        "differentByMoreThanOne": 0,
+        "differentFraction": 0.0,
+        "maximumChannelDifference": 1,
+        "passedExistingTolerance": true,
+        "exactPngMatch": false,
+        "controlPngSha256": "efdc76cb16d3cc47e7b246e50277f64cc6762948475702c7e6f53ce4165f2dd3",
+        "candidatePngSha256": "988941d07fa8811209bdb0f317e264e53653fbed29b972ef462eccd50552017f"
+      },
+      {
+        "checkpoint": "lich",
+        "pixels": 518400,
+        "differentByMoreThanOne": 0,
+        "differentFraction": 0.0,
+        "maximumChannelDifference": 1,
+        "passedExistingTolerance": true,
+        "exactPngMatch": false,
+        "controlPngSha256": "da71632b1315c80910b7974c1c98bf1dd29c134c95ab18d2e6979a50e4d8b4e9",
+        "candidatePngSha256": "f6ba25fb497d24a93956a31a1c06f0612b75efb2a8fba295f6367bab64123de6"
+      },
+      {
+        "checkpoint": "finale-roof",
+        "pixels": 518400,
+        "differentByMoreThanOne": 0,
+        "differentFraction": 0.0,
+        "maximumChannelDifference": 0,
+        "passedExistingTolerance": true,
+        "exactPngMatch": true,
+        "controlPngSha256": "c2fbb089984bfdc543a964848ed851312414c7bb051625c45e18043d4c0cdf6d",
+        "candidatePngSha256": "c2fbb089984bfdc543a964848ed851312414c7bb051625c45e18043d4c0cdf6d"
+      },
+      {
+        "checkpoint": "two-enemy-combat",
+        "pixels": 518400,
+        "differentByMoreThanOne": 2,
+        "differentFraction": 3.86E-06,
+        "maximumChannelDifference": 3,
+        "passedExistingTolerance": true,
+        "exactPngMatch": false,
+        "controlPngSha256": "ebafbb20e7e046202a0205067eb3f6d9f75b1855ff7929f3d2d23c0a9f1d6686",
+        "candidatePngSha256": "2ade4197c77ff5472aea25c405b7d45fc9ed4d4b3ed81d8fd1693aac8d70e1e5"
+      }
+    ],
+    "passed": true
+  },
+  "candidateDiagnosticShippingPixelComparison": {
+    "captures": 13,
+    "pixelTolerance": {
+      "maximumChannelDifference": 3,
+      "maximumFractionOverOne": 0.001
+    },
+    "everyPixelExactlyEqual": true,
+    "perCheckpoint": [
+      {
+        "checkpoint": "opening",
+        "pixels": 518400,
+        "differentByMoreThanOne": 0,
+        "differentFraction": 0.0,
+        "maximumChannelDifference": 0,
+        "passedExistingTolerance": true
+      },
+      {
+        "checkpoint": "skeleton",
+        "pixels": 518400,
+        "differentByMoreThanOne": 0,
+        "differentFraction": 0.0,
+        "maximumChannelDifference": 0,
+        "passedExistingTolerance": true
+      },
+      {
+        "checkpoint": "worst-bend",
+        "pixels": 518400,
+        "differentByMoreThanOne": 0,
+        "differentFraction": 0.0,
+        "maximumChannelDifference": 0,
+        "passedExistingTolerance": true
+      },
+      {
+        "checkpoint": "lantern-drop",
+        "pixels": 518400,
+        "differentByMoreThanOne": 0,
+        "differentFraction": 0.0,
+        "maximumChannelDifference": 0,
+        "passedExistingTolerance": true
+      },
+      {
+        "checkpoint": "skylight",
+        "pixels": 518400,
+        "differentByMoreThanOne": 0,
+        "differentFraction": 0.0,
+        "maximumChannelDifference": 0,
+        "passedExistingTolerance": true
+      },
+      {
+        "checkpoint": "yellow",
+        "pixels": 518400,
+        "differentByMoreThanOne": 0,
+        "differentFraction": 0.0,
+        "maximumChannelDifference": 0,
+        "passedExistingTolerance": true
+      },
+      {
+        "checkpoint": "blue",
+        "pixels": 518400,
+        "differentByMoreThanOne": 0,
+        "differentFraction": 0.0,
+        "maximumChannelDifference": 0,
+        "passedExistingTolerance": true
+      },
+      {
+        "checkpoint": "red",
+        "pixels": 518400,
+        "differentByMoreThanOne": 0,
+        "differentFraction": 0.0,
+        "maximumChannelDifference": 0,
+        "passedExistingTolerance": true
+      },
+      {
+        "checkpoint": "green",
+        "pixels": 518400,
+        "differentByMoreThanOne": 0,
+        "differentFraction": 0.0,
+        "maximumChannelDifference": 0,
+        "passedExistingTolerance": true
+      },
+      {
+        "checkpoint": "mirror",
+        "pixels": 518400,
+        "differentByMoreThanOne": 0,
+        "differentFraction": 0.0,
+        "maximumChannelDifference": 0,
+        "passedExistingTolerance": true
+      },
+      {
+        "checkpoint": "lich",
+        "pixels": 518400,
+        "differentByMoreThanOne": 0,
+        "differentFraction": 0.0,
+        "maximumChannelDifference": 0,
+        "passedExistingTolerance": true
+      },
+      {
+        "checkpoint": "finale-roof",
+        "pixels": 518400,
+        "differentByMoreThanOne": 0,
+        "differentFraction": 0.0,
+        "maximumChannelDifference": 0,
+        "passedExistingTolerance": true
+      },
+      {
+        "checkpoint": "two-enemy-combat",
+        "pixels": 518400,
+        "differentByMoreThanOne": 0,
+        "differentFraction": 0.0,
+        "maximumChannelDifference": 0,
+        "passedExistingTolerance": true
+      }
+    ],
+    "overallComparisonPassed": false
+  },
+  "timing": {
+    "standardControlMedianMs": 6.44635,
+    "standardCandidateMedianMs": 11.06555,
+    "standardDeltaPercent": 71.656,
+    "standardTolerancePercent": 2.0,
+    "standardPassed": false,
+    "candidateDiagnosticMedianMs": 10.67515,
+    "candidateShippingMedianMs": 11.06555,
+    "candidateDiagnosticToShippingDeltaPercent": 3.657,
+    "candidateDiagnosticToShippingPassed": false,
+    "basis": "overall capture sample median"
+  },
+  "stagedPrimaryReportedAllocation": {
+    "organisation": "StagedPrimaryV1Investigation",
+    "recordBytes": 128,
+    "pages": 3,
+    "logicalBytes": 66355200,
+    "paddedBufferBytes": 66355200,
+    "allocationBytes": 66355200,
+    "logicalReadWriteBytesPerFrame": 132710400,
+    "dramTrafficMeasured": false,
+    "memoryFlagsRaw": [
+      1,
+      1,
+      1
+    ],
+    "modules": [
+      "6a05d46a3a83671db431d1ff04782ecb1937243c3292257e8cf5a501a7877dff",
+      "147f113e8dfcfeb14811513af667b81c0f7352544e931b9c25ff37293d67d7d3",
+      "82b45ee960bbbeb6f0dfed1ffb9550dbb7bb34a7d70325c0d913a4186e8df5d0",
+      "fabc53f43b7d00b4be683d23a978dd6045909c3e649fc1c8f8f9055d82e3c86d"
+    ]
+  },
+  "shippingDiagnostics": {
+    "controlAvailability": "CompiledOut",
+    "candidateAvailability": "CompiledOut",
+    "diagnosticCountersCompiledOut": true,
+    "compiledOutManifestPlaceholdersNumericallyZero": true,
+    "interpretation": "Failure/recovery event counts are not runtime evidence in these Shipping-policy manifests because those counters were compiled out."
+  },
+  "separateDiagnosticCounterEvidence": {
+    "source": "capture-manifest-comparison-summary.json (the separate Diagnostic/mobile manifest set)",
+    "fixturePairs": 8,
+    "capturePairs": 20,
+    "diagnosticAvailability": "Available in all paired manifests",
+    "dielectricFieldsCompared": 13,
+    "dielectricEventCountersCompared": 11,
+    "reasonFieldsCompared": 32,
+    "reasonEventAndMaskCountersCompared": 25,
+    "counterOutcome": "All event/overflow/recovery/mask counters compare equal and are zero in these manifests. The five reason-object primary pixel aggregate fields compare equal per pair; values are recorded per fixture below.",
+    "limitation": "Separate Diagnostic-policy evidence only; do not attribute these counters to Shipping-policy captures."
+  },
+  "manifestPairs": [
+    {
+      "fixture": "standard",
+      "captureCount": 13,
+      "controlManifest": {
+        "sha256": "f6c241d4a30a5663068977113ceb52264479f590bf1748b06aa2abc6965d745e",
+        "relativePath": "control/standard/capture-manifest.json"
+      },
+      "candidateManifest": {
+        "sha256": "2d4cb19f5e24b61a036dbf73543f0ddb2930842185c5c4e0ab826ba3c6fbdf6c",
+        "relativePath": "candidate/standard/capture-manifest.json"
+      },
+      "selectedControl": {
+        "opaqueFast": {
+          "key": "shipping_mobile_opaque_fast",
+          "sha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b"
+        },
+        "genericDielectric": {
+          "key": "shipping_mobile_generic_dielectric",
+          "sha256": "ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532"
+        }
+      },
+      "selectedCandidate": {
+        "opaqueFast": {
+          "key": "staged_primary_v1_shipping_mobile_opaque_fast",
+          "sha256": "8f9f8cd60b35d9dd91ffd487b492ef4f64a8028c444feef2f8b853fe026dd918"
+        },
+        "genericDielectric": {
+          "key": "staged_primary_v1_shipping_mobile_generic_dielectric",
+          "sha256": "07b56d6576d8537813eca70bd99dfdffc10c4fafb1f63fad7a080735d1e8f814"
+        }
+      },
+      "captureComparisons": [
+        {
+          "fixture": "standard",
+          "checkpoint": "opening",
+          "zone": "opening",
+          "captureId": 0,
+          "cameraEqual": true,
+          "requestedCameraEqual": true,
+          "viewmodelGeometrySha256Control": "ec903d3d30447a386e68b1e82ea5f0df03b10640a9835f1d5091ffd164765d81",
+          "viewmodelGeometrySha256Candidate": "ec903d3d30447a386e68b1e82ea5f0df03b10640a9835f1d5091ffd164765d81",
+          "playerWorldBodyGeometrySha256Control": "578aeee9efc59b728ce546597ec3ef12c7a7f2b5e25eaaa7914c07c316089207",
+          "playerWorldBodyGeometrySha256Candidate": "578aeee9efc59b728ce546597ec3ef12c7a7f2b5e25eaaa7914c07c316089207",
+          "instanceMasksEqual": true,
+          "primaryVisibilityEqual": true,
+          "honestlyPresentedBoth": true,
+          "exactPngMatch": false,
+          "controlPngSha256": "cd57c71fb57f239d9cc22b4812a1b9566870f4eb637c0209e3bef4f73b5289f5",
+          "candidatePngSha256": "a68eb3349f7f709df9d0f8da0dd44e5aa44486de74b021f40a2d1d69a39e7f0d"
+        },
+        {
+          "fixture": "standard",
+          "checkpoint": "skeleton",
+          "zone": "skeleton-room",
+          "captureId": 1,
+          "cameraEqual": true,
+          "requestedCameraEqual": true,
+          "viewmodelGeometrySha256Control": "4d002722014756fbd0f53cf50a5c925df89375cf9abc71aee8c1c82b1a5b0365",
+          "viewmodelGeometrySha256Candidate": "4d002722014756fbd0f53cf50a5c925df89375cf9abc71aee8c1c82b1a5b0365",
+          "playerWorldBodyGeometrySha256Control": "43434ab27d047c935118fc45ccd033102b5ae8009cd979c811a51215915273bf",
+          "playerWorldBodyGeometrySha256Candidate": "43434ab27d047c935118fc45ccd033102b5ae8009cd979c811a51215915273bf",
+          "instanceMasksEqual": true,
+          "primaryVisibilityEqual": true,
+          "honestlyPresentedBoth": true,
+          "exactPngMatch": false,
+          "controlPngSha256": "185a99386d086a504997acfb702ffb6b1b3c64b53506e7af1c55c232327442b3",
+          "candidatePngSha256": "c9c04cac914985700613cff2f293cd8cbd11bd652cc7980f7948fb9ec5e9e47e"
+        },
+        {
+          "fixture": "standard",
+          "checkpoint": "worst-bend",
+          "zone": "shadow-corridor",
+          "captureId": 2,
+          "cameraEqual": true,
+          "requestedCameraEqual": true,
+          "viewmodelGeometrySha256Control": "2b8ec63e94a0eff8c9d7ebad62079c814f12947d88b848eaccbfc2480e854767",
+          "viewmodelGeometrySha256Candidate": "2b8ec63e94a0eff8c9d7ebad62079c814f12947d88b848eaccbfc2480e854767",
+          "playerWorldBodyGeometrySha256Control": "db96571317a7ef7673c335a56ca16a9b6845f010afdcf167e53772f9e0ee7061",
+          "playerWorldBodyGeometrySha256Candidate": "db96571317a7ef7673c335a56ca16a9b6845f010afdcf167e53772f9e0ee7061",
+          "instanceMasksEqual": true,
+          "primaryVisibilityEqual": true,
+          "honestlyPresentedBoth": true,
+          "exactPngMatch": false,
+          "controlPngSha256": "4ab7f9f95ecf5ddec646e3685fa5e8d3fcf458296171e42afde2979f8d9eb8c4",
+          "candidatePngSha256": "9bb84b2b3f91bbfe8a4017fe5ab1f40099dd5a39f5976d28d09b4b43bd5eae38"
+        },
+        {
+          "fixture": "standard",
+          "checkpoint": "lantern-drop",
+          "zone": "shadow-corridor",
+          "captureId": 3,
+          "cameraEqual": true,
+          "requestedCameraEqual": true,
+          "viewmodelGeometrySha256Control": "258e63c2705b58bbecda45b8ebab4d10ed3ee0786bd55f10c7c1541546218414",
+          "viewmodelGeometrySha256Candidate": "258e63c2705b58bbecda45b8ebab4d10ed3ee0786bd55f10c7c1541546218414",
+          "playerWorldBodyGeometrySha256Control": "7c2c253531df5f119922ca4034435814d2685ec71eb87d82d35ea570df4083b7",
+          "playerWorldBodyGeometrySha256Candidate": "7c2c253531df5f119922ca4034435814d2685ec71eb87d82d35ea570df4083b7",
+          "instanceMasksEqual": true,
+          "primaryVisibilityEqual": true,
+          "honestlyPresentedBoth": true,
+          "exactPngMatch": false,
+          "controlPngSha256": "752abac3feb62bd523247b11d411a9ade581a0fff09f9625806ae2779f8026bb",
+          "candidatePngSha256": "65d75a70dd537c8d311e7db96850880094df8d91f584bb047d25896ccd8033b3"
+        },
+        {
+          "fixture": "standard",
+          "checkpoint": "skylight",
+          "zone": "skylight-chamber",
+          "captureId": 4,
+          "cameraEqual": true,
+          "requestedCameraEqual": true,
+          "viewmodelGeometrySha256Control": "57cf7ec0a16188c13e64d51f68ab0fcc27f2974166599eb531f084781bd6152a",
+          "viewmodelGeometrySha256Candidate": "57cf7ec0a16188c13e64d51f68ab0fcc27f2974166599eb531f084781bd6152a",
+          "playerWorldBodyGeometrySha256Control": "28d8fc50dc44a4d4a79cea27acb1722c457fe2703bd7034511eede00230d4d11",
+          "playerWorldBodyGeometrySha256Candidate": "28d8fc50dc44a4d4a79cea27acb1722c457fe2703bd7034511eede00230d4d11",
+          "instanceMasksEqual": true,
+          "primaryVisibilityEqual": true,
+          "honestlyPresentedBoth": true,
+          "exactPngMatch": false,
+          "controlPngSha256": "9c3a1f7922d5b416fd3f2fe9353812eef73d0924fb01aa35cf23a71914e8bcdf",
+          "candidatePngSha256": "771fabcd062e055c303fea5e2b18125b7ca134a0ee4a940f1f8863c6433a67c3"
+        },
+        {
+          "fixture": "standard",
+          "checkpoint": "yellow",
+          "zone": "yellow-torch-bay",
+          "captureId": 5,
+          "cameraEqual": true,
+          "requestedCameraEqual": true,
+          "viewmodelGeometrySha256Control": "bbe99aaaaf5ed12ca1f3a5811e587e7f3a0e5b3c67a9c20dfe93da7d52522a84",
+          "viewmodelGeometrySha256Candidate": "bbe99aaaaf5ed12ca1f3a5811e587e7f3a0e5b3c67a9c20dfe93da7d52522a84",
+          "playerWorldBodyGeometrySha256Control": "a523014e60a0e148b2132787c5bf385b962b3f3fcc3273b6efd56540e4d7324c",
+          "playerWorldBodyGeometrySha256Candidate": "a523014e60a0e148b2132787c5bf385b962b3f3fcc3273b6efd56540e4d7324c",
+          "instanceMasksEqual": true,
+          "primaryVisibilityEqual": true,
+          "honestlyPresentedBoth": true,
+          "exactPngMatch": false,
+          "controlPngSha256": "3967003e88cce6cef8edb7af8989cb5f06ccfe05b9ae1931516a5e172e6e1dad",
+          "candidatePngSha256": "ec31e39b117427aea8493e31dc1a6db57cc5ddd3530d2f3c5ad69fa0da8ff72e"
+        },
+        {
+          "fixture": "standard",
+          "checkpoint": "blue",
+          "zone": "blue-torch-bay",
+          "captureId": 6,
+          "cameraEqual": true,
+          "requestedCameraEqual": true,
+          "viewmodelGeometrySha256Control": "7a6f7b3bcf8797962f63dddbb10a65d44c4ac69a2452a06eb9475a2b3403f962",
+          "viewmodelGeometrySha256Candidate": "7a6f7b3bcf8797962f63dddbb10a65d44c4ac69a2452a06eb9475a2b3403f962",
+          "playerWorldBodyGeometrySha256Control": "c2c753e54c4011a9de1a1678c87b1d4bb9c77c1b567f1c7bbb5aafebe81b7c74",
+          "playerWorldBodyGeometrySha256Candidate": "c2c753e54c4011a9de1a1678c87b1d4bb9c77c1b567f1c7bbb5aafebe81b7c74",
+          "instanceMasksEqual": true,
+          "primaryVisibilityEqual": true,
+          "honestlyPresentedBoth": true,
+          "exactPngMatch": false,
+          "controlPngSha256": "37115a233662bd831be50f41e2ededd30666e94d412ffe8d029b15c2a31aadf6",
+          "candidatePngSha256": "dc93e7a872d111cdc2f814aceba761a23a4fd8491940d97fbbd010bb6d367242"
+        },
+        {
+          "fixture": "standard",
+          "checkpoint": "red",
+          "zone": "red-torch-bay",
+          "captureId": 7,
+          "cameraEqual": true,
+          "requestedCameraEqual": true,
+          "viewmodelGeometrySha256Control": "660303a74567733472ff6fcbb2eb44f41379d457bb272874ef259c161c1cc801",
+          "viewmodelGeometrySha256Candidate": "660303a74567733472ff6fcbb2eb44f41379d457bb272874ef259c161c1cc801",
+          "playerWorldBodyGeometrySha256Control": "d063a29a1442bebb5a869b26f4456296a16fe9f359239cf02abf8fae07b4d30d",
+          "playerWorldBodyGeometrySha256Candidate": "d063a29a1442bebb5a869b26f4456296a16fe9f359239cf02abf8fae07b4d30d",
+          "instanceMasksEqual": true,
+          "primaryVisibilityEqual": true,
+          "honestlyPresentedBoth": true,
+          "exactPngMatch": false,
+          "controlPngSha256": "5f9b9f4277bce38e888483bfc07018d35dc76fcb874522ed6ae19af0827d6831",
+          "candidatePngSha256": "28fb5b45d3179b9fef574b45fb0a99f166444a68658bde6b5640d336bfd84319"
+        },
+        {
+          "fixture": "standard",
+          "checkpoint": "green",
+          "zone": "green-torch-bay",
+          "captureId": 8,
+          "cameraEqual": true,
+          "requestedCameraEqual": true,
+          "viewmodelGeometrySha256Control": "f694829b0131173586a0ed2ae9462d810fe4a4f52bd2ca2046cf8693c6677e0c",
+          "viewmodelGeometrySha256Candidate": "f694829b0131173586a0ed2ae9462d810fe4a4f52bd2ca2046cf8693c6677e0c",
+          "playerWorldBodyGeometrySha256Control": "7702129f2a8d60b9062a0d8ea4ed4a357d81bee047b52b33383e53481280f290",
+          "playerWorldBodyGeometrySha256Candidate": "7702129f2a8d60b9062a0d8ea4ed4a357d81bee047b52b33383e53481280f290",
+          "instanceMasksEqual": true,
+          "primaryVisibilityEqual": true,
+          "honestlyPresentedBoth": true,
+          "exactPngMatch": false,
+          "controlPngSha256": "0afdc3e4685bf8f30da7ce4442fe7966675410349a064660713b759f4041bfdc",
+          "candidatePngSha256": "2c934efa4277c12e746ca4b8c5c1567e0d75c3a6f4e9700e127e350abcfd1f21"
+        },
+        {
+          "fixture": "standard",
+          "checkpoint": "mirror",
+          "zone": "finale",
+          "captureId": 9,
+          "cameraEqual": true,
+          "requestedCameraEqual": true,
+          "viewmodelGeometrySha256Control": "860817cfafbe84534249ceb01500a34cc0cce1fcae7857f08c2371e3e699b85c",
+          "viewmodelGeometrySha256Candidate": "860817cfafbe84534249ceb01500a34cc0cce1fcae7857f08c2371e3e699b85c",
+          "playerWorldBodyGeometrySha256Control": "a8af4d0eb78cb966636cfb84d7a5ac7dc80401a6f93b964a3b8a8f3f92dd25be",
+          "playerWorldBodyGeometrySha256Candidate": "a8af4d0eb78cb966636cfb84d7a5ac7dc80401a6f93b964a3b8a8f3f92dd25be",
+          "instanceMasksEqual": true,
+          "primaryVisibilityEqual": true,
+          "honestlyPresentedBoth": true,
+          "exactPngMatch": false,
+          "controlPngSha256": "efdc76cb16d3cc47e7b246e50277f64cc6762948475702c7e6f53ce4165f2dd3",
+          "candidatePngSha256": "988941d07fa8811209bdb0f317e264e53653fbed29b972ef462eccd50552017f"
+        },
+        {
+          "fixture": "standard",
+          "checkpoint": "lich",
+          "zone": "finale",
+          "captureId": 10,
+          "cameraEqual": true,
+          "requestedCameraEqual": true,
+          "viewmodelGeometrySha256Control": "54eddea2acd27c9f434242c8de18255b80cbfe28e16127fc0e7ee3e76ad0831f",
+          "viewmodelGeometrySha256Candidate": "54eddea2acd27c9f434242c8de18255b80cbfe28e16127fc0e7ee3e76ad0831f",
+          "playerWorldBodyGeometrySha256Control": "2818e324fb87e75a3e0c9b3a2cac94d9b1e053be50d8bb2e2de6ff3acf1e3af2",
+          "playerWorldBodyGeometrySha256Candidate": "2818e324fb87e75a3e0c9b3a2cac94d9b1e053be50d8bb2e2de6ff3acf1e3af2",
+          "instanceMasksEqual": true,
+          "primaryVisibilityEqual": true,
+          "honestlyPresentedBoth": true,
+          "exactPngMatch": false,
+          "controlPngSha256": "da71632b1315c80910b7974c1c98bf1dd29c134c95ab18d2e6979a50e4d8b4e9",
+          "candidatePngSha256": "f6ba25fb497d24a93956a31a1c06f0612b75efb2a8fba295f6367bab64123de6"
+        },
+        {
+          "fixture": "standard",
+          "checkpoint": "finale-roof",
+          "zone": "finale",
+          "captureId": 11,
+          "cameraEqual": true,
+          "requestedCameraEqual": true,
+          "viewmodelGeometrySha256Control": "82809fdf9263ea87c21ddcbcdd1b4396d0c6cb4bf242f6e453afa7ce22146884",
+          "viewmodelGeometrySha256Candidate": "82809fdf9263ea87c21ddcbcdd1b4396d0c6cb4bf242f6e453afa7ce22146884",
+          "playerWorldBodyGeometrySha256Control": "ea5e67f67d12dde6434d2722ac1e1b192f1ec624ccf65e92e166df52b684e976",
+          "playerWorldBodyGeometrySha256Candidate": "ea5e67f67d12dde6434d2722ac1e1b192f1ec624ccf65e92e166df52b684e976",
+          "instanceMasksEqual": true,
+          "primaryVisibilityEqual": true,
+          "honestlyPresentedBoth": true,
+          "exactPngMatch": true,
+          "controlPngSha256": "c2fbb089984bfdc543a964848ed851312414c7bb051625c45e18043d4c0cdf6d",
+          "candidatePngSha256": "c2fbb089984bfdc543a964848ed851312414c7bb051625c45e18043d4c0cdf6d"
+        },
+        {
+          "fixture": "standard",
+          "checkpoint": "two-enemy-combat",
+          "zone": "skeleton-room",
+          "captureId": 12,
+          "cameraEqual": true,
+          "requestedCameraEqual": true,
+          "viewmodelGeometrySha256Control": "5d656e6533315fb369fc8bbf559f48008da710305b2e83d04e1eb5f70f93bd33",
+          "viewmodelGeometrySha256Candidate": "5d656e6533315fb369fc8bbf559f48008da710305b2e83d04e1eb5f70f93bd33",
+          "playerWorldBodyGeometrySha256Control": "ab35082355f36738902ea6fcd4afb1c4325017fb28a1dec3d1dafb7044947f5f",
+          "playerWorldBodyGeometrySha256Candidate": "ab35082355f36738902ea6fcd4afb1c4325017fb28a1dec3d1dafb7044947f5f",
+          "instanceMasksEqual": true,
+          "primaryVisibilityEqual": true,
+          "honestlyPresentedBoth": true,
+          "exactPngMatch": false,
+          "controlPngSha256": "ebafbb20e7e046202a0205067eb3f6d9f75b1855ff7929f3d2d23c0a9f1d6686",
+          "candidatePngSha256": "2ade4197c77ff5472aea25c405b7d45fc9ed4d4b3ed81d8fd1693aac8d70e1e5"
+        }
+      ]
+    },
+    {
+      "fixture": "glass-edge-fresnel",
+      "captureCount": 1,
+      "controlManifest": {
+        "sha256": "badb05309ee920e7983121b9e75bde89dae49156a374f526124e861a14237c34",
+        "relativePath": "control/glass-edge-fresnel/capture-manifest.json"
+      },
+      "candidateManifest": {
+        "sha256": "2df876cc6cc20a05f3f1d8700708b07901bf75c947f1febc660474ebee796fbd",
+        "relativePath": "candidate/glass-edge-fresnel/capture-manifest.json"
+      },
+      "selectedControl": {
+        "opaqueFast": {
+          "key": "shipping_mobile_opaque_fast",
+          "sha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b"
+        },
+        "genericDielectric": {
+          "key": "shipping_mobile_generic_dielectric",
+          "sha256": "ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532"
+        }
+      },
+      "selectedCandidate": {
+        "opaqueFast": {
+          "key": "staged_primary_v1_shipping_mobile_opaque_fast",
+          "sha256": "8f9f8cd60b35d9dd91ffd487b492ef4f64a8028c444feef2f8b853fe026dd918"
+        },
+        "genericDielectric": {
+          "key": "staged_primary_v1_shipping_mobile_generic_dielectric",
+          "sha256": "07b56d6576d8537813eca70bd99dfdffc10c4fafb1f63fad7a080735d1e8f814"
+        }
+      },
+      "captureComparisons": [
+        {
+          "fixture": "glass-edge-fresnel",
+          "checkpoint": "glass-edge-fresnel",
+          "zone": "skylight-chamber",
+          "captureId": 113,
+          "cameraEqual": true,
+          "requestedCameraEqual": true,
+          "viewmodelGeometrySha256Control": "b617a42dec1f804f9a5d231f5e75707d4aa3a9f2a7bdb94ac2ae1c4b0207b54d",
+          "viewmodelGeometrySha256Candidate": "b617a42dec1f804f9a5d231f5e75707d4aa3a9f2a7bdb94ac2ae1c4b0207b54d",
+          "playerWorldBodyGeometrySha256Control": "d2761bde7793362f9a01eb010ec0d3a45a39f18642952b45c213dc64e7a93723",
+          "playerWorldBodyGeometrySha256Candidate": "d2761bde7793362f9a01eb010ec0d3a45a39f18642952b45c213dc64e7a93723",
+          "instanceMasksEqual": true,
+          "primaryVisibilityEqual": true,
+          "honestlyPresentedBoth": true,
+          "exactPngMatch": true,
+          "controlPngSha256": "0fa500a4f505e07636c9a8ebce9354f11c1cbd82eca01db7d1bd220b31f70436",
+          "candidatePngSha256": "0fa500a4f505e07636c9a8ebce9354f11c1cbd82eca01db7d1bd220b31f70436"
+        }
+      ]
+    },
+    {
+      "fixture": "glass-fire-transport",
+      "captureCount": 1,
+      "controlManifest": {
+        "sha256": "beba11023e58604f0466404ab1f94a4c6325a9bdafffacc33e397afc71ff7ff7",
+        "relativePath": "control/glass-fire-transport/capture-manifest.json"
+      },
+      "candidateManifest": {
+        "sha256": "8399da33e2f6f8db3af5ab122eaf59826f537ac35f07a09b8ff55f049a210b7d",
+        "relativePath": "candidate/glass-fire-transport/capture-manifest.json"
+      },
+      "selectedControl": {
+        "opaqueFast": {
+          "key": "shipping_mobile_opaque_fast",
+          "sha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b"
+        },
+        "genericDielectric": {
+          "key": "shipping_mobile_generic_dielectric",
+          "sha256": "ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532"
+        }
+      },
+      "selectedCandidate": {
+        "opaqueFast": {
+          "key": "staged_primary_v1_shipping_mobile_opaque_fast",
+          "sha256": "8f9f8cd60b35d9dd91ffd487b492ef4f64a8028c444feef2f8b853fe026dd918"
+        },
+        "genericDielectric": {
+          "key": "staged_primary_v1_shipping_mobile_generic_dielectric",
+          "sha256": "07b56d6576d8537813eca70bd99dfdffc10c4fafb1f63fad7a080735d1e8f814"
+        }
+      },
+      "captureComparisons": [
+        {
+          "fixture": "glass-fire-transport",
+          "checkpoint": "glass-fire-transport",
+          "zone": "opening",
+          "captureId": 110,
+          "cameraEqual": true,
+          "requestedCameraEqual": true,
+          "viewmodelGeometrySha256Control": "dd3a8acd3e79b6b291588b0b2729013a5158ea16bef13fdafb4bf142edafd7a6",
+          "viewmodelGeometrySha256Candidate": "dd3a8acd3e79b6b291588b0b2729013a5158ea16bef13fdafb4bf142edafd7a6",
+          "playerWorldBodyGeometrySha256Control": "4bc4f14d85f44a19e52c9f99bd59b2719ae67bb02210c30b7420c85eabbbafcb",
+          "playerWorldBodyGeometrySha256Candidate": "4bc4f14d85f44a19e52c9f99bd59b2719ae67bb02210c30b7420c85eabbbafcb",
+          "instanceMasksEqual": true,
+          "primaryVisibilityEqual": true,
+          "honestlyPresentedBoth": true,
+          "exactPngMatch": true,
+          "controlPngSha256": "86c9aa58eb7ca96e5a2360b4f3f2bf26b8867250e3abbb5161de9280c45420bc",
+          "candidatePngSha256": "86c9aa58eb7ca96e5a2360b4f3f2bf26b8867250e3abbb5161de9280c45420bc"
+        }
+      ]
+    },
+    {
+      "fixture": "glass-millimetre-closed",
+      "captureCount": 1,
+      "controlManifest": {
+        "sha256": "12344df5582305bee80ee4d315c7cb9e61f809fe9b1f0b546004e625d6e61132",
+        "relativePath": "control/glass-millimetre-closed/capture-manifest.json"
+      },
+      "candidateManifest": {
+        "sha256": "4fb8dbdbd96b1c08019915d50ef0796a676f2cf4b18010baa10aaf3df0b3c105",
+        "relativePath": "candidate/glass-millimetre-closed/capture-manifest.json"
+      },
+      "selectedControl": {
+        "opaqueFast": {
+          "key": "shipping_mobile_opaque_fast",
+          "sha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b"
+        },
+        "genericDielectric": {
+          "key": "shipping_mobile_generic_dielectric",
+          "sha256": "ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532"
+        }
+      },
+      "selectedCandidate": {
+        "opaqueFast": {
+          "key": "staged_primary_v1_shipping_mobile_opaque_fast",
+          "sha256": "8f9f8cd60b35d9dd91ffd487b492ef4f64a8028c444feef2f8b853fe026dd918"
+        },
+        "genericDielectric": {
+          "key": "staged_primary_v1_shipping_mobile_generic_dielectric",
+          "sha256": "07b56d6576d8537813eca70bd99dfdffc10c4fafb1f63fad7a080735d1e8f814"
+        }
+      },
+      "captureComparisons": [
+        {
+          "fixture": "glass-millimetre-closed",
+          "checkpoint": "glass-millimetre-closed",
+          "zone": "skylight-chamber",
+          "captureId": 112,
+          "cameraEqual": true,
+          "requestedCameraEqual": true,
+          "viewmodelGeometrySha256Control": "b0891b7591e16bf11d332716656420407dfd3479eabdfc625093ad61d3f156d8",
+          "viewmodelGeometrySha256Candidate": "b0891b7591e16bf11d332716656420407dfd3479eabdfc625093ad61d3f156d8",
+          "playerWorldBodyGeometrySha256Control": "27a4680a21c30d2895ccded628c1984a5f2d5a37e6c1a96eb26cd6d8420137c0",
+          "playerWorldBodyGeometrySha256Candidate": "27a4680a21c30d2895ccded628c1984a5f2d5a37e6c1a96eb26cd6d8420137c0",
+          "instanceMasksEqual": true,
+          "primaryVisibilityEqual": true,
+          "honestlyPresentedBoth": true,
+          "exactPngMatch": true,
+          "controlPngSha256": "ef770833f998849e0a945330c263aa8000aa11625224915e39ca78ebb54246b5",
+          "candidatePngSha256": "ef770833f998849e0a945330c263aa8000aa11625224915e39ca78ebb54246b5"
+        }
+      ]
+    },
+    {
+      "fixture": "glass-tinted-transport",
+      "captureCount": 1,
+      "controlManifest": {
+        "sha256": "4e33e9690b63f4b857c1196a71178acfc514c1b6d20d08476fe87698d3546e25",
+        "relativePath": "control/glass-tinted-transport/capture-manifest.json"
+      },
+      "candidateManifest": {
+        "sha256": "64add755bb268a7443fb1593437402539c8b691a4db41cd170d25161ae7d8658",
+        "relativePath": "candidate/glass-tinted-transport/capture-manifest.json"
+      },
+      "selectedControl": {
+        "opaqueFast": {
+          "key": "shipping_mobile_opaque_fast",
+          "sha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b"
+        },
+        "genericDielectric": {
+          "key": "shipping_mobile_generic_dielectric",
+          "sha256": "ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532"
+        }
+      },
+      "selectedCandidate": {
+        "opaqueFast": {
+          "key": "staged_primary_v1_shipping_mobile_opaque_fast",
+          "sha256": "8f9f8cd60b35d9dd91ffd487b492ef4f64a8028c444feef2f8b853fe026dd918"
+        },
+        "genericDielectric": {
+          "key": "staged_primary_v1_shipping_mobile_generic_dielectric",
+          "sha256": "07b56d6576d8537813eca70bd99dfdffc10c4fafb1f63fad7a080735d1e8f814"
+        }
+      },
+      "captureComparisons": [
+        {
+          "fixture": "glass-tinted-transport",
+          "checkpoint": "glass-tinted-transport",
+          "zone": "opening",
+          "captureId": 111,
+          "cameraEqual": true,
+          "requestedCameraEqual": true,
+          "viewmodelGeometrySha256Control": "dd3a8acd3e79b6b291588b0b2729013a5158ea16bef13fdafb4bf142edafd7a6",
+          "viewmodelGeometrySha256Candidate": "dd3a8acd3e79b6b291588b0b2729013a5158ea16bef13fdafb4bf142edafd7a6",
+          "playerWorldBodyGeometrySha256Control": "4bc4f14d85f44a19e52c9f99bd59b2719ae67bb02210c30b7420c85eabbbafcb",
+          "playerWorldBodyGeometrySha256Candidate": "4bc4f14d85f44a19e52c9f99bd59b2719ae67bb02210c30b7420c85eabbbafcb",
+          "instanceMasksEqual": true,
+          "primaryVisibilityEqual": true,
+          "honestlyPresentedBoth": true,
+          "exactPngMatch": true,
+          "controlPngSha256": "49c1128538ed9f8d3521aabbe1ba75a9775e2f6141af17bbefc68a0cafdd27a7",
+          "candidatePngSha256": "49c1128538ed9f8d3521aabbe1ba75a9775e2f6141af17bbefc68a0cafdd27a7"
+        }
+      ]
+    },
+    {
+      "fixture": "lantern-glass-production",
+      "captureCount": 1,
+      "controlManifest": {
+        "sha256": "caf2cf7ceb9d156ae8ae6b6f6f1acc2de91b69d8232d5f64d722b10db5b145df",
+        "relativePath": "control/lantern-glass-production/capture-manifest.json"
+      },
+      "candidateManifest": {
+        "sha256": "1869758f0df89460231362e47a3506141635651c804029f5f261a0a27eb6c319",
+        "relativePath": "candidate/lantern-glass-production/capture-manifest.json"
+      },
+      "selectedControl": {
+        "opaqueFast": {
+          "key": "shipping_mobile_opaque_fast",
+          "sha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b"
+        },
+        "genericDielectric": {
+          "key": "shipping_mobile_generic_dielectric",
+          "sha256": "ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532"
+        }
+      },
+      "selectedCandidate": {
+        "opaqueFast": {
+          "key": "staged_primary_v1_shipping_mobile_opaque_fast",
+          "sha256": "8f9f8cd60b35d9dd91ffd487b492ef4f64a8028c444feef2f8b853fe026dd918"
+        },
+        "genericDielectric": {
+          "key": "staged_primary_v1_shipping_mobile_generic_dielectric",
+          "sha256": "07b56d6576d8537813eca70bd99dfdffc10c4fafb1f63fad7a080735d1e8f814"
+        }
+      },
+      "captureComparisons": [
+        {
+          "fixture": "lantern-glass-production",
+          "checkpoint": "lantern-glass-production",
+          "zone": "yellow-torch-bay",
+          "captureId": 115,
+          "cameraEqual": true,
+          "requestedCameraEqual": true,
+          "viewmodelGeometrySha256Control": "dfdb4b90b7d1776cfc47589613b44a98e257788f50c22d219e04037944987ae4",
+          "viewmodelGeometrySha256Candidate": "dfdb4b90b7d1776cfc47589613b44a98e257788f50c22d219e04037944987ae4",
+          "playerWorldBodyGeometrySha256Control": "b95270e6b533d2b4ffefc71cbadec4d8b63af4d9d4877ab650a628e901efe2e3",
+          "playerWorldBodyGeometrySha256Candidate": "b95270e6b533d2b4ffefc71cbadec4d8b63af4d9d4877ab650a628e901efe2e3",
+          "instanceMasksEqual": true,
+          "primaryVisibilityEqual": true,
+          "honestlyPresentedBoth": true,
+          "exactPngMatch": true,
+          "controlPngSha256": "c714c6eb4c72fb488a35d24dd8e712e9a0617a39cf9be0dd6d92bf5eb2e10bc6",
+          "candidatePngSha256": "c714c6eb4c72fb488a35d24dd8e712e9a0617a39cf9be0dd6d92bf5eb2e10bc6"
+        }
+      ]
+    },
+    {
+      "fixture": "player-viewmodel-lantern-high-look-up",
+      "captureCount": 1,
+      "controlManifest": {
+        "sha256": "b4df3171608b84c3097b11c09d78aee7fd739ace4495d6bdfa792cc929ae7d11",
+        "relativePath": "control/player-viewmodel-lantern-high-look-up/capture-manifest.json"
+      },
+      "candidateManifest": {
+        "sha256": "c77b2747805a8a714c2aa6d67738e39a86cfefe0f17e6c4758860cc78c70b83b",
+        "relativePath": "candidate/player-viewmodel-lantern-high-look-up/capture-manifest.json"
+      },
+      "selectedControl": {
+        "opaqueFast": {
+          "key": "shipping_mobile_opaque_fast",
+          "sha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b"
+        },
+        "genericDielectric": {
+          "key": "shipping_mobile_generic_dielectric",
+          "sha256": "ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532"
+        }
+      },
+      "selectedCandidate": {
+        "opaqueFast": {
+          "key": "staged_primary_v1_shipping_mobile_opaque_fast",
+          "sha256": "8f9f8cd60b35d9dd91ffd487b492ef4f64a8028c444feef2f8b853fe026dd918"
+        },
+        "genericDielectric": {
+          "key": "staged_primary_v1_shipping_mobile_generic_dielectric",
+          "sha256": "07b56d6576d8537813eca70bd99dfdffc10c4fafb1f63fad7a080735d1e8f814"
+        }
+      },
+      "captureComparisons": [
+        {
+          "fixture": "player-viewmodel-lantern-high-look-up",
+          "checkpoint": "player-viewmodel-lantern-high-look-up",
+          "zone": "yellow-torch-bay",
+          "captureId": 146,
+          "cameraEqual": true,
+          "requestedCameraEqual": true,
+          "viewmodelGeometrySha256Control": "01879034f533eb6e0e9f5dcd7c6895b4826b74f4c7ab256f4f7fa5f0926ffa7e",
+          "viewmodelGeometrySha256Candidate": "01879034f533eb6e0e9f5dcd7c6895b4826b74f4c7ab256f4f7fa5f0926ffa7e",
+          "playerWorldBodyGeometrySha256Control": "2a62823a4351312cf55f28272a8b9ce2f1905f0831c14f5db2bb4d3fe95aea63",
+          "playerWorldBodyGeometrySha256Candidate": "2a62823a4351312cf55f28272a8b9ce2f1905f0831c14f5db2bb4d3fe95aea63",
+          "instanceMasksEqual": true,
+          "primaryVisibilityEqual": true,
+          "honestlyPresentedBoth": true,
+          "exactPngMatch": true,
+          "controlPngSha256": "e999af486122a96f1fa4760eb73b311a9d2a3fca075962e882b65cbee340eae5",
+          "candidatePngSha256": "e999af486122a96f1fa4760eb73b311a9d2a3fca075962e882b65cbee340eae5"
+        }
+      ]
+    },
+    {
+      "fixture": "player-viewmodel-lantern-low-parry",
+      "captureCount": 1,
+      "controlManifest": {
+        "sha256": "0492bc22ca3d8e149b76ae84a02a66715bf796e128f462f237e31259f77fc7d4",
+        "relativePath": "control/player-viewmodel-lantern-low-parry/capture-manifest.json"
+      },
+      "candidateManifest": {
+        "sha256": "7e55e017b7c0867f017f281d2f8644886f18b0e17f8468b6a32dc367d7403f7b",
+        "relativePath": "candidate/player-viewmodel-lantern-low-parry/capture-manifest.json"
+      },
+      "selectedControl": {
+        "opaqueFast": {
+          "key": "shipping_mobile_opaque_fast",
+          "sha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b"
+        },
+        "genericDielectric": {
+          "key": "shipping_mobile_generic_dielectric",
+          "sha256": "ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532"
+        }
+      },
+      "selectedCandidate": {
+        "opaqueFast": {
+          "key": "staged_primary_v1_shipping_mobile_opaque_fast",
+          "sha256": "8f9f8cd60b35d9dd91ffd487b492ef4f64a8028c444feef2f8b853fe026dd918"
+        },
+        "genericDielectric": {
+          "key": "staged_primary_v1_shipping_mobile_generic_dielectric",
+          "sha256": "07b56d6576d8537813eca70bd99dfdffc10c4fafb1f63fad7a080735d1e8f814"
+        }
+      },
+      "captureComparisons": [
+        {
+          "fixture": "player-viewmodel-lantern-low-parry",
+          "checkpoint": "player-viewmodel-lantern-low-parry",
+          "zone": "yellow-torch-bay",
+          "captureId": 144,
+          "cameraEqual": true,
+          "requestedCameraEqual": true,
+          "viewmodelGeometrySha256Control": "bf2682f34192bf46b9756ed90ea122a6cf225f23f0aadbb608d6b01855579596",
+          "viewmodelGeometrySha256Candidate": "bf2682f34192bf46b9756ed90ea122a6cf225f23f0aadbb608d6b01855579596",
+          "playerWorldBodyGeometrySha256Control": "e25329b84914c5ccaf61aa72beac29edc34db1842fe395736eb4041d2a3f4e89",
+          "playerWorldBodyGeometrySha256Candidate": "e25329b84914c5ccaf61aa72beac29edc34db1842fe395736eb4041d2a3f4e89",
+          "instanceMasksEqual": true,
+          "primaryVisibilityEqual": true,
+          "honestlyPresentedBoth": true,
+          "exactPngMatch": true,
+          "controlPngSha256": "25beb6eae967b5a8e434dab161a82906e08b11998e1a94aeecb1a66c65d5d80e",
+          "candidatePngSha256": "25beb6eae967b5a8e434dab161a82906e08b11998e1a94aeecb1a66c65d5d80e"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "The captures identify an NVIDIA GeForce RTX 5050 Laptop GPU and are desktop Debug-shell evidence, not physical-phone or Release performance evidence.",
+    "Pixel tolerance and exact PNG hashes establish only the recorded capture comparisons; they do not establish visual acceptability or gameplay quality.",
+    "The staged-primary allocation figures are reported logical/padded/allocation metadata. DRAM traffic was explicitly not measured.",
+    "Timing comparisons failed the retained 2% threshold. Their capture-median basis is not a sustained-performance claim."
+  ]
+}

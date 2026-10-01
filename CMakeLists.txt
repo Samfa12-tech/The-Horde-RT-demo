@@ -7,6 +7,7 @@ endif()
 include(cmake/HordeRtVersion.cmake)
 include(cmake/HordeRtRaygenArtifacts.cmake)
 include(cmake/HordeRtRaygenPolicy.cmake)
+include(cmake/HordeRtStagedPrimary.cmake)
 horde_rt_validate_raygen_policy()
 
 project(HordeLanternRT
@@ -103,6 +104,7 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS)
     target_link_libraries(horde_rt_probe_core PUBLIC Vulkan::Vulkan horde_gameplay_simulation)
     horde_rt_attach_raygen_artifacts(horde_rt_probe_core)
     horde_rt_apply_raygen_policy(horde_rt_probe_core Windows)
+    horde_rt_attach_staged_primary(horde_rt_probe_core "${CMAKE_CURRENT_SOURCE_DIR}")
 endif()
 
 if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_CAPABILITY_PROBE_EXECUTABLE)
@@ -184,6 +186,9 @@ endif()
 
 if(BUILD_TESTING)
     find_package(Threads REQUIRED)
+    add_executable(horde_rt_staged_primary_contract_tests tests/StagedPrimaryContractTests.cpp)
+    target_include_directories(horde_rt_staged_primary_contract_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_staged_primary_contract_tests COMMAND horde_rt_staged_primary_contract_tests)
     add_executable(horde_rt_lantern_benchmark_tests
         tests/LanternBenchmarkTests.cpp
         src/gameplay/ShowcaseBenchmark.cpp
@@ -686,6 +691,22 @@ if(BUILD_TESTING)
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 
     if(HORDE_RT_BUILD_VULKAN_TARGETS)
+        # CPU-only fault injection for the explicitly experimental staged owner.
+        # Its tiny shader header fixture encodes Shipping/Mobile policy only;
+        # this test does not validate SPIR-V or claim Vulkan/image behavior.
+        add_executable(horde_rt_staged_primary_resource_tests
+            tests/StagedPrimaryResourceTests.cpp
+            src/vulkan/raytracing/experimental/StagedPrimaryPass.cpp)
+        target_include_directories(horde_rt_staged_primary_resource_tests PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/src
+            ${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/staged-primary
+            ${Vulkan_INCLUDE_DIRS})
+        target_compile_definitions(horde_rt_staged_primary_resource_tests PRIVATE
+            HORDE_RT_SELECTED_INSTRUMENTATION=0
+            HORDE_RT_SELECTED_DIELECTRIC_QUALITY=0)
+        add_test(NAME horde_rt_staged_primary_resource_tests
+            COMMAND horde_rt_staged_primary_resource_tests)
+
         add_executable(horde_rt_gpu_frame_timer_collection_tests
             tests/GpuFrameTimerCollectionTests.cpp
             src/vulkan/GpuFrameTimer.cpp)

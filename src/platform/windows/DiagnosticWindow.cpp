@@ -4305,6 +4305,9 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
              << "\", \"sha256\": \""
              << JsonEscape(std::string(context.rtScene.SelectedGenericDielectricSha256()))
              << "\"}},\n"
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+             << "  \"executionOrganisation\": " << context.rtScene.ExecutionOrganisationJson() << ",\n"
+#endif
              << "  \"device\": {\n"
              << "    \"gpuName\": \"" << JsonEscape(capabilities.identity.gpuName) << "\",\n"
              << "    \"vendorId\": " << capabilities.identity.vendorId << ",\n"
