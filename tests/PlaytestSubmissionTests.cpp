@@ -73,6 +73,45 @@ int main(const int argc, char** argv)
         std::cout << BuildPlaytestSubmissionRequest(prepared, "mock-verification-only") << '\n';
         return prepared.IsReady() ? 0 : 1;
     }
+    PlaytestScreenshotPixels pixels;
+    const std::vector<std::uint8_t> warm{127u,63u,31u,255u};
+    Check(ResizePlaytestScreenshotRgba(1u,1u,warm,pixels) && pixels.rgba == warm &&
+        pixels.width == 1u && pixels.height == 1u, "capture RGB order and small pixels preserved");
+    Check(!ResizePlaytestScreenshotRgba(0u,1u,warm,pixels) && pixels.rgba.empty(), "invalid capture clears owned pixels");
+    Check(!ResizePlaytestScreenshotRgba(1u,2u,warm,pixels), "capture exact byte length enforced");
+    Check(!ResizePlaytestScreenshotRgba(0xffffffffu,0xffffffffu,warm,pixels), "source pixel cap before multiplication/allocation");
+    std::vector<std::uint8_t> portrait(1080u * 2235u * 4u,77u);
+    Check(ResizePlaytestScreenshotRgba(1080u,2235u,portrait,pixels) &&
+        pixels.width == 371u && pixels.height == 768u &&
+        pixels.rgba == std::vector<std::uint8_t>(371u * 768u * 4u,77u), "bounded proportional portrait and interpolation");
+    std::vector<std::uint8_t> landscape(1920u * 1080u * 4u,123u);
+    Check(ResizePlaytestScreenshotRgba(1920u,1080u,landscape,pixels) &&
+        pixels.width == 768u && pixels.height == 432u && pixels.rgba.front() == 123u,
+        "landscape both edge bounds preserved");
+    std::vector<std::uint8_t> square(721u * 721u * 4u,31u);
+    Check(ResizePlaytestScreenshotRgba(721u,721u,square,pixels) &&
+        pixels.width == 432u && pixels.height == 432u, "square short edge independently bounded");
+    std::vector<std::uint8_t> gradient(864u * 864u * 4u);
+    for (std::uint32_t y = 0u; y < 864u; ++y)
+        for (std::uint32_t x = 0u; x < 864u; ++x)
+        {
+            const auto at = (static_cast<std::size_t>(y) * 864u + x) * 4u;
+            gradient[at] = static_cast<std::uint8_t>(x);
+            gradient[at + 1u] = static_cast<std::uint8_t>(y);
+            gradient[at + 2u] = 31u; gradient[at + 3u] = 255u;
+        }
+    Check(ResizePlaytestScreenshotRgba(864u,864u,gradient,pixels) &&
+        pixels.width == 432u && pixels.height == 432u, "gradient both axes downsampled");
+    bool gradientCorrect = pixels.rgba.size() == 432u * 432u * 4u;
+    for (std::uint32_t y = 0u; gradientCorrect && y < 432u; ++y)
+        for (std::uint32_t x = 0u; x < 432u; ++x)
+        {
+            const auto at = (static_cast<std::size_t>(y) * 432u + x) * 4u;
+            gradientCorrect = gradientCorrect && pixels.rgba[at] == static_cast<std::uint8_t>(2u * x + 1u) &&
+                pixels.rgba[at + 1u] == static_cast<std::uint8_t>(2u * y + 1u) &&
+                pixels.rgba[at + 2u] == 31u && pixels.rgba[at + 3u] == 255u;
+        }
+    Check(gradientCorrect, "fixed-point bilinear pixel-centre RGB and rounding golden values");
     auto input = Input();
     input.consentToSubmit = false;
     auto prepared = PreparePlaytestSubmission(input, true, {png,1u,1u});
@@ -108,8 +147,8 @@ int main(const int argc, char** argv)
         const auto wrongSize = Png(size,1u);
         Check(!ValidatePlaytestScreenshot({wrongSize,size,1u}), "zero/overlong image dimensions rejected");
     }
-    const auto square = Png(721u,721u);
-    Check(!ValidatePlaytestScreenshot({square,721u,721u}), "short-edge cap enforced independently");
+    const auto squarePng = Png(721u,721u);
+    Check(!ValidatePlaytestScreenshot({squarePng,721u,721u}), "short-edge cap enforced independently");
     auto tooLarge = png; tooLarge.resize(kPlaytestScreenshotMaxBytes + 1u);
     Check(!ValidatePlaytestScreenshot({tooLarge,1u,1u}), "encoded byte cap enforced before parsing");
     for (std::size_t size = 0u; size < png.size(); ++size)

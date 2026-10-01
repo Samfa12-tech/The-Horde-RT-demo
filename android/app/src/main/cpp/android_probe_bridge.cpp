@@ -30,6 +30,7 @@
 
 #include "ui/DiagnosticOverlay.h"
 #include "reporting/PlaytestReport.h"
+#include "reporting/PlaytestSubmission.h"
 #include "gameplay/CorridorCollision.h"
 #include "gameplay/DevelopmentCheckpoints.h"
 #include "gameplay/DevelopmentCheckpointSimulation.h"
@@ -230,6 +231,20 @@ std::mutex gReportMutex;
 std::string gLatestTextReport;
 std::string gLatestJsonReport;
 horde::reporting::OwnedPlaytestReportContext gLatestPlaytestContext;
+// One consented foreground capture; only the render owner accesses rtScene.
+// JNI transfers owned pixels/context, never a live renderer pointer. Cancellation
+// invalidates the generation; it cannot undo a GPU readback already started.
+struct PlaytestCaptureRequest
+{
+    std::uint64_t token = 0u;
+    enum class State { Empty, Pending, Ready, Transferred, Failed } state = State::Empty;
+    horde::reporting::PlaytestScreenshotPixels pixels;
+    horde::reporting::OwnedPlaytestReportContext context;
+    std::string capturedAtUtc;
+    std::uint32_t width = 0u, height = 0u;
+};
+PlaytestCaptureRequest gPlaytestCapture;
+std::uint64_t gPlaytestCaptureNextToken = 0u; // guarded by gReportMutex
 std::string gLatestDeveloperOverlayText;
 std::string gLatestBenchmarkReport;
 std::string gLatestBenchmarkProgress;
@@ -665,6 +680,17 @@ bool WriteTextFile(const std::string& path, const std::string& data)
     return stream.good();
 }
 
+horde::reporting::OwnedPlaytestReportContext PlaytestContextOnRenderOwner(const SwapchainContext& context)
+{
+    return {"Horde Lantern RT", HORDE_RT_PACKAGE_VERSION,
+        HORDE_RT_BUILD_ID, "Android", "", context.capabilities.identity.gpuName,
+        horde::vulkan::ToString(context.capabilities.rtScene.executionBackend),
+        horde::vulkan::raytracing::RtPipelineVariantProvider::Compiled(context.executionBackend)
+            .request().quality == horde::vulkan::raytracing::DielectricQuality::Mobile ? "Mobile" : "High",
+        context.renderScale, context.capabilities.performance.internalRenderWidth,
+        context.capabilities.performance.internalRenderHeight, context.capabilities.rtScene.presented};
+}
+
 void PublishRuntimeReports(const SwapchainContext& context,
     const horde::telemetry::RtLifecyclePublishedState* finalPublication = nullptr)
 {
@@ -681,14 +707,7 @@ void PublishRuntimeReports(const SwapchainContext& context,
         gLatestJsonReport = json;
         // Publish the narrow allowlist from this render-thread-owned snapshot;
         // report preparation never reads the live scene or private diagnostic JSON.
-        gLatestPlaytestContext = {"Horde Lantern RT", HORDE_RT_PACKAGE_VERSION,
-            HORDE_RT_BUILD_ID, "Android", "", context.capabilities.identity.gpuName,
-            horde::vulkan::ToString(context.capabilities.rtScene.executionBackend),
-            horde::vulkan::raytracing::RtPipelineVariantProvider::Compiled(context.executionBackend)
-                .request().quality == horde::vulkan::raytracing::DielectricQuality::Mobile ? "Mobile" : "High",
-            context.renderScale, context.capabilities.performance.internalRenderWidth,
-            context.capabilities.performance.internalRenderHeight,
-            context.capabilities.rtScene.presented};
+        gLatestPlaytestContext = PlaytestContextOnRenderOwner(context);
     }
     WriteTextFile(context.reportDirectory + '/' + kTextReportFilename, text);
     WriteTextFile(context.reportDirectory + '/' + kJsonReportFilename, json);
@@ -728,6 +747,50 @@ std::string UtcTimestamp()
     char text[32]{};
     std::strftime(text, sizeof(text), "%Y-%m-%dT%H:%M:%SZ", &utc);
     return text;
+}
+
+void CaptureConsentedPlaytestFrameOnRenderOwner(SwapchainContext& context,
+    const bool framePresented, const bool framePaused)
+{
+    std::uint64_t token = 0u;
+    {
+        std::lock_guard<std::mutex> lock(gReportMutex);
+        if (gPlaytestCapture.state != PlaytestCaptureRequest::State::Pending) return;
+        token = gPlaytestCapture.token;
+    }
+    // This exact frame must have reached presentation; a recorded/ready target
+    // alone is not RT presentation evidence. Do not capture at all when unpaused.
+    bool pauseAcknowledged = false;
+    {
+        std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+        pauseAcknowledged = gLifecycleMeasurementPaused && gInputPublisherState.paused &&
+            gLifecyclePauseAcknowledgedGeneration >= gLifecyclePauseGeneration;
+    }
+    if (!framePresented || !context.capabilities.rtScene.presented ||
+        !framePaused || !pauseAcknowledged) return;
+    const auto extent = context.rtScene.DispatchExtent();
+    const auto sourcePixels = static_cast<std::uint64_t>(extent.width) * extent.height;
+    horde::vulkan::raytracing::PresentableTinyRtScene::StorageImageCapture raw;
+    horde::reporting::PlaytestScreenshotPixels pixels;
+    std::string diagnostic; // Never added to the public report/logged with user content.
+    bool success = false;
+    try
+    {
+        success = sourcePixels != 0u && sourcePixels <= horde::reporting::kPlaytestScreenshotMaxSourcePixels &&
+            context.rtScene.CaptureStorageImage(raw, diagnostic) &&
+            horde::reporting::ResizePlaytestScreenshotRgba(raw.width, raw.height, raw.rgba, pixels);
+    }
+    catch (...) { success = false; }
+    const auto ownedContext = PlaytestContextOnRenderOwner(context);
+    const auto capturedAtUtc = UtcTimestamp();
+    std::lock_guard<std::mutex> lock(gReportMutex);
+    if (gPlaytestCapture.token != token || gPlaytestCapture.state != PlaytestCaptureRequest::State::Pending) return;
+    if (!success) { gPlaytestCapture.state = PlaytestCaptureRequest::State::Failed; return; }
+    gPlaytestCapture.width = pixels.width; gPlaytestCapture.height = pixels.height;
+    gPlaytestCapture.pixels = std::move(pixels);
+    gPlaytestCapture.context = ownedContext;
+    gPlaytestCapture.capturedAtUtc = capturedAtUtc;
+    gPlaytestCapture.state = PlaytestCaptureRequest::State::Ready;
 }
 
 horde::gameplay::ShowcaseBenchmarkMetadata BuildBenchmarkMetadata(const SwapchainContext& context)
@@ -3327,6 +3390,7 @@ void SwapchainRenderLoop()
             PublishRuntimeReports(gSwapchainContext);
             __android_log_print(ANDROID_LOG_INFO, kTag, "RT frame reached Android swapchain presentation.");
         }
+        CaptureConsentedPlaytestFrameOnRenderOwner(gSwapchainContext, rtFramePresented, measurementPaused);
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS)
         if (!gSwapchainContext.inAppBenchmark.IsRunning() &&
             frameStart - lastDeveloperOverlayPublish >= std::chrono::milliseconds(250))
@@ -3338,6 +3402,16 @@ void SwapchainRenderLoop()
     }
 
     gSwapchainRunning.store(false, std::memory_order_release);
+
+    {
+        std::lock_guard<std::mutex> lock(gReportMutex);
+        if (gPlaytestCapture.state != PlaytestCaptureRequest::State::Empty)
+        {
+            gPlaytestCapture.pixels = {};
+            gPlaytestCapture.context = {};
+            gPlaytestCapture.state = PlaytestCaptureRequest::State::Failed;
+        }
+    }
 
     SwapchainContext cleanup = std::move(gSwapchainContext);
     gSwapchainContext = {};
@@ -3587,10 +3661,10 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getJsonReport(JNIEnv* env, jclass)
     return env->NewStringUTF(reportJson.c_str());
 }
 
-extern "C" JNIEXPORT jbyteArray JNICALL
-Java_com_samfa12_hordelanternrt_ProbeBridge_preparePlaytestReport(JNIEnv* env, jclass,
+static jbyteArray PrepareAndroidPlaytestReport(JNIEnv* env,
     jstring reportId, jstring capturedAtUtc, jint category, jint impact, jstring note,
-    jboolean exportConsent, jboolean includeBasicContext, jstring rawModel)
+    jboolean exportConsent, jboolean includeBasicContext, jstring rawModel,
+    const bool submission, const bool includeScreenshot, const jlong captureToken, jbyteArray screenshotPng)
 {
     using namespace horde::reporting;
     const auto reply = [env](const PlaytestReportStatus status, const std::string_view text) {
@@ -3628,9 +3702,33 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_preparePlaytestReport(JNIEnv* env, j
             if (status != PlaytestReportStatus::Ready) return reply(status, PlaytestReportStatusName(status));
         }
         OwnedPlaytestReportContext context;
+        std::uint32_t screenshotWidth = 0u, screenshotHeight = 0u;
+        std::vector<std::uint8_t> png;
+        if (includeScreenshot)
+        {
+            if (!submission || !screenshotPng || captureToken <= 0)
+                return reply(PlaytestReportStatus::InvalidPreparedReport, "The game screenshot is unavailable. Nothing was submitted.");
+            const auto pngLength = env->GetArrayLength(screenshotPng);
+            if (pngLength <= 0 || static_cast<std::size_t>(pngLength) > kPlaytestScreenshotMaxBytes)
+                return reply(PlaytestReportStatus::InvalidPreparedReport, "The screenshot exceeds the attachment limit. Nothing was submitted.");
+            {
+                std::lock_guard<std::mutex> lock(gReportMutex);
+                if (gPlaytestCapture.token != static_cast<std::uint64_t>(captureToken) ||
+                    gPlaytestCapture.state != PlaytestCaptureRequest::State::Transferred)
+                    return reply(PlaytestReportStatus::InvalidPreparedReport, "The game capture was cancelled or expired. Nothing was submitted.");
+                context = gPlaytestCapture.context;
+                utc = gPlaytestCapture.capturedAtUtc;
+                screenshotWidth = gPlaytestCapture.width; screenshotHeight = gPlaytestCapture.height;
+            }
+            png.resize(static_cast<std::size_t>(pngLength));
+            env->GetByteArrayRegion(screenshotPng, 0, pngLength, reinterpret_cast<jbyte*>(png.data()));
+            if (env->ExceptionCheck()) return nullptr;
+        }
+        else if (screenshotPng || captureToken != 0)
+            return reply(PlaytestReportStatus::ConsentRequired, "Screenshot consent is required before capture.");
         if (includeBasicContext == JNI_TRUE)
         {
-            {
+            if (!includeScreenshot) {
                 std::lock_guard<std::mutex> lock(gReportMutex);
                 context = gLatestPlaytestContext;
             }
@@ -3642,9 +3740,24 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_preparePlaytestReport(JNIEnv* env, j
                     "Renderer context is unavailable. Uncheck basic context to export your note alone.");
             }
         }
-        const auto prepared = PreparePlaytestReport({id, utc,
+        const PlaytestReportInput input{id, utc,
             static_cast<PlaytestReportCategory>(category), static_cast<PlaytestReportImpact>(impact),
-            text, true, includeBasicContext == JNI_TRUE, context.View()});
+            text, true, includeBasicContext == JNI_TRUE, context.View()};
+        if (submission)
+        {
+            const auto prepared = PreparePlaytestSubmission(input, includeScreenshot,
+                {png, screenshotWidth, screenshotHeight});
+            if (!prepared.IsReady())
+                return reply(prepared.reportStatus != PlaytestReportStatus::Ready ? prepared.reportStatus :
+                    PlaytestReportStatus::InvalidPreparedReport, "Report or screenshot validation failed. Nothing was submitted.");
+            if (includeScreenshot)
+            {
+                std::lock_guard<std::mutex> lock(gReportMutex);
+                if (gPlaytestCapture.token == static_cast<std::uint64_t>(captureToken)) gPlaytestCapture = {};
+            }
+            return reply(PlaytestReportStatus::Ready, prepared.json);
+        }
+        const auto prepared = PreparePlaytestReport(input);
         return reply(prepared.status, prepared.IsReady() ? std::string_view(prepared.json)
             : PlaytestReportStatusName(prepared.status));
     }
@@ -3652,6 +3765,78 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_preparePlaytestReport(JNIEnv* env, j
     {
         return nullptr; // No exception or allocation retry escapes the JNI boundary.
     }
+}
+
+extern "C" JNIEXPORT jbyteArray JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_preparePlaytestReport(JNIEnv* env, jclass,
+    jstring reportId, jstring capturedAtUtc, jint category, jint impact, jstring note,
+    jboolean exportConsent, jboolean includeBasicContext, jstring rawModel)
+{
+    return PrepareAndroidPlaytestReport(env, reportId, capturedAtUtc, category, impact, note,
+        exportConsent, includeBasicContext, rawModel, false, false, 0, nullptr);
+}
+
+extern "C" JNIEXPORT jbyteArray JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_preparePlaytestSubmission(JNIEnv* env, jclass,
+    jstring reportId, jstring capturedAtUtc, jint category, jint impact, jstring note,
+    jboolean submissionConsent, jboolean includeBasicContext, jstring rawModel,
+    jboolean includeScreenshot, jlong captureToken, jbyteArray screenshotPng)
+{
+    return PrepareAndroidPlaytestReport(env, reportId, capturedAtUtc, category, impact, note,
+        submissionConsent, includeBasicContext, rawModel, true, includeScreenshot == JNI_TRUE,
+        captureToken, screenshotPng);
+}
+
+extern "C" JNIEXPORT jlong JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_requestPlaytestCapture(JNIEnv*, jclass, jboolean screenshotConsent)
+{
+    if (screenshotConsent != JNI_TRUE || !gSwapchainRunning.load(std::memory_order_acquire) ||
+        gRuntimeState.load(std::memory_order_acquire) != 1) return 0;
+    std::lock_guard<std::mutex> lock(gReportMutex);
+    if (gPlaytestCapture.state != PlaytestCaptureRequest::State::Empty ||
+        gPlaytestCaptureNextToken == static_cast<std::uint64_t>(std::numeric_limits<jlong>::max())) return 0;
+    gPlaytestCapture.token = ++gPlaytestCaptureNextToken;
+    gPlaytestCapture.state = PlaytestCaptureRequest::State::Pending;
+    return static_cast<jlong>(gPlaytestCapture.token);
+}
+
+extern "C" JNIEXPORT jbyteArray JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_takePlaytestCapture(JNIEnv* env, jclass, jlong token)
+{
+    // status0 + little-endian width/height + owned RGBA;1=pending,2=unavailable.
+    std::lock_guard<std::mutex> lock(gReportMutex);
+    if (token <= 0 || gPlaytestCapture.token != static_cast<std::uint64_t>(token) ||
+        gPlaytestCapture.state != PlaytestCaptureRequest::State::Ready)
+    {
+        const jbyte status = token > 0 && gPlaytestCapture.token == static_cast<std::uint64_t>(token) &&
+            gPlaytestCapture.state == PlaytestCaptureRequest::State::Pending ? 1 : 2;
+        auto result = env->NewByteArray(1);
+        if (result) env->SetByteArrayRegion(result, 0, 1, &status);
+        return result;
+    }
+    const auto& pixels = gPlaytestCapture.pixels;
+    const auto length = static_cast<jsize>(pixels.rgba.size() + 9u);
+    auto result = env->NewByteArray(length);
+    if (!result) return nullptr;
+    std::array<jbyte, 9u> header{};
+    for (unsigned byte = 0u; byte < 4u; ++byte)
+    {
+        header[1u + byte] = static_cast<jbyte>(pixels.width >> (byte * 8u));
+        header[5u + byte] = static_cast<jbyte>(pixels.height >> (byte * 8u));
+    }
+    env->SetByteArrayRegion(result, 0, 9, header.data());
+    env->SetByteArrayRegion(result, 9, length - 9, reinterpret_cast<const jbyte*>(pixels.rgba.data()));
+    if (env->ExceptionCheck()) return nullptr;
+    gPlaytestCapture.pixels = {};
+    gPlaytestCapture.state = PlaytestCaptureRequest::State::Transferred;
+    return result;
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_cancelPlaytestCapture(JNIEnv*, jclass, jlong token)
+{
+    std::lock_guard<std::mutex> lock(gReportMutex);
+    if (token > 0 && gPlaytestCapture.token == static_cast<std::uint64_t>(token)) gPlaytestCapture = {};
 }
 
 extern "C" JNIEXPORT jstring JNICALL

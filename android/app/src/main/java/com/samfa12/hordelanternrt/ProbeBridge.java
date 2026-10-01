@@ -13,6 +13,15 @@ public final class ProbeBridge {
     public static native byte[] preparePlaytestReport(String reportId, String capturedAtUtc,
             int category, int impact, String note, boolean exportConsent,
             boolean includeBasicContext, String rawModel);
+    public static native byte[] preparePlaytestSubmission(String reportId, String capturedAtUtc,
+            int category, int impact, String note, boolean submissionConsent,
+            boolean includeBasicContext, String rawModel, boolean includeScreenshot,
+            long captureToken, byte[] screenshotPng);
+    // Consent BEFORE render-owner readback. status0 + LE width,height + RGBA8;
+    // status1=pending,2=unavailable. This reads only the presented game RT target.
+    public static native long requestPlaytestCapture(boolean screenshotConsent);
+    public static native byte[] takePlaytestCapture(long captureToken);
+    public static native void cancelPlaytestCapture(long captureToken);
     public static native String getDeveloperOverlayText();
     public static native byte[] getGitHubReleaseRequestContract();
     public static native byte[] evaluateGitHubReleaseUpdate(String installedVersion,

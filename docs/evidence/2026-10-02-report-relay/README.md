@@ -43,11 +43,46 @@ player acceptance. Full local receipts are under
 `C:/Dev/tmp/horde-report-submission-20261002/` (`capture-windows-debug.log`,
 `capture-windows-debug-tests.log`, `rtx-capture/capture-manifest.json`).
 
+## Consented Android game-image ownership
+
+Readback happens only on the existing render owner, after this paused frame has
+successfully presented and lifecycle pause is acknowledged. JNI transfers owned
+RGB-normalised pixels/context through one generation-tagged ticket. Edit,
+lifecycle interruption, render teardown and stale generations cannot publish a
+different capture. No OS screenshot, UI overlay, arbitrary file, save or log.
+Source readback is capped before allocation at8,388,608 pixels (32MiB RGBA;
+GPU readback plus CPU source copy can transiently total64MiB). The disclosed
+proportional report thumbnail is at most768 long/432 short, not a gameplay
+render-resolution change;1080x2235 becomes371x768. Schema admission1280/720
+and PNG512KiB remain unchanged. Attachment-cap failure is honest, not a silently
+resized/omitted image.
+
+Lossless RGB8 PNG Sub prediction emits only IHDR/IDAT/IEND with CRCs. The actual
+RT noise fixture rejected960x540 at512KiB; unfiltered768x432 also exceeded the
+cap. Sub-filtered768x432 is460809 bytes, SHA256
+`462677a63e112389df28843ec25be7bf2abd21f57b97f8316d36ba9c2a7f1790`.
+Actual workerd validates its deflate/pixels and614883-byte envelope, with outbound
+requests denied (no verification/email). Smaller640x360 measured333010 bytes,
+not selected as a second silent shrink. Initial Windows Node ESM path spelling
+failed before the harness ran; corrected file URL yields the recorded pass.
+
+Current native source: Debug3/3 affected reporting tests pass (the accidentally
+broad selector also ran the unchanged release-updater preflight, passing4/4 total),
+Release3/3 pass. New two-axis fixed-point bilinear gradient golden assertions
+also pass both configurations. Android four-ABI Debug native build passes after
+readback exception/pause-lock fixes and thumbnail-bound changes. Focused Java
+PNG5/5, verification7/7 and submission16/16 pass, including before-dispatch and
+in-flight interruption preserving the same frozen report. Receipts under the
+same local directory: `capture-android-native-final.log`, `capture-native-*-final-tests.log`,
+`report-helpers-final.log`, `png-sub-fixture.log`, `png-workerd-admission-final.log`.
+These are host/compiler/local-runtime facts; JNI lifecycle races and real phone
+readback/WebView acceptance are not claimed from these tests.
+
 ## Next unfinished step
 
-Finish review/validation of consented Android render-owner capture, thumbnail,
-native verification and submission UI. Record its current source tests before
-committing. Existing Turnstile widget hostname admission needs the requested
+Finish Android form/lifecycle review and focused activity tests, then build/lint
+the complete candidate before device acceptance. Windows remote transport is a
+separate bounded implementation slice. Existing Turnstile hostname admission needs the requested
 owner dashboard sign-in; do not repeat the request or copy/broaden credentials.
 Then send only the approved single labelled fixture email and verify the
 attachment/delivery. No email has been sent yet. Windows remote UI/transport and

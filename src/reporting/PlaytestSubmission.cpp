@@ -45,6 +45,58 @@ std::string Base64(const std::span<const std::uint8_t> bytes)
 }
 } // namespace
 
+bool ResizePlaytestScreenshotRgba(const std::uint32_t width, const std::uint32_t height,
+    const std::span<const std::uint8_t> rgba, PlaytestScreenshotPixels& output)
+{
+    output = {};
+    const auto pixels = static_cast<std::uint64_t>(width) * height;
+    if (width == 0u || height == 0u || pixels > kPlaytestScreenshotMaxSourcePixels ||
+        pixels * 4u != rgba.size()) return false;
+    std::uint32_t numerator = 1u, denominator = 1u;
+    const auto longEdge = std::max(width, height), shortEdge = std::min(width, height);
+    if (longEdge > kPlaytestScreenshotCaptureLongEdge || shortEdge > kPlaytestScreenshotCaptureShortEdge)
+    {
+        if (static_cast<std::uint64_t>(kPlaytestScreenshotCaptureLongEdge) * shortEdge <=
+            static_cast<std::uint64_t>(kPlaytestScreenshotCaptureShortEdge) * longEdge)
+        { numerator = kPlaytestScreenshotCaptureLongEdge; denominator = longEdge; }
+        else { numerator = kPlaytestScreenshotCaptureShortEdge; denominator = shortEdge; }
+    }
+    output.width = std::max(1u, static_cast<std::uint32_t>(static_cast<std::uint64_t>(width) * numerator / denominator));
+    output.height = std::max(1u, static_cast<std::uint32_t>(static_cast<std::uint64_t>(height) * numerator / denominator));
+    output.rgba.resize(static_cast<std::size_t>(output.width) * output.height * 4u);
+    // Fixed-point pixel-centre bilinear sampling keeps portrait/landscape and
+    // RGB order consistent without platform-dependent floating-point rounding.
+    const auto coordinate = [](const std::uint32_t at, const std::uint32_t source,
+                               const std::uint32_t destination) {
+        const auto centre = static_cast<std::int64_t>((2ull * at + 1u) * source * 65536u / (2ull * destination)) - 32768;
+        return static_cast<std::uint64_t>(std::clamp(centre, std::int64_t{0},
+            static_cast<std::int64_t>(source - 1u) * 65536));
+    };
+    for (std::uint32_t y = 0u; y < output.height; ++y)
+    {
+        const auto sy = coordinate(y, height, output.height);
+        const auto y0 = static_cast<std::uint32_t>(sy >> 16u), y1 = std::min(y0 + 1u, height - 1u);
+        const auto fy = sy & 65535u;
+        for (std::uint32_t x = 0u; x < output.width; ++x)
+        {
+            const auto sx = coordinate(x, width, output.width);
+            const auto x0 = static_cast<std::uint32_t>(sx >> 16u), x1 = std::min(x0 + 1u, width - 1u);
+            const auto fx = sx & 65535u;
+            for (std::size_t c = 0u; c < 4u; ++c)
+            {
+                const auto sample = [&](const std::uint32_t px, const std::uint32_t py) {
+                    return rgba[(static_cast<std::size_t>(py) * width + px) * 4u + c];
+                };
+                const auto top = sample(x0, y0) * (65536u - fx) + sample(x1, y0) * fx;
+                const auto bottom = sample(x0, y1) * (65536u - fx) + sample(x1, y1) * fx;
+                output.rgba[(static_cast<std::size_t>(y) * output.width + x) * 4u + c] =
+                    static_cast<std::uint8_t>((top * (65536u - fy) + bottom * fy + (1ull << 31u)) >> 32u);
+            }
+        }
+    }
+    return true;
+}
+
 bool ValidatePlaytestScreenshot(const PlaytestReportScreenshot& screenshot) noexcept
 {
     const auto bytes = screenshot.png;
