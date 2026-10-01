@@ -1,5 +1,6 @@
 #include "platform/windows/DiagnosticWindow.h"
 #include "platform/windows/WindowsMusicPlayback.h"
+#include "platform/windows/WindowsPlaytestReport.h"
 
 #include <algorithm>
 #include <array>
@@ -68,6 +69,7 @@
 #include "vulkan/RtCapabilityReport.h"
 #include "vulkan/VulkanContext.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
+#include "vulkan/raytracing/RtPipelineVariantProvider.h"
 #include "vulkan/raytracing/DevelopmentStaticAssetPolicy.h"
 #include "vulkan/raytracing/RtFrameEvidenceCoordinator.h"
 #include "vulkan/raytracing/RtDeviceEnablePlan.h"
@@ -160,6 +162,7 @@ constexpr int kRtLabGlassRoughnessSliderId = 160;
 constexpr int kChestPromptControlId = 161;
 constexpr int kMusicVolumeLabelId = 162;
 constexpr int kMusicVolumeSliderId = 163;
+constexpr int kReportProblemButtonId = 164;
 constexpr int kMenuPauseId = 2001;
 constexpr int kMenuRestartId = 2002;
 constexpr int kMenuExitId = 2003;
@@ -174,6 +177,7 @@ constexpr int kMenuAboutId = 2022;
 constexpr int kMenuCreditsId = 2023;
 constexpr int kMenuDeveloperOverlayId = 2024;
 constexpr int kMenuCheckUpdatesId = 2025;
+constexpr int kMenuReportProblemId = 2026;
 constexpr int kAppIconId = 1;
 constexpr UINT kDefaultDpi = 96u;
 constexpr char kUiFontProperty[] = "HordeLanternRtUiFont";
@@ -282,6 +286,9 @@ struct VulkanSurfaceContext
     bool rtFrameEvidenceInitialised = false;
     horde::telemetry::RtPresentationOutcome lastFramePresentation =
         horde::telemetry::RtPresentationOutcome::NotAttempted;
+    // Borrowed from RunDiagnosticSwapchainWindow's live owner; UI captures a
+    // copied report context on this same application thread.
+    const horde::vulkan::DeviceCapabilities* capabilitySnapshot = nullptr;
     bool useRtPath = false;
     horde::vulkan::RtExecutionBackend executionBackend = horde::vulkan::RtExecutionBackend::Unsupported;
     std::string developmentCheckpoint;
@@ -1661,7 +1668,7 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
     SetControlVisible(context.windowHandle, kEndingBodyId, pauseVisible && context.endingOverlayVisible);
     const bool fullPauseMenuVisible = pauseVisible && !context.deathOverlayVisible && !context.endingOverlayVisible;
     for (const int id : {kControlsButtonId, kSettingsButtonId, kDiagnosticsButtonId,
-                         kRunBenchmarkButtonId, kMoreBySamfa12ButtonId})
+                         kRunBenchmarkButtonId, kMoreBySamfa12ButtonId, kReportProblemButtonId})
     {
         SetControlVisible(context.windowHandle, id, fullPauseMenuVisible);
     }
@@ -1835,6 +1842,54 @@ void ShowPauseMenu(VulkanSurfaceContext& context, const bool visible)
         PlaySoundEffect(context, "ui_back.wav");
         SetFocus(context.windowHandle);
     }
+}
+
+horde::platform::windows::WindowsPlaytestReportContext CapturePlaytestReportContext(
+    const VulkanSurfaceContext& context)
+{
+    horde::platform::windows::WindowsPlaytestReportContext report;
+    auto& values = report.values;
+    values.product = "Horde Lantern RT";
+    values.version = HORDE_RT_DISPLAY_VERSION;
+    values.build = HORDE_RT_BUILD_ID;
+    values.platform = "Windows";
+    values.rawModel = "Windows desktop";
+    values.renderScale = context.renderScale;
+    values.rtPresented = context.capabilitySnapshot != nullptr && context.capabilitySnapshot->rtScene.presented;
+    const auto& compiledRequest = horde::vulkan::raytracing::RtPipelineVariantProvider::Compiled(
+        context.executionBackend).request();
+    values.quality = compiledRequest.quality ==
+            horde::vulkan::raytracing::DielectricQuality::High ? "High" : "Mobile";
+
+    if (context.physicalDevice == VK_NULL_HANDLE) return report;
+    VkPhysicalDeviceProperties properties{};
+    vkGetPhysicalDeviceProperties(context.physicalDevice, &properties);
+    const auto extent = context.rtScene.DispatchExtent();
+    if (extent.width == 0u || extent.height == 0u || !std::isfinite(context.renderScale) ||
+        context.renderScale <= 0.0f || properties.deviceName[0] == '\0')
+    {
+        return report;
+    }
+    values.gpu = properties.deviceName;
+    values.backend = horde::vulkan::ToString(context.rtScene.ExecutionBackend());
+    values.internalWidth = extent.width;
+    values.internalHeight = extent.height;
+    report.available = !values.backend.empty();
+    return report;
+}
+
+void OpenPlaytestReport(VulkanSurfaceContext& context)
+{
+    // The form is only reachable from paused/menu UI. A Help-menu request made
+    // during play pauses first; closing the form leaves the pause in place.
+    if (!context.simulationPaused || !context.pauseMenuVisible || context.settingsVisible ||
+        context.diagnosticsVisible || context.benchmarkReportVisible || context.rtLabVisible)
+    {
+        ShowPauseMenu(context, true);
+    }
+    PlaySoundEffect(context, "ui_select.wav");
+    horde::platform::windows::ShowWindowsPlaytestReport(
+        context.windowHandle, CapturePlaytestReportContext(context));
 }
 
 void ResetRoute(VulkanSurfaceContext& context, const bool preserveBenchmark = false)
@@ -2509,8 +2564,8 @@ void ClearDesktopInput(VulkanSurfaceContext& context)
 
 std::vector<HWND> VisibleControllerMenuControls(const VulkanSurfaceContext& context)
 {
-    constexpr std::array<int, 36u> controlIds{{
-        kResumeButtonId, kRestartButtonId, kControlsButtonId, kSettingsButtonId,
+    constexpr std::array<int, 37u> controlIds{{
+        kResumeButtonId, kRestartButtonId, kControlsButtonId, kSettingsButtonId, kReportProblemButtonId,
         kRtLabButtonId, kDiagnosticsButtonId, kRunBenchmarkButtonId, kMoreBySamfa12ButtonId,
         kExitButtonId, kSfxButtonId, kSensitivityButtonId, kWaterQualityButtonId,
         kRenderScaleSliderId, kMusicVolumeSliderId, kFullscreenButtonId, kSettingsBackButtonId,
@@ -4895,6 +4950,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     // commands; every normal application now uses this accepted profile.
     (void)anatomicalPlayerMount;
     context.windowHandle = hWnd;
+    context.capabilitySnapshot = &capabilities;
     context.unattendedBenchmark = unattendedBenchmark;
     if (developmentCheckpoint != nullptr) context.developmentCheckpoint = *developmentCheckpoint;
     LoadSettings(context);
@@ -5368,7 +5424,7 @@ void ApplyDpiScaledFonts(HWND window)
     }
 #endif
     for (const int id : {kHudControlId, kVitalityHudControlId, kChestPromptControlId, kPauseTitleId, kEndingBodyId, kResumeButtonId, kRestartButtonId,
-                         kControlsButtonId, kSettingsButtonId, kDiagnosticsButtonId, kRunBenchmarkButtonId,
+                         kControlsButtonId, kSettingsButtonId, kReportProblemButtonId, kDiagnosticsButtonId, kRunBenchmarkButtonId,
                          kMoreBySamfa12ButtonId, kExitButtonId, kBenchmarkTitleId,
                          kBenchmarkCopyButtonId, kBenchmarkSaveButtonId, kBenchmarkBackButtonId,
                          kSettingsTitleId, kSfxButtonId, kSensitivityButtonId, kWaterQualityButtonId, kRenderScaleLabelId,
@@ -5520,7 +5576,7 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
     const int compactButtonCount = endingLayout ? 4 : 3;
     const int pauseTotal = compactOverlayLayout
         ? titleHeight + endingBodyHeight + (endingLayout ? gap : 0) + compactButtonCount * buttonHeight + compactButtonCount * gap
-        : titleHeight + 9 * buttonHeight + 8 * gap;
+        : titleHeight + 10 * buttonHeight + 9 * gap;
     const int pauseX = (width - buttonWidth) / 2;
     int y = std::max(ScaleForDpi(window, 54), (height - pauseTotal) / 2);
     if (HWND title = GetDlgItem(window, kPauseTitleId)) MoveWindow(title, pauseX, y, buttonWidth, titleHeight, TRUE);
@@ -5544,8 +5600,9 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
     }
     else
     {
-        for (const int id : {kResumeButtonId, kRestartButtonId, kControlsButtonId, kSettingsButtonId, kRtLabButtonId,
-                             kDiagnosticsButtonId, kRunBenchmarkButtonId, kMoreBySamfa12ButtonId, kExitButtonId})
+        for (const int id : {kResumeButtonId, kRestartButtonId, kControlsButtonId, kSettingsButtonId,
+                             kReportProblemButtonId, kRtLabButtonId, kDiagnosticsButtonId,
+                             kRunBenchmarkButtonId, kMoreBySamfa12ButtonId, kExitButtonId})
         {
             if (HWND control = GetDlgItem(window, id)) MoveWindow(control, pauseX, y, buttonWidth, buttonHeight, TRUE);
             y += buttonHeight + gap;
@@ -5981,6 +6038,10 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 return 0;
             case kSettingsButtonId:
                 OpenSettings(*sceneContext);
+                return 0;
+            case kReportProblemButtonId:
+            case kMenuReportProblemId:
+                OpenPlaytestReport(*sceneContext);
                 return 0;
             case kRtLabButtonId:
                 OpenRtLab(*sceneContext);
@@ -6532,6 +6593,7 @@ HMENU CreateApplicationMenu()
 #endif
     AppendMenuA(help, MF_SEPARATOR, 0, nullptr);
     AppendMenuA(help, MF_STRING, kMenuCheckUpdatesId, "Check for &updates...");
+    AppendMenuA(help, MF_STRING, kMenuReportProblemId, "&Report a problem...");
     AppendMenuA(help, MF_SEPARATOR, 0, nullptr);
     AppendMenuA(help, MF_STRING, kMenuCreditsId, "&Credits && licences");
     AppendMenuA(help, MF_STRING, kMenuAboutId, "&About");
@@ -6744,6 +6806,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     createButton(kRestartButtonId, "RESTART ROUTE");
     createButton(kControlsButtonId, "CONTROLS");
     createButton(kSettingsButtonId, "SETTINGS");
+    createButton(kReportProblemButtonId, "REPORT A PROBLEM...");
     createButton(kRtLabButtonId, "RT LAB");
     createButton(kDiagnosticsButtonId, "RT DIAGNOSTICS");
     createButton(kRunBenchmarkButtonId, "RUN BENCHMARK");

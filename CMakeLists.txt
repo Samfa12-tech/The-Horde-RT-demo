@@ -150,6 +150,7 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AN
         src/platform/windows/DiagnosticWindowMain.cpp
         src/platform/windows/DiagnosticWindow.cpp
         src/platform/windows/WindowsGitHubReleaseUpdate.cpp
+        src/platform/windows/WindowsPlaytestReport.cpp
         "${HORDE_RT_WINDOWS_RESOURCE_DIRECTORY}/HordeLanternRT.manifest"
         "${HORDE_RT_WINDOWS_RESOURCE_DIRECTORY}/HordeLanternRT.rc"
         src/ui/DiagnosticOverlay.cpp
@@ -621,6 +622,15 @@ if(BUILD_TESTING)
     target_include_directories(horde_rt_playtest_report_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_link_libraries(horde_rt_playtest_report_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_playtest_report_tests COMMAND horde_rt_playtest_report_tests)
+    if(WIN32)
+        add_executable(horde_rt_windows_playtest_report_ui_tests
+            tests/WindowsPlaytestReportUiTests.cpp
+            src/platform/windows/WindowsPlaytestReport.cpp)
+        target_include_directories(horde_rt_windows_playtest_report_ui_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+        target_link_libraries(horde_rt_windows_playtest_report_ui_tests PRIVATE horde_gameplay_simulation comdlg32 bcrypt)
+        add_test(NAME horde_rt_windows_playtest_report_ui_tests COMMAND horde_rt_windows_playtest_report_ui_tests)
+        set_tests_properties(horde_rt_windows_playtest_report_ui_tests PROPERTIES TIMEOUT 30)
+    endif()
     add_test(NAME horde_rt_music_asset_admission_tests
         COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
             ${CMAKE_CURRENT_SOURCE_DIR}/tests/MusicAssetAdmissionTests.ps1)

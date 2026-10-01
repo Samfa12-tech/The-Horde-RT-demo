@@ -19,6 +19,7 @@
 #include <string>
 #include <string_view>
 #include <thread>
+#include <tuple>
 #include <vector>
 #include <sys/stat.h>
 
@@ -28,6 +29,7 @@
 #include <vulkan/vulkan_android.h>
 
 #include "ui/DiagnosticOverlay.h"
+#include "reporting/PlaytestReport.h"
 #include "gameplay/CorridorCollision.h"
 #include "gameplay/DevelopmentCheckpoints.h"
 #include "gameplay/DevelopmentCheckpointSimulation.h"
@@ -48,6 +50,7 @@
 #include "vulkan/RtCapabilityReport.h"
 #include "vulkan/VulkanContext.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
+#include "vulkan/raytracing/RtPipelineVariantProvider.h"
 #include "vulkan/raytracing/RtFrameEvidenceCoordinator.h"
 #include "vulkan/raytracing/RtDeviceEnablePlan.h"
 #include "telemetry/RtBenchmarkEvidenceRun.h"
@@ -226,6 +229,7 @@ std::mutex gSwapchainMutex;
 std::mutex gReportMutex;
 std::string gLatestTextReport;
 std::string gLatestJsonReport;
+horde::reporting::OwnedPlaytestReportContext gLatestPlaytestContext;
 std::string gLatestDeveloperOverlayText;
 std::string gLatestBenchmarkReport;
 std::string gLatestBenchmarkProgress;
@@ -612,6 +616,7 @@ void PublishReportSnapshot(const horde::vulkan::DeviceCapabilities& capabilities
     std::lock_guard<std::mutex> lock(gReportMutex);
     gLatestTextReport = text;
     gLatestJsonReport = json;
+    gLatestPlaytestContext = {}; // A probe is not a live renderer/context snapshot.
 }
 
 std::string LatestTextReport()
@@ -674,6 +679,16 @@ void PublishRuntimeReports(const SwapchainContext& context,
         std::lock_guard<std::mutex> lock(gReportMutex);
         gLatestTextReport = text;
         gLatestJsonReport = json;
+        // Publish the narrow allowlist from this render-thread-owned snapshot;
+        // report preparation never reads the live scene or private diagnostic JSON.
+        gLatestPlaytestContext = {"Horde Lantern RT", HORDE_RT_PACKAGE_VERSION,
+            HORDE_RT_BUILD_ID, "Android", "", context.capabilities.identity.gpuName,
+            horde::vulkan::ToString(context.capabilities.rtScene.executionBackend),
+            horde::vulkan::raytracing::RtPipelineVariantProvider::Compiled(context.executionBackend)
+                .request().quality == horde::vulkan::raytracing::DielectricQuality::Mobile ? "Mobile" : "High",
+            context.renderScale, context.capabilities.performance.internalRenderWidth,
+            context.capabilities.performance.internalRenderHeight,
+            context.capabilities.rtScene.presented};
     }
     WriteTextFile(context.reportDirectory + '/' + kTextReportFilename, text);
     WriteTextFile(context.reportDirectory + '/' + kJsonReportFilename, json);
@@ -3569,6 +3584,73 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getJsonReport(JNIEnv* env, jclass)
         reportJson = LatestJsonReport();
     }
     return env->NewStringUTF(reportJson.c_str());
+}
+
+extern "C" JNIEXPORT jbyteArray JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_preparePlaytestReport(JNIEnv* env, jclass,
+    jstring reportId, jstring capturedAtUtc, jint category, jint impact, jstring note,
+    jboolean exportConsent, jboolean includeBasicContext, jstring rawModel)
+{
+    using namespace horde::reporting;
+    const auto reply = [env](const PlaytestReportStatus status, const std::string_view text) {
+        std::string envelope(1u, static_cast<char>(status));
+        envelope.append(text);
+        return NewUtf8ByteArray(env, envelope);
+    };
+    try
+    {
+        if (exportConsent != JNI_TRUE)
+            return reply(PlaytestReportStatus::ConsentRequired,
+                PlaytestReportStatusName(PlaytestReportStatus::ConsentRequired));
+        if (category < 0 || category > 5 || impact < 0 || impact > 3)
+            return reply(PlaytestReportStatus::InvalidCategory, "Choose a valid category and impact.");
+        const auto read = [env](jstring value, const std::size_t maximum, std::string& out) {
+            if (!value) return PlaytestReportStatus::InvalidUtf8;
+            const auto length = env->GetStringLength(value);
+            if (static_cast<std::size_t>(length) > maximum) return PlaytestReportStatus::NoteTooLarge;
+            std::vector<jchar> units(static_cast<std::size_t>(length));
+            if (length) env->GetStringRegion(value, 0, length, units.data());
+            if (env->ExceptionCheck()) return PlaytestReportStatus::InvalidUtf8;
+            std::u16string text;
+            text.reserve(units.size());
+            for (const jchar unit : units) text.push_back(static_cast<char16_t>(unit));
+            return EncodePlaytestReportUtf16(text, maximum, out);
+        };
+        std::string id, utc, text;
+        for (const auto [value, maximum, out] : {
+            std::tuple{reportId, std::size_t{96u}, &id},
+            std::tuple{capturedAtUtc, std::size_t{30u}, &utc},
+            std::tuple{note, kPlaytestReportMaxNoteBytes, &text}})
+        {
+            const auto status = read(value, maximum, *out);
+            if (env->ExceptionCheck()) return nullptr;
+            if (status != PlaytestReportStatus::Ready) return reply(status, PlaytestReportStatusName(status));
+        }
+        OwnedPlaytestReportContext context;
+        if (includeBasicContext == JNI_TRUE)
+        {
+            {
+                std::lock_guard<std::mutex> lock(gReportMutex);
+                context = gLatestPlaytestContext;
+            }
+            if (read(rawModel, kPlaytestReportMaxContextStringBytes, context.rawModel) != PlaytestReportStatus::Ready ||
+                context.internalWidth == 0u || context.internalHeight == 0u)
+            {
+                if (env->ExceptionCheck()) return nullptr;
+                return reply(PlaytestReportStatus::InvalidContext,
+                    "Renderer context is unavailable. Uncheck basic context to export your note alone.");
+            }
+        }
+        const auto prepared = PreparePlaytestReport({id, utc,
+            static_cast<PlaytestReportCategory>(category), static_cast<PlaytestReportImpact>(impact),
+            text, true, includeBasicContext == JNI_TRUE, context.View()});
+        return reply(prepared.status, prepared.IsReady() ? std::string_view(prepared.json)
+            : PlaytestReportStatusName(prepared.status));
+    }
+    catch (...)
+    {
+        return nullptr; // No exception or allocation retry escapes the JNI boundary.
+    }
 }
 
 extern "C" JNIEXPORT jstring JNICALL

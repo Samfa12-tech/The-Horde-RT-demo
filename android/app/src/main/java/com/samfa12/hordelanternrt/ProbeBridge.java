@@ -9,6 +9,10 @@ public final class ProbeBridge {
 
     public static native String getTextReport();
     public static native String getJsonReport();
+    // One status byte (0=ready), then strict UTF-8 JSON/error text. No modified UTF-8.
+    public static native byte[] preparePlaytestReport(String reportId, String capturedAtUtc,
+            int category, int impact, String note, boolean exportConsent,
+            boolean includeBasicContext, String rawModel);
     public static native String getDeveloperOverlayText();
     public static native byte[] getGitHubReleaseRequestContract();
     public static native byte[] evaluateGitHubReleaseUpdate(String installedVersion,

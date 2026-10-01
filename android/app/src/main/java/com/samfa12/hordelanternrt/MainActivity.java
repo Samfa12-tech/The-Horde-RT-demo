@@ -26,6 +26,7 @@ import android.os.SystemClock;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.text.method.LinkMovementMethod;
+import android.text.InputType;
 import android.text.util.Linkify;
 import android.util.Log;
 import android.util.TypedValue;
@@ -41,6 +42,9 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -63,6 +67,10 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
+import java.util.UUID;
 
 import org.json.JSONObject;
 
@@ -110,6 +118,16 @@ public class MainActivity extends Activity {
     private static final String DEBUG_RETRY_ACTION =
             "com.samfa12.hordelanternrt.DEBUG_RETRY_ENCOUNTER";
     private static final int REQUEST_SAVE_BENCHMARK = 7101;
+    private static final int REQUEST_SAVE_PLAYTEST = 7102;
+    private final ExecutorService reportExecutor = Executors.newSingleThreadExecutor();
+    private PlaytestReportExport playtestExport;
+    private boolean playtestReportVisible;
+    private long playtestPickerToken;
+    private TextView playtestStatus;
+    private Button playtestSave, playtestEdit;
+    private EditText playtestNote;
+    private Spinner playtestCategory, playtestImpact;
+    private CheckBox playtestConsent, playtestContext;
     private static final int PLATFORM_EVENT_PLAYER_FOOTSTEP = 0;
     private static final int PLATFORM_EVENT_PLAYER_SWING = 1;
     private static final int PLATFORM_EVENT_PLAYER_DAMAGED = 2;
@@ -604,6 +622,7 @@ public class MainActivity extends Activity {
             addMenuButton(panel, getString(R.string.rt_lab), () -> openRtLab(false));
         }
         addMenuButton(panel, getString(R.string.run_benchmark), this::startBenchmark);
+        addMenuButton(panel, getString(R.string.playtest_report), this::showPlaytestReport);
         addMenuButtonRow(panel,
                 getString(R.string.more_by_samfa12), this::openSamfa12Website,
                 getString(R.string.check_for_updates), () -> checkForUpdates(true));
@@ -800,6 +819,179 @@ public class MainActivity extends Activity {
             Log.e(TAG, "Failed to open benchmark document picker.", error);
             Toast.makeText(this, R.string.report_save_failed, Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void showPlaytestReport() {
+        // Entry is only from the existing paused menu; no gameplay/sound authority changes.
+        playtestReportVisible = true;
+        playtestExport = new PlaytestReportExport();
+        menuScrim.removeAllViews();
+        final LinearLayout panel = createPanel(getString(R.string.playtest_report),
+                getString(R.string.playtest_local_only));
+        addBody(panel, getString(R.string.playtest_privacy));
+        addBody(panel, getString(R.string.playtest_category));
+        playtestCategory = createPlaytestChoice(getResources().getStringArray(R.array.playtest_categories));
+        panel.addView(playtestCategory);
+        addBody(panel, getString(R.string.playtest_impact));
+        playtestImpact = createPlaytestChoice(getResources().getStringArray(R.array.playtest_impacts));
+        playtestImpact.setSelection(2);
+        panel.addView(playtestImpact);
+        addBody(panel, getString(R.string.playtest_note_help));
+        playtestNote = new EditText(this);
+        playtestNote.setHint(R.string.playtest_note_hint);
+        playtestNote.setTextColor(Color.WHITE);
+        playtestNote.setHintTextColor(0xFFADADAD);
+        playtestNote.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE |
+                InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+        playtestNote.setMinLines(3);
+        playtestNote.setMaxLines(8);
+        panel.addView(playtestNote);
+        playtestContext = new CheckBox(this);
+        playtestContext.setText(R.string.playtest_context_consent);
+        playtestContext.setTextColor(Color.WHITE);
+        playtestContext.setButtonTintList(android.content.res.ColorStateList.valueOf(0xFFFFDEAD));
+        playtestContext.setChecked(false);
+        panel.addView(playtestContext);
+        playtestConsent = new CheckBox(this);
+        playtestConsent.setText(R.string.playtest_export_consent);
+        playtestConsent.setTextColor(Color.WHITE);
+        playtestConsent.setButtonTintList(android.content.res.ColorStateList.valueOf(0xFFFFDEAD));
+        playtestConsent.setChecked(false);
+        panel.addView(playtestConsent);
+        playtestStatus = new TextView(this);
+        playtestStatus.setTextColor(0xFFFFDEAD);
+        playtestStatus.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
+        panel.addView(playtestStatus);
+        playtestSave = new Button(this);
+        playtestSave.setText(R.string.playtest_save_json);
+        playtestSave.setOnClickListener(view -> preparePlaytestExport());
+        panel.addView(playtestSave);
+        playtestEdit = new Button(this);
+        playtestEdit.setText(R.string.playtest_edit);
+        playtestEdit.setVisibility(View.GONE);
+        playtestEdit.setOnClickListener(view -> {
+            playtestExport.cancel();
+            playtestExport = new PlaytestReportExport();
+            setPlaytestFieldsEnabled(true);
+            playtestConsent.setChecked(false); // New preparation requires new explicit consent.
+            playtestSave.setEnabled(true);
+            playtestSave.setText(R.string.playtest_save_json);
+            playtestEdit.setVisibility(View.GONE);
+            playtestStatus.setText("");
+        });
+        panel.addView(playtestEdit);
+        addMenuButton(panel, getString(R.string.back), this::closePlaytestReport);
+        attachPanel(panel);
+    }
+
+    private void setPlaytestFieldsEnabled(final boolean enabled) {
+        playtestNote.setEnabled(enabled);
+        playtestCategory.setEnabled(enabled);
+        playtestImpact.setEnabled(enabled);
+        playtestConsent.setEnabled(enabled);
+        playtestContext.setEnabled(enabled);
+    }
+
+    private Spinner createPlaytestChoice(final String[] choices) {
+        final Spinner spinner = new Spinner(this);
+        final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, choices) {
+            @Override public View getView(final int position, final View convertView, final ViewGroup parent) {
+                final TextView selected = (TextView) super.getView(position, convertView, parent);
+                selected.setTextColor(Color.WHITE); // Selected native item must contrast with the game panel.
+                selected.setTextSize(15);
+                return selected;
+            }
+        };
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        return spinner;
+    }
+
+    private void preparePlaytestExport() {
+        if (playtestExport.state() == PlaytestReportExport.State.RETRYABLE) {
+            if (playtestExport.retry()) choosePlaytestDestination();
+            return;
+        }
+        if (!playtestConsent.isChecked()) {
+            playtestStatus.setText(R.string.playtest_consent_required);
+            return;
+        }
+        final SimpleDateFormat utc = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ROOT);
+        utc.setTimeZone(TimeZone.getTimeZone("UTC"));
+        final byte[] prepared;
+        try {
+            prepared = ProbeBridge.preparePlaytestReport(UUID.randomUUID().toString(), utc.format(new Date()),
+                    playtestCategory.getSelectedItemPosition(), playtestImpact.getSelectedItemPosition(),
+                    playtestNote.getText().toString(), true, playtestContext.isChecked(), Build.MODEL);
+        } catch (final RuntimeException | LinkageError unavailable) {
+            playtestStatus.setText(R.string.playtest_prepare_failed);
+            return;
+        }
+        if (!playtestExport.begin(prepared, true)) {
+            playtestStatus.setText(PlaytestReportExport.preparationError(prepared));
+            return;
+        }
+        setPlaytestFieldsEnabled(false); // Retry owns these exact approved bytes, not later edits.
+        choosePlaytestDestination();
+    }
+
+    private void choosePlaytestDestination() {
+        playtestPickerToken = playtestExport.token();
+        playtestSave.setEnabled(false);
+        playtestEdit.setVisibility(View.GONE);
+        playtestStatus.setText(R.string.playtest_choose_destination);
+        final Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("application/json");
+        intent.putExtra(Intent.EXTRA_TITLE, "HordeLanternRT-player-report.json");
+        try { startActivityForResult(intent, REQUEST_SAVE_PLAYTEST); }
+        catch (final RuntimeException unavailable) {
+            playtestExport.pickerCancelled(playtestPickerToken);
+            playtestExportFailed(R.string.playtest_picker_failed);
+        }
+    }
+
+    private void playtestExportFailed(final int message) {
+        playtestStatus.setText(message);
+        playtestSave.setText(R.string.playtest_retry);
+        playtestSave.setEnabled(true);
+        playtestEdit.setVisibility(View.VISIBLE);
+    }
+
+    private void closePlaytestReport() {
+        if (playtestExport != null) playtestExport.cancel();
+        playtestReportVisible = false;
+        showMainMenu(false); // Back never resumes gameplay or submits anything.
+    }
+
+    private void finishPlaytestPicker(final int resultCode, final Intent data) {
+        if (!playtestReportVisible || playtestExport == null) return;
+        final PlaytestReportExport owner = playtestExport;
+        final long attempt = playtestPickerToken;
+        if (resultCode != RESULT_OK || data == null || data.getData() == null) {
+            if (owner.pickerCancelled(attempt)) playtestExportFailed(R.string.playtest_cancelled);
+            return;
+        }
+        final byte[] bytes = owner.startWrite(attempt);
+        if (bytes == null) return;
+        playtestStatus.setText(R.string.playtest_saving);
+        final android.content.ContentResolver resolver = getApplicationContext().getContentResolver();
+        final Uri destination = data.getData();
+        reportExecutor.execute(() -> {
+            // No note/URI/private provider exception enters logs or payload.
+            final boolean completed = PlaytestReportExport.writeApproved(owner, attempt, bytes,
+                    () -> resolver.openOutputStream(destination, "wt"));
+            handler.post(() -> {
+                if (!playtestReportVisible || playtestExport != owner ||
+                        !owner.complete(attempt, completed)) return;
+                if (completed) {
+                    playtestStatus.setText(R.string.playtest_saved);
+                    playtestSave.setText(R.string.playtest_save_json);
+                    playtestSave.setEnabled(false);
+                } else playtestExportFailed(R.string.playtest_save_failed);
+            });
+        });
     }
 
     private void hideMenu() {
@@ -2431,6 +2623,10 @@ public class MainActivity extends Activity {
     @Override
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_SAVE_PLAYTEST) {
+            finishPlaytestPicker(resultCode, data);
+            return;
+        }
         if (requestCode != REQUEST_SAVE_BENCHMARK || resultCode != RESULT_OK ||
                 data == null || data.getData() == null) {
             return;
@@ -2447,6 +2643,10 @@ public class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
+        if (playtestReportVisible) {
+            closePlaytestReport();
+            return;
+        }
         if (rtLabVisible) {
             closeRtLab();
             return;
@@ -2552,6 +2752,9 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        if (playtestExport != null) playtestExport.cancel();
+        playtestReportVisible = false;
+        reportExecutor.shutdownNow();
         if (musicPlayback != null) { musicPlayback.close(); musicPlayback = null; }
         handler.removeCallbacksAndMessages(null);
         updateExecutor.shutdownNow();
