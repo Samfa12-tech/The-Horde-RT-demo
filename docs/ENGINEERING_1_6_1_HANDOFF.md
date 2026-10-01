@@ -19,25 +19,40 @@ Owner approved extending/deploying the existing Briarhold Cloudflare Worker and
 one labelled fixture email. Reviewed private backend `fd104d7` is deployed as
 `1ca58068-e876-4016-be6f-b1ac4d2035ed`, preserving fixed mailbox/bindings and the
 existing delivery engine. Worker50/50 tests and actual workerd PNG/SQLite checks
-pass; tooling audit0. Live health/page200, invalid schema400 and actual native
-PNG wire fixture plus invalid token403. No email has been sent/accepted yet.
+pass; tooling audit0. Historical health/page200, schema400 and invalid-token403
+negatives are retained. The existing widget already admits the reporting host;
+authenticated inspection required no configuration/credential change.
 Public Horde adds the bounded frozen submission envelope, primary Android remote
 form, verification-only WebView and consented render-owner game thumbnail, not
-private Worker source or credentials. MSVC affected3/3 CTests each Debug/Release
-and one actual RTX game-only capture pass. Android final Debug/Release each75/75
-tests, four-ABI native builds, both APK/package guards and lint0 errors pass.
+private Worker source or credentials. Earlier foundation MSVC3/3 CTests each
+Debug/Release and one actual RTX game-only capture pass. Historical Android
+75/75 tests and four-ABI native/build/package evidence remain retained.
 Paused uncertain sends retain same-ID explicit retries; stale decision dialogs
-cannot replace later owners. No phone install/WebView/delivery acceptance yet.
-Windows remote submission remains unfinished; local JSON is fallback.
+cannot replace later owners. No phone install/exact-device WebView acceptance yet.
+Windows remote-first form `d6d187e` now integrates the bounded async transport,
+private native verification and consented render-owner RT-frame callback. Current
+Vulkan-enabled Debug/Release app builds and each5/5 affected CTests pass. A narrow
+local-child-document policy fixes a documented Turnstile compatibility mismatch;
+the fixed top-level page and HTTPS network allowlist remain unchanged. The one
+approved synthetic fixture completed real Windows verification/exchange and
+received matching202/queued, then reached the inbox. Owner accepted diagnostics
+and screenshot; a narrowly scoped authorised Gmail read independently confirms
+the synthetic body/context and463310-byte PNG. No second email/retry was sent.
+`4d0dad7` keeps this acceptance utility outside default builds/CTest/Shipping.
+Local JSON remains fallback. Android child-document compatibility `23ac884`
+passes forced-fresh Debug/Release76/76 Java tests, both APK/package guards and
+lint0 errors/42 warnings each. Native source is unchanged; incremental four-ABI
+packaging is not new compiler/device certification. Exact APKs are in the finite
+record, not installed. Older75-test APKs do not certify this changed candidate.
 See [single reporting record](ENGINEERING_1_6_1_REPORTING_2026-10-01.md).
-Next: reviewed Android checkpoint/fresh CI; bounded asynchronous Windows request
-owner (synchronous candidate's soft cancellation/deadline was not accepted),
-native verification/form; existing Turnstile widget hostname check; one approved
-email/attachment acceptance; exact platform/lifecycle checks. See the [finite
+Next: push the reviewed integration checkpoint and inspect fresh current-source
+and PR-integration CI, then full-game consented capture/UI and exact-platform
+WebView/lifecycle checks. The synchronous Windows candidate is superseded, not
+accepted; negative evidence is retained. See the [finite
 report-relay record](evidence/2026-10-02-report-relay/README.md) before resuming.
-OAuth lacks widget scope and the dashboard needs owner sign-in, requested once.
-Do not silently broaden/copy credentials, repeat questions or treat mocks as
-delivery. Preserve pending phone owner checks and unrelated raw S24 files.
+Do not repeat widget sign-in/configuration checks or resend the accepted fixture.
+Do not broaden/copy credentials or treat mocks as device acceptance. Preserve
+pending phone owner checks and unrelated raw S24 files.
 Audio/haptic manual revalidation required:NO (report-only, feedback unchanged).
 
 ### October 2 music focus (accepted integration slice)

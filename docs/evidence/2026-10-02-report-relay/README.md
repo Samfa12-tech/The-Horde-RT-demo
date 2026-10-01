@@ -198,18 +198,80 @@ is not inferred from the client-only success. Do not repeat this smoke unchanged
 Pure gate receipts: `windows-verification-child-documents-debug.log` and
 `windows-verification-child-documents-release.log`.
 
+### Native form integration and single-fixture submission
+
+Current Vulkan-enabled Windows Debug and Release application builds pass with
+the remote-first native form and consented application/render-owner image hook.
+Each configuration passes the five affected screenshot, transport, verification,
+remote-form and local-fallback CTests. Remote UI tests exercise default-off
+consent, distinct prepare/preview before verification, frozen same-ID retry,
+cancellation, aspect-preserving preview and whole-form keyboard traversal at a
+small/high-DPI window size. These are injected form contracts, not full-game
+capture/UI or inbox acceptance. Receipts `windows-remote-integrated-{debug,release}.log`
+and `windows-remote-integrated-{debug,release}-ctest.log`.
+
+The explicit acceptance utility is excluded from all default/Shipping builds and
+CTest. It admits only the reviewed463310-byte RT fixture and its pinned SHA256,
+uses fixed ID `horde_acceptance_windows_20261002_01`, refreshes real verification,
+and performs at most one exchange per invocation. Missing arguments and a wrong
+path fail before verification/network (exit64/2 respectively).
+Receipt `windows-acceptance-tool-negative.log`.
+
+The one owner-authorised labelled fixture invocation completed successfully:
+real native verification followed by the production fixed-HTTPS exchange returned
+strict matching202/accepted (`queued`). Receipt `windows-approved-single-fixture.log`.
+This proves real server token/action/hostname and schema/PNG admission, not a
+200/sent ACK. The owner then confirmed receipt and readable diagnostics/screenshot.
+An owner-authorised, exact-ID Gmail read independently found one inbox message,
+the unchanged synthetic note and typed fixture context in text/HTML, and the
+`horde-lantern-rt-playtest.png` attachment with463310 bytes. Attachment metadata is
+not a remote byte-hash comparison; visual readability is owner evidence.
+The single-email delivery/attachment gate is closed. No extra email or retry was
+sent. Do not repeat the approved fixture after resumption.
+The safe result receipt SHA256 is
+`02139c208969218dbe2a4238fe2daf94ec2d25b8b0b54b4fd2a8fc3121fef398`.
+
+### Android local-child compatibility candidate `23ac884`
+
+Only exact `about:blank`/`about:srcdoc` child documents are admitted; the shared
+request predicate is used by navigation and resource interception. The main page
+remains exact and outbound child resources remain restricted to Cloudflare HTTPS.
+Local document admission does not create networking. Variations, query/fragment,
+data/file/javascript and unrelated hosts fail the regression policy.
+
+Forced-fresh full Debug/Release Java runs each pass76 tests with zero failures,
+errors or skips, including all eight required report suites. Both APK builds,
+resolver/runtime/licence package guards and lint pass (0 errors/42 warnings
+per variant). Native source is unchanged: four-ABI packaged libraries and
+incremental CMake tasks are not new per-ABI compiler or physical-device proof.
+
+- Debug APK SHA256 `35776e1cb18d2089211a807e3c0f7a24bb15b31b248154684ed1a523125b9b10`.
+- Unsigned Release APK SHA256 `b1d75c250ebbce46ebf047821200b281f7484d83e6cc008f5573363fd231f36c`.
+- Complete receipts `android-child-documents-gradle.log`,
+  `android-child-documents-tests.log` (SHA256
+  `e48e712b3b2cd436d91b03ec0564476e06ffb83c15466468153b8298ec8419d4`) and
+  `android-child-documents-guards.log` (SHA256
+  `ca863411ad09068d47fd1e95484ca231dfd5945eb16c7ad3d4574dbb0394e242`).
+  The earlier ineffective transcript-header-only file is not a result receipt.
+
+No phone install, actual Android WebView verification or lifecycle acceptance.
+
 ## Next unfinished step
 
-Android reviewed checkpoint/fresh source and merge-state CI are complete.
+Earlier `52d3ed2` checkpoint source/merge-state CI is complete; later native-form
+and Android compatibility commits still require their fresh integrated CI.
 Windows synchronous transport candidate is superseded by the reviewed bounded
-asynchronous owner above; its negative evidence is retained. Next: integrate
-and validate the remote-first native form and consented render-owner capture
-hook. The accepted Android APK has not been reinstalled for unrelated checks.
+asynchronous owner above; its negative evidence is retained. Native remote-form
+integration `d6d187e` and affected host builds/tests are complete. Android
+child-document compatibility `23ac884` now passes its current build/lint/package
+and76-test gates; previous75-test artifacts are retained as historical evidence.
+Neither phone has been installed or disturbed for unrelated checks.
 Existing Turnstile hostname admission is now verified from the authenticated
 dashboard; no owner sign-in or widget change is pending.
-Then send only the approved single labelled fixture email and verify the
-attachment/delivery. No email has been sent yet. Windows remote UI/transport and
-actual device/lifecycle acceptance remain open; local JSON remains fallback.
+Next: push reviewed commits and inspect fresh current-source/PR-integration CI
+(current runs remain discoverable from PR15/head SHA), then affected full-game consented
+capture/UI and exact-device WebView/lifecycle acceptance. The single fixture
+email is delivered and accepted; do not resend it. Local JSON remains fallback.
 
 Audio/haptic manual revalidation required:NO (reporting/readback only; feedback,
 playback, source events, assets, music and haptics unchanged).

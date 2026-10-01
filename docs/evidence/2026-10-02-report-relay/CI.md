@@ -1,4 +1,30 @@
-# Fresh Android remote-form checkpoint CI
+# Fresh report-integration checkpoint CI
+
+## Windows helper / SDK checkpoint `52d3ed2`
+
+Both branch heads are `52d3ed2001021e01d5017e6b845059c57275ad2c` at this
+receipt. These are fresh source and integration runs, not old-job reruns.
+
+- [Push36922430459](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/36922430459): SUCCESS.
+- [PR36922432778](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/36922432778): SUCCESS.
+- All ten actual job logs: each GCC56, Clang56, MSVC61, Vulkan CPU-host15 and
+  Android75, zero failures/errors/skips. The Android aggregate is explicitly
+  printed from the test XML. Four native ABIs, lint, runtime/licence package
+  checks and required report-suite presence pass. Windows explicitly restores
+  and verifies the pinned WebView2 SDK before configure; no runtime installation.
+- PR15 draft/open/CLEAN. Synthetic integration
+  `8036e0a426353b20426eb2de536d22ccc2e65b72` has exact main
+  `bda1b99a62e1de883273dd21f267bcfc92bc5490` and checkpoint parents. Tree
+  `3e418c865c9d34cc999c4dd9ce00525036db6d03` matches the checkpoint head.
+- Actual raw push log `C:/Dev/tmp/horde-report-submission-20261002/ci-52d3ed2-push.log`
+  SHA256 `68aff9f173258a9704008f0da183842ebd652ea9501eaf2d031111a9589d3579`;
+  PR log `ci-52d3ed2-pr.log` SHA256
+  `7bb9995a4aa97d1a96240d90638843590a55f065dc9a6fcb84330df2097388bf`.
+
+This proves helper/SDK contracts and compilation, not later remote-form/app
+integration, real challenge completion, phone interaction or email delivery.
+
+## Android remote-form checkpoint `301105f`
 
 Reviewed current head `301105f595bcb33ffc87968a90c0f2673247da74`, not an old-job
 rerun. Both engineering/profile remote branch heads were verified identical.

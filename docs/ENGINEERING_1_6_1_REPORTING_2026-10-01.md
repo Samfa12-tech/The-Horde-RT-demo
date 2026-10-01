@@ -5,7 +5,7 @@ this slice does not reopen player, glass or music work. Original dirty engineeri
 checkout and scratch files remain untouched. No main merge, release or publication.
 Shared contract3e0f9be; reviewed native integration69afe4e.
 
-## October2 remote foundation — current unfinished slice
+## October2 remote integration — current slice
 
 Owner clarified the finished experience: in-game report delivery through the
 existing Briarhold Cloudflare architecture, not primarily local JSON export.
@@ -35,18 +35,34 @@ thumbnail, with all opt-ins default-off and separate offline fallback. Pause
 preserves an uncertain same-ID retry; stale confirmations cannot replace it.
 Debug/Release each75/75 Java tests, four native ABIs, both APK builds and package
 guards pass; lint0 errors/42 warnings each. Actual RT PNG decoder admission is
-tested offline with outbound requests denied. No phone install, real WebView,
-delivery or Windows remote pass is claimed. See the [finite receipts](evidence/2026-10-02-report-relay/README.md)
+tested offline with outbound requests denied. Those earlier artifacts do not
+certify the new Android child-document compatibility patch. No phone install or
+exact-device WebView/lifecycle acceptance is claimed. See the [finite receipts](evidence/2026-10-02-report-relay/README.md)
 for exact artifacts and boundaries. Live health/page200, invalid schema400 and
 invalid-token native wire403 are not successful verification/email evidence.
 
-Next finite steps: reviewed Android checkpoint/current CI; bounded async Windows
-transport and native verification/form integration; Turnstile existing-widget
-hostname admission; one approved fixture email and attachment acceptance;
-affected platform/device/lifecycle evidence. Existing OAuth
-cannot manage widgets and the dashboard is signed out. Owner sign-in requested
-once; do not copy/rotate credentials, resend the question or substitute fake
-verification. No completed measurement/player/music investigations reopen.
+Windows now has reviewed bounded async transport, private native verification,
+remote-first form and consented application/render-owner image hook (`d6d187e`).
+Vulkan-enabled Debug/Release app builds and each5/5 affected reporting CTests
+pass. Authenticated inspection confirms the existing widget admits the reporting
+host; no settings/credentials changed. Exact local child documents are permitted
+without broadening fixed-page or outbound HTTPS origins. Real Windows
+verification and one approved synthetic fixture exchange returned202/queued;
+owner-confirmed email/diagnostics/screenshot acceptance and a bounded authorised
+Gmail body/PNG-attachment read close that single-email gate. The guarded utility
+`4d0dad7` is outside default/Shipping builds and CTest; do not resend the fixture.
+
+Android child-document compatibility `23ac884` now passes forced-fresh full
+Debug/Release76/76 Java tests, both APK/package guards and lint0 errors/42 warnings
+per variant. Native source is unchanged; incremental four-ABI packaging is not
+new compiler/device certification. Exact new APK hashes are in the finite record;
+no install or device WebView acceptance is inferred.
+
+Next finite steps: push the reviewed current-source checkpoint/fresh CI, then affected full-game capture/UI
+and exact-device WebView/lifecycle evidence. Keep host/injected tests distinct
+from device acceptance. Do not copy/rotate credentials, repeat the sign-in
+question or substitute fake verification. No completed measurement/player/music
+investigations reopen.
 Audio/haptic manual revalidation required:NO (reporting-only, unchanged feedback).
 
 ## Historical implemented local boundary
