@@ -1,9 +1,12 @@
 package com.samfa12.hordelanternrt;
 
+import android.content.Context;
 import android.content.res.AssetManager;
 import android.media.AudioAttributes;
 import android.media.AudioFormat;
 import android.media.AudioTrack;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 // Thin PCM sink. Cue decisions and Core mixing stay native; no Java music engine.
@@ -13,14 +16,16 @@ final class HordeMusicPlayback implements AutoCloseable {
     private static final int FRAMES = 480;
     private static final int MAX_BUFFER_FRAMES = 12000; // 250ms maximum, music only; SFX independent.
     private final Object controlLock = new Object();
-    private final AssetManager assets;
+    private final Context context;
+    private final MusicAudioFocus audioFocus;
     private final Thread worker;
     private boolean stopped = false;
     private boolean suspended = true;
     private int volume = 70;
 
-    HordeMusicPlayback(AssetManager assets, int volume) {
-        this.assets = assets; // Strong reference through native asset loading.
+    HordeMusicPlayback(Context context, int volume) {
+        this.context = context.getApplicationContext() != null ? context.getApplicationContext() : context;
+        this.audioFocus = new MusicAudioFocus(this.context, new Handler(Looper.getMainLooper()));
         this.volume = Math.max(0, Math.min(100, volume));
         Thread candidate = null;
         try {
@@ -29,15 +34,19 @@ final class HordeMusicPlayback implements AutoCloseable {
         } catch (RuntimeException | LinkageError | OutOfMemoryError error) {
             synchronized (controlLock) { stopped = true; }
             Log.e(TAG, "Music worker unavailable; RT and SFX unchanged", error);
+            audioFocus.close();
         }
         worker = candidate;
     }
     void setSuspended(boolean value) {
+        boolean focusEligible;
         synchronized (controlLock) {
             if (stopped) return;
             suspended = value;
+            focusEligible = !suspended;
             controlLock.notifyAll(); // Worker pauses without flushing accepted PCM.
         }
+        audioFocus.setEligible(focusEligible);
     }
     void setVolumePercent(int value) {
         synchronized (controlLock) {
@@ -51,6 +60,7 @@ final class HordeMusicPlayback implements AutoCloseable {
             stopped = true;
             controlLock.notifyAll();
         }
+        audioFocus.close();
         if (worker == null) return; // Thread construction failed; no worker owns resources.
         // Only worker finally destroys native PCM/storage. A slow startup cannot
         // make the UI free a bank still in use; don't hang the Activity forever.
@@ -89,7 +99,7 @@ final class HordeMusicPlayback implements AutoCloseable {
         long nativeHandle = 0L;
         AudioTrack output = null;
         try {
-            nativeHandle = nativeCreate(assets);
+            nativeHandle = nativeCreate(context.getAssets());
             if (nativeHandle == 0L) throw new IllegalStateException("Native music bank unavailable");
             final int minimumBytes = AudioTrack.getMinBufferSize(48000,
                     AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_FLOAT);
@@ -112,7 +122,7 @@ final class HordeMusicPlayback implements AutoCloseable {
                 final boolean externallySuspended;
                 synchronized (controlLock) {
                     if (stopped) break;
-                    externallySuspended = suspended;
+                    externallySuspended = isSuspended(suspended, audioFocus.isGranted());
                 }
                 final int requestedVolume;
                 synchronized (controlLock) { requestedVolume = volume; }
@@ -135,7 +145,7 @@ final class HordeMusicPlayback implements AutoCloseable {
                 generated = control[3]; // Native content clock, not accepted/device-played frames.
                 synchronized (controlLock) {
                     if (stopped) break;
-                    if (suspended || control[2] != 0L) {
+                    if (isSuspended(suspended, audioFocus.isGranted()) || control[2] != 0L) {
                         if (playing) output.pause();
                         playing = false;
                     } else if (!playing) { output.play(); playing = true; }
@@ -178,6 +188,8 @@ final class HordeMusicPlayback implements AutoCloseable {
                 stopped = true;
                 controlLock.notifyAll();
             }
+            // Audio-focus APIs stay on the main thread, including worker failure.
+            audioFocus.close();
             try {
                 releaseOutput(output);
             } finally {
@@ -204,6 +216,10 @@ final class HordeMusicPlayback implements AutoCloseable {
     private static void logCleanupFailure(String message, Throwable error) {
         try { Log.w(TAG, message, error); }
         catch (Throwable ignored) { /* Cleanup must continue even if logging is unavailable. */ }
+    }
+
+    static boolean isSuspended(boolean lifecycleSuspended, boolean focusGranted) {
+        return lifecycleSuspended || !focusGranted;
     }
 
     private static native long nativeCreate(AssetManager assets);

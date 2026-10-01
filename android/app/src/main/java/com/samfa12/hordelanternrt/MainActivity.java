@@ -346,7 +346,7 @@ public class MainActivity extends Activity {
         }
 
         initialiseAudio();
-        musicPlayback = new HordeMusicPlayback(getAssets(), musicVolumePercent());
+        musicPlayback = new HordeMusicPlayback(this, musicVolumePercent());
         menuButton.setOnClickListener(view -> {
             playSound("menu_toggle", 0.20f);
             showMainMenu(false);
