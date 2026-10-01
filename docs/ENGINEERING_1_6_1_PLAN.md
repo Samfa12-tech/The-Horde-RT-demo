@@ -223,6 +223,11 @@ branch/commits; Windows/Android/CI/SPIR-V results; S24/S25 cause and fix evidenc
 viewmodel status and owner capture matrix; glass matched evidence; music/reporting
 status; confirmed exact RT devices; remaining 1.6.1 work and final-pass readiness.
 
-Hotstrike redistribution and signing backup/recovery remain owner-only. Do not
+Hotstrike redistribution and signing backup/recovery remain owner-only. The owner
+has contacted Hotstrike and tracks the unresolved permission issue on GitHub;
+on October1 they explicitly state it does **not** block publication of this update.
+Keep the issue open, provenance and licence statements unchanged, and do not
+autonomously replace the asset or rewrite history/distribution. This is not new
+licence permission or publication authorisation. Do not
 rewrite history, remove/replace the skeleton, change licences/distribution, spend
 paid generation credits casually, publish, or declare absent device evidence green.

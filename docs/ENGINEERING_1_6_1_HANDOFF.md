@@ -15,6 +15,20 @@ after coherent reviewed slices, preserving unrelated files and verifying remote 
 
 ### October 1 local player-report integration (current checkpoint)
 
+Latest owner performance steering: sustained30FPS at75% remains the goal, but
+allow only one or two further bounded, materially promising trials before an
+honest achieved-performance decision. Do not burn a broad investigation on small
+millisecond savings or silently make visual cuts. Benchmark-counter live checks
+are deferred after app/menu-only inspection; no benchmark was started.
+Hotstrike permission remains an owner-managed open GitHub issue after contact;
+owner states it will not block publishing this update. Asset/licence/history stay
+unchanged, no permission is inferred and publication is still unauthorised.
+Exact S24 is reconnected by renewed owner instruction; previous handback notes
+are historical, not a current prohibition. Use explicit serial/model matching.
+The next bounded performance candidate is tracked in the [primary opacity
+experiment](ENGINEERING_1_6_1_PRIMARY_OPACITY_2026-10-01.md). No gain or image
+equivalence is established yet; do not repeat rejected first-blocker/split trials.
+
 Shared contract3e0f9be and native integration69afe4e add paused Android/Windows
 report forms and explicit foreground local JSON export. Separate export/context
 choices reset off; strict Unicode/multiline, privacy/size limits, frozen explicit

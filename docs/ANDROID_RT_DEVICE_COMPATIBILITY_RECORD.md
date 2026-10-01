@@ -1218,6 +1218,14 @@ owns completed checks and the next unfinished step. No glass/Shipping-performanc
 or other-device acceptance. Audio/haptic manual revalidation required: **YES**
 for playback change; exact-candidate owner rate/crackle check now passes.
 
+## October 1, 2026 - renewed S24 availability
+
+Owner explicitly reconnects the S24. Fresh local ADB inventory identifies exact
+**SM-S928B**, serial R5CXC0G9GBW, alongside **SM-S948B**, serial R5GL219SZGK.
+This supersedes the earlier handback restriction; it is identity/availability
+evidence only, not new image, performance, RT presentation or release acceptance.
+The missing-hands/starting-enemy visual follow-up is open. S25 remains untested.
+
 ## Research sources
 
 - [Android NDK stable APIs - Vulkan runtime capability guidance](https://developer.android.com/ndk/guides/stable_apis)
