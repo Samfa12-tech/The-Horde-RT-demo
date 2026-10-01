@@ -79,6 +79,39 @@ evidence; remaining High/backend/report/music/final gates. Do not repeat the
 completed finite device/image matrix. No release/main merge/publication.
 Audio/haptic manual revalidation required:NO (renderer-only/unchanged playback).
 
+### October 2 bounded High/backend evidence reconciliation
+
+Offline review narrows the retained Mobile RTX backend failures to six pixels in
+five images; exact coordinates/RGB and the unchanged comparator counts are in
+the [existing experiment evidence](evidence/2026-10-01-primary-opacity/README.md#october2-bounded-backend-coordinate-review).
+Lead verifies those six pairs against original PNGs. No proven cause, shader edit,
+new capture or relaxed tolerance. The common primary formula is unchanged; this
+does not establish bit-identical native rays/intersections or shading. Next
+discriminator is hit/material/transport identity at those pixels, not a full rerun.
+
+Do not conflate the S26 Diagnostic/Mobile four-interface fifth-hit witness with
+High's eight-interface path. Actual Mobile panes are deliberately omitted by the
+owner's profile decision; the historical nonzero truncation remains preserved,
+not declared physically repaired. Current three RTX High pipeline fixtures have
+zero transport/stack/interface/volume/open/mismatch/shadow failure counters. They
+retain566 certified recoveries (reason1) in glass-edge,533/236 same-medium pane
+secondary terminals and149/94 TIR terminations in held-high/low. These bounded
+counters still need physical interpretation; zero reported failures is not full
+High correctness. See [current High receipts](evidence/2026-10-02-tlas-instance-refresh/README.md).
+
+The last full ordinary High ledger atd63e29 has one pipeline mismatch atrow43/
+tick646, compute zero. Its [native witness](evidence/2026-09-30-glass-spawn/derived-normal-bias/row43/README.md)
+proves a near-coincident outside-origin edge event and slightly different native
+ray directions, not a camera-inside exit or a universal triangle tolerance.
+Production shader sources are unchanged since that ledger (only unused experimental
+staged-primary source was added); current TLAS/host changes do not themselves
+prove the event repaired. It is last demonstrated evidence, not a freshly
+reproduced current-head live failure. The smallest next High discriminator is
+matched current-source row43/tick646 replay at100%/1232x803 on both RTX backends,
+retaining counters/images and unchanged gates. No budget increase, counter
+suppression, driver inference, Mobile-performance claim or player reopening.
+Audio/haptic manual revalidation required:NO for this read-only/document slice.
+
 ### October 1 local player-report integration (historical checkpoint)
 
 Latest owner performance steering: sustained30FPS at75% remains the goal, but

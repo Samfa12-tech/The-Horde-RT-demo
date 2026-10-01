@@ -75,6 +75,27 @@ over-one1.157e-5/1.93e-6/1.93e-6/5.79e-6/7.72e-6. Full comparator also fails cap
 timing+3.880%; see `windows/control-backend-comparison.json`. Candidate's within-
 backend byte equality preserves those same differences. No tolerance loosened.
 
+### October2 bounded backend-coordinate review
+
+Offline extraction of the retained controls locates six pixels with RGB delta>3
+across those five failed images. [Exact coordinates/colours](windows/backend-pixel-coordinates.json),
+SHA256 `4b8d8b386e5b66251d7fbee1193c6d333736853fe0b8208c09d5c2f8aca6eece`,
+matches all five original maximum-difference and over-one counts. Lead independently
+checks all six coordinate/RGB pairs against both original PNGs. Full-frame viewing
+does not confidently classify these one-pixel locations or establish their cause.
+Blue/red share (396,262), but that alone is not a hit/material/driver diagnosis.
+
+Retained manifests agree on scene/camera, Mobile Diagnostic quality,960x540 extent,
+settling frames, CPU geometry and assets. Primary ray arithmetic is common in
+`rt_frame.glsl`: pipeline launch ID/extent and compute invocation ID/image extent
+feed the same calculation. The8x8 compute dispatch guards its four padded rows
+before any trace/write. Source review shows no differing primary formula; it does
+not prove identical hardware intersections, intermediate shading or float results.
+No new capture, build, shader edit, tolerance change or inference from shader size.
+Next unfinished discriminator is first-hit/material or transport identity at these
+specific pixels, rather than repeating the full matrix or speculative global math
+changes. Shipping/Diagnostic parity is separate; all five backend gates stay open.
+
 Next: normal source/evidence integration, then bounded S24 numeric primary hit
 counts by named instance before metadata classification. Current aggregate player
 count depends on metadata after hit decode, so zero alone does not isolate AS
