@@ -30,6 +30,10 @@ option(HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW "Build the Win32 diagnostic shel
 option(HORDE_RT_BUILD_VULKAN_TARGETS "Build targets that require a Vulkan SDK" ON)
 
 include(CTest)
+if(WIN32 AND (BUILD_TESTING OR (HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW)))
+    include(cmake/HordeRtWebView2.cmake)
+    horde_rt_add_report_webview2("${CMAKE_CURRENT_SOURCE_DIR}")
+endif()
 include(cmake/HordeRtPocketAudioCore.cmake)
 horde_rt_add_pocket_audio_core("${CMAKE_CURRENT_SOURCE_DIR}" "${BUILD_TESTING}")
 if(BUILD_TESTING)
@@ -648,6 +652,17 @@ if(BUILD_TESTING)
         add_test(NAME horde_rt_windows_playtest_submission_tests
             COMMAND horde_rt_windows_playtest_submission_tests)
         set_tests_properties(horde_rt_windows_playtest_submission_tests PROPERTIES TIMEOUT 60)
+
+        add_executable(horde_rt_windows_playtest_verification_tests
+            tests/WindowsPlaytestVerificationTests.cpp
+            src/platform/windows/WindowsPlaytestVerification.cpp)
+        target_include_directories(horde_rt_windows_playtest_verification_tests PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/src)
+        target_link_libraries(horde_rt_windows_playtest_verification_tests PRIVATE
+            horde_rt_report_webview2 bcrypt user32)
+        add_test(NAME horde_rt_windows_playtest_verification_tests
+            COMMAND horde_rt_windows_playtest_verification_tests)
+        set_tests_properties(horde_rt_windows_playtest_verification_tests PROPERTIES TIMEOUT 30)
 
         add_executable(horde_rt_windows_playtest_report_ui_tests
             tests/WindowsPlaytestReportUiTests.cpp

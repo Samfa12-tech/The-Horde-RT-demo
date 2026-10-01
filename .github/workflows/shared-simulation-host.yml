@@ -143,6 +143,11 @@ jobs:
           "tests/fixtures/*/*.glb"
           "assets/audio/music/what-the-dark-keeps/runtime/*.wav"
 
+      - name: Restore pinned Windows report-verification SDK
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./tools/restore-report-webview2.ps1
+
       - name: Configure non-hardware host tests
         run: >-
           cmake -S . -B build/host-ci

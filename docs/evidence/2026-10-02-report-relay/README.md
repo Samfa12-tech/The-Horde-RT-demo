@@ -9,6 +9,13 @@ No main merge, game release or publication.
 
 - Public native envelope/foreground HTTPS owner: `cf156c2`, verified pushed on
   both `codex/horde-mobile-lantern-profile` and the engineering branch.
+- Render-owner capture/readback `046fa3e`/`33cb7c4`, Android remote form
+  `ed43e30`, required report-suite CI `301105f` are reviewed/pushed on both.
+  Fresh [push36917677635](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/36917677635)
+  and [PR36917683622](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/36917683622)
+  PASS actual GCC56/Clang56/MSVC58/Vulkan CPU-host15/Android75 each. Exact
+  synthetic merge parents/head-identical tree checked; draft PR15 CLEAN/MERGEABLE.
+  [Current checkpoint CI receipt](CI.md). This does not certify later Windows code.
 - Private shared relay: reviewed `fd104d7`, durable notes `0743e98`, pushed to
   its private branch. Existing mailbox, sender, bindings and provider retained.
   Deployed Worker `1ca58068-e876-4016-be6f-b1ac4d2035ed`.
@@ -108,14 +115,49 @@ real phone WebView/readback/lifecycle or delivery.
 - Earlier72-test APK/unsigned build receipts are intermediate artifacts, not
   this accepted source. No phone install or owner acceptance is claimed here.
 
+## Windows bounded adapters
+
+Reviewed native helpers preserve the fixed HTTPS relay, default TLS checks,
+no redirects/authentication/cookies, 768KiB request and8KiB response bounds.
+The30s attempt deadline starts before worker admission. UI cancellation signals
+an owned event; it does not join the worker. WinHTTP keeps a separate callback
+reference to its request/read buffers through HANDLE_CLOSING. Two retained
+contexts maximum fail closed if the OS never retires callbacks. This bounded
+retirement limitation is not represented as guaranteed OS cleanup.
+
+Frozen consented ID/body survives only in memory for explicit fresh-token retry.
+Exact matching202 accepted means queued, not email delivery;200 sent is distinct.
+Debug2/2 and Release2/2 screenshot/transport CTests pass after final ownership
+review. Tests include real localhost-only asynchronous WinHTTP callback-context
+delivery plus injected transport cancellation/deadline/stale/ACK contracts; they
+do not establish successful production HTTP/verification or inbox delivery.
+Receipts: `windows-adapters-debug-final.log`, `windows-adapters-release-final.log`.
+
+WIC produces lossless metadata-free RGB8 PNG at the unchanged512KiB cap.
+Initial24bppRGB codec request failed; the supported24bppBGR input plus explicit
+conversion passes actual pixel-decoder/RGB assertions, including cap rejection.
+No automatic additional shrink/omission, OS screenshot or file source.
+
+Verification uses the pinned native WebView2 SDK, installed Evergreen Runtime,
+read-back-confirmed InPrivate profile, fixed page/challenge origins, random
+nonce,4KiB parser and20s foreground deadline. It receives no report/image.
+Generation-checked posted completion avoids controller teardown inside browser
+callbacks. Missing Runtime/interface/timer fails closed, never auto-installs.
+Pure contracts pass Debug1/1 and Release1/1 through repository CMake.
+Direct compiler success initially missed COM-header/resource macro requirements
+in CMake; explicit COM include/wide cursor resource fixes close those build
+failures without changing the SDK. Receipts: `windows-verification-debug-final.log`
+(failed), `windows-verification-debug-com-include.log` (failed),
+`windows-verification-debug-integrated.log`, `windows-verification-release-integrated.log`.
+No real WebView/Turnstile success or device acceptance is inferred.
+
 ## Next unfinished step
 
-Push the reviewed Android checkpoint and require fresh source/merge-state CI.
-Windows remote transport is a separate bounded implementation slice: the first
-synchronous candidate cannot guarantee active cancellation/total deadline and
-is not admitted to production. Replace that demonstrated limitation with a
-small asynchronous request owner before UI integration; preserve the negative
-candidate evidence rather than claiming callback invalidation cancels network.
+Android reviewed checkpoint/fresh source and merge-state CI are complete.
+Windows synchronous transport candidate is superseded by the reviewed bounded
+asynchronous owner above; its negative evidence is retained. Next: integrate
+and validate the remote-first native form and consented render-owner capture
+hook. The accepted Android APK has not been reinstalled for unrelated checks.
 Existing Turnstile hostname admission needs the requested owner dashboard
 sign-in; do not repeat the request or copy/broaden credentials.
 Then send only the approved single labelled fixture email and verify the

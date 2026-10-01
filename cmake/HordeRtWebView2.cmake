@@ -46,5 +46,5 @@ function(horde_rt_add_report_webview2 repo_root)
     set_target_properties(horde_rt_report_webview2 PROPERTIES
         IMPORTED_LOCATION "${HORDE_RT_WEBVIEW2_SDK_ROOT}/build/native/${architecture}/WebView2LoaderStatic.lib"
         INTERFACE_INCLUDE_DIRECTORIES "${HORDE_RT_WEBVIEW2_SDK_ROOT}/build/native/include"
-        INTERFACE_LINK_LIBRARIES "ole32;shlwapi;version")
+        INTERFACE_LINK_LIBRARIES "ole32;shlwapi;version;advapi32")
 endfunction()

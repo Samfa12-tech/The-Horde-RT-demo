@@ -1353,6 +1353,23 @@ or S25 certification is inferred. External focus-loss/return owner check is pend
 [Finite receipts](evidence/2026-10-02-music-focus/README.md).
 Audio/haptic manual revalidation required:YES for music interruption/recovery only.
 
+## October 2, 2026 - report-relay candidate compiler/host evidence
+
+This is **local build/host evidence, not a new exact-device pass**. Reviewed
+Android remote-form checkpoint `ed43e30` adds default-off consent/context/game
+image opt-ins, verification-only WebView and same-ID explicit retry after pause.
+Shared thumbnail/JNI ownership checkpoint `33cb7c4` captures only presented
+paused game RT, never an OS screenshot. Debug/Release each75/75 Java tests,
+four native ABIs, both APKs and exact runtime/licence package guards pass;
+lint0 errors/42 warnings each. Debug SHA256
+`3127c2a11701c12ea3a393e5bebcd1c4a700f14f14fba580f9abedfb36c7a1ff`;
+unsigned Release `bf39acdbecf3618934afe0269717368ae2de688c2aa3085f2dd1decb82499345`.
+No phone installed/overwritten in this slice. Real SM-S948B/SM-S928B capture,
+WebView/Turnstile and lifecycle acceptance remain open; S25 stays unverified.
+Pending owner music-focus and S24 live hands/enemy checks remain undisturbed.
+[Finite receipts](evidence/2026-10-02-report-relay/README.md).
+Audio/haptic manual revalidation required:NO (reporting only).
+
 ## Research sources
 
 - [Android NDK stable APIs - Vulkan runtime capability guidance](https://developer.android.com/ndk/guides/stable_apis)

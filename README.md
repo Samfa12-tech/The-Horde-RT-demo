@@ -146,6 +146,7 @@ See:
 ### Windows
 
 ```powershell
+.\tools\restore-report-webview2.ps1
 $cmake = "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe"
 & $cmake -S . -B build
 & $cmake --build build --config Debug --target horde_rt_diagnostic_window
@@ -153,6 +154,11 @@ $cmake = "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7
 ```
 
 The standalone capability probe remains available as target `horde_rt_capability_probe`.
+
+The explicit restore verifies the pinned native WebView2 SDK used only for
+foreground report verification. Configure never downloads it. The game uses an
+installed compatible Evergreen Runtime; it does not install a Runtime and keeps
+offline report export available if verification is unavailable.
 
 Additive Visual Studio configure/build/test presets are also available:
 
