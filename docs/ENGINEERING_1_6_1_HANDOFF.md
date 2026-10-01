@@ -51,6 +51,14 @@ unavailable counters are gaps. Preserve unfinished reporting work at a reviewed
 checkpoint before renderer edits. Phone remains disconnected. No main merge,
 release or publication; no assumed additive omission savings or30FPS promise.
 
+The in-flight reusable reporting contract is preserved at a reviewed unwired
+checkpoint: consent/context default off, typed bounded UTF-8/JSON projection,
+privacy rejection and explicit retry/cancel identity. No endpoint/UI/upload.
+Focused MSVC Debug/Release1/1 and lead ASan1/1 PASS after demonstrated fixture/path/
+Unicode defects were corrected. [Evidence](evidence/2026-10-01-report-contract/README.md).
+Platform forms/local export/remote real delivery remain unfinished; no scope loss.
+Audio/haptic manual:NO. Resume renderer experiment next, not further reporting.
+
 ### October 1 Android music output checkpoint
 
 Core-backed native bank/session plus bounded AudioTrack worker is now wired with
