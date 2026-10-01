@@ -211,6 +211,25 @@ final class PlaytestReportSubmission {
         }
     }
 
+    /**
+     * Stops only the current foreground attempt on lifecycle interruption. HTTP
+     * cancellation cannot establish non-acceptance: retain the exact ID/body for
+     * an explicit same-report retry with fresh verification after returning.
+     * Invalidates old callbacks and never enqueues a retry by itself.
+     */
+    boolean interruptInFlight() {
+        ActiveCall old;
+        synchronized (this) {
+            if (state != State.IN_FLIGHT) return false;
+            ++generation;
+            state = State.RETRYABLE;
+            old = active;
+            active = null;
+        }
+        if (old != null) old.cancel(); // Bounded asynchronous disconnect, never on the UI thread.
+        return true;
+    }
+
     void cancel() {
         ActiveCall old;
         synchronized (this) {

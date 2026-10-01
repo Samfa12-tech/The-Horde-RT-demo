@@ -178,6 +178,78 @@ public final class PlaytestReportSubmissionTest {
         assertEquals(ID, f.owner.reportId());
     }
 
+    @Test public void lifecycleInterruptionBeforeDispatchRetainsIdentityWithoutBackgroundRetry() {
+        Fixture f = new Fixture();
+        long first = f.owner.attempt();
+        assertTrue(f.owner.submit(first, "old-token", f.callback));
+        assertTrue(f.owner.interruptInFlight());
+        assertEquals(PlaytestReportSubmission.State.RETRYABLE, f.owner.state());
+        assertEquals(ID, f.owner.reportId());
+        assertFalse(f.owner.interruptInFlight());
+        f.executor.runNext();
+        assertTrue(f.requests.isEmpty());
+        assertTrue(f.results.isEmpty());
+        assertTrue(f.executor.jobs.isEmpty()); // Interruption is not permission to send again.
+        assertFalse(f.owner.submit(first, "stale-token", f.callback));
+        long retry = f.owner.retry();
+        assertTrue(retry > first);
+        assertTrue(f.owner.submit(retry, "fresh-token", f.callback));
+        f.executor.runNext();
+        assertEquals(ID, f.owner.reportId());
+        assertEquals(1, f.requests.size());
+        assertEquals(new String(json(), StandardCharsets.UTF_8),
+                new String(f.requests.get(0), StandardCharsets.UTF_8)
+                        .replace(",\"turnstileToken\":\"fresh-token\"}", "}"));
+        assertEquals(1, f.results.size());
+        assertEquals(PlaytestReportSubmission.ResultCode.QUEUED, f.results.get(0).code);
+        assertFalse(f.owner.interruptInFlight()); // Do not turn acknowledged acceptance into uncertainty.
+    }
+
+    @Test public void lifecycleInterruptionDuringHttpSuppressesOldCallbackAndPreservesFrozenRetry() throws Exception {
+        QueuedExecutor executor = new QueuedExecutor();
+        QueuedExecutor cleanup = new QueuedExecutor();
+        CountDownLatch entered = new CountDownLatch(1), release = new CountDownLatch(1);
+        List<byte[]> requests = new ArrayList<>();
+        List<PlaytestReportSubmission.Result> results = new ArrayList<>();
+        FakeCall blocking = new FakeCall(ack(202, ID, "accepted"), entered, release);
+        PlaytestReportSubmission owner = new PlaytestReportSubmission(executor, body -> {
+            requests.add(body.clone());
+            return requests.size() == 1 ? blocking : new FakeCall(ack(200, ID, "sent"));
+        }, (work, delay) -> () -> {}, cleanup::execute);
+        assertTrue(owner.begin(prepared(), true));
+        long first = owner.attempt();
+        assertTrue(owner.submit(first, "old-token", (attempt, result) -> results.add(result)));
+        Runnable request = executor.jobs.remove(0);
+        Thread worker = new Thread(request, "report-lifecycle-fixture");
+        worker.start();
+        try {
+            assertTrue(entered.await(2, TimeUnit.SECONDS));
+            assertTrue(owner.interruptInFlight());
+            assertEquals(PlaytestReportSubmission.State.RETRYABLE, owner.state());
+            assertEquals(ID, owner.reportId());
+            assertFalse(blocking.cancelled); // Disconnect is off the calling/UI thread.
+            assertEquals(1, cleanup.jobs.size());
+            cleanup.runNext();
+            worker.join(2000);
+            assertFalse(worker.isAlive());
+            assertTrue(results.isEmpty());
+            assertTrue(executor.jobs.isEmpty());
+            assertTrue(owner.submit(owner.retry(), "fresh-token", (attempt, result) -> results.add(result)));
+            executor.runNext();
+            assertEquals(2, requests.size());
+            assertEquals(new String(requests.get(0), StandardCharsets.UTF_8)
+                            .replace(",\"turnstileToken\":\"old-token\"}", "}"),
+                    new String(requests.get(1), StandardCharsets.UTF_8)
+                            .replace(",\"turnstileToken\":\"fresh-token\"}", "}"));
+            assertEquals(1, results.size());
+            assertEquals(PlaytestReportSubmission.ResultCode.SENT, results.get(0).code);
+        } finally {
+            release.countDown();
+            worker.join(2000);
+            owner.cancel();
+        }
+    }
+
     @Test public void typedAcknowledgmentsAndRetryStatusesAreDistinct() {
         Fixture f = new Fixture();
         f.next = ack(200, ID, "sent");

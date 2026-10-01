@@ -27,16 +27,23 @@ same-report retries. Late/cancelled callbacks cannot complete another attempt.
 202 means queued, not delivered email;200 means relay-confirmed sent. Provider
 crash after acceptance/before durable state remains at-least-once, not exactly-once.
 
-Current evidence: MSVC Debug/Release3/3 affected reporting CTests; Android
-transport14/14 focused tests; private Worker50/50 tests including actual workerd
-PNG/SQLite fixture, clean tooling audit0 and deployment. Live health/page200,
-invalid schema400, actual native wire fixture plus invalid token403. No email
-acceptance, native remote UI/capture, Android application/device or Windows
-remote-delivery pass is claimed. Existing local export remains functional.
+Current evidence: MSVC Debug/Release3/3 affected reporting CTests; one actual RTX
+game-only readback; private Worker50/50 tests including actual workerd PNG/SQLite
+fixtures, clean tooling audit0 and deployment. Android now implements the primary
+remote form, verification-only WebView and generation-owned render-thread game
+thumbnail, with all opt-ins default-off and separate offline fallback. Pause
+preserves an uncertain same-ID retry; stale confirmations cannot replace it.
+Debug/Release each75/75 Java tests, four native ABIs, both APK builds and package
+guards pass; lint0 errors/42 warnings each. Actual RT PNG decoder admission is
+tested offline with outbound requests denied. No phone install, real WebView,
+delivery or Windows remote pass is claimed. See the [finite receipts](evidence/2026-10-02-report-relay/README.md)
+for exact artifacts and boundaries. Live health/page200, invalid schema400 and
+invalid-token native wire403 are not successful verification/email evidence.
 
-Next finite steps: native consented render-owner screenshot/UI integration;
-Turnstile existing-widget hostname admission; one approved fixture email and
-attachment acceptance; affected platform/CI/lifecycle evidence. Existing OAuth
+Next finite steps: reviewed Android checkpoint/current CI; bounded async Windows
+transport and native verification/form integration; Turnstile existing-widget
+hostname admission; one approved fixture email and attachment acceptance;
+affected platform/device/lifecycle evidence. Existing OAuth
 cannot manage widgets and the dashboard is signed out. Owner sign-in requested
 once; do not copy/rotate credentials, resend the question or substitute fake
 verification. No completed measurement/player/music investigations reopen.

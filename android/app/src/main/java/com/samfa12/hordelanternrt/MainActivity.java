@@ -12,6 +12,8 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.graphics.Color;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.media.AudioAttributes;
@@ -46,6 +48,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
@@ -60,6 +63,9 @@ import java.io.OutputStream;
 import java.net.URL;
 import javax.net.ssl.HttpsURLConnection;
 import java.nio.charset.StandardCharsets;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -67,6 +73,10 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.RejectedExecutionException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
@@ -119,15 +129,32 @@ public class MainActivity extends Activity {
             "com.samfa12.hordelanternrt.DEBUG_RETRY_ENCOUNTER";
     private static final int REQUEST_SAVE_BENCHMARK = 7101;
     private static final int REQUEST_SAVE_PLAYTEST = 7102;
-    private final ExecutorService reportExecutor = Executors.newSingleThreadExecutor();
+    private final ThreadPoolExecutor reportExecutor = new ThreadPoolExecutor(1, 1, 0L,
+            TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(2), runnable -> {
+                Thread thread = new Thread(runnable, "HordePlaytestReport");
+                thread.setDaemon(true);
+                return thread;
+            }, new ThreadPoolExecutor.AbortPolicy());
     private PlaytestReportExport playtestExport;
+    private PlaytestReportSubmission playtestSubmission;
+    private AlertDialog playtestDecisionDialog;
     private boolean playtestReportVisible;
     private long playtestPickerToken;
+    private long playtestFormGeneration;
+    private long playtestCaptureToken;
+    private long playtestCaptureStartedAt;
+    private PlaytestReportVerification.Handle playtestVerification;
+    private byte[] playtestPreparedPng;
+    private Bitmap playtestPreviewBitmap;
+    private String playtestRemoteReportId;
+    private String playtestRemoteCapturedAt;
     private TextView playtestStatus;
-    private Button playtestSave, playtestEdit;
+    private Button playtestSave, playtestEdit, playtestRemotePrepare, playtestRemoteSend;
     private EditText playtestNote;
     private Spinner playtestCategory, playtestImpact;
-    private CheckBox playtestConsent, playtestContext;
+    private CheckBox playtestConsent, playtestContext, playtestRemoteConsent,
+            playtestRemoteContext, playtestRemoteScreenshot;
+    private ImageView playtestPreview;
     private static final int PLATFORM_EVENT_PLAYER_FOOTSTEP = 0;
     private static final int PLATFORM_EVENT_PLAYER_SWING = 1;
     private static final int PLATFORM_EVENT_PLAYER_DAMAGED = 2;
@@ -824,7 +851,9 @@ public class MainActivity extends Activity {
     private void showPlaytestReport() {
         // Entry is only from the existing paused menu; no gameplay/sound authority changes.
         playtestReportVisible = true;
+        ++playtestFormGeneration;
         playtestExport = new PlaytestReportExport();
+        playtestSubmission = newPlaytestSubmission();
         menuScrim.removeAllViews();
         final LinearLayout panel = createPanel(getString(R.string.playtest_report),
                 getString(R.string.playtest_local_only));
@@ -846,41 +875,58 @@ public class MainActivity extends Activity {
         playtestNote.setMinLines(3);
         playtestNote.setMaxLines(8);
         panel.addView(playtestNote);
-        playtestContext = new CheckBox(this);
-        playtestContext.setText(R.string.playtest_context_consent);
-        playtestContext.setTextColor(Color.WHITE);
-        playtestContext.setButtonTintList(android.content.res.ColorStateList.valueOf(0xFFFFDEAD));
-        playtestContext.setChecked(false);
-        panel.addView(playtestContext);
-        playtestConsent = new CheckBox(this);
-        playtestConsent.setText(R.string.playtest_export_consent);
-        playtestConsent.setTextColor(Color.WHITE);
-        playtestConsent.setButtonTintList(android.content.res.ColorStateList.valueOf(0xFFFFDEAD));
-        playtestConsent.setChecked(false);
-        panel.addView(playtestConsent);
+        addBody(panel, getString(R.string.playtest_remote_section));
+        playtestRemoteConsent = new CheckBox(this);
+        playtestRemoteConsent.setText(R.string.playtest_remote_consent);
+        stylePlaytestConsent(playtestRemoteConsent);
+        panel.addView(playtestRemoteConsent);
+        playtestRemoteContext = new CheckBox(this);
+        playtestRemoteContext.setText(R.string.playtest_remote_context_consent);
+        stylePlaytestConsent(playtestRemoteContext);
+        panel.addView(playtestRemoteContext);
+        playtestRemoteScreenshot = new CheckBox(this);
+        playtestRemoteScreenshot.setText(R.string.playtest_remote_screenshot_consent);
+        stylePlaytestConsent(playtestRemoteScreenshot);
+        panel.addView(playtestRemoteScreenshot);
+        playtestPreview = new ImageView(this);
+        playtestPreview.setAdjustViewBounds(true);
+        playtestPreview.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        playtestPreview.setContentDescription(getString(R.string.playtest_preview_description));
+        playtestPreview.setVisibility(View.GONE);
+        panel.addView(playtestPreview, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, dp(220)));
         playtestStatus = new TextView(this);
         playtestStatus.setTextColor(0xFFFFDEAD);
         playtestStatus.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
         panel.addView(playtestStatus);
+        playtestRemotePrepare = new Button(this);
+        playtestRemotePrepare.setText(R.string.playtest_prepare_remote);
+        playtestRemotePrepare.setOnClickListener(view -> preparePlaytestSubmission());
+        panel.addView(playtestRemotePrepare);
+        playtestRemoteSend = new Button(this);
+        playtestRemoteSend.setText(R.string.playtest_verify_send);
+        playtestRemoteSend.setVisibility(View.GONE);
+        playtestRemoteSend.setOnClickListener(view -> verifyAndSendPlaytestReport());
+        panel.addView(playtestRemoteSend);
+        playtestEdit = new Button(this);
+        playtestEdit.setText(R.string.playtest_edit);
+        playtestEdit.setVisibility(View.GONE);
+        playtestEdit.setOnClickListener(view -> requestPlaytestEdit());
+        panel.addView(playtestEdit);
+        addBody(panel, getString(R.string.playtest_local_section));
+        playtestContext = new CheckBox(this);
+        playtestContext.setText(R.string.playtest_context_consent);
+        stylePlaytestConsent(playtestContext);
+        panel.addView(playtestContext);
+        playtestConsent = new CheckBox(this);
+        playtestConsent.setText(R.string.playtest_export_consent);
+        stylePlaytestConsent(playtestConsent);
+        panel.addView(playtestConsent);
         playtestSave = new Button(this);
         playtestSave.setText(R.string.playtest_save_json);
         playtestSave.setOnClickListener(view -> preparePlaytestExport());
         panel.addView(playtestSave);
-        playtestEdit = new Button(this);
-        playtestEdit.setText(R.string.playtest_edit);
-        playtestEdit.setVisibility(View.GONE);
-        playtestEdit.setOnClickListener(view -> {
-            playtestExport.cancel();
-            playtestExport = new PlaytestReportExport();
-            setPlaytestFieldsEnabled(true);
-            playtestConsent.setChecked(false); // New preparation requires new explicit consent.
-            playtestSave.setEnabled(true);
-            playtestSave.setText(R.string.playtest_save_json);
-            playtestEdit.setVisibility(View.GONE);
-            playtestStatus.setText("");
-        });
-        panel.addView(playtestEdit);
-        addMenuButton(panel, getString(R.string.back), this::closePlaytestReport);
+        addMenuButton(panel, getString(R.string.back), this::requestClosePlaytestReport);
         attachPanel(panel);
     }
 
@@ -890,6 +936,519 @@ public class MainActivity extends Activity {
         playtestImpact.setEnabled(enabled);
         playtestConsent.setEnabled(enabled);
         playtestContext.setEnabled(enabled);
+        playtestRemoteConsent.setEnabled(enabled);
+        playtestRemoteContext.setEnabled(enabled);
+        playtestRemoteScreenshot.setEnabled(enabled);
+    }
+
+    private void stylePlaytestConsent(final CheckBox box) {
+        box.setTextColor(Color.WHITE);
+        box.setButtonTintList(android.content.res.ColorStateList.valueOf(0xFFFFDEAD));
+        box.setChecked(false);
+    }
+
+    /** Guard is independent of View.enabled so stale or accessibility-triggered clicks cannot abandon a send. */
+    void requestPlaytestEdit() {
+        final PlaytestReportSubmission.State state = playtestSubmission == null
+                ? PlaytestReportSubmission.State.DRAFT : playtestSubmission.state();
+        if (state == PlaytestReportSubmission.State.IN_FLIGHT) return;
+        if (state == PlaytestReportSubmission.State.RETRYABLE) {
+            showPlaytestDecision(R.string.playtest_edit_uncertain, state, this::beginPlaytestEdit);
+        } else if (state == PlaytestReportSubmission.State.QUEUED ||
+                state == PlaytestReportSubmission.State.SENT) {
+            showPlaytestDecision(R.string.playtest_edit_accepted, state, this::beginPlaytestEdit);
+        } else beginPlaytestEdit();
+    }
+
+    /** A decision only applies to the exact visible form and submission state that opened it. */
+    private void showPlaytestDecision(final int messageResource,
+                                     final PlaytestReportSubmission.State requiredState,
+                                     final Runnable confirmed) {
+        dismissPlaytestDecisionDialog();
+        final long generation = playtestFormGeneration;
+        final PlaytestReportSubmission owner = playtestSubmission;
+        final AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.playtest_report)
+                .setMessage(messageResource)
+                .setNegativeButton(R.string.playtest_stay_here, null)
+                .setPositiveButton(R.string.playtest_edit_continue, null)
+                .create();
+        playtestDecisionDialog = dialog;
+        dialog.setOnDismissListener(ignored -> {
+            if (playtestDecisionDialog == dialog) playtestDecisionDialog = null;
+        });
+        dialog.setOnShowListener(ignored -> dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                .setOnClickListener(view -> {
+                    final boolean stillCurrent = playtestDecisionDialog == dialog &&
+                            playtestReportVisible && playtestFormGeneration == generation &&
+                            playtestSubmission == owner && owner != null && owner.state() == requiredState;
+                    dialog.dismiss();
+                    if (stillCurrent) confirmed.run();
+                }));
+        dialog.show();
+    }
+
+    private void dismissPlaytestDecisionDialog() {
+        final AlertDialog dialog = playtestDecisionDialog;
+        playtestDecisionDialog = null;
+        if (dialog != null && dialog.isShowing()) dialog.dismiss();
+    }
+
+    private void beginPlaytestEdit() {
+        invalidateRemotePlaytest(true);
+        playtestSubmission = newPlaytestSubmission();
+        playtestExport.cancel();
+        playtestExport = new PlaytestReportExport();
+        setPlaytestFieldsEnabled(true);
+        playtestConsent.setChecked(false);
+        playtestRemoteConsent.setChecked(false);
+        playtestRemoteContext.setChecked(false);
+        playtestRemoteScreenshot.setChecked(false);
+        playtestSave.setEnabled(true);
+        playtestSave.setText(R.string.playtest_save_json);
+        playtestRemotePrepare.setEnabled(true);
+        playtestRemotePrepare.setVisibility(View.VISIBLE);
+        playtestRemoteSend.setVisibility(View.GONE);
+        playtestRemoteSend.setText(R.string.playtest_verify_send);
+        playtestRemoteSend.setEnabled(true);
+        playtestEdit.setEnabled(true);
+        playtestEdit.setVisibility(View.GONE);
+        playtestStatus.setText("");
+    }
+
+    private void requestClosePlaytestReport() {
+        final PlaytestReportSubmission.State state = playtestSubmission == null
+                ? PlaytestReportSubmission.State.DRAFT : playtestSubmission.state();
+        if (state == PlaytestReportSubmission.State.IN_FLIGHT) {
+            showPlaytestDecision(R.string.playtest_close_inflight, state, this::closePlaytestReport);
+        } else if (state == PlaytestReportSubmission.State.RETRYABLE) {
+            showPlaytestDecision(R.string.playtest_close_uncertain, state, this::closePlaytestReport);
+        } else closePlaytestReport();
+    }
+
+    private PlaytestReportSubmission newPlaytestSubmission() {
+        return new PlaytestReportSubmission(reportExecutor::execute,
+                new PlaytestReportSubmission.HttpsTransport());
+    }
+
+    private static final class CaptureOutcome {
+        final boolean pending;
+        final byte[] png;
+        CaptureOutcome(boolean pending, byte[] png) { this.pending = pending; this.png = png; }
+    }
+
+    private void preparePlaytestSubmission() {
+        if (!playtestRemoteConsent.isChecked()) {
+            playtestStatus.setText(R.string.playtest_consent_remote_required);
+            return;
+        }
+        final long generation = ++playtestFormGeneration;
+        final String id = UUID.randomUUID().toString();
+        final SimpleDateFormat utc = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ROOT);
+        utc.setTimeZone(TimeZone.getTimeZone("UTC"));
+        final String capturedAt = utc.format(new Date());
+        final boolean includeContext = playtestRemoteContext.isChecked();
+        final boolean includeScreenshot = playtestRemoteScreenshot.isChecked();
+        playtestRemoteReportId = id;
+        playtestRemoteCapturedAt = capturedAt;
+
+        // Native validation happens before requesting an RT-frame capture. This
+        // validation envelope is discarded; only the final native bytes are frozen.
+        final byte[] validation;
+        try {
+            validation = ProbeBridge.preparePlaytestSubmission(id, capturedAt,
+                    playtestCategory.getSelectedItemPosition(), playtestImpact.getSelectedItemPosition(),
+                    playtestNote.getText().toString(), true, includeContext, Build.MODEL,
+                    false, 0L, null);
+        } catch (RuntimeException | LinkageError unavailable) {
+            playtestStatus.setText(R.string.playtest_prepare_failed);
+            return;
+        }
+        if (!isPreparedEnvelope(validation)) {
+            wipe(validation);
+            playtestStatus.setText(R.string.playtest_prepare_failed);
+            return;
+        }
+        wipe(validation);
+        setPlaytestFieldsEnabled(false);
+        playtestSave.setEnabled(false);
+        playtestRemotePrepare.setEnabled(false);
+        playtestEdit.setVisibility(View.GONE);
+        playtestRemoteSend.setVisibility(View.GONE);
+        if (!includeScreenshot) {
+            final byte[] prepared = prepareFinalRemoteEnvelope(id, capturedAt, includeContext, false, 0L, null);
+            finishRemotePreparation(generation, prepared, null);
+            return;
+        }
+
+        final long token;
+        try { token = ProbeBridge.requestPlaytestCapture(true); }
+        catch (RuntimeException | LinkageError unavailable) {
+            remoteCaptureFailed(generation);
+            return;
+        }
+        if (token <= 0L) {
+            remoteCaptureFailed(generation);
+            return;
+        }
+        playtestCaptureToken = token;
+        playtestCaptureStartedAt = SystemClock.elapsedRealtime();
+        playtestStatus.setText(R.string.playtest_capture_wait);
+        pollPlaytestCapture(generation, token);
+    }
+
+    private static boolean isPreparedEnvelope(final byte[] value) {
+        return value != null && value.length > 1 && value[0] == 0;
+    }
+
+    private byte[] prepareFinalRemoteEnvelope(final String id, final String capturedAt,
+            final boolean includeContext, final boolean includeScreenshot,
+            final long captureToken, final byte[] png) {
+        try {
+            return ProbeBridge.preparePlaytestSubmission(id, capturedAt,
+                    playtestCategory.getSelectedItemPosition(), playtestImpact.getSelectedItemPosition(),
+                    playtestNote.getText().toString(), true, includeContext, Build.MODEL,
+                    includeScreenshot, captureToken, png);
+        } catch (RuntimeException | LinkageError unavailable) { return null; }
+    }
+
+    private void pollPlaytestCapture(final long generation, final long token) {
+        if (!playtestReportVisible || generation != playtestFormGeneration || token != playtestCaptureToken) return;
+        if (SystemClock.elapsedRealtime() - playtestCaptureStartedAt >= 10_000L) {
+            remoteCaptureFailed(generation);
+            return;
+        }
+        try {
+            reportExecutor.execute(() -> {
+                final CaptureOutcome outcome = takeAndEncodePlaytestCapture(token);
+                handler.post(() -> {
+                    if (!playtestReportVisible || generation != playtestFormGeneration ||
+                            token != playtestCaptureToken) {
+                        wipe(outcome.png);
+                        return;
+                    }
+                    if (SystemClock.elapsedRealtime() - playtestCaptureStartedAt >= 10_000L) {
+                        wipe(outcome.png);
+                        remoteCaptureFailed(generation);
+                        return;
+                    }
+                    if (outcome.pending) {
+                        handler.postDelayed(() -> pollPlaytestCapture(generation, token), 100L);
+                        return;
+                    }
+                    if (outcome.png == null) {
+                        remoteCaptureFailed(generation);
+                        return;
+                    }
+                    playtestPreparedPng = outcome.png;
+                    final byte[] prepared = prepareFinalRemoteEnvelope(playtestRemoteReportId,
+                            playtestRemoteCapturedAt, playtestRemoteContext.isChecked(), true,
+                            token, playtestPreparedPng);
+                    finishRemotePreparation(generation, prepared, playtestPreparedPng);
+                });
+            });
+        } catch (RejectedExecutionException saturated) { remoteCaptureFailed(generation); }
+    }
+
+    private CaptureOutcome takeAndEncodePlaytestCapture(final long token) {
+        final int maxOwnedCaptureBytes = 32 * 1024 * 1024 + 9;
+        byte[] raw = null;
+        try {
+            raw = ProbeBridge.takePlaytestCapture(token);
+            if (raw == null || raw.length == 0 || raw.length > maxOwnedCaptureBytes)
+                return new CaptureOutcome(false, null);
+            if (raw[0] == 1) return new CaptureOutcome(true, null);
+            if (raw[0] != 0 || raw.length < 9) return new CaptureOutcome(false, null);
+            final ByteBuffer header = ByteBuffer.wrap(raw).order(ByteOrder.LITTLE_ENDIAN);
+            final long widthLong = Integer.toUnsignedLong(header.getInt(1));
+            final long heightLong = Integer.toUnsignedLong(header.getInt(5));
+            if (widthLong < 1 || heightLong < 1 || widthLong > PlaytestReportScreenshot.MAX_LONG_EDGE ||
+                    heightLong > PlaytestReportScreenshot.MAX_LONG_EDGE ||
+                    Math.min(widthLong, heightLong) > PlaytestReportScreenshot.MAX_SHORT_EDGE ||
+                    9L + widthLong * heightLong * 4L != raw.length) return new CaptureOutcome(false, null);
+            byte[] rgba = Arrays.copyOfRange(raw, 9, raw.length);
+            try {
+                PlaytestReportScreenshot.Result result = PlaytestReportScreenshot.encodeRgba8(
+                        rgba, (int) widthLong, (int) heightLong);
+                return new CaptureOutcome(false, result.isEncoded() ? result.png : null);
+            } finally { wipe(rgba); }
+        } catch (RuntimeException | LinkageError unavailable) {
+            return new CaptureOutcome(false, null);
+        } finally { wipe(raw); }
+    }
+
+    private void finishRemotePreparation(final long generation, final byte[] prepared, final byte[] png) {
+        if (!playtestReportVisible || generation != playtestFormGeneration) {
+            wipe(prepared);
+            wipe(png);
+            return;
+        }
+        if (!isPreparedEnvelope(prepared) || playtestSubmission == null ||
+                !playtestSubmission.begin(prepared, true)) {
+            cancelPlaytestCapture();
+            playtestSubmission = newPlaytestSubmission();
+            wipe(prepared);
+            wipe(png);
+            clearPlaytestPng();
+            setPlaytestFieldsEnabled(true);
+            playtestSave.setEnabled(true);
+            playtestRemotePrepare.setEnabled(true);
+            playtestEdit.setVisibility(View.VISIBLE);
+            playtestStatus.setText(R.string.playtest_prepare_failed);
+            return;
+        }
+        playtestCaptureToken = 0L; // Native accepted and consumed any one-use screenshot ticket.
+        wipe(prepared);
+        if (png != null && !showPreparedPlaytestPreview(png)) {
+            if (playtestCaptureToken > 0L) cancelPlaytestCapture();
+            playtestSubmission.cancel();
+            playtestSubmission = newPlaytestSubmission();
+            clearPlaytestPng();
+            setPlaytestFieldsEnabled(true);
+            playtestSave.setEnabled(true);
+            playtestRemotePrepare.setEnabled(true);
+            playtestEdit.setVisibility(View.VISIBLE);
+            playtestStatus.setText(R.string.playtest_capture_failed);
+            return;
+        }
+        clearPlaytestPng();
+        playtestRemotePrepare.setVisibility(View.GONE);
+        playtestRemoteSend.setVisibility(View.VISIBLE);
+        playtestRemoteSend.setEnabled(true);
+        playtestEdit.setVisibility(View.VISIBLE);
+        playtestStatus.setText(R.string.playtest_review_ready);
+    }
+
+    private boolean showPreparedPlaytestPreview(final byte[] png) {
+        Bitmap decoded = BitmapFactory.decodeByteArray(png, 0, png.length);
+        if (decoded == null || decoded.getWidth() > PlaytestReportScreenshot.MAX_LONG_EDGE ||
+                decoded.getHeight() > PlaytestReportScreenshot.MAX_LONG_EDGE ||
+                Math.min(decoded.getWidth(), decoded.getHeight()) > PlaytestReportScreenshot.MAX_SHORT_EDGE) {
+            if (decoded != null) decoded.recycle();
+            return false;
+        }
+        releasePlaytestPreview();
+        playtestPreviewBitmap = decoded;
+        playtestPreview.setImageBitmap(decoded);
+        playtestPreview.setVisibility(View.VISIBLE);
+        return true;
+    }
+
+    private void remoteCaptureFailed(final long generation) {
+        if (generation != playtestFormGeneration || !playtestReportVisible) return;
+        cancelPlaytestCapture();
+        clearPlaytestPng();
+        setPlaytestFieldsEnabled(true);
+        playtestSave.setEnabled(true);
+        playtestRemotePrepare.setEnabled(true);
+        playtestEdit.setVisibility(View.VISIBLE);
+        playtestStatus.setText(R.string.playtest_capture_failed);
+    }
+
+    private void verifyAndSendPlaytestReport() {
+        if (!playtestReportVisible || playtestSubmission == null) return;
+        if (playtestSubmission.state() == PlaytestReportSubmission.State.RETRYABLE) {
+            if (playtestSubmission.retry() < 0L) return;
+        }
+        if (playtestSubmission.state() != PlaytestReportSubmission.State.READY) return;
+        final long attempt = playtestSubmission.attempt();
+        final long formGeneration = playtestFormGeneration;
+        playtestRemoteSend.setEnabled(false);
+        playtestStatus.setText(R.string.playtest_verification_open);
+        try {
+            playtestVerification = PlaytestReportVerification.show(this, attempt,
+                    candidate -> playtestReportVisible && playtestSubmission != null &&
+                            playtestFormGeneration == formGeneration &&
+                            playtestSubmission.attempt() == candidate &&
+                            playtestSubmission.state() == PlaytestReportSubmission.State.READY,
+                    new PlaytestReportVerification.Callback() {
+                        @Override public void onVerified(long ownerGeneration, String token) {
+                            if (!isCurrentRemoteAttempt(formGeneration, ownerGeneration)) return;
+                            playtestVerification = null;
+                            playtestEdit.setEnabled(false);
+                            playtestStatus.setText(R.string.playtest_sending);
+                            final boolean accepted = playtestSubmission.submit(ownerGeneration, token,
+                                    (completedAttempt, result) -> handler.post(() ->
+                                            showSubmissionResult(formGeneration, completedAttempt, result)));
+                            if (!accepted) {
+                                playtestEdit.setEnabled(true);
+                                playtestRemoteSend.setEnabled(true);
+                                playtestStatus.setText(R.string.playtest_verification_failed);
+                            }
+                        }
+                        @Override public void onFailure(long ownerGeneration,
+                                PlaytestReportVerification.Failure failure) {
+                            if (!isCurrentRemoteAttempt(formGeneration, ownerGeneration)) return;
+                            playtestVerification = null;
+                            playtestEdit.setEnabled(true);
+                            playtestRemoteSend.setEnabled(true);
+                            playtestStatus.setText(R.string.playtest_verification_failed);
+                        }
+                        @Override public void onCancelled(long ownerGeneration) {
+                            if (!isCurrentRemoteAttempt(formGeneration, ownerGeneration)) return;
+                            playtestVerification = null;
+                            playtestEdit.setEnabled(true);
+                            playtestRemoteSend.setEnabled(true);
+                            playtestStatus.setText(R.string.playtest_verification_cancelled);
+                        }
+                    });
+        } catch (RuntimeException unavailable) {
+            playtestRemoteSend.setEnabled(true);
+            playtestStatus.setText(R.string.playtest_verification_failed);
+        }
+    }
+
+    private boolean isCurrentRemoteAttempt(final long formGeneration, final long attempt) {
+        return playtestReportVisible && playtestSubmission != null &&
+                playtestFormGeneration == formGeneration && playtestSubmission.attempt() == attempt;
+    }
+
+    private void showSubmissionResult(final long formGeneration, final long attempt,
+            final PlaytestReportSubmission.Result result) {
+        if (result == null || !isCurrentRemoteAttempt(formGeneration, attempt)) return;
+        playtestRemoteSend.setEnabled(false);
+        playtestEdit.setEnabled(true);
+        switch (result.code) {
+            case QUEUED:
+                showSubmissionState(PlaytestReportSubmission.State.QUEUED);
+                break;
+            case SENT:
+                showSubmissionState(PlaytestReportSubmission.State.SENT);
+                break;
+            case CONTENT_CONFLICT:
+                showSubmissionState(PlaytestReportSubmission.State.CONFLICT);
+                break;
+            case REJECTED:
+                showSubmissionState(PlaytestReportSubmission.State.REJECTED);
+                break;
+            case UNCERTAIN:
+                playtestStatus.setText(R.string.playtest_uncertain);
+                playtestRemoteSend.setText(R.string.playtest_retry_submission);
+                playtestRemoteSend.setVisibility(View.VISIBLE);
+                playtestRemoteSend.setEnabled(true);
+                break;
+            case VERIFICATION_EXPIRED:
+                playtestStatus.setText(R.string.playtest_verification_expired);
+                playtestRemoteSend.setEnabled(true);
+                break;
+            case RATE_LIMITED:
+                playtestStatus.setText(R.string.playtest_rate_limited);
+                playtestRemoteSend.setEnabled(true);
+                break;
+            default:
+                playtestStatus.setText(R.string.playtest_uncertain);
+                playtestRemoteSend.setText(R.string.playtest_retry_submission);
+                playtestRemoteSend.setVisibility(View.VISIBLE);
+                playtestRemoteSend.setEnabled(true);
+                break;
+        }
+    }
+
+    private void showSubmissionState(final PlaytestReportSubmission.State state) {
+        playtestRemoteSend.setEnabled(false);
+        playtestRemoteSend.setVisibility(View.GONE);
+        playtestEdit.setEnabled(true);
+        if (state == PlaytestReportSubmission.State.QUEUED) playtestStatus.setText(R.string.playtest_queued);
+        else if (state == PlaytestReportSubmission.State.SENT) playtestStatus.setText(R.string.playtest_sent);
+        else if (state == PlaytestReportSubmission.State.CONFLICT) playtestStatus.setText(R.string.playtest_conflict);
+        else if (state == PlaytestReportSubmission.State.REJECTED) playtestStatus.setText(R.string.playtest_remote_rejected);
+    }
+
+    private void cancelPlaytestCapture() {
+        final long token = playtestCaptureToken;
+        playtestCaptureToken = 0L;
+        if (token > 0L) {
+            try { ProbeBridge.cancelPlaytestCapture(token); }
+            catch (RuntimeException | LinkageError ignored) { /* Capture teardown is best effort. */ }
+        }
+    }
+
+    private void clearPlaytestPng() {
+        wipe(playtestPreparedPng);
+        playtestPreparedPng = null;
+    }
+
+    private void releasePlaytestPreview() {
+        if (playtestPreview != null) playtestPreview.setImageDrawable(null);
+        if (playtestPreviewBitmap != null && !playtestPreviewBitmap.isRecycled()) playtestPreviewBitmap.recycle();
+        playtestPreviewBitmap = null;
+        if (playtestPreview != null) playtestPreview.setVisibility(View.GONE);
+    }
+
+    private static void wipe(final byte[] bytes) {
+        if (bytes != null) Arrays.fill(bytes, (byte) 0);
+    }
+
+    private void invalidateRemotePlaytest(final boolean closing) {
+        ++playtestFormGeneration;
+        dismissPlaytestDecisionDialog();
+        if (playtestVerification != null) {
+            playtestVerification.cancel();
+            playtestVerification = null;
+        }
+        cancelPlaytestCapture();
+        clearPlaytestPng();
+        if (playtestSubmission != null) playtestSubmission.cancel();
+        if (closing) releasePlaytestPreview();
+    }
+
+    /** UI-owned pause reconciliation seam; kept package-visible for no-JNI Robolectric coverage. */
+    void reconcilePlaytestReportForPause() {
+        if (!playtestReportVisible || playtestSubmission == null) return;
+        final boolean sendWasInFlight = playtestSubmission.state() == PlaytestReportSubmission.State.IN_FLIGHT;
+        final boolean interrupted = sendWasInFlight && playtestSubmission.interruptInFlight();
+        final PlaytestReportSubmission.State state = playtestSubmission.state();
+        final boolean capturePending = playtestCaptureToken > 0L;
+        ++playtestFormGeneration;
+        dismissPlaytestDecisionDialog();
+        if (playtestVerification != null) {
+            playtestVerification.cancel();
+            playtestVerification = null;
+        }
+        cancelPlaytestCapture();
+        if (capturePending) {
+            playtestSubmission = newPlaytestSubmission();
+            clearPlaytestPng();
+            releasePlaytestPreview();
+            setPlaytestFieldsEnabled(true);
+            playtestSave.setEnabled(true);
+            playtestRemotePrepare.setEnabled(true);
+            playtestRemotePrepare.setVisibility(View.VISIBLE);
+            playtestRemoteSend.setVisibility(View.GONE);
+            playtestRemoteSend.setText(R.string.playtest_verify_send);
+            playtestEdit.setEnabled(true);
+            playtestEdit.setVisibility(View.VISIBLE);
+            playtestRemoteConsent.setChecked(false);
+            playtestRemoteContext.setChecked(false);
+            playtestRemoteScreenshot.setChecked(false);
+            playtestStatus.setText(R.string.playtest_lifecycle_cancelled);
+        } else if (state == PlaytestReportSubmission.State.IN_FLIGHT) {
+            // Do not offer a second send while an attempt still owns the controller.
+            playtestRemoteSend.setEnabled(false);
+            playtestEdit.setEnabled(false);
+            playtestStatus.setText(R.string.playtest_sending);
+        } else if (state == PlaytestReportSubmission.State.RETRYABLE || interrupted) {
+            playtestRemoteSend.setText(R.string.playtest_retry_submission);
+            playtestRemoteSend.setEnabled(true);
+            playtestRemoteSend.setVisibility(View.VISIBLE);
+            playtestEdit.setEnabled(true);
+            playtestStatus.setText(interrupted || sendWasInFlight ? R.string.playtest_lifecycle_uncertain :
+                    R.string.playtest_retry_ready);
+        } else if (state == PlaytestReportSubmission.State.READY) {
+            playtestRemoteSend.setText(R.string.playtest_verify_send);
+            playtestRemoteSend.setEnabled(true);
+            playtestRemoteSend.setVisibility(View.VISIBLE);
+            playtestEdit.setEnabled(true);
+            playtestStatus.setText(R.string.playtest_verification_cancelled);
+        } else if (state == PlaytestReportSubmission.State.QUEUED) {
+            showSubmissionState(PlaytestReportSubmission.State.QUEUED);
+        } else if (state == PlaytestReportSubmission.State.SENT) {
+            showSubmissionState(PlaytestReportSubmission.State.SENT);
+        } else if (state == PlaytestReportSubmission.State.CONFLICT) {
+            showSubmissionState(PlaytestReportSubmission.State.CONFLICT);
+        } else if (state == PlaytestReportSubmission.State.REJECTED) {
+            showSubmissionState(PlaytestReportSubmission.State.REJECTED);
+        }
     }
 
     private Spinner createPlaytestChoice(final String[] choices) {
@@ -933,6 +1492,7 @@ public class MainActivity extends Activity {
             return;
         }
         setPlaytestFieldsEnabled(false); // Retry owns these exact approved bytes, not later edits.
+        playtestRemotePrepare.setEnabled(false);
         choosePlaytestDestination();
     }
 
@@ -960,6 +1520,7 @@ public class MainActivity extends Activity {
     }
 
     private void closePlaytestReport() {
+        invalidateRemotePlaytest(true);
         if (playtestExport != null) playtestExport.cancel();
         playtestReportVisible = false;
         showMainMenu(false); // Back never resumes gameplay or submits anything.
@@ -978,20 +1539,25 @@ public class MainActivity extends Activity {
         playtestStatus.setText(R.string.playtest_saving);
         final android.content.ContentResolver resolver = getApplicationContext().getContentResolver();
         final Uri destination = data.getData();
-        reportExecutor.execute(() -> {
-            // No note/URI/private provider exception enters logs or payload.
-            final boolean completed = PlaytestReportExport.writeApproved(owner, attempt, bytes,
-                    () -> resolver.openOutputStream(destination, "wt"));
-            handler.post(() -> {
-                if (!playtestReportVisible || playtestExport != owner ||
-                        !owner.complete(attempt, completed)) return;
-                if (completed) {
-                    playtestStatus.setText(R.string.playtest_saved);
-                    playtestSave.setText(R.string.playtest_save_json);
-                    playtestSave.setEnabled(false);
-                } else playtestExportFailed(R.string.playtest_save_failed);
+        try {
+            reportExecutor.execute(() -> {
+                // No note/URI/private provider exception enters logs or payload.
+                final boolean completed = PlaytestReportExport.writeApproved(owner, attempt, bytes,
+                        () -> resolver.openOutputStream(destination, "wt"));
+                handler.post(() -> {
+                    if (!playtestReportVisible || playtestExport != owner ||
+                            !owner.complete(attempt, completed)) return;
+                    if (completed) {
+                        playtestStatus.setText(R.string.playtest_saved);
+                        playtestSave.setText(R.string.playtest_save_json);
+                        playtestSave.setEnabled(false);
+                    } else playtestExportFailed(R.string.playtest_save_failed);
+                });
             });
-        });
+        } catch (RejectedExecutionException saturated) {
+            owner.complete(attempt, false);
+            playtestExportFailed(R.string.playtest_save_failed);
+        }
     }
 
     private void hideMenu() {
@@ -2644,7 +3210,7 @@ public class MainActivity extends Activity {
     @Override
     public void onBackPressed() {
         if (playtestReportVisible) {
-            closePlaytestReport();
+            requestClosePlaytestReport();
             return;
         }
         if (rtLabVisible) {
@@ -2718,6 +3284,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onPause() {
         resumed = false;
+        reconcilePlaytestReportForPause(); // A document-picker pause leaves local export untouched.
         if (musicPlayback != null) musicPlayback.setSuspended(true);
         if (benchmarkAutomationId != null && !benchmarkAutomationFinishing) {
             finishBenchmarkAutomation(3);
@@ -2752,6 +3319,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        invalidateRemotePlaytest(true);
         if (playtestExport != null) playtestExport.cancel();
         playtestReportVisible = false;
         reportExecutor.shutdownNow();

@@ -78,12 +78,46 @@ same local directory: `capture-android-native-final.log`, `capture-native-*-fina
 These are host/compiler/local-runtime facts; JNI lifecycle races and real phone
 readback/WebView acceptance are not claimed from these tests.
 
+## Android foreground form checkpoint
+
+Remote submission now precedes the separate offline JSON fallback. All five
+consent/context/image/export opt-ins start off. Note/context validation precedes
+readback; the optional game-only thumbnail is previewed before explicit
+verification/send. The hosted page receives only a random nonce, never the report
+or image. Exact-origin WebMessage admission, bounded parser/deadline, navigation
+and permission restrictions isolate the verification-only WebView.
+
+Pause interrupts an in-flight attempt without discarding its frozen ID/body;
+an uncertain retry obtains a fresh token and remains explicit. Late completion,
+Edit and Back cannot silently replace an in-flight/uncertain report. Confirmed
+discard/new-report decisions disclose duplicate/recall limits; their generation-
+checked dialogs dismiss on pause and stale buttons cannot replace a later owner.
+Already-queued acknowledgement is not presented as delivered email.
+
+Final combined Debug/Release each75/75 Java tests, zero failures/errors/skips;
+seven actual Activity reconciliation/form tests, seven verification tests,16
+submission tests and five PNG tests. Both lint runs have zero errors/42 warnings;
+four native ABIs and both APK builds pass. Exact asset/licence package guards
+pass for both artifacts. Required CI suite-presence/count checks pass against
+both configurations' actual XML. These no-JNI Robolectric tests do not certify
+real phone WebView/readback/lifecycle or delivery.
+
+- Debug APK SHA256: `3127c2a11701c12ea3a393e5bebcd1c4a700f14f14fba580f9abedfb36c7a1ff`.
+- Unsigned Release APK SHA256: `bf39acdbecf3618934afe0269717368ae2de688c2aa3085f2dd1decb82499345`.
+- Receipt: `C:/Dev/tmp/horde-report-submission-20261002/report-android-accepted-source.log`.
+- Earlier72-test APK/unsigned build receipts are intermediate artifacts, not
+  this accepted source. No phone install or owner acceptance is claimed here.
+
 ## Next unfinished step
 
-Finish Android form/lifecycle review and focused activity tests, then build/lint
-the complete candidate before device acceptance. Windows remote transport is a
-separate bounded implementation slice. Existing Turnstile hostname admission needs the requested
-owner dashboard sign-in; do not repeat the request or copy/broaden credentials.
+Push the reviewed Android checkpoint and require fresh source/merge-state CI.
+Windows remote transport is a separate bounded implementation slice: the first
+synchronous candidate cannot guarantee active cancellation/total deadline and
+is not admitted to production. Replace that demonstrated limitation with a
+small asynchronous request owner before UI integration; preserve the negative
+candidate evidence rather than claiming callback invalidation cancels network.
+Existing Turnstile hostname admission needs the requested owner dashboard
+sign-in; do not repeat the request or copy/broaden credentials.
 Then send only the approved single labelled fixture email and verify the
 attachment/delivery. No email has been sent yet. Windows remote UI/transport and
 actual device/lifecycle acceptance remain open; local JSON remains fallback.

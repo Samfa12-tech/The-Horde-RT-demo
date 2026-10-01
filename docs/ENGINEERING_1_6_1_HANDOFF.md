@@ -21,13 +21,20 @@ one labelled fixture email. Reviewed private backend `fd104d7` is deployed as
 existing delivery engine. Worker50/50 tests and actual workerd PNG/SQLite checks
 pass; tooling audit0. Live health/page200, invalid schema400 and actual native
 PNG wire fixture plus invalid token403. No email has been sent/accepted yet.
-Public Horde adds the bounded frozen submission envelope and foreground Android
-HTTPS owner, not private Worker source or credentials. MSVC affected3/3 CTests
-each Debug/Release and Android transport14/14 focused tests pass. UI/JNI screenshot
-capture and Windows remote submission are still unfinished; local JSON is fallback.
+Public Horde adds the bounded frozen submission envelope, primary Android remote
+form, verification-only WebView and consented render-owner game thumbnail, not
+private Worker source or credentials. MSVC affected3/3 CTests each Debug/Release
+and one actual RTX game-only capture pass. Android final Debug/Release each75/75
+tests, four-ABI native builds, both APK/package guards and lint0 errors pass.
+Paused uncertain sends retain same-ID explicit retries; stale decision dialogs
+cannot replace later owners. No phone install/WebView/delivery acceptance yet.
+Windows remote submission remains unfinished; local JSON is fallback.
 See [single reporting record](ENGINEERING_1_6_1_REPORTING_2026-10-01.md).
-Next: consented presented-game-RT-only capture/native UI; existing Turnstile widget
-hostname check; one approved email/attachment acceptance; platform/lifecycle/CI.
+Next: reviewed Android checkpoint/fresh CI; bounded asynchronous Windows request
+owner (synchronous candidate's soft cancellation/deadline was not accepted),
+native verification/form; existing Turnstile widget hostname check; one approved
+email/attachment acceptance; exact platform/lifecycle checks. See the [finite
+report-relay record](evidence/2026-10-02-report-relay/README.md) before resuming.
 OAuth lacks widget scope and the dashboard needs owner sign-in, requested once.
 Do not silently broaden/copy credentials, repeat questions or treat mocks as
 delivery. Preserve pending phone owner checks and unrelated raw S24 files.
