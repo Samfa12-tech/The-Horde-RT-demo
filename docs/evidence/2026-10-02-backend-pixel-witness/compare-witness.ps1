@@ -2,7 +2,7 @@ param(
     [Parameter(Mandatory)][string]$ControlRoot,
     [Parameter(Mandatory)][string]$WitnessRoot,
     [Parameter(Mandatory)][string]$OutputPath,
-    [ValidateSet('Output','Surface','CombatSurface')][string]$WitnessStage = 'Output'
+    [ValidateSet('Output','Surface','CombatSurface','CombatSampling')][string]$WitnessStage = 'Output'
 )
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
@@ -33,7 +33,7 @@ public static class HordeBackendWitnessPixels {
             Color original = a.GetPixel(x,y), observed = b.GetPixel(x,y);
             result.controlRgb = new int[] {original.R,original.G,original.B};
             result.witnessRgb = new int[] {observed.R,observed.G,observed.B};
-            if (fieldCount != 48 && fieldCount != 85)
+            if (fieldCount != 48 && fieldCount != 85 && fieldCount != 115)
                 throw new InvalidOperationException("Unknown finite witness schema.");
             result.fields = new float[fieldCount];
             for (int field = 0; field < fieldCount; ++field) {
@@ -60,7 +60,7 @@ $names = @('sentinel','x','y','hit','instance','primitive','material','t',
     'afterFireR','afterFireG','afterFireB','afterMistR','afterMistG','afterMistB',
     'displayR','displayG','displayB','originX','originY','originZ')
 $expectedInvestigation = 'six-backend-pixel-output-witness'
-if ($WitnessStage -cin @('Surface','CombatSurface')) {
+if ($WitnessStage -cin @('Surface','CombatSurface','CombatSampling')) {
     $expectedInvestigation = 'six-backend-surface-split-witness'
     $names += @('directR','directG','directB','localVisibility','skyVisibility',
         'skyDiffuse','localStrength','bounceDirectionX','bounceDirectionY','bounceDirectionZ',
@@ -71,6 +71,17 @@ if ($WitnessStage -cin @('Surface','CombatSurface')) {
         'bounceTransmission','bounceMaterialFlags','bounceR','bounceG','bounceB',
         'afterBounceR','afterBounceG','afterBounceB','fog')
 }
+if ($WitnessStage -ceq 'CombatSampling') {
+    $names += @('primaryBaryX','primaryBaryY','primaryUvX','primaryUvY',
+        'primaryLocalNormalX','primaryLocalNormalY','primaryLocalNormalZ',
+        'primaryLocalTangentX','primaryLocalTangentY','primaryLocalTangentZ','primaryLocalTangentW',
+        'primaryWorldNormalX','primaryWorldNormalY','primaryWorldNormalZ',
+        'primaryWorldTangentX','primaryWorldTangentY','primaryWorldTangentZ',
+        'primaryWorldBitangentX','primaryWorldBitangentY','primaryWorldBitangentZ',
+        'primaryNormalSampleX','primaryNormalSampleY','primaryNormalSampleZ',
+        'primaryBaseSampleR','primaryBaseSampleG','primaryBaseSampleB','primaryBaseSampleA',
+        'primaryOrmSampleR','primaryOrmSampleG','primaryOrmSampleB')
+}
 $cases = @(
     @{id=2; file='02-worst-bend.png'; x=556; y=378; row=0},
     @{id=6; file='06-blue.png'; x=396; y=262; row=1},
@@ -80,13 +91,16 @@ $cases = @(
     @{id=12; file='12-two-enemy-combat.png'; x=564; y=393; row=4})
 $expectedRoster = '2,6,7,11,12'
 $expectedCaptureCount = 5
-if ($WitnessStage -ceq 'CombatSurface') {
+if ($WitnessStage -cin @('CombatSurface','CombatSampling')) {
     $expectedInvestigation = 'two-enemy-reflection-witness'
     $expectedRoster = '12'
     $expectedCaptureCount = 1
     $cases = @(
         @{id=12; file='12-two-enemy-combat.png'; x=542; y=311; row=1},
         @{id=12; file='12-two-enemy-combat.png'; x=564; y=393; row=4})
+    if ($WitnessStage -ceq 'CombatSampling') {
+        $expectedInvestigation = 'two-enemy-primary-sampling-witness'
+    }
 }
 function Get-StaticAssetIdentity($asset) {
     # Build durations are measured observations, not immutable asset identity.
@@ -101,7 +115,7 @@ function Get-StaticAssetIdentity($asset) {
 }
 $rows = foreach ($backend in @('pipeline','compute')) {
     $oldDirectory = Join-Path $ControlRoot "control-windows-$backend"
-    if ($WitnessStage -ceq 'CombatSurface') { $oldDirectory = Join-Path $ControlRoot $backend }
+    if ($WitnessStage -cin @('CombatSurface','CombatSampling')) { $oldDirectory = Join-Path $ControlRoot $backend }
     $newDirectory = Join-Path $WitnessRoot $backend
     $old = Get-Content (Join-Path $oldDirectory 'capture-manifest.json') -Raw | ConvertFrom-Json
     $new = Get-Content (Join-Path $newDirectory 'capture-manifest.json') -Raw | ConvertFrom-Json

@@ -1,5 +1,6 @@
 // Investigation-only output witness. No extra rays, counters or CPU/GPU ABI.
-// Reuse the same85 fields; row1 now localizes the newly exposed combat pixel.
+// Preserve the85 surface fields and append30 primary-sampling discriminator
+// fields. They reuse the same five reserved rows, with no extra rays/samples.
 vec3 investigationDirect;
 vec4 investigationLightTerms;
 vec3 investigationBounceDirection;
@@ -94,4 +95,18 @@ void backendWitness(HitInfo primary, vec3 direction, vec3 origin,
     backendWitnessVector(row, 78, investigationBounce);
     backendWitnessVector(row, 81, investigationAfterBounce);
     backendWitnessFloat(row, 84, investigationFog);
+    backendWitnessFloat(row, 85, investigationPrimaryBary.x);
+    backendWitnessFloat(row, 86, investigationPrimaryBary.y);
+    backendWitnessFloat(row, 87, investigationPrimaryUv.x);
+    backendWitnessFloat(row, 88, investigationPrimaryUv.y);
+    backendWitnessVector(row, 89, investigationPrimaryLocalNormal);
+    backendWitnessVector(row, 92, investigationPrimaryLocalTangent.xyz);
+    backendWitnessFloat(row, 95, investigationPrimaryLocalTangent.w);
+    backendWitnessVector(row, 96, investigationPrimaryWorldNormal);
+    backendWitnessVector(row, 99, investigationPrimaryWorldTangent);
+    backendWitnessVector(row, 102, investigationPrimaryWorldBitangent);
+    backendWitnessVector(row, 105, investigationPrimaryNormalSample);
+    backendWitnessVector(row, 108, investigationPrimaryBaseSample.rgb);
+    backendWitnessFloat(row, 111, investigationPrimaryBaseSample.a);
+    backendWitnessVector(row, 112, investigationPrimaryOrmSample);
 }

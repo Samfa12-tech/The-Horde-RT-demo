@@ -4,6 +4,21 @@
 #if defined(HORDE_RT_VARIANT_INSTRUMENTATION) && HORDE_RT_VARIANT_INSTRUMENTATION == HORDE_RT_INSTRUMENTATION_DIAGNOSTIC && HORDE_RT_VARIANT_QUALITY == HORDE_RT_QUALITY_MOBILE
 #define HORDE_BACKEND_PIXEL_WITNESS
 #endif
+#ifdef HORDE_BACKEND_PIXEL_WITNESS
+// Local investigation state, not a GPU buffer/HitInfo ABI. Only the existing
+// primary query at a watched pixel writes these values; no extra sampling.
+bool investigationCapturePrimarySampling = false;
+vec2 investigationPrimaryBary;
+vec2 investigationPrimaryUv;
+vec3 investigationPrimaryLocalNormal;
+vec4 investigationPrimaryLocalTangent;
+vec3 investigationPrimaryWorldNormal;
+vec3 investigationPrimaryWorldTangent;
+vec3 investigationPrimaryWorldBitangent;
+vec3 investigationPrimaryNormalSample;
+vec4 investigationPrimaryBaseSample;
+vec3 investigationPrimaryOrmSample;
+#endif
 #include "rt_lighting.glsl"
 #ifdef HORDE_BACKEND_PIXEL_WITNESS
 #include "../experimental/backend_pixel_witness.glsl"
@@ -45,8 +60,14 @@ void main()
     float playerPrimaryStart = clamp(0.68 - abs(controls.pitch), 0.34, 0.68);
     uint primaryMask = (uv.y > playerPrimaryStart ? 0x27u : 0x23u) |
                        kPlayerViewmodelPrimaryMask | kPlayerBodyRemainderPrimaryMask;
+#ifdef HORDE_BACKEND_PIXEL_WITNESS
+    investigationCapturePrimarySampling = backendWitnessRow() >= 0;
+#endif
     HitInfo primary = traceScene(origin, rayDirection, 10000.0, primaryMask,
                                  0.002, controls.waterQuality < 0.5, true);
+#ifdef HORDE_BACKEND_PIXEL_WITNESS
+    investigationCapturePrimarySampling = false;
+#endif
     if (primary.hit)
     {
         if (primary.instance == 1)

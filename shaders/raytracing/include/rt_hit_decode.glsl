@@ -526,6 +526,21 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
                     ? texture(rtEmissiveTextures,
                         vec3(uv, float(staticMaterial.textureLayers.w))).rgb
                     : vec3(1.0);
+#ifdef HORDE_BACKEND_PIXEL_WITNESS
+                if (investigationCapturePrimarySampling)
+                {
+                    investigationPrimaryBary = bary;
+                    investigationPrimaryUv = uv;
+                    investigationPrimaryLocalNormal = localNormal;
+                    investigationPrimaryLocalTangent = localTangent;
+                    investigationPrimaryWorldNormal = worldNormal;
+                    investigationPrimaryWorldTangent = worldTangent;
+                    investigationPrimaryWorldBitangent = worldBitangent;
+                    investigationPrimaryNormalSample = sampledNormal;
+                    investigationPrimaryBaseSample = baseSample;
+                    investigationPrimaryOrmSample = orm;
+                }
+#endif
                 h.material = 100 + int(primitiveMetadata.materialIndex);
                 h.base = baseSample.rgb * staticMaterial.baseColorFactor.rgb *
                          mix(1.0, orm.r, staticMaterial.metallicRoughnessOcclusionTransmission.z);

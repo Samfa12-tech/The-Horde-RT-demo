@@ -4451,7 +4451,7 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
              << "{\n"
              << "  \"schemaVersion\": 1,\n"
              << "  \"investigationOnly\": true,\n"
-           << "  \"investigation\": \"two-enemy-reflection-witness\",\n"
+                 << "  \"investigation\": \"two-enemy-primary-sampling-witness\",\n"
              << "  \"payloadRows\": 5,\n"
              << "  \"complete\": " << (complete ? "true" : "false") << ",\n"
              << "  \"source\": \"rt-storage-image\",\n"
