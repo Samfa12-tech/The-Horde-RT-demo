@@ -27,6 +27,11 @@ untracked raw receipts, not an uncommitted implementation. No app data cleared.
   exact PNGs, median15.58345 ->15.53295ms; unchanged2% capture-timing gate PASS.
 - [RTX compute comparison](windows-compute/capture-comparison.json):13/13
   exact PNGs, median16.18805 ->15.51560ms; unchanged timing gate PASS.
+- [RTX High pipeline](windows-high/glass-edge-fresnel/capture-manifest.json):
+  three matched fixtures (`glass-edge-fresnel`, `lantern-held-high`, `lantern-held-low`),
+  all PNGs byte-identical to retained High controls. Aggregate/reason diagnostics
+  match exactly, including existing nonzero baseline counters. This is full-glass
+  preservation regression evidence, not closure of High transport correctness.
 
 Windows frozen Debug executable SHA256:
 `485d8743c8b1a91dfdc69eec2f835926824cac6fd88996b21e92d9eaa0d3e8f3`.
@@ -42,6 +47,21 @@ No sustained performance sweep was repeated. Keep the prior opacity NO-GO.
 
 Raw full capability/process/thermal reports, executable/APK and build logs stay
 local in `C:/Dev/tmp/horde-s24-instance-hits-20261001`; this archive retains the
-bounded scene/state/validation/comparison receipts only. Current-head CI and
-owner live S24 acceptance are the next unfinished admission checks. No release,
+bounded scene/state/validation/comparison receipts only. [Fresh source/merge CI](CI.md)
+passes both runs at46afd73; owner live S24 acceptance is still open. No release,
 main merge or publication. Audio/haptic manual revalidation required:NO.
+
+High uses the already-built frozen Debug executable SHA256
+`685579119ff2caafc61c1cbf4852c99726e17e79384c5ca8977ba688472a3ef3`;
+no unchanged artifact rebuild. Pipeline/High/Diagnostic, same RTX5050,960x540/100%.
+Lead independently checks candidate/control PNG hashes and completed manifests.
+The initial pre-initialisation console status is unavailable/unsupported; this
+does not override the completed RT-storage-image manifests' successful RT
+presentation. No compute-High, Shipping performance or full foundation claim.
+Raw CPU geometry exports/logs remain in the local run directories, not this archive.
+
+| High fixture | Exact control/candidate PNG SHA256 |
+| --- | --- |
+| glass-edge-fresnel |4b561086679c7b533aff3fe6fd8d7e897b3b375776a23035d4e0f741eec04409 |
+| lantern-held-high |3faac36e59e167b7908f7f33612a6ba933b6b7b01948d003a47a982691609d7b |
+| lantern-held-low |613349dbb3e4ae3de9c0a0a612036626a914209234edcf349aea36929773da4a |

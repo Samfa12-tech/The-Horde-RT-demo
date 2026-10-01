@@ -29,6 +29,8 @@ replay (1840 skin updates, endpoint visible). SM-S948B six PNGs and RTX Mobile
 Diagnostic13 pipeline +13 compute PNGs are byte-identical to each normal control;
 existing Windows capture-timing gates also pass. No GPU allocation/byte changes,
 2688 CPU cache bytes plus flags. See [receipts](evidence/2026-10-02-tlas-instance-refresh/README.md).
+Three focused RTX High pipeline glass/held-lantern images and diagnostics also
+match retained High controls exactly; no High correctness/backend gate waived.
 No new Shipping performance claim or backend-parity closure. No repeated finished
 performance sweep; opacity trial remains NO-GO. Probe code stays on separate
 `codex/horde-s24-instance-hit-probe`, never normal runtime. S24 normal entry is
@@ -42,9 +44,15 @@ bda1b99/0cf4f05 parents and the head tree. The report-fixture startup-readiness
 fix preserves consent/privacy assertions and timeout; old-job results are not
 current validation. Docs-only6ec30f0 PR36879098824 passed but push36879087706
 failed only MSVC report-UI WM_SETTEXT/control106 timeout; its cause is not yet
-proven, no compiler/renderer failure observed. **Next:** integrate reviewed9f4042f/evidence,
-push coherent engineering checkpoint, inspect fresh source/merge CI and update
-PR15; then remaining High/backend/report/music/final gates. Do not repeat the
+proven, no compiler/renderer failure observed. **Integration complete:** normal
+engineering46afd73 contains reviewed9f4042f/evidence. Fresh push36883566312 and
+PR36883575417 PASS GCC55/Clang55/MSVC57/Vulkan CPU-host15 each; actual logs,
+new resource fixture and merge a4758ad parents/tree inspected. PR15 remains draft,
+CLEAN/MERGEABLE. [CI receipt](evidence/2026-10-02-tlas-instance-refresh/CI.md)
+preserves the earlier timeout; current passes do not prove its cause fixed.
+S26 exact A627 is at normal entry/Home, not frozen capture mode, data preserved.
+**Next:** owner S24 live hands/enemy response and complete-visibility Shipping
+evidence; remaining High/backend/report/music/final gates. Do not repeat the
 completed finite device/image matrix. No release/main merge/publication.
 Audio/haptic manual revalidation required:NO (renderer-only/unchanged playback).
 

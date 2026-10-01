@@ -263,6 +263,7 @@ not uncommitted implementation. Do not repeat these rows without a validity reas
 | SM-S948B capture010625 | Six75% captures and Home/resume PASS; six PNGs byte-identical to normal8CB run20261001-222521 | Within-backend image regression, not phone-performance or S24/S25 certification. |
 | RTX5050 Mobile/Diagnostic pipeline | 13/13 byte-identical images; capture median15.58345 ->15.53295ms, existing2% timing gate PASS | Debug capture timing only, not a Shipping optimisation result. |
 | RTX5050 Mobile/Diagnostic compute | 13/13 byte-identical images; capture median16.18805 ->15.51560ms, existing2% timing gate PASS | Separate within-backend control. Does not resolve the prior5/13 pipeline/compute parity failures. |
+| RTX5050 High/Diagnostic pipeline | Three glass-edge/held-high/held-low fixtures, byte-identical PNGs and unchanged aggregate/reason diagnostics | Retained High controls matched; no missing fourth fixture invented. Existing physical correctness gates remain open. |
 
 Windows uses one frozen Debug executable SHA256
 485d8743c8b1a91dfdc69eec2f835926824cac6fd88996b21e92d9eaa0d3e8f3,
@@ -271,19 +272,26 @@ reports,13 zero-difference entries per backend and executable hash. S24 GPU
 inventory remains43 buffers/53 allocations/17 BLAS/1 TLAS/21 instances/2 pipelines,
 9814976 host-visible /72250176 device-local bytes: no new GPU resource overhead.
 The2688-byte CPU caches are not an intermediate rendering buffer.
+High uses its already-built frozen executable68557911, retained separately from
+the Mobile executable; no shader or unchanged artifact rebuild. Lead checks the
+three exact PNG hashes and completed pipeline/High manifests. Full glass remains.
 
-Decision: admit the bounded renderer policy after current-head CI, retaining
+Decision: admit the bounded renderer policy after the fresh46afd73 source/merge
+CI passes, retaining
 UPDATE for ordinary motion. Underlying driver cause remains unproven. S24 is at
 the regular entry screen for the already-requested owner hands/enemy check; do
 not interrupt that check or resend it after compaction. No player tuning, no
 new audio/haptic manual revalidation and no performance acceptance.
 
-Next unfinished step: integrate this exact reviewed commit and receipts into the
-engineering branch; inspect fresh push/PR compiler evidence and update PR15.
+Integration/push is complete: normal engineering46afd73 contains this exact
+reviewed commit and receipts. Fresh push36883566312 / PR36883575417 both PASS
+GCC55/Clang55/MSVC57/focused Vulkan CPU-host15; actual result lines and current
+merge parents/tree inspected. [CI receipt](evidence/2026-10-02-tlas-instance-refresh/CI.md).
 The docs-only6ec30f0 PR run36879098824 passed, but push36879087706 failed one
 MSVC report-UI fixture: WM_SETTEXT to note control106 timed out (ERROR_TIMEOUT1460).
 Other push lanes passed; the reason for the unresponsive UI thread is unproven.
-Do not call current CI green from0cf4f05's older passes. Restore
-S26 to its normal entry/Home configuration. Owner live S24 acceptance, current
+Do not infer that this intermittent fixture issue is solved by current passes.
+S26 is restored to the normal entry/Home configuration with the exact A627 APK;
+no data/settings cleared. Next unfinished step: owner live S24 acceptance, current
 Shipping timings with complete S24 visibility, High physical/backend and full
 final-candidate gates remain open. No S25, release/main merge/publication claim.
