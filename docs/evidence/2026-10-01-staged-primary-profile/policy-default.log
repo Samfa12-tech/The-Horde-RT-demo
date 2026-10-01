@@ -1,0 +1,12 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.11.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+
+> Task :app:printHordeRtPolicyForTest
+debug=-DHORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION=Diagnostic|-DHORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY=Mobile|-DHORDE_RT_STAGED_PRIMARY_SHADER_DIR=|-DHORDE_RT_STAGED_PRIMARY_DEFAULT=OFF|-DHORDE_RT_STAGED_PRIMARY_TIMING=OFF
+release=-DHORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION=Shipping|-DHORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY=Mobile|-DHORDE_RT_STAGED_PRIMARY_SHADER_DIR=|-DHORDE_RT_STAGED_PRIMARY_DEFAULT=OFF|-DHORDE_RT_STAGED_PRIMARY_TIMING=OFF
+benchmark=unavailable; set hordeBenchmarkValidation=true
+benchmarkValidation=false
+stagedPrimaryShaderDir=
+
+BUILD SUCCESSFUL in 7s
+1 actionable task: 1 executed

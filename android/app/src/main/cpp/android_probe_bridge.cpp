@@ -53,6 +53,9 @@
 #include "telemetry/RtBenchmarkEvidenceRun.h"
 #include "telemetry/RtEvidencePublication.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+#include "vulkan/raytracing/experimental/StagedPrimaryProfile.h"
+#endif
 
 #ifndef HORDE_RT_BUILD_ID
 #define HORDE_RT_BUILD_ID "development"
@@ -173,6 +176,10 @@ struct SwapchainContext
     horde::vulkan::DeviceCapabilities capabilities;
     horde::vulkan::raytracing::PresentableTinyRtScene rtScene;
     horde::vulkan::GpuFrameTimer gpuFrameTimer;
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+    horde::vulkan::raytracing::experimental::StagedPrimaryTiming stagedPassTimer;
+    horde::vulkan::raytracing::experimental::StagedPrimaryProfile stagedPassProfile;
+#endif
     horde::vulkan::raytracing::RtFrameEvidenceCoordinator rtFrameEvidence;
     bool gpuFrameTimingEnabled = true;
     double gpuFrameTimingTotalMs = 0.0;
@@ -790,6 +797,21 @@ void DeliverCompletedBenchmarkEvidence(
     }
 }
 
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+void CollectStagedPassTiming(SwapchainContext& context, std::uint32_t frameSlot,
+                            const horde::vulkan::raytracing::RtFrameEvidenceCompletionResult& completion,
+                            const horde::telemetry::RtPerformanceEvidenceSnapshot& snapshot)
+{
+    if (!completion.ownedGraphicsSubmission) return; // Own fence/device idle already succeeded.
+    const auto timing = context.stagedPassTimer.CollectCompleted(frameSlot);
+    if (completion.completedEvidence &&
+        context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring &&
+        snapshot.identity.submitted.frame.sceneEpoch == context.benchmarkEvidence.SceneEpoch() &&
+        snapshot.identity.submitted.frame.measurementGeneration == context.benchmarkEvidence.MeasurementGeneration())
+        (void)context.stagedPassProfile.Append(timing, snapshot);
+}
+#endif
+
 void RejectPendingBenchmarkExpectation(
     SwapchainContext& context,
     const horde::telemetry::RtBenchmarkFailureReason reason)
@@ -870,6 +892,9 @@ void StartInAppBenchmark(SwapchainContext& context)
         __android_log_print(ANDROID_LOG_ERROR, kTag,
                             "Android benchmark evidence allocation failed; route will remain invalid.");
     }
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+    (void)context.stagedPassProfile.Start(horde::gameplay::ShowcaseBenchmarkRun::kMaximumFramesPerLap);
+#endif
     context.inAppBenchmark.Start(
         horde::gameplay::ShowcaseBenchmarkRun::kDefaultLaps, requestedWorkload,
         context.benchmarkRunId.empty()); // Automated evidence has no FPS observer.
@@ -887,7 +912,12 @@ void FinishInAppBenchmark(SwapchainContext& context)
         horde::telemetry::RtBenchmarkRunStatus::Complete &&
         context.benchmarkEvidence.ExpectedCount() == context.inAppBenchmark.Frames().size();
     std::string text = context.inAppBenchmark.BuildTextReport(metadata, &context.benchmarkEvidence);
-    const std::string json = context.inAppBenchmark.BuildJsonReport(metadata, &context.benchmarkEvidence);
+    std::string json = context.inAppBenchmark.BuildJsonReport(metadata, &context.benchmarkEvidence);
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+    json = horde::vulkan::raytracing::experimental::AttachStagedPrimaryProfile(std::move(json),
+        context.stagedPassProfile.Json(context.benchmarkEvidence.ExpectedCount(), context.stagedPassTimer,
+                                      context.rtScene.ExecutionOrganisationJson()));
+#endif
     const std::string textPath = context.reportDirectory + "/HordeLanternRT-benchmark-latest.txt";
     const std::string jsonPath = context.reportDirectory + "/HordeLanternRT-benchmark-latest.json";
     const bool jsonSaved = WriteTextFile(jsonPath, json);
@@ -1972,6 +2002,9 @@ bool ReleaseSwapchainResources(SwapchainContext& context)
             horde::telemetry::RtResourceResetReason::SwapchainRecreate,
             CurrentInitialGpuEvidenceStatus(context));
     context.gpuFrameTimer.ResetAfterDeviceIdle();
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+    if (idleResult == VK_SUCCESS) context.stagedPassTimer.ResetAfterDeviceIdle();
+#endif
     context.gpuFrameTimingTotalMs = 0.0;
     context.gpuFrameTimingSampleCount = 0u;
     context.rtScene.Destroy();
@@ -2117,6 +2150,9 @@ bool CompleteRtEvidenceAfterDeviceIdle(
         const horde::vulkan::raytracing::RtFrameEvidenceCompletionResult result =
             context.rtFrameEvidence.CompleteFinalIdle(
                 frameSlot, gpuIo, diagnosticIo, &completedSnapshot);
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+        CollectStagedPassTiming(context, frameSlot, result, completedSnapshot);
+#endif
         if (result.gpuCollectionAttempted)
         {
             RefreshGpuTimingTelemetry(context, &result.gpuCollection);
@@ -2260,6 +2296,10 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
         context.gpuFrameTimer.Initialise(
             context.physicalDevice, context.device, context.graphicsQueueFamilyIndex, kMaxFramesInFlight);
     }
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+    if (context.stagedPassTimer.Status() == horde::vulkan::raytracing::experimental::StagedPrimaryTimingInitStatus::Uninitialised)
+        context.stagedPassTimer.Initialise(context.physicalDevice, context.device, context.graphicsQueueFamilyIndex, kMaxFramesInFlight);
+#endif
     RefreshGpuTimingTelemetry(context);
     __android_log_print(ANDROID_LOG_INFO, kTag, "PBR material encoding: %s", context.rtScene.MaterialEncoding().c_str());
     __android_log_print(ANDROID_LOG_INFO,
@@ -2311,6 +2351,9 @@ void DestroySwapchainContext(SwapchainContext& context)
     DestroyRtEvidenceOnOwnerThread(context);
     context.rtScene.Destroy();
     context.gpuFrameTimer.Destroy();
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+    context.stagedPassTimer.Destroy();
+#endif
     for (VkSemaphore semaphore : context.imageAvailableSemaphores)
     {
         if (semaphore != VK_NULL_HANDLE)
@@ -2428,6 +2471,9 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
                     context.gpuFrameTimer),
                 horde::vulkan::raytracing::MakeRtDiagnosticFrameIo(context.rtScene),
                 &completedSnapshot);
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+        CollectStagedPassTiming(context, context.currentFrame, completion, completedSnapshot);
+#endif
         RefreshGpuTimingTelemetry(
             context,
             completion.gpuCollectionAttempted ? &completion.gpuCollection : nullptr);
@@ -2498,6 +2544,9 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
     }
 
     bool gpuTimingRecording = false;
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+    horde::vulkan::raytracing::experimental::StagedPrimaryRecordingGuard stagedRecordingGuard(context.stagedPassTimer, context.currentFrame);
+#endif
     bool inAppBenchmarkFrame = false;
     const auto recordStart = std::chrono::steady_clock::now();
     if (useRtFrame)
@@ -2844,7 +2893,11 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
                                                 context.swapchainExtent,
                                                 frameInputs,
                                                 diagnostic,
-                                                evidenceFrame ? &observation : nullptr))
+                                                evidenceFrame ? &observation : nullptr
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+                                                , gpuTimingRecording ? &context.stagedPassTimer : nullptr, context.currentFrame
+#endif
+                                                ))
         {
             if (evidenceFrame)
             {
@@ -2972,6 +3025,11 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             gpuTimingRecording,
             horde::vulkan::raytracing::MakeRtGpuFrameTimerIo(
                 context.gpuFrameTimer));
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+        horde::telemetry::RtSubmittedFrameIdentity stagedOwner{};
+        if (context.rtFrameEvidence.TryGetCommittedIdentity(context.currentFrame, stagedOwner))
+            (void)context.stagedPassTimer.MarkSubmitted(context.currentFrame, stagedOwner.submissionSerial);
+#endif
     }
     if (context.benchmarkExpectedFrame.has_value())
     {
@@ -3176,6 +3234,9 @@ void SwapchainRenderLoop()
                     horde::telemetry::RtResourceResetReason::RenderScaleChange,
                     CurrentInitialGpuEvidenceStatus(gSwapchainContext));
             gSwapchainContext.gpuFrameTimer.ResetAfterDeviceIdle();
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+            gSwapchainContext.stagedPassTimer.ResetAfterDeviceIdle();
+#endif
             gSwapchainContext.gpuFrameTimingTotalMs = 0.0;
             gSwapchainContext.gpuFrameTimingSampleCount = 0u;
             RefreshGpuTimingTelemetry(gSwapchainContext);

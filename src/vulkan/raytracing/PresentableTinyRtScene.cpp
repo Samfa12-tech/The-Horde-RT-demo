@@ -5613,7 +5613,12 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                                                 VkExtent2D swapchainExtent,
                                                 const RtSceneFrameInputs& frame,
                                                 std::string& diagnostic,
-                                                RtSceneRecordObservation* observation)
+                                                RtSceneRecordObservation* observation
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+                                                , experimental::StagedPrimaryTiming* stagedTiming,
+                                                std::uint32_t timingFrameSlot
+#endif
+                                                )
 {
 #ifndef NDEBUG
     // A rejected presentation attempt invalidates geometry evidence from the
@@ -5731,7 +5736,11 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
             if (stagedPrimary_) {
                 stagedPrimary_->Record(commandBuffer,
                     genericTransmissionActive_ ? RtMaterialStrategy::GenericDielectric : RtMaterialStrategy::OpaqueFast,
-                    std::as_bytes(std::span{&pushConstants, 1u}));
+                    std::as_bytes(std::span{&pushConstants, 1u})
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+                    , stagedTiming, timingFrameSlot
+#endif
+                    );
                 return;
             }
 #endif

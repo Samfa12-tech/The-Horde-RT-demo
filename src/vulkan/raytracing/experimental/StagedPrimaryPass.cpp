@@ -1,5 +1,8 @@
 #include "vulkan/raytracing/experimental/StagedPrimaryPass.h"
 #include "StagedPrimaryShaders.generated.h"
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+#include "vulkan/raytracing/experimental/StagedPrimaryTiming.h"
+#endif
 
 #include <sstream>
 #include <locale>
@@ -143,7 +146,8 @@ void StagedPrimaryPass::WritePageDescriptors() noexcept
 }
 
 void StagedPrimaryPass::Record(VkCommandBuffer command, RtMaterialStrategy strategy,
-                             std::span<const std::byte> pushConstants) const noexcept
+                             std::span<const std::byte> pushConstants,
+                             StagedPrimaryTiming* timing, std::uint32_t frameSlot) const noexcept
 {
     const auto& selected = passes_[strategy == RtMaterialStrategy::OpaqueFast ? 0u : 1u];
     const std::array<VkDescriptorSet, 2u> sets{sceneSet_, pageSet_};
@@ -157,13 +161,26 @@ void StagedPrimaryPass::Record(VkCommandBuffer command, RtMaterialStrategy strat
         trace_(command, &pass.sbtRegions[0], &pass.sbtRegions[1], &pass.sbtRegions[2], &pass.sbtRegions[3],
                extent_.width, extent_.height, 1u);
     };
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+    bool timingRecorded = timing != nullptr && timing->RecordBegin(command, frameSlot);
+#else
+    (void)timing; (void)frameSlot;
+#endif
     dispatch(selected[0]);
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+    if (timingRecorded && !timing->RecordPrimaryEnd(command, frameSlot)) {
+        timing->CancelRecording(frameSlot); timingRecorded = false;
+    }
+#endif
     VkMemoryBarrier barrier{VK_STRUCTURE_TYPE_MEMORY_BARRIER};
     barrier.srcAccessMask = VK_ACCESS_SHADER_WRITE_BIT; barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
     vkCmdPipelineBarrier(command, VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
                          VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR, 0u,
                          1u, &barrier, 0u, nullptr, 0u, nullptr);
     dispatch(selected[1]);
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+    if (timingRecorded && !timing->RecordEnd(command, frameSlot)) timing->CancelRecording(frameSlot);
+#endif
 }
 
 bool StagedPrimaryPass::PrepareResizeAfterDeviceIdle(VkExtent2D extent, std::string& diagnostic)
@@ -229,7 +246,12 @@ std::string_view StagedPrimaryPass::PairSha256(RtMaterialStrategy strategy) noex
 std::string StagedPrimaryPass::MetadataJson() const
 {
     std::ostringstream out; out.imbue(std::locale::classic());
-    out << "{\"organisation\":\"StagedPrimaryV1Investigation\",\"recordBytes\":128,\"pages\":3"
+    out << "{\"organisation\":\"StagedPrimaryV1Investigation\",\"traceDispatchesPerFrame\":2,\"recordBytes\":128,\"pages\":3"
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+        << ",\"passProfilingCompiled\":true"
+#else
+        << ",\"passProfilingCompiled\":false"
+#endif
         << ",\"logicalBytes\":" << extentContract_.logicalBytes
         << ",\"paddedBufferBytes\":" << extentContract_.paddedBufferBytes
         << ",\"allocationBytes\":" << IntermediateAllocationBytes()

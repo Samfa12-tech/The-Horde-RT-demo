@@ -28,7 +28,7 @@ without loosening tolerance. Include live motion, not just frozen extreme poses.
 Music, consent-based reporting, resource work and final gates remain in scope;
 licensing, signing recovery and publication remain owner-controlled.
 
-### October 1 safe checkpoint before staged Mobile experiment
+### October 1 bounded staged Mobile experiment checkpoint
 
 The single [staged-primary experiment record](ENGINEERING_1_6_1_STAGED_MOBILE_RT_2026-10-01.md)
 owns its finite matrix, memory-counter gaps, exact identities, completed results
@@ -41,8 +41,18 @@ Diagnostic/Mobile and Shipping/Mobile-policy, but capture-loop medians regress
 explicit isolated Android benchmark builds4ABIs and actual ARM64/Windows candidate
 eight-module SPIR-V checks pass without atomics/binding22. Dirty-build fingerprints
 and exact artifacts are retained in the experiment evidence. Normal Shipping
-defaults/closed-roster gates remain unchanged. No device action; per-pass timing,
-High images, live physical and exact warm phone/memory gates remain open.
+defaults/closed-roster gates remain unchanged. Reviewed candidate `0c84e40` and
+focused CI `ee05ea0` are pushed; exactee05 push/PR55/55 common and14/14 focused
+CPU-host tests pass (not physical RT evidence).
+
+The separate optional pass observer now passes six affected host tests,14
+byte-identical observer images and a real RTX Release frozen600-frame smoke:
+all query/benchmark identities match, including final serial1200. Android timed
+benchmark builds4ABIs; final APK0e605dee…d5a8b is retained, not installed. Normal
+Shipping defaults remain OFF, modules unchanged. Follow the experiment's exact
+receipts/next step; no repeated Mobile matrices or retroactive clean-build claim.
+No phone action. High supplement, known live physical failures, warm exact-phone
+ABBA and RAM/GPU-counter sampling remain open; no performance acceptance.
 
 Windows84f111e and Android884dc8b native music output are pushed; exact884dc8b
 push36797092043/PR36797097338 freshly PASS GCC/Clang/MSVC53/53 each and Vulkan

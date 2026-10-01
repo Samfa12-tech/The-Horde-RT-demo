@@ -1,0 +1,52 @@
+{
+  "backend": "Vulkan",
+  "rtMode": "RayTracingPipeline",
+  "executionBackend": "RayTracingPipeline",
+  "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+  "vendorId": 4318,
+  "deviceId": 11672,
+  "driverVersion": 2559295488,
+  "driverVersionText": "610.188.0",
+  "vulkanApiVersion": 4211029,
+  "vulkanApiVersionText": "1.4.341",
+  "extensions": {
+    "VK_KHR_acceleration_structure": true,
+    "VK_KHR_ray_tracing_pipeline": true,
+    "VK_KHR_ray_query": true,
+    "VK_KHR_buffer_device_address": true,
+    "VK_KHR_deferred_host_operations": true
+  },
+  "features": {
+    "accelerationStructure": true,
+    "rayTracingPipeline": true,
+    "rayQuery": true,
+    "bufferDeviceAddress": true
+  },
+  "internalRenderResolution": {
+    "width": 0,
+    "height": 0
+  },
+  "fps": "N/A",
+  "frameTimeMs": "N/A",
+  "gpuRtTiming": {
+    "status": "Not initialised",
+    "supported": false,
+    "valid": false,
+    "latestMs": "N/A",
+    "averageMs": "N/A",
+    "timestampPeriodNanoseconds": 0,
+    "timestampValidBits": 0,
+    "sampleCount": 0,
+    "unavailableCount": 0,
+    "errorCount": 0
+  },
+  "rtScene": {
+    "status": "Execution backend selected; presentation pending",
+    "geometry": "Complete Horde showcase route with sequential animated skeleton and staff-lit lich",
+    "dispatchWidth": 0,
+    "dispatchHeight": 0,
+    "presented": false
+  },
+  "diagnostics": ["Inspecting candidate 1", "Driver version packed: 2559295488", "Driver version: 610.188.0", "Vulkan API version: 1.4.341", "RT capability mode: RayTracingPipeline", "Internal render resolution: not measured yet.", "FPS / frame time: not measured yet."],
+  "rtFrameEvidence": {"version":1,"observerAvailable":false,"sceneEpoch":null,"measurementGeneration":null,"running":null,"paused":null,"presented":null,"diagnosticStatus":"unavailable","gpuStatus":"unavailable","completedFrameStatus":"unavailable","completedFrameReason":"observer-unavailable","completedFrame":null}
+}

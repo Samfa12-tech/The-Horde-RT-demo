@@ -53,7 +53,8 @@ package and builds/runs the focused player contracts, actual skinned-player smok
 and malformed/reordered GLB fixtures. Focused initialization preflight and scene
 resource-inventory tests also cover output-only resize rollback and ownership.
 The investigation-only staged-primary owner has CPU fault-injection coverage in
-this focused lane (14 tests at this checkpoint). Its tiny non-SPIR-V header and
+this focused lane (15 tests at this checkpoint, including experimental timestamp/
+profile identity fixtures). Its tiny non-SPIR-V header and
 fake Vulkan/resource functions test cleanup/resize ownership only, not real
 allocation, shader validity, device limits or image/performance acceptance.
 The tests do not create a Vulkan device:

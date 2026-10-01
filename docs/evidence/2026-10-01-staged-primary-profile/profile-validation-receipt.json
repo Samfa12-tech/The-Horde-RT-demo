@@ -1,0 +1,165 @@
+{
+  "schemaVersion": 1,
+  "validation": "PASS",
+  "scope": "Offline consistency review of one completed Windows Release staged-primary benchmark smoke and static inspection of the exact profiled Windows Release executable plus the rebuilt staged Shipping/Mobile Android benchmark APK.",
+  "source": {
+    "head": "ee05ea0ad1ac1673d9051cd0fd024b1bd0cc7144",
+    "workingTreeWasDirty": true,
+    "reportRunId": "",
+    "reportTimestampUtc": "2026-10-01T02:41:33Z",
+    "workload": "lantern-held-high-v1"
+  },
+  "inputs": {
+    "benchmarkJson": {
+      "file": "HordeLanternRT-benchmark-20261001-024133.json",
+      "bytes": 711370,
+      "sha256": "1f3e9073e455c175be62f9e28208ff38d72fca98166b6c481004d783d1765d16"
+    },
+    "benchmarkText": {
+      "file": "HordeLanternRT-benchmark-20261001-024133.txt",
+      "bytes": 4423,
+      "sha256": "99353d834352a4aab5682b8fba4bb7a61f2fa75904934960923c337994cbfb6e"
+    },
+    "capabilityJson": {
+      "file": "vulkan_capability_report.json",
+      "bytes": 1920,
+      "sha256": "8b10a580ea1bd4f33853b14ec6e07b5712d150756b9d931100492c0c4244ffe9"
+    },
+    "capabilityText": {
+      "file": "vulkan_capability_report.txt",
+      "bytes": 1176,
+      "sha256": "4364832ded4bcfc479705c594768bbbcac8f489ce6bb1d2986223772718ef786"
+    },
+    "stdout": {
+      "file": "stdout.log",
+      "bytes": 1973,
+      "sha256": "bb9f1d8e83c90ac5a90ac0f4bfc8d558660fff9372608ff1ac9bc5294e3ef71d"
+    },
+    "stderr": {
+      "file": "stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "showcaseTimingCsv": {
+      "file": "windows_showcase_timing.csv",
+      "bytes": 91,
+      "sha256": "289745e82478d7f78a307808c2b300531bb9413ffa36bea326ab1848b3c3b593"
+    }
+  },
+  "ledgerValidation": {
+    "runStatus": "complete",
+    "expected": 600,
+    "completed": 600,
+    "rejected": 0,
+    "cancelled": 0,
+    "outstanding": 0,
+    "cpuAccepted": 600,
+    "gpuValid": 600,
+    "presentedEveryFrame": true,
+    "capabilitySnapshotNote": "The capability report records RT scene presented=true and matching extent, but its separate rtFrameEvidence block is an earlier pending snapshot (generation 4, presented=false); it is not identity-aligned to this benchmark. The completed benchmark ledger is the source for the 600 measured presentation outcomes.",
+    "zone": "yellow-torch-bay",
+    "sceneEpoch": 2,
+    "measurementGeneration": 6,
+    "firstSubmittedSerial": 601,
+    "finalCompletionDrainSerial": 1200,
+    "stageRows": 600,
+    "identityJoin": {
+      "joinFields": [
+        "submissionSerial",
+        "frameSlot",
+        "sceneEpoch",
+        "measurementGeneration",
+        "simulationTick"
+      ],
+      "querySerialAndSlotMatched": true,
+      "submittedToCompletionLedgerIdentityMatched": true,
+      "completionSerialMatchedSubmissionSerial": true,
+      "mismatches": 0
+    },
+    "querySamples": {
+      "valid": 600,
+      "unavailable": 0,
+      "errors": 0,
+      "consumedAndIdentityMatched": 600,
+      "rejectedProfileRows": 0,
+      "missingCompletionRows": 0
+    },
+    "timestampConversion": {
+      "validBits": 64,
+      "periodNanoseconds": 1,
+      "tickToMillisecondMismatches": 0,
+      "maxAbsoluteConversionErrorMilliseconds": 0
+    }
+  },
+  "timingsMilliseconds": {
+    "primaryInclusiveOfPrerequisiteWait": {
+      "sampleCount": 600,
+      "median": 0.937664,
+      "p95NearestRank": 0.94864,
+      "min": 0.929408,
+      "max": 1.259392
+    },
+    "shadeInclusiveOfInterpassBarrier": {
+      "sampleCount": 600,
+      "median": 1.958912,
+      "p95NearestRank": 2.455552,
+      "min": 1.943552,
+      "max": 2.59072
+    },
+    "existingWholeRtGpuTimer": {
+      "sampleCount": 600,
+      "median": 2.948544,
+      "p95NearestRank": 3.433568,
+      "min": 2.914528,
+      "max": 4.063872
+    }
+  },
+  "executionAndAllocation": {
+    "device": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "backend": "RayTracingPipeline",
+    "presentMode": "MAILBOX",
+    "instrumentation": "Shipping",
+    "quality": "Mobile",
+    "renderScalePercent": 100,
+    "internalExtent": "1232x803",
+    "presentationExtent": "1232x803",
+    "capabilityReportRtPresented": true,
+    "dispatchExtent": "1232x803",
+    "allocation": {
+      "organisation": "StagedPrimaryV1Investigation",
+      "traceDispatchesPerFrame": 2,
+      "pages": 3,
+      "logicalBytes": 126629888,
+      "paddedBufferBytes": 126630144,
+      "allocationBytes": 126630144,
+      "logicalReadWriteBytesPerFrame": 253259776,
+      "dramTrafficMeasured": false
+    },
+    "runtimeReportModuleSha256": [
+      "6a05d46a3a83671db431d1ff04782ecb1937243c3292257e8cf5a501a7877dff",
+      "147f113e8dfcfeb14811513af667b81c0f7352544e931b9c25ff37293d67d7d3",
+      "82b45ee960bbbeb6f0dfed1ffb9550dbb7bb34a7d70325c0d913a4186e8df5d0",
+      "fabc53f43b7d00b4be683d23a978dd6045909c3e649fc1c8f8f9055d82e3c86d"
+    ]
+  },
+  "staticArtifactInspection": {
+    "receiptFile": "../artifacts-profiled-idle-guard/module-inspection/module-inspection.json",
+    "receiptSha256": "b89316f9e4ae4038fb71cbc2dd59dd7ab7005d33f4d9f42befd43c45c8b67be5",
+    "windowsExeSha256": "5b3e154abf4bda909c1e85b45d38c0576279a9d0a8f810a92843db496e0e58bf",
+    "androidBenchmarkApk": {
+      "applicationId": "com.samfa12.hordelanternrt.benchmark",
+      "variant": "benchmark",
+      "versionCode": 9,
+      "bytes": 111592386,
+      "sha256": "0e605deeeff693e01083790a314f0ecd23cb68e2472a8c077b9d2a084bcd5a8b"
+    },
+    "validation": "Eight exact normal plus staged Shipping/Mobile modules were found once in each APK/EXE, matched catalog or staged-manifest hashes, passed spirv-val and spirv-dis, and contained zero atomics and no binding 22. This is static artifact validation, not runtime-device evidence."
+  },
+  "limitations": [
+    "One frozen warm lap plus one measured 600-frame lap, at 100% desktop extent; not a matched comparison or causal performance estimate.",
+    "The capability report's nested frame-evidence snapshot is earlier and pending; it is not a substitute for the completed run ledger.",
+    "Windows RTX desktop smoke only; no phone runtime or sustained performance evidence.",
+    "Stage intervals include prerequisite-wait and interpass-barrier effects; they are not isolated shader costs or additive DRAM bandwidth measurements.",
+    "No optimization, production-promotion, 30-FPS, or owner-visual-acceptance claim."
+  ]
+}

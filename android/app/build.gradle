@@ -67,6 +67,11 @@ def hordeRtInstrumentationOverride = providers.gradleProperty('hordeRtInstrument
 def hordeRtDielectricQualityOverride = providers.gradleProperty('hordeRtDielectricQualityOverride').orNull
 def hordeStagedPrimaryShaderDirProperty = providers.gradleProperty('hordeStagedPrimaryShaderDir').orNull
 def hordeStagedPrimaryShaderDir = null
+def hordeStagedPrimaryTimingProperty = providers.gradleProperty('hordeStagedPrimaryTiming').orNull
+if (hordeStagedPrimaryTimingProperty != null && !(hordeStagedPrimaryTimingProperty in ['true', 'false'])) {
+    throw new GradleException('hordeStagedPrimaryTiming must be true or false.')
+}
+def hordeStagedPrimaryTiming = hordeStagedPrimaryTimingProperty == 'true'
 if (hordeStagedPrimaryShaderDirProperty != null) {
     if (!hordeBenchmarkValidation) {
         throw new GradleException('hordeStagedPrimaryShaderDir requires hordeBenchmarkValidation=true.')
@@ -86,6 +91,9 @@ if (hordeStagedPrimaryShaderDirProperty != null) {
         throw new GradleException('hordeStagedPrimaryShaderDir must contain a non-empty StagedPrimaryShaders.generated.h.')
     }
     hordeStagedPrimaryShaderDir = stagedPrimaryDirectory.absolutePath
+}
+if (hordeStagedPrimaryTiming && (!hordeBenchmarkValidation || !hordeStagedPrimaryShaderDir)) {
+    throw new GradleException('hordeStagedPrimaryTiming=true requires the explicit staged benchmark shader directory.')
 }
 def hordeRtOverridePresent = { String value -> value != null && !value.isEmpty() }
 if (hordeRtOverridePresent(hordeRtInstrumentationOverride) != hordeRtOverridePresent(hordeRtDielectricQualityOverride)) {
@@ -112,11 +120,13 @@ def hordeRtNativePolicyArguments = { String defaultInstrumentation ->
     return ["-DHORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION=${instrumentation}",
             "-DHORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY=${quality}",
             '-DHORDE_RT_STAGED_PRIMARY_SHADER_DIR=',
-            '-DHORDE_RT_STAGED_PRIMARY_DEFAULT=OFF']
+            '-DHORDE_RT_STAGED_PRIMARY_DEFAULT=OFF',
+            '-DHORDE_RT_STAGED_PRIMARY_TIMING=OFF']
 }
 def hordeRtBenchmarkStagedPrimaryArguments = [
     "-DHORDE_RT_STAGED_PRIMARY_SHADER_DIR=${hordeStagedPrimaryShaderDir ?: ''}",
-    "-DHORDE_RT_STAGED_PRIMARY_DEFAULT=${hordeStagedPrimaryShaderDir ? 'ON' : 'OFF'}"
+    "-DHORDE_RT_STAGED_PRIMARY_DEFAULT=${hordeStagedPrimaryShaderDir ? 'ON' : 'OFF'}",
+    "-DHORDE_RT_STAGED_PRIMARY_TIMING=${hordeStagedPrimaryTiming ? 'ON' : 'OFF'}"
 ]
 
 // Explicit local-only asset experiment. Release and ordinary Debug never consume
@@ -374,7 +384,8 @@ android {
                 externalNativeBuild {
                     cmake {
                         arguments "-DHORDE_RT_STAGED_PRIMARY_SHADER_DIR=${hordeStagedPrimaryShaderDir ?: ''}",
-                            "-DHORDE_RT_STAGED_PRIMARY_DEFAULT=${hordeStagedPrimaryShaderDir ? 'ON' : 'OFF'}"
+                            "-DHORDE_RT_STAGED_PRIMARY_DEFAULT=${hordeStagedPrimaryShaderDir ? 'ON' : 'OFF'}",
+                            "-DHORDE_RT_STAGED_PRIMARY_TIMING=${hordeStagedPrimaryTiming ? 'ON' : 'OFF'}"
                     }
                 }
             }

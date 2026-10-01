@@ -405,7 +405,12 @@ public:
                             VkExtent2D swapchainExtent,
                             const RtSceneFrameInputs& frame,
                             std::string& diagnostic,
-                            RtSceneRecordObservation* observation = nullptr);
+                            RtSceneRecordObservation* observation = nullptr
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+                            , experimental::StagedPrimaryTiming* stagedTiming = nullptr,
+                            std::uint32_t timingFrameSlot = 0u
+#endif
+                            );
 
     // Owning render thread only, after successful device-idle/evidence completion.
     // Replaces only the extent-dependent output image; caller must reset and

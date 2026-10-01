@@ -1,0 +1,235 @@
+{
+  "schema": 1,
+  "scope": "Separate optional staged-primary observer; no phone evidence",
+  "sourceHead": "ee05ea0ad1ac1673d9051cd0fd024b1bd0cc7144",
+  "sourceWasDirty": true,
+  "sourceIdentity": "Relevant current runtime inputs fingerprinted after builds before reviewed commit. Last change was Android-only failed-idle guard; only Android rebuilt for it. Unrelated scratch omitted and preserved.",
+  "windowsPolicy": "Shipping/Mobile; Debug image automation shell plus actual Release frozen benchmark smoke",
+  "androidPolicy": "Four-ABI development-signed isolated benchmark Shipping/Mobile; staged and timing ON; no install",
+  "normalPolicy": "Normal Debug/Release empty staged directory, default OFF and timing OFF; no installed configuration changed",
+  "sourceFiles": [
+    {
+      "path": "CMakeLists.txt",
+      "bytes": 51533,
+      "sha256": "e56aa57c78c5368b0a219f15d248bd1e5b9657b413aa3e78cc23ec0f69efa0da"
+    },
+    {
+      "path": "cmake/HordeRtStagedPrimary.cmake",
+      "bytes": 2205,
+      "sha256": "e55da5f6160d43aa8bbfce8d9693fef8887e293b065b886b8e514f4101b517b1"
+    },
+    {
+      "path": "android/app/build.gradle",
+      "bytes": 22946,
+      "sha256": "bdfbfc60c4a1cb0efeff127d38620ed1e3f4a4aeabc435581ca6613a581e541a"
+    },
+    {
+      "path": "android/app/src/main/cpp/android_probe_bridge.cpp",
+      "bytes": 182729,
+      "sha256": "1dc2a76bd7261851c5dcf7ebc118a6c8bcb7e428ca110007a4b79b9697aff7c7"
+    },
+    {
+      "path": "src/platform/windows/DiagnosticWindow.cpp",
+      "bytes": 312095,
+      "sha256": "5901b9907c4dd639cdb47e2ae63870c18730f1cb00df9a46e6ef589e2e9de03d"
+    },
+    {
+      "path": "src/vulkan/raytracing/PresentableTinyRtScene.cpp",
+      "bytes": 333076,
+      "sha256": "9858fb338e54703064c66fdad7a2e9d0ee74dba137d3fe40d4706346ce1da2ba"
+    },
+    {
+      "path": "src/vulkan/raytracing/PresentableTinyRtScene.h",
+      "bytes": 35675,
+      "sha256": "c76aae0a20c4e5bc4fbe562e84c3959879c7eb32142ffe18aa066b0199ec0a8b"
+    },
+    {
+      "path": "src/vulkan/raytracing/experimental/StagedPrimaryPass.cpp",
+      "bytes": 14836,
+      "sha256": "d13a20ced8ff17bc609145ad3661df6fc4293f485f2ff1c7a22f239ed4341ea0"
+    },
+    {
+      "path": "src/vulkan/raytracing/experimental/StagedPrimaryPass.h",
+      "bytes": 3425,
+      "sha256": "4d3c51cdfedbbb3241de903ac2b5efeea57bc49587d5e61671cab347ca86230a"
+    },
+    {
+      "path": "src/vulkan/raytracing/experimental/StagedPrimaryTiming.cpp",
+      "bytes": 10560,
+      "sha256": "5a2a7ab4697a07aa44eb04bae3631c1324cb372bb2e61a887813c533b3696d0d"
+    },
+    {
+      "path": "src/vulkan/raytracing/experimental/StagedPrimaryTiming.h",
+      "bytes": 3872,
+      "sha256": "507f08351b1319953f3ab2bcc8b3252d450126eade843b5022282d0cdd8867a0"
+    },
+    {
+      "path": "src/vulkan/raytracing/experimental/StagedPrimaryProfile.h",
+      "bytes": 8113,
+      "sha256": "1210f1ab7b03d30c5815c2cbc6675f6e40f4867b278d5fb17e9480bbc11175ef"
+    },
+    {
+      "path": "tests/StagedPrimaryTimingTests.cpp",
+      "bytes": 18285,
+      "sha256": "f9eafe14486215e42da20b8a34491ab301dca016f73a85f31cfde259ee5a623c"
+    }
+  ],
+  "externalRoot": "C:\\Dev\\tmp\\horde-staged-rt-20261001",
+  "artifacts": [
+    {
+      "path": "build-shipping-profiled/Release/HordeLanternRT.exe",
+      "bytes": 3961856,
+      "sha256": "5b3e154abf4bda909c1e85b45d38c0576279a9d0a8f810a92843db496e0e58bf"
+    },
+    {
+      "path": "build-shipping-profiled/Debug/HordeLanternRT.exe",
+      "bytes": 9295872,
+      "sha256": "dba45d83e53209045efa2cc6d4f52ac17d6d5b17a5e2ed67173c9eae2dd977d9"
+    },
+    {
+      "path": "artifacts-profiled-idle-guard/app-benchmark-staged-shipping-mobile-timed.apk",
+      "bytes": 111592386,
+      "sha256": "0e605deeeff693e01083790a314f0ecd23cb68e2472a8c077b9d2a084bcd5a8b"
+    },
+    {
+      "path": "artifacts-profiled/app-benchmark-staged-shipping-mobile-timed.apk",
+      "bytes": 111592386,
+      "sha256": "1b7dccb9cfa8a2a50150c6b0c69b0f1f7556596d549916920e7974698652e5ff"
+    },
+    {
+      "path": "artifacts/app-benchmark-staged-shipping-mobile.apk",
+      "bytes": 111541698,
+      "sha256": "fe116182e2fbdbbecbfca84b1cd56a96d0f216fc671ccad68b5948a07887d62a"
+    },
+    {
+      "path": "shaders-shipping-mobile/staged-primary-manifest.json",
+      "bytes": 7565,
+      "sha256": "0813589f6ed357857ab6c10a7f044e0db24c4c931ba60eb73a9b203c587e484f"
+    }
+  ],
+  "retainedEvidence": [
+    {
+      "path": "android-staged-shipping-profiled-build.log",
+      "bytes": 19560,
+      "sha256": "ec8d16d343063635367189ccdcc63b3fed44b6445b9fdfc0d3353e5c1bb60382"
+    },
+    {
+      "path": "android-staged-shipping-profiled-idle-guard-build.log",
+      "bytes": 3878,
+      "sha256": "1f76e482a391b2fdffeda1c14e7ef43a7209b91a8332710dba0103a6180cfa57"
+    },
+    {
+      "path": "android-staged-shipping-profiled-repaired-build.log",
+      "bytes": 3881,
+      "sha256": "f03a4218a5d3657f04810d388d7ca9fc393b76b1e7109806ffb7323e0e8d1d0c"
+    },
+    {
+      "path": "HordeLanternRT-benchmark-20261001-024133.json",
+      "bytes": 711370,
+      "sha256": "1f3e9073e455c175be62f9e28208ff38d72fca98166b6c481004d783d1765d16"
+    },
+    {
+      "path": "HordeLanternRT-benchmark-20261001-024133.txt",
+      "bytes": 4423,
+      "sha256": "99353d834352a4aab5682b8fba4bb7a61f2fa75904934960923c337994cbfb6e"
+    },
+    {
+      "path": "policy-default.log",
+      "bytes": 946,
+      "sha256": "84674f5d7dcc2cfef032fabad3662917d51377afb8a09b0bbac90bed406c8d58"
+    },
+    {
+      "path": "policy-negative-invalid-value.log",
+      "bytes": 1435,
+      "sha256": "d7e83b8babaaaccf927c1988d809407f5bc14f31b9042fd2b132233ea34f6ca2"
+    },
+    {
+      "path": "policy-negative-missing-dir.log",
+      "bytes": 1474,
+      "sha256": "c8ee523b1a924dd2806860fae5b06fc2dcdf5528c206dcc72be981760108c87e"
+    },
+    {
+      "path": "policy-staged-timing.log",
+      "bytes": 1345,
+      "sha256": "c1f0dac15b58982bdb4053bf98aa7b808b391eb97fc11cc89ad8439be1e5bc33"
+    },
+    {
+      "path": "profile-observer-image-equivalence.json",
+      "bytes": 4757,
+      "sha256": "053ad82ad36ddb17582843c52b2074d918d83ed529e42230a24ee42ca9061b8e"
+    },
+    {
+      "path": "profile-smoke-runtime-assets.json",
+      "bytes": 13647,
+      "sha256": "0891f83b5d235ec75d192bafdfebab4d11713e0cd191a8af9b4de851f72cd1a2"
+    },
+    {
+      "path": "profile-validation-receipt.json",
+      "bytes": 6404,
+      "sha256": "688ea2d667c9880c9a47eb3c0def94aa1b26a426a150aad3f633294db457f436"
+    },
+    {
+      "path": "profiled-configure.log",
+      "bytes": 1554,
+      "sha256": "ff72bebd7bedb8622285d20d36f081a66ec41180874717866140ceb8afd970b9"
+    },
+    {
+      "path": "profiled-debug-build.log",
+      "bytes": 2963,
+      "sha256": "8508b4069c08573f99098a3755caa9157dedab0e103ab810703afb3941fc491b"
+    },
+    {
+      "path": "profiled-module-inspection.json",
+      "bytes": 16699,
+      "sha256": "b89316f9e4ae4038fb71cbc2dd59dd7ab7005d33f4d9f42befd43c45c8b67be5"
+    },
+    {
+      "path": "profiled-observer-images.log",
+      "bytes": 234,
+      "sha256": "383c3f132eecdc4956b1a4407ba04a875cb4cb77ff64e3ecd2b76d726f2459e6"
+    },
+    {
+      "path": "profiled-release-current-build.log",
+      "bytes": 3641,
+      "sha256": "cda460d4991ea026231cefa58495ee576493663f901daebec14a84d423e70297"
+    },
+    {
+      "path": "profiled-release-current-tests.log",
+      "bytes": 1081,
+      "sha256": "3b6e3bc9eac331df24a346ff7f65d36c9ddf92248478f4f3ef59060fc2ae9899"
+    },
+    {
+      "path": "profiled-release-idle-guard-build.log",
+      "bytes": 758,
+      "sha256": "fc429c1db3cef1de2512099299709840a8fb733eb824463a8aee86075231782b"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3303,
+      "sha256": "d4c8f62e86399ebb3e8867d5cbe5e54a5efced09826d7a08d27bd5a2c5ad7a04"
+    },
+    {
+      "path": "failed-missing-runtime-assets/stderr.log",
+      "bytes": 210,
+      "sha256": "dc4673b894d68436890d6b1d46f7ec48f175e8cce9bf5029efd7ec5b68e0e105"
+    },
+    {
+      "path": "failed-missing-runtime-assets/stdout.log",
+      "bytes": 1450,
+      "sha256": "e3a6251a49a4506bd58fa04b68b2c359172df09de9afe9912510cc7fe09241cc"
+    },
+    {
+      "path": "failed-missing-runtime-assets/vulkan_capability_report.json",
+      "bytes": 1939,
+      "sha256": "6cd66b1fb74f7e70898668878ebd8adeec1b5c78e7ac7da49da6d67603467657"
+    }
+  ],
+  "excludedClaims": [
+    "Matched performance saving",
+    "Phone runtime or memory counters",
+    "DRAM bandwidth",
+    "Live physical transport",
+    "Registers/spills/occupancy",
+    "Production promotion/publication"
+  ]
+}

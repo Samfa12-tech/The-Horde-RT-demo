@@ -3,7 +3,8 @@
 Status: Diagnostic/Mobile and Shipping/Mobile-policy RTX image matrices pass
 their unchanged pixel gates; capture-loop timing comparisons fail. **No warm
 Shipping or phone performance acceptance, and no promotion.** Android candidate
-compilation/static inspection passes; per-pass timing admission remains open.
+compilation/static inspection passes. The optional pass observer now has real RTX
+submission-owned runtime evidence; exact phone admission remains open.
 This is the single resumption record. Read its next unfinished step instead of
 restarting the completed omission investigations or rebuilding unchanged artifacts.
 
@@ -149,6 +150,27 @@ and **unknown DRAM bandwidth cost** separately. Total-minus-pass residual is not
 a pure bandwidth measurement. A traffic-only calibration, if needed, is a
 separate nonvisual control, never a reduced-effect rendering candidate.
 
+### Separate optional pass observer
+
+`HORDE_RT_STAGED_PRIMARY_TIMING=ON` is opt-in and requires the explicit staged
+candidate. Android additionally requires `hordeBenchmarkValidation=true`, the
+staged shader directory and `hordeStagedPrimaryTiming=true`; ordinary Debug and
+Release explicitly reset all three prototype settings OFF/empty. No normal
+configuration or installed phone build was switched.
+
+Three additional timestamps per submission delimit TOP→primary RT completion
+(includes prerequisite waits), then primary→shading completion (includes the
+write/read barrier). Availability, slot and exact submission serial are collected
+only after the owning fence or successful final idle. Unsupported/failed/mismatched
+queries remain null/error rows. A preallocated4000-row profile is separate from
+the accepted benchmark ledger and its ordinary report; no allocation/file IO/JSON
+occurs in frame retention. Profiled medians must not be mixed with unprofiled ABBA.
+
+These intervals include record write/read work but do **not** separate DRAM traffic
+from traversal/shading/cache/synchronisation. Subtracting their sum from total GPU
+time is not an intermediate-buffer bandwidth measurement. Actual memory counters
+and query overhead comparisons remain required where available.
+
 ## Decision and continuation
 
 GO only if image/physical gates pass and matched phone results show meaningful
@@ -168,6 +190,12 @@ telemetry or scheduling framework.
 ### Completed results
 
 - Prior work preserved at pushed7ab8607; four unrelated scratch paths untouched.
+- Reviewed slices `783f1be` (RAM sidecar), `0c84e40` (isolated staged candidate)
+  and `ee05ea0` (focused owner CI) are pushed. Exactee05 push36804796096 and
+  PR36804800378 SUCCESS: GCC/Clang/MSVC55/55 each event, focused Vulkan CPU-host
+  14/14 each. Actual eight job logs inspected; synthetic merge75e1a02 has
+  exact basebda1b99/headee05 parents. These validate that committed checkpoint,
+  not later dirty profiling changes or physical RT.
 - Exact7ab8607 push36798927158 and PR36798930661 SUCCESS; actual GCC/Clang/MSVC
   logs show54/54 on both events, Vulkan CPU-host13/13 on both. Synthetic PR merge
   e8432dc72f6c282f6af22209f27cfe11839ac7c3 has basebda1b99 and exact7ab8607 parents.
@@ -218,20 +246,43 @@ telemetry or scheduling framework.
 - Initial unsupported `--development-checkpoint opening` exited2 before Vulkan;
   error logs are retained. The existing13-checkpoint standard batch supplied
   opening instead. Completed valid captures must not be repeated for that error.
+- Separate optional profile slice: MSVC Shipping/Mobile Release app and six
+  affected host tests PASS. Shader modules/transport are unchanged. The Debug
+  capture shell's13 standard plus production-lantern PNGs are byte-identical to
+  the retained untimed candidate, including primary/secondary ownership images.
+- Real RTX5050 Release observer smoke completes `lantern-held-high-v1`, one
+  warm-up and one measured lap, all600 expected rows retained without missing or
+  rejected queries, exact serial601–1200/epoch2/generation6 and valid whole-GPU
+  samples. Actual extent1232x803 at100%; frozen snapshot, not live motion or a
+  matched performance experiment. Actual pages126,630,144 allocation bytes versus
+  126,629,888 logical bytes; nominal253,259,776 read+write bytes/frame, device-local
+  flags1. The first smoke's missing Release skeleton asset failure is retained;
+  one repaired run stages69 existing runtime assets with matching hashes, without
+  rebuilding the executable or changing asset/source-distribution policy.
+- Android optional-profile build succeeds4ABIs. The demonstrated armeabi-v7a
+  typed-null move compile defect was fixed with typed Vulkan handles; earlier
+  failed log and APK retained. One further28s incremental build follows the
+  Android-only failed-idle ownership guard. Final timed APK SHA256
+  `0e605deeeff693e01083790a314f0ecd23cb68e2472a8c077b9d2a084bcd5a8b`.
+  It is an isolated development benchmark, not an installed/accepted phone build.
+  [Observer evidence](evidence/2026-10-01-staged-primary-profile/README.md) preserves
+  runtime identity, image proof, build inputs and exact profiled-binary inspection.
 - Phone unavailable; no device action or counter discovery performed.
 
 ### Next unfinished step
 
-Reach a reviewed pushed first-candidate checkpoint with fresh current-source CI.
-Then add fence/submission-owned per-pass timestamps before admitting a phone
-performance artifact. The isolated Android build exists; rebuild only after an
-actual compiled-source change and retain the new receipt. Do not repeat completed
-Mobile image matrices unless a rendering change invalidates them; timing-only
-changes need their own observer-equivalence proof. High Windows checks, known
-phone physical failures/live motion, matched warm Shipping performance and the
-exact phone matrix remain open. Memory-counter discovery and warm paired samples
-wait for reconnection, without restarting completed investigations. The current
-desktop negative result is reason for caution, not proof of phone behaviour.
+Review/push the optional observer slice and obtain fresh current-source CI;
+complete the bounded High Windows supplement (13standard+production/tinted,
+separate identities), not another Mobile matrix. Prepare the normal Shipping
+control alongside the retained untimed candidate and separately profiled APK.
+Do not rebuild unchanged artifacts absent a recorded compiled-source/policy change.
+On phone reconnection: discover the exact counter roster once; admit image and
+known physical/live-motion gates first, then execute the fixed75% warm Shipping
+ABBA matrix, with separate RAM/counter/profile runs if observers perturb timing.
+Keep total-frame/GPU/pass/actual allocation/logical traffic and unavailable hardware
+counters separate. Record each finished trial and next unfinished row here.
+The desktop negative result warrants caution, not a claim of phone behaviour;
+Mobile decision remains **INCONCLUSIVE / no promotion** until exact-device evidence.
 
 Audio/haptic manual revalidation required: **NO** for this renderer experiment;
 music/feedback authority is unchanged. Separate pending music listening remains open.

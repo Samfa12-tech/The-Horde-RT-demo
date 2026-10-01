@@ -7,6 +7,7 @@
 #include <span>
 
 namespace horde::vulkan::raytracing::experimental {
+class StagedPrimaryTiming;
 
 // Investigation-only owner, built only with an explicitly selected shader dir.
 // The platform must make the device idle before destroying/replacing resources.
@@ -24,7 +25,8 @@ public:
         const RtPipelineBundleBuildApi& pipelineApi, std::string& diagnostic);
 
     void Record(VkCommandBuffer command, RtMaterialStrategy strategy,
-                std::span<const std::byte> pushConstants) const noexcept;
+                std::span<const std::byte> pushConstants,
+                StagedPrimaryTiming* timing = nullptr, std::uint32_t frameSlot = 0u) const noexcept;
     bool PrepareResizeAfterDeviceIdle(VkExtent2D extent, std::string& diagnostic);
     void CommitResizeAfterDeviceIdle() noexcept;
     void CancelResizeAfterDeviceIdle() noexcept;

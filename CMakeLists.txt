@@ -691,6 +691,13 @@ if(BUILD_TESTING)
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 
     if(HORDE_RT_BUILD_VULKAN_TARGETS)
+        add_executable(horde_rt_staged_primary_timing_tests
+            tests/StagedPrimaryTimingTests.cpp
+            src/vulkan/raytracing/experimental/StagedPrimaryTiming.cpp)
+        target_include_directories(horde_rt_staged_primary_timing_tests PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/src ${Vulkan_INCLUDE_DIRS})
+        add_test(NAME horde_rt_staged_primary_timing_tests COMMAND horde_rt_staged_primary_timing_tests)
+
         # CPU-only fault injection for the explicitly experimental staged owner.
         # Its tiny shader header fixture encodes Shipping/Mobile policy only;
         # this test does not validate SPIR-V or claim Vulkan/image behavior.
