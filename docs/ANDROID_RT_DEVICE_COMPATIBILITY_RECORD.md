@@ -2,6 +2,24 @@
 
 Last updated: 2026-10-01
 
+## October 1: primary-opacity trial image containment
+
+Exact local SM-S948B Diagnostic/Mobile75% pipeline control8CB97689 and
+candidate6DA2BCCF install/pull checks, six authored captures and Home/resume pass.
+All six paired PNGs are byte-identical; this is image/presentation containment,
+not Shipping performance or High physical-glass acceptance. Candidate code is
+retained separately at e78028c; its S26 collector ran before that commit and
+truthfully records the earlier dirty checkout plus exact APK/module hashes.
+
+Exact SM-S928B candidate6DA2BCCF/compute75% additionally passes two bounded
+captures and Home/resume in run223947. Combat/high-lantern images are byte-identical
+to the renewed normal8CB captures: native two-enemy state still lacks visibly
+distinguishable enemies in that view, and primary-player pixel count remains0.
+Missing hands is not repaired or attributed to an asset/IK cause. Normal8CB was
+restored and pulled back identically, app data preserved, then Home. No S24 timing
+rerun, owner-feel or S25 claim. [Retained native/image evidence](evidence/2026-10-01-primary-opacity/README.md).
+Audio/haptic manual revalidation required:NO; playback inputs are unchanged.
+
 ## October 1: S26 consent-based local report export
 
 **Local exact-device UI/file evidence**, only SM-S948B/serialR5GL219SZGK,
