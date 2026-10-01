@@ -12,7 +12,21 @@ No merge to main, release or publication is authorised.
 Base/control: `9f4f439e40a9477efe0bac42ee41b74de64b3b1b`.
 Isolated branch: `codex/horde-mobile-lantern-profile`. The engineering worktree's
 unfinished staged/probe changes and scratch files are preserved untouched.
-Candidate commit/APK hashes: pending. Do not repeat completed trials after resumption.
+Candidate: `1da483d01124ca673badf6c13939d99736c4a658`, pushed and verified on both
+the isolated and engineering remote branches. Original engineering checkout dirty
+work remains untouched. Do not repeat completed trials after resumption.
+
+Frozen Shipping/Mobile artifacts (current music, no staged/probe/isolation path):
+- Physical control APK SHA-256: `3a4faf72923e24da9da859ef6cd71c221b818b97d7418a75b1c8dd0ca0540378`.
+- Open-aperture APK SHA-256: `bac94c45bcfe3f8fcc367f21439735387d188959005b5ee873d02f0f1e9cf142`.
+- Normal Debug/Mobile APK SHA-256: `e10b02034e0a0a78828c6ff885d03b79dd2058f77c6f20346a7c977edd794af4`.
+
+Retained artifacts and raw trials are under
+`C:/Dev/tmp/horde-mobile-lantern-profile-20261001`; do not rebuild unchanged APKs.
+Actual paired APK inspection confirms70/70 asset payloads byte-identical and all
+six aligned SPIR-V modules byte-identical. All12 extracted modules pass fresh
+Vulkan1.2 validation/disassembly; the four Shipping/Mobile modules have no
+diagnostic atomics/image reads/Binding22. The geometry hook is the rendering change.
 
 ## Optional optimisation gate: no supported candidate
 
@@ -51,8 +65,9 @@ The independent physical dielectric validation fixture remains intact on Mobile.
   denominators, native cycle/GPU/pacing and thermal context reported separately.
   No recording during timed runs. Retain allocation/RAM evidence, unavailable GPU
   bandwidth/cache/stall counters as gaps. No external cooling assumption.
-- Exact S24: currently disconnected, requested reconnection; do not substitute S26
-  or infer S25. Prepare the same matrix with its actual supported hardware backend.
+- Exact S24 `SM-S928B`: connected and running the same finite matrix, actual
+  RayQueryCompute backend. Its75% extent810x1682 differs from S26's1080x2235;
+  report within-device comparisons, not a hardware ranking. Do not infer S25.
 - Diagnostic live route: pickup, high/low, walking/looking, attacks/parry, geometric
   cage/player shadows, pause/Home/resume and scale resize. Frozen captures do not
   establish live correctness or perceived playability. Explicit profile image
@@ -68,8 +83,10 @@ Restore normal configuration afterward. Audio/haptic manual revalidation require
 - Verified9f current pushed checkpoint and isolated clean worktree; local LFS
   runtime assets hydrated without regeneration. Initial control build rejected
   unhydrated launcher PNG pointers; hydrated only required resource objects and
-  retained failure log. Retry is underway. This is artifact setup, not a source fix.
-- No phone result or performance improvement claimed yet; S24 is an explicit gap.
+  retained failure log. Subsequent complete artifacts are frozen above. This was
+  artifact setup, not a renderer fix.
+- Initial setup had no admitted phone result; subsequent valid trials are listed
+  below. Do not reinterpret setup failures as performance evidence.
 - First controlAPK `d41ec87c...c147777` was invalid: enemy/sword LFS pointers
   packaged instead ofGLBs; owner reported both platform startup failures. No
   benchmark was admitted. Preserve failed artifacts/logs, do not reuse their
@@ -88,9 +105,52 @@ Restore normal configuration afterward. Audio/haptic manual revalidation require
   glass-edge-Fresnel control/candidate native images are byte-identical (PNG hashes
   `3faac36e...609d7b`, `613349db...da4a`, `4b561086...04409`); both manifests complete
   with identical actual High shader identities. No pixel tolerance was changed.
-- Repaired S26 C1 route completed1838 presented frames, native-cycle median66.435ms;
-  row/thermal admission and paired performance conclusion still pending. S24 C1
-  route is underway with required hardware RayQueryCompute backend.
-- Next: commit/freeze candidate and containment proof, continue C1 heavy/live then
-  P1/P2/C2 for each phone; capture candidate live interactions/lifecycle after timed
+- Repaired C1 route/high/live completed on both phones. S26 route1838 presented
+  frames, native-cycle median66.435ms; held-high600 frames235.8745ms. S24 route
+  median47.2864ms, held-high265.3316ms. Six C1 reports passed the original
+  control-aware row admission; preserved receipts predate the extended source/
+  serial/ledger/producer-hash gate. Later parser tests11/11 PASS, including green
+  candidate and nine fail-closed mutations. New P1/P2/C2 receipts use the pinned
+  extended parser. Paired conclusions remain pending. Native-cycle reciprocal is not measured display
+  pacing; completed-report UI pauses rendering and the boundary SurfaceFlinger
+  layer query exposed no usable latency layer. Record that as a gap, not a pass.
+- First S26 P1 held-high completed600 frames at112.0319ms native-cycle median,
+  not a sustained matched conclusion or30FPS acceptance. P1/P2 complete on both
+  phones; current C2 blocks continue;
+  never restart completed rows. Memory boundary samples do not prove GPU bandwidth,
+  cache misses or stalls. Retained S26 source enumeration exposed no counter specs;
+  unavailable counters remain gaps, not evidence that memory is the culprit.
+- Current1da CI push36834923024 and PR36834930180 both pass: GCC55/55,
+  Clang55/55, MSVC56/56, focused Vulkan CPU-host15/15 in each. Actual job logs
+  inspected. PR15 is draft/mergeable; no main merge/release/publication.
+- Windows Mobile Diagnostic pipeline held-high/held-low/glass-edge and Compute
+  held-high/glass-edge all complete and honestly present. Retained primitive
+  metadata320 to304 bytes; actual pane geometry omitted. Compute held-high has
+  visible hands and46309 diagnostic primary-player pixels. This rejects universal
+  desktop compute-path absence, not exact S24 absence or Shipping/Diagnostic parity.
+- Windows Debug shell with Shipping/Mobile compute modules now completes held-high;
+  visible hands and PNG byte-identical to Diagnostic same-backend counterpart,
+  SHA256`915d4945f3870b50955ee75f7be9ca5297416d6c04f63880c10ec0b2938556a8`.
+  This is one Shipping/Diagnostic check, not full pipeline/compute parity or phone
+  proof. Release capture automation is correctly rejected; no Release performance
+  is inferred from this Debug-shell image. Normal High configuration untouched.
+- Owner S24 control observations: one rather than two starting skeletons and
+  yellow-looking water. Not yet a matched-state reproduction; compare exact
+  two-enemy/skylight/water checkpoint images on both devices after timing, record
+  state/backend/presentation format. Do not reopen player tuning or change water
+  colours/gameplay as a workaround.
+- Subsequent owner comparison: water colour appears the same on S24 and S26.
+  Do not spend further investigation on a device-colour discrepancy without new
+  evidence. The owner prefers the open/no-pane lantern appearance. This is visual
+  preference, not a measured-performance or complete-device acceptance verdict.
+  Owner also suspects imperfect glass-pane alignment to the lantern model: record
+  for **future** geometry/mounting investigation only, explicitly not a fix now.
+  Full High dielectric glass and its evidence remain retained for future use.
+- Owner also reports missing S24 hands: explicit visual acceptance blocker. Keep
+  accepted player geometry unchanged; isolate actual state/geometry/backend path
+  with matched captures. Physical-vs-open timing can describe workload cost but
+  cannot certify S24 playability while that discrepancy remains unresolved.
+- Next: finish the already-running C2 blocks for each phone, admit owned
+  rows/artifact identities once, then capture candidate live interactions/lifecycle
+  and matched S24 discrepancy checkpoints after timed
   matrix. Do not repeat valid completed rows or rebuild unchanged artifacts.

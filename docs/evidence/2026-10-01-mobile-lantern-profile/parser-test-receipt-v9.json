@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "classification": "synthetic parser fixtures only; not physical evidence",
+  "analyzerPath": "C:\\Users\\sam_s\\.codex\\worktrees\\horde-mobile-lantern-profile\\the Horde RT Demo\\docs\\evidence\\2026-10-01-mobile-lantern-profile\\analyse-trial.ps1",
+  "testedSourceRun": "mobile-pane-s26-c1-route-valid-20261001",
+  "cases": [
+    {
+      "fixture": "green-control",
+      "result": "PASS",
+      "reason": "synthetic clone only"
+    },
+    {
+      "fixture": "green-candidate",
+      "result": "PASS",
+      "reason": "completed P1 high clone; opaque-fast selected"
+    },
+    {
+      "fixture": "identity",
+      "result": "expected rejection",
+      "reason": "result marker identity"
+    },
+    {
+      "fixture": "gpu-gap",
+      "result": "expected rejection",
+      "reason": "GPU status at row 0"
+    },
+    {
+      "fixture": "diagnostics",
+      "result": "expected rejection",
+      "reason": "Shipping diagnostic status at row 0"
+    },
+    {
+      "fixture": "measured-count",
+      "result": "expected rejection",
+      "reason": "measured frame count expected"
+    },
+    {
+      "fixture": "artifact-identity",
+      "result": "expected rejection",
+      "reason": "installed APK package identity"
+    },
+    {
+      "fixture": "shader-identity",
+      "result": "expected rejection",
+      "reason": "loaded backend-specific Shipping/Mobile shader identities"
+    },
+    {
+      "fixture": "source-identity",
+      "result": "expected rejection",
+      "reason": "member source receipt identity"
+    },
+    {
+      "fixture": "device-serial",
+      "result": "expected rejection",
+      "reason": "exact Android device serial"
+    },
+    {
+      "fixture": "ledger-owning-identity",
+      "result": "expected rejection",
+      "reason": "ledger scene epoch at row 0"
+    }
+  ]
+}

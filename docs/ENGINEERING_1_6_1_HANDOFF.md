@@ -24,7 +24,14 @@ repeat rejected trials or restart broad investigation. Continue from the
 Control is9f4f439; current isolated branch `codex/horde-mobile-lantern-profile`
 preserves the engineering checkout's dirty staged/probe work. Host/High containment
 and matched current-music75% S26/S24 evidence are required before playability claims.
-S26 is connected; S24 reconnection requested, not yet available. No release/main merge.
+Source1da483d and its frozen APKs are retained in the single record. Both exact
+phones are connected; the finite interleaved Shipping matrix is underway, not
+accepted. S24 owner reports missing hands and one starting skeleton;
+these remain separate visual blockers for matched authored-state follow-up after
+timing. Original dirty engineering checkout remains untouched. No release/main merge.
+Later owner comparison says water colour matches S26; do not pursue that as a
+device mismatch. Owner prefers open lantern; suspected pane/model misalignment
+is recorded for future investigation only, not a current glass geometry change.
 Audio/haptic manual revalidation required: **NO**, geometry-only selection.
 
 ### October 1 instrumentation - selected whistle bank and S26 playback correction

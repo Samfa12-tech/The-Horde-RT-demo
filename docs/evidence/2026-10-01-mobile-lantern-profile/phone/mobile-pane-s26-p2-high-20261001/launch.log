@@ -1,0 +1,6 @@
+Starting: Intent { act=com.samfa12.hordelanternrt.action.BENCHMARK cmp=com.samfa12.hordelanternrt.benchmark/com.samfa12.hordelanternrt.MainActivity (has extras) }
+Status: timeout
+LaunchState: UNKNOWN (-1)
+Activity: com.samfa12.hordelanternrt.benchmark/com.samfa12.hordelanternrt.MainActivity
+WaitTime: 10012
+Complete

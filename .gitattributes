@@ -188,3 +188,6 @@ docs/evidence/2026-10-01-android-music/*.json -text
 docs/evidence/2026-10-01-android-music/lint-results-debug*.txt -text whitespace=cr-at-eol
 docs/evidence/2026-10-01-benchmark-fps/*.log -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
 docs/evidence/2026-10-01-report-contract/*.log -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+
+# Exact paired Mobile pane-profile reports, package pins and admission scripts.
+docs/evidence/2026-10-01-mobile-lantern-profile/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol

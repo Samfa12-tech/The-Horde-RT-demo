@@ -20,6 +20,26 @@ S26 is `SM-S948B`/`R5GL219SZGK`. Preserve prior S24 black-glass evidence and use
 the actual backend for its new paired75% test; S26 cannot certify S24/S25.
 See [finite profile record](ENGINEERING_1_6_1_MOBILE_LANTERN_PROFILE_2026-10-01.md).
 
+During the S24 physical-control route (9f renderer, repaired3a4faf72APK), the owner
+observes only one skeleton at the start rather than two, and unusually yellow
+water. These are **owner visual reports**, not yet reproduced at identical frozen
+states or established backend defects. Compare matched authored checkpoints on
+S24 and S26 after timed trials, including scene/enemy state and presentation colour
+format; do not adjust gameplay, water, masks or material colours to conceal a
+possible backend discrepancy. Pane omission does not certify unrelated visibility.
+The owner additionally reports **missing first-person hands on S24** in this
+control build. Treat this as an open S24 visual acceptance blocker, not an
+anatomical/player tuning request or proof of a glass-performance issue. Verify
+matched frozen state, loaded viewmodel/TLAS ownership and actual compute shading
+before attributing a cause. Timing evidence alone cannot accept S24 gameplay.
+
+Subsequent owner comparison reports water colour appears the same on S24 and S26;
+the earlier yellow-water note is not an outstanding demonstrated device mismatch.
+Do not expand that investigation without new evidence. Owner prefers the open
+Mobile lantern appearance; this does not close performance, hands/enemy visibility,
+or lifecycle gates. Possible physical-pane/model alignment is a future-only owner
+note, not authority to change preserved High glass geometry in this pass.
+
 ## October 1: immutable music bank build only (no new device acceptance)
 
 Android Debug compiles the bounded transactional native bank for four ABIs.
