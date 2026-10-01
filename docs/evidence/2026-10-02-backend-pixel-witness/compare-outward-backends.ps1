@@ -1,4 +1,5 @@
-param([Parameter(Mandatory)][string]$CaptureRoot,[Parameter(Mandatory)][string]$OutputPath)
+param([Parameter(Mandatory)][string]$CaptureRoot,[Parameter(Mandatory)][string]$OutputPath,
+      [string]$Candidate='7782e8eeb54850813c74c90b188969f908f4906f')
 $ErrorActionPreference='Stop'
 Add-Type -AssemblyName System.Drawing
 Add-Type -ReferencedAssemblies System.Drawing.Common,System.Drawing.Primitives,System.Private.Windows.GdiPlus,System.Private.Windows.Core,System.Collections -TypeDefinition @'
@@ -47,7 +48,7 @@ $rows=foreach($p in $a.captures){
     [ordered]@{file=$p.file;pipelineSha256=$p.pngSha256;computeSha256=$q[0].pngSha256;
         comparison=[HordeOutwardBoxParity]::Read($pipeline,$compute)}
 }
-[ordered]@{schema=1;candidate='7782e8eeb54850813c74c90b188969f908f4906f';payloadRows=5;
+[ordered]@{schema=1;candidate=$Candidate;payloadRows=5;
     toleranceMaximum=3;toleranceFraction=0.001;records=@($rows)}|ConvertTo-Json -Depth 9|
     Set-Content -LiteralPath $OutputPath -Encoding utf8NoBOM
 $rows|ForEach-Object {'{0}: max={1}, fraction={2}, gate={3}, outliers={4}' -f

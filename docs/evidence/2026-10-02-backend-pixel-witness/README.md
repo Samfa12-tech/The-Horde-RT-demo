@@ -157,3 +157,80 @@ No main merge, release or publication. Normal worktree/configuration unchanged.
 
 Audio/haptic manual revalidation:NO: output-only diagnostics, semantic playback
 inputs unchanged. Existing owner music-focus/S24 checks remain untouched.
+
+## Closed light-region arithmetic candidate (latest completed stage)
+
+Candidate `cc0491e601bc6665ae57a99b8920dcbc38efd719` is isolated on the same
+witness branch, after outward-box control `94f0c4e`. This stage changes the
+closed receiver-region predicate, not geometry, materials, ray masks, traversal
+budgets, receiver positions, shadow-origin offsets or shadow transport. Corrected
+region selection necessarily changes the selected light ray at the affected
+boundary; identical buggy pixels are not the acceptance target.
+
+The captured rays/t are **not identical**. At770,526, pipeline t=5.2704535 and
+directionZ=.60715836 reconstruct z=-12; compute t=5.270455 and
+directionZ=.6071583 reconstruct z=-11.999999. The authored triangle809 lies on
+z=-12, which the existing closed finale region deliberately includes. A
+conservative reconstruction-arithmetic neighbourhood preserves this inclusive
+boundary policy instead of selecting the ordinary moon for one backend.
+
+For non-overflowing finite binary32 arithmetic, the ordinary two-operation
+reconstruction bound is gamma(2)(|origin|+|direction*t|). Eliminating the unavailable
+origin gives gamma(2)/(1-gamma(2))(|computedPosition|+2|direction*t|). The scalar
+GLSL helper rounds its nonnegative bound operations outward. Using the actual
+ray component avoids a normalization assumption; accumulated nonnegative hit t
+bounds the local parameter. This follows the standard
+[floating-point error-bound method](https://www.pbr-book.org/4ed/Shapes/Managing_Rounding_Error),
+but **does not certify hardware intersection-t error or the exact geometric
+side of an arbitrary hit**. No universal backend-parity claim follows.
+
+The existing host smoke includes the actual scalar GLSL body, the captured
+boundary pair, all eight region endpoints, one-step neighbours and excluded
+millimetre offsets, plus12 reconstruction fixtures evaluated with separate and
+fused arithmetic against double references. Fresh MSVC Debug1/1 PASS4.40s and
+Release1/1 PASS1.96s; app build PASS. Debug executable SHA-256
+`e5e68dd444dd8077f7c5d4b072caabb8c4c9134c20ee6a7eb0c6b501eecb58df`.
+Read-only independent review found no concrete derivation/call-site flaw within
+that finite, non-overflowing arithmetic contract.
+
+All16 real module families compile, optimise, disassemble and validate. Decoding
+each actual embedded artifact reproduces its nonempty top-level catalog SPIR-V
+hash and byte count. All8 Shipping modules still have zero diagnostic atomics
+and no binding22. Unlike earlier output-only stages, this shader candidate
+intentionally changes Shipping/High modules too. Relative to94f0c4e it adds
+3060bytes/180 instructions to Generic and13064bytes/791 instructions to Opaque
+in both backends. It exceeds existing frozen cost limits; their exact file hash
+remains `f2ff4be07c08536d140ea395fb24d1e3d502882449a84fc245df121e2ad89f4d`.
+**Cost admission FAIL; not promoted.** No budgets were raised. Shader size is
+not a register/occupancy/performance measurement.
+
+The finite matrix is complete: one new five-checkpoint capture per backend,
+each exit0 with honest RTX presentation at960x540,12 settling frames and time0.
+The retained control comparison preserves scene/CPU geometry/allocations/full
+diagnostics; its old-colour image failures are explicit expected differences,
+not passing regression gates. No old control was rebuilt or recaptured.
+[Full paired scan](closed-light-region/backend-parity.json),
+[actual fields](closed-light-region/witness-comparison.json), all ten PNGs,
+manifests/OBJs and shader/build/run logs are retained in `closed-light-region/`.
+Native finale image inspected; payload rows remain diagnostic-only.
+
+770,526 now yields exactly18,21,25 on both backends; both sky visibilities=1,
+skyDiffuse=.6990025/.69900256, direct colours agree within1e-9. Blue/red still
+pass max1/fraction over1=0. Four remaining >3 outliers are unchanged:
+worst556,378 max4; finale552,395 max4; combat542,311 max7 and564,393 max92.
+Thus three of the six original discrepant pixels have demonstrated isolated
+corrections, with one extra combat point exposed by the outward-normal stage;
+whole backend parity still fails. No tolerance relaxation or phone/performance
+acceptance is claimed.
+
+Next unfinished step: inspect the unobserved combat542,311 reflection layer;
+reuse the85-field discriminator if new GPU evidence is necessary, with only a
+bounded two-enemy capture on each backend, not another five-checkpoint/control
+rerun. Keep the three original mapped-normal/reflection outliers and High
+row43 separate. The boundary candidate is parked pending cost/integration
+admission and uninstrumented images; do not repeat its completed finite matrix
+or start a precision/epsilon sweep. Normal worktree/configuration remains
+untouched; no phone action, main merge, release or publication.
+
+Audio/haptic manual revalidation required:NO: receiver lighting only, unchanged
+gameplay/event-time/listener/PCM/haptic semantics. Existing owner gates unchanged.
