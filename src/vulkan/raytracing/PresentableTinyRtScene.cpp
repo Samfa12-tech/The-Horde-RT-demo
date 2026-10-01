@@ -2305,12 +2305,15 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     const auto addWorldBox = [&addWorldQuad](float minX, float minY, float minZ,
                                              float maxX, float maxY, float maxZ,
                                              SurfaceMaterial material) {
-        addWorldQuad({{minX, minY, minZ}}, {{minX, maxY, minZ}}, {{maxX, maxY, minZ}}, {{maxX, minY, minZ}}, material, SurfaceForward);
-        addWorldQuad({{maxX, minY, maxZ}}, {{maxX, maxY, maxZ}}, {{minX, maxY, maxZ}}, {{minX, minY, maxZ}}, material, SurfaceBack);
-        addWorldQuad({{minX, minY, maxZ}}, {{minX, maxY, maxZ}}, {{minX, maxY, minZ}}, {{minX, minY, minZ}}, material, SurfaceRight);
-        addWorldQuad({{maxX, minY, minZ}}, {{maxX, maxY, minZ}}, {{maxX, maxY, maxZ}}, {{maxX, minY, maxZ}}, material, SurfaceLeft);
-        addWorldQuad({{minX, maxY, minZ}}, {{minX, maxY, maxZ}}, {{maxX, maxY, maxZ}}, {{maxX, maxY, minZ}}, material, SurfaceDown);
-        addWorldQuad({{minX, minY, maxZ}}, {{minX, minY, minZ}}, {{maxX, minY, minZ}}, {{maxX, minY, maxZ}}, material, SurfaceUp);
+        // Closed solid boxes use outward geometric normals matching winding.
+        // Inward metadata launched hemisphere bounces/spawn offsets inside the
+        // solid, including the coincident bracket-top/flame-bottom interface.
+        addWorldQuad({{minX, minY, minZ}}, {{minX, maxY, minZ}}, {{maxX, maxY, minZ}}, {{maxX, minY, minZ}}, material, SurfaceBack);
+        addWorldQuad({{maxX, minY, maxZ}}, {{maxX, maxY, maxZ}}, {{minX, maxY, maxZ}}, {{minX, minY, maxZ}}, material, SurfaceForward);
+        addWorldQuad({{minX, minY, maxZ}}, {{minX, maxY, maxZ}}, {{minX, maxY, minZ}}, {{minX, minY, minZ}}, material, SurfaceLeft);
+        addWorldQuad({{maxX, minY, minZ}}, {{maxX, maxY, minZ}}, {{maxX, maxY, maxZ}}, {{maxX, minY, maxZ}}, material, SurfaceRight);
+        addWorldQuad({{minX, maxY, minZ}}, {{minX, maxY, maxZ}}, {{maxX, maxY, maxZ}}, {{maxX, maxY, minZ}}, material, SurfaceUp);
+        addWorldQuad({{minX, minY, maxZ}}, {{minX, minY, minZ}}, {{maxX, minY, minZ}}, {{maxX, minY, maxZ}}, material, SurfaceDown);
     };
     const auto addBox = [&addQuad](float minX, float minY, float minZ, float maxX, float maxY, float maxZ) {
         // Fixed face order for the raygen material normal lookup:
