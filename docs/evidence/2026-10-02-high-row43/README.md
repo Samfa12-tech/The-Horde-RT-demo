@@ -24,11 +24,48 @@ Compare exact PNGs and pixel(524,552); retain any mismatch, do not force buggy
 baseline pixels. No speedup/phone/Shipping/live-motion acceptance from a frozen
 replay. Build affected application and staging/launch/resource contracts only.
 
-Next unfinished step: review/build the capture-only patch, run the two rows,
-record the demonstrated result and restore normal branch. Only then decide
-whether a bounded ray-arithmetic consistency experiment is justified. No
-precision change is assumed to fix the edge event or the six unrelated backend
-pixels. Audio/haptic manual revalidation required:NO (capture-only with unchanged
+## Completed current control
+
+Capture-only source `db8a0bbcfe2f8471a056f6408ae3531751a84a44`; executable SHA-256
+`e9839f3b54eeef2599c28620d39f01f8de7459b9584bc7f86b8a6c145911766f`.
+MSVC Debug application build passed. Affected benchmark staging, Windows launch
+and scene-resource CTests passed 3/3. Both native RTX5050 runs exited 0, honestly
+presented RT and froze the required frame44/tick646.
+
+Both rows reproduce the respective September30 control exactly: all41 counters,
+CPU viewmodel/world-body geometry, module bundles and PNG bytes. Pipeline retains
+one primary mismatched exit; compute retains zero. Pixel(524,552) remains
+pipeline RGB(32,14,35), compute RGB(202,169,91). This is a reproduced failure, not
+backend equivalence or physical acceptance. The unchanged same-backend image
+gate passes with maximum RGB difference0 and fraction over1=0.
+
+Pipeline PNG SHA-256 `5f0b1a6cc9c2184accb375d8ca4e6644c93aea956ae9c3942233327de52ffb01`;
+compute PNG SHA-256 `0bf5a402451d12ced7058649961e7690ae2056a7632026c68556d18ddcd0ac5d`.
+The comparison receipt SHA-256 is
+`819574aaa8bb39ac7bc81dc43cb5fb8ff3a144f858bdf32514b55d467f2ca732`.
+Use the retained raw September30 PNGs: checkout copies can be unhydrated LFS
+pointers. The analysis helper verifies image bytes against manifests before
+loading; pointer hashes are not image regressions.
+
+## One bounded candidate, not production
+
+Next unfinished step: add only `precise` to the shared primary `rayDirection`
+declaration, regenerate/validate both eight-module families with unchanged
+frozen budgets, inspect actual NoContraction decorations, then run exactly one
+pipeline and one compute candidate replay against the completed current control.
+Record candidate source/executable/module hashes before capture. No repeated
+control captures, qualifier search, general precision rewrite or transport edit.
+
+Hypothesis: preventing contraction/reassociation along this primary expression
+may reduce the demonstrated stage-dependent ray-direction difference. It is not
+a demonstrated cause or a guaranteed cross-stage normalisation/trigonometry
+identity. See the [GLSL precise contract](https://registry.khronos.org/OpenGL/specs/gl/GLSLangSpec.4.60.html#the-precise-qualifier).
+If the mismatch persists, preserve the negative result and stop this idea. If it
+clears, require ray/first-hit evidence and unchanged image/physical admission
+before any production promotion. The six separate Mobile backend pixels are
+not certified by this row. No performance claim or phone acceptance is implied.
+
+Audio/haptic manual revalidation required:NO (capture-only with unchanged
 semantic playback inputs); no owner interruption/return check is repeated.
 
 Raw receipts/build will remain at `C:/Dev/tmp/horde-high-row43-current-20261002`.
