@@ -1269,6 +1269,21 @@ Private device/process rosters remain local; no data/settings/source fix.
 
 ## Research sources
 
+## October 2, 2026 - S24 raw primary instance-hit discriminator
+
+Exact **SM-S928B**, serialR5CXC0G9GBW, Android16/Adreno750. Investigation-only
+sourcee8b6965, exact Debug DD69EEB7947D631450780665324380766A85D3D03F42FBA661CA21523AC0183C
+installed/pulled match, all70 assets equal normal8CB. Actual ARM64 module verified.
+Run20261002-000200, two75% captures, RayQueryCompute/OpaqueFast, strict ASTC,
+honest RT presentation and Home/resume. Both PNGs byte-identical to normal;
+hands remain absent. Raw committed TLAS IDs before decoded shading count player
+20/4 as0/0 in both views; ID/custom-index mismatches0. Skeleton2 counts15496
+combat/12 high;18 zero does not alone explain second-enemy visibility. The named
+remapped counters are **not glass diagnostic results** and no performance pass
+is claimed. Next: one independent unfiltered viewmodel-mask hardware query, not
+accepted-arm tuning. [Finite record](ENGINEERING_1_6_1_S24_INSTANCE_HITS_2026-10-01.md).
+S26/S25 certification is unchanged.
+
 - [Android NDK stable APIs - Vulkan runtime capability guidance](https://developer.android.com/ndk/guides/stable_apis)
 - [Qualcomm Snapdragon device finder](https://www.qualcomm.com/smartphones/device-finder)
 - [Qualcomm Snapdragon 8 Gen 2](https://www.qualcomm.com/smartphones/products/8-series/snapdragon-8-gen-2-mobile-platform)
