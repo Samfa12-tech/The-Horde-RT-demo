@@ -4,7 +4,11 @@
 #include <wincodec.h>
 #include <wrl/client.h>
 #include <algorithm>
+#include <filesystem>
+#include <fstream>
 #include <iostream>
+#include <string_view>
+#include <utility>
 
 namespace
 {
@@ -44,12 +48,76 @@ bool DecodeRgb(const std::vector<std::uint8_t>& png, const PlaytestScreenshotPix
             expected.rgba.begin() + pixel * 4u)) return false;
     return true;
 }
+
+bool DecodeRgbaFile(const std::filesystem::path& path, PlaytestScreenshotPixels& image)
+{
+    using Microsoft::WRL::ComPtr;
+    ComPtr<IWICImagingFactory> factory;
+    ComPtr<IWICBitmapDecoder> decoder;
+    ComPtr<IWICBitmapFrameDecode> frame;
+    ComPtr<IWICFormatConverter> converter;
+    HRESULT result = CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&factory));
+    if (SUCCEEDED(result)) result = factory->CreateDecoderFromFilename(path.c_str(), nullptr, GENERIC_READ,
+        WICDecodeMetadataCacheOnDemand, &decoder);
+    UINT frames = 0, width = 0, height = 0;
+    if (SUCCEEDED(result)) result = decoder->GetFrameCount(&frames);
+    if (SUCCEEDED(result)) result = decoder->GetFrame(0, &frame);
+    if (SUCCEEDED(result)) result = frame->GetSize(&width, &height);
+    const auto sourcePixels = static_cast<std::uint64_t>(width) * height;
+    if (FAILED(result) || frames != 1 || width == 0 || height == 0 ||
+        sourcePixels > horde::reporting::kPlaytestScreenshotMaxSourcePixels) return false;
+    if (SUCCEEDED(result)) result = factory->CreateFormatConverter(&converter);
+    if (SUCCEEDED(result)) result = converter->Initialize(frame.Get(), GUID_WICPixelFormat32bppRGBA,
+        WICBitmapDitherTypeNone, nullptr, 0.0, WICBitmapPaletteTypeCustom);
+    std::vector<std::uint8_t> rgba(static_cast<std::size_t>(sourcePixels) * 4u);
+    if (SUCCEEDED(result)) result = converter->CopyPixels(nullptr, width * 4u,
+        static_cast<UINT>(rgba.size()), rgba.data());
+    if (FAILED(result)) return false;
+    image = {width, height, std::move(rgba)};
+    return true;
 }
 
-int main()
+int RunNativeRtFixture(const std::filesystem::path& source, const std::filesystem::path& destination)
+{
+    if (!source.is_absolute() || !destination.is_absolute() ||
+        _wcsicmp(source.lexically_normal().c_str(), destination.lexically_normal().c_str()) == 0) return 2;
+
+    PlaytestScreenshotPixels sourceImage;
+    if (!DecodeRgbaFile(source, sourceImage)) return 3;
+    PlaytestScreenshotPixels resized;
+    if (!horde::reporting::ResizePlaytestScreenshotRgba(sourceImage.width, sourceImage.height,
+        sourceImage.rgba, resized)) return 4;
+    std::vector<std::uint8_t> png;
+    if (!EncodeWindowsPlaytestScreenshot(resized, png) ||
+        !horde::reporting::ValidatePlaytestScreenshot({png, resized.width, resized.height}) ||
+        !DecodeRgb(png, resized)) return 5;
+
+    std::ofstream output(destination, std::ios::binary | std::ios::trunc);
+    if (!output) return 6;
+    output.write(reinterpret_cast<const char*>(png.data()), static_cast<std::streamsize>(png.size()));
+    output.close();
+    if (!output) return 7;
+    std::cout << "Native RT fixture encoded and losslessly decoded: " << resized.width << 'x'
+              << resized.height << ", " << png.size() << " bytes.\n";
+    return 0;
+}
+}
+
+int wmain(int argc, wchar_t** argv)
 {
     const HRESULT apartment = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
     if (FAILED(apartment)) return 1;
+    if (argc == 4 && std::wstring_view(argv[1]) == L"--native-rt-fixture")
+    {
+        const int result = RunNativeRtFixture(argv[2], argv[3]);
+        CoUninitialize();
+        return result;
+    }
+    if (argc != 1)
+    {
+        CoUninitialize();
+        return 2;
+    }
     {
         PlaytestScreenshotPixels image{3u, 2u, {255,0,0,0, 0,255,0,100, 0,0,255,255,
             12,34,56,70, 200,110,10,80, 99,77,55,90}};

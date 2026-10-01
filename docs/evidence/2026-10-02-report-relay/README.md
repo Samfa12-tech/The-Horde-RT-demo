@@ -138,6 +138,17 @@ Initial24bppRGB codec request failed; the supported24bppBGR input plus explicit
 conversion passes actual pixel-decoder/RGB assertions, including cap rejection.
 No automatic additional shrink/omission, OS screenshot or file source.
 
+Test-only `--native-rt-fixture <absolute-input> <absolute-output>` reuses the
+already captured native RTX137 image (no new renderer capture/build). WIC
+decodes that960x540 game image, the shared helper resizes to768x432, native WIC
+encodes, then independent WIC decode asserts every RGB pixel exactly matches.
+Output `windows-rtx-report-thumbnail.png`:463310 bytes, SHA256
+`bc02f8fe4c6974831b3b1eb2188760bfe764992f357ae472dde5a529b4abe6bc`.
+Actual workerd admits this PNG/typed fixture envelope with all outbound providers
+denied (zero requests). Lossless codec/deflate byte differences from Android do
+not change pixels. No production file-import route, verification or email.
+The normal no-argument test mode remains file/network-free.
+
 Verification uses the pinned native WebView2 SDK, installed Evergreen Runtime,
 read-back-confirmed InPrivate profile, fixed page/challenge origins, random
 nonce,4KiB parser and20s foreground deadline. It receives no report/image.
