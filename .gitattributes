@@ -19,6 +19,9 @@ third_party/cgltf/cgltf.h whitespace=-trailing-space
 # Native Core is a byte-hashed upstream subset, not a locally edited engine.
 third_party/pocket-audio-core/** text eol=lf
 
+# The explicitly restored Windows report SDK inventory is byte-hash pinned.
+third_party/webview2-sdk/manifest.json text eol=lf
+
 # Verbatim editable music sources, pinned manifest and measured derivatives.
 assets/audio/music/what-the-dark-keeps/source/** -text
 assets/audio/music/what-the-dark-keeps/asset.manifest.json text eol=lf
