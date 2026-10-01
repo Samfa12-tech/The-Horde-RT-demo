@@ -1,7 +1,7 @@
 # S24 bounded primary-hit discriminator
 
-Status: both shader discriminators and CPU AS facts complete; player BUILD-vs-UPDATE
-discriminator next. Normal control source0cf4f05; exact
+Status: both shader discriminators, CPU AS facts and player BUILD-vs-UPDATE
+discriminator complete; TLAS discriminator next. Normal control source0cf4f05; exact
 normal Debug8CB APK and four existing captures are retained in the
 [visual follow-up](evidence/2026-10-01-s24-visual-followup/RESULTS.md).
 Do not repeat the finished opacity/performance trial or tune accepted arms.
@@ -166,3 +166,21 @@ No repeated performance matrix or shader recompilation. Normal Shipping stays
 unchanged. Next unfinished step: build/freeze that new candidate once, capture.
 Audio/haptic manual revalidation required: **NO** (unchanged semantic playback).
 No main merge, release or publication authorised.
+
+## Player BLAS BUILD discriminator completed
+
+Source9eddddb, frozen `C:/Dev/tmp/horde-s24-instance-hits-20261001/player-build-debug.apk`,
+SHA2563b5a241f9765aa0674ca4c7e29bd34d8c9fc55814fca21aa5ee71cdcf1e0db63.
+Fresh four-ABI Debug build passes (21s); all70 assets and the actual embedded
+ARM64 probe shader are identical to the CPU-fact control. Exact SM-S928B
+run20261002-003413 passes high-lantern75% capture and Home/resume. PNG is again
+byte-identical to normal8CB, player committed/candidate/direct-query counts0,
+ID mask131469 unchanged. Finite CPU uploads and aligned scratch remain recorded.
+This rejects a player-BLAS-UPDATE-only explanation; no rebuild policy is promoted.
+
+Next bounded discriminator restores normal player BLAS UPDATE and changes only
+TLAS UPDATE to BUILD (null source), using the same instances, masks, shaders,
+poses and already max(build,update)-sized scratch. Capture high-lantern and the
+two-enemy checkpoint, because both viewmodel and second-skeleton visibility are
+open. No performance rerun or asset/IK changes. Build/freeze once, capture, retain
+the result, then restore normal8CB. This is diagnosis, not a production policy.

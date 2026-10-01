@@ -1298,6 +1298,12 @@ agree, reported scratch alignment64 with remainders0. Filtered diagnostic log is
 retained separately. These facts do not certify GPU AS contents or a driver cause.
 Next is one diagnostic player BLAS BUILD-vs-UPDATE comparison, not arm tuning.
 
+Player-BLAS BUILD-only source9eddddb / exact3B5A241F9765AA0674CA4C7E29BD34D8C9FC55814FCA21AA5EE71CDCF1E0DB63
+Debug run20261002-003413 passes the high-lantern capture/Home-resume; image and
+zero player committed/candidate/direct-query hits are unchanged. This rejects a
+player-BLAS-UPDATE-only explanation. Next discriminator changes TLAS UPDATE only,
+with normal player updates restored. No new performance, S26/S25 or audio claim.
+
 ## Research sources
 
 - [Android NDK stable APIs - Vulkan runtime capability guidance](https://developer.android.com/ndk/guides/stable_apis)
