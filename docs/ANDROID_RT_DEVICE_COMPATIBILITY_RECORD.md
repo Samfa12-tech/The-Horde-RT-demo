@@ -1304,6 +1304,16 @@ zero player committed/candidate/direct-query hits are unchanged. This rejects a
 player-BLAS-UPDATE-only explanation. Next discriminator changes TLAS UPDATE only,
 with normal player updates restored. No new performance, S26/S25 or audio claim.
 
+TLAS-BUILD-only sourcefaef9de / exactFDBB32CD050C4110210E5B0155FDE462535F28942DD8ECE60B17A03CA2C49D1C
+Debug run20261002-003825 passes two75% captures/Home-resume on SM-S928B. Modelled
+hands are restored: native player primary pixels66584 combat/167535 lanternhigh,
+and raw instance20 commits44480/133366. Second skeleton18 now commits7282 pixels
+in combat. Geometry, pose, shader, masks and player BLAS UPDATE unchanged. This
+isolates TLAS UPDATE behaviour in these views, not a proven driver defect. Source
+review finds no forbidden reference-zero activation transition. Next is a normal-
+shader bounded instance-definition-change rebuild policy; live/current Shipping
+performance and final-device acceptance remain open. S25 remains unverified.
+
 ## Research sources
 
 - [Android NDK stable APIs - Vulkan runtime capability guidance](https://developer.android.com/ndk/guides/stable_apis)

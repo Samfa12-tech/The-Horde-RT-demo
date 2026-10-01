@@ -1,7 +1,7 @@
 # S24 bounded primary-hit discriminator
 
-Status: both shader discriminators, CPU AS facts and player BUILD-vs-UPDATE
-discriminator complete; TLAS discriminator next. Normal control source0cf4f05; exact
+Status: completed discriminators isolate TLAS UPDATE behaviour on exact S24;
+bounded visibility/reference-change rebuild candidate next. Normal control source0cf4f05; exact
 normal Debug8CB APK and four existing captures are retained in the
 [visual follow-up](evidence/2026-10-01-s24-visual-followup/RESULTS.md).
 Do not repeat the finished opacity/performance trial or tune accepted arms.
@@ -184,3 +184,37 @@ poses and already max(build,update)-sized scratch. Capture high-lantern and the
 two-enemy checkpoint, because both viewmodel and second-skeleton visibility are
 open. No performance rerun or asset/IK changes. Build/freeze once, capture, retain
 the result, then restore normal8CB. This is diagnosis, not a production policy.
+
+## TLAS BUILD discriminator completed
+
+Sourcefaef9de, fresh four-ABI Debug build passes (21s). Frozen
+`C:/Dev/tmp/horde-s24-instance-hits-20261001/tlas-build-debug.apk`, SHA256
+fdbb32cd050c4110210e5b0155fde462535f28942dd8ece60b17a03ca2c49d1c.
+All70 assets are byte-identical to the CPU-fact control; shaders unchanged.
+Exact SM-S928B run20261002-003825 passes two75% captures and Home/resume.
+
+| Checkpoint | Viewmodel20 / World4 committed pixels | Independent viewmodel-only hit pixels | Skeleton2 /18 committed pixels | Metadata-based player pixels |
+| --- | --- | --- | --- | --- |
+| two-enemy-combat |44480 /22104 |67986 |5717 /7282 |66584 |
+| player-viewmodel-lantern-high |133366 /34169 |168745 |12 /0 |167535 |
+
+Lead image inspection confirms modelled hands now render in both captures. These
+are expected corrected visibility changes, not a reason to restore buggy control
+pixels or weaken image tolerances. Second skeleton now receives primary hits;
+this is not yet live two-enemy/owner acceptance. Geometry, poses, materials, ray
+masks, player BLAS UPDATE and shaders did not change. TLAS BUILD instead of UPDATE
+is sufficient in these views; neither player geometry nor IK is implicated.
+
+Independent source/spec review finds no illegal player activation transition:
+an inactive Vulkan instance has a zero AS reference, not merely mask0. Slots4,
+20 and18 retain valid nonzero references; changing masks/references is permitted
+by TLAS UPDATE. Thus this result isolates the TLAS-update behaviour but does not
+prove a particular driver defect or universal workaround.
+
+Next finite candidate starts from normal0cf4f05 (no diagnostic counter remapping,
+extra query or CPU logging). Rebuild only for discrete instance-definition changes
+(visibility mask, BLAS reference and other non-transform fields), retaining UPDATE
+for ordinary transforms and BLAS refits. Test the two affected S24 captures, live
+route/lifecycle and relevant host contract before adoption. If this does not
+retain visibility, do not claim the cheaper policy works. Preserve all negatives.
+Normal8CB restoration is next before integration; no new performance claim.
