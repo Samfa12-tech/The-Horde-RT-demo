@@ -4451,7 +4451,7 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
              << "{\n"
              << "  \"schemaVersion\": 1,\n"
              << "  \"investigationOnly\": true,\n"
-                 << "  \"investigation\": \"two-enemy-primary-sampling-witness\",\n"
+                 << "  \"investigation\": \"ordered-uv-remaining-reflections-witness\",\n"
              << "  \"payloadRows\": 5,\n"
              << "  \"complete\": " << (complete ? "true" : "false") << ",\n"
              << "  \"source\": \"rt-storage-image\",\n"
@@ -4740,7 +4740,7 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
     else
     {
         for (const auto& checkpoint : horde::gameplay::kShowcaseCheckpoints)
-            if (checkpoint.id == 12)
+            if (checkpoint.id == 2 || checkpoint.id == 11)
                 checkpoints.push_back(&checkpoint);
     }
     captures.reserve(checkpoints.size());

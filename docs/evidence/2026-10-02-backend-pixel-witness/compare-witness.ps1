@@ -2,7 +2,7 @@ param(
     [Parameter(Mandatory)][string]$ControlRoot,
     [Parameter(Mandatory)][string]$WitnessRoot,
     [Parameter(Mandatory)][string]$OutputPath,
-    [ValidateSet('Output','Surface','CombatSurface','CombatSampling')][string]$WitnessStage = 'Output'
+    [ValidateSet('Output','Surface','CombatSurface','CombatSampling','RemainingSurface')][string]$WitnessStage = 'Output'
 )
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
@@ -60,7 +60,7 @@ $names = @('sentinel','x','y','hit','instance','primitive','material','t',
     'afterFireR','afterFireG','afterFireB','afterMistR','afterMistG','afterMistB',
     'displayR','displayG','displayB','originX','originY','originZ')
 $expectedInvestigation = 'six-backend-pixel-output-witness'
-if ($WitnessStage -cin @('Surface','CombatSurface','CombatSampling')) {
+if ($WitnessStage -cin @('Surface','CombatSurface','CombatSampling','RemainingSurface')) {
     $expectedInvestigation = 'six-backend-surface-split-witness'
     $names += @('directR','directG','directB','localVisibility','skyVisibility',
         'skyDiffuse','localStrength','bounceDirectionX','bounceDirectionY','bounceDirectionZ',
@@ -102,6 +102,15 @@ if ($WitnessStage -cin @('CombatSurface','CombatSampling')) {
         $expectedInvestigation = 'two-enemy-primary-sampling-witness'
     }
 }
+if ($WitnessStage -ceq 'RemainingSurface') {
+    $expectedInvestigation = 'ordered-uv-remaining-reflections-witness'
+    $expectedRoster = '2,11'
+    $expectedCaptureCount = 2
+    $cases = @(
+        @{id=2; file='02-worst-bend.png'; x=556; y=378; row=0},
+        @{id=11; file='11-finale-roof.png'; x=552; y=395; row=2},
+        @{id=11; file='11-finale-roof.png'; x=770; y=526; row=3})
+}
 function Get-StaticAssetIdentity($asset) {
     # Build durations are measured observations, not immutable asset identity.
     # Ignore only the four known timing fields; retain all allocation/schema fields.
@@ -115,7 +124,7 @@ function Get-StaticAssetIdentity($asset) {
 }
 $rows = foreach ($backend in @('pipeline','compute')) {
     $oldDirectory = Join-Path $ControlRoot "control-windows-$backend"
-    if ($WitnessStage -cin @('CombatSurface','CombatSampling')) { $oldDirectory = Join-Path $ControlRoot $backend }
+    if ($WitnessStage -cin @('CombatSurface','CombatSampling','RemainingSurface')) { $oldDirectory = Join-Path $ControlRoot $backend }
     $newDirectory = Join-Path $WitnessRoot $backend
     $old = Get-Content (Join-Path $oldDirectory 'capture-manifest.json') -Raw | ConvertFrom-Json
     $new = Get-Content (Join-Path $newDirectory 'capture-manifest.json') -Raw | ConvertFrom-Json

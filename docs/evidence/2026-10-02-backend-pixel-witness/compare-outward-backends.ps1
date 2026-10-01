@@ -1,6 +1,6 @@
 param([Parameter(Mandatory)][string]$CaptureRoot,[Parameter(Mandatory)][string]$OutputPath,
       [string]$Candidate='7782e8eeb54850813c74c90b188969f908f4906f',
-      [ValidateSet('FiveCheckpoint','CombatOnly')][string]$Roster='FiveCheckpoint')
+      [ValidateSet('FiveCheckpoint','CombatOnly','RemainingReflection')][string]$Roster='FiveCheckpoint')
 $ErrorActionPreference='Stop'
 Add-Type -AssemblyName System.Drawing
 Add-Type -ReferencedAssemblies System.Drawing.Common,System.Drawing.Primitives,System.Private.Windows.GdiPlus,System.Private.Windows.Core,System.Collections -TypeDefinition @'
@@ -33,6 +33,10 @@ $a=Get-Content (Join-Path $CaptureRoot 'pipeline/capture-manifest.json') -Raw|Co
 $b=Get-Content (Join-Path $CaptureRoot 'compute/capture-manifest.json') -Raw|ConvertFrom-Json
 $expectedIds=if($Roster -ceq 'CombatOnly'){'12'}else{'2,6,7,11,12'}
 $expectedCount=if($Roster -ceq 'CombatOnly'){1}else{5}
+if ($Roster -ceq 'RemainingReflection') {
+    $expectedIds='2,11'
+    $expectedCount=2
+}
 if (-not $a.complete -or -not $b.complete -or $a.captures.Count -ne $expectedCount -or
     $b.captures.Count -ne $expectedCount -or ($a.captures.id -join ',') -cne $expectedIds -or
     ($b.captures.id -join ',') -cne $expectedIds -or $a.executionBackend -cne 'RayTracingPipeline' -or
