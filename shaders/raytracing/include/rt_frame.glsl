@@ -28,7 +28,7 @@ void main()
     vec2 screen = uv * 2.0 - 1.0;
     screen.x *= aspect;
     screen.y *= -0.74;
-    vec3 rayDirection = normalize(forward * 1.22 + right * screen.x + up * screen.y);
+    precise vec3 rayDirection = normalize(forward * 1.22 + right * screen.x + up * screen.y);
 
     // The first-person body only occupies the lower view. Skip its BLAS for
     // upper-screen primary rays, but retain it in lower-screen primary rays,
