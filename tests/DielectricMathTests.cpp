@@ -560,6 +560,130 @@ void TestRecordedTriangleSurfacePointKeepsMicrometreExit()
           "the captured triangle surface point retains a real micrometre-scale adjacent exit above the unchanged query minimum");
 }
 
+void TestRecordedRow43OutsideOriginCornerRejectsFirstExit()
+{
+    // Investigation witnesses are retained under
+    // docs/evidence/2026-09-30-glass-spawn/derived-normal-bias/row43/:
+    // native-path.json decodes 11-finale-roof.png, SHA-256
+    // 9d68aef8110e5f64319690973dbcafa6f3178204a5bec89e2c978fefb845be1c,
+    // and records pipeline primitive 63. compute-native-path.json decodes
+    // 11-finale-roof.png, SHA-256
+    // e0cbf7fd2f3246c84c4e03e26ea8e2d7b8cdcb4af6c9f8f5b1fdd60340a24a0e,
+    // and records the valid primitive 9 entry at the same pixel. The values
+    // below preserve each backend's captured float32 ray independently; these
+    // double-precision fixture calculations are not runtime predicates.
+    const Vec3 origin{
+        0.29004669189453125f, -0.018100142478942871f, 1.5681824684143066f};
+    const Vec3 pipelineDirection{
+        -0.40491229295730591f, -0.49916413426399231f, -2.1799464225769043f};
+    const Vec3 computeDirection{
+        -0.40491232275962830f, -0.49916410446166992f, -2.1799466609954834f};
+    const float nativeExitBaryV = 3.486895217008623e-9f;
+    const std::array<Vec3, 3u> nativeExitTriangle{{
+        {0.013142652809619904f, -0.33249998092651367f, 0.20776373147964478f},
+        {0.17335733771324158f, -0.33249998092651367f, 0.11526373028755188f},
+        {0.17335733771324158f, -0.67750000953674316f, 0.11526373028755188f},
+    }};
+    const std::array<Vec3, 3u> capturedValidEntryTriangle{{
+        {-0.013142652809619904f, -0.33249998092651367f, -0.20776373147964478f},
+        {-0.17335733771324158f, -0.67750000953674316f, -0.11526373028755188f},
+        {-0.013142652809619904f, -0.67750000953674316f, -0.20776373147964478f},
+    }};
+
+    struct ReferenceHit
+    {
+        double determinant;
+        double uNumerator;
+        double vNumerator;
+        double tNumerator;
+        double t;
+        bool insideTriangle;
+    };
+    const auto referenceHit = [](const Vec3& rayOrigin, const Vec3& rayDirection,
+                                 const std::array<Vec3, 3u>& triangle) {
+        using DVec3 = std::array<double, 3u>;
+        const auto asDouble = [](const Vec3& value) -> DVec3 {
+            return {static_cast<double>(value.x), static_cast<double>(value.y),
+                    static_cast<double>(value.z)};
+        };
+        const auto subtract = [](const DVec3& left, const DVec3& right) -> DVec3 {
+            return {left[0] - right[0], left[1] - right[1], left[2] - right[2]};
+        };
+        const auto cross = [](const DVec3& left, const DVec3& right) -> DVec3 {
+            return {left[1] * right[2] - left[2] * right[1],
+                    left[2] * right[0] - left[0] * right[2],
+                    left[0] * right[1] - left[1] * right[0]};
+        };
+        const auto dot = [](const DVec3& left, const DVec3& right) {
+            return left[0] * right[0] + left[1] * right[1] + left[2] * right[2];
+        };
+        const DVec3 o = asDouble(rayOrigin);
+        const DVec3 d = asDouble(rayDirection);
+        const DVec3 a = asDouble(triangle[0]);
+        const DVec3 edge1 = subtract(asDouble(triangle[1]), a);
+        const DVec3 edge2 = subtract(asDouble(triangle[2]), a);
+        const DVec3 p = cross(d, edge2);
+        const double determinant = dot(edge1, p);
+        const DVec3 fromA = subtract(o, a);
+        const double uNumerator = dot(fromA, p);
+        const DVec3 q = cross(fromA, edge1);
+        const double vNumerator = dot(d, q);
+        const double tNumerator = dot(edge2, q);
+        const double signedUvSum = uNumerator + vNumerator;
+        const bool insideTriangle = determinant > 0.0
+            ? uNumerator >= 0.0 && vNumerator >= 0.0 && signedUvSum <= determinant
+            : determinant < 0.0 && uNumerator <= 0.0 && vNumerator <= 0.0 &&
+                  signedUvSum >= determinant;
+        return ReferenceHit{determinant, uNumerator, vNumerator, tNumerator,
+                            tNumerator / determinant, insideTriangle};
+    };
+
+    const ReferenceHit exit = referenceHit(
+        origin, pipelineDirection, nativeExitTriangle);
+    Check(nativeExitBaryV > 0.0f && exit.determinant < 0.0 &&
+              exit.uNumerator < 0.0 && exit.vNumerator > 0.0 &&
+              exit.uNumerator + exit.vNumerator >= exit.determinant &&
+              !exit.insideTriangle,
+          "row43 primitive 63 has positive native baryV but a strictly outside double-precision signed numerator");
+    Check(std::abs(exit.vNumerator / exit.determinant -
+                   (-1.0472011617346364e-7)) < 1.0e-15,
+          "pipeline primitive 63 normalized v reproduces the retained strictly negative double reference");
+    Check(exit.t > 0.0 && std::abs(exit.t - 0.629852548967093) < 1.0e-12,
+          "the outside primitive 63 reference distance reproduces the retained double result");
+
+    DielectricStack<4u> outsideOriginStack;
+    const auto rejectedFirstExit = outsideOriginStack.Exit(8u, 115u);
+    Check(!rejectedFirstExit.accepted && outsideOriginStack.Depth() == 0u,
+          "an exiting glass boundary cannot pop an empty primary stack for the recorded outside ray origin");
+
+    const ReferenceHit pipelineEntry = referenceHit(
+        origin, pipelineDirection, capturedValidEntryTriangle);
+    const ReferenceHit computeEntry = referenceHit(
+        origin, computeDirection, capturedValidEntryTriangle);
+    Check(pipelineEntry.determinant > 0.0 && pipelineEntry.uNumerator > 0.0 &&
+              pipelineEntry.vNumerator > 0.0 &&
+              pipelineEntry.uNumerator + pipelineEntry.vNumerator <
+                  pipelineEntry.determinant && pipelineEntry.insideTriangle &&
+              computeEntry.determinant > 0.0 && computeEntry.uNumerator > 0.0 &&
+              computeEntry.vNumerator > 0.0 &&
+              computeEntry.uNumerator + computeEntry.vNumerator <
+                  computeEntry.determinant && computeEntry.insideTriangle,
+          "captured primitive 9 is inside under each backend's own captured ray");
+    Check(pipelineEntry.t > 0.0 &&
+              std::abs(pipelineEntry.t - 0.8082919771786382) < 1.0e-12,
+          "pipeline ray reproduces its retained primitive 9 double distance");
+    Check(computeEntry.t > 0.0 &&
+              std::abs(computeEntry.t - 0.8082918915765992) < 1.0e-12,
+          "compute ray reproduces its distinct retained primitive 9 double distance");
+    DielectricStack<4u> validEntryStack;
+    Check(validEntryStack.Enter(8u, 115u, 1.52f).accepted &&
+              validEntryStack.Depth() == 1u,
+          "the valid primitive 9 entry is admitted as the paired volume's first boundary");
+    // The independent TestRecordedTriangleSurfacePointKeepsMicrometreExit
+    // covers a distinct valid short exit; this row43 assertion rejects an
+    // outside triangle candidate without introducing a spatial epsilon.
+}
+
 void TestBoundedTirAndWaterTerminationContracts()
 {
     Check(ResolveDielectricInterfaceBudget(1u, 8u) ==
@@ -703,6 +827,7 @@ int main()
     TestGenericShadowOriginKeepsMillimetreClearance();
     TestClosedPaneEntryNearEdgeKeepsExitReachable();
     TestRecordedTriangleSurfacePointKeepsMicrometreExit();
+    TestRecordedRow43OutsideOriginCornerRejectsFirstExit();
     TestRoughClosedVolumeTransmissionReachesPairedBoundary();
     TestBoundedTirAndWaterTerminationContracts();
     TestSelfHitClassificationUsesBoundedEpsilon();
