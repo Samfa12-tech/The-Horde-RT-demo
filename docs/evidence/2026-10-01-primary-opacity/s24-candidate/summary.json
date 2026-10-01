@@ -1,0 +1,57 @@
+{
+  "schema": 8,
+  "runId": "20261001-223947",
+  "mode": "Benchmark",
+  "scale": 75,
+  "include100": false,
+  "rtLabWorkloadComparison": false,
+  "rtLabComparisonCheckpoints": null,
+  "checkpoints": [],
+  "gpuTiming": "disabled",
+  "deviceSerial": "R5CXC0G9GBW",
+  "deviceModel": "SM-S928B",
+  "androidVersion": "16",
+  "apiLevel": "36",
+  "osBuildFingerprint": "samsung/e3qxxx/e3q:16/BP4A.251205.006/S928BXXS6DZH2:user/release-keys",
+  "gpuName": "Adreno (TM) 750",
+  "gpuVendorId": 20803,
+  "gpuDeviceId": 1124406273,
+  "gpuDriverVersion": 2150604841,
+  "vulkanApiVersion": 4206720,
+  "displaySize": "Physical size: 1080x2340",
+  "displayDensity": "Physical density: 450",
+  "package": "com.samfa12.hordelanternrt.debug",
+  "apkSha256": "6da2bccf3ec90f4dfe0aef1b9899626c6fb0a13525359c6fc229146f3848fa8b",
+  "installedApkSha256": "6da2bccf3ec90f4dfe0aef1b9899626c6fb0a13525359c6fc229146f3848fa8b",
+  "sourceCommit": "e78028c999e745e7cfd1695468062bb45f300b21",
+  "sourceDirty": true,
+  "selectedRtPipelineBundle": {
+    "opaqueFast": {
+      "key": "rayquery_compute_diagnostic_mobile_opaque_fast",
+      "sha256": "e7a03381663212491c5483b7e5f4049470a8e3237faf3f7756e4214c68bee3c5"
+    },
+    "genericDielectric": {
+      "key": "rayquery_compute_diagnostic_mobile_generic_dielectric",
+      "sha256": "62799da4e0e8f26277926f3289b2cf2f0f717eb05d60a6c30404bc5f24f9edea"
+    }
+  },
+  "captureRequested": true,
+  "captureCheckpointCount": 2,
+  "captureManifest": "capture-manifest.json",
+  "lifecycle": {
+    "requested": true,
+    "homeResumePassed": true,
+    "honestPresentationAfterResume": true,
+    "log": "lifecycle-home-resume-logcat.txt"
+  },
+  "timingMethod": "CPU wall-clock from frame start through vkQueuePresentKHR; not a Vulkan GPU timestamp",
+  "performanceReference": {
+    "policy": "descriptive FPS-equivalent bands; no single frame-time threshold is a product acceptance gate",
+    "sixtyFpsMs": 16.667,
+    "fiftyFpsMs": 20.0,
+    "thirtyFpsMs": 33.333,
+    "matchedRegressionInvestigationPercent": 15.0
+  },
+  "warnings": [],
+  "failures": []
+}

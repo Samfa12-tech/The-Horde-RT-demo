@@ -1,7 +1,7 @@
 # Bounded Mobile primary opacity admission experiment
 
 Owner permits only one or two further materially promising trials, not another
-broad investigation. This is candidate 1; no performance result exists yet.
+broad investigation. This is candidate 1; finite Shipping collection is running.
 Normal source control is 8c65afa694067e56b09ccb09c427fffd0b5ee570 plus prose-only
 steering checkpoint. Original dirty engineering worktree/probe is untouched.
 
@@ -44,11 +44,11 @@ tradeoff. Added upload-after-clones and shadow confirmation source contracts.
 
 | Gate | Planned evidence | State |
 | --- | --- | --- |
-| Source contract | Water-off, body filtering, secondary opacity and clone isolation | Open |
-| Shader | Actual compilation/validation; Shipping diagnostics absent; High unchanged | Open |
-| Windows | Current Mobile primary/body/water/lantern images, pipeline and compute, unchanged tolerance | Open |
-| Exact S26 | Same authored image fixtures, primary ownership and physical-query containment | Open |
-| Shipping timing, only after image admission | Opening route and glassless held-high; interleaved A1/B1/B2/A2 warm runs at75%, same backend/extent | Open |
+| Source contract | Water-off, body filtering, secondary opacity and clone isolation | Affected4/4 PASS |
+| Shader | Actual compilation/validation; Shipping diagnostics absent; High unchanged | Actual16 modules PASS; eight High hashes identical |
+| Windows | Current Mobile primary/body/water/lantern images, pipeline and compute, unchanged tolerance |26 images byte-identical; pipeline capture-timing gate fails+4.766%, compute passes−0.963% |
+| Exact S26 | Same authored image fixtures, primary ownership and physical-query containment | Six images byte-identical; strict ASTC/presentation/Home-resume PASS |
+| Shipping timing, only after image admission | Opening route and glassless held-high; interleaved A1/B1/B2/A2 warm runs at75%, same backend/extent | Running; no gain claimed |
 | Memory | Active RAM/PSI separate from GPU bandwidth/cache/stall gaps; no intermediate allocation | Open |
 | Restore/decision | Normal APK/config restored; preserve negative results, achieved30FPS gap and next action | Open |
 
@@ -87,8 +87,21 @@ opening,two-enemy,skylight,lantern-high,low-look-down,glass-edge-fresnel. All si
 PNGs are byte-identical, stricter than unchanged maxRGB3/fraction0.001. Mutable
 frame serials/skin-update counts are not pose differences. Not High acceptance.
 
-**Next:** finite S26 Shipping A1/B1/B2/A2 opening-route +held-high measurements,
-then normal artifact restoration/decision. No timing rows completed yet. Stop on
+**Next:** finish the eight named S26 Shipping rows already launched from
+`C:/Dev/tmp/horde-primary-opacity-20261001/performance/run-opacity-matrix.ps1`,
+then its integrity-only analyser and lead performance/thermal admission. A1 route
+and held-high complete with1838/600 presented rows and native medians64.6229/
+96.9337ms; B1 route is running next. No A/B conclusion yet. Candidate
+source is pinned e78028c999e745e7cfd1695468062bb45f300b21, not moving evidence HEAD.
+Normal source is6fa1c53 prose-only ancestor of1e20f438. Do not repeat complete rows
+or rebuild unchanged APKs; existing incomplete rows halt for exact recovery.
+The matched collector adds one sparse active RAM/system-memory/PSI sample after30s,
+with retained UTC bounds, separate from lifecycle-boundary before/after snapshots.
+It does not measure GPU bandwidth/cache/stalls. Then normal restoration/decision.
+The S24 candidate containment also has two byte-identical images, zero player
+pixels and restored normal APK; it does not resolve its visibility defect.
+[Retained image/state receipts](evidence/2026-10-01-primary-opacity/README.md).
+Stop on
 incomparable runs or absent/small gain; no tuning sweep. Audio/haptic
 manual revalidation required: **NO**, semantic playback inputs are unchanged.
 No main merge, release or publication is authorized.

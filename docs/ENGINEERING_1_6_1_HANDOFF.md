@@ -31,8 +31,13 @@ Opening's single skeleton matches the authored/native count; the two-enemy
 checkpoint has two native entities but no distinguishable skeleton in that view.
 No timing rerun or player tuning; visual acceptance remains open.
 The next bounded performance candidate is tracked in the [primary opacity
-experiment](ENGINEERING_1_6_1_PRIMARY_OPACITY_2026-10-01.md). No gain or image
-equivalence is established yet; do not repeat rejected first-blocker/split trials.
+experiment](ENGINEERING_1_6_1_PRIMARY_OPACITY_2026-10-01.md). Experimental source
+e78028c is pushed separately; affected host4/4,16 module validation and26 RTX/six
+S26 byte-identical images pass image admission, but RTX pipeline's unchanged
+capture-timing gate fails+4.766%. Eight interleaved S26 Shipping rows are running;
+no gain claimed. Two S24 candidate captures reproduce missing hands identically,
+normal8CB restored. Read the finite record before resuming; do not rebuild unchanged
+artifacts or repeat completed rows/rejected first-blocker/split trials.
 
 Shared contract3e0f9be and native integration69afe4e add paused Android/Windows
 report forms and explicit foreground local JSON export. Separate export/context
