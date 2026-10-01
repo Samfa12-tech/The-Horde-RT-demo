@@ -314,6 +314,7 @@ struct Session final : std::enable_shared_from_this<Session>
                         return S_OK;
                     if (FAILED(error) || created == nullptr) { self->SafeUnavailable(); return S_OK; }
                     self->environment = created;
+                    self->result.stage = WindowsPlaytestVerificationStage::EnvironmentReady;
                     ComPtr<ICoreWebView2Environment10> privateEnvironment;
                     ComPtr<ICoreWebView2ControllerOptions> options;
                     if (FAILED(self->environment.As(&privateEnvironment)) ||
@@ -367,6 +368,7 @@ struct Session final : std::enable_shared_from_this<Session>
                     return S_OK;
                 }).Get(), &acceleratorToken))) { SafeUnavailable(); return; }
         if (FAILED(ConfigureWebView())) { SafeUnavailable(); return; }
+        result.stage = WindowsPlaytestVerificationStage::InPrivateControllerReady;
         static constexpr wchar_t filePickerBlocker[] =
             L"(()=>{const p=HTMLInputElement.prototype,c=p.click,s=p.showPicker;"
             L"Object.defineProperty(p,'click',{value:function(){if(String(this.type).toLowerCase()==='file')return;return c.apply(this,arguments)},configurable:false,writable:false});"
@@ -408,7 +410,10 @@ struct Session final : std::enable_shared_from_this<Session>
                 const bool allowed = IsAllowedWindowsPlaytestVerificationPageUrl(Wide(uri));
                 CoTaskMemFree(uri);
                 if (!allowed) args->put_Cancel(TRUE);
-                else if (auto self = weak.lock()) self->pageNavigationStarted = true;
+                else if (auto self = weak.lock()) {
+                    self->pageNavigationStarted = true;
+                    self->result.stage = WindowsPlaytestVerificationStage::PageNavigationStarted;
+                }
                 return S_OK;
             }).Get(), &navigationToken))) return E_FAIL;
         if (FAILED(webview->add_FrameNavigationStarting(Callback<ICoreWebView2NavigationStartingEventHandler>(
@@ -433,6 +438,17 @@ struct Session final : std::enable_shared_from_this<Session>
                     return S_OK;
                 }
                 CoTaskMemFree(source);
+                // A plain HTTP error page has no bridge script. Do not mistake
+                // successful navigation to a 503 body for an active challenge.
+                ComPtr<ICoreWebView2NavigationCompletedEventArgs2> http;
+                INT httpStatus = 0;
+                if (FAILED(args->QueryInterface(IID_PPV_ARGS(&http))) ||
+                    FAILED(http->get_HttpStatusCode(&httpStatus)) || httpStatus != 200)
+                {
+                    self->QueueFinish(WindowsPlaytestVerificationStatus::Unavailable);
+                    return S_OK;
+                }
+                self->result.stage = WindowsPlaytestVerificationStage::PageLoaded;
                 if (self->status && IsWindow(self->status))
                     SetWindowTextW(self->status, L"Complete the anti-spam check below. Your report stays in the game.");
                 self->PostHandshake();
@@ -488,7 +504,10 @@ struct Session final : std::enable_shared_from_this<Session>
                 WindowsPlaytestVerificationResult accepted;
                 const bool completed = self->oneShot.TryComplete(reply, accepted);
                 if (!reply.token.empty()) SecureZeroMemory(reply.token.data(), reply.token.size());
-                if (completed) self->QueueFinish(accepted.status, std::move(accepted.token));
+                if (completed) {
+                    self->result.stage = WindowsPlaytestVerificationStage::ReplyReceived;
+                    self->QueueFinish(accepted.status, std::move(accepted.token));
+                }
                 return S_OK;
             }).Get(), &webMessageToken))) return E_FAIL;
 
@@ -566,7 +585,10 @@ struct Session final : std::enable_shared_from_this<Session>
         const std::wstring message = L"{\"type\":\"horde-report-init\",\"nonce\":\"" + nonceWide + L"\"}";
         const HRESULT posted = webview->PostWebMessageAsJson(message.c_str());
         if (FAILED(posted)) QueueFinish(WindowsPlaytestVerificationStatus::Failed);
-        else handshakeSent = true;
+        else {
+            handshakeSent = true;
+            result.stage = WindowsPlaytestVerificationStage::HandshakePosted;
+        }
     }
 
     void Resize()
@@ -635,6 +657,7 @@ struct Session final : std::enable_shared_from_this<Session>
             Finish(WindowsPlaytestVerificationStatus::Unavailable);
             return;
         }
+        result.stage = WindowsPlaytestVerificationStage::ModalReady;
         if (FAILED(StartEnvironment())) Finish(WindowsPlaytestVerificationStatus::Unavailable);
     }
 
@@ -721,6 +744,21 @@ bool IsAllowedWindowsPlaytestVerificationChallengeUrl(std::wstring_view url) noe
     if (authority[host.size()] != L':') return false;
     if (authority.substr(host.size() + 1) != L"443") return false;
     return url.find(L'#', authorityEnd) == std::wstring_view::npos;
+}
+
+std::string_view WindowsPlaytestVerificationStageName(const WindowsPlaytestVerificationStage stage) noexcept
+{
+    switch (stage) {
+    case WindowsPlaytestVerificationStage::NotStarted: return "not-started";
+    case WindowsPlaytestVerificationStage::ModalReady: return "modal-ready";
+    case WindowsPlaytestVerificationStage::EnvironmentReady: return "environment-ready";
+    case WindowsPlaytestVerificationStage::InPrivateControllerReady: return "inprivate-controller-ready";
+    case WindowsPlaytestVerificationStage::PageNavigationStarted: return "page-navigation-started";
+    case WindowsPlaytestVerificationStage::PageLoaded: return "page-loaded";
+    case WindowsPlaytestVerificationStage::HandshakePosted: return "handshake-posted";
+    case WindowsPlaytestVerificationStage::ReplyReceived: return "reply-received";
+    }
+    return "unknown";
 }
 
 WindowsPlaytestVerificationReply ParseWindowsPlaytestVerificationMessage(

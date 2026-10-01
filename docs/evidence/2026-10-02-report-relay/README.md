@@ -162,6 +162,19 @@ failures without changing the SDK. Receipts: `windows-verification-debug-final.l
 `windows-verification-debug-integrated.log`, `windows-verification-release-integrated.log`.
 No real WebView/Turnstile success or device acceptance is inferred.
 
+Two finite explicit native verification smokes are retained, neither submits a
+report/email. First20s timeout lacked a stage. Fixed enum milestones plus HTTP200
+admission were then added because that evidence could not locate the stall.
+The changed candidate's one follow-up reaches a verified InPrivate controller,
+exact hosted page HTTP200 and `handshake-posted`, then times out20s without an
+accepted page reply. Browser startup is demonstrated; JS/challenge completion,
+widget hostname admission and successful token/server verification remain open.
+Do not infer a widget/configuration defect or successful CAPTCHA from timeout.
+Receipts `windows-verification-real-smoke.log` and
+`windows-verification-real-stages.log`; no token/nonces/provider data logged.
+Pure stage/parser contracts pass current Debug/Release1/1. No unchanged live
+retry: next is the existing owner/configuration and real challenge gate.
+
 ## Next unfinished step
 
 Android reviewed checkpoint/fresh source and merge-state CI are complete.

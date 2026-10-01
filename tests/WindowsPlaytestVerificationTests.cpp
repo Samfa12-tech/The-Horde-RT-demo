@@ -15,8 +15,32 @@ void Check(bool condition, std::string_view message)
 }
 }
 
-int main()
+int main(int argc, char** argv)
 {
+    // Explicit developer/owner smoke only. Normal CTest never opens a browser
+    // or contacts the hosted page. Never log a real token or submit a report.
+    if (argc == 2 && std::string_view(argv[1]) == "--interactive-verification-smoke")
+    {
+        auto result = ShowWindowsPlaytestVerification(nullptr);
+        if (!result.token.empty()) SecureZeroMemory(result.token.data(), result.token.size());
+        result.token.clear();
+        std::cout << "Real verification status enum (0=verified, 1=failed, 2=cancelled, 3=unavailable, 4=deadline): "
+                  << static_cast<int>(result.status) << ", last local stage: "
+                  << WindowsPlaytestVerificationStageName(result.stage)
+                  << ". No report or email submitted.\n";
+        return result.status == WindowsPlaytestVerificationStatus::Verified ? 0 : 2;
+    }
+    if (argc != 1) return 2;
+    for (const auto stage : {
+        WindowsPlaytestVerificationStage::NotStarted,
+        WindowsPlaytestVerificationStage::ModalReady,
+        WindowsPlaytestVerificationStage::EnvironmentReady,
+        WindowsPlaytestVerificationStage::InPrivateControllerReady,
+        WindowsPlaytestVerificationStage::PageNavigationStarted,
+        WindowsPlaytestVerificationStage::PageLoaded,
+        WindowsPlaytestVerificationStage::HandshakePosted,
+        WindowsPlaytestVerificationStage::ReplyReceived})
+        Check(!WindowsPlaytestVerificationStageName(stage).empty(), "stage diagnostic label is fixed and non-empty");
     Check(IsAllowedWindowsPlaytestVerificationPageUrl(
         L"https://briarhold-signal.samfa12.com/horde-report/verify"), "fixed verification page is allowed");
     for (const auto bad : {

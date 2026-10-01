@@ -32,9 +32,27 @@ enum class WindowsPlaytestVerificationStatus : unsigned char
     Deadline,
 };
 
+// Safe, fixed diagnostics for locating a timeout without exposing browser or
+// provider details. Values advance only across locally observed milestones.
+enum class WindowsPlaytestVerificationStage : unsigned char
+{
+    NotStarted,
+    ModalReady,
+    EnvironmentReady,
+    InPrivateControllerReady,
+    PageNavigationStarted,
+    PageLoaded,
+    HandshakePosted,
+    ReplyReceived,
+};
+
+[[nodiscard]] std::string_view WindowsPlaytestVerificationStageName(
+    WindowsPlaytestVerificationStage stage) noexcept;
+
 struct WindowsPlaytestVerificationResult
 {
     WindowsPlaytestVerificationStatus status = WindowsPlaytestVerificationStatus::Unavailable;
+    WindowsPlaytestVerificationStage stage = WindowsPlaytestVerificationStage::NotStarted;
     // A successful result contains the sole transient token. Callers must pass
     // it directly to their explicit send action and then discard it.
     std::string token;
