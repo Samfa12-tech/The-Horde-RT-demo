@@ -1,11 +1,48 @@
-# 1.6.1 local player-report integration
+# 1.6.1 player-report integration
 
 Single continuation record. Reporting remains part of the agreed programme;
 this slice does not reopen player, glass or music work. Original dirty engineering
 checkout and scratch files remain untouched. No main merge, release or publication.
 Shared contract3e0f9be; reviewed native integration69afe4e.
 
-## Implemented boundary
+## October2 remote foundation — current unfinished slice
+
+Owner clarified the finished experience: in-game report delivery through the
+existing Briarhold Cloudflare architecture, not primarily local JSON export.
+Owner approved deployment/configuration and one labelled synthetic fixture
+email. The reviewed private backend extension `fd104d7` is deployed as Worker
+version `1ca58068-e876-4016-be6f-b1ac4d2035ed`. Separate Horde endpoint/object
+namespaces reuse the existing fixed-mailbox binding, rate limiter and bounded
+delivery queue. No provider, client secret, mailbox change, game publication or
+main merge. Private backend source/personal email are not copied into this repo.
+
+Shared `PlaytestSubmission` preserves schema1/16KiB report,4096-byte note,
+512-byte context fields and opt-ins; envelope768KiB, metadata-free PNG512KiB,
+long edge1280/short720. Frozen report ID/bytes exclude the refreshed single-use
+Turnstile token. PNG framing/CRC are native checks; the actual Worker additionally
+validates bounded deflate pixels. Consent must precede RT-target readback.
+Android transport is foreground/memory-only, fixed HTTPS/no redirects,8KiB
+response,30s owner deadline armed before enqueue, bounded cleanup and explicit
+same-report retries. Late/cancelled callbacks cannot complete another attempt.
+202 means queued, not delivered email;200 means relay-confirmed sent. Provider
+crash after acceptance/before durable state remains at-least-once, not exactly-once.
+
+Current evidence: MSVC Debug/Release3/3 affected reporting CTests; Android
+transport14/14 focused tests; private Worker50/50 tests including actual workerd
+PNG/SQLite fixture, clean tooling audit0 and deployment. Live health/page200,
+invalid schema400, actual native wire fixture plus invalid token403. No email
+acceptance, native remote UI/capture, Android application/device or Windows
+remote-delivery pass is claimed. Existing local export remains functional.
+
+Next finite steps: native consented render-owner screenshot/UI integration;
+Turnstile existing-widget hostname admission; one approved fixture email and
+attachment acceptance; affected platform/CI/lifecycle evidence. Existing OAuth
+cannot manage widgets and the dashboard is signed out. Owner sign-in requested
+once; do not copy/rotate credentials, resend the question or substitute fake
+verification. No completed measurement/player/music investigations reopen.
+Audio/haptic manual revalidation required:NO (reporting-only, unchanged feedback).
+
+## Historical implemented local boundary
 
 The shared schema1 builder is now used by native Android and Windows forms,
 reached from paused/menu UI. Explicit export consent and separate basic-context
@@ -13,7 +50,8 @@ opt-in start **off on every new form**. Foreground local file export is not remo
 delivery: neither client uploads a report, chooses a server, attaches logs/saves/
 screenshots, persists report consent, or retries in the background. A user-selected
 document provider may sync the exported file independently; Android discloses this.
-No Briarhold endpoint/account is borrowed.
+At this historical checkpoint no Briarhold endpoint/account was borrowed;
+the authorised October2 shared-relay extension above supersedes that boundary.
 
 `PlaytestReport` owns validation, strict UTF-16-to-UTF-8 conversion, privacy-policy
 checks, note4096-byte/context512-byte limits and final16KiB cap. Authored CR/LF/TAB
@@ -89,11 +127,9 @@ Audio/haptic manual revalidation required: **NO** (test-only behavior).
    local file and inspection of its exact JSON/saved-state UI. Keep this desktop
    interaction explicitly open; do not repeat the four helpers unchanged.
    Opening the picker or passing mocked destinations does not close this gate.
-3. Complete remote reporting only with a confirmed appropriate backend destination
-   and authority; deployment/account configuration and real delivery are still open.
-   Do not send unsolicited test reports or introduce client secrets.
-   Destination was requested once on October2; await that answer rather than
-   repeating the question after resumption.
+3. Owner destination clarification and deployment approval are now received.
+   Follow the October2 remote foundation's next finite steps above; real delivery
+   and native UI/capture remain open. Only one labelled fixture email is approved.
 
 The historical S24 handback is superseded by renewed owner availability. Current
 bounded TLAS refresh restores normal hands/second-enemy intersections in captures

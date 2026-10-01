@@ -11,6 +11,7 @@ set(HORDE_RT_CORE_RELATIVE_SOURCES
     audio/MusicPcmAssetBank.cpp
     audio/MusicPlaybackSession.cpp
     reporting/PlaytestReport.cpp
+    reporting/PlaytestSubmission.cpp
     gameplay/simulation/GameSimulation.cpp
     gameplay/animation/PlayerAnimationState.cpp
     gameplay/animation/PlayerIkTargets.cpp

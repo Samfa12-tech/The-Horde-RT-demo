@@ -58,7 +58,7 @@ set(HORDE_RT_SOURCE_FILES)
 foreach(source IN LISTS HORDE_RT_CORE_RELATIVE_SOURCES)
     list(APPEND HORDE_RT_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/${source}")
 endforeach()
-list(FILTER HORDE_RT_SOURCE_FILES EXCLUDE REGEX "/(audio/(MusicDirector|MusicPcmStream|MusicPcmWave|MusicPcmAssetBank|MusicPlaybackSession)|reporting/PlaytestReport|gameplay/(simulation/GameSimulation|animation/(PlayerAnimationState|PlayerIkTargets)|effects/FireEmitterState|interactions/(InteractionState|ChestRewardSequence|FinaleSequence)|items/(HeldItemState|HeldItemKinematics|HeldLightState|LanternPendulum)))\\.cpp$")
+list(FILTER HORDE_RT_SOURCE_FILES EXCLUDE REGEX "/(audio/(MusicDirector|MusicPcmStream|MusicPcmWave|MusicPcmAssetBank|MusicPlaybackSession)|reporting/(PlaytestReport|PlaytestSubmission)|gameplay/(simulation/GameSimulation|animation/(PlayerAnimationState|PlayerIkTargets)|effects/FireEmitterState|interactions/(InteractionState|ChestRewardSequence|FinaleSequence)|items/(HeldItemState|HeldItemKinematics|HeldLightState|LanternPendulum)))\\.cpp$")
 
 add_library(horde_gameplay_simulation STATIC
     src/audio/MusicDirector.cpp
@@ -67,6 +67,7 @@ add_library(horde_gameplay_simulation STATIC
     src/audio/MusicPcmAssetBank.cpp
     src/audio/MusicPlaybackSession.cpp
     src/reporting/PlaytestReport.cpp
+    src/reporting/PlaytestSubmission.cpp
     src/gameplay/simulation/GameSimulation.cpp
     src/gameplay/animation/PlayerAnimationState.cpp
     src/gameplay/animation/PlayerIkTargets.cpp
@@ -622,6 +623,9 @@ if(BUILD_TESTING)
     target_include_directories(horde_rt_playtest_report_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_link_libraries(horde_rt_playtest_report_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_playtest_report_tests COMMAND horde_rt_playtest_report_tests)
+    add_executable(horde_rt_playtest_submission_tests tests/PlaytestSubmissionTests.cpp)
+    target_link_libraries(horde_rt_playtest_submission_tests PRIVATE horde_gameplay_simulation)
+    add_test(NAME horde_rt_playtest_submission_tests COMMAND horde_rt_playtest_submission_tests)
     if(WIN32)
         add_executable(horde_rt_windows_playtest_report_ui_tests
             tests/WindowsPlaytestReportUiTests.cpp

@@ -13,7 +13,27 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
-### October 2 music focus (current integration slice)
+### October 2 shared report relay (current integration slice)
+
+Owner approved extending/deploying the existing Briarhold Cloudflare Worker and
+one labelled fixture email. Reviewed private backend `fd104d7` is deployed as
+`1ca58068-e876-4016-be6f-b1ac4d2035ed`, preserving fixed mailbox/bindings and the
+existing delivery engine. Worker50/50 tests and actual workerd PNG/SQLite checks
+pass; tooling audit0. Live health/page200, invalid schema400 and actual native
+PNG wire fixture plus invalid token403. No email has been sent/accepted yet.
+Public Horde adds the bounded frozen submission envelope and foreground Android
+HTTPS owner, not private Worker source or credentials. MSVC affected3/3 CTests
+each Debug/Release and Android transport14/14 focused tests pass. UI/JNI screenshot
+capture and Windows remote submission are still unfinished; local JSON is fallback.
+See [single reporting record](ENGINEERING_1_6_1_REPORTING_2026-10-01.md).
+Next: consented presented-game-RT-only capture/native UI; existing Turnstile widget
+hostname check; one approved email/attachment acceptance; platform/lifecycle/CI.
+OAuth lacks widget scope and the dashboard needs owner sign-in, requested once.
+Do not silently broaden/copy credentials, repeat questions or treat mocks as
+delivery. Preserve pending phone owner checks and unrelated raw S24 files.
+Audio/haptic manual revalidation required:NO (report-only, feedback unchanged).
+
+### October 2 music focus (accepted integration slice)
 
 `ef812d0` adds a main-thread OS-focus gate to the thin Android PCM sink; shared
 Core looping/tails/crossfades, canonical score, accepted whistles, queue capacity,

@@ -140,6 +140,8 @@ struct PlaytestReportAttempt
     std::string json;
 };
 
+struct PreparedPlaytestSubmission;
+
 // UI/platform-owner seam for a synchronous transport callback. Retry explicitly
 // reuses identical ID/JSON bytes; Cancel invalidates the token so a late result
 // cannot complete a newer/cancelled submission. This class is not thread-safe,
@@ -148,6 +150,10 @@ class PlaytestReportDelivery
 {
 public:
     [[nodiscard]] bool Begin(const PreparedPlaytestReport& report, PlaytestReportAttempt& attempt);
+    // Remote envelopes have their own bounded attachment cap. This does not
+    // relax the 16KiB local-export/typed-report contract.
+    [[nodiscard]] bool BeginSubmission(const PreparedPlaytestSubmission& submission,
+        PlaytestReportAttempt& attempt);
     [[nodiscard]] bool Retry(PlaytestReportAttempt& attempt);
     [[nodiscard]] bool Complete(std::uint64_t token, PlaytestReportDeliveryResult result) noexcept;
     void Cancel() noexcept;
@@ -155,6 +161,8 @@ public:
     [[nodiscard]] PlaytestReportDeliveryState State() const noexcept { return state_; }
 
 private:
+    [[nodiscard]] bool BeginPayload(std::string_view id, std::string_view json,
+        std::size_t maximumBytes, PlaytestReportAttempt& attempt);
     [[nodiscard]] bool MakeAttempt(PlaytestReportAttempt& attempt);
 
     PlaytestReportDeliveryState state_ = PlaytestReportDeliveryState::Idle;

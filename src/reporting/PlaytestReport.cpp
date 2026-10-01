@@ -1,4 +1,5 @@
 #include "reporting/PlaytestReport.h"
+#include "reporting/PlaytestSubmission.h"
 
 #include <algorithm>
 #include <charconv>
@@ -424,11 +425,25 @@ std::string_view PlaytestReportStatusName(const PlaytestReportStatus status) noe
 bool PlaytestReportDelivery::Begin(const PreparedPlaytestReport& report,
                                    PlaytestReportAttempt& attempt)
 {
-    if (!report.IsReady() || !ValidReportId(report.reportId) || report.json.empty() ||
-        report.json.size() > kPlaytestReportMaxJsonBytes ||
+    return report.IsReady() && BeginPayload(report.reportId, report.json, kPlaytestReportMaxJsonBytes, attempt);
+}
+
+bool PlaytestReportDelivery::BeginSubmission(const PreparedPlaytestSubmission& submission,
+    PlaytestReportAttempt& attempt)
+{
+    // An explicit Retry is the only way to resend a pending frozen submission;
+    // a new form owns a new delivery instance. Never restart an accepted report.
+    return state_ == PlaytestReportDeliveryState::Idle && submission.IsReady() &&
+        BeginPayload(submission.reportId, submission.json, kPlaytestSubmissionMaxBytes, attempt);
+}
+
+bool PlaytestReportDelivery::BeginPayload(const std::string_view id, const std::string_view json,
+    const std::size_t maximumBytes, PlaytestReportAttempt& attempt)
+{
+    if (!ValidReportId(id) || json.empty() || json.size() > maximumBytes ||
         state_ == PlaytestReportDeliveryState::InFlight) return false;
-    reportId_ = report.reportId;
-    json_ = report.json;
+    reportId_ = id;
+    json_ = json;
     if (!MakeAttempt(attempt)) return false;
     state_ = PlaytestReportDeliveryState::InFlight;
     return true;
