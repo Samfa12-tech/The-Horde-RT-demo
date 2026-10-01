@@ -627,6 +627,28 @@ if(BUILD_TESTING)
     target_link_libraries(horde_rt_playtest_submission_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_playtest_submission_tests COMMAND horde_rt_playtest_submission_tests)
     if(WIN32)
+        add_executable(horde_rt_windows_playtest_screenshot_tests
+            tests/WindowsPlaytestScreenshotTests.cpp
+            src/platform/windows/WindowsPlaytestScreenshot.cpp)
+        target_include_directories(horde_rt_windows_playtest_screenshot_tests PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/src)
+        target_link_libraries(horde_rt_windows_playtest_screenshot_tests PRIVATE
+            horde_gameplay_simulation windowscodecs ole32 oleaut32)
+        add_test(NAME horde_rt_windows_playtest_screenshot_tests
+            COMMAND horde_rt_windows_playtest_screenshot_tests)
+        set_tests_properties(horde_rt_windows_playtest_screenshot_tests PROPERTIES TIMEOUT 30)
+
+        add_executable(horde_rt_windows_playtest_submission_tests
+            tests/WindowsPlaytestSubmissionTests.cpp
+            src/platform/windows/WindowsPlaytestSubmission.cpp)
+        target_include_directories(horde_rt_windows_playtest_submission_tests PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/src)
+        target_link_libraries(horde_rt_windows_playtest_submission_tests PRIVATE
+            horde_gameplay_simulation winhttp)
+        add_test(NAME horde_rt_windows_playtest_submission_tests
+            COMMAND horde_rt_windows_playtest_submission_tests)
+        set_tests_properties(horde_rt_windows_playtest_submission_tests PROPERTIES TIMEOUT 60)
+
         add_executable(horde_rt_windows_playtest_report_ui_tests
             tests/WindowsPlaytestReportUiTests.cpp
             src/platform/windows/WindowsPlaytestReport.cpp)
