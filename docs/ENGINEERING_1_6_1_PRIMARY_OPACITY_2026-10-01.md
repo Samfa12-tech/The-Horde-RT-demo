@@ -52,7 +52,7 @@ tradeoff. Added upload-after-clones and shadow confirmation source contracts.
 | Exact S26 | Same authored image fixtures, primary ownership and physical-query containment | Six images byte-identical; strict ASTC/presentation/Home-resume PASS |
 | Shipping timing, only after image admission | Opening route and glassless held-high; interleaved A1/B1/B2/A2 warm runs at75%, same backend/extent | Eight rows complete;9752 joined/presented/GPU-valid frames; NO-GO |
 | Memory | Active RAM/PSI separate from GPU bandwidth/cache/stall gaps; no intermediate allocation | Eight sparse active samples retained; GPU counter/plateau gaps remain |
-| Restore/decision | Normal APK/config restored; preserve negative results, achieved30FPS gap and next action | Normal Debug/benchmark bytes restored; experiment separate, source restoration below |
+| Restore/decision | Normal APK/config restored; preserve negative results, achieved30FPS gap and next action | Normal source/Debug/benchmark restored; only evidence integrated |
 
 S24 missing-hands/enemy follow-up is independent and does not certify S26 or this
 experiment. Do not repeat its completed physical-vs-open-pane timing matrix.
@@ -142,8 +142,13 @@ control and candidate, not a candidate regression. Separate timing+3.880% also
 fails its2% capture gate; it is not a matched Shipping backend-speed measurement.
 S24 candidate's two images likewise retain zero player pixels, not a repair.
 
-**Next:** restore the normal source branch and push evidence-only checkpoints;
-then a bounded S24 numeric instance-hit discriminator before metadata/shading,
+Normal source branch `codex/horde-mobile-lantern-profile` is restored; evidence-only
+8452ae3/d44a671 integrates image/measurement receipts. Diff against1e20f438 for
+src/shaders/android/tools/tests/CMake is empty: no experimental shader, helper,
+compiler ceiling or ownership change is promoted. Original dirty engineering
+checkout and scratch remain untouched. Trial source/evidence20b39df stays separate.
+
+**Next:** a bounded S24 numeric instance-hit discriminator before metadata/shading,
 not an arms rewrite. No more performance sweep. Broader Mobile lighting/secondary
 workload changes need their own bounded visual-quality decision, not automatic
 promotion of temporal reconstruction. [Raw results and next gates](evidence/2026-10-01-primary-opacity/README.md).

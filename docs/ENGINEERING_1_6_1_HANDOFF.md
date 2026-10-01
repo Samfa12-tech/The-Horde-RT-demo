@@ -45,7 +45,11 @@ installed hashes verified, Home. Existing RTX backend comparison also fails5/13
 pixel gates, unchanged tolerance; separate from within-backend candidate equality.
 Two S24 candidate captures reproduce missing hands identically,
 normal8CB restored. Read the finite record before resuming; do not rebuild unchanged
-artifacts or repeat completed rows/rejected first-blocker/split trials. **Next:**
+artifacts or repeat completed rows/rejected first-blocker/split trials. Normal
+source is restored on `codex/horde-mobile-lantern-profile`, with evidence-only
+8452ae3/d44a671; runtime/generated modules/ceilings equal1e20f438, original dirty
+engineering checkout/scratch preserved. Separate trial20b39df remains on GitHub.
+**Next:**
 bounded S24 numeric primary-instance hit discriminator before metadata/shading,
 not accepted player tuning; then remaining High/backend/report/final-candidate
 gates. Full programme remains active, no release/main merge/publication.
