@@ -23,14 +23,17 @@ Java tests, four-ABI build, zero-error lint and package gates PASS. Exact Debug
 are byte-identical to accepted A627. Fresh RT-active UI,12 consumed music periods
 with zero underruns,65s menu pause, Home focus release and same-epoch resume pass.
 Both10s launch waits time out before later readiness; no fast-start claim.
-`3cf25b3` adds focused Android native/Java/lint/package CI coverage; hosted results
-are pending, not covered by older host CI. [Finite record](evidence/2026-10-02-music-focus/README.md).
+`3cf25b3` adds focused Android native/Java/lint/package CI coverage. SDK-path fix
+`bdac965` passes fresh push36892699876 / PR36892707813: actual GCC55/Clang55/MSVC57/
+Vulkan CPU-host15/Android38 results, four Android ABIs, lint/package and merge
+parents/tree inspected. [CI receipt](evidence/2026-10-02-music-focus/CI.md) retains
+the initial SDK-path failures; no old-job rerun. [Finite record](evidence/2026-10-02-music-focus/README.md).
 Owner external-audio interruption/return check was requested once; do not resend
 or interrupt it. No new timbre audition/long-loop replay. Audio/haptic manual
 revalidation required:YES for music-focus recovery only. S26 is menu/Home with
 data preserved; S24 owner hands/enemy check remains untouched. Current music bank
-and Core pinned version remain authoritative. Next independent gates are current
-source CI, complete-visibility Shipping evidence, High physical/backend, reporting
+and Core pinned version remain authoritative. Next independent gates are
+complete-visibility Shipping evidence, High physical/backend, reporting
 delivery/export and final matrix; no main merge/release/publication.
 
 ### October 2 S24 bounded TLAS refresh (accepted integration)

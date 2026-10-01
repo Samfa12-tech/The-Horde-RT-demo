@@ -10,8 +10,9 @@ set is complete. It does not authorise publication or relax any RT requirement.
 
 Current checkpoint: bounded TLAS instance-definition refresh is integrated with
 fresh source/integration CI and separate S24/S26/RTX image/lifecycle evidence;
-S24 owner/live Shipping acceptance is still open. Android music focus is the
-current small integration slice, not a soundtrack or player rewrite. Read the
+S24 owner/live Shipping acceptance is still open. Android music focus is integrated
+with fresh five-lane source/PR CI; the external-audio owner check remains open.
+This is not a soundtrack or player rewrite. Read the
 [current handoff](ENGINEERING_1_6_1_HANDOFF.md) and its finite evidence records.
 Retain the completed negative performance trials; do not restart their sweeps.
 
@@ -84,7 +85,8 @@ material or a phone-model exception. The [finite profile record](ENGINEERING_1_6
 retains the completed24 exact S26/S24 Shipping comparisons, which show a large
 heavy-workload saving but do **not** meet the sustained30FPS goal. Exact S24 hands/
 enemy visibility, S26 live interaction/pacing, High physical-correctness/backend
-gates and full final-candidate acceptance stay explicit; S24 is now unavailable.
+gates and full final-candidate acceptance stay explicit. The owner reconnected S24;
+the already-requested live visibility check must not be interrupted or resent.
 Do not repeat finished experiments or reopen accepted player tuning.
 
 | Order | Work | Exit evidence |

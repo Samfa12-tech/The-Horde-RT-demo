@@ -69,8 +69,10 @@ actual package contents/music pins without production signing credentials. Debug
 uses AGP's debug key. Explicit SDK licenses/pinned packages and36 runtime LFS
 payloads are used. It requires at least38 passing tests and complete focus/buffer
 suites. Local actionlint1.7.12 passes (external shellcheck/pyflakes unavailable,
-explicitly disabled); the exact post-build PowerShell step passes locally. Hosted
-results are pending, not inferred from the existing C++ CI. First687dda9 push
+explicitly disabled); the exact post-build PowerShell step passes locally. Fresh
+bdac965 source and reconciled PR checks now PASS all five lanes; actual test/build
+results and merge parents/tree were inspected. See the [CI receipt](CI.md), not
+older C++ jobs, for Android admission. First687dda9 push
 36892419452 / PR36892429964 Android jobs fail before compilation: `sdkmanager`
 is not on the runner PATH (exit127). The correction resolves the existing tool
 explicitly under ANDROID_HOME and requires it to be executable; no SDK/version
