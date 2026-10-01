@@ -234,3 +234,53 @@ untouched; no phone action, main merge, release or publication.
 
 Audio/haptic manual revalidation required:NO: receiver lighting only, unchanged
 gameplay/event-time/listener/PCM/haptic semantics. Existing owner gates unchanged.
+
+## Combat reflection localization (completed; next sampling discriminator)
+
+Source `1975e0317cc538e29a44486076d85768666021fd` retargets only the existing
+Mobile/Diagnostic witness and limits its native capture to checkpoint12. Exact
+Debug executable SHA-256
+`2d9ebdb347c0c6dca8912b3113f8a03553588dc079bbaa53af672f054d889896`.
+Fresh app/affected-host build PASS; affected MSVC Debug CTest1/1 PASS4.82s.
+All16 real shaders compile/optimise/disassemble/validate. The8 Shipping and4
+High/Diagnostic SPIR-V hashes remain byte-identical to parked `ac15d64`;
+only4 Mobile/Diagnostic observer modules change. Cost admission remains the
+already-recorded FAIL; no budgets or normal Shipping configuration changed.
+
+The finite matrix is complete: one checkpoint12 native RTX capture on each
+backend, both exit0. [Decoded fields](combat-point/witness-comparison.json)
+preserve all non-payload pixels exactly against the retained closed-light-region
+control, plus camera/state, complete visibility diagnostics, CPU geometry and
+allocations. [Full paired scan](combat-point/backend-parity.json) still fails the
+unchanged max3/.001 gate: two outliers, maximum92. Do not rerun these captures.
+Manifests and PNGs are retained; identical CPU-geometry OBJ identities are checked
+against the preceding control instead of duplicating its large files.
+
+At542,311 both primary rays/t/positions and instance3/triangle5523/material100
+are identical. Primary mapped normals differ by up to8.2606e-5; direct RGB differs
+by at most.00050387. Reflected directions differ by up to.0001612584, selecting
+world triangle5 at t2.709058 versus triangle23 at t1.2331331. Reflected red
+radiance is.00027323925 versus.19996978. Display RGB remains183,134,52 versus
+190,140,54 (max7). The earlier564,393 outlier still selects skeleton triangles
+7109/2259 (max92). Fire/mist do not cause either divergence. This localizes the
+new point to mapped-normal/reflected-hit sensitivity, not a new glass-transport
+or selected-light-region failure; it does not yet establish which arithmetic
+or sampling operation produces the primary-normal difference.
+
+Source inspection and actual pipeline disassembly show PBR texture operations
+already use explicit LOD0; changing GLSL `texture()` to `textureLod(...,0)` is not
+an evidence-backed fix. No geometry, material, texture, normal smoothing,
+reflection direction, tolerance or quality change is admitted from this result.
+
+Next finite discriminator: capture the actual primary barycentrics, interpolated
+UV/tangent frame and normal/base/ORM samples at these same two points. Reuse the
+existing reserved output rows and primary query, with no extra rays, GPU-buffer
+ABI or framework. One new checkpoint12 capture per backend; require exact
+non-payload recurrence before interpreting its fields. Compare Shipping/High
+bytecode to this control. Do not repeat the completed five-scene matrix or begin
+a precision/epsilon sweep. A demonstrated differing layer, not confidence,
+must justify any subsequent candidate. S26 remains owner-disconnected; no phone
+poll/install, main merge, release or publication.
+
+Audio/haptic manual revalidation required:NO: investigation output only;
+gameplay/event-time/listener/PCM/haptic inputs unchanged.
