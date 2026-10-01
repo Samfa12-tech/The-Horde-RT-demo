@@ -1290,6 +1290,14 @@ the missing hands below material shading/counter classification, but does not
 certify a driver or AS-update cause. One CPU geometry/instance/alignment record is
 next; no animation/asset tuning or performance rerun.
 
+CPU-fact sourceeef3c79 / exact2904C7E2BF82C3690CD443D2CE58343CD3B236F8DA5B8958609BA0C4D9481E55
+Debug run20261002-002823 passes one75% high-lantern capture and Home/resume on
+SM-S928B. Image remains byte-identical and player query hits0. Both CPU player
+uploads are wholly finite (34304/15855 vertices), masks144/64, BLAS/TLAS references
+agree, reported scratch alignment64 with remainders0. Filtered diagnostic log is
+retained separately. These facts do not certify GPU AS contents or a driver cause.
+Next is one diagnostic player BLAS BUILD-vs-UPDATE comparison, not arm tuning.
+
 ## Research sources
 
 - [Android NDK stable APIs - Vulkan runtime capability guidance](https://developer.android.com/ndk/guides/stable_apis)

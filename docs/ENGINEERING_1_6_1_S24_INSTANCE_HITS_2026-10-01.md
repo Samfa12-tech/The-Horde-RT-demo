@@ -1,6 +1,7 @@
 # S24 bounded primary-hit discriminator
 
-Status: both shader discriminators complete; CPU AS facts pending. Normal control source0cf4f05; exact
+Status: both shader discriminators and CPU AS facts complete; player BUILD-vs-UPDATE
+discriminator next. Normal control source0cf4f05; exact
 normal Debug8CB APK and four existing captures are retained in the
 [visual follow-up](evidence/2026-10-01-s24-visual-followup/RESULTS.md).
 Do not repeat the finished opacity/performance trial or tune accepted arms.
@@ -134,8 +135,34 @@ Corrected four-ABI Debug build passes (21s); logs retain both attempts. Frozen
 All70 APK assets are byte-identical to the second-probe artifact. This candidate
 retains the second-probe shader and its investigation-only counter meanings.
 
-Next unfinished step: collect one high-lantern capture/CPU log with this exact
-artifact, then restore normal8CB. Do not rebuild unchanged artifacts; diagnose
-only from the actual facts. Normal Shipping stays unchanged.
+## CPU facts completed
+
+Sourceeef3c79d8e80bbdebccb76eebd58b9ad3945b10d, exact2904 APK install/pull matches;
+run20261002-002823 passes one75% high-lantern capture and Home/resume. PNG SHA256
+d6fe26c2557867bba69a1e8fb0ecd1737c0f3f37d3a6a36328237f48c88d673a remains byte-identical
+to normal8CB. Player committed/candidate/direct-query counts remain0.
+The runner filters logcat to bridge/audio/runtime tags, excluding the diagnostic
+HordeLanternRT tag. Reading that still-retained tag separately supplies the CPU
+receipt; no recapture/rebuild was necessary.
+
+World-body: mask144,5 geometries,34304/34304 finite vertices,2195456-byte vertex
+allocation. Viewmodel: mask64,2 geometries,15855/15855 finite vertices,1014720
+bytes. Both BLAS addresses equal their actual CPU TLAS references. Reported
+scratch alignment64; both scratch-address remainders0 (sizes4451424/2300224).
+High-lantern viewmodel world bounds approximately[-11.3603,0.131978,-15.4931] to
+[-10.5961,0.587804,-14.9264], camera[-10.65,0.7,-15.2]. This does not demonstrate
+a GPU upload/AS build pass, but excludes nonfinite/empty CPU vertices, zero/wrong
+CPU masks/references and misaligned player scratch addresses in this run. The
+source's missing explicit alignment guarantee remains a separate portability
+risk, not the demonstrated cause of these missing hands.
+
+Next bounded discriminator: one same high-lantern capture with only the player
+BLAS update mode changed to BUILD and source handle null on this Android Debug
+investigation branch. Existing allocation covers max(buildScratch,updateScratch);
+geometry, pose, masks, shaders, TLAS UPDATE and presentation stay unchanged.
+This distinguishes the player BLAS update path; it is not a proposed production
+rebuild/performance policy. Preserve negative results, then restore normal8CB.
+No repeated performance matrix or shader recompilation. Normal Shipping stays
+unchanged. Next unfinished step: build/freeze that new candidate once, capture.
 Audio/haptic manual revalidation required: **NO** (unchanged semantic playback).
 No main merge, release or publication authorised.
