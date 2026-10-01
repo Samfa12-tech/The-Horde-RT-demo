@@ -5471,7 +5471,11 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         playerUpdateInfo.pGeometries = playerGeometries.data();
         playerUpdateInfo.scratchData.deviceAddress = playerScratch.address;
 #if defined(__ANDROID__) && !defined(NDEBUG)
-        // Investigation branch only; numerical CPU facts, not an RT-hit claim.
+        // Investigation branch only: isolate player BLAS UPDATE from identical
+        // geometry built anew. Existing scratch covers both build/update sizes.
+        playerUpdateInfo.mode = VK_BUILD_ACCELERATION_STRUCTURE_MODE_BUILD_KHR;
+        playerUpdateInfo.srcAccelerationStructure = VK_NULL_HANDLE;
+        // Numerical CPU facts, not an RT-hit claim.
         VkPhysicalDeviceAccelerationStructurePropertiesKHR asProperties{
             VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_PROPERTIES_KHR};
         VkPhysicalDeviceProperties2 properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2};
