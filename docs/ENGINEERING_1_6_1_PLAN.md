@@ -1,6 +1,6 @@
 # 1.6.1 engineering programme and release gates
 
-Updated 2026-09-30. Status: **in development; not ready for final comprehensive validation or release**.
+Updated 2026-10-01. Status: **in development; not ready for final comprehensive validation or release**.
 
 This is the current next-step index for `codex/horde-1.6.1-engineering-pass`.
 The owner-authorised full repository audit remains in scope. The 2026-09-13
@@ -68,6 +68,17 @@ This is not closure of physical glass
 correctness, all-view/causal performance, exact S24/S25 acceptance or final validation.
 Historical entries above retain their original evidence status; the new gate
 decision supersedes their then-open measurement-foundation status only.
+
+October1 owner quality-profile decision deliberately supersedes physical lantern
+panes as a1.6.1 **Mobile** requirement: omit the actual pane primitives for every
+ray, retain native RT and unchanged cage/flame/lighting, and preserve full High
+physical glass/assets/fixes for future Mobile work. This is not a fake-transparent
+material or a phone-model exception. The [finite profile record](ENGINEERING_1_6_1_MOBILE_LANTERN_PROFILE_2026-10-01.md)
+retains the completed24 exact S26/S24 Shipping comparisons, which show a large
+heavy-workload saving but do **not** meet the sustained30FPS goal. Exact S24 hands/
+enemy visibility, S26 live interaction/pacing, High physical-correctness/backend
+gates and full final-candidate acceptance stay explicit; S24 is now unavailable.
+Do not repeat finished experiments or reopen accepted player tuning.
 
 | Order | Work | Exit evidence |
 | --- | --- | --- |

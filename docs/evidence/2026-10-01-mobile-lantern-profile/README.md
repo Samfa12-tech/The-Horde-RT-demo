@@ -78,7 +78,20 @@ not a Release performance measurement. Normal Windows High configuration untouch
 
 ## Next unfinished step
 
-Finish the existing C2 blocks (no restart); archive/admit new reports once. Then
-collect exact Debug authored hands/two-enemy comparisons and live open-lantern
-interaction/lifecycle evidence. Keep target/playability and S24 visibility open
-unless their own fresh evidence closes them.
+All24 timings are complete/archived at6d29d8b. `phone-matrix-derived-window-view.json`
+contains a read-only160-opening/600-heavy summary and SHA-256 bindings to each
+original benchmark/analysis; it is not a rerun or new admission. Full median/p95
+tables, thermal caveats, intended strategy transition and unmet30FPS gap are in
+the single record. No comfortable-playability claim is supported.
+
+`s26-debug/run-20261001-190159` retains the120s timeout and cleanup-terminated
+incomplete replay. `s26-debug/run-20261001-191403` retains the justified unchanged
+APK300s retry:13 replay waypoints,7 screenshots/states, strict ASTC/primary route,
+zero warnings/failures and honest RT Home/resume. This is Diagnostic image/lifecycle
+evidence, not Shipping performance, unfrozen interaction or S24 acceptance. Its
+single active-memory/PSI sample is separately labelled, not active RAM A/B.
+
+Next: S26 unfrozen interaction/pacing/resize checks, then independent remaining
+programme work. S24 has been returned; missing-hands/starting-enemy visual checks
+await renewed availability. Do not rerun the timing matrix or unchanged captures.
+Keep High physical/backend and full final-candidate acceptance open.

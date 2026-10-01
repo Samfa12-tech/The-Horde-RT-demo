@@ -48,6 +48,26 @@ so that stop is not confirmed. No data cleared/uninstall. S24 hands and
 starting-enemy authored-state checks remain **not completed**; do not claim visual
 acceptance or run further phone checks until it is available again.
 
+Subsequent **exact local SM-S948B Diagnostic image/replay/lifecycle evidence**:
+frozen e10b0203 Debug APK reused at75%/Mobile pipeline, installed bytes equal.
+Run191403 passes strict ASTC,13-waypoint replay,7 capture states/images, dedicated
+modelled primary ownership and renewed RT presentation after Home/resume, with
+zero warnings/failures. Lead inspected hands/open cage/flame and geometric floor
+shadows. Opening authored state reports1 active skinned enemy; two-enemy state2,
+without a clean front-on view of both. This does not diagnose the S24 owner report.
+Run190159 was incomplete at the120s observation timeout; finally cleanup stopped
+it after waypoint8. The single unchanged-APK300s retry has a recorded validity
+reason, not a repeated completed test. No live/Shipping/device-family acceptance.
+
+All24 retained Shipping trials now have a descriptive derived-window table in
+the finite profile record: S26 candidate heavy cycle112-122ms, S24 84-110ms.
+Large savings include automatic OpaqueFast selection and thermal/order context;
+they do **not** meet30FPS or establish comfortable playability. S26 opening GPU
+71-76ms remains costly. A separate active Diagnostic replay snapshot records
+PSS521032KiB/RSS627096KiB and memory PSI avg10=0.00; one snapshot is not sustained
+RAM-pressure acceptance, GPU bandwidth/cache/stall proof or Shipping A/B.
+S24 remains released/unavailable; no further S24 checks were made. S25 unverified.
+
 ## October 1: immutable music bank build only (no new device acceptance)
 
 Android Debug compiles the bounded transactional native bank for four ABIs.

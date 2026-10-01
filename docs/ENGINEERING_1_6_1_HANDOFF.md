@@ -24,18 +24,31 @@ repeat rejected trials or restart broad investigation. Continue from the
 Control is9f4f439; current isolated branch `codex/horde-mobile-lantern-profile`
 preserves the engineering checkout's dirty staged/probe work. Host/High containment
 and matched current-music75% S26/S24 evidence are required before playability claims.
-Source1da483d and its frozen APKs are retained in the single record. Both exact
-phones are connected; the finite interleaved Shipping matrix is underway, not
-accepted. S24 owner reports missing hands and one starting skeleton;
+Source1da483d and its frozen APKs are retained in the single record. The finite
+interleaved Shipping matrix is complete: all24 reports are archived/pushed at
+6d29d8b. S24 owner reports missing hands and one starting skeleton;
 these remain separate visual blockers for matched authored-state follow-up after
 timing. Original dirty engineering checkout remains untouched. No release/main merge.
 Later owner comparison says water colour matches S26; do not pursue that as a
 device mismatch. Owner prefers open lantern; suspected pane/model misalignment
 is recorded for future investigation only, not a current glass geometry change.
-The full two-device timing matrix is now complete, with reports retained locally;
 S24 returned to spouse at owner request before diagnostic visibility checks.
 No more S24 device actions until renewed availability. Its hands/enemy gate stays
-open; finish/archive existing results and available S26 validation without reruns.
+open. Pane-profile treatment materially lowers heavy cycle/GPU times but does
+not achieve30FPS: S26 candidate held-high112-114ms/live115-122ms; S24 held-high
+84ms/live100-110ms native-cycle medians. Thermal drift and the intended automatic
+GenericDielectric-to-OpaqueFast switch prohibit attributing this to geometry alone.
+Opening anchors remain slow; no comfortable-playability/display-pacing claim.
+S26 Debug exact frozen APK passes13 replay waypoints,7 captures and Home/resume
+in run191403; the first120s attempt was incomplete and cleanup terminated it,
+so one justified unchanged-APK300s retry is retained. Visible modelled hands,
+open cage/flame and geometric floor shadows were inspected; this is not live
+interaction/owner acceptance. New matrix interpretation and memory/counter gaps
+are in the single record. Current6d29 push36840516701/PR36840521652 are green
+(GCC55,Clang55,MSVC56,focused Vulkan-host15 each); actual job logs inspected.
+**Next:** S26 unfrozen interaction/pacing/resize checks, then independent remaining
+programme work; S24 visual gates and High physical/backend gates remain open.
+Do not rerun the matrix or rebuild unchanged artifacts.
 Audio/haptic manual revalidation required: **NO**, geometry-only selection.
 
 ### October 1 instrumentation - selected whistle bank and S26 playback correction

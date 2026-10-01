@@ -1,0 +1,146 @@
+--------- beginning of main
+10-01 19:14:19.570 17775 17775 I HordeLanternAudio: Accepted debug automation intent: checkpoint=-1 capture=false replay=false scale=75 gpuTiming=enabled requireRayQueryCompute=false rtLab=false
+10-01 19:14:19.767 17775 17775 I HordeLanternAudio: SFX loaded: 1
+10-01 19:14:19.767 17775 17775 I HordeLanternAudio: SFX loaded: 3
+10-01 19:14:19.767 17775 17775 I HordeLanternAudio: SFX loaded: 4
+10-01 19:14:19.767 17775 17775 I HordeLanternAudio: SFX loaded: 2
+10-01 19:14:19.767 17775 17775 I HordeLanternAudio: SFX loaded: 5
+10-01 19:14:19.767 17775 17775 I HordeLanternAudio: SFX loaded: 7
+10-01 19:14:19.767 17775 17775 I HordeLanternAudio: SFX loaded: 6
+10-01 19:14:19.767 17775 17775 I HordeLanternAudio: SFX loaded: 9
+10-01 19:14:19.767 17775 17775 I HordeLanternAudio: SFX loaded: 8
+10-01 19:14:19.767 17775 17775 I HordeLanternAudio: SFX loaded: 10
+10-01 19:14:19.767 17775 17775 I HordeLanternAudio: SFX loaded: 11
+10-01 19:14:19.767 17775 17775 I HordeLanternAudio: SFX loaded: 12
+10-01 19:14:19.767 17775 17775 I HordeLanternAudio: SFX loaded: 13
+10-01 19:14:19.767 17775 17775 I HordeLanternAudio: SFX loaded: 14
+10-01 19:14:19.767 17775 17775 I HordeLanternAudio: SFX loaded: 16
+10-01 19:14:19.767 17775 17775 I HordeLanternAudio: SFX loaded: 15
+10-01 19:14:19.767 17775 17775 I HordeLanternAudio: SFX loaded: 17
+10-01 19:14:19.767 17775 17775 I HordeLanternAudio: SFX loaded: 18
+10-01 19:14:19.767 17775 17775 I HordeLanternAudio: SFX loaded: 20
+10-01 19:14:19.767 17775 17775 I HordeLanternAudio: SFX loaded: 19
+10-01 19:14:19.780 17775 17775 I HordeRtProbeBridge: HORDE_GPU_TIMING mode=enabled rt_rendering=unchanged
+10-01 19:14:32.099 17775 17775 I HordeRtProbeBridge: PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich
+10-01 19:14:32.099 17775 17775 I HordeRtProbeBridge: RT render scale 75%: 1080x2235 -> 1440x2980
+10-01 19:14:32.099 17775 17775 I HordeRtProbeBridge: Started Android diagnostic surface rendering loop.
+10-01 19:14:32.106 17775 17977 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
+10-01 19:14:32.828 17775 17775 I HordeLanternAudio: Accepted debug automation intent: checkpoint=-1 capture=false replay=true scale=75 gpuTiming=enabled requireRayQueryCompute=false rtLab=false
+10-01 19:14:32.830 17775 17775 I HordeRtProbeBridge: HORDE_GPU_TIMING mode=enabled rt_rendering=unchanged
+10-01 19:14:45.603 17775 17775 I HordeRtProbeBridge: PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich
+10-01 19:14:45.603 17775 17775 I HordeRtProbeBridge: RT render scale 75%: 1080x2235 -> 1440x2980
+10-01 19:14:45.603 17775 17775 I HordeRtProbeBridge: Started Android diagnostic surface rendering loop.
+10-01 19:14:45.609 17775 18368 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
+10-01 19:14:45.949 17775 18368 I HordeRtProbeBridge: HORDE_REPLAY begin generation=1 waypoints=13 distance_per_frame=0.032
+10-01 19:14:50.414 17775 18368 I HordeRtProbeBridge: RT frame timing avg ms: total=154.495 fence=145.565 record=8.311 submit+present=0.439
+10-01 19:14:50.414 17775 18368 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=113.742 average_ms=145.773 samples=31 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:14:57.174 17775 18368 I HordeRtProbeBridge: HORDE_REPLAY waypoint generation=1 index=1 zone=opening x=0.000 z=-1.000
+10-01 19:15:03.125 17775 18368 I HordeRtProbeBridge: RT frame timing avg ms: total=105.894 fence=96.084 record=9.196 submit+present=0.476
+10-01 19:15:03.125 17775 18368 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=71.518 average_ms=106.086 samples=151 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:15:07.739 17775 18368 I HordeRtProbeBridge: HORDE_REPLAY waypoint generation=1 index=2 zone=skeleton-room x=0.000 z=-4.800
+10-01 19:15:12.416 17775 18368 I HordeRtProbeBridge: RT frame timing avg ms: total=77.399 fence=67.334 record=9.480 submit+present=0.459
+10-01 19:15:12.416 17775 18368 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=57.781 average_ms=88.795 samples=271 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:15:18.251 17775 18368 I HordeRtProbeBridge: HORDE_REPLAY waypoint generation=1 index=3 zone=shadow-corridor x=0.000 z=-9.400
+10-01 19:15:21.030 17775 18368 I HordeRtProbeBridge: RT frame timing avg ms: total=71.755 fence=62.531 record=8.641 submit+present=0.464
+10-01 19:15:21.030 17775 18368 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=66.563 average_ms=80.639 samples=391 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:15:27.801 17775 18368 I HordeRtProbeBridge: HORDE_REPLAY waypoint generation=1 index=4 zone=shadow-corridor x=4.200 z=-9.400
+10-01 19:15:29.628 17775 18368 I HordeRtProbeBridge: RT frame timing avg ms: total=71.626 fence=62.238 record=8.828 submit+present=0.438
+10-01 19:15:29.628 17775 18368 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=61.858 average_ms=76.241 samples=511 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:15:38.565 17775 18368 I HordeRtProbeBridge: RT frame timing avg ms: total=74.445 fence=65.316 record=8.564 submit+present=0.445
+10-01 19:15:38.565 17775 18368 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=56.027 average_ms=74.104 samples=631 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:15:39.794 17775 18368 I HordeRtProbeBridge: HORDE_REPLAY waypoint generation=1 index=5 zone=shadow-corridor x=4.200 z=-14.600
+10-01 19:15:48.266 17775 18368 I HordeRtProbeBridge: RT frame timing avg ms: total=80.818 fence=71.450 record=8.812 submit+present=0.429
+10-01 19:15:48.266 17775 18368 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=78.909 average_ms=73.628 samples=751 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:15:56.280 17775 18368 I HordeRtProbeBridge: HORDE_REPLAY waypoint generation=1 index=6 zone=shadow-corridor x=-2.000 z=-14.600
+10-01 19:15:58.490 17775 18368 I HordeRtProbeBridge: RT frame timing avg ms: total=85.166 fence=75.948 record=8.648 submit+present=0.442
+10-01 19:15:58.490 17775 18368 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=69.654 average_ms=73.904 samples=871 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:16:03.106 17775 18368 I HordeRtProbeBridge: HORDE_REPLAY waypoint generation=1 index=7 zone=skylight-chamber x=-5.500 z=-15.200
+10-01 19:16:05.104 17775 18368 I HordeRtProbeBridge: RT frame timing avg ms: total=55.096 fence=45.454 record=9.098 submit+present=0.419
+10-01 19:16:05.104 17775 18368 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=43.238 average_ms=70.418 samples=991 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:16:11.697 17775 18368 I HordeRtProbeBridge: RT frame timing avg ms: total=54.913 fence=45.190 record=9.179 submit+present=0.416
+10-01 19:16:11.697 17775 18368 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=49.908 average_ms=67.655 samples=1111 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:16:12.613 17775 18368 I HordeRtProbeBridge: HORDE_REPLAY waypoint generation=1 index=8 zone=yellow-torch-bay x=-11.000 z=-15.200
+10-01 19:16:19.273 17775 18368 I HordeRtProbeBridge: RT frame timing avg ms: total=63.114 fence=53.421 record=9.113 submit+present=0.443
+10-01 19:16:19.273 17775 18368 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=48.076 average_ms=66.235 samples=1231 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:16:22.323 17775 18368 I HordeRtProbeBridge: HORDE_REPLAY waypoint generation=1 index=9 zone=blue-torch-bay x=-16.000 z=-15.200
+10-01 19:16:26.640 17775 18368 I HordeRtProbeBridge: RT frame timing avg ms: total=61.363 fence=52.292 record=8.531 submit+present=0.414
+10-01 19:16:26.640 17775 18368 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=59.762 average_ms=64.968 samples=1351 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:16:32.224 17775 18368 I HordeRtProbeBridge: HORDE_REPLAY waypoint generation=1 index=10 zone=red-torch-bay x=-21.000 z=-15.200
+10-01 19:16:34.231 17775 18368 I HordeRtProbeBridge: RT frame timing avg ms: total=63.238 fence=53.982 record=8.704 submit+present=0.410
+10-01 19:16:34.232 17775 18368 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=57.021 average_ms=64.044 samples=1471 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:16:42.257 17775 18368 I HordeRtProbeBridge: RT frame timing avg ms: total=66.857 fence=57.735 record=8.512 submit+present=0.479
+10-01 19:16:42.257 17775 18368 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=55.615 average_ms=63.546 samples=1591 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:16:42.633 17775 18368 I HordeRtProbeBridge: HORDE_REPLAY waypoint generation=1 index=11 zone=green-torch-bay x=-26.000 z=-15.200
+10-01 19:16:49.932 17775 18368 I HordeRtProbeBridge: HORDE_REPLAY waypoint generation=1 index=12 zone=transmission-threshold x=-29.500 z=-15.200
+10-01 19:16:50.182 17775 18368 I HordeRtProbeBridge: RT frame timing avg ms: total=66.017 fence=57.227 record=8.230 submit+present=0.428
+10-01 19:16:50.182 17775 18368 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=50.484 average_ms=63.082 samples=1711 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:16:57.208 17775 18368 I HordeRtProbeBridge: RT frame timing avg ms: total=58.523 fence=49.104 record=8.879 submit+present=0.414
+10-01 19:16:57.208 17775 18368 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=69.347 average_ms=62.145 samples=1831 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:16:57.840 17775 18368 I HordeRtProbeBridge: HORDE_REPLAY waypoint generation=1 index=13 zone=finale x=-33.700 z=-15.200
+10-01 19:16:57.840 17775 18368 I HordeRtProbeBridge: HORDE_REPLAY complete generation=1 reached=13 expected=13 zone=finale
+10-01 19:16:58.315 17775 17775 I HordeLanternAudio: Accepted debug automation intent: checkpoint=0 capture=true replay=false scale=75 gpuTiming=enabled requireRayQueryCompute=false rtLab=false
+10-01 19:16:58.317 17775 17775 I HordeRtProbeBridge: HORDE_GPU_TIMING mode=enabled rt_rendering=unchanged
+10-01 19:17:11.929 17775 17775 I HordeRtProbeBridge: PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich
+10-01 19:17:11.929 17775 17775 I HordeRtProbeBridge: RT render scale 75%: 1080x2235 -> 1440x2980
+10-01 19:17:11.929 17775 17775 I HordeRtProbeBridge: Started Android diagnostic surface rendering loop.
+10-01 19:17:11.936 17775 20161 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
+10-01 19:17:12.136 17775 20161 I HordeRtProbeBridge: HORDE_CAPTURE begin generation=1 checkpoint=opening scale=75 stable_frames=12 zone=opening
+10-01 19:17:12.849 17775 20161 I HordeRtProbeBridge: HORDE_CAPTURE_READY generation=1 checkpoint=opening scale=75 stable_frames=12 presented=1
+10-01 19:17:13.999 17775 20161 I HordeRtProbeBridge: RT frame timing avg ms: total=63.556 fence=62.298 record=0.628 submit+present=0.461
+10-01 19:17:13.999 17775 20161 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=63.205 average_ms=60.778 samples=33 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:17:15.470 17775 17775 I HordeLanternAudio: Accepted debug automation intent: checkpoint=12 capture=true replay=false scale=75 gpuTiming=enabled requireRayQueryCompute=false rtLab=false
+10-01 19:17:15.471 17775 17775 I HordeRtProbeBridge: HORDE_GPU_TIMING mode=enabled rt_rendering=unchanged
+10-01 19:17:29.991 17775 17775 I HordeRtProbeBridge: PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich
+10-01 19:17:29.991 17775 17775 I HordeRtProbeBridge: RT render scale 75%: 1080x2235 -> 1440x2980
+10-01 19:17:29.991 17775 17775 I HordeRtProbeBridge: Started Android diagnostic surface rendering loop.
+10-01 19:17:29.998 17775 20319 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
+10-01 19:17:30.260 17775 20319 I HordeRtProbeBridge: HORDE_CAPTURE begin generation=1 checkpoint=two-enemy-combat scale=75 stable_frames=12 zone=skeleton-room
+10-01 19:17:31.529 17775 20319 I HordeRtProbeBridge: HORDE_CAPTURE_READY generation=1 checkpoint=two-enemy-combat scale=75 stable_frames=12 presented=1
+10-01 19:17:33.854 17775 20319 I HordeRtProbeBridge: RT frame timing avg ms: total=123.970 fence=122.454 record=0.825 submit+present=0.504
+10-01 19:17:33.854 17775 20319 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=135.504 average_ms=122.417 samples=31 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:17:34.156 17775 17775 I HordeLanternAudio: Accepted debug automation intent: checkpoint=137 capture=true replay=false scale=75 gpuTiming=enabled requireRayQueryCompute=false rtLab=false
+10-01 19:17:34.160 17775 17775 I HordeRtProbeBridge: HORDE_GPU_TIMING mode=enabled rt_rendering=unchanged
+10-01 19:17:47.956 17775 17775 I HordeRtProbeBridge: PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich
+10-01 19:17:47.956 17775 17775 I HordeRtProbeBridge: RT render scale 75%: 1080x2235 -> 1440x2980
+10-01 19:17:47.957 17775 17775 I HordeRtProbeBridge: Started Android diagnostic surface rendering loop.
+10-01 19:17:47.963 17775 20783 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
+10-01 19:17:48.210 17775 20783 I HordeRtProbeBridge: HORDE_CAPTURE begin generation=1 checkpoint=player-viewmodel-forward scale=75 stable_frames=12 zone=opening
+10-01 19:17:49.579 17775 20783 I HordeRtProbeBridge: HORDE_CAPTURE_READY generation=1 checkpoint=player-viewmodel-forward scale=75 stable_frames=12 presented=1
+10-01 19:17:51.939 17775 17775 I HordeLanternAudio: Accepted debug automation intent: checkpoint=116 capture=true replay=false scale=75 gpuTiming=enabled requireRayQueryCompute=false rtLab=false
+10-01 19:17:51.943 17775 17775 I HordeRtProbeBridge: HORDE_GPU_TIMING mode=enabled rt_rendering=unchanged
+10-01 19:18:05.810 17775 17775 I HordeRtProbeBridge: PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich
+10-01 19:18:05.810 17775 17775 I HordeRtProbeBridge: RT render scale 75%: 1080x2235 -> 1440x2980
+10-01 19:18:05.810 17775 17775 I HordeRtProbeBridge: Started Android diagnostic surface rendering loop.
+10-01 19:18:05.817 17775 21082 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
+10-01 19:18:06.076 17775 21082 I HordeRtProbeBridge: HORDE_CAPTURE begin generation=1 checkpoint=lantern-held-high scale=75 stable_frames=12 zone=yellow-torch-bay
+10-01 19:18:08.586 17775 21082 I HordeRtProbeBridge: HORDE_CAPTURE_READY generation=1 checkpoint=lantern-held-high scale=75 stable_frames=12 presented=1
+10-01 19:18:10.779 17775 17775 I HordeLanternAudio: Accepted debug automation intent: checkpoint=117 capture=true replay=false scale=75 gpuTiming=enabled requireRayQueryCompute=false rtLab=false
+10-01 19:18:10.784 17775 17775 I HordeRtProbeBridge: HORDE_GPU_TIMING mode=enabled rt_rendering=unchanged
+10-01 19:18:24.436 17775 17775 I HordeRtProbeBridge: PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich
+10-01 19:18:24.436 17775 17775 I HordeRtProbeBridge: RT render scale 75%: 1080x2235 -> 1440x2980
+10-01 19:18:24.436 17775 17775 I HordeRtProbeBridge: Started Android diagnostic surface rendering loop.
+10-01 19:18:24.445 17775 21250 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
+10-01 19:18:24.660 17775 21250 I HordeRtProbeBridge: HORDE_CAPTURE begin generation=1 checkpoint=lantern-held-low scale=75 stable_frames=12 zone=yellow-torch-bay
+10-01 19:18:27.063 17775 21250 I HordeRtProbeBridge: HORDE_CAPTURE_READY generation=1 checkpoint=lantern-held-low scale=75 stable_frames=12 presented=1
+10-01 19:18:29.460 17775 17775 I HordeLanternAudio: Accepted debug automation intent: checkpoint=144 capture=true replay=false scale=75 gpuTiming=enabled requireRayQueryCompute=false rtLab=false
+10-01 19:18:29.464 17775 17775 I HordeRtProbeBridge: HORDE_GPU_TIMING mode=enabled rt_rendering=unchanged
+10-01 19:18:43.329 17775 17775 I HordeRtProbeBridge: PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich
+10-01 19:18:43.329 17775 17775 I HordeRtProbeBridge: RT render scale 75%: 1080x2235 -> 1440x2980
+10-01 19:18:43.329 17775 17775 I HordeRtProbeBridge: Started Android diagnostic surface rendering loop.
+10-01 19:18:43.337 17775 21424 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
+10-01 19:18:43.528 17775 21424 I HordeRtProbeBridge: HORDE_PARRY_STAGE checkpoint=player-viewmodel-lantern-low-parry staged=1 consumed_parry_edges=1 parry_success_events=0 player_damaged_events=0 player_killed_events=0 enemy_hit_events=0 action=parry-active action_time=0.1100 events_cleared=1
+10-01 19:18:43.528 17775 21424 I HordeRtProbeBridge: HORDE_CAPTURE begin generation=1 checkpoint=player-viewmodel-lantern-low-parry scale=75 stable_frames=12 zone=yellow-torch-bay
+10-01 19:18:46.052 17775 21424 I HordeRtProbeBridge: HORDE_CAPTURE_READY generation=1 checkpoint=player-viewmodel-lantern-low-parry scale=75 stable_frames=12 presented=1
+10-01 19:18:48.598 17775 17775 I HordeLanternAudio: Accepted debug automation intent: checkpoint=9 capture=true replay=false scale=75 gpuTiming=enabled requireRayQueryCompute=false rtLab=false
+10-01 19:18:48.600 17775 17775 I HordeRtProbeBridge: HORDE_GPU_TIMING mode=enabled rt_rendering=unchanged
+10-01 19:19:02.224 17775 17775 I HordeRtProbeBridge: PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich
+10-01 19:19:02.224 17775 17775 I HordeRtProbeBridge: RT render scale 75%: 1080x2235 -> 1440x2980
+10-01 19:19:02.224 17775 17775 I HordeRtProbeBridge: Started Android diagnostic surface rendering loop.
+10-01 19:19:02.231 17775 21609 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
+10-01 19:19:02.442 17775 21609 I HordeRtProbeBridge: HORDE_CAPTURE begin generation=1 checkpoint=mirror scale=75 stable_frames=12 zone=finale
+10-01 19:19:03.544 17775 21609 I HordeRtProbeBridge: HORDE_CAPTURE_READY generation=1 checkpoint=mirror scale=75 stable_frames=12 presented=1
+10-01 19:19:06.176 17775 17775 I HordeRtProbeBridge: HORDE_GPU_TIMING mode=enabled rt_rendering=unchanged
+10-01 19:19:20.406 17775 17775 I HordeRtProbeBridge: PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich
+10-01 19:19:20.406 17775 17775 I HordeRtProbeBridge: RT render scale 75%: 1080x2235 -> 1440x2980
+10-01 19:19:20.406 17775 17775 I HordeRtProbeBridge: Started Android diagnostic surface rendering loop.
+10-01 19:19:20.413 17775 21874 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
