@@ -121,6 +121,7 @@ $viewmodelCheckpoints = @(
     "player-viewmodel-lantern-high-look-up")
 $captureCheckpoints = @("opening", "skeleton", "worst-bend", "lantern-drop", "skylight", "yellow", "blue", "red", "green", "mirror", "lich", "finale-roof", "two-enemy-combat")
 if ($CaptureSelection.Count -gt 0) { $captureCheckpoints = @($CaptureSelection) }
+if ($Capture) { Assert-AndroidShowcaseCaptureSelection -Selection $captureCheckpoints -KnownZones $checkpointZones }
 $combatCaptureExpectations = @{
     "player-body-downward-cut" = @{
         action = "swing-active"; animationTime = 0.5833; actionTime = 0.4033; minimumConsumedAttackSequence = 1

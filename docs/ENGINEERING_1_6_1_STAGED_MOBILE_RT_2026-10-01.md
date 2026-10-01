@@ -4,7 +4,8 @@ Status: Diagnostic/Mobile and Shipping/Mobile-policy RTX image matrices pass
 their unchanged pixel gates; capture-loop timing comparisons fail. **No warm
 Shipping or phone performance acceptance, and no promotion.** Android candidate
 compilation/static inspection passes. The optional pass observer now has real RTX
-submission-owned runtime evidence; exact phone admission remains open.
+submission-owned runtime evidence; exact phone admission now **FAILS** the
+unchanged image/counter gate. Phone Shipping timing is held, not assumed.
 This is the single resumption record. Read its next unfinished step instead of
 restarting the completed omission investigations or rebuilding unchanged artifacts.
 
@@ -296,15 +297,37 @@ telemetry or scheduling framework.
   authorised serial/modelSM-S948B; raw Perfetto service query is retained privately.
   Exact descriptor decoding and physical/image admission are next, not yet passes.
 
+### Exact-phone admission checkpoint (after8fb1da4)
+
+- Exact8fb push36810364762 / PR36810369431 green: GCC55/Clang55/MSVC56/focused
+  Vulkan CPU-host15 on both events. Integrationf66a6fe joins exact8fb/bda1b99.
+- Normal composite19+repair1 and actual staged20 captures completed on SM-S948B
+  at75%. Same70 assets, frozen semantic state and stable player/AS ownership.
+  Ten pairs fail unchanged maxRGB3 (largest116); fraction<0.000036 does not
+  excuse it. All5 glass/2focused viewmodel images byte-identical. Two ordinary
+  fixtures have torch+1/player−1 primary-pixel counter differences. Cumulative
+  skin updates differ, not animation authority. Original control typo/final
+  manifest/ASTC-log gap explicit; only missing checkpoint repaired, no repeat19.
+- Production interface-budget/overflow1 and recovery80/reason2 remain on both.
+- Actual intermediate308,966,400B / nominal617,932,800B read+write/frame, not DRAM
+  measurement. Exact309,113B binary-safe Perfetto decode exposes only allocation
+  source, no GPU counter specs in this snapshot. Hardware counters remain gaps;
+  preliminary CRLF-corrupted/normalized query unaccepted.
+- Apparent freeze is expected deterministic capture while RT continues; scoped
+  inspected logs show no music error. Listening still deferred/open. Capture
+  typo/duplicate preflight now29 PS7/5.1 assertions PASS, no native/APK rebuild.
+  [Exact failure evidence](evidence/2026-10-01-staged-primary-phone/README.md).
+
 ### Next unfinished step
 
-Review/push the diagnostic admission slice and obtain fresh current-source CI.
-Normal Diagnostic control is prepared; admit exact-phone image/physical fixtures
-using the two retained Debug APKs. Windows Mobile/High matrices and Shipping artifacts are
-complete; do not repeat/rebuild them without a specific validity problem.
-Decode the retained raw counter roster once, preserving unavailable-counter gaps;
-then execute the fixed75% warm Shipping ABBA matrix, with separate RAM/counter/
-profile runs if observers perturb timing. Known control physical failures stay
+Review/push the capture-preflight/exact-phone failure checkpoint with fresh CI.
+First one bounded normal same-APK opening/skeleton A/A capture-stability check:
+sparse boundary differences need a demonstrated cause, and original control19
+lacked its final manifest. This is a specific validity investigation, not a new
+20-image matrix. Record exact run/next step here. Fixed24-trial Shipping ABBA and
+separate RAM/profile runs stay **held by image admission**. Windows matrices,
+retained APKs/counter decoding are complete; no repeat/rebuild without a new
+recorded validity problem. Known control physical failures stay
 open independently of execution-equivalence/performance evidence.
 Keep total-frame/GPU/pass/actual allocation/logical traffic and unavailable hardware
 counters separate. Record each finished trial and next unfinished row here.

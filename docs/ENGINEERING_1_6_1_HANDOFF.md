@@ -62,6 +62,19 @@ Known live physical failures, warm exact-phone ABBA and RAM/GPU-counter sampling
 remain open; no performance acceptance. Phone now available; music listening is
 deferred by the owner, not passed. No player/viewmodel retuning.
 
+Exact-phone staged image admission now FAIL10/20 unchanged maxRGB3 gates
+(sparse differences, max116); all5 glass/2focused player fixtures byte-identical,
+semantic state/AS ownership/70assets agree. Two ordinary fixtures have torch+1/
+player−1 counter discrepancies. Existing production interface failure/recovery
+preserved. [Phone receipts/next step](evidence/2026-10-01-staged-primary-phone/README.md).
+Next is only normal same-APK opening/skeleton A/A capture stability, not another
+full matrix or arm tuning. Shipping comparisons are held by image admission.
+Exact8fb push/PR CI PASS GCC55/Clang55/MSVC56/focused15 each. Preflight29 PS7/5.1
+assertions PASS. Strict binary-safe Perfetto decoding done: allocation source
+only/no advertised GPU counter specs in this snapshot. Actual308,966,400B pages
+is not RAM-pressure/DRAM-traffic evidence. Deliberate capture freeze is not music
+acceptance; listening deferred/open. No Shipping promotion or publication.
+
 Windows84f111e and Android884dc8b native music output are pushed; exact884dc8b
 push36797092043/PR36797097338 freshly PASS GCC/Clang/MSVC53/53 each and Vulkan
 CPU-host13/13 both. Actual eight logs inspected; synthetic integration956059c

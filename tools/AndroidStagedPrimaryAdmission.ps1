@@ -1,5 +1,15 @@
 # Read-only, investigation-specific preflight. This does not inspect an APK,
 # validate SPIR-V or replace the unchanged production containment gate.
+function Assert-AndroidShowcaseCaptureSelection {
+    param([string[]]$Selection, [Collections.IDictionary]$KnownZones)
+    $seen = @{}
+    foreach ($checkpoint in $Selection) {
+        if (-not $KnownZones.Contains($checkpoint)) { throw "Unknown capture checkpoint '$checkpoint'." }
+        if ($seen.ContainsKey($checkpoint)) { throw "Duplicate capture checkpoint '$checkpoint'." }
+        $seen[$checkpoint] = $true
+    }
+}
+
 function Resolve-AndroidShowcaseValidationTarget {
     param([bool]$StagedPrimary, [bool]$SkipBuild, [string]$ApkPath,
           [string]$ManifestPath, [string]$ViewmodelDirectory, [bool]$AnatomicalMount)

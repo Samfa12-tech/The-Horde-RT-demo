@@ -1,0 +1,49 @@
+{
+  "schema": 3,
+  "scope": "Sanitized GPU-related Perfetto data-source descriptor roster from one exact query snapshot; not a universal device capability claim",
+  "rawInput": {
+    "file": "perfetto-exec-out.raw.pb",
+    "bytes": 309113,
+    "sha256": "09930ebd6a5d428bb59332cde215a2c332af8544bc1b808b116f8ab6e024c6b8",
+    "readMode": "exact bytes; no CR stripping, filtering, transcoding, or normalization"
+  },
+  "decoder": {
+    "kind": "bounded protobuf wire decoder",
+    "utf8": "strict",
+    "scriptSha256": "71da3ad825dca759b7a7bf071e74369457f82ad030f4a40e77042af87d430724",
+    "producerRecordsParsedOrEmitted": false,
+    "non-GPUSourceNamesEmitted": false,
+    "schemaFields": [
+      "TracingServiceState.data_sources field 2",
+      "DataSource.ds_descriptor field 1",
+      "DataSourceDescriptor.name field 1",
+      "DataSourceDescriptor.gpu_counter_descriptor field 5",
+      "GpuCounterDescriptor.specs field 1",
+      "GpuCounterSpec.counter_id field 1, name field 2, numerator_units field 7, denominator_units field 8"
+    ],
+    "schemaSources": [
+      "https://raw.githubusercontent.com/google/perfetto/main/protos/perfetto/common/tracing_service_state.proto",
+      "https://raw.githubusercontent.com/google/perfetto/main/protos/perfetto/common/data_source_descriptor.proto",
+      "https://raw.githubusercontent.com/google/perfetto/main/protos/perfetto/common/gpu_counter_descriptor.proto"
+    ]
+  },
+  "gpuRelatedDataSourceRowCount": 1,
+  "gpuRelatedSourceNames": [
+    "android.gpu.memory"
+  ],
+  "sources": [
+    {
+      "name": "android.gpu.memory",
+      "gpuCounterDescriptor": null
+    }
+  ],
+  "counterSpecCount": 0,
+  "counterIdentifiersNamesUnits": [],
+  "snapshotFinding": "This exact snapshot advertised no GPU counter specs in its GPU-related sources.",
+  "limits": [
+    "The conclusion applies only to this captured service snapshot and exposed source roster.",
+    "Absence of advertised counter descriptors does not prove counters are unavailable on the device generally, through other APIs, or in other Perfetto configurations.",
+    "No GPU source was configured, started, or sampled by this offline decode.",
+    "Source IDs, producers, process names, serials, and unrelated descriptor names are deliberately omitted."
+  ]
+}

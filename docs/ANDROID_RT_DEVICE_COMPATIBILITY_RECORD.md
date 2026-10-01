@@ -1027,11 +1027,39 @@ Add one block per new result rather than changing a prediction into an implied f
   RT presentation, image equivalence, performance, music or release acceptance.
 - Perfetto v51.2 service query and raw descriptors are retained privately under
   `C:/Dev/tmp/horde-staged-rt-20261001/phone-counter-discovery/`; hardware counter
-  availability awaits exact descriptor decoding. A memory-allocation source is
-  not a bandwidth/cache/stall counter. No root, driver or profiling configuration
+  roster now strictly decodes binary-safe309,113B query09930ebd…24c6b8 without
+  normalization. Only GPU-related source `android.gpu.memory`, no counter specs
+  in this snapshot; bandwidth/cache/stall/register/spill/occupancy remain gaps.
+  Preliminary CRLF-corrupted/normalized query is unaccepted. Not universal
+  hardware unavailability. No root, driver or profiling configuration
   changed. S24/S25 remain unverified.
 - Owner deferred the pending listening test. Renderer and memory testing may
   continue; music acceptance remains open.
+
+## October 1, 2026 - staged Diagnostic image admission (local SM-S948B)
+
+Exact model/serial above, Adreno840 driver2150932499 / Android16/API36.
+Normal Debug581ea466…cc066a versus isolated staged Debugdb125b80…afc299,
+Diagnostic/Mobile native pipeline75%1080x2235 /1440x2980,70 assets equal, actual
+install/pullback identities. Candidate20 capture/Home-resume/strict ASTC pass;
+normal explicitly19 retained captures+one same-APK repair. Original typo failed
+before manifest/startup-log export; no whole-batch pass is invented. Normal
+repair proves strict ASTC/Home-resume for exact APK, not missing initial logs.
+
+Unchanged image gate FAIL10/20: maxRGB5–116 despite fraction<0.000036. Five glass
+and two focused viewmodel pairs byte-identical; frozen semantic/player/BLAS17/
+TLAS1/instance21 ownership agrees. Two ordinary fixtures have torch+1/player−1
+pixel counter differences, unexplained. Production interface-budget/overflow1/
+recovery80 persist on both. Actual308,966,400B intermediate/617,932,800B nominal
+read+write is not RAM-pressure/DRAM-traffic measurement. No warm Shipping,
+compute, S24/S25 or owner-feel acceptance.
+[Evidence/bounded A/A validity check](evidence/2026-10-01-staged-primary-phone/README.md).
+
+Owner-reported apparent startup freeze is explained by deliberate frozen-image
+simulation while actual RT frames/checkpoints continue. No music error/ANR/
+exception found in inspected scoped process/window; not a comprehensive
+no-stall/music guarantee. Listening remains deferred/open. Audio/haptic manual:NO
+for renderer/harness-only changes.
 
 ## Research sources
 

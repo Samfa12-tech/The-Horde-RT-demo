@@ -8,6 +8,11 @@ function Sha([byte[]]$Bytes) {
     try { ([BitConverter]::ToString($hash.ComputeHash($Bytes))).Replace('-', '').ToLowerInvariant() }
     finally { $hash.Dispose() }
 }
+$knownZones=@{opening='opening';'player-viewmodel-lantern-low-parry'='yellow-torch-bay'}
+Assert-AndroidShowcaseCaptureSelection -Selection @('opening','player-viewmodel-lantern-low-parry') -KnownZones $knownZones
+++ $passed
+Reject { Assert-AndroidShowcaseCaptureSelection -Selection @('opening','player-viewmodel-parry-low') -KnownZones $knownZones } 'Unknown final capture name accepted'
+Reject { Assert-AndroidShowcaseCaptureSelection -Selection @('opening','opening') -KnownZones $knownZones } 'Duplicate capture name accepted'
 Assert ((Resolve-AndroidShowcaseValidationTarget).package -ceq 'com.samfa12.hordelanternrt.debug') 'Normal Debug target changed'
 Assert ((Resolve-AndroidShowcaseValidationTarget -ViewmodelDirectory 'existing').package -ceq 'com.samfa12.hordelanternrt.debug.viewmodel') 'Existing viewmodel target changed'
 Reject { Resolve-AndroidShowcaseValidationTarget -ManifestPath 'unrequested' } 'Implicit investigation accepted'
