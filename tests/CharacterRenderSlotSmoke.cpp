@@ -7,6 +7,8 @@
 #include "platform/android/AndroidRtLabState.h"
 
 #include <cmath>
+#include <bit>
+#include <limits>
 #include <atomic>
 #include <filesystem>
 #include <fstream>
@@ -18,6 +20,15 @@
 
 namespace
 {
+
+namespace LightRegionReference
+{
+using std::abs;
+std::uint32_t floatBitsToUint(float value) { return std::bit_cast<std::uint32_t>(value); }
+float uintBitsToFloat(std::uint32_t value) { return std::bit_cast<float>(value); }
+// Exercise the actual scalar GLSL, not a separately maintained approximation.
+#include "../shaders/raytracing/include/rt_light_region.glsl"
+}
 
 bool Require(const bool condition, const char* message)
 {
@@ -141,6 +152,58 @@ int main()
     androidTuning.Replace(androidUnclamped);
     const RtSceneTuning androidClamped = androidTuning.Snapshot();
     bool ok = true;
+    // Native backend witness: same authored z=-12 wall, with distinct rounded
+    // directions/t and reconstructed positions. The existing closed region
+    // includes that wall; use arithmetic uncertainty only for light selection.
+    using namespace LightRegionReference;
+    ok &= Require(lightRegionContainsClosedCoordinate(-12.0f, 5.2704535f, 0.60715836f,
+                                                      -18.4f, -12.0f) &&
+                  lightRegionContainsClosedCoordinate(-11.999999f, 5.270455f, 0.6071583f,
+                                                      -18.4f, -12.0f),
+                  "both captured boundary receivers must select the authored closed finale region");
+    for (const float boundary : {-36.9f, -30.5f, -18.4f, -12.0f, -8.5f, -2.5f, -18.0f, -12.4f})
+    {
+        ok &= Require(lightRegionContainsClosedCoordinate(boundary, 5.3f, 1.0f,
+                                                          boundary, boundary) &&
+                      lightRegionContainsClosedCoordinate(
+                          std::nextafter(boundary, -std::numeric_limits<float>::infinity()),
+                          5.3f, 1.0f, boundary, boundary) &&
+                      lightRegionContainsClosedCoordinate(
+                          std::nextafter(boundary, std::numeric_limits<float>::infinity()),
+                          5.3f, 1.0f, boundary, boundary),
+                      "closed light-region boundaries must admit their one-step arithmetic neighbourhood");
+        ok &= Require(!lightRegionContainsClosedCoordinate(boundary - 0.001f, 5.3f, 1.0f,
+                                                           boundary, boundary) &&
+                      !lightRegionContainsClosedCoordinate(boundary + 0.001f, 5.3f, 1.0f,
+                                                           boundary, boundary),
+                      "arithmetic boundary allowance must not move light regions by a millimetre");
+    }
+    struct Reconstruction { float origin, direction, distance; };
+    constexpr Reconstruction reconstructions[] = {
+        {-15.2f, 0.60715836f, 5.2704535f}, {-15.2f, 0.6071583f, 5.270455f},
+        {-35.5f, 0.75986534f, 5.2704535f}, {-35.5f, 0.7598653f, 5.270455f},
+        {0.7f, -0.23230033f, 5.2704535f}, {0.7f, -0.2323003f, 5.270455f},
+        {-1000000.0f, 0.1f, 10000000.0f}, {12.0f, -0.95f, 12.63158f},
+        {0.00001f, 0.43f, 0.00013f}, {-2.5f, 3.25f, 0.77f},
+        {2.5f, -3.25f, 0.77f}, {0.0f, 0.0f, 0.0f}
+    };
+    for (const Reconstruction& r : reconstructions)
+    {
+        const double exact = double(r.origin) + double(r.direction) * double(r.distance);
+        // Force the separately rounded product and also check an FMA result;
+        // neither direction normalization nor contraction is assumed here.
+        volatile float product = r.direction * r.distance;
+        for (const float reconstructed : {r.origin + product,
+                                         std::fma(r.direction, r.distance, r.origin)})
+        {
+            ok &= Require(double(lightRegionCoordinateError(reconstructed, r.distance, r.direction)) >=
+                              std::abs(double(reconstructed) - exact),
+                          "actual GLSL bound must cover separate and fused finite reconstruction arithmetic");
+            ok &= Require(lightRegionCoordinateError(reconstructed, r.distance + 12.0f, r.direction) >=
+                              lightRegionCoordinateError(reconstructed, r.distance, r.direction),
+                          "accumulated nonnegative ray distance must not reduce the reconstruction bound");
+        }
+    }
     ok &= Require(Near(androidClamped.waterfallWidthScale, 2.0f) &&
                       Near(*androidClamped.finaleRoofOpenOverride, 0.0f) &&
                       Near(*androidClamped.finaleDawnRevealOverride, 1.0f) &&
@@ -851,6 +914,10 @@ int main()
                       raygenSource.find("controls.guidanceLightStrength > 0.001") != std::string::npos &&
                       raygenSource.find("vec3(1.0, 0.48, 0.12)") != std::string::npos &&
                       raygenSource.find("void activeSkyLight(") != std::string::npos &&
+                      raygenSource.find("lightRegionContainsClosedCoordinate(surfacePosition.z, receiver.t, rayDirection.z, -18.4, -12.0)") !=
+                          std::string::npos &&
+                      raygenSource.find("activeSkyLight(h, rayDirection, sampleIndex,") != std::string::npos &&
+                      raygenSource.find("activeSkyLight(h, rayDirection, skySample,") != std::string::npos &&
                       raygenSource.find("vec3 shadeOpaqueDirect(") != std::string::npos &&
                       raygenSource.find("vec3 shadeOpaqueSecondary(") != std::string::npos,
                       "opaque and water paths must share active local/sky light selection and direct RT shading");

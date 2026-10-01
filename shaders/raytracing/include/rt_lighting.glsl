@@ -1,4 +1,5 @@
 #include "rt_fire.glsl"
+#include "rt_light_region.glsl"
 
 vec2 lightTuning(int group)
 {
@@ -1111,13 +1112,16 @@ vec3 fireEmitterDirectLighting(HitInfo h, vec3 rayDirection, bool dualVisibility
     return result;
 }
 
-void activeSkyLight(vec3 surfacePosition, int sampleIndex, out vec3 direction,
+void activeSkyLight(HitInfo receiver, vec3 rayDirection, int sampleIndex, out vec3 direction,
                     out float distance, out vec3 radiance, out float gain)
 {
-    bool inSkylightChamber = surfacePosition.x >= -8.5 && surfacePosition.x <= -2.5 &&
-                             surfacePosition.z >= -18.0 && surfacePosition.z <= -12.4;
-    bool inFinaleChamber = surfacePosition.x >= -36.9 && surfacePosition.x <= -30.5 &&
-                           surfacePosition.z >= -18.4 && surfacePosition.z <= -12.0;
+    vec3 surfacePosition = receiver.position;
+    bool inSkylightChamber =
+        lightRegionContainsClosedCoordinate(surfacePosition.x, receiver.t, rayDirection.x, -8.5, -2.5) &&
+        lightRegionContainsClosedCoordinate(surfacePosition.z, receiver.t, rayDirection.z, -18.0, -12.4);
+    bool inFinaleChamber =
+        lightRegionContainsClosedCoordinate(surfacePosition.x, receiver.t, rayDirection.x, -36.9, -30.5) &&
+        lightRegionContainsClosedCoordinate(surfacePosition.z, receiver.t, rayDirection.z, -18.4, -12.0);
     bool finaleActive = inFinaleChamber && controls.finaleSkylightOpen > 0.001;
     vec3 target = finaleActive
         ? (sampleIndex == 0 ? vec3(-34.35, 2.76, -16.02) : vec3(-33.05, 2.76, -14.38))
@@ -1171,7 +1175,7 @@ vec3 shadeOpaqueDirect(HitInfo h, vec3 rayDirection, bool dualVisibility,
         otherDistance = length(otherVector);
         otherDirection = otherVector / max(otherDistance, 0.001);
     }
-    activeSkyLight(h.position, sampleIndex, skyDirection, skyDistance,
+    activeSkyLight(h, rayDirection, sampleIndex, skyDirection, skyDistance,
                    skyRadiance, skyGain);
     vec3 otherSkyDirection = skyDirection;
     float otherSkyDistance = skyDistance;
@@ -1179,7 +1183,7 @@ vec3 shadeOpaqueDirect(HitInfo h, vec3 rayDirection, bool dualVisibility,
     if (dualVisibility)
     {
         vec3 otherSkyRadiance;
-        activeSkyLight(h.position, 1 - sampleIndex, otherSkyDirection,
+        activeSkyLight(h, rayDirection, 1 - sampleIndex, otherSkyDirection,
                        otherSkyDistance, otherSkyRadiance, otherSkyGain);
         skyRadiance = 0.5 * (skyRadiance + otherSkyRadiance);
     }

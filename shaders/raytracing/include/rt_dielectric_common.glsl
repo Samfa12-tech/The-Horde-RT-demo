@@ -221,7 +221,7 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
     float skyDistance;
     vec3 skyRadiance;
     float skyGain;
-    activeSkyLight(h.position, skySample, skyDirection, skyDistance,
+    activeSkyLight(h, rayDirection, skySample, skyDirection, skyDistance,
                    skyRadiance, skyGain);
     vec3 skyInterfaceTransmittance = sceneShadowTransmittanceMask(
         offsetRayOrigin(h, skyDirection), skyDirection,
