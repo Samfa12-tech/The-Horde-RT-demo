@@ -28,6 +28,29 @@ without loosening tolerance. Include live motion, not just frozen extreme poses.
 Music, consent-based reporting, resource work and final gates remain in scope;
 licensing, signing recovery and publication remain owner-controlled.
 
+### October 1 safe checkpoint before staged Mobile experiment
+
+Windows84f111e and Android884dc8b native music output are pushed; exact884dc8b
+push36797092043/PR36797097338 freshly PASS GCC/Clang/MSVC53/53 each and Vulkan
+CPU-host13/13 both. Actual eight logs inspected; synthetic integration956059c
+has exact basebda1b99/head884dc8b parents. No physical RT/music acceptance follows.
+Fresh forced Android lint rerun0errors/38warnings also retained; no device actions.
+
+Interactive benchmark rolling native-loop FPS now has a bounded60-interval
+counter and three-line status. Automated/frozen A/B runs stay disabled; host twins
+prove persisted report bytes unchanged. Fresh Debug/Release focused4/4 PASS and
+real Windows app links; Android Debug/lint SUCCESS (0errors/38warnings).
+[Evidence](evidence/2026-10-01-benchmark-fps/README.md). Actual interactive HUD and
+observer-overhead gates remain open, not phone evidence. Audio/haptic manual:NO.
+
+Owner now requests one bounded staged Mobile RT prototype before temporal work,
+with unchanged resolution/rays/samples/physical transport/tolerances, separately
+selectable investigation path, image equivalence first and exact warm phone
+comparisons later. Add RAM pressure versus GPU bandwidth/cache/stall profiling;
+unavailable counters are gaps. Preserve unfinished reporting work at a reviewed
+checkpoint before renderer edits. Phone remains disconnected. No main merge,
+release or publication; no assumed additive omission savings or30FPS promise.
+
 ### October 1 Android music output checkpoint
 
 Core-backed native bank/session plus bounded AudioTrack worker is now wired with

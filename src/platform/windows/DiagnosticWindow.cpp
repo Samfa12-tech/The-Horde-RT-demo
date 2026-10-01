@@ -2017,10 +2017,11 @@ void UpdateBenchmarkHud(VulkanSurfaceContext& context)
 
 void StartBenchmark(VulkanSurfaceContext& context,
                     const horde::gameplay::BenchmarkWorkload workload =
-                        horde::gameplay::BenchmarkWorkload::ShowcaseRoute)
+                        horde::gameplay::BenchmarkWorkload::ShowcaseRoute,
+                    const bool showLiveFps = true)
 {
     ResetRoute(context);
-    context.benchmark.Start(horde::gameplay::ShowcaseBenchmarkRun::kDefaultLaps, workload);
+    context.benchmark.Start(horde::gameplay::ShowcaseBenchmarkRun::kDefaultLaps, workload, showLiveFps);
     (void)context.benchmarkEvidence.Start(
         horde::gameplay::ShowcaseBenchmarkRun::kMaximumFramesPerLap);
     context.expectedBenchmarkFrame.reset();
@@ -2039,6 +2040,9 @@ void StartBenchmark(VulkanSurfaceContext& context,
     context.diagnosticsVisible = false;
     context.benchmarkReportVisible = false;
     ApplyOverlayState(context);
+    RECT benchmarkClient{};
+    GetClientRect(context.windowHandle, &benchmarkClient);
+    LayoutOverlayControls(context.windowHandle, benchmarkClient.right, benchmarkClient.bottom);
     UpdateBenchmarkHud(context);
     PlaySoundEffect(context, "ui_select.wav");
     SetFocus(context.windowHandle);
@@ -5013,7 +5017,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             DestroyRenderContext(context);
             return 1;
         }
-        StartBenchmark(context, benchmarkWorkload);
+        StartBenchmark(context, benchmarkWorkload, false); // Unattended evidence has no FPS observer.
     }
     const VkClearColorValue clearColor = ClearColorForMode(capabilities.rtMode);
     MSG message{};
@@ -5133,6 +5137,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                 context.benchmark.Cancel();
             }
             context.benchmark.RecordFrame(frameTimeMs, rtFramePresented);
+            if (context.benchmark.ConsumeLiveProgressUpdate()) UpdateBenchmarkHud(context);
             if (!context.benchmark.IsRunning())
             {
                 CompleteBenchmark(context, capabilities, textReportPath.parent_path());
@@ -5395,9 +5400,12 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
     if (HWND hud = GetDlgItem(window, kHudControlId))
     {
         const int hudInset = ScaleForDpi(window, 14);
+        const bool expanded = sceneContext != nullptr && sceneContext->benchmark.ShowsLiveFps();
+        const LONG_PTR style = GetWindowLongPtrA(hud, GWL_STYLE);
+        SetWindowLongPtrA(hud, GWL_STYLE, expanded ? style & ~SS_CENTERIMAGE : style | SS_CENTERIMAGE);
         MoveWindow(hud, hudInset, hudInset,
                    std::min(ScaleForDpi(window, 650), std::max(ScaleForDpi(window, 260), width - hudInset * 2)),
-                   ScaleForDpi(window, 30), TRUE);
+                   ScaleForDpi(window, expanded ? 80 : 30), TRUE);
     }
     if (HWND vitality = GetDlgItem(window, kVitalityHudControlId))
     {

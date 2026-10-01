@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <string>
@@ -47,6 +48,14 @@ struct ShowcaseBenchmarkStatistics
     double onePercentLowFps = 0.0;
 };
 
+// Existing platform render-loop intervals, not GPU-only cost or display pacing.
+struct ShowcaseBenchmarkLiveTiming
+{
+    std::size_t frames = 0u;
+    double averageMs = 0.0;
+    double fps = 0.0;
+};
+
 struct ShowcaseBenchmarkMetadata
 {
     std::string runId;
@@ -72,9 +81,11 @@ class ShowcaseBenchmarkRun
 public:
     static constexpr std::uint32_t kDefaultLaps = 2u;
     static constexpr std::uint32_t kMaximumFramesPerLap = 4000u;
+    static constexpr std::size_t kLiveTimingWindowFrames = 60u;
 
     void Start(std::uint32_t laps = kDefaultLaps,
-               BenchmarkWorkload workload = BenchmarkWorkload::ShowcaseRoute);
+               BenchmarkWorkload workload = BenchmarkWorkload::ShowcaseRoute,
+               bool showLiveFps = false);
     ShowcaseBenchmarkAdvance Advance();
     void RecordFrame(double frameTimeMs, bool rtFramePresented);
     void Cancel();
@@ -96,6 +107,9 @@ public:
     ShowcaseBenchmarkStatistics OverallStatistics() const;
     ShowcaseBenchmarkStatistics ZoneStatistics(ShowcaseZone zone) const;
     std::string ProgressText() const;
+    ShowcaseBenchmarkLiveTiming LiveTiming() const;
+    bool ShowsLiveFps() const { return showLiveFps_ && IsRunning(); }
+    bool ConsumeLiveProgressUpdate();
     std::string BuildTextReport(const ShowcaseBenchmarkMetadata& metadata,
         const horde::telemetry::RtBenchmarkEvidenceRun* evidence = nullptr) const;
     std::string BuildJsonReport(const ShowcaseBenchmarkMetadata& metadata,
@@ -103,6 +117,7 @@ public:
 
 private:
     ShowcaseBenchmarkStatistics StatisticsFor(ShowcaseZone zone, bool filterZone) const;
+    void ResetLiveTiming();
 
     ShowcaseRouteReplay replay_;
     ShowcaseReplaySnapshot currentReplay_{};
@@ -116,6 +131,15 @@ private:
     bool pendingLapRestart_ = false;
     bool presentedEveryFrame_ = true;
     std::vector<ShowcaseBenchmarkFrame> frames_;
+    // Opt-in interactive HUD only: no extra collector/formatting in automated or
+    // frozen A/B runs, and no change to persisted benchmark evidence/statistics.
+    bool showLiveFps_ = false;
+    bool liveProgressDue_ = false;
+    std::array<double, kLiveTimingWindowFrames> liveIntervals_{};
+    std::size_t liveCount_ = 0u;
+    std::size_t liveNext_ = 0u;
+    double liveTotalMs_ = 0.0;
+    double liveRefreshMs_ = 0.0;
 };
 
 const char* ShowcaseBenchmarkStatusName(ShowcaseBenchmarkStatus status);

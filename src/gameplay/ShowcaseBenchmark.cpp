@@ -96,9 +96,12 @@ const char* ShowcaseBenchmarkStatusName(const ShowcaseBenchmarkStatus status)
     }
 }
 
-void ShowcaseBenchmarkRun::Start(const std::uint32_t laps, const BenchmarkWorkload workload)
+void ShowcaseBenchmarkRun::Start(const std::uint32_t laps, const BenchmarkWorkload workload,
+                                 const bool showLiveFps)
 {
     workload_ = workload;
+    showLiveFps_ = showLiveFps && !IsFrozenBenchmark(workload);
+    ResetLiveTiming();
     totalLaps_ = std::max(1u, laps);
     currentLap_ = 1u;
     completedLaps_ = 0u;
@@ -129,6 +132,7 @@ ShowcaseBenchmarkAdvance ShowcaseBenchmarkRun::Advance()
         currentLap_ = completedLaps_ + 1u;
         lapFrames_ = 0u;
         pendingLapRestart_ = false;
+        ResetLiveTiming();
         result.lapStarted = true;
     }
 
@@ -184,11 +188,37 @@ ShowcaseBenchmarkAdvance ShowcaseBenchmarkRun::Advance()
 
 void ShowcaseBenchmarkRun::RecordFrame(const double frameTimeMs, const bool rtFramePresented)
 {
-    if (!HasStarted() || status_ == ShowcaseBenchmarkStatus::Cancelled ||
-        currentLap_ < totalLaps_ || !std::isfinite(frameTimeMs) || frameTimeMs <= 0.0)
+    if (!HasStarted() || status_ == ShowcaseBenchmarkStatus::Cancelled)
+        return;
+    if (!std::isfinite(frameTimeMs) || frameTimeMs <= 0.0)
     {
+        ResetLiveTiming(); // Never show a stale valid rate after invalid timing.
+        liveProgressDue_ = showLiveFps_;
         return;
     }
+    if (showLiveFps_ && IsRunning())
+    {
+        if (!rtFramePresented)
+        {
+            ResetLiveTiming();
+            liveProgressDue_ = true;
+        }
+        else
+        {
+            liveTotalMs_ -= liveIntervals_[liveNext_];
+            liveIntervals_[liveNext_] = frameTimeMs;
+            liveTotalMs_ += frameTimeMs;
+            liveNext_ = (liveNext_ + 1u) % liveIntervals_.size();
+            liveCount_ = std::min(liveCount_ + 1u, liveIntervals_.size());
+            liveRefreshMs_ += frameTimeMs;
+            if (liveCount_ == 1u || liveRefreshMs_ >= 500.0)
+            {
+                liveProgressDue_ = true;
+                liveRefreshMs_ = 0.0;
+            }
+        }
+    }
+    if (currentLap_ < totalLaps_) return; // Original final-lap report policy.
     frames_.push_back({frameTimeMs, currentReplay_.zone, currentLap_});
     presentedEveryFrame_ = presentedEveryFrame_ && rtFramePresented;
 }
@@ -200,7 +230,31 @@ void ShowcaseBenchmarkRun::Cancel()
     if (IsRunning() || status_ == ShowcaseBenchmarkStatus::Complete)
     {
         status_ = ShowcaseBenchmarkStatus::Cancelled;
+        ResetLiveTiming();
     }
+}
+
+void ShowcaseBenchmarkRun::ResetLiveTiming()
+{
+    liveIntervals_.fill(0.0);
+    liveCount_ = liveNext_ = 0u;
+    liveTotalMs_ = liveRefreshMs_ = 0.0;
+    liveProgressDue_ = false;
+}
+
+ShowcaseBenchmarkLiveTiming ShowcaseBenchmarkRun::LiveTiming() const
+{
+    if (!showLiveFps_ || !IsRunning() || liveCount_ == 0u ||
+        !std::isfinite(liveTotalMs_) || liveTotalMs_ <= 0.0) return {};
+    const double average = liveTotalMs_ / static_cast<double>(liveCount_);
+    return {liveCount_, average, 1000.0 / average};
+}
+
+bool ShowcaseBenchmarkRun::ConsumeLiveProgressUpdate()
+{
+    const bool due = liveProgressDue_ && showLiveFps_ && IsRunning();
+    liveProgressDue_ = false;
+    return due;
 }
 
 bool ShowcaseBenchmarkRun::Passed() const
@@ -258,16 +312,28 @@ ShowcaseBenchmarkStatistics ShowcaseBenchmarkRun::ZoneStatistics(const ShowcaseZ
 std::string ShowcaseBenchmarkRun::ProgressText() const
 {
     std::ostringstream out;
+    out.imbue(std::locale::classic());
     if (IsLanternBenchmark(workload_))
     {
         out << BenchmarkWorkloadName(workload_) << " " << currentLap_ << '/' << totalLaps_
             << " | FRAME " << lapFrames_ << '/' << kLanternBenchmarkFramesPerLap;
-        return out.str();
     }
-    out << "BENCHMARK " << std::max(1u, currentLap_) << '/' << totalLaps_
-        << "  |  WAYPOINT " << replay_.Snapshot().reachedWaypoints << '/'
-        << kShowcaseReplayPath.size()
-        << "  |  " << ShowcaseZoneName(replay_.Snapshot().zone);
+    else
+        out << "BENCHMARK " << std::max(1u, currentLap_) << '/' << totalLaps_
+            << "  |  WAYPOINT " << replay_.Snapshot().reachedWaypoints << '/'
+            << kShowcaseReplayPath.size()
+            << "  |  " << ShowcaseZoneName(replay_.Snapshot().zone);
+    if (showLiveFps_ && IsRunning())
+    {
+        const std::string course = out.str();
+        out.str({});
+        out.clear();
+        const auto timing = LiveTiming();
+        if (timing.frames == 0u) out << "RT loop FPS: waiting";
+        else out << std::fixed << std::setprecision(1)
+            << "RT loop " << timing.fps << " FPS | mean " << timing.averageMs << "ms";
+        out << "\nlast " << timing.frames << " frames; not display Hz\n" << course;
+    }
     return out.str();
 }
 

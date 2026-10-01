@@ -871,7 +871,8 @@ void StartInAppBenchmark(SwapchainContext& context)
                             "Android benchmark evidence allocation failed; route will remain invalid.");
     }
     context.inAppBenchmark.Start(
-        horde::gameplay::ShowcaseBenchmarkRun::kDefaultLaps, requestedWorkload);
+        horde::gameplay::ShowcaseBenchmarkRun::kDefaultLaps, requestedWorkload,
+        context.benchmarkRunId.empty()); // Automated evidence has no FPS observer.
     {
         std::lock_guard<std::mutex> lock(gReportMutex);
         gLatestBenchmarkProgress = context.inAppBenchmark.ProgressText();
@@ -3085,6 +3086,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
     if (inAppBenchmarkFrame)
     {
         context.inAppBenchmark.RecordFrame(frameTotalMs, rtFramePresented);
+        if (context.inAppBenchmark.ConsumeLiveProgressUpdate()) PublishBenchmarkProgress(context);
         if (!context.inAppBenchmark.IsRunning())
         {
             if (context.inAppBenchmark.Status() ==

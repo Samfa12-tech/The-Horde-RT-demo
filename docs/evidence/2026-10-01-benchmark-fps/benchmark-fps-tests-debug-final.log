@@ -1,0 +1,14 @@
+Internal ctest changing into directory: C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build
+Test project C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build
+    Start  5: horde_rt_lantern_benchmark_tests
+1/4 Test  #5: horde_rt_lantern_benchmark_tests ...........   Passed    0.07 sec
+    Start  6: horde_rt_benchmark_evidence_report_tests
+2/4 Test  #6: horde_rt_benchmark_evidence_report_tests ...   Passed    4.96 sec
+    Start  7: horde_rt_windows_benchmark_launch_tests
+3/4 Test  #7: horde_rt_windows_benchmark_launch_tests ....   Passed    1.70 sec
+    Start 85: horde_rt_showcase_benchmark_smoke
+4/4 Test #85: horde_rt_showcase_benchmark_smoke ..........   Passed    0.09 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =   6.84 sec

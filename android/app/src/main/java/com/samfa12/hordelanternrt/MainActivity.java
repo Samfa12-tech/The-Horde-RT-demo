@@ -36,6 +36,7 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -195,6 +196,7 @@ public class MainActivity extends Activity {
     private boolean developerOverlayVisible;
     private boolean debugCaptureUiSuppressed;
     private boolean benchmarkRunning;
+    private boolean benchmarkStatusExpanded;
     private boolean benchmarkReportVisible;
     private String latestBenchmarkReport = "";
     private String benchmarkAutomationId;
@@ -496,6 +498,7 @@ public class MainActivity extends Activity {
     }
 
     private void stopSurface() {
+        setBenchmarkStatusExpanded(false);
         if (musicPlayback != null) musicPlayback.setSuspended(true);
         if (!surfaceStarted) return;
         ProbeBridge.stopDiagnosticSurface();
@@ -559,6 +562,7 @@ public class MainActivity extends Activity {
     }
 
     private void showMainMenu(final boolean firstLaunch) {
+        setBenchmarkStatusExpanded(false);
         rtLabVisible = false;
         rtLabTelemetry = null;
         handler.removeCallbacks(refreshRtLabTelemetry);
@@ -633,6 +637,7 @@ public class MainActivity extends Activity {
         latestBenchmarkReport = "";
         firstMenu = false;
         hideMenu();
+        setBenchmarkStatusExpanded(benchmarkAutomationId == null);
         menuButton.setVisibility(View.GONE);
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
@@ -715,6 +720,7 @@ public class MainActivity extends Activity {
         benchmarkAutomationFinishing = true;
         benchmarkAutomationPending = false;
         benchmarkRunning = false;
+        setBenchmarkStatusExpanded(false);
         if (nativeStatus != 2) ProbeBridge.cancelBenchmark();
         final String runId = benchmarkAutomationId;
         final String workload = benchmarkAutomationWorkload;
@@ -740,6 +746,7 @@ public class MainActivity extends Activity {
 
     private void showBenchmarkReport(final boolean completed) {
         benchmarkRunning = false;
+        setBenchmarkStatusExpanded(false);
         benchmarkReportVisible = true;
         menuVisible = true;
         diagnosticsVisible = false;
@@ -796,6 +803,7 @@ public class MainActivity extends Activity {
     }
 
     private void hideMenu() {
+        if (!benchmarkRunning) setBenchmarkStatusExpanded(false);
         if (deathOverlayVisible) {
             return;
         }
@@ -914,6 +922,15 @@ public class MainActivity extends Activity {
 
     private int musicVolumePercent() {
         return Math.max(0, Math.min(100, preferences.getInt(PREF_MUSIC_VOLUME, 70)));
+    }
+
+    private void setBenchmarkStatusExpanded(boolean expanded) {
+        if (rtStatus == null || expanded == benchmarkStatusExpanded) return;
+        benchmarkStatusExpanded = expanded;
+        rtStatus.setMaxLines(expanded ? 3 : 1);
+        final ViewGroup.LayoutParams layout = rtStatus.getLayoutParams();
+        layout.height = expanded ? ViewGroup.LayoutParams.WRAP_CONTENT : dp(40);
+        rtStatus.setLayoutParams(layout);
     }
 
     private void setGameplayPaused(boolean paused) {

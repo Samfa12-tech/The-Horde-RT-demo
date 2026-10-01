@@ -1,5 +1,7 @@
 #include <iostream>
+#include <cmath>
 #include <clocale>
+#include <limits>
 #include <locale>
 #include <string>
 
@@ -45,6 +47,55 @@ int main()
             passed = false;
         }
     };
+    ShowcaseBenchmarkRun live;
+    live.Start(2u, BenchmarkWorkload::ShowcaseRoute, true);
+    check(live.ProgressText().find("FPS: waiting") != std::string::npos,
+          "interactive counter must not invent startup timing");
+    live.Advance();
+    live.RecordFrame(10.0, true);
+    check(live.ConsumeLiveProgressUpdate() && !live.ConsumeLiveProgressUpdate(),
+          "first completed interval requests exactly one HUD refresh");
+    for (int i = 0; i < 49; ++i) live.RecordFrame(10.0, true);
+    check(!live.ConsumeLiveProgressUpdate(), "HUD refresh must be bounded to500ms after first interval");
+    live.RecordFrame(10.0, true);
+    check(live.ConsumeLiveProgressUpdate(), "500ms of completed intervals refreshes live rate");
+    check(live.Frames().empty() && live.LiveTiming().frames == 51u,
+          "warmup live rate must not admit warmup frames into persisted report");
+    for (int i = 0; i < 60; ++i) live.RecordFrame((i & 1) == 0 ? 10.0 : 30.0, true);
+    check(live.LiveTiming().frames == ShowcaseBenchmarkRun::kLiveTimingWindowFrames &&
+              std::abs(live.LiveTiming().averageMs - 20.0) < 1e-9 &&
+              std::abs(live.LiveTiming().fps - 50.0) < 1e-9,
+          "bounded rolling FPS must invert interval mean, not average per-frame FPS");
+    check(live.ProgressText().find("RT loop 50.0 FPS | mean 20.0ms\nlast 60 frames; not display Hz") != std::string::npos,
+          "counter must label the exact sampling window and distinguish display pacing");
+    live.RecordFrame(std::numeric_limits<double>::quiet_NaN(), true);
+    check(live.LiveTiming().frames == 0u && live.ConsumeLiveProgressUpdate(),
+          "invalid timing must clear stale live rate and request waiting-state refresh");
+    live.RecordFrame(10.0, true);
+    live.RecordFrame(10.0, false);
+    check(live.LiveTiming().frames == 0u && live.ProgressText().find("FPS: waiting") != std::string::npos,
+          "nonpresented interval cannot certify a live RT rate");
+    live.Cancel();
+    check(live.LiveTiming().frames == 0u && !live.ConsumeLiveProgressUpdate() &&
+              live.ProgressText().find("FPS") == std::string::npos,
+          "cancelled benchmark removes its counter");
+    live.Start();
+    live.Advance(); live.RecordFrame(10.0, true);
+    check(live.LiveTiming().frames == 0u && !live.ConsumeLiveProgressUpdate() &&
+              live.ProgressText().find("FPS") == std::string::npos,
+          "restart with default automated policy must not retain interactive state");
+    for (const auto workload : kBenchmarkWorkloads)
+    {
+        if (!IsFrozenBenchmark(workload)) continue;
+        live.Start(2u, workload, true);
+        live.Advance(); live.RecordFrame(10.0, true);
+        check(live.LiveTiming().frames == 0u && !live.ConsumeLiveProgressUpdate() &&
+                  live.ProgressText().find("FPS") == std::string::npos,
+              "frozen A/B cases must reject even explicit counter opt-in");
+    }
+    live.Start(2u, BenchmarkWorkload::LanternRevealSequence, true);
+    live.Advance(); live.RecordFrame(25.0, true);
+    check(live.LiveTiming().fps == 40.0, "live reveal supports interactive rate without frozen special casing");
     check(benchmark.Passed(), "two-lap deterministic course must pass");
     check(benchmark.CompletedLaps() == 2u, "two laps must complete");
     check(benchmark.ReachedWaypoints() == 2u * kShowcaseReplayPath.size(),
@@ -68,6 +119,23 @@ int main()
     metadata.materialEncoding = "test materials";
     const std::string text = benchmark.BuildTextReport(metadata);
     const std::string json = benchmark.BuildJsonReport(metadata);
+    ShowcaseBenchmarkRun interactiveTwin;
+    interactiveTwin.Start(2u, BenchmarkWorkload::ShowcaseRoute, true);
+    int twinFrames = 0;
+    while (interactiveTwin.IsRunning() && twinFrames < 8000)
+    {
+        interactiveTwin.Advance();
+        interactiveTwin.RecordFrame((twinFrames % 100) == 0 ? 30.0 :
+            (twinFrames % 100) == 1 ? 20.0 : 10.0, true);
+        (void)interactiveTwin.ConsumeLiveProgressUpdate();
+        (void)interactiveTwin.ProgressText();
+        ++twinFrames;
+    }
+    check(interactiveTwin.BuildTextReport(metadata) == text &&
+              interactiveTwin.BuildJsonReport(metadata) == json &&
+              interactiveTwin.ProgressText().find("FPS") == std::string::npos &&
+              interactiveTwin.LiveTiming().frames == 0u,
+          "counter changes no report bytes and disappears at completion");
     check(text.find("Integrity: COMPLETE") != std::string::npos, "text report must expose integrity result");
     check(text.find("Laps completed: 2/2") != std::string::npos, "text report must expose lap count");
     check(json.find("\"result\": \"complete\"") != std::string::npos, "JSON report must expose integrity result");
