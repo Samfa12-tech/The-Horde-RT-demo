@@ -1,6 +1,6 @@
 # 1.6.1 recovery handoff
 
-Updated 2026-10-01. Branch: `codex/horde-1.6.1-engineering-pass`.
+Updated 2026-10-02. Branch: `codex/horde-1.6.1-engineering-pass`.
 Engineering work has resumed by explicit owner instruction; the goal is not complete. See [programme scope](ENGINEERING_1_6_1_PLAN.md)
 and [latest lantern evidence](ENGINEERING_1_6_1_LANTERN_BENCHMARK_2026-09-20.md).
 
@@ -13,7 +13,28 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
-### October 1 local player-report integration (current checkpoint)
+### October 2 S24 visibility discriminator (current next step)
+
+Read the [finite S24 record](ENGINEERING_1_6_1_S24_INSTANCE_HITS_2026-10-01.md), not
+the audit again. Shader probes and CPU facts are complete. Player BLAS BUILD alone
+does not restore hands; TLAS BUILD alone restores modelled hands and second-enemy
+primary intersections on exact SM-S928B. No geometry/IK/asset tuning is justified.
+Next is a normal-shader candidate that rebuilds for discrete instance-definition
+changes only and retains UPDATE for ordinary motion/refits. No repeated finished
+performance sweep; opacity trial remains NO-GO. Probe code stays on separate
+`codex/horde-s24-instance-hit-probe`; only receipts/documentation are integrated.
+Normal8CB was restored/pulled identically, data preserved, with honest RT
+Home/resume in run20261002-004452. S24 live/final acceptance remains open.
+
+Normal0cf4f05 push36872121123 and PR36872130059 are freshly SUCCESS: actual GCC55,
+Clang55, MSVC57 and focused Vulkan CPU-host15 result lines inspected in both.
+PR15 is MERGEABLE/CLEAN, still draft/unmerged. Merge b033765 has exact
+bda1b99/0cf4f05 parents and the head tree. The report-fixture startup-readiness
+fix preserves consent/privacy assertions and timeout; old-job results are not
+current validation. Remaining High/backend/report/music/final gates remain open.
+Audio/haptic manual revalidation required:NO (renderer-only/unchanged playback).
+
+### October 1 local player-report integration (historical checkpoint)
 
 Latest owner performance steering: sustained30FPS at75% remains the goal, but
 allow only one or two further bounded, materially promising trials before an

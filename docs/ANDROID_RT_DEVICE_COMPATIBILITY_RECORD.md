@@ -1267,6 +1267,53 @@ hands, not an animation/asset cause. No timing, owner-feel or S26/S25 claim.
 [Retained visual evidence](evidence/2026-10-01-s24-visual-followup/RESULTS.md).
 Private device/process rosters remain local; no data/settings/source fix.
 
+## October 2, 2026 - S24 raw primary instance-hit discriminator
+
+Exact **SM-S928B**, serialR5CXC0G9GBW, Android16/Adreno750. Investigation-only
+sourcee8b6965, exact Debug DD69EEB7947D631450780665324380766A85D3D03F42FBA661CA21523AC0183C
+installed/pulled match, all70 assets equal normal8CB. Actual ARM64 module verified.
+Run20261002-000200, two75% captures, RayQueryCompute/OpaqueFast, strict ASTC,
+honest RT presentation and Home/resume. Both PNGs byte-identical to normal;
+hands remain absent. Raw committed TLAS IDs before decoded shading count player
+20/4 as0/0 in both views; ID/custom-index mismatches0. Skeleton2 counts15496
+combat/12 high;18 zero does not alone explain second-enemy visibility. The named
+remapped counters are **not glass diagnostic results** and no performance pass
+is claimed. Next: one independent unfiltered viewmodel-mask hardware query, not
+accepted-arm tuning. [Finite record](ENGINEERING_1_6_1_S24_INSTANCE_HITS_2026-10-01.md).
+S26/S25 certification is unchanged.
+
+Second source3e6c020 / exact3C11C209E9FA0B7CF37C27DEA86BE17EC0102579392AFCC911C28B01254C1E92
+Debug run20261002-001043 installs/pulls match, two75% compute captures and
+Home/resume pass. Normal viewmodel candidates0 and independent Opaque/viewmodel-
+only hardware query hits0 in both views; PNGs remain byte-identical. This narrows
+the missing hands below material shading/counter classification, but does not
+certify a driver or AS-update cause. One CPU geometry/instance/alignment record is
+next; no animation/asset tuning or performance rerun.
+
+CPU-fact sourceeef3c79 / exact2904C7E2BF82C3690CD443D2CE58343CD3B236F8DA5B8958609BA0C4D9481E55
+Debug run20261002-002823 passes one75% high-lantern capture and Home/resume on
+SM-S928B. Image remains byte-identical and player query hits0. Both CPU player
+uploads are wholly finite (34304/15855 vertices), masks144/64, BLAS/TLAS references
+agree, reported scratch alignment64 with remainders0. Filtered diagnostic log is
+retained separately. These facts do not certify GPU AS contents or a driver cause.
+Next is one diagnostic player BLAS BUILD-vs-UPDATE comparison, not arm tuning.
+
+Player-BLAS BUILD-only source9eddddb / exact3B5A241F9765AA0674CA4C7E29BD34D8C9FC55814FCA21AA5EE71CDCF1E0DB63
+Debug run20261002-003413 passes the high-lantern capture/Home-resume; image and
+zero player committed/candidate/direct-query hits are unchanged. This rejects a
+player-BLAS-UPDATE-only explanation. Next discriminator changes TLAS UPDATE only,
+with normal player updates restored. No new performance, S26/S25 or audio claim.
+
+TLAS-BUILD-only sourcefaef9de / exactFDBB32CD050C4110210E5B0155FDE462535F28942DD8ECE60B17A03CA2C49D1C
+Debug run20261002-003825 passes two75% captures/Home-resume on SM-S928B. Modelled
+hands are restored: native player primary pixels66584 combat/167535 lanternhigh,
+and raw instance20 commits44480/133366. Second skeleton18 now commits7282 pixels
+in combat. Geometry, pose, shader, masks and player BLAS UPDATE unchanged. This
+isolates TLAS UPDATE behaviour in these views, not a proven driver defect. Source
+review finds no forbidden reference-zero activation transition. Next is a normal-
+shader bounded instance-definition-change rebuild policy; live/current Shipping
+performance and final-device acceptance remain open. S25 remains unverified.
+
 ## Research sources
 
 - [Android NDK stable APIs - Vulkan runtime capability guidance](https://developer.android.com/ndk/guides/stable_apis)
