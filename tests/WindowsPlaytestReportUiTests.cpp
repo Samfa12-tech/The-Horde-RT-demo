@@ -11,8 +11,11 @@ namespace
 {
 std::atomic<bool> passed{true};
 std::atomic<int> exports{0};
+std::atomic<const char*> currentPhase{"startup"};
 std::vector<std::string> approved;
 bool acceptExport = false; // Accessed only by the UI owner thread.
+
+void SetPhase(const char* phase) { currentPhase.store(phase); }
 
 void Check(const bool condition, const char* description)
 {
@@ -43,17 +46,35 @@ HWND WaitForForm(const DWORD thread)
             }
             return TRUE;
         }, reinterpret_cast<LPARAM>(&found));
-        if (found && GetDlgItem(found, 111)) return found;
+        if (found && GetDlgItem(found, 111))
+        {
+            // Child creation happens in WM_CREATE, before the caller has shown
+            // the dialog and assigned its initial focus. Do not start driving
+            // controls until the UI thread has completed that initialization.
+            GUITHREADINFO info{};
+            info.cbSize = sizeof(info);
+            if (IsWindowVisible(found) && GetGUIThreadInfo(thread, &info) != FALSE &&
+                info.hwndFocus == GetDlgItem(found, 102)) return found;
+        }
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     } while (std::chrono::steady_clock::now() < deadline);
+    std::cerr << "report form did not become visible with category focus; phase="
+              << currentPhase.load() << '\n';
     return nullptr;
 }
 
 LRESULT Send(HWND window, const UINT message, const WPARAM value = 0, const LPARAM argument = 0)
 {
     DWORD_PTR result = 0;
-    Check(SendMessageTimeoutW(window, message, value, argument, SMTO_ABORTIFHUNG, 2000, &result) != 0,
-        "native control message timed out");
+    if (SendMessageTimeoutW(window, message, value, argument, SMTO_ABORTIFHUNG, 2000, &result) == 0)
+    {
+        const DWORD error = GetLastError();
+        std::cerr << "native control message timed out; phase=" << currentPhase.load()
+                  << " hwnd=" << window << " controlId=" << GetDlgCtrlID(window)
+                  << " message=0x" << std::hex << message << std::dec
+                  << " error=" << error << '\n';
+        passed.store(false);
+    }
     return static_cast<LRESULT>(result);
 }
 
@@ -83,6 +104,7 @@ int main()
     if (!owner) return 1;
     const DWORD thread = GetCurrentThreadId();
     std::thread actions([thread] {
+        SetPhase("note-only default and private-content checks");
         const HWND form = WaitForForm(thread);
         Defaults(form, false);
         if (!form) return;
@@ -98,6 +120,7 @@ int main()
         ClickExport(form);
         Check(exports.load() == 0, "private-content rejection reached destination");
         SetNote(form, L"Walk.\r\nThen parry. \u9f8d \U0001f525");
+        SetPhase("note-only approved export and retry");
         ClickExport(form);
         Check(exports.load() == 1, "approved note-only export did not reach injected destination once");
         Check(!IsWindowEnabled(GetDlgItem(form, 106)), "approved note did not freeze for retry");
@@ -119,11 +142,13 @@ int main()
             "native Unicode/reproduction steps were changed");
     }
     approved.clear(); exports.store(0); acceptExport = true;
+    SetPhase("explicit-context form startup");
     horde::platform::windows::WindowsPlaytestReportContext context;
     context.available = true;
     context.values = {"Horde Lantern RT", "1.6.1", "fixture-build", "Windows", "Windows desktop",
         "Fixture GPU", "RayTracingPipeline", "High", 0.75, 960, 540, false};
     std::thread contextActions([thread] {
+        SetPhase("explicit-context consent and duplicate-export checks");
         const HWND form = WaitForForm(thread);
         Defaults(form, true);
         if (!form) return;

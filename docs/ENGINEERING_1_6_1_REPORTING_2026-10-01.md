@@ -67,6 +67,20 @@ phone report is a new frame-rate, transport-correctness or release acceptance.
 
 ## Next unfinished step
 
+Current checkpoint982ff9a push36869518263 passes GCC55/55, Clang55/55,
+MSVC57/57 and focused Vulkan-host15/15. PR36869523187 has the same source
+tree in its synthetic merge; its MSVC lane fails56/57 at the native report
+fixture (`native control message timed out`), other lanes pass. This is not a
+green PR. The fixture previously admitted a form during WM_CREATE before
+ShowWindow/UpdateWindow/initial focus completed. It now waits for the visible
+form and category focus, with the same2s message bound and all consent/privacy/
+Unicode/retry assertions retained. Timeout diagnostics preserve the Windows
+error and identify phase/control/message. That startup race is source-demonstrated,
+but the hosted timeout was not reproduced locally and its unique cause remains
+unproven. Affected UI CTest repetitions pass10/10 each Debug and Release; fresh
+current-head CI remains required after integration. Runtime reporting is unchanged.
+Audio/haptic manual revalidation required: **NO** (test-only behavior).
+
 1. Local integration/push and fresh source/integration CI are complete atca58f09.
    [CI and Windows continuation](evidence/2026-10-01-report-export/RUN_STATUS.md)
    owns exact handles and completed failures; no completed test/build replay.
