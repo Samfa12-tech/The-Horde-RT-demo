@@ -1020,6 +1020,19 @@ Add one block per new result rather than changing a prediction into an implied f
 - [Full source/artifact report and recovery bundle](ENGINEERING_1_6_1_LANTERN_ABBA_2026-09-20.md).
   No S24/S25, subjective arms, full glass-performance matrix or final release pass.
 
+## October 1, 2026 - staged experiment device reconnection
+
+- Evidence type: local ADB identity and read-only tracing-service discovery.
+  Authorised serial R5GL219SZGK reports exact model **SM-S948B**. This is not new
+  RT presentation, image equivalence, performance, music or release acceptance.
+- Perfetto v51.2 service query and raw descriptors are retained privately under
+  `C:/Dev/tmp/horde-staged-rt-20261001/phone-counter-discovery/`; hardware counter
+  availability awaits exact descriptor decoding. A memory-allocation source is
+  not a bandwidth/cache/stall counter. No root, driver or profiling configuration
+  changed. S24/S25 remain unverified.
+- Owner deferred the pending listening test. Renderer and memory testing may
+  continue; music acceptance remains open.
+
 ## Research sources
 
 - [Android NDK stable APIs - Vulkan runtime capability guidance](https://developer.android.com/ndk/guides/stable_apis)

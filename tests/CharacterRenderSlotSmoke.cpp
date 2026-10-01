@@ -1413,6 +1413,12 @@ int main()
                       windowsSource.find("tuning.glassIor") != std::string::npos &&
                       windowsSource.find("tuning.glassRoughness") != std::string::npos,
                       "Windows RT Lab must expose bounded reusable dielectric controls");
+        const std::size_t androidLabBegin = androidSource.find("private void showRtLab()");
+        const std::size_t androidLabEnd = androidSource.find("private LinearLayout createRtLabPanel()", androidLabBegin);
+        const std::string androidLab = androidLabBegin != std::string::npos &&
+                androidLabEnd != std::string::npos
+            ? androidSource.substr(androidLabBegin, androidLabEnd - androidLabBegin)
+            : std::string{};
         ok &= Require(androidSource.find("PREF_RT_LAB_UNLOCKED = \"rt_lab_unlocked\"") != std::string::npos &&
                       androidSource.find(".putBoolean(PREF_RT_LAB_UNLOCKED, rtLabUnlocked)") != std::string::npos &&
                       androidSource.find("ProbeBridge.isRtLabUnlockEligible()") != std::string::npos &&
@@ -1425,8 +1431,9 @@ int main()
                           std::string::npos &&
                       androidSource.find("LinearLayout.LayoutParams.MATCH_PARENT, dp(48)") !=
                           std::string::npos &&
-                      androidSource.find("private void showRtLab()") != std::string::npos &&
-                      androidSource.find("ProbeBridge.setSimulationPaused(true)") != std::string::npos,
+                      androidLab.find("setGameplayPaused(true)") != std::string::npos &&
+                      androidSource.find("private void setGameplayPaused(boolean paused)") != std::string::npos &&
+                      androidSource.find("ProbeBridge.setSimulationPaused(paused)") != std::string::npos,
                       "Android RT Lab must preserve progress through settings reset and expose a live paused 48dp panel");
         const std::size_t androidShowEndingBegin =
             androidSource.find("private void showEndingOverlay()");

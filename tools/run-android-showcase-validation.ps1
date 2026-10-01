@@ -14,6 +14,8 @@ param(
     [switch]$SkipInstall,
     [string]$ViewmodelCandidateDirectory = "",
     [switch]$AnatomicalPlayerMount,
+    [switch]$StagedPrimaryInvestigation,
+    [string]$StagedPrimaryManifest = "",
     [string]$ApkPath = "",
     [ValidateNotNullOrEmpty()]
     [string]$DeviceSerial = "R5GL219SZGK",
@@ -29,7 +31,11 @@ $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 $androidRoot = Join-Path $repoRoot "android"
 if ($ApkPath -and -not $SkipBuild) { throw 'An explicit immutable ApkPath requires SkipBuild.' }
 $apk = ""
-$packageName = if ($ViewmodelCandidateDirectory) { "com.samfa12.hordelanternrt.debug.viewmodel" } else { "com.samfa12.hordelanternrt.debug" }
+. (Join-Path $PSScriptRoot 'AndroidStagedPrimaryAdmission.ps1')
+$validationTarget = Resolve-AndroidShowcaseValidationTarget -StagedPrimary ([bool]$StagedPrimaryInvestigation) `
+    -SkipBuild ([bool]$SkipBuild) -ApkPath $ApkPath -ManifestPath $StagedPrimaryManifest `
+    -ViewmodelDirectory $ViewmodelCandidateDirectory -AnatomicalMount ([bool]$AnatomicalPlayerMount)
+$packageName = $validationTarget.package
 $activityName = "$packageName/com.samfa12.hordelanternrt.MainActivity"
 $adb = Join-Path $env:LOCALAPPDATA "Android\Sdk\platform-tools\adb.exe"
 $runId = Get-Date -Format "yyyyMMdd-HHmmss"
@@ -248,6 +254,7 @@ function Register-SelectedRtPipelineBundle {
             throw "$Context is missing exact selected $strategy key/hash identity."
         }
     }
+    Assert-AndroidStagedPrimaryBundle -Bundle $Bundle -ExpectedBundle $validationTarget.expectedBundle
     $opaquePolicy = ([string]$Bundle.opaqueFast.key) -replace '_opaque_fast$', ''
     $genericPolicy = ([string]$Bundle.genericDielectric.key) -replace '_generic_dielectric$', ''
     if ($opaquePolicy -ceq [string]$Bundle.opaqueFast.key -or
@@ -715,6 +722,12 @@ try {
             checkpoints = @($captureRecords)
             lifecycle = $lifecycleEvidence
         }
+        if ($StagedPrimaryInvestigation) {
+            $captureManifest.stagedPrimaryInvestigation = [ordered]@{
+                investigationOnly = $true; manifestSha256 = $validationTarget.manifestSha256
+                expectedBundle = $validationTarget.expectedBundle; publishable = $false
+            }
+        }
         $captureManifest | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath (Join-Path $outputDirectory "capture-manifest.json") -Encoding utf8
     }
 
@@ -798,6 +811,12 @@ try {
         }
         warnings = @($warnings)
         failures = @($failures)
+    }
+    if ($StagedPrimaryInvestigation) {
+        $metadata.stagedPrimaryInvestigation = [ordered]@{
+            investigationOnly = $true; manifestSha256 = $validationTarget.manifestSha256
+            expectedBundle = $validationTarget.expectedBundle; publishable = $false
+        }
     }
     $metadata | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $outputDirectory "summary.json") -Encoding utf8
     $timingSummary = @($timingRows | ForEach-Object {

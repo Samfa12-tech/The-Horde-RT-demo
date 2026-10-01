@@ -1,0 +1,90 @@
+{
+  "scope": "Current normal Diagnostic/Mobile Debug phone-image control; static build/package evidence only",
+  "source": {
+    "head": "59cb0576790cdb47d529746ab3d2d30ac34462fb",
+    "worktreeDirty": true,
+    "trackedDirtyFilesAtReceipt": [
+      "CMakeLists.txt",
+      "android/app/build.gradle",
+      "tools/run-android-showcase-validation.ps1"
+    ],
+    "fileSha256AtReceipt": {
+      "android/app/build.gradle": "7dd7b9b053adbca3a6c3c1a49e52ae1d076ee7b988492dc78f2c169c0482c7b9",
+      "CMakeLists.txt": "dc744f7bb8c4ff74e8464aa7285e7ea1bf7738b317249106704fd6e4d3e4c217",
+      "tools/run-android-showcase-validation.ps1": "f2977c819bb83548c0bf5b35ec3d220610a565fb87bce539b7cfae81b168449a",
+      "tools/AndroidStagedPrimaryAdmission.ps1": "5271497a1e226dd01b0aa5819ad3c4cd440e4dd0f1ea3a24337787df39fcc721",
+      "tools/tests/Test-AndroidStagedPrimaryAdmission.ps1": "739bc48cad6b74a70ea14004774968268ec81512618c6bbd741ca00951cdb922"
+    },
+    "CMakeLists.txt note": "The observed diff is a host-only CTest registration for the staged admission test; no Android/native source was changed by this task. It appeared dirty during this task, so the receipt records current file SHA rather than assuming it was in the initial snapshot."
+  },
+  "build": {
+    "command": ":app:assembleDebug --no-daemon --max-workers=2 --console=plain (no staged or viewmodel Gradle properties)",
+    "result": "BUILD SUCCESSFUL; ARM64, ARMv7, x86 and x86_64 CMake build tasks completed",
+    "log": "C:/Dev/tmp/horde-staged-rt-20261001/android-normal-debug-control/assembleDebug-normal.log",
+    "logSha256": "5c22ce68741cfe916e3537b7525a4db1b840377b9b909592779cdd458c026cb1",
+    "warnings": [
+      "Android command-line tools warned that SDK XML version 4 is newer than the version supported by this tool version.",
+      "Java compilation noted deprecated API usage in MainActivity.java."
+    ]
+  },
+  "apk": {
+    "path": "C:/Dev/tmp/horde-staged-rt-20261001/android-normal-debug-control/horde-normal-debug-diagnostic-mobile.apk",
+    "sha256": "581ea4668967458c000162da9c3eb722cd5e69719f069b80aa79591cebcc066a",
+    "bytes": 110214083,
+    "outputMetadata": "C:/Dev/tmp/horde-staged-rt-20261001/android-normal-debug-control/output-metadata.json",
+    "outputMetadataSha256": "59d8d2ca048bc736f7aa60f7133ee0f05b2b91389caa00617820074b9dfa7ab3",
+    "packageId": "com.samfa12.hordelanternrt.debug",
+    "applicationLabel": "Horde Lantern RT Alpha",
+    "versionCode": 9,
+    "versionName": "1.6.1-debug",
+    "minSdk": 24,
+    "targetSdk": 34,
+    "allAbis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ]
+  },
+  "actualCmakePolicy": {
+    "instrumentation": "Diagnostic",
+    "dielectricQuality": "Mobile",
+    "stagedShaderDirectory": "",
+    "stagedPrimaryDefault": false,
+    "stagedPrimaryTiming": false,
+    "abiCmakeCacheSha256": {
+      "arm64-v8a": "3dbb66bb693dafc285aa72499f015df6ba1b9e40f399bb256cd08dcfa45168a5",
+      "armeabi-v7a": "e2004d083a0bd070ac6c14fbc82728bf84f52a3e391f07a14656a7cb272eb367",
+      "x86": "06972f95355467bd64c890522c7865d885b0846386f8d62ebf79c54743b66f6f",
+      "x86_64": "d16d026d8a3cd0c918db143edc84639f2c6ff316e0a03705077b1a38b4925411"
+    }
+  },
+  "packagedNativeLibraries": {
+    "arm64-v8a": {"bytes": 3886496, "sha256": "f7cc35a953771c6e9dd737582cfba13eaf8c4c9bbdbf5808cbb82452fc8fe857"},
+    "armeabi-v7a": {"bytes": 3426848, "sha256": "4db1140e509b7ba0cf155d2868eca9f3a19094ebf34406bae84288e88f4720c1"},
+    "x86": {"bytes": 4148256, "sha256": "a55cfc92571a1ec2689a6309e1918bd4612c241ee014618c0955fb2567dd9246"},
+    "x86_64": {"bytes": 3996048, "sha256": "29bd2453eb256009906371ad7fc9be5fed1b33a9621fd5f77bd39c4282257a4d"}
+  },
+  "assetComparisons": [
+    {
+      "baseline": "C:/Dev/tmp/horde-staged-rt-20261001/android-staged-debug-admission/horde-staged-debug-diagnostic-mobile.apk",
+      "baselineSha256": "db125b80210753a9b1e50bdf51cbb5a923036d13280db346b3190f13f4afc299",
+      "payloadEntriesEach": 70,
+      "hashMismatches": 0,
+      "missingOrAdded": 0,
+      "result": "All assets/ and res/raw payloads byte-identical."
+    },
+    {
+      "baseline": "C:/Dev/tmp/horde-staged-rt-20261001/artifacts-control-59cb057/app-benchmark-normal-shipping-mobile.apk",
+      "baselineSha256": "8ead0a2ba632ba490027ee8806d7e135002fb09713fad14390fcd2186a5bf175",
+      "payloadEntriesEach": 70,
+      "hashMismatches": 0,
+      "missingOrAdded": 0,
+      "result": "All assets/ and res/raw payloads byte-identical."
+    }
+  ],
+  "limits": [
+    "No ADB/device/install or phone image capture was performed.",
+    "This is the normal Diagnostic/Mobile Debug control APK, not Shipping performance or physical RT evidence."
+  ]
+}

@@ -51,8 +51,16 @@ all query/benchmark identities match, including final serial1200. Android timed
 benchmark builds4ABIs; final APK0e605dee…d5a8b is retained, not installed. Normal
 Shipping defaults remain OFF, modules unchanged. Follow the experiment's exact
 receipts/next step; no repeated Mobile matrices or retroactive clean-build claim.
-No phone action. High supplement, known live physical failures, warm exact-phone
-ABBA and RAM/GPU-counter sampling remain open; no performance acceptance.
+Observer `59cb057` is pushed; fresh push/PR common55/55 and focused15/15 PASS.
+High supplement now passes15 image pairs, separately retained timing FAIL+76.918%
+(observer-enabled candidate, not matched performance). Normal Shipping control
+8ead0a2…5bf175 is ready, four-module admission PASS/70 assets match both candidates.
+Isolated Diagnostic Debug db125b80…afc299 builds4ABIs, actual8module SPIR-V checks
+PASS with counters retained, and explicit admission guards pass26 host assertions.
+Follow the experiment record for exact receipts and next unfinished phone row.
+Known live physical failures, warm exact-phone ABBA and RAM/GPU-counter sampling
+remain open; no performance acceptance. Phone now available; music listening is
+deferred by the owner, not passed. No player/viewmodel retuning.
 
 Windows84f111e and Android884dc8b native music output are pushed; exact884dc8b
 push36797092043/PR36797097338 freshly PASS GCC/Clang/MSVC53/53 each and Vulkan
@@ -72,7 +80,7 @@ with unchanged resolution/rays/samples/physical transport/tolerances, separately
 selectable investigation path, image equivalence first and exact warm phone
 comparisons later. Add RAM pressure versus GPU bandwidth/cache/stall profiling;
 unavailable counters are gaps. Preserve unfinished reporting work at a reviewed
-checkpoint before renderer edits. Phone remains disconnected. No main merge,
+checkpoint before renderer edits. Phone is now available. No main merge,
 release or publication; no assumed additive omission savings or30FPS promise.
 
 The in-flight reusable reporting contract is preserved at a reviewed unwired

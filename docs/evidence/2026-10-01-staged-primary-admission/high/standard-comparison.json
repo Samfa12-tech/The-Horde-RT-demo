@@ -1,0 +1,121 @@
+{
+  "schema": 3,
+  "passed": false,
+  "pixelTolerance": {
+    "maximumChannelDifference": 3,
+    "maximumFractionOverOne": 0.001
+  },
+  "timingTolerancePercent": 2.0,
+  "timingBasis": "overall capture sample median",
+  "baselineMatchedMedianMs": 6.103,
+  "candidateMatchedMedianMs": 10.7973,
+  "timingDeltaPercent": 76.918,
+  "timingPassed": false,
+  "captures": [
+    {
+      "checkpoint": "opening",
+      "pixels": 518400,
+      "pixelsDifferentByMoreThanOne": 0,
+      "differentFraction": 0.0,
+      "maximumChannelDifference": 1,
+      "passed": true
+    },
+    {
+      "checkpoint": "skeleton",
+      "pixels": 518400,
+      "pixelsDifferentByMoreThanOne": 2,
+      "differentFraction": 3.86E-06,
+      "maximumChannelDifference": 3,
+      "passed": true
+    },
+    {
+      "checkpoint": "worst-bend",
+      "pixels": 518400,
+      "pixelsDifferentByMoreThanOne": 2,
+      "differentFraction": 3.86E-06,
+      "maximumChannelDifference": 2,
+      "passed": true
+    },
+    {
+      "checkpoint": "lantern-drop",
+      "pixels": 518400,
+      "pixelsDifferentByMoreThanOne": 0,
+      "differentFraction": 0.0,
+      "maximumChannelDifference": 1,
+      "passed": true
+    },
+    {
+      "checkpoint": "skylight",
+      "pixels": 518400,
+      "pixelsDifferentByMoreThanOne": 0,
+      "differentFraction": 0.0,
+      "maximumChannelDifference": 1,
+      "passed": true
+    },
+    {
+      "checkpoint": "yellow",
+      "pixels": 518400,
+      "pixelsDifferentByMoreThanOne": 0,
+      "differentFraction": 0.0,
+      "maximumChannelDifference": 1,
+      "passed": true
+    },
+    {
+      "checkpoint": "blue",
+      "pixels": 518400,
+      "pixelsDifferentByMoreThanOne": 0,
+      "differentFraction": 0.0,
+      "maximumChannelDifference": 1,
+      "passed": true
+    },
+    {
+      "checkpoint": "red",
+      "pixels": 518400,
+      "pixelsDifferentByMoreThanOne": 0,
+      "differentFraction": 0.0,
+      "maximumChannelDifference": 1,
+      "passed": true
+    },
+    {
+      "checkpoint": "green",
+      "pixels": 518400,
+      "pixelsDifferentByMoreThanOne": 0,
+      "differentFraction": 0.0,
+      "maximumChannelDifference": 1,
+      "passed": true
+    },
+    {
+      "checkpoint": "mirror",
+      "pixels": 518400,
+      "pixelsDifferentByMoreThanOne": 0,
+      "differentFraction": 0.0,
+      "maximumChannelDifference": 1,
+      "passed": true
+    },
+    {
+      "checkpoint": "lich",
+      "pixels": 518400,
+      "pixelsDifferentByMoreThanOne": 0,
+      "differentFraction": 0.0,
+      "maximumChannelDifference": 1,
+      "passed": true
+    },
+    {
+      "checkpoint": "finale-roof",
+      "pixels": 518400,
+      "pixelsDifferentByMoreThanOne": 0,
+      "differentFraction": 0.0,
+      "maximumChannelDifference": 0,
+      "passed": true
+    },
+    {
+      "checkpoint": "two-enemy-combat",
+      "pixels": 518400,
+      "pixelsDifferentByMoreThanOne": 3,
+      "differentFraction": 5.79E-06,
+      "maximumChannelDifference": 3,
+      "passed": true
+    }
+  ],
+  "unpairedCandidateCaptures": []
+}

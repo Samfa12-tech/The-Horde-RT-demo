@@ -1,0 +1,112 @@
+{
+  "scope": "Android staged Diagnostic/Mobile Debug admission; static build/package evidence only",
+  "source": {
+    "head": "59cb0576790cdb47d529746ab3d2d30ac34462fb",
+    "worktreeDirty": true,
+    "relevantFilesAtReceipt": {
+      "android/app/build.gradle": "7dd7b9b053adbca3a6c3c1a49e52ae1d076ee7b988492dc78f2c169c0482c7b9",
+      "tools/run-android-showcase-validation.ps1": "f2977c819bb83548c0bf5b35ec3d220610a565fb87bce539b7cfae81b168449a",
+      "tools/AndroidStagedPrimaryAdmission.ps1": "5271497a1e226dd01b0aa5819ad3c4cd440e4dd0f1ea3a24337787df39fcc721"
+    },
+    "trackedDirtyFiles": [
+      "android/app/build.gradle",
+      "tools/run-android-showcase-validation.ps1"
+    ],
+    "untrackedRelevantAdmissionFiles": [
+      "tools/AndroidStagedPrimaryAdmission.ps1",
+      "tools/tests/Test-AndroidStagedPrimaryAdmission.ps1"
+    ]
+  },
+  "policyMatrix": {
+    "logsDirectory": "C:/Dev/tmp/horde-staged-rt-20261001/android-staged-debug-admission",
+    "ordinaryDefault": "PASS; Debug Diagnostic/Mobile and Release Shipping/Mobile both clear staged dir and set staged default/timing OFF",
+    "stagedDebugPositive": "PASS; Debug Diagnostic/Mobile uses accepted diagnostic-mobile dir, staged ON, timing OFF; Release remains staged OFF",
+    "benchmarkShippingControl": "PASS; benchmark remains Shipping/Mobile staged ON with timing OFF; normal Debug and Release remain staged OFF",
+    "expectedRejections": {
+      "debugBenchmarkMix": "PASS: rejected as separate investigation modes",
+      "debugTiming": "PASS: timing=true rejected without benchmark validation",
+      "shippingManifest": "PASS: Shipping manifest rejected for Diagnostic Debug",
+      "highManifest": "PASS: High manifest rejected for Mobile Debug",
+      "missingDirectory": "PASS: opt-in without staged directory rejected",
+      "invalidBoolean": "PASS: non-boolean opt-in rejected",
+      "viewmodelOverlay": "PASS: staged mode rejects viewmodel asset overlay",
+      "debugPolicyOverride": "PASS: Diagnostic/Mobile policy override rejected"
+    },
+    "allPositiveCasesExitZero": true,
+    "allNegativeCasesExitNonzero": true
+  },
+  "build": {
+    "command": ":app:assembleDebug -PhordeStagedPrimaryDebugValidation=true -PhordeStagedPrimaryShaderDir=C:/Dev/tmp/horde-staged-rt-20261001/shaders-diagnostic-mobile --no-daemon --max-workers=2 --console=plain",
+    "result": "BUILD SUCCESSFUL; ARM64, ARMv7, x86 and x86_64 CMake build tasks completed",
+    "log": "C:/Dev/tmp/horde-staged-rt-20261001/android-staged-debug-admission/assembleDebug-staged.log",
+    "logSha256": "90b3292f71f72d79bad1656eb5f4fe02e79806bd41735993262ec5cb5b5dc6ee",
+    "warnings": [
+      "Android command-line tools warned that SDK XML version 4 is newer than the version supported by this tool version.",
+      "Java compilation noted deprecated API usage in MainActivity.java."
+    ]
+  },
+  "apk": {
+    "path": "C:/Dev/tmp/horde-staged-rt-20261001/android-staged-debug-admission/horde-staged-debug-diagnostic-mobile.apk",
+    "sha256": "db125b80210753a9b1e50bdf51cbb5a923036d13280db346b3190f13f4afc299",
+    "bytes": 113780999,
+    "outputMetadata": "C:/Dev/tmp/horde-staged-rt-20261001/android-staged-debug-admission/output-metadata.json",
+    "outputMetadataSha256": "6cee8f56fdf03722e18c9f34f250747aba8894723f941e4e3bed6c542e0b645a",
+    "packageId": "com.samfa12.hordelanternrt.debug.staged",
+    "applicationLabel": "Horde RT Staged Investigation",
+    "versionCode": 9,
+    "versionName": "1.6.1-debug",
+    "minSdk": 24,
+    "targetSdk": 34,
+    "allAbis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ]
+  },
+  "stagedShaderPolicy": {
+    "instrumentation": "Diagnostic",
+    "quality": "Mobile",
+    "stage": "rgen",
+    "defaultEnabled": true,
+    "timingEnabled": false,
+    "manifest": "C:/Dev/tmp/horde-staged-rt-20261001/shaders-diagnostic-mobile/staged-primary-manifest.json",
+    "manifestSha256": "d9dfe29d53774bab090dba671d53fb783872d81045366d07e3e7238e6e1a678b",
+    "generatedHeaderSha256": "890c07f49d7b81d734fd47c57e7f3d95d62b46e8a5780a5fbfb30e81ce03da88",
+    "modules": {
+      "OpaqueFast/primary": "23a489043f4d0ef4c0979f8d8ceb8a83962dbe9f47bfaa3673a1538fd648b5a3",
+      "OpaqueFast/shade": "a20f658086e103f4ce9eda591177c5ad4f337715b75c49b5970383b4e229f157",
+      "GenericDielectric/primary": "35044d5ff95d9f09f51e70aaf7c9c1f3747b1113a7929b92b521425f9d587d50",
+      "GenericDielectric/shade": "1857f535ebe921416060d366b6e632a7777144218fbe222912a4cc53df1f981e"
+    },
+    "abiCMakeCacheSha256": {
+      "arm64-v8a": "28e110518144006557b5257141fb06507be316897fca65e31f0c621ec01980b3",
+      "armeabi-v7a": "ea1a7800517c14303f58fe9fbaaa0fce28465652ab3ae76f1c41d0a2aa7c6f8f",
+      "x86": "672beb96145c1425c2a84854dc85813478f96bae7cb4eef8191eb5a1d225527c",
+      "x86_64": "7f1597d75cc368e6eb13d9a9dca1c804fc2e4fba58f3b81cfe5095b3fb85e9a8"
+    },
+    "abiCachedPolicy": "All four Debug CMake caches select the exact staged diagnostic-mobile directory, DEFAULT=ON and TIMING=OFF."
+  },
+  "packagedNativeLibraries": {
+    "arm64-v8a": {"bytes": 4780480, "sha256": "a5c108b9e7ccaacf9dd11c35cdccd455113ab4525606d4ea249ad32e261ca8f1"},
+    "armeabi-v7a": {"bytes": 4317920, "sha256": "4a0e0f4e9201880b2079626c567951fa3be5647fa6d6f328404cf1f154ccd232"},
+    "x86": {"bytes": 5049824, "sha256": "691e278558105aec4d80cea5bd8ea41583d194e3baeb72b45dc8f0269b8e7ecd"},
+    "x86_64": {"bytes": 4892352, "sha256": "3672623469bc0b212e7824d12ee301613393f72f3d46cb0bb1f5b09778b0062c"}
+  },
+  "assetComparison": {
+    "currentControlApk": "C:/Dev/tmp/horde-staged-rt-20261001/artifacts-control-59cb057/app-benchmark-normal-shipping-mobile.apk",
+    "currentControlSha256": "8ead0a2ba632ba490027ee8806d7e135002fb09713fad14390fcd2186a5bf175",
+    "candidateAssetEntries": 70,
+    "controlAssetEntries": 70,
+    "commonEntries": 70,
+    "hashMismatches": 0,
+    "missingEntries": 0,
+    "addedEntries": 0,
+    "result": "All packaged assets and res/raw payloads byte-identical to current same-source Shipping/Mobile control."
+  },
+  "limits": [
+    "No ADB/device/install, gameplay, physical RT presentation or owner validation was performed.",
+    "This is an isolated development-signed Diagnostic/Mobile staged APK; it is not a Shipping package or performance result.",
+    "A historical C11 Debug APK predates the admitted music bank; that comparison showed expected music/license additions. It is not used as the asset gate here."
+  ]
+}

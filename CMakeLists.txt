@@ -518,6 +518,10 @@ if(BUILD_TESTING)
                 ${CMAKE_CURRENT_SOURCE_DIR}/tests/RtPipelinePolicyExecutionTests.ps1
                 -CmakeExecutable ${CMAKE_COMMAND}
                 -GradleExecutable ${CMAKE_CURRENT_SOURCE_DIR}/android/gradlew.bat)
+        # Byte-provenance admission only: no Vulkan/device is needed here.
+        add_test(NAME horde_rt_android_staged_admission_tests
+            COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
+                ${CMAKE_CURRENT_SOURCE_DIR}/tools/tests/Test-AndroidStagedPrimaryAdmission.ps1)
         set_tests_properties(
             horde_rt_pipeline_policy_fence_tests
             horde_rt_pipeline_policy_execution_tests

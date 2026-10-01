@@ -1,0 +1,65 @@
+{
+  "source": {
+    "repository": "Samfa12-tech/The-Horde-RT-demo",
+    "commit": "59cb0576790cdb47d529746ab3d2d30ac34462fb",
+    "parent": "ee05ea0ad1ac1673d9051cd0fd024b1bd0cc7144",
+    "subject": "feat(rt): add opt-in submission-owned staged pass profiling",
+    "pullRequest": 15,
+    "pullRequestBase": "bda1b99a62e1de883273dd21f267bcfc92bc5490",
+    "pullRequestHead": "59cb0576790cdb47d529746ab3d2d30ac34462fb",
+    "pullRequestMergeCommit": "17f31fe",
+    "integrationEvidence": "All four PR job logs show checkout of refs/remotes/pull/15/merge at merge commit 17f31fe: 59cb057 into bda1b99. Push jobs check out the exact commit."
+  },
+  "runs": [
+    {
+      "event": "push",
+      "runId": 36807823930,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/36807823930",
+      "headSha": "59cb0576790cdb47d529746ab3d2d30ac34462fb",
+      "conclusion": "success",
+      "tests": {
+        "Shared simulation host (GCC)": "55/55 passed",
+        "Shared simulation host (Clang)": "55/55 passed",
+        "Shared simulation host (MSVC)": "55/55 passed",
+        "player-vulkan-host": "15/15 passed"
+      },
+      "eventFile": {
+        "name": "push-event.json",
+        "bytes": 10301,
+        "sha256": "f69853aead0dd547e934a3b1dd3d08e03f6f4bd12c1f68743d1dadbf57750230"
+      }
+    },
+    {
+      "event": "pull_request",
+      "runId": 36807828168,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/36807828168",
+      "headSha": "59cb0576790cdb47d529746ab3d2d30ac34462fb",
+      "conclusion": "success",
+      "tests": {
+        "Shared simulation host (GCC)": "55/55 passed",
+        "Shared simulation host (Clang)": "55/55 passed",
+        "Shared simulation host (MSVC)": "55/55 passed",
+        "player-vulkan-host": "15/15 passed"
+      },
+      "eventFile": {
+        "name": "pull-request-event.json",
+        "bytes": 10309,
+        "sha256": "cf73e72517384cb2457bc87d51b605b57093e7283aaee9b7a42a56b1c39f124c"
+      }
+    }
+  ],
+  "jobs": [
+    { "file": "push-player-vulkan-host.log", "bytes": 69933, "sha256": "3df177d57b174e5ac03d7776075ada5f3be1058ba91f262cea4baee069a82d59", "tests": "15/15 passed" },
+    { "file": "push-shared-simulation-host-gcc.log", "bytes": 99978, "sha256": "91179bac1a8bf1961de6eb0bc948af5a4f3ce0c80a320734f410198015f29a74", "tests": "55/55 passed" },
+    { "file": "push-shared-simulation-host-clang.log", "bytes": 102668, "sha256": "dbb797d21de2e68915d3768ddd8ecdfe6a3cb52667f203a62c3b9f3337f9b402", "tests": "55/55 passed" },
+    { "file": "push-shared-simulation-host-msvc.log", "bytes": 113326, "sha256": "40704e52b6e21cb0816ea61b9253d72fd42e49853db9f5cc3ff8de045bed6f42", "tests": "55/55 passed" },
+    { "file": "pull-request-player-vulkan-host.log", "bytes": 70825, "sha256": "37a15aec98ed7bb856f5b6e7f6545e27c20e836f178a8dd58f3205ce59e35f27", "tests": "15/15 passed" },
+    { "file": "pull-request-shared-simulation-host-gcc.log", "bytes": 100985, "sha256": "2cf9d0554e43eab35f44e534dc62f912d0881ffd159b52812274275ae8fe3663", "tests": "55/55 passed" },
+    { "file": "pull-request-shared-simulation-host-clang.log", "bytes": 102240, "sha256": "21894d116bc730f0cf279c58365b6cdcabc902268b3a09eea01afebc92c7208f", "tests": "55/55 passed" },
+    { "file": "pull-request-shared-simulation-host-msvc.log", "bytes": 114298, "sha256": "f9e5451b1338c1ba19414a4ddbf1601b60dc10fe1314b29ee557961892057777", "tests": "55/55 passed" }
+  ],
+  "limitations": [
+    "The focused Vulkan job uses a CPU-host test lane; it does not establish hardware ray-tracing performance or physical-device acceptance.",
+    "Both workflow events validated the same source commit; PR jobs additionally ran on the synthetic merge with base bda1b99a62e1de883273dd21f267bcfc92bc5490."
+  ]
+}

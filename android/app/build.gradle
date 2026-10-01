@@ -56,9 +56,17 @@ if (!(hordeVersionCode instanceof Integer) || hordeVersionCode < 1) {
 def runtimeAssetsDir = layout.buildDirectory.dir('generated/runtimeAssets')
 def validationUnsigned = System.getenv('HORDE_VALIDATION_UNSIGNED') == '1'
 def hordeBenchmarkValidation = providers.gradleProperty('hordeBenchmarkValidation').orNull == 'true'
+def hordeStagedPrimaryDebugValidationProperty = providers.gradleProperty('hordeStagedPrimaryDebugValidation').orNull
+if (hordeStagedPrimaryDebugValidationProperty != null && !(hordeStagedPrimaryDebugValidationProperty in ['true', 'false'])) {
+    throw new GradleException('hordeStagedPrimaryDebugValidation must be true or false.')
+}
+def hordeStagedPrimaryDebugValidation = hordeStagedPrimaryDebugValidationProperty == 'true'
+if (hordeStagedPrimaryDebugValidation && hordeBenchmarkValidation) {
+    throw new GradleException('Staged diagnostic Debug and Shipping benchmark investigations must be separate configurations.')
+}
 // Benchmark validation is an isolated, development-signed app. Do not even
-// read production signing environment variables when that opt-in is present.
-def hordeValidationUnsigned = validationUnsigned || hordeBenchmarkValidation
+// read production signing environment variables for either investigation opt-in.
+def hordeValidationUnsigned = validationUnsigned || hordeBenchmarkValidation || hordeStagedPrimaryDebugValidation
 def releaseStoreFile = hordeValidationUnsigned ? null : System.getenv('HORDE_RELEASE_STORE_FILE')
 def releaseStorePassword = hordeValidationUnsigned ? null : System.getenv('HORDE_RELEASE_STORE_PASSWORD')
 def releaseKeyAlias = hordeValidationUnsigned ? null : System.getenv('HORDE_RELEASE_KEY_ALIAS')
@@ -73,8 +81,8 @@ if (hordeStagedPrimaryTimingProperty != null && !(hordeStagedPrimaryTimingProper
 }
 def hordeStagedPrimaryTiming = hordeStagedPrimaryTimingProperty == 'true'
 if (hordeStagedPrimaryShaderDirProperty != null) {
-    if (!hordeBenchmarkValidation) {
-        throw new GradleException('hordeStagedPrimaryShaderDir requires hordeBenchmarkValidation=true.')
+    if (!hordeBenchmarkValidation && !hordeStagedPrimaryDebugValidation) {
+        throw new GradleException('hordeStagedPrimaryShaderDir requires explicit benchmark or diagnostic Debug investigation validation.')
     }
     if (hordeStagedPrimaryShaderDirProperty.isEmpty() ||
         hordeStagedPrimaryShaderDirProperty != hordeStagedPrimaryShaderDirProperty.trim() ||
@@ -90,7 +98,26 @@ if (hordeStagedPrimaryShaderDirProperty != null) {
     if (!stagedPrimaryDirectory.isDirectory() || !stagedPrimaryHeader.isFile() || stagedPrimaryHeader.length() == 0) {
         throw new GradleException('hordeStagedPrimaryShaderDir must contain a non-empty StagedPrimaryShaders.generated.h.')
     }
+    def stagedPrimaryManifestFile = new File(stagedPrimaryDirectory, 'staged-primary-manifest.json')
+    if (!stagedPrimaryManifestFile.isFile()) {
+        throw new GradleException('Staged investigation artifacts require their compiler/validation manifest.')
+    }
+    def stagedPrimaryManifest = new JsonSlurper().parse(stagedPrimaryManifestFile, 'UTF-8')
+    def expectedInstrumentation = hordeStagedPrimaryDebugValidation ? 'Diagnostic' : 'Shipping'
+    def expectedPasses = ['GenericDielectric:primary', 'GenericDielectric:shade', 'OpaqueFast:primary', 'OpaqueFast:shade']
+    if (stagedPrimaryManifest.schema != 1 ||
+        stagedPrimaryManifest.classification != 'investigation-only-staged-primary' ||
+        stagedPrimaryManifest.instrumentation != expectedInstrumentation || stagedPrimaryManifest.quality != 'Mobile' ||
+        stagedPrimaryManifest.stage != 'rgen' || !(stagedPrimaryManifest.modules instanceof List) ||
+        stagedPrimaryManifest.modules.size() != 4 ||
+        stagedPrimaryManifest.modules.collect { "${it.material}:${it.pass}".toString() }.sort() != expectedPasses) {
+        throw new GradleException("Staged investigation requires the exact ${expectedInstrumentation}/Mobile four-pass manifest.")
+    }
     hordeStagedPrimaryShaderDir = stagedPrimaryDirectory.absolutePath
+}
+if (hordeStagedPrimaryDebugValidation && (!hordeStagedPrimaryShaderDir ||
+    hordeRtInstrumentationOverride != null || hordeRtDielectricQualityOverride != null)) {
+    throw new GradleException('Staged Debug validation requires explicit Diagnostic/Mobile artifacts and the normal Debug shader policy, without policy overrides.')
 }
 if (hordeStagedPrimaryTiming && (!hordeBenchmarkValidation || !hordeStagedPrimaryShaderDir)) {
     throw new GradleException('hordeStagedPrimaryTiming=true requires the explicit staged benchmark shader directory.')
@@ -128,11 +155,19 @@ def hordeRtBenchmarkStagedPrimaryArguments = [
     "-DHORDE_RT_STAGED_PRIMARY_DEFAULT=${hordeStagedPrimaryShaderDir ? 'ON' : 'OFF'}",
     "-DHORDE_RT_STAGED_PRIMARY_TIMING=${hordeStagedPrimaryTiming ? 'ON' : 'OFF'}"
 ]
+def hordeRtDebugStagedPrimaryArguments = hordeStagedPrimaryDebugValidation ? [
+    "-DHORDE_RT_STAGED_PRIMARY_SHADER_DIR=${hordeStagedPrimaryShaderDir}",
+    '-DHORDE_RT_STAGED_PRIMARY_DEFAULT=ON',
+    '-DHORDE_RT_STAGED_PRIMARY_TIMING=OFF'
+] : []
 
 // Explicit local-only asset experiment. Release and ordinary Debug never consume
 // this overlay, and its separate application id prevents stale private-file assets.
 def viewmodelCandidatePath = providers.gradleProperty('hordeViewmodelCandidateDir').orNull
 def viewmodelCandidate = viewmodelCandidatePath ? file(viewmodelCandidatePath).canonicalFile : null
+if (hordeStagedPrimaryDebugValidation && viewmodelCandidate) {
+    throw new GradleException('Staged execution investigation must preserve the accepted player assets, not a viewmodel asset overlay.')
+}
 def viewmodelOverlayDir = layout.buildDirectory.dir('generated/viewmodelCandidateAssets')
 def viewmodelReceipt = viewmodelCandidate ? new JsonSlurper().parse(
     new File(viewmodelCandidate, 'viewmodel-processing.json'), 'UTF-8') : null
@@ -348,16 +383,18 @@ android {
 
     buildTypes {
         debug {
-            applicationIdSuffix viewmodelCandidate ? '.debug.viewmodel' : '.debug'
+            applicationIdSuffix hordeStagedPrimaryDebugValidation ? '.debug.staged' : (viewmodelCandidate ? '.debug.viewmodel' : '.debug')
             buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', viewmodelCandidate ? 'true' : 'false'
             if (viewmodelCandidate) resValue 'string', 'app_name', 'Horde RT Viewmodel Candidate'
+            if (hordeStagedPrimaryDebugValidation) resValue 'string', 'app_name', 'Horde RT Staged Investigation'
             versionNameSuffix '-debug'
             minifyEnabled false
             externalNativeBuild {
                 cmake {
                     arguments '-DHORDE_RT_DEBUG_CHECKPOINTS=ON',
                         "-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=${viewmodelCandidate ? 'ON' : 'OFF'}",
-                        *hordeRtNativePolicyArguments('Diagnostic')
+                        *hordeRtNativePolicyArguments('Diagnostic'),
+                        *hordeRtDebugStagedPrimaryArguments
                 }
             }
         }
@@ -425,12 +462,13 @@ if (viewmodelCandidate) {
 // It intentionally reports the CMake arguments without configuring native code.
 tasks.register('printHordeRtPolicyForTest') {
     doLast {
-        println("debug=" + hordeRtNativePolicyArguments('Diagnostic').join('|'))
+        println("debug=" + (hordeRtNativePolicyArguments('Diagnostic') + hordeRtDebugStagedPrimaryArguments).join('|'))
         println("release=" + hordeRtNativePolicyArguments('Shipping').join('|'))
         println("benchmark=" + (hordeBenchmarkValidation
             ? (hordeRtNativePolicyArguments('Shipping') + hordeRtBenchmarkStagedPrimaryArguments).join('|')
             : 'unavailable; set hordeBenchmarkValidation=true'))
         println("benchmarkValidation=${hordeBenchmarkValidation}")
+        println("stagedPrimaryDebugValidation=${hordeStagedPrimaryDebugValidation}")
         println("stagedPrimaryShaderDir=${hordeStagedPrimaryShaderDir ?: ''}")
     }
 }

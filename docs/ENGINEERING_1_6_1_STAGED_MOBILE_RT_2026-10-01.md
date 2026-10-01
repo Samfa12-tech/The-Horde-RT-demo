@@ -267,18 +267,45 @@ telemetry or scheduling framework.
   It is an isolated development benchmark, not an installed/accepted phone build.
   [Observer evidence](evidence/2026-10-01-staged-primary-profile/README.md) preserves
   runtime identity, image proof, build inputs and exact profiled-binary inspection.
-- Phone unavailable; no device action or counter discovery performed.
+- Optional observer `59cb057` is pushed, exact push36807823930/PR36807828168
+  SUCCESS: GCC/Clang/MSVC55/55 and focused Vulkan CPU-host15/15 on both events.
+  Synthetic integration17f31fe uses exact59cb057/basebda1b99. These validate the
+  committed observer checkpoint, not subsequent Android admission changes.
+- Bounded Diagnostic/High RTX supplement is complete:15 pairs preserve images,
+  unchanged maxRGB3/fraction0.001, two focused PNGs byte-identical. Comparator
+  timing FAIL +76.918% is retained separately (candidate observer ON/control OFF,
+  fresh-process Debug captures, not matched performance). Do not repeat it.
+- Normal Shipping/Mobile control `8ead0a2ba632ba490027ee8806d7e135002fb09713fad14390fcd2186a5bf175`
+  builds4ABIs and passes the unchanged four-module package inspector. Its70
+  runtime assets exactly match both retained staged Shipping candidates.
+- Diagnostic phone admission is now explicit, isolated `.debug.staged`, with
+  immutable APK/Diagnostic-Mobile manifest and unchanged player assets; wrong
+  policy/backend/hash/overlay/implicit selection fail closed. Candidate APK
+  `db125b80210753a9b1e50bdf51cbb5a923036d13280db346b3190f13f4afc299`
+  builds4ABIs. Actual ARM64 eight-module containment and Vulkan1.2 validation/
+  disassembly PASS, with Diagnostic counters retained. Eleven real Gradle probes
+  and26 host admission assertions (PS7/5.1) PASS; admission/character-slot CTest2/2
+  PASS after updating a demonstrated stale pause-adapter assertion, not runtime
+  code. [Receipts](evidence/2026-10-01-staged-primary-admission/README.md).
+- Normal Diagnostic/Mobile Debug control is retained at
+  `581ea4668967458c000162da9c3eb722cd5e69719f069b80aa79591cebcc066a`:
+  four-ABI build PASS, staged/timing OFF in actual caches,70 runtime assets match
+  staged Debug and Shipping control. This justified policy-switch build is done;
+  no rebuilding either Debug APK just to change metadata.
+- Owner has made the phone available and deferred music listening. ADB confirms
+  authorised serial/modelSM-S948B; raw Perfetto service query is retained privately.
+  Exact descriptor decoding and physical/image admission are next, not yet passes.
 
 ### Next unfinished step
 
-Review/push the optional observer slice and obtain fresh current-source CI;
-complete the bounded High Windows supplement (13standard+production/tinted,
-separate identities), not another Mobile matrix. Prepare the normal Shipping
-control alongside the retained untimed candidate and separately profiled APK.
-Do not rebuild unchanged artifacts absent a recorded compiled-source/policy change.
-On phone reconnection: discover the exact counter roster once; admit image and
-known physical/live-motion gates first, then execute the fixed75% warm Shipping
-ABBA matrix, with separate RAM/counter/profile runs if observers perturb timing.
+Review/push the diagnostic admission slice and obtain fresh current-source CI.
+Normal Diagnostic control is prepared; admit exact-phone image/physical fixtures
+using the two retained Debug APKs. Windows Mobile/High matrices and Shipping artifacts are
+complete; do not repeat/rebuild them without a specific validity problem.
+Decode the retained raw counter roster once, preserving unavailable-counter gaps;
+then execute the fixed75% warm Shipping ABBA matrix, with separate RAM/counter/
+profile runs if observers perturb timing. Known control physical failures stay
+open independently of execution-equivalence/performance evidence.
 Keep total-frame/GPU/pass/actual allocation/logical traffic and unavailable hardware
 counters separate. Record each finished trial and next unfinished row here.
 The desktop negative result warrants caution, not a claim of phone behaviour;
