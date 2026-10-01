@@ -132,6 +132,8 @@ tools/music-instrumentation-core-check/* -text whitespace=cr-at-eol
 docs/evidence/2026-10-01-music-whistle-bank/** -text whitespace=cr-at-eol
 # Retain raw compiler/Gradle log spaces byte-for-byte, not source formatting.
 docs/evidence/2026-10-01-music-whistle-bank/**/*.log whitespace=-blank-at-eol,cr-at-eol
+docs/evidence/2026-10-01-music-whistle-phone/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-01-music-whistle-phone/**/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
 
 # Exact compiler-treatment investigation receipts; not Shipping artifacts.
 docs/evidence/2026-10-01-opaque-compiler/** -text whitespace=cr-at-eol

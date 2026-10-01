@@ -1,0 +1,24 @@
+{
+  "sourceHead": "97f07e2a5791346f2b4563221909a87ab5948086",
+  "sourceWorkingTreeDirty": true,
+  "canonicalSourceDiffEmpty": true,
+  "retryReason": "First restoration wrote validated bytes, then rejected Git status reporting checkout-only newline changes. Normalized exact blob comparison and git diff both pass.",
+  "manifests": [
+    {
+      "path": "assets/models/player/runtime/clip-manifest.json",
+      "beforeSha256": "c53fd3a4c5d9e9095c683b2062a9e3c7c53662c3440d8980fe3c71d3bad400a1",
+      "acceptedBytes": 1008,
+      "restoredSha256": "c53fd3a4c5d9e9095c683b2062a9e3c7c53662c3440d8980fe3c71d3bad400a1",
+      "canonicalGitSourceUnchanged": true,
+      "change": "Checkout-only line-ending restoration from accepted C11 APK"
+    },
+    {
+      "path": "assets/models/player/viewmodel/runtime/asset.manifest.json",
+      "beforeSha256": "e90020ba31fe22d888e3db02ad4a6bc830c015ea9e03fbccc83c2d4517bdcbe6",
+      "acceptedBytes": 985,
+      "restoredSha256": "e90020ba31fe22d888e3db02ad4a6bc830c015ea9e03fbccc83c2d4517bdcbe6",
+      "canonicalGitSourceUnchanged": true,
+      "change": "Checkout-only line-ending restoration from accepted C11 APK"
+    }
+  ]
+}

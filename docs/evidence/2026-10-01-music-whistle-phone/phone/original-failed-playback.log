@@ -1,0 +1,12 @@
+--------- beginning of main
+10-01 16:40:43.416  7141  7312 I HordeLanternMusic: PCM ready48k stereo; queue capacity=1440frames (not assumed30ms)
+10-01 16:40:54.959  7141  7312 I HordeLanternMusic: Music epoch=1; discarded prior-session PCM
+10-01 16:42:14.313  7141  7312 I HordeLanternMusic: Music progress epoch=1 periods=1 generated=576480 accepted=576480 deviceHeadObserved=576000 capacity=1440 underruns=400
+10-01 16:42:30.314  7141  7312 I HordeLanternMusic: Music progress epoch=1 periods=2 generated=1152480 accepted=1152480 deviceHeadObserved=1152000 capacity=1440 underruns=800
+10-01 16:42:46.314  7141  7312 I HordeLanternMusic: Music progress epoch=1 periods=3 generated=1728480 accepted=1728480 deviceHeadObserved=1728000 capacity=1440 underruns=1200
+10-01 16:43:02.316  7141  7312 I HordeLanternMusic: Music progress epoch=1 periods=4 generated=2304480 accepted=2304480 deviceHeadObserved=2304000 capacity=1440 underruns=1600
+10-01 16:43:18.315  7141  7312 I HordeLanternMusic: Music progress epoch=1 periods=5 generated=2880480 accepted=2880480 deviceHeadObserved=2880000 capacity=1440 underruns=2000
+10-01 16:43:39.934  7141  7312 I HordeLanternMusic: Music progress epoch=1 periods=6 generated=3456480 accepted=3456480 deviceHeadObserved=3456000 capacity=1440 underruns=2399
+10-01 16:43:55.935  7141  7312 I HordeLanternMusic: Music progress epoch=1 periods=7 generated=4032480 accepted=4032480 deviceHeadObserved=4032000 capacity=1440 underruns=2799
+10-01 16:44:11.939  7141  7312 I HordeLanternMusic: Music progress epoch=1 periods=8 generated=4608480 accepted=4608480 deviceHeadObserved=4608000 capacity=1440 underruns=3199
+10-01 16:44:46.872  7141  7312 I HordeLanternMusic: Music stop requested; epoch=1 generated=5150880 accepted=5150880 deviceHeadObserved=5149440 capacity=1440 underruns=3575

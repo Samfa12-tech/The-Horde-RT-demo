@@ -11,6 +11,7 @@ import android.util.Log;
 final class HordeMusicPlayback implements AutoCloseable {
     private static final String TAG = "HordeLanternMusic";
     private static final int FRAMES = 480;
+    private static final int MAX_BUFFER_FRAMES = 12000; // 250ms maximum, music only; SFX independent.
     private final Object controlLock = new Object();
     private final AssetManager assets;
     private final Thread worker;
@@ -63,6 +64,27 @@ final class HordeMusicPlayback implements AutoCloseable {
     private void waitForControl() throws InterruptedException {
         synchronized (controlLock) { if (!stopped) controlLock.wait(5L); }
     }
+    // Package-visible construction seam: Android's PCM sink, not Core mixing.
+    static AudioTrack createOutput(int minimumBytes) {
+        if (minimumBytes <= 0 || minimumBytes > MAX_BUFFER_FRAMES * 8)
+            throw new IllegalArgumentException("PCM minimum buffer unavailable or exceeds250ms bound");
+        // getMinBufferSize is a creation estimate, not permission to shrink the
+        // constructed sink. Its actual allocation may be larger on the device.
+        return new AudioTrack.Builder()
+                .setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_GAME)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build())
+                .setAudioFormat(new AudioFormat.Builder().setSampleRate(48000)
+                        .setEncoding(AudioFormat.ENCODING_PCM_FLOAT)
+                        .setChannelMask(AudioFormat.CHANNEL_OUT_STEREO).build())
+                .setTransferMode(AudioTrack.MODE_STREAM)
+                .setBufferSizeInBytes(Math.max(minimumBytes, FRAMES * 3 * 8)).build();
+    }
+    static int queueCapacityFrames(AudioTrack output, int minimumBytes) {
+        final int frames = output.getBufferSizeInFrames();
+        if (frames <= 0 || frames > MAX_BUFFER_FRAMES || (long) frames * 8 < minimumBytes)
+            throw new IllegalStateException("PCM queue outside platform minimum/250ms bound: " + frames);
+        return frames;
+    }
     private void run() {
         long nativeHandle = 0L;
         AudioTrack output = null;
@@ -72,19 +94,14 @@ final class HordeMusicPlayback implements AutoCloseable {
             final int minimumBytes = AudioTrack.getMinBufferSize(48000,
                     AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_FLOAT);
             if (minimumBytes <= 0) throw new IllegalStateException("PCM48k stereo float unsupported: " + minimumBytes);
-            output = new AudioTrack.Builder()
-                    .setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_GAME)
-                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build())
-                    .setAudioFormat(new AudioFormat.Builder().setSampleRate(48000)
-                            .setEncoding(AudioFormat.ENCODING_PCM_FLOAT)
-                            .setChannelMask(AudioFormat.CHANNEL_OUT_STEREO).build())
-                    .setTransferMode(AudioTrack.MODE_STREAM)
-                    .setBufferSizeInBytes(Math.max(minimumBytes, FRAMES * 3 * 8)).build();
+            output = createOutput(minimumBytes);
             if (output.getState() != AudioTrack.STATE_INITIALIZED) throw new IllegalStateException("PCM output not initialized");
-            final int capacity = output.setBufferSizeInFrames(FRAMES * 3);
-            if (capacity <= 0) throw new IllegalStateException("PCM queue bound rejected: " + capacity);
+            final int capacity = queueCapacityFrames(output, minimumBytes);
             int appliedVolume = -1;
-            Log.i(TAG, "PCM ready48k stereo; queue capacity=" + capacity + "frames (not assumed30ms)");
+            Log.i(TAG, "PCM ready48k stereo; queue capacity=" + capacity +
+                    "frames minimumBytes=" + minimumBytes +
+                    " allocatedFrames=" + output.getBufferCapacityInFrames() +
+                    " sampleRate=" + output.getSampleRate());
             final float[] pcm = new float[FRAMES * 2];
             final long[] control = new long[4]; // available, restartEpoch, suspended, generatedFrames
             long epoch = -1L, submitted = 0L, rawPrevious = 0L, wraps = 0L, consumed = 0L;

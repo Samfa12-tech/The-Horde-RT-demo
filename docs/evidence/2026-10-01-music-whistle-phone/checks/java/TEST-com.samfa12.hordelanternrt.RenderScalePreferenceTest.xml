@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.samfa12.hordelanternrt.RenderScalePreferenceTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-01T06:52:01" hostname="SAM_LAPPY" time="0.148">
+  <properties/>
+  <testcase name="unsetPreferenceUsesTheMobileDefault" classname="com.samfa12.hordelanternrt.RenderScalePreferenceTest" time="0.063"/>
+  <testcase name="explicitSavedPreferenceIsPreserved" classname="com.samfa12.hordelanternrt.RenderScalePreferenceTest" time="0.032"/>
+  <testcase name="runtimeSliderSelectionPersistsForTheNextRead" classname="com.samfa12.hordelanternrt.RenderScalePreferenceTest" time="0.053"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

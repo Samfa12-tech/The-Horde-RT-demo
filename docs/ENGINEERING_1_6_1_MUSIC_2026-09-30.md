@@ -1,8 +1,9 @@
 # What the Dark Keeps: shared resolver checkpoint
 
 Status: Core-backed Windows/Android playback and independent persisted volume
-implemented; exact-phone playback, loop/lifecycle and owner listening acceptance
-**not complete**. Historical checkpoints below retain their original scope.
+implemented; exact-S26 rate/crackle/timbre listening **accepted**, longer-loop,
+lifecycle/focus and full route/SFX balance **not complete**. Historical checkpoints
+below retain their original scope.
 Source: owner-supplied `What_the_Dark_Keeps_Horde_RT_Music_Pack.zip`, SHA-256
 `e28e5936189919fed25f6208dd7a8b97172eb5f7d25f69732cc7339c45f386fa`.
 Owner explicitly confirmed: **Owner-supplied; authorised for Horde use only**.
@@ -19,12 +20,20 @@ the other six cues are rendered once. Revised canonical JSON/PCS1, sixteen
 runtime derivatives and matching manifest/pins are admitted locally with the
 same notes/timings/frame lengths and20,160,000-byte decoded PCM bank. Original
 reference remains in Git/evidence. Objective schedule/format/headroom, Core
-sample-clock and Android asset-staging checks pass; actual-game listening and
-native/device acceptance remain open. Read the [finite record](ENGINEERING_1_6_1_MUSIC_INSTRUMENTATION_2026-10-01.md)
+sample-clock and Android asset-staging checks pass; remaining device gates are
+listed below. Read the [finite record](ENGINEERING_1_6_1_MUSIC_INSTRUMENTATION_2026-10-01.md)
 and [bank evidence](evidence/2026-10-01-music-whistle-bank/README.md) before resumption.
-Next is exact-game listening when the owner is ready; do not repeat auditions,
-rerender unchanged cues or use the non-equivalent Core/WAV renderer. Pocket DAW
-MCP/UI is off-limits while the owner fixes it. No device actions in this slice.
+Owner exact-S26 listening accepts instrumentation/cue sequencing but rejects
+6f1be881's slow/crackly playback; native1440-frame cap gives400 underruns/12s
+content played in16s wall. Android-only35ec7e46 removes the post-creation cap,
+uses bounded actual5766-frame queue, first two periods12.002s/no underruns.
+Java24/24, build/lint/package PASS; owner: **"Music sounds perfect now"**. Six
+underrun-free periods; controlled run interrupted by owner closure, announced run
+by death-overlay suspension after one period. Idle opening is not a safe long-test
+state; do not repeat it. Twenty-period/lifecycle/audio-focus gates remain open.
+[Single phone record](evidence/2026-10-01-music-whistle-phone/README.md)
+owns remaining evidence. Do not rerender or change tempo. S26/DAW available;
+no further DAW use needed. Non-equivalent Core/WAV renderer stays prohibited.
 Manual music listening:YES; no haptic/SFX-event implementation changes.
 
 ## Native playback checkpoint - October 1

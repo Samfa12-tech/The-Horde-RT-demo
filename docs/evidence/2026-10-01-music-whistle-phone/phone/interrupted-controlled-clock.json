@@ -1,0 +1,27 @@
+{
+  "status": "INCOMPLETE-Activity-teardown-before-twenty-periods",
+  "exactModel": "SM-S948B",
+  "serial": "R5GL219SZGK",
+  "process": 17073,
+  "apkSha256": "35ec7e46b12a55474ad66f11509a1aa4566e2f25d86d6c34992a4a5ee18058d6",
+  "requiredPeriods": 20,
+  "observedPeriods": 1,
+  "stopObserved": true,
+  "rows": [
+    {
+      "time": "10-01 17:06:14.159",
+      "epoch": 1,
+      "period": 1,
+      "generated": 580320,
+      "accepted": 580320,
+      "head": 576000,
+      "capacity": 5766,
+      "underruns": 0
+    }
+  ],
+  "ownerReported": "Music sounds perfect now",
+  "twentyPeriodAcceptance": false,
+  "lifecycleAcceptance": false,
+  "nextUnfinishedStep": "Uninterrupted normal quiet-opening twenty-period run, then affected pause/Home/resume and audio focus. Do not repeat completed renders/tests.",
+  "logSha256": "9f65b2a73c4c1373f37cf53ed53756a47c6a5a9ecf7ef8280c8167b44783ce49"
+}

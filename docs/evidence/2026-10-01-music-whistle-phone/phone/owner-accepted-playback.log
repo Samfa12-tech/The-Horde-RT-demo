@@ -1,0 +1,10 @@
+--------- beginning of main
+10-01 16:55:55.748 12876 12962 I HordeLanternMusic: PCM ready48k stereo; queue capacity=5766frames minimumBytes=46128 allocatedFrames=5766 sampleRate=48000
+10-01 16:56:07.587 12876 12962 I HordeLanternMusic: Music epoch=1; discarded prior-session PCM
+10-01 16:57:48.023 12876 12962 I HordeLanternMusic: Music progress epoch=1 periods=1 generated=580320 accepted=580320 deviceHeadObserved=576000 capacity=5766 underruns=0
+10-01 16:58:00.025 12876 12962 I HordeLanternMusic: Music progress epoch=1 periods=2 generated=1156320 accepted=1156320 deviceHeadObserved=1152000 capacity=5766 underruns=0
+10-01 16:58:12.024 12876 12962 I HordeLanternMusic: Music progress epoch=1 periods=3 generated=1732320 accepted=1732320 deviceHeadObserved=1728000 capacity=5766 underruns=0
+10-01 16:58:24.024 12876 12962 I HordeLanternMusic: Music progress epoch=1 periods=4 generated=2308320 accepted=2308320 deviceHeadObserved=2304000 capacity=5766 underruns=0
+10-01 16:58:36.026 12876 12962 I HordeLanternMusic: Music progress epoch=1 periods=5 generated=2884320 accepted=2884320 deviceHeadObserved=2880000 capacity=5766 underruns=0
+10-01 16:58:48.025 12876 12962 I HordeLanternMusic: Music progress epoch=1 periods=6 generated=3460320 accepted=3460320 deviceHeadObserved=3456000 capacity=5766 underruns=0
+10-01 16:59:56.213 12876 12962 I HordeLanternMusic: Music stop requested; epoch=1 generated=3719520 accepted=3719046 deviceHeadObserved=3713280 capacity=5766 underruns=0

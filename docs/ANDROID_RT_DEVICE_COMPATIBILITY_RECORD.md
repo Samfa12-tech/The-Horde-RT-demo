@@ -1069,6 +1069,35 @@ Candidate admission remains NO-GO, cause unproven. Normal Shipping benchmark
 retained, phone Home. Restoration only: no new Shipping RT/performance/music
 acceptance. Matched timing/RAM remain held by image gate.
 
+## October 1, 2026 - S26 whistle-bank listening and music sink correction
+
+Exact **SM-S948B**, serialR5GL219SZGK. Fresh identity, actual Debug package
+installation/pullback and owner gameplay/listening evidence; not S24/S25 proof.
+Normal75%/Mobile, Music70/default, data/system volume preserved. No frozen
+checkpoint or benchmark used for listening; primary-hit experiment excluded.
+
+Original6f1be881…dc595 owner accepts instruments/cue sequencing but rejects
+slow/glitchy/crackly output. AudioTrack1440-frame cap produces roughly400
+underruns per576000 consumed frames;12s content takes16s wall. Negative evidence
+retained. Owner ordinary-gameplay performance acceptable until lantern chugging
+is a subjective workload report, not matched warm Shipping or a new FPS result.
+
+Candidate35ec7e46…058d6 installs/pulls byte-exactly. Android-only sink correction
+keeps the constructed platform buffer rather than shrinking it, actual5766frames
+(120.125ms)/48kHz, fail-closed250ms maximum. All4 native libraries and52 old
+render/SFX asset hashes unchanged; actual4 ARM64 RT modules validate. Java24/24,
+build/lint/package pass. First two12s consumed periods12.002s/zero underruns;
+six periods stay underrun-free; controlled long run closes after one (owner
+confirms closing it). Announced follow-up reaches **YOU FELL** after one period;
+death-overlay music suspension makes idle opening unsuitable for the long gate,
+not an audio failure. Twenty-period/lifecycle/audio-focus gates remain open. Owner on this
+candidate: **"Music sounds perfect now"**. This accepts perceived rate/crackles
+and selected timbre, not all route/SFX masking, audio-focus or release gates.
+[Single exact-artifact phone record](evidence/2026-10-01-music-whistle-phone/README.md)
+owns completed checks and the next unfinished step. No glass/Shipping-performance
+or other-device acceptance. Audio/haptic manual revalidation required: **YES**
+for playback change; exact-candidate owner rate/crackle check now passes.
+
 ## Research sources
 
 - [Android NDK stable APIs - Vulkan runtime capability guidance](https://developer.android.com/ndk/guides/stable_apis)

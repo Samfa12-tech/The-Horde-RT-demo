@@ -78,18 +78,28 @@ closed on partial assets, with original bytes recoverable. `runtimeNotChanged`
 in historical prepare/verify receipts describes those pre-admission steps;
 `admission.json` establishes the later local change.
 
+At bank checkpoint97f07e2, fresh push36823996776 and PR36824003880 each pass
+GCC55/55,Clang55/55,MSVC56/56 and focused Vulkan CPU-host15/15. Actual eight job
+logs inspected; synthetic integrationf528ce88 has exactbda1b99/97f07e2 parents
+and the identical head tree. Compiler evidence is not device/audio acceptance.
+
 No new Windows audio endpoint, phone run, native consumed-clock, physical RT,
 memory/pacing or renderer/backend acceptance. Unfinished primary-hit diagnostic
 work and unrelated scratch remain outside this commit. No merge/publication.
 
 ## Next unfinished gate
 
-When the owner is ready, install/run an exact candidate and listen at normal70%
-Music Volume through exploration, torch pickup, combat, lich and dawn/finale.
+Exact-S26 instrumentation/cue preference is accepted, but first6f1be881 phone
+playback is slow/crackly and rejected. The Android-only35ec7e46 bounded-buffer
+candidate is installed; its [separate finite phone record](../2026-10-01-music-whistle-phone/README.md)
+owns consumed-clock/lifecycle and owner recheck. Normal70% Music Volume through
+exploration, torch pickup, combat, lich and dawn/finale still needs final balance.
 Check repeated loops, transitions, warning/hit audibility, separate persisted
 volume, pause/focus/background/resume and native-clock/underrun diagnostics.
-Do not ask for S24 now: its glass gate remains separate and this slice needs no
-phone. **Do not use Pocket DAW MCP/UI while the owner fixes its glitch.**
+Do not ask for S24 now: its glass gate remains separate. S26/DAW are available;
+no further DAW use is needed. New device
+checks belong in a separate exact-artifact listening record, not this historical
+offline receipt manifest.
 
 Audio/haptic manual revalidation required: **YES** for changed audible music
 assets/timbre/balance. Existing SFX event authority and haptic implementation are

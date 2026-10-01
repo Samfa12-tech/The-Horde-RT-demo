@@ -2,7 +2,8 @@
 
 Status: owner selected **whistle-lead** after both comparisons. Full-bank
 instrumentation admitted locally; objective source/PCM/Core/package checks pass.
-Exact-game listening, audible loops/transitions and SFX masking remain open.
+Exact-S26 rate/crackle/timbre listening accepted; longer-loop, lifecycle/focus,
+full cue-route/transitions and SFX masking remain open.
 Owner steering: preserve the composition and gameplay/cue timing; replace the
 sci-fi instrumental character with an intimate, ancient, mournful palette.
 No paid generation, shared-preset edits, renderer/gameplay changes or publication.
@@ -95,11 +96,21 @@ not an OS/device-played clock or perceptual acceptance. Failed schema-projection
 silent-tail and compile checks are preserved alongside corrected results.
 [Exact bank evidence and limits](evidence/2026-10-01-music-whistle-bank/README.md).
 
-**Next: exact-game listening when the owner is ready**, normal Music Volume70,
-exploration/torch/combat/lich/finale, loop transitions and warning/SFX clarity,
-then affected native-clock/pause/focus/resume checks. Do not repeat completed
-auditions or rerender unchanged cues. Owner is fixing Pocket DAW: **do not use
-its MCP/UI** until that restriction is lifted. No new phone installation here.
+Owner exact-S26 listening on6f1be881 accepts instruments and cue sequencing,
+but rejects slow/crackly output. Native1440-frame cap underruns roughly400 times
+per576000 consumed frames, taking16s wall for12s content. Keep this negative
+result; do not rerender or change tempo. Android sink candidate35ec7e46 removes
+post-creation shrink and uses bounded actual platform buffer (5766frames here);
+first two periods12.002s/zero underruns, full Java24/24 and build/lint/package
+PASS. [Finite phone record](evidence/2026-10-01-music-whistle-phone/README.md)
+records owner's **"Music sounds perfect now"** and six underrun-free periods.
+Separate controlled long run is interrupted after one period; twenty-period/
+lifecycle, full route/SFX balance, audio focus and final acceptance remain open.
+Owner confirms closing that check. Announced follow-up reaches the death overlay,
+which suspends music after one underrun-free period; this is not an audio failure.
+Do not repeat the unsafe idle-opening setup. Use a legitimate safe unpaused live
+state for the unfinished long gate; raw incomplete receipts/UI remain retained.
+S26/DAW available; no further DAW use needed. Dirty renderer/scratch preserved.
 Uncommitted diagnostic primary-hit work and unrelated scratch are preserved.
 
 Audio/haptic manual revalidation required: **YES** for the changed music timbre/

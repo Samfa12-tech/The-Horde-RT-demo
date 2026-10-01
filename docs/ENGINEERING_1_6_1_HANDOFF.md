@@ -13,7 +13,7 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
-### October 1 instrumentation - selected whistle bank admitted locally
+### October 1 instrumentation - selected whistle bank and S26 playback correction
 
 The owner requests a bounded dark-fantasy instrumental pass, not a new score or
 renderer/gameplay work. Read the [single audition record](ENGINEERING_1_6_1_MUSIC_INSTRUMENTATION_2026-10-01.md)
@@ -39,14 +39,35 @@ decoder regression covers it without dropping strict format/hash/frame gates.
 MSVC Debug/Release real-WAV+bank2/2 each PASS; production Core offline loops/
 transitions plus six-new-cue supplement PASS; Android verify/stage assets SUCCESS.
 [Bank receipts/known limits](evidence/2026-10-01-music-whistle-bank/README.md)
-preserve earlier failed checks and exact producers. Audition checkpointa1c90bb
-push36820045325/PR36820050128 freshly green (GCC/Clang55,MSVC56,focused15);
-new bank commit requires its own CI. No phone/OS-played-clock acceptance here.
-**Next music gate:** exact-game listening when owner ready, normal70% music,
-loops/transitions and SFX clarity, then affected native clock/lifecycle. Do not
-repeat completed renders. **Do not use Pocket DAW MCP/UI** while owner fixes it;
-unsaved project untouched. Audio/haptic manual:YES for audible assets/mix;
-no SFX/haptic implementation changes, phone install or publication.
+preserve earlier failed checks and exact producers. Bank checkpoint97f07e2
+push36823996776/PR36824003880 are freshly green: GCC55/55,Clang55/55,MSVC56/56,
+focused Vulkan CPU-host15/15 each; actual eight job logs inspected. PR integration
+f528ce88 has exactbda1b99/97f07e2 parents and the head tree. Do not rerun completed
+renders/tests merely on resumption. Exact S26 APK6f1be881 installed/pulled back:
+owner accepts instrument colours/cue sequence but rejects slow/crackly playback.
+Device queue1440frames;12s content takes16s, about400 underruns per period.
+The bounded Android-only correction removes the post-creation30ms shrink,
+uses actual OEM queue and retains partial-write/worker cleanup,250ms fail-closed
+maximum. Full Java24/24PASS; fresh build/lint and strict old-asset/music/module
+package gates PASS. Candidate35ec7e46 installed byte-exactly; minimum/effective
+5766frames/120.125ms, first two consumed periods12.002s and zero underruns.
+Owner on35ec7e46: **"Music sounds perfect now"**; rate/crackle/timbre check passes.
+Six consumed periods remain underrun-free. The separate controlled long run
+closes after one period; its receipt is INCOMPLETE, not twenty-period acceptance.
+Owner confirms closing that check because its purpose was unclear. The announced
+follow-up also reaches only one period, but fresh UI proves **YOU FELL** and normal
+death-overlay music suspension, not a sink regression. Retain both incomplete
+receipts; do not repeat unsafe idle-opening tests or alter enemies to pass them.
+**Next music gate:** twenty uninterrupted periods in a legitimate safe unpaused
+live state, then affected lifecycle/audio-focus and remaining route/SFX balance.
+Do not repeat accepted rate/timbre listening, renders or unchanged builds. The single
+[phone record](evidence/2026-10-01-music-whistle-phone/README.md) owns results/next
+step. Do not include dirty renderer work or rerender unchanged cues. DAW is now
+available but unnecessary; retained v68 route stays authoritative. Unsaved
+project untouched. Owner observes ordinary gameplay acceptable until lantern
+chugging; not a new Shipping performance comparison or glass acceptance.
+Audio/haptic manual:YES for audible assets/mix;
+no SFX/haptic implementation changes or publication.
 Unfinished primary-hit probe and unrelated scratch remain preserved, uncommitted;
 this side slice does not close glass or reduce the agreed programme scope.
 
