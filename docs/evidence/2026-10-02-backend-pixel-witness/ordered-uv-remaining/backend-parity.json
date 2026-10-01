@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "candidate": "36c9ec5ad1945a0c2df9b84a50fed58bb9c67ad0",
+  "payloadRows": 5,
+  "toleranceMaximum": 3,
+  "toleranceFraction": 0.001,
+  "records": [
+    {
+      "file": "02-worst-bend.png",
+      "pipelineSha256": "d853f8c139c9bdaf5d09e242dfccd4511ff480d18305660f3c5846f5b1e78bc4",
+      "computeSha256": "db591a71851ff64ab0aacdfefd93dc20cacdea767eb71f392b8e3539046db036",
+      "comparison": {
+        "maximumChannelDifference": 1,
+        "pixelsDifferentByMoreThanOne": 0,
+        "differentFraction": 0.0,
+        "unchangedGate": true,
+        "outliers": []
+      }
+    },
+    {
+      "file": "11-finale-roof.png",
+      "pipelineSha256": "75c8b2e143fe15db79bfc268b53d0ebec318658ad7ba28509a4ad104705a6ec2",
+      "computeSha256": "34276d593f19be7a17e23acb2a9517e9bcb0a86b9175a33106127d256b8da096",
+      "comparison": {
+        "maximumChannelDifference": 3,
+        "pixelsDifferentByMoreThanOne": 2,
+        "differentFraction": 3.894080996884735E-06,
+        "unchangedGate": true,
+        "outliers": []
+      }
+    }
+  ]
+}

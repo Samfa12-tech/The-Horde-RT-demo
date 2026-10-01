@@ -376,3 +376,45 @@ promotion. No precision sweep, phone action, main merge, release or publication.
 
 Audio/haptic manual revalidation required:NO: UV arithmetic only; gameplay,
 event-time/listener/PCM/haptic inputs unchanged.
+
+## Remaining ordered-UV reflection scenes (completed; clean admission next)
+
+Source `36c9ec5ad1945a0c2df9b84a50fed58bb9c67ad0` changes only the isolated
+capture roster/manifest and comparison scripts to checkpoints2,11. Shader source,
+actual embedded modules and generated catalogs remain unchanged from877f567;
+no shader recompilation or completed checkpoint12/control rerun was performed.
+Fresh native app build PASS; exact executable SHA-256
+`ee024233a2e27021246b1403814e582e91b2277060a14fa911d70a3ec798b60b`.
+The unchanged shader/test candidate retains fresh Debug/Release1/1 evidence
+above; this harness-only step does not claim another host-test run.
+
+Finite matrix DONE: one two-checkpoint capture per backend, both exit0, with
+honest RT presentation. [Control comparison](ordered-uv-remaining/witness-comparison.json)
+preserves scene/CPU geometry/complete visibility diagnostics/allocations against
+the existing closed-light-region control; expected UV-corrected pixels differ
+and old-image failures are retained. [Paired scan](ordered-uv-remaining/backend-parity.json)
+passes unchanged max3/.001: worst-bend max1/fraction over1=0; finale max3/fraction
+over1=3.894080996884735e-6, no >3 outliers.556,378 now exactly29,15,9 on both;
+552,395 exactly38,18,3. Reflected triangles226/811 and radiances now agree up to
+small floating-point differences. The corrected boundary770,526 remains exactly
+18,21,25. A negative comparison using the wrong one-checkpoint roster is rejected
+before result creation; strict finite coverage was not weakened.
+
+Together with the completed combat pair, all four remaining >3 reflection
+outliers in this isolated Mobile RTX investigation are closed. This is not a
+single full13-image/uninstrumented production gate. Earlier blue/red passes
+belong to their exact retained source, not a newly rerun whole matrix. High row43
+is still a separate demonstrated false-candidate problem. Cost, full physical
+High fixtures, normal Shipping/Diagnostic and exact-phone gates remain open.
+
+Next unfinished step: prepare a clean **uninstrumented** candidate containing
+only separable outward-world-box normals and ordered PBR UV interpolation on
+the normal engineering source; do not merge the witness branch or automatically
+include the cost-failing light-region helper. Record exact cost admission and
+normal full affected RTX evidence, with the known boundary/High negatives honest.
+Do not repeat these completed finite observers or start a precision sweep.
+S26 is owner-disconnected; no polling/install or new phone claim. Normal renderer
+unchanged; no main merge, release or publication.
+
+Audio/haptic manual revalidation required:NO: capture/UV arithmetic only,
+unchanged feedback semantics.
