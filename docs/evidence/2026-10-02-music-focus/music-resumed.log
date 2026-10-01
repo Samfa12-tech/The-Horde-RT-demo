@@ -1,0 +1,16 @@
+--------- beginning of main
+10-02 02:08:25.143  9226  9351 I HordeLanternMusic: PCM ready48k stereo; queue capacity=5766frames minimumBytes=46128 allocatedFrames=5766 sampleRate=48000
+10-02 02:08:36.511  9226  9351 I HordeLanternMusic: Music epoch=1; discarded prior-session PCM
+10-02 02:08:36.586  9226  9351 I HordeLanternMusic: Music epoch=2; discarded prior-session PCM
+10-02 02:10:29.731  9226  9351 I HordeLanternMusic: Music progress epoch=2 periods=1 generated=580320 accepted=580320 deviceHeadObserved=576000 capacity=5766 underruns=0
+10-02 02:10:41.732  9226  9351 I HordeLanternMusic: Music progress epoch=2 periods=2 generated=1156320 accepted=1156320 deviceHeadObserved=1152000 capacity=5766 underruns=0
+10-02 02:10:53.733  9226  9351 I HordeLanternMusic: Music progress epoch=2 periods=3 generated=1732320 accepted=1732320 deviceHeadObserved=1728000 capacity=5766 underruns=0
+10-02 02:11:05.730  9226  9351 I HordeLanternMusic: Music progress epoch=2 periods=4 generated=2308320 accepted=2308320 deviceHeadObserved=2304000 capacity=5766 underruns=0
+10-02 02:11:17.730  9226  9351 I HordeLanternMusic: Music progress epoch=2 periods=5 generated=2884320 accepted=2884320 deviceHeadObserved=2880000 capacity=5766 underruns=0
+10-02 02:11:29.730  9226  9351 I HordeLanternMusic: Music progress epoch=2 periods=6 generated=3460320 accepted=3460320 deviceHeadObserved=3456000 capacity=5766 underruns=0
+10-02 02:11:41.732  9226  9351 I HordeLanternMusic: Music progress epoch=2 periods=7 generated=4036320 accepted=4036320 deviceHeadObserved=4032000 capacity=5766 underruns=0
+10-02 02:14:55.957  9226  9351 I HordeLanternMusic: Music progress epoch=2 periods=8 generated=4612320 accepted=4612320 deviceHeadObserved=4608000 capacity=5766 underruns=0
+10-02 02:15:07.958  9226  9351 I HordeLanternMusic: Music progress epoch=2 periods=9 generated=5188320 accepted=5188320 deviceHeadObserved=5184000 capacity=5766 underruns=0
+10-02 02:15:19.958  9226  9351 I HordeLanternMusic: Music progress epoch=2 periods=10 generated=5764320 accepted=5764320 deviceHeadObserved=5760000 capacity=5766 underruns=0
+10-02 02:15:31.958  9226  9351 I HordeLanternMusic: Music progress epoch=2 periods=11 generated=6340320 accepted=6340320 deviceHeadObserved=6336000 capacity=5766 underruns=0
+10-02 02:15:43.959  9226  9351 I HordeLanternMusic: Music progress epoch=2 periods=12 generated=6916320 accepted=6916320 deviceHeadObserved=6912000 capacity=5766 underruns=0

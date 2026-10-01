@@ -3,8 +3,9 @@
 Status: owner selected **whistle-lead** after both comparisons. Full-bank
 instrumentation admitted locally; objective source/PCM/Core/package checks pass.
 Exact-S26 rate/crackle/timbre listening accepted; twenty-period cueH device clock
-and basic pause/Home/resume now pass. Audio focus, full cue-route/transitions and
-SFX masking remain open.
+and basic pause/Home/resume now pass. Android focus/lifecycle gating is implemented
+and host/device-smoke verified; external interruption, full cue-route/transitions
+and SFX masking remain open. [Current focus record](evidence/2026-10-02-music-focus/README.md).
 Owner steering: preserve the composition and gameplay/cue timing; replace the
 sci-fi instrumental character with an intimate, ancient, mournful palette.
 No paid generation, shared-preset edits, renderer/gameplay changes or publication.

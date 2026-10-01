@@ -1338,6 +1338,21 @@ S24 and S26 evidence remain separate; S25 remains unverified. Underlying driver
 cause is not proven. [Finite receipts](evidence/2026-10-02-tlas-instance-refresh/README.md).
 Audio/haptic manual revalidation required:NO (renderer-only, semantic audio unchanged).
 
+## October 2, 2026 - Android music-focus candidate on SM-S948B
+
+Exact normal Debug2C93D30322B5CA7B176D7E3543B770582828CF7945D57D3D35BE9BF44D94E04E,
+Java sourceef812d0, installed/pulled identically; all70 assets and four native
+libraries equal the accepted A627 payload. Current UI honestly reports native RT
+active/vitality3 before and after Home/resume. Twelve consumed music periods have
+zero underruns,5766-frame queue, same epoch2 across65s menu pause/Home and resume.
+Android focus stack grants one GAME/MUSIC request in gameplay and retains none
+on menu/Home. Initial/return10s launch waits time out before later readiness;
+no fast-start or render-scale improvement is inferred. No shader/material/player
+change, system-volume/data clear or performance measurement. No S24 music evidence
+or S25 certification is inferred. External focus-loss/return owner check is pending.
+[Finite receipts](evidence/2026-10-02-music-focus/README.md).
+Audio/haptic manual revalidation required:YES for music interruption/recovery only.
+
 ## Research sources
 
 - [Android NDK stable APIs - Vulkan runtime capability guidance](https://developer.android.com/ndk/guides/stable_apis)

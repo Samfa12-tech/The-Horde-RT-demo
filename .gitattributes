@@ -204,3 +204,6 @@ docs/evidence/2026-10-02-s24-instance-hits/** -text whitespace=-trailing-space,-
 
 # Byte-preserved bounded TLAS refresh capture and live-route receipts.
 docs/evidence/2026-10-02-tlas-instance-refresh/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+
+# Scoped Android music-focus/lifecycle evidence, preserving raw receipt bytes.
+docs/evidence/2026-10-02-music-focus/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol

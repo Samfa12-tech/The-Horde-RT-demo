@@ -13,7 +13,27 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
-### October 2 S24 bounded TLAS refresh (current next step)
+### October 2 music focus (current integration slice)
+
+`ef812d0` adds a main-thread OS-focus gate to the thin Android PCM sink; shared
+Core looping/tails/crossfades, canonical score, accepted whistles, queue capacity,
+SFX/haptics and native renderer are unchanged. Debug/unsigned Release each38/38
+Java tests, four-ABI build, zero-error lint and package gates PASS. Exact Debug
+2C93D303 installed/pulled identically on SM-S948B; all70 assets/four native libraries
+are byte-identical to accepted A627. Fresh RT-active UI,12 consumed music periods
+with zero underruns,65s menu pause, Home focus release and same-epoch resume pass.
+Both10s launch waits time out before later readiness; no fast-start claim.
+`3cf25b3` adds focused Android native/Java/lint/package CI coverage; hosted results
+are pending, not covered by older host CI. [Finite record](evidence/2026-10-02-music-focus/README.md).
+Owner external-audio interruption/return check was requested once; do not resend
+or interrupt it. No new timbre audition/long-loop replay. Audio/haptic manual
+revalidation required:YES for music-focus recovery only. S26 is menu/Home with
+data preserved; S24 owner hands/enemy check remains untouched. Current music bank
+and Core pinned version remain authoritative. Next independent gates are current
+source CI, complete-visibility Shipping evidence, High physical/backend, reporting
+delivery/export and final matrix; no main merge/release/publication.
+
+### October 2 S24 bounded TLAS refresh (accepted integration)
 
 Read the [finite S24 record](ENGINEERING_1_6_1_S24_INSTANCE_HITS_2026-10-01.md), not
 the audit again. Shader probes and CPU facts are complete. Player BLAS BUILD alone

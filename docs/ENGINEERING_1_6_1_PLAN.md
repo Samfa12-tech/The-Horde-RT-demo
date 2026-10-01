@@ -1,12 +1,19 @@
 # 1.6.1 engineering programme and release gates
 
-Updated 2026-10-01. Status: **in development; not ready for final comprehensive validation or release**.
+Updated 2026-10-02. Status: **in development; not ready for final comprehensive validation or release**.
 
 This is the current next-step index for `codex/horde-1.6.1-engineering-pass`.
 The owner-authorised full repository audit remains in scope. The 2026-09-13
 update adds S24/S25 compatibility, adaptive music and player reporting, changes
 the work order below, and defers the large validation matrix until the feature
 set is complete. It does not authorise publication or relax any RT requirement.
+
+Current checkpoint: bounded TLAS instance-definition refresh is integrated with
+fresh source/integration CI and separate S24/S26/RTX image/lifecycle evidence;
+S24 owner/live Shipping acceptance is still open. Android music focus is the
+current small integration slice, not a soundtrack or player rewrite. Read the
+[current handoff](ENGINEERING_1_6_1_HANDOFF.md) and its finite evidence records.
+Retain the completed negative performance trials; do not restart their sweeps.
 
 ## Authority and recovered state
 
