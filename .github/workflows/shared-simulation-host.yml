@@ -11,6 +11,87 @@ permissions:
   contents: read
 
 jobs:
+  android-debug:
+    name: Android Debug build, playback tests and lint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+
+      - name: Set up the Android Gradle JDK
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+          cache-dependency-path: |
+            android/gradle/wrapper/gradle-wrapper.properties
+            android/gradle.properties
+            android/build.gradle
+            android/app/build.gradle
+
+      - name: Install the repository-pinned Android SDK tools
+        run: |
+          # Ignore only yes's expected SIGPIPE, not a failed sdkmanager command.
+          (set +o pipefail; yes | sdkmanager --licenses)
+          sdkmanager --install "platforms;android-34" "build-tools;34.0.0" "ndk;26.1.10909125" "cmake;3.22.1"
+
+      - name: Fetch only Android runtime LFS payloads
+        run: >-
+          git -c lfs.fetchexclude= lfs fetch
+          --include="assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb,assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb,assets/models/player/runtime/*.runtime.glb,assets/models/player/viewmodel/runtime/*.runtime.glb,assets/models/props/runtime/*.runtime.glb,assets/models/props/runtime/*/*.runtime.glb,assets/models/weapons/runtime/*.runtime.glb,assets/textures/polyhaven/mobile_1k/*-array-512-astc*.ktx2,assets/textures/meshy/lich_placeholder_v01/*-2048-astc6x6.ktx2,assets/textures/props/runtime/*.android.ktx2,assets/audio/music/what-the-dark-keeps/runtime/*.wav"
+          && git lfs checkout
+          "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb"
+          "assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb"
+          "assets/models/player/runtime/*.runtime.glb"
+          "assets/models/player/viewmodel/runtime/*.runtime.glb"
+          "assets/models/props/runtime/*.runtime.glb"
+          "assets/models/props/runtime/*/*.runtime.glb"
+          "assets/models/weapons/runtime/*.runtime.glb"
+          "assets/textures/polyhaven/mobile_1k/*-array-512-astc*.ktx2"
+          "assets/textures/meshy/lich_placeholder_v01/*-2048-astc6x6.ktx2"
+          "assets/textures/props/runtime/*.android.ktx2"
+          "assets/audio/music/what-the-dark-keeps/runtime/*.wav"
+
+      - name: Build all Debug ABIs, run Java contracts and lint
+        working-directory: android
+        env:
+          # Never load production signing credentials. Debug uses only AGP's debug key.
+          HORDE_VALIDATION_UNSIGNED: '1'
+        run: >-
+          bash gradlew --no-daemon --max-workers=2 --console=plain
+          :app:testDebugUnitTest :app:lintDebug :app:assembleDebug
+
+      - name: Check actual Java results and runtime APK payload
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $reports = @(Get-ChildItem android/app/build/test-results/testDebugUnitTest -Filter 'TEST-*.xml')
+          if ($reports.Count -eq 0) { throw 'No Android unit-test reports were produced.' }
+          foreach ($required in @{'MusicAudioFocusTest' = 8; 'MusicOutputBufferTest' = 5}.GetEnumerator()) {
+            $requiredReport = Join-Path android/app/build/test-results/testDebugUnitTest "TEST-com.samfa12.hordelanternrt.$($required.Key).xml"
+            if (-not (Test-Path -LiteralPath $requiredReport)) { throw "Missing playback suite: $($required.Key)" }
+            $suite = [xml](Get-Content -LiteralPath $requiredReport -Raw)
+            if ([int]$suite.testsuite.tests -lt $required.Value) { throw "Incomplete playback suite: $($required.Key)" }
+          }
+          $tests = 0; $failures = 0; $errors = 0; $skipped = 0
+          foreach ($report in $reports) {
+            $suite = [xml](Get-Content -LiteralPath $report.FullName -Raw)
+            $tests += [int]$suite.testsuite.tests
+            $failures += [int]$suite.testsuite.failures
+            $errors += [int]$suite.testsuite.errors
+            $skipped += [int]$suite.testsuite.skipped
+          }
+          Write-Output "Android Debug unit tests: $tests total; $failures failures; $errors errors; $skipped skipped."
+          if ($tests -lt 38 -or $failures -ne 0 -or $errors -ne 0 -or $skipped -ne 0) {
+            throw 'Android Java contract tests did not pass completely.'
+          }
+          $apk = ./tools/resolve-android-apk.ps1 -AndroidRoot (Join-Path $PWD android) -Variant debug
+          ./tools/test-held-item-package-contract.ps1 -AndroidApkPath $apk
+          Get-FileHash -LiteralPath $apk -Algorithm SHA256
+          # Compile/package evidence only: this job has no physical Vulkan RT device.
+
   shared-gameplay:
     name: Shared simulation host (${{ matrix.compiler }})
     runs-on: ${{ matrix.os }}
