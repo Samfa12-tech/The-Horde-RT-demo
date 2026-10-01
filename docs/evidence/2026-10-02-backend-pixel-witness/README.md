@@ -325,3 +325,54 @@ main merge, release or publication. Owner-disconnected S26 gates remain open.
 
 Audio/haptic manual revalidation required:NO: output-only investigation;
 gameplay/event-time/listener/PCM/haptic inputs unchanged.
+
+## Ordered PBR UV candidate (combat gate PASS; remaining scenes next)
+
+Source `877f5670f2093c72730e315491b61139fc320667` changes one shader expression
+to `precise vec2 uv`, preserving all three authored vertex weights. The existing
+host smoke now guards that source contract. No UV snapping, texture/LOD/material
+change, normal smoothing, ray offset/direction policy, geometry or tolerance
+change. The115-field observer is unchanged. Independent read-only review
+supports this bounded experiment, not general cross-device equality.
+
+Exact Debug executable SHA-256
+`4a9f27250cc6742b5fe5b00f88556e85237e7ec1e9a0d1ab63103dd6e345d430`.
+Fresh Debug app/test build and Release test build PASS; affected CTest each1/1
+PASS (Debug4.21s, Release1.97s). All16 real shaders compile/optimise/disassemble/
+validate. Each Generic grows84bytes/7 counted instructions and each Opaque
+504bytes/42 counted instructions in both backends. Actual pipeline Mobile
+Shipping **and Diagnostic** disassembly is otherwise identical to the preceding
+control after removing `NoContraction` decorations. Those constraints cover the
+two weight subtractions, three vector/scalar products and two additions at each
+interpolation site. This does not identify native FMA/register/occupancy costs.
+All8 Shipping modules remain zero diagnostic atomics/no binding22.
+
+The finite combat pair is DONE, both native captures exit0 and preserve scene,
+CPU geometry, complete visibility diagnostics and allocations. Expected image
+changes versus the old unconstrained-UV control are retained, not labelled a
+regression pass. At542,311 the pipeline image changes to the compute result;
+at564,393 compute changes to the pipeline result. There is no forced restoration
+of one backend's entire old image. [New fields](precise-pbr-uv/witness-comparison.json)
+show bit-identical UVs and sampled normals at both points; reflected triangles
+now agree (world23 and skeleton7109). Small later floating-point differences
+remain. [Whole two-enemy paired scan](precise-pbr-uv/backend-parity.json) passes
+the **unchanged** max3/.001 gate at max1, fraction over1=0, no outliers. Native
+candidate image inspected; diagnostic payload remains confined to five rows.
+This demonstrates the ordered interpolation removes the observed sampling fork
+on these exact RTX artifacts, not universal parity or phone acceptance.
+
+No normal renderer change or cost admission is claimed. Even without the parked
+light-region helper, the normal frozen Generic ceiling equals its243852-byte
+baseline; this candidate adds84bytes. Opaque's normal bytes/instruction headroom
+is412/18 versus this candidate's504/42 decoration growth. Cost gates remain open;
+no budgets were raised. A shader size increase is not a measured frame-time loss.
+
+Next finite step: check the remaining original reflection checkpoints2 and11
+with this exact shader set, one two-checkpoint native run per backend. Do not
+recapture completed checkpoint12 or rebuild unchanged shader modules. Then
+prepare a clean uninstrumented candidate with only demonstrated, separable
+corrections and earn actual cost/full affected RTX/High/device gates before
+promotion. No precision sweep, phone action, main merge, release or publication.
+
+Audio/haptic manual revalidation required:NO: UV arithmetic only; gameplay,
+event-time/listener/PCM/haptic inputs unchanged.

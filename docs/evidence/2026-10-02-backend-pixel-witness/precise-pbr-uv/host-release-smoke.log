@@ -1,0 +1,8 @@
+Internal ctest changing into directory: C:/Dev/worktrees/horde-backend-six-pixel-witness/build/presets/windows-x64-release
+Test project C:/Dev/worktrees/horde-backend-six-pixel-witness/build/presets/windows-x64-release
+    Start 93: horde_rt_character_render_slot_smoke
+1/1 Test #93: horde_rt_character_render_slot_smoke ...   Passed    1.97 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   1.98 sec
