@@ -91,7 +91,14 @@ zero warnings/failures and honest RT Home/resume. This is Diagnostic image/lifec
 evidence, not Shipping performance, unfrozen interaction or S24 acceptance. Its
 single active-memory/PSI sample is separately labelled, not active RAM A/B.
 
-Next: S26 unfrozen interaction/pacing/resize checks, then independent remaining
-programme work. S24 has been returned; missing-hands/starting-enemy visual checks
+`s26-live/` now retains the unchanged normal Debug APK's live inputs, failed chest
+setup/death, existing authored safe finale and full60s movie. Twenty consumed
+music periods and basic pause/Home/resume pass; output-only75→100→75 resize and
+a short nonrecording Debug actual-display sample are separately labelled. No
+Shipping A/B gain, owner acceptance, pickup-to-reveal or new player tuning.
+
+Next: independent foreground explicit-consent local-report export; owner pickup/
+live feel, Shipping display pacing and audio-focus/full-route gates stay open.
+S24 has been returned; missing-hands/starting-enemy visual checks
 await renewed availability. Do not rerun the timing matrix or unchanged captures.
 Keep High physical/backend and full final-candidate acceptance open.

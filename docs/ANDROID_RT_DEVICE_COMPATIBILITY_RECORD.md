@@ -2,6 +2,32 @@
 
 Last updated: 2026-10-01
 
+## October 1: S26 unfrozen containment and completed music clock
+
+**Exact local SM-S948B functional/clock evidence**, unchanged Debug APK e10b0203
+(runtime1da483d,evidence0ff5860),75% Diagnostic/Mobile pipeline. The chest-unlock
+inspection state unfreezes with its lich still active and reaches normal death;
+ordinary Retry also dies during inspection. Retained failures, not an audio freeze
+or successful live test. Existing authored defeated-lich finale-roof11 plus normal
+Continue enables recorded60s high/low,walk/look,swing/parry inputs with alive HUD
+and visible modelled hands/open cage. Post-claim only, not full owner/pickup gates.
+Twenty consecutive device-consumed cueH music periods pass existing clock/queue
+bounds,11.996-12.004s intervals,zero underruns. Menu pause/Home/resume retains
+epoch and reaches nine more periods plus renewed honest RT. Audio focus/full
+cue-route/SFX balance remain open. No new listening requirement or music/player edit.
+
+Output-only75→100→75 records107.186/165.946ms idle-plus-resize,75% restored;
+not matched pre-change speedup or button latency. A cleared, nonrecording live
+SurfaceView sample has80 actual-present intervals,112.500ms median/116.667ms p95,
+8.947averageFPS over8.941667s: short stationary Debug post-finale evidence, not
+Shipping A/B or30FPS acceptance. One active RAM sample PSS524168/RSS645100KiB,
+zero-average system memory PSI, thermal3 does not certify sustained RAM
+plateau or GPU stalls/bandwidth. Startup null-root UI attempt pulled stale settings
+XML; it is explicitly excluded, later fresh UI admitted. Full movie/receipts and
+next step in [live record](evidence/2026-10-01-mobile-lantern-profile/s26-live/README.md).
+S24/SM-S928B remains released to spouse with hands/enemy gate open; no actions on
+it, no S25 claim. All24 Shipping trials remain complete and must not be repeated.
+
 ## October 1: Mobile open-aperture programme - startup setup failure (not acceptance)
 
 Exact `SM-S948B` owner report and local screenshot show RT startup error on the

@@ -249,13 +249,36 @@ visible silhouettes or a diagnosis of S24. Nested completed-frame evidence recor
 available/positive primary-player counts; neither that nor frozen parry proves
 continuous live transitions. No accepted player tuning was changed.
 
-Current6d29 source push36840516701 and PR36840521652 are green: GCC55/55,
+At6d29 source push36840516701 and PR36840521652 were green: GCC55/55,
 Clang55/55, MSVC56/56 and focused Vulkan CPU-host15/15 each. Actual eight job logs
 inspected; compile/host checks are not physical presentation or performance tests.
 
-**Next unfinished step:** S26 unfrozen pickup/high-low/walk-look/attack-parry,
-geometric lighting/shadows, pause/resize and display-pacing checks on the normal
-candidate; then independent remaining programme work. S24 hands/enemy visuals
-await renewed availability, without another timed matrix. High physical transport/
-backend-parity and final-candidate gates remain open. Audio/haptic manual:NO for
-this geometry/evidence slice; accepted music is unchanged. No merge/publication.
+Subsequent unchanged-APK [S26 live record](evidence/2026-10-01-mobile-lantern-profile/s26-live/README.md)
+retains the chest-checkpoint live-lich/death setup failure, then uses existing
+authored dead-lich finale-roof11 and ordinary Continue for unfrozen high/low,
+walk/look/swing/parry inputs. A60s movie and contact sheets retain changing
+hands/cage/sword/camera and alive HUD; this is post-claim functional containment,
+not pickup-to-reveal or every-frame/owner acceptance. Twenty consumed music
+periods pass the unchanged queue/50ms clock gates, zero underruns; pause/Home/
+resume reaches honest RT and nine more periods with retained epoch. Audio-focus
+and full cue-route/SFX balance remain separate. First startup UI dump had a null
+root and pulled stale XML; only the later fresh menu/live UI is admitted.
+
+Existing output-only75→100→75 resize logs107.186/165.946ms idle-plus-resize,
+normal75% restored. This is not button latency or a matched before/after speedup.
+After recording ends, cleared live SurfaceFlinger history yields80 actual-present
+intervals:112.500ms median/116.667ms p95,8.947averageFPS over8.941667s. Short
+stationary Debug post-finale observation, **not** Shipping A/B or sustained30FPS.
+One active PSS524168/RSS645100KiB sample and zero-average memory PSI do not certify
+RAM plateau or GPU memory efficiency; thermal3 is separate context.
+No new optimisation, shader/asset/player/music change or acceptance from these.
+
+Current0ff5860 push36842946449 and PR36842953474 freshly green, same GCC55,
+Clang55,MSVC56,focused Vulkan-host15 each; actual logs inspected. PR15 remains
+draft/mergeable with CLEAN check state, no main merge.
+**Next unfinished step:** independent explicit-consent foreground local player-report
+export on Android/Windows. Owner live/pickup, matched Shipping display pacing,
+S24 hands/enemies (phone returned), S25, High physical/backend and final-candidate
+gates remain open. Do not rerun this completed matrix/live/music check or rebuild
+unchanged APKs. Audio/haptic manual:NO for unchanged geometry/evidence; prior
+rate/crackle/timbre owner acceptance retained. No merge/publication.

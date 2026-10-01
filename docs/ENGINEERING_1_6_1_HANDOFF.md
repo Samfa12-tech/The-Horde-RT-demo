@@ -44,10 +44,20 @@ in run191403; the first120s attempt was incomplete and cleanup terminated it,
 so one justified unchanged-APK300s retry is retained. Visible modelled hands,
 open cage/flame and geometric floor shadows were inspected; this is not live
 interaction/owner acceptance. New matrix interpretation and memory/counter gaps
-are in the single record. Current6d29 push36840516701/PR36840521652 are green
+are in the single record. Current0ff5860 push36842946449/PR36842953474 are green
 (GCC55,Clang55,MSVC56,focused Vulkan-host15 each); actual job logs inspected.
-**Next:** S26 unfrozen interaction/pacing/resize checks, then independent remaining
-programme work; S24 visual gates and High physical/backend gates remain open.
+Unchanged e10 Debug APK now has [unfrozen S26 containment/music evidence](evidence/2026-10-01-mobile-lantern-profile/s26-live/README.md):
+retained chest-state live-lich/death failure, then existing defeated-lich finale11
+plus normal Continue;60s high/low,walk/look,swing/parry inputs with alive HUD,
+twenty consumed music periods at11.996-12.004s/zero underruns, pause/Home/resume
+and nine more same-epoch periods. Post-claim only, not every-frame/owner acceptance.
+Output-only75→100→75 idle-plus-resize107/166ms,normal75% restored; not A/B speedup.
+Short Debug stationary display sample80 intervals112.500ms median/116.667ms p95
+is not Shipping pacing/30FPS. Single active RAM/PSI and thermal3 context do not
+close sustained memory/GPU-counter gaps. No player/music/renderer source change.
+**Next:** explicit-consent foreground local player-report export on Android/Windows;
+owner pickup/live feel, Shipping display pacing, S24 visual, S25, High physical/
+backend and final-candidate gates remain open. Do not restart completed checks.
 Do not rerun the matrix or rebuild unchanged artifacts.
 Audio/haptic manual revalidation required: **NO**, geometry-only selection.
 
@@ -96,8 +106,12 @@ Owner confirms closing that check because its purpose was unclear. The announced
 follow-up also reaches only one period, but fresh UI proves **YOU FELL** and normal
 death-overlay music suspension, not a sink regression. Retain both incomplete
 receipts; do not repeat unsafe idle-opening tests or alter enemies to pass them.
-**Next music gate:** twenty uninterrupted periods in a legitimate safe unpaused
-live state, then affected lifecycle/audio-focus and remaining route/SFX balance.
+Subsequent e10 unchanged-playback candidate passes twenty uninterrupted periods
+in existing safe finale11 after Continue,11.996-12.004s/zero underruns, then menu/
+Home/resume with retained epoch and nine more periods. See the linked S26 live
+record above; old interrupted/death receipts remain, not overwritten. CueH long
+clock and basic lifecycle pass is not all-cue/SFX or audio-focus acceptance.
+**Next music gate:** audio-focus interruption and remaining route/SFX balance.
 Do not repeat accepted rate/timbre listening, renders or unchanged builds. The single
 [phone record](evidence/2026-10-01-music-whistle-phone/README.md) owns results/next
 step. Do not include dirty renderer work or rerender unchanged cues. DAW is now
@@ -204,7 +218,9 @@ privacy rejection and explicit retry/cancel identity. No endpoint/UI/upload.
 Focused MSVC Debug/Release1/1 and lead ASan1/1 PASS after demonstrated fixture/path/
 Unicode defects were corrected. [Evidence](evidence/2026-10-01-report-contract/README.md).
 Platform forms/local export/remote real delivery remain unfinished; no scope loss.
-Audio/haptic manual:NO. Resume renderer experiment next, not further reporting.
+Audio/haptic manual:NO. The renderer experiment and finite Mobile profile matrix
+have since reached reviewed checkpoints above. Resume the independent foreground
+local-export platform slice next; no approved remote endpoint/backend deployment.
 
 ### October 1 Android music output checkpoint
 

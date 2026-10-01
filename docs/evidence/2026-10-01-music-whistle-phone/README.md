@@ -73,9 +73,16 @@ and the death overlay intentionally suspends music. Retain the scoped log, UI an
 for the long gate; do not repeat it or disable enemies/simulation to manufacture a
 pass. A first startup UI dump had no root; no capture gate was relaxed.
 
-**Next unfinished step:** obtain a legitimate safe, unpaused live state for twenty
-uninterrupted device-consumed periods, then affected pause/Home-resume/audio-focus
-checks. Full cue-route/SFX balance, other devices, matched Shipping music-on cost
+Subsequent [S26 live record](../2026-10-01-mobile-lantern-profile/s26-live/README.md)
+uses unchanged-playback APKe10b0203 on authored dead-lich finale11 after normal
+Continue. Twenty consecutive consumed cueH periods pass the existing50ms clock/
+queue bounds,11.996-12.004s and zero underruns; menu pause/Home/resume retains
+epoch and nine more periods. This closes the safe long-clock/basic lifecycle
+step, not every cue/transition or owner combat masking. Original interrupted
+receipts and this original35ec7e46 identity remain unchanged.
+
+**Next unfinished step:** affected audio-focus interruption and full cue-route/
+SFX balance. Other devices, matched Shipping music-on cost
 and final candidate gates remain separate/open. Do not repeat completed renders,
 builds, host checks or accepted rate/timbre listening. Negative results stay retained.
 

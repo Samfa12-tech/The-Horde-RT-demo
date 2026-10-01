@@ -2,8 +2,9 @@
 
 Status: owner selected **whistle-lead** after both comparisons. Full-bank
 instrumentation admitted locally; objective source/PCM/Core/package checks pass.
-Exact-S26 rate/crackle/timbre listening accepted; longer-loop, lifecycle/focus,
-full cue-route/transitions and SFX masking remain open.
+Exact-S26 rate/crackle/timbre listening accepted; twenty-period cueH device clock
+and basic pause/Home/resume now pass. Audio focus, full cue-route/transitions and
+SFX masking remain open.
 Owner steering: preserve the composition and gameplay/cue timing; replace the
 sci-fi instrumental character with an intimate, ancient, mournful palette.
 No paid generation, shared-preset edits, renderer/gameplay changes or publication.
@@ -110,6 +111,12 @@ Owner confirms closing that check. Announced follow-up reaches the death overlay
 which suspends music after one underrun-free period; this is not an audio failure.
 Do not repeat the unsafe idle-opening setup. Use a legitimate safe unpaused live
 state for the unfinished long gate; raw incomplete receipts/UI remain retained.
+Subsequent unchanged-playback Debug APKe10b0203 uses existing authored dead-lich
+finale11 and ordinary Continue, not invulnerability or an idle live enemy. Twenty
+consumed cueH periods pass unchanged clock/queue gates at11.996-12.004s with zero
+underruns. Menu pause/Home/resume retains epoch and nine more periods. See the
+[single S26 live record](evidence/2026-10-01-mobile-lantern-profile/s26-live/README.md);
+do not repeat the long gate. Audio focus/full route/SFX balance remain open.
 S26/DAW available; no further DAW use needed. Dirty renderer/scratch preserved.
 Uncommitted diagnostic primary-hit work and unrelated scratch are preserved.
 
