@@ -49,7 +49,7 @@ loading; pointer hashes are not image regressions.
 
 ## One bounded candidate, not production
 
-Next unfinished step: add only `precise` to the shared primary `rayDirection`
+Planned candidate: add only `precise` to the shared primary `rayDirection`
 declaration, regenerate/validate both eight-module families with unchanged
 frozen budgets, inspect actual NoContraction decorations, then run exactly one
 pipeline and one compute candidate replay against the completed current control.
@@ -64,6 +64,36 @@ If the mismatch persists, preserve the negative result and stop this idea. If it
 clears, require ray/first-hit evidence and unchanged image/physical admission
 before any production promotion. The six separate Mobile backend pixels are
 not certified by this row. No performance claim or phone acceptance is implied.
+
+### Candidate admission stopped; hypothesis remains untested on hardware
+
+The one-keyword candidate compiled, optimised and passed SPIR-V validation for
+all eight raygen variants. Frozen publication then rejected
+`diagnostic_high_generic_dielectric/bytes`:252896 against252680, +216 bytes;
+14973 instructions against14955. No embedded artifact, catalog, budget, compute
+adapter or production setting was changed. Do not call this a failed physical
+or performance experiment: no candidate native frame was dispatched.
+
+To inspect the actual compiler result deleted by the failed freeze, compiled
+only the temporary High Diagnostic generic artifact again outside the checkout.
+This is a specific evidence-retention gap, not a repeated image/control run.
+SPIR-V SHA-256 `960b14c0903c75b2eaf8916958ff16adeeb4058d6eafe2933b8dabebfad66ab5`;
+source dependency SHA-256
+`09e3f696b21b4f88d5b2b92fcf4eb257d2eccc2314835117d22168574e1bb58c`.
+The actual generic disassembly contains86 NoContraction decorations and41
+diagnostic atomics, with diagnostics binding22 retained. This proves compiler
+decorations, not runtime ray equality,
+register occupancy, performance or a physical fix. The retained statistics and
+freeze log are adjacent. Production frozen budgets were not raised.
+
+Decision: **not admitted / inconclusive**. Preserve the source candidate only on
+the separate investigation branch, restore normal source/configuration, and do
+not build a new runtime module-override framework solely for this keyword test.
+Next unfinished correctness step is an explicitly isolated temporary-module
+candidate route (if justified), or a geometric edge-handling proposal backed by
+the retained independent intersections. Neither is an accepted fix. Current
+High row43 and the independent Mobile backend pixel gate remain open. Do not
+repeat the completed current replay after resumption.
 
 Audio/haptic manual revalidation required:NO (capture-only with unchanged
 semantic playback inputs); no owner interruption/return check is repeated.
