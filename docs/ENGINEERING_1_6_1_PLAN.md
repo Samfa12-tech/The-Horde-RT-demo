@@ -15,6 +15,10 @@ with fresh five-lane source/PR CI; the external-audio owner check remains open.
 This is not a soundtrack or player rewrite. Read the
 [current handoff](ENGINEERING_1_6_1_HANDOFF.md) and its finite evidence records.
 Retain the completed negative performance trials; do not restart their sweeps.
+Current RTX High row43/tick646 replay reproduces the retained one-pipeline/
+zero-compute mismatch exactly. A single primary-precision candidate is preserved
+separately but fails frozen artifact admission; no runtime/physical result is
+claimed. See its [finite record](evidence/2026-10-02-high-row43/README.md).
 
 ## Authority and recovered state
 

@@ -36,6 +36,13 @@ and Core pinned version remain authoritative. Next independent gates are
 complete-visibility Shipping evidence, High physical/backend, reporting
 delivery/export and final matrix; no main merge/release/publication.
 
+Current normal head `a32a718` also has fresh successful push36896117060 and
+PR36896130080. All ten actual job logs inspected: each run GCC55/Clang55/MSVC57,
+Vulkan CPU-host15, Android38, four Android ABIs, lint/package. Synthetic merge
+`4ecdde735d16291c15573d02bfa381b44b1d5015` has exact mainbda1b99/head a32a718
+parents and the identical source tree `eefa3a6996b7baedcf47935925a1b0640cddb697`.
+PR15 remains draft, CLEAN/MERGEABLE; no old-job rerun or assumed integration.
+
 ### October 2 S24 bounded TLAS refresh (accepted integration)
 
 Read the [finite S24 record](ENGINEERING_1_6_1_S24_INSTANCE_HITS_2026-10-01.md), not
@@ -104,11 +111,26 @@ tick646, compute zero. Its [native witness](evidence/2026-09-30-glass-spawn/deri
 proves a near-coincident outside-origin edge event and slightly different native
 ray directions, not a camera-inside exit or a universal triangle tolerance.
 Production shader sources are unchanged since that ledger (only unused experimental
-staged-primary source was added); current TLAS/host changes do not themselves
-prove the event repaired. It is last demonstrated evidence, not a freshly
-reproduced current-head live failure. The smallest next High discriminator is
-matched current-source row43/tick646 replay at100%/1232x803 on both RTX backends,
-retaining counters/images and unchanged gates. No budget increase, counter
+staged-primary source was added). **Current replay completed:** capture-only
+`db8a0bb` on separate `codex/horde-high-row43-current` reproduces row43/tick646 at
+100%/1232x803 exactly on both RTX backends: all41 counters, module/geometry hashes
+and both PNG bytes unchanged; pipeline mismatch1, compute0. Affected CTests3/3
+and MSVC Debug app build pass. No current failure is inferred only from history.
+See the [finite current record](evidence/2026-10-02-high-row43/README.md); do not
+repeat those completed controls after resumption.
+
+One shared-primary `precise` keyword candidate `c64dc6e` compiled/validated all
+eight pipeline variants but failed frozen byte/instruction admission (+216bytes/
+18instructions for the generic path). Publication touched no embedded artifact,
+catalog or budget. Temporary High generic disassembly confirms86 NoContraction
+decorations,41 diagnostic atomics and binding22, not runtime equality or a fix.
+Separate investigation head `d15fc01` preserves source/evidence on GitHub. No
+candidate hardware captures or performance claim: **unadmitted/inconclusive**,
+not a measured negative or a repaired edge. Normal branch/source/configuration
+restored; no module-override framework or qualifier search. Next High correctness
+work needs a justified isolated candidate or geometric edge treatment supported
+by the retained independent intersections. High shadow/live and backend gates
+remain open; pending phone owner checks are untouched. No budget increase, counter
 suppression, driver inference, Mobile-performance claim or player reopening.
 Audio/haptic manual revalidation required:NO for this read-only/document slice.
 
