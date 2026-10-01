@@ -317,14 +317,28 @@ telemetry or scheduling framework.
   inspected logs show no music error. Listening still deferred/open. Capture
   typo/duplicate preflight now29 PS7/5.1 assertions PASS, no native/APK rebuild.
   [Exact failure evidence](evidence/2026-10-01-staged-primary-phone/README.md).
+- Bounded normal A/A run140240 complete: opening/skeleton byte-identical to
+  original control, all41 counters/semantic state/inventories equal. Cumulative
+  skin updates+1 do not explain divergence. Real2-row manifest/Home-resume pass;
+  no full matrix repeat. Candidate admission NO-GO / hypothesis inconclusive,
+  no phone net saving measured.
+- Normal Shipping benchmark8ead0a2…5bf175 installed/pulled back exactly,
+  staged/observer OFF, normal Debug retained, phone Home. Not new RT/performance/
+  listening acceptance. Shipping parser/preflight prepared, zero new trials;
+  GPU stats recomputable from completion rows, CPU raw percentiles unavailable
+  (existing stage summaries/zone means retained).
+- Current guard3499eea push36813383791 / PR36813388376 PASS55/55/56/15,
+  integration9add73ab exact parents/tree. Eight actual job logs hashed; no hardware
+  RT inference. A/A/restoration/parser state update changes evidence/docs only.
 
 ### Next unfinished step
 
-Review/push the capture-preflight/exact-phone failure checkpoint with fresh CI.
-First one bounded normal same-APK opening/skeleton A/A capture-stability check:
-sparse boundary differences need a demonstrated cause, and original control19
-lacked its final manifest. This is a specific validity investigation, not a new
-20-image matrix. Record exact run/next step here. Fixed24-trial Shipping ABBA and
+Capture-preflight/exact-phone failure3499eea pushed; fresh push/PR CI is green.
+A/A complete; do not repeat. Next is bounded Diagnostic-only primary-input/hit
+layer isolation at existing divergent pixels with frozen geometry/input identity,
+before changing arithmetic. No numerical/compiler cause proved; classification
+differs before record load, so no blind packing rewrite/arm tuning. No larger
+scheduler/temporal system/tolerance change. Fixed24-trial Shipping ABBA and
 separate RAM/profile runs stay **held by image admission**. Windows matrices,
 retained APKs/counter decoding are complete; no repeat/rebuild without a new
 recorded validity problem. Known control physical failures stay

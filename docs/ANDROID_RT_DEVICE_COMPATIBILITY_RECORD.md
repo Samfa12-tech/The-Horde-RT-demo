@@ -1061,6 +1061,14 @@ exception found in inspected scoped process/window; not a comprehensive
 no-stall/music guarantee. Listening remains deferred/open. Audio/haptic manual:NO
 for renderer/harness-only changes.
 
+Bounded same-APK normal A/A run140240 subsequently passes opening/skeleton
+byte-exactly, all41 counters/semantic state/inventories equal; skin updates+1 do
+not explain split divergence. Actual2-row manifest/Home-resume, no repeated20.
+Candidate admission remains NO-GO, cause unproven. Normal Shipping benchmark
+8ead0a2…5bf175 installs/pulls back exactly, staged/observer OFF, normal Debug
+retained, phone Home. Restoration only: no new Shipping RT/performance/music
+acceptance. Matched timing/RAM remain held by image gate.
+
 ## Research sources
 
 - [Android NDK stable APIs - Vulkan runtime capability guidance](https://developer.android.com/ndk/guides/stable_apis)

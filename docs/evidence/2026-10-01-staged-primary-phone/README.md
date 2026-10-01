@@ -69,10 +69,39 @@ Current8fb push36810364762 / PR36810369431 green: GCC55/Clang55/MSVC56/focused
 Vulkan CPU-host15 each. Integrationf66a6fe has exactbda1b99/8fb parents; these
 results precede this guard/evidence slice and are not hardware RT proof.
 
-Next: **one normal same-APK opening+skeleton A/A stability check**. Specific
-validity question is deterministic capture stability versus changed execution;
-no whole-matrix repeat. Primary camera/first-query SPIR-V sequences match modulo
-IDs, not proof of identical driver machine code or geometry bytes. No shader
-cause has been established. Shipping ABBA/RAM/profile runs held until unchanged
-image admission passes. No promotion/merge/publication. Audio/haptic manual:NO
-for this slice; separate listening remains open.
+Exact guard checkpoint3499eea now has fresh push36813383791 / PR36813388376
+green with the same55/55/56/15 totals. Integration9add73ab has exactbda1b99/
+3499eea parents and identical tree. Eight real job logs/hash receipt retained;
+not phone/hardware RT proof. Actual admission CTest passes1/1 locally.
+
+## Completed A/A check and decision
+
+Normal same-APK opening/skeleton check completed once:
+`control-aa/run-20261001-140240`, real2-row manifest SHA256
+`dbef7e113de53d1461f025e3dd648ec3ce4961d2c37ced42f3bf9fd966225818`.
+Both PNGs byte-identical to initial control (maxRGB0, zero changed pixels);
+all41 counters, semantic state, primary counts and inventories agree. Skin-update
+count+1 in both does not explain the image difference. Home/resume/strict ASTC
+pass. A/A comparison SHA256
+`f272c3de211062d6622791f72e7c8c697a90f1d12072e7fe426a1622456e51a8`.
+No full matrix repeat, rebuild or tolerance change.
+
+**NO-GO for candidate admission/promotion; performance hypothesis inconclusive.**
+No exact-phone Shipping net/pass-time saving measured: timing held by image
+failure. Actual294.65MiB records are allocation, not measured bandwidth/timing
+overhead. Historical ordinary60–66ms / lantern225–237ms GPU workloads still need
+roughly60–67% /89–91% reduction to estimated22–24ms budget for30FPS; these are
+budget gaps, not new matched results or promised savings.
+
+Smallest next step: bounded Diagnostic-only primary-input/hit data at existing
+divergent pixels, joined to frozen input/geometry identity, before changing maths.
+Primary camera/first-query SPIR-V sequences match modulo IDs, not proof of driver
+machine-code or geometry-byte equality. Torch/player classification counters
+differ **before** record load, so decoding alone cannot explain those two deltas.
+Layer localisation is not a proved compiler/numerical cause or arm-tuning authority.
+No repeated valid matrices/larger scheduler/temporal framework.
+
+Normal Shipping benchmark8ead0a2…5bf175 installed/pulled back exactly,
+staged/observer OFF; normal Debug retained, phone Home. Restoration is not new
+RT/performance acceptance. Shipping ABBA/RAM/profile remains held by image gate.
+No promotion/merge/publication. Audio/haptic manual:NO; listening deferred/open.

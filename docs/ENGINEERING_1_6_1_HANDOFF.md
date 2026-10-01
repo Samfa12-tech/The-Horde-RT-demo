@@ -67,9 +67,15 @@ Exact-phone staged image admission now FAIL10/20 unchanged maxRGB3 gates
 semantic state/AS ownership/70assets agree. Two ordinary fixtures have torch+1/
 player−1 counter discrepancies. Existing production interface failure/recovery
 preserved. [Phone receipts/next step](evidence/2026-10-01-staged-primary-phone/README.md).
-Next is only normal same-APK opening/skeleton A/A capture stability, not another
-full matrix or arm tuning. Shipping comparisons are held by image admission.
-Exact8fb push/PR CI PASS GCC55/Clang55/MSVC56/focused15 each. Preflight29 PS7/5.1
+Normal same-APK opening/skeleton A/A completed once: byte-identical images/all41
+counters/semantic states/resources; skin updates+1 do not explain divergence.
+Next only bounded divergent-pixel primary-input/hit isolation, not another full
+matrix/arm tuning. Shipping held by image admission; candidate NO-GO / hypothesis
+inconclusive / no measured phone net saving. Normal Shipping8ead0a2…5bf175
+installed/pulled back exactly, staged/observer OFF, normal Debug retained, phone
+Home. Not new RT-presentation/performance acceptance.
+Exact3499eea push36813383791/PR36813388376 CI PASS55/55/56/focused15 each;
+integration9add73ab exactbda1b99/3499eea parents/tree. Preflight29 PS7/5.1
 assertions PASS. Strict binary-safe Perfetto decoding done: allocation source
 only/no advertised GPU counter specs in this snapshot. Actual308,966,400B pages
 is not RAM-pressure/DRAM-traffic evidence. Deliberate capture freeze is not music
