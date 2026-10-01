@@ -98,6 +98,58 @@ Measure representative opening, combat, held-lantern and water/secondary-effect 
 
 Completion requires accurate UI-to-renderer mapping, reliable persistence/apply/revert, accessible controls, tested supported combinations, genuine RT presentation, matched images/motion and sustained-cost evidence. Record **ship / defer / reject** for each candidate control. Automated tests and captures do not replace live Android/Windows usability review.
 
+**Expanded settings inventory**
+
+Treat these as audited candidates, not promises of unsupported renderer features:
+
+- **Display/performance:** Windows display resolution and window/fullscreen mode; explicit internal scale/dimensions; supported upscaler and quality mode; DRS target frame rate and minimum/maximum scale; foreground, menu and background frame caps; supported V-sync/presentation choices. Show current effective DRS scale and interactions with caps/upscalers. Resolution, upscaling and DRS must compose through one tested sizing/history policy.
+- **Materials/scene detail:** texture quality backed by real mip/residency choices, texture filtering, and geometry/detail distance only with a validated shared LOD path. Preserve appropriate silhouettes, shadows and reflected/transmitted representations. Optional detail-normal control depends on that capability being implemented and accepted.
+- **RT/effects:** offer an understandable overall preset plus supported individual water, fire, glass and smoke/fog overrides. Explain all coupled settings. Reflection/secondary-lighting controls require a proven cheaper mode consistent with the RT contract, rather than exposing unsafe transport parameters.
+- **Image/comfort:** brightness/gamma calibration, FOV and existing optional post effects/camera shake where applicable. HDR, motion blur, bloom and other controls appear only if actually supported. Keep comfort/accessibility choices distinct from performance presets.
+- **Player representation:** retain a lower-detail/fallback-player idea as an experiment, not a required shipping toggle. First measure matched visual and CPU/GPU costs, including skinning and acceleration-structure work. Prefer a supported LOD using shared animation/IK over maintaining two independent player implementations. Merely hiding the body does not prove its work was removed. Preserve hands, equipment, collision, shadows/reflections and gameplay readability; reject or defer without worthwhile savings.
+
+**GPU memory information**
+
+Where supported, distinguish the game's tracked allocations, driver-reported heap usage/current usable budget, and physical capacity. Label measured, estimated and unavailable quantities accurately; do not call allocation totals exact residency or infer memory bandwidth from them. Consider `VK_EXT_memory_budget` only after capability checks and correct per-heap accounting; do not double-count shared heaps or sum unrelated capacities.
+
+For discrete GPUs, show dedicated capacity separately from the current budget. On Android and integrated GPUs, label shared GPU/system memory honestly rather than presenting the phone's total RAM as dedicated VRAM. Explain that other applications and OS pressure can change the usable budget. A settings-dependent estimate must say it is an estimate and need not match current loaded-scene usage. Bound refresh overhead and give a clear unavailable state; budget-pressure warnings are guidance, not guaranteed crash thresholds.
+
+References: [Khronos memory-budget sample](https://docs.vulkan.org/samples/latest/samples/extensions/memory_budget/README.html) and [Vulkan memory allocation guidance](https://github.khronos.org/Vulkan-Site/guide/latest/memory_allocation.html).
+
+### Authored graphics preview room
+
+**Owner-approved direction:** provide a compact authored scene within the Graphics menu, with real-time FPS/frame-time feedback as settings change. Include an **idle animated skeleton**, mirror, flame, waterfall and glass pane. Reuse this room as the representative material/effects validation scene where practical; do not build a second renderer or unrelated playable level.
+
+**Scene brief**
+
+- A small historical-gothic dungeon alcove with detailed stone, wood and metal, a torch and reward-style lantern, a clearly visible glass pane, a modest waterfall/pool, restrained fog/smoke and a mirror positioned to expose reflection changes.
+- One skeleton using the actual admitted actor, material, rig and skinning/animation path, in a bounded looping idle. Its movement and mirror/shadow visibility exercise deforming geometry and temporal stability. It is not a combat encounter and must not alter player progression or consume gameplay events.
+- Where the player-body option is under evaluation, show the actual player representation through the same viewmodel/world-body ownership rules. Do not substitute the skeleton as evidence of player-skinning cost.
+- Keep the room small enough for supported phone settings. Reuse licensed assets/shared effects and bound resident resources. A waterfall or other effect that still needs engine work is a scoped dependency, not permission for a new fluid simulation.
+
+**Interaction and comparison**
+
+- Selecting a setting can focus a relevant fixed camera: textures at an angled wall/floor, glass at the pane/lantern, water at the pool, animation at the skeleton and reflection at the mirror. Allow a stable overview and avoid forced camera movement while comparing settings.
+- Use a deterministic scene seed, camera, lighting and animation timeline. A visual A/B mode resets to the same point; make clear which configuration is shown. Invalidate/re-warm temporal history correctly when required.
+- Provide a repeatable moving-camera/animation test for upscaling, DRS, ghosting, shimmer and disocclusion. Frozen captures alone cannot validate these paths.
+- Apply the real selected configuration using the production renderer, shaders/materials, RT geometry and effects. Explain deferred/restart-required settings instead of showing an approximation.
+- Keep the underlying gameplay safely paused and isolated. Avoid rendering the full game and preview simultaneously; manage shared resource ownership and unload preview-only assets on exit without corrupting gameplay, audio, saves or temporal history. Prevent preview input from reaching combat.
+
+**Live performance panel**
+
+- Show presented FPS where measurable, frame time in milliseconds and a short rolling frame-time graph. Define the sampling scope; if only rendered/submitted frames are observable, label that limitation rather than claiming display presentation. Smooth numeric readouts for legibility while retaining stutters in the graph. Add separately labelled CPU/GPU times only where reliable instrumentation supports them; GPU work time is not whole-frame or presentation time.
+- Display actual internal/output dimensions, effective quality/upscaler/DRS settings, and any active frame cap/V-sync limit. A capped result cannot demonstrate that an optimisation has no benefit; do not quietly uncap the device.
+- Label data **Preview scene performance**. This room is illustrative and is not a prediction of every fight, level or lantern-heavy workload. Retain the separate deterministic full-game benchmark with summaries and comparison against the previous run.
+- Distinguish cold loading, shader/pipeline creation, resource rebuilds, setting transitions and history warm-up from stable samples. Keep transition stalls observable, but do not mix them silently into steady-state comparisons.
+- Show the memory information above where available. Optional temperature/throttling indications require actual platform evidence. Record thermal/power context for comparisons; a cool short preview is not sustained-performance proof.
+- Measure observer/UI overhead and maintain bounded buffers/update frequency. Do not add synchronous readbacks or logging that materially distort the measured result.
+
+**Phone, lifecycle and acceptance**
+
+Provide a user-controlled preview pause and a reasonable visible menu frame cap. Pause rendering when backgrounded; resume safely with valid resources/history. An explicitly invoked performance test may use its documented test cap, with thermal guidance, rather than leaving an uncapped stress scene running throughout settings navigation.
+
+Acceptance requires honest setting-to-image correspondence, working skeleton/mirror/water/fire/glass paths, deterministic A/B and motion tests, labelled trustworthy counters, safe apply/revert/persistence, pause/background/resume/exit recovery, and measured memory/observer cost on actual supported Android hardware and Windows RTX. Test menu-opened-from-game and entry-menu paths; verify gameplay resources/state restore correctly. Missing capability stays unavailable or deferred with a reason. This plan adds no requirement to change 1.6.1 before its release.
+
 ### Renderer readiness: temporal inputs, resolution and upscaling
 
 - Evaluate one shared temporal-input foundation: depth, motion vectors for camera and moving/deforming objects, jitter and previous-frame transforms, plus explicit history ownership, invalidation and disocclusion handling. Cover reset/retry, camera cuts, lifecycle and internal-resolution changes before relying on accumulated history.
