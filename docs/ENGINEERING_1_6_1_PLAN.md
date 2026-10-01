@@ -17,8 +17,9 @@ This is not a soundtrack or player rewrite. Read the
 Retain the completed negative performance trials; do not restart their sweeps.
 Current RTX High row43/tick646 replay reproduces the retained one-pipeline/
 zero-compute mismatch exactly. A single primary-precision candidate is preserved
-separately but fails frozen artifact admission; no runtime/physical result is
-claimed. See its [finite record](evidence/2026-10-02-high-row43/README.md).
+separately as **NO-GO**: unchanged failure/counters and both native candidate image
+gates fail; frozen cost admission also fails. Normal modules restored. No repeated
+keyword/controls or performance claim. See its [finite record](evidence/2026-10-02-high-row43/README.md).
 
 ## Authority and recovered state
 

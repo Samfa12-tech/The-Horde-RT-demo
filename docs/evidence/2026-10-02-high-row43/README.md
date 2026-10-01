@@ -43,8 +43,7 @@ Pipeline PNG SHA-256 `5f0b1a6cc9c2184accb375d8ca4e6644c93aea956ae9c3942233327de5
 compute PNG SHA-256 `0bf5a402451d12ced7058649961e7690ae2056a7632026c68556d18ddcd0ac5d`.
 The raw comparison receipt SHA-256 is
 `819574aaa8bb39ac7bc81dc43cb5fb8ff3a144f858bdf32514b55d467f2ca732`.
-The adjacent JSON copies are canonical-content records; their line endings need
-not retain raw-file byte identity. Raw artifact identities remain in the manifests.
+Adjacent JSON copies are canonical-content records, not raw line-ending identity.
 Use the retained raw September30 PNGs: checkout copies can be unhydrated LFS
 pointers. The analysis helper verifies image bytes against manifests before
 loading; pointer hashes are not image regressions.
@@ -67,10 +66,9 @@ clears, require ray/first-hit evidence and unchanged image/physical admission
 before any production promotion. The six separate Mobile backend pixels are
 not certified by this row. No performance claim or phone acceptance is implied.
 
-### Candidate admission stopped; hypothesis remains untested on hardware
+### First admission attempt (historical: no hardware run at this step)
 
-One-keyword source candidate `c64dc6e`, preserved at investigation head `d15fc01`.
-The candidate compiled, optimised and passed SPIR-V validation for
+The one-keyword candidate compiled, optimised and passed SPIR-V validation for
 all eight raygen variants. Frozen publication then rejected
 `diagnostic_high_generic_dielectric/bytes`:252896 against252680, +216 bytes;
 14973 instructions against14955. No embedded artifact, catalog, budget, compute
@@ -97,6 +95,71 @@ candidate route (if justified), or a geometric edge-handling proposal backed by
 the retained independent intersections. Neither is an accepted fix. Current
 High row43 and the independent Mobile backend pixel gate remain open. Do not
 repeat the completed current replay after resumption.
+
+### Bounded temporary-module continuation
+
+The existing compiler catalog/publication functions can stage actual modules on
+the isolated branch without a new renderer/module-override framework. Use the
+branch-guarded [staging helper](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/5ac24b2607d04d47ffcd8bb81651bb97887a1951/docs/evidence/2026-10-02-high-row43/stage-precision-candidate.ps1) once, with external temporary
+output, and generate both real metadata adapters. No budget/assertion/traversal
+constant changes. Structural catalog status is needed by the existing provider;
+it does **not** mean production frozen-cost admission passed. This branch and
+all generated candidate artifacts remain investigation-only/unshippable.
+
+Finite continuation plan: build this same keyword candidate, record exact source/
+executable/module identities, run one pipeline and one compute row43 capture,
+and compare against the completed current controls. `-ShaderCandidate` records
+counter/module changes rather than requiring buggy pixels/counters to recur; it
+retains the unchanged maximum3/fraction0.001 image gate and fails on violation.
+No completed controls will be rerun. If no correction, stop this hypothesis;
+otherwise require first-hit/physical/image evidence before any promotion.
+
+### Completed native candidate: NO-GO; stop this hypothesis
+
+Candidate source `ce1e76e949f94b8425143947895e9aba04e834e0`; exact executable
+SHA-256 `f7c4cd340182bb2855dcfd71ab9ae340ad1a40cdbc631ce045859ca5d18e8a04`.
+MSVC Debug application build PASS, both candidate processes exit0 and honestly
+present RT. Same High Diagnostic/RTX5050/100%/1232x803/frame44/tick646; CPU
+world-body/viewmodel geometry hashes unchanged. Captured module hashes match
+the actual regenerated catalogs. All16 SPIR-V compiles/validations complete;
+all eight Shipping modules have zero atomics and no diagnostic binding. Frozen
+program-size admission still fails; budgets/assertions/traversal are unchanged.
+
+| Candidate versus current control | Pipeline | Compute |
+| --- | --- | --- |
+| Primary mismatched exits | 1, unchanged | 0, unchanged |
+| Changed counters (41 checked) | 0 | 0 |
+| Pixel(524,552) RGB | (32,14,35), unchanged | (202,169,91), unchanged |
+| Maximum RGB difference | 108 | 108 |
+| Pixels differing by more than1 | 18 /989296 | 19 /989296 |
+| Existing image gate | FAIL | FAIL |
+
+The fraction limits pass (0.00001819/0.00001921), but maximum3 is exceeded;
+no tolerance was loosened. The demonstrated edge event remains and additional
+pixels change without demonstrated correctness benefit. This is a **measured
+negative for this keyword candidate**, not proof that all arithmetic-consistency
+approaches are impossible. No more qualifier search, phone test, full fixture
+rerun or performance sweep is justified for it. Do not promote it.
+
+Adjacent `precision-comparison.json` retains both failures and module/PNG hashes;
+raw receipt SHA-256
+`c77c1f66aa43049405dd3c587e3be80bd5408283e8643ea9715ba44d7f5a2342`.
+Both candidate manifests/images are retained with their original image names;
+unchanged CPU geometry exports remain in the raw path, not silently substituted
+by new assets. First wrapper attempts rejected an incorrect root, then lost
+PSCommandPath metadata binding and reuse-path validation; none published modules.
+The completed matrix was hash/dependency checked and reused, not recompiled for
+those wrapper repairs. The final wrapper stages no new runtime framework and
+never raises production budgets. Build/capture timing here is not matched
+Shipping performance, register/spill evidence or phone acceptance.
+
+Normal branch/source/configuration are restored; only the negative receipt and
+analysis helper enter engineering. Investigation source/artifacts/receipts are
+pushed at `5ac24b2607d04d47ffcd8bb81651bb97887a1951`. Next unfinished step is
+High row43 geometry/physical interpretation; shadow/live
+and the independent Mobile backend pixel failures remain open. Any next candidate
+needs a different demonstrated mechanism supported by the native/intersection
+evidence, not another primary precision tuning loop. No repeated completed runs.
 
 Audio/haptic manual revalidation required:NO (capture-only with unchanged
 semantic playback inputs); no owner interruption/return check is repeated.

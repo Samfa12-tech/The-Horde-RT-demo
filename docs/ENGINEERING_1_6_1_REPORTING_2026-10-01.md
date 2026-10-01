@@ -92,9 +92,14 @@ Audio/haptic manual revalidation required: **NO** (test-only behavior).
 3. Complete remote reporting only with a confirmed appropriate backend destination
    and authority; deployment/account configuration and real delivery are still open.
    Do not send unsolicited test reports or introduce client secrets.
+   Destination was requested once on October2; await that answer rather than
+   repeating the question after resumption.
 
-S24 is released to the owner's spouse: no more S24 device operations until renewed
-availability. Its missing-hands/starting-enemy checks stay open; S25 stays unverified.
+The historical S24 handback is superseded by renewed owner availability. Current
+bounded TLAS refresh restores normal hands/second-enemy intersections in captures
+and a live route, without player tuning; see the October2 programme handoff.
+The already-requested S24 owner check and complete-visibility Shipping evidence
+remain open and must not be interrupted/resent. S25 stays unverified.
 All remaining glass/High/backend, music focus/balance, performance and final-candidate
 gates remain in the [programme handoff](ENGINEERING_1_6_1_HANDOFF.md).
 

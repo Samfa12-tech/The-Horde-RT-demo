@@ -124,11 +124,19 @@ eight pipeline variants but failed frozen byte/instruction admission (+216bytes/
 18instructions for the generic path). Publication touched no embedded artifact,
 catalog or budget. Temporary High generic disassembly confirms86 NoContraction
 decorations,41 diagnostic atomics and binding22, not runtime equality or a fix.
-Separate investigation head `d15fc01` preserves source/evidence on GitHub. No
-candidate hardware captures or performance claim: **unadmitted/inconclusive**,
-not a measured negative or a repaired edge. Normal branch/source/configuration
-restored; no module-override framework or qualifier search. Next High correctness
-work needs a justified isolated candidate or geometric edge treatment supported
+The existing provider/compiler functions subsequently staged the same candidate
+only on the isolated branch without changing a budget or runtime framework.
+Candidate `ce1e76e`/executableF7C4CD34 passed the real MSVC app build and one native
+capture per RTX backend. Actual module identities/CPU geometry/pose verified.
+**NO-GO:** all41 counters and pixel(524,552) unchanged (pipeline mismatch1,
+compute0); extra18/19 pixels differ over1 with maximum108 on each backend,
+failing the unchanged maximum3 gate. No demonstrated correctness benefit,
+performance/phone claim or promotion. Production frozen-size admission still
+fails. Separate investigation head `5ac24b2` preserves source/modules/receipts
+on GitHub. Normal branch/source/configuration restored; only analysis/evidence
+enter engineering. Do not repeat this keyword or completed controls after
+resumption. Next High correctness work needs a different demonstrated mechanism
+or geometric edge treatment supported
 by the retained independent intersections. High shadow/live and backend gates
 remain open; pending phone owner checks are untouched. No budget increase, counter
 suppression, driver inference, Mobile-performance claim or player reopening.

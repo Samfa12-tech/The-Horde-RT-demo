@@ -1,0 +1,103 @@
+{
+  "schema": 1,
+  "sourceBase": "a32a718",
+  "shaderCandidate": true,
+  "pixelTolerance": {
+    "maximumFractionOverOne": 0.001,
+    "maxRgb": 3
+  },
+  "rows": [
+    {
+      "backend": "RayTracingPipeline",
+      "counterCount": 41,
+      "matchedCpuGeometry": true,
+      "matchedModules": false,
+      "counterChanges": [],
+      "controlModules": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "8dbebd86eeed23b388626719e6f9946b8027df754869b5811673e24036ae12c9"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "feac38eca1df17159bca4d490825b7e3750742b05bb07cd2f6db4eec42261b5c"
+        }
+      },
+      "currentModules": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "595915b274c9913e03d0b780a35c2c785536bd64ff91e1c8b14d5df4e1c97ef3"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "960b14c0903c75b2eaf8916958ff16adeeb4058d6eafe2933b8dabebfad66ab5"
+        }
+      },
+      "primaryMismatchedExitCount": 1,
+      "controlPngSha256": "5f0b1a6cc9c2184accb375d8ca4e6644c93aea956ae9c3942233327de52ffb01",
+      "currentPngSha256": "32eb53e70262af6577523c1a3ee0d7bdfa4698c1fc3cb9521454cfd830652f8d",
+      "pixels": {
+        "maximumChannelDifference": 108,
+        "pixelsDifferentByMoreThanOne": 18,
+        "differentFraction": 1.819475667545406E-05,
+        "controlWitnessRgb": [
+          32,
+          14,
+          35
+        ],
+        "currentWitnessRgb": [
+          32,
+          14,
+          35
+        ]
+      },
+      "pixelGatePassed": false
+    },
+    {
+      "backend": "RayQueryCompute",
+      "counterCount": 41,
+      "matchedCpuGeometry": true,
+      "matchedModules": false,
+      "counterChanges": [],
+      "controlModules": {
+        "opaqueFast": {
+          "key": "rayquery_compute_diagnostic_high_opaque_fast",
+          "sha256": "c1e4622ae5df0c87a06c36d803617c7d4e0227845cd33a9dd38de5f0d956ff58"
+        },
+        "genericDielectric": {
+          "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+          "sha256": "a88abd1880da54d159e0e912cc9030a51a46cb5759bf29bc548c99b08c62cbd8"
+        }
+      },
+      "currentModules": {
+        "opaqueFast": {
+          "key": "rayquery_compute_diagnostic_high_opaque_fast",
+          "sha256": "4c266c346e9efd4b7175c9b65b82d9d268611afc396b683d852c2b95c5a270f7"
+        },
+        "genericDielectric": {
+          "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+          "sha256": "364767ed3c550456d9bedbb90a8cae322cd9721e649e749c358ab7ebe15bce2f"
+        }
+      },
+      "primaryMismatchedExitCount": 0,
+      "controlPngSha256": "0bf5a402451d12ced7058649961e7690ae2056a7632026c68556d18ddcd0ac5d",
+      "currentPngSha256": "0a4e39948c0bc78aceb853402541065ae1f56c702fea191c01d2f1e20f2b67ad",
+      "pixels": {
+        "maximumChannelDifference": 108,
+        "pixelsDifferentByMoreThanOne": 19,
+        "differentFraction": 1.9205576490757065E-05,
+        "controlWitnessRgb": [
+          202,
+          169,
+          91
+        ],
+        "currentWitnessRgb": [
+          202,
+          169,
+          91
+        ]
+      },
+      "pixelGatePassed": false
+    }
+  ]
+}
