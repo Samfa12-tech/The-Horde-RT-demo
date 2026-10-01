@@ -4253,6 +4253,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         }
         return false;
     }
+    if (useRtFrame) ctx.rtScene.NotifyFrameSubmitted();
     if (evidenceFrame)
     {
         ctx.rtFrameEvidence.CommitGraphicsSubmit(

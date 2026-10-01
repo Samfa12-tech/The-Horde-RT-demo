@@ -9,6 +9,7 @@
 #include "vulkan/raytracing/RtSceneRecordObservation.h"
 #include "vulkan/raytracing/RtSceneRouteConstants.h"
 #include "vulkan/raytracing/RtLanternGeometryProfile.h"
+#include "vulkan/raytracing/TlasInstanceRefresh.h"
 
 #include <algorithm>
 #include <array>
@@ -427,6 +428,10 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     indexBuffer_ = std::exchange(other.indexBuffer_, Buffer{});
     transformBuffer_ = std::exchange(other.transformBuffer_, Buffer{});
     instanceBuffer_ = std::exchange(other.instanceBuffer_, Buffer{});
+    tlasBuiltInstances_ = std::exchange(other.tlasBuiltInstances_, {});
+    tlasInstanceDefinitionsValid_ = std::exchange(other.tlasInstanceDefinitionsValid_, false);
+    tlasPendingInstances_ = std::exchange(other.tlasPendingInstances_, {});
+    tlasPendingDefinitionsValid_ = std::exchange(other.tlasPendingDefinitionsValid_, false);
     heldLightBuffer_ = std::exchange(other.heldLightBuffer_, Buffer{});
     fireEmitterBuffer_ = std::exchange(other.fireEmitterBuffer_, Buffer{});
     worldSurfaceBuffer_ = std::exchange(other.worldSurfaceBuffer_, Buffer{});
@@ -858,6 +863,10 @@ bool PresentableTinyRtScene::ContinueInitialiseAfterPreflight(
 
 void PresentableTinyRtScene::Destroy()
 {
+    tlasBuiltInstances_ = {};
+    tlasInstanceDefinitionsValid_ = false;
+    tlasPendingInstances_ = {};
+    tlasPendingDefinitionsValid_ = false;
     executionPolicy_ = {};
     computeDispatchGroups_ = {};
     if (device_ == VK_NULL_HANDLE)
@@ -3936,6 +3945,8 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     VkAccelerationStructureDeviceAddressInfoKHR tlasAddressInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR};
     tlasAddressInfo.accelerationStructure = tlas_.handle;
     tlas_.address = vkGetAccelerationStructureDeviceAddressKHR_(device_, &tlasAddressInfo);
+    tlasBuiltInstances_ = instances;
+    tlasInstanceDefinitionsValid_ = true;
 
     diagnostic.clear();
     return true;
@@ -5571,8 +5582,11 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     VkAccelerationStructureBuildGeometryInfoKHR updateInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR};
     updateInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR;
     updateInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR | VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_KHR;
-    updateInfo.mode = VK_BUILD_ACCELERATION_STRUCTURE_MODE_UPDATE_KHR;
-    updateInfo.srcAccelerationStructure = tlas_.handle;
+    const bool rebuildTlas = !tlasInstanceDefinitionsValid_ ||
+        RequiresTlasInstanceRebuild(tlasBuiltInstances_, instances);
+    updateInfo.mode = rebuildTlas ? VK_BUILD_ACCELERATION_STRUCTURE_MODE_BUILD_KHR
+                                 : VK_BUILD_ACCELERATION_STRUCTURE_MODE_UPDATE_KHR;
+    updateInfo.srcAccelerationStructure = rebuildTlas ? VK_NULL_HANDLE : tlas_.handle;
     updateInfo.dstAccelerationStructure = tlas_.handle;
     updateInfo.geometryCount = 1u;
     updateInfo.pGeometries = &tlasGeometry;
@@ -5603,6 +5617,11 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                                  nullptr);
         });
     tlasUpdateScope.Complete(1u);
+    if (rebuildTlas)
+    {
+        tlasPendingInstances_ = instances;
+        tlasPendingDefinitionsValid_ = true;
+    }
 
 #ifndef NDEBUG
     playerWorldBodyPoseCurrent_ = usesSkinnedPlayer &&
@@ -5611,6 +5630,14 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
 #endif
     diagnostic.clear();
     return true;
+}
+
+void PresentableTinyRtScene::NotifyFrameSubmitted() noexcept
+{
+    if (!tlasPendingDefinitionsValid_) return;
+    tlasBuiltInstances_ = tlasPendingInstances_;
+    tlasInstanceDefinitionsValid_ = true;
+    tlasPendingDefinitionsValid_ = false;
 }
 
 bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
@@ -5626,6 +5653,8 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
 #endif
                                                 )
 {
+    // A prior unsubmitted recording must not advance the GPU definition cache.
+    tlasPendingDefinitionsValid_ = false;
 #ifndef NDEBUG
     // A rejected presentation attempt invalidates geometry evidence from the
     // prior recorded frame, including failures before dynamic scene updates.

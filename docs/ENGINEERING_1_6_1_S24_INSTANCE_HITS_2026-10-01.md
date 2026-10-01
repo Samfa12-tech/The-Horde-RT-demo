@@ -223,3 +223,32 @@ Normal8CB restoration completed in run20261002-004452: exact install/pull SHA256
 8cb976891e5719eceb7fd809ec91aac939ff3ec58eb2d6df44f15b5526f4ff87, honest RT
 Home/resume, no data clearing or performance/capture repetition. Probe code is
 not integrated into normal; durable receipts and this journal are retained.
+
+## Bounded normal-shader candidate (device result pending)
+
+Separate branch `codex/horde-tlas-instance-refresh` starts from normal6ec30f0,
+whose runtime is0cf4f05. A small backend-neutral predicate selects BUILD for
+changed masks, BLAS references, custom indices, SBT offsets or flags. Transforms
+and BLAS-content motion retain UPDATE. Existing scratch/AS allocations and all
+barriers remain unchanged. Two fixed21-instance CPU caches add2688 bytes plus
+flags, no GPU buffers/allocations/traffic or shader changes. Cache advancement
+occurs only after successful RT submission, independent of optional telemetry;
+a new recording discards prior unsubmitted pending state. Move/destroy own both
+caches. Submission is not falsely described as completed GPU execution.
+
+An initial303DA6FB candidate built/tested but was **not installed**: review found
+its cache advanced during recording before submit success. That is a concrete
+validity problem requiring the corrected build, not an unchanged-artifact rerun.
+Corrected four-ABI Debug build passes (24s); Windows full application Debug and
+Release build, affected resource/preflight tests2/2 each PASS. Added regression
+cases cover all discrete fields, normal transforms, count changes, move/destroy,
+unsubmitted/rejected recording and successful-submit/idempotence behaviour.
+Frozen `C:/Dev/tmp/horde-s24-instance-hits-20261001/bounded-submission-refresh-debug.apk`,
+SHA256a627c4a6431f40708e14327f9585bd0e6c0e7ca3133a9ded97242dfd7763d761.
+All70 assets equal normal8CB; CPU diagnostic probe string absent from ARM64.
+Normal shaders/counters apply (no remapping or added query). Audio/haptic manual:NO.
+
+Next finite matrix: two affected S24 captures first, then existing live deterministic
+13-waypoint route/Home-resume if restored. Relevant S26/Windows images and current
+source CI remain required before normal integration; no S25 or sustained-performance
+acceptance is implied. Keep the exact artifact, completed tests and next step here.

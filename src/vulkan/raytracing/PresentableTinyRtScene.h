@@ -412,6 +412,11 @@ public:
 #endif
                             );
 
+    // Owning render thread, only after successful submission of the recorded RT
+    // command buffer. One frame in flight: pending TLAS definitions never become
+    // the UPDATE baseline merely because a BUILD was recorded.
+    void NotifyFrameSubmitted() noexcept;
+
     // Owning render thread only, after successful device-idle/evidence completion.
     // Replaces only the extent-dependent output image; caller must reset and
     // re-record command buffers invalidated by the descriptor update.
@@ -628,6 +633,10 @@ private:
     Buffer indexBuffer_;
     Buffer transformBuffer_;
     Buffer instanceBuffer_;
+    std::array<VkAccelerationStructureInstanceKHR, kTlasInstanceCount> tlasBuiltInstances_{};
+    bool tlasInstanceDefinitionsValid_ = false;
+    std::array<VkAccelerationStructureInstanceKHR, kTlasInstanceCount> tlasPendingInstances_{};
+    bool tlasPendingDefinitionsValid_ = false;
     Buffer heldLightBuffer_;
     Buffer fireEmitterBuffer_;
     Buffer worldSurfaceBuffer_;

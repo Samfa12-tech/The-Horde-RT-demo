@@ -3032,6 +3032,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             context, horde::telemetry::RtBenchmarkFailureReason::SubmissionFailed);
         return false;
     }
+    if (useRtFrame) context.rtScene.NotifyFrameSubmitted();
     if (evidenceFrame)
     {
         context.rtFrameEvidence.CommitGraphicsSubmit(

@@ -2,6 +2,7 @@
 #include "vulkan/raytracing/RtFrameEvidenceCoordinator.h"
 #include "vulkan/raytracing/RtSceneRecordObservation.h"
 #include "vulkan/raytracing/RtExecutionPolicy.h"
+#include "vulkan/raytracing/TlasInstanceRefresh.h"
 
 #include <algorithm>
 #include <array>
@@ -54,6 +55,54 @@ bool Require(const bool condition, const std::string_view message)
         std::cerr << "FAIL: " << message << '\n';
     }
     return condition;
+}
+
+bool CheckTlasInstanceRefresh()
+{
+    using horde::vulkan::raytracing::RequiresTlasInstanceRebuild;
+    std::array<VkAccelerationStructureInstanceKHR, 21u> built{};
+    for (std::size_t i = 0u; i < built.size(); ++i)
+    {
+        built[i].instanceCustomIndex = static_cast<std::uint32_t>(i);
+        built[i].accelerationStructureReference = 0x100u + i;
+    }
+    auto next = built;
+    bool ok = Require(!RequiresTlasInstanceRebuild(built, next),
+                      "unchanged instance definitions must retain UPDATE");
+    next[20].transform.matrix[0][3] = 25.0f;
+    next[18].transform.matrix[2][3] = -15.0f;
+    ok &= Require(!RequiresTlasInstanceRebuild(built, next),
+                  "ordinary player/enemy movement must not force TLAS BUILD");
+    next[20].mask = 64u;
+    next[18].mask = 1u;
+    ok &= Require(RequiresTlasInstanceRebuild(built, next),
+                  "viewmodel/second-enemy zero-mask visibility change must rebuild");
+    built = next;
+    ok &= Require(!RequiresTlasInstanceRebuild(built, next),
+                  "after BUILD, stable definitions must return to UPDATE");
+    next[20].mask = 0u;
+    ok &= Require(RequiresTlasInstanceRebuild(built, next),
+                  "visibility removal must rebuild too");
+    next = built;
+    next[4].accelerationStructureReference += 1u;
+    ok &= Require(RequiresTlasInstanceRebuild(built, next),
+                  "world-body BLAS ownership change must rebuild");
+    next = built;
+    next[4].accelerationStructureReference = 0u;
+    ok &= Require(RequiresTlasInstanceRebuild(built, next),
+                  "reference-zero activation-state change must never UPDATE");
+    next = built;
+    next[8].instanceCustomIndex += 1u;
+    ok &= Require(RequiresTlasInstanceRebuild(built, next), "custom-index change must rebuild");
+    next = built;
+    next[8].instanceShaderBindingTableRecordOffset += 1u;
+    ok &= Require(RequiresTlasInstanceRebuild(built, next), "SBT-index change must rebuild");
+    next = built;
+    next[8].flags = VK_GEOMETRY_INSTANCE_FORCE_OPAQUE_BIT_KHR;
+    ok &= Require(RequiresTlasInstanceRebuild(built, next), "instance-flag change must rebuild");
+    ok &= Require(RequiresTlasInstanceRebuild(built, std::span(next).first(20u)),
+                  "instance-count change must rebuild");
+    return ok;
 }
 
 struct NoWorkClock
@@ -114,6 +163,26 @@ namespace horde::vulkan::raytracing
 
 struct PresentableTinyRtSceneObservationTestAccess
 {
+    static void MarkTlasDefinitions(PresentableTinyRtScene& scene)
+    {
+        scene.tlasInstanceDefinitionsValid_ = true;
+        scene.tlasBuiltInstances_[20].accelerationStructureReference = 42u;
+    }
+
+    static void MarkPendingTlasDefinitions(PresentableTinyRtScene& scene)
+    {
+        scene.tlasPendingInstances_ = scene.tlasBuiltInstances_;
+        scene.tlasPendingInstances_[20].accelerationStructureReference = 99u;
+        scene.tlasPendingDefinitionsValid_ = true;
+    }
+
+    static bool HasTlasDefinitions(const PresentableTinyRtScene& scene,
+                                   const std::uint64_t reference = 42u)
+    {
+        return scene.tlasInstanceDefinitionsValid_ &&
+               scene.tlasBuiltInstances_[20].accelerationStructureReference == reference;
+    }
+
     static RtGpuBuffer MakeBuffer(std::uintptr_t& next)
     {
         RtGpuBuffer buffer{};
@@ -717,6 +786,7 @@ int main()
     using namespace horde::vulkan::raytracing;
 
     bool ok = true;
+    ok &= CheckTlasInstanceRefresh();
     ok &= PresentableTinyRtSceneOutputResizeTestAccess::RunTests();
     const auto pipelinePolicy = TryMakeRtExecutionPolicy(
         horde::vulkan::RtExecutionBackend::RayTracingPipeline);
@@ -937,6 +1007,10 @@ int main()
                   "dynamic recording must not read the prior Diagnostic submission");
 
     PresentableTinyRtScene notReadyScene;
+    PresentableTinyRtSceneObservationTestAccess::MarkTlasDefinitions(notReadyScene);
+    PresentableTinyRtSceneObservationTestAccess::MarkPendingTlasDefinitions(notReadyScene);
+    ok &= Require(PresentableTinyRtSceneObservationTestAccess::HasTlasDefinitions(notReadyScene),
+                  "recorded-but-unsubmitted BUILD must not change the committed definition baseline");
     horde::telemetry::RtStageAccumulator notReadyStages;
     NoWorkClock noWorkClock;
     RtSceneRecordObservation notReadyObservation{
@@ -951,6 +1025,9 @@ int main()
             RtSceneFrameInputs{}, notReadyDiagnostic, &notReadyObservation) &&
             noWorkClock.reads == 0u,
         "record rejection before renderer work must not sample observation clocks");
+    notReadyScene.NotifyFrameSubmitted();
+    ok &= Require(PresentableTinyRtSceneObservationTestAccess::HasTlasDefinitions(notReadyScene),
+                  "new/rejected recording must discard a prior unsubmitted definition change");
     ok &= Require(notReadyStages.Abort(),
                   "not-ready record observation attempt did not abort");
 
@@ -989,7 +1066,27 @@ int main()
                       shipping.deviceLocalBytes == 4096u,
                   "inventory must count only a genuinely live Diagnostic buffer");
 
+    PresentableTinyRtSceneObservationTestAccess::MarkTlasDefinitions(scene);
+    PresentableTinyRtSceneObservationTestAccess::MarkPendingTlasDefinitions(scene);
     PresentableTinyRtScene moved(std::move(scene));
+    ok &= Require(!PresentableTinyRtSceneObservationTestAccess::HasTlasDefinitions(scene) &&
+                      PresentableTinyRtSceneObservationTestAccess::HasTlasDefinitions(moved),
+                  "TLAS definition cache must follow its sole scene owner on move");
+    moved.NotifyFrameSubmitted();
+    scene.NotifyFrameSubmitted();
+    ok &= Require(PresentableTinyRtSceneObservationTestAccess::HasTlasDefinitions(moved, 99u) &&
+                      !PresentableTinyRtSceneObservationTestAccess::HasTlasDefinitions(scene, 99u),
+                  "only the moved owner may commit its pending BUILD after successful submission");
+    moved.NotifyFrameSubmitted();
+    ok &= Require(PresentableTinyRtSceneObservationTestAccess::HasTlasDefinitions(moved, 99u),
+                  "submission notification with no pending BUILD must be idempotent");
+    PresentableTinyRtScene emptyScene;
+    PresentableTinyRtSceneObservationTestAccess::MarkTlasDefinitions(emptyScene);
+    PresentableTinyRtSceneObservationTestAccess::MarkPendingTlasDefinitions(emptyScene);
+    emptyScene.Destroy();
+    emptyScene.NotifyFrameSubmitted();
+    ok &= Require(!PresentableTinyRtSceneObservationTestAccess::HasTlasDefinitions(emptyScene),
+                  "even partial/no-device destruction must invalidate cached TLAS definitions");
     const auto movedFrom = scene.ResourceInventory();
     const auto movedTo = moved.ResourceInventory();
     ok &= Require(scene.BlasCount() == 0u && moved.BlasCount() == 17u &&
