@@ -107,11 +107,52 @@ No rounding-room-boundary fix, scene/material edit or tolerance relaxation is
 accepted yet. Five other points are dominated by bounce differences, so one
 blanket precision or shadow change is not supported.
 
-Next unfinished step: inspect the blue/red implicated authored faces for actual
-coplanarity/overlap and retain exact geometry/ray evidence; separately design a
-bounded numerical correction for the demonstrated closed-room light selector.
-Do not recapture the completed observers, redo normal controls or repeat rejected
-precision/phone measurements. A later actual fix must earn its own image gate.
+## Bounded outward world-box correction (isolated candidate, not promoted)
+
+Read-only authored-geometry inventory is complete. Bracket top and flame bottom
+are coplanar at y=.50 and overlap the captured blue/red bounce. More importantly,
+all six `addWorldBox` normal codes oppose their actual outward triangle winding.
+The affected primary -X code points inside the box at its max-X face, sending
+the hemisphere bounce/spawn into the solid and onto that internal interface.
+This is a geometry-normal metadata defect, not evidence to tune player assets,
+remove flame/metal faces or choose an arbitrary equal-distance material winner.
+
+Candidate `7782e8eeb54850813c74c90b188969f908f4906f` swaps only those six normal
+codes to match outward winding, plus a focused actual-source face/code regression
+in the existing host smoke. Vertices, triangle order/count, material codes,
+textures, masks, budgets and all shader modules remain unchanged. Fresh MSVC
+Debug app/test build and affected CTest1/1 PASS (4.26s). Debug executable SHA-256
+`05e8247fd9b7f213c2ca328ff2673076dd424dc7807f59b821582a6c2a16b567`.
+No additional shader compilation or unchanged control capture was needed.
+
+Both five-checkpoint native captures exit0 with scene/CPU geometry/diagnostics/
+allocation checks intact. Blue/red now spawn outward and hit the same ordinary
+world triangles489/488 on both backends. Their originally discrepant pixels are
+exactly9,13,28 and31,9,11 on both; entire non-payload blue/red images have max1,
+fraction over1=0 and **pass the unchanged backend gate**. The physical normal
+correction intentionally changes old buggy control colours; old-control gates
+fail and are retained, not loosened or forcibly restored.
+
+[Full candidate backend scan](outward-boxes/backend-parity.json) retains four
+original >3 outliers plus one newly exposed two-enemy point542,311 (max7,
+183,134,52 versus190,140,54). Worst-bend max4, finale max6 and two-enemy max92
+still fail. This is not full parity or production acceptance. Correct normal
+orientation is demonstrated; promotion still needs investigation of that extra
+point, normal uninstrumented/full affected RTX images, High physical fixtures
+and affected Android-device evidence when available. No phone build/install or
+performance claim belongs to this candidate.
+
+[Selected-sky source reconstruction](surface/sky-selector-reference.json)
+corroborates the two different selected directions against captured skyDiffuse
+within2.48e-7/2.39e-8. This is source-derived double reference evidence, not a new
+GPU direction/blocker payload or proof of the underlying shadow blocker.
+
+Next unfinished step: implement/test the smallest justified closed-room selector
+numerical correction on an isolated candidate; keep the outward-normal candidate
+and newly exposed point separate. Do not repeat completed geometry inventory,
+observers, controls or rejected precision/phone measurements. Later promotion
+must earn real uninstrumented/cross-platform image gates. S26 is disconnected
+by the owner until reconnection; do not poll/install or re-request owner checks.
 No main merge, release or publication. Normal worktree/configuration unchanged.
 
 Audio/haptic manual revalidation:NO: output-only diagnostics, semantic playback
