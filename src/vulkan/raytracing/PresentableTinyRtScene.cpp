@@ -6099,6 +6099,16 @@ bool PresentableTinyRtScene::CaptureStorageImage(StorageImageCapture& capture, s
 
     const VkDeviceSize byteSize = static_cast<VkDeviceSize>(dispatchExtent_.width) *
                                   static_cast<VkDeviceSize>(dispatchExtent_.height) * 4u;
+    // Allocate CPU storage BEFORE acquiring the readback buffer or mapping its
+    // memory. Allocation failure must not strand a mapped Vulkan allocation.
+    // The reporting caller additionally bounds source pixels before this call.
+    std::vector<std::uint8_t> pixels;
+    try { pixels.resize(static_cast<std::size_t>(byteSize)); }
+    catch (...)
+    {
+        diagnostic = "Failed to allocate RT capture CPU storage.";
+        return false;
+    }
     Buffer readback;
     if (!CreateBuffer(byteSize,
                       VK_BUFFER_USAGE_TRANSFER_DST_BIT,
@@ -6163,13 +6173,13 @@ bool PresentableTinyRtScene::CaptureStorageImage(StorageImageCapture& capture, s
         return false;
     }
 
+    std::memcpy(pixels.data(), mapped, pixels.size());
+    vkUnmapMemory(device_, readback.memory);
+    DestroyBuffer(readback);
     capture.width = dispatchExtent_.width;
     capture.height = dispatchExtent_.height;
     capture.redBlueSwapNormalised = lastOutputRedBlueSwapApplied_;
-    capture.rgba.resize(static_cast<std::size_t>(byteSize));
-    std::memcpy(capture.rgba.data(), mapped, capture.rgba.size());
-    vkUnmapMemory(device_, readback.memory);
-    DestroyBuffer(readback);
+    capture.rgba = std::move(pixels);
 
     if (capture.redBlueSwapNormalised)
     {
