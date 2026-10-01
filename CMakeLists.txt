@@ -686,6 +686,17 @@ if(BUILD_TESTING)
             COMMAND horde_rt_windows_remote_playtest_report_ui_tests)
         set_tests_properties(horde_rt_windows_remote_playtest_report_ui_tests PROPERTIES TIMEOUT 45)
 
+        # Explicit owner-approved acceptance tool only. Never built by default,
+        # registered with CTest, or linked into the shipping application.
+        add_executable(horde_rt_windows_playtest_relay_acceptance EXCLUDE_FROM_ALL
+            tests/WindowsPlaytestRelayAcceptance.cpp
+            src/platform/windows/WindowsPlaytestSubmission.cpp
+            src/platform/windows/WindowsPlaytestVerification.cpp)
+        target_include_directories(horde_rt_windows_playtest_relay_acceptance PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/src)
+        target_link_libraries(horde_rt_windows_playtest_relay_acceptance PRIVATE
+            horde_gameplay_simulation horde_rt_report_webview2 bcrypt winhttp oleaut32)
+
         add_executable(horde_rt_windows_playtest_report_ui_tests
             tests/WindowsPlaytestReportUiTests.cpp
             src/platform/windows/WindowsPlaytestReport.cpp)
