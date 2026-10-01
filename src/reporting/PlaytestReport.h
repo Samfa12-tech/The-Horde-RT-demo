@@ -95,6 +95,27 @@ struct PreparedPlaytestReport
 [[nodiscard]] PreparedPlaytestReport PreparePlaytestReport(const PlaytestReportInput& input);
 [[nodiscard]] std::string_view PlaytestReportStatusName(PlaytestReportStatus status) noexcept;
 
+// JNI and native Windows controls provide UTF-16, not JNI modified UTF-8.
+// Reject unpaired surrogates and byte overflow without replacing/truncating text.
+// Output is cleared on failure. Content/consent policy stays in the builder.
+[[nodiscard]] PlaytestReportStatus EncodePlaytestReportUtf16(
+    std::u16string_view text, std::size_t maximumBytes, std::string& output);
+
+// Platform-owned snapshot: no borrowed renderer strings cross a thread or picker.
+struct OwnedPlaytestReportContext
+{
+    std::string product, version, build, platform, rawModel, gpu, backend, quality;
+    double renderScale = 0.0;
+    std::uint32_t internalWidth = 0u, internalHeight = 0u;
+    bool rtPresented = false;
+
+    [[nodiscard]] PlaytestReportContext View() const noexcept
+    {
+        return {product, version, build, platform, rawModel, gpu, backend, quality,
+            renderScale, internalWidth, internalHeight, rtPresented};
+    }
+};
+
 enum class PlaytestReportDeliveryState : std::uint8_t
 {
     Idle,

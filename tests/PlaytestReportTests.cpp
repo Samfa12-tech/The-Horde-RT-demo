@@ -103,7 +103,7 @@ void TestRejectedIdentifiersTimesEnumsAndText()
     input.note = oversizedNote;
     Check(PreparePlaytestReport(input).status == PlaytestReportStatus::NoteTooLarge,
           "note overflow is rejected, not silently truncated");
-    input = ValidInput(); input.note = "bad\nline";
+    input = ValidInput(); input.note = "bad\x01line";
     Check(PreparePlaytestReport(input).status == PlaytestReportStatus::ControlCharacter,
           "control characters rejected");
     input = ValidInput();
@@ -195,7 +195,43 @@ void TestRetryIdentityAndCancellation()
 
 int main()
 {
+    {
+        std::string output = "stale";
+        Check(EncodePlaytestReportUtf16(u"\u9f8d \U0001f525", 8u, output) == PlaytestReportStatus::Ready &&
+            output == "\xe9\xbe\x8d \xf0\x9f\x94\xa5", "UTF-16 CJK and paired emoji encode to exact UTF-8 bytes");
+        Check(EncodePlaytestReportUtf16(u"\u9f8d \U0001f525", 7u, output) == PlaytestReportStatus::NoteTooLarge &&
+            output.empty(), "UTF-8 byte cap clears output instead of truncating");
+        const std::u16string high(1u, static_cast<char16_t>(0xd800u));
+        const std::u16string low(1u, static_cast<char16_t>(0xdc00u));
+        Check(EncodePlaytestReportUtf16(high, 10u, output) == PlaytestReportStatus::InvalidUtf8 &&
+            output.empty(), "unpaired high surrogate rejected");
+        Check(EncodePlaytestReportUtf16(low, 10u, output) == PlaytestReportStatus::InvalidUtf8 &&
+            output.empty(), "unpaired low surrogate rejected");
+        Check(EncodePlaytestReportUtf16(high + u"a", 10u, output) == PlaytestReportStatus::InvalidUtf8,
+            "high surrogate followed by ordinary character rejected");
+        const std::u16string nul(1u, u'\0');
+        Check(EncodePlaytestReportUtf16(nul, 1u, output) == PlaytestReportStatus::Ready &&
+            output.size() == 1u && output[0] == '\0', "NUL remains for builder policy, not JNI truncation");
+        Check(EncodePlaytestReportUtf16(u"", 0u, output) == PlaytestReportStatus::Ready && output.empty(),
+            "empty conversion remains builder's required-note decision");
+    }
     TestConsentSchemaAndContext();
+    {
+        auto input = ValidInput();
+        input.note = "Walk forward.\r\nThen parry.\tExpected: no clipping.";
+        const auto prepared = PreparePlaytestReport(input);
+        Check(prepared.IsReady() && prepared.json.find("\\r\\n") != std::string::npos &&
+            prepared.json.find("\\t") != std::string::npos,
+            "authored multiline steps survive as escaped JSON, not flattened/truncated");
+        input.includeBasicContext = true;
+        input.context = ValidContext();
+        input.context.gpu = "GPU\nInjected";
+        Check(PreparePlaytestReport(input).status == PlaytestReportStatus::InvalidContext,
+            "note layout exception never permits control characters in context");
+        input = ValidInput(); input.note = "token\n=secret-value";
+        Check(PreparePlaytestReport(input).status == PlaytestReportStatus::SensitiveContent,
+            "credential assignment cannot bypass detection through an authored line break");
+    }
     TestRejectedIdentifiersTimesEnumsAndText();
     TestSensitiveContentRejected();
     TestRetryIdentityAndCancellation();

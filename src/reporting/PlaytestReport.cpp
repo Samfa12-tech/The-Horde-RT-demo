@@ -46,14 +46,15 @@ bool ValidUtf8(const std::string_view text) noexcept
     return true;
 }
 
-bool ContainsControl(const std::string_view text) noexcept
+bool ContainsControl(const std::string_view text, const bool allowNoteLayout) noexcept
 {
     for (std::size_t i = 0u; i < text.size();)
     {
         const auto first = static_cast<unsigned char>(text[i]);
         if (first <= 0x7fu)
         {
-            if (first < 0x20u || first == 0x7fu) return true;
+            if ((first < 0x20u || first == 0x7fu) &&
+                !(allowNoteLayout && (first == '\n' || first == '\r' || first == '\t'))) return true;
             ++i;
             continue;
         }
@@ -124,7 +125,8 @@ bool ContainsSensitivePattern(const std::string_view text)
         while (at != std::string::npos)
         {
             std::size_t next = at + key.size();
-            while (next < lower.size() && (lower[next] == ' ' || lower[next] == '\t')) ++next;
+            while (next < lower.size() && (lower[next] == ' ' || lower[next] == '\t' ||
+                lower[next] == '\r' || lower[next] == '\n')) ++next;
             if (next < lower.size() && (lower[next] == '=' || lower[next] == ':')) return true;
             if (key == "bearer" && next < lower.size() && lower[next] != ',' && lower[next] != '.') return true;
             at = lower.find(key, at + 1u);
@@ -157,13 +159,13 @@ bool ContainsSensitivePattern(const std::string_view text)
 }
 
 TextStatus ValidateText(const std::string_view text, const std::size_t maximumBytes,
-                        const bool mayBeEmpty = false)
+                        const bool mayBeEmpty = false, const bool allowNoteLayout = false)
 {
     if (text.empty() && !mayBeEmpty) return TextStatus::Empty;
     if (!mayBeEmpty && IsWhitespaceOnly(text)) return TextStatus::Empty;
     if (text.size() > maximumBytes) return TextStatus::TooLarge;
     if (!ValidUtf8(text)) return TextStatus::InvalidUtf8;
-    if (ContainsControl(text)) return TextStatus::Control;
+    if (ContainsControl(text, allowNoteLayout)) return TextStatus::Control;
     if (ContainsSensitivePattern(text)) return TextStatus::Sensitive;
     return TextStatus::Ok;
 }
@@ -255,6 +257,9 @@ void AppendJsonString(std::string& output, const std::string_view value)
         {
         case '"': output += "\\\""; break;
         case '\\': output += "\\\\"; break;
+        case '\n': output += "\\n"; break;
+        case '\r': output += "\\r"; break;
+        case '\t': output += "\\t"; break;
         default: output.push_back(ch); break;
         }
     }
@@ -286,6 +291,41 @@ PlaytestReportStatus ToReportStatus(const TextStatus status) noexcept
 
 } // namespace
 
+PlaytestReportStatus EncodePlaytestReportUtf16(const std::u16string_view text,
+    const std::size_t maximumBytes, std::string& output)
+{
+    output.clear();
+    // Every UTF-16 code unit requires at least one UTF-8 byte.
+    if (text.size() > maximumBytes) return PlaytestReportStatus::NoteTooLarge;
+    std::string encoded;
+    encoded.reserve(text.size());
+    for (std::size_t i = 0u; i < text.size(); ++i)
+    {
+        std::uint32_t codepoint = text[i];
+        if (codepoint >= 0xd800u && codepoint <= 0xdbffu)
+        {
+            if (++i == text.size() || text[i] < 0xdc00u || text[i] > 0xdfffu)
+                return PlaytestReportStatus::InvalidUtf8;
+            codepoint = 0x10000u + ((codepoint - 0xd800u) << 10u) + (text[i] - 0xdc00u);
+        }
+        else if (codepoint >= 0xdc00u && codepoint <= 0xdfffu)
+            return PlaytestReportStatus::InvalidUtf8;
+        const std::size_t count = codepoint < 0x80u ? 1u : codepoint < 0x800u ? 2u :
+            codepoint < 0x10000u ? 3u : 4u;
+        if (count > maximumBytes - encoded.size()) return PlaytestReportStatus::NoteTooLarge;
+        if (count == 1u) encoded.push_back(static_cast<char>(codepoint));
+        else
+        {
+            encoded.push_back(static_cast<char>((count == 2u ? 0xc0u : count == 3u ? 0xe0u : 0xf0u) |
+                (codepoint >> (6u * (count - 1u)))));
+            for (std::size_t n = count - 1u; n > 0u; --n)
+                encoded.push_back(static_cast<char>(0x80u | ((codepoint >> (6u * (n - 1u))) & 0x3fu)));
+        }
+    }
+    output = std::move(encoded);
+    return PlaytestReportStatus::Ready;
+}
+
 PreparedPlaytestReport PreparePlaytestReport(const PlaytestReportInput& input)
 {
     PreparedPlaytestReport result;
@@ -294,7 +334,7 @@ PreparedPlaytestReport PreparePlaytestReport(const PlaytestReportInput& input)
     if (!ValidUtcTimestamp(input.capturedAtUtc)) { result.status = PlaytestReportStatus::InvalidTimestamp; return result; }
     if (!IsValidCategory(input.category)) { result.status = PlaytestReportStatus::InvalidCategory; return result; }
     if (!IsValidImpact(input.impact)) { result.status = PlaytestReportStatus::InvalidImpact; return result; }
-    const auto noteStatus = ValidateText(input.note, kPlaytestReportMaxNoteBytes);
+    const auto noteStatus = ValidateText(input.note, kPlaytestReportMaxNoteBytes, false, true);
     if (noteStatus != TextStatus::Ok) { result.status = ToReportStatus(noteStatus); return result; }
 
     if (input.includeBasicContext)
