@@ -95,6 +95,24 @@ the retained independent intersections. Neither is an accepted fix. Current
 High row43 and the independent Mobile backend pixel gate remain open. Do not
 repeat the completed current replay after resumption.
 
+### Bounded temporary-module continuation
+
+The existing compiler catalog/publication functions can stage actual modules on
+the isolated branch without a new renderer/module-override framework. Use the
+branch-guarded `stage-precision-candidate.ps1` once, with external temporary
+output, and generate both real metadata adapters. No budget/assertion/traversal
+constant changes. Structural catalog status is needed by the existing provider;
+it does **not** mean production frozen-cost admission passed. This branch and
+all generated candidate artifacts remain investigation-only/unshippable.
+
+Next unfinished step: build this same keyword candidate, record exact source/
+executable/module identities, run one pipeline and one compute row43 capture,
+and compare against the completed current controls. `-ShaderCandidate` records
+counter/module changes rather than requiring buggy pixels/counters to recur; it
+retains the unchanged maximum3/fraction0.001 image gate and fails on violation.
+No completed controls will be rerun. If no correction, stop this hypothesis;
+otherwise require first-hit/physical/image evidence before any promotion.
+
 Audio/haptic manual revalidation required:NO (capture-only with unchanged
 semantic playback inputs); no owner interruption/return check is repeated.
 

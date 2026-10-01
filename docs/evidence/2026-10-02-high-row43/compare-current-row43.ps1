@@ -1,7 +1,8 @@
 param(
     [Parameter(Mandatory)][string]$ControlRoot,
     [Parameter(Mandatory)][string]$CurrentRoot,
-    [Parameter(Mandatory)][string]$OutputPath
+    [Parameter(Mandatory)][string]$OutputPath,
+    [switch]$ShaderCandidate
 )
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
@@ -48,11 +49,15 @@ $rows = foreach ($backend in @('pipeline','compute')) {
         throw "Invalid replay identity: $backend"
     }
     $counterCount = 0
+    $counterChanges = @()
     foreach ($group in @('dielectricDiagnostics','dielectricReasonDiagnostics')) {
         if (-not $new.$group.available) { throw "Counters unavailable: $backend" }
         foreach ($field in $old.$group.psobject.Properties) {
             if ($field.Name -in @('available','availability')) { continue }
-            if ($field.Value -ne $new.$group.($field.Name)) { throw "Counter changed: $backend $($field.Name)" }
+            if ($field.Value -ne $new.$group.($field.Name)) {
+                if (-not $ShaderCandidate) { throw "Counter changed: $backend $($field.Name)" }
+                $counterChanges += [pscustomobject]@{field=$field.Name; control=$field.Value; candidate=$new.$group.($field.Name)}
+            }
             ++$counterCount
         }
     }
@@ -62,8 +67,9 @@ $rows = foreach ($backend in @('pipeline','compute')) {
             throw "CPU geometry changed: $backend $geometry"
         }
     }
-    if (($old.selectedRtPipelineBundle | ConvertTo-Json -Compress) -ne
-        ($new.selectedRtPipelineBundle | ConvertTo-Json -Compress)) { throw "Modules changed: $backend" }
+    $modulesMatch = ($old.selectedRtPipelineBundle | ConvertTo-Json -Compress) -ceq
+        ($new.selectedRtPipelineBundle | ConvertTo-Json -Compress)
+    if (-not $modulesMatch -and -not $ShaderCandidate) { throw "Modules changed: $backend" }
     $oldImage = [IO.Path]::GetFullPath((Join-Path $oldDirectory $old.captures[0].file))
     $newImage = [IO.Path]::GetFullPath((Join-Path $newDirectory $new.captures[0].file))
     $oldPngHash = (Get-FileHash -LiteralPath $oldImage).Hash.ToLowerInvariant()
@@ -75,7 +81,10 @@ $rows = foreach ($backend in @('pipeline','compute')) {
     $pixels = [HordeRow43Pixels]::Compare($oldImage,$newImage)
     [pscustomobject]@{
         backend = $new.executionBackend; counterCount = $counterCount
-        matchedCpuGeometryAndModules = $true
+        matchedCpuGeometry = $true; matchedModules = $modulesMatch
+        counterChanges = @($counterChanges)
+        controlModules = $old.selectedRtPipelineBundle
+        currentModules = $new.selectedRtPipelineBundle
         primaryMismatchedExitCount = $new.dielectricReasonDiagnostics.primaryMismatchedExitCount
         controlPngSha256 = $oldPngHash
         currentPngSha256 = $newPngHash
@@ -83,7 +92,7 @@ $rows = foreach ($backend in @('pipeline','compute')) {
         pixelGatePassed = $pixels.maximumChannelDifference -le 3 -and $pixels.differentFraction -le 0.001
     }
 }
-[pscustomobject]@{ schema=1; sourceBase='a32a718'; pixelTolerance=@{maxRgb=3;maximumFractionOverOne=0.001}; rows=@($rows) } |
+[pscustomobject]@{ schema=1; sourceBase='a32a718'; shaderCandidate=[bool]$ShaderCandidate; pixelTolerance=@{maxRgb=3;maximumFractionOverOne=0.001}; rows=@($rows) } |
     ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $OutputPath -Encoding utf8
 $rows | ConvertTo-Json -Depth 5
 if (@($rows | Where-Object { -not $_.pixelGatePassed }).Count) { throw 'Current replay pixel gate failed; preserve the result.' }
