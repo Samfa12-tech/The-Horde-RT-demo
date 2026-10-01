@@ -13,7 +13,36 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
-### October 2 exact corner regression and backend discriminator (current slice)
+### October 2 closed light-region result (current unfinished step)
+
+Do not restart controls/status/geometry inventory on resumption. Isolated shader
+candidate `cc0491e` / complete pushed evidence `ac15d64` fixes the demonstrated
+closed-finale-room boundary selector: native RTX770,526 now exactly18,21,25 on
+both backends. Five-image pairs exit0 with unchanged scene/CPU geometry/complete
+diagnostics. Debug/Release affected host smoke each1/1 passes (4.40/1.96s);
+all16 actual SPIR-V modules compile/validate. The bound is for reconstruction
+arithmetic only, not hardware intersection-t accuracy. Actual ray components
+avoid a normalization assumption; shadow transport/origin tolerances unchanged.
+
+**Not promoted:** Generic adds3060bytes/180 instructions and Opaque adds13064bytes/
+791 instructions relative to isolated control; frozen cost admission fails.
+All8 Shipping modules remain free of diagnostic atomics/binding22. No shader
+budget, pixel tolerance, accepted player work or normal renderer changes.
+Blue/red remain passing; four >3 reflection pixels remain:556,378 max4;
+552,395 max4;542,311 max7;564,393 max92. High row43 remains separate/open.
+[Single durable experiment record](evidence/2026-10-02-backend-pixel-witness/README.md)
+links the exact source, all new images/manifests/logs and curated current receipts.
+
+Next concrete step: localize the previously unobserved combat542,311 reflection
+layer, using existing85 fields and at most one bounded two-enemy capture per
+backend if new GPU evidence is necessary. No repeat of this completed five-image
+matrix, old controls, precision/epsilon sweeps or rejected phone performance work.
+Cost/integration and uninstrumented/cross-platform gates remain open. S26 stays
+owner-disconnected until reconnection; existing music-interruption/S24 owner
+checks must not be re-requested. Audio/haptic manual revalidation required:NO:
+receiver lighting only, unchanged semantic feedback/playback inputs.
+
+### October 2 exact corner regression and backend discriminator (preceding slice)
 
 Continue from this specific unfinished step; do not repeat a status recap, broad
 audit or completed controls merely after compaction. Normal source remains on
@@ -41,8 +70,8 @@ reached because closed-box normal metadata points inward. Isolated correction
 contract; Debug smoke1/1 passes. Both whole blue/red images now pass unchanged
 backend tolerance. Four old outliers and one new combat542,311 max7 remain;
 candidate is not promoted. Full exact source/images are pushed on the witness
-branch; the normal renderer is untouched. Next unfinished step: smallest
-justified numerical correction for the proven closed-room selector boundary.
+branch; the normal renderer is untouched. The subsequent closed-room selector
+experiment is completed above; use its explicit next step, not this old stage.
 Keep normal-candidate acceptance/new point and mapped-normal outliers separate.
 No repeated geometry inventory, completed captures or precision keyword
 search, old phone performance trial, observer recapture or telemetry framework.

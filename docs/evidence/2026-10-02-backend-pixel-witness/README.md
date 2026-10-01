@@ -134,3 +134,53 @@ Raw logs remain at C:/Dev/tmp/horde-backend-pixel-witness-20261002:
 push SHA-2561a5c05caf482390b48824413fad1318bf1dae4275aa70d9d9c77c4a85df7604e;
 PR SHA-25659131bcb31bca141c8ec3a4ce0d65d70a7c55fd7f8d5ad96f6762372765bcade.
 Later prose/receipt updates are not silently relabelled as this exact-source CI.
+
+## Closed light-region candidate: completed finite matrix, not promoted
+
+Isolated source `cc0491e601bc6665ae57a99b8920dcbc38efd719`, after outward-box
+control94f0c4e, replaces exact coordinate membership with the conservative
+reconstruction-arithmetic neighbourhood of the **same closed light regions**.
+The captured rays/t differ, not just their rounded positions. This policy
+preserves inclusion of the authored z=-12 wall; it does not certify undocumented
+hardware intersection-t error. Actual ray components avoid a normalization
+assumption. Geometry/materials/masks/traversal budgets, receiver positions,
+shadow-origin tolerances and physical visibility transport remain unchanged;
+the corrected selected light ray necessarily differs at the affected boundary.
+
+Fresh MSVC Debug/Release affected smoke each1/1 PASS4.40/1.96s exercises the
+actual scalar GLSL, captured pair, eight region endpoints/one-step neighbours/
+excluded millimetre offsets and12 double-reference separate/FMA fixtures.
+Native Debug app build passes, executable SHA-256
+`e5e68dd444dd8077f7c5d4b072caabb8c4c9134c20ee6a7eb0c6b501eecb58df`.
+All16 real SPIR-V modules compile/optimise/disassemble/validate, and all actual
+embedded byte hashes match their nonempty catalog fields. All8 Shipping modules
+remain zero-atomic/no binding22. This is a shader change: unlike preceding
+output-only stages, Shipping and High modules are not byte-identical controls.
+
+**Frozen cost gate FAIL:** relative to94f0c4e, Generic adds3060bytes/180
+instructions and Opaque adds13064bytes/791 instructions in both backends.
+The existing budget file/hash is unchanged; no limits are raised and no
+performance/register/occupancy gain is claimed. Keep this candidate isolated.
+
+One new five-checkpoint native capture on each RTX backend exits0, honestly
+presents RT and preserves scene/CPU geometry/allocations/full diagnostics.
+[Paired scan](closed-light-region/backend-parity.json) retains unchanged
+max3/fraction.001 gates.770,526 now exactly18,21,25 on both, with skyVisibility1
+and skyDiffuse.6990025/.69900256. Blue/red remain max1/fraction over1=0. Four
+remaining outliers are unchanged: worst556,378 max4; finale552,395 max4;
+combat542,311 max7 and564,393 max92. Whole parity still fails. Old buggy-control
+colour changes are retained as expected differences, never relabelled passes.
+
+[Exact pushed source/full native evidence](https://github.com/Samfa12-tech/The-Horde-RT-demo/tree/ac15d641e6497bbd3fbbe3fff204e0d6c96f4863/docs/evidence/2026-10-02-backend-pixel-witness)
+contains all ten lossless PNGs, manifests/geometry, actual fields and build/run
+logs. This engineering tree contains only five curated receipts; no experimental
+source/modules/configuration are integrated. No phone operation or main merge,
+release or publication. No unchanged control/artifact was rebuilt or recaptured.
+
+Next unfinished step supersedes the earlier selector task: localize the new
+combat542,311 reflection layer using existing85 fields, with only bounded
+two-enemy captures per backend if needed. Do not repeat the completed candidate
+matrix or conduct another precision/epsilon sweep. Keep remaining original
+reflection outliers, High row43 and shader-cost/promotion gates distinct.
+Audio/haptic manual revalidation required:NO; lighting only, no semantic
+listener/event/playback/haptic changes. Previously requested owner gates unchanged.
