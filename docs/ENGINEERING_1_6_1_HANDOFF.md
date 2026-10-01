@@ -47,8 +47,13 @@ second cancels dialog and closes without forced cleanup. See the
 One independent UIA follow-up also stops before save: initial metadata does not
 identify unique filename Edit; owned process exits normally0. Three incomplete
 attempts retained, no Windows file-save pass/product failure inferred.
-**Next:** inspect settled picker metadata, identify actual filename element and one bounded
-real path/write gate, then confirmed reporting destination/authority for any
+The bounded settled-visible UIA continuation also runs once without identifying
+a filename field. Four incomplete attempts, no path/write; no product failure
+inferred. Do not repeat these helpers unchanged. Latestdfaf3f3 push36855920874/
+PR36855927565 are freshly SUCCESS, actual logs GCC55/Clang55/MSVC57/focused15
+each inspected, PR MERGEABLE/CLEAN and main unchanged.
+**Next:** one manual Windows fresh-file export with exact JSON/saved-UI inspection,
+then confirmed reporting destination/authority for any
 remote integration. All performance/High glass/backend, S24 visuals/S25, music
 focus/balance and final-candidate gates remain open; no player retuning or repeated
 finished matrix. Audio/haptic manual revalidation required: **NO**, existing paused

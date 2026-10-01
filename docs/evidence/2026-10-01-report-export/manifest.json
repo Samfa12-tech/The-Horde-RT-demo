@@ -170,8 +170,8 @@
     },
     {
       "path": "RUN_STATUS.md",
-      "bytes": 4592,
-      "sha256": "8ac22a507c4ed734b9da1cb263e077c4093a8bf1e4ed0ff68448353b9135320f"
+      "bytes": 5712,
+      "sha256": "91c90e37a36c54687e8b931a407051aaea8140c5166a52f24dbdc3c98e972a25"
     },
     {
       "path": "windows/windows-attempt1-stderr.log",
@@ -227,6 +227,26 @@
       "path": "windows/windows-real-uia-once.stdout.log",
       "bytes": 2068,
       "sha256": "d57369bae49c1177cc2623acf1d88f241e6574ccb5991efe935efdd81bae9872"
+    },
+    {
+      "path": "windows/windows-real-save-visible-settled.ps1",
+      "bytes": 13004,
+      "sha256": "5fdaa7438af40f9950f6af99272a492b9e326e434f1ca3f4fe3a994480bf8438"
+    },
+    {
+      "path": "windows/windows-real-visible-settled.stdout.log",
+      "bytes": 2069,
+      "sha256": "3b8fa82cd802b7c5299fef46f34f925250f9e1f25c96afad3cad202adf1101db"
+    },
+    {
+      "path": "windows/windows-real-visible-settled.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "windows/windows-visible-settled-observation.md",
+      "bytes": 2230,
+      "sha256": "1c9e3b233812fda26abe9246cee22d3f4a756fd4b7d3ffbafb1d2c6a76aa7ebe"
     }
   ]
 }

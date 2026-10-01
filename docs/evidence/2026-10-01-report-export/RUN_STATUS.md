@@ -27,6 +27,15 @@ ca58f0956637f9063fe1cda42989ad5f74daa47d. Its tree
 a29cbd6c9beabd5b208a86dfacc13be81b4a5145 equals the engineering head tree.
 This is non-mutating integration validation, not permission to merge.
 
+The later documentation/evidence checkpointdfaf3f3 also completes fresh
+[push36855920874](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/36855920874)
+and [PR36855927565](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/36855927565)
+with **SUCCESS**. Actual job-log results inspected: GCC55/55, Clang55/55,
+MSVC57/57 and focused Vulkan CPU-host15/15 in each; real native-form fixture
+0.54s push/0.57s PR. Exact PR head remainsdfaf3f3, MERGEABLE/CLEAN, mainbda1b99
+unchanged. No current-source or reconciled-integration failure is being hidden
+behind an old-job rerun. These are compiler/CPU-host results, not device passes.
+
 ## Windows actual application / picker attempt
 
 Exact built Debug executable SHA-256
@@ -61,14 +70,21 @@ Startup capability report still says presentation pending/false while the
 foreground form/picker blocks the application's first RT frame. This is not
 mislabelled as a rendering defect or fresh RTX presentation acceptance.
 
-**Next finite step:** capture settled picker accessibility metadata in the same
-owned process (not an initial HWND/early snapshot), identify the actual filename
-element without guessing, then perform exactly one approved-path/write check.
-If reliable automation remains unavailable, retain this as an explicit desktop
-interaction acceptance gap. Do not replay S26 saves, the performance matrix,
-unchanged builds, or the already passing compiler/native-form fixtures to solve
-this automation gap. Backend destination/authority and real remote delivery stay
-separate and open.
+The specific settled-metadata continuation has now run **once**: only one visible
+owned picker,20s bounded discovery, Edit/ComboBox name/labelled-by/parent matching,
+two stable reads required before any write. No filename target is identified;
+no path/Save action or JSON is produced. Cleanup completes without forced
+termination, but the wrapper emits no numeric exit code. See the
+[fourth observation](windows/windows-visible-settled-observation.md).
+Total actual-save attempts: **four incomplete**, zero successful saves. No product
+defect is inferred, and no unchanged helper is to be replayed.
+
+**Next finite step:** one manual Windows form/export to a fresh local file, then
+inspect its exact JSON and saved-state UI. Automated filename discovery remains
+unreliable; keep desktop interaction acceptance open while progressing independent
+work. Do not replay S26 saves, the performance matrix, unchanged builds or the
+passing compiler/native-form fixtures. Backend destination/authority and real
+remote delivery stay separate and open.
 
 The two synthetic S26 Download test JSONs were SHA-256 checked against the
 archived exact bytes, then removed. Generated private picker scratch XML was
