@@ -34,10 +34,21 @@ The next bounded performance candidate is tracked in the [primary opacity
 experiment](ENGINEERING_1_6_1_PRIMARY_OPACITY_2026-10-01.md). Experimental source
 e78028c is pushed separately; affected host4/4,16 module validation and26 RTX/six
 S26 byte-identical images pass image admission, but RTX pipeline's unchanged
-capture-timing gate fails+4.766%. Eight interleaved S26 Shipping rows are running;
-no gain claimed. Two S24 candidate captures reproduce missing hands identically,
+capture-timing gate fails+4.766%. Eight interleaved S26 Shipping rows complete,
+9752 joined/presented/GPU-valid rows: **NO-GO for promotion**. Opening descriptive
+cycle+4.26%, heavy−3.54%/3.7ms but not repeatable and thermally confounded; no causal
+gain/display-pacing/30FPS acceptance. Normal opening82ms/heavy105ms means still
+about49/71ms above33.3ms. Sparse active RAM/PSI do not prove a GPU bandwidth cause;
+GPU cache/stall/register counters remain gaps. Do not spend a second sweep on
+similarly small speculative savings. Normal S26 Debug8CB and benchmark3CB restored,
+installed hashes verified, Home. Existing RTX backend comparison also fails5/13
+pixel gates, unchanged tolerance; separate from within-backend candidate equality.
+Two S24 candidate captures reproduce missing hands identically,
 normal8CB restored. Read the finite record before resuming; do not rebuild unchanged
-artifacts or repeat completed rows/rejected first-blocker/split trials.
+artifacts or repeat completed rows/rejected first-blocker/split trials. **Next:**
+bounded S24 numeric primary-instance hit discriminator before metadata/shading,
+not accepted player tuning; then remaining High/backend/report/final-candidate
+gates. Full programme remains active, no release/main merge/publication.
 
 Shared contract3e0f9be and native integration69afe4e add paused Android/Windows
 report forms and explicit foreground local JSON export. Separate export/context

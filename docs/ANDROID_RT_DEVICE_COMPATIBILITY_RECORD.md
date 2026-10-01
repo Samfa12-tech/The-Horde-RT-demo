@@ -2,7 +2,18 @@
 
 Last updated: 2026-10-01
 
-## October 1: primary-opacity trial image containment
+## October 1: primary-opacity trial image/performance containment
+
+Exact local SM-S948B Shipping/Mobile75% pipeline ABBA evidence completes eight
+fixed rows,9752 presented/joined CPU/GPU samples, actual OpaqueFast, strict ASTC
+and identical assets. Opening mean-of-run-medians82.277→85.785ms cycle,71.497→74.751ms
+GPU; held-high104.664→100.962ms cycle,102.992→99.114ms GPU. Apparent heavy3.7ms
+gain is not repeatable or thermally stationary (battery28.9–43.2C, status0–3,
+power0–8). **No promotion**, causal speedup or30FPS/display-pacing pass. All eight
+sparse active RAM/PSI samples and GPU bandwidth/cache/stall gaps are retained;
+no assumption memory is the culprit. Normal8CB Debug reinstalled/pulled identical;
+last A2 normal3CB benchmark installed/pulled identical, then force-stop/Home.
+No app-data/stable package changes, no S24 timing rerun or S25 claim.
 
 Exact local SM-S948B Diagnostic/Mobile75% pipeline control8CB97689 and
 candidate6DA2BCCF install/pull checks, six authored captures and Home/resume pass.

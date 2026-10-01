@@ -1,7 +1,9 @@
 # Bounded Mobile primary opacity admission experiment
 
 Owner permits only one or two further materially promising trials, not another
-broad investigation. This is candidate 1; finite Shipping collection is running.
+broad investigation. Candidate1 is finished: **NO-GO for promotion**. Image
+equivalence passes; no meaningful repeatable phone saving is admitted. Do not
+repeat these rows or tune/rebuild this candidate to force a favourable result.
 Normal source control is 8c65afa694067e56b09ccb09c427fffd0b5ee570 plus prose-only
 steering checkpoint. Original dirty engineering worktree/probe is untouched.
 
@@ -48,9 +50,9 @@ tradeoff. Added upload-after-clones and shadow confirmation source contracts.
 | Shader | Actual compilation/validation; Shipping diagnostics absent; High unchanged | Actual16 modules PASS; eight High hashes identical |
 | Windows | Current Mobile primary/body/water/lantern images, pipeline and compute, unchanged tolerance |26 images byte-identical; pipeline capture-timing gate fails+4.766%, compute passes−0.963% |
 | Exact S26 | Same authored image fixtures, primary ownership and physical-query containment | Six images byte-identical; strict ASTC/presentation/Home-resume PASS |
-| Shipping timing, only after image admission | Opening route and glassless held-high; interleaved A1/B1/B2/A2 warm runs at75%, same backend/extent | Running; no gain claimed |
-| Memory | Active RAM/PSI separate from GPU bandwidth/cache/stall gaps; no intermediate allocation | Open |
-| Restore/decision | Normal APK/config restored; preserve negative results, achieved30FPS gap and next action | Open |
+| Shipping timing, only after image admission | Opening route and glassless held-high; interleaved A1/B1/B2/A2 warm runs at75%, same backend/extent | Eight rows complete;9752 joined/presented/GPU-valid frames; NO-GO |
+| Memory | Active RAM/PSI separate from GPU bandwidth/cache/stall gaps; no intermediate allocation | Eight sparse active samples retained; GPU counter/plateau gaps remain |
+| Restore/decision | Normal APK/config restored; preserve negative results, achieved30FPS gap and next action | Normal Debug/benchmark bytes restored; experiment separate, source restoration below |
 
 S24 missing-hands/enemy follow-up is independent and does not certify S26 or this
 experiment. Do not repeat its completed physical-vs-open-pane timing matrix.
@@ -59,7 +61,7 @@ Rebuild unchanged artifacts only for a stated validity problem. Current UI/repor
 source differs from the old pane benchmark; a current Shipping control may be
 built once to eliminate that difference, not to repeat the old experiment.
 
-## Next unfinished step
+## Completed source and image checks
 
 Code and independent review complete. Fresh MSVC Debug affected host4/4 PASS;
 full Mobile Windows app and Android Debug/Shipping benchmark four-ABI builds
@@ -87,21 +89,64 @@ opening,two-enemy,skylight,lantern-high,low-look-down,glass-edge-fresnel. All si
 PNGs are byte-identical, stricter than unchanged maxRGB3/fraction0.001. Mutable
 frame serials/skin-update counts are not pose differences. Not High acceptance.
 
-**Next:** finish the eight named S26 Shipping rows already launched from
-`C:/Dev/tmp/horde-primary-opacity-20261001/performance/run-opacity-matrix.ps1`,
-then its integrity-only analyser and lead performance/thermal admission. A1 route
-and held-high complete with1838/600 presented rows and native medians64.6229/
-96.9337ms; B1 route is running next. No A/B conclusion yet. Candidate
-source is pinned e78028c999e745e7cfd1695468062bb45f300b21, not moving evidence HEAD.
-Normal source is6fa1c53 prose-only ancestor of1e20f438. Do not repeat complete rows
-or rebuild unchanged APKs; existing incomplete rows halt for exact recovery.
-The matched collector adds one sparse active RAM/system-memory/PSI sample after30s,
-with retained UTC bounds, separate from lifecycle-boundary before/after snapshots.
-It does not measure GPU bandwidth/cache/stalls. Then normal restoration/decision.
-The S24 candidate containment also has two byte-identical images, zero player
-pixels and restored normal APK; it does not resolve its visibility defect.
-[Retained image/state receipts](evidence/2026-10-01-primary-opacity/README.md).
-Stop on
-incomparable runs or absent/small gain; no tuning sweep. Audio/haptic
+## Shipping decision and30FPS gap
+
+All eight planned rows complete; the reviewed integrity analyser admits every
+1838 route/600 held-high sample, measured lap2 only, completed submission joins,
+Shipping Diagnostic counters compiled out, strict ASTC, actual OpaqueFast,
+1080x2235 internal/1440x2980 presentation and RayTracingPipeline at75%.
+Both APKs have70 byte-identical assets; all four Mobile Shipping module identities
+come from actual ARM64 extraction. No recordings or data clearing.
+
+| ABBA block | Route cycle /GPU median ms | Opening160 cycle /GPU median ms | Held-high cycle /GPU median ms |
+| --- | --- | --- | --- |
+| A1 normal |64.6229 /54.3546 |83.0352 /72.1846 |96.9337 /95.2356 |
+| B1 candidate |63.5642 /52.2830 |82.6093 /71.7178 |97.2509 /95.3840 |
+| B2 candidate |68.7450 /57.9924 |88.9597 /77.7850 |104.6725 /102.8431 |
+| A2 normal |62.3703 /51.6754 |81.5187 /70.8093 |112.3951 /110.7480 |
+
+Descriptive means of run medians: route candidate+2.6580ms/+4.19% slower;
+opening+3.5076ms/+4.26% slower. Held-high candidate−3.7027ms/−3.54%, GPU−3.8783ms/
+−3.77%, but the first heavy pair is slightly worse and the later control reaches
+thermal3. Battery context spans28.9–43.2C; sampled GPU thermal power levels span0–8.
+Warmup is excluded but thermal stationarity is not established. Thus no causal
+net saving, intrinsic regression, sustained display-FPS or pacing claim. Stop this
+direction, retain the negative/inconclusive evidence, no second micro-optimisation
+with only similarly small speculative savings.
+
+Normal opening means82.2770ms cycle/71.4970ms GPU; held-high104.6644/102.9918ms.
+The target33.333ms needs about49/71ms less total work in these fixtures. Using
+the owner's live-game planning GPU budget22–24ms implies about66–69% less opening
+GPU work and77–79% less heavy work, not an achievable-saving prediction. Held-high
+is frozen: its near-zero skinning does not replace live motion/ordinary CPU costs.
+Route player-skin medians8.65–8.76ms are separate CPU work, not the large GPU cause.
+No tiny exact traversal change shown here makes unchanged quality30FPS plausible.
+
+Sparse active PSS471615–667054KiB, RSS593628–788604KiB, swapPSS24KiB;
+system MemAvailable2447056–2899992KiB. Active memory PSI avg10 some/full ranges
+0–0.18%; these isolated snapshots do not show sustained severe RAM pressure, prove
+no plateau/leak, or measure GPU memory bandwidth/cache/stalls. B1's larger RAM
+sample is retained, not dismissed or called permanent overhead. There are zero
+new intermediate buffers/passes/synchronisation by architecture; actual GPU
+traffic/register/spill/occupancy counters remain unavailable/unsampled gaps.
+
+Normal S26 Debug8CB was reinstalled/pulled byte-identically with data preserved;
+last A2 already restores normal benchmark3CB, its installed bytes verified before
+execution. Benchmark force-stopped, Home checked. S24 normal8CB was independently
+restored earlier. Full High source and glass work remain intact.
+
+Reusing existing normal RTX Mobile images also finds pipeline/compute pixel
+failures in5/13 shots (worst-bend4,blue116,red120,finale6,two-enemy92 maxRGB).
+The unchanged3/0.001 pixel gate stays open; these differences occur in both
+control and candidate, not a candidate regression. Separate timing+3.880% also
+fails its2% capture gate; it is not a matched Shipping backend-speed measurement.
+S24 candidate's two images likewise retain zero player pixels, not a repair.
+
+**Next:** restore the normal source branch and push evidence-only checkpoints;
+then a bounded S24 numeric instance-hit discriminator before metadata/shading,
+not an arms rewrite. No more performance sweep. Broader Mobile lighting/secondary
+workload changes need their own bounded visual-quality decision, not automatic
+promotion of temporal reconstruction. [Raw results and next gates](evidence/2026-10-01-primary-opacity/README.md).
+Audio/haptic
 manual revalidation required: **NO**, semantic playback inputs are unchanged.
 No main merge, release or publication is authorized.

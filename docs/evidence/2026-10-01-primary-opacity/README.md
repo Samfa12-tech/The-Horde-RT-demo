@@ -34,15 +34,55 @@ promotion, quality reduction, main merge or publication.
 
 ## Performance and memory
 
-Shipping S26 A1/B1/B2/A2 route+held-high collection is underway: A1 route/high
-are complete with1838/600 presented rows and native medians64.6229/96.9337ms;
-candidate B1 route is the next running row. No speedup,
-display pacing or30FPS acceptance exists yet. Per-row warmup exclusion, actual
-completed CPU/GPU joins, installed package pullback and thermal context are
-required. A single sparse active RAM/PSI/system-memory snapshot is taken after30s
-for each row, with explicit UTC bounds; boundary snapshots remain separate.
-These are not GPU bandwidth/cache/stall/occupancy counters or causal proof.
-No intermediate allocations or extra dispatch/synchronization are introduced.
+All eight Shipping rows complete. Reviewed analyser passes9752 measured-lap2
+CPU/GPU submission/presentation joins, four1838-frame routes and four600-frame
+held-high workloads, actual OpaqueFast, fixed pipeline/Mobile75%1080x2235 and
+unchanged assets. Candidate e78028c; control6fa1c53 (prose-only ancestor of1e20f438).
+The complete native reports, result markers, identities,294 thermal samples,
+timed active RAM/PSI/system-memory context and before/after PSI are under `phone/`.
+No captured video or data clearing. `opacity-matrix-analysis.json` is integrity
+only, original SHA2565ba4b1eb23b13d7aca060ffceb83234c0389a1a36b189a69b034f42b54965fb5.
+Its active/boundary PSS/RSS summaries retain the original own-app snapshots here;
+they are not GPU counters or a leak/plateau pass. One wrong-source-identity
+negative analyser check rejects before writing output; no device rerun.
+
+Lead decision: **NO-GO for promotion**, not proof the shader is intrinsically
+slower. Descriptive means of run medians: opening cycle82.277→85.785ms (+4.26%),
+GPU71.497→74.751ms; held-high cycle104.664→100.962ms (−3.54%), GPU102.992→99.114ms.
+Route cycle63.497→66.155ms (+4.19%). The first heavy pair is slightly worse;
+later control reaches thermal3, battery28.9–43.2C and power levels0–8 across the
+matrix. Warmup exclusion does not make these thermally stationary. The apparent
+heavy3.7ms saving is not admitted as a repeatable causal gain. No display-pacing,
+physical High, live-motion or30FPS acceptance. Preserve result; no tuning sweep.
+
+Active PSS461–651MiB/RSS580–770MiB,24KiB swapPSS,2.33–2.77GiB system MemAvailable
+and0–0.18% instantaneous PSI avg10 are sparse RAM context, not sustained severe
+pressure or an explanation of GPU cost. Larger B1 RAM is retained. Bandwidth,
+cache misses, stalls, registers/spills/occupancy remain unavailable/unsampled gaps.
+Zero new intermediate allocations/passes/synchronization by architecture; no
+measured GPU-traffic reduction. The30FPS GPU planning budget22–24ms still needs
+roughly66–69% less opening GPU work and77–79% less frozen-heavy work. These are
+required reductions, not promised optimisation savings; live CPU/motion differs.
+
+Normal S26 Debug8CB restored with installed pullback equality; last A2 already
+restored normal Shipping benchmark3CB, verified in its receipt. Test benchmark
+force-stopped, Home launcher independently confirmed; data/stable package untouched.
+Experimental runtime source remains on its own branch, not a production admission.
+
+Direct reuse of normal RTX pipeline/compute images additionally leaves5/13 pixel
+gates failing, maxRGB4/116/120/6/92 in worst-bend/blue/red/finale/two-enemy, fractions
+over-one1.157e-5/1.93e-6/1.93e-6/5.79e-6/7.72e-6. Full comparator also fails capture
+timing+3.880%; see `windows/control-backend-comparison.json`. Candidate's within-
+backend byte equality preserves those same differences. No tolerance loosened.
+
+Next: normal source/evidence integration, then bounded S24 numeric primary hit
+counts by named instance before metadata classification. Current aggregate player
+count depends on metadata after hit decode, so zero alone does not isolate AS
+traversal from decode faults. Separate player/viewmodel buffers, coherent host
+uploads, independent scratch and BLAS→TLAS→shader dependencies are present; no
+generic missing-flush/barrier cause is demonstrated. Opening skeleton uses a
+dynamic path successfully; the two-enemy state has one pose bucket, not two tested
+independent pose-buffer branches. No arm/asset retuning or new diagnostic framework.
 
 Private process/package/device/log rosters remain outside Git. Capture summary
 and validation are actual producers, not a replacement for image inspection or
