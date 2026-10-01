@@ -92,3 +92,42 @@ six remaining cues rendered once. Sparse authored bell accents remain in C/G.
 No preview normalization is applied to runtime. Rights remain **Horde-only**;
 this is not public distribution, platform-listening or release acceptance. See
 `docs/evidence/2026-10-01-music-whistle-bank/README.md` for exact provenance.
+
+## Windows report-verification SDK (1.6.1 development)
+
+Microsoft.Web.WebView2 **1.0.4258.31**, official NuGet package, BSD-3-Clause.
+Native headers/static loader only; exact archive/entry hashes and source URL in
+`third_party/webview2-sdk/manifest.json`. The SDK is explicitly restored into
+ignored build storage, not vendored source. Windows uses the separately installed
+Evergreen WebView2 Runtime for consented anti-spam verification only; no bundled
+fixed Runtime, editor/framework migration or automatic Runtime installation.
+Missing Runtime leaves clear diagnostics and offline JSON fallback.
+SDK licence (reproduced for the statically linked loader's binary distribution):
+
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * The name of Microsoft Corporation, or the names of its contributors
+may not be used to endorse or promote products derived from this
+software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

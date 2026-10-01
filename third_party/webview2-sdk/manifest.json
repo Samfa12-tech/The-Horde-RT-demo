@@ -1,0 +1,16 @@
+{
+  "package": "Microsoft.Web.WebView2",
+  "version": "1.0.4258.31",
+  "license": "BSD-3-Clause",
+  "url": "https://api.nuget.org/v3-flatcontainer/microsoft.web.webview2/1.0.4258.31/microsoft.web.webview2.1.0.4258.31.nupkg",
+  "archiveSha256": "56f7f4b8bf9aee4b8efefbbdd4f67d5f74ebd1b100ed0806da71bf76af481aa9",
+  "archiveBytes": 9801922,
+  "files": [
+    {"path": "build/native/include/WebView2.h", "bytes": 2939599, "sha256": "dff1e3181ec7ec203a34ef6efa966590e0ef0ba1a5c3fe3b69da6508c2f8a02e"},
+    {"path": "build/native/include/WebView2EnvironmentOptions.h", "bytes": 19500, "sha256": "73566559e49911301b9c34db59b547343c81ab06ac6428a39ec0204956b37118"},
+    {"path": "build/native/x64/WebView2LoaderStatic.lib", "bytes": 11463528, "sha256": "e66284970876a616c82e7dcda75a17fd46d04827f9de81d4299b8862d34d25d6"},
+    {"path": "build/native/x86/WebView2LoaderStatic.lib", "bytes": 11428262, "sha256": "bd66d0b41302e6d56938e61ded16e32bc66318fd54324b0dae419aeeccfb9b96"},
+    {"path": "build/native/arm64/WebView2LoaderStatic.lib", "bytes": 11474832, "sha256": "353d360800c31fdb36aa069c0a703e3bb1a08ec29e36f8ea55d6d2324ebc9971"},
+    {"path": "LICENSE.txt", "bytes": 1487, "sha256": "0af8f1b807512aae39c2ac1aa4d0cae65cabecb6fd554b8439a5162a0d6eca55"}
+  ]
+}
