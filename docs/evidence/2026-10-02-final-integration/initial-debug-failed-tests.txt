@@ -1,0 +1,5 @@
+38:horde_rt_raygen_variant_manifest_tests
+41:horde_rt_pipeline_policy_fence_tests
+44:horde_rt_static_texture_array_tool_tests
+45:horde_rt_static_preparation_lod_policy_tests
+47:horde_rt_static_preparation_colliding_lod_policy_tests

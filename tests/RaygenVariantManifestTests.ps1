@@ -31,11 +31,26 @@ function Invoke-ExpectFailure {
     if (-not $failed) { throw $Message }
 }
 
-function Get-CanonicalFileHash {
+function Get-RawFileHash {
     param([string]$Path)
     $sha256 = [Security.Cryptography.SHA256]::Create()
     try {
         ([BitConverter]::ToString($sha256.ComputeHash([IO.File]::ReadAllBytes($Path)))).Replace('-', '').ToLowerInvariant()
+    }
+    finally {
+        $sha256.Dispose()
+    }
+}
+
+function Get-CanonicalShaderTextHash {
+    param([string]$Path)
+    # Match the compiler's logical-line identity, not git's CRLF checkout bytes.
+    # Raw hashes below independently retain the byte-exact non-mutation gate.
+    $lines = [IO.File]::ReadAllLines($Path)
+    $text = if ($lines.Count -eq 0) { '' } else { [string]::Join("`n", $lines) + "`n" }
+    $sha256 = [Security.Cryptography.SHA256]::Create()
+    try {
+        ([BitConverter]::ToString($sha256.ComputeHash([Text.Encoding]::UTF8.GetBytes($text)))).Replace('-', '').ToLowerInvariant()
     }
     finally {
         $sha256.Dispose()
@@ -135,12 +150,27 @@ try {
     Invoke-InvalidVariantConfigCompile -MacroName 'HORDE_RT_VARIANT_QUALITY' -Value '-1'
     Invoke-InvalidVariantConfigCompile -MacroName 'HORDE_RT_VARIANT_MATERIAL' -Value '7'
 
-    $genericHashBefore = Get-CanonicalFileHash (Join-Path $repoRoot 'src\vulkan\raytracing\MinimalRayGenShader.inc')
-    $legacyHashBefore = Get-CanonicalFileHash (Join-Path $repoRoot 'src\vulkan\raytracing\MinimalLegacyRayGenShader.inc')
+    $lfHashFixture = Join-Path $temporaryRoot 'hash-lf.inc'
+    $crlfHashFixture = Join-Path $temporaryRoot 'hash-crlf.inc'
+    $changedHashFixture = Join-Path $temporaryRoot 'hash-changed.inc'
+    [IO.File]::WriteAllText($lfHashFixture, "0x07230203,`n0x00010500,`n", [Text.UTF8Encoding]::new($false))
+    [IO.File]::WriteAllText($crlfHashFixture, "0x07230203,`r`n0x00010500,`r`n", [Text.UTF8Encoding]::new($false))
+    [IO.File]::WriteAllText($changedHashFixture, "0x07230203,`n0x00010501,`n", [Text.UTF8Encoding]::new($false))
+    Assert-True ((Get-RawFileHash $lfHashFixture) -ne (Get-RawFileHash $crlfHashFixture)) `
+        'The byte-exact mutation hash must distinguish LF and CRLF.'
+    Assert-True ((Get-CanonicalShaderTextHash $lfHashFixture) -eq (Get-CanonicalShaderTextHash $crlfHashFixture)) `
+        'Canonical shader identity must admit an equivalent CRLF checkout.'
+    Assert-True ((Get-CanonicalShaderTextHash $lfHashFixture) -ne (Get-CanonicalShaderTextHash $changedHashFixture)) `
+        'Canonical shader identity must still reject a changed SPIR-V word.'
+
+    $genericIncludePath = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalRayGenShader.inc'
+    $legacyIncludePath = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalLegacyRayGenShader.inc'
+    $genericHashBefore = Get-RawFileHash $genericIncludePath
+    $legacyHashBefore = Get-RawFileHash $legacyIncludePath
     # Restored measured control compatibility artifacts; matrix mode must not
     # mutate them, and the artifact suite independently checks fresh compilation.
-    Assert-True ($genericHashBefore -eq 'f4170abbf7f68364d7eeb5d9d01baeed0efacb2fc6db7ab4d1f4c0075dddacd4') 'Generic include hash changed before matrix compilation.'
-    Assert-True ($legacyHashBefore -eq 'a3b32262260a25e31fbc880f851baabc5df14bbbb7995fd532e5696afd3e06bb') 'Legacy include hash changed before matrix compilation.'
+    Assert-True ((Get-CanonicalShaderTextHash $genericIncludePath) -eq 'f4170abbf7f68364d7eeb5d9d01baeed0efacb2fc6db7ab4d1f4c0075dddacd4') 'Generic include hash changed before matrix compilation.'
+    Assert-True ((Get-CanonicalShaderTextHash $legacyIncludePath) -eq 'a3b32262260a25e31fbc880f851baabc5df14bbbb7995fd532e5696afd3e06bb') 'Legacy include hash changed before matrix compilation.'
 
     $matrixOutputRoot = Join-Path $temporaryRoot 'matrix'
     $matrixCompilerOutput = @(& $compiler -Matrix -OutputDirectory $matrixOutputRoot)
@@ -187,8 +217,8 @@ try {
     $matrixStatsText = Get-Content -LiteralPath (Join-Path $matrixOutputRoot 'shipping_mobile_generic_dielectric\raygen-stats.json') -Raw
     $singleStatsText = Get-Content -LiteralPath (Join-Path $singleOutputRoot 'shipping_mobile_generic_dielectric\raygen-stats.json') -Raw
     Assert-True ($singleStatsText -eq $matrixStatsText) 'Single-key compilation did not reproduce deterministic stats output.'
-    Assert-True ((Get-CanonicalFileHash (Join-Path $repoRoot 'src\vulkan\raytracing\MinimalRayGenShader.inc')) -eq $genericHashBefore) 'Matrix compilation modified the generic include.'
-    Assert-True ((Get-CanonicalFileHash (Join-Path $repoRoot 'src\vulkan\raytracing\MinimalLegacyRayGenShader.inc')) -eq $legacyHashBefore) 'Matrix compilation modified the legacy include.'
+    Assert-True ((Get-RawFileHash $genericIncludePath) -eq $genericHashBefore) 'Matrix compilation modified the generic include.'
+    Assert-True ((Get-RawFileHash $legacyIncludePath) -eq $legacyHashBefore) 'Matrix compilation modified the legacy include.'
 
     Invoke-ExpectFailure { & $compiler -Variant 'unknown_variant' -OutputDirectory (Join-Path $temporaryRoot 'unknown') } 'Unknown variant did not fail closed.'
     Invoke-ExpectFailure { & $compiler -Matrix -OutputDirectory $repoRoot } 'Unsafe repository output directory did not fail closed.'
