@@ -1,0 +1,34 @@
+Actual child-process observations from retained PowerShell Process handles.
+Candidate executable SHA256:
+173e1875899b53752c9fc5b8f490ade35f3fa3b307529204a73f73c1c5c4eb7e
+Source:3281bce66eca18651acc75e5de1d3ce28d214dea plus cancellation logging patch.
+Stage:C:/Dev/tmp/horde-windows-shipping-backends-20261002
+
+run01-pipeline-route PID5744: process ended; ExitCode NOT RETAINED.
+Validity problem: original launch observer discarded the process exit receipt.
+One repeat run02 changes only launch observation, not the candidate/workload.
+
+EXIT run02-pipeline-route-exit PID=28384 code=0
+PASS frames=1838 backend=RayTracingPipeline scale=100
+Report:HordeLanternRT-benchmark-20261002-115931.json
+EXIT run03-compute-route PID=5056 code=0
+PASS frames=1838 backend=RayQueryCompute scale=100
+Report:HordeLanternRT-benchmark-20261002-120023.json
+EXIT run04-pipeline-reveal PID=30040 code=0
+PASS frames=600 backend=RayTracingPipeline scale=100
+Report:HordeLanternRT-benchmark-20261002-120037.json
+EXIT run05-compute-reveal PID=28480 code=0
+PASS frames=600 backend=RayQueryCompute scale=100
+Report:HordeLanternRT-benchmark-20261002-120050.json
+Final parent command ExitCode=0.
+
+Arguments for each case:
+--benchmark-showcase <unique named stage/run folder>
+--benchmark-workload showcase-route-v1 OR lantern-reveal-sequence-v1
+Compute rows additionally:--require-rayquery-compute
+
+WaitForExit(10000) observations, actual ExitCode, then report admission:
+result/status complete; exact requested workload/executionBackend;
+presentedEveryFrame; complete frame evidence; expected=completed=GPU valid;
+zero outstanding. No process termination or cancellation-policy change.
+All four stderr files are empty. No phone or foreground/pacing acceptance claim.

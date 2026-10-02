@@ -22,11 +22,14 @@ The affected route now passes13/13 with four byte-identical control images and
 honest resumed RT. Initial Host Debug92/97 stopped at five failures, now each
 passing after bounded repairs. Release builds and96/97 tests finish; its new
 strict-mode music staging failure is fixed with a targeted14/14 pass. Package,
-Shipping SPIR-V containment and ARM64 object checks pass. Packaged Windows RT
-presents, but its cancelled0-frame benchmark is not a live-route/timing pass.
-Debug RTX13 captures and Android Debug/unsigned Release compile pass. Windows
-report prepare/preview/cancel is owner-confirmed. New laptop feedback reopens
-only the resting right-hand/arm sword attachment, not accepted player tuning.
+Shipping SPIR-V containment and ARM64 object checks pass. The old packaged
+Windows0-frame cancellation is retained, not relabelled a pass. Subsequent
+Shipping173e1875 finishes Pipeline/explicit Compute route and live reveal,
+exit0 with complete RT/GPU evidence. Background/acquire-tail limitations keep
+foreground pacing/visual acceptance distinct. Debug RTX13 captures and Android
+Debug/unsigned Release compile pass. Windows report prepare/preview/cancel,
+bounded right-cuff repair, independent SFX balance and startup music focus are
+owner-confirmed. No accepted player/audio tuning reopened.
 Do not repeat accepted Android/Windows emails or completed focused lifecycle rows.
 
 ## Release-focused remaining gates — October2 owner direction
@@ -45,7 +48,7 @@ The full agreed feature scope is retained; no merge/publication is authorised.
 | 1 — practical performance acceptance | Last warm Shipping/Mobile S26 cycle medians are81–86ms opening and112–123ms held/reveal at75%, not the33.3ms target. Pane removal helped greatly but did not establish comfortable30FPS. | Use existing results, then one final-candidate warm ordinary/lantern/live check with tails/thermal/pacing limits stated. Owner accepts actual playability or makes an explicit profile/product decision. No further unpromising micro-optimisation campaign. |
 | 2 — finished reporting experience | Android hosted verification/one approved exchange and independent inbox note/context/PNG receipt PASS. Owner also confirms actual Windows prepare/preview/context/cancel and supplies the prepared-form screenshot; local JSON stays fallback. | Reuse [Android delivery](evidence/2026-10-02-s26-report-send/README.md) and [Windows owner acceptance](evidence/2026-10-02-windows-report-ui/README.md). Complete only current-source integration/selected-quality metadata contracts. No repeated UI check, second backend or extra email. |
 | 2 — remaining change-triggered checks | Owner accepts current music and S24 screenshot appearance; Windows SFX balance/control and targeted Windows startup/menu/refocus repair5e20f10 are now accepted too. External-audio interruption/recovery and changed phone cuff/gain/final S24 live Shipping coverage remain separate. | Reuse these verdicts and the [Windows music finite record](evidence/2026-10-02-windows-music-startup/README.md). No repeated auditions or S24 screenshot acceptance question. Complete only distinct unfinished device/lifecycle rows. |
-| 3 — one coherent final candidate | Current source/artifact CI/host/tooling, Vulkan/SPIR-V freshness and diagnostic-free Shipping, deterministic contracts, assets/packages, Windows RTX and exact Android presentation/lifecycle/resize/update path. | Run the comprehensive matrix once the production changes are coherent; fix and rerun only invalidated checks. Include Shipping heavy-scene resize stress and bounded UI/FPS checks, not a new framework. Signing/publication require separate owner authority. |
+| 3 — one coherent final candidate | Current source/artifact CI/host/tooling, Vulkan/SPIR-V freshness and diagnostic-free Shipping, deterministic contracts, assets/packages, Windows RTX and exact Android presentation/lifecycle/resize/update path. | The finite integration matrix and four Shipping backend/live rows are completed with explicit limitations; reuse [backend receipts](evidence/2026-10-02-final-integration/windows-shipping-backends/README.md). Finish foreground/live Compute visual acceptance and exact-device rows; fix and rerun only invalidated checks. Include Shipping heavy-scene resize stress and bounded UI/FPS checks, not a new framework. Signing/publication require separate owner authority. |
 
 ### Physical defects versus numerical parity
 

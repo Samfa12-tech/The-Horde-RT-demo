@@ -2225,12 +2225,26 @@ void StartBenchmark(VulkanSurfaceContext& context,
     SetFocus(context.windowHandle);
 }
 
-void CancelBenchmark(VulkanSurfaceContext& context, const bool showMenu)
+void LogBenchmarkCancellation(const VulkanSurfaceContext& context, const char* trigger)
+{
+    // One observation at cancellation, not per-frame instrumentation. Keep
+    // lifecycle failures distinct from a completed hardware timing result.
+    if (context.benchmark.IsRunning())
+    {
+        std::cerr << "Windows benchmark cancelled: trigger=" << trigger
+                  << " measuredFrames=" << context.benchmark.Frames().size()
+                  << " tick=" << context.simulation.Snapshot().tickIndex
+                  << " foreground=" << (GetForegroundWindow() == context.windowHandle) << '\n';
+    }
+}
+
+void CancelBenchmark(VulkanSurfaceContext& context, const bool showMenu, const char* trigger)
 {
     if (!context.benchmark.IsRunning())
     {
         return;
     }
+    LogBenchmarkCancellation(context, trigger);
     context.benchmark.Cancel();
     context.benchmarkEvidence.Cancel();
     ResetRoute(context);
@@ -3170,6 +3184,7 @@ void UpdateDesktopSceneControls(
         if (horde::gameplay::IsLanternBenchmark(workload) && advance.frameInLap == 1u &&
             !horde::gameplay::StageLanternBenchmark(context.simulation, workload))
         {
+            LogBenchmarkCancellation(context, "lantern-staging-failed");
             context.benchmark.Cancel();
             context.benchmarkEvidence.Cancel();
             return;
@@ -5348,6 +5363,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         {
             if (benchmarkFrame)
             {
+                LogBenchmarkCancellation(context, "render-frame-failed");
                 context.benchmark.Cancel();
                 CompleteBenchmark(context, capabilities, textReportPath.parent_path());
             }
@@ -5373,6 +5389,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                 // A successful SUBOPTIMAL present is still honest presentation,
                 // but recreation interrupted this measurement. Cancel before
                 // RecordFrame so the legacy collector cannot admit its timing.
+                LogBenchmarkCancellation(context, "presentation-needs-recreate");
                 context.benchmark.Cancel();
             }
             context.benchmark.RecordFrame(frameTimeMs, rtFramePresented);
@@ -6116,7 +6133,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 }
                 else if (LOWORD(wParam) == kMenuPauseId)
                 {
-                    CancelBenchmark(*sceneContext, true);
+                    CancelBenchmark(*sceneContext, true, "user-pause");
                 }
                 return 0;
             }
@@ -6159,7 +6176,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 return 0;
             case kRestartButtonId:
             case kMenuRestartId:
-                CancelBenchmark(*sceneContext, false);
+                CancelBenchmark(*sceneContext, false, "user-restart");
                 ResetRoute(*sceneContext);
                 PlaySoundEffect(*sceneContext, "ui_select.wav");
                 ShowPauseMenu(*sceneContext, false);
@@ -6244,7 +6261,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 return 0;
             case kFullscreenButtonId:
             case kMenuFullscreenId:
-                CancelBenchmark(*sceneContext, true);
+                CancelBenchmark(*sceneContext, true, "fullscreen-change");
                 ToggleFullscreen(*sceneContext);
                 PlaySoundEffect(*sceneContext, "ui_select.wav");
                 return 0;
@@ -6357,7 +6374,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 }
                 if (sceneContext->benchmark.IsRunning())
                 {
-                    CancelBenchmark(*sceneContext, true);
+                    CancelBenchmark(*sceneContext, true, "escape");
                     return 0;
                 }
                 if (sceneContext->benchmarkReportVisible)
@@ -6619,7 +6636,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         }
         if (sceneContext && wParam == FALSE && sceneContext->benchmark.IsRunning())
         {
-            CancelBenchmark(*sceneContext, true);
+            CancelBenchmark(*sceneContext, true, "app-deactivated");
         }
         break;
     case WM_ACTIVATE:
@@ -6631,7 +6648,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
     case WM_SIZE:
         if (sceneContext && sceneContext->benchmark.IsRunning() && wParam != SIZE_MINIMIZED)
         {
-            CancelBenchmark(*sceneContext, true);
+            CancelBenchmark(*sceneContext, true, "window-size");
         }
         LayoutOverlayControls(hWnd, LOWORD(lParam), HIWORD(lParam));
         return 0;
@@ -6650,7 +6667,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
     {
         if (sceneContext && sceneContext->benchmark.IsRunning())
         {
-            CancelBenchmark(*sceneContext, true);
+            CancelBenchmark(*sceneContext, true, "dpi-change");
         }
         const auto* suggested = reinterpret_cast<const RECT*>(lParam);
         SetWindowPos(hWnd, nullptr,

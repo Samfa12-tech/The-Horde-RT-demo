@@ -31,7 +31,7 @@ not a duplicate experiment. No music re-render or new email.
 | Windows Debug native RTX capture continuation | PASS command/manifest: all13 checkpoints captured, Diagnostic/High pipeline pair,960x540 on RTX5050. Opening/drop/mirror/two-enemy images inspected; not universal physical correctness or Release/performance acceptance. Subsequent right-cuff defect is repaired and owner accepted in the separate finite cuff record below. |
 | Android selected-quality continuation | PASS fresh Debug/unsigned Release build, all4 ABIs and Release lint42 warnings/0 errors. Unchanged Java76/76 result is reused (unit task UP-TO-DATE), not a fresh execution. No install/device claim. |
 | Windows Release build/CTest continuation | Fresh build PASS; single CTest run96/97 PASS748.55s. Newly added strict-mode music staging regression67 catches the packaging defect before its fix; targeted14/14 script cases pass aftere39ac0a. Original failure retained, no single-run97/97 claim. |
-| Final retained Windows Shipping RT application | PARTIAL: packaged218ab102 honestly presents via pipeline/High, but unattended route cancels before measurement (0 frames); not a live-route/performance pass. Compute/live-lantern rows not started after this cancellation. Release capture automation correctly rejects with exit2/no output. |
+| Final retained Windows Shipping RT application | Functional route/live harness PASS on173e1875 over3281bce plus cancellation observations: Pipeline and explicitly required Compute exit0 with1838 route/600 reveal completions each, all GPU rows valid and RT presented. Earlier218ab102 cancelled0-frame row retained; cause not reproduced. Sequential background timings have acquire tails, not foreground pacing/image/phone acceptance. Release capture guard remains unchanged. [Finite backend record](windows-shipping-backends/README.md). |
 | Current Android/Windows Shipping containment | PASS actual final binaries/APK, spirv-val/disassembly and adversarial controls. Four backend/pass modules per Shipping artifact have0 diagnostic atomics and no binding22. No device/backend-image equivalence claim. |
 | Unsigned/unpublishable validation packages | PASS after strict-mode staging repair: closed runtime/music inventories, source exclusion, version1.6.1/code9, embedded manifest/credits and Android16KiB APK/ELF alignment. No signing, distribution or licence-status change. |
 | Final retained Android Shipping ordinary/lantern/lifecycle/Settings resize | PENDING; reuse prior performance experiments; no new speculative optimisation. |
@@ -140,9 +140,15 @@ and [Windows startup/focus repair](../2026-10-02-windows-music-startup/README.md
 are also owner accepted on their exact recorded candidates. Do not restart those
 checks or relabel older captured/packaged artifacts as containing the changes.
 
-Next unfinished step: finish only the still-open Windows Shipping live/backend
-rows with a specific cancellation discriminator, plus remaining exact-device
-final-candidate gates. No new phone use in this run. All original Debug failures
+The bounded Windows Shipping backend continuation is now complete on173e1875:
+all four native route/live rows exit0 with complete RT/GPU evidence. The specific
+cancellation observation did not reproduce the original failure, so predicates
+remain unchanged. Raw runs/exit receipts and background/acquire-tail limitations
+are in the [finite backend record](windows-shipping-backends/README.md).
+
+Next unfinished step: foreground/live Windows Compute visual acceptance and
+remaining exact-device final-candidate gates, not another unattended matrix.
+No new phone use in this run. All original Debug failures
 have bounded passing rechecks, not a new single-run97/97 Debug claim.
 No repetition of the92 passing Debug rows or prior phone experiments.
 Audio/haptic manual revalidation required:NO for unchanged assets, gains,

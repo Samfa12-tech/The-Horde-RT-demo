@@ -13,6 +13,29 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
+### October 2 Windows Shipping backend continuation — completed
+
+Parent3281bce plus bounded Windows-only cancellation observations freshly builds
+Debug/Shipping and passes selected6/6 contracts each (0.33s/0.14s). Cancellation
+predicates/workloads/shaders/assets/audio are unchanged. Exact Shipping173e1875
+completes Pipeline and explicitly required RayQueryCompute route1838/1838 and
+live lantern reveal600/600 each, exit0, every frame RT-presented, full valid GPU
+denominators and empty stderr. No cancellation reproduced; do not invent the
+older0-frame failure's cause or change its cancellation policy. First completed
+route omitted the exit receipt; exactly one receipt-only repeat fixes that
+observation gap, preserving the first run.
+
+[Finite record](evidence/2026-10-02-final-integration/windows-shipping-backends/README.md)
+retains exact binaries/modules/settings/exit receipts and raw reports. These
+are High100%1232x803 RTX5050 short background-window harness rows, not matched
+performance, foreground visual acceptance or phone evidence. Pipeline cycle/
+acquire tails are large; aggregate medians do not certify pacing. No High
+physical defect or strict image-comparison failure is waived. No player/audio
+check reopened. Next is foreground/live Compute visual acceptance and remaining
+exact-device/final-candidate disposition; never repeat this completed matrix
+without a specific validity problem. Audio/haptic manual revalidation:NO; only
+cancellation observations changed. No phone use, merge, signing or publication.
+
 ### October 2 independent SFX volume / quieter steps
 
 Windows now has a separate persisted0–100 SFX slider instead of the primary
