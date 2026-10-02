@@ -16,8 +16,13 @@ Activity resume wait8–11ms; native ready still13.119/13.795s, interrupted repl
 [Finite evidence](evidence/2026-10-02-s26-surface-session/README.md).
 
 No data clear, stable-app/volume/font change or further report email. All4 native
-Debug ABIs,76 Java unit tests, lint and focused3/3 host checks pass. Existing
-route/final Shipping matrix still pending; no new S24/S25 acceptance. Prior ANR
+Debug ABIs,76 Java unit tests, lint and focused3/3 host checks pass. Affected
+run182844 on runtime242e573 also passes13/13 replay,1838 skin updates, four
+inspected opening/combat/held captures byte-identical to the prior control,
+and honest RT after settled Home/resume in process13226. No repeated build/install.
+Replay timing CSV is empty; no Shipping/performance claim. Phone left at Home
+and returned to owner/Briarhold use. Final Shipping matrix still pending; no new
+S24/S25 acceptance. Prior ANR
 below remains retained control evidence. Manual audio/haptic:NO: intended readiness
 and semantic inputs/assets/playback unchanged; distinct external focus row open.
 

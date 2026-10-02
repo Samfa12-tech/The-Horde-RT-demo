@@ -32,7 +32,7 @@ readiness signal. Probe refresh is retained off UI.
 | Android build/unit/lint | Revised integration: all4 Debug ABIs/assembleDebug PASS1m40s; unchanged Java inputs reuse the fresh76/76 PASS/lint42 warnings,0 errors from the preceding1m8s check. Review's stale-report rejection is included in the new native artifact. |
 | Interrupted pending startup | PASS: S26 generation1 requested18:15:06.097, cancelled18:15:06.389 before presentation. Replacement3 presents18:15:30.164; no old-generation presentation. Cold Activity426ms, immediate resume wait11ms. |
 | Rapid resume after ready | PASS: two cycles, generations5/7 honestly present; Activity wait8/9ms, fresh own-app UI roots during startup, same PID10077, no new owned ANR. |
-| Affected route / normal presentation | PENDING: reuse existing runner,75% route plus opening/held views and lifecycle. Not Shipping timing or owner touch acceptance. |
+| Affected route / normal presentation | PASS: run182844 on runtime242e573/exact retained APK,13/13 replay waypoints,1838 skin updates, four inspected opening/combat/held-lantern views, and honest RT after Home/resume. All four PNGs byte-match the preceding normal-correction control. Not Shipping timing or owner touch acceptance. |
 
 The first broader CTest invocation had two NotRun results because those selected
 executables were not built; building the explicit three targets yields the
@@ -44,6 +44,19 @@ source review changes, not by repeating unchanged completed artifacts.
 Local raw/build artifacts: `C:/Dev/tmp/horde-surface-session-20261002/` and
 `C:/Dev/tmp/horde-surface-session-*.log`. Retain one candidate receipt and mark
 completed rows here; do not restart this experiment after compaction.
+
+Affected runner receipt: [phone/run-20261002-182844](phone/run-20261002-182844/summary.json).
+No rebuild/install was repeated. Tracked runtime inputs were clean at launch;
+the runner's `sourceDirty:true` records preserved unrelated S24 scratch (and
+later documentation), not an unrecorded runtime modification. Four exact image
+hash comparisons are retained alongside the manifest; identical blobs are not
+new visual tuning. Same process13226 owns the route/captures/resume; generation13
+presents after settled Home/resume. The timing CSV is empty in Replay mode, so
+incidental Diagnostic frame logs are not promoted to performance evidence.
+Full own logs remain local; bounded lifecycle markers are retained. After the
+completed run the app was left at Home and the phone returned to owner/Briarhold
+use; do not operate it again in this run. Next unfinished step is the current-source
+[integration matrix](../2026-10-02-final-integration/README.md), not another route.
 
 ## Exact candidate and limits
 

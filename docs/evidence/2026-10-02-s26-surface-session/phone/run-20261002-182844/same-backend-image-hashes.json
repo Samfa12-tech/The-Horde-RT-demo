@@ -1,0 +1,22 @@
+[
+  {
+    "file": "capture-01-pbr-torch-fire-75.png",
+    "sha256": "6b92a6a4046dee186ea4ba006f7b69228b1daba4d75b364c856a7346116a294c",
+    "byteExactToControl": true
+  },
+  {
+    "file": "capture-02-two-enemy-combat-75.png",
+    "sha256": "c4c021146fc5ecaa03c120687c678d9e89340667343f3fd414e0c5ca90c8e9d9",
+    "byteExactToControl": true
+  },
+  {
+    "file": "capture-03-lantern-held-high-75.png",
+    "sha256": "c685fed99c81cb48ea642463f16c2f27b208ace2306fe9fc970e1daeff30d67c",
+    "byteExactToControl": true
+  },
+  {
+    "file": "capture-04-lantern-held-low-75.png",
+    "sha256": "a13611d432bc7d4cdd3de6b98ab47e8ce1ce1dd60300411d0c46d1eaee6f4cf0",
+    "byteExactToControl": true
+  }
+]

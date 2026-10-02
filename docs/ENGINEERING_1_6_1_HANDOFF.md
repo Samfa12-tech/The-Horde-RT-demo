@@ -31,9 +31,13 @@ Activity resume wait8–11ms, but native ready still takes13.119/13.795s; cancel
 startup plus replacement23.666s. This fixes UI blocking, not gameplay FPS or
 compile time. [Finite record](evidence/2026-10-02-s26-surface-session/README.md).
 
-Next unfinished row is one affected existing-runner replay/capture/lifecycle on
-this retained artifact, then final-candidate integration gates/Windows report
-interaction. No repeat email, accepted player/music tuning or parity campaign.
+Affected run182844 now PASS on runtime242e573/the same retained APK:13/13 replay,
+four inspected byte-identical control images and honest RT after Home/resume.
+No performance claim from Replay mode. Phone left at Home/returned to owner and
+Briarhold use; do not operate it further in this run. Next is the single running
+[current-source integration matrix](evidence/2026-10-02-final-integration/README.md)
+and remaining Windows report interaction. No repeated route/email, accepted
+player/music tuning or parity campaign.
 All unrelated S24 scratch preserved. Audio/haptic manual revalidation:NO for
 unchanged semantic inputs/assets/playback and intended RT-ready gating; distinct
 external focus recovery remains open. Goal ACTIVE; no release/publication.

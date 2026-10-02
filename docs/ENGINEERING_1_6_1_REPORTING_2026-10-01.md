@@ -7,6 +7,20 @@ Shared contract3e0f9be; reviewed native integration69afe4e.
 
 ## October2 remote integration — current slice
 
+The owner's additional Android email approval has now been consumed exactly
+once. Actual S26 in-game preparation, RT-only preview, hosted verification and
+strict202/accepted QUEUED UI pass on APK e9fd31e7/source00af842. Independent inbox
+inspection finds one exact-marker message with the synthetic note, bounded
+typed context and396183B PNG attachment. No extra send/retry or Windows fixture
+repeat. [Single delivery receipt](evidence/2026-10-02-s26-report-send/README.md).
+The subsequent rapid-resume ANR is independently traced to UI-thread Vulkan
+pipeline startup and repaired at242e573; it is not evidence of HTTP/music
+causation. [Separate lifecycle record](evidence/2026-10-02-s26-surface-session/README.md).
+Full-game Windows preparation/preview/cancel remains open after the native
+helper addressing limitation; separate passing injected UI tests are not that
+interaction. Earlier preparation-only and approval-pending statements below
+describe their historical checkpoint, not the current delivery state.
+
 Exact S26 Debug preparation/lifecycle admission now passes on retained APK
 35776e1c, installed and pulled back byte-identically. Default-off consent,
 no-consent refusal, consented game-only RT preview, READY Home/resume, edit reset,
