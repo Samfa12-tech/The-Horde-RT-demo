@@ -31,7 +31,7 @@ honest RT presentation and final-candidate stability are still gates. No shader,
 asset, rendering, performance or audio change is made by this deferral.
 Audio/haptic manual revalidation:NO. No merge, signing or publication.
 
-### October3 selected sanitizer CI F10 — implementation ready, execution pending
+### October3 selected sanitizer CI F10 — passes, inventory parser repair underway
 
 An additive Ubuntu24.04 Clang ASan/UBSan job uses a finite15-target roster for
 shared simulation/IK/grips, physical math, native PCM ownership, mailbox and
@@ -40,7 +40,13 @@ fail-fast unsuppressed diagnostics. Required CTest registrations run by exact
 name, fail on empty, and are not retried. Existing five lanes remain intact.
 [Finite record](evidence/2026-10-03-selected-host-sanitizers/README.md) records
 local Bash/YAML/whitespace passes and the unavailable local Linux toolchain;
-actual current-source GitHub execution remains required. This does not change
+actual f2ebe42 push37068625638 and PR37068630417 sanitizer jobs both PASS. Their
+focused Vulkan lane passes16/16 and Android76 Java tests/build/lint pass. The
+whole workflows FAIL solely because all three portable compiler lanes encounter
+the same inventory-test job-boundary bug (58/59 GCC/Clang;64/65 MSVC). The parser
+mistakenly includes the newly inserted sanitizer sibling's asset lists. A bounded
+next-sibling correction with LF/CRLF and negative fixtures is being validated;
+fresh corrected-source CI remains required, not a rerun. This does not change
 production flags/runtime or reopen manual audio acceptance. No phone operation.
 Audio/haptic manual revalidation:NO; CI only. No merge, signing or publication.
 

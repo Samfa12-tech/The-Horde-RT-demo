@@ -5,10 +5,26 @@ $repo = Split-Path -Parent $PSScriptRoot
 $required = @(
     'assets/models/player/viewmodel/runtime/asset.manifest.json',
     'assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb')
+function Test-PortableViewmodelInventory([string]$WorkflowText) {
+    # Stop at the next sibling job, not at a particular historical job name.
+    # Additional CI lanes must not enter the shared-gameplay fetch inventory.
+    $lane = [regex]::Match($WorkflowText,
+        '(?ms)^  shared-gameplay:[ \t]*\r?\n(.*?)(?=^  [A-Za-z0-9_-]+:[ \t]*\r?$|\z)')
+    return $lane.Success -and [regex]::Matches($lane.Groups[1].Value,
+        [regex]::Escape('assets/models/player/viewmodel/runtime/*.glb')).Count -eq 2
+}
+# Regress an inserted sibling lane and retain the missing-checkout negative gate.
+$fixture = "  shared-gameplay:`n    fetch: assets/models/player/viewmodel/runtime/*.glb`n    checkout: assets/models/player/viewmodel/runtime/*.glb`n  inserted-lane:`n    fetch: assets/models/player/viewmodel/runtime/*.glb`n    checkout: assets/models/player/viewmodel/runtime/*.glb`n  player-vulkan-host:`n"
+$withoutCheckout = $fixture.Replace(
+    'checkout: assets/models/player/viewmodel/runtime/*.glb', 'checkout: none')
+if (-not (Test-PortableViewmodelInventory $fixture) -or
+    -not (Test-PortableViewmodelInventory ($fixture.Replace("`n", "`r`n"))) -or
+    (Test-PortableViewmodelInventory $withoutCheckout) -or
+    (Test-PortableViewmodelInventory '  absent-job:')) {
+    throw 'Portable workflow job-boundary regression failed'
+}
 $workflow = Get-Content (Join-Path $repo '.github/workflows/shared-simulation-host.yml') -Raw
-$portableLane = [regex]::Match($workflow, '(?s)  shared-gameplay:(.*?)  player-vulkan-host:')
-if (-not $portableLane.Success -or [regex]::Matches($portableLane.Groups[1].Value,
-        [regex]::Escape('assets/models/player/viewmodel/runtime/*.glb')).Count -ne 2) {
+if (-not (Test-PortableViewmodelInventory $workflow)) {
     throw 'Portable manifest checks require viewmodel GLBs in both LFS fetch and checkout lists'
 }
 foreach ($relative in @('tools/package-alpha.ps1', 'tools/run-foundation-validation.ps1')) {
