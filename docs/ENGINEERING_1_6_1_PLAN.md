@@ -19,7 +19,11 @@ and independently confirmed in the inbox. A subsequent rapid Home/resume ANR in
 UI-thread Vulkan pipeline startup is now repaired with a serial off-UI owner;
 the exact S26 interrupted-start and two rapid resumes pass without a new ANR.
 The affected route now passes13/13 with four byte-identical control images and
-honest resumed RT; the single current-source integration matrix is running.
+honest resumed RT. Initial Host Debug92/97 stopped at five failures, now each
+passing after bounded repairs; Release continuation runs in the retained build.
+Debug RTX13 captures and Android Debug/unsigned Release compile pass. Windows
+report prepare/preview/cancel is owner-confirmed. New laptop feedback reopens
+only the resting right-hand/arm sword attachment, not accepted player tuning.
 Do not repeat accepted Android/Windows emails or completed focused lifecycle rows.
 
 ## Release-focused remaining gates — October2 owner direction
@@ -33,9 +37,10 @@ The full agreed feature scope is retained; no merge/publication is authorised.
 
 | Priority | Remaining gate | Smallest useful completion evidence |
 | --- | --- | --- |
+| 1 — new laptop visual feedback | Resting sword right hand/arm attachment looks wonky on the larger Windows screen. Cause not yet proven; previous phone acceptance remains valid evidence, not closure of this newly visible issue. | Obtain the owner's resting-pose screenshot; trace the existing socket/anatomical mount/wrist/cuff layers, fix only the demonstrated layer and retain a matched native RT regression capture. No broad arm rewrite or unrestricted IK/roll/weight search. |
 | 1 — real correctness and gameplay | Final production route must load/present, retain S24 hands/two-enemy visibility, accepted player/grips and stable lifecycle. World-box normal gates pass. The demonstrated UI-thread resume ANR is repaired: exact S26 pending cancellation/two rapid resumes and affected13-waypoint route pass with current RT. | Reuse the [completed surface-owner route](evidence/2026-10-02-s26-surface-session/README.md); finish [current-source integration](evidence/2026-10-02-final-integration/README.md) and final-candidate checks. Reuse the [normal correction evidence](evidence/2026-10-02-world-box-normals/README.md), not isolated UV/contact candidates. Do not whole-merge the experimental renderer or reopen accepted player tuning. |
 | 1 — practical performance acceptance | Last warm Shipping/Mobile S26 cycle medians are81–86ms opening and112–123ms held/reveal at75%, not the33.3ms target. Pane removal helped greatly but did not establish comfortable30FPS. | Use existing results, then one final-candidate warm ordinary/lantern/live check with tails/thermal/pacing limits stated. Owner accepts actual playability or makes an explicit profile/product decision. No further unpromising micro-optimisation campaign. |
-| 2 — finished reporting experience | Android hosted verification/one approved exchange and independent inbox note/context/PNG receipt now PASS. Full-game Windows remote-form prepare/cancel/readback remains incomplete after helper addressing failures; local JSON stays fallback. | Reuse the [single Android receipt](evidence/2026-10-02-s26-report-send/README.md); close the bounded Windows interaction without repeating unchanged failed helpers. No second backend, extra email or new export-helper investigation. |
+| 2 — finished reporting experience | Android hosted verification/one approved exchange and independent inbox note/context/PNG receipt PASS. Owner also confirms actual Windows prepare/preview/context/cancel and supplies the prepared-form screenshot; local JSON stays fallback. | Reuse [Android delivery](evidence/2026-10-02-s26-report-send/README.md) and [Windows owner acceptance](evidence/2026-10-02-windows-report-ui/README.md). Complete only current-source integration/selected-quality metadata contracts. No repeated UI check, second backend or extra email. |
 | 2 — remaining change-triggered checks | Owner accepts current audio and S24 screenshot appearance on October2. External-audio focus interruption/recovery is not explicitly confirmed; final-candidate S24 live/Shipping coverage remains separate. | Reuse these verdicts, accepted "Music sounds perfect now", cue/loop evidence and arm acceptance. No repeated auditions or S24 screenshot acceptance question. Complete only the distinct unfinished focus/lifecycle/device rows. |
 | 3 — one coherent final candidate | Current source/artifact CI/host/tooling, Vulkan/SPIR-V freshness and diagnostic-free Shipping, deterministic contracts, assets/packages, Windows RTX and exact Android presentation/lifecycle/resize/update path. | Run the comprehensive matrix once the production changes are coherent; fix and rerun only invalidated checks. Include Shipping heavy-scene resize stress and bounded UI/FPS checks, not a new framework. Signing/publication require separate owner authority. |
 

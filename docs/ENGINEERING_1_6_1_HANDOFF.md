@@ -15,6 +15,22 @@ after coherent reviewed slices, preserving unrelated files and verifying remote 
 
 ### October 2 off-UI surface owner repairs the demonstrated ANR
 
+Latest integration checkpoint: runtime22d6633 over5fc5545. Initial Host
+run183151 passed92/97 Debug tests and stopped; all five failures now have
+bounded passing rechecks (CRLF canonical shader-text identity, scene-owned
+report quality, hydrated exact LFS fixtures). Original failure receipt is
+retained. Debug RTX13 captures and Android Debug/unsigned Release compilation
+pass; Release build/tests run once in the retained directory. Java76 results
+are reused for unchanged inputs, not rerun. See the single
+[finite matrix](evidence/2026-10-02-final-integration/README.md).
+
+Owner confirms actual Windows report prepare/preview/context/cancel works and
+supplies the real READY form/game-only preview. This closes that interaction;
+do not repeat it or send another email. New laptop feedback opens only a
+bounded resting sword right-hand/arm attachment check; screenshot requested,
+cause unproven. Preserve accepted player geometry/animation and diagnose the
+actual socket/mount/seam layer before changing it. No broad arm/IK/roll tuning.
+
 The bounded native lifecycle owner and generation-scoped Java/JNI readiness/stop
 are now implemented. Existing render/simulation ownership, shaders, assets,
 player geometry, quality, audio sources and gains are unchanged. Pending starts
@@ -34,10 +50,11 @@ compile time. [Finite record](evidence/2026-10-02-s26-surface-session/README.md)
 Affected run182844 now PASS on runtime242e573/the same retained APK:13/13 replay,
 four inspected byte-identical control images and honest RT after Home/resume.
 No performance claim from Replay mode. Phone left at Home/returned to owner and
-Briarhold use; do not operate it further in this run. Next is the single running
+Briarhold use; do not operate it further in this run. Next is the unfinished
+Release/package continuation in the
 [current-source integration matrix](evidence/2026-10-02-final-integration/README.md)
-and remaining Windows report interaction. No repeated route/email, accepted
-player/music tuning or parity campaign.
+and the newly reported laptop resting attachment check. No repeated route/email,
+accepted music tuning or parity campaign.
 All unrelated S24 scratch preserved. Audio/haptic manual revalidation:NO for
 unchanged semantic inputs/assets/playback and intended RT-ready gating; distinct
 external focus recovery remains open. Goal ACTIVE; no release/publication.
