@@ -1,6 +1,8 @@
 #include "vulkan/raytracing/DielectricMath.h"
+#include "vulkan/raytracing/DielectricContactGeometry.h"
 
 #include <array>
+#include <bit>
 #include <cmath>
 #include <iostream>
 #include <limits>
@@ -757,6 +759,145 @@ void TestRecordedHighGlassFloorContactKeepsBothSurfaces()
     // relaxes ordinary open-volume failure, query bounds or image tolerances.
 }
 
+void TestConservativeGeometricContactQualification()
+{
+    using horde::vulkan::raytracing::CertifyAxisContactPlane;
+    using horde::vulkan::raytracing::MatchesAxisContactPlane;
+    using horde::vulkan::raytracing::contact_detail::ExactAffineCoordinate;
+    // Actual world floor primitive486 and unit-box bottom8, not a replacement
+    // ray intersection. Native candidates establish the bounded footprints.
+    const std::array<Vec3, 3u> floor{{
+        {-28.5f, -0.95f, -13.6f}, {-8.5f, -0.95f, -13.6f}, {-8.5f, -0.95f, -16.8f}}};
+    const std::array<Vec3, 3u> bottom{{
+        {-0.5f, -0.5f, -0.5f}, {0.5f, -0.5f, -0.5f}, {0.5f, -0.5f, 0.5f}}};
+    const auto receiver = CertifyAxisContactPlane(floor, {0.0f, 1.0f, 0.0f});
+    const std::array<float, 4u> row{0.0f, 1.25f, 0.0f, -0.325f};
+    Check(receiver.has_value() && MatchesAxisContactPlane(*receiver, bottom, row),
+          "actual authored glass/floor contact is certified independently of native raw-distance ordering");
+    if (!receiver) return;
+    auto gapRow = row;
+    gapRow[3] = std::nextafter(row[3], 0.0f);
+    Check(static_cast<double>(gapRow[1]) * -0.5 + gapRow[3] != receiver->coordinate,
+          "air-gap fixture remains distinct in the exact double reference");
+    Check(!MatchesAxisContactPlane(*receiver, bottom, gapRow),
+          "a real air gap at the recorded contact is rejected without an epsilon");
+    auto insideRow = row;
+    insideRow[3] = std::nextafter(row[3], -1.0f);
+    Check(!MatchesAxisContactPlane(*receiver, bottom, insideRow),
+          "an interior receiver is not reclassified as a coincident exit");
+    auto slanted = bottom;
+    slanted[1].y = std::nextafter(slanted[1].y, 0.0f);
+    Check(!MatchesAxisContactPlane(*receiver, slanted, row),
+          "a triangle with only partial coplanarity does not qualify");
+    Check(!MatchesAxisContactPlane(*receiver, {bottom[0], bottom[0], bottom[0]}, row) &&
+              !MatchesAxisContactPlane(*receiver,
+                  {bottom[0], Vec3{0.0f, -0.5f, -0.5f}, bottom[1]}, row),
+          "a degenerate exit triangle cannot establish an actual contact plane");
+    auto sheared = row;
+    sheared[0] = 0.125f;
+    Check(!MatchesAxisContactPlane(*receiver, bottom, sheared) &&
+              !MatchesAxisContactPlane(*receiver, bottom, {0.0f, 0.0f, 0.0f, -0.95f}),
+          "unsupported multi-coefficient and collapsed transform rows remain uncertified");
+    Check(!CertifyAxisContactPlane(floor, {0.0f, -1.0f, 0.0f}) &&
+              !CertifyAxisContactPlane(floor, {0.0f, 0.5f, 0.0f}) &&
+              !CertifyAxisContactPlane({floor[0], floor[0], floor[0]}, {0.0f, 1.0f, 0.0f}),
+          "wrong winding, non-unit axis normal and degenerate source receiver are rejected");
+    Check(!CertifyAxisContactPlane({Vec3{0.0f, -0.95f, 0.0f},
+                  Vec3{2.0f, -0.95f, 4.0f}, Vec3{3.0f, -0.95f, 1.0f}}, {0.0f, 1.0f, 0.0f}),
+          "valid planes without a provable axis-edge winding remain deliberately uncertified");
+    auto nonplanarFloor = floor;
+    nonplanarFloor[2].y = std::nextafter(-0.95f, 0.0f);
+    Check(!CertifyAxisContactPlane(nonplanarFloor, {0.0f, 1.0f, 0.0f}),
+          "authored normal code alone cannot certify a nonplanar receiver");
+    const float nan = std::numeric_limits<float>::quiet_NaN();
+    Check(!MatchesAxisContactPlane(*receiver, bottom, {0.0f, nan, 0.0f, -0.325f}) &&
+              !MatchesAxisContactPlane(*receiver, bottom, {0.0f, 0x1p-30f, 0.0f, -0.95f}) &&
+              !MatchesAxisContactPlane(*receiver, bottom, {0.0f, 0x1p30f, 0.0f, -0.95f}),
+          "nonfinite, subnormal-sensitive and oversized arithmetic domains are rejected, not clamped");
+    for (float gap : {-0x1p-20f, 0x1p-20f})
+    {
+        const float rounded = 128.0f * 0.5f + gap;
+        Check(rounded == 64.0f && 64.0 + static_cast<double>(gap) != 64.0 &&
+              !ExactAffineCoordinate(128.0f, 0.5f, gap, 64.0f),
+              "a rounded-away gap or interior obstruction is rejected in both signs");
+    }
+    Check(ExactAffineCoordinate(1.0f, 1.0f, -0.5f, 0.5f) &&
+              ExactAffineCoordinate(-1.0f, 1.0f, 0.5f, -0.5f) &&
+              ExactAffineCoordinate(1.0f, 0.0f, -0.325f, -0.325f) &&
+              ExactAffineCoordinate(1.0f, 1.0f, -0.0f, 1.0f),
+          "integer proof preserves exact differences of both signs and signed zero");
+    const float oneNext = std::nextafter(1.0f, 2.0f);
+    Check(!ExactAffineCoordinate(oneNext, 1.0f, 3.0f, 4.0f) &&
+              ExactAffineCoordinate(1.0f, 1.0f, 3.0f, 4.0f),
+          "discarded significand bits reject a rounded-only equality at the maximum alignment shift");
+    Check(!ExactAffineCoordinate(1.0f, 1.0f, -2.0f, -1.0f) &&
+              !ExactAffineCoordinate(1.0f, 1.0f, -1.0f, 0.0f) &&
+              !ExactAffineCoordinate(1.0f, 1.0f, 7.0f, 8.0f),
+          "unsupported sign cancellation, zero receiver and exponent gaps are not silently certified");
+    // Independently exact double reference over a finite dyadic/nextafter grid.
+    // Inputs remain in a narrow range: double represents every product+sum
+    // exactly here (this is not a claimed oracle for arbitrary float exponents).
+    unsigned cases = 0u;
+    unsigned accepted = 0u;
+    for (int i = 0; i < 16; ++i)
+        for (int j = 0; j < 16; ++j)
+            for (int k = 0; k < 8; ++k)
+                for (int sign : {-1, 1})
+                {
+                    const float scale = sign * std::bit_cast<float>(
+                        std::bit_cast<std::uint32_t>(0.5f + i / 16.0f) + j / 4u);
+                    const float local = std::ldexp(0.25f, j % 4);
+                    const float translation = sign * k / 16.0f;
+                    const double exact = static_cast<double>(scale) * local + translation;
+                    const float rounded = static_cast<float>(exact);
+                    for (const float plane : {rounded, std::nextafter(rounded, -4.0f),
+                                             std::nextafter(rounded, 4.0f)})
+                    {
+                        const bool qualified = ExactAffineCoordinate(scale, local, translation, plane);
+                        const bool commuted = ExactAffineCoordinate(local, scale, translation, plane);
+                        Check(qualified == (exact == static_cast<double>(plane)) &&
+                                  commuted == qualified,
+                              "bounded integer equality agrees with the independent exact finite-grid reference");
+                        if (qualified) accepted += 2u;
+                        cases += 2u;
+                    }
+                }
+    Check(cases == 24576u && accepted > 0u && accepted < cases,
+          "finite integer-contact grid exercises both certification and rejection");
+    std::cout << "Integer contact grid: " << cases << " checks, " << accepted
+              << " exact contacts admitted.\n";
+    Check(!ExactAffineCoordinate(1.25f, 0.75f, 0.0f, 0.9375f),
+          "unsupported non-power-of-two products remain uncertified even when exact");
+    for (std::uint32_t axis = 0u; axis < 3u; ++axis)
+    {
+        auto rotated = floor;
+        for (auto& vertex : rotated)
+            vertex = axis == 0u ? Vec3{vertex.y, vertex.z, vertex.x} :
+                (axis == 2u ? Vec3{vertex.z, vertex.x, vertex.y} : vertex);
+        const Vec3 normal = axis == 0u ? Vec3{1.0f, 0.0f, 0.0f} :
+            (axis == 2u ? Vec3{0.0f, 0.0f, 1.0f} : Vec3{0.0f, 1.0f, 0.0f});
+        for (unsigned edge = 0; edge < 3u; ++edge)
+        {
+            const auto plane = CertifyAxisContactPlane(rotated, normal);
+            Check(plane && plane->axis == axis && plane->coordinate == -0.95f,
+                  "source winding certificate is cyclically invariant on all three plane axes");
+            const auto first = rotated[0];
+            rotated[0] = rotated[1]; rotated[1] = rotated[2]; rotated[2] = first;
+        }
+    }
+    DielectricStack<4u> stack;
+    stack.Enter(9u, 107u, 1.52f);
+    const Vec3 incident{0.8660254f, -0.5f, 0.0f};
+    const auto exit = OrientInterface(incident, {0.0f, -1.0f, 0.0f});
+    Vec3 transmitted{};
+    const bool transmits = RefractDirection(incident, exit.normal, 1.52f, 1.0f, transmitted);
+    if (transmits) stack.Exit(9u, 107u);
+    Check(!transmits && stack.Depth() == 1u &&
+              ResolveDielectricTerminal(stack.Depth(), DielectricTerminalKind::Opaque) ==
+                  DielectricTerminalResolution::FailUnclosedVolume,
+          "geometric coincidence does not consume an opaque receiver or pop the volume during TIR");
+}
+
 void TestBoundedTirAndWaterTerminationContracts()
 {
     Check(ResolveDielectricInterfaceBudget(1u, 8u) ==
@@ -902,6 +1043,7 @@ int main()
     TestRecordedTriangleSurfacePointKeepsMicrometreExit();
     TestRecordedRow43OutsideOriginCornerRejectsFirstExit();
     TestRecordedHighGlassFloorContactKeepsBothSurfaces();
+    TestConservativeGeometricContactQualification();
     TestRoughClosedVolumeTransmissionReachesPairedBoundary();
     TestBoundedTirAndWaterTerminationContracts();
     TestSelfHitClassificationUsesBoundedEpsilon();
