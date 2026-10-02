@@ -23,6 +23,30 @@ The owner also accepts the current look-down angle and occlusion. Visible feet
 and a steeper look range are deferred until a gameplay need justifies revisiting
 them; they are not remaining1.6.1 visual gates.
 
+## Future glass investigation — owner deferral, 2026-10-03
+
+The owner moves the remaining glass defects out of the1.6.1 release gates and
+into future investigation. They remain demonstrated, unresolved defects, not
+fixed or passed comparisons:
+
+- High physical-glass exit/opaque-receiver contact ordering can lose the actual
+  receiver and create a bright strip. The isolated contact-policy candidate is
+  not production-admitted; its unchanged Shipping static-cost gate fails.
+  Preserve the [native contact evidence](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/646f508/docs/evidence/2026-10-02-backend-pixel-witness/axis-contact-policy.md).
+- The High near-edge primary candidate atrow43/tick646 is invalid according to
+  the independent source-world reference. The completed bounded hypotheses
+  do not fix it. Preserve the [finite record](docs/evidence/2026-10-02-high-row43/README.md)
+  and its positive and negative rows.
+
+Do not restart these investigations during1.6.1, promote rejected candidates,
+relax numerical/image/static-cost tolerances or suppress failure diagnostics.
+The physical dielectric engine and full High/desktop glass route stay intact;
+Mobile's already-authorised open-aperture lantern remains unchanged. Future
+work starts from these retained records, not another broad audit or epsilon
+search. Original failed gates remain failed evidence, but are no longer1.6.1
+release blockers by explicit owner scope decision. Normal gameplay, lighting,
+RT presentation and final-candidate stability checks still apply.
+
 ## S24/S25 compatibility programme - required within 1.6.1
 
 The immediate motivation is now confirmed across two Qualcomm flagship generations: real Samsung Galaxy S25 Ultra and Galaxy S24 Ultra tests performed on 2026-09-11 both reached Horde's Vulkan diagnostics and exposed acceleration structures plus `VK_KHR_ray_query`, but neither tested driver exposed `VK_KHR_ray_tracing_pipeline`. The current renderer therefore selected `RayQuery` capability mode but did not attempt or present the Horde RT scene.

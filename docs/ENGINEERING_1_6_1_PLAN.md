@@ -50,19 +50,22 @@ The full agreed feature scope is retained; no merge/publication is authorised.
 | 2 — remaining change-triggered checks | Owner accepts current music and S24 screenshot appearance; Windows SFX balance/control and targeted Windows startup/menu/refocus repair5e20f10 are now accepted too. External-audio interruption/recovery and changed phone cuff/gain/final S24 live Shipping coverage remain separate. | Reuse these verdicts and the [Windows music finite record](evidence/2026-10-02-windows-music-startup/README.md). No repeated auditions or S24 screenshot acceptance question. Complete only distinct unfinished device/lifecycle rows. |
 | 3 — one coherent final candidate | Current source/artifact CI/host/tooling, Vulkan/SPIR-V freshness and diagnostic-free Shipping, deterministic contracts, assets/packages, Windows RTX and exact Android presentation/lifecycle/resize/update path. | The finite integration matrix and four Shipping backend/live rows are completed with explicit limitations; reuse [backend receipts](evidence/2026-10-02-final-integration/windows-shipping-backends/README.md). Finish foreground/live Compute visual acceptance and exact-device rows; fix and rerun only invalidated checks. Include Shipping heavy-scene resize stress and bounded UI/FPS checks, not a new framework. Signing/publication require separate owner authority. |
 
-### Physical defects versus numerical parity
+### Glass deferral and numerical parity — October3 owner direction
 
-- **Retain as genuine High correctness issues:** the demonstrated glass-exit/
+- **Future investigation, no longer1.6.1 release blockers:** the owner explicitly
+  defers the remaining glass defects on October3. The demonstrated glass-exit/
   opaque-receiver contact ordering loses the actual receiver/creates a bright
   strip; the source-world row43 reference proves an invalid near-edge primary
   candidate, not merely different RGB arithmetic. Their [native contact evidence](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/646f508/docs/evidence/2026-10-02-backend-pixel-witness/axis-contact-policy.md)
-  and [row43 record](evidence/2026-10-02-high-row43/README.md) stay open. The contact
+  and [row43 record](evidence/2026-10-02-high-row43/README.md) remain unresolved
+  evidence, not passed or fixed. The contact
   prototype is not production-admitted; its clean Shipping static gate fails.
-  Only bounded work aimed at a demonstrated wrong path/visible artifact is
-  justified. If no safe bounded fix is available, report the exact High limitation
-  for owner disposition rather than silently waiving the physical gate or starting
-  another expression/epsilon/precision/budget sweep. Mathematical corner perfection
-  is not an unlimited engineering programme.
+  Do not continue these investigations in1.6.1 or promote their rejected candidates.
+  Preserve the physical High path, current materials/geometry, diagnostics and
+  unchanged tolerances. The [future investigation backlog](../FUTURE_WORK.md#future-glass-investigation--owner-deferral-2026-10-03)
+  retains the exact limitations and completed evidence. This is an explicit scope
+  deferral, not proof that the physical/image gates pass. Final gameplay/lighting,
+  RT presentation and stability checks remain required.
 - **Park as diagnostic investigation, not release-blocking equivalence:** isolated
   RGB/UV-rounding/backend differences without demonstrated bad geometry/material/
   transport or gameplay impact. Preserve failed strict comparisons and unchanged

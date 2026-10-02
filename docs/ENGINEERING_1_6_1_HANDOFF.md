@@ -1,6 +1,6 @@
 # 1.6.1 recovery handoff
 
-Updated 2026-10-02. Branch: `codex/horde-1.6.1-engineering-pass`.
+Updated 2026-10-03. Branch: `codex/horde-1.6.1-engineering-pass`.
 Engineering work has resumed by explicit owner instruction; the goal is not complete. See [programme scope](ENGINEERING_1_6_1_PLAN.md)
 and [latest lantern evidence](ENGINEERING_1_6_1_LANTERN_BENCHMARK_2026-09-20.md).
 
@@ -12,6 +12,24 @@ Do not restore either the quota pause or explicit-resume restriction from older
 handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
+
+### October3 owner deferral — remaining glass defects are future investigation
+
+The owner explicitly moves the remaining glass defects out of1.6.1 release
+gates. High exit/opaque-receiver ordering/bright strips androw43's invalid
+near-edge primary candidate are **unresolved, deferred**, not fixed or passing.
+This newer instruction supersedes historical "physical OPEN"/next-glass-fix
+directions below. Preserve completed tests, failed comparisons, rejected
+candidates, diagnostic counters and unchanged tolerances. Do not resume glass
+investigation or promote unadmitted fixes in this engineering pass.
+
+[Future backlog](../FUTURE_WORK.md#future-glass-investigation--owner-deferral-2026-10-03)
+and the [current gate plan](ENGINEERING_1_6_1_PLAN.md#glass-deferral-and-numerical-parity--october3-owner-direction)
+retain the exact evidence/limits. Full physical High/desktop glass and Mobile's
+accepted open-aperture lantern remain unchanged. Ordinary lighting/gameplay,
+honest RT presentation and final-candidate stability are still gates. No shader,
+asset, rendering, performance or audio change is made by this deferral.
+Audio/haptic manual revalidation:NO. No merge, signing or publication.
 
 ### October 2 Windows Shipping backend continuation — completed
 
