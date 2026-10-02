@@ -471,8 +471,11 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
                 vec3 weights = vec3(1.0 - bary.x - bary.y, bary.x, bary.y);
                 StaticRtVertex v0, v1, v2;
                 loadPbrTriangle(instanceMetadata, i0, i1, i2, v0, v1, v2);
-                vec2 uv = v0.uv0.xy * weights.x + v1.uv0.xy * weights.y +
-                          v2.uv0.xy * weights.z;
+                // Preserve the authored interpolation order across shader
+                // stages. A one-ULP UV change can alter a filtered normal and
+                // consequently the geometry selected by its reflection ray.
+                precise vec2 uv = v0.uv0.xy * weights.x + v1.uv0.xy * weights.y +
+                                  v2.uv0.xy * weights.z;
                 mat3 objectToWorld = mat3(rayQueryGetIntersectionObjectToWorldEXT(query, true));
                 mat3 normalToWorld = transpose(inverse(objectToWorld));
                 vec3 localNormal = normalize(v0.normal.xyz * weights.x +

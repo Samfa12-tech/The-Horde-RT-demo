@@ -645,6 +645,10 @@ int main()
                       hitDecodeSource.find("precise vec3 surfacePosition = objectToWorld * localPosition +") != std::string::npos &&
                       hitDecodeSource.find("h.position = surfacePosition;") != std::string::npos,
                       "transmitting triangle hits must reconstruct the geometric surface point before spawning dielectric rays");
+        ok &= Require(hitDecodeSource.find(
+                          "precise vec2 uv = v0.uv0.xy * weights.x + v1.uv0.xy * weights.y +") != std::string::npos &&
+                      hitDecodeSource.find("v2.uv0.xy * weights.z;") != std::string::npos,
+                      "PBR UV interpolation must retain all three authored vertex weights without cross-stage contraction");
         const std::size_t shadowStart = lightingSource.find("vec3 boundedShadowTransmittanceMask(");
         const std::size_t shadowEnd = lightingSource.find("float visibilityMask(", shadowStart);
         const std::string selectedShadow = shadowStart != std::string::npos &&
