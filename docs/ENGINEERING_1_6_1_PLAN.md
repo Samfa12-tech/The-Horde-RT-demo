@@ -20,7 +20,10 @@ UI-thread Vulkan pipeline startup is now repaired with a serial off-UI owner;
 the exact S26 interrupted-start and two rapid resumes pass without a new ANR.
 The affected route now passes13/13 with four byte-identical control images and
 honest resumed RT. Initial Host Debug92/97 stopped at five failures, now each
-passing after bounded repairs; Release continuation runs in the retained build.
+passing after bounded repairs. Release builds and96/97 tests finish; its new
+strict-mode music staging failure is fixed with a targeted14/14 pass. Package,
+Shipping SPIR-V containment and ARM64 object checks pass. Packaged Windows RT
+presents, but its cancelled0-frame benchmark is not a live-route/timing pass.
 Debug RTX13 captures and Android Debug/unsigned Release compile pass. Windows
 report prepare/preview/cancel is owner-confirmed. New laptop feedback reopens
 only the resting right-hand/arm sword attachment, not accepted player tuning.
@@ -37,7 +40,7 @@ The full agreed feature scope is retained; no merge/publication is authorised.
 
 | Priority | Remaining gate | Smallest useful completion evidence |
 | --- | --- | --- |
-| 1 — new laptop visual feedback | Resting sword right hand/arm attachment looks wonky on the larger Windows screen. Cause not yet proven; previous phone acceptance remains valid evidence, not closure of this newly visible issue. | Obtain the owner's resting-pose screenshot; trace the existing socket/anatomical mount/wrist/cuff layers, fix only the demonstrated layer and retain a matched native RT regression capture. No broad arm rewrite or unrestricted IK/roll/weight search. |
+| 1 — new laptop visual feedback | Owner rest/motion crops demonstrate right glove/sleeve misalignment. Retained CPU/source inspection measures coincident wrist origins but cuff-centre offset and different Hand/ForeArm motion. Weights-only contrast rejected; bounded local fit passes paired native admission and protected-surface checks. Owner now accepts the join through laptop live movement. | Reuse the [finite cuff record](evidence/2026-10-02-right-cuff/README.md) and completed captures. Integrate the exact paired fit into engineering, validate affected contracts and prepare its phone build; change-triggered exact-device acceptance remains open. No broad arm rewrite, grip/IK adjustment or repeated contrast matrix. |
 | 1 — real correctness and gameplay | Final production route must load/present, retain S24 hands/two-enemy visibility, accepted player/grips and stable lifecycle. World-box normal gates pass. The demonstrated UI-thread resume ANR is repaired: exact S26 pending cancellation/two rapid resumes and affected13-waypoint route pass with current RT. | Reuse the [completed surface-owner route](evidence/2026-10-02-s26-surface-session/README.md); finish [current-source integration](evidence/2026-10-02-final-integration/README.md) and final-candidate checks. Reuse the [normal correction evidence](evidence/2026-10-02-world-box-normals/README.md), not isolated UV/contact candidates. Do not whole-merge the experimental renderer or reopen accepted player tuning. |
 | 1 — practical performance acceptance | Last warm Shipping/Mobile S26 cycle medians are81–86ms opening and112–123ms held/reveal at75%, not the33.3ms target. Pane removal helped greatly but did not establish comfortable30FPS. | Use existing results, then one final-candidate warm ordinary/lantern/live check with tails/thermal/pacing limits stated. Owner accepts actual playability or makes an explicit profile/product decision. No further unpromising micro-optimisation campaign. |
 | 2 — finished reporting experience | Android hosted verification/one approved exchange and independent inbox note/context/PNG receipt PASS. Owner also confirms actual Windows prepare/preview/context/cancel and supplies the prepared-form screenshot; local JSON stays fallback. | Reuse [Android delivery](evidence/2026-10-02-s26-report-send/README.md) and [Windows owner acceptance](evidence/2026-10-02-windows-report-ui/README.md). Complete only current-source integration/selected-quality metadata contracts. No repeated UI check, second backend or extra email. |

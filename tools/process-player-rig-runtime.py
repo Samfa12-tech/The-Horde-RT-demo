@@ -8,7 +8,7 @@ from mathutils import Vector
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from player_gauntlet_geometry import authored_face_and_uvs, mirror_for_hand
+from player_gauntlet_geometry import authored_face_and_uvs, mirror_for_hand, fit_cuff_to_forearm
 from player_body_partition import upper_torso_partition_limits
 
 
@@ -21,6 +21,9 @@ if "--" not in sys.argv:
         "usage: blender --background --python process-player-rig-runtime.py -- idle.glb walking.glb pbr-directory gauntlet.glb output.glb"
     )
 arguments = sys.argv[sys.argv.index("--") + 1:]
+fit_right_cuff = '--fit-right-cuff' in arguments
+if fit_right_cuff:
+    arguments.remove('--fit-right-cuff')
 body_remainder = '--body-remainder' in arguments
 if body_remainder:
     arguments.remove('--body-remainder')
@@ -414,8 +417,9 @@ def create_authored_viewmodel_gauntlet(side):
     """Bake one rigid authored grip over the character's fitted sleeve.
 
     The accepted Meshy 7 hand supplies the visible fingers, thumb, palm and
-    cuff without any destructive voxel remesh or decimation.  It is rigid to
-    the actual Hand bone.  The character's original fitted sleeve is retained
+    cuff without any destructive voxel remesh or decimation. It is rigid to
+    the actual Hand bone by default; the opt-in right cuff fit articulates
+    only its proximal cuff. The character's original fitted sleeve is retained
     and reweighted separately so the visible arm follows shoulder, elbow and
     wrist anatomy instead of a synthetic straight cylinder.
     """
@@ -470,6 +474,23 @@ def create_authored_viewmodel_gauntlet(side):
             target_x * (local.x * gauntlet_scale) +
             target_y * (local.y * gauntlet_scale) +
             target_z * (local.z * gauntlet_scale)))
+    cuff_fit = {}
+    forearm_shares = [0.0] * len(vertices)
+    if fit_right_cuff and side == 'Right':
+        # An infinite authored-handle cylinder protects contacts even far
+        # along the grip axis. Select from ORIGINAL positions: moving a point
+        # away from the handle cannot evade this guard. The distal wrist
+        # half-space is separately preserved by the fit itself.
+        protected_contact = []
+        for index, point in enumerate(vertices):
+            offset = Vector(point) - handle_centre
+            radial = offset - handle_axis * offset.dot(handle_axis)
+            if radial.length <= 0.034:
+                protected_contact.append(index)
+        vertices, forearm_shares, cuff_fit = fit_cuff_to_forearm(
+            vertices, tuple(wrist), tuple(elbow),
+            (tuple(target_x), tuple(target_y), tuple(target_z)),
+            protected_indices=protected_contact)
     target_face_uvs = []
     for source_face, source_uvs in zip(gauntlet_faces, gauntlet_face_uvs):
         face, uvs = authored_face_and_uvs(
@@ -503,25 +524,30 @@ def create_authored_viewmodel_gauntlet(side):
     gauntlet_object.data.update()
 
     hand_group = gauntlet_object.vertex_groups.new(name=hand_name)
+    forearm_group = gauntlet_object.vertex_groups.new(name=side + 'ForeArm') if cuff_fit else None
     primary_group = gauntlet_object.vertex_groups.new(
         name="ViewmodelPrimary" + side)
     gauntlet_group = gauntlet_object.vertex_groups.new(
         name="ViewmodelGauntlet" + side)
     rigid_gauntlet_vertices = 0
     for vertex in gauntlet_object.data.vertices:
-        # Preserve the reviewed finger/palm silhouette exactly.  A hand has
-        # no finger bones in this compact rig, so neighbouring arm weights
-        # would tear the grip apart under IK.
-        hand_group.add([vertex.index], 1.0, "REPLACE")
+        # Preserve the grip-bearing finger/palm silhouette exactly. The
+        # opt-in fit articulates only the proven proximal cuff, never fingers.
+        # The default remains the byte-compatible Hand-rigid accepted export.
+        share = forearm_shares[vertex.index]
+        if share < 1.0:
+            hand_group.add([vertex.index], 1.0 - share, "REPLACE")
+        if share:
+            forearm_group.add([vertex.index], share, "REPLACE")
         primary_group.add([vertex.index], 1.0, "REPLACE")
         gauntlet_group.add([vertex.index], 1.0, "REPLACE")
-        rigid_gauntlet_vertices += 1
+        rigid_gauntlet_vertices += int(share == 0.0)
     for polygon in gauntlet_object.data.polygons:
         polygon.use_smooth = True
 
     components, boundary_edges, component_sizes = mesh_topology_metrics(
         gauntlet_object.data)
-    if rigid_gauntlet_vertices != len(gauntlet_world_vertices):
+    if rigid_gauntlet_vertices != len(gauntlet_world_vertices) - cuff_fit.get('proximalVertices', 0):
         raise RuntimeError(f"{side} authored gauntlet lost rigid hand weights")
     return gauntlet_object, {
         "triangles": sum(max(0, len(polygon.vertices) - 2)
@@ -533,13 +559,15 @@ def create_authored_viewmodel_gauntlet(side):
         "rigidGauntletVertices": rigid_gauntlet_vertices,
         "sleeveVertices": 0,
         "uvSource": "accepted Meshy glove/bracer authored loop UV0 preserved through fitted transform",
-        "gripConstruction": "accepted Meshy 7 anatomical gauntlet rigid to Hand; side-mirrored by chirality; authored fitted character sleeve retained beneath cuff",
+        "gripConstruction": ("accepted Meshy 7 distal hand rigid to Hand; local proximal cuff fit/articulation; authored sleeve unchanged"
+                             if cuff_fit else "accepted Meshy 7 anatomical gauntlet rigid to Hand; side-mirrored by chirality; authored fitted character sleeve retained beneath cuff"),
         "gauntletScale": gauntlet_scale,
         "handleForearmDot": handle_axis.dot(forearm_direction),
         "sourceHandedness": gauntlet_source_hand,
         "targetHandedness": side,
         "mirrored": mirrored,
         "legacyUvOrder": legacy_gauntlet_export,
+        **({'cuffFit': cuff_fit} if cuff_fit else {}),
     }
 
 

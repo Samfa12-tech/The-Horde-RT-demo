@@ -22,6 +22,8 @@ Investigation-only switches (not admission or production defaults):
     preserving the existing head mask and all geometry/weights.
   --reconcile-segmented-seams: split proven coarse world cloth edges at the
     unchanged view sleeve midpoints before exact boundary-weight transfer.
+  --fit-right-cuff: local bind-space gauntlet cuff fit/articulation, preserving
+    distal hand/grip geometry and unchanged sleeve skinning. Investigation only.
 These retain gameplay sockets/prop authority. None establishes visual acceptance;
 the candidates still require anatomical, surface and live-motion validation.
 """
@@ -50,6 +52,7 @@ parser.add_argument('--body-remainder', action='store_true')
 parser.add_argument('--retain-upper-torso', action='store_true')
 parser.add_argument('--reconcile-segmented-seams', action='store_true')
 parser.add_argument('--stabilize-sleeves', action='store_true')
+parser.add_argument('--fit-right-cuff', action='store_true')
 parser.add_argument('--gauntlet-source-hand', choices=('Left', 'Right'),
                     help='Explicit anatomical source handedness; omission reproduces the historical export')
 parser.add_argument('--gauntlet-scale', type=float,
@@ -106,7 +109,7 @@ if base_world_sha256 != admitted_view_receipt['sourceWorldSha256']:
     raise RuntimeError('World reference differs from the admitted base-rig receipt; reconcile inputs/Blender threading first')
 
 paired_gauntlet_world = None
-if options.gauntlet_source_hand or options.gauntlet_scale is not None or options.body_remainder:
+if options.gauntlet_source_hand or options.gauntlet_scale is not None or options.body_remainder or options.fit_right_cuff:
     world_name = 'world-chirality-corrected.runtime.glb' if options.gauntlet_source_hand else \
         'world-gauntlet-size-candidate.runtime.glb'
     paired_gauntlet_world = output / world_name
@@ -118,6 +121,8 @@ if options.gauntlet_source_hand or options.gauntlet_scale is not None or options
         paired_arguments.extend(['--gauntlet-source-hand', options.gauntlet_source_hand])
     if options.gauntlet_scale is not None:
         paired_arguments.extend(['--gauntlet-scale', format(options.gauntlet_scale, '.17g')])
+    if options.fit_right_cuff:
+        paired_arguments.append('--fit-right-cuff')
     if options.body_remainder:
         paired_arguments.append('--body-remainder')
     if options.retain_upper_torso:
@@ -426,6 +431,8 @@ report = dict(schema=1, role='Viewmodel',
               elbowWeightField=elbow_corrections,
               sleeveEnvelopeFit=sleeve_fit,
               sleeveClosure=sleeve_closure,
+              **({'rightGauntletCuffFit': world['report']['authoredViewmodelGauntlets']['Right']['cuffFit']}
+                 if options.fit_right_cuff else {}),
               sleeveSeamReconciliation=seam_reconciliation,
               **({'segmentedSeamReconciliation': segmented_seam_reconciliation}
                  if options.reconcile_segmented_seams else {}),

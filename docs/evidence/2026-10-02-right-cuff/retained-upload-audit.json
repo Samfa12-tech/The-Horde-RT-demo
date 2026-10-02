@@ -1,0 +1,950 @@
+{
+  "scope": "Exact retained CPU upload, not owner frame, GPU readback or visual acceptance",
+  "poses": {
+    "00-opening": {
+      "Left": {
+        "fitMaxResidualMetres": {
+          "ForeArm": 1.6837598316929104e-07,
+          "Hand": 1.8181236967425686e-07
+        },
+        "wristBindMeshUnits": [
+          0.3970412313938141,
+          1.2334095239639282,
+          0.15257765352725983
+        ],
+        "elbowBindMeshUnits": [
+          0.29562726616859436,
+          1.231248378753662,
+          -0.03861011192202568
+        ],
+        "wristPositionDisagreementMetres": 1.775578632281575e-07,
+        "forearmAxisHandVsForeArmDegrees": 20.168090667705474,
+        "authoredRightCuffToBindForearmDegrees": null,
+        "rightSourceCuffAttachment": null,
+        "fullHandVsForeArmRotationDegrees": 97.40449454650029,
+        "boneMapSingularValues": {
+          "ForeArm": [
+            1.4087565706167464,
+            0.9999996143537787,
+            0.9999993177850554
+          ],
+          "Hand": [
+            0.9999994996000406,
+            0.999999222153801,
+            0.9999991351322413
+          ]
+        },
+        "gauntletProjectionRangeMetres": [
+          -0.10001908242702484,
+          0.05137329548597336
+        ],
+        "gauntletCuffRadialRangeMetres": [
+          0.022703954949975014,
+          0.04900854080915451
+        ],
+        "sleeveCuffNearestGloveDistanceMetres": [
+          0.003184599255065722,
+          0.04239850118763791,
+          0.10048974999093552
+        ],
+        "contrast": {
+          "gauntletVerticesChanged": 1754,
+          "distalHandVerticesUnchanged": 3856,
+          "terminalSleeveVertices": 19,
+          "terminalNearestGloveBeforeMetres": [
+            0.003184599255065722,
+            0.013290379569752452,
+            0.02944387629333657
+          ],
+          "terminalNearestGloveAfterMetres": [
+            0.0036578477724211215,
+            0.006657996265644848,
+            0.010163274286134638
+          ],
+          "terminalNearestGloveBindMetres": [
+            0.0031740800477564335,
+            0.004420460667461157,
+            0.009826556779444218
+          ],
+          "maximumGauntletDisplacementMetres": 0.09253305029603041
+        },
+        "nearestSleeveVertices": [
+          {
+            "index": 4547,
+            "distanceMeshUnits": 0.0316215343773365,
+            "projectionMeshUnits": 0.020970074459910393,
+            "weights": {
+              "LeftForeArm": 1.0
+            }
+          },
+          {
+            "index": 622,
+            "distanceMeshUnits": 0.03241385892033577,
+            "projectionMeshUnits": 0.01904192566871643,
+            "weights": {
+              "LeftForeArm": 1.0
+            }
+          },
+          {
+            "index": 623,
+            "distanceMeshUnits": 0.03241385892033577,
+            "projectionMeshUnits": 0.01904192566871643,
+            "weights": {
+              "LeftForeArm": 1.0
+            }
+          },
+          {
+            "index": 630,
+            "distanceMeshUnits": 0.03316677734255791,
+            "projectionMeshUnits": 0.022898240014910698,
+            "weights": {
+              "LeftForeArm": 1.0
+            }
+          },
+          {
+            "index": 631,
+            "distanceMeshUnits": 0.03316677734255791,
+            "projectionMeshUnits": 0.022898240014910698,
+            "weights": {
+              "LeftForeArm": 1.0
+            }
+          },
+          {
+            "index": 632,
+            "distanceMeshUnits": 0.03316677734255791,
+            "projectionMeshUnits": 0.022898240014910698,
+            "weights": {
+              "LeftForeArm": 1.0
+            }
+          },
+          {
+            "index": 4423,
+            "distanceMeshUnits": 0.037239328026771545,
+            "projectionMeshUnits": 0.022685334086418152,
+            "weights": {
+              "LeftForeArm": 1.0
+            }
+          },
+          {
+            "index": 4548,
+            "distanceMeshUnits": 0.04014727845788002,
+            "projectionMeshUnits": 0.02934524044394493,
+            "weights": {
+              "LeftForeArm": 1.0
+            }
+          },
+          {
+            "index": 4422,
+            "distanceMeshUnits": 0.04014727845788002,
+            "projectionMeshUnits": 0.02934524044394493,
+            "weights": {
+              "LeftForeArm": 1.0
+            }
+          },
+          {
+            "index": 4441,
+            "distanceMeshUnits": 0.0404767207801342,
+            "projectionMeshUnits": 0.03127337992191315,
+            "weights": {
+              "LeftForeArm": 1.0
+            }
+          },
+          {
+            "index": 4566,
+            "distanceMeshUnits": 0.042489904910326004,
+            "projectionMeshUnits": 0.03345117345452309,
+            "weights": {
+              "LeftForeArm": 1.0
+            }
+          },
+          {
+            "index": 4373,
+            "distanceMeshUnits": 0.04408356547355652,
+            "projectionMeshUnits": 0.03298863023519516,
+            "weights": {
+              "LeftForeArm": 1.0
+            }
+          }
+        ],
+        "boneMapsRowVectors": {
+          "ForeArm": [
+            [
+              0.9077360931477794,
+              -0.23274803594691695,
+              0.5813969666781594
+            ],
+            [
+              0.07182074218239104,
+              0.9576100605677974,
+              0.27914529415134837
+            ],
+            [
+              -0.41543605794971333,
+              -0.31627633778491016,
+              1.2229876782652664
+            ],
+            [
+              -0.19193187104845796,
+              0.23946602397521366,
+              -0.17532225301202245
+            ]
+          ],
+          "Hand": [
+            [
+              -0.05062964149387314,
+              0.9101204330839023,
+              0.41123682438360215
+            ],
+            [
+              -0.9978532203232614,
+              -0.02897740942822924,
+              -0.058720682848778266
+            ],
+            [
+              -0.04152612200150884,
+              -0.4133272217330397,
+              0.9096344076248949
+            ],
+            [
+              1.4508744219656748,
+              1.0173742633606702,
+              0.35677612477936516
+            ]
+          ]
+        }
+      },
+      "Right": {
+        "fitMaxResidualMetres": {
+          "ForeArm": 1.658854172833018e-07,
+          "Hand": 1.4193008624621596e-07
+        },
+        "wristBindMeshUnits": [
+          -0.3987743854522705,
+          1.235403060913086,
+          0.15724875032901764
+        ],
+        "elbowBindMeshUnits": [
+          -0.3053772747516632,
+          1.2276455163955688,
+          -0.025704275816679
+        ],
+        "wristPositionDisagreementMetres": 2.002536818346218e-07,
+        "forearmAxisHandVsForeArmDegrees": 34.938438659681786,
+        "authoredRightCuffToBindForearmDegrees": 10.039928696179672,
+        "rightSourceCuffAttachment": {
+          "wristSource": [
+            0.11213130250439601,
+            -0.004911530783668752,
+            0.3860243490683728
+          ],
+          "sourceEndCentre": [
+            0.7273935675621033,
+            -0.12293300777673721,
+            -0.11416248977184296
+          ],
+          "bindEndCentre": [
+            -0.3692486863507597,
+            1.2835725563317346,
+            0.10151118271822815
+          ],
+          "axialFromWristMetres": 0.06120490608346276,
+          "radialFromForearmAxisMetres": 0.05052428317028098
+        },
+        "fullHandVsForeArmRotationDegrees": 78.7058338172051,
+        "boneMapSingularValues": {
+          "ForeArm": [
+            1.282998379555699,
+            0.9999999623243909,
+            0.9999994577656846
+          ],
+          "Hand": [
+            0.9999996958902446,
+            0.9999994845713622,
+            0.9999993111263304
+          ]
+        },
+        "gauntletProjectionRangeMetres": [
+          -0.08914855867624283,
+          0.06371429562568665
+        ],
+        "gauntletCuffRadialRangeMetres": [
+          0.012092226184904575,
+          0.089657261967659
+        ],
+        "sleeveCuffNearestGloveDistanceMetres": [
+          0.0019034218157479058,
+          0.08386316620897051,
+          0.12450279824073271
+        ],
+        "contrast": {
+          "gauntletVerticesChanged": 2046,
+          "distalHandVerticesUnchanged": 3564,
+          "terminalSleeveVertices": 27,
+          "terminalNearestGloveBeforeMetres": [
+            0.0019034218157479058,
+            0.007441252359636937,
+            0.06825026478529038
+          ],
+          "terminalNearestGloveAfterMetres": [
+            0.005333233222786103,
+            0.019336316684177395,
+            0.051610306456994146
+          ],
+          "terminalNearestGloveBindMetres": [
+            0.0033149244263768196,
+            0.03040017932653427,
+            0.052084267139434814
+          ],
+          "maximumGauntletDisplacementMetres": 0.1415989612103882
+        },
+        "nearestSleeveVertices": [
+          {
+            "index": 1124,
+            "distanceMeshUnits": 0.03631642460823059,
+            "projectionMeshUnits": 0.025308433920145035,
+            "weights": {
+              "RightForeArm": 1.0
+            }
+          },
+          {
+            "index": 1125,
+            "distanceMeshUnits": 0.03631642460823059,
+            "projectionMeshUnits": 0.025308433920145035,
+            "weights": {
+              "RightForeArm": 1.0
+            }
+          },
+          {
+            "index": 1801,
+            "distanceMeshUnits": 0.03685234859585762,
+            "projectionMeshUnits": 0.02725147269666195,
+            "weights": {
+              "RightForeArm": 1.0
+            }
+          },
+          {
+            "index": 1147,
+            "distanceMeshUnits": 0.03867649286985397,
+            "projectionMeshUnits": 0.02919449470937252,
+            "weights": {
+              "RightForeArm": 1.0
+            }
+          },
+          {
+            "index": 1789,
+            "distanceMeshUnits": 0.039213940501213074,
+            "projectionMeshUnits": 0.029529819265007973,
+            "weights": {
+              "RightForeArm": 1.0
+            }
+          },
+          {
+            "index": 1840,
+            "distanceMeshUnits": 0.04369381442666054,
+            "projectionMeshUnits": 0.0346408449113369,
+            "weights": {
+              "RightForeArm": 1.0
+            }
+          },
+          {
+            "index": 1793,
+            "distanceMeshUnits": 0.04425042122602463,
+            "projectionMeshUnits": 0.026706505566835403,
+            "weights": {
+              "RightForeArm": 1.0
+            }
+          },
+          {
+            "index": 1107,
+            "distanceMeshUnits": 0.045825619250535965,
+            "projectionMeshUnits": 0.01966184377670288,
+            "weights": {
+              "RightForeArm": 1.0
+            }
+          },
+          {
+            "index": 1109,
+            "distanceMeshUnits": 0.045825619250535965,
+            "projectionMeshUnits": 0.01966184377670288,
+            "weights": {
+              "RightForeArm": 1.0
+            }
+          },
+          {
+            "index": 1108,
+            "distanceMeshUnits": 0.045825619250535965,
+            "projectionMeshUnits": 0.01966184377670288,
+            "weights": {
+              "RightForeArm": 1.0
+            }
+          },
+          {
+            "index": 1138,
+            "distanceMeshUnits": 0.046292658895254135,
+            "projectionMeshUnits": 0.03375117480754852,
+            "weights": {
+              "RightForeArm": 1.0
+            }
+          },
+          {
+            "index": 1139,
+            "distanceMeshUnits": 0.046292658895254135,
+            "projectionMeshUnits": 0.03375117480754852,
+            "weights": {
+              "RightForeArm": 1.0
+            }
+          }
+        ],
+        "boneMapsRowVectors": {
+          "ForeArm": [
+            [
+              0.9033376288054716,
+              0.24993543619215453,
+              -0.504865601321054
+            ],
+            [
+              -0.07346332884517773,
+              0.9333878930769393,
+              0.35257533730535495
+            ],
+            [
+              0.4232117464465467,
+              -0.3580082353296321,
+              1.0975019571041742
+            ],
+            [
+              0.1975052430826852,
+              0.26949090948534093,
+              -0.3007393816615099
+            ]
+          ],
+          "Hand": [
+            [
+              -0.08990251945344811,
+              0.9675535925129918,
+              -0.23612846502582438
+            ],
+            [
+              -0.7925034145422691,
+              0.07409601035814783,
+              0.6053484652159489
+            ],
+            [
+              0.6032037831293786,
+              0.2415553188538469,
+              0.7601286026671712
+            ],
+            [
+              0.6614271724812447,
+              1.522949980722346,
+              -0.4527989936222663
+            ]
+          ]
+        }
+      }
+    },
+    "09-mirror": {
+      "Left": {
+        "fitMaxResidualMetres": {
+          "ForeArm": 1.254550494163049e-07,
+          "Hand": 1.6907721273591117e-07
+        },
+        "wristBindMeshUnits": [
+          0.3970412313938141,
+          1.2334095239639282,
+          0.15257765352725983
+        ],
+        "elbowBindMeshUnits": [
+          0.29562726616859436,
+          1.231248378753662,
+          -0.03861011192202568
+        ],
+        "wristPositionDisagreementMetres": 2.607385699419481e-07,
+        "forearmAxisHandVsForeArmDegrees": 77.15263755701994,
+        "authoredRightCuffToBindForearmDegrees": null,
+        "rightSourceCuffAttachment": null,
+        "fullHandVsForeArmRotationDegrees": 127.08390469049786,
+        "boneMapSingularValues": {
+          "ForeArm": [
+            1.4878090114970501,
+            0.9999996239356709,
+            0.999999427896051
+          ],
+          "Hand": [
+            0.9999995132716527,
+            0.9999992055884399,
+            0.9999991729353077
+          ]
+        },
+        "gauntletProjectionRangeMetres": [
+          -0.10001908242702484,
+          0.05137329548597336
+        ],
+        "gauntletCuffRadialRangeMetres": [
+          0.022703954949975014,
+          0.04900854080915451
+        ],
+        "sleeveCuffNearestGloveDistanceMetres": [
+          0.0009331337248776108,
+          0.04359559071109133,
+          0.10949184147609724
+        ],
+        "contrast": {
+          "gauntletVerticesChanged": 1754,
+          "distalHandVerticesUnchanged": 3856,
+          "terminalSleeveVertices": 19,
+          "terminalNearestGloveBeforeMetres": [
+            0.0009331337248776108,
+            0.005778773107951704,
+            0.028853909127444604
+          ],
+          "terminalNearestGloveAfterMetres": [
+            0.004094067765696796,
+            0.005224772804333798,
+            0.009512116547935252
+          ],
+          "terminalNearestGloveBindMetres": [
+            0.0031740800477564335,
+            0.004420460667461157,
+            0.009826556779444218
+          ],
+          "maximumGauntletDisplacementMetres": 0.13855990168562166
+        },
+        "nearestSleeveVertices": [
+          {
+            "index": 4547,
+            "distanceMeshUnits": 0.0316215343773365,
+            "projectionMeshUnits": 0.020970074459910393,
+            "weights": {
+              "LeftForeArm": 1.0
+            }
+          },
+          {
+            "index": 622,
+            "distanceMeshUnits": 0.03241385892033577,
+            "projectionMeshUnits": 0.01904192566871643,
+            "weights": {
+              "LeftForeArm": 1.0
+            }
+          },
+          {
+            "index": 623,
+            "distanceMeshUnits": 0.03241385892033577,
+            "projectionMeshUnits": 0.01904192566871643,
+            "weights": {
+              "LeftForeArm": 1.0
+            }
+          },
+          {
+            "index": 630,
+            "distanceMeshUnits": 0.03316677734255791,
+            "projectionMeshUnits": 0.022898240014910698,
+            "weights": {
+              "LeftForeArm": 1.0
+            }
+          },
+          {
+            "index": 631,
+            "distanceMeshUnits": 0.03316677734255791,
+            "projectionMeshUnits": 0.022898240014910698,
+            "weights": {
+              "LeftForeArm": 1.0
+            }
+          },
+          {
+            "index": 632,
+            "distanceMeshUnits": 0.03316677734255791,
+            "projectionMeshUnits": 0.022898240014910698,
+            "weights": {
+              "LeftForeArm": 1.0
+            }
+          },
+          {
+            "index": 4423,
+            "distanceMeshUnits": 0.037239328026771545,
+            "projectionMeshUnits": 0.022685334086418152,
+            "weights": {
+              "LeftForeArm": 1.0
+            }
+          },
+          {
+            "index": 4548,
+            "distanceMeshUnits": 0.04014727845788002,
+            "projectionMeshUnits": 0.02934524044394493,
+            "weights": {
+              "LeftForeArm": 1.0
+            }
+          },
+          {
+            "index": 4422,
+            "distanceMeshUnits": 0.04014727845788002,
+            "projectionMeshUnits": 0.02934524044394493,
+            "weights": {
+              "LeftForeArm": 1.0
+            }
+          },
+          {
+            "index": 4441,
+            "distanceMeshUnits": 0.0404767207801342,
+            "projectionMeshUnits": 0.03127337992191315,
+            "weights": {
+              "LeftForeArm": 1.0
+            }
+          },
+          {
+            "index": 4566,
+            "distanceMeshUnits": 0.042489904910326004,
+            "projectionMeshUnits": 0.03345117345452309,
+            "weights": {
+              "LeftForeArm": 1.0
+            }
+          },
+          {
+            "index": 4373,
+            "distanceMeshUnits": 0.04408356547355652,
+            "projectionMeshUnits": 0.03298863023519516,
+            "weights": {
+              "LeftForeArm": 1.0
+            }
+          }
+        ],
+        "boneMapsRowVectors": {
+          "ForeArm": [
+            [
+              0.9419837851968598,
+              -0.5559406693447518,
+              -0.26467185072732635
+            ],
+            [
+              0.48236891527835757,
+              0.44898986367340377,
+              0.7522290723386144
+            ],
+            [
+              0.02602177530640585,
+              -1.199019554410116,
+              0.7132137269818889
+            ],
+            [
+              -0.5792631384440738,
+              0.6705239033081163,
+              -0.7624184931214373
+            ]
+          ],
+          "Hand": [
+            [
+              -0.05062964223015227,
+              0.929430470741373,
+              0.365505147252388
+            ],
+            [
+              -0.9978532197714284,
+              -0.031859436816707776,
+              -0.05720830171165076
+            ],
+            [
+              -0.0415261219850577,
+              -0.3676171235523271,
+              0.9290488578467002
+            ],
+            [
+              1.6508714890150307,
+              0.5470011154370187,
+              -0.0471886913290036
+            ]
+          ]
+        }
+      },
+      "Right": {
+        "fitMaxResidualMetres": {
+          "ForeArm": 1.5700078631639958e-07,
+          "Hand": 1.428616647505567e-07
+        },
+        "wristBindMeshUnits": [
+          -0.3987743854522705,
+          1.235403060913086,
+          0.15724875032901764
+        ],
+        "elbowBindMeshUnits": [
+          -0.3053772747516632,
+          1.2276455163955688,
+          -0.025704275816679
+        ],
+        "wristPositionDisagreementMetres": 1.921634205723761e-07,
+        "forearmAxisHandVsForeArmDegrees": 34.917635635036795,
+        "authoredRightCuffToBindForearmDegrees": 10.039928696179672,
+        "rightSourceCuffAttachment": {
+          "wristSource": [
+            0.11213130250439601,
+            -0.004911530783668752,
+            0.3860243490683728
+          ],
+          "sourceEndCentre": [
+            0.7273935675621033,
+            -0.12293300777673721,
+            -0.11416248977184296
+          ],
+          "bindEndCentre": [
+            -0.3692486863507597,
+            1.2835725563317346,
+            0.10151118271822815
+          ],
+          "axialFromWristMetres": 0.06120490608346276,
+          "radialFromForearmAxisMetres": 0.05052428317028098
+        },
+        "fullHandVsForeArmRotationDegrees": 79.31402808677198,
+        "boneMapSingularValues": {
+          "ForeArm": [
+            1.3039147324186546,
+            1.0000000571288914,
+            0.9999996567434078
+          ],
+          "Hand": [
+            0.9999998084471868,
+            0.9999995134529234,
+            0.9999994566119222
+          ]
+        },
+        "gauntletProjectionRangeMetres": [
+          -0.08914855867624283,
+          0.06371429562568665
+        ],
+        "gauntletCuffRadialRangeMetres": [
+          0.012092226184904575,
+          0.089657261967659
+        ],
+        "sleeveCuffNearestGloveDistanceMetres": [
+          0.0018913700307684057,
+          0.08345571655209623,
+          0.1253110337366022
+        ],
+        "contrast": {
+          "gauntletVerticesChanged": 2046,
+          "distalHandVerticesUnchanged": 3564,
+          "terminalSleeveVertices": 27,
+          "terminalNearestGloveBeforeMetres": [
+            0.0018913700307684057,
+            0.006779945909458627,
+            0.06819584942256313
+          ],
+          "terminalNearestGloveAfterMetres": [
+            0.005397075677969239,
+            0.019357739676183722,
+            0.05167212470988457
+          ],
+          "terminalNearestGloveBindMetres": [
+            0.0033149244263768196,
+            0.03040017932653427,
+            0.052084267139434814
+          ],
+          "maximumGauntletDisplacementMetres": 0.1430646763200449
+        },
+        "nearestSleeveVertices": [
+          {
+            "index": 1124,
+            "distanceMeshUnits": 0.03631642460823059,
+            "projectionMeshUnits": 0.025308433920145035,
+            "weights": {
+              "RightForeArm": 1.0
+            }
+          },
+          {
+            "index": 1125,
+            "distanceMeshUnits": 0.03631642460823059,
+            "projectionMeshUnits": 0.025308433920145035,
+            "weights": {
+              "RightForeArm": 1.0
+            }
+          },
+          {
+            "index": 1801,
+            "distanceMeshUnits": 0.03685234859585762,
+            "projectionMeshUnits": 0.02725147269666195,
+            "weights": {
+              "RightForeArm": 1.0
+            }
+          },
+          {
+            "index": 1147,
+            "distanceMeshUnits": 0.03867649286985397,
+            "projectionMeshUnits": 0.02919449470937252,
+            "weights": {
+              "RightForeArm": 1.0
+            }
+          },
+          {
+            "index": 1789,
+            "distanceMeshUnits": 0.039213940501213074,
+            "projectionMeshUnits": 0.029529819265007973,
+            "weights": {
+              "RightForeArm": 1.0
+            }
+          },
+          {
+            "index": 1840,
+            "distanceMeshUnits": 0.04369381442666054,
+            "projectionMeshUnits": 0.0346408449113369,
+            "weights": {
+              "RightForeArm": 1.0
+            }
+          },
+          {
+            "index": 1793,
+            "distanceMeshUnits": 0.04425042122602463,
+            "projectionMeshUnits": 0.026706505566835403,
+            "weights": {
+              "RightForeArm": 1.0
+            }
+          },
+          {
+            "index": 1107,
+            "distanceMeshUnits": 0.045825619250535965,
+            "projectionMeshUnits": 0.01966184377670288,
+            "weights": {
+              "RightForeArm": 1.0
+            }
+          },
+          {
+            "index": 1109,
+            "distanceMeshUnits": 0.045825619250535965,
+            "projectionMeshUnits": 0.01966184377670288,
+            "weights": {
+              "RightForeArm": 1.0
+            }
+          },
+          {
+            "index": 1108,
+            "distanceMeshUnits": 0.045825619250535965,
+            "projectionMeshUnits": 0.01966184377670288,
+            "weights": {
+              "RightForeArm": 1.0
+            }
+          },
+          {
+            "index": 1138,
+            "distanceMeshUnits": 0.046292658895254135,
+            "projectionMeshUnits": 0.03375117480754852,
+            "weights": {
+              "RightForeArm": 1.0
+            }
+          },
+          {
+            "index": 1139,
+            "distanceMeshUnits": 0.046292658895254135,
+            "projectionMeshUnits": 0.03375117480754852,
+            "weights": {
+              "RightForeArm": 1.0
+            }
+          }
+        ],
+        "boneMapsRowVectors": {
+          "ForeArm": [
+            [
+              0.9043009647114695,
+              0.21709469781570673,
+              -0.5288249144543591
+            ],
+            [
+              -0.060878236961100715,
+              0.9497947426077363,
+              0.30851315862115936
+            ],
+            [
+              0.4231822701873985,
+              -0.3150745714581604,
+              1.12973232368291
+            ],
+            [
+              0.1823460394742715,
+              0.25512721175421804,
+              -0.24252013792593372
+            ]
+          ],
+          "Hand": [
+            [
+              -0.08990246593043683,
+              0.9546252608968571,
+              -0.2839141889922762
+            ],
+            [
+              -0.7925036149042334,
+              0.10408415155827955,
+              0.6009189010751728
+            ],
+            [
+              0.6032038012662463,
+              0.2790275481885456,
+              0.7471868800837497
+            ],
+            [
+              0.6614272214640953,
+              1.5006072787416282,
+              -0.44594003404572136
+            ]
+          ]
+        }
+      }
+    }
+  },
+  "sourceCuffFit": {
+    "uvPairs": 5610,
+    "maxResidualMetres": 2.3923938943682116e-07,
+    "sourceExtras": {
+      "hordeGauntletSchema": 1,
+      "hordeGripOrigin": [
+        -0.4031010781400442,
+        -0.13307665203943106,
+        0.017481967283695322
+      ],
+      "hordeGripAxis": [
+        0.08846598071612699,
+        0.09239557754780603,
+        0.9917846679121136
+      ],
+      "hordeCuffAxis": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "hordePalmInteriorAxis": [
+        0.0,
+        1.0,
+        0.0
+      ]
+    },
+    "sourceToBindRowVectorMap": [
+      [
+        0.059657618978372184,
+        -0.0027444697699687518,
+        -0.07895843109718194
+      ],
+      [
+        0.07889111062002646,
+        -0.0032671651155509185,
+        0.059720322818135
+      ],
+      [
+        -0.004261333070796416,
+        -0.09890797720287164,
+        0.00021820594737827215
+      ],
+      [
+        -0.40343141752944056,
+        1.273875642618444,
+        0.16631154744678062
+      ]
+    ],
+    "rawSourcePositionBounds": [
+      [
+        -0.7792230248451233,
+        -0.6343709230422974,
+        -0.4968779683113098
+      ],
+      [
+        0.8034380674362183,
+        0.5029929876327515,
+        0.49836501479148865
+      ]
+    ]
+  }
+}

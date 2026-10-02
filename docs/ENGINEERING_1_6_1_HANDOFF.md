@@ -20,16 +20,41 @@ run183151 passed92/97 Debug tests and stopped; all five failures now have
 bounded passing rechecks (CRLF canonical shader-text identity, scene-owned
 report quality, hydrated exact LFS fixtures). Original failure receipt is
 retained. Debug RTX13 captures and Android Debug/unsigned Release compilation
-pass; Release build/tests run once in the retained directory. Java76 results
+pass. Release builds and single96/97 CTest run finish; new strict-mode music
+staging regression exposes an empty-result Count bug, fixed ine39ac0a with
+targeted14/14 checks. Unpublishable/unsigned package, actual Shipping containment
+and strict ARM64 object checks pass. Packaged Windows pipeline honestly presents,
+but its unattended benchmark cancels before measurement; no live-route/timing
+pass. Remaining live/compute cases were not started. Java76 results
 are reused for unchanged inputs, not rerun. See the single
 [finite matrix](evidence/2026-10-02-final-integration/README.md).
 
 Owner confirms actual Windows report prepare/preview/context/cancel works and
 supplies the real READY form/game-only preview. This closes that interaction;
 do not repeat it or send another email. New laptop feedback opens only a
-bounded resting sword right-hand/arm attachment check; screenshot requested,
-cause unproven. Preserve accepted player geometry/animation and diagnose the
-actual socket/mount/seam layer before changing it. No broad arm/IK/roll tuning.
+bounded right sword glove/sleeve attachment check. Owner supplies rest and motion
+crops from the opened Shipping218ab102 package and explicitly identifies glove/
+sleeve misalignment. It was opened normally as PID13176, no benchmark arguments;
+later read-only inspection finds it no longer running (not terminated by Codex).
+Preserve all other accepted player work; no broad IK/grip-roll tuning.
+Exact retained CPU upload confirms coincident wrist origins but34.94-degree
+Hand/ForeArm axis disagreement. A weights-only proximal cuff contrast is rejected;
+source inspection also measures a50.5mm bind-space cuff-centre offset from the
+forearm axis. One local fit/articulation candidate is investigation-only, not
+production admission or visual acceptance. Guarded generation is byte-identical
+to C (world46a88dac/vieweaa0db3a). Fourteen pure tests and actual paired native
+pose/tangent/grip admission pass. Independent expanded-surface checks confirm
+unchanged sleeves, left hand and non-gauntlet world geometry/weights; the distal
+right grip records and UV topology are exact. Nine finite RT captures include
+one matched laptop-orientation pair; duplicate136/141 poses are not extra coverage.
+The separate Shipping218ab102 live-review stage opened as PID29916 and presented
+hardware RT. Its last report is paused/tick0, and it is now closed (not terminated
+by Codex). The owner subsequently answers the requested rest/walk/attack/parry
+review: "Join looks natural through movement". This closes the Windows live
+cuff check; integrate this exact local pair into engineering and validate affected
+contracts. Exact-device change-triggered acceptance remains open; no phone use
+in this run. Do not reopen automatically or repeat the contrasts after compaction.
+[Finite cuff record](evidence/2026-10-02-right-cuff/README.md).
 
 The bounded native lifecycle owner and generation-scoped Java/JNI readiness/stop
 are now implemented. Existing render/simulation ownership, shaders, assets,
@@ -51,9 +76,9 @@ Affected run182844 now PASS on runtime242e573/the same retained APK:13/13 replay
 four inspected byte-identical control images and honest RT after Home/resume.
 No performance claim from Replay mode. Phone left at Home/returned to owner and
 Briarhold use; do not operate it further in this run. Next is the unfinished
-Release/package continuation in the
+Windows Shipping live/backend acceptance and new resting attachment check in the
 [current-source integration matrix](evidence/2026-10-02-final-integration/README.md)
-and the newly reported laptop resting attachment check. No repeated route/email,
+finite record. No repeated route/email,
 accepted music tuning or parity campaign.
 All unrelated S24 scratch preserved. Audio/haptic manual revalidation:NO for
 unchanged semantic inputs/assets/playback and intended RT-ready gating; distinct
