@@ -55,7 +55,8 @@ bool RtGpuResources::CreateBuffer(VkDeviceSize size,
                                   const VkMemoryPropertyFlags memoryFlags,
                                   const bool deviceAddress,
                                   RtGpuBuffer& out,
-                                  std::string& diagnostic) const
+                                  std::string& diagnostic,
+                                  const VkMemoryPropertyFlags preferredMemoryFlags) const
 {
     out = {};
     if (physicalDevice_ == VK_NULL_HANDLE || device_ == VK_NULL_HANDLE || size == 0u)
@@ -86,8 +87,14 @@ bool RtGpuResources::CreateBuffer(VkDeviceSize size,
     VkMemoryRequirements requirements{};
     vkGetBufferMemoryRequirements(device_, out.buffer, &requirements);
     VkMemoryPropertyFlags selectedMemoryFlags = 0u;
-    const std::uint32_t memoryType = FindMemoryType(
-        requirements.memoryTypeBits, memoryFlags, &selectedMemoryFlags);
+    // Relax placement only when a compatible preferred type is unavailable.
+    // Allocation/binding failures never retry on another heap.
+    std::uint32_t memoryType = FindMemoryType(
+        requirements.memoryTypeBits, memoryFlags | preferredMemoryFlags, &selectedMemoryFlags);
+    if (memoryType == UINT32_MAX && preferredMemoryFlags != 0u)
+    {
+        memoryType = FindMemoryType(requirements.memoryTypeBits, memoryFlags, &selectedMemoryFlags);
+    }
     if (memoryType == UINT32_MAX)
     {
         diagnostic = "No compatible memory type for RT buffer.";

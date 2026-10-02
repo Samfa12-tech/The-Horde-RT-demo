@@ -1233,9 +1233,11 @@ bool PresentableTinyRtScene::CreateBuffer(VkDeviceSize size,
                                           VkMemoryPropertyFlags memoryFlags,
                                           bool deviceAddress,
                                           Buffer& out,
-                                          std::string& diagnostic) const
+                                          std::string& diagnostic,
+                                          VkMemoryPropertyFlags preferredMemoryFlags) const
 {
-    return gpuResources_.CreateBuffer(size, usage, memoryFlags, deviceAddress, out, diagnostic);
+    return gpuResources_.CreateBuffer(size, usage, memoryFlags, deviceAddress, out,
+                                      diagnostic, preferredMemoryFlags);
 }
 
 void PresentableTinyRtScene::DestroyBuffer(Buffer& buffer) const
@@ -2116,7 +2118,8 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
         Buffer& buffer, const bool dynamic = false) {
         const std::array<std::uint8_t, 16u> zeros{};
         const VkDeviceSize actualSize = std::max<VkDeviceSize>(size, zeros.size());
-        if (!CreateBuffer(actualSize, usage, uploadMemory, address, buffer, diagnostic)) return false;
+        if (!CreateBuffer(actualSize, usage, uploadMemory, address, buffer, diagnostic,
+                          dynamic ? 0u : VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT)) return false;
         if (dynamic && !gpuResources_.MapBufferForHostWrites(buffer, diagnostic)) return false;
         return WriteBuffer(buffer, size == 0u ? zeros.data() : data, actualSize, label, diagnostic);
     };
@@ -2900,15 +2903,19 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     const VkDeviceSize vertexBufferSize = sizeof(Vertex) * vertices.size();
     const VkDeviceSize indexBufferSize = sizeof(std::uint32_t) * indices.size();
     const VkDeviceSize worldSurfaceBufferSize = sizeof(std::uint32_t) * worldSurfaceCodes.size();
-    if (!CreateBuffer(vertexBufferSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, vertexBuffer_, diagnostic) ||
-        !CreateBuffer(indexBufferSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, indexBuffer_, diagnostic) ||
-        !CreateBuffer(sizeof(transform), VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, transformBuffer_, diagnostic) ||
+    if (!CreateBuffer(vertexBufferSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
+                      uploadMemory, true, vertexBuffer_, diagnostic, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT) ||
+        !CreateBuffer(indexBufferSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
+                      uploadMemory, true, indexBuffer_, diagnostic, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT) ||
+        !CreateBuffer(sizeof(transform), VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
+                      uploadMemory, true, transformBuffer_, diagnostic, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT) ||
         !CreateBuffer(sizeof(RtHeldLightGpu), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                       uploadMemory, false, heldLightBuffer_, diagnostic) ||
         !CreateBuffer(sizeof(RtFireEmitterGpu) * kRtFireEmitterCapacity,
                       VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                       uploadMemory, false, fireEmitterBuffer_, diagnostic) ||
-        !CreateBuffer(worldSurfaceBufferSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, uploadMemory, false, worldSurfaceBuffer_, diagnostic))
+        !CreateBuffer(worldSurfaceBufferSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                      uploadMemory, false, worldSurfaceBuffer_, diagnostic, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT))
     {
         return false;
     }

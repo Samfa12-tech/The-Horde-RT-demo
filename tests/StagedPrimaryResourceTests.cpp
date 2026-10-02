@@ -278,7 +278,8 @@ std::optional<RtDescriptorIoContract> TryMakeRtDescriptorIoContract(RtInstrument
 }
 
 bool RtGpuResources::CreateBuffer(VkDeviceSize size, VkBufferUsageFlags, VkMemoryPropertyFlags flags,
-                                  bool deviceAddress, RtGpuBuffer& out, std::string& diagnostic) const
+                                  bool deviceAddress, RtGpuBuffer& out, std::string& diagnostic,
+                                  VkMemoryPropertyFlags) const
 {
     auto& c = *gContext;
     ++c.bufferCreateCalls;

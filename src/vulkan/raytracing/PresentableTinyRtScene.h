@@ -533,7 +533,8 @@ private:
                       VkMemoryPropertyFlags memoryFlags,
                       bool deviceAddress,
                       Buffer& out,
-                      std::string& diagnostic) const;
+                      std::string& diagnostic,
+                      VkMemoryPropertyFlags preferredMemoryFlags = 0u) const;
     bool WriteBuffer(const Buffer& buffer,
                      const void* data,
                      VkDeviceSize size,

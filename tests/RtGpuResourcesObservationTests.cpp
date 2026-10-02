@@ -48,6 +48,9 @@ struct FakeVulkanState
     std::uint32_t unmapCount = 0u;
     std::uint32_t destroyBufferCount = 0u;
     std::uint32_t freeMemoryCount = 0u;
+    VkResult allocateResult = VK_SUCCESS;
+    std::uint32_t allocateCount = 0u;
+    std::uint32_t selectedMemoryType = UINT32_MAX;
 };
 
 FakeVulkanState gVulkan;
@@ -100,8 +103,11 @@ VKAPI_ATTR void VKAPI_CALL vkGetBufferMemoryRequirements(
 }
 
 VKAPI_ATTR VkResult VKAPI_CALL vkAllocateMemory(
-    VkDevice, const VkMemoryAllocateInfo*, const VkAllocationCallbacks*, VkDeviceMemory* memory)
+    VkDevice, const VkMemoryAllocateInfo* info, const VkAllocationCallbacks*, VkDeviceMemory* memory)
 {
+    ++gVulkan.allocateCount;
+    gVulkan.selectedMemoryType = info->memoryTypeIndex;
+    if (gVulkan.allocateResult != VK_SUCCESS) return gVulkan.allocateResult;
     *memory = FakeHandle<VkDeviceMemory>(0x202u);
     return VK_SUCCESS;
 }
@@ -321,6 +327,41 @@ int main()
                       gVulkan.unmapCount == unmapsBeforeFailedDestroy + 1u,
                   "an invalid success/null map must be closed without publishing a pointer");
     resources.DestroyBuffer(buffer);
+
+    // Immutable direct uploads prefer local coherent storage without changing
+    // dynamic selection, or retrying allocation failure on a different heap.
+    gVulkan.nullMapResult = false;
+    gVulkan.requirements.memoryTypeBits = 0x3u;
+    constexpr VkMemoryPropertyFlags host =
+        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+    gVulkan.memoryProperties.memoryTypes[0].propertyFlags = host;
+    gVulkan.memoryProperties.memoryTypes[1].propertyFlags = host | VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+    ok &= Require(resources.CreateBuffer(96u, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                      host, false, buffer, diagnostic) && gVulkan.selectedMemoryType == 0u,
+                  "dynamic default selection must remain unchanged");
+    resources.DestroyBuffer(buffer);
+    ok &= Require(resources.CreateBuffer(96u, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                      host, false, buffer, diagnostic, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT) &&
+                      gVulkan.selectedMemoryType == 1u && buffer.memoryPropertyFlags == kSelectedUmaFlags &&
+                      resources.WriteBuffer(buffer, payload.data(), payload.size(), "local immutable", diagnostic) &&
+                      buffer.mappedWriteData == nullptr,
+                  "immutable upload must prefer the compatible local type and unmap after upload");
+    resources.DestroyBuffer(buffer);
+    gVulkan.requirements.memoryTypeBits = 0x1u;
+    ok &= Require(resources.CreateBuffer(96u, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                      host, false, buffer, diagnostic, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT) &&
+                      gVulkan.selectedMemoryType == 0u && buffer.memoryPropertyFlags == host,
+                  "incompatible local memory must retain honest required-host placement");
+    resources.DestroyBuffer(buffer);
+    gVulkan.requirements.memoryTypeBits = 0x3u;
+    gVulkan.allocateResult = VK_ERROR_OUT_OF_DEVICE_MEMORY;
+    const auto allocationsBeforeFailure = gVulkan.allocateCount;
+    ok &= Require(!resources.CreateBuffer(96u, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                      host, false, buffer, diagnostic, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT) &&
+                      gVulkan.selectedMemoryType == 1u &&
+                      gVulkan.allocateCount == allocationsBeforeFailure + 1u &&
+                      buffer.buffer == VK_NULL_HANDLE && buffer.memory == VK_NULL_HANDLE,
+                  "preferred heap allocation failure must not be concealed by a fallback retry");
 
     return ok ? 0 : 1;
 }

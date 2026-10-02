@@ -111,7 +111,8 @@ public:
                       VkMemoryPropertyFlags memoryFlags,
                       bool deviceAddress,
                       RtGpuBuffer& out,
-                      std::string& diagnostic) const;
+                      std::string& diagnostic,
+                      VkMemoryPropertyFlags preferredMemoryFlags = 0u) const;
     bool MapBufferForHostWrites(RtGpuBuffer& buffer,
                                std::string& diagnostic) const;
     bool WriteBuffer(const RtGpuBuffer& buffer,

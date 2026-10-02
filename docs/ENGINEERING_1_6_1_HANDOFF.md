@@ -67,6 +67,17 @@ Next: reviewed push/current CI, separate immutable upload subtask and final-devi
 gates when available. S26 is currently occupied by Briarhold; no coordination or
 device operation is needed. Audio/haptic manual revalidation:NO.
 
+Dynamic36f99c2 push37070775737 and PR37070782489 both SUCCESS across six lanes.
+The separate [immutable placement candidate](evidence/2026-10-03-static-memory-placement/README.md)
+prefers compatible coherent local memory, preserving honest unsupported-type
+placement and OOM. Debug/Release4/4 resource checks,13 byte-identical RTX PNGs,
+four-ABI Shipping/Mobile APK5f05a131/exact assets/ARM64 SPIR-V/signature PASS.
+The owner now releases S26 from Briarhold. Continue the
+[finite final phone record](evidence/2026-10-03-final-s26-resources/README.md):
+commit/bind the candidate, then row1. Do not repeat accepted glass/player/audio
+investigation or the completed host tests. Generic staging without a compatible
+local coherent type is not implemented; no phone/FPS gain claim yet.
+
 ### October3 driver reporting F14 — implemented and locally validated
 
 Raw driverVersion is no longer decoded as a Vulkan API version. Guarded driver
