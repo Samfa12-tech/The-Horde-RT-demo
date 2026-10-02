@@ -41,6 +41,17 @@ tools not provisioned by this compiler lane. This is additive MSVC coverage, not
 a replacement for the separate full Windows tooling/shader gate. Keep that scope
 and the workflow's fail-on-empty-test behaviour explicit in validation reports.
 
+The additive `selected-host-sanitizers` Ubuntu24.04 lane runs the finite15-target
+roster in `tools/run-host-sanitizer-validation.sh` with Clang ASan/UBSan on both
+compile and link, frame pointers, fail-fast diagnostics and leak detection. It
+covers shared simulation, animation/grips, physical math, Core/Horde PCM ownership,
+worker/mailbox and consent-bounded reporting contracts. Each required CTest
+registration is selected individually with `--no-tests=error`; a missing fixture
+cannot silently shrink coverage. This is CPU memory/undefined-behavior evidence,
+not Vulkan allocation/driver validation, race detection, hardware RT or listening.
+Do not add sanitizer flags to production presets or infer phone performance from
+instrumented host runs. Current-source job results, not YAML presence, prove a pass.
+
 For report changes, select `horde_rt_playtest_report_tests` and, on Windows,
 `horde_rt_windows_playtest_report_ui_tests`. The latter opens only its own native
 form, with bounded waits; it is not real Windows file-picker/write, remote delivery

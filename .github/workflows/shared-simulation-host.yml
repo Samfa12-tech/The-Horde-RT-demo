@@ -183,6 +183,30 @@ jobs:
         shell: pwsh
         run: ./tests/AndroidCombatCaptureExpectations.ps1
 
+  selected-host-sanitizers:
+    name: Selected host contracts (Clang ASan/UBSan)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+
+      - name: Fetch only selected fixture and PCM payloads
+        run: >-
+          git -c lfs.fetchexclude= lfs fetch
+          --include="assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,tests/fixtures/*/*.glb,assets/audio/music/what-the-dark-keeps/runtime/*.wav"
+          && git lfs checkout
+          "assets/models/player/runtime/*.glb"
+          "assets/models/player/viewmodel/runtime/*.glb"
+          "assets/models/props/runtime/*.glb"
+          "assets/models/props/runtime/*/*.glb"
+          "assets/models/weapons/runtime/*.glb"
+          "tests/fixtures/*/*.glb"
+          "assets/audio/music/what-the-dark-keeps/runtime/*.wav"
+
+      - name: Build and run the finite sanitizer roster
+        run: bash tools/run-host-sanitizer-validation.sh
+
   player-vulkan-host:
     runs-on: ubuntu-latest
     timeout-minutes: 20

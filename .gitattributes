@@ -1,4 +1,5 @@
 # Keep high-resolution source art out of normal Git history.
+tools/run-host-sanitizer-validation.sh text eol=lf
 # Preserve lossless backend witnesses and the exact native manifest receipts.
 docs/evidence/2026-10-02-s26-report-ui/** -text whitespace=cr-at-eol
 docs/evidence/2026-10-02-s26-report-send/** -text whitespace=cr-at-eol

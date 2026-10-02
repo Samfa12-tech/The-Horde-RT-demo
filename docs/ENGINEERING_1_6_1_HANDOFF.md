@@ -31,6 +31,19 @@ honest RT presentation and final-candidate stability are still gates. No shader,
 asset, rendering, performance or audio change is made by this deferral.
 Audio/haptic manual revalidation:NO. No merge, signing or publication.
 
+### October3 selected sanitizer CI F10 — implementation ready, execution pending
+
+An additive Ubuntu24.04 Clang ASan/UBSan job uses a finite15-target roster for
+shared simulation/IK/grips, physical math, native PCM ownership, mailbox and
+bounded reporting. Compile and link are instrumented, with leak detection and
+fail-fast unsuppressed diagnostics. Required CTest registrations run by exact
+name, fail on empty, and are not retried. Existing five lanes remain intact.
+[Finite record](evidence/2026-10-03-selected-host-sanitizers/README.md) records
+local Bash/YAML/whitespace passes and the unavailable local Linux toolchain;
+actual current-source GitHub execution remains required. This does not change
+production flags/runtime or reopen manual audio acceptance. No phone operation.
+Audio/haptic manual revalidation:NO; CI only. No merge, signing or publication.
+
 ### October3 driver reporting F14 — implemented and locally validated
 
 Raw driverVersion is no longer decoded as a Vulkan API version. Guarded driver
