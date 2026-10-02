@@ -13,7 +13,26 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
-### October 2 conservative contact qualifier (latest completed step)
+### October 2 world-plane metadata compatibility (latest isolated step)
+
+Isolated source53624d83dd984a4cc479755dae2886623e7069bb carries a12-byte
+source-certified world triangle record at existing binding6; no contact policy.
+Debug/Release ABI/generator2/2 each PASS; Debug focused runtime-host5/5 PASS;
+all16 compiled/validated actual SPIR-V layouts offsets0/4/8,stride12,binding6;
+all8 Shipping zero atomics/no binding22/no observer. High observer remains isolated.
+High native2/2 own-controls byte-exact outside payload row, prior12 groups/41
+counters unchanged; actual floor plane bf733333/flags2,868 triangles,10416 requested
+payload bytes (+6944, not measured driver alignment/bandwidth). Mobile native26/26
+own-controls byte-exact. Existing High max20/32pixels and Mobile finale max6/onepixel
+backend gates remain OPEN, not relaxed. Normal source/artifacts unchanged.
+[Finite evidence, failures and next step](evidence/2026-10-02-backend-pixel-witness/world-plane-metadata.md).
+Cache restored Mobile/Shipping; retained exe is actual Mobile/Diagnostic f970be46,
+not falsely called Shipping. Next: isolated uint32 GLSL qualifier + identity/
+footprint/opposed-normal/post-Snell/TIR runtime gates before contact admission.
+No repeated metadata matrix without a specific validity problem. No phone use
+while disconnected; audio/haptic manual revalidation required:NO.
+
+### October 2 conservative contact qualifier (preceding completed step)
 
 CPU-only675a32c is integrated as441a8f5; engineering/profile durable checkpoint
 3d84e5489bd36b9a2f94cbf587a9d825299af7b5 is pushed/remote-verified. Integrated

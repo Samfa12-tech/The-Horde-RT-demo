@@ -1,9 +1,6 @@
-param([Parameter(Mandatory)][string]$OutputRoot,[switch]$HighFixtures,[switch]$ControlHighComputeOnly,[switch]$Shipping,[switch]$EdgeWitness,[switch]$OpeningOnly)
+param([Parameter(Mandatory)][string]$OutputRoot,[switch]$HighFixtures,[switch]$ControlHighComputeOnly,[switch]$Shipping,[switch]$EdgeWitness)
 $ErrorActionPreference = 'Stop'
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
-if ($OpeningOnly -and ($HighFixtures -or $ControlHighComputeOnly -or $EdgeWitness)) {
-    throw 'Opening-only compatibility captures are Mobile, without the High observer.'
-}
 if($EdgeWitness -and (-not $HighFixtures -or $Shipping -or $ControlHighComputeOnly)) {
     throw 'The isolated edge witness is High Diagnostic candidate only.'
 }
@@ -35,7 +32,7 @@ $matrix = foreach ($backend in @('pipeline', 'compute')) {
             [pscustomobject]@{backend=$backend;checkpoint=$checkpoint;directory="$backend/$checkpoint";label="$backend-$checkpoint"}
         }
     } else {
-        [pscustomobject]@{backend=$backend;checkpoint=$(if($OpeningOnly){'opening'}else{$null});directory=$backend;label=$backend}
+        [pscustomobject]@{backend=$backend;checkpoint=$null;directory=$backend;label=$backend}
     }
 }
 $quality = if($HighFixtures){'High'}else{'Mobile'}

@@ -1,0 +1,47 @@
+=== Horde RT Diagnostic Window ===
+Probe initialisation: OK
+
+Backend: Vulkan
+RT mode: RayTracingPipeline
+Execution backend: Unsupported
+GPU name: NVIDIA GeForce RTX 5050 Laptop GPU
+Vendor ID: 4318
+Device ID: 11672
+Driver version: 610.188.0
+Vulkan API version: 1.4.341
+VK_KHR_acceleration_structure: yes
+VK_KHR_ray_tracing_pipeline: yes
+VK_KHR_ray_query: yes
+VK_KHR_buffer_device_address: yes
+VK_KHR_deferred_host_operations: yes
+Internal render resolution: N/A
+FPS / frame time: N/A
+GPU RT command-buffer time: N/A (Not initialised)
+RT scene status: Not attempted
+RT scene geometry: Complete Horde showcase route with sequential animated skeleton and staff-lit lich
+RT scene dispatch resolution: N/A
+RT scene presented: no
+RT EVIDENCE PUBLICATION version=1
+Observer: unavailable
+Lifecycle: N/A
+Diagnostic status: unavailable
+GPU status: unavailable
+Completed frame: N/A (observer-unavailable)
+Diagnostics:
+- Inspecting candidate 1
+- Driver version packed: 2559295488
+- Driver version: 610.188.0
+- Vulkan API version: 1.4.341
+- RT capability mode: RayTracingPipeline
+- Internal render resolution: not measured yet.
+- FPS / frame time: not measured yet.
+
+
+Stored report (text): "C:\\Users\\sam_s\\.codex\\worktrees\\horde-rtx-corrections\\the Horde RT Demo\\build\\presets\\windows-x64-debug\\Debug\\reports\\vulkan_capability_report.txt"
+Stored report (json): "C:\\Users\\sam_s\\.codex\\worktrees\\horde-rtx-corrections\\the Horde RT Demo\\build\\presets\\windows-x64-debug\\Debug\\reports\\vulkan_capability_report.json"
+PBR material encoding: RGBA8 raw fallback + raw RGBA8 KTX2 lich
+RT render scale 100%: 960x540 -> 960x540
+Development static RT asset: vertexBytes=5803648, indexBytes=825972, materialBytes=2016, instanceMetadataBytes=672, primitiveMetadataBytes=320, descriptors=9, textureBytes=173364524, blasBytes=1032704, blasBuildMs=1.3018, swordBlasBytes=717696, swordBlasBuildMs=0.6836, torchBlasBytes=315008, torchBlasBuildMs=0.6182, productionPropBlasBytes=648064, productionPropBlasBuildMs=3.0806
+Captured glass-edge-fresnel -> "C:\\Dev\\tmp\\horde-world-plane-native-high-20261002\\compute\\glass-edge-fresnel\\113-glass-edge-fresnel.png"
+Captured all 1 showcase checkpoints to "C:\\Dev\\tmp\\horde-world-plane-native-high-20261002\\compute\\glass-edge-fresnel"
+

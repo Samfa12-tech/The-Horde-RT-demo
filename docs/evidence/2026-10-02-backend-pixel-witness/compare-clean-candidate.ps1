@@ -1,13 +1,18 @@
 param([Parameter(Mandatory)][string]$CandidateRoot,
       [Parameter(Mandatory)][string]$ControlPipelineDirectory,
       [string]$ControlComputeDirectory,
-      [Parameter(Mandatory)][string]$OutputPath,[switch]$HighFixtures,[switch]$ShippingParity,[switch]$EdgeWitness)
+      [Parameter(Mandatory)][string]$OutputPath,[switch]$HighFixtures,[switch]$ShippingParity,[switch]$EdgeWitness,
+      [string]$ControlSourceCommit)
 $ErrorActionPreference = 'Stop'
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 $controlCommit = 'd9be81e77493d7e5c9af01604f865d0d3ef11e48'
 if($EdgeWitness) {
     if(-not $HighFixtures -or $ShippingParity){throw 'Edge witness is High Diagnostic only.'}
     $controlCommit='b041ea832b0b7fc1882bbf4239c695cc70fbcd45'
+}
+if(-not [string]::IsNullOrWhiteSpace($ControlSourceCommit)) {
+    $controlCommit=(& git -C $repoRoot rev-parse --verify "${ControlSourceCommit}^{commit}").Trim()
+    if($LASTEXITCODE -ne 0){throw 'Explicit retained-control source must resolve to a commit.'}
 }
 $expected = @('opening','skeleton','worst-bend','lantern-drop','skylight','yellow',
               'blue','red','green','mirror','lich','finale-roof','two-enemy-combat')

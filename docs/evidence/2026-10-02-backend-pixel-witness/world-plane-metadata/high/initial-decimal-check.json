@@ -1,0 +1,621 @@
+{
+  "schema": 1,
+  "controlSource": "6ed11ed4247159ad13d2e753c0b62618a7a69901",
+  "candidateSource": "53624d83dd984a4cc479755dae2886623e7069bb",
+  "rows": [
+    {
+      "backend": "pipeline",
+      "fields": [
+        {
+          "field": "backend",
+          "unchanged": true
+        },
+        {
+          "field": "actualRgb",
+          "unchanged": true
+        },
+        {
+          "field": "primary",
+          "unchanged": true
+        },
+        {
+          "field": "surface",
+          "unchanged": true
+        },
+        {
+          "field": "display",
+          "unchanged": true
+        },
+        {
+          "field": "firstFresnel",
+          "unchanged": true
+        },
+        {
+          "field": "reflection",
+          "unchanged": true
+        },
+        {
+          "field": "transmitted",
+          "unchanged": true
+        },
+        {
+          "field": "throughput",
+          "unchanged": true
+        },
+        {
+          "field": "termination",
+          "unchanged": true
+        },
+        {
+          "field": "contactProbe",
+          "unchanged": true
+        },
+        {
+          "field": "visits",
+          "unchanged": true
+        }
+      ],
+      "counters": [
+        {
+          "counter": "transportOverflowCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "shadowOverflowCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "secondaryDielectricRejectCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "unclosedVolumeCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryUnclosedVolumeCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "shadowUnclosedVolumeCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "productionPaneStackFailureCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "productionPaneSecondaryOriginCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "productionPaneSecondaryTerminalCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "productionPaneSecondarySameMediumCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "productionPaneSecondaryDifferentMediumCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "secondaryNearSelfHitCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryOpenMissCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryOpenOpaqueCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryMismatchedExitCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryInterfaceBudgetCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryVolumeBudgetCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "shadowOpenMissCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "shadowMismatchedExitCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryTirCount",
+          "before": 13842,
+          "after": 13842,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryInterfaceBudgetOpenVolumeCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryInterfaceBudgetClosedVolumeCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "shadowMismatchEmptyCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "shadowImplicitOriginExitCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "secondaryDielectricTerminalCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryTirTerminationCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "shadowFiniteEndpointVolumeCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryOpenOpaqueSameInstanceDifferentMaterialCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryOpenOpaqueAfterTirCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryOpenOpaqueTerminalInstanceMask",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryOpenOpaqueVolumeInstanceMask",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryOpenOpaqueTerminalMaterialMask",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryClosedVolumeAbsorptionCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryCertifiedClosedVolumeRecoveryCount",
+          "before": 566,
+          "after": 566,
+          "unchanged": true
+        },
+        {
+          "counter": "shadowCertifiedClosedVolumeRecoveryCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "certifiedClosedVolumeRecoveryReasonMask",
+          "before": 1,
+          "after": 1,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryTorchPixelCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primarySwordPixelCount",
+          "before": 6797,
+          "after": 6797,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryPlayerPixelCount",
+          "before": 3853,
+          "after": 3853,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryRewardRingPixelCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryRewardBodyPixelCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        }
+      ],
+      "plane": {
+        "coordinate": -0.95,
+        "flags": 2.0,
+        "triangleCount": 868.0
+      },
+      "passed": false
+    },
+    {
+      "backend": "compute",
+      "fields": [
+        {
+          "field": "backend",
+          "unchanged": true
+        },
+        {
+          "field": "actualRgb",
+          "unchanged": true
+        },
+        {
+          "field": "primary",
+          "unchanged": true
+        },
+        {
+          "field": "surface",
+          "unchanged": true
+        },
+        {
+          "field": "display",
+          "unchanged": true
+        },
+        {
+          "field": "firstFresnel",
+          "unchanged": true
+        },
+        {
+          "field": "reflection",
+          "unchanged": true
+        },
+        {
+          "field": "transmitted",
+          "unchanged": true
+        },
+        {
+          "field": "throughput",
+          "unchanged": true
+        },
+        {
+          "field": "termination",
+          "unchanged": true
+        },
+        {
+          "field": "contactProbe",
+          "unchanged": true
+        },
+        {
+          "field": "visits",
+          "unchanged": true
+        }
+      ],
+      "counters": [
+        {
+          "counter": "transportOverflowCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "shadowOverflowCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "secondaryDielectricRejectCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "unclosedVolumeCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryUnclosedVolumeCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "shadowUnclosedVolumeCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "productionPaneStackFailureCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "productionPaneSecondaryOriginCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "productionPaneSecondaryTerminalCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "productionPaneSecondarySameMediumCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "productionPaneSecondaryDifferentMediumCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "secondaryNearSelfHitCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryOpenMissCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryOpenOpaqueCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryMismatchedExitCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryInterfaceBudgetCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryVolumeBudgetCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "shadowOpenMissCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "shadowMismatchedExitCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryTirCount",
+          "before": 13843,
+          "after": 13843,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryInterfaceBudgetOpenVolumeCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryInterfaceBudgetClosedVolumeCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "shadowMismatchEmptyCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "shadowImplicitOriginExitCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "secondaryDielectricTerminalCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryTirTerminationCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "shadowFiniteEndpointVolumeCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryOpenOpaqueSameInstanceDifferentMaterialCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryOpenOpaqueAfterTirCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryOpenOpaqueTerminalInstanceMask",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryOpenOpaqueVolumeInstanceMask",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryOpenOpaqueTerminalMaterialMask",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryClosedVolumeAbsorptionCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryCertifiedClosedVolumeRecoveryCount",
+          "before": 568,
+          "after": 568,
+          "unchanged": true
+        },
+        {
+          "counter": "shadowCertifiedClosedVolumeRecoveryCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "certifiedClosedVolumeRecoveryReasonMask",
+          "before": 1,
+          "after": 1,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryTorchPixelCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primarySwordPixelCount",
+          "before": 6797,
+          "after": 6797,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryPlayerPixelCount",
+          "before": 3853,
+          "after": 3853,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryRewardRingPixelCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        {
+          "counter": "primaryRewardBodyPixelCount",
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        }
+      ],
+      "plane": {
+        "coordinate": -0.95,
+        "flags": 2.0,
+        "triangleCount": 868.0
+      },
+      "passed": false
+    }
+  ]
+}

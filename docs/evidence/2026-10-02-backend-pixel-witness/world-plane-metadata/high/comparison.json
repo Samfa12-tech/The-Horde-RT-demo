@@ -1,0 +1,1155 @@
+{
+  "schema": 1,
+  "controlSource": "6ed11ed4247159ad13d2e753c0b62618a7a69901",
+  "runReceipt": {
+    "schema": 1,
+    "sourceCommit": "53624d83dd984a4cc479755dae2886623e7069bb",
+    "executableSha256": "91e56a4edd9dddaee743f5dde8d605e866d611eb44cfe761adb78fd8818cb311",
+    "instrumentation": "Diagnostic",
+    "quality": "High",
+    "payloadRows": 1,
+    "existingNormalBinary": false,
+    "investigationOnly": true,
+    "performanceEvidence": false,
+    "runs": [
+      {
+        "backend": "pipeline",
+        "checkpoint": "glass-edge-fresnel",
+        "exitCode": 0,
+        "arguments": [
+          "--capture-showcase",
+          "C:\\Dev\\tmp\\horde-world-plane-native-high-20261002\\pipeline\\glass-edge-fresnel",
+          "--development-checkpoint",
+          "glass-edge-fresnel"
+        ]
+      },
+      {
+        "backend": "compute",
+        "checkpoint": "glass-edge-fresnel",
+        "exitCode": 0,
+        "arguments": [
+          "--capture-showcase",
+          "C:\\Dev\\tmp\\horde-world-plane-native-high-20261002\\compute\\glass-edge-fresnel",
+          "--require-rayquery-compute",
+          "--development-checkpoint",
+          "glass-edge-fresnel"
+        ]
+      }
+    ]
+  },
+  "payloadRows": 1,
+  "pixelTolerance": {
+    "maximumChannelDifference": 3,
+    "maximumFractionOverOne": 0.001
+  },
+  "performanceEvidence": false,
+  "shippingDiagnosticMatrix": false,
+  "comparisons": [
+    {
+      "label": "candidate-backend-parity/glass-edge-fresnel",
+      "passed": false,
+      "leftManifestSha256": "65d35ccf83530d19eb5f9d76010fdd8297e632da59460b26d1abb1b27560a18f",
+      "rightManifestSha256": "28e54ea7e0cdecc3d6f667563a033bb6d999a60d25c5fd7011a6b81996f7cb91",
+      "records": [
+        {
+          "checkpoint": "glass-edge-fresnel",
+          "file": "113-glass-edge-fresnel.png",
+          "leftSha256": "243e525641948eb0c8ed7133b460e2a190635f27c2746a555749793c36fe85ee",
+          "rightSha256": "41065fb5970cae0619b950a268c65d543de5219e8e712885abc5bb506e7130d3",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 6797,
+            "player": 3853,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 6797,
+            "player": 3853,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 20,
+            "pixelsDifferentByMoreThanOne": 33,
+            "differentFraction": 6.377551020408164E-05,
+            "unchangedGate": false,
+            "outlierCount": 32,
+            "firstOutliers": [
+              {
+                "x": 456,
+                "y": 304,
+                "maximumChannelDifference": 20,
+                "leftRgb": [
+                  22,
+                  17,
+                  17
+                ],
+                "rightRgb": [
+                  2,
+                  2,
+                  3
+                ]
+              },
+              {
+                "x": 511,
+                "y": 475,
+                "maximumChannelDifference": 7,
+                "leftRgb": [
+                  0,
+                  0,
+                  0
+                ],
+                "rightRgb": [
+                  4,
+                  5,
+                  7
+                ]
+              },
+              {
+                "x": 510,
+                "y": 476,
+                "maximumChannelDifference": 7,
+                "leftRgb": [
+                  4,
+                  5,
+                  7
+                ],
+                "rightRgb": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "x": 504,
+                "y": 485,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  3,
+                  3,
+                  5
+                ],
+                "rightRgb": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "x": 439,
+                "y": 487,
+                "maximumChannelDifference": 6,
+                "leftRgb": [
+                  0,
+                  0,
+                  0
+                ],
+                "rightRgb": [
+                  3,
+                  4,
+                  6
+                ]
+              },
+              {
+                "x": 438,
+                "y": 491,
+                "maximumChannelDifference": 6,
+                "leftRgb": [
+                  0,
+                  0,
+                  0
+                ],
+                "rightRgb": [
+                  3,
+                  4,
+                  6
+                ]
+              },
+              {
+                "x": 437,
+                "y": 492,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  0,
+                  0,
+                  0
+                ],
+                "rightRgb": [
+                  3,
+                  4,
+                  5
+                ]
+              },
+              {
+                "x": 449,
+                "y": 495,
+                "maximumChannelDifference": 9,
+                "leftRgb": [
+                  0,
+                  0,
+                  0
+                ],
+                "rightRgb": [
+                  4,
+                  6,
+                  9
+                ]
+              },
+              {
+                "x": 453,
+                "y": 495,
+                "maximumChannelDifference": 10,
+                "leftRgb": [
+                  5,
+                  7,
+                  10
+                ],
+                "rightRgb": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "x": 441,
+                "y": 496,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  0,
+                  0,
+                  0
+                ],
+                "rightRgb": [
+                  3,
+                  4,
+                  5
+                ]
+              },
+              {
+                "x": 489,
+                "y": 500,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  0,
+                  0,
+                  0
+                ],
+                "rightRgb": [
+                  3,
+                  4,
+                  5
+                ]
+              },
+              {
+                "x": 442,
+                "y": 502,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  3,
+                  4,
+                  5
+                ],
+                "rightRgb": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "x": 492,
+                "y": 508,
+                "maximumChannelDifference": 6,
+                "leftRgb": [
+                  3,
+                  4,
+                  6
+                ],
+                "rightRgb": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "x": 441,
+                "y": 511,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  0,
+                  0,
+                  0
+                ],
+                "rightRgb": [
+                  3,
+                  4,
+                  5
+                ]
+              },
+              {
+                "x": 482,
+                "y": 512,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  3,
+                  3,
+                  5
+                ],
+                "rightRgb": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "x": 452,
+                "y": 513,
+                "maximumChannelDifference": 9,
+                "leftRgb": [
+                  5,
+                  6,
+                  9
+                ],
+                "rightRgb": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "x": 446,
+                "y": 514,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  0,
+                  0,
+                  0
+                ],
+                "rightRgb": [
+                  3,
+                  3,
+                  5
+                ]
+              },
+              {
+                "x": 475,
+                "y": 515,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  3,
+                  4,
+                  5
+                ],
+                "rightRgb": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "x": 477,
+                "y": 515,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  3,
+                  3,
+                  5
+                ],
+                "rightRgb": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "x": 476,
+                "y": 517,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  3,
+                  3,
+                  5
+                ],
+                "rightRgb": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "x": 481,
+                "y": 517,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  0,
+                  0,
+                  0
+                ],
+                "rightRgb": [
+                  3,
+                  3,
+                  5
+                ]
+              },
+              {
+                "x": 479,
+                "y": 518,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  3,
+                  4,
+                  5
+                ],
+                "rightRgb": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "x": 482,
+                "y": 519,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  0,
+                  0,
+                  0
+                ],
+                "rightRgb": [
+                  3,
+                  3,
+                  5
+                ]
+              },
+              {
+                "x": 439,
+                "y": 523,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  0,
+                  0,
+                  0
+                ],
+                "rightRgb": [
+                  3,
+                  3,
+                  5
+                ]
+              },
+              {
+                "x": 450,
+                "y": 524,
+                "maximumChannelDifference": 8,
+                "leftRgb": [
+                  4,
+                  6,
+                  8
+                ],
+                "rightRgb": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "x": 474,
+                "y": 524,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  0,
+                  0,
+                  0
+                ],
+                "rightRgb": [
+                  3,
+                  4,
+                  5
+                ]
+              },
+              {
+                "x": 443,
+                "y": 526,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  2,
+                  3,
+                  5
+                ],
+                "rightRgb": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "x": 474,
+                "y": 527,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  3,
+                  4,
+                  5
+                ],
+                "rightRgb": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "x": 459,
+                "y": 533,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  3,
+                  4,
+                  5
+                ],
+                "rightRgb": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "x": 464,
+                "y": 535,
+                "maximumChannelDifference": 6,
+                "leftRgb": [
+                  3,
+                  4,
+                  6
+                ],
+                "rightRgb": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "x": 464,
+                "y": 536,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  0,
+                  0,
+                  0
+                ],
+                "rightRgb": [
+                  3,
+                  4,
+                  5
+                ]
+              },
+              {
+                "x": 442,
+                "y": 539,
+                "maximumChannelDifference": 6,
+                "leftRgb": [
+                  0,
+                  0,
+                  0
+                ],
+                "rightRgb": [
+                  3,
+                  4,
+                  6
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "label": "pipeline-old-control-differences/glass-edge-fresnel",
+      "passed": true,
+      "leftManifestSha256": "ef3ec2426a1c488987ff035258d9266b6e8b2d344d9ef0e95557ccedb54f47bd",
+      "rightManifestSha256": "65d35ccf83530d19eb5f9d76010fdd8297e632da59460b26d1abb1b27560a18f",
+      "records": [
+        {
+          "checkpoint": "glass-edge-fresnel",
+          "file": "113-glass-edge-fresnel.png",
+          "leftSha256": "c294723273c3075ac011627d13ed31ad09c040709c357fbf1b7177fb52ea8374",
+          "rightSha256": "243e525641948eb0c8ed7133b460e2a190635f27c2746a555749793c36fe85ee",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 6797,
+            "player": 3853,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 6797,
+            "player": 3853,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 0,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        }
+      ]
+    },
+    {
+      "label": "normal-control-backend-parity/glass-edge-fresnel",
+      "passed": false,
+      "leftManifestSha256": "ef3ec2426a1c488987ff035258d9266b6e8b2d344d9ef0e95557ccedb54f47bd",
+      "rightManifestSha256": "cb7db69f2ac40a352b95f531f39b66babf809651bf6dd86e6499c7a1d9ec1dc0",
+      "records": [
+        {
+          "checkpoint": "glass-edge-fresnel",
+          "file": "113-glass-edge-fresnel.png",
+          "leftSha256": "c294723273c3075ac011627d13ed31ad09c040709c357fbf1b7177fb52ea8374",
+          "rightSha256": "5ebf8e15b86b1b70eef7164a55b668c36a34903005bf50aa49db164d1e731eef",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 6797,
+            "player": 3853,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 6797,
+            "player": 3853,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 20,
+            "pixelsDifferentByMoreThanOne": 33,
+            "differentFraction": 6.377551020408164E-05,
+            "unchangedGate": false,
+            "outlierCount": 32,
+            "firstOutliers": [
+              {
+                "x": 456,
+                "y": 304,
+                "maximumChannelDifference": 20,
+                "leftRgb": [
+                  22,
+                  17,
+                  17
+                ],
+                "rightRgb": [
+                  2,
+                  2,
+                  3
+                ]
+              },
+              {
+                "x": 511,
+                "y": 475,
+                "maximumChannelDifference": 7,
+                "leftRgb": [
+                  0,
+                  0,
+                  0
+                ],
+                "rightRgb": [
+                  4,
+                  5,
+                  7
+                ]
+              },
+              {
+                "x": 510,
+                "y": 476,
+                "maximumChannelDifference": 7,
+                "leftRgb": [
+                  4,
+                  5,
+                  7
+                ],
+                "rightRgb": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "x": 504,
+                "y": 485,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  3,
+                  3,
+                  5
+                ],
+                "rightRgb": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "x": 439,
+                "y": 487,
+                "maximumChannelDifference": 6,
+                "leftRgb": [
+                  0,
+                  0,
+                  0
+                ],
+                "rightRgb": [
+                  3,
+                  4,
+                  6
+                ]
+              },
+              {
+                "x": 438,
+                "y": 491,
+                "maximumChannelDifference": 6,
+                "leftRgb": [
+                  0,
+                  0,
+                  0
+                ],
+                "rightRgb": [
+                  3,
+                  4,
+                  6
+                ]
+              },
+              {
+                "x": 437,
+                "y": 492,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  0,
+                  0,
+                  0
+                ],
+                "rightRgb": [
+                  3,
+                  4,
+                  5
+                ]
+              },
+              {
+                "x": 449,
+                "y": 495,
+                "maximumChannelDifference": 9,
+                "leftRgb": [
+                  0,
+                  0,
+                  0
+                ],
+                "rightRgb": [
+                  4,
+                  6,
+                  9
+                ]
+              },
+              {
+                "x": 453,
+                "y": 495,
+                "maximumChannelDifference": 10,
+                "leftRgb": [
+                  5,
+                  7,
+                  10
+                ],
+                "rightRgb": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "x": 441,
+                "y": 496,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  0,
+                  0,
+                  0
+                ],
+                "rightRgb": [
+                  3,
+                  4,
+                  5
+                ]
+              },
+              {
+                "x": 489,
+                "y": 500,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  0,
+                  0,
+                  0
+                ],
+                "rightRgb": [
+                  3,
+                  4,
+                  5
+                ]
+              },
+              {
+                "x": 442,
+                "y": 502,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  3,
+                  4,
+                  5
+                ],
+                "rightRgb": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "x": 492,
+                "y": 508,
+                "maximumChannelDifference": 6,
+                "leftRgb": [
+                  3,
+                  4,
+                  6
+                ],
+                "rightRgb": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "x": 441,
+                "y": 511,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  0,
+                  0,
+                  0
+                ],
+                "rightRgb": [
+                  3,
+                  4,
+                  5
+                ]
+              },
+              {
+                "x": 482,
+                "y": 512,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  3,
+                  3,
+                  5
+                ],
+                "rightRgb": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "x": 452,
+                "y": 513,
+                "maximumChannelDifference": 9,
+                "leftRgb": [
+                  5,
+                  6,
+                  9
+                ],
+                "rightRgb": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "x": 446,
+                "y": 514,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  0,
+                  0,
+                  0
+                ],
+                "rightRgb": [
+                  3,
+                  3,
+                  5
+                ]
+              },
+              {
+                "x": 475,
+                "y": 515,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  3,
+                  4,
+                  5
+                ],
+                "rightRgb": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "x": 477,
+                "y": 515,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  3,
+                  3,
+                  5
+                ],
+                "rightRgb": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "x": 476,
+                "y": 517,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  3,
+                  3,
+                  5
+                ],
+                "rightRgb": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "x": 481,
+                "y": 517,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  0,
+                  0,
+                  0
+                ],
+                "rightRgb": [
+                  3,
+                  3,
+                  5
+                ]
+              },
+              {
+                "x": 479,
+                "y": 518,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  3,
+                  4,
+                  5
+                ],
+                "rightRgb": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "x": 482,
+                "y": 519,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  0,
+                  0,
+                  0
+                ],
+                "rightRgb": [
+                  3,
+                  3,
+                  5
+                ]
+              },
+              {
+                "x": 439,
+                "y": 523,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  0,
+                  0,
+                  0
+                ],
+                "rightRgb": [
+                  3,
+                  3,
+                  5
+                ]
+              },
+              {
+                "x": 450,
+                "y": 524,
+                "maximumChannelDifference": 8,
+                "leftRgb": [
+                  4,
+                  6,
+                  8
+                ],
+                "rightRgb": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "x": 474,
+                "y": 524,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  0,
+                  0,
+                  0
+                ],
+                "rightRgb": [
+                  3,
+                  4,
+                  5
+                ]
+              },
+              {
+                "x": 443,
+                "y": 526,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  2,
+                  3,
+                  5
+                ],
+                "rightRgb": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "x": 474,
+                "y": 527,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  3,
+                  4,
+                  5
+                ],
+                "rightRgb": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "x": 459,
+                "y": 533,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  3,
+                  4,
+                  5
+                ],
+                "rightRgb": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "x": 464,
+                "y": 535,
+                "maximumChannelDifference": 6,
+                "leftRgb": [
+                  3,
+                  4,
+                  6
+                ],
+                "rightRgb": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "x": 464,
+                "y": 536,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  0,
+                  0,
+                  0
+                ],
+                "rightRgb": [
+                  3,
+                  4,
+                  5
+                ]
+              },
+              {
+                "x": 442,
+                "y": 539,
+                "maximumChannelDifference": 6,
+                "leftRgb": [
+                  0,
+                  0,
+                  0
+                ],
+                "rightRgb": [
+                  3,
+                  4,
+                  6
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "label": "compute-old-control-differences/glass-edge-fresnel",
+      "passed": true,
+      "leftManifestSha256": "cb7db69f2ac40a352b95f531f39b66babf809651bf6dd86e6499c7a1d9ec1dc0",
+      "rightManifestSha256": "28e54ea7e0cdecc3d6f667563a033bb6d999a60d25c5fd7011a6b81996f7cb91",
+      "records": [
+        {
+          "checkpoint": "glass-edge-fresnel",
+          "file": "113-glass-edge-fresnel.png",
+          "leftSha256": "5ebf8e15b86b1b70eef7164a55b668c36a34903005bf50aa49db164d1e731eef",
+          "rightSha256": "41065fb5970cae0619b950a268c65d543de5219e8e712885abc5bb506e7130d3",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 6797,
+            "player": 3853,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 6797,
+            "player": 3853,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 0,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        }
+      ]
+    }
+  ]
+}
