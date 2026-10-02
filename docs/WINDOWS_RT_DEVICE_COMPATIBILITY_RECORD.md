@@ -1,6 +1,6 @@
 # Windows RT Device Compatibility Record
 
-Last updated: 2026-08-31
+Last updated: 2026-10-01
 
 This is the living compatibility record for the Horde Lantern RT Windows build. A GPU is marked as working only when the project selects `RayTracingPipeline`, creates the required Vulkan RT path, and presents RT-produced frames through the swapchain. DirectX feature level, vendor marketing, or merely launching the executable are not sufficient on their own.
 
@@ -20,6 +20,7 @@ The Android record remains in [`ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md`](ANDR
 |---|---|---|---|
 | NVIDIA GeForce RTX 5050 Laptop GPU | Works - locally tested | `1.6.0`, 100%, `1232x803` | Exact published ZIP; `RayTracingPipeline`; honest swapchain presentation |
 | HP EliteBook 845 14-inch G11 / AMD Radeon 780M integrated graphics | Works - locally tested | `0.1.3-alpha.1`, 100%, `1484x991` | `RayTracingPipeline`; 1,838 measured frames; 10.222 ms median / 97.828 FPS; 59.650 FPS 1% low |
+| Aspire 14 AI laptop (tester-described) / AMD Radeon 840M integrated graphics | Works - user-reported, screenshot evidence | `1.6.0` (window title), `1478x964`; render scale unreported | `RayTracingPipeline`; successful swapchain presentation; screenshot shows 22.18 FPS, not a sustained benchmark |
 
 ## Confirmed evidence
 
@@ -81,6 +82,24 @@ This is a notably stronger result than a launch-only test: the machine completed
 - **RT result:** NVIDIA GeForce RTX 5050 Laptop GPU; `RayTracingPipeline`; honest RT-produced swapchain presentation.
 - **Lifecycle:** The main window received direct `WM_CLOSE`, exited normally with code 0, and left no game process.
 - **Qualification:** This confirms the exact published package, asset layout, Vulkan RT selection, and honest presentation. It is not a fresh sustained benchmark or proof for another GPU/driver.
+
+## Community-reported evidence
+
+### Aspire 14 AI laptop - AMD Radeon 840M integrated graphics
+
+- **Status:** Works - user-reported; diagnostic screenshot evidence, without a preserved generated capability or benchmark report.
+- **Tester/source:** itch.io user **ArchParch**, [“Runs on my laptop”](https://itch.io/t/7034600/runs-on-my-laptop).
+- **Evidence reviewed:** 2026-10-01; actual test time unreported.
+- **Reported experience:** “This runs perfectly on my AMD Aspire 14 AI laptop.” This is the tester's subjective assessment.
+- **Build:** Window title identifies Showcase Alpha `1.6.0`; exact executable/package hash and shader identity were not supplied.
+- **System:** Aspire 14 AI laptop as described by the tester; exact model SKU, CPU, RAM and OS version unreported.
+- **GPU:** Screenshot identifies `AMD Radeon(TM) 840M Graphics`.
+- **Vulkan / driver:** API `1.4.329`; Vulkan driver `2.0.373`.
+- **RT result:** Vulkan backend; `RayTracingPipeline`; diagnostic screenshot reports successful RT scene presentation via the swapchain.
+- **Render extent:** Internal render/dispatch resolution `1478x964`; render-scale percentage and present mode unreported.
+- **Performance shown:** `22.18 FPS` / `45.09 ms` frame time. GPU RT command-buffer time: `25.572 ms` latest and `32.987 ms` average across `599` samples. These are screenshot readings, not a preserved deterministic benchmark or whole-session average FPS.
+- **Evidence:** Public post and attached diagnostic screenshot at the source link above; no generated report is archived in this repository.
+- **Qualification:** Supports successful hardware-RT presentation on this reported machine/configuration. It does not establish a minimum or sustained frame rate, thermal/power conditions, complete gameplay validation, support for every Radeon 840M laptop, or acceptance of the `1.6.1` engineering branch. Do not rank it against other entries without matched builds and settings.
 
 ## Interpretation rules
 

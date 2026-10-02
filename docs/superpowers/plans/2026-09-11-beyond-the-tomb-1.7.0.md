@@ -12,13 +12,13 @@
 
 **Status:** Planning only. The owner approved the preceding creative direction and requested this complete scoped handoff, adding Blender, image generation and an on-theme controls/menu refresh. No 1.7.0 runtime, artwork, voice recordings or performance evidence is delivered by this document. Numerical budgets below are proposed starting budgets, not measured capabilities.
 
-**Start condition:** Implement only after the owner has finished and accepted the 1.6.1 baseline. Do not interrupt, merge, overwrite, re-version or declare complete the unfinished 1.6.1 engineering pass. This documentation-only file may live on `main` before the implementation baseline is ready.
+**Start condition (updated 30 September 2026):** Follow the [canonical roadmap](../../ROADMAP.md): finish, accept, merge and release 1.6.1, then implement, validate and accept the 1.6.2 engine-readiness/demo-polish milestone before starting 1.7 gameplay expansion. Do not interrupt, merge, overwrite, re-version or declare complete the unfinished 1.6.1 engineering pass as part of this planning work. This documentation-only file may live on `main` before the implementation baseline is ready. Historical 1.6.1 inspection and feature-origin references remain context; re-audit the accepted 1.6.2 source and evidence as the actual 1.7 starting point. The full rope rescue, companion, forest and coherent moonlit outdoor programme remain in 1.7.
 
 ---
 
 ## 1. Source authority and what was actually inspected
 
-The owner's latest instructions govern the new experience. Preserve `AGENTS.md` engineering/safety requirements and use the eventual accepted 1.6.1 source as implementation authority. Historical documents remain evidence of their own versions, not proof of current implementation or performance.
+The owner's latest instructions govern the new experience. Preserve `AGENTS.md` engineering/safety requirements and use the accepted 1.6.2 source as implementation authority. Historical documents remain evidence of their own versions, not proof of current implementation or performance.
 
 Planning inspection used `codex/horde-1.6.1-engineering-pass` at `191d799ab7fda54fab36d9792b11f908ddaaf42d`. The branch's package note calls 1.6.1 an unpublished engineering candidate. This is an inspection snapshot, **not the mandatory future starting SHA**. Re-audit the accepted baseline before changing code.
 
@@ -70,7 +70,7 @@ Explicitly outside 1.7.0: an open world, extra dungeons, a new forest boss, new 
 
 Do not remove a required feature merely to finish quickly. When a required subsystem is blocked, record it honestly and continue independent work; final acceptance remains open. Optional density and ornamentation can scale before required features are cut.
 
-**Story terminology:** Keep the owner's working term **the Horde**. Do not silently rename it to the Hoard, reinterpret it as an army, decide what it ultimately is, or invent a larger mythology. The pair are dungeon crawlers searching for a legendary objective; the lantern is their first tangible piece of the puzzle. Final proper names and lore are not needed for this chapter.
+**Story and voice authority (30 September 2026):** Read [CAMPAIGN_DESIGN.md](../../CAMPAIGN_DESIGN.md). The Horde retains the lost-army/treasure ambiguity; the lantern contains a deceptive entity claiming to be the dead king. Kit is the loyal companion and the player is silent. Preserve spoiler pacing: 1.7 hints at the mystery, not the late-game reveal.
 
 ## 4. Authored player experience
 
@@ -82,7 +82,7 @@ Do not simulate the collapse live. It already happened. A few settling particles
 
 ### 4.2 Reward and night opening
 
-Preserve the accepted Lich/chest sequence, including the separate two-second chest unlock if it remains the accepted 1.6.1 behavior, the guidance cue and actual claim interaction. The player must own the lantern before rescue progression can complete.
+Preserve the accepted Lich/chest sequence, including the separate two-second chest unlock if it remains the accepted 1.6.2 behavior, the guidance cue and actual claim interaction. The player must own the lantern before rescue progression can complete.
 
 Replace the campaign's returning-dawn/ending-card transition with a moonlit opening. Use the same moon orientation, exposure policy and sky inside and outside. Opening stonework must have a believable place to move; do not lift an enormous roof through trees, terrain or the companion. Rework the lid/oculus and upper chamber geometry only as necessary for a traversable shaft.
 
@@ -110,7 +110,7 @@ The companion approaches a safe conversation position, asks about the lantern an
 
 If the lantern was raised before climbing, stowing and restoring it leaves it lowered for this lesson. Consume a **new raise action during the reunion**, not a stale input edge from before the climb. The player may look away, pause or take time; the story cannot soft-lock. One delayed reminder is allowed, not constant repeated dialogue.
 
-The warm lantern lights the companion, nearby bark and appropriate fog against cold moonlight. The player answer and companion reaction follow the raise event. This is the chapter's central lighting/character moment.
+The warm lantern lights the companion, nearby bark and appropriate fog against cold moonlight. The silent player's gesture and Kit's reaction follow the raise event; there is no voiced player answer. This is the chapter's central lighting/character moment.
 
 ### 4.6 Woodland continuation and stopping point
 
@@ -180,7 +180,7 @@ Pause freezes progression and the rope. Restart cancels the sequence and pending
 
 Add one friendly actor with a stable entity identity. Reuse existing skinned-asset/animation/render-slot infrastructure, but do not overwrite a skeleton or Lich slot without explicit lifetime ownership. Avoid widening combat enemy limits as a side effect. The forest requires only the player and one companion to be animated characters.
 
-Default visual brief: an original practical adult human dungeon crawler, travel-worn layered clothing, restrained gothic detail, belt equipment, readable hands/face and a short coat or garment that skins well. No ornate full-body armor, long simulated cloak or complex hair. Final face, presentation and colors should be selected from a small reference set; use `Companion` as the internal/speaker working name until the owner names them.
+Default visual brief: an original practical adult human dungeon crawler, travel-worn layered clothing, restrained gothic detail, belt equipment, readable hands/face and a short coat or garment that skins well. No ornate full-body armor, long simulated cloak or complex hair. Final face, presentation and colors should be selected from a small reference set; use **Kit** as the companion's narrative/speaker name; a stable generic internal entity ID may remain.
 
 Required animation behaviors: idle/breathing, look down, throw/release rope, recover/stand, approach, concerned talk, lantern reaction, turn, walk, wait and natural look-at. Reuse compatible clips, blend layers and author missing actions in Blender. The rope release is a semantic marker in the body action, connected to the same simulation event that releases the rope.
 
@@ -188,7 +188,7 @@ Walking follows an authored collision-aware route with stopping points and speed
 
 ### 7.2 Voice deliverable
 
-Ship actual offline voice audio for the mandatory exchange, with one consistent companion voice and one consistent player voice. Owner recordings, a licensed synthetic voice or authorized actors are acceptable. Do not clone or imitate an identifiable real person without authorization. Select/verify any provider and commercial distribution terms before paid generation; no provider, subscription or specific model is assumed by this plan.
+Ship actual offline voice audio for the mandatory exchange, with one consistent Kit voice. The player is silent: do not produce player dialogue clips. Owner recordings, a licensed synthetic voice or authorized actors are acceptable. Do not clone or imitate an identifiable real person without authorization. Select/verify any provider and commercial distribution terms before paid generation; no provider, subscription or specific model is assumed by this plan.
 
 Store lossless source recordings outside runtime packaging; produce normalized, trimmed mono runtime clips through the accepted audio pipeline. Record provider/performer permission, voice identifier, generation/recording date, source hash and derivative processing. No API keys, private account data or signed temporary download URLs in Git. Gameplay must run offline, with no live TTS or network request on an interaction.
 
@@ -196,7 +196,7 @@ Subtitles and temporary voice are valid development scaffolding, but **subtitles
 
 ### 7.3 Initial script and triggers
 
-These are the implementation script defaults. Keep line IDs stable when the owner edits wording. Direction labels are not spoken.
+These are provisional implementation script defaults, updated for the owner-approved silent protagonist. Kit provides conversational momentum without speaking the player's thoughts; leave room for quiet and player agency. Keep line IDs stable when the owner edits wording. Direction labels are not spoken.
 
 | Line ID | Speaker / delivery | Text | Trigger |
 |---|---|---|---|
@@ -204,18 +204,18 @@ These are the implementation script defaults. Keep line IDs stable when the owne
 | `rescue.rope` | Companion, practical | Hold on. Rope coming down. | After first line; rope throw prepared. |
 | `reunion.question` | Companion, eager but believable | Did you find it? Tell me you found it. | Player safely at summit and companion at reunion mark. |
 | `reunion.hint` | Companion, gentle reminder | Let me see. Raise it. | Once only, after a generous idle delay during the raise lesson. |
-| `reunion.answer` | Player, tired satisfaction | I found it. | Fresh valid player raise action during the lesson. |
-| `reunion.proof` | Companion, wonder | Then we're not chasing a story anymore. | After answer; lantern visibly presented. |
-| `reunion.first_piece` | Player, grounded | It's only the first piece. | After companion reaction. |
+| `reunion.answer` | Silent player action/event; no audio or subtitle line | — | Fresh valid raise action; wait for visibly presented lantern. |
+| `reunion.proof` | Kit, wonder | Then we're not chasing a story anymore. | After silent raise event; lantern visibly presented. |
+| `reunion.first_piece` | Kit, thoughtful | A start, then. Let's see where it leads. | After wonder reaction; provisional wording, no claim to know the prison's nature. |
 | `reunion.depart` | Companion, quiet purpose | Good. Let's find the rest. | Exchange complete; begin trail-leading state. |
 
-The hint is conditional, not an extra line forced into every playthrough. Do not require camera aim at the NPC for quest progress. Avoid playing the answer before the lantern has reached its presented pose. The story context can use a short objective such as `The Horde — follow your companion`; do not add a lore monologue.
+The hint is conditional, not an extra line forced into every playthrough. Do not require camera aim at the NPC for quest progress. The answer event is nonverbal; do not trigger Kit's response before the lantern has reached its presented pose. The story context can use a short objective such as `The Horde — follow your companion`; do not add a lore monologue.
 
 ### 7.4 Dialogue infrastructure
 
 Use a small line manifest: stable line ID, speaker/entity, subtitle, audio asset, gesture, start condition, once-per-run/checkpoint policy and skip/completion behavior. A dialogue controller sequences state; platform backends play audio and report completion with a generation/line token. Stale completion messages must be ignored after pause/reset/reload or a skip. Audio duration/metadata provides a bounded fallback when playback fails, so missing audio cannot lock the game.
 
-Subtitles default on, with speaker label, configurable size and opaque-enough scrim. Companion speech is world-positioned with distance/pan and appropriate interior-to-exterior treatment; player speech remains centered. Retain intelligibility, and do not bake tomb reverb permanently into a clip also heard outside. Use subtle animation/head/jaw response if the rig supports it, but cinematic phoneme-perfect facial animation is not required.
+Subtitles default on, with speaker label, configurable size and opaque-enough scrim. Companion speech is world-positioned with distance/pan and appropriate interior-to-exterior treatment; the player has no speech channel or spoken lines. Future lantern-entity voice positioning is a separate scoped design decision. Retain intelligibility, and do not bake tomb reverb permanently into a clip also heard outside. Use subtle animation/head/jaw response if the rig supports it, but cinematic phoneme-perfect facial animation is not required.
 
 Dialogue can pause/resume with gameplay. Provide an explicit skip for the current spoken line; skip is not the gameplay Interact action and must not skip the player-controlled raise lesson. Missing optional audio falls back to subtitle timing and a diagnostic. Story events are exactly-once state transitions, never dependent on the player hearing the clip.
 
@@ -302,6 +302,8 @@ Suggested new authoring locations: `assets/source/beyond_the_tomb/` for retained
 
 ## 10. On-theme touch controls, HUD and menus
 
+**2 October 2026 milestone update:** The existing-demo HUD and menu refresh is now owned by [1.6.2 UI_REFRESH_1_6_2.md](../../UI_REFRESH_1_6_2.md). That proposal supersedes the timing of the base-theme work below and the existing-demo portion of WP7. Audit and reuse the accepted 1.6.2 result rather than rebuilding it or claiming existing translucency as new. This chapter retains traversal/companion context, dialogue/subtitle controls, chapter-end integration and genuinely new input/accessibility requirements. The earlier reference-board request does not require generating UI art already solved in 1.6.2.
+
 This is a mandatory workstream, not optional polish after the forest. The UI should belong to the same world as the lantern without compromising input, readability or accessibility.
 
 ### 10.1 Visual system
@@ -348,7 +350,7 @@ Use design reviews on captured **real phone/Windows screens**, including bright 
 
 ## 11. Music, ambience and audio integration
 
-The owner has separately planned Pocket Chordsmith adaptive music for exploration, torch loss, combat, Lich and roof opening. Treat this as owner context, not proof that a particular music pack or engine is already in the final code. Inspect final 1.6.1 and available assets first.
+The owner has separately planned Pocket Chordsmith adaptive music for exploration, torch loss, combat, Lich and roof opening. Treat this as owner context, not proof that a particular music pack or engine is already in the final code. Inspect the accepted 1.6.2 baseline and available assets first.
 
 Extend the existing accepted music route with a short rescue/reveal transition and a restrained forest-exploration state. Preserve compatible musical motifs and avoid playing a second independent music engine. If the pack is absent, use the existing audio abstraction and record the missing integration input; do not invent a nonexistent asset or claim Chordsmith is integrated.
 
@@ -360,7 +362,7 @@ Every work package records `Audio/haptic manual revalidation required: YES/NO` w
 
 ## 12. Save, replay and recovery
 
-Add only the persistence required by this chapter. Use versioned, validated campaign state and atomic replacement, or extend the accepted save system if 1.6.1 has one. Preserve existing settings and do not confuse the persistent RT Lab-unlocked preference with complete campaign progress.
+Add only the persistence required by this chapter. Use versioned, validated campaign state and atomic replacement, or extend the accepted baseline's save system if one exists. Preserve existing settings and do not confuse the persistent RT Lab-unlocked preference with complete campaign progress.
 
 Required durable checkpoints: safely in the reward room with the lantern claimed and rescue available; safely at the summit; and the forest endpoint. Save logical state/IDs, not raw Vulkan resources or OS audio handles. Retain health, lantern ownership and relevant dialogue flags. Do not serialize a fragile instantaneous rope configuration as the only recovery path.
 
@@ -427,9 +429,9 @@ Create `docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0-execution-log.md
 
 ### WP0 — Accepted baseline, tool discovery and scope lock
 
-**Reads:** This plan, `AGENTS.md`, final 1.6.1 decisions/memory, open work/validation, asset contracts, scene/input/audio/UI sources.
+**Reads:** This plan, `AGENTS.md`, accepted 1.6.2 decisions/memory, open work/validation, asset contracts, scene/input/audio/UI sources.
 
-- [ ] Verify owner acceptance of 1.6.1; record its exact source and package identity. If still unfinished, limit work to safe planning/tool discovery; do not implement onto its active branch.
+- [ ] Verify that 1.6.1 was completed, accepted, merged and released, and that 1.6.2 is implemented, validated and owner-accepted; record the exact 1.6.2 source and package identity. If either prerequisite is unfinished, limit work to safe planning/tool discovery; do not implement onto an active foundation branch.
 - [ ] Inspect Git status and existing worktrees. Start an isolated feature worktree/branch from the accepted baseline without discarding local changes. Import this documentation-only file if it is not yet present there.
 - [ ] Establish fresh baseline tests/captures and inventory existing scene, vertical position, save, music and UI behavior. Do not hardcode historical CTest counts as current requirements.
 - [ ] Discover Blender executable/version, image generation capability, Meshy API/credits, and voice-production options. Log unavailable/cost-gated capabilities precisely.
@@ -611,7 +613,7 @@ Blender discovery can use `blender --version` where configured, followed by a re
 Treat the owner's model choice as the operating context, not a product benchmark. No specific subagent model, API access or reasoning-setting mechanism is assumed.
 
 1. **Read the whole master handoff once, then work from the current package and log.** Avoid repeated full-repository audits. Inspect the smallest relevant sources and neighboring consumers.
-2. **Protect the baseline.** Start runtime work from the completed accepted 1.6.1 state, not the older public main solely because this plan lives there. Never merge the unfinished engineering branch automatically.
+2. **Protect the baseline.** Start runtime work from the completed accepted 1.6.2 state, not the older public main solely because this plan lives there. Never merge the unfinished engineering branch automatically.
 3. **Use concrete package contracts.** Before each package, settle its public data/API and failing acceptance tests against the actual baseline. Keep files focused and do not turn `PresentableTinyRtScene`, `GameSimulation` or `MainActivity` into larger feature dumps.
 4. **Delegate sparingly.** At most two non-overlapping implementation workers by default, after interfaces are frozen. Good independent work: UI artwork cleanup, asset validation, bounded host tests. The lead owns world-state/render/input integration. Do not have two workers edit shared shader ABI, simulation snapshots or native bridge contracts concurrently.
 5. **Review before integration.** Use a fresh focused review for resource lifetime, input races, progression and changed shader paths. Available subagents are optional; perform an explicit local review when absent. Do not claim unseen reviewer/test results.
@@ -631,10 +633,11 @@ It is the approved scoped direction and master handoff for the next update,
 including Blender/image-generation/Meshy production, physical rope traversal,
 the moonlit forest, voiced companion and the themed touch HUD/menus.
 
-First verify that 1.6.1 is completed and owner-accepted. Protect existing local
-work and use an isolated feature branch/worktree from that accepted baseline.
+First verify that 1.6.1 was completed, accepted, merged and released, and that
+1.6.2 is implemented, validated and owner-accepted. Protect existing local work
+and use an isolated feature branch/worktree from the accepted 1.6.2 baseline.
 The plan was saved separately on main; obtain the documentation without
-merging or replacing unfinished runtime work. If 1.6.1 is still unfinished,
+merging or replacing unfinished runtime work. If either prerequisite is unfinished,
 report the start-condition blocker and restrict yourself to safe planning
 and tool discovery rather than changing its implementation.
 
