@@ -21,6 +21,9 @@ struct RtGpuBuffer
     VkDeviceSize size = 0;
     VkDeviceSize allocationSize = 0;
     VkMemoryPropertyFlags memoryPropertyFlags = 0u;
+    // Owned by this buffer, opt-in for coherent CPU-written dynamic resources.
+    // The caller still waits for the owning GPU fence before every write.
+    void* mappedWriteData = nullptr;
 };
 
 struct RtAccelerationStructure
@@ -109,6 +112,8 @@ public:
                       bool deviceAddress,
                       RtGpuBuffer& out,
                       std::string& diagnostic) const;
+    bool MapBufferForHostWrites(RtGpuBuffer& buffer,
+                               std::string& diagnostic) const;
     bool WriteBuffer(const RtGpuBuffer& buffer,
                      const void* data,
                      VkDeviceSize size,

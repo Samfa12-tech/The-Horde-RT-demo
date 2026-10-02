@@ -9,6 +9,7 @@
 #include <string>
 #include <string_view>
 #include <type_traits>
+#include <utility>
 
 namespace
 {
@@ -38,6 +39,11 @@ struct FakeVulkanState
     VkPhysicalDeviceMemoryProperties memoryProperties{};
     std::array<std::byte, 512u> mappedBytes{};
     VkResult mapResult = VK_SUCCESS;
+    bool nullMapResult = false;
+    bool mappingActive = false;
+    bool freedWhileMapped = false;
+    VkDeviceSize mappedOffset = 0u;
+    VkDeviceSize mappedSize = 0u;
     std::uint32_t mapCount = 0u;
     std::uint32_t unmapCount = 0u;
     std::uint32_t destroyBufferCount = 0u;
@@ -107,22 +113,27 @@ VKAPI_ATTR VkResult VKAPI_CALL vkBindBufferMemory(
 }
 
 VKAPI_ATTR VkResult VKAPI_CALL vkMapMemory(
-    VkDevice, VkDeviceMemory, const VkDeviceSize offset, VkDeviceSize,
+    VkDevice, VkDeviceMemory, const VkDeviceSize offset, VkDeviceSize size,
     VkMemoryMapFlags, void** mapped)
 {
     ++gVulkan.mapCount;
+    gVulkan.mappedOffset = offset;
+    gVulkan.mappedSize = size;
     if (gVulkan.mapResult != VK_SUCCESS)
     {
         *mapped = nullptr;
         return gVulkan.mapResult;
     }
-    *mapped = gVulkan.mappedBytes.data() + static_cast<std::size_t>(offset);
+    *mapped = gVulkan.nullMapResult ? nullptr :
+        gVulkan.mappedBytes.data() + static_cast<std::size_t>(offset);
+    gVulkan.mappingActive = true;
     return VK_SUCCESS;
 }
 
 VKAPI_ATTR void VKAPI_CALL vkUnmapMemory(VkDevice, VkDeviceMemory)
 {
     ++gVulkan.unmapCount;
+    gVulkan.mappingActive = false;
 }
 
 VKAPI_ATTR void VKAPI_CALL vkDestroyBuffer(
@@ -135,6 +146,7 @@ VKAPI_ATTR void VKAPI_CALL vkFreeMemory(
     VkDevice, VkDeviceMemory, const VkAllocationCallbacks*)
 {
     ++gVulkan.freeMemoryCount;
+    gVulkan.freedWhileMapped = gVulkan.freedWhileMapped || gVulkan.mappingActive;
 }
 
 } // extern "C"
@@ -225,8 +237,90 @@ int main()
     ok &= Require(buffer.buffer == VK_NULL_HANDLE && buffer.memory == VK_NULL_HANDLE &&
                       buffer.address == 0u && buffer.size == 0u &&
                       buffer.allocationSize == 0u && buffer.memoryPropertyFlags == 0u &&
+                      buffer.mappedWriteData == nullptr &&
                       gVulkan.destroyBufferCount == 1u && gVulkan.freeMemoryCount == 1u,
                   "destroy must clear handles and all retained allocation facts");
+
+    gVulkan.mapResult = VK_SUCCESS;
+    ok &= Require(resources.CreateBuffer(96u, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                      VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                      false, buffer, diagnostic), "persistent fixture allocation failed");
+    const auto mapsBeforePersistent = gVulkan.mapCount;
+    const auto unmapsBeforePersistent = gVulkan.unmapCount;
+    ok &= Require(resources.MapBufferForHostWrites(buffer, diagnostic) &&
+                      resources.MapBufferForHostWrites(buffer, diagnostic) &&
+                      buffer.mappedWriteData == gVulkan.mappedBytes.data() &&
+                      gVulkan.mapCount == mapsBeforePersistent + 1u &&
+                      gVulkan.mappedOffset == 0u && gVulkan.mappedSize == buffer.size,
+                  "persistent mapping must be bounded and idempotent, not double-map memory");
+    gVulkan.mapResult = VK_ERROR_MEMORY_MAP_FAILED; // writes must not map again
+    TestClock persistentClock{{300u, 325u}, 2u, 0u};
+    observation.clockUser = &persistentClock;
+    ok &= Require(accumulator.Begin(), "persistent upload observation did not begin");
+    ok &= Require(resources.WriteBufferRange(buffer, 84u, payload.data(), payload.size(),
+                      "persistent end range", diagnostic, &observation),
+                  "persistent exact-end range failed");
+    RtStageFrameSample persistentSample{};
+    ok &= Require(accumulator.Commit(persistentSample), "persistent upload did not commit");
+    const auto& persistentUpload = persistentSample.values[RtStageIndex(RtStage::DynamicUpload)];
+    ok &= Require(persistentUpload.durationNanoseconds == 25u &&
+                      persistentUpload.workInvocationCount == 1u &&
+                      persistentUpload.byteCount == payload.size() &&
+                      persistentUpload.operationCount == 1u &&
+                      std::memcmp(gVulkan.mappedBytes.data() + 84u, payload.data(), payload.size()) == 0 &&
+                      resources.WriteBuffer(buffer, payload.data(), payload.size(),
+                          "persistent whole", diagnostic) && diagnostic.empty() &&
+                      gVulkan.mapCount == mapsBeforePersistent + 1u &&
+                      gVulkan.unmapCount == unmapsBeforePersistent,
+                  "persistent writes must retain copy observations without map/unmap calls");
+    const auto bytesBeforeInvalid = gVulkan.mappedBytes;
+    ok &= Require(!resources.WriteBufferRange(buffer, 85u, payload.data(), payload.size(),
+                      "overrun", diagnostic) &&
+                      !resources.WriteBufferRange(buffer, UINT64_MAX, payload.data(), 1u,
+                          "overflow", diagnostic) &&
+                      !resources.WriteBuffer(buffer, nullptr, 1u, "null", diagnostic) &&
+                      !resources.WriteBuffer(buffer, payload.data(), 0u, "empty", diagnostic) &&
+                      gVulkan.mappedBytes == bytesBeforeInvalid,
+                  "persistent uploads must reject invalid ranges without touching memory");
+
+    RtGpuBuffer moved = std::exchange(buffer, RtGpuBuffer{});
+    resources.DestroyBuffer(buffer);
+    ok &= Require(gVulkan.unmapCount == unmapsBeforePersistent,
+                  "moved-from owner must not unmap the transferred allocation");
+    resources.DestroyBuffer(moved);
+    resources.DestroyBuffer(moved);
+    ok &= Require(moved.mappedWriteData == nullptr &&
+                      gVulkan.unmapCount == unmapsBeforePersistent + 1u &&
+                      gVulkan.freeMemoryCount == 2u && !gVulkan.freedWhileMapped,
+                  "persistent mapping must transfer and unmap/free exactly once");
+
+    ok &= Require(resources.CreateBuffer(96u, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                      VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                      false, buffer, diagnostic), "failure fixture allocation failed");
+    const auto mapsBeforeInvalid = gVulkan.mapCount;
+    buffer.memoryPropertyFlags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
+    ok &= Require(!resources.MapBufferForHostWrites(buffer, diagnostic) &&
+                      gVulkan.mapCount == mapsBeforeInvalid && buffer.mappedWriteData == nullptr,
+                  "noncoherent memory must not be admitted without flush ownership");
+    buffer.memoryPropertyFlags = kSelectedUmaFlags;
+    ok &= Require(!resources.MapBufferForHostWrites(buffer, diagnostic) &&
+                      buffer.mappedWriteData == nullptr,
+                  "map failure must not publish a persistent pointer");
+    const auto unmapsBeforeFailedDestroy = gVulkan.unmapCount;
+    resources.DestroyBuffer(buffer);
+    ok &= Require(gVulkan.unmapCount == unmapsBeforeFailedDestroy &&
+                      gVulkan.freeMemoryCount == 3u,
+                  "failed map cleanup must free the allocation without a phantom unmap");
+    gVulkan.mapResult = VK_SUCCESS;
+    gVulkan.nullMapResult = true;
+    ok &= Require(resources.CreateBuffer(96u, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                      VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                      false, buffer, diagnostic) &&
+                      !resources.MapBufferForHostWrites(buffer, diagnostic) &&
+                      buffer.mappedWriteData == nullptr &&
+                      gVulkan.unmapCount == unmapsBeforeFailedDestroy + 1u,
+                  "an invalid success/null map must be closed without publishing a pointer");
+    resources.DestroyBuffer(buffer);
 
     return ok ? 0 : 1;
 }

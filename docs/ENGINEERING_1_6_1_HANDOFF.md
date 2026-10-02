@@ -50,6 +50,23 @@ fresh corrected-source CI remains required, not a rerun. This does not change
 production flags/runtime or reopen manual audio acceptance. No phone operation.
 Audio/haptic manual revalidation:NO; CI only. No merge, signing or publication.
 
+Corrected inventory sourced4e6cba: fresh push37069580760 and PR37069586129 both
+SUCCESS across all six lanes. PR GCC log confirms actual merge checkoutf0e4391,
+whose verified parents are current mainbda1b99 and sourced4e6cba, and59/59 tests.
+Do not relabel the earlier f2ebe42 failures as green or repeat their investigation.
+
+### October3 F08 dynamic mappings — bounded candidate validated on Windows
+
+Opt-in coherent mappings now belong to the existing dynamic buffer owners;
+checked per-frame copies no longer map/unmap. One frame/fence/barriers, independent
+world/viewmodel buffers, Diagnostic/readback separation and all shader/assets
+remain unchanged. Failure and move/cleanup contracts, Windows affected Debug/
+Release tests,13 native RTX captures and Shipping containment pass; no phone or
+FPS gain claim. [Finite record](evidence/2026-10-03-dynamic-buffer-mapping/README.md).
+Next: reviewed push/current CI, separate immutable upload subtask and final-device
+gates when available. S26 is currently occupied by Briarhold; no coordination or
+device operation is needed. Audio/haptic manual revalidation:NO.
+
 ### October3 driver reporting F14 — implemented and locally validated
 
 Raw driverVersion is no longer decoded as a Vulkan API version. Guarded driver

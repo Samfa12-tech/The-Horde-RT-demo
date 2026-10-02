@@ -2113,10 +2113,11 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
         VkBufferUsageFlags usage,
         bool address,
         const char* label,
-        Buffer& buffer) {
+        Buffer& buffer, const bool dynamic = false) {
         const std::array<std::uint8_t, 16u> zeros{};
         const VkDeviceSize actualSize = std::max<VkDeviceSize>(size, zeros.size());
         if (!CreateBuffer(actualSize, usage, uploadMemory, address, buffer, diagnostic)) return false;
+        if (dynamic && !gpuResources_.MapBufferForHostWrites(buffer, diagnostic)) return false;
         return WriteBuffer(buffer, size == 0u ? zeros.data() : data, actualSize, label, diagnostic);
     };
 
@@ -2124,19 +2125,19 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
     const VkBufferUsageFlags geometry = storage |
         VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR;
     if (!createAndWrite(instances.data(), sizeof(instances), storage, false,
-                        "RT instance metadata", instanceMetadataBuffer_) ||
+                        "RT instance metadata", instanceMetadataBuffer_, true) ||
         !createAndWrite(primitives.data(), primitives.size() * sizeof(RtPrimitiveMetadata),
                         storage, false, "RT primitive metadata", primitiveMetadataBuffer_) ||
         !createAndWrite(materials.data(), materials.size() * sizeof(RtMaterialGpu),
-                        storage, false, "RT material metadata", materialMetadataBuffer_) ||
+                        storage, false, "RT material metadata", materialMetadataBuffer_, true) ||
         !createAndWrite(vertices.data(),
                         vertices.size() * sizeof(horde::scene::assets::StaticRtVertex),
                         geometry, true, "static RT vertices", staticVertexBuffer_) ||
         !createAndWrite(worldVertices.data(), worldVertices.size() * sizeof(worldVertices.front()),
-                        geometry, true, "world player RT vertices", worldPlayerVertexBuffer_) ||
+                        geometry, true, "world player RT vertices", worldPlayerVertexBuffer_, true) ||
         !createAndWrite(viewVertices.empty() ? &unusedViewVertex : viewVertices.data(),
                         std::max<std::size_t>(viewVertices.size(), 1u) * sizeof(unusedViewVertex),
-                        geometry, true, "viewmodel RT vertices", viewmodelVertexBuffer_) ||
+                        geometry, true, "viewmodel RT vertices", viewmodelVertexBuffer_, true) ||
         !createAndWrite(indices.data(), indices.size() * sizeof(std::uint32_t),
                         geometry, true, "static RT indices", staticIndexBuffer_) ||
         !createAndWrite(geometryTransforms.data(),
@@ -2914,7 +2915,9 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
 
     const RtHeldLightGpu initialHeldLight{};
     const std::array<RtFireEmitterGpu, kRtFireEmitterCapacity> initialFireEmitters{};
-    if (!WriteBuffer(vertexBuffer_, vertices.data(), vertexBufferSize, "world vertex", diagnostic) ||
+    if (!gpuResources_.MapBufferForHostWrites(heldLightBuffer_, diagnostic) ||
+        !gpuResources_.MapBufferForHostWrites(fireEmitterBuffer_, diagnostic) ||
+        !WriteBuffer(vertexBuffer_, vertices.data(), vertexBufferSize, "world vertex", diagnostic) ||
         !WriteBuffer(indexBuffer_, indices.data(), indexBufferSize, "world index", diagnostic) ||
         !WriteBuffer(transformBuffer_, &transform, sizeof(transform), "world transform", diagnostic) ||
         !WriteBuffer(heldLightBuffer_, &initialHeldLight, sizeof(initialHeldLight),
@@ -3646,6 +3649,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
                           true,
                           skeletonGpu.vertices,
                           diagnostic) ||
+            !gpuResources_.MapBufferForHostWrites(skeletonGpu.vertices, diagnostic) ||
             !WriteBuffer(skeletonGpu.vertices,
                          skeletonVertices.data(),
                          skeletonVertexBufferSize,
@@ -3737,7 +3741,8 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     {
         return false;
     }
-    if (!WriteBuffer(lichVertexBuffer_, lichSkinnedVertices_.data(), lichVertexBufferSize,
+    if (!gpuResources_.MapBufferForHostWrites(lichVertexBuffer_, diagnostic) ||
+        !WriteBuffer(lichVertexBuffer_, lichSkinnedVertices_.data(), lichVertexBufferSize,
                      "lich vertex", diagnostic))
     {
         return false;
@@ -3884,7 +3889,8 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     {
         return false;
     }
-    if (!WriteBuffer(instanceBuffer_, instances.data(), sizeof(instances), "TLAS instance", diagnostic))
+    if (!gpuResources_.MapBufferForHostWrites(instanceBuffer_, diagnostic) ||
+        !WriteBuffer(instanceBuffer_, instances.data(), sizeof(instances), "TLAS instance", diagnostic))
     {
         return false;
     }
