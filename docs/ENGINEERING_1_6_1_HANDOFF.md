@@ -13,7 +13,25 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
-### October 2 clean contact-policy static admission (latest compile-only step)
+### October 2 S26 report preparation (latest device step)
+
+Owner made the phone available again; continue unfinished device gates without
+repeating availability coordination or accepted performance/player/music work.
+Installed retained Debug35776e1c (child-document candidate23ac884), pulled back
+byte-identically; previous2c93d303, data/stable/volume/fonts preserved. Actual
+SM-S948B RT presentation and consent-off refusal, consented game-only preview,
+READY Home/resume, edit consent reset, note-only preview and Back pass.
+[Finite record/receipts](evidence/2026-10-02-s26-report-ui/README.md).
+No verification/send action yet: one additional Android synthetic report request
+is pending; do not assume approval or repeat the accepted Windows fixture email.
+Capture-pending/in-flight races are host coverage only; S24 UI and S25 unverified.
+Current5ea481d push36969363479/PR36969366368 both SUCCESS. No APK rebuild or
+renderer/player/music change. Audio/haptic manual revalidation:NO.
+Next: approved single Android verification/exchange, or retain that gate open and
+continue independent unfinished checks. The completed static contact-policy
+NO-GO below remains valid; no promotion or completed-test repetition.
+
+### October 2 clean contact-policy static admission (preceding compile-only step)
 
 Isolated e43c11c compile-only High/Shipping probes2/2 compile/optimize/SPIR-V
 validate PASS; actual pipeline280344B, compute280580B,78functions/235calls/

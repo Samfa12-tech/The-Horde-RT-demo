@@ -7,6 +7,16 @@ Shared contract3e0f9be; reviewed native integration69afe4e.
 
 ## October2 remote integration — current slice
 
+Exact S26 Debug preparation/lifecycle admission now passes on retained APK
+35776e1c, installed and pulled back byte-identically. Default-off consent,
+no-consent refusal, consented game-only RT preview, READY Home/resume, edit reset,
+note-only preparation and Back are demonstrated. Real Android verification/send
+is not yet exercised; one additional synthetic email is requested, not assumed
+approved. [Finite continuation record](evidence/2026-10-02-s26-report-ui/README.md)
+supersedes the earlier no-phone-install statements below. Do not repeat accepted
+rows, earlier Windows email or unchanged APK builds. Current5ea481d push and PR
+CI both pass; delivery and capture-pending/in-flight phone races remain separate.
+
 Owner clarified the finished experience: in-game report delivery through the
 existing Briarhold Cloudflare architecture, not primarily local JSON export.
 Owner approved deployment/configuration and one labelled synthetic fixture

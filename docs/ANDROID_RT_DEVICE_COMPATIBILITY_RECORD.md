@@ -1370,6 +1370,23 @@ Pending owner music-focus and S24 live hands/enemy checks remain undisturbed.
 [Finite receipts](evidence/2026-10-02-report-relay/README.md).
 Audio/haptic manual revalidation required:NO (reporting only).
 
+## October 2, 2026 - SM-S948B report preparation/lifecycle evidence
+
+Actual Debug phone UI and RT-readback evidence, not sustained Shipping performance.
+Owner made SM-S948B available; retained APK35776e1c replaced2c93d303 in the Debug
+package only and post-install base.apk matches exactly. Android16 / Adreno840 /
+driver512.842.19 / Vulkan1.4.295, honest RT swapchain presentation, Diagnostic/Mobile
+OpaqueFast1080x2235. No app-data/system-volume/font clear or stable-package change.
+Remote opt-ins default off and no-consent preparation is refused. Consented
+preparation produces a game-only preview; READY Home/resume preserves explicit
+retry, Edit clears consent/preview, note-only preparation omits image and Back
+returns to paused menu. Initial10s launch timeout is retained, not a startup pass.
+No Verify/send action, new email or performance comparison was performed.
+Real Android WebView/delivery and capture-pending/in-flight lifecycle gates remain
+open; host tests do not replace these. S24 report UI and S25 stay unverified.
+[Exact finite receipts](evidence/2026-10-02-s26-report-ui/README.md).
+Audio/haptic manual revalidation required:NO (reporting/readback only).
+
 ## Research sources
 
 - [Android NDK stable APIs - Vulkan runtime capability guidance](https://developer.android.com/ndk/guides/stable_apis)
